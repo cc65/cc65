@@ -21,6 +21,10 @@ initirq:
         .byte   $40             ; Alloc interrupt
         .addr   i_param
         bcs     prterr
+
+        ; Enable interrupts, as old ProDOS versions (i.e. 1.1.1)
+        ; jump to SYS and BIN programs with interrupts disabled.
+        cli
         rts
 
         ; Print error message and exit

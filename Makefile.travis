@@ -24,7 +24,7 @@ endif
 
 SF_USER = oliverschmidt
 SF_HOST = frs.sourceforge.net
-SF_FILE = /home/frs/project/cc65/cc65-snapshot-win64.zip
+SF_FILE = /home/frs/project/cc65/cc65-snapshot-win32.zip
 
 SCPFLAGS = -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -q
 

@@ -126,7 +126,7 @@ mymain(int argc,char **argv)
     } else {
         /* why not using a function pointer ? */
         f = &fact;
-        print_num((*(long (*)())f)(n), base);
+        print_num((*(long (*)(int))f)(n), base);
     }
     printf("\n");
     return 0;

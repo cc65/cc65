@@ -46,9 +46,9 @@
         sta     $94
         sty     $95
 
-        ; Call into the Applesoft Block Transfer Utility -- which handles zero-
+        ; Call into Applesoft Block Transfer Up -- which handles zero-
         ; sized blocks well -- to move the content of the LC memory area.
-        jsr     $D396           ; BLTU + 3
+        jsr     $D39A           ; BLTU2
 
         ; Set the source start address.
         lda     #<__ZPSAVE_RUN__
@@ -68,9 +68,9 @@
         sta     $94
         sty     $95
 
-        ; Call into the Applesoft Block Transfer Utility -- which handles moving
+        ; Call into Applesoft Block Transfer Up -- which handles moving
         ; overlapping blocks upwards well -- to move the INIT segment.
-        jsr     $D396           ; BLTU + 3
+        jsr     $D39A           ; BLTU2
 
         ; Delegate all further processing, to keep the STARTUP segment small.
         jsr     init
@@ -163,10 +163,6 @@ basic:  lda     HIMEM
         ; Set up the C stack.
 :       sta     sp
         stx     sp+1
-
-        ; Enable interrupts, as old ProDOS versions (i.e. 1.1.1)
-        ; jump to SYS and BIN programs with interrupts disabled.
-        cli
 
         ; Call the module constructors.
         jsr     initlib

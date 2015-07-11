@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2015, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -42,7 +42,7 @@
 #ifdef NDEBUG
 #  define assert(expr)
 #else
-extern void _afailed (const char*, unsigned);
+extern void __fastcall__ _afailed (const char*, unsigned);
 #  define assert(expr)  ((expr)? (void)0 : _afailed(__FILE__, __LINE__))
 #endif
 

@@ -22,14 +22,14 @@ READ_CALL          = $CA
 CLOSE_CALL         = $CC
 FILE_NOT_FOUND_ERR = $46
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; ------------------------------------------------------------------------
 
         .import __CODE_0300_SIZE__, __DATA_0300_SIZE__
         .import __CODE_0300_LOAD__, __CODE_0300_RUN__
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; ------------------------------------------------------------------------
 
-.segment        "DATA_2000"
+        .segment        "DATA_2000"
 
 GET_FILE_INFO_PARAM:
                 .byte   $0A             ;PARAM_COUNT
@@ -57,9 +57,9 @@ LOADING:
 ELLIPSES:
                 .byte   " ...", $0D, $0D, $00
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; ------------------------------------------------------------------------
 
-.segment        "DATA_0300"
+        .segment        "DATA_0300"
 
 READ_PARAM:
                 .byte   $04             ;PARAM_COUNT
@@ -81,22 +81,22 @@ QUIT_PARAM:
 
 FILE_NOT_FOUND:
                 .asciiz "... File Not Found"
-                                
+
 ERROR_NUMBER:
                 .asciiz "... Error $"
 
 PRESS_ANY_KEY:
                 .asciiz " - Press Any Key "
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; ------------------------------------------------------------------------
 
-.segment        "CODE_2000"
+        .segment        "CODE_2000"
 
         jmp     :+
         .byte   $EE
         .byte   $EE
-        .byte   65
-STARTUP:.res    65
+        .byte   $7F
+STARTUP:.res    $7F
 
         ; Reset stack
 :       ldx     #$FF
@@ -104,8 +104,8 @@ STARTUP:.res    65
 
         ; Relocate CODE_0300 and DATA_0300
         ldx     #<(__CODE_0300_SIZE__ + __DATA_0300_SIZE__)
-:       lda     __CODE_0300_LOAD__ - 1,x
-        sta     __CODE_0300_RUN__ - 1,x
+:       lda     __CODE_0300_LOAD__-1,x
+        sta     __CODE_0300_RUN__-1,x
         dex
         bne     :-
 
@@ -118,23 +118,23 @@ STARTUP:.res    65
         ; Add trailing '\0' to pathname
         tax
         lda     #$00
-        sta     PATHNAME + 1,x
+        sta     PATHNAME+1,x
 
         ; Copy ProDOS startup filename and trailing '\0' to stack
         ldx     STARTUP
         lda     #$00
-        beq     :++             ; bra
-:       lda     STARTUP + 1,x
+        beq     :++             ; Branch always
+:       lda     STARTUP+1,x
 :       sta     STACK,x
         dex
-        bpl     :--     
+        bpl     :--
 
         ; Provide some user feedback
         lda     #<LOADING
         ldx     #>LOADING
         jsr     PRINT
-        lda     #<(PATHNAME + 1)
-        ldx     #>(PATHNAME + 1)
+        lda     #<(PATHNAME+1)
+        ldx     #>(PATHNAME+1)
         jsr     PRINT
         lda     #<ELLIPSES
         ldx     #>ELLIPSES
@@ -159,16 +159,16 @@ STARTUP:.res    65
 
         ; Get load address from aux-type
         lda     FILE_INFO_ADDR
-        ldx     FILE_INFO_ADDR + 1
+        ldx     FILE_INFO_ADDR+1
         sta     READ_ADDR
-        stx     READ_ADDR + 1
+        stx     READ_ADDR+1
 
         ; It's high time to leave this place
         jmp     __CODE_0300_RUN__
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; ------------------------------------------------------------------------
 
-.segment        "CODE_0300"
+        .segment        "CODE_0300"
 
         jsr     MLI
         .byte   READ_CALL
@@ -180,15 +180,15 @@ STARTUP:.res    65
         .word   CLOSE_PARAM
         bcs     ERROR
 
-        ; Copy REM token and startup filename to BASIC input buffer
+        ; Copy REM and startup filename to BASIC input buffer
         ldx     #$00
-        lda     #$B2
-        bne     :++             ; bra
+        lda     #$B2            ; REM token
+        bne     :++             ; Branch always
 :       inx
-        lda     a:STACK - 1,x
+        lda     a:STACK-1,x
 :       sta     BUF,x
         bne     :--
-        
+
         ; Go for it ...
         jmp     (READ_ADDR)
 
@@ -207,7 +207,7 @@ PRINT:
 :       ora     #$80
         jsr     COUT
         iny
-        bne     :--             ; bra
+        bne     :--             ; Branch always
 :       rts
 
 ERROR:
@@ -216,7 +216,7 @@ ERROR:
         lda     #<FILE_NOT_FOUND
         ldx     #>FILE_NOT_FOUND
         jsr     PRINT
-        beq     :++             ; bra
+        beq     :++             ; Branch always
 :       pha
         lda     #<ERROR_NUMBER
         ldx     #>ERROR_NUMBER
@@ -230,5 +230,3 @@ ERROR:
         jsr     MLI
         .byte   QUIT_CALL
         .word   QUIT_PARAM
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

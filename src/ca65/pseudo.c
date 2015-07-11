@@ -1964,6 +1964,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoA16           },
     { ccNone,           DoA8            },
     { ccNone,           DoAddr          },      /* .ADDR */
+    { ccNone,           DoUnexpected    },      /* .ADDRSIZE */
     { ccNone,           DoAlign         },
     { ccNone,           DoASCIIZ        },
     { ccNone,           DoAssert        },
@@ -2039,6 +2040,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoIncBin        },
     { ccNone,           DoInclude       },
     { ccNone,           DoInterruptor   },
+    { ccNone,           DoUnexpected    },      /* .ISMNEMONIC */
     { ccNone,           DoInvalid       },      /* .LEFT */
     { ccNone,           DoLineCont      },
     { ccNone,           DoList          },

@@ -135,6 +135,7 @@ struct DotKeyword {
     { ".A16",           TOK_A16         },
     { ".A8",            TOK_A8          },
     { ".ADDR",          TOK_ADDR        },
+    { ".ADDRSIZE",      TOK_ADDRSIZE    },
     { ".ALIGN",         TOK_ALIGN       },
     { ".AND",           TOK_BOOLAND     },
     { ".ASCIIZ",        TOK_ASCIIZ      },
@@ -222,6 +223,8 @@ struct DotKeyword {
     { ".INCBIN",        TOK_INCBIN      },
     { ".INCLUDE",       TOK_INCLUDE     },
     { ".INTERRUPTOR",   TOK_INTERRUPTOR },
+    { ".ISMNEM",        TOK_ISMNEMONIC  },
+    { ".ISMNEMONIC",    TOK_ISMNEMONIC  },
     { ".LEFT",          TOK_LEFT        },
     { ".LINECONT",      TOK_LINECONT    },
     { ".LIST",          TOK_LIST        },
@@ -723,7 +726,24 @@ static token_t FindDotKeyword (void)
     R = bsearch (&K, DotKeywords, sizeof (DotKeywords) / sizeof (DotKeywords [0]),
                  sizeof (DotKeywords [0]), CmpDotKeyword);
     if (R != 0) {
+
+        /* By default, disable any somewhat experiemental DotKeyword. */
+
+        switch (R->Tok) {
+
+            case TOK_ADDRSIZE:
+                /* Disallow .ADDRSIZE function by default */
+                if (AddrSize == 0) {
+                    return TOK_NONE;
+                }
+                break;
+
+            default:
+                break;
+        }
+
         return R->Tok;
+
     } else {
         return TOK_NONE;
     }

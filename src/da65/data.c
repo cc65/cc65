@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2007 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2014, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -65,12 +65,12 @@ static unsigned GetSpan (attr_t Style)
         attr_t Attr;
         if (MustDefLabel(PC+Count)) {
             break;
-        }           
+        }
         Attr = GetAttr (PC+Count);
         if ((Attr & atStyleMask) != Style) {
             break;
         }
-        if ((Attr & atSegmentChange)) {
+        if ((Attr & (atSegmentStart | atSegmentEnd))) {
             break;
         }
         ++Count;

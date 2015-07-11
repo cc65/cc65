@@ -9,6 +9,7 @@
 
 #include <assert.h>
 #include <string.h>
+#include <stdio.h>
 typedef unsigned char U8;
 char var = 0xf0;
 char fn(char bar)

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2013, Ullrich von Bassewitz                                      */
+/* (C) 2000-2015, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -104,6 +104,7 @@ static void Usage (void)
             "\n"
             "Long options:\n"
             "  --add-source\t\t\tInclude source as comment\n"
+            "  --all-cdecl\t\t\tMake functions default to __cdecl__\n"
             "  --bss-name seg\t\tSet the name of the BSS segment\n"
             "  --check-stack\t\t\tGenerate stack overflow checks\n"
             "  --code-name seg\t\tSet the name of the CODE segment\n"
@@ -258,6 +259,10 @@ static void SetSys (const char* Sys)
             DefineNumericMacro ("__SIM65C02__", 1);
             break;
 
+        case TGT_OSIC1P:
+            DefineNumericMacro ("__OSIC1P__", 1);
+            break;
+
         case TGT_PCENGINE:
             DefineNumericMacro ("__PCE__", 1);
             break;
@@ -346,6 +351,15 @@ static void OptAddSource (const char* Opt attribute ((unused)),
 /* Add source lines as comments in generated assembler file */
 {
     AddSource = 1;
+}
+
+
+
+static void OptAllCDecl (const char* Opt attribute ((unused)),
+                         const char* Arg attribute ((unused)))
+/* Make functions default to cdecl instead of fastcall. */
+{
+    AutoCDecl = 1;
 }
 
 
@@ -790,6 +804,7 @@ int main (int argc, char* argv[])
     /* Program long options */
     static const LongOpt OptTab[] = {
         { "--add-source",       0,      OptAddSource            },
+        { "--all-cdecl",        0,      OptAllCDecl             },
         { "--bss-name",         1,      OptBssName              },
         { "--check-stack",      0,      OptCheckStack           },
         { "--code-name",        1,      OptCodeName             },

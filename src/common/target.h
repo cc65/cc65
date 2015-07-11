@@ -64,6 +64,7 @@ typedef enum {
     TGT_PLUS4,
     TGT_CBM510,
     TGT_CBM610,
+    TGT_OSIC1P,
     TGT_PET,
     TGT_BBC,
     TGT_APPLE2,

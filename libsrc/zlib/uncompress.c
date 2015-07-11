@@ -6,8 +6,8 @@
 
 #include <zlib.h>
 
-int uncompress (char* dest, unsigned* destLen,
-                const char* source, unsigned sourceLen)
+int __fastcall__ uncompress (char* dest, unsigned* destLen,
+                             const char* source, unsigned sourceLen)
 {
         unsigned len;
         unsigned char* ptr;

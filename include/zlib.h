@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2001 Piotr Fusik <fox@scene.pl>                                  */
+/* (C) 2000-2015 Piotr Fusik <fox@scene.pl>                                  */
 /*                                                                           */
 /* This file is based on the zlib.h from 'zlib' general purpose compression  */
 /* library, version 1.1.3, (C) 1995-1998 Jean-loup Gailly and Mark Adler.    */
@@ -83,8 +83,8 @@ unsigned __fastcall__ inflatemem (char* dest, const char* source);
 */
 
 
-int uncompress (char* dest, unsigned* destLen,
-                const char* source, unsigned sourceLen);
+int __fastcall__ uncompress (char* dest, unsigned* destLen,
+                             const char* source, unsigned sourceLen);
 /*
    Original zlib description:
 

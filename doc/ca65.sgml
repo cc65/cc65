@@ -1279,6 +1279,35 @@ Pseudo functions expect their arguments in parenthesis, and they have a result,
 either a string or an expression.
 
 
+<sect1><tt>.ADDRSIZE</tt><label id=".ADDRSIZE"><p>
+
+  The <tt/.ADDRSIZE/ function is used to return the interal address size 
+  associated with a symbol. This can be helpful in macros when knowing the address 
+  size of symbol can help with custom instructions.
+
+  Example:
+
+  <tscreen><verb>
+        .macro myLDA foo
+                .if .ADDRSIZE(foo) = 1
+                        ;do custom command based on zeropage addressing:
+                        .byte 0A5h, foo
+                .elseif .ADDRSIZE(foo) = 2
+                        ;do custom command based on absolute addressing:
+                        .byte 0ADh
+                        .word foo
+                .elseif .ADDRSIZE(foo) = 0
+                        ; no address size defined for this symbol:
+                        .out .sprintf("Error, address size unknown for symbol %s", .string(foo))
+                .endif
+        .endmacro
+  </verb></tscreen>
+
+  This command is new and must be enabled with the <tt/.FEATURE addrsize/ command.
+
+  See: <tt><ref id=".FEATURE" name=".FEATURE"></tt>
+
+
 <sect1><tt>.BANK</tt><label id=".BANK"><p>
 
   The <tt/.BANK/ function is used to support systems with banked memory. The
@@ -2287,6 +2316,24 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
+<sect1><tt>.ISMNEM, .ISMNEMONIC</tt><label id=".ISMNEMONIC"><p>
+
+  Builtin function. The function expects an identifier as argument in braces.
+  The argument is evaluated, and the function yields "true" if the identifier
+  is defined as an instruction mnemonic that is recognized by the assembler.
+  Example:
+
+  <tscreen><verb>
+  	.if  	.not .ismnemonic(ina)
+  	  	.macro ina
+  	  	  	clc
+  	  	  	adc #$01
+  	  	.endmacro
+  	.endif
+
+  </verb></tscreen>
+
+
 <sect1><tt>.DESTRUCTOR</tt><label id=".DESTRUCTOR"><p>
 
   Export a symbol and mark it as a module destructor. This may be used
@@ -2595,6 +2642,12 @@ Here's a list of all control commands and a description, what they do:
   The following features are available:
 
   <descrip>
+
+  <tag><tt>addrsize</tt><label id="addrsize"></tag>
+
+    Enables the .ADDRSIZE pseudo function. This function is experimental and not enabled by default.
+
+    See also: <tt><ref id=".ADDRSIZE" name=".ADDRSIZE"></tt>
 
   <tag><tt>at_in_identifiers</tt><label id="at_in_identifiers"></tag>
 
@@ -4418,6 +4471,7 @@ compiler, depending on the target system selected:
 <item><tt/__LUNIX__/ - Target system is <tt/lunix/
 <item><tt/__LYNX__/ - Target system is <tt/lynx/
 <item><tt/__NES__/ - Target system is <tt/nes/
+<item><tt/__OSIC1P__/ - Target system is <tt/osic1p/
 <item><tt/__PET__/ - Target system is <tt/pet/
 <item><tt/__PLUS4__/ - Target system is <tt/plus4/
 <item><tt/__SIM6502__/ - Target system is <tt/sim6502/

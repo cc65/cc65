@@ -3,7 +3,7 @@
 <article>
 <title>Defining a Custom cc65 Target
 <author>Bruce Reidenbach
-<date>2010-02-22
+<date>2015-03-13
 
 <abstract>
 This section provides step-by-step instructions on how to use the cc65
@@ -525,15 +525,16 @@ The first step in creating the assembly language code for the driver is
 to determine how to pass the C arguments to the assembly language
 routine.  The cc65 toolset allows the user to specify whether the data
 is passed to a subroutine via the stack or by the processor registers by
-using the <tt>__fastcall__</tt> function declaration (note that there
-are two underscore characters in front of and two behind the
-<tt>fastcall</tt> declaration).  When <tt>__fastcall__</tt> is
-specified, the rightmost argument in the function call is passed to the
+using the <tt/__fastcall__/ and <tt/__cdecl__/ function qualifiers (note that
+there are two underscore characters in front of and two behind each
+qualifier).  <tt/__fastcall__/ is the default.  When <tt/__cdecl__/ <em/isn't/
+specified, and the function isn't variadic (i.e., its prototype doesn't have
+an ellipsis), the rightmost argument in the function call is passed to the
 subroutine using the 6502 registers instead of the stack.  Note that if
 there is only one argument in the function call, the execution overhead
 required by the stack interface routines is completely avoided.
 
-Without <tt>__fastcall__</tt>, the argument is loaded in the A and X
+With <tt/__cdecl__</tt>, the last argument is loaded into the A and X
 registers and then pushed onto the stack via a call to <tt>pushax</tt>.
 The first thing the subroutine does is retrieve the argument from the
 stack via a call to <tt>ldax0sp</tt>, which copies the values into the A
@@ -561,7 +562,7 @@ _foo:   jsr     ldax0sp    ;  Retrieve A and X from the stack
         jmp     incsp2     ;  Pop A and X from the stack (includes return)
 </verb></tscreen>
 
-If <tt>__fastcall__</tt> is specified, the argument is loaded into the A
+If <tt/__cdecl__/ isn't specified, then the argument is loaded into the A
 and X registers as before, but the subroutine is then called
 immediately.  The subroutine does not need to retrieve the argument
 since the value is already available in the A and X registers.

@@ -1,12 +1,17 @@
+;
+; PCE definitions. By Groepaz/Hitmem.
+;
 
-; Write VDC register
-                  .macro VREG arg1,arg2
-                        st0     #arg1
-                        st1     #<(arg2)
-                        st2     #>(arg2)
-                  .endmacro
+;; FIXME: optimize zeropage usage
 
-_tickcount= $20
+CURS_X      = $30
+CURS_Y      = $31
+SCREEN_PTR  = $32       ;2
+CRAM_PTR    = $34       ;2
+CHARCOLOR   = $36
+RVS         = $37
+BGCOLOR     = $38
+_tickcount  = $39       ;2
 
 screenrows = (224/8)
 charsperline = (512/8)
@@ -14,14 +19,6 @@ xsize = charsperline
 
 CH_HLINE = 7
 CH_VLINE = 7
-
-CURS_X	= $30
-CURS_Y	= $31
-SCREEN_PTR = $32
-CRAM_PTR = $34
-CHARCOLOR = $36
-RVS = $37   
-BGCOLOR=$38
 
 ; huc6270 - Video Display Controller (vdc)
 
@@ -45,9 +42,9 @@ VDC_DESR =16 ; (DMA) Destination Register
 VDC_LENR =17 ; (DMA) Length Register
 VDC_SATB =18 ; Sprite Attribute Table
 
-VDC_CTRL 	= $0000
-VDC_DATA_LO = $0002
-VDC_DATA_HI = $0003
+VDC_CTRL        = $0000
+VDC_DATA_LO     = $0002
+VDC_DATA_HI     = $0003
 
 ; huc6260 - Video Color Encoder (vce)
 
@@ -61,17 +58,16 @@ VCE_ADDR_HI = $0403 ; MSB of byte offset into palette
 VCE_DATA_LO = $0404 ; LSB of 16-bit palette data
 VCE_DATA_HI = $0405 ; MSB of 16-bit palette data
 
-TIMER_COUNT = $0c00
-TIMER_CTRL	= $0c01
+TIMER_COUNT     = $0c00
+TIMER_CTRL      = $0c01
 
-JOY_CTRL	= $1000
+JOY_CTRL        = $1000
 
-IRQ_MASK	= $1402
-IRQ_STATUS	= $1403
+IRQ_MASK        = $1402
+IRQ_STATUS      = $1403
 
 CDR_MEM_DISABLE = $1803
 CDR_MEM_ENABLE  = $1807
-
 
 ;; lda abs
 .macro ldaio arg1
@@ -87,4 +83,11 @@ CDR_MEM_ENABLE  = $1807
 .macro stzio arg1
         .byte $9c
         .word arg1
+.endmacro
+
+; Write VDC register
+.macro VREG arg1,arg2
+        st0     #arg1
+        st1     #<(arg2)
+        st2     #>(arg2)
 .endmacro

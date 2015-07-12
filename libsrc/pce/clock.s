@@ -1,17 +1,15 @@
 ;
-; Ullrich von Bassewitz, 21.09.1998
-;
 ; clock_t clock (void);
 ;
 
-        .include "pcengine.inc"
+        .include "pce.inc"
 
-        .export  	_clock
+        .export         _clock
         .importzp       sreg
- 
-.proc	_clock
 
-        ldy #0  	    	; Byte 3 is always zero
+.proc   _clock
+
+        ldy #0                  ; Byte 3 is always zero
         sty sreg+1
         sty sreg
 
@@ -20,4 +18,3 @@
         rts
 
 .endproc
-

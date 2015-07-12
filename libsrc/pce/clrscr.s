@@ -1,5 +1,5 @@
 
-                .include "pcengine.inc"
+                .include "pce.inc"
 
                 .export _clrscr
 _clrscr:

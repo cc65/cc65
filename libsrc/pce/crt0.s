@@ -24,7 +24,7 @@
 	.import		__DATA_LOAD__,__DATA_RUN__, __DATA_SIZE__	; Linker generated
 	.import __BSS_SIZE__
 
-	.include "pcengine.inc"
+	.include "pce.inc"
 
     .importzp       sp
 	.importzp	ptr1,ptr2
@@ -84,10 +84,9 @@ start:
                 sta     IRQ_MASK     ; Interrupts off
                 stz     IRQ_STATUS   ; Acknowledge timer
 
-                ;; i dont know why the heck this one doesnt
-                ;; work when called from a constructor :/
-                        .import vdc_init
-                        jsr     vdc_init
+                ;; FIXME; i dont know why the heck this one doesnt work when called from a constructor :/
+                .import vdc_init
+                jsr     vdc_init
 
 ;;                        jsr     joy_init
 
@@ -167,6 +166,7 @@ start:
 
   		jsr	initlib
 
+  		;; FIXME: this should be called from a constructor instead
 		.import initconio
 		jsr initconio
 

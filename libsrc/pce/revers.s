@@ -1,5 +1,5 @@
 
-    .export _revers
+            .export _revers
 _revers:
-    lda #0
-    rts     
+            lda #0
+            rts

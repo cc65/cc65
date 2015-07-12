@@ -94,9 +94,3 @@ getbyt:
 ;;getbyt_:
 	lda	$FFFF,y
 	rts
-
-;; callax doesnt work? why?!
-;_callax:
-;    sta @l+1
-;    stx @l+2
-;@l: jmp $dead

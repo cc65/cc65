@@ -1,4 +1,6 @@
 
+; VGA charset for the PC-Engine conio implementation
+
         .byte     $00, $00, $00, $00, $00, $00, $00, $00 
         .byte     $7E, $81, $A5, $81, $BD, $99, $81, $7E 
         .byte     $7E, $FF, $DB, $FF, $C3, $E7, $FF, $7E 

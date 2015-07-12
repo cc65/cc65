@@ -1,15 +1,12 @@
 
-				.include "pcengine.inc"
+                        .include "pcengine.inc"
 
 HIRES = 1
 
-            .export vdc_init
+                        .export vdc_init
 
 vdc_init:
-                        ;;lda     $0000
-						;;.byte $ad,0,0
-
-						ldaio	VDC_CTRL
+                        ldaio   VDC_CTRL
 
                         VREG    $00, $0000 ; MAWR
                         VREG    $01, $0000 ; MARR
@@ -39,8 +36,5 @@ vdc_init:
 
                         .endif
 
-                        ;;lda     $0000
-						;;.byte $ad,0,0
-
-						ldaio VDC_CTRL
+                        ldaio VDC_CTRL
                         rts

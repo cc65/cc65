@@ -1,6 +1,7 @@
 
- 						.include "pcengine.inc"
-            .export vce_init
+                        .include "pcengine.inc"
+
+                        .export vce_init
 
 vce_init:
                         stz     VCE_ADDR_LO   ;

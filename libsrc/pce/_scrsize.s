@@ -2,16 +2,14 @@
 ; Screen size variables
 ;
 
-
-
-.export _screensize
+                .export _screensize
 _screensize:
-        ldx     xsize
-        ldy     ysize
-        rts
+                ldx     xsize
+                ldy     ysize
+                rts
 
 .rodata
-	.export		xsize, ysize
+                .export xsize, ysize
 
-xsize: 	.byte 64
-ysize:	.byte 28
+xsize:          .byte 64
+ysize:          .byte 28

@@ -43,56 +43,60 @@ start:
 
 ; setup the CPU and System-IRQ
 
-                        ; Initialize CPU
+                ; Initialize CPU
 
-                        sei
-                        nop
-                        csh
-                        nop
-                        cld
-                        nop
+                sei
+                nop
+                csh     ; set high speed CPU mode
+                nop
+                cld
+                nop
 
-                        ; Setup stack and memory mapping
-                        ldx     #$FF    ; Stack top ($21FF)
-                        txs
-                        txa
-                        tam     #0      ; 0000-1FFF = Hardware page
+                ; Setup stack and memory mapping
+                ldx     #$FF    ; Stack top ($21FF)
+                txs
 
-                        lda     #$F8
-                        tam     #1      ; 2000-3FFF = Work RAM
+                ; at startup all MPRs are set to 0, so init them
+                lda     #$ff
+                tam     #1         ; 0000-1FFF = Hardware page
+                lda     #$F8
+                tam     #2         ; 2000-3FFF = Work RAM
+                ;lda     #$F7
+                ;tam     #2      ; 4000-5FFF = Save RAM
+                ;lda     #1
+                ;tam     #3      ; 6000-7FFF  Page 2
+                ;lda     #2
+                ;tam     #4      ; 8000-9FFF  Page 3
+                ;lda     #3
+                ;tam     #5      ; A000-BFFF  Page 4
+                ;lda     #4
+                ;tam     #6      ; C000-DFFF  Page 5
+                ;lda     #0
+                ;tam     #7      ; e000-fFFF  hucard/syscard bank 0
 
-                        lda     #$F7
-                        tam     #2      ; 4000-5FFF = Save RAM
+                ; Clear work RAM (2000-3FFF)
+                stz     <$00
+                tii     $2000, $2001, $1FFF
 
-						lda 	#1
-                        tam     #3      ; 6000-7FFF  Page 2
-						lda 	#2
-                        tam     #4      ; 8000-9FFF  Page 3
-						lda 	#3
-                        tam     #5      ; A000-BFFF  Page 4
-						lda 	#4
-                        tam     #6      ; C000-DFFF  Page 5
+                ; Initialize hardware
+                stz     TIMER_COUNT   ; Timer off
+                lda     #$07
+                sta     IRQ_MASK     ; Interrupts off
+                stz     IRQ_STATUS   ; Acknowledge timer
 
-                        ; Initialize hardware
-                        stz     TIMER_COUNT   ; Timer off
-                        lda     #$07
-                        sta     IRQ_MASK     ; Interrupts off
-                        stz     IRQ_STATUS   ; Acknowledge timer
+                ;; i dont know why the heck this one doesnt
+                ;; work when called from a constructor :/
+                        .import vdc_init
+                        jsr     vdc_init
 
-                        ; Clear work RAM
-                        stz     <$00
-                        tii     $2000, $2001, $1FFF
-
-						;; i dont know why the heck this one doesnt
-						;; work when called from a constructor :/
-						.import vdc_init
-						jsr     vdc_init
 ;;                        jsr     joy_init
 
-                        ; Turn on background and VD interrupt/IRQ1
-                        lda     #$05
-                        sta     IRQ_MASK           ; IRQ1=on
-                        cli
+                ; Turn on background and VD interrupt/IRQ1
+
+                lda     #$05
+                sta     IRQ_MASK           ; IRQ1=on
+
+                cli
 
 ; Clear the BSS data
 
@@ -162,8 +166,10 @@ start:
 ; Call module constructors
 
   		jsr	initlib
-;		.import initconio
-;		jsr initconio
+
+		.import initconio
+		jsr initconio
+
 ; Pass an empty command line
 
 
@@ -189,34 +195,34 @@ _exit:
 ; ------------------------------------------------------------------------
 
 _irq1:
-                        pha
-                        phx
-                        phy
+                pha
+                phx
+                phy
 
 
-		inc _tickcount
-		bne @s
-		inc _tickcount+1
+                inc _tickcount
+                bne @s
+                inc _tickcount+1
 @s:
 
-                        ; Acknowlege interrupt
-						ldaio VDC_CTRL
+                ; Acknowlege interrupt
+                ldaio VDC_CTRL
 
-						ply
-                        plx
-                        pla
-                        rti
+                ply
+                plx
+                pla
+                rti
 _irq2:
-                        rti
+                rti
 _nmi:
-                        rti
+                rti
 _timer:
-                        stz     IRQ_STATUS
-                        rti
+                stz     IRQ_STATUS
+                rti
 
-	.export initmainargs
+                .export initmainargs
 initmainargs:
-	rts
+                rts
 
 ; ------------------------------------------------------------------------
 ; hardware vectors

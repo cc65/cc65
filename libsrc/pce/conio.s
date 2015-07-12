@@ -5,7 +5,6 @@
                 .import vdc_init
 
                 .export initconio
-                .export _conio_init
 
                 .constructor initconio, 24
 
@@ -46,8 +45,6 @@ set_palette:
                 stz     VCE_DATA_LO
                 stz     VCE_DATA_HI
 
-                ; so it will get linked in
-_conio_init:
                 rts
 
 ;----------------------------------------------------------------------------

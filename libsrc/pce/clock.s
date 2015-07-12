@@ -9,10 +9,10 @@
 
 .proc   _clock
 
-        ldy #0                  ; Byte 3 is always zero
-        sty sreg+1
-        sty sreg
-
+        lda _tickcount+3
+        sta sreg+1
+        lda _tickcount+2
+        sta sreg
         ldx _tickcount+1
         lda _tickcount
         rts

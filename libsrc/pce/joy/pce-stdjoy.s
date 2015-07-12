@@ -25,11 +25,6 @@
 
 ; Button state masks (8 values)
 
-;extern const unsigned char joy_masks[8];
-
-        .export _joy_masks
-
-_joy_masks:
         .byte   $10                     ; JOY_UP
         .byte   $40                     ; JOY_DOWN
         .byte   $80                     ; JOY_LEFT

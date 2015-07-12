@@ -9,6 +9,7 @@ void main(void)
 {
     int stackvar = 42;
     int i, j;
+    clock_t clk;
 
     joy_install(&joy_static_stddrv);
 
@@ -39,7 +40,9 @@ void main(void)
         ++datavar; ++stackvar;
 
         gotoxy(0,8);
-        cprintf("clock: %08x", clock());
+        clk = clock();
+        cprintf("clock: %08lx", clk);
+        
         for (i = 0; i < 4; ++i)
         {
             gotoxy(0, 12 + i);

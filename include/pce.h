@@ -28,12 +28,8 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef _PCE_H
 #define _PCE_H
-
-
 
 /* Check for errors */
 #if !defined(__PCE__)
@@ -69,8 +65,8 @@
 #define COLOR_LIGHTBLUE         0x0E
 #define COLOR_GRAY3             0x0F
 
-#define CLOCKS_PER_SEC          50      // ???
-#define CLK_TCK                 50      // ?!?
+#define CLOCKS_PER_SEC          50      // FIXME: is this correct?
+#define CLK_TCK                 50      // FIXME: is this correct?
 
 #define TV_NTSC                 0
 #define TV_PAL                  1

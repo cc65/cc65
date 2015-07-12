@@ -11,7 +11,7 @@ CRAM_PTR    = $34       ;2
 CHARCOLOR   = $36
 RVS         = $37
 BGCOLOR     = $38
-_tickcount  = $39       ;2
+_tickcount  = $39       ;4
 
 screenrows = (224/8)
 charsperline = (512/8)
@@ -74,11 +74,13 @@ CDR_MEM_ENABLE  = $1807
         .byte $ad
         .word arg1
 .endmacro
+
 ;; sta abs
 .macro staio arg1
         .byte $8d
         .word arg1
 .endmacro
+
 ;; stz abs
 .macro stzio arg1
         .byte $9c

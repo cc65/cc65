@@ -42,7 +42,7 @@ void main(void)
         gotoxy(0,8);
         clk = clock();
         cprintf("clock: %08lx", clk);
-        
+
         for (i = 0; i < 4; ++i)
         {
             gotoxy(0, 12 + i);

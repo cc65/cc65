@@ -55,3 +55,9 @@ colors:               ; G      R      B
                 .word ((7<<6)+(4<<3)+(4))           ; d light green
                 .word ((4<<6)+(4<<3)+(7))           ; e light blue
                 .word ((6<<6)+(6<<3)+(6))           ; f light gray
+
+;-------------------------------------------------------------------------------
+; force the init constructor to be imported
+
+                .import initconio
+conio_init = initconio

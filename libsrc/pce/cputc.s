@@ -91,3 +91,9 @@ putchar:
                 staio VDC_DATA_HI
 
                 rts
+
+;-------------------------------------------------------------------------------
+; force the init constructor to be imported
+
+                .import initconio
+conio_init = initconio

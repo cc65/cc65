@@ -149,10 +149,6 @@ start:
                 ; Call module constructors
                 jsr        initlib
 
-                ;; FIXME: this should be called from a constructor instead
-                .import initconio
-                jsr initconio
-
                 ; Pass an empty command line
                 jsr     push0                ; argc
                 jsr     push0                ; argv

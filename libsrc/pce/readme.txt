@@ -13,11 +13,10 @@ get_tv() is missing
 
 some graphical petscii chars should get added to the charset
 
-conio-init should get initialized from a constructor rather than always get
-called from crt0 (which for some reason doesnt work) -> see conio.s, it should
-get linked if _any_ of the conio function is used
-
 interruptor support in crt0 (and cfg) is missing
+
+conio lacks support for different screen sizes, which could be used with
+different video modes
 
 --------------------------------------------------------------------------------
 

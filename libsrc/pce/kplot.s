@@ -29,4 +29,9 @@ _plothi:
                     .byte >($0000+(line*$80))
                 .endrepeat
 
+;-------------------------------------------------------------------------------
+; force the init constructor to be imported
+
+                .import initconio
+conio_init = initconio
 

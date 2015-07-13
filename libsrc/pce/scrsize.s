@@ -8,6 +8,8 @@ _screensize:
                 ldy     ysize
                 rts
 
+; FIXME: changing the video mode allows for different screen sizes
+
 .rodata
                 .export xsize, ysize
 

@@ -11,7 +11,7 @@ CRAM_PTR    = $34       ;2
 CHARCOLOR   = $36
 RVS         = $37
 BGCOLOR     = $38
-_tickcount  = $39       ;4
+tickcount   = $39       ;4
 
 screenrows = (224/8)
 charsperline = (512/8)

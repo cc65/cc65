@@ -6,15 +6,16 @@
 
         .export         _clock
         .importzp       sreg
+;;        .importzp       tickcount
 
 .proc   _clock
 
-        lda _tickcount+3
+        lda tickcount+3
         sta sreg+1
-        lda _tickcount+2
+        lda tickcount+2
         sta sreg
-        ldx _tickcount+1
-        lda _tickcount
+        ldx tickcount+1
+        lda tickcount
         rts
 
 .endproc

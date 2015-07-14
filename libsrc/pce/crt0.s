@@ -174,13 +174,13 @@ _irq1:
                 phy
 
 
-                inc _tickcount
+                inc tickcount
                 bne @s1
-                inc _tickcount+1
+                inc tickcount+1
                 bne @s1
-                inc _tickcount+2
+                inc tickcount+2
                 bne @s1
-                inc _tickcount+3
+                inc tickcount+3
 @s1:
                 ; Acknowlege interrupt
                 ldaio VDC_CTRL

@@ -14,6 +14,7 @@ get_tv() is missing
 some graphical petscii chars should get added to the charset
 
 interruptor support in crt0 (and cfg) is missing
+- clock() should be hooked to a VBL interrupt
 
 conio lacks support for different screen sizes, which could be used with
 different video modes

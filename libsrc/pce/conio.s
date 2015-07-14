@@ -59,18 +59,18 @@ conio_init:
                 st2     #>$2000
 
                 ; ptr to font data
-                lda 	#<font
-                sta	 	ptr1
-                lda 	#>font
-                sta	 	ptr1+1
+                lda     #<font
+                sta     ptr1
+                lda     #>font
+                sta     ptr1+1
 
-                st0     #VDC_VWR            ; VWR
+                st0     #VDC_VWR        ; VWR
                 ldy     #$80            ; 128 chars
 charloop:       ldx     #$08            ; 8 bytes/char
 lineloop:
                 lda (ptr1)
-                staio	VDC_DATA_LO       ; bitplane 0
-                stzio	VDC_DATA_HI       ; bitplane 1
+                staio   VDC_DATA_LO     ; bitplane 0
+                stzio   VDC_DATA_HI     ; bitplane 1
 
                 clc                     ; increment font pointer
                 lda     ptr1
@@ -90,9 +90,9 @@ fillloop:       st1     #$00
                 bne     charloop        ; next character
 
                 ldx #0
-                stx	BGCOLOR
+                stx     BGCOLOR
                 inx
-                stx	CHARCOLOR
+                stx     CHARCOLOR
 
 
                 rts

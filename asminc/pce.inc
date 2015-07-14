@@ -52,11 +52,21 @@ VDC_DATA_HI     = $0003
 ; bitmap of the palette data is this: 0000000gggrrrbbb.
 ; You can read and write the DAC-registers.
 
-VCE_CTRL = $0400    ; write$00 to reset
+VCE         = $0400 ; base
+
+VCE_CTRL    = $0400 ; write$00 to reset
 VCE_ADDR_LO = $0402 ; LSB of byte offset into palette
 VCE_ADDR_HI = $0403 ; MSB of byte offset into palette
 VCE_DATA_LO = $0404 ; LSB of 16-bit palette data
 VCE_DATA_HI = $0405 ; MSB of 16-bit palette data
+
+; programmable sound generator (PSG)
+
+PSG             = $0800 ; base
+
+; timer
+
+TIMER           = $0c00 ; base
 
 TIMER_COUNT     = $0c00
 TIMER_CTRL      = $0c01

@@ -2,6 +2,8 @@
 #include <conio.h>
 #include <time.h>
 #include <joystick.h>
+#include <string.h>
+#include <stdlib.h>
 
 static int datavar = 10;
 
@@ -10,6 +12,7 @@ void main(void)
     int stackvar = 42;
     int i, j;
     clock_t clk;
+    char *p;
 
     joy_install(&joy_static_stddrv);
 
@@ -30,6 +33,15 @@ void main(void)
     j = joy_count();
     gotoxy(0,10);
     cprintf("Found %d Joysticks.", j);
+
+    for (i = 0; i < 4; ++i) {
+        gotoxy(0, 17 + i);
+        p = malloc(16);
+        memcpy(p, "01234567890abcdef", 16);
+        cprintf("alloced at: %04p - %c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c", p,
+            p[0],p[1],p[2],p[3],p[4],p[5],p[6],p[7],p[8],p[9],p[10],p[11],p[12],p[13],p[14],p[15]
+        );
+    }
 
     for(;;)
     {

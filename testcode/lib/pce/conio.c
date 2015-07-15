@@ -43,8 +43,22 @@ void main(void)
         );
     }
 
-    for(;;)
-    {
+    i = get_tv();
+    gotoxy(30,0);
+    cputs("TV Mode: ");
+    switch(i) {
+        case TV_NTSC:
+            cputs("NTSC");
+            break;
+        case TV_PAL:
+            cputs("PAL");
+            break;
+        case TV_OTHER:
+            cputs("OTHER");
+            break;
+    }
+
+    for(;;) {
         gotoxy(13,4);
         cprintf("%02x", datavar);
         gotoxy(13,5);
@@ -68,6 +82,7 @@ void main(void)
                      (j & joy_masks[JOY_FIRE])?  " fire " : " ---- ",
                      (j & joy_masks[JOY_FIRE2])? "fire2 " : " ---- ");
         }
+        waitvblank();
     }
     for(;;);
 }

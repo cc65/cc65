@@ -83,8 +83,8 @@ extern void pce_stdjoy_joy[];       /* Referred to by joy_static_stddrv[] */
 void waitvblank (void);
 /* Wait for the vertical blanking */
 
-/* FIXME: not implemented */
-unsigned char get_tv (void);
+/* all PCE are NTSC */
+#define get_tv() TV_NTSC
 /* Return the video mode the machine is using. */
 
 

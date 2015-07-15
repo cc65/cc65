@@ -8,9 +8,6 @@ joystick support should get verified on real hw
 
 revers() is a dummy function, actual reverse output is not supported yet
 
-waitvblank() is missing
-get_tv() is missing
-
 some graphical petscii chars should get added to the charset
 
 interruptor support in crt0 (and cfg) is missing

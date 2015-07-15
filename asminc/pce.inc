@@ -42,6 +42,9 @@ VDC_DESR =16 ; (DMA) Destination Register
 VDC_LENR =17 ; (DMA) Length Register
 VDC_SATB =18 ; Sprite Attribute Table
 
+; VDC port
+; Note: absolute addressing mode must be used when writing to this port
+
 VDC_CTRL        = $0000
 VDC_DATA_LO     = $0002
 VDC_DATA_HI     = $0003
@@ -78,24 +81,6 @@ IRQ_STATUS      = $1403
 
 CDR_MEM_DISABLE = $1803
 CDR_MEM_ENABLE  = $1807
-
-;; lda abs
-.macro ldaio arg1
-        .byte $ad
-        .word arg1
-.endmacro
-
-;; sta abs
-.macro staio arg1
-        .byte $8d
-        .word arg1
-.endmacro
-
-;; stz abs
-.macro stzio arg1
-        .byte $9c
-        .word arg1
-.endmacro
 
 ; Write VDC register
 .macro VREG arg1,arg2

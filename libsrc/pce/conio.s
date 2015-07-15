@@ -4,8 +4,6 @@
                 .import psg_init
                 .import vdc_init
 
-                .export initconio
-
                 .constructor initconio, 24
 
                 .macpack longbranch
@@ -28,17 +26,19 @@ set_palette:
 
                 ldx #0
 @lp:
-                .repeat 16
-                lda colors,x
+                ldy     #16
+@lp1:
+                lda     colors,x
                 sta     VCE_DATA_LO
-                lda colors+1,x
+                lda     colors+1,x
                 sta     VCE_DATA_HI
-                .endrepeat
+                dey
+                bne     @lp1
 
                 inx
                 inx
-                cpx #16*2
-                jne @lp
+                cpx     #16*2
+                jne     @lp
 
                 stz     VCE_ADDR_LO
                 stz     VCE_ADDR_HI
@@ -68,9 +68,9 @@ conio_init:
                 ldy     #$80            ; 128 chars
 charloop:       ldx     #$08            ; 8 bytes/char
 lineloop:
-                lda (ptr1)
-                staio   VDC_DATA_LO     ; bitplane 0
-                stzio   VDC_DATA_HI     ; bitplane 1
+                lda     (ptr1)
+                sta     a:VDC_DATA_LO     ; bitplane 0
+                stz     a:VDC_DATA_HI     ; bitplane 1
 
                 clc                     ; increment font pointer
                 lda     ptr1
@@ -89,7 +89,7 @@ fillloop:       st1     #$00
                 dey
                 bne     charloop        ; next character
 
-                ldx #0
+                ldx     #0
                 stx     BGCOLOR
                 inx
                 stx     CHARCOLOR

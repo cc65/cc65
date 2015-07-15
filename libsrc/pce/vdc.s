@@ -6,7 +6,7 @@ HIRES = 1
                         .export vdc_init
 
 vdc_init:
-                        ldaio   VDC_CTRL
+                        lda     a:VDC_CTRL
 
                         VREG    $00, $0000 ; MAWR
                         VREG    $01, $0000 ; MARR
@@ -20,21 +20,21 @@ vdc_init:
                         VREG    $0E, $000C ; CRTC - VDE
                         VREG    $0F, $0000 ; DCR
 
-                        .if      HIRES
+.if      HIRES
 
                         VREG    $0A, $0C02 ; CRTC - HSR
                         VREG    $0B, $043C ; CRTC - HDS
                         lda     #$06
                         sta     VCE_CTRL
 
-                        .else
+.else
 
                         VREG    $0A, $0202 ; CRTC - HSR
                         VREG    $0B, $041F ; CRTC - HDS
                         lda     #$04
                         sta     VCE_CTRL
 
-                        .endif
+.endif
 
-                        ldaio VDC_CTRL
+                        lda     a:VDC_CTRL
                         rts

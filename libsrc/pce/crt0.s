@@ -31,18 +31,13 @@
         .importzp ptr1,ptr2
 
 ; ------------------------------------------------------------------------
-; Create an empty LOWCODE segment to avoid linker warnings
-
-                .segment "LOWCODE"
-
-; ------------------------------------------------------------------------
 ; Place the startup code in a special segment.
 
                 .segment "STARTUP"
 
 start:
 
-; setup the CPU and System-IRQ
+                ; setup the CPU and System-IRQ
 
                 ; Initialize CPU
 
@@ -96,58 +91,55 @@ start:
                 cli
 
                 ; Clear the BSS data
-                jsr        zerobss
+                jsr     zerobss
 
                 ; Copy the .data segment to RAM
-                lda #<(__DATA_LOAD__)
-                sta ptr1
-                lda #>(__DATA_LOAD__)
-                sta ptr1+1
-                lda #<(__DATA_RUN__)
-                sta ptr2
-                lda #>(__DATA_RUN__)
-                sta ptr2+1
+                lda     #<(__DATA_LOAD__)
+                sta     ptr1
+                lda     #>(__DATA_LOAD__)
+                sta     ptr1+1
+                lda     #<(__DATA_RUN__)
+                sta     ptr2
+                lda     #>(__DATA_RUN__)
+                sta     ptr2+1
 
-                ldx #>(__DATA_SIZE__)
+                ldx     #>(__DATA_SIZE__)
 @l2:
-                beq @s1        ; no more full pages
+                beq     @s1        ; no more full pages
 
                 ; copy one page
-                ldy #0
+                ldy     #0
 @l1:
-                lda (ptr1),y
-                sta (ptr2),y
+                lda     (ptr1),y
+                sta     (ptr2),y
                 iny
-                bne @l1
+                bne     @l1
 
-                inc ptr1+1
-                inc ptr2+1
+                inc     ptr1+1
+                inc     ptr2+1
 
                 dex
-                bne @l2
+                bne     @l2
 
                 ; copy remaining bytes
 @s1:
                 ; copy one page
-                ldy #0
+                ldy     #0
 @l3:
-                lda (ptr1),y
-                sta (ptr2),y
+                lda     (ptr1),y
+                sta     (ptr2),y
                 iny
-                cpy #<(__DATA_SIZE__)
-                bne @l3
+                cpy     #<(__DATA_SIZE__)
+                bne     @l3
 
                 ; setup the stack
-                lda #<(__RAM_START__+__RAM_SIZE__)
-                sta        sp
-                lda #>(__RAM_START__+__RAM_SIZE__)
-                sta        sp+1
-
-                ; Init the Heap
-                jsr initheap
+                lda     #<(__RAM_START__+__RAM_SIZE__)
+                sta     sp
+                lda     #>(__RAM_START__+__RAM_SIZE__)
+                sta     sp+1
 
                 ; Call module constructors
-                jsr        initlib
+                jsr     initlib
 
                 ; Pass an empty command line
                 jsr     push0                ; argc
@@ -158,7 +150,7 @@ start:
 
                 ; Call module destructors. This is also the _exit entry.
 _exit:
-                jsr        donelib                ; Run module destructors
+                jsr     donelib                ; Run module destructors
 
                 ; reset the PCEngine (start over)
                 jmp start
@@ -174,16 +166,16 @@ _irq1:
                 phy
 
 
-                inc tickcount
-                bne @s1
-                inc tickcount+1
-                bne @s1
-                inc tickcount+2
-                bne @s1
-                inc tickcount+3
+                inc     tickcount
+                bne     @s1
+                inc     tickcount+1
+                bne     @s1
+                inc     tickcount+2
+                bne     @s1
+                inc     tickcount+3
 @s1:
                 ; Acknowlege interrupt
-                ldaio VDC_CTRL
+                lda     a:VDC_CTRL
 
                 ply
                 plx

@@ -11,10 +11,10 @@ _clrscr:
                 st0     #VDC_VWR
                 ldy     #$40
 rowloop:        ldx     #$80
-colloop:        lda #' '
-                staio VDC_DATA_LO
-                lda #$02
-                staio VDC_DATA_HI
+colloop:        lda     #' '
+                sta     a:VDC_DATA_LO
+                lda     #$02
+                sta     a:VDC_DATA_HI
 
                 dex
                 bne     colloop

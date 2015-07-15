@@ -65,9 +65,6 @@
 #define COLOR_LIGHTBLUE         0x0E
 #define COLOR_GRAY3             0x0F
 
-#define CLOCKS_PER_SEC          50      // FIXME: is this correct?
-#define CLK_TCK                 50      // FIXME: is this correct?
-
 #define TV_NTSC                 0
 #define TV_PAL                  1
 #define TV_OTHER                2

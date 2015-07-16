@@ -130,6 +130,8 @@ No extended memory drivers are currently available for the PCE.
   <tag><tt/pce-stdjoy.joy (pce_stdjoy)/</tag>
   A joystick driver for the standard two buttons joypad is available.
 
+  Note that the japanese 6-button pad is currently not supported.
+
 </descrip><p>
 
 
@@ -146,6 +148,10 @@ No serial drivers are currently available for the PCE.
 
 <sect>Limitations<p>
 
+<itemize>
+<item>interruptor support in crt0 (and cfg) is missing
+</itemize>
+
 <sect1>Disk I/O<p>
 
 The existing library for the PCE doesn't implement C file
@@ -155,6 +161,7 @@ To be more concrete, this limitation means that you cannot use any of the
 following functions (and a few others):
 
 <itemize>
+<item>printf
 <item>fclose
 <item>fopen
 <item>fread
@@ -165,11 +172,25 @@ following functions (and a few others):
 <item>...
 </itemize>
 
-
-
 <sect>Other hints<p>
 
+<itemize>
+<item>a good emulator to use for PC-Engine is "mednafen" (<url url="http://mednafen.sourceforge.net">)
+</itemize>
 
+some useful resources on PCE coding:
+
+<itemize>
+<item><url url="http://blog.blockos.org/?tag=pc-engine">
+<item><url url="http://pcedev.blockos.org/viewforum.php?f=5">
+<item><url url="http://www.romhacking.net/?page=documents&amp;category=&amp;platform=4&amp:game=&amp;author=&amp;perpage=20&amp;level=&amp;title=&amp;desc=&amp;docsearch=Go">
+<item><url url="http://archaicpixels.com/Main_Page">
+
+<item><url url="http://www.magicengine.com/mkit/doc.html">
+
+<item><url url="https://github.com/uli/huc">
+<item><url url="http://www.zeograd.com/parse.php?src=hucf">
+</itemize>
 
 <sect>License<p>
 

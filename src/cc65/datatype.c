@@ -391,6 +391,12 @@ unsigned SizeOf (const Type* T)
         case T_VOID:
             return 0;   /* Assume voids have size zero */
 
+        /* Beware: There's a chance that this triggers problems in other parts
+           of the compiler. The solution is to fix the callers, because calling
+           SizeOf() with a function type as argument is bad. */
+        case T_FUNC:
+            return 0;   /* Size of function is unknown */
+
         case T_SCHAR:
         case T_UCHAR:
             return SIZEOF_CHAR;
@@ -404,7 +410,6 @@ unsigned SizeOf (const Type* T)
             return SIZEOF_INT;
 
         case T_PTR:
-        case T_FUNC:    /* Maybe pointer to function */
             return SIZEOF_PTR;
 
         case T_LONG:

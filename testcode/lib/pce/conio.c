@@ -95,14 +95,16 @@ void main(void)
         {
             gotoxy(0, 12 + i);
             j = joy_read (i);
-            cprintf ("pad %d: %02x %-6s%-6s%-6s%-6s%-6s%-6s",
+            cprintf ("pad %d: %02x %-6s%-6s%-6s%-6s%-6s%-6s%-6s%-6s",
                      i, j,
                      (j & joy_masks[JOY_UP])?    "  up  " : " ---- ",
                      (j & joy_masks[JOY_DOWN])?  " down " : " ---- ",
                      (j & joy_masks[JOY_LEFT])?  " left " : " ---- ",
                      (j & joy_masks[JOY_RIGHT])? "right " : " ---- ",
                      (j & joy_masks[JOY_FIRE])?  " fire " : " ---- ",
-                     (j & joy_masks[JOY_FIRE2])? "fire2 " : " ---- ");
+                     (j & joy_masks[JOY_FIRE2])? "fire2 " : " ---- ",
+                     (j & joy_masks[JOY_SELECT])? "select" : " ---- ",
+                     (j & joy_masks[JOY_RUN])?   " run  " : " ---- ");
         }
 
         gotoxy(xsize - 10, 3);

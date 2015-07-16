@@ -80,8 +80,8 @@
 extern void pce_stdjoy_joy[];       /* Referred to by joy_static_stddrv[] */
 
 #define JOY_FIRE_B              5
-#define JOY_START               6
-#define JOY_SELECT              7
+#define JOY_SELECT              6
+#define JOY_RUN                 7
 
 void waitvblank (void);
 /* Wait for the vertical blanking */

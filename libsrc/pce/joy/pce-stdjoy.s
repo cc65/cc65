@@ -29,10 +29,10 @@
         .byte   $40                     ; JOY_DOWN
         .byte   $80                     ; JOY_LEFT
         .byte   $20                     ; JOY_RIGHT
-        .byte   $02                     ; JOY_FIRE A  ; FIXME: is this correct?
-        .byte   $01                     ; JOY_FIRE B  ; FIXME: is this correct?
-        .byte   $04                     ; JOY_START   ; FIXME: is this correct?
-        .byte   $08                     ; JOY_SELECT  ; FIXME: is this correct?
+        .byte   $01                     ; JOY_FIRE_A
+        .byte   $02                     ; JOY_FIRE_B
+        .byte   $04                     ; JOY_SELECT
+        .byte   $08                     ; JOY_RUN
 
 ; Jump table.
 

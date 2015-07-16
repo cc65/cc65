@@ -2,9 +2,7 @@ PC-Engine (PCE) target support for cc65. this is still work in progress and
 a couple of things need to be fixed:
 --------------------------------------------------------------------------------
 
-joystick support should get verified on real hw
- - the masks for buttons may be wrong.
- - 6 button gamepads are different and need slightly different code
+- 6 button gamepads are different and need slightly different code
 
 interruptor support in crt0 (and cfg) is missing
 - clock() should be hooked to a VBL interrupt

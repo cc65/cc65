@@ -36,16 +36,20 @@
 #  error This module may only be used when compiling for the PCE!
 #endif
 
-/* FIXME: the respective characters are not present in the VGA charset (yet) */
-#define CH_CROSS	        0x10
+#define CH_HLINE                   1
+#define CH_VLINE                   2
+#define CH_CROSS                   3
+#define CH_ULCORNER                4
+#define CH_URCORNER                5
+#define CH_LLCORNER                6
+#define CH_LRCORNER                7
+#define CH_TTEE                    8
+#define CH_BTEE                    9
+#define CH_LTEE                   10
+#define CH_RTEE                   11
 
-#define CH_RTEE                 0x17
-#define CH_LTEE                 0x0f
-
-#define CH_ULCORNER             0x10
-#define CH_URCORNER             0x10
-#define CH_LLCORNER             0x10
-#define CH_LRCORNER             0x10
+#define CH_ENTER                  13
+#define CH_PI                     18
 
 /* Color defines (CBM compatible, for conio) */
 #define COLOR_BLACK             0x00
@@ -79,14 +83,12 @@ extern void pce_stdjoy_joy[];       /* Referred to by joy_static_stddrv[] */
 #define JOY_START               6
 #define JOY_SELECT              7
 
-/* FIXME: not implemented */
 void waitvblank (void);
 /* Wait for the vertical blanking */
 
-/* all PCE are NTSC */
+/* NOTE: all PCE are NTSC */
 #define get_tv() TV_NTSC
 /* Return the video mode the machine is using. */
-
 
 /* End of pce.h */
 #endif

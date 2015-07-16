@@ -7,6 +7,7 @@
                 .export newline, plot
                 .import popa, _gotoxy
                 .import PLOT
+                .import xsize
 
                 .importzp tmp3,tmp4
 
@@ -38,7 +39,7 @@ cputdirect:
 advance:
                 ldy     CURS_X
                 iny
-                cpy     #xsize
+                cpy     xsize
                 bne     L3
                 jsr     newline         ; new line
                 ldy     #0              ; + cr

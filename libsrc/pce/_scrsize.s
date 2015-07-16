@@ -1,9 +1,10 @@
 ;
 ; Screen size variables
 ;
+                .include "pce.inc"
 
-                .export _screensize
-_screensize:
+                .export screensize
+screensize:
                 ldx     xsize
                 ldy     ysize
                 rts
@@ -13,5 +14,5 @@ _screensize:
 .rodata
                 .export xsize, ysize
 
-xsize:          .byte 64
-ysize:          .byte 28
+xsize:          .byte charsperline
+ysize:          .byte screenrows

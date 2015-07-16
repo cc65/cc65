@@ -13,10 +13,12 @@ void main(void)
     int i, j;
     clock_t clk;
     char *p;
+    unsigned char xsize, ysize, n;
 
     joy_install(&joy_static_stddrv);
 
     clrscr();
+    screensize(&xsize, &ysize);
 
     cputs("hello world");
     cputsxy(0, 2, "colors:" );
@@ -43,6 +45,25 @@ void main(void)
         );
     }
 
+    gotoxy(0,ysize - 1);
+    for (i = 0; i < xsize; ++i) {
+        cputc('0' + i % 10);
+    }
+
+    gotoxy(0,ysize - 2 - ((256 + xsize) / xsize));
+    for (i = 0; i < xsize; ++i) {
+        cputc('0' + i % 10);
+    }
+    for (i = 0; i < (xsize * 5); ++i) {
+        cputc('#');
+    }
+    gotoxy(0,ysize - 1 - ((256 + xsize) / xsize));
+    for (i = 0; i < 256; ++i) {
+        if ((i != '\n') && (i != '\r')) {
+            cputc(i);
+        }
+    }
+
     i = get_tv();
     gotoxy(30,0);
     cputs("TV Mode: ");
@@ -57,6 +78,7 @@ void main(void)
             cputs("OTHER");
             break;
     }
+    cprintf(" %dx%d", xsize, ysize);
 
     for(;;) {
         gotoxy(13,4);
@@ -82,7 +104,16 @@ void main(void)
                      (j & joy_masks[JOY_FIRE])?  " fire " : " ---- ",
                      (j & joy_masks[JOY_FIRE2])? "fire2 " : " ---- ");
         }
+
+        gotoxy(xsize - 10, 3);
+        j = (n >> 5) & 1;
+        revers(j);
+        cputc(j ? 'R' : ' ');
+        cputs(" revers");
+        revers(0);
+
         waitvblank();
+        ++n;
     }
     for(;;);
 }

@@ -6,15 +6,10 @@ joystick support should get verified on real hw
  - the masks for buttons may be wrong.
  - 6 button gamepads are different and need slightly different code
 
-revers() is a dummy function, actual reverse output is not supported yet
-
 some graphical petscii chars should get added to the charset
 
 interruptor support in crt0 (and cfg) is missing
 - clock() should be hooked to a VBL interrupt
-
-conio lacks support for different screen sizes, which could be used with
-different video modes
 
 --------------------------------------------------------------------------------
 

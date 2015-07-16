@@ -51,7 +51,7 @@ set_palette:
 ;
 ;----------------------------------------------------------------------------
 
-                .importzp ptr1
+                .importzp ptr1, tmp1
 conio_init:
                 ; Load font
                 st0     #VDC_MAWR
@@ -65,10 +65,35 @@ conio_init:
                 sta     ptr1+1
 
                 st0     #VDC_VWR        ; VWR
+
+                lda     #0
+                sta     tmp1
+                jsr     copy
+
+                lda     #<font
+                sta     ptr1
+                lda     #>font
+                sta     ptr1+1
+
+                lda     #$ff
+                sta     tmp1
+                jsr     copy
+
+
+                ldx     #0
+                stx     BGCOLOR
+                inx
+                stx     CHARCOLOR
+
+
+                rts
+
+copy:
                 ldy     #$80            ; 128 chars
 charloop:       ldx     #$08            ; 8 bytes/char
 lineloop:
                 lda     (ptr1)
+                eor     tmp1
                 sta     a:VDC_DATA_LO     ; bitplane 0
                 stz     a:VDC_DATA_HI     ; bitplane 1
 
@@ -88,12 +113,6 @@ fillloop:       st1     #$00
                 bne     fillloop        ; next byte
                 dey
                 bne     charloop        ; next character
-
-                ldx     #0
-                stx     BGCOLOR
-                inx
-                stx     CHARCOLOR
-
 
                 rts
 

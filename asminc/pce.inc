@@ -14,8 +14,7 @@ BGCOLOR     = $38
 tickcount   = $39       ;4
 
 screenrows = (224/8)
-charsperline = (512/8)
-xsize = charsperline
+charsperline = 61
 
 CH_HLINE = 7
 CH_VLINE = 7

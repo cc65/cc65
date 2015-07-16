@@ -88,8 +88,6 @@ start:
                 lda     #$05
                 sta     IRQ_MASK           ; IRQ1=on
 
-                cli
-
                 ; Clear the BSS data
                 jsr     zerobss
 
@@ -140,6 +138,8 @@ start:
 
                 ; Call module constructors
                 jsr     initlib
+
+                cli     ; allow IRQ only after constructors have run
 
                 ; Pass an empty command line
                 jsr     push0                ; argc

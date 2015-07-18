@@ -2,7 +2,7 @@
 ; int __fastcall__ vsnprintf (char* Buf, size_t size, const char* Format, va_list ap);
 ;
 ; 2009-09-26, Ullrich von Bassewitz
-; 2015-07-09, Greg King
+; 2015-07-17, Greg King
 ;
 
         .export         _vsnprintf, vsnprintf
@@ -131,12 +131,15 @@ L4:     lda     ccount+0
 
 ; Bail out if size is too high.
 
-L9:     lda     #ERANGE
+L9:     ldy     #ERANGE
         .byte   $2C             ;(bit $xxxx)
 
 ; NULL buffer pointers usually are invalid.
 
-L0:     lda     #EINVAL
+L0:     ldy     #EINVAL
+        pla                     ; Drop ap
+        pla
+        tya
         jsr     __directerrno   ; Return -1
         jmp     incsp6          ; Drop parameters
 

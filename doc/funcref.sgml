@@ -3309,7 +3309,7 @@ macro.
 <item>When compiling without <tt/-Os/, the function is only available as
 fastcall function, so it may only be used in presence of a prototype.
 </itemize>
-<tag/Availability/cc65
+<tag/Availability/ISO 9899
 <tag/See also/
 <ref id="isalnum" name="isalnum">,
 <ref id="isalpha" name="isalpha">,

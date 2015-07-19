@@ -1,5 +1,5 @@
 ;
-; int vsnprintf (char* Buf, size_t size, const char* Format, va_list ap);
+; int __fastcall__ vsnprintf (char* Buf, size_t size, const char* Format, va_list ap);
 ;
 ; Ullrich von Bassewitz, 2009-09-26
 ;
@@ -130,7 +130,7 @@ L9:     pla
 ; ----------------------------------------------------------------------------
 ; Callback routine used for the actual output.
 ;
-; static void out (struct outdesc* d, const char* buf, unsigned count)
+; static void __cdecl__ out (struct outdesc* d, const char* buf, unsigned count)
 ; /* Routine used for writing */
 ;
 ; Since we know, we're called with a pointer to our static outdesc structure,

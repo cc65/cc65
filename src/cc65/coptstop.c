@@ -766,12 +766,8 @@ static unsigned Opt_toseqax_tosneax (StackOpData* D, const char* BoolTransformer
         InsertEntry (D, X, D->IP++);
 
         /* Lhs load entries can be removed */
-        if (LoadX->AM != AM65_IMM) {
-            D->Lhs.X.Flags |= LI_REMOVE;
-        }
-        if (LoadA->AM != AM65_IMM) {
-            D->Lhs.A.Flags |= LI_REMOVE;
-        }
+        D->Lhs.X.Flags |= LI_REMOVE;
+        D->Lhs.A.Flags |= LI_REMOVE;
 
     } else if ((D->Rhs.A.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT &&
                (D->Rhs.X.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT) {
@@ -794,12 +790,8 @@ static unsigned Opt_toseqax_tosneax (StackOpData* D, const char* BoolTransformer
         InsertEntry (D, X, D->IP++);
 
         /* Rhs load entries can be removed */
-        if (LoadX->AM != AM65_IMM) {
-            D->Rhs.X.Flags |= LI_REMOVE;
-        }
-        if (LoadA->AM != AM65_IMM) {
-            D->Rhs.A.Flags |= LI_REMOVE;
-        }
+        D->Rhs.X.Flags |= LI_REMOVE;
+        D->Rhs.A.Flags |= LI_REMOVE;
 
     } else if ((D->Rhs.A.Flags & LI_DIRECT) != 0 &&
                (D->Rhs.X.Flags & LI_DIRECT) != 0) {

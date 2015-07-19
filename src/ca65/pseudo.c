@@ -1989,6 +1989,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoDebugInfo     },
     { ccNone,           DoDefine        },
     { ccNone,           DoUnexpected    },      /* .DEFINED */
+    { ccNone,           DoUnexpected    },      /* .DEFINEDMACRO */
     { ccNone,           DoDelMac        },
     { ccNone,           DoDestructor    },
     { ccNone,           DoDWord         },
@@ -2040,6 +2041,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoIncBin        },
     { ccNone,           DoInclude       },
     { ccNone,           DoInterruptor   },
+    { ccNone,           DoUnexpected    },      /* .ISMNEMONIC */
     { ccNone,           DoInvalid       },      /* .LEFT */
     { ccNone,           DoLineCont      },
     { ccNone,           DoList          },

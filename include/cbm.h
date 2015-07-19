@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2012, Ullrich von Bassewitz                                      */
+/* (C) 1998-2015, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -222,7 +222,7 @@ void cbm_k_unlsn (void);
 
 
 
-unsigned int cbm_load (const char* name, unsigned char device, void* data);
+unsigned int __fastcall__ cbm_load (const char* name, unsigned char device, void* data);
 /* Loads file "name", from given device, to given address -- or, to the load
 ** address of the file if "data" is the null pointer (like load"name",8,1
 ** in BASIC).

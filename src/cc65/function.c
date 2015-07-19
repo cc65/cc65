@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2012, Ullrich von Bassewitz                                      */
+/* (C) 2000-2015, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -460,6 +460,9 @@ void NewFunc (SymEntry* Func)
         */
         if (D->ParamCount > 0 || (D->Flags & FD_VARIADIC) != 0) {
             g_importmainargs ();
+
+            /* The start-up code doesn't fast-call main(). */
+            Func->Type->C |= T_QUAL_CDECL;
         }
 
         /* Determine if this is a main function in a C99 environment that
@@ -478,12 +481,11 @@ void NewFunc (SymEntry* Func)
     PushLiteralPool (Func);
 
     /* If this is a fastcall function, push the last parameter onto the stack */
-    if (IsQualFastcall (Func->Type) && D->ParamCount > 0) {
-
+    if ((D->Flags & FD_VARIADIC) == 0 && D->ParamCount > 0 &&
+        (AutoCDecl ?
+         IsQualFastcall (Func->Type) :
+         !IsQualCDecl (Func->Type))) {
         unsigned Flags;
-
-        /* Fastcall functions may never have an ellipsis or the compiler is buggy */
-        CHECK ((D->Flags & FD_VARIADIC) == 0);
 
         /* Generate the push */
         if (IsTypeFunc (D->LastParam->Type)) {

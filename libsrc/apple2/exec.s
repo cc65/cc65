@@ -166,7 +166,7 @@ setbuf: lda     #$00            ; Low byte
         bit     $C080
         .endif
 
-        ; Reset stack we already passed
+        ; Reset stack as we already passed
         ; the point of no return anyway
         ldx     #$FF
         txs

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2012, Ullrich von Bassewitz                                      */
+/* (C) 1998-2015, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -601,6 +601,16 @@ INLINE int IsQualCDecl (const Type* T)
 }
 #else
 #  define IsQualCDecl(T)        (((T)->C & T_QUAL_CDECL) != 0)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsQualCConv (const Type* T)
+/* Return true if the given type has a calling convention qualifier */
+{
+    return (T->C & T_QUAL_CCONV) != 0;
+}
+#else
+#  define IsQualCConv(T)        (((T)->C & T_QUAL_CCONV) != 0)
 #endif
 
 int IsVariadicFunc (const Type* T) attribute ((const));

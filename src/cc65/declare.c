@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2013, Ullrich von Bassewitz                                      */
+/* (C) 1998-2015, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -85,7 +85,7 @@ struct StructInitData {
 
 
 static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers);
-/* Parse a type specificier */
+/* Parse a type specifier */
 
 static unsigned ParseInitInternal (Type* T, int AllowFlexibleMembers);
 /* Parse initialization of variables. Return the number of data bytes. */
@@ -335,18 +335,30 @@ static void FixQualifiers (Type* DataType)
     T = DataType;
     while (T->C != T_END) {
         if (IsTypePtr (T)) {
+            /* Calling convention qualifier on the pointer? */
+            if (IsQualCConv (T)) {
+                /* Pull the convention off of the pointer */
+                Q = T[0].C & T_QUAL_CCONV;
+                T[0].C &= ~T_QUAL_CCONV;
 
-            /* Fastcall qualifier on the pointer? */
-            if (IsQualFastcall (T)) {
-                /* Pointer to function which is not fastcall? */
-                if (IsTypeFunc (T+1) && !IsQualFastcall (T+1)) {
-                    /* Move the fastcall qualifier from the pointer to
-                    ** the function.
-                    */
-                    T[0].C &= ~T_QUAL_FASTCALL;
-                    T[1].C |= T_QUAL_FASTCALL;
+                /* Pointer to a function which doesn't have an explicit convention? */
+                if (IsTypeFunc (T + 1)) {
+                    if (IsQualCConv (T + 1)) {
+                        if ((T[1].C & T_QUAL_CCONV) == Q) {
+                            Warning ("Pointer duplicates function's calling convention");
+                        } else {
+                            Error ("Function's and pointer's calling conventions are different");
+                        }
+                    } else {
+                        if (Q == T_QUAL_FASTCALL && IsVariadicFunc (T + 1)) {
+                            Error ("Variadic-function pointers cannot be __fastcall__");
+                        } else {
+                            /* Move the qualifier from the pointer to the function. */
+                            T[1].C |= Q;
+                        }
+                    }
                 } else {
-                    Error ("Invalid `_fastcall__' qualifier for pointer");
+                    Error ("Not pointer to a function; can't use a calling convention");
                 }
             }
 
@@ -355,8 +367,8 @@ static void FixQualifiers (Type* DataType)
             if (Q == T_QUAL_NONE) {
                 /* No address size qualifiers specified */
                 if (IsTypeFunc (T+1)) {
-                    /* Pointer to function. Use the qualifier from the function
-                    ** or the default if the function don't has one.
+                    /* Pointer to function. Use the qualifier from the function,
+                    ** or the default if the function doesn't have one.
                     */
                     Q = (T[1].C & T_QUAL_ADDRSIZE);
                     if (Q == T_QUAL_NONE) {
@@ -368,7 +380,7 @@ static void FixQualifiers (Type* DataType)
                 T[0].C |= Q;
             } else {
                 /* We have address size qualifiers. If followed by a function,
-                ** apply these also to the function.
+                ** apply them to the function also.
                 */
                 if (IsTypeFunc (T+1)) {
                     TypeCode FQ = (T[1].C & T_QUAL_ADDRSIZE);
@@ -489,7 +501,7 @@ static void ParseEnumDecl (void)
 
 
 static int ParseFieldWidth (Declaration* Decl)
-/* Parse an optional field width. Returns -1 if no field width is speficied,
+/* Parse an optional field width. Returns -1 if no field width is specified,
 ** otherwise the width of the field.
 */
 {
@@ -862,7 +874,7 @@ NextMember: if (CurTok.Tok != TOK_COMMA) {
 
 
 static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers)
-/* Parse a type specificier */
+/* Parse a type specifier */
 {
     ident       Ident;
     SymEntry*   Entry;
@@ -1376,13 +1388,13 @@ static FuncDesc* ParseFuncDecl (void)
 static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
 /* Recursively process declarators. Build a type array in reverse order. */
 {
-    /* Read optional function or pointer qualifiers. These modify the
-    ** identifier or token to the right. For convenience, we allow the fastcall
-    ** qualifier also for pointers here. If it is a pointer-to-function, the
-    ** qualifier will later be transfered to the function itself. If it's a
+    /* Read optional function or pointer qualifiers. They modify the
+    ** identifier or token to the right. For convenience, we allow a calling
+    ** convention also for pointers here. If it's a pointer-to-function, the
+    ** qualifier later will be transfered to the function itself. If it's a
     ** pointer to something else, it will be flagged as an error.
     */
-    TypeCode Qualifiers = OptionalQualifiers (T_QUAL_ADDRSIZE | T_QUAL_FASTCALL);
+    TypeCode Qualifiers = OptionalQualifiers (T_QUAL_ADDRSIZE | T_QUAL_CCONV);
 
     /* Pointer to something */
     if (CurTok.Tok == TOK_STAR) {
@@ -1390,10 +1402,10 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
         /* Skip the star */
         NextToken ();
 
-        /* Allow const, restrict and volatile qualifiers */
+        /* Allow const, restrict, and volatile qualifiers */
         Qualifiers |= OptionalQualifiers (T_QUAL_CONST | T_QUAL_VOLATILE | T_QUAL_RESTRICT);
 
-        /* Parse the type, the pointer points to */
+        /* Parse the type that the pointer points to */
         Declarator (Spec, D, Mode);
 
         /* Add the type */
@@ -1443,7 +1455,7 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
 
             /* We cannot specify fastcall for variadic functions */
             if ((F->Flags & FD_VARIADIC) && (Qualifiers & T_QUAL_FASTCALL)) {
-                Error ("Variadic functions cannot be `__fastcall__'");
+                Error ("Variadic functions cannot be __fastcall__");
                 Qualifiers &= ~T_QUAL_FASTCALL;
             }
 

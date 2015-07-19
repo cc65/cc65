@@ -62,6 +62,7 @@
 #include "symtab.h"
 #include "toklist.h"
 #include "ulabel.h"
+#include "macro.h"
 
 
 
@@ -417,6 +418,26 @@ static ExprNode* FuncDefined (void)
 
 
 
+static ExprNode* FuncDefinedMacro (void)
+/* Handle the .DEFINEDMACRO builtin function */
+{
+    Macro* Mac = 0;
+
+    /* Check if the identifier is a macro */
+
+    if (CurTok.Tok == TOK_IDENT) {
+        Mac = FindMacro (&CurTok.SVal);
+    } else {
+        Error ("Identifier expected.");
+    }
+    /* Skip the name */
+    NextTok ();
+
+    return GenLiteralExpr (Mac != 0);
+}
+
+
+
 ExprNode* FuncHiByte (void)
 /* Handle the .HIBYTE builtin function */
 {
@@ -429,6 +450,36 @@ static ExprNode* FuncHiWord (void)
 /* Handle the .HIWORD builtin function */
 {
     return HiWord (Expression ());
+}
+
+
+
+static ExprNode* FuncIsMnemonic (void)
+/* Handle the .ISMNEMONIC, .ISMNEM builtin function */
+{
+    int Instr = -1;
+
+    /* Check for a macro or an instruction depending on UbiquitousIdents */
+
+    if (CurTok.Tok == TOK_IDENT) {
+        if (UbiquitousIdents) {
+            /* Macros CAN be instructions, so check for them first */
+            if (FindMacro (&CurTok.SVal) == 0) {
+                Instr = FindInstruction (&CurTok.SVal);
+            }
+        }
+        else {
+            /* Macros and symbols may NOT use the names of instructions, so just check for the instruction */
+            Instr = FindInstruction (&CurTok.SVal);
+        }
+    }
+    else {
+        Error ("Identifier expected.");
+    }
+    /* Skip the name */
+    NextTok ();
+
+    return GenLiteralExpr (Instr > 0);
 }
 
 
@@ -1065,12 +1116,20 @@ static ExprNode* Factor (void)
             N = Function (FuncDefined);
             break;
 
+        case TOK_DEFINEDMACRO:
+            N = Function (FuncDefinedMacro);
+            break;
+
         case TOK_HIBYTE:
             N = Function (FuncHiByte);
             break;
 
         case TOK_HIWORD:
             N = Function (FuncHiWord);
+            break;
+
+        case TOK_ISMNEMONIC:
+            N = Function (FuncIsMnemonic);
             break;
 
         case TOK_LOBYTE:

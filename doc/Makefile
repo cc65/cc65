@@ -2,7 +2,7 @@ ifneq ($(shell echo),)
   CMD_EXE = 1
 endif
 
-.PHONY: all mostlyclean clean install zip doc html info gh-pages
+.PHONY: all mostlyclean clean install zip doc html info
 
 .SUFFIXES:
 

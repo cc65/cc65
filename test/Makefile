@@ -10,25 +10,27 @@ ifneq ($(shell echo),)
 endif
 
 ifdef CMD_EXE
-  RM := del /f
   EXE := .exe
-  MKDIR := mkdir
-  RMDIR := rmdir
+  DEL = -del /f $(subst /,\,$1)
+  MKDIR = mkdir $(subst /,\,$1)
+  RMDIR = -rmdir /s /q $(subst /,\,$1)
 else
-  RM := rm -f
   EXE :=
-  MKDIR := mkdir -p
-  RMDIR := rmdir
+  DEL = $(RM) $1
+  MKDIR = mkdir $1
+  RMDIR = $(RM) -r $1
 endif
 
 WORKDIR := ../testwrk
+
+CC := gcc
 
 .PHONY: all dotests continue mostly-clean clean
 
 all: dotests
 
 $(WORKDIR):
-	$(MKDIR) $(WORKDIR)
+	$(call MKDIR,$(WORKDIR))
 
 $(WORKDIR)/bdiff$(EXE): bdiff.c | $(WORKDIR)
 	$(CC) -O2 -o $@ $<
@@ -50,5 +52,5 @@ mostly-clean:
 	@$(MAKE) -C misc clean
 
 clean: mostly-clean
-	$(RM) $(WORKDIR)/bdiff$(EXE)
-	$(RMDIR) $(WORKDIR)
+	@$(call DEL,$(WORKDIR)/bdiff$(EXE))
+	@$(call RMDIR,$(WORKDIR))

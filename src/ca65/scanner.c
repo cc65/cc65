@@ -865,7 +865,7 @@ static token_t FindDotKeyword (void)
                  sizeof (DotKeywords [0]), CmpDotKeyword);
     if (R != 0) {
 
-        /* By default, disable any somewhat experiemental DotKeyword. */
+        /* By default, disable any somewhat experimental DotKeyword. */
 
         switch (R->Tok) {
 

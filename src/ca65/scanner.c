@@ -1679,14 +1679,11 @@ CharAgain:
             /* Line continuation? */
             if (LineCont) {
                 NextChar ();
-                /* Next char should be a LF, if not, will result in an error later */
                 if (C == '\n') {
-                    /* Ignore the '\n' */
+                    /* Handle as white space */
                     NextChar ();
+                    C = ' ';
                     goto Again;
-                } else {
-                    /* Make it clear what the problem is: */
-                    Error ("EOL expected.");
                 }
             }
             break;

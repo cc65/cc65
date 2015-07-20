@@ -1012,7 +1012,7 @@ Again:
                 break;
             }
             DVal = DigitVal (Buf[I]);
-            if (DVal > Base) {
+            if (DVal >= Base) {
                 Error ("Invalid digits in number");
                 CurTok.IVal = 0;
                 break;

@@ -1423,8 +1423,7 @@ CharAgain:
                     /* Ignore the '\n' */
                     NextChar ();
                     goto Again;
-                }
-                else {
+                } else {
                     /* Make it clear what the problem is: */
                     Error ("EOL expected.");
                 }

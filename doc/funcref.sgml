@@ -3,7 +3,7 @@
 <article>
 <title>cc65 function reference
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2014-05-26
+<date>2015-07-21
 
 <abstract>
 cc65 is a C compiler for 6502 based systems. This function reference describes
@@ -840,6 +840,8 @@ the CBM systems are classified as being "regular" files, for example.
 <tag/Notes/<itemize>
 <item>The minimum blocksize that can be added is 6 bytes; the function will
 ignore smaller blocks.
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
@@ -868,6 +870,8 @@ id="calloc" name="calloc">/ or <tt/<ref id="realloc" name="realloc">/.
 <tag/Notes/<itemize>
 <item>Passing a pointer to a block that was is not the result of one of the
 allocation functions, or that has been free'd will give unpredicable results.
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
@@ -912,7 +916,7 @@ be allocated from the heap using <tt/<ref id="malloc" name="malloc">/.
 <descrip>
 <tag/Function/Return the total available space on the heap.
 <tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
-<tag/Declaration/<tt/size_t __fastcall__ _heapmemavail (void);/
+<tag/Declaration/<tt/size_t _heapmemavail (void);/
 <tag/Description/The function returns the total number of bytes available on
 the heap.
 <tag/Notes/<itemize>
@@ -1323,6 +1327,10 @@ used in presence of a prototype.
 <tag/Header/<tt/<ref id="atmos.h" name="atmos.h">/
 <tag/Declaration/<tt/void __fastcall__ atmos_load(const char* name);/
 <tag/Description/<tt/atmos_load/ reads a memory block from tape.
+<tag/Notes/<itemize>
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
+</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="atmos_save" name="atmos_save">
@@ -1339,6 +1347,10 @@ used in presence of a prototype.
 <tag/Header/<tt/<ref id="atmos.h" name="atmos.h">/
 <tag/Declaration/<tt/void __fastcall__ atmos_save(const char* name, const void* start, const void* end);/
 <tag/Description/<tt/atmos_save/ writes a memory block to tape.
+<tag/Notes/<itemize>
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
+</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="atmos_load" name="atmos_load">
@@ -1460,7 +1472,7 @@ be used in presence of a prototype.
 <tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
 <tag/Declaration/<tt/void* __fastcall__ bsearch (const void* key,
 const void* base, size_t n, size_t size,
-int (*cmp) (const void*, const void*));/
+int __fastcall__ (* cmp) (const void*, const void*));/
 <tag/Description/<tt/bsearch/ searches a sorted array for a member that
 matches the one pointed to by <tt/key/. <tt/base/ is the address of the array,
 <tt/n/ is the number of elements, <tt/size/ the size of an element and <tt/cmp/
@@ -1473,6 +1485,8 @@ the compare function given.
 return one of the members.
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
+<item>The function to which <tt/cmp/ points must have the <tt/fastcall/ calling
+convention.
 </itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
@@ -4132,6 +4146,8 @@ the <tt/<ref id="mod_load" name="mod_load">/ function.
 <tag/Notes/<itemize>
 <item>The pointer passed as parameter is the pointer to the module memory,
 not the pointer to the control structure.
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
@@ -4147,7 +4163,7 @@ not the pointer to the control structure.
 <descrip>
 <tag/Function/Load a relocatable module.
 <tag/Header/<tt/<ref id="modload.h" name="modload.h">/
-<tag/Declaration/<tt/unsigned char mod_load (struct mod_ctrl* ctrl);/
+<tag/Declaration/<tt/unsigned char __fastcall__ mod_load (struct mod_ctrl* ctrl);/
 <tag/Description/The function will load a code module into memory and relocate
 it. The function will return an error code. If <tt/MLOAD_OK/ is returned, the
 outgoing fields in the passed <tt/mod_ctrl/ struct contain information about
@@ -4163,6 +4179,8 @@ the module just loaded. Possible error codes are:
 <tag/Notes/<itemize>
 <item>The <htmlurl url="ld65.html" name="ld65"> linker is needed to create
 relocatable o65 modules for use with this function.
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
@@ -4501,7 +4519,7 @@ from memory.
 <descrip>
 <tag/Function/Unload a mouse driver.
 <tag/Header/<tt/<ref id="mouse.h" name="mouse.h">/
-<tag/Declaration/<tt/unsigned char __fastcall__ mouse_unload (void);/
+<tag/Declaration/<tt/unsigned char mouse_unload (void);/
 <tag/Description/The function unloads a loaded mouse driver and frees all
 memory allocated for the driver.
 <tag/Notes/<itemize>
@@ -4726,7 +4744,7 @@ be used in presence of a prototype.
 <tag/Function/Sort an array.
 <tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
 <tag/Declaration/<tt/void __fastcall__ qsort (void* base, size_t count,
-size_t size, int (*compare) (const void*, const void*));/
+size_t size, int __fastcall__ (* compare) (const void*, const void*));/
 <tag/Description/<tt/qsort/ sorts an array according to a given compare
 function <tt/compare/. <tt/base/ is the address of the array, <tt/count/
 is the number of elements, <tt/size/ the size of an element and <tt/compare/
@@ -4736,6 +4754,8 @@ the function used to compare the members.
 the function is undefined.
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
+<item>The function to which <tt/compare/ points must have the <tt/fastcall/
+calling convention.
 </itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
@@ -6919,6 +6939,8 @@ ratio for a loaded driver. The value is not reset by <ref id="tgi_init"
 name="tgi_init">, so if a driver is linked statically to an application,
 switching into and out of graphics mode will not restore the original aspect
 ratio.
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/

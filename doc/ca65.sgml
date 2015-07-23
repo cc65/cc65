@@ -3080,8 +3080,8 @@ Here's a list of all control commands and a description, what they do:
         .import bar: zeropage
   </verb></tscreen>
 
-  See: <tt><ref id=".IMPORTZP" name=".IMPORTZP"></tt>
-
+  See: <tt><ref id=".IMPORTZP" name=".IMPORTZP"></tt>,
+       <tt><ref id=".WEAK" name=".WEAK"></tt>
 
 <sect1><tt>.IMPORTZP</tt><label id=".IMPORTZP"><p>
 
@@ -3845,6 +3845,30 @@ Here's a list of all control commands and a description, what they do:
   See also: <tt><ref id=".ERROR" name=".ERROR"></tt>,
             <tt><ref id=".FATAL" name=".FATAL"></tt>,
             <tt><ref id=".OUT" name=".OUT"></tt>
+
+
+<sect1><tt>.WEAK</tt><label id=".WEAK"><p>
+
+  Import a symbol from another module. The command is followed by a comma
+  separated list of symbols to import, with each one optionally followed by
+  an address specification.
+
+  <tt>.WEAK</tt> behaves like <tt>.IMPORT</tt>, except that if the
+  symbol isn't defined anywhere at the linking stage, the linker doesn't
+  throw an error, but resolves the symbol's value to zero instead. If the
+  symbol was used with the JSR opcode, the JSR is replaced by NOPs. Furthermore,
+  members of libraries aren't pulled in to satisfy a weak import.
+
+  Example:
+
+  <tscreen><verb>
+	.weak   foo
+	.weak   bar: zeropage
+  </verb></tscreen>
+
+  Weak imports of zeropage symbols are not useful in general.
+
+  See: <tt><ref id=".IMPORT" name=".IMPORT"></tt>
 
 
 <sect1><tt>.WORD</tt><label id=".WORD"><p>

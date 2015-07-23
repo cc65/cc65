@@ -80,6 +80,7 @@ static Export**         ExpPool  = 0;           /* Exports array */
 
 /* Defines for the flags in Import */
 #define IMP_INLIST      0x0001U                 /* Import is in exports list */
+#define IMP_WEAK        0x0002U                 /* Import is weak */
 
 /* Defines for the flags in Export */
 #define EXP_INLIST      0x0001U                 /* Export is in exports list */
@@ -148,11 +149,19 @@ Import* ReadImport (FILE* F, ObjData* Obj)
     /* Read the import address size */
     unsigned char AddrSize = Read8 (F);
 
+    /* Read the flags */
+    unsigned char Flags = Read8 (F);
+
     /* Create a new import */
     I = NewImport (AddrSize, Obj);
 
     /* Read the name */
     I->Name = MakeGlobalStringId (Obj, ReadVar (F));
+
+    /* Set the IMP_WEAK flag if this import is weak */
+    if (OBJ_IMPORT_IS_WEAK(Flags)) {
+        I->Flags |= IMP_WEAK;
+    }
 
     /* Read the line infos */
     ReadLineInfoList (F, Obj, &I->DefLines);
@@ -657,6 +666,25 @@ int IsConstExport (const Export* E)
 
 
 
+int HasJustWeakImports(unsigned Name)
+/* Check if the imports of this symbol are all "weak" */
+{
+    unsigned J;
+    Export* E = FindExport (Name);
+    Import* I = E->ImpList;
+
+    for (J = 0; J < E->ImpCount; J++) {
+        if ((I->Flags & IMP_WEAK) != IMP_WEAK) {
+            return 0;
+        }
+        I = I->Next;
+    }
+
+    return 1;
+}
+
+
+
 long GetExportVal (const Export* E)
 /* Get the value of this export */
 {
@@ -694,10 +722,16 @@ static void CheckSymType (const Export* E)
                            GetString (E->Obj->Name),
                            GetSourceName (ExportLI),
                            GetSourceLine (ExportLI));
-            } else {
+            } else if (ExportLI) {
                 SB_Printf (&ExportLoc, "%s(%u)",
                            GetSourceName (ExportLI),
                            GetSourceLine (ExportLI));
+            }
+            else {
+                /* The export is linker generated and we don't have line
+                ** information
+                */
+                SB_Printf (&ExportLoc, "%s", GetObjFileName (E->Obj));
             }
             if (I->Obj) {
                 /* The import comes from an object file */
@@ -750,6 +784,74 @@ static void CheckSymTypes (void)
         if (E->Expr != 0 && E->ImpCount > 0) {
             /* External with matching imports */
             CheckSymType (E);
+        }
+    }
+}
+
+
+
+static void CheckWeakAsmSymbols (void)
+/* Check if any unresolved symbols are declared as "weak" and define
+** them if needed. Don't define them if any non-"weak" reference to them
+** exists.
+*/
+{
+    unsigned I, J;
+
+    for (I = 0; I < ExpCount; ++I) {
+        Export* E = ExpPool [I];
+        if (E->Expr == 0 && E->ImpCount != 0) {
+            unsigned AllWeak = 1, AnyWeak = 0;
+            unsigned char AddrSize;
+
+            /* Check if all or any of the references are "weak" */
+            Import* I = E->ImpList;
+            AddrSize = I->AddrSize;
+            for (J = 0; J < E->ImpCount; J++) {
+                if ((I->Flags & IMP_WEAK) != IMP_WEAK) {
+                    AllWeak = 0;
+                }
+                else {
+                    AnyWeak = 1;
+                }
+                I = I->Next;
+            }
+
+            if (AnyWeak == 0) {
+                continue;  /* No "weak" references */
+            }
+
+            if (AllWeak == 0) {
+                /* Not all of the references are "weak". Remove the "weak"
+                ** references in order that the error message won't complain
+                ** about undefined "weak" references.
+                */
+                Import** PrevImport;
+
+            restart:
+                PrevImport = &E->ImpList;
+                I = E->ImpList;
+                for (J = 0; J < E->ImpCount; J++) {
+                    if ((I->Flags & IMP_WEAK) == IMP_WEAK) {
+                        *PrevImport = I->Next;
+                        I->Flags &= ~IMP_INLIST;
+                        FreeImport (I);
+                        E->ImpCount--;
+                        --ImpCount;
+                        goto restart;
+                    }
+                    PrevImport = &I->Next;
+                    I = I->Next;
+                }
+
+                continue;
+            }
+
+            /* All references are weak: Create the symbol.
+            ** If address sizes don't match, we'll get an error later.
+            */
+            E->Expr = WeakExpr(0, 0);
+            E->AddrSize = AddrSize;
         }
     }
 }
@@ -832,6 +934,9 @@ void CheckExports (void)
 {
     /* Create an export pool */
     CreateExportPool ();
+
+    /* Check for weak imports and fill them in with default value */
+    CheckWeakAsmSymbols ();
 
     /* Check for symbol type mismatches */
     CheckSymTypes ();

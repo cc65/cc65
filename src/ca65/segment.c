@@ -446,7 +446,7 @@ void SegDump (void)
         printf ("New segment: %s", S->Def->Name);
         F = S->Root;
         while (F) {
-            if (F->Type == FRAG_LITERAL) {
+            if (F->Type == FRAG_LITERAL || F->Type == FRAG_NOPABLE) {
                 if (State != 0) {
                     printf ("\n  Literal:");
                     X = 15;
@@ -554,6 +554,12 @@ static void WriteOneSeg (Segment* Seg)
 
             case FRAG_LITERAL:
                 ObjWrite8 (FRAG_LITERAL);
+                ObjWriteVar (Frag->Len);
+                ObjWriteData (Frag->V.Data, Frag->Len);
+                break;
+
+            case FRAG_NOPABLE:
+                ObjWrite8 (FRAG_NOPABLE);
                 ObjWriteVar (Frag->Len);
                 ObjWriteData (Frag->V.Data, Frag->Len);
                 break;

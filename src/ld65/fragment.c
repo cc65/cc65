@@ -60,7 +60,7 @@ Fragment* NewFragment (unsigned char Type, unsigned Size, Section* S)
     ** fragment contains literal data.
     */
     unsigned FragSize = sizeof (Fragment) - 1;
-    if (Type == FRAG_LITERAL) {
+    if (Type == FRAG_LITERAL || Type == FRAG_NOPABLE) {
         FragSize += Size;
     }
 
@@ -69,6 +69,7 @@ Fragment* NewFragment (unsigned char Type, unsigned Size, Section* S)
 
     /* Initialize the data */
     F->Next      = 0;
+    F->Prev      = 0;
     F->Obj       = 0;
     F->Sec       = S;
     F->Size      = Size;
@@ -79,8 +80,10 @@ Fragment* NewFragment (unsigned char Type, unsigned Size, Section* S)
     /* Insert the code fragment into the section */
     if (S->FragRoot == 0) {
         /* First fragment */
+        F->Prev     = 0;
         S->FragRoot = F;
     } else {
+        F->Prev           = S->FragLast;
         S->FragLast->Next = F;
     }
     S->FragLast = F;

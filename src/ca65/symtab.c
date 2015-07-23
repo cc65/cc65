@@ -40,6 +40,7 @@
 #include "check.h"
 #include "hashfunc.h"
 #include "mmodel.h"
+#include "objdefs.h"
 #include "scopedefs.h"
 #include "symdefs.h"
 #include "xmalloc.h"
@@ -735,6 +736,11 @@ void WriteImports (void)
             (S->Flags & (SF_REFERENCED | SF_FORCED)) != 0) {
 
             ObjWrite8 (S->AddrSize);
+            if ((S->Flags & SF_WEAK) == SF_WEAK) {
+                ObjWrite8 (OBJ_FLAGS_IMPORT_WEAK);  /* Import flags */
+            } else {
+                ObjWrite8 (0);
+            }
             ObjWriteVar (S->Name);
             WriteLineInfo (&S->DefLines);
             WriteLineInfo (&S->RefLines);

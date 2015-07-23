@@ -90,6 +90,12 @@ void FreeExpr (ExprNode* Root)
 }
 
 
+int IsWeakExpr (ExprNode *Node)
+/* Return true if the given expression is "weak". */
+{
+    return Node->Op == EXPR_WEAK;
+}
+
 
 int IsConstExpr (ExprNode* Root)
 /* Return true if the given expression is a constant expression, that is, one
@@ -105,6 +111,7 @@ int IsConstExpr (ExprNode* Root)
         switch (Root->Op) {
 
             case EXPR_LITERAL:
+            case EXPR_WEAK:
                 return 1;
 
             case EXPR_SYMBOL:
@@ -282,6 +289,7 @@ long GetExprVal (ExprNode* Expr)
     switch (Expr->Op) {
 
         case EXPR_LITERAL:
+        case EXPR_WEAK:
             return Expr->V.IVal;
 
         case EXPR_SYMBOL:
@@ -463,6 +471,7 @@ static void GetSegExprValInternal (ExprNode* Expr, SegExprDesc* D, int Sign)
     switch (Expr->Op) {
 
         case EXPR_LITERAL:
+        case EXPR_WEAK:
             D->Val += (Sign * Expr->V.IVal);
             break;
 
@@ -549,6 +558,16 @@ ExprNode* LiteralExpr (long Val, ObjData* O)
 /* Return an expression tree that encodes the given literal value */
 {
     ExprNode* Expr = NewExprNode (O, EXPR_LITERAL);
+    Expr->V.IVal = Val;
+    return Expr;
+}
+
+
+
+ExprNode* WeakExpr (long Val, ObjData* O)
+/* Return an expression tree that encodes the given literal value, indicating it's "weak" */
+{
+    ExprNode* Expr = NewExprNode (O, EXPR_WEAK);
     Expr->V.IVal = Val;
     return Expr;
 }

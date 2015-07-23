@@ -82,6 +82,10 @@ static void InternalDumpExpr (const ExprNode* Expr, const ExprNode* (*ResolveSym
             printf (" MEM");
             break;
 
+        case EXPR_WEAK:
+            printf (" WEA");
+            break;
+
         case EXPR_PLUS:
             printf (" +");
             break;

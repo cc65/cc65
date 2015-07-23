@@ -67,6 +67,7 @@ struct Section;
 typedef struct Fragment Fragment;
 struct Fragment {
     Fragment*           Next;           /* Next fragment in list */
+    Fragment*           Prev;
     struct ObjData*     Obj;            /* Source of fragment */
     struct Section*     Sec;            /* Section for this fragment */
     unsigned            Size;           /* Size of data/expression */

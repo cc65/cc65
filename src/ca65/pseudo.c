@@ -1197,6 +1197,14 @@ static void DoImportZP (void)
 
 
 
+static void DoWeak (void)
+/* Import a symbol */
+{
+    ExportImport (SymImport, ADDR_SIZE_DEFAULT, SF_WEAK);
+}
+
+
+
 static void DoIncBin (void)
 /* Include a binary file */
 {
@@ -2095,6 +2103,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoUnion         },
     { ccNone,           DoUnexpected    },      /* .VERSION */
     { ccNone,           DoWarning       },
+    { ccNone,           DoWeak          },
     { ccNone,           DoWord          },
     { ccNone,           DoUnexpected    },      /* .XMATCH */
     { ccNone,           DoZeropage      },

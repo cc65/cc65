@@ -60,6 +60,7 @@
 #define EXPR_SEGMENT            (EXPR_LEAFNODE | 0x04)  /* Linker only */
 #define EXPR_MEMAREA            (EXPR_LEAFNODE | 0x05)  /* Linker only */
 #define EXPR_ULABEL             (EXPR_LEAFNODE | 0x06)  /* Assembler only */
+#define EXPR_WEAK               (EXPR_LEAFNODE | 0x07)  /* Linker only */
 
 /* Binary operations, left and right hand sides are valid */
 #define EXPR_PLUS               (EXPR_BINARYNODE | 0x01)

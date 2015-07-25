@@ -46,7 +46,7 @@
 
 /* Defines for magic and version */
 #define OBJ_MAGIC       0x616E7A55
-#define OBJ_VERSION     0x0011
+#define OBJ_VERSION     0x0012
 
 /* Size of an object file header */
 #define OBJ_HDR_SIZE    (24*4)
@@ -55,6 +55,9 @@
 #define OBJ_FLAGS_DBGINFO       0x0001  /* File has debug info */
 #define OBJ_HAS_DBGINFO(x)      (((x) & OBJ_FLAGS_DBGINFO) != 0)
 
+/* Flag bits for imports */
+#define OBJ_FLAGS_IMPORT_WEAK   0x0001  /* This import is "weak" */
+#define OBJ_IMPORT_IS_WEAK(x)   (((x) & OBJ_FLAGS_IMPORT_WEAK) != 0)
 
 
 /* Header structure */

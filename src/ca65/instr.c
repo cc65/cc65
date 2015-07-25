@@ -110,6 +110,11 @@ static void PutTMAn (const InsDesc* Ins);
 static void PutTST (const InsDesc* Ins);
 /* Emit a TST instruction (HuC6280). */
 
+static void PutJSR (const InsDesc* Ins);
+/* Emit a JSR instruction. It will indicate that it's "NOPable" for weak
+** symbols.
+*/
+
 static void PutJMP (const InsDesc* Ins);
 /* Handle the jump instruction for the 6502. Problem is that these chips have
 ** a bug: If the address crosses a page, the upper byte gets not corrected and
@@ -181,7 +186,7 @@ static const struct {
         { "INX",  0x0000001, 0xe8, 0, PutAll },
         { "INY",  0x0000001, 0xc8, 0, PutAll },
         { "JMP",  0x0000808, 0x4c, 6, PutJMP },
-        { "JSR",  0x0000008, 0x20, 7, PutAll },
+        { "JSR",  0x0000008, 0x20, 7, PutJSR },
         { "LDA",  0x080A26C, 0xa0, 0, PutAll },
         { "LDX",  0x080030C, 0xa2, 1, PutAll },
         { "LDY",  0x080006C, 0xa0, 1, PutAll },
@@ -255,7 +260,7 @@ static const struct {
         { "ISC",  0x000A26C, 0xE3, 0, PutAll },         /* X */
         { "JAM",  0x0000001, 0x02, 0, PutAll },         /* X */
         { "JMP",  0x0000808, 0x4c, 6, PutJMP },
-        { "JSR",  0x0000008, 0x20, 7, PutAll },
+        { "JSR",  0x0000008, 0x20, 7, PutJSR },
         { "LAS",  0x0000200, 0xBB, 0, PutAll },         /* X */
         { "LAX",  0x080A30C, 0xA3, 11, PutAll },        /* X */
         { "LDA",  0x080A26C, 0xa0, 0, PutAll },
@@ -335,7 +340,7 @@ static const struct {
         { "INX",  0x0000001, 0xe8, 0, PutAll },
         { "INY",  0x0000001, 0xc8, 0, PutAll },
         { "JMP",  0x0010808, 0x4c, 6, PutAll },
-        { "JSR",  0x0000008, 0x20, 7, PutAll },
+        { "JSR",  0x0000008, 0x20, 7, PutJSR },
         { "LDA",  0x080A66C, 0xa0, 0, PutAll },
         { "LDX",  0x080030C, 0xa2, 1, PutAll },
         { "LDY",  0x080006C, 0xa0, 1, PutAll },
@@ -427,7 +432,7 @@ static const struct {
         { "INX",  0x0000001, 0xe8, 0, PutAll },
         { "INY",  0x0000001, 0xc8, 0, PutAll },
         { "JMP",  0x0010808, 0x4c, 6, PutAll },
-        { "JSR",  0x0000008, 0x20, 7, PutAll },
+        { "JSR",  0x0000008, 0x20, 7, PutJSR },
         { "LDA",  0x080A66C, 0xa0, 0, PutAll },
         { "LDX",  0x080030C, 0xa2, 1, PutAll },
         { "LDY",  0x080006C, 0xa0, 1, PutAll },
@@ -524,7 +529,7 @@ static const struct {
         { "JML",  0x4000010, 0x5c, 1, PutAll },
         { "JMP",  0x4010818, 0x4c, 6, PutAll },
         { "JSL",  0x0000010, 0x20, 7, PutAll },
-        { "JSR",  0x0010018, 0x20, 7, PutAll },
+        { "JSR",  0x0010018, 0x20, 7, PutJSR },
         { "LDA",  0x0b8f6fc, 0xa0, 0, PutAll },
         { "LDX",  0x0c0030c, 0xa2, 1, PutAll },
         { "LDY",  0x0c0006c, 0xa0, 1, PutAll },
@@ -686,7 +691,7 @@ static const struct {
         { "INX",  0x0000001, 0xe8, 0, PutAll },
         { "INY",  0x0000001, 0xc8, 0, PutAll },
         { "JMP",  0x0010808, 0x4c, 6, PutAll },
-        { "JSR",  0x0000008, 0x20, 7, PutAll },
+        { "JSR",  0x0000008, 0x20, 7, PutJSR },
         { "LDA",  0x080A66C, 0xa0, 0, PutAll },
         { "LDX",  0x080030C, 0xa2, 1, PutAll },
         { "LDY",  0x080006C, 0xa0, 1, PutAll },
@@ -783,7 +788,7 @@ static const InsTable* InsTabs[CPU_COUNT] = {
     (const InsTable*) &InsTab65816,
     (const InsTable*) &InsTabSweet16,
     (const InsTable*) &InsTabHuC6280,
-    0,                                  /* Mitsubishi 740 */
+    0,
 };
 const InsTable* InsTab = (const InsTable*) &InsTab6502;
 
@@ -1043,7 +1048,7 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
 
 
 
-static void EmitCode (EffAddr* A)
+static void EmitCode (EffAddr* A, int Nopable)
 /* Output code for the data in A */
 {
     /* Check how many extension bytes are needed and output the instruction */
@@ -1063,9 +1068,9 @@ static void EmitCode (EffAddr* A)
                 ** mode, force this address into 16 bit range to allow
                 ** addressing inside a 64K segment.
                 */
-                Emit2 (A->Opcode, GenWordExpr (A->Expr));
+                Emit2 (A->Opcode, GenWordExpr (A->Expr), Nopable);
             } else {
-                Emit2 (A->Opcode, A->Expr);
+                Emit2 (A->Opcode, A->Expr, Nopable);
             }
             break;
 
@@ -1317,6 +1322,19 @@ static void PutTST (const InsDesc* Ins)
 }
 
 
+static void PutJSR (const InsDesc* Ins)
+/* Emit a JSR instruction. It will indicate that it's "NOPable" for weak
+** symbols.
+*/
+{
+    EffAddr A;
+
+    /* Evaluate the addressing mode used */
+    if (EvalEA (Ins, &A)) {
+        /* No error, output code */
+        EmitCode (&A, 1);
+    }
+}
 
 static void PutJMP (const InsDesc* Ins)
 /* Handle the jump instruction for the 6502. Problem is that these chips have
@@ -1347,7 +1365,7 @@ static void PutJMP (const InsDesc* Ins)
         }
 
         /* No error, output code */
-        EmitCode (&A);
+        EmitCode (&A, 0);
     }
 }
 
@@ -1375,7 +1393,7 @@ static void PutAll (const InsDesc* Ins)
     /* Evaluate the addressing mode used */
     if (EvalEA (Ins, &A)) {
         /* No error, output code */
-        EmitCode (&A);
+        EmitCode (&A, 0);
     }
 }
 
@@ -1423,7 +1441,7 @@ static void PutSweet16 (const InsDesc* Ins)
             break;
 
         case 2:
-            Emit2 (A.Opcode, A.Expr);
+            Emit2 (A.Opcode, A.Expr, 0);
             break;
 
         default:

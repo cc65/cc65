@@ -300,7 +300,7 @@ static void LibCheckExports (ObjData* O)
     /* Check all exports */
     for (I = 0; I < CollCount (&O->Exports); ++I) {
         const Export* E = CollConstAt (&O->Exports, I);
-        if (IsUnresolved (E->Name)) {
+        if (IsUnresolved (E->Name) && HasJustWeakImports (E->Name) == 0) {
            /* We need this module, insert the imports and exports */
             O->Flags |= OBJ_REF;
             InsertObjGlobals (O);

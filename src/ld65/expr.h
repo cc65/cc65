@@ -76,6 +76,9 @@ ExprNode* NewExprNode (ObjData* O, unsigned char Op);
 void FreeExpr (ExprNode* Root);
 /* Free the expression tree, Root is pointing to. */
 
+int IsWeakExpr (ExprNode *Node);
+/* Return true if the given expression is "weak". */
+
 int IsConstExpr (ExprNode* Root);
 /* Return true if the given expression is a constant expression, that is, one
 ** with no references to external symbols.
@@ -101,6 +104,9 @@ void GetSegExprVal (ExprNode* Expr, SegExprDesc* D);
 
 ExprNode* LiteralExpr (long Val, ObjData* O);
 /* Return an expression tree that encodes the given literal value */
+
+ExprNode* WeakExpr (long Val, ObjData* O);
+/* Return an expression tree that encodes the given literal value, indicating it's "weak" */
 
 ExprNode* MemoryExpr (MemoryArea* Mem, long Offs, ObjData* O);
 /* Return an expression tree that encodes an offset into the memory area */

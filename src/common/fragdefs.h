@@ -45,7 +45,7 @@
 
 
 /* Masks for the fragment type byte */
-#define FRAG_TYPEMASK   0x38            /* Mask the type of the fragment */
+#define FRAG_TYPEMASK   0x78            /* Mask the type of the fragment */
 #define FRAG_BYTEMASK   0x07            /* Mask for byte count */
 
 /* Fragment types */
@@ -65,7 +65,7 @@
 
 #define FRAG_FILL       0x20            /* Fill bytes */
 
-
+#define FRAG_NOPABLE    0x40            /* similar to FRAG_LITERAL, but indicates a "nopable" instruction */
 
 /* End of fragdefs.h */
 

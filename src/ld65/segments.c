@@ -75,6 +75,8 @@ static Segment*         HashTab[HASHTAB_SIZE];
 /* List of all segments */
 static Collection       SegmentList = STATIC_COLLECTION_INITIALIZER;
 
+/* Array of four NOP instructions. */
+static unsigned char FourNOPs[4] = { 0xea, 0xea, 0xea, 0xea };
 
 
 /*****************************************************************************/
@@ -253,6 +255,7 @@ Section* ReadSection (FILE* F, ObjData* O)
         /* Handle the different fragment types */
         switch (Type) {
 
+            case FRAG_NOPABLE:
             case FRAG_LITERAL:
                 Frag = NewFragment (Type, ReadVar (F), Sec);
                 ReadData (F, Frag->LitBuf, Frag->Size);
@@ -361,6 +364,7 @@ void SegDump (void)
                 switch (F->Type) {
 
                     case FRAG_LITERAL:
+                    case FRAG_NOPABLE:
                         printf ("    Literal (%u bytes):", F->Size);
                         Count = F->Size;
                         Data  = F->LitBuf;
@@ -455,7 +459,7 @@ void SegWrite (const char* TgtName, FILE* Tgt, Segment* S, SegWriteFunc F, void*
     unsigned      I;
     int           Sign;
     unsigned long Offs = 0;
-
+    Export*       E;
 
     /* Remember the output file and offset for the segment */
     S->OutputName = TgtName;
@@ -489,11 +493,26 @@ void SegWrite (const char* TgtName, FILE* Tgt, Segment* S, SegWriteFunc F, void*
             switch (Frag->Type) {
 
                 case FRAG_LITERAL:
+                case FRAG_NOPABLE:
                     WriteData (Tgt, Frag->LitBuf, Frag->Size);
                     break;
 
                 case FRAG_EXPR:
                 case FRAG_SEXPR:
+                    if (Frag->Expr->Op == EXPR_SYMBOL && (E = GetExprExport(Frag->Expr)))
+                    {
+                        /* If we have a reference to an undefined weak symbol and the previous Frag
+                        ** is "NOPable", write NOPs to the output file.
+                        */
+                        if (IsWeakExpr (E->Expr) && Frag->Prev && Frag->Prev->Type == FRAG_NOPABLE) {
+                            FileSetPos (Tgt, FileGetPos (Tgt) - 1);
+                            if (Frag->Size != 2 && Frag->Size != 3)
+                                Internal ("Unexpected symbol size: %u\n", Frag->Size);
+                            WriteData (Tgt, FourNOPs, Frag->Size + 1);
+                            break;
+                        }
+                    }
+
                     Sign = (Frag->Type == FRAG_SEXPR);
                     /* Call the users function and evaluate the result */
                     switch (F (Frag->Expr, Sign, Frag->Size, Offs, Data)) {

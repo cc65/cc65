@@ -740,6 +740,9 @@ unsigned GetSymInfoFlags (const SymEntry* S, long* ConstVal)
     if (S->Flags & SF_IMPORT) {
         Flags |= SYM_IMPORT;
     }
+    if (S->Flags & SF_WEAK) {
+        Flags |= SYM_WEAK;
+    }
 
     /* Return the result */
     return Flags;

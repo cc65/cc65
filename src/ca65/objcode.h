@@ -53,10 +53,13 @@
 void Emit0 (unsigned char OPC);
 /* Emit an instruction with a zero sized operand */
 
+void Emit0Nopable (unsigned char OPC);
+/* Emit an instruction with a zero sized operand, indicating that it's "NOPable" */
+
 void Emit1 (unsigned char OPC, ExprNode* Value);
 /* Emit an instruction with an one byte argument */
 
-void Emit2 (unsigned char OPC, ExprNode* Value);
+void Emit2 (unsigned char OPC, ExprNode* Value, int Nopable);
 /* Emit an instruction with a two byte argument */
 
 void Emit3 (unsigned char OPC, ExprNode* Expr);

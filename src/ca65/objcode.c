@@ -59,6 +59,15 @@ void Emit0 (unsigned char OPC)
 
 
 
+void Emit0Nopable (unsigned char OPC)
+/* Emit an instruction with a zero sized operand, indicating that it's "NOPable" */
+{
+    Fragment* F = GenFragment (FRAG_NOPABLE, 1);
+    F->V.Data[0] = OPC;
+}
+
+
+
 void Emit1 (unsigned char OPC, ExprNode* Value)
 /* Emit an instruction with an one byte argument */
 {
@@ -91,7 +100,7 @@ void Emit1 (unsigned char OPC, ExprNode* Value)
 
 
 
-void Emit2 (unsigned char OPC, ExprNode* Value)
+void Emit2 (unsigned char OPC, ExprNode* Value, int Nopable)
 /* Emit an instruction with a two byte argument */
 {
     long V;
@@ -114,7 +123,11 @@ void Emit2 (unsigned char OPC, ExprNode* Value)
     } else {
 
         /* Emit the opcode */
-        Emit0 (OPC);
+        if (Nopable != 0) {
+            Emit0Nopable (OPC);
+        } else {
+            Emit0 (OPC);
+        }
 
         /* Emit the argument as an expression */
         F = GenFragment (FRAG_EXPR, 2);

@@ -74,6 +74,7 @@ struct HLLDbgSym;
 #define SF_MULTDEF      0x1000          /* Multiply defined symbol */
 #define SF_DEFINED      0x2000          /* Defined */
 #define SF_REFERENCED   0x4000          /* Referenced */
+#define SF_WEAK         0x8000          /* Weak import, SF_IMPORT also set */
 
 /* Combined values */
 #define SF_REFIMP       (SF_REFERENCED|SF_IMPORT)       /* A ref'd import */

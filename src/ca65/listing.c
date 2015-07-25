@@ -359,6 +359,7 @@ void CreateListing (void)
             switch (Frag->Type) {
 
                 case FRAG_LITERAL:
+                case FRAG_NOPABLE:
                     for (I = 0; I < Frag->Len; ++I) {
                         B = AddHex (B, Frag->V.Data[I]);
                     }

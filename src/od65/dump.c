@@ -557,6 +557,7 @@ void DumpObjImports (FILE* F, unsigned long Offset)
 
         /* Read the data for one import */
         unsigned char AddrSize = Read8 (F);
+        unsigned char Flags    = Read8 (F);
         const char*   Name     = GetString (&StrPool, ReadVar (F));
         unsigned      Len      = strlen (Name);
 
@@ -571,6 +572,11 @@ void DumpObjImports (FILE* F, unsigned long Offset)
         printf ("      Address size:%14s0x%02X  (%s)\n", "", AddrSize,
                 AddrSizeToStr (AddrSize));
         printf ("      Name:%*s\"%s\"\n", (int)(24-Len), "", Name);
+        printf ("      Flags:%21s0x%02X", "", Flags);
+        if (OBJ_IMPORT_IS_WEAK(Flags)) {
+            printf("  (weak)");
+        }
+        printf("\n");
     }
 
     /* Destroy the string pool */
@@ -738,7 +744,11 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset)
             printf ("      Size:%20s0x%04lX  (%lu)\n", "", Size, Size);
         }
         if (SYM_IS_IMPORT (Type)) {
-            printf ("      Import:%24u\n", ImportId);
+            if (SYM_IS_WEAK (Type)) {
+                printf ("      Import:%24u  (weak)\n", ImportId);
+            } else {
+                printf ("      Import:%24u\n", ImportId);
+            }
         }
         if (SYM_IS_EXPORT (Type)) {
             printf ("      Export:%24u\n", ExportId);

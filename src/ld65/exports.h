@@ -170,6 +170,9 @@ int IsUnresolved (unsigned Name);
 int IsUnresolvedExport (const Export* E);
 /* Return true if the given export is unresolved */
 
+int HasJustWeakImports(unsigned Name);
+/* Check if the imports of this symbol are all "weak" */
+
 int IsConstExport (const Export* E);
 /* Return true if the expression associated with this export is const */
 

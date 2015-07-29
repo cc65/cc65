@@ -3,10 +3,10 @@
 <article>
 <title>ca65 Users Guide
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2014-04-24
+<date>2015-07-29
 
 <abstract>
-ca65 is a powerful macro assembler for the 6502, 65C02 and 65816 CPUs. It is
+ca65 is a powerful macro assembler for the 6502, 65C02, and 65816 CPUs. It is
 used as a companion assembler for the cc65 crosscompiler, but it may also be
 used as a standalone product.
 </abstract>
@@ -430,22 +430,19 @@ The assembler accepts
 
 <sect1>65816 mode<p>
 
-In 65816 mode several aliases are accepted in addition to the official
+In 65816 mode, several aliases are accepted, in addition to the official
 mnemonics:
 
 <tscreen><verb>
-  	BGE is an alias for BCS
-  	BLT is an alias for BCC
-  	CPA is an alias for CMP
-  	DEA is an alias for DEC A
-        INA is an alias for INC A
-  	SWA is an alias for XBA
-      	TAD is an alias for TCD
-  	TAS is an alias for TCS
-  	TDA is an alias for TDC
-  	TSA is an alias for TSC
+CPA is an alias for CMP
+DEA is an alias for DEC A
+INA is an alias for INC A
+SWA is an alias for XBA
+TAD is an alias for TCD
+TAS is an alias for TCS
+TDA is an alias for TDC
+TSA is an alias for TSC
 </verb></tscreen>
-
 
 
 <sect1>6502X mode<label id="6502X-mode"><p>
@@ -3330,8 +3327,8 @@ Here's a list of all control commands and a description, what they do:
         atari           Defines the scrcode macro.
         cbm             Defines the scrcode macro.
         cpu             Defines constants for the .CPU variable.
-	generic		Defines generic macros like add and sub.
-    	longbranch     	Defines conditional long jump macros.
+        generic         Defines generic macroes like add, sub, and blt.
+        longbranch      Defines conditional long-jump macroes.
   </verb></tscreen>
 
   Including a macro package twice, or including a macro package that
@@ -4317,48 +4314,47 @@ are:
 
 <sect1><tt>.MACPACK generic</tt><p>
 
-This macro package defines macros that are useful in almost any program.
-Currently defined macros are:
+This macro package defines macroes that are useful in almost any program.
+Currently defined macroes are:
 
 <tscreen><verb>
-      	.macro  add     Arg
+        .macro  add     Arg     ; add without carry
       	     	clc
       	     	adc     Arg
       	.endmacro
 
-      	.macro  sub     Arg
+        .macro  sub     Arg     ; subtract without borrow
       	     	sec
       	     	sbc     Arg
       	.endmacro
 
-        .macro  bge     Arg
+        .macro  bge     Arg     ; branch on greater-than or equal
                 bcs     Arg
         .endmacro
 
-        .macro  blt     Arg
+        .macro  blt     Arg     ; branch on less-than
                 bcc     Arg
         .endmacro
 
-        .macro  bgt     Arg
+        .macro  bgt     Arg     ; branch on greater-than
                 .local  L
                 beq     L
                 bcs     Arg
         L:
         .endmacro
 
-        .macro  ble     Arg
+        .macro  ble     Arg     ; branch on less-than or equal
                 beq     Arg
                 bcc     Arg
         .endmacro
 
-        .macro  bnz     Arg
+        .macro  bnz     Arg     ; branch on not zero
                 bne     Arg
         .endmacro
 
-        .macro  bze     Arg
+        .macro  bze     Arg     ; branch on zero
                 beq     Arg
         .endmacro
-
 </verb></tscreen>
 
 

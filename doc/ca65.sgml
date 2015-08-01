@@ -3,7 +3,7 @@
 <article>
 <title>ca65 Users Guide
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2015-07-29
+<date>2015-08-01
 
 <abstract>
 ca65 is a powerful macro assembler for the 6502, 65C02, and 65816 CPUs. It is
@@ -3667,7 +3667,7 @@ Here's a list of all control commands and a description, what they do:
   segment, that is, a named section of data. The default segment is
   "CODE". There may be up to 254 different segments per object file
   (and up to 65534 per executable). There are shortcut commands for
-  the most common segments ("CODE", "DATA" and "BSS").
+  the most common segments ("ZEROPAGE", "CODE", "RODATA", "DATA", and "BSS").
 
   The command is followed by a string containing the segment name (there are
   some constraints for the name - as a rule of thumb use only those segment
@@ -3701,8 +3701,9 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
   See: <tt><ref id=".BSS" name=".BSS"></tt>, <tt><ref id=".CODE"
-  name=".CODE"></tt>, <tt><ref id=".DATA" name=".DATA"></tt> and <tt><ref
-  id=".RODATA" name=".RODATA"></tt>
+  name=".CODE"></tt>, <tt><ref id=".DATA" name=".DATA"></tt>, <tt><ref
+  id=".RODATA" name=".RODATA"></tt>, and <tt><ref id=".ZEROPAGE"
+  name=".ZEROPAGE"></tt>
 
 
 <sect1><tt>.SET</tt><label id=".SET"><p>
@@ -3863,7 +3864,7 @@ Here's a list of all control commands and a description, what they do:
   shortcut for
 
   <tscreen><verb>
-       	.segment  "ZEROPAGE", zeropage
+        .segment  "ZEROPAGE": zeropage
   </verb></tscreen>
 
   Because of the "zeropage" attribute, labels declared in this segment are

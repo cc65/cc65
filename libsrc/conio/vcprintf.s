@@ -1,5 +1,5 @@
 ;
-; int vcprintf (const char* Format, va_list ap);
+; int __fastcall__ vcprintf (const char* Format, va_list ap);
 ;
 ; Ullrich von Bassewitz, 2.12.2000
 ;
@@ -30,7 +30,7 @@ outdesc:                        ; Static outdesc structure
 ; ----------------------------------------------------------------------------
 ; Callback routine used for the actual output.
 ;
-; static void out (struct outdesc* d, const char* buf, unsigned count)
+; static void __cdecl__ out (struct outdesc* d, const char* buf, unsigned count)
 ; /* Routine used for writing */
 ; {
 ;     /* Fast screen output */
@@ -94,7 +94,7 @@ out:    jsr     popax           ; count
 ; ----------------------------------------------------------------------------
 ; vcprintf - formatted console i/o
 ;
-; int vcprintf (const char* format, va_list ap)
+; int __fastcall__ vcprintf (const char* format, va_list ap)
 ; {
 ;     struct outdesc d;
 ;
@@ -107,10 +107,6 @@ out:    jsr     popax           ; count
 ;     /* Return bytes written */
 ;     return d.ccount;
 ; }
-;
-; It is intentional that this function does not have __fastcall__ calling
-; conventions - we need the space on the stack anyway, so there's nothing
-; gained by using __fastcall__.
 
 _vcprintf:
         sta     ptr1            ; Save ap
@@ -153,6 +149,3 @@ _vcprintf:
         lda     outdesc         ; ccount
         ldx     outdesc+1
         rts
-
-                      
-

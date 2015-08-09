@@ -813,6 +813,11 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
             }
         }
 
+        /* An extern declaration must not change the current linkage. */
+        if (IsFunc || (Flags & (SC_EXTERN | SC_DEF)) == SC_EXTERN) {
+            Flags &= ~SC_EXTERN;
+        }
+
         /* Add the new flags */
         Entry->Flags |= Flags;
 

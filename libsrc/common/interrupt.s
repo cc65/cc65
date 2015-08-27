@@ -1,5 +1,6 @@
 ;
-; Oliver Schmidt, 2012-01-18
+; 2012-01-18, Oliver Schmidt
+; 2015-08-22, Greg King
 ;
 ; void __fastcall__ set_irq (irq_handler f, void *stack_addr, size_t stack_size);
 ; void reset_irq (void);
@@ -7,8 +8,7 @@
 
         .export         _set_irq, _reset_irq
         .interruptor    clevel_irq, 1           ; Export as low priority IRQ handler
-        .import         popax
-        .importzp       __ZP_START__
+        .import         popax, __ZP_START__
 
         .include        "zeropage.inc"
 
@@ -30,6 +30,8 @@ irqsp:  .res    2
 zpsave: .res    zpsavespace
 
 ; ---------------------------------------------------------------------------
+
+.code
 
 .proc   _set_irq
 
@@ -77,7 +79,7 @@ zpsave: .res    zpsavespace
 
         ; Save our zero page locations
 @L1:    ldx     #.sizeof(::zpsave)-1
-@L2:    lda     __ZP_START__,x
+@L2:    lda     <__ZP_START__,x
         sta     zpsave,x
         dex
         bpl     @L2
@@ -94,7 +96,7 @@ zpsave: .res    zpsavespace
         ; Copy back our zero page content
         ldx     #.sizeof(::zpsave)-1
 @L3:    ldy     zpsave,x
-        sty     __ZP_START__,x
+        sty     <__ZP_START__,x
         dex
         bpl     @L3
 
@@ -103,4 +105,3 @@ zpsave: .res    zpsavespace
         rts
 
 .endproc
-

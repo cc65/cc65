@@ -4,6 +4,8 @@
 
 [![build status](http://travis-ci.org/cc65/cc65.png)](http://travis-ci.org/cc65/cc65/builds)
 
+Binary snapshot for [Windows](http://sourceforge.net/projects/cc65/files/cc65-snapshot-win32.zip)
+
 cc65 is a complete cross development package for 65(C)02 systems, including
 a powerful macro assembler, a C compiler, linker, librarian and several
 other tools.
@@ -23,6 +25,7 @@ including
 - the Atari 8 bit machines.
 - the Atari 5200 console.
 - GEOS for the C64, C128 and Apple //e.
+- the NEC PC-Engine
 - the Nintendo Entertainment System (NES) console.
 - the Supervision console.
 - the Oric Atmos.

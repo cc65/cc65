@@ -5,6 +5,7 @@
 
         .include        "joy-kernel.inc"
         .include        "joy-error.inc"
+        .include        "pce.inc"
 
         .macpack        module
 
@@ -58,10 +59,10 @@ JOY_COUNT       = 4             ; Number of joysticks we support
 ;
 
 INSTALL:
-                lda     #<JOY_ERR_OK
-                ldx     #>JOY_ERR_OK
+        lda     #<JOY_ERR_OK
+        ldx     #>JOY_ERR_OK
 
-;               rts                     ; Run into DEINSTALL instead
+;        rts                     ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------
 ; DEINSTALL routine. Is called before the driver is removed from memory.
@@ -69,7 +70,7 @@ INSTALL:
 ;
 
 UNINSTALL:
-                rts
+        rts
 
 
 ; ------------------------------------------------------------------------
@@ -78,9 +79,9 @@ UNINSTALL:
 ;unsigned char __fastcall__ joy_count (void);
 
 COUNT:
-                lda     #<JOY_COUNT
-                ldx     #>JOY_COUNT
-                rts
+        lda     #<JOY_COUNT
+        ldx     #>JOY_COUNT
+        rts
 
 ; ------------------------------------------------------------------------
 ; READ: Read a particular joystick passed in A.
@@ -88,70 +89,71 @@ COUNT:
 ;unsigned char __fastcall__ joy_read (unsigned char joystick);
 
 READJOY:
-                pha
-                jsr read_joy
-                pla
-                tax             ; Joystick number into X
+        pha
+        jsr     read_joy
+        pla
+        tax                     ; Joystick number into X
 
-                ; return value from buffer
+        ; return value from buffer
 
 joy1:
-                lda padbuffer,x
-                ldx #0
-                rts
+        lda     padbuffer,x
+        ldx     #0
+        rts
 
 read_joy:
-                ; reset multitap counter
-                lda     #$01
-                sta     $1000
-                pha
-                pla
-                nop
-                nop
+        ; reset multitap counter
+        lda     #$01
+        sta     JOY_CTRL
+        pha
+        pla
+        nop
+        nop
 
-                lda     #$03
-                sta     $1000
-                pha
-                pla
-                nop
-                nop
+        lda     #$03
+        sta     JOY_CTRL
+        pha
+        pla
+        nop
+        nop
 
-                cly
+        cly
 nextpad:
-                lda     #$01
-                sta     $1000   ; sel = 1
-                pha
-                pla
-                nop
-                nop
+        lda     #$01
+        sta     JOY_CTRL           ; sel = 1
+        pha
+        pla
+        nop                     ; some delay is required
+        nop
 
-                lda     $1000
-                asl     a
-                asl     a
-                asl     a
-                asl     a
-                sta     padbuffer, y     ; store new value
+        lda     JOY_CTRL
+        asl     a
+        asl     a
+        asl     a
+        asl     a
+        sta     padbuffer, y     ; store new value
 
-                stz     $1000
-                pha
-                pla
-                nop
-                nop
+        stz     JOY_CTRL
+        pha
+        pla
 
-                lda     $1000
-                and     #$0F
-                ora     padbuffer, y     ; second half of new value
+        nop                     ; some delay is required
+        nop
 
-                eor     #$FF
-                sta     padbuffer, y     ; store new value
+        lda     JOY_CTRL
+        and     #$0F
+        ora     padbuffer, y     ; second half of new value
 
-                iny
-                cpy     #$05
-                bcc     nextpad
-                rts
+        eor     #$FF
+        sta     padbuffer, y     ; store new value
+
+        iny
+        cpy     #$05
+        bcc     nextpad
+        rts
 
 .bss
 
 padbuffer:
-                .res 4
+        .res    4
 

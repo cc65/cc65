@@ -7,153 +7,155 @@
 ; This must be the *first* file on the linker command line
 ;
 
-        .export _exit
-        .export __STARTUP__ : absolute = 1      ; Mark as startup
+        .export         _exit
+        .export         __STARTUP__ : absolute = 1      ; Mark as startup
 
-        .import initlib, donelib
-        .import push0, _main, zerobss
-        .import initheap
-        .import tmp1,tmp2,tmp3
+        .import         initlib, donelib
+        .import         push0, _main, zerobss
+        .import         initheap
+        .import         tmp1,tmp2,tmp3
 
         ; Linker generated
-        .import __RAM_START__, __RAM_SIZE__
-        .import __ROM0_START__, __ROM0_SIZE__
-        .import __ROM_START__, __ROM_SIZE__
-        .import __STARTUP_LOAD__,__STARTUP_RUN__, __STARTUP_SIZE__
-        .import __CODE_LOAD__,__CODE_RUN__, __CODE_SIZE__
-        .import __RODATA_LOAD__,__RODATA_RUN__, __RODATA_SIZE__
-        .import __DATA_LOAD__,__DATA_RUN__, __DATA_SIZE__
-        .import __BSS_SIZE__
+        .import         __RAM_START__, __RAM_SIZE__
+        .import         __ROM0_START__, __ROM0_SIZE__
+        .import         __ROM_START__, __ROM_SIZE__
+        .import         __STARTUP_LOAD__,__STARTUP_RUN__, __STARTUP_SIZE__
+        .import         __CODE_LOAD__,__CODE_RUN__, __CODE_SIZE__
+        .import         __RODATA_LOAD__,__RODATA_RUN__, __RODATA_SIZE__
+        .import         __DATA_LOAD__,__DATA_RUN__, __DATA_SIZE__
+        .import         __BSS_SIZE__
 
-        .include "pce.inc"
+        .include        "pce.inc"
 
-        .importzp sp
-        .importzp ptr1,ptr2
+        .importzp       sp
+        .importzp       ptr1,ptr2
 
 ; ------------------------------------------------------------------------
 ; Place the startup code in a special segment.
 
-                .segment "STARTUP"
+        .segment "STARTUP"
 
 start:
 
-                ; setup the CPU and System-IRQ
+        ; setup the CPU and System-IRQ
 
-                ; Initialize CPU
+        ; Initialize CPU
 
-                sei
-                nop
-                csh                     ; set high speed CPU mode
-                nop
-                cld
-                nop
+        sei
+        nop
+        csh                     ; set high speed CPU mode
+        nop
+        cld
+        nop
 
-                ; Setup stack and memory mapping
-                ldx     #$FF            ; Stack top ($21FF)
-                txs
+        ; Setup stack and memory mapping
+        ldx     #$FF            ; Stack top ($21FF)
+        txs
 
-                ; at startup all MPRs are set to 0, so init them
-                lda     #$ff
-                tam     #%00000001      ; 0000-1FFF = Hardware page
-                lda     #$F8
-                tam     #%00000010      ; 2000-3FFF = Work RAM
-                ;lda     #$F7
-                ;tam     #%00000100      ; 4000-5FFF = Save RAM
-                ;lda     #1
-                ;tam     #%00001000      ; 6000-7FFF  Page 2
-                ;lda     #2
-                ;tam     #%00010000      ; 8000-9FFF  Page 3
-                ;lda     #3
-                ;tam     #%00100000      ; A000-BFFF  Page 4
-                ;lda     #4
-                ;tam     #%01000000      ; C000-DFFF  Page 5
-                ;lda     #0
-                ;tam     #%10000000      ; e000-fFFF  hucard/syscard bank 0
+        ; at startup all MPRs are set to 0, so init them
+        lda     #$ff
+        tam     #%00000001      ; 0000-1FFF = Hardware page
+        lda     #$F8
+        tam     #%00000010      ; 2000-3FFF = Work RAM
 
-                ; Clear work RAM (2000-3FFF)
-                stz     <$00
-                tii     $2000, $2001, $1FFF
+        ; FIXME: setup a larger block of memory to use with C-code
+        ;lda     #$F7
+        ;tam     #%00000100      ; 4000-5FFF = Save RAM
+        ;lda     #1
+        ;tam     #%00001000      ; 6000-7FFF  Page 2
+        ;lda     #2
+        ;tam     #%00010000      ; 8000-9FFF  Page 3
+        ;lda     #3
+        ;tam     #%00100000      ; A000-BFFF  Page 4
+        ;lda     #4
+        ;tam     #%01000000      ; C000-DFFF  Page 5
+        ;lda     #0
+        ;tam     #%10000000      ; e000-fFFF  hucard/syscard bank 0
 
-                ; Initialize hardware
-                stz     TIMER_COUNT   ; Timer off
-                lda     #$07
-                sta     IRQ_MASK     ; Interrupts off
-                stz     IRQ_STATUS   ; Acknowledge timer
+        ; Clear work RAM (2000-3FFF)
+        stz     <$00
+        tii     $2000, $2001, $1FFF
 
-                ;; FIXME; i dont know why the heck this one doesnt work when called from a constructor :/
-                .import vdc_init
-                jsr     vdc_init
+        ; Initialize hardware
+        stz     TIMER_COUNT     ; Timer off
+        lda     #$07
+        sta     IRQ_MASK        ; Interrupts off
+        stz     IRQ_STATUS      ; Acknowledge timer
 
-                ; Turn on background and VD interrupt/IRQ1
-                lda     #$05
-                sta     IRQ_MASK           ; IRQ1=on
+        ; FIXME; i dont know why the heck this one doesnt work when called from a constructor :/
+        .import vdc_init
+        jsr     vdc_init
 
-                ; Clear the BSS data
-                jsr     zerobss
+        ; Turn on background and VD interrupt/IRQ1
+        lda     #$05
+        sta     IRQ_MASK        ; IRQ1=on
 
-                ; Copy the .data segment to RAM
-                lda     #<(__DATA_LOAD__)
-                sta     ptr1
-                lda     #>(__DATA_LOAD__)
-                sta     ptr1+1
-                lda     #<(__DATA_RUN__)
-                sta     ptr2
-                lda     #>(__DATA_RUN__)
-                sta     ptr2+1
+        ; Clear the BSS data
+        jsr     zerobss
 
-                ldx     #>(__DATA_SIZE__)
+        ; Copy the .data segment to RAM
+        lda     #<(__DATA_LOAD__)
+        sta     ptr1
+        lda     #>(__DATA_LOAD__)
+        sta     ptr1+1
+        lda     #<(__DATA_RUN__)
+        sta     ptr2
+        lda     #>(__DATA_RUN__)
+        sta     ptr2+1
+
+        ldx     #>(__DATA_SIZE__)
 @l2:
-                beq     @s1        ; no more full pages
+        beq     @s1             ; no more full pages
 
-                ; copy one page
-                ldy     #0
+        ; copy one page
+        ldy     #0
 @l1:
-                lda     (ptr1),y
-                sta     (ptr2),y
-                iny
-                bne     @l1
+        lda     (ptr1),y
+        sta     (ptr2),y
+        iny
+        bne     @l1
 
-                inc     ptr1+1
-                inc     ptr2+1
+        inc     ptr1+1
+        inc     ptr2+1
 
-                dex
-                bne     @l2
+        dex
+        bne     @l2
 
-                ; copy remaining bytes
+        ; copy remaining bytes
 @s1:
-                ; copy one page
-                ldy     #0
+        ; copy one page
+        ldy     #0
 @l3:
-                lda     (ptr1),y
-                sta     (ptr2),y
-                iny
-                cpy     #<(__DATA_SIZE__)
-                bne     @l3
+        lda     (ptr1),y
+        sta     (ptr2),y
+        iny
+        cpy     #<(__DATA_SIZE__)
+        bne     @l3
 
-                ; setup the stack
-                lda     #<(__RAM_START__+__RAM_SIZE__)
-                sta     sp
-                lda     #>(__RAM_START__+__RAM_SIZE__)
-                sta     sp+1
+        ; setup the stack
+        lda     #<(__RAM_START__+__RAM_SIZE__)
+        sta     sp
+        lda     #>(__RAM_START__+__RAM_SIZE__)
+        sta     sp + 1
 
-                ; Call module constructors
-                jsr     initlib
+        ; Call module constructors
+        jsr     initlib
 
-                cli     ; allow IRQ only after constructors have run
+        cli     ; allow IRQ only after constructors have run
 
-                ; Pass an empty command line
-                jsr     push0                ; argc
-                jsr     push0                ; argv
+        ; Pass an empty command line
+        jsr     push0           ; argc
+        jsr     push0           ; argv
 
-                ldy     #4                   ; Argument size
-                jsr     _main                ; call the users code
+        ldy     #4              ; Argument size
+        jsr     _main           ; call the users code
 
-                ; Call module destructors. This is also the _exit entry.
+        ; Call module destructors. This is also the _exit entry.
 _exit:
-                jsr     donelib                ; Run module destructors
+        jsr     donelib         ; Run module destructors
 
-                ; reset the PCEngine (start over)
-                jmp start
+        ; reset the PCEngine (start over)
+        jmp     start
 
 ; ------------------------------------------------------------------------
 ; System V-Blank Interupt
@@ -161,45 +163,45 @@ _exit:
 ; ------------------------------------------------------------------------
 
 _irq1:
-                pha
-                phx
-                phy
+        pha
+        phx
+        phy
 
-
-                inc     tickcount
-                bne     @s1
-                inc     tickcount+1
-                bne     @s1
-                inc     tickcount+2
-                bne     @s1
-                inc     tickcount+3
+        ; increment the system tick counter
+        inc     tickcount
+        bne     @s1
+        inc     tickcount + 1
+        bne     @s1
+        inc     tickcount + 2
+        bne     @s1
+        inc     tickcount + 3
 @s1:
-                ; Acknowlege interrupt
-                lda     a:VDC_CTRL
+        ; Acknowlege interrupt
+        lda     a:VDC_CTRL
 
-                ply
-                plx
-                pla
-                rti
+        ply
+        plx
+        pla
+        rti
 _irq2:
-                rti
+        rti
 _nmi:
-                rti
+        rti
 _timer:
-                stz     IRQ_STATUS
-                rti
+        stz     IRQ_STATUS
+        rti
 
-                .export initmainargs
+        .export initmainargs
 initmainargs:
-                rts
+        rts
 
 ; ------------------------------------------------------------------------
 ; hardware vectors
 ; ------------------------------------------------------------------------
-                .segment "VECTORS"
+        .segment "VECTORS"
 
-                .word   _irq2           ; $fff6 IRQ2 (External IRQ, BRK)
-                .word   _irq1           ; $fff8 IRQ1 (VDC)
-                .word   _timer          ; $fffa Timer
-                .word   _nmi            ; $fffc NMI
-                .word   start           ; $fffe reset
+        .word   _irq2           ; $fff6 IRQ2 (External IRQ, BRK)
+        .word   _irq1           ; $fff8 IRQ1 (VDC)
+        .word   _timer          ; $fffa Timer
+        .word   _nmi            ; $fffc NMI
+        .word   start           ; $fffe reset

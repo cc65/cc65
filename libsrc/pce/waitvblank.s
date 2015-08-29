@@ -2,17 +2,15 @@
 ; void waitvblank (void);
 ;
 
-        .include "pce.inc"
+        .include        "pce.inc"
 
         .export         _waitvblank
-;;        .importzp       tickcount
 
 .proc   _waitvblank
 
-        lda tickcount
-@lp:    cmp tickcount
-        beq @lp
+        lda     tickcount
+@lp:    cmp     tickcount
+        beq     @lp
         rts
 
 .endproc
-

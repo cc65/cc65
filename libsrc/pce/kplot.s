@@ -1,37 +1,36 @@
 
-                .export PLOT
+        .export         PLOT
 
-                .include        "pce.inc"
+        .include        "pce.inc"
 
 PLOT:
-                bcs @getpos
+        bcs     @getpos
 
-                tya
-                clc
-                adc     _plotlo,x
-                sta     SCREEN_PTR
+        tya
+        clc
+        adc     _plotlo,x
+        sta     SCREEN_PTR
 
-                lda     _plothi,x
-                adc     #0
-                sta     SCREEN_PTR+1
+        lda     _plothi,x
+        adc     #0
+        sta     SCREEN_PTR+1
 @getpos:
-                ldx CURS_Y
-                ldy CURS_X
-                rts
+        ldx     CURS_Y
+        ldy     CURS_X
+        rts
 
 _plotlo:
-                .repeat screenrows,line
-                    .byte <($0000+(line*$80))
-                .endrepeat
+        .repeat screenrows,line
+        .byte   <($0000+(line*$80))
+        .endrepeat
 
 _plothi:
-                .repeat screenrows,line
-                    .byte >($0000+(line*$80))
-                .endrepeat
+        .repeat screenrows,line
+        .byte   >($0000+(line*$80))
+        .endrepeat
 
 ;-------------------------------------------------------------------------------
 ; force the init constructor to be imported
 
-                .import initconio
-conio_init = initconio
-
+        .import initconio
+conio_init      = initconio

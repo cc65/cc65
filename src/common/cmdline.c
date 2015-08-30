@@ -210,11 +210,11 @@ void InitCmdLine (int* aArgCount, char*** aArgVec, const char* aProgName)
     }
 
     /* Store the new argument list in a safe place... */
-    ArgCount = L.Count;
+    ArgCount = L.Count - 1;
     ArgVec   = L.Vec;
 
     /* ...and pass back the changed data also */
-    *aArgCount = L.Count;
+    *aArgCount = L.Count - 1;
     *aArgVec   = L.Vec;
 }
 

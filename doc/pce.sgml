@@ -78,7 +78,7 @@ Programs containing PCE specific code may use the <tt/pce.h/ header file.
 
 <itemize>
 <item>waitvblank</item>
-<item>get_tv</item> (since all PCE systems are NTSC, this always returns TV_NTSC)
+<item>get_tv (since all PCE systems are NTSC, this always returns TV_NTSC)</item>
 </itemize>
 
 
@@ -111,11 +111,7 @@ The names in the parentheses denote the symbols to be used for static linking of
 
 <sect1>Graphics drivers<p>
 
-<descrip>
-
 No TGI graphics drivers are currently available for the PCE.
-
-</descrip><p>
 
 
 <sect1>Extended memory drivers<p>
@@ -175,7 +171,7 @@ following functions (and a few others):
 <sect>Other hints<p>
 
 <itemize>
-<item>a good emulator to use for PC-Engine is "mednafen" (<url url="http://mednafen.sourceforge.net">)
+<item>a good emulator to use for PC-Engine is "mednafen" (<url url="http://mednafen.fobby.net/">)
 </itemize>
 
 some useful resources on PCE coding:

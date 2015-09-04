@@ -2,7 +2,7 @@
 
 [wiki](http://github.com/cc65/wiki/wiki)
 
-[![build status](http://travis-ci.org/cc65/cc65.png)](http://travis-ci.org/cc65/cc65/builds)
+[![build status](https://api.travis-ci.org/cc65/cc65.svg?branch=master)](https://travis-ci.org/cc65/cc65/builds)
 
 Binary snapshot for [Windows](http://sourceforge.net/projects/cc65/files/cc65-snapshot-win32.zip)
 
@@ -25,7 +25,7 @@ including
 - the Atari 8 bit machines.
 - the Atari 5200 console.
 - GEOS for the C64, C128 and Apple //e.
-- the NEC PC-Engine
+- the NEC PC-Engine (aka TurboGrafx-16).
 - the Nintendo Entertainment System (NES) console.
 - the Supervision console.
 - the Oric Atmos.

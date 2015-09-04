@@ -126,19 +126,19 @@ void DumpSymEntry (FILE* F, const SymEntry* E)
     /* Print the assembler name if we have one */
     if (E->AsmName) {
         fprintf (F, "    AsmName: %s\n", E->AsmName);
-    }                                             
+    }
 
     /* Print the flags */
     SymFlags = E->Flags;
-    fprintf (F, "    Flags: ");
+    fprintf (F, "    Flags:");
     for (I = 0; I < sizeof (Flags) / sizeof (Flags[0]) && SymFlags != 0; ++I) {
         if ((SymFlags & Flags[I].Val) == Flags[I].Val) {
             SymFlags &= ~Flags[I].Val;
-            fprintf (F, "%s ", Flags[I].Name);
+            fprintf (F, " %s", Flags[I].Name);
         }
     }
     if (SymFlags != 0) {
-        fprintf (F, "%04X", SymFlags);
+        fprintf (F, " 0x%05X", SymFlags);
     }
     fprintf (F, "\n");
 

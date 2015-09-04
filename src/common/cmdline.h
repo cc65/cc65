@@ -71,7 +71,7 @@ struct LongOpt {
 
 
 
-void InitCmdLine (int* aArgCount, char** aArgVec[], const char* aProgName);
+void InitCmdLine (int* aArgCount, char*** aArgVec, const char* aProgName);
 /* Initialize command line parsing. aArgVec is the argument array terminated by
 ** a NULL pointer (as usual), ArgCount is the number of valid arguments in the
 ** array. Both arguments are remembered in static storage.

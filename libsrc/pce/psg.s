@@ -5,20 +5,21 @@
 
 psg_init:
         clx
-        stx     $0800           ; Select channel
+        stz     PSG_GLOBAL_PAN          ; Clear global balance
+
 psg_clear_loop:
-        stz     $0801           ; Clear global balance
-        stz     $0802           ; Clear frequency LSB
-        stz     $0803           ; Clear frequency MSB
-        stz     $0804           ; Clear volume
-        stz     $0805           ; Clear balance
-        stz     $0807           ; Clear noise control
-        stz     $0808           ; Clear LFO frequency
-        stz     $0809           ; Clear LFO control
+        stx     PSG_CHAN_SELECT         ; Select channel
+        stz     PSG_FREQ_LO             ; Clear frequency LSB
+        stz     PSG_FREQ_HI             ; Clear frequency MSB
+        stz     PSG_CHAN_CTRL           ; Clear volume
+        stz     PSG_CHAN_PAN            ; Clear balance
+        stz     PSG_NOISE               ; Clear noise control
+        stz     PSG_LFO_FREQ            ; Clear LFO frequency
+        stz     PSG_LFO_CTRL            ; Clear LFO control
 
         cly
 psg_clear_waveform:
-        stz     $0806           ; Clear waveform byte
+        stz     PSG_CHAN_DATA           ; Clear waveform byte
         iny
         cpy     #$20
         bne     psg_clear_waveform

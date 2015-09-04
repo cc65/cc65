@@ -6,11 +6,10 @@
 CURS_X          = $30
 CURS_Y          = $31
 SCREEN_PTR      = $32           ;2
-CRAM_PTR        = $34           ;2
-CHARCOLOR       = $36
-RVS             = $37
-BGCOLOR         = $38
-tickcount       = $39           ;4
+CHARCOLOR       = $34
+RVS             = $35
+BGCOLOR         = $36
+tickcount       = $37           ;4
 
 ; FIXME: screen dimensions my change according to selected video mode
 screenrows      = (224/8)
@@ -65,6 +64,17 @@ VCE_DATA_HI     = $0405         ; MSB of 16-bit palette data
 ; programmable sound generator (PSG)
 
 PSG             = $0800         ; base
+
+PSG_CHAN_SELECT = $0800
+PSG_GLOBAL_PAN  = $0801
+PSG_FREQ_LO     = $0802
+PSG_FREQ_HI     = $0803
+PSG_CHAN_CTRL   = $0804
+PSG_CHAN_PAN    = $0805
+PSG_CHAN_DATA   = $0806
+PSG_NOISE       = $0807
+PSG_LFO_FREQ    = $0808
+PSG_LFO_CTRL    = $0809
 
 ; timer
 

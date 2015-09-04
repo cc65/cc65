@@ -19,6 +19,8 @@ PLOT:
         ldy     CURS_X
         rts
 
+        .rodata
+
 _plotlo:
         .repeat screenrows,line
         .byte   <($0000+(line*$80))

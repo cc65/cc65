@@ -1885,7 +1885,7 @@ int main (int argc, char* argv[])
         ExecCmd (&Args, MainCmds, sizeof (MainCmds) / sizeof (MainCmds[0]));
     }
 
-    /* Loop til program end */
+    /* Loop until program end */
     while (!Terminate) {
 
         /* Output a prompt, then read the input */

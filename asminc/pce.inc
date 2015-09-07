@@ -18,27 +18,29 @@ charsperline    = 61
 CH_HLINE        = 1
 CH_VLINE        = 2
 
-; huc6270 - Video Display Controller (vdc)
+; huc6270 - Video Display Controller (VDC)
 
 VDC_MAWR        = 0             ; Memory Address Write Register
 VDC_MARR        = 1             ; Memory Address Read Register
-VDC_VWR         = 2             ; VRAM Write Register
-VDC_VRR         = 3             ; VRAM Read Register
-VDC_CR          = 4             ; Control Register
-VDC_RCR         = 5             ; Raster Counter Register
-VDC_BXR         = 6             ; Background X-Scroll Register
-VDC_BYR         = 7             ; Background Y-Scroll Register
-VDC_MWR         = 8             ; Memory-access Width Register
-VDC_HSR         = 9             ; Horizontal Sync Register (?)
-VDC_HDR         = 10            ; Horizontal Display Register (?)
-VDC_VPR         = 11            ; (unknown)
-VDC_VDW         = 12            ; (unknown use)
-VDC_VCR         = 13            ; (unknown use)
-VDC_DCR         = 14            ; (DMA) Control Register
-VDC_SOUR        = 15            ; (DMA) Source Register
-VDC_DESR        = 16            ; (DMA) Destination Register
-VDC_LENR        = 17            ; (DMA) Length Register
-VDC_SATB        = 18            ; Sprite Attribute Table
+VDC_VWR         = 2             ; VRAM Write Register (write only)
+VDC_VRR         = 2             ; VRAM Read Register (read only)
+VDC_UNK03       = 3             ; (unknown)
+VDC_UNK04       = 4             ; (unknown)
+VDC_CR          = 5             ; Control Register
+VDC_RCR         = 6             ; Raster Counter Register
+VDC_BXR         = 7             ; Background X-Scroll Register
+VDC_BYR         = 8             ; Background Y-Scroll Register
+VDC_MWR         = 9             ; Memory-access Width Register
+VDC_HSR         = 10            ; Horizontal Sync Register
+VDC_HDR         = 11            ; Horizontal Display Register
+VDC_VPR         = 12            ; Vertical synchronous register
+VDC_VDW         = 13            ; Vertical display register
+VDC_VCR         = 14            ; Vertical display END position register
+VDC_DCR         = 15            ; (DMA) Control Register
+VDC_SOUR        = 16            ; (DMA) Source Register
+VDC_DESR        = 17            ; (DMA) Destination Register
+VDC_LENR        = 18            ; (DMA) Length Register
+VDC_SATB        = 19            ; Sprite Attribute Table
 
 ; VDC port
 ; Note: absolute addressing mode must be used when writing to this port

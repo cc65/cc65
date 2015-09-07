@@ -14,7 +14,7 @@ initconio:
         jsr     conio_init
         jsr     set_palette
 
-        st0     #VDC_RCR
+        st0     #VDC_CR
         st1     #<$0088
         st2     #>$0088
         rts

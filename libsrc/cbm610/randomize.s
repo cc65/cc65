@@ -1,5 +1,6 @@
 ;
-; Ullrich von Bassewitz, 05.11.2002
+; 2002-11-05, Ullrich von Bassewitz
+; 2015-09-11, Greg King
 ;
 ; void _randomize (void);
 ; /* Initialize the random number generator */
@@ -10,7 +11,7 @@
         .importzp       time
 
 __randomize:               
-        ldx     time            ; Use 50/60HZ clock
+        ldx     time+2          ; Use 50/60HZ clock
         lda     time+1
         jmp     _srand          ; Initialize generator
 

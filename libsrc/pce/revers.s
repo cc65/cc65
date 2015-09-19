@@ -1,5 +1,6 @@
 
-        .include "pce.inc"
+        .include        "pce.inc"
+        .include        "extzp.inc"
 
         .export _revers
 

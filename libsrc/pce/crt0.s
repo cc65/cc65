@@ -26,6 +26,7 @@
         .import         __BSS_SIZE__
 
         .include        "pce.inc"
+        .include        "extzp.inc"
 
         .importzp       sp
         .importzp       ptr1,ptr2
@@ -77,7 +78,7 @@ start:
         tii     $2000, $2001, $1FFF
 
         ; Initialize hardware
-        stz     TIMER_COUNT     ; Timer off
+        stz     TIMER_CTRL      ; Timer off
         lda     #$07
         sta     IRQ_MASK        ; Interrupts off
         stz     IRQ_STATUS      ; Acknowledge timer

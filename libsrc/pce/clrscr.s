@@ -1,6 +1,8 @@
 
         .include        "pce.inc"
+        .include        "extzp.inc"
 
+        .import PLOT
         .export _clrscr
 _clrscr:
 
@@ -23,7 +25,11 @@ colloop:
         dey
         bne     rowloop
 
-        rts
+; Go to the home position.
+
+        stz     CURS_X
+        stz     CURS_Y
+        jmp     PLOT
 
 ;-------------------------------------------------------------------------------
 ; force the init constructor to be imported

@@ -3,6 +3,7 @@
 ;
 
         .include        "pce.inc"
+        .include        "extzp.inc"
 
         .export         _waitvblank
 

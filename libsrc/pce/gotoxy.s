@@ -6,6 +6,7 @@
         .import         popa, plot
 
         .include        "pce.inc"
+        .include        "extzp.inc"
 
 _gotoxy:
         sta     CURS_Y          ; Set Y

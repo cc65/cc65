@@ -2,6 +2,7 @@
         .export         PLOT
 
         .include        "pce.inc"
+        .include        "extzp.inc"
 
 PLOT:
         bcs     @getpos

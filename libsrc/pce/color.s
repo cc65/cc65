@@ -7,7 +7,8 @@
 
         .export     _textcolor, _bgcolor, _bordercolor
 
-        .include    "pce.inc"
+        .include        "pce.inc"
+        .include        "extzp.inc"
 
 _textcolor:
         ldx     CHARCOLOR       ; get old value
@@ -33,9 +34,10 @@ _bgcolor:
 
 _bordercolor:
         lda     #0
-        txa
+        tax
         rts
 
+        .rodata
         .export colors
 
 colors:

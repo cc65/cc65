@@ -2,15 +2,6 @@
 ; PCE definitions. By Groepaz/Hitmem.
 ;
 
-; FIXME: optimize zeropage usage
-CURS_X          = $30
-CURS_Y          = $31
-SCREEN_PTR      = $32           ;2
-CHARCOLOR       = $34
-RVS             = $35
-BGCOLOR         = $36
-tickcount       = $37           ;4
-
 ; FIXME: screen dimensions my change according to selected video mode
 screenrows      = (224/8)
 charsperline    = 61

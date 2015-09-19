@@ -1,4 +1,5 @@
         .include        "pce.inc"
+        .include        "extzp.inc"
 
         .import vce_init
         .import psg_init

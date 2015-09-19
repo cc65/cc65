@@ -12,6 +12,7 @@
         .importzp       tmp3,tmp4
 
         .include        "pce.inc"
+        .include        "extzp.inc"
 
 _cputcxy:
         pha                     ; Save C

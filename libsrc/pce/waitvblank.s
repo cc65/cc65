@@ -5,6 +5,7 @@
         .include        "pce.inc"
         .include        "extzp.inc"
 
+        .forceimport    ticktock
         .export         _waitvblank
 
 .proc   _waitvblank

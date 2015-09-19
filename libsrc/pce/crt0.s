@@ -13,7 +13,7 @@
         .import         initlib, donelib
         .import         push0, _main, zerobss
         .import         initheap
-        .import         tmp1,tmp2,tmp3
+        .import         IRQStub
 
         ; Linker generated
         .import         __RAM_START__, __RAM_SIZE__
@@ -30,6 +30,7 @@
 
         .importzp       sp
         .importzp       ptr1,ptr2
+        .importzp       tmp1,tmp2,tmp3
 
 ; ------------------------------------------------------------------------
 ; Place the startup code in a special segment.
@@ -158,38 +159,7 @@ _exit:
         ; reset the PCEngine (start over)
         jmp     start
 
-; ------------------------------------------------------------------------
-; System V-Blank Interupt
-; FIXME: hooks should be provided so the user can abuse the IRQ
-; ------------------------------------------------------------------------
-
-_irq1:
-        pha
-        phx
-        phy
-
-        ; increment the system tick counter
-        inc     tickcount
-        bne     @s1
-        inc     tickcount + 1
-        bne     @s1
-        inc     tickcount + 2
-        bne     @s1
-        inc     tickcount + 3
-@s1:
-        ; Acknowlege interrupt
-        lda     a:VDC_CTRL
-
-        ply
-        plx
-        pla
-        rti
-_irq2:
-        rti
 _nmi:
-        rti
-_timer:
-        stz     IRQ_STATUS
         rti
 
         .export initmainargs
@@ -201,8 +171,8 @@ initmainargs:
 ; ------------------------------------------------------------------------
         .segment "VECTORS"
 
-        .word   _irq2           ; $fff6 IRQ2 (External IRQ, BRK)
-        .word   _irq1           ; $fff8 IRQ1 (VDC)
-        .word   _timer          ; $fffa Timer
+        .word   IRQStub         ; $fff6 IRQ2 (External IRQ, BRK)
+        .word   IRQStub         ; $fff8 IRQ1 (VDC)
+        .word   IRQStub         ; $fffa Timer
         .word   _nmi            ; $fffc NMI
         .word   start           ; $fffe reset

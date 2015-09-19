@@ -15,3 +15,4 @@
         .global         RVS: zp
         .global         BGCOLOR: zp
         .global         tickcount: zp
+        .global         vdc_flags: zp

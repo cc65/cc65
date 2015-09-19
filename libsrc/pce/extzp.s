@@ -15,3 +15,4 @@ CHARCOLOR:      .res 1
 RVS:            .res 1
 BGCOLOR:        .res 1
 tickcount:      .res 4
+vdc_flags:      .res 1

@@ -8,7 +8,7 @@ PLOT:
         bcs     @getpos
 
         tya
-        clc
+        ;clc                    ; already cleared
         adc     _plotlo,x
         sta     SCREEN_PTR
 

@@ -2,7 +2,7 @@
         .include        "pce.inc"
         .include        "extzp.inc"
 
-        .import PLOT
+        .import plot
         .export _clrscr
 _clrscr:
 
@@ -29,7 +29,7 @@ colloop:
 
         stz     CURS_X
         stz     CURS_Y
-        jmp     PLOT
+        jmp     plot
 
 ;-------------------------------------------------------------------------------
 ; force the init constructor to be imported

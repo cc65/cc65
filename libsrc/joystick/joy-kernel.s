@@ -109,7 +109,7 @@ inv_drv:
 
 copy:   lda     (ptr1),y
         iny
-set:    sta     joy_vectors,x
+        sta     joy_vectors,x
         inx
         rts
 

@@ -25,6 +25,7 @@ TARGETS = apple2    \
           lynx      \
           nes       \
           osic1p    \
+          pce       \
           sim6502   \
           sim65c02  \
           supervision

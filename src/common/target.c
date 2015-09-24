@@ -163,6 +163,7 @@ static const TargetEntry TargetMap[] = {
     {   "nes",          TGT_NES         },
     {   "none",         TGT_NONE        },
     {   "osic1p",       TGT_OSIC1P      },
+    {   "pce",          TGT_PCENGINE    },
     {   "pet",          TGT_PET         },
     {   "plus4",        TGT_PLUS4       },
     {   "sim6502",      TGT_SIM6502     },
@@ -202,6 +203,7 @@ static const TargetProperties PropertyTable[TGT_COUNT] = {
     { "lynx",           CPU_65C02,      BINFMT_BINARY,      CTNone  },
     { "sim6502",        CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "sim65c02",       CPU_65C02,      BINFMT_BINARY,      CTNone  },
+    { "pce",            CPU_HUC6280,    BINFMT_BINARY,      CTNone  },
 };
 
 /* Target system */

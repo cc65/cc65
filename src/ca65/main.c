@@ -307,6 +307,10 @@ static void SetSys (const char* Sys)
             NewSymbol ("__OSIC1P__", 1);
             break;
 
+        case TGT_PCENGINE:
+            NewSymbol ("__PCE__", 1);
+            break;
+
         default:
             AbEnd ("Invalid target name: `%s'", Sys);
 

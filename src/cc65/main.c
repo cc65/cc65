@@ -263,6 +263,10 @@ static void SetSys (const char* Sys)
             DefineNumericMacro ("__OSIC1P__", 1);
             break;
 
+        case TGT_PCENGINE:
+            DefineNumericMacro ("__PCE__", 1);
+            break;
+
         default:
             AbEnd ("Unknown target system type %d", Target);
     }

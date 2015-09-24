@@ -1,10 +1,10 @@
-[documentation](http://cc65.github.io/doc)
+[Documentation](http://cc65.github.io/doc)
 
-[wiki](http://github.com/cc65/wiki/wiki)
+[Wiki](http://github.com/cc65/wiki/wiki)
 
-[![build status](https://api.travis-ci.org/cc65/cc65.svg?branch=master)](https://travis-ci.org/cc65/cc65/builds)
+[![Build Status](https://api.travis-ci.org/cc65/cc65.svg?branch=master)](https://travis-ci.org/cc65/cc65/builds)
 
-Binary snapshot for [Windows](http://sourceforge.net/projects/cc65/files/cc65-snapshot-win32.zip)
+[Windows Binary](http://sourceforge.net/projects/cc65/files/cc65-snapshot-win32.zip)
 
 cc65 is a complete cross development package for 65(C)02 systems, including
 a powerful macro assembler, a C compiler, linker, librarian and several

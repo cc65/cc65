@@ -6,7 +6,7 @@
         .destructor     soft80_shutdown
 
         .import         soft80_kclrscr, soft80_plotinit
-        .import         __textcolor, __bgcolor  ; CHECK/FIX
+        .import         soft80_textcolor, soft80_bgcolor
 
         .include        "c64.inc"
         .include        "soft80.inc"
@@ -52,10 +52,12 @@ soft80_init:
 
         jsr     soft80_plotinit
 
-        lda     #1
-        sta     __textcolor
-        lda     #0
-        sta     __bgcolor
+        lda     646                     ; use current textcolor
+        jsr     soft80_textcolor
+
+        lda     VIC_BG_COLOR0           ; use current bgcolor
+        and     #$0f
+        jsr     soft80_bgcolor
 
         jmp     soft80_kclrscr
 

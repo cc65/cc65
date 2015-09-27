@@ -5,13 +5,14 @@
 
 void main(void)
 {
-        int i, j;
-        unsigned char xsize, ysize, n;
+        int i, j, n;
+        unsigned char xsize, ysize, tcol;
 
         clrscr();
         screensize(&xsize, &ysize);
-
         cputs("cc65 conio test");
+
+        tcol = textcolor(1);
         cputsxy(0, 2, "colors:" );
         for (i = 3; i < 6; ++i) {
                 gotoxy(i,i);
@@ -20,7 +21,7 @@ void main(void)
                         cputc('X');
                 }
         }
-        textcolor(1);
+        textcolor(tcol);
 
         cprintf("\n\n\rscreensize is: %dx%d", xsize, ysize );
 

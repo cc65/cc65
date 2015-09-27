@@ -25,15 +25,13 @@ soft80_textcolor:
         asl     a
         asl     a
         ora     __textcolor
-        sta     CHARCOLOR
+        sta     CHARCOLOR               ; text/bg combo for new chars
 
         txa                             ; get old value
         rts
 
 
 soft80_bgcolor:
-        cmp     __bgcolor
-        beq     _donothing
         ldx     __bgcolor               ; get old value
         sta     __bgcolor               ; set new value
         asl     a
@@ -62,8 +60,8 @@ lp2:
         .scope
         lda     soft80_vram+(page*$100),x
         and     #$0f
-        cmp     tmp1                    ; old bg color
-        bne     as
+        ;cmp     tmp1                    ; old bg color
+        ;bne     as
         ; is old bg color
         ; is space
         ;lda __bgcolor
@@ -82,7 +80,6 @@ as:
         cli
 
         pla                             ; get old value
-_donothing:
         rts
 
 

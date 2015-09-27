@@ -5,7 +5,7 @@
         .constructor    soft80_init, 24
         .destructor     soft80_shutdown
 
-        .import         soft80_kclrscr, soft80_plotinit
+        .import         soft80_kclrscr
         .import         soft80_textcolor, soft80_bgcolor
 
         .include        "c64.inc"
@@ -49,8 +49,6 @@ soft80_init:
         pla
         sta     $01
         cli
-
-        jsr     soft80_plotinit
 
         lda     646                     ; use current textcolor
         jsr     soft80_textcolor

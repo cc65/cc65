@@ -1,6 +1,5 @@
 
         .export         soft80_kplot
-        .export         soft80_plotinit
 
         .include        "c64.inc"
         .include        "soft80.inc"
@@ -32,70 +31,30 @@ soft80_kplot:
         ldy     CURS_X
         rts
 
-        ; FIXME: perhaps just include the respective tables directly?
-soft80_plotinit:
-        ; create screen-rows base tables (bitmap)
-        lda     #<soft80_bitmap
-        sta     SCREEN_PTR
-        lda     #>soft80_bitmap
-        sta     SCREEN_PTR+1
-
-        ldx     #$00
-l1:
-        lda     SCREEN_PTR
-        sta     _bitmaplo,x
-        clc
-        adc     #<(40*8)
-        sta     SCREEN_PTR
-        lda     SCREEN_PTR+1
-        sta     _bitmaphi,x
-        adc     #>(40*8)
-        sta     SCREEN_PTR+1
-        inx
-        cpx     #25
-        bne     l1
-
-        ; create screen-rows base tables (colorram)
-
-        lda     #<soft80_vram
-        sta     CRAM_PTR
-        lda     #>soft80_vram
-        sta     CRAM_PTR+1
-
-        ldx     #$00
-l1b:
-        lda     CRAM_PTR
-        sta     _vramlo,x
-        clc
-        adc     #<(40)
-        sta     CRAM_PTR
-        lda     CRAM_PTR+1
-        sta     _vramhi,x
-        adc     #>(40)
-        sta     CRAM_PTR+1
-        inx
-        cpx     #25
-        bne     l1b
-
-        rts
-
+        .rodata
 _bitmapxlo:
-        .repeat 80,col1
-        .byte <((col1/2)*8)
+        .repeat 80,col
+        .byte <((col/2)*8)
         .endrepeat
 
 _bitmapxhi:
         .repeat 80,col
         .byte >((col/2)*8)
         .endrepeat
-
-        .bss
 _vramlo:
-        .res 25
+        .repeat 25,row
+        .byte <(soft80_vram+(row*40))
+        .endrepeat
 _vramhi:
-        .res 25
+        .repeat 25,row
+        .byte >(soft80_vram+(row*40))
+        .endrepeat
 _bitmaplo:
-        .res 25
+        .repeat 25,row
+        .byte <(soft80_bitmap+(row*40*8))
+        .endrepeat
 _bitmaphi:
-        .res 25
+        .repeat 25,row
+        .byte >(soft80_bitmap+(row*40*8))
+        .endrepeat
 

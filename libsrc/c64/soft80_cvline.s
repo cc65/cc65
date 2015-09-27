@@ -17,7 +17,7 @@ soft80_cvline:
         cmp     #0              ; Is the length zero?
         beq     L9              ; Jump if done
         sta     tmp1
-L1:     lda     #125            ; Vertical bar
+L1:     lda     #125            ; Vertical bar, petscii code
         jsr     soft80_putchar  ; Write, no cursor advance
         jsr     soft80_newline  ; Advance cursor to next line
         dec     tmp1

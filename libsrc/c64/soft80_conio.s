@@ -8,6 +8,8 @@
         .import         soft80_kclrscr
         .import         soft80_textcolor, soft80_bgcolor
 
+        .importzp       ptr1, ptr2, ptr3
+
         .include        "c64.inc"
         .include        "soft80.inc"
 
@@ -28,22 +30,36 @@ soft80_init:
         lda     #$34
         sta     $01
 
-        lda     #>soft80_lo_charset0
-        sta     @hi1+2
-        lda     #>$d000
-        sta     @hi2+2
+        lda     #>soft80_charset
+        sta     ptr1+1
+        lda     #<soft80_charset
+        sta     ptr1
+        lda     #>soft80_lo_charset
+        sta     ptr2+1
+        lda     #<soft80_lo_charset
+        sta     ptr2
+        lda     #>soft80_hi_charset
+        sta     ptr3+1
+        lda     #<soft80_hi_charset
+        sta     ptr3
 
-        ldy     #8
+        ldx     #4
 @l2:
-        ldx     #0
+        ldy     #0
 @l1:
-@hi1:   lda     soft80_lo_charset0,x
-@hi2:   sta     $d000,x
-        inx
+        lda     (ptr1),y
+        sta     (ptr2),y
+        asl     a
+        asl     a
+        asl     a
+        asl     a
+        sta     (ptr3),y
+        iny
         bne     @l1
-        inc     @hi1+2
-        inc     @hi2+2
-        dey
+        inc     ptr1+1
+        inc     ptr2+1
+        inc     ptr3+1
+        dex
         bne     @l2
 
         pla
@@ -68,7 +84,6 @@ soft80_shutdown:
         sta     VIC_VIDEO_ADR
         rts
 
-; FIXME: generate the charset at init time, and put it into RAM under I/O
-
+soft80_charset:
         .include "soft80_charset.s"
 

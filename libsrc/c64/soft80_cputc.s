@@ -5,14 +5,15 @@
 
         .export         soft80_cputcxy, soft80_cputc
         .export         soft80_cputdirect, soft80_putchar
-        .export         putcolor        ; FIX/CHECK
-
+        .export         soft80_putcolor
         .export         soft80_newline, soft80_plot
+
         .import         popa, _gotoxy
         .import         xsize
-        .import         PLOT            ; FIX/CHECK
-        .importzp       tmp4,tmp3
+        .import         soft80_kplot
         .import         __bgcolor               ; FIX/CHECK
+
+        .importzp       tmp4,tmp3
 
         .macpack        longbranch
 
@@ -39,7 +40,7 @@ soft80_plot:
         ldx     CURS_Y
         ldy     CURS_X
         clc
-        jmp     PLOT            ; Set the new cursor
+        jmp     soft80_kplot            ; Set the new cursor
 
 L1:     cmp     #$0D            ; LF?
         beq     soft80_newline         ; Recalculate pointers
@@ -170,7 +171,7 @@ remcolor:
 
 ; put color to cell
 ; y unmodified
-putcolor:
+soft80_putcolor:
 
         ;ldy     #$00            ; is still $00
 
@@ -301,7 +302,7 @@ _space:
 
 _spaceinvers:
 
-        jsr     putcolor
+        jsr     soft80_putcolor
 
         lda     CURS_X
         and     #$01
@@ -344,7 +345,7 @@ soft80_putchar:
         cmp     #' '            ; space is a special (optimized) case
         jeq     _space
 
-        jsr     putcolor
+        jsr     soft80_putcolor
 
 ; output character
 char:

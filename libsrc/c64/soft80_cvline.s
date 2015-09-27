@@ -4,7 +4,7 @@
 ;
 
         .export         soft80_cvline, soft80_cvlinexy
-        .import         popa, _gotoxy, putchar, newline ; CHECK/FIX
+        .import         popa, _gotoxy, soft80_putchar, soft80_newline
         .importzp       tmp1
 
 soft80_cvlinexy:
@@ -18,8 +18,8 @@ soft80_cvline:
         beq     L9              ; Jump if done
         sta     tmp1
 L1:     lda     #125            ; Vertical bar
-        jsr     putchar         ; Write, no cursor advance
-        jsr     newline         ; Advance cursor to next line
+        jsr     soft80_putchar  ; Write, no cursor advance
+        jsr     soft80_newline  ; Advance cursor to next line
         dec     tmp1
         bne     L1
 L9:     rts

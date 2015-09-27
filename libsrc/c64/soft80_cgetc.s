@@ -4,7 +4,7 @@
 
         .export         soft80_cgetc
         .import         cursor          ; FIX/CHECK
-        .import         putcolor        ; FIX/CHECK
+        .import         soft80_putcolor
 
         .include        "c64.inc"
         .include        "soft80.inc"
@@ -52,7 +52,7 @@ L3:     jsr     KBDREAD         ; Read char and return in A
         lda     #$34
         sta     $01
 
-        jsr     putcolor
+        jsr     soft80_putcolor
 
         ldy     #$00
 

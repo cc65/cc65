@@ -3,7 +3,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-
 static char grid[5][5] = {
     { CH_ULCORNER, CH_HLINE, CH_TTEE, CH_HLINE, CH_URCORNER },
     { CH_VLINE, ' ', CH_VLINE, ' ', CH_VLINE },
@@ -15,11 +14,11 @@ static char grid[5][5] = {
 void main(void)
 {
         int i, j, n;
-        unsigned char xsize, ysize, tcol;
+        unsigned char xsize, ysize, tcol, inpos = 0;
 
         clrscr();
         screensize(&xsize, &ysize);
-        cputs("cc65 conio test");
+        cputs("cc65 conio test\n\rInput:[        ]");
 
         cputsxy(0, 2, "Colors:" );
         tcol = textcolor(0); /* remember original textcolor */
@@ -70,14 +69,20 @@ void main(void)
         }
         revers(0);
 
+        cursor(1);
         for(;;) {
 
                 gotoxy(8, 2);
-                j = (n >> 5) & 1;
+                j = n & 1;
                 revers(j);
                 cputc(j ? 'R' : ' ');
+                revers(j ^ 1);
                 cputs(" revers");
                 revers(0);
+
+                gotoxy(7 + inpos,1);
+                cputc(cgetc());
+                inpos = (inpos + 1) & 7;
 
                 ++n;
         }

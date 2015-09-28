@@ -7,6 +7,9 @@
 soft80_kplot:
         bcs     @getpos
 
+        stx     CURS_Y
+        sty     CURS_X
+
         ; calc pointer to bitmap
         lda     _bitmaplo,x
         clc

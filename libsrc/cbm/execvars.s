@@ -20,9 +20,15 @@
         .include        "vic20.inc"
 .endif
 
-        .export         _txtptr:zp, _basbuf, _basbuf_len:zp
+; exec() is written in C.
+; Provide the spellings that the C compiler wants to use.
 
-_txtptr         :=      TXTPTR
+.ifdef  VARTAB
+.exportzp _vartab       :=      VARTAB
+.exportzp _memsize      :=      MEMSIZE
+.endif
 
-_basbuf         :=      BASIC_BUF
-_basbuf_len     =       BASIC_BUF_LEN
+.exportzp _txtptr       :=      TXTPTR
+
+.export   _basbuf       :=      BASIC_BUF
+.exportzp _basbuf_len   =       BASIC_BUF_LEN

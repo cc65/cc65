@@ -7,6 +7,9 @@
         .import         popa, _gotoxy, soft80_cputdirect
         .importzp       tmp1
 
+        .include        "c64.inc"
+        .include        "soft80.inc"
+
 soft80_chlinexy:
         pha                             ; Save the length
         jsr     popa                    ; Get y
@@ -17,7 +20,7 @@ soft80_chline:
         cmp     #0                      ; Is the length zero?
         beq     L9                      ; Jump if done
         sta     tmp1
-L1:     lda     #96                     ; Horizontal line, petscii code
+L1:     lda     #CH_HLINE               ; Horizontal line, petscii code
         jsr     soft80_cputdirect       ; Direct output
         dec     tmp1
         bne     L1

@@ -40,28 +40,39 @@ soft80_plot:
         ldx     CURS_Y
         ldy     CURS_X
         clc
-        jmp     soft80_kplot            ; Set the new cursor
+        jmp     soft80_kplot    ; Set the new cursor
 
 L1:     cmp     #$0D            ; LF?
-        beq     soft80_newline         ; Recalculate pointers
+        beq     soft80_newline  ; Recalculate pointers
 
         ; Printable char of some sort
 
         tay
         bpl     L10
 
+        ; extra check for petscii codes 160-191, these have been moved to
+        ; 0-31 in the charset
+        and     #%11100000
+        cmp     #%10100000
+        bne     @sk
+
+        tya
+        and     #%00011111
+        bpl     L10             ; branch always
+@sk:
+        tya
         clc
         adc     #$20
         and     #$7F
 L10:
 
 soft80_cputdirect:
-        jsr     soft80_putchar         ; Write the character to the screen
+        jsr     soft80_putchar  ; Write the character to the screen
 
 ; Advance cursor position
 
 advance:
-        iny
+        iny                     ; contains CURS_X
         cpy     #charsperline
         beq     L3
 

@@ -1,7 +1,7 @@
 
         .export         soft80_kclrscr
         .import         soft80_kplot
-        .import         __bgcolor        ; FIX/CHECK
+        .import         __bgcolor
 
         .include        "c64.inc"
         .include        "soft80.inc"

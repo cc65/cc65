@@ -3,7 +3,7 @@
 ;
 
         .export         soft80_cgetc
-        .import         cursor          ; FIX/CHECK
+        .import         cursor
         .import         soft80_putcolor
 
         .include        "c64.inc"

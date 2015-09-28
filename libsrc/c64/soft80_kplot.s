@@ -18,7 +18,8 @@ soft80_kplot:
 
         ; calc pointer to vram
         tya
-        lsr     a
+        lsr     a               ; NOTE: we can save 2 cycles here at the expense of
+                                ;       making the tables twice as big (+50 bytes)
         clc
         adc     _vramlo,x
         sta     CRAM_PTR

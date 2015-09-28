@@ -5,7 +5,7 @@
 ;
 
         .export         soft80_textcolor, soft80_bgcolor, soft80_bordercolor
-        .export         __textcolor,__bgcolor   ; CHECK/FIX
+        .export         __textcolor, __bgcolor
 
         .importzp       tmp1,tmp2
 
@@ -89,7 +89,6 @@ soft80_bordercolor:
         txa
         rts
 
-        ; FIXME: shouldnt they be in zeropage?
         .bss
 __textcolor:
         .res 1

@@ -11,7 +11,7 @@
         .import         popa, _gotoxy
         .import         xsize
         .import         soft80_kplot
-        .import         __bgcolor               ; FIX/CHECK
+        .import         __bgcolor
 
         .importzp       tmp4,tmp3
 

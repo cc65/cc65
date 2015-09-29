@@ -69,15 +69,15 @@ putchar:
         st0     #VDC_MAWR       ; Memory Adress Write
 
         lda     SCREEN_PTR
-        sta     a:VDC_DATA_LO
+        sta     VDC_DATA_LO
 
         lda     SCREEN_PTR + 1
-        sta     a:VDC_DATA_HI
+        sta     VDC_DATA_HI
 
         st0     #VDC_VWR        ; VWR
 
         txa
-        sta     a:VDC_DATA_LO   ; character
+        sta     VDC_DATA_LO     ; character
 
         lda     CHARCOLOR
 
@@ -87,7 +87,7 @@ putchar:
         asl     a
 
         ora     #$02
-        sta     a:VDC_DATA_HI
+        sta     VDC_DATA_HI
 
         rts
 

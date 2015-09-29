@@ -16,9 +16,9 @@ rowloop:
         ldx     #$80
 colloop:
         lda     #' '
-        sta     a:VDC_DATA_LO
+        sta     VDC_DATA_LO
         lda     #$02
-        sta     a:VDC_DATA_HI
+        sta     VDC_DATA_HI
 
         dex
         bne     colloop

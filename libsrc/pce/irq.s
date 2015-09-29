@@ -32,7 +32,7 @@ IRQStub:
 
 ; Save the display-source flags (and, release the interrupt).
 ;
-        ldy     a:VDC_CTRL
+        ldy     VDC_CTRL
         sty     vdc_flags
 
         ldy     #<(__INTERRUPTOR_COUNT__ * 2)

@@ -90,8 +90,8 @@ charloop:
 lineloop:
         lda     (ptr1)
         eor     tmp1
-        sta     a:VDC_DATA_LO   ; bitplane 0
-        stz     a:VDC_DATA_HI   ; bitplane 1
+        sta     VDC_DATA_LO     ; bitplane 0
+        stz     VDC_DATA_HI     ; bitplane 1
 
         clc                     ; increment font pointer
         lda     ptr1

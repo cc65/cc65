@@ -12,9 +12,10 @@ soft80_kclrscr:
 
         ldx     #$00
 lp1:
-        .repeat $20,page
+        .repeat $1f,page
         sta     soft80_bitmap+(page*$100),x
         .endrepeat
+        sta     soft80_bitmap+$1e40,x
         inx
         bne     lp1
 
@@ -29,9 +30,10 @@ lp1:
 
         ;ldx     #$00
 lp2:
-        .repeat $4,page
-        sta     soft80_vram+(page*$100),x
-        .endrepeat
+        sta     soft80_vram,x
+        sta     soft80_vram+$100,x
+        sta     soft80_vram+$200,x
+        sta     soft80_vram+$2e8,x
         inx
         bne     lp2
 
@@ -40,9 +42,10 @@ lp2:
         lda     __bgcolor
         ;ldx     #$00
 lp3:
-        .repeat $4,page
-        sta     soft80_colram+(page*$100),x
-        .endrepeat
+        sta     soft80_colram,x
+        sta     soft80_colram+$100,x
+        sta     soft80_colram+$200,x
+        sta     soft80_colram+$2e8,x
         inx
         bne     lp3
 

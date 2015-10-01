@@ -1,9 +1,9 @@
 
-        .export         soft80_kscreen
+        .export         soft80_screensize
 
         .include        "soft80.inc"
 
-soft80_kscreen:
+soft80_screensize:
         ldy     #screenrows
         ldx     #charsperline
         rts

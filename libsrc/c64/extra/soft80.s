@@ -48,8 +48,8 @@
         .export PLOT := soft80_kplot
 
         ; soft80_kscreen.s
-        .import soft80_kscreen
-        .export SCREEN := soft80_kscreen
+        .import soft80_screensize
+        .export screensize := soft80_screensize
 
 ;-------------------------------------------------------------------------------
 ; force the init constructor to be imported

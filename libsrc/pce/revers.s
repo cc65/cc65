@@ -1,11 +1,10 @@
 
+        .export         _revers
+
         .include        "pce.inc"
         .include        "extzp.inc"
 
-        .export _revers
-
 .proc   _revers
-
         ldx     #$00            ; Assume revers off
         tay                     ; Test onoff
         beq     L1              ; Jump if off
@@ -18,7 +17,6 @@ L1:     lda     RVS             ; Load old value
 L2:     ldx     #$00            ; Load high byte of result
         tya                     ; Load low byte, set CC
         rts
-
 .endproc
 
 ;-------------------------------------------------------------------------------

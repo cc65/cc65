@@ -2,17 +2,15 @@
 ; clock_t clock (void);
 ;
 
-        .include        "pce.inc"
-        .include        "extzp.inc"
-
         .export         _clock
+        .constructor    initclock, 24
+
         .forceimport    ticktock
         .importzp       sreg
-        .constructor    initclock
 
+        .include        "extzp.inc"
 
 .proc   _clock
-
         lda     tickcount+3
         sta     sreg+1
         lda     tickcount+2
@@ -20,7 +18,6 @@
         ldx     tickcount+1
         lda     tickcount
         rts
-
 .endproc
 
         .segment        "ONCE"

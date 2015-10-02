@@ -1,4 +1,3 @@
-
 ;
 ; Standard joystick driver for the PCEngine
 ;
@@ -17,8 +16,8 @@
 
 ; Driver signature
 
-        .byte   $6A, $6F, $79           ; "joy"
-        .byte   JOY_API_VERSION         ; Driver API version number
+        .byte   $6A, $6F, $79   ; "joy"
+        .byte   JOY_API_VERSION ; Driver API version number
 
 ; Library reference
 
@@ -43,7 +42,7 @@ JOY_COUNT       = 4             ; Number of joysticks we support
 ; INSTALL routine. Is called after the driver is loaded into memory. If
 ; possible, check if the hardware is present and determine the amount of
 ; memory available.
-; Must return an JOY_ERR_xx code in a/x.
+; Must return a JOY_ERR_xx code in a/x.
 ;
 
 INSTALL:
@@ -90,7 +89,7 @@ joy1:
         rts
 
 read_joy:
-        ; reset multitap counter
+        ; Reset Multitap counter.
         lda     #$01
         sta     JOY_CTRL
         pha
@@ -108,7 +107,7 @@ read_joy:
         cly
 nextpad:
         lda     #$01
-        sta     JOY_CTRL           ; sel = 1
+        sta     JOY_CTRL        ; sel = 1
         pha
         pla
         nop                     ; some delay is required
@@ -119,21 +118,20 @@ nextpad:
         asl     a
         asl     a
         asl     a
-        sta     padbuffer, y     ; store new value
+        sta     padbuffer,y     ; store new value
 
         stz     JOY_CTRL
         pha
         pla
-
         nop                     ; some delay is required
         nop
 
         lda     JOY_CTRL
         and     #$0F
-        ora     padbuffer, y     ; second half of new value
+        ora     padbuffer,y     ; second half of new value
 
         eor     #$FF
-        sta     padbuffer, y     ; store new value
+        sta     padbuffer,y     ; store new value
 
         iny
         cpy     #$05
@@ -144,4 +142,3 @@ nextpad:
 
 padbuffer:
         .res    4
-

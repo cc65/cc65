@@ -1,8 +1,8 @@
 ;
 ; Startup code for cc65 (PCEngine version)
 ;
-; by Groepaz/Hitmen <groepaz@gmx.net>
-; based on code by Ullrich von Bassewitz <uz@cc65.org>
+; by Groepaz/Hitmen <groepaz@gmx.net>,
+; based on code by Ullrich von Bassewitz <uz@cc65.org>.
 ;
 ; 2018-02-11, Greg King
 ;
@@ -28,16 +28,12 @@
 ; ------------------------------------------------------------------------
 ; Place the startup code in a special segment.
 
-        .segment "STARTUP"
-
-start:
-
-        ; Set up the CPU and System-IRQ
+.segment        "STARTUP"
 
         ; Initialize CPU
-        sei
+start:  sei
         nop
-        csh                     ; Set high speed CPU mode
+        csh                     ; Set high-speed CPU mode
         nop
 
         ; Set up stack and memory mapping
@@ -64,7 +60,7 @@ start:
         inc     a
 @L1:    tam     #%01000000      ; $C000-$DFFF = ROM bank 3 (32K) or 1 (16K)
         ;lda    #$00            ; (The reset default)
-        ;tam    #%10000000      ; $E000-$FFFF  hucard/syscard bank 0
+        ;tam    #%10000000      ; $E000-$FFFF  Hucard/Syscard bank 0
 
         ; Initialize hardware
         stz     TIMER_CTRL      ; Timer off
@@ -72,7 +68,7 @@ start:
         sta     IRQ_MASK        ; Interrupts off
         stz     IRQ_STATUS      ; Acknowledge timer
 
-        ; FIXME; i dont know why the heck this one doesnt work when called from a constructor :/
+        ; FIXME; I don't know why the heck this one doesn't work when called from a constructor. :/
         .import vdc_init
         jsr     vdc_init
 
@@ -96,24 +92,22 @@ start:
         ; Call module constructors
         jsr     initlib
 
-        cli     ; allow IRQ only after constructors have run
+        cli                     ; allow IRQ only after constructors have run
 
         ; Pass an empty command line
         jsr     push0           ; argc
         jsr     push0           ; argv
 
         ldy     #4              ; Argument size
-        jsr     _main           ; Call the users code
+        jsr     _main           ; Call the user's code
 
         ; Call module destructors. This is also the _exit entry.
-_exit:
-        jsr     donelib         ; Run module destructors
+_exit:  jsr     donelib         ; Run module destructors
 
         ; reset the PCEngine (start over)
         jmp     start
 
-_nmi:
-        rti
+_nmi:   rti
 
         .export initmainargs
 initmainargs:
@@ -122,10 +116,10 @@ initmainargs:
 ; ------------------------------------------------------------------------
 ; hardware vectors
 ; ------------------------------------------------------------------------
-        .segment "VECTORS"
+.segment        "VECTORS"
 
-        .word   IRQStub         ; $fff6 IRQ2 (External IRQ, BRK)
-        .word   IRQStub         ; $fff8 IRQ1 (VDC)
-        .word   IRQStub         ; $fffa Timer
-        .word   _nmi            ; $fffc NMI
-        .word   start           ; $fffe reset
+        .word   IRQStub         ; $FFF6 IRQ2 (External IRQ, BRK)
+        .word   IRQStub         ; $FFF8 IRQ1 (VDC)
+        .word   IRQStub         ; $FFFA Timer
+        .word   _nmi            ; $FFFC NMI
+        .word   start           ; $FFFE reset

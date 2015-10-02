@@ -9,7 +9,7 @@ charsperline    = 61
 CH_HLINE        = 1
 CH_VLINE        = 2
 
-; huc6270 - Video Display Controller (VDC)
+; HuC6270 - Video Display Controller (VDC)
 
 VDC_MAWR        = 0             ; Memory Address Write Register
 VDC_MARR        = 1             ; Memory Address Read Register
@@ -42,21 +42,21 @@ VDC_CTRL        := $0200
 VDC_DATA_LO     := $0202
 VDC_DATA_HI     := $0203
 
-; huc6260 - Video Color Encoder (vce)
+; HuC6260 - Video Color Encoder (vce)
 
 ; The DAC has a palette of 512 colours.
-; bitmap of the palette data is this: 0000000gggrrrbbb.
-; You can read and write the DAC-registers.
+; The bitmap of the palette data is this: 0000000gggrrrbbb.
+; You can read and write the DAC registers.
 
 VCE             = $0400         ; base
 
-VCE_CTRL        = $0400         ; write$00 to reset
+VCE_CTRL        = $0400         ; write $00 to reset
 VCE_ADDR_LO     = $0402         ; LSB of byte offset into palette
 VCE_ADDR_HI     = $0403         ; MSB of byte offset into palette
 VCE_DATA_LO     = $0404         ; LSB of 16-bit palette data
 VCE_DATA_HI     = $0405         ; MSB of 16-bit palette data
 
-; programmable sound generator (PSG)
+; Programmable Sound Generator (PSG)
 
 PSG             = $0800         ; base
 
@@ -71,12 +71,12 @@ PSG_NOISE       = $0807
 PSG_LFO_FREQ    = $0808
 PSG_LFO_CTRL    = $0809
 
-; timer
+; Timer
 
-TIMER           = $0c00         ; base
+TIMER           = $0C00         ; base
 
-TIMER_COUNT     = $0c00
-TIMER_CTRL      = $0c01
+TIMER_COUNT     = $0C00
+TIMER_CTRL      = $0C01
 
 JOY_CTRL        = $1000
 

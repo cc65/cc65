@@ -20,7 +20,7 @@ PLOT:
         ldy     CURS_X
         rts
 
-        .rodata
+.rodata
 
 _plotlo:
         .repeat screenrows,line

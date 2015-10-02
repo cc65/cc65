@@ -1,11 +1,11 @@
+        .export         _clrscr
+
+        .import         plot
 
         .include        "pce.inc"
         .include        "extzp.inc"
 
-        .import plot
-        .export _clrscr
 _clrscr:
-
         st0     #VDC_MAWR
         st1     #<$0000
         st2     #>$0000

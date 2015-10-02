@@ -1,6 +1,6 @@
-        .include        "pce.inc"
-
         .export         vce_init
+
+        .include        "pce.inc"
 
         .segment        "ONCE"
 vce_init:

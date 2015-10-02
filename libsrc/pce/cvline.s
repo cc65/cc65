@@ -6,6 +6,7 @@
 ;
 
         .export         _cvlinexy, _cvline
+
         .import         gotoxy, putchar, newline
         .importzp       tmp1
 
@@ -26,6 +27,3 @@ L1:     lda     #CH_VLINE       ; Vertical bar
         dec     tmp1
         bne     L1
 L9:     rts
-
-
-

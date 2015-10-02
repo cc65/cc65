@@ -1,13 +1,13 @@
-        .include        "pce.inc"
-        .include        "extzp.inc"
+        .constructor    initconio, 24
 
         .import         vce_init
         .import         psg_init
+        .import         vdc_init
         .import         colors
         .importzp       ptr1, tmp1
 
-        .constructor    initconio
-
+        .include        "pce.inc"
+        .include        "extzp.inc"
         .macpack        longbranch
 
         .segment        "ONCE"
@@ -39,7 +39,7 @@ set_palette:
 
         inx
         inx
-        cpx     #16*2
+        cpx     #16 * 2
         jne     @lp
 
         stz     VCE_ADDR_LO
@@ -72,7 +72,7 @@ conio_init:
         lda     #>font
         sta     ptr1+1
 
-        lda     #$ff
+        lda     #$FF
         sta     tmp1
         jsr     copy
 
@@ -113,5 +113,5 @@ fillloop:
 
         rts
 
-font:
-        .include        "vga.inc"
+.rodata
+font:   .include        "vga.inc"

@@ -1,9 +1,11 @@
 ;
 ; Screen size variables
 ;
+        .export         screensize
+        .export         xsize, ysize
+
         .include        "pce.inc"
 
-        .export screensize
 screensize:
         ldx     xsize
         ldy     ysize
@@ -12,7 +14,6 @@ screensize:
 ; FIXME: changing the video mode allows for different screen sizes
 
 .rodata
-        .export xsize, ysize
 
 xsize:  .byte   charsperline
 ysize:  .byte   screenrows

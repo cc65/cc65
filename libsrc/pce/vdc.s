@@ -1,10 +1,10 @@
 
+        .export         vdc_init
+
         .include        "pce.inc"
 
 ; FIXME: implement selection of different video modes at runtime
 HIRES   = 1
-
-        .export         vdc_init
 
 vdc_init:
         lda     VDC_CTRL

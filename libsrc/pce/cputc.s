@@ -5,11 +5,11 @@
 
         .export         _cputcxy, _cputc, cputdirect, putchar
         .export         newline, plot
+
         .import         gotoxy
         .import         PLOT
         .import         xsize
-
-        .importzp       tmp3,tmp4
+        .importzp       tmp3, tmp4
 
         .include        "pce.inc"
         .include        "extzp.inc"
@@ -21,13 +21,13 @@ _cputcxy:
 
 ; Plot a character - also used as internal function
 
-_cputc: cmp     #$0d            ; CR?
+_cputc: cmp     #$0D            ; CR?
         bne     L1
         lda     #0
         sta     CURS_X
         beq     plot            ; Recalculate pointers
 
-L1:     cmp     #$0a            ; LF?
+L1:     cmp     #$0A            ; LF?
         beq     newline         ; Recalculate pointers
 
 ; Printable char of some sort
@@ -43,7 +43,7 @@ advance:
         cpy     xsize
         bne     L3
         jsr     newline         ; new line
-        ldy     #0              ; + cr
+        ldy     #0              ; + CR
 L3:     sty     CURS_X
         jmp     plot
 
@@ -71,7 +71,7 @@ putchar:
         lda     SCREEN_PTR
         sta     VDC_DATA_LO
 
-        lda     SCREEN_PTR + 1
+        lda     SCREEN_PTR+1
         sta     VDC_DATA_HI
 
         st0     #VDC_VWR        ; VWR

@@ -10,7 +10,7 @@
 
 .rodata
 
-; The following 256 byte wide table specifies attributes for the isxxx type
+; The following 256-byte-wide table specifies attributes for the isxxx type
 ; of functions. Doing it by a table means some overhead in space, but it
 ; has major advantages:
 ;
@@ -157,5 +157,3 @@ __ctype:
         .byte   CT_NONE                 ; 126/7e _____~_____
         .byte   CT_OTHER_WS             ; 127/7f ____DEL____
         .endrepeat
-
-

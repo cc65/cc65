@@ -2,11 +2,11 @@
 /*                                                                           */
 /*                                   pce.h                                   */
 /*                                                                           */
-/*                   PC-Engine system specific definitions                   */
+/*                   PC-Engine system-specific definitions                   */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2015 Groepaz/Hitmen                                                   */
+/* (C) 2015, Groepaz/Hitmen                                                  */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -51,7 +51,7 @@
 #define CH_ENTER                13
 #define CH_PI                   18
 
-/* Color defines (CBM compatible, for conio) */
+/* Color defines (CBM-compatible, for conio) */
 #define COLOR_BLACK             0x00
 #define COLOR_WHITE             0x01
 #define COLOR_RED               0x02
@@ -102,7 +102,7 @@ extern void pce_stdjoy_joy[];   /* Referred to by joy_static_stddrv[] */
 void waitvsync (void);
 /* Wait for start of the next frame */
 
-/* NOTE: all PCE are NTSC */
+/* NOTE: all PCEs are NTSC. */
 #define get_tv()                TV_NTSC
 /* Return the video mode the machine is using. */
 

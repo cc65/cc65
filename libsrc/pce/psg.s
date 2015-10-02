@@ -1,6 +1,6 @@
-        .include        "pce.inc"
-
         .export         psg_init
+
+        .include        "pce.inc"
 
         .segment        "ONCE"
 psg_init:

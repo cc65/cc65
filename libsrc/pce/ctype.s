@@ -14,7 +14,7 @@
 ; of functions. Doing it by a table means some overhead in space, but it
 ; has major advantages:
 ;
-;   * It is fast. If it were'nt for the slow parameter passing of cc65, one
+;   * It is fast. If it weren't for the slow parameter passing of cc65, one
 ;     could even define macros for the isxxx functions (this is usually
 ;     done on other platforms).
 ;

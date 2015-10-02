@@ -63,27 +63,37 @@ actually see when they execute the code in that cartridge.
 
 <sect>Memory layout<p>
 
-cc65-generated programs with the default setup run with the I/O area and a
-CHR bank enabled, which gives a usable memory range of &dollar;8000 - &dollar;FFF3.
-All boot ROM entry points may be called directly without additional code.
+cc65-generated programs with the default setup run with the memory map that was
+used by many PC-Engine games:
+<itemize>
+<item>The first 8K bytes is the I/O area.
+<item>The second 8K bytes is RAM, which holds
+<itemize>
+<item>the redirected zero-page and the redirected hardware stack page,
+<item>and 7680 bytes of general memory (&dollar;2200 - &dollar;3FFF).
+</itemize>
+<item>The last 8K bytes in the usual 64K-byte range is the ROM that holds the
+program.
+</itemize>
 
 Special locations:
 
 <descrip>
   <tag/Text screen and Font/
-  The text screen is located at VRAM &dollar;0000;
-  the Font is located at VRAM &dollar;2000.
+  The text screen is located at Video RAM (VRAM) address &dollar;0000;
+  the Font is located at VRAM address &dollar;2000.
 
   <tag/Stack/
-  The C runtime stack is located in system RAM at &dollar;3FFF; and, grows downwards.
+  The C run-time stack is located in system RAM at &dollar;3FFF;
+  and, grows downwards.
 
   <tag/Data and BSS/
   The Data (initialized variables) and BSS (uninitialized variables) sections are
   placed one after the other into system RAM at &dollar;2200.
 
   <tag/Heap/
-  The C heap is located after the end of the BSS section; and, grows towards the C
-  runtime stack.
+  The C heap is located after the end of the BSS section;
+  and, extends up to the C run-time stack.
 
   <tag/Code/
   In an 8K ROM cartridge, code and read-only data are located between
@@ -94,7 +104,7 @@ Special locations:
 
   In a 32K cartridge, code and read-only data are located between &dollar;8000
   and &dollar;FFF5.
-</descrip><p>
+</descrip>
 
 
 
@@ -113,21 +123,22 @@ Programs containing PCE-specific code may use the <tt/pce.h/ header file.
 
 <sect1>Hardware access<p>
 
-The following pseudo variables, declared in the <tt/pce.inc/ include file, do
+The following constants, defined in the <tt/pce.inc/ include file, do
 allow access to hardware that is located in the address space.
 
 <descrip>
 
   <tag><tt/PSG/</tag>
-  The <tt/PSG/ defines allow access to the PSG chip (Programmable Sound Generator).
+  The <tt/PSG/ defines allow access to the PSG (Programmable Sound Generator).
 
   <tag><tt/VCE/</tag>
   The <tt/VCE/ defines allow access to the VCE chip (Video Color Encoder).
 
   <tag><tt/VDC/</tag>
-  The <tt/VDC/ defines allow access to the VDC chip (Video Display Controller).
+  The <tt/VDC/ defines allow access to the VDC chip (Video Display Controller).<newline>
+  32K of 16-bit words of Video RAM can be accessed only through this chip.
 
-</descrip><p>
+</descrip>
 
 
 
@@ -156,7 +167,7 @@ No extended memory drivers are currently available for the PCE.
 
   Note that the Japanese 6-button pad currently is not supported.
 
-</descrip><p>
+</descrip>
 
 
 <sect1>Mouse drivers<p>
@@ -172,17 +183,13 @@ No serial drivers are currently available for the PCE.
 
 <sect>Limitations<p>
 
-<itemize>
-<item>interruptor support in crt0 (and cfg) is missing
-</itemize>
-
 
 <sect1>Disk I/O<p>
 
 The existing library for the PCE doesn't implement C file
 I/O. There are no hacks for the <tt/read()/ and <tt/write()/ routines.
 
-To be more concrete, this limitation means that you cannot use any of the
+To be more concrete, that limitation means that you cannot use any of the
 following functions (and a few others):
 
 <itemize>

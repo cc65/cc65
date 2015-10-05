@@ -69,7 +69,7 @@ Programs containing NES specific code may use the <tt/nes.h/ header file.
 <sect1>NES specific functions<p>
 
 <itemize>
-<item>waitvblank
+<item>waitvblank - wait until the start of vblank
 <item>get_tv
 </itemize>
 

@@ -3,13 +3,13 @@
 ;
 
         .export         _exit
+        .exportzp       init_load_, init_run_
         .export         __STARTUP__ : absolute = 1      ; Mark as startup
+
         .import         initlib, donelib
-        .import         zerobss
-        .import         callmain
+        .import         move_init, zerobss, callmain
         .import         RESTOR, BSOUT, CLRCH
-        .import         __RAM_START__, __RAM_SIZE__     ; Linker generated
-        .import         __STACKSIZE__                   ; Linker generated
+        .import         __HIMEM__                       ; from configure file
         .importzp       ST
 
         .include        "zeropage.inc"
@@ -19,17 +19,16 @@
 ; ------------------------------------------------------------------------
 ; Startup code
 
+; Two zero-page pointers are needed before any zero-page stuff is saved.
+; Choose locations that are not used by anything.
+
+init_load_      :=      FREKZP
+init_run_       :=      FREKZP+2
+
+
 .segment        "STARTUP"
 
 Start:
-
-; Save the zero-page locations that we need.
-
-        ldx     #zpspace-1
-L1:     lda     sp,x
-        sta     zpsave,x
-        dex
-        bpl     L1
 
 ; Switch to the second charset.
 
@@ -39,35 +38,30 @@ L1:     lda     sp,x
 ; Switch off the BASIC ROM.
 
         lda     $01
-        pha                     ; Remember the value
+        sta     mmusave         ; Save the memory configuration
         and     #$F8
         ora     #$06            ; Enable Kernal+I/O, disable BASIC
         sta     $01
 
-; Clear the BSS data.
-
-        jsr     zerobss
-
-; Save some system settings; and, set up the stack.
-
-        pla
-        sta     mmusave         ; Save the memory configuration
-
         tsx
         stx     spsave          ; Save the system stack ptr
 
-        lda     #<(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
-        sta     sp
-        lda     #>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
-        sta     sp+1            ; Set argument stack ptr
+; Allow some re-entrancy by skipping the next task if it already was done.
+; This often can let us rerun the program without reloading it.
 
-; Call the module constructors.
+        ldx     moveinit
+        beq     L0
 
-        jsr     initlib
+; Move the INIT segment from where it was loaded (over ZPSAVE and BSS)
+; into where it must be run (in the heap).
 
-; Push the command-line arguments; and, call main().
+        jsr     move_init
+        dec     moveinit        ; set to false
 
-        jsr     callmain
+; Save space by putting the rest of the start-up code in the INIT segment,
+; which can be re-used by the heap.
+
+L0:     jsr     initstart
 
 ; Back from main() [this is also the exit() entry]. Run the module destructors.
 
@@ -98,14 +92,51 @@ L2:     lda     zpsave,x
 
         rts
 
+
+; ------------------------------------------------------------------------
+
+.segment        "INIT"
+
+initstart:
+
+; Save the zero-page locations that we need.
+
+        ldx     #zpspace-1
+L1:     lda     sp,x
+        sta     zpsave,x
+        dex
+        bpl     L1
+
+; Clear the BSS data.
+
+        jsr     zerobss
+
+; Set up the stack.
+
+        lda     #<__HIMEM__
+        ldx     #>__HIMEM__
+        sta     sp
+        stx     sp+1            ; Set argument stack ptr
+
+; Call the module constructors.
+
+        jsr     initlib
+
+; Push the command-line arguments; and, call main().
+
+        jmp     callmain
+
+
 ; ------------------------------------------------------------------------
 ; Data
+
+.data
+
+mmusave:.res    1
+spsave: .res    1
+moveinit:
+        .byte   1
 
 .segment        "ZPSAVE"
 
 zpsave: .res    zpspace
-
-.bss
-
-spsave: .res    1
-mmusave:.res    1

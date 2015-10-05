@@ -24,6 +24,7 @@ SCREEN_PTR      := $D1          ; Pointer to current char in text screen
 CURS_X          := $D3          ; Cursor column
 CURS_Y          := $D6          ; Cursor row
 CRAM_PTR        := $F3          ; Pointer to current char in color RAM
+FREKZP          := $FB          ; Five unused bytes
 
 BASIC_BUF       := $200         ; Location of command-line
 BASIC_BUF_LEN   = 89            ; Maximum length of command-line
@@ -212,4 +213,3 @@ CASSMOT         = $20           ; Cassette motor on
 TP_FAST         = $80           ; Switch Rossmoeller TurboProcess to fast mode
 
 RAMONLY         = $F8           ; (~(LORAM | HIRAM | IOEN)) & $FF
-

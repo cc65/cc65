@@ -123,6 +123,14 @@ No extended memory drivers are currently available for the NES.
 
 </descrip><p>
 
+The generic interface doesn't export the start and select buttons. To
+test for those, use the defines in nes.h instead of the generic masks.
+
+Example:
+<tscreen><verb>
+if (joy_read(0) & KEY_A)
+</verb></tscreen>
+
 
 <sect1>Mouse drivers<p>
 

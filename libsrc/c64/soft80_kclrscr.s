@@ -2,22 +2,36 @@
         .export         soft80_kclrscr
         .import         soft80_kplot
         .import         __bgcolor
+        .importzp       ptr1
 
         .include        "c64.inc"
         .include        "soft80.inc"
 
 soft80_kclrscr:
 
+        lda     #<soft80_bitmap
+        sta     ptr1
+        lda     #>soft80_bitmap
+        sta     ptr1+1
+
         lda     #$ff
 
-        ldx     #$00
-lp1:
-        .repeat $1f,page
-        sta     soft80_bitmap+(page*$100),x
-        .endrepeat
+        ldx     #$1f
+@lp2:
+        ldy     #0
+@lp1:
+        sta     (ptr1),y
+        iny
+        bne     @lp1
+        inc     ptr1+1
+        dex
+        bne     @lp2
+
+        ;ldx     #$00
+@lp3:
         sta     soft80_bitmap+$1e40,x
         inx
-        bne     lp1
+        bne     @lp3
 
         sei
         ldy     $01
@@ -27,28 +41,12 @@ lp1:
         lda     CHARCOLOR
         and     #$f0
         ora     __bgcolor
+        jsr     clear           ; clear vram
 
-        ;ldx     #$00
-lp2:
-        sta     soft80_vram,x
-        sta     soft80_vram+$100,x
-        sta     soft80_vram+$200,x
-        sta     soft80_vram+$2e8,x
-        inx
-        bne     lp2
-
-        inc     $01
+        inc     $01             ; -> $35
 
         lda     __bgcolor
-        ;ldx     #$00
-lp3:
-        sta     soft80_colram,x
-        sta     soft80_colram+$100,x
-        sta     soft80_colram+$200,x
-        sta     soft80_colram+$2e8,x
-        inx
-        bne     lp3
-
+        jsr     clear           ; clear color ram
 
         sty     $01
         cli
@@ -58,6 +56,16 @@ lp3:
         clc
         jmp     soft80_kplot
 
-
+        ; clear loop for colram and vram
+clear:
+        ;ldx     #$00
+@lp1:
+        sta     soft80_colram,x
+        sta     soft80_colram+$100,x
+        sta     soft80_colram+$200,x
+        sta     soft80_colram+$2e8,x
+        inx
+        bne     @lp1
+        rts
 
 

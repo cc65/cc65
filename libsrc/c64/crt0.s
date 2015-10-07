@@ -3,12 +3,11 @@
 ;
 
         .export         _exit
-        .exportzp       init_load_, init_run_
         .export         __STARTUP__ : absolute = 1      ; Mark as startup
 
         .import         initlib, donelib
-        .import         move_init, zerobss, callmain
-        .import         RESTOR, BSOUT, CLRCH
+        .import         moveinit, zerobss, callmain
+        .import         BSOUT
         .import         __HIMEM__                       ; from configure file
         .importzp       ST
 
@@ -18,13 +17,6 @@
 
 ; ------------------------------------------------------------------------
 ; Startup code
-
-; Two zero-page pointers are needed before any zero-page stuff is saved.
-; Choose locations that are not used by anything.
-
-init_load_      :=      FREKZP
-init_run_       :=      FREKZP+2
-
 
 .segment        "STARTUP"
 
@@ -49,17 +41,17 @@ Start:
 ; Allow some re-entrancy by skipping the next task if it already was done.
 ; This often can let us rerun the program without reloading it.
 
-        ldx     moveinit
+        ldx     move_init
         beq     L0
 
 ; Move the INIT segment from where it was loaded (over ZPSAVE and BSS)
 ; into where it must be run (in the heap).
 
-        jsr     move_init
-        dec     moveinit        ; set to false
+        jsr     moveinit
+        dec     move_init       ; set to false
 
 ; Save space by putting the rest of the start-up code in the INIT segment,
-; which can be re-used by the heap.
+; which can be re-used by the heap and the C stack.
 
 L0:     jsr     initstart
 
@@ -134,7 +126,7 @@ L1:     lda     sp,x
 
 mmusave:.res    1
 spsave: .res    1
-moveinit:
+move_init:
         .byte   1
 
 .segment        "ZPSAVE"

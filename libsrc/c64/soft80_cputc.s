@@ -5,7 +5,6 @@
 
         .export         soft80_cputcxy, soft80_cputc
         .export         soft80_cputdirect, soft80_putchar
-        .export         soft80_putcolor
         .export         soft80_newline, soft80_plot
 
         .import         popa, _gotoxy
@@ -19,6 +18,10 @@
 
         .include        "c64.inc"
         .include        "soft80.inc"
+
+.if SOFT80COLORVOODOO = 1
+        .export         soft80_putcolor
+.endif
 
 soft80_cputcxy:
         pha                     ; Save C
@@ -125,163 +128,17 @@ L5:
 ; returns:    Y:  cursor X position
 ; this function is going to be used a lot so we unroll it a bit for speed
 
-;--- start color vodoo
-
-; remove color from cell
-; y unmodified
-remcolor:
-
-        ;ldy     #$00            ; is still $00
-
-        lda     (CRAM_PTR),y    ; vram
-        and     #$0f
-        cmp     __bgcolor
-        jeq     @l2b            ; vram==bgcolor
-
-        inc     $01
-        lda     (CRAM_PTR),y    ; colram
-        stx     $01             ;$34
-        and     #$0f
-        cmp     __bgcolor
-        beq     @l2s            ; colram==bgcolor
-
-        ; vram = colram
-        ;inc     $01
-        ;lda     (CRAM_PTR),y    ; colram
-        ;stx     $01             ;$34
-        ;and     #$0f
-
-        sta     tmp3
-        lda     (CRAM_PTR),y    ; vram
-        and     #$f0
-        ora     tmp3
-        sta     (CRAM_PTR),y    ; vram
-
-        ; colram = bgcolor
-        lda     __bgcolor
-        inc     $01
-        sta     (CRAM_PTR),y    ; colram
-        stx     $01 ;$34
-
-        jmp     @l2b
-
-@l2s:
-        ; colram is bgcolor
-        ; => only one char in cell used
-
-        jsr     soft80_checkchar
-        bcc     @l2b            ; space at current position
-
-        ; vram = bgcolor
-        lda     (CRAM_PTR),y    ; vram
-        and     #$f0
-        ora     __bgcolor
-        sta     (CRAM_PTR),y    ; vram
-@l2b:
-        rts
-
-; put color to cell
-; y unmodified
-soft80_putcolor:
-
-        ;ldy     #$00            ; is still $00
-
-        lda     (CRAM_PTR),y    ; vram
-        and     #$0f
-        cmp     __bgcolor
-        beq     @l2s            ; vram==bgcolor => first char in cell
-
-        ; vram!=bgcolor => second char in cell
-
-        inc     $01             ;$35
-        lda     (CRAM_PTR),y    ; colram
-        stx     $01             ;$34
-        and     #$0f
-        cmp     __bgcolor
-        bne     @l2s            ; colram!=bgcolor
-
-        ; colram==bgcolor => second char in cell or overwrite 1st char
-
-        jsr     soft80_checkchar
-        bcs     @l2a            ; char at current position => overwrite 1st
-
-        ; colram=vram
-        lda     (CRAM_PTR),y    ; vram
-        inc     $01
-        sta     (CRAM_PTR),y    ; colram
-        stx     $01 ;$34
-
-        ;jmp     @l2a
-
-@l2s:
-        ; colram!=bgcolor => alread 2 chars in cell
-@l2a:
-
-        ; Set color
-        lda     CHARCOLOR
-        sta     (CRAM_PTR),y    ; vram
-
-        rts
-
-
-;--- end color vodoo
-
-        .export soft80_checkchar
-
-; test if there is a space or a character at current position
-; CLC: space        SEC: character
-soft80_checkchar:
-
-        ;ldy     #$00            ; is still $00
-
-        lda     CURS_X
-        and     #$01
-        jne     @l1a
-
-        .repeat 8,line
-        lda     (SCREEN_PTR),y
-        and     #$f0
-        cmp     #$f0
-        bne     @l2b
-        .if (line < 7)
-        iny
-        .endif
-        .endrepeat
-
-        ldy     #$00
-        clc
-        rts
-@l2b:
-        ldy     #$00
-        sec
-        rts
-@l1a:
-        .repeat 8,line
-        lda     (SCREEN_PTR),y
-        and     #$0f
-        cmp     #$0f
-        bne     @l2bb
-        .if line < 7
-        iny
-        .endif
-        .endrepeat
-        ldy     #$00
-        clc
-        rts
-@l2bb:
-        ldy     #$00
-        sec
-        rts
-
+.if SOFT80FASTSPACE = 1
 ; output space
-
+; in: y must be $00
 _space:
 
         lda     RVS
         jne     _spaceinvers
 
+.if SOFT80COLORVOODOO = 1
         jsr     remcolor
-
+.endif
         ;ldy     #$00            ; is still $00
 
         lda     CURS_X
@@ -310,10 +167,15 @@ _space:
         jmp     _back
 
 ; output inverted space
-
+; in: y must be $00
 _spaceinvers:
 
+.if SOFT80COLORVOODOO = 1
         jsr     soft80_putcolor
+.else
+        lda     CHARCOLOR
+        sta     (CRAM_PTR),y    ; vram
+.endif
 
         lda     CURS_X
         and     #$01
@@ -339,11 +201,12 @@ _spaceinvers:
         .endrepeat
 
         jmp     _back
+.endif
 
 ; output a character
 
 soft80_putchar:
-        sta     tmp3
+        sta     tmp3            ; remember charcode
 
         sei
         ldx     $01
@@ -353,14 +216,20 @@ soft80_putchar:
         stx     $01             ; will stay $34 for space
         ldy     #$00            ; will be $00 from now on
 
+.if SOFT80FASTSPACE = 1
         cmp     #' '            ; space is a special (optimized) case
         jeq     _space
+.endif
 
+.if SOFT80COLORVOODOO = 1
         jsr     soft80_putcolor
+.else
+        lda     CHARCOLOR
+        sta     (CRAM_PTR),y    ; vram
+.endif
+        ; output character
 
-; output character
-char:
-        ldx     tmp3
+        ldx     tmp3            ; get charcode
 
         lda     RVS
         jne     _invers
@@ -429,3 +298,166 @@ _invers:
         .endif
         .endrepeat
         jmp     _back
+
+;-------------------------------------------------------------------------------
+
+.if SOFT80COLORVOODOO = 1
+;--- start color vodoo
+
+; remove color from cell, called before putting a "space" character to the bitmap
+; y unmodified
+remcolor:
+
+        ;ldy     #$00            ; is still $00
+
+        ; if the textcolor in vram is equal to the background color, then
+        ; no (visible) character is in the current cell and we can exit
+        ; immediately.
+        lda     (CRAM_PTR),y    ; vram (textcolor)
+        and     #$0f
+        cmp     __bgcolor
+        jeq     @l2b            ; yes, vram==bgcolor
+
+        ; now check if the textcolor in color ram is equal the background color,
+        ; if yes then there is only one (visible) character in the current cell
+        inc     $01
+        lda     (CRAM_PTR),y    ; colram (2nd textcolor)
+        stx     $01             ;$34
+        and     #$0f
+        cmp     __bgcolor
+        beq     @l2s            ; yes, colram==bgcolor
+
+        ; two characters in the current cell, of which one will get removed
+
+        ; vram = colram
+        ;inc     $01
+        ;lda     (CRAM_PTR),y    ; colram
+        ;stx     $01             ;$34
+        ;and     #$0f
+
+        ; move 2nd text color to vram
+        sta     tmp3
+        lda     (CRAM_PTR),y    ; vram
+        and     #$f0
+        ora     tmp3
+        sta     (CRAM_PTR),y    ; vram
+
+        ; colram = bgcolor
+        lda     __bgcolor
+        inc     $01
+        sta     (CRAM_PTR),y    ; colram
+        stx     $01 ;$34
+
+        jmp     @l2b
+
+@l2s:
+        ; colram is bgcolor
+        ; => only one char in cell used
+
+        jsr     soft80_checkchar
+        bcc     @l2b            ; space at current position
+
+        ; vram (textcolor) = bgcolor
+        lda     (CRAM_PTR),y    ; vram
+        and     #$f0
+        ora     __bgcolor
+        sta     (CRAM_PTR),y    ; vram
+@l2b:
+        rts
+
+; put color to cell
+; in: $01 is $34 (RAM under I/O) when entering
+;     y must be $00
+; out: y = $00
+soft80_putcolor:
+
+        ;ldy     #$00            ; is still $00
+
+        lda     (CRAM_PTR),y    ; vram
+        and     #$0f
+        cmp     __bgcolor
+        beq     @l2s            ; vram==bgcolor => first char in cell
+
+        ; vram!=bgcolor => second char in cell
+
+        inc     $01             ;$35
+        lda     (CRAM_PTR),y    ; colram
+        stx     $01             ;$34
+        and     #$0f
+        cmp     __bgcolor
+        bne     @l2s            ; colram!=bgcolor
+
+        ; colram==bgcolor => second char in cell or overwrite 1st char
+
+        jsr     soft80_checkchar
+        bcs     @l2a            ; char at current position => overwrite 1st
+
+        ; colram=vram
+        lda     (CRAM_PTR),y    ; vram
+        inc     $01
+        sta     (CRAM_PTR),y    ; colram
+        stx     $01 ;$34
+
+        ;jmp     @l2a
+
+@l2s:
+        ; colram!=bgcolor => alread 2 chars in cell
+@l2a:
+
+        ; Set color
+        lda     CHARCOLOR
+        sta     (CRAM_PTR),y    ; vram
+
+        rts
+
+        ;.export soft80_checkchar
+
+; test if there is a space or a character at current position
+; in:  y must be $00
+; out: CLC: space        SEC: character
+;      y = $00
+soft80_checkchar:
+
+        ;ldy     #$00            ; is still $00
+
+        lda     CURS_X
+        and     #$01
+        jne     @l1a
+
+        .repeat 8,line
+        lda     (SCREEN_PTR),y
+        and     #$f0
+        cmp     #$f0
+        bne     @l2b
+        .if (line < 7)
+        iny
+        .endif
+        .endrepeat
+
+        ldy     #$00
+        clc
+        rts
+@l2b:
+        ldy     #$00
+        sec
+        rts
+@l1a:
+        .repeat 8,line
+        lda     (SCREEN_PTR),y
+        and     #$0f
+        cmp     #$0f
+        bne     @l2bb
+        .if line < 7
+        iny
+        .endif
+        .endrepeat
+        ldy     #$00
+        clc
+        rts
+@l2bb:
+        ldy     #$00
+        sec
+        rts
+
+;--- end color vodoo
+.endif

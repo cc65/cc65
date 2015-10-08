@@ -21,3 +21,10 @@ CH_BTEE                 = 177
 CH_TTEE                 = 178
 CH_RTEE                 = 179
 CH_LRCORNER             = 189
+
+;-------------------------------------------------------------------------------
+; set to 0 to disable the color-ram "voodoo" for debugging purposes
+.define SOFT80COLORVOODOO 1
+; set to 0 to disable special case optimization for the "space" character
+.define SOFT80FASTSPACE 1
+

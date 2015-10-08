@@ -33,20 +33,20 @@ soft80_kclrscr:
         inx
         bne     @lp3
 
+.if SOFT80COLORVOODOO = 1
+        lda     __bgcolor
+        jsr     clear           ; clear color ram
+.endif
+
         sei
         ldy     $01
-        lda     #$34
+        lda     #$34            ; enable RAM under I/O
         sta     $01
 
         lda     CHARCOLOR
         and     #$f0
         ora     __bgcolor
         jsr     clear           ; clear vram
-
-        inc     $01             ; -> $35
-
-        lda     __bgcolor
-        jsr     clear           ; clear color ram
 
         sty     $01
         cli

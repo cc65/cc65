@@ -30,57 +30,54 @@ soft80_bgcolor:
 
         jsr     mkcharcolor
 
+.if SOFT80COLORVOODOO = 1
         ; if the old bg color is equal to color ram of that cell, then also
         ; update the color ram to the new value.
         ; FIXME: perhaps we must also check if the non visible character is not
         ;        a space, and NOT update the color ram in that case.
         ldx     #$00
 lp1:
-        .repeat $3,page
+        .repeat $4,page
         .scope
-        lda     soft80_colram+(page*$100),x
+        lda     soft80_colram+(page*250),x
         and     #$0f
         cmp     tmp2                    ; old bg color
         bne     @sk1
-        lda     __bgcolor
-        sta     soft80_colram+(page*$100),x
+        lda     __bgcolor               ; new bg color
+        sta     soft80_colram+(page*250),x
 @sk1:
         .endscope
         .endrepeat
 
-        .scope
-        lda     soft80_colram+$2e8,x
-        and     #$0f
-        cmp     tmp2                    ; old bg color
-        bne     @sk1
-        lda     __bgcolor
-        sta     soft80_colram+$2e8,x
-@sk1:
-        .endscope
-
         inx
         bne     lp1
+.endif
 
         sei
         ldy     $01
         lda     #$34                    ; disable I/O
         sta     $01
 
+        ; if the old bg color is equal to text color in this cell, then also
+        ; update the text color to the new value.
+        ; FIXME: perhaps we need to check for space, see note above
         ldx     #$00
-@lp2:
-        .repeat $3,page
-        lda     soft80_vram+(page*$100),x
+lp2:
+        .repeat $4,page
+        .scope
+        lda     soft80_vram+(page*250),x
         and     #$0f
+        cmp     tmp2                    ; old bg color
+        bne     @sk2
+        lda     __bgcolor               ; new bg color
+@sk2:
         ora     tmp1                    ; new bg color (high nibble)
-        sta     soft80_vram+(page*$100),x
+        sta     soft80_vram+(page*250),x
+        .endscope
         .endrepeat
-        lda     soft80_vram+$2e8,x
-        and     #$0f
-        ora     tmp1                    ; new bg color (high nibble)
-        sta     soft80_vram+$2e8,x
 
         inx
-        bne     @lp2
+        bne     lp2
 
         sty     $01                     ; enable I/O
         cli

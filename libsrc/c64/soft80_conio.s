@@ -6,7 +6,7 @@
         .destructor     soft80_shutdown
 
         .import         soft80_kclrscr
-        .import         soft80_textcolor, soft80_bgcolor
+        .import         __textcolor, __bgcolor
 
         .importzp       ptr1, ptr2, ptr3
 
@@ -67,11 +67,18 @@ soft80_init:
         cli
 
         lda     646                     ; use current textcolor
-        jsr     soft80_textcolor
+        and     #$0f
+        sta     __textcolor
 
         lda     VIC_BG_COLOR0           ; use current bgcolor
         and     #$0f
-        jsr     soft80_bgcolor
+        sta     __bgcolor
+        asl     a
+        asl     a
+        asl     a
+        asl     a
+        ora     __textcolor
+        sta     CHARCOLOR
 
         jmp     soft80_kclrscr
 

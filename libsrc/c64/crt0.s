@@ -8,7 +8,8 @@
         .import         initlib, donelib
         .import         moveinit, zerobss, callmain
         .import         BSOUT
-        .import         __HIMEM__                       ; from configure file
+        .import         __RAM_START__, __RAM_SIZE__     ; Linker generated
+        .import         __STACKSIZE__                   ; from configure file
         .importzp       ST
 
         .include        "zeropage.inc"
@@ -105,8 +106,8 @@ L1:     lda     sp,x
 
 ; Set up the stack.
 
-        lda     #<__HIMEM__
-        ldx     #>__HIMEM__
+        lda     #<(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
+        ldx     #>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
         sta     sp
         stx     sp+1            ; Set argument stack ptr
 

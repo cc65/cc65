@@ -410,8 +410,6 @@ soft80_putcolor:
 
         rts
 
-        ;.export soft80_checkchar
-
 ; test if there is a space or a character at current position
 ; in:  y must be $00
 ; out: CLC: space        SEC: character

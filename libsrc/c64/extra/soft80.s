@@ -51,8 +51,3 @@
         .import soft80_screensize
         .export screensize := soft80_screensize
 
-;-------------------------------------------------------------------------------
-; force the init constructor to be imported
-
-        .import soft80_init
-conio_init      = soft80_init

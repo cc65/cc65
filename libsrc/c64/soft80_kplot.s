@@ -62,3 +62,8 @@ _bitmaphi:
         .byte >(soft80_bitmap+(row*40*8))
         .endrepeat
 
+;-------------------------------------------------------------------------------
+; force the init constructor to be imported
+
+        .import soft80_init
+conio_init      = soft80_init

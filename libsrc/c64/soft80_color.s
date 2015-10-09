@@ -9,8 +9,6 @@
 
         .importzp       tmp1, tmp2
 
-        .import         soft80_checkchar
-
         .include        "c64.inc"
         .include        "soft80.inc"
 
@@ -107,3 +105,9 @@ __textcolor:
         .res 1
 __bgcolor:
         .res 1
+
+;-------------------------------------------------------------------------------
+; force the init constructor to be imported
+
+        .import soft80_init
+conio_init      = soft80_init

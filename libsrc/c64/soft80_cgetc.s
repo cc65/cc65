@@ -67,3 +67,9 @@ invertcursor:
 
         .rodata
 nibble: .byte $f0, $0f
+
+;-------------------------------------------------------------------------------
+; force the init constructor to be imported
+
+        .import soft80_init
+conio_init      = soft80_init

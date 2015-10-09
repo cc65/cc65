@@ -19,7 +19,7 @@
         .export         __getdefdev             ; get default device
         .export         __defdev                ; this is the default device string (e.g. "D1:")
 .ifdef  DYNAMIC_DD
-        .constructor    __getdefdev,24
+        .constructor    __getdefdev, 24
 .endif
 
 ; Get default device (LBUF will be destroyed!!)

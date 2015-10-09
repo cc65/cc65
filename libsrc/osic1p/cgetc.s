@@ -11,12 +11,14 @@
         .include        "zeropage.inc"
 
 ; Initialize one-character buffer that is filled by kbhit()
+        .segment        "INIT"
 initcgetc:
         lda     #$00
         sta     CHARBUF         ; No character in buffer initially
         rts
 
 ; Input routine from 65V PROM MONITOR, show cursor if enabled
+        .code
 _cgetc:
         lda     CHARBUF         ; character in buffer available?
         beq     nobuffer

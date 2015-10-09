@@ -1,14 +1,16 @@
         .include        "pce.inc"
         .include        "extzp.inc"
 
-        .import vce_init
-        .import psg_init
-        .import vdc_init
+        .import         vce_init
+        .import         psg_init
+        .import         colors
+        .importzp       ptr1, tmp1
 
         .constructor    initconio
 
         .macpack        longbranch
 
+        .segment        "INIT"
 initconio:
         jsr     vce_init
         jsr     psg_init
@@ -20,7 +22,6 @@ initconio:
         st2     #>$0088
         rts
 
-        .import colors
 set_palette:
         stz     VCE_ADDR_LO
         stz     VCE_ADDR_HI
@@ -48,11 +49,6 @@ set_palette:
 
         rts
 
-;----------------------------------------------------------------------------
-;
-;----------------------------------------------------------------------------
-
-        .importzp       ptr1, tmp1
 conio_init:
         ; Load font
         st0     #VDC_MAWR
@@ -80,12 +76,10 @@ conio_init:
         sta     tmp1
         jsr     copy
 
-
         ldx     #0
         stx     BGCOLOR
         inx
         stx     CHARCOLOR
-
 
         rts
 

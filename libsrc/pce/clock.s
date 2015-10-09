@@ -5,9 +5,11 @@
         .include        "pce.inc"
         .include        "extzp.inc"
 
-        .forceimport    ticktock
         .export         _clock
+        .forceimport    ticktock
         .importzp       sreg
+        .constructor    initclock
+
 
 .proc   _clock
 
@@ -21,8 +23,7 @@
 
 .endproc
 
-        .constructor initclock
-
+        .segment        "INIT"
 initclock:
         lda     #0
         ldx     #3

@@ -2,7 +2,7 @@
 ; Low level stuff for screen output/console input
 ;
 
-        .constructor    soft80_init, 24
+        .constructor    soft80_init
         .destructor     soft80_shutdown
 
         .import         soft80_kclrscr

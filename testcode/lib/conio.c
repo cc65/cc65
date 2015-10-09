@@ -18,7 +18,7 @@ void main(void)
 
         clrscr();
         screensize(&xsize, &ysize);
-        cputs("cc65 conio test\n\rInput:[        ]");
+        cputs("cc65 conio test\n\rInput: [        ]");
 
         cputsxy(0, 2, "Colors:" );
         tcol = textcolor(0); /* remember original textcolor */
@@ -80,9 +80,18 @@ void main(void)
                 cputs(" revers");
                 revers(0);
 
-                gotoxy(7 + inpos,1);
-                cputc(cgetc());
-                inpos = (inpos + 1) & 7;
+                gotoxy(8 + inpos,1);
+                i = cgetc();
+                if ((i >= '0') && (i<='9')) {
+                    textcolor(i - '0');
+                } else if (i == CH_CURS_LEFT) {
+                    inpos = (inpos - 1) & 7;
+                } else if (i == CH_CURS_RIGHT) {
+                    inpos = (inpos + 1) & 7;
+                } else {
+                    cputc(i);
+                    inpos = (inpos + 1) & 7;
+                }
 
                 ++n;
         }

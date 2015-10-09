@@ -40,7 +40,7 @@ Start:
         stx     spsave          ; Save the system stack ptr
 
 ; Allow some re-entrancy by skipping the next task if it already was done.
-; This often can let us rerun the program without reloading it.
+; This sometimes can let us rerun the program without reloading it.
 
         ldx     move_init
         beq     L0
@@ -125,8 +125,12 @@ L1:     lda     sp,x
 
 .data
 
+; These two variables were moved out of the BSS segment, and into DATA, because
+; we need to use them before INIT is moved off of BSS, and before BSS is zeroed.
+
 mmusave:.res    1
 spsave: .res    1
+
 move_init:
         .byte   1
 

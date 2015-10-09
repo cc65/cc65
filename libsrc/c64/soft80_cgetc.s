@@ -4,23 +4,22 @@
 
         .export         soft80_cgetc
         .import         cursor
+        .importzp       tmp1
 
         .include        "c64.inc"
         .include        "soft80.inc"
-
-.if SOFT80COLORVOODOO = 1
-        .import         soft80_putcolor
-.endif
 
 soft80_cgetc:
         lda     KEY_COUNT       ; Get number of characters
         bne     L3              ; Jump if there are already chars waiting
 
+        ldx     #1
         jsr     invertcursor    ; set cursor on or off accordingly
 
 L1:     lda     KEY_COUNT       ; wait for key
         beq     L1
 
+        ldx     #0
         jsr     invertcursor    ; set cursor on or off accordingly
 
 L3:     jsr     KBDREAD         ; Read char and return in A
@@ -36,18 +35,13 @@ invertcursor:
 @invert:
 
         sei
-        lda     $01
+        lda     $01             ; enable RAM under I/O
         pha
-        lda     #$34            ; enable RAM under I/O
+        lda     #$34
         sta     $01
 
         ldy     #$00
-.if SOFT80COLORVOODOO = 1
-        jsr     soft80_putcolor
-.else
-        lda     CHARCOLOR
-        sta     (CRAM_PTR),y    ; vram
-.endif
+        jsr     setcolor
 
         lda     CURS_X
         and     #$01
@@ -63,6 +57,24 @@ invertcursor:
         pla
         sta     $01
         cli
+        rts
+
+        ; do not use soft80_putcolor here to make sure the cursor is always
+        ; shown using the current textcolor without disturbing the "color voodoo"
+        ; in soft80_cputc
+setcolor:
+        ;ldy     #0              ; is 0
+        txa
+        bne     @set
+        ; restore old value
+        lda     tmp1
+        sta     (CRAM_PTR),y    ; vram
+        rts
+@set:
+        lda     (CRAM_PTR),y    ; vram
+        sta     tmp1
+        lda     CHARCOLOR
+        sta     (CRAM_PTR),y    ; vram
         rts
 
         .rodata

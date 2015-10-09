@@ -21,7 +21,7 @@
 
 .endproc
 
-        .constructor initclock, 24
+        .constructor initclock
 
 initclock:
         lda     #0

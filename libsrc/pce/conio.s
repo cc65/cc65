@@ -5,7 +5,7 @@
         .import psg_init
         .import vdc_init
 
-        .constructor    initconio, 24
+        .constructor    initconio
 
         .macpack        longbranch
 

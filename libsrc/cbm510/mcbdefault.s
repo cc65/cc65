@@ -55,7 +55,7 @@ initmcb:
         sta     IndReg
 
         lda     _mouse_def_pointercolor
-        ldy     VIC_SPR0_COLOR + MOUSE_SPR
+        ldy     #VIC_SPR0_COLOR + MOUSE_SPR
         sta     (vic),y
 
         stx     IndReg

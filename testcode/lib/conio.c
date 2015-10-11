@@ -58,6 +58,8 @@ void main(void)
         for (i = 0; i < 256; ++i) {
             if ((i != '\n') && (i != '\r')) {
                     cputc(i);
+            } else {
+                    cputc(' ');
             }
         }
         while(wherex() > 0) {

@@ -1,4 +1,6 @@
 ;
+; Groepaz/Hitmen, 11.10.2015
+;
 ; void cputcxy (unsigned char x, unsigned char y, char c);
 ; void cputc (char c);
 ;
@@ -49,7 +51,6 @@ L1:     cmp     #$0D            ; LF?
         beq     soft80_newline  ; Recalculate pointers
 
         ; Printable char of some sort
-
         tay
         bpl     L10
 

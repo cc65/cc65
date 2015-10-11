@@ -1,4 +1,6 @@
 ;
+; Groepaz/Hitmen, 11.10.2015
+;
 ; char cgetc (void);
 ;
 

@@ -40,18 +40,18 @@ soft80_kclrscr:
 
 .if SOFT80COLORVOODOO = 1
         lda     soft80_internal_bgcolor
-        jsr     clear           ; clear color ram
+        jsr     clear                           ; clear color ram
 .endif
 
         sei
         ldy     $01
-        lda     #$34            ; enable RAM under I/O
+        lda     #$34                            ; enable RAM under I/O
         sta     $01
 
         lda     CHARCOLOR
         and     #$f0
         ora     soft80_internal_bgcolor
-        jsr     clear           ; clear vram
+        jsr     clear                           ; clear vram
 
         sty     $01
         cli

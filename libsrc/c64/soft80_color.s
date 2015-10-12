@@ -14,18 +14,18 @@
         .include        "soft80.inc"
 
 soft80_textcolor:
-        ldx     soft80_internal_textcolor             ; get old value
-        sta     soft80_internal_textcolor             ; set new value
+        ldx     soft80_internal_textcolor       ; get old value
+        sta     soft80_internal_textcolor       ; set new value
 
         jsr     mkcharcolor
 
-        txa                             ; get old value
+        txa                                     ; get old value
         rts
 
 soft80_bgcolor:
-        ldx     soft80_internal_bgcolor               ; get old value
-        stx     tmp2                    ; save old value
-        sta     soft80_internal_bgcolor               ; set new value
+        ldx     soft80_internal_bgcolor         ; get old value
+        stx     tmp2                            ; save old value
+        sta     soft80_internal_bgcolor         ; set new value
 
         jsr     mkcharcolor
 
@@ -40,9 +40,9 @@ lp1:
         .scope
         lda     soft80_colram+(page*250),x
         and     #$0f
-        cmp     tmp2                    ; old bg color
+        cmp     tmp2                            ; old bg color
         bne     @sk1
-        lda     soft80_internal_bgcolor               ; new bg color
+        lda     soft80_internal_bgcolor         ; new bg color
         sta     soft80_colram+(page*250),x
 @sk1:
         .endscope
@@ -54,7 +54,7 @@ lp1:
 
         sei
         ldy     $01
-        lda     #$34                    ; disable I/O
+        lda     #$34                            ; disable I/O
         sta     $01
 
         ; if the old bg color is equal to text color in this cell, then also
@@ -66,11 +66,11 @@ lp2:
         .scope
         lda     soft80_vram+(page*250),x
         and     #$0f
-        cmp     tmp2                    ; old bg color
+        cmp     tmp2                            ; old bg color
         bne     @sk2
-        lda     soft80_internal_bgcolor               ; new bg color
+        lda     soft80_internal_bgcolor         ; new bg color
 @sk2:
-        ora     tmp1                    ; new bg color (high nibble)
+        ora     tmp1                            ; new bg color (high nibble)
         sta     soft80_vram+(page*250),x
         .endscope
         .endrepeat
@@ -78,10 +78,10 @@ lp2:
         inx
         bne     lp2
 
-        sty     $01                     ; enable I/O
+        sty     $01                             ; enable I/O
         cli
 
-        lda     tmp2                    ; get old value
+        lda     tmp2                            ; get old value
         rts
 
 mkcharcolor:
@@ -90,9 +90,9 @@ mkcharcolor:
         asl     a
         asl     a
         asl     a
-        sta     tmp1                    ; remember new bg color (high nibble)
+        sta     tmp1                            ; remember new bg color (high nibble)
         ora     soft80_internal_textcolor
-        sta     CHARCOLOR               ; text/bg combo for new chars
+        sta     CHARCOLOR                       ; text/bg combo for new chars
         rts
 
 ;-------------------------------------------------------------------------------

@@ -70,11 +70,11 @@ soft80_init:
         sta     $01
         cli
 
-        lda     646                     ; use current textcolor
+        lda     646                             ; use current textcolor
         and     #$0f
         sta     soft80_internal_textcolor
 
-        lda     VIC_BG_COLOR0           ; use current bgcolor
+        lda     VIC_BG_COLOR0                   ; use current bgcolor
         and     #$0f
         sta     soft80_internal_bgcolor
         asl     a

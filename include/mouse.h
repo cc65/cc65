@@ -122,6 +122,16 @@ struct mouse_callbacks {
 /* The default mouse callbacks */
 extern const struct mouse_callbacks mouse_def_callbacks;
 
+#if defined(__CBM__)
+
+/* The default mouse pointer shape used by the default mouse callbacks */
+extern const unsigned char mouse_def_pointershape[63];
+
+/* The default mouse pointer color used by the default mouse callbacks */
+extern const unsigned char mouse_def_pointercolor;
+
+#endif
+
 /* The name of the standard mouse driver for a platform */
 extern const char mouse_stddrv[];
 
@@ -208,6 +218,3 @@ unsigned char __fastcall__ mouse_ioctl (unsigned char code, void* data);
 
 /* End of mouse.h */
 #endif
-
-
-

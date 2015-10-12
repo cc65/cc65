@@ -90,7 +90,15 @@
 /* No support for dynamically loadable drivers */
 #define DYN_DRV         0
 
-
+/* The joystick keys - all keys are supported */
+#define KEY_A           0x01
+#define KEY_B           0x02
+#define KEY_SELECT      0x04
+#define KEY_START       0x08
+#define KEY_UP          0x10
+#define KEY_DOWN        0x20
+#define KEY_LEFT        0x40
+#define KEY_RIGHT       0x80
 
 /* The addresses of the static drivers */
 extern void nes_stdjoy_joy[];       /* Referred to by joy_static_stddrv[] */

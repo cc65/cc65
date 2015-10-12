@@ -1,8 +1,8 @@
-
         .include        "pce.inc"
 
         .export         psg_init
 
+        .segment        "INIT"
 psg_init:
         clx
         stz     PSG_GLOBAL_PAN          ; Clear global balance

@@ -10,8 +10,8 @@
         .include        "atari.inc"
         .importzp       sp
         .export         _mouse_pm_callbacks
-        .constructor    pm_init,27
-        .destructor     pm_down,7
+        .constructor    pm_init, 27
+        .destructor     pm_down
 
 ; get mouse shape data
         .import   mouse_pm_bits

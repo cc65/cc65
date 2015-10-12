@@ -9,12 +9,6 @@
         .import soft80_cgetc
         .export _cgetc := soft80_cgetc
 
-        ; soft80_chline.s
-        .import soft80_chlinexy
-        .import soft80_chline
-        .export _chlinexy := soft80_chlinexy
-        .export _chline := soft80_chline
-
         ; soft80_color.s
         .import soft80_textcolor
         .import soft80_bgcolor
@@ -39,12 +33,6 @@
         .export newline := soft80_newline
         .export plot := soft80_plot
 
-        ; soft80_cvline.s
-        .import soft80_cvlinexy
-        .import soft80_cvline
-        .export _cvlinexy := soft80_cvlinexy
-        .export _cvline := soft80_cvline
-
         ; soft80_kclrscr.s
         .import soft80_kclrscr
         .export _clrscr := soft80_kclrscr
@@ -58,5 +46,10 @@
         .import soft80_screensize
         .export screensize := soft80_screensize
 
-        .export mcb_spritememory  := soft80_spriteblock
-        .export mcb_spritepointer := (soft80_vram + $03F8)
+        ; VIC sprite data for the mouse pointer
+        .export         mcb_spritememory  := soft80_spriteblock
+        .export         mcb_spritepointer := (soft80_vram + $03F8)
+
+        ; Chars used by chline () and cvline ()
+        .exportzp       chlinechar = CH_HLINE
+        .exportzp       cvlinechar = CH_VLINE

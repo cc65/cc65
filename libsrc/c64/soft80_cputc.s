@@ -389,7 +389,7 @@ remcolor:
         ; => only one char in cell used
 
         jsr     soft80_checkchar
-        bcc     @sk1            ; space at current position
+        bcs     @sk1            ; space at current position
 
         ; vram (textcolor) = bgcolor
         lda     (CRAM_PTR),y    ; vram
@@ -447,7 +447,7 @@ soft80_putcolor:
 @l2s:
         ; one character in cell is already used
         jsr     soft80_checkchar
-        bcs     @sk1            ; char at current position => overwrite 1st
+        bcc     @sk1            ; char at current position => overwrite 1st
 
         lda     soft80_internal_cursorxlsb
         beq     @sk3            ; jump if even xpos
@@ -476,7 +476,8 @@ soft80_putcolor:
 ;
 ; in:  x = $34
 ;      y must be $00
-; out: CLC: space        SEC: character
+; out: SEC: space
+;      CLC: character
 ;      x = $34
 ;      y = $00
 soft80_checkchar:
@@ -501,11 +502,11 @@ soft80_checkchar:
         .endif
         .endrepeat
         ;ldy     #$00                            ; is 0
-        clc
+        ;sec                                     ; is set
         rts
 @ischar:
         ldy     #$00
-        sec
+        ;clc                                     ; is cleared
         rts
 @l1a:
         ldy     #$07
@@ -519,6 +520,6 @@ soft80_checkchar:
         .endif
         .endrepeat
         ;ldy     #$00                            ; is 0
-        clc
+        ;sec                                     ; is set
         rts
 .endif

@@ -9,6 +9,7 @@
 
         .import         soft80_kclrscr, soft80_charset
         .export         soft80_internal_textcolor, soft80_internal_bgcolor
+        .export         soft80_internal_cursorxlsb
 
         .importzp       ptr1, ptr2, ptr3
 
@@ -103,5 +104,7 @@ soft80_shutdown:
 soft80_internal_textcolor:
         .res 1
 soft80_internal_bgcolor:
+        .res 1
+soft80_internal_cursorxlsb:
         .res 1
 

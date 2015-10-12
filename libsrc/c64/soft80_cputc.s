@@ -13,6 +13,7 @@
         .import         xsize
         .import         soft80_kplot
         .import         soft80_internal_bgcolor, soft80_internal_textcolor
+        .import         soft80_internal_cursorxlsb
 
         .importzp       tmp4,tmp3
 
@@ -86,6 +87,7 @@ advance:
         sty     CURS_X
         tya
         and     #$01
+        sta     soft80_internal_cursorxlsb
         bne     @L5
 
         lda     SCREEN_PTR
@@ -146,8 +148,9 @@ _space:
 .endif
         ;ldy     #$00            ; is still $00
 
-        lda     CURS_X
-        and     #$01
+        ;lda     CURS_X
+        ;and     #$01
+        lda     soft80_internal_cursorxlsb
         bne     @l1
 
         .repeat 8,line
@@ -182,8 +185,9 @@ _spaceinvers:
         sta     (CRAM_PTR),y    ; vram
 .endif
 
-        lda     CURS_X
-        and     #$01
+        ;lda     CURS_X
+        ;and     #$01
+        lda     soft80_internal_cursorxlsb
         bne     @l1
 
         .repeat 8,line
@@ -240,8 +244,9 @@ soft80_putchar:
         lda     RVS
         jne     _invers
 
-        lda     CURS_X
-        and     #$01
+        ;lda     CURS_X
+        ;and     #$01
+        lda     soft80_internal_cursorxlsb
         bne     @l1
 
         .repeat 8,line
@@ -279,8 +284,9 @@ _back:
 ; output inverted character
 _invers:
 
-        lda     CURS_X
-        and     #$01
+        ;lda     CURS_X
+        ;and     #$01
+        lda     soft80_internal_cursorxlsb
         bne     @l1
 
         .repeat 8,line
@@ -366,8 +372,9 @@ remcolor:
         ;and     #$0f
         sta     tmp3            ; A contains colram
 
-        lda     CURS_X
-        and     #$01
+        ;lda     CURS_X
+        ;and     #$01
+        lda     soft80_internal_cursorxlsb
         bne     @sk3
 
         ; vram = colram
@@ -436,8 +443,9 @@ soft80_putcolor:
 
         ; botch characters in the cell are used
 
-        lda     CURS_X
-        and     #$01
+        ;lda     CURS_X
+        ;and     #$01
+        lda     soft80_internal_cursorxlsb
         bne     @sk2            ; jump if odd xpos
 
         ; vram = textcol
@@ -450,8 +458,9 @@ soft80_putcolor:
         jsr     soft80_checkchar
         bcs     @sk1            ; char at current position => overwrite 1st
 
-        lda     CURS_X
-        and     #$01
+        ;lda     CURS_X
+        ;and     #$01
+        lda     soft80_internal_cursorxlsb
         beq     @sk3            ; jump if even xpos
 @sk2:
         ; colram = textcol
@@ -481,8 +490,9 @@ soft80_checkchar:
 
         ;ldy     #$00            ; is still $00
 
-        lda     CURS_X
-        and     #$01
+        ;lda     CURS_X
+        ;and     #$01
+        lda     soft80_internal_cursorxlsb
         jne     @l1a
 
         .repeat 8,line

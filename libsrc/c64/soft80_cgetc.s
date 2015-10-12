@@ -5,6 +5,7 @@
 ;
 
         .export         soft80_cgetc
+        .import         soft80_internal_cursorxlsb
         .import         cursor
         .importzp       tmp1
 
@@ -45,9 +46,10 @@ invertcursor:
         ldy     #$00
         jsr     setcolor
 
-        lda     CURS_X
-        and     #$01
-        tax
+        ;lda     CURS_X
+        ;and     #$01
+        ;tax
+        ldx     soft80_internal_cursorxlsb
 @lp1:
         lda     (SCREEN_PTR),y
         eor     nibble,x

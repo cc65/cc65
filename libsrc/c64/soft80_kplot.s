@@ -6,6 +6,7 @@
 ;
 
         .export         soft80_kplot
+        .import         soft80_internal_cursorxlsb
 
         .include        "c64.inc"
         .include        "soft80.inc"
@@ -24,6 +25,10 @@ soft80_kplot:
         lda     _bitmaphi,x
         adc     _bitmapxhi,y
         sta     SCREEN_PTR+1
+
+        tya
+        and     #1
+        sta     soft80_internal_cursorxlsb
 
         ; calc pointer to vram
         tya

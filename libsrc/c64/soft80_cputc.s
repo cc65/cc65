@@ -10,21 +10,15 @@
         .export         soft80_newline, soft80_plot
 
         .import         popa, _gotoxy
-        .import         xsize
+
         .import         soft80_kplot
         .import         soft80_internal_bgcolor, soft80_internal_textcolor
         .import         soft80_internal_cursorxlsb
 
         .importzp       tmp4,tmp3
 
-        .macpack        longbranch
-
         .include        "c64.inc"
         .include        "soft80.inc"
-
-.if SOFT80COLORVOODOO = 1
-        .export         soft80_putcolor
-.endif
 
 soft80_cputcxy:
         pha                     ; Save C
@@ -51,9 +45,17 @@ soft80_plot:
 L1:     cmp     #$0D            ; LF?
         beq     soft80_newline  ; Recalculate pointers
 
-        ; Printable char of some sort
+        ; shortcut for codes < $80 ... codes $20-$7f can be printed directly,
+        ; codes $00-$1f are control codes which are not printable and thus may
+        ; give undefined result.
         tay
         bpl     L10
+
+        ; codes $80-$ff must get converted like this:
+        ; $80-$9f  ->   dont care (control codes)
+        ; $a0-$bf  ->   $00-$1f
+        ; $c0-$df  ->   $60-$7f
+        ; $e0-$ff  ->   $00-$1f
 
         ; extra check for petscii codes 160-191, these have been moved to
         ; 0-31 in the charset
@@ -77,9 +79,7 @@ L10:
 soft80_cputdirect:
         jsr     soft80_putchar  ; Write the character to the screen
 
-; Advance cursor position
-
-advance:
+        ; Advance cursor position
         iny                     ; contains CURS_X
         cpy     #charsperline
         beq     L3
@@ -130,53 +130,29 @@ L5:
         inc     CURS_Y
         rts
 
-; Write one character to the screen without doing anything else
-; in:         A:  character
-; returns:    Y:  cursor X position
-; this function is going to be used a lot so we unroll it a bit for speed
+;-------------------------------------------------------------------------------
+; All following code belongs to the character output to bitmap
+;
+; this stuff is going to be used a lot so we unroll it a bit for speed
+;-------------------------------------------------------------------------------
 
 .if SOFT80FASTSPACE = 1
-; output space
-; in: y must be $00
-_space:
 
-        lda     RVS
-        jne     _spaceinvers
-
-.if SOFT80COLORVOODOO = 1
-        jsr     remcolor
-.endif
-        ;ldy     #$00            ; is still $00
-
-        ;lda     CURS_X
-        ;and     #$01
-        lda     soft80_internal_cursorxlsb
-        bne     @l1
-
+; output inverted space (odd)
+draw_spaceinvers_odd:
         .repeat 8,line
         lda     (SCREEN_PTR),y
-        ora     #$f0
-        sta     (SCREEN_PTR),y
-        .if (line < 7)
-        iny
-        .endif
-        .endrepeat
-        jmp     _back
-@l1:
-        .repeat 8,line
-        lda     (SCREEN_PTR),y
-        ora     #$0f
+        and     #$f0
         sta     (SCREEN_PTR),y
         .if line < 7
         iny
         .endif
         .endrepeat
-@l2:
-        jmp     _back
+        jmp     draw_back
 
-; output inverted space
+; output inverted space (general entry point)
 ; in: y must be $00
-_spaceinvers:
+draw_spaceinvers:
 
 .if SOFT80COLORVOODOO = 1
         jsr     soft80_putcolor
@@ -188,8 +164,9 @@ _spaceinvers:
         ;lda     CURS_X
         ;and     #$01
         lda     soft80_internal_cursorxlsb
-        bne     @l1
+        bne     draw_spaceinvers_odd
 
+; output inverted space (even)
         .repeat 8,line
         lda     (SCREEN_PTR),y
         and     #$0f
@@ -198,23 +175,57 @@ _spaceinvers:
         iny
         .endif
         .endrepeat
-        jmp     _back
-@l1:
+        jmp     draw_back
+
+; output space (odd)
+draw_space_odd:
         .repeat 8,line
         lda     (SCREEN_PTR),y
-        and     #$f0
+        ora     #$0f
         sta     (SCREEN_PTR),y
         .if line < 7
         iny
         .endif
         .endrepeat
+        jmp     draw_back
 
-        jmp     _back
+; output space (general entry point)
+; in: y must be $00
+draw_space:
+
+        lda     RVS
+        bne     draw_spaceinvers
+
+.if SOFT80COLORVOODOO = 1
+        jsr     remcolor
+.endif
+        ;ldy     #$00            ; is still $00
+
+        ;lda     CURS_X
+        ;and     #$01
+        lda     soft80_internal_cursorxlsb
+        bne     draw_space_odd
+
+; output space (even)
+        .repeat 8,line
+        lda     (SCREEN_PTR),y
+        ora     #$f0
+        sta     (SCREEN_PTR),y
+        .if (line < 7)
+        iny
+        .endif
+        .endrepeat
+        jmp     draw_back
 .endif
 
-        ; entry point for outputting one character in internal encoding
-        ; without advancing cursor position
-        ; - the following may not modify tmp1
+;-------------------------------------------------------------------------------
+; output one character in internal encoding without advancing cursor position
+; generic entry point
+;
+; - the following may not modify tmp1
+; in:   A: charcode
+; out:  Y: CURS_X
+;
 soft80_putchar:
         sta     tmp3            ; remember charcode
 
@@ -228,7 +239,7 @@ soft80_putchar:
 
 .if SOFT80FASTSPACE = 1
         cmp     #' '            ; space is a special (optimized) case
-        jeq     _space
+        beq     draw_space
 .endif
 
 .if SOFT80COLORVOODOO = 1
@@ -237,18 +248,18 @@ soft80_putchar:
         lda     CHARCOLOR
         sta     (CRAM_PTR),y    ; vram
 .endif
-        ; output character
 
+; output character
         ldx     tmp3            ; get charcode
 
         lda     RVS
-        jne     _invers
-
-        ;lda     CURS_X
-        ;and     #$01
+        beq     @skp
+        jmp     draw_charinvers
+@skp:
         lda     soft80_internal_cursorxlsb
-        bne     @l1
+        bne     draw_char_even
 
+; output character (odd)
         .repeat 8,line
         lda     (SCREEN_PTR),y
         and     #$0f
@@ -258,9 +269,10 @@ soft80_putchar:
         iny
         .endif
         .endrepeat
-        jmp     @l2
-@l1:
+        jmp     draw_back
 
+; output character (even)
+draw_char_even:
         .repeat 8,line
         lda     (SCREEN_PTR),y
         and     #$f0
@@ -271,9 +283,7 @@ soft80_putchar:
         .endif
         .endrepeat
 
-@l2:
-
-_back:
+draw_back:
         lda     tmp4
         sta     $01
         cli
@@ -281,13 +291,23 @@ _back:
         ldy     CURS_X
         rts
 
-; output inverted character
-_invers:
+; output inverted character (odd)
+draw_charinvers_odd:
+        .repeat 8,line
+        lda     (SCREEN_PTR),y
+        ora     #$0f
+        eor     soft80_lo_charset+(line*$80),x
+        sta     (SCREEN_PTR),y
+        .if line < 7
+        iny
+        .endif
+        .endrepeat
+        jmp     draw_back
 
-        ;lda     CURS_X
-        ;and     #$01
+; output inverted character (generic)
+draw_charinvers:
         lda     soft80_internal_cursorxlsb
-        bne     @l1
+        bne     draw_charinvers_odd
 
         .repeat 8,line
         lda     (SCREEN_PTR),y
@@ -298,18 +318,7 @@ _invers:
         iny
         .endif
         .endrepeat
-        jmp     _back
-@l1:
-        .repeat 8,line
-        lda     (SCREEN_PTR),y
-        ora     #$0f
-        eor     soft80_lo_charset+(line*$80),x
-        sta     (SCREEN_PTR),y
-        .if line < 7
-        iny
-        .endif
-        .endrepeat
-        jmp     _back
+        jmp     draw_back
 
 ;-------------------------------------------------------------------------------
 ; optional "color voodoo". the problem is that each 8x8 cell can only contain
@@ -500,7 +509,7 @@ soft80_checkchar:
         bne     @l1a
 
         ; check charset data from bottom up, since a lot of eg lowercase chars
-        ; have no data in the top rows, but all of the DO have data in the
+        ; have no data in the top rows, but all of them DO have data in the
         ; second to bottom row, this will likely be faster in average.
 
         ldy     #7
@@ -513,7 +522,6 @@ soft80_checkchar:
         dey
         .endif
         .endrepeat
-
         ;ldy     #$00                            ; is 0
         clc
         rts
@@ -527,7 +535,7 @@ soft80_checkchar:
         lda     (SCREEN_PTR),y
         and     #$0f
         cmp     #$0f
-        bne     @l2bb
+        bne     @l2b
         .if line < 7
         dey
         .endif
@@ -535,9 +543,9 @@ soft80_checkchar:
         ;ldy     #$00                            ; is 0
         clc
         rts
-@l2bb:
-        ldy     #$00
-        sec
-        rts
+;@l2bb:
+;        ldy     #$00
+;        sec
+;        rts
 
 .endif

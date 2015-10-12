@@ -70,6 +70,10 @@ soft80_init:
         sta     $01
         cli
 
+        ; the "color voodoo" in other parts of the code relies on the vram and
+        ; colorram being set up as expected, which is why we cant use the
+        ; _bgcolor and _textcolor functions here.
+
         lda     646                             ; use current textcolor
         and     #$0f
         sta     soft80_internal_textcolor

@@ -16,13 +16,13 @@ soft80_cgetc:
         lda     KEY_COUNT       ; Get number of characters
         bne     L3              ; Jump if there are already chars waiting
 
-        ldx     #1
+        sec
         jsr     invertcursor    ; set cursor on or off accordingly
 
 L1:     lda     KEY_COUNT       ; wait for key
         beq     L1
 
-        ldx     #0
+        clc
         jsr     invertcursor    ; set cursor on or off accordingly
 
 L3:     jsr     KBDREAD         ; Read char and return in A
@@ -59,7 +59,7 @@ invertcursor:
         bne     @lp1
 
         pla
-        sta     $01
+        sta     $01             ; enable I/O
         cli
         rts
 
@@ -68,8 +68,7 @@ invertcursor:
         ; in soft80_cputc
 setcolor:
         ;ldy     #0              ; is 0
-        txa
-        bne     @set
+        bcs     @set
         ; restore old value
         lda     tmp1
         sta     (CRAM_PTR),y    ; vram

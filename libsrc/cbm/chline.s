@@ -7,7 +7,7 @@
 
         .export         _chlinexy, _chline
         .import         popa, _gotoxy, cputdirect
-        .importzp       tmp1
+        .importzp       tmp1, chlinechar
 
 _chlinexy:
         pha                     ; Save the length
@@ -19,7 +19,7 @@ _chline:
         cmp     #0              ; Is the length zero?
         beq     L9              ; Jump if done
         sta     tmp1
-L1:     lda     #64             ; Horizontal line, screen code
+L1:     lda     #chlinechar     ; Horizontal line, screen code
         jsr     cputdirect      ; Direct output
         dec     tmp1
         bne     L1

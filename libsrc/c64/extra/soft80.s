@@ -17,9 +17,11 @@
         ; soft80_color.s
         .import soft80_textcolor
         .import soft80_bgcolor
-        .import soft80_bordercolor
         .export _textcolor := soft80_textcolor
         .export _bgcolor := soft80_bgcolor
+
+        ; soft80_bordercolor.s
+        .import soft80_bordercolor
         .export _bordercolor := soft80_bordercolor
 
         ; soft80_cputc.s

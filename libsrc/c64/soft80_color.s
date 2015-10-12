@@ -3,10 +3,9 @@
 ;
 ; unsigned char __fastcall__ textcolor (unsigned char color);
 ; unsigned char __fastcall__ bgcolor (unsigned char color);
-; unsigned char __fastcall__ bordercolor (unsigned char color);
 ;
 
-        .export         soft80_textcolor, soft80_bgcolor, soft80_bordercolor
+        .export         soft80_textcolor, soft80_bgcolor
         .import         soft80_internal_textcolor, soft80_internal_bgcolor
 
         .importzp       tmp1, tmp2
@@ -94,12 +93,6 @@ mkcharcolor:
         sta     tmp1                    ; remember new bg color (high nibble)
         ora     soft80_internal_textcolor
         sta     CHARCOLOR               ; text/bg combo for new chars
-        rts
-
-soft80_bordercolor:
-        ldx     VIC_BORDERCOLOR         ; get old value
-        sta     VIC_BORDERCOLOR         ; set new value
-        txa
         rts
 
 ;-------------------------------------------------------------------------------

@@ -12,7 +12,7 @@
         .import         popa, _gotoxy
         .import         xsize
         .import         soft80_kplot
-        .import         __bgcolor, __textcolor
+        .import         soft80_internal_bgcolor, soft80_internal_textcolor
 
         .importzp       tmp4,tmp3
 
@@ -70,6 +70,9 @@ L1:     cmp     #$0D            ; LF?
         and     #$7F
 L10:
 
+        ; entry point for direct output of a character. the value passed in
+        ; akku must match the offset in the charset.
+        ; - the following may not modify tmp1
 soft80_cputdirect:
         jsr     soft80_putchar  ; Write the character to the screen
 
@@ -103,6 +106,7 @@ L3:
         sty     CURS_X
         jmp     soft80_plot
 
+        ; - the following may not modify tmp1
 soft80_newline:
 
         lda     SCREEN_PTR
@@ -204,8 +208,9 @@ _spaceinvers:
         jmp     _back
 .endif
 
-; output a character
-
+        ; entry point for outputting one character in internal encoding
+        ; without advancing cursor position
+        ; - the following may not modify tmp1
 soft80_putchar:
         sta     tmp3            ; remember charcode
 
@@ -340,7 +345,7 @@ remcolor:
         ; immediately.
         lda     (CRAM_PTR),y    ; vram (textcolor)
         and     #$0f
-        cmp     __bgcolor
+        cmp     soft80_internal_bgcolor
         beq     @sk1            ; yes, vram==bgcolor
 
         ; now check if the textcolor in color ram is equal the background color,
@@ -349,7 +354,7 @@ remcolor:
         lda     (CRAM_PTR),y    ; colram (2nd textcolor)
         stx     $01             ; $34
         and     #$0f
-        cmp     __bgcolor
+        cmp     soft80_internal_bgcolor
         beq     @sk2            ; yes, colram==bgcolor
 
         ; two characters in the current cell, of which one will get removed
@@ -372,7 +377,7 @@ remcolor:
         sta     (CRAM_PTR),y    ; vram
 @sk3:
         ; colram = bgcolor
-        lda     __bgcolor
+        lda     soft80_internal_bgcolor
         inc     $01             ; $35
         sta     (CRAM_PTR),y    ; colram
         stx     $01             ; $34
@@ -389,7 +394,7 @@ remcolor:
         ; vram (textcolor) = bgcolor
         lda     (CRAM_PTR),y    ; vram
         and     #$f0
-        ora     __bgcolor
+        ora     soft80_internal_bgcolor
         sta     (CRAM_PTR),y    ; vram
 @sk1:
         rts
@@ -417,7 +422,7 @@ soft80_putcolor:
 
         lda     (CRAM_PTR),y    ; vram
         and     #$0f
-        cmp     __bgcolor
+        cmp     soft80_internal_bgcolor
         beq     @sk1            ; vram==bgcolor => first char in cell
 
         ; vram!=bgcolor => second char in cell
@@ -426,7 +431,7 @@ soft80_putcolor:
         lda     (CRAM_PTR),y    ; colram
         stx     $01             ; $34
         and     #$0f
-        cmp     __bgcolor
+        cmp     soft80_internal_bgcolor
         beq     @l2s            ; colram==bgcolor -> second char in cell
 
         ; botch characters in the cell are used
@@ -450,7 +455,7 @@ soft80_putcolor:
         beq     @sk3            ; jump if even xpos
 @sk2:
         ; colram = textcol
-        lda     __textcolor
+        lda     soft80_internal_textcolor
         inc     $01             ; $35
         sta     (CRAM_PTR),y    ; colram
         stx     $01             ; $34

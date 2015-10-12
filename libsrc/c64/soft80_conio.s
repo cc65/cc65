@@ -8,7 +8,7 @@
         .destructor     soft80_shutdown
 
         .import         soft80_kclrscr, soft80_charset
-        .import         __textcolor, __bgcolor
+        .export         soft80_internal_textcolor, soft80_internal_bgcolor
 
         .importzp       ptr1, ptr2, ptr3
 
@@ -71,16 +71,16 @@ soft80_init:
 
         lda     646                     ; use current textcolor
         and     #$0f
-        sta     __textcolor
+        sta     soft80_internal_textcolor
 
         lda     VIC_BG_COLOR0           ; use current bgcolor
         and     #$0f
-        sta     __bgcolor
+        sta     soft80_internal_bgcolor
         asl     a
         asl     a
         asl     a
         asl     a
-        ora     __textcolor
+        ora     soft80_internal_textcolor
         sta     CHARCOLOR
 
         jmp     soft80_kclrscr
@@ -93,4 +93,15 @@ soft80_shutdown:
         lda     #$15
         sta     VIC_VIDEO_ADR
         rts
+
+;-------------------------------------------------------------------------------
+; FIXME: when the code is fixed to use the "init" segment, these variables must
+;        be moved into a section other than .bss so they survive after the init
+;        code has been run.
+
+        .bss
+soft80_internal_textcolor:
+        .res 1
+soft80_internal_bgcolor:
+        .res 1
 

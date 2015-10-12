@@ -7,7 +7,7 @@
 ;
 
         .export         soft80_textcolor, soft80_bgcolor, soft80_bordercolor
-        .export         __textcolor, __bgcolor
+        .import         soft80_internal_textcolor, soft80_internal_bgcolor
 
         .importzp       tmp1, tmp2
 
@@ -15,8 +15,8 @@
         .include        "soft80.inc"
 
 soft80_textcolor:
-        ldx     __textcolor             ; get old value
-        sta     __textcolor             ; set new value
+        ldx     soft80_internal_textcolor             ; get old value
+        sta     soft80_internal_textcolor             ; set new value
 
         jsr     mkcharcolor
 
@@ -24,9 +24,9 @@ soft80_textcolor:
         rts
 
 soft80_bgcolor:
-        ldx     __bgcolor               ; get old value
+        ldx     soft80_internal_bgcolor               ; get old value
         stx     tmp2                    ; save old value
-        sta     __bgcolor               ; set new value
+        sta     soft80_internal_bgcolor               ; set new value
 
         jsr     mkcharcolor
 
@@ -43,7 +43,7 @@ lp1:
         and     #$0f
         cmp     tmp2                    ; old bg color
         bne     @sk1
-        lda     __bgcolor               ; new bg color
+        lda     soft80_internal_bgcolor               ; new bg color
         sta     soft80_colram+(page*250),x
 @sk1:
         .endscope
@@ -69,7 +69,7 @@ lp2:
         and     #$0f
         cmp     tmp2                    ; old bg color
         bne     @sk2
-        lda     __bgcolor               ; new bg color
+        lda     soft80_internal_bgcolor               ; new bg color
 @sk2:
         ora     tmp1                    ; new bg color (high nibble)
         sta     soft80_vram+(page*250),x
@@ -86,13 +86,13 @@ lp2:
         rts
 
 mkcharcolor:
-        lda     __bgcolor
+        lda     soft80_internal_bgcolor
         asl     a
         asl     a
         asl     a
         asl     a
         sta     tmp1                    ; remember new bg color (high nibble)
-        ora     __textcolor
+        ora     soft80_internal_textcolor
         sta     CHARCOLOR               ; text/bg combo for new chars
         rts
 
@@ -101,12 +101,6 @@ soft80_bordercolor:
         sta     VIC_BORDERCOLOR         ; set new value
         txa
         rts
-
-        .bss
-__textcolor:
-        .res 1
-__bgcolor:
-        .res 1
 
 ;-------------------------------------------------------------------------------
 ; force the init constructor to be imported

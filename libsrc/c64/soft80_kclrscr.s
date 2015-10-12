@@ -6,7 +6,7 @@
 
         .export         soft80_kclrscr
         .import         soft80_kplot
-        .import         __bgcolor
+        .import         soft80_internal_bgcolor
         .importzp       ptr1
 
         .include        "c64.inc"
@@ -39,7 +39,7 @@ soft80_kclrscr:
         bne     @lp3
 
 .if SOFT80COLORVOODOO = 1
-        lda     __bgcolor
+        lda     soft80_internal_bgcolor
         jsr     clear           ; clear color ram
 .endif
 
@@ -50,7 +50,7 @@ soft80_kclrscr:
 
         lda     CHARCOLOR
         and     #$f0
-        ora     __bgcolor
+        ora     soft80_internal_bgcolor
         jsr     clear           ; clear vram
 
         sty     $01

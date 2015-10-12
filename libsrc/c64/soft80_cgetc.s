@@ -14,18 +14,18 @@
 
 soft80_cgetc:
         lda     KEY_COUNT       ; Get number of characters
-        bne     L3              ; Jump if there are already chars waiting
+        bne     @L3             ; Jump if there are already chars waiting
 
         sec
         jsr     invertcursor    ; set cursor on or off accordingly
 
-L1:     lda     KEY_COUNT       ; wait for key
-        beq     L1
+@L1:    lda     KEY_COUNT       ; wait for key
+        beq     @L1
 
         clc
         jsr     invertcursor    ; set cursor on or off accordingly
 
-L3:     jsr     KBDREAD         ; Read char and return in A
+@L3:    jsr     KBDREAD         ; Read char and return in A
         ldx     #0
         rts
 

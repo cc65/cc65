@@ -18,12 +18,12 @@ soft80_kplot:
         sty     CURS_X
 
         ; calc pointer to bitmap
-        lda     _bitmaplo,x
+        lda     soft80_bitmapylo,x
         clc
-        adc     _bitmapxlo,y
+        adc     soft80_bitmapxlo,y
         sta     SCREEN_PTR
-        lda     _bitmaphi,x
-        adc     _bitmapxhi,y
+        lda     soft80_bitmapyhi,x
+        adc     soft80_bitmapxhi,y
         sta     SCREEN_PTR+1
 
         tya
@@ -32,13 +32,13 @@ soft80_kplot:
 
         ; calc pointer to vram
         tya
-        lsr     a               ; NOTE: we can save 2 cycles here at the expense of
-                                ;       making the tables twice as big (+50 bytes)
+        lsr     a
+
         clc
-        adc     _vramlo,x
+        adc     soft80_vramlo,x
         sta     CRAM_PTR
         lda     #0
-        adc     _vramhi,x
+        adc     soft80_vramhi,x
         sta     CRAM_PTR+1
 
 @getpos:
@@ -50,28 +50,27 @@ soft80_kplot:
         ;        to 0xdc00... area in ram under i/o
 
         .rodata
-_bitmapxlo:
+soft80_bitmapxlo:
         .repeat 80,col
         .byte <((col/2)*8)
         .endrepeat
-
-_bitmapxhi:
+soft80_bitmapxhi:
         .repeat 80,col
         .byte >((col/2)*8)
         .endrepeat
-_vramlo:
+soft80_vramlo:
         .repeat 25,row
         .byte <(soft80_vram+(row*40))
         .endrepeat
-_vramhi:
+soft80_vramhi:
         .repeat 25,row
         .byte >(soft80_vram+(row*40))
         .endrepeat
-_bitmaplo:
+soft80_bitmapylo:
         .repeat 25,row
         .byte <(soft80_bitmap+(row*40*8))
         .endrepeat
-_bitmaphi:
+soft80_bitmapyhi:
         .repeat 25,row
         .byte >(soft80_bitmap+(row*40*8))
         .endrepeat

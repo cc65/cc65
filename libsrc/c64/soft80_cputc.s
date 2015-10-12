@@ -72,7 +72,7 @@ soft80_cputdirect:
         ; Advance cursor position
         iny                     ; contains CURS_X
         cpy     #charsperline
-        beq     L3
+        beq     @L3
 
         sty     CURS_X
         tya
@@ -92,7 +92,7 @@ soft80_cputdirect:
         inc     CRAM_PTR+1
 @L5:
         rts
-L3:
+@L3:
         inc     CURS_Y          ; new line
         ldy     #0              ; + cr
         sty     CURS_X
@@ -114,9 +114,9 @@ soft80_newline:
         clc
         adc     #40
         sta     CRAM_PTR
-        bcc     L5
+        bcc     @L5
         inc     CRAM_PTR+1
-L5:
+@L5:
         inc     CURS_Y
         rts
 
@@ -336,7 +336,8 @@ draw_charinvers:
 ;
 ; in:  x must be $34
 ;      y must be $00
-; out: y = $00
+; out: x = $34
+;      y = $00
 remcolor:
 
         ;ldy     #$00            ; is still $00
@@ -357,15 +358,9 @@ remcolor:
         and     #$0f
         cmp     soft80_internal_bgcolor
         beq     @sk2            ; yes, colram==bgcolor
+        sta     tmp3            ; A contains colram
 
         ; two characters in the current cell, of which one will get removed
-
-        ; vram = colram
-        ;inc     $01
-        ;lda     (CRAM_PTR),y    ; colram
-        ;stx     $01             ;$34
-        ;and     #$0f
-        sta     tmp3            ; A contains colram
 
         lda     soft80_internal_cursorxlsb
         bne     @sk3
@@ -373,7 +368,7 @@ remcolor:
         ; vram = colram
         lda     (CRAM_PTR),y    ; vram
         and     #$f0
-        ora     tmp3
+        ora     tmp3            ; colram value
         sta     (CRAM_PTR),y    ; vram
 @sk3:
         ; colram = bgcolor

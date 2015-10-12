@@ -1,3 +1,8 @@
+;
+; Groepaz/Hitmen, 12.10.2015
+;
+; lowlevel kclrscr for soft80 implementation
+;
 
         .export         soft80_kclrscr
         .import         soft80_kplot

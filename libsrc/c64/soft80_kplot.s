@@ -1,4 +1,10 @@
 
+;
+; Groepaz/Hitmen, 12.10.2015
+;
+; lowlevel kplot function for the soft80 implementation
+;
+
         .export         soft80_kplot
 
         .include        "c64.inc"
@@ -34,6 +40,9 @@ soft80_kplot:
         ldx     CURS_Y
         ldy     CURS_X
         rts
+
+        ; FIXME: the following tables take up 260 bytes, perhaps move them
+        ;        to 0xdc00... area in ram under i/o
 
         .rodata
 _bitmapxlo:

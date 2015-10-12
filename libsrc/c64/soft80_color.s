@@ -1,4 +1,6 @@
 ;
+; Groepaz/Hitmen, 12.10.2015
+;
 ; unsigned char __fastcall__ textcolor (unsigned char color);
 ; unsigned char __fastcall__ bgcolor (unsigned char color);
 ; unsigned char __fastcall__ bordercolor (unsigned char color);

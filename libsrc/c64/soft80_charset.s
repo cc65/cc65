@@ -1,5 +1,5 @@
 ;
-; Groepaz/Hitmen, 10.10.2015
+; Groepaz/Hitmen, 12.10.2015
 ;
 ; character set for use with the soft80 implementation
 ;
@@ -14,6 +14,8 @@
 ;   - $60 - $7f screencodes $40 - $5f (petscii codes $60 - $7f)
 ; - only 128 characters are defined here, the soft80 implementation will invert
 ;   the graphics data for inverted display on the fly.
+; - since the charset is 4 by 8 pixels, only the lower 4bit of each byte is
+;   used. the upper bits have to be 0.
 ; - finally the lower 4bits are "inverted", ie a space character is represented
 ;   as $0f, $0f, $0f, $0f, $0f, $0f, $0f, $0f
 ;
@@ -29,6 +31,15 @@
 ; +280 ....xxxx ......xx ........ ....xxxx
 ; +300 ....xxxx ......xx ........ ....xxxx
 ; +380 ....xxxx ......xx ........ ....xxxx
+; [...]
+; +040 ....x.xx ....xxxx ....xxxx ....xxxx
+; +0c0 .....x.x ....xxxx .....xxx ....xxxx
+; +140 .......x ....x.xx .....xxx ....x..x
+; +1c0 .......x ....xx.x ......xx .....xxx
+; +240 .....xxx ....x..x .....x.x .....xxx
+; +2c0 .....x.x .....x.x .....x.x .....xxx
+; +340 ....x.xx ....x..x ......xx ....x..x
+; +3c0 ....xxxx ....xxxx ....xxxx ....xxxx
 
         .export         soft80_charset
 

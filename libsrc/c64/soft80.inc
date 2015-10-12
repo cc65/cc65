@@ -1,3 +1,7 @@
+;
+; Groepaz/Hitmen, 12.10.2015
+;
+; internal constants for the soft80 implementation
 
 soft80_lo_charset       = $d000
 soft80_hi_charset       = $d400
@@ -8,6 +12,7 @@ soft80_bitmap           = $e000
 charsperline            = 80
 screenrows              = 25
 
+; FIXME: these should match petscii and perhaps come from a common cbm.inc?
 CH_ESC                  = 95
 CH_HLINE                = 96
 CH_CROSS                = 123

@@ -1,4 +1,6 @@
 ;
+; Groepaz/Hitmen, 12.10.2015
+;
 ; void chlinexy (unsigned char x, unsigned char y, unsigned char length);
 ; void chline (unsigned char length);
 ;

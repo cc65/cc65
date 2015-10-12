@@ -25,7 +25,8 @@ soft80_init:
         lda     #$c8
         sta     VIC_CTRL2
 
-; copy charset to RAM under I/O -> FIXME: generate at runtime
+        ; copy charset to RAM under I/O
+        ; FIXME: move charset and this constructor into init segment
         sei
         lda     $01
         pha

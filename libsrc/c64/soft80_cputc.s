@@ -482,30 +482,39 @@ soft80_putcolor:
         sta     (CRAM_PTR),y    ; vram
         rts
 
+;
 ; test if there is a space or a character at current position
-; in:  y must be $00
+;
+; in:  x = $34
+;      y must be $00
 ; out: CLC: space        SEC: character
+;      x = $34
 ;      y = $00
 soft80_checkchar:
 
-        ;ldy     #$00            ; is still $00
+        ;ldy     #$00                            ; is still $00
 
         ;lda     CURS_X
         ;and     #$01
         lda     soft80_internal_cursorxlsb
-        jne     @l1a
+        bne     @l1a
 
+        ; check charset data from bottom up, since a lot of eg lowercase chars
+        ; have no data in the top rows, but all of the DO have data in the
+        ; second to bottom row, this will likely be faster in average.
+
+        ldy     #7
         .repeat 8,line
         lda     (SCREEN_PTR),y
         and     #$f0
         cmp     #$f0
         bne     @l2b
         .if (line < 7)
-        iny
+        dey
         .endif
         .endrepeat
 
-        ldy     #$00
+        ;ldy     #$00                            ; is 0
         clc
         rts
 @l2b:
@@ -513,16 +522,17 @@ soft80_checkchar:
         sec
         rts
 @l1a:
+        ldy     #$07
         .repeat 8,line
         lda     (SCREEN_PTR),y
         and     #$0f
         cmp     #$0f
         bne     @l2bb
         .if line < 7
-        iny
+        dey
         .endif
         .endrepeat
-        ldy     #$00
+        ;ldy     #$00                            ; is 0
         clc
         rts
 @l2bb:

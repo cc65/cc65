@@ -49,7 +49,7 @@ L1:     cmp     #$0D            ; LF?
         ; codes $00-$1f are control codes which are not printable and thus may
         ; give undefined result.
         tay
-        bpl     L10
+        bpl     @L10
 
         ; codes $80-$ff must get converted like this:
         ; $80-$9f  ->   dont care (control codes)
@@ -57,21 +57,11 @@ L1:     cmp     #$0D            ; LF?
         ; $c0-$df  ->   $60-$7f
         ; $e0-$ff  ->   $00-$1f
 
-        ; extra check for petscii codes 160-191, these have been moved to
-        ; 0-31 in the charset
-        and     #%11100000
-        cmp     #%10100000
-        bne     @sk
-
-        tya
-        and     #%00011111
-        bpl     L10             ; branch always
-@sk:
-        tya
+        ora     #%01000000      ; $40
         clc
-        adc     #$20
-        and     #$7F
-L10:
+        adc     #%00100000      ; $20
+        and     #%01111111      ; $7f
+@L10:
 
         ; entry point for direct output of a character. the value passed in
         ; akku must match the offset in the charset.

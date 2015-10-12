@@ -7,6 +7,7 @@ soft80_lo_charset       = $d000
 soft80_hi_charset       = $d400
 soft80_vram             = $d800 ; ram under i/o
 soft80_colram           = $d800 ; color ram (used for temp. storage)
+soft80_spriteblock      = $dc00
 soft80_bitmap           = $e000
 
 charsperline            = 80

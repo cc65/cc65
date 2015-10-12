@@ -3,6 +3,7 @@
 ;
 ; import/overload stubs for the soft80 implementation
 
+        .include "../soft80.inc"
 
         ; soft80_cgetc.s
         .import soft80_cgetc
@@ -57,3 +58,5 @@
         .import soft80_screensize
         .export screensize := soft80_screensize
 
+        .export mcb_spritememory  := soft80_spriteblock
+        .export mcb_spritepointer := (soft80_vram + $03F8)

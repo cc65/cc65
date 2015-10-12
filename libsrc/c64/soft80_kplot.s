@@ -17,6 +17,12 @@ soft80_kplot:
         stx     CURS_Y
         sty     CURS_X
 
+        sei
+        lda     $01
+        pha
+        lda     #$34                            ; enable RAM under I/O
+        sta     $01
+
         ; calc pointer to bitmap
         lda     soft80_bitmapylo,x
         clc
@@ -41,39 +47,14 @@ soft80_kplot:
         adc     soft80_vramhi,x
         sta     CRAM_PTR+1
 
+        pla
+        sta     $01
+        cli
+
 @getpos:
         ldx     CURS_Y
         ldy     CURS_X
         rts
-
-        ; FIXME: the following tables take up 260 bytes, perhaps move them
-        ;        to 0xdc00... area in ram under i/o
-
-        .rodata
-soft80_bitmapxlo:
-        .repeat 80,col
-        .byte <((col/2)*8)
-        .endrepeat
-soft80_bitmapxhi:
-        .repeat 80,col
-        .byte >((col/2)*8)
-        .endrepeat
-soft80_vramlo:
-        .repeat 25,row
-        .byte <(soft80_vram+(row*40))
-        .endrepeat
-soft80_vramhi:
-        .repeat 25,row
-        .byte >(soft80_vram+(row*40))
-        .endrepeat
-soft80_bitmapylo:
-        .repeat 25,row
-        .byte <(soft80_bitmap+(row*40*8))
-        .endrepeat
-soft80_bitmapyhi:
-        .repeat 25,row
-        .byte >(soft80_bitmap+(row*40*8))
-        .endrepeat
 
 ;-------------------------------------------------------------------------------
 ; force the init constructor to be imported

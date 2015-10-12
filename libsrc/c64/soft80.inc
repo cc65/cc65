@@ -7,7 +7,17 @@ soft80_lo_charset       = $d000
 soft80_hi_charset       = $d400
 soft80_vram             = $d800 ; ram under i/o
 soft80_colram           = $d800 ; color ram (used for temp. storage)
-soft80_spriteblock      = $dc00
+soft80_spriteblock      = $dc00 ; 64 bytes reserved for pointer sprite data
+
+; tables for kplot
+soft80_bitmapxlo        = $dc40       ; (80 bytes)
+soft80_bitmapxhi        = $dc40 + 80  ; (80 bytes)
+soft80_vramlo           = $dc40 + 160 ; (25 bytes)
+; align to next page for speed
+soft80_vramhi           = $dd00       ; (25 bytes)
+soft80_bitmapylo        = $dd00 + 25  ; (25 bytes)
+soft80_bitmapyhi        = $dd00 + 50  ; (25 bytes)
+
 soft80_bitmap           = $e000
 
 charsperline            = 80

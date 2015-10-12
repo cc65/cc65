@@ -43,7 +43,7 @@
 
         .export         soft80_charset
 
-        .rodata
+        .segment "INIT"
 soft80_charset:
         .byte $0f,$03,$0f,$00,$0f,$07,$05,$0e
         .byte $0f,$05,$0e,$0b,$0f,$0b,$0f,$0f

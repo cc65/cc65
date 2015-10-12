@@ -4,7 +4,7 @@
 ; Low level init code for soft80 screen output/console input
 ;
 
-        .constructor    soft80_init
+        .constructor    soft80_init, 8
         .destructor     soft80_shutdown
 
         .import         soft80_kclrscr, soft80_charset

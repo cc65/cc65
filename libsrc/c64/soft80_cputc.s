@@ -161,8 +161,6 @@ draw_spaceinvers:
         sta     (CRAM_PTR),y    ; vram
 .endif
 
-        ;lda     CURS_X
-        ;and     #$01
         lda     soft80_internal_cursorxlsb
         bne     draw_spaceinvers_odd
 
@@ -201,8 +199,6 @@ draw_space:
 .endif
         ;ldy     #$00            ; is still $00
 
-        ;lda     CURS_X
-        ;and     #$01
         lda     soft80_internal_cursorxlsb
         bne     draw_space_odd
 
@@ -381,8 +377,6 @@ remcolor:
         ;and     #$0f
         sta     tmp3            ; A contains colram
 
-        ;lda     CURS_X
-        ;and     #$01
         lda     soft80_internal_cursorxlsb
         bne     @sk3
 
@@ -452,8 +446,6 @@ soft80_putcolor:
 
         ; botch characters in the cell are used
 
-        ;lda     CURS_X
-        ;and     #$01
         lda     soft80_internal_cursorxlsb
         bne     @sk2            ; jump if odd xpos
 
@@ -467,8 +459,6 @@ soft80_putcolor:
         jsr     soft80_checkchar
         bcs     @sk1            ; char at current position => overwrite 1st
 
-        ;lda     CURS_X
-        ;and     #$01
         lda     soft80_internal_cursorxlsb
         beq     @sk3            ; jump if even xpos
 @sk2:
@@ -503,8 +493,6 @@ soft80_checkchar:
 
         ;ldy     #$00                            ; is still $00
 
-        ;lda     CURS_X
-        ;and     #$01
         lda     soft80_internal_cursorxlsb
         bne     @l1a
 
@@ -517,7 +505,7 @@ soft80_checkchar:
         lda     (SCREEN_PTR),y
         and     #$f0
         cmp     #$f0
-        bne     @l2b
+        bne     @ischar
         .if (line < 7)
         dey
         .endif
@@ -525,7 +513,7 @@ soft80_checkchar:
         ;ldy     #$00                            ; is 0
         clc
         rts
-@l2b:
+@ischar:
         ldy     #$00
         sec
         rts
@@ -535,7 +523,7 @@ soft80_checkchar:
         lda     (SCREEN_PTR),y
         and     #$0f
         cmp     #$0f
-        bne     @l2b
+        bne     @ischar
         .if line < 7
         dey
         .endif
@@ -543,9 +531,4 @@ soft80_checkchar:
         ;ldy     #$00                            ; is 0
         clc
         rts
-;@l2bb:
-;        ldy     #$00
-;        sec
-;        rts
-
 .endif

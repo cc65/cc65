@@ -46,9 +46,6 @@ invertcursor:
         ldy     #$00
         jsr     setcolor
 
-        ;lda     CURS_X
-        ;and     #$01
-        ;tax
         ldx     soft80_internal_cursorxlsb
 @lp1:
         lda     (SCREEN_PTR),y
@@ -74,6 +71,7 @@ setcolor:
         sta     (CRAM_PTR),y    ; vram
         rts
 @set:
+        ; save old value
         lda     (CRAM_PTR),y    ; vram
         sta     tmp1
         lda     CHARCOLOR

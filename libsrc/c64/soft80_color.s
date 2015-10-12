@@ -24,10 +24,11 @@ soft80_textcolor:
 
 soft80_bgcolor:
         ldx     soft80_internal_bgcolor         ; get old value
-        stx     tmp2                            ; save old value
         sta     soft80_internal_bgcolor         ; set new value
 
         jsr     mkcharcolor
+
+        stx     tmp2                            ; save old value
 
 .if SOFT80COLORVOODOO = 1
         ; if the old bg color is equal to color ram of that cell, then also

@@ -14,7 +14,7 @@ static char grid[5][5] = {
 void main(void)
 {
         int i, j, n;
-        unsigned char xsize, ysize, tcol, inpos = 0;
+        unsigned char xsize, ysize, tcol, bgcol, inpos = 0;
 
         clrscr();
         screensize(&xsize, &ysize);
@@ -22,6 +22,7 @@ void main(void)
 
         cputsxy(0, 2, "Colors:" );
         tcol = textcolor(0); /* remember original textcolor */
+        bgcol = bgcolor(0); /* remember original background color */
         for (i = 0; i < 3; ++i) {
                 gotoxy(i,3 + i);
                 for (j = 0; j < 16; ++j) {
@@ -30,6 +31,7 @@ void main(void)
                 }
         }
         textcolor(tcol);
+        bgcolor(bgcol);
 
         cprintf("\n\n\r Screensize is: %dx%d", xsize, ysize );
 
@@ -90,6 +92,12 @@ void main(void)
                     inpos = (inpos - 1) & 7;
                 } else if (i == CH_CURS_RIGHT) {
                     inpos = (inpos + 1) & 7;
+                } else if (i == CH_F7) {
+                    bgcol = (bgcol + 1) & 0x0f;
+                    bgcolor(bgcol);
+                } else if (i == CH_F8) {
+                    bgcol = (bgcol - 1) & 0x0f;
+                    bgcolor(bgcol);
                 } else {
                     cputc(i);
                     inpos = (inpos + 1) & 7;

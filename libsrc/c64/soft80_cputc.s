@@ -8,6 +8,7 @@
         .export         soft80_cputcxy, soft80_cputc
         .export         soft80_cputdirect, soft80_putchar
         .export         soft80_newline, soft80_plot
+        .export         soft80_checkchar
 
         .import         popa, _gotoxy
 
@@ -470,14 +471,13 @@ soft80_putcolor:
 ; test if there is a space or a character at current position
 ;
 ; in:  x = $34
-;      y must be $00
+;      $01 must be $34
+;
 ; out: SEC: space
 ;      CLC: character
 ;      x = $34
 ;      y = $00
 soft80_checkchar:
-
-        ;ldy     #$00                            ; is still $00
 
         lda     soft80_internal_cursorxlsb
         bne     @l1a

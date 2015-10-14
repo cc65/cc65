@@ -7,13 +7,13 @@
 
         ; soft80_cgetc.s
         .import soft80_cgetc
-        .export _cgetc := soft80_cgetc
+        .export _cgetc := soft80_cgetc                  ; cgetc.s
 
         ; soft80_color.s
         .import soft80_textcolor
         .import soft80_bgcolor
-        .export _textcolor := soft80_textcolor
-        .export _bgcolor := soft80_bgcolor
+        .export _textcolor := soft80_textcolor          ; color.s
+        .export _bgcolor := soft80_bgcolor              ; color.s
 
         ; soft80_cputc.s
         .import soft80_cputc
@@ -22,25 +22,26 @@
         .import soft80_putchar
         .import soft80_newline
         .import soft80_plot
-        .export _cputc := soft80_cputc
-        .export _cputcxy := soft80_cputcxy
-        .export cputdirect := soft80_cputdirect
-        .export putchar := soft80_putchar
-        .export newline := soft80_newline
-        .export plot := soft80_plot
+        .export _cputc := soft80_cputc                  ; cputc.s
+        .export _cputcxy := soft80_cputcxy              ; cputc.s
+        .export cputdirect := soft80_cputdirect         ; cputc.s
+        .export putchar := soft80_putchar               ; cputc.s
+        .export newline := soft80_newline               ; cputc.s
+        .export plot := soft80_plot                     ; cputc.s
 
         ; soft80_kclrscr.s
         .import soft80_kclrscr
-        .export _clrscr := soft80_kclrscr
-        .export CLRSCR := soft80_kclrscr
+        .export _clrscr := soft80_kclrscr               ; clrscr.s
+        .export CLRSCR := soft80_kclrscr                ; kernal func (c64.inc)
 
         ; soft80_kplot.s
         .import soft80_kplot
-        .export PLOT := soft80_kplot
+        .export PLOT := soft80_kplot                    ; kplot.s
 
         ; soft80_kscreen.s
         .import soft80_screensize
-        .export screensize := soft80_screensize
+        .export screensize := soft80_screensize         ; _scrsize.s
+        .export SCREEN := soft80_screensize             ; kernal func (kernal.s)
 
         ; VIC sprite data for the mouse pointer
         .export         mcb_spritememory  := soft80_spriteblock

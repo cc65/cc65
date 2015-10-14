@@ -13,7 +13,7 @@
         .import         popa, _gotoxy
 
         .import         soft80_kplot
-        .import         soft80_internal_bgcolor, soft80_internal_textcolor
+        .import         soft80_internal_bgcolor, soft80_internal_cellcolor
         .import         soft80_internal_cursorxlsb
 
         .importzp       tmp4,tmp3
@@ -148,7 +148,7 @@ draw_spaceinvers:
 .if SOFT80COLORVOODOO = 1
         jsr     soft80_putcolor
 .else
-        lda     CHARCOLOR
+        lda     soft80_internal_cellcolor
         sta     (CRAM_PTR),y    ; vram
 .endif
 
@@ -232,7 +232,7 @@ soft80_putchar:
 .if SOFT80COLORVOODOO = 1
         jsr     soft80_putcolor
 .else
-        lda     CHARCOLOR
+        lda     soft80_internal_cellcolor
         sta     (CRAM_PTR),y    ; vram
 .endif
 
@@ -436,7 +436,7 @@ soft80_putcolor:
         bne     @sk2            ; jump if odd xpos
 
         ; vram = textcol
-        lda     CHARCOLOR
+        lda     soft80_internal_cellcolor
         sta     (CRAM_PTR),y    ; vram
         rts
 
@@ -449,7 +449,7 @@ soft80_putcolor:
         beq     @sk3            ; jump if even xpos
 @sk2:
         ; colram = textcol
-        lda     soft80_internal_textcolor
+        lda     CHARCOLOR
         inc     $01             ; $35
         sta     (CRAM_PTR),y    ; colram
         stx     $01             ; $34
@@ -463,7 +463,7 @@ soft80_putcolor:
         stx     $01             ; $34
 @sk1:
         ; vram = textcol
-        lda     CHARCOLOR
+        lda     soft80_internal_cellcolor
         sta     (CRAM_PTR),y    ; vram
         rts
 

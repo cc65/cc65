@@ -5,7 +5,7 @@
 ;
 
         .export         soft80_cgetc
-        .import         soft80_internal_cursorxlsb
+        .import         soft80_internal_cellcolor, soft80_internal_cursorxlsb
         .import         cursor
         .importzp       tmp1
 
@@ -74,7 +74,7 @@ setcolor:
         ; save old value
         lda     (CRAM_PTR),y    ; vram
         sta     tmp1
-        lda     CHARCOLOR
+        lda     soft80_internal_cellcolor
         sta     (CRAM_PTR),y    ; vram
         rts
 

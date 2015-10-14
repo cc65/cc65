@@ -8,7 +8,7 @@
         .destructor     soft80_shutdown
 
         .import         soft80_kclrscr, soft80_charset
-        .export         soft80_internal_textcolor, soft80_internal_bgcolor
+        .export         soft80_internal_bgcolor, soft80_internal_cellcolor
         .export         soft80_internal_cursorxlsb
 
         .importzp       ptr1, ptr2, ptr3
@@ -25,9 +25,9 @@ soft80_init:
         ; colorram being set up as expected, which is why we cant use the
         ; _bgcolor and _textcolor functions here.
 
-        lda     646                             ; use current textcolor
-        and     #$0f
-        sta     soft80_internal_textcolor
+        lda     CHARCOLOR                       ; use current textcolor
+        and     #$0f                            ; make sure the upper nibble is 0s
+        sta     CHARCOLOR
 
         lda     VIC_BG_COLOR0                   ; use current bgcolor
         and     #$0f
@@ -36,8 +36,8 @@ soft80_init:
         asl     a
         asl     a
         asl     a
-        ora     soft80_internal_textcolor
-        sta     CHARCOLOR
+        ora     CHARCOLOR
+        sta     soft80_internal_cellcolor
 
         lda     #$3b
         sta     VIC_CTRL1
@@ -154,7 +154,7 @@ soft80_tables_data_end:
 ;        code has been run.
 
         .data           ; FIXME
-soft80_internal_textcolor:
+soft80_internal_cellcolor:
         .res 1
 soft80_internal_bgcolor:
         .res 1

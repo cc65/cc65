@@ -6,7 +6,7 @@
 ;
 
         .export         soft80_textcolor, soft80_bgcolor
-        .import         soft80_internal_textcolor, soft80_internal_bgcolor
+        .import         soft80_internal_cellcolor, soft80_internal_bgcolor
         .import         soft80_internal_cursorxlsb
         .import         soft80_kplot, soft80_checkchar
 
@@ -16,8 +16,8 @@
         .include        "soft80.inc"
 
 soft80_textcolor:
-        ldx     soft80_internal_textcolor       ; get old value
-        sta     soft80_internal_textcolor       ; set new value
+        ldx     CHARCOLOR                       ; get old value
+        sta     CHARCOLOR                       ; set new value
 
 mkcharcolor:
         lda     soft80_internal_bgcolor
@@ -26,8 +26,8 @@ mkcharcolor:
         asl     a
         asl     a
         sta     tmp1                            ; remember new bg color (high nibble)
-        ora     soft80_internal_textcolor
-        sta     CHARCOLOR                       ; text/bg combo for new chars
+        ora     CHARCOLOR
+        sta     soft80_internal_cellcolor       ; text/bg combo for new chars
 
         txa                                     ; get old value
         rts

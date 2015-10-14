@@ -6,7 +6,7 @@
 
         .export         soft80_kclrscr
         .import         soft80_kplot
-        .import         soft80_internal_bgcolor
+        .import         soft80_internal_bgcolor, soft80_internal_cellcolor
         .importzp       ptr1
 
         .include        "c64.inc"
@@ -48,7 +48,7 @@ soft80_kclrscr:
         lda     #$34                            ; enable RAM under I/O
         sta     $01
 
-        lda     CHARCOLOR
+        lda     soft80_internal_cellcolor
         and     #$f0
         ora     soft80_internal_bgcolor
         jsr     clear                           ; clear vram

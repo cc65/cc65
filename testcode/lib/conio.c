@@ -1,3 +1,14 @@
+/*
+ * conio api test program
+ *
+ * keys:
+ *
+ * 1...0        change text color
+ * F5/F6        change border color
+ * F7/F8        change background color
+ *
+ */
+
 
 #include <conio.h>
 #include <string.h>
@@ -14,7 +25,7 @@ static char grid[5][5] = {
 void main(void)
 {
         int i, j, n;
-        unsigned char xsize, ysize, tcol, bgcol, inpos = 0;
+        unsigned char xsize, ysize, tcol, bgcol, bcol, inpos = 0;
 
         clrscr();
         screensize(&xsize, &ysize);
@@ -23,6 +34,7 @@ void main(void)
         cputsxy(0, 2, "Colors:" );
         tcol = textcolor(0); /* remember original textcolor */
         bgcol = bgcolor(0); /* remember original background color */
+        bcol = bordercolor(0); /* remember original border color */
         for (i = 0; i < 3; ++i) {
                 gotoxy(i,3 + i);
                 for (j = 0; j < 16; ++j) {
@@ -92,6 +104,12 @@ void main(void)
                     inpos = (inpos - 1) & 7;
                 } else if (i == CH_CURS_RIGHT) {
                     inpos = (inpos + 1) & 7;
+                } else if (i == CH_F5) {
+                    bgcol = (bgcol + 1) & 0x0f;
+                    bordercolor(bgcol);
+                } else if (i == CH_F6) {
+                    bgcol = (bgcol - 1) & 0x0f;
+                    bordercolor(bgcol);
                 } else if (i == CH_F7) {
                     bgcol = (bgcol + 1) & 0x0f;
                     bgcolor(bgcol);

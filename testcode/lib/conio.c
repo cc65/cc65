@@ -35,6 +35,7 @@ void main(void)
         tcol = textcolor(0); /* remember original textcolor */
         bgcol = bgcolor(0); /* remember original background color */
         bcol = bordercolor(0); /* remember original border color */
+        bgcolor(bgcol);bordercolor(bcol);
         for (i = 0; i < 3; ++i) {
                 gotoxy(i,3 + i);
                 for (j = 0; j < 16; ++j) {
@@ -43,7 +44,6 @@ void main(void)
                 }
         }
         textcolor(tcol);
-        bgcolor(bgcol);
 
         cprintf("\n\n\r Screensize is: %dx%d", xsize, ysize );
 

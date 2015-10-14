@@ -21,20 +21,21 @@ initcwd:
         jsr     callmli
 
         ; Check for null prefix
-        lda     __cwd
+        ldx     __cwd
         beq     done
 
         ; Remove length byte and trailing slash
-        sta     tmp1
-        ldx     #$01
-:       lda     __cwd,x
-        sta     __cwd - 1,x
+        dex
+        stx     tmp1
+        ldx     #$00
+:       lda     __cwd + 1,x
+        sta     __cwd,x
         inx
         cpx     tmp1
         bcc     :-
 
         ; Add terminating zero
         lda     #$00
-        sta     __cwd - 1,x
+        sta     __cwd,x
         
 done:   rts

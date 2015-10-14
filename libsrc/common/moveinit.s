@@ -15,8 +15,8 @@
 .data
 
 ; Move the INIT segment from where it was loaded (over the bss segments)
-; into where it must be run (in the heap).  The two areas might overlap; and,
-; the segment is moved upwards.  Therefore, this code starts at the highest
+; into where it must be run (over the BSS segment).  The two areas might overlap;
+; and, the segment is moved upwards.  Therefore, this code starts at the highest
 ; address, and decrements to the lowest address.  The low bytes of the starting
 ; pointers are not sums.  The high bytes are sums; but, they do not include the
 ; carry.  Both the low-byte sums and the carries will be done when the pointers

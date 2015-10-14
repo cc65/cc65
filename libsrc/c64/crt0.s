@@ -8,7 +8,7 @@
         .import         initlib, donelib
         .import         moveinit, zerobss, callmain
         .import         BSOUT
-        .import         __RAM_START__, __RAM_SIZE__     ; Linker generated
+        .import         __MAIN_START__, __MAIN_SIZE__   ; Linker generated
         .import         __STACKSIZE__                   ; from configure file
         .importzp       ST
 
@@ -45,16 +45,24 @@ Start:
         ldx     move_init
         beq     L0
 
-; Move the INIT segment from where it was loaded (over ZPSAVE and BSS)
-; into where it must be run (in the heap).
+; Move the INIT segment from where it was loaded (over the bss segments)
+; into where it must be run (over the BSS segment).
 
         jsr     moveinit
-        dec     move_init       ; set to false
+        dec     move_init       ; Set to false
 
-; Save space by putting the rest of the start-up code in the INIT segment,
-; which can be re-used by the heap and the C stack.
+; Save space by putting some of the start-up code in the INIT segment,
+; which can be re-used by the BSS segment, the heap and the C stack.
 
-L0:     jsr     initstart
+L0:     jsr     runinit
+
+; Clear the BSS data.
+
+        jsr     zerobss
+
+; Push the command-line arguments; and, call main().
+
+        jsr     callmain
 
 ; Back from main() [this is also the exit() entry]. Run the module destructors.
 
@@ -90,7 +98,7 @@ L2:     lda     zpsave,x
 
 .segment        "INIT"
 
-initstart:
+runinit:
 
 ; Save the zero-page locations that we need.
 
@@ -100,24 +108,16 @@ L1:     lda     sp,x
         dex
         bpl     L1
 
-; Clear the BSS data.
-
-        jsr     zerobss
-
 ; Set up the stack.
 
-        lda     #<(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
-        ldx     #>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
+        lda     #<(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
+        ldx     #>(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
         sta     sp
         stx     sp+1            ; Set argument stack ptr
 
 ; Call the module constructors.
 
-        jsr     initlib
-
-; Push the command-line arguments; and, call main().
-
-        jmp     callmain
+        jmp     initlib
 
 
 ; ------------------------------------------------------------------------
@@ -134,6 +134,6 @@ spsave: .res    1
 move_init:
         .byte   1
 
-.segment        "ZPSAVE"
+.segment        "INITBSS"
 
 zpsave: .res    zpspace

@@ -9,6 +9,8 @@
 
 .proc   initcwd
 
+        lda     #0
+        sta     __cwd
         jsr     findfreeiocb
         bne     oserr
         lda     #GETCWD

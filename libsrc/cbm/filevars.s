@@ -9,7 +9,7 @@
         .importzp       devnum
 
 
-.bss
+.segment "INITBSS"
 
 curunit:
         .res    1

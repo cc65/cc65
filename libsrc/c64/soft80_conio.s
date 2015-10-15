@@ -149,11 +149,7 @@ soft80_bitmapyhi_data:
 soft80_tables_data_end:
 
 ;-------------------------------------------------------------------------------
-; FIXME: when the code is fixed to use the "init" segment, these variables must
-;        be moved into a section other than .bss so they survive after the init
-;        code has been run.
-
-        .data           ; FIXME
+        .segment "INITBSS"
 soft80_internal_cellcolor:
         .res 1
 soft80_internal_bgcolor:

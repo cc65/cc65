@@ -9,7 +9,7 @@
         .importzp       ptr1
 
 
-.segment "INIT"
+.code
 
 zerobss:
         lda     #<__BSS_RUN__
@@ -41,6 +41,3 @@ L3:     cpy     #<__BSS_SIZE__
 ; Done
 
 L4:     rts
-
-
-

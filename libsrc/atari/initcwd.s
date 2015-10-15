@@ -9,6 +9,8 @@
 
 .proc   initcwd
 
+        lda     #0
+        sta     __cwd
         jsr     findfreeiocb
         bne     oserr
         lda     #GETCWD
@@ -19,13 +21,13 @@
         sta     ICBLH,x
         jsr     CIOV
         bmi     oserr
-        ldx     #0              ; ATEOL -> \0
-:       lda     __cwd,x
-        inx
+        ldx     #$FF            ; ATEOL -> \0
+:       inx
+        lda     __cwd,x
         cmp     #ATEOL
         bne     :-
         lda     #0
-        sta     __cwd-1,x
+        sta     __cwd,x
 oserr:  rts
 
 .endproc

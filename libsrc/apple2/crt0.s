@@ -11,7 +11,7 @@
         .import         callmain
         .import         __LC_START__, __LC_LAST__       ; Linker generated
         .import         __INIT_RUN__, __INIT_SIZE__     ; Linker generated
-        .import         __ZPSAVE_RUN__                  ; Linker generated
+        .import         __INITBSS_RUN__                 ; Linker generated
 
         .include        "zeropage.inc"
         .include        "apple2.inc"
@@ -29,14 +29,14 @@
         bit     $C081
 
         ; Set the source start address.
-        lda     #<(__ZPSAVE_RUN__ + __INIT_SIZE__)
-        ldy     #>(__ZPSAVE_RUN__ + __INIT_SIZE__)
+        lda     #<(__INITBSS_RUN__ + __INIT_SIZE__)
+        ldy     #>(__INITBSS_RUN__ + __INIT_SIZE__)
         sta     $9B
         sty     $9C
 
         ; Set the source last address.
-        lda     #<(__ZPSAVE_RUN__ + __INIT_SIZE__ + __LC_LAST__ - __LC_START__)
-        ldy     #>(__ZPSAVE_RUN__ + __INIT_SIZE__ + __LC_LAST__ - __LC_START__)
+        lda     #<(__INITBSS_RUN__ + __INIT_SIZE__ + __LC_LAST__ - __LC_START__)
+        ldy     #>(__INITBSS_RUN__ + __INIT_SIZE__ + __LC_LAST__ - __LC_START__)
         sta     $96
         sty     $97
 
@@ -51,14 +51,14 @@
         jsr     $D39A           ; BLTU2
 
         ; Set the source start address.
-        lda     #<__ZPSAVE_RUN__
-        ldy     #>__ZPSAVE_RUN__
+        lda     #<__INITBSS_RUN__
+        ldy     #>__INITBSS_RUN__
         sta     $9B
         sty     $9C
 
         ; Set the source last address.
-        lda     #<(__ZPSAVE_RUN__ + __INIT_SIZE__)
-        ldy     #>(__ZPSAVE_RUN__ + __INIT_SIZE__)
+        lda     #<(__INITBSS_RUN__ + __INIT_SIZE__)
+        ldy     #>(__INITBSS_RUN__ + __INIT_SIZE__)
         sta     $96
         sty     $97
 
@@ -201,7 +201,7 @@ q_param:.byte   $04             ; param_count
         ; Final jump when we're done
 done:   jmp     DOSWARM         ; Potentially patched at runtime
 
-        .segment        "ZPSAVE"
+        .segment        "INITBSS"
 
 zpsave: .res    zpspace
 

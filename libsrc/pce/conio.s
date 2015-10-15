@@ -113,6 +113,5 @@ fillloop:
 
         rts
 
-        .rodata
 font:
         .include        "vga.inc"

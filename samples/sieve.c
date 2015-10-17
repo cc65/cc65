@@ -110,7 +110,7 @@ int main (void)
                     J = 0;
                 }
             }
-            if (kbhit() && ReadUpperKey == 'Q') {
+            if (kbhit() && ReadUpperKey () == 'Q') {
                 break;
             }
         }

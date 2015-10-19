@@ -1,6 +1,8 @@
 ;
 ; Groepaz/Hitmen, 11.10.2015
 ;
+; high level implementation for the soft80 implementation
+;
 ; void cputcxy (unsigned char x, unsigned char y, char c);
 ; void cputc (char c);
 ;

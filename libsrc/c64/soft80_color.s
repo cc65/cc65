@@ -1,6 +1,8 @@
 ;
 ; Groepaz/Hitmen, 12.10.2015
 ;
+; high level implementation for the soft80 implementation
+;
 ; unsigned char __fastcall__ textcolor (unsigned char color);
 ; unsigned char __fastcall__ bgcolor (unsigned char color);
 ;

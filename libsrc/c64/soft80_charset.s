@@ -1,7 +1,7 @@
 ;
 ; Groepaz/Hitmen, 12.10.2015
 ;
-; character set for use with the soft80 implementation
+; character set for use with the soft80 implementations
 ;
 
 ; the format of the data follows the following layout:

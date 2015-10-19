@@ -141,6 +141,16 @@ Note that the soft80 conio driver is incompatible with the
 <tt/c64-ram.emd (c64_ram_emd)/ extended memory driver and the
  <tt/c64-hi.tgi (c64_hi_tgi)/ graphics driver.
 
+<sect2>80 Columns conio driver (monochrome)<p>
+
+In an (even more) memory constrained situation, a size optimized version of the
+software driven 80 columns module may be used, which only supports one common
+text color for the whole screen.
+
+<tscreen><verb>
+cl65 -t c64 myprog.c c64-soft80mono.o
+</verb></tscreen>
+
 <sect>Platform-specific header files<p>
 
 Programs containing C64-specific code may use the <tt/c64.h/ or <tt/cbm.h/

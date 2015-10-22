@@ -96,43 +96,7 @@ start:
         jsr     zerobss
 
         ; Copy the .data segment to RAM
-        lda     #<(__DATA_LOAD__)
-        sta     ptr1
-        lda     #>(__DATA_LOAD__)
-        sta     ptr1+1
-        lda     #<(__DATA_RUN__)
-        sta     ptr2
-        lda     #>(__DATA_RUN__)
-        sta     ptr2+1
-
-        ldx     #>(__DATA_SIZE__)
-@l2:
-        beq     @s1             ; no more full pages
-
-        ; copy one page
-        ldy     #0
-@l1:
-        lda     (ptr1),y
-        sta     (ptr2),y
-        iny
-        bne     @l1
-
-        inc     ptr1+1
-        inc     ptr2+1
-
-        dex
-        bne     @l2
-
-        ; copy remaining bytes
-@s1:
-        ; copy one page
-        ldy     #0
-@l3:
-        lda     (ptr1),y
-        sta     (ptr2),y
-        iny
-        cpy     #<(__DATA_SIZE__)
-        bne     @l3
+        tii     __DATA_LOAD__, __DATA_RUN__, __DATA_SIZE__
 
         ; setup the stack
         lda     #<(__RAM_START__+__RAM_SIZE__)

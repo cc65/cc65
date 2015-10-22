@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+  <head>
+    <title>cc65 - Getting Started</title>
+    <link rel="stylesheet" type="text/css" href="cc65.css"/>
+    <link rel="shortcut icon" type="image/x-icon" href="image/favicon.ico"/>
+  </head>
+  <body>
+    <img style="float:right;" width="300" height="150" src="image/cc65.png" alt=""/>
+    <h1>Getting Started</h1>
+    <div id="menu">
+      <div id="innermenu">
+        <ul>
+          <li><a href="index.html">Main Page</a>
+          </li>
+          <li id="here"><a href="getting-started.html">Getting Started</a>
+          </li>
+          <li><a href="mailing-lists.html">Mailing Lists</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <h2>Content</h2>
+    <ul class="down">
+      <li><a href="#GNU">GNU/Linux</a>
+      </li>
+      <li><a href="#Windows">Microsoft Windows</a>
+      </li>
+    </ul>
+    <h2><a name="GNU">GNU/Linux</a></h2>
+    <p>You have two options...
+      <ul class="bullet">
+        <li>
+          <p>Change the current working directory to a path of your choice and
+             enter...
+          </p>
+          <p>
+            <kbd>git clone https://github.com/cc65/cc65.git<br>
+                  cd cc65<br>
+                  make<br>
+            </kbd>
+          </p>
+          <p>This builds both the cc65 binaries (located in the 'bin'
+             subdirectory) and the cc65 libraries. Now cc65 is fully functional
+             without further steps.
+          </p>
+          <p>If you want to be able to run the cc65 binaries without providing
+             their path you may additionally enter <kbd>sudo make avail</kbd>.
+             This creates symbolic links to the binaries in '/usr/local/bin'.
+          </p>
+        </li>
+       </ul>
+       <ul class="bullet">
+        <li>
+          <p>Install one of the pre-built packages for RPM based systems
+             (OpenSUSE) or DEB based systems (Debian) from the
+             <a href="http://software.opensuse.org/download.html?project=home%3Astrik&package=cc65">
+             openSUSE Build Service download page for cc65</a>.
+          </p>
+        </li>
+      </ul>
+    </p>
+    <h2><a name="Windows">Microsoft Windows</a></h2>
+    <p>Download the
+       <a href="http://sourceforge.net/projects/cc65/files/cc65-snapshot-win32.zip">
+       current cc65 snapshot</a> and unzip it to a path of your choice  that
+       <u>doesn't contain spaces</u> (let's presume 'c:\cc65' here).  Now cc65
+       is fully functional without further steps.
+    </p>
+    <p>If you want to be able to run the cc65 binaries without providing their
+       path you may additionally add 'c:\cc65\bin' to your 'Path' environment
+       variable.
+    </p>
+    <p><u>Note:</u> If you have used cc65 before then you need to make sure
+       to remove all environment variables related to cc65 (like CC65_HOME).
+    </p>
+  </body>
+</html>

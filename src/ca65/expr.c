@@ -1099,14 +1099,14 @@ static ExprNode* Factor (void)
             N = Function (FuncAddrSize);
             break;
 
-	case TOK_ASIZE:
-            if (GetCPU() != CPU_65816) {
+        case TOK_ASIZE:
+            if (GetCPU () != CPU_65816) {
                 N = GenLiteralExpr (8);
             } else {
-	        N = GenLiteralExpr (ExtBytes [AM65I_IMM_ACCU] * 8);
+                N = GenLiteralExpr (ExtBytes[AM65I_IMM_ACCU] * 8);
             }
-	    NextTok ();
-	    break;
+            NextTok ();
+            break;
 
         case TOK_BLANK:
             N = Function (FuncBlank);
@@ -1141,14 +1141,14 @@ static ExprNode* Factor (void)
             N = Function (FuncIsMnemonic);
             break;
 
-	case TOK_ISIZE:
-            if (GetCPU() != CPU_65816) {
+        case TOK_ISIZE:
+            if (GetCPU () != CPU_65816) {
                 N = GenLiteralExpr (8);
             } else {
-                N = GenLiteralExpr (ExtBytes [AM65I_IMM_INDEX] * 8);
+                N = GenLiteralExpr (ExtBytes[AM65I_IMM_INDEX] * 8);
             }
             NextTok ();
-	    break;
+            break;
 
         case TOK_LOBYTE:
             N = Function (FuncLoByte);

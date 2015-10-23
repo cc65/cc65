@@ -1191,6 +1191,35 @@ writable.
   assignments to <tt/*/, use <tt/<ref id=".ORG" name=".ORG">/ instead.
 
 
+<sect1><tt>.ASIZE</tt><label id=".ASIZE"><p>
+
+  Reading this pseudo variable will return the current size of the
+  Accumulator in bits.
+
+  For the 65816 instruction set .ASIZE will return either 8 or 16, depending
+  on the current size of the operand in immediate accu addressing mode.
+
+  For all other CPU instruction sets, .ASIZE will always return 8.
+
+  Example:
+
+  <tscreen><verb>
+	; Reverse Subtract with Accumulator
+	; A = memory - A
+	.macro rsb param
+		.if .asize = 8
+			eor	#$ff
+		.else
+			eor	#$ffff
+		.endif
+		sec
+		adc	param
+	.endmacro
+  </verb></tscreen>
+
+  See also: <tt><ref id=".ISIZE" name=".ISIZE"></tt>
+
+
 <sect1><tt>.CPU</tt><label id=".CPU"><p>
 
   Reading this pseudo variable will give a constant integer value that
@@ -1216,6 +1245,19 @@ writable.
   	 	pha
   	.endif
   </verb></tscreen>
+
+
+<sect1><tt>.ISIZE</tt><label id=".ISIZE"><p>
+
+  Reading this pseudo variable will return the current size of the Index
+  register in bits.
+
+  For the 65816 instruction set .ISIZE will return either 8 or 16, depending
+  on the current size of the operand in immediate index addressing mode.
+
+  For all other CPU instruction sets, .ISIZE will always return 8.
+
+  See also: <tt><ref id=".ASIZE" name=".ASIZE"></tt>
 
 
 <sect1><tt>.PARAMCOUNT</tt><label id=".PARAMCOUNT"><p>

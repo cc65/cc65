@@ -1,7 +1,7 @@
 ;
-; Ullrich von Bassewitz, 2003-08-20
-; Performance increase (about 20%) by
-; Christian Krueger, 2009-09-13
+; 2003-08-20, Ullrich von Bassewitz
+; 2009-09-13, Christian Krueger -- performance increase (about 20%)
+; 2015-10-23, Greg King
 ;
 ; void* __fastcall__ memmove (void* dest, const void* src, size_t size);
 ;
@@ -23,8 +23,7 @@ _memmove:
 ; low addresses and increase pointers), otherwise we must copy downwards
 ; (start at high addresses and decrease pointers).
 
-        sec
-        sbc     ptr1
+        cmp     ptr1
         txa
         sbc     ptr1+1
         jcc     memcpy_upwards  ; Branch if dest < src (upwards copy)
@@ -81,4 +80,3 @@ PageSizeCopy:                   ; assert Y = 0
 ; Done, return dest
 
 done:   jmp     popax           ; Pop ptr and return as result
-                

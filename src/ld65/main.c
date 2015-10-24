@@ -819,8 +819,8 @@ int main (int argc, char* argv [])
         if (MapFileName) {
             CreateMapFile (SHORT_MAPFILE);
         }
-        Error ("Cannot generate output due to memory area overflow%s",
-               (MemoryAreaOverflows > 1)? "s" : "");
+        Error ("Cannot generate most of the files due to memory area overflow%c",
+               (MemoryAreaOverflows > 1) ? 's' : ' ');
     }
 
     /* Create the output file */

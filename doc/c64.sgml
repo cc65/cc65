@@ -125,7 +125,7 @@ module <tt/c64-soft80.o/ which uses the memory under I/O between &dollar;d000
 and &dollar;ffff.
 
 In memory constrained situations the memory from &dollar;400 to &dollar;7FF
-can be made available to a program by calling <tt/_heapadd ((void *) 0x400, 0x400);/
+can be made available to a program by calling <tt/_heapadd ((void *) 0x0400, 0x0400);/
 at the beginning of <tt/main()/. Doing so is beneficial even if the program
 doesn't use the the heap explicitly because loading a driver uses the heap implicitly.
 

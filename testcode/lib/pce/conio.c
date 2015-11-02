@@ -1,4 +1,3 @@
-
 #include <conio.h>
 #include <time.h>
 #include <joystick.h>
@@ -13,7 +12,7 @@ void main(void)
         int i, j;
         clock_t clk;
         char* p;
-        unsigned char xsize, ysize, n;
+        unsigned char xsize, ysize, n, nn;
 
         joy_install(&joy_static_stddrv);
 
@@ -40,11 +39,12 @@ void main(void)
                 gotoxy(0, 16 + i);
                 p = malloc(16);
                 memcpy(p, "0123456789abcdef", 16);
-                cprintf("alloced at: %04p - %c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c", p,
+                cprintf("alloc'ed at: %04p - %c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c", p,
                         p[0],p[1],p[2],p[3],p[4],p[5],p[6],p[7],
                         p[8],p[9],p[10],p[11],p[12],p[13],p[14],p[15]
                 );
         }
+        memcpy(p, main, 0);     /* test that a zero length doesn't copy 64K */
 
         gotoxy(0,ysize - 1);
         for (i = 0; i < xsize; ++i) {
@@ -108,14 +108,22 @@ void main(void)
                 }
 
                 gotoxy(xsize - 10, 3);
-                j = (n >> 5) & 1;
-                revers(j);
-                cputc(j ? 'R' : ' ');
+                nn = (n >> 5) & 1;
+                revers(nn);
+                cputc(nn ? 'R' : ' ');
                 cputs(" revers");
                 revers(0);
+
+                if ((n & 0x1f) == 0x00) {
+                        nn = p[15];
+                        ((char*)memmove(p + 1, p, 15))[-1] = nn;
+                        gotoxy(22, 19);
+                        cprintf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+                                p[0],p[1],p[ 2],p[ 3],p[ 4],p[ 5],p[ 6],p[ 7],
+                                p[8],p[9],p[10],p[11],p[12],p[13],p[14],p[15]);
+                }
 
                 waitvblank();
                 ++n;
         }
-        for(;;);
 }

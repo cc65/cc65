@@ -4,7 +4,7 @@
 ; block-copy instructions.
 ;
 ; 2003-08-20, Ullrich von Bassewitz
-; 2015-10-11, Greg King
+; 2015-11-02, Greg King
 ;
 ; void* __fastcall__ memcpy (void* dest, const void* src, size_t size);
 ;
@@ -16,7 +16,7 @@
         .export         _memcpy
         .export         memcpy_increment, memcpy_transfer, memcpy_getparams
 
-        .import         popax
+        .import         incsp2, popax
         .importzp       sp, ptr1, ptr2, ptr3
 
 
@@ -68,12 +68,23 @@ memcpy_transfer:
 memcpy_getparams:
         sta     ptr3
         stx     ptr3+1                  ; save size
+        ora     ptr3+1
+        bne     @L1
 
-        jsr     popax
+; The size is zero; copy nothing; just return the dest address.
+; (The HuC6280's transfer instructions can't copy $0000 bytes;
+;  they would copy $10000 [64K] bytes instead.)
+
+        ply                             ; drop return address
+        plx
+        jsr     incsp2                  ; drop src address
+        jmp     popax                   ; get pointer; return it as result
+
+@L1:    jsr     popax
         sta     ptr1
         stx     ptr1+1                  ; save src
 
-; (Direct stack access is four cycles faster [total cycle count].)
+; (Direct stack access is six cycles faster [total cycle count].)
 
         ldy     #1                      ; save dest
         lda     (sp),y                  ; get high byte
@@ -85,10 +96,10 @@ memcpy_getparams:
 
 ; ----------------------------------------------------------------------
 ; The transfer instructions use inline arguments.
-; Therefore, we must build the instruction in the DATA segment.
+; Therefore, we must build the instruction, in the DATA segment.
 
 .data
 
 transfer:
         tii     $FFFF, $FFFF, $0001
-        jmp     popax                   ; get pointer; and, return it as result
+        jmp     popax                   ; get pointer; return it as result

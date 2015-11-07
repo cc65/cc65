@@ -8,9 +8,10 @@
 ;
 ; void* __fastcall__ memcpy (void* dest, const void* src, size_t size);
 ;
-; NOTE:  This function contains entry points for memmove, which will resort
-; to memcpy for an incrementing copy.  Don't change this module without looking
-; at "pce/memmove.s"!
+; NOTE:  This function contains entry points for memmove(), which resorts to
+; memcpy() for incrementing copies.  The PC-Engine memset() uses this memcpy()
+; to fill memory quickly.  Don't change this module without looking at
+; "pce/memmove.s" and "pce/memset.s"!
 ;
 
         .export         _memcpy
@@ -34,25 +35,25 @@ _memcpy:
         jsr     memcpy_getparams
 
 memcpy_increment:
-        ldy     #$73                    ; TII
+        ldy     #$73                    ; TII opcode
 
 memcpy_transfer:
-        sty     transfer+opcode
+        sty     transfer + opcode
 
         lda     ptr1
         ldx     ptr1+1
-        sta     transfer+source
-        stx     transfer+source+1
+        sta     transfer + source
+        stx     transfer + source+1
 
         lda     ptr2
         ldx     ptr2+1
-        sta     transfer+destination
-        stx     transfer+destination+1
+        sta     transfer + destination
+        stx     transfer + destination+1
 
         lda     ptr3
         ldx     ptr3+1
-        sta     transfer+length
-        stx     transfer+length+1
+        sta     transfer + length
+        stx     transfer + length+1
 
         jmp     transfer
 

@@ -32,7 +32,6 @@
         ; soft80_kclrscr.s
         .import soft80_kclrscr
         .export _clrscr := soft80_kclrscr               ; clrscr.s
-        .export CLRSCR := soft80_kclrscr                ; kernal func (c64.inc)
 
         ; soft80_kplot.s
         .import soft80_kplot
@@ -41,7 +40,8 @@
         ; soft80_kscreen.s
         .import soft80_screensize
         .export screensize := soft80_screensize         ; _scrsize.s
-        .export SCREEN := soft80_screensize             ; kernal func (kernal.s)
+        ; FIXME: use _scrsize.s/remove soft80_scrsize.s
+        ;.export SCREEN := soft80_screensize             ; kernal func (kernal.s)
 
         ; VIC sprite data for the mouse pointer
         .export         mcb_spritememory  := soft80_spriteblock

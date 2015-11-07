@@ -35,25 +35,25 @@ _memcpy:
         jsr     memcpy_getparams
 
 memcpy_increment:
-        ldy     #$73                    ; TII
+        ldy     #$73                    ; TII opcode
 
 memcpy_transfer:
-        sty     transfer+opcode
+        sty     transfer + opcode
 
         lda     ptr1
         ldx     ptr1+1
-        sta     transfer+source
-        stx     transfer+source+1
+        sta     transfer + source
+        stx     transfer + source+1
 
         lda     ptr2
         ldx     ptr2+1
-        sta     transfer+destination
-        stx     transfer+destination+1
+        sta     transfer + destination
+        stx     transfer + destination+1
 
         lda     ptr3
         ldx     ptr3+1
-        sta     transfer+length
-        stx     transfer+length+1
+        sta     transfer + length
+        stx     transfer + length+1
 
         jmp     transfer
 

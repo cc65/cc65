@@ -59,5 +59,5 @@ _memmove:
         dec     ptr2+1
 @L2:    dec     ptr2
 
-        ldy     #$C3                    ; TDD
+        ldy     #$C3                    ; TDD opcode
         jmp     memcpy_transfer

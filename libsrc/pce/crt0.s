@@ -36,7 +36,7 @@ start:  sei
         csh                     ; Set high-speed CPU mode
         nop
 
-        ; Set up stack and memory mapping
+        ; Set up stack and memory mapping.
         ldx     #$FF            ; Stack top ($21FF)
         txs
 
@@ -74,7 +74,7 @@ start:  sei
 
         ; Turn on background and VD interrupt/IRQ1
         lda     #$05
-        sta     IRQ_MASK        ; IRQ1=on
+        sta     IRQ_MASK        ; IRQ1 = on
 
         ; Copy the .data segment to RAM
         tii     __DATA_LOAD__, __DATA_RUN__, __DATA_SIZE__
@@ -87,7 +87,7 @@ start:  sei
         lda     #<(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
         ldx     #>(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
         sta     sp
-        stx     sp + 1
+        stx     sp+1
 
         ; Call module constructors
         jsr     initlib

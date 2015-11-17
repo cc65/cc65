@@ -5,7 +5,7 @@
         .segment        "ONCE"
 psg_init:
         clx
-        stz     PSG_GLOBAL_PAN          ; Clear global balance
+        stz     PSG_GLOBAL_PAN          ; Silence global balance
 
 psg_clear_loop:
         stx     PSG_CHAN_SELECT         ; Select channel

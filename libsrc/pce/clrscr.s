@@ -1,3 +1,9 @@
+;
+; Clear (erase) the screen.
+;
+; Support the full 128- x 64-tile background.
+;
+
         .export         _clrscr
 
         .import         plot
@@ -15,9 +21,9 @@ _clrscr:
 rowloop:
         ldx     #$80
 colloop:
-        lda     #' '
+        lda     #' '            ; low byte of char. index
         sta     VDC_DATA_LO
-        lda     #$02
+        lda     #$02            ; background color, high nybble of char. index
         sta     VDC_DATA_HI
 
         dex

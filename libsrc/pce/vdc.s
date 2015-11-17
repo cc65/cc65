@@ -1,4 +1,3 @@
-
         .export         vdc_init
 
         .include        "pce.inc"
@@ -15,7 +14,7 @@ vdc_init:
         VREG    $06, $0000      ; RCR
         VREG    $07, $0000      ; BXR
         VREG    $08, $0000      ; BYR
-        VREG    $09, $0070      ; MAWR
+        VREG    $09, $0070      ; MWR
         VREG    $0C, $1702      ; CRTC - VSR
         VREG    $0D, $00DF      ; CRTC - VDS
         VREG    $0E, $000C      ; CRTC - VDE

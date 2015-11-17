@@ -13,8 +13,8 @@ CH_VLINE        = 2
 
 VDC_MAWR        = 0             ; Memory Address Write Register
 VDC_MARR        = 1             ; Memory Address Read Register
-VDC_VWR         = 2             ; VRAM Write Register (write only)
-VDC_VRR         = 2             ; VRAM Read Register (read only)
+VDC_VWR         = 2             ; VRAM Write Register
+VDC_VRR         = 2             ; VRAM Read Register
 VDC_UNK03       = 3             ; (unknown)
 VDC_UNK04       = 4             ; (unknown)
 VDC_CR          = 5             ; Control Register
@@ -35,8 +35,7 @@ VDC_SATB        = 19            ; Sprite Attribute Table
 
 ; VDC port
 ; Note:  The zero-page addressing mode is redirected to page $20.
-; Therefore, absolute addressing mode must be used when writing to this port.
-; We force it by using mirror locations that are outside of zero page.
+; We avoid it by using mirror locations that are outside of the zero page.
 
 VDC_CTRL        := $0200
 VDC_DATA_LO     := $0202
@@ -45,7 +44,7 @@ VDC_DATA_HI     := $0203
 ; HuC6260 -- Video Color Encoder (VCE)
 
 ; The DAC has a palette of 512 colours.
-; The bitmap of the palette data is this: 0000000gggrrrbbb.
+; The bitmap of that data is 0000000gggrrrbbb (Green, Red, Blue).
 ; You can read and write the DAC registers.
 
 VCE             := $0400        ; base
@@ -86,8 +85,8 @@ IRQ_STATUS      := $1403
 CDR_MEM_DISABLE := $1803
 CDR_MEM_ENABLE  := $1807
 
-; Write VDC register
-.macro VREG arg1,arg2
+; Write to a VDC register.
+.macro  VREG    arg1, arg2
         st0     #arg1
         st1     #<(arg2)
         st2     #>(arg2)

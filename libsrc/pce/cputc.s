@@ -25,10 +25,10 @@ _cputc: cmp     #$0D            ; CR?
         bne     L1
         lda     #0
         sta     CURS_X
-        beq     plot            ; Recalculate pointers
+        beq     plot            ; Recalculate pointer
 
 L1:     cmp     #$0A            ; LF?
-        beq     newline         ; Recalculate pointers
+        beq     newline         ; Recalculate pointer
 
 ; Printable char of some sort
 
@@ -50,23 +50,21 @@ L3:     sty     CURS_X
 newline:
         inc     CURS_Y
 
-; Set cursor position, calculate RAM pointers
+; Set cursor position; calculate VRAM pointer.
 
 plot:   ldy     CURS_X
         ldx     CURS_Y
         clc
         jmp     PLOT            ; Set the new cursor
 
-; Write one character to the screen without doing anything else, return X
-; position in Y
+; Write one character to the screen without doing anything else.
 
 putchar:
-
         ora     RVS             ; Set revers bit
 
         tax
 
-        st0     #VDC_MAWR       ; Memory Adress Write
+        st0     #VDC_MAWR       ; Memory Address Write
 
         lda     SCREEN_PTR
         sta     VDC_DATA_LO
@@ -79,8 +77,7 @@ putchar:
         txa
         sta     VDC_DATA_LO     ; character
 
-        lda     CHARCOLOR
-
+        lda     CHARCOLOR       ; pallette number
         asl     a
         asl     a
         asl     a

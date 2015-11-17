@@ -3,9 +3,9 @@
 ;
 
         .export         _clock
-        .constructor    initclock, 24
+        .constructor    initclock
 
-        .forceimport    ticktock
+        .forceimport    ticktock        ; make sure that tickcount changes
         .importzp       sreg
 
         .include        "extzp.inc"
@@ -19,6 +19,9 @@
         lda     tickcount
         rts
 .endproc
+
+
+; Make the process clock start at zero.
 
         .segment        "ONCE"
 initclock:

@@ -12,17 +12,17 @@
         .include        "pce.inc"
         .include        "extzp.inc"
 
-_bordercolor    := return0
+_bordercolor    := return0              ; always black
 
 _textcolor:
-        ldx     CHARCOLOR       ; get old value
-        sta     CHARCOLOR       ; set new value
+        ldx     CHARCOLOR               ; get old value
+        sta     CHARCOLOR               ; set new value
         txa
         rts
 
 _bgcolor:
-        ldx     BGCOLOR         ; get old value
-        sta     BGCOLOR         ; set new value
+        ldx     BGCOLOR                 ; get old value
+        sta     BGCOLOR                 ; set new value
         asl     a
         tay
 
@@ -43,7 +43,7 @@ colors: .word   ((0<<6)+(0<<3)+(0))     ; $0 black
         .word   ((7<<6)+(7<<3)+(7))     ; $1 white
         .word   ((0<<6)+(7<<3)+(0))     ; $2 red
         .word   ((7<<6)+(0<<3)+(7))     ; $3 cyan
-        .word   ((0<<6)+(5<<3)+(7))     ; $4 violett
+        .word   ((0<<6)+(5<<3)+(7))     ; $4 violet
         .word   ((7<<6)+(0<<3)+(0))     ; $5 green
         .word   ((0<<6)+(0<<3)+(7))     ; $6 blue
         .word   ((7<<6)+(7<<3)+(0))     ; $7 yellow

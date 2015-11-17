@@ -1,7 +1,11 @@
+;
+; Ullrich von Bassewitz, 07.08.1998
+;
+; unsigned char revers (unsigned char onoff);
+;
 
         .export         _revers
 
-        .include        "pce.inc"
         .include        "extzp.inc"
 
 .proc   _revers
@@ -18,9 +22,3 @@ L2:     ldx     #$00            ; Load high byte of result
         tya                     ; Load low byte, set CC
         rts
 .endproc
-
-;-------------------------------------------------------------------------------
-; force the init constructor to be imported
-
-        .import         initconio
-conio_init      = initconio

@@ -6,7 +6,7 @@
 
         .include        "ctype.inc"
 
-; The tables are readonly, put them into the rodata segment
+; The tables are read-only; put them into the RODATA segment.
 
 .rodata
 
@@ -22,7 +22,6 @@
 ;     all real code goes into the common library.
 ;
 ;   * We save some code in the isxxx functions.
-
 
 __ctype:
         .repeat 2

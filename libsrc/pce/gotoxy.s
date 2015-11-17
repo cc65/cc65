@@ -1,5 +1,5 @@
 ;
-; void gotoxy (unsigned char x, unsigned char y);
+; void __fastcall__ gotoxy (unsigned char x, unsigned char y);
 ;
 
         .export         gotoxy, _gotoxy

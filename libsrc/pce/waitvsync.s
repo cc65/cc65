@@ -6,9 +6,8 @@
 
         .export         _waitvsync
 
-        .forceimport    ticktock
+        .forceimport    ticktock        ; make sure that tickcount changes
 
-        .include        "pce.inc"
         .include        "extzp.inc"
 
 .proc   _waitvsync

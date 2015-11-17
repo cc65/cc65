@@ -147,7 +147,7 @@ static int DoMacAbort = 0;
 /* Counter to create local names for symbols */
 static unsigned LocalName = 0;
 
-/* Define style macros disabled if != 0 */
+/* Define-style macros disabled if != 0 */
 static unsigned DisableDefines = 0;
 
 
@@ -422,8 +422,8 @@ void MacDef (unsigned Style)
     EnterRawTokenMode ();
     NextTok ();
 
-    /* If we have a DEFINE style macro, we may have parameters in braces,
-    ** otherwise we may have parameters without braces.
+    /* If we have a DEFINE-style macro, we may have parameters in parentheses;
+    ** otherwise, we may have parameters without parentheses.
     */
     if (Style == MAC_STYLE_CLASSIC) {
         HaveParams = 1;
@@ -475,7 +475,7 @@ void MacDef (unsigned Style)
         }
     }
 
-    /* For class macros, we expect a separator token, for define style macros,
+    /* For classic macros, we expect a separator token, for define-style macros,
     ** we expect the closing paren.
     */
     if (Style == MAC_STYLE_CLASSIC) {
@@ -485,9 +485,9 @@ void MacDef (unsigned Style)
     }
 
     /* Preparse the macro body. We will read the tokens until we reach end of
-    ** file, or a .endmacro (or end of line for DEFINE style macros) and store
-    ** them into an token list internal to the macro. For classic macros, there
-    ** the .LOCAL command is detected and removed at this time.
+    ** file, or a .endmacro (or end of line for DEFINE-style macros) and store
+    ** them into a token list internal to the macro. For classic macros,
+    ** the .LOCAL command is detected and removed, at this time.
     */
     while (1) {
 
@@ -752,11 +752,11 @@ ExpandParam:
         FreeTokNode (Mac->Final);
         Mac->Final = 0;
 
-        /* Problem: When a .define style macro is expanded within the call
+        /* Problem: When a .define-style macro is expanded within the call
         ** of a classic one, the latter may be terminated and removed while
-        ** the expansion of the .define style macro is still active. Because
+        ** the expansion of the .define-style macro is still active. Because
         ** line info slots are "stacked", this runs into a CHECK FAILED. For
-        ** now, we will fix that by removing the .define style macro expansion
+        ** now, we will fix that by removing the .define-style macro expansion
         ** immediately, once the final token is placed. The better solution
         ** would probably be to not require AllocLineInfoSlot/FreeLineInfoSlot
         ** to be called in FIFO order, but this is a bigger change.
@@ -785,72 +785,74 @@ MacEnd:
 static void StartExpClassic (MacExp* E)
 /* Start expanding a classic macro */
 {
-    token_t     Term;
+    token_t Term;
 
     /* Skip the macro name */
     NextTok ();
 
-    /* Read the actual parameters */
-    while (!TokIsSep (CurTok.Tok)) {
+    /* Does this invocation have any arguments? */
+    if (!TokIsSep (CurTok.Tok)) {
 
-        TokNode* Last;
+        /* Read the actual parameters */
+        while (1) {
+            TokNode* Last;
 
-        /* Check for maximum parameter count */
-        if (E->ParamCount >= E->M->ParamCount) {
-            ErrorSkip ("Too many macro parameters");
-            break;
-        }
-
-        /* The macro may optionally be enclosed in curly braces */
-        Term = GetTokListTerm (TOK_COMMA);
-
-        /* Read tokens for one parameter, accept empty params */
-        Last = 0;
-        while (CurTok.Tok != Term && CurTok.Tok != TOK_SEP) {
-
-            TokNode* T;
-
-            /* Check for end of file */
-            if (CurTok.Tok == TOK_EOF) {
-                Error ("Unexpected end of file");
-                FreeMacExp (E);
-                return;
-            }
-
-            /* Get the next token in a node */
-            T = NewTokNode ();
-
-            /* Insert it into the list */
-            if (Last == 0) {
-                E->Params [E->ParamCount] = T;
-            } else {
-                Last->Next = T;
-            }
-            Last = T;
-
-            /* And skip it... */
-            NextTok ();
-        }
-
-        /* One parameter more */
-        ++E->ParamCount;
-
-        /* If the macro argument was enclosed in curly braces, end-of-line
-        ** is an error. Skip the closing curly brace.
-        */
-        if (Term == TOK_RCURLY) {
-            if (CurTok.Tok == TOK_SEP) {
-                Error ("End of line encountered within macro argument");
+            /* Check for maximum parameter count */
+            if (E->ParamCount >= E->M->ParamCount) {
+                ErrorSkip ("Too many macro parameters");
                 break;
             }
-            NextTok ();
-        }
 
-        /* Check for a comma */
-        if (CurTok.Tok == TOK_COMMA) {
-            NextTok ();
-        } else {
-            break;
+            /* The macro argument optionally may be enclosed in curly braces */
+            Term = GetTokListTerm (TOK_COMMA);
+
+            /* Read tokens for one parameter, accept empty params */
+            Last = 0;
+            while (CurTok.Tok != Term && CurTok.Tok != TOK_SEP) {
+                TokNode* T;
+
+                /* Check for end of file */
+                if (CurTok.Tok == TOK_EOF) {
+                    Error ("Unexpected end of file");
+                    FreeMacExp (E);
+                    return;
+                }
+
+                /* Get the next token in a node */
+                T = NewTokNode ();
+
+                /* Insert it into the list */
+                if (Last == 0) {
+                    E->Params [E->ParamCount] = T;
+                } else {
+                    Last->Next = T;
+                }
+                Last = T;
+
+                /* And skip it... */
+                NextTok ();
+            }
+
+            /* One parameter more */
+            ++E->ParamCount;
+
+            /* If the macro argument was enclosed in curly braces, end-of-line
+            ** is an error. Skip the closing curly brace.
+            */
+            if (Term == TOK_RCURLY) {
+                if (CurTok.Tok == TOK_SEP) {
+                    Error ("End of line encountered within macro argument");
+                    break;
+                }
+                NextTok ();
+            }
+
+            /* Check for a comma */
+            if (CurTok.Tok == TOK_COMMA) {
+                NextTok ();
+            } else {
+                break;
+            }
         }
     }
 
@@ -864,9 +866,9 @@ static void StartExpClassic (MacExp* E)
 
 
 static void StartExpDefine (MacExp* E)
-/* Start expanding a DEFINE style macro */
+/* Start expanding a DEFINE-style macro */
 {
-    /* A define style macro must be called with as many actual parameters
+    /* A define-style macro must be called with as many actual parameters
     ** as there are formal ones. Get the parameter count.
     */
     unsigned Count = E->M->ParamCount;
@@ -876,10 +878,9 @@ static void StartExpDefine (MacExp* E)
 
     /* Read the actual parameters */
     while (Count--) {
+        TokNode* Last;
 
-        TokNode*   Last;
-
-        /* The macro may optionally be enclosed in curly braces */
+        /* The macro argument optionally may be enclosed in curly braces */
         token_t Term = GetTokListTerm (TOK_COMMA);
 
         /* Check if there is really a parameter */
@@ -892,7 +893,6 @@ static void StartExpDefine (MacExp* E)
         /* Read tokens for one parameter */
         Last = 0;
         do {
-
             TokNode* T;
 
             /* Get the next token in a node */
@@ -936,7 +936,7 @@ static void StartExpDefine (MacExp* E)
     }
 
     /* Macro expansion will overwrite the current token. This is a problem
-    ** for define style macros since these are called from the scanner level.
+    ** for define-style macros since these are called from the scanner level.
     ** To avoid it, remember the current token and re-insert it, once macro
     ** expansion is done.
     */
@@ -1007,8 +1007,8 @@ Macro* FindMacro (const StrBuf* Name)
 
 
 Macro* FindDefine (const StrBuf* Name)
-/* Try to find the define style macro with the given name and return it. If no
-** such macro was found, return NULL.
+/* Try to find the define-style macro with the given name; and, return it.
+** If no such macro was found, return NULL.
 */
 {
     Macro* M;
@@ -1034,7 +1034,7 @@ int InMacExpansion (void)
 
 
 void DisableDefineStyleMacros (void)
-/* Disable define style macros until EnableDefineStyleMacros is called */
+/* Disable define-style macros until EnableDefineStyleMacros() is called */
 {
     ++DisableDefines;
 }
@@ -1042,8 +1042,8 @@ void DisableDefineStyleMacros (void)
 
 
 void EnableDefineStyleMacros (void)
-/* Re-enable define style macros previously disabled with
-** DisableDefineStyleMacros.
+/* Re-enable define-style macros previously disabled with
+** DisableDefineStyleMacros().
 */
 {
     PRECONDITION (DisableDefines > 0);

@@ -51,13 +51,9 @@ soft80_init:
         jmp     soft80_kclrscr
 
 soft80_shutdown:
-        lda     #$1b
-        sta     VIC_CTRL1
-        lda     #$03
-        sta     CIA2_PRA
-        lda     #$15
-        sta     VIC_VIDEO_ADR
-        rts
+
+        jsr     $fda3   ; Initialise I/O
+        jmp     $ff5b   ; Initialize screen editor
 
         .segment "INIT"
 firstinit:

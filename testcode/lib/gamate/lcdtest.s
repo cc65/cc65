@@ -1,4 +1,9 @@
+
+        .export reset, irq, nmi ; FIXME
+
+
 .include "gamate.inc"
+
 	.zeropage
 addr: .word 0
 psa:	.word 0
@@ -17,12 +22,6 @@ xpos: .byte 0
 ypos:	.byte 0
 
 	.code
-checksum:	.word 0
-	.byte 1,0,1
-	.byte "COPYRIGHT BIT CORPORATION", 0, $ff
-	jmp	reset
-	jmp nmi
-	jmp irq
 
 chars:
 .incbin "cga2.chr"
@@ -36,6 +35,7 @@ ydesc:	.byte "0123456789ABCDEFGHIJKLMNOPQRSTUV", 0
 			inc nmi_count
 			rts
 .endproc
+
 
 .proc	irq
 			inc irq_count
@@ -87,7 +87,6 @@ ydesc:	.byte "0123456789ABCDEFGHIJKLMNOPQRSTUV", 0
 			ldy #0
 			sty	lcd_y
 			jsr printstringy
-
 
 			lda #<format
 			ldx	#>format
@@ -176,6 +175,7 @@ ydesc:	.byte "0123456789ABCDEFGHIJKLMNOPQRSTUV", 0
 			sta lcd_y
 			lda #'V'
 			jsr printsign
+
 
 			lda #1
 			sta nmi_enable

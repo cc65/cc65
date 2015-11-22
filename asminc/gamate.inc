@@ -1,6 +1,6 @@
 ; gamate symbols
 
-.p02
+;.p02
 
 LCD_WIDTH = 160
 LCD_HEIGHT = 152

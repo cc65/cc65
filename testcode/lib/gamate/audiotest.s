@@ -1,3 +1,6 @@
+
+        .export reset, irq, nmi ; FIXME
+
 .include "gamate.inc"
 	.zeropage
 addr: .word 0
@@ -25,12 +28,6 @@ xpos: .byte 0
 ypos:	.byte 0
 
 	.code
-checksum:	.word 0
-	.byte 1,0,1
-	.byte "COPYRIGHT BIT CORPORATION", 0, $ff
-	jmp	reset
-	jmp nmi
-	jmp irq
 
 chars:
 .incbin "cga2.chr"

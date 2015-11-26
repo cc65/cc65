@@ -1,5 +1,9 @@
+;----------------------------------------------------------------------------
+; VGA font for the PC-Engine conio implementation
 
-; VGA charset for the PC-Engine conio implementation
+; The character tiles use only two colors from each pallette.  Color zero
+; comes from pallette zero; color one is different in each pallette.  The
+; color of a character is set by choosing one of the 16 pallettes.
 
         .byte   $00, $00, $00, $00, $00, $00, $00, $00
 

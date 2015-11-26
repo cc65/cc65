@@ -1,6 +1,5 @@
-        .interruptor    ticktock, 24
+        .interruptor    ticktock
 
-        .include        "pce.inc"
         .include        "extzp.inc"
 
 ticktock:

@@ -2,7 +2,7 @@
 ; IRQ handling (PCE version)
 ;
 
-        .export         initirq, doneirq, IRQStub
+        .export         initirq, doneirq, IRQStub, __nmi
 
         .import         __INTERRUPTOR_COUNT__, callirq_y
 
@@ -45,4 +45,4 @@ IRQStub:
         pla
         plx
 @L1:    ply
-        rti
+__nmi:  rti

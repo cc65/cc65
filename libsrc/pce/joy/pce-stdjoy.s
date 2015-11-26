@@ -36,6 +36,10 @@
 JOY_COUNT       = 4             ; Number of joysticks we support
 
 
+.bss
+
+padbuffer:      .res    JOY_COUNT
+
 .code
 
 ; ------------------------------------------------------------------------
@@ -67,7 +71,7 @@ UNINSTALL:
 
 COUNT:
         lda     #<JOY_COUNT
-        ldx     #>JOY_COUNT
+        clx                     ; ldx #>JOY_COUNT
         rts
 
 ; ------------------------------------------------------------------------
@@ -85,7 +89,6 @@ READJOY:
 
 joy1:
         lda     padbuffer,x
-        ldx     #0
         rts
 
 read_joy:
@@ -134,11 +137,6 @@ nextpad:
         sta     padbuffer,y     ; store new value
 
         iny
-        cpy     #$05
+        cpy     #.sizeof(padbuffer)
         bcc     nextpad
         rts
-
-.bss
-
-padbuffer:
-        .res    4

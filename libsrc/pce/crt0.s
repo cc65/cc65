@@ -1,18 +1,19 @@
 ;
-; Startup code for cc65 (PCEngine version)
+; Start-up code for cc65 (PC-Engine version)
 ;
 ; by Groepaz/Hitmen <groepaz@gmx.net>,
-; based on code by Ullrich von Bassewitz <uz@cc65.org>.
+; based on code by Ullrich von Bassewitz <uz@cc65.org>
 ;
-; 2018-02-11, Greg King
+; 2018-02-24, Greg King
 ;
 
         .export         _exit
-        .export         __STARTUP__ : absolute = 1      ; Mark as startup
+        .export         __STARTUP__ : absolute = 1      ; Mark as start-up
 
         .import         initlib, donelib
         .import         push0, _main
-        .import         IRQStub
+        .import         IRQStub, __nmi
+        .importzp       sp
 
         ; Linker-generated
         .import         __CARTSIZE__
@@ -23,20 +24,18 @@
         .include        "pce.inc"
         .include        "extzp.inc"
 
-        .importzp       sp
-
 ; ------------------------------------------------------------------------
-; Place the startup code in a special segment.
+; Place the start-up code in a special segment.
 
 .segment        "STARTUP"
 
-        ; Initialize CPU
+        ; Initialize the CPU.
 start:  sei
         nop
         csh                     ; Set high-speed CPU mode
         nop
 
-        ; Set up stack and memory mapping.
+        ; Set up the stack and the memory mapping.
         ldx     #$FF            ; Stack top ($21FF)
         txs
 
@@ -62,18 +61,19 @@ start:  sei
         ;lda    #$00            ; (The reset default)
         ;tam    #%10000000      ; $E000-$FFFF  Hucard/Syscard bank 0
 
-        ; Initialize hardware
+        ; Initialize the hardware.
         stz     TIMER_CTRL      ; Timer off
-        lda     #$07
+        lda     #%00000111
         sta     IRQ_MASK        ; Interrupts off
-        stz     IRQ_STATUS      ; Acknowledge timer
 
-        ; FIXME; I don't know why the heck this one doesn't work when called from a constructor. :/
+        ; FIXME; I don't know why the heck this one doesn't work when called from a constructor. -Groepaz :-/
+.if 0   ; It now seems to work (at least, in Mednafen). -Greg King
         .import vdc_init
         jsr     vdc_init
+.endif
 
-        ; Turn on background and VD interrupt/IRQ1
-        lda     #$05
+        ; Allow interrupts from the VDC.
+        lda     #%00000101
         sta     IRQ_MASK        ; IRQ1 = on
 
         ; Copy the .data segment to RAM
@@ -89,10 +89,11 @@ start:  sei
         sta     sp
         stx     sp+1
 
-        ; Call module constructors
+        ; Call the module constructors.
         jsr     initlib
 
-        cli                     ; allow IRQ only after constructors have run
+        stz     IRQ_STATUS      ; Clear IRQs
+        cli                     ; Allow IRQ only after constructors have run
 
         ; Pass an empty command line
         jsr     push0           ; argc
@@ -101,13 +102,11 @@ start:  sei
         ldy     #4              ; Argument size
         jsr     _main           ; Call the user's code
 
-        ; Call module destructors. This is also the _exit entry.
-_exit:  jsr     donelib         ; Run module destructors
+        ; Call the module destructors. This is also the exit() entry.
+_exit:  jsr     donelib
 
-        ; reset the PCEngine (start over)
+        ; Reset the PCEngine (start over).
         jmp     start
-
-_nmi:   rti
 
         .export initmainargs
 initmainargs:
@@ -121,5 +120,5 @@ initmainargs:
         .word   IRQStub         ; $FFF6 IRQ2 (External IRQ, BRK)
         .word   IRQStub         ; $FFF8 IRQ1 (VDC)
         .word   IRQStub         ; $FFFA Timer
-        .word   _nmi            ; $FFFC NMI
+        .word   __nmi           ; $FFFC NMI
         .word   start           ; $FFFE reset

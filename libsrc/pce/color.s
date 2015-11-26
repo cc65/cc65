@@ -21,6 +21,7 @@ _textcolor:
         rts
 
 _bgcolor:
+        and     #$0F
         ldx     BGCOLOR                 ; get old value
         sta     BGCOLOR                 ; set new value
         asl     a

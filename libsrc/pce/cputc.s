@@ -5,6 +5,7 @@
 
         .export         _cputcxy, _cputc, cputdirect, putchar
         .export         newline, plot
+        .forceimport    initconio       ; force conio initiation
 
         .import         gotoxy
         .import         PLOT
@@ -23,9 +24,8 @@ _cputcxy:
 
 _cputc: cmp     #$0D            ; CR?
         bne     L1
-        lda     #0
-        sta     CURS_X
-        beq     plot            ; Recalculate pointer
+        stz     CURS_X
+        bra     plot            ; Recalculate pointer
 
 L1:     cmp     #$0A            ; LF?
         beq     newline         ; Recalculate pointer
@@ -35,20 +35,16 @@ L1:     cmp     #$0A            ; LF?
 cputdirect:
         jsr     putchar         ; Write the character to the screen
 
-; Advance cursor position
+; Move the cursor (rightwards) to the next position.
 
 advance:
         ldy     CURS_X
         iny
         cpy     xsize
         bne     L3
-        jsr     newline         ; new line
-        ldy     #0              ; + CR
+        inc     CURS_Y          ; new line
+        cly                     ; + CR
 L3:     sty     CURS_X
-        jmp     plot
-
-newline:
-        inc     CURS_Y
 
 ; Set cursor position; calculate VRAM pointer.
 
@@ -57,24 +53,22 @@ plot:   ldy     CURS_X
         clc
         jmp     PLOT            ; Set the new cursor
 
+newline:
+        inc     CURS_Y
+        bra     plot
+
 ; Write one character to the screen without doing anything else.
 
 putchar:
-        ora     RVS             ; Set revers bit
+        ora     RVS             ; Set reverse bit
 
-        tax
+        st0     #VDC_MAWR       ; Memory-Address Write
+        ldy     SCREEN_PTR
+        ldx     SCREEN_PTR+1
+        sty     VDC_DATA_LO
+        stx     VDC_DATA_HI
 
-        st0     #VDC_MAWR       ; Memory Address Write
-
-        lda     SCREEN_PTR
-        sta     VDC_DATA_LO
-
-        lda     SCREEN_PTR+1
-        sta     VDC_DATA_HI
-
-        st0     #VDC_VWR        ; VWR
-
-        txa
+        st0     #VDC_VWR
         sta     VDC_DATA_LO     ; character
 
         lda     CHARCOLOR       ; pallette number
@@ -82,14 +76,7 @@ putchar:
         asl     a
         asl     a
         asl     a
-
-        ora     #$02
+        ora     #>$0200         ; high nybble of char. index
         sta     VDC_DATA_HI
 
         rts
-
-;-------------------------------------------------------------------------------
-; force the init constructor to be imported
-
-        .import initconio
-conio_init      = initconio

@@ -262,6 +262,21 @@ void WriteFiles (void)
 
 
 
+static void WriteEscaped (FILE* F, const char* Name)
+/* Write a file name to a dependency file escaping spaces */
+{
+    while (*Name) {
+        if (*Name == ' ') {
+            /* Escape spaces */
+            fputc ('\\', F);
+        }
+        fputc (*Name, F);
+        ++Name;
+    }
+}
+
+
+
 static void WriteDep (FILE* F, FileType Types)
 /* Helper function. Writes all file names that match Types to the output */
 {
@@ -285,9 +300,9 @@ static void WriteDep (FILE* F, FileType Types)
             fputc (' ', F);
         }
 
-        /* Print the dependency */
+        /* Print the dependency escaping spaces */
         Filename = GetStrBuf (E->Name);
-        fprintf (F, "%*s", SB_GetLen (Filename), SB_GetConstBuf (Filename));
+        WriteEscaped (F, SB_GetConstBuf (Filename));
     }
 }
 
@@ -305,7 +320,8 @@ static void CreateDepFile (const char* Name, FileType Types)
     }
 
     /* Print the output file followed by a tab char */
-    fprintf (F, "%s:\t", OutFile);
+    WriteEscaped (F, OutFile);
+    fputs (":\t", F);
 
     /* Write out the dependencies for the output file */
     WriteDep (F, Types);

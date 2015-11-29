@@ -95,7 +95,7 @@ No serial drivers are currently available for the Gamate.
 <sect>Limitations<p>
 
 <itemize>
-<item>When using the C-compiler, keep in mind that only 0x300 bytes RAM in total
+<item>When using the C-compiler, keep in mind that only 0x200 bytes RAM in total
 can be used for variables and the runtime stack.
 </itemize>
 

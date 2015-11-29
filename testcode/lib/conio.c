@@ -14,6 +14,14 @@
 #include <string.h>
 #include <stdlib.h>
 
+#if defined(__GAMATE__)
+#define NUMCHARS        128
+#define NUMCOLS           4
+#else
+#define NUMCHARS        256
+#define NUMCOLS          16
+#endif
+
 static char grid[5][5] = {
     { CH_ULCORNER, CH_HLINE, CH_TTEE, CH_HLINE, CH_URCORNER },
     { CH_VLINE, ' ', CH_VLINE, ' ', CH_VLINE },
@@ -29,8 +37,10 @@ void main(void)
 
         clrscr();
         screensize(&xsize, &ysize);
-        cputs("cc65 conio test\n\rInput: [        ]");
-
+        cputs("cc65 conio test\n\r");
+#if !defined(__NES__) && !defined(__PCE__) && !defined(__GAMATE__)
+        cputs("Input: [        ]");
+#endif
         cputsxy(0, 2, "Colors:" );
         tcol = textcolor(0); /* remember original textcolor */
         bgcol = bgcolor(0); /* remember original background color */
@@ -38,14 +48,14 @@ void main(void)
         bgcolor(bgcol);bordercolor(bcol);
         for (i = 0; i < 3; ++i) {
                 gotoxy(i,3 + i);
-                for (j = 0; j < 16; ++j) {
+                for (j = 0; j < NUMCOLS; ++j) {
                         textcolor(j);
                         cputc('X');
                 }
         }
         textcolor(tcol);
 
-        cprintf("\n\n\r Screensize is: %dx%d", xsize, ysize );
+        cprintf("\n\n\r Screensize: %dx%d", xsize, ysize );
 
         chlinexy(0,6,xsize);
         cvlinexy(0,6,3);
@@ -63,13 +73,13 @@ void main(void)
                 }
         }
 
-        gotoxy(0,ysize - 2 - ((256 + xsize) / xsize));
+        gotoxy(0,ysize - 2 - ((NUMCHARS + xsize) / xsize));
         revers(1);
         for (i = 0; i < xsize; ++i) {
                 cputc('0' + i % 10);
         }
         revers(0);
-        for (i = 0; i < 256; ++i) {
+        for (i = 0; i < NUMCHARS; ++i) {
             if ((i != '\n') && (i != '\r')) {
                     cputc(i);
             } else {
@@ -89,13 +99,14 @@ void main(void)
         for(;;) {
 
                 gotoxy(8, 2);
-                j = n & 1;
+                j = n >> 4 & 1;
                 revers(j);
                 cputc(j ? 'R' : ' ');
                 revers(j ^ 1);
-                cputs(" revers");
+                cputs(" rvs");
                 revers(0);
 
+#if !defined(__NES__) && !defined(__PCE__) && !defined(__GAMATE__)
                 gotoxy(8 + inpos,1);
                 i = cgetc();
                 if ((i >= '0') && (i<='9')) {
@@ -120,6 +131,10 @@ void main(void)
                     cputc(i);
                     inpos = (inpos + 1) & 7;
                 }
+#endif
+#if defined(__NES__) || defined(__PCE__) || defined(__GAMATE__)
+                waitvblank();
+#endif
 
                 ++n;
         }

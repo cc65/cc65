@@ -1,43 +1,70 @@
-; gamate symbols
+;-------------------------------------------------------------------------------
+;                                gamate.inc
+;
+;                   Gamate system specific definitions
+;
+; (w) 2015 Groepaz/Hitmen (groepaz@gmx.net)
+;     based on technical reference by PeT (mess@utanet.at)
+;-------------------------------------------------------------------------------
 
-;.p02
+; look at gamate.h for comments, they are not duplicated here
 
-LCD_WIDTH = 160
-LCD_HEIGHT = 152
+AUDIO_BASE      = $4000
 
-lcd_base = $5000
-lcd_mode = $5001
-lcd_mode_y_increment = $40
-lcd_x_pos = $5002
-lcd_x_pos_plane2_flag =$80
-lcd_y_pos = $5003
-lcd_x = $5004
-lcd_y = $5005
-lcd_read = $5006
-lcd_data = $5007
+JOY_DATA        = $4400
 
-audio_base =$4000
+JOY_DATA_UP     = $01
+JOY_DATA_DOWN   = $02
+JOY_DATA_LEFT   = $04
+JOY_DATA_RIGHT  = $08
+JOY_DATA_FIRE_A = $10
+JOY_DATA_FIRE_B = $20
+JOY_DATA_START  = $40
+JOY_DATA_SELECT = $80
 
-controls = $4400
-; active low
-up=1
-down=2
-left=4
-right=8
-button_a=$10
-button_b=$20
-start=$40
-select=$80
+LCD_WIDTH       = 160
+LCD_HEIGHT      = 152
 
-cart_main = $6020
-;cart_nmi = $6023
-cart_irq = $6026 ; 135 hz
-cart_font = $6029
+LCD_BASE        = $5000
+LCD_MODE        = $5001
+LCD_XPOS        = $5002
+LCD_YPOS        = $5003
+LCD_X           = $5004
+LCD_Y           = $5005
+LCD_READ        = $5006
+LCD_DATA        = $5007
 
-nmi_enable = $c
-nmi_4800 = $a
+LCD_MODE_INC_X  = $00
+LCD_MODE_INC_Y  = $40
+LCD_XPOS_PLANE1 = $00
+LCD_XPOS_PLANE2 = $80
 
-_f009 = $f009 ; wait 1/60s
-_f00c = $f00c ; install font
-_f012 = $f012 ; write screen
+; constants for the conio implementation
+charsperline    = (LCD_WIDTH / 8)
+screenrows      = (LCD_HEIGHT / 8)
+
+CH_HLINE        = 1
+CH_VLINE        = 2
+
+COLOR_WHITE     = 0
+COLOR_GREY2     = 1
+COLOR_GREY1     = 2
+COLOR_BLACK     = 3
+
+;-------------------------------------------------------------------------------
+; bios zp usage:
+;
+; 06/07         address of character set bitplane 1
+; 08/09         address of character set bitplane 2
+; 0a            nmi $4800 echo
+; 0b            irq counter
+; 0c            nmi call cart nmi
+; 0e/0f/10/11   big endian irq counter
+; 15/16/17      ?/xpos/ypos
+;
+; e8            nmi reset to $ff
+;
+
+ZP_NMI_4800     = $0a
+ZP_NMI_ENABLE   = $0c
 

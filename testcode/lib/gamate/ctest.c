@@ -1,0 +1,52 @@
+
+#include <gamate.h>
+#include <time.h>
+#include <conio.h>
+
+unsigned char y = 0;
+unsigned char x;
+unsigned short n;
+
+int main(int argc, char *argv[])
+{
+    clrscr();
+    gotoxy(0,0);cputs("abcdABCD");
+
+    textcolor(0);gotoxy(0,5);cputs("abcdABCD 0");
+    textcolor(1);gotoxy(0,6);cputs("abcdABCD  1");
+    textcolor(2);gotoxy(0,7);cputs("abcdABCD   2");
+    textcolor(3);gotoxy(0,8);cputs("abcdABCD    3");
+
+    while(1) {
+        textcolor(COLOR_BLACK);
+
+        n = clock();
+
+        gotoxy(0,2);cprintf("%04x %02x %02x", n, x, y);
+
+        switch((*((unsigned char*)JOY_DATA))) {
+            case 0xff ^ JOY_DATA_UP:
+                ++y;
+                break;
+            case 0xff ^ JOY_DATA_DOWN:
+                --y;
+                break;
+            case 0xff ^ JOY_DATA_LEFT:
+                ++x;
+                break;
+            case 0xff ^ JOY_DATA_RIGHT:
+                --x;
+                break;
+            case 0xff ^ JOY_DATA_FIRE_A:
+                break;
+        }
+
+        (*((unsigned char*)LCD_XPOS)) = x;
+        (*((unsigned char*)LCD_YPOS)) = y;
+
+        waitvblank();
+
+    }
+
+    return 0;
+}

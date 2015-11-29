@@ -1,7 +1,6 @@
 
 ; original lcdtest.s by PeT (mess@utanet.at)
 
-        .export _main
         .include "gamate.inc"
 
         .zeropage
@@ -32,14 +31,14 @@ xdesc:          .byte "0123456789abcdefghijklmnopqrstuv", 0
 ydesc:          .byte "0123456789ABCDEFGHIJKLMNOPQRSTUV", 0
 
 ;-------------------------------------------------------------------------------
+        .export IRQStub, NMIStub
 
-.proc   nmi
+
+.proc   NMIStub
 
         inc     nmi_count
         rts
 .endproc
-
-        .export IRQStub
 
 .proc   IRQStub
 
@@ -55,8 +54,9 @@ ydesc:          .byte "0123456789ABCDEFGHIJKLMNOPQRSTUV", 0
 .endproc
 
 ;-------------------------------------------------------------------------------
+        .export Start
 
-.proc   _main
+.proc   Start
 
         lda #0
         sta	LCD_XPOS

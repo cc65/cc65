@@ -13,6 +13,9 @@ int main(int argc, char *argv[]) {
     }
     in = fopen(argv[1], "rb");
     out = fopen(argv[2], "wb");
+    if (!in || !out) {
+        exit(-1);
+    }
     len = fread(buffer, 1, 512 * 1024, in);
     n = 0; for (i = 0x1000; i < 0x2000; i++) {
         n += buffer[i];
@@ -22,4 +25,5 @@ int main(int argc, char *argv[]) {
     fwrite(buffer, 1, len, out);
     fclose(in);
     fclose(out);
+    return (0);
 }

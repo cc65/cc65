@@ -4,7 +4,7 @@
 #include <conio.h>
 
 unsigned char y = 0;
-unsigned char x;
+unsigned char x = 0;
 unsigned short n;
 
 int main(int argc, char *argv[])
@@ -22,14 +22,14 @@ int main(int argc, char *argv[])
 
         n = clock();
 
-        gotoxy(0,2);cprintf("%04x %02x %02x", n, x, y);
+        gotoxy(0,2);cprintf("%04x %02x %02x %02x", n, x, y, *((unsigned char*)JOY_DATA));
 
         switch((*((unsigned char*)JOY_DATA))) {
             case 0xff ^ JOY_DATA_UP:
-                ++y;
+                ++y; if (y == 0xc8) y = 0;
                 break;
             case 0xff ^ JOY_DATA_DOWN:
-                --y;
+                --y; if (y == 0xff) y = 0xc7;
                 break;
             case 0xff ^ JOY_DATA_LEFT:
                 ++x;
@@ -40,13 +40,11 @@ int main(int argc, char *argv[])
             case 0xff ^ JOY_DATA_FIRE_A:
                 break;
         }
-        if (y == 0xff) y = 0xc7;
-        if (y == 0xc8) y = 0;
+
+        waitvblank();
 
         (*((unsigned char*)LCD_XPOS)) = x;
         (*((unsigned char*)LCD_YPOS)) = y;
-
-        waitvblank();
 
     }
 

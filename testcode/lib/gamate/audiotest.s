@@ -1,7 +1,6 @@
 
 ; original audiotest.s by PeT (mess@utanet.at)
 
-        .export _main
         .include "gamate.inc"
 
         .zeropage
@@ -29,17 +28,15 @@ psy:	.byte 0
 xpos: .byte 0
 ypos:	.byte 0
 
-.code
+        .code
 
-chars:
-                .incbin "cga2.chr"
-
-hex2asc:	.byte "0123456789abcdef"
+chars:          .incbin "cga2.chr"
+hex2asc:        .byte "0123456789abcdef"
 
 ;-------------------------------------------------------------------------------
-        .export IRQStub
+        .export IRQStub, NMIStub
 
-.proc nmi
+.proc   NMIStub
         inc nmi_count
         rts
 .endproc
@@ -50,8 +47,9 @@ hex2asc:	.byte "0123456789abcdef"
 .endproc
 
 ;-------------------------------------------------------------------------------
+        .export Start
 
-.proc _main
+.proc   Start
         lda #>AUDIO_BASE
         sta writeaddr+1
         sta readaddr+1

@@ -10,7 +10,6 @@
 
         .segment        "INIT"
 initconio:
-        ; FIXME
         lda     #0
         sta     LCD_XPOS
         sta     LCD_YPOS

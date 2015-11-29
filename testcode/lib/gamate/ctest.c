@@ -10,7 +10,7 @@ unsigned short n;
 int main(int argc, char *argv[])
 {
     clrscr();
-    gotoxy(0,0);cputs("abcdABCD");
+    gotoxy(0,0);cputs("Gamate C-Test");
 
     textcolor(0);gotoxy(0,5);cputs("abcdABCD 0");
     textcolor(1);gotoxy(0,6);cputs("abcdABCD  1");
@@ -40,6 +40,8 @@ int main(int argc, char *argv[])
             case 0xff ^ JOY_DATA_FIRE_A:
                 break;
         }
+        if (y == 0xff) y = 0xc7;
+        if (y == 0xc8) y = 0;
 
         (*((unsigned char*)LCD_XPOS)) = x;
         (*((unsigned char*)LCD_YPOS)) = y;

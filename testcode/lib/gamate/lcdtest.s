@@ -1,12 +1,14 @@
 
-        .export _main
-.include "gamate.inc"
+; original lcdtest.s by PeT (mess@utanet.at)
 
-.zeropage
-addr: .word 0
+        .export _main
+        .include "gamate.inc"
+
+        .zeropage
+addr:   .word 0
 psa:	.word 0
 
-.data
+        .data
 temp_x:	.byte 0
 temp_y:	.byte	0
 temp_a:	.byte 0

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (w) 2015 Groepaz/Hitmen (groepaz@gmx.net)                                                  */
+/* (w) 2015 Groepaz/Hitmen (groepaz@gmx.net)                                 */
 /*     based on technical reference by PeT (mess@utanet.at)                  */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */

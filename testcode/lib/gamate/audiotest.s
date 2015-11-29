@@ -1,11 +1,11 @@
 
-;        .export reset, irq, nmi ; FIXME
-        .export _main
+; original audiotest.s by PeT (mess@utanet.at)
 
+        .export _main
         .include "gamate.inc"
 
-.zeropage
-addr: .word 0
+        .zeropage
+addr:   .word 0
 psa:	.word 0
 
 .word 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0 ; get out of sensitiv area
@@ -32,7 +32,7 @@ ypos:	.byte 0
 .code
 
 chars:
-.incbin "cga2.chr"
+                .incbin "cga2.chr"
 
 hex2asc:	.byte "0123456789abcdef"
 

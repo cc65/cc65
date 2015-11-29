@@ -106,7 +106,7 @@ static emd_test_t drivers[] = {
     { '0', "CBM6x0/7x0 RAM in bank 2", "cbm610-ram.emd" },
 #endif
 
-    { NULL, NULL }
+    { 0, NULL, NULL }
 };
 
 int main (void)
@@ -123,13 +123,13 @@ int main (void)
 
     clrscr ();
     cputs ("Which RAM exp to test?\r\n\r\n");
-    for (index = 0; drivers[index].displayname; ++index) {
+    for (index = 0; drivers[index].key; ++index) {
         cprintf("%c: %s\r\n", drivers[index].key, drivers[index].displayname);
     }
 
-    while (valid_key == -1) {
+    while (valid_key < 0) {
         key = cgetc();
-        for (index = 0; drivers[index].displayname && valid_key == -1; ++index) {
+        for (index = 0; drivers[index].key && valid_key < 0; ++index) {
             if (key == drivers[index].key) {
                 valid_key = index;
             }

@@ -103,8 +103,8 @@ unsigned _clocks_per_sec (void);
 #  define CLK_TCK               60      /* POSIX */
 #  define CLOCKS_PER_SEC        60      /* ANSI */
 #elif  defined(__GAMATE__)
-#  define CLK_TCK               60      /* POSIX */     /* FIXME */
-#  define CLOCKS_PER_SEC        60      /* ANSI */      /* FIXME */
+#  define CLK_TCK               135     /* POSIX */     /* FIXME */
+#  define CLOCKS_PER_SEC        135     /* ANSI */      /* FIXME */
 #elif  defined(__GEOS__)
 #  define CLK_TCK               1       /* POSIX */
 #  define CLOCKS_PER_SEC        1       /* ANSI */

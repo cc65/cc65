@@ -41,7 +41,8 @@
 /*
    base clock cpu clock/32 ?
 
-0/1: 1. channel(right): 12 bit frequency: right frequency 0 nothing, 1 high; 3 23khz; 4 17,3; 10 6,9; 15 4.6; $60 720hz; $eff 18,0; $fff 16,9 hz)
+0/1: 1. channel(right): 12 bit frequency: right frequency 0 nothing, 1 high;
+  3 23khz; 4 17,3; 10 6,9; 15 4.6; $60 720hz; $eff 18,0; $fff 16,9 hz)
  (delay clock/32)
 2/3: 2. channel(left): 12 bit frequency
 4/5: 3. channel(both): 12 bit frequency
@@ -132,6 +133,26 @@
 #define LCD_READ        0x5006  /* read from RAM (no auto inc?) */
 #define LCD_DATA        0x5007  /* write to RAM */
 
+/* BIOS zeropage usage */
+
+/* locations 0x0a-0x0c, 0x0e-0x11 and 0xe8 are in use by the BIOS IRQ/NMI handlers */
+#define ZP_NMI_4800     0x0a    /* content of I/O reg 4800 gets copied here each NMI */
+
+#define ZP_IRQ_COUNT    0x0b    /* increments once per IRQ, used elsewhere in the
+                                   BIOS for synchronisation purposes */
+#define ZP_IRQ_CTRL     0x0c    /* if 0 then cartridge irq stubs will not get called */
+
+/* each of the following 4 increments by 1 per IRQ - it is _not_ a 32bit
+   counter (see code at $ffa6 in BIOS)
+   these are not used elsewhere in the bios and can be (re)setted as needed by
+   the user.
+*/
+#define ZP_IRQ_CNT1     0x0e
+#define ZP_IRQ_CNT2     0x0f
+#define ZP_IRQ_CNT3     0x10
+#define ZP_IRQ_CNT4     0x11
+
+#define ZP_NMI_FLAG     0xe8    /* set to 0xff each NMI */
 
 /* constants for the conio implementation */
 #define COLOR_BLACK     0x03

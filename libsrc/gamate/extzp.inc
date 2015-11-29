@@ -1,7 +1,7 @@
 ;
 ; extzp.inc for the Gamate
 ;
-; Groepaz/Hitmen, 2015-11-19
+; Groepaz/Hitmen, 2015-11-27
 ;
 ; Assembler include file that imports the runtime zero page locations used
 ; by the Gamate runtime, ready for usage in asm code.

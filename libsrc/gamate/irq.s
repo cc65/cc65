@@ -30,9 +30,10 @@ doneirq:
 ; -> guess 16384 clock cycles = 135,28hz (might be audio signal 1/512?)
 
 IRQStub:
-        pha
-        tya
-        pha
+        ; A and Y are saved by the BIOS
+        ;pha
+        ;tya
+        ;pha
 
         ldy     #<(__INTERRUPTOR_COUNT__ * 2)
         beq     @L1
@@ -45,7 +46,7 @@ IRQStub:
         pla
         tax
 
-@L1:    pla
-        tay
-        pla
+@L1:    ;pla
+        ;tay
+        ;pla
         rts

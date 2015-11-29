@@ -17,8 +17,12 @@ Start:
         sei
         cld
 
+        ldx     #0
+        stx     ZP_IRQ_CTRL     ; disable calling cartridge IRQ/NMI handler
+
         ; Setup stack and memory mapping
-        ldx     #$FF            ; Stack top ($01FF)
+        ;ldx     #$FF            ; Stack top ($01FF)
+        dex
         txs
 
         ; Clear the BSS data
@@ -36,6 +40,8 @@ Start:
         ; Call module constructors
         jsr     initlib
 
+        lda     #1
+        sta     ZP_IRQ_CTRL     ; enable calling cartridge IRQ/NMI handler
         cli     ; allow IRQ only after constructors have run
 
         ; Pass an empty command line

@@ -65,16 +65,6 @@ plot:   ldy     CURS_X
 ; position in Y
 
 putchar:
-
-; FIXME
-;        ora     RVS             ; Set revers bit
-
-;        sty     temp_y
-;        stx     temp_x
-;        sta     temp_a
-
-;        lda     temp_a
-
         sta     ptr3
 
         txa
@@ -139,8 +129,6 @@ putchar:
         bne     @copylp2
 
 @skip_plane2:
-
-
         pla
         tax
         ldy     CURS_X

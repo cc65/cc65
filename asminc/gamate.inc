@@ -51,20 +51,14 @@ COLOR_GREY2     = 1
 COLOR_GREY1     = 2
 COLOR_BLACK     = 3
 
-;-------------------------------------------------------------------------------
 ; bios zp usage:
-;
-; 06/07         address of character set bitplane 1
-; 08/09         address of character set bitplane 2
-; 0a            nmi $4800 echo
-; 0b            irq counter
-; 0c            nmi call cart nmi
-; 0e/0f/10/11   big endian irq counter
-; 15/16/17      ?/xpos/ypos
-;
-; e8            nmi reset to $ff
-;
-
 ZP_NMI_4800     = $0a
-ZP_NMI_ENABLE   = $0c
+ZP_IRQ_COUNT    = $0b
+ZP_IRQ_CTRL     = $0c
 
+ZP_IRQ_CNT1     = $0e
+ZP_IRQ_CNT2     = $0f
+ZP_IRQ_CNT3     = $10
+ZP_IRQ_CNT4     = $11
+
+ZP_NMI_FLAG     = $e8

@@ -6,10 +6,10 @@
         .export _clrscr
 _clrscr:
         ldy     #$0
+        tya
 rowloop:
         sty     LCD_X
 
-        lda     #0
         sta     LCD_Y
 
         ldx     #$0

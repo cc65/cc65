@@ -70,7 +70,7 @@ INSTALL:
         stx     curpage+1               ; Invalidate the current page
         inx
         txa                             ; A = X = EM_ERR_OK
-        rts
+;       rts                             ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------
 ; UNINSTALL routine. Is called before the driver is removed from memory.

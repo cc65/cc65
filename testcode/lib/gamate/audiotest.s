@@ -275,6 +275,7 @@ notstart:
         lda     controlsedge
         and     #JOY_DATA_SELECT
         bne     notselect
+
         lda     editbuffer1
         sta     AUDIO_BASE
         lda     editbuffer1+1

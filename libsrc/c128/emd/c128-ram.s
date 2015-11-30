@@ -51,7 +51,7 @@ PAGES   = (TOPMEM - BASE) / 256
 ; Data.
 
 .bss
-curpage:        .res    1               ; Current page number
+curpage:        .res    2               ; Current page number
 
 window:         .res    256             ; Memory "window"
 
@@ -96,7 +96,8 @@ PAGECOUNT:
 ; by the driver.
 ;
 
-MAP:    sta     curpage
+MAP:    sei
+        sta     curpage
         stx     curpage+1               ; Remember the new page
 
         clc
@@ -120,6 +121,7 @@ MAP:    sta     curpage
 
         lda     #<window
         ldx     #>window                ; Return the window address
+        cli
         rts
 
 ; ------------------------------------------------------------------------
@@ -134,7 +136,8 @@ USE:    sta     curpage
 ; ------------------------------------------------------------------------
 ; COMMIT: Commit changes in the memory window to extended storage.
 
-COMMIT: lda     curpage                 ; Get the current page
+COMMIT: sei
+        lda     curpage                 ; Get the current page
         ldx     curpage+1
         bmi     done                    ; Jump if no page mapped
 
@@ -157,7 +160,8 @@ COMMIT: lda     curpage                 ; Get the current page
 
 ; Done
 
-done:   rts
+done:   cli
+        rts
 
 ; ------------------------------------------------------------------------
 ; COPYFROM: Copy from extended into linear memory. A pointer to a structure
@@ -166,6 +170,7 @@ done:   rts
 ;
 
 COPYFROM:
+        sei
         sta     ptr3
         stx     ptr3+1                  ; Save the passed em_copy pointer
 
@@ -223,7 +228,8 @@ COPYFROM:
 
 ; Done
 
-@L4:    rts
+@L4:    cli
+        rts
 
 ; ------------------------------------------------------------------------
 ; COPYTO: Copy from linear into extended memory. A pointer to a structure
@@ -231,7 +237,8 @@ COPYFROM:
 ; The function must not return anything.
 ;
 
-COPYTO: sta     ptr3
+COPYTO: sei
+        sta     ptr3
         stx     ptr3+1                  ; Save the passed em_copy pointer
 
         ldy     #EM_COPY::OFFS
@@ -288,5 +295,5 @@ COPYTO: sta     ptr3
 
 ; Done
 
-@L4:    rts
-
+@L4:    cli
+        rts

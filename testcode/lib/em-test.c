@@ -96,6 +96,7 @@ static emd_test_t drivers[] = {
     { '3', "RamCart", "c128-ramcart.emd" },
     { '4', "REU", "c128-reu.emd" },
     { '5', "VDC", "c128-vdc.emd" },
+    { '6', "Internal Function RAM", "c128-ifnram.emd" },
 #endif
 
 #if defined(__CBM510__)

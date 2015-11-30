@@ -15,6 +15,7 @@
 #include <stdlib.h>
 
 #if defined(__GAMATE__)
+/* there is not enough screen space to show all 256 characters at the bottom */
 #define NUMCHARS        128
 #define NUMCOLS           4
 #else
@@ -132,6 +133,7 @@ void main(void)
                     inpos = (inpos + 1) & 7;
                 }
 #endif
+/* not all targets have waitvblank() */
 #if defined(__NES__) || defined(__PCE__) || defined(__GAMATE__)
                 waitvblank();
 #endif

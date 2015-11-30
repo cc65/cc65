@@ -158,25 +158,25 @@
 #define COLOR_BLACK     0x03
 #define COLOR_WHITE     0x00
 
-#define CH_HLINE                1
-#define CH_VLINE                2
-#define CH_CROSS                3
-#define CH_ULCORNER             4
-#define CH_URCORNER             5
-#define CH_LLCORNER             6
-#define CH_LRCORNER             7
-#define CH_TTEE                 8
-#define CH_BTEE                 9
+#define CH_HLINE        1
+#define CH_VLINE        2
+#define CH_CROSS        3
+#define CH_ULCORNER     4
+#define CH_URCORNER     5
+#define CH_LLCORNER     6
+#define CH_LRCORNER     7
+#define CH_TTEE         8
+#define CH_BTEE         9
 
-#define CH_RTEE                 11
-#define CH_LTEE                 12
+#define CH_RTEE         11
+#define CH_LTEE         12
 
-#define CH_ENTER                13
-#define CH_PI                   18
+#define CH_ENTER        13
+#define CH_PI           18
 
-#define TV_NTSC                 0
-#define TV_PAL                  1
-#define TV_OTHER                2
+#define TV_NTSC         0
+#define TV_PAL          1
+#define TV_OTHER        2
 
 /* No support for dynamically loadable drivers */
 #define DYN_DRV         0
@@ -184,15 +184,15 @@
 /* The addresses of the static drivers */
 extern void gamate_stdjoy_joy[];   /* Referred to by joy_static_stddrv[] */
 
-#define JOY_FIRE_B              5
-#define JOY_START               6
-#define JOY_SELECT              7
+#define JOY_FIRE_B      5
+#define JOY_START       6
+#define JOY_SELECT      7
 
 void waitvblank (void);
 /* Wait for the vertical blanking */
 
 /* NOTE: all Gamate are "NTSC" */
-#define get_tv()                TV_NTSC
+#define get_tv()        TV_NTSC
 /* Return the video mode the machine is using. */
 
 /* End of gamate.h */

@@ -72,7 +72,8 @@ putchar:
 
         lda     #0
         sta     ptr3+1
-        ; * 8
+
+        ; char index * 8
         asl     ptr3
         rol     ptr3+1
         asl     ptr3
@@ -80,6 +81,7 @@ putchar:
         asl     ptr3
         rol     ptr3+1
 
+        ; plus fontdata base address
         lda     ptr3
         clc
         adc     #<(fontdata-$f8)

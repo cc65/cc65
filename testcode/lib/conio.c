@@ -13,6 +13,7 @@
 #include <conio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <joystick.h>
 
 static char grid[5][5] = {
     { CH_ULCORNER, CH_HLINE, CH_TTEE, CH_HLINE, CH_URCORNER },
@@ -45,7 +46,7 @@ void main(void)
         }
         textcolor(tcol);
 
-        cprintf("\n\n\r Screensize is: %dx%d", xsize, ysize );
+        cprintf("\n\n\r Screensize is: %dx%d", xsize, ysize);
 
         chlinexy(0,6,xsize);
         cvlinexy(0,6,3);
@@ -86,7 +87,7 @@ void main(void)
         revers(0);
 
         cursor(1);
-        for(;;) {
+        for (;;) {
 
                 gotoxy(8, 2);
                 j = n & 1;
@@ -95,6 +96,14 @@ void main(void)
                 revers(j ^ 1);
                 cputs(" revers");
                 revers(0);
+
+#if defined(__NES__) || defined(__PCE__)
+
+                joy_install(joy_static_stddrv);
+                while (!joy_read(JOY_1)) ;
+                joy_uninstall();
+
+#else
 
                 gotoxy(8 + inpos,1);
                 i = cgetc();
@@ -121,8 +130,8 @@ void main(void)
                     inpos = (inpos + 1) & 7;
                 }
 
+#endif
+
                 ++n;
         }
-
-        for(;;);
 }

@@ -144,7 +144,7 @@
 
 /* each of the following 4 increments by 1 per IRQ - it is _not_ a 32bit
    counter (see code at $ffa6 in BIOS)
-   these are not used elsewhere in the bios and can be (re)setted as needed by
+   these are not used elsewhere in the bios and can be (re)set as needed by
    the user.
 */
 #define ZP_IRQ_CNT1     0x0e

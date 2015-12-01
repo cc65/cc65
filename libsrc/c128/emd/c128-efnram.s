@@ -1,5 +1,5 @@
 ;
-; Extended memory driver for the C128 Internal Function RAM. Driver works
+; Extended memory driver for the C128 External Function RAM. Driver works
 ; without problems when statically linked.
 ;
 ; Marco van den Heuvel, 2015-11-30
@@ -18,7 +18,7 @@
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-        module_header   _c128_ifnram_emd
+        module_header   _c128_efnram_emd
 
 ; Driver signature
 
@@ -73,15 +73,15 @@ INSTALL:
         stx     FETVEC
         stx     STAVEC
         ldy     #0
-        ldx     #MMU_CFG_INT_FROM
+        ldx     #MMU_CFG_EXT_FROM
         jsr     FETCH
         tax
         inx
         txa
         sta     tmp1
-        ldx     #MMU_CFG_INT_FROM
+        ldx     #MMU_CFG_EXT_FROM
         jsr     STASH
-        ldx     #MMU_CFG_INT_FROM
+        ldx     #MMU_CFG_EXT_FROM
         jsr     FETCH
         cmp     tmp1
         beq     @ram_present
@@ -138,7 +138,7 @@ MAP:    sei
 
 ; Transfer one page
 
-@L1:    ldx     #MMU_CFG_INT_FROM
+@L1:    ldx     #MMU_CFG_EXT_FROM
         jsr     FETCH
         sta     window,y
         iny
@@ -180,7 +180,7 @@ COMMIT: sei
 ; Transfer one page. Y must be zero on entry
 
 @L1:    lda     window,y
-        ldx     #MMU_CFG_INT_FROM
+        ldx     #MMU_CFG_EXT_FROM
         jsr     STASH
         iny
         bne     @L1
@@ -228,7 +228,7 @@ COPYFROM:
 ; Copy full pages
 
         ldy     #$00
-@L1:    ldx     #MMU_CFG_INT_FROM
+@L1:    ldx     #MMU_CFG_EXT_FROM
         jsr     FETCH
         sta     (ptr2),y
         iny
@@ -246,7 +246,7 @@ COPYFROM:
         sta     tmp1
 
         ldy     #$00
-@L3:    ldx     #MMU_CFG_INT_FROM
+@L3:    ldx     #MMU_CFG_EXT_FROM
         jsr     FETCH
         sta     (ptr2),y
         iny
@@ -296,7 +296,7 @@ COPYTO: sei
 
         ldy     #$00
 @L1:    lda     (ptr2),y
-        ldx     #MMU_CFG_INT_FROM
+        ldx     #MMU_CFG_EXT_FROM
         jsr     STASH
         iny
         bne     @L1
@@ -314,7 +314,7 @@ COPYTO: sei
 
         ldy     #$00
 @L3:    lda     (ptr2),y
-        ldx     #MMU_CFG_INT_FROM
+        ldx     #MMU_CFG_EXT_FROM
         jsr     STASH
         iny
         dec     tmp1

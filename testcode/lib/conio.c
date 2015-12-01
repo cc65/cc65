@@ -13,6 +13,7 @@
 #include <conio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <joystick.h>
 
 #if defined(__GAMATE__)
 /* there is not enough screen space to show all 256 characters at the bottom */
@@ -35,13 +36,16 @@ void main(void)
 {
         int i, j, n;
         unsigned char xsize, ysize, tcol, bgcol, bcol, inpos = 0;
+#if defined(__NES__) || defined(__PCE__) || defined(__GAMATE__)
+        unsigned char joy;
 
+        joy_install(joy_static_stddrv);
+#endif
         clrscr();
         screensize(&xsize, &ysize);
         cputs("cc65 conio test\n\r");
-#if !defined(__NES__) && !defined(__PCE__) && !defined(__GAMATE__)
-        cputs("Input: [        ]");
-#endif
+        cputs("Input:[        ]");
+
         cputsxy(0, 2, "Colors:" );
         tcol = textcolor(0); /* remember original textcolor */
         bgcol = bgcolor(0); /* remember original background color */
@@ -97,8 +101,10 @@ void main(void)
         revers(0);
 
         cursor(1);
-        for(;;) {
+        for (;;) {
 
+                /* do the "rvs" blinking */
+                i = textcolor(COLOR_BLACK);
                 gotoxy(8, 2);
                 j = n >> 4 & 1;
                 revers(j);
@@ -106,9 +112,18 @@ void main(void)
                 revers(j ^ 1);
                 cputs(" rvs");
                 revers(0);
+                textcolor(i);
 
-#if !defined(__NES__) && !defined(__PCE__) && !defined(__GAMATE__)
-                gotoxy(8 + inpos,1);
+                gotoxy(7 + inpos,1);
+
+#if defined(__NES__) || defined(__PCE__) || defined(__GAMATE__)
+                /* not all targets have waitvblank */
+                waitvblank();
+                /* for targets that do not have a keyboard, read the first
+                   joystick */
+                joy = joy_read(JOY_1);
+                cprintf("%02x", joy);
+#else
                 i = cgetc();
                 if ((i >= '0') && (i<='9')) {
                     textcolor(i - '0');
@@ -133,13 +148,6 @@ void main(void)
                     inpos = (inpos + 1) & 7;
                 }
 #endif
-/* not all targets have waitvblank() */
-#if defined(__NES__) || defined(__PCE__) || defined(__GAMATE__)
-                waitvblank();
-#endif
-
                 ++n;
         }
-
-        for(;;);
 }

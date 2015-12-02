@@ -96,8 +96,7 @@ PAGECOUNT:
 ; by the driver.
 ;
 
-MAP:    sei
-        sta     curpage
+MAP:    sta     curpage
         stx     curpage+1               ; Remember the new page
 
         clc
@@ -108,6 +107,7 @@ MAP:    sei
 
         lda     #<ptr1
         sta     FETVEC
+        sei
 
 ; Transfer one page
 
@@ -116,12 +116,12 @@ MAP:    sei
         sta     window,y
         iny
         bne     @L1
+        cli
 
 ; Return the memory window
 
         lda     #<window
         ldx     #>window                ; Return the window address
-        cli
         rts
 
 ; ------------------------------------------------------------------------
@@ -136,8 +136,7 @@ USE:    sta     curpage
 ; ------------------------------------------------------------------------
 ; COMMIT: Commit changes in the memory window to extended storage.
 
-COMMIT: sei
-        lda     curpage                 ; Get the current page
+COMMIT: lda     curpage                 ; Get the current page
         ldx     curpage+1
         bmi     done                    ; Jump if no page mapped
 
@@ -149,6 +148,7 @@ COMMIT: sei
 
         lda     #<ptr1
         sta     STAVEC
+        sei
 
 ; Transfer one page. Y must be zero on entry
 
@@ -157,11 +157,11 @@ COMMIT: sei
         jsr     STASH
         iny
         bne     @L1
+        cli
 
 ; Done
 
-done:   cli
-        rts
+done:   rts
 
 ; ------------------------------------------------------------------------
 ; COPYFROM: Copy from extended into linear memory. A pointer to a structure
@@ -170,7 +170,6 @@ done:   cli
 ;
 
 COPYFROM:
-        sei
         sta     ptr3
         stx     ptr3+1                  ; Save the passed em_copy pointer
 
@@ -201,6 +200,7 @@ COPYFROM:
 ; Copy full pages
 
         ldy     #$00
+        sei
 @L1:    ldx     #MMU_CFG_RAM1
         jsr     FETCH
         sta     (ptr2),y
@@ -237,8 +237,7 @@ COPYFROM:
 ; The function must not return anything.
 ;
 
-COPYTO: sei
-        sta     ptr3
+COPYTO: sta     ptr3
         stx     ptr3+1                  ; Save the passed em_copy pointer
 
         ldy     #EM_COPY::OFFS
@@ -268,6 +267,7 @@ COPYTO: sei
 ; Copy full pages
 
         ldy     #$00
+        sei
 @L1:    lda     (ptr2),y
         ldx     #MMU_CFG_RAM1
         jsr     STASH

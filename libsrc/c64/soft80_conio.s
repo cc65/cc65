@@ -25,12 +25,12 @@ soft80_init:
         ; colorram being set up as expected, which is why we cant use the
         ; _bgcolor and _textcolor functions here.
 
-        lda     CHARCOLOR                       ; use current textcolor
-        and     #$0f                            ; make sure the upper nibble is 0s
+        lda     CHARCOLOR       ; use current textcolor
+        and     #$0F            ; make sure the upper nibble is 0s
         sta     CHARCOLOR
 
-        lda     VIC_BG_COLOR0                   ; use current bgcolor
-        and     #$0f
+        lda     VIC_BG_COLOR0   ; use current bgcolor
+        and     #$0F
         sta     soft80_internal_bgcolor
         asl     a
         asl     a
@@ -39,21 +39,22 @@ soft80_init:
         ora     CHARCOLOR
         sta     soft80_internal_cellcolor
 
-        lda     #$3b
+        lda     #$3B
         sta     VIC_CTRL1
         lda     #$00
         sta     CIA2_PRA
         lda     #$68
         sta     VIC_VIDEO_ADR
-        lda     #$c8
+        lda     #$C8
         sta     VIC_CTRL2
 
         jmp     soft80_kclrscr
 
 soft80_shutdown:
 
-        jsr     $fda3   ; Initialise I/O
-        jmp     $ff5b   ; Initialize screen editor
+        lda     #$07
+        sta     CIA2_PRA
+        jmp     $FF5B           ; Initialize video I/O
 
         .segment "INIT"
 firstinit:
@@ -66,18 +67,18 @@ firstinit:
 
         inc     soft80_first_init
 
-        lda     #>soft80_charset
-        sta     ptr1+1
         lda     #<soft80_charset
+        ldx     #>soft80_charset
         sta     ptr1
-        lda     #>soft80_lo_charset
-        sta     ptr2+1
+        stx     ptr1+1
         lda     #<soft80_lo_charset
+        ldx     #>soft80_lo_charset
         sta     ptr2
-        lda     #>soft80_hi_charset
-        sta     ptr3+1
+        stx     ptr2+1
         lda     #<soft80_hi_charset
+        ldx     #>soft80_hi_charset
         sta     ptr3
+        stx     ptr3+1
 
         ldx     #4
 @l2:
@@ -99,12 +100,12 @@ firstinit:
         bne     @l2
 
         ; copy the kplot tables to ram under I/O
-        ;ldx     #0              ; is 0
+        ;ldx     #0             ; is 0
 @l3:
         lda     soft80_tables_data_start,x
         sta     soft80_bitmapxlo,x
-        lda     soft80_tables_data_start + (soft80_tables_data_end - soft80_tables_data_start - $100) ,x
-        sta     soft80_bitmapxlo + (soft80_tables_data_end - soft80_tables_data_start - $100),x
+        lda     soft80_tables_data_start + (soft80_tables_data_end - soft80_tables_data_start - $0100),x
+        sta     soft80_bitmapxlo + (soft80_tables_data_end - soft80_tables_data_start - $0100),x
         inx
         bne     @l3
 
@@ -155,4 +156,4 @@ soft80_internal_cursorxlsb:
 
         .data
 soft80_first_init:
-        .byte 0         ; flag to check first init, this really must be in .data
+        .byte 0                 ; flag to check first init, this really must be in .data

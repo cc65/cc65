@@ -198,14 +198,14 @@ CIA2_CRB        := $DD0F
 ; ---------------------------------------------------------------------------
 ; I/O: MMU
 
-MMU_CR           := $FF00
-MMU_CFG_CC65     := %00001110    ; Bank 0 with kernal ROM
-MMU_CFG_RAM0     := %00111111    ; Bank 0 full RAM
-MMU_CFG_RAM1     := %01111111    ; Bank 1 full RAM
-MMU_CFG_RAM2     := %10111111    ; Bank 2 full RAM
-MMU_CFG_RAM3     := %11111111    ; Bank 3 full RAM
-MMU_CFG_INT_FROM := %01010111    ; Bank 1 with Internal Function RAM/ROM
-MMU_CFG_EXT_FROM := %01101011    ; Bank 1 with External Function RAM/ROM
+MMU_CR          := $FF00
+MMU_CFG_CC65    := %00001110    ; Bank 0 with kernal ROM
+MMU_CFG_RAM0    := %00111111    ; Bank 0 full RAM
+MMU_CFG_RAM1    := %01111111    ; Bank 1 full RAM
+MMU_CFG_RAM2    := %10111111    ; Bank 2 full RAM
+MMU_CFG_RAM3    := %11111111    ; Bank 3 full RAM
+MMU_CFG_IFROM   := %01010111    ; Bank 1 with Internal Function RAM/ROM
+MMU_CFG_EFROM   := %01101011    ; Bank 1 with External Function RAM/ROM
 
 ; ---------------------------------------------------------------------------
 ; Super CPU

@@ -72,17 +72,17 @@ INSTALL:
         stx     FETVEC
         stx     STAVEC
         ldy     #0
-        ldx     #MMU_CFG_EXT_FROM
+        ldx     #MMU_CFG_EFROM
         sei
         jsr     FETCH
         tax
         inx
         txa
         sta     tmp1
-        ldx     #MMU_CFG_EXT_FROM
+        ldx     #MMU_CFG_EFROM
         sei
         jsr     STASH
-        ldx     #MMU_CFG_EXT_FROM
+        ldx     #MMU_CFG_EFROM
         jsr     FETCH
         cli
         cmp     tmp1
@@ -138,7 +138,7 @@ MAP:    sta     curpage
 
 ; Transfer one page
 
-@L1:    ldx     #MMU_CFG_EXT_FROM
+@L1:    ldx     #MMU_CFG_EFROM
         jsr     FETCH
         sta     window,y
         iny
@@ -180,7 +180,7 @@ COMMIT: lda     curpage                 ; Get the current page
 ; Transfer one page. Y must be zero on entry
 
 @L1:    lda     window,y
-        ldx     #MMU_CFG_EXT_FROM
+        ldx     #MMU_CFG_EFROM
         jsr     STASH
         iny
         bne     @L1
@@ -228,7 +228,7 @@ COPYFROM:
 
         ldy     #$00
         sei
-@L1:    ldx     #MMU_CFG_EXT_FROM
+@L1:    ldx     #MMU_CFG_EFROM
         jsr     FETCH
         sta     (ptr2),y
         iny
@@ -246,7 +246,7 @@ COPYFROM:
         sta     tmp1
 
         ldy     #$00
-@L3:    ldx     #MMU_CFG_EXT_FROM
+@L3:    ldx     #MMU_CFG_EFROM
         jsr     FETCH
         sta     (ptr2),y
         iny
@@ -295,7 +295,7 @@ COPYTO: sta     ptr3
         sei
         ldy     #$00
 @L1:    lda     (ptr2),y
-        ldx     #MMU_CFG_EXT_FROM
+        ldx     #MMU_CFG_EFROM
         jsr     STASH
         iny
         bne     @L1
@@ -313,7 +313,7 @@ COPYTO: sta     ptr3
 
         ldy     #$00
 @L3:    lda     (ptr2),y
-        ldx     #MMU_CFG_EXT_FROM
+        ldx     #MMU_CFG_EFROM
         jsr     STASH
         iny
         dec     tmp1

@@ -44,6 +44,7 @@
 ; Data.
 
 .bss
+isnotscpu:      .res    1               ; SuperCPU not present
 curpage:        .res    1               ; Current page number
 curbank:        .res    1               ; Current bank number (+1)
 bankcount:      .res    1               ; Number of available banks (pages = banks * 256)
@@ -63,7 +64,7 @@ INSTALL:
         clc
         sed
         lda     #$99
-        adc     #$01                    ; on 65C02, 65SC02, 65CE02, 65802 and 65816 this has been fixed
+        adc     #$01                    ; on 65C02, 65SC02, 65CE02, 65802 and 65816 sets the zero flag correctly
         cld
         bne     @not_present            
         clc
@@ -71,10 +72,13 @@ INSTALL:
         sep     #$01                    ; nop #$01 on 65C02/65SC02 and lda ($01,s),y on 65CE02
 .P02
         bcc     @not_present
+        lda     $d0bc
+        and     #$80
+        sta     isnotscpu
         lda     $07e8
-        pha
+        pha                             ; save value incase it was used somewhere else
         ldx     #$ff
-@fillloop:
+@fillloop:                              ; fill from top (bank 255) to bottom
         txa
         pha
 .P816
@@ -85,12 +89,18 @@ INSTALL:
         cpx     #$ff
         bne     @fillloop
         inx
-@compareloop:
+@compareloop:                           ; check from bottom to top
         txa
         pha
 .P816
         plb
 .P02
+        cmp     $07e8
+        bne     @found_pages
+.P816
+        inc
+.P02
+        sta     $07e8
         cmp     $07e8
         bne     @found_pages
         inx
@@ -104,15 +114,19 @@ INSTALL:
 .P02
         pla
         sta     $07e8
+        cli
+        lda     isnotscpu
+        bne     @noextradex
+        dex
+@noextradex:
         stx     bankcount
         lda     #<EM_ERR_OK
         ldx     #>EM_ERR_OK
-        cli
         rts
-@notpresent:
+@not_present:
+        cli
         lda     #<EM_ERR_NO_DEVICE
         ldx     #>EM_ERR_NO_DEVICE
-        cli
 ;       rts                             ; Run into UNINSTALL instead
 
 
@@ -130,7 +144,7 @@ UNINSTALL:
 ;
 
 PAGECOUNT:
-        lda     #$00
+        lda     #$00                   ; a whole bank is either usable or not
         ldx     bankcount
         rts
 
@@ -140,13 +154,17 @@ PAGECOUNT:
 ; by the driver.
 ;
 
-MAP:    sei
-        sta     curpage                 ; Remember the new page
+MAP:    sta     curpage                 ; Remember the new page
         stx     curbank                 ; Remember the new bank
 
         sta     ptr2+1                  ; src address low
         lda     #$00
         sta     ptr2                    ; src address high
+        inx
+        ldy     isnotscpu               ; check if not scpu
+        bne     @notscpu
+        inx
+@notscpu:
         stx     tmp2                    ; src bank
 
         sta     tmp1                    ; dst bank
@@ -162,7 +180,6 @@ MAP:    sei
 
         jsr     transfer
 
-        cli
         rts
 
 ; ------------------------------------------------------------------------
@@ -178,46 +195,31 @@ USE:    sta     curpage                 ; Remember the page
 ; COMMIT: Commit changes in the memory window to extended storage.
 
 COMMIT: lda     curpage                 ; Get the current page
-        bmi     done                    ; Jump if no page mapped
-
-        clc
-        adc     #>BASE
-        sta     ptr2+1
-        ldy     #$00
-        sty     ptr2
+        sta     ptr1+1                  ; dst high
+        ldx     #$00
+        stx     ptr1                    ; dst low
 
         lda     #<window
-        sta     ptr1
+        sta     ptr2                    ; src low
         lda     #>window
-        sta     ptr1+1
+        sta     ptr2+1                  ; src high
 
-; Transfer one page. Y must be zero on entry
+        stx     ptr3+1                  ; length high
+        lda     #$ff
+        sta     ptr3                    ; length low
 
-transfer:
-        ldx     $01                     ; Remember c64 control port
-        txa
-        and     #$F8                    ; Bank out ROMs, I/O
-        sei
-        sta     $01
-
-; Unroll the following loop
-
-loop:   .repeat 8
-        lda     (ptr1),y
-        sta     (ptr2),y
+        stx     tmp2                    ; src bank
+        ldy     curbank                 ; Get the current bank
         iny
-        .endrepeat
+        ldx     isnotscpu
+        bne     @notascpu
+        iny
+@notascpu:
+        sty     tmp1                    ; dst bank
 
-        bne     loop
+        jsr     transfer
 
-; Restore the old memory configuration, allow interrupts
-
-        stx     $01                     ; Restore the old configuration
-        cli
-
-; Done
-
-done:   rts               
+        rts               
 
 ; ------------------------------------------------------------------------
 ; COPYFROM: Copy from extended into linear memory. A pointer to a structure
@@ -226,70 +228,55 @@ done:   rts
 ;
 
 COPYFROM:
-        sta     ptr3
-        stx     ptr3+1                  ; Save the passed em_copy pointer
+        sta     ptr4
+        stx     ptr4+1                  ; Save the passed em_copy pointer
                        
-        ldy     #EM_COPY::OFFS
-        lda     (ptr3),y
-        sta     ptr1
-        ldy     #EM_COPY::PAGE
-        lda     (ptr3),y
-        clc
-        adc     #>BASE
-        sta     ptr1+1                  ; From
-
-        ldy     #EM_COPY::BUF
-        lda     (ptr3),y
-        sta     ptr2
-        iny
-        lda     (ptr3),y
-        sta     ptr2+1                  ; To
-
-common: ldy     #EM_COPY::COUNT+1
-        lda     (ptr3),y                ; Get number of pages
-        beq     @L2                     ; Skip if no full pages
-        sta     tmp1
-
-; Copy full pages allowing interrupts after each page copied
-
-        ldy     #$00
-@L1:    jsr     transfer
-        inc     ptr1+1
-        inc     ptr2+1
-        dec     tmp1
-        bne     @L1
-
-; Copy the remainder of the page
-
-@L2:    ldy     #EM_COPY::COUNT
-        lda     (ptr3),y                ; Get bytes in last page
-        beq     @L4
+        ldy     #EM_COPY::COUNT+1       ; start at the end of the struct
+        lda     (ptr4),y                ; get high byte of count
         tax
-
-        lda     $01                     ; Remember c64 control port
-        pha
-        and     #$F8                    ; Bank out ROMs, I/O
-        sei
-        sta     $01
-
-; Transfer the bytes in the last page
-
-        ldy     #$00
-@L3:    lda     (ptr1),y
-        sta     (ptr2),y
-        iny
+        dey
+        lda     (ptr4),y                ; get low byte of count
+        bne     @nodex
         dex
-        bne     @L3
+@nodex:
+.P816
+        dec
+.P02
+        eor     #$ff
+        sta     ptr3                    ; length low
+        txa
+        eor     #$ff
+        sta     ptr3+1                  ; length high
+        dey
+        lda     (ptr4),y                ; get bank
+.P816
+        inc
+.P02
+        ldx     isnotscpu
+        bne     @notscpu64
+.P816
+        inc
+.P02
+@notscpu64:
+        sta     tmp2                    ; src bank
+        dey
+        lda     (ptr4),y                ; get page
+        sta     ptr2+1                  ; src high
+        dey
+        lda     (ptr4),y                ; get offset in page
+        sta     ptr2                    ; src low
+        dey
+        lda     (ptr4),y                ; get memory buffer high
+        sta     ptr1+1                  ; dst high
+        dey
+        lda     (ptr4),y                ; get memory buffer low
+        sta     ptr1                    ; dst low
+        lda     #$00
+        sta     tmp1                    ; dst bank
 
-; Restore the old memory configuration, allow interrupts
+        jsr     transfer
 
-        pla
-        sta     $01                     ; Restore the old configuration
-        cli
-
-; Done
-
-@L4:    rts
+        rts
 
 ; ------------------------------------------------------------------------
 ; COPYTO: Copy from linear into extended memory. A pointer to a structure
@@ -297,27 +284,55 @@ common: ldy     #EM_COPY::COUNT+1
 ; The function must not return anything.
 ;
 
-COPYTO: sta     ptr3
-        stx     ptr3+1                  ; Save the passed em_copy pointer
+COPYTO: sta     ptr4
+        stx     ptr4+1                  ; Save the passed em_copy pointer
 
-        ldy     #EM_COPY::OFFS
-        lda     (ptr3),y
-        sta     ptr2
-        ldy     #EM_COPY::PAGE
-        lda     (ptr3),y
-        clc
-        adc     #>BASE
-        sta     ptr2+1                  ; To
+        ldy     #EM_COPY::COUNT+1       ; start at the end of the struct
+        lda     (ptr4),y                ; get high byte of count
+        tax
+        dey
+        lda     (ptr4),y                ; get low byte of count
+        bne     @nodex2
+        dex
+@nodex2:
+.P816
+        dec
+.P02
+        eor     #$ff
+        sta     ptr3                    ; length low
+        txa
+        eor     #$ff
+        sta     ptr3+1                  ; length high
+        dey
+        lda     (ptr4),y                ; get bank
+.P816
+        inc
+.P02
+        ldx     isnotscpu
+        bne     @notascpu64
+.P816
+        inc
+.P02
+@notascpu64:
+        sta     tmp1                    ; dst bank
+        dey
+        lda     (ptr4),y                ; get page
+        sta     ptr1+1                  ; dst high
+        dey
+        lda     (ptr4),y                ; get page offset
+        sta     ptr1                    ; dst low
+        dey
+        lda     (ptr4),y                ; get memory buffer high
+        sta     ptr2+1                  ; src low
+        dey
+        lda     (ptr4),y                ; get memory buffer low
+        sta     ptr2                    ; src high
+        lda     #$00
+        sta     tmp2                    ; src bank
 
-        ldy     #EM_COPY::BUF
-        lda     (ptr3),y
-        sta     ptr1
-        iny
-        lda     (ptr3),y
-        sta     ptr1+1                  ; From
+        jsr     transfer
 
-        jmp     common
-
+        rts
 
 ; ------------------------------------------------------------------------
 ; Helper function for moving a block, the following is used:
@@ -331,13 +346,14 @@ transfer:
 .P816
 .A8
 .I8
+        sei
         pha
         phx
         phy
         ldx     tmp1                    ; load srcbank
         stx     @move+1                 ; store srcbank in move + 1
         ldy     tmp2                    ; load dstbank
-        sty     @mapmove+2              ; store dstbank in move + 2
+        sty     @move+2                 ; store dstbank in move + 2
         clc                             ; switch to native mode
         xce
         php                             ; save status bits
@@ -352,7 +368,14 @@ transfer:
         plp                             ; restore status bits
 .A8
 .I8
+        lda     #$00
+        pha
+        plb                             ; restore dbr
+        sec
+        xce                             ; switch to emul mode
         ply
         plx
         pla
+        cli
         rts
+.P02

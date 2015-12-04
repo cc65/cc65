@@ -242,10 +242,8 @@ COPYFROM:
 .P816
         dec
 .P02
-        eor     #$ff
         sta     ptr3                    ; length low
         txa
-        eor     #$ff
         sta     ptr3+1                  ; length high
         dey
         lda     (ptr4),y                ; get bank
@@ -298,10 +296,8 @@ COPYTO: sta     ptr4
 .P816
         dec
 .P02
-        eor     #$ff
         sta     ptr3                    ; length low
         txa
-        eor     #$ff
         sta     ptr3+1                  ; length high
         dey
         lda     (ptr4),y                ; get bank

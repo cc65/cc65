@@ -320,6 +320,11 @@ unsigned OptShift2 (CodeSeg* S)
 **      ror     a
 **
 ** if X is not used later (X is assumed to be zero on entry).
+** If the sequence is followed immediately by another
+**
+**      jsr     asraxN
+**
+** then their shifts are combined.
 */
 {
     unsigned Changes = 0;
@@ -327,10 +332,10 @@ unsigned OptShift2 (CodeSeg* S)
 
     /* Walk over the entries */
     while (I < CS_GetEntryCount (S)) {
-
         unsigned Shift;
-        unsigned Count;
-        CodeEntry* L[3];
+        unsigned Count, Count2;
+        unsigned K;
+        CodeEntry* L[4];
 
         /* Get next entry */
         L[0] = CS_GetEntry (S, I);
@@ -338,40 +343,51 @@ unsigned OptShift2 (CodeSeg* S)
         /* Check for the sequence */
         if (L[0]->OPC == OP65_BPL                                       &&
             L[0]->JumpTo != 0                                           &&
-            CS_GetEntries (S, L+1, I+1, 2)                              &&
+            CS_GetEntries (S, L+1, I+1, 3)                              &&
             L[1]->OPC == OP65_DEX                                       &&
             L[0]->JumpTo->Owner == L[2]                                 &&
             !CS_RangeHasLabel (S, I, 2)                                 &&
             L[2]->OPC == OP65_JSR                                       &&
             SHIFT_TYPE (Shift = GetShift (L[2]->Arg)) == SHIFT_TYPE_ASR &&
-            (Count = SHIFT_COUNT (Shift)) > 0                           &&
-            Count * 100 <= S->CodeSizeFactor                            &&
-            !RegXUsed (S, I+3)) {
+            (Count = SHIFT_COUNT (Shift)) > 0) {
 
-            CodeEntry* X;
-            unsigned J = I+2;
+            if (L[3]->OPC == OP65_JSR                                           &&
+                SHIFT_TYPE (Shift = GetShift (L[3]->Arg)) == SHIFT_TYPE_ASR     &&
+                (Count2 = SHIFT_COUNT (Shift)) > 0) {
 
-            /* Generate the replacement sequence */
-            while (Count--) {
-                /* cmp #$80 */
-                X = NewCodeEntry (OP65_CMP, AM65_IMM, "$80", 0, L[2]->LI);
-                CS_InsertEntry (S, X, ++J);
-
-                /* ror a */
-                X = NewCodeEntry (OP65_ROR, AM65_ACC, "a", 0, L[2]->LI);
-                CS_InsertEntry (S, X, ++J);
+                /* Found a second jsr asraxN */
+                Count += Count2;
+                K = 4;
+            } else {
+                K = 3;
             }
+            if (Count * 100 <= S->CodeSizeFactor        &&
+                !RegXUsed (S, I+K)) {
 
-            /* Remove the bpl/dex/jsr */
-            CS_DelEntries (S, I, 3);
+                CodeEntry* X;
+                unsigned J = I+K;
 
-            /* Remember, we had changes */
-            ++Changes;
+                /* Generate the replacement sequence */
+                do {
+                    /* cmp #$80 */
+                    X = NewCodeEntry (OP65_CMP, AM65_IMM, "$80", 0, L[2]->LI);
+                    CS_InsertEntry (S, X, J++);
+
+                    /* ror a */
+                    X = NewCodeEntry (OP65_ROR, AM65_ACC, "a", 0, L[2]->LI);
+                    CS_InsertEntry (S, X, J++);
+                } while (--Count);
+
+                /* Remove the bpl/dex/jsr */
+                CS_DelEntries (S, I, K);
+
+                /* Remember, we had changes */
+                ++Changes;
+            }
         }
 
         /* Next entry */
         ++I;
-
     }
 
     /* Return the number of changes made */

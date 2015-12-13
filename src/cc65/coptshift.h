@@ -60,12 +60,19 @@ unsigned OptShift1 (CodeSeg* S);
 **  L1:
 */
 
-unsigned OptShift2(CodeSeg* S);
-/* A call to the asrax1 routines may get replaced by something simpler, if
-** X is not used later:
+unsigned OptShift2 (CodeSeg* S);
+/* The sequence
+**
+**      bpl     L
+**      dex
+** L:   jsr     asraxN
+**
+** might be replaced by N copies of
 **
 **      cmp     #$80
 **      ror     a
+**
+** if X is not used later (X is assumed to be zero on entry).
 */
 
 unsigned OptShift3 (CodeSeg* S);

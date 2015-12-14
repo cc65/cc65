@@ -341,7 +341,7 @@ unsigned OptShift2 (CodeSeg* S)
         L[0] = CS_GetEntry (S, I);
 
         /* Check for the sequence */
-        if (L[0]->OPC == OP65_BPL                                       &&
+        if ((L[0]->OPC == OP65_BPL || L[0]->OPC == OP65_BCC)            &&
             L[0]->JumpTo != 0                                           &&
             CS_GetEntries (S, L+1, I+1, 3)                              &&
             L[1]->OPC == OP65_DEX                                       &&

@@ -1,6 +1,7 @@
 language:
   - c
 install:
+  - sudo apt-get update
   - sudo apt-get install linuxdoc-tools linuxdoc-tools-info binutils-mingw-w64-i686 gcc-mingw-w64-i686 sshpass
 script:
   - make bin USER_CFLAGS=-Werror

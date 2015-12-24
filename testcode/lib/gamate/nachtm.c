@@ -863,7 +863,7 @@ typedef struct {
     unsigned char       Trigger;        /* Trigger value */
     unsigned char       Ticks;          /* Ticks for this tone */
     unsigned short      Freq;           /* Actual frequency value */
-    int                 SoftEnv;
+    unsigned short      SoftEnv;
     const unsigned*     Data;           /* Pointer to data */
     int                 DecVal;
 } VoiceCtrl;
@@ -985,11 +985,11 @@ void UpdateScreen(void)
         VC = V [I];
         Offs = (I * 6) + 1;
         textcolor(1);
-        gotoxy(Offs, 9); cprintf("%02x", VC->SoftEnv);
+        gotoxy(Offs, 9); cprintf("%02x", VC->SoftEnv >> 8);
         textcolor(COLOR_BLACK);
         for (N = 0; N < 0x8; ++N) {
             gotoxy(Offs, 10 + N);
-            cputc((VC->SoftEnv >> 5) >= (N ^ 0x7) ? '#' : '.' );
+            cputc((VC->SoftEnv >> (8+5)) >= (N ^ 0x7) ? '#' : '.' );
         }
     }
 }
@@ -1002,20 +1002,30 @@ void DoEffects(void)
         /* Get a pointer to this voice */
         VC = V [I];
         /* do soft envelope */
+        if (VC->DecVal != 0) {
         if (VC->DecVal < 0) {
+//          VC->DecVal = - 0x400;
             if ((VC->SoftEnv + VC->DecVal) > 0) {
                 VC->SoftEnv += VC->DecVal;
+//                VC->SoftEnv >>= 1;
+                VC->SoftEnv = (VC->SoftEnv >> 1) + (VC->SoftEnv >> 2);
             } else {
                 VC->SoftEnv = 0;
+                VC->DecVal = 0;
             }
         } else if (VC->DecVal > 0) {
-            if ((VC->SoftEnv + VC->DecVal) < 0xff) {
+            VC->DecVal = 0x800;
+            if (VC->SoftEnv < (0xffff - VC->DecVal)) {
+//                VC->SoftEnv += VC->DecVal;
                 VC->SoftEnv += VC->DecVal;
             } else {
-                VC->SoftEnv = 0xff;
+                VC->SoftEnv = 0xffff;
+                VC->DecVal = -VC->DecVal;
             }
         }
-        outb ((unsigned char*)(AUDIO_BASE + 8 + I), VC->SoftEnv);      // volume
+        }
+//        outb ((unsigned char*)(AUDIO_BASE + 8 + I), (VC->SoftEnv & 0xf0 ) | 0x0f);      // volume
+        outb ((unsigned char*)(AUDIO_BASE + 8 + I),(VC->SoftEnv >> 8));      // volume
     }
 }
 
@@ -1105,7 +1115,7 @@ int main (void)
                 if (Val & 0x8000) {
                         /* This is a pause.  */
                         gotoxy(Offs + 1, 9); cprintf("---");
-                        VC->DecVal =  -17 - (getbits() & 0x07);
+                        VC->DecVal =  -11 - (getbits() & 0x07);
                 } else {
                     /* This is a tone. Extract the attributes. */
                     Tone = (Val >> 8) & 0x0F;
@@ -1121,7 +1131,7 @@ int main (void)
                     outb ((unsigned char*)(AUDIO_BASE + (I << 1) + 1), VC->Freq >> 8);
                     outb ((unsigned char*)(AUDIO_BASE + (I << 1)), VC->Freq & 0xff);
                     /* Start the tone */
-                    VC->DecVal =  13 + (getbits() & 0x07);
+                    VC->DecVal =  1 + (getbits() & 0x07);
                     gotoxy(Offs + 1, 9); cprintf("%c%c%d", Tone1[Tone], Tone2[Tone], Octave);
                 }
             } else {

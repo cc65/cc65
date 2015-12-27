@@ -148,7 +148,7 @@ static char* TargetLib  = 0;
 
 
 #if defined(NEED_SPAWN)
-#  if defined(SPAWN_AMIGA)
+#  if defined(_AMIGA)
 #    include "spawn-amiga.inc"
 #  else
 #    include "spawn-unix.inc"

@@ -1,0 +1,116 @@
+<!doctype linuxdoc system>      <!-- -*- text-mode -*- -->
+
+<article>
+<title>chrcvt Users Guide
+<author><url url="mailto:polluks@sdf.lonestar.org" name="Stefan A. Haubenthal">
+<date>2013-02-10
+
+<abstract>
+chrcvt is the vector font converter. It is able to convert a foreign font into
+the native format.
+</abstract>
+
+<!-- Table of contents -->
+<toc>
+
+<!-- Begin the document -->
+
+
+<sect>Overview<p>
+
+chrcvt is a vector font converter. It is able to convert a "BGI Stroked
+Font" to a compact TGI native vector font. See the function <url
+url="funcref.html#tgi_load_vectorfont" name="tgi_load_vectorfont"> for usage.
+
+
+
+<sect>Usage<p>
+
+The chrcvt utility converts the font of one Borland file to its cc65 equivalent.
+
+
+<sect1>Command line option overview<p>
+
+The program may be called as follows:
+
+<tscreen><verb>
+---------------------------------------------------------------------------
+Usage: chrcvt [options] file [options] [file]
+Short options:
+  -h                    Help (this text)
+  -v                    Be more verbose
+  -V                    Print the version number and exit
+
+Long options:
+  --help                Help (this text)
+  --verbose             Be more verbose
+  --version             Print the version number and exit
+---------------------------------------------------------------------------
+</verb></tscreen>
+
+
+<sect1>Command line options in detail<p>
+
+Here is a description of all the command line options:
+
+<descrip>
+
+  <tag><tt>-v, --verbose</tt></tag>
+
+  Increase the converter verbosity.
+
+
+  <tag><tt>-h, --help</tt></tag>
+
+  Print the short option summary shown above.
+
+
+  <tag><tt>-V, --version</tt></tag>
+
+  Print the version number of the utility. When submitting a bug report,
+  please include the operating system you're using, and the compiler
+  version.
+</descrip>
+
+
+<sect>Input and output<p>
+
+The converter will read one CHR file per invocation and write the font
+in TCH format to a new file.
+
+Example output for the command
+<tscreen><verb>
+chrcvt --verbose LITT.CHR
+</verb></tscreen>
+<tscreen><verb>
+BGI Stroked Font V1.1 - Aug 12, 1991
+Copyright (c) 1987,1988 Borland International
+</verb></tscreen>
+
+
+
+<sect>Copyright<p>
+
+chrcvt is (C) Copyright 2009, Ullrich von Bassewitz. For usage of the
+binaries and/or sources the following conditions apply:
+
+This software is provided 'as-is', without any expressed or implied
+warranty.  In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+<enum>
+<item>	The origin of this software must not be misrepresented; you must not
+	claim that you wrote the original software. If you use this software
+	in a product, an acknowledgment in the product documentation would be
+	appreciated but is not required.
+<item>	Altered source versions must be plainly marked as such, and must not
+	be misrepresented as being the original software.
+<item>	This notice may not be removed or altered from any source
+	distribution.
+</enum>
+
+</article>

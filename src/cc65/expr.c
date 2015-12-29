@@ -2105,8 +2105,8 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                 */
                 Type* left  = Indirect (Expr->Type);
                 Type* right = Indirect (Expr2.Type);
-                if (TypeCmp (left, right) < TC_EQUAL && left->C != T_VOID && right->C != T_VOID) {
-                    /* Incomatible pointers */
+                if (TypeCmp (left, right) < TC_QUAL_DIFF && left->C != T_VOID && right->C != T_VOID) {
+                    /* Incompatible pointers */
                     Error ("Incompatible types");
                 }
             } else if (!ED_IsNullPtr (&Expr2)) {

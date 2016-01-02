@@ -2390,7 +2390,6 @@ static void parseadd (ExprDesc* Expr)
     Type* lhst;                 /* Type of left hand side */
     Type* rhst;                 /* Type of right hand side */
 
-
     /* Skip the PLUS token */
     NextToken ();
 
@@ -2573,7 +2572,7 @@ static void parseadd (ExprDesc* Expr)
                 flags = CF_PTR;
             } else if (IsClassInt (lhst) && IsClassPtr (rhst)) {
                 /* Left is int, right is pointer, must scale lhs */
-                g_tosint (TypeOf (rhst));       /* Make sure, TOS is int */
+                g_tosint (TypeOf (lhst));       /* Make sure TOS is int */
                 g_swap (CF_INT);                /* Swap TOS and primary */
                 g_scale (CF_INT, CheckedPSizeOf (rhst));
                 /* Operate on pointers, result type is a pointer */
@@ -2607,7 +2606,6 @@ static void parseadd (ExprDesc* Expr)
 
     /* Condition codes not set */
     ED_MarkAsUntested (Expr);
-
 }
 
 

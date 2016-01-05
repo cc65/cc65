@@ -128,7 +128,7 @@ static void PVArgs (CPURegs* Regs)
     unsigned SP   = MemReadZPWord (0x00);
     unsigned Args = SP - (ArgC + 1) * 2;
 
-    Print (stdout, 2, "PVArgs ($%04X)\n", ArgV);
+    Print (stderr, 2, "PVArgs ($%04X)\n", ArgV);
 
     MemWriteWord (ArgV, Args);
 
@@ -155,7 +155,7 @@ static void PVArgs (CPURegs* Regs)
 
 static void PVExit (CPURegs* Regs)
 {
-    Print (stdout, 1, "PVExit ($%02X)\n", Regs->AC);
+    Print (stderr, 1, "PVExit ($%02X)\n", Regs->AC);
 
     exit (Regs->AC);
 }
@@ -177,7 +177,7 @@ static void PVOpen (CPURegs* Regs)
     }
     while (Path[I++]);
 
-    Print (stdout, 2, "PVOpen (\"%s\", $%04X)\n", Path, Flags);
+    Print (stderr, 2, "PVOpen (\"%s\", $%04X)\n", Path, Flags);
 
     switch (Flags & 0x03) {
         case 0x01:
@@ -219,7 +219,7 @@ static void PVClose (CPURegs* Regs)
 
     unsigned FD = GetAX (Regs);
 
-    Print (stdout, 2, "PVClose ($%04X)\n", FD);
+    Print (stderr, 2, "PVClose ($%04X)\n", FD);
 
     RetVal = close (FD);
 
@@ -237,7 +237,7 @@ static void PVRead (CPURegs* Regs)
     unsigned Buf   = PopParam (2);
     unsigned FD    = PopParam (2);
 
-    Print (stdout, 2, "PVRead ($%04X, $%04X, $%04X)\n", FD, Buf, Count);
+    Print (stderr, 2, "PVRead ($%04X, $%04X, $%04X)\n", FD, Buf, Count);
 
     Data = xmalloc (Count);
 
@@ -264,7 +264,7 @@ static void PVWrite (CPURegs* Regs)
     unsigned Buf   = PopParam (2);
     unsigned FD    = PopParam (2);
 
-    Print (stdout, 2, "PVWrite ($%04X, $%04X, $%04X)\n", FD, Buf, Count);
+    Print (stderr, 2, "PVWrite ($%04X, $%04X, $%04X)\n", FD, Buf, Count);
 
     Data = xmalloc (Count);
     while (I < Count) {

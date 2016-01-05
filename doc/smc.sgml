@@ -224,7 +224,7 @@ These marcos are determined to get, set and change arguments of instructions:
   <label id="Change branch">
   <tag><tt>SMC_ChangeBranch label, destination (, register)</tt></tag>
 
-  Used to modify the destination of a branch instruction. If the adress offset
+  Used to modify the destination of a branch instruction. If the address offset
   exceeds the supported range of 8-bit of the 6502, a error will be thrown.
 
   Example:
@@ -296,7 +296,7 @@ SMC GetK, { LDX #SMC_Value      }
   <tag><tt>SMC_TransferLowByte label, value (, register)</tt></tag>
 
   Does the same as '<tt>SMC_TransferValue</tt>' but should be used for
-  low-bytes of adresses for better readability.
+  low-bytes of addresses for better readability.
 
   Example:
 <tscreen><verb>
@@ -312,7 +312,7 @@ SMC LoadData, { LDA $2000 }
   <tag><tt>SMC_LoadLowByte label (, register)</tt></tag>
 
   Does the same as '<tt>SMC_LoadValue</tt>' but should be used for low-bytes
-  of adresses for better readability.
+  of addresses for better readability.
 
   Example:
 <tscreen><verb>
@@ -329,7 +329,7 @@ SMC LoadData, { LDA $2000 }
   <tag><tt>SMC_StoreLowByte label (, register)</tt></tag>
 
   Does the same as '<tt>SMC_StoreValue</tt>' but should be used for low-bytes
-  of adresses for better readability.
+  of addresses for better readability.
 
   Example:
 <tscreen><verb>
@@ -352,7 +352,7 @@ SMC StoreCollisionData, { STY $2200 }
   <tag><tt>SMC_TransferHighByte label, value (, register)</tt></tag>
 
   Loads and stores the given value via the named register to the high-byte
-  adress portion of an SMC-instruction.
+  address portion of an SMC-instruction.
 
   Example:
 <tscreen><verb>
@@ -370,7 +370,7 @@ PlayOtherSound:
   <label id="Load high-byte">
   <tag><tt>SMC_LoadHighByte label (, register)</tt></tag>
 
-  Loads the high-byte part of an SMC-instruction adress to the given register.
+  Loads the high-byte part of an SMC-instruction address to the given register.
 
   Example:
 <tscreen><verb>
@@ -387,7 +387,7 @@ SMC GetVolume { LDA $3200,x }
   <label id="Store high-byte">
   <tag><tt>SMC_StoreHighByte label (, register)</tt></tag>
 
-  Stores the high-byte adress part of an SMC-instruction from the given
+  Stores the high-byte address part of an SMC-instruction from the given
   register.
 
   Example:
@@ -407,7 +407,7 @@ SMC GetSoundData, { LDA Level1Base+Sound, y }
 </verb></tscreen>
 
 
-  <label id="Transfer single adress">
+  <label id="Transfer single address">
   <tag><tt>SMC_TransferAddressSingle label, address (, register)</tt></tag>
 
   Transfers the contents of the given address via the given register to the
@@ -428,7 +428,7 @@ SMC GetChar, { LDA  SMC_AbsAdr, x }
 </verb></tscreen>
 
 
-  <label id="Transfer adress">
+  <label id="Transfer address">
   <tag><tt>SMC_TransferAddress label, address</tt></tag>
 
   Loads contents of given address to A/X and stores the result to SMC
@@ -559,11 +559,11 @@ allowing reuse of some instructions.
  8:     SMC FirstIncHighByte, { SMC_OperateOnHighByte inc, StoreAccuFirstSection }		; code will be overwritten to 'beq RestoreCode' (*)
  9:     ...
 10:     SMC_TransferOpcode FirstIncHighByte, OPC_BEQ , x					; change code marked above with (*)
-11:     SMC_TransferValue FirstIncHighByte, #(restoreCode - RestoreCodeBranchBaseAdr-2), x	; set relative adress to 'RestoreCode'
+11:     SMC_TransferValue FirstIncHighByte, #(restoreCode - RestoreCodeBranchBaseAdr-2), x	; set relative address to 'RestoreCode'
 12:     ...
 13: restoreCode:
 14:     SMC_TransferOpcode FirstIncHighByte, OPC_INC_abs , x					; restore original code...
-15:     SMC_TransferValue FirstIncHighByte, #(<(StoreToFirstSection+2)), x			; (second byte of inc contained low-byte of adress)
+15:     SMC_TransferValue FirstIncHighByte, #(<(StoreToFirstSection+2)), x			; (second byte of inc contained low-byte of address)
 16:             ...
 </verb></tscreen>
 

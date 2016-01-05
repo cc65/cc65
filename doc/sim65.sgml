@@ -73,8 +73,8 @@ Here is a description of all the command line options:
 
 <sect>Input and output<p>
 
-The simulator will read one binary file per invocation and can log some
-library calls.
+The simulator will read one binary file per invocation and can log the
+program loading and paravirtualization calls to stderr.
 
 Example output for the command
 <tscreen><verb>

@@ -89,7 +89,7 @@
   An overview over the cc65 runtime and C libraries.
 
   <tag><htmlurl url="smc.html" name="smc.html"></tag>
-  Describes Christian Kr&uuml;gers macro package for writing self modifying
+  Describes Christian Kr&uuml;ger's macro package for writing self modifying
   assembler code.
 
   <tag><url name="6502 Binary Relocation Format document"

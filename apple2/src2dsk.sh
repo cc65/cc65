@@ -30,7 +30,6 @@
 # curl -# -o EmptyDSK_DOS33.zip ftp://ftp.apple.asimov.net/pub/apple_II/images/masters/emptyDSK_Dos33.zip
 #
 # I've included an 'empty.dsk' in the repo. for convenience
-cc65dir=../bin
 COPY=cp
 DEL=rm
 
@@ -61,9 +60,20 @@ fi
 
 # http://www.cc65.org/doc/ca65-2.html#ss2.2
 if [[ -z ${cc65dir} ]]; then
-    echo "ERROR: 'cc65dir' not set, should point to directory containing 'ca65', 'ld65'"
-    return
-else
+    echo "INFO: 'cc65dir' not set, should point to directory containing 'ca65', 'ld65'"
+    cc65dir=../bin
+    echo "INFO: Trying '${cc65dir}' for assembler and linker"
+fi
+
+if [ ! -f ${cc65dir}/ca65 ]; then
+    echo "ERROR: Couldn't find assembler 'ca65' !"
+    exit 1
+fi
+if [ ! -f ${cc65dir}/ld65 ]; then
+    echo "ERROR: Couldn't find linker 'ld65' !"
+    exit 1
+fi
+
     #http://stackoverflow.com/questions/965053/extract-filename-and-extension-in-bash
     # Get filename without path
     # Get filename without extension
@@ -92,7 +102,6 @@ else
         # you will want to first remove the old version on .DSK
         #${DEBUG} a2rm      ${FILE}.dsk ${A2FILE}
         ${DEBUG} a2in -r b ${FILE}.dsk ${A2FILE} ${BIN}
-fi
 
 echo "INFO: Created: ${FILE}.dsk"
 

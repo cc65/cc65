@@ -1,11 +1,10 @@
 #!/bin/sh
 #
 # Purpose: Assemble, Link, & Copy a binary to a DOS 3.3 .DSK image without all the cc65 library crap.
-# Note: Leave off the extension for 'sourcefile.s'
 # Usage: src2dsk.sh {sourcefile}
 #
 # Example: 
-# 1. src2dsk.sh barebones
+# 1. src2dsk.sh barebones.s
 #
 #    foo.s   <- original assembly source file
 #    foo.o   <- output of assembler
@@ -27,8 +26,8 @@
 #
 # You can get a blank DSK here
 # * ftp://ftp.apple.asimov.net/pub/apple_II/images/masters/
-# wget -# -o EmptyDSK_DOS33.zip ftp://ftp.apple.asimov.net/pub/apple_II/images/masters/emptyDSK_Dos33.zip
-
+# wget ftp://ftp.apple.asimov.net/pub/apple_II/images/masters/emptyDSK_Dos33.zip
+# curl -# -o EmptyDSK_DOS33.zip ftp://ftp.apple.asimov.net/pub/apple_II/images/masters/emptyDSK_Dos33.zip
 #
 cc65dir=../bin
 
@@ -37,22 +36,28 @@ if [[ -z ${cc65dir} ]]; then
     echo "Error: 'cc65dir' not set, should point to directory containing 'ca65', 'ld65'"
     return
 else
-    SRC=${1}.s
-    OBJ=${1}.o
-    BIN=${1}.bin
+    #http://stackoverflow.com/questions/965053/extract-filename-and-extension-in-bash
+    # Get filename without path
+    # Get filename without extension
+    FILENAME=$(basename "${1}")
+    FILE="${FILENAME%%.*}"
+
+    SRC=${FILE}.s
+    OBJ=${FILE}.o
+    BIN=${FILE}.bin
 
     ASM_FLAGS="--cpu 65c02"
-    LINK_FLAGS="-C apple2bin.cfg"
+    LNK_FLAGS="-C apple2bin.cfg"
 
     #DEBUG=echo
-    ${DEBUG} ${cc65dir}/ca65 ${ASM_FLAGS}           -o ${OBJ} ${SRC}
-    ${DEBUG} ${cc65dir}/ld65 ${LINK_FLAGS} -o ${BIN}   ${OBJ}
+    ${DEBUG} ${cc65dir}/ca65 ${ASM_FLAGS}          -o ${OBJ} ${SRC}
+    ${DEBUG} ${cc65dir}/ld65 ${LNK_FLAGS} -o ${BIN}   ${OBJ}
 
     # We need to uppercase the file name for a DOS 3.3 DSK
     # The ${1,,} is a Bash 4.0 uppercase extension so we can't use that
     # Likewise, GNU sed 's/.*/\L&/g' doesn't work on OSX (BSD)
-    A2FILE=`echo "${1}" | awk '{print toupper($0)}'`
-    a2rm      ${1}.DSK ${A2FILE}
-    a2in -r b ${1}.DSK ${A2FILE} ${BIN} 
+    A2FILE=`echo "${FILE}" | awk '{print toupper($0)}'`
+    a2rm      ${FILE}.DSK ${A2FILE}
+    a2in -r b ${FILE}.DSK ${A2FILE} ${BIN}
 fi
 

@@ -44,10 +44,10 @@
 ;     .wordwd __END - __MAIN
 
             __MAIN = $1000
-            .include "dos33.h"   ; Apple DOS 3.3 binary file 4 byte prefix header
+            .include "dos33.h"  ; Apple DOS 3.3 binary file 4 byte prefix header
 
             LDX    #0
-            LDA    MSG,X    ; load initial char
+            LDA    MSG,X        ; load initial char
 PRINTCHAR:  JSR    COUT
             INX
             LDA    MSG,X
@@ -71,8 +71,9 @@ PRINTCHAR:  JSR    COUT
             JMP $3D0
 
 MSG:
-            ASC "Hello world, Apple!"
-            .byte $8D  ; CR with high-bit set
+            ASC "Hello world, Apple"
+            .byte "!"           ; normal ASCII displayed as inverse
+            .byte $8D           ; CR with high-bit set
             .byte $00
 __END:
 

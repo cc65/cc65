@@ -26,6 +26,8 @@
 # curl -# -o EmptyDSK_DOS33.zip ftp://ftp.apple.asimov.net/pub/apple_II/images/masters/emptyDSK_Dos33.zip
 #
 cc65dir=../bin
+COPY=cp
+DEL=rm
 
 # http://www.cc65.org/doc/ca65-2.html#ss2.2
 if [[ -z ${cc65dir} ]]; then
@@ -47,6 +49,7 @@ else
 
     DEBUG=
     #DEBUG=echo
+    ${DEBUG} ${DEL}                          ${BIN}   ${OBJ}
     ${DEBUG} ${cc65dir}/ca65 ${ASM_FLAGS}          -o ${OBJ} ${SRC}
     ${DEBUG} ${cc65dir}/ld65 ${LNK_FLAGS} -o ${BIN}   ${OBJ}
 
@@ -55,7 +58,8 @@ else
     # Likewise, GNU sed 's/.*/\L&/g' doesn't work on OSX (BSD)
     if [[ -f a2rm && -f a2in ]]; then
         A2FILE=`echo "${FILE}" | awk '{print toupper($0)}'`
-        ${DEBUG} a2rm      ${FILE}.DSK ${A2FILE}
+        ${COPY}  empty.dsk ${FILE}.DSK
+        #${DEBUG} a2rm      ${FILE}.DSK ${A2FILE}
         ${DEBUG} a2in -r b ${FILE}.DSK ${A2FILE} ${BIN}
     else
         echo "ERROR: a2tools missing: 'a2rm' and 'a2in'"

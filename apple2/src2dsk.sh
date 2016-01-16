@@ -3,28 +3,33 @@
 # Purpose: Assemble, Link, & Copy a binary to a DOS 3.3 .DSK image without all the cc65 library crap.
 # Usage: src2dsk.sh {sourcefile}
 #
-# Example: 
+# Example:
 # 1. src2dsk.sh barebones.s
 #
-#    foo.s   <- original assembly source file
+#    foo.s   <- input assembly source file
 #    foo.o   <- output of assembler
 #    foo.bin <- output of linker
-#    foo.bin is "copied" to 'foo.dsk' as "FOO"
+#    foo.dsk <- DOS 3.3 disk contaning binary 'FOO'
+#
 # 2. Mount 'barebones.dsk' in your emulator
 #
-# If you try BRUN'ing the file the RTS won't exit to BASIC properly.
+# If you try BRUN'ing the file the RTS won't exit to DOS 3.3 / BASIC properly.
 # A simple work-around is to BLOAD, then run it.
-# 3. BLOAD BAREBONES
-# 4. CALL -151
-# 5. AA72.AA73
-# 6  Use whatever addres is displayed (bytes are swapped):
-#    1000G
+#   3. BLOAD BAREBONES
+#   4. CALL -151
+#   5. AA72.AA73
+#   6  Use whatever addres is displayed (bytes are swapped):
+#      1000G
+#
+# The 'barebones.s' exits via 'JMP $3D0' to warmstart DOS.
 #
 # You can get a blank DSK here
 # * ftp://ftp.apple.asimov.net/pub/apple_II/images/masters/
-# wget ftp://ftp.apple.asimov.net/pub/apple_II/images/masters/emptyDSK_Dos33.zip
+
+## wget ftp://ftp.apple.asimov.net/pub/apple_II/images/masters/emptyDSK_Dos33.zip
 # curl -# -o EmptyDSK_DOS33.zip ftp://ftp.apple.asimov.net/pub/apple_II/images/masters/emptyDSK_Dos33.zip
 #
+# I've included an 'empty.dsk' in the repo. for convenience
 cc65dir=../bin
 COPY=cp
 DEL=rm
@@ -80,7 +85,7 @@ else
         ${COPY}  empty.dsk ${FILE}.dsk
         # If you want to keep an existing disk
         # you will want to first remove the old version on .DSK
-        #${DEBUG} a2rm      ${FILE}.DSK ${A2FILE}
+        #${DEBUG} a2rm      ${FILE}.dsk ${A2FILE}
         ${DEBUG} a2in -r b ${FILE}.dsk ${A2FILE} ${BIN}
 fi
 

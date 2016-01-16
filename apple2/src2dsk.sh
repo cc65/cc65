@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Purpose: Assemble, Link, & Copy a binary to a DOS 3.3 .DSK image without all the cc65 library crap.
 # Usage: src2dsk.sh {sourcefile}

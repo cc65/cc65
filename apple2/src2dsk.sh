@@ -3,6 +3,7 @@
 # Purpose: Assemble, Link, & Copy a binary to a DOS 3.3 .DSK image without all the cc65 library crap.
 # Note: Leave off the extension for 'sourcefile.s'
 # Usage: src2dsk.sh {sourcefile}
+#
 # Example: 
 # 1. src2dsk.sh barebones
 #
@@ -23,7 +24,9 @@
 # Requires: a2tools
 # * ftp://ftp.apple.asimov.net/pub/apple_II/utility/
 # * http://slackbuilds.org/repository/14.1/system/a2tools/
-
+#
+# You can get a blank DSK here
+# * ftp://ftp.apple.asimov.net/pub/apple_II/images/masters/
 cc65dir=../bin
 
 # http://www.cc65.org/doc/ca65-2.html#ss2.2

@@ -10,7 +10,15 @@
 #    foo.o   <- output of assembler
 #    foo.bin <- output of linker
 #    foo.bin is "copied" to 'foo.dsk' as "FOO"
-# 2. Load 'barebones.dsk' in your emulator
+# 2. Mount 'barebones.dsk' in your emulator
+#
+# If you try BRUN'ing the file the RTS won't exit to BASIC properly.
+# A simple work-around is to BLOAD, then run it.
+# 3. BLOAD BAREBONES
+# 4. CALL -151
+# 5. AA72.AA73
+# 6  Use whatever addres is displayed (bytes are swapped):
+#    1000G
 #
 # Requires: a2tools
 # * ftp://ftp.apple.asimov.net/pub/apple_II/utility/

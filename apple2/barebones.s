@@ -52,7 +52,24 @@ PRINTCHAR:  JSR    COUT
             INX
             LDA    MSG,X
             BNE    PRINTCHAR
-            RTS
+
+; Normally you would end with an RTS
+; but if you try to BRUN our binary file with DOS 3.3
+; it doesn't properly handle the return stack causing the program to run twice.
+;
+; Solution 1:
+;    BLOAD <file>
+;    CALL-151
+;    AA72.AA73
+;    Swap the byte displayed
+;    To run type:
+;        ####G
+;    i.e. 1000G
+;
+; Solution 2:
+;    Replace the RTS with 'JMP $3D0' which is the reconnect DOS vector.
+            JMP $3D0
+
 MSG:
             ASC "Hello world, Apple!"
             .byte $00

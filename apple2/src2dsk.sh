@@ -56,13 +56,15 @@ else
     # We need to uppercase the file name for a DOS 3.3 DSK
     # The ${1,,} is a Bash 4.0 uppercase extension so we can't use that
     # Likewise, GNU sed 's/.*/\L&/g' doesn't work on OSX (BSD)
-    if [[ -f a2rm && -f a2in ]]; then
+    if [[ -f a2in ]]; then
         A2FILE=`echo "${FILE}" | awk '{print toupper($0)}'`
         ${COPY}  empty.dsk ${FILE}.DSK
+        # If you want to keep an existing disk
+        # you will want to first remove the old version on .DSK
         #${DEBUG} a2rm      ${FILE}.DSK ${A2FILE}
         ${DEBUG} a2in -r b ${FILE}.DSK ${A2FILE} ${BIN}
     else
-        echo "ERROR: a2tools missing: 'a2rm' and 'a2in'"
+        echo "ERROR: a2tools missing: 'a2in'"
         echo " "
         echo "It can be found here:"
         echo " * ftp://ftp.apple.asimov.net/pub/apple_II/utility/"

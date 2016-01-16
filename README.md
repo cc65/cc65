@@ -52,8 +52,11 @@ shouldn't be too much work.
             .include "dos33.h"   ; Apple DOS 3.3 binary file 4 byte prefix header
 
 
-2. You need to use a2tools in "raw" mode
-3. If you need text with the high-bit set use the macro ASC in [barebones.s](apple2/barebones.s)
+2. If you want the ability to BRUN your binary and return to DOS when done you need to use `JMP $3D0` instead of an `RTS`. (If you really want to use `RTS` you will first need to BLOAD your binary and then run it manually with an Applesoft `CALL` or monitor `####G` command.)
+
+3. If you use `a2tools` you need to use a2tools in "raw" mode
+
+4. If you need text with the high-bit set use the macro ASC in [barebones.s](apple2/barebones.s)
 
 * See the directory [apple2](apple2/) for more details.
 

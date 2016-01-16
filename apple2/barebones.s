@@ -72,6 +72,7 @@ PRINTCHAR:  JSR    COUT
 
 MSG:
             ASC "Hello world, Apple!"
+            .byte $8D  ; CR with high-bit set
             .byte $00
 __END:
 

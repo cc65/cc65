@@ -27,6 +27,9 @@
 #
 # You can get a blank DSK here
 # * ftp://ftp.apple.asimov.net/pub/apple_II/images/masters/
+# wget -# -o EmptyDSK_DOS33.zip ftp://ftp.apple.asimov.net/pub/apple_II/images/masters/emptyDSK_Dos33.zip
+
+#
 cc65dir=../bin
 
 # http://www.cc65.org/doc/ca65-2.html#ss2.2

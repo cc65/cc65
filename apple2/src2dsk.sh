@@ -49,6 +49,7 @@ else
     ASM_FLAGS="--cpu 65c02"
     LNK_FLAGS="-C apple2bin.cfg"
 
+    DEBUG=
     #DEBUG=echo
     ${DEBUG} ${cc65dir}/ca65 ${ASM_FLAGS}          -o ${OBJ} ${SRC}
     ${DEBUG} ${cc65dir}/ld65 ${LNK_FLAGS} -o ${BIN}   ${OBJ}
@@ -57,7 +58,7 @@ else
     # The ${1,,} is a Bash 4.0 uppercase extension so we can't use that
     # Likewise, GNU sed 's/.*/\L&/g' doesn't work on OSX (BSD)
     A2FILE=`echo "${FILE}" | awk '{print toupper($0)}'`
-    a2rm      ${FILE}.DSK ${A2FILE}
-    a2in -r b ${FILE}.DSK ${A2FILE} ${BIN}
+    ${DEBUG} a2rm      ${FILE}.DSK ${A2FILE}
+    ${DEBUG} a2in -r b ${FILE}.DSK ${A2FILE} ${BIN}
 fi
 

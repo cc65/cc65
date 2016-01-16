@@ -77,11 +77,11 @@ else
     # The ${1,,} is a Bash 4.0 uppercase extension so we can't use that
     # Likewise, GNU sed 's/.*/\L&/g' doesn't work on OSX (BSD)
         A2FILE=`echo "${FILE}" | awk '{print toupper($0)}'`
-        ${COPY}  empty.dsk ${FILE}.DSK
+        ${COPY}  empty.dsk ${FILE}.dsk
         # If you want to keep an existing disk
         # you will want to first remove the old version on .DSK
         #${DEBUG} a2rm      ${FILE}.DSK ${A2FILE}
-        ${DEBUG} a2in -r b ${FILE}.DSK ${A2FILE} ${BIN}
+        ${DEBUG} a2in -r b ${FILE}.dsk ${A2FILE} ${BIN}
 fi
 
 echo "Created: ${FILE}.dsk"

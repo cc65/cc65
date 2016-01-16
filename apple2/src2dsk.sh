@@ -29,6 +29,26 @@ cc65dir=../bin
 COPY=cp
 DEL=rm
 
+if [ ! -f a2in ]; then
+    echo "WARNING: Missing a2tools 'a2in', attempting to build"
+    echo "Compiling 'a2tools' ..."
+    echo "  gcc -DUNIX a2tools.c -o a2in"
+    gcc -DUNIX a2tools.c -o a2in
+    if [[ -f a2in ]]; then
+        echo "... success!"
+    else
+        echo "ERROR: a2tools missing: 'a2in'"
+        echo " "
+        echo "The original tools can be found here:"
+        echo " * ftp://ftp.apple.asimov.net/pub/apple_II/utility/"
+        echo " * http://slackbuilds.org/repository/14.1/system/a2tools/"
+        echo "To download:"
+        echo "   curl -o a2tools.zip ftp://ftp.apple.asimov.net/pub/apple_II/utility/a2tools.zip"
+        echo "This repo. contains a copy but was unable to compile it."
+        exit
+    fi
+fi
+
 # http://www.cc65.org/doc/ca65-2.html#ss2.2
 if [[ -z ${cc65dir} ]]; then
     echo "Error: 'cc65dir' not set, should point to directory containing 'ca65', 'ld65'"
@@ -56,21 +76,13 @@ else
     # We need to uppercase the file name for a DOS 3.3 DSK
     # The ${1,,} is a Bash 4.0 uppercase extension so we can't use that
     # Likewise, GNU sed 's/.*/\L&/g' doesn't work on OSX (BSD)
-    if [[ -f a2in ]]; then
         A2FILE=`echo "${FILE}" | awk '{print toupper($0)}'`
         ${COPY}  empty.dsk ${FILE}.DSK
         # If you want to keep an existing disk
         # you will want to first remove the old version on .DSK
         #${DEBUG} a2rm      ${FILE}.DSK ${A2FILE}
         ${DEBUG} a2in -r b ${FILE}.DSK ${A2FILE} ${BIN}
-    else
-        echo "ERROR: a2tools missing: 'a2in'"
-        echo " "
-        echo "It can be found here:"
-        echo " * ftp://ftp.apple.asimov.net/pub/apple_II/utility/"
-        echo " * http://slackbuilds.org/repository/14.1/system/a2tools/"
-        echo "To download:"
-        echo "   curl -o a2tools.zip ftp://ftp.apple.asimov.net/pub/apple_II/utility/a2tools.zip"
-    fi
 fi
+
+echo "Created: ${FILE}.dsk"
 

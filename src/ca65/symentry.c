@@ -570,8 +570,8 @@ void SymConDes (SymEntry* S, unsigned char AddrSize, unsigned Type, unsigned Pri
         }
     }
 
-    /* If the symbol was already declared as a condes, check if the new
-    ** priority value is the same as the old one.
+    /* If the symbol already was declared as a condes of this type,
+    ** check if the new priority value is the same as the old one.
     */
     if (S->ConDesPrio[Type] != CD_PRIO_NONE) {
         if (S->ConDesPrio[Type] != Prio) {
@@ -583,10 +583,8 @@ void SymConDes (SymEntry* S, unsigned char AddrSize, unsigned Type, unsigned Pri
     /* Set the symbol data */
     S->Flags |= (SF_EXPORT | SF_REFERENCED);
 
-    /* In case we have no line info for the definition, record it now */
-    if (CollCount (&S->DefLines) == 0) {
-        GetFullLineInfo (&S->DefLines);
-    }
+    /* Remember the line info for this reference */
+    CollAppend (&S->RefLines, GetAsmLineInfo ());
 }
 
 

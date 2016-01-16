@@ -34,9 +34,14 @@ cc65dir=../bin
 COPY=cp
 DEL=rm
 
+if [[ -z ${1} ]]; then
+    echo "ERROR: need an assembly source file (e.g. foo.s) to build from!"
+    exit 1
+fi
+
 if [ ! -f a2in ]; then
     echo "WARNING: Missing a2tools 'a2in', attempting to build"
-    echo "Compiling 'a2tools' ..."
+    echo "INFO: Compiling 'a2tools' ..."
     echo "  gcc -DUNIX a2tools.c -o a2in"
     gcc -DUNIX a2tools.c -o a2in
     if [[ -f a2in ]]; then
@@ -50,13 +55,13 @@ if [ ! -f a2in ]; then
         echo "To download:"
         echo "   curl -o a2tools.zip ftp://ftp.apple.asimov.net/pub/apple_II/utility/a2tools.zip"
         echo "This repo. contains a copy but was unable to compile it."
-        exit
+        exit 1
     fi
 fi
 
 # http://www.cc65.org/doc/ca65-2.html#ss2.2
 if [[ -z ${cc65dir} ]]; then
-    echo "Error: 'cc65dir' not set, should point to directory containing 'ca65', 'ld65'"
+    echo "ERROR: 'cc65dir' not set, should point to directory containing 'ca65', 'ld65'"
     return
 else
     #http://stackoverflow.com/questions/965053/extract-filename-and-extension-in-bash
@@ -89,5 +94,5 @@ else
         ${DEBUG} a2in -r b ${FILE}.dsk ${A2FILE} ${BIN}
 fi
 
-echo "Created: ${FILE}.dsk"
+echo "INFO: Created: ${FILE}.dsk"
 

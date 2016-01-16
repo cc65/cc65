@@ -24,7 +24,7 @@
     -------------------------------------------------------------------
 
     Cleaned up abuse of C semantics to compile clean
-    Replaced original line #820 (now line #829)
+    Replaced original line #820 (now line #831)
         while(i<30 && a2_name[i]) padded_name[i]=a2_name[i++] & 0x7f;
     With:
         while(i<30 && a2_name[i]) { padded_name[i]=a2_name[i] & 0x7f; i++; }
@@ -84,6 +84,8 @@ const char *const DOS_HelpText =
 "\n"
 "a2tools - utility for transferring files from/to Apple II .dsk images\n"
 "          Copyright (C) 1998, 2001  Terry Kyriacopoulos\n"
+"          Copyright (C) 2001 Paul Schlyter\n"
+"          Copyright (C) 2016 Michael Pohoreski\n"
 "\n"
 "    Usage:\n"
 "\n"

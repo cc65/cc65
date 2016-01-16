@@ -34,3 +34,26 @@ including
 
 The libraries are fairly portable, so creating a version for other 6502s
 shouldn't be too much work.
+
+# Apple 2 standalone barebones assembly without C libraries.
+
+1. You need to generate a 4 bytes DOS 3.3 binary file prefix
+
+ Place these 4 lines at the beginning of your source file:
+
+            __MAIN = $1000       ; Apple DOS 3.3 binary file 4 byte prefix header
+            .word __MAIN         ; 2 byte BLAOD address
+            .word __END - __MAIN ; 2 byte BLOAD size
+            .org  __MAIN         ; .org must come after header else offsets are wrong
+
+ Or the simpler 2-liner:
+
+            __MAIN = $1000
+            .include "dos33.h"   ; Apple DOS 3.3 binary file 4 byte prefix header
+
+
+2. You need to use a2tools in "raw" mode
+3. If you need text with the high-bit set use the macro ASC in [barebones.s](apple2/barebones.s)
+
+* See the directory [apple2](apple2/) for more details.
+

@@ -19,7 +19,9 @@
 ; 
 ; "The 'nice' thing about standards, is that there are so many to pick from!"
 ;
-; This macro _would_ work except ca65 is broken. :-(
+; NOTE: If you use the buggy '*' operator (see note below) this macro won't
+; process the last 4 chars! Once we used a working "END-MAIN" we no longer
+; need to manually set the high bit when printing characters via `ORA #80`.
 .macro ASC text
     .repeat .strlen(text), I
     .byte   .strat(text, I) | $80
@@ -48,13 +50,13 @@
             .org  __MAIN         ; .org must come after header else offsets are wrong
             LDX    #0
             LDA    MSG,X    ; load initial char
-PRINTCHAR:  ORA    #$80     ; work-around stupid macro bug *sigh*
-            JSR    COUT
+PRINTCHAR:  JSR    COUT
             INX
             LDA    MSG,X
             BNE    PRINTCHAR
             RTS
-MSG:        .asciiz "Hello, world!"
-
+MSG:
+            ASC "Hello world, Apple!"
+            .byte $00
 __END:
 

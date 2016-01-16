@@ -43,11 +43,9 @@
 ; Solution 2 is to not use the buggy '*' operator, replace with a real variable
 ;     .wordwd __END - __MAIN
 
-            __MAIN = $1000       ; Apple DOS 3.3 binary file 4 byte prefix header
-            .word __MAIN         ; 2 byte BLAOD address
-            .word __END - __MAIN ; 2 byte BLOAD size
+            __MAIN = $1000
+            .include "dos33.h"   ; Apple DOS 3.3 binary file 4 byte prefix header
 
-            .org  __MAIN         ; .org must come after header else offsets are wrong
             LDX    #0
             LDA    MSG,X    ; load initial char
 PRINTCHAR:  JSR    COUT

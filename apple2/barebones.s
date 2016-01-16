@@ -42,8 +42,8 @@
 ;     .wordwd __END - __MAIN
 
             __MAIN = $1000       ; Apple DOS 3.3 binary file 4 byte prefix header
-            .word __MAIN         ; 2 byte blaod address
-            .word __END - __MAIN ; 2 byte bload size
+            .word __MAIN         ; 2 byte BLAOD address
+            .word __END - __MAIN ; 2 byte BLOAD size
 
             .org  __MAIN         ; .org must come after header else offsets are wrong
             LDX    #0

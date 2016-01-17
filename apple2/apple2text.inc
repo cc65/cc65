@@ -31,7 +31,7 @@
 ; NOTE: There is no lowercase flashinng characters - they will appar as gibbersh!
 .macro AT text
     .repeat .strlen(text)-1, I
-        .byte   .strat(text, I) .BITAND $7F
+        .byte   .strat(text, I) & $7F
     .endrep
     .byte   .strat(text, .strlen(text)-1) | $80
 .endmacro

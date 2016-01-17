@@ -28,6 +28,7 @@
 .endmacro
 
 ; Force ASCII 'text' but last character has high bit on
+; Will display as FLASHING characters
 ; NOTE: There is no lowercase flashinng characters - they will appar as gibbersh!
 .macro AT text
     .repeat .strlen(text)-1, I
@@ -45,6 +46,7 @@
 .endmacro
 
 ; Force ASCII 'text' to be control chars: $00..$1F
+; Will display as INVERSE characters
 .macro AC text
     .repeat .strlen(text), I
         .byte   .strat(text, I) & $1F

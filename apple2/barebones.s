@@ -19,7 +19,7 @@
 ;     .wordwd __END - __MAIN
 
             __MAIN = $1000
-            .include "dos33.h"  ; Apple DOS 3.3 binary file 4 byte prefix header
+            .include "dos33.inc"  ; Apple DOS 3.3 binary file 4 byte prefix header
 
             LDX    #0
             LDA    MSG,X        ; load initial char

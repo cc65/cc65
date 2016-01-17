@@ -9,7 +9,7 @@
             .include "dos33.inc"  ; Apple DOS 3.3 binary file 4 byte prefix header
 
             LDX    #0
-            LDA    MSG,X        ; load initial char
+            LDA    MSG,X          ; load initial char
 PRINTCHAR:  JSR    COUT
             INX
             LDA    MSG,X
@@ -28,7 +28,7 @@ PRINTCHAR:  JSR    COUT
 ;    i.e. 1000G
 ;
 ; Solution 2:
-;    Replace the RTS with 'JMP $3D0' which is the reconnect DOS "warmstart" vector.
+;    Replace the `RTS` with `JMP $3D0` -- the reconnect DOS "warmstart" vector.
             JMP $3D0
 
 MSG:

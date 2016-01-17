@@ -1,11 +1,11 @@
-; Example showing how to assemble+link without any of the cc65 library crap
-; to produce a standalone Apple DOS3.3 binary barbones file
+; Example showing how to assemble+link without any cc65's C library bloat
+; to produce a barbones standalone (Apple DOS 3.3) binary file.
 
             .include "apple2text.inc" ; AR, AS and AT macros
 
             COUT = $FDED
 
-; The operator '*' is buggy. This will generate a bogusBogus link error:
+; The operator '*' is buggy. This will generate a bogus link error:
 ; ld65: Error: Range error in module `link_bug.s', line 3
 ;            __MAIN = $1000       ; Apple DOS 3.3 binary file 4 byte prefix header
 ;            .word __MAIN         ; 2 byte BLAOD address

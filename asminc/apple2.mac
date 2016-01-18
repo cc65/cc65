@@ -5,7 +5,7 @@
 ;
 ;     There is no "standard" directive to set the high bit on ASCII text.
 ;
-; * The assembler used in the redbook uses `msb on` and `msb off`
+; * The assembler used in the Redbook uses `msb on` and `msb off`
 ; * S-C Macro Assembler used
 ;     .AS for normal ASCII, and
 ;     .AT for normal ASCII but the last char has the high bit ON
@@ -14,9 +14,8 @@
 ;     ASC "Hello"   ; high bit is ON
 ;   See the new Merlin-32 project at:
 ;   * http://brutaldeluxe.fr/products/crossdevtools/merlin/
-; 
-; "The 'nice' thing about standards, is that there are so many to pick from!"
-;
+
+
 ; Force APPLE 'text' to have high bit on
 .macro AS text
     .repeat .strlen(text), I
@@ -24,15 +23,17 @@
     .endrep
 .endmacro
 
+
 ; Force ASCII 'text' but last character has high bit on
 ; Will display as FLASHING characters
-; NOTE: There is no lowercase flashinng characters - they will appar as gibbersh!
+; NOTE: There is no lowercase flashing characters - they will appear as gibberish!
 .macro AT text
     .repeat .strlen(text)-1, I
         .byte   .strat(text, I) & $7F
     .endrep
     .byte   .strat(text, .strlen(text)-1) | $80
 .endmacro
+
 
 ; Force APPLE 'text' with high bit on but last character has high bit off
 .macro AR text
@@ -41,6 +42,7 @@
     .endrep
     .byte   .strat(text, .strlen(text)-1) & $7F
 .endmacro
+
 
 ; Force ASCII 'text' to be control chars: $00..$1F
 ; Will display as INVERSE characters

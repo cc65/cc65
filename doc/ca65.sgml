@@ -4432,7 +4432,21 @@ The package defines the following macros:
        	jeq, jne, jmi, jpl, jcs, jcc, jvs, jvc
 </verb></tscreen>
 
+<sect1><tt>.MACPACK apple2</tt><p>
 
+This macro package defines 4 macros named <tt/AS/, <tt/AT/, <tt/AR/, and
+<tt/AC/, to convert a string depending if you need the high bit set, cleared,
+toggled, or control characters, respectively.
+
+Example showing the 5 variations and how they will be displayed on the Apple.
+
+<tscreen><verb>
+    .ascii "Ascii"      ; FLASH  : ASCII text
+    AR "ABC"            ; NORMAL : APPLE high-bit text, last char is ASCII (FLASHING)
+    AS "Hello world"    ; NORMAL : APPLE high-bit text
+    AT "XYZ"            ; FLASH  : ASCII text, last char is APPLE high-bit (NORMAL)
+    AC "DEFM"           ; INVERSE: Force to be control chars0 $0..$1F (INVERSE)
+</verb></tscreen>
 
 <sect1><tt>.MACPACK atari</tt><p>
 

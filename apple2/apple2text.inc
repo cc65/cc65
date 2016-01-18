@@ -1,11 +1,5 @@
-; ca65 doesn't have a directive to control (set, clear, toggle) the high bit on
-; text as, sadly, the original author didn't know anything about the Apple. :-(
-;
-; * http://www.cc65.org/mailarchive/2003-05/2992.html
-; * http://www.cc65.org/mailarchive/2003-05/2995.html
-;
-;    Can someone explain me how characters work in the apple? This is the first
-;    time I hear something about the usage of bit 7.
+; ca65, sadly, doesn't have a directive to control (set, clear, toggle) the
+; high bit on text.
 ;
 ; **NOTE**: If you are familiar with other Apple 2 assemblers:
 ;

@@ -34,4 +34,3 @@ including
 
 The libraries are fairly portable, so creating a version for other 6502s
 shouldn't be too much work.
-

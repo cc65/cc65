@@ -1,7 +1,7 @@
 ; Example showing how to assemble+link without any cc65's C library bloat
 ; to produce a barebones standalone (Apple DOS 3.3) binary file.
 
-            .include "apple2text.inc" ; AR, AS and AT macros
+            .include "apple2.mac" ; AC, AR, AS and AT macros
 
             COUT = $FDED
 

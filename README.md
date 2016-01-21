@@ -27,7 +27,7 @@ including
 - GEOS for the C64, C128 and Apple //e.
 - the NEC PC-Engine (aka TurboGrafx-16).
 - the Nintendo Entertainment System (NES) console.
-- the Supervision console.
+- the Watara Supervision console.
 - the Oric Atmos.
 - the Lynx console.
 - the Ohio Scientific Challenger 1P

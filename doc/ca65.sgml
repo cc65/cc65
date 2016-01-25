@@ -4432,21 +4432,41 @@ The package defines the following macros:
        	jeq, jne, jmi, jpl, jcs, jcc, jvs, jvc
 </verb></tscreen>
 
-<sect1><tt>.MACPACK apple2</tt><p>
+<sect1><tt>.MACPACK apple2</tt><label id="macropackages-apple2"><p>
 
-This macro package defines 4 macros named <tt/AS/, <tt/AT/, <tt/AR/, and
-<tt/AC/, to convert a string depending if you need the high bit set, cleared,
-toggled, or control characters, respectively.
+This macro package defines 5 macros named <tt/AS/, <tt/AT/, <tt/AR/, <tt/AC/,
+and <tt/AI/ to convert a string depending if you need the high bit set,
+cleared, toggled, control characters, or inverse text respectively.
 
-Example showing the 5 variations and how they will be displayed on the Apple.
+Example showing the variations:
+
+<itemize>
+<item>How they will be displayed on the Apple, and
+<item>The raw bytes generated.
+</itemize>
 
 <tscreen><verb>
-    .ascii "Ascii"      ; FLASH  : ASCII text
-    AR "ABC"            ; NORMAL : APPLE high-bit text, last char is ASCII (FLASHING)
-    AS "Hello world"    ; NORMAL : APPLE high-bit text
-    AT "XYZ"            ; FLASH  : ASCII text, last char is APPLE high-bit (NORMAL)
-    AC "DEFM"           ; INVERSE: Force to be control chars0 $0..$1F (INVERSE)
+        .ascii "Abc"                ; FLASH  : ASCII text (lowercase appears as symbols)
+        .byte $41, $62, $63
+
+        AR "Abc"                    ; NORMAL : APPLE high-bit text, last char. is ASCII (FLASHING)
+        .byte $C1, $E2, $63
+
+        AS "Abc"                    ; NORMAL : APPLE high-bit text
+        .byte $C1, $E2, $E3
+
+        AT "HGR"                    ; FLASH  : ASCII text, last char. is APPLE high-bit (NORMAL)
+        .byte $48, $47, $D2
+
+        AC "HUJK"                   ; INVERSE: Force to be control chars. $00..$1F
+        .byte $08, $15, $0A, $0B    ; Arrow Keys <-, ->, Down, Up
+
+        AI "ABC?"                   ; INVERSE: Control chars. and symbols $00..$3F
+        .byte $01, $02, $03, $3F
 </verb></tscreen>
+
+For more information see section <tt/<ref id="porting-sources-apple2-assemblers"
+name="Other Apple 2 Assemblers">/ in <tt/Porting sources from other assemblers./>
 
 <sect1><tt>.MACPACK atari</tt><p>
 
@@ -4765,7 +4785,7 @@ additional type. Predefined types are 0 (constructor), 1 (destructor) and 2
 </itemize>
 
 
-<sect>Porting sources from other assemblers<p>
+<sect>Porting sources from other assemblers<label id="porting-sources-assemblers"><p>
 
 Sometimes it is necessary to port code written for older assemblers to ca65.
 In some cases, this can be done without any changes to the source code by
@@ -4848,6 +4868,76 @@ Note that you need to use the actual start address minus two, since two bytes
 are used for the cbm load address.
 
 </enum>
+
+<sect1>Other Apple 2 Assemblers<label id="porting-sources-apple2-assemblers"></p>
+
+Since ASCII is only 7-bit the Apple 2 computers used the high bit for
+characters / strings in a variety of ways unique to the Apple computer:
+
+<itemize>
+
+<item>A valid key press will have its high bit set when reading the keyboard
+($C000). Example:
+
+<tscreen><verb>
+        GetKey: LDA $C000
+                BPL GetKey  ; Wait until A is Negative, A >= $80
+        GotKey: STA $C010   ; Acknowledge key press
+</verb></tscreen>
+
+<item>Characters displayed on the TEXT screens ($400/$800) will have the high
+bit set when displaying normal ASCII text or the high bit cleared when
+displaying inverse (or flashing) text.
+
+<item>To compactly represent an End-of-String (without wasting an additional
+byte such as C's zero terminated string) the last character can have its high
+bit toggled.  (An example is Applesoft's Tokens at $D0D0..$D25F)
+
+</itemize>
+
+Unfortunately, there is no "standard" directive or <ref id="control-commands"
+name="Control Commands"> to set the high bit on ASCII text. Some of the various
+Apple 2 assemblers used these directives:
+
+<itemize>
+
+<item>EDASM, Apple's official assembler used in the Apple ][ "Redbook", used:
+
+<tscreen><verb>
+        MSB OFF     ; Generate ASCII text, high bit off
+        MSB ON      ; Generate APPLE text, high bit on
+
+        ASC "Abc"   ; Generate ASCII text
+        STR "Abc"   ; Generate text with the high bit set by MSB
+        DCI "HGR"   ; Generate ASCII text, last char has high bit set
+</verb></tscreen>
+
+NOTE: Even Apple's assembler was slightly inconsistent:
+
+<itemize>
+<item>The DOS 3.3 version of EDASM defaulted to MSB ON, and
+<item>The ProDOS  version of EDASM defaulted to MSB OFF.
+</itemize>
+
+More more info see the book "ProDOS Assembler Tools."
+
+<item>S-C Macro Assembler, used:
+<tscreen><verb>
+        .AS "Abc"   ; for normal ASCII, and
+        .AT "HGR"   ; for normal ASCII but the last char has the high bit ON
+</verb></tscreen>
+
+<item>Merlin, used yet another variation with single or double quotes to
+control the high bit:
+
+<tscreen><verb>
+        ASC 'Abc'   ; high bit is off
+        ASC "Abc"   ; high bit is ON
+</verb></tscreen>
+
+</itemize>
+
+See section <tt/<ref id="macropackages-apple2" name=".MACPACK apple2">/ for Apple 2 specific macros.
 
 
 <sect>Copyright<p>

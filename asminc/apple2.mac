@@ -5,7 +5,16 @@
 ;
 ;     There is no "standard" directive to set the high bit on ASCII text.
 ;
-; * The assembler used in the Redbook uses `msb on` and `msb off`
+; * EDASM, the assembler used in the Redbook uses:
+;     MSB OFF       ; Generate ASCII text, high bit off
+;     MSB ON        ; Generate APPLE text, high bit on
+;     ASC "Hello"   ; Generate ASCII text
+;     STR "Hello"   ; Generate text with the high bit set by MSB
+;     DCI "Hello"   ; Generate ASCII text, last char has high bit set
+;   NOTE:
+;    * EDAM DOS 3.3 version defaulted to MSB ON,
+;    * EDMA ProDOS version defaulted to MSB OFF.
+;   Reference: ProDOS   Assembler Tools
 ; * S-C Macro Assembler used
 ;     .AS for normal ASCII, and
 ;     .AT for normal ASCII but the last char has the high bit ON
@@ -17,23 +26,22 @@
 
 
 ; Force APPLE 'text' to have high bit on
+; Will display as NORMAL characters
 .macro AS text
     .repeat .strlen(text), I
         .byte   .strat(text, I) | $80
     .endrep
 .endmacro
 
-
 ; Force ASCII 'text' but last character has high bit on
 ; Will display as FLASHING characters
-; NOTE: There is no lowercase flashing characters - they will appear as gibberish!
+; NOTE: There is no lowercase flashing characters - they will appear as symbols!
 .macro AT text
     .repeat .strlen(text)-1, I
         .byte   .strat(text, I) & $7F
     .endrep
     .byte   .strat(text, .strlen(text)-1) | $80
 .endmacro
-
 
 ; Force APPLE 'text' with high bit on but last character has high bit off
 .macro AR text
@@ -42,7 +50,6 @@
     .endrep
     .byte   .strat(text, .strlen(text)-1) & $7F
 .endmacro
-
 
 ; Force ASCII 'text' to be control chars: $00..$1F
 ; Will display as INVERSE characters

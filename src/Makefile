@@ -2,16 +2,17 @@ ifneq ($(shell echo),)
   CMD_EXE = 1
 endif
 
-PROGS = ar65  \
-        ca65  \
-        cc65  \
-        cl65  \
-        co65  \
-        da65  \
-        grc65 \
-        ld65  \
-        od65  \
-        sim65 \
+PROGS = ar65     \
+        ca65     \
+        cc65     \
+        chrcvt65 \
+        cl65     \
+        co65     \
+        da65     \
+        grc65    \
+        ld65     \
+        od65     \
+        sim65    \
         sp65
 
 .PHONY: all mostlyclean clean install zip avail unavail bin $(PROGS)

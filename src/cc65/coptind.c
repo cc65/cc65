@@ -900,11 +900,11 @@ unsigned OptCondBranches1 (CodeSeg* S)
 
         /* Check if it's a register load */
         if ((E->Info & OF_LOAD) != 0              &&  /* It's a load instruction */
-            E->AM == AM65_IMM                     &&  /* ..with immidiate addressing */
+            E->AM == AM65_IMM                     &&  /* ..with immediate addressing */
             (E->Flags & CEF_NUMARG) != 0          &&  /* ..and a numeric argument. */
             (N = CS_GetNextEntry (S, I)) != 0     &&  /* There is a following entry */
             (N->Info & OF_CBRA) != 0              &&  /* ..which is a conditional branch */
-            !CE_HasLabel (N)) {               /* ..and does not have a label */
+            !CE_HasLabel (N)) {                       /* ..and does not have a label */
 
             /* Get the branch condition */
             bc_t BC = GetBranchCond (N->OPC);

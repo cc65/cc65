@@ -96,7 +96,7 @@ unsigned OptJumpTarget3 (CodeSeg* S);
 */
 
 unsigned OptCondBranches1 (CodeSeg* S);
-/* If an immidiate load of a register is followed by a conditional jump that
+/* If an immediate load of a register is followed by a conditional jump that
 ** is never taken because the load of the register sets the flags in such a
 ** manner, remove the conditional branch.
 */

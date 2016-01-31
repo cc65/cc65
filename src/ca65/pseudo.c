@@ -336,7 +336,7 @@ static void DoA16 (void)
     if (GetCPU() != CPU_65816) {
         Error ("Command is only valid in 65816 mode");
     } else {
-        /* Immidiate mode has two extension bytes */
+        /* Immediate mode has two extension bytes */
         ExtBytes [AM65I_IMM_ACCU] = 2;
     }
 }
@@ -349,7 +349,7 @@ static void DoA8 (void)
     if (GetCPU() != CPU_65816) {
         Error ("Command is only valid in 65816 mode");
     } else {
-        /* Immidiate mode has one extension byte */
+        /* Immediate mode has one extension byte */
         ExtBytes [AM65I_IMM_ACCU] = 1;
     }
 }
@@ -1161,7 +1161,7 @@ static void DoI16 (void)
     if (GetCPU() != CPU_65816) {
         Error ("Command is only valid in 65816 mode");
     } else {
-        /* Immidiate mode has two extension bytes */
+        /* Immediate mode has two extension bytes */
         ExtBytes [AM65I_IMM_INDEX] = 2;
     }
 }
@@ -1174,7 +1174,7 @@ static void DoI8 (void)
     if (GetCPU() != CPU_65816) {
         Error ("Command is only valid in 65816 mode");
     } else {
-        /* Immidiate mode has one extension byte */
+        /* Immediate mode has one extension byte */
         ExtBytes [AM65I_IMM_INDEX] = 1;
     }
 }

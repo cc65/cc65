@@ -68,7 +68,7 @@
 
 
 static void PutPCRel8 (const InsDesc* Ins);
-/* Handle branches with a 8 bit distance */
+/* Handle branches with an 8 bit distance */
 
 static void PutPCRel16 (const InsDesc* Ins);
 /* Handle branches with an 16 bit distance and PER */
@@ -1033,9 +1033,9 @@ unsigned char ExtBytes[AM65I_COUNT] = {
     2,          /* Relative long */
     1,          /* r,s */
     1,          /* (r,s),y */
-    1,          /* Immidiate accu */
-    1,          /* Immidiate index */
-    1,          /* Immidiate byte */
+    1,          /* Immediate accu */
+    1,          /* Immediate index */
+    1,          /* Immediate byte */
     2,          /* Blockmove (65816) */
     7,          /* Block transfer (HuC6280) */
     2,          /* Absolute Indirect long */
@@ -1252,7 +1252,7 @@ static long PutImmed8 (const InsDesc* Ins)
 
 
 static void PutPCRel8 (const InsDesc* Ins)
-/* Handle branches with a 8 bit distance */
+/* Handle branches with an 8 bit distance */
 {
     EmitPCRel (Ins->BaseCode, GenBranchExpr (2), 1);
 }

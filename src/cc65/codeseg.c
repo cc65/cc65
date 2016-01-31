@@ -297,7 +297,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
             break;
 
         case '#':
-            /* Immidiate */
+            /* Immediate */
             StrCopy (Arg, sizeof (Arg), L+1);
             AM = AM65_IMM;
             break;
@@ -1583,7 +1583,7 @@ void CS_GenRegInfo (CodeSeg* S)
                         break;
 
                     case OP65_CMP:
-                        /* If this is an immidiate compare, the A register has
+                        /* If this is an immediate compare, the A register has
                         ** the value of the compare later.
                         */
                         if (CE_IsConstImm (P)) {
@@ -1596,7 +1596,7 @@ void CS_GenRegInfo (CodeSeg* S)
                         break;
 
                     case OP65_CPX:
-                        /* If this is an immidiate compare, the X register has
+                        /* If this is an immediate compare, the X register has
                         ** the value of the compare later.
                         */
                         if (CE_IsConstImm (P)) {
@@ -1609,7 +1609,7 @@ void CS_GenRegInfo (CodeSeg* S)
                         break;
 
                     case OP65_CPY:
-                        /* If this is an immidiate compare, the Y register has
+                        /* If this is an immediate compare, the Y register has
                         ** the value of the compare later.
                         */
                         if (CE_IsConstImm (P)) {

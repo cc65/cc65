@@ -375,7 +375,7 @@ void g_restore (unsigned flags);
 /* Copy hold register to primary. */
 
 void g_cmp (unsigned flags, unsigned long val);
-/* Immidiate compare. The primary register will not be changed, Z flag
+/* Immediate compare. The primary register will not be changed, Z flag
 ** will be set.
 */
 

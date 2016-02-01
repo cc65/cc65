@@ -484,7 +484,7 @@ static const struct {
 /* Instruction table for the 65CE02 */
 static const struct {
     unsigned Count;
-    InsDesc  Ins[122];
+    InsDesc  Ins[123];
 } InsTab65CE02 = {
     sizeof (InsTab65CE02.Ins) / sizeof (InsTab65CE02.Ins[0]),
     {
@@ -578,7 +578,8 @@ static const struct {
         { "ROR",  0x000006F, 0x62, 1, PutAll },
         { "ROW",  0x0000008, 0xeb, 6, PutAll },
         { "RTI",  0x0000001, 0x40, 0, PutAll },
-        { "RTS",  0x0800001, 0x60, 0, PutAll },
+        { "RTN",  0x0800000, 0x62, 1, PutAll },
+        { "RTS",  0x0000001, 0x60, 0, PutAll },
         { "SBC",  0x080A66C, 0xe0, 0, PutAll },
         { "SEC",  0x0000001, 0x38, 0, PutAll },
         { "SED",  0x0000001, 0xf8, 0, PutAll },

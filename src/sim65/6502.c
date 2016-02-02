@@ -930,6 +930,16 @@ static void OPC_6502_59 (void)
 
 
 
+static void OPC_65C02_5A (void)
+/* Opcode $5A: PHY */
+{
+    Cycles = 3;
+    PUSH (Regs.YR);
+    Regs.PC += 1;
+}
+
+
+
 static void OPC_65C02_5C (void)
 /* Opcode $5C: NOP */
 {
@@ -1076,7 +1086,7 @@ static void OPC_65C02_6C (void)
 /* Opcode $6C: JMP (ind) */
 {
     /* 6502 bug fixed here */
-    Cycles = 5;
+    Cycles = 6;
     Regs.PC = MemReadWord (MemReadWord (Regs.PC+1));
 }
 
@@ -1186,6 +1196,18 @@ static void OPC_6502_79 (void)
 
 
 
+static void OPC_65C02_7A (void)
+/* Opcode $7A: PLY */
+{
+    Cycles = 4;
+    Regs.YR = POP ();
+    TEST_ZF (Regs.YR);
+    TEST_SF (Regs.YR);
+    Regs.PC += 1;
+}
+
+
+
 static void OPC_6502_7D (void)
 /* Opcode $7D: ADC abs,x */
 {
@@ -1212,6 +1234,14 @@ static void OPC_6502_7E (void)
     ROR (Val);
     MemWriteByte (Addr, Val);
     Regs.PC += 3;
+}
+
+
+
+static void OPC_65C02_80 (void)
+/* Opcode $80: BRA */
+{
+    BRANCH (1);
 }
 
 
@@ -1965,6 +1995,16 @@ static void OPC_6502_D9 (void)
 
 
 
+static void OPC_65C02_DA (void)
+/* Opcode $DA: PHX */
+{
+    Cycles = 3;
+    PUSH (Regs.XR);
+    Regs.PC += 1;
+}
+
+
+
 static void OPC_65C02_DC (void)
 /* Opcode $DC and $FC: NOP */
 {
@@ -2214,6 +2254,18 @@ static void OPC_6502_F9 (void)
     }
     SBC (MemReadByte (Addr + Regs.YR));
     Regs.PC += 3;
+}
+
+
+
+static void OPC_65C02_FA (void)
+/* Opcode $FA: PLX */
+{
+    Cycles = 4;
+    Regs.XR = POP ();
+    TEST_ZF (Regs.XR);
+    TEST_SF (Regs.XR);
+    Regs.PC += 1;
 }
 
 
@@ -2609,7 +2661,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_6502_EA,
     OPC_6502_58,
     OPC_6502_59,
-    OPC_6502_EA,
+    OPC_65C02_5A,
     OPC_6502_EA,
     OPC_65C02_5C,
     OPC_6502_5D,
@@ -2641,13 +2693,13 @@ static const OPFunc OP65C02Table[256] = {
     OPC_6502_EA,
     OPC_6502_78,
     OPC_6502_79,
-    OPC_6502_EA,
+    OPC_65C02_7A,
     OPC_6502_EA,
     OPC_6502_EA,
     OPC_6502_7D,
     OPC_6502_7E,
     OPC_6502_EA,
-    OPC_6502_EA,
+    OPC_65C02_80,
     OPC_6502_81,
     OPC_6502_EA,
     OPC_6502_EA,
@@ -2737,7 +2789,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_6502_EA,
     OPC_6502_D8,
     OPC_6502_D9,
-    OPC_6502_EA,
+    OPC_65C02_DA,
     OPC_6502_EA,
     OPC_65C02_DC,
     OPC_6502_DD,
@@ -2769,7 +2821,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_6502_EA,
     OPC_6502_F8,
     OPC_6502_F9,
-    OPC_6502_EA,
+    OPC_65C02_FA,
     OPC_6502_EA,
     OPC_65C02_DC,
     OPC_6502_FD,

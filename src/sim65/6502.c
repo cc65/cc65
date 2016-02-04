@@ -352,6 +352,22 @@ static void OPC_6502_00 (void)
 
 
 
+static void OPC_65C02_00 (void)
+/* Opcode $00: BRK */
+{
+    Cycles = 7;
+    Regs.PC += 2;
+    SET_BF (1);
+    PUSH (PCH);
+    PUSH (PCL);
+    PUSH (Regs.SR);
+    SET_DF (0);
+    SET_IF (1);
+    Regs.PC = MemReadWord (0xFFFE);
+}
+
+
+
 static void OPC_6502_01 (void)
 /* Opcode $01: ORA (ind,x) */
 {
@@ -2238,7 +2254,9 @@ static void OPC_6502_F6 (void)
 static void OPC_6502_F8 (void)
 /* Opcode $F8: SED */
 {
+    Cycles = 2;
     SET_DF (1);
+    Regs.PC += 1;
 }
 
 
@@ -2571,7 +2589,7 @@ static const OPFunc OP6502Table[256] = {
 
 /* Opcode handler table for the 65C02 */
 static const OPFunc OP65C02Table[256] = {
-    OPC_6502_00,
+    OPC_65C02_00,
     OPC_6502_01,
     OPC_6502_EA,
     OPC_6502_EA,
@@ -2847,6 +2865,9 @@ void IRQRequest (void)
 {
     /* Remember the request */
     HaveIRQRequest = 1;
+    if (CPU == CPU_65C02) {
+        SET_DF (0);
+    }
 }
 
 
@@ -2856,6 +2877,9 @@ void NMIRequest (void)
 {
     /* Remember the request */
     HaveNMIRequest = 1;
+    if (CPU == CPU_65C02) {
+        SET_DF (0);
+    }
 }
 
 

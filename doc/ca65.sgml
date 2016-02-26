@@ -2701,13 +2701,15 @@ Here's a list of all control commands and a description, what they do:
 
   <tag><tt>bracket_as_indirect</tt><label id="bracket_as_indirect"></tag>
 
-    Use <tt>[]</tt> intead of <tt>()</tt> for the indirect addressing mode.
+    Use <tt>[]</tt> instead of <tt>()</tt> for the indirect addressing modes.
     Example:
 
     <tscreen><verb>
         lda     [$82]
         lda     [$82,x]
         lda     [$82],y
+        jmp     [$fffe]
+        jmp     [table,x]
     </verb></tscreen>
     <em/Note:/ This should not be used in 65186 mode because it conflicts with
     the 65816 instruction syntax for far addressing. See the section covering

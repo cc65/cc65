@@ -40,7 +40,11 @@ If the <tt/--standard/ command line option is used,
 the <tt/cdecl/ and <tt/fastcall/ keywords will not be available.
 The standard compliant variations <tt/__cdecl__/ and <tt/__fastcall__/ are always available.
 
-K &amp; R style function prototypes may be used, but they do not alter the calling conventions in any way.
+If a function has a prototype, parameters are pushed to the C-stack as their respective types
+(i.e. a <tt/char/ parameter will push 1 byte), but if a function has no prototype, default
+promotions will apply. This means that with no prototype, <tt/char/ will be promoted
+to <tt/int/ and be pushed as 2 bytes. K &amp; R style function prototypes may be used,
+but they will function the same as if no prototype was used.
 
 <sect1>Prologue, before the function call<p>
 
@@ -57,8 +61,9 @@ All other parameters will be pushed to the C-stack from left to right.
 The rightmost parameter will have the lowest address on the stack,
 and multi-byte parameters will have their least significant byte at the lower address.
 
-The <tt/Y/ register will contain the number of bytes pushed to the stack for this function,
-and the <tt/sp/ pseudo-register is a zeropage pointer to the base of the C-stack.
+The <tt/sp/ pseudo-register is a zeropage pointer to the base of the C-stack.
+If the function has no prototype or is variadic
+the <tt/Y/ register will contain the number of bytes pushed to the stack for this function.
 
 Example:
 <tscreen><verb>
@@ -84,10 +89,6 @@ void foo(unsigned bar, unsigned char baz);
     lda     (sp),y  ; Low byte now in A
 </verb></tscreen>
 
-Variadic functions push all parameters exactly as other <tt/cdecl/ convention functions,
-but the value of <tt/Y/ should be used to determine how many bytes of parameters
-were placed onto the stack.
-
 <sect1>Epilogue, after the functiona call<p>
 
 <sect2>Return requirements</p>
@@ -106,10 +107,10 @@ of <tt>A/X/sreg</tt>, so these may be clobbered by the function.
 
 The C-stack pointer <tt/sp/ must be restored by the function to its value before the
 function call prologue. It may pop all of its parameters from the C-stack
-(e.g. using the <tt/runtime/ function <tt/popa/.),
+(e.g. using the <tt/runtime/ function <tt/popa/),
 or it could adjust <tt/sp/ directly.
-On entry to the function the <tt/Y/ register contains the number of bytes
-pushed to the stack, which may be added to <tt/sp/ to restore its original state.
+If the function has no prototype, or is variadic the <tt/Y/ register contains the
+number of bytes pushed to the stack on entry, which may be added to <tt/sp/ to restore its original state.
 
 The internal pseudo-register <tt/regbank/ must not be changed by the function.
 

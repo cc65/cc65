@@ -40,44 +40,11 @@
 
 
 
-#if defined(__C64__) || defined(__C128__) || defined(__CBM510__)
+#ifdef __CBM__
 
-/* Addresses of data for sprite 0 */
-#if defined(__C64__)
-#  define SPRITE0_DATA  ((unsigned char[64])0x0340)
-#  define SPRITE0_PTR   ((unsigned char *)0x07F8)
-#elif defined(__C128__)
-#  define SPRITE0_DATA  ((unsigned char[64])0x0E00)
-#  define SPRITE0_PTR   ((unsigned char *)0x07F8)
-#elif defined(__CBM510__)
-#  define SPRITE0_DATA  ((unsigned char[64])0xF400)
-#  define SPRITE0_PTR   ((unsigned char *)0xF3F8)
-#endif
+/* Set dark-on-light colors. */
+const unsigned char mouse_def_pointercolor = COLOR_BLACK;
 
-/* The mouse sprite (an arrow) */
-static const unsigned char MouseSprite[64] = {
-    0xFE, 0x00, 0x00,
-    0xFC, 0x00, 0x00,
-    0xF8, 0x00, 0x00,
-    0xFC, 0x00, 0x00,
-    0xDE, 0x00, 0x00,
-    0x8F, 0x00, 0x00,
-    0x07, 0x80, 0x00,
-    0x03, 0xC0, 0x00,
-    0x01, 0xE0, 0x00,
-    0x00, 0xF0, 0x00,
-    0x00, 0x78, 0x00,
-    0x00, 0x38, 0x00,
-    0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00
-};
 #endif
 
 
@@ -158,25 +125,6 @@ int main (void)
 #endif
     cursor (0);
     clrscr ();
-
-    /* The pointer should be created before the driver is installed,
-    ** in case a lightpen driver needs it during calibration.
-    */
-
-#if defined(__C64__) || defined(__C128__) || defined(__CBM510__)
-    /* Copy the sprite data */
-    memcpy ((void*) SPRITE0_DATA, MouseSprite, sizeof (MouseSprite));
-
-    /* Set the VIC-II sprite pointer. */
-    *SPRITE0_PTR = ((unsigned) SPRITE0_DATA & 0x3FFF) / sizeof SPRITE0_DATA;
-
-    /* Set the color of sprite 0 */
-#  ifdef __CBM510__
-    pokebsys ((unsigned) &VIC.spr0_color, COLOR_BLACK);
-#  else
-    VIC.spr0_color = COLOR_BLACK;
-#  endif
-#endif
 
     /* If a lightpen driver is installed, then it can get a calibration value
     ** from this file (if it exists).  Or, the user can adjust the pen; and,

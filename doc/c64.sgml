@@ -116,6 +116,39 @@ cl65 -o file.prg -u __EXEHDR__ -t c64 -C c64-asm.cfg source.s
 Please note that in this case a changed start address doesn't make sense,
 since the program must be loaded to the BASIC start address.
 
+<sect>Extras<p>
+
+<sect1>80 Columns conio driver<p>
+
+The C64 package comes with an alternative software driven 80 columns
+module <tt/c64-soft80.o/ which uses the memory under I/O between &dollar;d000
+and &dollar;ffff.
+
+In memory constrained situations the memory from &dollar;400 to &dollar;7FF
+can be made available to a program by calling <tt/_heapadd ((void *) 0x0400, 0x0400);/
+at the beginning of <tt/main()/. Doing so is beneficial even if the program
+doesn't use the the heap explicitly because loading a driver uses the heap implicitly.
+
+Using <tt/c64-soft80.o/ is as simple as placing it on the linker command
+line like this:
+
+<tscreen><verb>
+cl65 -t c64 myprog.c c64-soft80.o
+</verb></tscreen>
+
+Note that the soft80 conio driver is incompatible with the
+<tt/c64-ram.emd (c64_ram_emd)/ extended memory driver and the
+ <tt/c64-hi.tgi (c64_hi_tgi)/ graphics driver.
+
+<sect2>80 Columns conio driver (monochrome)<p>
+
+In an (even more) memory constrained situation, a size optimized version of the
+software driven 80 columns module may be used, which only supports one common
+text color for the whole screen.
+
+<tscreen><verb>
+cl65 -t c64 myprog.c c64-soft80mono.o
+</verb></tscreen>
 
 <sect>Platform-specific header files<p>
 
@@ -216,6 +249,9 @@ configuration.
   palette of the 16 C64 colors).
 </descrip><p>
 
+Note that the graphics drivers are incompatible with the
+<tt/c64-ram.emd (c64_ram_emd)/ extended memory driver and the
+ <tt/c64-soft80.o/ software 80 columns conio driver.
 
 <sect1>Extended memory drivers<p>
 
@@ -241,7 +277,7 @@ configuration.
   <tag><tt/c64-ram.emd (c64_ram_emd)/</tag>
   A driver for the hidden RAM below the I/O area and kernal ROM. Supports 48
   256 byte pages. Please note that this driver is incompatible with any of the
-  graphics drivers!
+  graphics drivers, or the soft80 conio driver!
 
   <tag><tt/c64-ramcart.emd (c64_ramcart_emd)/</tag>
   A driver for the RamCart 64/128 written and contributed by Maciej Witkowiak.

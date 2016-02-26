@@ -1,13 +1,16 @@
 ;
-; int vsnprintf (char* Buf, size_t size, const char* Format, va_list ap);
+; int __fastcall__ vsnprintf (char* Buf, size_t size, const char* Format, va_list ap);
 ;
-; Ullrich von Bassewitz, 2009-09-26
+; 2009-09-26, Ullrich von Bassewitz
+; 2015-07-17, Greg King
 ;
 
         .export         _vsnprintf, vsnprintf
         .import         ldaxysp, popax, incsp2, incsp6
         .import         _memcpy, __printf
         .importzp       sp, ptr1
+
+        .include        "errno.inc"
 
         .macpack        generic
 
@@ -46,8 +49,10 @@ vsnprintf:
         sta     ccount+1        ; Clear ccount
 
 ; Get the size parameter and replace it by a pointer to outdesc. This is to
-; build a stack frame for the call to _printf.
-; If size is zero, there's nothing to do.
+; build a stack frame for the call to _printf. The size must not be greater
+; than INT_MAX because the return type is int. If the size is zero,
+; then nothing will be written into the buffer; but, the arguments still will
+; be formatted and counted.
 
         ldy     #2
         lda     (sp),y
@@ -58,15 +63,13 @@ vsnprintf:
 
         iny
         lda     (sp),y
+        bmi     L9              ; More than $7FFF
         sta     ptr1+1
-
-        ora     ptr1
-        beq     L9
 
         lda     #>outdesc
         sta     (sp),y
 
-; Write size-1 to outdesc.uns
+; Write size-1 to outdesc.uns.  It will be -1 if there is no buffer.
 
         ldy     ptr1+1
         ldx     ptr1
@@ -83,24 +86,32 @@ L1:     dex
         sta     bufptr+0
         stx     bufptr+1
 
+; There must be a buffer if its size is non-zero.
+
+        bit     bufsize+1
+        bmi     L5
+        ora     bufptr+1
+        bze     L0              ; The pointer shouldn't be NULL
+
 ; Restore ap and call _printf
 
-        pla
+L5:     pla
         tax
         pla
         jsr     __printf
 
-; Terminate the string. The last char is either at bufptr+ccount or
-; bufptr+bufsize, whichever is smaller.
+; Terminate the string if there is a buffer.  The last char. is at either
+; bufptr+bufsize or bufptr+ccount, whichever is smaller.
 
+        ldx     bufsize+1
+        bmi     L4              ; -1 -- No buffer
+        lda     bufsize+0
+        cpx     ccount+1
+        bne     L2
+        cmp     ccount+0
+L2:     bcc     L3
         lda     ccount+0
         ldx     ccount+1
-        cpx     bufsize+1
-        bne     L2
-        cmp     bufsize+0
-L2:     bcc     L3
-        lda     bufsize+0
-        ldx     bufsize+1
         clc
 L3:     adc     bufptr+0
         sta     ptr1
@@ -114,23 +125,29 @@ L3:     adc     bufptr+0
 
 ; Return the number of bytes written and drop buf
 
-        lda     ccount+0
+L4:     lda     ccount+0
         ldx     ccount+1
         jmp     incsp2
 
-; Bail out if size is zero.
+; Bail out if size is too high.
 
-L9:     pla
-        pla                     ; Discard ap
-        lda     #0
-        tax
+L9:     ldy     #ERANGE
+        .byte   $2C             ;(bit $xxxx)
+
+; NULL buffer pointers usually are invalid.
+
+L0:     ldy     #EINVAL
+        pla                     ; Drop ap
+        pla
+        tya
+        jsr     __directerrno   ; Return -1
         jmp     incsp6          ; Drop parameters
 
 
 ; ----------------------------------------------------------------------------
 ; Callback routine used for the actual output.
 ;
-; static void out (struct outdesc* d, const char* buf, unsigned count)
+; static void __cdecl__ out (struct outdesc* d, const char* buf, unsigned count)
 ; /* Routine used for writing */
 ;
 ; Since we know, we're called with a pointer to our static outdesc structure,
@@ -146,10 +163,11 @@ out:
         sbc     ccount+0                ; Low byte of bytes already written
         sta     ptr1
         lda     bufsize+1
+        bmi     @L9                     ; -1 -- No buffer
         sbc     ccount+1
         sta     ptr1+1
         bcs     @L0                     ; Branch if space left
-        lda     #$00
+@L9:    lda     #$0000
         sta     ptr1
         sta     ptr1+1                  ; No space left
 

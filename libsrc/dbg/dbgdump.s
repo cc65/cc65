@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 11.08.1998
 ;
-; char* DbgMemDump (unsigend Addr, char* Buf, unsigned char Length);
+; char* __cdecl__ DbgMemDump (unsigend Addr, char* Buf, unsigned char Length);
 ;
 
         .export         _DbgMemDump

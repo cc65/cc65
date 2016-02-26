@@ -11,6 +11,7 @@ Please note:
     the programs manually.
 
   * The makefile specifies the C64 as the default target platform, because all
+    but one
     of the programs run on this platform. When compiling for another platform,
     you will have to change the line that specifies the target system at the
     top of the makefile.

@@ -62,6 +62,7 @@
 #include "symtab.h"
 #include "toklist.h"
 #include "ulabel.h"
+#include "macro.h"
 
 
 
@@ -417,6 +418,26 @@ static ExprNode* FuncDefined (void)
 
 
 
+static ExprNode* FuncDefinedMacro (void)
+/* Handle the .DEFINEDMACRO builtin function */
+{
+    Macro* Mac = 0;
+
+    /* Check if the identifier is a macro */
+
+    if (CurTok.Tok == TOK_IDENT) {
+        Mac = FindMacro (&CurTok.SVal);
+    } else {
+        Error ("Identifier expected.");
+    }
+    /* Skip the name */
+    NextTok ();
+
+    return GenLiteralExpr (Mac != 0);
+}
+
+
+
 ExprNode* FuncHiByte (void)
 /* Handle the .HIBYTE builtin function */
 {
@@ -429,6 +450,36 @@ static ExprNode* FuncHiWord (void)
 /* Handle the .HIWORD builtin function */
 {
     return HiWord (Expression ());
+}
+
+
+
+static ExprNode* FuncIsMnemonic (void)
+/* Handle the .ISMNEMONIC, .ISMNEM builtin function */
+{
+    int Instr = -1;
+
+    /* Check for a macro or an instruction depending on UbiquitousIdents */
+
+    if (CurTok.Tok == TOK_IDENT) {
+        if (UbiquitousIdents) {
+            /* Macros CAN be instructions, so check for them first */
+            if (FindMacro (&CurTok.SVal) == 0) {
+                Instr = FindInstruction (&CurTok.SVal);
+            }
+        }
+        else {
+            /* Macros and symbols may NOT use the names of instructions, so just check for the instruction */
+            Instr = FindInstruction (&CurTok.SVal);
+        }
+    }
+    else {
+        Error ("Identifier expected.");
+    }
+    /* Skip the name */
+    NextTok ();
+
+    return GenLiteralExpr (Instr > 0);
 }
 
 
@@ -625,6 +676,85 @@ static ExprNode* FuncReferenced (void)
 
     /* Check if the symbol is referenced */
     return GenLiteralExpr (Sym != 0 && SymIsRef (Sym));
+}
+
+
+
+static ExprNode* FuncAddrSize (void)
+/* Handle the .ADDRSIZE function */
+{
+    StrBuf    ScopeName = STATIC_STRBUF_INITIALIZER;
+    StrBuf    Name = STATIC_STRBUF_INITIALIZER;
+    SymEntry* Sym;
+    int       AddrSize;
+    int       NoScope;
+
+
+    /* Assume we don't know the size */
+    AddrSize = 0;
+
+    /* Check for a cheap local which needs special handling */
+    if (CurTok.Tok == TOK_LOCAL_IDENT) {
+
+        /* Cheap local symbol */
+        Sym = SymFindLocal (SymLast, &CurTok.SVal, SYM_FIND_EXISTING);
+        if (Sym == 0) {
+            Error ("Unknown symbol or scope: `%m%p'", &CurTok.SVal);
+        } else {
+            AddrSize = Sym->AddrSize;
+        }
+
+        /* Remember and skip SVal, terminate ScopeName so it is empty */
+        SB_Copy (&Name, &CurTok.SVal);
+        NextTok ();
+        SB_Terminate (&ScopeName);
+
+    } else {
+
+        /* Parse the scope and the name */
+        SymTable* ParentScope = ParseScopedIdent (&Name, &ScopeName);
+
+        /* Check if the parent scope is valid */
+        if (ParentScope == 0) {
+            /* No such scope */
+            SB_Done (&ScopeName);
+            SB_Done (&Name);
+            return GenLiteral0 ();
+        }
+
+        /* If ScopeName is empty, no explicit scope was specified. We have to
+        ** search upper scope levels in this case.
+        */
+        NoScope = SB_IsEmpty (&ScopeName);
+
+        /* If we did find a scope with the name, read the symbol defining the
+        ** size, otherwise search for a symbol entry with the name and scope.
+        */
+        if (NoScope) {
+            Sym = SymFindAny (ParentScope, &Name);
+        } else {
+            Sym = SymFind (ParentScope, &Name, SYM_FIND_EXISTING);
+        }
+        /* If we found the symbol retrieve the size, otherwise complain */
+        if (Sym) {
+            AddrSize = Sym->AddrSize;
+        } else {
+            Error ("Unknown symbol or scope: `%m%p%m%p'", &ScopeName, &Name);
+        }
+
+    }
+
+    if (AddrSize == 0) {
+        Warning (1, "Unknown address size: `%m%p%m%p'", &ScopeName, &Name);
+    }
+
+    /* Free the string buffers */
+    SB_Done (&ScopeName);
+    SB_Done (&Name);
+
+    /* Return the size. */
+
+    return GenLiteralExpr (AddrSize);
 }
 
 
@@ -965,6 +1095,19 @@ static ExprNode* Factor (void)
             N = Function (FuncBankByte);
             break;
 
+        case TOK_ADDRSIZE:
+            N = Function (FuncAddrSize);
+            break;
+
+        case TOK_ASIZE:
+            if (GetCPU () != CPU_65816) {
+                N = GenLiteralExpr (8);
+            } else {
+                N = GenLiteralExpr (ExtBytes[AM65I_IMM_ACCU] * 8);
+            }
+            NextTok ();
+            break;
+
         case TOK_BLANK:
             N = Function (FuncBlank);
             break;
@@ -982,12 +1125,29 @@ static ExprNode* Factor (void)
             N = Function (FuncDefined);
             break;
 
+        case TOK_DEFINEDMACRO:
+            N = Function (FuncDefinedMacro);
+            break;
+
         case TOK_HIBYTE:
             N = Function (FuncHiByte);
             break;
 
         case TOK_HIWORD:
             N = Function (FuncHiWord);
+            break;
+
+        case TOK_ISMNEMONIC:
+            N = Function (FuncIsMnemonic);
+            break;
+
+        case TOK_ISIZE:
+            if (GetCPU () != CPU_65816) {
+                N = GenLiteralExpr (8);
+            } else {
+                N = GenLiteralExpr (ExtBytes[AM65I_IMM_INDEX] * 8);
+            }
+            NextTok ();
             break;
 
         case TOK_LOBYTE:

@@ -1,0 +1,125 @@
+<!doctype linuxdoc system>      <!-- -*- text-mode -*- -->
+
+<article>
+
+<title>sim65 Users Guide
+<author><url url="mailto:polluks@sdf.lonestar.org" name="Stefan A. Haubenthal">
+<date>2016-01-05
+
+<abstract>
+sim65 is a simulator for 6502 and 65C02 CPUs. It allows to test target
+independed code.
+</abstract>
+
+<!-- Table of contents -->
+<toc>
+
+<!-- Begin the document -->
+
+<sect>Overview<p>
+
+
+sim65 is the only solution as part of the toolchain to execute code. The
+binary needs to be compiled with <tt/--target sim6502/ or <tt/--target sim65c02/.
+
+
+<sect>Usage<p>
+
+The simulator is called as follows:
+
+<tscreen><verb>
+	Usage: sim65 [options] file [arguments]
+	Short options:
+	  -h			Help (this text)
+	  -v			Increase verbosity
+	  -V			Print the simulator version number
+	  -x <num>		Exit simulator after <num> cycles
+
+	Long options:
+	  --help		Help (this text)
+	  --verbose		Increase verbosity
+	  --version		Print the simulator version number
+</verb></tscreen>
+
+
+<sect1>Command line options in detail<p>
+
+Here is a description of all the command line options:
+
+<descrip>
+
+  <tag><tt>-h, --help</tt></tag>
+
+  Print the short option summary shown above.
+
+
+  <tag><tt>-v, --verbose</tt></tag>
+
+  Increase the simulator verbosity.
+
+
+  <tag><tt>-V, --version</tt></tag>
+
+  Print the version number of the utility. When submitting a bug report,
+  please include the operating system you're using, and the compiler
+  version.
+
+
+  <tag><tt>-x num</tt></tag>
+
+  Exit simulator after num cycles.
+</descrip>
+
+
+<sect>Input and output<p>
+
+The simulator will read one binary file per invocation and can log the
+program loading and paravirtualization calls to stderr.
+
+Example output for the command
+<tscreen><verb>
+sim65 --verbose --verbose samples/gunzip65
+</verb></tscreen>
+<tscreen><verb>
+Loaded `samples/gunzip65' at $0200-$151F
+PVWrite ($0001, $13C9, $000F)
+GZIP file name:PVWrite ($0001, $151F, $0001)
+
+PVRead ($0000, $FFD7, $0001)
+PVOpen ("", $0001)
+PVRead ($0003, $1520, $6590)
+PVClose ($0003)
+PVWrite ($0001, $13D9, $000F)
+Not GZIP formatPVWrite ($0001, $151F, $0001)
+
+PVExit ($01)
+</verb></tscreen>
+
+
+
+<sect>Copyright<p>
+
+sim65 (and all cc65 binutils) are (C) Copyright 1998-2000 Ullrich von
+Bassewitz. For usage of the binaries and/or sources the following conditions
+do apply:
+
+This software is provided 'as-is', without any expressed or implied
+warranty.  In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+<enum>
+<item>	The origin of this software must not be misrepresented; you must not
+	claim that you wrote the original software. If you use this software
+	in a product, an acknowledgment in the product documentation would be
+	appreciated but is not required.
+<item>	Altered source versions must be plainly marked as such, and must not
+	be misrepresented as being the original software.
+<item>	This notice may not be removed or altered from any source
+	distribution.
+</enum>
+
+</article>

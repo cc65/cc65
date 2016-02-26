@@ -34,12 +34,12 @@
 MAXARGS = 10
 
 ; ProDOS stores the filename in the second half of BASIC's input buffer, so
-; there are 128 characters left. At least 7 characters are necessary for the
-; CALLxxxx:REM so 121 characters may be used before overwriting the ProDOS
-; filename. As we don't want to put further restrictions on the command-line
-; length we reserve those 121 characters terminated by a zero.
+; there are 128 characters left. At least 1 character is necessary for the
+; REM so 127 characters (including the terminating zero) may be used before
+; overwriting the ProDOS filename. As we don't want to further restrict the
+; command-line length we reserve those 127 characters.
 
-BUF_LEN = 122
+BUF_LEN = 127
 
 BASIC_BUF = $200
 FNAM_LEN  = $280

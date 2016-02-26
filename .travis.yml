@@ -1,10 +1,12 @@
 language:
   - c
 install:
+  - sudo apt-get update
   - sudo apt-get install linuxdoc-tools linuxdoc-tools-info binutils-mingw-w64-i686 gcc-mingw-w64-i686 sshpass
 script:
   - make bin USER_CFLAGS=-Werror
   - make lib QUIET=1
+  - make -C test
   - make -C src clean
   - make bin USER_CFLAGS=-Werror CROSS_COMPILE=i686-w64-mingw32-
   - make doc zip

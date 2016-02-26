@@ -1964,8 +1964,10 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoA16           },
     { ccNone,           DoA8            },
     { ccNone,           DoAddr          },      /* .ADDR */
+    { ccNone,           DoUnexpected    },      /* .ADDRSIZE */
     { ccNone,           DoAlign         },
     { ccNone,           DoASCIIZ        },
+    { ccNone,           DoUnexpected    },      /* .ASIZE */
     { ccNone,           DoAssert        },
     { ccNone,           DoAutoImport    },
     { ccNone,           DoUnexpected    },      /* .BANK */
@@ -1988,6 +1990,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoDebugInfo     },
     { ccNone,           DoDefine        },
     { ccNone,           DoUnexpected    },      /* .DEFINED */
+    { ccNone,           DoUnexpected    },      /* .DEFINEDMACRO */
     { ccNone,           DoDelMac        },
     { ccNone,           DoDestructor    },
     { ccNone,           DoDWord         },
@@ -2039,6 +2042,8 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoIncBin        },
     { ccNone,           DoInclude       },
     { ccNone,           DoInterruptor   },
+    { ccNone,           DoUnexpected    },      /* .ISIZE */
+    { ccNone,           DoUnexpected    },      /* .ISMNEMONIC */
     { ccNone,           DoInvalid       },      /* .LEFT */
     { ccNone,           DoLineCont      },
     { ccNone,           DoList          },

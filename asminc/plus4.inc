@@ -7,6 +7,8 @@
 ; Zero page, Commodore stuff
 
 TMPPTR          := $22          ; Temporary ptr used by BASIC
+VARTAB          := $2D          ; Pointer to start of BASIC variables
+MEMSIZE         := $37          ; Pointer to highest BASIC RAM location (+1)
 TXTPTR          := $3B          ; Pointer into BASIC source code
 TIME            := $A3          ; 60HZ clock
 FNAM_LEN        := $AB          ; Length of filename

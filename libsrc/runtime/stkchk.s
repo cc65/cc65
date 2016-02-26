@@ -101,14 +101,14 @@ Fail:   lda     #4
 ; ----------------------------------------------------------------------------
 ; Data
 
-.bss
+.segment        "INITBSS"
 
 ; Initial stack pointer value. Stack is reset to this in case of overflows to
 ; allow program exit processing.
-initialsp:      .word   0
+initialsp:      .res    2
 
 ; Stack low water mark.
-lowwater:       .word   0
+lowwater:       .res    2
 
 
 

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2012, Ullrich von Bassewitz                                      */
+/* (C) 1998-2015, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -44,6 +44,7 @@
 
 
 unsigned char AddSource         = 0;    /* Add source lines as comments */
+unsigned char AutoCDecl         = 0;    /* Make functions default to __cdecl__ */
 unsigned char DebugInfo         = 0;    /* Add debug info to the obj */
 unsigned char PreprocessOnly    = 0;    /* Just preprocess the input */
 unsigned char DebugOptOutput    = 0;    /* Output debug stuff */

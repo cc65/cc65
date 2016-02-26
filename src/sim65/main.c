@@ -156,7 +156,7 @@ static void ReadProgramFile (void)
     /* Close the file */
     fclose (F);
 
-    Print (stdout, 1, "Loaded `%s' at $0200-$%04X\n", ProgramFile, Addr - 1);
+    Print (stderr, 1, "Loaded `%s' at $0200-$%04X\n", ProgramFile, Addr - 1);
 }
 
 
@@ -238,7 +238,7 @@ int main (int argc, char* argv[])
         ExecuteInsn ();
         if (MaxCycles && (GetCycles () >= MaxCycles)) {
             Error ("Maximum number of cycles reached.");
-            exit (-99); /* do not ues EXIT_FAILURE to avoid conflicts with the
+            exit (-99); /* do not use EXIT_FAILURE to avoid conflicts with the
                            same value being used in a test program */
         }
     }

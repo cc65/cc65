@@ -3,7 +3,7 @@
 <article>
 <title>cc65 function reference
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2014-05-26
+<date>2015-07-21
 
 <abstract>
 cc65 is a C compiler for 6502 based systems. This function reference describes
@@ -39,7 +39,7 @@ Each entry for a function contains a detailed description
 <tag/Declaration/Describes the needed header files and declaration of the
 function.
 <tag/Description/Description of the function.
-<tag/Limits/Limits.
+<tag/Notes/Notes on the function.
 <tag/Availability/The availability of the function.
 <tag/See also/Other related functions.
 <tag/Example/A piece of actual code using the function.
@@ -744,8 +744,7 @@ communication.
 <tag/Description/The function is called with the type of a directory entry
 taken from a <tt/struct dirent/ and returns true if the entry designates
 a directory.
-<tag/Limits/
-<itemize>
+<tag/Notes/<itemize>
 <item>The function is actually a macro.
 </itemize>
 <tag/Availability/cc65
@@ -768,8 +767,7 @@ a directory.
 <tag/Description/The function is called with the type of a directory entry
 taken from a <tt/struct dirent/ and returns true if the entry designates
 a disk label.
-<tag/Limits/
-<itemize>
+<tag/Notes/<itemize>
 <item>The function is actually a macro.
 </itemize>
 <tag/Availability/cc65
@@ -792,8 +790,7 @@ a disk label.
 <tag/Description/The function is called with the type of a directory entry
 taken from a <tt/struct dirent/ and returns true if the entry designates
 a link.
-<tag/Limits/
-<itemize>
+<tag/Notes/<itemize>
 <item>The function is actually a macro.
 </itemize>
 <tag/Availability/cc65
@@ -816,8 +813,7 @@ a link.
 <tag/Description/The function is called with the type of a directory entry
 taken from a <tt/struct dirent/ and returns true if the entry designates
 a regular file.
-<tag/Limits/
-<itemize>
+<tag/Notes/<itemize>
 <item>The function is actually a macro.
 <item>A "regular file" means anything with data in it. This might still mean
 that special processing is needed, when accessing the file. Relative files of
@@ -841,10 +837,11 @@ the CBM systems are classified as being "regular" files, for example.
 <tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
 <tag/Declaration/<tt/void __fastcall__ _heapadd (void* mem, size_t size);/
 <tag/Description/The function adds a block of raw memory to the heap.
-<tag/Limits/
-<itemize>
+<tag/Notes/<itemize>
 <item>The minimum blocksize that can be added is 6 bytes; the function will
 ignore smaller blocks.
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
@@ -870,10 +867,11 @@ ignore smaller blocks.
 <tag/Description/The function returns the size of a block that must have
 previously been allocated by <tt/<ref id="malloc" name="malloc">/, <tt/<ref
 id="calloc" name="calloc">/ or <tt/<ref id="realloc" name="realloc">/.
-<tag/Limits/
-<itemize>
+<tag/Notes/<itemize>
 <item>Passing a pointer to a block that was is not the result of one of the
 allocation functions, or that has been free'd will give unpredicable results.
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
@@ -918,11 +916,10 @@ be allocated from the heap using <tt/<ref id="malloc" name="malloc">/.
 <descrip>
 <tag/Function/Return the total available space on the heap.
 <tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
-<tag/Declaration/<tt/size_t __fastcall__ _heapmemavail (void);/
+<tag/Declaration/<tt/size_t _heapmemavail (void);/
 <tag/Description/The function returns the total number of bytes available on
 the heap.
-<tag/Limits/
-<itemize>
+<tag/Notes/<itemize>
 <item>This function is of less use than usually assumed, since the returned
 heap space may be available but not in one block. So even if this function
 says that several times more heap space is available than needed, <ref
@@ -955,8 +952,7 @@ a colon and a blank. Then the error message for the current contents of
 <tt/_oserror/ are printed followed by a newline. The message output is the
 same as returned by <tt/<ref id="_stroserror" name="_stroserror">/ with an
 argument of <tt/_oserror/.
-<tag/Limits/
-<itemize>
+<tag/Notes/<itemize>
 <item>Since operating system specific error code are - you guessed it -
 operating system specific, the value in <tt/_oserror/ and the message that is
 printed depends on the cc65 target.
@@ -982,7 +978,7 @@ be used in presence of a prototype.
 <tag/Description/The function initializes the random number generator with
 a seed derived from fast changing hardware events, so the seed itself can be
 considered random to a certain degree.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The randomness of the seed depends on the machine hardware.
 </itemize>
 <tag/Availability/cc65
@@ -1003,7 +999,7 @@ considered random to a certain degree.
 <tag/Declaration/<tt/const char* __fastcall__ _stroserror (unsigned char errcode);/
 <tag/Description/<tt/_stroserror/ will return a string describing the given
 operating system specific error code.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>Since operating system specific error code are - you guessed it -
 operating system specific, the parameter and the string returned depend on the
 cc65 target.
@@ -1028,7 +1024,7 @@ used in presence of a prototype.
 <tag/Description/<tt/_swap/ will swap (exchange) the contents of the two memory
 areas pointed to by <tt/p/ and <tt/q/. Both memory areas are assumed to be
 <tt/size/ bytes in size.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The memory areas may not overlap, otherwise the results are undefined.
 <item>The function is only available as fastcall function, so it may only be
 used in presence of a prototype.
@@ -1054,7 +1050,7 @@ specified in the <tt/pc/ member of the passed <tt/regs/ structure. All
 registers and the CPU flags are set to the values given in the <tt/regs/
 structure. On return from the subroutine, the new values of the registers and
 flags are stored back overwriting the old values.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>Bits 4 and 5 of the flags value in the <tt/regs/ structure are ignored
 when calling the subroutine (they are unchanged from their current values).
 <item>The function is only available as fastcall function, so it may only be
@@ -1075,7 +1071,7 @@ used in presence of a prototype.
 <tag/Declaration/<tt/void BRK (void);/
 <tag/Description/The function will insert a 6502 BRK instruction into the code
 which may be used to trigger a debugger.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is actually a macro.
 <item>The inserted instruction may lead to unexpected results if no debugger
 is present.
@@ -1099,7 +1095,7 @@ is present.
 <tag/Description/The function will insert a 6502 CLI instruction into the code,
 so interrupts are enabled. Enabling interrupts has no effects if they are
 already enabled (the default).
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is actually a macro.
 <item>Disabling interrupts may lead to unexpected results.
 </itemize>
@@ -1121,7 +1117,7 @@ already enabled (the default).
 <tag/Declaration/<tt/unsigned char PEEK (unsigned addr);/
 <tag/Description/The function will read the absolute memory given by <tt/addr/
 and return the value read.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is actually a macro.
 <item>This function depends highly on the platform and environment.
 </itemize>
@@ -1144,7 +1140,7 @@ and return the value read.
 <tag/Description/The function will read the absolute memory given by <tt/addr/
 and return the value read. The byte read from the higher address is the high
 byte of the return value.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is actually a macro.
 <item>This function depends highly on the platform and environment.
 <item>The order in which the two bytes are read is unspecified and may
@@ -1168,7 +1164,7 @@ depend of the address expression used.
 <tag/Declaration/<tt/void POKE (unsigned addr, unsigned char val);/
 <tag/Description/The function writes the value <tt/val/ to the absolute
 memory address given by <tt/addr/.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is actually a macro.
 <item>This function depends highly on the platform and environment.
 <item>Careless use will cause the program to act strange or may crash the
@@ -1193,7 +1189,7 @@ machine.
 <tag/Description/The function writes the value <tt/val/ to the absolute
 memory address given by <tt/addr/. The low byte of <tt/val/ is written to
 the <tt/addr/, the high byte is written to <tt/addr+1/.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is actually a macro.
 <item>This function depends highly on the platform and environment.
 <item>Careless use will cause the program to act strange or may crash the
@@ -1220,7 +1216,7 @@ depend of the address expression used.
 <tag/Description/The function will insert a 6502 SEI instruction into the code,
 so interrupts are disabled. Note that non maskable interrupts cannot be
 disabled.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is actually a macro.
 <item>Disabling interrupts may lead to unexpected results.
 </itemize>
@@ -1261,7 +1257,7 @@ on stderr, then terminates the program with an exit code of 3.
 <tag/Declaration/<tt/int __fastcall__ abs (int v);/
 <tag/Description/<tt/abs/ returns the absolute value of the argument passed to
 the function.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The return value is undefined if <tt/INT_MIN/ is passed to the function.
 <item>The function is only available as fastcall function, so it may only be
 used in presence of a prototype.
@@ -1284,7 +1280,7 @@ used in presence of a prototype.
 <tag/Description/<tt/assert/ is a macro that expands to a <tt/id/
 statement. If the condition evaluates t zero (false), assert prints a message
 on stderr and aborts the program.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is actually a macro.
 </itemize>
 <tag/Availability/ISO 9899
@@ -1308,7 +1304,7 @@ on stderr and aborts the program.
 terminates, they are called in LIFO order (the last function registered is
 called first). <tt/atexit/ returns zero on success and a nonzero value on
 failure.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>A maximum of 5 exit functions can be registered.
 <item>There is no way to unregister an exit function.
 <item>The function is only available as fastcall function, so it may only be
@@ -1331,6 +1327,10 @@ used in presence of a prototype.
 <tag/Header/<tt/<ref id="atmos.h" name="atmos.h">/
 <tag/Declaration/<tt/void __fastcall__ atmos_load(const char* name);/
 <tag/Description/<tt/atmos_load/ reads a memory block from tape.
+<tag/Notes/<itemize>
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
+</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="atmos_save" name="atmos_save">
@@ -1347,6 +1347,10 @@ used in presence of a prototype.
 <tag/Header/<tt/<ref id="atmos.h" name="atmos.h">/
 <tag/Declaration/<tt/void __fastcall__ atmos_save(const char* name, const void* start, const void* end);/
 <tag/Description/<tt/atmos_save/ writes a memory block to tape.
+<tag/Notes/<itemize>
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
+</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="atmos_load" name="atmos_load">
@@ -1366,7 +1370,7 @@ atmos_save("hires", 0xa000, 0xc000);
 <tag/Declaration/<tt/int __fastcall__ atoi (const char* s);/
 <tag/Description/<tt/atoi/ converts the given string into an integer.
 Conversion stops as soon as any invalid character is encountered.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>There is no way to detect any conversion errors.
 <item>The function does not check for an numerical overflow when converting.
 <item>The function is only available as fastcall function, so it may only be
@@ -1393,7 +1397,7 @@ used in presence of a prototype.
 <tag/Declaration/<tt/long __fastcall__ atol (const char* s);/
 <tag/Description/<tt/atol/ converts the given string into a long integer.
 Conversion stops as soon as any invalid character is encountered.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>There is no way to detect any conversion errors.
 <item>The function does not check for an numerical overflow when converting.
 <item>The function is only available as fastcall function, so it may only be
@@ -1421,7 +1425,7 @@ used in presence of a prototype.
 <tag/Description/The function will set a new background color and return the
 old (current) one. The background color is valid for the whole text output
 area of the screen, not just for new text.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>Background colors are system dependent. The function may have no effect
 on systems where the background color cannot be changed.
 <item>The function is only available as fastcall function, so it may only be
@@ -1445,7 +1449,7 @@ used in presence of a prototype.
 <tag/Declaration/<tt/unsigned char __fastcall__ bordercolor (unsigned char color);/
 <tag/Description/The function will set a new border color. It returns the old
 (current) border color.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>Border colors are system dependent. The function may have no effect
 on systems where the border color cannot be changed.
 <item>The function is only available as fastcall function, so it may only
@@ -1468,20 +1472,21 @@ be used in presence of a prototype.
 <tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
 <tag/Declaration/<tt/void* __fastcall__ bsearch (const void* key,
 const void* base, size_t n, size_t size,
-int (*cmp) (const void*, const void*));/
+int __fastcall__ (* cmp) (const void*, const void*));/
 <tag/Description/<tt/bsearch/ searches a sorted array for a member that
 matches the one pointed to by <tt/key/. <tt/base/ is the address of the array,
 <tt/n/ is the number of elements, <tt/size/ the size of an element and <tt/cmp/
 the function used to compare the members against the key. The function returns
 a pointer to the member found, or <tt/NULL/ if there was no match.
-<tag/Limits/
-<itemize>
+<tag/Notes/<itemize>
 <item>The contents of the array must be sorted in ascending order according to
 the compare function given.
 <item>If there are multiple members that match the key, the function will
 return one of the members.
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
+<item>The function to which <tt/cmp/ points must have the <tt/fastcall/ calling
+convention.
 </itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
@@ -1500,8 +1505,7 @@ be used in presence of a prototype.
 <tag/Declaration/<tt/void __fastcall__ bzero (void* p, size_t count);/
 <tag/Description/<tt/bzero/ fills the memory area pointed to by <tt/p/ with
 zero.
-<tag/Limits/
-<itemize>
+<tag/Notes/<itemize>
 <item>The function is non standard and therefore only available in non ANSI
 mode. You should use <tt/<ref id="memset" name="memset">/ instead.
 <item>The function is only available as fastcall function, so it may only
@@ -1526,7 +1530,7 @@ be used in presence of a prototype.
 <tag/Header/<tt/<ref id="c128.h" name="c128.h">/
 <tag/Declaration/<tt/void c64mode (void);/
 <tag/Description/The function will cause the machine to reboot into C64 mode.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is specific to the C128.
 <item>The function will not return to the caller.
 </itemize>
@@ -1547,8 +1551,7 @@ be used in presence of a prototype.
 of size <tt/size/, clears the whole block with binary zeroes and returns a
 pointer to it. On error (not enough memory available), <tt/calloc/ returns
 <tt/NULL/.
-<tag/Limits/
-<itemize>
+<tag/Notes/<itemize>
 <item>Clearing the memory may not have the expected effect on all platforms:
 pointers in the block may not be <tt/NULL/ and floating point variables may
 not be zero (0.0). In other words: The "clearing" effect of this function
@@ -1581,7 +1584,7 @@ be used in presence of a prototype.
 gets from the current TALKer on the serial bus.
 In order to receive the data, the device must have previously been
 sent a command to TALK and a secondary address if it needs one.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>
 </itemize>
 <tag/Availability/cc65
@@ -1603,7 +1606,7 @@ sent a command to TALK and a secondary address if it needs one.
 Device must first have been OPENed and then designated as the input channel by the CHKIN routine.
 When this function is called, the next byte of data available from the device is returned.
 Exception is the routine for the keyboard device (which is the default input device).
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>
 </itemize>
 <tag/Availability/cc65
@@ -1629,7 +1632,7 @@ printed to the screen, which is the default output device.  If the
 cassette is the current device, outputting a byte will only add it to
 the buffer. No actual transmission of data will occur until the
 192-byte buffer is full.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may
 only be used in presence of a prototype.
 </itemize>
@@ -1659,7 +1662,7 @@ address as the current secondary address.  If the device on the
 channel is a serial device, which requires a TALK command and
 sometimes a secondary address, function will send them over the
 serial bus.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may
 only be used in presence of a prototype.
 </itemize>
@@ -1687,7 +1690,7 @@ secondary address if necessary.  This routine always buffers the
 current character, and defers sending it until the next byte is
 buffered.  When the UNLISTEN command is sent, the last byte will be
 sent with an End or Identify (EOI).
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may
 only be used in presence of a prototype.
 </itemize>
@@ -1716,7 +1719,7 @@ file, its device as the current device, and its secondary address as
 the current secondary address.  If the device on the channel uses the
 serial bus, and therefore requires a LISTEN command and possibly a
 secondary address, this information will be sent on the bus.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may
 only be used in presence of a prototype.
 </itemize>
@@ -1739,7 +1742,7 @@ only be used in presence of a prototype.
 <tag/Description/It closes all
 open files, by resetting the index into open files to
 zero and restores the default I/O devices.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>
 </itemize>
 <tag/Availability/cc65
@@ -1761,7 +1764,7 @@ zero and restores the default I/O devices.
 <tag/Description/It is used to
 close a logical file after all I/O operations involving that file have
 been completed.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may
 only be used in presence of a prototype.
 </itemize>
@@ -1787,7 +1790,7 @@ the screen.  Also, if the current input device was formerly a serial
 device, the routine sends it an UNTALK command on the serial bus, and
 if a serial device was formerly the current output device, the routine
 sends it an UNLISTEN command.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>
 </itemize>
 <tag/Availability/cc65
@@ -1807,7 +1810,7 @@ sends it an UNLISTEN command.
 <tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
 <tag/Declaration/<tt/unsigned char cbm_k_getin (void);/
 <tag/Description/Function gets a character from the current input device.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>
 </itemize>
 <tag/Availability/cc65
@@ -1835,7 +1838,7 @@ VIC-20, and future models of the Commodore 64. If the I/O locations for
 a program are set by a call to this function, they should
 still remain compatible with future versions of the Commodore 64, the
 KERNAL and BASIC.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>
 </itemize>
 <tag/Availability/cc65
@@ -1858,7 +1861,7 @@ receive data. The KERNAL routine will OR the supplied device number bit by bit
 to convert it to a listen address, then transmits this data as a command on
 the serial bus. The specified device will then go into listen mode, and
 be ready to accept information.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may
 only be used in presence of a prototype.
 </itemize>
@@ -1888,7 +1891,7 @@ loaded into memory starting at the location specified by the header.
 Function returns the address of the highest RAM location loaded.
 Before this function can be called, the KERNAL SETLFS, and SETNAM
 routines must be called.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may
 only be used in presence of a prototype.
 </itemize>
@@ -1914,7 +1917,7 @@ Input/Output operations. In order to specify the logical file number,
 the device number, and the secondary address if any, the cbm_k_setlfs() function must first be called.
 Likewise, in order to designate the filename, the cbm_k_setnam() function must be used first.  After these two
 functions are called, cbm_k_open() is then called.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>
 </itemize>
 <tag/Availability/cc65
@@ -1935,7 +1938,7 @@ functions are called, cbm_k_open() is then called.
 <tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
 <tag/Declaration/<tt/unsigned char cbm_k_readst (void);/
 <tag/Description/This function returns the current status of the I/O devices. It is usually called after new communication to an I/O device and gives information about device status, or errors that have occurred during the I/O operation.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>
 </itemize>
 <tag/Availability/cc65
@@ -1957,7 +1960,7 @@ functions are called, cbm_k_open() is then called.
 used before calling this function. However, a file name is not required to
 SAVE to device 1 (the Datassette(TM) recorder). Any attempt to save to
 other devices without using a file name results in an error. NOTE: Device 0 (the keyboard), device 2 (RS-232), and device 3 (the screen) cannot be SAVEd to. If the attempt is made, an error occurs, and the SAVE is stopped.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may
 only be used in presence of a prototype.
 </itemize>
@@ -1980,7 +1983,7 @@ only be used in presence of a prototype.
 <tag/Declaration/<tt/void __fastcall__ cbm_k_setlfs (unsigned char LFN, unsigned char DEV, unsigned char SA);/
 <tag/Description/This functions sets up the logical file by setting its number, device address,
 and secondary address.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may
 only be used in presence of a prototype.
 </itemize>
@@ -2001,7 +2004,7 @@ only be used in presence of a prototype.
 <tag/Declaration/<tt/void __fastcall__ cbm_k_setnam (const char* Name);/
 <tag/Description/This function is used to set up the file name for the OPEN,
 SAVE, or LOAD operations.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may
 only be used in presence of a prototype.
 </itemize>
@@ -2024,7 +2027,7 @@ only be used in presence of a prototype.
 <tag/Declaration/<tt/void __fastcall__ cbm_k_talk (unsigned char dev);/
 <tag/Description/When called, it ORs the device number with the TALK code (64, $40) and sends it on the serial
 bus. This commands the device to TALK.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may
 only be used in presence of a prototype.
 </itemize>
@@ -2050,7 +2053,7 @@ bus. Only devices previously commanded to LISTEN are affected. This
 function is normally used after the host computer is finished sending data
 to external devices. Sending the UNLISTEN commands the listening devices
 to get off the serial bus so it can be used for other purposes.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>
 </itemize>
 <tag/Availability/cc65
@@ -2070,7 +2073,7 @@ to get off the serial bus so it can be used for other purposes.
 <tag/Declaration/<tt/void __fastcall__ cclear (unsigned char length);/
 <tag/Description/The function clears part of a line by writing <tt/length/
 spaces in the current text color.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may
 only be used in presence of a prototype.
 </itemize>
@@ -2094,7 +2097,7 @@ at a specific screen position.
 <tag/Description/The function moves the cursor to a specific position, and
 will then clear part of the line by writing <tt/length/ spaces in the current
 text color.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may
 only be used in presence of a prototype.
 </itemize>
@@ -2118,7 +2121,7 @@ only be used in presence of a prototype.
 no character available, <tt/cgetc/ waits until the user presses a key. If the
 cursor is enabled by use of the <tt/cursor/ function, a blinking cursor is
 displayed while waiting.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>If the system supports a keyboard buffer, <tt/cgetc/ will fetch a key
 from this buffer and wait only if the buffer is empty.
 </itemize>
@@ -2140,7 +2143,7 @@ from this buffer and wait only if the buffer is empty.
 <tag/Declaration/<tt/void __fastcall__ chline (unsigned char length);/
 <tag/Description/The function outputs a horizontal line with the given length
 starting at the current cursor position.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The character used to draw the horizontal line is system dependent.
 If available, a line drawing character is used. Drawing a line that is partially
 off screen leads to undefined behaviour.
@@ -2166,7 +2169,7 @@ used in presence of a prototype.
 <tag/Declaration/<tt/void __fastcall__ chlinexy (unsigned char x, unsigned char y, unsigned char length);/
 <tag/Description/The function outputs a horizontal line with the given length
 starting at a given position.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The character used to draw the horizontal line is system dependent.
 If available, a line drawing character is used. Drawing a line that is partially
 off screen leads to undefined behaviour.
@@ -2192,7 +2195,7 @@ used in presence of a prototype.
 <tag/Declaration/<tt/void __fastcall__ clearerr (FILE* f);/
 <tag/Description/<tt/clearerr/ clears the error and end-of-file status
 indicators for the stream <tt/f/.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only be
 used in presence of a prototype.
 </itemize>
@@ -2216,7 +2219,7 @@ used in presence of a prototype.
 time used by the program. The time is returned in implementation defined
 units. It can be converted to seconds by dividing by the value of the macro
 <tt/CLOCKS_PER_SEC/.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>Since the machines, cc65 generated programs run on, cannot run multiple
 processes, the function will actually return the time since some
 implementation defined point in the past.
@@ -2257,7 +2260,7 @@ the upper left corner.
 <tag/Description/The function closes the given file descriptor. It returns zero
 on success and -1 on error. If an error occurs, the cause can be determined by
 reading the <tt/errno/ variable.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -2280,7 +2283,7 @@ be used in presence of a prototype.
 <tag/Description/The function closes the given directory descriptor. It returns
 zero on success and -1 on error. If an error occurs, the cause can be determined
 by reading the <tt/errno/ variable.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -2303,7 +2306,7 @@ be used in presence of a prototype.
 <tag/Description/<tt/creat/ creates a new file and returns the file descriptor
 associated with it. On error, -1 is returned and an error code is stored in
 <tt/errno/.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item><tt/creat/ is identical to calling <tt/<ref id="open" name="open">/ with
 <tt/flags/ equal to <tt/O_WRONLY | O_CREAT | O_TRUNC/.
 <item>The function is only available as fastcall function, so it may only
@@ -2329,7 +2332,7 @@ be used in presence of a prototype.
 formatted according to the format string given. The resulting string is output
 to the console. <tt/cprintf/ supports the same format specifiers as
 <tt/printf/. <!-- <tt/<ref id="printf" name="printf">/. -->
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>Like all other <tt/conio/ output functions, <tt/cprintf/ distinguishes
 between <tt/\r/ and <tt/\n/.
 </itemize>
@@ -2354,7 +2357,7 @@ between <tt/\r/ and <tt/\n/.
 <tag/Declaration/<tt/void __fastcall__ cputc (char c);/
 <tag/Description/Output one character to the console at the current cursor
 position.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>Like all other <tt/conio/ output functions, <tt/cputc/ distinguishes
 between <tt/\r/ and <tt/\n/.
 <item>The function is only available as fastcall function, so it may only
@@ -2381,7 +2384,7 @@ be used in presence of a prototype.
 <tag/Declaration/<tt/void __fastcall__ cputcxy (unsigned char x, unsigned char y, char c);/
 <tag/Description/<tt/cputcxy/ moves the cursor to the given x/y position on
 the screen and outputs one character.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>Like all other <tt/conio/ output functions, <tt/cputcxy/ distinguishes
 between <tt/\r/ and <tt/\n/.
 <item>The function is only available as fastcall function, so it may only
@@ -2408,7 +2411,7 @@ be used in presence of a prototype.
 <tag/Declaration/<tt/void __fastcall__ cputs (const char* s);/
 <tag/Description/The function outputs the given string on the console at the
 current cursor position.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>Like all other <tt/conio/ output functions, <tt/cputs/ distinguishes
 between <tt/\r/ and <tt/\n/.
 <item>The function is only available as fastcall function, so it may only
@@ -2435,7 +2438,7 @@ be used in presence of a prototype.
 <tag/Declaration/<tt/void __fastcall__ cputsxy (unsigned char x, unsigned char y, const char* s);/
 <tag/Description/<tt/cputsxy/ moves the cursor to the given x/y position,
 and outputs the string <tt/s/.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>Like all other <tt/conio/ output functions, <tt/cputsxy/ distinguishes
 between <tt/\r/ and <tt/\n/.
 <item>The function is only available as fastcall function, so it may only
@@ -2463,7 +2466,7 @@ be used in presence of a prototype.
 <tag/Description/If the argument to the function is non zero, a blinking cursor
 will be enabled when the <tt/cgetc/ function waits for input from the keyboard.
 If the argument is zero, <tt/cgetc/ will wait without a blinking cursor.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -2485,7 +2488,7 @@ be used in presence of a prototype.
 <tag/Declaration/<tt/void __fastcall__ cvline (unsigned char length);/
 <tag/Description/The function outputs a vertical line with the given length
 starting at the current cursor position.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The character used to draw the vertical line is system dependent.
 If available, a line drawing character is used. Drawing a line that is partially
 off screen leads to undefined behaviour.
@@ -2511,7 +2514,7 @@ used in presence of a prototype.
 <tag/Declaration/<tt/void __fastcall__ cvlinexy (unsigned char x, unsigned char y, unsigned char length);/
 <tag/Description/The function outputs a vertical line with the given length
 starting at a given position.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The character used to draw the vertical line is system dependent.
 If available, a line drawing character is used. Drawing a line that is partially
 off screen leads to undefined behaviour.
@@ -2537,8 +2540,7 @@ used in presence of a prototype.
 <tag/Declaration/<tt/div_t __fastcall__ div (int numer, int denom);/
 <tag/Description/<tt/div/ divides <tt/numer/ by <tt/denom/ and returns the
 quotient and remainder in a <tt/div_t/ structure.
-<tag/Limits/
-<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -2562,7 +2564,7 @@ the contents of the memory window have been changed, these changes may be lost
 if <tt/<ref id="em_map" name="em_map">/, <tt/<ref id="em_use" name="em_use">/,
 <tt/<ref id="em_copyfrom" name="em_copyfrom">/ or <tt/<ref id="em_copyto"
 name="em_copyto">/ are called without calling <tt/em_commit/ first.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>Calling <tt/em_commit/ does not necessarily mean that changes to the
 memory window are discarded, it does just mean that the drivers is allowed
 to discard it.
@@ -2591,7 +2593,7 @@ loaded.
 <tag/Description/Copy data from extended memory into linear memory. Source and
 target addresses as well as the number of bytes to transfer are specified in
 the <tt/em_copy/ structure that is passed as a parameter.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>Calling <tt/em_copyfrom/ will invalidate the memory window, so if you
 made any changes to the data in the window, call <tt/<ref id="em_commit"
 name="em_commit">/ first, or the changes are lost.
@@ -2620,7 +2622,7 @@ loaded.
 <tag/Description/Copy data from linear into extended memory. Source and
 target addresses as well as the number of bytes to transfer are specified in
 the <tt/em_copy/ structure that is passed as a parameter.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>Calling <tt/em_copyto/ will invalidate the memory window, so if you
 made any changes to the data in the window, call <tt/<ref id="em_commit"
 name="em_commit">/ first, or the changes are lost.
@@ -2649,7 +2651,7 @@ loaded.
 <tag/Description/The function installs an already loaded extended memory driver
 and returns an error code. The function may be used to install a driver linked
 statically to the program.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>Not all drivers are able to detect if the supported hardware is really
 present.
 <item>The function is only available as fastcall function, so it may only be
@@ -2675,7 +2677,7 @@ used in presence of a prototype.
 <tag/Description/Load an extended memory driver into memory and initialize
 it. The function returns an error code that tells if all this has been
 successful.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>Not all drivers are able to detect if the supported hardware is really
 present.
 <item>The function is only available as fastcall function, so it may only be
@@ -2705,7 +2707,7 @@ into a buffer. If you don't need the actual contents of the page (for example
 because you're going to overwrite it completely), it is better to call
 <tt/<ref id="em_use" name="em_use">/ instead. <tt/em_use/ will not transfer the
 data if it is possible to avoid that.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>Calling <tt/em_map/ will invalidate the memory window, so if you
 made any changes to the data in the window, call <tt/<ref id="em_commit"
 name="em_commit">/ first, or the changes are lost.
@@ -2733,7 +2735,7 @@ loaded.
 <tag/Declaration/<tt/unsigned em_pagecount (void);/
 <tag/Description/The function returns the size of the extended memory supported
 by the driver in 256 byte pages.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function returns zero if no extended memory driver is loaded.
 <item>The function may return zero if the supported hardware was not detected.
 </itemize>
@@ -2754,7 +2756,7 @@ by the driver in 256 byte pages.
 <tag/Declaration/<tt/unsigned char em_uninstall (void);/
 <tag/Description/The function uninstalls an already loaded extended memory
 driver but doesn't remove it from memory.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>If the driver has been loaded using <tt/<ref id="em_load_driver"
 name="em_load_driver">/, <tt/<ref id="em_unload" name="em_unload">/
 should be used instead of <tt/em_uninstall/ so the driver is also removed
@@ -2779,7 +2781,7 @@ from memory.
 <tag/Declaration/<tt/unsigned char em_unload (void);/
 <tag/Description/The function unloads a loaded extended memory driver and
 frees all memory allocated for the driver.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function does nothing if no driver is loaded.
 </itemize>
 <tag/Availability/cc65
@@ -2802,7 +2804,7 @@ memory and returns a pointer to the page frame. This function is similar to
 <tt/<ref id="em_map" name="em_map">/, but will not transfer data into the
 actual memory window in the assumption that the existing data is wrong or
 will get overwritten.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>Calling <tt/em_use/ will invalidate the memory window, so if you
 made any changes to the data in the window, call <tt/<ref id="em_commit"
 name="em_commit">/ first, or the changes are lost.
@@ -2834,7 +2836,7 @@ output is written and any functions registered with <tt/<ref id="atexit"
 name="atexit">/ are called. Common values for status are <tt/EXIT_SUCCESS/ and
 <tt/EXIT_FAILURE/ which are also defined in <tt/<ref id="stdlib.h"
 name="stdlib.h">/.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 <item>It depends on the host machine if the program return code can be
@@ -2863,7 +2865,7 @@ the command line specified as second argument. Instead of an empty string,
 a <tt/NULL/ pointer may be passed as second parameter.
 On success, the function does not return. On failure, -1 is returned and
 <tt/errno/ contains an error code.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 <item>On most platforms, the function needs to copy a small stub loader to
@@ -2893,7 +2895,7 @@ program, it may not be able to read it.
 <tag/Declaration/<tt/void fast (void);/
 <tag/Description/The function will switch the clock of the C128 to 2MHz. This
 will nearly double the speed compared to slow mode.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is specific to the C128.
 <item>2MHz clock will not work in 40 column mode.
 </itemize>
@@ -2916,7 +2918,7 @@ will nearly double the speed compared to slow mode.
 <tag/Declaration/<tt/int __fastcall__ feof (FILE* f);/
 <tag/Description/<tt/feof/ tests the end-of-file indicator ofthe stream
 <tt/f/, and returns a non zero value if it is set.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The indicator is set only after a read past the end of a file is
 attempted.
 <item>The function is only available as fastcall function, so it may only be
@@ -2940,7 +2942,7 @@ used in presence of a prototype.
 <tag/Declaration/<tt/int __fastcall__ ferror (FILE* f);/
 <tag/Description/<tt/ferror/ tests the error indicator of the stream
 <tt/f/, and returns a non zero value if it is set.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only be
 used in presence of a prototype.
 </itemize>
@@ -2963,7 +2965,7 @@ used in presence of a prototype.
 <tag/Description/The <tt/fileno/ function returns the file handle used
 internally by a C stream. This file handle (an integer) can be used as a
 handle for the POSIX input/output functions.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only be
 used in presence of a prototype.
 <item>Mixing C file I/O functions and POSIX file I/O functions for the same
@@ -2991,8 +2993,7 @@ file may have unpredictable results.
 <tt/<ref id="malloc" name="malloc">/, <tt/<ref id="calloc" name="calloc">/
 or <tt/<ref id="realloc" name="realloc">/. As an exception, if the passed
 pointer is <tt/NULL/, no action is performed.
-<tag/Limits/
-<itemize>
+<tag/Notes/<itemize>
 <item>Passing an already free'd block to <tt/free/ again will cause undefined
 behaviour and may crash your program.
 <item>The function is only available as fastcall function, so it may only
@@ -3024,7 +3025,7 @@ be used in presence of a prototype.
 all supported targets. If it exists, it returns a number that identifies the
 operating system or machine type, the program runs on. The machine dependent
 header files define constants that can be used to check the return code.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function does not exist on all platforms.
 <item>The return codes are platform dependent.
 </itemize>
@@ -3047,7 +3048,7 @@ returns one of the constants<itemize>
 <item><tt/CPU_65C02/
 <item><tt/CPU_65816/
 </itemize>
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>Other, more exotic CPU types are not disinguished.
 </itemize>
 <tag/Availability/cc65
@@ -3067,7 +3068,7 @@ returns one of the constants<itemize>
 matches <tt/name/ and returns its value. The environment consists of a list
 of strings in the form <tt/name=value/. If there is no match, <tt/getenv/
 returns <tt/NULL/.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>What exactly is stored in the environment depends on the machine the
 program is running on.
 <item>The function is only available as fastcall function, so it may only
@@ -3097,7 +3098,7 @@ preceeded by a '-'.
 found on the command line and <tt/EOF/ (-1) if there is no other option. An
 option argument is placed in <tt/optarg/, the index of the next element on the
 command line to be processed is placed in <tt/optind/.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The implementation will not reorder options. A non option on the command
 line will terminate option processing. All remaining arguments are not
 recognized as options, even if the start with a '-' character.
@@ -3120,7 +3121,7 @@ be used in presence of a prototype.
 <tag/Description/The function moves the text mode cursor to the specified X
 position while leaving the Y position untouched. The leftmost position on the
 screen has the coordinate 0.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may
 only be used in presence of a prototype.
 <item>Invalid values for the X position (out of screen coordinates) may
@@ -3147,7 +3148,7 @@ lead to undefined behaviour.
 <tag/Description/The function moves the text mode cursor to the specified
 position. The leftmost position on the screen has the X coordinate 0, the
 topmost line has the Y coordinate 0.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only be
 used in presence of a prototype.
 <item>Invalid values for any of both coordinates (out of screen positions) may
@@ -3174,7 +3175,7 @@ lead to undefined behaviour.
 <tag/Description/The function moves the text mode cursor to the specified Y
 position while leaving the X position untouched. The uppermost position on the
 screen has the coordinate 0.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may
 only be used in presence of a prototype.
 <item>Invalid values for the Y position (out of screen coordinates) may lead
@@ -3201,7 +3202,7 @@ to undefined behaviour.
 <tag/Description/The function returns a non zero value if the given argument
 is a letter or digit. The return value is zero if the character is anything
 else.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>When compiling with <tt/-Os/ the function is actually a macro. The
 inline sequence generated by the macro will not work correctly for values
 outside the range 0..255. <em/Note:/ The constant <tt/EOF/ is not part of
@@ -3238,7 +3239,7 @@ fastcall function, so it may only be used in presence of a prototype.
 <tag/Declaration/<tt/int __fastcall__ isalpha (int c);/
 <tag/Description/The function returns a non zero value if the given argument
 is a letter. The return value is zero if the character is anything else.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>When compiling with <tt/-Os/ the function is actually a macro. The
 inline sequence generated by the macro will not work correctly for values
 outside the range 0..255. <em/Note:/ The constant <tt/EOF/ is not part of
@@ -3275,7 +3276,7 @@ fastcall function, so it may only be used in presence of a prototype.
 <tag/Declaration/<tt/int __fastcall__ isascii (int c);/
 <tag/Description/The function returns a non zero value if the given argument
 is in the range 0..127 (the range of valid ASCII characters) and zero if not.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>When compiling with <tt/-Os/ the function is actually a macro. The
 inline sequence generated by the macro will not work correctly for values
 outside the range 0..255. <em/Note:/ The constant <tt/EOF/ is not part of
@@ -3313,7 +3314,7 @@ fastcall function, so it may only be used in presence of a prototype.
 <tag/Description/The function returns a non zero value if the given argument
 is a space or tab character. The return value is zero if the character is
 anything else.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>When compiling with <tt/-Os/ the function is actually a macro. The
 inline sequence generated by the macro will not work correctly for values
 outside the range 0..255. <em/Note:/ The constant <tt/EOF/ is not part of
@@ -3322,7 +3323,7 @@ macro.
 <item>When compiling without <tt/-Os/, the function is only available as
 fastcall function, so it may only be used in presence of a prototype.
 </itemize>
-<tag/Availability/cc65
+<tag/Availability/ISO 9899
 <tag/See also/
 <ref id="isalnum" name="isalnum">,
 <ref id="isalpha" name="isalpha">,
@@ -3351,7 +3352,7 @@ fastcall function, so it may only be used in presence of a prototype.
 <tag/Description/The function returns a non zero value if the given argument
 is a control character. The return value is zero if the character is anything
 else.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>When compiling with <tt/-Os/ the function is actually a macro. The
 inline sequence generated by the macro will not work correctly for values
 outside the range 0..255. <em/Note:/ The constant <tt/EOF/ is not part of
@@ -3388,7 +3389,7 @@ fastcall function, so it may only be used in presence of a prototype.
 <tag/Declaration/<tt/int __fastcall__ isdigit (int c);/
 <tag/Description/The function returns a non zero value if the given argument
 is a digit. The return value is zero if the character is anything else.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>When compiling with <tt/-Os/ the function is actually a macro. The
 inline sequence generated by the macro will not work correctly for values
 outside the range 0..255. <em/Note:/ The constant <tt/EOF/ is not part of
@@ -3427,7 +3428,7 @@ space).
 <tag/Description/The function returns a non zero value if the given argument
 is a printable character with the exception of space. The return value is zero
 if the character is anything else.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>When compiling with <tt/-Os/ the function is actually a macro. The
 inline sequence generated by the macro will not work correctly for values
 outside the range 0..255. <em/Note:/ The constant <tt/EOF/ is not part of
@@ -3465,7 +3466,7 @@ fastcall function, so it may only be used in presence of a prototype.
 <tag/Description/The function returns a non zero value if the given argument
 is a lower case letter. The return value is zero if the character is anything
 else.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>When compiling with <tt/-Os/ the function is actually a macro. The
 inline sequence generated by the macro will not work correctly for values
 outside the range 0..255. <em/Note:/ The constant <tt/EOF/ is not part of
@@ -3503,7 +3504,7 @@ fastcall function, so it may only be used in presence of a prototype.
 <tag/Description/The function returns a non zero value if the given argument
 is a printable character (this includes the space character). The return value
 is zero if the character is anything else.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>When compiling with <tt/-Os/ the function is actually a macro. The
 inline sequence generated by the macro will not work correctly for values
 outside the range 0..255. <em/Note:/ The constant <tt/EOF/ is not part of
@@ -3542,7 +3543,7 @@ space or an alphanumeric character.
 <tag/Description/The function returns a non zero value if the given argument
 is a printable character, but not a space or anything alphanumeric. The return
 value is zero if the character is anything else.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>When compiling with <tt/-Os/ the function is actually a macro. The
 inline sequence generated by the macro will not work correctly for values
 outside the range 0..255. <em/Note:/ The constant <tt/EOF/ is not part of
@@ -3582,7 +3583,7 @@ is a white space character. The return value is zero if the character is
 anything else. The standard white space characters are: space, formfeed ('\f'),
 newline ('\n'), carriage return ('\r'), horizontal tab ('\t'), and vertical tab
 ('\v').
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>When compiling with <tt/-Os/ the function is actually a macro. The
 inline sequence generated by the macro will not work correctly for values
 outside the range 0..255. <em/Note:/ The constant <tt/EOF/ is not part of
@@ -3620,7 +3621,7 @@ fastcall function, so it may only be used in presence of a prototype.
 <tag/Description/The function returns a non zero value if the given argument
 is an upper case letter. The return value is zero if the character is anything
 else.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>When compiling with <tt/-Os/ the function is actually a macro. The
 inline sequence generated by the macro will not work correctly for values
 outside the range 0..255. <em/Note:/ The constant <tt/EOF/ is not part of
@@ -3658,7 +3659,7 @@ fastcall function, so it may only be used in presence of a prototype.
 <tag/Description/The function returns a non zero value if the given argument
 is a hexadecimal digit (0..9, a..f and A..F). The return value is zero if the
 character is anything else.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>When compiling with <tt/-Os/ the function is actually a macro. The
 inline sequence generated by the macro will not work correctly for values
 outside the range 0..255. <em/Note:/ The constant <tt/EOF/ is not part of
@@ -3695,7 +3696,7 @@ fastcall function, so it may only be used in presence of a prototype.
 <tag/Declaration/<tt/char* __fastcall__ itoa (int val, char* buf, int radix);/
 <tag/Description/<tt/itoa/ converts the integer <tt/val/ into a string using
 <tt/radix/ as the base.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>There are no provisions to prevent a buffer overflow.
 <item>If <tt/val/ contains <tt/INT_MIN/, the behaviour is undefined.
 <item>The function is non standard, so it is not available in strict ANSI mode.
@@ -3724,7 +3725,7 @@ used in presence of a prototype.
 <tag/Declaration/<tt/unsigned char joy_count (void);/
 <tag/Description/The function returns a the number of joysticks supported
 by the current joystick driver.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>A joystick driver must be loaded using <ref id="joy_load_driver"
 name="joy_load_driver"> before calling this function.
 <item>The function returns the number of joysticks supported by the driver.
@@ -3749,7 +3750,7 @@ There's no way to check for the number of actually connected joysticks.
 <tag/Description/The function installs a driver that was already loaded into
 memory (or linked statically to the program). It returns an error code
 (<tt/JOY_ERR_OK/ in case of success).
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only be
 used in presence of a prototype.
 </itemize>
@@ -3773,7 +3774,7 @@ used in presence of a prototype.
 <tag/Description/The function loads a driver with the given name from disk
 and installs it. An error code is returned, which is <tt/JOY_ERR_OK/ if the
 driver was successfully loaded and installed.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only be
 used in presence of a prototype.
 </itemize>
@@ -3797,7 +3798,7 @@ used in presence of a prototype.
 <tag/Description/The function reads the status bits for a joystick. The number
 of the joystick is passed as parameter. The result may be examined by using one
 of the <tt/JOY_xxx/ macros from <ref id="joystick.h" name="joystick.h">.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>A joystick driver must be loaded using <ref id="joy_load_driver"
 name="joy_load_driver"> before calling this function.
 <item>The function is only available as fastcall function, so it may only be
@@ -3823,7 +3824,7 @@ used in presence of a prototype.
 <tag/Description/The function uninstalls the currently installed joystick
 driver. It does not remove the driver from memory. The function returns an
 error code, which is <tt/JOY_ERR_OK/ if the driver was successfully uninstalled.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>A joystick driver must be installed using <ref id="joy_install"
 name="joy_install"> before calling this function.
 </itemize>
@@ -3847,7 +3848,7 @@ name="joy_install"> before calling this function.
 <tag/Description/The function uninstalls the currently installed joystick
 driver and removes it from memory. An error code is returned, which is
 <tt/JOY_ERR_OK/ if the driver was successfully uninstalled.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>A joystick driver must be loaded using <ref id="joy_load_driver"
 name="joy_load_driver"> before calling this function.
 </itemize>
@@ -3868,7 +3869,7 @@ name="joy_load_driver"> before calling this function.
 <tag/Declaration/<tt/unsigned char kbhit (void);/
 <tag/Description/The function returns a value of zero if there is no character
 waiting to be read from the keyboard. It returns non zero otherwise.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>If the system does not support a keyboard buffer (most systems
 do), the function is rather useless.
 </itemize>
@@ -3890,7 +3891,7 @@ do), the function is rather useless.
 <tag/Declaration/<tt/long __fastcall__ labs (long v);/
 <tag/Description/<tt/labs/ returns the absolute value of the argument passed to
 the function.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The return value is undefined if <tt/LONG_MIN/ is passed to the function.
 <item>The function is only available as fastcall function, so it may only be
 used in presence of a prototype.
@@ -3912,7 +3913,7 @@ used in presence of a prototype.
 <tag/Declaration/<tt/char* __fastcall__ ltoa (long val, char* buf, int radix);/
 <tag/Description/<tt/itoa/ converts the long integer <tt/val/ into a string
 using <tt/radix/ as the base.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>There are no provisions to prevent a buffer overflow.
 <item>If <tt/val/ contains <tt/LONG_MIN/, the behaviour is undefined.
 <item>The function is non standard, so it is not available in strict ANSI mode.
@@ -3941,7 +3942,7 @@ used in presence of a prototype.
 <tag/Declaration/<tt/struct lconv* localeconv (void);/
 <tag/Description/<tt/localeconv/ returns a pointer to the current locale
 structure.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>cc65 supports only the "C" locale, so even after setting a new locale
 using <tt/<ref id="setlocale" name="setlocale">/, the structure returned will
 always be the same.
@@ -3966,8 +3967,7 @@ data in <tt/buf/, which must have been set by a preceeding call to
 <tt/<ref id="setjmp" name="setjmp">/. Program execution continues as if the
 call to <tt/<ref id="setjmp" name="setjmp">/ has just returned the value
 <tt/retval/.
-<tag/Limits/
-<itemize>
+<tag/Notes/<itemize>
 <item>If the parameter <tt/retval/ is zero, the function will behave as if it
 was called with a value of one.
 <item>The function is only available as fastcall function, so it may only
@@ -3991,8 +3991,7 @@ be used in presence of a prototype.
 <tag/Description/<tt/malloc/ allocates size bytes on the heap and returns a
 pointer to the allocated memory block. On error (not enough memory available),
 <tt/malloc/ returns <tt/NULL/.
-<tag/Limits/
-<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -4022,7 +4021,7 @@ be used in presence of a prototype.
 (converted to a char) in the block of raw memory string pointed to by <tt/mem/
 that is of size <tt/count/. Upon completion, the function returns a pointer to
 the character found, or a null pointer if the character was not found.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -4045,8 +4044,7 @@ be used in presence of a prototype.
 pointed to by <tt/p1/ into the memory area pointed to by <tt/p2/. It returns a value that is less than
 zero if <tt/p1/ is less than <tt/p2/, zero if <tt/p1/ is the same as <tt/p2/,
 and a value greater than zero if <tt/p1/ is greater than <tt/p2/.
-<tag/Limits/
-<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -4070,8 +4068,7 @@ be used in presence of a prototype.
 <tag/Description/<tt/memcpy/ copies <tt/count/ bytes from the memory area
 pointed to by <tt/src/ into the memory area pointed to by <tt/dest/. It returns
 <tt/dest/.
-<tag/Limits/
-<itemize>
+<tag/Notes/<itemize>
 <item>The result is undefined if the memory areas do overlap. Use
 <tt/<ref id="memmove" name="memmove">/ to copy overlapping memory areas.
 <item>The function is only available as fastcall function, so it may only
@@ -4097,8 +4094,7 @@ be used in presence of a prototype.
 <tag/Description/<tt/memmove/ copies <tt/count/ bytes from the memory area
 pointed to by <tt/src/ into the memory area pointed to by <tt/dest/. It returns
 <tt/dest/.
-<tag/Limits/
-<itemize>
+<tag/Notes/<itemize>
 <item>While <tt/memmove/ allows the memory areas to overlap, it has some
 additional overhead compared to <tt/<ref id="memcpy" name="memcpy">/.
 <item>The function is only available as fastcall function, so it may only
@@ -4123,8 +4119,7 @@ be used in presence of a prototype.
 <tag/Declaration/<tt/void* __fastcall__ memset (void* p, int val, size_t count);/
 <tag/Description/<tt/memset/ fills the memory area pointed to by <tt/p/ with
 the value <tt/val/. The function returns <tt/p/.
-<tag/Limits/
-<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -4148,9 +4143,11 @@ be used in presence of a prototype.
 <tag/Declaration/<tt/void __fastcall__ mod_free (void* module);/
 <tag/Description/The function will free a module loaded into memory by use of
 the <tt/<ref id="mod_load" name="mod_load">/ function.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The pointer passed as parameter is the pointer to the module memory,
 not the pointer to the control structure.
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
@@ -4166,7 +4163,7 @@ not the pointer to the control structure.
 <descrip>
 <tag/Function/Load a relocatable module.
 <tag/Header/<tt/<ref id="modload.h" name="modload.h">/
-<tag/Declaration/<tt/unsigned char mod_load (struct mod_ctrl* ctrl);/
+<tag/Declaration/<tt/unsigned char __fastcall__ mod_load (struct mod_ctrl* ctrl);/
 <tag/Description/The function will load a code module into memory and relocate
 it. The function will return an error code. If <tt/MLOAD_OK/ is returned, the
 outgoing fields in the passed <tt/mod_ctrl/ struct contain information about
@@ -4179,9 +4176,11 @@ the module just loaded. Possible error codes are:
 <item><tt/MLOAD_ERR_FMT/ - Data format error
 <item><tt/MLOAD_ERR_MEM/ - Not enough memory
 </itemize>
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The <htmlurl url="ld65.html" name="ld65"> linker is needed to create
 relocatable o65 modules for use with this function.
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
@@ -4199,7 +4198,7 @@ relocatable o65 modules for use with this function.
 <tag/Header/<tt/<ref id="mouse.h" name="mouse.h">/
 <tag/Declaration/<tt/void __fastcall__ mouse_setbox (const struct mouse_box* box);/
 <tag/Description/The function allows to set a bounding box for mouse movement.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function does not check if the mouse cursor is currently within the
 given rectangle. Placing the mouse cursor within the bounding box is the
 responsibility of the programmer.
@@ -4228,7 +4227,7 @@ used in presence of a prototype.
 <tag/Declaration/<tt/void __fastcall__ mouse_getbox (struct mouse_box* box);/
 <tag/Description/The function queries the current bounding box for mouse
 movement.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only be
 used in presence of a prototype.
 </itemize>
@@ -4270,7 +4269,7 @@ return value.
 code);/
 <tag/Description/The function returns an error message (in english) for the
 error code passed parameter.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function will return "Unknown error" for invalid error codes.
 <item>The function is only available as fastcall function, so it may only be
 used in presence of a prototype.
@@ -4315,7 +4314,7 @@ mouse.
 <tag/Declaration/<tt/void __fastcall__ mouse_info (struct mouse_info* info);/
 <tag/Description/The function returns the state of the mouse buttons and the
 position of the mouse in the <tt/mouse_info/ structure passed as parameter.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The <tt/mouse_info/ struct is a superset of the <tt/mouse_pos/ struct,
 so if you just need the mouse position, call <tt/<ref id="mouse_pos"
 name="mouse_pos">/ instead.
@@ -4346,7 +4345,7 @@ pointer. Defaults for these routines are supplied by the library, so if you
 can live with these defaults (which are platform specific), just pass a
 pointer to <tt/mouse_def_callbacks/. The function may be used to install a
 driver linked statically to the program.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>Not all drivers are able to detect if the supported hardware is really
 present.
 <item>After installing a driver, the mouse cursor is hidden.
@@ -4376,7 +4375,7 @@ different IOCTL functions, and the <tt/data/ depends on code. The
 function returns an error code. The purpose of this function is to allow
 for driver specific extensions. See the documentation for a specific mouse
 driver for supported ioctl calls.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>Calling this function is non portable, because each driver may
 implement different ioctl calls (or none at all).
 <item>The function is only available as fastcall function, so it may only be
@@ -4402,7 +4401,7 @@ function returns an error code that tells if the call has been successful. The
 routines needed to move or hide/show the mouse pointer. Defaults for these
 routines are supplied by the library, so if you can live with these defaults
 (which are platform specific), just pass a pointer to <tt/mouse_def_callbacks/.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The driver is loaded by name, so currently you must know the type of
 mouse that should be supported. There is no autodetect capability.
 <item>Not all drivers are able to detect if the supported hardware is really
@@ -4430,7 +4429,7 @@ used in presence of a prototype.
 <tag/Declaration/<tt/void __fastcall__ mouse_move (int x, int y);/
 <tag/Description/The function updates the mouse position. If the mouse cursor
 is visible, it is shown at the new position.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function does not check if the new position is within the bounding
 box specified with <tt/<ref id="mouse_setbox" name="mouse_setbox">/.
 <item>The function is only available as fastcall function, so it may only be
@@ -4454,7 +4453,7 @@ used in presence of a prototype.
 <tag/Declaration/<tt/void __fastcall__ mouse_pos (struct mouse_pos* pos);/
 <tag/Description/The function returns the position of the mouse in the
 <tt/mouse_pos/ structure passed as parameter.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The <tt/mouse_pos/ struct is a subset of the <tt/mouse_info/ struct,
 so if you do also need the mouse buttons, call <tt/<ref id="mouse_info"
 name="mouse_info">/ instead.
@@ -4498,7 +4497,7 @@ that is shared between <tt/<ref id="mouse_hide" name="mouse_hide">/ and
 <tag/Declaration/<tt/unsigned char mouse_uninstall (void);/
 <tag/Description/The function uninstalls an already loaded mouse driver but
 don't removes it from memory.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>If the driver has been loaded using <tt/<ref id="mouse_load_driver"
 name="mouse_load_driver">/, <tt/<ref id="mouse_unload" name="mouse_unload">/
 should be used instead of <tt/mouse_uninstall/ so the driver is also removed
@@ -4520,10 +4519,10 @@ from memory.
 <descrip>
 <tag/Function/Unload a mouse driver.
 <tag/Header/<tt/<ref id="mouse.h" name="mouse.h">/
-<tag/Declaration/<tt/unsigned char __fastcall__ mouse_unload (void);/
+<tag/Declaration/<tt/unsigned char mouse_unload (void);/
 <tag/Description/The function unloads a loaded mouse driver and frees all
 memory allocated for the driver.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function does nothing if no driver is loaded.
 </itemize>
 <tag/Availability/cc65
@@ -4545,7 +4544,7 @@ memory allocated for the driver.
 <tag/Declaration/<tt/size_t offsetof (type, member);/
 <tag/Description/<tt/offsetof/ calculates the address offset of a <tt/struct/
 or <tt/union/ member.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is actually a macro.
 </itemize>
 <tag/Availability/ISO 9899
@@ -4564,7 +4563,7 @@ or <tt/union/ member.
 <tag/Description/<tt/open/ opens a file and returns the file descriptor
 associated with it. On error, -1 is returned and an error code is stored in
 <tt/errno/. Several flags may be passed to <tt/open/ that change the behaviour.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>POSIX specifies an additional <tt/mode/ argument that may be passed to
 open, which is used as the permission mask when a new file is created. While
 cc65 allows to pass this argument, it is ignored.
@@ -4588,7 +4587,7 @@ cc65 allows to pass this argument, it is ignored.
 <tag/Description/<tt/opendir/ opens a directory and returns the direcory
 descriptor associated with it. On error, NULL is returned and an error code is
 stored in <tt/errno/.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -4611,8 +4610,7 @@ be used in presence of a prototype.
 <tag/Declaration/<tt/unsigned char __fastcall__ peekbsys (unsigned addr);/
 <tag/Description/<tt/peekbsys/ reads one byte from the given address in the
 system bank (bank 15) of the CBM PET-II machines and returns it.
-<tag/Limits/
-<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 <item>This function may be a macro depending on the compiler options. The
@@ -4642,8 +4640,7 @@ actual function is accessible by #undef'ing the macro.
 system bank (bank 15) of the CBM PET-II machines and returns it. Following
 the usual 6502 conventions, the low byte is read from <tt/addr/, and the
 high byte is read from <tt/addr+1/.
-<tag/Limits/
-<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 <item>The order in which the two bytes are read is undefined.
@@ -4672,8 +4669,7 @@ is not <tt/NULL/ and not an empty string, it is printed followed by a colon and
 a blank. Then the error message for the current contents of <tt/errno/ is
 printed followed by a newline. The message output is the same as returned by
 <tt/<ref id="strerror" name="strerror">/ with an argument of <tt/errno/.
-<tag/Limits/
-<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -4696,8 +4692,7 @@ be used in presence of a prototype.
 <tag/Declaration/<tt/void __fastcall__ pokebsys (unsigned addr, unsigned char val);/
 <tag/Description/<tt/pokebsys/ writes one byte to the given address in the
 system bank (bank 15) of the CBM PET-II machines.
-<tag/Limits/
-<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -4725,8 +4720,7 @@ be used in presence of a prototype.
 system bank (bank 15) of the CBM PET-II machines. Following the usual 6502
 conventions, the low byte of <tt/val/ is written to <tt/addr/, and the
 high byte is written to <tt/addr+1/.
-<tag/Limits/
-<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 <item>The order in which the two bytes are written is undefined.
@@ -4750,17 +4744,18 @@ be used in presence of a prototype.
 <tag/Function/Sort an array.
 <tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
 <tag/Declaration/<tt/void __fastcall__ qsort (void* base, size_t count,
-size_t size, int (*compare) (const void*, const void*));/
+size_t size, int __fastcall__ (* compare) (const void*, const void*));/
 <tag/Description/<tt/qsort/ sorts an array according to a given compare
 function <tt/compare/. <tt/base/ is the address of the array, <tt/count/
 is the number of elements, <tt/size/ the size of an element and <tt/compare/
 the function used to compare the members.
-<tag/Limits/
-<itemize>
+<tag/Notes/<itemize>
 <item>If there are multiple members with the same key, the order after calling
 the function is undefined.
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
+<item>The function to which <tt/compare/ points must have the <tt/fastcall/
+calling convention.
 </itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
@@ -4782,7 +4777,7 @@ program has installed a signal handler for the signal, this signal handler
 will be executed. If no handler has been installed, the default action for
 the raised signal will be taken. The function returns zero on success,
 nonzero otherwise.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -4804,7 +4799,7 @@ be used in presence of a prototype.
 <tag/Declaration/<tt/int rand (void);/
 <tag/Description/The function returns a pseudo random number
 between 0 and <tt/RAND_MAX/ (exclusive).
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>Without using <tt><ref id="srand" name="srand"></tt>, always the same
 flow of numbers is generated.
 <item>On startup, the function behaves as if <ref id="srand" name="srand">
@@ -4831,7 +4826,7 @@ stream pointed to by <tt/dir/. It stores the data in a <tt/dirent/ structure
 and returns a pointer to it. If the end of directory is reached, or an error
 occurs, NULL is returned. In case of errors, an error code is stored into
 <tt/errno/.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 <item>The returned pointer may point to a statically allocated instance of
@@ -4870,8 +4865,7 @@ by <tt/block/ to <tt/size/ bytes. If <tt/block/ is <tt/NULL/, <tt/realloc/
 behaves as if <tt/malloc/ had been called. If <tt/size/ is zero, <tt/realloc/
 behaves as if <tt/free/ had been called. On error (not enough memory
 available), <tt/realloc/ returns <tt/NULL/.
-<tag/Limits/
-<itemize>
+<tag/Notes/<itemize>
 <item>The part of the memory block that is returned will have its contents
 unchanged.
 <item>This function is somewhat dangerous to use. Be careful to save the
@@ -4907,8 +4901,7 @@ be used in presence of a prototype.
 <tag/Description/<tt/remove/ deletes the file with the given name. On success,
 zero is returned. On error, -1 is returned and <tt/errno/ is set to an error
 code describing the reason for the failure.
-<tag/Limits/
-<itemize>
+<tag/Notes/<itemize>
 <item>This function is not available on all cc65 targets (depends on the
 availability of file I/O).
 <item>The function is only available as fastcall function, so it may only
@@ -4944,8 +4937,7 @@ if (remove (FILENAME) == 0) {
 <tag/Description/<tt/rename/ renames a file (gives it a new name). On success,
 zero is returned. On error, -1 is returned and <tt/errno/ is set to an error
 code describing the reason for the failure.
-<tag/Limits/
-<itemize>
+<tag/Notes/<itemize>
 <item>This function is not available on all cc65 targets (depends on the
 capabilities of the storage devices).
 <item>The function is only available as fastcall function, so it may only
@@ -4980,11 +4972,9 @@ if (rename (OLDNAME, NEWNAME) == 0) {
 <tag/Declaration/<tt/void reset_brk (void);/
 <tag/Description/<tt/reset_brk/ resets the break vector to the value it had
 before a call to <tt/set_brk/.
-<tag/Limits/
-<itemize>
-<item>Since <tt/<ref id="set_brk" name="set_brk">/ installs an exit handler,
-it is not strictly necessary to call this function as part of the cleanup when
-the program ends.
+<tag/Notes/<itemize>
+<item>The break vector is reset on program termination, so it's not strictly
+necessary to call this function as a part of your clean-up when exitting the program.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
@@ -5004,10 +4994,9 @@ the program ends.
 <tag/Header/<tt/<ref id="6502.h" name="6502.h">/
 <tag/Declaration/<tt/void reset_irq (void);/
 <tag/Description/<tt/reset_irq/ resets the C level interrupt request vector.
-<tag/Limits/
-<itemize>
-<item>The original IRQ vector is restored on program termination even without
-calling this function.
+<tag/Notes/<itemize>
+<item>The interrupt vector is reset on program termination, so it's not strictly
+necessary to call this function as a part of your clean-up when exitting the program.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
@@ -5029,7 +5018,7 @@ calling this function.
 <tag/Description/If the argument is non zero, the function enables reverse
 character display. If the argument is zero, reverse character display is
 switched off. The old value of the setting is returned.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function may not be supported by the hardware, in which case
 the call is ignored.
 <item>The function is only available as fastcall function, so it may only
@@ -5052,7 +5041,7 @@ be used in presence of a prototype.
 <tag/Declaration/<tt/void __fastcall__ rewinddir (DIR* dir);/
 <tag/Description/<tt/rewinddir/ sets the position of the directory stream
 pointed to by <tt/dir/ to the start of the directory.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -5073,7 +5062,7 @@ be used in presence of a prototype.
 <tag/Header/<tt/<ref id="conio.h" name="conio.h">/
 <tag/Declaration/<tt/void __fastcall__ screensize (unsigned char* x, unsigned char* y);/
 <tag/Description/The function returns the dimensions of the text mode screen.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -5099,7 +5088,7 @@ be used in presence of a prototype.
 <tag/Description/<tt/seekdir/ sets the position of the directory stream
 pointed to by <tt/dir/ to the value given in <tt/offset/, which should be a
 value returned by <tt/<ref id="telldir" name="telldir">/.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -5153,7 +5142,7 @@ static void initialize(){
 <tag/Description/Get a character from the serial port. If no characters are
 available, the function will return SER_ERR_NO_DATA, so this is not a fatal
 error.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -5180,7 +5169,7 @@ while (ser_get(&amp;ch) == SER_ERR_NO_DATA)
 <tag/Description/The function installs a driver that was already loaded into
 memory (or linked statically to the program). It returns an error code
 (<tt/SER_ERR_OK/ in case of success).
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only be
 used in presence of a prototype.
 </itemize>
@@ -5206,7 +5195,7 @@ ser_install(lynx_comlynx); //Include the driver statically instead of loading it
 <tag/Description/Some platforms have extra serial functions that are not
 supported by standard serial driver functions. You can extend the driver to support
 this extra functionality bt using ser_ioctl functions.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 <item>These functions are not easily portable to other cc65 platforms.
@@ -5226,7 +5215,7 @@ be used in presence of a prototype.
 <tag/Declaration/<tt/unsigned char __fastcall__ ser_load_driver (const char *name);/
 <tag/Description/Load and install the driver by name.
 Will just load the driver and check if loading was successful.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -5245,7 +5234,7 @@ be used in presence of a prototype.
 <tag/Header/<tt/<ref id="serial.h" name="serial.h">/
 <tag/Declaration/<tt/unsigned char __fastcall__ ser_open (const struct ser_params* params);/
 <tag/Description/Open the port by setting the port parameters and enable interrupts.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -5282,7 +5271,7 @@ static void initialize(){
 <tag/Description/Send a character via the serial port. There is a transmit
 buffer, but transmitting is not done via interrupt. The function returns
 SER_ERR_OVERFLOW if there is no space left in the transmit buffer.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -5304,7 +5293,7 @@ ser_put('A');
 <tag/Header/<tt/<ref id="serial.h" name="serial.h">/
 <tag/Declaration/<tt/unsigned char __fastcall__ ser_status (unsigned char* status);/
 <tag/Description/Return the serial port status.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -5355,8 +5344,7 @@ be used in presence of a prototype.
 program code by letting the vector point to a user written C function. The
 runtime library installs a small stub that saves the registers into global
 variables that may be accessed (and changed) by the break handler.
-<tag/Limits/
-<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 <item>The stub saves the zero page registers used by the C runtime and switches
@@ -5367,9 +5355,9 @@ function called from it.
 <item>The <tt/brk_pc/ variable points to the <tt/BRK/ instruction. If you want
 the continue with the interrupted code, you have to adjust <tt/brk_pc/,
 otherwise the <tt/BRK/ instruction will get executed over and over again.
-<item>Since <tt/set_brk/ installs an exit handler, it is not strictly necessary
-to call <tt/<ref id="reset_brk" name="reset_brk">/ as part of the cleanup when
-the program terminates.
+<item>The break vector is reset on program termination, so it's not strictly
+necessary to call <tt/<ref id="reset_brk" name="reset_brk">/ as a part of your
+clean-up when exitting the program.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
@@ -5396,8 +5384,7 @@ was set up to handle a "private", "exclusive" interrupt request source it must
 return the value <tt/IRQ_HANDLED/ if and only if it has verified that the current
 interrupt request actually stems from that source. In all other cases it must return
 the value <tt/IRQ_NOT_HANDLED/.
-<tag/Limits/
-<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 <item>The stub saves the registers and zero page locations used by the C runtime
@@ -5406,9 +5393,9 @@ runtime overhead, but it it is safe to execute C code, even if other C code
 was interrupted. Be careful however not to call C library functions, and do not
 enable stack checks for the handler function or any other function called from
 it.
-<item>The interrupt vector is reset on function termination, so it's not
-strictly necessary to call <tt/<ref id="reset_irq" name="reset_irq">/ as part
-of the cleanup when the program terminates.
+<item>The interrupt vector is reset on program termination, so it's not strictly
+necessary to call <tt/<ref id="reset_irq" name="reset_irq">/ as a part of your
+clean-up when exitting the program.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
@@ -5430,8 +5417,7 @@ of the cleanup when the program terminates.
 <tag/Description/The <tt/setjmp/ function saves the current context in <tt/buf/
 for subsequent use by the <tt/<ref id="longjmp" name="longjmp">/ function and
 returns zero.
-<tag/Limits/
-<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 <item><tt/setjmp/ is actually a macro as required by the ISO standard.
@@ -5453,8 +5439,7 @@ be used in presence of a prototype.
 <tag/Header/<tt/<ref id="locale.h" name="locale.h">/
 <tag/Declaration/<tt/char* __fastcall__ setlocale (int category, const char* locale);/
 <tag/Description/<tt/setlocale/ sets or queries the program's locale.
-<tag/Limits/
-<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 <item>cc65 supports only the "C" locale, so calling this function to set a
@@ -5482,7 +5467,7 @@ handler may either be a user supplied function, or one of the predefined
 signal handlers <tt/SIG_IGN/ or <tt/SIG_DFL/. The function returns the
 previous value if the signal , or the special function vector SIG_ERR in
 case of an error.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -5504,7 +5489,7 @@ be used in presence of a prototype.
 <tag/Declaration/<tt/void __fastcall__ sleep (unsigned seconds);/
 <tag/Description/The function will return after the specified number of
 seconds have elapsed.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -5523,7 +5508,7 @@ be used in presence of a prototype.
 <tag/Declaration/<tt/void slow (void);/
 <tag/Description/The function will switch the clock of the C128 to 1MHz. This
 will halve the speed compared to fast mode.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is specific to the C128.
 </itemize>
 <tag/Availability/C128
@@ -5546,7 +5531,7 @@ will halve the speed compared to fast mode.
 <tag/Description/The function initializes the random number generator using
 the given seed. On program startup, the generator behaves as if <tt/srand/ has
 been called with an argument of 1.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -5570,7 +5555,7 @@ be used in presence of a prototype.
 as parameters without case sensitivity. It returns a value that is less than
 zero if <tt/s1/ is less than <tt/s2/, zero if <tt/s1/ is the same as <tt/s2/,
 and a value greater than zero if <tt/s1/ is greater than <tt/s2/.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 <item>The function is not available in strict ANSI mode.
@@ -5598,7 +5583,7 @@ be used in presence of a prototype.
 pointed to by s2 (including the terminating null byte) to the end of the
 string pointed to by s1. The initial byte of s2 overwrites the null byte at
 the end of s1.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 <item>If copying takes place between objects that overlap, the behaviour
@@ -5625,7 +5610,7 @@ is undefined.
 (converted to a char) in the string pointed to by <tt/s/. The terminating null
 byte is considered to be part of the string. Upon completion, the function
 returns a pointer to the byte, or a null pointer if the byte was not found.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -5649,7 +5634,7 @@ be used in presence of a prototype.
 parameters. It returns a value that is less than zero if <tt/s1/ is less than
 <tt/s2/, zero if <tt/s1/ is the same as <tt/s2/, and a value greater than zero
 if <tt/s1/ is greater than <tt/s2/.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -5677,7 +5662,7 @@ parameters, according to the collating sequence set by <tt/<ref id="setlocale"
 name="setlocale">/. It returns a value that is less than zero if <tt/s1/ is
 less than <tt/s2/, zero if <tt/s1/ is the same as <tt/s2/, and a value greater
 than zero if <tt/s1/ is greater than <tt/s2/.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -5704,7 +5689,7 @@ be used in presence of a prototype.
 <tag/Description/The <tt/strcpy/ function copies the string pointed to by
 <tt/s2/ (including the terminating null byte) into the array pointed to by
 <tt/s1/. The function will always return <tt/s1/.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 <item>If copying takes place between objects that overlap, the behaviour
@@ -5737,7 +5722,7 @@ strcpy (hello, "Hello world!\n");
 <tag/Description/The <tt/strcspn/ function computes and returns the length of
 the substring pointed to by <tt/s/ which does <em>not</em> consist of
 characters contained in the string <tt/set/.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -5763,7 +5748,7 @@ be used in presence of a prototype.
 to hold a copy of <tt/s/ including the terminating zero. If the allocation
 fails, <tt/NULL/ is returned, otherwise <tt/s/ is copied into the allocated
 memory block, and a pointer to the block is returned.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 <item>It is up to the caller to free the allocated memory block.
@@ -5788,7 +5773,7 @@ be used in presence of a prototype.
 given error code. If an invalid error code is passed, the string "Unknown
 error" is returned, and <tt/errno/ is set to <tt/EINVAL/. In all other cases,
 <tt/errno/ is left untouched.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 <item>While the return type of the function is a <tt/char*/, the returned
@@ -5813,7 +5798,7 @@ string must not be modified by the caller!
 parameters without case sensitivity. It returns a value that is less than zero
 if <tt/s1/ is less than <tt/s2/, zero if <tt/s1/ is the same as <tt/s2/, and a
 value greater than zero if <tt/s1/ is greater than <tt/s2/.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 <item>The function is not available in strict ANSI mode.
@@ -5839,7 +5824,7 @@ be used in presence of a prototype.
 <tag/Declaration/<tt/size_t __fastcall__ strlen (const char* s);/
 <tag/Description/The <tt/strlen/ function computes the number of bytes in the
 string to which s points, not including the terminating null byte.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 <item>When compiling with <tt/-Os/ (inline known standard functions), the
@@ -5862,7 +5847,7 @@ function does not work correctly for strings with more than 255 characters.
 <tag/Declaration/<tt/char* __fastcall__ strlower (char* s);/
 <tag/Description/The <tt/strlower/ function will apply the <tt/tolower/
 function to each character of a string. The function will always return <tt/s/.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 <item>The function prototype is unavailable when compiling in strict ANSI mode.
@@ -5895,7 +5880,7 @@ See <tt/strlower/.
 of the string pointed to by s2 to the end of the string pointed to by s1. The
 terminating null character at the end of s1 is overwritten. A terminating null
 character is appended to the result, even if not all of s2 is appended to s1.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 <item>If copying takes place between objects that overlap, the behaviour
@@ -5923,7 +5908,7 @@ characters of the two strings passed as parameters. It returns a value that is
 less than zero if the first <tt/count/ characters of <tt/s1/ are less than
 <tt/s2/, zero if they are identical, and a value greater than zero they are
 greater.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -5951,7 +5936,7 @@ the array pointed to by <tt/s2/ to the array pointed to by <tt/s1/. If the array
 pointed to by <tt/s2/ is a string that is shorter than <tt/n/ bytes, null bytes are
 appended to the copy in the array pointed to by <tt/s1/, until <tt/n/ bytes are
 written. The function always will return <tt/s1/.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is available only as a fastcall function; so, it may be used
 only in the presence of a prototype.
 <item>If there is no null byte in the first <tt/n/ bytes of the array pointed
@@ -5991,7 +5976,7 @@ string <tt/s2/. Tokens inside quotation marks may contain characters from <tt/s2
 pointer to the first token in the string <tt/s1/. The following calls must pass
 a <tt/NULL/ pointer as <tt/s1/, in order to get the next token in the string.
 Different sets of delimiters may be used for the subsequent calls to <tt/strqtok()/.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is available only as a fastcall function; so, it may be used
 only in the presence of a prototype.
 <item><tt/strqtok()/ will modify the string <tt/s1/.
@@ -6020,7 +6005,7 @@ a second <tt/s1/ string before it finishes the first one.
 (converted to a char) in the string pointed to by <tt/s/. The terminating null
 byte is considered to be part of the string. Upon completion, the function
 returns a pointer to the byte, or a null pointer if the byte was not found.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -6042,7 +6027,7 @@ be used in presence of a prototype.
 <tag/Description/The <tt/strspn/ function computes and returns the length of
 the substring pointed to by <tt/s/ which does consist only of characters
 contained in the string <tt/set/.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -6065,7 +6050,7 @@ be used in presence of a prototype.
 <tag/Description/<tt/strstr/ searches for the first occurance of the string
 <tt/substr/ within <tt/str/. If found, it returns a pointer to the copy,
 otherwise it returns <tt/NULL/.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -6091,7 +6076,7 @@ to <tt/strtok()/ will return a pointer to the first token in the string <tt/s1/.
 The following calls must pass a <tt/NULL/ pointer as <tt/s1/, in order to get
 the next token in the string. Different sets of delimiters may be used for the
 subsequent calls to <tt/strtok()/.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 <item><tt/strtok()/ will modify the string <tt/s1/.
@@ -6123,7 +6108,7 @@ transformed strings, it returns a value greater than, equal to, or less than
 zero, corresponding to the result of the <tt/strcoll/ function applied to the
 same two original strings. No more than n characters are placed into the
 resulting array pointed to by s1, including the terminating null character.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item><tt/s1/ and <tt/s2/ must not point to the same memory area, otherwise
 the behaviour is undefined.
 <item>If <tt/n/ is zero, <tt/s1/ may be a NULL pointer.
@@ -6151,7 +6136,7 @@ just copy s2 to s1 using <tt><ref id="strncpy" name="strncpy"></tt>.
 <tag/Declaration/<tt/char* __fastcall__ strupper (char* s);/
 <tag/Description/The <tt/strupper/ function will apply the <tt/toupper/
 function to each character of a string. The function will always return <tt/s/.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 <item>The function prototype is unavailable when compiling in strict ANSI mode.
@@ -6183,7 +6168,7 @@ See <tt/strupper/.
 <tag/Description/<tt/telldir/ returns the current position of a directory
 stream. The return value may be used in subsequent calls to
 <tt/<ref id="seekdir" name="seekdir">/.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -6206,7 +6191,7 @@ be used in presence of a prototype.
 <tag/Description/The function will set a new text color. It returns the old
 (current) text color. Text output using any <tt/conio.h/ function will use
 the color set by this function.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>Text colors are system dependent. The function may have no effect
 on systems where the text color cannot be changed.
 <item>The function is only available as fastcall function, so it may only
@@ -6233,7 +6218,7 @@ unsigned char rx, unsigned char ry, unsigned sa, unsigned ea);/
 radii rx/ry using the current drawing color. The arc covers the angle
 between sa and ea (startangle and endangle), which must be in the range
 0..360.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 <item>The function behaves unexpectedly or may crash if the angles are out
@@ -6265,7 +6250,7 @@ color.
 <tag/Declaration/<tt/void __fastcall__ tgi_bar (int x1, int y1, int x2, int y2);/
 <tag/Description/The function fills a rectangle on the drawpage with the current
 color.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -6287,7 +6272,7 @@ tgi_bar(10, 10, 100, 60);
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
 <tag/Declaration/<tt/void __fastcall__ tgi_circle (int x, int y, unsigned char radius);/
 <tag/Description/The function draws a circle in the current color.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -6347,7 +6332,7 @@ Will NOT uninstall or unload the driver!
 <tag/Declaration/<tt/void __fastcall__ tgi_ellipse (int x, int y, unsigned char rx, unsigned char ry);/
 <tag/Description/The function draws an ellipse at position x/y with radii
 rx and ry, using the current drawing color.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -6374,7 +6359,7 @@ tgi_ellipse (50, 40, 40, 20);
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
 <tag/Declaration/<tt/void __fastcall__ tgi_free_vectorfont (const tgi_vectorfont* font);/
 <tag/Description/Free a vector font that was previously loaded into memory.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -6397,7 +6382,7 @@ driver and display as an 8.8 fixed point value. It may be used to correct
 geometric shapes so they look correct on the display. As an example, a circle
 with a radius of 100 pixels may look elliptic on some driver/display
 combinations if the aspect ratio is not 1.00.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The aspect ratio is encoded in the TGI driver which assumes a "standard"
 monitor for the given platform. The aspect ratio may be wrong if another
 monitor is used.
@@ -6501,7 +6486,7 @@ This will also clear the error.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
 <tag/Declaration/<tt/const char* __fastcall__ tgi_geterrormsg (unsigned char code);/
 <tag/Description/Get an error message describing the error.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -6597,7 +6582,7 @@ be used in presence of a prototype.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
 <tag/Declaration/<tt/unsigned char __fastcall__ tgi_getpixel (int x, int y);/
 <tag/Description/Get the color of a pixel from the viewpage.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -6648,7 +6633,7 @@ This is same as tgi_maxy()+1.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
 <tag/Declaration/<tt/void __fastcall__ tgi_gotoxy (int x, int y);/
 <tag/Description/Set graphics cursor at x, y.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -6668,7 +6653,7 @@ be used in presence of a prototype.
 <tag/Declaration/<tt/void tgi_init (void);/
 <tag/Description/The tgi_init function will set the default palette to the
 hardware.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item><tt/tgi_init/ will not clear the screen. This allows switching between
 text and graphics mode on platforms that have separate memory areas for the
 screens. If you want the screen cleared, call <tt/<ref id="tgi_clear"
@@ -6694,7 +6679,7 @@ tgi_init(); //Set up the default palette and clear the screen.
 <tag/Description/The function installs a driver that was already loaded into
 memory (or linked statically to the program). It returns an error code
 (<tt/TGI_ERR_OK/ in case of success).
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only be
 used in presence of a prototype.
 </itemize>
@@ -6722,7 +6707,7 @@ tgi_init(); //Set up the default palette and clear the screen.
 Install a vector font for use. More than one vector font can be loaded,
 but only one can be active. This function is used to tell which one. Call
 with a NULL pointer to uninstall the currently installed font.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only be
 used in presence of a prototype.
 </itemize>
@@ -6745,7 +6730,7 @@ used in presence of a prototype.
 <tag/Description/Some platforms have extra display hardware that is not
 supported by standard tgi functions. You can extend the driver to support
 this extra hardware using tgi_ioctl functions.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 <item>These functions are not easily portable to other cc65 platforms.
@@ -6780,7 +6765,7 @@ The graphics cursor will be set to x2/y2 by this call.
 <tag/Declaration/<tt/void __fastcall__ tgi_line (int x1, int y1, int x2, int y2);/
 <tag/Description/Draw a line in the current drawing color.
 The graphics cursor will be set to x2/y2 by this call.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -6801,7 +6786,7 @@ cursor to the new end point. The graphics cursor will be updated to x2/y2.
 <tag/Declaration/<tt/void __fastcall__ tgi_lineto (int x2, int y2);/
 <tag/Description/Draw a line in the current drawing color from the graphics
 cursor to the new end point. The graphics cursor will be updated to x2/y2.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -6822,7 +6807,7 @@ be used in presence of a prototype.
 <tag/Description/Load and install the driver by name.
 Will just load the driver and check if loading was successful.
 Will not switch to graphics mode.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -6844,7 +6829,7 @@ be used in presence of a prototype.
 Load a vector font into memory and return it. In case of errors, NULL is
 returned and an error is set, which can be retrieved using tgi_geterror.
 To use the font, it has to be installed using tgi_install_vectorfont.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -6867,7 +6852,7 @@ The graphics cursor is moved to the end of the text.
 <tag/Declaration/<tt/void __fastcall__ tgi_outtext (const char* s);/
 <tag/Description/Output text at the current graphics cursor position.
 The graphics cursor is moved to the end of the text.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -6888,7 +6873,7 @@ The graphics cursor is moved to the end of the text.
 <tag/Declaration/<tt/void __fastcall__ tgi_outtextxy (int x, int y, const char* s);/
 <tag/Description/Output text at the given cursor position.
 The graphics cursor is moved to the end of the text.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -6911,7 +6896,7 @@ unsigned char rx, unsigned char ry, unsigned sa, unsigned ea);/
 and radii rx/ry using the current drawing color. The pie slice covers the angle
 between sa and ea (startangle and endangle), which must be in the range
 0..360.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 <item>The function behaves unexpectedly or may crash if the angles are out
@@ -6943,7 +6928,7 @@ driver and display. The argument is an 8.8 fixed point value. The aspect ratio
 may be used to correct geometric shapes so they look correct on a given
 display. As an example, a circle with a radius of 100 pixels may look elliptic
 on some driver/display combinations if the aspect ratio is not 1.00.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The aspect ratio is encoded in the TGI driver which assumes a "standard"
 monitor for the given platform. The aspect ratio may be wrong if another
 monitor is used.
@@ -6954,6 +6939,8 @@ ratio for a loaded driver. The value is not reset by <ref id="tgi_init"
 name="tgi_init">, so if a driver is linked statically to an application,
 switching into and out of graphics mode will not restore the original aspect
 ratio.
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
@@ -6971,7 +6958,7 @@ ratio.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
 <tag/Declaration/<tt/void __fastcall__ tgi_setcolor (unsigned char color);/
 <tag/Description/Set color to be used in future draw operations.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -6997,7 +6984,7 @@ tgi_bar(10,10,20,20);
 is seen immediately as it is drawn. For double buffered games you can set the
 drawpage to a different page than the viewpage. This lets you draw the next
 screen in the background and when the screen is ready you display it.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -7025,7 +7012,7 @@ Palette is a pointer to as many entries as there are colors.
 <tag/Declaration/<tt/void __fastcall__ tgi_setpalette (const unsigned char* palette);/
 <tag/Description/Set the palette (not available with all drivers/hardware).
 Palette is a pointer to as many entries as there are colors.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -7043,7 +7030,7 @@ be used in presence of a prototype.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
 <tag/Declaration/<tt/void __fastcall__ tgi_setpixel (int x, int y);/
 <tag/Description/Plot a pixel on the drawpage with the current color.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -7064,7 +7051,7 @@ be used in presence of a prototype.
 is seen immediately as it is drawn. For double buffered games you can set the
 drawpage to a different page than the viewpage. This lets you draw the next
 screen in the background and when the screen is ready you display it.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -7092,7 +7079,7 @@ the current text style.
 <tag/Declaration/<tt/unsigned __fastcall__ tgi_gettextheight (const char* s);/
 <tag/Description/Calculate the height of the text in pixels according to
 the current text style.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -7112,7 +7099,7 @@ be used in presence of a prototype.
 <tag/Description/
 Set the scaling for text output. The scaling factors for width and height
 are 8.8 fixed point values. This means that $100 = 1 $200 = 2 etc.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -7131,7 +7118,7 @@ be used in presence of a prototype.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
 <tag/Declaration/<tt/void __fastcall__ tgi_settextstyle (unsigned char magx, unsigned char magy, unsigned char dir, unsigned char font);/
 <tag/Description/Set the style for text output.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -7150,7 +7137,7 @@ be used in presence of a prototype.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
 <tag/Declaration/<tt/unsigned __fastcall__ tgi_gettextwidth (const char* s);/
 <tag/Description/Calculate the width of the text in pixels according to the current text style.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -7203,7 +7190,7 @@ Will call tgi_done if necessary.
 measured in seconds. If the pointer <tt/t/ is not <tt/NULL/, the function
 result will also be stored there. If no time is available, <tt/(time_t)-1/ is
 returned and <tt/errno/ is set to <tt/ENOSYS/.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may
 only be used in presence of a prototype.
 <item>Many platforms supported by cc65 do not have a realtime clock, so the
@@ -7227,7 +7214,7 @@ returned value may not be valid.
 <tag/Description/Toggle between 40 and 80 column mode. The settings for the
 old mode (cursor position, color and so on) are saved and restored together
 with the mode.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is specific to the C128.
 <item>This function is deprecated. Please use <ref id="videomode"
 name="videomode"> instead!
@@ -7251,7 +7238,7 @@ name="videomode"> instead!
 <tag/Declaration/<tt/int __fastcall__ tolower (int c);/
 <tag/Description/The function returns the given character converted to lower
 case. If the given character is not a letter, it is returned unchanged.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may
 only be used in presence of a prototype.
 </itemize>
@@ -7274,7 +7261,7 @@ only be used in presence of a prototype.
 <tag/Declaration/<tt/int __fastcall__ toupper (int c);/
 <tag/Description/The function returns the given character converted to upper
 case. If the given character is not a letter, it is returned unchanged.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may
 only be used in presence of a prototype.
 </itemize>
@@ -7297,7 +7284,7 @@ only be used in presence of a prototype.
 <tag/Declaration/<tt/char* __fastcall__ ultoa (unsigned long val, char* buf, int radix);/
 <tag/Description/<tt/itoa/ converts the unsigned long integer <tt/val/ into a
 string using <tt/radix/ as the base.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>There are no provisions to prevent a buffer overflow.
 <item>The function is non standard, so it is not available in strict ANSI mode.
 You should probably use <tt/sprintf/ instead.
@@ -7326,8 +7313,7 @@ used in presence of a prototype.
 <tag/Description/<tt/unlink/ deletes the file with the given name. On success,
 zero is returned. On error, -1 is returned and <tt/errno/ is set to an error
 code describing the reason for the failure.
-<tag/Limits/
-<itemize>
+<tag/Notes/<itemize>
 <item>The use of this function is discouraged. Please use <tt/<ref id="remove"
 name="remove">/ instead, which is a native ANSI C function and does the same.
 <item>This function is not available on all cc65 targets (depends on the
@@ -7367,7 +7353,7 @@ if (unlink (FILENAME) == 0) {
 <tag/Declaration/<tt/char* __fastcall__ utoa (unsigned val, char* buf, int radix);/
 <tag/Description/<tt/itoa/ converts the unsigned integer <tt/val/ into a string
 using <tt/radix/ as the base.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>There are no provisions to prevent a buffer overflow.
 <item>The function is non standard, so it is not available in strict ANSI mode.
 You should probably use <tt/sprintf/ instead.
@@ -7397,7 +7383,7 @@ used in presence of a prototype.
 text where necessary and formatted according to the format string given. The
 resulting string is output to the console. <tt/vcprintf/ supports the same
 format specifiers as <tt/vprintf/. <!-- <tt/<ref id="vprintf" name="vprintf">/. -->
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>Like all other <tt/conio/ output functions, <tt/vcprintf/ distinguishes
 between <tt/\r/ and <tt/\n/.
 <item>The function is only available as fastcall function, so it may only be
@@ -7426,7 +7412,7 @@ used in presence of a prototype.
 <tag/Description/Switch to 40 or 80 column mode depending on the argument. If
 the requested mode is already active, nothing happens. The old mode is returned
 from the call.
-<tag/Limits/<itemize>
+<tag/Notes/<itemize>
 <item>The function is specific to the C128 and enhanced Apple //e.
 <item>This function replaces <ref id="toggle_videomode"
 name="toggle_videomode">.

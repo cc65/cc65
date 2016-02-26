@@ -64,6 +64,7 @@ typedef enum {
     TGT_PLUS4,
     TGT_CBM510,
     TGT_CBM610,
+    TGT_OSIC1P,
     TGT_PET,
     TGT_BBC,
     TGT_APPLE2,
@@ -77,6 +78,7 @@ typedef enum {
     TGT_LYNX,
     TGT_SIM6502,
     TGT_SIM65C02,
+    TGT_PCENGINE,
     TGT_COUNT                   /* Number of target systems */
 } target_t;
 

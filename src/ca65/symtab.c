@@ -696,10 +696,10 @@ void SymDump (FILE* F)
 
     while (S) {
         /* Ignore unused symbols */
-        if ((S->Flags & SF_UNUSED) != 0) {
+        if ((S->Flags & SF_UNUSED) == 0) {
             fprintf (F,
-                     "%m%-24p %s %s %s %s %s\n",
-                     GetSymName (S),
+                     "%-24s %s %s %s %s %s\n",
+                     SB_GetConstBuf (GetSymName (S)),
                      (S->Flags & SF_DEFINED)? "DEF" : "---",
                      (S->Flags & SF_REFERENCED)? "REF" : "---",
                      (S->Flags & SF_IMPORT)? "IMP" : "---",

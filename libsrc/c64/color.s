@@ -3,11 +3,10 @@
 ;
 ; unsigned char __fastcall__ textcolor (unsigned char color);
 ; unsigned char __fastcall__ bgcolor (unsigned char color);
-; unsigned char __fastcall__ bordercolor (unsigned char color);
 ;
 
 
-        .export         _textcolor, _bgcolor, _bordercolor
+        .export         _textcolor, _bgcolor
 
         .include        "c64.inc"
 
@@ -23,11 +22,3 @@ _bgcolor:
         sta     VIC_BG_COLOR0   ; set new value
         txa
         rts
-
-
-_bordercolor:
-        ldx     VIC_BORDERCOLOR ; get old value
-        sta     VIC_BORDERCOLOR ; set new value
-        txa
-        rts
-

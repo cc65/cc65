@@ -321,7 +321,7 @@ static void NewStyleComment (void)
 /* Remove a new style C comment from line. */
 {
     /* Beware: Because line continuation chars are handled when reading
-    ** lines, we may only skip til the end of the source line, which
+    ** lines, we may only skip until the end of the source line, which
     ** may not be the same as the end of the input line. The end of the
     ** source line is denoted by a lf (\n) character.
     */

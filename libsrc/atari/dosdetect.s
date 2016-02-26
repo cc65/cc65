@@ -5,7 +5,7 @@
 ;
 
         .include        "atari.inc"
-        .constructor    detect,26
+        .constructor    detect, 26
         .export         __dos_type
 
 ; ------------------------------------------------------------------------

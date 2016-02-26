@@ -2,14 +2,14 @@
 /*                                                                           */
 /*                                   ace.h                                   */
 /*                                                                           */
-/*                      ACE system specific definitions                      */
+/*                      ACE system-specific definitions                      */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2015, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -61,9 +61,9 @@ struct aceDirentBuf {
     char            ad_name [17];       /* Name itself, ASCIIZ */
 };
 
-int aceDirOpen (char* dir);
-int aceDirClose (int handle);
-int aceDirRead (int handle, struct aceDirentBuf* buf);
+int __cdecl__ aceDirOpen (char* dir);
+int __cdecl__ aceDirClose (int handle);
+int __cdecl__ aceDirRead (int handle, struct aceDirentBuf* buf);
 
 /* Type of an ACE key. Key in low byte, shift mask in high byte */
 typedef unsigned int aceKey;
@@ -92,23 +92,23 @@ typedef unsigned int aceKey;
 #define aceOP_RPTRATE           11      /* Key repeat rate */
 
 /* Console functions */
-void aceConWrite (char* buf, size_t count);
-void aceConPutLit (int c);
-void aceConPos (unsigned x, unsigned y);
-void aceConGetPos (unsigned* x, unsigned* y);
+void __cdecl__ aceConWrite (char* buf, size_t count);
+void __cdecl__ aceConPutLit (int c);
+void __cdecl__ aceConPos (unsigned x, unsigned y);
+void __cdecl__ aceConGetPos (unsigned* x, unsigned* y);
 unsigned aceConGetX (void);
 unsigned aceConGetY (void);
-char* aceConInput (char* buf, unsigned initial);
+char __cdecl__* aceConInput (char* buf, unsigned initial);
 int aceConStopKey (void);
 aceKey aceConGetKey (void);
-int aceConKeyAvail (aceKey* key);
-void aceConKeyMat (char* matrix);
-void aceConSetOpt (unsigned char opt, unsigned char val);
-int aceConGetOpt (unsigned char opt);
+int __cdecl__ aceConKeyAvail (aceKey* key);
+void __cdecl__ aceConKeyMat (char* matrix);
+void __cdecl__ aceConSetOpt (unsigned char opt, unsigned char val);
+int __cdecl__ aceConGetOpt (unsigned char opt);
 
 /* Misc stuff */
-int aceMiscIoPeek (unsigned addr);
-void aceMiscIoPoke (unsigned addr, unsigned char val);
+int __cdecl__ aceMiscIoPeek (unsigned addr);
+void __cdecl__ aceMiscIoPoke (unsigned addr, unsigned char val);
 
 
 

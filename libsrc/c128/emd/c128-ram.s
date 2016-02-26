@@ -51,7 +51,7 @@ PAGES   = (TOPMEM - BASE) / 256
 ; Data.
 
 .bss
-curpage:        .res    1               ; Current page number
+curpage:        .res    2               ; Current page number
 
 window:         .res    256             ; Memory "window"
 
@@ -70,7 +70,7 @@ INSTALL:
         stx     curpage+1               ; Invalidate the current page
         inx
         txa                             ; A = X = EM_ERR_OK
-        rts
+;       rts                             ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------
 ; UNINSTALL routine. Is called before the driver is removed from memory.
@@ -107,6 +107,7 @@ MAP:    sta     curpage
 
         lda     #<ptr1
         sta     FETVEC
+        sei
 
 ; Transfer one page
 
@@ -115,6 +116,7 @@ MAP:    sta     curpage
         sta     window,y
         iny
         bne     @L1
+        cli
 
 ; Return the memory window
 
@@ -146,6 +148,7 @@ COMMIT: lda     curpage                 ; Get the current page
 
         lda     #<ptr1
         sta     STAVEC
+        sei
 
 ; Transfer one page. Y must be zero on entry
 
@@ -154,6 +157,7 @@ COMMIT: lda     curpage                 ; Get the current page
         jsr     STASH
         iny
         bne     @L1
+        cli
 
 ; Done
 
@@ -196,6 +200,7 @@ COPYFROM:
 ; Copy full pages
 
         ldy     #$00
+        sei
 @L1:    ldx     #MMU_CFG_RAM1
         jsr     FETCH
         sta     (ptr2),y
@@ -223,7 +228,8 @@ COPYFROM:
 
 ; Done
 
-@L4:    rts
+@L4:    cli
+        rts
 
 ; ------------------------------------------------------------------------
 ; COPYTO: Copy from linear into extended memory. A pointer to a structure
@@ -261,6 +267,7 @@ COPYTO: sta     ptr3
 ; Copy full pages
 
         ldy     #$00
+        sei
 @L1:    lda     (ptr2),y
         ldx     #MMU_CFG_RAM1
         jsr     STASH
@@ -288,5 +295,5 @@ COPYTO: sta     ptr3
 
 ; Done
 
-@L4:    rts
-
+@L4:    cli
+        rts

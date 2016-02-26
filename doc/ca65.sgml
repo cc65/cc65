@@ -2,11 +2,12 @@
 
 <article>
 <title>ca65 Users Guide
-<author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2014-04-24
+<author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
+<url url="mailto:greg.king5@verizon.net" name="Greg King">
+<date>2015-11-17
 
 <abstract>
-ca65 is a powerful macro assembler for the 6502, 65C02 and 65816 CPUs. It is
+ca65 is a powerful macro assembler for the 6502, 65C02, and 65816 CPUs. It is
 used as a companion assembler for the cc65 crosscompiler, but it may also be
 used as a standalone product.
 </abstract>
@@ -430,22 +431,19 @@ The assembler accepts
 
 <sect1>65816 mode<p>
 
-In 65816 mode several aliases are accepted in addition to the official
+In 65816 mode, several aliases are accepted, in addition to the official
 mnemonics:
 
 <tscreen><verb>
-  	BGE is an alias for BCS
-  	BLT is an alias for BCC
-  	CPA is an alias for CMP
-  	DEA is an alias for DEC A
-        INA is an alias for INC A
-  	SWA is an alias for XBA
-      	TAD is an alias for TCD
-  	TAS is an alias for TCS
-  	TDA is an alias for TDC
-  	TSA is an alias for TSC
+CPA is an alias for CMP
+DEA is an alias for DEC A
+INA is an alias for INC A
+SWA is an alias for XBA
+TAD is an alias for TCD
+TAS is an alias for TCS
+TDA is an alias for TDC
+TSA is an alias for TSC
 </verb></tscreen>
-
 
 
 <sect1>6502X mode<label id="6502X-mode"><p>
@@ -1194,6 +1192,35 @@ writable.
   assignments to <tt/*/, use <tt/<ref id=".ORG" name=".ORG">/ instead.
 
 
+<sect1><tt>.ASIZE</tt><label id=".ASIZE"><p>
+
+  Reading this pseudo variable will return the current size of the
+  Accumulator in bits.
+
+  For the 65816 instruction set .ASIZE will return either 8 or 16, depending
+  on the current size of the operand in immediate accu addressing mode.
+
+  For all other CPU instruction sets, .ASIZE will always return 8.
+
+  Example:
+
+  <tscreen><verb>
+	; Reverse Subtract with Accumulator
+	; A = memory - A
+	.macro rsb param
+		.if .asize = 8
+			eor	#$ff
+		.else
+			eor	#$ffff
+		.endif
+		sec
+		adc	param
+	.endmacro
+  </verb></tscreen>
+
+  See also: <tt><ref id=".ISIZE" name=".ISIZE"></tt>
+
+
 <sect1><tt>.CPU</tt><label id=".CPU"><p>
 
   Reading this pseudo variable will give a constant integer value that
@@ -1219,6 +1246,19 @@ writable.
   	 	pha
   	.endif
   </verb></tscreen>
+
+
+<sect1><tt>.ISIZE</tt><label id=".ISIZE"><p>
+
+  Reading this pseudo variable will return the current size of the Index
+  register in bits.
+
+  For the 65816 instruction set .ISIZE will return either 8 or 16, depending
+  on the current size of the operand in immediate index addressing mode.
+
+  For all other CPU instruction sets, .ISIZE will always return 8.
+
+  See also: <tt><ref id=".ASIZE" name=".ASIZE"></tt>
 
 
 <sect1><tt>.PARAMCOUNT</tt><label id=".PARAMCOUNT"><p>
@@ -1277,6 +1317,35 @@ writable.
 
 Pseudo functions expect their arguments in parenthesis, and they have a result,
 either a string or an expression.
+
+
+<sect1><tt>.ADDRSIZE</tt><label id=".ADDRSIZE"><p>
+
+  The <tt/.ADDRSIZE/ function is used to return the interal address size
+  associated with a symbol. This can be helpful in macros when knowing the address
+  size of symbol can help with custom instructions.
+
+  Example:
+
+  <tscreen><verb>
+        .macro myLDA foo
+                .if .ADDRSIZE(foo) = 1
+                        ;do custom command based on zeropage addressing:
+                        .byte 0A5h, foo
+                .elseif .ADDRSIZE(foo) = 2
+                        ;do custom command based on absolute addressing:
+                        .byte 0ADh
+                        .word foo
+                .elseif .ADDRSIZE(foo) = 0
+                        ; no address size defined for this symbol:
+                        .out .sprintf("Error, address size unknown for symbol %s", .string(foo))
+                .endif
+        .endmacro
+  </verb></tscreen>
+
+  This command is new and must be enabled with the <tt/.FEATURE addrsize/ command.
+
+  See: <tt><ref id=".FEATURE" name=".FEATURE"></tt>
 
 
 <sect1><tt>.BANK</tt><label id=".BANK"><p>
@@ -2287,6 +2356,28 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
+<sect1><tt>.DEFINEDMACRO</tt><label id=".DEFINEDMACRO"><p>
+
+  Builtin function. The function expects an identifier as argument in braces.
+  The argument is evaluated, and the function yields "true" if the identifier
+  has already been defined as the name of a macro. Otherwise the function yields
+  false. Example:
+
+  <tscreen><verb>
+        .macro add foo
+                clc
+                adc foo
+        .endmacro
+
+  	.if	.definedmacro(add)
+                add #$01
+        .else
+                clc
+                adc #$01
+        .endif
+  </verb></tscreen>
+
+
 <sect1><tt>.DESTRUCTOR</tt><label id=".DESTRUCTOR"><p>
 
   Export a symbol and mark it as a module destructor. This may be used
@@ -2595,6 +2686,12 @@ Here's a list of all control commands and a description, what they do:
   The following features are available:
 
   <descrip>
+
+  <tag><tt>addrsize</tt><label id="addrsize"></tag>
+
+    Enables the .ADDRSIZE pseudo function. This function is experimental and not enabled by default.
+
+    See also: <tt><ref id=".ADDRSIZE" name=".ADDRSIZE"></tt>
 
   <tag><tt>at_in_identifiers</tt><label id="at_in_identifiers"></tag>
 
@@ -3105,6 +3202,23 @@ Here's a list of all control commands and a description, what they do:
   the feature in more detail.
 
 
+<sect1><tt>.ISMNEM, .ISMNEMONIC</tt><label id=".ISMNEMONIC"><p>
+
+  Builtin function. The function expects an identifier as argument in braces.
+  The argument is evaluated, and the function yields "true" if the identifier
+  is defined as an instruction mnemonic that is recognized by the assembler.
+  Example:
+
+  <tscreen><verb>
+  	.if  	.not .ismnemonic(ina)
+  	  	.macro ina
+  	  	  	clc
+  	  	  	adc #$01
+  	  	.endmacro
+  	.endif
+  </verb></tscreen>
+
+
 <sect1><tt>.LINECONT</tt><label id=".LINECONT"><p>
 
   Switch on or off line continuations using the backslash character
@@ -3256,8 +3370,8 @@ Here's a list of all control commands and a description, what they do:
         atari           Defines the scrcode macro.
         cbm             Defines the scrcode macro.
         cpu             Defines constants for the .CPU variable.
-	generic		Defines generic macros like add and sub.
-    	longbranch     	Defines conditional long jump macros.
+        generic         Defines generic macroes like add, sub, and blt.
+        longbranch      Defines conditional long-jump macroes.
   </verb></tscreen>
 
   Including a macro package twice, or including a macro package that
@@ -3596,7 +3710,7 @@ Here's a list of all control commands and a description, what they do:
   segment, that is, a named section of data. The default segment is
   "CODE". There may be up to 254 different segments per object file
   (and up to 65534 per executable). There are shortcut commands for
-  the most common segments ("CODE", "DATA" and "BSS").
+  the most common segments ("ZEROPAGE", "CODE", "RODATA", "DATA", and "BSS").
 
   The command is followed by a string containing the segment name (there are
   some constraints for the name - as a rule of thumb use only those segment
@@ -3630,8 +3744,9 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
   See: <tt><ref id=".BSS" name=".BSS"></tt>, <tt><ref id=".CODE"
-  name=".CODE"></tt>, <tt><ref id=".DATA" name=".DATA"></tt> and <tt><ref
-  id=".RODATA" name=".RODATA"></tt>
+  name=".CODE"></tt>, <tt><ref id=".DATA" name=".DATA"></tt>, <tt><ref
+  id=".RODATA" name=".RODATA"></tt>, and <tt><ref id=".ZEROPAGE"
+  name=".ZEROPAGE"></tt>
 
 
 <sect1><tt>.SET</tt><label id=".SET"><p>
@@ -3792,7 +3907,7 @@ Here's a list of all control commands and a description, what they do:
   shortcut for
 
   <tscreen><verb>
-       	.segment  "ZEROPAGE", zeropage
+        .segment  "ZEROPAGE": zeropage
   </verb></tscreen>
 
   Because of the "zeropage" attribute, labels declared in this segment are
@@ -3821,10 +3936,10 @@ In its simplest form, a macro does not have parameters. Here's an
 example:
 
 <tscreen><verb>
-       	.macro  asr		; Arithmetic shift right
-      	       	cmp	#$80	; Put bit 7 into carry
-      		ror		; Rotate right with carry
-      	.endmacro
+.macro  asr             ; Arithmetic shift right
+        cmp     #$80    ; Put bit 7 into carry
+        ror             ; Rotate right with carry
+.endmacro
 </verb></tscreen>
 
 The macro above consists of two real instructions, that are inserted into
@@ -3832,9 +3947,9 @@ the code, whenever the macro is expanded. Macro expansion is simply done
 by using the name, like this:
 
 <tscreen><verb>
-      	lda    	$2010
-      	asr
-      	sta	$2010
+        lda     $2010
+        asr
+        sta     $2010
 </verb></tscreen>
 
 
@@ -3843,15 +3958,15 @@ by using the name, like this:
 When using macro parameters, macros can be even more useful:
 
 <tscreen><verb>
-      	.macro 	inc16	addr
-      		clc
-      		lda    	addr
-      		adc	#$01
-      		sta	addr
-      		lda	addr+1
-      	 	adc	#$00
-      		sta	addr+1
-      	.endmacro
+.macro  inc16   addr
+        clc
+        lda     addr
+        adc     #<$0001
+        sta     addr
+        lda     addr+1
+        adc     #>$0001
+        sta     addr+1
+.endmacro
 </verb></tscreen>
 
 When calling the macro, you may give a parameter, and each occurrence of
@@ -3859,19 +3974,19 @@ the name "addr" in the macro definition will be replaced by the given
 parameter. So
 
 <tscreen><verb>
-      	inc16  	$1000
+        inc16   $1000
 </verb></tscreen>
 
 will be expanded to
 
 <tscreen><verb>
-      	       	clc
-      		lda	$1000
-      		adc	#$01
-      		sta	$1000
-      		lda	$1000+1
-      		adc	#$00
-      		sta	$1000+1
+        clc
+        lda     $1000
+        adc     #<$0001
+        sta     $1000
+        lda     $1000+1
+        adc     #>$0001
+        sta     $1000+1
 </verb></tscreen>
 
 A macro may have more than one parameter, in this case, the parameters
@@ -3892,40 +4007,40 @@ opposite.
 Look at this example:
 
 <tscreen><verb>
-      	.macro 	ldaxy  	a, x, y
-      	.ifnblank      	a
-      	     	lda    	#a
-      	.endif
-      	.ifnblank      	x
-      		ldx    	#x
-      	.endif
-      	.ifnblank      	y
-      		ldy    	#y
-      	.endif
-      	.endmacro
+.macro  ldaxy   a, x, y
+.ifnblank       a
+        lda     #a
+.endif
+.ifnblank       x
+        ldx     #x
+.endif
+.ifnblank       y
+        ldy     #y
+.endif
+.endmacro
 </verb></tscreen>
 
-This macro may be called as follows:
+That macro may be called as follows:
 
 <tscreen><verb>
-      	ldaxy  	1, 2, 3		; Load all three registers
+        ldaxy   1, 2, 3         ; Load all three registers
 
-  	ldaxy	1, , 3 		; Load only a and y
+        ldaxy   1, , 3          ; Load only a and y
 
-  	ldaxy	, , 3  		; Load y only
+        ldaxy   , , 3           ; Load y only
 </verb></tscreen>
 
-There's another helper command for determining, which macro parameters are
-valid: <tt><ref id=".PARAMCOUNT" name=".PARAMCOUNT"></tt> This command is
-replaced by the parameter count given, <em/including/ intermediate empty macro
+There's another helper command for determining which macro parameters are
+valid: <tt><ref id=".PARAMCOUNT" name=".PARAMCOUNT"></tt>. That command is
+replaced by the parameter count given, <em/including/ explicitly empty
 parameters:
 
 <tscreen><verb>
-  	ldaxy  	1      	       	; .PARAMCOUNT = 1
-  	ldaxy	1,,3   	       	; .PARAMCOUNT = 3
-  	ldaxy	1,2    	       	; .PARAMCOUNT = 2
-  	ldaxy	1,     	       	; .PARAMCOUNT = 2
-  	ldaxy	1,2,3  	       	; .PARAMCOUNT = 3
+        ldaxy   1       ; .PARAMCOUNT = 1
+        ldaxy   1,,3    ; .PARAMCOUNT = 3
+        ldaxy   1,2     ; .PARAMCOUNT = 2
+        ldaxy   1,      ; .PARAMCOUNT = 2
+        ldaxy   1,2,3   ; .PARAMCOUNT = 3
 </verb></tscreen>
 
 Macro parameters may optionally be enclosed into curly braces. This allows the
@@ -3933,19 +4048,19 @@ inclusion of tokens that would otherwise terminate the parameter (the comma in
 case of a macro parameter).
 
 <tscreen><verb>
-        .macro  foo     arg1, arg2
-                ...
-        .endmacro
+.macro  foo     arg1, arg2
+        ...
+.endmacro
 
-                foo     ($00,x)         ; Two parameters passed
-                foo     {($00,x)}       ; One parameter passed
+        foo     ($00,x)         ; Two parameters passed
+        foo     {($00,x)}       ; One parameter passed
 </verb></tscreen>
 
 In the first case, the macro is called with two parameters: '<tt/(&dollar;00/'
-and 'x)'. The comma is not passed to the macro, since it is part of the
+and '<tt/x)/'. The comma is not passed to the macro, because it is part of the
 calling sequence, not the parameters.
 
-In the second case, '(&dollar;00,x)' is passed to the macro, this time
+In the second case, '<tt/(&dollar;00,x)/' is passed to the macro; this time,
 including the comma.
 
 
@@ -3958,17 +4073,17 @@ id=".MATCH" name=".MATCH">/ and <tt/<ref id=".XMATCH" name=".XMATCH">/
 functions will allow you to do exactly this:
 
 <tscreen><verb>
-        .macro  ldax    arg
-                .if (.match (.left (1, {arg}), #))
-                    ; immediate mode
-                    lda     #<(.right (.tcount ({arg})-1, {arg}))
-                    ldx     #>(.right (.tcount ({arg})-1, {arg}))
-                .else
-                    ; assume absolute or zero page
-                    lda     arg
-                    ldx     1+(arg)
-                .endif
-        .endmacro
+.macro  ldax    arg
+        .if (.match (.left (1, {arg}), #))
+            ; immediate mode
+            lda     #<(.right (.tcount ({arg})-1, {arg}))
+            ldx     #>(.right (.tcount ({arg})-1, {arg}))
+        .else
+            ; assume absolute or zero page
+            lda     arg
+            ldx     1+(arg)
+        .endif
+.endmacro
 </verb></tscreen>
 
 Using the <tt/<ref id=".MATCH" name=".MATCH">/ function, the macro is able to
@@ -3982,11 +4097,11 @@ as end-of-list.
 The macro can be used as
 
 <tscreen><verb>
-        foo:    .word   $5678
-        ...
-                ldax    #$1234          ; X=$12, A=$34
-        ...
-                ldax    foo             ; X=$56, A=$78
+foo:    .word   $5678
+...
+        ldax    #$1234          ; X=$12, A=$34
+...
+        ldax    foo             ; X=$56, A=$78
 </verb></tscreen>
 
 
@@ -3995,38 +4110,38 @@ The macro can be used as
 Macros may be used recursively:
 
 <tscreen><verb>
-  	.macro 	push   	r1, r2, r3
-  	    	lda    	r1
-  	    	pha
-  	.if 	.paramcount > 1
-  	    	push   	r2, r3
-  	.endif
-  	.endmacro
+.macro  push    r1, r2, r3
+        lda     r1
+        pha
+.ifnblank       r2
+        push    r2, r3
+.endif
+.endmacro
 </verb></tscreen>
 
-There's also a special macro to help writing recursive macros: <tt><ref
-id=".EXITMACRO" name=".EXITMACRO"></tt> This command will stop macro expansion
-immediately:
+There's also a special macro command to help with writing recursive macros:
+<tt><ref id=".EXITMACRO" name=".EXITMACRO"></tt>. That command will stop macro
+expansion immediately:
 
 <tscreen><verb>
-      	.macro 	push   	r1, r2, r3, r4, r5, r6, r7
-      	.ifblank       	r1
-      	      	; First parameter is empty
-      	      	.exitmacro
-      	.else
-      	      	lda    	r1
-      	      	pha
-      	.endif
-      	      	push   	r2, r3, r4, r5, r6, r7
-      	.endmacro
+.macro  push    r1, r2, r3, r4, r5, r6, r7
+.ifblank        r1
+        ; First parameter is empty
+        .exitmacro
+.else
+        lda     r1
+        pha
+.endif
+        push    r2, r3, r4, r5, r6, r7
+.endmacro
 </verb></tscreen>
 
-When expanding this macro, the expansion will push all given parameters
+When expanding that macro, the expansion will push all given parameters
 until an empty one is encountered. The macro may be called like this:
 
 <tscreen><verb>
-      	push   	$20, $21, $32		; Push 3 ZP locations
-      	push  	$21    			; Push one ZP location
+        push    $20, $21, $32   ; Push 3 ZP locations
+        push    $21             ; Push one ZP location
 </verb></tscreen>
 
 
@@ -4037,27 +4152,27 @@ Now, with recursive macros, <tt><ref id=".IFBLANK" name=".IFBLANK"></tt> and
 Have a look at the inc16 macro above. Here is it again:
 
 <tscreen><verb>
-       	.macro 	inc16  	addr
-       	      	clc
-       	      	lda    	addr
-       	      	adc    	#$01
-       	      	sta    	addr
-       	      	lda    	addr+1
-       	      	adc    	#$00
-       	      	sta    	addr+1
-       	.endmacro
+.macro  inc16   addr
+        clc
+        lda     addr
+        adc     #<$0001
+        sta     addr
+        lda     addr+1
+        adc     #>$0001
+        sta     addr+1
+.endmacro
 </verb></tscreen>
 
 If you have a closer look at the code, you will notice, that it could be
 written more efficiently, like this:
 
 <tscreen><verb>
-       	.macro 	inc16  	addr
-       	       	inc	addr
-       	       	bne    	Skip
-       	   	inc    	addr+1
-       	Skip:
-       	.endmacro
+.macro  inc16   addr
+        inc     addr
+        bne     Skip
+        inc     addr+1
+Skip:
+.endmacro
 </verb></tscreen>
 
 But imagine what happens, if you use this macro twice? Since the label "Skip"
@@ -4069,27 +4184,27 @@ local variables are replaced by a unique name in each separate macro
 expansion. So we can solve the problem above by using <tt/.LOCAL/:
 
 <tscreen><verb>
-     	.macro 	inc16	addr
-       	    	.local 	Skip 	    	; Make Skip a local symbol
-  	     	inc     addr
-       	       	bne     Skip
-  	     	inc     addr+1
-  	Skip:	     	     		; Not visible outside
-  	.endmacro
+.macro  inc16   addr
+        .local  Skip            ; Make Skip a local symbol
+        inc     addr
+        bne     Skip
+        inc     addr+1
+Skip:                           ; Not visible outside
+.endmacro
 </verb></tscreen>
 
 Another solution is of course to start a new lexical block inside the macro
 that hides any labels:
 
 <tscreen><verb>
-  	.macro 	inc16  	addr
-  	.proc
-       	       	inc   	addr
-       	       	bne    	Skip
-       	   	inc    	addr+1
-  	Skip:
-  	.endproc
-  	.endmacro
+.macro  inc16   addr
+.proc
+        inc     addr
+        bne     Skip
+        inc     addr+1
+Skip:
+.endproc
+.endmacro
 </verb></tscreen>
 
 
@@ -4126,7 +4241,7 @@ different:
 	be omitted.
 
 <item>	Since <tt><ref id=".DEFINE" name=".DEFINE"></tt> style macros may not
-      	contain end-of-line tokens, there are things that cannot be done. They
+	contain end-of-line tokens, there are things that cannot be done. They
 	may not contain several processor instructions for example. So, while
 	some things may be done with both macro types, each type has special
 	usages. The types complement each other.
@@ -4140,27 +4255,27 @@ To emulate assemblers that use "<tt/EQU/" instead of "<tt/=/" you may use the
 following <tt/.DEFINE/:
 
 <tscreen><verb>
-      	.define	EQU   	=
+.define EQU     =
 
-      	foo  	EQU   	$1234	   	; This is accepted now
+foo     EQU     $1234           ; This is accepted now
 </verb></tscreen>
 
 You may use the directive to define string constants used elsewhere:
 
 <tscreen><verb>
-      	; Define the version number
-      	.define	VERSION	       	"12.3a"
+; Define the version number
+.define VERSION "12.3a"
 
-      	; ... and use it
-      	.asciiz	VERSION
+        ; ... and use it
+        .asciiz VERSION
 </verb></tscreen>
 
 Macros with parameters may also be useful:
 
 <tscreen><verb>
-      	.define DEBUG(message)	.out	message
+.define DEBUG(message)  .out    message
 
-      	DEBUG	"Assembling include file #3"
+        DEBUG   "Assembling include file #3"
 </verb></tscreen>
 
 Note that, while formal parameters have to be placed in braces, this is
@@ -4169,12 +4284,12 @@ detect the end of one parameter, only the first token is used. If you
 don't like that, use classic macros instead:
 
 <tscreen><verb>
-   	.macro 	DEBUG   message
-   	     	.out	message
-   	.endmacro
+.macro  DEBUG   message
+        .out    message
+.endmacro
 </verb></tscreen>
 
-(This is an example where a problem can be solved with both macro types).
+(That is an example where a problem can be solved with both macro types).
 
 
 <sect1>Characters in macros<p>
@@ -4194,12 +4309,12 @@ be sure to take the translation into account.
 <sect1>Deleting macros<p>
 
 Macros can be deleted. This will not work if the macro that should be deleted
-is currently expanded as in the following non working example:
+is currently expanded as in the following non-working example:
 
 <tscreen><verb>
-   	.macro 	notworking
-   	     	.delmacro       notworking
-   	.endmacro
+.macro  notworking
+        .delmacro       notworking
+.endmacro
 
         notworking              ; Will not work
 </verb></tscreen>
@@ -4210,19 +4325,19 @@ for <tt><ref id=".DEFINE" name=".DEFINE"></tt> style macros, <tt><ref
 id=".UNDEFINE" name=".UNDEFINE"></tt> must be used. Example:
 
 <tscreen><verb>
-        .define value   1
-   	.macro 	mac
-   	       	.byte   2
-   	.endmacro
+.define value   1
+.macro  mac
+        .byte   2
+.endmacro
 
-                .byte   value           ; Emit one byte with value 1
-                mac                     ; Emit another byte with value 2
+        .byte   value           ; Emit one byte with value 1
+        mac                     ; Emit another byte with value 2
 
-        .undefine value
-        .delmacro mac
+.undefine value
+.delmacro mac
 
-                .byte   value           ; Error: Unknown identifier
-                mac                     ; Error: Missing ":"
+        .byte   value           ; Error: Unknown identifier
+        mac                     ; Error: Missing ":"
 </verb></tscreen>
 
 A separate command for <tt>.DEFINE</tt> style macros was necessary, because
@@ -4234,6 +4349,7 @@ argument to <tt>.UNDEFINE</tt> is not allowed to come from another
 different commands increases flexibility.
 
 
+
 <sect>Macro packages<label id="macropackages"><p>
 
 Using the <tt><ref id=".MACPACK" name=".MACPACK"></tt> directive, predefined
@@ -4243,48 +4359,47 @@ are:
 
 <sect1><tt>.MACPACK generic</tt><p>
 
-This macro package defines macros that are useful in almost any program.
-Currently defined macros are:
+This macro package defines macroes that are useful in almost any program.
+Currently defined macroes are:
 
 <tscreen><verb>
-      	.macro  add     Arg
+        .macro  add     Arg     ; add without carry
       	     	clc
       	     	adc     Arg
       	.endmacro
 
-      	.macro  sub     Arg
+        .macro  sub     Arg     ; subtract without borrow
       	     	sec
       	     	sbc     Arg
       	.endmacro
 
-        .macro  bge     Arg
+        .macro  bge     Arg     ; branch on greater-than or equal
                 bcs     Arg
         .endmacro
 
-        .macro  blt     Arg
+        .macro  blt     Arg     ; branch on less-than
                 bcc     Arg
         .endmacro
 
-        .macro  bgt     Arg
+        .macro  bgt     Arg     ; branch on greater-than
                 .local  L
                 beq     L
                 bcs     Arg
         L:
         .endmacro
 
-        .macro  ble     Arg
+        .macro  ble     Arg     ; branch on less-than or equal
                 beq     Arg
                 bcc     Arg
         .endmacro
 
-        .macro  bnz     Arg
+        .macro  bnz     Arg     ; branch on not zero
                 bne     Arg
         .endmacro
 
-        .macro  bze     Arg
+        .macro  bze     Arg     ; branch on zero
                 beq     Arg
         .endmacro
-
 </verb></tscreen>
 
 
@@ -4384,7 +4499,7 @@ it is possible to determine if the
 instruction is supported, which is the case for the 65SC02, 65C02 and 65816
 CPUs (the latter two are upwards compatible to the 65SC02).
 
-  
+
 <sect1><tt>.MACPACK module</tt><p>
 
 This macro package defines a macro named <tt/module_header/. It takes an
@@ -4418,6 +4533,7 @@ compiler, depending on the target system selected:
 <item><tt/__LUNIX__/ - Target system is <tt/lunix/
 <item><tt/__LYNX__/ - Target system is <tt/lynx/
 <item><tt/__NES__/ - Target system is <tt/nes/
+<item><tt/__OSIC1P__/ - Target system is <tt/osic1p/
 <item><tt/__PET__/ - Target system is <tt/pet/
 <item><tt/__PLUS4__/ - Target system is <tt/plus4/
 <item><tt/__SIM6502__/ - Target system is <tt/sim6502/
@@ -4748,6 +4864,3 @@ freely, subject to the following restrictions:
 
 
 </article>
-
-
-

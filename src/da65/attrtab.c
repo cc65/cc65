@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2006 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2014, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -66,6 +66,18 @@ void AddrCheck (unsigned Addr)
 
 
 
+attr_t GetAttr (unsigned Addr)
+/* Return the attribute for the given address */
+{
+    /* Check the given address */
+    AddrCheck (Addr);
+
+    /* Return the attribute */
+    return AttrTab[Addr];
+}
+
+
+
 int SegmentDefined (unsigned Start, unsigned End)
 /* Return true if the atSegment bit is set somewhere in the given range */
 {
@@ -79,14 +91,18 @@ int SegmentDefined (unsigned Start, unsigned End)
 
 
 
-int HaveSegmentChange (unsigned Addr)
-/* Return true if the segment change attribute is set for the given address */
+int IsSegmentEnd (unsigned Addr)
+/* Return true if a segment ends at the given address */
 {
-    /* Check the given address */
-    AddrCheck (Addr);
+    return (GetAttr (Addr) & atSegmentEnd) != 0x0000;
+}
 
-    /* Return the attribute */
-    return (AttrTab[Addr] & atSegmentChange) != 0;
+
+
+int IsSegmentStart (unsigned Addr)
+/* Return true if a segment starts at the given address */
+{
+    return (GetAttr (Addr) & atSegmentStart) != 0x0000;
 }
 
 
@@ -141,18 +157,6 @@ void MarkAddr (unsigned Addr, attr_t Attr)
 
     /* Set the style */
     AttrTab[Addr] |= Attr;
-}
-
-
-
-attr_t GetAttr (unsigned Addr)
-/* Return the attribute for the given address */
-{
-    /* Check the given address */
-    AddrCheck (Addr);
-
-    /* Return the attribute */
-    return AttrTab[Addr];
 }
 
 

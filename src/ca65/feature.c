@@ -63,6 +63,7 @@ static const char* FeatureKeys[FEAT_COUNT] = {
     "c_comments",
     "force_range",
     "underline_in_numbers",
+    "addrsize",
 };
 
 
@@ -119,6 +120,7 @@ feature_t SetFeature (const StrBuf* Key)
         case FEAT_C_COMMENTS:                 CComments         = 1;    break;
         case FEAT_FORCE_RANGE:                ForceRange        = 1;    break;
         case FEAT_UNDERLINE_IN_NUMBERS:       UnderlineInNumbers= 1;    break;
+        case FEAT_ADDRSIZE:                   AddrSize          = 1;    break;
         default:                         /* Keep gcc silent */          break;
     }
 

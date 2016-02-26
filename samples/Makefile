@@ -44,7 +44,7 @@ endif
 C1541	= c1541
 
 # --------------------------------------------------------------------------
-# System dependent settings
+# System-dependent settings
 
 # The Apple machines need the start address adjusted when using TGI
 LDFLAGS_mandelbrot_apple2 = --start-addr 0x4000
@@ -81,10 +81,10 @@ LDFLAGS_tgidemo_atari = -D __RESERVED_MEMORY__=0x2000
 .PRECIOUS: %.o
 
 .o:
-	@$(LD) $(LDFLAGS_$(basename $@)_$(SYS)) -o $@ -t $(SYS) -m $@.map $^ $(CLIB)
+	@$(LD) $(LDFLAGS_$(@F)_$(SYS)) -o $@ -t $(SYS) -m $@.map $^ $(CLIB)
 
 # --------------------------------------------------------------------------
-# List of executables. This list could be made target dependent by checking
+# List of executables. This list could be made target-dependent by checking
 # $(SYS).
 
 EXELIST	=	ascii		\
@@ -103,13 +103,23 @@ EXELIST	=	ascii		\
 		tgidemo
 
 # --------------------------------------------------------------------------
-# Rules how to make each one of the binaries
+# Rules to make the binaries
 
 .PHONY:	all
 all:	$(EXELIST)
 
 # --------------------------------------------------------------------------
-# Rule to make a disk with all samples. Needs the c1541 program that comes
+# Overlay rules. Overlays need special ld65 configuration files.  Also, the
+# overlay file-names are shortenned to fit the Atari's 8.3-character limit.
+
+multdemo:	multidemo.o
+	@$(LD) -o $@ -C $(SYS)-overlay.cfg -m $@.map $^ $(CLIB)
+
+ovrldemo:	overlaydemo.o
+	@$(LD) -o $@ -C $(SYS)-overlay.cfg -m $@.map $^ $(CLIB)
+
+# --------------------------------------------------------------------------
+# Rule to make a CBM disk with all samples. Needs the c1541 program that comes
 # with the VICE emulator.
 
 .PHONY:	disk
@@ -125,7 +135,7 @@ samples.d64:	all
 	done
 
 # --------------------------------------------------------------------------
-# Cleanup rules
+# Clean-up rules
 
 .PHONY:	clean
 clean:
@@ -134,3 +144,4 @@ clean:
 .PHONY:	zap
 zap:	clean
 	$(RM) $(EXELIST) samples.d64
+	$(RM) multdemo.? ovrldemo.?

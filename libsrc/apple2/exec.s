@@ -23,10 +23,28 @@ oserr:  jsr     popname         ; Preserves A
         jmp     __mappederrno
 
 _exec:
+        ; Save cmdline
+        sta     ptr4
+        stx     ptr4+1
+
         ; Get and push name
         jsr     popax
         jsr     pushname
         bne     oserr
+
+        ; ProDOS TechRefMan, chapter 5.1.5.1:
+        ; "The complete or partial pathname of the system program
+        ;  is stored at $280, starting with a length byte."
+        ; In fact BASIC.SYSTEM does the same for BLOAD and BRUN of
+        ; binary programs so we should do the same too in any case
+        ; especially as _we_ rely on it in mainargs.s for argv[0]
+        ldy     #$00
+        lda     (sp),y
+        tay
+:       lda     (sp),y
+        sta     $0280,y
+        dey
+        bpl     :-
 
         ; Set pushed name
         lda     sp
@@ -52,24 +70,14 @@ _exec:
         lda     mliparam + MLI::INFO::FILE_TYPE
         cmp     #$FF            ; SYS file?
         bne     binary          ; No, check for BIN file
+        sta     file_type       ; Save file type for cmdline handling
 
-        ; ProDOS TechRefMan, chapter 5.1.5.1:
-        ; "The complete or partial pathname of the system program
-        ;  is stored at $280, starting with a length byte."
-        ldy     #$00
-        lda     (sp),y
-        tay
-:       lda     (sp),y
-        sta     $0280,y
-        dey
-        bpl     :-
-        
         ; SYS programs replace BASIC.SYSTEM so set in the ProDOS system bit map
         ; protection for pages $80 - $BF just in case BASIC.SYSTEM is there now
         ldx     #$0F            ; Start with protection for pages $B8 - $BF
         lda     #%00000001      ; Protect only system global page
 :       sta     $BF60,x         ; Set protection for 8 pages
-        lda     #$00            ; Protect no page
+        lda     #%00000000      ; Protect no page
         dex
         bpl     :-
         bmi     prodos          ; Branch always
@@ -112,7 +120,7 @@ setbuf: lda     #$00            ; Low byte
         dex
         dex
         dex
-        
+
         ; Set I/O buffer
         sta     mliparam + MLI::OPEN::IO_BUFFER
         stx     mliparam + MLI::OPEN::IO_BUFFER+1
@@ -126,7 +134,7 @@ setbuf: lda     #$00            ; Low byte
         stx     level
         beq     :+
         dec     LEVEL
-        
+
         ; Open file
 :       lda     #OPEN_CALL
         ldx     #OPEN_COUNT
@@ -158,8 +166,27 @@ setbuf: lda     #$00            ; Low byte
         bit     $C080
         .endif
 
+        ; Reset stack as we already passed
+        ; the point of no return anyway
+        ldx     #$FF
+        txs
+
+        ; Store up to 127 chars of cmdline (if any)
+        ; including terminating zero in stack page
+        ldy     #$00
+        lda     ptr4+1          ; NULL?
+        beq     :++             ; Yes, store as '\0'
+:       lda     (ptr4),y
+:       sta     $0100,y
+        beq     :+              ; '\0' stored, done
+        iny
+        cpy     #$7E
+        bcc     :--
+        lda     #$00            ; '\0'
+        beq     :-              ; Branch always
+
         ; Call loader stub after C libary shutdown
-        lda     #<target
+:       lda     #<target
         ldx     #>target
         sta     done+1
         stx     done+2
@@ -177,16 +204,58 @@ level : .res    1
 source: jsr     $BF00
         .byte   READ_CALL
         .word   read_param
-        bcs     :+
+        bcs     error
 
         ; Close program file
         jsr     $BF00
         .byte   CLOSE_CALL
         .word   close_param
-        bcs     :+
+        bcs     error
+
+        ; Check for cmdline handling
+        lda     $0100           ; Valid cmdline?
+        beq     jump            ; No, jump to program right away
+        ldx     file_type       ; SYS file?
+        bne     system          ; Yes, check for startup filename
+
+        ; Store REM and cmdline in BASIC input buffer
+        lda     #$B2            ; REM token
+        bne     :++             ; Branch always
+:       inx
+        lda     a:$0100-1,x
+:       sta     $0200,x
+        bne     :--
+        beq     jump            ; Branch always
+
+        ; Check for startup filename support
+        ; ProDOS TechRefMan, chapter 5.1.5.1:
+        ; "$2000 is a jump instruction. $2003 and $2004 are $EE."
+system: lda     $2000
+        cmp     #$4C
+        bne     jump
+        lda     $2003
+        cmp     #$EE
+        bne     jump
+        lda     $2004
+        cmp     #$EE
+        bne     jump
+
+        ; Store cmdline in startup filename buffer
+        ldx     #$01
+:       lda     a:$0100-1,x
+        beq     :+
+        sta     $2006,x
+        inx
+        cpx     $2005           ; Buffer full?
+        bcc     :-              ; No, continue
+:       dex
+        stx     $2006           ; Store cmdline length
 
         ; Go for it ...
-        jmp     (data_buffer)
+jump:   jmp     (data_buffer)
+
+file_type       = * - source + target
+        .byte   $00
 
 read_param      = * - source + target
         .byte   $04             ; PARAM_COUNT
@@ -204,7 +273,7 @@ close_ref       = * - source + target
 
         ; Quit to ProDOS dispatcher
 quit            = * - source + target
-:       jsr     $BF00
+error:  jsr     $BF00
         .byte   $65             ; QUIT
         .word   quit_param
 

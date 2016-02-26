@@ -113,9 +113,9 @@ void ExpInsert (const char* Name, const ObjData* Module)
     while (1) {
         if (strcmp (L->Name, Name) == 0) {
             /* Duplicate entry */
-            Warning ("External symbol `%s' in module `%s', library `%s' "
+            Warning ("External symbol `%s' in module `%s', library `%s', "
                      "is duplicated in module `%s'",
-                     Name, L->Name, LibName, Module->Name);
+                     Name, L->Module->Name, LibName, Module->Name);
         }
         if (L->Next == 0) {
             break;

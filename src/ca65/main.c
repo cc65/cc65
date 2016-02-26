@@ -303,6 +303,14 @@ static void SetSys (const char* Sys)
             NewSymbol ("__SIM65C02__", 1);
             break;
 
+        case TGT_OSIC1P:
+            NewSymbol ("__OSIC1P__", 1);
+            break;
+
+        case TGT_PCENGINE:
+            NewSymbol ("__PCE__", 1);
+            break;
+
         default:
             AbEnd ("Invalid target name: `%s'", Sys);
 

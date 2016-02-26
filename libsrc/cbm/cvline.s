@@ -7,7 +7,7 @@
 
         .export         _cvlinexy, _cvline
         .import         popa, _gotoxy, putchar, newline
-        .importzp       tmp1
+        .importzp       tmp1, cvlinechar
 
 _cvlinexy:
         pha                     ; Save the length
@@ -19,7 +19,7 @@ _cvline:
         cmp     #0              ; Is the length zero?
         beq     L9              ; Jump if done
         sta     tmp1
-L1:     lda     #93             ; Vertical bar
+L1:     lda     #cvlinechar     ; Vertical bar
         jsr     putchar         ; Write, no cursor advance
         jsr     newline         ; Advance cursor to next line
         dec     tmp1

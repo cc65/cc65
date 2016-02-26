@@ -90,7 +90,72 @@
 /* No support for dynamically loadable drivers */
 #define DYN_DRV         0
 
+/* The joystick keys - all keys are supported */
+#define KEY_A           0x01
+#define KEY_B           0x02
+#define KEY_SELECT      0x04
+#define KEY_START       0x08
+#define KEY_UP          0x10
+#define KEY_DOWN        0x20
+#define KEY_LEFT        0x40
+#define KEY_RIGHT       0x80
 
+/* Define hardware */
+
+/* Picture Processing Unit */
+struct __ppu {
+    unsigned char control;
+    unsigned char mask;                 /* color; show sprites, background */
+      signed char volatile const status;
+    struct {
+        unsigned char address;
+        unsigned char data;
+    } sprite;
+    unsigned char scroll;
+    struct {
+        unsigned char address;
+        unsigned char data;
+    } vram;
+};
+#define PPU             (*(struct __ppu*)0x2000)
+#define SPRITE_DMA      (APU.sprite.dma)
+
+/* Audio Processing Unit */
+struct __apu {
+    struct {
+        unsigned char control;          /* duty, counter halt, volume/envelope */
+        unsigned char ramp;
+        unsigned char period_low;       /* timing */
+        unsigned char len_period_high;  /* length, timing */
+    } pulse[2];
+    struct {
+        unsigned char counter;          /* counter halt, linear counter */
+        unsigned char unused;
+        unsigned char period_low;       /* timing */
+        unsigned char len_period_high;  /* length, timing */
+    } triangle;
+    struct {
+        unsigned char control;          /* counter halt, volume/envelope */
+        unsigned char unused;
+        unsigned char period;           /* loop, timing */
+        unsigned char len;              /* length */
+    } noise;
+    struct {
+        unsigned char control;          /* IRQ, loop, rate */
+        unsigned char output;           /* output value */
+        unsigned char address;
+        unsigned char length;
+    } delta_mod;                        /* delta pulse-code modulation */
+    struct {
+        unsigned char dma;
+    } sprite;
+      signed char volatile status;
+    unsigned char unused;
+    unsigned char fcontrol;
+};
+#define APU             (*(struct __apu*)0x4000)
+
+#define JOYPAD          ((unsigned char volatile[2])0x4016)
 
 /* The addresses of the static drivers */
 extern void nes_stdjoy_joy[];       /* Referred to by joy_static_stddrv[] */

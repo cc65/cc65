@@ -1,7 +1,8 @@
 /*
 ** _afailed.c
 **
-** Ullrich von Bassewitz, 06.06.1998
+** 1998-06-06, Ullrich von Bassewitz
+** 2015-03-13, Greg King
 */
 
 
@@ -11,7 +12,7 @@
 
 
 
-void _afailed (char* file, unsigned line)
+void __fastcall__ _afailed (char* file, unsigned line)
 {
     fprintf (stderr, "ASSERTION FAILED IN %s(%u)\n", file, line);
     exit (2);

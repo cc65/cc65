@@ -5,6 +5,7 @@
 ;
 
 
+        .include        "cbm.inc"
         .include        "filedes.inc"
 
 .code
@@ -29,9 +30,14 @@ found:  rts
 ;--------------------------------------------------------------------------
 ; Data
 
-.bss
-fdtab:  .res    MAX_FDS
-unittab:.res    MAX_FDS
+.data
 
+fdtab:  .byte   LFN_READ
+        .byte   LFN_WRITE
+        .byte   LFN_WRITE
+        .res    MAX_FDS-3
 
-
+unittab:.byte   CBMDEV_KBD
+        .byte   CBMDEV_SCREEN
+        .byte   CBMDEV_SCREEN
+        .res    MAX_FDS-3

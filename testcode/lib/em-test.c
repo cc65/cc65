@@ -87,6 +87,7 @@ static emd_test_t drivers[] = {
     { '6', "REU", "c64-reu.emd" },
     { '7', "C128 VDC (in C64 mode)", "c64-vdc.emd" },
     { '8', "C64DTV himem", "dtv-himem.emd" },
+    { '9', "65816 extra banks", "c64-65816.emd" },
 #endif
 
 #if defined(__C128__)

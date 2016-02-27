@@ -93,8 +93,8 @@ void NewListingLine (const StrBuf* Line, unsigned char File, unsigned char Depth
         /* Get the length of the line */
         unsigned Len = SB_GetLen (Line);
 
-        /* Ignore trailing newlines */
-        while (Len > 0 && SB_AtUnchecked (Line, Len-1) == '\n') {
+        /* Ignore trailing newlines and NULLs */
+        while (Len > 0 && (SB_AtUnchecked(Line, Len - 1) == '\n' || SB_AtUnchecked(Line, Len - 1) == '\0' )) {
             --Len;
         }
 

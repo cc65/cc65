@@ -191,10 +191,18 @@ missing on VDC, and are translated to the two colors missing from the VIC palett
 
 <descrip>
 
+  <tag><tt/c128-efnram.emd (c128_efnram_emd)/</tag>
+  Extended memory driver for the C128 External Function RAM.
+  Written and contributed by Marco van den Heuvel.
+
   <tag><tt/c128-georam.emd (c128_georam_emd)/</tag>
   A driver for the GeoRam cartridge. The driver will always assume 2048 pages
   of 256 bytes each. There are no checks, so if your program knows better,
   just go ahead.
+
+  <tag><tt/c128-ifnram.emd (c128_ifnram_emd)/</tag>
+  Extended memory driver for the C128 Internal Function RAM.
+  Written and contributed by Marco van den Heuvel.
 
   <tag><tt/c128-ram.emd (c128_ram_emd)/</tag>
   An extended memory driver for the RAM in page 1. The common memory area is

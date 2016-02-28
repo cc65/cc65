@@ -287,12 +287,6 @@ static void SetSys (const char* Sys)
             NewSymbol ("__GEOS_APPLE__", 1);
             break;
 
-        case TGT_GEOS_CBM:
-            /* Do not handle as a CBM system */
-            NewSymbol ("__GEOS__", 1);
-            NewSymbol ("__GEOS_CBM__", 1);
-            break;
-
         case TGT_LUNIX:
             NewSymbol ("__LUNIX__", 1);
             break;

@@ -191,7 +191,7 @@ missing on VDC, and are translated to the two colors missing from the VIC palett
 
 <descrip>
 
-  <tag><tt/c128-efnram.emd (c128_georam_emd)/</tag>
+  <tag><tt/c128-efnram.emd (c128_efnram_emd)/</tag>
   Extended memory driver for the C128 External Function RAM.
   Written and contributed by Marco van den Heuvel.
 
@@ -200,7 +200,7 @@ missing on VDC, and are translated to the two colors missing from the VIC palett
   of 256 bytes each. There are no checks, so if your program knows better,
   just go ahead.
 
-  <tag><tt/c128-ifnram.emd (c128_georam_emd)/</tag>
+  <tag><tt/c128-ifnram.emd (c128_ifnram_emd)/</tag>
   Extended memory driver for the C128 Internal Function RAM.
   Written and contributed by Marco van den Heuvel.
 

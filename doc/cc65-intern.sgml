@@ -89,9 +89,9 @@ void foo(unsigned bar, unsigned char baz);
     lda     (sp),y  ; Low byte now in A
 </verb></tscreen>
 
-<sect1>Epilogue, after the functiona call<p>
+<sect1>Epilogue, after the function call<p>
 
-<sect2>Return requirements</p>
+<sect2>Return requirements<p>
 
 If the function has a return value, it will appear in the <tt>A/X/sreg</tt> registers.
 
@@ -114,7 +114,7 @@ number of bytes pushed to the stack on entry, which may be added to <tt/sp/ to r
 
 The internal pseudo-register <tt/regbank/ must not be changed by the function.
 
-<sect2>Clobbered state</p>
+<sect2>Clobbered state<p>
 
 The <tt/Y/ register may be clobbered by the function.
 The compiler will not depend on its state after a function call.
@@ -126,6 +126,7 @@ Many of the internal pseudo-registers used by cc65 are available for
 free use by any function called by C, and do not need to be preserved.
 Note that if another C function is called from your assembly function,
 it may clobber any of these itself:
+
 <itemize>
   <item><tt>tmp1 .. tmp4</tt><p>
   <item><tt>ptr1 .. ptr4</tt><p>

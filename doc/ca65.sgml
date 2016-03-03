@@ -2699,6 +2699,22 @@ Here's a list of all control commands and a description, what they do:
     at character is not allowed to start an identifier, even with this
     feature enabled.
 
+  <tag><tt>bracket_as_indirect</tt><label id="bracket_as_indirect"></tag>
+
+    Use <tt>[]</tt> instead of <tt>()</tt> for the indirect addressing modes.
+    Example:
+
+    <tscreen><verb>
+        lda     [$82]
+        lda     [$82,x]
+        lda     [$82],y
+        jmp     [$fffe]
+        jmp     [table,x]
+    </verb></tscreen>
+    <em/Note:/ This should not be used in 65186 mode because it conflicts with
+    the 65816 instruction syntax for far addressing. See the section covering
+    <tt/<ref id="address-sizes" name="address sizes">/ for more information.
+
   <tag><tt>c_comments</tt><label id="c_comments"></tag>
 
     Allow C like comments using <tt>/*</tt> and <tt>*/</tt> as left and right

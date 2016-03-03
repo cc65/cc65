@@ -27,7 +27,7 @@ There are two calling conventions used in cc65:
   <item><tt/cdecl/ - passes all parameters on the C-stack.
   <p>
   <item><tt/fastcall/ - passes the rightmost parameter in
-  registers <tt>A/X/sreg</tt> an all others on the C-stack.
+  registers <tt>A/X/sreg</tt> and all others on the C-stack.
   <p>
 </itemize>
 
@@ -52,7 +52,7 @@ If the function is declared as fastcall, the rightmost argument will be loaded i
 the <tt>A/X/sreg</tt> registers:
 
 <itemize>
-  <item><tt/A/ - 8-bit parameter, or low byte of larger tyes<p>
+  <item><tt/A/ - 8-bit parameter, or low byte of larger types<p>
   <item><tt/X/ - 16-bit high byte, or second byte of 32-bits<p>
   <item><tt/sreg/ - Zeropage pseudo-register including high 2 bytes of 32-bit parameter<p>
 </itemize>
@@ -68,7 +68,7 @@ the <tt/Y/ register will contain the number of bytes pushed to the stack for thi
 Example:
 <tscreen><verb>
 // C prototype
-void foo(unsigned bar, unsigned char baz);
+void cdecl foo(unsigned bar, unsigned char baz);
 
 ; C-stack layout within the function:
 ;

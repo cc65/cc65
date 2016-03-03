@@ -6,7 +6,7 @@
         .export         __STARTUP__ : absolute = 1      ; Mark as startup
 
         .import         initlib, donelib
-        .import         moveinit, zerobss, callmain
+        .import         zerobss, callmain
         .import         BSOUT
         .import         __MAIN_START__, __MAIN_SIZE__   ; Linker generated
         .import         __STACKSIZE__                   ; from configure file
@@ -23,11 +23,6 @@
 
 Start:
 
-; Switch to the second charset.
-
-        lda     #14
-        jsr     BSOUT
-
 ; Switch off the BASIC ROM.
 
         lda     $01
@@ -39,22 +34,10 @@ Start:
         tsx
         stx     spsave          ; Save the system stack ptr
 
-; Allow some re-entrancy by skipping the next task if it already was done.
-; This sometimes can let us rerun the program without reloading it.
-
-        ldx     move_init
-        beq     L0
-
-; Move the INIT segment from where it was loaded (over the bss segments)
-; into where it must be run (over the BSS segment).
-
-        jsr     moveinit
-        dec     move_init       ; Set to false
-
 ; Save space by putting some of the start-up code in the INIT segment,
 ; which can be re-used by the BSS segment, the heap and the C stack.
 
-L0:     jsr     runinit
+        jsr     init
 
 ; Clear the BSS data.
 
@@ -98,7 +81,7 @@ L2:     lda     zpsave,x
 
 .segment        "INIT"
 
-runinit:
+init:
 
 ; Save the zero-page locations that we need.
 
@@ -115,6 +98,11 @@ L1:     lda     sp,x
         sta     sp
         stx     sp+1            ; Set argument stack ptr
 
+; Switch to the second charset.
+
+        lda     #14
+        jsr     BSOUT
+
 ; Call the module constructors.
 
         jmp     initlib
@@ -123,17 +111,8 @@ L1:     lda     sp,x
 ; ------------------------------------------------------------------------
 ; Data
 
-.data
-
-; These two variables were moved out of the BSS segment, and into DATA, because
-; we need to use them before INIT is moved off of BSS, and before BSS is zeroed.
+.segment        "INITBSS"
 
 mmusave:.res    1
 spsave: .res    1
-
-move_init:
-        .byte   1
-
-.segment        "INITBSS"
-
 zpsave: .res    zpspace

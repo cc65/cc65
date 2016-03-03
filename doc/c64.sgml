@@ -257,6 +257,10 @@ Note that the graphics drivers are incompatible with the
 
 <descrip>
 
+  <tag><tt/c64-65816.emd (c64_65816_emd)/</tag>
+  Extended memory driver for 65816 (eg SCPU) based extra RAM.
+  Written and contributed by Marco van den Heuvel.
+
   <tag><tt/c64-c256k.emd (c64_c256k_emd)/</tag>
   A driver for the C64 256K memory expansion. This driver offers 768 pages of
   256 bytes each. Written and contributed by Marco van den Heuvel.

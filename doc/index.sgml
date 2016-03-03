@@ -149,6 +149,9 @@
   <tag><htmlurl url="pce.html" name="pce.html"></tag>
   Topics specific to NEC PC-Engine (TurboGrafx) Console.
 
+  <tag><htmlurl url="gamate.html" name="gamate.html"></tag>
+  Topics specific to Bit Corporation Gamate Console.
+
   <tag><htmlurl url="pet.html" name="pet.html"></tag>
   Topics specific to the Commodore PET machines.
 

@@ -22,6 +22,7 @@ TARGETS = apple2    \
           atmos     \
           $(CBMS)   \
           $(GEOS)   \
+          gamate    \
           lynx      \
           nes       \
           osic1p    \

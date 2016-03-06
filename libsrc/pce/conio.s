@@ -10,7 +10,7 @@
 
         .macpack        longbranch
 
-        .segment        "INIT"
+        .segment        "ONCE"
 initconio:
         jsr     vce_init
         jsr     psg_init

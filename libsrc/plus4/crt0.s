@@ -195,7 +195,7 @@ spsave:         .res    1
 
 irqcount:       .byte   0
 
-.segment        "INITBSS"
+.segment        "INIT"
 
 zpsave:         .res    zpspace
 

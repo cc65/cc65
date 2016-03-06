@@ -20,7 +20,7 @@ SPACE   = 32            ; SPACE char.
 ; --------------------------------------------------------------------------
 ; Get command line
 
-.segment        "INIT"
+.segment        "ONCE"
 
 initmainargs:
         lda     #0

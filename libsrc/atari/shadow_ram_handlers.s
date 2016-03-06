@@ -26,7 +26,7 @@ SHRAM_HANDLERS  =       1
 BUFSZ           =       128     ; bounce buffer size
 BUFSZ_SIO       =       256
 
-.segment "INIT"
+.segment "ONCE"
 
 ; Turn off ROMs, install system and interrupt wrappers, set new chargen pointer
 

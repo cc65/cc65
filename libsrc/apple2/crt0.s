@@ -10,8 +10,8 @@
         .import         initlib, donelib
         .import         callmain
         .import         __LC_START__, __LC_LAST__       ; Linker generated
-        .import         __INIT_RUN__, __INIT_SIZE__     ; Linker generated
-        .import         __INITBSS_RUN__                 ; Linker generated
+        .import         __ONCE_RUN__, __ONCE_SIZE__     ; Linker generated
+        .import         __INIT_RUN__                    ; Linker generated
 
         .include        "zeropage.inc"
         .include        "apple2.inc"
@@ -29,14 +29,14 @@
         bit     $C081
 
         ; Set the source start address.
-        lda     #<(__INITBSS_RUN__ + __INIT_SIZE__)
-        ldy     #>(__INITBSS_RUN__ + __INIT_SIZE__)
+        lda     #<(__INIT_RUN__ + __ONCE_SIZE__)
+        ldy     #>(__INIT_RUN__ + __ONCE_SIZE__)
         sta     $9B
         sty     $9C
 
         ; Set the source last address.
-        lda     #<(__INITBSS_RUN__ + __INIT_SIZE__ + __LC_LAST__ - __LC_START__)
-        ldy     #>(__INITBSS_RUN__ + __INIT_SIZE__ + __LC_LAST__ - __LC_START__)
+        lda     #<(__INIT_RUN__ + __ONCE_SIZE__ + __LC_LAST__ - __LC_START__)
+        ldy     #>(__INIT_RUN__ + __ONCE_SIZE__ + __LC_LAST__ - __LC_START__)
         sta     $96
         sty     $97
 
@@ -51,25 +51,25 @@
         jsr     $D39A           ; BLTU2
 
         ; Set the source start address.
-        lda     #<__INITBSS_RUN__
-        ldy     #>__INITBSS_RUN__
+        lda     #<__INIT_RUN__
+        ldy     #>__INIT_RUN__
         sta     $9B
         sty     $9C
 
         ; Set the source last address.
-        lda     #<(__INITBSS_RUN__ + __INIT_SIZE__)
-        ldy     #>(__INITBSS_RUN__ + __INIT_SIZE__)
+        lda     #<(__INIT_RUN__ + __ONCE_SIZE__)
+        ldy     #>(__INIT_RUN__ + __ONCE_SIZE__)
         sta     $96
         sty     $97
 
         ; Set the destination last address.
-        lda     #<(__INIT_RUN__ + __INIT_SIZE__)
-        ldy     #>(__INIT_RUN__ + __INIT_SIZE__)
+        lda     #<(__ONCE_RUN__ + __ONCE_SIZE__)
+        ldy     #>(__ONCE_RUN__ + __ONCE_SIZE__)
         sta     $94
         sty     $95
 
         ; Call into Applesoft Block Transfer Up -- which handles moving
-        ; overlapping blocks upwards well -- to move the INIT segment.
+        ; overlapping blocks upwards well -- to move the ONCE segment.
         jsr     $D39A           ; BLTU2
 
         ; Delegate all further processing, to keep the STARTUP segment small.
@@ -109,7 +109,7 @@ exit:   ldx     #$02
         ; We're done
         jmp     done
 
-        .segment        "INIT"
+        .segment        "ONCE"
 
         ; Save the zero-page locations that we need.
 init:   ldx     #zpspace-1
@@ -201,7 +201,7 @@ q_param:.byte   $04             ; param_count
         ; Final jump when we're done
 done:   jmp     DOSWARM         ; Potentially patched at runtime
 
-        .segment        "INITBSS"
+        .segment        "INIT"
 
 zpsave: .res    zpspace
 

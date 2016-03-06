@@ -75,10 +75,10 @@ putchar:
         jmp     ppubuf_put
 
 ;-----------------------------------------------------------------------------
-; Initialize the conio subsystem. Code goes into the INIT segment, which may
+; Initialize the conio subsystem. Code goes into the ONCE segment, which may
 ; be reused after startup.
 
-.segment        "INIT"
+.segment        "ONCE"
 
 initconio:
         jsr     ppuinit

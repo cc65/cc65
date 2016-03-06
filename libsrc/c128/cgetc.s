@@ -42,7 +42,7 @@ L2:     jsr     KBDREAD         ; Read char and return in A
 .bss
 keyvec: .res    2
 
-.segment        "INIT"
+.segment        "ONCE"
 initcgetc:
 
 ; Save the old vector

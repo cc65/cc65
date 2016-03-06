@@ -30,7 +30,7 @@
 ; - Apple II ProDOS 8 TechNote #23, ProDOS 8 Changes and Minutia
 ; - ProDOS TechRefMan, chapter 5.2.4
 
-        .segment        "INIT"
+        .segment        "ONCE"
 
 initdostype:
         lda     $BF00

@@ -1032,11 +1032,11 @@ The builtin config files do contain segments that have a special meaning for
 the compiler and the libraries that come with it. If you replace the builtin
 config files, you will need the following information.
 
-<sect1>INIT<p>
+<sect1>ONCE<p>
 
-The INIT segment is used for initialization code that may be reused once
+The ONCE segment is used for initialization code run only once before
 execution reaches main() - provided that the program runs in RAM. You
-may for example add the INIT segment to the heap in really memory
+may for example add the ONCE segment to the heap in really memory
 constrained systems.
 
 <sect1>LOWCODE<p>

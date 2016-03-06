@@ -14,7 +14,7 @@
         .include        "errno.inc"
         .include        "../filedes.inc"
 
-        .segment        "INIT"
+        .segment        "ONCE"
 
 initiobuf:
         ; Convert end address highbyte to table index

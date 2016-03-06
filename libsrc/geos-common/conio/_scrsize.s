@@ -14,7 +14,7 @@
                       
         .include "geossym.inc"
 
-.segment        "INIT"
+.segment        "ONCE"
 
 initscrsize:
 .ifdef __GEOS_CBM__

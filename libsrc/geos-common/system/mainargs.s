@@ -18,7 +18,7 @@
             .include "const.inc"
             .include "geossym.inc"
 
-.segment        "INIT"
+.segment        "ONCE"
 
 ; Setup arguments for main
 

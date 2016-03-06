@@ -2,7 +2,7 @@
 
         .export         vce_init
 
-        .segment        "INIT"
+        .segment        "ONCE"
 vce_init:
         ; Set CTA to zero
         stz     VCE_ADDR_LO

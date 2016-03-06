@@ -9,7 +9,7 @@
 
         .include        "apple2.inc"
 
-        .segment        "INIT"
+        .segment        "ONCE"
 
 initirq:
         ; Check for ProDOS

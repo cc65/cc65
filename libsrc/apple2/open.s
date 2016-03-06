@@ -19,7 +19,7 @@
         .include        "mli.inc"
         .include        "filedes.inc"
 
-        .segment        "INIT"
+        .segment        "ONCE"
 
 raisefilelevel:
         ; Raise file level

@@ -34,7 +34,7 @@ Start:
         tsx
         stx     spsave          ; Save the system stack ptr
 
-; Save space by putting some of the start-up code in the INIT segment,
+; Save space by putting some of the start-up code in the ONCE segment,
 ; which can be re-used by the BSS segment, the heap and the C stack.
 
         jsr     init
@@ -79,7 +79,7 @@ L2:     lda     zpsave,x
 
 ; ------------------------------------------------------------------------
 
-.segment        "INIT"
+.segment        "ONCE"
 
 init:
 
@@ -111,7 +111,7 @@ L1:     lda     sp,x
 ; ------------------------------------------------------------------------
 ; Data
 
-.segment        "INITBSS"
+.segment        "INIT"
 
 mmusave:.res    1
 spsave: .res    1

@@ -14,7 +14,7 @@
 
         .include        "apple2.inc"
 
-        .segment        "INIT"
+        .segment        "ONCE"
 
         .ifdef  __APPLE2ENH__
 initconio:

@@ -108,7 +108,7 @@ L2:     lda     zpsave,x
 ; ------------------------------------------------------------------------
 ; Data
 
-.segment        "INITBSS"
+.segment        "INIT"
 
 zpsave: .res    zpspace
 

@@ -17,7 +17,7 @@
 ;--------------------------------------------------------------------------
 ; Put this constructor into a segment that can be re-used by programs.
 ;
-.segment        "INIT"
+.segment        "ONCE"
 
 ; Turn the capitals lock off.
 

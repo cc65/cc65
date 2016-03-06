@@ -11,7 +11,7 @@
         .include        "zeropage.inc"
 
 ; Initialize one-character buffer that is filled by kbhit()
-        .segment        "INIT"
+        .segment        "ONCE"
 initcgetc:
         lda     #$00
         sta     CHARBUF         ; No character in buffer initially

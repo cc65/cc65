@@ -11,7 +11,7 @@
 ; ------------------------------------------------------------------------
 ; DOS type detection
 
-.segment        "INIT"
+.segment        "ONCE"
 
 detect: lda     DOS
         cmp     #'S'            ; SpartaDOS

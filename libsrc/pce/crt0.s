@@ -39,22 +39,21 @@
 
 start:
 
-        ; setup the CPU and System-IRQ
+        ; Set up the CPU and System-IRQ
 
         ; Initialize CPU
-
         sei
         nop
-        csh                     ; set high speed CPU mode
+        csh                     ; Set high speed CPU mode
         nop
         cld
         nop
 
-        ; Setup stack and memory mapping
+        ; Set up stack and memory mapping
         ldx     #$FF            ; Stack top ($21FF)
         txs
 
-        ; at startup all MPRs are set to 0, so init them
+        ; At startup all MPRs are set to 0, so init them
         lda     #$ff
         tam     #%00000001      ; 0000-1FFF = Hardware page
         lda     #$F8
@@ -98,11 +97,11 @@ start:
         ; Copy the .data segment to RAM
         tii     __DATA_LOAD__, __DATA_RUN__, __DATA_SIZE__
 
-        ; setup the stack
+        ; Set up the stack
         lda     #<(__RAM_START__+__RAM_SIZE__)
+        ldx     #>(__RAM_START__+__RAM_SIZE__)
         sta     sp
-        lda     #>(__RAM_START__+__RAM_SIZE__)
-        sta     sp + 1
+        stx     sp + 1
 
         ; Call module constructors
         jsr     initlib
@@ -114,7 +113,7 @@ start:
         jsr     push0           ; argv
 
         ldy     #4              ; Argument size
-        jsr     _main           ; call the users code
+        jsr     _main           ; Call the users code
 
         ; Call module destructors. This is also the _exit entry.
 _exit:

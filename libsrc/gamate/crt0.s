@@ -20,7 +20,7 @@ Start:
         ldx     #0
         stx     ZP_IRQ_CTRL     ; disable calling cartridge IRQ/NMI handler
 
-        ; Setup stack and memory mapping
+        ; Set up stack and memory mapping
         ;ldx     #$FF            ; Stack top ($01FF)
         dex
         txs
@@ -31,7 +31,7 @@ Start:
         ; Copy the .data segment to RAM
         jsr     copydata
 
-        ; setup the stack
+        ; Set up the stack
         lda     #<(__RAM_START__+__RAM_SIZE__)
         ldx     #>(__RAM_START__+__RAM_SIZE__)
         sta     sp

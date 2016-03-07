@@ -5,7 +5,7 @@
 ;
         .include "lynx.inc"
         .import         __STARTOFDIRECTORY__
-        .import         __RAM_START__
+        .import         __MAIN_START__
         .import         __CODE_SIZE__, __DATA_SIZE__, __RODATA_SIZE__
         .import         __STARTUP_SIZE__, __ONCE_SIZE__, __LOWCODE_SIZE__
         .import         __BLOCKSIZE__
@@ -25,6 +25,6 @@ len0 = __STARTUP_SIZE__ + __ONCE_SIZE__ + __CODE_SIZE__ + __DATA_SIZE__ + __RODA
         .byte   <block0
         .word   off0 & (__BLOCKSIZE__ - 1)
         .byte   $88
-        .word   __RAM_START__
+        .word   __MAIN_START__
         .word   len0
 __DIRECTORY_END__:

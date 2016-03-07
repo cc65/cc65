@@ -148,7 +148,7 @@ Special locations:
   (&dollar;58).
 
   <tag/Stack/
-  The C runtime stack is located at end of the RAM memory area (&dollar;CFFF)
+  The C runtime stack is located at end of the MAIN memory area (&dollar;CFFF)
   and grows downwards.
 
   <tag/Heap/
@@ -561,7 +561,7 @@ The contents of this chunk come from the SYSCHKCHNK memory area of the linker co
 <item>main program&nl;
 This load chunk is loaded at the selected program start address (default &dollar;2000) and
 contains all of the code and data of the program.&nl;
-The contents of this chunk come from the RAM memory area of the linker config file.
+The contents of this chunk come from the MAIN memory area of the linker config file.
 </enum>
 
 

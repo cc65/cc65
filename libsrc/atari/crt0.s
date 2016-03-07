@@ -14,7 +14,7 @@
         .import         initlib, donelib
         .import         callmain, zerobss
         .import         __RESERVED_MEMORY__
-        .import         __RAM_START__, __RAM_SIZE__
+        .import         __MAIN_START__, __MAIN_SIZE__
 .ifdef __ATARIXL__
         .import         __STACKSIZE__
         .import         sram_init
@@ -55,10 +55,10 @@ start:
 
 .ifdef __ATARIXL__
 
-        lda     #<(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
+        lda     #<(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
+        ldx     #>(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
         sta     sp
-        lda     #>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
-        sta     sp+1
+        stx     sp+1
 
 .else
 

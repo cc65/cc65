@@ -33,16 +33,16 @@ Start:
 
         ; setup the stack
         lda     #<(__RAM_START__+__RAM_SIZE__)
+        ldx     #>(__RAM_START__+__RAM_SIZE__)
         sta     sp
-        lda     #>(__RAM_START__+__RAM_SIZE__)
-        sta     sp + 1
+        stx     sp + 1
 
         ; Call module constructors
         jsr     initlib
 
         lda     #1
         sta     ZP_IRQ_CTRL     ; enable calling cartridge IRQ/NMI handler
-        cli     ; allow IRQ only after constructors have run
+        cli                     ; allow IRQ only after constructors have run
 
         ; Pass an empty command line
         jsr     push0           ; argc

@@ -1,0 +1,140 @@
+<!doctype linuxdoc system>
+
+<article>
+<title>cc65 internals
+<author><url url="mailto:bbbradsmith@users.noreply.github.com" name="Brad Smith">
+<date>2016-02-27
+
+<abstract>
+Internal details of cc65 code generation,
+such as calling assembly functions from C.
+</abstract>
+
+<!-- Table of contents -->
+<toc>
+
+<!-- Begin the document -->
+
+
+
+<sect>Calling assembly functions from C<p>
+
+<sect1>Calling conventions<p>
+
+There are two calling conventions used in cc65:
+
+<itemize>
+  <item><tt/cdecl/ - passes all parameters on the C-stack.
+  <p>
+  <item><tt/fastcall/ - passes the rightmost parameter in
+  registers <tt>A/X/sreg</tt> and all others on the C-stack.
+  <p>
+</itemize>
+
+The default convention is <tt/fastcall/, but this can be changed with
+the <tt/--all-cdecl/ command line option. If a convention is specified in
+the function's declaration, that convention will be used instead.
+Variadic functions will always use <tt/cdecl/ convention.
+
+If the <tt/--standard/ command line option is used,
+the <tt/cdecl/ and <tt/fastcall/ keywords will not be available.
+The standard compliant variations <tt/__cdecl__/ and <tt/__fastcall__/ are always available.
+
+If a function has a prototype, parameters are pushed to the C-stack as their respective types
+(i.e. a <tt/char/ parameter will push 1 byte), but if a function has no prototype, default
+promotions will apply. This means that with no prototype, <tt/char/ will be promoted
+to <tt/int/ and be pushed as 2 bytes. K &amp; R style function prototypes may be used,
+but they will function the same as if no prototype was used.
+
+<sect1>Prologue, before the function call<p>
+
+If the function is declared as fastcall, the rightmost argument will be loaded into
+the <tt>A/X/sreg</tt> registers:
+
+<itemize>
+  <item><tt/A/ - 8-bit parameter, or low byte of larger types<p>
+  <item><tt/X/ - 16-bit high byte, or second byte of 32-bits<p>
+  <item><tt/sreg/ - Zeropage pseudo-register including high 2 bytes of 32-bit parameter<p>
+</itemize>
+
+All other parameters will be pushed to the C-stack from left to right.
+The rightmost parameter will have the lowest address on the stack,
+and multi-byte parameters will have their least significant byte at the lower address.
+
+The <tt/sp/ pseudo-register is a zeropage pointer to the base of the C-stack.
+If the function has no prototype or is variadic
+the <tt/Y/ register will contain the number of bytes pushed to the stack for this function.
+
+Example:
+<tscreen><verb>
+// C prototype
+void cdecl foo(unsigned bar, unsigned char baz);
+
+; C-stack layout within the function:
+;
+;            +------------------+
+;            | High byte of bar |
+; Offset 2 ->+------------------+
+;            | Low byte of bar  |
+; Offset 1 ->+------------------+
+;            | baz              |
+; Offset 0 ->+------------------+
+
+; Example code for accessing bar. The variable is in A/X after this code snippet:
+;
+    ldy     #2      ; Offset of high byte of bar
+    lda     (sp),y  ; High byte now in A
+    tax             ; High byte now in X
+    dey             ; Offset of low byte of bar
+    lda     (sp),y  ; Low byte now in A
+</verb></tscreen>
+
+<sect1>Epilogue, after the function call<p>
+
+<sect2>Return requirements<p>
+
+If the function has a return value, it will appear in the <tt>A/X/sreg</tt> registers.
+
+Functions with an 8-bit return value (<tt/char/ or <tt/unsigned char/) are expected
+to promote this value to a 16-bit integer on return, and store the high byte in <tt/X/.
+The compiler will depend on the promoted value in some cases (e.g. implicit conversion to <tt/int/),
+and failure to return the high byte in <tt/X/ will cause unexpected errors.
+This problem does not apply to the <tt/sreg/ pseudo-register, which is only
+used if the return type is 32-bit.
+
+If the function has a void return type, the compiler will not depend on the result
+of <tt>A/X/sreg</tt>, so these may be clobbered by the function.
+
+The C-stack pointer <tt/sp/ must be restored by the function to its value before the
+function call prologue. It may pop all of its parameters from the C-stack
+(e.g. using the <tt/runtime/ function <tt/popa/),
+or it could adjust <tt/sp/ directly.
+If the function has no prototype, or is variadic the <tt/Y/ register contains the
+number of bytes pushed to the stack on entry, which may be added to <tt/sp/ to restore its original state.
+
+The internal pseudo-register <tt/regbank/ must not be changed by the function.
+
+<sect2>Clobbered state<p>
+
+The <tt/Y/ register may be clobbered by the function.
+The compiler will not depend on its state after a function call.
+
+The <tt>A/X/sreg</tt> registers may be clobbered if any of them
+are not used by the return value (see above).
+
+Many of the internal pseudo-registers used by cc65 are available for
+free use by any function called by C, and do not need to be preserved.
+Note that if another C function is called from your assembly function,
+it may clobber any of these itself:
+
+<itemize>
+  <item><tt>tmp1 .. tmp4</tt><p>
+  <item><tt>ptr1 .. ptr4</tt><p>
+  <item><tt>regsave</tt><p>
+  <item><tt>sreg</tt> (if unused by return)<p>
+</itemize>
+
+
+
+</article>
+

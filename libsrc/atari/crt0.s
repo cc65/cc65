@@ -65,9 +65,9 @@ start:
 ; Report the memory usage.
 
         lda     APPMHI
+        ldx     APPMHI+1
         sta     APPMHI_save             ; remember old APPMHI value
-        lda     APPMHI+1
-        sta     APPMHI_save+1
+        stx     APPMHI_save+1
 
         sec
         lda     MEMTOP
@@ -129,9 +129,9 @@ _exit:  jsr     donelib         ; Run module destructors
 ; Restore APPMHI.
 
         lda     APPMHI_save
+        ldx     APPMHI_save+1
         sta     APPMHI
-        lda     APPMHI_save+1
-        sta     APPMHI+1
+        stx     APPMHI+1
 
 .ifdef __ATARIXL__
 
@@ -142,9 +142,9 @@ _exit:  jsr     donelib         ; Run module destructors
         lda     RAMTOP_save
         sta     RAMTOP
         lda     MEMTOP_save
+        ldx     MEMTOP_save+1
         sta     MEMTOP
-        lda     MEMTOP_save+1
-        sta     MEMTOP+1
+        stx     MEMTOP+1
 
 
 ; Issue a GRAPHICS 0 call (copied'n'pasted from the TGI drivers), in

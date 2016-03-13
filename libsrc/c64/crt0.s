@@ -93,8 +93,8 @@ L1:     lda     sp,x
 
 ; Set up the stack.
 
-        lda     #<(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
-        ldx     #>(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
+        lda     #<(__MAIN_START__ + __MAIN_SIZE__)
+        ldx     #>(__MAIN_START__ + __MAIN_SIZE__)
         sta     sp
         stx     sp+1            ; Set argument stack ptr
 

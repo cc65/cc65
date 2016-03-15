@@ -69,6 +69,9 @@ L2:     jsr     KBDREAD         ; Read char and return in A
 
 .endproc
 
+fnkeys: .byte   $01, $01, $01, $01, $01, $01, $01, $01
+        .byte   133, 137, 134, 138, 135, 139, 136, 140
+
 
 .code
 
@@ -82,11 +85,3 @@ L2:     jsr     KBDREAD         ; Read char and return in A
         rts
 
 .endproc
-
-
-; Function key table, readonly
-
-.rodata
-fnkeys: .byte   $01, $01, $01, $01, $01, $01, $01, $01
-        .byte   133, 137, 134, 138, 135, 139, 136, 140
-

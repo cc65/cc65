@@ -48,6 +48,6 @@ done:   rts
 ; ------------------------------------------------------------------------
 ; Data
 
-        .bss
+        .data
 
-__dos_type:     .res    1       ; default to ATARIDOS
+__dos_type:     .byte   0       ; default to ATARIDOS

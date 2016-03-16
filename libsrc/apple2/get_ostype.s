@@ -65,6 +65,6 @@ _get_ostype:
         ldx     #$00
         rts
 
-        .bss
+        .segment        "INIT"
 
 ostype: .res    1

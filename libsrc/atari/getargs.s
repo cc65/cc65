@@ -23,12 +23,6 @@ SPACE   = 32            ; SPACE char.
 .segment        "ONCE"
 
 initmainargs:
-        lda     #0
-        sta     __argc
-        sta     __argc+1
-        sta     __argv
-        sta     __argv+1
-
         lda     __dos_type      ; which DOS?
         cmp     #ATARIDOS
         beq     nargdos         ; DOS does not support arguments
@@ -120,7 +114,7 @@ eopar:
 
 finargs:
         lda     __argc
-        asl           
+        asl
         tax
         lda     #0
         sta     argv,x
@@ -134,7 +128,7 @@ finargs:
 ; --------------------------------------------------------------------------
 ; Data
 
-.bss
+.segment        "INIT"
 
 argv:   .res    (1 + MAXARGS) * 2
 

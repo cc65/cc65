@@ -43,6 +43,6 @@ initdostype:
 :       sta     __dos_type
 done:   rts
 
-        .bss
+        .data
 
-__dos_type:     .res    1
+__dos_type:     .byte   $00

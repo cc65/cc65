@@ -43,7 +43,7 @@ screensize:
         ldy ysize
         rts
 
-.bss
+.segment        "INIT"
 
 xsize:
         .res 1

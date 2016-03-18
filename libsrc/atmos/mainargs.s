@@ -18,7 +18,7 @@ REM      = $9D                  ; BASIC token-code
 
 ;---------------------------------------------------------------------------
 ; Get possible command-line arguments. Goes into the special ONCE segment,
-; which may be reused after the startup code is run
+; which will be reused after the startup code is run.
 
 .segment        "ONCE"
 
@@ -119,8 +119,6 @@ done:   lda     #<argv
 
 .endproc
 
-; These arrays are zeroed before initmainargs is called.
-
 .segment        "INIT"
 
 term:   .res    1
@@ -129,6 +127,7 @@ args:   .res    SCREEN_XSIZE * 2 - 1
 
 .data
 
+; This array has zeroes when initmainargs starts.
 ; char* argv[MAXARGS+1]={name};
 
 argv:   .addr   name

@@ -4450,6 +4450,12 @@ The package defines the following macros:
 
 
 
+<sect1><tt>.MACPACK apple2</tt><p>
+
+This macro package defines a macro named <tt/scrcode/. It takes a string
+as argument and places this string into memory translated into screen codes.
+
+
 <sect1><tt>.MACPACK atari</tt><p>
 
 This macro package defines a macro named <tt/scrcode/. It takes a string

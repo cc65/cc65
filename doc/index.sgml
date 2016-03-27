@@ -18,7 +18,7 @@
   <tag><htmlurl url="cc65.html" name="cc65.html"></tag>
   Describes the cc65 C compiler.
 
-  <tag><htmlurl url="chrcvt.html" name="chrcvt.html"></tag>
+  <tag><htmlurl url="chrcvt65.html" name="chrcvt65.html"></tag>
   Describes the vector font converter.
 
   <tag><htmlurl url="cl65.html" name="cl65.html"></tag>
@@ -31,7 +31,7 @@
   Describes the da65 6502/65C02 disassembler.
 
   <tag><htmlurl url="grc65.html" name="grc65.html"></tag>
-  Describes the GEOS resource compiler (grc65).
+  Describes the GEOS resource compiler.
 
   <tag><htmlurl url="ld65.html" name="ld65.html"></tag>
   Describes the ld65 linker.

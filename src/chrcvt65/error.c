@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 error.h                                   */
+/*                                 error.c                                   */
 /*                                                                           */
-/*            Error handling for the chrcvt vector font converter            */
+/*           Error handling for the chrcvt65 vector font converter           */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,13 +33,11 @@
 
 
 
-#ifndef ERROR_H
-#define ERROR_H
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
 
-
-
-/* common */
-#include "attrib.h"
+#include "error.h"
 
 
 
@@ -49,20 +47,44 @@
 
 
 
-void Warning (const char* Format, ...) attribute((format(printf,1,2)));
+void Warning (const char* Format, ...)
 /* Print a warning message */
+{
+    va_list ap;
+    va_start (ap, Format);
+    fprintf (stderr, "Warning: ");
+    vfprintf (stderr, Format, ap);
+    putc ('\n', stderr);
+    va_end (ap);
+}
 
-void Error (const char* Format, ...) attribute((noreturn, format(printf,1,2)));
+
+
+void Error (const char* Format, ...)
 /* Print an error message and die */
+{
+    va_list ap;
+    va_start (ap, Format);
+    fprintf (stderr, "Error: ");
+    vfprintf (stderr, Format, ap);
+    putc ('\n', stderr);
+    va_end (ap);
+    exit (EXIT_FAILURE);
+}
 
-void Internal (const char* Format, ...) attribute((noreturn, format(printf,1,2)));
+
+
+void Internal (const char* Format, ...)
 /* Print an internal error message and die */
-
-
-
-/* End of error.h */
-
-#endif
+{
+    va_list ap;
+    va_start (ap, Format);
+    fprintf (stderr, "Internal error: ");
+    vfprintf (stderr, Format, ap);
+    putc ('\n', stderr);
+    va_end (ap);
+    exit (EXIT_FAILURE);
+}
 
 
 

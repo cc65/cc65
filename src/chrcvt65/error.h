@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 error.c                                   */
+/*                                 error.h                                   */
 /*                                                                           */
-/*            Error handling for the chrcvt vector font converter            */
+/*           Error handling for the chrcvt65 vector font converter           */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,11 +33,13 @@
 
 
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
+#ifndef ERROR_H
+#define ERROR_H
 
-#include "error.h"
+
+
+/* common */
+#include "attrib.h"
 
 
 
@@ -47,44 +49,20 @@
 
 
 
-void Warning (const char* Format, ...)
+void Warning (const char* Format, ...) attribute((format(printf,1,2)));
 /* Print a warning message */
-{
-    va_list ap;
-    va_start (ap, Format);
-    fprintf (stderr, "Warning: ");
-    vfprintf (stderr, Format, ap);
-    putc ('\n', stderr);
-    va_end (ap);
-}
 
-
-
-void Error (const char* Format, ...)
+void Error (const char* Format, ...) attribute((noreturn, format(printf,1,2)));
 /* Print an error message and die */
-{
-    va_list ap;
-    va_start (ap, Format);
-    fprintf (stderr, "Error: ");
-    vfprintf (stderr, Format, ap);
-    putc ('\n', stderr);
-    va_end (ap);
-    exit (EXIT_FAILURE);
-}
 
-
-
-void Internal (const char* Format, ...)
+void Internal (const char* Format, ...) attribute((noreturn, format(printf,1,2)));
 /* Print an internal error message and die */
-{
-    va_list ap;
-    va_start (ap, Format);
-    fprintf (stderr, "Internal error: ");
-    vfprintf (stderr, Format, ap);
-    putc ('\n', stderr);
-    va_end (ap);
-    exit (EXIT_FAILURE);
-}
+
+
+
+/* End of error.h */
+
+#endif
 
 
 

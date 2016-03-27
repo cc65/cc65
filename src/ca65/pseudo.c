@@ -336,7 +336,7 @@ static void DoA16 (void)
     if (GetCPU() != CPU_65816) {
         Error ("Command is only valid in 65816 mode");
     } else {
-        /* Immidiate mode has two extension bytes */
+        /* Immediate mode has two extension bytes */
         ExtBytes [AM65I_IMM_ACCU] = 2;
     }
 }
@@ -349,7 +349,7 @@ static void DoA8 (void)
     if (GetCPU() != CPU_65816) {
         Error ("Command is only valid in 65816 mode");
     } else {
-        /* Immidiate mode has one extension byte */
+        /* Immediate mode has one extension byte */
         ExtBytes [AM65I_IMM_ACCU] = 1;
     }
 }
@@ -1161,7 +1161,7 @@ static void DoI16 (void)
     if (GetCPU() != CPU_65816) {
         Error ("Command is only valid in 65816 mode");
     } else {
-        /* Immidiate mode has two extension bytes */
+        /* Immediate mode has two extension bytes */
         ExtBytes [AM65I_IMM_INDEX] = 2;
     }
 }
@@ -1174,7 +1174,7 @@ static void DoI8 (void)
     if (GetCPU() != CPU_65816) {
         Error ("Command is only valid in 65816 mode");
     } else {
-        /* Immidiate mode has one extension byte */
+        /* Immediate mode has one extension byte */
         ExtBytes [AM65I_IMM_INDEX] = 1;
     }
 }
@@ -1627,6 +1627,14 @@ static void DoPSC02 (void)
 
 
 
+static void DoPCE02 (void)
+/* Switch to 65CE02 CPU */
+{
+    SetCPU (CPU_65CE02);
+}
+
+
+
 static void DoPushCPU (void)
 /* Push the current CPU setting onto the CPU stack */
 {
@@ -2035,6 +2043,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccKeepToken,      DoConditionals  },      /* .IFP02 */
     { ccKeepToken,      DoConditionals  },      /* .IFP816 */
     { ccKeepToken,      DoConditionals  },      /* .IFPC02 */
+    { ccKeepToken,      DoConditionals  },      /* .IFPCE02 */
     { ccKeepToken,      DoConditionals  },      /* .IFPSC02 */
     { ccKeepToken,      DoConditionals  },      /* .IFREF */
     { ccNone,           DoImport        },
@@ -2067,6 +2076,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoPageLength    },
     { ccNone,           DoUnexpected    },      /* .PARAMCOUNT */
     { ccNone,           DoPC02          },
+    { ccNone,           DoPCE02         },
     { ccNone,           DoPopCPU        },
     { ccNone,           DoPopSeg        },
     { ccNone,           DoProc          },

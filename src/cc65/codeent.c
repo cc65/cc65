@@ -1421,7 +1421,7 @@ void CE_Output (const CodeEntry* E)
             break;
 
         case AM65_IMM:
-            /* immidiate */
+            /* immediate */
             Chars += WriteOutput ("%*s#%s", Space, "", E->Arg);
             break;
 

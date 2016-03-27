@@ -6,6 +6,7 @@
 ;  Bastian Schick's Lynx Documentation
 ;  http://www.geocities.com/SiliconValley/Byte/4242/lynx/
 ;
+.psc02
 
 ; ***
 ; *** Suzy Addresses

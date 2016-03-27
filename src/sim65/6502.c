@@ -352,6 +352,22 @@ static void OPC_6502_00 (void)
 
 
 
+static void OPC_65C02_00 (void)
+/* Opcode $00: BRK */
+{
+    Cycles = 7;
+    Regs.PC += 2;
+    SET_BF (1);
+    PUSH (PCH);
+    PUSH (PCL);
+    PUSH (Regs.SR);
+    SET_DF (0);
+    SET_IF (1);
+    Regs.PC = MemReadWord (0xFFFE);
+}
+
+
+
 static void OPC_6502_01 (void)
 /* Opcode $01: ORA (ind,x) */
 {
@@ -756,6 +772,16 @@ static void OPC_6502_41 (void)
 
 
 
+static void OPC_65C02_44 (void)
+/* Opcode $44: NOP */
+{
+    /* This one is easy... */
+    Cycles = 3;
+    Regs.PC += 2;
+}
+
+
+
 static void OPC_6502_45 (void)
 /* Opcode $45: EOR zp */
 {
@@ -866,6 +892,16 @@ static void OPC_6502_51 (void)
 
 
 
+static void OPC_65C02_54 (void)
+/* Opcode $54, $74, $D4 and $F4: NOP */
+{
+    /* This one is easy... */
+    Cycles = 4;
+    Regs.PC += 2;
+}
+
+
+
 static void OPC_6502_55 (void)
 /* Opcode $55: EOR zp,x */
 {
@@ -906,6 +942,26 @@ static void OPC_6502_59 (void)
 /* Opcode $59: EOR abs,y */
 {
     AC_OP_ABSY (^);
+}
+
+
+
+static void OPC_65C02_5A (void)
+/* Opcode $5A: PHY */
+{
+    Cycles = 3;
+    PUSH (Regs.YR);
+    Regs.PC += 1;
+}
+
+
+
+static void OPC_65C02_5C (void)
+/* Opcode $5C: NOP */
+{
+    /* This one is easy... */
+    Cycles = 8;
+    Regs.PC += 3;
 }
 
 
@@ -1046,7 +1102,7 @@ static void OPC_65C02_6C (void)
 /* Opcode $6C: JMP (ind) */
 {
     /* 6502 bug fixed here */
-    Cycles = 5;
+    Cycles = 6;
     Regs.PC = MemReadWord (MemReadWord (Regs.PC+1));
 }
 
@@ -1156,6 +1212,18 @@ static void OPC_6502_79 (void)
 
 
 
+static void OPC_65C02_7A (void)
+/* Opcode $7A: PLY */
+{
+    Cycles = 4;
+    Regs.YR = POP ();
+    TEST_ZF (Regs.YR);
+    TEST_SF (Regs.YR);
+    Regs.PC += 1;
+}
+
+
+
 static void OPC_6502_7D (void)
 /* Opcode $7D: ADC abs,x */
 {
@@ -1182,6 +1250,14 @@ static void OPC_6502_7E (void)
     ROR (Val);
     MemWriteByte (Addr, Val);
     Regs.PC += 3;
+}
+
+
+
+static void OPC_65C02_80 (void)
+/* Opcode $80: BRA */
+{
+    BRANCH (1);
 }
 
 
@@ -1935,6 +2011,26 @@ static void OPC_6502_D9 (void)
 
 
 
+static void OPC_65C02_DA (void)
+/* Opcode $DA: PHX */
+{
+    Cycles = 3;
+    PUSH (Regs.XR);
+    Regs.PC += 1;
+}
+
+
+
+static void OPC_65C02_DC (void)
+/* Opcode $DC and $FC: NOP */
+{
+    /* This one is easy... */
+    Cycles = 4;
+    Regs.PC += 3;
+}
+
+
+
 static void OPC_6502_DD (void)
 /* Opcode $DD: CMP abs,x */
 {
@@ -2158,7 +2254,9 @@ static void OPC_6502_F6 (void)
 static void OPC_6502_F8 (void)
 /* Opcode $F8: SED */
 {
+    Cycles = 2;
     SET_DF (1);
+    Regs.PC += 1;
 }
 
 
@@ -2174,6 +2272,18 @@ static void OPC_6502_F9 (void)
     }
     SBC (MemReadByte (Addr + Regs.YR));
     Regs.PC += 3;
+}
+
+
+
+static void OPC_65C02_FA (void)
+/* Opcode $FA: PLX */
+{
+    Cycles = 4;
+    Regs.XR = POP ();
+    TEST_ZF (Regs.XR);
+    TEST_SF (Regs.XR);
+    Regs.PC += 1;
 }
 
 
@@ -2479,262 +2589,262 @@ static const OPFunc OP6502Table[256] = {
 
 /* Opcode handler table for the 65C02 */
 static const OPFunc OP65C02Table[256] = {
-    OPC_6502_00,
+    OPC_65C02_00,
     OPC_6502_01,
-    OPC_Illegal,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_6502_EA,
+    OPC_6502_EA,
+    OPC_6502_EA,
     OPC_6502_05,
     OPC_6502_06,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_08,
     OPC_6502_09,
     OPC_6502_0A,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_6502_EA,
+    OPC_6502_EA,
     OPC_6502_0D,
     OPC_6502_0E,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_10,
     OPC_6502_11,
-    OPC_Illegal,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_6502_EA,
+    OPC_6502_EA,
+    OPC_6502_EA,
     OPC_6502_15,
     OPC_6502_16,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_18,
     OPC_6502_19,
-    OPC_Illegal,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_6502_EA,
+    OPC_6502_EA,
+    OPC_6502_EA,
     OPC_6502_1D,
     OPC_6502_1E,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_20,
     OPC_6502_21,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_6502_EA,
+    OPC_6502_EA,
     OPC_6502_24,
     OPC_6502_25,
     OPC_6502_26,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_28,
     OPC_6502_29,
     OPC_6502_2A,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_2C,
     OPC_6502_2D,
     OPC_6502_2E,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_30,
     OPC_6502_31,
-    OPC_Illegal,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_6502_EA,
+    OPC_6502_EA,
+    OPC_6502_EA,
     OPC_6502_35,
     OPC_6502_36,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_38,
     OPC_6502_39,
-    OPC_Illegal,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_6502_EA,
+    OPC_6502_EA,
+    OPC_6502_EA,
     OPC_6502_3D,
     OPC_6502_3E,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_40,
     OPC_6502_41,
-    OPC_Illegal,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_6502_EA,
+    OPC_6502_EA,
+    OPC_65C02_44,
     OPC_6502_45,
     OPC_6502_46,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_48,
     OPC_6502_49,
     OPC_6502_4A,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_4C,
     OPC_6502_4D,
     OPC_6502_4E,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_50,
     OPC_6502_51,
-    OPC_Illegal,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_6502_EA,
+    OPC_6502_EA,
+    OPC_65C02_54,
     OPC_6502_55,
     OPC_6502_56,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_58,
     OPC_6502_59,
-    OPC_Illegal,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_65C02_5A,
+    OPC_6502_EA,
+    OPC_65C02_5C,
     OPC_6502_5D,
     OPC_6502_5E,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_60,
     OPC_6502_61,
-    OPC_Illegal,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_6502_EA,
+    OPC_6502_EA,
+    OPC_6502_EA,
     OPC_6502_65,
     OPC_6502_66,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_68,
     OPC_6502_69,
     OPC_6502_6A,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_65C02_6C,
     OPC_6502_6D,
     OPC_6502_6E,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_70,
     OPC_6502_71,
-    OPC_Illegal,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_6502_EA,
+    OPC_6502_EA,
+    OPC_65C02_54,
     OPC_6502_75,
     OPC_6502_76,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_78,
     OPC_6502_79,
-    OPC_Illegal,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_65C02_7A,
+    OPC_6502_EA,
+    OPC_6502_EA,
     OPC_6502_7D,
     OPC_6502_7E,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_6502_EA,
+    OPC_65C02_80,
     OPC_6502_81,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_6502_EA,
+    OPC_6502_EA,
     OPC_6502_84,
     OPC_6502_85,
     OPC_6502_86,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_88,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_8A,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_8C,
     OPC_6502_8D,
     OPC_6502_8E,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_90,
     OPC_6502_91,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_6502_EA,
+    OPC_6502_EA,
     OPC_6502_94,
     OPC_6502_95,
     OPC_6502_96,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_98,
     OPC_6502_99,
     OPC_6502_9A,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_6502_EA,
+    OPC_6502_EA,
     OPC_6502_9D,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_6502_EA,
+    OPC_6502_EA,
     OPC_6502_A0,
     OPC_6502_A1,
     OPC_6502_A2,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_A4,
     OPC_6502_A5,
     OPC_6502_A6,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_A8,
     OPC_6502_A9,
     OPC_6502_AA,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_AC,
     OPC_6502_AD,
     OPC_6502_AE,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_B0,
     OPC_6502_B1,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_6502_EA,
+    OPC_6502_EA,
     OPC_6502_B4,
     OPC_6502_B5,
     OPC_6502_B6,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_B8,
     OPC_6502_B9,
     OPC_6502_BA,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_BC,
     OPC_6502_BD,
     OPC_6502_BE,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_C0,
     OPC_6502_C1,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_6502_EA,
+    OPC_6502_EA,
     OPC_6502_C4,
     OPC_6502_C5,
     OPC_6502_C6,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_C8,
     OPC_6502_C9,
     OPC_6502_CA,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_CC,
     OPC_6502_CD,
     OPC_6502_CE,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_D0,
     OPC_6502_D1,
-    OPC_Illegal,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_6502_EA,
+    OPC_6502_EA,
+    OPC_65C02_54,
     OPC_6502_D5,
     OPC_6502_D6,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_D8,
     OPC_6502_D9,
-    OPC_Illegal,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_65C02_DA,
+    OPC_6502_EA,
+    OPC_65C02_DC,
     OPC_6502_DD,
     OPC_6502_DE,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_E0,
     OPC_6502_E1,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_6502_EA,
+    OPC_6502_EA,
     OPC_6502_E4,
     OPC_6502_E5,
     OPC_6502_E6,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_E8,
     OPC_6502_E9,
     OPC_6502_EA,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_EC,
     OPC_6502_ED,
     OPC_6502_EE,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_F0,
     OPC_6502_F1,
-    OPC_Illegal,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_6502_EA,
+    OPC_6502_EA,
+    OPC_65C02_54,
     OPC_6502_F5,
     OPC_6502_F6,
-    OPC_Illegal,
+    OPC_6502_EA,
     OPC_6502_F8,
     OPC_6502_F9,
-    OPC_Illegal,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_65C02_FA,
+    OPC_6502_EA,
+    OPC_65C02_DC,
     OPC_6502_FD,
     OPC_6502_FE,
-    OPC_Illegal,
+    OPC_6502_EA,
 };
 
 
@@ -2755,6 +2865,9 @@ void IRQRequest (void)
 {
     /* Remember the request */
     HaveIRQRequest = 1;
+    if (CPU == CPU_65C02) {
+        SET_DF (0);
+    }
 }
 
 
@@ -2764,6 +2877,9 @@ void NMIRequest (void)
 {
     /* Remember the request */
     HaveNMIRequest = 1;
+    if (CPU == CPU_65C02) {
+        SET_DF (0);
+    }
 }
 
 

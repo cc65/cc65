@@ -18,7 +18,7 @@
   <tag><htmlurl url="cc65.html" name="cc65.html"></tag>
   Describes the cc65 C compiler.
 
-  <tag><htmlurl url="chrcvt.html" name="chrcvt.html"></tag>
+  <tag><htmlurl url="chrcvt65.html" name="chrcvt65.html"></tag>
   Describes the vector font converter.
 
   <tag><htmlurl url="cl65.html" name="cl65.html"></tag>

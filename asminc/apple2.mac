@@ -1,0 +1,46 @@
+; For more information see the documentation:
+;     "Porting sources from other assemblers"
+
+; Force APPLE 'text' to have high bit on
+; Will display as NORMAL characters
+.macro AS text
+    .repeat .strlen(text), I
+        .byte   .strat(text, I) | $80
+    .endrep
+.endmacro
+
+; Force ASCII 'text' but last character has high bit on
+; Will display as FLASHING characters (last character will appear NORMAL)
+; NOTE: There is no lowercase flashing characters - they will appear as symbols!
+.macro AT text
+    .repeat .strlen(text)-1, I
+        .byte   .strat(text, I) & $7F
+    .endrep
+    .byte   .strat(text, .strlen(text)-1) | $80
+.endmacro
+
+; Force APPLE 'text' with high bit on but last character has high bit off
+; Will display as NORMAL characters (last character will appear FLASHING)
+.macro AR text
+    .repeat .strlen(text)-1, I
+        .byte   .strat(text, I) | $80
+    .endrep
+    .byte   .strat(text, .strlen(text)-1) & $7F
+.endmacro
+
+; Force ASCII 'text' to be control characters: $00..$1F
+; Will display as INVERSE characters
+.macro AC text
+    .repeat .strlen(text), I
+        .byte   .strat(text, I) & $1F
+    .endrep
+.endmacro
+
+; Force ASCII 'text' to be control characters plus symbols: $00..$3F
+; Will display as INVERSE characters
+.macro AI text
+    .repeat .strlen(text), I
+        .byte   .strat(text, I) & $3F
+    .endrep
+.endmacro
+

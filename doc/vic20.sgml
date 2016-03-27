@@ -161,8 +161,9 @@ The default drivers, <tt/joy_stddrv (joy_static_stddrv)/, point to <tt/vic20-std
 
   <tag><tt/vic20-ptvjoy.joy (vic20_ptvjoy_joy)/</tag>
   Driver for the Protovision 4-player adapter contributed by Groepaz. See
-  <url url="http://www.protovision-online.de/hardw/hardwstart.htm"> for prices and
-  building instructions. Up to three joysticks are supported.
+  <url url="http://www.protovision-online.de/hardw/4_player.php?language=en"
+  name="Protovision shop"> for prices and building instructions. Up to three
+  joysticks are supported.
 
 </descrip><p>
 

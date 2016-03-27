@@ -319,8 +319,9 @@ The default drivers, <tt/joy_stddrv (joy_static_stddrv)/, point to <tt/c64-stdjo
 
   <tag><tt/c64-ptvjoy.joy (c64_ptvjoy_joy)/</tag>
   Driver for the Protovision 4-player adapter contributed by Groepaz. See
-  <url url="http://www.protovision-online.de/hardw/hardwstart.htm"> for prices and
-  building instructions. Up to four joysticks are supported.
+  <url url="http://www.protovision-online.de/hardw/4_player.php?language=en"
+  name="Protovision shop"> for prices and building instructions. Up to four
+  joysticks are supported.
 
   <tag><tt/c64-stdjoy.joy (c64_stdjoy_joy)/</tag>
   Supports up to two standard joysticks connected to the joysticks port of

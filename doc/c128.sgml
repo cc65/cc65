@@ -244,8 +244,9 @@ The default drivers, <tt/joy_stddrv (joy_static_stddrv)/, point to <tt/c128-stdj
   <tag><tt/c128-ptvjoy.joy (c128_ptvjoy_joy)/</tag>
   Driver for the Protovision 4-player adapter originally written by Groepaz
   for the C64, and converted for the C128 by Uz. See <url
-  url="http://www.protovision-online.de/hardw/hardwstart.htm"> for prices and
-  building instructions. Up to four joysticks are supported.
+  url="http://www.protovision-online.de/hardw/4_player.php?language=en"
+  name="Protovision shop"> for prices and building instructions. Up to four
+  joysticks are supported.
 
   <tag><tt/c128-stdjoy.joy (c128_stdjoy_joy)/</tag>
   Supports up to two joysticks connected to the standard joysticks ports of

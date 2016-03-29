@@ -1855,6 +1855,20 @@ unsigned CfgProcess (void)
                 /* This is the run (and maybe load) memory area. Handle
                 ** alignment and explict start address and offset.
                 */
+
+                /* Check if the alignment for the segment from the linker
+                ** config. is a multiple for that of the segment.
+                */
+                if ((S->RunAlignment % S->Seg->Alignment) != 0) {
+                    /* Segment requires another alignment than configured
+                    ** in the linker.
+                    */
+                    CfgWarning (GetSourcePos (S->LI),
+                                "Segment `%s' isn't aligned properly; the"
+                                " resulting executable might not be functional.",
+                                GetString (S->Name));
+                }
+
                 if (S->Flags & SF_ALIGN) {
                     /* Align the address */
                     unsigned long NewAddr = AlignAddr (Addr, S->RunAlignment);
@@ -1865,8 +1879,8 @@ unsigned CfgProcess (void)
                     */
                     if (M->FillLevel == 0 && NewAddr > Addr) {
                         CfgWarning (GetSourcePos (S->LI),
-                                    "First segment in memory area `%s' does "
-                                    "already need fill bytes for alignment",
+                                    "The first segment in memory area `%s' "
+                                    "needs fill bytes for alignment.",
                                     GetString (M->Name));
                     }
 

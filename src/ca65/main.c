@@ -251,10 +251,6 @@ static void SetSys (const char* Sys)
             CBMSystem ("__PET__");
             break;
 
-        case TGT_BBC:
-            NewSymbol ("__BBC__", 1);
-            break;
-
         case TGT_APPLE2:
             NewSymbol ("__APPLE2__", 1);
             break;
@@ -274,6 +270,18 @@ static void SetSys (const char* Sys)
             NewSymbol ("__GEOS_CBM__", 1);
             break;
 
+        case TGT_ATMOS:
+            NewSymbol ("__ATMOS__", 1);
+            break;
+
+        case TGT_BBC:
+            NewSymbol ("__BBC__", 1);
+            break;
+
+        case TGT_CREATIVISION:
+            NewSymbol ("__CREATIVISION__", 1);
+            break;
+
         case TGT_GEOS_APPLE:
             NewSymbol ("__GEOS__", 1);
             NewSymbol ("__GEOS_APPLE__", 1);
@@ -283,20 +291,12 @@ static void SetSys (const char* Sys)
             NewSymbol ("__LUNIX__", 1);
             break;
 
-        case TGT_ATMOS:
-            NewSymbol ("__ATMOS__", 1);
+        case TGT_LYNX:
+            NewSymbol ("__LYNX__", 1);
             break;
 
         case TGT_NES:
             NewSymbol ("__NES__", 1);
-            break;
-
-        case TGT_SUPERVISION:
-            NewSymbol ("__SUPERVISION__", 1);
-            break;
-
-        case TGT_LYNX:
-            NewSymbol ("__LYNX__", 1);
             break;
 
         case TGT_SIM6502:
@@ -313,6 +313,10 @@ static void SetSys (const char* Sys)
 
         case TGT_PCENGINE:
             NewSymbol ("__PCE__", 1);
+            break;
+
+        case TGT_SUPERVISION:
+            NewSymbol ("__SUPERVISION__", 1);
             break;
 
         default:

@@ -1,8 +1,7 @@
 ; supervision symbols
 
-;  supervision 65c02s
-; in cc65 up to 2.9.1 65c02 means 65c02s
-.pc02
+; supervision 65c02s
+; in cc65 up to 2.9.1 65c02 means 65sc02
 
 lcd_addr = $4000
 LCD_LINESIZE = $30

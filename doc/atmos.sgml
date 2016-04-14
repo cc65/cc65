@@ -129,8 +129,8 @@ The names in the parentheses denote the symbols to be used for static linking of
 
 <sect1>Graphics drivers<p>
 
-The default drivers, <tt/tgi_stddrv (tgi_static_stddrv)/,
-point to <tt/atmos-240-200-2.tgi (atmos_240_200_2_tgi)/.
+The default driver, <tt/tgi_stddrv (tgi_static_stddrv)/,
+points to <tt/atmos-240-200-2.tgi (atmos_240_200_2_tgi)/.
 
 <descrip>
 

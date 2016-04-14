@@ -205,7 +205,7 @@ No graphics drivers are currently available for the Commodore 510.
 
 <sect1>Mouse drivers<p>
 
-The default drivers, <tt/mouse_stddrv (mouse_static_stddrv)/, point to <tt/cbm510-joy.mou (cbm510_joy_mou)/.
+The default driver, <tt/mouse_stddrv (mouse_static_stddrv)/, points to <tt/cbm510-joy.mou (cbm510_joy_mou)/.
 
 <descrip>
 

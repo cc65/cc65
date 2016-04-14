@@ -149,7 +149,7 @@ No extended memory drivers are currently available for the PET.
 
 <sect1>Joystick drivers<p>
 
-The default drivers, <tt/joy_stddrv (joy_static_stddrv)/, point to <tt/pet-stdjoy.joy (pet_stdjoy_joy)/.
+The default driver, <tt/joy_stddrv (joy_static_stddrv)/, points to <tt/pet-stdjoy.joy (pet_stdjoy_joy)/.
 
 <descrip>
 

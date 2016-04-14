@@ -268,7 +268,7 @@ configuration.
 
 <sect1>Joystick drivers<p>
 
-The default drivers, <tt/joy_stddrv (joy_static_stddrv)/, point to <tt/c64-stdjoy.joy (c64_stdjoy_joy)/.
+The default driver, <tt/joy_stddrv (joy_static_stddrv)/, points to <tt/c64-stdjoy.joy (c64_stdjoy_joy)/.
 
 <descrip>
 
@@ -295,7 +295,7 @@ The default drivers, <tt/joy_stddrv (joy_static_stddrv)/, point to <tt/c64-stdjo
 
 <sect1>Mouse drivers<p>
 
-The default drivers, <tt/mouse_stddrv (mouse_static_stddrv)/, point to <tt/c64-1351.mou (c64_1351_mou)/.
+The default driver, <tt/mouse_stddrv (mouse_static_stddrv)/, points to <tt/c64-1351.mou (c64_1351_mou)/.
 
 <descrip>
 

@@ -164,7 +164,7 @@ The names in the parentheses denote the symbols to be used for static linking of
 
 <sect1>Graphics drivers<p>
 
-The default drivers, <tt/tgi_stddrv (tgi_static_stddrv)/, point to <tt/c128-vdc.tgi (c128_vdc_tgi)/.
+The default driver, <tt/tgi_stddrv (tgi_static_stddrv)/, points to <tt/c128-vdc.tgi (c128_vdc_tgi)/.
 
 Note: The graphics drivers for the VDC are incompatible with the extended
 memory drivers using the VDC memory!
@@ -229,7 +229,7 @@ missing on VDC, and are translated to the two colors missing from the VIC palett
 
 <sect1>Joystick drivers<p>
 
-The default drivers, <tt/joy_stddrv (joy_static_stddrv)/, point to <tt/c128-stdjoy.joy (c128_stdjoy_joy)/.
+The default driver, <tt/joy_stddrv (joy_static_stddrv)/, points to <tt/c128-stdjoy.joy (c128_stdjoy_joy)/.
 
 <descrip>
 
@@ -249,7 +249,7 @@ The default drivers, <tt/joy_stddrv (joy_static_stddrv)/, point to <tt/c128-stdj
 
 <sect1>Mouse drivers<p>
 
-The default drivers, <tt/mouse_stddrv (mouse_static_stddrv)/, point to <tt/c128-1351.mou (c128_1351_mou)/.
+The default driver, <tt/mouse_stddrv (mouse_static_stddrv)/, points to <tt/c128-1351.mou (c128_1351_mou)/.
 
 <descrip>
 

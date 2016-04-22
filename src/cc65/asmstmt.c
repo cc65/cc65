@@ -41,12 +41,14 @@
 /* cc65 */
 #include "asmlabel.h"
 #include "codegen.h"
+#include "codeseg.h"
 #include "datatype.h"
 #include "error.h"
 #include "expr.h"
 #include "function.h"
 #include "litpool.h"
 #include "scanner.h"
+#include "segments.h"
 #include "stackptr.h"
 #include "symtab.h"
 #include "asmstmt.h"
@@ -421,6 +423,15 @@ void AsmStatement (void)
 {
     /* Skip the ASM */
     NextToken ();
+
+    /* An optional volatile qualifier disables optimization for
+    ** the entire function [same as #pragma optimize(push, off)].
+    */
+    if (CurTok.Tok == TOK_VOLATILE) {
+        /* Don't optimize the Current code Segment */
+        CS->Code->Optimize = 0;
+        NextToken ();
+    }
 
     /* Need left parenthesis */
     if (!ConsumeLParen ()) {

@@ -47,9 +47,9 @@
 ;-----------------------------------------------------------------------------
 ; All functions are available in the kernal jump table
 
-CINT            = $FF81
-IOINIT          = $FF84
-RAMTAS          = $FF87
+CINT            = $E518         ; No entries are in the kernal jump table for these functions.
+IOINIT          = $FDF9         ; The entries point directly to the function.
+RAMTAS          = $FD8D         ;
 RESTOR          = $FF8A
 VECTOR          = $FF8D
 SETMSG          = $FF90

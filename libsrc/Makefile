@@ -37,12 +37,15 @@ DRVTYPES = emd \
            ser \
            tgi
 
-OUTPUTDIRS := lib         \
-              $(DRVTYPES) \
-              targetutil  \
-              asminc      \
-              cfg         \
-              include     \
+DRVOUTPUTDIRS := $(foreach drvtype,$(DRVTYPES),goodies/drivers/$(drvtype))
+
+OUTPUTDIRS := lib                 \
+              $(DRVOUTPUTDIRS)    \
+              goodies/targetutil  \
+              asminc              \
+              cfg                 \
+              include             \
+              samples             \
               $(subst ../,,$(filter-out $(wildcard ../include/*.*),$(wildcard ../include/*)))
 
 .PHONY: all mostlyclean clean install zip lib $(TARGETS)
@@ -76,8 +79,11 @@ all lib: $(TARGETS)
 mostlyclean:
 	$(call RMDIR,../libwrk)
 
+# Transitional line active. Final line commented out below in order to
+# allow some time for transition between the directory structures
 clean:
-	$(call RMDIR,../libwrk ../lib ../targetutil $(addprefix ../,$(DRVTYPES)))
+	$(call RMDIR,../libwrk ../lib ../targetutil ../goodies $(addprefix ../,$(DRVTYPES)))
+# 	$(call RMDIR,../libwrk ../lib ../goodies)
 
 ifdef CMD_EXE
 
@@ -212,7 +218,7 @@ define DRVTYPE_template
 $1_SRCDIR = $$(SRCDIR)/$1
 $1_STCDIR = ../libwrk/$$(TARGET)
 $1_DYNDIR = ../libwrk/$$(TARGET)/$1
-$1_DRVDIR = ../$1
+$1_DRVDIR = ../goodies/drivers/$1
 
 $1_SRCPAT = $$($1_SRCDIR)/$$(OBJPFX)%.s
 $1_STCPAT = $$($1_STCDIR)/$$(OBJPFX)%-$1.o
@@ -283,7 +289,7 @@ $(EXTRA_OBJPAT): $(EXTRA_SRCPAT) | ../lib
 ../lib/$(TARGET).lib: $(OBJS) | ../lib
 	$(AR65) a $@ $?
 
-../libwrk/$(TARGET) ../lib ../targetutil:
+../libwrk/$(TARGET) ../lib ../goodies/targetutil:
 	@$(call MKDIR,$@)
 
 $(TARGET): $(EXTRA_OBJS) ../lib/$(TARGET).lib

@@ -8,7 +8,7 @@ DEPS += ../libwrk/$(TARGET)/convert.d
 ../lib/apple2enh.lib:
 	@$(MAKE) --no-print-directory apple2enh
 
-../targetutil/convert.system: ../libwrk/$(TARGET)/convert.o ../lib/apple2enh.lib | ../targetutil
+../goodies/targetutil/convert.system: ../libwrk/$(TARGET)/convert.o ../lib/apple2enh.lib | ../goodies/targetutil
 	$(LD65) -o $@ -C apple2enh-system.cfg $^
 
-$(TARGET): ../targetutil/convert.system
+$(TARGET): ../goodies/targetutil/convert.system

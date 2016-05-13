@@ -41,7 +41,9 @@ ifeq ($(wildcard ../info),../info)
 endif
 
 zip:
+ifneq "$(wildcard ../html)" ""
 	@cd .. && zip cc65 html/*.*
+endif
 
 doc: html info
 

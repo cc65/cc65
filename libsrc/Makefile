@@ -39,12 +39,13 @@ DRVTYPES = emd \
            tgi
 
 OUTPUTDIRS := lib                 \
-              target              \
               asminc              \
               cfg                 \
               include             \
               samples             \
-              $(subst ../,,$(filter-out $(wildcard ../include/*.*),$(wildcard ../include/*)))
+              $(subst ../,,$(filter-out $(wildcard ../include/*.*),$(wildcard ../include/*)))\
+              $(subst ../,,$(wildcard ../target/*/drv/*))\
+              $(subst ../,,$(wildcard ../target/*/util))\
 
 .PHONY: all mostlyclean clean install zip lib $(TARGETS)
 
@@ -80,8 +81,8 @@ mostlyclean:
 # Transitional line active. Final line commented out below in order to
 # allow some time for transition between the directory structures
 clean:
-	$(call RMDIR,../libwrk ../lib ../targetutil ../target $(addprefix ../,$(DRVTYPES)))
-# 	$(call RMDIR,../libwrk ../lib ../target)
+	$(call RMDIR,../libwrk ../lib ../targetutil ../$(TARGETDIR) $(addprefix ../,$(DRVTYPES)))
+# 	$(call RMDIR,../libwrk ../lib ../$(TARGETDIR))
 
 ifdef CMD_EXE
 
@@ -95,12 +96,13 @@ define INSTALL_recipe
 
 $(if $(prefix),,$(error variable `prefix' must be set))
 $(INSTALL) -d $(DESTDIR)$(datadir)/$(dir)
-$(INSTALL) -m644 ../$(dir)/*.* $(DESTDIR)$(datadir)/$(dir)
+$(INSTALL) -m0644 ../$(dir)/*.* $(DESTDIR)$(datadir)/$(dir)
 
 endef # INSTALL_recipe
 
 install:
 	$(foreach dir,$(OUTPUTDIRS),$(INSTALL_recipe))
+
 
 endif # CMD_EXE
 

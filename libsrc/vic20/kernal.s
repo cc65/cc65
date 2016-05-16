@@ -47,9 +47,9 @@
 ;-----------------------------------------------------------------------------
 ; All functions are available in the kernal jump table
 
-CINT            = $FF81
-IOINIT          = $FF84
-RAMTAS          = $FF87
+CINT            = $E518         ; No entries are in the kernal jump table of the Vic20 for these three (3) functions.
+IOINIT          = $FDF9         ; The entries for these functions have been set to point directly to the functions 
+RAMTAS          = $FD8D         ; in the kernal to maintain compatibility with the other Commodore platforms.
 RESTOR          = $FF8A
 VECTOR          = $FF8D
 SETMSG          = $FF90

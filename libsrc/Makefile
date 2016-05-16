@@ -1,3 +1,4 @@
+
 ifneq ($(shell echo),)
   CMD_EXE = 1
 endif
@@ -37,11 +38,8 @@ DRVTYPES = emd \
            ser \
            tgi
 
-DRVOUTPUTDIRS := $(foreach drvtype,$(DRVTYPES),goodies/drivers/$(drvtype))
-
 OUTPUTDIRS := lib                 \
-              $(DRVOUTPUTDIRS)    \
-              goodies/targetutil  \
+              target              \
               asminc              \
               cfg                 \
               include             \
@@ -82,8 +80,8 @@ mostlyclean:
 # Transitional line active. Final line commented out below in order to
 # allow some time for transition between the directory structures
 clean:
-	$(call RMDIR,../libwrk ../lib ../targetutil ../goodies $(addprefix ../,$(DRVTYPES)))
-# 	$(call RMDIR,../libwrk ../lib ../goodies)
+	$(call RMDIR,../libwrk ../lib ../targetutil ../target $(addprefix ../,$(DRVTYPES)))
+# 	$(call RMDIR,../libwrk ../lib ../target)
 
 ifdef CMD_EXE
 
@@ -218,7 +216,7 @@ define DRVTYPE_template
 $1_SRCDIR = $$(SRCDIR)/$1
 $1_STCDIR = ../libwrk/$$(TARGET)
 $1_DYNDIR = ../libwrk/$$(TARGET)/$1
-$1_DRVDIR = ../goodies/drivers/$1
+$1_DRVDIR = ../target/$$(TARGET)/drv/$1
 
 $1_SRCPAT = $$($1_SRCDIR)/$$(OBJPFX)%.s
 $1_STCPAT = $$($1_STCDIR)/$$(OBJPFX)%-$1.o
@@ -289,7 +287,7 @@ $(EXTRA_OBJPAT): $(EXTRA_SRCPAT) | ../lib
 ../lib/$(TARGET).lib: $(OBJS) | ../lib
 	$(AR65) a $@ $?
 
-../libwrk/$(TARGET) ../lib ../goodies/targetutil:
+../libwrk/$(TARGET) ../lib ../target/$(TARGET)/util:
 	@$(call MKDIR,$@)
 
 $(TARGET): $(EXTRA_OBJS) ../lib/$(TARGET).lib

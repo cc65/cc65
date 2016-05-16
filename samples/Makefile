@@ -12,15 +12,19 @@ SYS	= c64
 # source tree; otherwise, use the "install" directories.
 ifeq "$(wildcard ../src)" ""
 # No source tree
-MOUS = /usr/lib/cc65/mou/$(SYS)*.mou
-TGI  = /usr/lib/cc65/tgi/$(SYS)*.tgi
+MOUS = /usr/lib/cc65/target/$(SYS)/drv/mou/$(SYS)*.mou
+TGI  = /usr/lib/cc65/target/$(SYS)/drv/tgi/$(SYS)*.tgi
 ifneq "$(wildcard /usr/local/lib/cc65)" ""
-MOUS = /usr/local/lib/cc65/mou/$(SYS)*.mou
-TGI  = /usr/local/lib/cc65/tgi/$(SYS)*.tgi
+MOUS = /usr/local/lib/cc65/target/$(SYS)/drv/mou/$(SYS)*.mou
+TGI  = /usr/local/lib/cc65/target/$(SYS)/drv/tgi/$(SYS)*.tgi
+endif
+ifneq "$(wildcard /opt/local/share/cc65)" ""
+MOUS = /opt/local/share/cc65/target/$(SYS)/drv/mou/$(SYS)*.mou
+TGI  = /opt/local/share/cc65/target/$(SYS)/drv/tgi/$(SYS)*.tgi
 endif
 ifdef CC65_HOME
-MOUS = $(CC65_HOME)/mou/$(SYS)*.mou
-TGI  = $(CC65_HOME)/tgi/$(SYS)*.tgi
+MOUS = $(CC65_HOME)/target/$(SYS)/drv/mou/$(SYS)*.mou
+TGI  = $(CC65_HOME)/target/$(SYS)/drv/tgi/$(SYS)*.tgi
 endif
 CLIB = --lib $(SYS).lib
 CL   = cl65
@@ -31,8 +35,8 @@ LD   = ld65
 else
 # "samples/" is a part of a complete source tree.
 export CC65_HOME := $(abspath ..)
-MOUS = ../mou/$(SYS)*.mou
-TGI  = ../tgi/$(SYS)*.tgi
+MOUS = ../target/$(SYS)/drv/mou/$(SYS)*.mou
+TGI  = ../target/$(SYS)/drv/tgi/$(SYS)*.tgi
 CLIB = ../lib/$(SYS).lib
 CL   = ../bin/cl65
 CC   = ../bin/cc65

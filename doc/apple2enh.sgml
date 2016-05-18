@@ -241,7 +241,7 @@ The easiest (and for really large programs in fact the only) way to have a cc65
 program use the memory from &dollar;800 to &dollar;2000 is to link it as binary
 (as opposed to system) program using the default linker configuration
 <ref id="apple-def-cfg" name="apple2enh.cfg"> with <tt/__HIMEM__/set to &dollar;BF00
-and load it with the targetutil LOADER.SYSTEM. The program then works like a system
+and load it with the LOADER.SYSTEM utility. The program then works like a system
 program (i.e. quits to the ProDOS dispatcher).
 
 Using LOADER.SYSTEM is as simple as copying it to the ProDOS 8 directory of the
@@ -277,7 +277,7 @@ default I/O buffer allocation basically yields the same placement of I/O buffers
 in memory the primary benefit of <tt/apple2enh-iobuf-0800.o/ is a reduction in code
 size - and thus program file size - of more than 1400 bytes.
 
-Using <tt/apple2enh-iobuf-0800.o/ is as simple as placing it on the linker command 
+Using <tt/apple2enh-iobuf-0800.o/ is as simple as placing it on the linker command
 line like this:
 
 <tscreen><verb>

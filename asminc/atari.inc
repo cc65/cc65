@@ -1011,16 +1011,16 @@ MAX_DOS_WITH_CMDLINE = XDOS
 ; XDOS defines (version 2.4, taken from xdos24.pdf)
 ;-------------------------------------------------------------------------
 
-XOPT         = $70B     ; XDOS options
-XCAR         = $70C     ; XDOS cartridge address (+ $70D)
-XPAT         = $86F     ; XDOS bugfix and patch number
-XVER         = $870     ; XDOS version number
-XFILE        = $87D     ; XDOS filename buffer
-XLINE        = $880     ; XDOS DUP input line
-XGLIN        = $871     ; get line
-XSKIP        = $874     ; skip parameter
-XMOVE        = $877     ; move filename
-XGNUM        = $87A     ; get number
+XOPT         = $070B    ; XDOS options
+XCAR         = $070C    ; XDOS cartridge address (+ $70D)
+XPAT         = $086F    ; XDOS bugfix and patch number
+XVER         = $0870    ; XDOS version number
+XFILE        = $087D    ; XDOS filename buffer
+XLINE        = $0880    ; XDOS DUP input line
+XGLIN        = $0871    ; get line
+XSKIP        = $0874    ; skip parameter
+XMOVE        = $0877    ; move filename
+XGNUM        = $087A    ; get number
 
 ;-------------------------------------------------------------------------
 ; End of atari.inc

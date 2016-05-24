@@ -185,6 +185,19 @@ static void ParseArg (ArgDesc* Arg, Type* Type)
 
 
 
+void AddCmpCodeIfSizeNot256 (const char* Code, long Size)
+/* Add a line of Assembly code that compares an index register
+** only if it isn't comparing to #<256.  (If the next line
+** is "bne", then this will avoid a redundant line.)
+*/
+{
+    if (Size != 256) {
+        AddCodeLine (Code, (unsigned int)Size);
+    }
+}
+
+
+
 /*****************************************************************************/
 /*                                  memcpy                                   */
 /*****************************************************************************/
@@ -272,7 +285,6 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         if (Arg3.Expr.IVal <= 127) {
 
             AddCodeLine ("ldy #$%02X", (unsigned char) (Arg3.Expr.IVal-1));
-            AddCodeLine ("lda #$%02X", (unsigned char) Arg2.Expr.IVal);
             g_defcodelabel (Label);
             if (Reg2) {
                 AddCodeLine ("lda (%s),y", ED_GetLabelName (&Arg2.Expr, 0));
@@ -290,7 +302,6 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         } else {
 
             AddCodeLine ("ldy #$00");
-            AddCodeLine ("lda #$%02X", (unsigned char) Arg2.Expr.IVal);
             g_defcodelabel (Label);
             if (Reg2) {
                 AddCodeLine ("lda (%s),y", ED_GetLabelName (&Arg2.Expr, 0));
@@ -303,7 +314,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                 AddCodeLine ("sta %s,y", ED_GetLabelName (&Arg1.Expr, 0));
             }
             AddCodeLine ("iny");
-            AddCodeLine ("cpy #$%02X", (unsigned char) Arg3.Expr.IVal);
+            AddCmpCodeIfSizeNot256 ("cpy #$%02X", Arg3.Expr.IVal);
             AddCodeLine ("bne %s", LocalLabelName (Label));
 
         }
@@ -366,7 +377,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                 AddCodeLine ("lda %s,y", ED_GetLabelName (&Arg2.Expr, -Offs));
                 AddCodeLine ("sta (sp),y");
                 AddCodeLine ("iny");
-                AddCodeLine ("cpy #$%02X", (unsigned char) (Offs + Arg3.Expr.IVal));
+                AddCmpCodeIfSizeNot256 ("cpy #$%02X", Offs + Arg3.Expr.IVal);
                 AddCodeLine ("bne %s", LocalLabelName (Label));
             } else {
                 AddCodeLine ("ldx #$00");
@@ -376,7 +387,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                 AddCodeLine ("sta (sp),y");
                 AddCodeLine ("iny");
                 AddCodeLine ("inx");
-                AddCodeLine ("cpx #$%02X", (unsigned char) Arg3.Expr.IVal);
+                AddCmpCodeIfSizeNot256 ("cpx #$%02X", Arg3.Expr.IVal);
                 AddCodeLine ("bne %s", LocalLabelName (Label));
             }
 
@@ -440,7 +451,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                 AddCodeLine ("lda (sp),y");
                 AddCodeLine ("sta %s,y", ED_GetLabelName (&Arg1.Expr, -Offs));
                 AddCodeLine ("iny");
-                AddCodeLine ("cpy #$%02X", (unsigned char) (Offs + Arg3.Expr.IVal));
+                AddCmpCodeIfSizeNot256 ("cpy #$%02X", Offs + Arg3.Expr.IVal);
                 AddCodeLine ("bne %s", LocalLabelName (Label));
             } else {
                 AddCodeLine ("ldx #$00");
@@ -450,7 +461,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                 AddCodeLine ("sta %s,x", ED_GetLabelName (&Arg1.Expr, 0));
                 AddCodeLine ("iny");
                 AddCodeLine ("inx");
-                AddCodeLine ("cpx #$%02X", (unsigned char) Arg3.Expr.IVal);
+                AddCmpCodeIfSizeNot256 ("cpx #$%02X", Arg3.Expr.IVal);
                 AddCodeLine ("bne %s", LocalLabelName (Label));
             }
 
@@ -487,7 +498,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             AddCodeLine ("lda (sp),y");
             AddCodeLine ("sta (ptr1),y");
             AddCodeLine ("iny");
-            AddCodeLine ("cpy #$%02X", (unsigned char) Arg3.Expr.IVal);
+            AddCmpCodeIfSizeNot256 ("cpy #$%02X", Arg3.Expr.IVal);
             AddCodeLine ("bne %s", LocalLabelName (Label));
         }
 
@@ -631,7 +642,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                 AddCodeLine ("sta %s,y", ED_GetLabelName (&Arg1.Expr, 0));
             }
             AddCodeLine ("iny");
-            AddCodeLine ("cpy #$%02X", (unsigned char) Arg3.Expr.IVal);
+            AddCmpCodeIfSizeNot256 ("cpy #$%02X", Arg3.Expr.IVal);
             AddCodeLine ("bne %s", LocalLabelName (Label));
 
         }
@@ -661,7 +672,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         g_defcodelabel (Label);
         AddCodeLine ("sta (sp),y");
         AddCodeLine ("iny");
-        AddCodeLine ("cpy #$%02X", (unsigned char) (Offs + Arg3.Expr.IVal));
+        AddCmpCodeIfSizeNot256 ("cpy #$%02X", Offs + Arg3.Expr.IVal);
         AddCodeLine ("bne %s", LocalLabelName (Label));
 
         /* memset returns the address, so the result is actually identical
@@ -697,7 +708,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             g_defcodelabel (Label);
             AddCodeLine ("sta (ptr1),y");
             AddCodeLine ("iny");
-            AddCodeLine ("cpy #$%02X", (unsigned char) Arg3.Expr.IVal);
+            AddCmpCodeIfSizeNot256 ("cpy #$%02X", Arg3.Expr.IVal);
             AddCodeLine ("bne %s", LocalLabelName (Label));
         }
 

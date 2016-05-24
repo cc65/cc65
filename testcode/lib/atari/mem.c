@@ -11,7 +11,6 @@
 
 extern int getsp(void);                         /* comes from ../getsp.s */
 
-extern char _dos_type;                          /* bss variable */
 unsigned char data = 0x12;                      /* data variable */
 
 unsigned int *APPMHI = (unsigned int *)14;      /* 14,15 */
@@ -42,6 +41,6 @@ int main(void)
   printf("  sp:              $%04X  (stack ptr)\n", getsp());
 
   if (allocmem) free(allocmem);
-  if (_dos_type != 1) cgetc();
+  if (! _is_cmdline_dos()) cgetc();
   return(0);
 }

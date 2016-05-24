@@ -27,10 +27,9 @@
 __getdefdev:
 
         lda     __dos_type      ; which DOS?
-        cmp     #ATARIDOS
-        beq     finish
-        cmp     #MYDOS
-        beq     finish
+        cmp     #OSADOS+1
+        bcs     finish          ; only supported on OS/A+ and SpartaDOS
+                                ; (TODO: add XDOS support)
 
         ldy     #BUFOFF
         lda     #0

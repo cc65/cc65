@@ -275,6 +275,7 @@ See the <url url="funcref.html" name="function reference"> for declaration and u
 <item>_getcolor
 <item>_getdefdev
 <item>_graphics
+<item>_is_cmdline_dos
 <item>_rest_vecs
 <item>_save_vecs
 <item>_scroll

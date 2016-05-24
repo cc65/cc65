@@ -106,7 +106,7 @@ SIO_WRPERCOM = $4F      ;write PERCOM block (XF551)
 SIO_WRITE    = $50      ;write sector
 SIO_READ     = $52      ;read sector
 SIO_STAT     = $53      ;get status information
-SIO_VERIFY   = $56      ;verify sector 
+SIO_VERIFY   = $56      ;verify sector
 SIO_WRITEV   = $57      ;write sector with verify
 SIO_WRITETRK = $60      ;write track (Speedy)
 SIO_READTRK  = $62      ;read track (Speedy)
@@ -689,7 +689,7 @@ CASFLG  = $030F         ;CASSETTE MODE WHEN SET
 TIMER2  = $0310         ;2-byte final baud rate timer value
 TEMP1   = $0312         ;TEMPORARY STORAGE REGISTER
 ;TEMP2  = $0314         ;##old## TEMPORARY STORAGE REGISTER
-TEMP2   = $0313         ;##1200xl## 1-byte temporary 
+TEMP2   = $0313         ;##1200xl## 1-byte temporary
 PTIMOT  = $0314         ;##1200xl## 1-byte printer timeout
 TEMP3   = $0315         ;TEMPORARY STORAGE REGISTER
 SAVIO   = $0316         ;SAVE SERIAL IN DATA PORT
@@ -765,7 +765,7 @@ CART    = $BFFC         ;##rev2## 1-byte cartridge present indicator
                         ;0=Cart Exists
 CARTFG  = $BFFD         ;##rev2## 1-byte cartridge flags
                         ;D7  0=Not a Diagnostic Cart
-                        ;    1=Is a Diagnostic cart and control is 
+                        ;    1=Is a Diagnostic cart and control is
                         ;      given to cart before any OS is init.
                         ;D2  0=Init but Do not Start Cart
                         ;    1=Init and Start Cart
@@ -925,7 +925,7 @@ RADON   = 0             ;INDICATES RADIANS
 DEGON   = 6             ;INDICATES DEGREES
 
 ASCZER  = '0'           ;ASCII ZERO
-COLON   = $3A           ;ASCII COLON 
+COLON   = $3A           ;ASCII COLON
 CR      = $9B           ;SYSTEM EOL (CARRIAGE RETURN)
 
 ;-------------------------------------------------------------------------
@@ -997,12 +997,30 @@ diopp_size   = 5        ; size of structure
 ; VALUES for dos_type
 ;-------------------------------------------------------------------------
 
-ATARIDOS     = 0
-SPARTADOS    = 1
-OSADOS       = 2        ; OS/A+
-MYDOS        = 3
-XDOS         = 4
+SPARTADOS    = 0
+OSADOS       = 1        ; OS/A+
+XDOS         = 2
+ATARIDOS     = 3
+MYDOS        = 4
 NODOS        = 255
+; The DOSes with dos_type below or equal MAX_DOS_WITH_CMDLINE do support
+; command line arguments.
+MAX_DOS_WITH_CMDLINE = XDOS
+
+;-------------------------------------------------------------------------
+; XDOS defines (version 2.4, taken from xdos24.pdf)
+;-------------------------------------------------------------------------
+
+XOPT         = $070B    ; XDOS options
+XCAR         = $070C    ; XDOS cartridge address (+ $70D)
+XPAT         = $086F    ; XDOS bugfix and patch number
+XVER         = $0870    ; XDOS version number
+XFILE        = $087D    ; XDOS filename buffer
+XLINE        = $0880    ; XDOS DUP input line
+XGLIN        = $0871    ; get line
+XSKIP        = $0874    ; skip parameter
+XMOVE        = $0877    ; move filename
+XGNUM        = $087A    ; get number
 
 ;-------------------------------------------------------------------------
 ; End of atari.inc

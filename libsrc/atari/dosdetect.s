@@ -50,4 +50,4 @@ done:   rts
 
         .data
 
-__dos_type:     .byte   0       ; default to ATARIDOS
+__dos_type:     .byte   ATARIDOS; default to ATARIDOS

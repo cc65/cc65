@@ -261,11 +261,11 @@ extern void atrx15p2_tgi[];
 #define AT_PAL      1
 
 /* valid _dos_type values */
-#define ATARIDOS    0
-#define SPARTADOS   1
-#define OSADOS      2
-#define MYDOS       3
-#define XDOS        4
+#define SPARTADOS   0
+#define OSADOS      1
+#define XDOS        2
+#define ATARIDOS    3
+#define MYDOS       4
 #define NODOS       255
 
 /* Define hardware */

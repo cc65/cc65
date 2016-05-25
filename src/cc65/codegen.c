@@ -55,6 +55,7 @@
 #include "global.h"
 #include "segments.h"
 #include "stackptr.h"
+#include "stdfunc.h"
 #include "textseg.h"
 #include "util.h"
 #include "codegen.h"
@@ -4241,7 +4242,7 @@ void g_initauto (unsigned Label, unsigned Size)
         AddCodeLine ("lda %s,y", GetLabelName (CF_STATIC, Label, 0));
         AddCodeLine ("sta (sp),y");
         AddCodeLine ("iny");
-        AddCodeLine ("cpy #$%02X", (unsigned char) Size);
+	AddCmpCodeIfSizeNot256 ("cpy #$%02X", Size);
         AddCodeLine ("bne %s", LocalLabelName (CodeLabel));
     }
 }
@@ -4266,10 +4267,10 @@ void g_initstatic (unsigned InitLabel, unsigned VarLabel, unsigned Size)
         AddCodeLine ("lda %s,y", GetLabelName (CF_STATIC, InitLabel, 0));
         AddCodeLine ("sta %s,y", GetLabelName (CF_STATIC, VarLabel, 0));
         AddCodeLine ("iny");
-        AddCodeLine ("cpy #$%02X", (unsigned char) Size);
+	AddCmpCodeIfSizeNot256 ("cpy #$%02X", Size);
         AddCodeLine ("bne %s", LocalLabelName (CodeLabel));
     } else {
-        /* Use the easy way here: memcpy */
+        /* Use the easy way here: memcpy() */
         g_getimmed (CF_STATIC, VarLabel, 0);
         AddCodeLine ("jsr pushax");
         g_getimmed (CF_STATIC, InitLabel, 0);

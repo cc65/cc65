@@ -45,7 +45,7 @@ int main(int argc, char **argv)
 
     if (! iocb) {
         fprintf(stderr, "couldn't find a free iocb\n");
-        if (_dos_type != 1)
+        if (! _is_cmdline_dos())
             cgetc();
         return 1;
     }
@@ -57,10 +57,20 @@ int main(int argc, char **argv)
         printf("\nfilename: ");
         x = fgets(buf, 19, stdin);
         printf("\n");
-        if (! x)
+        if (! x) {
+            printf("empty filename, exiting...\n");
+            if (! _is_cmdline_dos())
+                cgetc();
             return 1;
+        }
         if (*x && *(x + strlen(x) - 1) == '\n')
             *(x + strlen(x) - 1) = 0;
+        if (! strlen(x)) {  /* empty filename */
+            printf("empty filename, exiting...\n");
+            if (! _is_cmdline_dos())
+                cgetc();
+            return 1;
+        }
         filename = x;
     }
     else {
@@ -74,7 +84,7 @@ int main(int argc, char **argv)
         buffer = malloc(buflen);
         if (! buffer) {
             fprintf(stderr, "cannot alloc %ld bytes -- aborting...\n", (long)buflen);
-            if (_dos_type != 1)
+            if (! _is_cmdline_dos())
                 cgetc();
             return 1;
         }
@@ -87,7 +97,7 @@ int main(int argc, char **argv)
     if (! file) {
         free(buffer);
         fprintf(stderr, "cannot open '%s': %s\n", filename, strerror(errno));
-        if (_dos_type != 1)
+        if (! _is_cmdline_dos())
             cgetc();
         return 1;
     }
@@ -101,7 +111,7 @@ int main(int argc, char **argv)
     file_err:
         fclose(file);
         free(buffer);
-        if (_dos_type != 1)
+        if (! _is_cmdline_dos())
             cgetc();
         return 1;
     }
@@ -133,7 +143,7 @@ int main(int argc, char **argv)
     if (regs.y != 1) {
         fprintf(stderr, "CIO call to open cassette returned %d\n", regs.y);
         free(buffer);
-        if (_dos_type != 1)
+        if (! _is_cmdline_dos())
             cgetc();
         return 1;
     }
@@ -157,7 +167,7 @@ int main(int argc, char **argv)
         regs.pc = 0xe456;   /* CIOV */
         _sys(&regs);
 
-        if (_dos_type != 1)
+        if (! _is_cmdline_dos())
             cgetc();
         return 1;
     }
@@ -173,14 +183,14 @@ int main(int argc, char **argv)
 
     if (regs.y != 1) {
         fprintf(stderr, "CIO call to close cassette returned %d\n", regs.y);
-        if (_dos_type != 1)
+        if (! _is_cmdline_dos())
             cgetc();
         return 1;
     }
 
     /* all is fine */
     printf("success\n");
-    if (_dos_type != 1)
+    if (! _is_cmdline_dos())
         cgetc();
     return 0;
 }

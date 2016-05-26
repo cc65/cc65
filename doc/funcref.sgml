@@ -98,6 +98,7 @@ function.
 <!-- <item><ref id="_getcolor" name="_getcolor"> -->
 <!-- <item><ref id="_getdefdev" name="_getdefdev"> -->
 <!-- <item><ref id="_graphics" name="_graphics"> -->
+<item><ref id="_is_cmdline_dos" name="_is_cmdline_dos">
 <!-- <item><ref id="_rest_vecs" name="_rest_vecs"> -->
 <!-- <item><ref id="_save_vecs" name="_save_vecs"> -->
 <!-- <item><ref id="_scroll" name="_scroll"> -->
@@ -935,6 +936,40 @@ id="malloc" name="malloc"> may still return <tt/NULL/.
 <ref id="malloc" name="malloc">,
 <ref id="realloc" name="realloc">
 <tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>_is_cmdline_dos<label id="_is_cmdline_dos"><p>
+
+<quote>
+<descrip>
+<tag/Function/Determines whether the underlying DOS supports command line arguments.
+<tag/Header/<tt/<ref id="atari.h" name="atari.h">/
+<tag/Declaration/<tt/unsigned char _is_cmdline_dos (void);/
+<tag/Description/The function returns 0 if the DOS doesn't support command line arguments.
+It returns 1 if it does.
+<tag/Notes/<itemize>
+<item>Many Atari DOSes which don't support command line arguments immediately clear the screen
+and display their menu after a program exits. Therefore it might be difficult to read
+the last messages printed by the program prior to its exit. This function can be used
+to decide if a delay or wait for a key press should be executed when then program
+exits.
+</itemize>
+<tag/Availability/cc65 (<tt/atari/ and <tt/atarixl/ platforms)
+<tag/Example/<verb>
+/* Hello World for Atari */
+#include <stdio.h>
+#include <unistd.h>
+#include <atari.h>
+int main(void)
+{
+    printf("Hello World\n");
+    if (! _is_cmdline_dos())
+        sleep(5);
+    return 0;
+}
+</verb>
 </descrip>
 </quote>
 

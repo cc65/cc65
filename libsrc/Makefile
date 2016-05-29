@@ -78,11 +78,8 @@ all lib: $(TARGETS)
 mostlyclean:
 	$(call RMDIR,../libwrk)
 
-# Transitional line active. Final line commented out below in order to
-# allow some time for transition between the directory structures
 clean:
-	$(call RMDIR,../libwrk ../lib ../targetutil ../target $(addprefix ../,$(DRVTYPES)))
-# 	$(call RMDIR,../libwrk ../lib ../target)
+	$(call RMDIR,../libwrk ../lib ../target)
 
 ifdef CMD_EXE
 
@@ -102,7 +99,6 @@ endef # INSTALL_recipe
 
 install:
 	$(foreach dir,$(OUTPUTDIRS),$(INSTALL_recipe))
-
 
 endif # CMD_EXE
 

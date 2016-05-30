@@ -230,8 +230,8 @@ source: jsr     $BF00
         ; Check for startup filename support
         ; ProDOS TechRefMan, chapter 5.1.5.1:
         ; "$2000 is a jump instruction. $2003 and $2004 are $EE."
-system: lda     $2000
-        cmp     #$4C
+system: lda     #$4C
+        cmp     $2000
         bne     jump
         lda     #$EE
         cmp     $2003

@@ -42,7 +42,6 @@ OUTPUTDIRS := lib                 \
               asminc              \
               cfg                 \
               include             \
-              samples             \
               $(subst ../,,$(filter-out $(wildcard ../include/*.*),$(wildcard ../include/*)))\
               $(subst ../,,$(wildcard ../target/*/drv/*))\
               $(subst ../,,$(wildcard ../target/*/util))\

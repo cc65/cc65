@@ -233,11 +233,10 @@ source: jsr     $BF00
 system: lda     $2000
         cmp     #$4C
         bne     jump
-        lda     $2003
-        cmp     #$EE
+        lda     #$EE
+        cmp     $2003
         bne     jump
-        lda     $2004
-        cmp     #$EE
+        cmp     $2004
         bne     jump
 
         ; Store cmdline in startup filename buffer

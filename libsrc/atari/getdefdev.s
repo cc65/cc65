@@ -84,7 +84,7 @@ xdos:   lda     XDEFDEV
 
         .data
 
-crvec:	.byte	$4C,$FF,$FF     ; will be set to crunch vector
+crvec:  jmp     $FFFF           ; target address will be set to crunch vector
 
 ; Default device
 

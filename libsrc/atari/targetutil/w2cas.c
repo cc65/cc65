@@ -32,6 +32,13 @@ static struct __iocb *findfreeiocb(void)
     return NULL;
 }
 
+static void exitfn(void)
+{
+    /* if DOS will automatically clear the screen, after the program exits, wait for a keypress... */
+    if (! _is_cmdline_dos())
+        cgetc();
+}
+
 int main(int argc, char **argv)
 {
     char *filename, *x;
@@ -43,10 +50,10 @@ int main(int argc, char **argv)
     struct __iocb *iocb = findfreeiocb();
     int iocb_num;
 
+    atexit(exitfn);
+
     if (! iocb) {
         fprintf(stderr, "couldn't find a free iocb\n");
-        if (! _is_cmdline_dos())
-            cgetc();
         return 1;
     }
     iocb_num = (iocb - &IOCB) * 16;
@@ -59,16 +66,12 @@ int main(int argc, char **argv)
         printf("\n");
         if (! x) {
             printf("empty filename, exiting...\n");
-            if (! _is_cmdline_dos())
-                cgetc();
             return 1;
         }
         if (*x && *(x + strlen(x) - 1) == '\n')
             *(x + strlen(x) - 1) = 0;
         if (! strlen(x)) {  /* empty filename */
             printf("empty filename, exiting...\n");
-            if (! _is_cmdline_dos())
-                cgetc();
             return 1;
         }
         filename = x;
@@ -84,8 +87,6 @@ int main(int argc, char **argv)
         buffer = malloc(buflen);
         if (! buffer) {
             fprintf(stderr, "cannot alloc %ld bytes -- aborting...\n", (long)buflen);
-            if (! _is_cmdline_dos())
-                cgetc();
             return 1;
         }
     }
@@ -97,8 +98,6 @@ int main(int argc, char **argv)
     if (! file) {
         free(buffer);
         fprintf(stderr, "cannot open '%s': %s\n", filename, strerror(errno));
-        if (! _is_cmdline_dos())
-            cgetc();
         return 1;
     }
 
@@ -111,8 +110,6 @@ int main(int argc, char **argv)
     file_err:
         fclose(file);
         free(buffer);
-        if (! _is_cmdline_dos())
-            cgetc();
         return 1;
     }
     if (filen > 32767l) {
@@ -143,8 +140,6 @@ int main(int argc, char **argv)
     if (regs.y != 1) {
         fprintf(stderr, "CIO call to open cassette returned %d\n", regs.y);
         free(buffer);
-        if (! _is_cmdline_dos())
-            cgetc();
         return 1;
     }
 
@@ -167,8 +162,6 @@ int main(int argc, char **argv)
         regs.pc = 0xe456;   /* CIOV */
         _sys(&regs);
 
-        if (! _is_cmdline_dos())
-            cgetc();
         return 1;
     }
 
@@ -183,14 +176,10 @@ int main(int argc, char **argv)
 
     if (regs.y != 1) {
         fprintf(stderr, "CIO call to close cassette returned %d\n", regs.y);
-        if (! _is_cmdline_dos())
-            cgetc();
         return 1;
     }
 
     /* all is fine */
     printf("success\n");
-    if (! _is_cmdline_dos())
-        cgetc();
     return 0;
 }

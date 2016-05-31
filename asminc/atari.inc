@@ -1021,6 +1021,7 @@ XGLIN        = $0871    ; get line
 XSKIP        = $0874    ; skip parameter
 XMOVE        = $0877    ; move filename
 XGNUM        = $087A    ; get number
+XDEFDEV      = $0816    ; current drive * undocumented *
 
 ;-------------------------------------------------------------------------
 ; End of atari.inc

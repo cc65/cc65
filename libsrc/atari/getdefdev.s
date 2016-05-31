@@ -60,7 +60,7 @@ __getdefdev:
         lda     (DOSVEC),y
         sta     crvec+2
 
-crvec:  jsr     $FFFF           ; will be set to crunch vector
+        jsr     crvec
 
 ; Get default device
 
@@ -83,6 +83,8 @@ xdos:   lda     XDEFDEV
         bne     done
 
         .data
+
+crvec:	.byte	$4C,$FF,$FF     ; will be set to crunch vector
 
 ; Default device
 

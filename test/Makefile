@@ -25,7 +25,7 @@ WORKDIR := ../testwrk
 
 CC := gcc
 
-.PHONY: all dotests continue mostly-clean clean
+.PHONY: all dotests continue mostlyclean clean
 
 all: dotests
 
@@ -37,7 +37,7 @@ $(WORKDIR)/bdiff$(EXE): bdiff.c | $(WORKDIR)
 
 .NOTPARALLEL:
 
-dotests: mostly-clean continue
+dotests: mostlyclean continue
 
 continue: $(WORKDIR)/bdiff$(EXE)
 	@$(MAKE) -C val all
@@ -45,12 +45,12 @@ continue: $(WORKDIR)/bdiff$(EXE)
 	@$(MAKE) -C err all
 	@$(MAKE) -C misc all
 
-mostly-clean:
+mostlyclean:
 	@$(MAKE) -C val clean
 	@$(MAKE) -C ref clean
 	@$(MAKE) -C err clean
 	@$(MAKE) -C misc clean
 
-clean: mostly-clean
+clean: mostlyclean
 	@$(call DEL,$(WORKDIR)/bdiff$(EXE))
 	@$(call RMDIR,$(WORKDIR))

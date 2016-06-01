@@ -87,18 +87,16 @@ LDFLAGS_tgidemo_atari = -D __RESERVED_MEMORY__=0x2000
 %: %.s
 
 .c.o:
-	@echo $<
-	@$(CC) $(CFLAGS) -Oirs --codesize 500 -T -g -t $(SYS) $<
-	@$(AS) $(<:.c=.s)
+	$(CC) $(CFLAGS) -Oirs --codesize 500 -T -g -t $(SYS) $<
+	$(AS) $(<:.c=.s)
 
 .s.o:
-	@echo $<
-	@$(AS) $(AFLAGS) -t $(SYS) $<
+	$(AS) $(AFLAGS) -t $(SYS) $<
 
 .PRECIOUS: %.o
 
 .o:
-	@$(LD) $(LDFLAGS_$(@F)_$(SYS)) -o $@ -t $(SYS) -m $@.map $^ $(CLIB)
+	$(LD) $(LDFLAGS_$(@F)_$(SYS)) -o $@ -t $(SYS) -m $@.map $^ $(CLIB)
 
 # --------------------------------------------------------------------------
 # List of executables. This list could be made target-dependent by checking
@@ -131,10 +129,10 @@ samples: $(EXELIST)
 # overlay file-names are shortenned to fit the Atari's 8.3-character limit.
 
 multdemo: multidemo.o
-	@$(LD) -o $@ -C $(SYS)-overlay.cfg -m $@.map $^ $(CLIB)
+	$(LD) -o $@ -C $(SYS)-overlay.cfg -m $@.map $^ $(CLIB)
 
 ovrldemo: overlaydemo.o
-	@$(LD) -o $@ -C $(SYS)-overlay.cfg -m $@.map $^ $(CLIB)
+	$(LD) -o $@ -C $(SYS)-overlay.cfg -m $@.map $^ $(CLIB)
 
 # --------------------------------------------------------------------------
 # Rule to make a CBM disk with all samples. Needs the c1541 program that comes

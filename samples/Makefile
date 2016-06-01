@@ -171,7 +171,7 @@ mostlyclean:
 
 .PHONY:	clean
 clean:
-	$(RM) *~ *.map *.o *.s *.lbl
+	$(RM) *.map *.o *.s *.lbl
 
 .PHONY:	zap
 zap:	clean

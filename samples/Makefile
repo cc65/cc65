@@ -56,7 +56,7 @@ LD   = ../bin/ld65
 endif
 
 # This one comes with VICE
-C1541 = c1541
+C1541 ?= c1541
 
 # --------------------------------------------------------------------------
 # System-dependent settings

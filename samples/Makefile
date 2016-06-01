@@ -12,16 +12,19 @@ SYS	= c64
 # source tree; otherwise, use the "install" directories.
 ifeq "$(wildcard ../src)" ""
 # No source tree
-MOUS = /usr/lib/cc65/mou/$(SYS)*.mou
-TGI  = /usr/lib/cc65/tgi/$(SYS)*.tgi
+installdir = /usr/lib/cc65
 ifneq "$(wildcard /usr/local/lib/cc65)" ""
-MOUS = /usr/local/lib/cc65/mou/$(SYS)*.mou
-TGI  = /usr/local/lib/cc65/tgi/$(SYS)*.tgi
+installdir = /usr/local/lib/cc65
+endif
+ifneq "$(wildcard /opt/local/share/cc65)" ""
+installdir = /opt/local/share/cc65
 endif
 ifdef CC65_HOME
-MOUS = $(CC65_HOME)/mou/$(SYS)*.mou
-TGI  = $(CC65_HOME)/tgi/$(SYS)*.tgi
+installdir = $(CC65_HOME)
 endif
+
+MOUS = $(installdir)/target/$(SYS)/drv/mou/$(SYS)*.mou
+TGI  = $(installdir)/target/$(SYS)/drv/tgi/$(SYS)*.tgi
 CLIB = --lib $(SYS).lib
 CL   = cl65
 CC   = cc65
@@ -31,8 +34,8 @@ LD   = ld65
 else
 # "samples/" is a part of a complete source tree.
 export CC65_HOME := $(abspath ..)
-MOUS = ../mou/$(SYS)*.mou
-TGI  = ../tgi/$(SYS)*.tgi
+MOUS = ../target/$(SYS)/drv/mou/$(SYS)*.mou
+TGI  = ../target/$(SYS)/drv/tgi/$(SYS)*.tgi
 CLIB = ../lib/$(SYS).lib
 CL   = ../bin/cl65
 CC   = ../bin/cc65
@@ -105,8 +108,11 @@ EXELIST	=	ascii		\
 # --------------------------------------------------------------------------
 # Rules to make the binaries
 
-.PHONY:	all
-all:	$(EXELIST)
+.PHONY: all samples
+all:
+
+samples:
+	$(EXELIST)
 
 # --------------------------------------------------------------------------
 # Overlay rules. Overlays need special ld65 configuration files.  Also, the
@@ -135,7 +141,34 @@ samples.d64:	all
 	done
 
 # --------------------------------------------------------------------------
+# Installation rules
+
+INSTALL = install
+samplesdir = $(prefix)/share/cc65
+.PHONY:	install
+install:
+	$(if $(prefix),,$(error variable `prefix' must be set))
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/geos
+	$(INSTALL) -d $$(DESTDIR)$(samplesdir)/tutorial
+	$(INSTALL) -m0644 *.* $(DESTDIR)$(samplesdir)
+	$(INSTALL) -m0644 README $(DESTDIR)$(samplesdir)
+	$(INSTALL) -m0644 Makefile $(DESTDIR)$(samplesdir)
+	$(INSTALL) -m0644 geos/*.* $(DESTDIR)$(samplesdir)/geos
+	$(INSTALL) -m0644 tutorial/*.* $(DESTDIR)$(samplesdir)/tutorial
+
+# --------------------------------------------------------------------------
+# Packaging rules
+
+.PHONY:	zip
+zip:
+	@cd .. && zip -r cc65 samples/
+
+# --------------------------------------------------------------------------
 # Clean-up rules
+
+.PHONY:	mostlyclean
+mostlyclean:
 
 .PHONY:	clean
 clean:

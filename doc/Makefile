@@ -33,15 +33,17 @@ install:
 	$(if $(prefix),,$(error variable `prefix' must be set))
 ifeq ($(wildcard ../html),../html)
 	$(INSTALL) -d $(DESTDIR)$(htmldir)
-	$(INSTALL) -m644 ../html/*.* $(DESTDIR)$(htmldir)
+	$(INSTALL) -m0644 ../html/*.* $(DESTDIR)$(htmldir)
 endif
 ifeq ($(wildcard ../info),../info)
 	$(INSTALL) -d $(DESTDIR)$(infodir)
-	$(INSTALL) -m644 ../info/*.* $(DESTDIR)$(infodir)
+	$(INSTALL) -m0644 ../info/*.* $(DESTDIR)$(infodir)
 endif
 
 zip:
+ifneq "$(wildcard ../html)" ""
 	@cd .. && zip cc65 html/*.*
+endif
 
 doc: html info
 

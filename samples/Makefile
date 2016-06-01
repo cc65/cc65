@@ -127,8 +127,8 @@ ovrldemo:	overlaydemo.o
 # Rule to make a CBM disk with all samples. Needs the c1541 program that comes
 # with the VICE emulator.
 
-.PHONY:	disk
-disk:	samples.d64
+.PHONY:	d64
+d64:	samples.d64
 
 samples.d64:	samples
 	@$(C1541) -format samples,AA  d64 $@ > /dev/null

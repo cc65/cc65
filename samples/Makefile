@@ -69,6 +69,8 @@ LDFLAGS_tgidemo_atari = -D __RESERVED_MEMORY__=0x2000
 # --------------------------------------------------------------------------
 # Generic rules
 
+.PHONY: all mostlyclean clean install zip samples d64 zap
+
 %: %.c
 %: %.s
 
@@ -108,7 +110,6 @@ EXELIST = ascii      \
 # --------------------------------------------------------------------------
 # Rules to make the binaries
 
-.PHONY: all samples
 all:
 
 samples: $(EXELIST)
@@ -127,7 +128,6 @@ ovrldemo: overlaydemo.o
 # Rule to make a CBM disk with all samples. Needs the c1541 program that comes
 # with the VICE emulator.
 
-.PHONY: d64
 d64: samples.d64
 
 samples.d64: samples
@@ -144,7 +144,7 @@ samples.d64: samples
 
 INSTALL = install
 samplesdir = $(prefix)/share/cc65
-.PHONY: install
+
 install:
 	$(if $(prefix),,$(error variable `prefix' must be set))
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)
@@ -159,21 +159,17 @@ install:
 # --------------------------------------------------------------------------
 # Packaging rules
 
-.PHONY: zip
 zip:
 	@cd .. && zip -r cc65 samples/
 
 # --------------------------------------------------------------------------
 # Clean-up rules
 
-.PHONY:	mostlyclean
 mostlyclean:
 
-.PHONY: clean
 clean:
 	$(RM) *.map *.o *.s *.lbl
 
-.PHONY: zap
 zap: clean
 	$(RM) $(EXELIST) samples.d64
 	$(RM) multdemo.? ovrldemo.?

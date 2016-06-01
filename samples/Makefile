@@ -7,6 +7,18 @@
 # Enter the target system here
 SYS = c64
 
+ifneq ($(shell echo),)
+  CMD_EXE = 1
+endif
+
+ifdef CMD_EXE
+  NULLDEV = nul:
+  DEL = -del /f
+else
+  NULLDEV = /dev/null
+  DEL = $(RM)
+endif
+
 # Determine the path to the executables and libraries. If the samples
 # directory is part of a complete source tree, use the stuff from that
 # source tree; otherwise, use the "install" directories.
@@ -131,12 +143,12 @@ ovrldemo: overlaydemo.o
 d64: samples.d64
 
 samples.d64: samples
-	@$(C1541) -format samples,AA  d64 $@ > /dev/null
+	@$(C1541) -format samples,AA  d64 $@ >$(NULLDEV)
 	@for exe in $(EXELIST); do\
-	    $(C1541) -attach $@ -write $$exe > /dev/null || exit $$?;\
+	    $(C1541) -attach $@ -write $$exe >$(NULLDEV) || exit $$?;\
 	done
 	@for mod in $(TGI) $(MOUS); do\
-	    $(C1541) -attach $@ -write $$mod > /dev/null || exit $$?;\
+	    $(C1541) -attach $@ -write $$mod >$(NULLDEV) || exit $$?;\
 	done
 
 # --------------------------------------------------------------------------
@@ -168,8 +180,8 @@ zip:
 mostlyclean:
 
 clean:
-	$(RM) *.map *.o *.s *.lbl
+	@$(DEL) *.map *.o *.s *.lbl 2>$(NULLDEV)
 
 zap: clean
-	$(RM) $(EXELIST) samples.d64
-	$(RM) multdemo.? ovrldemo.?
+	@$(DEL) $(EXELIST) samples.d64 2>$(NULLDEV)
+	@$(DEL) multdemo.? ovrldemo.? 2>$(NULLDEV)

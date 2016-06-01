@@ -35,8 +35,8 @@ ifdef CC65_HOME
 installdir = $(CC65_HOME)
 endif
 
-MOUS = $(installdir)/target/$(SYS)/drv/mou/$(SYS)*.mou
-TGI  = $(installdir)/target/$(SYS)/drv/tgi/$(SYS)*.tgi
+MOUS := $(wildcard $(installdir)/target/$(SYS)/drv/mou/$(SYS)*.mou)
+TGI  := $(wildcard $(installdir)/target/$(SYS)/drv/tgi/$(SYS)*.tgi)
 CLIB = --lib $(SYS).lib
 CL   = cl65
 CC   = cc65
@@ -46,8 +46,8 @@ LD   = ld65
 else
 # "samples/" is a part of a complete source tree.
 export CC65_HOME := $(abspath ..)
-MOUS = ../target/$(SYS)/drv/mou/$(SYS)*.mou
-TGI  = ../target/$(SYS)/drv/tgi/$(SYS)*.tgi
+MOUS := $(wildcard ../target/$(SYS)/drv/mou/$(SYS)*.mou)
+TGI  := $(wildcard ../target/$(SYS)/drv/tgi/$(SYS)*.tgi)
 CLIB = ../lib/$(SYS).lib
 CL   = ../bin/cl65
 CC   = ../bin/cc65
@@ -140,14 +140,16 @@ ovrldemo: overlaydemo.o
 
 d64: samples.d64
 
+define D64_WRITE_recipe
+
+$(C1541) -attach $@ -write $(file) $(notdir $(file)) >$(NULLDEV)
+
+endef # D64_WRITE_recipe
+
 samples.d64: samples
 	@$(C1541) -format samples,AA  d64 $@ >$(NULLDEV)
-	@for exe in $(EXELIST); do\
-	    $(C1541) -attach $@ -write $$exe >$(NULLDEV) || exit $$?;\
-	done
-	@for mod in $(TGI) $(MOUS); do\
-	    $(C1541) -attach $@ -write $$mod >$(NULLDEV) || exit $$?;\
-	done
+	$(foreach file,$(EXELIST),$(D64_WRITE_recipe))
+	$(foreach file,$(TGI) $(MOUS),$(D64_WRITE_recipe))
 
 # --------------------------------------------------------------------------
 # Installation rules

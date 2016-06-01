@@ -81,7 +81,7 @@ LDFLAGS_tgidemo_atari = -D __RESERVED_MEMORY__=0x2000
 # --------------------------------------------------------------------------
 # Generic rules
 
-.PHONY: all mostlyclean clean install zip samples d64 zap
+.PHONY: all mostlyclean clean install zip samples d64
 
 %: %.c
 %: %.s
@@ -178,10 +178,8 @@ zip:
 # Clean-up rules
 
 mostlyclean:
-
-clean:
 	@$(DEL) *.map *.o *.s *.lbl 2>$(NULLDEV)
 
-zap: clean
+clean: mostlyclean
 	@$(DEL) $(EXELIST) samples.d64 2>$(NULLDEV)
 	@$(DEL) multdemo.? ovrldemo.? 2>$(NULLDEV)

@@ -176,7 +176,7 @@ zip:
 # Clean-up rules
 
 mostlyclean:
-	@$(DEL) *.map *.o *.s *.lbl 2>$(NULLDEV)
+	@$(DEL) *.map *.o *.s 2>$(NULLDEV)
 
 clean: mostlyclean
 	@$(DEL) $(EXELIST) samples.d64 2>$(NULLDEV)

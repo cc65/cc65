@@ -111,8 +111,7 @@ EXELIST	=	ascii		\
 .PHONY: all samples
 all:
 
-samples:
-	$(EXELIST)
+samples:	$(EXELIST)
 
 # --------------------------------------------------------------------------
 # Overlay rules. Overlays need special ld65 configuration files.  Also, the
@@ -131,7 +130,7 @@ ovrldemo:	overlaydemo.o
 .PHONY:	disk
 disk:	samples.d64
 
-samples.d64:	all
+samples.d64:	samples
 	@$(C1541) -format samples,AA  d64 $@ > /dev/null
 	@for exe in $(EXELIST); do\
 	    $(C1541) -attach $@ -write $$exe > /dev/null || exit $$?;\

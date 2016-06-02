@@ -134,6 +134,8 @@ multdemo: multidemo.o
 ovrldemo: overlaydemo.o
 	$(LD) -o $@ -C $(SYS)-overlay.cfg -m $@.map $^ $(CLIB)
 
+OVERLAYLIST := $(foreach I,1 2 3,multdemo.$I ovrldemo.$I)
+
 # --------------------------------------------------------------------------
 # Rule to make a CBM disk with all samples. Needs the c1541 program that comes
 # with the VICE emulator.
@@ -149,6 +151,7 @@ endef # D64_WRITE_recipe
 samples.d64: samples
 	@$(C1541) -format samples,AA  d64 $@ >$(NULLDEV)
 	$(foreach file,$(EXELIST),$(D64_WRITE_recipe))
+	$(foreach file,$(OVERLAYLIST),$(D64_WRITE_recipe))
 	$(foreach file,$(TGI) $(MOUS),$(D64_WRITE_recipe))
 
 # --------------------------------------------------------------------------

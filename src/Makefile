@@ -24,6 +24,7 @@ datadir := $(if $(prefix),$(prefix)/share/cc65,$(abspath ..))
 
 CA65_INC = $(datadir)/asminc
 CC65_INC = $(datadir)/include
+CL65_TGT = $(datadir)/target
 LD65_LIB = $(datadir)/lib
 LD65_OBJ = $(datadir)/lib
 LD65_CFG = $(datadir)/cfg
@@ -63,8 +64,9 @@ endif
 
 CFLAGS += -MMD -MP -O -I common \
           -Wall -Wextra -Wno-char-subscripts $(USER_CFLAGS) \
-          -DGIT_SHA=$(GIT_SHA) -DCA65_INC=$(CA65_INC) -DCC65_INC=$(CC65_INC) \
+          -DCA65_INC=$(CA65_INC) -DCC65_INC=$(CC65_INC) -DCL65_TGT=$(CL65_TGT) \
           -DLD65_LIB=$(LD65_LIB) -DLD65_OBJ=$(LD65_OBJ) -DLD65_CFG=$(LD65_CFG)
+          -DGIT_SHA=$(GIT_SHA)
 
 LDLIBS += -lm
 

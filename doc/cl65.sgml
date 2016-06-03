@@ -159,7 +159,7 @@ There are a few remaining options that control the behaviour of cl65:
 
   This option prints the absolute path of the target file directory and exits
   then. It is supposed to be used with shell backquotes or the GNU make shell
-  function This way you can write build scripts or Makefiles accessing target
+  function. This way you can write build scripts or Makefiles accessing target
   files without any assumption about the cc65 installation path.
 
 

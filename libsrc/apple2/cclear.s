@@ -6,12 +6,11 @@
 ;
 
         .export         _cclearxy, _cclear
-        .import         popa, _gotoxy, chlinedirect
+        .import         gotoxy, chlinedirect
 
 _cclearxy:
         pha                     ; Save the length
-        jsr     popa            ; Get y
-        jsr     _gotoxy         ; Call this one, will pop params
+        jsr     gotoxy          ; Call this one, will pop params
         pla                     ; Restore the length and run into _cclear
 
 _cclear:

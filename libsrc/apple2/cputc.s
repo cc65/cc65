@@ -10,7 +10,7 @@
         .endif
         .export         _cputcxy, _cputc
         .export         cputdirect, newline, putchar
-        .import         popa, _gotoxy, VTABZ
+        .import         gotoxy, VTABZ
 
         .include        "apple2.inc"
 
@@ -29,9 +29,8 @@ initconio:
 
 _cputcxy:
         pha                     ; Save C
-        jsr     popa            ; Get Y
-        jsr     _gotoxy
-        pla                     ; Restore C
+        jsr     gotoxy          ; Call this one, will pop params
+        pla                     ; Restore C and run into _cputc
 
 _cputc:
         cmp     #$0D            ; Test for \r = carrage return

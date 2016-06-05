@@ -10,7 +10,7 @@
 
         .export         _cputcxy, _cputc
         .export         plot, cputdirect, putchar
-        .import         popa, _gotoxy, mul20
+        .import         gotoxy, mul20
         .importzp       ptr4
         .import         setcursor
 
@@ -21,8 +21,7 @@ screen_setup    = screen_setup_20x24
 
 _cputcxy:
         pha                     ; Save C
-        jsr     popa            ; Get Y
-        jsr     _gotoxy         ; Set cursor, drop x
+        jsr      gotoxy         ; Set cursor, drop x and y
         pla                     ; Restore C
 
 _cputc:

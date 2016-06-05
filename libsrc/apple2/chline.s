@@ -6,15 +6,14 @@
 ;
 
         .export         _chlinexy, _chline, chlinedirect
-        .import         popa, _gotoxy, cputdirect
+        .import         gotoxy, cputdirect
 
         .include        "zeropage.inc"
         .include        "apple2.inc"
 
 _chlinexy:
         pha                     ; Save the length
-        jsr     popa            ; Get y
-        jsr     _gotoxy         ; Call this one, will pop params
+        jsr     gotoxy          ; Call this one, will pop params
         pla                     ; Restore the length and run into _chline
 
 _chline:

@@ -93,8 +93,10 @@ cont:   ldy     #3
 .ifdef  UCASE_FILENAME
 .ifdef  DEFAULT_DEVICE
         ldy     #$80
-        sty     tmp2            ; set flag for ucase_fn
+.else
+        ldy     #$00
 .endif
+        sty     tmp2            ; set flag for ucase_fn
         jsr     ucase_fn
         bcc     ucok1
 invret: lda     #<EINVAL        ; file name is too long

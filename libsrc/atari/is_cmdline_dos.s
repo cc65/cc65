@@ -7,14 +7,9 @@
 ;
 
         .export  __is_cmdline_dos
-        .import  __dos_type
-        .include "atari.inc"
+        .import  _doesclrscrafterexit
 
 __is_cmdline_dos:
-        ldx     #0
-        lda     __dos_type
-        cmp     #MAX_DOS_WITH_CMDLINE + 1
-        txa
-        rol     a
-        eor     #$01
+        jsr     _doesclrscrafterexit    ; currently (unless a DOS behaving differently is popping up)
+        eor     #$01                    ; we can get by with the inverse of _doesclrscrafterexit
         rts

@@ -161,12 +161,13 @@ extern void __fastcall__ _scroll (signed char numlines);
                                           /* numlines < 0  scrolls down */
 
 /* misc. functions */
-extern unsigned char get_ostype(void);       /* get ROM version */
-extern unsigned char get_tv(void);           /* get TV system */
-extern void _save_vecs(void);                /* save system vectors */
-extern void _rest_vecs(void);                /* restore system vectors */
-extern char *_getdefdev(void);               /* get default floppy device */
-extern unsigned char _is_cmdline_dos(void);  /* does DOS support command lines */
+extern unsigned char get_ostype(void);            /* get ROM version */
+extern unsigned char get_tv(void);                /* get TV system */
+extern void _save_vecs(void);                     /* save system vectors */
+extern void _rest_vecs(void);                     /* restore system vectors */
+extern char *_getdefdev(void);                    /* get default floppy device */
+extern unsigned char _is_cmdline_dos(void);       /* does DOS support command lines */
+extern unsigned char doesclrscrafterexit (void);  /* will DOS clear the screen after program termination */
 
 /* global variables */
 extern unsigned char _dos_type;         /* the DOS flavour */

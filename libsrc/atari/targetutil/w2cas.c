@@ -35,7 +35,7 @@ static struct __iocb *findfreeiocb(void)
 static void exitfn(void)
 {
     /* if DOS will automatically clear the screen, after the program exits, wait for a keypress... */
-    if (! _is_cmdline_dos())
+    if (doesclrscrafterexit())
         cgetc();
 }
 

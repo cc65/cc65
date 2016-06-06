@@ -177,6 +177,9 @@ unsigned char get_ostype (void);
 void rebootafterexit (void);
 /* Reboot machine after program termination has completed. */
 
+unsigned char doesclrscrafterexit (void);
+/* Will the screen automatically be cleared after program termination. */
+
 #define ser_apple2_slot(num)  ser_ioctl (0, (void*) (num))
 /* Select a slot number from 1 to 7 prior to ser_open.
 ** The default slot number is 2.

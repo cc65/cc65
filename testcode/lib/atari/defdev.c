@@ -13,6 +13,6 @@ extern char _defdev[];
 int main(void)
 {
         printf("default device: %s\n", _defdev);
-        if (! _is_cmdline_dos()) cgetc();
+        if (doesclrscrafterexit()) cgetc();
         return 0;
 }

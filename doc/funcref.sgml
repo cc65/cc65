@@ -2572,7 +2572,7 @@ ldiv
 <quote>
 <descrip>
 <tag/Function/Determines whether the screen is going to be cleared after program exit.
-<tag/Header/<tt/<ref id="atari.h" name="atari.h">, <ref id="apple2.h" name="apple2.h">/
+<tag/Header/<tt/<ref id="cc65.h" name="cc65.h">/
 <tag/Declaration/<tt/unsigned char doesclrscrafterexit (void);/
 <tag/Description/The function returns zero if the screen won't be cleared immediately after
 program termination. It returns a non-zero value if it will.

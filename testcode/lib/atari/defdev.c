@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <conio.h>
 #include <atari.h>
+#include <cc65.h>
 
 extern char _defdev[];
 

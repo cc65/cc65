@@ -167,7 +167,6 @@ extern void _save_vecs(void);                     /* save system vectors */
 extern void _rest_vecs(void);                     /* restore system vectors */
 extern char *_getdefdev(void);                    /* get default floppy device */
 extern unsigned char _is_cmdline_dos(void);       /* does DOS support command lines */
-extern unsigned char doesclrscrafterexit (void);  /* will DOS clear the screen after program termination */
 
 /* global variables */
 extern unsigned char _dos_type;         /* the DOS flavour */

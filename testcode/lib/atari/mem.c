@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <conio.h>
 #include <atari.h>
+#include <cc65.h>
 
 extern int getsp(void);                         /* comes from ../getsp.s */
 

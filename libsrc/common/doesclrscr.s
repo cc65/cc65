@@ -6,9 +6,7 @@
 ; returns 0/1 if after program termination the screen isn't/is cleared
 ;
 
-        .export  _doesclrscrafterexit
+        .export _doesclrscrafterexit
+        .import return0 
 
-_doesclrscrafterexit:
-        ldx     #$00
-        txa
-        rts
+_doesclrscrafterexit = return0

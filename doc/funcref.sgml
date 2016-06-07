@@ -949,27 +949,7 @@ id="malloc" name="malloc"> may still return <tt/NULL/.
 <tag/Declaration/<tt/unsigned char _is_cmdline_dos (void);/
 <tag/Description/The function returns 0 if the DOS doesn't support command line arguments.
 It returns 1 if it does.
-<tag/Notes/<itemize>
-<item>Many Atari DOSes which don't support command line arguments immediately clear the screen
-and display their menu after a program exits. Therefore it might be difficult to read
-the last messages printed by the program prior to its exit. This function can be used
-to decide if a delay or wait for a key press should be executed when then program
-exits.
-</itemize>
 <tag/Availability/cc65 (<tt/atari/ and <tt/atarixl/ platforms)
-<tag/Example/<verb>
-/* Hello World for Atari */
-#include <stdio.h>
-#include <unistd.h>
-#include <atari.h>
-int main(void)
-{
-    printf("Hello World\n");
-    if (! _is_cmdline_dos())
-        sleep(5);
-    return 0;
-}
-</verb>
 </descrip>
 </quote>
 
@@ -2583,6 +2563,40 @@ be used in presence of a prototype.
 <tag/See also/
 ldiv
 <tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>doesclrscrafterexit<label id="doesclrscrafterexit"><p>
+
+<quote>
+<descrip>
+<tag/Function/Determines whether the screen is going to be cleared after program exit.
+<tag/Header/<tt/<ref id="cc65.h" name="cc65.h">/
+<tag/Declaration/<tt/unsigned char doesclrscrafterexit (void);/
+<tag/Description/The function returns zero if the screen won't be cleared immediately after
+program termination. It returns a non-zero value if it will.
+<tag/Notes/<itemize>
+<item>Some systems, maybe depending on configuration, immediately clear the screen
+after a program exits. Therefore it might be difficult to read
+the last messages printed by the program prior to its exit. This function can be used
+to decide if a delay or wait for a key press should be executed when then program
+exits.
+</itemize>
+<tag/Availability/cc65
+<tag/Example/<verb>
+/* Hello World */
+#include <stdio.h>
+#include <unistd.h>
+#include <cc65.h>
+int main(void)
+{
+    printf("Hello World\n");
+    if (doesclrscrafterexit())
+        sleep(5);
+    return 0;
+}
+</verb>
 </descrip>
 </quote>
 

@@ -14,6 +14,7 @@
 #include <errno.h>
 #include <6502.h>
 #include <atari.h>
+#include <cc65.h>
 #include <conio.h>
 
 static int verbose = 1;
@@ -32,13 +33,6 @@ static struct __iocb *findfreeiocb(void)
     return NULL;
 }
 
-static void exitfn(void)
-{
-    /* if DOS will automatically clear the screen, after the program exits, wait for a keypress... */
-    if (! _is_cmdline_dos())
-        cgetc();
-}
-
 int main(int argc, char **argv)
 {
     char *filename, *x;
@@ -50,7 +44,9 @@ int main(int argc, char **argv)
     struct __iocb *iocb = findfreeiocb();
     int iocb_num;
 
-    atexit(exitfn);
+    /* if DOS will automatically clear the screen after the program exits, wait for a keypress... */
+    if (doesclrscrafterexit())
+        atexit((void (*)(void))cgetc);
 
     if (! iocb) {
         fprintf(stderr, "couldn't find a free iocb\n");

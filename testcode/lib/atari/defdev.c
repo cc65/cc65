@@ -7,12 +7,13 @@
 #include <stdio.h>
 #include <conio.h>
 #include <atari.h>
+#include <cc65.h>
 
 extern char _defdev[];
 
 int main(void)
 {
         printf("default device: %s\n", _defdev);
-        if (! _is_cmdline_dos()) cgetc();
+        if (doesclrscrafterexit()) cgetc();
         return 0;
 }

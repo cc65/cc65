@@ -3,7 +3,7 @@
 <article>
 <title>cc65 function reference
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2015-07-21
+<date>2016-06-08
 
 <abstract>
 cc65 is a C compiler for 6502 based systems. This function reference describes
@@ -207,7 +207,7 @@ function.
 
 <sect1><tt/cc65.h/<label id="cc65.h"><p>
 
-<!-- <itemize> -->
+<itemize>
 <!-- <item><ref id="cc65_cos" name="cc65_cos"> -->
 <!-- <item><ref id="cc65_idiv32by16r16" name="cc65_idiv32by16r16"> -->
 <!-- <item><ref id="cc65_imul16x16r32" name="cc65_imul16x16r32"> -->
@@ -217,7 +217,8 @@ function.
 <!-- <item><ref id="cc65_umul16x16r32" name="cc65_umul16x16r32"> -->
 <!-- <item><ref id="cc65_umul16x8r32" name="cc65_umul16x8r32"> -->
 <!-- <item><ref id="cc65_umul8x8r16" name="cc65_umul8x8r16"> -->
-<!-- </itemize> -->
+<item><ref id="doesclrscrafterexit" name="doesclrscrafterexit">
+</itemize>
 
 (incomplete)
 
@@ -344,6 +345,16 @@ function.
 </itemize>
 
 
+<sect1><tt/gamate.h/<label id="gamate.h"><p>
+
+<!-- <itemize> -->
+<!-- <item><ref id="get_tv" name="get_tv"> -->
+<!-- <item><ref id="waitvblank" name="waitvblank"> -->
+<!-- </itemize> -->
+
+(incomplete)
+
+
 <sect1><tt/geos.h/<label id="geos.h"><p>
 
 (incomplete)
@@ -430,6 +441,16 @@ url="http://www.6502.org/users/andre/o65/fileformat.html" name="the o65 format">
 It does not declare any functions.
 
 
+<sect1><tt/pce.h/<label id="pce.h"><p>
+
+<!-- <itemize> -->
+<!-- <item><ref id="get_tv" name="get_tv"> -->
+<!-- <item><ref id="waitvblank" name="waitvblank"> -->
+<!-- </itemize> -->
+
+(incomplete)
+
+
 <sect1><tt/peekpoke.h/<label id="peekpoke.h"><p>
 
 <itemize>
@@ -438,6 +459,16 @@ It does not declare any functions.
 <item><ref id="POKE" name="POKE">
 <item><ref id="POKEW" name="POKEW">
 </itemize>
+
+
+<sect1><tt/pen.h/<label id="pen.h"><p>
+
+<!-- <itemize> -->
+<!-- <item><ref id="pen_adjust" name="pen_adjust"> -->
+<!-- <item><ref id="pen_calibrate" name="pen_calibrate"> -->
+<!-- </itemize> -->
+
+(incomplete)
 
 
 <sect1><tt/pet.h/<label id="pet.h"><p>

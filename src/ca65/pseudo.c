@@ -618,16 +618,16 @@ static void DoCase (void)
 
 
 static void DoCharMap (void)
-/* Allow custome character mappings */
+/* Allow custom character mappings */
 {
     long Index;
     long Code;
 
     /* Read the index as numerical value */
     Index = ConstExpression ();
-    if (Index <= 0 || Index > 255) {
+    if (Index < 0 || Index > 255) {
         /* Value out of range */
-        ErrorSkip ("Range error");
+        ErrorSkip ("Index range error");
         return;
     }
 
@@ -638,7 +638,7 @@ static void DoCharMap (void)
     Code = ConstExpression ();
     if (Code < 0 || Code > 255) {
         /* Value out of range */
-        ErrorSkip ("Range error");
+        ErrorSkip ("Code range error");
         return;
     }
 

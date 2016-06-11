@@ -453,13 +453,14 @@ static void CharMapPragma (StrBuf* B)
         return;
     }
     if (Index < 1 || Index > 255) {
-        if (Index == 0) {
-            /* For groepaz */
-            Error ("Remapping 0 is not allowed");
-        } else {
+        if (Index != 0) {
             Error ("Character index out of range");
+            return;
         }
-        return;
+        /* For groepaz and Christian */
+        if (IS_Get (&WarnRemapZero)) {
+            Warning ("Remapping from 0 is dangerous with string functions");
+        }
     }
 
     /* Comma follows */
@@ -472,13 +473,14 @@ static void CharMapPragma (StrBuf* B)
         return;
     }
     if (C < 1 || C > 255) {
-        if (C == 0) {
-            /* For groepaz */
-            Error ("Remapping 0 is not allowed");
-        } else {
+        if (C != 0) {
             Error ("Character code out of range");
+            return;
         }
-        return;
+        /* For groepaz and Christian */
+        if (IS_Get (&WarnRemapZero)) {
+            Warning ("Remapping to 0 can make string functions stop unexpectedly");
+        }
     }
 
     /* Remap the character */

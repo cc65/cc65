@@ -4,7 +4,7 @@
 <title>ca65 Users Guide
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
-<date>2015-11-17
+<date>2016-06-11
 
 <abstract>
 ca65 is a powerful macro assembler for the 6502, 65C02, and 65816 CPUs. It is
@@ -2170,16 +2170,15 @@ Here's a list of all control commands and a description, what they do:
 <sect1><tt>.CHARMAP</tt><label id=".CHARMAP"><p>
 
   Apply a custom mapping for characters. The command is followed by two
-  numbers. The first one is the index of the source character (range 1..255),
+  numbers. The first one is the index of the source character (range 0..255);
   the second one is the mapping (range 0..255). The mapping applies to all
-  character and string constants when they generate output, and overrides a
-  mapping table specified with the <tt><ref id="option-t" name="-t"></tt>
+  character and string constants <em/when/ they generate output; and, overrides
+  a mapping table specified with the <tt><ref id="option-t" name="-t"></tt>
   command line switch.
 
   Example:
-
   <tscreen><verb>
-       	.charmap        $41, $61        ; Map 'A' to 'a'
+  .charmap        $41, $61        ; Map 'A' to 'a'
   </verb></tscreen>
 
 

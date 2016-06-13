@@ -9,7 +9,7 @@
 ;
 
         .export         __STARTUP__ : absolute = 1      ; Mark as startup
-        .export         _exit, start
+        .export         _exit, start, excexit, SP_save
 
         .import         initlib, donelib
         .import         callmain, zerobss
@@ -109,12 +109,12 @@ start:
 
 ; Call the module destructors. This is also the exit() entry.
 
-_exit:  jsr     donelib         ; Run module destructors
+_exit:  ldx     SP_save
+        txs                     ; Restore stack pointer
 
 ; Restore the system stuff.
 
-        ldx     SP_save
-        txs                     ; Restore stack pointer
+excexit:jsr     donelib         ; Run module destructors; 'excexit' is called from the exec routine
 
 ; Restore the left margin.
 

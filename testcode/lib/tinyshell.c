@@ -356,7 +356,6 @@ static void cmd_rename(void)
 
 static void cmd_exec(void)
 {
-    int st;
     unsigned char *progname, *arguments;
 
     progname = strtok(args, " \t\n");
@@ -367,7 +366,7 @@ static void cmd_exec(void)
     arguments = strtok(NULL, "");
 
     /*printf("exec: %s %s\n", progname, arguments ? arguments : "");*/
-    st = exec(progname, arguments);
+    (void)exec(progname, arguments);
     printf("exec error: %s\n", strerror(errno));
 }
 

@@ -33,10 +33,8 @@ notsupp:lda     #ENOSYS         ; "unsupported system call"
         .byte   $2C             ; bit opcode, eats the next 2 bytes
 noiocb: lda     #EMFILE         ; "too many open files"
         jsr     incsp2          ; clean up stack
-seterr: jsr     __directerrno
-        lda     #$FF
-        tax
-        rts                     ; return -1
+seterr: jmp     __directerrno
+
 
 ; entry point
 

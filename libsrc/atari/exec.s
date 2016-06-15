@@ -177,9 +177,9 @@ openok: lda     #>buf
 ; program file appears to be available and good
 ; here's the point of no return
 
-        lda     tmp4            ; get IOCB index
         ldx     SP_save
         txs                     ; reset stack pointer to what it was at program entry
+        lda     tmp4            ; get IOCB index
         pha                     ; and save it ('excexit' calls destructors and they might destroy tmp4)
         jsr     excexit         ; on atarixl this will enable the ROM again, making all high variables inaccessible
         pla

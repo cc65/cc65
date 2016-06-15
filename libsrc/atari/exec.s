@@ -11,11 +11,9 @@
         .import         __dos_type
         .import         findfreeiocb
         .import         incsp2
-        .import         __do_oserror
         .import         excexit                 ; from crt0.s
         .import         SP_save                 ; from crt0.s
 .ifdef  UCASE_FILENAME
-        .importzp       tmp3
         .import         ucase_fn
         .import         addysp
 .endif
@@ -24,7 +22,10 @@
         .include        "errno.inc"
         .include        "atari.inc"
 
-CMDLINE_BUFFER          =       $0100           ; put progname + cmdline as one single string there
+; area $0100 to $0128 might be in use (e.g. Hias' high speed patch)
+CMDLINE_BUFFER          =       $0129           ; put progname + cmdline as one single string there
+; alternatively:
+;CMDLINE_BUFFER          =       $0480           ; put progname + cmdline as one single string there
 CMDLINE_MAX             =       40+3            ; max. length of drive + progname + cmdline
 
         .code
@@ -84,6 +85,11 @@ copyp:  lda     (ptr4),y
 
         ; programe name too long
         beq     invret
+
+.ifndef  UCASE_FILENAME
+invret: lda     #EINVAL
+        bne     seterr
+.endif
 
 ; file name copied, check for args
 
@@ -172,11 +178,11 @@ openok: lda     #>buf
 ; here's the point of no return
 
         lda     tmp4            ; get IOCB index
-        pha                     ; and save it ('excexit' calls destructors and they might destroy tmp4)
-        jsr     excexit
-        pla
         ldx     SP_save
-        txs                     ; reset stack pointer
+        txs                     ; reset stack pointer to what it was at program entry
+        pha                     ; and save it ('excexit' calls destructors and they might destroy tmp4)
+        jsr     excexit         ; on atarixl this will enable the ROM again, making all high variables inaccessible
+        pla
         tax                     ; IOCB index in X
 
         lda     #<CMDLINE_BUFFER

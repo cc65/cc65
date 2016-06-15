@@ -72,7 +72,8 @@ extern int _errno;
 #define ESPIPE          14      /* Illegal seek */
 #define ERANGE          15      /* Range error */
 #define EBADF           16      /* Bad file number */
-#define EUNKNOWN        17      /* Unknown OS specific error */
+#define ENOEXEC         17      /* Exec format error */
+#define EUNKNOWN        18      /* Unknown OS specific error */
 
 
 

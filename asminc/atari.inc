@@ -183,6 +183,7 @@ FNTFND  = 170           ;($AA) file not found
 PNTINV  = 171           ;($AB) point invalid
 BADDSK  = 173           ;($AD) bad disk
 INCFMT  = 176           ;($B0) DOS 3: incompatible file system
+XNTBIN  = 180           ;($B4) XDOS: file not binary
 
 ; DCB Device Bus Equates
 
@@ -889,6 +890,10 @@ SETVBV_org  = $E45C     ;vector to set VBLANK parameters
 CIOV    = $E456         ;vector to CIO
 SIOV    = $E459         ;vector to SIO
 SETVBV  = $E45C         ;vector to set VBLANK parameters
+; aliases in order not to have to sprinkle common code with .ifdefs
+CIOV_org    = CIOV
+SIOV_org    = SIOV
+SETVBV_org  = SETVBV
 .endif
 SYSVBV  = $E45F         ;vector to process immediate VBLANK
 XITVBV  = $E462         ;vector to process deferred VBLANK

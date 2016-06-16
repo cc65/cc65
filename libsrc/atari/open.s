@@ -8,6 +8,7 @@
         .include "fcntl.inc"
         .include "errno.inc"
         .include "fd.inc"
+        .include "zeropage.inc"
 
         .export _open
         .destructor     closeallfiles, 5
@@ -19,9 +20,7 @@
         .import incsp4
         .import ldaxysp,addysp
         .import __oserror
-        .importzp tmp4,tmp2
 .ifdef  UCASE_FILENAME
-        .importzp tmp3
         .import ucase_fn
 .endif
 

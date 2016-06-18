@@ -77,7 +77,7 @@ int main (void)
 #else
 
     /* Wait for the user to press a key */
-    (void) cgetc ();
+    cgetc ();
 
 #endif
 

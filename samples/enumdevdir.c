@@ -8,12 +8,12 @@
 
 
 #include <stdio.h>
-#include <conio.h>
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <device.h>
 #include <dirent.h>
+#include <cc65.h>
 
 
 void printdir (char *newdir)
@@ -97,5 +97,7 @@ void main (void)
         device = getnextdevice (device);
     }
 
-    cgetc ();
+    if (doesclrscrafterexit ()) {
+        getchar ();
+    }
 }

@@ -14,6 +14,11 @@
 #include <string.h>
 #include <zlib.h>
 
+#ifdef __CC65__
+#include <stdlib.h>
+#include <cc65.h>
+#endif
+
 #ifndef __CC65__
 /*
 ** Emulate inflatemem() if using original zlib.
@@ -190,6 +195,13 @@ int main(void)
 {
         FILE* fp;
         unsigned length;
+
+#ifdef __CC65__
+        /* allow user to read exit messages */
+        if (doesclrscrafterexit()) {
+                atexit((void (*)) getchar);
+        }
+#endif /* __CC65__ */
 
         /* read GZIP file */
         puts("GZIP file name:");

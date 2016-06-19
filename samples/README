@@ -12,8 +12,8 @@ Please note:
   * The makefile specifies the C64 as the default target system, because all
     but one of the programs run on this platform. When compiling for another
     system, you will have to change the line that specifies the target system
-    at the top of the makefile or specify the system with SYS=<target> on the
-    make command line.
+    at the top of the makefile, specify the system with SYS=<target> on the
+    make command line or set a SYS env var.
 
 
 List of supplied sample programs:

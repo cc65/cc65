@@ -4,8 +4,9 @@
 # This Makefile requires GNU make
 #
 
-# Run 'make samples SYS=<target>' to build for another target system
-SYS = c64
+# Run 'make SYS=<target>' or set a SYS env
+# var to build for another target system.
+SYS ?= c64
 
 ifneq ($(shell echo),)
   CMD_EXE = 1
@@ -147,11 +148,11 @@ EXELIST_atarixl = $(EXELIST_atari)
 # --------------------------------------------------------------------------
 # Rules to make the binaries and the disk
 
-all:
-
 samples: $(EXELIST_$(SYS))
 
 disk: $(DISK_$(SYS))
+
+all:
 
 # --------------------------------------------------------------------------
 # Overlay rules. Overlays need special ld65 configuration files.  Also, the

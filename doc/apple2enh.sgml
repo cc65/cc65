@@ -450,10 +450,6 @@ BASIC.SYSTEM) there are some limitations for DOS 3.3:
   The enhanced&nbsp;Apple&nbsp;//e has no color text mode. Therefore the functions
   textcolor(), bgcolor() and bordercolor() have no effect.
 
-  <tag/Cursor/
-  The enhanced&nbsp;Apple&nbsp;//e has no hardware cursor. Therefore the function
-  cursor() has no effect.
-
 </descrip><p>
 
 

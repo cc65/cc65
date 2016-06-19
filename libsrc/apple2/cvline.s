@@ -23,12 +23,13 @@ _cvline:
         .endif
 
 cvlinedirect:
+        stx     tmp1
         cmp     #$00            ; Is the length zero?
         beq     done            ; Jump if done
-        sta     tmp1
-:       txa                     ; Screen code
+        sta     tmp2
+:       lda     tmp1            ; Screen code
         jsr     putchar         ; Write, no cursor advance
         jsr     newline         ; Advance cursor to next line
-        dec     tmp1
+        dec     tmp2
         bne     :-
 done:   rts

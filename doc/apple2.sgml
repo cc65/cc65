@@ -449,10 +449,6 @@ BASIC.SYSTEM) there are some limitations for DOS 3.3:
   The Apple&nbsp;&rsqb;&lsqb; has no color text mode. Therefore the functions textcolor(),
   bgcolor() and bordercolor() have no effect.
 
-  <tag/Cursor/
-  The Apple&nbsp;&rsqb;&lsqb; has no hardware cursor. Therefore the function cursor() has
-  no effect.
-
 </descrip><p>
 
 

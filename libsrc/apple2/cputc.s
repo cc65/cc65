@@ -9,7 +9,7 @@
         .constructor    initconio
         .endif
         .export         _cputcxy, _cputc
-        .export         cputdirect, newline, putchar
+        .export         cputdirect, newline, putchar, putchardirect
         .import         gotoxy, VTABZ
 
         .include        "apple2.inc"
@@ -62,32 +62,36 @@ newline:
         lda     WNDTOP          ; Goto top of screen
         sta     CV
 :       jmp     VTABZ
-                
+
 putchar:
         .ifdef  __APPLE2ENH__
         ldy     INVFLG
         cpy     #$FF            ; Normal character display mode?
-        beq     put
+        beq     putchardirect
         cmp     #$E0            ; Lowercase?
         bcc     mask
         and     #$7F            ; Inverse lowercase
-        bra     put
+        bra     putchardirect
         .endif
 mask:   and     INVFLG          ; Apply normal, inverse, flash
-put:    ldy     CH
+
+putchardirect:
+        pha
+        ldy     CH
         .ifdef  __APPLE2ENH__
         bit     RD80VID         ; In 80 column mode?
-        bpl     col40           ; No, in 40 cols
-        pha
+        bpl     put             ; No, just go ahead
         tya
         lsr                     ; Div by 2
         tay
-        pla
-        bcs     col40           ; Odd cols go in 40 col memory
+        bcs     put             ; Odd cols go in main memory
         bit     HISCR           ; Assume SET80COL
-        sta     (BASL),Y
-        bit     LOWSCR          ; Assume SET80COL
-        rts
         .endif
-col40:  sta     (BASL),Y
+put:    lda     (BASL),Y        ; Get current character
+        tax                     ; Return old character for _cgetc
+        pla
+        sta     (BASL),Y
+        .ifdef  __APPLE2ENH__
+        bit     LOWSCR          ; Doesn't hurt in 40 column mode
+        .endif
         rts

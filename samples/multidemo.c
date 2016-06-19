@@ -20,6 +20,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #else
+#include <cbm.h>
 #include <device.h>
 #endif
 

@@ -238,7 +238,7 @@ install:
 	$(if $(prefix),,$(error variable `prefix' must be set))
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)/geos
-	$(INSTALL) -d $$(DESTDIR)$(samplesdir)/tutorial
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/tutorial
 	$(INSTALL) -m0644 *.* $(DESTDIR)$(samplesdir)
 	$(INSTALL) -m0644 README $(DESTDIR)$(samplesdir)
 	$(INSTALL) -m0644 Makefile $(DESTDIR)$(samplesdir)

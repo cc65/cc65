@@ -36,6 +36,9 @@
 #include <string.h>
 #include <errno.h>
 
+/* common */
+#include "cpu.h"
+
 /* cc65 */
 #include "error.h"
 #include "fragment.h"
@@ -129,6 +132,38 @@ void Emit3 (unsigned char OPC, ExprNode* Expr)
 {
     Emit0 (OPC);
     EmitFarAddr (Expr);
+}
+
+
+
+void EmitZP (unsigned char OPC, ExprNode* Value)
+/* Emit an instruction with an one byte direct-page argument */
+{
+    long V;
+    Fragment* F;
+
+    if (IsEasyConst (Value, &V)) {
+        /* Must be in byte range */
+        if ((CPU != CPU_HUC6280 && (V & ~0xFFL) != 0x0000) ||
+            (CPU == CPU_HUC6280 && (V & ~0xFFL) != 0x2000)) {
+            Error ("Range error (0x%lx not in zero-page)", V);
+        }
+
+        /* Create a literal fragment */
+        F = GenFragment (FRAG_LITERAL, 2);
+        F->V.Data[0] = OPC;
+        F->V.Data[1] = (unsigned char) V;
+        FreeExpr (Value);
+
+    } else {
+
+        /* Emit the opcode */
+        Emit0 (OPC);
+
+        /* Emit the argument as an expression */
+        F = GenFragment (FRAG_EXPR, 1);
+        F->V.Expr = Value;
+    }
 }
 
 

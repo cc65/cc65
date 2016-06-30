@@ -40,6 +40,7 @@
 #include "debugflag.h"
 #include "shift.h"
 #include "xmalloc.h"
+#include "cpu.h"
 
 /* ca65 */
 #include "error.h"
@@ -445,7 +446,8 @@ static void StudyExprInternal (ExprNode* Expr, ExprDesc* D);
 static unsigned char GetConstAddrSize (long Val)
 /* Get the address size of a constant */
 {
-    if ((Val & ~0xFFL) == 0) {
+    if ((CPU != CPU_HUC6280 && (Val & ~0xFFL) == 0x0000) ||
+        (CPU == CPU_HUC6280 && (Val & ~0xFFL) == 0x2000)) {
         return ADDR_SIZE_ZP;
     } else if ((Val & ~0xFFFFL) == 0) {
         return ADDR_SIZE_ABS;

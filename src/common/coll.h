@@ -268,9 +268,9 @@ void CollReplaceExpand (Collection* C, void* Item, unsigned Index);
 
 void CollMove (Collection* C, unsigned OldIndex, unsigned NewIndex);
 /* Move an item from one position in the collection to another. OldIndex
-** is the current position of the item, NewIndex is the new index after
+** is the current position of the item, NewIndex is the new index before
 ** the function has done it's work. Existing entries with indices NewIndex
-** and up are moved one position upwards.
+** and up might be moved one position upwards.
 */
 
 void CollMoveMultiple (Collection* C, unsigned Start, unsigned Count, unsigned Target);

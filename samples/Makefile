@@ -34,6 +34,7 @@ else
   LD := $(if $(wildcard ../bin/ld65*),../bin/ld65,ld65)
 endif
 
+ifneq ($(filter disk samples.%,$(MAKECMDGOALS)),)
 TARGET_PATH := $(shell $(CL) --print-target-path)
 
 EMD := $(wildcard $(TARGET_PATH)/$(SYS)/drv/emd/*)
@@ -54,6 +55,7 @@ DISK_apple2    = samples.dsk
 DISK_apple2enh = samples.dsk
 DISK_atari     = samples.atr
 DISK_atarixl   = samples.atr
+endif
 
 # --------------------------------------------------------------------------
 # System-dependent settings

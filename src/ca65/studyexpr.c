@@ -443,8 +443,7 @@ static void StudyExprInternal (ExprNode* Expr, ExprDesc* D);
 
 
 
-// static unsigned char GetConstAddrSize (long Val)
-unsigned char GetConstAddrSize (long Val)
+static unsigned char GetConstAddrSize (long Val)
 /* Get the address size of a constant */
 {
     if ((Val & ~0xFFL) == 0) {

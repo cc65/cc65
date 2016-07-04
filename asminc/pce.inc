@@ -34,11 +34,11 @@ VDC_LENR        = 18            ; (DMA) Length Register
 VDC_SATB        = 19            ; Sprite Attribute Table
 
 ; VDC port
-; Note: absolute addressing mode must be used when writing to this port
+; Note: use mirror location to avoid CA65 zero-page logic
 
-VDC_CTRL        = $0000
-VDC_DATA_LO     = $0002
-VDC_DATA_HI     = $0003
+VDC_CTRL        = $0100
+VDC_DATA_LO     = $0102
+VDC_DATA_HI     = $0103
 
 ; huc6260 - Video Color Encoder (vce)
 

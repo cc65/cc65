@@ -7,7 +7,7 @@ HIRES   = 1
         .export         vdc_init
 
 vdc_init:
-        lda     a:VDC_CTRL
+        lda     VDC_CTRL
 
         VREG    $00, $0000      ; MAWR
         VREG    $01, $0000      ; MARR
@@ -37,5 +37,5 @@ vdc_init:
 
 .endif
 
-        lda     a:VDC_CTRL
+        lda     VDC_CTRL
         rts

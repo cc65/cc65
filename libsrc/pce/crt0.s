@@ -74,7 +74,7 @@ start:
         ;tam     #%10000000      ; e000-fFFF  hucard/syscard bank 0
 
         ; Clear work RAM (2000-3FFF)
-        stz     <$00
+        stz     $2000
         tii     $2000, $2001, $1FFF
 
         ; Initialize hardware

@@ -443,11 +443,13 @@ static void StudyExprInternal (ExprNode* Expr, ExprDesc* D);
 
 
 
-static unsigned char GetConstAddrSize (long Val)
+// static unsigned char GetConstAddrSize (long Val)
+unsigned char GetConstAddrSize (long Val)
 /* Get the address size of a constant */
 {
-    if ((CPU != CPU_HUC6280 && (Val & ~0xFFL) == 0x0000) ||
-        (CPU == CPU_HUC6280 && (Val & ~0xFFL) == 0x2000)) {
+    if ((Val & ~0xFFL) == 0) {
+        return ADDR_SIZE_ZP;
+    } else if (CPU == CPU_HUC6280 && (Val & ~0xFFL) == 0x2000L) {
         return ADDR_SIZE_ZP;
     } else if ((Val & ~0xFFFFL) == 0) {
         return ADDR_SIZE_ABS;

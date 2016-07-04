@@ -1054,7 +1054,7 @@ static void EmitCode (EffAddr* A)
             break;
 
         case 1:
-            if (A->AddrModeBit & (AM65_ALL_ZP | AM65_DIR_IND_Y | AM65_DIR_IND_LONG | AM65_DIR_IND_LONG_Y)) {
+            if (A->AddrModeBit & AM65_ALL_ZP) {
                 EmitZP (A->Opcode, A->Expr);
             } else {
                 Emit1 (A->Opcode, A->Expr);

@@ -137,15 +137,15 @@ void Emit3 (unsigned char OPC, ExprNode* Expr)
 
 
 void EmitZP (unsigned char OPC, ExprNode* Value)
-/* Emit an instruction with an one byte direct-page argument */
+/* Emit an instruction with an one byte zero-page argument */
 {
     long V;
     Fragment* F;
 
     if (IsEasyConst (Value, &V)) {
         /* Must be in byte range */
-        if ((CPU != CPU_HUC6280 && (V & ~0xFFL) != 0x0000) ||
-            (CPU == CPU_HUC6280 && (V & ~0xFFL) != 0x2000)) {
+        if (((V & ~0xFFL) != 0x0000L) &&
+            (CPU != CPU_HUC6280 || (V & ~0xFFL) != 0x2000L)) {
             Error ("Range error (0x%lx not in zero-page)", V);
         }
 

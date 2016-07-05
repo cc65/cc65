@@ -61,7 +61,7 @@
 const char* ProgramFile;
 
 /* exit simulator after MaxCycles Cycles */
-unsigned long MaxCycles = 0;
+unsigned long MaxCycles;
 
 /*****************************************************************************/
 /*                                   Code                                    */
@@ -74,12 +74,14 @@ static void Usage (void)
     printf ("Usage: %s [options] file [arguments]\n"
             "Short options:\n"
             "  -h\t\t\tHelp (this text)\n"
+            "  -c\t\t\tPrint amount of executed CPU cycles\n"
             "  -v\t\t\tIncrease verbosity\n"
             "  -V\t\t\tPrint the simulator version number\n"
             "  -x <num>\t\tExit simulator after <num> cycles\n"
             "\n"
             "Long options:\n"
             "  --help\t\tHelp (this text)\n"
+            "  --cycles\t\tPrint amount of executed CPU cycles\n"
             "  --verbose\t\tIncrease verbosity\n"
             "  --version\t\tPrint the simulator version number\n",
             ProgName);
@@ -102,6 +104,15 @@ static void OptVerbose (const char* Opt attribute ((unused)),
 /* Increase verbosity */
 {
     ++Verbosity;
+}
+
+
+
+static void OptCycles (const char* Opt attribute ((unused)),
+                       const char* Arg attribute ((unused)))
+/* Set flag to print amount of cycles at the end */
+{
+    PrintCycles = 1;
 }
 
 
@@ -166,6 +177,7 @@ int main (int argc, char* argv[])
     /* Program long options */
     static const LongOpt OptTab[] = {
         { "--help",             0,      OptHelp                 },
+        { "--cycles",           0,      OptCycles               },
         { "--verbose",          0,      OptVerbose              },
         { "--version",          0,      OptVersion              },
     };
@@ -194,6 +206,10 @@ int main (int argc, char* argv[])
                 case 'h':
                 case '?':
                     OptHelp (Arg, 0);
+                    break;
+
+                case 'c':
+                    OptCycles (Arg, 0);
                     break;
 
                 case 'v':

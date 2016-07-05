@@ -157,7 +157,7 @@ static void PVExit (CPURegs* Regs)
 {
     Print (stderr, 1, "PVExit ($%02X)\n", Regs->AC);
     if (PrintCycles) {
-      Print (stdout, 0, "%lu cycles\n", GetCycles ());
+        Print (stdout, 0, "%lu cycles\n", GetCycles ());
     }
 
     exit (Regs->AC);

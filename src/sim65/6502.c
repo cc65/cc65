@@ -67,6 +67,8 @@ static unsigned HaveNMIRequest;
 /* IRQ request active */
 static unsigned HaveIRQRequest;
 
+/* flag to print cycles at program termination */
+int PrintCycles;
 
 
 /*****************************************************************************/

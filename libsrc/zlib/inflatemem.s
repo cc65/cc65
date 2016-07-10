@@ -9,6 +9,8 @@
         .import         incsp2
         .importzp       sp, sreg, ptr1, ptr2, ptr3, ptr4, tmp1
 
+        .macpack        cpu
+
 ; --------------------------------------------------------------------------
 ;
 ; Constants
@@ -75,7 +77,7 @@ _inflatemem:
         sta     inputPointer
         stx     inputPointer+1
 ; outputPointer = dest
-.ifpc02
+.if (.cpu & CPU_ISET_65SC02)
         lda     (sp)
         ldy     #1
 .else
@@ -106,7 +108,7 @@ inflatemem_1:
 
 ; return outputPointer - dest;
         lda     outputPointer
-.ifpc02
+.if (.cpu & CPU_ISET_65SC02)
         sbc     (sp)            ; C flag is set
         ldy     #1
 .else
@@ -156,14 +158,14 @@ inflateCopyBlock:
 moveBlock:
         ldy     moveBlock_len
         beq     moveBlock_1
-.ifpc02
+.if (.cpu & CPU_ISET_65SC02)
 .else
         ldy     #0
 .endif
         inc     moveBlock_len+1
 moveBlock_1:
         lda     (0,x)
-.ifpc02
+.if (.cpu & CPU_ISET_65SC02)
         sta     (outputPointer)
 .else
         sta     (outputPointer),y
@@ -176,7 +178,7 @@ moveBlock_2:
         bne     moveBlock_3
         inc     outputPointer+1
 moveBlock_3:
-.ifpc02
+.if (.cpu & CPU_ISET_65SC02)
         dey
 .else
         dec     moveBlock_len
@@ -312,7 +314,7 @@ inflateCodes_1:
         jsr     fetchPrimaryCode
         bcs     inflateCodes_2
 ; Literal code
-.ifpc02
+.if (.cpu & CPU_ISET_65SC02)
         sta     (outputPointer)
 .else
         ldy     #0
@@ -512,7 +514,7 @@ getValue:
 getBits:
         cpx     #0
         beq     getBits_ret
-.ifpc02
+.if (.cpu & CPU_ISET_65SC02)
         stz     getBits_tmp
         dec     getBits_tmp
 .else
@@ -542,7 +544,7 @@ getBit:
         lsr     getBit_hold
         bne     getBit_ret
         pha
-.ifpc02
+.if (.cpu & CPU_ISET_65SC02)
         lda     (inputPointer)
 .else
         sty     getBit_hold
@@ -554,7 +556,7 @@ getBit:
         bne     getBit_1
         inc     inputPointer+1
 getBit_1:
-        ror     a       ; C flag is set
+        ror     a               ; (C flag was set)
         sta     getBit_hold
         pla
 getBit_ret:
@@ -668,6 +670,3 @@ bitsPointer_h:
 ; Sorted codes.
 sortedCodes:
         .res    256+1+29+30+2
-
-
-

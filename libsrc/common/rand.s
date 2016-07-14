@@ -44,7 +44,6 @@ _rand:  clc
         lda     rand+1
         adc     #$59
         sta     rand+1
-        pha
         lda     rand+2
         adc     #$41
         sta     rand+2
@@ -53,8 +52,7 @@ _rand:  clc
         lda     rand+3
         adc     #$31
         sta     rand+3
-        pla                     ; return bit 8-22 in (X,A)
-        rts
+        rts                     ; return bit (16-22,24-31) in (X,A)
 
 _srand: sta     rand+0          ; Store the seed
         stx     rand+1

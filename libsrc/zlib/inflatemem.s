@@ -1,5 +1,6 @@
 ;
-; Piotr Fusik, 21.09.2003
+; 2003-09-21, Piotr Fusik
+; 2016-07-19, Greg King
 ;
 ; unsigned __fastcall__ inflatemem (char* dest, const char* source);
 ;
@@ -40,30 +41,30 @@ TREES_SIZE    = 2*MAX_BITS
 ;
 
 ; Pointer to the compressed data.
-inputPointer            =       ptr1    ; 2 bytes
+inputPointer            :=      ptr1    ; 2 bytes
 
 ; Pointer to the uncompressed data.
-outputPointer           =       ptr2    ; 2 bytes
+outputPointer           :=      ptr2    ; 2 bytes
 
 ; Local variables.
 ; As far as there is no conflict, same memory locations are used
 ; for different variables.
 
-inflateDynamicBlock_cnt =       ptr3    ; 1 byte
-inflateCodes_src        =       ptr3    ; 2 bytes
-buildHuffmanTree_src    =       ptr3    ; 2 bytes
-getNextLength_last      =       ptr3    ; 1 byte
-getNextLength_index     =       ptr3+1  ; 1 byte
+inflateDynamicBlock_cnt :=      ptr3    ; 1 byte
+inflateCodes_src        :=      ptr3    ; 2 bytes
+buildHuffmanTree_src    :=      ptr3    ; 2 bytes
+getNextLength_last      :=      ptr3    ; 1 byte
+getNextLength_index     :=      ptr3+1  ; 1 byte
 
-buildHuffmanTree_ptr    =       ptr4    ; 2 bytes
-fetchCode_ptr           =       ptr4    ; 2 bytes
-getBits_tmp             =       ptr4    ; 1 byte
+buildHuffmanTree_ptr    :=      ptr4    ; 2 bytes
+fetchCode_ptr           :=      ptr4    ; 2 bytes
+getBits_tmp             :=      ptr4    ; 1 byte
 
-moveBlock_len           =       sreg    ; 2 bytes
-inflateDynamicBlock_np  =       sreg    ; 1 byte
-inflateDynamicBlock_nd  =       sreg+1  ; 1 byte
+moveBlock_len           :=      sreg    ; 2 bytes
+inflateDynamicBlock_np  :=      sreg    ; 1 byte
+inflateDynamicBlock_nd  :=      sreg+1  ; 1 byte
 
-getBit_hold             =       tmp1    ; 1 byte
+getBit_hold             :=      tmp1    ; 1 byte
 
 
 ; --------------------------------------------------------------------------
@@ -138,8 +139,8 @@ inflateCopyBlock:
         ldy     #1
         sty     getBit_hold
 ; Get 16-bit length
-        ldx     #inputPointer
-        lda     (0,x)
+        ldx     #0
+        lda     (inputPointer,x)
         sta     moveBlock_len
         lda     (inputPointer),y
         sta     moveBlock_len+1
@@ -164,15 +165,15 @@ moveBlock:
 .endif
         inc     moveBlock_len+1
 moveBlock_1:
-        lda     (0,x)
+        lda     (inputPointer,x)
 .if (.cpu & CPU_ISET_65SC02)
         sta     (outputPointer)
 .else
         sta     (outputPointer),y
 .endif
-        inc     0,x
+        inc     inputPointer
         bne     moveBlock_2
-        inc     1,x
+        inc     inputPointer+1
 moveBlock_2:
         inc     outputPointer
         bne     moveBlock_3

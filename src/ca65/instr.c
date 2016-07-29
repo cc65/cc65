@@ -376,7 +376,7 @@ static const struct {
 /* Instruction table for the 65C02 */
 static const struct {
     unsigned Count;
-    InsDesc  Ins[98];
+    InsDesc  Ins[100];
 } InsTab65C02 = {
     sizeof (InsTab65C02.Ins) / sizeof (InsTab65C02.Ins[0]),
     {
@@ -467,6 +467,7 @@ static const struct {
         { "SMB6", 0x0000004, 0xE7, 1, PutAll },
         { "SMB7", 0x0000004, 0xF7, 1, PutAll },
         { "STA",  0x000A66C, 0x80, 0, PutAll },
+        { "STP",  0x0000001, 0xdb, 0, PutAll },
         { "STX",  0x000010c, 0x82, 1, PutAll },
         { "STY",  0x000002c, 0x80, 1, PutAll },
         { "STZ",  0x000006c, 0x04, 5, PutAll },
@@ -477,7 +478,8 @@ static const struct {
         { "TSX",  0x0000001, 0xba, 0, PutAll },
         { "TXA",  0x0000001, 0x8a, 0, PutAll },
         { "TXS",  0x0000001, 0x9a, 0, PutAll },
-        { "TYA",  0x0000001, 0x98, 0, PutAll }
+        { "TYA",  0x0000001, 0x98, 0, PutAll },
+        { "WAI",  0x0000001, 0xcb, 0, PutAll }
     }
 };
 

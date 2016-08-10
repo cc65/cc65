@@ -35,26 +35,26 @@ else
 endif
 
 ifneq ($(filter disk samples.%,$(MAKECMDGOALS)),)
-TARGET_PATH := $(shell $(CL) --print-target-path)
+  TARGET_PATH := $(shell $(CL) --print-target-path)
 
-EMD := $(wildcard $(TARGET_PATH)/$(SYS)/drv/emd/*)
-MOU := $(wildcard $(TARGET_PATH)/$(SYS)/drv/mou/*)
-TGI := $(wildcard $(TARGET_PATH)/$(SYS)/drv/tgi/*)
+  EMD := $(wildcard $(TARGET_PATH)/$(SYS)/drv/emd/*)
+  MOU := $(wildcard $(TARGET_PATH)/$(SYS)/drv/mou/*)
+  TGI := $(wildcard $(TARGET_PATH)/$(SYS)/drv/tgi/*)
 
-# This one comes with VICE
-C1541 ?= c1541
+  # This one comes with VICE
+  C1541 ?= c1541
 
-# For this one see http://applecommander.sourceforge.net/
-AC ?= ac.jar
+  # For this one see http://applecommander.sourceforge.net/
+  AC ?= ac.jar
 
-# For this one see http://www.horus.com/~hias/atari/
-DIR2ATR ?= dir2atr
+  # For this one see http://www.horus.com/~hias/atari/
+  DIR2ATR ?= dir2atr
 
-DISK_c64       = samples.d64
-DISK_apple2    = samples.dsk
-DISK_apple2enh = samples.dsk
-DISK_atari     = samples.atr
-DISK_atarixl   = samples.atr
+  DISK_c64       = samples.d64
+  DISK_apple2    = samples.dsk
+  DISK_apple2enh = samples.dsk
+  DISK_atari     = samples.atr
+  DISK_atarixl   = samples.atr
 endif
 
 # --------------------------------------------------------------------------

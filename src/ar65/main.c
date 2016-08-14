@@ -121,7 +121,7 @@ int main (int argc, char* argv [])
                 break;
 
             case 'V':
-                fprintf (stderr, "ar65 V%s\n", GetVersionAsString ());
+                fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
                 break;
 
             default:

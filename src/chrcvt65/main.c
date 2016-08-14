@@ -220,6 +220,7 @@ static void OptVersion (const char* Opt attribute ((unused)),
 {
     fprintf (stderr,
              "%s V%s\n", ProgName, GetVersionAsString ());
+    exit(EXIT_SUCCESS);
 }
 
 

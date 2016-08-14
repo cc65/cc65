@@ -1,7 +1,7 @@
 ; smc.mac
 ; ca65 Macro-Pack for Self Modifying Code (SMC)
 ;
-; (c) Christian Krüger, latest change: 17-Jul-2016
+; (c) Christian KrÃ¼ger, latest change: 17-Jul-2016
 ;
 ; This software is provided 'as-is', without any expressed or implied
 ; warranty.  In no event will the authors be held liable for any damages
@@ -75,7 +75,7 @@ _SMCDesignator: statement
 .elseif .match ({register}, y)
         ldy _SMCDesignator
 .else
-	.error "Invalid usage of macro 'SMC_TransferOpcode'"
+	.error "Invalid usage of macro 'SMC_LoadOpcode'"
 .endif
 .endmacro
 

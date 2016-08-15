@@ -144,11 +144,6 @@ void SwitchStatement (void)
     /* Create a loop so we may use break. */
     AddLoop (ExitLabel, 0);
 
-    /* Make sure a curly brace follows */
-    if (CurTok.Tok != TOK_LCURLY) {
-        Error ("`{' expected");
-    }
-
     /* Parse the following statement, which will actually be a compound
     ** statement because of the curly brace at the current input position
     */

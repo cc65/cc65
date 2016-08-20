@@ -194,7 +194,7 @@ void SwitchStatement (void)
     /* Free the case value tree */
     FreeCaseNodeColl (SwitchData.Nodes);
 
-    /* If the case statement was (correctly) terminated by a closing curly
+    /* If the case statement was terminated by a closing curly
     ** brace, skip it now.
     */
     if (RCurlyBrace) {

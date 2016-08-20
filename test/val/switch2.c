@@ -22,7 +22,7 @@ void switch_no_body(void)
 
 void switch_empty_body(void)
 {
-  switch(0) {};
+  switch(0) {}
 }
 
 /* only worried about this file compiling successfully */

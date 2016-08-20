@@ -144,8 +144,8 @@ void SwitchStatement (void)
     /* Create a loop so we may use break. */
     AddLoop (ExitLabel, 0);
 
-    /* Parse the following statement, which will actually be a compound
-    ** statement because of the curly brace at the current input position
+    /* Parse the following statement, which may actually be a compound
+    ** statement if there is a curly brace at the current input position
     */
     HaveBreak = Statement (&RCurlyBrace);
 

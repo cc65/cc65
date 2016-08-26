@@ -62,6 +62,7 @@ Short options:
   -V                            Print the version number
   -W name[,...]                 Supress compiler warnings
   -Wa options                   Pass options to the assembler
+  -Wc options                   Pass options to the compiler
   -Wl options                   Pass options to the linker
 
 Long options:

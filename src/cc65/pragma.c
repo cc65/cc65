@@ -452,15 +452,9 @@ static void CharMapPragma (StrBuf* B)
     if (!GetNumber (B, &Index)) {
         return;
     }
-    if (Index < 1 || Index > 255) {
-        if (Index != 0) {
-            Error ("Character index out of range");
-            return;
-        }
-        /* For groepaz and Christian */
-        if (IS_Get (&WarnRemapZero)) {
-            Warning ("Remapping from 0 is dangerous with string functions");
-        }
+    if (Index < 0 || Index > 255) {
+        Error ("Character index out of range");
+        return;
     }
 
     /* Comma follows */
@@ -472,13 +466,19 @@ static void CharMapPragma (StrBuf* B)
     if (!GetNumber (B, &C)) {
         return;
     }
-    if (C < 1 || C > 255) {
-        if (C != 0) {
-            Error ("Character code out of range");
-            return;
+    if (C < 0 || C > 255) {
+        Error ("Character code out of range");
+        return;
+    }
+
+    /* Warn about remapping character code 0x00
+    ** (except when remapping it back to itself).
+    */
+    if (Index + C != 0 && IS_Get (&WarnRemapZero)) {
+        if (Index == 0) {
+            Warning ("Remapping from 0 is dangerous with string functions");
         }
-        /* For groepaz and Christian */
-        if (IS_Get (&WarnRemapZero)) {
+        else if (C == 0) {
             Warning ("Remapping to 0 can make string functions stop unexpectedly");
         }
     }

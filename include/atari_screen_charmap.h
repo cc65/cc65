@@ -30,7 +30,10 @@
 
 /* No include guard here! Multiple use in one file may be intentional. */
 
+#pragma warn (remap-zero, push, off)
 #pragma charmap (0x00, 0x40)
+#pragma warn (remap-zero, pop)
+
 #pragma charmap (0x01, 0x41)
 #pragma charmap (0x02, 0x42)
 #pragma charmap (0x03, 0x43)
@@ -64,7 +67,10 @@
 #pragma charmap (0x1E, 0x5E)
 #pragma charmap (0x1F, 0x5F)
 
-#pragma charmap (0x20, 0x00) 
+#pragma warn (remap-zero, push, off)
+#pragma charmap (0x20, 0x00)
+#pragma warn (remap-zero, pop)
+
 #pragma charmap (0x21, 0x01)
 #pragma charmap (0x22, 0x02)
 #pragma charmap (0x23, 0x03)

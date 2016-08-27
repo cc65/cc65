@@ -318,6 +318,58 @@ chip registers.
 </descrip><p>
 
 
+<sect1>Character mapping<p>
+
+The Atari has two representations for characters:
+<enum>
+<item> ATASCII is character mapping which is similar to ASCII and used
+by the CIO system of the OS. This is the default mapping of cc65 when
+producing code for the atari target.
+<item> The internal/screen mapping represents the real value of the
+screen ram when showing a character.
+</enum>
+
+For direct memory access (simplicity and speed) enabling the internal
+mapping can be useful. This can be achieved by including the
+"<tt/atari_screen_charmap.h/" header.
+
+A word of caution: Since the <tt/0x00/ character has to be mapped in an
+incompatible way to the C-standard, the usage of string functions in
+conjunction with internal character mapped strings delivers unexpected
+results regarding the string length. The end of strings are detected where
+you may not expect them (to early or (much) to late). Internal mapped
+strings typically support the "<tt/mem...()/" functions.
+
+<em>For assembler sources the macro "<tt/scrcode/" from the "<tt/atari.mac/"
+package delivers the same feature.</em>
+
+You can switch back to the ATASCII mapping by including
+"<tt/atari_atascii_charmap.h/".
+
+A final note: Since cc65 has currently some difficulties with string merging
+under different mappings, defining remapped strings works only flawlessly
+with static array initialization:
+
+<verb>
+#include &lt;atari\_screen\_charmap.h&gt;
+char pcScreenMappingString[] = "Hello Atari!";
+
+#include &lt;atari_atascii_charmap.h&gt;
+char pcAtasciiMappingString[] = "Hello Atari!";
+</verb>
+
+delivers correct results, while
+
+<verb>
+#include &lt;atari_screen_charmap.h&gt;
+char* pcScreenMappingString = "Hello Atari!";
+
+#include &lt;atari_atascii_charmap.h&gt;
+char* pcAtasciiMappingString = "Hello Atari!";
+</verb>
+
+does not.
+
 
 <sect>Loadable drivers<p>
 

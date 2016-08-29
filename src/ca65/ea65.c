@@ -145,12 +145,11 @@ void GetEA (EffAddr* A)
             if (CurTok.Tok == TOK_COMMA) {
                 /* (adr),y */
                 NextTok ();
-                switch(CurTok.Tok) {
+                switch (CurTok.Tok) {
                 case TOK_Z:
-                    if (CPU == CPU_4510) {
-                        NextTok ();
-                        A->AddrModeSet = AM65_DIR_IND;
-                    }
+                    /* only set by scanner.c if in 4510-mode */
+                    NextTok ();
+                    A->AddrModeSet = AM65_DIR_IND;
                     break;
                 default:
                     Consume (TOK_Y, "`Y' expected");

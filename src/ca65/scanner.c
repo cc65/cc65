@@ -1170,7 +1170,7 @@ Again:
                     CurTok.Tok = TOK_S;
                     return;
                 }
-                /* fall through */
+                /* FALL THROUGH */
             default:
                 if (CPU == CPU_SWEET16 &&
                    (CurTok.IVal = Sweet16Reg (&CurTok.SVal)) >= 0) {

@@ -476,10 +476,13 @@ from the mentioned web page, for more information, see there.
 <sect1>4510 mode<p>
 
 The 4510 is a microcontroller that is the core of the Commodore C65 aka C64DX.
-It contains among other functions a slightly modified 65CE02 CPU, to allow
+It contains among other functions a slightly modified 65CE02/4502 CPU, to allow
 address mapping for 20 bits of address space (1 megabyte addressable area).
-As compared to the description of the CPU in the System Specification of the
-Commodore C65 aka C64DX prototypes ca65 uses these changes:
+As compared to the description of the CPU in the
+<url url="http://www.zimmers.net/anonftp/pub/cbm/c65/c65manualupdated.txt.gz"
+name="C65 System Specification">
+<url url="https://raw.githubusercontent.com/MEGA65/c65-specifications/master/c65manualupdated.txt"
+name="(updated version)"> uses these changes:
 <itemize>
 <item><tt>LDA (d,SP),Y</tt> may also be written as <tt>LDA (d,S),Y</tt>
 (matching the 65816 notataion).
@@ -488,7 +491,8 @@ branch you have to prefix these with an "L" (e.g. "<tt>LBNE</tt>" instead of
 "<tt>BNE</tt>"). This might change at a later implementation of the assember.
 </itemize>
 For more information about the Commodore C65/C64DX and the 4510 CPU, see
-<url url="http://www.zimmers.net/anonftp/pub/cbm/c65/c65manualupdated.txt.gz">.
+<url url="http://www.zimmers.net/anonftp/pub/cbm/c65/"> and
+<url url="https://en.wikipedia.org/wiki/Commodore_65" name="Wikipedia">.
 
 
 <sect1>sweet16 mode<label id="sweet16-mode"><p>

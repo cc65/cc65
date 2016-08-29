@@ -1290,7 +1290,7 @@ static void PutPCRel16 (const InsDesc* Ins)
 static void PutPCRel4510 (const InsDesc* Ins)
 /* Handle branches with a 16 bit distance */
 {
-    /* 16 bit branch opcode is 8 bit branch opcode or 0x03 */
+    /* 16 bit branch opcode is 8 bit branch opcode or'ed with 0x03 */
     EmitPCRel (Ins->BaseCode, GenBranchExpr (2), 2);
 }
 
@@ -1543,33 +1543,33 @@ static void PutAll (const InsDesc* Ins)
 
 
 static void Put4510 (const InsDesc* Ins)
-/* Handle all other instructions */
+/* Handle all other instructions, with modifications for 4510 */
 {
-    /* The 4510 uses all 256 possible opcodes, so the last ones were cramped
-     * in where an opcode was still undefined. As a result, some of those
-     * don't follow any rules for encoding the addressmodes. So the EATab
-     * approach does not work always. In this function, the wrongly calculated
-     * opcode is replaced by the correct one "on the fly". Suggestions for a
-     * better approach are welcome.
-     *
-     * These are:
-     * $20 -> $22 : JSR ($1234) NEED TO CHECK FOR ADDRESSING
-     * $30 -> $23 : JSR ($1234,X)
-     * $47 -> $44 : ASR $12
-     * $57 -> $54 : ASR $12,X
-     * $93 -> $82 : STA ($12,SP),Y
-     * $9c -> $8b : STY $1234,X
-     * $9e -> $9b : STX $1234,Y
-     * $af -> $ab : LDZ $1234
-     * $bf -> $bb : LDZ $1234,X
-     * $b3 -> $e2 : LDA ($12,SP),Y
-     * $d0 -> $c2 : CPZ #$00
-     */
+    /* The 4510 uses all 256 possible opcodes, so the last ones were crammed
+    ** in where an opcode was still undefined. As a result, some of those
+    ** don't follow any rules for encoding the addressmodes. So the EATab
+    ** approach does not work always. In this function, the wrongly calculated
+    ** opcode is replaced by the correct one "on the fly". Suggestions for a
+    ** better approach are welcome.
+    **
+    ** These are:
+    ** $20 -> $22 : JSR ($1234) NEED TO CHECK FOR ADDRESSING
+    ** $30 -> $23 : JSR ($1234,X)
+    ** $47 -> $44 : ASR $12
+    ** $57 -> $54 : ASR $12,X
+    ** $93 -> $82 : STA ($12,SP),Y
+    ** $9c -> $8b : STY $1234,X
+    ** $9e -> $9b : STX $1234,Y
+    ** $af -> $ab : LDZ $1234
+    ** $bf -> $bb : LDZ $1234,X
+    ** $b3 -> $e2 : LDA ($12,SP),Y
+    ** $d0 -> $c2 : CPZ #$00
+    */
     EffAddr A;
 
     /* Evaluate the addressing mode used */
     if (EvalEA (Ins, &A)) {
-        switch(A.Opcode) {
+        switch (A.Opcode) {
             case 0x20: if(A.AddrModeBit == AM65_ABS_IND) A.Opcode = 0x22; break;
             case 0x30: A.Opcode = 0x23; break;
             case 0x47: A.Opcode = 0x44; break;

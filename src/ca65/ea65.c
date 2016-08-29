@@ -140,16 +140,27 @@ void GetEA (EffAddr* A)
 
         } else {
 
-            /* (adr) or (adr),y */
+            /* (adr), (adr),y or (adr),z */
             Consume (IndirectLeave, IndirectExpect);
             if (CurTok.Tok == TOK_COMMA) {
                 /* (adr),y */
                 NextTok ();
-                Consume (TOK_Y, "`Y' expected");
-                A->AddrModeSet = AM65_DIR_IND_Y;
+                switch(CurTok.Tok) {
+                case TOK_Z:
+                    if (CPU == CPU_4510) {
+                        NextTok ();
+                        A->AddrModeSet = AM65_DIR_IND;
+                    }
+                    break;
+                default:
+                    Consume (TOK_Y, "`Y' expected");
+                    A->AddrModeSet = AM65_DIR_IND_Y;
+                    break;
+                }
             } else {
                 /* (adr) */
-                A->AddrModeSet = AM65_ABS_IND | AM65_ABS_IND_LONG | AM65_DIR_IND;
+                A->AddrModeSet = (CPU == CPU_4510) ? AM65_ABS_IND
+                                                   : AM65_ABS_IND | AM65_ABS_IND_LONG | AM65_DIR_IND;
             }
         }
 

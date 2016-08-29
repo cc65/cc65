@@ -152,7 +152,7 @@ Here is a description of all the command line options:
   Set the default for the CPU type. The option takes a parameter, which
   may be one of
 
-       	6502, 65SC02, 65C02, 65816, sweet16, HuC6280
+	6502, 6502X, 65SC02, 65C02, 65816, sweet16, HuC6280, 4510
 
 
   <label id="option-create-dep">
@@ -434,16 +434,16 @@ The assembler accepts
 In 65816 mode, several aliases are accepted, in addition to the official
 mnemonics:
 
-<tscreen><verb>
-CPA is an alias for CMP
-DEA is an alias for DEC A
-INA is an alias for INC A
-SWA is an alias for XBA
-TAD is an alias for TCD
-TAS is an alias for TCS
-TDA is an alias for TDC
-TSA is an alias for TSC
-</verb></tscreen>
+<itemize>
+<item><tt>CPA</tt> is an alias for <tt>CMP</tt>
+<item><tt>DEA</tt> is an alias for <tt>DEC A</tt>
+<item><tt>INA</tt> is an alias for <tt>INC A</tt>
+<item><tt>SWA</tt> is an alias for <tt>XBA</tt>
+<item><tt>TAD</tt> is an alias for <tt>TCD</tt>
+<item><tt>TAS</tt> is an alias for <tt>TCS</tt>
+<item><tt>TDA</tt> is an alias for <tt>TDC</tt>
+<item><tt>TSA</tt> is an alias for <tt>TSC</tt>
+</itemize>
 
 
 <sect1>6502X mode<label id="6502X-mode"><p>
@@ -472,6 +472,23 @@ from the mentioned web page, for more information, see there.
 <item><tt>SRE: {adr}:={adr}/2; A:=A xor {adr};</tt>
 </itemize>
 
+
+<sect1>4510 mode<p>
+
+The 4510 is a microcontroller that is the core of the Commodore C65 aka C64DX.
+It contains among other functions a slightly modified 65CE02 CPU, to allow
+address mapping for 20 bits of address space (1 megabyte addressable area).
+As compared to the description of the CPU in the System Specification of the
+Commodore C65 aka C64DX prototypes ca65 uses these changes:
+<itemize>
+<item><tt>LDA (d,SP),Y</tt> may also be written as <tt>LDA (d,S),Y</tt>
+(matching the 65816 notataion).
+<item>All branch instruction allow now 16 bit offsets. To use a 16 bit
+branch you have to prefix these with an "L" (e.g. "<tt>LBNE</tt>" instead of
+"<tt>BNE</tt>"). This might change at a later implementation of the assember.
+</itemize>
+For more information about the Commodore C65/C64DX and the 4510 CPU, see
+<url url="http://www.zimmers.net/anonftp/pub/cbm/c65/c65manualupdated.txt.gz">.
 
 
 <sect1>sweet16 mode<label id="sweet16-mode"><p>

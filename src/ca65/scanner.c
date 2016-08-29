@@ -1109,60 +1109,76 @@ Again:
         /* Check for special names. Bail out if we have identified the type of
         ** the token. Go on if the token is an identifier.
         */
-        if (SB_GetLen (&CurTok.SVal) == 1) {
-            switch (toupper (SB_AtUnchecked (&CurTok.SVal, 0))) {
+        switch (SB_GetLen (&CurTok.SVal)) {
+            case 1:
+                switch (toupper (SB_AtUnchecked (&CurTok.SVal, 0))) {
 
-                case 'A':
-                    if (C == ':') {
-                        NextChar ();
-                        CurTok.Tok = TOK_OVERRIDE_ABS;
-                    } else {
-                        CurTok.Tok = TOK_A;
-                    }
-                    return;
-
-                case 'F':
-                    if (C == ':') {
-                        NextChar ();
-                        CurTok.Tok = TOK_OVERRIDE_FAR;
+                    case 'A':
+                        if (C == ':') {
+                            NextChar ();
+                            CurTok.Tok = TOK_OVERRIDE_ABS;
+                        } else {
+                            CurTok.Tok = TOK_A;
+                        }
                         return;
-                    }
-                    break;
 
-                case 'S':
-                    if (CPU == CPU_65816) {
-                        CurTok.Tok = TOK_S;
+                    case 'F':
+                        if (C == ':') {
+                            NextChar ();
+                            CurTok.Tok = TOK_OVERRIDE_FAR;
+                            return;
+                        }
+                        break;
+
+                    case 'S':
+                        if ((CPU == CPU_4510) || (CPU == CPU_65816)) {
+                            CurTok.Tok = TOK_S;
+                            return;
+                        }
+                        break;
+
+                    case 'X':
+                        CurTok.Tok = TOK_X;
                         return;
-                    }
-                    break;
 
-                case 'X':
-                    CurTok.Tok = TOK_X;
-                    return;
-
-                case 'Y':
-                    CurTok.Tok = TOK_Y;
-                    return;
-
-                case 'Z':
-                    if (C == ':') {
-                        NextChar ();
-                        CurTok.Tok = TOK_OVERRIDE_ZP;
+                    case 'Y':
+                        CurTok.Tok = TOK_Y;
                         return;
-                    }
-                    break;
 
-                default:
-                    break;
-            }
+                    case 'Z':
+                        if (C == ':') {
+                            NextChar ();
+                            CurTok.Tok = TOK_OVERRIDE_ZP;
+                           return;
+                        } else {
+                            if (CPU == CPU_4510) {
+                                CurTok.Tok = TOK_Z;
+                                return;
+                            }
+                        }
+                        break;
 
-        } else if (CPU == CPU_SWEET16 &&
-                  (CurTok.IVal = Sweet16Reg (&CurTok.SVal)) >= 0) {
+                    default:
+                        break;
+                }
+                break;
+            case 2:
+                if ((CPU == CPU_4510) &&
+                    (toupper (SB_AtUnchecked (&CurTok.SVal, 0)) == 'S') &&
+                    (toupper (SB_AtUnchecked (&CurTok.SVal, 1)) == 'P')) {
 
-            /* A sweet16 register number in sweet16 mode */
-            CurTok.Tok = TOK_REG;
-            return;
+                    CurTok.Tok = TOK_S;
+                    return;
+                }
+                /* fall through */
+            default:
+                if (CPU == CPU_SWEET16 &&
+                   (CurTok.IVal = Sweet16Reg (&CurTok.SVal)) >= 0) {
 
+                    /* A sweet16 register number in sweet16 mode */
+                    CurTok.Tok = TOK_REG;
+                    return;
+                }
         }
 
         /* Check for define style macro */

@@ -61,6 +61,7 @@ const char* CPUNames[CPU_COUNT] = {
     "sweet16",
     "huc6280",
     "m740",
+    "4510",
 };
 
 /* Tables with CPU instruction sets */
@@ -74,6 +75,7 @@ const unsigned CPUIsets[CPU_COUNT] = {
     CPU_ISET_SWEET16,
     CPU_ISET_6502 | CPU_ISET_65SC02 | CPU_ISET_65C02 | CPU_ISET_HUC6280,
     CPU_ISET_6502 | CPU_ISET_M740,
+    CPU_ISET_6502 | CPU_ISET_65SC02 | CPU_ISET_65C02 | CPU_ISET_4510,
 };
 
 

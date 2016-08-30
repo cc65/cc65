@@ -540,7 +540,7 @@ static const struct {
         { "CPZ",  0x080000C, 0xd0, 1, Put4510 },
         { "DEA",  0x0000001, 0x00, 3, PutAll },   /* == DEC */
         { "DEC",  0x000006F, 0x00, 3, PutAll },
-        { "DEW",  0x0000004, 0xc3, 7, PutAll }, /* trial'n'error */
+        { "DEW",  0x0000004, 0xc3, 9, PutAll },
         { "DEX",  0x0000001, 0xca, 0, PutAll },
         { "DEY",  0x0000001, 0x88, 0, PutAll },
         { "DEZ",  0x0000001, 0x3B, 0, PutAll },
@@ -548,12 +548,12 @@ static const struct {
         { "EOR",  0x080A66C, 0x40, 0, PutAll },
         { "INA",  0x0000001, 0x00, 4, PutAll },   /* == INC */
         { "INC",  0x000006f, 0x00, 4, PutAll },
-        { "INW",  0x0000004, 0xe3, 7, PutAll }, /* trial'n'error */
+        { "INW",  0x0000004, 0xe3, 9, PutAll },
         { "INX",  0x0000001, 0xe8, 0, PutAll },
         { "INY",  0x0000001, 0xc8, 0, PutAll },
         { "INZ",  0x0000001, 0x1B, 0, PutAll },
         { "JMP",  0x0010808, 0x4c, 6, PutAll },
-        { "JSR",  0x0010808, 0x20, 6, Put4510 },
+        { "JSR",  0x0010808, 0x20, 7, Put4510 },
         { "LBCC", 0x0040000, 0x93, 0, PutPCRel4510 },
         { "LBCS", 0x0040000, 0xb3, 0, PutPCRel4510 },
         { "LBEQ", 0x0040000, 0xf3, 0, PutPCRel4510 },
@@ -985,9 +985,9 @@ static unsigned char EATab[12][AM65I_COUNT] = {
         0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x90, 0x00
     },
-    {   /* Table 7 */
+    {   /* Table 7 (Subroutine opcodes) */
         0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00,
         0xDC, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00
     },
@@ -1553,8 +1553,6 @@ static void Put4510 (const InsDesc* Ins)
     ** better approach are welcome.
     **
     ** These are:
-    ** $20 -> $22 : JSR ($1234) NEED TO CHECK FOR ADDRESSING
-    ** $30 -> $23 : JSR ($1234,X)
     ** $47 -> $44 : ASR $12
     ** $57 -> $54 : ASR $12,X
     ** $93 -> $82 : STA ($12,SP),Y
@@ -1564,14 +1562,13 @@ static void Put4510 (const InsDesc* Ins)
     ** $bf -> $bb : LDZ $1234,X
     ** $b3 -> $e2 : LDA ($12,SP),Y
     ** $d0 -> $c2 : CPZ #$00
+    ** $fc -> $23 : JSR ($1234,X)
     */
     EffAddr A;
 
     /* Evaluate the addressing mode used */
     if (EvalEA (Ins, &A)) {
         switch (A.Opcode) {
-            case 0x20: if(A.AddrModeBit == AM65_ABS_IND) A.Opcode = 0x22; break;
-            case 0x30: A.Opcode = 0x23; break;
             case 0x47: A.Opcode = 0x44; break;
             case 0x57: A.Opcode = 0x54; break;
             case 0x93: A.Opcode = 0x82; break;
@@ -1581,6 +1578,7 @@ static void Put4510 (const InsDesc* Ins)
             case 0xBF: A.Opcode = 0xBB; break;
             case 0xB3: A.Opcode = 0xE2; break;
             case 0xD0: A.Opcode = 0xC2; break;
+            case 0xFC: A.Opcode = 0x23; break;
             default: /*nothing*/ break;
         }
 

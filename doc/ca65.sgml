@@ -488,7 +488,7 @@ name="(updated version)"> uses these changes:
 (matching the 65816 notataion).
 <item>All branch instruction allow now 16 bit offsets. To use a 16 bit
 branch you have to prefix these with an "L" (e.g. "<tt>LBNE</tt>" instead of
-"<tt>BNE</tt>"). This might change at a later implementation of the assember.
+"<tt>BNE</tt>"). This might change at a later implementation of the assembler.
 </itemize>
 For more information about the Commodore C65/C64DX and the 4510 CPU, see
 <url url="http://www.zimmers.net/anonftp/pub/cbm/c65/"> and

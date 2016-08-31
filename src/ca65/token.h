@@ -66,6 +66,7 @@ typedef enum token_t {
     TOK_A,              /* A)ccumulator */
     TOK_X,              /* X register */
     TOK_Y,              /* Y register */
+    TOK_Z,              /* Z register */
     TOK_S,              /* S register */
     TOK_REG,            /* Sweet16 R.. register (in sweet16 mode) */
 

@@ -1579,7 +1579,7 @@ static void Put4510 (const InsDesc* Ins)
             case 0xB3: A.Opcode = 0xE2; break;
             case 0xD0: A.Opcode = 0xC2; break;
             case 0xFC: A.Opcode = 0x23; break;
-            default: /*nothing*/ break;
+            default: /* Keep opcode as it is */ break;
         }
 
         /* No error, output code */

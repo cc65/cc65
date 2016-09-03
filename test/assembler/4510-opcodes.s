@@ -1,4 +1,4 @@
-   .setcpu "4510"
+.setcpu "4510"
 
    brk
    ora ($05,x)

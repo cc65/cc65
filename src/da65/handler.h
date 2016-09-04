@@ -94,11 +94,12 @@ void OH_AccumulatorBit (const OpcDesc*);
 void OH_AccumulatorBitBranch (const OpcDesc*);
 void OH_JmpDirectIndirect (const OpcDesc* D);
 void OH_SpecialPage (const OpcDesc*);
-                    
+
 /* Handlers for special instructions */
 void OH_Rts (const OpcDesc*);
 void OH_JmpAbsolute (const OpcDesc*);
 void OH_JmpAbsoluteIndirect (const OpcDesc* D);
+void OH_JmpAbsoluteXIndirect (const OpcDesc* D);
 
 
 

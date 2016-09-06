@@ -408,7 +408,7 @@ static void IFNextChar (CharSource* S)
 
         /* If we come here, we have a new input line. To avoid problems
         ** with strange line terminators, remove all whitespace from the
-        ** end of the line, the add a single newline.
+        ** end of the line, then add a single newline.
         */
         Len = SB_GetLen (&S->V.File.Line);
         while (Len > 0 && IsSpace (SB_AtUnchecked (&S->V.File.Line, Len-1))) {

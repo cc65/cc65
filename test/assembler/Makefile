@@ -14,7 +14,7 @@ TARGETS += huc6280
 all: $(addprefix $(WORKDIR)/, $(addsuffix -opcodes.bin, $(TARGETS)))
 	@#
 
-.PHONY: $(addprefix $(WORKDIR)/, $(addsuffix -opcodes.bin, $(TARGETS)))
+.PHONY: all clean $(addprefix $(WORKDIR)/, $(addsuffix -opcodes.bin, $(TARGETS)))
 
 clean:
 	rm -f *.o *.bin *.lst

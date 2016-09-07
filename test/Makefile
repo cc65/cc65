@@ -40,12 +40,14 @@ $(WORKDIR)/bdiff$(EXE): bdiff.c | $(WORKDIR)
 dotests: mostlyclean continue
 
 continue: $(WORKDIR)/bdiff$(EXE)
+	@$(MAKE) -C assembler all
 	@$(MAKE) -C val all
 	@$(MAKE) -C ref all
 	@$(MAKE) -C err all
 	@$(MAKE) -C misc all
 
 mostlyclean:
+	@$(MAKE) -C assembler clean
 	@$(MAKE) -C val clean
 	@$(MAKE) -C ref clean
 	@$(MAKE) -C err clean

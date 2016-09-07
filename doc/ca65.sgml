@@ -424,8 +424,10 @@ The assembler accepts
       <tt><ref id=".PSC02" name=".PSC02"></tt> command was given).
 <item>all valid 65C02 mnemonics when in 65C02 mode (after the
       <tt><ref id=".PC02" name=".PC02"></tt> command was given).
-<item>all valid 65618 mnemonics when in 65816 mode (after the
+<item>all valid 65816 mnemonics when in 65816 mode (after the
       <tt><ref id=".P816" name=".P816"></tt> command was given).
+<item>all valid 4510 mnemonics when in 4510 mode (after the
+      <tt><ref id=".P4510" name=".P4510"></tt> command was given).
 </itemize>
 
 
@@ -3103,6 +3105,12 @@ Here's a list of all control commands and a description, what they do:
   (see <tt><ref id=".P02" name=".P02"></tt> command).
 
 
+<sect1><tt>.IFP4510</tt><label id=".IFP4510"><p>
+
+  Conditional assembly: Check if the assembler is currently in 4510 mode
+  (see <tt><ref id=".P4510" name=".P4510"></tt> command).
+
+
 <sect1><tt>.IFP816</tt><label id=".IFP816"><p>
 
   Conditional assembly: Check if the assembler is currently in 65816 mode
@@ -3494,7 +3502,18 @@ Here's a list of all control commands and a description, what they do:
   <tt><ref id="option--cpu" name="--cpu"></tt> command line option.
 
   See: <tt><ref id=".PC02" name=".PC02"></tt>, <tt><ref id=".PSC02"
-  name=".PSC02"></tt> and <tt><ref id=".P816" name=".P816"></tt>
+  name=".PSC02"></tt>, <tt><ref id=".P816" name=".P816"></tt> and
+  <tt><ref id=".P4510" name=".P4510"></tt>
+
+
+<sect1><tt>.P4510</tt><label id=".P4510"><p>
+
+  Enable the 4510 instruction set. This is a superset of the 65C02 and
+  6502 instruction sets.
+
+  See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PSC02"
+  name=".PSC02"></tt>, <tt><ref id=".PC02" name=".PC02"></tt> and
+  <tt><ref id=".P816" name=".P816"></tt>
 
 
 <sect1><tt>.P816</tt><label id=".P816"><p>
@@ -3503,7 +3522,8 @@ Here's a list of all control commands and a description, what they do:
   6502 instruction sets.
 
   See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PSC02"
-  name=".PSC02"></tt> and <tt><ref id=".PC02" name=".PC02"></tt>
+  name=".PSC02"></tt>, <tt><ref id=".PC02" name=".PC02"></tt> and
+  <tt><ref id=".P4510" name=".P4510"></tt>
 
 
 <sect1><tt>.PAGELEN, .PAGELENGTH</tt><label id=".PAGELENGTH"><p>
@@ -3531,7 +3551,8 @@ Here's a list of all control commands and a description, what they do:
   6502 and 65SC02 instructions.
 
   See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PSC02"
-  name=".PSC02"></tt> and <tt><ref id=".P816" name=".P816"></tt>
+  name=".PSC02"></tt>, <tt><ref id=".P816" name=".P816"></tt> and
+  <ref id=".P4510" name=".P4510">4510</tt>
 
 
 <sect1><tt>.POPCPU</tt><label id=".POPCPU"><p>
@@ -3604,7 +3625,8 @@ Here's a list of all control commands and a description, what they do:
   6502 instructions.
 
   See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PC02"
-  name=".PC02"></tt> and <tt><ref id=".P816" name=".P816"></tt>
+  name=".PC02"></tt>, <tt><ref id=".P816" name=".P816"></tt> and
+  <tt><ref id=".P4510" name=".P4510"></tt>
 
 
 <sect1><tt>.PUSHCPU</tt><label id=".PUSHCPU"><p>
@@ -3796,7 +3818,7 @@ Here's a list of all control commands and a description, what they do:
   Switch the CPU instruction set. The command is followed by a string that
   specifies the CPU. Possible values are those that can also be supplied to
   the <tt><ref id="option--cpu" name="--cpu"></tt> command line option,
-  namely: 6502, 6502X, 65SC02, 65C02, 65816 and HuC6280.
+  namely: 6502, 6502X, 65SC02, 65C02, 65816, 4510 and HuC6280.
 
   See: <tt><ref id=".CPU" name=".CPU"></tt>,
        <tt><ref id=".IFP02" name=".IFP02"></tt>,
@@ -3805,6 +3827,7 @@ Here's a list of all control commands and a description, what they do:
        <tt><ref id=".IFPSC02" name=".IFPSC02"></tt>,
        <tt><ref id=".P02" name=".P02"></tt>,
        <tt><ref id=".P816" name=".P816"></tt>,
+       <tt><ref id=".P4510" name=".P4510"></tt>
        <tt><ref id=".PC02" name=".PC02"></tt>,
        <tt><ref id=".PSC02" name=".PSC02"></tt>
 
@@ -4501,6 +4524,7 @@ each supported CPU a constant similar to
     CPU_65816
     CPU_SWEET16
     CPU_HUC6280
+    CPU_4510
 </verb></tscreen>
 
 is defined. These constants may be used to determine the exact type of the
@@ -4514,6 +4538,7 @@ another constant is defined:
     CPU_ISET_65816
     CPU_ISET_SWEET16
     CPU_ISET_HUC6280
+    CPU_ISET_4510
 </verb></tscreen>
 
 The value read from the <tt/<ref id=".CPU" name=".CPU">/ pseudo variable may

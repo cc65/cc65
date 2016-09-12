@@ -77,16 +77,33 @@ finish: lda     #<__defdev
         ldx     #>__defdev
         rts
 
-; XDOS version
+; XDOS default device retrieval
 
-xdos:   lda     XDEFDEV
+xdos:
+
+; check XDOS version (we need >= 2.4)
+
+        lda     XGLIN
+        cmp     #$4C            ; there needs to be a 'JMP' opcode here
+        bne     finish          ; older version, use DEFAULT_DEVICE or D1:
+        lda     XVER            ; get BCD encoded version ($24 for 2.4)
+        cmp     #$24
+        bcc     finish          ; too old, below 2.4
+
+; good XDOS version, get default drive
+
+        lda     #ATEOL
+        sta     XLINE           ; simulate empty command line
+        ldy     #0
+        jsr     XMOVE           ; create an FMS filename (which in this case only contains the drive)
+        lda     XFILE+1
         bne     done
 
         .data
 
 crvec:  jmp     $FFFF           ; target address will be set to crunch vector
 
-; Default device
+; Default device string
 
 __defdev:
 .ifdef  DEFAULT_DEVICE
@@ -94,4 +111,3 @@ __defdev:
 .else
         .byte   "D1:", 0
 .endif
-

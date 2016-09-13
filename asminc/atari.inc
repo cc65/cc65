@@ -1024,9 +1024,16 @@ XFILE        = $087D    ; XDOS filename buffer
 XLINE        = $0880    ; XDOS DUP input line
 XGLIN        = $0871    ; get line
 XSKIP        = $0874    ; skip parameter
+.ifdef __ATARIXL__
+.ifndef SHRAM_HANDLERS
+.import XMOVE_handler
+.endif
+.define XMOVE XMOVE_handler
+XMOVE_org    = $0877    ; move filename
+.else
 XMOVE        = $0877    ; move filename
+.endif
 XGNUM        = $087A    ; get number
-XDEFDEV      = $0816    ; current drive * undocumented *
 
 ;-------------------------------------------------------------------------
 ; End of atari.inc

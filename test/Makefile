@@ -47,7 +47,6 @@ continue: $(WORKDIR)/bdiff$(EXE)
 	@$(MAKE) -C misc all
 
 mostlyclean:
-	@$(MAKE) -C assembler clean
 	@$(MAKE) -C val clean
 	@$(MAKE) -C ref clean
 	@$(MAKE) -C err clean

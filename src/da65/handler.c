@@ -546,24 +546,18 @@ void OH_DirectIndirectLongX (const OpcDesc* D attribute ((unused)))
 
 
 
-static void impl_StackRelativeIndirectY (const char *sp, const OpcDesc* D attribute ((unused)))
-{
-    /* Output the line */
-    OneLine (D, "($%02X,%s),y", GetCodeByte (PC+1), sp);
-}
-
-
-
 void OH_StackRelativeIndirectY (const OpcDesc* D attribute ((unused)))
 {
-    impl_StackRelativeIndirectY( "s", D );
+    /* Output the line */
+    OneLine (D, "($%02X,s),y", GetCodeByte (PC+1));
 }
 
 
 
 void OH_StackRelativeIndirectY4510 (const OpcDesc* D attribute ((unused)))
 {
-    impl_StackRelativeIndirectY( "sp", D );
+    /* Output the line */
+    OneLine (D, "($%02X,sp),y", GetCodeByte (PC+1));
 }
 
 

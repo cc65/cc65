@@ -3552,7 +3552,7 @@ Here's a list of all control commands and a description, what they do:
 
   See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PSC02"
   name=".PSC02"></tt>, <tt><ref id=".P816" name=".P816"></tt> and
-  <ref id=".P4510" name=".P4510">4510</tt>
+  <tt><ref id=".P4510" name=".P4510"></tt>
 
 
 <sect1><tt>.POPCPU</tt><label id=".POPCPU"><p>

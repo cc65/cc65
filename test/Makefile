@@ -41,6 +41,7 @@ dotests: mostlyclean continue
 
 continue: $(WORKDIR)/bdiff$(EXE)
 	@$(MAKE) -C assembler all
+	@$(MAKE) -C disassembler all
 	@$(MAKE) -C val all
 	@$(MAKE) -C ref all
 	@$(MAKE) -C err all

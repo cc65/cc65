@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                opctable.c                                 */
+/*                                 opc4510.h                                 */
 /*                                                                           */
-/*                   Disassembler opcode description table                   */
+/*                        4510 opcode description table                      */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2011, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
+/* (C) 2003      Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,17 +33,12 @@
 
 
 
-/* da65 */
-#include "error.h"
-#include "opc4510.h"
-#include "opc6502.h"
-#include "opc6502x.h"
-#include "opc65816.h"
-#include "opc65c02.h"
-#include "opc65sc02.h"
-#include "opchuc6280.h"
-#include "opcm740.h"
-#include "opctable.h"
+#ifndef OPC4510_H
+#define OPC4510_H
+
+
+
+#include "opcdesc.h"
 
 
 
@@ -54,27 +49,10 @@
 
 
 /* Descriptions for all opcodes */
-const OpcDesc* OpcTable = OpcTable_6502;
+extern const OpcDesc OpcTable_4510[256];
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+/* End of opc4510.h */
 
-
-
-void SetOpcTable (cpu_t CPU)
-/* Set the correct opcode table for the given CPU */
-{
-    switch (CPU) {
-        case CPU_6502:    OpcTable = OpcTable_6502;     break;
-        case CPU_6502X:   OpcTable = OpcTable_6502X;    break;
-        case CPU_65SC02:  OpcTable = OpcTable_65SC02;   break;
-        case CPU_65C02:   OpcTable = OpcTable_65C02;    break;
-        case CPU_HUC6280: OpcTable = OpcTable_HuC6280;  break;
-        case CPU_M740:    OpcTable = OpcTable_M740;     break;
-        case CPU_4510:    OpcTable = OpcTable_4510;     break;
-        default:          Error ("Unsupported CPU");
-    }
-}
+#endif

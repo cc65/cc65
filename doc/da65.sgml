@@ -243,7 +243,7 @@ manipulation and bit test-and-branch commands.
 
 When disassembling 4510 code, due to handling of 16-bit wide branches, da65
 can produce output that can not be re-assembled, when one or more of those
-branches point outside of the disassmbled memory. This can happen when text
+branches point outside of the disassembled memory. This can happen when text
 or binary data is processed.
 
 While there is some code for the 65816 in the sources, it is currently

@@ -28,6 +28,7 @@ $$(WORKDIR)/$(1)-reass.s: $$(WORKDIR)/$(1)-disass.bin
 
 $$(WORKDIR)/$(1)-reass.bin: $$(WORKDIR)/$(1)-reass.s
 	@$$(BINDIR)/cl65 --cpu $(1) -t none $(START) --obj-path $$(WORKDIR) -o $$@ $$<
+	@rm -f $(1)-reass.o #workaround for #168
 	@cmp $$@ $$(WORKDIR)/$(1)-disass.bin
 	@echo da65 --cpu $(1) ok
 endef

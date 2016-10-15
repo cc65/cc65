@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <conio.h>
+#include <cc65.h>
 
 
 
@@ -292,12 +293,11 @@ int main (void)
     gotoxy (0, 1); cprintf ("frames: %lu", f);
     gotoxy (0, 2); cprintf ("fps   : %lu.%u", fps, fps10);
 
-    /* Wait for a key, then end */
-    cputsxy (0, 4, "Press any key when done...");
-    (void) cgetc ();
+    if (doesclrscrafterexit ()) {
+        cputsxy (0, 4, "Press any key when done...");
+        (void) cgetc ();
+    }
 
     /* Done */
     return EXIT_SUCCESS;
 }
-
-

@@ -4,7 +4,7 @@
 	.export 	_ch376_reset
 	.export 	_ch376_check_exist
 	.export 	_ch376_disk_mount
-	
+	.export		_ch376_set_usb_mode
 	.import 	popax
 	.importzp 	sp,tmp2,tmp3,tmp1
 	.include    "telemon30.inc"
@@ -123,6 +123,7 @@ loop:
 .proc _ch376_ic_get_version
 	lda #CH376_GET_IC_VER
 	sta CH376_COMMAND
+	ldx #0
 	lda CH376_DATA
 	rts
 .endproc 
@@ -131,10 +132,10 @@ loop:
 	
 .proc _ch376_set_usb_mode
 ; CH376_SET_USB_MODE_CODE_USB_HOST_SOF_PACKAGE_AUTOMATICALLY
-	sta tmp1
+	pha
 	lda #CH376_SET_USB_MODE ; $15
 	sta CH376_COMMAND
-	lda tmp1
+	pla
 	sta CH376_DATA
 	rts
 .endproc 
@@ -169,6 +170,7 @@ loop:
 	sta CH376_COMMAND
 	jsr _ch376_wait_response
 	; if we read data value, we have then length of the volume name
+	ldx #0
 	rts	
 .endproc 
 

@@ -147,12 +147,11 @@ static const TargetEntry TargetMap[] = {
     {   "atari",        TGT_ATARI       },
     {   "atari5200",    TGT_ATARI5200   },
     {   "atarixl",      TGT_ATARIXL     },
-    {   "atmos",        TGT_ATMOS       },
+    {   "atmos",        TGT_ATMOS       },	
     {   "bbc",          TGT_BBC         },
     {   "c128",         TGT_C128        },
     {   "c16",          TGT_C16         },
     {   "c64",          TGT_C64         },
-    {   "c65",          TGT_C65         },
     {   "cbm510",       TGT_CBM510      },
     {   "cbm610",       TGT_CBM610      },
     {   "gamate",       TGT_GAMATE      },
@@ -171,6 +170,8 @@ static const TargetEntry TargetMap[] = {
     {   "sim6502",      TGT_SIM6502     },
     {   "sim65c02",     TGT_SIM65C02    },
     {   "supervision",  TGT_SUPERVISION },
+    {   "telemon24",    TGT_TELEMON24   },
+	{   "telemon30",    TGT_TELEMON30   },	
     {   "vic20",        TGT_VIC20       },
 };
 #define MAP_ENTRY_COUNT         (sizeof (TargetMap) / sizeof (TargetMap[0]))
@@ -199,6 +200,8 @@ static const TargetProperties PropertyTable[TGT_COUNT] = {
     { "geos-apple",     CPU_65C02,      BINFMT_BINARY,      CTNone  },
     { "lunix",          CPU_6502,       BINFMT_O65,         CTNone  },
     { "atmos",          CPU_6502,       BINFMT_BINARY,      CTNone  },
+	{ "telemon24",      CPU_6502,       BINFMT_BINARY,      CTNone  },
+	{ "telemon30",      CPU_6502,       BINFMT_BINARY,      CTNone  },	
     { "nes",            CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "supervision",    CPU_65SC02,     BINFMT_BINARY,      CTNone  },
     { "lynx",           CPU_65SC02,     BINFMT_BINARY,      CTNone  },
@@ -206,7 +209,6 @@ static const TargetProperties PropertyTable[TGT_COUNT] = {
     { "sim65c02",       CPU_65C02,      BINFMT_BINARY,      CTNone  },
     { "pce",            CPU_HUC6280,    BINFMT_BINARY,      CTNone  },
     { "gamate",         CPU_6502,       BINFMT_BINARY,      CTNone  },
-    { "c65",            CPU_4510,       BINFMT_BINARY,      CTPET   },
 };
 
 /* Target system */

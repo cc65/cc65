@@ -30,7 +30,9 @@ TARGETS = apple2    \
           pce       \
           sim6502   \
           sim65c02  \
-          supervision
+          supervision\
+          telemon24\
+          telemon30
 
 DRVTYPES = emd \
            joy \

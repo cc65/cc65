@@ -243,6 +243,14 @@ static void SetSys (const char* Sys)
             DefineNumericMacro ("__ATMOS__", 1);
             break;
 
+        case TGT_TELEMON24:
+            DefineNumericMacro ("__TELEMON24__", 1);
+            break;
+                                
+        case TGT_TELEMON30:
+            DefineNumericMacro ("__TELEMON30__", 1);
+            break;
+
         case TGT_NES:
             DefineNumericMacro ("__NES__", 1);
             break;
@@ -742,7 +750,7 @@ static void OptVersion (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
 /* Print the compiler version */
 {
-    fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
+    fprintf (stderr, "cc65 V%s\n", GetVersionAsString ());
     exit (EXIT_SUCCESS);
 }
 

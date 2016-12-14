@@ -226,10 +226,6 @@ static void SetSys (const char* Sys)
             CBMSystem ("__C64__");
             break;
 
-        case TGT_C65:
-            CBMSystem ("__C65__");
-            break;
-
         case TGT_VIC20:
             CBMSystem ("__VIC20__");
             break;
@@ -289,7 +285,15 @@ static void SetSys (const char* Sys)
 
         case TGT_ATMOS:
             NewSymbol ("__ATMOS__", 1);
-            break;
+            break; 
+
+        case TGT_TELEMON24:
+             NewSymbol ("__TELEMON24__", 1);
+             break;
+
+        case TGT_TELEMON30:
+             NewSymbol ("__TELEMON30__", 1);
+             break;
 
         case TGT_NES:
             NewSymbol ("__NES__", 1);
@@ -623,8 +627,7 @@ static void OptVersion (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
 /* Print the assembler version */
 {
-    fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
-    exit(EXIT_SUCCESS);
+    fprintf (stderr, "ca65 V%s\n", GetVersionAsString ());
 }
 
 

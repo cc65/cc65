@@ -73,6 +73,8 @@ typedef enum {
     TGT_GEOS_APPLE,
     TGT_LUNIX,
     TGT_ATMOS,
+	TGT_TELEMON24,
+	TGT_TELEMON30,	
     TGT_NES,
     TGT_SUPERVISION,
     TGT_LYNX,
@@ -80,7 +82,6 @@ typedef enum {
     TGT_SIM65C02,
     TGT_PCENGINE,
     TGT_GAMATE,
-    TGT_C65,
     TGT_COUNT                   /* Number of target systems */
 } target_t;
 

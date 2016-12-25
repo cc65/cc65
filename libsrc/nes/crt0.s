@@ -159,9 +159,6 @@ nmi:    pha
 
 ; Interrupt exit
 
-irq2:
-irq1:
-timerirq:
 irq:
         rti
 
@@ -171,9 +168,6 @@ irq:
 
 .segment "VECTORS"
 
-        .word   irq2        ; $fff4 ?
-        .word   irq1        ; $fff6 ?
-        .word   timerirq    ; $fff8 ?
         .word   nmi         ; $fffa vblank nmi
         .word   start       ; $fffc reset
         .word   irq         ; $fffe irq / brk

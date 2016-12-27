@@ -3012,7 +3012,7 @@ Here's a list of all control commands and a description, what they do:
   Conditional assembly: Check if there are any remaining tokens in this line,
   and evaluate to FALSE if this is the case, and to TRUE otherwise. If the
   condition is not true, further lines are not assembled until an <tt><ref
-  id=".ELSE" name=".ESLE"></tt>, <tt><ref id=".ELSEIF" name=".ELSEIF"></tt> or
+  id=".ELSE" name=".ELSE"></tt>, <tt><ref id=".ELSEIF" name=".ELSEIF"></tt> or
   <tt><ref id=".ENDIF" name=".ENDIF"></tt> directive.
 
   This command is often used to check if a macro parameter was given. Since an

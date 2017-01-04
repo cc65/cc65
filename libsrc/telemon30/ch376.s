@@ -1,3 +1,6 @@
+
+	; For XA65 compatibily in the futur
+	.FEATURE 	c_comments,labels_without_colons,pc_assignment, loose_char_term
 	.export 	_ch376_set_file_name
 	.export 	_ch376_file_open
 	.export 	_ch376_ic_get_version
@@ -5,10 +8,18 @@
 	.export 	_ch376_check_exist
 	.export 	_ch376_disk_mount
 	.export		_ch376_set_usb_mode
+	.export		_ch376_file_create
+	.export		_ch376_fcreate
+	
+	; High level function
+	.export 	_ch376_fcreate
+	
 	.import 	popax
 	.importzp 	sp,tmp2,tmp3,tmp1
 	.include    "telemon30.inc"
+/*
 
+*/
 ; CODE FOR CH376_SET_USB_MODE *************************************************
 
 CH376_SET_USB_MODE_CODE_USB_HOST_SOF_PACKAGE_AUTOMATICALLY := $06
@@ -17,8 +28,7 @@ CH376_USB_INT_DISK_READ := $1d
 CH376_USB_INT_SUCCESS 	:= $14
 CH376_ERR_MISS_FILE 	:= $42
 	
-CH376_DATA		:=$340
-CH376_COMMAND	:=$341
+
 
 CH376_GET_IC_VER		:= $01
 CH376_SET_BAUDRATE 		:= $02
@@ -34,6 +44,7 @@ CH376_DISK_CONNECT		:= $30 ; check the disk connection status
 CH376_DISK_MOUNT		:= $31
 CH376_FILE_OPEN  		:= $32
 CH376_FILE_ENUM_GO		:= $33
+CH376_FILE_CREATE 		:= $34
 CH376_FILE_CLOSE 		:= $36
 CH376_BYTE_READ			:= $3A
 CH376_BYTE_RD_GO 		:= $3b
@@ -41,7 +52,19 @@ CH376_BYTE_WRITE		:= $3C
 CH376_DISK_CAPACITY 	:= $3E
 CH376_DISK_RD_GO 		:= $55
 
+.proc _ch376_file_create
+	lda #CH376_FILE_CREATE
+	sta CH376_COMMAND
+	jsr _ch376_wait_response
+	rts
+.endproc
 
+; void _ch376_fcreate(char *filename)
+.proc _ch376_fcreate
+	jsr _ch376_set_file_name
+	jsr _ch376_file_open
+	jsr _ch376_file_create
+.endproc
 
 ; void ch376_set_file_name(char *filename)
 .proc _ch376_set_file_name

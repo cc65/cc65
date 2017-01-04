@@ -3,7 +3,9 @@
 		.importzp sp,tmp2,tmp3,tmp1
 		; int open (const char* name, int flags, ...);    /* May take a mode argument */
     .include        "telemon30.inc"
-		
+	.include 		"errno.inc"
+	.include        "fcntl.inc"	
+	
 .proc _open
 ; Throw away any additional parameters passed through the ellipsis
 
@@ -16,12 +18,32 @@
 
 ; Parameters ok. Pop the flags and save them into tmp3
 
-parmok: jsr     popax           ; Get flags
+parmok: jsr     popax           ; Get flagss
+		sta		tmp3 ; save flags
+		
+		;AND		#O_RDONLY
+		;beq 	READONLY
+		;lda tmp3
+		;AND #O_WRONLY
+		;beq WRITEONLY
+		;jmp next
 
+;READONLY:
+;		lda #'r'
+;		BRK_TELEMON XWR0
+;		jmp next
+;WRITEONLY:	
+;		lda #'w'
+;		BRK_TELEMON XWR0	
+		
+;next:		
 ; Get the filename from stack and parse it. Bail out if is not ok
 
         jsr     popax           ; Get name
-
+		
+		
+		ldy tmp3 ; Get flags
+		
 		
 		BRK_TELEMON XOPEN
 		

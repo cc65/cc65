@@ -205,6 +205,10 @@ static void SetSys (const char* Sys)
             AbEnd ("Cannot use `module' as a target for the assembler");
             break;
 
+        case TGT_ATARI2600:
+            NewSymbol ("__ATARI2600__", 1);
+            break;
+
         case TGT_ATARI5200:
             NewSymbol ("__ATARI5200__", 1);
             break;

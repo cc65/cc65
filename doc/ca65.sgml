@@ -4583,6 +4583,7 @@ compiler, depending on the target system selected:
 <itemize>
 <item><tt/__APPLE2__/ - Target system is <tt/apple2/ or <tt/apple2enh/
 <item><tt/__APPLE2ENH__/ - Target system is <tt/apple2enh/
+<item><tt/__ATARI2600__/ - Target system is <tt/atari2600/
 <item><tt/__ATARI5200__/ - Target system is <tt/atari5200/
 <item><tt/__ATARI__/ - Target system is <tt/atari/ or <tt/atarixl/
 <item><tt/__ATARIXL__/ - Target system is <tt/atarixl/

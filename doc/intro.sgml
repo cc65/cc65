@@ -335,6 +335,35 @@ your harddrive directly.
 to the DOS menu.  Your C program should wait for a keypress if you want to see
 any output.
 
+<sect2>Stella<p>
+Available at <url
+url="http://stella.sourceforge.net">:
+
+Stella is a multi-platform Atari 2600 VCS emulator. The latest version
+is available on the emulator's website. It is also available through
+the package manager of most Linux distributions (Fedora, Ubuntu, ..).
+
+Compile the Atari 2600 sample with
+
+<tscreen><verb>
+make SYS=atari2600 samples
+</verb></tscreen>
+
+Then execute it with
+
+<tscreen><verb>
+stella samples/atari2600hello
+</verb></tscreen>
+
+<sect2>Harmony Cartridge<p>
+Available at <url
+url="http://harmony.atariage.com/Site/Harmony.html">:
+
+The Harmony Cartridge allows running any Atari 2600 binary on real
+hardware. The binary must be copied on an SD card, to be inserted in
+the Harmony Cartridge. It can then be inserted on an Atari 2600
+console, and run any binary on the SD card.
+
 
 <sect1>Atmos
 

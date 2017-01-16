@@ -19,6 +19,7 @@ TARGETS = apple2    \
           apple2enh \
           atari     \
           atarixl   \
+          atari2600 \
           atari5200 \
           atmos     \
           $(CBMS)   \

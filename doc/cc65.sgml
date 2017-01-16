@@ -752,6 +752,10 @@ The compiler defines several macros at startup:
 
   This macro is defined if the target is the enhanced Apple //e (-t apple2enh).
 
+  <tag><tt>__ATARI2600__</tt></tag>
+
+  This macro is defined if the target is the Atari 2600 game console.
+
   <tag><tt>__ATARI5200__</tt></tag>
 
   This macro is defined if the target is the Atari 5200 game console.

@@ -3,8 +3,9 @@
 <article>
 
 <title>Commodore 64-specific information for cc65
-<author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2014-04-14
+<author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz"><newline>
+<url url="mailto:greg.king5@verizon.net" name="Greg King">
+<date>2017-01-18
 
 <abstract>
 An overview over the C64 runtime system as it is implemented for the cc65 C
@@ -235,12 +236,22 @@ structures, accessing the struct fields will access the chip registers.
 The names in the parentheses denote the symbols to be used for static linking of the drivers.
 
 
+<label id="graphics-drivers">
 <sect1>Graphics drivers<p>
 
 <em>Note:</em> All available graphics drivers for the TGI interface will use
-the space below the I/O area and kernal ROM, so you can have hires graphics in
-the standard setup without any memory loss or need for a changed
-configuration.
+the space below the I/O area and Kernal ROM; so, you can have hires graphics in
+the standard setup without any memory loss or need for a changed configuration.
+
+You can use a mouse driver at the same time that you use a TGI driver.  But, if
+you want to see the default mouse pointer on the graphics screen, then you
+explicitly must link a special object file into your program.  It will put the
+arrow into the "high RAM" area where the bitmaps are put.  It's name is
+"<tt/c64-tgimousedata.o/".  Example:
+
+<tscreen><verb>
+cl65 -t c64 -o program-file main-code.c subroutines.s c64-tgimousedata.o
+</verb></tscreen>
 
 <descrip>
   <tag><tt/c64-hi.tgi (c64_hi_tgi)/</tag>
@@ -251,7 +262,8 @@ configuration.
 
 Note that the graphics drivers are incompatible with the
 <tt/c64-ram.emd (c64_ram_emd)/ extended memory driver and the
- <tt/c64-soft80.o/ software 80 columns conio driver.
+ <tt/c64-soft80.o/ software 80-columns conio driver.
+
 
 <sect1>Extended memory drivers<p>
 
@@ -335,6 +347,9 @@ The default drivers, <tt/joy_stddrv (joy_static_stddrv)/, point to <tt/c64-stdjo
 
 
 <sect1>Mouse drivers<p>
+
+You can use these drivers in text-mode or graphics-mode (TGI) programs.  See
+the description of <ref id="graphics-drivers" name="the graphics drivers">.
 
 The default drivers, <tt/mouse_stddrv (mouse_static_stddrv)/, point to <tt/c64-1351.mou (c64_1351_mou)/.
 

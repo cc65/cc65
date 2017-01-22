@@ -246,7 +246,7 @@ the standard setup without any memory loss or need for a changed configuration.
 You can use a mouse driver at the same time that you use a TGI driver.  But, if
 you want to see the default mouse pointer on the graphics screen, then you
 explicitly must link a special object file into your program.  It will put the
-arrow into the "high RAM" area where the bitmaps are put.  It's name is
+arrow into the "high RAM" area where the bitmaps are put.  Its name is
 "<tt/c64-tgimousedata.o/".  Example:
 
 <tscreen><verb>

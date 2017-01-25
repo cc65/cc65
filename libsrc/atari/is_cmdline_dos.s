@@ -11,10 +11,8 @@
         .include "atari.inc"
 
 __is_cmdline_dos:
-        ldx     #0
-        lda     __dos_type
-        cmp     #MAX_DOS_WITH_CMDLINE + 1
-        txa
+        lda     #MAX_DOS_WITH_CMDLINE
+        cmp     __dos_type
+        lda     #0
         rol     a
-        eor     #$01
         rts

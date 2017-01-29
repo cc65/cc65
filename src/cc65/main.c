@@ -746,7 +746,6 @@ static void OptVerbose (const char* Opt attribute ((unused)),
 
 
 
-
 static void OptVersion (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
 /* Print the compiler version */

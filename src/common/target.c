@@ -147,7 +147,7 @@ static const TargetEntry TargetMap[] = {
     {   "atari",        TGT_ATARI       },
     {   "atari5200",    TGT_ATARI5200   },
     {   "atarixl",      TGT_ATARIXL     },
-    {   "atmos",        TGT_ATMOS       },	
+    {   "atmos",        TGT_ATMOS       },
     {   "bbc",          TGT_BBC         },
     {   "c128",         TGT_C128        },
     {   "c16",          TGT_C16         },
@@ -172,7 +172,7 @@ static const TargetEntry TargetMap[] = {
     {   "sim65c02",     TGT_SIM65C02    },
     {   "supervision",  TGT_SUPERVISION },
     {   "telemon24",    TGT_TELEMON24   },
-	{   "telemon30",    TGT_TELEMON30   },	
+    {   "telemon30",    TGT_TELEMON30   },	
     {   "vic20",        TGT_VIC20       },
 };
 #define MAP_ENTRY_COUNT         (sizeof (TargetMap) / sizeof (TargetMap[0]))

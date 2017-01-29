@@ -227,7 +227,7 @@ static void SetSys (const char* Sys)
             break;
 
         case TGT_C65:
-            CBMSystem("__C65__");
+            CBMSystem ("__C65__");
             break;
 
         case TGT_VIC20:

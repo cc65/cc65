@@ -1,7 +1,7 @@
-        .export         _paper,_hires,_text,_circle,_curset, _switchOffCursor
-		.importzp sp,tmp2,tmp3,tmp1
-		
-		.include        "telemon30.inc"
+        .export    _paper,_hires,_text,_circle,_curset, _switchOffCursor
+		.importzp 	sp,tmp2,tmp3,tmp1
+		.import 	popa
+		.include    "telemon30.inc"
 		
 .proc _paper
 	ldx #0 ; First window
@@ -30,8 +30,11 @@
 .endproc
 
 .proc _curset
+	jsr popa ; Pixel
+	jsr popa
 	sta HRSX
-	sty HRSY
+	jsr popa
+	sta HRSY
 	BRK_TELEMON XCURSE
 	rts
 .endproc

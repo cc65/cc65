@@ -1,5 +1,5 @@
 ;
-; Based on code by Debrune Jérôme <jede@oric.org>
+; Based on code by Debrune JÃ©rÃ´me <jede@oric.org>
 ; 2016-03-17, Greg King
 ;
 
@@ -17,18 +17,17 @@
 
 .segment        "ORIXHDR"
 
-        .byte   $01, $00          ; 
+    .byte   $01, $00          ; 
 
-	.byte "ORI"
+	.byte "ori"
 
 	.byte $01 ; version
-	.byte $00,$00 ; mode
-	.byte $00,$00 ; cpu type
+	.byte $00,%00000000 ; 6502 only
+	.byte $00,$00 ; Extends
 	.byte $00,$00 ; OS
 
-        .byte   $00                     ;  reserved
-        .byte   $00                     ; auto 
-
+    .byte   $00                     ;  reserved
+    .byte   $00                     ; auto 
 
 	.word   __BASHEAD_START__       ; Address of start of file
 	.word   __MAIN_LAST__ - 1       ;  Address of end of file

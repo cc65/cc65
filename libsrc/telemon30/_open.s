@@ -1,11 +1,12 @@
         .export         _open
 		.import 		addysp,popax
-		.importzp sp,tmp2,tmp3,tmp1
-		; int open (const char* name, int flags, ...);    /* May take a mode argument */
-    .include        "telemon30.inc"
-	.include 		"errno.inc"
-	.include        "fcntl.inc"	
+		.importzp 	sp,tmp2,tmp3,tmp1
 	
+	; int open (const char* name, int flags, ...);    /* May take a mode argument */
+		.include        "telemon30.inc"
+		.include 		"errno.inc"
+		.include        "fcntl.inc"	
+		
 .proc _open
 ; Throw away any additional parameters passed through the ellipsis
 
@@ -13,53 +14,18 @@
         dey                     ; ...checked (it generates a c compiler warning)
         dey
         dey
-        beq     parmok          ; Branch if parameter count ok
-        jsr     addysp          ; Fix stack, throw away unused parameters
+        beq     	parmok          ; Branch if parameter count ok
+        jsr     	addysp          ; Fix stack, throw away unused parameters
 
 ; Parameters ok. Pop the flags and save them into tmp3
 
-parmok: jsr     popax           ; Get flagss
-		sta		tmp3 ; save flags
-		
-		;AND		#O_RDONLY
-		;beq 	READONLY
-		;lda tmp3
-		;AND #O_WRONLY
-		;beq WRITEONLY
-		;jmp next
-
-;READONLY:
-;		lda #'r'
-;		BRK_TELEMON XWR0
-;		jmp next
-;WRITEONLY:	
-;		lda #'w'
-;		BRK_TELEMON XWR0	
-		
-;next:		
+parmok: jsr     	popax           ; Get flagss
+		sta			tmp3 ; save flags
 ; Get the filename from stack and parse it. Bail out if is not ok
 
-        jsr     popax           ; Get name
-		
-		
-		ldy tmp3 ; Get flags
-		
-		
-		BRK_TELEMON XOPEN
-		
-       ; jsr     fnparse         ; Parse it
-        ;tax
-        ;bne     oserror         ; Bail out if problem with name
-
-; Get a free file handle and remember it in tmp2
-
-      ;  jsr     freefd
-        ;lda     #EMFILE         ; Load error code
-        ;bcs     seterrno        ; Jump in case of errors
-        ;stx     tmp2
-;
-		
-		
+        jsr     	popax   ; Get name
+		ldy 		tmp3 	; Get flags again
+		BRK_TELEMON XOPEN	; launch primitive ROM
 		rts
 .endproc
 		

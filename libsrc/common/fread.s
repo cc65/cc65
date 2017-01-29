@@ -173,16 +173,13 @@
 
 ; Read was ok, account for the pushed back character (if any).
 
-@L8:   		
-		add     pb
+@L8:    add     pb
         bcc     @L9
         inx
 
 ; Check for end of file.
 
-@L9:   
-
-		cmp     #0                      ; Zero bytes read?
+@L9:    cmp     #0                      ; Zero bytes read?
         bne     @L10
         cpx     #0
         bne     @L10
@@ -195,10 +192,7 @@
 ; Return the number of items successfully read. Since we've checked for
 ; bytes == 0 above, size cannot be zero here, so the division is safe.
 
-@L10:	
-
-
-		jsr     pushax                  ; Push number of bytes read
+@L10:   jsr     pushax                  ; Push number of bytes read
         ldy     #5
         jsr     ldaxysp                 ; Get size
         jsr     tosudivax               ; bytes / size -> a/x

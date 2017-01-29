@@ -226,9 +226,9 @@ static void SetSys (const char* Sys)
             CBMSystem ("__C64__");
             break;
 
-		case TGT_C65:
-			CBMSystem("__C65__");
-			break;
+        case TGT_C65:
+            CBMSystem("__C65__");
+            break;
 
         case TGT_VIC20:
             CBMSystem ("__VIC20__");
@@ -627,11 +627,11 @@ static void OptVerbose (const char* Opt attribute ((unused)),
 
 
 
-static void OptVersion (const char* Opt attribute((unused)),
-                        const char* Arg attribute((unused)))
+static void OptVersion (const char* Opt attribute ((unused)),
+                        const char* Arg attribute ((unused)))
 /* Print the assembler version */
 {
-    fprintf(stderr, "%s V%s\n", ProgName, GetVersionAsString ());
+    fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
     exit(EXIT_SUCCESS);
 }
 

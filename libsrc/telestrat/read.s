@@ -3,13 +3,13 @@
 ;
 
 
-        .FEATURE 		c_comments,labels_without_colons,pc_assignment, loose_char_term
-        .export         _read
-        
-        .import         popax
-        
-        .include        "zeropage.inc"
-        .include        "telestrat.inc"
+    .FEATURE        c_comments,labels_without_colons,pc_assignment, loose_char_term
+    .export         _read
+
+    .import         popax
+
+    .include        "zeropage.inc"
+    .include        "telestrat.inc"
 		
 ;		int read (int fd, void* buf, unsigned count);
 

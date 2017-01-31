@@ -27,7 +27,7 @@ RESB            := $02
 TR0	            := $0C
 TR1	            := $0D
 
-PTR_READ_DEST   := $2D ; used for XFREAD and XWRITE only in telemon 3.0
+PTR_READ_DEST   := $2C           ; used for XFREAD and XWRITE only in telemon 3.0
 
 HRSX            := $46
 HRSY            := $47
@@ -108,12 +108,12 @@ XWSTR0           = $14
 XTEXT            = $19
 XHIRES           = $1A
 XMINMA           = $1F
-XFREAD           = $27 ; only in TELEMON 3.0
-XOPEN            = $30 ; only in TELEMON 3.0
-XCOSCR           = $34 ; switch off cursor
-XCSSCR           = $35 ; switch on cursor
-XCLOSE           = $3A ; only in TELEMON 3.0 Close file
-XFWRITE          = $3B ; only in TELEMON 3.0 write file
+XFREAD           = $27          ; only in TELEMON 3.0
+XOPEN            = $30          ; only in TELEMON 3.0
+XCOSCR           = $34          ; switch off cursor
+XCSSCR           = $35          ; switch on cursor
+XCLOSE           = $3A          ; only in TELEMON 3.0 Close file
+XFWRITE          = $3B          ; only in TELEMON 3.0 write file
 XSONPS           = $40
 XOUPS            = $42
 XPLAY            = $43

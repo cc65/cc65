@@ -24,8 +24,8 @@ initmainargs:
 
         ldx     #0      ; Limit the length
 L0:     lda     BUFEDT,x
-		beq 	L3
-		cmp 	#' '
+        beq 	L3
+        cmp 	#' '
 		bne 	L1
 		lda 	#0
 		beq 	L3
@@ -35,7 +35,7 @@ L1:     sta     name,x
         bne     L0
 		lda 	#0
 L3:		
-		sta 	name,x
+        sta 	name,x
         inc     __argc          ; argc always is equal to, at least, 1
 
 		

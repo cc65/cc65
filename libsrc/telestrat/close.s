@@ -2,9 +2,9 @@
 
     .export         _close
         
-	.import 		addysp,popax
+    .import 		addysp,popax
         
-	.include        "zeropage.inc"		
+    .include        "zeropage.inc"		
     .include        "telestrat.inc"
     .include 		"errno.inc"
     .include        "fcntl.inc"	

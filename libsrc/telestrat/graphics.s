@@ -4,7 +4,7 @@
 	
     .include        "zeropage.inc"
     .include        "telestrat.inc"
-    .import 	    popa
+    .import         popa
 		
 		
 .proc _paper

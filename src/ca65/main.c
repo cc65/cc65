@@ -291,12 +291,8 @@ static void SetSys (const char* Sys)
             NewSymbol ("__ATMOS__", 1);
             break; 
 
-        case TGT_TELEMON24:
-             NewSymbol ("__TELEMON24__", 1);
-             break;
-
-        case TGT_TELEMON30:
-             NewSymbol ("__TELEMON30__", 1);
+        case TGT_TELESTRAT:
+             NewSymbol ("__TELESTRAT__", 1);
              break;
 
         case TGT_NES:

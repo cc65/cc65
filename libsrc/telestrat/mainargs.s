@@ -9,7 +9,7 @@
         .constructor    initmainargs, 24
         .import         __argc, __argv
 		.import 			ptr1
-        .include        "telemon30.inc"
+        .include        "telestrat.inc"
         .macpack        generic
 
 MAXARGS  = 10                   ; Maximum number of arguments allowed
@@ -23,8 +23,6 @@ MAXARGS  = 10                   ; Maximum number of arguments allowed
 initmainargs:
 
         ldx     #0      ; Limit the length
-      ;  lda     #0              ; The terminating NUL character
-       ; beq     L1              ; Branch always
 L0:     lda     BUFEDT,x
 		beq 	L3
 		cmp 	#' '
@@ -40,9 +38,6 @@ L3:
 		sta 	name,x
         inc     __argc          ; argc always is equal to, at least, 1
 
-
-
-		
 		
         ldy     #1 * 2          ; Point to second argv slot
 		
@@ -52,31 +47,24 @@ next:   lda     BUFEDT,x
         cmp     #' '            ; Skip leading spaces
         beq     next		
 
-		
-
-		
-		
 found:  cmp     #'"'            ; Is the argument quoted?
         beq     setterm         ; Jump if so
         dex                     ; Reset pointer to first argument character
-		
-	
+
         lda     #' '            ; A space ends the argument
 setterm:sta     term            ; Set end of argument marker
 
 ; Now, store a pointer, to the argument, into the next slot.
 
         txa                     ; Get low byte
-		clc
-		adc 	#<BUFEDT
-		bcc 	L4
+	    clc
+        adc 	#<BUFEDT
+        bcc 	L4
         inc 	L5+1
-L4:		
-		;add     #<args
+L4:
         sta     argv,y          ; argv[y]=&arg
 L5:		
         lda     #>BUFEDT
-        ;adc     #>args
         sta     argv+1,y
         iny
         iny
@@ -106,15 +94,12 @@ argloop:lda     BUFEDT,x
         cmp     #MAXARGS        ; Maximum number of arguments reached?
         bcc     next            ; Parse next one if not		
 		
-	
-		
 		
 done:   lda     #<argv
         ldx     #>argv
         sta     __argv
         stx     __argv + 1
         rts
-		
 		
 		
 .segment        "INIT"
@@ -127,8 +112,6 @@ term:   .res    1
 name:   .res    FNAME_LEN + 1
 args:   .res    SCREEN_XSIZE * 2 - 1
 
-ptr_current:
-	.res 2
 param_found:
 		.res 1
 ; char* argv[MAXARGS+1]={name};

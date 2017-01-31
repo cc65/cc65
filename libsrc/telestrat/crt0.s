@@ -2,7 +2,6 @@
 ; Startup code for cc65 (Oric version)
 ;
 ; By Debrune Jérôme <jede@oric.org> and Ullrich von Bassewitz <uz@cc65.org>
-; 2016-03-18, Greg King
 ;
 
         .export         _exit
@@ -13,7 +12,7 @@
         .import         __MAIN_START__, __MAIN_SIZE__
 
         .include        "zeropage.inc"
-        .include        "telemon30.inc"
+        .include        "telestrat.inc"
 
 ; ------------------------------------------------------------------------
 ; Place the startup code in a special segment.
@@ -44,8 +43,6 @@ _exit:  jsr     donelib
 
         ldx     spsave
         txs
-;        lda     stsave
- ;       sta     STATUS
 
 ; Copy back the zero-page stuff.
 
@@ -73,13 +70,6 @@ L1:     lda     sp,x
         dex
         bpl     L1
 
-; Currently, color isn't supported on the text screen.
-; Unprotect screen columns 0 and 1 (where each line's color codes would sit).
-
-      ;  lda     STATUS
-      ;  sta     stsave
-      ;  and     #%11011111
-      ;  sta     STATUS
 
 ; Set up the C stack.
 

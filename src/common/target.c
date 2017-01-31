@@ -171,8 +171,7 @@ static const TargetEntry TargetMap[] = {
     {   "sim6502",      TGT_SIM6502     },
     {   "sim65c02",     TGT_SIM65C02    },
     {   "supervision",  TGT_SUPERVISION },
-    {   "telemon24",    TGT_TELEMON24   },
-    {   "telemon30",    TGT_TELEMON30   },	
+    {   "telestrat",    TGT_TELESTRAT   },
     {   "vic20",        TGT_VIC20       },
 };
 #define MAP_ENTRY_COUNT         (sizeof (TargetMap) / sizeof (TargetMap[0]))
@@ -201,8 +200,7 @@ static const TargetProperties PropertyTable[TGT_COUNT] = {
     { "geos-apple",     CPU_65C02,      BINFMT_BINARY,      CTNone  },
     { "lunix",          CPU_6502,       BINFMT_O65,         CTNone  },
     { "atmos",          CPU_6502,       BINFMT_BINARY,      CTNone  },
-    { "telemon24",      CPU_6502,       BINFMT_BINARY,      CTNone  },
-    { "telemon30",      CPU_6502,       BINFMT_BINARY,      CTNone  },	
+    { "telestrat",      CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "nes",            CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "supervision",    CPU_65SC02,     BINFMT_BINARY,      CTNone  },
     { "lynx",           CPU_65SC02,     BINFMT_BINARY,      CTNone  },

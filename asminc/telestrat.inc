@@ -1,6 +1,7 @@
 ;
 ; Oric Telemon definition
-; Telemon 2.4
+; Telemon 2.4 & Telemon 3.0
+; For telemon 3.0 check http://orix.oric.org
 ;
 
 
@@ -18,6 +19,24 @@ FNAME_LEN       = 11            ; maximum length of file-name
 ; ---------------------------------------------------------------------------
 ; Zero page
 
+; ---------------------------------------------------------------------------
+; Page 00
+RES             := $00
+RESB            := $02
+
+TR0	            := $0C
+TR1	            := $0D
+
+PTR_READ_DEST   := $2D ; used for XFREAD and XWRITE only in telemon 3.0
+
+HRSX            := $46
+HRSY            := $47
+
+HRS1            := $4D
+HRS2            := $4F
+HRS3            := $51
+HRS4            := $53
+HRS5            := $55
 
 
 
@@ -82,68 +101,46 @@ SCREEN          := $BB80
 ; ROM entries
 
 ; primitives telemon 2.4 
-XRD0   := $08
-XRDW0  := $0c
-XWR0   := $10 
-XWSTR0 := $14 
-XTEXT  := $19
-XHIRES := $1A
-XMINMA := $1f 
-XFREAD := $27 ; only in TELEMON 3.0
-XOPEN  := $30 ; only in TELEMON 3.0
-XCOSCR := $34 ; switch off cursor
-XCSSCR := $35 ; switch on cursor
-XCLOSE := $3a ; Close file
-XFWRITE:= $3b ; write
-
-XSONPS := $40
-XOUPS  := $42
-XPLAY  := $43
-XSOUND := $44 
-XMUSIC := $45 
-XZAP   := $46
-XSHOOT := $47
-XCIRCL := $8f
-XCURSE := $90
-XEXPLO := $9c 
-XPING  := $9d
-XPAPER := $92
-XINK   := $93
-
-
-; ---------------------------------------------------------------------------
-; Page 00
-RES  := $00
-RESB := $02
-
-TR0	 := $0c
-TR1	 := $0d
-
-PTR_READ_DEST := $2c ; used for XFREAD and XWRITE
-
-HRSX := $46
-HRSY := $47
-
-HRS1 := $4D
-HRS2 := $4F
-HRS3 := $51
-HRS4 := $53
-HRS5 := $55
+XRD0             = $08
+XRDW0            = $0C
+XWR0             = $10 
+XWSTR0           = $14 
+XTEXT            = $19
+XHIRES           = $1A
+XMINMA           = $1F
+XFREAD           = $27 ; only in TELEMON 3.0
+XOPEN            = $30 ; only in TELEMON 3.0
+XCOSCR           = $34 ; switch off cursor
+XCSSCR           = $35 ; switch on cursor
+XCLOSE           = $3A ; only in TELEMON 3.0 Close file
+XFWRITE          = $3B ; only in TELEMON 3.0 write file
+XSONPS           = $40
+XOUPS            = $42
+XPLAY            = $43
+XSOUND           = $44 
+XMUSIC           = $45 
+XZAP             = $46
+XSHOOT           = $47
+XCIRCL           = $8F
+XCURSE           = $90
+XEXPLO           = $9C 
+XPING            = $9D
+XPAPER           = $92
+XINK             = $93
 
 ; ---------------------------------------------------------------------------
 ; Page $500
 
-BUFNOM := $517
-BUFEDT := $590
+BUFNOM           := $517
+BUFEDT           := $590
 
 MAX_BUFEDT_LENGTH=110
 
 ; Hardware
-CH376_DATA		:=$340
-CH376_COMMAND	:=$341
+CH376_DATA       :=$340
+CH376_COMMAND    :=$341
 
 ; MACRO 
-
 
 .macro  BRK_TELEMON   value
 	.byte $00,value

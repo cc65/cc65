@@ -1,12 +1,13 @@
         .export         _open
-		.import 		addysp,popax
-		.importzp 	sp,tmp2,tmp3,tmp1
+        .import 		addysp,popax
+        .importzp 	    sp,tmp2,tmp3,tmp1
 	
-	; int open (const char* name, int flags, ...);    /* May take a mode argument */
-		.include        "telemon30.inc"
-		.include 		"errno.inc"
-		.include        "fcntl.inc"	
-		
+	
+        .include        "telestrat.inc"
+        .include 		"errno.inc"
+        .include        "fcntl.inc"	
+
+; int open (const char* name, int flags, ...);    /* May take a mode argument */
 .proc _open
 ; Throw away any additional parameters passed through the ellipsis
 
@@ -24,9 +25,9 @@ parmok: jsr     	popax           ; Get flagss
 ; Get the filename from stack and parse it. Bail out if is not ok
 
         jsr     	popax   ; Get name
-		ldy 		tmp3 	; Get flags again
-		BRK_TELEMON XOPEN	; launch primitive ROM
-		rts
+        ldy 		tmp3 	; Get flags again
+        BRK_TELEMON XOPEN	; launch primitive ROM
+        rts
 .endproc
 		
 		

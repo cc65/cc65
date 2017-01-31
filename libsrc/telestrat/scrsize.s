@@ -6,7 +6,7 @@
 ;
 
         .export         screensize
-        .include        "telemon24.inc"
+        .include        "telestrat.inc"
 
 .proc   screensize
 

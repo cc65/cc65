@@ -1,6 +1,6 @@
 ;
-; Based on code by Debrune Jérôme <jede@oric.org>
-; 2016-03-17, Greg King
+; By Debrune Jérôme <jede@oric.org>
+
 ;
 
         ; The following symbol is used by the linker config. file
@@ -13,23 +13,23 @@
 
 
 ; ------------------------------------------------------------------------
-; Oric cassette-tape header
+; Orix header see http://orix.oric.org/doku.php?id=orix:header for specs
 
 .segment        "ORIXHDR"
 
     .byte   $01, $00          ; 
 
-	.byte "ori"
+    .byte   "ori"
 
-	.byte $01 ; version
-	.byte $00,%00000000 ; 6502 only
-	.byte $00,$00 ; Extends
-	.byte $00,$00 ; OS
+    .byte   $01 ; version
+    .byte   $00,%00000000 ; 6502 only
+    .byte   $00,$00 ; Extends
+    .byte   $00,$00 ; OS
 
     .byte   $00                     ;  reserved
     .byte   $00                     ; auto 
 
-	.word   __BASHEAD_START__       ; Address of start of file
-	.word   __MAIN_LAST__ - 1       ;  Address of end of file
-	.word   __BASHEAD_START__       ;  Address of start of file
+    .word   __BASHEAD_START__       ; Address of start of file
+    .word   __MAIN_LAST__ - 1       ;  Address of end of file
+    .word   __BASHEAD_START__       ;  Address of start of file
 

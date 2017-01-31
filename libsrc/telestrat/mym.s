@@ -1,7 +1,7 @@
         .export         _Mym_MusicStart
 		.importzp sp,tmp2,tmp3,tmp1,ptr1
 		
-		.include        "telemon30.inc"
+		.include        "telestrat.inc"
 		
 ; To check: AYC
 ; http://cpcwiki.eu/index.php/AYC

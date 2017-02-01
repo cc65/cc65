@@ -20,5 +20,3 @@
         rts
 
 .endproc
-
-

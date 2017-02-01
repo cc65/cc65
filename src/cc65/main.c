@@ -211,6 +211,10 @@ static void SetSys (const char* Sys)
             cbmsys ("__PET__");
             break;
 
+        case TGT_BBC:
+            DefineNumericMacro ("__BBC__", 1);
+            break;
+
         case TGT_APPLE2:
             DefineNumericMacro ("__APPLE2__", 1);
             break;
@@ -230,14 +234,6 @@ static void SetSys (const char* Sys)
             DefineNumericMacro ("__GEOS_CBM__", 1);
             break;
 
-        case TGT_ATMOS:
-            DefineNumericMacro ("__ATMOS__", 1);
-            break;
-
-        case TGT_BBC:
-            DefineNumericMacro ("__BBC__", 1);
-            break;
-
         case TGT_CREATIVISION:
             DefineNumericMacro ("__CREATIVISION__", 1);
             break;
@@ -251,12 +247,20 @@ static void SetSys (const char* Sys)
             DefineNumericMacro ("__LUNIX__", 1);
             break;
 
-        case TGT_LYNX:
-            DefineNumericMacro ("__LYNX__", 1);
+        case TGT_ATMOS:
+            DefineNumericMacro ("__ATMOS__", 1);
             break;
 
         case TGT_NES:
             DefineNumericMacro ("__NES__", 1);
+            break;
+
+        case TGT_SUPERVISION:
+            DefineNumericMacro ("__SUPERVISION__", 1);
+            break;
+
+        case TGT_LYNX:
+            DefineNumericMacro ("__LYNX__", 1);
             break;
 
         case TGT_SIM6502:
@@ -273,10 +277,6 @@ static void SetSys (const char* Sys)
 
         case TGT_PCENGINE:
             DefineNumericMacro ("__PCE__", 1);
-            break;
-
-        case TGT_SUPERVISION:
-            DefineNumericMacro ("__SUPERVISION__", 1);
             break;
 
         default:

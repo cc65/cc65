@@ -12,9 +12,9 @@
 
 .proc   _gotoxy
 
-        sta     CURSOR_Y          ; Set Y
-        jsr     popa              ; Get X
-        sta     CURSOR_X          ; Set X
+        sta     CURSOR_Y        ; Set Y
+        jsr     popa            ; Get X
+        sta     CURSOR_X        ; Set X
         tay
         ldx     CURSOR_Y
         jmp     setcursor       ; Set the cursor position

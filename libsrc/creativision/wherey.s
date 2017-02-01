@@ -5,7 +5,6 @@
 ;
 
         .export         _wherey
-
         .include        "creativision.inc"
 
 .proc   _wherey
@@ -15,5 +14,3 @@
         rts
 
 .endproc
-
-

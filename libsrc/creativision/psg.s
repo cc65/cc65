@@ -3,40 +3,37 @@
 ; void __fastcall__ bios_playsound( void *b, unsigned char c);
 ; void psg_silence( void );
 
-    .export     _psg_outb, _psg_silence, _psg_delay
-    .export     _bios_playsound
-    .import     popa
-    .include    "creativision.inc"
-    
+        .export          _psg_outb, _psg_silence, _psg_delay
+        .export          _bios_playsound
+        .import          popa
+        .include        "creativision.inc"
+
 _psg_outb:
 
-    ;* Let BIOS output the value
-    jmp $FE77
-    
+        ;* Let BIOS output the value
+        jmp $FE77
+
 _psg_silence:
 
-    jmp $FE54
-    
-    
+        jmp $FE54
+
+
 _psg_delay:
 
-    tay
-l1:     
-    lda #200
-l2:
-    sbc #1
-    bne l2
-    
-    lda #200
-l3:
-    sbc #1
-    bne l3
-    
-    dey
-    bne l1
-    
-    rts
-    
+        tay
+l1:     lda #200
+l2:     sbc #1
+        bne l2
+
+        lda #200
+l3:     sbc #1
+        bne l3
+
+        dey
+        bne l1
+
+        rts
+
 
 ;* Creativision Sound Player
 ;*
@@ -46,23 +43,21 @@ l3:
 
 _bios_playsound:
 
-    pha                 ; Save Length Byte
-    
-    sei
-        
-    lda         #$D5    ; BIOS volume table low
-    sta         $4
-    lda         #$FC    ; BIOS volume table high
-    sta         $5
-    
-    jsr         popa    ; Get Sound table pointer low
-    sta         $0
-    jsr         popa    ; Get Sound table pointer high
-    sta         $1
-    
-    pla
-    tay                 ; Put length in Y
-    dey
-    php
-    jmp         $fbed   ; Let BIOS do it's thing
-        
+        pha                     ; Save Length Byte
+        sei
+
+        lda         #$D5        ; BIOS volume table low
+        sta         $4
+        lda         #$FC        ; BIOS volume table high
+        sta         $5
+
+        jsr         popa        ; Get Sound table pointer low
+        sta         $0
+        jsr         popa        ; Get Sound table pointer high
+        sta         $1
+
+        pla
+        tay                     ; Put length in Y
+        dey
+        php
+        jmp         $FBED       ; Let BIOS do it's thing

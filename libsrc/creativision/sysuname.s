@@ -34,6 +34,3 @@ utsdata:
 
         ; machine
         .asciiz         "CREATIVISION"
-
-                            
-

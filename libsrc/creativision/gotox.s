@@ -11,7 +11,7 @@
 
 .proc   _gotox
 
-        sta     CURSOR_X          ; Set new position
+        sta     CURSOR_X        ; Set new position
         tay
         ldx     CURSOR_Y
         jmp     setcursor       ; Set the cursor to the new position

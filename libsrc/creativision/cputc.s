@@ -29,13 +29,13 @@ _cputcxy:
 
 ; Plot a character - also used as internal function
 
-_cputc: cmp     #$0d            ; CR?
+_cputc: cmp     #$0D            ; CR?
         bne     L1
         lda     #0
         sta     CURSOR_X
         beq     plot            ; Recalculate pointers
 
-L1:     cmp     #$0a            ; LF?
+L1:     cmp     #$0A            ; LF?
         beq     newline         ; Recalculate pointers
 
 ; Printable char of some sort
@@ -82,19 +82,19 @@ IS_UPPER:
         pha
         lda     SCREEN_PTR
         sei
-        sta             VDP_CONTROL_W
+        sta     VDP_CONTROL_W
         lda     SCREEN_PTR+1
-        ora             #$40
-        sta             VDP_CONTROL_W
+        ora     #$40
+        sta     VDP_CONTROL_W
         pla
         clc
-        adc             #160
-        sta             VDP_DATA_W
+        adc     #160
+        sta     VDP_DATA_W
         cli
 
 BAD_CHAR:
         jmp     plot
-        
+
 ;-----------------------------------------------------------------------------
 ; Initialize the conio subsystem. Code goes into the INIT segment, which may
 ; be reused after startup.
@@ -102,24 +102,24 @@ BAD_CHAR:
 .segment        "INIT"
 
 initconio:
-    lda #$0
-    sta SCREEN_PTR
-    lda #$10
-    sta SCREEN_PTR+1
+        lda     #$0
+        sta     SCREEN_PTR
+        lda     #$10
+        sta     SCREEN_PTR+1
 
-    ; Copy box characters to slot
-    sei
-    lda #08
-    sta VDP_CONTROL_W
-    lda #$46
-    sta VDP_CONTROL_W
-    ldx #0
-LL:
-    lda boxchars,x
-    sta VDP_DATA_W
-    inx
-    cpx #48
-    bne LL      
+        ; Copy box characters to slot
+        sei
+        lda     #08
+        sta     VDP_CONTROL_W
+        lda     #$46
+        sta     VDP_CONTROL_W
+        ldx     #0
 
-    cli
-    jmp plot
+LL:     lda     boxchars,x
+        sta     VDP_DATA_W
+        inx
+        cpx     #48
+        bne     LL
+
+        cli
+        jmp plot

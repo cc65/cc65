@@ -6,7 +6,7 @@
         .importzp       tmp1
 
         .include        "creativision.inc"
-                                 
+
 _chlinexy:
         pha                     ; Save the length
         jsr     popa            ; Get y

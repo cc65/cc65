@@ -2,7 +2,7 @@
 /*                                                                           */
 /*                                  main.c                                   */
 /*                                                                           */
-/*             Main program of the chrcvt vector font converter              */
+/*            Main program of the chrcvt65 vector font converter             */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -46,7 +46,7 @@
 #include "xmalloc.h"
 #include "version.h"
 
-/* chrcvt */
+/* chrcvt65 */
 #include "error.h"
 
 
@@ -219,8 +219,8 @@ static void OptVersion (const char* Opt attribute ((unused)),
 /* Print the assembler version */
 {
     fprintf (stderr,
-             "%s V%s - (C) Copyright 2009, Ullrich von Bassewitz\n",
-             ProgName, GetVersionAsString ());
+             "%s V%s\n", ProgName, GetVersionAsString ());
+    exit(EXIT_SUCCESS);
 }
 
 
@@ -482,7 +482,7 @@ int main (int argc, char* argv [])
     unsigned I;
 
     /* Initialize the cmdline module */
-    InitCmdLine (&argc, &argv, "chrcvt");
+    InitCmdLine (&argc, &argv, "chrcvt65");
 
     /* Check the parameters */
     I = 1;

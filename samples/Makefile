@@ -4,144 +4,264 @@
 # This Makefile requires GNU make
 #
 
-# Enter the target system here
-SYS	= c64
+# Run 'make SYS=<target>' or set a SYS env
+# var to build for another target system.
+SYS ?= c64
 
-# Determine the path to the executables and libraries. If the samples
-# directory is part of a complete source tree, use the stuff from that
-# source tree; otherwise, use the "install" directories.
-ifeq "$(wildcard ../src)" ""
-# No source tree
-MOUS = /usr/lib/cc65/mou/$(SYS)*.mou
-TGI  = /usr/lib/cc65/tgi/$(SYS)*.tgi
-ifneq "$(wildcard /usr/local/lib/cc65)" ""
-MOUS = /usr/local/lib/cc65/mou/$(SYS)*.mou
-TGI  = /usr/local/lib/cc65/tgi/$(SYS)*.tgi
+ifneq ($(shell echo),)
+  CMD_EXE = 1
 endif
-ifdef CC65_HOME
-MOUS = $(CC65_HOME)/mou/$(SYS)*.mou
-TGI  = $(CC65_HOME)/tgi/$(SYS)*.tgi
-endif
-CLIB = --lib $(SYS).lib
-CL   = cl65
-CC   = cc65
-AS   = ca65
-LD   = ld65
 
+ifdef CMD_EXE
+  NULLDEV = nul:
+  DEL = -del /f
+  RMDIR = rmdir /s /q
 else
-# "samples/" is a part of a complete source tree.
-export CC65_HOME := $(abspath ..)
-MOUS = ../mou/$(SYS)*.mou
-TGI  = ../tgi/$(SYS)*.tgi
-CLIB = ../lib/$(SYS).lib
-CL   = ../bin/cl65
-CC   = ../bin/cc65
-AS   = ../bin/ca65
-LD   = ../bin/ld65
+  NULLDEV = /dev/null
+  DEL = $(RM)
+  RMDIR = $(RM) -r
 endif
 
-# This one comes with VICE
-C1541	= c1541
+ifdef CC65_HOME
+  AS = $(CC65_HOME)/bin/ca65
+  CC = $(CC65_HOME)/bin/cc65
+  CL = $(CC65_HOME)/bin/cl65
+  LD = $(CC65_HOME)/bin/ld65
+else
+  AS := $(if $(wildcard ../bin/ca65*),../bin/ca65,ca65)
+  CC := $(if $(wildcard ../bin/cc65*),../bin/cc65,cc65)
+  CL := $(if $(wildcard ../bin/cl65*),../bin/cl65,cl65)
+  LD := $(if $(wildcard ../bin/ld65*),../bin/ld65,ld65)
+endif
+
+ifneq ($(filter disk samples.%,$(MAKECMDGOALS)),)
+  TARGET_PATH := $(shell $(CL) --print-target-path)
+
+  EMD := $(wildcard $(TARGET_PATH)/$(SYS)/drv/emd/*)
+  MOU := $(wildcard $(TARGET_PATH)/$(SYS)/drv/mou/*)
+  TGI := $(wildcard $(TARGET_PATH)/$(SYS)/drv/tgi/*)
+
+  # This one comes with VICE
+  C1541 ?= c1541
+
+  # For this one see http://applecommander.sourceforge.net/
+  AC ?= ac.jar
+
+  # For this one see http://www.horus.com/~hias/atari/
+  DIR2ATR ?= dir2atr
+
+  DISK_c64       = samples.d64
+  DISK_apple2    = samples.dsk
+  DISK_apple2enh = samples.dsk
+  DISK_atari     = samples.atr
+  DISK_atarixl   = samples.atr
+endif
 
 # --------------------------------------------------------------------------
 # System-dependent settings
 
 # The Apple machines need the start address adjusted when using TGI
-LDFLAGS_mandelbrot_apple2 = --start-addr 0x4000
-LDFLAGS_tgidemo_apple2 = --start-addr 0x4000
+LDFLAGS_mandelbrot_apple2    = --start-addr 0x4000
 LDFLAGS_mandelbrot_apple2enh = --start-addr 0x4000
-LDFLAGS_tgidemo_apple2enh = --start-addr 0x4000
+LDFLAGS_tgidemo_apple2       = --start-addr 0x4000
+LDFLAGS_tgidemo_apple2enh    = --start-addr 0x4000
 
 # The Apple ][ needs the start address adjusted for the mousetest
 LDFLAGS_mousetest_apple2 = --start-addr 0x4000
 
-# The atarixl target needs the start address adjusted when using TGI
-LDFLAGS_mandelbrot_atarixl = --start-addr 0x4000
-LDFLAGS_tgidemo_atarixl = --start-addr 0x4000
+# The Apple machines need the end address adjusted for large programs
+LDFLAGS_gunzip65_apple2    = -D __HIMEM__=0xBF00
+LDFLAGS_gunzip65_apple2enh = -D __HIMEM__=0xBF00
 
 # The atari target needs to reserve some memory when using TGI
 LDFLAGS_mandelbrot_atari = -D __RESERVED_MEMORY__=0x2000
-LDFLAGS_tgidemo_atari = -D __RESERVED_MEMORY__=0x2000
+LDFLAGS_tgidemo_atari    = -D __RESERVED_MEMORY__=0x2000
+
+# The atarixl target needs the start address adjusted when using TGI
+LDFLAGS_mandelbrot_atarixl = --start-addr 0x4000
+LDFLAGS_tgidemo_atarixl    = --start-addr 0x4000
 
 # --------------------------------------------------------------------------
 # Generic rules
+
+.PHONY: all mostlyclean clean install zip samples disk
 
 %: %.c
 %: %.s
 
 .c.o:
-	@echo $<
-	@$(CC) $(CFLAGS) -Oirs --codesize 500 -T -g -t $(SYS) $<
-	@$(AS) $(<:.c=.s)
+	$(CC) $(CFLAGS) -Oirs --codesize 500 -T -g -t $(SYS) $<
+	$(AS) $(<:.c=.s)
 
 .s.o:
-	@echo $<
-	@$(AS) $(AFLAGS) -t $(SYS) $<
+	$(AS) $(AFLAGS) -t $(SYS) $<
 
 .PRECIOUS: %.o
 
 .o:
-	@$(LD) $(LDFLAGS_$(@F)_$(SYS)) -o $@ -t $(SYS) -m $@.map $^ $(CLIB)
+	$(LD) $(LDFLAGS_$(@F)_$(SYS)) -o $@ -t $(SYS) -m $@.map $^ $(SYS).lib
 
 # --------------------------------------------------------------------------
-# List of executables. This list could be made target-dependent by checking
-# $(SYS).
+# List of executables
 
-EXELIST	=	ascii		\
-		diodemo		\
-		enumdevdir	\
-		fire		\
-		gunzip65	\
-		hello		\
-		mandelbrot	\
-		mousetest	\
-		multdemo	\
-		nachtm		\
-		ovrldemo	\
-		plasma		\
-		sieve		\
-		tgidemo
+EXELIST_c64 =      \
+        ascii      \
+        enumdevdir \
+        fire       \
+        gunzip65   \
+        hello      \
+        mandelbrot \
+        mousetest  \
+        multdemo   \
+        nachtm     \
+        ovrldemo   \
+        plasma     \
+        sieve      \
+        tgidemo
+
+EXELIST_apple2 =   \
+        ascii      \
+        diodemo    \
+        enumdevdir \
+        gunzip65   \
+        hello      \
+        mandelbrot \
+        mousetest  \
+        multdemo   \
+        ovrldemo   \
+        sieve      \
+        tgidemo
+
+EXELIST_apple2enh = $(EXELIST_apple2)
+
+EXELIST_atari =    \
+        ascii      \
+        gunzip65   \
+        hello      \
+        mandelbrot \
+        mousetest  \
+        multdemo   \
+        ovrldemo   \
+        sieve      \
+        tgidemo
+
+EXELIST_atarixl = $(EXELIST_atari)
+
+EXELIST_atari2600 =    \
+        atari2600hello
 
 # --------------------------------------------------------------------------
-# Rules to make the binaries
+# Rules to make the binaries and the disk
 
-.PHONY:	all
-all:	$(EXELIST)
+samples: $(EXELIST_$(SYS))
+
+disk: $(DISK_$(SYS))
+
+all:
 
 # --------------------------------------------------------------------------
 # Overlay rules. Overlays need special ld65 configuration files.  Also, the
 # overlay file-names are shortenned to fit the Atari's 8.3-character limit.
 
-multdemo:	multidemo.o
-	@$(LD) -o $@ -C $(SYS)-overlay.cfg -m $@.map $^ $(CLIB)
+multdemo: multidemo.o
+	$(LD) -o $@ -C $(SYS)-overlay.cfg -m $@.map $^ $(SYS).lib
 
-ovrldemo:	overlaydemo.o
-	@$(LD) -o $@ -C $(SYS)-overlay.cfg -m $@.map $^ $(CLIB)
+ovrldemo: overlaydemo.o
+	$(LD) -o $@ -C $(SYS)-overlay.cfg -m $@.map $^ $(SYS).lib
+
+OVERLAYLIST := $(foreach I,1 2 3,multdemo.$I ovrldemo.$I)
 
 # --------------------------------------------------------------------------
 # Rule to make a CBM disk with all samples. Needs the c1541 program that comes
 # with the VICE emulator.
 
-.PHONY:	disk
-disk:	samples.d64
+define D64_WRITE_recipe
 
-samples.d64:	all
-	@$(C1541) -format samples,AA  d64 $@ > /dev/null
-	@for exe in $(EXELIST); do\
-	    $(C1541) -attach $@ -write $$exe > /dev/null || exit $$?;\
-	done
-	@for mod in $(TGI) $(MOUS); do\
-	    $(C1541) -attach $@ -write $$mod > /dev/null || exit $$?;\
-	done
+$(C1541) -attach $@ -write $(file) $(notdir $(file)) >$(NULLDEV)
+
+endef # D64_WRITE_recipe
+
+samples.d64: samples
+	@$(C1541) -format samples,AA  d64 $@ >$(NULLDEV)
+	$(foreach file,$(EXELIST_$(SYS)),$(D64_WRITE_recipe))
+	$(foreach file,$(OVERLAYLIST),$(D64_WRITE_recipe))
+	$(foreach file,$(EMD) $(MOU) $(TGI),$(D64_WRITE_recipe))
+
+# --------------------------------------------------------------------------
+# Rule to make an Apple II disk with all samples. Needs the Apple Commander
+# program available at http://applecommander.sourceforge.net/ and a template
+# disk named 'prodos.dsk'.
+
+define DSK_WRITE_BIN_recipe
+
+$(if $(findstring BF00,$(LDFLAGS_$(notdir $(file))_$(SYS))), \
+  java -jar $(AC) -p $@ $(notdir $(file)).system sys <$(TARGET_PATH)/$(SYS)/util/loader.system)
+java -jar $(AC) -cc65 $@ $(notdir $(file)) bin <$(file)
+
+endef # DSK_WRITE_BIN_recipe
+
+define DSK_WRITE_REL_recipe
+
+java -jar $(AC) -p $@ $(notdir $(file)) rel 0 <$(file)
+
+endef # DSK_WRITE_REL_recipe
+
+samples.dsk: samples
+	cp prodos.dsk $@
+	$(foreach file,$(EXELIST_$(SYS)),$(DSK_WRITE_BIN_recipe))
+	$(foreach file,$(OVERLAYLIST),$(DSK_WRITE_REL_recipe))
+	$(foreach file,$(EMD) $(MOU) $(TGI),$(DSK_WRITE_REL_recipe))
+
+# --------------------------------------------------------------------------
+# Rule to make an Atari disk with all samples. Needs the dir2atr program
+# available at http://www.horus.com/~hias/atari/ and the MyDos4534 variant
+# of dos.sys and dup.sys.
+
+define ATR_WRITE_recipe
+
+cp $(file) atr/$(notdir $(file))
+
+endef # ATR_WRITE_recipe
+
+samples.atr: samples
+	@mkdir atr
+	cp dos.sys atr/dos.sys
+	cp dup.sys atr/dup.sys
+	@$(foreach file,$(EXELIST_$(SYS)),$(ATR_WRITE_recipe))
+	@$(foreach file,$(OVERLAYLIST),$(ATR_WRITE_recipe))
+	@$(foreach file,$(EMD) $(MOU) $(TGI),$(ATR_WRITE_recipe))
+	$(DIR2ATR) -d -b MyDos4534 3200 $@ atr
+	@$(RMDIR) atr
+
+# --------------------------------------------------------------------------
+# Installation rules
+
+INSTALL = install
+samplesdir = $(prefix)/share/cc65
+
+install:
+	$(if $(prefix),,$(error variable `prefix' must be set))
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/geos
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/tutorial
+	$(INSTALL) -m0644 *.* $(DESTDIR)$(samplesdir)
+	$(INSTALL) -m0644 README $(DESTDIR)$(samplesdir)
+	$(INSTALL) -m0644 Makefile $(DESTDIR)$(samplesdir)
+	$(INSTALL) -m0644 geos/*.* $(DESTDIR)$(samplesdir)/geos
+	$(INSTALL) -m0644 tutorial/*.* $(DESTDIR)$(samplesdir)/tutorial
+
+# --------------------------------------------------------------------------
+# Packaging rules
+
+zip:
+	@cd .. && zip -r cc65 samples/
 
 # --------------------------------------------------------------------------
 # Clean-up rules
 
-.PHONY:	clean
-clean:
-	$(RM) *~ *.map *.o *.s *.lbl
+mostlyclean:
+	@$(DEL) *.map *.o *.s 2>$(NULLDEV)
 
-.PHONY:	zap
-zap:	clean
-	$(RM) $(EXELIST) samples.d64
-	$(RM) multdemo.? ovrldemo.?
+clean: mostlyclean
+	@$(DEL) $(EXELIST_$(SYS)) $(DISK_$(SYS)) 2>$(NULLDEV)
+	@$(DEL) multdemo.? ovrldemo.? 2>$(NULLDEV)

@@ -62,6 +62,7 @@ Short options:
   -V                            Print the version number
   -W name[,...]                 Supress compiler warnings
   -Wa options                   Pass options to the assembler
+  -Wc options                   Pass options to the compiler
   -Wl options                   Pass options to the linker
 
 Long options:
@@ -103,6 +104,7 @@ Long options:
   --o65-model model             Override the o65 model
   --obj file                    Link this object file
   --obj-path path               Specify an object file search path
+  --print-target-path           Print the target file path
   --register-space b            Set space available for register variables
   --register-vars               Enable register variables
   --rodata-name seg             Set the name of the RODATA segment
@@ -154,6 +156,14 @@ There are a few remaining options that control the behaviour of cl65:
   shouldn't use -o when more than one output file is created.
 
 
+  <tag><tt>--print-target-path</tt></tag>
+
+  This option prints the absolute path of the target file directory and exits
+  then. It is supposed to be used with shell backquotes or the GNU make shell
+  function. This way you can write build scripts or Makefiles accessing target
+  files without any assumption about the cc65 installation path.
+
+
   <tag><tt>-t sys, --target sys</tt></tag>
 
   The default for this option is different from the compiler and linker in the
@@ -161,6 +171,7 @@ There are a few remaining options that control the behaviour of cl65:
   and linker) will use the "none" system settings by default, cl65 will use
   the C64 as a target system by default. This was chosen since most people
   seem to use cc65 to develop for the C64.
+
 
   <tag><tt>-Wa options, --asm-args options</tt></tag>
 
@@ -172,6 +183,7 @@ There are a few remaining options that control the behaviour of cl65:
   if cl65 supports an option by itself, do not pass this option to the
   assembler by means of the <tt/-Wa/ switch.
 
+
   <tag><tt>-Wc options, --cc-args options</tt></tag>
 
   Pass options directly to the compiler. This may be used to pass options
@@ -181,6 +193,7 @@ There are a few remaining options that control the behaviour of cl65:
   with some of the defaults, because cl65 doesn't parse the options passed. So
   if cl65 supports an option by itself, do not pass this option to the
   compiler by means of the <tt/-Wc/ switch.
+
 
   <tag><tt>-Wl options, --ld-args options</tt></tag>
 
@@ -192,7 +205,7 @@ There are a few remaining options that control the behaviour of cl65:
   supports an option by itself, do not pass this option to the linker by means
   of the <tt/-Wl/ switch.
 
-</descrip>                        
+</descrip>
 
 
 
@@ -304,4 +317,3 @@ freely, subject to the following restrictions:
 
 
 </article>
-

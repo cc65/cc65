@@ -55,10 +55,10 @@
 .endproc
 
 ; ------------------------------------------------------------------------
-; Switch the cursor off. Code goes into the INIT segment
-; which may be reused after it is run.
+; Switch the cursor off. Code goes into the ONCE segment,
+; which will be reused after it is run.
 
-.segment        "INIT"
+.segment        "ONCE"
 
 initcgetc:
         lsr     STATUS

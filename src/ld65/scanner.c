@@ -505,7 +505,7 @@ void CfgSpecialToken (const IdentTok* Table, unsigned Size, const char* Name)
     }
 
     /* Not found or no identifier */
-    CfgError (&CfgErrorPos, "%s expected", Name);
+    CfgError (&CfgErrorPos, "%s expected, got '%s'", Name, SB_GetConstBuf(&CfgSVal));
 }
 
 

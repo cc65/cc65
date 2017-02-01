@@ -12,7 +12,7 @@
         .export         soft80_newline, soft80_plot
         .export         soft80_checkchar
 
-        .import         popa, _gotoxy
+        .import         gotoxy
 
         .import         soft80_kplot
         .import         soft80_internal_bgcolor, soft80_internal_cellcolor
@@ -25,8 +25,7 @@
 
 soft80_cputcxy:
         pha                     ; Save C
-        jsr     popa            ; Get Y
-        jsr     _gotoxy         ; Set cursor, drop x
+        jsr     gotoxy          ; Set cursor, drop x and y
         pla                     ; Restore C
 
 ; Plot a character - also used as internal function

@@ -124,6 +124,6 @@ void TgtTranslateStrBuf (StrBuf* Buf)
 void TgtTranslateSet (unsigned Index, unsigned char C)
 /* Set the translation code for the given character */
 {
-    CHECK (Index > 0 && Index < sizeof (Tab));
+    CHECK (Index < sizeof (Tab));
     Tab[Index] = C;
 }

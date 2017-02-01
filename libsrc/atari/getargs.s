@@ -7,6 +7,8 @@
 ; startup code but is nevertheless included in the compiled program when
 ; needed.
 
+; XDOS support added 05/2016 by Christian Groessler
+
 MAXARGS = 16            ; max. amount of arguments in arg. table
 CL_SIZE = 64            ; command line buffer size
 SPACE   = 32            ; SPACE char.
@@ -20,30 +22,32 @@ SPACE   = 32            ; SPACE char.
 ; --------------------------------------------------------------------------
 ; Get command line
 
-.segment        "INIT"
+.segment        "ONCE"
+
+nargdos:rts
 
 initmainargs:
-        lda     #0
-        sta     __argc
-        sta     __argc+1
-        sta     __argv
-        sta     __argv+1
-
         lda     __dos_type      ; which DOS?
-        cmp     #ATARIDOS
-        beq     nargdos         ; DOS does not support arguments
-        cmp     #MYDOS
-        bne     argdos          ; DOS supports arguments
-nargdos:rts
+        cmp     #MAX_DOS_WITH_CMDLINE + 1
+        bcs     nargdos
 
 ; Initialize ourcl buffer
 
-argdos: lda     #ATEOL
-        sta     ourcl+CL_SIZE
+argdos: ldy     #ATEOL
+        sty     ourcl+CL_SIZE
 
-; Move SpartaDOS command line to our own buffer
+; Move SpartaDOS/XDOS command line to our own buffer
 
-        lda     DOSVEC
+        cmp     #XDOS
+        bne     sparta
+
+        lda     #<XLINE
+        sta     ptr1
+        lda     #>XLINE
+        sta     ptr1+1
+        bne     cpcl0
+
+sparta: lda     DOSVEC
         clc
         adc     #<LBUF
         sta     ptr1
@@ -51,7 +55,7 @@ argdos: lda     #ATEOL
         adc     #>LBUF
         sta     ptr1+1
 
-        ldy     #0
+cpcl0:  ldy     #0
 cpcl:   lda     (ptr1),y
         sta     ourcl,y
         iny
@@ -120,7 +124,7 @@ eopar:
 
 finargs:
         lda     __argc
-        asl           
+        asl
         tax
         lda     #0
         sta     argv,x
@@ -134,7 +138,7 @@ finargs:
 ; --------------------------------------------------------------------------
 ; Data
 
-.bss
+.segment        "INIT"
 
 argv:   .res    (1 + MAXARGS) * 2
 

@@ -5,7 +5,7 @@
 <title>PC-Engine (TurboGrafx) System specific information for cc65
 <author>
 <url url="mailto:groepaz@gmx.net" name="Groepaz/Hitmen">
-<date>2015-07-14
+<date>2016-09-29
 
 <abstract>
 An overview over the PCE runtime system as it is implemented for the
@@ -179,7 +179,7 @@ some useful resources on PCE coding:
 <itemize>
 <item><url url="http://blog.blockos.org/?tag=pc-engine">
 <item><url url="http://pcedev.blockos.org/viewforum.php?f=5">
-<item><url url="http://www.romhacking.net/?page=documents&amp;category=&amp;platform=4&amp:game=&amp;author=&amp;perpage=20&amp;level=&amp;title=&amp;desc=&amp;docsearch=Go">
+<item><url url="http://www.romhacking.net/?page=documents&amp;platform=4">
 <item><url url="http://archaicpixels.com/Main_Page">
 
 <item><url url="http://www.magicengine.com/mkit/doc.html">

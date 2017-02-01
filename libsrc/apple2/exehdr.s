@@ -6,11 +6,11 @@
 ;
 
         .export         __EXEHDR__ : absolute = 1       ; Linker referenced
-        .import         __LOADADDR__, __LOADSIZE__      ; Linker generated
+        .import         __MAIN_START__, __MAIN_LAST__   ; Linker generated
 
 ; ------------------------------------------------------------------------
 
         .segment        "EXEHDR"
 
-        .addr           __LOADADDR__    ; Load address
-        .word           __LOADSIZE__    ; Load length
+        .addr           __MAIN_START__                  ; Load address
+        .word           __MAIN_LAST__ - __MAIN_START__  ; Load length

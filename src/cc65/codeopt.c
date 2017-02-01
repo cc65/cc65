@@ -911,6 +911,8 @@ void ListOptSteps (FILE* F)
 /* List all optimization steps */
 {
     unsigned I;
+    
+    fprintf (F, "any\n");
     for (I = 0; I < OPTFUNC_COUNT; ++I) {
         fprintf (F, "%s\n", OptFuncs[I]->Name);
     }

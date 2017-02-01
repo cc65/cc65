@@ -3,7 +3,7 @@
 <article>
 <title>cc65 function reference
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2015-07-21
+<date>2016-08-07
 
 <abstract>
 cc65 is a C compiler for 6502 based systems. This function reference describes
@@ -98,6 +98,7 @@ function.
 <!-- <item><ref id="_getcolor" name="_getcolor"> -->
 <!-- <item><ref id="_getdefdev" name="_getdefdev"> -->
 <!-- <item><ref id="_graphics" name="_graphics"> -->
+<item><ref id="_is_cmdline_dos" name="_is_cmdline_dos">
 <!-- <item><ref id="_rest_vecs" name="_rest_vecs"> -->
 <!-- <item><ref id="_save_vecs" name="_save_vecs"> -->
 <!-- <item><ref id="_scroll" name="_scroll"> -->
@@ -168,8 +169,11 @@ function.
 <item><ref id="cbm_k_open" name="cbm_k_open">
 <item><ref id="cbm_k_readst" name="cbm_k_readst">
 <item><ref id="cbm_k_save" name="cbm_k_save">
+<item><ref id="cbm_k_scnkey" name="cbm_k_scnkey">
 <item><ref id="cbm_k_setlfs" name="cbm_k_setlfs">
 <item><ref id="cbm_k_setnam" name="cbm_k_setnam">
+<item><ref id="cbm_k_talk" name="cbm_k_talk">
+<item><ref id="cbm_k_udtim" name="cbm_k_udtim">
 <item><ref id="cbm_k_unlsn" name="cbm_k_unlsn">
 <!-- <item><ref id="cbm_load" name="cbm_load"> -->
 <!-- <item><ref id="cbm_open" name="cbm_open"> -->
@@ -206,7 +210,7 @@ function.
 
 <sect1><tt/cc65.h/<label id="cc65.h"><p>
 
-<!-- <itemize> -->
+<itemize>
 <!-- <item><ref id="cc65_cos" name="cc65_cos"> -->
 <!-- <item><ref id="cc65_idiv32by16r16" name="cc65_idiv32by16r16"> -->
 <!-- <item><ref id="cc65_imul16x16r32" name="cc65_imul16x16r32"> -->
@@ -216,7 +220,8 @@ function.
 <!-- <item><ref id="cc65_umul16x16r32" name="cc65_umul16x16r32"> -->
 <!-- <item><ref id="cc65_umul16x8r32" name="cc65_umul16x8r32"> -->
 <!-- <item><ref id="cc65_umul8x8r16" name="cc65_umul8x8r16"> -->
-<!-- </itemize> -->
+<item><ref id="doesclrscrafterexit" name="doesclrscrafterexit">
+</itemize>
 
 (incomplete)
 
@@ -343,6 +348,16 @@ function.
 </itemize>
 
 
+<sect1><tt/gamate.h/<label id="gamate.h"><p>
+
+<!-- <itemize> -->
+<!-- <item><ref id="get_tv" name="get_tv"> -->
+<!-- <item><ref id="waitvblank" name="waitvblank"> -->
+<!-- </itemize> -->
+
+(incomplete)
+
+
 <sect1><tt/geos.h/<label id="geos.h"><p>
 
 (incomplete)
@@ -429,6 +444,16 @@ url="http://www.6502.org/users/andre/o65/fileformat.html" name="the o65 format">
 It does not declare any functions.
 
 
+<sect1><tt/pce.h/<label id="pce.h"><p>
+
+<!-- <itemize> -->
+<!-- <item><ref id="get_tv" name="get_tv"> -->
+<!-- <item><ref id="waitvblank" name="waitvblank"> -->
+<!-- </itemize> -->
+
+(incomplete)
+
+
 <sect1><tt/peekpoke.h/<label id="peekpoke.h"><p>
 
 <itemize>
@@ -437,6 +462,16 @@ It does not declare any functions.
 <item><ref id="POKE" name="POKE">
 <item><ref id="POKEW" name="POKEW">
 </itemize>
+
+
+<sect1><tt/pen.h/<label id="pen.h"><p>
+
+<!-- <itemize> -->
+<!-- <item><ref id="pen_adjust" name="pen_adjust"> -->
+<!-- <item><ref id="pen_calibrate" name="pen_calibrate"> -->
+<!-- </itemize> -->
+
+(incomplete)
 
 
 <sect1><tt/pet.h/<label id="pet.h"><p>
@@ -935,6 +970,20 @@ id="malloc" name="malloc"> may still return <tt/NULL/.
 <ref id="malloc" name="malloc">,
 <ref id="realloc" name="realloc">
 <tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>_is_cmdline_dos<label id="_is_cmdline_dos"><p>
+
+<quote>
+<descrip>
+<tag/Function/Determines whether the underlying DOS supports command line arguments.
+<tag/Header/<tt/<ref id="atari.h" name="atari.h">/
+<tag/Declaration/<tt/unsigned char _is_cmdline_dos (void);/
+<tag/Description/The function returns 0 if the DOS doesn't support command line arguments.
+It returns 1 if it does.
+<tag/Availability/cc65 (<tt/atari/ and <tt/atarixl/ platforms)
 </descrip>
 </quote>
 
@@ -1974,6 +2023,31 @@ only be used in presence of a prototype.
 </quote>
 
 
+<sect1>cbm_k_scnkey<label id="cbm_k_scnkey"><p>
+
+<quote>
+<descrip>
+<tag/Function/Scan the keyboard matrix.
+<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
+<tag/Declaration/<tt/void cbm_k_scnkey (void);/
+<tag/Description/This function looks at the switches in the keyboard, to see
+if any of them are being pressed.  If they are, then code numbers for them are
+stored in RAM.  Other functions use those numbers to input text.  Normally,
+the keyboard is scanned by the Kernal's Interrupt Service Routine.  But, if
+you divert the "Jiffy interrupt" to a C-code ISR, then that ISR must call this
+function, in order to provide input from the keyboard.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cbm_k_getin" name="cbm_k_getin">,
+<ref id="cbm_k_udtim" name="cbm_k_udtim">,
+<ref id="cgetc" name="cgetc">,
+<!-- <ref id="getc" name="getc"> -->
+<!-- <ref id="getchar" name="getchar"> -->
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>cbm_k_setlfs<label id="cbm_k_setlfs"><p>
 
 <quote>
@@ -2034,6 +2108,27 @@ only be used in presence of a prototype.
 <tag/Availability/cc65
 <tag/See also/
 <ref id="cbm_k_acptr" name="cbm_k_acptr">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cbm_k_udtim<label id="cbm_k_udtim"><p>
+
+<quote>
+<descrip>
+<tag/Function/Update the Jiffy clock.
+<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
+<tag/Declaration/<tt/void cbm_k_udtim (void);/
+<tag/Description/This function adds one count to the Jiffy clock.  That clock
+counts sixtieths of a second.  It is used by the library's <tt/clock()/
+function.  Normally, the Jiffy clock is updated by the Kernal's Interrupt
+Service Routine.  But, if you divert the "Jiffy interrupt" to a C-code ISR,
+then that ISR must call this function, in order to keep the clock valid.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cbm_k_scnkey" name="cbm_k_scnkey">,
+<ref id="clock" name="clock">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -2118,15 +2213,18 @@ only be used in presence of a prototype.
 <tag/Header/<tt/<ref id="conio.h" name="conio.h">/
 <tag/Declaration/<tt/char cgetc (void);/
 <tag/Description/The function reads a character from the keyboard. If there is
-no character available, <tt/cgetc/ waits until the user presses a key. If the
+no character available, <tt/cgetc()/ waits until the user presses a key. If the
 cursor is enabled by use of the <tt/cursor/ function, a blinking cursor is
 displayed while waiting.
 <tag/Notes/<itemize>
-<item>If the system supports a keyboard buffer, <tt/cgetc/ will fetch a key
-from this buffer and wait only if the buffer is empty.
+<item>If the system supports a keyboard buffer, <tt/cgetc()/ will fetch a key
+from that buffer; and, wait only if the buffer is empty.
+<item>The keyboard must be scanned periodically, in order for this function to
+see anything that you type.  (See the description of <tt/cbm_k_scnkey()/.)
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
+<ref id="cbm_k_scnkey" name="cbm_k_scnkey">,
 <ref id="cursor" name="cursor">,
 <ref id="kbhit" name="kbhit">
 <tag/Example/None.
@@ -2216,16 +2314,19 @@ used in presence of a prototype.
 <tag/Header/<tt/<ref id="time.h" name="time.h">/
 <tag/Declaration/<tt/clock_t clock (void);/
 <tag/Description/The <tt/clock/ function returns an approximaton of processor
-time used by the program. The time is returned in implementation defined
+time used by the program. The time is returned in implementation-defined
 units. It can be converted to seconds by dividing by the value of the macro
 <tt/CLOCKS_PER_SEC/.
 <tag/Notes/<itemize>
-<item>Since the machines, cc65 generated programs run on, cannot run multiple
-processes, the function will actually return the time since some
-implementation defined point in the past.
+<item>Since the machines that cc65-generated programs run on cannot run multiple
+processes, the function actually will return the time since some
+implementation-defined point in the past.
+<item>The Jiffy clock must be "running", in order for this function to return
+changing values.  (See the description of <tt/cbm_k_udtim()/.)
 </itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
+<ref id="cbm_k_udtim" name="cbm_k_udtim">,
 <ref id="time" name="time">
 <tag/Example/None.
 </descrip>
@@ -2548,6 +2649,40 @@ be used in presence of a prototype.
 <tag/See also/
 ldiv
 <tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>doesclrscrafterexit<label id="doesclrscrafterexit"><p>
+
+<quote>
+<descrip>
+<tag/Function/Determines whether the screen is going to be cleared after program exit.
+<tag/Header/<tt/<ref id="cc65.h" name="cc65.h">/
+<tag/Declaration/<tt/unsigned char doesclrscrafterexit (void);/
+<tag/Description/The function returns zero if the screen won't be cleared immediately after
+program termination. It returns a non-zero value if it will.
+<tag/Notes/<itemize>
+<item>Some systems, maybe depending on configuration, immediately clear the screen
+after a program exits. Therefore it might be difficult to read
+the last messages printed by the program prior to its exit. This function can be used
+to decide if a delay or wait for a key press should be executed when then program
+exits.
+</itemize>
+<tag/Availability/cc65
+<tag/Example/<verb>
+/* Hello World */
+#include <stdio.h>
+#include <unistd.h>
+#include <cc65.h>
+int main(void)
+{
+    printf("Hello World\n");
+    if (doesclrscrafterexit())
+        sleep(5);
+    return 0;
+}
+</verb>
 </descrip>
 </quote>
 

@@ -1,3 +1,4 @@
+
 ifneq ($(shell echo),)
   CMD_EXE = 1
 endif
@@ -18,6 +19,7 @@ TARGETS = apple2    \
           apple2enh \
           atari     \
           atarixl   \
+          atari2600 \
           atari5200 \
           atmos     \
           creativision \
@@ -38,13 +40,13 @@ DRVTYPES = emd \
            ser \
            tgi
 
-OUTPUTDIRS := lib         \
-              $(DRVTYPES) \
-              targetutil  \
-              asminc      \
-              cfg         \
-              include     \
-              $(subst ../,,$(filter-out $(wildcard ../include/*.*),$(wildcard ../include/*)))
+OUTPUTDIRS := lib                 \
+              asminc              \
+              cfg                 \
+              include             \
+              $(subst ../,,$(filter-out $(wildcard ../include/*.*),$(wildcard ../include/*)))\
+              $(subst ../,,$(wildcard ../target/*/drv/*))\
+              $(subst ../,,$(wildcard ../target/*/util))\
 
 .PHONY: all mostlyclean clean install zip lib $(TARGETS)
 
@@ -78,7 +80,7 @@ mostlyclean:
 	$(call RMDIR,../libwrk)
 
 clean:
-	$(call RMDIR,../libwrk ../lib ../targetutil $(addprefix ../,$(DRVTYPES)))
+	$(call RMDIR,../libwrk ../lib ../target)
 
 ifdef CMD_EXE
 
@@ -92,7 +94,7 @@ define INSTALL_recipe
 
 $(if $(prefix),,$(error variable `prefix' must be set))
 $(INSTALL) -d $(DESTDIR)$(datadir)/$(dir)
-$(INSTALL) -m644 ../$(dir)/*.* $(DESTDIR)$(datadir)/$(dir)
+$(INSTALL) -m0644 ../$(dir)/*.* $(DESTDIR)$(datadir)/$(dir)
 
 endef # INSTALL_recipe
 
@@ -213,7 +215,7 @@ define DRVTYPE_template
 $1_SRCDIR = $$(SRCDIR)/$1
 $1_STCDIR = ../libwrk/$$(TARGET)
 $1_DYNDIR = ../libwrk/$$(TARGET)/$1
-$1_DRVDIR = ../$1
+$1_DRVDIR = ../target/$$(TARGET)/drv/$1
 
 $1_SRCPAT = $$($1_SRCDIR)/$$(OBJPFX)%.s
 $1_STCPAT = $$($1_STCDIR)/$$(OBJPFX)%-$1.o
@@ -284,7 +286,7 @@ $(EXTRA_OBJPAT): $(EXTRA_SRCPAT) | ../lib
 ../lib/$(TARGET).lib: $(OBJS) | ../lib
 	$(AR65) a $@ $?
 
-../libwrk/$(TARGET) ../lib ../targetutil:
+../libwrk/$(TARGET) ../lib ../target/$(TARGET)/util:
 	@$(call MKDIR,$@)
 
 $(TARGET): $(EXTRA_OBJS) ../lib/$(TARGET).lib

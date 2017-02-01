@@ -100,9 +100,9 @@ start:
 ; Set up the stack.
 
         lda     #<(__SRAM_START__ + __SRAM_SIZE__)
+        ldx     #>(__SRAM_START__ + __SRAM_SIZE__)
         sta     sp
-        lda     #>(__SRAM_START__ + __SRAM_SIZE__)
-        sta     sp+1            ; Set argument stack ptr
+        stx     sp+1            ; Set argument stack ptr
 
 ; Call the module constructors.
 
@@ -159,9 +159,6 @@ nmi:    pha
 
 ; Interrupt exit
 
-irq2:
-irq1:
-timerirq:
 irq:
         rti
 
@@ -171,9 +168,6 @@ irq:
 
 .segment "VECTORS"
 
-        .word   irq2        ; $fff4 ?
-        .word   irq1        ; $fff6 ?
-        .word   timerirq    ; $fff8 ?
         .word   nmi         ; $fffa vblank nmi
         .word   start       ; $fffc reset
         .word   irq         ; $fffe irq / brk

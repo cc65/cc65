@@ -155,8 +155,9 @@ The default drivers, <tt/joy_stddrv (joy_static_stddrv)/, point to <tt/pet-stdjo
 
   <tag><tt/pet-ptvjoy.joy (pet_ptvjoy_joy)/</tag>
   Driver for the Protovision 4-player adapter contributed by Groepaz. See
-  <url url="http://www.protovision-online.de/hardw/hardwstart.htm"> for prices and
-  building instructions. Up to two joysticks are supported.
+  <url url="http://www.protovision-online.de/hardw/4_player.php?language=en"
+  name="Protovision shop"> for prices and building instructions. Up to two
+  joysticks are supported.
 
   <tag><tt/pet-stdjoy.joy (pet_stdjoy_joy)/</tag>
   Driver for the standard PET userport joystick.

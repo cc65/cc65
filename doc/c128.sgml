@@ -191,10 +191,18 @@ missing on VDC, and are translated to the two colors missing from the VIC palett
 
 <descrip>
 
+  <tag><tt/c128-efnram.emd (c128_efnram_emd)/</tag>
+  Extended memory driver for the C128 External Function RAM.
+  Written and contributed by Marco van den Heuvel.
+
   <tag><tt/c128-georam.emd (c128_georam_emd)/</tag>
   A driver for the GeoRam cartridge. The driver will always assume 2048 pages
   of 256 bytes each. There are no checks, so if your program knows better,
   just go ahead.
+
+  <tag><tt/c128-ifnram.emd (c128_ifnram_emd)/</tag>
+  Extended memory driver for the C128 Internal Function RAM.
+  Written and contributed by Marco van den Heuvel.
 
   <tag><tt/c128-ram.emd (c128_ram_emd)/</tag>
   An extended memory driver for the RAM in page 1. The common memory area is
@@ -236,8 +244,9 @@ The default drivers, <tt/joy_stddrv (joy_static_stddrv)/, point to <tt/c128-stdj
   <tag><tt/c128-ptvjoy.joy (c128_ptvjoy_joy)/</tag>
   Driver for the Protovision 4-player adapter originally written by Groepaz
   for the C64, and converted for the C128 by Uz. See <url
-  url="http://www.protovision-online.de/hardw/hardwstart.htm"> for prices and
-  building instructions. Up to four joysticks are supported.
+  url="http://www.protovision-online.de/hardw/4_player.php?language=en"
+  name="Protovision shop"> for prices and building instructions. Up to four
+  joysticks are supported.
 
   <tag><tt/c128-stdjoy.joy (c128_stdjoy_joy)/</tag>
   Supports up to two joysticks connected to the standard joysticks ports of

@@ -36,6 +36,7 @@
 #include <stdarg.h>
 
 /* common */
+#include "xmalloc.h"
 #include "xsprintf.h"
 
 /* da65 */
@@ -226,6 +227,13 @@ void OH_Immediate (const OpcDesc* D)
 
 
 
+void OH_ImmediateWord (const OpcDesc* D)
+{
+    OneLine (D, "#$%04X", GetCodeWord (PC+1));
+}
+
+
+
 void OH_Direct (const OpcDesc* D)
 {
     /* Get the operand */
@@ -348,6 +356,23 @@ void OH_RelativeLong (const OpcDesc* D attribute ((unused)))
 
 
 
+void OH_RelativeLong4510 (const OpcDesc* D attribute ((unused)))
+{
+    /* Get the operand */
+    signed short Offs = GetCodeWord (PC+1);
+
+    /* Calculate the target address */
+    unsigned Addr = (((int) PC+2) + Offs) & 0xFFFF;
+
+    /* Generate a label in pass 1 */
+    GenerateLabel (D->Flags, Addr);
+
+    /* Output the line */
+    OneLine (D, "%s", GetAddrArg (D->Flags, Addr));
+}
+
+
+
 void OH_DirectIndirect (const OpcDesc* D)
 {
     /* Get the operand */
@@ -372,6 +397,20 @@ void OH_DirectIndirectY (const OpcDesc* D)
 
     /* Output the line */
     OneLine (D, "(%s),y", GetAddrArg (D->Flags, Addr));
+}
+
+
+
+void OH_DirectIndirectZ (const OpcDesc* D)
+{
+    /* Get the operand */
+    unsigned Addr = GetCodeByte (PC+1);
+
+    /* Generate a label in pass 1 */
+    GenerateLabel (D->Flags, Addr);
+
+    /* Output the line */
+    OneLine (D, "(%s),z", GetAddrArg (D->Flags, Addr));
 }
 
 
@@ -406,6 +445,8 @@ void OH_AbsoluteIndirect (const OpcDesc* D)
 
 void OH_BitBranch (const OpcDesc* D)
 {
+    char* BranchLabel;
+
     /* Get the operands */
     unsigned char TestAddr   = GetCodeByte (PC+1);
     signed char   BranchOffs = GetCodeByte (PC+2);
@@ -421,8 +462,16 @@ void OH_BitBranch (const OpcDesc* D)
     GenerateLabel (D->Flags, TestAddr);
     GenerateLabel (flLabel, BranchAddr);
 
+    /* Make a copy of an operand, so that
+    ** the other operand can't overwrite it.
+    ** [GetAddrArg() uses a statically-stored buffer.]
+    */
+    BranchLabel = xstrdup (GetAddrArg (flLabel, BranchAddr));
+
     /* Output the line */
-    OneLine (D, "%s,%s", GetAddrArg (D->Flags, TestAddr), GetAddrArg (flLabel, BranchAddr));
+    OneLine (D, "%s,%s", GetAddrArg (D->Flags, TestAddr), BranchLabel);
+
+    xfree (BranchLabel);
 }
 
 
@@ -499,7 +548,16 @@ void OH_DirectIndirectLongX (const OpcDesc* D attribute ((unused)))
 
 void OH_StackRelativeIndirectY (const OpcDesc* D attribute ((unused)))
 {
-    Error ("Not implemented");
+    /* Output the line */
+    OneLine (D, "($%02X,s),y", GetCodeByte (PC+1));
+}
+
+
+
+void OH_StackRelativeIndirectY4510 (const OpcDesc* D attribute ((unused)))
+{
+    /* Output the line */
+    OneLine (D, "($%02X,sp),y", GetCodeByte (PC+1));
 }
 
 
@@ -518,8 +576,10 @@ void OH_DirectIndirectLongY (const OpcDesc* D attribute ((unused)))
 
 
 
-void OH_BlockMove (const OpcDesc* D attribute ((unused)))
+void OH_BlockMove (const OpcDesc* D)
 {
+    char* DstLabel;
+
     /* Get source operand */
     unsigned Src = GetCodeWord (PC+1);
     /* Get destination operand */
@@ -529,11 +589,19 @@ void OH_BlockMove (const OpcDesc* D attribute ((unused)))
     GenerateLabel (D->Flags, Src);
     GenerateLabel (D->Flags, Dst);
 
+    /* Make a copy of an operand, so that
+    ** the other operand can't overwrite it.
+    ** [GetAddrArg() uses a statically-stored buffer.]
+    */
+    DstLabel = xstrdup (GetAddrArg (D->Flags, Dst));
+
     /* Output the line */
-    OneLine (D, "%s%s,%s%s,#$%02X",
+    OneLine (D, "%s%s,%s%s,$%04X",
              GetAbsOverride (D->Flags, Src), GetAddrArg (D->Flags, Src),
-             GetAbsOverride (D->Flags, Dst), GetAddrArg (D->Flags, Dst),
+             GetAbsOverride (D->Flags, Dst), DstLabel,
              GetCodeWord (PC+5));
+
+    xfree (DstLabel);
 }
 
 
@@ -657,6 +725,17 @@ void OH_JmpAbsolute (const OpcDesc* D)
 void OH_JmpAbsoluteIndirect (const OpcDesc* D)
 {
     OH_AbsoluteIndirect (D);
+    if (NewlineAfterJMP) {
+        LineFeed ();
+    }
+    SeparatorLine ();
+}
+
+
+
+void OH_JmpAbsoluteXIndirect (const OpcDesc* D)
+{
+    OH_AbsoluteXIndirect (D);
     if (NewlineAfterJMP) {
         LineFeed ();
     }

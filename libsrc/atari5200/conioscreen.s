@@ -9,7 +9,7 @@ SCREEN_BUF      =       $4000 - SCREEN_BUF_SIZE
 
                 .export screen_setup_20x24
 
-                .segment "INIT"
+                .segment "ONCE"
 
 screen_setup_20x24:
 

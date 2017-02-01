@@ -56,7 +56,7 @@ soft80_shutdown:
         sta     CIA2_PRA
         jmp     $FF5B           ; Initialize video I/O
 
-        .segment "INIT"
+        .segment "ONCE"
 firstinit:
         ; copy charset to RAM under I/O
         sei
@@ -146,7 +146,7 @@ soft80_bitmapyhi_data:
 soft80_tables_data_end:
 
 ;-------------------------------------------------------------------------------
-        .segment "INITBSS"
+        .segment "INIT"
 soft80_internal_cellcolor:
         .res 1
 soft80_internal_bgcolor:

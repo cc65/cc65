@@ -2,7 +2,7 @@
 /*                                                                           */
 /*                                 error.h                                   */
 /*                                                                           */
-/*            Error handling for the chrcvt vector font converter            */
+/*           Error handling for the chrcvt65 vector font converter           */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */

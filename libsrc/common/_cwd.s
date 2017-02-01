@@ -19,7 +19,7 @@
 
         cwd_init        := initcwd
 
-.segment        "INITBSS"
+.segment        "INIT"
 
 __cwd:  .res    __cwd_buf_size
 

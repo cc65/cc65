@@ -17,6 +17,7 @@
 #include <conio.h>
 #include <ctype.h>
 #include <dbg.h>
+#include <cc65.h>
 
 #define max(a,b)  (((a) > (b)) ? (a) : (b))
 #define min(a,b)  (((a) < (b)) ? (a) : (b))
@@ -57,7 +58,9 @@ static void __fastcall__ CheckError (const char* S, unsigned char Error)
         /* Wait for a key-press, so that some platforms can show the error
         ** message before they remove the current screen.
         */
-        cgetc();
+        if (doesclrscrafterexit ()) {
+            cgetc ();
+        }
         exit (EXIT_FAILURE);
     }
 }

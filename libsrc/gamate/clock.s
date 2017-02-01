@@ -23,7 +23,7 @@
 
 .endproc
 
-        .segment        "INIT"
+        .segment        "ONCE"
 initclock:
         lda     #0
         ldx     #3

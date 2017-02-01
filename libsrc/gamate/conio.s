@@ -8,7 +8,7 @@
 
         .macpack        longbranch
 
-        .segment        "INIT"
+        .segment        "ONCE"
 initconio:
         lda     #0
         sta     LCD_XPOS

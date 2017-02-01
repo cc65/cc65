@@ -7,7 +7,7 @@
 ; void chline (unsigned char length);
 
             .export _chlinexy, _chline
-            .import popa, _gotoxy, fixcursor
+            .import gotoxy, fixcursor
             .importzp cursor_x, cursor_y, cursor_c
 
             .include "jumptab.inc"
@@ -15,8 +15,7 @@
 
 _chlinexy:
         pha                     ; Save the length
-        jsr popa                ; Get y
-        jsr _gotoxy             ; Call this one, will pop params
+        jsr gotoxy              ; Call this one, will pop params
         pla                     ; Restore the length
 
 _chline:

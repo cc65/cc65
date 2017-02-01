@@ -85,6 +85,11 @@ int __fastcall__ cc65_cos (unsigned x);
 ** is in 8.8 fixed point format, which means that 1.0 = $100 and -1.0 = $FF00.
 */
 
+unsigned char doesclrscrafterexit (void);
+/* Indicates whether the screen automatically be cleared after program
+** termination.
+*/
+
 
 
 /* End of cc65.h */

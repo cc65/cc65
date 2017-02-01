@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 error.c                                   */
+/*                                 opc4510.h                                 */
 /*                                                                           */
-/*            Error handling for the chrcvt vector font converter            */
+/*                        4510 opcode description table                      */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2009, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
+/* (C) 2003      Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,58 +33,26 @@
 
 
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
+#ifndef OPC4510_H
+#define OPC4510_H
 
-#include "error.h"
+
+
+#include "opcdesc.h"
 
 
 
 /*****************************************************************************/
-/*                                   Code                                    */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
-void Warning (const char* Format, ...)
-/* Print a warning message */
-{
-    va_list ap;
-    va_start (ap, Format);
-    fprintf (stderr, "Warning: ");
-    vfprintf (stderr, Format, ap);
-    putc ('\n', stderr);
-    va_end (ap);
-}
+/* Descriptions for all opcodes */
+extern const OpcDesc OpcTable_4510[256];
 
 
 
-void Error (const char* Format, ...)
-/* Print an error message and die */
-{
-    va_list ap;
-    va_start (ap, Format);
-    fprintf (stderr, "Error: ");
-    vfprintf (stderr, Format, ap);
-    putc ('\n', stderr);
-    va_end (ap);
-    exit (EXIT_FAILURE);
-}
+/* End of opc4510.h */
 
-
-
-void Internal (const char* Format, ...)
-/* Print an internal error message and die */
-{
-    va_list ap;
-    va_start (ap, Format);
-    fprintf (stderr, "Internal error: ");
-    vfprintf (stderr, Format, ap);
-    putc ('\n', stderr);
-    va_end (ap);
-    exit (EXIT_FAILURE);
-}
-
-
-
+#endif

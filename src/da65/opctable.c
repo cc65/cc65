@@ -35,6 +35,7 @@
 
 /* da65 */
 #include "error.h"
+#include "opc4510.h"
 #include "opc6502.h"
 #include "opc6502x.h"
 #include "opc65816.h"
@@ -73,6 +74,7 @@ void SetOpcTable (cpu_t CPU)
         case CPU_65C02:   OpcTable = OpcTable_65C02;    break;
         case CPU_HUC6280: OpcTable = OpcTable_HuC6280;  break;
         case CPU_M740:    OpcTable = OpcTable_M740;     break;
+        case CPU_4510:    OpcTable = OpcTable_4510;     break;
         default:          Error ("Unsupported CPU");
     }
 }

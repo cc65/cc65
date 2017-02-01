@@ -10,7 +10,7 @@
         .include        "extzp.inc"
 
 ; ------------------------------------------------------------------------
-.segment        "INIT"
+.segment        "ONCE"
 
 ; a constructor
 ;

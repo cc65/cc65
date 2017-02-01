@@ -205,6 +205,10 @@ static void SetSys (const char* Sys)
             AbEnd ("Cannot use `module' as a target for the assembler");
             break;
 
+        case TGT_ATARI2600:
+            NewSymbol ("__ATARI2600__", 1);
+            break;
+
         case TGT_ATARI5200:
             NewSymbol ("__ATARI5200__", 1);
             break;
@@ -224,6 +228,10 @@ static void SetSys (const char* Sys)
 
         case TGT_C64:
             CBMSystem ("__C64__");
+            break;
+
+        case TGT_C65:
+            CBMSystem ("__C65__");
             break;
 
         case TGT_VIC20:
@@ -623,7 +631,8 @@ static void OptVersion (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
 /* Print the assembler version */
 {
-    fprintf (stderr, "ca65 V%s\n", GetVersionAsString ());
+    fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
+    exit(EXIT_SUCCESS);
 }
 
 

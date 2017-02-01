@@ -2,11 +2,14 @@
 ; void gotoxy (unsigned char x, unsigned char y);
 ;
 
-        .export         _gotoxy
+        .export         gotoxy, _gotoxy
         .import         popa, plot
 
         .include        "gamate.inc"
         .include        "extzp.inc"
+
+gotoxy:
+        jsr     popa            ; Get X
 
 _gotoxy:
         sta     CURS_Y          ; Set Y

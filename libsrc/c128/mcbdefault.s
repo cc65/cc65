@@ -29,7 +29,7 @@ VIC_SPR_Y       = (VIC_SPR0_Y + 2*MOUSE_SPR)    ; Sprite Y register
 ; --------------------------------------------------------------------------
 ; Initialize the mouse sprite.
 
-.segment        "INIT"
+.segment        "ONCE"
 
 initmcb:
 

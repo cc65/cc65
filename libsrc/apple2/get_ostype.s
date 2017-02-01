@@ -10,7 +10,7 @@
 ; Identify machine according to:
 ; Apple II Miscellaneous TechNote #7, Apple II Family Identification
 
-        .segment        "INIT"
+        .segment        "ONCE"
 
 initostype:
         sec
@@ -65,6 +65,6 @@ _get_ostype:
         ldx     #$00
         rts
 
-        .bss
+        .segment        "INIT"
 
 ostype: .res    1

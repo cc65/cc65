@@ -55,6 +55,7 @@ typedef enum {
     TGT_NONE,
     TGT_MODULE,
     TGT_ATARI,
+    TGT_ATARI2600,
     TGT_ATARI5200,
     TGT_ATARIXL,
     TGT_VIC20,
@@ -81,6 +82,7 @@ typedef enum {
     TGT_PCENGINE,
     TGT_GAMATE,
     TGT_SUPERVISION,
+    TGT_C65,
     TGT_COUNT                   /* Number of target systems */
 } target_t;
 

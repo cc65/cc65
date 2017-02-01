@@ -216,6 +216,7 @@ struct DotKeyword {
     { ".IFNDEF",        TOK_IFNDEF              },
     { ".IFNREF",        TOK_IFNREF              },
     { ".IFP02",         TOK_IFP02               },
+    { ".IFP4510",       TOK_IFP4510             },
     { ".IFP816",        TOK_IFP816              },
     { ".IFPC02",        TOK_IFPC02              },
     { ".IFPSC02",       TOK_IFPSC02             },
@@ -251,6 +252,7 @@ struct DotKeyword {
     { ".ORG",           TOK_ORG                 },
     { ".OUT",           TOK_OUT                 },
     { ".P02",           TOK_P02                 },
+    { ".P4510",         TOK_P4510               },
     { ".P816",          TOK_P816                },
     { ".PAGELEN",       TOK_PAGELENGTH          },
     { ".PAGELENGTH",    TOK_PAGELENGTH          },
@@ -408,7 +410,7 @@ static void IFNextChar (CharSource* S)
 
         /* If we come here, we have a new input line. To avoid problems
         ** with strange line terminators, remove all whitespace from the
-        ** end of the line, the add a single newline.
+        ** end of the line, then add a single newline.
         */
         Len = SB_GetLen (&S->V.File.Line);
         while (Len > 0 && IsSpace (SB_AtUnchecked (&S->V.File.Line, Len-1))) {
@@ -1109,60 +1111,76 @@ Again:
         /* Check for special names. Bail out if we have identified the type of
         ** the token. Go on if the token is an identifier.
         */
-        if (SB_GetLen (&CurTok.SVal) == 1) {
-            switch (toupper (SB_AtUnchecked (&CurTok.SVal, 0))) {
+        switch (SB_GetLen (&CurTok.SVal)) {
+            case 1:
+                switch (toupper (SB_AtUnchecked (&CurTok.SVal, 0))) {
 
-                case 'A':
-                    if (C == ':') {
-                        NextChar ();
-                        CurTok.Tok = TOK_OVERRIDE_ABS;
-                    } else {
-                        CurTok.Tok = TOK_A;
-                    }
-                    return;
-
-                case 'F':
-                    if (C == ':') {
-                        NextChar ();
-                        CurTok.Tok = TOK_OVERRIDE_FAR;
+                    case 'A':
+                        if (C == ':') {
+                            NextChar ();
+                            CurTok.Tok = TOK_OVERRIDE_ABS;
+                        } else {
+                            CurTok.Tok = TOK_A;
+                        }
                         return;
-                    }
-                    break;
 
-                case 'S':
-                    if (CPU == CPU_65816) {
-                        CurTok.Tok = TOK_S;
+                    case 'F':
+                        if (C == ':') {
+                            NextChar ();
+                            CurTok.Tok = TOK_OVERRIDE_FAR;
+                            return;
+                        }
+                        break;
+
+                    case 'S':
+                        if ((CPU == CPU_4510) || (CPU == CPU_65816)) {
+                            CurTok.Tok = TOK_S;
+                            return;
+                        }
+                        break;
+
+                    case 'X':
+                        CurTok.Tok = TOK_X;
                         return;
-                    }
-                    break;
 
-                case 'X':
-                    CurTok.Tok = TOK_X;
-                    return;
-
-                case 'Y':
-                    CurTok.Tok = TOK_Y;
-                    return;
-
-                case 'Z':
-                    if (C == ':') {
-                        NextChar ();
-                        CurTok.Tok = TOK_OVERRIDE_ZP;
+                    case 'Y':
+                        CurTok.Tok = TOK_Y;
                         return;
-                    }
-                    break;
 
-                default:
-                    break;
-            }
+                    case 'Z':
+                        if (C == ':') {
+                            NextChar ();
+                            CurTok.Tok = TOK_OVERRIDE_ZP;
+                           return;
+                        } else {
+                            if (CPU == CPU_4510) {
+                                CurTok.Tok = TOK_Z;
+                                return;
+                            }
+                        }
+                        break;
 
-        } else if (CPU == CPU_SWEET16 &&
-                  (CurTok.IVal = Sweet16Reg (&CurTok.SVal)) >= 0) {
+                    default:
+                        break;
+                }
+                break;
+            case 2:
+                if ((CPU == CPU_4510) &&
+                    (toupper (SB_AtUnchecked (&CurTok.SVal, 0)) == 'S') &&
+                    (toupper (SB_AtUnchecked (&CurTok.SVal, 1)) == 'P')) {
 
-            /* A sweet16 register number in sweet16 mode */
-            CurTok.Tok = TOK_REG;
-            return;
+                    CurTok.Tok = TOK_S;
+                    return;
+                }
+                /* FALL THROUGH */
+            default:
+                if (CPU == CPU_SWEET16 &&
+                   (CurTok.IVal = Sweet16Reg (&CurTok.SVal)) >= 0) {
 
+                    /* A sweet16 register number in sweet16 mode */
+                    CurTok.Tok = TOK_REG;
+                    return;
+                }
         }
 
         /* Check for define style macro */

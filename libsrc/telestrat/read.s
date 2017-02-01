@@ -2,8 +2,6 @@
 ; jede jede@oric.org 2017-01-22
 ;
 
-
-    .FEATURE        c_comments,labels_without_colons,pc_assignment, loose_char_term
     .export         _read
 
     .import         popax
@@ -11,7 +9,7 @@
     .include        "zeropage.inc"
     .include        "telestrat.inc"
 		
-;		int read (int fd, void* buf, unsigned count);
+;int read (int fd, void* buf, unsigned count);
 
 .proc   _read
     sta     ptr1 ; count

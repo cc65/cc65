@@ -59,7 +59,7 @@ L2:     ldy     #0
 
         ldx     #$0D
 L3:     
-		BRK_TELEMON  XWR0  ; Macro
+        BRK_TELEMON  XWR0  ; Macro
 
         inc     ptr1
         bne     L1

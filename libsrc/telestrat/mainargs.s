@@ -26,14 +26,14 @@ initmainargs:
 L0:     lda     BUFEDT,x
         beq 	L3
         cmp 	#' '
-		bne 	L1
-		lda 	#0
-		beq 	L3
+        bne 	L1
+        lda 	#0
+        beq 	L3
 L1:     sta     name,x
         inx
-		cpx 	#FNAME_LEN
+        cpx 	#FNAME_LEN
         bne     L0
-		lda 	#0
+        lda 	#0
 L3:		
         sta 	name,x
         inc     __argc          ; argc always is equal to, at least, 1
@@ -57,7 +57,7 @@ setterm:sta     term            ; Set end of argument marker
 ; Now, store a pointer, to the argument, into the next slot.
 
         txa                     ; Get low byte
-	    clc
+        clc
         adc 	#<BUFEDT
         bcc 	L4
         inc 	L5+1

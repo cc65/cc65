@@ -6,7 +6,7 @@
         
     .include        "zeropage.inc"		
     .include        "telestrat.inc"
-    .include 		"errno.inc"
+    .include        "errno.inc"
     .include        "fcntl.inc"	
 	
 ; int open (const char* name, int flags, ...);    /* May take a mode argument */

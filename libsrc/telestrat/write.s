@@ -24,25 +24,23 @@
         stx     ptr1+1
         jsr     popax           ; get fd and discard
 
-		; if fd=0001 then it stdout
-		
-		
-		cpx 	#0
-		beq 	next
-		jmp 	L1
+        ; if fd=0001 then it stdout
+        cpx 	#0
+        beq 	next
+        jmp 	L1
 next:		
-		cmp 	#1
-		beq 	L1		
+        cmp 	#1
+        beq 	L1		
 		
-		; Here it's a file opened
-		lda 	ptr1
-		sta  	PTR_READ_DEST
-		lda 	ptr1+1
-		sta  	PTR_READ_DEST+1
-		lda 	ptr3
-		ldy 	ptr3+1
-		BRK_TELEMON  XFWRITE
-		rts
+        ; Here it's a file opened
+        lda 	ptr1
+        sta  	PTR_READ_DEST
+        lda 	ptr1+1
+        sta  	PTR_READ_DEST+1
+        lda 	ptr3
+        ldy 	ptr3+1
+        BRK_TELEMON  XFWRITE
+        rts
 		
 		
 L1:     inc     ptr2
@@ -54,9 +52,9 @@ L2:     ldy     #0
         tax
         cpx     #$0A            ; Check for \n
         bne     L3
-		BRK_TELEMON  XWR0  ; Macro send char to screen (channel 0 in telemon terms)
+        BRK_TELEMON  XWR0  ; Macro send char to screen (channel 0 in telemon terms)
 		lda     #$0D ; return to the beggining of the line
-		BRK_TELEMON  XWR0  ; Macro ; 
+        BRK_TELEMON  XWR0  ; Macro ; 
 	
 
         ldx     #$0D

@@ -97,7 +97,7 @@ memcpy_getparams:
 
 ; ----------------------------------------------------------------------
 ; The transfer instructions use inline arguments.
-; Therefore, we must build the instruction, in the DATA segment.
+; Therefore, we must build the instruction in the DATA segment.
 
 .data
 

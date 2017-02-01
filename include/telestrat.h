@@ -1,5 +1,5 @@
 
-void print (char *);
+
 
 void hires();
 void text();
@@ -14,8 +14,6 @@ void ink(char color);
 
 void kbdclick1();
 
-void curset(char x,char y, char display, char display);
-void circle(char rayon);
 
 
 

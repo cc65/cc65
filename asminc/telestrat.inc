@@ -24,8 +24,8 @@ FNAME_LEN       = 11            ; maximum length of file-name
 RES             := $00
 RESB            := $02
 
-TR0	            := $0C
-TR1	            := $0D
+TR0             := $0C
+TR1             := $0D
 
 PTR_READ_DEST   := $2C           ; used for XFREAD and XWRITE only in telemon 3.0
 
@@ -123,10 +123,11 @@ XZAP             = $46
 XSHOOT           = $47
 XCIRCL           = $8F
 XCURSE           = $90
-XEXPLO           = $9C 
-XPING            = $9D
 XPAPER           = $92
 XINK             = $93
+XEXPLO           = $9C 
+XPING            = $9D
+
 
 ; ---------------------------------------------------------------------------
 ; Page $500

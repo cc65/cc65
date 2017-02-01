@@ -150,7 +150,6 @@ it uses an extension "ch376 card" which handles sdcard and FAT 32 usb key. In th
 <item>fclose
 <item>fopen
 <item>fread
-
 </itemize>
 
 

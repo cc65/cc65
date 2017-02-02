@@ -27,9 +27,7 @@ parmok:
     sta         tmp3        ; save flags
 ; Get the filename from stack and parse it. Bail out if is not ok
     jsr     	popax       ; Get name
-    ldy 		tmp3 	    ; Get flags again
+    ldy         tmp3 	    ; Get flags again
     BRK_TELEMON XOPEN	    ; launch primitive ROM
     rts
 .endproc
-		
-		

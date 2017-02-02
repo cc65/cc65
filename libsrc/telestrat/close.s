@@ -14,5 +14,3 @@
     BRK_TELEMON XCLOSE	; launch primitive ROM
     rts
 .endproc
-		
-		

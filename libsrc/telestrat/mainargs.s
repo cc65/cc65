@@ -8,7 +8,7 @@
 
         .constructor    initmainargs, 24
         .import         __argc, __argv
-		.import 			ptr1
+        .import         ptr1
         .include        "telestrat.inc"
         .macpack        generic
 

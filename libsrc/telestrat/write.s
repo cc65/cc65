@@ -53,7 +53,7 @@ L2:     ldy     #0
         cpx     #$0A            ; Check for \n
         bne     L3
         BRK_TELEMON  XWR0  ; Macro send char to screen (channel 0 in telemon terms)
-		lda     #$0D ; return to the beggining of the line
+        lda     #$0D ; return to the beggining of the line
         BRK_TELEMON  XWR0  ; Macro ; 
 	
 

@@ -222,7 +222,7 @@ static MemoryArea* CfgFindMemory (unsigned Name)
 
 
 static MemoryArea* CfgGetMemory (unsigned Name)
-/* Find the memory are with the given name. Print an error on an invalid name */
+/* Find the memory with the given name. Print an error on an invalid name */
 {
     MemoryArea* M = CfgFindMemory (Name);
     if (M == 0) {

@@ -148,6 +148,7 @@ static void BinWriteMem (BinDesc* D, MemoryArea* M)
     /* Walk over all segments in this memory area */
     for (I = 0; I < CollCount (&M->SegList); ++I) {
 
+        unsigned J;
         int DoWrite;
 
         /* Get the segment */
@@ -160,6 +161,14 @@ static void BinWriteMem (BinDesc* D, MemoryArea* M)
         DoWrite = (S->Flags & SF_BSS) == 0      &&      /* No BSS segment */
                    S->Load == M                 &&      /* LOAD segment */
                    S->Seg->Dumped == 0;                 /* Not already written */
+
+        /* Write occur also if M belongs to the duplicate list of the segment */
+        for (J = 0; J < CollCount (&S->MemDuplicates); ++J) {
+            if (CollAtUnchecked (&S->MemDuplicates, J) == M) {
+                DoWrite = 1;
+                break;
+            }
+        }
 
         /* Output debugging stuff */
         PrintBoolVal ("bss", S->Flags & SF_BSS);

@@ -78,6 +78,7 @@ struct SegDesc {
     unsigned char       FillVal;        /* Fill value for this segment */
     struct MemoryArea*  Load;           /* Load memory section */
     struct MemoryArea*  Run;            /* Run memory section */
+    Collection          MemDuplicates;  /* List of memory areas where the segment is duplicated */
     unsigned long       Addr;           /* Start address or offset into segment */
     unsigned long       RunAlignment;   /* Run area alignment if given */
     unsigned long       LoadAlignment;  /* Load area alignment if given */

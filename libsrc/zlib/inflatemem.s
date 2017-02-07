@@ -1,9 +1,14 @@
 ;
 ; 2003-09-21, Piotr Fusik
-; 2016-07-19, Greg King
+; 2017-02-07, Greg King
 ;
 ; unsigned __fastcall__ inflatemem (char* dest, const char* source);
 ;
+
+; Two "lda (0,x)" instructions can't be assembled for the PC-Engine library
+; because an implied ".setdp $2000" changes $00 into a non-zero-page address.
+; Therefore, this file isn't assembled for that target.
+.ifndef	__PCE__
 
         .export         _inflatemem
 
@@ -139,8 +144,8 @@ inflateCopyBlock:
         ldy     #1
         sty     getBit_hold
 ; Get 16-bit length
-        ldx     #0
-        lda     (inputPointer,x)
+        ldx     #inputPointer
+        lda     (0,x)
         sta     moveBlock_len
         lda     (inputPointer),y
         sta     moveBlock_len+1
@@ -165,15 +170,15 @@ moveBlock:
 .endif
         inc     moveBlock_len+1
 moveBlock_1:
-        lda     (inputPointer,x)
+        lda     (0,x)
 .if (.cpu & CPU_ISET_65SC02)
         sta     (outputPointer)
 .else
         sta     (outputPointer),y
 .endif
-        inc     inputPointer
+        inc     0,x
         bne     moveBlock_2
-        inc     inputPointer+1
+        inc     1,x
 moveBlock_2:
         inc     outputPointer
         bne     moveBlock_3
@@ -671,3 +676,5 @@ bitsPointer_h:
 ; Sorted codes.
 sortedCodes:
         .res    256+1+29+30+2
+
+.endif

@@ -29,10 +29,10 @@ CH_URCORNER             = 36
 CH_LLCORNER             = 37
 CH_LRCORNER             = 38
 
-;** I/O
+;** I/O (Zero-page variables)
 ZP_KEYBOARD             = $10
 ZP_JOY0_DIR             = $11
 ZP_JOY1_DIR             = $13
-ZP_JOY_LBUTTONS         = $16
-ZP_JOY_RBUTTONS         = $17
+ZP_JOY0_BUTTONS         = $16
+ZP_JOY1_BUTTONS         = $17
 

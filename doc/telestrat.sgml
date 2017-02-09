@@ -147,7 +147,7 @@ Telestrat has a RS232 port, but it's not used
 
 <sect1>Disk I/O<p>
 
-Telemon 3.0 handles fopen, fread, fclose primitives. It means that this function will crash the Telestrat because Telemon 2.4 did not have not these primitives.
+Telemon 3.0 handles fopen, fread, fclose primitives. It means that this function will crash the Telestrat because Telemon 2.4 does not have these primitives.
 By the way, Telemon 3.0 uses an extension "ch376 card" which handles sdcard and FAT 32 usb key. In the next version of Telemon, FT DOS, Sedoric, Stratsed will be handled in these 3 primitives (fopen, fread, fclose).
 
 <itemize>

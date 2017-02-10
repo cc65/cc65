@@ -30,6 +30,7 @@ including
 - the Nintendo Entertainment System (NES) console.
 - the Watara Supervision console.
 - the Oric Atmos.
+- the Oric Telestrat.
 - the Lynx console.
 - the Ohio Scientific Challenger 1P.
 

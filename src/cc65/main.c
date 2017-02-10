@@ -247,6 +247,10 @@ static void SetSys (const char* Sys)
             DefineNumericMacro ("__ATMOS__", 1);
             break;
 
+        case TGT_TELESTRAT:
+            DefineNumericMacro ("__TELESTRAT__", 1);
+            break;
+                                
         case TGT_NES:
             DefineNumericMacro ("__NES__", 1);
             break;

@@ -32,7 +32,8 @@ TARGETS = apple2    \
           pce       \
           sim6502   \
           sim65c02  \
-          supervision
+          supervision\
+          telestrat
 
 DRVTYPES = emd \
            joy \

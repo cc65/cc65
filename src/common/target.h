@@ -75,6 +75,7 @@ typedef enum {
     TGT_GEOS_APPLE,
     TGT_LUNIX,
     TGT_ATMOS,
+    TGT_TELESTRAT,
     TGT_NES,
     TGT_SUPERVISION,
     TGT_LYNX,

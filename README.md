@@ -31,6 +31,7 @@ including
 - the Watara Supervision console.
 - the VTech Creativision console.
 - the Oric Atmos.
+- the Oric Telestrat.
 - the Lynx console.
 - the Ohio Scientific Challenger 1P.
 

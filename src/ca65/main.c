@@ -297,7 +297,11 @@ static void SetSys (const char* Sys)
 
         case TGT_ATMOS:
             NewSymbol ("__ATMOS__", 1);
-            break;
+            break; 
+
+        case TGT_TELESTRAT:
+             NewSymbol ("__TELESTRAT__", 1);
+             break;
 
         case TGT_NES:
             NewSymbol ("__NES__", 1);

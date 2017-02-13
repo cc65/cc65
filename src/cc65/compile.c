@@ -188,6 +188,10 @@ static void Parse (void)
                 if (CurTok.Tok == TOK_ASSIGN) {
 
                     /* This is a definition */
+                    if (SymIsDef (Entry)) {
+                        Error ("Global variable `%s' has already been defined",
+                               Entry->Name);
+                    }
                     Entry->Flags |= SC_DEF;
 
                     /* We cannot initialize types of unknown size, or

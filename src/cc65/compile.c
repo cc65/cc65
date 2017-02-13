@@ -154,7 +154,7 @@ static void Parse (void)
                  (Decl.StorageClass & (SC_EXTERN|SC_STATIC)) == SC_STATIC)) {
 
                 /* We will allocate storage */
-                Decl.StorageClass |= SC_STORAGE | SC_DEF;
+                Decl.StorageClass |= SC_STORAGE;
             }
 
             /* If this is a function declarator that is not followed by a comma
@@ -186,6 +186,9 @@ static void Parse (void)
 
                 /* Allow initialization */
                 if (CurTok.Tok == TOK_ASSIGN) {
+
+                    /* This is a definition */
+                    Entry->Flags |= SC_DEF;
 
                     /* We cannot initialize types of unknown size, or
                     ** void types in ISO modes.
@@ -234,18 +237,14 @@ static void Parse (void)
                         Entry->Flags &= ~(SC_STORAGE | SC_DEF);
                     }
 
-                    /* Allocate storage if it is still needed */
-                    if (Entry->Flags & SC_STORAGE) {
-
-                        /* Switch to the BSS segment */
-                        g_usebss ();
-
-                        /* Define a label */
-                        g_defgloblabel (Entry->Name);
-
-                        /* Allocate space for uninitialized variable */
-                        g_res (Size);
-                    }
+                    /* A global (including static) uninitialized variable
+                    ** is only a tentative definition. For example, this is valid:
+                    ** int i;
+                    ** int i;
+                    ** static int j;
+                    ** static int j = 42;
+                    ** Code for these will be generated in FinishCompile.
+                    */
                 }
 
             }
@@ -300,7 +299,7 @@ void Compile (const char* FileName)
     struct tm*  TM;
 
     /* Since strftime is locale dependent, we need the abbreviated month names
-    ** in english.
+    ** in English.
     */
     static const char MonthNames[12][4] = {
         "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -397,20 +396,26 @@ void Compile (const char* FileName)
 void FinishCompile (void)
 /* Emit literals, externals, debug info, do cleanup and optimizations */
 {
-    SymTable* SymTab;
-    SymEntry* Func;
+    SymEntry* Entry;
 
-    /* Walk over all functions, doing cleanup, optimizations ... */
-    SymTab = GetGlobalSymTab ();
-    Func   = SymTab->SymHead;
-    while (Func) {
-        if (SymIsOutputFunc (Func)) {
+    /* Walk over all global symbols:
+    ** - for functions do cleanup, optimizations ...
+    ** - generate code for uninitialized global variables
+    */
+    for (Entry = GetGlobalSymTab ()->SymHead; Entry; Entry = Entry->NextSym) {
+        if (SymIsOutputFunc (Entry)) {
             /* Function which is defined and referenced or extern */
-            MoveLiteralPool (Func->V.F.LitPool);
-            CS_MergeLabels (Func->V.F.Seg->Code);
-            RunOpt (Func->V.F.Seg->Code);
+            MoveLiteralPool (Entry->V.F.LitPool);
+            CS_MergeLabels (Entry->V.F.Seg->Code);
+            RunOpt (Entry->V.F.Seg->Code);
+        } else if ((Entry->Flags & (SC_STORAGE | SC_DEF | SC_STATIC)) == (SC_STORAGE | SC_STATIC)) {
+            /* Tentative definition of uninitialized global variable */
+            g_usebss ();
+            g_defgloblabel (Entry->Name);
+            g_res (SizeOf (Entry->Type));
+            /* Mark as defined, so that it will be exported not imported */
+            Entry->Flags |= SC_DEF;
         }
-        Func = Func->NextSym;
     }
 
     /* Output the literal pool */

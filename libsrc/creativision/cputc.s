@@ -50,7 +50,7 @@ advance:
         iny
         cpy     #SCREEN_COLS
         bne     L3
-        inc     CURSOR_Y          ; new line
+        inc     CURSOR_Y        ; new line
         ldy     #0              ; + cr
 L3:     sty     CURSOR_X
         jmp     plot

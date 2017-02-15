@@ -69,8 +69,8 @@ Platforms:      Runs on all platforms that have TGI support:
                 Apple ][, C64, C128, Oric Atmos, Geos and Lynx.
 
 -----------------------------------------------------------------------------
-Name:           mousetest
-Description:    Tests and shows how to use the mouse.
+Name:           mousedemo
+Description:    Shows how to use the mouse.
 Platforms:      All systems with mouse and conio support:
                 C64, C128, CBM510, Atari, Apple ][
 

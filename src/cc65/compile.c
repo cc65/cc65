@@ -144,14 +144,17 @@ static void Parse (void)
             **
             **   - if it is not a typedef or function,
             **   - if we don't had a storage class given ("int i")
-            **     or the storage class is explicitly specified as static.
+            **   - if the storage class is explicitly specified as static,
+            **   - or if there is an initialization.
             **
             ** This means that "extern int i;" will not get storage allocated.
             */
             if ((Decl.StorageClass & SC_FUNC) != SC_FUNC          &&
                 (Decl.StorageClass & SC_TYPEMASK) != SC_TYPEDEF    &&
                 ((Spec.Flags & DS_DEF_STORAGE) != 0         ||
-                 (Decl.StorageClass & (SC_EXTERN|SC_STATIC)) == SC_STATIC)) {
+                 (Decl.StorageClass & (SC_EXTERN|SC_STATIC)) == SC_STATIC ||
+                 ((Decl.StorageClass & SC_EXTERN) != 0 &&
+                  CurTok.Tok == TOK_ASSIGN))) {
 
                 /* We will allocate storage */
                 Decl.StorageClass |= SC_STORAGE;

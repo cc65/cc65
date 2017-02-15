@@ -66,7 +66,6 @@ Programs containing Creativision specific code may use the <tt/creativision.h/ h
 
 <itemize>
 <item>bios_playsound
-<item>joystate
 <item>psg_delay
 <item>psg_outb
 <item>psg_silence
@@ -109,8 +108,12 @@ No extended memory drivers are currently available for the Creativision.
 
 <sect1>Joystick drivers<p>
 
-No joystick drivers are currently available for the Creativision but <tt/joystate()/.
+<descrip>
 
+  <tag><tt/creativision-stdjoy.joy (creativisionstd_joy)/</tag>
+  A joystick driver for the standard joystick is available.
+
+</descrip><p>
 
 <sect1>Mouse drivers<p>
 

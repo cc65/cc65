@@ -29,6 +29,7 @@ including
 - the NEC PC-Engine (aka TurboGrafx-16).
 - the Nintendo Entertainment System (NES) console.
 - the Watara Supervision console.
+- the VTech Creativision console.
 - the Oric Atmos.
 - the Oric Telestrat.
 - the Lynx console.

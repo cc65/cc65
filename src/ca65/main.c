@@ -282,6 +282,10 @@ static void SetSys (const char* Sys)
             NewSymbol ("__GEOS_CBM__", 1);
             break;
 
+        case TGT_CREATIVISION:
+            NewSymbol ("__CREATIVISION__", 1);
+            break;
+
         case TGT_GEOS_APPLE:
             NewSymbol ("__GEOS__", 1);
             NewSymbol ("__GEOS_APPLE__", 1);

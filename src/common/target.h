@@ -71,6 +71,7 @@ typedef enum {
     TGT_APPLE2,
     TGT_APPLE2ENH,
     TGT_GEOS_CBM,
+    TGT_CREATIVISION,
     TGT_GEOS_APPLE,
     TGT_LUNIX,
     TGT_ATMOS,
@@ -89,7 +90,7 @@ typedef enum {
 /* Collection of target properties */
 typedef struct TargetProperties TargetProperties;
 struct TargetProperties {
-    const char              Name[12];   /* Name of the target */
+    const char              Name[13];   /* Name of the target */
     cpu_t                   DefaultCPU; /* Default CPU for this target */
     unsigned char           BinFmt;     /* Default binary format for this target */
     const unsigned char*    CharMap;    /* Character translation table */

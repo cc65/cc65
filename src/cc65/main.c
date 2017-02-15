@@ -234,6 +234,10 @@ static void SetSys (const char* Sys)
             DefineNumericMacro ("__GEOS_CBM__", 1);
             break;
 
+        case TGT_CREATIVISION:
+            DefineNumericMacro ("__CREATIVISION__", 1);
+            break;
+
         case TGT_GEOS_APPLE:
             DefineNumericMacro ("__GEOS__", 1);
             DefineNumericMacro ("__GEOS_APPLE__", 1);

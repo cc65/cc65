@@ -134,7 +134,7 @@ static const unsigned char CTPET[256] = {
 /* One entry in the target map */
 typedef struct TargetEntry TargetEntry;
 struct TargetEntry {
-    char        Name[12];               /* Target name */
+    char        Name[13];               /* Target name */
     target_t    Id;                     /* Target id */
 };
 
@@ -142,38 +142,39 @@ struct TargetEntry {
 ** Allows multiple entries for one target id (target name aliases).
 */
 static const TargetEntry TargetMap[] = {
-    {   "apple2",       TGT_APPLE2      },
-    {   "apple2enh",    TGT_APPLE2ENH   },
-    {   "atari",        TGT_ATARI       },
-    {   "atari2600",    TGT_ATARI2600   },
-    {   "atari5200",    TGT_ATARI5200   },
-    {   "atarixl",      TGT_ATARIXL     },
-    {   "atmos",        TGT_ATMOS       },
-    {   "bbc",          TGT_BBC         },
-    {   "c128",         TGT_C128        },
-    {   "c16",          TGT_C16         },
-    {   "c64",          TGT_C64         },
-    {   "c65",          TGT_C65         },
-    {   "cbm510",       TGT_CBM510      },
-    {   "cbm610",       TGT_CBM610      },
-    {   "gamate",       TGT_GAMATE      },
-    {   "geos",         TGT_GEOS_CBM    },
-    {   "geos-apple",   TGT_GEOS_APPLE  },
-    {   "geos-cbm",     TGT_GEOS_CBM    },
-    {   "lunix",        TGT_LUNIX       },
-    {   "lynx",         TGT_LYNX        },
-    {   "module",       TGT_MODULE      },
-    {   "nes",          TGT_NES         },
-    {   "none",         TGT_NONE        },
-    {   "osic1p",       TGT_OSIC1P      },
-    {   "pce",          TGT_PCENGINE    },
-    {   "pet",          TGT_PET         },
-    {   "plus4",        TGT_PLUS4       },
-    {   "sim6502",      TGT_SIM6502     },
-    {   "sim65c02",     TGT_SIM65C02    },
-    {   "supervision",  TGT_SUPERVISION },
-    {   "telestrat",    TGT_TELESTRAT   },
-    {   "vic20",        TGT_VIC20       },
+    {   "apple2",       TGT_APPLE2       },
+    {   "apple2enh",    TGT_APPLE2ENH    },
+    {   "atari",        TGT_ATARI        },
+    {   "atari2600",    TGT_ATARI2600    },
+    {   "atari5200",    TGT_ATARI5200    },
+    {   "atarixl",      TGT_ATARIXL      },
+    {   "atmos",        TGT_ATMOS        },
+    {   "bbc",          TGT_BBC          },
+    {   "c128",         TGT_C128         },
+    {   "c16",          TGT_C16          },
+    {   "c64",          TGT_C64          },
+    {   "c65",          TGT_C65          },
+    {   "cbm510",       TGT_CBM510       },
+    {   "cbm610",       TGT_CBM610       },
+    {   "creativision", TGT_CREATIVISION },
+    {   "gamate",       TGT_GAMATE       },
+    {   "geos",         TGT_GEOS_CBM     },
+    {   "geos-apple",   TGT_GEOS_APPLE   },
+    {   "geos-cbm",     TGT_GEOS_CBM     },
+    {   "lunix",        TGT_LUNIX        },
+    {   "lynx",         TGT_LYNX         },
+    {   "module",       TGT_MODULE       },
+    {   "nes",          TGT_NES          },
+    {   "none",         TGT_NONE         },
+    {   "osic1p",       TGT_OSIC1P       },
+    {   "pce",          TGT_PCENGINE     },
+    {   "pet",          TGT_PET          },
+    {   "plus4",        TGT_PLUS4        },
+    {   "sim6502",      TGT_SIM6502      },
+    {   "sim65c02",     TGT_SIM65C02     },
+    {   "supervision",  TGT_SUPERVISION  },
+    {   "telestrat",    TGT_TELESTRAT    },
+    {   "vic20",        TGT_VIC20        },
 };
 #define MAP_ENTRY_COUNT         (sizeof (TargetMap) / sizeof (TargetMap[0]))
 
@@ -199,6 +200,7 @@ static const TargetProperties PropertyTable[TGT_COUNT] = {
     { "apple2",         CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "apple2enh",      CPU_65C02,      BINFMT_BINARY,      CTNone  },
     { "geos-cbm",       CPU_6502,       BINFMT_BINARY,      CTNone  },
+    { "creativision",   CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "geos-apple",     CPU_65C02,      BINFMT_BINARY,      CTNone  },
     { "lunix",          CPU_6502,       BINFMT_O65,         CTNone  },
     { "atmos",          CPU_6502,       BINFMT_BINARY,      CTNone  },

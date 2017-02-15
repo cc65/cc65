@@ -66,8 +66,8 @@ LDFLAGS_mandelbrot_apple2enh = --start-addr 0x4000
 LDFLAGS_tgidemo_apple2       = --start-addr 0x4000
 LDFLAGS_tgidemo_apple2enh    = --start-addr 0x4000
 
-# The Apple ][ needs the start address adjusted for the mousetest
-LDFLAGS_mousetest_apple2 = --start-addr 0x4000
+# The Apple ][ needs the start address adjusted for the mousedemo
+LDFLAGS_mousedemo_apple2 = --start-addr 0x4000
 
 # The Apple machines need the end address adjusted for large programs
 LDFLAGS_gunzip65_apple2    = -D __HIMEM__=0xBF00
@@ -111,7 +111,7 @@ EXELIST_c64 =      \
         gunzip65   \
         hello      \
         mandelbrot \
-        mousetest  \
+        mousedemo  \
         multdemo   \
         nachtm     \
         ovrldemo   \
@@ -126,7 +126,7 @@ EXELIST_apple2 =   \
         gunzip65   \
         hello      \
         mandelbrot \
-        mousetest  \
+        mousedemo  \
         multdemo   \
         ovrldemo   \
         sieve      \
@@ -139,7 +139,7 @@ EXELIST_atari =    \
         gunzip65   \
         hello      \
         mandelbrot \
-        mousetest  \
+        mousedemo  \
         multdemo   \
         ovrldemo   \
         sieve      \
@@ -147,7 +147,7 @@ EXELIST_atari =    \
 
 EXELIST_atarixl = $(EXELIST_atari)
 
-EXELIST_atari2600 =    \
+EXELIST_atari2600 = \
         atari2600hello
 
 # --------------------------------------------------------------------------

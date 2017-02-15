@@ -1,9 +1,38 @@
-/* CreatiVision Header */
+/*****************************************************************************/
+/*                                                                           */
+/*                             creativision.h                                */
+/*                                                                           */
+/*                  Creativision system specific definitions                 */
+/*                                                                           */
+/*                                                                           */
+/*                                                                           */
+/* (C) 2013      cvemu                                                       */
+/* (C) 2017      Christian Groessler <chris@groessler.org>                   */
+/*                                                                           */
+/*                                                                           */
+/* This software is provided 'as-is', without any expressed or implied       */
+/* warranty.  In no event will the authors be held liable for any damages    */
+/* arising from the use of this software.                                    */
+/*                                                                           */
+/* Permission is granted to anyone to use this software for any purpose,     */
+/* including commercial applications, and to alter it and redistribute it    */
+/* freely, subject to the following restrictions:                            */
+/*                                                                           */
+/* 1. The origin of this software must not be misrepresented; you must not   */
+/*    claim that you wrote the original software. If you use this software   */
+/*    in a product, an acknowledgment in the product documentation would be  */
+/*    appreciated but is not required.                                       */
+/* 2. Altered source versions must be plainly marked as such, and must not   */
+/*    be misrepresented as being the original software.                      */
+/* 3. This notice may not be removed or altered from any source              */
+/*    distribution.                                                          */
+/*                                                                           */
+/*****************************************************************************/
 
 #ifndef _CVISION_H
-
 #define _CVISION_H
 
+/* Character codes */
 #define CH_VLINE 33
 #define CH_HLINE 34
 #define CH_ULCORNER 35
@@ -11,12 +40,13 @@
 #define CH_LLCORNER 37
 #define CH_LRCORNER 38
 
+/* no support for dynamically loadable drivers */
 #define DYN_DRV 0
 
 /* Colours - from TMS9918 */
 #define C_TRANSPARENT   0
 #define C_BLACK         1
-#define C_MED_GREEN     2 
+#define C_MED_GREEN     2
 #define C_LIGHT_GREEN   3
 #define C_DARK_BLUE     4
 #define C_LIGHT_BLUE    5
@@ -31,29 +61,10 @@
 #define C_GREY          14
 #define C_WHITE         15
 
-/* Joystick states */
-#define JOY_UP          5
-#define JOY_DOWN        1
-#define JOY_LEFT        7
-#define JOY_RIGHT       3
-#define JOY_LEFT_UP     6
-#define JOY_LEFT_DOWN   8
-#define JOY_RIGHT_UP    4
-#define JOY_RIGHT_DOWN  2
-#define JOY_LBUTTON     1
-#define JOY_RBUTTON     2
-
-/* Joystick values */
-#define JOY_LEFT_DIR      1
-#define JOY_RIGHT_DIR     2
-#define JOY_LEFT_BUTTONS  3
-#define JOY_RIGHT_BUTTONS 4                     
-
 /* Protos */
-void __fastcall__ psg_outb( unsigned char b );
-void __fastcall__ psg_delay( unsigned char b );
-void psg_silence( void );
-void __fastcall__ bios_playsound( void *a, unsigned char b);
-unsigned char __fastcall__ joystate( unsigned char which );
+void __fastcall__ psg_outb(unsigned char b);
+void __fastcall__ psg_delay(unsigned char b);
+void psg_silence(void);
+void __fastcall__ bios_playsound(void *a, unsigned char b);
 
-#endif
+#endif  /* #ifndef _CVISION_H */

@@ -49,7 +49,7 @@
 ; ------------------------------------------------------------------------
 ; Constants
 
-JOY_COUNT       = 2             ; Number of joysticks we support
+JOY_COUNT       = 2                     ; Number of joysticks we support
 
 ; ------------------------------------------------------------------------
 ; Code
@@ -66,7 +66,7 @@ JOY_COUNT       = 2             ; Number of joysticks we support
 INSTALL:
         lda     #JOY_ERR_OK
         ldx     #0
-;       rts                     ; Fall through
+;       rts                             ; Fall through
 
 ; ------------------------------------------------------------------------
 ; UNINSTALL routine. Is called before the driver is removed from memory.
@@ -91,14 +91,14 @@ COUNT:
 ;
 
 READJOY:
-        and     #1              ; fix joystick number
-        bne     READJOY_1       ; read right joystick
+        and     #1                      ; fix joystick number
+        bne     READJOY_1               ; read right joystick
 
 ; Read left joystick
 
         ldx     ZP_JOY0_DIR
         lda     ZP_JOY0_BUTTONS
-        jmp     convert         ; convert joystick state to sane cc65 values
+        jmp     convert                 ; convert joystick state to sane cc65 values
 
 ; Read right joystick
 
@@ -108,8 +108,8 @@ READJOY_1:
         lda     ZP_JOY1_BUTTONS
         lsr     a
         lsr     a
-        ;jmp    convert         ; convert joystick state to sane cc65 values
-                                ; fall thru...
+        ;jmp    convert                 ; convert joystick state to sane cc65 values
+                                        ; fall thru...
 
 ; ------------------------------------------------------------------------
 ; convert: make runtime lib compatible values
@@ -119,7 +119,7 @@ READJOY_1:
 
 convert:
         ldy     #0
-        sty     retval          ; initialize return value
+        sty     retval                  ; initialize return value
 
 ; ------
 ; buttons:
@@ -127,7 +127,7 @@ convert:
         ; values were shifted to the right to be identical).
         ; Why are there two bits indicating a pressed trigger?
         ; According to the "Second book of programs for the Dick Smith Wizard"
-	; (pg. 88ff), the left hand fire button gives the value of
+        ; (pg. 88ff), the left hand fire button gives the value of
         ; %00010001 and the right hand button gives %00100010
         ; Why two bits? Am I missing something? Can there be cases that just
         ; one of those bits is set?
@@ -137,7 +137,7 @@ convert:
         and     #%00010001
         beq     cnv_1
 
-        inc     retval           ; left button pressed
+        inc     retval                  ; left button pressed
 
 cnv_1:  tya
         and     #%00100010
@@ -145,45 +145,47 @@ cnv_1:  tya
 
         lda     #$02
         ora     retval
-        sta     retval           ; right button pressed
+        sta     retval                  ; right button pressed
 
 ; ------
 ; direction:
 cnv_2:  txa
-	; tested with https://sourceforge.net/projects/creativisionemulator
-	; $49 - %01001001 - up
-	; $41 - %01000001 - down
-	; $4D - %01001101 - left
-	; $45 - %01000101 - right
-	;
-	; are these correct? "Second book of programs for the Dick Smith Wizard" pg. 85 says something different
-	; ignored for now...
-	; $85 - %10000101 - up + right
-	; $8D - %10001101 - down + left
-	; $89 - %10001001 - up + left
-	; $85 - %10000101 - down + right (emulator bug?)
+        ; tested with https://sourceforge.net/projects/creativisionemulator
+        ; $49 - %01001001 - up
+        ; $41 - %01000001 - down
+        ; $4D - %01001101 - left
+        ; $45 - %01000101 - right
+        ;
+        ; are these correct? "Second book of programs for the Dick Smith Wizard" pg. 85 says something different
+        ; ignored for now...
+        ; $85 - %10000101 - up + right
+        ; $8D - %10001101 - down + left
+        ; $89 - %10001001 - up + left
+        ; $85 - %10000101 - down + right (emulator bug?)
 
-	bit	testbit		; bit #0 set?
-	beq	done		; no, no direction
+        bit     testbit                 ; bit #0 set?
+        beq     done                    ; no, no direction
 
-	and	#%00001100	; mask out other bits
-	tax
-	lda	#%00000100	; init bitmask
-loop:	dex
-	bmi	done2
-	asl	a
-	bne	loop
+        and     #%00001100              ; mask out other bits
+        lsr     a
+        lsr     a
+        tax
+        lda     #%00000100              ; init bitmask
+loop:   dex
+        bmi     done2
+        asl     a
+        bne     loop
 
-done2:	ora	retval
-	rts
+done2:  ora     retval
+        rts
 
-done:	lda	retval
-	rts
+done:   lda     retval
+        rts
 
 ; ------------------------------------------------------------------------
 ;
         .data
-testbit:.byte	$01
+testbit:.byte   $01
 
 ; ------------------------------------------------------------------------
 ;

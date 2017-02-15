@@ -4,11 +4,13 @@
 
         .export         _exit
         .export         __STARTUP__ : absolute = 1      ; Mark as startup
+        .export         irq2
         .import         zerobss, copydata
         .import         initlib, donelib, callmain
         .import         __VECTORS_LOAD__, __VECTORS_RUN__, __VECTORS_SIZE__
         .import         __ZP_LAST__, __STACKSIZE__, __RAM_START__
 
+        .include        "creativision.inc"
         .include        "zeropage.inc"
 
 ; ------------------------------------------------------------------------
@@ -61,8 +63,8 @@ loop:   jmp loop
 
 .segment        "VECTORS"
 
-irq1:   jmp     $FF3F
-irq2:   jmp     $FF52
+irq1:   jmp     BIOS_IRQ1_ADDR
+irq2:   jmp     BIOS_IRQ2_ADDR
 
 ; ------------------------------------------------------------------------
 ; Define CART setup values for BIOS.
@@ -92,7 +94,7 @@ irq2:   jmp     $FF52
         ; BIOS Vector after NMI or RESET
         ; Keeping with retail cartridges, we jump back to BIOS ROM and have it
         ; setup zeropage etc, and show the Creativision logo and copyright.
-        .addr $F808
+        .addr BIOS_NMI_RESET_ADDR
 
         ; BIOS Short Interrupt Handler
         ; Vectored from BIOS ROM:FE2C. This should contain a pointer to the user's

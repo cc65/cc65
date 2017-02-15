@@ -36,3 +36,7 @@ ZP_JOY1_DIR             = $13
 ZP_JOY0_BUTTONS         = $16
 ZP_JOY1_BUTTONS         = $17
 
+;** BIOS
+BIOS_IRQ1_ADDR          = $FF3F
+BIOS_IRQ2_ADDR          = $FF52
+BIOS_NMI_RESET_ADDR     = $F808

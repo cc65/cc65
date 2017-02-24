@@ -319,7 +319,7 @@ chip registers.
 
 <sect1>Display lists<p>
 
-An major feature of the Atari graphics chip "ANTIC" is to
+A major feature of the Atari graphics chip "ANTIC" is to
 process instructions for the display generation.
 cc65 supports constructing these display lists by offering defines
 for the instructions. In conjunction with the "void"-variable extension

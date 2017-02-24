@@ -317,6 +317,49 @@ chip registers.
 
 </descrip><p>
 
+<sect1>Display lists<p>
+
+A major feature of the Atari graphics chip "ANTIC" is to
+process instructions for the display generation.
+cc65 supports constructing these display lists by offering defines
+for the instructions. In conjunction with the "void"-variable extension
+of cc65, display lists can be created quite comfortable:
+
+<verb>
+...
+unsigned char ScreenMemory[100];
+
+void DisplayList =
+{
+	DL_BLK8,
+	DL_BLK8,
+	DL_BLK8,
+	DL_LMS(DL_CHR20x8x2),
+	ScreenMemory,
+	DL_CHR20x8x2,
+	DL_CHR20x8x2,
+	DL_CHR20x8x2,
+	DL_BLK4,
+	DL_CHR20x8x2,
+	DL_JVB
+};
+...
+POKEW(560,(unsigned int)&amp;DisplayList);		// SDLSTL
+...
+</verb>
+
+Please inspect the <tt/_antic.h/ header file to detemine the supported
+instruction names. Modifiers on instructions can be nested without need
+for an order:
+
+<tt/DL_LMS(DL_HSCROL(DL_VSCROL(DL_DLI(DL_MAP80x4x2))))/
+
+Please mind that ANTIC has memory alignment requirements for "player
+missile graphics"-data, font data, display lists and screen memory. Creation
+of a special linker configuration with appropriate aligned segments and
+switching to that segment in the c-code is usually neccessary. A more memory
+hungry solution consists in using the "<tt/posix_memalign()/" function in
+conjunction with copying your data to the allocated memory.
 
 <sect1>Character mapping<p>
 

@@ -51,7 +51,7 @@ main(void)
 {
     // unfortunately "sizeof()" doesn't work with void data
     // (Error: Size of data type is unknown)
-    // so we trick with the adresses at front and behind...
+    // so we trick with the addresses at front and end...
 
     int returnValue = (((unsigned int)&dlend-(unsigned int)&DisplayList) != 28);  // assure only one byte per instruction!
 

@@ -21,5 +21,5 @@
     sta     RESB+1
 
     lda     #' '
-	BRK_TELEMON XFILLM
+    BRK_TELEMON XFILLM
 .endproc	

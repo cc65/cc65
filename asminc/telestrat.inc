@@ -108,6 +108,7 @@ XWR0             = $10
 XWSTR0           = $14 
 XTEXT            = $19
 XHIRES           = $1A
+XFILLM           = $1C
 XMINMA           = $1F
 XFREAD           = $27          ; only in TELEMON 3.0
 XOPEN            = $30          ; only in TELEMON 3.0

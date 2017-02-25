@@ -5,10 +5,9 @@
 	
     .import    popa
 	
-    .importzp  sp,tmp2,tmp3,tmp1
+    .importzp  sp
 
     .include   "telestrat.inc"
-
 
 .proc _gotoxy
    ; This function move only cursor for display, it does not move the prompt position

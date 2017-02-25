@@ -7,7 +7,6 @@
 
     .include   "telestrat.inc"
 
-
 .proc _gotoy
    sta     SCRY
    rts

@@ -7,7 +7,6 @@
 
     .include   "telestrat.inc"
 
-
 .proc _wherex
     ldx    #$00
     lda    SCRX

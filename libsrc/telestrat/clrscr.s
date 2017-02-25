@@ -10,7 +10,7 @@
 
 .proc _clrscr
     lda     #<SCREEN
-	ldy     #>SCREEN
+    ldy     #>SCREEN
     sta     RES
     sty     RES+1
 
@@ -20,14 +20,14 @@
     BRK_TELEMON XFILLM
 	
 	
-	; reset prompt position
+    ; reset prompt position
     lda     #<(SCREEN+40)
     sta     ADSCRL
     lda     #>(SCREEN+40)
     sta     ADSCRH
 	
-	; reset display position
-	lda     #$01
+    ; reset display position
+    lda     #$01
     sta     SCRY
     lda     #$00
     sta     SCRX	

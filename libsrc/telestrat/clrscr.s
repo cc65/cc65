@@ -1,3 +1,7 @@
+;
+; jede jede@oric.org 2017-02-25
+; 
+
     .export    _clrscr
 	
     .importzp  sp
@@ -25,7 +29,7 @@
 	; reset display position
 	lda     #$01
     sta     SCRY
-    lda     #$02
+    lda     #$00
     sta     SCRX	
     rts
 .endproc	

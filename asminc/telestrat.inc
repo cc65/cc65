@@ -31,6 +31,7 @@ PTR_READ_DEST   := $2C           ; used for XFREAD and XWRITE only in telemon 3.
 
 HRSX            := $46
 HRSY            := $47
+HRSX40          := $49           ; X/6
 
 HRS1            := $4D
 HRS2            := $4F
@@ -107,6 +108,7 @@ XWR0             = $10
 XWSTR0           = $14 
 XTEXT            = $19
 XHIRES           = $1A
+XFILLM           = $1C
 XMINMA           = $1F
 XFREAD           = $27          ; only in TELEMON 3.0
 XOPEN            = $30          ; only in TELEMON 3.0
@@ -127,6 +129,11 @@ XPAPER           = $92
 XINK             = $93
 XEXPLO           = $9C 
 XPING            = $9D
+
+; ---------------------------------------------------------------------------
+; Page $200
+SCRX             := $220
+SCRY             := $224
 
 
 ; ---------------------------------------------------------------------------

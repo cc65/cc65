@@ -1,5 +1,6 @@
 ;
 ; Ullrich von Bassewitz, 31.05.1998
+; Christian Krueger: 2013-Jul-24, minor optimization
 ;
 ; char* strcat (char* dest, const char* src);
 ;
@@ -12,44 +13,35 @@ _strcat:
         sta     ptr1            ; Save src
         stx     ptr1+1
         jsr     popax           ; Get dest
-        sta     ptr2
-        stx     ptr2+1
         sta     tmp3            ; Remember for function return
-        ldy     #0
+	tay
+	lda	#0
+	sta	ptr2		; access from page start, y contains low byte
+        stx     ptr2+1
 
-; find end of dest
-
-sc1:    lda     (ptr2),y
-        beq     sc2
+findEndOfDest:
+	lda     (ptr2),y
+        beq     endOfDestFound
         iny
-        bne     sc1
+        bne     findEndOfDest
         inc     ptr2+1
-        bne     sc1
+        bne     findEndOfDest
 
-; end found, get offset in y into pointer
+endOfDestFound:
+	sty	ptr2		; advance pointer to last y position	
+	ldy	#0		; reset new y-offset
 
-sc2:    tya
-        clc
-        adc     ptr2
-        sta     ptr2
-        bcc     sc3
-        inc     ptr2+1
-
-; copy src
-
-sc3:    ldy     #0
-sc4:    lda     (ptr1),y
+copyByte:
+	lda     (ptr1),y
         sta     (ptr2),y
-        beq     sc5
+        beq     done
         iny
-        bne     sc4
+        bne     copyByte
         inc     ptr1+1
         inc     ptr2+1
-        bne     sc4
+        bne     copyByte	; like bra here
 
-; done, return pointer to dest
-
-sc5:    lda     tmp3            ; X does still contain high byte
+; return pointer to dest
+done:	lda     tmp3            ; X does still contain high byte
         rts
-
 

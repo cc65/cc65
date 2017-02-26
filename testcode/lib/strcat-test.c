@@ -3,7 +3,7 @@
 
 #define SourceStringSize 257                            // test correct page passing (>256)
 
-static char SourceString[SourceStringSize+1];		// +1 room for terminating null
+static char SourceString[SourceStringSize+1];           // +1 room for terminating null
 static char DestinationString[2*SourceStringSize+1];    // will contain two times the source buffer
 
 
@@ -48,7 +48,7 @@ TEST
             unsigned position = j*SourceStringSize+i;
             unsigned current = DestinationString[position];
             unsigned expected = (i%128)+1;
-	    ASSERT_AreEqual(expected, current, "%u", "Unexpected destination buffer contents at position %u!\n" COMMA position);
+            ASSERT_AreEqual(expected, current, "%u", "Unexpected destination buffer contents at position %u!\n" COMMA position);
         }
 }
 ENDTEST

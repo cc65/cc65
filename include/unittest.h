@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2017 Christian Krueger			                                     */
+/* (C) 2017 Christian Krueger                                                */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
 /* warranty.  In no event will the authors be held liable for any damages    */
@@ -37,49 +37,49 @@
 #define COMMA ,
 #endif
 
-#define TEST 	int main(void) \
-			 	{\
-					printf("%s: ",__FILE__);
+#define TEST    int main(void) \
+                {\
+                    printf("%s: ",__FILE__);
 
-#define ENDTEST		printf("Passed\n"); \
-					return EXIT_SUCCESS; \
-				}
+#define ENDTEST     printf("Passed\n"); \
+                    return EXIT_SUCCESS; \
+                }
 
-#define ASSERT_IsTrue(a,b)					if (!(a)) \
-											{\
-												printf("Fail at line %d:\n",__LINE__);\
-												printf(b);\
-												printf("\n");\
-												printf("Expected status should be true but wasn't!\n");\
-												exit(EXIT_FAILURE);\
-											}
+#define ASSERT_IsTrue(a,b)                  if (!(a)) \
+                                            {\
+                                                printf("Fail at line %d:\n",__LINE__);\
+                                                printf(b);\
+                                                printf("\n");\
+                                                printf("Expected status should be true but wasn't!\n");\
+                                                exit(EXIT_FAILURE);\
+                                            }
 
-#define ASSERT_IsFalse(a,b)					if ((a)) \
-											{\
-												printf("Fail at line %d:\n",__LINE__);\
-												printf(b);\
-												printf("\n");\
-												printf("Expected status should be false but wasn't!\n");\
-												exit(EXIT_FAILURE);\
-											}
+#define ASSERT_IsFalse(a,b)                 if ((a)) \
+                                            {\
+                                                printf("Fail at line %d:\n",__LINE__);\
+                                                printf(b);\
+                                                printf("\n");\
+                                                printf("Expected status should be false but wasn't!\n");\
+                                                exit(EXIT_FAILURE);\
+                                            }
 
-#define ASSERT_AreEqual(a,b,c,d)			if ((a) != (b)) \
-											{\
-												printf("Fail at line %d:\n",__LINE__);\
-												printf(d);\
-												printf("\n");\
-												printf("Expected value: "c", but is "c"!\n", (a), (b));\
-												exit(EXIT_FAILURE);\
-											}
+#define ASSERT_AreEqual(a,b,c,d)            if ((a) != (b)) \
+                                            {\
+                                                printf("Fail at line %d:\n",__LINE__);\
+                                                printf(d);\
+                                                printf("\n");\
+                                                printf("Expected value: "c", but is "c"!\n", (a), (b));\
+                                                exit(EXIT_FAILURE);\
+                                            }
 
-#define ASSERT_AreNotEqual(a,b,c,d)			if ((a) == (b)) \
-											{\
-												printf("Fail at line %d:\n",__LINE__);\
-												printf(d);\
-												printf("\n");\
-												printf("Expected value not: "c", but is "c"!\n", (a), (b));\
-												exit(EXIT_FAILURE);\
-											}
+#define ASSERT_AreNotEqual(a,b,c,d)         if ((a) == (b)) \
+                                            {\
+                                                printf("Fail at line %d:\n",__LINE__);\
+                                                printf(d);\
+                                                printf("\n");\
+                                                printf("Expected value not: "c", but is "c"!\n", (a), (b));\
+                                                exit(EXIT_FAILURE);\
+                                            }
 
 /* End of unittest.h */
 #endif

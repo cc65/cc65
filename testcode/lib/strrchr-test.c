@@ -1,7 +1,7 @@
 #include <unittest.h>
 #include <string.h>
                                                     
-static char TestString[] = "01234567890123456789";	// two times the same string
+static char TestString[] = "01234567890123456789";  // two times the same string
 static char Found[256];
 
 TEST
@@ -10,7 +10,7 @@ TEST
     unsigned i;
     char*    p;
 
-    len = strlen(TestString)/2;	// test only one half of the string, to find last appearance
+    len = strlen(TestString)/2; // test only one half of the string, to find last appearance
 
     /* Search for all characters in the string, including the terminator */
     for (i = 0; i < len; ++i)

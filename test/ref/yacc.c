@@ -562,7 +562,7 @@ yylook()
 		}
 
 # ifdef LEXDEBUG
-		if((*(lsp-1)-yysvec-1)<0)
+		if (*(lsp-1) < yysvec + 1)
 		{
 			fprintf(yyout,"yylook:  stopped (end)\n");
 		}

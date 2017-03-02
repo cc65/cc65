@@ -1,4 +1,3 @@
-
 # makefile for the regression tests that generate output which has to be
 # compared with reference output
 
@@ -24,7 +23,7 @@ WORKDIR := ..$S..$Stestwrk
 DIFF := $(WORKDIR)/bdiff
 
 CC := gcc
-CFLAGS := -O2 -Wall -W -Wextra -fwrapv -fno-strict-overflow
+CFLAGS := -O2 -Wall -W -Wextra -funsigned-char -fwrapv -fno-strict-overflow
 
 .PHONY: all clean
 
@@ -33,6 +32,11 @@ REFS := $(SOURCES:%.c=$(WORKDIR)/%.ref)
 TESTS := $(foreach option,. .o. .os. .osi. .osir. .oi. .oir. .or.,$(SOURCES:%.c=$(WORKDIR)/%$(option)prg))
 
 all: $(REFS) $(TESTS)
+
+# "yaccdbg.c" includes "yacc.c".
+# yaccdbg's built files must depend on both of them.
+
+$(WORKDIR)/yaccdbg.ref: yacc.c
 
 $(WORKDIR)/%.ref: %.c
 	$(CC) $(CFLAGS) $< -o $(WORKDIR)/$*.host
@@ -47,6 +51,8 @@ $(WORKDIR)/init%prg: CC65FLAGS += -Wc --all-cdecl
 $(WORKDIR)/switch.%rg: CC65FLAGS += -Wc --all-cdecl
 $(WORKDIR)/yacc.%rg: CC65FLAGS += -Wc --all-cdecl
 $(WORKDIR)/yaccdbg%prg: CC65FLAGS += -Wc --all-cdecl
+
+$(WORKDIR)/yaccdbg%prg: yacc.c
 
 $(WORKDIR)/%.prg: %.c $(WORKDIR)/%.ref
 	$(CL65) $(CC65FLAGS) $< -o $@

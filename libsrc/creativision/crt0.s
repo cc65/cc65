@@ -81,7 +81,7 @@ irq2:   jmp     BIOS_IRQ2_ADDR
         ; VDP Setup
         ; This sets to Graphics Mode 1
         .byte   $00             ; Register 0
-        .byte   $C0             ; Register 1 16K RAM, Active Display, Mode 1
+        .byte   $E0             ; Register 1 16K RAM, Active Display, Mode 1, VBI enabled
         .byte   $04             ; Register 2 Name Table at $1000 - $12FF
         .byte   $60             ; Register 3 Colour Table at $1800 - $181F
         .byte   $00             ; Register 4 Pattern Table at $0000 - $07FF

@@ -1,6 +1,6 @@
 ;
 ; Ullrich von Bassewitz, 31.05.1998
-; Christian Krueger: 2013-Jul-24, minor optimization
+; Christian Krueger: 2013-Jul-24, minor optimizations
 ;
 ; char* strcat (char* dest, const char* src);
 ;
@@ -15,8 +15,12 @@ _strcat:
         jsr popax       ; Get dest
         sta tmp3        ; Remember for function return
         tay
+.if (.cpu .bitand ::CPU_ISET_65SC02)
+        stz ptr2
+.else
         lda #0
         sta ptr2        ; access from page start, y contains low byte
+.endif        
         stx ptr2+1
 
 findEndOfDest:

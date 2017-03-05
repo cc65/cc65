@@ -14,8 +14,12 @@ _strchr:
         jsr popax       ; get s
         tay             ; low byte of pointer to y
         stx ptr1+1
+.if (.cpu .bitand ::CPU_ISET_65SC02)
+        stz ptr1
+.else
         lda #0
-        sta ptr1        ; ptr access page wise
+        sta ptr1        ; access from page start, y contains low byte
+.endif        
 
 Loop:   lda (ptr1),y    ; Get next char
         beq EOS         ; Jump on end of string

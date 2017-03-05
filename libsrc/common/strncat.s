@@ -8,7 +8,8 @@
         .export         _strncat
         .import         popax
         .importzp       ptr1, ptr2, ptr3, tmp1, tmp2
-
+        .macpack        cpu
+        
 _strncat:
     eor #$FF        ; one's complement to count upwards
     sta tmp1

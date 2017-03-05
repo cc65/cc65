@@ -8,6 +8,7 @@
         .export         _strchr
         .import         popax
         .importzp       ptr1, tmp1
+        .macpack        cpu
 
 _strchr:
         sta tmp1        ; Save c

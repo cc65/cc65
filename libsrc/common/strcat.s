@@ -8,6 +8,7 @@
         .export         _strcat
         .import         popax
         .importzp       ptr1, ptr2, tmp3
+        .macpack        cpu
 
 _strcat:
         sta ptr1        ; Save src

@@ -36,6 +36,24 @@ ZP_JOY1_DIR             = $13
 ZP_JOY0_BUTTONS         = $16
 ZP_JOY1_BUTTONS         = $17
 
+;** Joystick direction values (ZP_JOY0_DIR/ZP_JOY1_DIR)
+JOY_N                   = $49
+JOY_NNE                 = $48
+JOY_NE                  = $47
+JOY_ENE                 = $46
+JOY_E                   = $45
+JOY_ESE                 = $44
+JOY_SE                  = $43
+JOY_SSE                 = $42
+JOY_S                   = $41
+JOY_SSW                 = $40
+JOY_SW                  = $4F
+JOY_WSW                 = $4E
+JOY_W                   = $4D
+JOY_WNW                 = $4C
+JOY_NW                  = $4B
+JOY_NNW                 = $4A
+
 ;** BIOS
 BIOS_IRQ1_ADDR          = $FF3F
 BIOS_IRQ2_ADDR          = $FF52

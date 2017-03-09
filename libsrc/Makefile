@@ -15,24 +15,24 @@ CBMS = c128   \
 GEOS = geos-apple \
        geos-cbm
 
-TARGETS = apple2    \
-          apple2enh \
-          atari     \
-          atarixl   \
-          atari2600 \
-          atari5200 \
-          atmos     \
+TARGETS = apple2       \
+          apple2enh    \
+          atari        \
+          atarixl      \
+          atari2600    \
+          atari5200    \
+          atmos        \
           creativision \
-          $(CBMS)   \
-          $(GEOS)   \
-          gamate    \
-          lynx      \
-          nes       \
-          osic1p    \
-          pce       \
-          sim6502   \
-          sim65c02  \
-          supervision\
+          $(CBMS)      \
+          $(GEOS)      \
+          gamate       \
+          lynx         \
+          nes          \
+          osic1p       \
+          pce          \
+          sim6502      \
+          sim65c02     \
+          supervision  \
           telestrat
 
 DRVTYPES = emd \
@@ -41,13 +41,13 @@ DRVTYPES = emd \
            ser \
            tgi
 
-OUTPUTDIRS := lib                 \
-              asminc              \
-              cfg                 \
-              include             \
-              $(subst ../,,$(filter-out $(wildcard ../include/*.*),$(wildcard ../include/*)))\
-              $(subst ../,,$(wildcard ../target/*/drv/*))\
-              $(subst ../,,$(wildcard ../target/*/util))\
+OUTPUTDIRS := lib                                                                             \
+              asminc                                                                          \
+              cfg                                                                             \
+              include                                                                         \
+              $(subst ../,,$(filter-out $(wildcard ../include/*.*),$(wildcard ../include/*))) \
+              $(subst ../,,$(wildcard ../target/*/drv/*))                                     \
+              $(subst ../,,$(wildcard ../target/*/util))
 
 .PHONY: all mostlyclean clean install zip lib $(TARGETS)
 

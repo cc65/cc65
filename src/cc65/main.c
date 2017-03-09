@@ -88,7 +88,7 @@ static void Usage (void)
             "  -O\t\t\t\tOptimize code\n"
             "  -Oi\t\t\t\tOptimize code, inline more code\n"
             "  -Or\t\t\t\tEnable register variables\n"
-            "  -Os\t\t\t\tInline some known functions\n"
+            "  -Os\t\t\t\tForce inlining of some known functions\n"
             "  -T\t\t\t\tInclude source as comment\n"
             "  -V\t\t\t\tPrint the compiler version number\n"
             "  -W warning[,...]\t\tSuppress warnings\n"
@@ -119,6 +119,7 @@ static void Usage (void)
             "  --dep-target target\t\tUse this dependency target\n"
             "  --disable-opt name\t\tDisable an optimization step\n"
             "  --enable-opt name\t\tEnable an optimization step\n"
+            "  --force-inline-funcs\t\tForce inlining of some known functions\n"
             "  --help\t\t\tHelp (this text)\n"
             "  --include-dir dir\t\tSet an include directory search path\n"
             "  --list-opt-steps\t\tList all optimizer steps and exit\n"
@@ -254,7 +255,7 @@ static void SetSys (const char* Sys)
         case TGT_TELESTRAT:
             DefineNumericMacro ("__TELESTRAT__", 1);
             break;
-                                
+
         case TGT_NES:
             DefineNumericMacro ("__NES__", 1);
             break;
@@ -556,7 +557,7 @@ static void OptDebugOpt (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
-static void OptDebugOptOutput (const char* Opt attribute ((unused)), 
+static void OptDebugOptOutput (const char* Opt attribute ((unused)),
                                const char* Arg attribute ((unused)))
 /* Output optimization steps */
 {
@@ -585,6 +586,15 @@ static void OptEnableOpt (const char* Opt attribute ((unused)), const char* Arg)
 /* Enable an optimization step */
 {
     EnableOpt (Arg);
+}
+
+
+
+static void OptForceFuncs (const char* Opt attribute ((unused)),
+                           const char* Arg attribute ((unused)))
+/* Handle the --force-inline-funcs option */
+{
+    IS_Set (&InlineStdFuncs, 1);
 }
 
 
@@ -819,39 +829,40 @@ int main (int argc, char* argv[])
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
-        { "--add-source",       0,      OptAddSource            },
-        { "--all-cdecl",        0,      OptAllCDecl             },
-        { "--bss-name",         1,      OptBssName              },
-        { "--check-stack",      0,      OptCheckStack           },
-        { "--code-name",        1,      OptCodeName             },
-        { "--codesize",         1,      OptCodeSize             },
-        { "--cpu",              1,      OptCPU                  },
-        { "--create-dep",       1,      OptCreateDep            },
-        { "--create-full-dep",  1,      OptCreateFullDep        },
-        { "--data-name",        1,      OptDataName             },
-        { "--debug",            0,      OptDebug                },
-        { "--debug-info",       0,      OptDebugInfo            },
-        { "--debug-opt",        1,      OptDebugOpt             },
-        { "--debug-opt-output", 0,      OptDebugOptOutput       },
-        { "--dep-target",       1,      OptDepTarget            },
-        { "--disable-opt",      1,      OptDisableOpt           },
-        { "--enable-opt",       1,      OptEnableOpt            },
-        { "--help",             0,      OptHelp                 },
-        { "--include-dir",      1,      OptIncludeDir           },
-        { "--list-opt-steps",   0,      OptListOptSteps         },
-        { "--list-warnings",    0,      OptListWarnings         },
-        { "--local-strings",    0,      OptLocalStrings         },
-        { "--memory-model",     1,      OptMemoryModel          },
-        { "--register-space",   1,      OptRegisterSpace        },
-        { "--register-vars",    0,      OptRegisterVars         },
-        { "--rodata-name",      1,      OptRodataName           },
-        { "--signed-chars",     0,      OptSignedChars          },
-        { "--standard",         1,      OptStandard             },
-        { "--static-locals",    0,      OptStaticLocals         },
-        { "--target",           1,      OptTarget               },
-        { "--verbose",          0,      OptVerbose              },
-        { "--version",          0,      OptVersion              },
-        { "--writable-strings", 0,      OptWritableStrings      },
+        { "--add-source",               0,      OptAddSource            },
+        { "--all-cdecl",                0,      OptAllCDecl             },
+        { "--bss-name",                 1,      OptBssName              },
+        { "--check-stack",              0,      OptCheckStack           },
+        { "--code-name",                1,      OptCodeName             },
+        { "--codesize",                 1,      OptCodeSize             },
+        { "--cpu",                      1,      OptCPU                  },
+        { "--create-dep",               1,      OptCreateDep            },
+        { "--create-full-dep",          1,      OptCreateFullDep        },
+        { "--data-name",                1,      OptDataName             },
+        { "--debug",                    0,      OptDebug                },
+        { "--debug-info",               0,      OptDebugInfo            },
+        { "--debug-opt",                1,      OptDebugOpt             },
+        { "--debug-opt-output",         0,      OptDebugOptOutput       },
+        { "--dep-target",               1,      OptDepTarget            },
+        { "--disable-opt",              1,      OptDisableOpt           },
+        { "--enable-opt",               1,      OptEnableOpt            },
+        { "--force-inline-funcs",       0,      OptForceFuncs           },
+        { "--help",                     0,      OptHelp                 },
+        { "--include-dir",              1,      OptIncludeDir           },
+        { "--list-opt-steps",           0,      OptListOptSteps         },
+        { "--list-warnings",            0,      OptListWarnings         },
+        { "--local-strings",            0,      OptLocalStrings         },
+        { "--memory-model",             1,      OptMemoryModel          },
+        { "--register-space",           1,      OptRegisterSpace        },
+        { "--register-vars",            0,      OptRegisterVars         },
+        { "--rodata-name",              1,      OptRodataName           },
+        { "--signed-chars",             0,      OptSignedChars          },
+        { "--standard",                 1,      OptStandard             },
+        { "--static-locals",            0,      OptStaticLocals         },
+        { "--target",                   1,      OptTarget               },
+        { "--verbose",                  0,      OptVerbose              },
+        { "--version",                  0,      OptVersion              },
+        { "--writable-strings",         0,      OptWritableStrings      },
     };
 
     unsigned I;

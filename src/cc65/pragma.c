@@ -74,6 +74,7 @@ typedef enum {
     PRAGMA_CODESIZE,
     PRAGMA_DATA_NAME,
     PRAGMA_DATASEG,                                     /* obsolete */
+    PRAGMA_FORCE_INLINE,
     PRAGMA_LOCAL_STRINGS,
     PRAGMA_OPTIMIZE,
     PRAGMA_REGVARADDR,
@@ -91,7 +92,7 @@ typedef enum {
     PRAGMA_COUNT
 } pragma_t;
 
-/* Pragma table */
+/* Sorted pragma table */
 static const struct Pragma {
     const char* Key;            /* Keyword */
     pragma_t    Tok;            /* Token */
@@ -107,6 +108,7 @@ static const struct Pragma {
     { "codesize",               PRAGMA_CODESIZE         },
     { "data-name",              PRAGMA_DATA_NAME        },
     { "dataseg",                PRAGMA_DATASEG          },      /* obsolete */
+    { "force-inline",           PRAGMA_FORCE_INLINE     },
     { "local-strings",          PRAGMA_LOCAL_STRINGS    },
     { "optimize",               PRAGMA_OPTIMIZE         },
     { "register-vars",          PRAGMA_REGISTER_VARS    },
@@ -737,6 +739,10 @@ static void ParsePragma (void)
             /* FALLTHROUGH */
         case PRAGMA_DATA_NAME:
             SegNamePragma (&B, SEG_DATA);
+            break;
+
+        case PRAGMA_FORCE_INLINE:
+            FlagPragma (&B, &InlineStdFuncs);
             break;
 
         case PRAGMA_LOCAL_STRINGS:

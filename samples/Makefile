@@ -90,7 +90,7 @@ LDFLAGS_tgidemo_atarixl    = --start-addr 0x4000
 %: %.s
 
 .c.o:
-	$(CC) $(CFLAGS) -Oirs --codesize 500 -T -g -t $(SYS) $<
+	$(CC) $(CFLAGS) -Ors --codesize 500 -T -g -t $(SYS) $<
 	$(AS) $(<:.c=.s)
 
 .s.o:

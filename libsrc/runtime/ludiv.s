@@ -1,5 +1,6 @@
 ;
 ; Ullrich von Bassewitz, 17.08.1998
+; Christian Krueger, 11-Mar-2017, added 65SC02 optimization
 ;
 ; CC65 runtime: division for long unsigned ints
 ;
@@ -8,10 +9,17 @@
         .import         addysp1
         .importzp       sp, sreg, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4
 
+        .macpack        cpu
+
 tosudiv0ax:
+.if (.cpu .bitand ::CPU_ISET_65SC02)
+        stz     sreg
+        stz     sreg+1
+.else
         ldy     #$00
         sty     sreg
         sty     sreg+1
+.endif
 
 tosudiveax:                         
         jsr     getlop          ; Get the paramameters
@@ -30,10 +38,15 @@ getlop: sta     ptr3            ; Put right operand in place
         lda     sreg+1
         sta     ptr4+1
 
+.if (.cpu .bitand ::CPU_ISET_65SC02)
+        lda     (sp)
+        ldy     #1
+.else
         ldy     #0              ; Put left operand in place
         lda     (sp),y
-        sta     ptr1
         iny
+.endif
+        sta     ptr1
         lda     (sp),y
         sta     ptr1+1
         iny

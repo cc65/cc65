@@ -891,6 +891,7 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers)
         case TOK_VOID:
             NextToken ();
             D->Type[0].C = T_VOID;
+            D->Type[0].A.U = 0;
             D->Type[1].C = T_END;
             break;
 
@@ -2114,7 +2115,7 @@ NextMember:
 
 
 
-static unsigned ParseVoidInit (void)
+static unsigned ParseVoidInit (Type* T)
 /* Parse an initialization of a void variable (special cc65 extension).
 ** Return the number of bytes initialized.
 */
@@ -2181,6 +2182,9 @@ static unsigned ParseVoidInit (void)
     /* Closing brace */
     ConsumeRCurly ();
 
+    /* Number of bytes determined by initializer */
+    T->A.U = Size;
+
     /* Return the number of bytes initialized */
     return Size;
 }
@@ -2216,8 +2220,8 @@ static unsigned ParseInitInternal (Type* T, int AllowFlexibleMembers)
 
         case T_VOID:
             if (IS_Get (&Standard) == STD_CC65) {
-                /* Special cc65 extension in non ANSI mode */
-                return ParseVoidInit ();
+                /* Special cc65 extension in non-ANSI mode */
+                return ParseVoidInit (T);
             }
             /* FALLTHROUGH */
 

@@ -4,7 +4,7 @@
 <title>cc65 Users Guide
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:gregdk@users.sf.net" name="Greg King">
-<date>2016-06-11
+<date>2017-02-27
 
 <abstract>
 cc65 is a C compiler for 6502 targets. It supports several 6502 based home
@@ -687,30 +687,37 @@ This cc65 version has some extensions to the ISO C standard.
 	string.
 	<p>
 
-<item> 	cc65 allows the initialization of <tt/void/ variables. This may be
-	used to create variable structures that are more compatible with
-	interfaces written for assembler languages. Here is an example:
+<item>  cc65 allows the initialization of <tt/void/ variables. This may be
+        used to create arbitrary structures that are more compatible with
+        interfaces written for assembler languages. Here is an example:
 
-	<tscreen><verb>
-	void GCmd = {	(char)3, (unsigned)0x2000, (unsigned)0x3000 };
-	</verb></tscreen>
+        <tscreen><verb>
+        void GCmd = { (char)3, (unsigned)0x2000, (unsigned)0x3000 };
+        </verb></tscreen>
 
-	This will be translated as follows:
+        That will be translated as follows:
 
-	<tscreen><verb>
-	_GCmd:
-	   	.byte	3
-	   	.word	$2000
-	   	.word	$3000
-	</verb></tscreen>
+        <tscreen><verb>
+        _GCmd:
+                .byte   3
+                .word   $2000
+                .word   $3000
+        </verb></tscreen>
 
-	Since the variable is of type <tt/void/ you may not use it as is.
-	However, taking the address of the variable results in a <tt/void*/
-	which may be passed to any function expecting a pointer.
+        Since the variable is of type <tt/void/, you may not use it as-is.
+        However, taking the address of the variable results in a <tt/void*/
+        which may be passed to any function expecting a pointer.  Also, the
+        <tt/sizeof/ operator will give the length of the initializer:
 
-	See the <url url="geos.html" name="GEOS library document"> for examples
-	on how to use this feature.
-	<p>
+        <tscreen><verb>
+        GLen = sizeof GCmd;
+        </verb></tscreen>
+
+        will assign the value 5 to <tt/GLen/.
+
+        See the <url url="geos.html" name="GEOS library document"> for examples
+        on how to use that feature.
+        <p>
 
 <item>  cc65 implements flexible array struct members as defined in the C99 ISO
         standard. As an extension, these fields may be initialized. There are

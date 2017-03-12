@@ -4,7 +4,7 @@
 <title>cc65 Users Guide
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:gregdk@users.sf.net" name="Greg King">
-<date>2016-06-11
+<date>2017-03-08
 
 <abstract>
 cc65 is a C compiler for 6502 targets. It supports several 6502 based home
@@ -58,7 +58,7 @@ Short options:
   -O                            Optimize code
   -Oi                           Optimize code, inline more code
   -Or                           Enable register variables
-  -Os                           Inline some known functions
+  -Os                           Force inlining of some known functions
   -T                            Include source as comment
   -V                            Print the compiler version number
   -W warning[,...]              Suppress warnings
@@ -89,6 +89,7 @@ Long options:
   --dep-target target           Use this dependency target
   --disable-opt name            Disable an optimization step
   --enable-opt name             Enable an optimization step
+  --force-inline-funcs          Force inlining of some known functions
   --help                        Help (this text)
   --include-dir dir             Set an include directory search path
   --list-opt-steps              List all optimizer steps and exit
@@ -217,6 +218,41 @@ Here is a description of all the command line options:
   This will cause the compiler to insert a <tt/.DEBUGINFO/ command into the
   generated assembler code. This will cause the assembler to include all
   symbols in a special section in the object file.
+
+
+  <label id="option-force-inline">
+  <tag><tt>--force-inline-funcs</tt></tag>
+
+  Force the compiler to inline these functions from the C library:
+  <itemize>
+  <item><tt/memcpy()/
+  <item><tt/memset()/
+  <item><tt/strcmp()/
+  <item><tt/strcpy()/
+  <item><tt/strlen()/
+  <item>most of the functions declared in <tt/&lt;ctype.h&gt;/
+  </itemize>
+
+  Note: that has two consequences:
+  <itemize>
+  <item>You may not use names of standard C functions for your own functions.
+        If you do that, your program is not standard-compliant anyway; but,
+        using <tt/--force-inline-funcs/ actually will break things.
+        <p>
+  <item>The inlined string and memory functions will not handle strings or
+        memory areas larger than 255 bytes.  Similarly, the inlined <tt/is..()/
+        functions will not work with values outside the char. range (such as
+        <tt/EOF/).
+  </itemize>
+
+  You can combine this setting with other optimizer settings by using the
+  <tt/<ref id="option-O" name="-O">/ switch.  For example, <tt/-Ois/ will
+  enable the optimizer, convert internal calls to run-time functions into
+  faster inline code, and convert calls to those C functions even if cc65
+  isn't sure that it's safe to do so.
+
+  The compiler setting also can be changed within a source file by using
+  <tt/<ref id="pragma-force-inline" name="#pragma&nbsp;force-inline">/.
 
 
   <tag><tt>-h, --help</tt></tag>
@@ -445,20 +481,9 @@ Here is a description of all the command line options:
   id="register-vars" name="discussion of register variables"> below.
 
   Using <tt/-Os/ will force the compiler to inline some known functions from
-  the C library like strlen. Note: This has two consequences:
-  <p>
-  <itemize>
-  <item>You may not use names of standard C functions in your own code. If you
-     	do that, your program is not standard compliant anyway, but using
-     	<tt/-Os/ will actually break things.
-     	<p>
-  <item>The inlined string and memory functions will not handle strings or
-	memory areas larger than 255 bytes. Similarly, the inlined <tt/is..()/
-	functions will not work with values outside the char. range (such as
-	<tt/EOF/).
-     	<p>
-  </itemize>
-  <p>
+  the C library.  See the <tt/<ref id="option-force-inline"
+  name="--force-inline-funcs">/ switch for the details.
+
   It is possible to concatenate the modifiers for <tt/-O/. For example, to
   enable register variables and inlining of known functions, you may use
   <tt/-Ors/.
@@ -1030,6 +1055,23 @@ parameter with the <tt/#pragma/.
   <tscreen><verb>
        	#pragma data-name ("MyDATA")
   </verb></tscreen>
+
+
+<sect1><tt>#pragma force-inline ([push,] on|off)</tt><label id="pragma-force-inline"><p>
+
+  cc65 can substitute faster inline code for calls to some C library array
+  functions.  That inline code can handle only arrays that are smaller than
+  256 bytes.  Therefore, cc65 normally won't substitute if it cannot be sure
+  that the array is small enough.  This pragma can make cc65 ignore that
+  caution.
+
+  The default is "off", but may be changed with the <tt/<ref name="-Os"
+  id="option-O">/ compiler command-line option.  If the command-line switch
+  has changed the default to "on", then a programmer can use the pragma to
+  avoid substitution where it is risky, while allowing it everywhere else.
+
+  The <tt/#pragma/ understands the <tt/push/ and <tt/pop/ parameters, as
+  explained above.
 
 
 <sect1><tt>#pragma local-strings ([push,] on|off)</tt><label id="pragma-local-strings"><p>

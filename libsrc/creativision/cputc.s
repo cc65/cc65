@@ -96,8 +96,8 @@ BAD_CHAR:
         jmp     plot
 
 ;-----------------------------------------------------------------------------
-; Initialize the conio subsystem. Code goes into the INIT segment, which may
-; be reused after startup.
+; Initialize the conio subsystem. "INIT" segment is nothing special on the
+; Creativision, it is part of the "ROM" memory.
 
 .segment        "INIT"
 
@@ -122,4 +122,4 @@ LL:     lda     boxchars,x
         bne     LL
 
         cli
-        jmp plot
+        jmp     plot

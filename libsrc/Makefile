@@ -1,4 +1,3 @@
-
 ifneq ($(shell echo),)
   CMD_EXE = 1
 endif

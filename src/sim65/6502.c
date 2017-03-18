@@ -865,7 +865,7 @@ static void OPC_65SC02_3C (void)
     unsigned Addr;
     unsigned char Val;
     Cycles = 4;
-    Addr = MemReadByte (Regs.PC+1);
+    Addr = MemReadWord (Regs.PC+1);
     if (PAGE_CROSS (Addr, Regs.XR))
         ++Cycles;
     Val  = MemReadByte (Addr + Regs.XR);

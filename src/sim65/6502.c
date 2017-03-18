@@ -214,8 +214,7 @@ int PrintCycles;
     Cycles = 5;                                                 \
     ZPAddr = MemReadByte (Regs.PC+1);                           \
     Addr = MemReadZPWord (ZPAddr);                              \
-    if (PAGE_CROSS (Addr, Regs.YR))                             \
-    {                                                           \
+    if (PAGE_CROSS (Addr, Regs.YR)) {                           \
         ++Cycles;                                               \
     }                                                           \
     Addr += Regs.YR;                                            \
@@ -259,8 +258,7 @@ int PrintCycles;
             }                                                   \
             TEST_CF (Regs.AC);                                  \
             SET_OF ((res < -128) || (res > 127));               \
-            if (CPU != CPU_6502)                                \
-            {                                                   \
+            if (CPU != CPU_6502) {                              \
                 ++Cycles;                                       \
             }                                                   \
         } else {                                                \
@@ -342,8 +340,7 @@ int PrintCycles;
             TEST_SF (res);                                      \
             SET_CF (res <= 0xFF);                               \
             SET_OF (((old^rhs) & (old^res) & 0x80));            \
-            if (CPU != CPU_6502)                                \
-            {                                                   \
+            if (CPU != CPU_6502) {                              \
                 ++Cycles;                                       \
             }                                                   \
         } else {                                                \

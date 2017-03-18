@@ -10,10 +10,10 @@ CURSOR_X                = $3C
 CURSOR_Y                = $3D
 
 ;** VDP
-VDP_CONTROL_W           = $3001
-VDP_DATA_W              = $3000
-VDP_STATUS_R            = $2001
 VDP_DATA_R              = $2000
+VDP_STATUS_R            = $2001
+VDP_DATA_W              = $3000
+VDP_CONTROL_W           = $3001
 
 ;** PIA
 PIA0_DATA               = $1000
@@ -58,3 +58,4 @@ JOY_NNW                 = $4A
 BIOS_IRQ1_ADDR          = $FF3F
 BIOS_IRQ2_ADDR          = $FF52
 BIOS_NMI_RESET_ADDR     = $F808
+BIOS_WRITE_VDP_REG      = $FE1F

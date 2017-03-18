@@ -1447,7 +1447,7 @@ static void OPC_6502_7E (void)
     unsigned Addr;
     unsigned Val;
     Cycles = 7;
-    Addr = MemReadByte (Regs.PC+1) + Regs.XR;
+    Addr = MemReadWord (Regs.PC+1) + Regs.XR;
     Val  = MemReadByte (Addr);
     ROR (Val);
     MemWriteByte (Addr, Val);

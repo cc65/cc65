@@ -18,4 +18,3 @@ aulong: ldx     #0
 store:  stx     sreg
         stx     sreg+1
         rts
-        

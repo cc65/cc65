@@ -19,7 +19,6 @@ else
   DEL = $(RM) $1
 endif
 
-CC65FLAGS = -t sim6502
 SIM65FLAGS = -x 200000000
 
 CL65 := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)
@@ -38,7 +37,8 @@ CFLAGS = -O2 -Wall -W -Wextra -funsigned-char -fwrapv -fno-strict-overflow
 
 SOURCES := $(wildcard *.c)
 REFS = $(SOURCES:%.c=$(WORKDIR)/%.ref)
-TESTS = $(foreach option,$(OPTIONS),$(SOURCES:%.c=$(WORKDIR)/%.$(option).prg))
+TESTS  = $(foreach option,$(OPTIONS),$(SOURCES:%.c=$(WORKDIR)/%.$(option).6502.prg))
+TESTS += $(foreach option,$(OPTIONS),$(SOURCES:%.c=$(WORKDIR)/%.$(option).65c02.prg))
 
 all: $(REFS) $(TESTS)
 
@@ -70,14 +70,15 @@ $(WORKDIR)/yaccdbg.%.prg: yacc.c
 
 define PRG_template
 
-$(WORKDIR)/%.$1.prg: %.c $(WORKDIR)/%.ref $(DIFF)
-	$(CL65) $$(CC65FLAGS) -$1 -o $$@ $$<
+$(WORKDIR)/%.$1.$2.prg: %.c $(WORKDIR)/%.ref $(DIFF)
+	$(CL65) -t sim$2 $$(CC65FLAGS) -$1 -o $$@ $$<
 	$(SIM65) $(SIM65FLAGS) $$@ > $(WORKDIR)/$$*.out
 	$(DIFF) $(WORKDIR)/$$*.out $(WORKDIR)/$$*.ref
 
 endef # PRG_template
 
-$(foreach option,$(OPTIONS),$(eval $(call PRG_template,$(option))))
+$(foreach option,$(OPTIONS),$(eval $(call PRG_template,$(option),6502)))
+$(foreach option,$(OPTIONS),$(eval $(call PRG_template,$(option),65c02)))
 
 clean:
 	@$(call RMDIR,$(WORKDIR))

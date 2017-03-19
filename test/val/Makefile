@@ -14,7 +14,6 @@ else
   DEL = $(RM) $1
 endif
 
-CC65FLAGS = -t sim6502
 SIM65FLAGS = -x 200000000
 
 CL65 := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)
@@ -27,7 +26,15 @@ OPTIONS = g O Os Osi Osir Oi Oir Or
 .PHONY: all clean
 
 SOURCES := $(wildcard *.c)
-TESTS = $(foreach option,$(OPTIONS),$(SOURCES:%.c=$(WORKDIR)/%.$(option).prg))
+TESTS := $(foreach option,$(OPTIONS),$(SOURCES:%.c=$(WORKDIR)/%.$(option).6502.prg))
+TESTS += $(foreach option,$(OPTIONS),$(SOURCES:%.c=$(WORKDIR)/%.$(option).65c02.prg))
+
+# FIXME: These tests fail when built with optimizations for the 65c02
+TESTS := $(filter-out $(WORKDIR)/compare7.O%.65c02.prg,$(TESTS))
+TESTS := $(filter-out $(WORKDIR)/compare8.O%.65c02.prg,$(TESTS))
+TESTS := $(filter-out $(WORKDIR)/compare9.O%.65c02.prg,$(TESTS))
+TESTS := $(filter-out $(WORKDIR)/compare10.O%.65c02.prg,$(TESTS))
+TESTS := $(filter-out $(WORKDIR)/or1.O%.65c02.prg,$(TESTS))
 
 all: $(TESTS)
 
@@ -46,13 +53,14 @@ $(WORKDIR)/cq84.%.prg: CC65FLAGS += -Wc --all-cdecl
 
 define PRG_template
 
-$(WORKDIR)/%.$1.prg: %.c | $(WORKDIR)
-	$(CL65) $$(CC65FLAGS) -$1 -o $$@ $$<
+$(WORKDIR)/%.$1.$2.prg: %.c | $(WORKDIR)
+	$(CL65) -t sim$2 $$(CC65FLAGS) -$1 -o $$@ $$<
 	$(SIM65) $(SIM65FLAGS) $$@
 
 endef # PRG_template
 
-$(foreach option,$(OPTIONS),$(eval $(call PRG_template,$(option))))
+$(foreach option,$(OPTIONS),$(eval $(call PRG_template,$(option),6502)))
+$(foreach option,$(OPTIONS),$(eval $(call PRG_template,$(option),65c02)))
 
 clean:
 	@$(call RMDIR,$(WORKDIR))

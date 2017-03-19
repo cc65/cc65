@@ -5,10 +5,14 @@ ifneq ($(shell echo),)
 endif
 
 ifdef CMD_EXE
+  S = $(subst /,\,/)
+  NULLDEV = nul:
   MKDIR = mkdir $(subst /,\,$1)
   RMDIR = -rmdir /s /q $(subst /,\,$1)
   DEL = del /f $(subst /,\,$1)
 else
+  S = /
+  NULLDEV = /dev/null
   MKDIR = mkdir -p $1
   RMDIR = $(RM) -r $1
   DEL = $(RM) $1
@@ -17,7 +21,7 @@ endif
 SIM65FLAGS = -x 200000000
 
 CL65 := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)
-SIM65 := $(if $(wildcard ../../bin/sim65*),../../bin/sim65,sim65)
+SIM65 := $(if $(wildcard ../../bin/sim65*),..$S..$Sbin$Ssim65,sim65)
 
 WORKDIR = ../../testwrk/val
 
@@ -55,7 +59,7 @@ define PRG_template
 
 $(WORKDIR)/%.$1.$2.prg: %.c | $(WORKDIR)
 	$(CL65) -t sim$2 $$(CC65FLAGS) -$1 -o $$@ $$<
-	$(SIM65) $(SIM65FLAGS) $$@
+	$(SIM65) $(SIM65FLAGS) $$@ >$(NULLDEV)
 
 endef # PRG_template
 

@@ -1,45 +1,68 @@
+# Makefile for the assembler regression tests
 
-# makefile for the assembler regression tests
+ifneq ($(shell echo),)
+  CMD_EXE = 1
+endif
 
-BINDIR = ../../bin
-WORKDIR := ../../testwrk
+ifdef CMD_EXE
+  EXE = .exe
+  MKDIR = mkdir $(subst /,\,$1)
+  RMDIR = -rmdir /s /q $(subst /,\,$1)
+  DEL = del /f $(subst /,\,$1)
+else
+  EXE =
+  MKDIR = mkdir -p $1
+  RMDIR = $(RM) -r $1
+  DEL = $(RM) $1
+endif
 
-BASE_TARGETS  = 6502 6502x 65sc02 65c02
-BASE_TARGETS += 4510 huc6280
+CL65 := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)
 
-OPCODE_TARGETS = $(BASE_TARGETS)
-CPUDETECT_TARGETS = $(BASE_TARGETS)
+WORKDIR = ../../testwrk/asm
 
-CPUDETECT_TARGETS += 65816
+DIFF = $(WORKDIR)/bdiff$(EXE)
 
-# default target defined later
-all:
+CC = gcc
+CFLAGS = -O2
 
-# generate opcode targets and expand target list
-define opcode
-OPCODE_TARGETLIST += $$(WORKDIR)/$(1)-opcodes.bin
-$$(WORKDIR)/$(1)-opcodes.bin: $(1)-opcodes.s
-	@$$(BINDIR)/cl65 --cpu $(1) -t none -l $$(WORKDIR)/$(1)-opcodes.lst --obj-path $$(WORKDIR) -o $$@ $$<
-	@diff -q $(1)-opcodes.ref $$@ || (cat $$(WORKDIR)/$(1)-opcodes.lst ; exit 1)
-	@echo ca65 --cpu $(1) opcodes ok
-	@rm -f $(1)-opcodes.o #workaround for #168
-endef
-$(foreach target,$(OPCODE_TARGETS),$(eval $(call opcode,$(target))))
+.PHONY: all clean
 
-# generate cpudetect targets and expand target list
-define cpudetect
-CPUDETECT_TARGETLIST += $$(WORKDIR)/$(1)-cpudetect.bin
-$$(WORKDIR)/$(1)-cpudetect.bin: cpudetect.s
-	@$$(BINDIR)/cl65 --cpu $(1) -t none -l $$(WORKDIR)/$(1)-cpudetect.lst --obj-path $$(WORKDIR) -o $$@ $$<
-	@diff -q $(1)-cpudetect.ref $$@ || (cat $$(WORKDIR)/$(1)-cpudetect.lst ; exit 1)
-	@echo ca65 --cpu $(1) cpudetect ok
-	@rm -f cpudetect.o #workaround for #168
-endef
-$(foreach target,$(CPUDETECT_TARGETS),$(eval $(call cpudetect,$(target))))
+OPCODE_REFS := $(wildcard *-opcodes.ref)
+OPCODE_CPUS = $(foreach ref,$(OPCODE_REFS),$(ref:%-opcodes.ref=%))
+OPCODE_BINS = $(foreach cpu,$(OPCODE_CPUS),$(WORKDIR)/$(cpu)-opcodes.bin)
 
-# now that all targets have been generated, get to the manual ones
-all: $(OPCODE_TARGETLIST) $(CPUDETECT_TARGETLIST)
-	@#
+CPUDETECT_REFS := $(wildcard *-cpudetect.ref)
+CPUDETECT_CPUS = $(foreach ref,$(CPUDETECT_REFS),$(ref:%-cpudetect.ref=%))
+CPUDETECT_BINS = $(foreach cpu,$(CPUDETECT_CPUS),$(WORKDIR)/$(cpu)-cpudetect.bin)
 
-.PHONY: all $(OPCODE_TARGETLIST) $(CPUDETECT_TARGETLIST)
+all: $(OPCODE_BINS) $(CPUDETECT_BINS)
 
+$(WORKDIR):
+	$(call MKDIR,$(WORKDIR))
+
+$(DIFF): ../bdiff.c | $(WORKDIR)
+	$(CC) $(CFLAGS) -o $@ $<
+
+define OPCODE_template
+
+$(WORKDIR)/$1-opcodes.bin: $1-opcodes.s $(DIFF)
+	$(CL65) --cpu $1 -t none -l $(WORKDIR)/$1-opcodes.lst -o $$@ $$<
+	$(DIFF) $$@ $1-opcodes.ref
+
+endef # OPCODE_template
+
+$(foreach cpu,$(OPCODE_CPUS),$(eval $(call OPCODE_template,$(cpu))))
+
+define CPUDETECT_template
+
+$(WORKDIR)/$1-cpudetect.bin: cpudetect.s $(DIFF)
+	$(CL65) --cpu $1 -t none -l $(WORKDIR)/$1-cpudetect.lst -o $$@ $$<
+	$(DIFF) $$@ $1-cpudetect.ref
+
+endef # CPUDETECT_template
+
+$(foreach cpu,$(CPUDETECT_CPUS),$(eval $(call CPUDETECT_template,$(cpu))))
+
+clean:
+	@$(call RMDIR,$(WORKDIR))
+	@$(call DEL,$(OPCODE_REFS:.ref=.o) cpudetect.o)

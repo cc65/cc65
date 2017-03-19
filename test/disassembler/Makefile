@@ -1,42 +1,64 @@
+# Makefile for the disassembler regression tests
 
-# makefile for the disassembler regression tests
+ifneq ($(shell echo),)
+  CMD_EXE = 1
+endif
 
-BINDIR = ../../bin
-WORKDIR := ../../testwrk
+ifdef CMD_EXE
+  EXE = .exe
+  MKDIR = mkdir $(subst /,\,$1)
+  RMDIR = -rmdir /s /q $(subst /,\,$1)
+  DEL = del /f $(subst /,\,$1)
+else
+  EXE =
+  MKDIR = mkdir -p $1
+  RMDIR = $(RM) -r $1
+  DEL = $(RM) $1
+endif
 
-#BASE_TARGETS  = 6502 6502x 65sc02 65c02
-#BASE_TARGETS += 4510 huc6280
-BASE_TARGETS  = 4510
+CL65 := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)
+DA65 := $(if $(wildcard ../../bin/da65*),../../bin/da65,da65)
+
+WORKDIR = ../../testwrk/dasm
+
+DIFF = $(WORKDIR)/bdiff$(EXE)
+
+CC = gcc
+CFLAGS = -O2
 
 START = --start-addr 0x8000
 
-DISASS_TARGETS = $(BASE_TARGETS)
+.PHONY: all clean
+
+SOURCES := $(wildcard *.s)
+CPUS = $(foreach src,$(SOURCES),$(src:%-disass.s=%))
+BINS = $(foreach cpu,$(CPUS),$(WORKDIR)/$(cpu)-reass.bin)
 
 # default target defined later
-all:
+all: $(BINS)
 
-# generate opcode targets and expand target list
-define disass
-DISASS_TARGETLIST += $$(WORKDIR)/$(1)-reass.bin $$(WORKDIR)/$(1)-reass.s $$(WORKDIR)/$(1)-disass.bin
+$(WORKDIR):
+	$(call MKDIR,$(WORKDIR))
 
-$$(WORKDIR)/$(1)-disass.bin: $(1)-disass.s
-	@$$(BINDIR)/cl65 --cpu $(1) -t none $(START) --obj-path $$(WORKDIR) -o $$@ $$<
-	@rm -f $(1)-disass.o #workaround for #168
+$(DIFF): ../bdiff.c | $(WORKDIR)
+	$(CC) $(CFLAGS) -o $@ $<
 
-$$(WORKDIR)/$(1)-reass.s: $$(WORKDIR)/$(1)-disass.bin
-	@$$(BINDIR)/da65 --cpu $(1) $(START) -o $$@ $$<
+define DISASS_template
 
-$$(WORKDIR)/$(1)-reass.bin: $$(WORKDIR)/$(1)-reass.s
-	@$$(BINDIR)/cl65 --cpu $(1) -t none $(START) --obj-path $$(WORKDIR) -o $$@ $$<
-	@rm -f $(1)-reass.o #workaround for #168
-	@cmp $$@ $$(WORKDIR)/$(1)-disass.bin
-	@echo da65 --cpu $(1) ok
-endef
-$(foreach target,$(DISASS_TARGETS),$(eval $(call disass,$(target))))
+$(WORKDIR)/$1-disass.bin: $1-disass.s | $(WORKDIR)
+	$(CL65) --cpu $1 -t none $(START) -o $$@ $$<
 
-# now that all targets have been generated, get to the manual ones
-all: $(DISASS_TARGETLIST)
-	@#
+$(WORKDIR)/$1-reass.s: $(WORKDIR)/$1-disass.bin
+	$(DA65) --cpu $1 $(START) -o $$@ $$<
 
-.PHONY: all $(DISASS_TARGETLIST)
+$(WORKDIR)/$1-reass.bin: $(WORKDIR)/$1-reass.s $(DIFF)
+	$(CL65) --cpu $1 -t none $(START) -o $$@ $$<
+	$(DIFF) $$@ $(WORKDIR)/$1-disass.bin
 
+endef # DISASS_template
+
+$(foreach cpu,$(CPUS),$(eval $(call DISASS_template,$(cpu))))
+
+clean:
+	@$(call RMDIR,$(WORKDIR))
+	@$(call DEL,$(SOURCES:.s=.o))

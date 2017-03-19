@@ -25,16 +25,16 @@ all: dotests
 dotests: mostlyclean continue
 
 continue:
-	@$(MAKE) -C assembler all
-	@$(MAKE) -C disassembler all
+	@$(MAKE) -C asm all
+	@$(MAKE) -C dasm all
 	@$(MAKE) -C val all
 	@$(MAKE) -C ref all
 	@$(MAKE) -C err all
 	@$(MAKE) -C misc all
 
 mostlyclean:
-	@$(MAKE) -C assembler clean
-	@$(MAKE) -C disassembler clean
+	@$(MAKE) -C asm clean
+	@$(MAKE) -C dasm clean
 	@$(MAKE) -C val clean
 	@$(MAKE) -C ref clean
 	@$(MAKE) -C err clean

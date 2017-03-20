@@ -18,9 +18,15 @@ else
   DEL = $(RM) $1
 endif
 
+ifdef QUIET
+  .SILENT:
+  NULLOUT = >$(NULLDEV)
+  NULLERR = 2>$(NULLDEV)
+endif
+
 SIM65FLAGS = -x 200000000
 
-CL65 := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)
+CL65 := $(if $(wildcard ../../bin/cl65*),..$S..$Sbin$Scl65,cl65)
 SIM65 := $(if $(wildcard ../../bin/sim65*),..$S..$Sbin$Ssim65,sim65)
 
 WORKDIR = ../../testwrk/val
@@ -58,8 +64,9 @@ $(WORKDIR)/cq84.%.prg: CC65FLAGS += -Wc --all-cdecl
 define PRG_template
 
 $(WORKDIR)/%.$1.$2.prg: %.c | $(WORKDIR)
-	$(CL65) -t sim$2 $$(CC65FLAGS) -$1 -o $$@ $$<
-	$(SIM65) $(SIM65FLAGS) $$@ >$(NULLDEV)
+	$(if $(QUIET),echo val/$$*.$1.$2.prg)
+	$(CL65) -t sim$2 $$(CC65FLAGS) -$1 -o $$@ $$< $(NULLERR)
+	$(SIM65) $(SIM65FLAGS) $$@ $(NULLOUT)
 
 endef # PRG_template
 

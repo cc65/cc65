@@ -8,20 +8,27 @@ endif
 ifdef CMD_EXE
   S = $(subst /,\,/)
   EXE = .exe
+  NULLDEV = nul:
   MKDIR = mkdir $(subst /,\,$1)
   RMDIR = -rmdir /s /q $(subst /,\,$1)
   DEL = del /f $(subst /,\,$1)
 else
   S = /
   EXE =
+  NULLDEV = /dev/null
   MKDIR = mkdir -p $1
   RMDIR = $(RM) -r $1
   DEL = $(RM) $1
 endif
 
+ifdef QUIET
+  .SILENT:
+  NULLERR = 2>$(NULLDEV)
+endif
+
 SIM65FLAGS = -x 200000000
 
-CL65 := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)
+CL65 := $(if $(wildcard ../../bin/cl65*),..$S..$Sbin$Scl65,cl65)
 SIM65 := $(if $(wildcard ../../bin/sim65*),..$S..$Sbin$Ssim65,sim65)
 
 WORKDIR = ..$S..$Stestwrk$Sref
@@ -46,7 +53,8 @@ $(WORKDIR):
 	$(call MKDIR,$(WORKDIR))
 
 $(WORKDIR)/%.ref: %.c | $(WORKDIR)
-	$(CC) $(CFLAGS) -o $(WORKDIR)/$*.host $<
+	$(if $(QUIET),echo ref/$*.host)
+	$(CC) $(CFLAGS) -o $(WORKDIR)/$*.host $< $(NULLERR)
 	$(WORKDIR)$S$*.host > $@
 
 $(DIFF): ../bdiff.c | $(WORKDIR)
@@ -71,7 +79,8 @@ $(WORKDIR)/yaccdbg.%.prg: yacc.c
 define PRG_template
 
 $(WORKDIR)/%.$1.$2.prg: %.c $(WORKDIR)/%.ref $(DIFF)
-	$(CL65) -t sim$2 $$(CC65FLAGS) -$1 -o $$@ $$<
+	$(if $(QUIET),echo ref/$$*.$1.$2.prg)
+	$(CL65) -t sim$2 $$(CC65FLAGS) -$1 -o $$@ $$< $(NULLERR)
 	$(SIM65) $(SIM65FLAGS) $$@ > $(WORKDIR)/$$*.out
 	$(DIFF) $(WORKDIR)/$$*.out $(WORKDIR)/$$*.ref
 

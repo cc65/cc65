@@ -16,6 +16,10 @@ else
   DEL = $(RM) $1
 endif
 
+ifdef QUIET
+  .SILENT:
+endif
+
 CL65 := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)
 
 WORKDIR = ../../testwrk/asm
@@ -46,6 +50,7 @@ $(DIFF): ../bdiff.c | $(WORKDIR)
 define OPCODE_template
 
 $(WORKDIR)/$1-opcodes.bin: $1-opcodes.s $(DIFF)
+	$(if $(QUIET),echo asm/$1-opcodes.bin)
 	$(CL65) --cpu $1 -t none -l $(WORKDIR)/$1-opcodes.lst -o $$@ $$<
 	$(DIFF) $$@ $1-opcodes.ref
 
@@ -56,6 +61,7 @@ $(foreach cpu,$(OPCODE_CPUS),$(eval $(call OPCODE_template,$(cpu))))
 define CPUDETECT_template
 
 $(WORKDIR)/$1-cpudetect.bin: cpudetect.s $(DIFF)
+	$(if $(QUIET),echo asm/$1-cpudetect.bin)
 	$(CL65) --cpu $1 -t none -l $(WORKDIR)/$1-cpudetect.lst -o $$@ $$<
 	$(DIFF) $$@ $1-cpudetect.ref
 

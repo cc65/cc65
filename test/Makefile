@@ -1,9 +1,5 @@
 # top-level Makefile for the regression tests
 
-# You can comment this special target when you debug the regression tests.
-# Then, make will give you more progress reports.
-.SILENT:
-
 ifneq ($(shell echo),)
   CMD_EXE = 1
 endif

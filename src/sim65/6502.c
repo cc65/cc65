@@ -470,7 +470,7 @@ static void OPC_65SC02_0C (void)
     unsigned Addr;
     unsigned char Val;
     Cycles = 6;
-    Addr = MemReadByte (Regs.PC+1);
+    Addr = MemReadWord (Regs.PC+1);
     Val = MemReadByte (Addr);
     SET_ZF ((Val & Regs.AC) == 0);
     MemWriteByte (Addr, (unsigned char) (Val | Regs.AC));    
@@ -604,7 +604,7 @@ static void OPC_65SC02_1C (void)
     unsigned Addr;
     unsigned char Val;
     Cycles = 6;
-    Addr = MemReadByte (Regs.PC+1);
+    Addr = MemReadWord (Regs.PC+1);
     Val = MemReadByte (Addr);
     SET_ZF ((Val & Regs.AC) == 0);
     MemWriteByte (Addr, (unsigned char) (Val & ~Regs.AC));    

@@ -39,13 +39,6 @@ SOURCES := $(wildcard *.c)
 TESTS := $(foreach option,$(OPTIONS),$(SOURCES:%.c=$(WORKDIR)/%.$(option).6502.prg))
 TESTS += $(foreach option,$(OPTIONS),$(SOURCES:%.c=$(WORKDIR)/%.$(option).65c02.prg))
 
-# FIXME: These tests fail when built with optimizations for the 65c02
-TESTS := $(filter-out $(WORKDIR)/compare7.O%.65c02.prg,$(TESTS))
-TESTS := $(filter-out $(WORKDIR)/compare8.O%.65c02.prg,$(TESTS))
-TESTS := $(filter-out $(WORKDIR)/compare9.O%.65c02.prg,$(TESTS))
-TESTS := $(filter-out $(WORKDIR)/compare10.O%.65c02.prg,$(TESTS))
-TESTS := $(filter-out $(WORKDIR)/or1.O%.65c02.prg,$(TESTS))
-
 all: $(TESTS)
 
 $(WORKDIR):

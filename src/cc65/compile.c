@@ -242,16 +242,24 @@ static void Parse (void)
                             Error ("Variable `%s' has unknown size", Decl.Ident);
                         }
                         Entry->Flags &= ~(SC_STORAGE | SC_DEF);
+                    } else {
+                        /* A global (including static) uninitialized variable
+                        ** is only a tentative definition. For example, this is valid:
+                        ** int i;
+                        ** int i;
+                        ** static int j;
+                        ** static int j = 42;
+                        ** Code for these will be generated in FinishCompile.
+                        ** For now, just save the BSS segment name
+                        ** (can be set with #pragma bss-name)
+                        */
+                        const char* bssName = GetSegName (SEG_BSS);
+                        if (Entry->V.BssName && strcmp (Entry->V.BssName, bssName) != 0) {
+                            Error ("Global variable `%s' has already been defined in `%s' segment",
+                                   Entry->Name, Entry->V.BssName);
+                        }
+                        Entry->V.BssName = xstrdup (bssName);
                     }
-
-                    /* A global (including static) uninitialized variable
-                    ** is only a tentative definition. For example, this is valid:
-                    ** int i;
-                    ** int i;
-                    ** static int j;
-                    ** static int j = 42;
-                    ** Code for these will be generated in FinishCompile.
-                    */
                 }
 
             }
@@ -418,6 +426,8 @@ void FinishCompile (void)
         } else if ((Entry->Flags & (SC_STORAGE | SC_DEF | SC_STATIC)) == (SC_STORAGE | SC_STATIC)) {
             /* Tentative definition of uninitialized global variable */
             g_usebss ();
+            SetSegName (SEG_BSS, Entry->V.BssName);
+            g_segname (SEG_BSS); /* TODO: skip if same as before */
             g_defgloblabel (Entry->Name);
             g_res (SizeOf (Entry->Type));
             /* Mark as defined, so that it will be exported not imported */

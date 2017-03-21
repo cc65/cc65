@@ -36,7 +36,7 @@ OPTIONS = g O Os Osi Osir Oi Oir Or
 .PHONY: all clean
 
 SOURCES := $(wildcard *.c)
-TESTS := $(foreach option,$(OPTIONS),$(SOURCES:%.c=$(WORKDIR)/%.$(option).6502.prg))
+TESTS  = $(foreach option,$(OPTIONS),$(SOURCES:%.c=$(WORKDIR)/%.$(option).6502.prg))
 TESTS += $(foreach option,$(OPTIONS),$(SOURCES:%.c=$(WORKDIR)/%.$(option).65c02.prg))
 
 all: $(TESTS)

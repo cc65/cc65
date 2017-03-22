@@ -4,7 +4,7 @@
 <title>cc65 Users Guide
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:gregdk@users.sf.net" name="Greg King">
-<date>2017-02-27
+<date>2017-03-21
 
 <abstract>
 cc65 is a C compiler for 6502 targets. It supports several 6502 based home
@@ -1276,7 +1276,7 @@ that function).
 As a shortcut, you can put the <tt/volatile/ qualifier in your <tt/asm/
 statements.  It will disable optimization for the functions in which those
 <tt/asm volatile/ statements sit.  The effect is the same as though you put
-</#pragma optimize(push, off)/ above those functions, and </#pragma
+<tt/#pragma optimize(push, off)/ above those functions, and <tt/#pragma
 optimize(pop)/ below those functions.
 
 The string literal may contain format specifiers from the following list. For

@@ -39,6 +39,8 @@
    6502)
  * one cycle win for fetch-modify-write instructions ignored
    (e.g. ROL abs,x takes only 6 cycles if no page break occurs)
+ * BRK, IRQ, NMI and RESET are not different from 6502 which they are in
+   reality (e.g. D-flag handling)
  */
 
 #include "memory.h"
@@ -2581,7 +2583,9 @@ static void OPC_6502_F6 (void)
 static void OPC_6502_F8 (void)
 /* Opcode $F8: SED */
 {
+    Cycles = 2;
     SET_DF (1);
+    Regs.PC += 1;
 }
 
 

@@ -247,10 +247,10 @@ Here is a description of all the command line options:
         <p>
   </itemize>
 
-  <tt/--eagerly-inline-funcs/ implies the <tt/<ref id="option-inline-stdfuncs"
-  name="--inline-stdfuncs"/ command line option.
+  <tt/--eagerly-inline-funcs/ implies the <tt><ref id="option-inline-stdfuncs"
+  name="--inline-stdfuncs"></tt> command line option.
 
-  See also <tt/<ref id="pragma-allow-eager-inline" name="#pragma&nbsp;allow-eager-inline">/.
+  See also <tt><ref id="pragma-allow-eager-inline" name="#pragma&nbsp;allow-eager-inline"></tt>.
 
 
   <tag><tt>-h, --help</tt></tag>
@@ -263,9 +263,9 @@ Here is a description of all the command line options:
 
   Allow the compiler to inline some standard functions from the C library like
   strlen.  This will not only remove the overhead for a function call, but will
-  make the code visible for the optimizer.  See also the <tt/<ref id="option-O"
-  name="-Os"/ command line option and <tt/<ref id="pragma-inline-stdfuncs"
-  name="#pragma&nbsp;inline-stdfuncs">/.
+  make the code visible for the optimizer.  See also the <tt><ref id="option-O"
+  name="-Os"></tt> command line option and <tt><ref id="pragma-inline-stdfuncs"
+  name="#pragma&nbsp;inline-stdfuncs"></tt>.
 
 
   <label id="option-list-warnings">
@@ -861,8 +861,8 @@ The compiler defines several macros at startup:
 
   <tag><tt>__EAGERLY_INLINE_FUNCS__</tt></tag>
 
-  Is defined if the compiler was called with the <tt/<ref id="option-eagerly-inline-funcs"
-  name="--eagerly-inline-funcs"/ command line option.
+  Is defined if the compiler was called with the <tt><ref id="option-eagerly-inline-funcs"
+  name="--eagerly-inline-funcs"></tt> command line option.
 
   <tag><tt>__FILE__</tt></tag>
 
@@ -965,9 +965,9 @@ parameter with the <tt/#pragma/.
 
   Allow eager inlining of known functions.  If the argument is "off", eager
   inlining is disabled, otherwise it is enabled. Please note that (in contrast
-  to the <tt/<ref id="option-eagerly-inline-funcs" name="--eagerly-inline-funcs"/
-  command line option) this pragma does not imply the <tt/<ref id="option-inline-stdfuncs"
-  name="--inline-stdfuncs"/ command line option.  Rather it marks code to be safe for
+  to the <tt><ref id="option-eagerly-inline-funcs" name="--eagerly-inline-funcs"></tt>
+  command line option) this pragma does not imply the <tt><ref id="option-inline-stdfuncs"
+  name="--inline-stdfuncs"></tt> command line option.  Rather it marks code to be safe for
   eager inlining of known functions if inlining of standard functions is enabled.
 
   The <tt/#pragma/ understands the push and pop parameters as explained above.

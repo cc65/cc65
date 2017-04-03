@@ -88,7 +88,7 @@ static void Usage (void)
             "  -O\t\t\t\tOptimize code\n"
             "  -Oi\t\t\t\tOptimize code, inline more code\n"
             "  -Or\t\t\t\tEnable register variables\n"
-            "  -Os\t\t\t\tInline some known functions\n"
+            "  -Os\t\t\t\tInline some standard functions\n"
             "  -T\t\t\t\tInclude source as comment\n"
             "  -V\t\t\t\tPrint the compiler version number\n"
             "  -W warning[,...]\t\tSuppress warnings\n"
@@ -118,9 +118,11 @@ static void Usage (void)
             "  --debug-opt name\t\tDebug optimization steps\n"
             "  --dep-target target\t\tUse this dependency target\n"
             "  --disable-opt name\t\tDisable an optimization step\n"
+            "  --eagerly-inline-funcs\t\tEagerly inline some known functions\n"
             "  --enable-opt name\t\tEnable an optimization step\n"
             "  --help\t\t\tHelp (this text)\n"
             "  --include-dir dir\t\tSet an include directory search path\n"
+            "  --inline-stdfuncs\t\tInline some standard functions\n"
             "  --list-opt-steps\t\tList all optimizer steps and exit\n"
             "  --list-warnings\t\tList available warning types for -W\n"
             "  --local-strings\t\tEmit string literals immediately\n"
@@ -581,6 +583,16 @@ static void OptDisableOpt (const char* Opt attribute ((unused)), const char* Arg
 
 
 
+static void OptEagerlyInlineFuncs (const char* Opt attribute((unused)),
+                                   const char* Arg attribute((unused)))
+/* Eagerly inline some known functions */
+{
+    IS_Set (&InlineStdFuncs, 1);
+    IS_Set (&EagerlyInlineFuncs, 1);
+}
+
+
+
 static void OptEnableOpt (const char* Opt attribute ((unused)), const char* Arg)
 /* Enable an optimization step */
 {
@@ -604,6 +616,15 @@ static void OptIncludeDir (const char* Opt attribute ((unused)), const char* Arg
 {
     AddSearchPath (SysIncSearchPath, Arg);
     AddSearchPath (UsrIncSearchPath, Arg);
+}
+
+
+
+static void OptInlineStdFuncs (const char* Opt attribute((unused)),
+                               const char* Arg attribute((unused)))
+/* Inline some standard functions */
+{
+    IS_Set (&InlineStdFuncs, 1);
 }
 
 
@@ -819,39 +840,41 @@ int main (int argc, char* argv[])
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
-        { "--add-source",       0,      OptAddSource            },
-        { "--all-cdecl",        0,      OptAllCDecl             },
-        { "--bss-name",         1,      OptBssName              },
-        { "--check-stack",      0,      OptCheckStack           },
-        { "--code-name",        1,      OptCodeName             },
-        { "--codesize",         1,      OptCodeSize             },
-        { "--cpu",              1,      OptCPU                  },
-        { "--create-dep",       1,      OptCreateDep            },
-        { "--create-full-dep",  1,      OptCreateFullDep        },
-        { "--data-name",        1,      OptDataName             },
-        { "--debug",            0,      OptDebug                },
-        { "--debug-info",       0,      OptDebugInfo            },
-        { "--debug-opt",        1,      OptDebugOpt             },
-        { "--debug-opt-output", 0,      OptDebugOptOutput       },
-        { "--dep-target",       1,      OptDepTarget            },
-        { "--disable-opt",      1,      OptDisableOpt           },
-        { "--enable-opt",       1,      OptEnableOpt            },
-        { "--help",             0,      OptHelp                 },
-        { "--include-dir",      1,      OptIncludeDir           },
-        { "--list-opt-steps",   0,      OptListOptSteps         },
-        { "--list-warnings",    0,      OptListWarnings         },
-        { "--local-strings",    0,      OptLocalStrings         },
-        { "--memory-model",     1,      OptMemoryModel          },
-        { "--register-space",   1,      OptRegisterSpace        },
-        { "--register-vars",    0,      OptRegisterVars         },
-        { "--rodata-name",      1,      OptRodataName           },
-        { "--signed-chars",     0,      OptSignedChars          },
-        { "--standard",         1,      OptStandard             },
-        { "--static-locals",    0,      OptStaticLocals         },
-        { "--target",           1,      OptTarget               },
-        { "--verbose",          0,      OptVerbose              },
-        { "--version",          0,      OptVersion              },
-        { "--writable-strings", 0,      OptWritableStrings      },
+        { "--add-source",           0,      OptAddSource            },
+        { "--all-cdecl",            0,      OptAllCDecl             },
+        { "--bss-name",             1,      OptBssName              },
+        { "--check-stack",          0,      OptCheckStack           },
+        { "--code-name",            1,      OptCodeName             },
+        { "--codesize",             1,      OptCodeSize             },
+        { "--cpu",                  1,      OptCPU                  },
+        { "--create-dep",           1,      OptCreateDep            },
+        { "--create-full-dep",      1,      OptCreateFullDep        },
+        { "--data-name",            1,      OptDataName             },
+        { "--debug",                0,      OptDebug                },
+        { "--debug-info",           0,      OptDebugInfo            },
+        { "--debug-opt",            1,      OptDebugOpt             },
+        { "--debug-opt-output",     0,      OptDebugOptOutput       },
+        { "--dep-target",           1,      OptDepTarget            },
+        { "--disable-opt",          1,      OptDisableOpt           },
+        { "--eagerly-inline-funcs", 0,      OptEagerlyInlineFuncs   },
+        { "--enable-opt",           1,      OptEnableOpt            },
+        { "--help",                 0,      OptHelp                 },
+        { "--include-dir",          1,      OptIncludeDir           },
+        { "--inline-stdfuncs",      0,      OptInlineStdFuncs       },
+        { "--list-opt-steps",       0,      OptListOptSteps         },
+        { "--list-warnings",        0,      OptListWarnings         },
+        { "--local-strings",        0,      OptLocalStrings         },
+        { "--memory-model",         1,      OptMemoryModel          },
+        { "--register-space",       1,      OptRegisterSpace        },
+        { "--register-vars",        0,      OptRegisterVars         },
+        { "--rodata-name",          1,      OptRodataName           },
+        { "--signed-chars",         0,      OptSignedChars          },
+        { "--standard",             1,      OptStandard             },
+        { "--static-locals",        0,      OptStaticLocals         },
+        { "--target",               1,      OptTarget               },
+        { "--verbose",              0,      OptVerbose              },
+        { "--version",              0,      OptVersion              },
+        { "--writable-strings",     0,      OptWritableStrings      },
     };
 
     unsigned I;

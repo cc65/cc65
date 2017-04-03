@@ -54,9 +54,9 @@ Short options:
   -L path                       Specify a library search path
   -Ln name                      Create a VICE label file
   -O                            Optimize code
-  -Oi                           Optimize code, inline functions
+  -Oi                           Optimize code, inline more code
   -Or                           Optimize code, honour the register keyword
-  -Os                           Optimize code, inline known C funtions
+  -Os                           Optimize code, inline standard funtions
   -S                            Compile but don't assemble and link
   -T                            Include source as comment
   -V                            Print the version number

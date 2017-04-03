@@ -335,17 +335,22 @@ void Compile (const char* FileName)
     ** changes using #pragma later.
     */
     if (IS_Get (&Optimize)) {
-        long CodeSize = IS_Get (&CodeSizeFactor);
         DefineNumericMacro ("__OPT__", 1);
+    }
+    {
+        long CodeSize = IS_Get (&CodeSizeFactor);
         if (CodeSize > 100) {
             DefineNumericMacro ("__OPT_i__", CodeSize);
         }
-        if (IS_Get (&EnableRegVars)) {
-            DefineNumericMacro ("__OPT_r__", 1);
-        }
-        if (IS_Get (&InlineStdFuncs)) {
-            DefineNumericMacro ("__OPT_s__", 1);
-        }
+    }
+    if (IS_Get (&EnableRegVars)) {
+        DefineNumericMacro ("__OPT_r__", 1);
+    }
+    if (IS_Get (&InlineStdFuncs)) {
+        DefineNumericMacro ("__OPT_s__", 1);
+    }
+    if (IS_Get (&EagerlyInlineFuncs)) {
+        DefineNumericMacro ("__EAGERLY_INLINE_FUNCS__", 1);
     }
 
     /* __TIME__ and __DATE__ macros */

@@ -64,6 +64,7 @@
 typedef enum {
     PRAGMA_ILLEGAL = -1,
     PRAGMA_ALIGN,
+    PRAGMA_ALLOW_EAGER_INLINE,
     PRAGMA_BSS_NAME,
     PRAGMA_BSSSEG,                                      /* obsolete */
     PRAGMA_CHARMAP,
@@ -74,6 +75,7 @@ typedef enum {
     PRAGMA_CODESIZE,
     PRAGMA_DATA_NAME,
     PRAGMA_DATASEG,                                     /* obsolete */
+    PRAGMA_INLINE_STDFUNCS,
     PRAGMA_LOCAL_STRINGS,
     PRAGMA_OPTIMIZE,
     PRAGMA_REGVARADDR,
@@ -96,31 +98,33 @@ static const struct Pragma {
     const char* Key;            /* Keyword */
     pragma_t    Tok;            /* Token */
 } Pragmas[PRAGMA_COUNT] = {
-    { "align",                  PRAGMA_ALIGN            },
-    { "bss-name",               PRAGMA_BSS_NAME         },
-    { "bssseg",                 PRAGMA_BSSSEG           },      /* obsolete */
-    { "charmap",                PRAGMA_CHARMAP          },
-    { "check-stack",            PRAGMA_CHECK_STACK      },
-    { "checkstack",             PRAGMA_CHECKSTACK       },      /* obsolete */
-    { "code-name",              PRAGMA_CODE_NAME        },
-    { "codeseg",                PRAGMA_CODESEG          },      /* obsolete */
-    { "codesize",               PRAGMA_CODESIZE         },
-    { "data-name",              PRAGMA_DATA_NAME        },
-    { "dataseg",                PRAGMA_DATASEG          },      /* obsolete */
-    { "local-strings",          PRAGMA_LOCAL_STRINGS    },
-    { "optimize",               PRAGMA_OPTIMIZE         },
-    { "register-vars",          PRAGMA_REGISTER_VARS    },
-    { "regvaraddr",             PRAGMA_REGVARADDR       },
-    { "regvars",                PRAGMA_REGVARS          },      /* obsolete */
-    { "rodata-name",            PRAGMA_RODATA_NAME      },
-    { "rodataseg",              PRAGMA_RODATASEG        },      /* obsolete */
-    { "signed-chars",           PRAGMA_SIGNED_CHARS     },
-    { "signedchars",            PRAGMA_SIGNEDCHARS      },      /* obsolete */
-    { "static-locals",          PRAGMA_STATIC_LOCALS    },
-    { "staticlocals",           PRAGMA_STATICLOCALS     },      /* obsolete */
-    { "warn",                   PRAGMA_WARN             },
-    { "writable-strings",       PRAGMA_WRITABLE_STRINGS },
-    { "zpsym",                  PRAGMA_ZPSYM            },
+    { "align",                  PRAGMA_ALIGN              },
+    { "allow-eager-inline",     PRAGMA_ALLOW_EAGER_INLINE },
+    { "bss-name",               PRAGMA_BSS_NAME           },
+    { "bssseg",                 PRAGMA_BSSSEG             },      /* obsolete */
+    { "charmap",                PRAGMA_CHARMAP            },
+    { "check-stack",            PRAGMA_CHECK_STACK        },
+    { "checkstack",             PRAGMA_CHECKSTACK         },      /* obsolete */
+    { "code-name",              PRAGMA_CODE_NAME          },
+    { "codeseg",                PRAGMA_CODESEG            },      /* obsolete */
+    { "codesize",               PRAGMA_CODESIZE           },
+    { "data-name",              PRAGMA_DATA_NAME          },
+    { "dataseg",                PRAGMA_DATASEG            },      /* obsolete */
+    { "inline-stdfuncs",        PRAGMA_INLINE_STDFUNCS    },
+    { "local-strings",          PRAGMA_LOCAL_STRINGS      },
+    { "optimize",               PRAGMA_OPTIMIZE           },
+    { "register-vars",          PRAGMA_REGISTER_VARS      },
+    { "regvaraddr",             PRAGMA_REGVARADDR         },
+    { "regvars",                PRAGMA_REGVARS            },      /* obsolete */
+    { "rodata-name",            PRAGMA_RODATA_NAME        },
+    { "rodataseg",              PRAGMA_RODATASEG          },      /* obsolete */
+    { "signed-chars",           PRAGMA_SIGNED_CHARS       },
+    { "signedchars",            PRAGMA_SIGNEDCHARS        },      /* obsolete */
+    { "static-locals",          PRAGMA_STATIC_LOCALS      },
+    { "staticlocals",           PRAGMA_STATICLOCALS       },      /* obsolete */
+    { "warn",                   PRAGMA_WARN               },
+    { "writable-strings",       PRAGMA_WRITABLE_STRINGS   },
+    { "zpsym",                  PRAGMA_ZPSYM              },
 };
 
 /* Result of ParsePushPop */
@@ -703,6 +707,10 @@ static void ParsePragma (void)
             IntPragma (&B, &DataAlignment, 1, 4096);
             break;
 
+        case PRAGMA_ALLOW_EAGER_INLINE:
+            FlagPragma (&B, &EagerlyInlineFuncs);
+            break;
+
         case PRAGMA_BSSSEG:
             Warning ("#pragma bssseg is obsolete, please use #pragma bss-name instead");
             /* FALLTHROUGH */
@@ -737,6 +745,10 @@ static void ParsePragma (void)
             /* FALLTHROUGH */
         case PRAGMA_DATA_NAME:
             SegNamePragma (&B, SEG_DATA);
+            break;
+
+        case PRAGMA_INLINE_STDFUNCS:
+            FlagPragma (&B, &InlineStdFuncs);
             break;
 
         case PRAGMA_LOCAL_STRINGS:

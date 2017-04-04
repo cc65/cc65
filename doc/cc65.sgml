@@ -491,7 +491,8 @@ Here is a description of all the command line options:
   Using <tt/-Os/ will allow the compiler to inline some standard functions
   from the C library like strlen.  This will not only remove the overhead
   for a function call, but will make the code visible for the optimizer.
-  See also <tt/<ref id="option-inline-stdfuncs" name="--inline-stdfuncs">/.
+  See also the <tt/<ref id="option-inline-stdfuncs" name="--inline-stdfuncs">/
+  command line option.
 
   It is possible to concatenate the modifiers for <tt/-O/. For example, to
   enable register variables and inlining of standard functions, you may use
@@ -1098,7 +1099,7 @@ parameter with the <tt/#pragma/.
   Allow the compiler to inline some standard functions from the C library like
   strlen.  If the argument is "off", inlining is disabled, otherwise it is enabled.
 
-  See also the the <tt/<ref id="option-inline-stdfuncs" name="--inline-stdfuncs">/
+  See also the <tt/<ref id="option-inline-stdfuncs" name="--inline-stdfuncs">/
   command line option.
 
   The <tt/#pragma/ understands the push and pop parameters as explained above.

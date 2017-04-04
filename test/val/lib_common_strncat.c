@@ -1,7 +1,3 @@
-// temporarily disable optimizations altogether until a fine grain control
-// is implemented on Makefile level only disabling the compiler option -Os
-#pragma optimize (off)
-
 #include <string.h>
 #include "unittest.h"
 
@@ -54,5 +50,3 @@ TEST
     }
 }
 ENDTEST
-
-

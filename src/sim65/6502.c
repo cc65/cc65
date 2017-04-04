@@ -34,14 +34,12 @@
 
 /* Known bugs and limitations of the 65C02 simulation:
  * support currently only on the level of 65SC02:
-   BBRx, BBSx, RMBx, SMBx, WAI and STP are unsupported
+   BBRx, BBSx, RMBx, SMBx, WAI, and STP are unsupported
  * BCD flag handling equals 6502 (unchecked if bug is simulated or wrong for
    6502)
  * one cycle win for fetch-modify-write instructions ignored
-   (e.g. ROL abs,x takes only 6 cycles if no page break occurs)
- * BRK, IRQ, NMI and RESET are not different from 6502 which they are in
-   reality (e.g. D-flag handling)
- */
+   (e.g., ROL abs,x takes only 6 cycles if no page break occurs)
+*/
 
 #include "memory.h"
 #include "error.h"
@@ -87,12 +85,11 @@ int PrintCycles;
 
 
 
-/* Return the flags as a boolean value (0/1) */
+/* Return the flags as boolean values (0/1) */
 #define GET_CF()        ((Regs.SR & CF) != 0)
 #define GET_ZF()        ((Regs.SR & ZF) != 0)
 #define GET_IF()        ((Regs.SR & IF) != 0)
 #define GET_DF()        ((Regs.SR & DF) != 0)
-#define GET_BF()        ((Regs.SR & BF) != 0)
 #define GET_OF()        ((Regs.SR & OF) != 0)
 #define GET_SF()        ((Regs.SR & SF) != 0)
 
@@ -103,7 +100,6 @@ int PrintCycles;
 #define SET_ZF(f)       do { if (f) { Regs.SR |= ZF; } else { Regs.SR &= ~ZF; } } while (0)
 #define SET_IF(f)       do { if (f) { Regs.SR |= IF; } else { Regs.SR &= ~IF; } } while (0)
 #define SET_DF(f)       do { if (f) { Regs.SR |= DF; } else { Regs.SR &= ~DF; } } while (0)
-#define SET_BF(f)       do { if (f) { Regs.SR |= BF; } else { Regs.SR &= ~BF; } } while (0)
 #define SET_OF(f)       do { if (f) { Regs.SR |= OF; } else { Regs.SR &= ~OF; } } while (0)
 #define SET_SF(f)       do { if (f) { Regs.SR |= SF; } else { Regs.SR &= ~SF; } } while (0)
 
@@ -119,8 +115,8 @@ int PrintCycles;
 #define PCH             ((Regs.PC >> 8) & 0xFF)
 
 /* Stack operations */
-#define PUSH(Val)       MemWriteByte (0x0100 + Regs.SP--, Val)
-#define POP()           MemReadByte (0x0100 + ++Regs.SP)
+#define PUSH(Val)       MemWriteByte (0x0100 | (Regs.SP-- & 0xFF), Val)
+#define POP()           MemReadByte (0x0100 | (++Regs.SP & 0xFF))
 
 /* Test for page cross */
 #define PAGE_CROSS(addr,offs)   ((((addr) & 0xFF) + offs) >= 0x100)
@@ -376,11 +372,14 @@ static void OPC_6502_00 (void)
 {
     Cycles = 7;
     Regs.PC += 2;
-    SET_BF (1);
     PUSH (PCH);
     PUSH (PCL);
     PUSH (Regs.SR);
     SET_IF (1);
+    if (CPU != CPU_6502)
+    {
+        SET_DF (0);
+    }
     Regs.PC = MemReadWord (0xFFFE);
 }
 
@@ -403,7 +402,7 @@ static void OPC_65SC02_04 (void)
     ZPAddr = MemReadByte (Regs.PC+1);
     Val = MemReadByte (ZPAddr);
     SET_ZF ((Val & Regs.AC) == 0);
-    MemWriteByte (ZPAddr, (unsigned char)(Val | Regs.AC)); 
+    MemWriteByte (ZPAddr, (unsigned char)(Val | Regs.AC));
     Regs.PC += 2;
 }
 
@@ -438,7 +437,7 @@ static void OPC_6502_08 (void)
 /* Opcode $08: PHP */
 {
     Cycles = 3;
-    PUSH (Regs.SR & ~BF);
+    PUSH (Regs.SR);
     Regs.PC += 1;
 }
 
@@ -475,7 +474,7 @@ static void OPC_65SC02_0C (void)
     Addr = MemReadWord (Regs.PC+1);
     Val = MemReadByte (Addr);
     SET_ZF ((Val & Regs.AC) == 0);
-    MemWriteByte (Addr, (unsigned char) (Val | Regs.AC));    
+    MemWriteByte (Addr, (unsigned char) (Val | Regs.AC));
     Regs.PC += 3;
 }
 
@@ -539,7 +538,7 @@ static void OPC_65SC02_14 (void)
     ZPAddr = MemReadByte (Regs.PC+1);
     Val = MemReadByte (ZPAddr);
     SET_ZF ((Val & Regs.AC) == 0);
-    MemWriteByte (ZPAddr, (unsigned char)(Val & ~Regs.AC)); 
+    MemWriteByte (ZPAddr, (unsigned char)(Val & ~Regs.AC));
     Regs.PC += 2;
 }
 
@@ -609,7 +608,7 @@ static void OPC_65SC02_1C (void)
     Addr = MemReadWord (Regs.PC+1);
     Val = MemReadByte (Addr);
     SET_ZF ((Val & Regs.AC) == 0);
-    MemWriteByte (Addr, (unsigned char) (Val & ~Regs.AC));    
+    MemWriteByte (Addr, (unsigned char) (Val & ~Regs.AC));
     Regs.PC += 3;
 }
 
@@ -707,7 +706,9 @@ static void OPC_6502_28 (void)
 /* Opcode $28: PLP */
 {
     Cycles = 4;
-    Regs.SR = (POP () & ~BF);
+
+    /* Bits 5 and 4 aren't used, and always are 1! */
+    Regs.SR = (POP () | 0x30);
     Regs.PC += 1;
 }
 
@@ -909,7 +910,9 @@ static void OPC_6502_40 (void)
 /* Opcode $40: RTI */
 {
     Cycles = 6;
-    Regs.SR = POP ();
+
+    /* Bits 5 and 4 aren't used, and always are 1! */
+    Regs.SR = POP () | 0x30;
     Regs.PC = POP ();                /* PCL */
     Regs.PC |= (POP () << 8);        /* PCH */
 }
@@ -2011,7 +2014,7 @@ static void OPC_6502_BA (void)
 /* Opcode $BA: TSX */
 {
     Cycles = 2;
-    Regs.XR = Regs.SP;
+    Regs.XR = Regs.SP & 0xFF;
     TEST_ZF (Regs.XR);
     TEST_SF (Regs.XR);
     Regs.PC += 1;
@@ -3213,7 +3216,9 @@ void Reset (void)
     /* Reset the CPU */
     HaveIRQRequest = 0;
     HaveNMIRequest = 0;
-    Regs.SR = 0;
+
+    /* Bits 5 and 4 aren't used, and always are 1! */
+    Regs.SR = 0x30;
     Regs.PC = MemReadWord (0xFFFC);
 }
 
@@ -3228,8 +3233,12 @@ unsigned ExecuteInsn (void)
         HaveNMIRequest = 0;
         PUSH (PCH);
         PUSH (PCL);
-        PUSH (Regs.SR);
+        PUSH (Regs.SR & ~BF);
         SET_IF (1);
+        if (CPU != CPU_6502)
+        {
+            SET_DF (0);
+        }
         Regs.PC = MemReadWord (0xFFFA);
         Cycles = 7;
 
@@ -3238,8 +3247,12 @@ unsigned ExecuteInsn (void)
         HaveIRQRequest = 0;
         PUSH (PCH);
         PUSH (PCL);
-        PUSH (Regs.SR);
+        PUSH (Regs.SR & ~BF);
         SET_IF (1);
+        if (CPU != CPU_6502)
+        {
+            SET_DF (0);
+        }
         Regs.PC = MemReadWord (0xFFFE);
         Cycles = 7;
 

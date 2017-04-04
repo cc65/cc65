@@ -1,7 +1,3 @@
-// temporarily disable optimizations altogether until a fine grain control
-// is implemented on Makefile level only disabling the compiler option -Os
-#pragma optimize (off)
-
 #include <string.h>
 #include "unittest.h"
 
@@ -10,6 +6,7 @@
 static char EstimatedString[EstimatedStringSize+1];     // +1 room for terminating null
 static char* EmptyTestChars="";                         // strlen equivalent...
 static char* TestChars="1234567890";                    // we like to find numbers
+
 
 TEST
 {
@@ -26,5 +23,3 @@ TEST
     ASSERT_AreEqual(strlen(EstimatedString), strcspn(EstimatedString, EmptyTestChars), "%u", "Unxpected position returned for empty test case!");
 }
 ENDTEST
-
-

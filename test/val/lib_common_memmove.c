@@ -1,14 +1,9 @@
-// temporarily disable optimizations altogether until a fine grain control
-// is implemented on Makefile level only disabling the compiler option -Os
-#pragma optimize (off)
-
 #include <string.h>
 #include "unittest.h"
 
 #define BufferSize 384               // test correct page passing (>256, multiple of 128 here)
 
 static char Buffer[BufferSize+3];    // +1 to move up (and down)
-
 
 
 TEST
@@ -61,5 +56,3 @@ TEST
     }
 }
 ENDTEST
-
-

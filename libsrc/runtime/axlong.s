@@ -19,4 +19,3 @@ axulong:
 store:  sty     sreg
         sty     sreg+1
         rts
-

@@ -20,7 +20,7 @@ _strchr:
 .else
         lda #0
         sta ptr1        ; access from page start, y contains low byte
-.endif        
+.endif
 
 Loop:   lda (ptr1),y    ; Get next char
         beq EOS         ; Jump on end of string
@@ -29,7 +29,7 @@ Loop:   lda (ptr1),y    ; Get next char
         iny
         bne Loop
         inc ptr1+1
-        bne Loop        ; Branch always                 
+        bne Loop        ; Branch always
 
 ; End of string. Check if we're searching for the terminating zero
 

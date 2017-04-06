@@ -71,5 +71,3 @@ L6: lda #0
 L7: lda ptr3
     ldx ptr3+1
     rts
-
-

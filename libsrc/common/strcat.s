@@ -21,7 +21,7 @@ _strcat:
 .else
         lda #0
         sta ptr2        ; access from page start, y contains low byte
-.endif        
+.endif
         stx ptr2+1
 
 findEndOfDest:
@@ -33,7 +33,7 @@ findEndOfDest:
         bne findEndOfDest
 
 endOfDestFound:
-        sty ptr2        ; advance pointer to last y position    
+        sty ptr2        ; advance pointer to last y position
         ldy #0          ; reset new y-offset
 
 copyByte:

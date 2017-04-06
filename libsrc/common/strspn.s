@@ -40,15 +40,14 @@ checkNext:
 check:  cpy tmp1            ; compare with length of test character string
         beq leave
         cmp (ptr1),y        ; found matching char?
-        bne checkNext           
+        bne checkNext
 
 foundTestChar:
         inx
         bne loadChar
         inc tmp2
-        bne loadChar        ; like bra...  
+        bne loadChar        ; like bra...
 
 leave:  txa                 ; restore position of finding
         ldx tmp2            ; and return
         rts
-   

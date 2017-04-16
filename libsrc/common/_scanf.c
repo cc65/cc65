@@ -276,7 +276,7 @@ static void __fastcall__ Error (unsigned char /* Code */)
     asm ("jsr pushax");
     asm ("pla");
     asm ("ldx #>$0000");
-    asm ("jmp %v", longjmp);
+    asm ("jmp %v", _longjmp);
 }
 
 #pragma optimize (pop)

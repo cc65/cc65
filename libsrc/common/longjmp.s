@@ -5,11 +5,11 @@
 ; void __fastcall__ longjmp (jmp_buf buf, int retval);
 ;
 
-        .export         _longjmp
+        .export         __longjmp
         .import         popax
         .importzp       sp, ptr1, ptr2
 
-_longjmp:
+__longjmp:
         sta     ptr2            ; Save retval
         stx     ptr2+1
         ora     ptr2+1          ; Check for 0

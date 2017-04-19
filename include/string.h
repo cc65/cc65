@@ -39,7 +39,8 @@
 
 
 #include <stddef.h>
-
+#include <regcall.h>
+#include <callconv.h>
 
 
 char* __fastcall__ strcat (char* dest, const char* src);
@@ -59,8 +60,20 @@ char* __fastcall__ strstr (const char* str, const char* substr);
 char* __fastcall__ strtok (char* s1, const char* s2);
 size_t __fastcall__ strxfrm (char* s1, const char* s2, size_t count);
 void* __fastcall__ memchr (const void* mem, int c, size_t count);
+
+// -> CK: Regcall test
 int __fastcall__ memcmp (const void* p1, const void* p2, size_t count);
+int __fastcall__ rc_memcmp(void);
+#define MEMCMP(a,b,c) (R0.pV=(a), R1.pV=(b), R2.st=(c), rc_memcmp())
+//#define memcmp(a,b,c) (RegCallPvPvStRetN(rc_memcmp, (a), (b), (c)))		// calling converter variant
+
 void* __fastcall__ memcpy (void* dest, const void* src, size_t count);
+void* __fastcall__ rc_memcpy(void);
+#define MEMCPY(a,b,c) (R0.pV=(a), R1.pV=(b), R2.st=(c), rc_memcpy())
+//#define memcpy(a,b,c) (RegCallPvPvStRetPv(rc_memcpy, (a), (b), (c)))		// calling converter variant
+// <-
+
+
 void* __fastcall__ memmove (void* dest, const void* src, size_t count);
 void* __fastcall__ memset (void* s, int c, size_t count);
 

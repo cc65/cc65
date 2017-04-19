@@ -1,72 +1,73 @@
 ;
 ; Ullrich von Bassewitz, 15.09.2000
+; Christian Krueger: 2013-Sep-16, minor speed optimization
+;                                 regcall parameter passing 
 ;
-; int memcmp (const void* p1, const void* p2, size_t count);
+; int __fastcall__ memcmp (const void* p1, const void* p2, size_t count);
+; int __fastcall__ _rc_memcmp(void);
+; ptr1 = const void* p1
+; ptr2 = const void* p2
+; ptr3 = size_t count
 ;
 
-        .export         _memcmp
-        .import         popax, return0
-        .importzp       ptr1, ptr2, ptr3
+.export _memcmp
+.export _rc_memcmp
+
+.import popax
+.import return0
+.importzp   ptr1, ptr2, ptr3
+
 
 _memcmp:
+    sta ptr3
+    stx ptr3+1
+    
+    jsr popax
+    sta ptr2
+    stx ptr2+1
 
-; Calculate (-count-1) and store it into ptr3. This is some overhead here but
-; saves time in the compare loop
+    jsr popax
+    sta ptr1
+    stx ptr1+1
 
-        eor     #$FF
-        sta     ptr3
-        txa
-        eor     #$FF
-        sta     ptr3+1
+_rc_memcmp:
+    ldy #0                  ; start with offset = 0
+    ldx ptr3+1              ; check high byte of length (to X)
+    beq handleLowByteLen
+    
+handleHighByteLen:          ; compare pages
+nextPageByte:
+    lda (ptr1),y
+    cmp (ptr2),y
+    bne notEqual            ; handle difference
+    iny
+    bne nextPageByte
+    inc ptr1+1              ; advance to next page
+    inc ptr2+1
+    dex
+    bne nextPageByte    
+    
+handleLowByteLen:           ; assert Y = 0 here!
+    lda ptr3                ; check low byte of length
+    beq equal               ; end reached, memory is equal
 
-; Get the pointer parameters
+nextByte:    
+    lda (ptr1),y
+    cmp (ptr2),y
+    bne notEqual
+    iny
+    cpy ptr3
+    bne nextByte
 
-        jsr     popax           ; Get p2
-        sta     ptr2
-        stx     ptr2+1
-        jsr     popax           ; Get p1
-        sta     ptr1
-        stx     ptr1+1
+equal:                      ; ran through without difference
+    jmp return0
 
-; Loop initialization
+notEqual:
+    bcs greater
+    ldx #$FF                ; make result negative
+    rts
 
-        ldx     ptr3            ; Load low counter byte into X
-        ldy     #$00            ; Initialize pointer
-
-; Head of compare loop: Test for the end condition
-
-Loop:   inx                     ; Bump low byte of (-count-1)
-        beq     BumpHiCnt       ; Jump on overflow
-
-; Do the compare
-
-Comp:   lda     (ptr1),y
-        cmp     (ptr2),y
-        bne     NotEqual        ; Jump if bytes not equal
-
-; Bump the pointers
-
-        iny                     ; Increment pointer
-        bne     Loop
-        inc     ptr1+1          ; Increment high bytes
-        inc     ptr2+1
-        bne     Loop            ; Branch always (pointer wrap is illegal)
-
-; Entry on low counter byte overflow
-
-BumpHiCnt:
-        inc     ptr3+1          ; Bump high byte of (-count-1)
-        bne     Comp            ; Jump if not done
-        jmp     return0         ; Count is zero, areas are identical
-
-; Not equal, check which one is greater
-
-NotEqual:
-        bcs     Greater
-        ldx     #$FF            ; Make result negative
-        rts
-
-Greater:
-        ldx     #$01            ; Make result positive
-        rts
+greater:
+    ldx #$01                ; make result positive
+    rts
 

@@ -62,6 +62,9 @@ void Emit2 (unsigned char OPC, ExprNode* Value);
 void Emit3 (unsigned char OPC, ExprNode* Expr);
 /* Emit an instruction with a three byte argument */
 
+void EmitZP (unsigned char OPC, ExprNode* Value);
+/* Emit an instruction with an one byte direct-page argument */
+
 void EmitSigned (ExprNode* Expr, unsigned Size);
 /* Emit a signed expression with the given size */
 

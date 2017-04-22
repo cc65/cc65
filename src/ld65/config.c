@@ -222,7 +222,7 @@ static MemoryArea* CfgFindMemory (unsigned Name)
 
 
 static MemoryArea* CfgGetMemory (unsigned Name)
-/* Find the memory are with the given name. Print an error on an invalid name */
+/* Find the memory with the given name. Print an error on an invalid name */
 {
     MemoryArea* M = CfgFindMemory (Name);
     if (M == 0) {
@@ -356,6 +356,7 @@ static SegDesc* NewSegDesc (unsigned Name)
     S->Attr          = 0;
     S->Flags         = 0;
     S->FillVal       = 0;
+    S->MemDuplicates = AUTO_COLLECTION_INITIALIZER;
     S->RunAlignment  = 1;
     S->LoadAlignment = 1;
 
@@ -640,6 +641,7 @@ static void ParseSegments (void)
         {   "ALIGN",            CFGTOK_ALIGN            },
         {   "ALIGN_LOAD",       CFGTOK_ALIGN_LOAD       },
         {   "DEFINE",           CFGTOK_DEFINE           },
+        {   "DUPLICATE",        CFGTOK_DUPLICATE        },
         {   "FILLVAL",          CFGTOK_FILLVAL          },
         {   "LOAD",             CFGTOK_LOAD             },
         {   "OFFSET",           CFGTOK_OFFSET           },
@@ -707,6 +709,12 @@ static void ParseSegments (void)
                     if (CfgTok == CFGTOK_TRUE) {
                         S->Flags |= SF_DEFINE;
                     }
+                    CfgNextTok ();
+                    break;
+
+                case CFGTOK_DUPLICATE:
+                    /* Allow multiple occurences of the duplicate keyword */
+                    CollAppend (&(S->MemDuplicates), CfgGetMemory (GetStrBufId (&CfgSVal)));
                     CfgNextTok ();
                     break;
 
@@ -1611,12 +1619,20 @@ static void ProcessSegments (void)
         ** invalid.
         */
         if (S->Seg != 0) {
+	    unsigned J;
 
             /* Insert the segment into the memory area list */
             MemoryInsert (S->Run, S);
             if (S->Load != S->Run) {
                 /* We have separate RUN and LOAD areas */
                 MemoryInsert (S->Load, S);
+            }
+
+            /* Go through the duplicates list and insert the segment
+               into the memory locations */
+            for (J = 0; J < CollCount (&(S->MemDuplicates)); ++J) {
+                MemoryArea* M = CollAtUnchecked (&(S->MemDuplicates), J);
+                MemoryInsert (M, S);
             }
 
             /* Use the fill value from the config */
@@ -1842,6 +1858,7 @@ unsigned CfgProcess (void)
 
         /* Walk through the segments in this memory area */
         for (J = 0; J < CollCount (&M->SegList); ++J) {
+            unsigned K;
             /* Get the segment */
             SegDesc* S = CollAtUnchecked (&M->SegList, J);
 
@@ -1975,9 +1992,18 @@ unsigned CfgProcess (void)
             /* If this segment will go out to the file, or its place
             ** in the file will be filled, then increase the file size.
             */
+
+            /* This segment may be a load segment */
             if (S->Load == M &&
                 ((S->Flags & SF_BSS) == 0 || (M->Flags & MF_FILL) != 0)) {
                 M->F->Size += Addr - StartAddr;
+            }
+            /* Or it could be a duplicate */
+            for (K = 0; K < CollCount (&S->MemDuplicates); ++K) {
+                if (CollAtUnchecked (&S->MemDuplicates, K) == M) {
+                    M->F->Size += Addr - StartAddr;
+                    break;
+                }
             }
         }
 

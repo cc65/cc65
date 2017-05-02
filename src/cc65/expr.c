@@ -536,6 +536,10 @@ static void FunctionCall (ExprDesc* Expr)
     /* Special handling for function pointers */
     if (IsFuncPtr) {
 
+        if (Func->Trampoline) {
+            Warning("Calling a trampolined function via a pointer, trampoline will not be used");
+        }
+
         /* If the function is not a fastcall function, load the pointer to
         ** the function into the primary.
         */
@@ -584,7 +588,47 @@ static void FunctionCall (ExprDesc* Expr)
     } else {
 
         /* Normal function */
-        g_call (TypeOf (Expr->Type), (const char*) Expr->Name, ParamSize);
+        if (Func->Trampoline) {
+            char tmp[64];
+            StrBuf S = AUTO_STRBUF_INITIALIZER;
+
+            /* Store the trampoline data in tmp4 */
+            sprintf(tmp, "ldy #%u", Func->TrampolineData);
+            SB_AppendStr (&S, tmp);
+            g_asmcode (&S);
+            SB_Clear(&S);
+
+            SB_AppendStr (&S, "sty tmp4");
+            g_asmcode (&S);
+            SB_Clear(&S);
+
+            /* Store the original function address in ptr4 */
+            SB_AppendStr (&S, "ldy #<(_");
+            SB_AppendStr (&S, (const char*) Expr->Name);
+            SB_AppendChar (&S, ')');
+            g_asmcode (&S);
+            SB_Clear(&S);
+
+            SB_AppendStr (&S, "sty ptr4");
+            g_asmcode (&S);
+            SB_Clear(&S);
+
+            SB_AppendStr (&S, "ldy #>(_");
+            SB_AppendStr (&S, (const char*) Expr->Name);
+            SB_AppendChar (&S, ')');
+            g_asmcode (&S);
+            SB_Clear(&S);
+
+            SB_AppendStr (&S, "sty ptr4+1");
+            g_asmcode (&S);
+            SB_Clear(&S);
+
+            SB_Done (&S);
+
+            g_call (TypeOf (Expr->Type), Func->Trampoline->Name, ParamSize);
+        } else {
+            g_call (TypeOf (Expr->Type), (const char*) Expr->Name, ParamSize);
+        }
 
     }
 

@@ -51,6 +51,7 @@
 #include "scanstrbuf.h"
 #include "symtab.h"
 #include "pragma.h"
+#include "trampoline.h"
 
 
 
@@ -87,6 +88,7 @@ typedef enum {
     PRAGMA_SIGNEDCHARS,                                 /* obsolete */
     PRAGMA_STATIC_LOCALS,
     PRAGMA_STATICLOCALS,                                /* obsolete */
+    PRAGMA_TRAMPOLINE,
     PRAGMA_WARN,
     PRAGMA_WRITABLE_STRINGS,
     PRAGMA_ZPSYM,
@@ -122,6 +124,7 @@ static const struct Pragma {
     { "signedchars",            PRAGMA_SIGNEDCHARS        },      /* obsolete */
     { "static-locals",          PRAGMA_STATIC_LOCALS      },
     { "staticlocals",           PRAGMA_STATICLOCALS       },      /* obsolete */
+    { "trampoline",		PRAGMA_TRAMPOLINE	  },
     { "warn",                   PRAGMA_WARN               },
     { "writable-strings",       PRAGMA_WRITABLE_STRINGS   },
     { "zpsym",                  PRAGMA_ZPSYM              },
@@ -437,6 +440,84 @@ static void SegNamePragma (StrBuf* B, segment_t Seg)
 
         /* Segment name is invalid */
         Error ("Illegal segment name: `%s'", Name);
+
+    }
+
+ExitPoint:
+    /* Call the string buf destructor */
+    SB_Done (&S);
+}
+
+
+static void TrampolinePragma (StrBuf* B)
+/* Handle the trampoline pragma */
+{
+    StrBuf      S = AUTO_STRBUF_INITIALIZER;
+    const char *Name;
+    long Val;
+    SymEntry *Entry;
+
+    /* Check for the "push" or "pop" keywords */
+    switch (ParsePushPop (B)) {
+
+        case PP_NONE:
+            Error ("Push or pop required");
+            break;
+
+        case PP_PUSH:
+            break;
+
+        case PP_POP:
+            PopTrampoline();
+
+            /* Done */
+            goto ExitPoint;
+
+        case PP_ERROR:
+            /* Bail out */
+            goto ExitPoint;
+
+        default:
+            Internal ("Invalid result from ParsePushPop");
+
+    }
+
+    /* A symbol argument must follow */
+    if (!SB_GetSym (B, &S, NULL)) {
+        goto ExitPoint;
+    }
+
+    /* Skip the following comma */
+    if (!GetComma (B)) {
+        /* Error already flagged by GetComma */
+        Error ("Value required for trampoline data");
+        goto ExitPoint;
+    }
+
+    if (!GetNumber (B, &Val)) {
+        Error ("Value required for trampoline data");
+        goto ExitPoint;
+    }
+
+    if (Val < 0 || Val > 255) {
+        Error ("Value must be between 0-255");
+        goto ExitPoint;
+    }
+
+    /* Get the string */
+    Name = SB_GetConstBuf (&S);
+    Entry = FindSym(Name);
+
+    /* Check if the name is valid */
+    if (Entry && Entry->Flags & (SC_FUNC | SC_STORAGE)) {
+
+        PushTrampoline(Entry, Val);
+        Entry->Flags |= SC_REF;
+
+    } else {
+
+        /* Segment name is invalid */
+        Error ("Trampoline does not exist or is not a function or array");
 
     }
 
@@ -790,6 +871,10 @@ static void ParsePragma (void)
         case PRAGMA_STATIC_LOCALS:
             FlagPragma (&B, &StaticLocals);
             break;
+
+	case PRAGMA_TRAMPOLINE:
+	    TrampolinePragma(&B);
+	    break;
 
         case PRAGMA_WARN:
             WarnPragma (&B);

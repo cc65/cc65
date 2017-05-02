@@ -58,6 +58,7 @@
 #include "scanner.h"
 #include "standard.h"
 #include "symtab.h"
+#include "trampoline.h"
 #include "typeconv.h"
 
 
@@ -1315,6 +1316,8 @@ static FuncDesc* ParseFuncDecl (void)
 {
     unsigned Offs;
     SymEntry* Sym;
+    SymEntry* Trampoline;
+    unsigned char TrampolineData;
 
     /* Create a new function descriptor */
     FuncDesc* F = NewFuncDesc ();
@@ -1379,6 +1382,13 @@ static FuncDesc* ParseFuncDecl (void)
 
     /* Leave the lexical level remembering the symbol tables */
     RememberFunctionLevel (F);
+
+    /* Did we have a trampoline for this function? */
+    GetTrampoline((void **) &Trampoline, &TrampolineData);
+    if (Trampoline) {
+        F->Trampoline = Trampoline;
+        F->TrampolineData = TrampolineData;
+    }
 
     /* Return the function descriptor */
     return F;
@@ -1447,6 +1457,7 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
 
             /* Function declaration */
             FuncDesc* F;
+            SymEntry* PrevEntry;
 
             /* Skip the opening paren */
             NextToken ();
@@ -1458,6 +1469,16 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
             if ((F->Flags & FD_VARIADIC) && (Qualifiers & T_QUAL_FASTCALL)) {
                 Error ("Variadic functions cannot be __fastcall__");
                 Qualifiers &= ~T_QUAL_FASTCALL;
+            }
+
+            /* Was there a previous entry? If so, copy trampoline info from it */
+            PrevEntry = FindGlobalSym (D->Ident);
+            if (PrevEntry && PrevEntry->Flags & SC_FUNC) {
+                FuncDesc* D = PrevEntry->V.F.Func;
+                if (D->Trampoline && !F->Trampoline) {
+                    F->Trampoline = D->Trampoline;
+                    F->TrampolineData = D->TrampolineData;
+                }
             }
 
             /* Add the function type. Be sure to bounds check the type buffer */

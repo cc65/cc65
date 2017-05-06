@@ -1590,25 +1590,34 @@ static void PostDec (ExprDesc* Expr)
     /* Get the data type */
     Flags = TypeOf (Expr->Type);
 
-    /* Push the address if needed */
-    PushAddr (Expr);
+    /* Fast path: char */
+    if ((Flags & CF_CHAR) == CF_CHAR && ED_GetLoc(Expr) & (E_LOC_GLOBAL | E_LOC_STATIC)) {
 
-    /* Fetch the value and save it (since it's the result of the expression) */
-    LoadExpr (CF_NONE, Expr);
-    g_save (Flags | CF_FORCECHAR);
+        LoadExpr (CF_NONE, Expr);
+        AddCodeLine ("dec %s", ED_GetLabelName(Expr, 0));
 
-    /* If we have a pointer expression, increment by the size of the type */
-    if (IsTypePtr (Expr->Type)) {
-        g_dec (Flags | CF_CONST | CF_FORCECHAR, CheckedSizeOf (Expr->Type + 1));
     } else {
-        g_dec (Flags | CF_CONST | CF_FORCECHAR, 1);
+
+        /* Push the address if needed */
+        PushAddr (Expr);
+
+        /* Fetch the value and save it (since it's the result of the expression) */
+        LoadExpr (CF_NONE, Expr);
+        g_save (Flags | CF_FORCECHAR);
+
+        /* If we have a pointer expression, increment by the size of the type */
+        if (IsTypePtr (Expr->Type)) {
+            g_dec (Flags | CF_CONST | CF_FORCECHAR, CheckedSizeOf (Expr->Type + 1));
+        } else {
+            g_dec (Flags | CF_CONST | CF_FORCECHAR, 1);
+        }
+
+        /* Store the result back */
+        Store (Expr, 0);
+
+        /* Restore the original value in the primary register */
+        g_restore (Flags | CF_FORCECHAR);
     }
-
-    /* Store the result back */
-    Store (Expr, 0);
-
-    /* Restore the original value in the primary register */
-    g_restore (Flags | CF_FORCECHAR);
 
     /* The result is always an expression, no reference */
     ED_MakeRValExpr (Expr);

@@ -1534,8 +1534,8 @@ static void PostInc (ExprDesc* Expr)
     /* Get the data type */
     Flags = TypeOf (Expr->Type);
 
-    /* Fast path: char */
-    if ((Flags & CF_CHAR) == CF_CHAR && ED_GetLoc(Expr) & (E_LOC_GLOBAL | E_LOC_STATIC)) {
+    /* Emit smaller code if a char variable is at a constant location */
+    if ((Flags & CF_CHAR) == CF_CHAR && ED_IsLocConst(Expr)) {
 
         LoadExpr (CF_NONE, Expr);
         AddCodeLine ("inc %s", ED_GetLabelName(Expr, 0));
@@ -1590,8 +1590,8 @@ static void PostDec (ExprDesc* Expr)
     /* Get the data type */
     Flags = TypeOf (Expr->Type);
 
-    /* Fast path: char */
-    if ((Flags & CF_CHAR) == CF_CHAR && ED_GetLoc(Expr) & (E_LOC_GLOBAL | E_LOC_STATIC)) {
+    /* Emit smaller code if a char variable is at a constant location */
+    if ((Flags & CF_CHAR) == CF_CHAR && ED_IsLocConst(Expr)) {
 
         LoadExpr (CF_NONE, Expr);
         AddCodeLine ("dec %s", ED_GetLabelName(Expr, 0));

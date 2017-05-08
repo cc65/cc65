@@ -19,5 +19,5 @@ int main() {
 	array[val--] = 0;
 	array[val--] = 0;
 
-	return (array[0] == array[1] && array[0] == 0) ? 0 : 1;
+	return (array[0] == array[1] && array[0] == 0 && val == 0xff) ? 0 : 1;
 }

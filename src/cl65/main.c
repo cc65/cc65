@@ -706,6 +706,7 @@ static void Usage (void)
             "  -C name\t\t\tUse linker config file\n"
             "  -Cl\t\t\t\tMake local variables static\n"
             "  -D sym[=defn]\t\t\tDefine a preprocessor symbol\n"
+            "  -E Stop after the preprocessing stage\n"
             "  -I dir\t\t\tSet a compiler include directory path\n"
             "  -L path\t\t\tSpecify a library search path\n"
             "  -Ln name\t\t\tCreate a VICE label file\n"
@@ -1411,14 +1412,41 @@ int main (int argc, char* argv [])
                     /* Print version number */
                     OptVersion (Arg, 0);
                     break;
-
+                
+                case 'E':
+                    /*Forward -E to compiler*/
+                    CmdAddArg (&CC65, Arg);  
+                    DoAssemble = 0;
+                    DoLink     = 0;
+                    break;
                 case 'W':
                     if (Arg[2] == 'a' && Arg[3] == '\0') {
                         /* -Wa: Pass options to assembler */
                         OptAsmArgs (Arg, GetArg (&I, 3));
-                    } else if (Arg[2] == 'c' && Arg[3] == '\0') {
+                    }   
+                    else if (Arg[2] == 'c' && Arg[3] == '\0') {
                         /* -Wc: Pass options to compiler */
-                        OptCCArgs (Arg, GetArg (&I, 3));
+                        
+                        /* Get argument succeeding -Wc switch */
+                        const char* WcSubArgs = GetArg (&I, 3); 
+                        
+                        /* Remember -Wc sub arguments in cc65 arg struct */ 
+                        OptCCArgs (Arg, WcSubArgs);
+                        /* Check for isolated -E switch given after -Wc*/
+                        if (!strcmp("-E", WcSubArgs)){
+                            /*If both -Wc and -E given, then prevent assembling 
+                              and linking */
+                            DoAssemble = 0;
+                            DoLink     = 0;
+                        }else{
+                            /* Check for -E beeing part of comma separated arg 
+                            list given after -Wc*/
+                            if ( (NULL!=strstr(WcSubArgs, "-E,")) || 
+                                 (NULL!=strstr(WcSubArgs, ",-E"))){
+                                DoAssemble = 0;
+                                DoLink     = 0;
+                            }
+                        }
                     } else if (Arg[2] == 'l' && Arg[3] == '\0') {
                         /* -Wl: Pass options to linker */
                         OptLdArgs (Arg, GetArg (&I, 3));

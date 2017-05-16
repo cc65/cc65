@@ -1229,7 +1229,7 @@ parameter with the <tt/#pragma/.
   </verb></tscreen>
 
 
-<sect1><tt>#pragma wrapped-call (&lt;push&rt;, &lt;name&gt;, &lt;identifier&gt;)</tt><label id="pragma-trampoline"><p>
+<sect1><tt>#pragma wrapped-call (&lt;push&rt;, &lt;name&gt;, &lt;identifier&gt;)</tt><label id="pragma-wrapped-call"><p>
 
   This pragma sets a wrapper for functions, often used for trampolines.
   The name is either a function returning void and taking no parameters,

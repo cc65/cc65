@@ -1209,31 +1209,6 @@ parameter with the <tt/#pragma/.
   The <tt/#pragma/ understands the push and pop parameters as explained above.
 
 
-<sect1><tt>#pragma trampoline (&lt;push&rt;, &lt;name&gt;, &lt;value&gt;)</tt><label id="pragma-trampoline"><p>
-
-  This pragma sets a trampoline for functions. The name is either
-  a function returning void and taking no parameters, or the address
-  of an array in memory (for a RAM trampoline). The value is an
-  8-bit number that's set to tmp4.
-
-  The address of the function is passed in ptr4.
-
-  This is useful for example with banked memory, to automatically
-  switch banks to where this function resides, and then restore
-  the bank when it returns.
-
-  The <tt/#pragma/ requires the push and pop parameters as explained above.
-
-  Example:
-  <tscreen><verb>
-	void mytrampoline(void);
-
-        #pragma trampoline (push, mytrampoline, 0)
-        void somefunc(void);
-        #pragma trampoline (pop)
-  </verb></tscreen>
-
-
 <sect1><tt>#pragma warn (name, [push,] on|off)</tt><label id="pragma-warn"><p>
 
   Switch compiler warnings on or off. "name" is the name of a warning (see the
@@ -1251,6 +1226,31 @@ parameter with the <tt/#pragma/.
             return 0;
         }
         #pragma warn (unused-param, pop)
+  </verb></tscreen>
+
+
+<sect1><tt>#pragma wrapped-call (&lt;push&rt;, &lt;name&gt;, &lt;identifier&gt;)</tt><label id="pragma-trampoline"><p>
+
+  This pragma sets a wrapper for functions, often used for trampolines.
+  The name is either a function returning void and taking no parameters,
+  or the address of an array in memory (for a RAM trampoline). The identifier
+  is an 8-bit number that's set to tmp4.
+
+  The address of the function is passed in ptr4.
+
+  This is useful for example with banked memory, to automatically
+  switch banks to where this function resides, and then restore
+  the bank when it returns.
+
+  The <tt/#pragma/ requires the push and pop parameters as explained above.
+
+  Example:
+  <tscreen><verb>
+	void mytrampoline(void);
+
+        #pragma wrapped-call (push, mytrampoline, 0)
+        void somefunc(void);
+        #pragma wrapped-call (pop)
   </verb></tscreen>
 
 

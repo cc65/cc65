@@ -23,21 +23,21 @@ void func3() {
 }
 
 unsigned char array[30];
-#pragma trampoline(push, array, 0)
-#pragma trampoline(pop)
+#pragma wrapped-call(push, array, 0)
+#pragma wrapped-call(pop)
 
-#pragma trampoline(push, trampoline_inc, 0)
+#pragma wrapped-call(push, trampoline_inc, 0)
 
 void func2() {
 	func3();
 }
 
-#pragma trampoline(push, trampoline_set, 4)
+#pragma wrapped-call(push, trampoline_set, 4)
 
 void func1(void);
 
-#pragma trampoline(pop)
-#pragma trampoline(pop)
+#pragma wrapped-call(pop)
+#pragma wrapped-call(pop)
 
 void func1() {
 	func2();

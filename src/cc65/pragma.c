@@ -88,8 +88,8 @@ typedef enum {
     PRAGMA_SIGNEDCHARS,                                 /* obsolete */
     PRAGMA_STATIC_LOCALS,
     PRAGMA_STATICLOCALS,                                /* obsolete */
-    PRAGMA_TRAMPOLINE,
     PRAGMA_WARN,
+    PRAGMA_WRAPPED_CALL,
     PRAGMA_WRITABLE_STRINGS,
     PRAGMA_ZPSYM,
     PRAGMA_COUNT
@@ -124,8 +124,8 @@ static const struct Pragma {
     { "signedchars",            PRAGMA_SIGNEDCHARS        },      /* obsolete */
     { "static-locals",          PRAGMA_STATIC_LOCALS      },
     { "staticlocals",           PRAGMA_STATICLOCALS       },      /* obsolete */
-    { "trampoline",		PRAGMA_TRAMPOLINE	  },
     { "warn",                   PRAGMA_WARN               },
+    { "wrapped-call",		PRAGMA_WRAPPED_CALL	  },
     { "writable-strings",       PRAGMA_WRITABLE_STRINGS   },
     { "zpsym",                  PRAGMA_ZPSYM              },
 };
@@ -449,8 +449,8 @@ ExitPoint:
 }
 
 
-static void TrampolinePragma (StrBuf* B)
-/* Handle the trampoline pragma */
+static void WrappedCallPragma (StrBuf* B)
+/* Handle the wrapped-call pragma */
 {
     StrBuf      S = AUTO_STRBUF_INITIALIZER;
     const char *Name;
@@ -490,17 +490,17 @@ static void TrampolinePragma (StrBuf* B)
     /* Skip the following comma */
     if (!GetComma (B)) {
         /* Error already flagged by GetComma */
-        Error ("Value required for trampoline data");
+        Error ("Value required for wrapped-call identifier");
         goto ExitPoint;
     }
 
     if (!GetNumber (B, &Val)) {
-        Error ("Value required for trampoline data");
+        Error ("Value required for wrapped-call identifier");
         goto ExitPoint;
     }
 
     if (Val < 0 || Val > 255) {
-        Error ("Value must be between 0-255");
+        Error ("Identifier must be between 0-255");
         goto ExitPoint;
     }
 
@@ -517,7 +517,7 @@ static void TrampolinePragma (StrBuf* B)
     } else {
 
         /* Segment name is invalid */
-        Error ("Trampoline does not exist or is not a function or array");
+        Error ("Wrapped-call target does not exist or is not a function or array");
 
     }
 
@@ -872,8 +872,8 @@ static void ParsePragma (void)
             FlagPragma (&B, &StaticLocals);
             break;
 
-	case PRAGMA_TRAMPOLINE:
-	    TrampolinePragma(&B);
+	case PRAGMA_WRAPPED_CALL:
+	    WrappedCallPragma(&B);
 	    break;
 
         case PRAGMA_WARN:

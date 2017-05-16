@@ -156,7 +156,21 @@ static char* TargetLib  = 0;
 #  endif
 #endif
 
+/*****************************************************************************/
+/*                        Credential functions		                         */
+/*****************************************************************************/
+void DisableAssembling(void){
+	DoAssemble = 0;
+}
 
+void DisableLinking(void){
+	DoLink = 0;
+}
+
+void DisableAssemblingAndLinking(void){
+	DisableAssembling();
+	DisableLinking();
+}
 
 /*****************************************************************************/
 /*                        Command structure handling                         */
@@ -1399,8 +1413,7 @@ int main (int argc, char* argv [])
 
                 case 'S':
                     /* Dont assemble and link the created files */
-                    DoAssemble = 0;
-                    DoLink     = 0;
+                    DisableAssemblingAndLinking();
                     break;
 
                 case 'T':
@@ -1416,37 +1429,16 @@ int main (int argc, char* argv [])
                 case 'E':
                     /*Forward -E to compiler*/
                     CmdAddArg (&CC65, Arg);  
-                    DoAssemble = 0;
-                    DoLink     = 0;
+                    DisableAssemblingAndLinking();
                     break;
                 case 'W':
                     if (Arg[2] == 'a' && Arg[3] == '\0') {
                         /* -Wa: Pass options to assembler */
                         OptAsmArgs (Arg, GetArg (&I, 3));
-                    }   
-                    else if (Arg[2] == 'c' && Arg[3] == '\0') {
+                    } else if (Arg[2] == 'c' && Arg[3] == '\0') {
                         /* -Wc: Pass options to compiler */
-                        
-                        /* Get argument succeeding -Wc switch */
-                        const char* WcSubArgs = GetArg (&I, 3); 
-                        
                         /* Remember -Wc sub arguments in cc65 arg struct */ 
-                        OptCCArgs (Arg, WcSubArgs);
-                        /* Check for isolated -E switch given after -Wc*/
-                        if (!strcmp("-E", WcSubArgs)){
-                            /*If both -Wc and -E given, then prevent assembling 
-                              and linking */
-                            DoAssemble = 0;
-                            DoLink     = 0;
-                        }else{
-                            /* Check for -E beeing part of comma separated arg 
-                            list given after -Wc*/
-                            if ( (NULL!=strstr(WcSubArgs, "-E,")) || 
-                                 (NULL!=strstr(WcSubArgs, ",-E"))){
-                                DoAssemble = 0;
-                                DoLink     = 0;
-                            }
-                        }
+                        OptCCArgs (Arg, GetArg (&I, 3));
                     } else if (Arg[2] == 'l' && Arg[3] == '\0') {
                         /* -Wl: Pass options to linker */
                         OptLdArgs (Arg, GetArg (&I, 3));
@@ -1458,7 +1450,7 @@ int main (int argc, char* argv [])
 
                 case 'c':
                     /* Don't link the resulting files */
-                    DoLink = 0;
+                    DisableLinking();
                     break;
 
                 case 'd':

@@ -157,19 +157,19 @@ static char* TargetLib  = 0;
 #endif
 
 /*****************************************************************************/
-/*                        Credential functions		                         */
+/*                        Credential functions                               */
 /*****************************************************************************/
 void DisableAssembling(void){
-	DoAssemble = 0;
+    DoAssemble = 0;
 }
 
 void DisableLinking(void){
-	DoLink = 0;
+    DoLink = 0;
 }
 
 void DisableAssemblingAndLinking(void){
-	DisableAssembling();
-	DisableLinking();
+    DisableAssembling();
+    DisableLinking();
 }
 
 /*****************************************************************************/

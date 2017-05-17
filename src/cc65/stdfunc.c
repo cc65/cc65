@@ -1245,9 +1245,8 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             AddCodeLine ("ldy #$FF");
             g_defcodelabel (L);
             AddCodeLine ("iny");
-            AddCodeLine ("lda %s,y", ED_GetLabelName (&Arg, 0));
+            AddCodeLine ("ldx %s,y", ED_GetLabelName (&Arg, 0));
             AddCodeLine ("bne %s", LocalLabelName (L));
-            AddCodeLine ("tax");
             AddCodeLine ("tya");
 
             /* The function result is an rvalue in the primary register */

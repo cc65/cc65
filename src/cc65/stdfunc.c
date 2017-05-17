@@ -284,7 +284,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             Label = GetLocalLabel ();
 
             /* Generate memcpy code */
-            if (Arg3.Expr.IVal <= 127) {
+            if (Arg3.Expr.IVal <= 129) {
 
                 AddCodeLine ("ldy #$%02X", (unsigned char) (Arg3.Expr.IVal-1));
                 g_defcodelabel (Label);
@@ -355,7 +355,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             Label = GetLocalLabel ();
 
             /* Generate memcpy code */
-            if (Arg3.Expr.IVal <= 127 && !AllowOneIndex) {
+            if (Arg3.Expr.IVal <= 129 && !AllowOneIndex) {
 
                 if (Offs == 0) {
                     AddCodeLine ("ldy #$%02X", (unsigned char) (Offs + Arg3.Expr.IVal - 1));
@@ -433,7 +433,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             Label = GetLocalLabel ();
 
             /* Generate memcpy code */
-            if (Arg3.Expr.IVal <= 127 && !AllowOneIndex) {
+            if (Arg3.Expr.IVal <= 129 && !AllowOneIndex) {
 
                 if (Offs == 0) {
                     AddCodeLine ("ldy #$%02X", (unsigned char) (Arg3.Expr.IVal - 1));
@@ -499,7 +499,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             /* Generate memcpy code */
             AddCodeLine ("sta ptr1");
             AddCodeLine ("stx ptr1+1");
-            if (Arg3.Expr.IVal <= 127) {
+            if (Arg3.Expr.IVal <= 129) {
                 AddCodeLine ("ldy #$%02X", (unsigned char) (Arg3.Expr.IVal - 1));
                 g_defcodelabel (Label);
                 AddCodeLine ("lda (sp),y");
@@ -635,7 +635,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             Label = GetLocalLabel ();
 
             /* Generate memset code */
-            if (Arg3.Expr.IVal <= 127) {
+            if (Arg3.Expr.IVal <= 129) {
 
                 AddCodeLine ("ldy #$%02X", (unsigned char) (Arg3.Expr.IVal-1));
                 AddCodeLine ("lda #$%02X", (unsigned char) Arg2.Expr.IVal);
@@ -720,7 +720,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             /* Generate code */
             AddCodeLine ("sta ptr1");
             AddCodeLine ("stx ptr1+1");
-            if (Arg3.Expr.IVal <= 127) {
+            if (Arg3.Expr.IVal <= 129) {
                 AddCodeLine ("ldy #$%02X", (unsigned char) (Arg3.Expr.IVal-1));
                 AddCodeLine ("lda #$%02X", (unsigned char) Arg2.Expr.IVal);
                 g_defcodelabel (Label);

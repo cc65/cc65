@@ -125,7 +125,7 @@ static const struct Pragma {
     { "static-locals",          PRAGMA_STATIC_LOCALS      },
     { "staticlocals",           PRAGMA_STATICLOCALS       },      /* obsolete */
     { "warn",                   PRAGMA_WARN               },
-    { "wrapped-call",		PRAGMA_WRAPPED_CALL	  },
+    { "wrapped-call",           PRAGMA_WRAPPED_CALL	  },
     { "writable-strings",       PRAGMA_WRITABLE_STRINGS   },
     { "zpsym",                  PRAGMA_ZPSYM              },
 };

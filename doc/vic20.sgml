@@ -182,13 +182,14 @@ No VIC1011 drivers are currently available for the VIC20.
 <sect>Limitations<p>
 
 
-
-<sect>Other hints<p>
-
-
 <sect1>Escape code<p>
 
-For an Esc, pressing CTRL and the <tt/[/ key is not supported.
+The CTRL key cannot be used to type most control characters,
+entering an Esc is not possible.
+
+
+
+<sect>Other hints<p>
 
 
 <sect1>Passing arguments to the program<p>

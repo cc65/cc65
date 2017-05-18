@@ -145,6 +145,7 @@
     <ClInclude Include="cc65\typecmp.h" />
     <ClInclude Include="cc65\typeconv.h" />
     <ClInclude Include="cc65\util.h" />
+    <ClInclude Include="cc65\wrappedcall.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cc65\anonname.c" />
@@ -218,6 +219,7 @@
     <ClCompile Include="cc65\typecmp.c" />
     <ClCompile Include="cc65\typeconv.c" />
     <ClCompile Include="cc65\util.c" />
+    <ClCompile Include="cc65\wrappedcall.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

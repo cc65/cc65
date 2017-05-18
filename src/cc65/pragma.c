@@ -517,7 +517,7 @@ static void WrappedCallPragma (StrBuf* B)
     } else {
 
         /* Segment name is invalid */
-        Error ("Wrapped-call target does not exist or is not a function or array");
+        Error ("Wrapped-call target does not exist or is not a function");
 
     }
 

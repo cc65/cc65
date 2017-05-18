@@ -1,5 +1,5 @@
 /*
-  !!DESCRIPTION!! trampoline pragma
+  !!DESCRIPTION!! wrapped-call pragma used for trampolines
   !!ORIGIN!!      cc65 regression tests
   !!LICENCE!!     Public Domain
   !!AUTHOR!!      Lauri Kasanen

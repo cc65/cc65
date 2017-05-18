@@ -51,7 +51,7 @@
 #include "scanstrbuf.h"
 #include "symtab.h"
 #include "pragma.h"
-#include "trampoline.h"
+#include "wrappedcall.h"
 
 
 
@@ -468,7 +468,7 @@ static void WrappedCallPragma (StrBuf* B)
             break;
 
         case PP_POP:
-            PopTrampoline();
+            PopWrappedCall();
 
             /* Done */
             goto ExitPoint;
@@ -511,7 +511,7 @@ static void WrappedCallPragma (StrBuf* B)
     /* Check if the name is valid */
     if (Entry && Entry->Flags & (SC_FUNC | SC_STORAGE)) {
 
-        PushTrampoline(Entry, Val);
+        PushWrappedCall(Entry, Val);
         Entry->Flags |= SC_REF;
 
     } else {

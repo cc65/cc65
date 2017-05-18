@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                trampoline.c                               */
+/*                                wrappedcall.c                              */
 /*                                                                           */
-/*                          Trampoline management                            */
+/*                          WrappedCall management                           */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -44,7 +44,7 @@
 /* cc65 */
 #include "codeent.h"
 #include "error.h"
-#include "trampoline.h"
+#include "wrappedcall.h"
 
 
 
@@ -53,8 +53,8 @@
 /*****************************************************************************/
 
 
-/* Trampolines */
-static IntPtrStack Trampolines;
+/* WrappedCalls */
+static IntPtrStack WrappedCalls;
 
 
 
@@ -64,39 +64,39 @@ static IntPtrStack Trampolines;
 
 
 
-void PushTrampoline (void *Ptr, unsigned char Val)
-/* Push the current trampoline */
+void PushWrappedCall (void *Ptr, unsigned char Val)
+/* Push the current WrappedCall */
 {
-    if (IPS_IsFull (&Trampolines)) {
-        Error ("Trampoline stack overflow");
+    if (IPS_IsFull (&WrappedCalls)) {
+        Error ("WrappedCall stack overflow");
     } else {
-        IPS_Push (&Trampolines, Val, Ptr);
+        IPS_Push (&WrappedCalls, Val, Ptr);
     }
 }
 
 
 
-void PopTrampoline (void)
-/* Remove the current trampoline */
+void PopWrappedCall (void)
+/* Remove the current WrappedCall */
 {
-    if (IPS_GetCount (&Trampolines) < 1) {
-        Error ("Trampoline stack is empty");
+    if (IPS_GetCount (&WrappedCalls) < 1) {
+        Error ("WrappedCall stack is empty");
     } else {
-        IPS_Drop (&Trampolines);
+        IPS_Drop (&WrappedCalls);
     }
 }
 
 
 
-void GetTrampoline (void **Ptr, unsigned char *Val)
-/* Get the current trampoline */
+void GetWrappedCall (void **Ptr, unsigned char *Val)
+/* Get the current WrappedCall */
 {
-    if (IPS_GetCount (&Trampolines) < 1) {
+    if (IPS_GetCount (&WrappedCalls) < 1) {
         *Ptr = NULL;
         *Val = 0;
     } else {
         long Temp;
-        IPS_Get (&Trampolines, &Temp, Ptr);
+        IPS_Get (&WrappedCalls, &Temp, Ptr);
         *Val = Temp;
     }
 }

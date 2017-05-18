@@ -67,8 +67,8 @@ struct FuncDesc {
     unsigned            ParamCount;     /* Number of parameters              */
     unsigned            ParamSize;      /* Size of the parameters            */
     struct SymEntry*    LastParam;      /* Pointer to last parameter         */
-    struct SymEntry*    Trampoline;     /* Pointer to the trampoline         */
-    unsigned char       TrampolineData; /* The trampoline's user data        */
+    struct SymEntry*    WrappedCall;     /* Pointer to the WrappedCall         */
+    unsigned char       WrappedCallData; /* The WrappedCall's user data        */
 };
 
 

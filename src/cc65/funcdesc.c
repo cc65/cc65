@@ -60,8 +60,8 @@ FuncDesc* NewFuncDesc (void)
     F->ParamCount = 0;
     F->ParamSize  = 0;
     F->LastParam  = 0;
-    F->Trampoline = 0;
-    F->TrampolineData = 0;
+    F->WrappedCall = 0;
+    F->WrappedCallData = 0;
 
     /* Return the new struct */
     return F;

@@ -58,7 +58,7 @@
 #include "scanner.h"
 #include "standard.h"
 #include "symtab.h"
-#include "trampoline.h"
+#include "wrappedcall.h"
 #include "typeconv.h"
 
 
@@ -1316,8 +1316,8 @@ static FuncDesc* ParseFuncDecl (void)
 {
     unsigned Offs;
     SymEntry* Sym;
-    SymEntry* Trampoline;
-    unsigned char TrampolineData;
+    SymEntry* WrappedCall;
+    unsigned char WrappedCallData;
 
     /* Create a new function descriptor */
     FuncDesc* F = NewFuncDesc ();
@@ -1383,11 +1383,11 @@ static FuncDesc* ParseFuncDecl (void)
     /* Leave the lexical level remembering the symbol tables */
     RememberFunctionLevel (F);
 
-    /* Did we have a trampoline for this function? */
-    GetTrampoline((void **) &Trampoline, &TrampolineData);
-    if (Trampoline) {
-        F->Trampoline = Trampoline;
-        F->TrampolineData = TrampolineData;
+    /* Did we have a WrappedCall for this function? */
+    GetWrappedCall((void **) &WrappedCall, &WrappedCallData);
+    if (WrappedCall) {
+        F->WrappedCall = WrappedCall;
+        F->WrappedCallData = WrappedCallData;
     }
 
     /* Return the function descriptor */
@@ -1471,13 +1471,13 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
                 Qualifiers &= ~T_QUAL_FASTCALL;
             }
 
-            /* Was there a previous entry? If so, copy trampoline info from it */
+            /* Was there a previous entry? If so, copy WrappedCall info from it */
             PrevEntry = FindGlobalSym (D->Ident);
             if (PrevEntry && PrevEntry->Flags & SC_FUNC) {
                 FuncDesc* D = PrevEntry->V.F.Func;
-                if (D->Trampoline && !F->Trampoline) {
-                    F->Trampoline = D->Trampoline;
-                    F->TrampolineData = D->TrampolineData;
+                if (D->WrappedCall && !F->WrappedCall) {
+                    F->WrappedCall = D->WrappedCall;
+                    F->WrappedCallData = D->WrappedCallData;
                 }
             }
 

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                trampoline.h                               */
+/*                                wrappedcall.h                              */
 /*                                                                           */
-/*                            Trampoline management                          */
+/*                            Wrapped-call management                        */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -30,8 +30,8 @@
 
 
 
-#ifndef TRAMPOLINE_H
-#define TRAMPOLINE_H
+#ifndef WRAPPEDCALL_H
+#define WRAPPEDCALL_H
 
 
 
@@ -50,16 +50,16 @@
 
 
 
-void PushTrampoline (void *Ptr, unsigned char Val);
-/* Push the current trampoline */
+void PushWrappedCall (void *Ptr, unsigned char Val);
+/* Push the current WrappedCall */
 
-void PopTrampoline (void);
-/* Pop the current trampoline */
+void PopWrappedCall (void);
+/* Pop the current WrappedCall */
 
-void GetTrampoline (void **Ptr, unsigned char *Val);
-/* Get the current trampoline, if any */
+void GetWrappedCall (void **Ptr, unsigned char *Val);
+/* Get the current WrappedCall, if any */
 
 
-/* End of trampoline.h */
+/* End of wrappedcall.h */
 
 #endif

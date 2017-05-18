@@ -536,8 +536,8 @@ static void FunctionCall (ExprDesc* Expr)
     /* Special handling for function pointers */
     if (IsFuncPtr) {
 
-        if (Func->Trampoline) {
-            Warning("Calling a trampolined function via a pointer, trampoline will not be used");
+        if (Func->WrappedCall) {
+            Warning("Calling a wrapped function via a pointer, wrapped-call will not be used");
         }
 
         /* If the function is not a fastcall function, load the pointer to
@@ -588,12 +588,12 @@ static void FunctionCall (ExprDesc* Expr)
     } else {
 
         /* Normal function */
-        if (Func->Trampoline) {
+        if (Func->WrappedCall) {
             char tmp[64];
             StrBuf S = AUTO_STRBUF_INITIALIZER;
 
-            /* Store the trampoline data in tmp4 */
-            sprintf(tmp, "ldy #%u", Func->TrampolineData);
+            /* Store the WrappedCall data in tmp4 */
+            sprintf(tmp, "ldy #%u", Func->WrappedCallData);
             SB_AppendStr (&S, tmp);
             g_asmcode (&S);
             SB_Clear(&S);
@@ -625,7 +625,7 @@ static void FunctionCall (ExprDesc* Expr)
 
             SB_Done (&S);
 
-            g_call (TypeOf (Expr->Type), Func->Trampoline->Name, ParamSize);
+            g_call (TypeOf (Expr->Type), Func->WrappedCall->Name, ParamSize);
         } else {
             g_call (TypeOf (Expr->Type), (const char*) Expr->Name, ParamSize);
         }

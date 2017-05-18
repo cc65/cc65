@@ -1229,6 +1229,30 @@ parameter with the <tt/#pragma/.
   </verb></tscreen>
 
 
+<sect1><tt>#pragma wrapped-call (&lt;push&rt;, &lt;name&gt;, &lt;identifier&gt;)</tt><label id="pragma-wrapped-call"><p>
+
+  This pragma sets a wrapper for functions, often used for trampolines.
+  The name is a function returning void and taking no parameters.
+  The identifier is an 8-bit number that's set to tmp4.
+
+  The address of the function is passed in ptr4.
+
+  This is useful for example with banked memory, to automatically
+  switch banks to where this function resides, and then restore
+  the bank when it returns.
+
+  The <tt/#pragma/ requires the push and pop parameters as explained above.
+
+  Example:
+  <tscreen><verb>
+	void mytrampoline(void);
+
+        #pragma wrapped-call (push, mytrampoline, 0)
+        void somefunc(void);
+        #pragma wrapped-call (pop)
+  </verb></tscreen>
+
+
 <sect1><tt>#pragma writable-strings ([push,] on|off)</tt><label id="pragma-writable-strings"><p>
 
   Changes the storage location of string literals. For historical reasons,

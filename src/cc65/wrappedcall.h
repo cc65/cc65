@@ -1,15 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                funcdesc.c                                 */
+/*                                wrappedcall.h                              */
 /*                                                                           */
-/*           Function descriptor structure for the cc65 C compiler           */
+/*                            Wrapped-call management                        */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2017, Mega Cat Studios                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,12 +30,18 @@
 
 
 
+#ifndef WRAPPEDCALL_H
+#define WRAPPEDCALL_H
+
+
+
+#include <stdio.h>
+
 /* common */
-#include "xmalloc.h"
+#include "attrib.h"
 
 /* cc65 */
-#include "funcdesc.h"
-
+#include "opcodes.h"
 
 
 /*****************************************************************************/
@@ -47,31 +50,16 @@
 
 
 
-FuncDesc* NewFuncDesc (void)
-/* Create a new symbol table with the given name */
-{
-    /* Create a new function descriptor */
-    FuncDesc* F = (FuncDesc*) xmalloc (sizeof (FuncDesc));
+void PushWrappedCall (void *Ptr, unsigned char Val);
+/* Push the current WrappedCall */
 
-    /* Nullify the fields */
-    F->Flags      = 0;
-    F->SymTab     = 0;
-    F->TagTab     = 0;
-    F->ParamCount = 0;
-    F->ParamSize  = 0;
-    F->LastParam  = 0;
-    F->WrappedCall = 0;
-    F->WrappedCallData = 0;
+void PopWrappedCall (void);
+/* Pop the current WrappedCall */
 
-    /* Return the new struct */
-    return F;
-}
+void GetWrappedCall (void **Ptr, unsigned char *Val);
+/* Get the current WrappedCall, if any */
 
 
+/* End of wrappedcall.h */
 
-void FreeFuncDesc (FuncDesc* F)
-/* Free a function descriptor */
-{
-    /* Free the structure */
-    xfree (F);
-}
+#endif

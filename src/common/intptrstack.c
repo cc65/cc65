@@ -1,15 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                funcdesc.c                                 */
+/*                                intptrstack.c                              */
 /*                                                                           */
-/*           Function descriptor structure for the cc65 C compiler           */
+/*                  Integer+ptr stack used for program settings              */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2017, Mega Cat Studios                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -34,10 +31,8 @@
 
 
 /* common */
-#include "xmalloc.h"
-
-/* cc65 */
-#include "funcdesc.h"
+#include "check.h"
+#include "intptrstack.h"
 
 
 
@@ -47,31 +42,49 @@
 
 
 
-FuncDesc* NewFuncDesc (void)
-/* Create a new symbol table with the given name */
+void IPS_Get (const IntPtrStack* S, long *Val, void **Ptr)
+/* Get the value on top of an int stack */
 {
-    /* Create a new function descriptor */
-    FuncDesc* F = (FuncDesc*) xmalloc (sizeof (FuncDesc));
-
-    /* Nullify the fields */
-    F->Flags      = 0;
-    F->SymTab     = 0;
-    F->TagTab     = 0;
-    F->ParamCount = 0;
-    F->ParamSize  = 0;
-    F->LastParam  = 0;
-    F->WrappedCall = 0;
-    F->WrappedCallData = 0;
-
-    /* Return the new struct */
-    return F;
+    PRECONDITION (S->Count > 0);
+    if (Val) *Val = S->Stack[S->Count-1].val;
+    if (Ptr) *Ptr = S->Stack[S->Count-1].ptr;
 }
 
 
 
-void FreeFuncDesc (FuncDesc* F)
-/* Free a function descriptor */
+void IPS_Set (IntPtrStack* S, long Val, void *Ptr)
+/* Set the value on top of an int stack */
 {
-    /* Free the structure */
-    xfree (F);
+    PRECONDITION (S->Count > 0);
+    S->Stack[S->Count-1].val = Val;
+    S->Stack[S->Count-1].ptr = Ptr;
+}
+
+
+
+void IPS_Drop (IntPtrStack* S)
+/* Drop a value from an int stack */
+{
+    PRECONDITION (S->Count > 0);
+    --S->Count;
+}
+
+
+
+void IPS_Push (IntPtrStack* S, long Val, void *Ptr)
+/* Push a value onto an int stack */
+{
+    PRECONDITION (S->Count < sizeof (S->Stack) / sizeof (S->Stack[0]));
+    S->Stack[S->Count].val = Val;
+    S->Stack[S->Count++].ptr = Ptr;
+}
+
+
+
+void IPS_Pop (IntPtrStack* S, long *Val, void **Ptr)
+/* Pop a value from an int stack */
+{
+    PRECONDITION (S->Count > 0);
+    if (Val) *Val = S->Stack[--S->Count].val;
+    if (Ptr) *Ptr = S->Stack[S->Count].ptr;
 }

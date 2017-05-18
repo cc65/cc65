@@ -51,6 +51,7 @@
 #include "scanstrbuf.h"
 #include "symtab.h"
 #include "pragma.h"
+#include "wrappedcall.h"
 
 
 
@@ -88,6 +89,7 @@ typedef enum {
     PRAGMA_STATIC_LOCALS,
     PRAGMA_STATICLOCALS,                                /* obsolete */
     PRAGMA_WARN,
+    PRAGMA_WRAPPED_CALL,
     PRAGMA_WRITABLE_STRINGS,
     PRAGMA_ZPSYM,
     PRAGMA_COUNT
@@ -123,6 +125,7 @@ static const struct Pragma {
     { "static-locals",          PRAGMA_STATIC_LOCALS      },
     { "staticlocals",           PRAGMA_STATICLOCALS       },      /* obsolete */
     { "warn",                   PRAGMA_WARN               },
+    { "wrapped-call",           PRAGMA_WRAPPED_CALL       },
     { "writable-strings",       PRAGMA_WRITABLE_STRINGS   },
     { "zpsym",                  PRAGMA_ZPSYM              },
 };
@@ -437,6 +440,84 @@ static void SegNamePragma (StrBuf* B, segment_t Seg)
 
         /* Segment name is invalid */
         Error ("Illegal segment name: `%s'", Name);
+
+    }
+
+ExitPoint:
+    /* Call the string buf destructor */
+    SB_Done (&S);
+}
+
+
+static void WrappedCallPragma (StrBuf* B)
+/* Handle the wrapped-call pragma */
+{
+    StrBuf      S = AUTO_STRBUF_INITIALIZER;
+    const char *Name;
+    long Val;
+    SymEntry *Entry;
+
+    /* Check for the "push" or "pop" keywords */
+    switch (ParsePushPop (B)) {
+
+        case PP_NONE:
+            Error ("Push or pop required");
+            break;
+
+        case PP_PUSH:
+            break;
+
+        case PP_POP:
+            PopWrappedCall();
+
+            /* Done */
+            goto ExitPoint;
+
+        case PP_ERROR:
+            /* Bail out */
+            goto ExitPoint;
+
+        default:
+            Internal ("Invalid result from ParsePushPop");
+
+    }
+
+    /* A symbol argument must follow */
+    if (!SB_GetSym (B, &S, NULL)) {
+        goto ExitPoint;
+    }
+
+    /* Skip the following comma */
+    if (!GetComma (B)) {
+        /* Error already flagged by GetComma */
+        Error ("Value required for wrapped-call identifier");
+        goto ExitPoint;
+    }
+
+    if (!GetNumber (B, &Val)) {
+        Error ("Value required for wrapped-call identifier");
+        goto ExitPoint;
+    }
+
+    if (Val < 0 || Val > 255) {
+        Error ("Identifier must be between 0-255");
+        goto ExitPoint;
+    }
+
+    /* Get the string */
+    Name = SB_GetConstBuf (&S);
+    Entry = FindSym(Name);
+
+    /* Check if the name is valid */
+    if (Entry && Entry->Flags & SC_FUNC) {
+
+        PushWrappedCall(Entry, Val);
+        Entry->Flags |= SC_REF;
+
+    } else {
+
+        /* Segment name is invalid */
+        Error ("Wrapped-call target does not exist or is not a function");
 
     }
 
@@ -790,6 +871,10 @@ static void ParsePragma (void)
         case PRAGMA_STATIC_LOCALS:
             FlagPragma (&B, &StaticLocals);
             break;
+
+	case PRAGMA_WRAPPED_CALL:
+	    WrappedCallPragma(&B);
+	    break;
 
         case PRAGMA_WARN:
             WarnPragma (&B);

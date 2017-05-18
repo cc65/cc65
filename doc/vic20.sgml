@@ -2,11 +2,11 @@
 
 <article>
 
-<title>Commodore VIC20 (aka VC20) specific information for cc65
+<title>Commodore VIC20 (aka VC20 aka VIC1001) specific information for cc65
 <author>
 <url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:polluks@sdf.lonestar.org" name="Stefan A. Haubenthal">
-<date>2014-04-12
+<date>2017-05-18
 
 <abstract>
 An overview over the VIC20 runtime system as it is implemented for the cc65 C
@@ -188,7 +188,7 @@ No VIC1011 drivers are currently available for the VIC20.
 
 <sect1>Escape code<p>
 
-For an Esc, press CTRL and the <tt/[/ key.
+For an Esc, pressing CTRL and the <tt/[/ key is not supported.
 
 
 <sect1>Passing arguments to the program<p>
@@ -219,8 +219,7 @@ The program return code (low byte) is passed back to BASIC by use of the
 
 <sect1>Using extended memory<p>
 
-The extended memory at $A000 may be added to the heap by using the following
-code:
+BLK5 memory may be added to the heap by using the following code:
 
 <tscreen><verb>
     /* Check for the existence of RAM */

@@ -1232,9 +1232,8 @@ parameter with the <tt/#pragma/.
 <sect1><tt>#pragma wrapped-call (&lt;push&rt;, &lt;name&gt;, &lt;identifier&gt;)</tt><label id="pragma-wrapped-call"><p>
 
   This pragma sets a wrapper for functions, often used for trampolines.
-  The name is either a function returning void and taking no parameters,
-  or the address of an array in memory (for a RAM trampoline). The identifier
-  is an 8-bit number that's set to tmp4.
+  The name is a function returning void and taking no parameters.
+  The identifier is an 8-bit number that's set to tmp4.
 
   The address of the function is passed in ptr4.
 

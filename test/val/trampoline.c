@@ -22,10 +22,6 @@ void func3() {
 
 }
 
-unsigned char array[30];
-#pragma wrapped-call(push, array, 0)
-#pragma wrapped-call(pop)
-
 #pragma wrapped-call(push, trampoline_inc, 0)
 
 void func2() {

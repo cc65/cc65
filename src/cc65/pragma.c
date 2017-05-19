@@ -513,6 +513,7 @@ static void WrappedCallPragma (StrBuf* B)
 
         PushWrappedCall(Entry, Val);
         Entry->Flags |= SC_REF;
+        Entry->V.F.Func->Flags |= FD_CALL_WRAPPER;
 
     } else {
 

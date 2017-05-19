@@ -403,7 +403,8 @@ void GetFuncInfo (const char* Name, unsigned short* Use, unsigned short* Chg)
                 *Use = REG_Y;
             } else if (D->Flags & FD_CALL_WRAPPER) {
                 /* Wrappers may go to any functions, so mark them as using all
-                  registers */
+                ** registers.
+                */
                 *Use = REG_EAXY;
             } else if (D->ParamCount > 0 &&
                        (AutoCDecl ?

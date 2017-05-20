@@ -1,5 +1,5 @@
 /*
-  !!DESCRIPTION!! wrapped-call pragma w/ varags
+  !!DESCRIPTION!! wrapped-call pragma w/ variadic function
   !!ORIGIN!!      cc65 regression tests
   !!LICENCE!!     Public Domain
   !!AUTHOR!!      Lauri Kasanen

@@ -4,7 +4,7 @@
 <title>cc65 Users Guide
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:gregdk@users.sf.net" name="Greg King">
-<date>2017-03-21
+<date>2017-05-20
 
 <abstract>
 cc65 is a C compiler for 6502 targets. It supports several 6502 based home
@@ -1229,27 +1229,36 @@ parameter with the <tt/#pragma/.
   </verb></tscreen>
 
 
-<sect1><tt>#pragma wrapped-call (&lt;push&rt;, &lt;name&gt;, &lt;identifier&gt;)</tt><label id="pragma-wrapped-call"><p>
+<sect1><tt>#pragma wrapped-call (push, &lt;name&gt;, &lt;identifier&gt;)</tt><label id="pragma-wrapped-call"><p>
 
   This pragma sets a wrapper for functions, often used for trampolines.
-  The name is a function returning void and taking no parameters.
-  The identifier is an 8-bit number that's set to tmp4.
 
-  The address of the function is passed in ptr4.
+  The name is a function returning <tt/void/, and taking no parameters.
+  It must preserve the CPU's <tt/A/ and <tt/X/ registers if it wraps any
+  <tt/__fastcall__/ functions that have parameters.  It must preserve
+  the <tt/Y/ register if it wraps any variadic functions (they have "<tt/.../"
+  in their prototypes).
 
-  This is useful for example with banked memory, to automatically
-  switch banks to where this function resides, and then restore
-  the bank when it returns.
+  The identifier is an 8-bit number that's set into <tt/tmp4/.
 
-  The <tt/#pragma/ requires the push and pop parameters as explained above.
+  The address of a wrapped function is passed in <tt/ptr4/.  The wrapper can
+  call that function by using "<tt/jsr callptr4/".
+
+  This feature is useful, for example, with banked memory, to switch banks
+  automatically to where a wrapped function resides, and then to restore the
+  previous bank when it returns.
+
+  The <tt/#pragma/ requires the push or pop argument as explained above.
 
   Example:
   <tscreen><verb>
-	void mytrampoline(void);
+/* Note that this code can be in a header. */
+void mytrampoline(void); /* Doesn't corrupt __AX__ */
 
-        #pragma wrapped-call (push, mytrampoline, 0)
-        void somefunc(void);
-        #pragma wrapped-call (pop)
+#pragma wrapped-call (push, mytrampoline, 5)
+void somefunc1(void);
+void somefunc2(int, char *);
+#pragma wrapped-call (pop)
   </verb></tscreen>
 
 

@@ -734,7 +734,7 @@ static void Usage (void)
             "  -C name\t\t\tUse linker config file\n"
             "  -Cl\t\t\t\tMake local variables static\n"
             "  -D sym[=defn]\t\t\tDefine a preprocessor symbol\n"
-            "  -E Stop after the preprocessing stage\n"
+            "  -E\t\t\t\tStop after the preprocessing stage\n"
             "  -I dir\t\t\tSet a compiler include directory path\n"
             "  -L path\t\t\tSpecify a library search path\n"
             "  -Ln name\t\t\tCreate a VICE label file\n"

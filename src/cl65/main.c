@@ -156,21 +156,35 @@ static char* TargetLib  = 0;
 #  endif
 #endif
 
+
+
 /*****************************************************************************/
 /*                        Credential functions                               */
 /*****************************************************************************/
-void DisableAssembling(void){
+
+
+
+static void DisableAssembling (void)
+{
     DoAssemble = 0;
 }
 
-void DisableLinking(void){
+
+
+static void DisableLinking (void)
+{
     DoLink = 0;
 }
 
-void DisableAssemblingAndLinking(void){
+
+
+static void DisableAssemblingAndLinking (void)
+{
     DisableAssembling();
     DisableLinking();
 }
+
+
 
 /*****************************************************************************/
 /*                        Command structure handling                         */
@@ -1427,22 +1441,33 @@ int main (int argc, char* argv [])
                     break;
                 
                 case 'E':
-                    /*Forward -E to compiler*/
+                    /* Forward -E to compiler */
                     CmdAddArg (&CC65, Arg);  
                     DisableAssemblingAndLinking();
                     break;
+                    
                 case 'W':
-                    if (Arg[2] == 'a' && Arg[3] == '\0') {
-                        /* -Wa: Pass options to assembler */
-                        OptAsmArgs (Arg, GetArg (&I, 3));
-                    } else if (Arg[2] == 'c' && Arg[3] == '\0') {
-                        /* -Wc: Pass options to compiler */
-                        /* Remember -Wc sub arguments in cc65 arg struct */ 
-                        OptCCArgs (Arg, GetArg (&I, 3));
-                    } else if (Arg[2] == 'l' && Arg[3] == '\0') {
-                        /* -Wl: Pass options to linker */
-                        OptLdArgs (Arg, GetArg (&I, 3));
-                    } else {
+                    /* avoid && with'\0' in if clauses */
+                    if (Arg[3] == '\0') {
+                        switch (Arg[2]) {
+                        case 'a':
+                            /* -Wa: Pass options to assembler */
+                            OptAsmArgs (Arg, GetArg (&I, 3));
+                            break;
+                        case 'c':
+                            /* -Wc: Pass options to compiler 
+                            ** Remember -Wc sub arguments in cc65 arg struct 
+                            */
+                            OptCCArgs (Arg, GetArg (&I, 3));
+                            break;
+                        case 'l':
+                            /* -Wl: Pass options to linker */
+                            OptLdArgs (Arg, GetArg (&I, 3));
+                            break;
+                        default:
+                            break;
+                       }
+                    }else {
                         /* Anything else: Suppress warnings (compiler) */
                         CmdAddArg2 (&CC65, "-W", GetArg (&I, 2));
                     }

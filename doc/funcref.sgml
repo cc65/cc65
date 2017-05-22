@@ -3710,7 +3710,7 @@ fastcall function, so it may only be used in presence of a prototype.
 
 <quote>
 <descrip>
-<tag/Function/Check if a given character is a a white-space character.
+<tag/Function/Check if a given character is a white-space character.
 <tag/Header/<tt/<ref id="ctype.h" name="ctype.h">/
 <tag/Declaration/<tt/int __fastcall__ isspace (int c);/
 <tag/Description/The function returns a non zero value if the given argument

@@ -4282,6 +4282,12 @@ different:
 	some things may be done with both macro types, each type has special
 	usages. The types complement each other.
 
+<item>	Parentheses work differently from C macros.
+	The common practice of wrapping C macros in parentheses may cause
+	unintended problems here, such as accidentally implying an
+	indirect addressing mode. While the definition of a macro requires
+	parentheses around its argument list, when invoked they should not be included.
+
 </itemize>
 
 Let's look at a few examples to make the advantages and disadvantages
@@ -4314,19 +4320,17 @@ Macros with parameters may also be useful:
         DEBUG   "Assembling include file #3"
 </verb></tscreen>
 
-Note that, while formal parameters have to be placed in braces, this is
-not true for the actual parameters. Beware: Since the assembler cannot
-detect the end of one parameter, only the first token is used. If you
-don't like that, use classic macros instead:
+Note that, while formal parameters have to be placed in braces,
+the actual parameters used when invoking the macro should not use braces.
+The invoked parameters are separated by commas only, if parentheses are
+used by accident they will become part of the replaced token:
 
 <tscreen><verb>
-.macro  DEBUG   message
-        .out    message
-.endmacro
+.define COMBINE(ta,tb,tc) ta+tb*10+tc*100
+
+        COMBINE 5,6,7     ; 5+6*10+7*100 = 765 correct
+        COMBINE(5,6,7)    ; (5+6*10+7)*100 = 7200 incorrect!
 </verb></tscreen>
-
-(That is an example where a problem can be solved with both macro types).
-
 
 <sect1>Characters in macros<p>
 

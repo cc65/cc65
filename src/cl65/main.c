@@ -180,8 +180,8 @@ static void DisableLinking (void)
 
 static void DisableAssemblingAndLinking (void)
 {
-    DisableAssembling();
-    DisableLinking();
+    DisableAssembling ();
+    DisableLinking ();
 }
 
 
@@ -1427,7 +1427,7 @@ int main (int argc, char* argv [])
 
                 case 'S':
                     /* Dont assemble and link the created files */
-                    DisableAssemblingAndLinking();
+                    DisableAssemblingAndLinking ();
                     break;
 
                 case 'T':
@@ -1443,7 +1443,7 @@ int main (int argc, char* argv [])
                 case 'E':
                     /* Forward -E to compiler */
                     CmdAddArg (&CC65, Arg);  
-                    DisableAssemblingAndLinking();
+                    DisableAssemblingAndLinking ();
                     break;
                     
                 case 'W':
@@ -1465,9 +1465,10 @@ int main (int argc, char* argv [])
                             OptLdArgs (Arg, GetArg (&I, 3));
                             break;
                         default:
+                            UnknownOption (Arg);
                             break;
                        }
-                    }else {
+                    } else {
                         /* Anything else: Suppress warnings (compiler) */
                         CmdAddArg2 (&CC65, "-W", GetArg (&I, 2));
                     }
@@ -1475,7 +1476,7 @@ int main (int argc, char* argv [])
 
                 case 'c':
                     /* Don't link the resulting files */
-                    DisableLinking();
+                    DisableLinking ();
                     break;
 
                 case 'd':

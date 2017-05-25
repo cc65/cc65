@@ -15,7 +15,7 @@
 ;  Added value must be 1 (mod 2)
 ;  This guarantees max. period (2**32)
 ;  The lowest bits have poor entropy and
-;  exhibit easily detectabl patterns, so
+;  exhibit easily detectable patterns, so
 ;  only the upper bits 16-22 and 24-31 of the
 ;  4-byte state are returned.
 ;

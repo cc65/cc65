@@ -2,6 +2,7 @@
 ; Randum number generator
 ;
 ; Written and donated by Sidney Cadot - sidney@ch.twi.tudelft.nl
+; 2016-11-07, modified by Brad Smith
 ;
 ; May be distributed with the cc65 runtime using the same license.
 ;
@@ -13,10 +14,14 @@
 ;  Multiplier must be 1 (mod 4)
 ;  Added value must be 1 (mod 2)
 ;  This guarantees max. period (2**32)
-;  Bits 8-22 are returned (positive 2-byte int)
-;  where 0 is LSB, 31 is MSB.
-;  This is better as lower bits exhibit easily
-;  detectable patterns.
+;  The lowest bits have poor entropy and
+;  exhibit easily detectabl patterns, so
+;  only the upper bits 16-22 and 24-31 of the
+;  4-byte state are returned.
+;
+;  The best 8 bits, 24-31 are returned in the
+;  low byte A to provide the best entropy in the
+;  most commonly used part of the return value.
 ;
 
         .export         _rand, _srand

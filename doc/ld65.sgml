@@ -247,10 +247,11 @@ Here is a description of all of the command-line options:
   <tag><tt>-Ln</tt></tag>
 
   This option allows you to create a file that contains all global labels and
-  may be loaded into the VICE emulator using the <tt/ll/ (load label) command. You
+  may be loaded into the VICE emulator using the <tt/ll/ (load label) command
+  or into the Oricutron emulator using the <tt/sl/ (symbols load) command. You
   may use this to debug your code with VICE. Note: Older versions had some
   bugs in the label code. If you have problems, please get the latest <url
-  url="http://vice-emu.sourceforge.net/" name="VICE"> version.
+  url="http://vice-emu.sourceforge.net" name="VICE"> version.
 
 
   <label id="option-S">

@@ -4,13 +4,14 @@
 
 <title>Oric Telestrat-specific information for cc65
 <author>
-<url url="mailto:jede@oric.org" name="Jede">,<newline>
+<url url="mailto:jede@oric.org" name="Jede">
 
 <date>2017-01-22
 
 <abstract>
-An overview over the Telestrat (Telemon 3.0 : http://orix.oric.org) runtime system as it is implemented for the cc65 C
-compiler.)
+An overview over the Telestrat (<url name="Telemon 3.0"
+url="http://orix.oric.org">) runtime system as it is implemented for the
+cc65 C compiler.
 </abstract>
 
 <!-- Table of contents -->
@@ -32,25 +33,28 @@ information.
 
 <sect>Binary format<p>
 
-The standard binary output format generated the linker for the Telestrat target
-is a machine language program with a 20 bytes header described here : http://orix.oric.org/doku.php?id=orix:header 
+The standard binary output format generated the linker for the Telestrat
+target is a machine language program with a 20 bytes header described <url
+name="here" url="http://orix.oric.org/doku.php?id=orix:header">
 
-This header is used for Telemon 3.0. 
+This header is used for Telemon 3.0.
 
-Anyway, for Telemon 2.4, there is no file management, there is no TAPE routine in Telemon, there is no way to load a binary easily. 
+Anyway, for Telemon 2.4, there is no file management, there is no TAPE routine in Telemon, there is no way to load a binary easily.
 
-Stratsed (the Telestrat operating system) handles files management. Stratsed is loaded to memory from floppy disk. 
+Stratsed (the Telestrat operating system) handles files management. Stratsed is loaded to memory from floppy disk.
 
-There is no tool to insert a binary in a Stratsed floppy disk. 
+There is no tool to insert a binary in a Stratsed floppy disk.
 
-The only way to load a binary (for Telemon 2.4) is to :
+The only way to load a binary (for Telemon 2.4) is to:
 <itemize>
 <item>remove the 20 bytes header
-<item>download osdk : http://osdk.defence-force.org/index?page=download
+<item>download <url name="osdk" url="http://osdk.defence-force.org/index?page=download">
 <item>use Floppybuilder in OSDK to insert the binary with the tool (please read FloppyBuilder manual to insert your binary, and to start microdisc boot sector when Telestrat starts)
 </itemize>
 
-Please note also, that the binary converted into TAP file, will not produce a right stratsed file when tap2dsk and old2mfm are used. You will be in the case that Telestrat/Stratsed crashed when you do "DIR" command.
+Please note also, that the binary converted into TAP file, will not produce
+a right stratsed file when tap2dsk and old2mfm are used. You will be in the
+case that Telestrat/Stratsed crashed when you do "DIR" command.
 
 If you know the Stratsed disk format, please contact the author of this doc.
 
@@ -79,7 +83,7 @@ Special locations:
 
 <sect>Platform-specific header files<p>
 
-Programs containing Telestrat -specific code may use the <tt/telestrat.h/ header file.
+Programs containing Telestrat-specific code may use the <tt/telestrat.h/ header file.
 
 
 <sect1>Telestrat-specific functions<p>
@@ -147,8 +151,12 @@ Telestrat has a RS232 port, but it's not used
 
 <sect1>Disk I/O<p>
 
-Telemon 3.0 handles fopen, fread, fclose primitives. It means that this function will crash the Telestrat because Telemon 2.4 does not have these primitives.
-By the way, Telemon 3.0 uses an extension "ch376 card" which handles sdcard and FAT 32 usb key. In the next version of Telemon, FT DOS, Sedoric, Stratsed will be handled in these 3 primitives (fopen, fread, fclose).
+Telemon 3.0 handles fopen, fread, fclose primitives. It means that this
+function will crash the Telestrat because Telemon 2.4 does not have these
+primitives. By the way, Telemon 3.0 uses an extension "ch376 card" which
+handles sdcard and FAT 32 usb key. In the next version of Telemon, FT DOS,
+Sedoric, Stratsed will be handled in these 3 primitives (fopen, fread,
+fclose).
 
 <itemize>
 <item>fclose

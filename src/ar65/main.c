@@ -64,8 +64,8 @@ static void Usage (void)
             "Operations are some of:\n"
             "\ta\tAdd modules\n"
             "\td\tDelete modules\n"
-            "\tl\tList library contents\n"
-            "\tv\tIncrease verbosity (put before other operation)\n"
+            "\tt\tList library table\n"
+            "\tv\tIncrease verbosity (put after other operation)\n"
             "\tx\tExtract modules\n"
             "\tV\tPrint the archiver version\n",
             ProgName);
@@ -94,10 +94,6 @@ int main (int argc, char* argv [])
         /* Get the argument */
         const char* Arg = ArgVec [I];
 
-        /* Check for an option */
-        if (strlen (Arg) != 1) {
-            Usage ();
-        }
         switch (Arg [0]) {
 
             case 'a':
@@ -108,7 +104,11 @@ int main (int argc, char* argv [])
                 DelObjFiles (ArgCount - I - 1, &ArgVec [I+1]);
                 break;
 
-            case 'l':
+            case 't': /* POSIX.2 */
+            case 'l': /* staying compatible */
+                if (Arg [1] == 'v') {
+                    ++Verbosity;
+                }
                 ListObjFiles (ArgCount - I - 1, &ArgVec [I+1]);
                 break;
 

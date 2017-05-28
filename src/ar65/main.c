@@ -62,7 +62,7 @@ static void Usage (void)
 {
     fprintf (stderr, "Usage: %s <operation ...> lib file|module ...\n"
             "Operations are some of:\n"
-            "\ta\tAdd modules\n"
+            "\tr\tAdd modules\n"
             "\td\tDelete modules\n"
             "\tt\tList library table\n"
             "\tv\tIncrease verbosity (put before other operation)\n"
@@ -96,7 +96,8 @@ int main (int argc, char* argv [])
 
         switch (Arg [0]) {
 
-            case 'a':
+            case 'r': /* POSIX.2 */
+            case 'a': /* staying compatible */
                 AddObjFiles (ArgCount - I - 1, &ArgVec[I+1]);
                 break;
 

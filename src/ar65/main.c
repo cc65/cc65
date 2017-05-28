@@ -65,7 +65,7 @@ static void Usage (void)
             "\ta\tAdd modules\n"
             "\td\tDelete modules\n"
             "\tt\tList library table\n"
-            "\tv\tIncrease verbosity (put after other operation)\n"
+            "\tv\tIncrease verbosity (put before other operation)\n"
             "\tx\tExtract modules\n"
             "\tV\tPrint the archiver version\n",
             ProgName);

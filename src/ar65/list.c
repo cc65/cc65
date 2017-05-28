@@ -78,7 +78,7 @@ void ListObjFiles (int argc, char* argv [])
 
         /* Print the size */
         if (Verbosity > 0) {
-            printf ("%5ld ", O->Size);
+            Print (stdout, 1, "%5lu ", O->Size);
         }
         /* Print the name */
         printf ("%s\n", O->Name);

@@ -79,7 +79,7 @@ void ListObjFiles (int argc, char* argv [])
         /* Print the size if verbose */
         Print (stdout, 1, "%5lu ", O->Size);
         /* Print the name */
-        printf ("%s\n", O->Name);
+        puts (O->Name);
 
     }
 

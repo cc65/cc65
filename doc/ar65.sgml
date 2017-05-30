@@ -42,7 +42,7 @@ The archiver is called as follows:
 		V	Print the archiver version
 </verb></tscreen>
 
-You may add modules to a library using the `r' command. If the library
+You may add modules to a library using the `r' command (`a' is deprecated). If the library
 does not exist, it is created (and a warning message is printed which you
 may ignore if creation of the library was your intention). You may
 specify any number of modules on the command line following the library.
@@ -82,8 +82,8 @@ This will delete the module named `sub1.o' from the library, printing an
 error if the library does not contain that module.
 
 
-The `t' command prints a table of all modules in the library. Any module
-names on the command line are ignored.
+The `t' command prints a table of all modules in the library (`l' is deprecated).
+Any module names on the command line are ignored.
 
 Example:
 

@@ -33,7 +33,7 @@ SIM65 := $(if $(wildcard ../../bin/sim65*),..$S..$Sbin$Ssim65,sim65)
 
 WORKDIR = ..$S..$Stestwrk$Sref
 
-OPTIONS = g O Os Osi Osir Oi Oir Or
+OPTIONS = g O Os Osi Osir Osr Oi Oir Or
 
 DIFF = $(WORKDIR)$Sbdiff$(EXE)
 

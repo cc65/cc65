@@ -139,7 +139,17 @@ define PROG_template
 
 $$(eval $$(call OBJS_template,$1))
 
-../bin/$1$(EXE_SUFFIX): $$($1_OBJS) ../wrk/common/common.a | ../bin
+ifeq ($(GIT_SHA),N/A)
+$1_VERSION =
+else
+$1_VERSION = ../wrk/$1/version.o
+
+$$($1_VERSION): $$($1_OBJS) ../wrk/common/common.a
+	@echo $1 -- Git $(GIT_SHA)
+	@$(CC) -c $(CFLAGS) -o $$@ common/version.c
+endif
+
+../bin/$1$(EXE_SUFFIX): $$($1_OBJS) $$($1_VERSION) ../wrk/common/common.a | ../bin
 	$$(CC) $$(LDFLAGS) -o $$@ $$^ $$(LDLIBS)
 
 $1: ../bin/$1$(EXE_SUFFIX)

@@ -49,7 +49,7 @@ outlen = ptr4
 ;
 ; token = *in++;
 ;
-L0004:  ldy     #0
+L0004:  ldy     #$00
         lda     (in),y
         sta     token
 
@@ -74,7 +74,7 @@ L000A:
         lda     token
         and     #$0F
         clc
-        adc     #4
+        adc     #$04
         sta     token
 ;
 ; if (offset == 15) {
@@ -85,7 +85,7 @@ L0013:  bne     L001A
 ;
 ; tmp = *in++;
 ;
-        ldy     #0
+        ldy     #$00
         lda     (in),y
         sta     tmp
 
@@ -134,7 +134,7 @@ L001A:  lda     offset
         ldx     in+1
         sta     ptr1
         stx     ptr1+1
-        ldy     #0
+        ldy     #$00
         jsr     memcpy_upwards
 ;
 ; written += offset;
@@ -171,7 +171,7 @@ L001C:  lda     written
 ;
 ; memcpy(&offset, in, 2);
 ;
-L0047:  ldy     #0
+L0047:  ldy     #$00
         lda     (in),y
         sta     offset
         iny
@@ -218,7 +218,7 @@ L0045:  bne     L003C
 ;
 ; tmp = *in++;
 ;
-        ldy     #0
+        ldy     #$00
         lda     (in),y
         sta     tmp
 

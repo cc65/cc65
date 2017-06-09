@@ -32,12 +32,11 @@
 #ifndef _LZ4_H
 #define _LZ4_H
 
-void __fastcall__ decompress_lz4 (const unsigned char* src, unsigned char* dst,
+void __fastcall__ decompress_lz4 (const unsigned char* src, unsigned char* const dst,
                                   const unsigned short uncompressed_size);
-/*
-   Decompresses the source buffer into the destination buffer.
-   The size of the decompressed data must be known in advance, LZ4
-   does not include any terminator in-stream.
+/* Decompresses the source buffer into the destination buffer.
+** The size of the decompressed data must be known in advance, LZ4
+** does not include any terminator in-stream.
 */
 
 /* end of lz4.h */

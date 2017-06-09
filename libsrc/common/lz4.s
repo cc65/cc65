@@ -137,7 +137,7 @@ L001A:  lda     offset
         ldx     in+1
         sta     ptr1
         stx     ptr1+1
-        ldy     #$00
+;        ldy     #$00 - not needed as pushax zeroes Y
         jsr     memcpy_upwards
 ;
 ; written += offset;
@@ -195,11 +195,11 @@ L0047:  ldy     #$00
 L002F:  lda     out
         clc
         adc     written
-        pha
+        tay
         lda     out+1
         adc     written+1
         tax
-        pla
+        tya
         sec
         sbc     offset
         sta     ptr1

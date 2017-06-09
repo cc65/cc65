@@ -3,6 +3,9 @@
 ; (C) Mega Cat Studios
 ; An optimized LZ4 decompressor
 ;
+; Almost 7 times faster, uses no RAM (vs 14 bytes BSS), and takes 1/4 the space
+; vs the official C source.
+;
 
         .importzp       sp, sreg, regsave, regbank
         .importzp       tmp1, tmp2, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4

@@ -398,6 +398,13 @@ function.
 (incomplete)
 
 
+<sect1><tt/lz4.h/<label id="lz4.h"><p>
+
+<itemize>
+<item><ref id="decompress_lz4" name="decompress_lz4">
+</itemize>
+
+
 <sect1><tt/modload.h/<label id="modload.h"><p>
 
 <itemize>
@@ -2627,6 +2634,23 @@ used in presence of a prototype.
 <ref id="chline" name="chline">,
 <ref id="chlinexy" name="chlinexy">,
 <ref id="cvline" name="cvline">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>decompress_lz4<label id="decompress_lz4"><p>
+
+<quote>
+<descrip>
+<tag/Function/Uncompress a LZ4-compressed buffer.
+<tag/Header/<tt/<ref id="lz4.h" name="lz4.h">/
+<tag/Declaration/<tt/void decompress_lz4 (const unsigned char* src, unsigned char* const dst, const unsigned short uncompressed_size);/
+<tag/Description/<tt/decompress_lz4/ uncompresses a LZ4-compressed buffer.
+<tag/Notes/<itemize>
+<item>Use LZ4_compress_HC with compression level 16 for best compression.
+</itemize>
+<tag/Availability/cc65
 <tag/Example/None.
 </descrip>
 </quote>

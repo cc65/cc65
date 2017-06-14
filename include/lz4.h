@@ -1,16 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                funcdesc.c                                 */
+/*                                  lz4.h                                    */
 /*                                                                           */
-/*           Function descriptor structure for the cc65 C compiler           */
+/*              Decompression routine for the 'lz4' format                   */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
-/*                                                                           */
+/* (C) 2017 Mega Cat Studios                                                 */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
 /* warranty.  In no event will the authors be held liable for any damages    */
@@ -33,45 +29,15 @@
 
 
 
-/* common */
-#include "xmalloc.h"
+#ifndef _LZ4_H
+#define _LZ4_H
 
-/* cc65 */
-#include "funcdesc.h"
+void __fastcall__ decompress_lz4 (const unsigned char* src, unsigned char* const dst,
+                                  const unsigned short uncompressed_size);
+/* Decompresses the source buffer into the destination buffer.
+** The size of the decompressed data must be known in advance, LZ4
+** does not include any terminator in-stream.
+*/
 
-
-
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
-
-
-
-FuncDesc* NewFuncDesc (void)
-/* Create a new symbol table with the given name */
-{
-    /* Create a new function descriptor */
-    FuncDesc* F = (FuncDesc*) xmalloc (sizeof (FuncDesc));
-
-    /* Nullify the fields */
-    F->Flags      = 0;
-    F->SymTab     = 0;
-    F->TagTab     = 0;
-    F->ParamCount = 0;
-    F->ParamSize  = 0;
-    F->LastParam  = 0;
-    F->WrappedCall = 0;
-    F->WrappedCallData = 0;
-
-    /* Return the new struct */
-    return F;
-}
-
-
-
-void FreeFuncDesc (FuncDesc* F)
-/* Free a function descriptor */
-{
-    /* Free the structure */
-    xfree (F);
-}
+/* end of lz4.h */
+#endif

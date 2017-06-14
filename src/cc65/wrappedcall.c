@@ -1,15 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                funcdesc.c                                 */
+/*                                wrappedcall.c                              */
 /*                                                                           */
-/*           Function descriptor structure for the cc65 C compiler           */
+/*                          WrappedCall management                           */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2017, Mega Cat Studios                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,11 +30,31 @@
 
 
 
+#include <stdarg.h>
+#include <string.h>
+
 /* common */
+#include "chartype.h"
+#include "check.h"
+#include "coll.h"
+#include "scanner.h"
+#include "intptrstack.h"
 #include "xmalloc.h"
 
 /* cc65 */
-#include "funcdesc.h"
+#include "codeent.h"
+#include "error.h"
+#include "wrappedcall.h"
+
+
+
+/*****************************************************************************/
+/*                                   Data                                    */
+/*****************************************************************************/
+
+
+/* WrappedCalls */
+static IntPtrStack WrappedCalls;
 
 
 
@@ -47,31 +64,39 @@
 
 
 
-FuncDesc* NewFuncDesc (void)
-/* Create a new symbol table with the given name */
+void PushWrappedCall (void *Ptr, unsigned char Val)
+/* Push the current WrappedCall */
 {
-    /* Create a new function descriptor */
-    FuncDesc* F = (FuncDesc*) xmalloc (sizeof (FuncDesc));
-
-    /* Nullify the fields */
-    F->Flags      = 0;
-    F->SymTab     = 0;
-    F->TagTab     = 0;
-    F->ParamCount = 0;
-    F->ParamSize  = 0;
-    F->LastParam  = 0;
-    F->WrappedCall = 0;
-    F->WrappedCallData = 0;
-
-    /* Return the new struct */
-    return F;
+    if (IPS_IsFull (&WrappedCalls)) {
+        Error ("WrappedCall stack overflow");
+    } else {
+        IPS_Push (&WrappedCalls, Val, Ptr);
+    }
 }
 
 
 
-void FreeFuncDesc (FuncDesc* F)
-/* Free a function descriptor */
+void PopWrappedCall (void)
+/* Remove the current WrappedCall */
 {
-    /* Free the structure */
-    xfree (F);
+    if (IPS_GetCount (&WrappedCalls) < 1) {
+        Error ("WrappedCall stack is empty");
+    } else {
+        IPS_Drop (&WrappedCalls);
+    }
+}
+
+
+
+void GetWrappedCall (void **Ptr, unsigned char *Val)
+/* Get the current WrappedCall */
+{
+    if (IPS_GetCount (&WrappedCalls) < 1) {
+        *Ptr = NULL;
+        *Val = 0;
+    } else {
+        long Temp;
+        IPS_Get (&WrappedCalls, &Temp, Ptr);
+        *Val = Temp;
+    }
 }

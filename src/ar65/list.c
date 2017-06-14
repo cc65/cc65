@@ -36,6 +36,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/* common */
+#include "print.h"
+
 /* ar65 */
 #include "error.h"
 #include "library.h"
@@ -73,8 +76,10 @@ void ListObjFiles (int argc, char* argv [])
         /* Get the entry */
         O = CollConstAt (&ObjPool, I);
 
+        /* Print the size if verbose */
+        Print (stdout, 1, "%5lu ", O->Size);
         /* Print the name */
-        printf ("%s\n", O->Name);
+        puts (O->Name);
 
     }
 

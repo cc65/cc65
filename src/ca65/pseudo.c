@@ -1388,7 +1388,7 @@ static void DoList (void)
 /* Enable/disable the listing */
 {
     /* Get the setting */
-    unsigned char List;
+    unsigned char List = 0;
     SetBoolOption (&List);
 
     /* Manage the counter */

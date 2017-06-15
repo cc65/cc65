@@ -63,7 +63,7 @@ L1:     jsr     _cgetc
 
 
 ; ----------------------------------------------------------------------------
-; static int unget(int c) {
+; static int cdecl unget(int c) {
 ;     pushed = true;
 ;     return back = c;
 ;     }
@@ -127,4 +127,3 @@ d:      .addr   get             ; SCANFDATA::GET
         pla
         jmp     __scanf
         .endproc
-

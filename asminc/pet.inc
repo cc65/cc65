@@ -6,6 +6,7 @@
 ; ---------------------------------------------------------------------------
 ; Zero page, Commodore stuff
 
+VARTAB          := $2A          ; Pointer to start of BASIC variables
 MEMSIZE         := $34          ; Size of memory installed
 TXTPTR          := $77          ; Pointer into BASIC source code
 TIME            := $8D          ; 60HZ clock

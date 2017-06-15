@@ -9,13 +9,13 @@
         .importzp       devnum
 
 
-.bss
+.segment "INIT"
 
 curunit:
         .res    1
 
 
-.segment "INIT"
+.segment "ONCE"
 
 .proc   initcurunit
 

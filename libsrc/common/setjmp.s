@@ -1,10 +1,13 @@
 ;
-; Ullrich von Bassewitz, 06.06.1998
+; 1998-06-06, Ullrich von Bassewitz
+; 2015-09-11, Greg King
 ;
-; int setjmp (jmp_buf buf);
+; int __fastcall__ setjmp (jmp_buf buf);
 ;
 
         .export         __setjmp
+
+        .import         return0
         .importzp       sp, ptr1
 
 __setjmp:
@@ -44,9 +47,4 @@ __setjmp:
 
 ; Return zero
 
-        lda     #0
-        tax
-        rts
-
-
-  
+        jmp     return0

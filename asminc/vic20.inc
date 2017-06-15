@@ -6,6 +6,8 @@
 ; ---------------------------------------------------------------------------
 ; Zero page, Commodore stuff
 
+VARTAB          := $2D          ; Pointer to start of BASIC variables
+MEMSIZE         := $37          ; Pointer to highest BASIC RAM location (+1)
 TXTPTR          := $7A          ; Pointer into BASIC source code
 TIME            := $A0          ; 60HZ clock
 FNAM_LEN        := $B7          ; Length of filename

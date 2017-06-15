@@ -78,7 +78,7 @@ update_clock:
 ;-----------------------------------------------------------------------------
 ; Enable the interrupt that update_clock needs.
 ;
-        .segment        "INIT"
+        .segment        "ONCE"
 init_clock:
         lda     #%10000000
         tsb     VTIMCTLA

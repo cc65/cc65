@@ -8,7 +8,7 @@
 
         .export         _cputcxy, _cputc, cputdirect, putchar
         .export         newline, plot
-        .import         popa, _gotoxy
+        .import         gotoxy
         .import         PLOT
 
         .include        "c128.inc"
@@ -21,8 +21,7 @@ newline         = NEWLINE
 
 _cputcxy:
         pha                     ; Save C
-        jsr     popa            ; Get Y
-        jsr     _gotoxy         ; Set cursor, drop x
+        jsr      gotoxy         ; Set cursor, drop x and y
         pla                     ; Restore C
 
 ; Plot a character - also used as internal function

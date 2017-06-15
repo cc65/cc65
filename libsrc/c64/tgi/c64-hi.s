@@ -1,7 +1,9 @@
 ;
 ; Graphics driver for the 320x200x2 mode on the C64.
 ;
-; Based on Stephen L. Judds GRLIB code
+; Based on Stephen L. Judd's GRLIB code.
+;
+; 2017-01-13, Greg King
 ;
 
         .include        "zeropage.inc"
@@ -351,7 +353,7 @@ SETPALETTE:
 @L2:    sta     CBASE+$0000,y
         sta     CBASE+$0100,y
         sta     CBASE+$0200,y
-        sta     CBASE+$0300,y
+        sta     CBASE+$02e8,y
         iny
         bne     @L2
         pla
@@ -872,7 +874,7 @@ TEXTSTYLE:
 OUTTEXT:
 
 ; Calculate a pointer to the representation of the character in the
-; character ROM 
+; character ROM
 
         ldx     #((>(CHARROM + $0800)) >> 3)
         ldy     #0
@@ -957,5 +959,3 @@ CALC:   lda     Y1
         lda     #00
 @L9:    sta     INRANGE
         rts
-
-

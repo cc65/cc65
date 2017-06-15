@@ -69,7 +69,7 @@ L9:     lda     ptr3
 ;--------------------------------------------------------------------------
 ; initstdin:  Reset the stdin console.
 
-.segment        "INIT"
+.segment        "ONCE"
 
 initstdin:
         ldx     #<-1
@@ -79,8 +79,7 @@ initstdin:
 
 ;--------------------------------------------------------------------------
 
-.bss
+.segment        "INIT"
 
 text_count:
         .res    1
-

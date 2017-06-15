@@ -543,7 +543,8 @@ static void OptVersion (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
 /* Print the assembler version */
 {
-    fprintf (stderr, "ld65 V%s\n", GetVersionAsString ());
+    fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
+    exit(EXIT_SUCCESS);
 }
 
 
@@ -819,8 +820,8 @@ int main (int argc, char* argv [])
         if (MapFileName) {
             CreateMapFile (SHORT_MAPFILE);
         }
-        Error ("Cannot generate output due to memory area overflow%s",
-               (MemoryAreaOverflows > 1)? "s" : "");
+        Error ("Cannot generate most of the files due to memory area overflow%c",
+               (MemoryAreaOverflows > 1) ? 's' : ' ');
     }
 
     /* Create the output file */

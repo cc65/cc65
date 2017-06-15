@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <conio.h>
-#include <dbg.h>
+#include <joystick.h>
 
 
 
@@ -34,11 +34,10 @@ int main (void)
 {
     unsigned char XSize, YSize;
 
-    /* Set screen colors, hide the cursor */
-    textcolor (COLOR_WHITE);
-    bordercolor (COLOR_BLACK);
-    bgcolor (COLOR_BLACK);
-    cursor (0);
+    /* Set screen colors */
+    (void) textcolor (COLOR_WHITE);
+    (void) bordercolor (COLOR_BLACK);
+    (void) bgcolor (COLOR_BLACK);
 
     /* Clear the screen, put cursor in upper left corner */
     clrscr ();
@@ -68,8 +67,19 @@ int main (void)
     gotoxy ((XSize - strlen (Text)) / 2, YSize / 2);
     cprintf ("%s", Text);
 
+#if defined(__NES__) || defined(__PCE__) || defined(__GAMATE__)
+
+    /* Wait for the user to press a button */
+    joy_install (joy_static_stddrv);
+    while (!joy_read (JOY_1)) ;
+    joy_uninstall ();
+
+#else
+
     /* Wait for the user to press a key */
-    (void) cgetc ();
+    cgetc ();
+
+#endif
 
     /* Clear the screen again */
     clrscr ();
@@ -77,6 +87,3 @@ int main (void)
     /* Done */
     return EXIT_SUCCESS;
 }
-
-
-

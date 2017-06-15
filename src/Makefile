@@ -3,16 +3,17 @@ ifneq ($(shell echo),)
 endif
 CMD_EXE = 1
 
-PROGS = ar65  \
-        ca65  \
-        cc65  \
-        cl65  \
-        co65  \
-        da65  \
-        grc65 \
-        ld65  \
-        od65  \
-        sim65 \
+PROGS = ar65     \
+        ca65     \
+        cc65     \
+        chrcvt65 \
+        cl65     \
+        co65     \
+        da65     \
+        grc65    \
+        ld65     \
+        od65     \
+        sim65    \
         sp65
 
 .PHONY: all mostlyclean clean install zip avail unavail bin $(PROGS)
@@ -24,6 +25,7 @@ datadir := $(if $(prefix),$(prefix)/share/cc65,$(abspath ..))
 
 CA65_INC = $(datadir)/asminc
 CC65_INC = $(datadir)/include
+CL65_TGT = $(datadir)/target
 LD65_LIB = $(datadir)/lib
 LD65_OBJ = $(datadir)/lib
 LD65_CFG = $(datadir)/cfg
@@ -65,7 +67,7 @@ else
   endif
 endif
 
-CFLAGS += -MMD -MP -O -I common \
+CFLAGS += -MMD -MP -O3 -I common \
           -Wall -Wextra -Wno-char-subscripts $(USER_CFLAGS) \
           -DGIT_SHA=$(GIT_SHA) -DCA65_INC=$(CA65_INC) -DCC65_INC=$(CC65_INC) \
           -DLD65_LIB=$(LD65_LIB) -DLD65_OBJ=$(LD65_OBJ) -DLD65_CFG=$(LD65_CFG) \

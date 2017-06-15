@@ -7,7 +7,12 @@
 ; be called from an interrupt handler
 ;
 
+        .constructor    initmcb
         .export         _mouse_def_callbacks
+        .import         _mouse_def_pointershape
+        .import         _mouse_def_pointercolor
+        .import         mcb_spritememory
+        .import         mcb_spritepointer
 
         .include        "mouse-kernel.inc"
         .include        "c64.inc"
@@ -23,7 +28,47 @@ VIC_SPR_X       = (VIC_SPR0_X + 2*MOUSE_SPR)    ; Sprite X register
 VIC_SPR_Y       = (VIC_SPR0_Y + 2*MOUSE_SPR)    ; Sprite Y register
 
 ; --------------------------------------------------------------------------
+; Initialize the mouse sprite.
+
+.segment        "ONCE"
+
+initmcb:
+
+; Make all RAM accessible
+
+        lda     #$30
+        ldy     $01
+        sei
+        sta     $01
+
+; Copy the mouse sprite data
+
+        ldx     #64 - 1
+@L0:    lda     _mouse_def_pointershape,x
+        sta     mcb_spritememory,x
+        dex
+        bpl     @L0
+
+; Set the mouse sprite pointer
+
+        lda     #<(mcb_spritememory / 64)
+        sta     mcb_spritepointer + MOUSE_SPR
+
+; Restore memory configuration
+
+        sty     $01
+        cli
+
+; Set the mouse sprite color
+
+        lda     _mouse_def_pointercolor
+        sta     VIC_SPR0_COLOR + MOUSE_SPR
+        rts
+
+; --------------------------------------------------------------------------
 ; Hide the mouse pointer. Always called with interrupts disabled.
+
+.code
 
 hide:
         lda     #MOUSE_SPR_NMASK

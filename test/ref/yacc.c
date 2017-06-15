@@ -562,13 +562,13 @@ yylook()
 		}
 
 # ifdef LEXDEBUG
-		if((*(lsp-1)-yysvec-1)<0)
+		if (lsp == yylstate)
 		{
 			fprintf(yyout,"yylook:  stopped (end)\n");
 		}
 		else
 		{
-			fprintf(yyout,"yylook:  stopped at %d with\n",*(lsp-1)-yysvec-1);
+			fprintf(yyout,"yylook:  stopped at %d with:\n",*(lsp-1)-(yysvec+1));
 		}
 # endif
 		while (lsp-- > yylstate)
@@ -594,7 +594,7 @@ yylook()
 				yyleng = yylastch-yytext+1;
 				yytext[yyleng] = 0;
 # ifdef LEXDEBUG
-				fprintf(yyout,"\nyylook:  match action %d\n",*yyfnd);
+				fprintf(yyout,"yylook:  match action %d\n",*yyfnd);
 				fprintf(yyout,"yylook:  done loops: %d\n",testbreak);
 # endif
 				return(*yyfnd++);

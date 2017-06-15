@@ -204,6 +204,8 @@ MMU_CFG_RAM0    := %00111111    ; Bank 0 full RAM
 MMU_CFG_RAM1    := %01111111    ; Bank 1 full RAM
 MMU_CFG_RAM2    := %10111111    ; Bank 2 full RAM
 MMU_CFG_RAM3    := %11111111    ; Bank 3 full RAM
+MMU_CFG_IFROM   := %01010111    ; Bank 1 with Internal Function RAM/ROM
+MMU_CFG_EFROM   := %01101011    ; Bank 1 with External Function RAM/ROM
 
 ; ---------------------------------------------------------------------------
 ; Super CPU

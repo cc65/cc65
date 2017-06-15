@@ -618,16 +618,16 @@ static void DoCase (void)
 
 
 static void DoCharMap (void)
-/* Allow custome character mappings */
+/* Allow custom character mappings */
 {
     long Index;
     long Code;
 
     /* Read the index as numerical value */
     Index = ConstExpression ();
-    if (Index <= 0 || Index > 255) {
+    if (Index < 0 || Index > 255) {
         /* Value out of range */
-        ErrorSkip ("Range error");
+        ErrorSkip ("Index range error");
         return;
     }
 
@@ -638,7 +638,7 @@ static void DoCharMap (void)
     Code = ConstExpression ();
     if (Code < 0 || Code > 255) {
         /* Value out of range */
-        ErrorSkip ("Range error");
+        ErrorSkip ("Code range error");
         return;
     }
 
@@ -1388,7 +1388,7 @@ static void DoList (void)
 /* Enable/disable the listing */
 {
     /* Get the setting */
-    unsigned char List;
+    unsigned char List = 0;
     SetBoolOption (&List);
 
     /* Manage the counter */
@@ -1526,6 +1526,14 @@ static void DoP816 (void)
 /* Switch to 65816 CPU */
 {
     SetCPU (CPU_65816);
+}
+
+
+
+static void DoP4510 (void)
+/* Switch to 4510 CPU */
+{
+    SetCPU (CPU_4510);
 }
 
 
@@ -1967,6 +1975,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoUnexpected    },      /* .ADDRSIZE */
     { ccNone,           DoAlign         },
     { ccNone,           DoASCIIZ        },
+    { ccNone,           DoUnexpected    },      /* .ASIZE */
     { ccNone,           DoAssert        },
     { ccNone,           DoAutoImport    },
     { ccNone,           DoUnexpected    },      /* .BANK */
@@ -1989,6 +1998,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoDebugInfo     },
     { ccNone,           DoDefine        },
     { ccNone,           DoUnexpected    },      /* .DEFINED */
+    { ccNone,           DoUnexpected    },      /* .DEFINEDMACRO */
     { ccNone,           DoDelMac        },
     { ccNone,           DoDestructor    },
     { ccNone,           DoDWord         },
@@ -2031,6 +2041,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccKeepToken,      DoConditionals  },      /* .IFNDEF */
     { ccKeepToken,      DoConditionals  },      /* .IFNREF */
     { ccKeepToken,      DoConditionals  },      /* .IFP02 */
+    { ccKeepToken,      DoConditionals  },      /* .IFP4510 */
     { ccKeepToken,      DoConditionals  },      /* .IFP816 */
     { ccKeepToken,      DoConditionals  },      /* .IFPC02 */
     { ccKeepToken,      DoConditionals  },      /* .IFPSC02 */
@@ -2040,6 +2051,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoIncBin        },
     { ccNone,           DoInclude       },
     { ccNone,           DoInterruptor   },
+    { ccNone,           DoUnexpected    },      /* .ISIZE */
     { ccNone,           DoUnexpected    },      /* .ISMNEMONIC */
     { ccNone,           DoInvalid       },      /* .LEFT */
     { ccNone,           DoLineCont      },
@@ -2060,6 +2072,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoOrg           },
     { ccNone,           DoOut           },
     { ccNone,           DoP02           },
+    { ccNone,           DoP4510         },
     { ccNone,           DoP816          },
     { ccNone,           DoPageLength    },
     { ccNone,           DoUnexpected    },      /* .PARAMCOUNT */

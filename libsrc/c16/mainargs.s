@@ -28,39 +28,38 @@
         .include        "plus4.inc"
 
 
-
 MAXARGS  = 10                   ; Maximum number of arguments allowed
 REM      = $8f                  ; BASIC token-code
-NAME_LEN = 16                   ; maximum length of command-name
+NAME_LEN = 16                   ; Maximum length of command-name
 
-; Get possible command-line arguments. Goes into the special INIT segment,
+; Get possible command-line arguments. Goes into the special ONCE segment,
 ; which may be reused after the startup code is run
 
-.segment        "INIT"
+.segment        "ONCE"
 
 initmainargs:
 
 ; Assume that the program was loaded, a moment ago, by the traditional LOAD
 ; statement.  Save the "most-recent filename" as argument #0.
-; Because the buffer, that we're copying into, was zeroed out,
-; we don't need to add a NUL character.
-;
+
+        lda     #0              ; The terminating NUL character
         ldy     FNAM_LEN
         cpy     #NAME_LEN + 1
         bcc     L1
-        ldy     #NAME_LEN - 1   ; limit the length
+        ldy     #NAME_LEN       ; Limit the length
+        bne     L1              ; Branch always
 L0:     lda     #FNAM           ; Vector address
         jsr     FETCH           ; Load byte from RAM
-        sta     name,y
-L1:     dey
+L1:     sta     name,y
+        dey
         bpl     L0
         inc     __argc          ; argc always is equal to, at least, 1
 
 ; Find the "rem" token.
-;
+
         ldx     #0
 L2:     lda     BASIC_BUF,x
-        beq     done            ; no "rem," no args.
+        beq     done            ; No "rem," no args.
         inx
         cmp     #REM
         bne     L2
@@ -72,7 +71,7 @@ next:   lda     BASIC_BUF,x
         beq     done            ; End of line reached
         inx
         cmp     #' '            ; Skip leading spaces
-        beq     next            ;
+        beq     next
 
 ; Found start of next argument. We've incremented the pointer in X already, so
 ; it points to the second character of the argument. This is useful since we
@@ -127,15 +126,13 @@ done:   lda     #<argv
         stx     __argv + 1
         rts
 
-; These arrays are zeroed before initmainargs is called.
-; char  name[16+1];
-; char* argv[MAXARGS+1]={name};
-;
-.bss
+.segment        "INIT"
+
 term:   .res    1
 name:   .res    NAME_LEN + 1
 
 .data
+
+; char* argv[MAXARGS+1]={name};
 argv:   .addr   name
         .res    MAXARGS * 2
-

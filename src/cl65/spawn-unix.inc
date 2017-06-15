@@ -48,8 +48,8 @@
 
 
 /* Mode argument for spawn. This value is ignored by the function and only
- * provided for DOS/Windows compatibility.
- */
+** provided for DOS/Windows compatibility.
+*/
 #ifndef P_WAIT
 #define P_WAIT  0
 #endif
@@ -63,11 +63,11 @@
 
 
 int spawnvp (int Mode attribute ((unused)), const char* File, char* const argv [])
-/* Execute the given program searching and wait til it terminates. The Mode
- * argument is ignored (compatibility only). The result of the function is
- * the return code of the program. The function will terminate the program
- * on errors.
- */
+/* Execute the given program searching and wait until it terminates. The Mode
+** argument is ignored (compatibility only). The result of the function is
+** the return code of the program. The function will terminate the program
+** on errors.
+*/
 {
     int Status = 0;
 
@@ -99,7 +99,7 @@ int spawnvp (int Mode attribute ((unused)), const char* File, char* const argv [
     }
 
     /* Only the father goes here, we place a return here regardless of that
-     * to avoid compiler warnings.
-     */
+    ** to avoid compiler warnings.
+    */
     return WEXITSTATUS (Status);
 }

@@ -267,6 +267,7 @@ static int ParseChar (void)
 {
     int C;
     int HadError;
+    int Count;
 
     /* Check for escape chars */
     if (CurC == '\\') {
@@ -336,19 +337,14 @@ static int ParseChar (void)
             case '6':
             case '7':
                 /* Octal constant */
-                HadError = 0;
+                Count = 1;
                 C = HexVal (CurC);
-                while (IsODigit (NextC)) {
-                    if ((C << 3) >= 256) {
-                        if (!HadError) {
-                            Error ("Octal character constant out of range");
-                            HadError = 1;
-                        }
-                    } else {
-                        C = (C << 3) | HexVal (NextC);
-                    }
+                while (IsODigit (NextC) && Count++ < 3) {
+                    C = (C << 3) | HexVal (NextC);
                     NextChar ();
                 }
+                if (C >= 256)
+                    Error ("Octal character constant out of range");
                 break;
             default:
                 Error ("Illegal character constant");

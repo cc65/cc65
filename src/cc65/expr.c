@@ -50,6 +50,7 @@
 /* Generator attributes */
 #define GEN_NOPUSH      0x01            /* Don't push lhs */
 #define GEN_COMM        0x02            /* Operator is commutative */
+#define GEN_NOFUNC      0x04            /* Not allowed for function pointers */
 
 /* Map a generator function and its attributes to a token */
 typedef struct {
@@ -535,6 +536,10 @@ static void FunctionCall (ExprDesc* Expr)
     /* Special handling for function pointers */
     if (IsFuncPtr) {
 
+        if (Func->WrappedCall) {
+            Warning("Calling a wrapped function via a pointer, wrapped-call will not be used");
+        }
+
         /* If the function is not a fastcall function, load the pointer to
         ** the function into the primary.
         */
@@ -583,7 +588,47 @@ static void FunctionCall (ExprDesc* Expr)
     } else {
 
         /* Normal function */
-        g_call (TypeOf (Expr->Type), (const char*) Expr->Name, ParamSize);
+        if (Func->WrappedCall) {
+            char tmp[64];
+            StrBuf S = AUTO_STRBUF_INITIALIZER;
+
+            /* Store the WrappedCall data in tmp4 */
+            sprintf(tmp, "ldy #%u", Func->WrappedCallData);
+            SB_AppendStr (&S, tmp);
+            g_asmcode (&S);
+            SB_Clear(&S);
+
+            SB_AppendStr (&S, "sty tmp4");
+            g_asmcode (&S);
+            SB_Clear(&S);
+
+            /* Store the original function address in ptr4 */
+            SB_AppendStr (&S, "ldy #<(_");
+            SB_AppendStr (&S, (const char*) Expr->Name);
+            SB_AppendChar (&S, ')');
+            g_asmcode (&S);
+            SB_Clear(&S);
+
+            SB_AppendStr (&S, "sty ptr4");
+            g_asmcode (&S);
+            SB_Clear(&S);
+
+            SB_AppendStr (&S, "ldy #>(_");
+            SB_AppendStr (&S, (const char*) Expr->Name);
+            SB_AppendChar (&S, ')');
+            g_asmcode (&S);
+            SB_Clear(&S);
+
+            SB_AppendStr (&S, "sty ptr4+1");
+            g_asmcode (&S);
+            SB_Clear(&S);
+
+            SB_Done (&S);
+
+            g_call (TypeOf (Expr->Type), Func->WrappedCall->Name, ParamSize);
+        } else {
+            g_call (TypeOf (Expr->Type), (const char*) Expr->Name, ParamSize);
+        }
 
     }
 
@@ -1533,25 +1578,34 @@ static void PostInc (ExprDesc* Expr)
     /* Get the data type */
     Flags = TypeOf (Expr->Type);
 
-    /* Push the address if needed */
-    PushAddr (Expr);
+    /* Emit smaller code if a char variable is at a constant location */
+    if ((Flags & CF_CHAR) == CF_CHAR && ED_IsLocConst(Expr)) {
 
-    /* Fetch the value and save it (since it's the result of the expression) */
-    LoadExpr (CF_NONE, Expr);
-    g_save (Flags | CF_FORCECHAR);
+        LoadExpr (CF_NONE, Expr);
+        AddCodeLine ("inc %s", ED_GetLabelName(Expr, 0));
 
-    /* If we have a pointer expression, increment by the size of the type */
-    if (IsTypePtr (Expr->Type)) {
-        g_inc (Flags | CF_CONST | CF_FORCECHAR, CheckedSizeOf (Expr->Type + 1));
     } else {
-        g_inc (Flags | CF_CONST | CF_FORCECHAR, 1);
+
+        /* Push the address if needed */
+        PushAddr (Expr);
+
+        /* Fetch the value and save it (since it's the result of the expression) */
+        LoadExpr (CF_NONE, Expr);
+        g_save (Flags | CF_FORCECHAR);
+
+        /* If we have a pointer expression, increment by the size of the type */
+        if (IsTypePtr (Expr->Type)) {
+            g_inc (Flags | CF_CONST | CF_FORCECHAR, CheckedSizeOf (Expr->Type + 1));
+        } else {
+            g_inc (Flags | CF_CONST | CF_FORCECHAR, 1);
+        }
+
+        /* Store the result back */
+        Store (Expr, 0);
+
+        /* Restore the original value in the primary register */
+        g_restore (Flags | CF_FORCECHAR);
     }
-
-    /* Store the result back */
-    Store (Expr, 0);
-
-    /* Restore the original value in the primary register */
-    g_restore (Flags | CF_FORCECHAR);
 
     /* The result is always an expression, no reference */
     ED_MakeRValExpr (Expr);
@@ -1580,25 +1634,34 @@ static void PostDec (ExprDesc* Expr)
     /* Get the data type */
     Flags = TypeOf (Expr->Type);
 
-    /* Push the address if needed */
-    PushAddr (Expr);
+    /* Emit smaller code if a char variable is at a constant location */
+    if ((Flags & CF_CHAR) == CF_CHAR && ED_IsLocConst(Expr)) {
 
-    /* Fetch the value and save it (since it's the result of the expression) */
-    LoadExpr (CF_NONE, Expr);
-    g_save (Flags | CF_FORCECHAR);
+        LoadExpr (CF_NONE, Expr);
+        AddCodeLine ("dec %s", ED_GetLabelName(Expr, 0));
 
-    /* If we have a pointer expression, increment by the size of the type */
-    if (IsTypePtr (Expr->Type)) {
-        g_dec (Flags | CF_CONST | CF_FORCECHAR, CheckedSizeOf (Expr->Type + 1));
     } else {
-        g_dec (Flags | CF_CONST | CF_FORCECHAR, 1);
+
+        /* Push the address if needed */
+        PushAddr (Expr);
+
+        /* Fetch the value and save it (since it's the result of the expression) */
+        LoadExpr (CF_NONE, Expr);
+        g_save (Flags | CF_FORCECHAR);
+
+        /* If we have a pointer expression, increment by the size of the type */
+        if (IsTypePtr (Expr->Type)) {
+            g_dec (Flags | CF_CONST | CF_FORCECHAR, CheckedSizeOf (Expr->Type + 1));
+        } else {
+            g_dec (Flags | CF_CONST | CF_FORCECHAR, 1);
+        }
+
+        /* Store the result back */
+        Store (Expr, 0);
+
+        /* Restore the original value in the primary register */
+        g_restore (Flags | CF_FORCECHAR);
     }
-
-    /* Store the result back */
-    Store (Expr, 0);
-
-    /* Restore the original value in the primary register */
-    g_restore (Flags | CF_FORCECHAR);
 
     /* The result is always an expression, no reference */
     ED_MakeRValExpr (Expr);
@@ -2042,6 +2105,11 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
         Tok = CurTok.Tok;
         NextToken ();
 
+        /* If lhs is a function, convert it to pointer to function */
+        if (IsTypeFunc (Expr->Type)) {
+            Expr->Type = PointerTo (Expr->Type);
+        }
+
         /* Get the lhs on stack */
         GetCodePos (&Mark1);
         ltype = TypeOf (Expr->Type);
@@ -2059,11 +2127,32 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
         /* Get the right hand side */
         MarkedExprWithCheck (hienext, &Expr2);
 
+        /* If rhs is a function, convert it to pointer to function */
+        if (IsTypeFunc (Expr2.Type)) {
+            Expr2.Type = PointerTo (Expr2.Type);
+        }
+
         /* Check for a constant expression */
         rconst = (ED_IsConstAbs (&Expr2) && ED_CodeRangeIsEmpty (&Expr2));
         if (!rconst) {
             /* Not constant, load into the primary */
             LoadExpr (CF_NONE, &Expr2);
+        }
+
+        /* Some operations aren't allowed on function pointers */
+        if ((Gen->Flags & GEN_NOFUNC) != 0) {
+            /* Output only one message even if both sides are wrong */
+            if (IsTypeFuncPtr (Expr->Type)) {
+                Error ("Invalid left operand for relational operator");
+                /* Avoid further errors */
+                ED_MakeConstAbsInt (Expr, 0);
+                ED_MakeConstAbsInt (&Expr2, 0);
+            } else if (IsTypeFuncPtr (Expr2.Type)) {
+                Error ("Invalid right operand for relational operator");
+                /* Avoid further errors */
+                ED_MakeConstAbsInt (Expr, 0);
+                ED_MakeConstAbsInt (&Expr2, 0);
+            }
         }
 
         /* Make sure, the types are compatible */
@@ -2078,8 +2167,8 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                 */
                 Type* left  = Indirect (Expr->Type);
                 Type* right = Indirect (Expr2.Type);
-                if (TypeCmp (left, right) < TC_EQUAL && left->C != T_VOID && right->C != T_VOID) {
-                    /* Incomatible pointers */
+                if (TypeCmp (left, right) < TC_QUAL_DIFF && left->C != T_VOID && right->C != T_VOID) {
+                    /* Incompatible pointers */
                     Error ("Incompatible types");
                 }
             } else if (!ED_IsNullPtr (&Expr2)) {
@@ -2363,7 +2452,6 @@ static void parseadd (ExprDesc* Expr)
     Type* lhst;                 /* Type of left hand side */
     Type* rhst;                 /* Type of right hand side */
 
-
     /* Skip the PLUS token */
     NextToken ();
 
@@ -2546,7 +2634,7 @@ static void parseadd (ExprDesc* Expr)
                 flags = CF_PTR;
             } else if (IsClassInt (lhst) && IsClassPtr (rhst)) {
                 /* Left is int, right is pointer, must scale lhs */
-                g_tosint (TypeOf (rhst));       /* Make sure, TOS is int */
+                g_tosint (TypeOf (lhst));       /* Make sure TOS is int */
                 g_swap (CF_INT);                /* Swap TOS and primary */
                 g_scale (CF_INT, CheckedPSizeOf (rhst));
                 /* Operate on pointers, result type is a pointer */
@@ -2580,7 +2668,6 @@ static void parseadd (ExprDesc* Expr)
 
     /* Condition codes not set */
     ED_MarkAsUntested (Expr);
-
 }
 
 
@@ -2600,6 +2687,13 @@ static void parsesub (ExprDesc* Expr)
     int rscale;                 /* Scale factor for the result */
 
 
+    /* lhs cannot be function or pointer to function */
+    if (IsTypeFunc (Expr->Type) || IsTypeFuncPtr (Expr->Type)) {
+        Error ("Invalid left operand for binary operator `-'");
+        /* Make it pointer to char to avoid further errors */
+        Expr->Type = type_uchar;
+    }
+
     /* Skip the MINUS token */
     NextToken ();
 
@@ -2615,6 +2709,13 @@ static void parsesub (ExprDesc* Expr)
 
     /* Parse the right hand side */
     MarkedExprWithCheck (hie9, &Expr2);
+
+    /* rhs cannot be function or pointer to function */
+    if (IsTypeFunc (Expr2.Type) || IsTypeFuncPtr (Expr2.Type)) {
+        Error ("Invalid right operand for binary operator `-'");
+        /* Make it pointer to char to avoid further errors */
+        Expr2.Type = type_uchar;
+    }
 
     /* Check for a constant rhs expression */
     if (ED_IsConstAbs (&Expr2) && ED_CodeRangeIsEmpty (&Expr2)) {
@@ -2775,11 +2876,11 @@ static void hie6 (ExprDesc* Expr)
 /* Handle greater-than type comparators */
 {
     static const GenDesc hie6_ops [] = {
-        { TOK_LT,       GEN_NOPUSH,     g_lt    },
-        { TOK_LE,       GEN_NOPUSH,     g_le    },
-        { TOK_GE,       GEN_NOPUSH,     g_ge    },
-        { TOK_GT,       GEN_NOPUSH,     g_gt    },
-        { TOK_INVALID,  0,              0       }
+        { TOK_LT,       GEN_NOPUSH | GEN_NOFUNC,     g_lt    },
+        { TOK_LE,       GEN_NOPUSH | GEN_NOFUNC,     g_le    },
+        { TOK_GE,       GEN_NOPUSH | GEN_NOFUNC,     g_ge    },
+        { TOK_GT,       GEN_NOPUSH | GEN_NOFUNC,     g_gt    },
+        { TOK_INVALID,  0,                           0       }
     };
     hie_compare (hie6_ops, Expr, ShiftExpr);
 }

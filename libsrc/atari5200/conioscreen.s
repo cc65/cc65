@@ -7,8 +7,9 @@
 SCREEN_BUF_SIZE =       20 * 24
 SCREEN_BUF      =       $4000 - SCREEN_BUF_SIZE
 
-                .code
                 .export screen_setup_20x24
+
+                .segment "ONCE"
 
 screen_setup_20x24:
 
@@ -78,6 +79,5 @@ dlist:          .repeat 3
 ; end of display list
 
 .assert ((* >> 10) = (dlist >> 10)), error, "Display list crosses 1K boundary"
-
 
                 .end

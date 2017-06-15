@@ -2,11 +2,11 @@
 
 <article>
 
-<title>Commodore VIC20 (aka VC20) specific information for cc65
+<title>Commodore VIC20 (aka VC20 aka VIC1001) specific information for cc65
 <author>
 <url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:polluks@sdf.lonestar.org" name="Stefan A. Haubenthal">
-<date>2014-04-12
+<date>2017-05-18
 
 <abstract>
 An overview over the VIC20 runtime system as it is implemented for the cc65 C
@@ -161,8 +161,9 @@ The default drivers, <tt/joy_stddrv (joy_static_stddrv)/, point to <tt/vic20-std
 
   <tag><tt/vic20-ptvjoy.joy (vic20_ptvjoy_joy)/</tag>
   Driver for the Protovision 4-player adapter contributed by Groepaz. See
-  <url url="http://www.protovision-online.de/hardw/hardwstart.htm"> for prices and
-  building instructions. Up to three joysticks are supported.
+  <url url="http://www.protovision-online.de/hardw/4_player.php?language=en"
+  name="Protovision shop"> for prices and building instructions. Up to three
+  joysticks are supported.
 
 </descrip><p>
 
@@ -181,13 +182,14 @@ No VIC1011 drivers are currently available for the VIC20.
 <sect>Limitations<p>
 
 
-
-<sect>Other hints<p>
-
-
 <sect1>Escape code<p>
 
-For an Esc, press CTRL and the <tt/[/ key.
+The CTRL key cannot be used to type most control characters,
+entering an Esc is not possible.
+
+
+
+<sect>Other hints<p>
 
 
 <sect1>Passing arguments to the program<p>
@@ -218,8 +220,7 @@ The program return code (low byte) is passed back to BASIC by use of the
 
 <sect1>Using extended memory<p>
 
-The extended memory at $A000 may be added to the heap by using the following
-code:
+BLK5 memory may be added to the heap by using the following code:
 
 <tscreen><verb>
     /* Check for the existence of RAM */

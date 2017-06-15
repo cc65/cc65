@@ -7,7 +7,7 @@
         .include "atari.inc"
         
         .export         _cvlinexy, _cvline
-        .import         popa, _gotoxy, putchar, setcursor
+        .import         gotoxy, putchar, setcursor
         .importzp       tmp1
 
 .ifdef __ATARI5200__
@@ -18,8 +18,7 @@ CHRCODE =       $7C             ; Vertical bar
 
 _cvlinexy:
         pha                     ; Save the length
-        jsr     popa            ; Get y
-        jsr     _gotoxy         ; Call this one, will pop params
+        jsr     gotoxy          ; Call this one, will pop params
         pla                     ; Restore the length and run into _cvline
 
 _cvline:

@@ -418,30 +418,22 @@ static ExprNode* FuncDefined (void)
 
 
 
-static ExprNode* FuncIsMnemonic (void)
-/* Handle the .ISMNEMONIC, .ISMNEM builtin function */
+static ExprNode* FuncDefinedMacro (void)
+/* Handle the .DEFINEDMACRO builtin function */
 {
-    int Instr = -1;
+    Macro* Mac = 0;
 
-    /* Check for a macro or an instruction depending on UbiquitousIdents */
+    /* Check if the identifier is a macro */
 
     if (CurTok.Tok == TOK_IDENT) {
-        if (UbiquitousIdents) {
-            /* Macros CAN be instructions, so check for them first */
-            if (FindMacro (&CurTok.SVal) == 0) {
-                Instr = FindInstruction (&CurTok.SVal);
-            }
-        } else {
-            /* Macros and symbols may NOT use the names of instructions, so just check for the instruction */
-            Instr = FindInstruction (&CurTok.SVal);
-        }
+        Mac = FindMacro (&CurTok.SVal);
     } else {
         Error ("Identifier expected.");
     }
     /* Skip the name */
     NextTok ();
 
-    return GenLiteralExpr (Instr > 0);
+    return GenLiteralExpr (Mac != 0);
 }
 
 
@@ -458,6 +450,36 @@ static ExprNode* FuncHiWord (void)
 /* Handle the .HIWORD builtin function */
 {
     return HiWord (Expression ());
+}
+
+
+
+static ExprNode* FuncIsMnemonic (void)
+/* Handle the .ISMNEMONIC, .ISMNEM builtin function */
+{
+    int Instr = -1;
+
+    /* Check for a macro or an instruction depending on UbiquitousIdents */
+
+    if (CurTok.Tok == TOK_IDENT) {
+        if (UbiquitousIdents) {
+            /* Macros CAN be instructions, so check for them first */
+            if (FindMacro (&CurTok.SVal) == 0) {
+                Instr = FindInstruction (&CurTok.SVal);
+            }
+        }
+        else {
+            /* Macros and symbols may NOT use the names of instructions, so just check for the instruction */
+            Instr = FindInstruction (&CurTok.SVal);
+        }
+    }
+    else {
+        Error ("Identifier expected.");
+    }
+    /* Skip the name */
+    NextTok ();
+
+    return GenLiteralExpr (Instr > 0);
 }
 
 
@@ -1077,6 +1099,15 @@ static ExprNode* Factor (void)
             N = Function (FuncAddrSize);
             break;
 
+        case TOK_ASIZE:
+            if (GetCPU () != CPU_65816) {
+                N = GenLiteralExpr (8);
+            } else {
+                N = GenLiteralExpr (ExtBytes[AM65I_IMM_ACCU] * 8);
+            }
+            NextTok ();
+            break;
+
         case TOK_BLANK:
             N = Function (FuncBlank);
             break;
@@ -1094,8 +1125,8 @@ static ExprNode* Factor (void)
             N = Function (FuncDefined);
             break;
 
-        case TOK_ISMNEMONIC:
-            N = Function (FuncIsMnemonic);
+        case TOK_DEFINEDMACRO:
+            N = Function (FuncDefinedMacro);
             break;
 
         case TOK_HIBYTE:
@@ -1104,6 +1135,19 @@ static ExprNode* Factor (void)
 
         case TOK_HIWORD:
             N = Function (FuncHiWord);
+            break;
+
+        case TOK_ISMNEMONIC:
+            N = Function (FuncIsMnemonic);
+            break;
+
+        case TOK_ISIZE:
+            if (GetCPU () != CPU_65816) {
+                N = GenLiteralExpr (8);
+            } else {
+                N = GenLiteralExpr (ExtBytes[AM65I_IMM_INDEX] * 8);
+            }
+            NextTok ();
             break;
 
         case TOK_LOBYTE:

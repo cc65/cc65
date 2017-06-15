@@ -132,165 +132,170 @@ struct DotKeyword {
     const char* Key;                    /* MUST be first field */
     token_t     Tok;
 } DotKeywords [] = {
-    { ".A16",           TOK_A16         },
-    { ".A8",            TOK_A8          },
-    { ".ADDR",          TOK_ADDR        },
-    { ".ADDRSIZE",      TOK_ADDRSIZE    },
-    { ".ALIGN",         TOK_ALIGN       },
-    { ".AND",           TOK_BOOLAND     },
-    { ".ASCIIZ",        TOK_ASCIIZ      },
-    { ".ASSERT",        TOK_ASSERT      },
-    { ".AUTOIMPORT",    TOK_AUTOIMPORT  },
-    { ".BANK",          TOK_BANK        },
-    { ".BANKBYTE",      TOK_BANKBYTE    },
-    { ".BANKBYTES",     TOK_BANKBYTES   },
-    { ".BITAND",        TOK_AND         },
-    { ".BITNOT",        TOK_NOT         },
-    { ".BITOR",         TOK_OR          },
-    { ".BITXOR",        TOK_XOR         },
-    { ".BLANK",         TOK_BLANK       },
-    { ".BSS",           TOK_BSS         },
-    { ".BYT",           TOK_BYTE        },
-    { ".BYTE",          TOK_BYTE        },
-    { ".CASE",          TOK_CASE        },
-    { ".CHARMAP",       TOK_CHARMAP     },
-    { ".CODE",          TOK_CODE        },
-    { ".CONCAT",        TOK_CONCAT      },
-    { ".CONDES",        TOK_CONDES      },
-    { ".CONST",         TOK_CONST       },
-    { ".CONSTRUCTOR",   TOK_CONSTRUCTOR },
-    { ".CPU",           TOK_CPU         },
-    { ".DATA",          TOK_DATA        },
-    { ".DBG",           TOK_DBG         },
-    { ".DBYT",          TOK_DBYT        },
-    { ".DEBUGINFO",     TOK_DEBUGINFO   },
-    { ".DEF",           TOK_DEFINED     },
-    { ".DEFINE",        TOK_DEFINE      },
-    { ".DEFINED",       TOK_DEFINED     },
-    { ".DELMAC",        TOK_DELMAC      },
-    { ".DELMACRO",      TOK_DELMAC      },
-    { ".DESTRUCTOR",    TOK_DESTRUCTOR  },
-    { ".DWORD",         TOK_DWORD       },
-    { ".ELSE",          TOK_ELSE        },
-    { ".ELSEIF",        TOK_ELSEIF      },
-    { ".END",           TOK_END         },
-    { ".ENDENUM",       TOK_ENDENUM     },
-    { ".ENDIF",         TOK_ENDIF       },
-    { ".ENDMAC",        TOK_ENDMACRO    },
-    { ".ENDMACRO",      TOK_ENDMACRO    },
-    { ".ENDPROC",       TOK_ENDPROC     },
-    { ".ENDREP",        TOK_ENDREP      },
-    { ".ENDREPEAT",     TOK_ENDREP      },
-    { ".ENDSCOPE",      TOK_ENDSCOPE    },
-    { ".ENDSTRUCT",     TOK_ENDSTRUCT   },
-    { ".ENDUNION",      TOK_ENDUNION    },
-    { ".ENUM",          TOK_ENUM        },
-    { ".ERROR",         TOK_ERROR       },
-    { ".EXITMAC",       TOK_EXITMACRO   },
-    { ".EXITMACRO",     TOK_EXITMACRO   },
-    { ".EXPORT",        TOK_EXPORT      },
-    { ".EXPORTZP",      TOK_EXPORTZP    },
-    { ".FARADDR",       TOK_FARADDR     },
-    { ".FATAL",         TOK_FATAL       },
-    { ".FEATURE",       TOK_FEATURE     },
-    { ".FILEOPT",       TOK_FILEOPT     },
-    { ".FOPT",          TOK_FILEOPT     },
-    { ".FORCEIMPORT",   TOK_FORCEIMPORT },
-    { ".FORCEWORD",     TOK_FORCEWORD   },
-    { ".GLOBAL",        TOK_GLOBAL      },
-    { ".GLOBALZP",      TOK_GLOBALZP    },
-    { ".HIBYTE",        TOK_HIBYTE      },
-    { ".HIBYTES",       TOK_HIBYTES     },
-    { ".HIWORD",        TOK_HIWORD      },
-    { ".I16",           TOK_I16         },
-    { ".I8",            TOK_I8          },
-    { ".IDENT",         TOK_MAKEIDENT   },
-    { ".IF",            TOK_IF          },
-    { ".IFBLANK",       TOK_IFBLANK     },
-    { ".IFCONST",       TOK_IFCONST     },
-    { ".IFDEF",         TOK_IFDEF       },
-    { ".IFNBLANK",      TOK_IFNBLANK    },
-    { ".IFNCONST",      TOK_IFNCONST    },
-    { ".IFNDEF",        TOK_IFNDEF      },
-    { ".IFNREF",        TOK_IFNREF      },
-    { ".IFP02",         TOK_IFP02       },
-    { ".IFP816",        TOK_IFP816      },
-    { ".IFPC02",        TOK_IFPC02      },
-    { ".IFPSC02",       TOK_IFPSC02     },
-    { ".IFREF",         TOK_IFREF       },
-    { ".IMPORT",        TOK_IMPORT      },
-    { ".IMPORTZP",      TOK_IMPORTZP    },
-    { ".INCBIN",        TOK_INCBIN      },
-    { ".INCLUDE",       TOK_INCLUDE     },
-    { ".INTERRUPTOR",   TOK_INTERRUPTOR },
-    { ".ISMNEM",        TOK_ISMNEMONIC  },
-    { ".ISMNEMONIC",    TOK_ISMNEMONIC  },
-    { ".LEFT",          TOK_LEFT        },
-    { ".LINECONT",      TOK_LINECONT    },
-    { ".LIST",          TOK_LIST        },
-    { ".LISTBYTES",     TOK_LISTBYTES   },
-    { ".LOBYTE",        TOK_LOBYTE      },
-    { ".LOBYTES",       TOK_LOBYTES     },
-    { ".LOCAL",         TOK_LOCAL       },
-    { ".LOCALCHAR",     TOK_LOCALCHAR   },
-    { ".LOWORD",        TOK_LOWORD      },
-    { ".MAC",           TOK_MACRO       },
-    { ".MACPACK",       TOK_MACPACK     },
-    { ".MACRO",         TOK_MACRO       },
-    { ".MATCH",         TOK_MATCH       },
-    { ".MAX",           TOK_MAX         },
-    { ".MID",           TOK_MID         },
-    { ".MIN",           TOK_MIN         },
-    { ".MOD",           TOK_MOD         },
-    { ".NOT",           TOK_BOOLNOT     },
-    { ".NULL",          TOK_NULL        },
-    { ".OR",            TOK_BOOLOR      },
-    { ".ORG",           TOK_ORG         },
-    { ".OUT",           TOK_OUT         },
-    { ".P02",           TOK_P02         },
-    { ".P816",          TOK_P816        },
-    { ".PAGELEN",       TOK_PAGELENGTH  },
-    { ".PAGELENGTH",    TOK_PAGELENGTH  },
-    { ".PARAMCOUNT",    TOK_PARAMCOUNT  },
-    { ".PC02",          TOK_PC02        },
-    { ".POPCPU",        TOK_POPCPU      },
-    { ".POPSEG",        TOK_POPSEG      },
-    { ".PROC",          TOK_PROC        },
-    { ".PSC02",         TOK_PSC02       },
-    { ".PUSHCPU",       TOK_PUSHCPU     },
-    { ".PUSHSEG",       TOK_PUSHSEG     },
-    { ".REF",           TOK_REFERENCED  },
-    { ".REFERENCED",    TOK_REFERENCED  },
-    { ".RELOC",         TOK_RELOC       },
-    { ".REPEAT",        TOK_REPEAT      },
-    { ".RES",           TOK_RES         },
-    { ".RIGHT",         TOK_RIGHT       },
-    { ".RODATA",        TOK_RODATA      },
-    { ".SCOPE",         TOK_SCOPE       },
-    { ".SEGMENT",       TOK_SEGMENT     },
-    { ".SET",           TOK_SET         },
-    { ".SETCPU",        TOK_SETCPU      },
-    { ".SHL",           TOK_SHL         },
-    { ".SHR",           TOK_SHR         },
-    { ".SIZEOF",        TOK_SIZEOF      },
-    { ".SMART",         TOK_SMART       },
-    { ".SPRINTF",       TOK_SPRINTF     },
-    { ".STRAT",         TOK_STRAT       },
-    { ".STRING",        TOK_STRING      },
-    { ".STRLEN",        TOK_STRLEN      },
-    { ".STRUCT",        TOK_STRUCT      },
-    { ".TAG",           TOK_TAG         },
-    { ".TCOUNT",        TOK_TCOUNT      },
-    { ".TIME",          TOK_TIME        },
-    { ".UNDEF",         TOK_UNDEF       },
-    { ".UNDEFINE",      TOK_UNDEF       },
-    { ".UNION",         TOK_UNION       },
-    { ".VERSION",       TOK_VERSION     },
-    { ".WARNING",       TOK_WARNING     },
-    { ".WORD",          TOK_WORD        },
-    { ".XMATCH",        TOK_XMATCH      },
-    { ".XOR",           TOK_BOOLXOR     },
-    { ".ZEROPAGE",      TOK_ZEROPAGE    },
+    { ".A16",           TOK_A16                 },
+    { ".A8",            TOK_A8                  },
+    { ".ADDR",          TOK_ADDR                },
+    { ".ADDRSIZE",      TOK_ADDRSIZE            },
+    { ".ALIGN",         TOK_ALIGN               },
+    { ".AND",           TOK_BOOLAND             },
+    { ".ASCIIZ",        TOK_ASCIIZ              },
+    { ".ASIZE",         TOK_ASIZE               },
+    { ".ASSERT",        TOK_ASSERT              },
+    { ".AUTOIMPORT",    TOK_AUTOIMPORT          },
+    { ".BANK",          TOK_BANK                },
+    { ".BANKBYTE",      TOK_BANKBYTE            },
+    { ".BANKBYTES",     TOK_BANKBYTES           },
+    { ".BITAND",        TOK_AND                 },
+    { ".BITNOT",        TOK_NOT                 },
+    { ".BITOR",         TOK_OR                  },
+    { ".BITXOR",        TOK_XOR                 },
+    { ".BLANK",         TOK_BLANK               },
+    { ".BSS",           TOK_BSS                 },
+    { ".BYT",           TOK_BYTE                },
+    { ".BYTE",          TOK_BYTE                },
+    { ".CASE",          TOK_CASE                },
+    { ".CHARMAP",       TOK_CHARMAP             },
+    { ".CODE",          TOK_CODE                },
+    { ".CONCAT",        TOK_CONCAT              },
+    { ".CONDES",        TOK_CONDES              },
+    { ".CONST",         TOK_CONST               },
+    { ".CONSTRUCTOR",   TOK_CONSTRUCTOR         },
+    { ".CPU",           TOK_CPU                 },
+    { ".DATA",          TOK_DATA                },
+    { ".DBG",           TOK_DBG                 },
+    { ".DBYT",          TOK_DBYT                },
+    { ".DEBUGINFO",     TOK_DEBUGINFO           },
+    { ".DEF",           TOK_DEFINED             },
+    { ".DEFINE",        TOK_DEFINE              },
+    { ".DEFINED",       TOK_DEFINED             },
+    { ".DEFINEDMACRO",  TOK_DEFINEDMACRO        },
+    { ".DELMAC",        TOK_DELMAC              },
+    { ".DELMACRO",      TOK_DELMAC              },
+    { ".DESTRUCTOR",    TOK_DESTRUCTOR          },
+    { ".DWORD",         TOK_DWORD               },
+    { ".ELSE",          TOK_ELSE                },
+    { ".ELSEIF",        TOK_ELSEIF              },
+    { ".END",           TOK_END                 },
+    { ".ENDENUM",       TOK_ENDENUM             },
+    { ".ENDIF",         TOK_ENDIF               },
+    { ".ENDMAC",        TOK_ENDMACRO            },
+    { ".ENDMACRO",      TOK_ENDMACRO            },
+    { ".ENDPROC",       TOK_ENDPROC             },
+    { ".ENDREP",        TOK_ENDREP              },
+    { ".ENDREPEAT",     TOK_ENDREP              },
+    { ".ENDSCOPE",      TOK_ENDSCOPE            },
+    { ".ENDSTRUCT",     TOK_ENDSTRUCT           },
+    { ".ENDUNION",      TOK_ENDUNION            },
+    { ".ENUM",          TOK_ENUM                },
+    { ".ERROR",         TOK_ERROR               },
+    { ".EXITMAC",       TOK_EXITMACRO           },
+    { ".EXITMACRO",     TOK_EXITMACRO           },
+    { ".EXPORT",        TOK_EXPORT              },
+    { ".EXPORTZP",      TOK_EXPORTZP            },
+    { ".FARADDR",       TOK_FARADDR             },
+    { ".FATAL",         TOK_FATAL               },
+    { ".FEATURE",       TOK_FEATURE             },
+    { ".FILEOPT",       TOK_FILEOPT             },
+    { ".FOPT",          TOK_FILEOPT             },
+    { ".FORCEIMPORT",   TOK_FORCEIMPORT         },
+    { ".FORCEWORD",     TOK_FORCEWORD           },
+    { ".GLOBAL",        TOK_GLOBAL              },
+    { ".GLOBALZP",      TOK_GLOBALZP            },
+    { ".HIBYTE",        TOK_HIBYTE              },
+    { ".HIBYTES",       TOK_HIBYTES             },
+    { ".HIWORD",        TOK_HIWORD              },
+    { ".I16",           TOK_I16                 },
+    { ".I8",            TOK_I8                  },
+    { ".IDENT",         TOK_MAKEIDENT           },
+    { ".IF",            TOK_IF                  },
+    { ".IFBLANK",       TOK_IFBLANK             },
+    { ".IFCONST",       TOK_IFCONST             },
+    { ".IFDEF",         TOK_IFDEF               },
+    { ".IFNBLANK",      TOK_IFNBLANK            },
+    { ".IFNCONST",      TOK_IFNCONST            },
+    { ".IFNDEF",        TOK_IFNDEF              },
+    { ".IFNREF",        TOK_IFNREF              },
+    { ".IFP02",         TOK_IFP02               },
+    { ".IFP4510",       TOK_IFP4510             },
+    { ".IFP816",        TOK_IFP816              },
+    { ".IFPC02",        TOK_IFPC02              },
+    { ".IFPSC02",       TOK_IFPSC02             },
+    { ".IFREF",         TOK_IFREF               },
+    { ".IMPORT",        TOK_IMPORT              },
+    { ".IMPORTZP",      TOK_IMPORTZP            },
+    { ".INCBIN",        TOK_INCBIN              },
+    { ".INCLUDE",       TOK_INCLUDE             },
+    { ".INTERRUPTOR",   TOK_INTERRUPTOR         },
+    { ".ISIZE",         TOK_ISIZE               },
+    { ".ISMNEM",        TOK_ISMNEMONIC          },
+    { ".ISMNEMONIC",    TOK_ISMNEMONIC          },
+    { ".LEFT",          TOK_LEFT                },
+    { ".LINECONT",      TOK_LINECONT            },
+    { ".LIST",          TOK_LIST                },
+    { ".LISTBYTES",     TOK_LISTBYTES           },
+    { ".LOBYTE",        TOK_LOBYTE              },
+    { ".LOBYTES",       TOK_LOBYTES             },
+    { ".LOCAL",         TOK_LOCAL               },
+    { ".LOCALCHAR",     TOK_LOCALCHAR           },
+    { ".LOWORD",        TOK_LOWORD              },
+    { ".MAC",           TOK_MACRO               },
+    { ".MACPACK",       TOK_MACPACK             },
+    { ".MACRO",         TOK_MACRO               },
+    { ".MATCH",         TOK_MATCH               },
+    { ".MAX",           TOK_MAX                 },
+    { ".MID",           TOK_MID                 },
+    { ".MIN",           TOK_MIN                 },
+    { ".MOD",           TOK_MOD                 },
+    { ".NOT",           TOK_BOOLNOT             },
+    { ".NULL",          TOK_NULL                },
+    { ".OR",            TOK_BOOLOR              },
+    { ".ORG",           TOK_ORG                 },
+    { ".OUT",           TOK_OUT                 },
+    { ".P02",           TOK_P02                 },
+    { ".P4510",         TOK_P4510               },
+    { ".P816",          TOK_P816                },
+    { ".PAGELEN",       TOK_PAGELENGTH          },
+    { ".PAGELENGTH",    TOK_PAGELENGTH          },
+    { ".PARAMCOUNT",    TOK_PARAMCOUNT          },
+    { ".PC02",          TOK_PC02                },
+    { ".POPCPU",        TOK_POPCPU              },
+    { ".POPSEG",        TOK_POPSEG              },
+    { ".PROC",          TOK_PROC                },
+    { ".PSC02",         TOK_PSC02               },
+    { ".PUSHCPU",       TOK_PUSHCPU             },
+    { ".PUSHSEG",       TOK_PUSHSEG             },
+    { ".REF",           TOK_REFERENCED          },
+    { ".REFERENCED",    TOK_REFERENCED          },
+    { ".RELOC",         TOK_RELOC               },
+    { ".REPEAT",        TOK_REPEAT              },
+    { ".RES",           TOK_RES                 },
+    { ".RIGHT",         TOK_RIGHT               },
+    { ".RODATA",        TOK_RODATA              },
+    { ".SCOPE",         TOK_SCOPE               },
+    { ".SEGMENT",       TOK_SEGMENT             },
+    { ".SET",           TOK_SET                 },
+    { ".SETCPU",        TOK_SETCPU              },
+    { ".SHL",           TOK_SHL                 },
+    { ".SHR",           TOK_SHR                 },
+    { ".SIZEOF",        TOK_SIZEOF              },
+    { ".SMART",         TOK_SMART               },
+    { ".SPRINTF",       TOK_SPRINTF             },
+    { ".STRAT",         TOK_STRAT               },
+    { ".STRING",        TOK_STRING              },
+    { ".STRLEN",        TOK_STRLEN              },
+    { ".STRUCT",        TOK_STRUCT              },
+    { ".TAG",           TOK_TAG                 },
+    { ".TCOUNT",        TOK_TCOUNT              },
+    { ".TIME",          TOK_TIME                },
+    { ".UNDEF",         TOK_UNDEF               },
+    { ".UNDEFINE",      TOK_UNDEF               },
+    { ".UNION",         TOK_UNION               },
+    { ".VERSION",       TOK_VERSION             },
+    { ".WARNING",       TOK_WARNING             },
+    { ".WORD",          TOK_WORD                },
+    { ".XMATCH",        TOK_XMATCH              },
+    { ".XOR",           TOK_BOOLXOR             },
+    { ".ZEROPAGE",      TOK_ZEROPAGE            },
 };
 
 
@@ -405,7 +410,7 @@ static void IFNextChar (CharSource* S)
 
         /* If we come here, we have a new input line. To avoid problems
         ** with strange line terminators, remove all whitespace from the
-        ** end of the line, the add a single newline.
+        ** end of the line, then add a single newline.
         */
         Len = SB_GetLen (&S->V.File.Line);
         while (Len > 0 && IsSpace (SB_AtUnchecked (&S->V.File.Line, Len-1))) {
@@ -1011,7 +1016,7 @@ Again:
                 break;
             }
             DVal = DigitVal (Buf[I]);
-            if (DVal > Base) {
+            if (DVal >= Base) {
                 Error ("Invalid digits in number");
                 CurTok.IVal = 0;
                 break;
@@ -1106,60 +1111,76 @@ Again:
         /* Check for special names. Bail out if we have identified the type of
         ** the token. Go on if the token is an identifier.
         */
-        if (SB_GetLen (&CurTok.SVal) == 1) {
-            switch (toupper (SB_AtUnchecked (&CurTok.SVal, 0))) {
+        switch (SB_GetLen (&CurTok.SVal)) {
+            case 1:
+                switch (toupper (SB_AtUnchecked (&CurTok.SVal, 0))) {
 
-                case 'A':
-                    if (C == ':') {
-                        NextChar ();
-                        CurTok.Tok = TOK_OVERRIDE_ABS;
-                    } else {
-                        CurTok.Tok = TOK_A;
-                    }
-                    return;
-
-                case 'F':
-                    if (C == ':') {
-                        NextChar ();
-                        CurTok.Tok = TOK_OVERRIDE_FAR;
+                    case 'A':
+                        if (C == ':') {
+                            NextChar ();
+                            CurTok.Tok = TOK_OVERRIDE_ABS;
+                        } else {
+                            CurTok.Tok = TOK_A;
+                        }
                         return;
-                    }
-                    break;
 
-                case 'S':
-                    if (CPU == CPU_65816) {
-                        CurTok.Tok = TOK_S;
+                    case 'F':
+                        if (C == ':') {
+                            NextChar ();
+                            CurTok.Tok = TOK_OVERRIDE_FAR;
+                            return;
+                        }
+                        break;
+
+                    case 'S':
+                        if ((CPU == CPU_4510) || (CPU == CPU_65816)) {
+                            CurTok.Tok = TOK_S;
+                            return;
+                        }
+                        break;
+
+                    case 'X':
+                        CurTok.Tok = TOK_X;
                         return;
-                    }
-                    break;
 
-                case 'X':
-                    CurTok.Tok = TOK_X;
-                    return;
-
-                case 'Y':
-                    CurTok.Tok = TOK_Y;
-                    return;
-
-                case 'Z':
-                    if (C == ':') {
-                        NextChar ();
-                        CurTok.Tok = TOK_OVERRIDE_ZP;
+                    case 'Y':
+                        CurTok.Tok = TOK_Y;
                         return;
-                    }
-                    break;
 
-                default:
-                    break;
-            }
+                    case 'Z':
+                        if (C == ':') {
+                            NextChar ();
+                            CurTok.Tok = TOK_OVERRIDE_ZP;
+                           return;
+                        } else {
+                            if (CPU == CPU_4510) {
+                                CurTok.Tok = TOK_Z;
+                                return;
+                            }
+                        }
+                        break;
 
-        } else if (CPU == CPU_SWEET16 &&
-                  (CurTok.IVal = Sweet16Reg (&CurTok.SVal)) >= 0) {
+                    default:
+                        break;
+                }
+                break;
+            case 2:
+                if ((CPU == CPU_4510) &&
+                    (toupper (SB_AtUnchecked (&CurTok.SVal, 0)) == 'S') &&
+                    (toupper (SB_AtUnchecked (&CurTok.SVal, 1)) == 'P')) {
 
-            /* A sweet16 register number in sweet16 mode */
-            CurTok.Tok = TOK_REG;
-            return;
+                    CurTok.Tok = TOK_S;
+                    return;
+                }
+                /* FALL THROUGH */
+            default:
+                if (CPU == CPU_SWEET16 &&
+                   (CurTok.IVal = Sweet16Reg (&CurTok.SVal)) >= 0) {
 
+                    /* A sweet16 register number in sweet16 mode */
+                    CurTok.Tok = TOK_REG;
+                    return;
+                }
         }
 
         /* Check for define style macro */
@@ -1417,11 +1438,14 @@ CharAgain:
             /* Line continuation? */
             if (LineCont) {
                 NextChar ();
+                /* Next char should be a LF, if not, will result in an error later */
                 if (C == '\n') {
-                    /* Handle as white space */
+                    /* Ignore the '\n' */
                     NextChar ();
-                    C = ' ';
                     goto Again;
+                } else {
+                    /* Make it clear what the problem is: */
+                    Error ("EOL expected.");
                 }
             }
             break;

@@ -20,16 +20,10 @@
 ;--------------------------------------------------------------------------
 ; initstdout: Open the stdout and stderr file descriptors for the screen.
 
-.segment        "INIT"
+.segment        "ONCE"
 
 .proc   initstdout
 
-        lda     #LFN_WRITE
-        sta     fdtab+STDOUT_FILENO
-        sta     fdtab+STDERR_FILENO
-        lda     #CBMDEV_SCREEN
-        sta     unittab+STDOUT_FILENO
-        sta     unittab+STDERR_FILENO
         lda     #STDOUT_FILENO + LFN_OFFS
         jsr     @L1
         lda     #STDERR_FILENO + LFN_OFFS
@@ -122,7 +116,3 @@ invalidfd:
         jmp     __directerrno   ; Sets _errno, clears _oserror, returns -1
 
 .endproc
-
-
-
-

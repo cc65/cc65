@@ -389,7 +389,16 @@ unsigned SizeOf (const Type* T)
     switch (UnqualifiedType (T->C)) {
 
         case T_VOID:
-            return 0;   /* Assume voids have size zero */
+            /* A void variable is a cc65 extension.
+            ** Get its size (in bytes).
+            */
+            return T->A.U;
+
+        /* Beware: There's a chance that this triggers problems in other parts
+           of the compiler. The solution is to fix the callers, because calling
+           SizeOf() with a function type as argument is bad. */
+        case T_FUNC:
+            return 0;   /* Size of function is unknown */
 
         case T_SCHAR:
         case T_UCHAR:
@@ -404,7 +413,6 @@ unsigned SizeOf (const Type* T)
             return SIZEOF_INT;
 
         case T_PTR:
-        case T_FUNC:    /* Maybe pointer to function */
             return SIZEOF_PTR;
 
         case T_LONG:
@@ -433,7 +441,7 @@ unsigned SizeOf (const Type* T)
                 /* Array with unspecified size */
                 return 0;
             } else {
-                return T->A.L * SizeOf (T + 1);
+                return T->A.U * SizeOf (T + 1);
             }
 
         default:

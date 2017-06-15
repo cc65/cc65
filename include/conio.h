@@ -69,6 +69,8 @@
 #  include <atmos.h>
 #elif defined(__CBM__)
 #  include <cbm.h>
+#elif defined(__GAMATE__)
+#  include <gamate.h>
 #elif defined(__GEOS__)
 #  include <geos.h>
 #elif defined(__LUNIX__)
@@ -79,6 +81,8 @@
 #  include <nes.h>
 #elif defined(__OSIC1P__)
 #  include <osic1p.h>
+#elif defined(__PCE__)
+#  include <pce.h>
 #endif
 
 

@@ -7,7 +7,10 @@
 ; be called from an interrupt handler
 ;
 
+        .constructor    initmcb
         .export         _mouse_def_callbacks
+        .import         _mouse_def_pointershape
+        .import         _mouse_def_pointercolor
 
         .include        "mouse-kernel.inc"
         .include        "c128.inc"
@@ -15,15 +18,44 @@
         .macpack        generic
 
 ; Sprite definitions. The first value can be changed to adjust the number
-; of the sprite used for the mouse.
+; of the sprite used for the mouse. All others depend on this value.
 MOUSE_SPR       = 0                             ; Sprite used for the mouse
+MOUSE_SPR_MEM   = $0E00                         ; Memory location
 MOUSE_SPR_MASK  = $01 .shl MOUSE_SPR            ; Positive mask
 MOUSE_SPR_NMASK = .lobyte(.not MOUSE_SPR_MASK)  ; Negative mask
 VIC_SPR_X       = (VIC_SPR0_X + 2*MOUSE_SPR)    ; Sprite X register
 VIC_SPR_Y       = (VIC_SPR0_Y + 2*MOUSE_SPR)    ; Sprite Y register
 
 ; --------------------------------------------------------------------------
+; Initialize the mouse sprite.
+
+.segment        "ONCE"
+
+initmcb:
+
+; Copy the mouse sprite data
+
+        ldx     #64 - 1
+@L0:    lda     _mouse_def_pointershape,x
+        sta     MOUSE_SPR_MEM,x
+        dex
+        bpl     @L0
+
+; Set the mouse sprite pointer
+
+        lda     #<(MOUSE_SPR_MEM / 64)
+        sta     $07F8 + MOUSE_SPR
+
+; Set the mouse sprite color
+
+        lda     _mouse_def_pointercolor
+        sta     VIC_SPR0_COLOR + MOUSE_SPR
+        rts
+
+; --------------------------------------------------------------------------
 ; Hide the mouse pointer. Always called with interrupts disabled.
+
+.code
 
 hide:
         lda     #MOUSE_SPR_NMASK

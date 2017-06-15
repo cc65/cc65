@@ -7,7 +7,7 @@
 
         .export         _cputcxy, _cputc
         .export         plot, cputdirect, putchar
-        .import         popa, _gotoxy, mul40
+        .import         gotoxy, mul40
         .importzp       tmp4,ptr4
         .import         _revflag,setcursor
 
@@ -15,8 +15,7 @@
 
 _cputcxy:
         pha                     ; Save C
-        jsr     popa            ; Get Y
-        jsr     _gotoxy         ; Set cursor, drop x
+        jsr     gotoxy          ; Set cursor, drop x and y
         pla                     ; Restore C
 
 _cputc:

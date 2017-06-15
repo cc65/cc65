@@ -39,18 +39,18 @@ L2:     jsr     KBDREAD         ; Read char and return in A
 ;--------------------------------------------------------------------------
 ; Module constructor/destructor
 
-.bss
+.segment        "INIT"
 keyvec: .res    2
 
-.segment        "INIT"
+.segment        "ONCE"
 initcgetc:
 
 ; Save the old vector
 
         lda     KeyStoreVec
+        ldx     KeyStoreVec+1
         sta     keyvec
-        lda     KeyStoreVec+1
-        sta     keyvec+1
+        stx     keyvec+1
 
 ; Set the new vector. I can only hope that this works for other C128
 ; versions...
@@ -68,5 +68,3 @@ SetVec: sei
         stx     KeyStoreVec+1
         cli
         rts
-
-

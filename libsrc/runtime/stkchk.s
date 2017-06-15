@@ -28,7 +28,7 @@
 ; Initialization code. This is a constructor, so it is called on startup if
 ; the linker has detected references to this module.
 
-.segment        "INIT"
+.segment        "ONCE"
 
 .proc   initstkchk
 
@@ -101,14 +101,14 @@ Fail:   lda     #4
 ; ----------------------------------------------------------------------------
 ; Data
 
-.bss
+.segment        "INIT"
 
 ; Initial stack pointer value. Stack is reset to this in case of overflows to
 ; allow program exit processing.
-initialsp:      .word   0
+initialsp:      .res    2
 
 ; Stack low water mark.
-lowwater:       .word   0
+lowwater:       .res    2
 
 
 

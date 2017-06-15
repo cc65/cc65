@@ -1,9 +1,9 @@
 /*
 ** Simple ("tiny") shell to test filename and directory functions.
-** Copyright (c) 2013, Christian Groessler, chris@groessler.org
+** Copyright (c) 2013,2016 Christian Groessler, chris@groessler.org
 */
 
-#define VERSION_ASC "0.90"
+#define VERSION_ASC "0.91"
 
 #ifdef __ATARI__
 #define UPPERCASE      /* define (e.g. for Atari) to convert filenames etc. to upper case */
@@ -18,7 +18,7 @@
 #define CHECK_SP
 #endif
 
-#define KEYB_BUFSZ 80
+#define KEYB_BUFSZ 127
 #define PROMPT ">>> "
 
 #include <stdio.h>
@@ -55,12 +55,14 @@ extern unsigned int getsp(void);  /* comes from getsp.s */
 #define CMD_PWD     11
 #define CMD_CLS     12
 #define CMD_VERBOSE 13
+#define CMD_EXEC    14
 
 static unsigned char verbose;
 static unsigned char terminate;
 static unsigned char cmd;
-static unsigned char *cmd_asc, *arg1, *arg2, *arg3;
-static unsigned char keyb_buf[KEYB_BUFSZ];
+static unsigned char *cmd_asc, *arg1, *arg2, *arg3, *args;  /* 'args': everything after command */
+static unsigned char keyb_buf[KEYB_BUFSZ + 1];
+static unsigned char keyb_buf2[KEYB_BUFSZ + 1];
 static size_t cpbuf_sz = 4096;
 
 struct cmd_table {
@@ -88,6 +90,7 @@ struct cmd_table {
     { "mv",    CMD_RENAME },
     { "ren",   CMD_RENAME },
     { "pwd",   CMD_PWD },
+    { "exec",  CMD_EXEC },
 #ifdef __ATARI__
     { "cls",   CMD_CLS },
 #endif
@@ -134,6 +137,17 @@ static void get_command(void)
         return;
     }
 
+    /* put everything after first string into 'args' */
+
+    strcpy(keyb_buf2, keyb_buf);  /* use a backup copy for 'args' */
+
+    /* skip over the first non-whitespace item */
+    cmd_asc = strtok(keyb_buf2, " \t\n");
+    if (cmd_asc)
+        args = strtok(NULL, "");  /* get everything */
+    else
+        *args = 0;  /* no arguments */
+
     /* split input into cmd, arg1, arg2, arg3 */
 
     /* get and parse command */
@@ -172,11 +186,11 @@ static void cmd_help(void)
     puts("cd, chdir  -  change directory or drive");
     puts("md, mkdir  -  make directory or drive");
     puts("rd, rmdir  -  remove directory or drive");
+    puts("exec       -  run program");
 #ifdef __ATARI__
     puts("cls        -  clear screen");
 #endif
     puts("verbose    -  set verbosity level");
-    puts("sorry, you cannot start programs here");
 }
 
 static void cmd_ls(void)
@@ -340,6 +354,22 @@ static void cmd_rename(void)
         printf("rename failed: %s\n", strerror(errno));
 }
 
+static void cmd_exec(void)
+{
+    unsigned char *progname, *arguments;
+
+    progname = strtok(args, " \t\n");
+    if (! progname) {
+        puts("usage: exec <progname> [arguments]");
+        return;
+    }
+    arguments = strtok(NULL, "");
+
+    /*printf("exec: %s %s\n", progname, arguments ? arguments : "");*/
+    (void)exec(progname, arguments);
+    printf("exec error: %s\n", strerror(errno));
+}
+
 static void cmd_copy(void)
 {
     int srcfd = -1, dstfd = -1;
@@ -446,6 +476,7 @@ static void run_command(void)
         case CMD_RMDIR: cmd_rmdir(); return;
         case CMD_PWD: cmd_pwd(); return;
 #endif
+        case CMD_EXEC: cmd_exec(); return;
         case CMD_RENAME: cmd_rename(); return;
         case CMD_COPY: cmd_copy(); return;
 #ifdef __ATARI__

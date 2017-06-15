@@ -1,7 +1,8 @@
 ;
-; Ullrich von Bassewitz, 06.06.1998
+; 1998-06-06, Ullrich von Bassewitz
+; 2015-09-11, Greg King
 ;
-; void longjmp (jmp_buf buf, int retval);
+; void __fastcall__ longjmp (jmp_buf buf, int retval);
 ;
 
         .export         _longjmp
@@ -13,8 +14,8 @@ _longjmp:
         stx     ptr2+1
         ora     ptr2+1          ; Check for 0
         bne     @L1
-        lda     #1              ; 0 is illegal according to the standard...
-        sta     ptr2            ; ... and must be replaced by 1
+        inc     ptr2            ; 0 is illegal, according to the standard ...
+                                ; ... and, must be replaced by 1
 @L1:    jsr     popax           ; get buf
         sta     ptr1
         stx     ptr1+1
@@ -49,4 +50,3 @@ _longjmp:
         lda     ptr2
         ldx     ptr2+1
         rts
-

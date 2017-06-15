@@ -104,7 +104,7 @@ joy1:   lda     #$7F
         sei
         sta     CIA1_PRA
         lda     CIA1_PRB
-        cli
+back:   cli
         and     #$1F
         eor     #$1F
         rts
@@ -118,9 +118,4 @@ joy2:   ldx     #0
         sta     CIA1_DDRA
         lda     CIA1_PRA
         sty     CIA1_DDRA
-        cli
-        and     #$1F
-        eor     #$1F
-        rts
-
-
+        jmp     back

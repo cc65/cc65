@@ -114,10 +114,12 @@ Here is a description of all the command line options:
   <item>65sc02
   <item>65c02
   <item>huc6280
+  <item>4510
   </itemize>
 
   6502x is for the NMOS 6502 with unofficial opcodes. huc6280 is the CPU of
-  the PC engine. Support for the 65816 currently is not available.
+  the PC engine. 4510 is the CPU of the Commodore C65. Support for the 65816
+  currently is not available.
 
 
   <label id="option--formfeeds">
@@ -238,6 +240,11 @@ With the command line option <tt><ref id="option--cpu" name="--cpu"></tt>, the
 disassembler may be told to recognize either the 65SC02 or 65C02 CPUs. The
 latter understands the same opcodes as the former, plus 16 additional bit
 manipulation and bit test-and-branch commands.
+
+When disassembling 4510 code, due to handling of 16-bit wide branches, da65
+can produce output that can not be re-assembled, when one or more of those
+branches point outside of the disassembled memory. This can happen when text
+or binary data is processed.
 
 While there is some code for the 65816 in the sources, it is currently
 unsupported.

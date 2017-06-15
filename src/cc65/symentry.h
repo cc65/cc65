@@ -153,6 +153,8 @@ struct SymEntry {
             struct LiteralPool* LitPool;  /* Literal pool for this function */
         } F;
 
+        /* Segment name for tentantive global definitions */
+        const char*             BssName;
     } V;
     char                       Name[1]; /* Name, dynamically allocated */
 };

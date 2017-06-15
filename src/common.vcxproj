@@ -38,6 +38,7 @@
     <ClInclude Include="common\hashtab.h" />
     <ClInclude Include="common\hlldbgsym.h" />
     <ClInclude Include="common\inline.h" />
+    <ClInclude Include="common\intptrstack.h" />
     <ClInclude Include="common\intstack.h" />
     <ClInclude Include="common\inttypes.h" />
     <ClInclude Include="common\libdefs.h" />
@@ -87,6 +88,7 @@
     <ClCompile Include="common\gentype.c" />
     <ClCompile Include="common\hashfunc.c" />
     <ClCompile Include="common\hashtab.c" />
+    <ClCompile Include="common\intptrstack.c" />
     <ClCompile Include="common\intstack.c" />
     <ClCompile Include="common\matchpat.c" />
     <ClCompile Include="common\mmodel.c" />

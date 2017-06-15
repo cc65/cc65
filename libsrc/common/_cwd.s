@@ -14,12 +14,12 @@
         .import         initcwd
 
         .include        "stdio.inc"
-                                      
+
         __cwd_buf_size  = FILENAME_MAX
 
         cwd_init        := initcwd
 
-.bss
+.segment        "INIT"
 
 __cwd:  .res    __cwd_buf_size
 
@@ -29,4 +29,3 @@ __cwd:  .res    __cwd_buf_size
 ; checking the other sources.
 
         .assert __cwd_buf_size < 256, error, "__cwd_buf_size must not be > 255"
-

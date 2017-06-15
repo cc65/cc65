@@ -237,7 +237,7 @@ void TypeConversion (ExprDesc* Expr, Type* NewType)
                 switch (TypeCmp (NewType, Expr->Type)) {
 
                     case TC_INCOMPATIBLE:
-                        Error ("Incompatible pointer types");
+                        Error ("Incompatible pointer types at '%s'", (Expr->Sym? Expr->Sym->Name : "Unknown"));
                         break;
 
                     case TC_QUAL_DIFF:

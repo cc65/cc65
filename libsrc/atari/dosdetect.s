@@ -5,13 +5,13 @@
 ;
 
         .include        "atari.inc"
-        .constructor    detect,26
+        .constructor    detect, 26
         .export         __dos_type
 
 ; ------------------------------------------------------------------------
 ; DOS type detection
 
-.segment        "INIT"
+.segment        "ONCE"
 
 detect: lda     DOS
         cmp     #'S'            ; SpartaDOS
@@ -48,6 +48,6 @@ done:   rts
 ; ------------------------------------------------------------------------
 ; Data
 
-        .bss
+        .data
 
-__dos_type:     .res    1       ; default to ATARIDOS
+__dos_type:     .byte   ATARIDOS; default to ATARIDOS

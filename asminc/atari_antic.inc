@@ -33,16 +33,16 @@ NMIRES  = ANTIC + $0F         ;NMI interrupt reset
 ; ScreenDL:
 ; .byte DL_BLK8
 ; .byte DL_BLK8
-; .byte DL_CHR40x8x1 + DL_LMS + DL_DLI
+; .byte DL_CHR40x8x1 | DL_LMS | DL_DLI
 ; .word ScreenAlignment
-; .byte DL_BLK1 + DL_DLI
-; .byte DL_MAP320x1x1 + DL_LMS
+; .byte DL_BLK1 | DL_DLI
+; .byte DL_MAP320x1x1 | DL_LMS
 ; .word Screen
 ;
 ; .repeat 99
 ; .byte DL_MAP320x1x1
 ; .endrepeat
-; .byte DL_MAP320x1x1 + DL_LMS
+; .byte DL_MAP320x1x1 | DL_LMS
 ; .word Screen + 40 * 100       ; 100 lines a 40 byte, 'Screen' has to be aligned correctly!
 ; .repeat 92
 ; .byte DL_MAP320x1x1
@@ -54,6 +54,8 @@ NMIRES  = ANTIC + $0F         ;NMI interrupt reset
 
 DL_JMP  = 1
 DL_JVB  = 65
+
+; DL_BLKn display n empty lines (just background)
 
 DL_BLK1  = 0
 DL_BLK2  = 16

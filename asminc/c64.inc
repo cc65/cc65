@@ -6,6 +6,8 @@
 ; ---------------------------------------------------------------------------
 ; Zero page, Commodore stuff
 
+VARTAB          := $2D          ; Pointer to start of BASIC variables
+MEMSIZE         := $37          ; Pointer to highest BASIC RAM location (+1)
 TXTPTR          := $7A          ; Pointer into BASIC source code
 TIME            := $A0          ; 60 HZ clock
 FNAM_LEN        := $B7          ; Length of filename
@@ -22,6 +24,7 @@ SCREEN_PTR      := $D1          ; Pointer to current char in text screen
 CURS_X          := $D3          ; Cursor column
 CURS_Y          := $D6          ; Cursor row
 CRAM_PTR        := $F3          ; Pointer to current char in color RAM
+FREKZP          := $FB          ; Five unused bytes
 
 BASIC_BUF       := $200         ; Location of command-line
 BASIC_BUF_LEN   = 89            ; Maximum length of command-line
@@ -210,4 +213,3 @@ CASSMOT         = $20           ; Cassette motor on
 TP_FAST         = $80           ; Switch Rossmoeller TurboProcess to fast mode
 
 RAMONLY         = $F8           ; (~(LORAM | HIRAM | IOEN)) & $FF
-

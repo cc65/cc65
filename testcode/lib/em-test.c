@@ -5,34 +5,8 @@
 #include <conio.h>
 #include <em.h>
 
-
-#if defined(__C64__)
-#define DRIVERNAME      "c64-ram.emd"
-#elif defined(__C128__)
-#define DRIVERNAME      "c128-ram.emd"
-#elif defined(__C16__)
-#define DRIVERNAME      "c16-ram.emd"
-#elif defined(__CBM510__)
-#define DRIVERNAME      "cbm510-ram.emd"
-#elif defined(__CBM610__)
-#define DRIVERNAME      "cbm610-ram.emd"
-#elif defined(__APPLE2ENH__)
-#define DRIVERNAME      "a2e.auxmem.emd"
-#elif defined(__APPLE2__)
-#define DRIVERNAME      "a2.auxmem.emd"
-#elif defined(__ATARIXL__)
-#define DRIVERNAME      "atrx130.emd"
-#elif defined(__ATARI__)
-#define DRIVERNAME      "atr130.emd"
-#else
-#define DRIVERNAME      "unknown"
-#error "Unknown target system"
-#endif
-
-
 #define FORCE_ERROR1 0
 #define FORCE_ERROR2 0
-
 
 #define PAGE_SIZE       128                     /* Size in words */
 #define BUF_SIZE        (PAGE_SIZE + PAGE_SIZE/2)
@@ -75,7 +49,68 @@ static void cmp (unsigned page, register const unsigned* buf,
     }
 }
 
+typedef struct emd_test_s {
+    char key;
+    char *displayname;
+    char *drivername;
+} emd_test_t;
 
+static emd_test_t drivers[] = {
+
+#if defined(__APPLE2__)
+    { '0', "Apple II auxiliary memory", "a2.auxmem.emd" },
+#endif
+
+#if defined(__APPLE2ENH__)
+    { '0', "Apple II auxiliary memory", "a2e.auxmem.emd" },
+#endif
+
+#if defined(__ATARI__)
+    { '0', "Atari 130XE memory", "atr130.emd" },
+#endif
+
+#if defined(__ATARIXL__)
+    { '0', "Atari 130XE memory", "atrx130.emd" },
+#endif
+
+#if defined(__C16__)
+    { '0', "C16 RAM above $8000", "c16-ram.emd" },
+#endif
+
+#if defined(__C64__)
+    { '0', "C64 RAM above $D000", "c64-ram.emd" },
+    { '1', "C64 256K", "c64-c256k.emd" },
+    { '2', "Double Quick Brown Box", "c64-dqbb.emd" },
+    { '3', "GEORAM", "c64-georam.emd" },
+    { '4', "Isepic", "c64-isepic.emd" },
+    { '5', "RamCart", "c64-ramcart.emd" },
+    { '6', "REU", "c64-reu.emd" },
+    { '7', "C128 VDC (in C64 mode)", "c64-vdc.emd" },
+    { '8', "C64DTV himem", "dtv-himem.emd" },
+    { '9', "65816 extra banks", "c64-65816.emd" },
+#endif
+
+#if defined(__C128__)
+    { '0', "C128 RAM in bank 1", "c128-ram.emd" },
+    { '1', "C128 RAM in banks 1, 2 & 3", "c128-ram2.emd" },
+    { '2', "GEORAM", "c128-georam.emd" },
+    { '3', "RamCart", "c128-ramcart.emd" },
+    { '4', "REU", "c128-reu.emd" },
+    { '5', "VDC", "c128-vdc.emd" },
+    { '6', "Internal Function RAM", "c128-ifnram.emd" },
+    { '7', "External Function RAM", "c128-efnram.emd" },
+#endif
+
+#if defined(__CBM510__)
+    { '0', "CBM5x0 RAM in bank 2", "cbm510-ram.emd" },
+#endif
+
+#if defined(__CBM610__)
+    { '0', "CBM6x0/7x0 RAM in bank 2", "cbm610-ram.emd" },
+#endif
+
+    { 0, NULL, NULL }
+};
 
 int main (void)
 {
@@ -85,9 +120,27 @@ int main (void)
     unsigned PageCount;
     unsigned char X, Y;
     struct em_copy c;
+    unsigned index;
+    signed char valid_key = -1;
+    char key;
 
     clrscr ();
-    Res = em_load_driver (DRIVERNAME);
+    cputs ("Which RAM exp to test?\r\n\r\n");
+    for (index = 0; drivers[index].key; ++index) {
+        cprintf("%c: %s\r\n", drivers[index].key, drivers[index].displayname);
+    }
+
+    while (valid_key < 0) {
+        key = cgetc();
+        for (index = 0; drivers[index].key && valid_key < 0; ++index) {
+            if (key == drivers[index].key) {
+                valid_key = index;
+            }
+        }
+    }
+
+    clrscr ();
+    Res = em_load_driver (drivers[valid_key].drivername);
     if (Res != EM_ERR_OK) {
         cprintf ("Error in em_load_driver: %u\r\n", Res);
         cprintf ("os: %u, %s\r\n", _oserror, _stroserror (_oserror));

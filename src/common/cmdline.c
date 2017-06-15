@@ -161,7 +161,7 @@ static void ExpandFile (CmdLine* L, const char* Name)
 
 
 
-void InitCmdLine (int* aArgCount, char** aArgVec[], const char* aProgName)
+void InitCmdLine (int* aArgCount, char*** aArgVec, const char* aProgName)
 /* Initialize command line parsing. aArgVec is the argument array terminated by
 ** a NULL pointer (as usual), ArgCount is the number of valid arguments in the
 ** array. Both arguments are remembered in static storage.
@@ -171,7 +171,7 @@ void InitCmdLine (int* aArgCount, char** aArgVec[], const char* aProgName)
     int         I;
 
     /* Get the program name from argv[0] but strip a path */
-    if (*(aArgVec)[0] == 0) {
+    if ((*aArgVec)[0] == 0) {
         /* Use the default name given */
         ProgName = aProgName;
     } else {
@@ -190,7 +190,7 @@ void InitCmdLine (int* aArgCount, char** aArgVec[], const char* aProgName)
     ** special handling for arguments preceeded by the '@' sign - these are
     ** actually files containing arguments.
     */
-    for (I = 0; I < *aArgCount; ++I) {
+    for (I = 0; I <= *aArgCount; ++I) {
 
         /* Get the next argument */
         char* Arg = (*aArgVec)[I];
@@ -210,11 +210,11 @@ void InitCmdLine (int* aArgCount, char** aArgVec[], const char* aProgName)
     }
 
     /* Store the new argument list in a safe place... */
-    ArgCount = L.Count;
+    ArgCount = L.Count - 1;
     ArgVec   = L.Vec;
 
     /* ...and pass back the changed data also */
-    *aArgCount = L.Count;
+    *aArgCount = L.Count - 1;
     *aArgVec   = L.Vec;
 }
 

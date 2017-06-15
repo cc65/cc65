@@ -59,7 +59,7 @@ L2:     sta     ENABLE_ROM      ; Bank in the ROM
         .constructor    initkbd
         .destructor     donekbd
 
-.segment        "INIT"          ; Special init code segment may get overwritten
+.segment        "ONCE"          ; Special init code segment may get overwritten
 
 .proc   initkbd
 
@@ -71,6 +71,9 @@ L2:     sta     ENABLE_ROM      ; Bank in the ROM
         rts
 
 .endproc
+
+fnkeys: .byte   $01, $01, $01, $01, $01, $01, $01, $01
+        .byte   133, 137, 134, 138, 135, 139, 136, 140
 
 
 .segment        "LOWCODE"       ; Accesses the ROM - must go into low mem
@@ -87,11 +90,3 @@ L2:     sta     ENABLE_ROM      ; Bank in the ROM
         rts
 
 .endproc
-
-
-; Function key table, readonly
-
-.rodata
-fnkeys: .byte   $01, $01, $01, $01, $01, $01, $01, $01
-        .byte   133, 137, 134, 138, 135, 139, 136, 140
-

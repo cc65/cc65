@@ -22,15 +22,12 @@
 ;--------------------------------------------------------------------------
 ; initstdin: Open the stdin file descriptors for the keyboard
 
-.segment        "INIT"
+.segment        "ONCE"
 
 .proc   initstdin
 
-        lda     #LFN_READ
-        sta     fdtab+STDIN_FILENO
         lda     #STDIN_FILENO + LFN_OFFS
         ldx     #CBMDEV_KBD
-        stx     unittab+STDIN_FILENO
         ldy     #$FF
         jsr     SETLFS
         jmp     OPEN            ; Will always succeed
@@ -155,5 +152,3 @@ invalidfd:
 .bss
 
 unit:   .res    1
-
-

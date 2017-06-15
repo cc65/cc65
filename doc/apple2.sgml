@@ -75,13 +75,30 @@ However while running module constructors/destructors the Language Card is disab
 Enabling the Language Card allows to use it as additional memory for cc65
 generated code. However code is never automatically placed there. Rather code
 needs to be explicitly placed in the Language Card either per file by compiling
-with <tt/--code-name HIGHCODE/ or per function by enclosing in <tt/#pragma
-code-name (push, "HIGHCODE")/ and <tt/#pragma code-name (pop)/. In either case the
-cc65 runtime system takes care of actually moving the code into the Language
-Card.
+with <tt/--code-name LC/ or per function by enclosing in <tt/#pragma code-name
+(push, "LC")/ and <tt/#pragma code-name (pop)/. In either case the cc65 runtime
+system takes care of actually moving the code into the Language Card.
 
 The amount of memory available in the Language Card for generated code depends
-on the chosen <ref id="link-configs" name="linker configuration">.
+on the <ref id="link-configs" name="linker configuration"> parameters. There are
+several usefull settings:
+
+<descrip>
+
+  <tag>LC address: &dollar;D400, LC size: &dollar;C00</tag>
+  For plain vanilla ProDOS 8 which doesn't actually use the Language Card bank 2
+  memory from &dollar;D400 to &dollar;DFFF. This is the default setting.
+
+  <tag>LC address: &dollar;D000, LC size: &dollar;1000</tag>
+  For ProDOS 8 together with the function <tt/rebootafterexit()/. If a program
+  doesn't quit to the ProDOS 8 dispatcher but rather reboots the machine after
+  exit then a plain vanilla ProDOS 8 doesn't make use of the Language Card bank
+  2 at all.
+
+  <tag>LC address: &dollar;D000, LC size: &dollar;3000</tag>
+  For plain vanilla DOS 3.3 which doesn't make use of the Language Card at all.
+
+</descrip><p>
 
 
 
@@ -93,126 +110,118 @@ The apple2 package comes with additional secondary linker config files, which
 are used via <tt/-t apple2 -C &lt;configfile&gt;/.
 
 
-<sect1>default config file (<tt/apple2.cfg/)<p>
+<sect1>default config file (<tt/apple2.cfg/)<label id="apple-def-cfg"><p>
 
-Default configuration optimized for a binary program running on ProDOS 8 with
-BASIC.SYSTEM. A plain vanilla ProDOS 8 doesn't actually use the Language Card
-bank 2 memory from &dollar;D400 to &dollar;DFFF.
+Default configuration for a binary program.
 
-<descrip>
-
-  <tag><tt/RAM:/ Main memory area</tag>
-  From &dollar;803 to &dollar;95FF (35.5 KB)
-
-  <tag><tt/LC:/ Language Card memory area</tag>
-  From &dollar;D400 to &dollar;DFFF (3 KB)
-
-  <tag><tt/STARTADDRESS:/ Program start address</tag>
-  Variable (default: &dollar;803)
-
-  <tag><tt/HEADER:/ Binary file header</tag>
-  DOS 3.3 header (address and length)
-
-</descrip><p>
-
-
-<sect1><tt/apple2-dos33.cfg/<p>
-
-Configuration optimized for a binary program running on DOS 3.3. A plain
-vanilla DOS 3.3 doesn't make use of the Language Card at all.
+Parameters:
 
 <descrip>
 
-  <tag><tt/RAM:/ Main memory area</tag>
-  From &dollar;803 to &dollar;95FF (35.5 KB)
-
-  <tag><tt/LC:/ Language Card memory area</tag>
-  From &dollar;D000 to &dollar;FFFF (12 KB)
-
   <tag><tt/STARTADDRESS:/ Program start address</tag>
-  Variable (default: &dollar;803)
+  Default: &dollar;803. Use <tt/-S &lt;addr&gt;/ to set a different start address.
 
-  <tag><tt/HEADER:/ Binary file header</tag>
-  DOS 3.3 header (address and length)
+  <tag><tt/__EXEHDR__:/ Executable file header</tag>
+  Default: DOS 3.3 header (address and length). Use <tt/-D __EXEHDR__=0/ to omit
+  the header.
+
+  <tag><tt/__STACKSIZE__:/ C runtime stack size</tag>
+  Default: &dollar;800. Use <tt/-D __STACKSIZE__=&lt;size&gt;/ to set a different
+  stack size.
+
+  <tag><tt/__HIMEM__:/ Highest usable memory address presumed at link time</tag>
+  Default: &dollar;9600. Use <tt/-D __HIMEM__=&lt;addr&gt;/ to set a different
+  highest usable address.
+
+  <tag><tt/__LCADDR__:/ Address of code in the Language Card</tag>
+  Default: &dollar;D400. Use <tt/-D __LCADDR__=&lt;addr&gt;/ to set a different
+  code address.
+
+  <tag><tt/__LCSIZE__:/ Size of code in the Language Card</tag>
+  Default: &dollar;C00. Use <tt/-D __LCSIZE__=&lt;size&gt;/ to set a different
+  code size.
 
 </descrip><p>
 
 
 <sect1><tt/apple2-system.cfg/<label id="apple-sys-cfg"><p>
 
-Configuration for a system program running on ProDOS 8.
+Configuration for a system program running on ProDOS 8 and using the memory from
+&dollar;2000 to &dollar;BEFF.
+
+Parameters:
 
 <descrip>
 
-  <tag><tt/RAM:/ Main memory area</tag>
-  From &dollar;2000 to &dollar;BEFF (39.75 KB)
+  <tag><tt/__STACKSIZE__:/ C runtime stack size</tag>
+  Default: &dollar;800. Use <tt/-D __STACKSIZE__=&lt;size&gt;/ to set a different
+  stack size.
 
-  <tag><tt/LC:/ Language Card memory area</tag>
-  From &dollar;D400 to &dollar;DFFF (3 KB)
+  <tag><tt/__LCADDR__:/ Address of code in the Language Card</tag>
+  Default: &dollar;D400. Use <tt/-D __LCADDR__=&lt;addr&gt;/ to set a different
+  code address.
 
-  <tag><tt/STARTADDRESS:/ Program start address</tag>
-  Fixed (&dollar;2000)
-
-  <tag><tt/HEADER:/ Binary file header</tag>
-  None
+  <tag><tt/__LCSIZE__:/ Size of code in the Language Card</tag>
+  Default: &dollar;C00. Use <tt/-D __LCSIZE__=&lt;size&gt;/ to set a different
+  code size.
 
 </descrip><p>
 
 
-<sect1><tt/apple2-loader.cfg/<label id="apple-load-cfg"><p>
+<sect1><tt/apple2-overlay.cfg/<p>
 
-Configuration optimized for a binary program running on ProDOS 8 without
-BASIC.SYSTEM. Intended to be used with <bf/LOADER.SYSTEM - an
-Apple&nbsp;&rsqb;&lsqb; ProDOS 8 loader for cc65 programs/, which is available
-in the cc65 User Contributions section.
+Configuration for overlay programs with the up to nine overlays. The overlay files
+don't include the DOS 3.3 header. See <tt>samples/overlaydemo.c</tt> for more
+information on overlays.
 
-A program loaded by LOADER.SYSTEM works like a ProDOS 8 system program but
-isn't tied to the start address &dollar;2000. Thus with the default start
-address &dollar;800 the main memory area is increased by 6 KB.
+Parameters:
 
 <descrip>
 
-  <tag><tt/RAM:/ Main memory area</tag>
-  From &dollar;800 to &dollar;BEFF (45.75 KB)
-
-  <tag><tt/LC:/ Language Card memory area</tag>
-  From &dollar;D400 to &dollar;DFFF (3 KB)
-
   <tag><tt/STARTADDRESS:/ Program start address</tag>
-  Variable (default: &dollar;800)
+  Default: &dollar;803. Use <tt/-S &lt;addr&gt;/ to set a different start address.
 
-  <tag><tt/HEADER:/ Binary file header</tag>
-  DOS 3.3 header (address and length)
+  <tag><tt/__EXEHDR__:/ Executable file header</tag>
+  Default: DOS 3.3 header (address and length). Use <tt/-D __EXEHDR__=0/ to omit
+  the header.
+
+  <tag><tt/__STACKSIZE__:/ C runtime stack size</tag>
+  Default: &dollar;800. Use <tt/-D __STACKSIZE__=&lt;size&gt;/ to set a different
+  stack size.
+
+  <tag><tt/__HIMEM__:/ Highest usable memory address presumed at link time</tag>
+  Default: &dollar;9600. Use <tt/-D __HIMEM__=&lt;addr&gt;/ to set a different
+  highest usable address.
+
+  <tag><tt/__LCADDR__:/ Address of code in the Language Card</tag>
+  Default: &dollar;D400. Use <tt/-D __LCADDR__=&lt;addr&gt;/ to set a different
+  code address.
+
+  <tag><tt/__LCSIZE__:/ Size of code in the Language Card</tag>
+  Default: &dollar;C00. Use <tt/-D __LCSIZE__=&lt;size&gt;/ to set a different
+  code size.
+
+  <tag><tt/__OVERLAYSIZE__:/ Size of code in the overlays</tag>
+  Default: &dollar;1000. Use <tt/-D __OVERLAYSIZE__=&lt;size&gt;/ to set a different
+  code size.
 
 </descrip><p>
 
 
-<sect1><tt/apple2-reboot.cfg/<p>
+<sect1><tt/apple2-asm.cfg/<p>
 
-Configuration optimized for a binary program running on ProDOS 8 without
-BASIC.SYSTEM. Intended to be used with <bf/LOADER.SYSTEM - an
-Apple&nbsp;&rsqb;&lsqb; ProDOS 8 loader for cc65 programs/ (see above) together
-with the function <tt/rebootafterexit()/.
+Configuration for a assembler programs which don't need a special setup.
 
-If a ProDOS 8 system program doesn't quit to the ProDOS 8 dispatcher but rather
-reboots the machine after exit then a plain vanilla ProDOS 8 doesn't make use of
-the Language Card bank 2 at all.
-
-This setup makes nearly 50 KB available to a cc65 program - on a 64 KB machine!
+Parameters:
 
 <descrip>
 
-  <tag><tt/RAM:/ Main memory area</tag>
-  From &dollar;800 to &dollar;BEFF (45.75 KB)
-
-  <tag><tt/LC:/ Language Card memory area</tag>
-  From &dollar;D000 to &dollar;DFFF (4 KB)
-
   <tag><tt/STARTADDRESS:/ Program start address</tag>
-  Variable (default: &dollar;800)
+  Default: &dollar;803. Use <tt/-S &lt;addr&gt;/ to set a different start address.
 
-  <tag><tt/HEADER:/ Binary file header</tag>
-  DOS 3.3 header (address and length)
+  <tag><tt/__EXEHDR__:/ Executable file header</tag>
+  Default: No header. Use <tt/-u __EXEHDR__ apple2.lib/ to add a DOS 3.3 header
+  (address and length).
 
 </descrip><p>
 
@@ -230,10 +239,10 @@ range.
 
 The easiest (and for really large programs in fact the only) way to have a cc65
 program use the memory from &dollar;800 to &dollar;2000 is to link it as binary
-(as opposed to system) program using the linker configuration
-<ref id="apple-load-cfg" name="apple2-loader.cfg"> with start address
-&dollar;803 and load it with the targetutil LOADER.SYSTEM. The program then works
-like a system program (i.e. quits to the ProDOS dispatcher).
+(as opposed to system) program using the default linker configuration
+<ref id="apple-def-cfg" name="apple2.cfg"> with <tt/__HIMEM__/ set to &dollar;BF00
+and load it with the LOADER.SYSTEM utility. The program then works like a system
+program (i.e. quits to the ProDOS dispatcher).
 
 Using LOADER.SYSTEM is as simple as copying it to the ProDOS 8 directory of the
 program to load under name &lt;program&gt;.SYSTEM as a system program. For
@@ -325,8 +334,8 @@ The names in the parentheses denote the symbols to be used for static linking of
   <tag><tt/a2.hi.tgi (a2_hi_tgi)/</tag>
   This driver features a resolution of 280&times;192 with 8 colors and two
   hires pages. Note that programs using this driver will have to be linked
-  with <tt/--start-addr $4000/ to reserve the first hires page or with
-  <tt/--start-addr $6000/ to reserve both hires pages.
+  with <tt/-S $4000/ to reserve the first hires page or with <tt/-S $6000/
+  to reserve both hires pages.
 
   The function <tt/tgi_apple2_mix()/ allows to activate 4 lines of text. The
   function doesn't clear the corresponding area at the bottom of the screen.
@@ -374,7 +383,7 @@ The names in the parentheses denote the symbols to be used for static linking of
   for an AppleMouse&nbsp;II Card compatible firmware. The default bounding
   box is &lsqb;0..279,0..191&rsqb;.
 
-  Programs using this driver will have to be linked with <tt/--start-addr $4000/
+  Programs using this driver will have to be linked with <tt/-S $4000/
   to reserve the first hires page if they are intended to run on an
   Apple&nbsp;&rsqb;&lsqb; (in contrast to an Apple&nbsp;//e) because the
   AppleMouse&nbsp;II Card firmware writes to the hires page when initializing
@@ -439,10 +448,6 @@ BASIC.SYSTEM) there are some limitations for DOS 3.3:
   <tag/Color/
   The Apple&nbsp;&rsqb;&lsqb; has no color text mode. Therefore the functions textcolor(),
   bgcolor() and bordercolor() have no effect.
-
-  <tag/Cursor/
-  The Apple&nbsp;&rsqb;&lsqb; has no hardware cursor. Therefore the function cursor() has
-  no effect.
 
 </descrip><p>
 

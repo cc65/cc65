@@ -50,7 +50,13 @@ OUTPUTDIRS := lib         \
 ifdef CMD_EXE
   DIRLIST = $(strip $(foreach dir,$1,$(wildcard $(dir))))
   MKDIR = mkdir $(subst /,\,$1)
-  RMDIR = $(if $(DIRLIST),rmdir /s /q $(subst /,\,$(DIRLIST)))
+  ifdef OS2
+    RMDIR = $(if $(DIRLIST),rm -r $(subst /,\,$(DIRLIST)))
+    MKDIR = /@unixroot/usr/bin/mkdir -p $1
+  else
+    MKDIR = mkdir $(subst /,\,$1)
+    RMDIR = $(if $(DIRLIST),rmdir /s /q $(subst /,\,$(DIRLIST)))
+  endif
 else
   MKDIR = mkdir -p $1
   RMDIR = $(RM) -r $1

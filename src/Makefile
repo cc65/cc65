@@ -32,7 +32,11 @@ ifdef CMD_EXE
   NULLDEV = nul:
   DIRLIST = $(strip $(foreach dir,$1,$(wildcard $(dir))))
   MKDIR = mkdir $(subst /,\,$1)
-  RMDIR = $(if $(DIRLIST),rmdir /s /q $(subst /,\,$(DIRLIST)))
+  ifdef OS2
+    RMDIR = $(if $(DIRLIST),rm -r $(subst /,\,$(DIRLIST)))
+  else
+    RMDIR = $(if $(DIRLIST),rmdir /s /q $(subst /,\,$(DIRLIST)))
+  endif
 else
   NULLDEV = /dev/null
   MKDIR = mkdir -p $1

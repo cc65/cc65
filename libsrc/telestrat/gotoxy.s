@@ -1,19 +1,26 @@
 ;
-; jede jede@oric.org 2017-02-25
+; 2017-02-25, jede <jede@oric.org>
+; 2017-06-15, Greg King
 ;
-    .export    _gotoxy
-	
-    .import    popa
-	
-    .importzp  sp
+; void gotoxy (unsigned char x, unsigned char y);
+;
 
-    .include   "telestrat.inc"
+        .export         gotoxy, _gotoxy
+
+        .import         popa
+        .importzp       sp
+
+        .include        "telestrat.inc"
+
+gotoxy: jsr     popa            ; Get Y
 
 .proc _gotoxy
-   ; This function move only cursor for display, it does not move the prompt position
-   ; in telemon, there is position for prompt, and another for the cursor
-   sta    SCRY
-   jsr    popa
-   sta    SCRX
-   rts
-.endproc	
+
+; This function moves only the display cursor; it does not move the prompt position.
+; In telemon, there is a position for the prompt, and another for the cursor.
+
+        sta     SCRY
+        jsr     popa
+        sta     SCRX
+        rts
+.endproc

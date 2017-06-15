@@ -1,6 +1,7 @@
 ifneq ($(shell echo),)
   CMD_EXE = 1
 endif
+CMD_EXE = 1
 
 PROGS = ar65     \
         ca65     \
@@ -33,7 +34,11 @@ ifdef CMD_EXE
   NULLDEV = nul:
   DIRLIST = $(strip $(foreach dir,$1,$(wildcard $(dir))))
   MKDIR = mkdir $(subst /,\,$1)
-  RMDIR = $(if $(DIRLIST),rmdir /s /q $(subst /,\,$(DIRLIST)))
+  ifdef OS2
+    RMDIR = $(if $(DIRLIST),rm -r $(subst /,\,$(DIRLIST)))
+  else
+    RMDIR = $(if $(DIRLIST),rmdir /s /q $(subst /,\,$(DIRLIST)))
+  endif
 else
   NULLDEV = /dev/null
   MKDIR = mkdir -p $1
@@ -64,11 +69,11 @@ endif
 
 CFLAGS += -MMD -MP -O3 -I common \
           -Wall -Wextra -Wno-char-subscripts $(USER_CFLAGS) \
-          -DCA65_INC=$(CA65_INC) -DCC65_INC=$(CC65_INC) -DCL65_TGT=$(CL65_TGT) \
+          -DGIT_SHA=$(GIT_SHA) -DCA65_INC=$(CA65_INC) -DCC65_INC=$(CC65_INC) \
           -DLD65_LIB=$(LD65_LIB) -DLD65_OBJ=$(LD65_OBJ) -DLD65_CFG=$(LD65_CFG) \
-          -DGIT_SHA=$(GIT_SHA)
+          -D__EMX__ -DEMX -DOS2  -D__ST_MT_ERRNO__ -O3 -march=pentium -mtune=pentium4 -static-libgcc
 
-LDLIBS += -lm
+LDLIBS += -lm -Zexe -Zomf -Zmap -Zhigh-mem -Zstack 8000 -D__ST_MT_ERRNO__ -s -static-libgcc
 
 ifdef CMD_EXE
   EXE_SUFFIX=.exe

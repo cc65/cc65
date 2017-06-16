@@ -1,14 +1,18 @@
 ;
-; Ullrich von Bassewitz, 06.08.1998
+; 1998-08-06, Ullrich von Bassewitz
+; 2017-06-15, Greg King
 ;
 ; void gotoxy (unsigned char x, unsigned char y);
 ;
 
-        .export         _gotoxy
+        .export         gotoxy, _gotoxy
+
         .import         setcursor
         .import         popa
 
         .include        "creativision.inc"
+
+gotoxy: jsr     popa            ; Get Y
 
 .proc   _gotoxy
 

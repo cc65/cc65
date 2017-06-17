@@ -6,7 +6,7 @@
 		.import mul40
 		.importzp ptr4
 
-		.include	"atari/atari.inc"
+		.include	"atari.inc"
 
 	.segment "CODE"
 

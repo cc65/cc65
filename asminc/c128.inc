@@ -163,8 +163,13 @@ SID_Read3       := $D41C
 ; ---------------------------------------------------------------------------
 ; I/O: VDC (128 only)
 
-VDC_INDEX       := $D600
-VDC_DATA        := $D601
+VDC_INDEX       := $D600 ; VDC address
+VDC_DATA        := $D601 ; VDC data
+
+VDC_DATA_HI     := 18
+VDC_DATA_LO     := 19
+VDC_CSET        := 28
+VDC_DATA_RW     := 31
 
 ; ---------------------------------------------------------------------------
 ; I/O: CIAs

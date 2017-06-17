@@ -4,7 +4,8 @@
 
 		.import _gotoxy
 
-		.include	"cbm510/cbm510.inc"
+		.include	"cbm510.inc"
+		.include	"extzp.inc"
 
 	.segment "CODE"
 

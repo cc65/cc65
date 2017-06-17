@@ -4,7 +4,7 @@
 
 		.import _gotoxy
 
-		.include	"c128/c128.inc"
+		.include	"c128.inc"
 
 	.segment "CODE"
 
@@ -33,20 +33,20 @@ _cpeekcol:
 @s:
 	; get byte from vdc mem
 	ldx	#VDC_DATA_LO
-	stx	VDC_ADDR_REG
-@L0:	bit	VDC_ADDR_REG
+	stx	VDC_INDEX
+@L0:	bit	VDC_INDEX
 	bpl	@L0
-	sta	VDC_DATA_REG
+	sta	VDC_DATA
 	dex
 	;;tya
-	stx	VDC_ADDR_REG
-	sty	VDC_DATA_REG
+	stx	VDC_INDEX
+	sty	VDC_DATA
 
 	ldx	#VDC_DATA_RW
-	stx	VDC_ADDR_REG
-@L1:	bit	VDC_ADDR_REG
+	stx	VDC_INDEX
+@L1:	bit	VDC_INDEX
 	bpl	@L1
-	lda	VDC_DATA_REG
+	lda	VDC_DATA
 
 
 	and #$0f

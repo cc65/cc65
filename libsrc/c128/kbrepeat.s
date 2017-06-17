@@ -1,7 +1,7 @@
 
         .export _kbrepeat, _kbrepeatdelay, _kbrepeatrate
 
-        .include        "c128/c128.inc"
+        .include        "c128.inc"
 
 _kbrepeat:
         ldx KBDREPEAT           ; get old value

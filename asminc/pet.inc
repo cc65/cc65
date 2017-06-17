@@ -31,6 +31,11 @@ BASIC_BUF_LEN   = 81            ; Maximum length of command-line
 
 KEY_BUF         := $26F         ; Keyboard buffer
 
+;FIXME: these are wrong?
+KBDREPEAT       := $28a
+KBDREPEATRATE   := $28b
+KBDREPEATDELAY  := $28c
+
 ;----------------------------------------------------------------------------
 ; PET ROM type detection
 

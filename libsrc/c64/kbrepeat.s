@@ -1,7 +1,7 @@
 
         .export _kbrepeat, _kbrepeatdelay, _kbrepeatrate
 
-        .include        "c64/c64.inc"
+        .include        "c64.inc"
 
 _kbrepeat:
         ldx KBDREPEAT           ; get old value

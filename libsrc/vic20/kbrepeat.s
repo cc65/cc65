@@ -1,7 +1,7 @@
 
         .export _kbrepeat, _kbrepeatdelay, _kbrepeatrate
 
-        .include        "vic20/vic20.inc"
+        .include        "vic20.inc"
 
 _kbrepeat:
         ldx KBDREPEAT           ; get old value

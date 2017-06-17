@@ -33,6 +33,11 @@ FKEY_COUNT      := $55D         ; Characters for function key
 FKEY_SPACE      := $55F         ; Function key definitions
 FKEY_ORIG       := $F3D2        ; Original definitions
 
+;FIXME: he?! these ok? :o)
+KBDREPEAT       := $28a
+KBDREPEATRATE   := $28b
+KBDREPEATDELAY  := $28c
+
 ; ---------------------------------------------------------------------------
 ; Kernal routines
 

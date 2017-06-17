@@ -1,7 +1,7 @@
 
         .export _kbrepeat, _kbrepeatdelay, _kbrepeatrate
 
-        .include        "plus4/plus4.inc"
+        .include        "plus4.inc"
 
 _kbrepeat:
         ldx KBDREPEAT           ; get old value

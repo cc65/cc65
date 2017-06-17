@@ -1,7 +1,7 @@
 
         .export _kbrepeat, _kbrepeatdelay, _kbrepeatrate
 
-        .include        "pet/pet.inc"
+        .include        "pet.inc"
 
 _kbrepeat:
         ldx KBDREPEAT           ; get old value

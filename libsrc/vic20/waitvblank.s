@@ -1,6 +1,11 @@
         .export         _waitvblank
 
-        .include        "vic20/vic20.inc"
+        .include        "vic20.inc"
+
+; FIXME
+; this flag doesnt work on vic20!!!
+; it will have to be filled by a get_tv() constructor or so
+PALFLAG		= $2A6		; $01 = PAL, $00 = NTSC
 
 _waitvblank:
         lda     PALFLAG

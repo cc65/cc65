@@ -386,11 +386,11 @@ static void StringPragma (StrBuf* B, void (*Func) (const char*))
 static void SegNamePragma (StrBuf* B, segment_t Seg)
 /* Handle a pragma that expects a segment name parameter */
 {
-    StrBuf      S = AUTO_STRBUF_INITIALIZER;
     const char* Name;
+    StrBuf S = AUTO_STRBUF_INITIALIZER;
+    int Push = 0;
 
     /* Check for the "push" or "pop" keywords */
-    int Push = 0;
     switch (ParsePushPop (B)) {
 
         case PP_NONE:
@@ -403,7 +403,13 @@ static void SegNamePragma (StrBuf* B, segment_t Seg)
         case PP_POP:
             /* Pop the old value and output it */
             PopSegName (Seg);
-            g_segname (Seg);
+
+            /* BSS variables are output at the end of the compilation.  Don't
+            ** bother to change their segment, now.
+            */
+            if (Seg != SEG_BSS) {
+                g_segname (Seg);
+            }
 
             /* Done */
             goto ExitPoint;
@@ -434,7 +440,13 @@ static void SegNamePragma (StrBuf* B, segment_t Seg)
         } else {
             SetSegName (Seg, Name);
         }
-        g_segname (Seg);
+
+        /* BSS variables are output at the end of the compilation.  Don't
+        ** bother to change their segment, now.
+        */
+        if (Seg != SEG_BSS) {
+            g_segname (Seg);
+        }
 
     } else {
 

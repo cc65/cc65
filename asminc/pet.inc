@@ -31,10 +31,17 @@ BASIC_BUF_LEN   = 81            ; Maximum length of command-line
 
 KEY_BUF         := $26F         ; Keyboard buffer
 
-;FIXME: these are wrong?
-KBDREPEAT       := $28a
-KBDREPEATRATE   := $28b
-KBDREPEATDELAY  := $28c
+;FIXME: we must somehow handle the difference between the two - how?
+
+; 40-Column PETs
+;KBDREPEAT       := $3ee
+;KBDREPEATRATE   := $3ea
+;KBDREPEATDELAY  := $3e9
+
+; 80-Column PETs
+KBDREPEAT       := $e4
+KBDREPEATRATE   := $e5
+KBDREPEATDELAY  := $e6
 
 ;----------------------------------------------------------------------------
 ; PET ROM type detection

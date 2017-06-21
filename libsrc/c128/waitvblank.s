@@ -5,7 +5,7 @@
 
 _waitvblank:
 
-        lda     MODE
+        bit     MODE
         bmi     @c80
 
 @l1:

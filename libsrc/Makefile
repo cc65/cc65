@@ -196,6 +196,7 @@ DEPS = $(OBJS:.o=.d)
 EXTRA_SRCPAT = $(SRCDIR)/extra/%.s
 EXTRA_OBJPAT = ../lib/$(TARGET)-%.o
 EXTRA_OBJS := $(patsubst $(EXTRA_SRCPAT),$(EXTRA_OBJPAT),$(wildcard $(SRCDIR)/extra/*.s))
+DEPS += $(EXTRA_OBJS:../lib/%.o=../libwrk/$(TARGET)/%.d)
 
 ZPOBJ = ../libwrk/$(TARGET)/zeropage.o
 ifeq ($(TARGET),$(filter $(TARGET),$(EXTZP)))
@@ -281,7 +282,7 @@ endef # COMPILE_recipe
 
 $(EXTRA_OBJPAT): $(EXTRA_SRCPAT) | ../lib
 	@echo $(TARGET) - $(<F)
-	@$(CA65) -t $(TARGET) $(CA65FLAGS) -o $@ $<
+	@$(CA65) -t $(TARGET) $(CA65FLAGS) --create-dep $(@:../lib/%.o=../libwrk/$(TARGET)/%.d) -o $@ $<
 
 ../lib/$(TARGET).lib: $(OBJS) | ../lib
 	$(AR65) a $@ $?

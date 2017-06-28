@@ -226,18 +226,15 @@ static void openSFile (void)
 }
 
 
-static int findToken (const char **tokenTbl, const char *token)
+static int findToken (const char * const *tokenTbl, const char *token)
 {
     /* takes as input table of tokens and token, returns position in table or -1 if not found */
-    int a = 0;
-
-    while (strlen (tokenTbl[a]) != 0) {
-        if (strcmp (tokenTbl[a], token) == 0) break;
-        a++;
+    int i;
+    for (i = 0; tokenTbl[i][0]; i++) {
+        if (strcmp (tokenTbl[i], token) == 0) return i;
     }
 
-    if (strlen (tokenTbl[a]) == 0) a = -1;
-    return a;
+    return -1;
 }
 
 

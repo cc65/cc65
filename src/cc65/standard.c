@@ -50,7 +50,7 @@
 IntStack Standard           = INTSTACK(STD_UNKNOWN);
 
 /* Table mapping names to standards, sorted by standard. */
-static const char* StdNames[STD_COUNT] = {
+static const char* const StdNames[STD_COUNT] = {
     "c89", "c99", "cc65"
 };
 

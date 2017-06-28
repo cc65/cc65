@@ -211,7 +211,7 @@ void DbgInfoFile (void)
 void DbgInfoFunc (void)
 /* Parse and handle func subcommand of the .dbg pseudo instruction */
 {
-    static const char* StorageKeys[] = {
+    static const char* const StorageKeys[] = {
         "EXTERN",
         "STATIC",
     };
@@ -352,7 +352,7 @@ void DbgInfoLine (void)
 void DbgInfoSym (void)
 /* Parse and handle SYM subcommand of the .dbg pseudo instruction */
 {
-    static const char* StorageKeys[] = {
+    static const char* const StorageKeys[] = {
         "AUTO",
         "EXTERN",
         "REGISTER",

@@ -280,7 +280,7 @@ endef # COMPILE_recipe
 ../libwrk/$(TARGET)/%.o: %.c | ../libwrk/$(TARGET)
 	$(COMPILE_recipe)
 
-$(EXTRA_OBJPAT): $(EXTRA_SRCPAT) | ../lib
+$(EXTRA_OBJPAT): $(EXTRA_SRCPAT) | ../libwrk/$(TARGET) ../lib
 	@echo $(TARGET) - $(<F)
 	@$(CA65) -t $(TARGET) $(CA65FLAGS) --create-dep $(@:../lib/%.o=../libwrk/$(TARGET)/%.d) -o $@ $<
 

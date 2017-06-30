@@ -3547,7 +3547,7 @@ void g_lt (unsigned flags, unsigned long val)
 /* Test for less than */
 {
     static const char* const ops[4] = {
-        "tosltax", "tosultax", "toslteax", "tosulteax",
+        "tosltax", "tosultax", "toslteax", "tosulteax"
     };
 
     unsigned Label;

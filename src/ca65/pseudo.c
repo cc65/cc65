@@ -151,7 +151,7 @@ static unsigned char OptionalAddrSize (void)
 static void SetBoolOption (unsigned char* Flag)
 /* Read a on/off/+/- option and set flag accordingly */
 {
-    static const char* Keys[] = {
+    static const char* const Keys[] = {
         "OFF",
         "ON",
     };
@@ -451,7 +451,7 @@ static void DoASCIIZ (void)
 static void DoAssert (void)
 /* Add an assertion */
 {
-    static const char* ActionTab [] = {
+    static const char* const ActionTab [] = {
         "WARN", "WARNING",
         "ERROR",
         "LDWARN", "LDWARNING",
@@ -659,7 +659,7 @@ static void DoCode (void)
 static void DoConDes (void)
 /* Export a symbol as constructor/destructor */
 {
-    static const char* Keys[] = {
+    static const char* const Keys[] = {
         "CONSTRUCTOR",
         "DESTRUCTOR",
         "INTERRUPTOR",
@@ -744,7 +744,7 @@ static void DoData (void)
 static void DoDbg (void)
 /* Add debug information from high level code */
 {
-    static const char* Keys[] = {
+    static const char* const Keys[] = {
         "FILE",
         "FUNC",
         "LINE",
@@ -1039,7 +1039,7 @@ static void DoFileOpt (void)
     if (CurTok.Tok == TOK_IDENT) {
 
         /* Option given as keyword */
-        static const char* Keys [] = {
+        static const char* const Keys [] = {
             "AUTHOR", "COMMENT", "COMPILER"
         };
 

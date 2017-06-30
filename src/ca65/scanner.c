@@ -1477,7 +1477,7 @@ CharAgain:
 
 
 
-int GetSubKey (const char** Keys, unsigned Count)
+int GetSubKey (const char* const* Keys, unsigned Count)
 /* Search for a subkey in a table of keywords. The current token must be an
 ** identifier and all keys must be in upper case. The identifier will be
 ** uppercased in the process. The function returns the index of the keyword,

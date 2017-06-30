@@ -48,7 +48,7 @@
 
 
 /* Names of the features */
-static const char* FeatureKeys[FEAT_COUNT] = {
+static const char* const FeatureKeys[FEAT_COUNT] = {
     "dollar_is_pc",
     "labels_without_colons",
     "loose_string_term",

@@ -435,7 +435,7 @@ BASIC.SYSTEM) there are some limitations for DOS 3.3:
   <tag/Interrupts/
   There's no <tt/interruptor/ support. Any attempt to use it yields the message
   'FAILED TO ALLOC INTERRUPT' on program startup. This implicitly means that
-  <tt/a2.stdmou.mou/ and <tt/a2.ssc.ser/ are not functional as they depend on
+  joystick, mouse and RS232 device drivers are not functional as they depend on
   interrupts.
 
 </descrip><p>

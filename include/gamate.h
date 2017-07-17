@@ -188,8 +188,8 @@ extern void gamate_stdjoy_joy[];   /* Referred to by joy_static_stddrv[] */
 #define JOY_START       6
 #define JOY_SELECT      7
 
-void waitvblank (void);
-/* Wait for the vertical blanking */
+void waitvsync (void);
+/* Wait for start of next frame */
 
 /* NOTE: all Gamate are "NTSC" */
 #define get_tv()        TV_NTSC

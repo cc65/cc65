@@ -1,14 +1,14 @@
 ;
-; void waitvblank (void);
+; void waitvsync (void);
 ;
 
         .include        "pce.inc"
         .include        "extzp.inc"
 
         .forceimport    ticktock
-        .export         _waitvblank
+        .export         _waitvsync
 
-.proc   _waitvblank
+.proc   _waitvsync
 
         lda     tickcount
 @lp:    cmp     tickcount

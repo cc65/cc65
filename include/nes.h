@@ -163,8 +163,8 @@ extern void nes_64_56_2_tgi[];      /* Referred to by tgi_static_stddrv[] */
 
 
 
-void waitvblank (void);
-/* Wait for the vertical blanking */
+void waitvsync (void);
+/* Wait for start of the next frame */
 
 unsigned char get_tv (void);
 /* Return the video mode the machine is using. */

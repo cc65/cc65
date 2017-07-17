@@ -1,4 +1,4 @@
-<!doctype linuxdoc system>
+<!-- <!doctype linuxdoc system> //-->
 
 <article>
 
@@ -69,7 +69,7 @@ Programs containing NES specific code may use the <tt/nes.h/ header file.
 <sect1>NES specific functions<p>
 
 <itemize>
-<item>waitvblank - wait until the start of vblank
+<item>waitvsync - wait until the start of the next frame
 <item>get_tv
 </itemize>
 

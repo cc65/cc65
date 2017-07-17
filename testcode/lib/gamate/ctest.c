@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
                 break;
         }
 
-        waitvblank();
+        waitvsync();
 
         (*((unsigned char*)LCD_XPOS)) = x;
         (*((unsigned char*)LCD_YPOS)) = y;

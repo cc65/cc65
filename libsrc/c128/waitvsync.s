@@ -1,9 +1,9 @@
 
-        .export         _waitvblank
+        .export         _waitvsync
 
         .include        "c128.inc"
 
-_waitvblank:
+_waitvsync:
 
         bit     MODE
         bmi     @c80

@@ -1,5 +1,5 @@
 
-        .export         _waitvblank
+        .export         _waitvsync
         .import         PALFLAG
         .import         sys_bank, restore_bank
 
@@ -7,7 +7,7 @@
 
         .include        "cbm510.inc"
 
-_waitvblank:
+_waitvsync:
         rts     ; FIXME
 
         jsr	sys_bank		; Switch to the system bank

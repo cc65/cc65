@@ -1,9 +1,9 @@
 
-        .export         _waitvblank
+        .export         _waitvsync
 
         .include        "c64.inc"
 
-_waitvblank:
+_waitvsync:
 @l1:
         bit     VIC_CTRL1
         bpl     @l1

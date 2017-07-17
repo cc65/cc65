@@ -1,4 +1,4 @@
-        .export         _waitvblank
+        .export         _waitvsync
 
         .include        "vic20.inc"
 
@@ -7,7 +7,7 @@
 ; it will have to be filled by a get_tv() constructor or so
 PALFLAG		= $2A6		; $01 = PAL, $00 = NTSC
 
-_waitvblank:
+_waitvsync:
         lda     PALFLAG
         beq     @ntsc
         ldx     #(312-8)/2

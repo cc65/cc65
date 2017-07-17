@@ -158,6 +158,9 @@ extern void c64_hi_tgi[];               /* Referred to by tgi_static_stddrv[] */
 
 
 
+void waitvblank (void);
+/* Wait for the vertical blanking */
+
 unsigned char get_ostype (void);
 /* Get the ROM version. Returns one of the C64_OS_xxx codes. */
 

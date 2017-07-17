@@ -79,8 +79,8 @@ typedef enum {
     PRAGMA_INLINE_STDFUNCS,
     PRAGMA_LOCAL_STRINGS,
     PRAGMA_OPTIMIZE,
-    PRAGMA_REGVARADDR,
     PRAGMA_REGISTER_VARS,
+    PRAGMA_REGVARADDR,
     PRAGMA_REGVARS,                                     /* obsolete */
     PRAGMA_RODATA_NAME,
     PRAGMA_RODATASEG,                                   /* obsolete */

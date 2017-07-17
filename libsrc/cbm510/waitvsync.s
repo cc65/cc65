@@ -1,3 +1,8 @@
+;
+; Written by Groepaz <groepaz@gmx.net>
+;
+; void waitvsync (void);
+;
 
         .export         _waitvsync
         .import         PALFLAG
@@ -8,16 +13,16 @@
         .include        "cbm510.inc"
 
 _waitvsync:
-        jsr sys_bank        ; Switch to the system bank
+        jsr     sys_bank        ; Switch to the system bank
         sei
 
-        ldy #VIC_CTRL1
+        ldy     #VIC_CTRL1
 @l1:
-        lda (vic),y
-        bpl @l1
+        lda     (vic),y
+        bpl     @l1
 @l2:
-        lda (vic),y
-        bmi @l2
+        lda     (vic),y
+        bmi     @l2
 
         cli
-        jmp	restore_bank
+        jmp	    restore_bank

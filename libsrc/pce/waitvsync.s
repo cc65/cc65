@@ -1,4 +1,6 @@
 ;
+; Written by Groepaz <groepaz@gmx.net>
+;
 ; void waitvsync (void);
 ;
 

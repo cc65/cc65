@@ -1,3 +1,9 @@
+;
+; Written by Groepaz <groepaz@gmx.net>
+;
+; void waitvsync (void);
+;
+
         .export         _waitvsync
 
         .include        "vic20.inc"

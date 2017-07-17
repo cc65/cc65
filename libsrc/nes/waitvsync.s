@@ -1,5 +1,5 @@
 ;
-; Written by Groepaz/Hitmen <groepaz@gmx.net>
+; Written by Groepaz <groepaz@gmx.net>
 ; Cleanup by Ullrich von Bassewitz <uz@cc65.org>
 ;
 ; void waitvsync(void);

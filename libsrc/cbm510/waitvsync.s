@@ -8,10 +8,7 @@
         .include        "cbm510.inc"
 
 _waitvsync:
-        rts     ; FIXME
-
-        jsr	sys_bank		; Switch to the system bank
-
+        jsr sys_bank        ; Switch to the system bank
         sei
 
         ldy #VIC_CTRL1

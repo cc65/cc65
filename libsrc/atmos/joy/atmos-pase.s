@@ -34,7 +34,7 @@
         .byte   $08                     ; JOY_DOWN
         .byte   $01                     ; JOY_LEFT
         .byte   $02                     ; JOY_RIGHT
-        .byte   $20                     ; JOY_FIRE
+        .byte   $20                     ; JOY_A
         .byte   $00                     ; Future expansion
         .byte   $00                     ; Future expansion
         .byte   $00                     ; Future expansion

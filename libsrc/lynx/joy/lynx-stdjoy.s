@@ -38,8 +38,8 @@ joy_mask:
         .byte   $40                     ; JOY_DOWN
         .byte   $20                     ; JOY_LEFT
         .byte   $10                     ; JOY_RIGHT
-        .byte   $01                     ; JOY_FIRE
-        .byte   $02                     ; JOY_FIRE1
+        .byte   $01                     ; JOY_A
+        .byte   $02                     ; JOY_A1
         .byte   $00                     ;
         .byte   $00                     ;
 

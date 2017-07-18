@@ -60,8 +60,10 @@
 #define JOY_DOWN        1
 #define JOY_LEFT        2
 #define JOY_RIGHT       3
-#define JOY_FIRE        4
-#define JOY_FIRE2       5               /* Second fire button if available */
+#define JOY_A           4
+#define JOY_B           5               /* Second fire button if available */
+#define JOY_SELECT      6               /* Select or third button if available */
+#define JOY_START       7               /* Start or fourth button if avaiable */
 
 /* Array of masks used to check the return value of joy_read for a state */
 extern const unsigned char joy_masks[8];
@@ -71,8 +73,11 @@ extern const unsigned char joy_masks[8];
 #define JOY_BTN_DOWN(v)         ((v) & joy_masks[JOY_DOWN])
 #define JOY_BTN_LEFT(v)         ((v) & joy_masks[JOY_LEFT])
 #define JOY_BTN_RIGHT(v)        ((v) & joy_masks[JOY_RIGHT])
-#define JOY_BTN_FIRE(v)         ((v) & joy_masks[JOY_FIRE])
-#define JOY_BTN_FIRE2(v)        ((v) & joy_masks[JOY_FIRE2])
+#define JOY_BTN_A(v)            ((v) & joy_masks[JOY_A])
+#define JOY_BTN_B(v)            ((v) & joy_masks[JOY_B])
+#define JOY_BTN_SELECT(v)       ((v) & joy_masks[JOY_SELECT])
+#define JOY_BTN_START(v)        ((v) & joy_masks[JOY_START])
+
 
 /* The name of the standard joystick driver for a platform */
 extern const char joy_stddrv[];

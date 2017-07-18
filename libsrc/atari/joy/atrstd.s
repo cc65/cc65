@@ -40,8 +40,8 @@
         .byte   $02                     ; JOY_DOWN
         .byte   $04                     ; JOY_LEFT
         .byte   $08                     ; JOY_RIGHT
-        .byte   $10                     ; JOY_FIRE
-        .byte   $00                     ; JOY_FIRE2 not available
+        .byte   $10                     ; JOY_A
+        .byte   $00                     ; JOY_B not available
         .byte   $00                     ; Future expansion
         .byte   $00                     ; Future expansion
 

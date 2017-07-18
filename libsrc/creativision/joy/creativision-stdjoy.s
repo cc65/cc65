@@ -33,8 +33,8 @@ JOY_UP          =       $10
 JOY_DOWN        =       $04
 JOY_LEFT        =       $20
 JOY_RIGHT       =       $08
-JOY_FIRE        =       $01
-JOY_FIRE2       =       $02
+JOY_A        =       $01
+JOY_B       =       $02
 
 ; Joystick state masks (8 values)
 
@@ -42,8 +42,8 @@ JOY_FIRE2       =       $02
                 .byte   JOY_DOWN
                 .byte   JOY_LEFT
                 .byte   JOY_RIGHT
-                .byte   JOY_FIRE
-                .byte   JOY_FIRE2
+                .byte   JOY_A
+                .byte   JOY_B
                 .byte   $00                     ; Future expansion
                 .byte   $00                     ; Future expansion
 

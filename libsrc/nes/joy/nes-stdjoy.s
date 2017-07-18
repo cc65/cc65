@@ -35,10 +35,10 @@
         .byte   $20                     ; JOY_DOWN
         .byte   $40                     ; JOY_LEFT
         .byte   $80                     ; JOY_RIGHT
-        .byte   $01                     ; JOY_FIRE      (A)
-        .byte   $02                     ; JOY_FIRE2     (B)
-        .byte   $04                     ;               (Select)
-        .byte   $08                     ;               (Start)
+        .byte   $01                     ; JOY_A         (A)
+        .byte   $02                     ; JOY_B         (B)
+        .byte   $04                     ; JOY_SELECT    (Select)
+        .byte   $08                     ; JOY_START     (Start)
 
 ; Jump table.
 

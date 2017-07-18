@@ -30,8 +30,8 @@
         .byte   $02                     ; JOY_DOWN
         .byte   $04                     ; JOY_LEFT
         .byte   $08                     ; JOY_RIGHT
-        .byte   $10                     ; JOY_FIRE_A
-        .byte   $20                     ; JOY_FIRE_B
+        .byte   $10                     ; JOY_A_A
+        .byte   $20                     ; JOY_A_B
         .byte   $80                     ; JOY_SELECT
         .byte   $40                     ; JOY_START
 

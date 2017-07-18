@@ -1,16 +1,16 @@
 ;
-; void waitvblank (void);
+; Written by Groepaz <groepaz@gmx.net>
+;
+; void waitvsync (void);
 ;
 
-        .include        "gamate.inc"
+        .include        "pce.inc"
         .include        "extzp.inc"
 
         .forceimport    ticktock
-        .export         _waitvblank
+        .export         _waitvsync
 
-; FIXME: is this actually correct?
-
-.proc   _waitvblank
+.proc   _waitvsync
 
         lda     tickcount
 @lp:    cmp     tickcount

@@ -153,7 +153,10 @@ struct cbm_dirent {
 unsigned char get_tv (void);
 /* Return the video mode the machine is using. */
 
-
+#if !defined(__CBM610__) && !defined(__PET__)
+void waitvsync (void);
+/* wait for the start of the next frame */
+#endif
 
 /*****************************************************************************/
 /*                           CBM kernal functions                            */

@@ -437,7 +437,7 @@ function.
 
 <!-- <itemize> -->
 <!-- <item><ref id="get_tv" name="get_tv"> -->
-<!-- <item><ref id="waitvblank" name="waitvblank"> -->
+<!-- <item><ref id="waitvsync" name="waitvsync"> -->
 <!-- </itemize> -->
 
 (incomplete)

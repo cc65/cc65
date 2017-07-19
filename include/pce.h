@@ -76,6 +76,17 @@
 /* No support for dynamically loadable drivers */
 #define DYN_DRV         0
 
+/* Expanding upon joystick.h */
+#define JOY_I           4
+#define JOY_II          5
+#define JOY_SELECT      6
+#define JOY_RUN         7
+
+#define JOY_BTN_I(v)            ((v) & joy_masks[JOY_I])
+#define JOY_BTN_II(v)           ((v) & joy_masks[JOY_II])
+#define JOY_BTN_SELECT(v)       ((v) & joy_masks[JOY_SELECT])
+#define JOY_BTN_RUN(v)          ((v) & joy_masks[JOY_RUN])
+
 /* The addresses of the static drivers */
 extern void pce_stdjoy_joy[];   /* Referred to by joy_static_stddrv[] */
 

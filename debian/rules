@@ -1,0 +1,7 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+override_dh_auto_install:
+	$(MAKE) -j1 install DESTDIR=$(CURDIR)/debian/cc65 prefix=/usr

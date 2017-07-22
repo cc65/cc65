@@ -78,6 +78,7 @@ typedef enum {
     PRAGMA_DATASEG,                                     /* obsolete */
     PRAGMA_INLINE_STDFUNCS,
     PRAGMA_LOCAL_STRINGS,
+    PRAGMA_MESSAGE,
     PRAGMA_OPTIMIZE,
     PRAGMA_REGISTER_VARS,
     PRAGMA_REGVARADDR,
@@ -114,6 +115,7 @@ static const struct Pragma {
     { "dataseg",                PRAGMA_DATASEG            },      /* obsolete */
     { "inline-stdfuncs",        PRAGMA_INLINE_STDFUNCS    },
     { "local-strings",          PRAGMA_LOCAL_STRINGS      },
+    { "message",                PRAGMA_MESSAGE            },
     { "optimize",               PRAGMA_OPTIMIZE           },
     { "register-vars",          PRAGMA_REGISTER_VARS      },
     { "regvaraddr",             PRAGMA_REGVARADDR         },
@@ -750,6 +752,13 @@ static void IntPragma (StrBuf* B, IntStack* Stack, long Low, long High)
 
 
 
+static void MakeMessage (const char* Message)
+{
+    fprintf (stderr, "%s(%u): Note: %s\n", GetInputName (CurTok.LI), GetInputLine (CurTok.LI), Message);
+}
+
+
+
 static void ParsePragma (void)
 /* Parse the contents of the _Pragma statement */
 {
@@ -847,6 +856,10 @@ static void ParsePragma (void)
 
         case PRAGMA_LOCAL_STRINGS:
             FlagPragma (&B, &LocalStrings);
+            break;
+
+        case PRAGMA_MESSAGE:
+            StringPragma (&B, MakeMessage);
             break;
 
         case PRAGMA_OPTIMIZE:

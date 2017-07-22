@@ -1119,6 +1119,23 @@ parameter with the <tt/#pragma/.
   remembered and output as a whole when translation is finished.
 
 
+<sect1><tt>#pragma message (&lt;message&gt;)</tt><label id="pragma-message"><p>
+
+  This pragma is used to display informational messages at compile-time.
+
+  The message intented to be displayed must be a string literal.
+
+  Example:
+  <tscreen><verb>
+        #pragma message ("in a bottle")
+  </verb></tscreen>
+
+  Results in the compiler outputting the following to stderr:
+  <tscreen><verb>
+        example.c(42): Note: in a bottle
+  </verb></tscreen>
+
+
 <sect1><tt>#pragma optimize ([push,] on|off)</tt><label id="pragma-optimize"><p>
 
   Switch optimization on or off. If the argument is "off", optimization is

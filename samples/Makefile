@@ -237,7 +237,7 @@ samples.atr: samples
 # Installation rules
 
 INSTALL = install
-samplesdir = $(prefix)/share/cc65
+samplesdir = $(prefix)/share/cc65/samples
 
 install:
 	$(if $(prefix),,$(error variable `prefix' must be set))

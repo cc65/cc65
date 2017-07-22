@@ -92,6 +92,15 @@
 
 
 
+/* Expanding upon joystick.h */
+#define JOY_BTN_A_IDX           4
+#define JOY_BTN_B_IDX           5
+
+#define JOY_BTN_A(v)            ((v) & joy_masks[JOY_BTN_A_IDX])
+#define JOY_BTN_B(v)            ((v) & joy_masks[JOY_BTN_B_IDX])
+
+
+
 /*****************************************************************************/
 /*                                 Variables                                 */
 /*****************************************************************************/

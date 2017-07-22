@@ -91,15 +91,15 @@
 #define DYN_DRV         0
 
 /* Expanding upon joystick.h */
-#define JOY_A           4
-#define JOY_B           5
-#define JOY_SELECT      6
-#define JOY_START       7
+#define JOY_BTN_A_IDX           4
+#define JOY_BTN_B_IDX           5
+#define JOY_SELECT_IDX          6
+#define JOY_START_IDX           7
 
-#define JOY_BTN_A(v)            ((v) & joy_masks[JOY_A])
-#define JOY_BTN_B(v)            ((v) & joy_masks[JOY_B])
-#define JOY_BTN_SELECT(v)       ((v) & joy_masks[JOY_SELECT])
-#define JOY_BTN_START(v)        ((v) & joy_masks[JOY_START])
+#define JOY_BTN_A(v)            ((v) & joy_masks[JOY_BTN_A_IDX])
+#define JOY_BTN_B(v)            ((v) & joy_masks[JOY_BTN_B_IDX])
+#define JOY_SELECT(v)           ((v) & joy_masks[JOY_SELECT_IDX])
+#define JOY_START(v)            ((v) & joy_masks[JOY_START_IDX])
 
 /* Define hardware */
 

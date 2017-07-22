@@ -19,8 +19,8 @@ PROGS = ar65     \
 
 .SUFFIXES:
 
-bindir  := $(prefix)/bin
-datadir := $(if $(prefix),$(prefix)/share/cc65,$(abspath ..))
+bindir  := $(PREFIX)/bin
+datadir := $(if $(PREFIX),$(PREFIX)/share/cc65,$(abspath ..))
 
 CA65_INC = $(datadir)/asminc
 CC65_INC = $(datadir)/include
@@ -107,7 +107,7 @@ $(RM) /usr/local/bin/$(prog)
 endef # UNAVAIL_recipe
 
 install:
-	$(if $(prefix),,$(error variable `prefix' must be set))
+	$(if $(PREFIX),,$(error variable `PREFIX' must be set))
 	$(INSTALL) -d $(DESTDIR)$(bindir)
 	$(INSTALL) ../bin/* $(DESTDIR)$(bindir)
 

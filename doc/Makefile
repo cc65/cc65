@@ -6,8 +6,8 @@ endif
 
 .SUFFIXES:
 
-htmldir = $(prefix)/share/doc/cc65$(DESTPACKAGE_SUFFIX)/html
-infodir = $(prefix)/share/info
+htmldir = $(PREFIX)/share/doc/cc65$(DESTPACKAGE_SUFFIX)/html
+infodir = $(PREFIX)/share/info
 
 ifdef CMD_EXE
 
@@ -46,7 +46,7 @@ clean:
 	$(RM) -r ../html ../info
 
 install:
-	$(if $(prefix),,$(error variable `prefix' must be set))
+	$(if $(PREFIX),,$(error variable `PREFIX' must be set))
 ifeq ($(wildcard ../html),../html)
 	$(INSTALL) -d $(DESTDIR)$(htmldir)
 	$(INSTALL) -m0644 ../html/*.* $(DESTDIR)$(htmldir)

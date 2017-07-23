@@ -72,7 +72,7 @@ endif
 
 ifndef TARGET
 
-datadir = $(prefix)/share/cc65
+datadir = $(PREFIX)/share/cc65
 
 all lib: $(TARGETS)
 
@@ -92,7 +92,7 @@ INSTALL = install
 
 define INSTALL_recipe
 
-$(if $(prefix),,$(error variable `prefix' must be set))
+$(if $(PREFIX),,$(error variable `PREFIX' must be set))
 $(INSTALL) -d $(DESTDIR)$(datadir)/$(dir)
 $(INSTALL) -m0644 ../$(dir)/*.* $(DESTDIR)$(datadir)/$(dir)
 

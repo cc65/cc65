@@ -7,3 +7,6 @@
 /testwrk/
 /wrk/
 /cc65.zip
+
+# Vim swap files
+.*.swp

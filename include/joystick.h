@@ -61,9 +61,9 @@
 #define JOY_LEFT_IDX            2
 #define JOY_RIGHT_IDX           3
 #define JOY_BTN_1_IDX           4       /* Universally available */
-#define JOY_BTN_2_IDX           5       /* Second fire button if available */
-#define JOY_BTN_3_IDX           6       /* Third fire button if available  */
-#define JOY_BTN_4_IDX           7       /* Fourth fire button if available */
+#define JOY_BTN_2_IDX           5       /* Second button if available */
+#define JOY_BTN_3_IDX           6       /* Third button if available  */
+#define JOY_BTN_4_IDX           7       /* Fourth button if available */
 
 /* Array of masks used to check the return value of joy_read for a state */
 extern const unsigned char joy_masks[8];

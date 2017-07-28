@@ -6,8 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000  Kevin Ruland, <kevin@rodin.wustl.edu>                           */
-/* (C) 2003  Ullrich von Bassewitz, <uz@cc65.org>                            */
+/* (C) 2017  Bill Chatfield, <bill_chatfield@yahoo.com>                      */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -303,6 +302,13 @@
 
 /* BAS auxiliary types */
 #define PRODOS_AUX_T_BAS_PGM_LOAD_ADDR  0x0801  /* Applesoft pgm load addr  */
+
+/* The file stream implementation and the POSIX I/O functions will use the
+** following variables to determine the file type and auxiliary type to use.
+** This applies specifically to the fopen and open functions.
+*/
+extern unsigned char _filetype;  /* Default: PRODOS_T_BIN */
+extern unsigned int _auxtype;    /* Default: 0 */
 
 /* End of apple2_filetype.h */
 #endif

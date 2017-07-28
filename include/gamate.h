@@ -80,17 +80,6 @@
  bit 3:
 */
 
-#define JOY_DATA        0x4400
-
-#define JOY_DATA_UP     0x01
-#define JOY_DATA_DOWN   0x02
-#define JOY_DATA_LEFT   0x04
-#define JOY_DATA_RIGHT  0x08
-#define JOY_DATA_FIRE_A 0x10
-#define JOY_DATA_FIRE_B 0x20
-#define JOY_DATA_START  0x40
-#define JOY_DATA_SELECT 0x80
-
 /* LCD
 
     resolution 160x152 in 4 greys/greens
@@ -181,12 +170,19 @@
 /* No support for dynamically loadable drivers */
 #define DYN_DRV         0
 
+/* Expanding upon joystick.h */
+#define JOY_BTN_A_IDX           4
+#define JOY_BTN_B_IDX           5
+#define JOY_START_IDX           6
+#define JOY_SELECT_IDX          7
+
+#define JOY_BTN_A(v)            ((v) & joy_masks[JOY_BTN_A_IDX])
+#define JOY_BTN_B(v)            ((v) & joy_masks[JOY_BTN_B_IDX])
+#define JOY_START(v)            ((v) & joy_masks[JOY_START_IDX])
+#define JOY_SELECT(v)           ((v) & joy_masks[JOY_SELECT_IDX])
+
 /* The addresses of the static drivers */
 extern void gamate_stdjoy_joy[];   /* Referred to by joy_static_stddrv[] */
-
-#define JOY_FIRE_B      5
-#define JOY_START       6
-#define JOY_SELECT      7
 
 void waitvsync (void);
 /* Wait for start of next frame */

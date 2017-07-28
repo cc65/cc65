@@ -42,6 +42,7 @@
 #endif
 
 
+#include <apple2_filetype.h>
 
 /*****************************************************************************/
 /*                                   Data                                    */
@@ -136,11 +137,9 @@ extern unsigned char _dos_type;
 
 
 /* The file stream implementation and the POSIX I/O functions will use the
-** following variables to determine the file type, aux type and creation time
-** stamp to use.
+** following struct to set the date and time stamp on files. This specificially
+** applies to the open and fopen functions.
 */
-extern unsigned char _filetype;  /* Default: 6 */
-extern unsigned int _auxtype;    /* Default: 0 */
 extern struct {
     struct {
         unsigned day  :5;

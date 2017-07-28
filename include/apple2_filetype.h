@@ -303,6 +303,14 @@
 /* BAS auxiliary types */
 #define PRODOS_AUX_T_BAS_PGM_LOAD_ADDR  0x0801  /* Applesoft pgm load addr  */
 
+
+
+/*****************************************************************************/
+/*                                 Variables                                 */
+/*****************************************************************************/
+
+
+
 /* The file stream implementation and the POSIX I/O functions will use the
 ** following variables to determine the file type and auxiliary type to use.
 ** This applies specifically to the fopen and open functions.

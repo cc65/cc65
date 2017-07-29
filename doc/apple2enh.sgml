@@ -517,6 +517,14 @@ url="ca65.html" name="assembler manual">.
 </descrip><p>
 
 
+<sect1>Specifying file types for fopen<p>
+
+See section 
+<url url="apple2.html#ss9.4" name="Specifying file types for fopen">
+in the apple2 docoumentation.
+
+
+
 
 <sect>License<p>
 

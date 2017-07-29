@@ -511,11 +511,11 @@ url="ca65.html" name="assembler manual">.
 </descrip><p>
 
 
-<sect1>Specifying ProDOS File Types<p>
+<sect1>Specifying file types for fopen<p>
 
 <descrip>
 
-  <tag>Problem Explanation</tag>
+  <tag>Explanation of File Types</tag>
 
   ProDOS associates a file type and an auxiliary type with each file.
   These type specifications are separate from the file's name, unlike
@@ -531,18 +531,18 @@ url="ca65.html" name="assembler manual">.
   auxiliary type. Therefore, some additional mechanism for specifying
   the file types is needed. 
   
-  <tag>Solution</tag>
+  <tag>Specifying the File Type and Auxiliary Type</tag>
 
   There are two global variables provided that allow the file type
   and auxiliary type to be specified before a call to <tt/fopen()/
   or <tt/open/. They are defined in <tt/apple2_filetype.h/:
 
-  <quote>
+  <tscreen>
   <verb>
   extern unsigned char _filetype;  /* Default: PRODOS_T_BIN */
   extern unsigned int _auxtype;    /* Default: 0            */
   </verb>
-  </quote>  
+  </tscreen>  
 
   The header file <tt/apple2_filetype.h/ also defines many values
   that can be used to set these variables. It is included in
@@ -577,19 +577,24 @@ url="ca65.html" name="assembler manual">.
   <tt/_auxtype/ can also be set to <tt/PRODOS_AUX_T_TXT_SEQ/
   which is defined as zero.
 
-  <quote>
+  <tscreen>
   <verb>
-    #include <stdio.h>
-    #include <string.h>
-    #include <errno.h>
-    #include <apple2.h>
+    &num;include &lt;stdio.h&gt;
+    &num;include &lt;string.h&gt;
+    &num;include &lt;errno.h&gt;
+    &num;include &lt;apple2.h&gt;
+
     void main()
     {
         FILE *out;
         char *name = "MY.FAVS";
 
+        /*-----------------------------*/
+
         _filetype = PRODOS_T_TXT;
         _auxtype  = PRODOS_AUX_T_TXT_SEQ;
+
+        /*-----------------------------*/
 
         if ((out = fopen(name, "w")) != NULL) {
             fputs("Jorah Mormont\r", out);
@@ -605,7 +610,7 @@ url="ca65.html" name="assembler manual">.
         }
     }
   </verb>
-  </quote>  
+  </tscreen>  
 
 </descrip><p>
 

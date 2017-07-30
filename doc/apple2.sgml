@@ -519,8 +519,9 @@ url="ca65.html" name="assembler manual">.
 
   ProDOS associates a file type and an auxiliary type with each file.
   These type specifications are separate from the file's name, unlike
-  Windows and UNIX-like systems which use the file name's suffix (a.k.a.
-  extension) to specify the file type. For example, .exe, .doc, or .bat.
+  Windows which uses the file name's suffix (a.k.a.
+  extension) to specify the file type. For example, <tt/.exe/, 
+  <tt/.doc/, or <tt/.bat/.
   The ProDOS low-level 
   Machine-Language Interface (MLI) functions for creating and opening 
   files require these types to be specified. And if they don't match
@@ -535,7 +536,7 @@ url="ca65.html" name="assembler manual">.
 
   There are two global variables provided that allow the file type
   and auxiliary type to be specified before a call to <tt/fopen()/
-  or <tt/open/. They are defined in <tt/apple2_filetype.h/:
+  or <tt/open()/. They are defined in <tt/apple2_filetype.h/:
 
   <tscreen>
   <verb>
@@ -547,8 +548,7 @@ url="ca65.html" name="assembler manual">.
   The header file <tt/apple2_filetype.h/ also defines many values
   that can be used to set these variables. It is included in
   <tt/apple2.h/, which is in turn included in <tt/apple2enh.h/.
-  So it
-  not necessary to include it directly. Just
+  So it isn't necessary to include it directly. Just
   include one of <tt/apple2.h/ or <tt/apple2enh.h/.
 
   <tag>Example</tag>
@@ -563,8 +563,8 @@ url="ca65.html" name="assembler manual">.
   length text file is referred to as a sequential text file.
   This is equivalent to text files on 
   other operating systems, except that the line terminator is a
-  carriage return instead of a new line (Linux/BSD/MacOS) or 
-  carriage return, new line pair (Windows).
+  carriage return instead of a line-feed (Linux/BSD/MacOS) or 
+  carriage return, line-feed pair (Windows).
   
   The "sequential" text file terminology is in contrast to a 
   "random-access" text file which would
@@ -584,7 +584,7 @@ url="ca65.html" name="assembler manual">.
     &num;include &lt;errno.h&gt;
     &num;include &lt;apple2.h&gt;
 
-    void main()
+    void main(void)
     {
         FILE *out;
         char *name = "MY.FAVS";

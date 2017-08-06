@@ -153,7 +153,13 @@ struct cbm_dirent {
 unsigned char get_tv (void);
 /* Return the video mode the machine is using. */
 
+#define KBDREPEAT_CURSOR 0x00
+#define KBDREPEAT_NONE   0x40
+#define KBDREPEAT_ALL    0x80
 
+unsigned char kbrepeat(unsigned char);
+unsigned char kbrepeatdelay(unsigned char);
+unsigned char kbrepeatrate(unsigned char);
 
 /*****************************************************************************/
 /*                           CBM kernal functions                            */

@@ -161,6 +161,11 @@ unsigned char kbrepeat(unsigned char);
 unsigned char kbrepeatdelay(unsigned char);
 unsigned char kbrepeatrate(unsigned char);
 
+#if !defined(__CBM610__) && !defined(__PET__)
+void waitvsync (void);
+/* wait for the start of the next frame */
+#endif
+
 /*****************************************************************************/
 /*                           CBM kernal functions                            */
 /*****************************************************************************/

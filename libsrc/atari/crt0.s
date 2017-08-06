@@ -9,12 +9,12 @@
 ;
 
         .export         __STARTUP__ : absolute = 1      ; Mark as startup
-        .export         _exit, start
+        .export         _exit, start, excexit, SP_save
 
         .import         initlib, donelib
         .import         callmain, zerobss
         .import         __RESERVED_MEMORY__
-        .import         __RAM_START__, __RAM_SIZE__
+        .import         __MAIN_START__, __MAIN_SIZE__
 .ifdef __ATARIXL__
         .import         __STACKSIZE__
         .import         sram_init
@@ -55,19 +55,19 @@ start:
 
 .ifdef __ATARIXL__
 
-        lda     #<(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
+        lda     #<(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
+        ldx     #>(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
         sta     sp
-        lda     #>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
-        sta     sp+1
+        stx     sp+1
 
 .else
 
 ; Report the memory usage.
 
         lda     APPMHI
+        ldx     APPMHI+1
         sta     APPMHI_save             ; remember old APPMHI value
-        lda     APPMHI+1
-        sta     APPMHI_save+1
+        stx     APPMHI_save+1
 
         sec
         lda     MEMTOP
@@ -109,12 +109,12 @@ start:
 
 ; Call the module destructors. This is also the exit() entry.
 
-_exit:  jsr     donelib         ; Run module destructors
+_exit:  ldx     SP_save
+        txs                     ; Restore stack pointer
 
 ; Restore the system stuff.
 
-        ldx     SP_save
-        txs                     ; Restore stack pointer
+excexit:jsr     donelib         ; Run module destructors; 'excexit' is called from the exec routine
 
 ; Restore the left margin.
 
@@ -129,9 +129,9 @@ _exit:  jsr     donelib         ; Run module destructors
 ; Restore APPMHI.
 
         lda     APPMHI_save
+        ldx     APPMHI_save+1
         sta     APPMHI
-        lda     APPMHI_save+1
-        sta     APPMHI+1
+        stx     APPMHI+1
 
 .ifdef __ATARIXL__
 
@@ -142,9 +142,9 @@ _exit:  jsr     donelib         ; Run module destructors
         lda     RAMTOP_save
         sta     RAMTOP
         lda     MEMTOP_save
+        ldx     MEMTOP_save+1
         sta     MEMTOP
-        lda     MEMTOP_save+1
-        sta     MEMTOP+1
+        stx     MEMTOP+1
 
 
 ; Issue a GRAPHICS 0 call (copied'n'pasted from the TGI drivers), in

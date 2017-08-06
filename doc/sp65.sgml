@@ -49,6 +49,7 @@ Short options:
 
 Long options:
   --convert-to fmt[,attrlist]   Convert into target format
+  --dump-palette                Dump palette as table
   --help                        Help (this text)
   --list-conversions            List all possible conversions
   --pop                         Restore the original loaded image
@@ -74,6 +75,12 @@ attribute lists see <ref id="attr-lists" name="below">.
   Convert a bitmap into one of the supported target formats. The option
   argument must at least contain the "format" attribute. For more attributes,
   see section <ref id="conversions" name="Conversions">.
+
+
+  <label id="option--dump-palette">
+  <tag><tt>--dump-palette</tt></tag>
+
+  Dump palette as table.
 
 
   <label id="option--help">

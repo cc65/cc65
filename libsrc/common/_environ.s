@@ -15,10 +15,10 @@
         .export         __environ, __envcount, __envsize
         .import         initenv
         .constructor    env_init
-        
+
         env_init := initenv
-                           
-.bss
+
+.data
 
 __environ:
         .addr   0
@@ -26,5 +26,3 @@ __envcount:
         .byte   0
 __envsize:
         .byte   0
-
-

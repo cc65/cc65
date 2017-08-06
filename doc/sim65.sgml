@@ -4,7 +4,7 @@
 
 <title>sim65 Users Guide
 <author><url url="mailto:polluks@sdf.lonestar.org" name="Stefan A. Haubenthal">
-<date>2016-01-05
+<date>2016-07-05
 
 <abstract>
 sim65 is a simulator for 6502 and 65C02 CPUs. It allows to test target
@@ -31,12 +31,14 @@ The simulator is called as follows:
 	Usage: sim65 [options] file [arguments]
 	Short options:
 	  -h			Help (this text)
+	  -c			Print amount of executed CPU cycles
 	  -v			Increase verbosity
 	  -V			Print the simulator version number
 	  -x <num>		Exit simulator after <num> cycles
 
 	Long options:
 	  --help		Help (this text)
+	  --cycles		Print amount of executed CPU cycles
 	  --verbose		Increase verbosity
 	  --version		Print the simulator version number
 </verb></tscreen>
@@ -51,6 +53,13 @@ Here is a description of all the command line options:
   <tag><tt>-h, --help</tt></tag>
 
   Print the short option summary shown above.
+
+
+  <tag><tt>-c, --cycles</tt></tag>
+
+  Print the number of executed CPU cycles when the program terminates.
+  The cycles for the final "<tt>jmp exit</tt>" are not included in this
+  count.
 
 
   <tag><tt>-v, --verbose</tt></tag>

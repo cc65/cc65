@@ -7,14 +7,13 @@ the supported platforms.
 Please note:
 
   * The supplied makefile needs GNU make. It works out of the box on Linux
-    and similar systems. If you're using Windows, you will have to compile
-    the programs manually.
+    and similar systems. If you're using Windows, consider installing Cygwin.
 
-  * The makefile specifies the C64 as the default target platform, because all
-    but one
-    of the programs run on this platform. When compiling for another platform,
-    you will have to change the line that specifies the target system at the
-    top of the makefile.
+  * The makefile specifies the C64 as the default target system, because all
+    but one of the programs run on this platform. When compiling for another
+    system, you will have to change the line that specifies the target system
+    at the top of the makefile, specify the system with SYS=<target> on the
+    make command line or set a SYS env var.
 
 
 List of supplied sample programs:
@@ -70,8 +69,8 @@ Platforms:      Runs on all platforms that have TGI support:
                 Apple ][, C64, C128, Oric Atmos, Geos and Lynx.
 
 -----------------------------------------------------------------------------
-Name:           mousetest
-Description:    Tests and shows how to use the mouse.
+Name:           mousedemo
+Description:    Shows how to use the mouse.
 Platforms:      All systems with mouse and conio support:
                 C64, C128, CBM510, Atari, Apple ][
 

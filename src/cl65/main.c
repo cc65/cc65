@@ -73,6 +73,7 @@
 #include "filetype.h"
 #include "fname.h"
 #include "mmodel.h"
+#include "searchpath.h"
 #include "strbuf.h"
 #include "target.h"
 #include "version.h"
@@ -154,6 +155,34 @@ static char* TargetLib  = 0;
 #    include "spawn-unix.inc"
 #  endif
 #endif
+
+
+
+/*****************************************************************************/
+/*                        Credential functions                               */
+/*****************************************************************************/
+
+
+
+static void DisableAssembling (void)
+{
+    DoAssemble = 0;
+}
+
+
+
+static void DisableLinking (void)
+{
+    DoLink = 0;
+}
+
+
+
+static void DisableAssemblingAndLinking (void)
+{
+    DisableAssembling ();
+    DisableLinking ();
+}
 
 
 
@@ -705,6 +734,7 @@ static void Usage (void)
             "  -C name\t\t\tUse linker config file\n"
             "  -Cl\t\t\t\tMake local variables static\n"
             "  -D sym[=defn]\t\t\tDefine a preprocessor symbol\n"
+            "  -E\t\t\t\tStop after the preprocessing stage\n"
             "  -I dir\t\t\tSet a compiler include directory path\n"
             "  -L path\t\t\tSpecify a library search path\n"
             "  -Ln name\t\t\tCreate a VICE label file\n"
@@ -759,6 +789,7 @@ static void Usage (void)
             "  --o65-model model\t\tOverride the o65 model\n"
             "  --obj file\t\t\tLink this object file\n"
             "  --obj-path path\t\tSpecify an object file search path\n"
+            "  --print-target-path\t\tPrint the target file path\n"
             "  --register-space b\t\tSet space available for register variables\n"
             "  --register-vars\t\tEnable register variables\n"
             "  --rodata-name seg\t\tSet the name of the RODATA segment\n"
@@ -1126,6 +1157,23 @@ static void OptObjPath (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
+static void OptPrintTargetPath (const char* Opt attribute ((unused)),
+                                const char* Arg attribute ((unused)))
+/* Print the target file path */
+{
+    SearchPaths* TargetPath = NewSearchPath ();
+    AddSubSearchPathFromEnv (TargetPath, "CC65_HOME", "target");
+#if defined(CL65_TGT) && !defined(_WIN32)
+    AddSearchPath (TargetPath, STRINGIZE (CL65_TGT));
+#endif
+    AddSubSearchPathFromWinBin (TargetPath, "target");
+
+    printf ("%s\n", GetSearchPath (TargetPath, 0));
+    exit (EXIT_SUCCESS);
+}
+
+
+
 static void OptRegisterSpace (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --register-space option */
 {
@@ -1214,7 +1262,8 @@ static void OptVersion (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
 /* Print version number */
 {
-    fprintf (stderr, "cl65 V%s\n", GetVersionAsString ());
+    fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
+    exit(EXIT_SUCCESS);
 }
 
 
@@ -1240,56 +1289,57 @@ int main (int argc, char* argv [])
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
-        { "--add-source",       0,      OptAddSource            },
-        { "--asm-args",         1,      OptAsmArgs              },
-        { "--asm-define",       1,      OptAsmDefine            },
-        { "--asm-include-dir",  1,      OptAsmIncludeDir        },
-        { "--bin-include-dir",  1,      OptBinIncludeDir        },
-        { "--bss-label",        1,      OptBssLabel             },
-        { "--bss-name",         1,      OptBssName              },
-        { "--cc-args",          1,      OptCCArgs               },
-        { "--cfg-path",         1,      OptCfgPath              },
-        { "--check-stack",      0,      OptCheckStack           },
-        { "--code-label",       1,      OptCodeLabel            },
-        { "--code-name",        1,      OptCodeName             },
-        { "--codesize",         1,      OptCodeSize             },
-        { "--config",           1,      OptConfig               },
-        { "--cpu",              1,      OptCPU                  },
-        { "--create-dep",       1,      OptCreateDep            },
-        { "--create-full-dep",  1,      OptCreateFullDep        },
-        { "--data-label",       1,      OptDataLabel            },
-        { "--data-name",        1,      OptDataName             },
-        { "--debug",            0,      OptDebug                },
-        { "--debug-info",       0,      OptDebugInfo            },
-        { "--feature",          1,      OptFeature              },
-        { "--force-import",     1,      OptForceImport          },
-        { "--help",             0,      OptHelp                 },
-        { "--include-dir",      1,      OptIncludeDir           },
-        { "--ld-args",          1,      OptLdArgs               },
-        { "--lib",              1,      OptLib                  },
-        { "--lib-path",         1,      OptLibPath              },
-        { "--list-targets",     0,      OptListTargets          },
-        { "--listing",          1,      OptListing              },
-        { "--list-bytes",       1,      OptListBytes            },
-        { "--mapfile",          1,      OptMapFile              },
-        { "--memory-model",     1,      OptMemoryModel          },
-        { "--module",           0,      OptModule               },
-        { "--module-id",        1,      OptModuleId             },
-        { "--o65-model",        1,      OptO65Model             },
-        { "--obj",              1,      OptObj                  },
-        { "--obj-path",         1,      OptObjPath              },
-        { "--register-space",   1,      OptRegisterSpace        },
-        { "--register-vars",    0,      OptRegisterVars         },
-        { "--rodata-name",      1,      OptRodataName           },
-        { "--signed-chars",     0,      OptSignedChars          },
-        { "--standard",         1,      OptStandard             },
-        { "--start-addr",       1,      OptStartAddr            },
-        { "--static-locals",    0,      OptStaticLocals         },
-        { "--target",           1,      OptTarget               },
-        { "--verbose",          0,      OptVerbose              },
-        { "--version",          0,      OptVersion              },
-        { "--zeropage-label",   1,      OptZeropageLabel        },
-        { "--zeropage-name",    1,      OptZeropageName         },
+        { "--add-source",        0, OptAddSource      },
+        { "--asm-args",          1, OptAsmArgs        },
+        { "--asm-define",        1, OptAsmDefine      },
+        { "--asm-include-dir",   1, OptAsmIncludeDir  },
+        { "--bin-include-dir",   1, OptBinIncludeDir  },
+        { "--bss-label",         1, OptBssLabel       },
+        { "--bss-name",          1, OptBssName        },
+        { "--cc-args",           1, OptCCArgs         },
+        { "--cfg-path",          1, OptCfgPath        },
+        { "--check-stack",       0, OptCheckStack     },
+        { "--code-label",        1, OptCodeLabel      },
+        { "--code-name",         1, OptCodeName       },
+        { "--codesize",          1, OptCodeSize       },
+        { "--config",            1, OptConfig         },
+        { "--cpu",               1, OptCPU            },
+        { "--create-dep",        1, OptCreateDep      },
+        { "--create-full-dep",   1, OptCreateFullDep  },
+        { "--data-label",        1, OptDataLabel      },
+        { "--data-name",         1, OptDataName       },
+        { "--debug",             0, OptDebug          },
+        { "--debug-info",        0, OptDebugInfo      },
+        { "--feature",           1, OptFeature        },
+        { "--force-import",      1, OptForceImport    },
+        { "--help",              0, OptHelp           },
+        { "--include-dir",       1, OptIncludeDir     },
+        { "--ld-args",           1, OptLdArgs         },
+        { "--lib",               1, OptLib            },
+        { "--lib-path",          1, OptLibPath        },
+        { "--list-targets",      0, OptListTargets    },
+        { "--listing",           1, OptListing        },
+        { "--list-bytes",        1, OptListBytes      },
+        { "--mapfile",           1, OptMapFile        },
+        { "--memory-model",      1, OptMemoryModel    },
+        { "--module",            0, OptModule         },
+        { "--module-id",         1, OptModuleId       },
+        { "--o65-model",         1, OptO65Model       },
+        { "--obj",               1, OptObj            },
+        { "--obj-path",          1, OptObjPath        },
+        { "--print-target-path", 0, OptPrintTargetPath},
+        { "--register-space",    1, OptRegisterSpace  },
+        { "--register-vars",     0, OptRegisterVars   },
+        { "--rodata-name",       1, OptRodataName     },
+        { "--signed-chars",      0, OptSignedChars    },
+        { "--standard",          1, OptStandard       },
+        { "--start-addr",        1, OptStartAddr      },
+        { "--static-locals",     0, OptStaticLocals   },
+        { "--target",            1, OptTarget         },
+        { "--verbose",           0, OptVerbose        },
+        { "--version",           0, OptVersion        },
+        { "--zeropage-label",    1, OptZeropageLabel  },
+        { "--zeropage-name",     1, OptZeropageName   },
     };
 
     char* CmdPath;
@@ -1377,8 +1427,7 @@ int main (int argc, char* argv [])
 
                 case 'S':
                     /* Dont assemble and link the created files */
-                    DoAssemble = 0;
-                    DoLink     = 0;
+                    DisableAssemblingAndLinking ();
                     break;
 
                 case 'T':
@@ -1390,17 +1439,35 @@ int main (int argc, char* argv [])
                     /* Print version number */
                     OptVersion (Arg, 0);
                     break;
-
+                
+                case 'E':
+                    /* Forward -E to compiler */
+                    CmdAddArg (&CC65, Arg);  
+                    DisableAssemblingAndLinking ();
+                    break;
+                    
                 case 'W':
-                    if (Arg[2] == 'a' && Arg[3] == '\0') {
-                        /* -Wa: Pass options to assembler */
-                        OptAsmArgs (Arg, GetArg (&I, 3));
-                    } else if (Arg[2] == 'c' && Arg[3] == '\0') {
-                        /* -Wc: Pass options to compiler */
-                        OptCCArgs (Arg, GetArg (&I, 3));
-                    } else if (Arg[2] == 'l' && Arg[3] == '\0') {
-                        /* -Wl: Pass options to linker */
-                        OptLdArgs (Arg, GetArg (&I, 3));
+                    /* avoid && with'\0' in if clauses */
+                    if (Arg[3] == '\0') {
+                        switch (Arg[2]) {
+                        case 'a':
+                            /* -Wa: Pass options to assembler */
+                            OptAsmArgs (Arg, GetArg (&I, 3));
+                            break;
+                        case 'c':
+                            /* -Wc: Pass options to compiler 
+                            ** Remember -Wc sub arguments in cc65 arg struct 
+                            */
+                            OptCCArgs (Arg, GetArg (&I, 3));
+                            break;
+                        case 'l':
+                            /* -Wl: Pass options to linker */
+                            OptLdArgs (Arg, GetArg (&I, 3));
+                            break;
+                        default:
+                            UnknownOption (Arg);
+                            break;
+                       }
                     } else {
                         /* Anything else: Suppress warnings (compiler) */
                         CmdAddArg2 (&CC65, "-W", GetArg (&I, 2));
@@ -1409,7 +1476,7 @@ int main (int argc, char* argv [])
 
                 case 'c':
                     /* Don't link the resulting files */
-                    DoLink = 0;
+                    DisableLinking ();
                     break;
 
                 case 'd':

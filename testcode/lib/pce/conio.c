@@ -123,7 +123,7 @@ void main(void)
                                 p[8],p[9],p[10],p[11],p[12],p[13],p[14],p[15]);
                 }
 
-                waitvblank();
+                waitvsync();
                 ++n;
         }
 }

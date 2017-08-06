@@ -1711,7 +1711,7 @@ static int HarmlessCall (const char* Name)
 ** the pushax/op sequence when encountered.
 */
 {
-    static const char* Tab[] = {
+    static const char* const Tab[] = {
         "aslax1",
         "aslax2",
         "aslax3",

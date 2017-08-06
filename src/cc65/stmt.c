@@ -273,9 +273,6 @@ static void WhileStatement (void)
     /* Remember the current position */
     GetCodePos (&CondCodeStart);
 
-    /* Emit the code position label */
-    g_defcodelabel (CondLabel);
-
     /* Test the loop condition */
     TestInParens (LoopLabel, 1);
 
@@ -287,6 +284,9 @@ static void WhileStatement (void)
 
     /* Loop body */
     Statement (&PendingToken);
+
+    /* Emit the while condition label */
+    g_defcodelabel (CondLabel);
 
     /* Move the test code here */
     GetCodePos (&Here);

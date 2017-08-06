@@ -90,15 +90,16 @@
 /* No support for dynamically loadable drivers */
 #define DYN_DRV         0
 
-/* The joystick keys - all keys are supported */
-#define KEY_A           0x01
-#define KEY_B           0x02
-#define KEY_SELECT      0x04
-#define KEY_START       0x08
-#define KEY_UP          0x10
-#define KEY_DOWN        0x20
-#define KEY_LEFT        0x40
-#define KEY_RIGHT       0x80
+/* Expanding upon joystick.h */
+#define JOY_BTN_A_IDX           4
+#define JOY_BTN_B_IDX           5
+#define JOY_SELECT_IDX          6
+#define JOY_START_IDX           7
+
+#define JOY_BTN_A(v)            ((v) & joy_masks[JOY_BTN_A_IDX])
+#define JOY_BTN_B(v)            ((v) & joy_masks[JOY_BTN_B_IDX])
+#define JOY_SELECT(v)           ((v) & joy_masks[JOY_SELECT_IDX])
+#define JOY_START(v)            ((v) & joy_masks[JOY_START_IDX])
 
 /* Define hardware */
 
@@ -163,8 +164,8 @@ extern void nes_64_56_2_tgi[];      /* Referred to by tgi_static_stddrv[] */
 
 
 
-void waitvblank (void);
-/* Wait for the vertical blanking */
+void waitvsync (void);
+/* Wait for start of the next frame */
 
 unsigned char get_tv (void);
 /* Return the video mode the machine is using. */

@@ -53,7 +53,8 @@ unsigned      RegisterSpace     = 6;    /* Space available for register vars */
 /* Stackable options */
 IntStack WritableStrings    = INTSTACK(0);  /* Literal strings are r/w */
 IntStack LocalStrings       = INTSTACK(0);  /* Emit string literals immediately */
-IntStack InlineStdFuncs     = INTSTACK(0);  /* Inline some known functions */
+IntStack InlineStdFuncs     = INTSTACK(0);  /* Inline some standard functions */
+IntStack EagerlyInlineFuncs = INTSTACK(0);  /* Eagerly inline some known functions */
 IntStack EnableRegVars      = INTSTACK(0);  /* Enable register variables */
 IntStack AllowRegVarAddr    = INTSTACK(0);  /* Allow taking addresses of register vars */
 IntStack RegVarsToCallStack = INTSTACK(0);  /* Save reg variables on call stack */

@@ -32,10 +32,10 @@ MAXARGS  = 10                   ; Maximum number of arguments allowed
 REM      = $8f                  ; BASIC token-code
 NAME_LEN = 16                   ; Maximum length of command-name
 
-; Get possible command-line arguments. Goes into the special INIT segment,
+; Get possible command-line arguments. Goes into the special ONCE segment,
 ; which may be reused after the startup code is run
 
-.segment        "INIT"
+.segment        "ONCE"
 
 initmainargs:
 
@@ -125,7 +125,7 @@ done:   lda     #<argv
         stx     __argv + 1
         rts
 
-.segment        "INITBSS"
+.segment        "INIT"
 
 term:   .res    1
 name:   .res    NAME_LEN + 1

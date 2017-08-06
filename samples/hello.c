@@ -34,11 +34,10 @@ int main (void)
 {
     unsigned char XSize, YSize;
 
-    /* Set screen colors, hide the cursor */
-    textcolor (COLOR_WHITE);
-    bordercolor (COLOR_BLACK);
-    bgcolor (COLOR_BLACK);
-    cursor (0);
+    /* Set screen colors */
+    (void) textcolor (COLOR_WHITE);
+    (void) bordercolor (COLOR_BLACK);
+    (void) bgcolor (COLOR_BLACK);
 
     /* Clear the screen, put cursor in upper left corner */
     clrscr ();
@@ -78,7 +77,7 @@ int main (void)
 #else
 
     /* Wait for the user to press a key */
-    (void) cgetc ();
+    cgetc ();
 
 #endif
 

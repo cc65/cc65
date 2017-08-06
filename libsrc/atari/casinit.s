@@ -13,7 +13,7 @@
         .import start
         .export _cas_init
 
-.segment        "INIT"
+.segment        "ONCE"
 
 _cas_init:
 .ifdef  DEBUG

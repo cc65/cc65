@@ -123,7 +123,6 @@ static void Usage (void)
             "  --large-alignment\t\tDon't warn about large alignments\n"
             "  --listing name\t\tCreate a listing file if assembly was ok\n"
             "  --list-bytes n\t\tMaximum number of bytes per listing line\n"
-            "  --macpack-dir dir\t\tSet a macro package directory\n"
             "  --memory-model model\t\tSet the memory model\n"
             "  --pagelength n\t\tSet the page length for the listing\n"
             "  --relax-checks\t\tRelax some checks (see docs)\n"
@@ -205,6 +204,10 @@ static void SetSys (const char* Sys)
             AbEnd ("Cannot use `module' as a target for the assembler");
             break;
 
+        case TGT_ATARI2600:
+            NewSymbol ("__ATARI2600__", 1);
+            break;
+
         case TGT_ATARI5200:
             NewSymbol ("__ATARI5200__", 1);
             break;
@@ -224,6 +227,10 @@ static void SetSys (const char* Sys)
 
         case TGT_C64:
             CBMSystem ("__C64__");
+            break;
+
+        case TGT_C65:
+            CBMSystem ("__C65__");
             break;
 
         case TGT_VIC20:
@@ -274,6 +281,10 @@ static void SetSys (const char* Sys)
             NewSymbol ("__GEOS_CBM__", 1);
             break;
 
+        case TGT_CREATIVISION:
+            NewSymbol ("__CREATIVISION__", 1);
+            break;
+
         case TGT_GEOS_APPLE:
             NewSymbol ("__GEOS__", 1);
             NewSymbol ("__GEOS_APPLE__", 1);
@@ -285,7 +296,11 @@ static void SetSys (const char* Sys)
 
         case TGT_ATMOS:
             NewSymbol ("__ATMOS__", 1);
-            break;
+            break; 
+
+        case TGT_TELESTRAT:
+             NewSymbol ("__TELESTRAT__", 1);
+             break;
 
         case TGT_NES:
             NewSymbol ("__NES__", 1);
@@ -619,7 +634,8 @@ static void OptVersion (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
 /* Print the assembler version */
 {
-    fprintf (stderr, "ca65 V%s\n", GetVersionAsString ());
+    fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
+    exit(EXIT_SUCCESS);
 }
 
 

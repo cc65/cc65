@@ -144,7 +144,7 @@ static void AddNotifications (const Collection* LineInfos)
                 break;
 
             case LI_TYPE_EXT:
-                Msg = "Assembler code generated from this line";
+                Msg = "Assembly code generated from this line";
                 break;
 
             case LI_TYPE_MACRO:

@@ -13,34 +13,34 @@
         .macpack        generic
 
 MAXARGS  = 10                   ; Maximum number of arguments allowed
-REM      = $9d                  ; BASIC token-code
+REM      = $9D                  ; BASIC token-code
 
 
 ;---------------------------------------------------------------------------
-; Get possible command-line arguments. Goes into the special INIT segment,
-; which may be reused after the startup code is run
+; Get possible command-line arguments. Goes into the special ONCE segment,
+; which will be reused after the startup code is run.
 
-.segment        "INIT"
+.segment        "ONCE"
 
 .proc   initmainargs
 
 ; Assume that the program was loaded, a moment ago, by the traditional LOAD
 ; statement.  Save the "most-recent filename" as argument #0.
-; Because the buffer, that we're copying into, was zeroed out,
-; we don't need to add a NUL character.
-;
-        ldy     #FNAME_LEN - 1  ; limit the length
+
+        ldy     #FNAME_LEN      ; Limit the length
+        lda     #0              ; The terminating NUL character
+        beq     L1              ; Branch always
 L0:     lda     CFOUND_NAME,y
-        sta     name,y
+L1:     sta     name,y
         dey
         bpl     L0
         inc     __argc          ; argc always is equal to, at least, 1
 
 ; Find the "rem" token.
-;
+
         ldx     #0
 L2:     lda     BASIC_BUF,x
-        beq     done            ; no "rem", no args.
+        beq     done            ; No "rem", no args.
         inx
         cmp     #REM
         bne     L2
@@ -62,7 +62,7 @@ next:   lda     BASIC_BUF,x
         beq     done            ; End of line reached
         inx
         cmp     #' '            ; Skip leading spaces
-        beq     next            ;
+        beq     next
 
 ; Found start of next argument. We've incremented the pointer in X already, so
 ; it points to the second character of the argument. This is useful since we
@@ -79,7 +79,7 @@ setterm:sta     term            ; Set end of argument marker
 
         txa                     ; Get low byte
         add     #<args
-        sta     argv,y          ; argv[y]= &arg
+        sta     argv,y          ; argv[y]=&arg
         lda     #>$0000
         adc     #>args
         sta     argv+1,y
@@ -99,7 +99,7 @@ argloop:lda     BASIC_BUF,x
 ; A contains the terminating character. To make the argument a valid C string,
 ; replace the terminating character by a zero.
 
-        lda     #$00
+        lda     #0
         sta     args-1,x
 
 ; Check if the maximum number of command line arguments is reached. If not,
@@ -119,15 +119,16 @@ done:   lda     #<argv
 
 .endproc
 
-; These arrays are zeroed before initmainargs is called.
-; char  name[16+1];
-; char* argv[MAXARGS+1]={name};
-;
-.bss
+.segment        "INIT"
+
 term:   .res    1
 name:   .res    FNAME_LEN + 1
 args:   .res    SCREEN_XSIZE * 2 - 1
 
 .data
+
+; This array has zeroes when initmainargs starts.
+; char* argv[MAXARGS+1]={name};
+
 argv:   .addr   name
-        .res    MAXARGS * 2, $00
+        .res    MAXARGS * 2

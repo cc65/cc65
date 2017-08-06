@@ -161,11 +161,12 @@ extern void __fastcall__ _scroll (signed char numlines);
                                           /* numlines < 0  scrolls down */
 
 /* misc. functions */
-extern unsigned char get_ostype(void);  /* get ROM version */
-extern unsigned char get_tv(void);      /* get TV system */
-extern void _save_vecs(void);           /* save system vectors */
-extern void _rest_vecs(void);           /* restore system vectors */
-extern char *_getdefdev(void);          /* get default floppy device */
+extern unsigned char get_ostype(void);       /* get ROM version */
+extern unsigned char get_tv(void);           /* get TV system */
+extern void _save_vecs(void);                /* save system vectors */
+extern void _rest_vecs(void);                /* restore system vectors */
+extern char *_getdefdev(void);               /* get default floppy device */
+extern unsigned char _is_cmdline_dos(void);  /* does DOS support command lines */
 
 /* global variables */
 extern unsigned char _dos_type;         /* the DOS flavour */
@@ -261,11 +262,11 @@ extern void atrx15p2_tgi[];
 #define AT_PAL      1
 
 /* valid _dos_type values */
-#define ATARIDOS    0
-#define SPARTADOS   1
-#define OSADOS      2
-#define MYDOS       3
-#define XDOS        4
+#define SPARTADOS   0
+#define OSADOS      1
+#define XDOS        2
+#define ATARIDOS    3
+#define MYDOS       4
 #define NODOS       255
 
 /* Define hardware */

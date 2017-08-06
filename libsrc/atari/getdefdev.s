@@ -27,10 +27,10 @@
 __getdefdev:
 
         lda     __dos_type      ; which DOS?
-        cmp     #ATARIDOS
-        beq     finish
-        cmp     #MYDOS
-        beq     finish
+        cmp     #XDOS
+        beq     xdos            ; only supported on XDOS ...
+;       cmp     #OSADOS+1       ; (redundant: #OSADOS+1 = #XDOS)
+        bcs     finish          ; ... and on OS/A+ and SpartaDOS
 
         ldy     #BUFOFF
         lda     #0
@@ -60,7 +60,7 @@ __getdefdev:
         lda     (DOSVEC),y
         sta     crvec+2
 
-crvec:  jsr     $FFFF           ; will be set to crunch vector
+        jsr     crvec
 
 ; Get default device
 
@@ -69,7 +69,7 @@ crvec:  jsr     $FFFF           ; will be set to crunch vector
         sta     __defdev
         iny
         lda     (DOSVEC),y
-        sta     __defdev+1
+done:   sta     __defdev+1
 
 ; Return pointer to default device
 
@@ -77,9 +77,33 @@ finish: lda     #<__defdev
         ldx     #>__defdev
         rts
 
+; XDOS default device retrieval
+
+xdos:
+
+; check XDOS version (we need >= 2.4)
+
+        lda     XGLIN
+        cmp     #$4C            ; there needs to be a 'JMP' opcode here
+        bne     finish          ; older version, use DEFAULT_DEVICE or D1:
+        lda     XVER            ; get BCD encoded version ($24 for 2.4)
+        cmp     #$24
+        bcc     finish          ; too old, below 2.4
+
+; good XDOS version, get default drive
+
+        lda     #ATEOL
+        sta     XLINE           ; simulate empty command line
+        ldy     #0
+        jsr     XMOVE           ; create an FMS filename (which in this case only contains the drive)
+        lda     XFILE+1
+        bne     done
+
         .data
 
-; Default device
+crvec:  jmp     $FFFF           ; target address will be set to crunch vector
+
+; Default device string
 
 __defdev:
 .ifdef  DEFAULT_DEVICE
@@ -87,4 +111,3 @@ __defdev:
 .else
         .byte   "D1:", 0
 .endif
-

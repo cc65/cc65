@@ -55,6 +55,7 @@ typedef enum {
     TGT_NONE,
     TGT_MODULE,
     TGT_ATARI,
+    TGT_ATARI2600,
     TGT_ATARI5200,
     TGT_ATARIXL,
     TGT_VIC20,
@@ -70,9 +71,11 @@ typedef enum {
     TGT_APPLE2,
     TGT_APPLE2ENH,
     TGT_GEOS_CBM,
+    TGT_CREATIVISION,
     TGT_GEOS_APPLE,
     TGT_LUNIX,
     TGT_ATMOS,
+    TGT_TELESTRAT,
     TGT_NES,
     TGT_SUPERVISION,
     TGT_LYNX,
@@ -80,13 +83,14 @@ typedef enum {
     TGT_SIM65C02,
     TGT_PCENGINE,
     TGT_GAMATE,
+    TGT_C65,
     TGT_COUNT                   /* Number of target systems */
 } target_t;
 
 /* Collection of target properties */
 typedef struct TargetProperties TargetProperties;
 struct TargetProperties {
-    const char              Name[12];   /* Name of the target */
+    const char              Name[13];   /* Name of the target */
     cpu_t                   DefaultCPU; /* Default CPU for this target */
     unsigned char           BinFmt;     /* Default binary format for this target */
     const unsigned char*    CharMap;    /* Character translation table */

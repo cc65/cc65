@@ -40,6 +40,9 @@ static void CheckError (const char* S)
     unsigned char Error = tgi_geterror ();
     if (Error != TGI_ERR_OK) {
         printf ("%s: %d\n", S, Error);
+        if (doesclrscrafterexit ()) {
+            cgetc ();
+        }
         exit (EXIT_FAILURE);
     }
 }

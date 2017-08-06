@@ -2,14 +2,15 @@
 ; Startup code for cc65 (Oric version)
 ;
 ; By Debrune Jérôme <jede@oric.org> and Ullrich von Bassewitz <uz@cc65.org>
-; 2015-01-09, Greg King
+; 2016-03-18, Greg King
 ;
 
         .export         _exit
         .export         __STARTUP__ : absolute = 1      ; Mark as startup
+
         .import         initlib, donelib
         .import         callmain, zerobss
-        .import         __RAM_START__, __RAM_SIZE__, __STACKSIZE__
+        .import         __MAIN_START__, __MAIN_SIZE__
 
         .include        "zeropage.inc"
         .include        "atmos.inc"
@@ -19,39 +20,17 @@
 
 .segment        "STARTUP"
 
-; Save the zero-page area that we're about to use.
-
-        ldx     #zpspace-1
-L1:     lda     sp,x
-        sta     zpsave,x
-        dex
-        bpl     L1
-
-; Clear the BSS data.
-
-        jsr     zerobss
-
-; Currently, color isn't supported on the text screen.
-; Unprotect screen columns 0 and 1 (where each line's color codes would sit).
-
-        lda     STATUS
-        sta     stsave
-        and     #%11011111
-        sta     STATUS
-
-; Save some system stuff; and, set up the stack.
-
         tsx
         stx     spsave          ; Save system stk ptr
 
-        lda     #<(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
-        sta     sp
-        lda     #>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
-        sta     sp+1            ; Set argument stack ptr
+; Save space by putting some of the start-up code in a segment
+; that will be re-used.
 
-; Call the module constructors.
+        jsr     init
 
-        jsr     initlib
+; Clear the BSS variables (after the constructors have been run).
+
+        jsr     zerobss
 
 ; Push the command-line arguments; and, call main().
 
@@ -70,7 +49,7 @@ _exit:  jsr     donelib
 
 ; Copy back the zero-page stuff.
 
-        ldx     #zpspace-1
+        ldx     #zpspace - 1
 L2:     lda     zpsave,x
         sta     sp,x
         dex
@@ -81,28 +60,42 @@ L2:     lda     zpsave,x
         rts
 
 ; ------------------------------------------------------------------------
+; Put this code in a place that will be re-used by BSS, the heap,
+; and the C stack.
 
-.segment        "ZPSAVE1"
+.segment        "ONCE"
 
-zpsave:
+; Save the zero-page area that we're about to use.
 
-; This padding is needed by a bug in the ROM.
-; (The CLOAD command starts BASIC's variables table on top of the last byte
-; that was loaded [instead of at the next address].)
-; This is overlaid on a buffer, so that it doesn't use extra space in RAM.
+init:   ldx     #zpspace - 1
+L1:     lda     sp,x
+        sta     zpsave,x
+        dex
+        bpl     L1
 
-        .byte   0
+; Currently, color isn't supported on the text screen.
+; Unprotect screen columns 0 and 1 (where each line's color codes would sit).
 
-; The segments "ZPSAVE1" and "ZPSAVE2" always must be together.
-; They create a single object (the zpsave buffer).
+        lda     STATUS
+        sta     stsave
+        and     #%11011111
+        sta     STATUS
 
-.segment        "ZPSAVE2"
+; Set up the C stack.
 
-        .res    zpspace - 1
+        lda     #<(__MAIN_START__ + __MAIN_SIZE__)
+        ldx     #>(__MAIN_START__ + __MAIN_SIZE__)
+        sta     sp
+        stx     sp+1            ; Set argument stack ptr
+
+; Call the module constructors.
+
+        jmp     initlib
 
 ; ------------------------------------------------------------------------
 
-.bss
+.segment        "INIT"
 
 spsave: .res    1
 stsave: .res    1
+zpsave: .res    zpspace

@@ -58,6 +58,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sim65", "sim65.vcxproj", "{
 		{71DC1F68-BFC4-478C-8655-C8E9C9654D2B} = {71DC1F68-BFC4-478C-8655-C8E9C9654D2B}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "chrcvt65", "chrcvt65.vcxproj", "{1C7A3FEF-DD0B-4B10-BC33-C3BE29BF67CC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{71DC1F68-BFC4-478C-8655-C8E9C9654D2B} = {71DC1F68-BFC4-478C-8655-C8E9C9654D2B}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -112,6 +117,10 @@ Global
 		{002A366E-2863-46A8-BDDE-DDF534AAEC73}.Debug|Win32.Build.0 = Debug|Win32
 		{002A366E-2863-46A8-BDDE-DDF534AAEC73}.Release|Win32.ActiveCfg = Release|Win32
 		{002A366E-2863-46A8-BDDE-DDF534AAEC73}.Release|Win32.Build.0 = Release|Win32
+		{1C7A3FEF-DD0B-4B10-BC33-C3BE29BF67CC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1C7A3FEF-DD0B-4B10-BC33-C3BE29BF67CC}.Debug|Win32.Build.0 = Debug|Win32
+		{1C7A3FEF-DD0B-4B10-BC33-C3BE29BF67CC}.Release|Win32.ActiveCfg = Release|Win32
+		{1C7A3FEF-DD0B-4B10-BC33-C3BE29BF67CC}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

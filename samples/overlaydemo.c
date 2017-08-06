@@ -10,11 +10,12 @@
 
 
 #include <stdio.h>
-#include <conio.h>
+#include <cc65.h>
 #ifndef __CBM__
 #include <fcntl.h>
 #include <unistd.h>
 #else
+#include <cbm.h>
 #include <device.h>
 #endif
 
@@ -130,5 +131,7 @@ void main (void)
         foobar ();
     }
 
-    cgetc ();
+    if (doesclrscrafterexit ()) {
+        getchar ();
+    }
 }

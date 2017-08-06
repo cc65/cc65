@@ -156,6 +156,7 @@ Here is a description of all of the command-line options:
   <item>module
   <item>apple2
   <item>apple2enh
+  <item>atari2600
   <item>atari
   <item>atarixl
   <item>atmos
@@ -246,10 +247,11 @@ Here is a description of all of the command-line options:
   <tag><tt>-Ln</tt></tag>
 
   This option allows you to create a file that contains all global labels and
-  may be loaded into the VICE emulator using the <tt/ll/ (load label) command. You
+  may be loaded into the VICE emulator using the <tt/ll/ (load label) command
+  or into the Oricutron emulator using the <tt/sl/ (symbols load) command. You
   may use this to debug your code with VICE. Note: Older versions had some
   bugs in the label code. If you have problems, please get the latest <url
-  url="http://vice-emu.sourceforge.net/" name="VICE"> version.
+  url="http://vice-emu.sourceforge.net" name="VICE"> version.
 
 
   <label id="option-S">
@@ -1032,11 +1034,11 @@ The builtin config files do contain segments that have a special meaning for
 the compiler and the libraries that come with it. If you replace the builtin
 config files, you will need the following information.
 
-<sect1>INIT<p>
+<sect1>ONCE<p>
 
-The INIT segment is used for initialization code that may be reused once
+The ONCE segment is used for initialization code run only once before
 execution reaches main() - provided that the program runs in RAM. You
-may for example add the INIT segment to the heap in really memory
+may for example add the ONCE segment to the heap in really memory
 constrained systems.
 
 <sect1>LOWCODE<p>

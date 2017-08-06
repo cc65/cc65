@@ -238,6 +238,18 @@ void PopSearchPath (SearchPaths* P)
 
 
 
+char* GetSearchPath (SearchPaths* P, unsigned Index)
+/* Return the search path at the given index, if the index is valid, return an
+** empty string otherwise.
+*/
+{
+    if (Index < CollCount (P))
+        return CollAtUnchecked (P, Index);
+    return "";
+}
+
+
+
 char* SearchFile (const SearchPaths* P, const char* File)
 /* Search for a file in a list of directories. Return a pointer to a malloced
 ** area that contains the complete path, if found, return 0 otherwise.

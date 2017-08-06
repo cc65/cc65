@@ -8,7 +8,7 @@
         .import         zerobss
         .import         push0, callmain
         .import         RESTOR, BSOUT, CLRCH
-        .import         __RAM_START__, __RAM_SIZE__, __STACKSIZE__
+        .import         __MAIN_START__, __MAIN_SIZE__, __STACKSIZE__
         .importzp       ST
 
         .include        "zeropage.inc"
@@ -56,10 +56,10 @@ L1:     lda     sp,x
         tsx
         stx     spsave          ; Save the system stack pointer
 
-        lda     #<(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
+        lda     #<(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
+        ldx     #>(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
         sta     sp
-        lda     #>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
-        sta     sp+1            ; Set argument stack ptr
+        stx     sp+1            ; Set argument stack ptr
 
 ; Call the module constructors.
 
@@ -108,7 +108,7 @@ L2:     lda     zpsave,x
 ; ------------------------------------------------------------------------
 ; Data
 
-.segment        "INITBSS"
+.segment        "INIT"
 
 zpsave: .res    zpspace
 

@@ -73,8 +73,7 @@ ScrollLength    = (ScrHeight - 1) * ScrollDist
 
 _cputcxy:
         pha                     ; Save C
-        jsr     popa            ; Get Y
-        jsr     _gotoxy         ; Set cursor, drop x
+        jsr     gotoxy          ; Set cursor, drop x and y
         pla                     ; Restore C
 
 ; Plot a character - also used as internal function
@@ -157,7 +156,7 @@ putchar:
 .macro osi_screen_funcs ScrBase, ScrRamSize, ScrFirstChar, \
                         ScrWidth, ScrHeight, ScrollDist
 
-        .import         popa, _gotoxy
+        .import         gotoxy
         .import         _memmove, _memset, pushax
         .importzp       ptr1
 

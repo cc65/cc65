@@ -1,6 +1,6 @@
 ;
 ; 2010-11-14, Ullrich von Bassewitz
-; 2014-09-06, Greg King
+; 2016-03-17, Greg King
 ;
 ; This module supplies a small BASIC stub program that uses CALL
 ; to jump to the machine-language code that follows it.
@@ -22,3 +22,13 @@
         .byte   $00             ; End of BASIC line
 Next:   .addr   $0000           ; BASIC program end marker
 Start:
+
+; ------------------------------------------------------------------------
+
+; This padding is needed by a bug in the ROM.
+; (The CLOAD command starts BASIC's variables table on top of the last byte
+; that was loaded [instead of at the next address].)
+
+.segment        "BASTAIL"
+
+        .byte   0

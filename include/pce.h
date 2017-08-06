@@ -76,15 +76,22 @@
 /* No support for dynamically loadable drivers */
 #define DYN_DRV         0
 
+/* Expanding upon joystick.h */
+#define JOY_BTN_I_IDX           4
+#define JOY_BTN_II_IDX          5
+#define JOY_SELECT_IDX          6
+#define JOY_RUN_IDX             7
+
+#define JOY_BTN_I(v)            ((v) & joy_masks[JOY_BTN_I_IDX])
+#define JOY_BTN_II(v)           ((v) & joy_masks[JOY_BTN_II_IDX])
+#define JOY_SELECT(v)           ((v) & joy_masks[JOY_SELECT_IDX])
+#define JOY_RUN(v)              ((v) & joy_masks[JOY_RUN_IDX])
+
 /* The addresses of the static drivers */
 extern void pce_stdjoy_joy[];   /* Referred to by joy_static_stddrv[] */
 
-#define JOY_FIRE_B              5
-#define JOY_SELECT              6
-#define JOY_RUN                 7
-
-void waitvblank (void);
-/* Wait for the vertical blanking */
+void waitvsync (void);
+/* Wait for start of the next frame */
 
 /* NOTE: all PCE are NTSC */
 #define get_tv()                TV_NTSC

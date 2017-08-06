@@ -52,9 +52,10 @@
 #define FD_OLDSTYLE             0x0010U /* Old style (K&R) function          */
 #define FD_OLDSTYLE_INTRET      0x0020U /* K&R func has implicit int return  */
 #define FD_UNNAMED_PARAMS       0x0040U /* Function has unnamed params       */
+#define FD_CALL_WRAPPER         0x0080U /* This function is used as a wrapper */
 
 /* Bits that must be ignored when comparing funcs */
-#define FD_IGNORE       (FD_OLDSTYLE | FD_OLDSTYLE_INTRET | FD_UNNAMED_PARAMS)
+#define FD_IGNORE       (FD_OLDSTYLE | FD_OLDSTYLE_INTRET | FD_UNNAMED_PARAMS | FD_CALL_WRAPPER)
 
 
 
@@ -67,6 +68,8 @@ struct FuncDesc {
     unsigned            ParamCount;     /* Number of parameters              */
     unsigned            ParamSize;      /* Size of the parameters            */
     struct SymEntry*    LastParam;      /* Pointer to last parameter         */
+    struct SymEntry*    WrappedCall;    /* Pointer to the WrappedCall        */
+    unsigned char       WrappedCallData;/* The WrappedCall's user data       */
 };
 
 

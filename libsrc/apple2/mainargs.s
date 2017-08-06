@@ -46,10 +46,10 @@ FNAM_LEN  = $280
 FNAM      = $281
 REM       = $B2                 ; BASIC token-code
 
-; Get possible command-line arguments. Goes into the special INIT segment,
+; Get possible command-line arguments. Goes into the special ONCE segment,
 ; which may be reused after the startup code is run.
 
-        .segment        "INIT"
+        .segment        "ONCE"
 
 initmainargs:
 
@@ -83,6 +83,7 @@ initmainargs:
 ; destroyed.
 
         ldy     #$00
+        sty     buffer + BUF_LEN - 1
 :       lda     BASIC_BUF,x
         sta     buffer,y
         inx
@@ -166,14 +167,13 @@ done:   lda     #<argv
         stx     __argv+1
         rts
 
-; This array is zeroed before initmainargs is called.
-; char* argv[MAXARGS+1] = {FNAM};
-
         .data
+
+; char* argv[MAXARGS+1] = {FNAM};
 
 argv:   .addr   FNAM
         .res    MAXARGS * 2
 
-        .bss
+        .segment        "INIT"
 
 buffer: .res    BUF_LEN

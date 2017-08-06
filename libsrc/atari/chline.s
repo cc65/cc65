@@ -6,7 +6,7 @@
 ;
 
         .export         _chlinexy, _chline
-        .import         popa, _gotoxy, cputdirect, setcursor
+        .import         gotoxy, cputdirect, setcursor
         .importzp       tmp1
 
 .ifdef __ATARI5200__
@@ -17,8 +17,7 @@ CHRCODE =       $12+64
 
 _chlinexy:
         pha                     ; Save the length
-        jsr     popa            ; Get y
-        jsr     _gotoxy         ; Call this one, will pop params
+        jsr     gotoxy          ; Call this one, will pop params
         pla                     ; Restore the length
 
 _chline:

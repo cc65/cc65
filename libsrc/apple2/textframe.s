@@ -16,10 +16,10 @@
         .include        "zeropage.inc"
         .include        "apple2.inc"
 
-WIDTH   = tmp2
-HEIGHT  = tmp3
-XORIGIN = tmp4
-YORIGIN = ptr1
+WIDTH   = ptr1
+HEIGHT  = ptr1+1
+XORIGIN = ptr2
+YORIGIN = ptr2+1
 
 _textframexy:
         sec

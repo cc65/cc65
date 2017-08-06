@@ -368,6 +368,14 @@ void NewAsmLine (void)
 
     /* Start a new line using the current line info */
     AsmLineInfo = StartLine (&CurTok.Pos, LI_TYPE_ASM, 0);
+
+    /* If the first LineInfo in the list came from a .dbg line, then we want
+    ** errors and warnings to show it as an additional note, not as the primary
+    ** line.  Therefore, swap the first two LineInfo items.
+    */
+    if (GetLineInfoType (CollAtUnchecked (&CurLineInfo, 0)) == LI_TYPE_EXT) {
+        CollMove (&CurLineInfo, 1, 0);
+    }
 }
 
 

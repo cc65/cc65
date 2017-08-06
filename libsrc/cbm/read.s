@@ -22,7 +22,7 @@
 ;--------------------------------------------------------------------------
 ; initstdin: Open the stdin file descriptors for the keyboard
 
-.segment        "INIT"
+.segment        "ONCE"
 
 .proc   initstdin
 

@@ -20,7 +20,7 @@
 ;--------------------------------------------------------------------------
 ; initstdout: Open the stdout and stderr file descriptors for the screen.
 
-.segment        "INIT"
+.segment        "ONCE"
 
 .proc   initstdout
 

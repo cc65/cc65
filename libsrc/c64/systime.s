@@ -63,7 +63,7 @@ BCD2dec:tax
 ; Constructor that writes to the 1/10 sec register of the TOD to kick it
 ; into action. If this is not done, the clock hangs. We will read the register
 ; and write it again, ignoring a possible change in between.
-.segment "INIT"
+.segment "ONCE"
 
 .proc   initsystime
 

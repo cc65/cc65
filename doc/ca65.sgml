@@ -4,7 +4,7 @@
 <title>ca65 Users Guide
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
-<date>2015-11-17
+<date>2016-06-11
 
 <abstract>
 ca65 is a powerful macro assembler for the 6502, 65C02, and 65816 CPUs. It is
@@ -152,7 +152,7 @@ Here is a description of all the command line options:
   Set the default for the CPU type. The option takes a parameter, which
   may be one of
 
-       	6502, 65SC02, 65C02, 65816, sweet16, HuC6280
+	6502, 6502X, 65SC02, 65C02, 65816, sweet16, HuC6280, 4510
 
 
   <label id="option-create-dep">
@@ -424,8 +424,10 @@ The assembler accepts
       <tt><ref id=".PSC02" name=".PSC02"></tt> command was given).
 <item>all valid 65C02 mnemonics when in 65C02 mode (after the
       <tt><ref id=".PC02" name=".PC02"></tt> command was given).
-<item>all valid 65618 mnemonics when in 65816 mode (after the
+<item>all valid 65816 mnemonics when in 65816 mode (after the
       <tt><ref id=".P816" name=".P816"></tt> command was given).
+<item>all valid 4510 mnemonics when in 4510 mode (after the
+      <tt><ref id=".P4510" name=".P4510"></tt> command was given).
 </itemize>
 
 
@@ -434,16 +436,16 @@ The assembler accepts
 In 65816 mode, several aliases are accepted, in addition to the official
 mnemonics:
 
-<tscreen><verb>
-CPA is an alias for CMP
-DEA is an alias for DEC A
-INA is an alias for INC A
-SWA is an alias for XBA
-TAD is an alias for TCD
-TAS is an alias for TCS
-TDA is an alias for TDC
-TSA is an alias for TSC
-</verb></tscreen>
+<itemize>
+<item><tt>CPA</tt> is an alias for <tt>CMP</tt>
+<item><tt>DEA</tt> is an alias for <tt>DEC A</tt>
+<item><tt>INA</tt> is an alias for <tt>INC A</tt>
+<item><tt>SWA</tt> is an alias for <tt>XBA</tt>
+<item><tt>TAD</tt> is an alias for <tt>TCD</tt>
+<item><tt>TAS</tt> is an alias for <tt>TCS</tt>
+<item><tt>TDA</tt> is an alias for <tt>TDC</tt>
+<item><tt>TSA</tt> is an alias for <tt>TSC</tt>
+</itemize>
 
 
 <sect1>6502X mode<label id="6502X-mode"><p>
@@ -472,6 +474,27 @@ from the mentioned web page, for more information, see there.
 <item><tt>SRE: {adr}:={adr}/2; A:=A xor {adr};</tt>
 </itemize>
 
+
+<sect1>4510 mode<p>
+
+The 4510 is a microcontroller that is the core of the Commodore C65 aka C64DX.
+It contains among other functions a slightly modified 65CE02/4502 CPU, to allow
+address mapping for 20 bits of address space (1 megabyte addressable area).
+As compared to the description of the CPU in the
+<url url="http://www.zimmers.net/anonftp/pub/cbm/c65/c65manualupdated.txt.gz"
+name="C65 System Specification">
+<url url="https://raw.githubusercontent.com/MEGA65/c65-specifications/master/c65manualupdated.txt"
+name="(updated version)"> uses these changes:
+<itemize>
+<item><tt>LDA (d,SP),Y</tt> may also be written as <tt>LDA (d,S),Y</tt>
+(matching the 65816 notataion).
+<item>All branch instruction allow now 16 bit offsets. To use a 16 bit
+branch you have to prefix these with an "L" (e.g. "<tt>LBNE</tt>" instead of
+"<tt>BNE</tt>"). This might change at a later implementation of the assembler.
+</itemize>
+For more information about the Commodore C65/C64DX and the 4510 CPU, see
+<url url="http://www.zimmers.net/anonftp/pub/cbm/c65/"> and
+<url url="https://en.wikipedia.org/wiki/Commodore_65" name="Wikipedia">.
 
 
 <sect1>sweet16 mode<label id="sweet16-mode"><p>
@@ -2170,16 +2193,15 @@ Here's a list of all control commands and a description, what they do:
 <sect1><tt>.CHARMAP</tt><label id=".CHARMAP"><p>
 
   Apply a custom mapping for characters. The command is followed by two
-  numbers. The first one is the index of the source character (range 1..255),
+  numbers. The first one is the index of the source character (range 0..255);
   the second one is the mapping (range 0..255). The mapping applies to all
-  character and string constants when they generate output, and overrides a
-  mapping table specified with the <tt><ref id="option-t" name="-t"></tt>
+  character and string constants <em/when/ they generate output; and, overrides
+  a mapping table specified with the <tt><ref id="option-t" name="-t"></tt>
   command line switch.
 
   Example:
-
   <tscreen><verb>
-       	.charmap        $41, $61        ; Map 'A' to 'a'
+  .charmap        $41, $61        ; Map 'A' to 'a'
   </verb></tscreen>
 
 
@@ -2699,6 +2721,22 @@ Here's a list of all control commands and a description, what they do:
     at character is not allowed to start an identifier, even with this
     feature enabled.
 
+  <tag><tt>bracket_as_indirect</tt><label id="bracket_as_indirect"></tag>
+
+    Use <tt>[]</tt> instead of <tt>()</tt> for the indirect addressing modes.
+    Example:
+
+    <tscreen><verb>
+        lda     [$82]
+        lda     [$82,x]
+        lda     [$82],y
+        jmp     [$fffe]
+        jmp     [table,x]
+    </verb></tscreen>
+    <em/Note:/ This should not be used in 65186 mode because it conflicts with
+    the 65816 instruction syntax for far addressing. See the section covering
+    <tt/<ref id="address-sizes" name="address sizes">/ for more information.
+
   <tag><tt>c_comments</tt><label id="c_comments"></tag>
 
     Allow C like comments using <tt>/*</tt> and <tt>*/</tt> as left and right
@@ -2974,7 +3012,7 @@ Here's a list of all control commands and a description, what they do:
   Conditional assembly: Check if there are any remaining tokens in this line,
   and evaluate to FALSE if this is the case, and to TRUE otherwise. If the
   condition is not true, further lines are not assembled until an <tt><ref
-  id=".ELSE" name=".ESLE"></tt>, <tt><ref id=".ELSEIF" name=".ELSEIF"></tt> or
+  id=".ELSE" name=".ELSE"></tt>, <tt><ref id=".ELSEIF" name=".ELSEIF"></tt> or
   <tt><ref id=".ENDIF" name=".ENDIF"></tt> directive.
 
   This command is often used to check if a macro parameter was given. Since an
@@ -3065,6 +3103,12 @@ Here's a list of all control commands and a description, what they do:
 
   Conditional assembly: Check if the assembler is currently in 6502 mode
   (see <tt><ref id=".P02" name=".P02"></tt> command).
+
+
+<sect1><tt>.IFP4510</tt><label id=".IFP4510"><p>
+
+  Conditional assembly: Check if the assembler is currently in 4510 mode
+  (see <tt><ref id=".P4510" name=".P4510"></tt> command).
 
 
 <sect1><tt>.IFP816</tt><label id=".IFP816"><p>
@@ -3458,7 +3502,18 @@ Here's a list of all control commands and a description, what they do:
   <tt><ref id="option--cpu" name="--cpu"></tt> command line option.
 
   See: <tt><ref id=".PC02" name=".PC02"></tt>, <tt><ref id=".PSC02"
-  name=".PSC02"></tt> and <tt><ref id=".P816" name=".P816"></tt>
+  name=".PSC02"></tt>, <tt><ref id=".P816" name=".P816"></tt> and
+  <tt><ref id=".P4510" name=".P4510"></tt>
+
+
+<sect1><tt>.P4510</tt><label id=".P4510"><p>
+
+  Enable the 4510 instruction set. This is a superset of the 65C02 and
+  6502 instruction sets.
+
+  See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PSC02"
+  name=".PSC02"></tt>, <tt><ref id=".PC02" name=".PC02"></tt> and
+  <tt><ref id=".P816" name=".P816"></tt>
 
 
 <sect1><tt>.P816</tt><label id=".P816"><p>
@@ -3467,7 +3522,8 @@ Here's a list of all control commands and a description, what they do:
   6502 instruction sets.
 
   See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PSC02"
-  name=".PSC02"></tt> and <tt><ref id=".PC02" name=".PC02"></tt>
+  name=".PSC02"></tt>, <tt><ref id=".PC02" name=".PC02"></tt> and
+  <tt><ref id=".P4510" name=".P4510"></tt>
 
 
 <sect1><tt>.PAGELEN, .PAGELENGTH</tt><label id=".PAGELENGTH"><p>
@@ -3495,7 +3551,8 @@ Here's a list of all control commands and a description, what they do:
   6502 and 65SC02 instructions.
 
   See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PSC02"
-  name=".PSC02"></tt> and <tt><ref id=".P816" name=".P816"></tt>
+  name=".PSC02"></tt>, <tt><ref id=".P816" name=".P816"></tt> and
+  <tt><ref id=".P4510" name=".P4510"></tt>
 
 
 <sect1><tt>.POPCPU</tt><label id=".POPCPU"><p>
@@ -3568,7 +3625,8 @@ Here's a list of all control commands and a description, what they do:
   6502 instructions.
 
   See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PC02"
-  name=".PC02"></tt> and <tt><ref id=".P816" name=".P816"></tt>
+  name=".PC02"></tt>, <tt><ref id=".P816" name=".P816"></tt> and
+  <tt><ref id=".P4510" name=".P4510"></tt>
 
 
 <sect1><tt>.PUSHCPU</tt><label id=".PUSHCPU"><p>
@@ -3760,7 +3818,7 @@ Here's a list of all control commands and a description, what they do:
   Switch the CPU instruction set. The command is followed by a string that
   specifies the CPU. Possible values are those that can also be supplied to
   the <tt><ref id="option--cpu" name="--cpu"></tt> command line option,
-  namely: 6502, 6502X, 65SC02, 65C02, 65816 and HuC6280.
+  namely: 6502, 6502X, 65SC02, 65C02, 65816, 4510 and HuC6280.
 
   See: <tt><ref id=".CPU" name=".CPU"></tt>,
        <tt><ref id=".IFP02" name=".IFP02"></tt>,
@@ -3769,6 +3827,7 @@ Here's a list of all control commands and a description, what they do:
        <tt><ref id=".IFPSC02" name=".IFPSC02"></tt>,
        <tt><ref id=".P02" name=".P02"></tt>,
        <tt><ref id=".P816" name=".P816"></tt>,
+       <tt><ref id=".P4510" name=".P4510"></tt>,
        <tt><ref id=".PC02" name=".PC02"></tt>,
        <tt><ref id=".PSC02" name=".PSC02"></tt>
 
@@ -4246,6 +4305,13 @@ different:
 	some things may be done with both macro types, each type has special
 	usages. The types complement each other.
 
+<item>	Parentheses work differently from C macros.
+	The common practice of wrapping C macros in parentheses may cause
+	unintended problems here, such as accidentally implying an
+	indirect addressing mode. While the definition of a macro requires
+	parentheses around its argument list, when invoked they should not be
+	included.
+
 </itemize>
 
 Let's look at a few examples to make the advantages and disadvantages
@@ -4278,18 +4344,42 @@ Macros with parameters may also be useful:
         DEBUG   "Assembling include file #3"
 </verb></tscreen>
 
-Note that, while formal parameters have to be placed in braces, this is
-not true for the actual parameters. Beware: Since the assembler cannot
-detect the end of one parameter, only the first token is used. If you
-don't like that, use classic macros instead:
+Note that, while formal parameters have to be placed in parentheses,
+the actual argument used when invoking the macro should not be.
+The invoked arguments are separated by commas only, if parentheses are
+used by accident they will become part of the replaced token.
+
+If you wish to have an expression follow the macro invocation, the
+last parameter can be enclosed in curly braces {} to indicate the end of that
+argument.
+
+Examples:
 
 <tscreen><verb>
-.macro  DEBUG   message
-        .out    message
-.endmacro
+.define COMBINE(ta,tb,tc) ta+tb*10+tc*100
+
+.word COMBINE 5,6,7      ; 5+6*10+7*100 = 765
+.word COMBINE(5,6,7)     ; (5+6*10+7)*100 = 7200 ; incorrect use of parentheses
+.word COMBINE 5,6,7+1    ; 5+6*10+7+1*100 = 172
+.word COMBINE 5,6,{7}+1  ; 5+6*10+7*100+1 = 766 ; {} encloses the argument
+.word COMBINE 5,6-2,7    ; 5+6-2*10+7*100 = 691
+.word COMBINE 5,(6-2),7  ; 5+(6-2)*10+7*100 = 745
+.word COMBINE 5,6,7+COMBINE 0,1,2    ; 5+6*10+7+0+1*10+2*100*100 = 20082
+.word COMBINE 5,6,{7}+COMBINE 0,1,2  ; 5+6*10+7*100+0+1*10+2*100 = 975
 </verb></tscreen>
 
-(That is an example where a problem can be solved with both macro types).
+With C macros it is common to enclose the results in parentheses to
+prevent unintended interactions with the text of the arguments, but
+additional care must be taken in this assembly context where parentheses
+may alter the meaning of a statement. In particular, indirect addressing modes
+may be accidentally implied:
+
+<tscreen><verb>
+.define DUO(ta,tb) (ta+(tb*10))
+
+        lda DUO(5,4), Y         ; LDA (indirect), Y
+        lda 0+DUO(5,4), Y       ; LDA absolute indexed, Y
+</verb></tscreen>
 
 
 <sect1>Characters in macros<p>
@@ -4434,6 +4524,12 @@ The package defines the following macros:
 
 
 
+<sect1><tt>.MACPACK apple2</tt><p>
+
+This macro package defines a macro named <tt/scrcode/. It takes a string
+as argument and places this string into memory translated into screen codes.
+
+
 <sect1><tt>.MACPACK atari</tt><p>
 
 This macro package defines a macro named <tt/scrcode/. It takes a string
@@ -4459,6 +4555,7 @@ each supported CPU a constant similar to
     CPU_65816
     CPU_SWEET16
     CPU_HUC6280
+    CPU_4510
 </verb></tscreen>
 
 is defined. These constants may be used to determine the exact type of the
@@ -4472,6 +4569,7 @@ another constant is defined:
     CPU_ISET_65816
     CPU_ISET_SWEET16
     CPU_ISET_HUC6280
+    CPU_ISET_4510
 </verb></tscreen>
 
 The value read from the <tt/<ref id=".CPU" name=".CPU">/ pseudo variable may
@@ -4516,6 +4614,7 @@ compiler, depending on the target system selected:
 <itemize>
 <item><tt/__APPLE2__/ - Target system is <tt/apple2/ or <tt/apple2enh/
 <item><tt/__APPLE2ENH__/ - Target system is <tt/apple2enh/
+<item><tt/__ATARI2600__/ - Target system is <tt/atari2600/
 <item><tt/__ATARI5200__/ - Target system is <tt/atari5200/
 <item><tt/__ATARI__/ - Target system is <tt/atari/ or <tt/atarixl/
 <item><tt/__ATARIXL__/ - Target system is <tt/atarixl/

@@ -16,7 +16,7 @@
         .include        "filedes.inc"
         .include        "apple2.inc"
 
-        .segment        "INIT"
+        .segment        "ONCE"
 
 initprompt:
         ; Set prompt <> ']' to let DOS 3.3 know that we're

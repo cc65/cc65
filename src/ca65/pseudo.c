@@ -151,7 +151,7 @@ static unsigned char OptionalAddrSize (void)
 static void SetBoolOption (unsigned char* Flag)
 /* Read a on/off/+/- option and set flag accordingly */
 {
-    static const char* Keys[] = {
+    static const char* const Keys[] = {
         "OFF",
         "ON",
     };
@@ -451,7 +451,7 @@ static void DoASCIIZ (void)
 static void DoAssert (void)
 /* Add an assertion */
 {
-    static const char* ActionTab [] = {
+    static const char* const ActionTab [] = {
         "WARN", "WARNING",
         "ERROR",
         "LDWARN", "LDWARNING",
@@ -618,16 +618,16 @@ static void DoCase (void)
 
 
 static void DoCharMap (void)
-/* Allow custome character mappings */
+/* Allow custom character mappings */
 {
     long Index;
     long Code;
 
     /* Read the index as numerical value */
     Index = ConstExpression ();
-    if (Index <= 0 || Index > 255) {
+    if (Index < 0 || Index > 255) {
         /* Value out of range */
-        ErrorSkip ("Range error");
+        ErrorSkip ("Index range error");
         return;
     }
 
@@ -638,7 +638,7 @@ static void DoCharMap (void)
     Code = ConstExpression ();
     if (Code < 0 || Code > 255) {
         /* Value out of range */
-        ErrorSkip ("Range error");
+        ErrorSkip ("Code range error");
         return;
     }
 
@@ -659,7 +659,7 @@ static void DoCode (void)
 static void DoConDes (void)
 /* Export a symbol as constructor/destructor */
 {
-    static const char* Keys[] = {
+    static const char* const Keys[] = {
         "CONSTRUCTOR",
         "DESTRUCTOR",
         "INTERRUPTOR",
@@ -744,7 +744,7 @@ static void DoData (void)
 static void DoDbg (void)
 /* Add debug information from high level code */
 {
-    static const char* Keys[] = {
+    static const char* const Keys[] = {
         "FILE",
         "FUNC",
         "LINE",
@@ -1039,7 +1039,7 @@ static void DoFileOpt (void)
     if (CurTok.Tok == TOK_IDENT) {
 
         /* Option given as keyword */
-        static const char* Keys [] = {
+        static const char* const Keys [] = {
             "AUTHOR", "COMMENT", "COMPILER"
         };
 
@@ -1388,7 +1388,7 @@ static void DoList (void)
 /* Enable/disable the listing */
 {
     /* Get the setting */
-    unsigned char List;
+    unsigned char List = 0;
     SetBoolOption (&List);
 
     /* Manage the counter */
@@ -1526,6 +1526,14 @@ static void DoP816 (void)
 /* Switch to 65816 CPU */
 {
     SetCPU (CPU_65816);
+}
+
+
+
+static void DoP4510 (void)
+/* Switch to 4510 CPU */
+{
+    SetCPU (CPU_4510);
 }
 
 
@@ -2033,6 +2041,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccKeepToken,      DoConditionals  },      /* .IFNDEF */
     { ccKeepToken,      DoConditionals  },      /* .IFNREF */
     { ccKeepToken,      DoConditionals  },      /* .IFP02 */
+    { ccKeepToken,      DoConditionals  },      /* .IFP4510 */
     { ccKeepToken,      DoConditionals  },      /* .IFP816 */
     { ccKeepToken,      DoConditionals  },      /* .IFPC02 */
     { ccKeepToken,      DoConditionals  },      /* .IFPSC02 */
@@ -2063,6 +2072,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoOrg           },
     { ccNone,           DoOut           },
     { ccNone,           DoP02           },
+    { ccNone,           DoP4510         },
     { ccNone,           DoP816          },
     { ccNone,           DoPageLength    },
     { ccNone,           DoUnexpected    },      /* .PARAMCOUNT */

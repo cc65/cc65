@@ -26,10 +26,12 @@ including
 - the Atari 5200 console.
 - GEOS for the C64, C128 and Apple //e.
 - the Bit Corporation Gamate console.
-- the NEC PC-Engine (aka TurboGrafx-16).
+- the NEC PC-Engine (aka TurboGrafx-16) console.
 - the Nintendo Entertainment System (NES) console.
 - the Watara Supervision console.
+- the VTech Creativision console.
 - the Oric Atmos.
+- the Oric Telestrat.
 - the Lynx console.
 - the Ohio Scientific Challenger 1P.
 

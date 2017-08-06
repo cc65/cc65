@@ -169,18 +169,6 @@ static void BinWriteMem (BinDesc* D, MemoryArea* M)
         PrintNumVal  ("Address", Addr);
         PrintNumVal  ("FileOffs", (unsigned long) ftell (D->F));
 
-        /* Check if the alignment for the segment from the linker config is
-        ** a multiple for that of the segment.
-        */
-        if ((S->RunAlignment % S->Seg->Alignment) != 0) {
-            /* Segment requires another alignment than configured
-            ** in the linker.
-            */
-            Warning ("Segment `%s' is not aligned properly. Resulting "
-                     "executable may not be functional.",
-                     GetString (S->Name));
-        }
-
         /* If this is the run memory area, we must apply run alignment. If
         ** this is not the run memory area but the load memory area (which
         ** means that both are different), we must apply load alignment.

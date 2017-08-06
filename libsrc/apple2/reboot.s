@@ -10,7 +10,7 @@
 
 _rebootafterexit := return
 
-        .segment        "INIT"
+        .segment        "ONCE"
 
 initreboot:
         ; Quit to PWRUP

@@ -4,7 +4,7 @@
 ;
 ; Reference:
 ;  Bastian Schick's Lynx Documentation
-;  http://www.geocities.com/SiliconValley/Byte/4242/lynx/
+;  http://www.geocities.ws/SiliconValley/Byte/4242/lynx/
 ;
 
 ; ***

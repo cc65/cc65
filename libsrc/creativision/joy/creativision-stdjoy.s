@@ -27,26 +27,6 @@
 
                 .addr   $0000
 
-; Symbolic names for joystick masks (similar names like the defines in joystick.h, but not related to them)
-
-JOY_UP          =       $10
-JOY_DOWN        =       $04
-JOY_LEFT        =       $20
-JOY_RIGHT       =       $08
-JOY_FIRE        =       $01
-JOY_FIRE2       =       $02
-
-; Joystick state masks (8 values)
-
-                .byte   JOY_UP
-                .byte   JOY_DOWN
-                .byte   JOY_LEFT
-                .byte   JOY_RIGHT
-                .byte   JOY_FIRE
-                .byte   JOY_FIRE2
-                .byte   $00                     ; Future expansion
-                .byte   $00                     ; Future expansion
-
 ; Jump table.
 
                 .addr   INSTALL
@@ -59,6 +39,13 @@ JOY_FIRE2       =       $02
 ; Constants
 
 JOY_COUNT       =       2                       ; Number of joysticks we support
+
+; Symbolic names for joystick masks (similar names like the defines in joystick.h, but not related to them)
+
+JOY_UP          =       $10
+JOY_DOWN        =       $04
+JOY_LEFT        =       $20
+JOY_RIGHT       =       $08
 
 ; ------------------------------------------------------------------------
 ; Code
@@ -129,7 +116,7 @@ convert:
 ; values were shifted to the right to be identical).
 ; Why are there two bits indicating a pressed trigger?
 ; According to the "Second book of programs for the Dick Smith Wizard"
-; (pg. 88ff), the left hand fire button gives the value of
+; (pg. 88ff), the left hand button gives the value of
 ; %00010001 and the right hand button gives %00100010
 ; Why two bits? Can there be cases that just one of those bits is set?
 ; Until these questions have been answered, we only use the lower two

@@ -46,17 +46,6 @@ PREAD   :=      $FB1E   ; Read paddle in X, return AD conv. value in Y
 
         .addr   $0000
 
-; Button state masks (8 values)
-
-        .byte   $10
-        .byte   $20
-        .byte   $04
-        .byte   $08
-        .byte   $40
-        .byte   $80
-        .byte   $00             ; Future expansion
-        .byte   $00             ; Future expansion
-
 ; Jump table
 
         .addr   INSTALL
@@ -119,7 +108,7 @@ READJOY:
         lda     BUTN0-1,x       ; Check button (1, 3)
         asl
         tya
-        ror                     ; FIRE DOWN !UP RIGHT !LEFT 0 0 0
+        ror                     ; BTN DOWN !UP RIGHT !LEFT 0 0 0
 
         ; Read secondary button
         tay
@@ -130,10 +119,10 @@ READJOY:
         lda     BUTN0-1,x       ; Check button (2, 0)
         asl
         tya
-        ror                     ; FIRE2 FIRE DOWN !UP RIGHT !LEFT 0 0
+        ror                     ; BTN2 BTN DOWN !UP RIGHT !LEFT 0 0
 
         ; Finalize
-        eor     #%00010100      ; FIRE2 FIRE DOWN UP RIGHT LEFT 0 0
+        eor     #%00010100      ; BTN2 BTN DOWN UP RIGHT LEFT 0 0
         ldx     #$00
         bit     $C080           ; Switch in LC bank 2 for R/O
         rts

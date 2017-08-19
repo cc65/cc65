@@ -73,19 +73,28 @@
 #define TV_PAL                  1
 #define TV_OTHER                2
 
+/* Masks for joy_read */
+#define JOY_UP_MASK             0x10
+#define JOY_DOWN_MASK           0x40
+#define JOY_LEFT_MASK           0x80
+#define JOY_RIGHT_MASK          0x20
+#define JOY_BTN_1_MASK          0x01
+#define JOY_BTN_2_MASK          0x02
+#define JOY_BTN_3_MASK          0x04
+#define JOY_BTN_4_MASK          0x08
+
+#define JOY_BTN_I_MASK          JOY_BTN_1_MASK
+#define JOY_BTN_II_MASK         JOY_BTN_2_MASK
+#define JOY_SELECT_MASK         JOY_BTN_3_MASK
+#define JOY_RUN_MASK            JOY_BTN_4_MASK
+
+#define JOY_BTN_I(v)            ((v) & JOY_BTN_I_MASK)
+#define JOY_BTN_II(v)           ((v) & JOY_BTN_II_MASK)
+#define JOY_SELECT(v)           ((v) & JOY_SELECT_MASK)
+#define JOY_RUN(v)              ((v) & JOY_RUN_MASK)
+
 /* No support for dynamically loadable drivers */
-#define DYN_DRV         0
-
-/* Expanding upon joystick.h */
-#define JOY_BTN_I_IDX           4
-#define JOY_BTN_II_IDX          5
-#define JOY_SELECT_IDX          6
-#define JOY_RUN_IDX             7
-
-#define JOY_BTN_I(v)            ((v) & joy_masks[JOY_BTN_I_IDX])
-#define JOY_BTN_II(v)           ((v) & joy_masks[JOY_BTN_II_IDX])
-#define JOY_SELECT(v)           ((v) & joy_masks[JOY_SELECT_IDX])
-#define JOY_RUN(v)              ((v) & joy_masks[JOY_RUN_IDX])
+#define DYN_DRV                 0
 
 /* The addresses of the static drivers */
 extern void pce_stdjoy_joy[];   /* Referred to by joy_static_stddrv[] */

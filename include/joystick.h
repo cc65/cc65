@@ -55,28 +55,15 @@
 #define JOY_1                   0
 #define JOY_2                   1
 
-/* The following codes are *indices* into the joy_masks array */
-#define JOY_UP_IDX              0
-#define JOY_DOWN_IDX            1
-#define JOY_LEFT_IDX            2
-#define JOY_RIGHT_IDX           3
-#define JOY_BTN_1_IDX           4       /* Universally available */
-#define JOY_BTN_2_IDX           5       /* Second button if available */
-#define JOY_BTN_3_IDX           6       /* Third button if available  */
-#define JOY_BTN_4_IDX           7       /* Fourth button if available */
-
-/* Array of masks used to check the return value of joy_read for a state */
-extern const unsigned char joy_masks[8];
-
 /* Macros that evaluate the return code of joy_read */
-#define JOY_UP(v)               ((v) & joy_masks[JOY_UP_IDX])
-#define JOY_DOWN(v)             ((v) & joy_masks[JOY_DOWN_IDX])
-#define JOY_LEFT(v)             ((v) & joy_masks[JOY_LEFT_IDX])
-#define JOY_RIGHT(v)            ((v) & joy_masks[JOY_RIGHT_IDX])
-#define JOY_BTN_1(v)            ((v) & joy_masks[JOY_BTN_1_IDX])
-#define JOY_BTN_2(v)            ((v) & joy_masks[JOY_BTN_2_IDX])
-#define JOY_BTN_3(v)            ((v) & joy_masks[JOY_BTN_3_IDX])
-#define JOY_BTN_4(v)            ((v) & joy_masks[JOY_BTN_4_IDX])
+#define JOY_UP(v)               ((v) & JOY_UP_MASK)
+#define JOY_DOWN(v)             ((v) & JOY_DOWN_MASK)
+#define JOY_LEFT(v)             ((v) & JOY_LEFT_MASK)
+#define JOY_RIGHT(v)            ((v) & JOY_RIGHT_MASK)
+#define JOY_BTN_1(v)            ((v) & JOY_BTN_1_MASK)      /* Universally available */
+#define JOY_BTN_2(v)            ((v) & JOY_BTN_2_MASK)      /* Second button if available */
+#define JOY_BTN_3(v)            ((v) & JOY_BTN_3_MASK)      /* Third button if available  */
+#define JOY_BTN_4(v)            ((v) & JOY_BTN_4_MASK)      /* Fourth button if available */
 
 /* The name of the standard joystick driver for a platform */
 extern const char joy_stddrv[];

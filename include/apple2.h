@@ -91,6 +91,14 @@
 #define CH_RTEE      '+'
 #define CH_CROSS     '+'
 
+/* Masks for joy_read */
+#define JOY_UP_MASK     0x10
+#define JOY_DOWN_MASK   0x20
+#define JOY_LEFT_MASK   0x04
+#define JOY_RIGHT_MASK  0x08
+#define JOY_BTN_1_MASK  0x40
+#define JOY_BTN_2_MASK  0x80
+
 /* Return codes for get_ostype */
 #define APPLE_UNKNOWN  0x00
 #define APPLE_II       0x10  /* Apple ][                    */

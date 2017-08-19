@@ -75,10 +75,8 @@
 
 
 
-/* Expanding upon joystick.h */
-#define JOY_FIRE_IDX            4
-
-#define JOY_FIRE(v)             ((v) & joy_masks[JOY_FIRE_IDX])
+#define JOY_FIRE_MASK   JOY_BTN_1_MASK
+#define JOY_FIRE(v)     ((v) & JOY_FIRE_MASK)
 
 
 

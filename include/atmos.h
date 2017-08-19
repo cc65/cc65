@@ -113,6 +113,15 @@
 
 
 
+/* Masks for joy_read */
+#define JOY_UP_MASK     0x10
+#define JOY_DOWN_MASK   0x08
+#define JOY_LEFT_MASK   0x01
+#define JOY_RIGHT_MASK  0x02
+#define JOY_BTN_1_MASK  0x20
+
+
+
 /* No support for dynamically loadable drivers */
 #define DYN_DRV         0
 

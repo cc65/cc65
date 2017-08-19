@@ -164,9 +164,9 @@ unsigned char get_tv (void);
 #define KBDREPEAT_NONE   0x40
 #define KBDREPEAT_ALL    0x80
 
-unsigned char kbrepeat(unsigned char);
-unsigned char kbrepeatdelay(unsigned char);
-unsigned char kbrepeatrate(unsigned char);
+unsigned char __fastcall__ kbrepeat(unsigned char);
+unsigned char __fastcall__ kbrepeatdelay(unsigned char);
+unsigned char __fastcall__ kbrepeatrate(unsigned char);
 
 #if !defined(__CBM610__) && !defined(__PET__)
 void waitvsync (void);

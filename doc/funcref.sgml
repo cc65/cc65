@@ -2181,7 +2181,8 @@ only cursor-related keys), KBDREPEAT_NONE (no repeat for any keys) and
 KBDREPEAT_ALL (repeat all keys).
 The old mode is returned so it can be restored later.
 <tag/Notes/<itemize>
-<item>
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
@@ -2202,7 +2203,8 @@ The old mode is returned so it can be restored later.
 repeated automatically.
 The old value is returned so it can be restored later.
 <tag/Notes/<itemize>
-<item>
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
@@ -2223,7 +2225,8 @@ The old value is returned so it can be restored later.
 repeated keypresses).
 The old value is returned so it can be restored later.
 <tag/Notes/<itemize>
-<item>
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/

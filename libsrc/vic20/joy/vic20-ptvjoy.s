@@ -102,10 +102,21 @@ joy1:   lda     #$7F            ; mask for VIA2 JOYBIT: sw3
         sty     VIA1_DDRA       ; restore the state of DDRA
 
         cli                     ; necessary?
-        ror                     ; Shift sw3 into bit 7
-        and     #$9E            ; Mask relevant bits
-        eor     #$9E            ; Active states are inverted
+        php                     ; Save sw3 in carry
+        lsr                     ; Shift sw0,sw1,sw2,sw4 into bits 1-4
+        tax                     ; Save sw0,sw1,sw2
+        and     #$10            ; Extract sw4 in bit 4
+        sta     tmp1            ; Save sw4 in bit 4
+        txa                     ; Restore sw0,sw1,sw2
+        lsr                     ; Shift sw0,sw1,sw2 into bits 0-2
+        and     #$07            ; Mask bits 0-2
+        plp                     ; Restore sw3 in carry
+        bcc     @L0             ; Is sw3 set?
+        ora     #$08            ; Yes: Add sw3 in bit 3
+@L0:    ora     tmp1            ; Add sw4 in bit 4
+        eor     #$1F            ; Active states are inverted
 
+        ldx     #0
         rts
 
 ; Read joystick 2
@@ -120,8 +131,8 @@ joy2:   lda     #%10000000      ; via port B Data-Direction
         sta     VIA1_PRB        ; (output one at PB7)
 
         lda     VIA1_PRB        ; via port B read/write
-        and     #$1f            ; get bit 4-0 (PB4-PB0)
-        eor     #$1f
+        and     #$1F            ; get bit 4-0 (PB4-PB0)
+        eor     #$1F
         rts
 
 ; Read joystick 3
@@ -130,14 +141,14 @@ joy3:   lda     #$00            ; via port B read/write
         sta     VIA1_PRB        ; (output zero at PB7)
 
         lda     VIA1_PRB        ; via port B read/write
-        and     #$0f            ; get bit 3-0 (PB3-PB0)
+        and     #$0F            ; get bit 3-0 (PB3-PB0)
         sta     tmp1            ; joy 4 directions
 
         lda     VIA1_PRB        ; via port B read/write
         and     #%00100000      ; get bit 5 (PB5)
         lsr
         ora     tmp1
-        eor     #$1f
+        eor     #$1F
 
         ldx     #0
         rts

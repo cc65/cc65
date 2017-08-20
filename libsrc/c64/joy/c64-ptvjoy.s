@@ -122,8 +122,8 @@ joy3:
         sta     CIA2_PRB        ; (output one at PB7)
 
         lda     CIA2_PRB        ; cia 2 port B read/write
-        and     #$1f            ; get bit 4-0 (PB4-PB0)
-        eor     #$1f
+        and     #$1F            ; get bit 4-0 (PB4-PB0)
+        eor     #$1F
         rts
 
 ; Read joystick 4
@@ -132,14 +132,14 @@ joy4:   lda     #$00            ; cia 2 port B read/write
         sta     CIA2_PRB        ; (output zero at PB7)
 
         lda     CIA2_PRB        ; cia 2 port B read/write
-        and     #$0f            ; get bit 3-0 (PB3-PB0)
+        and     #$0F            ; get bit 3-0 (PB3-PB0)
         sta     tmp1            ; joy 4 directions
 
         lda     CIA2_PRB        ; cia 2 port B read/write
         and     #%00100000      ; get bit 5 (PB5)
         lsr
         ora     tmp1
-        eor     #$1f
+        eor     #$1F
 
         ldx #0
         rts

@@ -38,6 +38,10 @@ INIT_STATUS     := $A04         ; Flags: Reset/Restore initiation status
 FKEY_LEN        := $1000        ; Function key lengths
 FKEY_TEXT       := $100A        ; Function key texts
 
+KBDREPEAT       := $28a
+KBDREPEATRATE   := $28b
+KBDREPEATDELAY  := $28c
+
 ; ---------------------------------------------------------------------------
 ; Kernal routines
 

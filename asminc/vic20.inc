@@ -31,6 +31,9 @@ BASIC_BUF_LEN   = 89            ; Maximum length of command-line
 CHARCOLOR       := $286
 CURS_COLOR      := $287         ; Color under the cursor
 
+KBDREPEAT       := $28a
+KBDREPEATRATE   := $28b
+KBDREPEATDELAY  := $28c
 
 ; ---------------------------------------------------------------------------
 ; Screen size

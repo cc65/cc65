@@ -7,9 +7,11 @@
 ;
 
         .export         soft80_cgetc
+
         .import         soft80_internal_cellcolor, soft80_internal_cursorxlsb
         .import         cursor
         .importzp       tmp1
+        .forceimport    keys_repeat
 
         .include        "c64.inc"
         .include        "soft80.inc"

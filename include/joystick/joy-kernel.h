@@ -52,7 +52,7 @@ typedef struct {
     /* Driver header */
     char                id[3];          /* Contains 0x6a, 0x6f, 0x79 ("joy") */
     unsigned char       version;        /* Interface version */
-    void*                               /* Library reference */
+    void*               libreference;   /* Library reference */
 
     /* Jump vectors. Note that these are not C callable */
     void*               install;        /* INSTALL routine */

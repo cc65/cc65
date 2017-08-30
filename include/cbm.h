@@ -158,17 +158,16 @@ struct cbm_dirent {
 unsigned char get_tv (void);
 /* Return the video mode the machine is using. */
 
-#define KBDREPEAT_CURSOR 0x00
-#define KBDREPEAT_NONE   0x40
-#define KBDREPEAT_ALL    0x80
+#define KBREPEAT_CURSOR 0x00
+#define KBREPEAT_NONE   0x40
+#define KBREPEAT_ALL    0x80
 
-unsigned char __fastcall__ kbrepeat(unsigned char);
-unsigned char __fastcall__ kbrepeatdelay(unsigned char);
-unsigned char __fastcall__ kbrepeatrate(unsigned char);
+unsigned char __fastcall__ kbrepeat (unsigned char mode);
+/* Changes which keys have automatic repeat. */
 
 #if !defined(__CBM610__) && !defined(__PET__)
 void waitvsync (void);
-/* wait for the start of the next frame */
+/* Wait for the start of the next frame */
 #endif
 
 /*****************************************************************************/

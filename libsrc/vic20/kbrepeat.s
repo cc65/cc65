@@ -1,5 +1,8 @@
+;
+; unsigned char __fastcall__ kbrepeat (unsigned char mode);
+;
 
-        .export _kbrepeat, _kbrepeatdelay, _kbrepeatrate
+        .export _kbrepeat
 
         .include        "vic20.inc"
 
@@ -7,16 +10,5 @@ _kbrepeat:
         ldx KBDREPEAT           ; get old value
         sta KBDREPEAT           ; store new value
         txa                     ; return old value
-        rts
-
-_kbrepeatdelay:
-        ldx KBDREPEATDELAY      ; get old value
-        sta KBDREPEATDELAY      ; store new value
-        txa                     ; return old value
-        rts
-
-_kbrepeatrate:
-        ldx KBDREPEATRATE       ; get old value
-        sta KBDREPEATRATE       ; store new value
-        txa                     ; return old value
+        ldx #0
         rts

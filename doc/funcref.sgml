@@ -184,8 +184,6 @@ function.
 <!-- <item><ref id="cbm_write" name="cbm_write"> -->
 <!-- <item><ref id="get_tv" name="get_tv"> -->
 <item><ref id="kbrepeat" name="kbrepeat">
-<item><ref id="kbrepeatdelay" name="kbrepeatdelay">
-<item><ref id="kbrepeatrate" name="kbrepeatrate">
 </itemize>
 
 (incomplete)
@@ -2174,64 +2172,17 @@ to get off the serial bus so it can be used for other purposes.
 <descrip>
 <tag/Function/Set keyboard repeat mode
 <tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
-<tag/Declaration/<tt/unsigned char kbrepeat (unsigned char);/
-<tag/Description/This function changes what keys will have automatic repeat when
-being hold down for a certain time. Possible values are KBDREPEAT_CURSOR (repeat
-only cursor-related keys), KBDREPEAT_NONE (no repeat for any keys) and 
-KBDREPEAT_ALL (repeat all keys).
-The old mode is returned so it can be restored later.
+<tag/Declaration/<tt/unsigned char __fastcall__ kbrepeat (unsigned char mode);/
+<tag/Description/This function changes which keys have automatic repeat when
+being hold down for a certain time. Possible values are KBREPEAT_CURSOR (repeat
+only cursor-related keys), KBREPEAT_NONE (no repeat for any keys) and 
+KBREPEAT_ALL (repeat all keys). The old mode is returned so it can be restored
+later.
 <tag/Notes/<itemize>
 <item>The function is available only as a fastcall function; so, it may be used
 only in the presence of a prototype.
 </itemize>
 <tag/Availability/cc65
-<tag/See also/
-<ref id="kbrepeatdelay" name="kbrepeatdelay">
-<ref id="kbrepeatrate" name="kbrepeatrate">
-<tag/Example/None.
-</descrip>
-</quote>
-
-<sect1>kbrepeatdelay<label id="kbrepeatdelay"><p>
-
-<quote>
-<descrip>
-<tag/Function/Set keyboard repeat delay
-<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
-<tag/Declaration/<tt/unsigned char kbrepeatdelay (unsigned char);/
-<tag/Description/This function changes the delay until a keypress is being
-repeated automatically.
-The old value is returned so it can be restored later.
-<tag/Notes/<itemize>
-<item>The function is available only as a fastcall function; so, it may be used
-only in the presence of a prototype.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/
-<ref id="kbrepeat" name="kbrepeat">
-<ref id="kbrepeatrate" name="kbrepeatrate">
-<tag/Example/None.
-</descrip>
-</quote>
-
-<sect1>kbrepeatrate<label id="kbrepeatrate"><p>
-
-<quote>
-<descrip>
-<tag/Function/Set keyboard repeat rate
-<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
-<tag/Declaration/<tt/unsigned char kbrepeatrate (unsigned char);/
-<tag/Description/This function changes the keyboard repeat rate (the time between
-repeated keypresses).
-The old value is returned so it can be restored later.
-<tag/Notes/<itemize>
-<item>The function is available only as a fastcall function; so, it may be used
-only in the presence of a prototype.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/
-<ref id="kbrepeat" name="kbrepeat">
-<ref id="kbrepeatdelay" name="kbrepeatdelay">
 <tag/Example/None.
 </descrip>
 </quote>

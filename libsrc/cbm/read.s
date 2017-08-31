@@ -1,6 +1,6 @@
 ;
 ; 2002-11-16, Ullrich von Bassewitz
-; 2013-12-23, Greg King
+; 2017-08-07, Greg King
 ;
 ; int read (int fd, void* buf, unsigned count);
 ;
@@ -12,6 +12,10 @@
         .import         rwcommon
         .import         popax
         .importzp       ptr1, ptr2, ptr3, tmp1, tmp2, tmp3
+
+.if     .def(__C64__) || .def(__VIC20__)
+        .forceimport    keys_repeat
+.endif
 
         .include        "cbm.inc"
         .include        "errno.inc"

@@ -31,11 +31,10 @@ BASIC_BUF_LEN   = 89            ; Maximum length of command-line
 
 CHARCOLOR       := $286
 CURS_COLOR      := $287         ; Color under the cursor
+KBDREPEAT       := $28A         ; $00 = cursor, $40 = none, $80 = all
+KBDREPEATRATE   := $28B
+KBDREPEATDELAY  := $28C
 PALFLAG         := $2A6         ; $01 = PAL, $00 = NTSC
-
-KBDREPEAT       := $28a
-KBDREPEATRATE   := $28b
-KBDREPEATDELAY  := $28c
 
 ; ---------------------------------------------------------------------------
 ; Kernal routines

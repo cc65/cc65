@@ -5,7 +5,9 @@
 ;
 
         .export         _cgetc
+
         .import         cursor
+        .forceimport    keys_repeat
 
         .include        "c64.inc"
 

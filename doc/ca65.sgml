@@ -1695,7 +1695,7 @@ either a string or an expression.
   Example:
 
   <tscreen><verb>
-        ; Reserve space for some data, but 256 bytes minimum
+        ; Reserve space for some data, but 256 bytes maximum
        	savearea:       .min (.sizeof (foo), 256)
   </verb></tscreen>
 

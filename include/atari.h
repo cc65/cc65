@@ -156,6 +156,9 @@
 #define JOY_RIGHT_MASK  0x08
 #define JOY_BTN_1_MASK  0x10
 
+#define JOY_FIRE_MASK   JOY_BTN_1_MASK
+#define JOY_FIRE(v)     ((v) & JOY_FIRE_MASK)
+
 /* color register functions */
 extern void __fastcall__ _setcolor     (unsigned char color_reg, unsigned char hue, unsigned char luminace);
 extern void __fastcall__ _setcolor_low (unsigned char color_reg, unsigned char color_value);

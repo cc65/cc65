@@ -2,8 +2,9 @@
 
 <article>
 <title>cc65 function reference
-<author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2016-08-07
+<author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
+<url url="mailto:greg.king5@verizon.net" name="Greg King">
+<date>2017-09-02
 
 <abstract>
 cc65 is a C compiler for 6502 based systems. This function reference describes
@@ -2166,26 +2167,6 @@ to get off the serial bus so it can be used for other purposes.
 </descrip>
 </quote>
 
-<sect1>kbrepeat<label id="kbrepeat"><p>
-
-<quote>
-<descrip>
-<tag/Function/Set keyboard repeat mode
-<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
-<tag/Declaration/<tt/unsigned char __fastcall__ kbrepeat (unsigned char mode);/
-<tag/Description/This function changes which keys have automatic repeat when
-being hold down for a certain time. Possible values are KBREPEAT_CURSOR (repeat
-only cursor-related keys), KBREPEAT_NONE (no repeat for any keys) and 
-KBREPEAT_ALL (repeat all keys). The old mode is returned so it can be restored
-later.
-<tag/Notes/<itemize>
-<item>The function is available only as a fastcall function; so, it may be used
-only in the presence of a prototype.
-</itemize>
-<tag/Availability/cc65
-<tag/Example/None.
-</descrip>
-</quote>
 
 <sect1>cclear<label id="cclear"><p>
 
@@ -4057,6 +4038,28 @@ do), the function is rather useless.
 <tag/See also/
 <ref id="cgetc" name="cgetc">,
 <ref id="cursor" name="cursor">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>kbrepeat<label id="kbrepeat"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set the keyboard repeat mode.
+<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ kbrepeat (unsigned char mode);/
+<tag/Description/This function changes which keys have automatic repeat when
+being held down for a certain time. Possible values are <tt/KBREPEAT_CURSOR/
+(repeat only cursor-related keys), <tt/KBREPEAT_NONE/ (no repeat for any
+keys), and <tt/KBREPEAT_ALL/ (repeat all keys). The old mode is returned, so
+it can be restored later.
+<tag/Notes/<itemize>
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
+</itemize>
+<tag/Availability/cc65
 <tag/Example/None.
 </descrip>
 </quote>

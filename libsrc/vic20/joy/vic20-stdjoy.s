@@ -30,17 +30,6 @@
 
         .addr   $0000
 
-; Button state masks (8 values)
-
-        .byte   $02                     ; JOY_UP
-        .byte   $04                     ; JOY_DOWN
-        .byte   $08                     ; JOY_LEFT
-        .byte   $80                     ; JOY_RIGHT
-        .byte   $10                     ; JOY_FIRE
-        .byte   $00                     ; JOY_FIRE2 unavailable
-        .byte   $00                     ; Future expansion
-        .byte   $00                     ; Future expansion
-
 ; Jump table.
 
         .addr   INSTALL
@@ -128,5 +117,3 @@ READ:   lda     #$7F            ; mask for VIA2 JOYBIT: sw3
 
         ldx     #0
         rts
-
-

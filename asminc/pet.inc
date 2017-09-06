@@ -26,22 +26,21 @@ SCR_LINELEN     := $D5          ; Screen line length
 CURS_Y          := $D8          ; Cursor row
 FNADR           := $DA          ; Pointer to file name
 
+; 80-Column CBMs
+KBDREPEAT80     := $E4
+KBDRPTRATE80    := $E5
+KBDRPTDELAY80   := $E6
+
 BASIC_BUF       := $200         ; Location of command-line
 BASIC_BUF_LEN   = 81            ; Maximum length of command-line
 
 KEY_BUF         := $26F         ; Keyboard buffer
 
-;FIXME: we must somehow handle the difference between the two - how?
-
-; 40-Column PETs
-;KBDREPEAT       := $3ee
-;KBDREPEATRATE   := $3ea
-;KBDREPEATDELAY  := $3e9
-
-; 80-Column PETs
-KBDREPEAT       := $e4
-KBDREPEATRATE   := $e5
-KBDREPEATDELAY  := $e6
+; 40-Column PETs/CBMs
+KBDRPTDELAY40   := $3E9
+KBDRPTRATE40    := $3EA
+KBDREPEAT40     := $3EE
+KBDREPEAT40B    := $3F8
 
 ;----------------------------------------------------------------------------
 ; PET ROM type detection
@@ -67,5 +66,3 @@ VIA_PRB         := $E840
 VIA_PRA         := $E841
 VIA_DDRB        := $E842
 VIA_DDRA        := $E843
-
-

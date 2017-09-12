@@ -71,6 +71,8 @@
 #  include <atmos.h>
 #elif defined(__CBM__)
 #  include <cbm.h>
+#elif defined(__CREATIVISION__)
+#  include <creativision.h>
 #elif defined(__GAMATE__)
 #  include <gamate.h>
 #elif defined(__GEOS__)

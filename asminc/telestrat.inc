@@ -26,6 +26,15 @@ RESB            := $02
 
 TR0             := $0C
 TR1             := $0D
+TR2             := $0E
+TR3             := $0F
+TR4             := $10
+TR5             := $11
+TR6             := $12
+TR7             := $13
+
+
+
 
 PTR_READ_DEST   := $2C           ; used for XFREAD and XWRITE only in telemon 3.0
 
@@ -109,6 +118,7 @@ XTEXT            = $19
 XHIRES           = $1A
 XFILLM           = $1C
 XMINMA           = $1F
+XVARS            = $24          ; only in TELEMON 3.0, in telemon 2.4, it's XNOMFI ($24)
 XFREAD           = $27          ; only in TELEMON 3.0
 XOPEN            = $30          ; only in TELEMON 3.0
 XCOSCR           = $34          ; switch off cursor
@@ -146,8 +156,8 @@ BUFEDT           := $590
 MAX_BUFEDT_LENGTH=110
 
 ; Hardware
-CH376_DATA       :=$340
-CH376_COMMAND    :=$341
+CH376_DATA       := $340
+CH376_COMMAND    := $341
 
 ; MACRO 
 

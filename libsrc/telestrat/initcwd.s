@@ -24,5 +24,5 @@ loop:
         bne     loop
        
 done:   
-        sta     _cwd,y
+        sta     __cwd,y
         rts

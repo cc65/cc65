@@ -24,5 +24,5 @@ loop:
         bne     loop
        
 done:   
-        sta     (tmp2),y
+        sta     _cwd,y
         rts

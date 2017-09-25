@@ -15,7 +15,7 @@ FUNCTKEY        = $A5
 
 FNAME_LEN       = 11            ; maximum length of file-name
 
-FILENAME_MAX    = 200
+
 
 ; ---------------------------------------------------------------------------
 ; Zero page

@@ -1,5 +1,5 @@
 ;
-; Oliver Schmidt, 18.04.2005
+; Jede (jede@oric.org) 24.09.2017
 ;
 
         .export         initcwd
@@ -10,14 +10,17 @@
 
 
 initcwd:
+       
         ldx     #PWD_PTR
         BRK_TELEMON XVARS
-        sta     tmp1
-        sty     tmp1+1
-
+        
+        sta     ptr1
+        sty     ptr1+1
+        
         ldy     #$00
+        
 loop:        
-        lda     (tmp1),y
+        lda     (ptr1),y
         beq     done
         sta     __cwd,y
         iny

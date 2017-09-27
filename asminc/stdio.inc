@@ -47,6 +47,8 @@ FILENAME_MAX    = 64+1
 FILENAME_MAX    = 12+1
 .elseif .defined(__LUNIX__)
 FILENAME_MAX    = 80+1
+.elseif .defined(__TELESTRAT__)
+FILENAME_MAX    = 50+1
 .else
 FILENAME_MAX    = 16+1
 .endif

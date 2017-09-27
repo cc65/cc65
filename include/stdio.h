@@ -75,6 +75,8 @@ extern FILE* stderr;
 #  define FILENAME_MAX  (12+1)
 #elif defined(__LUNIX__)
 #  define FILENAME_MAX  (80+1)
+#elif defined(__TELESTRAT__)
+#  define FILENAME_MAX  (50+1)
 #else
 #  define FILENAME_MAX  (16+1)
 #endif

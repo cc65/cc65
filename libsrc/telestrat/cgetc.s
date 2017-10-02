@@ -8,8 +8,6 @@
 .proc _cgetc
 loop:   
         BRK_TELEMON XRD0
-        bcc     key_pressed
-        jmp     loop
-key_pressed:
+        bcs     loop
         rts
 .endproc	

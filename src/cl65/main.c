@@ -752,6 +752,7 @@ static void Usage (void)
             "\n"
             "Long options:\n"
             "  --add-source\t\t\tInclude source as comment\n"
+            "  --all-cdecl\t\t\tMake functions default to __cdecl__\n"
             "  --asm-args options\t\tPass options to the assembler\n"
             "  --asm-define sym[=v]\t\tDefine an assembler symbol\n"
             "  --asm-include-dir dir\t\tSet an assembler include directory\n"
@@ -812,6 +813,14 @@ static void OptAddSource (const char* Opt attribute ((unused)),
 /* Strict source code as comments to the generated asm code */
 {
     CmdAddArg (&CC65, "-T");
+}
+
+
+static void OptAllCDecl  (const char* Opt attribute ((unused)),
+                          const char* Arg attribute ((unused)))
+/* Make functions default to __cdecl__ */
+{
+    CmdAddArg (&CC65, "--all-cdecl");
 }
 
 
@@ -1290,6 +1299,7 @@ int main (int argc, char* argv [])
     /* Program long options */
     static const LongOpt OptTab[] = {
         { "--add-source",        0, OptAddSource      },
+        { "--all-cdecl",         0, OptAllCDecl       },
         { "--asm-args",          1, OptAsmArgs        },
         { "--asm-define",        1, OptAsmDefine      },
         { "--asm-include-dir",   1, OptAsmIncludeDir  },

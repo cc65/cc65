@@ -1,9 +1,8 @@
 ;
 ; Graphics driver for the 240x200x2 monochrome mode on the Atmos
 ;
-; Stefan Haubenthal <polluks@sdf.lonestar.org>
-; 2014-09-10, Greg King <gregdk@users.sf.net>
-;
+; Jede (jede@oric.org), 2017-10-15
+
 
         .include        "zeropage.inc"
 

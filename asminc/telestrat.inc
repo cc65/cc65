@@ -1,7 +1,7 @@
 ;
 ; Oric Telemon definition
-; Telemon 2.4 & Telemon 3.0
-; For telemon 3.0 check http://orix.oric.org
+; Telemon 2.4 & Telemon 3.x
+; For telemon 3.x check http://orix.oric.org
 ;
 
 
@@ -15,6 +15,15 @@ FUNCTKEY        = $A5
 
 FNAME_LEN       = 11            ; maximum length of file-name
 
+; ---------------------------------------------------------------------------
+; I/O Identifier
+; this identifers are used for channel management
+; 
+
+XKBD            = $80           ; Keyboard
+XRSE            = $83           ; RS232 in
+XSCR            = $88           ; Screen
+XRSS            = $90           ; RS232 out
 
 
 ; ---------------------------------------------------------------------------
@@ -34,10 +43,7 @@ TR5             := $11
 TR6             := $12
 TR7             := $13
 
-
-
-
-PTR_READ_DEST   := $2C           ; used for XFREAD and XWRITE only in telemon 3.0
+PTR_READ_DEST   := $2C           ; used for XFREAD and XWRITE only in telemon 3.x
 
 HRSX            := $46
 HRSY            := $47

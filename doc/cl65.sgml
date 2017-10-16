@@ -4,7 +4,7 @@
 <title>cl65 Users Guide
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
-<date>2017-05-24
+<date>2017-10-16
 
 <abstract>
 cl65 is the compile &amp; link utility for cc65, the 6502 C compiler. It was
@@ -69,6 +69,7 @@ Short options:
 
 Long options:
   --add-source                  Include source as comment
+  --all-cdecl                   Make functions default to __cdecl__
   --asm-args options            Pass options to the assembler
   --asm-define sym[=v]          Define an assembler symbol
   --asm-include-dir dir         Set an assembler include directory

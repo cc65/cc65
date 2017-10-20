@@ -54,11 +54,43 @@ HRS3            := $51
 HRS4            := $53
 HRS5            := $55
 
+HRSFB           := $57
 
+; RS232T
+; b0-b3 : speed 
+;         1111 => 19200 bps  (please note that telestrat can't handle this speed with stopping all IRQ except ACIA's one)
+;         1100 =>  9600 bps  (default from telemon)
+;         1110 =>  4800 bps 
+;         1010 =>  2400 bps 
+;         1000 =>  1200 bps 
+;         0111 =>   600 bps 
+;         0110 =>   300 bps 
+;         0101 =>   150 bps 
+;         0010 =>    75 bps 
+
+; b4    : 0 external clock, 1 internal clock
+; b6-b5 : 00 8 bits
+;         01 7 bits
+;         10 6 bits
+;         11 5 bits
+; b7    : 0  a stop  
+
+RS232T          := $59
+
+; RS232C 
+; b0-b3 : 0
+; b4    : 1 if echo
+; b5    : 1 if parity
+; b7-b6 : 00 in/out parity odd
+;       : 01 on/out parity even
+;       : 10 parity sent, answer not tested
+;       : 11 SPACE SENT, reception not tested
+
+RS232C          := $5A
 
 ; ---------------------------------------------------------------------------
 ; Low memory
-IRQVec          := $02fb        ; "fast" interrupt vector
+IRQVec          := $02FB        ; "fast" interrupt vector
 
 
 
@@ -84,7 +116,7 @@ PRA2    .byte                   ; Port Register A without handshaking
 .endstruct
 
 
-.struct VIA2                     ; Versatile Interface Adapter
+.struct VIA2                    ; Versatile Interface Adapter
         .res    $0320
 PRB     .byte                   ; Port Register B
 PRA     .byte                   ; Port Register A
@@ -116,7 +148,7 @@ SCREEN          := $BB80
 ; ---------------------------------------------------------------------------
 ; ROM entries
 
-; primitives telemon 2.4 
+; telemon primitives (2.4 & 3.x)
 XRD0             = $08
 XRDW0            = $0C
 XWR0             = $10 
@@ -140,10 +172,19 @@ XMUSIC           = $45
 XZAP             = $46
 XSHOOT           = $47
 XSOUT            = $67          ; Send A register to RS232, available in telemon 2.4 & 3.x
+XHRSSE           = $8C          ; Put in X and Y
+XDRAWA           = $8D          ; Draw a line 
+XDRAWR           = $8E          ; Draw a line 
 XCIRCL           = $8F
 XCURSE           = $90
+XCURMO           = $91
 XPAPER           = $92
 XINK             = $93
+XBOX             = $94
+XABOX            = $95
+XFILL            = $96
+XCHAR            = $97
+XSCHAR           = $98          ; Draw a string
 XEXPLO           = $9C 
 XPING            = $9D
 
@@ -158,6 +199,7 @@ SCRX             := $220
 SCRY             := $224
 ADSCRL           := $218
 ADSCRH           := $21C
+HRSPAT           := $2AA        ; Hires pattern : it's used to draw pattern for a line or a circle
 IRQVECTOR        := $2FA
 
 

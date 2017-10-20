@@ -55,6 +55,7 @@ YSIZE   =       8               ; System font height
         .addr   GETPIXEL
         .addr   LINE
         .addr   BAR
+        .addr   CIRCLE
         .addr   TEXTSTYLE
         .addr   OUTTEXT
         .addr   0               ; IRQ entry is unused
@@ -107,9 +108,12 @@ INIT:
 
 ; Switch into graphics mode.
         BRK_TELEMON(XHIRES)
-        rts
-
+       
 ; Done, reset the error code.
+
+        lda     #TGI_ERR_OK
+        sta     ERROR
+        rts
 
 ; ------------------------------------------------------------------------
 ; GETERROR: Return the error code in A, and clear it.
@@ -251,7 +255,17 @@ GETDEFPALETTE:
 ;
 
 SETPIXEL:
-        ; not done yet
+        
+        lda X1
+        sta HRS1
+        lda Y1
+        sta HRS2
+        
+        lda #$80
+        sta HRSFB
+        
+        BRK_TELEMON(XCURSE)
+        
         rts
 
 ; ------------------------------------------------------------------------
@@ -274,6 +288,10 @@ LINE:
         ; not done yet
         rts
 
+CIRCLE:
+        ; not done yet
+        rts
+        
 ; ------------------------------------------------------------------------
 ; BAR: Draw a filled rectangle with the corners X1/Y1, X2/Y2, where
 ; X1/Y1 = ptr1/ptr2 and X2/Y2 = ptr3/ptr4, using the current drawing color.

@@ -58,7 +58,7 @@ HRSFB           := $57
 
 ; RS232T
 ; b0-b3 : speed 
-;         1111 => 19200 bps  (please note that telestrat can't handle this speed with stopping all IRQ except ACIA's one)
+;         1111 => 19200 bps  (please note that telestrat can't handle this speed without stopping all IRQ except ACIA's one)
 ;         1100 =>  9600 bps  (default from telemon)
 ;         1110 =>  4800 bps 
 ;         1010 =>  2400 bps 

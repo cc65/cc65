@@ -9,7 +9,7 @@
 <date>2017-01-22
 
 <abstract>
-An overview over the Telestrat (Telemon 3.0 : http://orix.oric.org) runtime system as it is implemented for the cc65 C
+An overview over the Telestrat (Telemon 2.4 & Telemon 3.x : http://orix.oric.org) runtime system as it is implemented for the cc65 C
 compiler.)
 </abstract>
 
@@ -113,6 +113,21 @@ structures; accessing the struct fields will access the chip registers.
 
 <sect>Loadable drivers<p>
 
+<sect1>TGI<p>
+
+TGI drivers is available on Oric Telestrat with some functions :
+
+<itemize>
+<item>
+<item>tgi_install
+<item>tgi_init
+<item>tgi_clear
+<item>tgi_setpixel
+<item>tgi_getmaxx
+<item>tgi_getmaxy
+</itemize>
+
+
 <sect1>Extended memory drivers<p>
 
 No extended memory drivers are currently available for the Telestrat.
@@ -139,7 +154,7 @@ Telestrat manages also mouse, but it had been no handled yet in this version.
 
 <descrip>
 
-Telestrat has a RS232 port, but it's not used
+Telestrat has a RS232 port, but it's not usable in cc65.
 
 </descrip>
 

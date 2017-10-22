@@ -286,9 +286,27 @@ GETPIXEL:
 
 LINE:
         ; not done yet
+        lda   X1
+        sta   HRS1
+        lda   Y1
+        sta   HRS2
+        
+        lda   X2
+        sta   HRS3
+        lda   Y2
+        sta   HRS4
+        
+        lda   #$ff
+        sta   HRSPAT
+
+        BRK_TELEMON(XDRAWA)
+
         rts
 
+     
+        
 CIRCLE:
+
         ; not done yet
         rts
         
@@ -332,5 +350,25 @@ TEXTSTYLE:
 ;
 
 OUTTEXT:
-        ; not done yet
+        ; put hires cursor in X & Y
+        lda   #$00
+        jsr   SETPIXELSETMODE
+        
+        
+        ; count the length of the string
+        ldy   #$00
+loop:        
+        lda   (ptr3),y
+        beq   out
+        iny
+        bne   loop
+out:
+        ; XSCHAR routine from telemon needs to have the length of the string in X register
+        ; copy Y register to X register. It could be optimized in 65C02 with TYX
+        tya 
+        tax
+    
+        lda   ptr3     ; XSCHAR needs in A and Y the adress of the string        
+        ldy   ptr3+1    
+        BRK_TELEMON(XSCHAR)
         rts

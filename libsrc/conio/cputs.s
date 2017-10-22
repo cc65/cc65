@@ -1,8 +1,8 @@
 ;
 ; Ullrich von Bassewitz, 06.08.1998
 ;
-; void cputsxy (unsigned char x, unsigned char y, char* s);
-; void cputs (char* s);
+; void cputsxy (unsigned char x, unsigned char y, const char* s);
+; void cputs (const char* s);
 ;
 
         .export         _cputsxy, _cputs

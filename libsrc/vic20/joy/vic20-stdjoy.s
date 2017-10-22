@@ -30,17 +30,6 @@
 
         .addr   $0000
 
-; Button state masks (8 values)
-
-        .byte   $02                     ; JOY_UP
-        .byte   $04                     ; JOY_DOWN
-        .byte   $08                     ; JOY_LEFT
-        .byte   $80                     ; JOY_RIGHT
-        .byte   $10                     ; JOY_FIRE
-        .byte   $00                     ; JOY_FIRE2 unavailable
-        .byte   $00                     ; Future expansion
-        .byte   $00                     ; Future expansion
-
 ; Jump table.
 
         .addr   INSTALL
@@ -112,10 +101,19 @@ READ:   lda     #$7F            ; mask for VIA2 JOYBIT: sw3
         sty     VIA1_DDRA       ; restore the state of DDRA
 
         cli                     ; necessary?
-        ror                     ; Shift sw3 into bit 7
-        and     #$9E            ; Mask relevant bits
-        eor     #$9E            ; Active states are inverted
+        php                     ; Save sw3 in carry
+        lsr                     ; Shift sw0,sw1,sw2,sw4 into bits 1-4
+        tax                     ; Save sw0,sw1,sw2
+        and     #$10            ; Extract sw4 in bit 4
+        sta     tmp1            ; Save sw4 in bit 4
+        txa                     ; Restore sw0,sw1,sw2
+        lsr                     ; Shift sw0,sw1,sw2 into bits 0-2
+        and     #$07            ; Mask bits 0-2
+        plp                     ; Restore sw3 in carry
+        bcc     @L0             ; Is sw3 set?
+        ora     #$08            ; Yes: Add sw3 in bit 3
+@L0:    ora     tmp1            ; Add sw4 in bit 4
+        eor     #$1F            ; Active states are inverted
 
+        ldx     #0
         rts
-
-

@@ -18,7 +18,7 @@ _clrscr:
         lda     #$50    ; VRAM offset high ($10 OR $40)
         sta     VDP_CONTROL_W
 
-        lda     #$C0    ; Space from ROM setup
+        lda     #$40    ; Space char from ROM setup
 
         ldx     #0
         ldy     #3
@@ -34,8 +34,8 @@ L1:     sta     VDP_DATA_W
         lda     #0
         sta     CURSOR_X
         sta     CURSOR_Y
-        sta     <SCREEN_PTR
+        sta     SCREEN_PTR
         lda     #$10
-        sta      >SCREEN_PTR
+        sta     SCREEN_PTR+1
 
         rts

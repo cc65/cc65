@@ -63,12 +63,16 @@
 #  include <apple2enh.h>
 #elif defined(__APPLE2__)
 #  include <apple2.h>
+#elif defined(__ATARI5200__)
+#  include <atari5200.h>
 #elif defined(__ATARI__)
 #  include <atari.h>
 #elif defined(__ATMOS__)
 #  include <atmos.h>
 #elif defined(__CBM__)
 #  include <cbm.h>
+#elif defined(__CREATIVISION__)
+#  include <creativision.h>
 #elif defined(__GAMATE__)
 #  include <gamate.h>
 #elif defined(__GEOS__)
@@ -225,6 +229,3 @@ void __fastcall__ cputhex16 (unsigned val);
 
 /* End of conio.h */
 #endif
-
-
-

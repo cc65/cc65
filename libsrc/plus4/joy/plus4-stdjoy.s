@@ -31,17 +31,6 @@
 
         .addr   $0000
 
-; Button state masks (8 values)
-
-        .byte   $01                     ; JOY_UP
-        .byte   $02                     ; JOY_DOWN
-        .byte   $04                     ; JOY_LEFT
-        .byte   $08                     ; JOY_RIGHT
-        .byte   $80                     ; JOY_FIRE
-        .byte   $00                     ; JOY_FIRE2 unavailable
-        .byte   $00                     ; Future expansion
-        .byte   $00                     ; Future expansion
-
 ; Jump table.
 
         .addr   INSTALL
@@ -107,7 +96,7 @@ READ:   ldy     #%11111011      ; Load index for joystick #1
         cli
         eor     #%11111111
 
-; The fire buttons are in bits 6 and 7.  Both of them cannot be %1 together.
+; The push buttons are in bits 6 and 7.  Both of them cannot be %1 together.
 ; Therefore, bit 6 can be merged with bit 7.
 
         clc

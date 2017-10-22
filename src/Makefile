@@ -19,8 +19,8 @@ PROGS = ar65     \
 
 .SUFFIXES:
 
-bindir  := $(prefix)/bin
-datadir := $(if $(prefix),$(prefix)/share/cc65,$(abspath ..))
+bindir  := $(PREFIX)/bin
+datadir := $(if $(PREFIX),$(PREFIX)/share/cc65,$(abspath ..))
 
 CA65_INC = $(datadir)/asminc
 CC65_INC = $(datadir)/include
@@ -62,10 +62,10 @@ else
   endif
 endif
 
-CFLAGS += -MMD -MP -O -I common \
+CFLAGS += -MMD -MP -O3 -I common \
           -Wall -Wextra -Wno-char-subscripts $(USER_CFLAGS) \
           -DCA65_INC=$(CA65_INC) -DCC65_INC=$(CC65_INC) -DCL65_TGT=$(CL65_TGT) \
-          -DLD65_LIB=$(LD65_LIB) -DLD65_OBJ=$(LD65_OBJ) -DLD65_CFG=$(LD65_CFG)
+          -DLD65_LIB=$(LD65_LIB) -DLD65_OBJ=$(LD65_OBJ) -DLD65_CFG=$(LD65_CFG) \
           -DGIT_SHA=$(GIT_SHA)
 
 LDLIBS += -lm
@@ -107,7 +107,7 @@ $(RM) /usr/local/bin/$(prog)
 endef # UNAVAIL_recipe
 
 install:
-	$(if $(prefix),,$(error variable `prefix' must be set))
+	$(if $(PREFIX),,$(error variable `PREFIX' must be set))
 	$(INSTALL) -d $(DESTDIR)$(bindir)
 	$(INSTALL) ../bin/* $(DESTDIR)$(bindir)
 

@@ -52,6 +52,7 @@ typedef struct {
     /* Driver header */
     char                id[3];          /* Contains 0x65, 0x6d, 0x64 ("emd") */
     unsigned char       version;        /* Interface version */
+    void*               libreference;   /* Library reference */
 
     /* Jump vectors. Note that these are not C callable */
     void*               install;        /* INSTALL routine */
@@ -74,6 +75,3 @@ extern em_drv_header*   em_drv;         /* Pointer to driver */
 
 /* End of em-kernel.h */
 #endif
-
-
-

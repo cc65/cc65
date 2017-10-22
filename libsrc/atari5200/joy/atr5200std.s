@@ -27,17 +27,6 @@
 
         .addr   $0000
 
-; Button state masks (8 values)
-
-        .byte   $01             ; JOY_UP
-        .byte   $02             ; JOY_DOWN
-        .byte   $04             ; JOY_LEFT
-        .byte   $08             ; JOY_RIGHT
-        .byte   $10             ; JOY_FIRE
-        .byte   $20             ; JOY_FIRE2
-        .byte   $00             ; Future expansion
-        .byte   $00             ; Future expansion
-
 ; Jump table.
 
         .addr   INSTALL
@@ -99,7 +88,7 @@ READJOY:
         lda     #0              ; Initialize return value
         cmp     TRIG0,y
         bne     @notrg
-        lda     #$10            ; JOY_FIRE
+        lda     #$10            ; JOY_BTN
 
 ; Read joystick
 

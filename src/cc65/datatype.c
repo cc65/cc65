@@ -389,7 +389,10 @@ unsigned SizeOf (const Type* T)
     switch (UnqualifiedType (T->C)) {
 
         case T_VOID:
-            return 0;   /* Assume voids have size zero */
+            /* A void variable is a cc65 extension.
+            ** Get its size (in bytes).
+            */
+            return T->A.U;
 
         /* Beware: There's a chance that this triggers problems in other parts
            of the compiler. The solution is to fix the callers, because calling
@@ -438,7 +441,7 @@ unsigned SizeOf (const Type* T)
                 /* Array with unspecified size */
                 return 0;
             } else {
-                return T->A.L * SizeOf (T + 1);
+                return T->A.U * SizeOf (T + 1);
             }
 
         default:

@@ -87,6 +87,13 @@ extern void atr5200std_joy[];        /* referred to by joy_static_stddrv[] */
 #define COLOR_LIGHTBLUE         _gtia_mkcolor(HUE_BLUE,6)
 #define COLOR_GRAY3             _gtia_mkcolor(HUE_GREY,5)
 
+/* Masks for joy_read */
+#define JOY_UP_MASK     0x01
+#define JOY_DOWN_MASK   0x02
+#define JOY_LEFT_MASK   0x04
+#define JOY_RIGHT_MASK  0x08
+#define JOY_BTN_1_MASK  0x10
+
 /* get_tv return values */
 #define AT_NTSC     0
 #define AT_PAL      1
@@ -104,4 +111,4 @@ extern void atr5200std_joy[];        /* referred to by joy_static_stddrv[] */
 #define ANTIC (*(struct __antic*)0xD400)
 
 /* End of atari5200.h */
-#endif /* #ifndef _ATARI5200_H */
+#endif

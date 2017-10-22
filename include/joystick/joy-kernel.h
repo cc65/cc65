@@ -52,9 +52,7 @@ typedef struct {
     /* Driver header */
     char                id[3];          /* Contains 0x6a, 0x6f, 0x79 ("joy") */
     unsigned char       version;        /* Interface version */
-
-    /* Bitmasks for the joystick states. See joystick.h for indices */
-    unsigned char       masks[8];
+    void*               libreference;   /* Library reference */
 
     /* Jump vectors. Note that these are not C callable */
     void*               install;        /* INSTALL routine */
@@ -85,6 +83,3 @@ void joy_clear_ptr (void);
 
 /* End of joy-kernel.h */
 #endif
-
-
-

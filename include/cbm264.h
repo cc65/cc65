@@ -112,6 +112,17 @@
 #define COLOR_LIGHTBLUE         (BCOLOR_LIGHTBLUE | CATTR_LUMA7)
 #define COLOR_GRAY3             (BCOLOR_WHITE | CATTR_LUMA5)
 
+
+
+/* Masks for joy_read */
+#define JOY_UP_MASK             0x01
+#define JOY_DOWN_MASK           0x02
+#define JOY_LEFT_MASK           0x04
+#define JOY_RIGHT_MASK          0x08
+#define JOY_BTN_1_MASK          0x80
+
+
+
 /* Define hardware */
 #include <_ted.h>
 #define TED             (*(struct __ted*)0xFF00)

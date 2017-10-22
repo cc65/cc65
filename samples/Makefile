@@ -90,7 +90,7 @@ LDFLAGS_tgidemo_atarixl    = --start-addr 0x4000
 %: %.s
 
 .c.o:
-	$(CC) $(CFLAGS) -Oirs --codesize 500 -T -g -t $(SYS) $<
+	$(CC) $(CFLAGS) -Ors --codesize 500 -T -g -t $(SYS) $<
 	$(AS) $(<:.c=.s)
 
 .s.o:
@@ -237,10 +237,10 @@ samples.atr: samples
 # Installation rules
 
 INSTALL = install
-samplesdir = $(prefix)/share/cc65
+samplesdir = $(PREFIX)/share/cc65/samples
 
 install:
-	$(if $(prefix),,$(error variable `prefix' must be set))
+	$(if $(PREFIX),,$(error variable `PREFIX' must be set))
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)/geos
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)/tutorial

@@ -1,5 +1,6 @@
 ;
 ; Ullrich von Bassewitz, 05.10.1998
+; Christian Krueger, 11-Mar-2017, optimization
 ;
 ; CC65 runtime: Make boolean according to flags
 ;
@@ -9,14 +10,14 @@
 
 
 boolne: bne     ret1
-        ldx     #$00
+ret0:   ldx     #$00
         txa
         rts
 
 
-booleq: beq     ret1
-        ldx     #$00
-        txa
+booleq: bne     ret0
+ret1:   ldx     #$00
+        lda     #$01
         rts
 
 
@@ -44,17 +45,9 @@ boolult:
 
 
 boolugt:
-        beq     L1
+        beq     ret0
 booluge:
-        bcs     ret1
-L1:     ldx     #$00
+        ldx     #$00
         txa
+        rol     a
         rts
-
-
-ret1:   ldx     #$00
-        lda     #$01
-        rts
-
-
-

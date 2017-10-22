@@ -9,7 +9,7 @@
         .include        "extzp.inc"
 
 gotoxy:
-        jsr     popa            ; Get X
+        jsr     popa            ; Get Y
 
 _gotoxy:
         sta     CURS_Y          ; Set Y
@@ -20,6 +20,4 @@ _gotoxy:
 ;-------------------------------------------------------------------------------
 ; force the init constructor to be imported
 
-        .import initconio
-conio_init      = initconio
-
+        .forceimport    initconio

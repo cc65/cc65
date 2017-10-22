@@ -123,7 +123,6 @@ static void Usage (void)
             "  --large-alignment\t\tDon't warn about large alignments\n"
             "  --listing name\t\tCreate a listing file if assembly was ok\n"
             "  --list-bytes n\t\tMaximum number of bytes per listing line\n"
-            "  --macpack-dir dir\t\tSet a macro package directory\n"
             "  --memory-model model\t\tSet the memory model\n"
             "  --pagelength n\t\tSet the page length for the listing\n"
             "  --relax-checks\t\tRelax some checks (see docs)\n"

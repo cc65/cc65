@@ -141,7 +141,7 @@ static void SetOutputData (StrBuf* N)
 static void OptConvertTo (const char* Opt attribute ((unused)), const char* Arg)
 /* Convert the bitmap into a target format */
 {
-    static const char* NameList[] = {
+    static const char* const NameList[] = {
         "format"
     };
 
@@ -220,7 +220,7 @@ static void OptPop (const char* Opt attribute ((unused)),
 static void OptRead (const char* Opt attribute ((unused)), const char* Arg)
 /* Read an input file */
 {
-    static const char* NameList[] = {
+    static const char* const NameList[] = {
         "name", "format"
     };
 
@@ -294,7 +294,7 @@ static void OptVersion (const char* Opt attribute ((unused)),
 static void OptWrite (const char* Opt attribute ((unused)), const char* Arg)
 /* Write an output file */
 {
-    static const char* NameList[] = {
+    static const char* const NameList[] = {
         "name", "format"
     };
 

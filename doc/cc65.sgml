@@ -4,7 +4,7 @@
 <title>cc65 Users Guide
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:gregdk@users.sf.net" name="Greg King">
-<date>2016-06-11
+<date>2017-05-20
 
 <abstract>
 cc65 is a C compiler for 6502 targets. It supports several 6502 based home
@@ -58,7 +58,7 @@ Short options:
   -O                            Optimize code
   -Oi                           Optimize code, inline more code
   -Or                           Enable register variables
-  -Os                           Inline some known functions
+  -Os                           Inline some standard functions
   -T                            Include source as comment
   -V                            Print the compiler version number
   -W warning[,...]              Suppress warnings
@@ -88,9 +88,11 @@ Long options:
   --debug-opt name              Debug optimization steps
   --dep-target target           Use this dependency target
   --disable-opt name            Disable an optimization step
+  --eagerly-inline-funcs        Eagerly inline some known functions
   --enable-opt name             Enable an optimization step
   --help                        Help (this text)
   --include-dir dir             Set an include directory search path
+  --inline-stdfuncs             Inline some standard functions
   --list-opt-steps              List all optimizer steps and exit
   --list-warnings               List available warning types for -W
   --local-strings               Emit string literals immediately
@@ -219,9 +221,51 @@ Here is a description of all the command line options:
   symbols in a special section in the object file.
 
 
+  <label id="option-eagerly-inline-funcs">
+  <tag><tt>--eagerly-inline-funcs</tt></tag>
+
+  Have the compiler eagerly inline these functions from the C library:
+  <itemize>
+  <item><tt/memcpy()/
+  <item><tt/memset()/
+  <item><tt/strcmp()/
+  <item><tt/strcpy()/
+  <item><tt/strlen()/
+  <item>most of the functions declared in <tt/&lt;ctype.h&gt;/
+  </itemize>
+
+  Note: This has two consequences:
+  <itemize>
+  <item>You may not use names of standard C functions for your own functions.
+        If you do that, your program is not standard-compliant anyway; but,
+        using <tt/--eagerly-inline-funcs/ actually will break things.
+        <p>
+  <item>The inlined string and memory functions will not handle strings or
+        memory areas larger than 255 bytes.  Similarly, the inlined <tt/is..()/
+        functions will not work with values outside the char. range (such as
+        <tt/EOF/).
+        <p>
+  </itemize>
+
+  <tt/--eagerly-inline-funcs/ implies the <tt><ref id="option-inline-stdfuncs"
+  name="--inline-stdfuncs"></tt> command line option.
+
+  See also <tt><ref id="pragma-allow-eager-inline" name="#pragma&nbsp;allow-eager-inline"></tt>.
+
+
   <tag><tt>-h, --help</tt></tag>
 
   Print the short option summary shown above.
+
+
+  <label id="option-inline-stdfuncs">
+  <tag><tt>--inline-stdfuncs</tt></tag>
+
+  Allow the compiler to inline some standard functions from the C library like
+  strlen.  This will not only remove the overhead for a function call, but will
+  make the code visible for the optimizer.  See also the <tt><ref id="option-O"
+  name="-Os"></tt> command line option and <tt><ref id="pragma-inline-stdfuncs"
+  name="#pragma&nbsp;inline-stdfuncs"></tt>.
 
 
   <label id="option-list-warnings">
@@ -392,22 +436,22 @@ Here is a description of all the command line options:
   using
 
   <tscreen><verb>
-   	void f (void)
-   	{
-   	    unsigned a = 1;
-   	    ...
-   	}
+        void f (void)
+        {
+            unsigned a = 1;
+            ...
+        }
   </verb></tscreen>
 
   the variable <tt/a/ will always have the value <tt/1/ when entering the
   function and using <tt/-Cl/, while in
 
   <tscreen><verb>
-   	void f (void)
-   	{
-   	    static unsigned a = 1;
-   	    ....
-   	}
+        void f (void)
+        {
+            static unsigned a = 1;
+            ....
+        }
   </verb></tscreen>
 
   the variable <tt/a/ will have the value <tt/1/ only the first time that the
@@ -444,23 +488,14 @@ Here is a description of all the command line options:
   name="--register-vars">/ command line option, and the <ref
   id="register-vars" name="discussion of register variables"> below.
 
-  Using <tt/-Os/ will force the compiler to inline some known functions from
-  the C library like strlen. Note: This has two consequences:
-  <p>
-  <itemize>
-  <item>You may not use names of standard C functions in your own code. If you
-     	do that, your program is not standard compliant anyway, but using
-     	<tt/-Os/ will actually break things.
-     	<p>
-  <item>The inlined string and memory functions will not handle strings or
-	memory areas larger than 255 bytes. Similarly, the inlined <tt/is..()/
-	functions will not work with values outside the char. range (such as
-	<tt/EOF/).
-     	<p>
-  </itemize>
-  <p>
+  Using <tt/-Os/ will allow the compiler to inline some standard functions
+  from the C library like strlen.  This will not only remove the overhead
+  for a function call, but will make the code visible for the optimizer.
+  See also the <tt/<ref id="option-inline-stdfuncs" name="--inline-stdfuncs">/
+  command line option.
+
   It is possible to concatenate the modifiers for <tt/-O/. For example, to
-  enable register variables and inlining of known functions, you may use
+  enable register variables and inlining of standard functions, you may use
   <tt/-Ors/.
 
 
@@ -518,6 +553,7 @@ Here is a description of all the command line options:
 </descrip><p>
 
 
+
 <sect>Input and output<p>
 
 The compiler will accept one C file per invocation and create a file with
@@ -556,21 +592,21 @@ and the one defined by the ISO standard:
 
 <itemize>
 
-<item>	The datatypes "float" and "double" are not available.
-      	<p>
-<item> 	C Functions may not return structs (or unions), and structs may not
+<item>  The datatypes "float" and "double" are not available.
+        <p>
+<item>  C Functions may not return structs (or unions), and structs may not
         be passed as parameters by value. However, struct assignment *is*
-      	possible.
-      	<p>
-<item>	Most of the C library is available with only the fastcall calling
-	convention (<ref id="extension-fastcall" name="see below">).  It means
-	that you must not mix pointers to those functions with pointers to
-	user-written, cdecl functions (the calling conventions are incompatible).
-	<p>
-<item>	The <tt/volatile/ keyword has almost no effect. That is not as bad
+        possible.
+        <p>
+<item>  Most of the C library is available with only the fastcall calling
+        convention (<ref id="extension-fastcall" name="see below">).  It means
+        that you must not mix pointers to those functions with pointers to
+        user-written, cdecl functions (the calling conventions are incompatible).
+        <p>
+<item>  The <tt/volatile/ keyword has almost no effect. That is not as bad
         as it sounds, since the 6502 has so few registers that it isn't
         possible to keep values in registers anyway.
-	<p>
+        <p>
 </itemize>
 
 There may be some more minor differences I'm currently not aware of. The
@@ -585,49 +621,48 @@ This cc65 version has some extensions to the ISO C standard.
 
 <itemize>
 
-<item>	The compiler allows to insert assembler statements into the output
-     	file. The syntax is
+<item>  The compiler allows to insert assembler statements into the output
+        file. The syntax is
 
-	<tscreen><verb>
-	asm [optional volatile] (&lt;string literal&gt;[, optional parameters]) ;
-     	</verb></tscreen>
-     	or
-	<tscreen><verb>
+        <tscreen><verb>
+        asm [optional volatile] (&lt;string literal&gt;[, optional parameters]) ;
+        </verb></tscreen>
+        or
+        <tscreen><verb>
         __asm__ [optional volatile] (&lt;string literal&gt;[, optional parameters]) ;
-     	</verb></tscreen>
+        </verb></tscreen>
 
-	The first form is in the user namespace; and, is disabled if the <tt/-A/
-     	switch is given.
+        The first form is in the user namespace; and, is disabled if the <tt/-A/
+        switch is given.
 
-	There is a whole section covering inline assembler statements,
-	<ref id="inline-asm" name="see there">.
-	<p>
+        There is a whole section covering inline assembler statements,
+        <ref id="inline-asm" name="see there">.
+        <p>
 
 <label id="extension-fastcall">
-<item>	The normal calling convention -- for non-variadic functions -- is
-	named "fastcall". The syntax for a function declaration that
-	<em/explicitly/ uses fastcall is
+<item>  The normal calling convention -- for non-variadic functions -- is
+        named "fastcall". The syntax for a function declaration that
+        <em/explicitly/ uses fastcall is
 
-	<tscreen><verb>
-	&lt;return type&gt; fastcall &lt;function name&gt; (&lt;parameter list&gt;)
-     	</verb></tscreen>
-     	or
-	<tscreen><verb>
-	&lt;return type&gt; __fastcall__ &lt;function name&gt; (&lt;parameter list&gt;)
-     	</verb></tscreen>
-	An example is
-	<tscreen><verb>
-	void __fastcall__ f (unsigned char c)
-     	</verb></tscreen>
-	The first form of the fastcall keyword is in the user namespace and can
-	therefore be disabled with the <tt><ref id="option--standard"
+        <tscreen><verb>
+        &lt;return type&gt; fastcall &lt;function name&gt; (&lt;parameter list&gt;)
+        </verb></tscreen>
+        or
+        <tscreen><verb>
+        &lt;return type&gt; __fastcall__ &lt;function name&gt; (&lt;parameter list&gt;)
+        </verb></tscreen>
+        An example is
+        <tscreen><verb>
+        void __fastcall__ f (unsigned char c)
+        </verb></tscreen>
+        The first form of the fastcall keyword is in the user namespace and can
+        therefore be disabled with the <tt><ref id="option--standard"
         name="--standard"></tt> command line option.
 
-	For functions that are <tt/fastcall/, the rightmost parameter is not
-	pushed on the stack but left in the primary register when the function
-	is called. That significantly reduces the cost of calling those functions.
-	<newline><newline>
-	<p>
+        For functions that are <tt/fastcall/, the rightmost parameter is not
+        pushed on the stack but left in the primary register when the function
+        is called. That significantly reduces the cost of calling those functions.
+        <p>
 
 <item>  There is another calling convention named "cdecl". Variadic functions
         (their prototypes have an ellipsis &lsqb;<tt/.../&rsqb;) always use that
@@ -652,65 +687,72 @@ This cc65 version has some extensions to the ISO C standard.
         For functions that are <tt/cdecl/, the rightmost parameter is pushed
         onto the stack before the function is called. That increases the cost
         of calling those functions, especially when they are called from many
-        places.<newline><newline>
+        places.
         <p>
 
-<item>	There are two pseudo variables named <tt/__AX__/ and <tt/__EAX__/.
-	Both refer to the primary register that is used by the compiler to
-	evaluate expressions or return function results. <tt/__AX__/ is of
-	type <tt/unsigned int/ and <tt/__EAX__/ of type <tt/long unsigned int/
-	respectively. The pseudo variables may be used as lvalue and rvalue as
-	every other variable. They are most useful together with short
-	sequences of assembler code. For example, the macro
+<item>  There are two pseudo variables named <tt/__AX__/ and <tt/__EAX__/.
+        Both refer to the primary register that is used by the compiler to
+        evaluate expressions or return function results. <tt/__AX__/ is of
+        type <tt/unsigned int/ and <tt/__EAX__/ of type <tt/long unsigned int/
+        respectively. The pseudo variables may be used as lvalue and rvalue as
+        every other variable. They are most useful together with short
+        sequences of assembler code. For example, the macro
 
-	<tscreen><verb>
-       	#define hi(x)           \
+        <tscreen><verb>
+        #define hi(x)           \
             (__AX__ = (x),      \
              asm ("txa"),       \
              asm ("ldx #$00"),  \
              __AX__)
-	</verb></tscreen>
+        </verb></tscreen>
 
-	will give the high byte of any unsigned value.
-	<p>
+        will give the high byte of any unsigned value.
+        <p>
 
-<item>	Inside a function, the identifier <tt/__func__/ gives the name of the
-	current function as a string. Outside of functions, <tt/__func__/ is
-	undefined.
-	Example:
+<item>  Inside a function, the identifier <tt/__func__/ gives the name of the
+        current function as a string. Outside of functions, <tt/__func__/ is
+        undefined.
+        Example:
 
-	<tscreen><verb>
-	#define PRINT_DEBUG(s)	printf ("%s: %s\n", __func__, s);
-	</verb></tscreen>
+        <tscreen><verb>
+        #define PRINT_DEBUG(s)  printf ("%s: %s\n", __func__, s);
+        </verb></tscreen>
 
-	The macro will print the name of the current function plus a given
-	string.
-	<p>
+        The macro will print the name of the current function plus a given
+        string.
+        <p>
 
-<item> 	cc65 allows the initialization of <tt/void/ variables. This may be
-	used to create variable structures that are more compatible with
-	interfaces written for assembler languages. Here is an example:
+<item>  cc65 allows the initialization of <tt/void/ variables. This may be
+        used to create arbitrary structures that are more compatible with
+        interfaces written for assembler languages. Here is an example:
 
-	<tscreen><verb>
-	void GCmd = {	(char)3, (unsigned)0x2000, (unsigned)0x3000 };
-	</verb></tscreen>
+        <tscreen><verb>
+        void GCmd = { (char)3, (unsigned)0x2000, (unsigned)0x3000 };
+        </verb></tscreen>
 
-	This will be translated as follows:
+        That will be translated as follows:
 
-	<tscreen><verb>
-	_GCmd:
-	   	.byte	3
-	   	.word	$2000
-	   	.word	$3000
-	</verb></tscreen>
+        <tscreen><verb>
+        _GCmd:
+                .byte   3
+                .word   $2000
+                .word   $3000
+        </verb></tscreen>
 
-	Since the variable is of type <tt/void/ you may not use it as is.
-	However, taking the address of the variable results in a <tt/void*/
-	which may be passed to any function expecting a pointer.
+        Since the variable is of type <tt/void/, you may not use it as-is.
+        However, taking the address of the variable results in a <tt/void*/
+        which may be passed to any function expecting a pointer.  Also, the
+        <tt/sizeof/ operator will give the length of the initializer:
 
-	See the <url url="geos.html" name="GEOS library document"> for examples
-	on how to use this feature.
-	<p>
+        <tscreen><verb>
+        GLen = sizeof GCmd;
+        </verb></tscreen>
+
+        will assign the value 5 to <tt/GLen/.
+
+        See the <url url="geos.html" name="GEOS library document"> for examples
+        on how to use that feature.
+        <p>
 
 <item>  cc65 implements flexible array struct members as defined in the C99 ISO
         standard. As an extension, these fields may be initialized. There are
@@ -818,6 +860,11 @@ The compiler defines several macros at startup:
   This macro expands to the date of translation of the preprocessing
   translation unit in the form "Mmm dd yyyy".
 
+  <tag><tt>__EAGERLY_INLINE_FUNCS__</tt></tag>
+
+  Is defined if the compiler was called with the <tt><ref id="option-eagerly-inline-funcs"
+  name="--eagerly-inline-funcs"></tt> command line option.
+
   <tag><tt>__FILE__</tt></tag>
 
   This macro expands to a string containing the name of the C source file.
@@ -905,6 +952,7 @@ The compiler defines several macros at startup:
 </descrip>
 
 
+
 <sect>&num;pragmas<label id="pragmas"><p>
 
 The compiler understands some pragmas that may be used to change code
@@ -912,6 +960,19 @@ generation and other stuff. Some of these pragmas understand a special form:
 If the first parameter is <tt/push/, the old value is saved onto a stack
 before changing it. The value may later be restored by using the <tt/pop/
 parameter with the <tt/#pragma/.
+
+
+<sect1><tt>#pragma allow-eager-inline ([push,] on|off)</tt><label id="pragma-allow-eager-inline"><p>
+
+  Allow eager inlining of known functions.  If the argument is "off", eager
+  inlining is disabled, otherwise it is enabled. Please note that (in contrast
+  to the <tt><ref id="option-eagerly-inline-funcs" name="--eagerly-inline-funcs"></tt>
+  command line option) this pragma does not imply the <tt><ref id="option-inline-stdfuncs"
+  name="--inline-stdfuncs"></tt> command line option.  Rather it marks code to be safe for
+  eager inlining of known functions if inlining of standard functions is enabled.
+
+  The <tt/#pragma/ understands the push and pop parameters as explained above.
+
 
 <sect1><tt>#pragma bss-name (&lsqb;push,&rsqb; &lt;name&gt;)</tt><label id="pragma-bss-name"><p>
 
@@ -931,7 +992,7 @@ parameter with the <tt/#pragma/.
 
   Example:
   <tscreen><verb>
-       	#pragma bss-name ("MyBSS")
+        #pragma bss-name ("MyBSS")
   </verb></tscreen>
 
 
@@ -986,6 +1047,7 @@ parameter with the <tt/#pragma/.
 
   The <tt/#pragma/ understands the push and pop parameters as explained above.
 
+
 <sect1><tt>#pragma code-name ([push,] &lt;name&gt;)</tt><label id="pragma-code-name"><p>
 
   This pragma changes the name used for the CODE segment (the CODE segment
@@ -1000,7 +1062,7 @@ parameter with the <tt/#pragma/.
 
   Example:
   <tscreen><verb>
-       	#pragma code-name ("MyCODE")
+        #pragma code-name ("MyCODE")
   </verb></tscreen>
 
 
@@ -1028,8 +1090,19 @@ parameter with the <tt/#pragma/.
 
   Example:
   <tscreen><verb>
-       	#pragma data-name ("MyDATA")
+        #pragma data-name ("MyDATA")
   </verb></tscreen>
+
+
+<sect1><tt>#pragma inline-stdfuncs ([push,] on|off)</tt><label id="pragma-inline-stdfuncs"><p>
+
+  Allow the compiler to inline some standard functions from the C library like
+  strlen.  If the argument is "off", inlining is disabled, otherwise it is enabled.
+
+  See also the <tt/<ref id="option-inline-stdfuncs" name="--inline-stdfuncs">/
+  command line option.
+
+  The <tt/#pragma/ understands the push and pop parameters as explained above.
 
 
 <sect1><tt>#pragma local-strings ([push,] on|off)</tt><label id="pragma-local-strings"><p>
@@ -1044,6 +1117,23 @@ parameter with the <tt/#pragma/.
   output immediately, which means that they go into the currently active data
   or rodata segment, but cannot be merged. When inactive, string literals are
   remembered and output as a whole when translation is finished.
+
+
+<sect1><tt>#pragma message (&lt;message&gt;)</tt><label id="pragma-message"><p>
+
+  This pragma is used to display informational messages at compile-time.
+
+  The message intented to be displayed must be a string literal.
+
+  Example:
+  <tscreen><verb>
+        #pragma message ("in a bottle")
+  </verb></tscreen>
+
+  Results in the compiler outputting the following to stderr:
+  <tscreen><verb>
+        example.c(42): Note: in a bottle
+  </verb></tscreen>
 
 
 <sect1><tt>#pragma optimize ([push,] on|off)</tt><label id="pragma-optimize"><p>
@@ -1076,7 +1166,7 @@ parameter with the <tt/#pragma/.
 
   Example:
   <tscreen><verb>
-       	#pragma rodata-name ("MyRODATA")
+        #pragma rodata-name ("MyRODATA")
   </verb></tscreen>
 
 
@@ -1098,9 +1188,9 @@ parameter with the <tt/#pragma/.
 
   Example:
   <tscreen><verb>
-       	#pragma regvaraddr(on) 	/* Allow taking the address
-       		      	       	 * of register variables
-       		      	       	 */
+        #pragma regvaraddr(on)  /* Allow taking the address
+                                 * of register variables
+                                 */
   </verb></tscreen>
 
 
@@ -1147,12 +1237,45 @@ parameter with the <tt/#pragma/.
   Example:
   <tscreen><verb>
         /* Don't warn about the unused parameter in function func */
-      	#pragma warn (unused-param, push, off)
+        #pragma warn (unused-param, push, off)
         static int func (int unused)
         {
             return 0;
         }
         #pragma warn (unused-param, pop)
+  </verb></tscreen>
+
+
+<sect1><tt>#pragma wrapped-call (push, &lt;name&gt;, &lt;identifier&gt;)</tt><label id="pragma-wrapped-call"><p>
+
+  This pragma sets a wrapper for functions, often used for trampolines.
+
+  The name is a function returning <tt/void/, and taking no parameters.
+  It must preserve the CPU's <tt/A/ and <tt/X/ registers if it wraps any
+  <tt/__fastcall__/ functions that have parameters.  It must preserve
+  the <tt/Y/ register if it wraps any variadic functions (they have "<tt/.../"
+  in their prototypes).
+
+  The identifier is an 8-bit number that's set into <tt/tmp4/.
+
+  The address of a wrapped function is passed in <tt/ptr4/.  The wrapper can
+  call that function by using "<tt/jsr callptr4/".
+
+  This feature is useful, for example, with banked memory, to switch banks
+  automatically to where a wrapped function resides, and then to restore the
+  previous bank when it returns.
+
+  The <tt/#pragma/ requires the push or pop argument as explained above.
+
+  Example:
+  <tscreen><verb>
+/* Note that this code can be in a header. */
+void mytrampoline(void); /* Doesn't corrupt __AX__ */
+
+#pragma wrapped-call (push, mytrampoline, 5)
+void somefunc1(void);
+void somefunc2(int, char *);
+#pragma wrapped-call (pop)
   </verb></tscreen>
 
 
@@ -1180,10 +1303,9 @@ parameter with the <tt/#pragma/.
 
   Example:
   <tscreen><verb>
-      	extern int foo;
-      	#pragma zpsym ("foo");	/* foo is in the zeropage */
+        extern int foo;
+        #pragma zpsym ("foo");  /* foo is in the zeropage */
   </verb></tscreen>
-
 
 
 
@@ -1269,7 +1391,7 @@ that function).
 As a shortcut, you can put the <tt/volatile/ qualifier in your <tt/asm/
 statements.  It will disable optimization for the functions in which those
 <tt/asm volatile/ statements sit.  The effect is the same as though you put
-</#pragma optimize(push, off)/ above those functions, and </#pragma
+<tt/#pragma optimize(push, off)/ above those functions, and <tt/#pragma
 optimize(pop)/ below those functions.
 
 The string literal may contain format specifiers from the following list. For
@@ -1443,14 +1565,14 @@ including commercial applications, and to alter it and redistribute it
 freely, subject to the following restrictions:
 
 <enum>
-<item> 	The origin of this software must not be misrepresented; you must not
-       	claim that you wrote the original software. If you use this software
-       	in a product, an acknowledgment in the product documentation would be
-	appreciated but is not required.
-<item>	Altered source versions must be plainly marked as such, and must not
-	be misrepresented as being the original software.
-<item>	This notice may not be removed or altered from any source
-	distribution.
+<item>  The origin of this software must not be misrepresented; you must not
+        claim that you wrote the original software. If you use this software
+        in a product, an acknowledgment in the product documentation would be
+        appreciated but is not required.
+<item>  Altered source versions must be plainly marked as such, and must not
+        be misrepresented as being the original software.
+<item>  This notice may not be removed or altered from any source
+        distribution.
 </enum>
 
 </article>

@@ -30,17 +30,6 @@
 
         .addr   $0000
 
-; Button state masks (8 values)
-
-        .byte   $01                     ; JOY_UP
-        .byte   $02                     ; JOY_DOWN
-        .byte   $04                     ; JOY_LEFT
-        .byte   $08                     ; JOY_RIGHT
-        .byte   $10                     ; JOY_FIRE
-        .byte   $00                     ; JOY_FIRE2 unavailable
-        .byte   $00                     ; Future expansion
-        .byte   $00                     ; Future expansion
-
 ; Jump table.
 
         .addr   INSTALL
@@ -104,7 +93,7 @@ joy1:   lda     #$7F
         sei
         sta     CIA1_PRA
         lda     CIA1_PRB
-        cli
+back:   cli
         and     #$1F
         eor     #$1F
         rts
@@ -118,9 +107,4 @@ joy2:   ldx     #0
         sta     CIA1_DDRA
         lda     CIA1_PRA
         sty     CIA1_DDRA
-        cli
-        and     #$1F
-        eor     #$1F
-        rts
-
-
+        jmp     back

@@ -1636,7 +1636,7 @@ either a string or an expression.
 
   <tscreen><verb>
         ; Reserve space for the larger of two data blocks
-       	savearea:       .max (.sizeof (foo), .sizeof (bar))
+       	savearea:       .res .max (.sizeof (foo), .sizeof (bar))
   </verb></tscreen>
 
   See: <tt><ref id=".MIN" name=".MIN"></tt>
@@ -1695,8 +1695,8 @@ either a string or an expression.
   Example:
 
   <tscreen><verb>
-        ; Reserve space for some data, but 256 bytes minimum
-       	savearea:       .min (.sizeof (foo), 256)
+        ; Reserve space for some data, but 256 bytes maximum
+       	savearea:       .res .min (.sizeof (foo), 256)
   </verb></tscreen>
 
   See: <tt><ref id=".MAX" name=".MAX"></tt>
@@ -4305,6 +4305,13 @@ different:
 	some things may be done with both macro types, each type has special
 	usages. The types complement each other.
 
+<item>	Parentheses work differently from C macros.
+	The common practice of wrapping C macros in parentheses may cause
+	unintended problems here, such as accidentally implying an
+	indirect addressing mode. While the definition of a macro requires
+	parentheses around its argument list, when invoked they should not be
+	included.
+
 </itemize>
 
 Let's look at a few examples to make the advantages and disadvantages
@@ -4337,18 +4344,42 @@ Macros with parameters may also be useful:
         DEBUG   "Assembling include file #3"
 </verb></tscreen>
 
-Note that, while formal parameters have to be placed in braces, this is
-not true for the actual parameters. Beware: Since the assembler cannot
-detect the end of one parameter, only the first token is used. If you
-don't like that, use classic macros instead:
+Note that, while formal parameters have to be placed in parentheses,
+the actual argument used when invoking the macro should not be.
+The invoked arguments are separated by commas only, if parentheses are
+used by accident they will become part of the replaced token.
+
+If you wish to have an expression follow the macro invocation, the
+last parameter can be enclosed in curly braces {} to indicate the end of that
+argument.
+
+Examples:
 
 <tscreen><verb>
-.macro  DEBUG   message
-        .out    message
-.endmacro
+.define COMBINE(ta,tb,tc) ta+tb*10+tc*100
+
+.word COMBINE 5,6,7      ; 5+6*10+7*100 = 765
+.word COMBINE(5,6,7)     ; (5+6*10+7)*100 = 7200 ; incorrect use of parentheses
+.word COMBINE 5,6,7+1    ; 5+6*10+7+1*100 = 172
+.word COMBINE 5,6,{7}+1  ; 5+6*10+7*100+1 = 766 ; {} encloses the argument
+.word COMBINE 5,6-2,7    ; 5+6-2*10+7*100 = 691
+.word COMBINE 5,(6-2),7  ; 5+(6-2)*10+7*100 = 745
+.word COMBINE 5,6,7+COMBINE 0,1,2    ; 5+6*10+7+0+1*10+2*100*100 = 20082
+.word COMBINE 5,6,{7}+COMBINE 0,1,2  ; 5+6*10+7*100+0+1*10+2*100 = 975
 </verb></tscreen>
 
-(That is an example where a problem can be solved with both macro types).
+With C macros it is common to enclose the results in parentheses to
+prevent unintended interactions with the text of the arguments, but
+additional care must be taken in this assembly context where parentheses
+may alter the meaning of a statement. In particular, indirect addressing modes
+may be accidentally implied:
+
+<tscreen><verb>
+.define DUO(ta,tb) (ta+(tb*10))
+
+        lda DUO(5,4), Y         ; LDA (indirect), Y
+        lda 0+DUO(5,4), Y       ; LDA absolute indexed, Y
+</verb></tscreen>
 
 
 <sect1>Characters in macros<p>

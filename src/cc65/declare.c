@@ -58,6 +58,7 @@
 #include "scanner.h"
 #include "standard.h"
 #include "symtab.h"
+#include "wrappedcall.h"
 #include "typeconv.h"
 
 
@@ -891,6 +892,7 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers)
         case TOK_VOID:
             NextToken ();
             D->Type[0].C = T_VOID;
+            D->Type[0].A.U = 0;
             D->Type[1].C = T_END;
             break;
 
@@ -1314,6 +1316,8 @@ static FuncDesc* ParseFuncDecl (void)
 {
     unsigned Offs;
     SymEntry* Sym;
+    SymEntry* WrappedCall;
+    unsigned char WrappedCallData;
 
     /* Create a new function descriptor */
     FuncDesc* F = NewFuncDesc ();
@@ -1378,6 +1382,13 @@ static FuncDesc* ParseFuncDecl (void)
 
     /* Leave the lexical level remembering the symbol tables */
     RememberFunctionLevel (F);
+
+    /* Did we have a WrappedCall for this function? */
+    GetWrappedCall((void **) &WrappedCall, &WrappedCallData);
+    if (WrappedCall) {
+        F->WrappedCall = WrappedCall;
+        F->WrappedCallData = WrappedCallData;
+    }
 
     /* Return the function descriptor */
     return F;
@@ -1446,6 +1457,7 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
 
             /* Function declaration */
             FuncDesc* F;
+            SymEntry* PrevEntry;
 
             /* Skip the opening paren */
             NextToken ();
@@ -1457,6 +1469,16 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
             if ((F->Flags & FD_VARIADIC) && (Qualifiers & T_QUAL_FASTCALL)) {
                 Error ("Variadic functions cannot be __fastcall__");
                 Qualifiers &= ~T_QUAL_FASTCALL;
+            }
+
+            /* Was there a previous entry? If so, copy WrappedCall info from it */
+            PrevEntry = FindGlobalSym (D->Ident);
+            if (PrevEntry && PrevEntry->Flags & SC_FUNC) {
+                FuncDesc* D = PrevEntry->V.F.Func;
+                if (D->WrappedCall && !F->WrappedCall) {
+                    F->WrappedCall = D->WrappedCall;
+                    F->WrappedCallData = D->WrappedCallData;
+                }
             }
 
             /* Add the function type. Be sure to bounds check the type buffer */
@@ -2114,7 +2136,7 @@ NextMember:
 
 
 
-static unsigned ParseVoidInit (void)
+static unsigned ParseVoidInit (Type* T)
 /* Parse an initialization of a void variable (special cc65 extension).
 ** Return the number of bytes initialized.
 */
@@ -2181,6 +2203,9 @@ static unsigned ParseVoidInit (void)
     /* Closing brace */
     ConsumeRCurly ();
 
+    /* Number of bytes determined by initializer */
+    T->A.U = Size;
+
     /* Return the number of bytes initialized */
     return Size;
 }
@@ -2216,8 +2241,8 @@ static unsigned ParseInitInternal (Type* T, int AllowFlexibleMembers)
 
         case T_VOID:
             if (IS_Get (&Standard) == STD_CC65) {
-                /* Special cc65 extension in non ANSI mode */
-                return ParseVoidInit ();
+                /* Special cc65 extension in non-ANSI mode */
+                return ParseVoidInit (T);
             }
             /* FALLTHROUGH */
 

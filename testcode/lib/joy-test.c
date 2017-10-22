@@ -58,21 +58,19 @@ int main (void)
 #if defined(__ATARI5200__) || defined(__CREATIVISION__)
             cprintf ("%1d:%-3s%-3s%-3s%-3s%-3s%-3s",
                      i,
-                     (j & joy_masks[JOY_UP])?    " U " : "   ",
-                     (j & joy_masks[JOY_DOWN])?  " D " : "   ",
-                     (j & joy_masks[JOY_LEFT])?  " L " : "   ",
-                     (j & joy_masks[JOY_RIGHT])? " R " : "   ",
-                     (j & joy_masks[JOY_FIRE])?  " 1 " : "   ",
-                     (j & joy_masks[JOY_FIRE2])? " 2 " : "   ");
+                     JOY_UP(j)?    " U " : " - ",
+                     JOY_DOWN(j)?  " D " : " - ",
+                     JOY_LEFT(j)?  " L " : " - ",
+                     JOY_RIGHT(j)? " R " : " - ",
+                     JOY_BTN_1(j)? " 1 " : " - ");
 #else
             cprintf ("%2d: %-6s%-6s%-6s%-6s%-6s%-6s",
                      i,
-                     (j & joy_masks[JOY_UP])?    "  up  " : " ---- ",
-                     (j & joy_masks[JOY_DOWN])?  " down " : " ---- ",
-                     (j & joy_masks[JOY_LEFT])?  " left " : " ---- ",
-                     (j & joy_masks[JOY_RIGHT])? "right " : " ---- ",
-                     (j & joy_masks[JOY_FIRE])?  " fire " : " ---- ",
-                     (j & joy_masks[JOY_FIRE2])? "fire2 " : " ---- ");
+                     JOY_UP(j)?    "  up  " : " ---- ",
+                     JOY_DOWN(j)?  " down " : " ---- ",
+                     JOY_LEFT(j)?  " left " : " ---- ",
+                     JOY_RIGHT(j)? "right " : " ---- ",
+                     JOY_BTN_1(j)? "button" : " ---- ");
 #endif
         }
     }

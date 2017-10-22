@@ -159,6 +159,34 @@ static char* TargetLib  = 0;
 
 
 /*****************************************************************************/
+/*                        Credential functions                               */
+/*****************************************************************************/
+
+
+
+static void DisableAssembling (void)
+{
+    DoAssemble = 0;
+}
+
+
+
+static void DisableLinking (void)
+{
+    DoLink = 0;
+}
+
+
+
+static void DisableAssemblingAndLinking (void)
+{
+    DisableAssembling ();
+    DisableLinking ();
+}
+
+
+
+/*****************************************************************************/
 /*                        Command structure handling                         */
 /*****************************************************************************/
 
@@ -706,6 +734,7 @@ static void Usage (void)
             "  -C name\t\t\tUse linker config file\n"
             "  -Cl\t\t\t\tMake local variables static\n"
             "  -D sym[=defn]\t\t\tDefine a preprocessor symbol\n"
+            "  -E\t\t\t\tStop after the preprocessing stage\n"
             "  -I dir\t\t\tSet a compiler include directory path\n"
             "  -L path\t\t\tSpecify a library search path\n"
             "  -Ln name\t\t\tCreate a VICE label file\n"
@@ -723,6 +752,7 @@ static void Usage (void)
             "\n"
             "Long options:\n"
             "  --add-source\t\t\tInclude source as comment\n"
+            "  --all-cdecl\t\t\tMake functions default to __cdecl__\n"
             "  --asm-args options\t\tPass options to the assembler\n"
             "  --asm-define sym[=v]\t\tDefine an assembler symbol\n"
             "  --asm-include-dir dir\t\tSet an assembler include directory\n"
@@ -783,6 +813,14 @@ static void OptAddSource (const char* Opt attribute ((unused)),
 /* Strict source code as comments to the generated asm code */
 {
     CmdAddArg (&CC65, "-T");
+}
+
+
+static void OptAllCDecl  (const char* Opt attribute ((unused)),
+                          const char* Arg attribute ((unused)))
+/* Make functions default to __cdecl__ */
+{
+    CmdAddArg (&CC65, "--all-cdecl");
 }
 
 
@@ -1261,6 +1299,7 @@ int main (int argc, char* argv [])
     /* Program long options */
     static const LongOpt OptTab[] = {
         { "--add-source",        0, OptAddSource      },
+        { "--all-cdecl",         0, OptAllCDecl       },
         { "--asm-args",          1, OptAsmArgs        },
         { "--asm-define",        1, OptAsmDefine      },
         { "--asm-include-dir",   1, OptAsmIncludeDir  },
@@ -1398,8 +1437,7 @@ int main (int argc, char* argv [])
 
                 case 'S':
                     /* Dont assemble and link the created files */
-                    DoAssemble = 0;
-                    DoLink     = 0;
+                    DisableAssemblingAndLinking ();
                     break;
 
                 case 'T':
@@ -1411,17 +1449,35 @@ int main (int argc, char* argv [])
                     /* Print version number */
                     OptVersion (Arg, 0);
                     break;
-
+                
+                case 'E':
+                    /* Forward -E to compiler */
+                    CmdAddArg (&CC65, Arg);  
+                    DisableAssemblingAndLinking ();
+                    break;
+                    
                 case 'W':
-                    if (Arg[2] == 'a' && Arg[3] == '\0') {
-                        /* -Wa: Pass options to assembler */
-                        OptAsmArgs (Arg, GetArg (&I, 3));
-                    } else if (Arg[2] == 'c' && Arg[3] == '\0') {
-                        /* -Wc: Pass options to compiler */
-                        OptCCArgs (Arg, GetArg (&I, 3));
-                    } else if (Arg[2] == 'l' && Arg[3] == '\0') {
-                        /* -Wl: Pass options to linker */
-                        OptLdArgs (Arg, GetArg (&I, 3));
+                    /* avoid && with'\0' in if clauses */
+                    if (Arg[3] == '\0') {
+                        switch (Arg[2]) {
+                        case 'a':
+                            /* -Wa: Pass options to assembler */
+                            OptAsmArgs (Arg, GetArg (&I, 3));
+                            break;
+                        case 'c':
+                            /* -Wc: Pass options to compiler 
+                            ** Remember -Wc sub arguments in cc65 arg struct 
+                            */
+                            OptCCArgs (Arg, GetArg (&I, 3));
+                            break;
+                        case 'l':
+                            /* -Wl: Pass options to linker */
+                            OptLdArgs (Arg, GetArg (&I, 3));
+                            break;
+                        default:
+                            UnknownOption (Arg);
+                            break;
+                       }
                     } else {
                         /* Anything else: Suppress warnings (compiler) */
                         CmdAddArg2 (&CC65, "-W", GetArg (&I, 2));
@@ -1430,7 +1486,7 @@ int main (int argc, char* argv [])
 
                 case 'c':
                     /* Don't link the resulting files */
-                    DoLink = 0;
+                    DisableLinking ();
                     break;
 
                 case 'd':

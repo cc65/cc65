@@ -300,13 +300,11 @@ LINE:
         sta   HRSPAT
 
         BRK_TELEMON(XDRAWA)
-
         rts
 
      
         
 CIRCLE:
-
         ; not done yet
         rts
         

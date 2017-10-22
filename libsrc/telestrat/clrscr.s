@@ -9,6 +9,9 @@
     .include   "telestrat.inc"
 
 .proc _clrscr
+    ; Switch to text mode
+    BRK_TELEMON(XTEXT) 
+
     lda     #<SCREEN
     ldy     #>SCREEN
     sta     RES

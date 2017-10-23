@@ -17,7 +17,7 @@ FNAME_LEN       = 11            ; maximum length of file-name
 
 ; ---------------------------------------------------------------------------
 ; I/O Identifier
-; this identifers are used for channel management
+; theses identifers are used for channel management
 ; 
 
 XKBD            = $80           ; keyboard

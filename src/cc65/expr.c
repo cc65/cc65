@@ -537,7 +537,7 @@ static void FunctionCall (ExprDesc* Expr)
     if (IsFuncPtr) {
 
         if (Func->WrappedCall) {
-            Warning("Calling a wrapped function via a pointer, wrapped-call will not be used");
+            Warning ("Calling a wrapped function via a pointer, wrapped-call will not be used");
         }
 
         /* If the function is not a fastcall function, load the pointer to

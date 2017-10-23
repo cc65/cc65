@@ -20,9 +20,9 @@ FNAME_LEN       = 11            ; maximum length of file-name
 ; this identifers are used for channel management
 ; 
 
-XKBD            = $80           ; Keyboard
+XKBD            = $80           ; keyboard
 XRSE            = $83           ; RS232 in
-XSCR            = $88           ; Screen
+XSCR            = $88           ; screen
 XRSS            = $90           ; RS232 out
 
 
@@ -165,16 +165,16 @@ XCSSCR           = $35          ; switch on cursor
 XCLOSE           = $3A          ; only in TELEMON 3.x Close file
 XFWRITE          = $3B          ; only in TELEMON 3.x write file
 XSONPS           = $40
-XOUPS            = $42          ; sends Oups sound into PSG
+XOUPS            = $42          ; send Oups sound into PSG
 XPLAY            = $43
 XSOUND           = $44 
 XMUSIC           = $45 
 XZAP             = $46
 XSHOOT           = $47
-XSOUT            = $67          ; Send A register to RS232, available in telemon 2.4 & 3.x
-XHRSSE           = $8C          ; Set hires position cursor
-XDRAWA           = $8D          ; Draw a line 
-XDRAWR           = $8E          ; Draw a line 
+XSOUT            = $67          ; send A register to RS232, available in telemon 2.4 & 3.x
+XHRSSE           = $8C          ; set hires position cursor
+XDRAWA           = $8D          ; draw a line 
+XDRAWR           = $8E          ; draw a line 
 XCIRCL           = $8F
 XCURSE           = $90
 XCURMO           = $91
@@ -184,7 +184,7 @@ XBOX             = $94
 XABOX            = $95
 XFILL            = $96
 XCHAR            = $97
-XSCHAR           = $98          ; Draw a string in hires
+XSCHAR           = $98          ; draw a string in hires
 XEXPLO           = $9C 
 XPING            = $9D
 
@@ -199,7 +199,7 @@ SCRX             := $220
 SCRY             := $224
 ADSCRL           := $218
 ADSCRH           := $21C
-HRSPAT           := $2AA        ; Hires pattern : it's used to draw pattern for a line or a circle
+HRSPAT           := $2AA        ; hires pattern : it's used to draw pattern for a line or a circle
 IRQVECTOR        := $2FA
 
 

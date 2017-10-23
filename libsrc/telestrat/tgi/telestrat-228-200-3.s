@@ -255,14 +255,16 @@ GETDEFPALETTE:
 ;
 
 SETPIXEL:
+        lda #$80
         
+SETPIXELSETMODE:
+        sta HRSFB
         lda X1
         sta HRS1
         lda Y1
         sta HRS2
         
-        lda #$80
-        sta HRSFB
+
         
         BRK_TELEMON(XCURSE)
         

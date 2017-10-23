@@ -42,6 +42,7 @@
 #endif
 
 
+#include <apple2_filetype.h>
 
 /*****************************************************************************/
 /*                                   Data                                    */
@@ -90,6 +91,14 @@
 #define CH_RTEE      '+'
 #define CH_CROSS     '+'
 
+/* Masks for joy_read */
+#define JOY_UP_MASK     0x10
+#define JOY_DOWN_MASK   0x20
+#define JOY_LEFT_MASK   0x04
+#define JOY_RIGHT_MASK  0x08
+#define JOY_BTN_1_MASK  0x40
+#define JOY_BTN_2_MASK  0x80
+
 /* Return codes for get_ostype */
 #define APPLE_UNKNOWN  0x00
 #define APPLE_II       0x10  /* Apple ][                    */
@@ -136,11 +145,9 @@ extern unsigned char _dos_type;
 
 
 /* The file stream implementation and the POSIX I/O functions will use the
-** following variables to determine the file type, aux type and creation time
-** stamp to use.
+** following struct to set the date and time stamp on files. This specificially
+** applies to the open and fopen functions.
 */
-extern unsigned char _filetype;  /* Default: 6 */
-extern unsigned int _auxtype;    /* Default: 0 */
 extern struct {
     struct {
         unsigned day  :5;

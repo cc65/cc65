@@ -89,9 +89,9 @@ unsigned char __fastcall__ toascii (unsigned char c);
 ** #undef'ing the macroes.
 ** Please note that the following macroes do NOT handle EOF correctly, as
 ** stated in the manual. If you need correct behaviour for EOF, don't
-** use -Os, or #undefine the following macroes.
+** use --eagerly-inline-funcs, or #undefine the following macroes.
 */
-#ifdef __OPT_s__
+#ifdef __EAGERLY_INLINE_FUNCS__
 
 #define isalnum(c)  (__AX__ = (c),                      \
                     __asm__ ("tay"),                    \

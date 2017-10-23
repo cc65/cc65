@@ -149,6 +149,16 @@
 #define TGI_COLOR_LIGHTBLUE     COLOR_LIGHTBLUE
 #define TGI_COLOR_GRAY3         COLOR_GRAY3
 
+/* Masks for joy_read */
+#define JOY_UP_MASK     0x01
+#define JOY_DOWN_MASK   0x02
+#define JOY_LEFT_MASK   0x04
+#define JOY_RIGHT_MASK  0x08
+#define JOY_BTN_1_MASK  0x10
+
+#define JOY_FIRE_MASK   JOY_BTN_1_MASK
+#define JOY_FIRE(v)     ((v) & JOY_FIRE_MASK)
+
 /* color register functions */
 extern void __fastcall__ _setcolor     (unsigned char color_reg, unsigned char hue, unsigned char luminace);
 extern void __fastcall__ _setcolor_low (unsigned char color_reg, unsigned char color_value);
@@ -346,4 +356,4 @@ struct __iocb {
 #define IOCB_FORMAT      0xFE  /* format */
 
 /* End of atari.h */
-#endif /* #ifndef _ATARI_H */
+#endif

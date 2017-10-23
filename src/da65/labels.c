@@ -264,11 +264,11 @@ const char* GetLabel (unsigned Addr, unsigned RefFrom)
 ** of unnamed labels, to determine the name.
 */
 {
-    static const char* FwdLabels[] = {
+    static const char* const FwdLabels[] = {
         ":+", ":++", ":+++", ":++++", ":+++++", ":++++++", ":+++++++",
         ":++++++++", ":+++++++++", ":++++++++++"
     };
-    static const char* BackLabels[] = {
+    static const char* const BackLabels[] = {
         ":-", ":--", ":---", ":----", ":-----", ":------", ":-------",
         ":--------", ":---------", ":----------"
     };

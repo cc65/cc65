@@ -133,6 +133,12 @@
 #define TGI_COLOR_LIGHTBLUE     COLOR_LIGHTBLUE
 #define TGI_COLOR_GRAY3         COLOR_GRAY3
 
+#define JOY_UP_MASK             0x01
+#define JOY_DOWN_MASK           0x02
+#define JOY_LEFT_MASK           0x04
+#define JOY_RIGHT_MASK          0x08
+#define JOY_BTN_1_MASK          0x10
+
 
 /* End of geos.h */
 #endif

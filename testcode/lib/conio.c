@@ -117,8 +117,8 @@ void main(void)
                 gotoxy(7 + inpos,1);
 
 #if defined(__NES__) || defined(__PCE__) || defined(__GAMATE__)
-                /* not all targets have waitvblank */
-                waitvblank();
+                /* not all targets have waitvsync */
+                waitvsync();
                 /* for targets that do not have a keyboard, read the first
                    joystick */
                 joy = joy_read(JOY_1);

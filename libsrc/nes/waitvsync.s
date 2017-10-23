@@ -1,15 +1,15 @@
 ;
-; Written by Groepaz/Hitmen <groepaz@gmx.net>
+; Written by Groepaz <groepaz@gmx.net>
 ; Cleanup by Ullrich von Bassewitz <uz@cc65.org>
 ;
-; void waitvblank(void);
+; void waitvsync(void);
 ;
 
-        .export _waitvblank
+        .export _waitvsync
 
         .include "nes.inc"
 
-.proc   _waitvblank
+.proc   _waitvsync
 
 wait:   lda     PPU_STATUS
         bpl     wait

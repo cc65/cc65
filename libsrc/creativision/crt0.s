@@ -31,9 +31,6 @@ entry:
         ldx     #<__RAM_START__ - 1
         txs
 
-        ; Start interrupts
-        cli
-
         ; Clear the BSS data
         jsr     zerobss
 
@@ -49,13 +46,21 @@ entry:
         ; Call module constructors
         jsr     initlib
 
+        ; enable vertical blank interrupts in the display controller
+        lda      #$E0           ; 16K RAM, Active Display, Mode 1, VBI enabled
+        ldx      #$01           ; Register 1
+        jsr      BIOS_WRITE_VDP_REG
+
+        ; Start interrupts
+        cli
+
         ; Call main()
         jsr     callmain
 
         ; Call module destructors. This is also the _exit entry.
 _exit:  jsr     donelib
 
-        ; TODO: Replace with some sort of reset
+        ; A Creativision program isn't supposed to exit.
 loop:   jmp loop
 
 ; ------------------------------------------------------------------------
@@ -81,7 +86,7 @@ irq2:   jmp     BIOS_IRQ2_ADDR
         ; VDP Setup
         ; This sets to Graphics Mode 1
         .byte   $00             ; Register 0
-        .byte   $C0             ; Register 1 16K RAM, Active Display, Mode 1
+        .byte   $C0             ; Register 1 16K RAM, Active Display, Mode 1, VBI disabled
         .byte   $04             ; Register 2 Name Table at $1000 - $12FF
         .byte   $60             ; Register 3 Colour Table at $1800 - $181F
         .byte   $00             ; Register 4 Pattern Table at $0000 - $07FF

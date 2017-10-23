@@ -1,6 +1,10 @@
 ;
 ; Ullrich von Bassewitz, 31.05.1998
 ;
+; Note: strspn & strcspn call internally this function and rely on
+; the usage of only ptr1 here! Keep in mind when appling changes
+; and check the other implementations too!
+;
 ; int strlen (const char* s);
 ;
 
@@ -23,4 +27,3 @@ L1:     lda     (ptr1),y
 
 L9:     tya                     ; get low byte of counter, hi's all set
         rts
-

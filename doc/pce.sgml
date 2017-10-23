@@ -77,7 +77,7 @@ Programs containing PCE specific code may use the <tt/pce.h/ header file.
 <sect1>PCE specific functions<p>
 
 <itemize>
-<item>waitvblank</item>
+<item>waitvsync</item>
 <item>get_tv (since all PCE systems are NTSC, this always returns TV_NTSC)</item>
 </itemize>
 

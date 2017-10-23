@@ -71,6 +71,7 @@ SymEntry* NewSymEntry (const char* Name, unsigned Flags)
     E->Type     = 0;
     E->Attr     = 0;
     E->AsmName  = 0;
+    E->V.BssName = 0;
     memcpy (E->Name, Name, Len+1);
 
     /* Return the new entry */

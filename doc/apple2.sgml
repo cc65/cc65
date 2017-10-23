@@ -435,7 +435,7 @@ BASIC.SYSTEM) there are some limitations for DOS 3.3:
   <tag/Interrupts/
   There's no <tt/interruptor/ support. Any attempt to use it yields the message
   'FAILED TO ALLOC INTERRUPT' on program startup. This implicitly means that
-  <tt/a2.stdmou.mou/ and <tt/a2.ssc.ser/ are not functional as they depend on
+  joystick, mouse and RS232 device drivers are not functional as they depend on
   interrupts.
 
 </descrip><p>
@@ -510,6 +510,109 @@ url="ca65.html" name="assembler manual">.
 
 </descrip><p>
 
+
+<sect1>Specifying file types for fopen<p>
+
+<descrip>
+
+  <tag>Explanation of File Types</tag>
+
+  ProDOS associates a file type and an auxiliary type with each file.
+  These type specifications are separate from the file's name, unlike
+  Windows which uses the file name's suffix (a.k.a.
+  extension) to specify the file type. For example, <tt/.exe/, 
+  <tt/.doc/, or <tt/.bat/.
+  The ProDOS low-level 
+  Machine-Language Interface (MLI) functions for creating and opening 
+  files require these types to be specified. And if they don't match
+  with the file being opened, the operation may fail.
+
+  In contrast, the ISO C function <tt/fopen()/ and the POSIX function
+  <tt/open()/ have no parameter to specify either a file type or an
+  auxiliary type. Therefore, some additional mechanism for specifying
+  the file types is needed. 
+  
+  <tag>Specifying the File Type and Auxiliary Type</tag>
+
+  There are two global variables provided that allow the file type
+  and auxiliary type to be specified before a call to <tt/fopen()/
+  or <tt/open()/. They are defined in <tt/apple2_filetype.h/:
+
+  <tscreen>
+  <verb>
+  extern unsigned char _filetype;  /* Default: PRODOS_T_BIN */
+  extern unsigned int _auxtype;    /* Default: 0            */
+  </verb>
+  </tscreen>  
+
+  The header file <tt/apple2_filetype.h/ also defines many values
+  that can be used to set these variables. It is included in
+  <tt/apple2.h/, which is in turn included in <tt/apple2enh.h/.
+  So it isn't necessary to include it directly. Just
+  include one of <tt/apple2.h/ or <tt/apple2enh.h/.
+
+  <tag>Example</tag>
+
+  A text file cannot be created with just the
+  standard C functions because they default to the binary type 
+  <tt/PRODOS_T_BIN/. The <tt/_filetype/ variable must be set to
+  <tt/PRODOS_T_TXT/ to create a text file. 
+  
+  For a text file, 
+  <tt/_auxtype/ specifies the record length. A zero record
+  length text file is referred to as a sequential text file.
+  This is equivalent to text files on 
+  other operating systems, except that the line terminator is a
+  carriage return instead of a line-feed (Linux/BSD/MacOS) or 
+  carriage return, line-feed pair (Windows).
+  
+  The "sequential" text file terminology is in contrast to a 
+  "random-access" text file which would
+  have a fixed-length, non-zero record length, so that the 
+  file position of any individual record can be calculated.
+  
+  For this example, the
+  <tt/_auxtype/ does not need to be set because it defaults to
+  the desired value, which is zero. To be more explicit, 
+  <tt/_auxtype/ can also be set to <tt/PRODOS_AUX_T_TXT_SEQ/
+  which is defined as zero.
+
+  <tscreen>
+  <verb>
+    &num;include &lt;stdio.h&gt;
+    &num;include &lt;string.h&gt;
+    &num;include &lt;errno.h&gt;
+    &num;include &lt;apple2.h&gt;
+
+    void main(void)
+    {
+        FILE *out;
+        char *name = "MY.FAVS";
+
+        /*-----------------------------*/
+
+        _filetype = PRODOS_T_TXT;
+        _auxtype  = PRODOS_AUX_T_TXT_SEQ;
+
+        /*-----------------------------*/
+
+        if ((out = fopen(name, "w")) != NULL) {
+            fputs("Jorah Mormont\r", out);
+            fputs("Brienne of Tarth\r", out);
+            fputs("Daenerys Targaryen\r", out);
+            fputs("Sandor Clegane\r", out);
+            if (fclose(out) == EOF) {
+                fprintf(stderr, "fclose failed for %s: %s", name, strerror(errno));
+            }
+        }
+        else {
+            fprintf(stderr, "fopen failed for %s: %s", name, strerror(errno));
+        }
+    }
+  </verb>
+  </tscreen>  
+
+</descrip><p>
 
 
 <sect>License<p>

@@ -33,6 +33,9 @@ CHARCOLOR       := $286
 CURS_COLOR      := $287         ; Color under the cursor
 PALFLAG         := $2A6         ; $01 = PAL, $00 = NTSC
 
+KBDREPEAT       := $28a
+KBDREPEATRATE   := $28b
+KBDREPEATDELAY  := $28c
 
 ; ---------------------------------------------------------------------------
 ; Kernal routines

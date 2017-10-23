@@ -2,8 +2,9 @@
 
 <article>
 <title>cc65 function reference
-<author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2016-08-07
+<author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
+<url url="mailto:greg.king5@verizon.net" name="Greg King">
+<date>2017-09-02
 
 <abstract>
 cc65 is a C compiler for 6502 based systems. This function reference describes
@@ -183,6 +184,7 @@ function.
 <!-- <item><ref id="cbm_save" name="cbm_save"> -->
 <!-- <item><ref id="cbm_write" name="cbm_write"> -->
 <!-- <item><ref id="get_tv" name="get_tv"> -->
+<item><ref id="kbrepeat" name="kbrepeat">
 </itemize>
 
 (incomplete)
@@ -398,6 +400,13 @@ function.
 (incomplete)
 
 
+<sect1><tt/lz4.h/<label id="lz4.h"><p>
+
+<itemize>
+<item><ref id="decompress_lz4" name="decompress_lz4">
+</itemize>
+
+
 <sect1><tt/modload.h/<label id="modload.h"><p>
 
 <itemize>
@@ -430,7 +439,7 @@ function.
 
 <!-- <itemize> -->
 <!-- <item><ref id="get_tv" name="get_tv"> -->
-<!-- <item><ref id="waitvblank" name="waitvblank"> -->
+<!-- <item><ref id="waitvsync" name="waitvsync"> -->
 <!-- </itemize> -->
 
 (incomplete)
@@ -2632,6 +2641,23 @@ used in presence of a prototype.
 </quote>
 
 
+<sect1>decompress_lz4<label id="decompress_lz4"><p>
+
+<quote>
+<descrip>
+<tag/Function/Uncompress a LZ4-compressed buffer.
+<tag/Header/<tt/<ref id="lz4.h" name="lz4.h">/
+<tag/Declaration/<tt/void decompress_lz4 (const unsigned char* src, unsigned char* const dst, const unsigned short uncompressed_size);/
+<tag/Description/<tt/decompress_lz4/ uncompresses a LZ4-compressed buffer.
+<tag/Notes/<itemize>
+<item>Use LZ4_compress_HC with compression level 16 for best compression.
+</itemize>
+<tag/Availability/cc65
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>div<label id="div"><p>
 
 <quote>
@@ -3710,7 +3736,7 @@ fastcall function, so it may only be used in presence of a prototype.
 
 <quote>
 <descrip>
-<tag/Function/Check if a given character is a a white-space character.
+<tag/Function/Check if a given character is a white-space character.
 <tag/Header/<tt/<ref id="ctype.h" name="ctype.h">/
 <tag/Declaration/<tt/int __fastcall__ isspace (int c);/
 <tag/Description/The function returns a non zero value if the given argument
@@ -4012,6 +4038,28 @@ do), the function is rather useless.
 <tag/See also/
 <ref id="cgetc" name="cgetc">,
 <ref id="cursor" name="cursor">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>kbrepeat<label id="kbrepeat"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set the keyboard repeat mode.
+<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ kbrepeat (unsigned char mode);/
+<tag/Description/This function changes which keys have automatic repeat when
+being held down for a certain time. Possible values are <tt/KBREPEAT_CURSOR/
+(repeat only cursor-related keys), <tt/KBREPEAT_NONE/ (no repeat for any
+keys), and <tt/KBREPEAT_ALL/ (repeat all keys). The old mode is returned, so
+it can be restored later.
+<tag/Notes/<itemize>
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
+</itemize>
+<tag/Availability/cc65
 <tag/Example/None.
 </descrip>
 </quote>

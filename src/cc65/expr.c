@@ -536,6 +536,10 @@ static void FunctionCall (ExprDesc* Expr)
     /* Special handling for function pointers */
     if (IsFuncPtr) {
 
+        if (Func->WrappedCall) {
+            Warning("Calling a wrapped function via a pointer, wrapped-call will not be used");
+        }
+
         /* If the function is not a fastcall function, load the pointer to
         ** the function into the primary.
         */
@@ -584,7 +588,47 @@ static void FunctionCall (ExprDesc* Expr)
     } else {
 
         /* Normal function */
-        g_call (TypeOf (Expr->Type), (const char*) Expr->Name, ParamSize);
+        if (Func->WrappedCall) {
+            char tmp[64];
+            StrBuf S = AUTO_STRBUF_INITIALIZER;
+
+            /* Store the WrappedCall data in tmp4 */
+            sprintf(tmp, "ldy #%u", Func->WrappedCallData);
+            SB_AppendStr (&S, tmp);
+            g_asmcode (&S);
+            SB_Clear(&S);
+
+            SB_AppendStr (&S, "sty tmp4");
+            g_asmcode (&S);
+            SB_Clear(&S);
+
+            /* Store the original function address in ptr4 */
+            SB_AppendStr (&S, "ldy #<(_");
+            SB_AppendStr (&S, (const char*) Expr->Name);
+            SB_AppendChar (&S, ')');
+            g_asmcode (&S);
+            SB_Clear(&S);
+
+            SB_AppendStr (&S, "sty ptr4");
+            g_asmcode (&S);
+            SB_Clear(&S);
+
+            SB_AppendStr (&S, "ldy #>(_");
+            SB_AppendStr (&S, (const char*) Expr->Name);
+            SB_AppendChar (&S, ')');
+            g_asmcode (&S);
+            SB_Clear(&S);
+
+            SB_AppendStr (&S, "sty ptr4+1");
+            g_asmcode (&S);
+            SB_Clear(&S);
+
+            SB_Done (&S);
+
+            g_call (TypeOf (Expr->Type), Func->WrappedCall->Name, ParamSize);
+        } else {
+            g_call (TypeOf (Expr->Type), (const char*) Expr->Name, ParamSize);
+        }
 
     }
 
@@ -1534,25 +1578,34 @@ static void PostInc (ExprDesc* Expr)
     /* Get the data type */
     Flags = TypeOf (Expr->Type);
 
-    /* Push the address if needed */
-    PushAddr (Expr);
+    /* Emit smaller code if a char variable is at a constant location */
+    if ((Flags & CF_CHAR) == CF_CHAR && ED_IsLocConst(Expr)) {
 
-    /* Fetch the value and save it (since it's the result of the expression) */
-    LoadExpr (CF_NONE, Expr);
-    g_save (Flags | CF_FORCECHAR);
+        LoadExpr (CF_NONE, Expr);
+        AddCodeLine ("inc %s", ED_GetLabelName(Expr, 0));
 
-    /* If we have a pointer expression, increment by the size of the type */
-    if (IsTypePtr (Expr->Type)) {
-        g_inc (Flags | CF_CONST | CF_FORCECHAR, CheckedSizeOf (Expr->Type + 1));
     } else {
-        g_inc (Flags | CF_CONST | CF_FORCECHAR, 1);
+
+        /* Push the address if needed */
+        PushAddr (Expr);
+
+        /* Fetch the value and save it (since it's the result of the expression) */
+        LoadExpr (CF_NONE, Expr);
+        g_save (Flags | CF_FORCECHAR);
+
+        /* If we have a pointer expression, increment by the size of the type */
+        if (IsTypePtr (Expr->Type)) {
+            g_inc (Flags | CF_CONST | CF_FORCECHAR, CheckedSizeOf (Expr->Type + 1));
+        } else {
+            g_inc (Flags | CF_CONST | CF_FORCECHAR, 1);
+        }
+
+        /* Store the result back */
+        Store (Expr, 0);
+
+        /* Restore the original value in the primary register */
+        g_restore (Flags | CF_FORCECHAR);
     }
-
-    /* Store the result back */
-    Store (Expr, 0);
-
-    /* Restore the original value in the primary register */
-    g_restore (Flags | CF_FORCECHAR);
 
     /* The result is always an expression, no reference */
     ED_MakeRValExpr (Expr);
@@ -1581,25 +1634,34 @@ static void PostDec (ExprDesc* Expr)
     /* Get the data type */
     Flags = TypeOf (Expr->Type);
 
-    /* Push the address if needed */
-    PushAddr (Expr);
+    /* Emit smaller code if a char variable is at a constant location */
+    if ((Flags & CF_CHAR) == CF_CHAR && ED_IsLocConst(Expr)) {
 
-    /* Fetch the value and save it (since it's the result of the expression) */
-    LoadExpr (CF_NONE, Expr);
-    g_save (Flags | CF_FORCECHAR);
+        LoadExpr (CF_NONE, Expr);
+        AddCodeLine ("dec %s", ED_GetLabelName(Expr, 0));
 
-    /* If we have a pointer expression, increment by the size of the type */
-    if (IsTypePtr (Expr->Type)) {
-        g_dec (Flags | CF_CONST | CF_FORCECHAR, CheckedSizeOf (Expr->Type + 1));
     } else {
-        g_dec (Flags | CF_CONST | CF_FORCECHAR, 1);
+
+        /* Push the address if needed */
+        PushAddr (Expr);
+
+        /* Fetch the value and save it (since it's the result of the expression) */
+        LoadExpr (CF_NONE, Expr);
+        g_save (Flags | CF_FORCECHAR);
+
+        /* If we have a pointer expression, increment by the size of the type */
+        if (IsTypePtr (Expr->Type)) {
+            g_dec (Flags | CF_CONST | CF_FORCECHAR, CheckedSizeOf (Expr->Type + 1));
+        } else {
+            g_dec (Flags | CF_CONST | CF_FORCECHAR, 1);
+        }
+
+        /* Store the result back */
+        Store (Expr, 0);
+
+        /* Restore the original value in the primary register */
+        g_restore (Flags | CF_FORCECHAR);
     }
-
-    /* Store the result back */
-    Store (Expr, 0);
-
-    /* Restore the original value in the primary register */
-    g_restore (Flags | CF_FORCECHAR);
 
     /* The result is always an expression, no reference */
     ED_MakeRValExpr (Expr);

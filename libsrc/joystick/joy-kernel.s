@@ -19,8 +19,6 @@
 .bss
 _joy_drv:       .res    2               ; Pointer to driver
 
-_joy_masks:     .res    .sizeof(JOY_HDR::MASKS)
-
 ; Jump table for the driver functions.
 .data
 joy_vectors:
@@ -65,38 +63,28 @@ _joy_install:
         lda     #>joy_libref
         sta     (ptr1),y
 
-; Copy the mask array
-
-        ldy     #JOY_HDR::MASKS + .sizeof(JOY_HDR::MASKS) - 1
-        ldx     #.sizeof(JOY_HDR::MASKS)-1
-@L1:    lda     (ptr1),y
-        sta     _joy_masks,x
-        dey
-        dex
-        bpl     @L1
-
 ; Copy the jump vectors
 
         ldy     #JOY_HDR::JUMPTAB
         ldx     #0
-@L2:    inx                             ; Skip the JMP opcode
+@L1:    inx                             ; Skip the JMP opcode
         jsr     copy                    ; Copy one byte
         jsr     copy                    ; Copy one byte
         cpy     #(JOY_HDR::JUMPTAB + .sizeof(JOY_HDR::JUMPTAB))
-        bne     @L2
+        bne     @L1
 
         jsr     joy_install             ; Call driver install routine
         tay                             ; Test error code
-        bne     @L3                     ; Bail out if install had errors
+        bne     @L2                     ; Bail out if install had errors
 
 ; Install the IRQ vector if the driver needs it. A/X contains the error code
 ; from joy_install, so don't use it.
 
         ldy     joy_irq+2               ; Check high byte of IRQ vector
-        beq     @L3                     ; Jump if vector invalid
+        beq     @L2                     ; Jump if vector invalid
         ldy     #$4C                    ; JMP opcode
         sty     joy_irq                 ; Activate IRQ routine
-@L3:    rts
+@L2:    rts
 
 ; Driver signature invalid
 

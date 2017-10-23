@@ -1,3 +1,4 @@
+#include <pce.h>
 #include <conio.h>
 #include <time.h>
 #include <joystick.h>
@@ -97,14 +98,14 @@ void main(void)
                         j = joy_read (i);
                         cprintf ("pad %d: %02x %-6s%-6s%-6s%-6s%-6s%-6s%-6s%-6s",
                                 i, j,
-                                (j & joy_masks[JOY_UP])?    "  up  " : " ---- ",
-                                (j & joy_masks[JOY_DOWN])?  " down " : " ---- ",
-                                (j & joy_masks[JOY_LEFT])?  " left " : " ---- ",
-                                (j & joy_masks[JOY_RIGHT])? "right " : " ---- ",
-                                (j & joy_masks[JOY_FIRE])?  " fire " : " ---- ",
-                                (j & joy_masks[JOY_FIRE2])? "fire2 " : " ---- ",
-                                (j & joy_masks[JOY_SELECT])? "select" : " ---- ",
-                                (j & joy_masks[JOY_RUN])?   " run  " : " ---- ");
+                                JOY_UP(j)?     "  up  " : " ---- ",
+                                JOY_DOWN(j)?   " down " : " ---- ",
+                                JOY_LEFT(j)?   " left " : " ---- ",
+                                JOY_RIGHT(j)?  "right " : " ---- ",
+                                JOY_BTN_I(j)?  "btn I " : " ---- ",
+                                JOY_BTN_II(j)? "btn II" : " ---- ",
+                                JOY_SELECT(j)? "select" : " ---- ",
+                                JOY_RUN(j)?    " run  " : " ---- ");
                 }
 
                 gotoxy(xsize - 10, 3);
@@ -123,7 +124,7 @@ void main(void)
                                 p[8],p[9],p[10],p[11],p[12],p[13],p[14],p[15]);
                 }
 
-                waitvblank();
+                waitvsync();
                 ++n;
         }
 }

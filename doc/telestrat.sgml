@@ -9,10 +9,7 @@
 <date>2017-01-22
 
 <abstract>
-
-An overview over the Telestrat (Telemon 2.4 & Telemon 3.x : http://orix.oric.org) runtime system as it is implemented for the cc65 C
-compiler.)
-
+An overview over the Telestrat (Telemon 2.4 & Telemon 3.x : http://orix.oric.org) runtime system as it is implemented for the cc65 C compiler.
 </abstract>
 
 <!-- Table of contents -->

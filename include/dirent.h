@@ -107,7 +107,7 @@ struct dirent {
 
 #define _DE_ISREG(t)    (((t) & _CBM_T_REG) != 0)
 #define _DE_ISDIR(t)    ((t) == _CBM_T_DIR)
-#define _DE_ISLBL(t)    ((t) == _CBM_T_HDR)
+#define _DE_ISLBL(t)    ((t) == _CBM_T_HEADER)
 #define _DE_ISLNK(t)    ((t) == _CBM_T_LNK)
 
 #elif defined(__LYNX__)

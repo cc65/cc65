@@ -1,5 +1,5 @@
 ;
-; 2017-11-06, Piotr Fusik
+; 2017-11-07, Piotr Fusik
 ;
 ; unsigned __fastcall__ inflatemem (char* dest, const char* source);
 ;
@@ -344,6 +344,9 @@ buildHuffmanTree_clear:
 buildHuffmanTree_countCodeLengths:
         ldx     literalSymbolCodeLength,y
         inc     nBitCode_literalCount,x
+        bne     buildHuffmanTree_notAllLiterals
+        stx     allLiteralsCodeLength
+buildHuffmanTree_notAllLiterals:
         cpy     #CONTROL_SYMBOLS
         bcs     buildHuffmanTree_noControlSymbol
         ldx     controlSymbolCodeLength,y
@@ -394,12 +397,33 @@ fetchCode_nextBit:
         jsr     getBit
         rol     a
         inx
+        bcs     fetchCode_ge256
+; are all 256 literal codes of this length?
+        cpx     allLiteralsCodeLength
+        beq     fetchCode_allLiterals
+; is it literal code of length X?
         sec
         sbc     nBitCode_literalCount,x
-        bcc     fetchCode_literal
+        bcs     fetchCode_notLiteral
+; literal code
+;       clc
+        adc     nBitCode_literalOffset,x
+        tax
+        lda     codeToLiteralSymbol,x
+fetchCode_allLiterals:
+        clc
+        rts
+; code >= 256, must be control
+fetchCode_ge256:
+;       sec
+        sbc     nBitCode_literalCount,x
+        sec
+; is it control code of length X?
+fetchCode_notLiteral:
 ;       sec
         sbc     nBitCode_controlCount,x
         bcs     fetchCode_nextBit
+; control code
 ;       clc
         adc     nBitCode_controlOffset,x
         tax
@@ -407,13 +431,6 @@ fetchCode_nextBit:
         and     #$1f    ; make distance symbols zero-based
         tax
 ;       sec
-        rts
-fetchCode_literal:
-;       clc
-        adc     nBitCode_literalOffset,x
-        tax
-        lda     codeToLiteralSymbol,x
-        clc
         rts
 
 ; Read A minus 1 bits, but no more than 8
@@ -523,6 +540,8 @@ nBitCode_literalOffset:
         .res    2*TREE_SIZE
 nBitCode_controlOffset:
         .res    2*TREE_SIZE
+allLiteralsCodeLength:
+        .res    1
 
 codeToLiteralSymbol:
         .res    256

@@ -171,6 +171,7 @@ XSOUND           = $44
 XMUSIC           = $45 
 XZAP             = $46
 XSHOOT           = $47
+XMKDIR           = $4B          ; create a folder. Only available in telemon 3.x
 XSOUT            = $67          ; send A register to RS232, available in telemon 2.4 & 3.x
 XHRSSE           = $8C          ; set hires position cursor
 XDRAWA           = $8D          ; draw a line 

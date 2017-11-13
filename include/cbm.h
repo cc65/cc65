@@ -209,6 +209,7 @@ void __fastcall__ cbm_k_setnam (const char* Name);
 void __fastcall__ cbm_k_talk (unsigned char dev);
 void cbm_k_udtim (void);
 void cbm_k_unlsn (void);
+void cbm_k_untlk (void);
 
 
 

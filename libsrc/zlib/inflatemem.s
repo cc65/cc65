@@ -1,5 +1,5 @@
 ;
-; 2017-02-12, Piotr Fusik
+; 2017-11-07, Piotr Fusik
 ;
 ; unsigned __fastcall__ inflatemem (char* dest, const char* source);
 ;
@@ -103,7 +103,7 @@ inflate_blockLoop:
 ;       ldy     #0
         sty     getBit_buffer   ; ignore bits until byte boundary
         jsr     getWord         ; skip the length we don't need
-        jsr     getWord         ; get the two's complement length
+        jsr     getWord         ; get the one's complement length
         sta     inflateStored_pageCounter
         bcs     inflateStored_firstByte ; jmp
 inflateStored_copyByte:
@@ -332,7 +332,7 @@ inflateDynamic_storeControl:
 ; Build Huffman trees basing on code lengths (in bits)
 ; stored in the *SymbolCodeLength arrays
 buildHuffmanTree:
-; Clear nBitCode_totalCount, nBitCode_literalCount, nBitCode_controlCount
+; Clear nBitCode_literalCount, nBitCode_controlCount
         tya
 ;       lda     #0
 buildHuffmanTree_clear:
@@ -344,22 +344,23 @@ buildHuffmanTree_clear:
 buildHuffmanTree_countCodeLengths:
         ldx     literalSymbolCodeLength,y
         inc     nBitCode_literalCount,x
-        inc     nBitCode_totalCount,x
+        bne     buildHuffmanTree_notAllLiterals
+        stx     allLiteralsCodeLength
+buildHuffmanTree_notAllLiterals:
         cpy     #CONTROL_SYMBOLS
         bcs     buildHuffmanTree_noControlSymbol
         ldx     controlSymbolCodeLength,y
         inc     nBitCode_controlCount,x
-        inc     nBitCode_totalCount,x
 buildHuffmanTree_noControlSymbol:
         iny
         bne     buildHuffmanTree_countCodeLengths
 ; Calculate offsets of symbols sorted by code length
 ;       lda     #0
-        ldx     #$100-3*TREE_SIZE
+        ldx     #$100-4*TREE_SIZE
 buildHuffmanTree_calculateOffsets:
-        sta     nBitCode_literalOffset+3*TREE_SIZE-$100,x
+        sta     nBitCode_literalOffset+4*TREE_SIZE-$100,x
         clc
-        adc     nBitCode_literalCount+3*TREE_SIZE-$100,x
+        adc     nBitCode_literalCount+4*TREE_SIZE-$100,x
         inx
         bne     buildHuffmanTree_calculateOffsets
 ; Put symbols in their place in the sorted array
@@ -396,26 +397,40 @@ fetchCode_nextBit:
         jsr     getBit
         rol     a
         inx
+        bcs     fetchCode_ge256
+; are all 256 literal codes of this length?
+        cpx     allLiteralsCodeLength
+        beq     fetchCode_allLiterals
+; is it literal code of length X?
         sec
-        sbc     nBitCode_totalCount,x
-        bcs     fetchCode_nextBit
-;       clc
-        adc     nBitCode_controlCount,x
-        bcs     fetchCode_control
+        sbc     nBitCode_literalCount,x
+        bcs     fetchCode_notLiteral
+; literal code
 ;       clc
         adc     nBitCode_literalOffset,x
         tax
         lda     codeToLiteralSymbol,x
+fetchCode_allLiterals:
         clc
         rts
-fetchCode_control:
+; code >= 256, must be control
+fetchCode_ge256:
 ;       sec
-        adc     nBitCode_controlOffset-1,x
+        sbc     nBitCode_literalCount,x
+        sec
+; is it control code of length X?
+fetchCode_notLiteral:
+;       sec
+        sbc     nBitCode_controlCount,x
+        bcs     fetchCode_nextBit
+; control code
+;       clc
+        adc     nBitCode_controlOffset,x
         tax
-        lda     codeToControlSymbol-1,x
+        lda     codeToControlSymbol,x
         and     #$1f    ; make distance symbols zero-based
         tax
-        sec
+;       sec
         rts
 
 ; Read A minus 1 bits, but no more than 8
@@ -517,16 +532,16 @@ controlSymbolCodeLength:
 ; Huffman trees.
 
 nBitCode_clearFrom:
-nBitCode_totalCount:
-        .res    2*TREE_SIZE
 nBitCode_literalCount:
-        .res    TREE_SIZE
+        .res    2*TREE_SIZE
 nBitCode_controlCount:
         .res    2*TREE_SIZE
 nBitCode_literalOffset:
-        .res    TREE_SIZE
+        .res    2*TREE_SIZE
 nBitCode_controlOffset:
         .res    2*TREE_SIZE
+allLiteralsCodeLength:
+        .res    1
 
 codeToLiteralSymbol:
         .res    256

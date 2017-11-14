@@ -79,6 +79,7 @@ COUNT:
 
 READJOY:
         lda     JOY_DATA
+        eor     #$FF
         ldx     #0
         rts
 

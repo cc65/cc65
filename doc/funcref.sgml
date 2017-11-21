@@ -4,7 +4,7 @@
 <title>cc65 function reference
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
-<date>2017-09-02
+<date>2017-11-21
 
 <abstract>
 cc65 is a C compiler for 6502 based systems. This function reference describes
@@ -352,10 +352,10 @@ function.
 
 <sect1><tt/gamate.h/<label id="gamate.h"><p>
 
-<!-- <itemize> -->
+<itemize>
 <!-- <item><ref id="get_tv" name="get_tv"> -->
-<!-- <item><ref id="waitvblank" name="waitvblank"> -->
-<!-- </itemize> -->
+<item><ref id="waitvsync" name="waitvsync">
+</itemize>
 
 (incomplete)
 
@@ -437,10 +437,10 @@ function.
 
 <sect1><tt/nes.h/<label id="nes.h"><p>
 
-<!-- <itemize> -->
+<itemize>
 <!-- <item><ref id="get_tv" name="get_tv"> -->
-<!-- <item><ref id="waitvsync" name="waitvsync"> -->
-<!-- </itemize> -->
+<item><ref id="waitvsync" name="waitvsync">
+</itemize>
 
 (incomplete)
 
@@ -455,10 +455,10 @@ It does not declare any functions.
 
 <sect1><tt/pce.h/<label id="pce.h"><p>
 
-<!-- <itemize> -->
+<itemize>
 <!-- <item><ref id="get_tv" name="get_tv"> -->
-<!-- <item><ref id="waitvblank" name="waitvblank"> -->
-<!-- </itemize> -->
+<item><ref id="waitvsync" name="waitvsync">
+</itemize>
 
 (incomplete)
 
@@ -7607,6 +7607,23 @@ used in presence of a prototype.
 <ref id="fast" name="fast">,
 <ref id="slow" name="slow">,
 <ref id="toggle_videomode" name="toggle_videomode">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>waitvsync<label id="waitvsync"><p>
+
+<quote>
+<descrip>
+<tag/Function/Wait until the start of the next frame.
+<tag/Header/
+<tt/<ref id="gamate.h" name="gamate.h">/,
+<tt/<ref id="nes.h" name="nes.h">/,
+<tt/<ref id="pce.h" name="pce.h">/
+<tag/Declaration/<tt/void waitvsync (void);/
+<tag/Description/Wait for vertical sync to reduce flickering.
+<tag/Availability/Platforms above
 <tag/Example/None.
 </descrip>
 </quote>

@@ -44,6 +44,13 @@ by an external program. Such an utility is provided in util/gamate/gamate-fixcar
 Programs containing Gamate specific code may use the <tt/gamate.h/ header file.
 
 
+<sect1>Gamate specific functions<p>
+
+<itemize>
+<item>waitvsync</item>
+</itemize>
+
+
 <sect1>Hardware access<p>
 
 The following pseudo variables declared in the <tt/gamate.inc/ include file do

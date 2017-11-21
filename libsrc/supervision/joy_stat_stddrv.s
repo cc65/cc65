@@ -7,6 +7,6 @@
 ;
 
         .export         _joy_static_stddrv
-        .import         _gamate_stdjoy_joy
+        .import         _supervision_stdjoy_joy
 
-_joy_static_stddrv      := _gamate_stdjoy_joy
+_joy_static_stddrv      := _supervision_stdjoy_joy

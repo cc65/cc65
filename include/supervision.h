@@ -125,6 +125,9 @@ extern unsigned char sv_timer_dma_counter;
 #define JOY_START(v)    ((v) & JOY_START_MASK)
 #define JOY_SELECT(v)   ((v) & JOY_SELECT_MASK)
 
+/* No support for dynamically loadable drivers */
+#define DYN_DRV 0
+
 /* The addresses of the static drivers */
 extern void supervision_stdjoy_joy[]; /* Referred to by joy_static_stddrv[] */
 

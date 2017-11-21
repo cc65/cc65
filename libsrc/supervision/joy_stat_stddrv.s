@@ -9,6 +9,4 @@
         .export         _joy_static_stddrv
         .import         _supervision_stdjoy_joy
 
-.rodata
-
 _joy_static_stddrv      := _supervision_stdjoy_joy

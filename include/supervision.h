@@ -105,9 +105,10 @@ extern unsigned char sv_nmi_counter;
 extern unsigned char sv_timer_irq_counter;
 extern unsigned char sv_timer_dma_counter;
 
+/* The addresses of the static drivers */
+extern void supervision_stdjoy_joy[]; /* Referred to by joy_static_stddrv[] */
+
 
 
 /* End of supervision.h */
 #endif
-
-

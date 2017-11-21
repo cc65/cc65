@@ -17,6 +17,7 @@
 #include <string.h> /* for memset */
 #include <time.h>
 #include <conio.h>
+#include <cbm.h>
 
 
 
@@ -60,9 +61,9 @@
 
 
 #ifdef DOVSYNC
-#  define waitvsync() while ((signed char)VIC.ctrl1 >= 0)
+#  define WAITVSYNC() waitvsync()
 #else
-#  define waitvsync()
+#  define WAITVSYNC()
 #endif
 
 
@@ -203,12 +204,12 @@ int main (void)
     while (!kbhit()) {
         /* Build page 1, then make it visible */
         fire (SCREEN1);
-        waitvsync ();
+        WAITVSYNC ();
         outb (&VIC.addr, PAGE1);
 
         /* Build page 2, then make it visible */
         fire (SCREEN2);
-        waitvsync ();
+        WAITVSYNC ();
         outb (&VIC.addr, PAGE2);
 
         /* Count frames */

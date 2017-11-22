@@ -184,6 +184,7 @@ function.
 <!-- <item><ref id="cbm_save" name="cbm_save"> -->
 <!-- <item><ref id="cbm_write" name="cbm_write"> -->
 <!-- <item><ref id="get_tv" name="get_tv"> -->
+<item><ref id="waitvsync" name="waitvsync">
 <item><ref id="kbrepeat" name="kbrepeat">
 </itemize>
 
@@ -362,7 +363,7 @@ function.
 
 <sect1><tt/geos.h/<label id="geos.h"><p>
 
-(incomplete)
+<url url="geos.html" name="GEOS API">.
 
 
 <sect1><tt/joystick.h/<label id="joystick.h"><p>
@@ -7618,6 +7619,7 @@ used in presence of a prototype.
 <descrip>
 <tag/Function/Wait until the start of the next frame.
 <tag/Header/
+<tt/<ref id="cbm.h" name="cbm.h">/,
 <tt/<ref id="gamate.h" name="gamate.h">/,
 <tt/<ref id="nes.h" name="nes.h">/,
 <tt/<ref id="pce.h" name="pce.h">/

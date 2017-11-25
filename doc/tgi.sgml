@@ -11,52 +11,7 @@ Include the tgi.h header file to get the necessary definitions.
 </abstract>
 
 <!-- Table of contents -->
-<itemize>
-<item><ref id="tgi_arc" name="tgi_arc">
-<item><ref id="tgi_bar" name="tgi_bar">
-<item><ref id="tgi_circle" name="tgi_circle">
-<item><ref id="tgi_clear" name="tgi_clear">
-<item><ref id="tgi_done" name="tgi_done">
-<item><ref id="tgi_ellipse" name="tgi_ellipse">
-<item><ref id="tgi_free_vectorfont" name="tgi_free_vectorfont">
-<item><ref id="tgi_getaspectratio" name="tgi_getaspectratio">
-<item><ref id="tgi_getcolor" name="tgi_getcolor">
-<item><ref id="tgi_getcolorcount" name="tgi_getcolorcount">
-<item><ref id="tgi_getdefpalette" name="tgi_getdefpalette">
-<item><ref id="tgi_geterror" name="tgi_geterror">
-<item><ref id="tgi_geterrormsg" name="tgi_geterrormsg">
-<item><ref id="tgi_getmaxcolor" name="tgi_getmaxcolor">
-<item><ref id="tgi_getmaxx" name="tgi_getmaxx">
-<item><ref id="tgi_getmaxy" name="tgi_getmaxy">
-<item><ref id="tgi_getpagecount" name="tgi_getpagecount">
-<item><ref id="tgi_getpalette" name="tgi_getpalette">
-<item><ref id="tgi_getpixel" name="tgi_getpixel">
-<item><ref id="tgi_gettextheight" name="tgi_gettextheight">
-<item><ref id="tgi_gettextwidth" name="tgi_gettextwidth">
-<item><ref id="tgi_getxres" name="tgi_getxres">
-<item><ref id="tgi_getyres" name="tgi_getyres">
-<item><ref id="tgi_gotoxy" name="tgi_gotoxy">
-<item><ref id="tgi_init" name="tgi_init">
-<item><ref id="tgi_install" name="tgi_install">
-<item><ref id="tgi_install_vectorfont" name="tgi_install_vectorfont">
-<item><ref id="tgi_ioctl" name="tgi_ioctl">
-<item><ref id="tgi_line" name="tgi_line">
-<item><ref id="tgi_lineto" name="tgi_lineto">
-<item><ref id="tgi_load_driver" name="tgi_load_driver">
-<item><ref id="tgi_load_vectorfont" name="tgi_load_vectorfont">
-<item><ref id="tgi_outtext" name="tgi_outtext">
-<item><ref id="tgi_outtextxy" name="tgi_outtextxy">
-<item><ref id="tgi_setaspectratio" name="tgi_setaspectratio">
-<item><ref id="tgi_setcolor" name="tgi_setcolor">
-<item><ref id="tgi_setdrawpage" name="tgi_setdrawpage">
-<item><ref id="tgi_setpalette" name="tgi_setpalette">
-<item><ref id="tgi_setpixel" name="tgi_setpixel">
-<item><ref id="tgi_setviewpage" name="tgi_setviewpage">
-<item><ref id="tgi_settextscale" name="tgi_settextscale">
-<item><ref id="tgi_settextstyle" name="tgi_settextstyle">
-<item><ref id="tgi_uninstall" name="tgi_uninstall">
-<item><ref id="tgi_unload" name="tgi_unload">
-</itemize>
+<toc>
 
 <!-- Begin the document -->
 

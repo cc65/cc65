@@ -5,7 +5,7 @@
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:polluks@sdf.lonestar.org" name="Stefan A. Haubenthal">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
-<date>2017-11-26
+<date>2017-11-30
 
 <abstract>
 The cc65 library provides functions for platform independent graphics.
@@ -392,6 +392,46 @@ be used in presence of a prototype.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
 <tag/Declaration/<tt/unsigned char __fastcall__ tgi_getpixel (int x, int y);/
 <tag/Description/Get the color of a pixel from the viewpage.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/Other tgi functions.
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_gettextheight<label id="tgi_gettextheight"><p>
+
+<quote>
+<descrip>
+<tag/Function/Calculate the height of the text in pixels according to
+the current text style.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/unsigned __fastcall__ tgi_gettextheight (const char* s);/
+<tag/Description/Calculate the height of the text in pixels according to
+the current text style.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/Other tgi functions.
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_gettextwidth<label id="tgi_gettextwidth"><p>
+
+<quote>
+<descrip>
+<tag/Function/Calculate the width of the text in pixels according to the current text style.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/unsigned __fastcall__ tgi_gettextwidth (const char* s);/
+<tag/Description/Calculate the width of the text in pixels according to the current text style.
 <tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
@@ -854,57 +894,6 @@ be used in presence of a prototype.
 </quote>
 
 
-<sect1>tgi_setviewpage<label id="tgi_setviewpage"><p>
-
-<quote>
-<descrip>
-<tag/Function/Set page to be visible on screen.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void __fastcall__ tgi_setviewpage (unsigned char page);/
-<tag/Description/If the drawpage and the viewpage are the same then all drawing
-is seen immediately as it is drawn. For double buffered games you can set the
-drawpage to a different page than the viewpage. This lets you draw the next
-screen in the background and when the screen is ready you display it.
-<tag/Notes/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/Other tgi functions.
-<tag/Example/<verb>
-tgi_setdrawpage(1);
-tgi_outtextxy(10, 10, "Hello World");
-tgi_setviewpage(1); // Show page 1
-tgi_setdrawpage(0);
-tgi_outtextxy(10, 10, "Creating next frame");
-...
-tgi_setviewpage(0); // Show page 0
-</verb>
-</descrip>
-</quote>
-
-
-<sect1>tgi_gettextheight<label id="tgi_gettextheight"><p>
-
-<quote>
-<descrip>
-<tag/Function/Calculate the height of the text in pixels according to
-the current text style.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/unsigned __fastcall__ tgi_gettextheight (const char* s);/
-<tag/Description/Calculate the height of the text in pixels according to
-the current text style.
-<tag/Notes/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/Other tgi functions.
-<tag/Example/None.
-</descrip>
-</quote>
-
-
 <sect1>tgi_settextscale<label id="tgi_settextscale"><p>
 
 <quote>
@@ -947,21 +936,32 @@ be used in presence of a prototype.
 </quote>
 
 
-<sect1>tgi_gettextwidth<label id="tgi_gettextwidth"><p>
+<sect1>tgi_setviewpage<label id="tgi_setviewpage"><p>
 
 <quote>
 <descrip>
-<tag/Function/Calculate the width of the text in pixels according to the current text style.
+<tag/Function/Set page to be visible on screen.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/unsigned __fastcall__ tgi_gettextwidth (const char* s);/
-<tag/Description/Calculate the width of the text in pixels according to the current text style.
+<tag/Declaration/<tt/void __fastcall__ tgi_setviewpage (unsigned char page);/
+<tag/Description/If the drawpage and the viewpage are the same then all drawing
+is seen immediately as it is drawn. For double buffered games you can set the
+drawpage to a different page than the viewpage. This lets you draw the next
+screen in the background and when the screen is ready you display it.
 <tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/Other tgi functions.
-<tag/Example/None.
+<tag/Example/<verb>
+tgi_setdrawpage(1);
+tgi_outtextxy(10, 10, "Hello World");
+tgi_setviewpage(1); // Show page 1
+tgi_setdrawpage(0);
+tgi_outtextxy(10, 10, "Creating next frame");
+...
+tgi_setviewpage(0); // Show page 0
+</verb>
 </descrip>
 </quote>
 

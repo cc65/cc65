@@ -15,7 +15,7 @@
 #define LF 0x0a
 
 // Lookup table of keys, given keyboard row and bit numbers.
-const unsigned char keys[8][8] = {
+static const unsigned char keys[8][8] = {
     { 0,   0,   0,    0,    0,  ESC,   0,  0  }, // Row 0
     { 0, 'p', ';',  '/',  ' ',  'z', 'a', 'q' }, // Row 1
     { 0, ',', 'm',  'n',  'b',  'v', 'c', 'x' }, // Row 2
@@ -27,7 +27,7 @@ const unsigned char keys[8][8] = {
 };
 
 // Table of bitmasks for active keys in each row.
-const unsigned char columnMask[8] = {
+static const unsigned char columnMask[8] = {
     0x20, // Row 0, only ESC key
     0xfe, // Row 1
     0xfe, // Row 2
@@ -39,12 +39,12 @@ const unsigned char columnMask[8] = {
 };
 
 // Bit masks for modifier keys.
-const unsigned char controlMask = 0x40; // Control
-const unsigned char shiftMask = 0x06;   // Left Shift, Right Shift
-const unsigned char lockMask = 0x01;    // Shift Lock
+static const unsigned char controlMask = 0x40; // Control
+static const unsigned char shiftMask = 0x06;   // Left Shift, Right Shift
+static const unsigned char lockMask = 0x01;    // Shift Lock
 
 // Holds last key pressed.
-unsigned char lastKey = 0;
+static unsigned char lastKey = 0;
 
 /*
  * Write to keyboard to select row.
@@ -160,7 +160,7 @@ char cgetc (void)
         key = lastKey; // If so, use it.
         lastKey = 0; // Then clear it.
     } else {
-        while ((key = getkey()) != 0)
+        while ((key = getkey()) == 0)
             ; // Wait for key to be pressed.
     }
     return key;

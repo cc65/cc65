@@ -241,12 +241,11 @@ OPC_BIT_abx = $3C
 ; OPC_NOP   = $44               ; doublet
 ; OPC_NOP   = $4B               ; doublet
 
-OPC_EOR_izp = $52               
+OPC_EOR_izp = $52
 ; OPC_NOP   = $53               ; doublet
 ; OPC_NOP   = $54               ; doublet
 ; OPC_NOP   = $5A               ; doublet
 ; OPC_NOP   = $5B               ; doublet
-OPC_EOR_abx = $5C
 
 ; OPC_NOP   = $62               ; doublet
 ; OPC_NOP   = $63               ; doublet

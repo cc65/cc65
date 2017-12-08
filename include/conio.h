@@ -121,6 +121,9 @@ unsigned char wherey (void);
 void __fastcall__ cputc (char c);
 /* Output one character at the current cursor position */
 
+unsigned char cpeekc (void);
+/* Retrieve one character from the current cursor position */
+
 void __fastcall__ cputcxy (unsigned char x, unsigned char y, char c);
 /* Same as "gotoxy (x, y); cputc (c);" */
 

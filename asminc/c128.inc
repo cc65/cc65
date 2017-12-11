@@ -15,7 +15,7 @@ FNAM            := $BB          ; Address of filename
 FNAM_BANK       := $C7          ; Bank for filename
 KEY_COUNT       := $D0          ; Number of keys in input buffer
 FKEY_COUNT      := $D1          ; Characters for function key
-MODE            := $D7          ; 40/80 column mode flag
+MODE            := $D7          ; 40-/80-column mode (bit 7: 80 columns)
 CURS_X          := $EC          ; Cursor column
 CURS_Y          := $EB          ; Cursor row
 SCREEN_PTR      := $E0          ; Pointer to current char in text screen
@@ -167,8 +167,14 @@ SID_Read3       := $D41C
 ; ---------------------------------------------------------------------------
 ; I/O: VDC (128 only)
 
-VDC_INDEX       := $D600
-VDC_DATA        := $D601
+VDC_INDEX       := $D600        ; register address port
+VDC_DATA        := $D601        ; data port
+
+; Registers
+VDC_DATA_HI     = 18            ; video RAM address (big endian)
+VDC_DATA_LO     = 19
+VDC_CSET        = 28
+VDC_RAM_RW      = 31            ; RAM port
 
 ; ---------------------------------------------------------------------------
 ; I/O: Complex Interface Adapters

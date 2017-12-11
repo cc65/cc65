@@ -105,6 +105,7 @@ extern void pet_stdjoy_joy[];       /* Referred to by joy_static_stddrv[] */
 #define _textcolor(color)       COLOR_WHITE
 #define _bgcolor(color)         COLOR_BLACK
 #define _bordercolor(color)     COLOR_BLACK
+#define _cpeekcolor(color)      COLOR_WHITE
 
 
 

@@ -19,7 +19,7 @@
 #elif defined(__CBM610__)
 #  define SCREEN_RAM ((unsigned char*)0xD000)
 #elif defined(__PET__)
-#  define SCREEN_RAM ((unsigned char*)0x0800)
+#  define SCREEN_RAM ((unsigned char*)0x8000)
 #elif defined(__VIC20__)
 #  define SCREEN_RAM ((unsigned char*)0x1000)
 #else

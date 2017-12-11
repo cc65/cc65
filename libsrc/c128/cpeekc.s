@@ -26,7 +26,8 @@ _cpeekc:
 ; Convert the screen code into a PetSCII code.
 ; $00 - $1F: +$40
 ; $20 - $3F
-; $40 - $7F: +$80
+; $40 - $5f: +$20
+; $60 - $7F: +$40
 
         cmp     #$20
         bcs     @sk1            ;(bge)
@@ -35,9 +36,13 @@ _cpeekc:
 
 @sk1:   cmp     #$40
         bcc     @end            ;(blt)
-        ora     #$80
-@end:   ldx     #0
-        rts
+        cmp     #$60
+        bcc     @sk2            ;(blt)
+        ;sec
+        adc     #$20 - $01
+@sk2:   ;clc                    ; both above cmp and adc clear carry flag
+        adc     #$20
+@end:   rts
 
 @c80:
         lda     SCREEN_PTR

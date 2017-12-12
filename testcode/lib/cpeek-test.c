@@ -16,6 +16,7 @@
 #  define SCREEN_RAM ((unsigned char*)0x0C00)
 #elif defined(__CBM510__)
 #  define SCREEN_RAM ((unsigned char*)0xF000)
+#  define COLOR_RAM ((unsigned char*)0xd400)
 #elif defined(__CBM610__)
 #  define SCREEN_RAM ((unsigned char*)0xD000)
 #elif defined(__PET__)
@@ -77,6 +78,18 @@ static unsigned char peekChWithoutTranslation (void)
 #endif
 }
 
+/* as above, but for color ram */
+static unsigned char peekColWithoutTranslation (void)
+{
+#if defined(__CBM610__) || defined (__PET__)
+    return COLOR_WHITE;
+#elif defined(__C128__) || defined(__C64__) || defined(__VIC20__) || defined(__CBM510__)
+    return COLOR_RAM[wherey () * width + wherex ()] & 0x0f;
+#else
+    return COLOR_RAM[wherey () * width + wherex ()];
+#endif
+}
+
 
 /* A test which outputs the given char, reads it back from
 ** screen memory, outputs the returned char at the next position,
@@ -133,6 +146,7 @@ static unsigned char testCPeekC (char ch)
         revers(0);
         cprintf ("\r\nError on char: %#x was %#x instead.", ch, ch2_a);
         cprintf ("\r\nRaw screen codes: %#x, %#x.", ch2_b, ch2_c);
+        cprintf ("\r\nscreen width: %#d", width);
         return 0;
     }
 
@@ -143,18 +157,70 @@ static unsigned char testCPeekC (char ch)
     return 1;
 }
 
+static unsigned char testCPeekCol (char ch)
+{
+    unsigned char ch2_a, ch2_b, ch2_c;
+
+    /* Output the char to the screen. */
+    textcolor (ch);
+    cputc ('*');
+
+    /* Move the cursor pos. to the previous output. */
+    chBack ();
+
+    /* Get back the written char without any translation. */
+    ch2_b = peekColWithoutTranslation ();
+
+    /* Get back the written char,
+    ** including the translation, screen-code -> text.
+    */
+    ch2_a = cpeekcolor ();
+
+    /* Move the cursor to the following writing position. */
+    chForth ();
+
+    /* Output again the char which was read back by cpeekc(). */
+    textcolor (ch2_a);
+    cputc ('x');
+
+    /* Move the cursor pos. to the second output. */
+    chBack ();
+
+    /* Get back the second written char without any translation;
+    ** and, compare it to the first untranslated char.
+    */
+    ch2_c = peekColWithoutTranslation ();
+    if (ch2_c != ch2_b) {
+        /* The test was NOT succesful.
+        ** Output a diagnostic; and, return FAILURE.
+        */
+        revers(0);
+        cprintf ("\r\nError on color: %#x was %#x instead.", ch, ch2_a);
+        cprintf ("\r\nRaw color codes: %#x, %#x.", ch2_b, ch2_c);
+        return 0;
+    }
+
+    /* The test was succesful.
+    ** Move the cursor to the following writing position.
+    */
+    chForth ();
+    return 1;
+}
 
 /* The main code initiates the screen for the tests, and sets the reverse flag.
 ** Then, it calls testCPeekC() for every char within 0..255.
+** Then, it calls testCPeekCol() for each color
 ** Returns zero for success, one for failure.
 */
 int main (void)
 {
-    unsigned char i;
+    unsigned char i, c1, c2;
+    char s[10];
     int ret = 0;
 
     clrscr ();
     revers (1);
+    textcolor(1);
     screensize (&width, &i);
 
 #if defined(__VIC20__)
@@ -166,10 +232,39 @@ int main (void)
     do {
         if (!testCPeekC (i)) {
             ret = 1;
-            break;
+            goto exiterror;
         }
     } while (++i != 0);         /* will wrap around when finished */
 
+    /* test colors */
+    clrscr ();
+    revers (0);
+#if defined (__CBM610__) || defined (__PET__)
+    cprintf("no COLOR_RAM\n\r");
+#else
+    cprintf("COLOR_RAM at $%04x\n\r", COLOR_RAM);
+#endif
+    do {
+        if (!testCPeekCol (i)) {
+            ret = 1;
+            goto exiterror;
+        }
+    } while (++i != 16);        /* max 16 colors */
+
+    /* test revers */
+    textcolor(1); cputc('\n'); cputc('\r');
+    revers(0); cputc('*'); chBack (); c1 = cpeekrevers(); chForth();
+    revers(1); cputc('*'); chBack (); c2 = cpeekrevers(); chForth();
+    cputc('\n'); cputc('\r');
+    revers(c1); cputc('*'); 
+    revers(c2); cputc('*'); 
+
+    /* test cpeeks() */
+    revers(0);
+    cprintf("\n\rtest1234"); gotox(0); cpeeks(s, 8); cputs("\n");
+    cputs(s);
+
+exiterror:
     if (doesclrscrafterexit()) {
         cgetc();
     }

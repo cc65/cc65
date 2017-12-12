@@ -1,0 +1,17 @@
+An implementation of booth's algorithm for 8x8 multiplication written for ca65, and
+a demonstration of how to call it using __fastcall__ conventions from C.
+
+Compiled for 6502 (65C02 people could probably add a few fancy instructions).
+
+To keep it simple, this uses the sim65 environment, but apart from some I/O in the
+test application, it's almost all about CPU.
+
+"sim65 boothtest compare" runs all possible combinations of signed 8x8 multiplication 
+using the booth algorithm and compares it to the standard routines. 
+
+"sim65 -c boothtest regular" and "sim65 -c boothtest booth" can be used as an elementary
+comparison of performance. Yes, it's the cycle count for the whole program,
+not for the booth multiply alone. But it gives some interesting results.
+
+Rob Burbidge
+prandeamus@btinternet.com

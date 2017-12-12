@@ -2,6 +2,7 @@
 ** revers(), and textcolor() for the full range of character codes.
 **
 ** 2017-07-15, Greg King
+** 2017-12-12, Groepaz
 */
 
 #include <conio.h>
@@ -139,7 +140,12 @@ static unsigned char testCPeekC (char ch)
     ** and, compare it to the first untranslated char.
     */
     ch2_c = peekChWithoutTranslation ();
-    if (ch2_c != ch2_b) {
+    if ((ch2_c != ch2_b)
+#if defined(__C128__)
+        /* VDC memory is not accessable */
+        && (width == 40)
+#endif
+        ){
         /* The test was NOT succesful.
         ** Output a diagnostic; and, return FAILURE.
         */
@@ -190,7 +196,12 @@ static unsigned char testCPeekCol (char ch)
     ** and, compare it to the first untranslated char.
     */
     ch2_c = peekColWithoutTranslation ();
-    if (ch2_c != ch2_b) {
+    if ((ch2_c != ch2_b)
+#if defined(__C128__)
+        /* VDC memory is not accessable */
+        && (width == 40)
+#endif
+        ){
         /* The test was NOT succesful.
         ** Output a diagnostic; and, return FAILURE.
         */
@@ -221,6 +232,7 @@ int main (void)
     clrscr ();
     revers (1);
     textcolor(1);
+    bgcolor(0);
     screensize (&width, &i);
 
 #if defined(__VIC20__)
@@ -236,14 +248,29 @@ int main (void)
         }
     } while (++i != 0);         /* will wrap around when finished */
 
-    /* test colors */
-    clrscr ();
-    revers (0);
-#if defined (__CBM610__) || defined (__PET__)
-    cprintf("no COLOR_RAM\n\r");
-#else
-    cprintf("COLOR_RAM at $%04x\n\r", COLOR_RAM);
+#if defined(__VIC20__)
+    cgetc();
 #endif
+
+    /* test colors */
+#if defined(__VIC20__)
+    clrscr ();
+#endif
+    revers (0);
+    textcolor(1);
+
+#if defined (__CBM610__) || defined (__PET__)
+    cprintf("\n\rno COLOR_RAM\n\r");
+#elif defined (__C128__)
+    if (width == 40) {
+        cprintf("\n\rCOLOR_RAM at $%04x\n\r", COLOR_RAM);
+    } else {
+        cprintf("\n\rno COLOR_RAM\n\r");
+    }
+#else
+    cprintf("\n\rCOLOR_RAM at $%04x\n\r", COLOR_RAM);
+#endif
+
     do {
         if (!testCPeekCol (i)) {
             ret = 1;
@@ -253,11 +280,11 @@ int main (void)
 
     /* test revers */
     textcolor(1); cputc('\n'); cputc('\r');
-    revers(0); cputc('*'); chBack (); c1 = cpeekrevers(); chForth();
-    revers(1); cputc('*'); chBack (); c2 = cpeekrevers(); chForth();
+    revers(0); cputc('x'); chBack (); c1 = cpeekrevers(); chForth();
+    revers(1); cputc('X'); chBack (); c2 = cpeekrevers(); chForth();
     cputc('\n'); cputc('\r');
-    revers(c1); cputc('*'); 
-    revers(c2); cputc('*'); 
+    revers(c1); cputc('o'); 
+    revers(c2); cputc('O'); 
 
     /* test cpeeks() */
     revers(0);

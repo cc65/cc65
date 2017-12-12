@@ -8,7 +8,7 @@
 
         .import         popax
         .importzp       ptr1, ptr2, ptr3, tmp1, tmp2
-        .importzp       CURS_X, SCREEN_PTR
+        .importzp       CURS_X, CharPtr
 
         .include        "cbm610.inc"
         .macpack        generic
@@ -21,8 +21,8 @@ _cpeeks:
         eor     #>$FFFF
         sta     ptr3+1
 
-        lda     SCREEN_PTR
-        ldx     SCREEN_PTR+1
+        lda     CharPtr
+        ldx     CharPtr+1
         sta     ptr2
         stx     ptr2+1
         ldy     CURS_X

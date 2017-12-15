@@ -58,7 +58,7 @@
 
         wFactor1 = ptr1 ; First factor - bits are rotated
         wFactor2 = ptr2 ; Second factor - sign extended into ptr3
-        lProduct = ptr4 ; 32-bit product tmp1,tmp2,tmp3,tmp4
+        lProduct = tmp1 ; 32-bit product tmp1,tmp2,tmp3,tmp4
         
 ; 8-bit multiply bFactor1*bFactor2->wProduct using Booth's algorithm
 ; Compared to a regular multiplication, this will reduce the number of

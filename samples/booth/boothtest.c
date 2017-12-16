@@ -32,7 +32,8 @@ void do_regular8x8() {
 }
 
 void do_regular16x16() {
-    int32_t x,y,z;
+    int16_t x,y;
+    int32_t z;
     for(x=-500;x<=500;++x) {
         for(y=-500;y<=500;++y) {
             z=regular16x16((int16_t)x,(int16_t)y);
@@ -49,16 +50,15 @@ void do_booth8x8() {
     }   
 }
 
-
 void do_booth16x16() {
-    int32_t x,y,z;
+    int16_t x,y;
+    int32_t z;
     for(x=-500;x<=500;++x) {
         for(y=-500;y<=500;++y) {
             z=booth16x16((int16_t)x,(int16_t)y);
         }
     }   
 }
-
 
 /* 
  * Regression test: compare booth 8x8 to internal multiply routines 
@@ -80,19 +80,20 @@ void compare_booth_regular_8x8() {
  */
  
 void compare_booth_regular_16x16() {
-    int32_t x,y, boothProduct, product;
+    int16_t x,y;
+    int32_t boothProduct, product;
     for(x=-500;x<=500;++x) {
         for(y=-500;y<=500;++y) {            
             boothProduct = booth16x16((int16_t)x, (int16_t)y);
             product = regular16x16((int16_t)x, (int16_t)y);
-            /*assert(boothProduct==product);*/
-            if(boothProduct != product) {
-                printf("%d x %d expected %08lx, got %08lx\n", (int16_t)x, (int16_t)y, (int32_t)product, (int32_t)boothProduct);
-                assert(0);
-            }
+            assert(boothProduct==product);
         }
     }
 }
+
+/*
+ * Print usage
+ */
 
 void usage() {
     puts("Usage: boothtest compare[8|16]|regular[8|16]|booth[8|16]\n"); 
@@ -101,6 +102,7 @@ void usage() {
 /*
  * Simple test/benchmark framework
  */
+
 int main(int argc, char**argv) {
     if (argc != 2) {
         usage();

@@ -115,17 +115,15 @@ function.
 <sect1><tt/atmos.h/<label id="atmos.h"><p>
 
 <itemize>
+<item><ref id="atmos_explode" name="atmos_explode">
 <item><ref id="atmos_load" name="atmos_load">
+<item><ref id="atmos_ping" name="atmos_ping">
 <item><ref id="atmos_save" name="atmos_save">
-<!-- <item><ref id="atmos_explode" name="atmos_explode"> -->
-<!-- <item><ref id="atmos_ping" name="atmos_ping"> -->
-<!-- <item><ref id="atmos_shoot" name="atmos_shoot"> -->
-<!-- <item><ref id="atmos_tick" name="atmos_tick"> -->
-<!-- <item><ref id="atmos_tock" name="atmos_tock"> -->
-<!-- <item><ref id="atmos_zap" name="atmos_zap"> -->
+<item><ref id="atmos_shoot" name="atmos_shoot">
+<item><ref id="atmos_tick" name="atmos_tick">
+<item><ref id="atmos_tock" name="atmos_tock">
+<item><ref id="atmos_zap" name="atmos_zap">
 </itemize>
-
-(incomplete)
 
 
 <sect1><tt/c128.h/<label id="c128.h"><p>
@@ -674,6 +672,20 @@ communication.
 <item><ref id="strxfrm" name="strxfrm">
 <item><ref id="strupper" name="strupper">
 <item><ref id="strupr" name="strupr">
+</itemize>
+
+(incomplete)
+
+
+<sect1><tt/telestrat.h/<label id="telestrat.h"><p>
+
+<itemize>
+<item><ref id="atmos_explode" name="explode">
+<item><ref id="atmos_ping" name="ping">
+<item><ref id="atmos_shoot" name="shoot">
+<item><ref id="atmos_zap" name="zap">
+<!-- <item><ref id="kbdclick1" name="kbdclick1"> -->
+<!-- <item><ref id="oups" name="oups"> -->
 </itemize>
 
 (incomplete)
@@ -1338,6 +1350,30 @@ used in presence of a prototype.
 </quote>
 
 
+<sect1>atmos_explode<label id="atmos_explode"><p>
+
+<quote>
+<descrip>
+<tag/Function/Bomb sound effect.
+<tag/Header/<tt/<ref id="atmos.h" name="atmos.h">/
+<tag/Declaration/<tt/void __fastcall__ atmos_explode(void);/
+<tag/Description/<tt/atmos_explode/ plays the BASIC sound.
+<tag/Notes/<itemize>
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="atmos_ping" name="atmos_ping">,
+<ref id="atmos_shoot" name="atmos_shoot">,
+<ref id="atmos_tick" name="atmos_tick">,
+<ref id="atmos_tock" name="atmos_tock">,
+<ref id="atmos_zap" name="atmos_zap">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>atmos_load<label id="atmos_load"><p>
 
 <quote>
@@ -1353,6 +1389,30 @@ only in the presence of a prototype.
 <tag/Availability/cc65
 <tag/See also/
 <ref id="atmos_save" name="atmos_save">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>atmos_ping<label id="atmos_ping"><p>
+
+<quote>
+<descrip>
+<tag/Function/Bell or ricochet sound effect.
+<tag/Header/<tt/<ref id="atmos.h" name="atmos.h">/
+<tag/Declaration/<tt/void __fastcall__ atmos_ping(void);/
+<tag/Description/<tt/atmos_ping/ plays the BASIC sound.
+<tag/Notes/<itemize>
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="atmos_explode" name="atmos_explode">,
+<ref id="atmos_shoot" name="atmos_shoot">,
+<ref id="atmos_tick" name="atmos_tick">,
+<ref id="atmos_tock" name="atmos_tock">,
+<ref id="atmos_zap" name="atmos_zap">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -1376,6 +1436,102 @@ only in the presence of a prototype.
 <tag/Example/<verb>
 atmos_save("hires", 0xa000, 0xc000);
 </verb>
+</descrip>
+</quote>
+
+
+<sect1>atmos_shoot<label id="atmos_shoot"><p>
+
+<quote>
+<descrip>
+<tag/Function/Pistol sound effect.
+<tag/Header/<tt/<ref id="atmos.h" name="atmos.h">/
+<tag/Declaration/<tt/void __fastcall__ atmos_shoot(void);/
+<tag/Description/<tt/atmos_shoot/ plays the BASIC sound.
+<tag/Notes/<itemize>
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="atmos_explode" name="atmos_explode">,
+<ref id="atmos_ping" name="atmos_ping">,
+<ref id="atmos_tick" name="atmos_tick">,
+<ref id="atmos_tock" name="atmos_tock">,
+<ref id="atmos_zap" name="atmos_zap">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>atmos_tick<label id="atmos_tick"><p>
+
+<quote>
+<descrip>
+<tag/Function/High-pitch click.
+<tag/Header/<tt/<ref id="atmos.h" name="atmos.h">/
+<tag/Declaration/<tt/void __fastcall__ atmos_tick(void);/
+<tag/Description/<tt/atmos_tick/ plays the system sound.
+<tag/Notes/<itemize>
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="atmos_explode" name="atmos_explode">,
+<ref id="atmos_ping" name="atmos_ping">,
+<ref id="atmos_shoot" name="atmos_shoot">,
+<ref id="atmos_tock" name="atmos_tock">,
+<ref id="atmos_zap" name="atmos_zap">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>atmos_tock<label id="atmos_tock"><p>
+
+<quote>
+<descrip>
+<tag/Function/Low-pitch click.
+<tag/Header/<tt/<ref id="atmos.h" name="atmos.h">/
+<tag/Declaration/<tt/void __fastcall__ atmos_tock(void);/
+<tag/Description/<tt/atmos_tock/ plays the system sound.
+<tag/Notes/<itemize>
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="atmos_explode" name="atmos_explode">,
+<ref id="atmos_ping" name="atmos_ping">,
+<ref id="atmos_shoot" name="atmos_shoot">,
+<ref id="atmos_tick" name="atmos_tick">,
+<ref id="atmos_zap" name="atmos_zap">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>atmos_zap<label id="atmos_zap"><p>
+
+<quote>
+<descrip>
+<tag/Function/Raygun sound effect.
+<tag/Header/<tt/<ref id="atmos.h" name="atmos.h">/
+<tag/Declaration/<tt/void __fastcall__ atmos_zap(void);/
+<tag/Description/<tt/atmos_zap/ plays the BASIC sound.
+<tag/Notes/<itemize>
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="atmos_explode" name="atmos_explode">,
+<ref id="atmos_ping" name="atmos_ping">,
+<ref id="atmos_shoot" name="atmos_shoot">,
+<ref id="atmos_tick" name="atmos_tick">,
+<ref id="atmos_tock" name="atmos_tock">
+<tag/Example/None.
 </descrip>
 </quote>
 

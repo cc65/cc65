@@ -15,35 +15,35 @@ L1:     jmp     PING1
 .endproc
 
 .proc   _atmos_shoot
-        lda     $31
+        bit     $31
         bvs     L1      ; Atmos?
         jmp SHOOT
 L1:     jmp SHOOT1
 .endproc
 
 .proc   _atmos_explode
-        lda     $31
+        bit     $31
         bvs     L1      ; Atmos?
         jmp EXPLODE
 L1:     jmp EXPLODE1
 .endproc
 
 .proc   _atmos_zap
-        lda     $31
+        bit     $31
         bvs     L1      ; Atmos?
         jmp ZAP
 L1:     jmp ZAP1
 .endproc
 
 .proc   _atmos_tick
-        lda     $31
+        bit     $31
         bvs     L1      ; Atmos?
         jmp TICK
 L1:     jmp TICK1
 .endproc
 
 .proc   _atmos_tock
-        lda     $31
+        bit     $31
         bvs     L1      ; Atmos?
         jmp TOCK
 L1:     jmp TOCK1

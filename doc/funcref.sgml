@@ -4,7 +4,7 @@
 <title>cc65 function reference
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
-<date>2017-11-21
+<date>2017-12-09
 
 <abstract>
 cc65 is a C compiler for 6502 based systems. This function reference describes
@@ -182,6 +182,7 @@ function.
 <!-- <item><ref id="cbm_save" name="cbm_save"> -->
 <!-- <item><ref id="cbm_write" name="cbm_write"> -->
 <!-- <item><ref id="get_tv" name="get_tv"> -->
+<item><ref id="waitvsync" name="waitvsync">
 <item><ref id="kbrepeat" name="kbrepeat">
 </itemize>
 
@@ -237,6 +238,10 @@ function.
 <item><ref id="chline" name="chline">
 <item><ref id="chlinexy" name="chlinexy">
 <item><ref id="clrscr" name="clrscr">
+<item><ref id="cpeekc" name="cpeekc">
+<item><ref id="cpeekcolor" name="cpeekcolor">
+<item><ref id="cpeekrevers" name="cpeekrevers">
+<item><ref id="cpeeks" name="cpeeks">
 <item><ref id="cprintf" name="cprintf">
 <item><ref id="cputc" name="cputc">
 <item><ref id="cputcxy" name="cputcxy">
@@ -360,7 +365,7 @@ function.
 
 <sect1><tt/geos.h/<label id="geos.h"><p>
 
-(incomplete)
+<url url="geos.html" name="GEOS API">.
 
 
 <sect1><tt/joystick.h/<label id="joystick.h"><p>
@@ -2513,6 +2518,121 @@ be used in presence of a prototype.
 <tag/See also/
 <ref id="opendir" name="opendir">,
 <ref id="readdir" name="readdir">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cpeekc<label id="cpeekc"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get a character from the display memory.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/char cpeekc (void);/
+<tag/Description/The function gets the character that's at the current location
+of the cursor in the display screen RAM.  That character is converted, if
+needed, into the encoding that can be passed to <tt/cputc()/.
+<tag/Notes/<itemize>
+<item>Conio peek functions don't have <tt/cpeek...xy()/ versions.  That was
+done to make it obvious that peeking doesn't move the cursor in any way.  Your
+program must place the cursor where it wants to peek before it calls any of
+those functions.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cpeekcolor" name="cpeekcolor">,
+<ref id="cpeekrevers" name="cpeekrevers">,
+<ref id="cpeeks" name="cpeeks">,
+<ref id="cputc" name="cputc">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cpeekcolor<label id="cpeekcolor"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get a color from the display memory.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/unsigned char cpeekcolor (void);/
+<tag/Description/The function gets the color number that's at the current
+location of the cursor in the display screen RAM.  That number can be passed to
+<tt/textcolor()/.
+<tag/Notes/<itemize>
+<item>Conio peek functions don't have <tt/cpeek...xy()/ versions.  That was
+done to make it obvious that peeking doesn't move the cursor in any way.  Your
+program must place the cursor where it wants to peek before it calls any of
+those functions.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cpeekc" name="cpeekc">,
+<ref id="cpeekrevers" name="cpeekrevers">,
+<ref id="cpeeks" name="cpeeks">,
+<ref id="cputc" name="cputc">,
+<ref id="textcolor" name="textcolor">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cpeekrevers<label id="cpeekrevers"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get a reverse-character attribute from the display memory.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/unsigned char cpeekrevers (void);/
+<tag/Description/The function gets the "reverse-mode" attribute of the
+character that's at the current location of the cursor in the display screen
+RAM.  It returns a boolean value (0/1) that can be passed to <tt/revers()/.
+<tag/Notes/<itemize>
+<item>Conio peek functions don't have <tt/cpeek...xy()/ versions.  That was
+done to make it obvious that peeking doesn't move the cursor in any way.  Your
+program must place the cursor where it wants to peek before it calls any of
+those functions.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cpeekc" name="cpeekc">,
+<ref id="cpeekcolor" name="cpeekcolor">,
+<ref id="cpeeks" name="cpeeks">,
+<ref id="cputc" name="cputc">,
+<ref id="revers" name="revers">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cpeeks<label id="cpeeks"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get a string from the display memory.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/void __fastcall__ cpeeks (char* s, unsigned length);/
+<tag/Description/The function gets a fixed-length string ('\0'-terminated) of
+characters that start at the current location of the cursor in the display
+screen RAM.  Those characters are converted, if needed, into the encoding that
+can be passed to <tt/cputs()/.  The first argument must point to a RAM area
+that's large enough to hold "length + 1" bytes.
+<tag/Notes/<itemize>
+<item>Conio peek functions don't have <tt/cpeek...xy()/ versions.  That was
+done to make it obvious that peeking doesn't move the cursor in any way.  Your
+program must place the cursor where it wants to peek before it calls any of
+those functions.
+<item>The function is available as only a fastcall function;
+so, it may be used only in the presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cpeekc" name="cpeekc">,
+<ref id="cpeekcolor" name="cpeekcolor">,
+<ref id="cpeekrevers" name="cpeekrevers">,
+<ref id="cputc" name="cputc">,
+<ref id="cputs" name="cputs">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -6757,6 +6877,7 @@ used in presence of a prototype.
 <descrip>
 <tag/Function/Wait until the start of the next frame.
 <tag/Header/
+<tt/<ref id="cbm.h" name="cbm.h">/,
 <tt/<ref id="gamate.h" name="gamate.h">/,
 <tt/<ref id="nes.h" name="nes.h">/,
 <tt/<ref id="pce.h" name="pce.h">/

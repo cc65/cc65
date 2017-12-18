@@ -148,6 +148,23 @@ int cscanf (const char* format, ...);
 int __fastcall__ vcscanf (const char* format, va_list ap);
 /* Like vscanf(), but uses direct keyboard input */
 
+char cpeekc (void);
+/* Return the character from the current cursor position */
+
+unsigned char cpeekcolor (void);
+/* Return the color from the current cursor position */
+
+unsigned char cpeekrevers (void);
+/* Return the reverse attribute from the current cursor position.
+** If the character is reversed, then return 1; return 0 otherwise.
+*/
+
+void __fastcall__ cpeeks (char* s, unsigned int length);
+/* Return a string of the characters that start at the current cursor position.
+** Put the string into the buffer to which "s" points.  The string will have
+** "length" characters, then will be '\0'-terminated.
+*/
+
 unsigned char __fastcall__ cursor (unsigned char onoff);
 /* If onoff is 1, a cursor is displayed when waiting for keyboard input. If
 ** onoff is 0, the cursor is hidden when waiting for keyboard input. The
@@ -223,6 +240,9 @@ void __fastcall__ cputhex16 (unsigned val);
 #endif
 #if defined(_bordercolor)
 #  define bordercolor(x)        _bordercolor(x)
+#endif
+#if defined(_cpeekcolor)
+#  define cpeekcolor(x)         _cpeekcolor(x)
 #endif
 
 

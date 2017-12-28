@@ -15,6 +15,13 @@
 
 soft80_cpeekc:
         jsr     soft80_cpeekchar
+        ;  0-1F -> A0-BF
+        ; 20-7F -> 20-7F
+        cmp     #$20
+        bcs     @sk
+        ;clc
+        adc     #$a0
+@sk:
         ldx     #0
         rts
 

@@ -153,7 +153,7 @@ static unsigned char testCPeekC (char ch)
     ch2_c = peekChWithoutTranslation ();
     if ((ch2_c != ch2_b)
 #if defined(__C128__) || defined(__C64__)
-        /* VDC memory is not accessable, soft80 has no "videoram" */
+        /* VDC memory is not accessible, soft80 has no "videoram" */
         && (width == 40)
 #endif
         ){

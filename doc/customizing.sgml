@@ -302,17 +302,16 @@ also forcing a BRK instruction into the CPU.
 The next step in customizing the cc65 toolset is creating a run-time
 library for the targeted hardware.  The recommended way to do this is to
 modify the platform-independent standard library of the cc65 distribution.
-It is named &quot;no-platform.lib&quot; in the lib directory of the
-cc65 distribution.
+It is named &quot;none.lib&quot; in the lib directory of the distribution.
 
-When using &quot;no-platform.lib&quot; we need to supply our own <tt>crt0</tt>
+When using &quot;none.lib&quot; we need to supply our own <tt>crt0</tt>
 module with custom startup code.  This is simply done by first copying the
 the library and giving it a new name, compiling the startup code with ca65,
 and finally using the ar65 archiver to add the module to the new library.
 The steps are shown below:
 
 <tscreen><verb>
-        cp /usr/local/share/cc65/lib/no-platform.lib sbc.lib
+        cp /usr/local/share/cc65/lib/none.lib sbc.lib
         ca65 crt0.s
         ar65 a sbc.lib crt0.o
 </verb></tscreen>

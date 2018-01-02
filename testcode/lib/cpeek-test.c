@@ -113,6 +113,17 @@ static unsigned char testCPeekC (char ch)
         return 1;
     }
 
+    /* toggle revers mode every few chars so cpeekc gets tested for both */
+    revers ((ch >> 3) & 1);
+
+    /* output additional space every now and then, that way not only even or only
+       odd half of the character cell will be tested */
+#if defined(__C64__)
+    if ((width == 80) && ((ch % 17) == 0)) {
+        cputc(' ');
+    }
+#endif
+
     /* Output the char to the screen. */
     cputc (ch);
 
@@ -141,8 +152,8 @@ static unsigned char testCPeekC (char ch)
     */
     ch2_c = peekChWithoutTranslation ();
     if ((ch2_c != ch2_b)
-#if defined(__C128__)
-        /* VDC memory is not accessable */
+#if defined(__C128__) || defined(__C64__)
+        /* VDC memory is not accessible, soft80 has no "videoram" */
         && (width == 40)
 #endif
         ){
@@ -230,7 +241,7 @@ int main (void)
     int ret = 0;
 
     clrscr ();
-    revers (1);
+    revers (0);
     textcolor(1);
     bgcolor(0);
     screensize (&width, &i);
@@ -261,7 +272,7 @@ int main (void)
 
 #if defined (__CBM610__) || defined (__PET__)
     cprintf("\n\rno COLOR_RAM\n\r");
-#elif defined (__C128__)
+#elif defined (__C128__) || defined (__C64__)
     if (width == 40) {
         cprintf("\n\rCOLOR_RAM at $%04x\n\r", COLOR_RAM);
     } else {

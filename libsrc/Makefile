@@ -33,7 +33,7 @@ TARGETS = apple2       \
           sim65c02     \
           supervision  \
           telestrat    \
-          none
+          no-platform
 
 DRVTYPES = emd \
            joy \

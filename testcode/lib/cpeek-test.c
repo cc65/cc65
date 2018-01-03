@@ -209,7 +209,7 @@ static unsigned char testCPeekCol (char ch)
     ch2_c = peekColWithoutTranslation ();
     if ((ch2_c != ch2_b)
 #if defined(__C128__)
-        /* VDC memory is not accessable */
+        /* VDC memory is not accessible */
         && (width == 40)
 #endif
         ){

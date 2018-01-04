@@ -81,6 +81,7 @@ SEGMENTS {
     ZEROPAGE: load = ZP,  type = zp,  define   = yes;
     DATA:     load = ROM, type = rw,  define   = yes, run = RAM;
     BSS:      load = RAM, type = bss, define   = yes;
+    HEAP:     load = RAM, type = bss, optional = yes;
     STARTUP:  load = ROM, type = ro;
     ONCE:     load = ROM, type = ro,  optional = yes;
     CODE:     load = ROM, type = ro;
@@ -94,6 +95,7 @@ The meaning of each of these segments is as follows.
 <p><tt>       ZEROPAGE:  </tt>Data in page 0, defined by ZP as starting at $0 with length $100
 <p><tt>       DATA:      </tt>Initialized data that can be modified by the program, stored in RAM
 <p><tt>       BSS:       </tt>Uninitialized data stored in RAM (used for variable storage)
+<p><tt>       HEAP:      </tt>Uninitialized C-level heap storage in RAM, optional
 <p><tt>       STARTUP:   </tt>The program initialization code, stored in ROM
 <p><tt>       ONCE:      </tt>The code run once to initialize the system, stored in ROM
 <p><tt>       CODE:      </tt>The program code, stored in ROM
@@ -300,20 +302,23 @@ also forcing a BRK instruction into the CPU.
 <sect>Custom Run-Time Library Creation<p>
 
 The next step in customizing the cc65 toolset is creating a run-time
-library for the targeted hardware.  The recommended way to do this is to
-modify the platform-independent standard library of the cc65 distribution.
-It is named &quot;none.lib&quot; in the lib directory of the distribution.
+library for the targeted hardware.  The easiest way to do this is to
+modify a standard library from the cc65 distribution.  In this example,
+there is no console I/O, mouse, joystick, etc. in the system, so it is
+most appropriate to use the simplest library as the base, which is for
+the Watara Supervision and is named &quot;supervision.lib&quot; in the
+lib directory of the distribution.
 
-When using &quot;none.lib&quot; we need to supply our own <tt>crt0</tt>
-module with custom startup code.  This is simply done by first copying the
-the library and giving it a new name, compiling the startup code with ca65,
-and finally using the ar65 archiver to add the module to the new library.
-The steps are shown below:
+The only modification required is to replace the <tt>crt0</tt> module in
+the supervision.lib library with custom startup code.  This is simply
+done by first copying the library and giving it a new name, compiling
+the startup code with ca65, and finally using the ar65 archiver to
+replace the module in the new library.  The steps are shown below:
 
 <tscreen><verb>
-        cp /usr/local/share/cc65/lib/none.lib sbc.lib
-        ca65 crt0.s
-        ar65 a sbc.lib crt0.o
+$ copy &quot;C:\Program Files\cc65\lib\supervision.lib&quot; sbc.lib
+$ ca65 crt0.s
+$ ar65 a sbc.lib crt0.o
 </verb></tscreen>
 
 <sect>Interrupt Service Routine Definition<p>
@@ -701,14 +706,14 @@ that can be used as the initialization data for the Xilinx Block RAM
 used for code storage:
 
 <tscreen><verb>
-        cc65 -t none -O --cpu 65sc02 main.c
-        ca65 --cpu 65sc02 main.s
-        ca65 --cpu 65sc02 rs232_tx.s
-        ca65 --cpu 65sc02 interrupt.s
-        ca65 --cpu 65sc02 vectors.s
-        ca65 --cpu 65sc02 wait.s
-        ld65 -C sbc.cfg -m main.map interrupt.o vectors.o wait.o
-                  rs232_tx.o main.o sbc.lib
+$ cc65 -t none -O --cpu 65sc02 main.c
+$ ca65 --cpu 65sc02 main.s
+$ ca65 --cpu 65sc02 rs232_tx.s
+$ ca65 --cpu 65sc02 interrupt.s
+$ ca65 --cpu 65sc02 vectors.s
+$ ca65 --cpu 65sc02 wait.s
+$ ld65 -C sbc.cfg -m main.map interrupt.o vectors.o wait.o rs232_tx.o
+          main.o sbc.lib
 </verb></tscreen>
 
 During the C-level code compilation phase (<tt>cc65</tt>), assumptions

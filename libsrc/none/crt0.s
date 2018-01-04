@@ -9,9 +9,6 @@
 
        .segment "STARTUP"
 
-       cld
-       ldx #$FF
-       txs
        lda #<(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
        ldx #<(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
        sta sp
@@ -22,4 +19,4 @@
 _exit: pha
        jsr donelib
        pla
-       brk
+       rts

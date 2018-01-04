@@ -2,7 +2,7 @@
        .export         __STARTUP__ : absolute = 1      ; Mark as startup
        .import         zerobss, _main
        .import         initlib, donelib
-       .import         __STACKSTART__, __STACKSIZE__   ; Linker generated
+       .import         __STACKSTART__                  ; Linker generated
 
        .include "zeropage.inc"
 

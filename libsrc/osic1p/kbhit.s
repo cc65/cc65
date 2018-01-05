@@ -11,6 +11,7 @@
 ;
 
         .export _kbhit
+        .import inputc
         .include "osic1p.inc"
         .include "extzp.inc"
         .include "zeropage.inc"
@@ -40,7 +41,7 @@ scan:
         sta     CHARBUF         ; No character in buffer
         rts
 keypressed:
-        jsr     INPUTC          ; Get input character in A
+        jsr     inputc          ; Get input character in A
         sta     CHARBUF         ; Save in buffer
         ldx     #$00            ; High byte of return is always zero
         lda     #$01            ; Return true

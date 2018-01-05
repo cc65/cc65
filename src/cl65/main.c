@@ -380,19 +380,14 @@ static void CmdPrint (CmdDesc* Cmd, FILE* F)
 static void SetTargetFiles (void)
 /* Set the target system files */
 {
-    /* Determine the names of the target specific library file */
-    if (Target != TGT_NONE) {
+    /* Get a pointer to the system name and its length */
+    const char* TargetName = GetTargetName (Target);
+    unsigned    TargetNameLen = strlen (TargetName);
 
-        /* Get a pointer to the system name and its length */
-        const char* TargetName = GetTargetName (Target);
-        unsigned    TargetNameLen = strlen (TargetName);
-
-        /* Set the library file */
-        TargetLib = xmalloc (TargetNameLen + 4 + 1);
-        memcpy (TargetLib, TargetName, TargetNameLen);
-        strcpy (TargetLib + TargetNameLen, ".lib");
-
-    }
+    /* Set the library file */
+    TargetLib = xmalloc (TargetNameLen + 4 + 1);
+    memcpy (TargetLib, TargetName, TargetNameLen);
+    strcpy (TargetLib + TargetNameLen, ".lib");
 }
 
 

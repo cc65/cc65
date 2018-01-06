@@ -1,6 +1,5 @@
-;
+; Booth multiply, 8x8 and 16x16 flavours
 ; Rob Burbidge, prandeamus@btinternet.com 
-; December 2017
 ;
         .include "zeropage.inc"        
         .export  _booth8x8, _booth16x16
@@ -129,8 +128,7 @@ loopNxt:
         ; Next loop
         dex                 ; preserves C
         bne loopTop
-
-exit:   
+        
         rts
 .endproc
 

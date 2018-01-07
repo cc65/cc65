@@ -5,20 +5,12 @@
         .export  _booth8x8, _booth16x16
         .import  popa,popax
 
-; C wrapper for signed integer 8x8
+; C wrapper for signed integer 8x8 (like cc65_imul8x8r16)
 ; int16_t __fastcall__ booth8x8(int8_t x, int8_t y);
 .proc   _booth8x8
-
-        sta bFactor2    ; Second parameter in A
-        jsr popa        ; First parameter on C stack
-        sta bFactor1
-
-        jsr booth8x8
-
-        lda wProduct    ; Return value in AX
-        ldx wProduct+1  
-        
-        rts
+        tax             ; Second parameter in A, to X
+        jsr popa        ; First parameter on C stack, to A
+        jmp booth8x8
 .endproc
 
 ; C wrapper for signed integer 16x16
@@ -59,21 +51,21 @@
         wFactor2 = ptr2 ; Second factor - sign extended into ptr3
         lProduct = tmp1 ; 32-bit product tmp1,tmp2,tmp3,tmp4
         
-; 8-bit multiply bFactor1*bFactor2->wProduct using Booth's algorithm
+; 8-bit multiply A*X->AX using Booth's algorithm. Y and status are trashed.
 ; Compared to a regular multiplication, this will reduce the number of
 ; 16-bit additions when there is a run of consecutive 1's or 0's in
-; the A parameter. On exit, AX contains the result. Y and status are trashed.
+; the A parameter. 
 
 .proc   booth8x8       
-        
-        ldy #0          ; Y=0 until further notice
 
-        ; Zero product (16-bit)
-        sty wProduct
+        ldy #0          ; Y=0 until further notice
+        sty wProduct    ; Zero product (16-bit)
         sty wProduct+1
+        
+        stx bFactor1
                 
-        ; Sign-extend bFactor2
-        lda bFactor2 
+        ; Store and sign-extend bFactor2
+        sta bFactor2
         ora #$7F        ; Now A is $FF or $7F
         bmi skipSgn     ; Skip if negative ($FF)
         tya             ; If zero/positive, set 0
@@ -88,12 +80,12 @@ loopTop:
         and bFactor1    ; Lowest bit of bFactor1. Sets S and Z, preserve C
 
         ; Logic for 00, 01, 10, 11 
-        ; Remember Z=1 means the low bit is zero)
-        bcs cSet
+        ; Z=1 means the low bit is zero
+        bcs cSet  
         beq loopNxt     ; C=0, Z=1
         bne minus       ; C=0, Z=0
 cSet:   bne loopNxt     ; C=1, Z=0
-        ;beq plus       ; C=1, Z=1 (Fall through, not a branch)
+        ;beq plus       ; C=1, Z=1 (Fall through)
         
 plus:   ; wProduct += bFactor2 (16 bit)
         clc
@@ -105,7 +97,7 @@ plus:   ; wProduct += bFactor2 (16 bit)
         sta wProduct+1
         
         jmp loopNxt
-        
+             
 minus:  ; wProduct -= bFactor2 (16 bit)
         sec
         lda wProduct
@@ -118,17 +110,13 @@ minus:  ; wProduct -= bFactor2 (16 bit)
         ; jmp loopNxt   ; Fall through
 
 loopNxt:
-        ; bFactor2 *= 2 (16-bit)
-        asl bFactor2
+        asl bFactor2     ; bFactor2 *= 2 (16-bit)
         rol bFactor2+1
-        
-        ; bFactor1 shift right, low bit into C
-        lsr bFactor1        ; Bit 0->C
-        
-        ; Next loop
-        dex                 ; preserves C
-        bne loopTop
-        
+        lsr bFactor1     ; bFactor1 shift right, low bit into C
+        dex              ; preserves C
+        bne loopTop        
+        ldx wProduct+1   ; Result into AX
+        lda wProduct
         rts
 .endproc
 

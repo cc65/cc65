@@ -43,6 +43,7 @@
 /* common */
 #include "fp.h"
 #include "inline.h"
+#include "inttypes.h"
 
 /* cc65 */
 #include "asmcode.h"
@@ -98,7 +99,7 @@ struct ExprDesc {
     struct SymEntry*    Sym;            /* Symbol table entry if known */
     Type*               Type;           /* Type array of expression */
     unsigned            Flags;
-    unsigned long       Name;           /* Name or label number */
+    uintptr_t           Name;           /* Name pointer or label number */
     long                IVal;           /* Integer value if expression constant */
     Double              FVal;           /* Floating point value */
     struct Literal*     LVal;           /* Literal value */

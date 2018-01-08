@@ -44,7 +44,6 @@
 #include "exprdesc.h"
 #include "stackptr.h"
 #include "symentry.h"
-#include "exprdesc.h"
 
 
 
@@ -361,7 +360,7 @@ void PrintExprDesc (FILE* F, ExprDesc* E)
     if (Sep != '(') {
         fputc (')', F);
     }
-    fprintf (F, "\nName:     0x%08lX\n", E->Name);
+    fprintf (F, "\nName:     0x%08lX\n", (unsigned long)E->Name);
 }
 
 

@@ -1,7 +1,7 @@
 /* expr.c
 **
 ** 1998-06-21, Ullrich von Bassewitz
-** 2015-06-26, Greg King
+** 2017-12-05, Greg King
 */
 
 
@@ -731,7 +731,7 @@ static void Primary (ExprDesc* E)
                 } else if ((Sym->Flags & SC_FUNC) == SC_FUNC) {
                     /* Function */
                     E->Flags = E_LOC_GLOBAL | E_RTYPE_LVAL;
-                    E->Name = (unsigned long) Sym->Name;
+                    E->Name = (uintptr_t) Sym->Name;
                 } else if ((Sym->Flags & SC_AUTO) == SC_AUTO) {
                     /* Local variable. If this is a parameter for a variadic
                     ** function, we have to add some address calculations, and the
@@ -754,7 +754,7 @@ static void Primary (ExprDesc* E)
                     /* Static variable */
                     if (Sym->Flags & (SC_EXTERN | SC_STORAGE)) {
                         E->Flags = E_LOC_GLOBAL | E_RTYPE_LVAL;
-                        E->Name = (unsigned long) Sym->Name;
+                        E->Name = (uintptr_t) Sym->Name;
                     } else {
                         E->Flags = E_LOC_STATIC | E_RTYPE_LVAL;
                         E->Name = Sym->V.Label;
@@ -798,7 +798,7 @@ static void Primary (ExprDesc* E)
                     Sym = AddGlobalSym (Ident, GetImplicitFuncType(), SC_EXTERN | SC_REF | SC_FUNC);
                     E->Type  = Sym->Type;
                     E->Flags = E_LOC_GLOBAL | E_RTYPE_RVAL;
-                    E->Name  = (unsigned long) Sym->Name;
+                    E->Name  = (uintptr_t) Sym->Name;
                 } else {
                     /* Undeclared Variable */
                     Sym = AddLocalSym (Ident, type_int, SC_AUTO | SC_REF, 0);
@@ -1308,7 +1308,7 @@ static void hie11 (ExprDesc *Expr)
                     ** Since we don't have a name, invent one.
                     */
                     ED_MakeConstAbs (Expr, 0, GetImplicitFuncType ());
-                    Expr->Name = (long) IllegalFunc;
+                    Expr->Name = (uintptr_t) IllegalFunc;
                 }
                 /* Call the function */
                 FunctionCall (Expr);

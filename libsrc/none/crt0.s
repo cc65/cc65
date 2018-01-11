@@ -9,7 +9,7 @@
        .segment "STARTUP"
 
        lda #<__STACKSTART__
-       lda #>__STACKSTART__
+       ldx #>__STACKSTART__
        sta sp
        stx sp+1
        jsr zerobss

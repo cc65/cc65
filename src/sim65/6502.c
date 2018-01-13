@@ -1266,6 +1266,8 @@ static void OPC_6502_6C (void)
         Cycles = 6;
         Regs.PC = MemReadWord(Lo);
     }
+    
+    ParaVirtHooks (&Regs);    
 }
 
 

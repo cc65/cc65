@@ -1278,6 +1278,8 @@ static void OPC_65C02_6C (void)
     /* 6502 bug fixed here */
     Cycles = 5;
     Regs.PC = MemReadWord (MemReadWord (Regs.PC+1));
+
+    ParaVirtHooks (&Regs);    
 }
 
 

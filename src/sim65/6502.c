@@ -1434,6 +1434,8 @@ static void OPC_65SC02_7C (void)
     PC = Regs.PC;
     Adr = MemReadWord (PC+1);
     Regs.PC = MemReadWord(Adr+Regs.XR);
+
+    ParaVirtHooks (&Regs);    
 }
 
 

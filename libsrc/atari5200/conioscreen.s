@@ -58,7 +58,7 @@ clrscr:         sta     (SAVMSC),y
                 rts
 
 
-                .segment "RODATA"
+                .segment "DLIST"
 
 ; display list for 20x24 text mode
 
@@ -77,6 +77,9 @@ dlist:          .repeat 3
                 .word   dlist
 
 ; end of display list
+
+.export         __DLISTSIZE__
+__DLISTSIZE__   = * - dlist
 
 .assert ((* >> 10) = (dlist >> 10)), error, "Display list crosses 1K boundary"
 

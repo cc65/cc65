@@ -78,9 +78,6 @@ dlist:          .repeat 3
 
 ; end of display list
 
-.export         __DLISTSIZE__
-__DLISTSIZE__   = * - dlist
-
 .assert ((* >> 10) = (dlist >> 10)), error, "Display list crosses 1K boundary"
 
                 .end

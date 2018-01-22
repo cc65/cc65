@@ -1,8 +1,9 @@
 ;
 ; Startup code for cc65 (Oric version)
 ;
-; By Debrune Jérôme <jede@oric.org> and Ullrich von Bassewitz <uz@cc65.org>
+; By Debrune JÃ©rÃ´me <jede@oric.org> and Ullrich von Bassewitz <uz@cc65.org>
 ; 2016-03-18, Greg King
+; 2018-01-19, Stefan Haubenthal
 ;
 
         .export         _exit
@@ -75,10 +76,11 @@ L1:     lda     sp,x
 
 ; Currently, color isn't supported on the text screen.
 ; Unprotect screen columns 0 and 1 (where each line's color codes would sit).
+; Turn cursor off.
 
         lda     STATUS
         sta     stsave
-        and     #%11011111
+        and     #%11011110
         sta     STATUS
 
 ; Set up the C stack.

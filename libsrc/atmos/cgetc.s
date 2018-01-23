@@ -6,7 +6,6 @@
 ;
 
         .export         _cgetc
-        .constructor    initcgetc
 
         .import         cursor
         .forceimport    disable_caps
@@ -53,14 +52,3 @@
 @L3:    rts
 
 .endproc
-
-; ------------------------------------------------------------------------
-; Switch the cursor off. Code goes into the ONCE segment,
-; which will be reused after it is run.
-
-.segment        "ONCE"
-
-initcgetc:
-        lsr     STATUS
-        asl     STATUS          ; Clear bit zero
-        rts

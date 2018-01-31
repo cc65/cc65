@@ -10,22 +10,19 @@
 
 
 initcwd:
-       
         ldx     #PWD_PTR
         BRK_TELEMON XVARS
-        
+
         sta     ptr1
         sty     ptr1+1
-        
+
         ldy     #$00
-        
-loop:        
+loop:
         lda     (ptr1),y
-        beq     done
         sta     __cwd,y
+        beq     done
         iny
         bne     loop
-       
-done:   
-        sta     __cwd,y
+
+done:
         rts

@@ -58,7 +58,7 @@ clrscr:         sta     (SAVMSC),y
                 rts
 
 
-                .segment "RODATA"
+                .segment "DLIST"
 
 ; display list for 20x24 text mode
 

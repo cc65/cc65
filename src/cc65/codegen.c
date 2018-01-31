@@ -40,6 +40,7 @@
 /* common */
 #include "check.h"
 #include "cpu.h"
+#include "inttypes.h"
 #include "strbuf.h"
 #include "xmalloc.h"
 #include "xsprintf.h"
@@ -92,7 +93,7 @@ static void CheckLocalOffs (unsigned Offs)
 
 
 
-static const char* GetLabelName (unsigned Flags, unsigned long Label, long Offs)
+static const char* GetLabelName (unsigned Flags, uintptr_t Label, long Offs)
 {
     static char Buf [256];              /* Label name */
 
@@ -119,7 +120,7 @@ static const char* GetLabelName (unsigned Flags, unsigned long Label, long Offs)
 
         case CF_ABSOLUTE:
             /* Absolute address */
-            xsprintf (Buf, sizeof (Buf), "$%04X", (int)((Label+Offs) & 0xFFFF));
+            xsprintf (Buf, sizeof (Buf), "$%04X", (unsigned)((Label+Offs) & 0xFFFF));
             break;
 
         case CF_REGVAR:
@@ -729,7 +730,7 @@ void g_getimmed (unsigned Flags, unsigned long Val, long Offs)
 
 
 
-void g_getstatic (unsigned flags, unsigned long label, long offs)
+void g_getstatic (unsigned flags, uintptr_t label, long offs)
 /* Fetch an static memory cell into the primary register */
 {
     /* Create the correct label name */
@@ -1008,7 +1009,7 @@ void g_leavariadic (int Offs)
 
 
 
-void g_putstatic (unsigned flags, unsigned long label, long offs)
+void g_putstatic (unsigned flags, uintptr_t label, long offs)
 /* Store the primary register into the specified static memory cell */
 {
     /* Create the correct label name */
@@ -1584,7 +1585,7 @@ void g_addlocal (unsigned flags, int offs)
 
 
 
-void g_addstatic (unsigned flags, unsigned long label, long offs)
+void g_addstatic (unsigned flags, uintptr_t label, long offs)
 /* Add a static variable to ax */
 {
     unsigned L;
@@ -1634,7 +1635,7 @@ void g_addstatic (unsigned flags, unsigned long label, long offs)
 
 
 
-void g_addeqstatic (unsigned flags, unsigned long label, long offs,
+void g_addeqstatic (unsigned flags, uintptr_t label, long offs,
                     unsigned long val)
 /* Emit += for a static variable */
 {
@@ -1857,7 +1858,7 @@ void g_addeqind (unsigned flags, unsigned offs, unsigned long val)
 
 
 
-void g_subeqstatic (unsigned flags, unsigned long label, long offs,
+void g_subeqstatic (unsigned flags, uintptr_t label, long offs,
                     unsigned long val)
 /* Emit -= for a static variable */
 {
@@ -2093,7 +2094,7 @@ void g_addaddr_local (unsigned flags attribute ((unused)), int offs)
 
 
 
-void g_addaddr_static (unsigned flags, unsigned long label, long offs)
+void g_addaddr_static (unsigned flags, uintptr_t label, long offs)
 /* Add the address of a static variable to ax */
 {
     /* Create the correct label name */
@@ -4276,7 +4277,7 @@ void g_initstatic (unsigned InitLabel, unsigned VarLabel, unsigned Size)
         g_getimmed (CF_STATIC, InitLabel, 0);
         AddCodeLine ("jsr pushax");
         g_getimmed (CF_INT | CF_UNSIGNED | CF_CONST, Size, 0);
-        AddCodeLine ("jsr %s", GetLabelName (CF_EXTERNAL, (unsigned long) "memcpy", 0));
+        AddCodeLine ("jsr %s", GetLabelName (CF_EXTERNAL, (uintptr_t) "memcpy", 0));
     }
 }
 

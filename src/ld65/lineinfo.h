@@ -155,11 +155,13 @@ INLINE const char* GetSourceNameFromList (const Collection* LineInfos)
 /* Return the name of a source file from a list of line infos */
 {
     /* The relevant entry is in slot zero */
-    return GetSourceName (CollConstAt (LineInfos, 0));
+    return CollCount(LineInfos) ? GetSourceName (CollConstAt (LineInfos, 0)) :
+                                  "<unknown>";
 }
 #else
 #  define GetSourceNameFromList(LineInfos)      \
-        GetSourceName ((const LineInfo*) CollConstAt ((LineInfos), 0))
+        (CollCount(LineInfos) ? GetSourceName ( \
+            (const LineInfo*) CollConstAt ((LineInfos), 0)) : "<unknown>")
 #endif
 
 #if defined(HAVE_INLINE)
@@ -167,11 +169,13 @@ INLINE unsigned GetSourceLineFromList (const Collection* LineInfos)
 /* Return the source file line from a list of line infos */
 {
     /* The relevant entry is in slot zero */
-    return GetSourceLine (CollConstAt (LineInfos, 0));
+    return CollCount(LineInfos) ? GetSourceLine (CollConstAt (LineInfos, 0)) :
+                                  0;
 }
 #else
 #  define GetSourceLineFromList(LineInfos)      \
-        GetSourceLine ((const LineInfo*) CollConstAt ((LineInfos), 0))
+        (CollCount(LineInfos) ? GetSourceLine ( \
+            (const LineInfo*) CollConstAt ((LineInfos), 0)) : 0)
 #endif
 
 unsigned LineInfoCount (void);

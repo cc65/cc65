@@ -35,7 +35,6 @@
         .addr   UNINSTALL
         .addr   COUNT
         .addr   READ
-        .addr   IRQ
 
 ; ------------------------------------------------------------------------
 ; Constants

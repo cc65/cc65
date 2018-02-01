@@ -33,7 +33,6 @@
         .addr   UNINSTALL
         .addr   COUNT
         .addr   READJOY
-        .addr   0               ; IRQ entry not used
 
 .code
 

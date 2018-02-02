@@ -7,9 +7,7 @@
 #ifndef _GGRAPH_H
 #define _GGRAPH_H
 
-#ifndef _GSTRUCT_H
 #include <geos/gstruct.h>
-#endif
 
 void __fastcall__ SetPattern(char newpattern);
 

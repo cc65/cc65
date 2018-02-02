@@ -45,9 +45,7 @@
 
 
 
-#ifndef _STDDEF_H
 #include <stddef.h>
-#endif
 
 
 

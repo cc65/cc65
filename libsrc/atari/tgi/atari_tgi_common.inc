@@ -68,7 +68,6 @@ libref: .addr   $0000                   ; Library reference
         .addr   BAR
         .addr   TEXTSTYLE
         .addr   OUTTEXT
-        .addr   0                       ; IRQ entry is unused
 
 ; ******************************************************************************
 

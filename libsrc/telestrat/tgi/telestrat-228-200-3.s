@@ -58,7 +58,6 @@ YSIZE   =       8               ; System font height
         .addr   CIRCLE
         .addr   TEXTSTYLE
         .addr   OUTTEXT
-        .addr   0               ; IRQ entry is unused
 
 ; ------------------------------------------------------------------------
 ; Data.

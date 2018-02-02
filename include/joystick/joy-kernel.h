@@ -59,7 +59,6 @@ typedef struct {
     void*               uninstall;      /* UNINSTALL routine */
     void*               count;          /* COUNT routine */
     void*               read;           /* READ routine */
-    void*               irq;            /* IRQ routine */
 
 } joy_drv_header;
 

@@ -54,40 +54,8 @@
 
 
 
-#if !defined(_STDARG_H)
-#  include <stdarg.h>
-#endif
-
-/* Include the correct machine-specific file */
-#if defined(__APPLE2ENH__)
-#  include <apple2enh.h>
-#elif defined(__APPLE2__)
-#  include <apple2.h>
-#elif defined(__ATARI5200__)
-#  include <atari5200.h>
-#elif defined(__ATARI__)
-#  include <atari.h>
-#elif defined(__ATMOS__)
-#  include <atmos.h>
-#elif defined(__CBM__)
-#  include <cbm.h>
-#elif defined(__CREATIVISION__)
-#  include <creativision.h>
-#elif defined(__GAMATE__)
-#  include <gamate.h>
-#elif defined(__GEOS__)
-#  include <geos.h>
-#elif defined(__LUNIX__)
-#  include <lunix.h>
-#elif defined(__LYNX__)
-#  include <lynx.h>
-#elif defined(__NES__)
-#  include <nes.h>
-#elif defined(__OSIC1P__)
-#  include <osic1p.h>
-#elif defined(__PCE__)
-#  include <pce.h>
-#endif
+#include <stdarg.h>
+#include <target.h>
 
 
 
@@ -232,16 +200,16 @@ void __fastcall__ cputhex16 (unsigned val);
 ** the macro will give access to the actual function.
 */
 
-#if defined(_textcolor)
+#ifdef _textcolor
 #  define textcolor(x)          _textcolor(x)
 #endif
-#if defined(_bgcolor)
+#ifdef _bgcolor
 #  define bgcolor(x)            _bgcolor(x)
 #endif
-#if defined(_bordercolor)
+#ifdef _bordercolor
 #  define bordercolor(x)        _bordercolor(x)
 #endif
-#if defined(_cpeekcolor)
+#ifdef _cpeekcolor
 #  define cpeekcolor(x)         _cpeekcolor(x)
 #endif
 

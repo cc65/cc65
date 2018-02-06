@@ -54,28 +54,28 @@ struct __sv_lcd {
     unsigned char       xpos;
     unsigned char       ypos;
 };
-#define SV_LCD  ((struct __sv_lcd*)0x2000)
+#define SV_LCD  (*(struct __sv_lcd*)0x2000)
 
 struct __sv_tone {
     unsigned            delay;
     unsigned char       control;
     unsigned char       timer;
 };
-#define SV_RIGHT ((struct __sv_tone*)0x2010)
-#define SV_LEFT  ((struct __sv_tone*)0x2014)
+#define SV_RIGHT (*(struct __sv_tone*)0x2010)
+#define SV_LEFT  (*(struct __sv_tone*)0x2014)
 
 struct __sv_noise {
     unsigned char       volume;         /* and frequency */
     unsigned char       timer;
     unsigned char       control;
 };
-#define SV_NOISE ((struct __sv_noise*)0x2028)
+#define SV_NOISE (*(struct __sv_noise*)0x2028)
 
 struct __io_port {
     unsigned char       in;
     unsigned char       out;
 };
-#define IO_PORT  ((struct __io_port*)(0x2021)
+#define IO_PORT  (*(struct __io_port*)0x2021)
 
 struct __sv_dma {
     unsigned            start;
@@ -83,7 +83,7 @@ struct __sv_dma {
     unsigned char       control;
     unsigned char       on;
 };
-#define SV_DMA   ((struct __sv_dma*)0x2018)
+#define SV_DMA   (*(struct __sv_dma*)0x2018)
 
 #define SV_CONTROL (*(unsigned char*)0x2020)
 

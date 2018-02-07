@@ -3466,6 +3466,9 @@ returns one of the constants<itemize>
 <tag/Header/<tt/<ref id="device.h" name="device.h">/
 <tag/Declaration/<tt/unsigned char getcurrentdevice (void);/
 <tag/Description/The function returns the current device.
+It allows to access the current device with the <ref id="dio.h"
+name="Low-level disk I/O API"> or <ref id="cbm.h" name="cbm_* I/O
+functions"> requiring a 'device' parameter.
 <tag/Notes/<itemize>
 <item>
 </itemize>
@@ -3475,7 +3478,7 @@ returns one of the constants<itemize>
 <ref id="getfirstdevice" name="getfirstdevice">,
 <ref id="getnextdevice" name="getnextdevice">
 <tag/Example/<verb>
-puts (getdevicedir (getcurrentdevice (), buf, sizeof buf));
+dio_open (getcurrentdevice ());
 </verb>
 </descrip>
 </quote>
@@ -3506,7 +3509,9 @@ be used in presence of a prototype.
 <tag/Function/Get device directory.
 <tag/Header/<tt/<ref id="device.h" name="device.h">/
 <tag/Declaration/<tt/char* __fastcall__ getdevicedir (unsigned char device, char* buf, size_t size);/
-<tag/Description/The function returns the current directory of <tt/device/.
+<tag/Description/The function returns the directory representing <tt/device/.
+It allows to access the device on filesystem level by calling chdir() with
+the directory returned.
 <tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
@@ -3518,7 +3523,7 @@ be used in presence of a prototype.
 <ref id="getfirstdevice" name="getfirstdevice">,
 <ref id="getnextdevice" name="getnextdevice">
 <tag/Example/<verb>
-puts (getdevicedir (getcurrentdevice (), buf, sizeof buf));
+chdir (getdevicedir (device, buf, sizeof buf));
 </verb>
 </descrip>
 </quote>
@@ -3555,7 +3560,7 @@ be used in presence of a prototype.
 <tag/Header/<tt/<ref id="device.h" name="device.h">/
 <tag/Declaration/<tt/unsigned char getfirstdevice (void);/
 <tag/Description/The function returns the first device.
-The value 255 indicates no device.
+The constant <tt/INVALID_DEVICE/ indicates no device.
 <tag/Notes/<itemize>
 <item>
 </itemize>
@@ -3566,7 +3571,7 @@ The value 255 indicates no device.
 <ref id="getnextdevice" name="getnextdevice">
 <tag/Example/<verb>
 unsigned char dev = getfirstdevice ();
-while (dev != 255) {
+while (dev != INVALID_DEVICE) {
         printf ("%d\n", dev);
         dev = getnextdevice (dev);
         }
@@ -3583,7 +3588,7 @@ while (dev != 255) {
 <tag/Header/<tt/<ref id="device.h" name="device.h">/
 <tag/Declaration/<tt/unsigned char __fastcall__ getnextdevice (unsigned char device);/
 <tag/Description/The function returns the next device after <tt/device/.
-The value 255 indicates no further device.
+The constant <tt/INVALID_DEVICE/ indicates no further device.
 <tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
@@ -3595,7 +3600,7 @@ be used in presence of a prototype.
 <ref id="getfirstdevice" name="getfirstdevice">
 <tag/Example/<verb>
 unsigned char dev = getfirstdevice ();
-while (dev != 255) {
+while (dev != INVALID_DEVICE) {
         printf ("%d\n", dev);
         dev = getnextdevice (dev);
         }

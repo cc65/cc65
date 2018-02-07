@@ -4,7 +4,7 @@
 <title>cc65 function reference
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
-<date>2018-02-06
+<date>2018-02-07
 
 <abstract>
 cc65 is a C compiler for 6502 based systems. This function reference describes
@@ -726,7 +726,7 @@ communication.
 <itemize>
 <!-- <item><ref id="chdir" name="chdir"> -->
 <item><ref id="exec" name="exec">
-<!-- <item><ref id="getcwd" name="getcwd"> -->
+<item><ref id="getcwd" name="getcwd">
 <item><ref id="getopt" name="getopt">
 <!-- <item><ref id="lseek" name="lseek"> -->
 <!-- <item><ref id="mkdir" name="mkdir"> -->
@@ -3477,6 +3477,24 @@ returns one of the constants<itemize>
 <tag/Example/<verb>
 puts (getdevicedir (getcurrentdevice (), buf, sizeof buf));
 </verb>
+</descrip>
+</quote>
+
+
+<sect1>getcwd<label id="getcwd"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get current working directory.
+<tag/Header/<tt/<ref id="unistd.h" name="unistd.h">/
+<tag/Declaration/<tt/char* __fastcall__ getcwd (char* buf, size_t size);/
+<tag/Description/The function will return the current working directory.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/POSIX 1003.1
+<tag/Example/None.
 </descrip>
 </quote>
 

@@ -1207,7 +1207,11 @@ static void EmitCode (EffAddr* A)
             break;
 
         case 1:
-            Emit1 (A->Opcode, A->Expr);
+            if (A->AddrModeBit & AM65_ALL_ZP) {
+                EmitZP (A->Opcode, A->Expr);
+            } else {
+                Emit1 (A->Opcode, A->Expr);
+            }
             break;
 
         case 2:

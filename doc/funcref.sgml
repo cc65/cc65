@@ -3513,6 +3513,8 @@ be used in presence of a prototype.
 It allows to access the device on filesystem level by calling chdir() with
 the directory returned.
 <tag/Notes/<itemize>
+<item>Calling getdevicedir() <em/does/ check for a (formatted) disk in a
+floppy-disk-type device and returns NULL if that check fails.
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -3525,6 +3527,7 @@ be used in presence of a prototype.
 <tag/Example/<verb>
 chdir (getdevicedir (device, buf, sizeof buf));
 </verb>
+cf. <tt/samples/enumdevdir.c/
 </descrip>
 </quote>
 

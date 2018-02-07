@@ -3524,6 +3524,29 @@ puts (getdevicedir (getcurrentdevice (), buf, sizeof buf));
 </quote>
 
 
+<sect1>getenv<label id="getenv"><p>
+
+<quote>
+<descrip>
+<tag/Function/Return a value from the environment.
+<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
+<tag/Declaration/<tt/char* __fastcall__ getenv (const char* name);/
+<tag/Description/The function searches the environment for an entry that
+matches <tt/name/ and returns its value. The environment consists of a list
+of strings in the form <tt/name=value/. If there is no match, <tt/getenv/
+returns <tt/NULL/.
+<tag/Notes/<itemize>
+<item>What exactly is stored in the environment depends on the machine the
+program is running on.
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>getfirstdevice<label id="getfirstdevice"><p>
 
 <quote>
@@ -3577,29 +3600,6 @@ while (dev != 255) {
         dev = getnextdevice (dev);
         }
 </verb>
-</descrip>
-</quote>
-
-
-<sect1>getenv<label id="getenv"><p>
-
-<quote>
-<descrip>
-<tag/Function/Return a value from the environment.
-<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
-<tag/Declaration/<tt/char* __fastcall__ getenv (const char* name);/
-<tag/Description/The function searches the environment for an entry that
-matches <tt/name/ and returns its value. The environment consists of a list
-of strings in the form <tt/name=value/. If there is no match, <tt/getenv/
-returns <tt/NULL/.
-<tag/Notes/<itemize>
-<item>What exactly is stored in the environment depends on the machine the
-program is running on.
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
-<tag/Availability/ISO 9899
-<tag/Example/None.
 </descrip>
 </quote>
 

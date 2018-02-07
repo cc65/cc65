@@ -3469,9 +3469,6 @@ returns one of the constants<itemize>
 It allows to access the current device with the <ref id="dio.h"
 name="Low-level disk I/O API"> or <ref id="cbm.h" name="cbm_* I/O
 functions"> requiring a 'device' parameter.
-<tag/Notes/<itemize>
-<item>
-</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="getdevicedir" name="getdevicedir">,
@@ -3564,9 +3561,6 @@ be used in presence of a prototype.
 <tag/Declaration/<tt/unsigned char getfirstdevice (void);/
 <tag/Description/The function returns the first device.
 The constant <tt/INVALID_DEVICE/ indicates no device.
-<tag/Notes/<itemize>
-<item>
-</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="getcurrentdevice" name="getcurrentdevice">,

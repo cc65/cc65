@@ -4,7 +4,7 @@
 <title>cc65 function reference
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
-<date>2017-12-09
+<date>2018-02-07
 
 <abstract>
 cc65 is a C compiler for 6502 based systems. This function reference describes
@@ -293,6 +293,16 @@ function.
 (incomplete)
 
 
+<sect1><tt/device.h/<label id="device.h"><p>
+
+<itemize>
+<item><ref id="getcurrentdevice" name="getcurrentdevice">
+<item><ref id="getdevicedir" name="getdevicedir">
+<item><ref id="getfirstdevice" name="getfirstdevice">
+<item><ref id="getnextdevice" name="getnextdevice">
+</itemize>
+
+
 <sect1><tt/dio.h/<label id="dio.h"><p>
 
 <url url="dio.html" name="Low-level disk I/O API">.
@@ -312,8 +322,6 @@ function.
 <item><ref id="seekdir" name="seekdir">
 <item><ref id="telldir" name="telldir">
 </itemize>
-
-(incomplete)
 
 
 <sect1><tt/em.h/<label id="em.h"><p>
@@ -661,9 +669,11 @@ communication.
 <item><ref id="strlen" name="strlen">
 <item><ref id="strlower" name="strlower">
 <item><ref id="strlwr" name="strlwr">
+<item><ref id="strncasecmp" name="strncasecmp">
 <item><ref id="strncat" name="strncat">
 <item><ref id="strncmp" name="strncmp">
 <item><ref id="strncpy" name="strncpy">
+<item><ref id="strnicmp" name="strnicmp">
 <item><ref id="strqtok" name="strqtok">
 <item><ref id="strrchr" name="strrchr">
 <item><ref id="strspn" name="strspn">
@@ -673,8 +683,6 @@ communication.
 <item><ref id="strupper" name="strupper">
 <item><ref id="strupr" name="strupr">
 </itemize>
-
-(incomplete)
 
 
 <sect1><tt/telestrat.h/<label id="telestrat.h"><p>
@@ -718,7 +726,7 @@ communication.
 <itemize>
 <!-- <item><ref id="chdir" name="chdir"> -->
 <item><ref id="exec" name="exec">
-<!-- <item><ref id="getcwd" name="getcwd"> -->
+<item><ref id="getcwd" name="getcwd">
 <item><ref id="getopt" name="getopt">
 <!-- <item><ref id="lseek" name="lseek"> -->
 <!-- <item><ref id="mkdir" name="mkdir"> -->
@@ -2930,9 +2938,9 @@ exits.
 <tag/Availability/cc65
 <tag/Example/<verb>
 /* Hello World */
-#include <stdio.h>
-#include <unistd.h>
-#include <cc65.h>
+#include &lt;stdio.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;cc65.h&gt;
 int main(void)
 {
     printf("Hello World\n");
@@ -3450,6 +3458,77 @@ returns one of the constants<itemize>
 </quote>
 
 
+<sect1>getcurrentdevice<label id="getcurrentdevice"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get current device.
+<tag/Header/<tt/<ref id="device.h" name="device.h">/
+<tag/Declaration/<tt/unsigned char getcurrentdevice (void);/
+<tag/Description/The function returns the current device.
+It allows to access the current device with the <ref id="dio.h"
+name="Low-level disk I/O API"> or <ref id="cbm.h" name="cbm_* I/O
+functions"> requiring a 'device' parameter.
+<tag/Notes/<itemize>
+<item>
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="getdevicedir" name="getdevicedir">,
+<ref id="getfirstdevice" name="getfirstdevice">,
+<ref id="getnextdevice" name="getnextdevice">
+<tag/Example/<verb>
+dio_open (getcurrentdevice ());
+</verb>
+</descrip>
+</quote>
+
+
+<sect1>getcwd<label id="getcwd"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get current working directory.
+<tag/Header/<tt/<ref id="unistd.h" name="unistd.h">/
+<tag/Declaration/<tt/char* __fastcall__ getcwd (char* buf, size_t size);/
+<tag/Description/The function will return the current working directory.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/POSIX 1003.1
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>getdevicedir<label id="getdevicedir"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get device directory.
+<tag/Header/<tt/<ref id="device.h" name="device.h">/
+<tag/Declaration/<tt/char* __fastcall__ getdevicedir (unsigned char device, char* buf, size_t size);/
+<tag/Description/The function returns the directory representing <tt/device/.
+It allows to access the device on filesystem level by calling chdir() with
+the directory returned.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="getcwd" name="getcwd">,
+<ref id="getcurrentdevice" name="getcurrentdevice">,
+<ref id="getfirstdevice" name="getfirstdevice">,
+<ref id="getnextdevice" name="getnextdevice">
+<tag/Example/<verb>
+chdir (getdevicedir (device, buf, sizeof buf));
+</verb>
+</descrip>
+</quote>
+
+
 <sect1>getenv<label id="getenv"><p>
 
 <quote>
@@ -3469,6 +3548,63 @@ be used in presence of a prototype.
 </itemize>
 <tag/Availability/ISO 9899
 <tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>getfirstdevice<label id="getfirstdevice"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get first device.
+<tag/Header/<tt/<ref id="device.h" name="device.h">/
+<tag/Declaration/<tt/unsigned char getfirstdevice (void);/
+<tag/Description/The function returns the first device.
+The constant <tt/INVALID_DEVICE/ indicates no device.
+<tag/Notes/<itemize>
+<item>
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="getcurrentdevice" name="getcurrentdevice">,
+<ref id="getdevicedir" name="getdevicedir">,
+<ref id="getnextdevice" name="getnextdevice">
+<tag/Example/<verb>
+unsigned char dev = getfirstdevice ();
+while (dev != INVALID_DEVICE) {
+        printf ("%d\n", dev);
+        dev = getnextdevice (dev);
+        }
+</verb>
+</descrip>
+</quote>
+
+
+<sect1>getnextdevice<label id="getnextdevice"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get next device.
+<tag/Header/<tt/<ref id="device.h" name="device.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ getnextdevice (unsigned char device);/
+<tag/Description/The function returns the next device after <tt/device/.
+The constant <tt/INVALID_DEVICE/ indicates no further device.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="getcurrentdevice" name="getcurrentdevice">,
+<ref id="getdevicedir" name="getdevicedir">,
+<ref id="getfirstdevice" name="getfirstdevice">
+<tag/Example/<verb>
+unsigned char dev = getfirstdevice ();
+while (dev != INVALID_DEVICE) {
+        printf ("%d\n", dev);
+        dev = getnextdevice (dev);
+        }
+</verb>
 </descrip>
 </quote>
 
@@ -6284,6 +6420,34 @@ See <tt/strlower/.
 </quote>
 
 
+<sect1>strncasecmp<label id="strncasecmp"><p>
+
+<quote>
+<descrip>
+<tag/Function/Compare two strings case insensitive.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/int __fastcall__ strncasecmp (const char* s1, const char* s2, size_t count);/
+<tag/Description/The <tt/strncasecmp/ function compares the two strings passed
+as parameters without case sensitivity. It returns a value that is less than
+zero if <tt/s1/ is less than <tt/s2/, zero if <tt/s1/ is the same as <tt/s2/,
+and a value greater than zero if <tt/s1/ is greater than <tt/s2/.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>The function is not available in strict ANSI mode.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="strcmp" name="strcmp">,
+<ref id="strcoll" name="strcoll">,
+<ref id="stricmp" name="stricmp">,
+<ref id="strncmp" name="strncmp">,
+<ref id="strxfrm" name="strxfrm">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>strncat<label id="strncat"><p>
 
 <quote>
@@ -6373,6 +6537,34 @@ static char hello[6];
 
 strncpy (hello, "Hello world!\n", sizeof hello - 1)[5] = '\0';
 </verb>
+</descrip>
+</quote>
+
+
+<sect1>strnicmp<label id="strnicmp"><p>
+
+<quote>
+<descrip>
+<tag/Function/Compare two strings case insensitive.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/int __fastcall__ strnicmp (const char* s1, const char* s2, size_t count);/
+<tag/Description/The <tt/strnicmp/ function compares the two strings passed as
+parameters without case sensitivity. It returns a value that is less than zero
+if <tt/s1/ is less than <tt/s2/, zero if <tt/s1/ is the same as <tt/s2/, and a
+value greater than zero if <tt/s1/ is greater than <tt/s2/.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>The function is not available in strict ANSI mode.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="strcasecmp" name="strcasecmp">,
+<ref id="strcmp" name="strcmp">,
+<ref id="strcoll" name="strcoll">,
+<ref id="strncmp" name="strncmp">,
+<ref id="strxfrm" name="strxfrm">
+<tag/Example/None.
 </descrip>
 </quote>
 

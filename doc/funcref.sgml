@@ -3561,6 +3561,10 @@ be used in presence of a prototype.
 <tag/Declaration/<tt/unsigned char getfirstdevice (void);/
 <tag/Description/The function returns the first device.
 The constant <tt/INVALID_DEVICE/ indicates no device.
+<tag/Notes/<itemize>
+<item>Calling getfirstdevice() does <em/not/ turn on the motor of a
+drive-type device and does <em/not/ check for a disk in the drive.
+</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="getcurrentdevice" name="getcurrentdevice">,
@@ -3587,6 +3591,8 @@ while (dev != INVALID_DEVICE) {
 <tag/Description/The function returns the next device after <tt/device/.
 The constant <tt/INVALID_DEVICE/ indicates no further device.
 <tag/Notes/<itemize>
+<item>Calling getnextdevice() does <em/not/ turn on the motor of a
+drive-type device and does <em/not/ check for a disk in the drive.
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>

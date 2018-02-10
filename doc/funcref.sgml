@@ -3469,9 +3469,6 @@ returns one of the constants<itemize>
 It allows to access the current device with the <ref id="dio.h"
 name="Low-level disk I/O API"> or <ref id="cbm.h" name="cbm_* I/O
 functions"> requiring a 'device' parameter.
-<tag/Notes/<itemize>
-<item>
-</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="getdevicedir" name="getdevicedir">,
@@ -3513,6 +3510,8 @@ be used in presence of a prototype.
 It allows to access the device on filesystem level by calling chdir() with
 the directory returned.
 <tag/Notes/<itemize>
+<item>Calling getdevicedir() <em/does/ check for a (formatted) disk in a
+floppy-disk-type device and returns NULL if that check fails.
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -3525,6 +3524,7 @@ be used in presence of a prototype.
 <tag/Example/<verb>
 chdir (getdevicedir (device, buf, sizeof buf));
 </verb>
+cf. <tt/samples/enumdevdir.c/
 </descrip>
 </quote>
 
@@ -3562,7 +3562,8 @@ be used in presence of a prototype.
 <tag/Description/The function returns the first device.
 The constant <tt/INVALID_DEVICE/ indicates no device.
 <tag/Notes/<itemize>
-<item>
+<item>Calling getfirstdevice() does <em/not/ turn on the motor of a
+drive-type device and does <em/not/ check for a disk in the drive.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
@@ -3590,6 +3591,8 @@ while (dev != INVALID_DEVICE) {
 <tag/Description/The function returns the next device after <tt/device/.
 The constant <tt/INVALID_DEVICE/ indicates no further device.
 <tag/Notes/<itemize>
+<item>Calling getnextdevice() does <em/not/ turn on the motor of a
+drive-type device and does <em/not/ check for a disk in the drive.
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>

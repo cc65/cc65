@@ -18,7 +18,7 @@ void main (void)
     gotoxy(0, 4);
     if (os == GEOS4) {
         machine = "plus4";
-        version = "GeOS v3.5";
+        version = "GEOS v3.5";
     } else {
         if ((os & GEOS128) == GEOS128) {
             machine = "c128";
@@ -27,13 +27,13 @@ void main (void)
         }
         os &= 0x7f;
         if (os == GEOS_V10) {
-            version = "GeOS v1.0";
+            version = "GEOS v1.0";
         } else if (os == GEOS_V11) {
-            version = "GeOS v1.1";
+            version = "GEOS v1.1";
         } else if (os == GEOS_V12) {
-            version = "GeOS v1.2";
+            version = "GEOS v1.2";
         } else if (os == GEOS_V20) {
-            version = "GeOS v2.0";
+            version = "GEOS v2.0";
         } else if (os == MEGAPATCH3) {
             version = "MegaPatch 3";
         } else if (os == GATEWAY) {
@@ -41,7 +41,7 @@ void main (void)
         } else if ((os & WHEELS) == WHEELS) {
             version = "Wheels";
         } else {
-            version = "Unknown GeOS version";
+            version = "Unknown GEOS version";
             good = 0;
         }
     }

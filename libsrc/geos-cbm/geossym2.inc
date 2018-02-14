@@ -11,3 +11,4 @@ sysFlgCopy              =       $c012
 c128Flag                =       $c013
 mp3Flag                 =       $c014
 dateCopy                =       $c018
+

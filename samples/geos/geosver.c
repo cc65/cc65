@@ -32,6 +32,10 @@ void main (void)
             version = "GEOS v1.1";
         } else if (os == GEOS_V12) {
             version = "GEOS v1.2";
+        } else if (os == GEOS_V13) {
+            version = "GEOS v1.3";
+        } else if (os == GEOS_V15) {
+            version = "GEOS v1.5";
         } else if (os == GEOS_V20) {
             version = "GEOS v2.0";
         } else if (os == MEGAPATCH3) {

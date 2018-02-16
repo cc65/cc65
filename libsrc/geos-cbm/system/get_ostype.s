@@ -26,6 +26,8 @@ _get_ostype:
         and #%11110000
         cmp #$10
         beq geos10
+        cmp #$13                ; either 1.3 or 1.5
+        beq geos13check
         lda gatewayFlag
         cmp #$41
         beq gateway
@@ -37,6 +39,7 @@ _get_ostype:
         beq geos_on_plus4
         ora version
         rts
+geos13:
 geos10:
         lda version
         rts
@@ -53,6 +56,13 @@ gateway:
 megapatch3:
         lda #$03
         ora c128Flag
+        rts
+geos13check:
+        lda mp3Flag
+        cmp #$03
+        bne geos13
+geos15:
+        lda #$15
         rts
 
 _get_tv:

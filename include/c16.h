@@ -47,9 +47,7 @@
 
 /* Include the base header file for the 264 series. include file.
  */
-#ifndef _CBM264_H
 #include <cbm264.h>
-#endif
 
 
 

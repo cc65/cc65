@@ -39,7 +39,7 @@ containing the load address and load length. The default load address is
 &dollar;803.
 
 <bf/AppleCommander 1.3.5/ or later (available at <url
-url="http://applecommander.sourceforge.net/">) includes the option <tt/-cc65/
+url="https://applecommander.github.io/">) includes the option <tt/-cc65/
 that allows to put binary files with a DOS 3.3 header onto disk images
 containing DOS 3.3 as well as ProDOS 8.
 
@@ -168,9 +168,44 @@ Parameters:
 </descrip><p>
 
 
+<sect1><tt/apple2-hgr.cfg/<p>
+
+Configuration for a program including a hires page. See <tt>testcode/lib/apple/hgrtest.c</tt>
+for an example of such a program.
+
+Parameters:
+
+<descrip>
+
+  <tag><tt/STARTADDRESS:/ Program start address</tag>
+  Default: &dollar;803. Use <tt/-S &lt;addr&gt;/ to set a different start address.
+
+  <tag><tt/__EXEHDR__:/ Executable file header</tag>
+  Default: DOS 3.3 header (address and length). Use <tt/-D __EXEHDR__=0/ to omit
+  the header.
+
+  <tag><tt/__STACKSIZE__:/ C runtime stack size</tag>
+  Default: &dollar;800. Use <tt/-D __STACKSIZE__=&lt;size&gt;/ to set a different
+  stack size.
+
+  <tag><tt/__HIMEM__:/ Highest usable memory address presumed at link time</tag>
+  Default: &dollar;9600. Use <tt/-D __HIMEM__=&lt;addr&gt;/ to set a different
+  highest usable address.
+
+  <tag><tt/__LCADDR__:/ Address of code in the Language Card</tag>
+  Default: &dollar;D400. Use <tt/-D __LCADDR__=&lt;addr&gt;/ to set a different
+  code address.
+
+  <tag><tt/__LCSIZE__:/ Size of code in the Language Card</tag>
+  Default: &dollar;C00. Use <tt/-D __LCSIZE__=&lt;size&gt;/ to set a different
+  code size.
+
+</descrip><p>
+
+
 <sect1><tt/apple2-overlay.cfg/<p>
 
-Configuration for overlay programs with the up to nine overlays. The overlay files
+Configuration for an overlay program with up to nine overlays. The overlay files
 don't include the DOS 3.3 header. See <tt>samples/overlaydemo.c</tt> for more
 information on overlays.
 
@@ -210,7 +245,7 @@ Parameters:
 
 <sect1><tt/apple2-asm.cfg/<p>
 
-Configuration for a assembler programs which don't need a special setup.
+Configuration for an assembler program that doesn't need a special setup.
 
 Parameters:
 

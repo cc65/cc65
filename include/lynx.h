@@ -123,6 +123,8 @@ extern void lynx_160_102_16_tgi[];    /* Referred to by tgi_static_stddrv[] */
 /*                           Sound support                                   */
 /*****************************************************************************/
 
+
+
 void lynx_snd_init (void);
 /* Initialize the sound driver */
 
@@ -143,6 +145,8 @@ void __fastcall__ lynx_snd_stop_channel (unsigned char channel);
 
 unsigned char lynx_snd_active(void);
 /* Show which channels are active */
+
+
 
 /*****************************************************************************/
 /*                           Accessing the cart                              */
@@ -207,6 +211,7 @@ unsigned __fastcall__ lynx_eewrite (unsigned cell, unsigned val);
 
 #include <_suzy.h>
 #define SUZY        (*(struct __suzy*)0xFC00)
+
 
 
 /* End of lynx.h */

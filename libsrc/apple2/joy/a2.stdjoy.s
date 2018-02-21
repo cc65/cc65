@@ -52,7 +52,6 @@ PREAD   :=      $FB1E   ; Read paddle in X, return AD conv. value in Y
         .addr   UNINSTALL
         .addr   COUNT
         .addr   READJOY
-        .addr   0               ; IRQ not used
 
 ; ------------------------------------------------------------------------
 

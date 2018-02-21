@@ -7,9 +7,7 @@
 #ifndef _GDISK_H
 #define _GDISK_H
 
-#ifndef _GSTRUCT_H
 #include <geos/gstruct.h>
-#endif
 
 char __fastcall__ ReadBuff(struct tr_se *myTrSe);
 char __fastcall__ WriteBuff(struct tr_se *myTrSe);

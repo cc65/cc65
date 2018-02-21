@@ -1,0 +1,8 @@
+
+; this is the resource file for geosver.c, a GEOS application example
+
+HEADER APPLICATION "geosver" "GEOSver" "V1.0" {
+dostype USR
+author "Marco van den Heuvel"
+info "This is a C prog compiled with cc65 and GEOSLib."
+}

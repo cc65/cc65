@@ -7,9 +7,7 @@
 #ifndef _GFILE_H
 #define _GFILE_H
 
-#ifndef _GSTRUCT_H
 #include <geos/gstruct.h>
-#endif
 
 struct filehandle *Get1stDirEntry(void);
 struct filehandle *GetNxtDirEntry(void);

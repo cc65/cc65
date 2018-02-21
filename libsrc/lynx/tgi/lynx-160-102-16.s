@@ -29,7 +29,7 @@
 
         .byte   $74, $67, $69           ; "tgi"
         .byte   TGI_API_VERSION         ; TGI API version number
-        .addr   $0000                   ; Library reference
+libref: .addr   $0000                   ; Library reference
         .word   160                     ; X resolution
         .word   102                     ; Y resolution
         .byte   16                      ; Number of drawing colors
@@ -64,7 +64,6 @@
         .addr   BAR
         .addr   TEXTSTYLE
         .addr   OUTTEXT
-        .addr   IRQ
 
 
 ; ------------------------------------------------------------------------
@@ -164,6 +163,18 @@ INSTALL:
         stz     BGINDEX
         stz     DRAWPAGE
         stz     SWAPREQUEST
+        lda     libref
+        ldx     libref+1
+        sta     ptr1
+        stx     ptr1+1
+        ldy     #1
+        lda     #<irq
+        sta     (ptr1),y
+        iny
+        lda     #>irq
+        sta     (ptr1),y
+        lda     #$4C            ; Jump opcode
+        sta     (ptr1)          ; Activate IRQ routine
         rts
 
 
@@ -175,6 +186,12 @@ INSTALL:
 ;
 
 UNINSTALL:
+        lda     libref
+        ldx     libref+1
+        sta     ptr1
+        stx     ptr1+1
+        lda     #$60            ; RTS opcode
+        sta     (ptr1)          ; Disable IRQ routine
         rts
 
 
@@ -466,14 +483,10 @@ SETDRAWPAGE:
         stx     DRAWPAGEH
         rts
 
-; ------------------------------------------------------------------------
-; IRQ: VBL interrupt handler
-;
-
-IRQ:
+irq:
         lda     INTSET          ; Poll all pending interrupts
         and     #VBL_INTERRUPT
-        beq     IRQEND          ; Exit if not a VBL interrupt
+        beq     @L0             ; Exit if not a VBL interrupt
 
         lda     SWAPREQUEST
         beq     @L0
@@ -485,7 +498,6 @@ IRQ:
         jsr     SETDRAWPAGE
         stz     SWAPREQUEST
 @L0:
-IRQEND:
         clc
         rts
 

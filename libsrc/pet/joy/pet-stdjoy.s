@@ -33,7 +33,6 @@
         .addr   UNINSTALL
         .addr   COUNT
         .addr   READ
-        .addr   0               ; IRQ entry unused
 
 ; ------------------------------------------------------------------------
 ; Constants

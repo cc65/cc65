@@ -48,14 +48,13 @@
             UNINSTALL   .addr   ; UNINSTALL routine
             COUNT       .addr   ; COUNT routine
             READ        .addr   ; READ routine
-            IRQ         .addr   ; IRQ routine
         .endstruct
 .endstruct
 
 ;------------------------------------------------------------------------------
 ; The JOY API version, stored in JOY_HDR::VERSION
 
-JOY_API_VERSION         = $04
+JOY_API_VERSION         = $05
 
 ;------------------------------------------------------------------------------
 ; Variables

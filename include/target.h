@@ -1,15 +1,9 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                  plus4.h                                  */
+/*                                  target.h                                 */
 /*                                                                           */
-/*                    Plus/4 system specific definitions                     */
+/*                        Target specific definitions                        */
 /*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 1998-2006, Ullrich von Bassewitz                                      */
-/*                Römerstrasse 52                                            */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,33 +27,47 @@
 
 
 
-#ifndef _PLUS4_H
-#define _PLUS4_H
+#ifndef _TARGET_H
+#define _TARGET_H
 
 
 
-/* Check for errors */
-#if !defined(__PLUS4__)
-#  error This module may only be used when compiling for the Plus/4!
+/* Include the correct target specific file */
+#if   defined(__APPLE2ENH__)
+#  include <apple2enh.h>
+#elif defined(__APPLE2__)
+#  include <apple2.h>
+#elif defined(__ATARI__)
+#  include <atari.h>
+#elif defined(__ATARI2600__)
+#  include <atari2600.h>
+#elif defined(__ATARI5200__)
+#  include <atari5200.h>
+#elif defined(__ATMOS__)
+#  include <atmos.h>
+#elif defined(__CBM__)
+#  include <cbm.h>
+#elif defined(__CREATIVISION__)
+#  include <creativision.h>
+#elif defined(__GAMATE__)
+#  include <gamate.h>
+#elif defined(__GEOS__)
+#  include <geos.h>
+#elif defined(__LYNX__)
+#  include <lynx.h>
+#elif defined(__NES__)
+#  include <nes.h>
+#elif defined(__OSIC1P__)
+#  include <osic1p.h>
+#elif defined(__PCE__)
+#  include <pce.h>
+#elif defined(__SUPERVISION__)
+#  include <supervision.h>
+#elif defined(__TELESTRAT__)
+#  include <telestrat.h>
 #endif
 
 
 
-/* Include the base header file for the 264 series. include file.
- */
-#include <cbm264.h>
-
-/* Define hardware */
-#include <_6551.h>
-#define ACIA    (*(struct __6551*)0xFD00)
-
-
-
-/* The addresses of the static drivers */
-extern void plus4_stdjoy_joy[];   /* Referred to by joy_static_stddrv[] */
-extern void plus4_stdser_ser[];
-
-
-
-/* End of plus4.h */
+/* End of target.h */
 #endif

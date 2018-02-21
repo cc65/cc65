@@ -355,5 +355,7 @@ struct __iocb {
 #define IOCB_GETCWD      0x30  /* get current directory (MyDOS/SpartaDOS) */
 #define IOCB_FORMAT      0xFE  /* format */
 
+
+
 /* End of atari.h */
 #endif

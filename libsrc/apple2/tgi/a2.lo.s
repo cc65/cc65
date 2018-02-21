@@ -85,7 +85,6 @@ Y2      :=      ptr4
         .addr   BAR
         .addr   TEXTSTYLE
         .addr   OUTTEXT
-        .addr   0               ; IRQ entry is unused
 
 ; ------------------------------------------------------------------------
 

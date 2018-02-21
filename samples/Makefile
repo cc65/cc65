@@ -44,7 +44,7 @@ ifneq ($(filter disk samples.%,$(MAKECMDGOALS)),)
   # This one comes with VICE
   C1541 ?= c1541
 
-  # For this one see http://applecommander.sourceforge.net/
+  # For this one see https://applecommander.github.io/
   AC ?= ac.jar
 
   # For this one see http://www.horus.com/~hias/atari/

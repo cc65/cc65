@@ -8,8 +8,12 @@
 /*                                                                           */
 /*****************************************************************************/
 
+
+
 #ifndef _ATARI2600_H
 #define _ATARI2600_H
+
+
 
 /* Check for errors */
 #if !defined(__ATARI2600__)
@@ -22,5 +26,7 @@
 #include <_riot.h>
 #define RIOT (*(struct __riot*)0x0280)
 
+
+
 /* End of atari2600.h */
-#endif /* #ifndef _ATARI2600_H */
+#endif

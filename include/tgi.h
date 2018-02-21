@@ -38,9 +38,8 @@
 
 
 
-#ifndef _TGI_ERROR_H
 #include <tgi/tgi-error.h>
-#endif
+#include <target.h>
 
 
 
@@ -284,6 +283,3 @@ int __fastcall__ tgi_imulround (int rhs, int lhs);
 
 /* End of tgi.h */
 #endif
-
-
-

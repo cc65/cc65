@@ -45,7 +45,7 @@ void main(void)
                         p[8],p[9],p[10],p[11],p[12],p[13],p[14],p[15]
                 );
         }
-        memcpy(p, main, 0);     /* test that a zero length doesn't copy 64K */
+        memcpy(p, main, i = 0);     /* test that a zero length doesn't copy 64K */
 
         gotoxy(0,ysize - 1);
         for (i = 0; i < xsize; ++i) {

@@ -40,7 +40,7 @@
 
         lda     #LFN_CLOSED
         sta     fdtab,x
-        lda     tmp2            ; Get the handle
+        txa                     ; Get handle
         clc
         adc     #LFN_OFFS       ; Make LFN from handle
         jsr     CLOSE

@@ -51,6 +51,8 @@ typedef unsigned size_t;
 #define CPU_65C02       1
 #define CPU_65816       2
 #define CPU_4510        3
+#define CPU_65SC02      4
+#define CPU_65CE02      5
 
 unsigned char getcpu (void);
 /* Detect the CPU the program is running on */

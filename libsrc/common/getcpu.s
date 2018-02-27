@@ -62,7 +62,6 @@ _getcpu:
         dec     a               ; .byte $3a, A=$00 if 65C02
         xba                     ; .byte $eb, get $01 back if 65816
         inc     a               ; .byte $1a, make $01/$02
-        .byte $2c               ; bit instruction to skip next command
 @L9:    ldx     #0              ; Load high byte of word
         rts
 

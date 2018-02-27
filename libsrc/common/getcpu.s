@@ -35,7 +35,7 @@ _getcpu:
         cmp     #1
         beq     @L6
 
-; check for 4510
+; This is at least a 65ce02, check for 4510
 
         lda     #5              ; CPU_65CE02 constant
         .byte   $5c             ; map on 4510, aug on 65ce02 (acts like 4 byte nop)
@@ -43,25 +43,26 @@ _getcpu:
         nop
         bne     @L9
 
+; Check for 65816/65802
+@L6:    xba                     ; .byte $eb, put $01 in B accu (nop on 65c02/65sc02)
+        dec     a               ; .byte $3a, A=$00
+        xba                     ; .byte $eb, A=$01 if 65816/65802 and A=$00 if 65c02/65sc02
+        inc     a               ; .byte $1a, A=$02 if 65816/65802 and A=$01 if 65c02/65sc02
+        cmp     #2
+        beq     @L9
+
 ; check for 65sc02
 
-@L6:    ldy     $f7
-        ldx     #$00
+        ldy     $f7
+        ldx     #0
         stx     $f7
-        .byte   $f7,$f7         ; nop nop on 65sc02, smb7 $f7 on 65c02 and 65816
+        .byte   $f7,$f7         ; nop nop on 65sc02, smb7 $f7 on 65c02
         ldx     $f7
         sty     $f7
         cpx     #$00
-        bne     @L7
-        lda     #4              ; CPU_65SC02 constant
         bne     @L9
+        lda     #4              ; CPU_65SC02 constant
 
-; check for 65816; after 4510, because $eb there is row (rotate word)
-
-@L7:    xba                     ; .byte $eb, put $01 in B accu
-        dec     a               ; .byte $3a, A=$00 if 65C02
-        xba                     ; .byte $eb, get $01 back if 65816
-        inc     a               ; .byte $1a, make $01/$02
 @L9:    ldx     #0              ; Load high byte of word
         rts
 

@@ -4,7 +4,7 @@
 
 <title>cc65 Library Overview
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2014-04-12
+<date>2018-02-28
 
 <abstract>
 An overview over the runtime and C libraries that come with the cc65 compiler,
@@ -43,7 +43,7 @@ Functions that are <em/not/ available:
 <itemize>
   <item><tt>tmpfile/tmpnam</tt>
   <p>
-  <item><tt>system</tt>
+  <item><tt>system</tt> (cc65 alternative <tt>exec</tt>)
   <p>
   <item>All functions that handle floating point numbers in some manner.
   <p>
@@ -172,10 +172,15 @@ portable. conio implementations exist for the following targets:
   <item>plus4 (or expanded c16/c116)
   <item>cbm510 (40 column video)
   <item>cbm610 (all CBM series-II computers with 80 column video)
+  <item>creativision
+  <item>gamate
   <item>geos-apple
   <item>geos-cbm
   <item>nes
+  <item>osic1p
+  <item>pce
   <item>pet (all CBM PET systems except the 2001)
+  <item>telestrat
   <item>vic20
   </itemize>
 
@@ -204,6 +209,7 @@ the following targets:
   <item>atarixl
   <item>c64
   <item>c128
+  <item>cbm510
   </itemize>
 
 The available functions are declared in <tt/mouse.h/.
@@ -235,6 +241,3 @@ freely, subject to the following restrictions:
 </enum>
 
 </article>
-
-
-

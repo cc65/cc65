@@ -3448,6 +3448,9 @@ returns one of the constants<itemize>
 <item><tt/CPU_6502/
 <item><tt/CPU_65C02/
 <item><tt/CPU_65816/
+<item><tt/CPU_4510/
+<item><tt/CPU_65SC02/
+<item><tt/CPU_65CE02/
 </itemize>
 <tag/Notes/<itemize>
 <item>Other, more exotic CPU types are not disinguished.

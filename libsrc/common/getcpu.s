@@ -10,11 +10,13 @@
 ; Subroutine to detect an 816. Returns
 ;
 ;   - carry clear and 0 in A for a NMOS 6502 CPU
-;   - carry set and 1 in A for a 65c02
+;   - carry set and 1 in A for a 65C02
 ;   - carry set and 2 in A for a 65816
 ;   - carry set and 3 in A for a 4510
-;   - carry set and 4 in A for a 65sc02
-;   - carry set and 5 in A for a 65ce02
+;   - carry set and 4 in A for a 65SC02
+;   - carry set and 5 in A for a 65CE02
+;   - carry set and 6 in A for a HuC6280
+;   - carry clear and 7 in A for a 2a03/2a07
 ;
 ; This function uses a $1A opcode which is a INA on the 816 and ignored
 ; (interpreted as a NOP) on a NMOS 6502. There are several CMOS versions
@@ -27,40 +29,60 @@ _getcpu:
         lda     #0
         inc     a               ; .byte $1A ; nop on nmos, inc on every cmos
         cmp     #1
-        bcc     @L9
+        bcc     @L8
 
-; This is at least a 65C02, check for a 65ce02/4510
+; This is at least a 65C02, check for a 65CE02/4510
 
-        .byte   $42,$ea         ; neg on 65ce02/4510, nop #$ea on 65c02, wdm $ea on 65816
+        .byte   $42,$ea         ; neg on 65CE02/4510, nop #$ea on 65C02, wdm $ea on 65816
         cmp     #1
         beq     @L6
 
-; This is at least a 65ce02, check for 4510
+; This is at least a 65CE02, check for 4510
 
         lda     #5              ; CPU_65CE02 constant
-        .byte   $5c             ; map on 4510, aug on 65ce02 (acts like 4 byte nop)
+        .byte   $5c             ; map on 4510, aug on 65CE02 (acts like 4 byte nop)
         lda     #3              ; CPU_4510 constant
         nop
         bne     @L9
 
+; 6502 type of cpu, check for a 2a03/2a07
+@L8:
+        sed                     ; set decimal mode, no decimal mode on the 2a03/2a07
+        lda     #9
+        clc
+        adc     #1              ; $01+$09 = $10 on 6502, $01+$09 = $0a on 2a03/2a07
+        cld
+        cmp     #10
+        bne     @L5
+        lda     #0              ; CPU_6502 constant
+        beq     @L9
+@L5:
+        lda     #7              ; CPU_2A0x constant
+        bne     @L9
+
+; 65C02 cpu type, check for HuC6280
+@L4:    ldx     #6              ; CPU_HUC6280 constant
+        .byte   $22,$ea         ; sax nop on HuC6280 (A=$06, X=$01), nop #$ea on 65C02 (A=$01, X=$06)
+        bne     @L9
+
 ; Check for 65816/65802
-@L6:    xba                     ; .byte $eb, put $01 in B accu (nop on 65c02/65sc02)
+@L6:    xba                     ; .byte $eb, put $01 in B accu (nop on 65C02/65SC02)
         dec     a               ; .byte $3a, A=$00
-        xba                     ; .byte $eb, A=$01 if 65816/65802 and A=$00 if 65c02/65sc02
-        inc     a               ; .byte $1a, A=$02 if 65816/65802 and A=$01 if 65c02/65sc02
+        xba                     ; .byte $eb, A=$01 if 65816/65802 and A=$00 if 65C02/65SC02
+        inc     a               ; .byte $1a, A=$02 if 65816/65802 and A=$01 if 65C02/65SC02
         cmp     #2
         beq     @L9
 
-; check for 65sc02
+; check for 65SC02
 
         ldy     $f7
         ldx     #0
         stx     $f7
-        .byte   $f7,$f7         ; nop nop on 65sc02, smb7 $f7 on 65c02
+        .byte   $f7,$f7         ; nop nop on 65SC02, smb7 $f7 on 65C02
         ldx     $f7
         sty     $f7
         cpx     #$00
-        bne     @L9
+        bne     @L4
         lda     #4              ; CPU_65SC02 constant
 
 @L9:    ldx     #0              ; Load high byte of word

@@ -33,14 +33,14 @@ _getcpu:
 
 ; This is at least a 65C02, check for a 65CE02/4510
 
-        .byte   $42,$ea         ; neg on 65CE02/4510, nop #$ea on 65C02, wdm $ea on 65816
+        .byte   $42,$EA         ; neg on 65CE02/4510, nop #$EA on 65C02, wdm $EA on 65816
         cmp     #1
         beq     @L6
 
 ; This is at least a 65CE02, check for 4510
 
         lda     #5              ; CPU_65CE02 constant
-        .byte   $5c             ; map on 4510, aug on 65CE02 (acts like 4 byte nop)
+        .byte   $5C             ; map on 4510, aug on 65CE02 (acts like 4 byte nop)
         lda     #3              ; CPU_4510 constant
         nop
         bne     @L9
@@ -50,7 +50,7 @@ _getcpu:
         sed                     ; set decimal mode, no decimal mode on the 2a03/2a07
         lda     #9
         clc
-        adc     #1              ; $01+$09 = $10 on 6502, $01+$09 = $0a on 2a03/2a07
+        adc     #1              ; $01+$09 = $10 on 6502, $01+$09 = $0A on 2a03/2a07
         cld
         cmp     #10
         bne     @L5
@@ -62,25 +62,25 @@ _getcpu:
 
 ; 65C02 cpu type, check for HuC6280
 @L4:    ldx     #6              ; CPU_HUC6280 constant
-        .byte   $22,$ea         ; sax nop on HuC6280 (A=$06, X=$01), nop #$ea on 65C02 (A=$01, X=$06)
+        .byte   $22,$EA         ; sax nop on HuC6280 (A=$06, X=$01), nop #$EA on 65C02 (A=$01, X=$06)
         bne     @L9
 
 ; Check for 65816/65802
-@L6:    xba                     ; .byte $eb, put $01 in B accu (nop on 65C02/65SC02)
-        dec     a               ; .byte $3a, A=$00
-        xba                     ; .byte $eb, A=$01 if 65816/65802 and A=$00 if 65C02/65SC02
-        inc     a               ; .byte $1a, A=$02 if 65816/65802 and A=$01 if 65C02/65SC02
+@L6:    xba                     ; .byte $EB, put $01 in B accu (nop on 65C02/65SC02)
+        dec     a               ; .byte $3A, A=$00
+        xba                     ; .byte $EB, A=$01 if 65816/65802 and A=$00 if 65C02/65SC02
+        inc     a               ; .byte $1A, A=$02 if 65816/65802 and A=$01 if 65C02/65SC02
         cmp     #2
         beq     @L9
 
 ; check for 65SC02
 
-        ldy     $f7
+        ldy     $F7
         ldx     #0
-        stx     $f7
-        .byte   $f7,$f7         ; nop nop on 65SC02, smb7 $f7 on 65C02
-        ldx     $f7
-        sty     $f7
+        stx     $F7
+        .byte   $F7,$F7         ; nop nop on 65SC02, smb7 $F7 on 65C02
+        ldx     $F7
+        sty     $F7
         cpx     #$00
         bne     @L4
         lda     #4              ; CPU_65SC02 constant

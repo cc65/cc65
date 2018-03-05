@@ -2,5 +2,7 @@ ipch/
 *.suo
 *.sdf
 *.opensdf
+*.VC.db
+*.VC.VC.opendb
 *.vcxproj.filters
 *.vcxproj.user

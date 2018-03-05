@@ -1444,35 +1444,24 @@ int main (int argc, char* argv [])
                     /* Print version number */
                     OptVersion (Arg, 0);
                     break;
-                
+
                 case 'E':
                     /* Forward -E to compiler */
                     CmdAddArg (&CC65, Arg);  
                     DisableAssemblingAndLinking ();
                     break;
-                    
+
                 case 'W':
-                    /* avoid && with'\0' in if clauses */
-                    if (Arg[3] == '\0') {
-                        switch (Arg[2]) {
-                        case 'a':
-                            /* -Wa: Pass options to assembler */
-                            OptAsmArgs (Arg, GetArg (&I, 3));
-                            break;
-                        case 'c':
-                            /* -Wc: Pass options to compiler 
-                            ** Remember -Wc sub arguments in cc65 arg struct 
-                            */
-                            OptCCArgs (Arg, GetArg (&I, 3));
-                            break;
-                        case 'l':
-                            /* -Wl: Pass options to linker */
-                            OptLdArgs (Arg, GetArg (&I, 3));
-                            break;
-                        default:
-                            UnknownOption (Arg);
-                            break;
-                       }
+                    if (Arg[2] == 'a' && Arg[3] == '\0') {
+                        /* -Wa: Pass options to assembler */
+                        OptAsmArgs (Arg, GetArg (&I, 3));
+                    } else if (Arg[2] == 'c' && Arg[3] == '\0') {
+                        /* -Wc: Pass options to compiler */
+                        /* Remember -Wc sub arguments in cc65 arg struct */ 
+                        OptCCArgs (Arg, GetArg (&I, 3));
+                    } else if (Arg[2] == 'l' && Arg[3] == '\0') {
+                        /* -Wl: Pass options to linker */
+                        OptLdArgs (Arg, GetArg (&I, 3));
                     } else {
                         /* Anything else: Suppress warnings (compiler) */
                         CmdAddArg2 (&CC65, "-W", GetArg (&I, 2));

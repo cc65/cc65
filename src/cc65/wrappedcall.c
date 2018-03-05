@@ -97,6 +97,6 @@ void GetWrappedCall (void **Ptr, unsigned char *Val)
     } else {
         long Temp;
         IPS_Get (&WrappedCalls, &Temp, Ptr);
-        *Val = Temp;
+        *Val = (unsigned char) Temp;
     }
 }

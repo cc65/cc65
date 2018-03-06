@@ -55,6 +55,9 @@ REU_TRIGGER     = $FF00                 ; REU command trigger
 OP_COPYFROM     = $ED
 OP_COPYTO       = $EC
 
+OP_COPYFROM_ALOAD = $B1
+OP_COPYTO_ALOAD   = $B0
+
 
 ; ------------------------------------------------------------------------
 ; Data.
@@ -99,7 +102,7 @@ INSTALL:
 loop:
         sty     window
         jsr     reu_size_check_common
-        ldx     #%10110000
+        ldx     #OP_COPYTO_ALOAD
         stx     REU_COMMAND
         dey
         cpy     #$FF
@@ -107,7 +110,7 @@ loop:
         iny
 size_loop:
         jsr     reu_size_check_common
-        ldx     #%10110001
+        ldx     #OP_COPYFROM_ALOAD
         stx     REU_COMMAND
         cpy     window
         bne     size_found

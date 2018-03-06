@@ -43,6 +43,7 @@ int main (void)
     unsigned char count;
     unsigned char i;
     unsigned char Res;
+    unsigned char ch, kb;
 
     clrscr ();
 
@@ -90,6 +91,14 @@ int main (void)
                      JOY_BTN_1(j)? "button" : " ---- ", j);
 #endif
         }
+
+        /* show pressed key, so we can verify keyboard is working */
+        kb = kbhit();
+        ch = kb ? cgetc() : ' ';
+        gotoxy (1, i+2);
+        revers(kb);
+        cprintf("kbd: %c", ch);
+        revers(0);
     }
     return 0;
 }

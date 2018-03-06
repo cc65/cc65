@@ -5,7 +5,6 @@
 #include <conio.h>
 #include <joystick.h>
 
-
 #ifdef JOYSTICK_DRIVER
 
 /* A statically linked driver was named on the compiler's command line.
@@ -13,6 +12,22 @@
 */
 #  undef DYN_DRV
 #  define DYN_DRV       0
+
+/*
+ * link existing drivers like this:
+ *
+ * cl65 -DJOYSTICK_DRIVER=c64_hitjoy_joy -o joy-test.prg joy-test.c
+ *
+ * for testing a new driver you will have to uncomment the define below, and
+ * link your driver like this:
+ *
+ * co65 ../../target/c64/drv/joy/c64-hitjoy.joy -o hitjoy.s --code-label _hitjoy
+ * cl65 -DJOYSTICK_DRIVER=hitjoy -o joy-test.prg joy-test.c hitjoy.s
+ *
+*/
+
+/* extern char JOYSTICK_DRIVER; */
+
 #else
 
 /* Use a dynamically loaded driver, by default. */
@@ -27,13 +42,16 @@ int main (void)
     unsigned char j;
     unsigned char count;
     unsigned char i;
+    unsigned char Res;
+
+    clrscr ();
 
 #if DYN_DRV
-    unsigned char Res = joy_load_driver (joy_stddrv);
+    Res = joy_load_driver (joy_stddrv);
 #elif defined(JOYSTICK_DRIVER)
-    unsigned char Res = joy_install (&JOYSTICK_DRIVER);
+    Res = joy_install (&JOYSTICK_DRIVER);
 #else
-    unsigned char Res = joy_install (&joy_static_stddrv);
+    Res = joy_install (&joy_static_stddrv);
 #endif
 
     if (Res != JOY_ERR_OK) {
@@ -44,7 +62,6 @@ int main (void)
         exit (EXIT_FAILURE);
     }
 
-    clrscr ();
     count = joy_count ();
 #if defined(__ATARI5200__) || defined(__CREATIVISION__)
     cprintf ("JOYSTICKS: %d", count);
@@ -56,21 +73,21 @@ int main (void)
             gotoxy (0, i+1);
             j = joy_read (i);
 #if defined(__ATARI5200__) || defined(__CREATIVISION__)
-            cprintf ("%1d:%-3s%-3s%-3s%-3s%-3s%-3s",
+            cprintf ("%1d:%-3s%-3s%-3s%-3s%-3s %02x",
                      i,
                      JOY_UP(j)?    " U " : " - ",
                      JOY_DOWN(j)?  " D " : " - ",
                      JOY_LEFT(j)?  " L " : " - ",
                      JOY_RIGHT(j)? " R " : " - ",
-                     JOY_BTN_1(j)? " 1 " : " - ");
+                     JOY_BTN_1(j)? " 1 " : " - ", j);
 #else
-            cprintf ("%2d: %-6s%-6s%-6s%-6s%-6s%-6s",
+            cprintf ("%2d: %-6s%-6s%-6s%-6s%-6s %02x",
                      i,
                      JOY_UP(j)?    "  up  " : " ---- ",
                      JOY_DOWN(j)?  " down " : " ---- ",
                      JOY_LEFT(j)?  " left " : " ---- ",
                      JOY_RIGHT(j)? "right " : " ---- ",
-                     JOY_BTN_1(j)? "button" : " ---- ");
+                     JOY_BTN_1(j)? "button" : " ---- ", j);
 #endif
         }
     }

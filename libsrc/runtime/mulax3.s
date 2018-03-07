@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 04.10.2001
 ;
-; CC65 runtime: Multiply the primary register
+; CC65 runtime: Multiply the primary register by 3
 ;
 
         .export         mulax3

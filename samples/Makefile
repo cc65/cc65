@@ -188,15 +188,15 @@ samples.d64: samples
 	$(foreach file,$(EMD) $(MOU) $(TGI),$(D64_WRITE_recipe))
 
 # --------------------------------------------------------------------------
-# Rule to make an Apple II disk with all samples. Needs the Apple Commander
-# program available at http://applecommander.sourceforge.net/ and a template
-# disk named 'prodos.dsk'.
+# Rule to make an Apple II disk with all samples. Needs the AppleCommander
+# program available at https://applecommander.github.io/ and a template disk
+# named 'prodos.dsk'.
 
 define DSK_WRITE_BIN_recipe
 
 $(if $(findstring BF00,$(LDFLAGS_$(notdir $(file))_$(SYS))), \
   java -jar $(AC) -p $@ $(notdir $(file)).system sys <$(TARGET_PATH)/$(SYS)/util/loader.system)
-java -jar $(AC) -cc65 $@ $(notdir $(file)) bin <$(file)
+java -jar $(AC) -as $@ $(notdir $(file)) <$(file)
 
 endef # DSK_WRITE_BIN_recipe
 

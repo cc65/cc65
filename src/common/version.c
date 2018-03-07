@@ -47,7 +47,7 @@
 
 
 #define VER_MAJOR       2U
-#define VER_MINOR       16U
+#define VER_MINOR       17U
 
 
 

@@ -13,12 +13,15 @@ deceaxy:
         sec
         sbc     tmp1
         bcs     @L9
+; borrow from X
         dex
         cpx     #$ff
         bne     @L9
+; X wrapped from zero to $ff, borrow from sreg
         dec     sreg
         cpx     sreg
         bne     @L9
+; sreg wrapped from zero to $ff, borrow from sreg+1
         dec     sreg+1
 @L9:    rts
 

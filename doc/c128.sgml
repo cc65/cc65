@@ -221,10 +221,8 @@ missing on VDC, and are translated to the two colors missing from the VIC palett
   Will test the hardware for the available RAM.
 
   <tag><tt/c128-reu.emd (c128_reu_emd)/</tag>
-  A driver for the CBM REUs. The driver will determine from the connected REU
-  if it supports 128KB of RAM or more. In the latter case, 256KB are assumed,
-  but since there are no range checks, the application can use more memory if
-  it has better knowledge about the hardware than the driver.
+  A driver for the CBM REUs. The driver will test the connected REU to find
+  out how much RAM is present.
 
   <tag><tt/c128-vdc.emd (c128_vdc_emd)/</tag>
   A driver for the VDC memory of the C128, written and contributed by Maciej

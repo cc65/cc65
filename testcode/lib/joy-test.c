@@ -14,16 +14,16 @@
 #  define DYN_DRV       0
 
 /*
- * link existing drivers like this:
- *
- * cl65 -DJOYSTICK_DRIVER=c64_hitjoy_joy -o joy-test.prg joy-test.c
- *
- * for testing a new driver you will have to uncomment the define below, and
- * link your driver like this:
- *
- * co65 ../../target/c64/drv/joy/c64-hitjoy.joy -o hitjoy.s --code-label _hitjoy
- * cl65 -DJOYSTICK_DRIVER=hitjoy -o joy-test.prg joy-test.c hitjoy.s
- *
+** link existing drivers like this:
+**
+** cl65 -DJOYSTICK_DRIVER=c64_hitjoy_joy -o joy-test.prg joy-test.c
+**
+** for testing a new driver you will have to uncomment the define below, and
+** link your driver like this:
+**
+** co65 ../../target/c64/drv/joy/c64-hitjoy.joy -o hitjoy.s --code-label _hitjoy
+** cl65 -DJOYSTICK_DRIVER=hitjoy -o joy-test.prg joy-test.c hitjoy.s
+**
 */
 
 /* extern char JOYSTICK_DRIVER; */
@@ -93,12 +93,12 @@ int main (void)
         }
 
         /* show pressed key, so we can verify keyboard is working */
-        kb = kbhit();
-        ch = kb ? cgetc() : ' ';
+        kb = kbhit ();
+        ch = kb ? cgetc () : ' ';
         gotoxy (1, i+2);
-        revers(kb);
-        cprintf("kbd: %c", ch);
-        revers(0);
+        revers (kb);
+        cprintf ("kbd: %c", ch);
+        revers (0);
     }
     return 0;
 }

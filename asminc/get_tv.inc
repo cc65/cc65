@@ -11,6 +11,8 @@
 .enum TV
     NTSC
     PAL
+    NTSC_OLD
+    PAL_N
     OTHER
 .endenum
 

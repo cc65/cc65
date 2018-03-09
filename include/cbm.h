@@ -150,9 +150,7 @@ struct cbm_dirent {
 
 #define TV_NTSC         0
 #define TV_PAL          1
-#define TV_NTSC_OLD     2
-#define TV_PAL_N        3
-#define TV_OTHER        4
+#define TV_OTHER        2
 
 unsigned char get_tv (void);
 /* Return the video mode the machine is using. */

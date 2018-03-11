@@ -435,7 +435,7 @@ GETDEFPALETTE:
 SETPIXEL:
         jsr     CALC            ; Calculate coordinates
 
-        ldy     #0
+        ldy     #$00
         lda     (POINT),Y
         eor     BITMASK
         and     BITTAB,X
@@ -453,12 +453,9 @@ SETPIXEL:
 GETPIXEL:
         jsr     CALC            ; Calculate coordinates
 
-        sei                     ; Get underneath ROM
-        lda     $01
-        pha
-        lda     #$34
-        sta     $01
-
+        lda     X1
+        and     #$07
+        tax
         lda     (POINT),Y
         ldy     #$00
         and     BITTAB,X

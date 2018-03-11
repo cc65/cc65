@@ -73,15 +73,7 @@ X2              := ptr3
 Y2              := ptr4
 TEXT            := ptr3
 
-ROW             := tmp2         ; Bitmap row...
-COL             := tmp3         ; ...and column, both set by PLOT
-TEMP            := tmp4
-TEMP2           := sreg
 POINT           := regsave
-INRANGE         := regsave+2    ; PLOT variable, $00 = coordinates in range
-
-CHUNK           := X2           ; Used in the line routine
-OLDCHUNK        := X2+1         ; Dito
 
 ; Absolute variables used in the code
 
@@ -91,13 +83,6 @@ ERROR:          .res    1       ; Error code
 PALETTE:        .res    2       ; The current palette
 
 BITMASK:        .res    1       ; $00 = clear, $FF = set pixels
-
-; INIT/DONE
-OLDD018:        .res    1       ; Old register value
-
-; Line routine stuff
-DX:             .res    2
-DY:             .res    2
 
 ; BAR variables
 X1SAVE:         .res    2
@@ -118,7 +103,6 @@ DEFPALETTE:     .byte   $00, $01        ; White on black
 PALETTESIZE     = * - DEFPALETTE
 
 BITTAB:         .byte   $80,$40,$20,$10,$08,$04,$02,$01
-BITCHUNK:       .byte   $FF,$7F,$3F,$1F,$0F,$07,$03,$01
 
 CHARROM         := $8000                ; Character ROM base address
 CBASE           := $9400                ; Color memory base address
@@ -453,11 +437,8 @@ SETPIXEL:
 GETPIXEL:
         jsr     CALC            ; Calculate coordinates
 
-        lda     X1
-        and     #$07
-        tax
-        lda     (POINT),Y
         ldy     #$00
+        lda     (POINT),Y
         and     BITTAB,X
         beq     @L1
         iny
@@ -566,49 +547,17 @@ TEXTSTYLE:
 ;
 
 OUTTEXT:
-
-; Calculate a pointer to the representation of the character in the
-; character ROM
-
-        ldx     #((>(CHARROM + $0800)) >> 3)
-        ldy     #0
-        lda     (TEXT),y
-        bmi     @L1
-        ldx     #((>(CHARROM + $0000)) >> 3)
-@L1:    stx     ptr4+1
-        asl     a
-        rol     ptr4+1
-        asl     a
-        rol     ptr4+1
-        asl     a
-        rol     ptr4+1
-        sta     ptr4
-
-
-
-
-
         rts
 
 ; ------------------------------------------------------------------------
-; Calculate all variables to plot the pixel at X1/Y1. If the point is out
-; of range, a carry is returned and INRANGE is set to a value != zero. If
-; the coordinates are valid, INRANGE is zero and the carry clear.
+; Calculate address and X offset in char line to plot the pixel at X1/Y1.
 
-CALC:
-        lda     X1+1
+CALC:   lda     X1+1
         bne     @L9
         lda     Y1+1
         bne     @L9
 
-        lda     Y1
-        cmp     #YRES
-        bcs     @L9
-        sta     ROW
-
         lda     X1
-        cmp     #XRES
-        bcs     @L9
         lsr
         lsr
         lsr
@@ -626,14 +575,6 @@ CALC:
         and     #7
         tax
 
-        lda     #0
-        sta     INRANGE
-        clc
-        rts
-
-@L9:    lda     #1
-        sta     INRANGE
-        sec
-        rts
+@L9:    rts
 
 .include "../../tgi/tgidrv_line.inc"

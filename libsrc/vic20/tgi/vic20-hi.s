@@ -1,7 +1,7 @@
 ;
 ; Graphics driver for a 160x192x2 mode on the VIC-20.
 ;
-; Based on C64 TGI
+; Based on C64 TGI driver
 ;
 ; 2018-03-11, Sven Michael Klose
 ;
@@ -15,8 +15,10 @@
         .macpack        module
 
 
-XRES := 160
-YRES := 192
+COLS := 20
+ROWS := 12
+XRES := COLS * 8
+YRES := ROWS * 16
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table and constants.
@@ -74,6 +76,8 @@ Y2              := ptr4
 TEXT            := ptr3
 
 POINT           := regsave
+SOURCE          := tmp1
+DEST            := tmp3
 
 ; Absolute variables used in the code
 
@@ -82,13 +86,18 @@ POINT           := regsave
 ERROR:          .res    1       ; Error code
 PALETTE:        .res    2       ; The current palette
 
+CURCOL:         .res    1
 BITMASK:        .res    1       ; $00 = clear, $FF = set pixels
 
 ; BAR variables
-X1SAVE:         .res    2
-Y1SAVE:         .res    2
-X2SAVE:         .res    2
-Y2SAVE:         .res    2
+XPOSR:          .res    1       ; Used by BAR.
+PATTERN:        .res    2       ; Address of pattern.
+COUNTER:        .res    2
+TMP:            .res    1
+MASKS:          .res    1
+MASKD:          .res    1
+XCPOS:          .res    1
+HEIGHT:         .res    1
 
 ; Text output stuff
 TEXTMAGX:       .res    1
@@ -161,6 +170,41 @@ XADDRS_H:
         .byte >(VBASE + YRES * 18)
         .byte >(VBASE + YRES * 19)
 
+MASKS_LEFT:
+        .byte %11111111
+MASKD_RIGHT:
+        .byte %01111111
+        .byte %00111111
+        .byte %00011111
+        .byte %00001111
+        .byte %00000111
+        .byte %00000011
+        .byte %00000001
+MASKD_LEFT:
+        .byte %00000000
+MASKS_RIGHT:
+        .byte %10000000
+        .byte %11000000
+        .byte %11100000
+        .byte %11110000
+        .byte %11111000
+        .byte %11111100
+        .byte %11111110
+        .byte %11111111
+
+PATTERN_EMPTY:
+        .byte 0, 0, 0, 0, 0, 0, 0, 0
+
+PATTERN_SOLID:
+        .byte %01111110
+        .byte %11111111
+        .byte %11111111
+        .byte %11111111
+        .byte %11111111
+        .byte %11111111
+        .byte %11111111
+        .byte %01111110
+
 .code
 
 ; ------------------------------------------------------------------------
@@ -171,8 +215,9 @@ XADDRS_H:
 ; Must set an error code: NO
 ;
 
-INSTALL:
+.proc INSTALL
         rts
+.endproc
 
 
 ; ------------------------------------------------------------------------
@@ -182,8 +227,9 @@ INSTALL:
 ; Must set an error code: NO
 ;
 
-UNINSTALL:
+.proc UNINSTALL
         rts
+.endproc
 
 
 ; ------------------------------------------------------------------------
@@ -200,8 +246,7 @@ UNINSTALL:
 ; Must set an error code: YES
 ;
 
-INIT:
-
+.proc INIT
 ; Initialize variables
 
         ldx     #$FF
@@ -241,9 +286,10 @@ l2:     clc
         sta     $9000,x
         dex
         bpl     l2
+
         lda     $900f
         and     #%00000111
-        ora     #8
+        ora     #9
         sta     $900f
 
 ; Done, reset the error code
@@ -251,6 +297,7 @@ l2:     clc
         lda     #TGI_ERR_OK
         sta     ERROR
         rts
+.endproc
 
 ; ------------------------------------------------------------------------
 ; DONE: Will be called to switch the graphics device back into text mode.
@@ -265,11 +312,12 @@ l2:     clc
 ; ------------------------------------------------------------------------
 ; GETERROR: Return the error code in A and clear it.
 
-GETERROR:
+.proc GETERROR
         ldx     #TGI_ERR_OK
         lda     ERROR
         stx     ERROR
         rts
+.endproc
 
 ; ------------------------------------------------------------------------
 ; CONTROL: Platform/driver specific entry point.
@@ -277,10 +325,11 @@ GETERROR:
 ; Must set an error code: YES
 ;
 
-CONTROL:
+.proc CONTROL
         lda     #TGI_ERR_INV_FUNC
         sta     ERROR
         rts
+.endproc
 
 ; ------------------------------------------------------------------------
 ; CLEAR: Clears the screen.
@@ -288,7 +337,8 @@ CONTROL:
 ; Must set an error code: NO
 ;
 
-CLEAR:  ldy     #$00
+.proc CLEAR
+        ldy     #$00
 @L1:    lda     #$00
         sta     $1100,y
         sta     $1200,y
@@ -311,6 +361,7 @@ CLEAR:  ldy     #$00
         iny
         bne     @L1
         rts
+.endproc
 
 ; ------------------------------------------------------------------------
 ; SETVIEWPAGE: Set the visible page. Called with the new page in A (0..n).
@@ -319,8 +370,9 @@ CLEAR:  ldy     #$00
 ; Must set an error code: NO (will only be called if page ok)
 ;
 
-SETVIEWPAGE:
+.proc SETVIEWPAGE
         rts
+.endproc
 
 ; ------------------------------------------------------------------------
 ; SETDRAWPAGE: Set the drawable page. Called with the new page in A (0..n).
@@ -329,8 +381,9 @@ SETVIEWPAGE:
 ; Must set an error code: NO (will only be called if page ok)
 ;
 
-SETDRAWPAGE:
+.proc SETDRAWPAGE
         rts
+.endproc
 
 ; ------------------------------------------------------------------------
 ; SETCOLOR: Set the drawing color (in A). The new color is already checked
@@ -339,12 +392,14 @@ SETDRAWPAGE:
 ; Must set an error code: NO (will only be called if color ok)
 ;
 
-SETCOLOR:
+.proc SETCOLOR
+        sta     CURCOL
         tax
         beq     @L1
         lda     #$FF
 @L1:    sta     BITMASK
         rts
+.endproc
 
 ; ------------------------------------------------------------------------
 ; SETPALETTE: Set the palette (not available with all drivers/hardware).
@@ -354,7 +409,7 @@ SETCOLOR:
 ; Must set an error code: YES
 ;
 
-SETPALETTE:
+.proc SETPALETTE
         ldy     #PALETTESIZE - 1
 @L1:    lda     (ptr1),y        ; Copy the palette
         and     #$0F            ; Make a valid color
@@ -380,6 +435,7 @@ SETPALETTE:
         lda     #TGI_ERR_OK
         sta     ERROR
         rts
+.endproc
 
 ; ------------------------------------------------------------------------
 ; GETPALETTE: Return the current palette in A/X. Even drivers that cannot
@@ -389,10 +445,11 @@ SETPALETTE:
 ; Must set an error code: NO
 ;
 
-GETPALETTE:
+.proc GETPALETTE
         lda     #<PALETTE
         ldx     #>PALETTE
         rts
+.endproc
 
 ; ------------------------------------------------------------------------
 ; GETDEFPALETTE: Return the default palette for the driver in A/X. All
@@ -403,10 +460,11 @@ GETPALETTE:
 ; Must set an error code: NO (all drivers must have a default palette)
 ;
 
-GETDEFPALETTE:
+.proc GETDEFPALETTE
         lda     #<DEFPALETTE
         ldx     #>DEFPALETTE
         rts
+.endproc
 
 ; ------------------------------------------------------------------------
 ; SETPIXEL: Draw one pixel at X1/Y1 = ptr1/ptr2 with the current drawing
@@ -416,7 +474,7 @@ GETDEFPALETTE:
 ; Must set an error code: NO
 ;
 
-SETPIXEL:
+.proc SETPIXEL
         jsr     CALC            ; Calculate coordinates
 
         ldy     #$00
@@ -427,6 +485,7 @@ SETPIXEL:
         sta     (POINT),Y
 
         rts
+.endproc
 
 ; ------------------------------------------------------------------------
 ; GETPIXEL: Read the color value of a pixel and return it in A/X. The
@@ -434,7 +493,7 @@ SETPIXEL:
 ; area, so there is no need for clipping inside this function.
 
 
-GETPIXEL:
+.proc GETPIXEL
         jsr     CALC            ; Calculate coordinates
 
         ldy     #$00
@@ -446,82 +505,7 @@ GETPIXEL:
 @L1:    tya                     ; Get color value into A
         ldx     #$00            ; Clear high byte
         rts
-
-
-; ------------------------------------------------------------------------
-; BAR: Draw a filled rectangle with the corners X1/Y1, X2/Y2, where
-; X1/Y1 = ptr1/ptr2 and X2/Y2 = ptr3/ptr4 using the current drawing color.
-; Contrary to most other functions, the graphics kernel will sort and clip
-; the coordinates before calling the driver, so on entry the following
-; conditions are valid:
-;       X1 <= X2
-;       Y1 <= Y2
-;       (X1 >= 0) && (X1 < XRES)
-;       (X2 >= 0) && (X2 < XRES)
-;       (Y1 >= 0) && (Y1 < YRES)
-;       (Y2 >= 0) && (Y2 < YRES)
-;
-; Must set an error code: NO
-;
-
-; Note: This function needs optimization. It's just a cheap translation of
-; the original C wrapper and could be written much smaller (besides that,
-; calling LINE is not a good idea either).
-
-BAR:    lda     Y2
-        sta     Y2SAVE
-        lda     Y2+1
-        sta     Y2SAVE+1
-
-        lda     X2
-        sta     X2SAVE
-        lda     X2+1
-        sta     X2SAVE+1
-
-        lda     Y1
-        sta     Y1SAVE
-        lda     Y1+1
-        sta     Y1SAVE+1
-
-        lda     X1
-        sta     X1SAVE
-        lda     X1+1
-        sta     X1SAVE+1
-
-@L1:    lda     Y1
-        sta     Y2
-        lda     Y1+1
-        sta     Y2+1
-        jsr     LINE
-
-        lda     Y1SAVE
-        cmp     Y2SAVE
-        bne     @L2
-        lda     Y1SAVE
-        cmp     Y2SAVE
-        beq     @L4
-
-@L2:    inc     Y1SAVE
-        bne     @L3
-        inc     Y1SAVE+1
-
-@L3:    lda     Y1SAVE
-        sta     Y1
-        lda     Y1SAVE+1
-        sta     Y1+1
-
-        lda     X1SAVE
-        sta     X1
-        lda     X1SAVE+1
-        sta     X1+1
-
-        lda     X2SAVE
-        sta     X2
-        lda     X2SAVE+1
-        sta     X2+1
-        jmp     @L1
-
-@L4:    rts
+.endproc
 
 
 ; ------------------------------------------------------------------------
@@ -531,11 +515,12 @@ BAR:    lda     Y2
 ; Must set an error code: NO
 ;
 
-TEXTSTYLE:
+.proc TEXTSTYLE
         stx     TEXTMAGX
         sty     TEXTMAGY
         sta     TEXTDIR
         rts
+.endproc
 
 
 ; ------------------------------------------------------------------------
@@ -546,13 +531,15 @@ TEXTSTYLE:
 ; Must set an error code: NO
 ;
 
-OUTTEXT:
+.proc OUTTEXT
         rts
+.endproc
 
 ; ------------------------------------------------------------------------
 ; Calculate address and X offset in char line to plot the pixel at X1/Y1.
 
-CALC:   lda     X1+1
+.proc CALC
+        lda     X1+1
         bne     @L9
         lda     Y1+1
         bne     @L9
@@ -576,5 +563,168 @@ CALC:   lda     X1+1
         tax
 
 @L9:    rts
+.endproc
 
 .include "../../tgi/tgidrv_line.inc"
+
+
+; In: xpos, ypos, width, height
+; ------------------------------------------------------------------------
+; BAR: Draw a filled rectangle with the corners X1/Y1, X2/Y2, where
+; X1/Y1 = ptr1/ptr2 and X2/Y2 = ptr3/ptr4 using the current drawing color.
+; Contrary to most other functions, the graphics kernel will sort and clip
+; the coordinates before calling the driver, so on entry the following
+; conditions are valid:
+;       X1 <= X2
+;       Y1 <= Y2
+;       (X1 >= 0) && (X1 < XRES)
+;       (X2 >= 0) && (X2 < XRES)
+;       (Y1 >= 0) && (Y1 < YRES)
+;       (Y2 >= 0) && (Y2 < YRES)
+;
+; Must set an error code: NO
+;
+.proc BAR
+; Determine pattern based on current colour.
+        lda     #<PATTERN_SOLID
+        ldx     #>PATTERN_SOLID
+        ldy     CURCOL
+        bne     L2
+        lda     #<PATTERN_EMPTY
+        ldx     #>PATTERN_EMPTY
+L2:     sta     PATTERN
+        stx     PATTERN+1
+
+; Get starting POINT on screen.
+        jsr     CALC
+        sty     XCPOS
+
+; Get height for VFILL.
+        lda     Y2
+        sec
+        sbc     Y1
+        sta     HEIGHT
+
+; Get rightmost char column.
+        lda     X2
+        and     #7
+        sta     XPOSR
+
+; Get width in characters.
+        lda     X2
+        lsr
+        lsr
+        lsr
+        sec
+        sbc     XCPOS
+        beq     SINGLE_COLUMN
+        sta     COUNTER
+
+; Draw left end.
+        lda     X1
+        and     #7
+        tax
+        lda     MASKD_LEFT,x
+        sta     MASKD
+        lda     MASKS_LEFT,x
+        sta     MASKS
+        jsr     VFILL
+        jsr     INCPOINTX
+
+; Draw middle.
+        dec     COUNTER
+        beq     RIGHT_END
+L1:     jsr     VCOPY
+        jsr     INCPOINTX
+        dec     COUNTER
+        bne     L1
+
+; Draw right end.
+RIGHT_END:
+        ldx     XPOSR
+        lda     MASKD_RIGHT,x
+        sta     MASKD
+        lda     MASKS_RIGHT,x
+        sta     MASKS
+        jmp     VFILL
+
+; Draw left end.
+SINGLE_COLUMN:
+        lda     X1
+        and     #7
+        tax
+        ldy     XPOSR
+        lda     MASKS_LEFT,x
+        and     MASKS_RIGHT,y
+        sta     MASKS
+        lda     MASKD_LEFT,x
+        ora     MASKD_RIGHT,y
+        sta     MASKD
+        jmp     VFILL
+.endproc
+
+; SYSCALL: Fill part of column
+;
+; In:   HEIGHT, PATTERN
+;       MASKS:  Source mask (ANDed with pattern).
+;       MASKD:  Destination mask (ANDed with screen).
+;       POINT:  Starting address.
+.proc VFILL
+        lda     PATTERN
+        sta     MOD_PATTERN+1
+        lda     PATTERN+1
+        sta     MOD_PATTERN+2
+        ldy     HEIGHT
+        lda     Y1
+        and     #7
+        tax
+
+L:      lda     (POINT),y
+        and     MASKD
+        sta     TMP
+MOD_PATTERN:
+        lda     $ffff,x
+        and     MASKS
+        ora     TMP
+        sta     (POINT),y
+        inx
+        txa
+        and     #7
+        tax
+        dey
+        bne     L
+
+        rts
+.endproc
+
+.proc VCOPY
+        lda     PATTERN
+        sta     L+1
+        lda     PATTERN+1
+        sta     L+2
+        ldy     HEIGHT
+        lda     Y1
+        and     #7
+        tax
+
+L:      lda     $ffff,x
+        sta     (POINT),y
+        inx
+        txa
+        and     #7
+        tax
+        dey
+        bne     L
+
+        rts
+.endproc
+
+.proc INCPOINTX
+        lda     POINT
+        clc
+        adc     #16*ROWS
+        sta     POINT
+        bcc     L
+        inc     POINT+1
+L:      rts
+.endproc

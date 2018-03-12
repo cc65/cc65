@@ -57,7 +57,7 @@
 
 
 
-/* Color defines ¿ (C64 colours >= 8) */
+/* Color defines */
 #define COLOR_BLACK             0x00
 #define COLOR_WHITE             0x01
 #define COLOR_RED               0x02

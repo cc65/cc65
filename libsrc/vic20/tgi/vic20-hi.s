@@ -277,9 +277,9 @@ NEW_COL:sta     (tmp2),y
         clc
         adc     #20
         sta     tmp2
-        bcc     L1
+        bcc     @L1
         inc     tmp2+1
-L1:     inx
+@L1:    inx
 
         cpx     #12
         bne     NEXT_ROW
@@ -287,12 +287,12 @@ L1:     inx
 ; Set up VIC.
 
         ldx #5
-l2:     clc
+@L2:    clc
         lda     $ede4,x
         adc     VICREGS,x
         sta     $9000,x
         dex
-        bpl     l2
+        bpl     @L2
 
         lda     $900f
         and     #%00000111
@@ -545,9 +545,9 @@ DONE:   jmp    $E518       ; KERNAL VIC init.
 
 .proc CALC
         lda     X1+1
-        bne     @L9
+        bne     @L1
         lda     Y1+1
-        bne     @L9
+        bne     @L1
 
         lda     X1
         lsr
@@ -567,7 +567,7 @@ DONE:   jmp    $E518       ; KERNAL VIC init.
         and     #7
         tax
 
-@L9:    rts
+@L1:    rts
 .endproc
 
 .include "../../tgi/tgidrv_line.inc"
@@ -596,10 +596,10 @@ DONE:   jmp    $E518       ; KERNAL VIC init.
         lda     #<PATTERN_SOLID
         ldx     #>PATTERN_SOLID
         ldy     CURCOL
-        bne     L2
+        bne     @L2
         lda     #<PATTERN_EMPTY
         ldx     #>PATTERN_EMPTY
-L2:     sta     PATTERN
+@L2     sta     PATTERN
         stx     PATTERN+1
 
 ; Get starting POINT on screen.
@@ -647,10 +647,10 @@ L2:     sta     PATTERN
 
         dec     COUNTER
         beq     RIGHT_END
-L1:     jsr     VCOPY
+@L1:    jsr     VCOPY
         jsr     INCPOINTX
         dec     COUNTER
-        bne     L1
+        bne     @L1
 
 ; Draw right end.
 
@@ -682,22 +682,24 @@ SINGLE_COLUMN:
 ;       MASKS:  Source mask (ANDed with pattern).
 ;       MASKD:  Destination mask (ANDed with screen).
 ;       POINT:  Starting address.
+; ------------------------------------------------------------------------
+; Fill column with pattern using masks.
 ;
 
 .proc VFILL
         lda     PATTERN
-        sta     MOD_PATTERN+1
+        sta     @MOD_PATTERN+1
         lda     PATTERN+1
-        sta     MOD_PATTERN+2
+        sta     @MOD_PATTERN+2
         ldy     HEIGHT
         lda     Y1
         and     #7
         tax
 
-L:      lda     (POINT),y
+@L1:    lda     (POINT),y
         and     MASKD
         sta     TMP
-MOD_PATTERN:
+@MOD_PATTERN:
         lda     $ffff,x
         and     MASKS
         ora     TMP
@@ -707,29 +709,35 @@ MOD_PATTERN:
         and     #7
         tax
         dey
-        bne     L
+        bne     @L1
 
         rts
 .endproc
 
+; In:   HEIGHT, PATTERN, POINT
+; ------------------------------------------------------------------------
+; Fill column with pattern.
+;
+
 .proc VCOPY
         lda     PATTERN
-        sta     L+1
+        sta     @MOD_PATTERN+1
         lda     PATTERN+1
-        sta     L+2
+        sta     @MOD_PATTERN+2
         ldy     HEIGHT
         lda     Y1
         and     #7
         tax
 
-L:      lda     $ffff,x
+@MOD_PATTERN:
+@L1:    lda     $ffff,x
         sta     (POINT),y
         inx
         txa
         and     #7
         tax
         dey
-        bne     L
+        bne     @L1
 
         rts
 .endproc
@@ -739,7 +747,9 @@ L:      lda     $ffff,x
         clc
         adc     #16*ROWS
         sta     POINT
-        bcc     L
+        bcc     @L1
         inc     POINT+1
-L:      rts
+@L1:
+
+        rts
 .endproc

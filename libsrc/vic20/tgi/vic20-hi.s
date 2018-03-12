@@ -259,17 +259,19 @@ PATTERN_SOLID:
         sta     tmp2+1
         ldx     #0
 
-NEW_ROW:ldy     #0
+@NEXT_ROW:
+        ldy     #0
         txa
         clc
         adc     #$10
 
-NEW_COL:sta     (tmp2),y
+@NEXT_COLUMN:
+        sta     (tmp2),y
         clc
         adc     #12
         iny
         cpy     #20
-        bne     NEW_COL
+        bne     @NEXT_COLUMN
 
 ; Step to next row on screen.
 
@@ -282,7 +284,7 @@ NEW_COL:sta     (tmp2),y
 @L1:    inx
 
         cpx     #12
-        bne     NEXT_ROW
+        bne     @NEXT_ROW
 
 ; Set up VIC.
 
@@ -314,7 +316,9 @@ NEW_COL:sta     (tmp2),y
 ; Must set an error code: NO
 ;
 
-DONE:   jmp    $E518       ; KERNAL VIC init.
+.proc DONE
+        jmp    $E518        ; KERNAL VIC init.
+.endproc
 
 ; ------------------------------------------------------------------------
 ; GETERROR: Return the error code in A and clear it.
@@ -599,7 +603,7 @@ DONE:   jmp    $E518       ; KERNAL VIC init.
         bne     @L2
         lda     #<PATTERN_EMPTY
         ldx     #>PATTERN_EMPTY
-@L2     sta     PATTERN
+@L2:    sta     PATTERN
         stx     PATTERN+1
 
 ; Get starting POINT on screen.

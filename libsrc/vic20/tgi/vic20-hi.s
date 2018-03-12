@@ -193,17 +193,24 @@ MASKS_RIGHT:
         .byte %11111111
 
 PATTERN_EMPTY:
-        .byte 0, 0, 0, 0, 0, 0, 0, 0
+        .byte %00000000
+        .byte %00000000
+        .byte %00000000
+        .byte %00000000
+        .byte %00000000
+        .byte %00000000
+        .byte %00000000
+        .byte %00000000
 
 PATTERN_SOLID:
-        .byte %01111110
         .byte %11111111
         .byte %11111111
         .byte %11111111
         .byte %11111111
         .byte %11111111
         .byte %11111111
-        .byte %01111110
+        .byte %11111111
+        .byte %11111111
 
 .code
 

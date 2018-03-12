@@ -46,7 +46,7 @@ YRES := ROWS * 16
         .addr   INSTALL
         .addr   UNINSTALL
         .addr   INIT
-        .addr   $e518           ; KERNAL VIC init.
+        .addr   DONE
         .addr   GETERROR
         .addr   CONTROL
         .addr   CLEAR
@@ -91,7 +91,7 @@ BITMASK:        .res    1       ; $00 = clear, $FF = set pixels
 
 ; BAR variables
 XPOSR:          .res    1       ; Used by BAR.
-PATTERN:        .res    2       ; Address of pattern.
+PATTERN:        .res    2       ; Address of pattern. Settable via IOCTL in the future.
 COUNTER:        .res    2
 TMP:            .res    1
 MASKS:          .res    1
@@ -219,7 +219,6 @@ PATTERN_SOLID:
         rts
 .endproc
 
-
 ; ------------------------------------------------------------------------
 ; UNINSTALL routine. Is called before the driver is removed from memory. May
 ; clean up anything done by INSTALL but is probably empty most of the time.
@@ -230,7 +229,6 @@ PATTERN_SOLID:
 .proc UNINSTALL
         rts
 .endproc
-
 
 ; ------------------------------------------------------------------------
 ; INIT: Changes an already installed device from text mode to graphics
@@ -247,38 +245,47 @@ PATTERN_SOLID:
 ;
 
 .proc INIT
+
 ; Initialize variables
 
         ldx     #$FF
         stx     BITMASK
 
 ; Make screen columns.
+
         lda     #<SBASE
         sta     tmp2
         lda     #>SBASE
         sta     tmp2+1
         ldx     #0
-l:      ldy     #0
+
+NEW_ROW:ldy     #0
         txa
         clc
         adc     #$10
-m:      sta     (tmp2),y
+
+NEW_COL:sta     (tmp2),y
         clc
         adc     #12
         iny
         cpy     #20
-        bne     m
+        bne     NEW_COL
+
+; Step to next row on screen.
+
         lda     tmp2
         clc
         adc     #20
         sta     tmp2
-        bcc     n
+        bcc     L1
         inc     tmp2+1
-n:      inx
+L1:     inx
+
         cpx     #12
-        bne     l
+        bne     NEXT_ROW
 
 ; Set up VIC.
+
         ldx #5
 l2:     clc
         lda     $ede4,x
@@ -307,7 +314,7 @@ l2:     clc
 ; Must set an error code: NO
 ;
 
-;DONE:   jmp    $e518       ; KERNAL VIC init.
+DONE:   jmp    $E518       ; KERNAL VIC init.
 
 ; ------------------------------------------------------------------------
 ; GETERROR: Return the error code in A and clear it.
@@ -507,7 +514,6 @@ l2:     clc
         rts
 .endproc
 
-
 ; ------------------------------------------------------------------------
 ; TEXTSTYLE: Set the style used when calling OUTTEXT. Text scaling in X and Y
 ; direction is passend in X/Y, the text direction is passed in A.
@@ -521,7 +527,6 @@ l2:     clc
         sta     TEXTDIR
         rts
 .endproc
-
 
 ; ------------------------------------------------------------------------
 ; OUTTEXT: Output text at X/Y = ptr1/ptr2 using the current color and the
@@ -567,7 +572,6 @@ l2:     clc
 
 .include "../../tgi/tgidrv_line.inc"
 
-
 ; In: xpos, ypos, width, height
 ; ------------------------------------------------------------------------
 ; BAR: Draw a filled rectangle with the corners X1/Y1, X2/Y2, where
@@ -584,8 +588,11 @@ l2:     clc
 ;
 ; Must set an error code: NO
 ;
+
 .proc BAR
+
 ; Determine pattern based on current colour.
+
         lda     #<PATTERN_SOLID
         ldx     #>PATTERN_SOLID
         ldy     CURCOL
@@ -596,21 +603,25 @@ L2:     sta     PATTERN
         stx     PATTERN+1
 
 ; Get starting POINT on screen.
+
         jsr     CALC
         sty     XCPOS
 
 ; Get height for VFILL.
+
         lda     Y2
         sec
         sbc     Y1
         sta     HEIGHT
 
 ; Get rightmost char column.
+
         lda     X2
         and     #7
         sta     XPOSR
 
 ; Get width in characters.
+
         lda     X2
         lsr
         lsr
@@ -621,6 +632,7 @@ L2:     sta     PATTERN
         sta     COUNTER
 
 ; Draw left end.
+
         lda     X1
         and     #7
         tax
@@ -632,6 +644,7 @@ L2:     sta     PATTERN
         jsr     INCPOINTX
 
 ; Draw middle.
+
         dec     COUNTER
         beq     RIGHT_END
 L1:     jsr     VCOPY
@@ -640,6 +653,7 @@ L1:     jsr     VCOPY
         bne     L1
 
 ; Draw right end.
+
 RIGHT_END:
         ldx     XPOSR
         lda     MASKD_RIGHT,x
@@ -649,6 +663,7 @@ RIGHT_END:
         jmp     VFILL
 
 ; Draw left end.
+
 SINGLE_COLUMN:
         lda     X1
         and     #7
@@ -663,12 +678,12 @@ SINGLE_COLUMN:
         jmp     VFILL
 .endproc
 
-; SYSCALL: Fill part of column
-;
 ; In:   HEIGHT, PATTERN
 ;       MASKS:  Source mask (ANDed with pattern).
 ;       MASKD:  Destination mask (ANDed with screen).
 ;       POINT:  Starting address.
+;
+
 .proc VFILL
         lda     PATTERN
         sta     MOD_PATTERN+1

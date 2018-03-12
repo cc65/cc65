@@ -157,7 +157,7 @@ const OpcDesc OpcTable_65C02[256] = {
     {   "",     1,  flIllegal,                OH_Illegal,              }, /* $6b */
     {   "jmp",  3,  flLabel,                  OH_JmpAbsoluteIndirect   }, /* $6c */
     {   "adc",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $6d */
-    {   "ror",  3,  flUseLabel,               OH_Absolute              }, /* $6e */
+    {   "ror",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $6e */
     {   "bbr6", 3,  flUseLabel,               OH_BitBranch             }, /* $6f */
     {   "bvs",  2,  flLabel,                  OH_Relative              }, /* $70 */
     {   "adc",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $71 */

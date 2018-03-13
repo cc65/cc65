@@ -725,7 +725,7 @@ STEPINY:
 ;
 YLOOP:  sta     TEMP
 
-        lda     (POINT),y    ;Otherwise plot
+        lda     (POINT),y    ;Plot
         eor     BITMASK
         and     CHUNK
         eor     (POINT),y

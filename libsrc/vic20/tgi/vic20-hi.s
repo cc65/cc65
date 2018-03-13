@@ -684,7 +684,7 @@ PATTERN_SOLID:
         lsr
         sec
         sbc     XCPOS
-        beq     SINGLE_COLUMN
+        beq     @DRAW_SINGLE_COLUMN
         sta     COUNTER
 
 ; Draw left end.
@@ -702,7 +702,7 @@ PATTERN_SOLID:
 ; Draw middle.
 
         dec     COUNTER
-        beq     RIGHT_END
+        beq     @DRAW_RIGHT_END
 @L1:    jsr     VCOPY
         jsr     INCPOINTX
         dec     COUNTER
@@ -710,7 +710,7 @@ PATTERN_SOLID:
 
 ; Draw right end.
 
-RIGHT_END:
+@DRAW_RIGHT_END:
         ldx     XPOSR
         lda     MASKD_RIGHT,x
         sta     MASKD
@@ -720,7 +720,7 @@ RIGHT_END:
 
 ; Draw left end.
 
-SINGLE_COLUMN:
+@DRAW_SINGLE_COLUMN:
         lda     X1
         and     #7
         tax

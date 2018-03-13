@@ -280,10 +280,10 @@ PATTERN_SOLID:
         sta     tmp2
         lda     #>SBASE
         sta     tmp2+1
-        ldx     #0
+        ldx     #$00
 
 @NEXT_ROW:
-        ldy     #0
+        ldy     #$00
         txa
         clc
         adc     #$10
@@ -326,7 +326,7 @@ PATTERN_SOLID:
 
 ; Reset user defined pattern.
 
-        lda     #0
+        lda     #$00
         sta     PATTERN
         sta     PATTERN+1
 
@@ -611,7 +611,7 @@ PATTERN_SOLID:
         adc     Y1
         sta     POINT
         lda     XADDRS_H,y
-        adc     #0
+        adc     #$00
         sta     POINT+1
 
         lda     X1
@@ -710,7 +710,7 @@ PATTERN_SOLID:
 ;
 ; On entry, X=DY=number of loop iterations, and Y=Y1
 STEPINY:
-        lda     #00
+        lda     #$00
         sta     OLDCHUNK     ;So plotting routine will work right
         lda     CHUNK
         lsr                  ;Strip the bit

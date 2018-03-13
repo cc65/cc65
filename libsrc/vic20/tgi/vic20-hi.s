@@ -42,7 +42,7 @@ TGI_IOCTL_VIC20_SET_PATTERN     :=  $01
         .byte   1                       ; Number of screens available
         .byte   8                       ; System font X size
         .byte   8                       ; System font Y size
-        .word   $00D4                   ; Aspect ratio (based on 4/3 display)
+        .word   $00C5                   ; Aspect ratio 2.5:3
         .byte   0                       ; TGI driver flags
 
 ; Next comes the jump table. With the exception of IRQ, all entries must be

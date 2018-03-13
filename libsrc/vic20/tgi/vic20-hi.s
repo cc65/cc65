@@ -126,8 +126,8 @@ TEXTDIR:        .res    1
 DEFPALETTE:     .byte   $00, $01        ; White on black
 PALETTESIZE     = * - DEFPALETTE
 
-BITTAB:         .byte   $80,$40,$20,$10,$08,$04,$02,$01
-BITCHUNK:       .byte   $FF,$7F,$3F,$1F,$0F,$07,$03,$01                                             
+BITTAB:         .byte   $80, $40, $20, $10, $08, $04, $02, $01
+BITCHUNK:       .byte   $FF, $7F, $3F, $1F, $0F, $07, $03, $01
 
 CHARROM         := $8000                ; Character ROM base address
 CBASE           := $9400                ; Color memory base address
@@ -136,11 +136,11 @@ VBASE           := $1100                ; Video memory base address
 
 VICREGS:
         .byte $02
-        .byte $fe
-        .byte $fe
-        .byte $eb
+        .byte $FE
+        .byte $FE
+        .byte $EB
         .byte $00
-        .byte $0c
+        .byte $0C
 
 XADDRS_L:
         .byte <(VBASE + YRES * 0)
@@ -313,16 +313,16 @@ PATTERN_SOLID:
 
         ldx #5
 @L2:    clc
-        lda     $ede4,x
+        lda     $EDE4,x
         adc     VICREGS,x
         sta     $9000,x
         dex
         bpl     @L2
 
-        lda     $900f
+        lda     $900F
         and     #%00000111
         ora     #9
-        sta     $900f
+        sta     $900F
 
 ; Reset user defined pattern.
 
@@ -407,12 +407,12 @@ PATTERN_SOLID:
         sta     $1700,y
         sta     $1800,y
         sta     $1900,y
-        sta     $1a00,y
-        sta     $1b00,y
-        sta     $1c00,y
-        sta     $1d00,y
-        sta     $1e00,y
-        sta     $1f00,y
+        sta     $1A00,y
+        sta     $1B00,y
+        sta     $1C00,y
+        sta     $1D00,y
+        sta     $1E00,y
+        sta     $1F00,y
         lda     #1
         sta     $9400,y
         sta     $9500,y
@@ -483,10 +483,10 @@ PATTERN_SOLID:
         sta     CBASE+$0100,y
         iny
         bne     @L2
-        lda     $900f
-        and     #$f8
+        lda     $900F
+        and     #$F8
         ora     PALETTE         ; Background color
-        sta     $900f
+        sta     $900F
 
 ; Done, reset the error code
 
@@ -999,7 +999,7 @@ LINEPLOT:                       ; Plot the line chunk
         and     MASKD
         sta     TMP
 @MOD_PATTERN:
-        lda     $ffff,x
+        lda     $FFFF,x
         and     MASKS
         ora     TMP
         sta     (POINT),y
@@ -1029,7 +1029,7 @@ LINEPLOT:                       ; Plot the line chunk
         tax
 
 @MOD_PATTERN:
-@L1:    lda     $ffff,x
+@L1:    lda     $FFFF,x
         sta     (POINT),y
         inx
         txa

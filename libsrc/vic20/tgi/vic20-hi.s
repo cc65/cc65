@@ -743,7 +743,7 @@ YCONT2: lda     (POINT),y    ;Plot endpoint
         and     CHUNK
         eor     (POINT),y
         sta     (POINT),y
-YDONE:  rts
+        rts
 
 YFIXX:                      ;x=x+1
         adc     DY
@@ -794,7 +794,7 @@ XCONT2: dex
         dec     COUNTHI      ;High bits set?
         bpl     XLOOP
 
-XDONE:  lsr     CHUNK        ;Advance to last point
+        lsr     CHUNK        ;Advance to last point
         jmp     LINEPLOT     ;Plot the last chunk
 ;
 ; CHUNK has passed a column, so plot and increment pointer
@@ -812,7 +812,6 @@ XFIXC:  sta     TEMP
         lda     TEMP
         bcc     XCONT1
         inc     POINT+1
-sec
         jmp     XCONT1
 ;
 ; Check to make sure there isn't a high bit, plot chunk,

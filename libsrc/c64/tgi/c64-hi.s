@@ -574,7 +574,7 @@ YCONT2: lda     (POINT),y    ;Plot endpoint
         and     CHUNK
         eor     (POINT),y
         sta     (POINT),y
-YDONE:  lda     #$36
+        lda     #$36
         sta     $01
         cli
         rts
@@ -629,7 +629,7 @@ XCONT2: dex
         dec     COUNTHI      ;High bits set?
         bpl     XLOOP
 
-XDONE:  lsr     CHUNK        ;Advance to last point
+        lsr     CHUNK        ;Advance to last point
         jsr     LINEPLOT     ;Plot the last chunk
 EXIT:   lda     #$36
         sta     $01

@@ -898,6 +898,13 @@ LINEPLOT:                       ; Plot the line chunk
 
         jsr     CALC
         sty     XCPOS
+        lda     POINT       ; One off for VFILL/VCOPY.
+        sec
+        sbc     #1
+        sta     POINT
+        bcs     @L3
+        dec     POINT+1
+@L3:
 
 ; Get height for VFILL.
 
@@ -1037,7 +1044,7 @@ LINEPLOT:                       ; Plot the line chunk
 .proc INCPOINTX
         lda     POINT
         clc
-        adc     #16*ROWS
+        adc     #16 * ROWS
         sta     POINT
         bcc     @L1
         inc     POINT+1

@@ -91,7 +91,7 @@ DEST            := tmp3
 ERROR:          .res    1       ; Error code
 PALETTE:        .res    2       ; The current palette
 
-CURCOL:         .res    1
+CURCOL:         .res    1       ; Current color.
 BITMASK:        .res    1       ; $00 = clear, $FF = set pixels
 
 ; BAR variables
@@ -104,6 +104,15 @@ MASKS:          .res    1
 MASKD:          .res    1
 XCPOS:          .res    1
 HEIGHT:         .res    1
+
+; Line variables
+
+CHUNK           := X2           ; Used in the line routine
+OLDCHUNK        := X2+1         ; Dito
+TEMP            := tmp4
+TEMP2           := sreg
+DX:             .res    2
+DY:             .res    2
 
 ; Text output stuff
 TEXTMAGX:       .res    1
@@ -118,6 +127,7 @@ DEFPALETTE:     .byte   $00, $01        ; White on black
 PALETTESIZE     = * - DEFPALETTE
 
 BITTAB:         .byte   $80,$40,$20,$10,$08,$04,$02,$01
+BITCHUNK:       .byte   $FF,$7F,$3F,$1F,$0F,$07,$03,$01                                             
 
 CHARROM         := $8000                ; Character ROM base address
 CBASE           := $9400                ; Color memory base address
@@ -611,7 +621,234 @@ PATTERN_SOLID:
 @L1:    rts
 .endproc
 
-.include "../../tgi/tgidrv_line.inc"
+; ------------------------------------------------------------------------
+; LINE: Draw a line from X1/Y1 to X2/Y2, where X1/Y1 = ptr1/ptr2 and
+; X2/Y2 = ptr3/ptr4 using the current drawing color.
+;
+; X1,X2 etc. are set up above (x2=LINNUM in particular)
+; Format is LINE x2,y2,x1,y1
+;
+; Must set an error code: NO
+;
+
+.proc LINE
+
+@CHECK: lda     X2           ;Make sure x1<x2
+        sec
+        sbc     X1
+        tax
+        lda     X2+1
+        sbc     X1+1
+        bpl     @CONT
+        lda     Y2           ;If not, swap P1 and P2
+        ldy     Y1
+        sta     Y1
+        sty     Y2
+        lda     Y2+1
+        ldy     Y1+1
+        sta     Y1+1
+        sty     Y2+1
+        lda     X1
+        ldy     X2
+        sty     X1
+        sta     X2
+        lda     X2+1
+        ldy     X1+1
+        sta     X1+1
+        sty     X2+1
+        bcc     @CHECK
+
+@CONT:  sta     DX+1
+        stx     DX
+
+        ldx     #$C8         ;INY
+        lda     Y2           ;Calculate dy
+        sec
+        sbc     Y1
+        tay
+        lda     Y2+1
+        sbc     Y1+1
+        bpl     @DYPOS       ;Is y2>=y1?
+        lda     Y1           ;Otherwise dy=y1-y2
+        sec
+        sbc     Y2
+        tay
+        ldx     #$88         ;DEY
+
+@DYPOS: sty     DY              ; 8-bit DY -- FIX ME?
+        stx     YINCDEC
+        stx     XINCDEC
+
+        lda     X1
+        lsr
+        lsr
+        lsr
+        tay
+        lda     XADDRS_L,y
+        sta     POINT
+        lda     XADDRS_H,y
+        sta     POINT+1
+        ldy     Y1
+
+        lda     X1
+        and     #7
+        tax
+        lda     BITCHUNK,X
+        sta     OLDCHUNK
+        sta     CHUNK
+
+        ldx     DY
+        cpx     DX           ;Who's bigger: dy or dx?
+        bcc     STEPINX      ;If dx, then...
+        lda     DX+1
+        bne     STEPINX
+
+;
+; Big steps in Y
+;
+;   X is now counter, Y is y-coordinate
+;
+; On entry, X=DY=number of loop iterations, and Y=Y1
+STEPINY:
+        lda     #00
+        sta     OLDCHUNK     ;So plotting routine will work right
+        lda     CHUNK
+        lsr                  ;Strip the bit
+        eor     CHUNK
+        sta     CHUNK
+        txa
+        bne     @CONT        ;If dy=0 it's just a point
+        inx
+@CONT:  lsr                  ;Init counter to dy/2
+;
+; Main loop
+;
+YLOOP:  sta     TEMP
+
+        lda     (POINT),y    ;Otherwise plot
+        eor     BITMASK
+        and     CHUNK
+        eor     (POINT),y
+        sta     (POINT),y
+YINCDEC:
+        iny                  ;Advance Y coordinate
+        lda     TEMP         ;Restore A
+        sec
+        sbc     DX
+        bcc     YFIXX
+YCONT:  dex                  ;X is counter
+        bne     YLOOP
+YCONT2: lda     (POINT),y    ;Plot endpoint
+        eor     BITMASK
+        and     CHUNK
+        eor     (POINT),y
+        sta     (POINT),y
+YDONE:  rts
+
+YFIXX:                      ;x=x+1
+        adc     DY
+        lsr     CHUNK
+        bne     YCONT        ;If we pass a column boundary...
+        ror     CHUNK        ;then reset CHUNK to $80
+        sta     TEMP2
+        lda     POINT
+        adc     #YRES
+        sta     POINT
+        bcc     @CONT
+        inc     POINT+1
+@CONT:  lda     TEMP2
+        dex
+        bne     YLOOP
+        beq     YCONT2
+
+;
+; Big steps in X direction
+;
+; On entry, X=DY=number of loop iterations, and Y=Y1
+
+.bss
+COUNTHI:
+        .byte   $00       ;Temporary counter
+                          ;only used once
+.code
+STEPINX:
+        ldx     DX
+        lda     DX+1
+        sta     COUNTHI
+        cmp     #$80
+        ror                  ;Need bit for initialization
+        sta     Y1           ;High byte of counter
+        txa
+        bne     @CONT        ;Could be $100
+        dec     COUNTHI
+@CONT:  ror
+;
+; Main loop
+;
+XLOOP:  lsr     CHUNK
+        beq     XFIXC        ;If we pass a column boundary...
+XCONT1: sbc     DY
+        bcc     XFIXY        ;Time to step in Y?
+XCONT2: dex
+        bne     XLOOP
+        dec     COUNTHI      ;High bits set?
+        bpl     XLOOP
+
+XDONE:  lsr     CHUNK        ;Advance to last point
+        jmp     LINEPLOT     ;Plot the last chunk
+;
+; CHUNK has passed a column, so plot and increment pointer
+; and fix up CHUNK, OLDCHUNK.
+;
+XFIXC:  sta     TEMP
+        jsr     LINEPLOT
+        lda     #$FF
+        sta     CHUNK
+        sta     OLDCHUNK
+        lda     POINT
+        clc
+        adc     #YRES
+        sta     POINT
+        lda     TEMP
+        bcc     XCONT1
+        inc     POINT+1
+sec
+        jmp     XCONT1
+;
+; Check to make sure there isn't a high bit, plot chunk,
+; and update Y-coordinate.
+;
+XFIXY:  dec     Y1           ;Maybe high bit set
+        bpl     XCONT2
+        adc     DX
+        sta     TEMP
+        lda     DX+1
+        adc     #$FF         ;Hi byte
+        sta     Y1
+
+        jsr     LINEPLOT     ;Plot chunk
+        lda     CHUNK
+        sta     OLDCHUNK
+
+        lda     TEMP
+XINCDEC:
+        iny                  ;Y-coord
+        jmp     XCONT2
+
+;
+; Subroutine to plot chunks/points (to save a little
+; room, gray hair, etc.)
+;
+LINEPLOT:                       ; Plot the line chunk
+        lda     (POINT),Y       ; Otherwise plot
+        eor     BITMASK
+        ora     CHUNK
+        and     OLDCHUNK
+        eor     CHUNK
+        eor     (POINT),Y
+        sta     (POINT),Y
+        rts
+.endproc
 
 ; In: xpos, ypos, width, height
 ; ------------------------------------------------------------------------

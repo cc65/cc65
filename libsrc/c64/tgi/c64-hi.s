@@ -510,7 +510,7 @@ LINE:
         stx     YINCDEC
         stx     XINCDEC
 
-        jsr     CALC            ; Set up .X,.Y,POINT, and INRANGE
+        jsr     CALC            ; Set up .X,.Y and POINT
         lda     BITCHUNK,X
         sta     OLDCHUNK
         sta     CHUNK

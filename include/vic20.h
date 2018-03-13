@@ -95,6 +95,10 @@
 
 
 
+/* tgi_ioctl() functions */
+#define TGI_IOCTL_VIC20_SET_PATTERN     0x01    /* Set 8-byte pattern for tgi_bar(). */
+
+
 /* Masks for joy_read */
 #define JOY_UP_MASK             0x01
 #define JOY_DOWN_MASK           0x02

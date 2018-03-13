@@ -15,10 +15,15 @@
         .macpack        module
 
 
+; ------------------------------------------------------------------------
+; Constants
+
 COLS := 20
 ROWS := 12
 XRES := COLS * 8
 YRES := ROWS * 16
+
+TGI_IOCTL_VIC20_SET_PATTERN     :=  $01
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table and constants.
@@ -91,7 +96,8 @@ BITMASK:        .res    1       ; $00 = clear, $FF = set pixels
 
 ; BAR variables
 XPOSR:          .res    1       ; Used by BAR.
-PATTERN:        .res    2       ; Address of pattern. Settable via IOCTL in the future.
+PATTERN:        .res    2       ; Address of pattern.
+USERPATTERN:    .res    2       ; User defined pattern set via CONTROL.
 COUNTER:        .res    2
 TMP:            .res    1
 MASKS:          .res    1
@@ -308,6 +314,12 @@ PATTERN_SOLID:
         ora     #9
         sta     $900f
 
+; Reset user defined pattern.
+
+        lda     #0
+        sta     PATTERN
+        sta     PATTERN+1
+
 ; Done, reset the error code
 
         lda     #TGI_ERR_OK
@@ -344,6 +356,24 @@ PATTERN_SOLID:
 ;
 
 .proc CONTROL
+
+; Set user defined pattern.
+
+        cmp     #TGI_IOCTL_VIC20_SET_PATTERN
+        bne     @INVALID_FUNC
+
+        lda     ptr1
+        sta     USERPATTERN
+        lda     ptr1+1
+        sta     USERPATTERN+1
+
+        lda     #TGI_ERR_OK
+        sta     ERROR
+        rts
+
+; Return with error code for invalid function index.
+
+@INVALID_FUNC:
         lda     #TGI_ERR_INV_FUNC
         sta     ERROR
         rts
@@ -602,8 +632,21 @@ PATTERN_SOLID:
 
 .proc BAR
 
+; Set user pattern if available.
+
+        lda     USERPATTERN
+        ora     USERPATTERN+1
+        beq     @GET_PATTERN_BY_COLOR
+
+        lda     USERPATTERN
+        sta     PATTERN
+        lda     USERPATTERN+1
+        sta     PATTERN+1
+        jmp     @GOT_PATTERN
+
 ; Determine pattern based on current colour.
 
+@GET_PATTERN_BY_COLOR:
         lda     #<PATTERN_SOLID
         ldx     #>PATTERN_SOLID
         ldy     CURCOL
@@ -612,6 +655,8 @@ PATTERN_SOLID:
         ldx     #>PATTERN_EMPTY
 @L2:    sta     PATTERN
         stx     PATTERN+1
+
+@GOT_PATTERN:
 
 ; Get starting POINT on screen.
 

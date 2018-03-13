@@ -1044,7 +1044,7 @@ LINEPLOT:                       ; Plot the line chunk
 .proc INCPOINTX
         lda     POINT
         clc
-        adc     #16 * ROWS
+        adc     #YRES
         sta     POINT
         bcc     @L1
         inc     POINT+1

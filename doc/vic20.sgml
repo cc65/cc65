@@ -142,7 +142,11 @@ The names in the parentheses denote the symbols to be used for static linking of
 
 <sect1>Graphics drivers<p>
 
-No graphics drivers are currently available for the VIC20.
+<descrip>
+  <tag><tt/vic20-hi.tgi (vic20_hi_tgi)/</tag>
+  This driver features a resolution of 160&times;192 with two colors. Note that this driver will occupy
+  memory from address $1000 to $1FFF.
+</descrip>
 
 
 <sect1>Extended memory drivers<p>
@@ -171,7 +175,6 @@ The default drivers, <tt/joy_stddrv (joy_static_stddrv)/, point to <tt/vic20-std
 <sect1>Mouse drivers<p>
 
 No mouse drivers are currently available for the VIC20.
-
 
 <sect1>RS232 device drivers<p>
 

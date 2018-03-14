@@ -144,8 +144,8 @@ The names in the parentheses denote the symbols to be used for static linking of
 
 <descrip>
   <tag><tt/vic20-hi.tgi (vic20_hi_tgi)/</tag>
-  This driver features a resolution of 160*192 with two colors. Note that this driver will occupy
-  memory from address $1000 to $1fff.
+  This driver features a resolution of 160&times;192 with two colors. Note that this driver will occupy
+  memory from address $1000 to $1FFF.
 </descrip>
 
 

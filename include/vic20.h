@@ -105,7 +105,7 @@
 extern void vic20_ptvjoy_joy[];
 extern void vic20_stdjoy_joy[];         /* Referred to by joy_static_stddrv[] */
 
-
+extern void vic20_rama_emd[];
 
 /* End of vic20.h */
 #endif

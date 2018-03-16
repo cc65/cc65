@@ -5,10 +5,13 @@
 ;
 
 
-        .export     _textcolor, _bgcolor, _bordercolor
+        .export         _textcolor, _bgcolor, _bordercolor
+        .import         return0
 
         .include        "pce.inc"
         .include        "extzp.inc"
+
+_bordercolor    = return0
 
 _textcolor:
         ldx     CHARCOLOR       ; get old value
@@ -30,11 +33,6 @@ _bgcolor:
         sta     VCE_DATA_HI
 
         txa
-        rts
-
-_bordercolor:
-        lda     #0
-        tax
         rts
 
         .rodata

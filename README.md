@@ -23,6 +23,7 @@ including
   - newer PET machines (not 2001).
 - the Apple ]\[+ and successors.
 - the Atari 8 bit machines.
+- the Atari 2600 console.
 - the Atari 5200 console.
 - GEOS for the C64, C128 and Apple //e.
 - the Bit Corporation Gamate console.

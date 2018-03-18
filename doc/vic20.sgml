@@ -147,9 +147,13 @@ No graphics drivers are currently available for the VIC20.
 
 <sect1>Extended memory drivers<p>
 
+<descrip>
+
   <tag><tt/vic20-rama.emd (vic20_rama_emd)/</tag>
   A driver for any RAM at $A000-$BFFF. Supports 32 256 byte pages.
   Written and contributed by Marco van den Heuvel.
+
+</descrip><p>
 
 
 <sect1>Joystick drivers<p>

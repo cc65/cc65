@@ -87,6 +87,7 @@ url="funcref.html" name="function reference"> for declaration and usage.
 <item>c64mode
 <item>fast
 <item>slow
+<item>isfast
 </itemize>
 
 

@@ -131,6 +131,7 @@ function.
 <itemize>
 <item><ref id="c64mode" name="c64mode">
 <item><ref id="fast" name="fast">
+<item><ref id="isfast" name="isfast">
 <item><ref id="slow" name="slow">
 <item><ref id="toggle_videomode" name="toggle_videomode">
 <item><ref id="videomode" name="videomode">
@@ -3302,6 +3303,7 @@ will nearly double the speed compared to slow mode.
 </itemize>
 <tag/Availability/C128
 <tag/See also/
+<ref id="isfast" name="isfast">,
 <ref id="slow" name="slow">,
 <ref id="toggle_videomode" name="toggle_videomode">,
 <ref id="videomode" name="videomode">
@@ -3949,6 +3951,28 @@ fastcall function, so it may only be used in presence of a prototype.
 <ref id="isspace" name="isspace">,
 <ref id="isupper" name="isupper">,
 <ref id="isxdigit" name="isxdigit">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>isfast<label id="isfast"><p>
+
+<quote>
+<descrip>
+<tag/Function/Check if the C128 is in 2MHz mode.
+<tag/Header/<tt/<ref id="c128.h" name="c128.h">/
+<tag/Declaration/<tt/unsigned char isfast (void);/
+<tag/Description/The function returns a 1 if the C128 is in 2MHz mode.
+<tag/Notes/<itemize>
+<item>The function is specific to the C128.
+</itemize>
+<tag/Availability/C128
+<tag/See also/
+<ref id="fast" name="fast">,
+<ref id="slow" name="slow">,
+<ref id="toggle_videomode" name="toggle_videomode">,
+<ref id="videomode" name="videomode">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -6073,6 +6097,7 @@ will halve the speed compared to fast mode.
 <tag/Availability/C128
 <tag/See also/
 <ref id="fast" name="fast">,
+<ref id="isfast" name="isfast">,
 <ref id="toggle_videomode" name="toggle_videomode">,
 <ref id="videomode" name="videomode">
 <tag/Example/None.
@@ -6864,6 +6889,7 @@ name="videomode"> instead!
 <tag/Availability/C128
 <tag/See also/
 <ref id="fast" name="fast">,
+<ref id="isfast" name="isfast">,
 <ref id="slow" name="slow">,
 <ref id="videomode" name="videomode">
 <tag/Example/None.
@@ -7064,6 +7090,7 @@ used in presence of a prototype.
 <tag/Availability/C128 and enhanced Apple //e
 <tag/See also/
 <ref id="fast" name="fast">,
+<ref id="isfast" name="isfast">,
 <ref id="slow" name="slow">,
 <ref id="toggle_videomode" name="toggle_videomode">
 <tag/Example/None.

@@ -14,6 +14,7 @@
 
         lda     VIC_CLK_128
         and     #$01
+        ldx     #$00
         rts
 
 .endproc

@@ -153,6 +153,12 @@ No graphics drivers are currently available for the VIC20.
   A driver for any RAM at $A000-$BFFF. Supports 32 256 byte pages.
   Written and contributed by Marco van den Heuvel.
 
+  <tag><tt/vic20-georam.emd (vic20_georam_emd)/</tag>
+  A driver for the Berkeley Softworks GeoRam cartridge connected by means of
+  the MasC=erade c64 cartridge adapter. The driver will determine the
+  available RAM from the connected cartridge. It supports 64KB
+  up to 2048KB of RAM.
+
 </descrip><p>
 
 

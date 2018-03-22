@@ -167,7 +167,8 @@ void fast (void);
 void slow (void);
 /* Switch the CPU into 1MHz mode. */
 
-
+unsigned char isfast (void);
+/* Returns 1 if the CPU is in 2MHz mode. */
 
 /* End of c128.h */
 #endif

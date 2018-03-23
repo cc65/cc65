@@ -85,9 +85,6 @@ url="funcref.html" name="function reference"> for declaration and usage.
 <itemize>
 <item>videomode
 <item>c64mode
-<item>fast
-<item>slow
-<item>isfast
 </itemize>
 
 
@@ -120,6 +117,19 @@ declaration and usage.
 <item>cbm_save
 <item>cbm_write
 <item>get_tv
+</itemize>
+
+
+<sect1>CBM specific CPU functions<p>
+
+Some CPU related functions are available for some of the Commodore
+machines. See the <url url="funcref.html" name="function reference"> for
+declaration and usage.
+
+<itemize>
+<item>fast
+<item>slow
+<item>isfast
 </itemize>
 
 

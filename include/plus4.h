@@ -59,6 +59,14 @@
 extern void plus4_stdjoy_joy[];   /* Referred to by joy_static_stddrv[] */
 extern void plus4_stdser_ser[];
 
+void fast (void);
+/* Switch the CPU into double clock mode. */
+
+void slow (void);
+/* Switch the CPU into single clock mode. */
+
+unsigned char isfast (void);
+/* Returns 1 if the CPU is in double clock mode. */
 
 
 /* End of plus4.h */

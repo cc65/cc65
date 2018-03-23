@@ -140,6 +140,12 @@ function.
 
 <sect1><tt/c16.h/<label id="c16.h"><p>
 
+<itemize>
+<item><ref id="fast" name="fast">
+<item><ref id="isfast" name="isfast">
+<item><ref id="slow" name="slow">
+</itemize>
+
 (incomplete)
 
 
@@ -501,6 +507,12 @@ It does not declare any functions.
 
 
 <sect1><tt/plus4.h/<label id="plus4.h"><p>
+
+<itemize>
+<item><ref id="fast" name="fast">
+<item><ref id="isfast" name="isfast">
+<item><ref id="slow" name="slow">
+</itemize>
 
 (incomplete)
 
@@ -3292,21 +3304,21 @@ program, it may not be able to read it.
 
 <quote>
 <descrip>
-<tag/Function/Switch the C128 into 2MHz mode.
-<tag/Header/<tt/<ref id="c128.h" name="c128.h">/
+<tag/Function/Switch the CPU into fast mode (C128: 2MHz mode, C16/Plus4: double clock mode).
+<tag/Header/<tt/<ref id="c128.h" name="c128.h">,
+<ref id="c16.h" name="c16.h">, <ref id="plus4.h" name="plus4.h">/
 <tag/Declaration/<tt/void fast (void);/
-<tag/Description/The function will switch the clock of the C128 to 2MHz. This
-will nearly double the speed compared to slow mode.
+<tag/Description/The function will switch the clock of the CPU to fast mode. For the C128
+target it means switching the CPU into 2MHz mode. For the C16/Plus4 target it means
+switching the CPU into double clock mode.
 <tag/Notes/<itemize>
-<item>The function is specific to the C128.
-<item>2MHz clock will not work in 40 column mode.
+<item>The function is specific to the C128, C16 and Plus4.
+<item>On the C128 the 2MHz clock will not work in 40 column mode.
 </itemize>
-<tag/Availability/C128
+<tag/Availability/cc65 (not all platforms)
 <tag/See also/
 <ref id="isfast" name="isfast">,
 <ref id="slow" name="slow">,
-<ref id="toggle_videomode" name="toggle_videomode">,
-<ref id="videomode" name="videomode">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -3960,19 +3972,18 @@ fastcall function, so it may only be used in presence of a prototype.
 
 <quote>
 <descrip>
-<tag/Function/Check if the C128 is in 2MHz mode.
-<tag/Header/<tt/<ref id="c128.h" name="c128.h">/
+<tag/Function/Check if the CPU is in fast mode (C128: 2MHz mode, C16/Plus4: double clock mode).
+<tag/Header/<tt/<ref id="c128.h" name="c128.h">,
+<ref id="c16.h" name="c16.h">, <ref id="plus4.h" name="plus4.h">/
 <tag/Declaration/<tt/unsigned char isfast (void);/
-<tag/Description/The function returns a 1 if the C128 is in 2MHz mode.
+<tag/Description/The function returns a 1 if the CPU is in fast mode (C128: 2MHz mode, C16/Plus4: double clock mode).
 <tag/Notes/<itemize>
-<item>The function is specific to the C128.
+<item>The function is specific to the C128, C16 and Plus4.
 </itemize>
-<tag/Availability/C128
+<tag/Availability/cc65 (not all platforms)
 <tag/See also/
 <ref id="fast" name="fast">,
 <ref id="slow" name="slow">,
-<ref id="toggle_videomode" name="toggle_videomode">,
-<ref id="videomode" name="videomode">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -6086,20 +6097,20 @@ be used in presence of a prototype.
 
 <quote>
 <descrip>
-<tag/Function/Switch the C128 into 1MHz mode.
-<tag/Header/<tt/<ref id="c128.h" name="c128.h">/
+<tag/Function/Switch the CPU into slow mode (C128: 1MHz mode, C16/Plus4: single clock mode).
+<tag/Header/<tt/<ref id="c128.h" name="c128.h">,
+<ref id="c16.h" name="c16.h">, <ref id="plus4.h" name="plus4.h">/
 <tag/Declaration/<tt/void slow (void);/
-<tag/Description/The function will switch the clock of the C128 to 1MHz. This
-will halve the speed compared to fast mode.
+<tag/Description/The function will switch the clock of the CPU to slow mode. for the C128
+target it means switching the CPU into 1MHz mode. for the C16/Plus4 target it means
+switching the CPU into single clock mode.
 <tag/Notes/<itemize>
-<item>The function is specific to the C128.
+<item>The function is specific to the C128, C16 and Plus4.
 </itemize>
-<tag/Availability/C128
+<tag/Availability/cc65 (not all platforms)
 <tag/See also/
 <ref id="fast" name="fast">,
 <ref id="isfast" name="isfast">,
-<ref id="toggle_videomode" name="toggle_videomode">,
-<ref id="videomode" name="videomode">
 <tag/Example/None.
 </descrip>
 </quote>

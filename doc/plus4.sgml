@@ -124,6 +124,19 @@ declaration and usage.
 </itemize>
 
 
+<sect1>CBM specific CPU functions<p>
+
+Some CPU related functions are available for some of the Commodore
+machines. See the <url url="funcref.html" name="function reference"> for
+declaration and usage.
+
+<itemize>
+<item>fast
+<item>slow
+<item>isfast
+</itemize>
+
+
 <sect1>Hardware access<p>
 
 The following pseudo variables declared in the <tt/plus4.h/ header file do

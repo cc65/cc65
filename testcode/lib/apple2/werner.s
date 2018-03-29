@@ -1,2 +1,2 @@
 .segment "HGR"
-.incbin "werner.pic"
+.incbin "werner.hgr"

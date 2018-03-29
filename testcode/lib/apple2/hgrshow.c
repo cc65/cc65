@@ -24,9 +24,9 @@ void main (void)
         if (!ext || strcasecmp (ext, ".hgr"))
             continue;
 
-        hgr = open(ent->d_name, O_RDONLY);
-        read(hgr, (void*)0x2000, 0x2000);
-        close(hgr);
+        hgr = open (ent->d_name, O_RDONLY);
+        read (hgr, (void*)0x2000, 0x2000);
+        close (hgr);
 
         if (cgetc () == '\r')
             break;

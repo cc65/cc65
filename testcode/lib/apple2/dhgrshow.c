@@ -28,12 +28,12 @@ void main (void)
         if (!ext || strcasecmp (ext, ".dhgr"))
             continue;
 
-        hgr = open(ent->d_name, O_RDONLY);
+        hgr = open (ent->d_name, O_RDONLY);
         POKE (0xC055, 0);
-        read(hgr, (void*)0x2000, 0x2000);
+        read (hgr, (void*)0x2000, 0x2000);
         POKE (0xC054, 0);
-        read(hgr, (void*)0x2000, 0x2000);
-        close(hgr);
+        read (hgr, (void*)0x2000, 0x2000);
+        close (hgr);
 
         if (cgetc () == '\r')
             break;

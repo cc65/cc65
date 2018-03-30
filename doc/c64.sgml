@@ -300,10 +300,8 @@ Note that the graphics drivers are incompatible with the
   Will test the hardware for the available RAM.
 
   <tag><tt/c64-reu.emd (c64_reu_emd)/</tag>
-  A driver for the CBM REUs. The driver will determine from the connected REU
-  if it supports 128KB of RAM or more. In the latter case, 256KB are assumed,
-  but since there are no range checks, the application can use more memory if
-  it has better knowledge about the hardware than the driver.
+  A driver for the CBM REUs. The driver will test the connected REU to find
+  out how much RAM is present.
 
   <tag><tt/c64-vdc.emd (c64_vdc_emd)/</tag>
   A driver for the VDC memory of the C128. Written and contributed by Maciej

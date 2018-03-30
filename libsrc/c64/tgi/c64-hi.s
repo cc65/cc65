@@ -4,6 +4,7 @@
 ; Based on Stephen L. Judd's GRLIB code.
 ;
 ; 2017-01-13, Greg King
+; 2018-03-13, Sven Klose
 ;
 
         .include        "zeropage.inc"
@@ -70,12 +71,9 @@ X2              := ptr3
 Y2              := ptr4
 TEXT            := ptr3
 
-ROW             := tmp2         ; Bitmap row...
-COL             := tmp3         ; ...and column, both set by PLOT
 TEMP            := tmp4
 TEMP2           := sreg
 POINT           := regsave
-INRANGE         := regsave+2    ; PLOT variable, $00 = coordinates in range
 
 CHUNK           := X2           ; Used in the line routine
 OLDCHUNK        := X2+1         ; Dito
@@ -454,11 +452,6 @@ GETPIXEL:
 ; LINE: Draw a line from X1/Y1 to X2/Y2, where X1/Y1 = ptr1/ptr2 and
 ; X2/Y2 = ptr3/ptr4 using the current drawing color.
 ;
-; To deal with off-screen coordinates, the current row
-; and column (40x25) is kept track of.  These are set
-; negative when the point is off the screen, and made
-; positive when the point is within the visible screen.
-;
 ; X1,X2 etc. are set up above (x2=LINNUM in particular)
 ; Format is LINE x2,y2,x1,y1
 ;
@@ -513,7 +506,7 @@ LINE:
         stx     YINCDEC
         stx     XINCDEC
 
-        jsr     CALC            ; Set up .X,.Y,POINT, and INRANGE
+        jsr     CALC            ; Set up .X, .Y, and POINT
         lda     BITCHUNK,X
         sta     OLDCHUNK
         sta     CHUNK
@@ -556,15 +549,11 @@ STEPINY:
 ;
 YLOOP:  sta     TEMP
 
-        lda     INRANGE      ;Range check
-        bne     @SKIP
-
-        lda     (POINT),y    ;Otherwise plot
+        lda     (POINT),y
         eor     BITMASK
         and     CHUNK
         eor     (POINT),y
         sta     (POINT),y
-@SKIP:
 YINCDEC:
         iny                  ;Advance Y coordinate
         cpy     #8
@@ -581,7 +570,7 @@ YCONT2: lda     (POINT),y    ;Plot endpoint
         and     CHUNK
         eor     (POINT),y
         sta     (POINT),y
-YDONE:  lda     #$36
+        lda     #$36
         sta     $01
         cli
         rts
@@ -592,23 +581,12 @@ YFIXX:                    ;x=x+1
         bne     YCONT        ;If we pass a column boundary...
         ror     CHUNK        ;then reset CHUNK to $80
         sta     TEMP2
-        lda     COL
-        bmi     @C1          ;Skip if column is negative
-        cmp     #39          ;End if move past end of screen
-        bcs     YDONE
-@C1:    lda     POINT        ;And add 8 to POINT
+        lda     POINT        ;And add 8 to POINT
         adc     #8
         sta     POINT
         bcc     @CONT
         inc     POINT+1
-@CONT:  inc     COL          ;Increment column
-        bne     @C2
-        lda     ROW          ;Range check
-        cmp     #25
-        bcs     @C2
-        lda     #00          ;Passed into col 0
-        sta     INRANGE
-@C2:    lda     TEMP2
+@CONT:  lda     TEMP2
         dex
         bne     YLOOP
         beq     YCONT2
@@ -647,7 +625,7 @@ XCONT2: dex
         dec     COUNTHI      ;High bits set?
         bpl     XLOOP
 
-XDONE:  lsr     CHUNK        ;Advance to last point
+        lsr     CHUNK        ;Advance to last point
         jsr     LINEPLOT     ;Plot the last chunk
 EXIT:   lda     #$36
         sta     $01
@@ -662,25 +640,14 @@ XFIXC:  sta     TEMP
         lda     #$FF
         sta     CHUNK
         sta     OLDCHUNK
-        lda     COL
-        bmi     @C1          ;Skip if column is negative
-        cmp     #39          ;End if move past end of screen
-        bcs     EXIT
-@C1:    lda     POINT
+        lda     POINT
+        clc
         adc     #8
         sta     POINT
-        bcc     @CONT
+        lda     TEMP
+        bcc     XCONT1
         inc     POINT+1
-@CONT:  inc     COL
-        bne     @C2
-        lda     ROW
-        cmp     #25
-        bcs     @C2
-        lda     #00
-        sta     INRANGE
-@C2:    lda     TEMP
-        sec
-        bcs     XCONT1
+        jmp     XCONT1
 ;
 ; Check to make sure there isn't a high bit, plot chunk,
 ; and update Y-coordinate.
@@ -712,17 +679,14 @@ XINCDEC:
 ; room, gray hair, etc.)
 ;
 LINEPLOT:                       ; Plot the line chunk
-        lda     INRANGE
-        bne     @SKIP
-
-        lda     (POINT),Y       ; Otherwise plot
+        lda     (POINT),Y
         eor     BITMASK
         ora     CHUNK
         and     OLDCHUNK
         eor     CHUNK
         eor     (POINT),Y
         sta     (POINT),Y
-@SKIP:  rts
+        rts
 
 ;
 ; Subroutine to fix up pointer when Y decreases through
@@ -730,23 +694,16 @@ LINEPLOT:                       ; Plot the line chunk
 ;
 FIXY:   cpy     #255         ;Y=255 or Y=8
         beq     @DECPTR
+
 @INCPTR:                     ;Add 320 to pointer
         ldy     #0           ;Y increased through 7
-        lda     ROW
-        bmi     @C1          ;If negative, then don't update
-        cmp     #24
-        bcs     @TOAST       ;If at bottom of screen then quit
-@C1:    lda     POINT
+        lda     POINT
         adc     #<320
         sta     POINT
         lda     POINT+1
         adc     #>320
         sta     POINT+1
-@CONT1: inc     ROW
-        bne     @DONE
-        lda     COL
-        bpl     @CLEAR
-@DONE:  rts
+        rts
 
 @DECPTR:                     ;Okay, subtract 320 then
         ldy     #7           ;Y decreased through 0
@@ -757,20 +714,7 @@ FIXY:   cpy     #255         ;Y=255 or Y=8
         lda     POINT+1
         sbc     #>320
         sta     POINT+1
-@CONT2: dec     ROW
-        bmi     @TOAST
-        lda     ROW
-        cmp     #24
-        bne     @DONE
-        lda     COL
-        bmi     @DONE
-@CLEAR: lda     #00
-        sta     INRANGE
         rts
-
-@TOAST: pla                  ;Remove old return address
-        pla
-        jmp     EXIT         ;Restore interrupts, etc.
 
 ; ------------------------------------------------------------------------
 ; BAR: Draw a filled rectangle with the corners X1/Y1, X2/Y2, where
@@ -896,48 +840,36 @@ OUTTEXT:
         rts
 
 ; ------------------------------------------------------------------------
-; Calculate all variables to plot the pixel at X1/Y1. If the point is out
-; of range, a carry is returned and INRANGE is set to a value !0 zero. If
-; the coordinates are valid, INRANGE is zero and the carry clear.
+; Calculate all variables to plot the pixel at X1/Y1.
 
 CALC:   lda     Y1
-        sta     ROW
+        sta     TEMP2
         and     #7
         tay
         lda     Y1+1
         lsr                     ; Neg is possible
-        ror     ROW
+        ror     TEMP2
         lsr
-        ror     ROW
+        ror     TEMP2
         lsr
-        ror     ROW
+        ror     TEMP2
 
         lda     #00
         sta     POINT
-        lda     ROW
+        lda     TEMP2
         cmp     #$80
         ror
         ror     POINT
         cmp     #$80
         ror
         ror     POINT           ; row*64
-        adc     ROW             ; +row*256
+        adc     TEMP2           ; +row*256
         clc
         adc     #>VBASE         ; +bitmap base
         sta     POINT+1
 
         lda     X1
         tax
-        sta     COL
-        lda     X1+1
-        lsr
-        ror     COL
-        lsr
-        ror     COL
-        lsr
-        ror     COL
-
-        txa
         and     #$F8
         clc
         adc     POINT           ; +(X AND #$F8)
@@ -948,13 +880,4 @@ CALC:   lda     Y1
         txa
         and     #7
         tax
-
-        lda     ROW
-        cmp     #25
-        bcs     @L9
-        lda     COL
-        cmp     #40
-        bcs     @L9
-        lda     #00
-@L9:    sta     INRANGE
         rts

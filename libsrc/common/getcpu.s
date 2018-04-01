@@ -53,7 +53,7 @@ _getcpu:
         adc     #1              ; $01+$09 = $10 on 6502, $01+$09 = $0A on 2a03/2a07
         cld
         cmp     #10
-        bne     @L5
+        beq     @L5
         lda     #0              ; CPU_6502 constant
         beq     @L9
 @L5:

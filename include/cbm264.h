@@ -136,11 +136,16 @@
 /*                                   Code                                    */
 /*****************************************************************************/
 
+void fast (void);
+/* Switch the CPU into double-clock mode. */
+
+void slow (void);
+/* Switch the CPU into single-clock mode. */
+
+unsigned char isfast (void);
+/* Returns 1 if the CPU is in double-clock mode. */
+
 
 
 /* End of cbm264.h */
 #endif
-
-
-
-

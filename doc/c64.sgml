@@ -169,6 +169,18 @@ url="funcref.html" name="function reference"> for declaration and usage.
 </itemize>
 
 
+<sect1>C64-specific accelerator functions<p>
+
+The functions listed below are accelerator functions for the C64. See the <url
+url="funcref.html" name="function reference"> for declaration and usage.
+
+<itemize>
+<item>detect_scpu
+<item>scpu_get_speed
+<item>scpu_set_speed
+</itemize>
+
+
 <sect1>CBM-specific functions<p>
 
 Some functions are available for all (or at least most) of the Commodore

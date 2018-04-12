@@ -7,21 +7,21 @@
 ; functions.
 
 
-SPEED_SLOW := $00
-SPEED_FAST := $FF
+SPEED_SLOW = $00
+SPEED_FAST = $FF
 
-SPEED_1X    := SPEED_SLOW
-SPEED_2X    :=  2 - 1
-SPEED_3X    :=  3 - 1
-SPEED_4X    :=  4 - 1
-SPEED_5X    :=  5 - 1
-SPEED_6X    :=  6 - 1
-SPEED_7X    :=  7 - 1
-SPEED_8X    :=  8 - 1
-SPEED_10X   := 10 - 1
-SPEED_12X   := 12 - 1
-SPEED_16X   := 16 - 1
-SPEED_20X   := 20 - 1
+SPEED_1X    = SPEED_SLOW
+SPEED_2X    =  2 - 1
+SPEED_3X    =  3 - 1
+SPEED_4X    =  4 - 1
+SPEED_5X    =  5 - 1
+SPEED_6X    =  6 - 1
+SPEED_7X    =  7 - 1
+SPEED_8X    =  8 - 1
+SPEED_10X   = 10 - 1
+SPEED_12X   = 12 - 1
+SPEED_16X   = 16 - 1
+SPEED_20X   = 20 - 1
 
 
 ; ---------------------------------------------------------------------------

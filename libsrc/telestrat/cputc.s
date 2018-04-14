@@ -5,7 +5,6 @@
 ;
 
         .export         _cputc
-        
 
         .include        "telestrat.inc"
 

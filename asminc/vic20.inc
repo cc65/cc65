@@ -66,7 +66,7 @@ VIC_COLOR       := $900F        ; Border and background color
 ; ---------------------------------------------------------------------------
 ; I/O: 6522 VIA1
 
-VIA1            := $9110        ; *** Deprecated ***
+VIA1            := $9110        ; VIA1 base address
 VIA1_JOY        := $9111        ; *** Deprecated ***
 VIA1_PB         := $9110        ; Port register B
 VIA1_PA1        := $9111        ; Port register A
@@ -88,7 +88,7 @@ VIA1_PA2        := $911F        ; Port register A w/o handshake
 ; ---------------------------------------------------------------------------
 ; I/O: 6522 VIA2
 
-VIA2            := $9120        ; *** Deprecated ***
+VIA2            := $9120        ; VIA2 base address
 VIA2_JOY        := $9120        ; *** Deprecated ***
 VIA2_PB         := $9120        ; Port register B
 VIA2_PA1        := $9121        ; Port register A

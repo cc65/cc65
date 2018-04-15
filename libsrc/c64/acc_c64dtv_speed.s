@@ -10,7 +10,7 @@
 ; * Note that any value higher or equal to SPEED_2X will switch to fast mode.
 ; *
 ; * This function will return the actual speed the CPU is at after trying
-; * to set the requested speed, to my knowledge this should not happen.
+; * to set the requested speed, to my knowlegde the switching should not fail.
 ; *
 ; * This function does not check for the presence of the C64DTV,
 ; * make sure you use 'detect_c64dtv();' before using.

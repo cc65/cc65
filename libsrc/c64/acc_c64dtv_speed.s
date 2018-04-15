@@ -41,7 +41,7 @@ low_speed:
 set_speed:
         .byte   $32,$99               ; SAC #$99   set accumulator to reg 9 (cpu control)
         txa                           ; (re)set skip and burst bits
-        .byte   $32,$00               ; SAC #$99   set accumulator back to reg 0
+        .byte   $32,$00               ; SAC #$00   set accumulator back to reg 0
         jmp     _get_c64dtv_speed
 
 high_speed:

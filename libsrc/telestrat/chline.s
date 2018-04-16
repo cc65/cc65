@@ -13,7 +13,7 @@
 .proc _chline
     sta     tmp1
 @loop:
-    lda     #'-'            ; Horizontal line screen code
+    lda     #'-'            ; horizontal line screen code
     BRK_TELEMON  XWR0       ; macro send char to screen (channel 0 in telemon terms)
     dec     tmp1
     bne     @loop

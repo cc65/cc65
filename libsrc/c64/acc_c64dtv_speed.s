@@ -10,7 +10,7 @@
 ; * Note that any value higher or equal to SPEED_2X will switch to fast mode.
 ; *
 ; * This function will return the actual speed the CPU is at after trying
-; * to set the requested speed, to my knowlegde the switching should not fail.
+; * to set the requested speed, to my knowledge the switching should not fail.
 ; *
 ; * This function does not check for the presence of the C64DTV,
 ; * make sure you use 'detect_c64dtv();' before using.
@@ -52,7 +52,7 @@ high_speed:
 _get_c64dtv_speed:
         .byte   $32,$99               ; SAC #$99   set accumulator to reg 9 (cpu control)
         tax
-        .byte   $32,$00               ; SAC #$99   set accumulator back to reg 0
+        .byte   $32,$00               ; SAC #$00   set accumulator back to reg 0
         txa
         and     #C64DTV_Fast
         bne     in_fast_mode

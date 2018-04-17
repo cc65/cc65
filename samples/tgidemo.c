@@ -49,8 +49,9 @@ static void CheckError (const char* S)
 
 
 
+#if DYN_DRV
 static void DoWarning (void)
-/* Warn the user that the TGI driver is needed for this program */
+/* Warn the user that the dynamic TGI driver is needed for this program */
 {
     printf ("Warning: This program needs the TGI\n"
             "driver on disk! Press 'y' if you have\n"
@@ -58,8 +59,9 @@ static void DoWarning (void)
     if (tolower (cgetc ()) != 'y') {
         exit (EXIT_SUCCESS);
     }
-    printf ("Ok. Please wait patiently...\n");
+    printf ("OK. Please wait patiently...\n");
 }
+#endif
 
 
 

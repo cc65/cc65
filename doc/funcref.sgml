@@ -68,8 +68,11 @@ function.
 <sect1><tt/accelerator.h/<label id="accelerator.h"><p>
 
 <itemize>
+<item><ref id="detect_c64dtv" name="detect_c64dtv">
 <item><ref id="detect_scpu" name="detect_scpu">
+<item><ref id="get_c64dtv_speed" name="get_c64dtv_speed">
 <item><ref id="get_scpu_speed" name="get_scpu_speed">
+<item><ref id="set_c64dtv_speed" name="set_c64dtv_speed">
 <item><ref id="set_scpu_speed" name="set_scpu_speed">
 </itemize>
 
@@ -2920,6 +2923,26 @@ used in presence of a prototype.
 </quote>
 
 
+<sect1>detect_c64dtv<label id="detect_c64dtv"><p>
+
+<quote>
+<descrip>
+<tag/Function/Check for the presence of the C64DTV.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char detect_c64dtv (void);/
+<tag/Description/The function returns a 1 if a C64DTV has been detected.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="get_c64dtv_speed" name="get_c64dtv_speed">,
+<ref id="set_c64dtv_speed" name="set_c64dtv_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>detect_scpu<label id="detect_scpu"><p>
 
 <quote>
@@ -3474,6 +3497,28 @@ header files define constants that can be used to check the return code.
 <item>The return codes are platform dependent.
 </itemize>
 <tag/Availability/cc65 (not all platforms)
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>get_c64dtv_speed<label id="get_c64dtv_speed"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get the current speed of the C64DTV.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char get_c64dtv_speed (void);/
+<tag/Description/The function returns the current speed of the C64DTV.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64.
+<item>The function does not check for the presence of the C64DTV.
+<item>See the accelerator.h header for the speed definitions.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="detect_c64dtv" name="detect_c64dtv">,
+<ref id="set_c64dtv_speed" name="set_c64dtv_speed">,
 <tag/Example/None.
 </descrip>
 </quote>
@@ -6052,13 +6097,35 @@ clean-up when exitting the program.
 </quote>
 
 
+<sect1>set_c64dtv_speed<label id="set_c64dtv_speed"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set the current speed of the C64DTV.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ set_c64dtv_speed (unsigned char speed);/
+<tag/Description/The function returns the speed after trying to set the speed of the C64DTV.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64.
+<item>The function does not check for the presence of the C64DTV.
+<item>See the accelerator.h header for the speed definitions.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="detect_c64dtv" name="detect_c64dtv">,
+<ref id="get_c64dtv_speed" name="get_c64dtv_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>set_scpu_speed<label id="set_scpu_speed"><p>
 
 <quote>
 <descrip>
 <tag/Function/Set the current speed of the C64/C128 SuperCPU cartridge.
 <tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
-<tag/Declaration/<tt/unsigned char set_scpu_speed (unsigned char speed);/
+<tag/Declaration/<tt/unsigned char __fastcall__ set_scpu_speed (unsigned char speed);/
 <tag/Description/The function returns the speed after trying to set the speed of the SuperCPU cartridge.
 <tag/Notes/<itemize>
 <item>The function is specific to the C128 and C64.

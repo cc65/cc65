@@ -98,5 +98,43 @@ extern unsigned char detect_scpu (void);
  * 0x01  : SuperCPU cartridge present
  */
 
+
+/* C64DTV */
+
+extern unsigned char __fastcall__ set_c64dtv_speed (unsigned char speed);
+
+/* Set the speed of the C64DTV, using SPEED_SLOW will switch to
+ * slow mode, SPEED_2X or SPEED_FAST will switch to fast mode.
+ *
+ * Note that any value higher or equal to SPEED_2X will switch to fast mode.
+ *
+ * This function will return the actual speed the CPU is at after trying
+ * to set the requested speed, to my knowledge the switch should not fail.
+ *
+ * This function does not check for the presence of the C64DTV,
+ * make sure you use 'detect_c64dtv();' before using.
+ */
+
+extern unsigned char get_c64dtv_speed (void);
+
+/* Get the speed of the C64DTV.
+ *
+ * Possible return values:
+ * SPEED_1X    : slow mode
+ * SPEED_2X    : fast mode
+ *
+ * This function does not check for the presence of the C64DTV,
+ * make sure you use 'detect_c64dtv();' before using.
+ */
+
+extern unsigned char detect_c64dtv (void);
+
+/* Check for the presence of the C64DTV.
+ *
+ * Possible return values:
+ * 0x00  : C64DTV not present
+ * 0x01  : C64DTV present
+ */
+
 /* End of accelerator.h */
 #endif

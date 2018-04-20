@@ -175,9 +175,12 @@ The functions listed below are accelerator functions for the C64. See the <url
 url="funcref.html" name="function reference"> for declaration and usage.
 
 <itemize>
+<item>detect_c64dtv
 <item>detect_scpu
-<item>scpu_get_speed
-<item>scpu_set_speed
+<item>get_c64dtv_speed
+<item>get_scpu_speed
+<item>set_c64dtv_speed
+<item>set_scpu_speed
 </itemize>
 
 

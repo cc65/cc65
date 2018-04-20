@@ -32,3 +32,11 @@ SuperCPU_Fast       := $D07B
 SuperCPU_Speed_Mode := $D0B8
 SuperCPU_Detect     := $D0BC
 
+
+; ---------------------------------------------------------------------------
+; C64DTV
+
+C64DTV_Extended_Regs := $D03F
+
+C64DTV_Slow = $00
+C64DTV_Fast = $03

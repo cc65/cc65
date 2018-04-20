@@ -69,10 +69,13 @@ function.
 
 <itemize>
 <item><ref id="detect_c64dtv" name="detect_c64dtv">
+<item><ref id="detect_c128" name="detect_c128">
 <item><ref id="detect_scpu" name="detect_scpu">
 <item><ref id="get_c64dtv_speed" name="get_c64dtv_speed">
+<item><ref id="get_c128_speed" name="get_c128_speed">
 <item><ref id="get_scpu_speed" name="get_scpu_speed">
 <item><ref id="set_c64dtv_speed" name="set_c64dtv_speed">
+<item><ref id="set_c128_speed" name="set_c64dtv_speed">
 <item><ref id="set_scpu_speed" name="set_scpu_speed">
 </itemize>
 
@@ -2943,6 +2946,26 @@ used in presence of a prototype.
 </quote>
 
 
+<sect1>detect_c128<label id="detect_c128"><p>
+
+<quote>
+<descrip>
+<tag/Function/Check for the presence of a C128 in C64 mode.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char detect_c128 (void);/
+<tag/Description/The function returns a 1 if a C128 in C64 mode has been detected.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="get_c128_speed" name="get_c128_speed">,
+<ref id="set_c128_speed" name="set_c128_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>detect_scpu<label id="detect_scpu"><p>
 
 <quote>
@@ -3519,6 +3542,28 @@ header files define constants that can be used to check the return code.
 <tag/See also/
 <ref id="detect_c64dtv" name="detect_c64dtv">,
 <ref id="set_c64dtv_speed" name="set_c64dtv_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>get_c128_speed<label id="get_c128_speed"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get the current speed of the C128 in C64 mode.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char get_c128_speed (void);/
+<tag/Description/The function returns the current speed of the C128 in C64 mode.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64.
+<item>The function does not check for the presence of a C128 in C64 mode.
+<item>See the accelerator.h header for the speed definitions.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="detect_c128" name="detect_c128">,
+<ref id="set_c128_speed" name="set_c128_speed">,
 <tag/Example/None.
 </descrip>
 </quote>
@@ -6114,6 +6159,28 @@ clean-up when exitting the program.
 <tag/See also/
 <ref id="detect_c64dtv" name="detect_c64dtv">,
 <ref id="get_c64dtv_speed" name="get_c64dtv_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>set_c128_speed<label id="set_c128_speed"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set the current speed of a C128 in C64 mode.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ set_c128_speed (unsigned char speed);/
+<tag/Description/The function returns the speed after trying to set the speed of the C128 in C64 mode.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64.
+<item>The function does not check for the presence of a C128 in C64 mode.
+<item>See the accelerator.h header for the speed definitions.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="detect_c128" name="detect_c128">,
+<ref id="get_c128_speed" name="get_c128_speed">,
 <tag/Example/None.
 </descrip>
 </quote>

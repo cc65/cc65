@@ -38,12 +38,11 @@ _set_c128_speed:
         bcs     high_speed
 store_speed:
         sta     C128_VICIIE_CLK
-        jmp     _get_c128_speed
 
+        .byte   $2C              ; skip over the lda #$01
 high_speed:
         lda     #$01
         bne     store_speed
-
 
 _get_c128_speed:
         lda     C128_VICIIE_CLK

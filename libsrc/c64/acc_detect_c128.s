@@ -21,13 +21,16 @@ _detect_c128:
 
 ; Make sure the CPU is a 8502
         .byte   $1A                   ; NOP on 8502, INA on 65(S)C(E)02, 4510 and 65816
-        bne     not_found
+        beq     found
+        .byte   $3A                   ; decrement A again, so a #$00 can be returned
+        rts
+
+found:
 
 ; Make sure a C128 VICIIe is present
         ldy     C128_VICIIE_CLK
         cpy     #$FF
         beq     not_found
-found:
         lda     #$01
 not_found:
         rts

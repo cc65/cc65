@@ -2930,12 +2930,12 @@ used in presence of a prototype.
 
 <quote>
 <descrip>
-<tag/Function/Check for the presence of a C128 in C64 mode.
+<tag/Function/Check if a C128 CPU is the current CPU.
 <tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
 <tag/Declaration/<tt/unsigned char detect_c128 (void);/
-<tag/Description/The function returns a 1 if a C128 in C64 mode has been detected.
+<tag/Description/The function returns a 1 if a C128 CPU is the current CPU.
 <tag/Notes/<itemize>
-<item>The function is specific to the C64.
+<item>The function is specific to the C64 and C128.
 </itemize>
 <tag/Availability/cc65 (not all platforms)
 <tag/See also/
@@ -3529,13 +3529,13 @@ header files define constants that can be used to check the return code.
 
 <quote>
 <descrip>
-<tag/Function/Get the current speed of the C128 in C64 mode.
+<tag/Function/Get the current speed of the C128 CPU.
 <tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
 <tag/Declaration/<tt/unsigned char get_c128_speed (void);/
-<tag/Description/The function returns the current speed of the C128 in C64 mode.
+<tag/Description/The function returns the current speed of the C128 CPU.
 <tag/Notes/<itemize>
-<item>The function is specific to the C64.
-<item>The function does not check for the presence of a C128 in C64 mode.
+<item>The function is specific to the C64 and C128.
+<item>The function does not check if the C128 CPU is the current CPU.
 <item>See the accelerator.h header for the speed definitions.
 </itemize>
 <tag/Availability/cc65 (not all platforms)
@@ -6146,13 +6146,13 @@ clean-up when exitting the program.
 
 <quote>
 <descrip>
-<tag/Function/Set the current speed of a C128 in C64 mode.
+<tag/Function/Set the current speed of a C128 CPU.
 <tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
 <tag/Declaration/<tt/unsigned char __fastcall__ set_c128_speed (unsigned char speed);/
-<tag/Description/The function returns the speed after trying to set the speed of the C128 in C64 mode.
+<tag/Description/The function returns the speed after trying to set the speed of the C128 CPU.
 <tag/Notes/<itemize>
-<item>The function is specific to the C64.
-<item>The function does not check for the presence of a C128 in C64 mode.
+<item>The function is specific to the C64 and C128.
+<item>The function does not check if the C128 CPU is the current CPU.
 <item>See the accelerator.h header for the speed definitions.
 </itemize>
 <tag/Availability/cc65 (not all platforms)

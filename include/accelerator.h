@@ -137,11 +137,11 @@ extern unsigned char detect_c64dtv (void);
  */
 
 
-/* C128 in C64 mode */
+/* C128 8502 CPU */
 
 extern unsigned char __fastcall__ set_c128_speed (unsigned char speed);
 
-/* Set the speed of the C128 CPU, using SPEED_SLOW will switch to
+/* Set the speed of the C128 8502 CPU, using SPEED_SLOW will switch to
  * 1 Mhz (slow) mode, SPEED_2X or SPEED_FAST will switch to 2Mhz (fast) mode.
  *
  * Note that any value higher or equal to SPEED_2X will switch to fast mode.
@@ -149,29 +149,29 @@ extern unsigned char __fastcall__ set_c128_speed (unsigned char speed);
  * This function will return the actual speed the CPU is at after trying
  * to set the requested speed, to my knowledge the switching should not fail.
  *
- * This function does not check for the presence of a C128 in C64 mode,
- * make sure you use 'detect_c128();' before using.
+ * This function does not check if the C128 CPU is the current CPU, make sure
+ * you use 'detect_c128();' before using.
  */
 
 extern unsigned char get_c128_speed (void);
 
-/* Get the speed of the C128 CPU.
+/* Get the speed of the C128 8502 CPU.
  *
  * Possible return values:
  * SPEED_SLOW  : Slow mode
  * SPEED_2X    : Fast mode
  *
- * This function does not check for the presence of a C128 in C64 mode,
- * make sure you use 'detect_c128();' before using.
+ * This function does not check if the C128 CPU is the current CPU, make sure
+ * you use 'detect_c128();' before using.
  */
 
 extern unsigned char detect_c128 (void);
 
-/* Check for the presence of a C128 in C64 mode.
+/* Check if the C128 CPU is the current CPU.
  *
  * Possible return values:
- * 0x00  : C128 in C64 mode not present
- * 0x01  : C128 in C64 mode present
+ * 0x00  : C128 CPU is not the current CPU
+ * 0x01  : C128 CPU is the current CPU
  */
 
 /* End of accelerator.h */

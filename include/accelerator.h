@@ -174,6 +174,58 @@ extern unsigned char detect_c128 (void);
  * 0x01  : C128 CPU is the current CPU
  */
 
+
+/* C64 Chameleon cartridge */
+
+extern unsigned char __fastcall__ set_chameleon_speed (unsigned char speed);
+
+/* Set the speed of the C64 Chameleon cartridge, the following inputs
+ * are accepted: 
+ * SPEED_SLOW : 1 Mhz mode
+ * SPEED_1X   : 1 Mhz mode
+ * SPEED_2X   : 2 Mhz mode
+ * SPEED_3X   : 3 Mhz mode
+ * SPEED_4X   : 4 Mhz mode
+ * SPEED_5X   : 5 Mhz mode
+ * SPEED_6X   : 6 Mhz mode
+ * SPEED_FAST : Maximum speed mode
+ *
+ * Note that any value higher or equal to SPEED_7X will switch to maximum
+ * speed mode.
+ *
+ * This function will return the actual speed the CPU is at after trying
+ * to set the requested speed, to my knowledge the switching should not fail.
+ *
+ * This function does not check for the presence of the C64 Chameleon cartridge,
+ * make sure you use 'detect_chameleon();' before using.
+ */
+
+extern unsigned char get_chameleon_speed (void);
+
+;/* Get the speed of the C64 Chameleon cartridge.
+; *
+; * Possible return values:
+; * SPEED_SLOW  : Slow mode
+; * SPEED_2X    : 2Mhz mode
+; * SPEED_3X    : 3Mhz mode
+; * SPEED_4X    : 4Mhz mode
+; * SPEED_5X    : 5Mhz mode
+; * SPEED_6X    : 6Mhz mode
+; * SPEED_FAST  : Maximum speed mode
+; *
+; * This function does not check for the presence of the C64 Chameleon cartridge,
+; * make sure you use 'detect_chameleon();' before using.
+; */
+
+extern unsigned char detect_chameleon (void);
+
+/* Check for the presence of the C64 Chameleon cartridge.
+ *
+ * Possible return values:
+ * 0x00  : C64 Chameleon cartridge not present
+ * 0x01  : C64 Chameleon cartridge present
+ */
+
 /* End of accelerator.h */
 #endif
 

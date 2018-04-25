@@ -1,6 +1,7 @@
 CL ?= cl65
 
-all: c64-scpu-test.prg c128-scpu-test.prg c64dtv-test.prg
+all:	c64-scpu-test.prg c128-scpu-test.prg c64dtv-test.prg \
+	c64-c128-test.prg c128-test.prg
 
 c64-scpu-test.prg: c64-c128-scpu-test.c
 	$(CL) -t c64 c64-c128-scpu-test.c -o c64-scpu-test.prg
@@ -11,3 +12,8 @@ c128-scpu-test.prg: c64-c128-scpu-test.c
 c64dtv-test.prg: c64dtv-test.c
 	$(CL) -t c64 c64dtv-test.c -o c64dtv-test.prg
 
+c64-c128-test.prg: c64-c128-test.c
+	$(CL) -t c64 c64-c128-test.c -o c64-c128-test.prg
+
+c128-test.prg: c64-c128-test.c
+	$(CL) -t c128 c64-c128-test.c -o c128-test.prg

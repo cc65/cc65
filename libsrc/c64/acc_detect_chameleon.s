@@ -32,8 +32,8 @@ _detect_chameleon:
         beq     not_found
 found:
         lda     #$01
-        .byte   $2C
+        .byte   $24
 not_found:
-        lda     #$00
+        txa
         rts
 

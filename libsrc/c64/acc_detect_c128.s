@@ -1,5 +1,6 @@
 ;
-; Marco van den Heuvel, 2018-04-20
+; 2018-04-20, Marco van den Heuvel
+; 2018-04-26, Greg King
 ;
 
 ; unsigned char detect_c128 (void);
@@ -16,21 +17,17 @@
         .include        "accelerator.inc"
 
 _detect_c128:
-        lda     #$00
-        tax
+        ldx     #>$0001
+        lda     #<$0001
 
-; Make sure the CPU is a 8502
-        .byte   $1A                   ; NOP on 8502, INA on 65(S)C(E)02, 4510 and 65816
-        beq     found
-        .byte   $3A                   ; decrement A again, so a #$00 can be returned
-        rts
+; Make sure the CPU is an 8502.
+        .byte   $3A     ; NOP on 8502, DEA on 65(S)C(E)02, 4510, and 65816
+        beq     detect_end
 
-found:
-
-; Make sure a C128 VICIIe is present
+; Make sure a C128 VIC-IIe is present.
         ldy     C128_VICIIE_CLK
         cpy     #$FF
-        beq     not_found
-        lda     #$01
-not_found:
+        bne     detect_end
+        txa             ; return zero when not VIC-IIe
+detect_end:
         rts

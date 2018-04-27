@@ -60,3 +60,12 @@ CHAMELEON_DISABLE_REGS = $FF
 CHAMELEON_CFGTUR_LIMIT_1MHZ = %00001100
 CHAMELEON_CFGTUR_LIMIT_NONE = %10000000
 
+
+; ---------------------------------------------------------------------------
+; C65/C64DX in C64 mode
+
+C65_VICIII_KEY    := $D02F
+C65_VICIII_CTRL_B := $D031
+
+C65_VICIII_UNLOCK_1 = $A5
+C65_VICIII_UNLOCK_2 = $96

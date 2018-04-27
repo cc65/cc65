@@ -3,7 +3,7 @@
 ; 2018-04-26, Greg King
 ;
 
-; extern unsigned char __fastcall__ set_c128_speed (unsigned char speed);
+; unsigned char __fastcall__ set_c128_speed (unsigned char speed);
 ;
 ;/* Set the speed of the C128 8502 CPU; using SPEED_SLOW will switch to
 ; * 1 Mhz (slow) mode, SPEED_2X or SPEED_FAST will switch to 2Mhz (fast) mode.
@@ -19,7 +19,7 @@
 ; * For C128 programs, no detect function call is needed.
 ; */
 
-; extern unsigned char get_c128_speed (void);
+; unsigned char get_c128_speed (void);
 ;
 ;/* Get the speed of the C128 8502 CPU.
 ; *

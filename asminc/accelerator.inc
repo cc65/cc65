@@ -43,7 +43,20 @@ C64DTV_Fast = $03
 
 
 ; ---------------------------------------------------------------------------
-; C128 in C64 mode
+; C128 native and C128 in C64 mode
 
 C128_VICIIE_CLK := $D030
+
+
+; ---------------------------------------------------------------------------
+; C64 Chameleon cartridge
+
+CHAMELEON_CFGTUR := $D0F3
+CHAMELEON_CFGENA := $D0FE
+
+CHAMELEON_ENABLE_REGS  = $2A
+CHAMELEON_DISABLE_REGS = $FF
+
+CHAMELEON_CFGTUR_LIMIT_1MHZ = %00001100
+CHAMELEON_CFGTUR_LIMIT_NONE = %10000000
 

@@ -2,7 +2,7 @@
 ; Marco van den Heuvel, 2018-04-09
 ;
 
-; extern unsigned char __fastcall__ set_scpu_speed (unsigned char speed);
+; unsigned char __fastcall__ set_scpu_speed (unsigned char speed);
 ;
 ;/* Set the speed of the SuperCPU cartridge, using SPEED_SLOW will switch to
 ; * 1 Mhz mode, SPEED_20X or SPEED_FAST will switch to 20 Mhz mode.
@@ -19,7 +19,7 @@
 ; * make sure you use 'detect_scpu();' before using.
 ; */
 
-; extern unsigned char get_scpu_speed (void);
+; unsigned char get_scpu_speed (void);
 ;
 ;/* Get the speed of the SuperCPU cartridge.
 ; *

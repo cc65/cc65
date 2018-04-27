@@ -77,7 +77,7 @@ extern unsigned char __fastcall__ set_scpu_speed (unsigned char speed);
  * make sure you use 'detect_scpu();' before using.
  */
 
-extern unsigned char get_scpu_speed (void);
+unsigned char get_scpu_speed (void);
 
 /* Get the speed of the SuperCPU cartridge.
  *
@@ -89,7 +89,7 @@ extern unsigned char get_scpu_speed (void);
  * make sure you use 'detect_scpu();' before using.
  */
 
-extern unsigned char detect_scpu (void);
+unsigned char detect_scpu (void);
 
 /* Check for the presence of the SuperCPU cartridge.
  *
@@ -101,7 +101,7 @@ extern unsigned char detect_scpu (void);
 
 /* C64DTV */
 
-extern unsigned char __fastcall__ set_c64dtv_speed (unsigned char speed);
+unsigned char __fastcall__ set_c64dtv_speed (unsigned char speed);
 
 /* Set the speed of the C64DTV, using SPEED_SLOW will switch to
  * slow mode, SPEED_2X or SPEED_FAST will switch to fast mode.
@@ -115,7 +115,7 @@ extern unsigned char __fastcall__ set_c64dtv_speed (unsigned char speed);
  * make sure you use 'detect_c64dtv();' before using.
  */
 
-extern unsigned char get_c64dtv_speed (void);
+unsigned char get_c64dtv_speed (void);
 
 /* Get the speed of the C64DTV.
  *
@@ -127,7 +127,7 @@ extern unsigned char get_c64dtv_speed (void);
  * make sure you use 'detect_c64dtv();' before using.
  */
 
-extern unsigned char detect_c64dtv (void);
+unsigned char detect_c64dtv (void);
 
 /* Check for the presence of the C64DTV.
  *
@@ -139,7 +139,7 @@ extern unsigned char detect_c64dtv (void);
 
 /* C128 8502 CPU */
 
-extern unsigned char __fastcall__ set_c128_speed (unsigned char speed);
+unsigned char __fastcall__ set_c128_speed (unsigned char speed);
 
 /* Set the speed of the C128 8502 CPU, using SPEED_SLOW will switch to
  * 1 Mhz (slow) mode, SPEED_2X or SPEED_FAST will switch to 2Mhz (fast) mode.
@@ -153,7 +153,7 @@ extern unsigned char __fastcall__ set_c128_speed (unsigned char speed);
  * you use 'detect_c128();' before using.
  */
 
-extern unsigned char get_c128_speed (void);
+unsigned char get_c128_speed (void);
 
 /* Get the speed of the C128 8502 CPU.
  *
@@ -165,7 +165,7 @@ extern unsigned char get_c128_speed (void);
  * you use 'detect_c128();' before using.
  */
 
-extern unsigned char detect_c128 (void);
+unsigned char detect_c128 (void);
 
 /* Check if the C128 CPU is the current CPU.
  *
@@ -177,7 +177,7 @@ extern unsigned char detect_c128 (void);
 
 /* C64 Chameleon cartridge */
 
-extern unsigned char __fastcall__ set_chameleon_speed (unsigned char speed);
+unsigned char __fastcall__ set_chameleon_speed (unsigned char speed);
 
 /* Set the speed of the C64 Chameleon cartridge, the following inputs
  * are accepted: 
@@ -200,7 +200,7 @@ extern unsigned char __fastcall__ set_chameleon_speed (unsigned char speed);
  * make sure you use 'detect_chameleon();' before using.
  */
 
-extern unsigned char get_chameleon_speed (void);
+unsigned char get_chameleon_speed (void);
 
 ;/* Get the speed of the C64 Chameleon cartridge.
 ; *
@@ -217,7 +217,7 @@ extern unsigned char get_chameleon_speed (void);
 ; * make sure you use 'detect_chameleon();' before using.
 ; */
 
-extern unsigned char detect_chameleon (void);
+unsigned char detect_chameleon (void);
 
 /* Check for the presence of the C64 Chameleon cartridge.
  *

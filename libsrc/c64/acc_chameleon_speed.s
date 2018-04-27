@@ -2,7 +2,7 @@
 ; Marco van den Heuvel, 2018-04-25
 ;
 
-; extern unsigned char __fastcall__ set_chameleon_speed (unsigned char speed);
+; unsigned char __fastcall__ set_chameleon_speed (unsigned char speed);
 ;
 ;/* Set the speed of the Chameleon cartridge, the following inputs
 ; * are accepted: 
@@ -25,7 +25,7 @@
 ; * make sure you use 'detect_chameleon();' before using.
 ; */
 
-; extern unsigned char get_chameleon_speed (void);
+; unsigned char get_chameleon_speed (void);
 ;
 ;/* Get the speed of the Chameleon cartridge.
 ; *

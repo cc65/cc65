@@ -2,7 +2,7 @@
 ; Marco van den Heuvel, 2018-04-14
 ;
 
-; extern unsigned char __fastcall__ set_c64dtv_speed (unsigned char speed);
+; unsigned char __fastcall__ set_c64dtv_speed (unsigned char speed);
 ;
 ;/* Set the speed of the C64DTV, using SPEED_SLOW will switch to
 ; * slow mode, SPEED_2X or SPEED_FAST will switch to fast mode.
@@ -16,7 +16,7 @@
 ; * make sure you use 'detect_c64dtv();' before using.
 ; */
 
-; extern unsigned char get_c64dtv_speed (void);
+; unsigned char get_c64dtv_speed (void);
 ;
 ;/* Get the speed of the C64DTV.
 ; *

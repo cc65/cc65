@@ -45,7 +45,7 @@ _detect_c65:
         bne     found
         inc     $D000
         cpy     $D040
-        beq     not_found
+        bne     not_found
 
 found:
         lda     #$01

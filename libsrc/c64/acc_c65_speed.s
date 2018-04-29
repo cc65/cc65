@@ -56,7 +56,6 @@ return_c65_speed:
         and     #$40
         beq     speed_is_slow              ; when this branch is taken then register A is already set to SPEED_SLOW
         lda     #SPEED_3X
-        .byte   $2C
 speed_is_slow:
         ldx     #$00
         rts

@@ -60,7 +60,7 @@
 
 /* C64/C128 SuperCPU cartridge */
 
-extern unsigned char __fastcall__ set_scpu_speed (unsigned char speed);
+unsigned char __fastcall__ set_scpu_speed (unsigned char speed);
 
 /* Set the speed of the SuperCPU cartridge, using SPEED_SLOW will switch to
  * 1 Mhz mode, SPEED_20X or SPEED_FAST will switch to 20 Mhz mode.

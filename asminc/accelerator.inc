@@ -69,3 +69,12 @@ C65_VICIII_CTRL_B := $D031
 
 C65_VICIII_UNLOCK_1 = $A5
 C65_VICIII_UNLOCK_2 = $96
+
+
+; ---------------------------------------------------------------------------
+; C64 Turbo Master cartridge
+
+TURBOMASTER_DETECT    := $BF53
+
+TURBOMASTER_SPEED_REG := $00
+

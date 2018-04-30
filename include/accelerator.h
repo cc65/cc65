@@ -263,6 +263,47 @@ unsigned char detect_c65 (void);
  * 0x00  : C65/C64DX in C64 mode not present
  * 0x01  : C65/C64DX in C64 mode present
  */
+
+
+/* C64 Turbo Master cartridge */
+
+unsigned char __fastcall__ set_turbomaster_speed (unsigned char speed);
+
+/* Set the speed of the Turbo Master cartridge, using SPEED_SLOW will switch to
+ * 1 Mhz mode, SPEED_4X or SPEED_FAST will switch to 4 Mhz mode.
+ *
+ * Note that any value higher or equal to SPEED_4X will switch to 4 Mhz mode,
+ * any value lower than SPEED_4X will switch to 1 Mhz mode.
+ *
+ * This function will return the actual speed the CPU is at after trying
+ * to set the requested speed, if the speed is different it might indicate
+ * that the hardware switch has locked the speed.
+ *
+ * This function does not check for the presence of a Turbo Master cartridge,
+ * make sure you use 'detect_turbomaster();' before using.
+ */
+
+unsigned char get_turbomaster_speed (void);
+
+/* Get the speed of the Turbo Master cartridge.
+ *
+ * Possible return values:
+ * SPEED_SLOW  : 1 Mhz mode
+ * SPEED_4X    : 4 Mhz mode
+ *
+ * This function does not check for the presence of a Turbo Master cartridge,
+ * make sure you use 'detect_turbomaster();' before using.
+ */
+
+unsigned char detect_turbomaster (void);
+
+/* Check for the presence of a C64 Turbo Master cartridge.
+ *
+ * Possible return values:
+ * 0x00  : C64 Turbo Master cartridge not present
+ * 0x01  : C64 Turbo Master cartridge present
+ */
+
 /* End of accelerator.h */
 #endif
 

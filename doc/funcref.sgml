@@ -3682,28 +3682,6 @@ header files define constants that can be used to check the return code.
 </quote>
 
 
-<sect1>get_turbomaster_speed<label id="get_turbomaster_speed"><p>
-
-<quote>
-<descrip>
-<tag/Function/Get the current speed of the C64 Turbo Master cartridge.
-<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
-<tag/Declaration/<tt/unsigned char get_turbomaster_speed (void);/
-<tag/Description/The function returns the current speed of the C64 Turbo Master cartridge.
-<tag/Notes/<itemize>
-<item>The function is specific to the C64.
-<item>The function does not check for the presence of the C64 Turbo Master cartridge.
-<item>See the accelerator.h header for the speed definitions.
-</itemize>
-<tag/Availability/cc65 (not all platforms)
-<tag/See also/
-<ref id="detect_turbomaster" name="detect_turbomaster">,
-<ref id="set_turbomaster_speed" name="set_turbomaster_speed">,
-<tag/Example/None.
-</descrip>
-</quote>
-
-
 <sect1>get_scpu_speed<label id="get_scpu_speed"><p>
 
 <quote>
@@ -3725,6 +3703,27 @@ header files define constants that can be used to check the return code.
 </descrip>
 </quote>
 
+
+<sect1>get_turbomaster_speed<label id="get_turbomaster_speed"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get the current speed of the C64 Turbo Master cartridge.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char get_turbomaster_speed (void);/
+<tag/Description/The function returns the current speed of the C64 Turbo Master cartridge.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64.
+<item>The function does not check for the presence of the C64 Turbo Master cartridge.
+<item>See the accelerator.h header for the speed definitions.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="detect_turbomaster" name="detect_turbomaster">,
+<ref id="set_turbomaster_speed" name="set_turbomaster_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
 
 <sect1>getcpu<label id="getcpu"><p>
 

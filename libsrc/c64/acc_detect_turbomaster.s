@@ -37,11 +37,9 @@ _detect_turbomaster:
 ; Check for turbo master basic replacement
         ldy     TURBOMASTER_DETECT
         cpy     #$A2
-        bne     not_found
-found:
-        lda     #$01
-        .byte   $24
+        beq     found
 not_found:
         txa
+found:
         rts
 

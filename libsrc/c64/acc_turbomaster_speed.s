@@ -38,18 +38,11 @@
 _set_turbomaster_speed:
         tay
         lda     TURBOMASTER_SPEED_REG
+        asl
         cpy     #SPEED_4X
-        bcs     high_speed
-low_speed:
-        and     #$7F
+        ror
 store_speed:
         sta     TURBOMASTER_SPEED_REG
-        jmp     _get_turbomaster_speed
-
-high_speed:
-        ora     #$80
-        bne     store_speed
-
 
 _get_turbomaster_speed:
         ldx     #$00

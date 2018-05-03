@@ -180,16 +180,19 @@ url="funcref.html" name="function reference"> for declaration and usage.
 <item>detect_c65
 <item>detect_chameleon
 <item>detect_scpu
+<item>detect_turbomaster
 <item>get_c128_speed
 <item>get_c64dtv_speed
 <item>get_c65_speed
 <item>get_chameleon_speed
 <item>get_scpu_speed
+<item>get_turbomaster_speed
 <item>set_c128_speed
 <item>set_c64dtv_speed
 <item>set_c65_speed
 <item>set_chameleon_speed
 <item>set_scpu_speed
+<item>set_turbomaster_speed
 </itemize>
 
 

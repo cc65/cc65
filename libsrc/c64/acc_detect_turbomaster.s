@@ -20,7 +20,7 @@ _detect_turbomaster:
         tax
 
 ; Make sure the current CPU is not a 6510
-        .byte   $1A                   ; NOP on 8502, INA on 65(S)C(E)02, 4510 and 65816
+        .byte   $1A                    ; NOP on 8502, INA on 65(S)C(E)02, 4510 and 65816
         beq     not_found
 
 ; Make sure the current CPU is not a 65816

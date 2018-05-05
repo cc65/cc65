@@ -88,6 +88,7 @@ found_get_speed:
         rts
 
 unlock_regs:
+        ldy     #$04                ; loop 4 times
         lda     #FASTCHIP_UNLOCK    ; load the unlock value
 unlock_loop:
         sta     FASTCHIP_LOCK_REG   ; store in lock register

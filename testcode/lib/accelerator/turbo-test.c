@@ -12,7 +12,7 @@
 #include <target.h>
 #include <peekpoke.h>
 
-#if defined(__APPLE2__) || defined(__APPLE2ENH__)
+#ifdef __APPLE2__
 static void print_time_taken(void)
 {
     unsigned char vbl = 0;
@@ -60,7 +60,7 @@ void main(void)
     unsigned char status;
     unsigned char speed = 0;
 
-#if defined(__APPLE2__) || defined(__APPLE2ENH__)
+#ifdef __APPLE2__
     unsigned char ostype = get_ostype();
 
     if (ostype != APPLE_IIE && ostype != APPLE_IIEENH && ostype != APPLE_IIECARD) {

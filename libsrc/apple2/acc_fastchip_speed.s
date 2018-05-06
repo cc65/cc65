@@ -98,6 +98,8 @@ unlock_loop:
         rts
 
 
+.rodata
+
 ; generic accelerator speeds for translation to/from Fast Chip speed values
 accel_speed_table:
         .byte SPEED_1X

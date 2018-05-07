@@ -314,15 +314,15 @@ unsigned char __fastcall__ set_fastchip_speed (unsigned char speed);
  * SPEED_SLOW : 1 Mhz mode
  * SPEED_1X   : 1 Mhz mode
  * SPEED_2X   : 2 Mhz mode
- * SPEED_3X   : 3 Mhz mode
- * SPEED_4X   : 4 Mhz mode
+ * SPEED_3X   : 3.1 Mhz mode
+ * SPEED_4X   : 4.1 Mhz mode
  * SPEED_5X   : 5 Mhz mode
- * SPEED_6X   : 6 Mhz mode
- * SPEED_7X   : 7 Mhz mode
- * SPEED_8X   : 8 Mhz mode
+ * SPEED_6X   : 6.2 Mhz mode
+ * SPEED_7X   : 7.1 Mhz mode
+ * SPEED_8X   : 8.3 Mhz mode
  * SPEED_10X  : 10 Mhz mode
- * SPEED_12X  : 12 Mhz mode
- * SPEED_16X  : 16 Mhz mode
+ * SPEED_12X  : 12.5 Mhz mode
+ * SPEED_16X  : 16.6 Mhz mode
  *
  * Note that any value higher or equal to SPEED_16X will switch to 16 Mhz mode.
  * SPEED_13X, SPEED_14X and SPEED15X will switch to 12 Mhz mode.
@@ -342,15 +342,15 @@ unsigned char get_fastchip_speed (void);
  * Possible return values:
  * SPEED_1X    : 1 Mhz mode
  * SPEED_2X    : 2 Mhz mode
- * SPEED_3X    : 3 Mhz mode
- * SPEED_4X    : 4 Mhz mode
+ * SPEED_3X    : 3.1 Mhz mode
+ * SPEED_4X    : 4.1 Mhz mode
  * SPEED_5X    : 5 Mhz mode
- * SPEED_6X    : 6 Mhz mode
- * SPEED_7X    : 7 Mhz mode
- * SPEED_8X    : 8 Mhz mode
+ * SPEED_6X    : 6.2 Mhz mode
+ * SPEED_7X    : 7.1 Mhz mode
+ * SPEED_8X    : 8.3 Mhz mode
  * SPEED_10X   : 10 Mhz mode
- * SPEED_12X   : 12 Mhz mode
- * SPEED 16X   : 16 Mhz mode
+ * SPEED_12X   : 12.5 Mhz mode
+ * SPEED 16X   : 16.6 Mhz mode
  *
  * This function does not check for the presence of the Apple IIe Fast Chip
  * slot carde, make sure you use 'detect_fastchip();' before using.

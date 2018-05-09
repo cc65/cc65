@@ -272,7 +272,7 @@ CLEAR:  ldy     #$00
         sta     VBASE+$1C00,y
         sta     VBASE+$1D00,y
         sta     VBASE+$1E00,y
-        sta     VBASE+$1F40,y   ; preserve vectors
+        sta     VBASE+$1E40,y   ; preserve vectors
         iny
         bne     @L1
         rts

@@ -65,6 +65,30 @@ function.
 </itemize>
 
 
+<sect1><tt/accelerator.h/<label id="accelerator.h"><p>
+
+<itemize>
+<item><ref id="detect_c128" name="detect_c128">
+<item><ref id="detect_c64dtv" name="detect_c64dtv">
+<item><ref id="detect_c65" name="detect_c65">
+<item><ref id="detect_chameleon" name="detect_chameleon">
+<item><ref id="detect_scpu" name="detect_scpu">
+<item><ref id="detect_turbomaster" name="detect_turbomaster">
+<item><ref id="get_c128_speed" name="get_c128_speed">
+<item><ref id="get_c64dtv_speed" name="get_c64dtv_speed">
+<item><ref id="get_c65_speed" name="get_c65_speed">
+<item><ref id="get_chameleon_speed" name="get_chameleon_speed">
+<item><ref id="get_scpu_speed" name="get_scpu_speed">
+<item><ref id="get_turbomaster_speed" name="get_turbomaster_speed">
+<item><ref id="set_c128_speed" name="set_c128_speed">
+<item><ref id="set_c64dtv_speed" name="set_c64dtv_speed">
+<item><ref id="set_c65_speed" name="set_c65_speed">
+<item><ref id="set_chameleon_speed" name="set_chameleon_speed">
+<item><ref id="set_scpu_speed" name="set_scpu_speed">
+<item><ref id="set_turbomaster_speed" name="set_turbomaster_speed">
+</itemize>
+
+
 <sect1><tt/apple2.h/<label id="apple2.h"><p>
 
 <itemize>
@@ -139,6 +163,12 @@ function.
 
 
 <sect1><tt/c16.h/<label id="c16.h"><p>
+
+<itemize>
+<item><ref id="fast" name="fast">
+<item><ref id="isfast" name="isfast">
+<item><ref id="slow" name="slow">
+</itemize>
 
 (incomplete)
 
@@ -501,6 +531,12 @@ It does not declare any functions.
 
 
 <sect1><tt/plus4.h/<label id="plus4.h"><p>
+
+<itemize>
+<item><ref id="fast" name="fast">
+<item><ref id="isfast" name="isfast">
+<item><ref id="slow" name="slow">
+</itemize>
 
 (incomplete)
 
@@ -2899,6 +2935,126 @@ used in presence of a prototype.
 </quote>
 
 
+<sect1>detect_c128<label id="detect_c128"><p>
+
+<quote>
+<descrip>
+<tag/Function/Check if a C128 CPU is the current CPU.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char detect_c128 (void);/
+<tag/Description/The function returns a 1 if a C128 CPU is the current CPU.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64 and C128.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="get_c128_speed" name="get_c128_speed">,
+<ref id="set_c128_speed" name="set_c128_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>detect_c64dtv<label id="detect_c64dtv"><p>
+
+<quote>
+<descrip>
+<tag/Function/Check for the presence of the C64DTV.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char detect_c64dtv (void);/
+<tag/Description/The function returns a 1 if a C64DTV has been detected.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="get_c64dtv_speed" name="get_c64dtv_speed">,
+<ref id="set_c64dtv_speed" name="set_c64dtv_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>detect_c65<label id="detect_c65"><p>
+
+<quote>
+<descrip>
+<tag/Function/Check for the presence of a C65/C64DX in C64 mode.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char detect_c65 (void);/
+<tag/Description/The function returns a 1 if a C65/C64DX in C64 mode has been detected.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="get_c65_speed" name="get_c65_speed">,
+<ref id="set_c65_speed" name="set_c65_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>detect_chameleon<label id="detect_chameleon"><p>
+
+<quote>
+<descrip>
+<tag/Function/Check for the presence of the C64 Chameleon cartridge.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char detect_chameleon (void);/
+<tag/Description/The function returns a 1 if a C64 Chameleon cartridge has been detected.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="get_chameleon_speed" name="get_chameleon_speed">,
+<ref id="set_chameleon_speed" name="set_chameleon_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>detect_scpu<label id="detect_scpu"><p>
+
+<quote>
+<descrip>
+<tag/Function/Check for the presence of the C64/C128 SuperCPU cartridge.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char detect_scpu (void);/
+<tag/Description/The function returns a 1 if a SuperCPU cartridge has been detected.
+<tag/Notes/<itemize>
+<item>The function is specific to the C128 and C64.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="get_scpu_speed" name="get_scpu_speed">,
+<ref id="set_scpu_speed" name="set_scpu_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>detect_turbomaster<label id="detect_turbomaster"><p>
+
+<quote>
+<descrip>
+<tag/Function/Check for the presence of the C64 Turbo Master cartridge.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char detect_turbomaster (void);/
+<tag/Description/The function returns a 1 if a C64 Turbo Master cartridge has been detected.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="get_turbomaster_speed" name="get_turbomaster_speed">,
+<ref id="set_turbomaster_speed" name="set_turbomaster_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>div<label id="div"><p>
 
 <quote>
@@ -3292,21 +3448,21 @@ program, it may not be able to read it.
 
 <quote>
 <descrip>
-<tag/Function/Switch the C128 into 2MHz mode.
-<tag/Header/<tt/<ref id="c128.h" name="c128.h">/
+<tag/Function/Switch the CPU into fast mode (C128: 2MHz mode, C16/Plus4: double clock mode).
+<tag/Header/<tt/<ref id="c128.h" name="c128.h">,
+<ref id="c16.h" name="c16.h">, <ref id="plus4.h" name="plus4.h">/
 <tag/Declaration/<tt/void fast (void);/
-<tag/Description/The function will switch the clock of the C128 to 2MHz. This
-will nearly double the speed compared to slow mode.
+<tag/Description/The function will switch the clock of the CPU to fast mode. For the C128
+target it means switching the CPU into 2MHz mode. For the C16/Plus4 target it means
+switching the CPU into double clock mode.
 <tag/Notes/<itemize>
-<item>The function is specific to the C128.
-<item>2MHz clock will not work in 40 column mode.
+<item>The function is specific to the C128, C16 and Plus4.
+<item>On the C128 the 2MHz clock will not work in 40 column mode.
 </itemize>
-<tag/Availability/C128
+<tag/Availability/cc65 (not all platforms)
 <tag/See also/
 <ref id="isfast" name="isfast">,
 <ref id="slow" name="slow">,
-<ref id="toggle_videomode" name="toggle_videomode">,
-<ref id="videomode" name="videomode">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -3437,6 +3593,137 @@ header files define constants that can be used to check the return code.
 </descrip>
 </quote>
 
+
+<sect1>get_c128_speed<label id="get_c128_speed"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get the current speed of the C128 CPU.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char get_c128_speed (void);/
+<tag/Description/The function returns the current speed of the C128 CPU.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64 and C128.
+<item>The function does not check if the C128 CPU is the current CPU.
+<item>See the accelerator.h header for the speed definitions.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="detect_c128" name="detect_c128">,
+<ref id="set_c128_speed" name="set_c128_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>get_c64dtv_speed<label id="get_c64dtv_speed"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get the current speed of the C64DTV.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char get_c64dtv_speed (void);/
+<tag/Description/The function returns the current speed of the C64DTV.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64.
+<item>The function does not check for the presence of the C64DTV.
+<item>See the accelerator.h header for the speed definitions.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="detect_c64dtv" name="detect_c64dtv">,
+<ref id="set_c64dtv_speed" name="set_c64dtv_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>get_c65_speed<label id="get_c65_speed"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get the current speed of the C65/C64DX in C64 mode.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char get_c65_speed (void);/
+<tag/Description/The function returns the current speed of the C65/C64DX in C64 mode.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64.
+<item>The function does not check for the presence of a C65/C64DX in C64 mode.
+<item>See the accelerator.h header for the speed definitions.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="detect_c65" name="detect_c65">,
+<ref id="set_c65_speed" name="set_c65_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>get_chameleon_speed<label id="get_chameleon_speed"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get the current speed of the C64 Chameleon cartridge.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char get_chameleon_speed (void);/
+<tag/Description/The function returns the current speed of the C64 Chameleon cartridge.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64.
+<item>The function does not check for the presence of the C64 Chameleon cartridge.
+<item>See the accelerator.h header for the speed definitions.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="detect_chameleon" name="detect_chameleon">,
+<ref id="set_chameleon_speed" name="set_chameleon_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>get_scpu_speed<label id="get_scpu_speed"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get the current speed of the C64/C128 SuperCPU cartridge.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char get_scpu_speed (void);/
+<tag/Description/The function returns the current speed of the SuperCPU cartridge.
+<tag/Notes/<itemize>
+<item>The function is specific to the C128 and C64.
+<item>The function does not check for the presence of the cartridge.
+<item>See the accelerator.h header for the speed definitions.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="detect_scpu" name="detect_scpu">,
+<ref id="set_scpu_speed" name="set_scpu_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>get_turbomaster_speed<label id="get_turbomaster_speed"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get the current speed of the C64 Turbo Master cartridge.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char get_turbomaster_speed (void);/
+<tag/Description/The function returns the current speed of the C64 Turbo Master cartridge.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64.
+<item>The function does not check for the presence of the C64 Turbo Master cartridge.
+<item>See the accelerator.h header for the speed definitions.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="detect_turbomaster" name="detect_turbomaster">,
+<ref id="set_turbomaster_speed" name="set_turbomaster_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
 
 <sect1>getcpu<label id="getcpu"><p>
 
@@ -3960,19 +4247,18 @@ fastcall function, so it may only be used in presence of a prototype.
 
 <quote>
 <descrip>
-<tag/Function/Check if the C128 is in 2MHz mode.
-<tag/Header/<tt/<ref id="c128.h" name="c128.h">/
+<tag/Function/Check if the CPU is in fast mode (C128: 2MHz mode, C16/Plus4: double clock mode).
+<tag/Header/<tt/<ref id="c128.h" name="c128.h">,
+<ref id="c16.h" name="c16.h">, <ref id="plus4.h" name="plus4.h">/
 <tag/Declaration/<tt/unsigned char isfast (void);/
-<tag/Description/The function returns a 1 if the C128 is in 2MHz mode.
+<tag/Description/The function returns a 1 if the CPU is in fast mode (C128: 2MHz mode, C16/Plus4: double clock mode).
 <tag/Notes/<itemize>
-<item>The function is specific to the C128.
+<item>The function is specific to the C128, C16 and Plus4.
 </itemize>
-<tag/Availability/C128
+<tag/Availability/cc65 (not all platforms)
 <tag/See also/
 <ref id="fast" name="fast">,
 <ref id="slow" name="slow">,
-<ref id="toggle_videomode" name="toggle_videomode">,
-<ref id="videomode" name="videomode">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -5990,6 +6276,138 @@ clean-up when exitting the program.
 </quote>
 
 
+<sect1>set_c128_speed<label id="set_c128_speed"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set the current speed of a C128 CPU.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ set_c128_speed (unsigned char speed);/
+<tag/Description/The function returns the speed after trying to set the speed of the C128 CPU.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64 and C128.
+<item>The function does not check if the C128 CPU is the current CPU.
+<item>See the accelerator.h header for the speed definitions.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="detect_c128" name="detect_c128">,
+<ref id="get_c128_speed" name="get_c128_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>set_c64dtv_speed<label id="set_c64dtv_speed"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set the current speed of the C64DTV.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ set_c64dtv_speed (unsigned char speed);/
+<tag/Description/The function returns the speed after trying to set the speed of the C64DTV.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64.
+<item>The function does not check for the presence of the C64DTV.
+<item>See the accelerator.h header for the speed definitions.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="detect_c64dtv" name="detect_c64dtv">,
+<ref id="get_c64dtv_speed" name="get_c64dtv_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>set_c65_speed<label id="set_c65_speed"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set the current speed of the C65/C64DX in C64 mode.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ set_c65_speed (unsigned char speed);/
+<tag/Description/The function returns the speed after trying to set the speed of the C65/C64DX in C64 mode.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64.
+<item>The function does not check for the presence of a C65/C64DX in C64 mode.
+<item>See the accelerator.h header for the speed definitions.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="detect_c65" name="detect_c65">,
+<ref id="get_c65_speed" name="get_c65_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>set_chameleon_speed<label id="set_chameleon_speed"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set the current speed of the C64 Chameleon cartridge.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ set_chameleon_speed (unsigned char speed);/
+<tag/Description/The function returns the speed after trying to set the speed of the C64 Chameleon cartridge.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64.
+<item>The function does not check for the presence of the C64 Chameleon cartridge.
+<item>See the accelerator.h header for the speed definitions.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="detect_chameleon" name="detect_chameleon">,
+<ref id="get_chameleon_speed" name="get_chameleon_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>set_scpu_speed<label id="set_scpu_speed"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set the current speed of the C64/C128 SuperCPU cartridge.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ set_scpu_speed (unsigned char speed);/
+<tag/Description/The function returns the speed after trying to set the speed of the SuperCPU cartridge.
+<tag/Notes/<itemize>
+<item>The function is specific to the C128 and C64.
+<item>The function does not check for the presence of the cartridge.
+<item>See the accelerator.h header for the speed definitions.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="detect_scpu" name="detect_scpu">,
+<ref id="get_scpu_speed" name="get_scpu_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>set_turbomaster_speed<label id="set_turbomaster_speed"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set the current speed of the C64 Turbo Master cartridge.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ set_turbomaster_speed (unsigned char speed);/
+<tag/Description/The function returns the speed after trying to set the speed of the C64 Turbo Master cartridge.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64.
+<item>The function does not check for the presence of the C64 Turbo Master cartridge.
+<item>See the accelerator.h header for the speed definitions.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="detect_turbomaster" name="detect_turbomaster">,
+<ref id="get_turbomaster_speed" name="get_turbomaster_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>setjmp<label id="setjmp"><p>
 
 <quote>
@@ -6086,20 +6504,20 @@ be used in presence of a prototype.
 
 <quote>
 <descrip>
-<tag/Function/Switch the C128 into 1MHz mode.
-<tag/Header/<tt/<ref id="c128.h" name="c128.h">/
+<tag/Function/Switch the CPU into slow mode (C128: 1MHz mode, C16/Plus4: single clock mode).
+<tag/Header/<tt/<ref id="c128.h" name="c128.h">,
+<ref id="c16.h" name="c16.h">, <ref id="plus4.h" name="plus4.h">/
 <tag/Declaration/<tt/void slow (void);/
-<tag/Description/The function will switch the clock of the C128 to 1MHz. This
-will halve the speed compared to fast mode.
+<tag/Description/The function will switch the clock of the CPU to slow mode. for the C128
+target it means switching the CPU into 1MHz mode. for the C16/Plus4 target it means
+switching the CPU into single clock mode.
 <tag/Notes/<itemize>
-<item>The function is specific to the C128.
+<item>The function is specific to the C128, C16 and Plus4.
 </itemize>
-<tag/Availability/C128
+<tag/Availability/cc65 (not all platforms)
 <tag/See also/
 <ref id="fast" name="fast">,
 <ref id="isfast" name="isfast">,
-<ref id="toggle_videomode" name="toggle_videomode">,
-<ref id="videomode" name="videomode">
 <tag/Example/None.
 </descrip>
 </quote>

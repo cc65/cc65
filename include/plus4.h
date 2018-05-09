@@ -45,8 +45,7 @@
 
 
 
-/* Include the base header file for the 264 series. include file.
- */
+/* Include the base header file for the 264 series. */
 #include <cbm264.h>
 
 /* Define hardware */

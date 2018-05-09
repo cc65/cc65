@@ -4,8 +4,8 @@
 # This Makefile requires GNU make
 #
 
-# Run 'make SYS=<target>' or set a SYS env
-# var to build for another target system.
+# Run 'make SYS=<target>'; or, set a SYS env.
+# var. to build for another target system.
 SYS ?= c64
 
 ifneq ($(shell echo),)
@@ -41,13 +41,14 @@ ifneq ($(filter disk samples.%,$(MAKECMDGOALS)),)
   MOU := $(wildcard $(TARGET_PATH)/$(SYS)/drv/mou/*)
   TGI := $(wildcard $(TARGET_PATH)/$(SYS)/drv/tgi/*)
 
-  # This one comes with VICE
+  # This one comes with the VICE emulator.
+  # See http://vice-emu.sourceforge.net/
   C1541 ?= c1541
 
-  # For this one see https://applecommander.github.io/
+  # For this one, see https://applecommander.github.io/
   AC ?= ac.jar
 
-  # For this one see http://www.horus.com/~hias/atari/
+  # For this one, see http://www.horus.com/~hias/atari/
   DIR2ATR ?= dir2atr
 
   DISK_c64       = samples.d64
@@ -59,6 +60,8 @@ endif
 
 # --------------------------------------------------------------------------
 # System-dependent settings
+# For convenience, these groups and lines are sorted alphabetically, first
+# by target-machine group, then by mission, then by program and sub-target.
 
 # The Apple machines need the start address adjusted when using TGI
 LDFLAGS_mandelbrot_apple2    = --start-addr 0x4000
@@ -94,15 +97,19 @@ LDFLAGS_tgidemo_atarixl    = --start-addr 0x4000
 	$(AS) $(<:.c=.s)
 
 .s.o:
-	$(AS) $(AFLAGS) -t $(SYS) $<
+	$(AS) $(ASFLAGS) -t $(SYS) $<
 
 .PRECIOUS: %.o
 
 .o:
-	$(LD) $(LDFLAGS_$(@F)_$(SYS)) -o $@ -t $(SYS) -m $@.map $^ $(SYS).lib
+ifeq ($(SYS),vic20)
+	$(LD) $(LDFLAGS_$(@F)_$(SYS)) $(LDFLAGS) -o $@ -C vic20-32k.cfg -m $@.map $^ $(SYS).lib
+else
+	$(LD) $(LDFLAGS_$(@F)_$(SYS)) $(LDFLAGS) -o $@ -t $(SYS) -m $@.map $^ $(SYS).lib
+endif
 
 # --------------------------------------------------------------------------
-# List of executables
+# Lists of executables
 
 EXELIST_c64 =      \
         ascii      \
@@ -150,6 +157,13 @@ EXELIST_atarixl = $(EXELIST_atari)
 EXELIST_atari2600 = \
         atari2600hello
 
+# Unlisted targets will try to build everything.
+# That lets us learn what they cannot build, and what settings
+# we need to use for programs that can be built and run.
+ifndef EXELIST_$(SYS)
+EXELIST_$(SYS) := ${patsubst %.c,%,$(wildcard *.c)}
+endif
+
 # --------------------------------------------------------------------------
 # Rules to make the binaries and the disk
 
@@ -164,10 +178,10 @@ all:
 # overlay file-names are shortenned to fit the Atari's 8.3-character limit.
 
 multdemo: multidemo.o
-	$(LD) -o $@ -C $(SYS)-overlay.cfg -m $@.map $^ $(SYS).lib
+	$(LD) $(LDFLAGS) -o $@ -C $(SYS)-overlay.cfg -m $@.map $^ $(SYS).lib
 
 ovrldemo: overlaydemo.o
-	$(LD) -o $@ -C $(SYS)-overlay.cfg -m $@.map $^ $(SYS).lib
+	$(LD) $(LDFLAGS) -o $@ -C $(SYS)-overlay.cfg -m $@.map $^ $(SYS).lib
 
 OVERLAYLIST := $(foreach I,1 2 3,multdemo.$I ovrldemo.$I)
 
@@ -189,7 +203,7 @@ samples.d64: samples
 
 # --------------------------------------------------------------------------
 # Rule to make an Apple II disk with all samples. Needs the AppleCommander
-# program available at https://applecommander.github.io/ and a template disk
+# program, available at https://applecommander.github.io/, and a template disk
 # named 'prodos.dsk'.
 
 define DSK_WRITE_BIN_recipe
@@ -260,7 +274,7 @@ zip:
 # Clean-up rules
 
 mostlyclean:
-	@$(DEL) *.map *.o *.s 2>$(NULLDEV)
+	@$(DEL) *.lbl *.map *.o *.s 2>$(NULLDEV)
 
 clean: mostlyclean
 	@$(DEL) $(EXELIST_$(SYS)) $(DISK_$(SYS)) 2>$(NULLDEV)

@@ -85,9 +85,21 @@ url="funcref.html" name="function reference"> for declaration and usage.
 <itemize>
 <item>videomode
 <item>c64mode
-<item>fast
-<item>slow
-<item>isfast
+</itemize>
+
+
+<sect1>C128-specific accelerator functions<p>
+
+The functions listed below are accelerator functions for the C128. See the <url
+url="funcref.html" name="function reference"> for declaration and usage.
+
+<itemize>
+<item>detect_c128
+<item>detect_scpu
+<item>get_c128_speed
+<item>get_scpu_speed
+<item>set_c128_speed
+<item>set_scpu_speed
 </itemize>
 
 
@@ -120,6 +132,19 @@ declaration and usage.
 <item>cbm_save
 <item>cbm_write
 <item>get_tv
+</itemize>
+
+
+<sect1>CBM specific CPU functions<p>
+
+Some CPU related functions are available for some of the Commodore
+machines. See the <url url="funcref.html" name="function reference"> for
+declaration and usage.
+
+<itemize>
+<item>fast
+<item>slow
+<item>isfast
 </itemize>
 
 

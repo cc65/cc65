@@ -131,7 +131,7 @@ VBASE           := $E000                ; Video memory base address
 ;
 
 INSTALL:
-        rts
+;       rts                     ; fall through
 
 
 ; ------------------------------------------------------------------------
@@ -272,7 +272,7 @@ CLEAR:  ldy     #$00
         sta     VBASE+$1C00,y
         sta     VBASE+$1D00,y
         sta     VBASE+$1E00,y
-        sta     VBASE+$1F00,y
+        sta     VBASE+$1E40,y   ; preserve vectors
         iny
         bne     @L1
         rts
@@ -285,7 +285,7 @@ CLEAR:  ldy     #$00
 ;
 
 SETVIEWPAGE:
-        rts
+;       rts                     ; fall through
 
 ; ------------------------------------------------------------------------
 ; SETDRAWPAGE: Set the drawable page. Called with the new page in A (0..n).

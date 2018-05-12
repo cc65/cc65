@@ -380,48 +380,48 @@ unsigned OptStore5 (CodeSeg* S)
 **      sta     something
 **      stx     something-else
 **
-** and replace it by
+** and, replace it by
 **
-**      lda     foo
-**      sta     something
 **      lda     bar
 **      sta     something-else
+**      lda     foo
+**      sta     something
 **
-** if X is not used later. This replacement doesn't save any cycles or bytes,
-** but it keeps the value of X, which may be reused later.
+** if the new value of X is not used later. That replacement doesn't save any
+** cycles or bytes; but, it keeps the old value of X, which may be reused later.
 */
 {
     unsigned Changes = 0;
+    unsigned I = 0;
 
     /* Walk over the entries */
-    unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
-
         CodeEntry* L[4];
 
         /* Get next entry */
         L[0] = CS_GetEntry (S, I);
 
         /* Check for the sequence */
-        if (L[0]->OPC == OP65_LDA                           &&
-            !CS_RangeHasLabel (S, I+1, 3)                   &&
-            CS_GetEntries (S, L+1, I+1, 3)                  &&
-            L[1]->OPC == OP65_LDX                           &&
-            L[2]->OPC == OP65_STA                           &&
-            L[3]->OPC == OP65_STX                           &&
+        if (L[0]->OPC == OP65_LDA               &&
+            !CS_RangeHasLabel (S, I+1, 3)       &&
+            CS_GetEntries (S, L+1, I+1, 3)      &&
+            L[1]->OPC == OP65_LDX               &&
+            L[2]->OPC == OP65_STA               &&
+            L[3]->OPC == OP65_STX               &&
             !RegXUsed (S, I+4)) {
 
-            CodeEntry* X;
+            CodeEntry* E = CS_GetEntry (S, I+1);
 
-            /* Insert the code after the sequence */
-            X = NewCodeEntry (OP65_LDA, L[1]->AM, L[1]->Arg, 0, L[1]->LI);
-            CS_InsertEntry (S, X, I+4);
-            X = NewCodeEntry (OP65_STA, L[3]->AM, L[3]->Arg, 0, L[3]->LI);
-            CS_InsertEntry (S, X, I+5);
+            /* Move the high-byte code to the beginning of the sequence */
+            CS_MoveEntry (S, I+1, I);
+            CS_MoveEntry (S, I+3, I+1);
 
-            /* Delete the old code */
-            CS_DelEntry (S, I+3);
-            CS_DelEntry (S, I+1);
+            /* Change from the X register to the A register */
+            CE_ReplaceOPC (E, OP65_LDA);
+            CE_ReplaceOPC (CS_GetEntry (S, I+1), OP65_STA);
+
+            /* Move labels from the old first entry to the new first entry */
+            CS_MoveLabels (S, CS_GetEntry (S, I+2), E);
 
             /* Remember, we had changes */
             ++Changes;
@@ -429,7 +429,6 @@ unsigned OptStore5 (CodeSeg* S)
 
         /* Next entry */
         ++I;
-
     }
 
     /* Return the number of changes made */

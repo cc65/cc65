@@ -656,13 +656,16 @@ static SymEntry* ParseUnionDecl (const char* Name)
             /* Check for fields without a name */
             if (Decl.Ident[0] == '\0') {
                 /* In cc65 mode, we allow anonymous structs/unions within
-                ** a struct.
+                ** a union.
                 */
                 if (IS_Get (&Standard) >= STD_CC65 && IsClassStruct (Decl.Type)) {
                     /* This is an anonymous struct or union. Copy the fields
                     ** into the current level.
                     */
-                    CopyAnonStructFields (&Decl, 0);
+                    FieldSize = CopyAnonStructFields (&Decl, 0);
+                    if (FieldSize > UnionSize) {
+                        UnionSize = FieldSize;
+                    }
 
                 } else {
                     /* A non bit-field without a name is legal but useless */

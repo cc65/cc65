@@ -758,7 +758,7 @@ static const struct {
         { "BNZ",  AMSW16_BRA,              0x07, 0, PutSweet16Branch },
         { "BP",   AMSW16_BRA,              0x04, 0, PutSweet16Branch },
         { "BR",   AMSW16_BRA,              0x01, 0, PutSweet16Branch },
-        { "BS",   AMSW16_BRA,              0x0B, 0, PutSweet16Branch },
+        { "BS",   AMSW16_BRA,              0x0C, 0, PutSweet16Branch },
         { "BZ",   AMSW16_BRA,              0x06, 0, PutSweet16Branch },
         { "CPR",  AMSW16_REG,              0xD0, 0, PutSweet16 },
         { "DCR",  AMSW16_REG,              0xF0, 0, PutSweet16 },

@@ -318,7 +318,7 @@ Note that the graphics drivers are incompatible with the
   bytes each. Written and contributed by Marco van den Heuvel.
 
   <tag><tt/c64-ram.emd (c64_ram_emd)/</tag>
-  A driver for the hidden RAM below the I/O area and kernal ROM. Supports 48
+  A driver for the hidden RAM below the I/O area and kernal ROM. Supports 47
   256 byte pages. Please note that this driver is incompatible with any of the
   graphics drivers, or the soft80 conio driver!
 

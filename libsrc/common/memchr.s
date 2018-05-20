@@ -5,7 +5,7 @@
 ;
 
         .export         _memchr
-        .import         popax, popptr1 return0
+        .import         popax, popptr1, return0
         .importzp       ptr1, ptr2
 
 

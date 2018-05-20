@@ -5,7 +5,7 @@
 ;
 
         .export         _strncpy
-        .import         popptr1
+        .import         popax, popptr1
         .importzp       ptr1, ptr2, tmp1, tmp2, tmp3
 
 .proc   _strncpy

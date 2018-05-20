@@ -5,25 +5,19 @@
 ; X is untouched, low byte in A, Y is defined to be 0!
 
         .export         popptr1
-        .import 		incsp2
+        .import         incsp2
         .importzp       sp, ptr1
 
-		.macpack cpu
+        .macpack        cpu
 
-.proc 	popptr1					; 14 bytes, 
-
+.proc   popptr1                 ; 14 bytes (four usages = at least 2 bytes saved) 
         ldy     #1
         lda     (sp),y          ; get hi byte
-        sta		ptr+1           ; into ptr hi
-        dey						; note: apply even for 65C02 to have Y=0 at exit! 
-.if (.cpu .bitand ::CPU_ISET_65SC02)
-        lda     (sp)            ; get lo byte
-.else
+        sta     ptr1+1          ; into ptr hi
+        dey                     ; no optimization for 65C02 here to have Y=0 at exit! 
         lda     (sp),y          ; get lo byte
-.endif
-		sta		ptr1 			; to ptr lo
-
-		jmp		incsp2
+        sta     ptr1            ; to ptr lo
+        jmp     incsp2
 .endproc
 
 

@@ -6,7 +6,7 @@
 ;
 
         .export         _stricmp, _strcasecmp
-        .import         popax
+        .import         popptr1
         .import         __ctype
         .importzp       ptr1, ptr2, tmp1
 
@@ -16,10 +16,8 @@ _stricmp:
 _strcasecmp:
         sta     ptr2            ; Save s2
         stx     ptr2+1
-        jsr     popax           ; get s1
-        sta     ptr1
-        stx     ptr1+1
-        ldy     #0
+        jsr     popptr1         ; get s1
+        ; ldy     #0            ; Y=0 guaranteed by popptr1
 
 loop:   lda     (ptr2),y        ; get char from second string
         tax

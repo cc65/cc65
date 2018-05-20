@@ -9,7 +9,7 @@
         .import         fnparse, fnadd, fnparsename
         .import         opencmdchannel, closecmdchannel
         .import         writefndiskcmd, readdiskerror
-        .import         popax
+        .import         popptr1
 
         .import         fncmd, fnunit
         .importzp       ptr1
@@ -26,10 +26,8 @@
         lda     #'='
         jsr     fnadd
 
-        jsr     popax
-        sta     ptr1
-        stx     ptr1+1
-        ldy     #0
+        jsr     popptr1
+        ; ldy     #0              Y=0 guaranteed by popptr1
         jsr     fnparsename     ; Parse second filename
         bne     done
 

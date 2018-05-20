@@ -6,7 +6,7 @@
 ;
 
         .export         _strncat
-        .import         popax
+        .import         popax, popptr1
         .importzp       ptr1, ptr2, ptr3, tmp1, tmp2
         .macpack        cpu
         
@@ -17,9 +17,7 @@ _strncat:
     eor #$FF
     sta tmp2
     
-    jsr popax       ; get src
-    sta ptr1
-    stx ptr1+1
+    jsr popptr1     ; get src
 
     jsr popax       ; get dest
     sta ptr3        ; remember for function return

@@ -6,7 +6,7 @@
 ;
 
         .export         _longjmp
-        .import         popax
+        .import         popptr1
         .importzp       sp, ptr1, ptr2
 
 _longjmp:
@@ -16,10 +16,8 @@ _longjmp:
         bne     @L1
         inc     ptr2            ; 0 is illegal, according to the standard ...
                                 ; ... and, must be replaced by 1
-@L1:    jsr     popax           ; get buf
-        sta     ptr1
-        stx     ptr1+1
-        ldy     #0
+@L1:    jsr     popptr1         ; get buf
+        ; ldy     #0            is guaranteed by popptr1
 
 ; Get the old parameter stack
 

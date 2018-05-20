@@ -5,7 +5,7 @@
 ;
 
         .export         _lseek
-        .import         popax
+        .import         popax, popptr1
 
         .include        "zeropage.inc"
         .include        "errno.inc"
@@ -18,9 +18,7 @@ _lseek:
         stx     tmp2
 
         ; Get and save offset
-        jsr     popax
-        sta     ptr1
-        stx     ptr1+1
+        jsr     popptr1
         jsr     popax
         sta     ptr2
 

@@ -2,7 +2,7 @@
 ; jede jede@oric.org 2017-01-22
 
         .export         _write
-        .import         popax
+        .import         popax, popptr1
         .importzp       ptr1, ptr2, ptr3, tmp1
 
         .include        "telestrat.inc"
@@ -19,9 +19,7 @@
         eor     #$FF
         sta     ptr2+1          ; Remember -count-1
 
-        jsr     popax           ; get buf
-        sta     ptr1
-        stx     ptr1+1
+        jsr     popptr1         ; get buf
         jsr     popax           ; get fd and discard
 
         ; if fd=0001 then it stdout

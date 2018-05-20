@@ -7,7 +7,7 @@
 
         .export _crc32
 
-        .import         compleax, incsp2, incsp4, popax, popeax
+        .import         compleax, incsp2, incsp4, popptr1, popeax
         .importzp       sreg, ptr1, ptr2, tmp1, tmp2
 
 POLYNOMIAL      =       $EDB88320
@@ -67,9 +67,7 @@ _crc32:
 @L1:    sta     ptr2
         stx     ptr2+1
 ; ptr1 = buf
-        jsr     popax
-        sta     ptr1
-        stx     ptr1+1
+        jsr     popptr1
 ; if (buf == NULL) return 0;
         ora     ptr1+1
         beq     @L0

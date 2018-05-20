@@ -5,17 +5,15 @@
 ;
 
         .export         _strpbrk
-        .import         popax, return0
+        .import         popax, popptr1, return0
         .importzp       ptr1, ptr2, tmp1, tmp2, tmp3
 
 _strpbrk:
         jsr     popax           ; get s2
         sta     ptr2
         stx     ptr2+1
-        jsr     popax           ; get s1
-        sta     ptr1
-        stx     ptr1+1
-        ldy     #$00
+        jsr     popptr1         ; get s1
+        ; ldy     #$00           Y=0 guaranteed by popptr1
 
 L1:     lda     (ptr1),y        ; get next char from s1
         beq     L9              ; jump if done

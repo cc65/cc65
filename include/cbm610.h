@@ -85,7 +85,8 @@
 #define SID     (*(struct __sid*)0xDA00)
 
 #include <_6526.h>
-#define CIA     (*(struct __6526*)0xDC00)
+#define CIA1    (*(struct __6526*)0xDB00)
+#define CIA2    (*(struct __6526*)0xDC00)
 
 #include <_6551.h>
 #define ACIA    (*(struct __6551*)0xDD00)
@@ -144,11 +145,9 @@ void __fastcall__ pokewsys (unsigned addr, unsigned val);
 #define _textcolor(color)       COLOR_WHITE
 #define _bgcolor(color)         COLOR_BLACK
 #define _bordercolor(color)     COLOR_BLACK
+#define _cpeekcolor(color)      COLOR_WHITE
 
 
 
 /* End of cbm610.h */
 #endif
-
-
-

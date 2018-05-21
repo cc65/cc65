@@ -6,7 +6,7 @@
 <author>
 <url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:polluks@sdf.lonestar.org" name="Stefan A. Haubenthal">
-<date>2017-05-18
+<date>2018-04-20
 
 <abstract>
 An overview over the VIC20 runtime system as it is implemented for the cc65 C
@@ -147,7 +147,19 @@ No graphics drivers are currently available for the VIC20.
 
 <sect1>Extended memory drivers<p>
 
-No extended memory drivers are currently available for the VIC20.
+<descrip>
+
+  <tag><tt/vic20-rama.emd (vic20_rama_emd)/</tag>
+  A driver for any RAM at $A000-$BFFF. Supports 32 256 byte pages.
+  Written and contributed by Marco van den Heuvel.
+
+  <tag><tt/vic20-georam.emd (vic20_georam_emd)/</tag>
+  A driver for the Berkeley Softworks GeoRam cartridge connected by means of
+  the MasC=erade c64 cartridge adapter. The driver will determine the
+  available RAM from the connected cartridge. It supports 64KB
+  up to 2048KB of RAM.
+
+</descrip><p>
 
 
 <sect1>Joystick drivers<p>
@@ -161,8 +173,8 @@ The default drivers, <tt/joy_stddrv (joy_static_stddrv)/, point to <tt/vic20-std
 
   <tag><tt/vic20-ptvjoy.joy (vic20_ptvjoy_joy)/</tag>
   Driver for the Protovision 4-player adapter contributed by Groepaz. See
-  <url url="http://www.protovision-online.de/hardw/4_player.php?language=en"
-  name="Protovision shop"> for prices and building instructions. Up to three
+  <url url="https://www.protovision.games/hardw/4_player.php"
+  name="the Protovision shop"> for prices and building instructions. Up to three
   joysticks are supported.
 
 </descrip><p>

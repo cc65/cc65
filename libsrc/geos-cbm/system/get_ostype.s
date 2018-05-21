@@ -3,8 +3,8 @@
 ;
 ; 10.09.2001
 ;
-; Plus4 and GEOS 1.1 detection by
-; Marco van den Heuvel, 2010-02-02
+; Plus4, Gateway, MP3 and GEOS 1.1 detection by
+; Marco van den Heuvel, 2018-02-07
 ;
 
 ; unsigned char get_ostype (void);
@@ -26,11 +26,20 @@ _get_ostype:
         and #%11110000
         cmp #$10
         beq geos10
+        cmp #$13                ; either 1.3 or 1.5
+        beq geos13check
+        lda gatewayFlag
+        cmp #$41
+        beq gateway
+        lda mp3Flag
+        cmp #$4d
+        beq megapatch3
         lda c128Flag            ; we're on at least 2.0
         cmp #$18
         beq geos_on_plus4
         ora version
         rts
+geos13:
 geos10:
         lda version
         rts
@@ -39,6 +48,21 @@ geos11:
         rts
 geos_on_plus4:
         lda #$04
+        rts
+gateway:
+        lda #$08
+        ora c128Flag
+        rts
+megapatch3:
+        lda #$03
+        ora c128Flag
+        rts
+geos13check:
+        lda mp3Flag
+        cmp #$03
+        bne geos13
+geos15:
+        lda #$15
         rts
 
 _get_tv:

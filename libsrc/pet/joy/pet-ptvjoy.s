@@ -10,6 +10,7 @@
 
         .include "joy-kernel.inc"
         .include "joy-error.inc"
+        .include "pet.inc"
 
         .macpack module
 
@@ -34,16 +35,11 @@
         .addr   UNINSTALL
         .addr   COUNT
         .addr   READ
-        .addr   0                       ; IRQ entry unused
 
 ; ------------------------------------------------------------------------
 ; Constants
 
 JOY_COUNT       = 2                     ; Number of joysticks we support
-
-VIA_PRA         := $E841                ; Port register A
-VIA_DDRA        := $E843                ; Data direction register A
-
 
 .code
 
@@ -90,9 +86,9 @@ READ:   lda     #%10000000      ; via port A Data-Direction
 ; Read joystick 1
 
 joy1:   lda     #$80            ; via port A read/write
-        sta     VIA_PRA         ; (output one at PA7)
+        sta     VIA_PA1         ; (output one at PA7)
 
-        lda     VIA_PRA         ; via port A read/write
+        lda     VIA_PA1         ; via port A read/write
         and     #$1f            ; get bit 4-0 (PA4-PA0)
         eor     #$1f
         rts
@@ -100,13 +96,13 @@ joy1:   lda     #$80            ; via port A read/write
 ; Read joystick 2
 
 joy2:   lda     #$00            ; via port A read/write
-        sta     VIA_PRA         ; (output zero at PA7)
+        sta     VIA_PA1         ; (output zero at PA7)
 
-        lda     VIA_PRA         ; via port A read/write
+        lda     VIA_PA1         ; via port A read/write
         and     #$0f            ; get bit 3-0 (PA3-PA0)
         sta     tmp1            ; joy 4 directions
 
-        lda     VIA_PRA         ; via port A read/write
+        lda     VIA_PA1         ; via port A read/write
         and     #%00100000      ; get bit 5 (PA5)
         lsr
         ora     tmp1

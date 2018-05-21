@@ -66,16 +66,43 @@ VIC_COLOR       := $900F        ; Border and background color
 ; ---------------------------------------------------------------------------
 ; I/O: 6522 VIA1
 
-VIA1            := $9110
-VIA1_JOY        := $9111
-VIA1_DDRB       := $9112
-VIA1_DDRA       := $9113
+VIA1            := $9110        ; VIA1 base address
+VIA1_JOY        := VIA1+$0      ; *** Deprecated ***
+VIA1_PB         := VIA1+$0      ; Port register B
+VIA1_PA1        := VIA1+$1      ; Port register A
+VIA1_DDRB       := VIA1+$2      ; Data direction register B
+VIA1_DDRA       := VIA1+$3      ; Data direction register A
+VIA1_T1CL       := VIA1+$4      ; Timer 1, low byte
+VIA1_T1CH       := VIA1+$5      ; Timer 1, high byte
+VIA1_T1LL       := VIA1+$6      ; Timer 1 latch, low byte
+VIA1_T1LH       := VIA1+$7      ; Timer 1 latch, high byte
+VIA1_T2CL       := VIA1+$8      ; Timer 2, low byte
+VIA1_T2CH       := VIA1+$9      ; Timer 2, high byte
+VIA1_SR         := VIA1+$A      ; Shift register
+VIA1_CR         := VIA1+$B      ; Auxiliary control register
+VIA1_PCR        := VIA1+$C      ; Peripheral control register
+VIA1_IFR        := VIA1+$D      ; Interrupt flag register
+VIA1_IER        := VIA1+$E      ; Interrupt enable register
+VIA1_PA2        := VIA1+$F      ; Port register A w/o handshake
 
 ; ---------------------------------------------------------------------------
 ; I/O: 6522 VIA2
 
-VIA2            := $9120
-VIA2_JOY        := $9120
-VIA2_DDRB       := $9122
-VIA2_DDRA       := $9123
-
+VIA2            := $9120        ; VIA2 base address
+VIA2_JOY        := VIA2+$0      ; *** Deprecated ***
+VIA2_PB         := VIA2+$0      ; Port register B
+VIA2_PA1        := VIA2+$1      ; Port register A
+VIA2_DDRB       := VIA2+$2      ; Data direction register B
+VIA2_DDRA       := VIA2+$3      ; Data direction register A
+VIA2_T1CL       := VIA2+$4      ; Timer 1, low byte
+VIA2_T1CH       := VIA2+$5      ; Timer 1, high byte
+VIA2_T1LL       := VIA2+$6      ; Timer 1 latch, low byte
+VIA2_T1LH       := VIA2+$7      ; Timer 1 latch, high byte
+VIA2_T2CL       := VIA2+$8      ; Timer 2, low byte
+VIA2_T2CH       := VIA2+$9      ; Timer 2, high byte
+VIA2_SR         := VIA2+$A      ; Shift register
+VIA2_CR         := VIA2+$B      ; Auxiliary control register
+VIA2_PCR        := VIA2+$C      ; Peripheral control register
+VIA2_IFR        := VIA2+$D      ; Interrupt flag register
+VIA2_IER        := VIA2+$E      ; Interrupt enable register
+VIA2_PA2        := VIA2+$F      ; Port register A w/o handshake

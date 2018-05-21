@@ -30,7 +30,6 @@
         .addr   UNINSTALL
         .addr   COUNT
         .addr   READJOY
-        .addr   0                       ; IRQ entry unused
 
 ; ------------------------------------------------------------------------
 ; Constants
@@ -79,6 +78,7 @@ COUNT:
 
 READJOY:
         lda     JOY_DATA
+        eor     #$FF
         ldx     #0
         rts
 

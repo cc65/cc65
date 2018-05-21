@@ -55,7 +55,7 @@ endif
 ifdef GIT_SHA
   $(info GIT_SHA: $(GIT_SHA))
 else
-  GIT_SHA := $(shell git rev-parse --short HEAD 2>$(NULLDEV))
+  GIT_SHA := $(shell git rev-parse --short HEAD 2>$(NULLDEV) || svnversion 2>$(NULLDEV))
   ifneq ($(words $(GIT_SHA)),1)
     GIT_SHA := N/A
     $(info GIT_SHA: N/A)

@@ -2,10 +2,6 @@
 ; Ullrich von Bassewitz, 16.11.2002
 ;
 ; int open (const char* name, int flags, ...);  /* May take a mode argument */
-;
-; Be sure to keep the value priority of closeallfiles lower than that of
-; closeallstreams (which is the high level C file I/O counterpart and must be
-; called before closeallfiles).
 
 
         .export         _open

@@ -8,6 +8,7 @@
 
         .export         _cputcxy, _cputc
         .export         setscrptr, putchar
+        .constructor    initcputc
         .import         rvs
         .import         popax
         .importzp       ptr2
@@ -95,3 +96,13 @@ ScrTabHi:
                 .byte   >(SCREEN + Line * SCREEN_XSIZE)
         .endrep
 
+; ------------------------------------------------------------------------
+; Switch the cursor off. Code goes into the ONCE segment,
+; which will be reused after it is run.
+
+.segment        "ONCE"
+
+initcputc:
+        lsr     STATUS
+        asl     STATUS          ; Clear bit zero
+        rts

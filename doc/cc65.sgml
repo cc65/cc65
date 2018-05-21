@@ -407,6 +407,7 @@ Here is a description of all the command line options:
   <item>sim6502
   <item>sim65c02
   <item>supervision
+  <item>telestrat
   <item>vic20
   </itemize>
 
@@ -941,6 +942,10 @@ The compiler defines several macros at startup:
 
   This macro is defined if the target is the Supervision (-t supervision).
 
+  <tag><tt>__TELESTRAT__</tt></tag>
+
+  This macro is defined if the target is the Telestrat (-t telestrat).
+  
   <tag><tt>__TIME__</tt></tag>
 
   This macro expands to the time of translation of the preprocessing

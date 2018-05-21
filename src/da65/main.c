@@ -350,6 +350,7 @@ static void OneOpcode (unsigned RemainingBytes)
 /* Disassemble one opcode */
 {
     unsigned I;
+    unsigned OldPC = PC;
 
     /* Get the opcode from the current address */
     unsigned char OPC = GetCodeByte (PC);
@@ -476,7 +477,7 @@ static void OneOpcode (unsigned RemainingBytes)
     /* Change back to the default CODE segment if
     ** a named segment stops at the current address.
     */
-    for (I = D->Size; I >= 1; --I) {
+    for (I = PC - OldPC; I > 0; --I) {
         if (IsSegmentEnd (PC - I)) {
             EndSegment ();
             break;

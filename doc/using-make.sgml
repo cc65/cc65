@@ -58,7 +58,7 @@ SOURCES = foo.c bar.c
 PROGRAM = foobar
 
 ifdef CC65_TARGET
-CC      = $(CC65_HOME)/bin/cl65
+CC      = cl65
 CFLAGS  = -t $(CC65_TARGET) --create-dep $(<:.c=.d) -O
 LDFLAGS = -t $(CC65_TARGET) -m $(PROGRAM).map
 else
@@ -103,12 +103,6 @@ best done on the GNU Make command line like this:
 <tscreen><verb>
 make CC65_TARGET=c64
 </verb></tscreen>
-
-The sample Makefile presumes the variable <tt/CC65_HOME/ to point to the
-directory cc65 is located in. Again there are several ways to define this
-variable but as its value typically won't change often it is best done as an
-environment variable. On Windows the cc65 .exe installer package takes care
-of creating a <tt/CC65_HOME/ environment variable.
 
 
 <sect1>Understanding the sample Makefile<p>

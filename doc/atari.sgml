@@ -394,7 +394,7 @@ under different mappings, defining remapped strings works only flawlessly
 with static array initialization:
 
 <verb>
-#include &lt;atari\_screen\_charmap.h&gt;
+#include &lt;atari_screen_charmap.h&gt;
 char pcScreenMappingString[] = "Hello Atari!";
 
 #include &lt;atari_atascii_charmap.h&gt;

@@ -36,7 +36,6 @@
         .addr   UNINSTALL
         .addr   COUNT
         .addr   READ
-        .addr   0                       ; IRQ entry unused
 
 ; ------------------------------------------------------------------------
 ; Constants
@@ -91,13 +90,13 @@ READ:   lda     #$7F            ; mask for VIA2 JOYBIT: sw3
 
         ldy     VIA2_DDRB       ; remember the date of DDRB
         sta     VIA2_DDRB       ; set JOYBITS on this VIA for input
-        lda     VIA2_JOY        ; read JOYBIT: sw3
+        lda     VIA2_PB         ; read JOYBIT: sw3
         sty     VIA2_DDRB       ; restore the state of DDRB
         asl                     ; Shift sw3 into carry
 
         ldy     VIA1_DDRA       ; remember the state of DDRA
         stx     VIA1_DDRA       ; set JOYBITS on this VIA for input
-        lda     VIA1_JOY        ; read JOYBITS: sw0,sw1,sw2,sw4
+        lda     VIA1_PA1        ; read JOYBITS: sw0,sw1,sw2,sw4
         sty     VIA1_DDRA       ; restore the state of DDRA
 
         cli                     ; necessary?

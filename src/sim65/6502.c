@@ -1266,6 +1266,8 @@ static void OPC_6502_6C (void)
         Cycles = 6;
         Regs.PC = MemReadWord(Lo);
     }
+    
+    ParaVirtHooks (&Regs);    
 }
 
 
@@ -1276,6 +1278,8 @@ static void OPC_65C02_6C (void)
     /* 6502 bug fixed here */
     Cycles = 5;
     Regs.PC = MemReadWord (MemReadWord (Regs.PC+1));
+
+    ParaVirtHooks (&Regs);    
 }
 
 
@@ -1430,6 +1434,8 @@ static void OPC_65SC02_7C (void)
     PC = Regs.PC;
     Adr = MemReadWord (PC+1);
     Regs.PC = MemReadWord(Adr+Regs.XR);
+
+    ParaVirtHooks (&Regs);    
 }
 
 

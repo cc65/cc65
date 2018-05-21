@@ -4,7 +4,7 @@
 <title>cc65 function reference
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
-<date>2017-09-02
+<date>2018-02-07
 
 <abstract>
 cc65 is a C compiler for 6502 based systems. This function reference describes
@@ -65,6 +65,30 @@ function.
 </itemize>
 
 
+<sect1><tt/accelerator.h/<label id="accelerator.h"><p>
+
+<itemize>
+<item><ref id="detect_c128" name="detect_c128">
+<item><ref id="detect_c64dtv" name="detect_c64dtv">
+<item><ref id="detect_c65" name="detect_c65">
+<item><ref id="detect_chameleon" name="detect_chameleon">
+<item><ref id="detect_scpu" name="detect_scpu">
+<item><ref id="detect_turbomaster" name="detect_turbomaster">
+<item><ref id="get_c128_speed" name="get_c128_speed">
+<item><ref id="get_c64dtv_speed" name="get_c64dtv_speed">
+<item><ref id="get_c65_speed" name="get_c65_speed">
+<item><ref id="get_chameleon_speed" name="get_chameleon_speed">
+<item><ref id="get_scpu_speed" name="get_scpu_speed">
+<item><ref id="get_turbomaster_speed" name="get_turbomaster_speed">
+<item><ref id="set_c128_speed" name="set_c128_speed">
+<item><ref id="set_c64dtv_speed" name="set_c64dtv_speed">
+<item><ref id="set_c65_speed" name="set_c65_speed">
+<item><ref id="set_chameleon_speed" name="set_chameleon_speed">
+<item><ref id="set_scpu_speed" name="set_scpu_speed">
+<item><ref id="set_turbomaster_speed" name="set_turbomaster_speed">
+</itemize>
+
+
 <sect1><tt/apple2.h/<label id="apple2.h"><p>
 
 <itemize>
@@ -115,17 +139,15 @@ function.
 <sect1><tt/atmos.h/<label id="atmos.h"><p>
 
 <itemize>
+<item><ref id="atmos_explode" name="atmos_explode">
 <item><ref id="atmos_load" name="atmos_load">
+<item><ref id="atmos_ping" name="atmos_ping">
 <item><ref id="atmos_save" name="atmos_save">
-<!-- <item><ref id="atmos_explode" name="atmos_explode"> -->
-<!-- <item><ref id="atmos_ping" name="atmos_ping"> -->
-<!-- <item><ref id="atmos_shoot" name="atmos_shoot"> -->
-<!-- <item><ref id="atmos_tick" name="atmos_tick"> -->
-<!-- <item><ref id="atmos_tock" name="atmos_tock"> -->
-<!-- <item><ref id="atmos_zap" name="atmos_zap"> -->
+<item><ref id="atmos_shoot" name="atmos_shoot">
+<item><ref id="atmos_tick" name="atmos_tick">
+<item><ref id="atmos_tock" name="atmos_tock">
+<item><ref id="atmos_zap" name="atmos_zap">
 </itemize>
-
-(incomplete)
 
 
 <sect1><tt/c128.h/<label id="c128.h"><p>
@@ -133,6 +155,7 @@ function.
 <itemize>
 <item><ref id="c64mode" name="c64mode">
 <item><ref id="fast" name="fast">
+<item><ref id="isfast" name="isfast">
 <item><ref id="slow" name="slow">
 <item><ref id="toggle_videomode" name="toggle_videomode">
 <item><ref id="videomode" name="videomode">
@@ -140,6 +163,12 @@ function.
 
 
 <sect1><tt/c16.h/<label id="c16.h"><p>
+
+<itemize>
+<item><ref id="fast" name="fast">
+<item><ref id="isfast" name="isfast">
+<item><ref id="slow" name="slow">
+</itemize>
 
 (incomplete)
 
@@ -184,6 +213,7 @@ function.
 <!-- <item><ref id="cbm_save" name="cbm_save"> -->
 <!-- <item><ref id="cbm_write" name="cbm_write"> -->
 <!-- <item><ref id="get_tv" name="get_tv"> -->
+<item><ref id="waitvsync" name="waitvsync">
 <item><ref id="kbrepeat" name="kbrepeat">
 </itemize>
 
@@ -239,6 +269,10 @@ function.
 <item><ref id="chline" name="chline">
 <item><ref id="chlinexy" name="chlinexy">
 <item><ref id="clrscr" name="clrscr">
+<item><ref id="cpeekc" name="cpeekc">
+<item><ref id="cpeekcolor" name="cpeekcolor">
+<item><ref id="cpeekrevers" name="cpeekrevers">
+<item><ref id="cpeeks" name="cpeeks">
 <item><ref id="cprintf" name="cprintf">
 <item><ref id="cputc" name="cputc">
 <item><ref id="cputcxy" name="cputcxy">
@@ -290,6 +324,16 @@ function.
 (incomplete)
 
 
+<sect1><tt/device.h/<label id="device.h"><p>
+
+<itemize>
+<item><ref id="getcurrentdevice" name="getcurrentdevice">
+<item><ref id="getdevicedir" name="getdevicedir">
+<item><ref id="getfirstdevice" name="getfirstdevice">
+<item><ref id="getnextdevice" name="getnextdevice">
+</itemize>
+
+
 <sect1><tt/dio.h/<label id="dio.h"><p>
 
 <url url="dio.html" name="Low-level disk I/O API">.
@@ -309,8 +353,6 @@ function.
 <item><ref id="seekdir" name="seekdir">
 <item><ref id="telldir" name="telldir">
 </itemize>
-
-(incomplete)
 
 
 <sect1><tt/em.h/<label id="em.h"><p>
@@ -352,17 +394,17 @@ function.
 
 <sect1><tt/gamate.h/<label id="gamate.h"><p>
 
-<!-- <itemize> -->
+<itemize>
 <!-- <item><ref id="get_tv" name="get_tv"> -->
-<!-- <item><ref id="waitvblank" name="waitvblank"> -->
-<!-- </itemize> -->
+<item><ref id="waitvsync" name="waitvsync">
+</itemize>
 
 (incomplete)
 
 
 <sect1><tt/geos.h/<label id="geos.h"><p>
 
-(incomplete)
+<url url="geos.html" name="GEOS API">.
 
 
 <sect1><tt/joystick.h/<label id="joystick.h"><p>
@@ -437,10 +479,10 @@ function.
 
 <sect1><tt/nes.h/<label id="nes.h"><p>
 
-<!-- <itemize> -->
+<itemize>
 <!-- <item><ref id="get_tv" name="get_tv"> -->
-<!-- <item><ref id="waitvsync" name="waitvsync"> -->
-<!-- </itemize> -->
+<item><ref id="waitvsync" name="waitvsync">
+</itemize>
 
 (incomplete)
 
@@ -455,10 +497,10 @@ It does not declare any functions.
 
 <sect1><tt/pce.h/<label id="pce.h"><p>
 
-<!-- <itemize> -->
+<itemize>
 <!-- <item><ref id="get_tv" name="get_tv"> -->
-<!-- <item><ref id="waitvblank" name="waitvblank"> -->
-<!-- </itemize> -->
+<item><ref id="waitvsync" name="waitvsync">
+</itemize>
 
 (incomplete)
 
@@ -489,6 +531,12 @@ It does not declare any functions.
 
 
 <sect1><tt/plus4.h/<label id="plus4.h"><p>
+
+<itemize>
+<item><ref id="fast" name="fast">
+<item><ref id="isfast" name="isfast">
+<item><ref id="slow" name="slow">
+</itemize>
 
 (incomplete)
 
@@ -658,9 +706,11 @@ communication.
 <item><ref id="strlen" name="strlen">
 <item><ref id="strlower" name="strlower">
 <item><ref id="strlwr" name="strlwr">
+<item><ref id="strncasecmp" name="strncasecmp">
 <item><ref id="strncat" name="strncat">
 <item><ref id="strncmp" name="strncmp">
 <item><ref id="strncpy" name="strncpy">
+<item><ref id="strnicmp" name="strnicmp">
 <item><ref id="strqtok" name="strqtok">
 <item><ref id="strrchr" name="strrchr">
 <item><ref id="strspn" name="strspn">
@@ -671,57 +721,25 @@ communication.
 <item><ref id="strupr" name="strupr">
 </itemize>
 
+
+<sect1><tt/telestrat.h/<label id="telestrat.h"><p>
+
+<itemize>
+<item><ref id="atmos_explode" name="explode">
+<item><ref id="atmos_ping" name="ping">
+<item><ref id="atmos_shoot" name="shoot">
+<item><ref id="atmos_zap" name="zap">
+<!-- <item><ref id="kbdclick1" name="kbdclick1"> -->
+<!-- <item><ref id="oups" name="oups"> -->
+</itemize>
+
 (incomplete)
 
 
 <sect1><tt/tgi.h/<label id="tgi.h"><p>
 
-<itemize>
-<item><ref id="tgi_arc" name="tgi_arc">
-<item><ref id="tgi_bar" name="tgi_bar">
-<item><ref id="tgi_circle" name="tgi_circle">
-<item><ref id="tgi_clear" name="tgi_clear">
-<item><ref id="tgi_done" name="tgi_done">
-<item><ref id="tgi_ellipse" name="tgi_ellipse">
-<item><ref id="tgi_free_vectorfont" name="tgi_free_vectorfont">
-<item><ref id="tgi_getaspectratio" name="tgi_getaspectratio">
-<item><ref id="tgi_getcolor" name="tgi_getcolor">
-<item><ref id="tgi_getcolorcount" name="tgi_getcolorcount">
-<item><ref id="tgi_getdefpalette" name="tgi_getdefpalette">
-<item><ref id="tgi_geterror" name="tgi_geterror">
-<item><ref id="tgi_geterrormsg" name="tgi_geterrormsg">
-<item><ref id="tgi_getmaxcolor" name="tgi_getmaxcolor">
-<item><ref id="tgi_getmaxx" name="tgi_getmaxx">
-<item><ref id="tgi_getmaxy" name="tgi_getmaxy">
-<item><ref id="tgi_getpagecount" name="tgi_getpagecount">
-<item><ref id="tgi_getpalette" name="tgi_getpalette">
-<item><ref id="tgi_getpixel" name="tgi_getpixel">
-<item><ref id="tgi_gettextheight" name="tgi_gettextheight">
-<item><ref id="tgi_gettextwidth" name="tgi_gettextwidth">
-<item><ref id="tgi_getxres" name="tgi_getxres">
-<item><ref id="tgi_getyres" name="tgi_getyres">
-<item><ref id="tgi_gotoxy" name="tgi_gotoxy">
-<item><ref id="tgi_init" name="tgi_init">
-<item><ref id="tgi_install" name="tgi_install">
-<item><ref id="tgi_install_vectorfont" name="tgi_install_vectorfont">
-<item><ref id="tgi_ioctl" name="tgi_ioctl">
-<item><ref id="tgi_line" name="tgi_line">
-<item><ref id="tgi_lineto" name="tgi_lineto">
-<item><ref id="tgi_load_driver" name="tgi_load_driver">
-<item><ref id="tgi_load_vectorfont" name="tgi_load_vectorfont">
-<item><ref id="tgi_outtext" name="tgi_outtext">
-<item><ref id="tgi_outtextxy" name="tgi_outtextxy">
-<item><ref id="tgi_setaspectratio" name="tgi_setaspectratio">
-<item><ref id="tgi_setcolor" name="tgi_setcolor">
-<item><ref id="tgi_setdrawpage" name="tgi_setdrawpage">
-<item><ref id="tgi_setpalette" name="tgi_setpalette">
-<item><ref id="tgi_setpixel" name="tgi_setpixel">
-<item><ref id="tgi_setviewpage" name="tgi_setviewpage">
-<item><ref id="tgi_settextscale" name="tgi_settextscale">
-<item><ref id="tgi_settextstyle" name="tgi_settextstyle">
-<item><ref id="tgi_uninstall" name="tgi_uninstall">
-<item><ref id="tgi_unload" name="tgi_unload">
-</itemize>
+<url url="tgi.html" name="Tiny Graphics Interface">.
+
 
 <sect1><tt/time.h/<label id="time.h"><p>
 
@@ -745,7 +763,7 @@ communication.
 <itemize>
 <!-- <item><ref id="chdir" name="chdir"> -->
 <item><ref id="exec" name="exec">
-<!-- <item><ref id="getcwd" name="getcwd"> -->
+<item><ref id="getcwd" name="getcwd">
 <item><ref id="getopt" name="getopt">
 <!-- <item><ref id="lseek" name="lseek"> -->
 <!-- <item><ref id="mkdir" name="mkdir"> -->
@@ -1377,6 +1395,30 @@ used in presence of a prototype.
 </quote>
 
 
+<sect1>atmos_explode<label id="atmos_explode"><p>
+
+<quote>
+<descrip>
+<tag/Function/Bomb sound effect.
+<tag/Header/<tt/<ref id="atmos.h" name="atmos.h">/
+<tag/Declaration/<tt/void __fastcall__ atmos_explode(void);/
+<tag/Description/<tt/atmos_explode/ plays the BASIC sound.
+<tag/Notes/<itemize>
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="atmos_ping" name="atmos_ping">,
+<ref id="atmos_shoot" name="atmos_shoot">,
+<ref id="atmos_tick" name="atmos_tick">,
+<ref id="atmos_tock" name="atmos_tock">,
+<ref id="atmos_zap" name="atmos_zap">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>atmos_load<label id="atmos_load"><p>
 
 <quote>
@@ -1392,6 +1434,30 @@ only in the presence of a prototype.
 <tag/Availability/cc65
 <tag/See also/
 <ref id="atmos_save" name="atmos_save">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>atmos_ping<label id="atmos_ping"><p>
+
+<quote>
+<descrip>
+<tag/Function/Bell or ricochet sound effect.
+<tag/Header/<tt/<ref id="atmos.h" name="atmos.h">/
+<tag/Declaration/<tt/void __fastcall__ atmos_ping(void);/
+<tag/Description/<tt/atmos_ping/ plays the BASIC sound.
+<tag/Notes/<itemize>
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="atmos_explode" name="atmos_explode">,
+<ref id="atmos_shoot" name="atmos_shoot">,
+<ref id="atmos_tick" name="atmos_tick">,
+<ref id="atmos_tock" name="atmos_tock">,
+<ref id="atmos_zap" name="atmos_zap">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -1415,6 +1481,102 @@ only in the presence of a prototype.
 <tag/Example/<verb>
 atmos_save("hires", 0xa000, 0xc000);
 </verb>
+</descrip>
+</quote>
+
+
+<sect1>atmos_shoot<label id="atmos_shoot"><p>
+
+<quote>
+<descrip>
+<tag/Function/Pistol sound effect.
+<tag/Header/<tt/<ref id="atmos.h" name="atmos.h">/
+<tag/Declaration/<tt/void __fastcall__ atmos_shoot(void);/
+<tag/Description/<tt/atmos_shoot/ plays the BASIC sound.
+<tag/Notes/<itemize>
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="atmos_explode" name="atmos_explode">,
+<ref id="atmos_ping" name="atmos_ping">,
+<ref id="atmos_tick" name="atmos_tick">,
+<ref id="atmos_tock" name="atmos_tock">,
+<ref id="atmos_zap" name="atmos_zap">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>atmos_tick<label id="atmos_tick"><p>
+
+<quote>
+<descrip>
+<tag/Function/High-pitch click.
+<tag/Header/<tt/<ref id="atmos.h" name="atmos.h">/
+<tag/Declaration/<tt/void __fastcall__ atmos_tick(void);/
+<tag/Description/<tt/atmos_tick/ plays the system sound.
+<tag/Notes/<itemize>
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="atmos_explode" name="atmos_explode">,
+<ref id="atmos_ping" name="atmos_ping">,
+<ref id="atmos_shoot" name="atmos_shoot">,
+<ref id="atmos_tock" name="atmos_tock">,
+<ref id="atmos_zap" name="atmos_zap">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>atmos_tock<label id="atmos_tock"><p>
+
+<quote>
+<descrip>
+<tag/Function/Low-pitch click.
+<tag/Header/<tt/<ref id="atmos.h" name="atmos.h">/
+<tag/Declaration/<tt/void __fastcall__ atmos_tock(void);/
+<tag/Description/<tt/atmos_tock/ plays the system sound.
+<tag/Notes/<itemize>
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="atmos_explode" name="atmos_explode">,
+<ref id="atmos_ping" name="atmos_ping">,
+<ref id="atmos_shoot" name="atmos_shoot">,
+<ref id="atmos_tick" name="atmos_tick">,
+<ref id="atmos_zap" name="atmos_zap">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>atmos_zap<label id="atmos_zap"><p>
+
+<quote>
+<descrip>
+<tag/Function/Raygun sound effect.
+<tag/Header/<tt/<ref id="atmos.h" name="atmos.h">/
+<tag/Declaration/<tt/void __fastcall__ atmos_zap(void);/
+<tag/Description/<tt/atmos_zap/ plays the BASIC sound.
+<tag/Notes/<itemize>
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="atmos_explode" name="atmos_explode">,
+<ref id="atmos_ping" name="atmos_ping">,
+<ref id="atmos_shoot" name="atmos_shoot">,
+<ref id="atmos_tick" name="atmos_tick">,
+<ref id="atmos_tock" name="atmos_tock">
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -2406,6 +2568,121 @@ be used in presence of a prototype.
 </quote>
 
 
+<sect1>cpeekc<label id="cpeekc"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get a character from the display memory.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/char cpeekc (void);/
+<tag/Description/The function gets the character that's at the current location
+of the cursor in the display screen RAM.  That character is converted, if
+needed, into the encoding that can be passed to <tt/cputc()/.
+<tag/Notes/<itemize>
+<item>Conio peek functions don't have <tt/cpeek...xy()/ versions.  That was
+done to make it obvious that peeking doesn't move the cursor in any way.  Your
+program must place the cursor where it wants to peek before it calls any of
+those functions.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cpeekcolor" name="cpeekcolor">,
+<ref id="cpeekrevers" name="cpeekrevers">,
+<ref id="cpeeks" name="cpeeks">,
+<ref id="cputc" name="cputc">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cpeekcolor<label id="cpeekcolor"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get a color from the display memory.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/unsigned char cpeekcolor (void);/
+<tag/Description/The function gets the color number that's at the current
+location of the cursor in the display screen RAM.  That number can be passed to
+<tt/textcolor()/.
+<tag/Notes/<itemize>
+<item>Conio peek functions don't have <tt/cpeek...xy()/ versions.  That was
+done to make it obvious that peeking doesn't move the cursor in any way.  Your
+program must place the cursor where it wants to peek before it calls any of
+those functions.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cpeekc" name="cpeekc">,
+<ref id="cpeekrevers" name="cpeekrevers">,
+<ref id="cpeeks" name="cpeeks">,
+<ref id="cputc" name="cputc">,
+<ref id="textcolor" name="textcolor">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cpeekrevers<label id="cpeekrevers"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get a reverse-character attribute from the display memory.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/unsigned char cpeekrevers (void);/
+<tag/Description/The function gets the "reverse-mode" attribute of the
+character that's at the current location of the cursor in the display screen
+RAM.  It returns a boolean value (0/1) that can be passed to <tt/revers()/.
+<tag/Notes/<itemize>
+<item>Conio peek functions don't have <tt/cpeek...xy()/ versions.  That was
+done to make it obvious that peeking doesn't move the cursor in any way.  Your
+program must place the cursor where it wants to peek before it calls any of
+those functions.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cpeekc" name="cpeekc">,
+<ref id="cpeekcolor" name="cpeekcolor">,
+<ref id="cpeeks" name="cpeeks">,
+<ref id="cputc" name="cputc">,
+<ref id="revers" name="revers">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cpeeks<label id="cpeeks"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get a string from the display memory.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/void __fastcall__ cpeeks (char* s, unsigned length);/
+<tag/Description/The function gets a fixed-length string ('\0'-terminated) of
+characters that start at the current location of the cursor in the display
+screen RAM.  Those characters are converted, if needed, into the encoding that
+can be passed to <tt/cputs()/.  The first argument must point to a RAM area
+that's large enough to hold "length + 1" bytes.
+<tag/Notes/<itemize>
+<item>Conio peek functions don't have <tt/cpeek...xy()/ versions.  That was
+done to make it obvious that peeking doesn't move the cursor in any way.  Your
+program must place the cursor where it wants to peek before it calls any of
+those functions.
+<item>The function is available as only a fastcall function;
+so, it may be used only in the presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cpeekc" name="cpeekc">,
+<ref id="cpeekcolor" name="cpeekcolor">,
+<ref id="cpeekrevers" name="cpeekrevers">,
+<ref id="cputc" name="cputc">,
+<ref id="cputs" name="cputs">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>creat<label id="creat"><p>
 
 <quote>
@@ -2658,6 +2935,126 @@ used in presence of a prototype.
 </quote>
 
 
+<sect1>detect_c128<label id="detect_c128"><p>
+
+<quote>
+<descrip>
+<tag/Function/Check if a C128 CPU is the current CPU.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char detect_c128 (void);/
+<tag/Description/The function returns a 1 if a C128 CPU is the current CPU.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64 and C128.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="get_c128_speed" name="get_c128_speed">,
+<ref id="set_c128_speed" name="set_c128_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>detect_c64dtv<label id="detect_c64dtv"><p>
+
+<quote>
+<descrip>
+<tag/Function/Check for the presence of the C64DTV.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char detect_c64dtv (void);/
+<tag/Description/The function returns a 1 if a C64DTV has been detected.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="get_c64dtv_speed" name="get_c64dtv_speed">,
+<ref id="set_c64dtv_speed" name="set_c64dtv_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>detect_c65<label id="detect_c65"><p>
+
+<quote>
+<descrip>
+<tag/Function/Check for the presence of a C65/C64DX in C64 mode.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char detect_c65 (void);/
+<tag/Description/The function returns a 1 if a C65/C64DX in C64 mode has been detected.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="get_c65_speed" name="get_c65_speed">,
+<ref id="set_c65_speed" name="set_c65_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>detect_chameleon<label id="detect_chameleon"><p>
+
+<quote>
+<descrip>
+<tag/Function/Check for the presence of the C64 Chameleon cartridge.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char detect_chameleon (void);/
+<tag/Description/The function returns a 1 if a C64 Chameleon cartridge has been detected.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="get_chameleon_speed" name="get_chameleon_speed">,
+<ref id="set_chameleon_speed" name="set_chameleon_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>detect_scpu<label id="detect_scpu"><p>
+
+<quote>
+<descrip>
+<tag/Function/Check for the presence of the C64/C128 SuperCPU cartridge.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char detect_scpu (void);/
+<tag/Description/The function returns a 1 if a SuperCPU cartridge has been detected.
+<tag/Notes/<itemize>
+<item>The function is specific to the C128 and C64.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="get_scpu_speed" name="get_scpu_speed">,
+<ref id="set_scpu_speed" name="set_scpu_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>detect_turbomaster<label id="detect_turbomaster"><p>
+
+<quote>
+<descrip>
+<tag/Function/Check for the presence of the C64 Turbo Master cartridge.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char detect_turbomaster (void);/
+<tag/Description/The function returns a 1 if a C64 Turbo Master cartridge has been detected.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="get_turbomaster_speed" name="get_turbomaster_speed">,
+<ref id="set_turbomaster_speed" name="set_turbomaster_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>div<label id="div"><p>
 
 <quote>
@@ -2698,9 +3095,9 @@ exits.
 <tag/Availability/cc65
 <tag/Example/<verb>
 /* Hello World */
-#include <stdio.h>
-#include <unistd.h>
-#include <cc65.h>
+#include &lt;stdio.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;cc65.h&gt;
 int main(void)
 {
     printf("Hello World\n");
@@ -3051,20 +3448,21 @@ program, it may not be able to read it.
 
 <quote>
 <descrip>
-<tag/Function/Switch the C128 into 2MHz mode.
-<tag/Header/<tt/<ref id="c128.h" name="c128.h">/
+<tag/Function/Switch the CPU into fast mode (C128: 2MHz mode, C16/Plus4: double clock mode).
+<tag/Header/<tt/<ref id="c128.h" name="c128.h">,
+<ref id="c16.h" name="c16.h">, <ref id="plus4.h" name="plus4.h">/
 <tag/Declaration/<tt/void fast (void);/
-<tag/Description/The function will switch the clock of the C128 to 2MHz. This
-will nearly double the speed compared to slow mode.
+<tag/Description/The function will switch the clock of the CPU to fast mode. For the C128
+target it means switching the CPU into 2MHz mode. For the C16/Plus4 target it means
+switching the CPU into double clock mode.
 <tag/Notes/<itemize>
-<item>The function is specific to the C128.
-<item>2MHz clock will not work in 40 column mode.
+<item>The function is specific to the C128, C16 and Plus4.
+<item>On the C128 the 2MHz clock will not work in 40 column mode.
 </itemize>
-<tag/Availability/C128
+<tag/Availability/cc65 (not all platforms)
 <tag/See also/
+<ref id="isfast" name="isfast">,
 <ref id="slow" name="slow">,
-<ref id="toggle_videomode" name="toggle_videomode">,
-<ref id="videomode" name="videomode">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -3196,6 +3594,137 @@ header files define constants that can be used to check the return code.
 </quote>
 
 
+<sect1>get_c128_speed<label id="get_c128_speed"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get the current speed of the C128 CPU.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char get_c128_speed (void);/
+<tag/Description/The function returns the current speed of the C128 CPU.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64 and C128.
+<item>The function does not check if the C128 CPU is the current CPU.
+<item>See the accelerator.h header for the speed definitions.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="detect_c128" name="detect_c128">,
+<ref id="set_c128_speed" name="set_c128_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>get_c64dtv_speed<label id="get_c64dtv_speed"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get the current speed of the C64DTV.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char get_c64dtv_speed (void);/
+<tag/Description/The function returns the current speed of the C64DTV.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64.
+<item>The function does not check for the presence of the C64DTV.
+<item>See the accelerator.h header for the speed definitions.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="detect_c64dtv" name="detect_c64dtv">,
+<ref id="set_c64dtv_speed" name="set_c64dtv_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>get_c65_speed<label id="get_c65_speed"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get the current speed of the C65/C64DX in C64 mode.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char get_c65_speed (void);/
+<tag/Description/The function returns the current speed of the C65/C64DX in C64 mode.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64.
+<item>The function does not check for the presence of a C65/C64DX in C64 mode.
+<item>See the accelerator.h header for the speed definitions.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="detect_c65" name="detect_c65">,
+<ref id="set_c65_speed" name="set_c65_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>get_chameleon_speed<label id="get_chameleon_speed"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get the current speed of the C64 Chameleon cartridge.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char get_chameleon_speed (void);/
+<tag/Description/The function returns the current speed of the C64 Chameleon cartridge.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64.
+<item>The function does not check for the presence of the C64 Chameleon cartridge.
+<item>See the accelerator.h header for the speed definitions.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="detect_chameleon" name="detect_chameleon">,
+<ref id="set_chameleon_speed" name="set_chameleon_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>get_scpu_speed<label id="get_scpu_speed"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get the current speed of the C64/C128 SuperCPU cartridge.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char get_scpu_speed (void);/
+<tag/Description/The function returns the current speed of the SuperCPU cartridge.
+<tag/Notes/<itemize>
+<item>The function is specific to the C128 and C64.
+<item>The function does not check for the presence of the cartridge.
+<item>See the accelerator.h header for the speed definitions.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="detect_scpu" name="detect_scpu">,
+<ref id="set_scpu_speed" name="set_scpu_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>get_turbomaster_speed<label id="get_turbomaster_speed"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get the current speed of the C64 Turbo Master cartridge.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char get_turbomaster_speed (void);/
+<tag/Description/The function returns the current speed of the C64 Turbo Master cartridge.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64.
+<item>The function does not check for the presence of the C64 Turbo Master cartridge.
+<item>See the accelerator.h header for the speed definitions.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="detect_turbomaster" name="detect_turbomaster">,
+<ref id="set_turbomaster_speed" name="set_turbomaster_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
 <sect1>getcpu<label id="getcpu"><p>
 
 <quote>
@@ -3208,12 +3737,88 @@ returns one of the constants<itemize>
 <item><tt/CPU_6502/
 <item><tt/CPU_65C02/
 <item><tt/CPU_65816/
+<item><tt/CPU_4510/
+<item><tt/CPU_65SC02/
+<item><tt/CPU_65CE02/
+<item><tt/CPU_HUC6280/
+<item><tt/CPU_2A0x/
 </itemize>
 <tag/Notes/<itemize>
 <item>Other, more exotic CPU types are not disinguished.
 </itemize>
 <tag/Availability/cc65
 <tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>getcurrentdevice<label id="getcurrentdevice"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get current device.
+<tag/Header/<tt/<ref id="device.h" name="device.h">/
+<tag/Declaration/<tt/unsigned char getcurrentdevice (void);/
+<tag/Description/The function returns the current device.
+It allows to access the current device with the <ref id="dio.h"
+name="Low-level disk I/O API"> or <ref id="cbm.h" name="cbm_* I/O
+functions"> requiring a 'device' parameter.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="getdevicedir" name="getdevicedir">,
+<ref id="getfirstdevice" name="getfirstdevice">,
+<ref id="getnextdevice" name="getnextdevice">
+<tag/Example/<verb>
+dio_open (getcurrentdevice ());
+</verb>
+</descrip>
+</quote>
+
+
+<sect1>getcwd<label id="getcwd"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get current working directory.
+<tag/Header/<tt/<ref id="unistd.h" name="unistd.h">/
+<tag/Declaration/<tt/char* __fastcall__ getcwd (char* buf, size_t size);/
+<tag/Description/The function will return the current working directory.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/POSIX 1003.1
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>getdevicedir<label id="getdevicedir"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get device directory.
+<tag/Header/<tt/<ref id="device.h" name="device.h">/
+<tag/Declaration/<tt/char* __fastcall__ getdevicedir (unsigned char device, char* buf, size_t size);/
+<tag/Description/The function returns the directory representing <tt/device/.
+It allows to access the device on filesystem level by calling chdir() with
+the directory returned.
+<tag/Notes/<itemize>
+<item>Calling getdevicedir() <em/does/ check for a (formatted) disk in a
+floppy-disk-type device and returns NULL if that check fails.
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="getcwd" name="getcwd">,
+<ref id="getcurrentdevice" name="getcurrentdevice">,
+<ref id="getfirstdevice" name="getfirstdevice">,
+<ref id="getnextdevice" name="getnextdevice">
+<tag/Example/<verb>
+chdir (getdevicedir (device, buf, sizeof buf));
+</verb>
+cf. <tt/samples/enumdevdir.c/
 </descrip>
 </quote>
 
@@ -3237,6 +3842,66 @@ be used in presence of a prototype.
 </itemize>
 <tag/Availability/ISO 9899
 <tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>getfirstdevice<label id="getfirstdevice"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get first device.
+<tag/Header/<tt/<ref id="device.h" name="device.h">/
+<tag/Declaration/<tt/unsigned char getfirstdevice (void);/
+<tag/Description/The function returns the first device.
+The constant <tt/INVALID_DEVICE/ indicates no device.
+<tag/Notes/<itemize>
+<item>Calling getfirstdevice() does <em/not/ turn on the motor of a
+drive-type device and does <em/not/ check for a disk in the drive.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="getcurrentdevice" name="getcurrentdevice">,
+<ref id="getdevicedir" name="getdevicedir">,
+<ref id="getnextdevice" name="getnextdevice">
+<tag/Example/<verb>
+unsigned char dev = getfirstdevice ();
+while (dev != INVALID_DEVICE) {
+        printf ("%d\n", dev);
+        dev = getnextdevice (dev);
+        }
+</verb>
+</descrip>
+</quote>
+
+
+<sect1>getnextdevice<label id="getnextdevice"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get next device.
+<tag/Header/<tt/<ref id="device.h" name="device.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ getnextdevice (unsigned char device);/
+<tag/Description/The function returns the next device after <tt/device/.
+The constant <tt/INVALID_DEVICE/ indicates no further device.
+<tag/Notes/<itemize>
+<item>Calling getnextdevice() does <em/not/ turn on the motor of a
+drive-type device and does <em/not/ check for a disk in the drive.
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="getcurrentdevice" name="getcurrentdevice">,
+<ref id="getdevicedir" name="getdevicedir">,
+<ref id="getfirstdevice" name="getfirstdevice">
+<tag/Example/<verb>
+unsigned char dev = getfirstdevice ();
+while (dev != INVALID_DEVICE) {
+        printf ("%d\n", dev);
+        dev = getnextdevice (dev);
+        }
+</verb>
 </descrip>
 </quote>
 
@@ -3573,6 +4238,27 @@ fastcall function, so it may only be used in presence of a prototype.
 <ref id="isspace" name="isspace">,
 <ref id="isupper" name="isupper">,
 <ref id="isxdigit" name="isxdigit">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>isfast<label id="isfast"><p>
+
+<quote>
+<descrip>
+<tag/Function/Check if the CPU is in fast mode (C128: 2MHz mode, C16/Plus4: double clock mode).
+<tag/Header/<tt/<ref id="c128.h" name="c128.h">,
+<ref id="c16.h" name="c16.h">, <ref id="plus4.h" name="plus4.h">/
+<tag/Declaration/<tt/unsigned char isfast (void);/
+<tag/Description/The function returns a 1 if the CPU is in fast mode (C128: 2MHz mode, C16/Plus4: double clock mode).
+<tag/Notes/<itemize>
+<item>The function is specific to the C128, C16 and Plus4.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="fast" name="fast">,
+<ref id="slow" name="slow">,
 <tag/Example/None.
 </descrip>
 </quote>
@@ -5590,6 +6276,138 @@ clean-up when exitting the program.
 </quote>
 
 
+<sect1>set_c128_speed<label id="set_c128_speed"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set the current speed of a C128 CPU.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ set_c128_speed (unsigned char speed);/
+<tag/Description/The function returns the speed after trying to set the speed of the C128 CPU.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64 and C128.
+<item>The function does not check if the C128 CPU is the current CPU.
+<item>See the accelerator.h header for the speed definitions.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="detect_c128" name="detect_c128">,
+<ref id="get_c128_speed" name="get_c128_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>set_c64dtv_speed<label id="set_c64dtv_speed"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set the current speed of the C64DTV.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ set_c64dtv_speed (unsigned char speed);/
+<tag/Description/The function returns the speed after trying to set the speed of the C64DTV.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64.
+<item>The function does not check for the presence of the C64DTV.
+<item>See the accelerator.h header for the speed definitions.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="detect_c64dtv" name="detect_c64dtv">,
+<ref id="get_c64dtv_speed" name="get_c64dtv_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>set_c65_speed<label id="set_c65_speed"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set the current speed of the C65/C64DX in C64 mode.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ set_c65_speed (unsigned char speed);/
+<tag/Description/The function returns the speed after trying to set the speed of the C65/C64DX in C64 mode.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64.
+<item>The function does not check for the presence of a C65/C64DX in C64 mode.
+<item>See the accelerator.h header for the speed definitions.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="detect_c65" name="detect_c65">,
+<ref id="get_c65_speed" name="get_c65_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>set_chameleon_speed<label id="set_chameleon_speed"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set the current speed of the C64 Chameleon cartridge.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ set_chameleon_speed (unsigned char speed);/
+<tag/Description/The function returns the speed after trying to set the speed of the C64 Chameleon cartridge.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64.
+<item>The function does not check for the presence of the C64 Chameleon cartridge.
+<item>See the accelerator.h header for the speed definitions.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="detect_chameleon" name="detect_chameleon">,
+<ref id="get_chameleon_speed" name="get_chameleon_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>set_scpu_speed<label id="set_scpu_speed"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set the current speed of the C64/C128 SuperCPU cartridge.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ set_scpu_speed (unsigned char speed);/
+<tag/Description/The function returns the speed after trying to set the speed of the SuperCPU cartridge.
+<tag/Notes/<itemize>
+<item>The function is specific to the C128 and C64.
+<item>The function does not check for the presence of the cartridge.
+<item>See the accelerator.h header for the speed definitions.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="detect_scpu" name="detect_scpu">,
+<ref id="get_scpu_speed" name="get_scpu_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>set_turbomaster_speed<label id="set_turbomaster_speed"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set the current speed of the C64 Turbo Master cartridge.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ set_turbomaster_speed (unsigned char speed);/
+<tag/Description/The function returns the speed after trying to set the speed of the C64 Turbo Master cartridge.
+<tag/Notes/<itemize>
+<item>The function is specific to the C64.
+<item>The function does not check for the presence of the C64 Turbo Master cartridge.
+<item>See the accelerator.h header for the speed definitions.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="detect_turbomaster" name="detect_turbomaster">,
+<ref id="get_turbomaster_speed" name="get_turbomaster_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>setjmp<label id="setjmp"><p>
 
 <quote>
@@ -5686,19 +6504,20 @@ be used in presence of a prototype.
 
 <quote>
 <descrip>
-<tag/Function/Switch the C128 into 1MHz mode.
-<tag/Header/<tt/<ref id="c128.h" name="c128.h">/
+<tag/Function/Switch the CPU into slow mode (C128: 1MHz mode, C16/Plus4: single clock mode).
+<tag/Header/<tt/<ref id="c128.h" name="c128.h">,
+<ref id="c16.h" name="c16.h">, <ref id="plus4.h" name="plus4.h">/
 <tag/Declaration/<tt/void slow (void);/
-<tag/Description/The function will switch the clock of the C128 to 1MHz. This
-will halve the speed compared to fast mode.
+<tag/Description/The function will switch the clock of the CPU to slow mode. for the C128
+target it means switching the CPU into 1MHz mode. for the C16/Plus4 target it means
+switching the CPU into single clock mode.
 <tag/Notes/<itemize>
-<item>The function is specific to the C128.
+<item>The function is specific to the C128, C16 and Plus4.
 </itemize>
-<tag/Availability/C128
+<tag/Availability/cc65 (not all platforms)
 <tag/See also/
 <ref id="fast" name="fast">,
-<ref id="toggle_videomode" name="toggle_videomode">,
-<ref id="videomode" name="videomode">
+<ref id="isfast" name="isfast">,
 <tag/Example/None.
 </descrip>
 </quote>
@@ -6052,6 +6871,34 @@ See <tt/strlower/.
 </quote>
 
 
+<sect1>strncasecmp<label id="strncasecmp"><p>
+
+<quote>
+<descrip>
+<tag/Function/Compare two strings case insensitive.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/int __fastcall__ strncasecmp (const char* s1, const char* s2, size_t count);/
+<tag/Description/The <tt/strncasecmp/ function compares the two strings passed
+as parameters without case sensitivity. It returns a value that is less than
+zero if <tt/s1/ is less than <tt/s2/, zero if <tt/s1/ is the same as <tt/s2/,
+and a value greater than zero if <tt/s1/ is greater than <tt/s2/.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>The function is not available in strict ANSI mode.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="strcmp" name="strcmp">,
+<ref id="strcoll" name="strcoll">,
+<ref id="stricmp" name="stricmp">,
+<ref id="strncmp" name="strncmp">,
+<ref id="strxfrm" name="strxfrm">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>strncat<label id="strncat"><p>
 
 <quote>
@@ -6141,6 +6988,34 @@ static char hello[6];
 
 strncpy (hello, "Hello world!\n", sizeof hello - 1)[5] = '\0';
 </verb>
+</descrip>
+</quote>
+
+
+<sect1>strnicmp<label id="strnicmp"><p>
+
+<quote>
+<descrip>
+<tag/Function/Compare two strings case insensitive.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/int __fastcall__ strnicmp (const char* s1, const char* s2, size_t count);/
+<tag/Description/The <tt/strnicmp/ function compares the two strings passed as
+parameters without case sensitivity. It returns a value that is less than zero
+if <tt/s1/ is less than <tt/s2/, zero if <tt/s1/ is the same as <tt/s2/, and a
+value greater than zero if <tt/s1/ is greater than <tt/s2/.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>The function is not available in strict ANSI mode.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="strcasecmp" name="strcasecmp">,
+<ref id="strcmp" name="strcmp">,
+<ref id="strcoll" name="strcoll">,
+<ref id="strncmp" name="strncmp">,
+<ref id="strxfrm" name="strxfrm">
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -6389,979 +7264,6 @@ be used in presence of a prototype.
 </quote>
 
 
-<sect1>tgi_arc<label id="tgi_arc"><p>
-
-<quote>
-<descrip>
-<tag/Function/Draw an elliptic arc in the current color.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void __fastcall__ tgi_arc (int x, int y,
-unsigned char rx, unsigned char ry, unsigned sa, unsigned ea);/
-<tag/Description/The function draws an elliptic arc with center at x/y and
-radii rx/ry using the current drawing color. The arc covers the angle
-between sa and ea (startangle and endangle), which must be in the range
-0..360.
-<tag/Notes/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-<item>The function behaves unexpectedly or may crash if the angles are out
-of range.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/
-<ref id="tgi_bar" name="tgi_bar">,
-<ref id="tgi_circle" name="tgi_circle">,
-<ref id="tgi_ellipse" name="tgi_ellipse">,
-<ref id="tgi_pieslice" name="tgi_pieslice">,
-<ref id="tgi_setcolor" name="tgi_setcolor">
-<tag/Example/<verb>
-/* Draw the upper half of an ellipse */
-tgi_setcolor(TGI_COLOR_BLUE);
-tgi_arc (50, 50, 40, 20, 0, 180);
-</verb>
-</descrip>
-</quote>
-
-
-<sect1>tgi_bar<label id="tgi_bar"><p>
-
-<quote>
-<descrip>
-<tag/Function/The function fills a rectangle on the drawpage with the current
-color.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void __fastcall__ tgi_bar (int x1, int y1, int x2, int y2);/
-<tag/Description/The function fills a rectangle on the drawpage with the current
-color.
-<tag/Notes/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/Other tgi function
-<tag/Example/<verb>
-tgi_setcolor(TGI_COLOR_GREEN);
-tgi_bar(10, 10, 100, 60);
-</verb>
-</descrip>
-</quote>
-
-
-<sect1>tgi_circle<label id="tgi_circle"><p>
-
-<quote>
-<descrip>
-<tag/Function/The function draws a circle in the current color.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void __fastcall__ tgi_circle (int x, int y, unsigned char radius);/
-<tag/Description/The function draws a circle in the current color.
-<tag/Notes/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/
-<ref id="tgi_arc" name="tgi_arc">,
-<ref id="tgi_bar" name="tgi_bar">,
-<ref id="tgi_ellipse" name="tgi_ellipse">,
-<ref id="tgi_pieslice" name="tgi_pieslice">,
-<ref id="tgi_setcolor" name="tgi_setcolor">
-<tag/Example/<verb>
-tgi_setcolor(TGI_COLOR_BLACK);
-tgi_circle(50, 40, 40);
-</verb>
-</descrip>
-</quote>
-
-
-<sect1>tgi_clear<label id="tgi_clear"><p>
-
-<quote>
-<descrip>
-<tag/Function/Clear the drawpage
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void tgi_clear (void);/
-<tag/Description/Clear the drawpage
-<tag/Availability/cc65
-<tag/See also/Other tgi functions
-<tag/Example/None.
-</descrip>
-</quote>
-
-
-<sect1>tgi_done<label id="tgi_done"><p>
-
-<quote>
-<descrip>
-<tag/Function/End graphics mode, switch back to text mode.
-Will NOT uninstall or unload the driver!
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void tgi_done (void);/
-<tag/Description/End graphics mode, switch back to text mode.
-Will NOT uninstall or unload the driver!
-<tag/Availability/cc65
-<tag/See also/Other tgi functions
-<tag/Example/None.
-</descrip>
-</quote>
-
-
-<sect1>tgi_ellipse<label id="tgi_ellipse"><p>
-
-<quote>
-<descrip>
-<tag/Function/The function draws an ellipse in the current color.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void __fastcall__ tgi_ellipse (int x, int y, unsigned char rx, unsigned char ry);/
-<tag/Description/The function draws an ellipse at position x/y with radii
-rx and ry, using the current drawing color.
-<tag/Notes/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/
-<ref id="tgi_arc" name="tgi_arc">,
-<ref id="tgi_bar" name="tgi_bar">,
-<ref id="tgi_circle" name="tgi_circle">,
-<ref id="tgi_pieslice" name="tgi_pieslice">,
-<ref id="tgi_setcolor" name="tgi_setcolor">
-<tag/Example/<verb>
-tgi_setcolor(TGI_COLOR_RED);
-tgi_ellipse (50, 40, 40, 20);
-</verb>
-</descrip>
-</quote>
-
-
-<sect1>tgi_free_vectorfont<label id="tgi_free_vectorfont"><p>
-
-<quote>
-<descrip>
-<tag/Function/Free a vector font that was previously loaded into memory.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void __fastcall__ tgi_free_vectorfont (const tgi_vectorfont* font);/
-<tag/Description/Free a vector font that was previously loaded into memory.
-<tag/Notes/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/
-<ref id="tgi_load_vectorfont" name="tgi_load_vectorfont">,
-<ref id="tgi_install_vectorfont" name="tgi_install_vectorfont">
-<tag/Example/None.
-</descrip>
-</quote>
-
-
-<sect1>tgi_getaspectratio<label id="tgi_getaspectratio"><p>
-
-<quote> <descrip> <tag/Function/Return the pixel aspect ratio.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/unsigned tgi_getaspectratio (void);/
-<tag/Description/The function returns the pixel aspect ratio for the current
-driver and display as an 8.8 fixed point value. It may be used to correct
-geometric shapes so they look correct on the display. As an example, a circle
-with a radius of 100 pixels may look elliptic on some driver/display
-combinations if the aspect ratio is not 1.00.
-<tag/Notes/<itemize>
-<item>The aspect ratio is encoded in the TGI driver which assumes a "standard"
-monitor for the given platform. The aspect ratio may be wrong if another
-monitor is used.
-<item>No TGI function will use the aspect ratio. It is up to the programmer to
-make use of it.
-<item>The <ref id="tgi_setaspectratio" name="tgi_setaspectratio"> function can
-be used to change the aspect ratio for a loaded driver. The value is not reset
-by <ref id="tgi_init" name="tgi_init">, so if a driver is linked statically to
-an application, switching into and out of graphics mode will not restore the
-original aspect ratio.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/
-<ref id="tgi_setaspectratio" name="tgi_setaspectratio">
-<tag/Example/None.
-</descrip>
-</quote>
-
-
-<sect1>tgi_getcolor<label id="tgi_getcolor"><p>
-
-<quote>
-<descrip>
-<tag/Function/Return the current drawing color.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/unsigned char tgi_getcolor (void);/
-<tag/Description/The actual color is an index to a palette. During tgi_init
-you will get a default palette. The number of colors depend on the platform.
-All platforms recognize at least TGI_COLOR_BLACK and TGI_COLOR_WHITE. But some
-platforms have many more predefined colors. If you paint using TGI_COLOR_GREEN
-and then you change the green of the palette to blue using tgi_setpalette then
-after this painting in TGI_COLOR_GREEN will actually be blue.
-<tag/Availability/cc65
-<tag/See also/Other tgi functions
-<tag/Example/<verb>
-color = tgi_getcolor();
-</verb>
-</descrip>
-</quote>
-
-
-<sect1>tgi_getcolorcount<label id="tgi_getcolorcount"><p>
-
-<quote>
-<descrip>
-<tag/Function/Get the number of available colors.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/unsigned char tgi_getcolorcount (void);/
-<tag/Description/Tgi platforms use indexed color palettes. This function
-returns the number of entries we can use in the palette.
-<tag/Availability/cc65
-<tag/See also/Other tgi functions
-<tag/Example/<verb>
-if (tgi_getcolorcount() == 2) {
-  printf("Only monochrome graphics is supported\n");
-}
-</verb>
-</descrip>
-</quote>
-
-
-<sect1>tgi_getdefpalette<label id="tgi_getdefpalette"><p>
-
-<quote>
-<descrip>
-<tag/Function/Get the palette installed by default.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/const unsigned char* tgi_getdefpalette (void);/
-<tag/Description/The tgi driver has a default palette that is active at startup.
-The named colors TGI_COLOR_BLACK, TGI_COLOR_WHITE, TGI_COLOR_RED... need this
-palette to work correctly.
-<tag/Availability/cc65
-<tag/See also/Other tgi functions
-<tag/Example/None.
-</descrip>
-</quote>
-
-
-<sect1>tgi_geterror<label id="tgi_geterror"><p>
-
-<quote>
-<descrip>
-<tag/Function/Return the error code for the last operation.
-This will also clear the error.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/unsigned char tgi_geterror (void);/
-<tag/Description/Return the error code for the last operation.
-This will also clear the error.
-<tag/Availability/cc65
-<tag/See also/Other tgi functions
-<tag/Example/None.
-</descrip>
-</quote>
-
-
-<sect1>tgi_geterrormsg<label id="tgi_geterrormsg"><p>
-
-<quote>
-<descrip>
-<tag/Function/Get an error message describing the error.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/const char* __fastcall__ tgi_geterrormsg (unsigned char code);/
-<tag/Description/Get an error message describing the error.
-<tag/Notes/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/Other tgi functions
-<tag/Example/None.
-</descrip>
-</quote>
-
-
-<sect1>tgi_getmaxcolor<label id="tgi_getmaxcolor"><p>
-
-<quote>
-<descrip>
-<tag/Function/Get the highest index of the palette.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/unsigned char tgi_getmaxcolor (void);/
-<tag/Description/Get the highest index of the palette.
-<tag/Availability/cc65
-<tag/See also/Other tgi functions
-<tag/Example/None.
-</descrip>
-</quote>
-
-
-<sect1>tgi_getmaxx<label id="tgi_getmaxx"><p>
-
-<quote>
-<descrip>
-<tag/Function/Get the maximum x coordinate that can be used on this screen.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/unsigned tgi_getmaxx (void);/
-<tag/Description/Get the maximum x coordinate that can be used on this screen.
-<tag/Availability/cc65
-<tag/See also/Other tgi functions
-<tag/Example/None.
-</descrip>
-</quote>
-
-
-<sect1>tgi_getmaxy<label id="tgi_getmaxy"><p>
-
-<quote>
-<descrip>
-<tag/Function/Get the maximum y coordinate that can be used on this screen.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/unsigned tgi_getmaxy (void);/
-<tag/Description/Get the maximum y coordinate that can be used on this screen.
-<tag/Availability/cc65
-<tag/See also/Other tgi functions
-<tag/Example/None.
-</descrip>
-</quote>
-
-
-<sect1>tgi_getpagecount<label id="tgi_getpagecount"><p>
-
-<quote>
-<descrip>
-<tag/Function/Return the number of screen pages available.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/unsigned tgi_getpagecount (void);/
-<tag/Description/Return the number of screen pages available.
-<tag/Availability/cc65
-<tag/See also/
-<ref id="tgi_setdrawpage" name="tgi_setdrawpage">,
-<ref id="tgi_setviewpage" name="tgi_setviewpage">
-<tag/Example/None.
-</descrip>
-</quote>
-
-
-<sect1>tgi_getpalette<label id="tgi_getpalette"><p>
-
-<quote>
-<descrip>
-<tag/Function/Get the palette installed.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/const unsigned char* tgi_getpalette (void);/
-<tag/Description/Get the palette installed.
-<tag/Availability/cc65
-<tag/See also/Other tgi functions
-<tag/Example/None.
-</descrip>
-</quote>
-
-
-<sect1>tgi_getpixel<label id="tgi_getpixel"><p>
-
-<quote>
-<descrip>
-<tag/Function/Get the color of a pixel from the viewpage.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/unsigned char __fastcall__ tgi_getpixel (int x, int y);/
-<tag/Description/Get the color of a pixel from the viewpage.
-<tag/Notes/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/Other tgi functions.
-<tag/Example/None.
-</descrip>
-</quote>
-
-
-<sect1>tgi_getxres<label id="tgi_getxres"><p>
-
-<quote>
-<descrip>
-<tag/Function/Get number of horisontal pixels on the screen.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/unsigned tgi_getxres (void);/
-<tag/Description/Get number of horisontal pixels on the screen.
-This is same as tgi_maxx()+1.
-<tag/Availability/cc65
-<tag/See also/Other tgi functions.
-<tag/Example/None.
-</descrip>
-</quote>
-
-
-<sect1>tgi_getyres<label id="tgi_getyres"><p>
-
-<quote>
-<descrip>
-<tag/Function/Get number of vertical pixels on the screen.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/unsigned tgi_getyres (void);/
-<tag/Description/Get number of vertical pixels on the screen.
-This is same as tgi_maxy()+1.
-<tag/Availability/cc65
-<tag/See also/Other tgi functions.
-<tag/Example/None.
-</descrip>
-</quote>
-
-
-<sect1>tgi_gotoxy<label id="tgi_gotoxy"><p>
-
-<quote>
-<descrip>
-<tag/Function/Set graphics cursor at x, y.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void __fastcall__ tgi_gotoxy (int x, int y);/
-<tag/Description/Set graphics cursor at x, y.
-<tag/Notes/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/Other tgi functions.
-<tag/Example/None.
-</descrip>
-</quote>
-
-
-<sect1>tgi_init<label id="tgi_init"><p>
-
-<quote>
-<descrip>
-<tag/Function/Initialize the already loaded graphics driver.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void tgi_init (void);/
-<tag/Description/The tgi_init function will set the default palette to the
-hardware.
-<tag/Notes/<itemize>
-<item><tt/tgi_init/ will not clear the screen. This allows switching between
-text and graphics mode on platforms that have separate memory areas for the
-screens. If you want the screen cleared, call <tt/<ref id="tgi_clear"
-name="tgi_clear">/ after <tt/tgi_init/.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/Other tgi functions.
-<tag/Example/<verb>
-tgi_install(tgi_static_stddrv); //Include the driver statically instead of loading it.
-tgi_init(); //Set up the default palette and clear the screen.
-</verb>
-</descrip>
-</quote>
-
-
-<sect1>tgi_install<label id="tgi_install"><p>
-
-<quote>
-<descrip>
-<tag/Function/Install an already loaded driver and return an error code.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/unsigned char __fastcall__ tgi_install (void* driver);/
-<tag/Description/The function installs a driver that was already loaded into
-memory (or linked statically to the program). It returns an error code
-(<tt/TGI_ERR_OK/ in case of success).
-<tag/Notes/<itemize>
-<item>The function is only available as fastcall function, so it may only be
-used in presence of a prototype.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/
-<ref id="tgi_load_driver" name="tgi_load_driver">,
-<ref id="tgi_uninstall" name="tgi_uninstall">,
-<ref id="tgi_unload" name="tgi_unload">
-<tag/Example/<verb>
-tgi_install(tgi_static_stddrv); //Include the driver statically instead of loading it.
-tgi_init(); //Set up the default palette and clear the screen.
-</verb>
-</descrip>
-</quote>
-
-
-<sect1>tgi_install_vectorfont<label id="tgi_install_vectorfont"><p>
-
-<quote>
-<descrip>
-<tag/Function/Install an already loaded driver and return an error code.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void __fastcall__ tgi_install_vectorfont (const tgi_vectorfont* font);/
-<tag/Description/
-Install a vector font for use. More than one vector font can be loaded,
-but only one can be active. This function is used to tell which one. Call
-with a NULL pointer to uninstall the currently installed font.
-<tag/Notes/<itemize>
-<item>The function is only available as fastcall function, so it may only be
-used in presence of a prototype.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/
-<ref id="tgi_load_vectorfont" name="tgi_load_vectorfont">,
-<ref id="tgi_free_vectorfont" name="tgi_free_vectorfont">
-<tag/Example/None.
-</descrip>
-</quote>
-
-
-<sect1>tgi_ioctl<label id="tgi_ioctl"><p>
-
-<quote>
-<descrip>
-<tag/Function/Platform dependent code extensions.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/unsigned __fastcall__ tgi_ioctl (unsigned char code, void* data);/
-<tag/Description/Some platforms have extra display hardware that is not
-supported by standard tgi functions. You can extend the driver to support
-this extra hardware using tgi_ioctl functions.
-<tag/Notes/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-<item>These functions are not easily portable to other cc65 platforms.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/Other tgi functions.
-<tag/Example/<verb>
-#define tgi_sprite(spr) tgi_ioctl(0, (void*)(spr))
-#define tgi_flip() tgi_ioctl(1, (void*)0)
-#define tgi_setbgcolor(bgcol) tgi_ioctl(2, (void*)(bgcol))
-#define tgi_setframerate(rate) tgi_ioctl(3, (void*)(rate))
-#define tgi_busy() tgi_ioctl(4, (void*)0)
-#define tgi_updatedisplay() tgi_ioctl(4, (void*)1)
-if (!tgi_busy()) {
-  tgi_sprite(&amp;background);
-  tgi_setcolor(TGI_COLOR_BLUE);
-  tgi_outttextxy(20,40,"Hello World");
-  tgi_updatedisplay();
-}
-</verb>
-</descrip>
-</quote>
-
-
-<sect1>tgi_line<label id="tgi_line"><p>
-
-<quote>
-<descrip>
-<tag/Function/Draw a line in the current drawing color.
-The graphics cursor will be set to x2/y2 by this call.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void __fastcall__ tgi_line (int x1, int y1, int x2, int y2);/
-<tag/Description/Draw a line in the current drawing color.
-The graphics cursor will be set to x2/y2 by this call.
-<tag/Notes/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/Other tgi functions.
-<tag/Example/None.
-</descrip>
-</quote>
-
-
-<sect1>tgi_lineto<label id="tgi_lineto"><p>
-
-<quote>
-<descrip>
-<tag/Function/Draw a line in the current drawing color from the graphics
-cursor to the new end point. The graphics cursor will be updated to x2/y2.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void __fastcall__ tgi_lineto (int x2, int y2);/
-<tag/Description/Draw a line in the current drawing color from the graphics
-cursor to the new end point. The graphics cursor will be updated to x2/y2.
-<tag/Notes/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/Other tgi functions.
-<tag/Example/None.
-</descrip>
-</quote>
-
-
-<sect1>tgi_load_driver<label id="tgi_load_driver"><p>
-
-<quote>
-<descrip>
-<tag/Function/Load and install the given driver.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void __fastcall__ tgi_load_driver (const char *name);/
-<tag/Description/Load and install the driver by name.
-Will just load the driver and check if loading was successful.
-Will not switch to graphics mode.
-<tag/Notes/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/Other tgi functions.
-<tag/Example/None.
-</descrip>
-</quote>
-
-
-<sect1>tgi_load_vectorfont<label id="tgi_load_vectorfont"><p>
-
-<quote>
-<descrip>
-<tag/Function/Load the given vector font.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/const tgi_vectorfont* __fastcall__ tgi_load_vectorfont (const char* name);/
-<tag/Description/
-Load a vector font into memory and return it. In case of errors, NULL is
-returned and an error is set, which can be retrieved using tgi_geterror.
-To use the font, it has to be installed using tgi_install_vectorfont.
-<tag/Notes/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/
-<ref id="tgi_install_vectorfont" name="tgi_install_vectorfont">,
-<ref id="tgi_free_vectorfont" name="tgi_free_vectorfont">
-<tag/Example/None.
-</descrip>
-</quote>
-
-
-<sect1>tgi_outtext<label id="tgi_outtext"><p>
-
-<quote>
-<descrip>
-<tag/Function/Output text at the current graphics cursor position.
-The graphics cursor is moved to the end of the text.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void __fastcall__ tgi_outtext (const char* s);/
-<tag/Description/Output text at the current graphics cursor position.
-The graphics cursor is moved to the end of the text.
-<tag/Notes/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/Other tgi functions.
-<tag/Example/None.
-</descrip>
-</quote>
-
-
-<sect1>tgi_outtextxy<label id="tgi_outtextxy"><p>
-
-<quote>
-<descrip>
-<tag/Function/Output text at the given cursor position.
-The graphics cursor is moved to the end of the text.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void __fastcall__ tgi_outtextxy (int x, int y, const char* s);/
-<tag/Description/Output text at the given cursor position.
-The graphics cursor is moved to the end of the text.
-<tag/Notes/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/Other tgi functions.
-<tag/Example/None.
-</descrip>
-</quote>
-
-
-<sect1>tgi_pieslice<label id="tgi_pieslice"><p>
-
-<quote>
-<descrip>
-<tag/Function/Draw an elliptic pie slice in the current color.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void __fastcall__ tgi_pie slice (int x, int y,
-unsigned char rx, unsigned char ry, unsigned sa, unsigned ea);/
-<tag/Description/The function draws an elliptic pie slice with center at x/y
-and radii rx/ry using the current drawing color. The pie slice covers the angle
-between sa and ea (startangle and endangle), which must be in the range
-0..360.
-<tag/Notes/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-<item>The function behaves unexpectedly or may crash if the angles are out
-of range.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/
-<ref id="tgi_bar" name="tgi_arc">,
-<ref id="tgi_bar" name="tgi_bar">,
-<ref id="tgi_circle" name="tgi_circle">,
-<ref id="tgi_ellipse" name="tgi_ellipse">,
-<ref id="tgi_setcolor" name="tgi_setcolor">
-<tag/Example/<verb>
-/* Draw the closed upper half of an ellipse */
-tgi_setcolor(TGI_COLOR_BLUE);
-tgi_pieslice (50, 50, 40, 20, 0, 180);
-</verb>
-</descrip>
-</quote>
-
-
-<sect1>tgi_setaspectratio<label id="tgi_setaspectratio"><p>
-
-<quote> <descrip> <tag/Function/Set the pixel aspect ratio.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void __fastcall__ tgi_setaspectratio (unsigned ratio);/
-<tag/Description/The function sets the pixel aspect ratio for the current
-driver and display. The argument is an 8.8 fixed point value. The aspect ratio
-may be used to correct geometric shapes so they look correct on a given
-display. As an example, a circle with a radius of 100 pixels may look elliptic
-on some driver/display combinations if the aspect ratio is not 1.00.
-<tag/Notes/<itemize>
-<item>The aspect ratio is encoded in the TGI driver which assumes a "standard"
-monitor for the given platform. The aspect ratio may be wrong if another
-monitor is used.
-<item>No TGI function will use the aspect ratio. It is up to the programmer to
-make use of it.
-<item>The <tt/tgi_setaspectratio/ function can be used to change the aspect
-ratio for a loaded driver. The value is not reset by <ref id="tgi_init"
-name="tgi_init">, so if a driver is linked statically to an application,
-switching into and out of graphics mode will not restore the original aspect
-ratio.
-<item>The function is available only as a fastcall function; so, it may be used
-only in the presence of a prototype.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/
-<ref id="tgi_getaspectratio" name="tgi_getaspectratio">
-<tag/Example/None.
-</descrip>
-</quote>
-
-
-<sect1>tgi_setcolor<label id="tgi_setcolor"><p>
-
-<quote>
-<descrip>
-<tag/Function/Set color to be used in future draw operations.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void __fastcall__ tgi_setcolor (unsigned char color);/
-<tag/Description/Set color to be used in future draw operations.
-<tag/Notes/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/Other tgi functions.
-<tag/Example/<verb>
-tgi_setcolor(TGI_COLOR_BLACK);
-tgi_bar(0,0,30,30);
-tgi_setcolor(TGI_COLOR_WHITE);
-tgi_bar(10,10,20,20);
-</verb>
-</descrip>
-</quote>
-
-<sect1>tgi_setdrawpage<label id="tgi_setdrawpage"><p>
-
-<quote>
-<descrip>
-<tag/Function/Set the page for drawing.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void __fastcall__ tgi_setdrawpage (unsigned char page);/
-<tag/Description/If the drawpage and the viewpage are the same then all drawing
-is seen immediately as it is drawn. For double buffered games you can set the
-drawpage to a different page than the viewpage. This lets you draw the next
-screen in the background and when the screen is ready you display it.
-<tag/Notes/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/Other tgi functions.
-<tag/Example/<verb>
-tgi_setdrawpage(1);
-tgi_outtextxy(10, 10, "Hello World");
-tgi_setviewpage(1); // Show page 1
-tgi_setdrawpage(0);
-tgi_outtextxy(10, 10, "Creating next frame");
-...
-tgi_setviewpage(0); // Show page 0
-</verb>
-</descrip>
-</quote>
-
-<sect1>tgi_setpalette<label id="tgi_setpalette"><p>
-
-<quote>
-<descrip>
-<tag/Function/Set the palette (not available with all drivers/hardware).
-Palette is a pointer to as many entries as there are colors.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void __fastcall__ tgi_setpalette (const unsigned char* palette);/
-<tag/Description/Set the palette (not available with all drivers/hardware).
-Palette is a pointer to as many entries as there are colors.
-<tag/Notes/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/Other tgi functions.
-<tag/Example/None.
-</descrip>
-</quote>
-
-<sect1>tgi_setpixel<label id="tgi_setpixel"><p>
-
-<quote>
-<descrip>
-<tag/Function/Plot a pixel on the drawpage with the current color.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void __fastcall__ tgi_setpixel (int x, int y);/
-<tag/Description/Plot a pixel on the drawpage with the current color.
-<tag/Notes/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/Other tgi functions.
-<tag/Example/None.
-</descrip>
-</quote>
-
-<sect1>tgi_setviewpage<label id="tgi_setviewpage"><p>
-
-<quote>
-<descrip>
-<tag/Function/Set page to be visible on screen.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void __fastcall__ tgi_setviewpage (unsigned char page);/
-<tag/Description/If the drawpage and the viewpage are the same then all drawing
-is seen immediately as it is drawn. For double buffered games you can set the
-drawpage to a different page than the viewpage. This lets you draw the next
-screen in the background and when the screen is ready you display it.
-<tag/Notes/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/Other tgi functions.
-<tag/Example/<verb>
-tgi_setdrawpage(1);
-tgi_outtextxy(10, 10, "Hello World");
-tgi_setviewpage(1); // Show page 1
-tgi_setdrawpage(0);
-tgi_outtextxy(10, 10, "Creating next frame");
-...
-tgi_setviewpage(0); // Show page 0
-</verb>
-</descrip>
-</quote>
-
-<sect1>tgi_gettextheight<label id="tgi_gettextheight"><p>
-
-<quote>
-<descrip>
-<tag/Function/Calculate the height of the text in pixels according to
-the current text style.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/unsigned __fastcall__ tgi_gettextheight (const char* s);/
-<tag/Description/Calculate the height of the text in pixels according to
-the current text style.
-<tag/Notes/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/Other tgi functions.
-<tag/Example/None.
-</descrip>
-</quote>
-
-<sect1>tgi_settextscale<label id="tgi_settextscale"><p>
-
-<quote>
-<descrip>
-<tag/Function/Set the scaling for text output.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void __fastcall__ tgi_settextscale (unsigned width, unsigned height);/
-<tag/Description/
-Set the scaling for text output. The scaling factors for width and height
-are 8.8 fixed point values. This means that $100 = 1 $200 = 2 etc.
-<tag/Notes/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/
-<ref id="tgi_settextstyle" name="tgi_settextstyle">
-<tag/Example/None.
-</descrip>
-</quote>
-
-<sect1>tgi_settextstyle<label id="tgi_settextstyle"><p>
-
-<quote>
-<descrip>
-<tag/Function/Set the style for text output.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void __fastcall__ tgi_settextstyle (unsigned char magx, unsigned char magy, unsigned char dir, unsigned char font);/
-<tag/Description/Set the style for text output.
-<tag/Notes/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/
-<ref id="tgi_settextscale" name="tgi_settextscale">
-<tag/Example/None.
-</descrip>
-</quote>
-
-<sect1>tgi_gettextwidth<label id="tgi_gettextwidth"><p>
-
-<quote>
-<descrip>
-<tag/Function/Calculate the width of the text in pixels according to the current text style.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/unsigned __fastcall__ tgi_gettextwidth (const char* s);/
-<tag/Description/Calculate the width of the text in pixels according to the current text style.
-<tag/Notes/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/Other tgi functions.
-<tag/Example/None.
-</descrip>
-</quote>
-
-<sect1>tgi_uninstall<label id="tgi_uninstall"><p>
-
-<quote>
-<descrip>
-<tag/Function/Uninstall the currently loaded driver but do not unload it.
-Will call tgi_done if necessary.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void tgi_uninstall (void);/
-<tag/Description/Uninstall the currently loaded driver but do not unload it.
-Will call tgi_done if necessary.
-<tag/Availability/cc65
-<tag/See also/Other tgi functions.
-<tag/Example/None.
-</descrip>
-</quote>
-
-<sect1>tgi_unload<label id="tgi_unload"><p>
-
-<quote>
-<descrip>
-<tag/Function/Uninstall, then unload the currently loaded driver.
-Will call tgi_done if necessary.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void tgi_unload (void);/
-<tag/Description/Uninstall, then unload the currently loaded driver.
-Will call tgi_done if necessary.
-<tag/Availability/cc65
-<tag/See also/Other tgi functions.
-<tag/Example/None.
-</descrip>
-</quote>
-
 <sect1>time<label id="time"><p>
 
 <quote>
@@ -7405,6 +7307,7 @@ name="videomode"> instead!
 <tag/Availability/C128
 <tag/See also/
 <ref id="fast" name="fast">,
+<ref id="isfast" name="isfast">,
 <ref id="slow" name="slow">,
 <ref id="videomode" name="videomode">
 <tag/Example/None.
@@ -7605,8 +7508,27 @@ used in presence of a prototype.
 <tag/Availability/C128 and enhanced Apple //e
 <tag/See also/
 <ref id="fast" name="fast">,
+<ref id="isfast" name="isfast">,
 <ref id="slow" name="slow">,
 <ref id="toggle_videomode" name="toggle_videomode">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>waitvsync<label id="waitvsync"><p>
+
+<quote>
+<descrip>
+<tag/Function/Wait until the start of the next frame.
+<tag/Header/
+<tt/<ref id="cbm.h" name="cbm.h">/,
+<tt/<ref id="gamate.h" name="gamate.h">/,
+<tt/<ref id="nes.h" name="nes.h">/,
+<tt/<ref id="pce.h" name="pce.h">/
+<tag/Declaration/<tt/void waitvsync (void);/
+<tag/Description/Wait for vertical sync to reduce flickering.
+<tag/Availability/Platforms above
 <tag/Example/None.
 </descrip>
 </quote>

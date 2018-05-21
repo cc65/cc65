@@ -30,6 +30,76 @@
 
 
 
+
+/* Color defines */
+#define COLOR_BLACK     0x00
+#define COLOR_RED       0x01
+#define COLOR_GREEN     0x02
+#define COLOR_YELLOW    0x03
+#define COLOR_BLUE      0x04
+#define COLOR_MAGENTA   0x05
+#define COLOR_CYAN      0x06
+#define COLOR_WHITE     0x07
+
+/* TGI color defines */
+/* White and red are swapped, so that the pallete
+** driver is compatible with black-and-white drivers.
+*/
+#define TGI_COLOR_BLACK         COLOR_BLACK
+#define TGI_COLOR_WHITE         1
+#define TGI_COLOR_GREEN         COLOR_GREEN
+#define TGI_COLOR_YELLOW        COLOR_YELLOW
+#define TGI_COLOR_BLUE          COLOR_BLUE
+#define TGI_COLOR_MAGENTA       COLOR_MAGENTA
+#define TGI_COLOR_CYAN          COLOR_CYAN
+#define TGI_COLOR_RED           7
+
+
+extern void telestrat_228_200_3_tgi[];
+extern void telestrat_240_200_2_tgi[];      /* Referred to by tgi_static_stddrv[] */
+
+/* Define hardware */
+#include <_6522.h>
+#define VIA     (*(struct __6522*)0x300)
+
+
+
+/* These are defined to be FUNCT + NumberKey */
+#define CH_F1           0xB1
+#define CH_F2           0xB2
+#define CH_F3           0xB3
+#define CH_F4           0xB4
+#define CH_F5           0xB5
+#define CH_F6           0xB6
+#define CH_F7           0xB7
+#define CH_F8           0xB8
+#define CH_F9           0xB9
+#define CH_F10          0xB0
+
+
+
+/* Character codes */
+#define CH_ULCORNER     '+'
+#define CH_URCORNER     '+'
+#define CH_LLCORNER     '+'
+#define CH_LRCORNER     '+'
+#define CH_TTEE         '+'
+#define CH_BTEE         '+'
+#define CH_LTEE         '+'
+#define CH_RTEE         '+'
+#define CH_CROSS        '+'
+#define CH_CURS_UP       11
+#define CH_CURS_DOWN     10
+#define CH_CURS_LEFT      8
+#define CH_CURS_RIGHT     9
+#define CH_DEL          127
+#define CH_ENTER         13
+#define CH_STOP           3
+#define CH_LIRA          95
+#define CH_ESC           27
+
+
+
 void oups();
 void ping();
 void zap();

@@ -38,12 +38,8 @@
 
 
 
-#ifndef _STDDEF_H
-#  include <stddef.h>
-#endif
-#ifndef _STDARG_H
-#  include <stdarg.h>
-#endif
+#include <stddef.h>
+#include <stdarg.h>
 
 
 
@@ -147,6 +143,3 @@ void __fastcall__ _poserror (const char* msg);          /* cc65 */
 
 /* End of stdio.h */
 #endif
-
-
-

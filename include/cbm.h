@@ -46,10 +46,7 @@
 
 
 /* We need NULL. */
-
-#if !defined(_STDDEF_H)
-#  include <stddef.h>
-#endif
+#include <stddef.h>
 
 /* Load the system-specific files here, if needed. */
 #if   defined(__C64__)    && !defined(_C64_H)
@@ -209,6 +206,7 @@ void __fastcall__ cbm_k_setnam (const char* Name);
 void __fastcall__ cbm_k_talk (unsigned char dev);
 void cbm_k_udtim (void);
 void cbm_k_unlsn (void);
+void cbm_k_untlk (void);
 
 
 

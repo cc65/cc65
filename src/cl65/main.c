@@ -380,19 +380,14 @@ static void CmdPrint (CmdDesc* Cmd, FILE* F)
 static void SetTargetFiles (void)
 /* Set the target system files */
 {
-    /* Determine the names of the target specific library file */
-    if (Target != TGT_NONE) {
+    /* Get a pointer to the system name and its length */
+    const char* TargetName = GetTargetName (Target);
+    unsigned    TargetNameLen = strlen (TargetName);
 
-        /* Get a pointer to the system name and its length */
-        const char* TargetName = GetTargetName (Target);
-        unsigned    TargetNameLen = strlen (TargetName);
-
-        /* Set the library file */
-        TargetLib = xmalloc (TargetNameLen + 4 + 1);
-        memcpy (TargetLib, TargetName, TargetNameLen);
-        strcpy (TargetLib + TargetNameLen, ".lib");
-
-    }
+    /* Set the library file */
+    TargetLib = xmalloc (TargetNameLen + 4 + 1);
+    memcpy (TargetLib, TargetName, TargetNameLen);
+    strcpy (TargetLib + TargetNameLen, ".lib");
 }
 
 
@@ -752,6 +747,7 @@ static void Usage (void)
             "\n"
             "Long options:\n"
             "  --add-source\t\t\tInclude source as comment\n"
+            "  --all-cdecl\t\t\tMake functions default to __cdecl__\n"
             "  --asm-args options\t\tPass options to the assembler\n"
             "  --asm-define sym[=v]\t\tDefine an assembler symbol\n"
             "  --asm-include-dir dir\t\tSet an assembler include directory\n"
@@ -812,6 +808,14 @@ static void OptAddSource (const char* Opt attribute ((unused)),
 /* Strict source code as comments to the generated asm code */
 {
     CmdAddArg (&CC65, "-T");
+}
+
+
+static void OptAllCDecl  (const char* Opt attribute ((unused)),
+                          const char* Arg attribute ((unused)))
+/* Make functions default to __cdecl__ */
+{
+    CmdAddArg (&CC65, "--all-cdecl");
 }
 
 
@@ -1290,6 +1294,7 @@ int main (int argc, char* argv [])
     /* Program long options */
     static const LongOpt OptTab[] = {
         { "--add-source",        0, OptAddSource      },
+        { "--all-cdecl",         0, OptAllCDecl       },
         { "--asm-args",          1, OptAsmArgs        },
         { "--asm-define",        1, OptAsmDefine      },
         { "--asm-include-dir",   1, OptAsmIncludeDir  },
@@ -1439,35 +1444,24 @@ int main (int argc, char* argv [])
                     /* Print version number */
                     OptVersion (Arg, 0);
                     break;
-                
+
                 case 'E':
                     /* Forward -E to compiler */
                     CmdAddArg (&CC65, Arg);  
                     DisableAssemblingAndLinking ();
                     break;
-                    
+
                 case 'W':
-                    /* avoid && with'\0' in if clauses */
-                    if (Arg[3] == '\0') {
-                        switch (Arg[2]) {
-                        case 'a':
-                            /* -Wa: Pass options to assembler */
-                            OptAsmArgs (Arg, GetArg (&I, 3));
-                            break;
-                        case 'c':
-                            /* -Wc: Pass options to compiler 
-                            ** Remember -Wc sub arguments in cc65 arg struct 
-                            */
-                            OptCCArgs (Arg, GetArg (&I, 3));
-                            break;
-                        case 'l':
-                            /* -Wl: Pass options to linker */
-                            OptLdArgs (Arg, GetArg (&I, 3));
-                            break;
-                        default:
-                            UnknownOption (Arg);
-                            break;
-                       }
+                    if (Arg[2] == 'a' && Arg[3] == '\0') {
+                        /* -Wa: Pass options to assembler */
+                        OptAsmArgs (Arg, GetArg (&I, 3));
+                    } else if (Arg[2] == 'c' && Arg[3] == '\0') {
+                        /* -Wc: Pass options to compiler */
+                        /* Remember -Wc sub arguments in cc65 arg struct */ 
+                        OptCCArgs (Arg, GetArg (&I, 3));
+                    } else if (Arg[2] == 'l' && Arg[3] == '\0') {
+                        /* -Wl: Pass options to linker */
+                        OptLdArgs (Arg, GetArg (&I, 3));
                     } else {
                         /* Anything else: Suppress warnings (compiler) */
                         CmdAddArg2 (&CC65, "-W", GetArg (&I, 2));

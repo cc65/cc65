@@ -246,13 +246,13 @@ varies in its start and exit conditions.
 
 <sect2>AppleWin<p>
 Available at <url
-url="http://applewin.berlios.de/">:
+url="https://github.com/AppleWin/AppleWin">:
 
 Emulates Apple&nbsp;&rsqb;&lsqb;/enhanced&nbsp;Apple&nbsp;//e computers, with
 sound, video, joysticks, serial port, and disk images. Includes monitor. Only
 for Windows. The package comes with a DOS 3.3 disk (called "master.dsk") image;
-however, you will need <bf/AppleCommander 1.3.5/ or later (available at <url
-url="http://applecommander.sourceforge.net/">).
+however, you will need <bf/AppleCommander 1.4.0/ or later (available at <url
+url="https://applecommander.github.io/">).
 
 Compile the tutorial with
 
@@ -270,14 +270,13 @@ the <tt/master.dsk/ which comes with <bf/AppleWin/, and rename it to
 <tt/cc65.dsk/, then use <bf/AppleCommander/:
 
 <tscreen><verb>
-java -jar ac.jar -cc65 cc65.dsk test B < hello
+java -jar ac.jar -as cc65.dsk test < hello
 </verb></tscreen>
 
 Note that a convention in the Apple world is that "hello" is the file which is
 run automatically upon booting a DOS disk, sort of like the "autoexec.bat" of
-the MSDOS/Windows world.  We've avoided that in the example, however.  Also,
-the <tt/B/ parameter must be in caps., and "test" is the name of the program as
-it will appear on the Apple disk.
+the MSDOS/Windows world.  We've avoided that in the example, however by using
+"test" as the name of the program as it will appear on the Apple disk.
 
 Start the emulator, click on the <bf/Disk 1/ icon, and point to <bf/cc65.dsk/;
 then, click the big Apple logo, to boot the system.  Then, type this on the

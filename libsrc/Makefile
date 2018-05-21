@@ -27,6 +27,7 @@ TARGETS = apple2       \
           gamate       \
           lynx         \
           nes          \
+          none         \
           osic1p       \
           pce          \
           sim6502      \

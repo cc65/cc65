@@ -986,6 +986,9 @@ int main (int argc, char* argv[])
                             case 's':
                                 IS_Set (&InlineStdFuncs, 1);
                                 break;
+                            default:
+                                UnknownOption (Arg);
+                                break;
                         }
                     }
                     break;

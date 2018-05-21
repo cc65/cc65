@@ -6,7 +6,6 @@
 
         .import         joy_libref
         .importzp       ptr1
-        .interruptor    joy_irq         ; Export as IRQ handler
 
         .include        "joy-kernel.inc"
         .include        "joy-error.inc"
@@ -26,7 +25,6 @@ joy_install:    jmp     $0000
 joy_uninstall:  jmp     $0000
 joy_count:      jmp     $0000
 joy_read:       jmp     $0000
-joy_irq:        .byte   $60, $00, $00   ; RTS plus two dummy bytes
 
 ; Driver header signature
 .rodata
@@ -73,18 +71,7 @@ _joy_install:
         cpy     #(JOY_HDR::JUMPTAB + .sizeof(JOY_HDR::JUMPTAB))
         bne     @L1
 
-        jsr     joy_install             ; Call driver install routine
-        tay                             ; Test error code
-        bne     @L2                     ; Bail out if install had errors
-
-; Install the IRQ vector if the driver needs it. A/X contains the error code
-; from joy_install, so don't use it.
-
-        ldy     joy_irq+2               ; Check high byte of IRQ vector
-        beq     @L2                     ; Jump if vector invalid
-        ldy     #$4C                    ; JMP opcode
-        sty     joy_irq                 ; Activate IRQ routine
-@L2:    rts
+        jmp     joy_install             ; Call driver install routine
 
 ; Driver signature invalid
 
@@ -108,9 +95,6 @@ copy:   lda     (ptr1),y
 ; */
 
 _joy_uninstall:
-        lda     #$60                    ; RTS opcode
-        sta     joy_irq                 ; Disable IRQ entry point
-
         jsr     joy_uninstall           ; Call the driver routine
 
 _joy_clear_ptr:                         ; External entry point

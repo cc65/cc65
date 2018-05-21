@@ -41,8 +41,9 @@
 #  error This module may only be used when compiling for the Apple ][!
 #endif
 
-
 #include <apple2_filetype.h>
+
+
 
 /*****************************************************************************/
 /*                                   Data                                    */
@@ -134,6 +135,7 @@ extern unsigned char _dos_type;
 ** ProDOS 8 2.0.1 - 0x21
 ** ProDOS 8 2.0.2 - 0x22
 ** ProDOS 8 2.0.3 - 0x23
+** ProDOS 8 2.4.x - 0x24
 */
 
 

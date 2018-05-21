@@ -85,6 +85,9 @@
   <tag><htmlurl url="dio.html" name="dio.html"></tag>
   Low-level disk I/O API.
 
+  <tag><htmlurl url="tgi.html" name="tgi.html"></tag>
+  Tiny Graphics Interface.
+
   <tag><htmlurl url="geos.html" name="geos.html"></tag>
   The GEOSLib manual.
 

@@ -159,7 +159,10 @@ No extended memory drivers are currently available for the Atmos.
 <descrip>
 
   <tag><tt/atmos-pase.joy (atmos_pase_joy)/</tag>
-  Supports two standard joysticks connected to the P.A.S.E. interface of the Atmos.
+  Supports two standard joysticks connected to a P.A.S.E. / Altai interface of the Atmos.
+
+  <tag><tt/atmos-ijk.joy (atmos_ijk_joy)/</tag>
+  Supports two standard joysticks connected to an IJK interface of the Atmos.
 
 </descrip><p>
 

@@ -33,7 +33,6 @@
         .addr   UNINSTALL
         .addr   COUNT
         .addr   READ
-        .addr   0               ; IRQ entry unused
 
 ; ------------------------------------------------------------------------
 ; Constants
@@ -86,7 +85,7 @@ READ:
 joy1:
         lda     #0
         sta     VIA_DDRA
-        lda     VIA_PRA
+        lda     VIA_PA1
         and     #$0f
         cmp     #$0c
         bne     @notc1
@@ -103,7 +102,7 @@ joy1:
 joy2:
         lda     #0
         sta     VIA_DDRA
-        lda     VIA_PRA
+        lda     VIA_PA1
         lsr
         lsr
         lsr

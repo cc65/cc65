@@ -525,7 +525,7 @@ static void WrappedCallPragma (StrBuf* B)
     /* Check if the name is valid */
     if (Entry && Entry->Flags & SC_FUNC) {
 
-        PushWrappedCall(Entry, Val);
+        PushWrappedCall(Entry, (unsigned char) Val);
         Entry->Flags |= SC_REF;
         Entry->V.F.Func->Flags |= FD_CALL_WRAPPER;
 

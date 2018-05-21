@@ -352,14 +352,14 @@ static void StoreOffset (PrintfCtrl* P)
 /* Store the current output offset (%n format spec) */
 {
     switch (P->LengthMod) {
-        case lmChar:     *va_arg (P->ap, int*)       = P->BufFill;
-        case lmShort:    *va_arg (P->ap, int*)       = P->BufFill;
-        case lmInt:      *va_arg (P->ap, int*)       = P->BufFill;
-        case lmLong:     *va_arg (P->ap, long*)      = P->BufFill;
-        case lmIntMax:   *va_arg (P->ap, intmax_t*)  = P->BufFill;
-        case lmSizeT:    *va_arg (P->ap, size_t*)    = P->BufFill;
-        case lmPtrDiffT: *va_arg (P->ap, ptrdiff_t*) = P->BufFill;
-        default: FAIL ("Invalid size modifier for %n format spec in xvsnprintf");
+        case lmChar:     *va_arg (P->ap, int*)       = P->BufFill; break;
+        case lmShort:    *va_arg (P->ap, int*)       = P->BufFill; break;
+        case lmInt:      *va_arg (P->ap, int*)       = P->BufFill; break;
+        case lmLong:     *va_arg (P->ap, long*)      = P->BufFill; break;
+        case lmIntMax:   *va_arg (P->ap, intmax_t*)  = P->BufFill; break;
+        case lmSizeT:    *va_arg (P->ap, size_t*)    = P->BufFill; break;
+        case lmPtrDiffT: *va_arg (P->ap, ptrdiff_t*) = P->BufFill; break;
+        default: FAIL ("Invalid size modifier for %n format spec. in xvsnprintf()");
     }
 }
 

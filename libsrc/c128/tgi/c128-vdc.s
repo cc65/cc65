@@ -88,7 +88,6 @@ pages:  .byte   1                       ; Number of screens available
         .addr   BAR
         .addr   TEXTSTYLE
         .addr   OUTTEXT
-        .addr   0                       ; IRQ entry is unused
 
 ; ------------------------------------------------------------------------
 ; Data.

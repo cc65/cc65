@@ -7,7 +7,7 @@
 
         .export _adler32
 
-        .import         incsp2, incsp4, popax, popeax
+        .import         incsp2, incsp4, popptr1, popeax
         .importzp       sreg, ptr1, ptr2, tmp1
 
 BASE    =       65521   ; largest prime smaller than 65536
@@ -20,9 +20,7 @@ _adler32:
 @L1:    sta     ptr2
         stx     ptr2+1
 ; ptr1 = buf
-        jsr     popax
-        sta     ptr1
-        stx     ptr1+1
+        jsr     popptr1
 ; if (buf == NULL) return 1L;
         ora     ptr1+1
         beq     @L0

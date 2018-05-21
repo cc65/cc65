@@ -5,7 +5,7 @@
 ;
 
         .export         _vcprintf
-        .import         pushax, popax
+        .import         pushax, popax, popptr1
         .import         __printf, _cputc
         .importzp       sp, ptr1, ptr2, ptr3, tmp1
 
@@ -54,9 +54,7 @@ out:    jsr     popax           ; count
         eor     #$FF
         sta     outdesc+7
 
-        jsr     popax           ; buf
-        sta     ptr1
-        stx     ptr1+1
+        jsr     popptr1         ; buf
 
         jsr     popax           ; d
         sta     ptr3

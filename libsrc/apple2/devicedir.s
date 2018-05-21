@@ -5,7 +5,7 @@
 ;
 
         .export         _getdevicedir
-        .import         popax, popa
+        .import         popptr1, popa
 
         .include        "zeropage.inc"
         .include        "errno.inc"
@@ -17,9 +17,7 @@ _getdevicedir:
         stx     ptr2+1
 
         ; Save buf
-        jsr     popax
-        sta     ptr1
-        stx     ptr1+1
+        jsr     popptr1
 
         ; Set buf
         sta     mliparam + MLI::ON_LINE::DATA_BUFFER

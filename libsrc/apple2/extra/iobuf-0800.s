@@ -8,7 +8,7 @@
         .constructor    initiobuf
         .export         iobuf_alloc, iobuf_free
         .import         __MAIN_START__
-        .import         incsp2, popax
+        .import         incsp2, popptr1
 
         .include        "zeropage.inc"
         .include        "errno.inc"
@@ -41,9 +41,7 @@ initiobuf:
 iobuf_alloc:
         ; Get and save "memptr"
         jsr     incsp2
-        jsr     popax
-        sta     ptr1
-        stx     ptr1+1
+        jsr     popptr1
 
         ; Search table for free entry
         ldx     #$00

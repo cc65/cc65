@@ -5,7 +5,7 @@
 ;
 
         .export         _strncpy
-        .import         popax
+        .import         popax, popptr1
         .importzp       ptr1, ptr2, tmp1, tmp2, tmp3
 
 .proc   _strncpy
@@ -16,9 +16,7 @@
         eor     #$FF
         sta     tmp2            ; Store -size - 1
 
-        jsr     popax           ; get src
-        sta     ptr1
-        stx     ptr1+1
+        jsr     popptr1         ; get src
         jsr     popax           ; get dest
         sta     ptr2
         stx     ptr2+1

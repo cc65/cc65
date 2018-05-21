@@ -6,7 +6,7 @@
 
         .export         _getcwd
 
-        .import         popax
+        .import         popptr1
         .import         __cwd
         .importzp       ptr1, ptr2
 
@@ -25,13 +25,11 @@
         eor     #$FF
         sta     ptr2+1
 
-        jsr     popax           ; Get buf
-        sta     ptr1
-        stx     ptr1+1          ; Save buf
+        jsr     popptr1         ; Get buf to ptr1
 
 ; Copy __cwd to the given buffer checking the length
 
-        ldy     #$00
+        ; ldy     #$00          is guaranteed by popptr1
 loop:   inc     ptr2
         bne     @L1
         inc     ptr2+1

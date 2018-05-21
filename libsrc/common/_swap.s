@@ -5,7 +5,7 @@
 ;
 
         .export         __swap
-        .import         popax
+        .import         popax, popptr1
         .importzp       ptr1, ptr2, ptr3
 
 
@@ -19,13 +19,11 @@ __swap: eor     #$FF
         sta     ptr2
         stx     ptr2+1
 
-        jsr     popax           ; Get p
-        sta     ptr1
-        stx     ptr1+1
+        jsr     popptr1         ; Get p
 
 ; Prepare for swap
 
-        ldy     #$00
+        ; ldy     #$00          is guaranteed by popptr1
 
 ; Swap loop
 

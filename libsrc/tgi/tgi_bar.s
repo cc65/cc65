@@ -8,7 +8,7 @@
         .include        "tgi-kernel.inc"
 
         .importzp       ptr1, ptr2, ptr3, ptr4
-        .import         popax
+        .import         popax, popptr1
 
 
 .proc   _tgi_bar
@@ -24,9 +24,7 @@
         sta     ptr2            ; Y1
         stx     ptr2+1
 
-        jsr     popax
-        sta     ptr1            ; X1
-        stx     ptr1+1
+        jsr     popptr1         ; X1
 
 ; Make sure X1 is less than X2. Swap both if not.
 

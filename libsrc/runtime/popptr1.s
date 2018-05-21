@@ -1,7 +1,7 @@
 ;
 ; Christian Kruger, 20-May-2018
 ;
-; CC65 runtime: Pop registers on stack to ptr1 or ptr2 and ptr1.
+; CC65 runtime: Pop 2 bytes from stack to ptr1.
 ; X is untouched, low byte in A, Y is defined to be 0!
 
         .export         popptr1

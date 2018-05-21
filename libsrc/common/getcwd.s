@@ -29,7 +29,7 @@
 
 ; Copy __cwd to the given buffer checking the length
 
-        ; ldy     #$00          is guaranteed by popptr10
+        ; ldy     #$00          is guaranteed by popptr1
 loop:   inc     ptr2
         bne     @L1
         inc     ptr2+1

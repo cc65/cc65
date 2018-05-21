@@ -20,12 +20,12 @@
         rol     ptr1+1                  ; * 8
         sec
         sbc     ptr1
-        pha
+        tay
         txa
         eor     #$ff
         adc     ptr1+1                  ; * (8 - 1)
         tax
-        pla
+        tya
         rts
 
 .endproc

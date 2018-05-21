@@ -20,11 +20,11 @@
         rol     ptr1+1                  ; * 8
         clc
         adc     ptr1                    ; * (8+1)
-        pha
+        tay
         txa
         adc     ptr1+1
         tax
-        pla
+        tya
         rts
 
 .endproc

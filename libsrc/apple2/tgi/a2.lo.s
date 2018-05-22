@@ -58,8 +58,8 @@ Y2      :=      ptr4
         .word   48              ; Y resolution
         .byte   16              ; Number of drawing colors
         .byte   1               ; Number of screens available
-        .byte   8               ; System font X size
-        .byte   8               ; System font Y size
+        .byte   0               ; System font X size
+        .byte   0               ; System font Y size
         .word   $0198           ; Aspect ratio (based on 4/3 display)
         .byte   0               ; TGI driver flags
 

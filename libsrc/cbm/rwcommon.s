@@ -27,8 +27,8 @@
         eor     #$FF
         sta     ptr2+1          ; Remember -count-1
 
-        jsr     popptr1         ; Get buf
-                                ; Y=0 by popptr1
+        jsr     popptr1         ; Get buf to ptr1, Y=0 by call
+
         sty     ptr3
         sty     ptr3+1          ; Clear ptr3
 

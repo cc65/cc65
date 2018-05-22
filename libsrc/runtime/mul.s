@@ -62,7 +62,8 @@ tosumulax:
 @L4:    ldy     ptr1            ; Save right operand (8 bit)
         ldx     ptr4            ; Copy left 16 bit operand to right
         stx     ptr1
-        ldx     ptr4+1          ; Don't store, this is done later
+        ldx     ptr4+1          ; swap high-byte too
+        stx     ptr1+1
         sty     ptr4            ; Copy low 8 bit of right op to left
         ldy     #8
         jmp     mul8x16a

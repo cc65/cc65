@@ -121,6 +121,7 @@ declaration and usage.
 <item>cbm_k_basin
 <item>cbm_k_bsout
 <item>cbm_k_clrch
+<item>cbm_k_tksa
 <item>cbm_load
 <item>cbm_open
 <item>cbm_opendir

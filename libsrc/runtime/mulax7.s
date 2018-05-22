@@ -4,6 +4,7 @@
 ;
 ; CC65 runtime: Multiply the primary register by 7
 ;
+; Don't touch the Y-register here, the optimizer relies on it!
 
         .export         mulax7
         .importzp       ptr1
@@ -20,12 +21,12 @@
         rol     ptr1+1                  ; * 8
         sec
         sbc     ptr1
-        tay
+        pha
         txa
         eor     #$ff
         adc     ptr1+1                  ; * (8 - 1)
         tax
-        tya
+        pla
         rts
 
 .endproc

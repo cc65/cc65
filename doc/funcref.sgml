@@ -357,6 +357,9 @@ function.
 
 <sect1><tt/em.h/<label id="em.h"><p>
 
+This header file contains definitions for extended memory access,
+see also <tt/testcode/lib/em-test.c/ and <tt/samples/multidemo.c/.
+
 <itemize>
 <item><ref id="em_commit" name="em_commit">
 <item><ref id="em_copyfrom" name="em_copyfrom">
@@ -543,8 +546,8 @@ It does not declare any functions.
 
 <sect1><tt/serial.h/<label id="serial.h"><p>
 
-The <tt/serial.h/ header file contains definitions for initializing serial
-communication.
+This header file contains definitions for initializing serial
+communication, see also <tt/testcode/lib/ser-test.c/.
 
 <itemize>
 <item><ref id="ser_close" name="ser_close">
@@ -5843,7 +5846,7 @@ if (rename (OLDNAME, NEWNAME) == 0) {
 before a call to <tt/set_brk/.
 <tag/Notes/<itemize>
 <item>The break vector is reset on program termination, so it's not strictly
-necessary to call this function as a part of your clean-up when exitting the program.
+necessary to call this function as a part of your clean-up when exiting the program.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
@@ -5865,7 +5868,7 @@ necessary to call this function as a part of your clean-up when exitting the pro
 <tag/Description/<tt/reset_irq/ resets the C level interrupt request vector.
 <tag/Notes/<itemize>
 <item>The interrupt vector is reset on program termination, so it's not strictly
-necessary to call this function as a part of your clean-up when exitting the program.
+necessary to call this function as a part of your clean-up when exiting the program.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
@@ -6226,7 +6229,7 @@ the continue with the interrupted code, you have to adjust <tt/brk_pc/,
 otherwise the <tt/BRK/ instruction will get executed over and over again.
 <item>The break vector is reset on program termination, so it's not strictly
 necessary to call <tt/<ref id="reset_brk" name="reset_brk">/ as a part of your
-clean-up when exitting the program.
+clean-up when exiting the program.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
@@ -6264,7 +6267,7 @@ enable stack checks for the handler function or any other function called from
 it.
 <item>The interrupt vector is reset on program termination, so it's not strictly
 necessary to call <tt/<ref id="reset_irq" name="reset_irq">/ as a part of your
-clean-up when exitting the program.
+clean-up when exiting the program.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/

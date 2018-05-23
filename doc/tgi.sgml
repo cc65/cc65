@@ -9,7 +9,8 @@
 
 <abstract>
 The cc65 library provides functions for platform independent graphics.
-Include the tgi.h header file to get the necessary definitions.
+Include the tgi.h header file to get the necessary definitions, see also
+<tt>samples/tgidemo.c</tt> and <tt>samples/mandelbrot.c</tt>.
 </abstract>
 
 <!-- Begin the document -->

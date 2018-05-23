@@ -548,7 +548,7 @@ It does not declare any functions.
 <sect1><tt/serial.h/<label id="serial.h"><p>
 
 This header file contains definitions for initializing serial
-communication, see also <tt/testcode/lib/ser-test.c/.
+communication, see also <tt>testcode/lib/ser-test.c</tt>.
 
 <itemize>
 <item><ref id="ser_close" name="ser_close">

@@ -6,7 +6,7 @@
 
         .export         rwcommon
 
-        .import         popax
+        .import         popax, popptr1
         .importzp       ptr1, ptr2, ptr3, tmp2
 
         .include        "errno.inc"
@@ -22,18 +22,15 @@
 .proc   rwcommon
 
         eor     #$FF
-        sta     ptr1
+        sta     ptr2
         txa
         eor     #$FF
-        sta     ptr1+1          ; Remember -count-1
+        sta     ptr2+1          ; Remember -count-1
 
-        jsr     popax           ; Get buf
-        sta     ptr2
-        stx     ptr2+1
+        jsr     popptr1         ; Get buf to ptr1, Y=0 by call
 
-        lda     #$00
-        sta     ptr3
-        sta     ptr3+1          ; Clear ptr3
+        sty     ptr3
+        sty     ptr3+1          ; Clear ptr3
 
         jsr     popax           ; Get the handle
         cpx     #$01

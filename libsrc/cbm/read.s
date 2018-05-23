@@ -88,10 +88,10 @@
 
         ldy     #0
         lda     tmp1
-        sta     (ptr2),y
-        inc     ptr2
+        sta     (ptr1),y
+        inc     ptr1
         bne     @L1
-        inc     ptr2+1          ; *buf++ = A;
+        inc     ptr1+1          ; *buf++ = A;
 
 ; Increment the byte count
 
@@ -107,9 +107,9 @@
 
 ; Decrement the count
 
-@L3:    inc     ptr1
+@L3:    inc     ptr2
         bne     @L0
-        inc     ptr1+1
+        inc     ptr2+1
         bne     @L0
         beq     done            ; Branch always
 

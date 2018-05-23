@@ -13,7 +13,7 @@
 FILEDES         = 3             ; first free to use file descriptor
 
             .importzp ptr1, ptr2, ptr3, tmp1
-            .import addysp, popax, poptr1
+            .import addysp, popax, popptr1
             .import __oserror
             .import _FindFile, _ReadByte
             .export _open, _close, _read

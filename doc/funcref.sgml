@@ -203,6 +203,7 @@ function.
 <item><ref id="cbm_k_setlfs" name="cbm_k_setlfs">
 <item><ref id="cbm_k_setnam" name="cbm_k_setnam">
 <item><ref id="cbm_k_talk" name="cbm_k_talk">
+<item><ref id="cbm_k_tksa" name="cbm_k_tksa">
 <item><ref id="cbm_k_udtim" name="cbm_k_udtim">
 <item><ref id="cbm_k_unlsn" name="cbm_k_unlsn">
 <!-- <item><ref id="cbm_load" name="cbm_load"> -->
@@ -2279,6 +2280,28 @@ only be used in presence of a prototype.
 <tag/Availability/cc65
 <tag/See also/
 <ref id="cbm_k_acptr" name="cbm_k_acptr">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cbm_k_tksa<label id="cbm_k_tksa"><p>
+
+<quote>
+<descrip>
+<tag/Function/Send TALK secondary address to serial bus
+<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
+<tag/Declaration/<tt/void __fastcall__ cbm_k_tksa (unsigned char addr);/
+<tag/Description/This function transmits a secondary address on the serial bus for a TALK device.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may
+only be used in presence of a prototype.
+<item>The function can only be called after a call to TALK.
+<item>The function will not work after a LISTEN.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cbm_k_talk" name="cbm_k_talk">
 <tag/Example/None.
 </descrip>
 </quote>

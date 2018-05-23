@@ -359,7 +359,7 @@ function.
 <sect1><tt/em.h/<label id="em.h"><p>
 
 This header file contains definitions for extended memory access,
-see also <tt/testcode/lib/em-test.c/ and <tt/samples/multidemo.c/.
+see also <tt>testcode/lib/em-test.c</tt> and <tt>samples/multidemo.c</tt>.
 
 <itemize>
 <item><ref id="em_commit" name="em_commit">

@@ -205,6 +205,7 @@ function.
 <item><ref id="cbm_k_talk" name="cbm_k_talk">
 <item><ref id="cbm_k_udtim" name="cbm_k_udtim">
 <item><ref id="cbm_k_unlsn" name="cbm_k_unlsn">
+<item><ref id="cbm_k_untlk" name="cbm_k_untlk">
 <!-- <item><ref id="cbm_load" name="cbm_load"> -->
 <!-- <item><ref id="cbm_open" name="cbm_open"> -->
 <!-- <item><ref id="cbm_opendir" name="cbm_opendir"> -->
@@ -2090,7 +2091,7 @@ only be used in presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
-<ref id="cbm_k_unlsn" name="cbm_k_unlsn">,
+<ref id="cbm_k_unlsn" name="cbm_k_unlsn">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -2322,12 +2323,31 @@ bus. Only devices previously commanded to LISTEN are affected. This
 function is normally used after the host computer is finished sending data
 to external devices. Sending the UNLISTEN commands the listening devices
 to get off the serial bus so it can be used for other purposes.
-<tag/Notes/<itemize>
-<item>
-</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="cbm_k_listen" name="cbm_k_listen">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cbm_k_untlk<label id="cbm_k_untlk"><p>
+
+<quote>
+<descrip>
+<tag/Function/Send an UNTALK command
+<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
+<tag/Declaration/<tt/void cbm_k_untlk (void);/
+<tag/Description/This function commands all devices on the serial bus to
+stop sending data to the host computer (i.e., UNTALK). Calling this
+function results in an UNTALK command being transmitted on the serial
+bus. Only devices previously commanded to TALK are affected. This
+function is normally used after the host computer is finished listening data
+to external devices. Sending the UNTALK commands the sending devices
+to get off the serial bus so it can be used for other purposes.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cbm_k_talk" name="cbm_k_talk">
 <tag/Example/None.
 </descrip>
 </quote>

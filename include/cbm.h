@@ -200,6 +200,7 @@ unsigned char cbm_k_open (void);
 unsigned char cbm_k_readst (void);
 unsigned char __fastcall__ cbm_k_save(unsigned int start, unsigned int end);
 void cbm_k_scnkey (void);
+void __fastcall__ cbm_k_second (unsigned char addr);
 void __fastcall__ cbm_k_setlfs (unsigned char LFN, unsigned char DEV,
                                 unsigned char SA);
 void __fastcall__ cbm_k_setnam (const char* Name);

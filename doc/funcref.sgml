@@ -200,6 +200,7 @@ function.
 <item><ref id="cbm_k_readst" name="cbm_k_readst">
 <item><ref id="cbm_k_save" name="cbm_k_save">
 <item><ref id="cbm_k_scnkey" name="cbm_k_scnkey">
+<item><ref id="cbm_k_second" name="cbm_k_second">
 <item><ref id="cbm_k_setlfs" name="cbm_k_setlfs">
 <item><ref id="cbm_k_setnam" name="cbm_k_setnam">
 <item><ref id="cbm_k_talk" name="cbm_k_talk">
@@ -2220,6 +2221,31 @@ function, in order to provide input from the keyboard.
 <!-- <ref id="getc" name="getc"> -->
 <!-- <ref id="getchar" name="getchar"> -->
 <tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cmb_k_second<label id="cbm_k_second"><p>
+
+<quote>
+<descrip>
+<tag/Function/Send secondary address for LISTEN.
+<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
+<tag/Declaration/<tt/void cbm_k_second (unsigned char addr);/
+<tag/Description/This function is used to send a secondary address to an I/O
+device after a call to LISTEN is made, and the device is commanded to LISTEN.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may
+only be used in presence of a prototype.
+<item>The function can only be called after a call to LISTEN.
+<item>The function will not work after a TALK.
+<item>When a secondary address is to be sent to a device on the serial bus,
+the address must first be ORed with $60.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cbm_k_listen" name="cbm_k_listen">
+<tag/Exampe/None.
 </descrip>
 </quote>
 

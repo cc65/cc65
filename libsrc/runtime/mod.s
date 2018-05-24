@@ -8,7 +8,7 @@
 ; values is $8000, in which case the negate will fail.
 
         .export         tosmoda0, tosmodax
-        .import         absvaludiv, negax
+        .import         absvaludiv16, negax
         .importzp       sp, sreg, tmp1
 
 tosmoda0:
@@ -23,10 +23,10 @@ tosmodax:
         lda     (sp),y             
         sta     tmp1                ; save post negation indicator to tmp1
         pla                         ; back to entry accu
-        jsr     absvaludiv
+        jsr     absvaludiv16
         ldx     sreg+1              ; remainder to return registers
         lda     sreg
-        ldy     tmp1                ; fetch idicator
+        ldy     tmp1                ; fetch indicator
         bmi     negate
         rts
 negate: jmp     negax

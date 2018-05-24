@@ -6,12 +6,12 @@
 ; When negating values, we will ignore the possibility here, that one of the
 ; values is $8000, in which case the negate will fail.
 
-        .export         absvaludiv
+        .export         absvaludiv16
         .import         _abs, popax, udiv16
         .importzp       ptr1, ptr4
 
 
-absvaludiv:
+absvaludiv16:
         jsr     _abs
         sta     ptr4
         stx     ptr4+1          ; Save right absolute operand      

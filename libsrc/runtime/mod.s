@@ -19,14 +19,14 @@ tosmodax:
 ; modulo operation is the same as that of the left operand.
 
         pha                         
-        ldy     #1                  ; prepare lhs operant hi-byte fetch
+        ldy     #1                  ; Prepare lhs operant hi-byte fetch
         lda     (sp),y             
-        sta     tmp1                ; save post negation indicator to tmp1
-        pla                         ; back to entry accu
+        sta     tmp1                ; Save post negation indicator to tmp1
+        pla                         ; Back to entry accu
         jsr     absvaludiv16
-        ldx     sreg+1              ; remainder to return registers
+        ldx     sreg+1              ; Remainder to return registers
         lda     sreg
-        ldy     tmp1                ; fetch indicator
+        ldy     tmp1                ; Fetch indicator
         bmi     negate
         rts
 negate: jmp     negax

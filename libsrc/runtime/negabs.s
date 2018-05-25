@@ -9,8 +9,8 @@
         .export         negax
         .export         _abs
 
-_abs:   cpx     #$00            ; test hi byte
-        bpl     L1              ; don't touch if positive
+_abs:   cpx     #$00            ; Test hi byte
+        bpl     L1              ; Don't touch if positive
 negax:  clc
         eor     #$FF
         adc     #1

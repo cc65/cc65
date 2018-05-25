@@ -14,16 +14,16 @@
 tosdiva0:
         ldx     #0
 tosdivax:
-        pha                         ; check if high-bytes indicate
-        txa                         ; different sign, so that we
-        ldy     #1                  ; negate the result after the operation
-        eor     (sp),y              ; eor with lhs high byte
-        sta     tmp1                ; save post negation indicator to tmp1
-        pla                         ; back to entry accu
+        pha                         ; Check if high-bytes indicate
+        txa                         ; different sign, so that we have to
+        ldy     #1                  ; negate the result after the operation.
+        eor     (sp),y              ; Eor with lhs high byte
+        sta     tmp1                ; Save post negation indicator to tmp1
+        pla                         ; Back to entry accu
         jsr     absvaludiv16
         ldx     ptr1+1
         lda     ptr1
-        ldy     tmp1                ; fetch indicator
+        ldy     tmp1                ; Fetch indicator
         bmi     negate
         rts
 negate: jmp     negax

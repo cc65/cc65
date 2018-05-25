@@ -2231,7 +2231,7 @@ function, in order to provide input from the keyboard.
 <descrip>
 <tag/Function/Send secondary address for LISTEN.
 <tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
-<tag/Declaration/<tt/void cbm_k_second (unsigned char addr);/
+<tag/Declaration/<tt/void __fastcall__ cbm_k_second (unsigned char addr);/
 <tag/Description/This function is used to send a secondary address to an I/O
 device after a call to LISTEN is made, and the device is commanded to LISTEN.
 <tag/Notes/<itemize>

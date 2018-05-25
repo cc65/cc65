@@ -1,5 +1,5 @@
 ;
-; Christian Krueger, 24-May-2018
+; Ullrich von Bassewitz, 07.08.1998
 ;
 ; CC65 runtime: division for signed ints
 ;
@@ -8,22 +8,30 @@
 ; values is $8000, in which case the negate will fail.
 
         .export         tosdiva0, tosdivax
-        .import         absvaludiv16, negax
-        .importzp       sp, ptr1, tmp1
+        .import         popsargsudiv16, negax
+        .importzp       ptr1, tmp1, tmp2
 
 tosdiva0:
         ldx     #0
 tosdivax:
-        pha                         ; Check if high-bytes indicate
-        txa                         ; different sign, so that we have to
-        ldy     #1                  ; negate the result after the operation.
-        eor     (sp),y              ; Eor with lhs high byte
-        sta     tmp1                ; Save post negation indicator to tmp1
-        pla                         ; Back to entry accu
-        jsr     absvaludiv16
-        ldx     ptr1+1
-        lda     ptr1
-        ldy     tmp1                ; Fetch indicator
-        bmi     negate
+        jsr     popsargsudiv16  ; Get arguments from stack, adjust sign
+                                ; and do the division
+        ldx     ptr1+1          ; Load high byte of result
+
+; Adjust the sign of the result. tmp1 contains the high byte of the left
+; operand, tmp2 contains the high byte of the right operand.
+
+        lda     tmp1
+        eor     tmp2
+        bpl     Pos             ; Jump if sign of result positive
+
+; Result is negative
+
+        lda     ptr1            ; Load low byte of result
+        jmp     negax           ; Adjust the sign
+
+; Result is positive
+
+Pos:    lda     ptr1            ; Load low byte of result
         rts
-negate: jmp     negax
+

@@ -1,5 +1,5 @@
 ;
-; Christian Krueger, 24-May-2018
+; Ullrich von Bassewitz, 07.08.1998
 ;
 ; CC65 runtime: modulo operation for signed ints
 ;
@@ -8,25 +8,30 @@
 ; values is $8000, in which case the negate will fail.
 
         .export         tosmoda0, tosmodax
-        .import         absvaludiv16, negax
-        .importzp       sp, sreg, tmp1
+        .import         popsargsudiv16, negax
+        .importzp       sreg, tmp1
 
 tosmoda0:
         ldx     #0
 tosmodax:
+        jsr     popsargsudiv16  ; Get arguments from stack, adjust sign
+                                ; and do the division
+        lda     sreg            ; Load low byte of result
+        ldx     sreg+1          ; Load high byte of result
 
-; Prepare adjustment of the sign of the result. The sign of the result of the
-; modulo operation is the same as that of the left operand.
+; Adjust the sign of the result. tmp1 contains the high byte of the left
+; operand, tmp2 contains the high byte of the right operand. The sign of
+; the result of the modulo operation is the same as that of the left
+; operand
 
-        pha                         
-        ldy     #1                  ; Prepare lhs operant hi-byte fetch
-        lda     (sp),y             
-        sta     tmp1                ; Save post negation indicator to tmp1
-        pla                         ; Back to entry accu
-        jsr     absvaludiv16
-        ldx     sreg+1              ; Remainder to return registers
-        lda     sreg
-        ldy     tmp1                ; Fetch indicator
-        bmi     negate
-        rts
-negate: jmp     negax
+        bit     tmp1
+        bpl     Pos             ; Jump if sign of result positive
+
+; Result is negative
+
+        jmp     negax           ; Adjust the sign
+
+; Result is positive
+
+Pos:    rts
+

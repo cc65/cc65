@@ -3,9 +3,10 @@
 ;
 ; CC65 runtime: division for unsigned ints
 ;
+; Don't use tmp1 here, the signed division tunnels data with it!
 
         .export         tosudiva0, tosudivax, udiv16
-        .import         popsreg
+        .import         popptr1
         .importzp       sreg, ptr1, ptr4
 
 
@@ -14,50 +15,50 @@ tosudiva0:
 tosudivax:
         sta     ptr4
         stx     ptr4+1          ; Save right operand
-        jsr     popsreg         ; Get left operand
+        jsr     popptr1         ; Get left operand
 
 ; Do the division
 
         jsr     udiv16
 
-; Result is in sreg, remainder in ptr1
+; Result is in ptr1, remainder in sreg
 
-        lda     sreg
-        ldx     sreg+1
+        lda     ptr1
+        ldx     ptr1+1
         rts
 
 ;---------------------------------------------------------------------------
-; 16by16 division. Divide sreg by ptr4. Result is in sreg, remainder in ptr1
+; 16by16 division. Divide ptr1 by ptr4. Result is in ptr1, remainder in sreg
 ; (see mult-div.s from "The Fridge").
 ; This is also the entry point for the signed division
 
 udiv16: lda     #0
-        sta     ptr1+1
+        sta     sreg+1
         ldy     #16
         ldx     ptr4+1
         beq     udiv16by8a
 
-L0:     asl     sreg
-        rol     sreg+1
-        rol     a
+L0:     asl     ptr1
         rol     ptr1+1
+        rol     a
+        rol     sreg+1
 
-        pha
+        tax
         cmp     ptr4
-        lda     ptr1+1
+        lda     sreg+1
         sbc     ptr4+1
         bcc     L1
 
-        sta     ptr1+1
-        pla
+        sta     sreg+1
+        txa
         sbc     ptr4
-        pha
-        inc     sreg
+        tax
+        inc     ptr1
 
-L1:     pla
+L1:     txa
         dey
         bne     L0
-        sta     ptr1
+        sta     sreg
         rts
 
 
@@ -65,18 +66,18 @@ L1:     pla
 ; 16by8 division
 
 udiv16by8a:
-@L0:    asl     sreg
-        rol     sreg+1
+@L0:    asl     ptr1
+        rol     ptr1+1
         rol     a
         bcs     @L1
 
         cmp     ptr4
         bcc     @L2
 @L1:    sbc     ptr4
-        inc     sreg
+        inc     ptr1
 
 @L2:    dey
         bne     @L0
-        sta     ptr1
+        sta     sreg
         rts
 

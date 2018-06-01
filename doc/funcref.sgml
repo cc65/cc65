@@ -4,7 +4,7 @@
 <title>cc65 function reference
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
-<date>2018-05-23
+<date>2018-05-29
 
 <abstract>
 cc65 is a C compiler for 6502 based systems. This function reference describes
@@ -717,6 +717,7 @@ communication, see also <tt>testcode/lib/ser-test.c</tt>.
 <item><ref id="strncmp" name="strncmp">
 <item><ref id="strncpy" name="strncpy">
 <item><ref id="strnicmp" name="strnicmp">
+<item><ref id="strpbrk" name="strpbrk">
 <item><ref id="strqtok" name="strqtok">
 <item><ref id="strrchr" name="strrchr">
 <item><ref id="strspn" name="strspn">
@@ -6802,6 +6803,7 @@ be used in presence of a prototype.
 </itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
+<ref id="strpbrk" name="strpbrk">,
 <ref id="strqtok" name="strqtok">,
 <ref id="strspn" name="strspn">,
 <ref id="strstr" name="strstr">,
@@ -7092,6 +7094,32 @@ be used in presence of a prototype.
 </quote>
 
 
+<sect1>strpbrk<label id="strpbrk"><p>
+
+<quote>
+<descrip>
+<tag/Function/Find a character in a string, from a set of characters.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/char* __fastcall__ strpbrk (const char* str, const char* set);/
+<tag/Description/<tt/strpbrk()/ searches within <tt/str/ for the first
+occurance of any character from <tt/set/.  It returns a pointer to that
+character if found; otherwise, it returns <tt/NULL/.
+<tag/Notes/<itemize>
+<item>The function is available only as a fastcall function;
+so, it should be used only in the presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="strchr" name="strchr">,
+<ref id="strcspn" name="strcspn">,
+<ref id="strqtok" name="strqtok">,
+<ref id="strspn" name="strspn">,
+<ref id="strtok" name="strtok">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>strqtok<label id="strqtok"><p>
 
 <quote>
@@ -7116,7 +7144,7 @@ a second <tt/s1/ string before it finishes the first one.
 <tag/Availability/cc65
 <tag/See also/
 <ref id="strcspn" name="strcspn">,
-<!-- <ref id="strpbrk" name="strpbrk">, -->
+<ref id="strpbrk" name="strpbrk">,
 <ref id="strspn" name="strspn">,
 <ref id="strtok" name="strtok">
 <tag/Example/None.
@@ -7164,6 +7192,7 @@ be used in presence of a prototype.
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="strcspn" name="strcspn">,
+<ref id="strpbrk" name="strpbrk">,
 <ref id="strstr" name="strstr">
 <tag/Example/None.
 </descrip>
@@ -7216,7 +7245,7 @@ a second <tt/s1/ string before it finishes the first one.
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="strcspn" name="strcspn">,
-<!-- <ref id="strpbrk" name="strpbrk">, -->
+<ref id="strpbrk" name="strpbrk">,
 <ref id="strqtok" name="strqtok">,
 <ref id="strspn" name="strspn">
 <tag/Example/None.

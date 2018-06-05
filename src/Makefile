@@ -148,7 +148,7 @@ endef # PROG_template
 
 ../wrk/%.o: %.c
 	@echo $<
-	$(CC) -c $(CFLAGS) -o $@ $<
+	@$(CC) -c $(CFLAGS) -o $@ $<
 
 ../bin:
 	@$(call MKDIR,$@)

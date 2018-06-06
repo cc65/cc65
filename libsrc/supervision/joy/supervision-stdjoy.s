@@ -77,5 +77,6 @@ COUNT:
 
 READJOY:
         lda     sv_control
+	eor     #$FF
         ldx     #0
         rts

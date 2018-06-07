@@ -1165,17 +1165,26 @@ static void OptPrintTargetPath (const char* Opt attribute ((unused)),
                                 const char* Arg attribute ((unused)))
 /* Print the target file path */
 {
-    SearchPaths* TargetPath = NewSearchPath ();
-    AddSubSearchPathFromEnv (TargetPath, "CC65_HOME", "target");
-#if defined(CL65_TGT) && !defined(_WIN32)
-    AddSearchPath (TargetPath, STRINGIZE (CL65_TGT));
-#endif
-    AddSubSearchPathFromWinBin (TargetPath, "target");
+    char* TargetPath;
 
-    printf ("%s\n", GetSearchPath (TargetPath, 0));
+    SearchPaths* TargetPaths = NewSearchPath ();
+    AddSubSearchPathFromEnv (TargetPaths, "CC65_HOME", "target");
+#if defined(CL65_TGT) && !defined(_WIN32)
+    AddSearchPath (TargetPaths, STRINGIZE (CL65_TGT));
+#endif
+    AddSubSearchPathFromWinBin (TargetPaths, "target");
+
+    TargetPath = GetSearchPath (TargetPaths, 0);
+    while (*TargetPath) {
+        if (*TargetPath == ' ') {
+            /* Escape spaces */
+            putchar ('\\');
+        }
+        putchar (*TargetPath++);
+    }
+    putchar ('\n');
     exit (EXIT_SUCCESS);
 }
-
 
 
 static void OptRegisterSpace (const char* Opt attribute ((unused)), const char* Arg)

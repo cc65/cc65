@@ -35,7 +35,15 @@ else
 endif
 
 ifneq ($(filter disk samples.%,$(MAKECMDGOALS)),)
-  TARGET_PATH := $(shell $(CL) --print-target-path)
+  ifdef CC65_HOME
+    TARGET_PATH = $(CC65_HOME)/target
+  else
+    TARGET_PATH := $(if $(wildcard ../target),../target,$(shell $(CL) --print-target-path))
+  endif
+
+  ifneq ($(words $(TARGET_PATH)),1)
+    $(error No space chars allowed in "$(TARGET_PATH)")
+  endif
 
   EMD := $(wildcard $(TARGET_PATH)/$(SYS)/drv/emd/*)
   MOU := $(wildcard $(TARGET_PATH)/$(SYS)/drv/mou/*)

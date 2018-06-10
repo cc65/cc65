@@ -51,6 +51,8 @@
 
 
 
+static unsigned short SubroutineVOperandSize[0x10000];
+
 /*****************************************************************************/
 /*                             Helper functions                              */
 /*****************************************************************************/
@@ -740,4 +742,32 @@ void OH_JmpAbsoluteXIndirect (const OpcDesc* D)
         LineFeed ();
     }
     SeparatorLine ();
+}
+
+
+
+void OH_JsrAbsolute (const OpcDesc* D)
+{
+    unsigned VOperandSize = SubroutineVOperandSize[GetCodeWord(PC+1)];
+    OH_Absolute (D);
+    if (VOperandSize > 0) {
+        unsigned RemainingBytes;
+        PC += D->Size;
+        RemainingBytes = GetRemainingBytes();
+        if (RemainingBytes < VOperandSize) {
+            VOperandSize = RemainingBytes;
+        }
+        if (VOperandSize > 0) {
+            DataByteLine (VOperandSize); /* FIXME: follow BytesPerLine */
+            PC += VOperandSize;
+        }
+        PC -= D->Size;
+    }
+}
+
+
+
+void SetSubroutineVOperand (unsigned Addr, unsigned Size)
+{
+    SubroutineVOperandSize[Addr] = Size;
 }

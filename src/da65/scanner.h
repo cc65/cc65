@@ -105,6 +105,7 @@ typedef enum token_t {
     INFOTOK_COMMENT,
     INFOTOK_ADDR,
     INFOTOK_SIZE,
+    INFOTOK_VOPERAND,
 
     /* ASMINC section */
     INFOTOK_FILE,

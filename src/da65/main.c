@@ -82,6 +82,7 @@ static void Usage (void)
             "  -v\t\t\tIncrease verbosity\n"
             "  -F\t\t\tAdd formfeeds to the output\n"
             "  -S addr\t\tSet the start/load address\n"
+            "  -s\t\t\tAccept line markers in the info file\n"
             "  -V\t\t\tPrint the disassembler version\n"
             "\n"
             "Long options:\n"
@@ -98,6 +99,7 @@ static void Usage (void)
             "  --mnemonic-column n\tSpecify mnemonic start column\n"
             "  --pagelength n\tSet the page length for the listing\n"
             "  --start-addr addr\tSet the start/load address\n"
+            "  --sync-lines\t\tAccept line markers in the info file\n"
             "  --text-column n\tSpecify text start column\n"
             "  --verbose\t\tIncrease verbosity\n"
             "  --version\t\tPrint the disassembler version\n",
@@ -308,6 +310,15 @@ static void OptStartAddr (const char* Opt, const char* Arg)
 /* Set the default start address */
 {
     StartAddr = CvtNumber (Opt, Arg);
+}
+
+
+
+static void OptSyncLines (const char* Opt attribute ((unused)),
+                          const char* Arg attribute ((unused)))
+/* Handle the --sync-lines option */
+{
+    InfoSyncLines = 1;
 }
 
 
@@ -539,6 +550,7 @@ int main (int argc, char* argv [])
         { "--mnemonic-column",  1,      OptMnemonicColumn       },
         { "--pagelength",       1,      OptPageLength           },
         { "--start-addr",       1,      OptStartAddr            },
+        { "--sync-lines",       0,      OptSyncLines            },
         { "--text-column",      1,      OptTextColumn           },
         { "--verbose",          0,      OptVerbose              },
         { "--version",          0,      OptVersion              },
@@ -587,6 +599,10 @@ int main (int argc, char* argv [])
 
                 case 'S':
                     OptStartAddr (Arg, GetArg (&I, 2));
+                    break;
+
+                case 's':
+                    OptSyncLines (Arg, 0);
                     break;
 
                 case 'V':

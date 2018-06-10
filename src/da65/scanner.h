@@ -137,6 +137,8 @@ extern long             InfoIVal;
 extern unsigned         InfoErrorLine;
 extern unsigned         InfoErrorCol;
 
+/* Options */
+extern unsigned char    InfoSyncLines;
 
 
 /*****************************************************************************/

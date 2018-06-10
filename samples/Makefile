@@ -8,6 +8,13 @@
 # var. to build for another target system.
 SYS ?= c64
 
+# Just the usual way to define a variable
+# containing a single space character.
+SPACE :=
+SPACE +=
+
+# Just the usual way to find out if we're
+# using cmd.exe to execute make rules.
 ifneq ($(shell echo),)
   CMD_EXE = 1
 endif
@@ -41,13 +48,40 @@ ifneq ($(filter disk samples.%,$(MAKECMDGOALS)),)
     TARGET_PATH := $(if $(wildcard ../target),../target,$(shell $(CL) --print-target-path))
   endif
 
-  ifneq ($(words $(TARGET_PATH)),1)
-    $(error No space chars allowed in "$(TARGET_PATH)")
-  endif
+  # If TARGET_PATH contains spaces then it is presumed to contain escaped spaces. GNU make
+  # has very limited support for paths containing spaces. $(wildcard) is the only function
+  # that is aware of escaped spaces. However, $(wildcard) never returns paths with escaped
+  # spaces !!! So if it e.g. finds in a path with 2 spaces 4 files then one ends up with a
+  # return value consisting of 12 plain words :-((
+  #
+  # Fortunately we can work around that behaviour here because we know that the files we
+  # are looking for have known extensions. So we can $(filter) the in our example above 12
+  # words for file extensions so we come up with 4 path fragments. Then we remove those
+  # path fragments with $(notdir) from the file names.
+  #
+  # So far so good. But here we want to process files from different paths in a single
+  # recipe further down below and therefore want to prepend the paths to the files with
+  # $(addprefix). However, $(foreach) isn't aware of escaped spaces (only $(wildcard) is).
+  # Therefore, we need to replace the spaces with some other character temporarily in order
+  # to have $(foreach) generate one invocation per file. We use the character '?' for that
+  # purpose here, just because it is known to not be part of file names.
+  #
+  # Inside the recipe generated per file we then replace the '?' again with a space. As we
+  # want to be compatible with cmd.exe for execution we're not using an escaped space but
+  # rather double-quote the whole path.
+  #
+  # Note: The "strange" $(wildcard) further down below just serves the purpose to unescape
+  #       spaces for cmd.exe. This could have as well been done with another $(subst).
+
+  SUBST_TARGET_PATH := $(subst \$(SPACE),?,$(TARGET_PATH))
 
   EMD := $(wildcard $(TARGET_PATH)/$(SYS)/drv/emd/*)
   MOU := $(wildcard $(TARGET_PATH)/$(SYS)/drv/mou/*)
   TGI := $(wildcard $(TARGET_PATH)/$(SYS)/drv/tgi/*)
+
+  EMD := $(addprefix $(SUBST_TARGET_PATH)/$(SYS)/drv/emd/,$(notdir $(filter %.emd,$(EMD))))
+  MOU := $(addprefix $(SUBST_TARGET_PATH)/$(SYS)/drv/mou/,$(notdir $(filter %.mou,$(MOU))))
+  TGI := $(addprefix $(SUBST_TARGET_PATH)/$(SYS)/drv/tgi/,$(notdir $(filter %.tgi,$(TGI))))
 
   # This one comes with the VICE emulator.
   # See http://vice-emu.sourceforge.net/
@@ -199,12 +233,12 @@ OVERLAYLIST := $(foreach I,1 2 3,multdemo.$I ovrldemo.$I)
 
 define D64_WRITE_recipe
 
-$(C1541) -attach $@ -write $(file) $(notdir $(file)) >$(NULLDEV)
+$(C1541) -attach $@ -write "$(subst ?,$(SPACE),$(file))" $(notdir $(file)) >$(NULLDEV)
 
 endef # D64_WRITE_recipe
 
 samples.d64: samples
-	@$(C1541) -format samples,AA  d64 $@ >$(NULLDEV)
+	@$(C1541) -format samples,AA d64 $@ >$(NULLDEV)
 	$(foreach file,$(EXELIST_$(SYS)),$(D64_WRITE_recipe))
 	$(foreach file,$(OVERLAYLIST),$(D64_WRITE_recipe))
 	$(foreach file,$(EMD) $(MOU) $(TGI),$(D64_WRITE_recipe))
@@ -217,14 +251,14 @@ samples.d64: samples
 define DSK_WRITE_BIN_recipe
 
 $(if $(findstring BF00,$(LDFLAGS_$(notdir $(file))_$(SYS))), \
-  java -jar $(AC) -p $@ $(notdir $(file)).system sys <$(TARGET_PATH)/$(SYS)/util/loader.system)
-java -jar $(AC) -as $@ $(notdir $(file)) <$(file)
+  java -jar $(AC) -p $@ $(notdir $(file)).system sys <"$(wildcard $(TARGET_PATH)/$(SYS)/util/loader.system)")
+java -jar $(AC) -as $@ $(notdir $(file)) <"$(file)"
 
 endef # DSK_WRITE_BIN_recipe
 
 define DSK_WRITE_REL_recipe
 
-java -jar $(AC) -p $@ $(notdir $(file)) rel 0 <$(file)
+java -jar $(AC) -p $@ $(notdir $(file)) rel 0 <"$(subst ?,$(SPACE),$(file))"
 
 endef # DSK_WRITE_REL_recipe
 
@@ -241,14 +275,14 @@ samples.dsk: samples
 
 define ATR_WRITE_recipe
 
-cp $(file) atr/$(notdir $(file))
+cp "$(subst ?,$(SPACE),$(file))" atr/$(notdir $(file))
 
 endef # ATR_WRITE_recipe
 
 samples.atr: samples
 	@mkdir atr
-	cp dos.sys atr/dos.sys
-	cp dup.sys atr/dup.sys
+	cp "dos.sys" atr/dos.sys
+	cp "dup.sys" atr/dup.sys
 	@$(foreach file,$(EXELIST_$(SYS)),$(ATR_WRITE_recipe))
 	@$(foreach file,$(OVERLAYLIST),$(ATR_WRITE_recipe))
 	@$(foreach file,$(EMD) $(MOU) $(TGI),$(ATR_WRITE_recipe))

@@ -76,8 +76,6 @@ static unsigned         InputCol        = 0;
 static FILE*            InputFile       = 0;
 static char*            InputSrcName    = 0;
 
-/* Options */
-unsigned char           InfoSyncLines   = 0;
 
 
 /*****************************************************************************/
@@ -116,6 +114,7 @@ void InfoError (const char* Format, ...)
             InputSrcName, InfoErrorLine, Buf);
     exit (EXIT_FAILURE);
 }
+
 
 
 
@@ -164,7 +163,7 @@ static void SkipBlanks (int SingleLine)
     }
 }
 
-static long GetDecimalToken ()
+static long GetDecimalToken (void)
 {
     long Value = 0;
 
@@ -226,15 +225,15 @@ Store:
 
 static void LineMarkerOrComment ()
 /* Handle a line beginning with '#'. Possible interpretations are:
- * - #line <lineno> ["<filename>"]	    (C preprocessor input)
- * - # <lineno> "<filename>" [<flag>]...    (gcc preprocessor output)
- * - #<comment>
- */
+** - #line <lineno> ["<filename>"]	    (C preprocessor input)
+** - # <lineno> "<filename>" [<flag>]...    (gcc preprocessor output)
+** - #<comment>
+*/
 {
     unsigned long LineNo = 0;
     int LineDirective = 0;
     StrBuf SrcNameBuf = AUTO_STRBUF_INITIALIZER;
-    
+
     /* Skip the first "# " */
     NextChar ();
     SkipBlanks (1);
@@ -440,7 +439,7 @@ Again:
 
         case '#':
             /* # lineno "sourcefile" or # comment */
-            if (InfoSyncLines && InputCol == 1) {
+            if (SyncLines && InputCol == 1) {
                 LineMarkerOrComment ();
             } else {
                 do {

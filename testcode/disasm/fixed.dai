@@ -1,0 +1,25 @@
+# 1 "fixed.da"
+# 1 "<built-in>"
+# 1 "<command-line>"
+# 1 "fixed.da"
+# 9 "fixed.da"
+global {
+    inputoffs $1C010;
+    inputsize $4000;
+    startaddr $C000;
+    cpu "6502";
+};
+
+
+
+label { addr $00; name "VariableA"; };
+label { addr $01; name "VariableB"; };
+label { addr $0100; name "Stack"; size $0100; };
+
+
+
+
+
+label { addr $C000; name "CommonProcA"; };
+label { addr $C123; name "CommonProcB"; };
+range { start $E123; end $FFFF; name "CommonData"; type ByteTable; };

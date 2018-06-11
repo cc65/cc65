@@ -312,7 +312,7 @@ anything). Each attribute is terminated by a semicolon.
 
 <sect1>Comments<p>
 
-Comments start with a hash mark (<tt/#/) or a double slashe (<tt>//</tt>);
+Comments start with a hash mark (<tt/#/) or a double slash (<tt>//</tt>);
 and, extend from the position of the mark to the end of the current line.
 Hash marks or double slashes inside of strings will <em/not/ start a comment,
 of course.

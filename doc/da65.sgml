@@ -542,16 +542,16 @@ code. The following attributes are recognized:
   range, where <tt/label/ is the label name given with the <tt/NAME/
   attribute, and <tt/offs/ is the offset within the data.
 
-  <tag><tt>VOPERAND</tt></tag>
+  <tag><tt>PARAMSIZE</tt></tag>
   This optional attribute is followed by a numerical value. It tells the
-  assembler that subroutine calls to this label follow "virtual operands"
+  assembler that subroutine calls to this label follow "inline parameters"
   of the given bytes like this:
 
 <tscreen><verb>
-       	JSR	LabelWith2BytesOfVoperand
-	.byte	$00, $10    ; virtual operands
-	; return here
-	BIT	$0F
+        JSR     LabelWithParamSize2
+        .byte   $00, $10
+        (return here)
+        code...
 </verb></tscreen>
 
 </descrip>

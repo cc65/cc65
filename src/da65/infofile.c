@@ -381,7 +381,7 @@ static void LabelSection (void)
         {   "ADDR",     INFOTOK_ADDR    },
         {   "NAME",     INFOTOK_NAME    },
         {   "SIZE",     INFOTOK_SIZE    },
-        {   "VOPERAND", INFOTOK_VOPERAND },
+        {   "PARAMSIZE", INFOTOK_PARAMSIZE },
     };
 
     /* Locals - initialize to avoid gcc warnings */
@@ -389,7 +389,7 @@ static void LabelSection (void)
     char* Comment = 0;
     long Value    = -1;
     long Size     = -1;
-    long VOperand = -1;
+    long ParamSize = -1;
 
     /* Skip the token */
     InfoNextTok ();
@@ -451,14 +451,14 @@ static void LabelSection (void)
                 InfoNextTok ();
                 break;
 
-            case INFOTOK_VOPERAND:
+            case INFOTOK_PARAMSIZE:
                 InfoNextTok ();
-                if (VOperand >= 0) {
-                    InfoError ("VOperand already given");
+                if (ParamSize >= 0) {
+                    InfoError ("ParamSize already given");
                 }
                 InfoAssureInt ();
                 InfoRangeCheck (1, 0x10000);
-                VOperand = InfoIVal;
+                ParamSize = InfoIVal;
                 InfoNextTok ();
                 break;
 
@@ -498,8 +498,8 @@ static void LabelSection (void)
     } else {
         AddExtLabelRange ((unsigned) Value, Name, Size);
     }
-    if (VOperand >= 0) {
-        SetSubroutineVOperand ((unsigned) Value, (unsigned) VOperand);
+    if (ParamSize >= 0) {
+        SetSubroutineParamSize ((unsigned) Value, (unsigned) ParamSize);
     }
 
     /* Define the comment */

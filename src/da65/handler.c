@@ -51,7 +51,7 @@
 
 
 
-static unsigned short SubroutineVOperandSize[0x10000];
+static unsigned short SubroutineParamSize[0x10000];
 
 /*****************************************************************************/
 /*                             Helper functions                              */
@@ -748,18 +748,22 @@ void OH_JmpAbsoluteXIndirect (const OpcDesc* D)
 
 void OH_JsrAbsolute (const OpcDesc* D)
 {
-    unsigned VOperandSize = SubroutineVOperandSize[GetCodeWord(PC+1)];
+    unsigned ParamSize = SubroutineParamSize[GetCodeWord(PC+1)];
     OH_Absolute (D);
-    if (VOperandSize > 0) {
+    if (ParamSize > 0) {
         unsigned RemainingBytes;
+	unsigned BytesLeft;
         PC += D->Size;
         RemainingBytes = GetRemainingBytes();
-        if (RemainingBytes < VOperandSize) {
-            VOperandSize = RemainingBytes;
+        if (RemainingBytes < ParamSize) {
+            ParamSize = RemainingBytes;
         }
-        if (VOperandSize > 0) {
-            DataByteLine (VOperandSize); /* FIXME: follow BytesPerLine */
-            PC += VOperandSize;
+        BytesLeft = ParamSize;
+        while (BytesLeft > 0) {
+            unsigned Chunk = (BytesLeft > BytesPerLine)? BytesPerLine : BytesLeft;
+            DataByteLine (Chunk);
+            BytesLeft -= Chunk;
+            PC        += Chunk;
         }
         PC -= D->Size;
     }
@@ -767,7 +771,7 @@ void OH_JsrAbsolute (const OpcDesc* D)
 
 
 
-void SetSubroutineVOperand (unsigned Addr, unsigned Size)
+void SetSubroutineParamSize (unsigned Addr, unsigned Size)
 {
-    SubroutineVOperandSize[Addr] = Size;
+    SubroutineParamSize[Addr] = Size;
 }

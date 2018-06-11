@@ -106,7 +106,7 @@ void OH_JmpAbsoluteIndirect (const OpcDesc* D);
 void OH_JmpAbsoluteXIndirect (const OpcDesc* D);
 void OH_JsrAbsolute (const OpcDesc*);
 
-void SetSubroutineVOperand (unsigned Addr, unsigned Size);
+void SetSubroutineParamSize (unsigned Addr, unsigned Size);
 
 
 /* End of handler.h */

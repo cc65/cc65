@@ -318,7 +318,7 @@ static void OptSyncLines (const char* Opt attribute ((unused)),
                           const char* Arg attribute ((unused)))
 /* Handle the --sync-lines option */
 {
-    InfoSyncLines = 1;
+    SyncLines = 1;
 }
 
 

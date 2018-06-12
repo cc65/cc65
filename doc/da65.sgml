@@ -544,8 +544,8 @@ code. The following attributes are recognized:
 
   <tag><tt>PARAMSIZE</tt></tag>
   This optional attribute is followed by a numerical value. It tells the
-  assembler that subroutine calls to this label follow "inline parameters"
-  of the given bytes like this:
+  assembler that subroutine calls to this label are followed by
+  "inline parameters" with the given number of bytes, like this:
 
 <tscreen><verb>
         JSR     LabelWithParamSize2

@@ -79,7 +79,7 @@ const OpcDesc OpcTable_65816[256] = {
     {   "ora",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $1d */
     {   "asl",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $1e */
     {   "ora",  4,  flUseLabel,               OH_AbsoluteLongX         }, /* $1f */
-    {   "jsr",  3,  flLabel,                  OH_Absolute              }, /* $20 */
+    {   "jsr",  3,  flLabel,                  OH_JsrAbsolute           }, /* $20 */
     {   "and",  2,  flUseLabel,               OH_DirectXIndirect       }, /* $21 */
     {   "jsl",  3,  flLabel,                  OH_AbsoluteLong          }, /* $22 */
     {   "and",  2,  flNone,                   OH_StackRelative         }, /* $23 */

@@ -377,19 +377,19 @@ static void LabelSection (void)
 /* Parse a label section */
 {
     static const IdentTok LabelDefs[] = {
-        {   "COMMENT",  INFOTOK_COMMENT },
-        {   "ADDR",     INFOTOK_ADDR    },
-        {   "NAME",     INFOTOK_NAME    },
-        {   "SIZE",     INFOTOK_SIZE    },
-        {   "PARAMSIZE", INFOTOK_PARAMSIZE },
+        {   "COMMENT",      INFOTOK_COMMENT     },
+        {   "ADDR",         INFOTOK_ADDR        },
+        {   "NAME",         INFOTOK_NAME        },
+        {   "SIZE",         INFOTOK_SIZE        },
+        {   "PARAMSIZE",    INFOTOK_PARAMSIZE   },
     };
 
     /* Locals - initialize to avoid gcc warnings */
-    char* Name    = 0;
-    char* Comment = 0;
-    long Value    = -1;
-    long Size     = -1;
-    long ParamSize = -1;
+    char* Name      = 0;
+    char* Comment   = 0;
+    long Value      = -1;
+    long Size       = -1;
+    long ParamSize  = -1;
 
     /* Skip the token */
     InfoNextTok ();

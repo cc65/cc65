@@ -748,19 +748,19 @@ void OH_JmpAbsoluteXIndirect (const OpcDesc* D)
 
 void OH_JsrAbsolute (const OpcDesc* D)
 {
-    unsigned ParamSize = SubroutineParamSize[GetCodeWord(PC+1)];
+    unsigned ParamSize = SubroutineParamSize[GetCodeWord (PC+1)];
     OH_Absolute (D);
     if (ParamSize > 0) {
         unsigned RemainingBytes;
-	unsigned BytesLeft;
+        unsigned BytesLeft;
         PC += D->Size;
-        RemainingBytes = GetRemainingBytes();
+        RemainingBytes = GetRemainingBytes ();
         if (RemainingBytes < ParamSize) {
             ParamSize = RemainingBytes;
         }
         BytesLeft = ParamSize;
         while (BytesLeft > 0) {
-            unsigned Chunk = (BytesLeft > BytesPerLine)? BytesPerLine : BytesLeft;
+            unsigned Chunk = (BytesLeft > BytesPerLine) ? BytesPerLine : BytesLeft;
             DataByteLine (Chunk);
             BytesLeft -= Chunk;
             PC        += Chunk;

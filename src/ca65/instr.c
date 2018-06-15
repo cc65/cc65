@@ -1298,10 +1298,16 @@ static void PutPCRel4510 (const InsDesc* Ins)
 static void PutBlockMove (const InsDesc* Ins)
 /* Handle the blockmove instructions (65816) */
 {
+    ExprNode* Arg1 = Expression ();
+
     Emit0 (Ins->BaseCode);
-    EmitByte (Expression ());
     ConsumeComma ();
+
+    /* The operands are written in Assembly code as source, destination;
+    ** but, they're assembled as <destination> <source>.
+    */
     EmitByte (Expression ());
+    EmitByte (Arg1);
 }
 
 

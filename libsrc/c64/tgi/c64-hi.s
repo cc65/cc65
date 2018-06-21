@@ -570,7 +570,10 @@ YCONT2: lda     (POINT),y    ;Plot endpoint
         and     CHUNK
         eor     (POINT),y
         sta     (POINT),y
-        jmp     EXIT
+        lda     #$36
+        sta     $01
+        cli
+        rts
 
 YFIXX:                    ;x=x+1
         adc     DY
@@ -624,7 +627,7 @@ XCONT2: dex
 
         lsr     CHUNK        ;Advance to last point
         jsr     LINEPLOT     ;Plot the last chunk
-EXIT:   lda     #$36
+        lda     #$36
         sta     $01
         cli
         rts

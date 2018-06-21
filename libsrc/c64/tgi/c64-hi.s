@@ -570,10 +570,7 @@ YCONT2: lda     (POINT),y    ;Plot endpoint
         and     CHUNK
         eor     (POINT),y
         sta     (POINT),y
-        lda     #$36
-        sta     $01
-        cli
-        rts
+        jmp     EXIT
 
 YFIXX:                    ;x=x+1
         adc     DY

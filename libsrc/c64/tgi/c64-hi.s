@@ -541,8 +541,7 @@ STEPINY:
         eor     CHUNK
         sta     CHUNK
         txa
-        bne     @CONT        ;If dy=0 it's just a point
-        inx
+        beq     YCONT2       ;If dy=0, it's just a point
 @CONT:  lsr                  ;Init counter to dy/2
 ;
 ; Main loop

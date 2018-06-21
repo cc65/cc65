@@ -626,7 +626,7 @@ XCONT2: dex
 
         lsr     CHUNK        ;Advance to last point
         jsr     LINEPLOT     ;Plot the last chunk
-EXIT:   lda     #$36
+        lda     #$36
         sta     $01
         cli
         rts

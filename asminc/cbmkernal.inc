@@ -15,13 +15,14 @@
 .elseif .def(__CBM510__) || .def(__CBM610__)
   IOINIT       := $FF7B
   CINT         := $FF7E
-  VECTOR       := $FF84
-  RESTOR       := $FF87
 .endif
 
 .if .def(__VIC20__) || .def(__C64__) || .def(__C128__) || .def(__C16__)
- RESTOR        := $FF8A
- VECTOR        := $FF8D
+  RESTOR       := $FF8A
+  VECTOR       := $FF8D
+.elseif .def(__CBM510__) || .def(__CBM610__)
+  VECTOR       := $FF84
+  RESTOR       := $FF87
 .endif
 
 .if .def(__CBM510__) || .def(__CBM610__) || .def(__VIC20__) || .def(__C64__) || .def(__C128__) || .def(__C16__)

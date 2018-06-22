@@ -70,6 +70,6 @@ UDTIM          := $FFEA
 
 .if .def(__CBM510__) || .def(__CBM610__) || .def(__VIC20__) || .def(__C64__) || .def(__C128__) || .def(__C16__)
   SCREEN       := $FFED
-  PLOT	       := $FFF0
+  PLOT         := $FFF0
   IOBASE       := $FFF3
 .endif

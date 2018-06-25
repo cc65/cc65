@@ -163,6 +163,8 @@ static void SkipBlanks (int SingleLine)
     }
 }
 
+
+
 static long GetDecimalToken (void)
 {
     long Value = 0;
@@ -174,7 +176,9 @@ static long GetDecimalToken (void)
     return Value;
 }
 
-static int GetEncodedChar (char *Buf, unsigned *IPtr, unsigned Size)
+
+
+static int GetEncodedChar (char* Buf, unsigned* IPtr, unsigned Size)
 {
     char Decoded = 0;
     int Count;
@@ -207,11 +211,11 @@ static int GetEncodedChar (char *Buf, unsigned *IPtr, unsigned Size)
     } else {
         switch (C) {
             case '"': case '\'': case '\\':
-                        Decoded = C;	    break;
-            case 't':	Decoded = '\t';	    break;
-            case 'r':	Decoded = '\r';	    break;
-            case 'n':	Decoded = '\n';	    break;
-            default:	return -1;
+                        Decoded = C;        break;
+            case 't':   Decoded = '\t';     break;
+            case 'r':   Decoded = '\r';     break;
+            case 'n':   Decoded = '\n';     break;
+            default:    return -1;
         }
         NextChar ();
     }
@@ -223,9 +227,11 @@ Store:
     return 0;
 }
 
+
+
 static void LineMarkerOrComment ()
 /* Handle a line beginning with '#'. Possible interpretations are:
-** - #line <lineno> ["<filename>"]	    (C preprocessor input)
+** - #line <lineno> ["<filename>"]          (C preprocessor input)
 ** - # <lineno> "<filename>" [<flag>]...    (gcc preprocessor output)
 ** - #<comment>
 */
@@ -311,6 +317,8 @@ NotMarker:
 Last:
     SB_Done (&SrcNameBuf);
 }
+
+
 
 void InfoNextTok (void)
 /* Read the next token from the input stream */
@@ -417,7 +425,7 @@ Again:
             if (C != '\"') {
                 InfoError ("Unterminated string");
             }
-	    NextChar ();
+            NextChar ();
             InfoTok = INFOTOK_STRCON;
             break;
 
@@ -657,16 +665,6 @@ void InfoSetName (const char* Name)
     xfree(InputSrcName);
     InputSrcName = xstrdup(Name);
 }
-
-
-
-#ifdef unused
-const char* InfoGetName (void)
-/* Get the name of the config file */
-{
-    return InfoFile? InfoFile : "";
-}
-#endif /* unused */
 
 
 

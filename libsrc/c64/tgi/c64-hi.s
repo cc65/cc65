@@ -541,8 +541,7 @@ STEPINY:
         eor     CHUNK
         sta     CHUNK
         txa
-        bne     @CONT        ;If dy=0 it's just a point
-        inx
+        beq     YCONT2       ;If dy=0, it's just a point
 @CONT:  lsr                  ;Init counter to dy/2
 ;
 ; Main loop
@@ -627,7 +626,7 @@ XCONT2: dex
 
         lsr     CHUNK        ;Advance to last point
         jsr     LINEPLOT     ;Plot the last chunk
-EXIT:   lda     #$36
+        lda     #$36
         sta     $01
         cli
         rts

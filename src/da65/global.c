@@ -59,6 +59,7 @@ unsigned char PassCount       = 2;      /* How many passed do we do? */
 signed char   NewlineAfterJMP = -1;     /* Add a newline after a JMP insn? */
 signed char   NewlineAfterRTS = -1;     /* Add a newline after a RTS insn? */
 long          StartAddr       = -1L;    /* Start/load address of the program */
+unsigned char SyncLines       = 0;      /* Accept line markers in the info file */
 long          InputOffs       = -1L;    /* Offset into input file */
 long          InputSize       = -1L;    /* Number of bytes to read from input */
 

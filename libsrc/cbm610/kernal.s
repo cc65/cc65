@@ -8,7 +8,6 @@
 
         .export         CINT
         .export         IOINIT
-;        .export         RAMTAS ; not available???
         .export         RESTOR
         .export         VECTOR
         .export         SETMSG

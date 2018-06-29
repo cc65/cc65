@@ -4,7 +4,7 @@
 ; CBM610 kernal functions
 ;
 
-	.include "cbmkernal.inc"
+	.include "cbm_kernal.inc"
 
         .export         CINT
         .export         IOINIT

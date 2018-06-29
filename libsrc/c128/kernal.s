@@ -4,7 +4,7 @@
 ; C128 kernal functions
 ;
 
-	.include "cbmkernal.inc"
+	.include "cbm_kernal.inc"
 
         .export         C64MODE
         .export         SWAPPER

@@ -4,7 +4,7 @@
 ; C64 kernal functions
 ;
 
-	.include "cbm_kernal.inc"
+        .include "cbm_kernal.inc"
 
         .export         CINT
         .export         IOINIT

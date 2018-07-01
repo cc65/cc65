@@ -4,6 +4,13 @@
 ; Commodore kernal functions
 ;
 
+.if .def(__C128__)
+  ; C128 Extended jump table
+  C64MODE      := $FF4D
+  SWAPPER      := $FF5F
+  SETBNK       := $FF68
+.endif
+
 .if .def(__C64__) || .def(__C128__) || .def(__C16__)
   CINT         := $FF81
   IOINIT       := $FF84

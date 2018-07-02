@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 2003-12-20
 ;
-; CBM610 kernal functions
+; CBM510 kernal functions
 ;
 
         .include "cbm_kernal.inc"

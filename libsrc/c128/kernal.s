@@ -49,12 +49,3 @@
         .export         SCREEN
         .export         PLOT
         .export         IOBASE
-
-
-;-----------------------------------------------------------------------------
-; All functions are available in the kernal jump table
-
-; Extended jump table
-C64MODE         = $FF4D
-SWAPPER         = $FF5F
-SETBNK          = $FF68

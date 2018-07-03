@@ -4,8 +4,8 @@
 ; unsigned char __fastcall__ cbm_k_save(unsigned int start, unsigned int end);
 ;
 
+        .include        "cbm.inc"
         .export         _cbm_k_save
-        .import         SAVE
         .import         popptr1
         .importzp       ptr1, tmp1
 

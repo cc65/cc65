@@ -4,9 +4,7 @@
 ; void __fastcall__ cbm_k_second (unsigned char addr)
 ;
 
-
-        .import SECOND
-        .export _cbm_k_second
+        .include        "cbm.inc"
+        .export         _cbm_k_second
 
 _cbm_k_second = SECOND
-

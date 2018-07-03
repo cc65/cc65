@@ -4,8 +4,8 @@
 ; unsigned char cbm_k_getin (void);
 ;
 
+        .include        "cbm.inc"
         .export         _cbm_k_getin
-        .import         GETIN
 
 
 _cbm_k_getin:

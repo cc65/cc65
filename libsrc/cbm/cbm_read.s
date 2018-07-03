@@ -39,7 +39,6 @@
         .include        "cbm.inc"
 
         .export         _cbm_read
-        .import         CHKIN, READST, BASIN, CLRCH
         .importzp       ptr1, ptr2, ptr3, tmp1
         .import         popax, popa
         .import         __oserror

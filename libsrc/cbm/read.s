@@ -8,7 +8,6 @@
         .export         _read
         .constructor    initstdin
 
-        .import         SETLFS, OPEN, CHKIN, BASIN, CLRCH, BSOUT, READST
         .import         rwcommon
         .import         popax
         .importzp       ptr1, ptr2, ptr3, tmp1, tmp2, tmp3

@@ -5,6 +5,7 @@
 ;
 
         .include        "cbm.inc"
+
         .export         _clock
         .importzp       sreg
 

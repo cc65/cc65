@@ -5,6 +5,7 @@
 ;
 
         .include        "cbm.inc"
+
         .export         _cbm_k_clrch
 
 _cbm_k_clrch = CLRCH

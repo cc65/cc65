@@ -5,8 +5,8 @@
 ;
 
         .include        "cbm.inc"
-        .export         _cbm_k_getin
 
+        .export         _cbm_k_getin
 
 _cbm_k_getin:
         jsr     GETIN

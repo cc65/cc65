@@ -7,6 +7,7 @@
 ;
 
         .include        "cbm.inc"
+
         .export         _cbm_k_setlfs
         .import         popa
         .importzp       tmp1

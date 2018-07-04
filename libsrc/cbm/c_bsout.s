@@ -5,6 +5,7 @@
 ;
 
         .include        "cbm.inc"
+
         .export         _cbm_k_bsout
 
 _cbm_k_bsout = BSOUT

@@ -4,10 +4,11 @@
 ; unsigned cbm_k_iobase (void);
 ;
 
-        .export         _cbm_k_iobase
-        .import         IOBASE
+        .include        "cbm.inc"
 
-_cbm_k_iobase:                   
+        .export         _cbm_k_iobase
+
+_cbm_k_iobase:
         jsr     IOBASE
         txa
         pha

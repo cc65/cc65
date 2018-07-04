@@ -4,5 +4,6 @@
 ; void cbm_k_clall (void);
 ;
 
-        .import         CLALL
+        .include        "cbm.inc"
+
         .export         _cbm_k_clall := CLALL

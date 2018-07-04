@@ -4,5 +4,6 @@
 ; void cbm_k_unlsn (void);
 ;
 
-        .import         UNLSN
+        .include        "cbm.inc"
+
         .export         _cbm_k_unlsn := UNLSN

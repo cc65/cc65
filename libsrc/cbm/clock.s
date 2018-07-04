@@ -4,10 +4,10 @@
 ; clock_t clock (void);
 ;
 
-        .export         _clock
-        .import         RDTIM
-        .importzp       sreg
+        .include        "cbm.inc"
 
+        .export         _clock
+        .importzp       sreg
 
 
 .proc   _clock
@@ -19,4 +19,3 @@
         rts
 
 .endproc
-

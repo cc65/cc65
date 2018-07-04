@@ -7,7 +7,6 @@
         .export         _open
         .destructor     closeallfiles, 5
 
-        .import         SETLFS, OPEN, CLOSE
         .import         addysp, popax
         .import         scratch, fnparse, fnaddmode, fncomplete, fnset
         .import         opencmdchannel, closecmdchannel, readdiskerror
@@ -18,6 +17,7 @@
         .include        "errno.inc"
         .include        "fcntl.inc"
         .include        "filedes.inc"
+        .include        "cbm.inc"
 
 
 ;--------------------------------------------------------------------------

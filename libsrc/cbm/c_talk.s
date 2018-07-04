@@ -4,12 +4,6 @@
 ; void __fastcall__ cbm_k_talk (unsigned char dev);
 ;
 
-        .import         TALK
+        .include        "cbm.inc"
+
         .export         _cbm_k_talk := TALK
-
-
-
-
-
-
-

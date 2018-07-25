@@ -18,10 +18,12 @@
         .importzp       sreg, ptr1, tmp1
 
 _div:   jsr     tosdivax        ; Division-operator does most of the work
-        sta     sreg            ; Quotient is in sreg
-        stx     sreg+1
-        lda     ptr1            ; Unsigned remainder is in ptr1
-        ldx     ptr1+1
+        lda     sreg            ; Unsigned remainder is in sreg
+        ldx     sreg+1
+        ldy     ptr1            ; transfer quotient to sreg
+        sty     sreg
+        ldy     ptr1+1
+        sty     sreg+1
 
 ; Adjust the sign of the remainder.
 ; It must be the same as the sign of the dividend.

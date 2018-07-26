@@ -17,14 +17,14 @@
         .export         _dio_log_to_phys
         .include        "atari.inc"
         .importzp       ptr1,ptr2,ptr3
-        .import         popax, popptr1, __oserror
+        .import         popax,popptr1,__oserror
 
 .proc   _dio_log_to_phys
 
         sta     ptr2
         stx     ptr2+1          ; pointer to output structure
 
-        jsr     popptr1         ; save pointer to input data      
+        jsr     popptr1         ; save pointer to input data
 
         jsr     popax
         sta     ptr3

@@ -16,7 +16,7 @@
 
         .export         __sio_call
         .include        "atari.inc"
-        .import         popa, popax, popptr1
+        .import         popa,popax,popptr1
         .import         sectsizetab,__oserror
         .importzp       ptr1
 

@@ -20,6 +20,7 @@ _getdevicedir:
         jsr     popptr1
 
         ; Set buf
+        ldx     ptr1+1
         sta     mliparam + MLI::ON_LINE::DATA_BUFFER
         stx     mliparam + MLI::ON_LINE::DATA_BUFFER+1
 
@@ -62,7 +63,7 @@ oserr:  jsr     __mappederrno
         lda     (ptr1),y
         and     #15             ; Max volume name length
         sta     tmp1
-        
+
         ; Add leading slash
         lda     #'/'
         sta     (ptr1),y

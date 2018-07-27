@@ -1,5 +1,6 @@
 ;
-; Piotr Fusik, 18.11.2001
+; 2001-11-18, Piotr Fusik
+; 2018-05-20, Christian Kruger
 ;
 ; unsigned long __fastcall__ adler32 (unsigned long adler, unsigned char* buf,
 ;                                     unsigned len);
@@ -78,6 +79,7 @@ _adler32:
 ; return 1L
 @L0:    sta     sreg
         sta     sreg+1
+        tax             ; (popptr1 doesn't set .X)
         lda     #1
 ; ignore adler
         jmp     incsp4

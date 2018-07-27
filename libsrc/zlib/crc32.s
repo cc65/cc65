@@ -1,5 +1,6 @@
 ;
-; Piotr Fusik, 14.11.2001
+; 2001-11-14, Piotr Fusik
+; 2018-05-20, Christian Kruger
 ;
 ; unsigned long __fastcall__ crc32 (unsigned long crc, unsigned char* buf,
 ;                                   unsigned len);
@@ -116,6 +117,7 @@ _crc32:
 ; return 0L
 @L0:    sta     sreg
         sta     sreg+1
+        tax             ; (popptr1 doesn't set .X)
 ; ignore crc
         jmp     incsp4
 
@@ -128,5 +130,3 @@ table_0:        .res    256
 table_1:        .res    256
 table_2:        .res    256
 table_3:        .res    256
-
-

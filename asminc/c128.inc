@@ -16,6 +16,8 @@ FNAM_BANK       := $C7          ; Bank for filename
 KEY_COUNT       := $D0          ; Number of keys in input buffer
 FKEY_COUNT      := $D1          ; Characters for function key
 MODE            := $D7          ; 40-/80-column mode (bit 7: 80 columns)
+GRAPHM          := $D8          ; Graphics mode flags (bits 5-7)
+CHARDIS         := $D9          ; Bit 2 shadow for location $01
 CURS_X          := $EC          ; Cursor column
 CURS_Y          := $EB          ; Cursor row
 SCREEN_PTR      := $E0          ; Pointer to current char in text screen
@@ -25,22 +27,23 @@ CHARCOLOR       := $F1
 RVS             := $F3          ; Reverse output flag
 SCROLL          := $F8          ; Disable scrolling flag
 
-BASIC_BUF       := $200         ; Location of command-line
+BASIC_BUF       := $0200        ; Location of command-line
 BASIC_BUF_LEN   = 162           ; Maximum length of command-line
 
-FETCH           := $2A2         ; Fetch subroutine in RAM
-FETVEC          := $2AA         ; Vector patch location for FETCH
-STASH           := $2AF         ; Stash routine in RAM
-STAVEC          := $2B9         ; Vector patch location for STASH
-IRQInd          := $2FD         ; JMP $0000 -- used as indirect IRQ vector
-PALFLAG         := $A03         ; $FF=PAL, $00=NTSC
-INIT_STATUS     := $A04         ; Flags: Reset/Restore initiation status
+FETCH           := $02A2        ; Fetch subroutine in RAM
+FETVEC          := $02AA        ; Vector patch location for FETCH
+STASH           := $02AF        ; Stash routine in RAM
+STAVEC          := $02B9        ; Vector patch location for STASH
+IRQInd          := $02FD        ; JMP $0000 -- used as indirect IRQ vector
+PALFLAG         := $0A03        ; $FF=PAL, $00=NTSC
+INIT_STATUS     := $0A04        ; Flags: Reset/Restore initiation status
+VM2             := $0A2D        ; VIC-IIe shadow for $D018 -- graphics mode
 FKEY_LEN        := $1000        ; Function key lengths
 FKEY_TEXT       := $100A        ; Function key texts
 
-KBDREPEAT       := $28a
-KBDREPEATRATE   := $28b
-KBDREPEATDELAY  := $28c
+KBDREPEAT       := $028a
+KBDREPEATRATE   := $028b
+KBDREPEATDELAY  := $028c
 
 ; ---------------------------------------------------------------------------
 ; Kernal routines

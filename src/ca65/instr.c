@@ -1295,18 +1295,38 @@ static void PutPCRel4510 (const InsDesc* Ins)
 }
 
 
+
 static void PutBlockMove (const InsDesc* Ins)
 /* Handle the blockmove instructions (65816) */
 {
-    ExprNode* Arg1 = Expression ();
+    ExprNode* Arg1;
+    ExprNode* Arg2;
 
     Emit0 (Ins->BaseCode);
+
+    if (CurTok.Tok == TOK_HASH) {
+        /* The operand is a bank-byte expression. */
+        NextTok ();
+        Arg1 = Expression ();
+    } else {
+        /* The operand is a far-address expression.
+        ** Use only its bank part.
+        */
+        Arg1 = FuncBankByte ();
+    }
     ConsumeComma ();
+
+    if (CurTok.Tok == TOK_HASH) {
+        NextTok ();
+        Arg2 = Expression ();
+    } else {
+        Arg2 = FuncBankByte ();
+    }
 
     /* The operands are written in Assembly code as source, destination;
     ** but, they're assembled as <destination> <source>.
     */
-    EmitByte (Expression ());
+    EmitByte (Arg2);
     EmitByte (Arg1);
 }
 

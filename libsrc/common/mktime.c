@@ -180,7 +180,8 @@ time_t __fastcall__ mktime (register struct tm* TM)
     return DayCount * 86400UL +
            ((unsigned) TM->tm_hour) * 3600UL +
            ((unsigned) TM->tm_min) * 60U +
-           ((unsigned) TM->tm_sec);
+           ((unsigned) TM->tm_sec) -
+           _tz.timezone;
 
 Error:
     /* Error exit */

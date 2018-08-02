@@ -21,7 +21,7 @@ int main(void)
 
   failures += !(rawtime == 1608805850);
 
-  p_timeinfo = gmtime(&rawtime);
+  p_timeinfo = localtime(&rawtime);
 
   failures += !(p_timeinfo->tm_year == timeinfo.tm_year);
   failures += !(p_timeinfo->tm_mon  == timeinfo.tm_mon);

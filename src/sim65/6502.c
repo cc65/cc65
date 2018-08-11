@@ -739,7 +739,7 @@ static void OPC_6502_2C (void)
     unsigned Addr;
     unsigned char Val;
     Cycles = 4;
-    Addr = MemReadByte (Regs.PC+1);
+    Addr = MemReadWord (Regs.PC+1);
     Val = MemReadByte (Addr);
     SET_SF (Val & 0x80);
     SET_OF (Val & 0x40);

@@ -3,15 +3,16 @@
 ;
 ; Based on Stephen L. Judd's GRLIB code.
 ;
-; 2017-01-13, Greg King
 ; 2018-03-13, Sven Klose
 ; 2018-07-22, Scott Hutter
+; 2018-07-28, Greg King
 ;
 
         .include        "zeropage.inc"
 
         .include        "tgi-kernel.inc"
         .include        "tgi-error.inc"
+        .include        "c128.inc"
 
         .macpack        generic
         .macpack        module
@@ -77,7 +78,7 @@ TEMP2           := sreg
 POINT           := regsave
 
 CHUNK           := X2           ; Used in the line routine
-OLDCHUNK        := X2+1         ; Dito
+OLDCHUNK        := X2+1         ; Ditto
 
 ; Absolute variables used in the code
 
@@ -88,18 +89,15 @@ PALETTE:        .res    2       ; The current palette
 
 BITMASK:        .res    1       ; $00 = clear, $FF = set pixels
 
-; INIT/DONE
-OLDD018:        .res    1       ; Old register value
-
 ; Line routine stuff
 DX:             .res    2
 DY:             .res    2
 
 ; BAR variables
 X1SAVE:         .res    2
-Y1SAVE:         .res    2
+Y1SAVE:         .res    1
 X2SAVE:         .res    2
-Y2SAVE:         .res    2
+Y2SAVE:         .res    1
 
 ; Text output stuff
 TEXTMAGX:       .res    1
@@ -116,15 +114,10 @@ PALETTESIZE     = * - DEFPALETTE
 BITTAB:         .byte   $80,$40,$20,$10,$08,$04,$02,$01
 BITCHUNK:       .byte   $FF,$7F,$3F,$1F,$0F,$07,$03,$01
 
-CHARROM         := $D000                ; Character rom base address
-CBASE           := $5C00                ; Color memory base address
-VBASE           := $6000                ; Video memory base address
-										; BASE + $4000 for each bank above VIC bank 0
-										; $2000 = VIC bank 0 (base)
-										; $6000 = VIC bank 1
-										; $A000 = VIC bank 2
-										; $E000 = VIC bank 3
+CHARROM         := $D000                ; Character ROM base address
 
+VBASE           := $C000                ; Video memory base address
+CBASE           := $E000                ; Color memory base address
 
 .code
 
@@ -166,28 +159,38 @@ UNINSTALL:
 ;
 
 INIT:
-; Initialize variables
-        ldx     #$FF
+
+; Initialize variables.
+
+        ldx     #$FF            ; Foreground color
         stx     BITMASK
 
-; Switch into graphics mode
+; Switch into graphics mode.
 
-		; select video bank
-		; bank 0=3 ($0-$3FFF) (default)
-		; bank 1=2 ($4000-$7FFF) *
-		; bank 2=1 ($8000-$BFFF)
-		; bank 3=0 ($C000-$FFFF)
-		lda $DD00
-		and #$FC
-		ora #$02	; bank number 1 ($4000)
-		sta $DD00
+; Select a video bank:
+; bank 0 = $03 ($0000-$3FFF) (default)
+; bank 1 = $02 ($4000-$7FFF)
+; bank 2 = $01 ($8000-$BFFF)
+; bank 3 = $00 ($C000-$FFFF) (TGI)
 
-		; Switch to bitmap mode
-		lda $D8
-		ora #$20
-		sta $D8
-		
-DONE1:  lda     #TGI_ERR_OK
+        lda     CIA2_PRA
+        and     #<~$03          ; Bank 3
+        sta     CIA2_PRA
+
+        lda     #$80            ; color-map at $E000, bitmap at $C000
+        sta     VM2
+
+; Make the VIC-IIe read RAM instead of the font ROM.
+
+        lda     #%00000100
+        sta     CHARDIS
+
+; Switch to bitmap mode.
+
+        lda     #%00100000
+        sta     GRAPHM
+
+        lda     #TGI_ERR_OK
         sta     ERROR
         rts
 
@@ -199,19 +202,26 @@ DONE1:  lda     #TGI_ERR_OK
 ; Must set an error code: NO
 ;
 
-DONE:	; select video bank
-		lda $DD00
-		and #$FC
-		ora #$03	; bank 0=3 ($0-$3FFF), 1=2 ($4000-$7FFF), 2=1 ($8000-$BFFF), 3=0 ($C000-$FFFF)
-		sta $DD00
+DONE:
 
-		lda $0A2D	; change screen ram location
-		AND #$0F
-		ORA #$10	; $0400
-		STA $0A2D   
+; Select the text video bank.
 
-		LDA #$00	; switch back to text mode
-		STA $D8
+        lda     CIA2_PRA
+        ora     #$03            ; Bank 0
+        sta     CIA2_PRA
+
+; Make the VIC-IIe read the font ROM instead of RAM.
+
+        lda     #%00000000
+        sta     CHARDIS
+
+        ;lda    #%00000000      ; Switch back to text mode
+        sta     GRAPHM
+
+; Restore a value that's needed by BASIC's GRAPHIC 1 statement.
+
+        lda     #$78            ; color-map at $1C00, bitmap at $2000
+        sta     VM2
         rts
 
 ; ------------------------------------------------------------------------
@@ -240,9 +250,12 @@ CONTROL:
 ; Must set an error code: NO
 ;
 
-CLEAR:  
-		ldy     #$00
+CLEAR:
+        ldy     #$00
         tya
+        ldx     #MMU_CFG_RAM0
+        sei
+        stx     MMU_CR
 @L1:    sta     VBASE+$0000,y
         sta     VBASE+$0100,y
         sta     VBASE+$0200,y
@@ -274,9 +287,12 @@ CLEAR:
         sta     VBASE+$1C00,y
         sta     VBASE+$1D00,y
         sta     VBASE+$1E00,y
-        sta     VBASE+$1E40,y   ; preserve vectors
+        sta     VBASE+$1F00,y
         iny
         bne     @L1
+        ldx     #MMU_CFG_CC65
+        stx     MMU_CR
+        cli
         rts
 
 ; ------------------------------------------------------------------------
@@ -337,26 +353,22 @@ SETPALETTE:
         asl     a
         asl     a
         ora     PALETTE         ; Background color
-        tax
 
 ; Initialize the color map with the new color settings (it is below the
-; I/O area)
+; Kernal ROM).
 
         ldy     #$00
+        ldx     #MMU_CFG_RAM0
         sei
-        lda     $01             ; Get ROM config
-        pha                     ; Save it
-        and     #%11111100      ; Clear bit 0 and 1
-        sta     $01
-        txa                     ; Load color code
+        stx     MMU_CR
 @L2:    sta     CBASE+$0000,y
         sta     CBASE+$0100,y
         sta     CBASE+$0200,y
         sta     CBASE+$02e8,y
         iny
         bne     @L2
-        pla
-        sta     $01
+        ldx     #MMU_CFG_CC65
+        stx     MMU_CR
         cli
 
 ; Done, reset the error code
@@ -403,11 +415,9 @@ GETDEFPALETTE:
 SETPIXEL:
         jsr     CALC            ; Calculate coordinates
 
-        sei                     ; Get underneath ROM
-        lda     $01
-        pha
-        lda     #$34
-        sta     $01
+        lda     #MMU_CFG_RAM0   ; Work behind ROMs
+        sei
+        sta     MMU_CR
 
         lda     (POINT),Y
         eor     BITMASK
@@ -415,11 +425,11 @@ SETPIXEL:
         eor     (POINT),Y
         sta     (POINT),Y
 
-        pla
-        sta     $01
+        ldx     #MMU_CFG_CC65
+        stx     MMU_CR
         cli
 
-@L9:    rts
+        rts
 
 ; ------------------------------------------------------------------------
 ; GETPIXEL: Read the color value of a pixel and return it in A/X. The
@@ -430,23 +440,18 @@ SETPIXEL:
 GETPIXEL:
         jsr     CALC            ; Calculate coordinates
 
-        sei                     ; Get underneath ROM
-        lda     $01
-        pha
-        lda     #$34
-        sta     $01
+        lda     #MMU_CFG_RAM0   ; Work behind ROMs
+        sei
+        sta     MMU_CR
 
         lda     (POINT),Y
-        ldy     #$00
         and     BITTAB,X
         beq     @L1
-        iny
+        lda     #$01            ; Foreground color
 
-@L1:    pla
-        sta     $01
+@L1:    ldy     #MMU_CFG_CC65
+        sty     MMU_CR
         cli
-
-        tya                     ; Get color value into A
         ldx     #$00            ; Clear high byte
         rts
 
@@ -513,9 +518,9 @@ LINE:
         sta     OLDCHUNK
         sta     CHUNK
 
-        sei                     ; Get underneath ROM
-        lda     #$34
-        sta     $01
+        lda     #MMU_CFG_RAM0   ; Work behind ROMs
+        sei
+        sta     MMU_CR
 
         ldx     DY
         cpx     DX           ;Who's bigger: dy or dx?
@@ -571,8 +576,8 @@ YCONT2: lda     (POINT),y    ;Plot endpoint
         and     CHUNK
         eor     (POINT),y
         sta     (POINT),y
-        lda     #$36
-        sta     $01
+        ldx     #MMU_CFG_CC65
+        stx     MMU_CR
         cli
         rts
 
@@ -628,8 +633,8 @@ XCONT2: dex
 
         lsr     CHUNK        ;Advance to last point
         jsr     LINEPLOT     ;Plot the last chunk
-        lda     #$36
-        sta     $01
+        ldx     #MMU_CFG_CC65
+        stx     MMU_CR
         cli
         rts
 ;
@@ -737,47 +742,35 @@ FIXY:   cpy     #255         ;Y=255 or Y=8
 ; the original C wrapper and could be written much smaller (besides that,
 ; calling LINE is not a good idea either).
 
-BAR:    lda     Y2
-        sta     Y2SAVE
-        lda     Y2+1
-        sta     Y2SAVE+1
-
+BAR:
         lda     X2
         sta     X2SAVE
         lda     X2+1
         sta     X2SAVE+1
 
-        lda     Y1
-        sta     Y1SAVE
-        lda     Y1+1
-        sta     Y1SAVE+1
+        lda     Y2
+        sta     Y2SAVE
 
         lda     X1
         sta     X1SAVE
         lda     X1+1
         sta     X1SAVE+1
 
-@L1:    lda     Y1
-        sta     Y2
-        lda     Y1+1
+        lda     Y1
+        sta     Y1SAVE
+
+@L1:    sta     Y2
+        lda     #>200
+        sta     Y1+1
         sta     Y2+1
+
         jsr     LINE
 
         lda     Y1SAVE
         cmp     Y2SAVE
-        bne     @L2
-        lda     Y1SAVE
-        cmp     Y2SAVE
         beq     @L4
 
-@L2:    inc     Y1SAVE
-        bne     @L3
-        inc     Y1SAVE+1
-
-@L3:    lda     Y1SAVE
-        sta     Y1
-        lda     Y1SAVE+1
-        sta     Y1+1
+        inc     Y1SAVE
 
         lda     X1SAVE
         sta     X1
@@ -788,6 +781,9 @@ BAR:    lda     Y2
         sta     X2
         lda     X2SAVE+1
         sta     X2+1
+
+        lda     Y1SAVE
+        sta     Y1
         jmp     @L1
 
 @L4:    rts

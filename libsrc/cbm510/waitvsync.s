@@ -25,4 +25,4 @@ _waitvsync:
         bmi     @l2
 
         cli
-        jmp	    restore_bank
+        jmp    restore_bank

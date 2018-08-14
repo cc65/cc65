@@ -56,7 +56,9 @@
 ; Available on all platforms including PET
 CHKIN          := $FFC6
 CKOUT          := $FFC9
+CHKOUT         := $FFC9
 CLRCH          := $FFCC
+CLRCHN         := $FFCC
 BASIN          := $FFCF
 CHRIN          := $FFCF
 BSOUT          := $FFD2

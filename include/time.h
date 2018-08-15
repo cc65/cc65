@@ -52,9 +52,10 @@ typedef unsigned size_t;
 
 typedef unsigned long time_t;
 typedef unsigned long clock_t;
+typedef unsigned char clockid_t;
 
 /* Structure for broken down time */
-struct tm {     
+struct tm {
     int     tm_sec;
     int     tm_min;
     int     tm_hour;
@@ -64,6 +65,12 @@ struct tm {
     int     tm_wday;
     int     tm_yday;
     int     tm_isdst;
+};
+
+/* Structure for seconds and nanoseconds */
+struct timespec {
+    time_t  tv_sec;
+    long    tv_nsec;
 };
 
 /* Timezone representation, default is UTC */
@@ -116,15 +123,9 @@ extern clock_t _clk_tck (void);
 #  define CLK_TCK               _clk_tck()
 #  define CLOCKS_PER_SEC        _clk_tck()
 #endif
+#define CLOCK_REALTIME          0
 
 
-
-time_t _systime (void);
-/* Similar to time(), but:
-**   - Is not ISO C
-**   - Does not take the additional pointer
-**   - Does not set errno when returning -1
-*/
 
 /* ISO C function prototypes */
 char* __fastcall__ asctime (const struct tm* timep);
@@ -135,6 +136,13 @@ struct tm* __fastcall__ localtime (const time_t* timep);
 time_t __fastcall__ mktime (struct tm* timep);
 size_t __fastcall__ strftime (char* buf, size_t bufsize, const char* format, const struct tm* tm);
 time_t __fastcall__ time (time_t* t);
+
+
+
+/* POSIX function prototypes */
+int __fastcall__ clock_getres (clockid_t clock_id, struct timespec *res);
+int __fastcall__ clock_gettime (clockid_t clock_id, struct timespec *tp);
+int __fastcall__ clock_settime (clockid_t clock_id, const struct timespec *tp);
 
 
 

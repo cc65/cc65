@@ -7375,7 +7375,7 @@ be used in presence of a prototype.
 <tag/Description/The function returns the time since the 1970-01-01 00:00:00
 measured in seconds. If the pointer <tt/t/ is not <tt/NULL/, the function
 result will also be stored there. If no time is available, <tt/(time_t)-1/ is
-returned and <tt/errno/ is set to <tt/ENOSYS/.
+returned and an error code is stored in <tt/errno/.
 <tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may
 only be used in presence of a prototype.

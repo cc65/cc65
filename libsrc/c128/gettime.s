@@ -1,27 +1,27 @@
 ;
 ; Stefan Haubenthal, 27.7.2009
+; Oliver Schmidt, 14.8.2018
 ;
-; time_t _systime (void);
-; /* Similar to time(), but:
-; **   - Is not ISO C
-; **   - Does not take the additional pointer
-; **   - Does not set errno when returning -1
-; */
+; int clock_gettime (clockid_t clk_id, struct timespec *tp);
 ;
 
         .include        "time.inc"
-        .include        "c64.inc"
+        .include        "c128.inc"
         .include        "get_tv.inc"
 
-        .constructor    initsystime
-        .importzp       tmp1, tmp2
-        .import         _get_tv, _get_ostype
+        .constructor    inittime
+        .importzp       sreg, tmp1, tmp2
+        .import         pushax, pusheax, tosmul0ax, steaxspidx, incsp1, return0
+        .import         _get_tv
 
 
 ;----------------------------------------------------------------------------
 .code
 
-.proc   __systime
+.proc   _clock_gettime
+
+        jsr     pushax
+        jsr     pushax
 
         lda     CIA1_TODHR
         bpl     AM
@@ -38,13 +38,38 @@ AM:     jsr     BCD2dec
         lda     CIA1_TODSEC
         jsr     BCD2dec
         sta     TM + tm::tm_sec
-        lda     CIA1_TOD10              ; Dummy read to unfreeze
         lda     #<TM
         ldx     #>TM
-        jmp     _mktime
+        jsr     _mktime
 
+        ldy     #timespec::tv_sec
+        jsr     steaxspidx      ; Pops address pushed by 2. pushax
+
+        lda     #<(100 * 1000 * 1000 / $10000)
+        ldx     #>(100 * 1000 * 1000 / $10000)
+        sta     sreg
+        stx     sreg+1
+        lda     #<(100 * 1000 * 1000)
+        ldx     #>(100 * 1000 * 1000)
+        jsr     pusheax
+        lda     CIA1_TOD10
+        ldx     #>$0000
+        jsr     tosmul0ax
+
+        ldy     #timespec::tv_nsec
+        jsr     steaxspidx      ; Pops address pushed by 1. pushax
+
+        jsr     incsp1
+        jmp     return0
+
+.endproc
+
+;----------------------------------------------------------------------------
 ; dec = (((BCD>>4)*10) + (BCD&0xf))
-BCD2dec:tax
+
+.proc   BCD2dec
+
+        tax
         and     #%00001111
         sta     tmp1
         txa
@@ -65,16 +90,13 @@ BCD2dec:tax
 ; and write it again, ignoring a possible change in between.
 .segment "ONCE"
 
-.proc   initsystime
+.proc   inittime
 
         lda     CIA1_TOD10
         sta     CIA1_TOD10
         jsr     _get_tv
         cmp     #TV::PAL
         bne     @60Hz
-        jsr     _get_ostype
-        cmp     #$43
-        beq     @60Hz
         lda     CIA1_CRA
         ora     #$80
         sta     CIA1_CRA

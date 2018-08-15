@@ -1,33 +1,28 @@
 ;
 ; Stefan Haubenthal, 2009-07-27
 ; Ullrich von Bassewitz, 2009-09-24
+; Oliver Schmidt, 2018-08-14
 ;
-; time_t _systime (void);
-; /* Similar to time(), but:
-; **   - Is not ISO C
-; **   - Does not take the additional pointer
-; **   - Does not set errno when returning -1
-; */
+; int clock_gettime (clockid_t clk_id, struct timespec *tp);
 ;
 
         .include        "time.inc"
         .include        "cbm610.inc"
         .include        "extzp.inc"
 
+        .import         pushax, pusheax, tosmul0ax, steaxspidx, incsp1
         .import         sys_bank, restore_bank
-        .importzp       tmp1, tmp2
+        .importzp       sreg, tmp1, tmp2
 
 
 ;----------------------------------------------------------------------------
 .code
 
-.proc   __systime
-
-; Switch to the system bank
+.proc   _clock_gettime
 
         jsr     sys_bank
-
-; Read the clock
+        jsr     pushax
+        jsr     pushax
 
         ldy     #CIA::TODHR
         lda     (cia),y
@@ -47,18 +42,33 @@ AM:     jsr     BCD2dec
         lda     (cia),y
         jsr     BCD2dec
         sta     TM + tm::tm_sec
-        ldy     #CIA::TOD10
-        lda     (cia),y                 ; Dummy read to unfreeze
-
-; Restore the bank
-
-        jsr     restore_bank
-
-; Convert to a time
-
         lda     #<TM
         ldx     #>TM
-        jmp     _mktime
+        jsr     _mktime
+
+        ldy     #timespec::tv_sec
+        jsr     steaxspidx      ; Pops address pushed by 2. pushax
+
+        lda     #<(100 * 1000 * 1000 / $10000)
+        ldx     #>(100 * 1000 * 1000 / $10000)
+        sta     sreg
+        stx     sreg+1
+        lda     #<(100 * 1000 * 1000)
+        ldx     #>(100 * 1000 * 1000)
+        jsr     pusheax
+        ldy     #CIA::TOD10
+        lda     (cia),y
+        ldx     #>$0000
+        jsr     tosmul0ax
+
+        ldy     #timespec::tv_nsec
+        jsr     steaxspidx      ; Pops address pushed by 1. pushax
+
+        jsr     incsp1
+
+        lda     #0
+        tax
+        jmp     restore_bank
 
 .endproc
 

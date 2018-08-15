@@ -6,10 +6,10 @@
 
         .export         _time
 
-        .import         __systime
-        .importzp       ptr1, sreg, tmp1
+        .import         decsp1
+        .importzp       ptr1, sreg, tmp1, tmp2
 
-        .include        "errno.inc"
+        .include        "time.inc"
 
 
 .code
@@ -20,8 +20,19 @@
         txa
         pha                     ; Save timep
 
-        jsr     __systime       ; Get the time (machine dependent)
+; Get the time (machine dependent)
 
+        jsr     decsp1
+        lda     #<time
+        ldx     #>time
+        jsr     _clock_gettime
+        sta     tmp2
+        lda     time + timespec::tv_sec+2
+        ldx     time + timespec::tv_sec+3
+        sta     sreg
+        stx     sreg+1
+        lda     time + timespec::tv_sec
+        ldx     time + timespec::tv_sec+1
         sta     tmp1            ; Save low byte of result
 
 ; Restore timep and check if it is NULL
@@ -48,13 +59,15 @@
         lda     tmp1
         sta     (ptr1),y
 
-; If the result is less than zero, set ERRNO
+; If the result is != 0, return -1
 
-@L1:    ldy     sreg+1
-        bpl     @L2
-                  
-        lda     #ENOSYS         ; Function not implemented
-        jsr     __seterrno      ; Set __errno
+@L1:    lda     tmp2
+        beq     @L2
+
+        tax
+        sta     sreg
+        sta     sreg+1
+        rts
 
 ; Reload the low byte of the result and return
 
@@ -63,4 +76,8 @@
 
 .endproc
 
+; ------------------------------------------------------------------------
+; Data
 
+.bss
+time:   .tag    timespec

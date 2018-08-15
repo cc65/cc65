@@ -68,8 +68,10 @@ _clock_gettime:
         ldy     #timespec::tv_sec
         jsr     steaxspidx
 
-        ; Return success
+        ; Cleanup stack
         jsr     incsp1
+
+        ; Return success
         jmp     return0
 
         ; Load errno code

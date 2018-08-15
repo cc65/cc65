@@ -64,7 +64,5 @@
 .global         _clock_getres
 .global         _clock_gettime
 .global         _clock_settime
+.global         _localtime
 .global         _mktime
-
-
-

@@ -169,7 +169,7 @@ static void PVOpen (CPURegs* Regs)
 {
     char Path[1024];
     int OFlag = O_INITIAL;
-    unsigned RetVal, I = 0;
+    unsigned RetVal, I = 0, OMode = 0;
 
     unsigned Mode  = PopParam (Regs->YR - 4);
     unsigned Flags = PopParam (2);
@@ -206,10 +206,14 @@ static void PVOpen (CPURegs* Regs)
         OFlag |= O_EXCL;
     }
 
-    /* Avoid gcc warning */
-    (void) Mode;
+    if (Mode & 0400) {
+        OMode |= S_IREAD;
+    }
+    if (Mode & 0200) {
+        OMode |= S_IWRITE;
+    }
 
-    RetVal = open (Path, OFlag, (mode_t) 0666);
+    RetVal = open (Path, OFlag, OMode);
 
     SetAX (Regs, RetVal);
 }

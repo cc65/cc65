@@ -196,7 +196,7 @@ static void PVOpen (CPURegs* Regs)
         /* If the caller did not supply the mode argument,
         ** use a reasonable default.
         */
-        Mode = 0400 | 0200;
+        Mode = 0x1 | 0x2;
     }
 
     do {
@@ -230,10 +230,10 @@ static void PVOpen (CPURegs* Regs)
         OFlag |= O_EXCL;
     }
 
-    if (Mode & 0400) {
+    if (Mode & 0x1) {
         OMode |= S_IREAD;
     }
-    if (Mode & 0200) {
+    if (Mode & 0x2) {
         OMode |= S_IWRITE;
     }
 

@@ -29,6 +29,7 @@ _clock_settime:
         tya                     ; Restore A
 
         ; Get tm
+        .assert timespec::tv_sec = 0, error
         jsr     _localtime
         sta     ptr1
         stx     ptr1+1

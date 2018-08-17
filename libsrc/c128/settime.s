@@ -20,6 +20,7 @@
 
         jsr     pushax
 
+        .assert timespec::tv_sec = 0, error
         jsr     _localtime
         sta     ptr1
         stx     ptr1+1

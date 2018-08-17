@@ -175,6 +175,13 @@ static void PVOpen (CPURegs* Regs)
     unsigned Flags = PopParam (2);
     unsigned Name  = PopParam (2);
 
+    if (Regs->YR - 4 < 2) {
+        /* If the caller did not supply the mode argument,
+        ** use a reasonable default.
+        */
+        Mode = 0400 | 0200;
+    }
+
     do {
         Path[I] = MemReadByte (Name++);
     }

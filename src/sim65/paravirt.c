@@ -48,6 +48,12 @@
 /* Anyone else */
 #  include <unistd.h>
 #endif
+#ifndef S_IREAD
+#  define S_IREAD  S_IRUSR
+#endif
+#ifndef S_IWRITE
+#  define S_IWRITE S_IWUSR
+#endif
 
 /* common */
 #include "cmdline.h"

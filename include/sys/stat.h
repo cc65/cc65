@@ -48,7 +48,7 @@
 ** https://en.wikipedia.org/wiki/File_system_permissions#Numeric_notation
 ** (S_IREAD and S_IWRITE are aliases for S_IRUSR and S_IWUSR)
 **
-** Must match the values in asminc/stat.inc and src/sim65/paravirt.c
+** Must match the values in src/sim65/paravirt.c
 */
 
 #define S_IREAD  0400

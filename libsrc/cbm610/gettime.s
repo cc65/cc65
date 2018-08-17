@@ -26,13 +26,18 @@
 
         ldy     #CIA::TODHR
         lda     (cia),y
-        bpl     AM
-        and     #%01111111
         sed
+        tax                     ; Save PM flag
+        and     #%01111111
+        cmp     #$12            ; 12 AM/PM
+        bcc     @L1
+        sbc     #$12
+@L1:    inx                     ; Get PM flag
+        bpl     @L2
         clc
         adc     #$12
-        cld
-AM:     jsr     BCD2dec
+@L2:    cld
+        jsr     BCD2dec
         sta     TM + tm::tm_hour
         ldy     #CIA::TODMIN
         lda     (cia),y

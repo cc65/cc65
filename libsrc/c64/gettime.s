@@ -24,13 +24,18 @@
         jsr     pushax
 
         lda     CIA1_TODHR
-        bpl     AM
-        and     #%01111111
         sed
+        tax                     ; Save PM flag
+        and     #%01111111
+        cmp     #$12            ; 12 AM/PM
+        bcc     @L1
+        sbc     #$12
+@L1:    inx                     ; Get PM flag
+        bpl     @L2
         clc
         adc     #$12
-        cld
-AM:     jsr     BCD2dec
+@L2:    cld
+        jsr     BCD2dec
         sta     TM + tm::tm_hour
         lda     CIA1_TODMIN
         jsr     BCD2dec

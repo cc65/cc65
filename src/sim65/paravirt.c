@@ -49,10 +49,18 @@
 #  include <unistd.h>
 #endif
 #ifndef S_IREAD
-#  define S_IREAD  S_IRUSR
+#  ifdef _WIN32
+#    define S_IREAD  _S_IREAD
+#  else
+#    define S_IREAD  S_IRUSR
+#  endif
 #endif
 #ifndef S_IWRITE
-#  define S_IWRITE S_IWUSR
+#  ifdef _WIN32
+#    define S_IWRITE _S_IWRITE
+#  else
+#    define S_IWRITE S_IWUSR
+#  endif
 #endif
 
 /* common */

@@ -15,6 +15,7 @@
         .include        "errno.inc"
         .include        "fcntl.inc"
         .include        "_file.inc"
+        .include        "stat.inc"
 
 
 ; ------------------------------------------------------------------------
@@ -82,7 +83,10 @@ modeok: ldy     #$00
         tya
         iny
         sta     (sp),y
-        ldy     #4              ; Size of arguments in bytes
+        lda     #<(S_IREAD|S_IWRITE)
+        ldx     #>(S_IREAD|S_IWRITE)
+        jsr     pushax          ; Push the "mode" argument onto the stack
+        ldy     #6              ; Size of arguments in bytes
         jsr     _open           ; Will cleanup the stack
 
 ; Check the result of the open() call

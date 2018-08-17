@@ -209,7 +209,7 @@ static void PVOpen (CPURegs* Regs)
     /* Avoid gcc warning */
     (void) Mode;
 
-    RetVal = open (Path, OFlag);
+    RetVal = open (Path, OFlag, (mode_t) 0666);
 
     SetAX (Regs, RetVal);
 }

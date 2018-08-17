@@ -36,6 +36,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #if defined(_WIN32)
 #  define O_INITIAL O_BINARY
 #else

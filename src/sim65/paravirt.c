@@ -185,7 +185,8 @@ static void PVOpen (CPURegs* Regs)
 {
     char Path[1024];
     int OFlag = O_INITIAL;
-    unsigned RetVal, I = 0, OMode = 0;
+    unsigned RetVal, I = 0;
+    mode_t OMode = 0;
 
     unsigned Mode  = PopParam (Regs->YR - 4);
     unsigned Flags = PopParam (2);

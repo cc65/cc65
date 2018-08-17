@@ -12,6 +12,7 @@
 
         .import         pushax, pusheax, tosmul0ax, steaxspidx, incsp1
         .import         sys_bank, restore_bank
+        .import         TM, load_tenth
         .importzp       sreg, tmp1, tmp2
 
 
@@ -54,12 +55,7 @@
         ldy     #timespec::tv_sec
         jsr     steaxspidx      ; Pops address pushed by 2. pushax
 
-        lda     #<(100 * 1000 * 1000 / $10000)
-        ldx     #>(100 * 1000 * 1000 / $10000)
-        sta     sreg
-        stx     sreg+1
-        lda     #<(100 * 1000 * 1000)
-        ldx     #>(100 * 1000 * 1000)
+        jsr     load_tenth
         jsr     pusheax
         ldy     #CIA::TOD10
         lda     (cia),y
@@ -96,18 +92,3 @@
         rts
 
 .endproc
-
-;----------------------------------------------------------------------------
-; TM struct with date set to 1970-01-01
-.data
-
-TM:     .word           0       ; tm_sec
-        .word           0       ; tm_min
-        .word           0       ; tm_hour
-        .word           1       ; tm_mday
-        .word           0       ; tm_mon
-        .word           70      ; tm_year
-        .word           0       ; tm_wday
-        .word           0       ; tm_yday
-        .word           0       ; tm_isdst
-

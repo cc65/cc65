@@ -1,0 +1,93 @@
+;
+; Oliver Schmidt, 16.8.2018
+;
+; int clock_settime (clockid_t clk_id, const struct timespec *tp);
+;
+
+        .include        "time.inc"
+        .include        "cbm510.inc"
+        .include        "extzp.inc"
+
+        .importzp       sreg, ptr1
+        .import         pushax, pusheax, ldax0sp, ldeaxidx
+        .import         sys_bank, restore_bank
+        .import         tosdiveax, incsp3, return0
+        .import         TM, load_tenth
+
+
+;----------------------------------------------------------------------------
+.code
+
+.proc   _clock_settime
+
+        jsr     sys_bank
+        jsr     pushax
+
+        jsr     _localtime
+        sta     ptr1
+        stx     ptr1+1
+        ldy     #.sizeof(tm)-1
+@L1:    lda     (ptr1),y
+        sta     TM,y
+        dey
+        bpl     @L1
+
+        lda     TM + tm::tm_hour
+        jsr     dec2BCD
+        tax                     ; Force flags
+        bne     @L2
+        lda     #$92            ; 12 AM
+        bne     @L3
+@L2:    cmp     #$13            ; 1 PM
+        bcc     @L3
+        sed
+        sbc     #$12
+        cld
+        ora     #%10000000
+@L3:    ldy     #CIA::TODHR
+        sta     (cia2),y
+        lda     TM + tm::tm_min
+        jsr     dec2BCD
+        ldy     #CIA::TODMIN
+        sta     (cia2),y
+        lda     TM + tm::tm_sec
+        jsr     dec2BCD
+        ldy     #CIA::TODSEC
+        sta     (cia2),y
+
+        jsr     ldax0sp
+        ldy     #3+timespec::tv_nsec
+        jsr     ldeaxidx
+        jsr     pusheax
+        jsr     load_tenth
+        jsr     tosdiveax
+        ldy     #CIA::TOD10
+        sta     (cia2),y
+
+        jsr     incsp3
+
+        lda     #0
+        tax
+        jmp     restore_bank
+
+.endproc
+
+;----------------------------------------------------------------------------
+; Just sum up the value in BCD mode.
+; http://forum.6502.org/viewtopic.php?p=7629#p7629
+
+.proc   dec2BCD
+
+        tax
+        dex
+        bmi     @L9
+        lda     #0
+        clc
+        sed
+@L1:    adc     #1
+        dex
+        bpl     @L1
+        cld
+@L9:    rts
+
+.endproc

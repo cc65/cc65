@@ -2,7 +2,7 @@
 /*                                                                           */
 /*                                  stat.h                                   */
 /*                                                                           */
-/*                   Constants for the mode argument of open                 */
+/*              Constants for the mode argument of open and creat            */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -44,10 +44,9 @@
 
 
 
-/* Must match the values in src/sim65/paravirt.c */
+#define S_IREAD  0x01
+#define S_IWRITE 0x02
 
-#define S_IREAD  0x1
-#define S_IWRITE 0x2
 
 
 /*****************************************************************************/

@@ -36,7 +36,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <fcntl.h>
-#include <sys/types.h>
 #include <sys/stat.h>
 #if defined(_WIN32)
 #  define O_INITIAL O_BINARY
@@ -51,18 +50,10 @@
 #  include <unistd.h>
 #endif
 #ifndef S_IREAD
-#  ifdef _WIN32
-#    define S_IREAD  _S_IREAD
-#  else
-#    define S_IREAD  S_IRUSR
-#  endif
+#  define S_IREAD  S_IRUSR
 #endif
 #ifndef S_IWRITE
-#  ifdef _WIN32
-#    define S_IWRITE _S_IWRITE
-#  else
-#    define S_IWRITE S_IWUSR
-#  endif
+#  define S_IWRITE S_IWUSR
 #endif
 
 /* common */
@@ -185,18 +176,18 @@ static void PVOpen (CPURegs* Regs)
 {
     char Path[1024];
     int OFlag = O_INITIAL;
+    int OMode = 0;
     unsigned RetVal, I = 0;
-    mode_t OMode = 0;
 
     unsigned Mode  = PopParam (Regs->YR - 4);
     unsigned Flags = PopParam (2);
     unsigned Name  = PopParam (2);
 
     if (Regs->YR - 4 < 2) {
-        /* If the caller did not supply the mode argument,
-        ** use a reasonable default.
+        /* If the caller didn't supply the mode
+        ** argument, use a reasonable default.
         */
-        Mode = 0x1 | 0x2;
+        Mode = 0x01 | 0x02;
     }
 
     do {
@@ -230,10 +221,10 @@ static void PVOpen (CPURegs* Regs)
         OFlag |= O_EXCL;
     }
 
-    if (Mode & 0x1) {
+    if (Mode & 0x01) {
         OMode |= S_IREAD;
     }
-    if (Mode & 0x2) {
+    if (Mode & 0x02) {
         OMode |= S_IWRITE;
     }
 

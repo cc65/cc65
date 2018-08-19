@@ -1,7 +1,8 @@
 ;
-; Stefan Haubenthal, 2009-07-27
-; Ullrich von Bassewitz, 2009-09-24
-; Oliver Schmidt, 2018-08-14
+; 2009-07-27, Stefan Haubenthal
+; 2009-09-24, Ullrich von Bassewitz
+; 2018-08-18, Oliver Schmidt
+; 2018-08-19, Greg King
 ;
 ; int clock_gettime (clockid_t clk_id, struct timespec *tp);
 ;
@@ -21,10 +22,10 @@
 
 .proc   _clock_gettime
 
-        jsr     sys_bank
         jsr     pushax
         jsr     pushax
 
+        jsr     sys_bank
         ldy     #CIA::TODHR
         lda     (cia2),y
         sed
@@ -48,6 +49,10 @@
         lda     (cia2),y
         jsr     BCD2dec
         sta     TM + tm::tm_sec
+        ldy     #CIA::TOD10
+        lda     (cia2),y
+        jsr     restore_bank
+        pha
         lda     #<TM
         ldx     #>TM
         jsr     _mktime
@@ -57,19 +62,16 @@
 
         jsr     load_tenth
         jsr     pusheax
-        ldy     #CIA::TOD10
-        lda     (cia2),y
+        pla
         ldx     #>$0000
         jsr     tosmul0ax
 
         ldy     #timespec::tv_nsec
         jsr     steaxspidx      ; Pops address pushed by 1. pushax
 
-        jsr     incsp1
-
-        lda     #0
+        lda     #$00
         tax
-        jmp     restore_bank
+        jmp     incsp1
 
 .endproc
 

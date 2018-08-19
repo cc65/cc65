@@ -1,5 +1,6 @@
 ;
-; Oliver Schmidt, 16.8.2018
+; 2018-08-18, Oliver Schmidt
+; 2018-08-19, Greg King
 ;
 ; int clock_settime (clockid_t clk_id, const struct timespec *tp);
 ;
@@ -20,7 +21,6 @@
 
 .proc   _clock_settime
 
-        jsr     sys_bank
         jsr     pushax
 
         .assert timespec::tv_sec = 0, error
@@ -33,6 +33,7 @@
         dey
         bpl     @L1
 
+        jsr     sys_bank
         lda     TM + tm::tm_hour
         jsr     dec2BCD
         tax                     ; Force flags
@@ -55,6 +56,7 @@
         jsr     dec2BCD
         ldy     #CIA::TODSEC
         sta     (cia),y
+        jsr     restore_bank
 
         jsr     ldax0sp
         ldy     #3+timespec::tv_nsec
@@ -62,14 +64,15 @@
         jsr     pusheax
         jsr     load_tenth
         jsr     tosdiveax
+
+        jsr     sys_bank
         ldy     #CIA::TOD10
         sta     (cia),y
+        jsr     restore_bank
 
-        jsr     incsp3
-
-        lda     #0
+        lda     #$00
         tax
-        jmp     restore_bank
+        jmp     incsp3
 
 .endproc
 

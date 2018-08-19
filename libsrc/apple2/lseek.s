@@ -84,6 +84,14 @@ seek_common:
         jsr     callmli
         bcs     oserr
 
+        ; Need to return the position in EAX
+        lda     #0
+        sta     sreg+1
+        lda     mliparam + MLI::MARK::POSITION+2
+        sta     sreg
+        ldx     mliparam + MLI::MARK::POSITION+1
+        lda     mliparam + MLI::MARK::POSITION
+
         rts
 
         ; Load errno code

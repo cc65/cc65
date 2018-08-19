@@ -25,11 +25,11 @@
 #endif
 
 static char grid[5][5] = {
-    { CH_ULCORNER, CH_HLINE, CH_TTEE, CH_HLINE, CH_URCORNER },
-    { CH_VLINE, ' ', CH_VLINE, ' ', CH_VLINE },
-    { CH_LTEE, CH_HLINE, CH_CROSS, CH_HLINE, CH_RTEE },
-    { CH_VLINE, ' ', CH_VLINE, ' ', CH_VLINE },
-    { CH_LLCORNER, CH_HLINE, CH_BTEE, CH_HLINE, CH_LRCORNER },
+    {CH_ULCORNER, CH_HLINE, CH_TTEE,  CH_HLINE, CH_URCORNER},
+    {CH_VLINE,    ' ',      CH_VLINE, ' ',      CH_VLINE   },
+    {CH_LTEE,     CH_HLINE, CH_CROSS, CH_HLINE, CH_RTEE    },
+    {CH_VLINE,    ' ',      CH_VLINE, ' ',      CH_VLINE   },
+    {CH_LLCORNER, CH_HLINE, CH_BTEE, CH_HLINE,  CH_LRCORNER}
 };
 
 void main(void)
@@ -50,35 +50,36 @@ void main(void)
         tcol = textcolor(0); /* remember original textcolor */
         bgcol = bgcolor(0); /* remember original background color */
         bcol = bordercolor(0); /* remember original border color */
-        bgcolor(bgcol);bordercolor(bcol);
+        (void)bgcolor(bgcol);
+        (void)bordercolor(bcol);
         for (i = 0; i < 3; ++i) {
-                gotoxy(i,3 + i);
+                gotoxy(i, 3 + i);
                 for (j = 0; j < NUMCOLS; ++j) {
-                        textcolor(j);
+                        (void)textcolor(j);
                         cputc('X');
                 }
         }
-        textcolor(tcol);
+        (void)textcolor(tcol);
 
-        cprintf("\n\n\r Screensize: %dx%d", xsize, ysize );
+        cprintf("\n\n\r Screensize: %dx%d", xsize, ysize);
 
-        chlinexy(0,6,xsize);
-        cvlinexy(0,6,3);
-        chlinexy(0,8,xsize);
-        cvlinexy(xsize-1,6,3);
-        cputcxy(0,6,CH_ULCORNER);
-        cputcxy(xsize-1,6,CH_URCORNER);
-        cputcxy(0,8,CH_LLCORNER);
-        cputcxy(xsize-1,8,CH_LRCORNER);
+        chlinexy(0, 6, xsize);
+        cvlinexy(0, 6, 3);
+        chlinexy(0, 8, xsize);
+        cvlinexy(xsize - 1, 6, 3);
+        cputcxy(0, 6, CH_ULCORNER);
+        cputcxy(xsize - 1, 6, CH_URCORNER);
+        cputcxy(0, 8, CH_LLCORNER);
+        cputcxy(xsize - 1, 8, CH_LRCORNER);
 
         for (i = 0; i < 5; ++i) {
-                gotoxy(xsize - 5,i);
+                gotoxy(xsize - 5, i);
                 for (j = 0; j < 5; ++j) {
                         cputc(grid[i][j]);
                 }
         }
 
-        gotoxy(0,ysize - 2 - ((NUMCHARS + xsize) / xsize));
+        gotoxy(0, ysize - 2 - ((NUMCHARS + xsize) / xsize));
         revers(1);
         for (i = 0; i < xsize; ++i) {
                 cputc('0' + i % 10);
@@ -112,9 +113,9 @@ void main(void)
                 revers(j ^ 1);
                 cputs(" rvs");
                 revers(0);
-                textcolor(i);
+                (void)textcolor(i);
 
-                gotoxy(7 + inpos,1);
+                gotoxy(7 + inpos, 1);
 
 #if defined(__NES__) || defined(__PCE__) || defined(__GAMATE__)
                 /* not all targets have waitvsync */
@@ -125,24 +126,35 @@ void main(void)
                 cprintf("%02x", joy);
 #else
                 i = cgetc();
-                if ((i >= '0') && (i<='9')) {
-                    textcolor(i - '0');
+                if ((i >= '0') && (i <= '9')) {
+                    (void)textcolor(i - '0');
+                } else if (i == CH_ENTER) {
+                    clrscr();
+                    return;
                 } else if (i == CH_CURS_LEFT) {
                     inpos = (inpos - 1) & 7;
                 } else if (i == CH_CURS_RIGHT) {
                     inpos = (inpos + 1) & 7;
+#ifdef CH_F5
                 } else if (i == CH_F5) {
                     bgcol = (bgcol + 1) & 0x0f;
-                    bordercolor(bgcol);
+                    (void)bordercolor(bgcol);
+#endif
+#ifdef CH_F6
                 } else if (i == CH_F6) {
                     bgcol = (bgcol - 1) & 0x0f;
-                    bordercolor(bgcol);
+                    (void)bordercolor(bgcol);
+#endif
+#ifdef CH_F7
                 } else if (i == CH_F7) {
                     bgcol = (bgcol + 1) & 0x0f;
-                    bgcolor(bgcol);
+                    (void)bgcolor(bgcol);
+#endif
+#ifdef CH_F8
                 } else if (i == CH_F8) {
                     bgcol = (bgcol - 1) & 0x0f;
-                    bgcolor(bgcol);
+                    (void)bgcolor(bgcol);
+#endif
                 } else {
                     cputc(i);
                     inpos = (inpos + 1) & 7;

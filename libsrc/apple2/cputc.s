@@ -50,6 +50,7 @@ cputdirect:
         lda     CH
         cmp     WNDWDTH
         bcc     :+
+        jsr     newline
 left:   lda     #$00            ; Goto left edge of screen
         sta     CH
 :       rts

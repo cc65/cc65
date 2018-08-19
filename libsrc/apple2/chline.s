@@ -18,12 +18,10 @@ _chlinexy:
 
 _chline:
         .ifdef  __APPLE2ENH__
-        ldx     #'S'            ; MouseText character
-        ldy     INVFLG
-        cpy     #$FF            ; Normal character display mode?
-        beq     chlinedirect
+        ldx     #'_' | $80      ; Underscore, screen code
+        .else
+        ldx     #'-' | $80      ; Minus, screen code
         .endif
-        ldx     #'-' | $80      ; Horizontal line, screen code
 
 chlinedirect:
         stx     tmp1

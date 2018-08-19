@@ -36,7 +36,7 @@ _mouse_def_callbacks:
         .data
 
         .ifdef  __APPLE2ENH__
-cursor = 'B'                    ; MouseText character
+cursor = $42                    ; Pointer MouseText character
         .else
 cursor = '+' | $40              ; Flashing crosshair
         .endif

@@ -6,7 +6,7 @@
 
         .export         _time
 
-        .import         decsp1
+        .import         decsp1, ldeaxi
         .importzp       ptr1, sreg, tmp1, tmp2
 
         .include        "time.inc"
@@ -27,12 +27,10 @@
         ldx     #>time
         jsr     _clock_gettime
         sta     tmp2
-        lda     time + timespec::tv_sec+2
-        ldx     time + timespec::tv_sec+3
-        sta     sreg
-        stx     sreg+1
-        lda     time + timespec::tv_sec
-        ldx     time + timespec::tv_sec+1
+        lda     #<time
+        ldx     #>time
+        .assert timespec::tv_sec = 0, error
+        jsr     ldeaxi
         sta     tmp1            ; Save low byte of result
 
 ; Restore timep and check if it is NULL

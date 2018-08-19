@@ -635,7 +635,7 @@ static const struct {
 /* Instruction table for the 65816 */
 static const struct {
     unsigned Count;
-    InsDesc  Ins[99];
+    InsDesc  Ins[100];
 } InsTab65816 = {
     sizeof (InsTab65816.Ins) / sizeof (InsTab65816.Ins[0]),
     {
@@ -659,7 +659,7 @@ static const struct {
         { "CLI",  0x0000001, 0x58, 0, PutAll },
         { "CLV",  0x0000001, 0xb8, 0, PutAll },
         { "CMP",  0x0b8f6fc, 0xc0, 0, PutAll },
-        { "COP",  0x0000004, 0x02, 6, PutAll },
+        { "COP",  0x0000004, 0x02, 0, PutAll },
         { "CPA",  0x0b8f6fc, 0xc0, 0, PutAll },   /* == CMP */
         { "CPX",  0x0c0000c, 0xe0, 1, PutAll },
         { "CPY",  0x0c0000c, 0xc0, 1, PutAll },
@@ -736,6 +736,7 @@ static const struct {
         { "TYA",  0x0000001, 0x98, 0, PutAll },
         { "TYX",  0x0000001, 0xbb, 0, PutAll },
         { "WAI",  0x0000001, 0xcb, 0, PutAll },
+        { "WDM",  0x0000004, 0x42, 0, PutAll },
         { "XBA",  0x0000001, 0xeb, 0, PutAll },
         { "XCE",  0x0000001, 0xfb, 0, PutAll }
     }

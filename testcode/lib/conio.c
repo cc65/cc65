@@ -1,5 +1,5 @@
 /*
- * conio api test program
+ * conio API test program
  *
  * keys:
  *
@@ -29,12 +29,12 @@ static char grid[5][5] = {
     {CH_VLINE,    ' ',      CH_VLINE, ' ',      CH_VLINE   },
     {CH_LTEE,     CH_HLINE, CH_CROSS, CH_HLINE, CH_RTEE    },
     {CH_VLINE,    ' ',      CH_VLINE, ' ',      CH_VLINE   },
-    {CH_LLCORNER, CH_HLINE, CH_BTEE, CH_HLINE,  CH_LRCORNER}
+    {CH_LLCORNER, CH_HLINE, CH_BTEE,  CH_HLINE, CH_LRCORNER}
 };
 
 void main(void)
 {
-        int i, j, n;
+        unsigned int i, j, n;
         unsigned char xsize, ysize, tcol, bgcol, bcol, inpos = 0;
 #if defined(__NES__) || defined(__PCE__) || defined(__GAMATE__)
         unsigned char joy;
@@ -44,14 +44,15 @@ void main(void)
         clrscr();
         screensize(&xsize, &ysize);
         cputs("cc65 conio test\n\r");
-        cputs("Input:[        ]");
+        cputs("Input:[        ]");      /* 8 spaces */
+
+        tcol = textcolor(0);    /* memorize original textcolor */
+        bgcol = bgcolor(0);     /* memorize original background color */
+        bcol = bordercolor(0);  /* memorize original border color */
+        (void)bordercolor(bcol);
+        (void)bgcolor(bgcol);
 
         cputsxy(0, 2, "Colors:" );
-        tcol = textcolor(0); /* remember original textcolor */
-        bgcol = bgcolor(0); /* remember original background color */
-        bcol = bordercolor(0); /* remember original border color */
-        (void)bgcolor(bgcol);
-        (void)bordercolor(bcol);
         for (i = 0; i < 3; ++i) {
                 gotoxy(i, 3 + i);
                 for (j = 0; j < NUMCOLS; ++j) {
@@ -61,7 +62,7 @@ void main(void)
         }
         (void)textcolor(tcol);
 
-        cprintf("\n\n\r Screensize: %dx%d", xsize, ysize);
+        cprintf("\n\n\r Screensize: %ux%u", xsize, ysize);
 
         chlinexy(0, 6, xsize);
         cvlinexy(0, 6, 3);
@@ -103,11 +104,10 @@ void main(void)
 
         cursor(1);
         for (;;) {
-
                 /* do the "rvs" blinking */
                 i = textcolor(COLOR_BLACK);
                 gotoxy(8, 2);
-                j = n >> 4 & 1;
+                j = (++n / 16) & 1;
                 revers(j);
                 cputc(j ? 'R' : ' ');
                 revers(j ^ 1);
@@ -126,40 +126,47 @@ void main(void)
                 cprintf("%02x", joy);
 #else
                 i = cgetc();
-                if ((i >= '0') && (i <= '9')) {
-                    (void)textcolor(i - '0');
-                } else if (i == CH_ENTER) {
-                    clrscr();
-                    return;
-                } else if (i == CH_CURS_LEFT) {
-                    inpos = (inpos - 1) & 7;
-                } else if (i == CH_CURS_RIGHT) {
-                    inpos = (inpos + 1) & 7;
+                switch (i) {
+                    case CH_ENTER:
+                        clrscr();
+                        return;
+                    case CH_CURS_LEFT:
+                        inpos = (inpos - 1) % 8;
+                        break;
+                    case '0': case '1': case '2': case '3': case '4':
+                    case '5': case '6': case '7': case '8': case '9':
+                        (void)textcolor(i - '0');
+                        break;
 #ifdef CH_F5
-                } else if (i == CH_F5) {
-                    bgcol = (bgcol + 1) & 0x0f;
-                    (void)bordercolor(bgcol);
+                    case CH_F5:
+                        bcol = (bcol + 1) & 0x0f;
+                        (void)bordercolor(bcol);
+                        break;
 #endif
 #ifdef CH_F6
-                } else if (i == CH_F6) {
-                    bgcol = (bgcol - 1) & 0x0f;
-                    (void)bordercolor(bgcol);
+                    case CH_F6:
+                        bcol = (bcol - 1) & 0x0f;
+                        (void)bordercolor(bcol);
+                        break;
 #endif
 #ifdef CH_F7
-                } else if (i == CH_F7) {
-                    bgcol = (bgcol + 1) & 0x0f;
-                    (void)bgcolor(bgcol);
+                    case CH_F7:
+                        bgcol = (bgcol + 1) & 0x0f;
+                        (void)bgcolor(bgcol);
+                        break;
 #endif
 #ifdef CH_F8
-                } else if (i == CH_F8) {
-                    bgcol = (bgcol - 1) & 0x0f;
-                    (void)bgcolor(bgcol);
+                    case CH_F8:
+                        bgcol = (bgcol - 1) & 0x0f;
+                        (void)bgcolor(bgcol);
+                        break;
 #endif
-                } else {
-                    cputc(i);
-                    inpos = (inpos + 1) & 7;
+                    default:
+                        cputc(i);
+                        /* fallthrough */
+                    case CH_CURS_RIGHT:
+                        inpos = (inpos + 1) % 8;
                 }
 #endif
-                ++n;
         }
 }

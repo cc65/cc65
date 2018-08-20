@@ -47,7 +47,6 @@ MikeyInitData:  .byte $9e,$18,$68,$1f,$00,$00,$00,$00,$00,$ff,$1a,$1b,$04,$0d,$2
 ; Set up the system.
 
         sei
-        cld
         ldx     #$FF
         txs
 

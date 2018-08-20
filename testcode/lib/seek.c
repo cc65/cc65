@@ -23,6 +23,7 @@ int main(int argc, char **argv)
         if (!x) {
             return(0);
         }
+        x[strcspn(x, "\r\n")] = 0;
         filename = x;
     }
     else {

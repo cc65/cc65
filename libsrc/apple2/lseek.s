@@ -6,6 +6,7 @@
 
         .export         _lseek
         .import         popax, popptr1
+        .macpack        cpu
 
         .include        "zeropage.inc"
         .include        "errno.inc"
@@ -85,12 +86,12 @@ seek_common:
         bcs     oserr
 
         ; Need to return the position in EAX
-        .ifdef  __APPLE2ENH__
+.if (.cpu .bitand ::CPU_ISET_65SC02)
         stz     sreg+1
-        .else
-        lda     #0
+.else
+        lda     #$00
         sta     sreg+1
-        .endif
+.endif
         lda     mliparam + MLI::MARK::POSITION+2
         sta     sreg
         ldx     mliparam + MLI::MARK::POSITION+1
@@ -102,7 +103,13 @@ seek_common:
 einval: lda     #EINVAL
 
         ; Set __errno
-errno:  jmp     __directerrno
+errno:  ldx     #$FF
+        stx     sreg
+        stx     sreg+1
+        jmp     __directerrno
 
         ; Set __oserror
-oserr:  jmp     __mappederrno
+oserr:  ldx     #$FF
+        stx     sreg
+        stx     sreg+1
+        jmp     __mappederrno

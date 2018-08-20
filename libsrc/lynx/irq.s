@@ -36,7 +36,6 @@ IRQStub:
         phy
         phx
         pha
-        cld
         jsr     callirq
         lda     INTSET
         sta     INTRST

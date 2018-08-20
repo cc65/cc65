@@ -85,8 +85,12 @@ seek_common:
         bcs     oserr
 
         ; Need to return the position in EAX
+        .ifdef  __APPLE2ENH__
+        stz     sreg+1
+        .else
         lda     #0
         sta     sreg+1
+        .endif
         lda     mliparam + MLI::MARK::POSITION+2
         sta     sreg
         ldx     mliparam + MLI::MARK::POSITION+1

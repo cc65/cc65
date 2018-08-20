@@ -39,7 +39,6 @@ start:
         nop
         csh                     ; Set high speed CPU mode
         nop
-        cld
         nop
 
         ; Set up stack and memory mapping

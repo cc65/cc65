@@ -22,6 +22,7 @@ _lseek:
         jsr     popptr1
         jsr     popax
         sta     ptr2
+        stx     ptr2+1
 
         ; Get and process fd
         jsr     popax
@@ -78,6 +79,9 @@ seek_common:
         tya
         adc     ptr2
         sta     mliparam + MLI::MARK::POSITION+2
+        lda     #$00
+        adc     ptr2+1
+        bne     einval          ; less than 0 or greater than 2^24 - 1
 
         ; Set file pointer
         lda     #SET_MARK_CALL
@@ -103,13 +107,13 @@ seek_common:
 einval: lda     #EINVAL
 
         ; Set __errno
-errno:  ldx     #$FF
-        stx     sreg
+errno:  jsr     __directerrno   ; leaves -1 in AX
+        stx     sreg            ; extend return value to 32 bits
         stx     sreg+1
-        jmp     __directerrno
+        rts
 
         ; Set __oserror
-oserr:  ldx     #$FF
-        stx     sreg
+oserr:  jsr     __mappederrno   ; leaves -1 in AX
+        stx     sreg            ; extend return value to 32 bits
         stx     sreg+1
-        jmp     __mappederrno
+        rts

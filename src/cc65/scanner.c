@@ -347,8 +347,8 @@ static int ParseChar (void)
                     Error ("Octal character constant out of range");
                 break;
             default:
-                Error ("Illegal escaped character");
                 C = CurC;
+                Error ("Illegal escaped character: 0x%02X", CurC);
                 break;
         }
     } else {

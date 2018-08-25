@@ -653,6 +653,7 @@ static void ParseSegments (void)
         {   "RW",               CFGTOK_RW               },
         {   "BSS",              CFGTOK_BSS              },
         {   "ZP",               CFGTOK_ZP               },
+        {   "OVERLAY",          CFGTOK_OVERLAY          },
     };
 
     unsigned Count;
@@ -757,6 +758,7 @@ static void ParseSegments (void)
                         case CFGTOK_RW:    /* Default */                    break;
                         case CFGTOK_BSS:   S->Flags |= SF_BSS;              break;
                         case CFGTOK_ZP:    S->Flags |= (SF_BSS | SF_ZP);    break;
+                        case CFGTOK_OVERLAY: S->Flags |= SF_OVERLAY;        break;
                         default:           Internal ("Unexpected token: %d", CfgTok);
                     }
                     CfgNextTok ();
@@ -1795,6 +1797,7 @@ unsigned CfgProcess (void)
     for (I = 0; I < CollCount (&MemoryAreas); ++I) {
         unsigned J;
         unsigned long Addr;
+        unsigned Overlays = 0;
 
         /* Get the next memory area */
         MemoryArea* M = CollAtUnchecked (&MemoryAreas, I);
@@ -1848,6 +1851,29 @@ unsigned CfgProcess (void)
             /* Remember the start address before handling this segment */
             unsigned long StartAddr = Addr;
 
+            /* Take note of overlayed segments and make sure there are no other
+            ** segment types following them in current memory region.
+            */
+            if (S->Flags & SF_OVERLAY) {
+            {
+                if (S->Flags & (SF_OFFSET | SF_START)) {
+                    ++Overlays;
+                } else {
+                    CfgError (GetSourcePos (M->LI),
+                              "Segment `%s' of type `overlay' requires either"
+                              " `Start' or `Offset' argument to be specified.",
+                              GetString (S->Name));
+                }
+            }
+            } else {
+                if (Overlays > 0) {
+                    CfgError (GetSourcePos (M->LI),
+                              "Segment `%s' is preceded by at least one segment"
+                              " of type `overlay'",
+                              GetString (S->Name));
+                }
+            }
+
             /* Some actions depend on whether this is the load or run memory
             ** area.
             */
@@ -1896,22 +1922,33 @@ unsigned CfgProcess (void)
                         /* An offset was given, no address, make an address */
                         NewAddr += M->Start;
                     }
-                    if (NewAddr < Addr) {
-                        /* Offset already too large */
-                        ++Overflows;
-                        if (S->Flags & SF_OFFSET) {
-                            CfgWarning (GetSourcePos (S->LI),
-                                        "Segment `%s' offset is too small in `%s' by %lu byte%c",
-                                        GetString (S->Name), GetString (M->Name),
-                                        Addr - NewAddr, (Addr - NewAddr == 1) ? ' ' : 's');
+
+                    if (S->Flags & SF_OVERLAY) {
+                        if (NewAddr < M->Start) {
+                            CfgError (GetSourcePos (S->LI),
+                                      "Segment `%s' begins before memory area `%s'.",
+                                      GetString (S->Name), GetString (M->Name));
                         } else {
-                            CfgWarning (GetSourcePos (S->LI),
-                                        "Segment `%s' start address is too low in `%s' by %lu byte%c",
-                                        GetString (S->Name), GetString (M->Name),
-                                        Addr - NewAddr, (Addr - NewAddr == 1) ? ' ' : 's');
+                            Addr = NewAddr;
                         }
                     } else {
-                        Addr = NewAddr;
+                        if (NewAddr < Addr) {
+                            /* Offset already too large */
+                            ++Overflows;
+                            if (S->Flags & SF_OFFSET) {
+                                CfgWarning (GetSourcePos (S->LI),
+                                            "Segment `%s' offset is too small in `%s' by %lu byte%c",
+                                            GetString (S->Name), GetString (M->Name),
+                                            Addr - NewAddr, (Addr - NewAddr == 1) ? ' ' : 's');
+                            } else {
+                                CfgWarning (GetSourcePos (S->LI),
+                                            "Segment `%s' start address is too low in `%s' by %lu byte%c",
+                                            GetString (S->Name), GetString (M->Name),
+                                            Addr - NewAddr, (Addr - NewAddr == 1) ? ' ' : 's');
+                            }
+                        } else {
+                            Addr = NewAddr;
+                        }
                     }
                 }
 

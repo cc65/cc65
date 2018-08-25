@@ -105,6 +105,7 @@ typedef enum {
     CFGTOK_RW,
     CFGTOK_BSS,
     CFGTOK_ZP,
+    CFGTOK_OVERLAY,
 
     CFGTOK_O65,
     CFGTOK_BIN,

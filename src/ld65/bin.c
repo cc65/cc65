@@ -193,8 +193,8 @@ static void BinWriteMem (BinDesc* D, MemoryArea* M)
                     NewAddr += M->Start;
                 }
                 if (DoWrite || (M->Flags & MF_FILL) != 0) {
-                    /* Seek back for "overlay" segments */
-                    if (NewAddr < Addr) {
+                    /* Seek in "overlay" segments */
+                    if (S->Flags & SF_OVERLAY) {
                         fseek(D->F, NewAddr - M->Start, SEEK_SET);
                     } else {
                         WriteMult (D->F, M->FillVal, NewAddr-Addr);

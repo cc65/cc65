@@ -118,7 +118,7 @@ static void Usage (void)
             "  --debug-opt name\t\tDebug optimization steps\n"
             "  --dep-target target\t\tUse this dependency target\n"
             "  --disable-opt name\t\tDisable an optimization step\n"
-            "  --eagerly-inline-funcs\t\tEagerly inline some known functions\n"
+            "  --eagerly-inline-funcs\tEagerly inline some known functions\n"
             "  --enable-opt name\t\tEnable an optimization step\n"
             "  --help\t\t\tHelp (this text)\n"
             "  --include-dir dir\t\tSet an include directory search path\n"

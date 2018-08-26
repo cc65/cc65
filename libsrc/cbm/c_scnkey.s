@@ -4,5 +4,6 @@
 ; void cbm_k_scnkey (void);
 ;
 
-        .import         SCNKEY
+        .include        "cbm.inc"
+
         .export         _cbm_k_scnkey := SCNKEY

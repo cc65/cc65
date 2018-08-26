@@ -1,5 +1,5 @@
 /*
-** systime.c
+** gettime.c
 **
 ** Maciej 'YTM/Elysium' Witkowiak, 22.11.2002
 */
@@ -7,7 +7,7 @@
 #include <time.h>
 #include <geos.h>
 
-time_t _systime(void)
+clock_t clock(void)
 {
     struct tm currentTime;
 
@@ -25,7 +25,10 @@ time_t _systime(void)
     return mktime(&currentTime);
 }
 
-clock_t clock(void)
+int clock_gettime(clockid_t, struct timespec *tp)
 {
-    return _systime();
+    tp->tv_sec = clock();
+    tp->tv_nsec = 0;
+
+    return 0;
 }

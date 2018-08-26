@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 28.09.1998
 ;
-; Banking routines for the 610.
+; Banking routines for the 510.
 ;
 
         .export         set_bank, sys_bank, restore_bank
@@ -37,5 +37,3 @@
         pla
         rts
 .endproc
-
-

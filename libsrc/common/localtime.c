@@ -45,31 +45,16 @@
 
 struct tm* __fastcall__ localtime (const time_t* timep)
 {
-    static struct tm timebuf;
     time_t t;
 
-    /* Check the argument */
-    if (timep == 0 || (long) (t = *timep) < 0) {
-        /* Invalid arg */
+    /* Check for a valid time spec */
+    if (timep == 0) {
         return 0;
     }
 
-    /* Since our ints are just 16 bits, split the given time into seconds,
-    ** hours and days. Each of the values will fit in a 16 bit variable.
-    ** The mktime routine will then do the rest.
-    */
-    timebuf.tm_sec  = t % 3600;
-    timebuf.tm_min  = 0;
-    timebuf.tm_hour = (t / 3600) % 24;
-    timebuf.tm_mday = (t / (3600UL * 24UL)) + 1;
-    timebuf.tm_mon  = 0;
-    timebuf.tm_year = 70;       /* Base value is 1/1/1970 */
+    /* Get the time and correct for the time zone offset */
+    t = *timep + _tz.timezone;
 
-    /* Call mktime to do the final conversion */
-    mktime (&timebuf);
-
-    /* Return the result */
-    return &timebuf;
+    /* Use gmtime for conversion */
+    return gmtime (&t);
 }
-
-

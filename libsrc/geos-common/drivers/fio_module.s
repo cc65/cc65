@@ -13,7 +13,7 @@
 FILEDES         = 3             ; first free to use file descriptor
 
             .importzp ptr1, ptr2, ptr3, tmp1
-            .import addysp, popax
+            .import addysp, popax, popptr1
             .import __oserror
             .import _FindFile, _ReadByte
             .export _open, _close, _read
@@ -37,9 +37,7 @@ _open:
 @parmok:
         jsr popax               ; Get flags
         sta tmp1
-        jsr popax               ; Get name
-        sta ptr1
-        stx ptr1+1
+        jsr popptr1             ; Get name
             
         lda filedesc            ; is there a file already open?
         bne @alreadyopen

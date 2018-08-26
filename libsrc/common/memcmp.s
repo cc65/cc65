@@ -5,7 +5,7 @@
 ;
 
         .export         _memcmp
-        .import         popax, return0
+        .import         popax, popptr1, return0
         .importzp       ptr1, ptr2, ptr3
 
 _memcmp:
@@ -24,14 +24,12 @@ _memcmp:
         jsr     popax           ; Get p2
         sta     ptr2
         stx     ptr2+1
-        jsr     popax           ; Get p1
-        sta     ptr1
-        stx     ptr1+1
+        jsr     popptr1         ; Get p1
 
 ; Loop initialization
 
+        ;ldy     #$00           ; Initialize pointer (Y=0 guaranteed by popptr1)
         ldx     ptr3            ; Load low counter byte into X
-        ldy     #$00            ; Initialize pointer
 
 ; Head of compare loop: Test for the end condition
 

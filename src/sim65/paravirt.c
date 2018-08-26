@@ -36,6 +36,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <sys/stat.h>
 #if defined(_WIN32)
 #  define O_INITIAL O_BINARY
 #else
@@ -47,6 +48,12 @@
 #else
 /* Anyone else */
 #  include <unistd.h>
+#endif
+#ifndef S_IREAD
+#  define S_IREAD  S_IRUSR
+#endif
+#ifndef S_IWRITE
+#  define S_IWRITE S_IWUSR
 #endif
 
 /* common */
@@ -169,11 +176,19 @@ static void PVOpen (CPURegs* Regs)
 {
     char Path[1024];
     int OFlag = O_INITIAL;
+    int OMode = 0;
     unsigned RetVal, I = 0;
 
     unsigned Mode  = PopParam (Regs->YR - 4);
     unsigned Flags = PopParam (2);
     unsigned Name  = PopParam (2);
+
+    if (Regs->YR - 4 < 2) {
+        /* If the caller didn't supply the mode
+        ** argument, use a reasonable default.
+        */
+        Mode = 0x01 | 0x02;
+    }
 
     do {
         Path[I] = MemReadByte (Name++);
@@ -206,10 +221,14 @@ static void PVOpen (CPURegs* Regs)
         OFlag |= O_EXCL;
     }
 
-    /* Avoid gcc warning */
-    (void) Mode;
+    if (Mode & 0x01) {
+        OMode |= S_IREAD;
+    }
+    if (Mode & 0x02) {
+        OMode |= S_IWRITE;
+    }
 
-    RetVal = open (Path, OFlag);
+    RetVal = open (Path, OFlag, OMode);
 
     SetAX (Regs, RetVal);
 }

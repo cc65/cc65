@@ -635,7 +635,7 @@ static const struct {
 /* Instruction table for the 65816 */
 static const struct {
     unsigned Count;
-    InsDesc  Ins[99];
+    InsDesc  Ins[100];
 } InsTab65816 = {
     sizeof (InsTab65816.Ins) / sizeof (InsTab65816.Ins[0]),
     {
@@ -650,7 +650,7 @@ static const struct {
         { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
         { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
         { "BRA",  0x0020000, 0x80, 0, PutPCRel8 },
-        { "BRK",  0x0000005, 0x00, 0, PutAll },
+        { "BRK",  0x0000005, 0x00, 6, PutAll },
         { "BRL",  0x0040000, 0x82, 0, PutPCRel16 },
         { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
         { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
@@ -736,6 +736,7 @@ static const struct {
         { "TYA",  0x0000001, 0x98, 0, PutAll },
         { "TYX",  0x0000001, 0xbb, 0, PutAll },
         { "WAI",  0x0000001, 0xcb, 0, PutAll },
+        { "WDM",  0x0000004, 0x42, 6, PutAll },
         { "XBA",  0x0000001, 0xeb, 0, PutAll },
         { "XCE",  0x0000001, 0xfb, 0, PutAll }
     }
@@ -758,7 +759,7 @@ static const struct {
         { "BNZ",  AMSW16_BRA,              0x07, 0, PutSweet16Branch },
         { "BP",   AMSW16_BRA,              0x04, 0, PutSweet16Branch },
         { "BR",   AMSW16_BRA,              0x01, 0, PutSweet16Branch },
-        { "BS",   AMSW16_BRA,              0x0B, 0, PutSweet16Branch },
+        { "BS",   AMSW16_BRA,              0x0C, 0, PutSweet16Branch },
         { "BZ",   AMSW16_BRA,              0x06, 0, PutSweet16Branch },
         { "CPR",  AMSW16_REG,              0xD0, 0, PutSweet16 },
         { "DCR",  AMSW16_REG,              0xF0, 0, PutSweet16 },
@@ -1295,13 +1296,39 @@ static void PutPCRel4510 (const InsDesc* Ins)
 }
 
 
+
 static void PutBlockMove (const InsDesc* Ins)
 /* Handle the blockmove instructions (65816) */
 {
+    ExprNode* Arg1;
+    ExprNode* Arg2;
+
     Emit0 (Ins->BaseCode);
-    EmitByte (Expression ());
+
+    if (CurTok.Tok == TOK_HASH) {
+        /* The operand is a bank-byte expression. */
+        NextTok ();
+        Arg1 = Expression ();
+    } else {
+        /* The operand is a far-address expression.
+        ** Use only its bank part.
+        */
+        Arg1 = FuncBankByte ();
+    }
     ConsumeComma ();
-    EmitByte (Expression ());
+
+    if (CurTok.Tok == TOK_HASH) {
+        NextTok ();
+        Arg2 = Expression ();
+    } else {
+        Arg2 = FuncBankByte ();
+    }
+
+    /* The operands are written in Assembly code as source, destination;
+    ** but, they're assembled as <destination> <source>.
+    */
+    EmitByte (Arg2);
+    EmitByte (Arg1);
 }
 
 

@@ -5,7 +5,7 @@
 ;
 
         .export         _memchr
-        .import         popax, return0
+        .import         popax, popptr1, return0
         .importzp       ptr1, ptr2
 
 
@@ -18,11 +18,10 @@
         sta     ptr2+1          ; Save ones complement of n
         jsr     popax           ; get c
         pha
-        jsr     popax           ; get p
-        sta     ptr1
-        stx     ptr1+1
 
-        ldy     #$00
+        jsr     popptr1         ; get p
+
+        ; ldy     #$00            is guaranteed by popptr1
         pla                     ; Get c
         ldx     ptr2            ; Use X as low counter byte
 

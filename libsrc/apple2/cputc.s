@@ -37,7 +37,7 @@ _cputc:
         beq     left
         cmp     #$0A            ; Test for \n = line feed
         beq     newline
-        ora     #$80            ; Turn on high bit
+        eor     #$80            ; Invert high bit
         .ifndef __APPLE2ENH__
         cmp     #$E0            ; Test for lowercase
         bcc     cputdirect
@@ -50,6 +50,7 @@ cputdirect:
         lda     CH
         cmp     WNDWDTH
         bcc     :+
+        jsr     newline
 left:   lda     #$00            ; Goto left edge of screen
         sta     CH
 :       rts

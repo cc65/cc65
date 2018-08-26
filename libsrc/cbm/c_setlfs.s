@@ -6,11 +6,12 @@
 ;                                 unsigned char SA);
 ;
 
+        .include        "cbm.inc"
+
         .export         _cbm_k_setlfs
-        .import         SETLFS
         .import         popa
         .importzp       tmp1
-                              
+
 
 _cbm_k_setlfs:
         sta     tmp1            ; Save SA
@@ -19,5 +20,3 @@ _cbm_k_setlfs:
         jsr     popa            ; Get LFN
         ldy     tmp1            ; Get SA
         jmp     SETLFS
-
-

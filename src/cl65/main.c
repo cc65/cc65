@@ -192,6 +192,38 @@ static void DisableAssemblingAndLinking (void)
 
 
 
+static char* CmdAllocArg (const char* Arg, unsigned Len)
+/* Alloc (potentially quoted) argument */
+{
+    char* Alloc;
+
+/* The Microsoft docs say on spawnvp():
+** Spaces embedded in strings may cause unexpected behavior; for example,
+** passing _spawn the string "hi there" will result in the new process getting
+** two arguments, "hi" and "there". If the intent was to have the new process
+** open a file named "hi there", the process would fail. You can avoid this by
+** quoting the string: "\"hi there\"".
+*/
+#if defined(_WIN32)
+    /* Quote argument if it contains space(s) */
+    if (memchr (Arg, ' ', Len)) {
+        Alloc = xmalloc (Len + 3);
+        Alloc[0] = '"';
+        memcpy (Alloc + 1, Arg, Len);
+        Alloc[Len + 1] = '"';
+        Alloc[Len + 2] = '\0';
+    } else
+#endif
+    {
+        Alloc = xmalloc (Len + 1);
+        memcpy (Alloc, Arg, Len);
+        Alloc[Len] = '\0';
+    }
+    return Alloc;
+}
+
+
+
 static void CmdExpand (CmdDesc* Cmd)
 /* Expand the argument vector */
 {
@@ -215,7 +247,7 @@ static void CmdAddArg (CmdDesc* Cmd, const char* Arg)
 
     /* Add a copy of the new argument, allow a NULL pointer */
     if (Arg) {
-        Cmd->Args[Cmd->ArgCount++] = xstrdup (Arg);
+        Cmd->Args[Cmd->ArgCount++] = CmdAllocArg (Arg, strlen (Arg));
     } else {
         Cmd->Args[Cmd->ArgCount++] = 0;
     }
@@ -250,9 +282,7 @@ static void CmdAddArgList (CmdDesc* Cmd, const char* ArgList)
             }
 
             /* Add the new argument */
-            Cmd->Args[Cmd->ArgCount] = memcpy (xmalloc (Len + 1), Arg, Len);
-            Cmd->Args[Cmd->ArgCount][Len] = '\0';
-            ++Cmd->ArgCount;
+            Cmd->Args[Cmd->ArgCount++] = CmdAllocArg (Arg, Len);
 
             /* If the argument was terminated by a comma, skip it, otherwise
             ** we're done.
@@ -1165,14 +1195,24 @@ static void OptPrintTargetPath (const char* Opt attribute ((unused)),
                                 const char* Arg attribute ((unused)))
 /* Print the target file path */
 {
-    SearchPaths* TargetPath = NewSearchPath ();
-    AddSubSearchPathFromEnv (TargetPath, "CC65_HOME", "target");
-#if defined(CL65_TGT) && !defined(_WIN32)
-    AddSearchPath (TargetPath, STRINGIZE (CL65_TGT));
-#endif
-    AddSubSearchPathFromWinBin (TargetPath, "target");
+    char* TargetPath;
 
-    printf ("%s\n", GetSearchPath (TargetPath, 0));
+    SearchPaths* TargetPaths = NewSearchPath ();
+    AddSubSearchPathFromEnv (TargetPaths, "CC65_HOME", "target");
+#if defined(CL65_TGT) && !defined(_WIN32)
+    AddSearchPath (TargetPaths, STRINGIZE (CL65_TGT));
+#endif
+    AddSubSearchPathFromWinBin (TargetPaths, "target");
+
+    TargetPath = GetSearchPath (TargetPaths, 0);
+    while (*TargetPath) {
+        if (*TargetPath == ' ') {
+            /* Escape spaces */
+            putchar ('\\');
+        }
+        putchar (*TargetPath++);
+    }
+    putchar ('\n');
     exit (EXIT_SUCCESS);
 }
 

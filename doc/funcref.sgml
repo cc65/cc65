@@ -4,7 +4,7 @@
 <title>cc65 function reference
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
-<date>2018-02-07
+<date>2018-05-29
 
 <abstract>
 cc65 is a C compiler for 6502 based systems. This function reference describes
@@ -104,8 +104,6 @@ function.
 <item>_dos_type
 <item><ref id="get_ostype" name="get_ostype">
 <item>rebootafterexit
-<item>textframe
-<item>textframexy
 <item><ref id="videomode" name="videomode">
 </itemize>
 
@@ -200,11 +198,14 @@ function.
 <item><ref id="cbm_k_readst" name="cbm_k_readst">
 <item><ref id="cbm_k_save" name="cbm_k_save">
 <item><ref id="cbm_k_scnkey" name="cbm_k_scnkey">
+<item><ref id="cbm_k_second" name="cbm_k_second">
 <item><ref id="cbm_k_setlfs" name="cbm_k_setlfs">
 <item><ref id="cbm_k_setnam" name="cbm_k_setnam">
 <item><ref id="cbm_k_talk" name="cbm_k_talk">
+<item><ref id="cbm_k_tksa" name="cbm_k_tksa">
 <item><ref id="cbm_k_udtim" name="cbm_k_udtim">
 <item><ref id="cbm_k_unlsn" name="cbm_k_unlsn">
+<item><ref id="cbm_k_untlk" name="cbm_k_untlk">
 <!-- <item><ref id="cbm_load" name="cbm_load"> -->
 <!-- <item><ref id="cbm_open" name="cbm_open"> -->
 <!-- <item><ref id="cbm_opendir" name="cbm_opendir"> -->
@@ -356,6 +357,9 @@ function.
 
 
 <sect1><tt/em.h/<label id="em.h"><p>
+
+This header file contains definitions for extended memory access,
+see also <tt>testcode/lib/em-test.c</tt> and <tt>samples/multidemo.c</tt>.
 
 <itemize>
 <item><ref id="em_commit" name="em_commit">
@@ -543,8 +547,8 @@ It does not declare any functions.
 
 <sect1><tt/serial.h/<label id="serial.h"><p>
 
-The <tt/serial.h/ header file contains definitions for initializing serial
-communication.
+This header file contains definitions for initializing serial
+communication, see also <tt>testcode/lib/ser-test.c</tt>.
 
 <itemize>
 <item><ref id="ser_close" name="ser_close">
@@ -711,6 +715,7 @@ communication.
 <item><ref id="strncmp" name="strncmp">
 <item><ref id="strncpy" name="strncpy">
 <item><ref id="strnicmp" name="strnicmp">
+<item><ref id="strpbrk" name="strpbrk">
 <item><ref id="strqtok" name="strqtok">
 <item><ref id="strrchr" name="strrchr">
 <item><ref id="strspn" name="strspn">
@@ -2087,7 +2092,7 @@ only be used in presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
-<ref id="cbm_k_unlsn" name="cbm_k_unlsn">,
+<ref id="cbm_k_unlsn" name="cbm_k_unlsn">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -2219,6 +2224,31 @@ function, in order to provide input from the keyboard.
 </quote>
 
 
+<sect1>cmb_k_second<label id="cbm_k_second"><p>
+
+<quote>
+<descrip>
+<tag/Function/Send secondary address for LISTEN.
+<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
+<tag/Declaration/<tt/void __fastcall__ cbm_k_second (unsigned char addr);/
+<tag/Description/This function is used to send a secondary address to an I/O
+device after a call to LISTEN is made, and the device is commanded to LISTEN.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may
+only be used in presence of a prototype.
+<item>The function can only be called after a call to LISTEN.
+<item>The function will not work after a TALK.
+<item>When a secondary address is to be sent to a device on the serial bus,
+the address must first be ORed with $60.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cbm_k_listen" name="cbm_k_listen">
+<tag/Exampe/None.
+</descrip>
+</quote>
+
+
 <sect1>cbm_k_setlfs<label id="cbm_k_setlfs"><p>
 
 <quote>
@@ -2284,6 +2314,28 @@ only be used in presence of a prototype.
 </quote>
 
 
+<sect1>cbm_k_tksa<label id="cbm_k_tksa"><p>
+
+<quote>
+<descrip>
+<tag/Function/Send TALK secondary address to serial bus
+<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
+<tag/Declaration/<tt/void __fastcall__ cbm_k_tksa (unsigned char addr);/
+<tag/Description/This function transmits a secondary address on the serial bus for a TALK device.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may
+only be used in presence of a prototype.
+<item>The function can only be called after a call to TALK.
+<item>The function will not work after a LISTEN.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cbm_k_talk" name="cbm_k_talk">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>cbm_k_udtim<label id="cbm_k_udtim"><p>
 
 <quote>
@@ -2319,12 +2371,31 @@ bus. Only devices previously commanded to LISTEN are affected. This
 function is normally used after the host computer is finished sending data
 to external devices. Sending the UNLISTEN commands the listening devices
 to get off the serial bus so it can be used for other purposes.
-<tag/Notes/<itemize>
-<item>
-</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="cbm_k_listen" name="cbm_k_listen">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cbm_k_untlk<label id="cbm_k_untlk"><p>
+
+<quote>
+<descrip>
+<tag/Function/Send an UNTALK command
+<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
+<tag/Declaration/<tt/void cbm_k_untlk (void);/
+<tag/Description/This function commands all devices on the serial bus to
+stop sending data to the host computer (i.e., UNTALK). Calling this
+function results in an UNTALK command being transmitted on the serial
+bus. Only devices previously commanded to TALK are affected. This
+function is normally used after the host computer is finished listening to data
+from an external device. Sending the UNTALK commands the sending devices
+to get off the serial bus so it can be used for other purposes.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cbm_k_talk" name="cbm_k_talk">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -5843,7 +5914,7 @@ if (rename (OLDNAME, NEWNAME) == 0) {
 before a call to <tt/set_brk/.
 <tag/Notes/<itemize>
 <item>The break vector is reset on program termination, so it's not strictly
-necessary to call this function as a part of your clean-up when exitting the program.
+necessary to call this function as a part of your clean-up when exiting the program.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
@@ -5865,7 +5936,7 @@ necessary to call this function as a part of your clean-up when exitting the pro
 <tag/Description/<tt/reset_irq/ resets the C level interrupt request vector.
 <tag/Notes/<itemize>
 <item>The interrupt vector is reset on program termination, so it's not strictly
-necessary to call this function as a part of your clean-up when exitting the program.
+necessary to call this function as a part of your clean-up when exiting the program.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
@@ -6226,7 +6297,7 @@ the continue with the interrupted code, you have to adjust <tt/brk_pc/,
 otherwise the <tt/BRK/ instruction will get executed over and over again.
 <item>The break vector is reset on program termination, so it's not strictly
 necessary to call <tt/<ref id="reset_brk" name="reset_brk">/ as a part of your
-clean-up when exitting the program.
+clean-up when exiting the program.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
@@ -6264,7 +6335,7 @@ enable stack checks for the handler function or any other function called from
 it.
 <item>The interrupt vector is reset on program termination, so it's not strictly
 necessary to call <tt/<ref id="reset_irq" name="reset_irq">/ as a part of your
-clean-up when exitting the program.
+clean-up when exiting the program.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
@@ -6730,6 +6801,7 @@ be used in presence of a prototype.
 </itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
+<ref id="strpbrk" name="strpbrk">,
 <ref id="strqtok" name="strqtok">,
 <ref id="strspn" name="strspn">,
 <ref id="strstr" name="strstr">,
@@ -7020,6 +7092,32 @@ be used in presence of a prototype.
 </quote>
 
 
+<sect1>strpbrk<label id="strpbrk"><p>
+
+<quote>
+<descrip>
+<tag/Function/Find a character in a string, from a set of characters.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/char* __fastcall__ strpbrk (const char* str, const char* set);/
+<tag/Description/<tt/strpbrk()/ searches within <tt/str/ for the first
+occurance of any character from <tt/set/.  It returns a pointer to that
+character if found; otherwise, it returns <tt/NULL/.
+<tag/Notes/<itemize>
+<item>The function is available only as a fastcall function;
+so, it should be used only in the presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="strchr" name="strchr">,
+<ref id="strcspn" name="strcspn">,
+<ref id="strqtok" name="strqtok">,
+<ref id="strspn" name="strspn">,
+<ref id="strtok" name="strtok">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>strqtok<label id="strqtok"><p>
 
 <quote>
@@ -7044,7 +7142,7 @@ a second <tt/s1/ string before it finishes the first one.
 <tag/Availability/cc65
 <tag/See also/
 <ref id="strcspn" name="strcspn">,
-<!-- <ref id="strpbrk" name="strpbrk">, -->
+<ref id="strpbrk" name="strpbrk">,
 <ref id="strspn" name="strspn">,
 <ref id="strtok" name="strtok">
 <tag/Example/None.
@@ -7092,6 +7190,7 @@ be used in presence of a prototype.
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="strcspn" name="strcspn">,
+<ref id="strpbrk" name="strpbrk">,
 <ref id="strstr" name="strstr">
 <tag/Example/None.
 </descrip>
@@ -7144,7 +7243,7 @@ a second <tt/s1/ string before it finishes the first one.
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="strcspn" name="strcspn">,
-<!-- <ref id="strpbrk" name="strpbrk">, -->
+<ref id="strpbrk" name="strpbrk">,
 <ref id="strqtok" name="strqtok">,
 <ref id="strspn" name="strspn">
 <tag/Example/None.
@@ -7274,7 +7373,7 @@ be used in presence of a prototype.
 <tag/Description/The function returns the time since the 1970-01-01 00:00:00
 measured in seconds. If the pointer <tt/t/ is not <tt/NULL/, the function
 result will also be stored there. If no time is available, <tt/(time_t)-1/ is
-returned and <tt/errno/ is set to <tt/ENOSYS/.
+returned and an error code is stored in <tt/errno/.
 <tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may
 only be used in presence of a prototype.

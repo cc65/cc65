@@ -5,7 +5,7 @@
 ;
 
         .export         _strncmp
-        .import         popax
+        .import         popax, popptr1
         .importzp       ptr1, ptr2, ptr3
 
 
@@ -28,13 +28,11 @@ _strncmp:
         jsr     popax           ; get s2
         sta     ptr2
         stx     ptr2+1
-        jsr     popax           ; get s1
-        sta     ptr1
-        stx     ptr1+1
+        jsr     popptr1         ; get s1
 
 ; Loop setup
 
-        ldy     #0
+        ;ldy     #0               Y=0 guaranteed by popptr1
 
 ; Start of compare loop. Check the counter.
 

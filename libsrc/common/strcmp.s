@@ -5,16 +5,14 @@
 ;
 
         .export         _strcmp
-        .import         popax
+        .import         popptr1
         .importzp       ptr1, ptr2
 
 _strcmp:
         sta     ptr2            ; Save s2
         stx     ptr2+1
-        jsr     popax           ; Get s1
-        sta     ptr1
-        stx     ptr1+1
-        ldy     #0
+        jsr     popptr1         ; Get s1
+        ;ldy     #0             ; Y=0 guaranteed by popptr1
 
 loop:   lda     (ptr1),y
         cmp     (ptr2),y

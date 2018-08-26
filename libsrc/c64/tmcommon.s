@@ -1,60 +1,30 @@
 ;
-; Stefan Haubenthal, 27.7.2009
+; Oliver Schmidt, 16.8.2018
 ;
-; time_t _systime (void);
-; /* Similar to time(), but:
-; **   - Is not ISO C
-; **   - Does not take the additional pointer
-; **   - Does not set errno when returning -1
-; */
+; Common stuff for the clock routines
 ;
 
-        .include        "time.inc"
         .include        "c64.inc"
         .include        "get_tv.inc"
 
-        .constructor    initsystime
-        .importzp       tmp1, tmp2
+        .export         TM, load_tenth
+
+        .constructor    inittime
+        .importzp       sreg
         .import         _get_tv, _get_ostype
 
 
 ;----------------------------------------------------------------------------
 .code
 
-.proc   __systime
+.proc   load_tenth
 
-        lda     CIA1_TODHR
-        bpl     AM
-        and     #%01111111
-        sed
-        clc
-        adc     #$12
-        cld
-AM:     jsr     BCD2dec
-        sta     TM + tm::tm_hour
-        lda     CIA1_TODMIN
-        jsr     BCD2dec
-        sta     TM + tm::tm_min
-        lda     CIA1_TODSEC
-        jsr     BCD2dec
-        sta     TM + tm::tm_sec
-        lda     CIA1_TOD10              ; Dummy read to unfreeze
-        lda     #<TM
-        ldx     #>TM
-        jmp     _mktime
-
-; dec = (((BCD>>4)*10) + (BCD&0xf))
-BCD2dec:tax
-        and     #%00001111
-        sta     tmp1
-        txa
-        and     #%11110000      ; *16
-        lsr                     ; *8
-        sta     tmp2
-        lsr
-        lsr                     ; *2
-        adc     tmp2            ; = *10
-        adc     tmp1
+        lda     #<(100 * 1000 * 1000 / $10000)
+        ldx     #>(100 * 1000 * 1000 / $10000)
+        sta     sreg
+        stx     sreg+1
+        lda     #<(100 * 1000 * 1000)
+        ldx     #>(100 * 1000 * 1000)
         rts
 
 .endproc
@@ -65,7 +35,7 @@ BCD2dec:tax
 ; and write it again, ignoring a possible change in between.
 .segment "ONCE"
 
-.proc   initsystime
+.proc   inittime
 
         lda     CIA1_TOD10
         sta     CIA1_TOD10

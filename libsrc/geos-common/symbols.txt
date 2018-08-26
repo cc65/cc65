@@ -1,5 +1,5 @@
 Source: The Hitchhiker's Guide To GEOS
-http://lyonlabs.org/commodore/onrequest/geos-manuals/The_Hitchhikers_Guide_to_GEOS.pdf
+https://archive.org/details/The_Hitchhikers_Guide_to_GEOS
 
 
 GEOS Variables

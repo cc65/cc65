@@ -1,0 +1,33 @@
+# 1 "bank0.da"
+# 1 "<built-in>"
+# 1 "<command-line>"
+# 1 "bank0.da"
+
+
+
+
+global {
+    inputoffs $00010;
+    inputsize $4000;
+    startaddr $8000;
+    cpu "6502";
+};
+
+# 1 "fixed.da" 1
+# 18 "fixed.da"
+label { addr $00; name "VariableA"; };
+label { addr $01; name "VariableB"; };
+label { addr $0100; name "Stack"; size $0100; };
+
+
+
+
+
+label { addr $C000; name "CommonProcA"; };
+label { addr $C123; name "CommonProcB"; };
+range { start $E123; end $FFFF; name "CommonData"; type ByteTable; };
+# 13 "bank0.da" 2
+
+label { addr $8000; name "Bank0ProcA"; };
+label { addr $8123; name "Bank0ProcB"; };
+range { start $A000; end $BFFF; name "Bank0Data"; type ByteTable; };

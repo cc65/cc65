@@ -23,6 +23,7 @@ int main(int argc, char **argv)
         if (!x) {
             return(0);
         }
+        x[strcspn(x, "\r\n")] = 0;
         filename = x;
     }
     else {
@@ -172,6 +173,35 @@ int main(int argc, char **argv)
     }
     else {
         printf("NOT OK, no error\n");
+        fclose(file);
+        return(1);
+    }
+
+    /* ProDOS on the Apple II only supports 24-bit file offsets,
+    ** so anything beyond that should be an error.  I don't know
+    ** about other platforms, but I'm guessing no 6502-based
+    ** operating systems support 32-bit offsets?
+    */
+    printf("seeking to position 2^24:\n\t");
+    pos = lseek(fd, 0x1000000L, SEEK_SET);
+    if (pos == -1) {
+        printf("Ok, error %s\n", strerror(errno));
+    }
+    else {
+        printf("NOT OK, returned %ld but expected -1\n", pos);
+        fclose(file);
+        return(1);
+    }
+
+    printf("trying invalid value for whence:\n\t");
+    pos = lseek(fd, 0L, 3);
+    if (pos == -1) {
+        printf("Ok, error %s\n", strerror(errno));
+    }
+    else {
+        printf("NOT OK, returned %ld but expected -1\n", pos);
+        fclose(file);
+        return(1);
     }
 
     fclose(file);

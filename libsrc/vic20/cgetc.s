@@ -40,8 +40,7 @@ L3:     jsr     KBDREAD         ; Read char and return in A
         bne     seton           ; Go set it on
         lda     CURS_FLAG       ; Is the cursor currently off?
         bne     crs9            ; Jump if yes
-        lda     #1
-        sta     CURS_FLAG       ; Mark it as off
+        inc     CURS_FLAG       ; Mark it as off
         lda     CURS_STATE      ; Cursor currently displayed?
         beq     crs8            ; Jump if no
         ldy     CURS_X          ; Get the character column

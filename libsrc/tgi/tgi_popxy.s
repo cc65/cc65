@@ -1,22 +1,19 @@
 ;
-; Ullrich von Bassewitz, 02.10.2002
+; 2002-10-02, Ullrich von Bassewitz
+; 2018-05-20, Christian Kruger
 ;
-; Helper function for tgi functions. Pops X/Y from stack into ptr1/ptr2
+; Helper function for TGI functions. Pops X/Y from arguments into ptr1/ptr2.
 ;
 
         .include        "tgi-kernel.inc"
 
-        .import         popax
-        .importzp       ptr1, ptr2
+        .import         popptr1
+        .importzp       ptr2
 
 .proc   tgi_popxy
 
         sta     ptr2            ; Y
         stx     ptr2+1
-        jsr     popax
-        sta     ptr1            ; X
-        stx     ptr1+1
-        rts
+        jmp     popptr1         ; X
 
 .endproc
-

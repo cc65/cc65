@@ -44,7 +44,7 @@
 ; Constants
 
 BASE    = $D000
-PAGES   = ($10000 - BASE) / 256
+PAGES   = ($FF00 - BASE) / 256
 
 ; ------------------------------------------------------------------------
 ; Data.
@@ -267,5 +267,3 @@ COPYTO: sta     ptr3
         sta     ptr1+1                  ; From
 
         jmp     common
-
-

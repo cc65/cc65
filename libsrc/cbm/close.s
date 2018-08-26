@@ -6,7 +6,6 @@
 
         .export         _close
 
-        .import         CLOSE
         .import         readdiskerror, closecmdchannel
         .importzp       tmp2
 
@@ -17,7 +16,7 @@
 
 ;--------------------------------------------------------------------------
 ; _close
-                                                   
+
 .proc   _close
 
 ; Check if we have a valid handle
@@ -64,7 +63,3 @@ invalidfd:
         jmp     __directerrno   ; Set _errno, clear _oserror, return -1
 
 .endproc
-
-
-
-

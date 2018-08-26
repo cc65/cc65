@@ -53,6 +53,7 @@ Short options:
   -o name               Name the output file
   -v                    Increase verbosity
   -F                    Add formfeeds to the output
+  -s                    Accept line markers in the info file
   -S addr               Set the start/load address
   -V                    Print the disassembler version
 
@@ -70,6 +71,7 @@ Long options:
   --mnemonic-column n   Specify mnemonic start column
   --pagelength n        Set the page length for the listing
   --start-addr addr     Set the start/load address
+  --sync-lines          Accept line markers in the info file
   --text-column n       Specify text start column
   --verbose             Increase verbosity
   --version             Print the disassembler version
@@ -205,6 +207,17 @@ Here is a description of all the command line options:
   start address is specified, $10000 minus the size of the input file is used.
 
 
+  <label id="option--sync-lines">
+  <tag><tt>-s, --sync-lines</tt></tag>
+
+  Accept line markers in the info file in the following syntax:
+<tscreen><verb>
+#line <lineno> ["<filename>"]
+# <lineno> "<filename>" [<flag>] ...
+</verb></tscreen>
+  This option is intended for preprocessing info files with "cpp" or "m4".
+
+
   <label id="option--text-column">
   <tag><tt>--text-column n</tt></tag>
 
@@ -299,9 +312,10 @@ anything). Each attribute is terminated by a semicolon.
 
 <sect1>Comments<p>
 
-Comments start with a hash mark (<tt/#/); and, extend from the position of
-the mark to the end of the current line. Hash marks inside of strings will
-<em/not/ start a comment, of course.
+Comments start with a hash mark (<tt/#/) or a double slash (<tt>//</tt>);
+and, extend from the position of the mark to the end of the current line.
+Hash marks or double slashes inside of strings will <em/not/ start a comment,
+of course.
 
 
 <sect1>Specifying global options<label id="global-options"><p>
@@ -541,6 +555,18 @@ code. The following attributes are recognized:
   create labels in the form <tt/label+offs/ for all bytes within the given
   range, where <tt/label/ is the label name given with the <tt/NAME/
   attribute, and <tt/offs/ is the offset within the data.
+
+  <tag><tt>PARAMSIZE</tt></tag>
+  This optional attribute is followed by a numerical value. It tells the
+  assembler that subroutine calls to this label are followed by
+  "inline parameters" with the given number of bytes, like this:
+
+<tscreen><verb>
+        JSR     LabelWithParamSize2
+        .byte   $00, $10
+        (return here)
+        code...
+</verb></tscreen>
 
 </descrip>
 

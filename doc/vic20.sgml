@@ -144,7 +144,13 @@ The names in the parentheses denote the symbols to be used for static linking of
 
 <sect1>Graphics drivers<p>
 
-No graphics drivers are currently available for the VIC20.
+<descrip>
+
+  <tag><tt/cbm-lo.tgi (cbm_lo_tgi)/</tag>
+  This driver features a resolution of 44&times;46 with two colors but the
+  bottom-right pixels.
+
+</descrip><p>
 
 
 <sect1>Extended memory drivers<p>

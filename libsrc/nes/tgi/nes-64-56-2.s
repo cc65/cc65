@@ -430,9 +430,7 @@ OUTTEXT:
         rts
 
 ; ------------------------------------------------------------------------
-; Calculate all variables to plot the pixel at X1/Y1. If the point is out
-; of range, a carry is returned and INRANGE is set to a value !0 zero. If
-; the coordinates are valid, INRANGE is zero and the carry clear.
+; Calculate all variables to plot the pixel at X1/Y1.
 
 CALC:   lda     xres
         sta     TEMP

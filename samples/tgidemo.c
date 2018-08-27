@@ -139,11 +139,13 @@ static void DoDiagram (void)
     tgi_line (XOrigin, 10, XOrigin, MaxY-10);
     tgi_line (XOrigin-2, 12, XOrigin, 10);
     tgi_lineto (XOrigin+2, 12);
+    tgi_outtext ("y");
 
     /* X axis */
     tgi_line (XOrigin, YOrigin, MaxX-10, YOrigin);
     tgi_line (MaxX-12, YOrigin-2, MaxX-10, YOrigin);
     tgi_lineto (MaxX-12, YOrigin+2);
+    tgi_outtext ("x");
 
     /* Sine */
     tgi_gotoxy (XOrigin, YOrigin);
@@ -184,7 +186,7 @@ static void DoLines (void)
 
 
 
-int main (void)
+int main (int argc, char* argv[])
 {
     unsigned char Border;
 
@@ -193,7 +195,12 @@ int main (void)
     DoWarning ();
 
     /* Load and initialize the driver */
-    tgi_load_driver (tgi_stddrv);
+    if (argc == 1) {
+        tgi_load_driver (tgi_stddrv);
+    }
+    else {
+        tgi_load_driver (argv[1]);
+    }
     CheckError ("tgi_load_driver");
 #else
     /* Install the driver */

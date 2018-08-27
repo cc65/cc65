@@ -167,7 +167,13 @@ The names in the parentheses denote the symbols to be used for static linking of
 
 <sect1>Graphics drivers<p>
 
-No graphics drivers are currently available for the C16/C116.
+<descrip>
+
+  <tag><tt/cbm-lo.tgi (cbm_lo_tgi)/</tag>
+  This driver features a resolution of 80&times;50 with two colors but the
+  bottom-right pixels.
+
+</descrip><p>
 
 
 <sect1>Extended memory drivers<p>
@@ -272,7 +278,3 @@ freely, subject to the following restrictions:
 </enum>
 
 </article>
-
-
-
-

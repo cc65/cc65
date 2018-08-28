@@ -187,18 +187,22 @@ The names in the parentheses denote the symbols to be used for static linking of
 the machine has no graphics capabilities, chances for a graphics driver aren't
 really good :-).-->
 <descrip>
+
   <tag><tt/cbm-lo.tgi (cbm_lo_tgi)/</tag>
   This driver features a resolution of 160&times;50 with two colors but the
   bottom-right pixels.
+
 </descrip><p>
 
 
 <sect1>Extended memory drivers<p>
 
 <descrip>
+
   <tag><tt/cbm610-ram.emd (cbm610_ram_emd)/</tag>
   A driver for the RAM in bank 2. Supports up to 255 pages with 256 bytes
   each.
+
 </descrip><p>
 
 

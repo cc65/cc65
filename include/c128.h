@@ -143,6 +143,7 @@ extern void c128_pot_mou[];
 extern void c128_swlink_ser[];
 extern void c128_vdc_tgi[];     /* Referred to by tgi_static_stddrv[] */
 extern void c128_vdc2_tgi[];
+extern void cbm_lo_tgi[];
 
 
 

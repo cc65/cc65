@@ -283,6 +283,7 @@ cl65 -t c64 -o program-file main-code.c subroutines.s c64-tgimousedata.o
 </verb></tscreen>
 
 <descrip>
+
   <tag><tt/c64-hi.tgi (c64_hi_tgi)/</tag>
   This driver features a resolution of 320&times;200 with two colors and an
   adjustable palette (that means that the two colors can be chosen out of a
@@ -291,6 +292,7 @@ cl65 -t c64 -o program-file main-code.c subroutines.s c64-tgimousedata.o
   <tag><tt/cbm-lo.tgi (cbm_lo_tgi)/</tag>
   This driver features a resolution of 80&times;50 with two colors but the
   bottom-right pixels.
+
 </descrip><p>
 
 Note that the graphics drivers are incompatible with the

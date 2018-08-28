@@ -55,6 +55,7 @@ directly, but using the BASIC ROM is not possible without additional code.
 Special locations:
 
 <descrip>
+
   <tag/Text screen/
   The text screen is located at &dollar;400 (as in the standard setup).
 
@@ -198,6 +199,7 @@ Note: The graphics drivers for the VDC are incompatible with the extended
 memory drivers using the VDC memory!
 
 <descrip>
+
   <tag><tt/c128-vdc.tgi (c128_vdc_tgi)/</tag>
   This driver was written by Maciej Witkowiak. It uses the 80-column display,
   and features a resolution of 640&times;200 with two colors and an adjustable
@@ -213,6 +215,7 @@ memory drivers using the VDC memory!
   <tag><tt/cbm-lo.tgi (cbm_lo_tgi)/</tag>
   This driver features a resolution of 80&times;50 or 160&times;50 with two colors
   but the bottom-right pixels.
+
 </descrip><p>
 
 Note: The colors are translated from definitions in headers to correct VDC values;

@@ -3,8 +3,9 @@
 <article>
 
 <title>Commodore 128-specific information for cc65
-<author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2014-04-12
+<author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
+<url url="mailto:polluks@sdf.lonestar.org" name="Stefan A. Haubenthal">
+<date>2018-08-29
 
 <abstract>
 An overview over the C128 runtime system as it is implemented for the cc65 C
@@ -198,6 +199,13 @@ Note: The graphics drivers for the VDC are incompatible with the extended
 memory drivers using the VDC memory!
 
 <descrip>
+
+  <tag><tt/c128-hi.tgi (c128_hi_tgi)/</tag>
+  This driver features a resolution of 320&times;200 with two colors and an
+  adjustable palette (that means that the two colors can be chosen out of a
+  palette of the 16 VIC colors). Unlike BASIC 7.0, this driver puts its
+  graphics data into the RAM behind the ROMs.
+
   <tag><tt/c128-vdc.tgi (c128_vdc_tgi)/</tag>
   This driver was written by Maciej Witkowiak. It uses the 80-column display,
   and features a resolution of 640&times;200 with two colors and an adjustable
@@ -209,19 +217,13 @@ memory drivers using the VDC memory!
   display, and features a resolution of 640&times;480 with two colors and an
   adjustable palette (that means that the two colors can be chosen out of the
   16 VDC colors). The driver requires 64KB VDC RAM.
+
 </descrip><p>
 
-Note: The colors are translated from definitions in headers to correct VDC values;
-so, please use definitions or VIC color numbers only. Colors <tt/GRAY3/ and <tt/BROWN/ are
-missing on VDC, and are translated to the two colors missing from the VIC palette.
-
-<descrip>
-  <tag><tt/c128-hi.tgi (c128_hi_tgi)/</tag>
-  This driver features a resolution of 320&times;200 with two colors and an
-  adjustable palette (that means that the two colors can be chosen out of a
-  palette of the 16 VIC colors). Unlike BASIC 7.0 this driver put its graphics
-  data into the RAM behind the ROMs.
-</descrip><p>
+Note: The colors are translated from the definitions in the headers to correct
+VDC values; so, please use definitions or VIC color numbers only. Colors
+<tt/GRAY3/ and <tt/BROWN/ are missing on the VDC; and, are translated to the
+two colors missing from the VIC palette.
 
 
 <sect1>Extended memory drivers<p>

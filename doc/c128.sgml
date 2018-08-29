@@ -4,7 +4,7 @@
 
 <title>Commodore 128-specific information for cc65
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2014-04-12
+<date>2018-08-29
 
 <abstract>
 An overview over the C128 runtime system as it is implemented for the cc65 C
@@ -55,7 +55,6 @@ directly, but using the BASIC ROM is not possible without additional code.
 Special locations:
 
 <descrip>
-
   <tag/Text screen/
   The text screen is located at &dollar;400 (as in the standard setup).
 
@@ -212,9 +211,9 @@ memory drivers using the VDC memory!
   adjustable palette (that means that the two colors can be chosen out of the
   16 VDC colors). The driver requires 64KB VDC RAM.
 
-  <tag><tt/cbm-lo.tgi (cbm_lo_tgi)/</tag>
-  This driver features a resolution of 80&times;50 or 160&times;50 with two colors
-  but the bottom-right pixels.
+  <tag><tt/c128-lo.tgi (c128_lo_tgi)/</tag>
+  This driver features a resolution of 80&times;50 or 160&times;50 with two
+  colors but the bottom-right pixels.
 
 </descrip><p>
 

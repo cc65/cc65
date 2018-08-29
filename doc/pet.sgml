@@ -6,7 +6,7 @@
 <author>
 <url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:polluks@sdf.lonestar.org" name="Stefan A. Haubenthal">
-<date>2014-04-12
+<date>2018-08-29
 
 <abstract>
 An overview over the PET runtime system as it is implemented for the cc65 C
@@ -141,9 +141,9 @@ The names in the parentheses denote the symbols to be used for static linking of
 
 <descrip>
 
-  <tag><tt/cbm-lo.tgi (cbm_lo_tgi)/</tag>
-  This driver features a resolution of 80&times;50 or 160&times;50 with two colors
-  but the bottom-right pixels.
+  <tag><tt/pet-lo.tgi (pet_lo_tgi)/</tag>
+  This driver features a resolution of 80&times;50 or 160&times;50 with two
+  colors but the bottom-right pixels.
 
 </descrip><p>
 

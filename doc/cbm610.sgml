@@ -6,7 +6,7 @@
 <author>
 <url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
-<date>2014-04-25
+<date>2018-08-29
 
 <abstract>
 An overview over the Commodore 610 runtime system as it is implemented for the
@@ -188,7 +188,7 @@ the machine has no graphics capabilities, chances for a graphics driver aren't
 really good :-).-->
 <descrip>
 
-  <tag><tt/cbm-lo.tgi (cbm_lo_tgi)/</tag>
+  <tag><tt/cbm610-lo.tgi (cbm610_lo_tgi)/</tag>
   This driver features a resolution of 160&times;50 with two colors but the
   bottom-right pixels.
 

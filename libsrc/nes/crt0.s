@@ -1,5 +1,5 @@
 ;
-; Startup code for cc65 (NES version)
+; Start-up code for cc65 (NES version)
 ;
 ; by Groepaz/Hitmen <groepaz@gmx.net>
 ; based on code by Ullrich von Bassewitz <uz@cc65.org>
@@ -7,11 +7,12 @@
 
         .export         _exit
         .export         __STARTUP__ : absolute = 1      ; Mark as startup
+
         .import         initlib, donelib, callmain
         .import         push0, _main, zerobss, copydata
         .import         ppubuf_flush
 
-        ; Linker generated symbols
+        ; Linker-generated symbols
         .import         __RAM_START__, __RAM_SIZE__
         .import         __SRAM_START__, __SRAM_SIZE__
         .import         __ROM0_START__, __ROM0_SIZE__
@@ -19,12 +20,17 @@
         .import         __CODE_LOAD__,__CODE_RUN__, __CODE_SIZE__
         .import         __RODATA_LOAD__,__RODATA_RUN__, __RODATA_SIZE__
 
+; ------------------------------------------------------------------------
+; Character data
+; ------------------------------------------------------------------------
+        .forceimport    NESfont
+
         .include        "zeropage.inc"
         .include        "nes.inc"
 
 
 ; ------------------------------------------------------------------------
-; 16 bytes INES header
+; 16-byte INES header
 
 .segment        "HEADER"
 
@@ -162,8 +168,9 @@ nmi:    pha
 irq:
         rti
 
+
 ; ------------------------------------------------------------------------
-; hardware vectors
+; Hardware vectors
 ; ------------------------------------------------------------------------
 
 .segment "VECTORS"
@@ -171,13 +178,3 @@ irq:
         .word   nmi         ; $fffa vblank nmi
         .word   start       ; $fffc reset
         .word   irq         ; $fffe irq / brk
-
-; ------------------------------------------------------------------------
-; character data
-; ------------------------------------------------------------------------
-
-.segment "CHARS"
-
-        .include        "neschar.inc"
-
-

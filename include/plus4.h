@@ -57,6 +57,7 @@
 /* The addresses of the static drivers */
 extern void plus4_stdjoy_joy[];   /* Referred to by joy_static_stddrv[] */
 extern void plus4_stdser_ser[];
+extern void plus4_lo_tgi[];       /* Referred to by tgi_static_stddrv[] */
 
 
 

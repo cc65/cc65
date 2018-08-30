@@ -53,6 +53,7 @@
 /* The addresses of the static drivers */
 extern void c16_ram_emd[];
 extern void c16_stdjoy_joy[];  /* Referred to by joy_static_stddrv[] */
+extern void c16_lo_tgi[];      /* Referred to by tgi_static_stddrv[] */
 
 
 

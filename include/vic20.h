@@ -103,10 +103,12 @@
 
 /* The addresses of the static drivers */
 extern void vic20_ptvjoy_joy[];
-extern void vic20_stdjoy_joy[];         /* Referred to by joy_static_stddrv[] */
+extern void vic20_stdjoy_joy[];   /* Referred to by joy_static_stddrv[] */
 
 extern void vic20_rama_emd[];
 extern void vic20_georam_emd[];
+
+extern void vic20_lo_tgi[];       /* Referred to by tgi_static_stddrv[] */
 
 /* End of vic20.h */
 #endif

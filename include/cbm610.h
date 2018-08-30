@@ -106,6 +106,7 @@
 /* The addresses of the static drivers */
 extern void cbm610_ram_emd[];
 extern void cbm610_std_ser[];
+extern void cbm610_lo_tgi[];   /* Referred to by tgi_static_stddrv[] */
 
 
 

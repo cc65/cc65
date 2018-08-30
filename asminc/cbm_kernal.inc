@@ -1,7 +1,7 @@
 ;
 ; Olli Savia <ops@iki.fi>
 ;
-; Commodore kernal functions
+; Commodore kernal functions http://web.archive.org/web/20180720093634/https://www.pagetable.com/?p=926
 ;
 
 .if .def(__C128__)

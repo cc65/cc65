@@ -9,6 +9,10 @@
         .include        "tgi-kernel.inc"
         .include        "tgi-error.inc"
         .include        "cbm_kernal.inc"
+        .if .def(__PET__)
+  SCREEN       := UDTIM
+  PLOT         := UDTIM
+        .endif
 
         .macpack        generic
         .macpack        module

@@ -8,7 +8,7 @@
 
         .include        "tgi-kernel.inc"
         .include        "tgi-error.inc"
-        .import         SCREEN, PLOT, BSOUT
+        .include        "cbm_kernal.inc"
 
         .macpack        generic
         .macpack        module

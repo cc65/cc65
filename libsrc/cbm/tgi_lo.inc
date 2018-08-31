@@ -113,11 +113,13 @@ CODE:           .byte   160, 172, 187, 162, 188, 161-128, 191-128, 190-128
 ;
 
 INSTALL:
+        .if .def(__PET__)
         ldx     SCR_LINELEN
         inx                     ; Variable is one less
         lda     SCREEN
         cmp     #$4C
         bne     patch
+        .endif
         jsr     SCREEN
         sty     yres
         asl     yres            ; yres*2
@@ -135,6 +137,7 @@ no_jmp: stx     xres
 UNINSTALL:
         rts
 
+        .if .def(__PET__)
 ; Runtime PET patch
 ; clc      -->  stx 198
 ; jsr PLOT -->  sty 216
@@ -152,6 +155,7 @@ patch:
         sta     P1+3
         sta     P2+3
         bne     no_jmp
+        .endif
 
 ; ------------------------------------------------------------------------
 ; INIT: Changes an already installed device from text mode to graphics

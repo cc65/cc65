@@ -1,7 +1,7 @@
 ;
-; Graphics driver for a max. 160x50x2 (but 4 pixels) mode on CBMs.
+; Graphics driver for a max. 160x50x2 (but 4 pixels) mode on all CBMs.
 ;
-; Stefan Haubenthal <polluks@sdf.lonestar.org>
+; 2018-08-30, Stefan Haubenthal
 ;
 
         .include        "zeropage.inc"
@@ -9,9 +9,10 @@
         .include        "tgi-kernel.inc"
         .include        "tgi-error.inc"
         .include        "cbm_kernal.inc"
+        .include        "pet.inc"
         .if .def(__PET__)
-  SCREEN       := UDTIM
-  PLOT         := UDTIM
+SCREEN         := $FFED
+PLOT           := $FFF0
         .endif
 
         .macpack        generic
@@ -112,11 +113,16 @@ CODE:           .byte   160, 172, 187, 162, 188, 161-128, 191-128, 190-128
 ;
 
 INSTALL:
+        ldx     SCR_LINELEN
+        inx                     ; Variable is one less
+        lda     SCREEN
+        cmp     #$4C
+        bne     patch
         jsr     SCREEN
-        stx     xres
-        asl     xres                    ; xres*2
         sty     yres
-        asl     yres                    ; yres*2
+        asl     yres            ; yres*2
+no_jmp: stx     xres
+        asl     xres            ; xres*2
 ;       rts
 
 ; ------------------------------------------------------------------------
@@ -128,6 +134,24 @@ INSTALL:
 
 UNINSTALL:
         rts
+
+; Runtime PET patch
+; clc      -->  stx 198
+; jsr PLOT -->  sty 216
+patch:
+        lda     #$86
+        sta     P1+0
+        sta     P2+0
+        lda     #198
+        sta     P1+1
+        sta     P2+1
+        lda     #$84
+        sta     P1+2
+        sta     P2+2
+        lda     #216
+        sta     P1+3
+        sta     P2+3
+        bne     no_jmp
 
 ; ------------------------------------------------------------------------
 ; INIT: Changes an already installed device from text mode to graphics
@@ -299,7 +323,7 @@ SETPIXEL:
         lda     Y1
         lsr
         tax
-        clc
+P1:     clc
         jsr     PLOT
         jsr     calc
         ldx     COLOR
@@ -399,7 +423,7 @@ OUTTEXT:
         lda     ptr2
         lsr
         tax
-        clc
+P2:     clc
         jsr     PLOT
         ldy     #0
 @L1:    lda     (ptr3),y

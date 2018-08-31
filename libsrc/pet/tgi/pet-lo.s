@@ -7,4 +7,4 @@
 
         .define         MODULE_LABEL    _pet_lo_tgi
 
-        .include        "../../cbm/cbm-lo.inc"
+        .include        "../../cbm/tgi_lo.inc"

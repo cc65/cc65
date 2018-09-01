@@ -1,41 +1,32 @@
+        .export         vdc_init
 
         .include        "pce.inc"
 
 ; FIXME: implement selection of different video modes at runtime
 HIRES   = 1
 
-        .export         vdc_init
-
 vdc_init:
-        lda     a:VDC_CTRL
+        lda     VDC_CTRL
 
-        VREG    $00, $0000      ; MAWR
-        VREG    $01, $0000      ; MARR
-        VREG    $05, $0000      ; CR
-        VREG    $06, $0000      ; RCR
-        VREG    $07, $0000      ; BXR
-        VREG    $08, $0000      ; BYR
-        VREG    $09, $0070      ; MAWR
-        VREG    $0C, $1702      ; CRTC - VSR
-        VREG    $0D, $00DF      ; CRTC - VDS
-        VREG    $0E, $000C      ; CRTC - VDE
-        VREG    $0F, $0000      ; DCR
+        VREG    VDC_CR , $0000  ; disable display and interrupts
+        VREG    VDC_BXR, $0000  ; no scrolling
+        VREG    VDC_BYR, $0000
+        VREG    VDC_MWR, $0070  ; 128 x 64 tiles (1024 x 512 pixels)
+        VREG    VDC_VSR, $1702  ; CRTC
+        VREG    VDC_VDR, $00DF  ; CRTC - VDS
+        VREG    VDC_VCR, $000C  ; CRTC - VDE
+        VREG    VDC_DCR, $0000
 
 .if      HIRES
-
-        VREG    $0A, $0C02      ; CRTC - HSR
-        VREG    $0B, $043C      ; CRTC - HDS
+        VREG    VDC_HSR, $0C02  ; CRTC
+        VREG    VDC_HDR, $043C  ; CRTC - HDS
         lda     #$06
-        sta     VCE_CTRL
-
 .else
-
-        VREG    $0A, $0202      ; CRTC - HSR
-        VREG    $0B, $041F      ; CRTC - HDS
+        VREG    VDC_HSR, $0202  ; CRTC
+        VREG    VDC_HDR, $041F  ; CRTC - HDS
         lda     #$04
+.endif
         sta     VCE_CTRL
 
-.endif
-
-        lda     a:VDC_CTRL
+        lda     VDC_CTRL
         rts

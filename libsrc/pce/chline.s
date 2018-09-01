@@ -6,6 +6,7 @@
 ;
 
         .export         _chlinexy, _chline
+
         .import         gotoxy, cputdirect
         .importzp       tmp1
 
@@ -25,7 +26,3 @@ L1:     lda     #CH_HLINE       ; Horizontal line, screen code
         dec     tmp1
         bne     L1
 L9:     rts
-
-
-
-

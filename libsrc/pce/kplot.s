@@ -4,36 +4,27 @@
         .include        "pce.inc"
         .include        "extzp.inc"
 
-PLOT:
-        bcs     @getpos
+PLOT:   bcs     @getpos
 
         tya
         ;clc                    ; already cleared
-        adc     _plotlo,x
+        adc     plotlo,x
         sta     SCREEN_PTR
 
-        lda     _plothi,x
-        adc     #0
+        cla
+        adc     plothi,x
         sta     SCREEN_PTR+1
 @getpos:
         ldx     CURS_Y
         ldy     CURS_X
         rts
 
-        .rodata
+.rodata
 
-_plotlo:
-        .repeat screenrows,line
+plotlo: .repeat screenrows,line
         .byte   <($0000+(line*$80))
         .endrepeat
 
-_plothi:
-        .repeat screenrows,line
+plothi: .repeat screenrows,line
         .byte   >($0000+(line*$80))
         .endrepeat
-
-;-------------------------------------------------------------------------------
-; force the init constructor to be imported
-
-        .import initconio
-conio_init      = initconio

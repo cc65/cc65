@@ -1,28 +1,23 @@
+;
+; 1998-08-07, Ullrich von Bassewitz
+; 2015-11-23, Greg King
+;
+; unsigned char __fastcall__ revers (unsigned char onoff);
+;
 
-        .include        "pce.inc"
-        .include        "extzp.inc"
+        .export         _revers
 
-        .export _revers
+        .importzp       RVS
 
 .proc   _revers
-
-        ldx     #$00            ; Assume revers off
-        tay                     ; Test onoff
-        beq     L1              ; Jump if off
-        ldx     #$80            ; Load on value
-        ldy     #$00            ; Assume old value is zero
-L1:     lda     RVS             ; Load old value
-        stx     RVS             ; Set new value
-        beq     L2              ; Jump if old value zero
-        iny                     ; Make old value = 1
-L2:     ldx     #$00            ; Load high byte of result
-        tya                     ; Load low byte, set CC
+        cmp     #$01            ; False or true?
+        cla
+        ror     a               ; Either $00 or $80
+        ldy     RVS             ; Load old value
+        sta     RVS             ; Set new value
+        tya
+        asl     a
+        rol     a               ; Either $00 or $01
+        clx
         rts
-
 .endproc
-
-;-------------------------------------------------------------------------------
-; force the init constructor to be imported
-
-        .import         initconio
-conio_init      = initconio

@@ -1,10 +1,9 @@
-        .interruptor    ticktock, 24
+        .interruptor    ticktock
 
-        .include        "pce.inc"
         .include        "extzp.inc"
 
 ticktock:
-        bbr5    vdc_flags,@s1   ; not vertical-blank interrupt
+        bbr5    vdc_flags,@s1   ; skip if not vertical-blank interrupt
 
         ; Increment the system tick counter.
         inc     tickcount

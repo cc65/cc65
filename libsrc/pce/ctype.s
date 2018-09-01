@@ -6,15 +6,15 @@
 
         .include        "ctype.inc"
 
-; The tables are readonly, put them into the rodata segment
+; The tables are read-only; put them into the RODATA segment.
 
 .rodata
 
-; The following 256 byte wide table specifies attributes for the isxxx type
+; The following 256-byte-wide table specifies attributes for the isxxx type
 ; of functions. Doing it by a table means some overhead in space, but it
 ; has major advantages:
 ;
-;   * It is fast. If it were'nt for the slow parameter passing of cc65, one
+;   * It is fast. If it weren't for the slow parameter passing of cc65, one
 ;     could even define macros for the isxxx functions (this is usually
 ;     done on other platforms).
 ;
@@ -22,7 +22,6 @@
 ;     all real code goes into the common library.
 ;
 ;   * We save some code in the isxxx functions.
-
 
 __ctype:
         .repeat 2
@@ -157,5 +156,3 @@ __ctype:
         .byte   CT_NONE                 ; 126/7e _____~_____
         .byte   CT_OTHER_WS             ; 127/7f ____DEL____
         .endrepeat
-
-

@@ -67,13 +67,31 @@
 #define COLOR_BLUE              0x06
 #define COLOR_YELLOW            0x07
 #define COLOR_ORANGE            0x08
-#define COLOR_BROWN             0x09
-#define COLOR_LIGHTRED          0x0A
-#define COLOR_GRAY1             0x0B
-#define COLOR_GRAY2             0x0C
+#define COLOR_LIGHTORANGE       0x09
+#define COLOR_PINK              0x0A
+#define COLOR_LIGHTCYAN         0x0B
+#define COLOR_LIGHTVIOLET       0x0C
 #define COLOR_LIGHTGREEN        0x0D
 #define COLOR_LIGHTBLUE         0x0E
-#define COLOR_GRAY3             0x0F
+#define COLOR_LIGHTYELLOW       0x0F
+
+/* TGI color defines */
+#define TGI_COLOR_BLACK         COLOR_BLACK
+#define TGI_COLOR_WHITE         COLOR_WHITE
+#define TGI_COLOR_RED           COLOR_RED
+#define TGI_COLOR_CYAN          COLOR_CYAN
+#define TGI_COLOR_VIOLET        COLOR_VIOLET
+#define TGI_COLOR_GREEN         COLOR_GREEN
+#define TGI_COLOR_BLUE          COLOR_BLUE
+#define TGI_COLOR_YELLOW        COLOR_YELLOW
+#define TGI_COLOR_ORANGE        COLOR_ORANGE
+#define TGI_COLOR_LIGHTORANGE   COLOR_LIGHTORANGE
+#define TGI_COLOR_PINK          COLOR_PINK
+#define TGI_COLOR_LIGHTCYAN     COLOR_LIGHTCYAN
+#define TGI_COLOR_LIGHTVIOLET   COLOR_LIGHTVIOLET
+#define TGI_COLOR_LIGHTGREEN    COLOR_LIGHTGREEN
+#define TGI_COLOR_LIGHTBLUE     COLOR_LIGHTBLUE
+#define TGI_COLOR_LIGHTYELLOW   COLOR_LIGHTYELLOW
 
 
 

@@ -27,7 +27,7 @@ RVS_OFF         = 18+128
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table and constants.
 
-        module_header   _cbm_lo_tgi
+        module_header   MODULE_LABEL
 
 ; First part of the header is a structure that has a magic and defines the
 ; capabilities of the driver

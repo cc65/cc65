@@ -55,6 +55,10 @@
 #define COLOR_BLACK             0x00
 #define COLOR_WHITE             0x01
 
+/* TGI color defines */
+#define TGI_COLOR_BLACK         COLOR_BLACK
+#define TGI_COLOR_WHITE         COLOR_WHITE
+
 /* Masks for joy_read */
 #define JOY_UP_MASK             0x01
 #define JOY_DOWN_MASK           0x02

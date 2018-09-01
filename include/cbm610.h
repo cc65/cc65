@@ -77,6 +77,10 @@
 #define COLOR_BLACK             0x00
 #define COLOR_WHITE             0x01
 
+/* TGI color defines */
+#define TGI_COLOR_BLACK         COLOR_BLACK
+#define TGI_COLOR_WHITE         COLOR_WHITE
+
 /* Define hardware */
 #include <_6545.h>
 #define CRTC    (*(struct __6545)0xD800)

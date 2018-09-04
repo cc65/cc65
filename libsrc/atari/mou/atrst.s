@@ -126,6 +126,7 @@ YMin:           .res    2               ; Y1 value of bounding box
 XMax:           .res    2               ; X2 value of bounding box
 YMax:           .res    2               ; Y2 value of bounding box
 Buttons:        .res    1               ; Button mask
+OldButton:      .res    1               ; previous buttons
 
 XPosWrk:        .res    2
 YPosWrk:        .res    2
@@ -496,6 +497,8 @@ IRQ:    lda     PORTA                   ; mouse port contents
 
         cmp     old_porta_vbi
         beq     @L3                     ; no motion
+        lda     #0
+        sta     ATRACT                  ; disable "attract mode"
 
 ; Turn mouse polling IRQ back on
 
@@ -544,25 +547,34 @@ IRQ:    lda     PORTA                   ; mouse port contents
 
         jsr     CPREP
 
+; Disable "attract mode" if button status has changed
+
+        lda     Buttons
+        cmp     OldButton
+        beq     @L5
+        sta     OldButton
+        lda     #0
+        sta     ATRACT
+
 ; Limit the X coordinate to the bounding box
 
-        lda     XPosWrk+1
+@L5:    lda     XPosWrk+1
         ldy     XPosWrk
         tax
         cpy     XMin
         sbc     XMin+1
-        bpl     @L5
+        bpl     @L6
         ldy     XMin
         ldx     XMin+1
-        jmp     @L6
+        jmp     @L7
 
-@L5:    txa
+@L6:    txa
         cpy     XMax
         sbc     XMax+1
-        bmi     @L6
+        bmi     @L7
         ldy     XMax
         ldx     XMax+1
-@L6:    sty     XPos
+@L7:    sty     XPos
         stx     XPos+1
         tya
         jsr     CMOVEX
@@ -574,18 +586,18 @@ IRQ:    lda     PORTA                   ; mouse port contents
         tax
         cpy     YMin
         sbc     YMin+1
-        bpl     @L7
+        bpl     @L8
         ldy     YMin
         ldx     YMin+1
-        jmp     @L8
+        jmp     @L9
 
-@L7:    txa
+@L8:    txa
         cpy     YMax
         sbc     YMax+1
-        bmi     @L8
+        bmi     @L9
         ldy     YMax
         ldx     YMax+1
-@L8:    sty     YPos
+@L9:    sty     YPos
         stx     YPos+1
         tya
         jsr     CMOVEY
@@ -595,10 +607,10 @@ IRQ:    lda     PORTA                   ; mouse port contents
 .ifdef  DEBUG
         ; print on upper right corner 'E' or 'D', indicating the IRQ is enabled or disabled
         ldy     irq_enabled
-        beq     @L9
+        beq     @L10
         lda     #37                     ; screen code for 'E'
         .byte   $2c                     ; bit opcode, eats next 2 bytes
-@L9:    lda     #36                     ; screen code for 'D'
+@L10:   lda     #36                     ; screen code for 'D'
         ldy     #39
         sta     (SAVMSC),y
 .endif

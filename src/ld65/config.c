@@ -653,7 +653,7 @@ static void ParseSegments (void)
         {   "RW",               CFGTOK_RW               },
         {   "BSS",              CFGTOK_BSS              },
         {   "ZP",               CFGTOK_ZP               },
-        {   "OVERLAY",          CFGTOK_OVERLAY          },
+        {   "REPLACE",          CFGTOK_REPLACE          },
     };
 
     unsigned Count;
@@ -754,12 +754,12 @@ static void ParseSegments (void)
                     FlagAttr (&S->Attr, SA_TYPE, "TYPE");
                     CfgSpecialToken (Types, ENTRY_COUNT (Types), "Type");
                     switch (CfgTok) {
-                        case CFGTOK_RO:    S->Flags |= SF_RO;               break;
-                        case CFGTOK_RW:    /* Default */                    break;
-                        case CFGTOK_BSS:   S->Flags |= SF_BSS;              break;
-                        case CFGTOK_ZP:    S->Flags |= (SF_BSS | SF_ZP);    break;
-                        case CFGTOK_OVERLAY: S->Flags |= SF_OVERLAY;        break;
-                        default:           Internal ("Unexpected token: %d", CfgTok);
+                        case CFGTOK_RO:      S->Flags |= SF_RO;                break;
+                        case CFGTOK_RW:      /* Default */                     break;
+                        case CFGTOK_BSS:     S->Flags |= SF_BSS;               break;
+                        case CFGTOK_ZP:      S->Flags |= (SF_BSS | SF_ZP);     break;
+                        case CFGTOK_REPLACE: S->Flags |= (SF_REPLACE | SF_RO); break;
+                        default:             Internal ("Unexpected token: %d", CfgTok);
                     }
                     CfgNextTok ();
                     break;
@@ -1854,17 +1854,15 @@ unsigned CfgProcess (void)
             /* Take note of overlayed segments and make sure there are no other
             ** segment types following them in current memory region.
             */
-            if (S->Flags & SF_OVERLAY) {
-            {
+            if (S->Flags & SF_REPLACE) {
                 if (S->Flags & (SF_OFFSET | SF_START)) {
                     ++Overlays;
                 } else {
                     CfgError (GetSourcePos (M->LI),
                               "Segment `%s' of type `overlay' requires either"
-                              " `Start' or `Offset' argument to be specified.",
+                              " `Start' or `Offset' attribute to be specified",
                               GetString (S->Name));
                 }
-            }
             } else {
                 if (Overlays > 0) {
                     CfgError (GetSourcePos (M->LI),
@@ -1923,10 +1921,10 @@ unsigned CfgProcess (void)
                         NewAddr += M->Start;
                     }
 
-                    if (S->Flags & SF_OVERLAY) {
+                    if (S->Flags & SF_REPLACE) {
                         if (NewAddr < M->Start) {
                             CfgError (GetSourcePos (S->LI),
-                                      "Segment `%s' begins before memory area `%s'.",
+                                      "Segment `%s' begins before memory area `%s'",
                                       GetString (S->Name), GetString (M->Name));
                         } else {
                             Addr = NewAddr;

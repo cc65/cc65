@@ -96,7 +96,7 @@ struct SegDesc {
 #define SF_RUN_DEF      0x0200          /* RUN symbols already defined */
 #define SF_LOAD_DEF     0x0400          /* LOAD symbols already defined */
 #define SF_FILLVAL      0x0800          /* Segment has separate fill value */
-#define SF_OVERLAY      0x1000          /* Segment can be overlayed on another one */
+#define SF_REPLACE      0x1000          /* Segment can replace (part of) another one */
 
 
 

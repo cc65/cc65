@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2006 Mark Keates <markk@dendrite.co.uk>                          */
+/* (C) 2000-2018 Mark Keates <markk@dendrite.co.uk>                          */
 /*               Freddy Offenga <taf_offenga@yahoo.com>                      */
 /*               Christian Groessler <chris@groessler.org>                   */
 /*                                                                           */
@@ -232,18 +232,6 @@ extern void atrx15_tgi[];
 extern void atrx15p2_tgi[];
 #endif
 
-/* provide old names for backwards compatibility */
-#ifdef ATARI_COMPAT_PRE_2_11
-#define setcolor     _setcolor
-#define setcolor_low _setcolor_low
-#define getcolor     _getcolor
-#define graphics     _graphics
-#define scroll       _scroll
-#define save_vecs    _save_vecs
-#define rest_vecs    _rest_vecs
-#define getdefdev    _getdefdev
-#endif  /* #ifdef ATARI_COMPAT_PRE_2_11 */
-
 /* get_ostype return value defines (for explanation, see ostype.s) */
 /* masks */
 #define AT_OS_TYPE_MAIN  7
@@ -275,8 +263,9 @@ extern void atrx15p2_tgi[];
 #define SPARTADOS   0
 #define OSADOS      1
 #define XDOS        2
-#define ATARIDOS    3
-#define MYDOS       4
+#define REALDOS     3
+#define ATARIDOS    4
+#define MYDOS       5
 #define NODOS       255
 
 /* Define hardware */

@@ -20,6 +20,8 @@ detect: lda     DOS
         beq     mydos
         cmp     #'X'            ; XDOS
         beq     xdos
+        cmp     #'R'            ; RealDOS
+        beq     rdos
 
         lda     #$4C            ; probably default
         ldy     #COMTAB
@@ -39,6 +41,9 @@ spdos:  lda     #SPARTADOS
         .byte   $2C             ; BIT <abs>
 
 mydos:  lda     #MYDOS
+        .byte   $2C             ; BIT <abs>
+
+rdos:   lda     #REALDOS
         .byte   $2C             ; BIT <abs>
 
 xdos:   lda     #XDOS

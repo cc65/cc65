@@ -1797,7 +1797,7 @@ unsigned CfgProcess (void)
     for (I = 0; I < CollCount (&MemoryAreas); ++I) {
         unsigned J;
         unsigned long Addr;
-        unsigned Overlays = 0;
+        unsigned Replaces = 0;
 
         /* Get the next memory area */
         MemoryArea* M = CollAtUnchecked (&MemoryAreas, I);
@@ -1851,23 +1851,23 @@ unsigned CfgProcess (void)
             /* Remember the start address before handling this segment */
             unsigned long StartAddr = Addr;
 
-            /* Take note of overlayed segments and make sure there are no other
+            /* Take note of "replace" segments and make sure there are no other
             ** segment types following them in current memory region.
             */
             if (S->Flags & SF_REPLACE) {
                 if (S->Flags & (SF_OFFSET | SF_START)) {
-                    ++Overlays;
+                    ++Replaces;
                 } else {
                     CfgError (GetSourcePos (M->LI),
-                              "Segment `%s' of type `overlay' requires either"
+                              "Segment `%s' of type `replace' requires either"
                               " `Start' or `Offset' attribute to be specified",
                               GetString (S->Name));
                 }
             } else {
-                if (Overlays > 0) {
+                if (Replaces > 0) {
                     CfgError (GetSourcePos (M->LI),
                               "Segment `%s' is preceded by at least one segment"
-                              " of type `overlay'",
+                              " of type `replace'",
                               GetString (S->Name));
                 }
             }

@@ -653,7 +653,7 @@ static void ParseSegments (void)
         {   "RW",               CFGTOK_RW               },
         {   "BSS",              CFGTOK_BSS              },
         {   "ZP",               CFGTOK_ZP               },
-        {   "REPLACE",          CFGTOK_REPLACE          },
+        {   "OVERWRITE",        CFGTOK_OVERWRITE        },
     };
 
     unsigned Count;
@@ -754,12 +754,12 @@ static void ParseSegments (void)
                     FlagAttr (&S->Attr, SA_TYPE, "TYPE");
                     CfgSpecialToken (Types, ENTRY_COUNT (Types), "Type");
                     switch (CfgTok) {
-                        case CFGTOK_RO:      S->Flags |= SF_RO;                break;
-                        case CFGTOK_RW:      /* Default */                     break;
-                        case CFGTOK_BSS:     S->Flags |= SF_BSS;               break;
-                        case CFGTOK_ZP:      S->Flags |= (SF_BSS | SF_ZP);     break;
-                        case CFGTOK_REPLACE: S->Flags |= (SF_REPLACE | SF_RO); break;
-                        default:             Internal ("Unexpected token: %d", CfgTok);
+                        case CFGTOK_RO:        S->Flags |= SF_RO;                  break;
+                        case CFGTOK_RW:        /* Default */                       break;
+                        case CFGTOK_BSS:       S->Flags |= SF_BSS;                 break;
+                        case CFGTOK_ZP:        S->Flags |= (SF_BSS | SF_ZP);       break;
+                        case CFGTOK_OVERWRITE: S->Flags |= (SF_OVERWRITE | SF_RO); break;
+                        default:               Internal ("Unexpected token: %d", CfgTok);
                     }
                     CfgNextTok ();
                     break;
@@ -1797,7 +1797,7 @@ unsigned CfgProcess (void)
     for (I = 0; I < CollCount (&MemoryAreas); ++I) {
         unsigned J;
         unsigned long Addr;
-        unsigned Replaces = 0;
+        unsigned Overwrites = 0;
 
         /* Get the next memory area */
         MemoryArea* M = CollAtUnchecked (&MemoryAreas, I);
@@ -1851,23 +1851,23 @@ unsigned CfgProcess (void)
             /* Remember the start address before handling this segment */
             unsigned long StartAddr = Addr;
 
-            /* Take note of "replace" segments and make sure there are no other
-            ** segment types following them in current memory region.
+            /* Take note of "overwrite" segments and make sure there are no
+            ** other segment types following them in current memory region.
             */
-            if (S->Flags & SF_REPLACE) {
+            if (S->Flags & SF_OVERWRITE) {
                 if (S->Flags & (SF_OFFSET | SF_START)) {
-                    ++Replaces;
+                    ++Overwrites;
                 } else {
                     CfgError (GetSourcePos (M->LI),
-                              "Segment `%s' of type `replace' requires either"
+                              "Segment `%s' of type `overwrite' requires either"
                               " `Start' or `Offset' attribute to be specified",
                               GetString (S->Name));
                 }
             } else {
-                if (Replaces > 0) {
+                if (Overwrites > 0) {
                     CfgError (GetSourcePos (M->LI),
                               "Segment `%s' is preceded by at least one segment"
-                              " of type `replace'",
+                              " of type `overwrite'",
                               GetString (S->Name));
                 }
             }
@@ -1921,7 +1921,7 @@ unsigned CfgProcess (void)
                         NewAddr += M->Start;
                     }
 
-                    if (S->Flags & SF_REPLACE) {
+                    if (S->Flags & SF_OVERWRITE) {
                         if (NewAddr < M->Start) {
                             CfgError (GetSourcePos (S->LI),
                                       "Segment `%s' begins before memory area `%s'",

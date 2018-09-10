@@ -189,8 +189,7 @@ really good :-).-->
 <descrip>
 
   <tag><tt/cbm610-lo.tgi (cbm610_lo_tgi)/</tag>
-  This driver features a resolution of 160&times;50 with two colors but the
-  bottom-right pixels.
+  This driver features a resolution of 158&times;50 with two colors.
 
 </descrip><p>
 

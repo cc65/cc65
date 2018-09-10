@@ -8,11 +8,13 @@
 
         .include        "tgi-kernel.inc"
         .include        "tgi-error.inc"
-        .include        "cbm_kernal.inc"
+        .ifndef __PLUS4__
+        .import         PLOT, BSOUT
+        .endif
+        .ifdef __PET__
         .include        "pet.inc"
-        .if .def(__PET__)
-SCREEN         := $FFED
-PLOT           := $FFF0
+        .else
+        .import         SCREEN
         .endif
 
         .macpack        generic
@@ -21,22 +23,28 @@ PLOT           := $FFF0
 ; ------------------------------------------------------------------------
 ; Constants
 
+.if .def(__CBM510__) || .def(__CBM610__) || .def(__C128__) || .def(__C16__)
+fix             = 2
+.else
+fix             = 0
+.endif
+
 RVS_ON          = 18
 RVS_OFF         = 18+128
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table and constants.
 
-        module_header   MODULE_LABEL
+        module_header   _c16_lo_tgi;MODULE_LABEL
 
 ; First part of the header is a structure that has a magic and defines the
 ; capabilities of the driver
 
         .byte   $74, $67, $69           ; "tgi"
         .byte   TGI_API_VERSION         ; TGI API version number
-        .addr   $0000                   ; Library reference
-xres:   .word   160                     ; Max X resolution
-yres:   .word   50                      ; Max Y resolution
+libref: .addr   $0000                   ; Library reference
+xres:   .word   80 - fix                ; X resolution (Plus/4 default)
+yres:   .word   50                      ; Y resolution
         .byte   2                       ; Number of drawing colors
         .byte   1                       ; Number of screens available
         .byte   2                       ; System font X size
@@ -113,18 +121,21 @@ CODE:           .byte   160, 172, 187, 162, 188, 161-128, 191-128, 190-128
 ;
 
 INSTALL:
-        .if .def(__PET__)
+        .ifndef __PLUS4__
+        .ifdef __PET__
         ldx     SCR_LINELEN
         inx                     ; Variable is one less
-        lda     SCREEN
-        cmp     #$4C
-        bne     patch
-        .endif
+        .else
         jsr     SCREEN
         sty     yres
         asl     yres            ; yres*2
-no_jmp: stx     xres
+        .endif
+        .if fix = 2
+        dex
+        .endif
+        stx     xres
         asl     xres            ; xres*2
+        .endif
 ;       rts
 
 ; ------------------------------------------------------------------------
@@ -136,26 +147,6 @@ no_jmp: stx     xres
 
 UNINSTALL:
         rts
-
-        .if .def(__PET__)
-; Runtime PET patch
-; clc      -->  stx 198
-; jsr PLOT -->  sty 216
-patch:
-        lda     #$86
-        sta     P1+0
-        sta     P2+0
-        lda     #198
-        sta     P1+1
-        sta     P2+1
-        lda     #$84
-        sta     P1+2
-        sta     P2+2
-        lda     #216
-        sta     P1+3
-        sta     P2+3
-        bne     no_jmp
-        .endif
 
 ; ------------------------------------------------------------------------
 ; INIT: Changes an already installed device from text mode to graphics
@@ -327,8 +318,13 @@ SETPIXEL:
         lda     Y1
         lsr
         tax
-P1:     clc
+        .ifdef __PET__
+        stx     198
+        sty     216
+        .else
+        clc
         jsr     PLOT
+        .endif
         jsr     calc
         ldx     COLOR
         bne     @set2
@@ -427,8 +423,13 @@ OUTTEXT:
         lda     ptr2
         lsr
         tax
-P2:     clc
+        .ifdef __PET__
+        stx     198
+        sty     216
+        .else
+        clc
         jsr     PLOT
+        .endif
         ldy     #0
 @L1:    lda     (ptr3),y
         jsr     BSOUT

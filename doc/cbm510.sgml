@@ -185,8 +185,7 @@ The names in the parentheses denote the symbols to be used for static linking of
 <descrip>
 
   <tag><tt/cbm510-lo.tgi (cbm510_lo_tgi)/</tag>
-  This driver features a resolution of 80&times;50 with two colors but the
-  bottom-right pixels.
+  This driver features a resolution of 78&times;50 with two colors.
 
 </descrip><p>
 

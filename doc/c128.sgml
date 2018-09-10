@@ -218,8 +218,8 @@ memory drivers using the VDC memory!
   16 VDC colors). The driver requires 64KB VDC RAM.
 
   <tag><tt/c128-lo.tgi (c128_lo_tgi)/</tag>
-  This driver features a resolution of 80&times;50 or 160&times;50 with two
-  colors but the bottom-right pixels.
+  This driver features a resolution of 78&times;50 or 158&times;50 with two
+  colors.
 
 </descrip><p>
 

@@ -73,7 +73,7 @@ cont:   ldx     #0              ; channel 0
 .ifdef __ATARIXL__
 
 ; check for SpartaDOS and its usage of RAM below ROM
-; return CF 0/1 for bad/ok
+; return CF 0/1 for ok/bad
 sdcheck:lda     DOS
         cmp     #'S'
         bne     sdcrts0         ; not SpartaDOS, assume RAM is not used

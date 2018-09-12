@@ -519,7 +519,7 @@ specify a segment attribute. There are five possible segment attributes:
         rw          means read/write
         bss         means that this is an uninitialized segment
         zp          a zeropage segment
-        overwrite   a segment that overwrites another one
+        overwrite   a segment that overwrites (parts of) another one
 
 </verb></tscreen>
 
@@ -635,8 +635,8 @@ Here is an example:
 
 <tscreen><verb>
 MEMORY {
-    RAM: file = "", start = $6000, size = $2000, type=bss;
-    ROM:  file = %O, start = $8000, size = $8000, type=ro;
+    RAM: file = "", start = $6000, size = $2000, type=rw;
+    ROM: file = %O, start = $8000, size = $8000, type=ro;
 }
 </verb></tscreen>
 
@@ -655,14 +655,15 @@ SEGMENTS {
 </verb></tscreen>
 
 Segment named ORIGINAL contains the original code, disassembled or provided in
-a binary form. Subsequent four segments will be relocated to addresses
-specified by their "start" attributes ("offset" can also be used) and then will
-overwrite whatever was at these locations in the ORIGINAL segment. In the end,
-resulting binary output file will thus contain original data with the exception
-of four sequences starting at $9000, $f7e8, $8000 and $e5b7, which will sport
-code from their respective segments. How long these sequences will be depends
-on the lengths of corresponding segments - they can even overlap, so think what
-you're doing.
+a binary form (i.e. using <tt><ref id=".INCBIN" name=".incbin"></tt>
+directive).  Subsequent four segments will be relocated to addresses specified
+by their "start" attributes ("offset" can also be used) and then will overwrite
+whatever was at these locations in the ORIGINAL segment. In the end, resulting
+binary output file will thus contain original data with the exception of four
+sequences starting at $9000, $f7e8, $8000 and $e5b7, which will sport code from
+their respective segments. How long these sequences will be depends on the
+lengths of corresponding segments - they can even overlap, so think what you're
+doing.
 
 Finally, note that OVERWRITE segments should be the final segments loaded to a
 particular memory area, and that they need at least one of "start" or "offset"

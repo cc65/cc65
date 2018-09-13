@@ -655,8 +655,8 @@ SEGMENTS {
 </verb></tscreen>
 
 Segment named ORIGINAL contains the original code, disassembled or provided in
-a binary form (i.e. using <tt><ref id=".INCBIN" name=".incbin"></tt>
-directive).  Subsequent four segments will be relocated to addresses specified
+a binary form (i.e. using <tt/.INCBIN/ directive; see the <tt/ca65/ assembler
+document).  Subsequent four segments will be relocated to addresses specified
 by their "start" attributes ("offset" can also be used) and then will overwrite
 whatever was at these locations in the ORIGINAL segment. In the end, resulting
 binary output file will thus contain original data with the exception of four

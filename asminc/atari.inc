@@ -1003,15 +1003,15 @@ diopp_size   = 5        ; size of structure
 ;-------------------------------------------------------------------------
 
 SPARTADOS    = 0
-OSADOS       = 1        ; OS/A+
-XDOS         = 2
-REALDOS      = 3
+REALDOS      = 1
+OSADOS       = 2        ; OS/A+
+XDOS         = 3
 ATARIDOS     = 4
 MYDOS        = 5
 NODOS        = 255
 ; The DOSes with dos_type below or equal MAX_DOS_WITH_CMDLINE do support
 ; command line arguments.
-MAX_DOS_WITH_CMDLINE = REALDOS
+MAX_DOS_WITH_CMDLINE = XDOS
 
 ;-------------------------------------------------------------------------
 ; XDOS defines (version 2.4, taken from xdos24.pdf)

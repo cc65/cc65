@@ -81,7 +81,7 @@ finish: lda     #<__defdev
         ldx     #>__defdev
         rts
 
-; On AtariDOS or MyDOS, use the DUNIT variable to setuo the default
+; On AtariDOS or MyDOS, use the DUNIT variable to setup the default
 ; device. The default device will then be the one the program was
 ; loaded from.
 
@@ -89,8 +89,7 @@ use_DUNIT:
         lda     DUNIT
         clc
         adc     #'0'
-        sta     __defdev + 1
-        bne     finish          ; jump always
+        bne     done            ; jump always
 
 ; XDOS default device retrieval
 

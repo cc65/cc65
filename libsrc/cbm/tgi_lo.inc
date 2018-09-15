@@ -2,6 +2,7 @@
 ; Graphics driver for a max. 160x50x2 (but 4 pixels) mode on all CBMs.
 ;
 ; 2018-08-30, Stefan Haubenthal
+; 2018-09-14, Greg King
 ;
 
         .include        "zeropage.inc"
@@ -35,7 +36,7 @@ RVS_OFF         = 18+128
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table and constants.
 
-        module_header   _c16_lo_tgi;MODULE_LABEL
+        module_header   MODULE_LABEL
 
 ; First part of the header is a structure that has a magic and defines the
 ; capabilities of the driver
@@ -94,6 +95,7 @@ TEMP3           := tmp3
 .bss
 
 COPY:           .res    160/2*50/2
+xcells:         .res    1       ; Number of physical cells across the screen
 ERROR:          .res    1       ; Error code
 COLOR:          .res    1       ; Current color
 
@@ -102,12 +104,16 @@ COLOR:          .res    1       ; Current color
 .rodata
 
 DEFPALETTE:     .byte   $0, $1
+
+;                       84
+;                       21
 OFFSET:         .byte   8, 4, 2, 1
-;                       00   00   00   00   01   01   01   01
-;                       00   01   10   11   00   01   10   11
+
+;                       00   00   00   00   01   01       01       01
+;                       00   01   10   11   00   01       10       11
 CODE:           .byte   160, 172, 187, 162, 188, 161-128, 191-128, 190-128
-;                       10   10   10   10   11   11   11   11
-;                       00   01   10   11   00   01   10   11
+;                       10   10   10   10       11       11       11       11
+;                       00   01   10   11       00       01       10       11
                 .byte   190, 191, 161, 188-128, 162-128, 187-128, 172-128, 160-128
 
 .code
@@ -130,6 +136,7 @@ INSTALL:
         sty     yres
         asl     yres            ; yres*2
         .endif
+        stx     xcells
         .if fix = 2
         dex
         .endif
@@ -439,49 +446,37 @@ OUTTEXT:
         rts
 
 ; ------------------------------------------------------------------------
-; Calculate all variables to plot the pixel at X1/Y1.
+; Calculate all variables to plot the pixel at (X1,Y1).
+;
+; xcells * Y1/2 + COPY + X1/2
 
-calc:
-        ; Y1 * xres / 2 + X1 / 2 + COPY
-        lda     xres
-        sta     TEMP
-        lda     #0
-        sta     TEMP+1
-        ldy     Y1
-@L1:    lda     TEMP
-        add     xres
-        lsr
-        sta     TEMP
-        lda     TEMP+1
-        adc     #0
-        lsr
-        sta     TEMP+1
-        dey
-        bne     @L1
-        lda     TEMP
-        add     X1
-        lsr
-        sta     TEMP
-        lda     TEMP+1
-        adc     #0
-        lsr
-        sta     TEMP+1
-        lda     TEMP
+calc:   lda     Y1
+        lsr     a
+        tay
+        lda     #$00
+        tax
+        beq     @L2
+
+@L1:    add     xcells
+        bcc     @L2
+        inx
+@L2:    dey
+        bpl     @L1
+
         add     #<COPY
         sta     TEMP
-        lda     TEMP+1
+        txa
         adc     #>COPY
-        sta     TEMP+1
+        sta     TEMP+1          ; Set cell row
 
         lda     X1
-        and     #%00000001
-        sta     TEMP3
+        lsr     a
+        tay                     ; Set cell column
         lda     Y1
-        asl
-        and     #%00000010
-        ora     TEMP3
+        rol     a
+        and     #%00000011
         tax
-        lda     OFFSET,x
+        lda     OFFSET,x        ; Get bitmask within cell
         rts
 
 ; ------------------------------------------------------------------------

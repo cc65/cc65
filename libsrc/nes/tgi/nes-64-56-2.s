@@ -2,7 +2,6 @@
 ; Graphics driver for the lores 64x56x2 mode on the NES
 ;
 ; Stefan Haubenthal, 2009-03-10
-; Based on Maciej Witkowiak's line routine.
 ;
 
         .include        "zeropage.inc"

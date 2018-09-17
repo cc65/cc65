@@ -3,6 +3,7 @@
 ;
 ; Generic LINE implementation based on SETPIXEL for TGI driver inclusion
 ; Code previously present in a2.lo.tgi, c128-vdc.tgi and c128-vdc2.tgi
+; Based on Maciej Witkowiak's line routine.
 ;
 
 ; ------------------------------------------------------------------------

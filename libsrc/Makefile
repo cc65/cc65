@@ -128,7 +128,8 @@ EXTZP = cbm510 \
 MKINC = $(GEOS) \
         atari   \
         atarixl \
-        nes
+        nes     \
+        plus4
 
 TARGETUTIL = apple2    \
              apple2enh \

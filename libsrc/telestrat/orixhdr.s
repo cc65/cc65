@@ -9,7 +9,7 @@
 
     ; These symbols, also, come from the configuration file.
     .import __AUTORUN__, __PROGFLAG__
-    .import __BASHEAD_START__, __MAIN_LAST__
+    .import __MAIN_START__, __MAIN_LAST__
 
 
 ; ------------------------------------------------------------------------
@@ -29,7 +29,7 @@
     .byte   $00                     ;  reserved
     .byte   $00                     ;  auto or not
 
-    .word   __BASHEAD_START__       ; Address of start of file
+    .word   __MAIN_START__          ; Address of start of file
     .word   __MAIN_LAST__ - 1       ;  Address of end of file
-    .word   __BASHEAD_START__       ;  Address of start of file
+    .word   __MAIN_START__          ;  Address of start of file
 

@@ -32,9 +32,9 @@ __getdefdev:
 
         lda     __dos_type      ; which DOS?
         cmp     #XDOS
-        beq     xdos            ; only supported on XDOS ...
+        beq     xdos            ; XDOS detected
 ;       cmp     #OSADOS+1       ; (redundant: #OSADOS+1 = #XDOS)
-        bcs     use_DUNIT       ; ... and on OS/A+ and SpartaDOS
+        bcs     use_DUNIT       ; neither XDOS, nor OS/A+ or SpartaDOS
 
         ldy     #BUFOFF
         lda     #0

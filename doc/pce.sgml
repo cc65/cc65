@@ -1,11 +1,9 @@
 <!doctype linuxdoc system>
 
 <article>
-
 <title>PC-Engine (TurboGrafx 16) System-specific information for cc65
 <author><url url="mailto:groepaz@gmx.net" name="Groepaz/Hitmen">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
-<date>2018-02-24
 
 <abstract>
 An overview over the PCE runtime system as it is implemented for the

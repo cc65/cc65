@@ -1,10 +1,8 @@
 <!doctype linuxdoc system>
 
 <article>
-
 <title>Watara Supervision specific information for cc65
 <author><url url="mailto:polluks@sdf.lonestar.org" name="Stefan A. Haubenthal">
-<date>2017-11-21
 
 <abstract>
 An overview over the Supervision runtime system as it is implemented for the

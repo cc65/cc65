@@ -1,11 +1,9 @@
 <!doctype linuxdoc system>
 
 <article>
-
 <title>Atari 5200 specific information for cc65
 <author>
 <url url="mailto:chris@groessler.org" name="Christian Groessler"><newline>
-<date>2014-05-27
 
 <abstract>
 An overview over the Atari 5200 runtime system as it is implemented for the

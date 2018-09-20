@@ -3,7 +3,6 @@
 <article>
 <title>ld65 Users Guide
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2014-04-20
 
 <abstract>
 The ld65 linker combines object files into an executable file. ld65 is highly

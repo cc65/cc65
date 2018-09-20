@@ -4,7 +4,6 @@
 <title>cl65 Users Guide
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
-<date>2017-10-16
 
 <abstract>
 cl65 is the compile &amp; link utility for cc65, the 6502 C compiler. It was

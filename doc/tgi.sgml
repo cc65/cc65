@@ -5,7 +5,6 @@
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:polluks@sdf.lonestar.org" name="Stefan A. Haubenthal">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
-<date>2017-11-30
 
 <abstract>
 The cc65 library provides functions for platform independent graphics.

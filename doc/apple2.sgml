@@ -1,10 +1,8 @@
 <!doctype linuxdoc system>
 
 <article>
-
 <title>Apple&nbsp;&rsqb;&lsqb; specific information for cc65
 <author><url url="mailto:ol.sc@web.de" name="Oliver Schmidt">
-<date>2014-04-10
 
 <abstract>
 An overview over the Apple&nbsp;&rsqb;&lsqb; runtime system as it is

@@ -523,6 +523,7 @@ void NewFunc (SymEntry* Func)
 
     /* Need a starting curly brace */
     ConsumeLCurly ();
+    CollAppend (&CurrentFunc->LocalsBlockStack, (void *)CurrentFunc->LocalsBlockCount);
 
     /* Parse local variable declarations if any */
     DeclareLocals ();

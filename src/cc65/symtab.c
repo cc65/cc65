@@ -57,6 +57,8 @@
 #include "symentry.h"
 #include "typecmp.h"
 #include "symtab.h"
+#include "function.h"
+#include "input.h"
 
 
 
@@ -658,10 +660,26 @@ SymEntry* AddConstSym (const char* Name, const Type* T, unsigned Flags, long Val
 }
 
 
+DefOrRef* AddDefOrRef(SymEntry* E, unsigned Flags)
+/* Add definition or reference to the SymEntry and preserve its attributes */
+{
+    DefOrRef *DOR;
+
+    DOR = xmalloc (sizeof (DefOrRef));
+    CollAppend (E->V.L.DefsOrRefs, DOR);
+    DOR->Line = GetCurrentLine ();
+    DOR->LocalsBlockNum = (long)CollLast (&CurrentFunc->LocalsBlockStack);
+    DOR->Flags = Flags;
+
+    return DOR;
+}
+
 
 SymEntry* AddLabelSym (const char* Name, unsigned Flags)
 /* Add a goto label to the label table */
 {
+    unsigned i;
+    DefOrRef *DOR;
     /* Do we have an entry with this name already? */
     SymEntry* Entry = FindSymInTable (LabelTab, Name, HashStr (Name));
     if (Entry) {
@@ -670,6 +688,24 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
             /* Trying to define the label more than once */
             Error ("Label `%s' is defined more than once", Name);
         }
+
+        /* Walk through all occurrences of the label so far and check
+           if any of them is in a region that would be risky to jump from/to
+           from the place where we are right now. */
+        for (i = 0; i < CollCount (Entry->V.L.DefsOrRefs); i++) {
+            DOR = CollAt (Entry->V.L.DefsOrRefs, i);
+            /* We are only interested in label occurences of type opposite to
+             the one currently being added, i.e.  if we are processing the
+             definition, we will only check the gotos; if we are processing
+             a goto statement, we will only look for the label definition. */
+            if (((DOR->Flags & SC_DEF) != (Flags & SC_DEF)) &&
+                (DOR->LocalsBlockNum != (long)CollLast (&CurrentFunc->LocalsBlockStack)))
+                Warning ("Goto from line %d to label \'%s\' can result in a "
+                    "trashed stack", Flags & SC_DEF ? DOR->Line : GetCurrentLine (), Name);
+        }
+
+        AddDefOrRef (Entry, Flags);
+
         Entry->Flags |= Flags;
 
     } else {
@@ -678,10 +714,14 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
         Entry = NewSymEntry (Name, SC_LABEL | Flags);
 
         /* Set a new label number */
-        Entry->V.Label = GetLocalLabel ();
+        Entry->V.L.Label = GetLocalLabel ();
+
+        /* Create Collection for label definition and references */
+        Entry->V.L.DefsOrRefs = NewCollection ();
+        AddDefOrRef (Entry, Flags);
 
         /* Generate the assembler name of the label */
-        Entry->AsmName = xstrdup (LocalLabelName (Entry->V.Label));
+        Entry->AsmName = xstrdup (LocalLabelName (Entry->V.L.Label));
 
         /* Add the entry to the label table */
         AddSymEntry (LabelTab, Entry);
@@ -717,12 +757,12 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
             Entry->V.R.RegOffs  = Offs;
             Entry->V.R.SaveOffs = StackPtr;
         } else if ((Flags & SC_EXTERN) == SC_EXTERN) {
-            Entry->V.Label = Offs;
+            Entry->V.L.Label = Offs;
             SymSetAsmName (Entry);
         } else if ((Flags & SC_STATIC) == SC_STATIC) {
             /* Generate the assembler name from the label number */
-            Entry->V.Label = Offs;
-            Entry->AsmName = xstrdup (LocalLabelName (Entry->V.Label));
+            Entry->V.L.Label = Offs;
+            Entry->AsmName = xstrdup (LocalLabelName (Entry->V.L.Label));
         } else if ((Flags & SC_STRUCTFIELD) == SC_STRUCTFIELD) {
             Entry->V.Offs = Offs;
         } else {

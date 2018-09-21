@@ -1,10 +1,8 @@
 <!doctype linuxdoc system>
 
 <article>
-
 <title>VTech Creativision (aka Funvision) specific information for cc65
 <author><url url="mailto:polluks+cc65@sdf.lonestar.org" name="Stefan A. Haubenthal">
-<date>2017-11-15
 
 <abstract>
 An overview over the Creativision runtime system as it is implemented for the

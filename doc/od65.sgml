@@ -3,7 +3,6 @@
 <article>
 <title>od65 Users Guide
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2014-04-14
 
 <abstract>
 od65 is the object file dump utility. It is able to output most parts of

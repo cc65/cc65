@@ -1,10 +1,8 @@
 <!doctype linuxdoc system>
 
 <article>
-
 <title>Enhanced&nbsp;Apple&nbsp;//e specific information for cc65
 <author><url url="mailto:ol.sc@web.de" name="Oliver Schmidt">
-<date>2014-04-10
 
 <abstract>
 An overview over the enhanced&nbsp;Apple&nbsp;//e runtime system as it is
@@ -456,7 +454,7 @@ BASIC.SYSTEM) there are some limitations for DOS 3.3:
 
 <descrip>
 
-  <tag>Disk File I/O</tag>
+  <tag>Disk file I/O</tag>
   There's no disk file I/O support. Any attempt to use it yields an error with
   <tt/errno/ set to <tt/ENOSYS/. This implicitly means that loadable drivers
   are in general not functional as they depend on disk file I/O. Therefore the statically
@@ -477,6 +475,18 @@ BASIC.SYSTEM) there are some limitations for DOS 3.3:
   <tag/Color/
   The enhanced&nbsp;Apple&nbsp;//e has no color text mode. Therefore the functions
   textcolor(), bgcolor() and bordercolor() have no effect.
+
+</descrip><p>
+
+
+<sect1>Random number generator<p>
+
+<descrip>
+
+  <tag/Random number seed/
+  The random number seed is generated from the time the program waits for user input.
+  Therefore it is necessary to wait for at least one user keypress either via Standard
+  I/O or via Direct console I/O before initializing the pseudo random number generator.
 
 </descrip><p>
 

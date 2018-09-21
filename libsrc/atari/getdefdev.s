@@ -3,7 +3,11 @@
 ;
 ; function to get default device: char *_getdefdev(void);
 ;
-; SpartaDOS:
+; AtariDOS/MyDOS:
+; Default device number is derived from DUNIT. Therefore "default
+; device" is the one the program was loaded from.
+;
+; SpartaDOS/RealDOS:
 ; the ZCRNAME routine is only used to get the default drive because
 ; ZCRNAME has two disadvantages:
 ; 1. It will convert D: into D1: instead of Dn: (n = default drive)
@@ -28,9 +32,9 @@ __getdefdev:
 
         lda     __dos_type      ; which DOS?
         cmp     #XDOS
-        beq     xdos            ; only supported on XDOS ...
+        beq     xdos            ; XDOS detected
 ;       cmp     #OSADOS+1       ; (redundant: #OSADOS+1 = #XDOS)
-        bcs     finish          ; ... and on OS/A+ and SpartaDOS
+        bcs     use_DUNIT       ; neither XDOS, nor OS/A+ or SpartaDOS
 
         ldy     #BUFOFF
         lda     #0
@@ -76,6 +80,16 @@ done:   sta     __defdev+1
 finish: lda     #<__defdev
         ldx     #>__defdev
         rts
+
+; On AtariDOS or MyDOS, use the DUNIT variable to setup the default
+; device. The default device will then be the one the program was
+; loaded from.
+
+use_DUNIT:
+        lda     DUNIT
+        clc
+        adc     #'0'
+        bne     done            ; jump always
 
 ; XDOS default device retrieval
 

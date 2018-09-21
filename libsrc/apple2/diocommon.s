@@ -26,7 +26,7 @@ dioprolog:
 diocommon:
         ; Call read_block or write_block
         ldx     #RW_BLOCK_COUNT
-        jsr     callmli         
+        jsr     callmli
 
 dioepilog:
         ; Return success or error

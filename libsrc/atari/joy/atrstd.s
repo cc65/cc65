@@ -93,8 +93,8 @@ _400800:
 ;
 
 READJOY:
-        and     #3              ; fix joystick number
-        tax                     ; Joystick number (0-3) into X
+        and     #JOY_COUNT-1    ; fix joystick number
+        tax                     ; Joystick number into X
 
 ; Read joystick
 
@@ -105,5 +105,14 @@ READJOY:
         asl     a
         ora     STICK0,x        ; add position information
         eor     #$1F
-        ldx     #0              ; fix X
+        cmp     oldval,x
+        beq     :+
+        sta     oldval,x
+        ldx     #0
+        stx     ATRACT          ; we have interaction, disable "attract mode"
+:       ldx     #0              ; fix X
         rts
+
+        .bss
+
+oldval: .res    JOY_COUNT

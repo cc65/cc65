@@ -1,11 +1,9 @@
 <!doctype linuxdoc system>
 
 <article>
-
 <title>Gamate System specific information for cc65
 <author>
 <url url="mailto:groepaz@gmx.net" name="Groepaz/Hitmen">
-<date>2015-11-29
 
 <abstract>
 An overview over the Gamate runtime system as it is implemented for the

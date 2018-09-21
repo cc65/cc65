@@ -1,14 +1,12 @@
 <!doctype linuxdoc system>
 
 <article>
-
 <title>cc65 Compiler Intro
 <author>
 <url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:cbmnut@hushmail.com" name="CbmNut">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">,<newline>
 <url url="mailto:stephan.muehlstrasser@web.de" name="Stephan M&uuml;hlstrasser">
-<date>2015-03-07
 
 <abstract>
 How to use the cc65 C language system -- an introduction.

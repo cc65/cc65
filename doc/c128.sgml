@@ -1,10 +1,9 @@
 <!doctype linuxdoc system>
 
 <article>
-
 <title>Commodore 128-specific information for cc65
-<author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2018-08-29
+<author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
+<url url="mailto:polluks@sdf.lonestar.org" name="Stefan A. Haubenthal">
 
 <abstract>
 An overview over the C128 runtime system as it is implemented for the cc65 C

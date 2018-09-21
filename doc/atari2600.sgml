@@ -1,11 +1,9 @@
 <!doctype linuxdoc system>
 
 <article>
-
 <title>Atari 2600 specific information for cc65
 <author>
 <url url="mailto:contact@florentflament.com" name="Florent Flament"><newline>
-<date>2017-01-11
 
 <abstract>
 An overview over the Atari 2600 runtime system as it is implemented

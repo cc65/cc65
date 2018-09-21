@@ -37,5 +37,5 @@ initcwd:
         ; Add terminating zero
         lda     #$00
         sta     __cwd,x
-        
+
 done:   rts

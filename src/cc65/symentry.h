@@ -101,7 +101,17 @@ struct LiteralPool;
 
 
 /* Symbol table entry */
+
+typedef struct DefOrRef DefOrRef;
+
+struct DefOrRef {
+    unsigned            Line;
+    long                LocalsBlockNum;
+    unsigned            Flags;
+};
+
 typedef struct SymEntry SymEntry;
+
 struct SymEntry {
     SymEntry*                   NextHash; /* Next entry in hash list */
     SymEntry*                   PrevSym;  /* Previous symbol in dl list */
@@ -120,7 +130,10 @@ struct SymEntry {
         int                     Offs;
 
         /* Label name for static symbols */
-        unsigned                Label;
+        struct {
+            unsigned            Label;
+            Collection          *DefsOrRefs;
+        } L;
 
         /* Register bank offset and offset of the saved copy on stack for
         ** register variables.

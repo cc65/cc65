@@ -535,8 +535,9 @@ static int CompoundStatement (void)
         g_space (StackPtr - OldStack);
     }
 
-    if (OldStack != StackPtr)
+    if (OldStack != StackPtr) {
         CollPop (&CurrentFunc->LocalsBlockStack);
+    }
 
     StackPtr = OldStack;
 

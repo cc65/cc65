@@ -65,8 +65,6 @@ struct Function {
     Collection          LocalsBlockStack; /* Stack of blocks with local vars */
 };
 
-
-
 /* Structure that holds all data needed for function activation */
 typedef struct Function Function;
 

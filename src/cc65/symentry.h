@@ -100,18 +100,17 @@ struct LiteralPool;
 
 
 
-/* Symbol table entry */
 
+/* Label definition or reference */
 typedef struct DefOrRef DefOrRef;
-
 struct DefOrRef {
     unsigned            Line;
     long                LocalsBlockNum;
     unsigned            Flags;
 };
 
+/* Symbol table entry */
 typedef struct SymEntry SymEntry;
-
 struct SymEntry {
     SymEntry*                   NextHash; /* Next entry in hash list */
     SymEntry*                   PrevSym;  /* Previous symbol in dl list */

@@ -116,6 +116,15 @@ CODE:           .byte   160, 172, 187, 162, 188, 161-128, 191-128, 190-128
 ;                       00   01   10   11       00       01       10       11
                 .byte   190, 191, 161, 188-128, 162-128, 187-128, 172-128, 160-128
 
+.ifdef __PLUS4__
+.data
+
+PLOT:
+                .byte   $4C, 0, 0
+BSOUT:
+                .byte   $4C, 0, 0
+.endif
+
 .code
 
 ; ------------------------------------------------------------------------
@@ -137,11 +146,16 @@ INSTALL:
         asl     yres            ; yres*2
         .endif
         stx     xcells
-        .if fix = 2
+        .if fix
         dex
         .endif
         stx     xres
         asl     xres            ; xres*2
+        .else
+        lda     libref
+        sta     PLOT+1
+        lda     libref+1
+        sta     PLOT+2
         .endif
 ;       rts
 
@@ -308,6 +322,7 @@ GETDEFPALETTE:
 ;
 
 SETPIXEL:
+        .if fix = 0
         ldx     Y1              ; y+2<yres
         inx
         inx
@@ -319,6 +334,7 @@ SETPIXEL:
         cpx     xres
         bcc     @L2
         rts
+        .endif
 @L2:    lda     X1
         lsr
         tay

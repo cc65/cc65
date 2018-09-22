@@ -72,6 +72,11 @@ $(WORKDIR)/limits.$1.$2.prg: limits.c $(DIFF)
 	$(SIM65) $(SIM65FLAGS) $$@ > $(WORKDIR)/limits.$1.out
 	$(DIFF) $(WORKDIR)/limits.$1.out limits.ref
 
+$(WORKDIR)/goto.$1.$2.prg: goto.c $(DIFF)
+	$(if $(QUIET),echo misc/goto.$1.$2.prg)
+	$(CL65) -t sim$2 -$1 -o $$@ $$< 2>$(WORKDIR)/goto.$1.out
+	$(DIFF) $(WORKDIR)/goto.$1.out goto.ref
+
 # the rest are tests that fail currently for one reason or another
 $(WORKDIR)/fields.$1.$2.prg: fields.c | $(WORKDIR)
 	@echo "FIXME: " $$@ "currently will fail."

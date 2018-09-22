@@ -60,6 +60,7 @@
 /*****************************************************************************/
 
 
+
 /* Pointer to current function */
 Function* CurrentFunc = 0;
 
@@ -523,7 +524,7 @@ void NewFunc (SymEntry* Func)
 
     /* Need a starting curly brace */
     ConsumeLCurly ();
-    CollAppend (&CurrentFunc->LocalsBlockStack, (void *)CurrentFunc->LocalsBlockCount);
+    CollAppend (&CurrentFunc->LocalsBlockStack, 0);
 
     /* Parse local variable declarations if any */
     DeclareLocals ();

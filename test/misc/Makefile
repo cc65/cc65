@@ -72,6 +72,7 @@ $(WORKDIR)/limits.$1.$2.prg: limits.c $(DIFF)
 	$(SIM65) $(SIM65FLAGS) $$@ > $(WORKDIR)/limits.$1.out
 	$(DIFF) $(WORKDIR)/limits.$1.out limits.ref
 
+# here we check if the right warnings are produced
 $(WORKDIR)/goto.$1.$2.prg: goto.c $(DIFF)
 	$(if $(QUIET),echo misc/goto.$1.$2.prg)
 	$(CL65) -t sim$2 -$1 -o $$@ $$< 2>$(WORKDIR)/goto.$1.out

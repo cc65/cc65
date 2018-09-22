@@ -88,6 +88,7 @@ YMin:           .res    2               ; Y1 value of bounding box
 XMax:           .res    2               ; X2 value of bounding box
 YMax:           .res    2               ; Y2 value of bounding box
 Buttons:        .res    1               ; Button mask
+OldButton:      .res    1               ; previous buttons
 
 ; Default values for above variables
 
@@ -337,10 +338,19 @@ IRQ:
         ora     Buttons
         sta     Buttons
 
+; Check if button status changed, and disable "attract mode" if yes
+
+@L02:   lda     Buttons
+        cmp     OldButton
+        beq     @L03
+        sta     OldButton
+        lda     #0
+        sta     ATRACT
+
 ; If we read 228 for X or Y positions, we assume the user has lifted the pen
 ; and don't change the cursor position.
 
-@L02:   lda     PADDL0
+@L03:   lda     PADDL0
         cmp     #228
         beq     @Cont                   ; CF set if equal
         lda     PADDL1
@@ -350,12 +360,13 @@ IRQ:
         jsr     CPREP
         plp                             ; restore CF
 
-        bcc     @L03
+        bcc     @L04
         jmp     @Show
 
-@L03:   ldx     #0
+@L04:   ldx     #0
         stx     XPos+1
         stx     YPos+1
+        stx     ATRACT                  ; disable "attract mode"
 
 ; Get cursor position
 ; -------------------
@@ -382,9 +393,9 @@ IRQ:
         clc
         adc     XPos
         sta     XPos
-        bcc     @L04
+        bcc     @L05
         inc     XPos+1
-@L04:   txa
+@L05:   txa
         lsr     a                       ; port value / 4
         lsr     a                       ; port value / 8
         tax
@@ -393,18 +404,18 @@ IRQ:
         stx     XPos
         sbc     XPos
         sta     XPos
-        bcs     @L05
+        bcs     @L06
         dec     XPos+1
-@L05:   txa
+@L06:   txa
         lsr     a                       ; port value / 16
         lsr     a                       ; port value / 32
         clc
         adc     XPos
         sta     XPos
-        bcc     @L06
+        bcc     @L07
         inc     XPos+1
 
-@L06:   tay
+@L07:   tay
         lda     XPos+1
         tax
 
@@ -412,18 +423,18 @@ IRQ:
 
         cpy     XMin
         sbc     XMin+1
-        bpl     @L07
+        bpl     @L08
         ldy     XMin
         ldx     XMin+1
-        jmp     @L08
-@L07:   txa
+        jmp     @L09
+@L08:   txa
 
         cpy     XMax
         sbc     XMax+1
-        bmi     @L08
+        bmi     @L09
         ldy     XMax
         ldx     XMax+1
-@L08:   sty     XPos
+@L09:   sty     XPos
         stx     XPos+1
 
 ; Move the mouse pointer to the new X pos
@@ -456,18 +467,18 @@ IRQ:
 
         cpy     YMin
         sbc     YMin+1
-        bpl     @L09
+        bpl     @L10
         ldy     YMin
         ldx     YMin+1
-        jmp     @L10
-@L09:   txa
+        jmp     @L11
+@L10:   txa
 
         cpy     YMax
         sbc     YMax+1
-        bmi     @L10
+        bmi     @L11
         ldy     YMax
         ldx     YMax+1
-@L10:   sty     YPos
+@L11:   sty     YPos
         stx     YPos+1
 
 ; Move the mouse pointer to the new X pos
@@ -479,4 +490,3 @@ IRQ:
 
         clc                             ; Interrupt not "handled"
         rts
-

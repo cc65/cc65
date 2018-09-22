@@ -4,7 +4,6 @@
 <title>cc65 function reference
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
-<date>2018-05-29
 
 <abstract>
 cc65 is a C compiler for 6502 based systems. This function reference describes

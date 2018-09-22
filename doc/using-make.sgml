@@ -1,10 +1,8 @@
 <!doctype linuxdoc system>
 
 <article>
-
 <title>Using GNU Make with cc65
 <author><url url="mailto:ol.sc@web.de" name="Oliver Schmidt">
-<date>2014-04-12
 
 <abstract>
 How to build your program using the GNU Make utility.

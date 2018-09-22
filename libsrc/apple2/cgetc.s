@@ -25,8 +25,11 @@ _cgetc:
         jsr     putchardirect   ; Returns old character in X
 
         ; Wait for keyboard strobe.
+:       inc     RNDL            ; Increment random counter low
+        bne     :+
+        inc     RNDH            ; Increment random counter high
 :       lda     KBD
-        bpl     :-              ; If < 128, no key pressed
+        bpl     :--             ; If < 128, no key pressed
 
         ; Cursor on ?
         ldy     cursor

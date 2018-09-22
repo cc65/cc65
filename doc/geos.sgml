@@ -1,12 +1,9 @@
 <!doctype linuxdoc system>
 
 <article>
-
-<!-- Title information -->
-
 <title>GEOSLib docs
 <author><url url="mailto:ytm@elysium.pl" name="Maciej Witkowiak">
-<date>2014-04-11
+
 <abstract>
 This is the documentation of cc65's GEOSLib, but information contained here may be also
 useful for writing GEOS applications in general.

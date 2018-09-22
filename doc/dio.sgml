@@ -3,7 +3,6 @@
 <article>
 <title>Diskette Sector I/O Routines
 <author><url url="mailto:chris@groessler.org" name="Christian Groessler">
-<date>2014-04-10
 
 <abstract>
 The cc65 library provides functions to read and write raw disk sectors.

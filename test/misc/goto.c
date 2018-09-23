@@ -61,5 +61,5 @@ int function () {
     goto end;
 
 end:
-    ;
+    return 0;
 }

@@ -4,7 +4,6 @@
 <title>cc65 Users Guide
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:gregdk@users.sf.net" name="Greg King">
-<date>2017-05-20
 
 <abstract>
 cc65 is a C compiler for 6502 targets. It supports several 6502 based home

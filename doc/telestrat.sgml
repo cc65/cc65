@@ -1,12 +1,9 @@
 <!doctype linuxdoc system>
 
 <article>
-
 <title>Oric Telestrat-specific information for cc65
 <author>
 <url url="mailto:jede@oric.org" name="Jede">
-
-<date>2017-01-22
 
 <abstract>
 An overview over the Telestrat (Telemon 2.4 & Telemon 3.x : http://orix.oric.org) runtime system as it is implemented for the cc65 C compiler.

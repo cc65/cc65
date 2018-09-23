@@ -1,10 +1,8 @@
 <!doctype linuxdoc system>
 
 <article>
-
 <title>cc65 Library Overview
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2018-02-28
 
 <abstract>
 An overview over the runtime and C libraries that come with the cc65 compiler,

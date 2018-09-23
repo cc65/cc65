@@ -1,12 +1,10 @@
 <!doctype linuxdoc system>
 
 <article>
-
 <title>Atari Lynx specific information for cc65
 <author>
 <url url="mailto:karri@sipo.fi" name="Karri Kaksonen">,<newline>
 <url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2014-04-12
 
 <abstract>
 An overview over the Atari Lynx runtime system as it is implemented for the

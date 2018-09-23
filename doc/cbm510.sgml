@@ -1,13 +1,11 @@
 <!doctype linuxdoc system>
 
 <article>
-
 <title>Commodore 510 (aka P500) specific information for cc65
 <author>
 <url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:polluks@sdf.lonestar.org" name="Stefan A. Haubenthal">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
-<date>2014-04-25
 
 <abstract>
 An overview over the Commodore 510 runtime system as it is implemented for the

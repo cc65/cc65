@@ -5,7 +5,6 @@
 <author>
 <url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
-<date>2014-11-23
 
 <abstract>
 da65 is a 6502/65C02 disassembler that is able to read user-supplied

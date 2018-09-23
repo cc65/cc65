@@ -3,7 +3,6 @@
 <article>
 <title>cc65 internals
 <author><url url="mailto:bbbradsmith@users.noreply.github.com" name="Brad Smith">
-<date>2016-02-27
 
 <abstract>
 Internal details of cc65 code generation,

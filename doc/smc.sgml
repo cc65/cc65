@@ -3,7 +3,6 @@
 <article>
 <title>ca65 Macros for Self Modifying Code
 <author>Christian Kr&uuml;ger
-<date>2014-04-24
 
 <abstract>
 The 'smc.inc' macro package for ca65 eases the use, increases the safeness and

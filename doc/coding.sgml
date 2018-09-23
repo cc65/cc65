@@ -3,7 +3,6 @@
 <article>
 <title>cc65 coding hints
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2000-12-03, 2009-09-01
 
 <abstract>
 How to generate the most effective code with cc65.

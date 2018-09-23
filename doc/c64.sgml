@@ -1,11 +1,9 @@
 <!doctype linuxdoc system>
 
 <article>
-
 <title>Commodore 64-specific information for cc65
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz"><newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
-<date>2018-05-14
 
 <abstract>
 An overview over the C64 runtime system as it is implemented for the cc65 C

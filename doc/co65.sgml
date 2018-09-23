@@ -3,7 +3,6 @@
 <article>
 <title>co65 Users Guide
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>12.02.2003
 
 <abstract>
 co65 is an object file conversion utility. It converts o65 object files into

@@ -700,7 +700,7 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
              a goto statement, we will only look for the label definition. */
             if (((DOR->Flags & SC_DEF) != (Flags & SC_DEF)) &&
                 (DOR->LocalsBlockNum != (long)CollLast (&CurrentFunc->LocalsBlockStack)))
-                Warning ("Goto from line %d to label \'%s\' can result in a "
+                Error ("Goto from line %d to label \'%s\' can result in a "
                     "trashed stack", Flags & SC_DEF ? DOR->Line : GetCurrentLine (), Name);
         }
 

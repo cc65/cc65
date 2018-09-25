@@ -107,6 +107,9 @@ struct DefOrRef {
     unsigned            Line;
     long                LocalsBlockNum;
     unsigned            Flags;
+    int                 StackPtr;
+    unsigned            Depth;
+    unsigned            LateSP_Label;
 };
 
 /* Symbol table entry */

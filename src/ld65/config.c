@@ -68,6 +68,7 @@
 #include "objdata.h"
 #include "scanner.h"
 #include "spool.h"
+#include "xex.h"
 
 
 
@@ -149,6 +150,7 @@ static Collection       CfgSymbols = STATIC_COLLECTION_INITIALIZER;
 /* Descriptor holding information about the binary formats */
 static BinDesc* BinFmtDesc      = 0;
 static O65Desc* O65FmtDesc      = 0;
+static XexDesc* XexFmtDesc      = 0;
 
 
 
@@ -543,6 +545,7 @@ static void ParseFiles (void)
         {   "FORMAT",   CFGTOK_FORMAT   },
     };
     static const IdentTok Formats [] = {
+        {   "ATARI",    CFGTOK_ATARIEXE },
         {   "O65",      CFGTOK_O65      },
         {   "BIN",      CFGTOK_BIN      },
         {   "BINARY",   CFGTOK_BIN      },
@@ -605,6 +608,10 @@ static void ParseFiles (void)
 
                         case CFGTOK_O65:
                             F->Format = BINFMT_O65;
+                            break;
+
+                        case CFGTOK_ATARIEXE:
+                            F->Format = BINFMT_ATARIEXE;
                             break;
 
                         default:
@@ -1023,6 +1030,7 @@ static void ParseFormats (void)
                 break;
 
             case CFGTOK_BIN:
+            case CFGTOK_ATARIEXE:
                 /* No attribibutes available */
                 break;
 
@@ -1559,6 +1567,7 @@ void CfgRead (void)
     /* Create the descriptors for the binary formats */
     BinFmtDesc = NewBinDesc ();
     O65FmtDesc = NewO65Desc ();
+    XexFmtDesc = NewXexDesc ();
 
     /* If we have a config name given, open the file, otherwise we will read
     ** from a buffer.
@@ -2096,6 +2105,10 @@ void CfgWriteTarget (void)
 
                     case BINFMT_O65:
                         O65WriteTarget (O65FmtDesc, F);
+                        break;
+
+                    case BINFMT_ATARIEXE:
+                        XexWriteTarget (XexFmtDesc, F);
                         break;
 
                     default:

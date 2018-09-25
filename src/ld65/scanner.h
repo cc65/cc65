@@ -107,6 +107,7 @@ typedef enum {
     CFGTOK_ZP,
     CFGTOK_OVERWRITE,
 
+    CFGTOK_ATARIEXE,
     CFGTOK_O65,
     CFGTOK_BIN,
 

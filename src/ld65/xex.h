@@ -1,15 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 target.h                                  */
+/*                                   xex.h                                   */
 /*                                                                           */
-/*                           Target specification                            */
+/*               Module to handle the Atari EXE binary format                */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2011, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
+/* (C) 2018 Daniel Serpell                                                   */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,13 +30,12 @@
 
 
 
-#ifndef TARGET_H
-#define TARGET_H
+#ifndef XEX_H
+#define XEX_H
 
 
 
-/* common */
-#include "cpu.h"
+#include "config.h"
 
 
 
@@ -49,61 +45,8 @@
 
 
 
-/* Supported target systems */
-typedef enum {
-    TGT_UNKNOWN = -1,           /* Not specified or invalid target */
-    TGT_NONE,
-    TGT_MODULE,
-    TGT_ATARI,
-    TGT_ATARI2600,
-    TGT_ATARI5200,
-    TGT_ATARIXL,
-    TGT_VIC20,
-    TGT_C16,
-    TGT_C64,
-    TGT_C128,
-    TGT_PLUS4,
-    TGT_CBM510,
-    TGT_CBM610,
-    TGT_OSIC1P,
-    TGT_PET,
-    TGT_BBC,
-    TGT_APPLE2,
-    TGT_APPLE2ENH,
-    TGT_GEOS_CBM,
-    TGT_CREATIVISION,
-    TGT_GEOS_APPLE,
-    TGT_LUNIX,
-    TGT_ATMOS,
-    TGT_TELESTRAT,
-    TGT_NES,
-    TGT_SUPERVISION,
-    TGT_LYNX,
-    TGT_SIM6502,
-    TGT_SIM65C02,
-    TGT_PCENGINE,
-    TGT_GAMATE,
-    TGT_C65,
-    TGT_COUNT                   /* Number of target systems */
-} target_t;
-
-/* Collection of target properties */
-typedef struct TargetProperties TargetProperties;
-struct TargetProperties {
-    const char              Name[13];   /* Name of the target */
-    cpu_t                   DefaultCPU; /* Default CPU for this target */
-    unsigned char           BinFmt;     /* Default binary format for this target */
-    const unsigned char*    CharMap;    /* Character translation table */
-};
-
-/* Target system */
-extern target_t         Target;
-
-/* Types of available output formats */
-#define BINFMT_DEFAULT          0       /* Default (binary) */
-#define BINFMT_BINARY           1       /* Straight binary format */
-#define BINFMT_O65              2       /* Andre Fachats o65 format */
-#define BINFMT_ATARIEXE         3       /* Standard Atari binary load */
+/* Structure describing the format */
+typedef struct XexDesc XexDesc;
 
 
 
@@ -113,19 +56,17 @@ extern target_t         Target;
 
 
 
-target_t FindTarget (const char* Name);
-/* Find a target by name and return the target id. TGT_UNKNOWN is returned if
-** the given name is no valid target.
-*/
+XexDesc* NewXexDesc (void);
+/* Create a new XEX format descriptor */
 
-const TargetProperties* GetTargetProperties (target_t Target);
-/* Return the properties for a target */
+void FreeXexDesc (XexDesc* D);
+/* Free a XEX format descriptor */
 
-const char* GetTargetName (target_t Target);
-/* Return the name of a target */
+void XexWriteTarget (XexDesc* D, File* F);
+/* Write a XEX output file */
 
 
 
-/* End of target.h */
+/* End of xex.h */
 
 #endif

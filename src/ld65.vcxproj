@@ -106,6 +106,7 @@
     <ClInclude Include="ld65\span.h" />
     <ClInclude Include="ld65\spool.h" />
     <ClInclude Include="ld65\tpool.h" />
+    <ClInclude Include="ld65\xex.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ld65\asserts.c" />
@@ -139,6 +140,7 @@
     <ClCompile Include="ld65\span.c" />
     <ClCompile Include="ld65\spool.c" />
     <ClCompile Include="ld65\tpool.c" />
+    <ClCompile Include="ld65\xex.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

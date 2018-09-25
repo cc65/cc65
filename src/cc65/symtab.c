@@ -670,6 +670,9 @@ DefOrRef* AddDefOrRef(SymEntry* E, unsigned Flags)
     DOR->Line = GetCurrentLine ();
     DOR->LocalsBlockNum = (long)CollLast (&CurrentFunc->LocalsBlockStack);
     DOR->Flags = Flags;
+    DOR->StackPtr = StackPtr;
+    DOR->Depth = CollCount(&CurrentFunc->LocalsBlockStack);
+    DOR->LateSP_Label = GetLocalLabel();
 
     return DOR;
 }
@@ -679,7 +682,8 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
 /* Add a goto label to the label table */
 {
     unsigned i;
-    DefOrRef *DOR;
+    DefOrRef *DOR, *NewDOR;
+
     /* Do we have an entry with this name already? */
     SymEntry* Entry = FindSymInTable (LabelTab, Name, HashStr (Name));
     if (Entry) {
@@ -688,6 +692,8 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
             /* Trying to define the label more than once */
             Error ("Label `%s' is defined more than once", Name);
         }
+
+        NewDOR = AddDefOrRef (Entry, Flags);
 
         /* Walk through all occurrences of the label so far and check
            if any of them is in a region that would be risky to jump from/to
@@ -698,13 +704,41 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
              the one currently being added, i.e.  if we are processing the
              definition, we will only check the gotos; if we are processing
              a goto statement, we will only look for the label definition. */
+             /*
             if (((DOR->Flags & SC_DEF) != (Flags & SC_DEF)) &&
+                (CollCount(&CurrentFunc->LocalsBlockStack) == DOR->Depth) &&
                 (DOR->LocalsBlockNum != (long)CollLast (&CurrentFunc->LocalsBlockStack)))
                 Error ("Goto from line %d to label \'%s\' can result in a "
                     "trashed stack", Flags & SC_DEF ? DOR->Line : GetCurrentLine (), Name);
-        }
+            */
+            if((DOR->Flags & SC_DEF) && (Flags & SC_REF)) {
+                /* We're processing a goto and here is its destination label.
+                 This means the difference between SP values is also known, so
+                 we simply emit SP adjustment code. */
+                 if(StackPtr != DOR->StackPtr)
+                    g_space(StackPtr - DOR->StackPtr);
 
-        AddDefOrRef (Entry, Flags);
+                if (CollCount(&CurrentFunc->LocalsBlockStack) <= DOR->Depth &&
+                    DOR->LocalsBlockNum != (long)CollLast (&CurrentFunc->LocalsBlockStack)) {
+                    Warning ("Goto from line %d to label \'%s\' can result in a "
+                        "trashed stack", DOR->Line, Name);
+                }
+            }
+
+            if((DOR->Flags & SC_REF) && (Flags & SC_DEF)) {
+                /* We're processing a label, let's update all gotos encountered
+                so far */
+                g_defdatalabel(DOR->LateSP_Label);
+                g_defdata(CF_CONST | CF_INT, StackPtr - DOR->StackPtr, 0);
+
+                if (CollCount(&CurrentFunc->LocalsBlockStack) >= DOR->Depth &&
+                    DOR->LocalsBlockNum != (long)CollLast (&CurrentFunc->LocalsBlockStack)) {
+                    Warning ("Goto from line %d to label \'%s\' can result in a "
+                        "trashed stack", DOR->Line, Name);
+                }
+             }
+
+        }
 
         Entry->Flags |= Flags;
 
@@ -718,7 +752,7 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
 
         /* Create Collection for label definition and references */
         Entry->V.L.DefsOrRefs = NewCollection ();
-        AddDefOrRef (Entry, Flags);
+        NewDOR = AddDefOrRef (Entry, Flags);
 
         /* Generate the assembler name of the label */
         Entry->AsmName = xstrdup (LocalLabelName (Entry->V.L.Label));
@@ -726,6 +760,11 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
         /* Add the entry to the label table */
         AddSymEntry (LabelTab, Entry);
 
+    }
+
+    /* We are processing a goto, but the label has not yet been defined */
+    if (!SymIsDef (Entry) && (Flags & SC_REF)) {
+        g_lateadjustSP(NewDOR->LateSP_Label);
     }
 
     /* Return the entry */

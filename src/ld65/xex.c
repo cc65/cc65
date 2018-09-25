@@ -112,14 +112,6 @@ static unsigned XexWriteExpr (ExprNode* E, int Signed, unsigned Size,
 
 
 
-static void PrintBoolVal (const char* Name, int B)
-/* Print a boolean value for debugging */
-{
-    Print (stdout, 2, "      %s = %s\n", Name, B? "true" : "false");
-}
-
-
-
 static void PrintNumVal (const char* Name, unsigned long V)
 /* Print a numerical value for debugging */
 {

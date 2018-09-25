@@ -765,7 +765,7 @@ DOS     = $0700
 SDX_FLAG     = DOS              ; 'S' for SpartaDOS
 SDX_VERSION  = $0701            ; SD version (e.g. $32 = 3.2, $40 = 4.0)
                                 ; address $0702 contains sub-version, e.g.
-				; 8 in case of SDX 4.48
+                                ; 8 in case of SDX 4.48
 SDX_KERNEL   = $0703            ; SDX kernel entry point
 SDX_BLOCK_IO = $0706            ; block I/O entry point
 SDX_MISC     = $0709            ; "misc" entry point

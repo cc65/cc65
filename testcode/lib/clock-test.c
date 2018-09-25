@@ -12,11 +12,6 @@
 #ifdef __CC65__
 #include <conio.h>
 #include <cc65.h>
-
-static void exitfn(void)
-{
-    if (doesclrscrafterexit()) cgetc();
-}
 #endif /* #ifdef __CC65__ */
 
 static void print_time(void)
@@ -42,7 +37,9 @@ int main(int argc, char **argv)
     static struct timespec new_time;
 
 #ifdef __CC65__
-    atexit(exitfn);
+    /* if DOS will automatically clear the screen after the program exits, wait for a keypress... */
+    if (doesclrscrafterexit())
+        atexit((void (*)(void))cgetc);
 #endif
 
     if (argc <= 1) {

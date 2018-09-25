@@ -7,6 +7,7 @@
 ; - Atari OS manual - XL addendum
 ; - Atari XL/XE rev.2 source code, Atari 1984
 ; - Mapping the Atari - revised edition, Ian Chadwick 1985
+; - SpartaDOS-X User Guide  (Aug-8-2016)
 ;
 ; ##old##       old OS rev.B label - moved or deleted
 ; ##1200xl##    new label introduced in 1200XL OS (rev.10/11)
@@ -756,6 +757,34 @@ FPSCR1  = $05EC         ;6-byte floating point temporary
 
 
 DOS     = $0700
+
+;-------------------------------------------------------------------------
+; SpartaDOS-X Definitions
+;-------------------------------------------------------------------------
+
+SDX_FLAG     = DOS              ; 'S' for SpartaDOS
+SDX_VERSION  = $0701            ; SD version (e.g. $32 = 3.2, $40 = 4.0)
+                                ; address $0702 contains sub-version, e.g.
+				; 8 in case of SDX 4.48
+SDX_KERNEL   = $0703            ; SDX kernel entry point
+SDX_BLOCK_IO = $0706            ; block I/O entry point
+SDX_MISC     = $0709            ; "misc" entry point
+SDX_DEVICE   = $0761
+SDX_DATE     = $077B            ; day, month, year (3 bytes)
+SDX_TIME     = $077E            ; hour, min, sec (3 bytes)
+SDX_DATESET  = $0781
+SDX_PATH     = $07A0            ; 64 bytes
+SDX_IFSYMBOL = $07EB            ; only valid on SDX 4.40 or newer
+SDX_S_LOOKUP = SDX_IFSYMBOL     ; alternative name for SDX_IFSYMBOL
+
+; values for SDX_DEVICE
+
+SDX_CLK_DEV  = $10              ; clock device
+
+; clock device functions
+
+SDX_KD_GETTD = 100              ; get time and date
+SDX_KD_SETTD = 101              ; set time and date
 
 ;-------------------------------------------------------------------------
 ; Cartridge Address Equates

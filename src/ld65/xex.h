@@ -36,6 +36,7 @@
 
 
 #include "config.h"
+#include "exports.h"
 
 
 
@@ -65,6 +66,8 @@ void FreeXexDesc (XexDesc* D);
 void XexWriteTarget (XexDesc* D, File* F);
 /* Write a XEX output file */
 
+void XexSetRunAd (XexDesc* D, Import *RunAd);
+/* Set the RUNAD export */
 
 
 /* End of xex.h */

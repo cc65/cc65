@@ -1002,6 +1002,66 @@ static void ParseO65 (void)
 
 
 
+static void ParseXex (void)
+/* Parse the o65 format section */
+{
+    static const IdentTok Attributes [] = {
+        {   "RUNAD",    CFGTOK_RUNAD            },
+    };
+
+    /* Remember the attributes read */
+    /* Bitmask to remember the attributes we got already */
+    enum {
+        atNone          = 0x0000,
+        atRunAd         = 0x0001,
+    };
+    unsigned AttrFlags = atNone;
+    Import *RunAd = 0;
+
+    /* Read the attributes */
+    while (CfgTok == CFGTOK_IDENT) {
+
+        /* Map the identifier to a token */
+        cfgtok_t AttrTok;
+        CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
+        AttrTok = CfgTok;
+
+        /* An optional assignment follows */
+        CfgNextTok ();
+        CfgOptionalAssign ();
+
+        /* Check which attribute was given */
+        switch (AttrTok) {
+
+            case CFGTOK_RUNAD:
+                /* Cannot have this attribute twice */
+                FlagAttr (&AttrFlags, atRunAd, "RUNAD");
+                /* We expect an identifier */
+                CfgAssureIdent ();
+                /* Generate an import for the symbol */
+                RunAd = InsertImport (GenImport (GetStrBufId (&CfgSVal), ADDR_SIZE_ABS));
+                /* Remember the file position */
+                CollAppend (&RunAd->RefLines, GenLineInfo (&CfgErrorPos));
+                /* Eat the identifier token */
+                CfgNextTok ();
+                break;
+
+            default:
+                FAIL ("Unexpected attribute token");
+
+        }
+
+        /* Skip an optional comma */
+        CfgOptionalComma ();
+    }
+
+    /* Set the RUNAD import if we have one */
+    if ( RunAd )
+        XexSetRunAd (XexFmtDesc, RunAd);
+}
+
+
+
 static void ParseFormats (void)
 /* Parse a target format section */
 {
@@ -1009,6 +1069,7 @@ static void ParseFormats (void)
         {   "O65",      CFGTOK_O65      },
         {   "BIN",      CFGTOK_BIN      },
         {   "BINARY",   CFGTOK_BIN      },
+        {   "ATARI",    CFGTOK_ATARIEXE },
     };
 
     while (CfgTok == CFGTOK_IDENT) {
@@ -1029,8 +1090,11 @@ static void ParseFormats (void)
                 ParseO65 ();
                 break;
 
-            case CFGTOK_BIN:
             case CFGTOK_ATARIEXE:
+                ParseXex ();
+                break;
+
+            case CFGTOK_BIN:
                 /* No attribibutes available */
                 break;
 

@@ -93,6 +93,7 @@ typedef enum {
     CFGTOK_ID,
     CFGTOK_VERSION,
     CFGTOK_FORMAT,
+    CFGTOK_RUNAD,
 
     CFGTOK_LOAD,
     CFGTOK_RUN,

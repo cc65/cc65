@@ -64,6 +64,7 @@ struct XexDesc {
     unsigned    Undef;          /* Count of undefined externals */
     FILE*       F;              /* Output file */
     const char* Filename;       /* Name of output file */
+    Import*     RunAd;          /* Run Address */
 };
 
 
@@ -84,6 +85,7 @@ XexDesc* NewXexDesc (void)
     D->Undef    = 0;
     D->F        = 0;
     D->Filename = 0;
+    D->RunAd    = 0;
 
     /* Return the created struct */
     return D;
@@ -95,6 +97,14 @@ void FreeXexDesc (XexDesc* D)
 /* Free a XEX format descriptor */
 {
     xfree (D);
+}
+
+
+
+void XexSetRunAd (XexDesc* D, Import *RunAd)
+/* Set the RUNAD export */
+{
+    D->RunAd = RunAd;
 }
 
 
@@ -173,7 +183,8 @@ static void XexWriteMem (XexDesc* D, MemoryArea* M)
     }
 
     /* Write header */
-    Write16(D->F, 0xFFFF);
+    if (ftell (D->F) == 0)
+        Write16(D->F, 0xFFFF);
     Write16(D->F, M->Start);
     Write16(D->F, Addr-1);
 
@@ -273,6 +284,7 @@ static void XexWriteMem (XexDesc* D, MemoryArea* M)
         WriteMult (D->F, M->FillVal, ToFill);
         M->FillLevel = M->Size;
     }
+
 }
 
 
@@ -323,6 +335,13 @@ void XexWriteTarget (XexDesc* D, struct File* F)
         MemoryArea* M = CollAtUnchecked (&F->MemoryAreas, I);
         Print (stdout, 1, "  XEX Dumping `%s'\n", GetString (M->Name));
         XexWriteMem (D, M);
+    }
+
+    /* Write RUNAD at file end */
+    if (D->RunAd) {
+        Write16 (D->F, 0x2E0);
+        Write16 (D->F, 0x2E1);
+        Write16 (D->F, GetExportVal (D->RunAd->Exp));
     }
 
     /* Close the file */

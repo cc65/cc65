@@ -31,10 +31,10 @@ static void print_time(void)
 
 int main(int argc, char **argv)
 {
-    static char c;
-    static int s;
-    static struct tm cur_time;
-    static struct timespec new_time;
+    char c = 0;
+    int s;
+    struct tm cur_time;
+    struct timespec new_time;
 
 #ifdef __CC65__
     /* if DOS will automatically clear the screen after the program exits, wait for a keypress... */
@@ -52,6 +52,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
+    memset(&cur_time, 0, sizeof(cur_time));
     s = sscanf(*(argv + 2), "%d-%d-%d-%d-%d-%d", &cur_time.tm_mday, &cur_time.tm_mon, &cur_time.tm_year, &cur_time.tm_hour, &cur_time.tm_min, &cur_time.tm_sec);
     if (s != 6 || cur_time.tm_year > 99 /* other input values aren't being verified... */) {
         printf("invalid time/date format\n");

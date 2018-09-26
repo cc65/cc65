@@ -88,10 +88,8 @@ void FreeSymEntry (SymEntry* E)
     TypeFree (E->Type);
     xfree (E->AsmName);
 
-    if (E->Flags & SC_LABEL)
-    {
-        for (i = 0; i < CollCount (E->V.L.DefsOrRefs); i++)
-        {
+    if (E->Flags & SC_LABEL) {
+        for (i = 0; i < CollCount (E->V.L.DefsOrRefs); i++) {
             xfree (CollAt(E->V.L.DefsOrRefs, i));
         }
 

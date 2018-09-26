@@ -671,8 +671,8 @@ DefOrRef* AddDefOrRef(SymEntry* E, unsigned Flags)
     DOR->LocalsBlockNum = (long)CollLast (&CurrentFunc->LocalsBlockStack);
     DOR->Flags = Flags;
     DOR->StackPtr = StackPtr;
-    DOR->Depth = CollCount(&CurrentFunc->LocalsBlockStack);
-    DOR->LateSP_Label = GetLocalLabel();
+    DOR->Depth = CollCount (&CurrentFunc->LocalsBlockStack);
+    DOR->LateSP_Label = GetLocalLabel ();
 
     return DOR;
 }
@@ -695,30 +695,21 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
 
         NewDOR = AddDefOrRef (Entry, Flags);
 
-        /* Walk through all occurrences of the label so far and check
-           if any of them is in a region that would be risky to jump from/to
-           from the place where we are right now. */
+        /* Walk through all occurrences of the label so far and evaluate
+           their relationship with the one passed to the function. */
         for (i = 0; i < CollCount (Entry->V.L.DefsOrRefs); i++) {
             DOR = CollAt (Entry->V.L.DefsOrRefs, i);
-            /* We are only interested in label occurences of type opposite to
-             the one currently being added, i.e.  if we are processing the
-             definition, we will only check the gotos; if we are processing
-             a goto statement, we will only look for the label definition. */
-             /*
-            if (((DOR->Flags & SC_DEF) != (Flags & SC_DEF)) &&
-                (CollCount(&CurrentFunc->LocalsBlockStack) == DOR->Depth) &&
-                (DOR->LocalsBlockNum != (long)CollLast (&CurrentFunc->LocalsBlockStack)))
-                Error ("Goto from line %d to label \'%s\' can result in a "
-                    "trashed stack", Flags & SC_DEF ? DOR->Line : GetCurrentLine (), Name);
-            */
+
             if((DOR->Flags & SC_DEF) && (Flags & SC_REF)) {
                 /* We're processing a goto and here is its destination label.
-                 This means the difference between SP values is also known, so
-                 we simply emit SP adjustment code. */
-                 if(StackPtr != DOR->StackPtr)
-                    g_space(StackPtr - DOR->StackPtr);
+                   This means the difference between SP values is already known,
+                   so we simply emit the SP adjustment code. */
+                if(StackPtr != DOR->StackPtr)
+                    g_space (StackPtr - DOR->StackPtr);
 
-                if (CollCount(&CurrentFunc->LocalsBlockStack) <= DOR->Depth &&
+                /* Are we jumping into same or deeper nesting region? That's risky,
+                   so let's emit a warning. */
+                if (CollCount (&CurrentFunc->LocalsBlockStack) <= DOR->Depth &&
                     DOR->LocalsBlockNum != (long)CollLast (&CurrentFunc->LocalsBlockStack)) {
                     Warning ("Goto from line %d to label \'%s\' can result in a "
                         "trashed stack", DOR->Line, Name);
@@ -727,11 +718,13 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
 
             if((DOR->Flags & SC_REF) && (Flags & SC_DEF)) {
                 /* We're processing a label, let's update all gotos encountered
-                so far */
-                g_defdatalabel(DOR->LateSP_Label);
-                g_defdata(CF_CONST | CF_INT, StackPtr - DOR->StackPtr, 0);
+                   so far */
+                g_defdatalabel (DOR->LateSP_Label);
+                g_defdata (CF_CONST | CF_INT, StackPtr - DOR->StackPtr, 0);
 
-                if (CollCount(&CurrentFunc->LocalsBlockStack) >= DOR->Depth &&
+                /* Are we jumping into same or deeper nesting region? That's risky,
+                   so let's emit a warning. */
+                if (CollCount (&CurrentFunc->LocalsBlockStack) >= DOR->Depth &&
                     DOR->LocalsBlockNum != (long)CollLast (&CurrentFunc->LocalsBlockStack)) {
                     Warning ("Goto from line %d to label \'%s\' can result in a "
                         "trashed stack", DOR->Line, Name);
@@ -764,7 +757,7 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
 
     /* We are processing a goto, but the label has not yet been defined */
     if (!SymIsDef (Entry) && (Flags & SC_REF)) {
-        g_lateadjustSP(NewDOR->LateSP_Label);
+        g_lateadjustSP (NewDOR->LateSP_Label);
     }
 
     /* Return the entry */

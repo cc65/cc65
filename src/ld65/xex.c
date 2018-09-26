@@ -138,58 +138,18 @@ static void XexWriteMem (XexDesc* D, MemoryArea* M)
     /* Get the start address and size of this memory area */
     unsigned long Addr = M->Start;
 
-    /* Walk over segments twice: first to get real area size, then to write
-     * all segments. */
-    for (I = 0; I < CollCount (&M->SegList); ++I) {
-
-        /* Get the segment */
-        SegDesc* S = CollAtUnchecked (&M->SegList, I);
-
-        /* Keep the user happy */
-        Print (stdout, 1, "    Allocating `%s'\n", GetString (S->Name));
-
-        /* If this is the run memory area, we must apply run alignment. If
-        ** this is not the run memory area but the load memory area (which
-        ** means that both are different), we must apply load alignment.
-        ** Beware: DoWrite may be true even if this is the run memory area,
-        ** because it may be also the load memory area.
-        */
-        if (S->Run == M) {
-
-            /* Handle ALIGN and OFFSET/START */
-            if (S->Flags & SF_ALIGN) {
-                /* Align the address */
-                Addr = AlignAddr (Addr, S->RunAlignment);
-            } else if (S->Flags & (SF_OFFSET | SF_START)) {
-                Addr = S->Addr;
-                if (S->Flags & SF_OFFSET) {
-                    /* It's an offset, not a fixed address, make an address */
-                    Addr += M->Start;
-                }
-            }
-
-        } else if (S->Load == M) {
-
-            /* Handle ALIGN_LOAD */
-            if (S->Flags & SF_ALIGN_LOAD) {
-                /* Align the address */
-                Addr = AlignAddr (Addr, S->LoadAlignment);
-            }
-
-        }
-
-        /* Calculate the new address */
-        Addr += S->Seg->Size;
-    }
+    /* Real size of the memory area, either the FillLevel or the Size */
+    unsigned long Size = M->FillLevel;
+    if ((M->Flags & MF_FILL) != 0 && M->FillLevel < M->Size)
+        Size = M->Size;
 
     /* Write header */
     if (ftell (D->F) == 0)
         Write16(D->F, 0xFFFF);
-    Write16(D->F, M->Start);
-    Write16(D->F, Addr-1);
+    Write16(D->F, Addr);
+    Write16(D->F, Addr + Size - 1);
 
-    /* Redo */
-    Addr = M->Start;
+    /* Walk over all segments in this memory area */
     for (I = 0; I < CollCount (&M->SegList); ++I) {
 
         int DoWrite;
@@ -229,9 +189,10 @@ static void XexWriteMem (XexDesc* D, MemoryArea* M)
                     NewAddr += M->Start;
                 }
                 if (DoWrite || (M->Flags & MF_FILL) != 0) {
-                    /* Seek in "overwrite" segments */
+                    /* "overwrite" segments are not supported */
                     if (S->Flags & SF_OVERWRITE) {
-                        fseek (D->F, NewAddr - M->Start, SEEK_SET);
+                        Error ("ATARI file format does not support overwrite for segment '%s'.",
+                               GetString (S->Name));
                     } else {
                         WriteMult (D->F, M->FillVal, NewAddr-Addr);
                         PrintNumVal ("SF_OFFSET", NewAddr - Addr);

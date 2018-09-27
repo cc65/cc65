@@ -1033,10 +1033,11 @@ diopp_size   = 5        ; size of structure
 
 SPARTADOS    = 0
 REALDOS      = 1
-OSADOS       = 2        ; OS/A+
-XDOS         = 3
-ATARIDOS     = 4
-MYDOS        = 5
+BWDOS        = 2
+OSADOS       = 3        ; OS/A+
+XDOS         = 4
+ATARIDOS     = 5
+MYDOS        = 6
 NODOS        = 255
 ; The DOSes with dos_type below or equal MAX_DOS_WITH_CMDLINE do support
 ; command line arguments.

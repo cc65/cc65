@@ -65,6 +65,9 @@ struct XexDesc {
     FILE*       F;              /* Output file */
     const char* Filename;       /* Name of output file */
     Import*     RunAd;          /* Run Address */
+    unsigned long HeadPos;      /* Position in the file of current header */
+    unsigned long HeadEnd;      /* End address of current header */
+    unsigned long HeadSize;     /* Last header size, can be removed if zero */
 };
 
 
@@ -86,6 +89,9 @@ XexDesc* NewXexDesc (void)
     D->F        = 0;
     D->Filename = 0;
     D->RunAd    = 0;
+    D->HeadPos  = 0;
+    D->HeadEnd  = 0;
+    D->HeadSize = 0;
 
     /* Return the created struct */
     return D;
@@ -130,24 +136,79 @@ static void PrintNumVal (const char* Name, unsigned long V)
 
 
 
+static void XexStartSegment (XexDesc *D, unsigned long Addr, unsigned long Size)
+{
+    /* Skip segment without size */
+    if (!Size)
+        return;
+
+    /* Store current position */
+    unsigned long Pos = ftell (D->F);
+    unsigned long End = Addr + Size - 1;
+
+    /* See if last header can be expanded into this one */
+    if (D->HeadPos && ((D->HeadEnd + 1) == Addr)) {
+        /* Expand current header */
+        D->HeadEnd = End;
+        D->HeadSize += Size;
+        fseek (D->F, D->HeadPos + 2, SEEK_SET);
+        Write16 (D->F, End);
+        /* Seek to old position */
+        fseek (D->F, Pos, SEEK_SET);
+    }
+    else
+    {
+        if (D->HeadSize == 0) {
+            /* Last header had no data, replace */
+            Pos = D->HeadPos;
+            fseek (D->F, Pos, SEEK_SET);
+        }
+
+        /* If we are at start of file, write XEX heder */
+        if (Pos == 0)
+            Write16 (D->F, 0xFFFF);
+
+        /* Writes a new segment header */
+        D->HeadPos = ftell (D->F);
+        D->HeadEnd = End;
+        D->HeadSize = Size;
+        Write16 (D->F, Addr);
+        Write16 (D->F, End);
+    }
+}
+
+
+
+static void XexFakeSegment (XexDesc *D, unsigned long Addr)
+{
+    /* See if last header can be expanded into this one, we are done */
+    if (D->HeadPos && ((D->HeadEnd + 1) == Addr))
+        return;
+
+    /* If we are at start of file, write XEX heder */
+    if (ftell (D->F) == 0)
+        Write16 (D->F, 0xFFFF);
+
+    /* Writes a new (invalid) segment header */
+    D->HeadPos = ftell (D->F);
+    D->HeadEnd = Addr - 1;
+    D->HeadSize = 0;
+    Write16 (D->F, Addr);
+    Write16 (D->F, D->HeadEnd);
+}
+
+
+
 static void XexWriteMem (XexDesc* D, MemoryArea* M)
 /* Write the segments of one memory area to a file */
 {
     unsigned I;
 
+    /* Always write a segment header for each memory area */
+    D->HeadPos = 0;
+
     /* Get the start address and size of this memory area */
     unsigned long Addr = M->Start;
-
-    /* Real size of the memory area, either the FillLevel or the Size */
-    unsigned long Size = M->FillLevel;
-    if ((M->Flags & MF_FILL) != 0 && M->FillLevel < M->Size)
-        Size = M->Size;
-
-    /* Write header */
-    if (ftell (D->F) == 0)
-        Write16(D->F, 0xFFFF);
-    Write16(D->F, Addr);
-    Write16(D->F, Addr + Size - 1);
 
     /* Walk over all segments in this memory area */
     for (I = 0; I < CollCount (&M->SegList); ++I) {
@@ -158,7 +219,7 @@ static void XexWriteMem (XexDesc* D, MemoryArea* M)
         SegDesc* S = CollAtUnchecked (&M->SegList, I);
 
         /* Keep the user happy */
-        Print (stdout, 1, "    Allocating `%s'\n", GetString (S->Name));
+        Print (stdout, 1, "    ATARI EXE Writing `%s'\n", GetString (S->Name));
 
         /* Writes do only occur in the load area and not for BSS segments */
         DoWrite = (S->Flags & SF_BSS) == 0      &&      /* No BSS segment */
@@ -178,6 +239,7 @@ static void XexWriteMem (XexDesc* D, MemoryArea* M)
                 /* Align the address */
                 unsigned long NewAddr = AlignAddr (Addr, S->RunAlignment);
                 if (DoWrite || (M->Flags & MF_FILL) != 0) {
+                    XexStartSegment (D, Addr, NewAddr - Addr);
                     WriteMult (D->F, M->FillVal, NewAddr - Addr);
                     PrintNumVal ("SF_ALIGN", NewAddr - Addr);
                 }
@@ -194,6 +256,7 @@ static void XexWriteMem (XexDesc* D, MemoryArea* M)
                         Error ("ATARI file format does not support overwrite for segment '%s'.",
                                GetString (S->Name));
                     } else {
+                        XexStartSegment (D, Addr, NewAddr - Addr);
                         WriteMult (D->F, M->FillVal, NewAddr-Addr);
                         PrintNumVal ("SF_OFFSET", NewAddr - Addr);
                     }
@@ -208,6 +271,7 @@ static void XexWriteMem (XexDesc* D, MemoryArea* M)
                 /* Align the address */
                 unsigned long NewAddr = AlignAddr (Addr, S->LoadAlignment);
                 if (DoWrite || (M->Flags & MF_FILL) != 0) {
+                    XexStartSegment (D, Addr, NewAddr - Addr);
                     WriteMult (D->F, M->FillVal, NewAddr - Addr);
                     PrintNumVal ("SF_ALIGN_LOAD", NewAddr - Addr);
                 }
@@ -220,10 +284,16 @@ static void XexWriteMem (XexDesc* D, MemoryArea* M)
         ** if the memory area is the load area.
         */
         if (DoWrite) {
+            /* Start a segment with only one byte, will fix later */
+            XexFakeSegment (D, Addr);
             unsigned long P = ftell (D->F);
             SegWrite (D->Filename, D->F, S->Seg, XexWriteExpr, D);
-            PrintNumVal ("Wrote", (unsigned long) (ftell (D->F) - P));
+            unsigned long Size = ftell (D->F) - P;
+            /* Fix segment size */
+            XexStartSegment (D, Addr, Size);
+            PrintNumVal ("Wrote", Size);
         } else if (M->Flags & MF_FILL) {
+            XexStartSegment (D, Addr, S->Seg->Size);
             WriteMult (D->F, S->Seg->FillVal, S->Seg->Size);
             PrintNumVal ("Filled", (unsigned long) S->Seg->Size);
         }
@@ -242,10 +312,15 @@ static void XexWriteMem (XexDesc* D, MemoryArea* M)
         unsigned long ToFill = M->Size - M->FillLevel;
         Print (stdout, 2, "    Filling 0x%lx bytes with 0x%02x\n",
                ToFill, M->FillVal);
+        XexStartSegment (D, Addr, ToFill);
         WriteMult (D->F, M->FillVal, ToFill);
         M->FillLevel = M->Size;
     }
 
+    /* If the last segment is empty, remove */
+    if (D->HeadSize == 0 && D->HeadPos) {
+        fseek (D->F, D->HeadPos, SEEK_SET);
+    }
 }
 
 
@@ -294,7 +369,7 @@ void XexWriteTarget (XexDesc* D, struct File* F)
     for (I = 0; I < CollCount (&F->MemoryAreas); ++I) {
         /* Get this entry */
         MemoryArea* M = CollAtUnchecked (&F->MemoryAreas, I);
-        Print (stdout, 1, "  XEX Dumping `%s'\n", GetString (M->Name));
+        Print (stdout, 1, "  ATARI EXE Dumping `%s'\n", GetString (M->Name));
         XexWriteMem (D, M);
     }
 

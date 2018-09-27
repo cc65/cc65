@@ -1,7 +1,7 @@
 ;
 ; Oliver Schmidt, 15.08.2018
 ;
-; int clock_getres (clockid_t clk_id, struct timespec *res);
+; int __fastcall__ clock_getres (clockid_t clk_id, struct timespec *res);
 ;
 
         .import         __dos_type

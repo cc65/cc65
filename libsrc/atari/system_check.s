@@ -77,7 +77,16 @@ cont:   ldx     #0              ; channel 0
 sdcheck:lda     DOS
         cmp     #'S'
         bne     sdcrts0         ; not SpartaDOS, assume RAM is not used
-        lda     DOS+1           ; SD version
+
+; check for BW-DOS, which always reports itself as SpartaDOS, but doesn't use memory under the ROM
+        lda     DOS+3           ; 'B' in BW-DOS
+        cmp     #'B'
+        bne     sdnobw
+        lda     DOS+4           ; 'W' in BW-DOS
+        cmp     #'W'
+        beq     sdcrts0         ; BW-DOS does not use RAM below ROM
+
+sdnobw: lda     DOS+1           ; SD version
         cmp     #$40            ; SD-X has $40 or higher
         bcc     sdcrts1         ; older versions (except maybe 1.x) always use the RAM under the ROM
         ldy     #31             ; offset for OSRMFLG

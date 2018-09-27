@@ -67,6 +67,8 @@ ucok1:
         beq     :+
         cmp     #REALDOS
         beq     :+
+        cmp     #BWDOS
+        beq     :+
         lda     #CHDIR_MYDOS
         .byte   $2C             ; BIT <abs>
 :       lda     #CHDIR_SPDOS

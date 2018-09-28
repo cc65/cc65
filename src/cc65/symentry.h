@@ -100,6 +100,15 @@ struct LiteralPool;
 
 
 
+
+/* Label definition or reference */
+typedef struct DefOrRef DefOrRef;
+struct DefOrRef {
+    unsigned            Line;
+    long                LocalsBlockNum;
+    unsigned            Flags;
+};
+
 /* Symbol table entry */
 typedef struct SymEntry SymEntry;
 struct SymEntry {
@@ -120,7 +129,10 @@ struct SymEntry {
         int                     Offs;
 
         /* Label name for static symbols */
-        unsigned                Label;
+        struct {
+            unsigned            Label;
+            Collection          *DefsOrRefs;
+        } L;
 
         /* Register bank offset and offset of the saved copy on stack for
         ** register variables.

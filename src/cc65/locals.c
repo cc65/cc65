@@ -538,6 +538,12 @@ void DeclareLocals (void)
     /* Be sure to allocate any reserved space for locals */
     F_AllocLocalSpace (CurrentFunc);
 
+    if (InitialStack != StackPtr) {
+        ++CurrentFunc->LocalsBlockCount;
+        /* Is it ok to abuse Collection in this way? */
+        CollAppend (&CurrentFunc->LocalsBlockStack, (void *)CurrentFunc->LocalsBlockCount);
+    }
+
     /* In case we've allocated local variables in this block, emit a call to
     ** the stack checking routine if stack checks are enabled.
     */

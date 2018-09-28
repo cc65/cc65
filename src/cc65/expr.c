@@ -757,7 +757,7 @@ static void Primary (ExprDesc* E)
                         E->Name = (uintptr_t) Sym->Name;
                     } else {
                         E->Flags = E_LOC_STATIC | E_RTYPE_LVAL;
-                        E->Name = Sym->V.Label;
+                        E->Name = Sym->V.L.Label;
                     }
                 } else {
                     /* Local static variable */

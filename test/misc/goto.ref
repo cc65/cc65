@@ -1,0 +1,6 @@
+goto.c(34): Error: Goto from line 29 to label 'bad' can result in a trashed stack
+goto.c(40): Error: Goto from line 18 to label 'unsafe' can result in a trashed stack
+goto.c(42): Error: Goto from line 42 to label 'another' can result in a trashed stack
+goto.c(47): Error: Goto from line 47 to label 'bad' can result in a trashed stack
+goto.c(56): Error: Goto from line 38 to label 'finish' can result in a trashed stack
+goto.c(58): Warning: `unused' is defined but never used

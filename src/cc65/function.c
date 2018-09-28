@@ -61,26 +61,6 @@
 
 
 
-/* Enumeration for function flags */
-typedef enum {
-    FF_NONE             = 0x0000,
-    FF_HAS_RETURN       = 0x0001,       /* Function has a return statement */
-    FF_IS_MAIN          = 0x0002,       /* This is the main function */
-    FF_VOID_RETURN      = 0x0004,       /* Function returning void */
-} funcflags_t;
-
-/* Structure that holds all data needed for function activation */
-struct Function {
-    struct SymEntry*    FuncEntry;      /* Symbol table entry */
-    Type*               ReturnType;     /* Function return type */
-    FuncDesc*           Desc;           /* Function descriptor */
-    int                 Reserved;       /* Reserved local space */
-    unsigned            RetLab;         /* Return code label */
-    int                 TopLevelSP;     /* SP at function top level */
-    unsigned            RegOffs;        /* Register variable space offset */
-    funcflags_t         Flags;          /* Function flags */
-};
-
 /* Pointer to current function */
 Function* CurrentFunc = 0;
 
@@ -99,14 +79,17 @@ static Function* NewFunction (struct SymEntry* Sym)
     Function* F = (Function*) xmalloc (sizeof (Function));
 
     /* Initialize the fields */
-    F->FuncEntry  = Sym;
-    F->ReturnType = GetFuncReturn (Sym->Type);
-    F->Desc       = GetFuncDesc (Sym->Type);
-    F->Reserved   = 0;
-    F->RetLab     = GetLocalLabel ();
-    F->TopLevelSP = 0;
-    F->RegOffs    = RegisterSpace;
-    F->Flags      = IsTypeVoid (F->ReturnType) ? FF_VOID_RETURN : FF_NONE;
+    F->FuncEntry        = Sym;
+    F->ReturnType       = GetFuncReturn (Sym->Type);
+    F->Desc             = GetFuncDesc (Sym->Type);
+    F->Reserved         = 0;
+    F->RetLab           = GetLocalLabel ();
+    F->TopLevelSP       = 0;
+    F->RegOffs          = RegisterSpace;
+    F->Flags            = IsTypeVoid (F->ReturnType) ? FF_VOID_RETURN : FF_NONE;
+    F->LocalsBlockCount = 0;
+
+    InitCollection (&F->LocalsBlockStack);
 
     /* Return the new structure */
     return F;
@@ -117,6 +100,7 @@ static Function* NewFunction (struct SymEntry* Sym)
 static void FreeFunction (Function* F)
 /* Free a function activation structure */
 {
+    DoneCollection (&F->LocalsBlockStack);
     xfree (F);
 }
 
@@ -540,6 +524,7 @@ void NewFunc (SymEntry* Func)
 
     /* Need a starting curly brace */
     ConsumeLCurly ();
+    CollAppend (&CurrentFunc->LocalsBlockStack, 0);
 
     /* Parse local variable declarations if any */
     DeclareLocals ();

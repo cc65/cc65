@@ -701,7 +701,7 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
         for (i = 0; i < CollCount (Entry->V.L.DefsOrRefs); i++) {
             DOR = CollAt (Entry->V.L.DefsOrRefs, i);
 
-            if ((DOR->Flags & SC_DEF) && (Flags & SC_REF)) {
+            if ((DOR->Flags & SC_DEF) && (Flags & SC_REF) && (Flags & SC_GOTO)) {
                 /* We're processing a goto and here is its destination label.
                    This means the difference between SP values is already known,
                    so we simply emit the SP adjustment code. */
@@ -721,7 +721,7 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
             }
 
 
-            if ((DOR->Flags & SC_REF) && (Flags & SC_DEF)) {
+            if ((DOR->Flags & SC_REF) && (DOR->Flags & SC_GOTO) && (Flags & SC_DEF)) {
                 /* We're processing a label, let's update all gotos encountered
                    so far */
                 g_defdatalabel (DOR->LateSP_Label);
@@ -762,7 +762,7 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
     }
 
     /* We are processing a goto, but the label has not yet been defined */
-    if (!SymIsDef (Entry) && (Flags & SC_REF)) {
+    if (!SymIsDef (Entry) && (Flags & SC_REF) && (Flags & SC_GOTO)) {
         g_lateadjustSP (NewDOR->LateSP_Label);
     }
 

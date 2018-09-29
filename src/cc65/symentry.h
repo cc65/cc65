@@ -98,6 +98,8 @@ struct LiteralPool;
 
 #define SC_HAVEATTR     0x10000U        /* Symbol has attributes */
 
+#define SC_GOTO         0x20000U
+
 
 
 

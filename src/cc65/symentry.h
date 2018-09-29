@@ -105,7 +105,7 @@ struct LiteralPool;
 typedef struct DefOrRef DefOrRef;
 struct DefOrRef {
     unsigned            Line;
-    long                LocalsBlockNum;
+    long                LocalsBlockId;
     unsigned            Flags;
     int                 StackPtr;
     unsigned            Depth;

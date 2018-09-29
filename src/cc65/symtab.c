@@ -668,7 +668,7 @@ DefOrRef* AddDefOrRef(SymEntry* E, unsigned Flags)
     DOR = xmalloc (sizeof (DefOrRef));
     CollAppend (E->V.L.DefsOrRefs, DOR);
     DOR->Line = GetCurrentLine ();
-    DOR->LocalsBlockNum = (long)CollLast (&CurrentFunc->LocalsBlockStack);
+    DOR->LocalsBlockId = (long)CollLast (&CurrentFunc->LocalsBlockStack);
     DOR->Flags = Flags;
     DOR->StackPtr = StackPtr;
     DOR->Depth = CollCount (&CurrentFunc->LocalsBlockStack);
@@ -677,12 +677,13 @@ DefOrRef* AddDefOrRef(SymEntry* E, unsigned Flags)
     return DOR;
 }
 
-
 SymEntry* AddLabelSym (const char* Name, unsigned Flags)
 /* Add a goto label to the label table */
 {
     unsigned i;
     DefOrRef *DOR, *NewDOR;
+    /* We juggle it so much that a shortcut will help with clarity */
+    Collection *AIC = &CurrentFunc->LocalsBlockStack;
 
     /* Do we have an entry with this name already? */
     SymEntry* Entry = FindSymInTable (LabelTab, Name, HashStr (Name));
@@ -700,35 +701,40 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
         for (i = 0; i < CollCount (Entry->V.L.DefsOrRefs); i++) {
             DOR = CollAt (Entry->V.L.DefsOrRefs, i);
 
-            if((DOR->Flags & SC_DEF) && (Flags & SC_REF)) {
+            if ((DOR->Flags & SC_DEF) && (Flags & SC_REF)) {
                 /* We're processing a goto and here is its destination label.
                    This means the difference between SP values is already known,
                    so we simply emit the SP adjustment code. */
-                if(StackPtr != DOR->StackPtr)
+                if (StackPtr != DOR->StackPtr) {
                     g_space (StackPtr - DOR->StackPtr);
+                }
 
-                /* Are we jumping into same or deeper nesting region? That's risky,
-                   so let's emit a warning. */
-                if (CollCount (&CurrentFunc->LocalsBlockStack) <= DOR->Depth &&
-                    DOR->LocalsBlockNum != (long)CollLast (&CurrentFunc->LocalsBlockStack)) {
-                    Warning ("Goto from line %d to label \'%s\' can result in a "
-                        "trashed stack", DOR->Line, Name);
+                /* Are we jumping into a block with initalization of an object that
+                   has automatic storage duration? Let's emit a warning. */
+                if ((long)CollLast (AIC) != DOR->LocalsBlockId &&
+                    (CollCount (AIC) < DOR->Depth ||
+                    (long)CollAt (AIC, DOR->Depth - 1) != DOR->LocalsBlockId)) {
+                    Warning ("Goto at line %d to label %s jumps into a block with "
+                    "initialization of an object that has automatic storage duration.",
+                    GetCurrentLine (), Name);
                 }
             }
 
-            if((DOR->Flags & SC_REF) && (Flags & SC_DEF)) {
+
+            if ((DOR->Flags & SC_REF) && (Flags & SC_DEF)) {
                 /* We're processing a label, let's update all gotos encountered
                    so far */
                 g_defdatalabel (DOR->LateSP_Label);
                 g_defdata (CF_CONST | CF_INT, StackPtr - DOR->StackPtr, 0);
 
-                /* Are we jumping into same or deeper nesting region? That's risky,
-                   so let's emit a warning. */
-                if (CollCount (&CurrentFunc->LocalsBlockStack) >= DOR->Depth &&
-                    DOR->LocalsBlockNum != (long)CollLast (&CurrentFunc->LocalsBlockStack)) {
-                    Warning ("Goto from line %d to label \'%s\' can result in a "
-                        "trashed stack", DOR->Line, Name);
-                }
+                /* Are we jumping into a block with initalization of an object that
+                   has automatic storage duration? Let's emit a warning. */
+                if ((long)CollLast (AIC) != DOR->LocalsBlockId &&
+                    (CollCount (AIC) >= DOR->Depth ||
+                    (long)CollLast (AIC) >= DOR->Line))
+                    Warning ("Goto at line %d to label %s jumps into a block with "
+                    "initialization of an object that has automatic storage duration.",
+                    DOR->Line, Name);
              }
 
         }

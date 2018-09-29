@@ -731,7 +731,7 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
                    has automatic storage duration? Let's emit a warning. */
                 if ((long)CollLast (AIC) != DOR->LocalsBlockId &&
                     (CollCount (AIC) >= DOR->Depth ||
-                    (long)CollLast (AIC) >= DOR->Line))
+                    (long)CollLast (AIC) >= (long)DOR->Line))
                     Warning ("Goto at line %d to label %s jumps into a block with "
                     "initialization of an object that has automatic storage duration.",
                     DOR->Line, Name);

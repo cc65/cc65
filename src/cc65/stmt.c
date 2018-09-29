@@ -513,7 +513,7 @@ static int CompoundStatement (void)
 
     /* Remember the stack at block entry */
     int OldStack = StackPtr;
-    long OldBlockStackSize = CollCount (&CurrentFunc->LocalsBlockStack);
+    unsigned OldBlockStackSize = CollCount (&CurrentFunc->LocalsBlockStack);
 
     /* Enter a new lexical level */
     EnterBlockLevel ();

@@ -90,7 +90,7 @@ void FreeSymEntry (SymEntry* E)
 
     if (E->Flags & SC_LABEL) {
         for (i = 0; i < CollCount (E->V.L.DefsOrRefs); i++) {
-            xfree (CollAt(E->V.L.DefsOrRefs, i));
+            xfree (CollAt (E->V.L.DefsOrRefs, i));
         }
 
         DoneCollection (E->V.L.DefsOrRefs);

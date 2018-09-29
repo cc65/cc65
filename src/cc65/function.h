@@ -61,7 +61,6 @@ struct Function {
     int                 TopLevelSP;       /* SP at function top level */
     unsigned            RegOffs;          /* Register variable space offset */
     funcflags_t         Flags;            /* Function flags */
-    long                LocalsBlockCount; /* Number of blocks with local vars */
     Collection          LocalsBlockStack; /* Stack of blocks with local vars */
 };
 

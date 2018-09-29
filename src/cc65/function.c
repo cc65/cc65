@@ -87,7 +87,6 @@ static Function* NewFunction (struct SymEntry* Sym)
     F->TopLevelSP       = 0;
     F->RegOffs          = RegisterSpace;
     F->Flags            = IsTypeVoid (F->ReturnType) ? FF_VOID_RETURN : FF_NONE;
-    F->LocalsBlockCount = 0;
 
     InitCollection (&F->LocalsBlockStack);
 
@@ -524,6 +523,8 @@ void NewFunc (SymEntry* Func)
 
     /* Need a starting curly brace */
     ConsumeLCurly ();
+
+    /* Make sure there is always something on the stack of local variable blocks */
     CollAppend (&CurrentFunc->LocalsBlockStack, 0);
 
     /* Parse local variable declarations if any */

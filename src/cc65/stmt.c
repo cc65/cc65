@@ -537,7 +537,8 @@ static int CompoundStatement (void)
     }
 
     /* If the segment had autoinited variables, let's pop it of a stack
-    of such blocks. */
+    ** of such blocks.
+    */
     if (OldBlockStackSize != CollCount (&CurrentFunc->LocalsBlockStack)) {
         CollPop (&CurrentFunc->LocalsBlockStack);
     }

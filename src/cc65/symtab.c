@@ -697,25 +697,28 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
         NewDOR = AddDefOrRef (Entry, Flags);
 
         /* Walk through all occurrences of the label so far and evaluate
-           their relationship with the one passed to the function. */
+        ** their relationship with the one passed to the function.
+        */
         for (i = 0; i < CollCount (Entry->V.L.DefsOrRefs); i++) {
             DOR = CollAt (Entry->V.L.DefsOrRefs, i);
 
             if ((DOR->Flags & SC_DEF) && (Flags & SC_REF) && (Flags & SC_GOTO)) {
                 /* We're processing a goto and here is its destination label.
-                   This means the difference between SP values is already known,
-                   so we simply emit the SP adjustment code. */
+                ** This means the difference between SP values is already known,
+                ** so we simply emit the SP adjustment code.
+                */
                 if (StackPtr != DOR->StackPtr) {
                     g_space (StackPtr - DOR->StackPtr);
                 }
 
                 /* Are we jumping into a block with initalization of an object that
-                   has automatic storage duration? Let's emit a warning. */
+                ** has automatic storage duration? Let's emit a warning.
+                */
                 if ((long)CollLast (AIC) != DOR->LocalsBlockId &&
                     (CollCount (AIC) < DOR->Depth ||
                     (long)CollAt (AIC, DOR->Depth - 1) != DOR->LocalsBlockId)) {
                     Warning ("Goto at line %d to label %s jumps into a block with "
-                    "initialization of an object that has automatic storage duration.",
+                    "initialization of an object that has automatic storage duration",
                     GetCurrentLine (), Name);
                 }
             }
@@ -723,17 +726,19 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
 
             if ((DOR->Flags & SC_REF) && (DOR->Flags & SC_GOTO) && (Flags & SC_DEF)) {
                 /* We're processing a label, let's update all gotos encountered
-                   so far */
+                ** so far
+                */
                 g_defdatalabel (DOR->LateSP_Label);
                 g_defdata (CF_CONST | CF_INT, StackPtr - DOR->StackPtr, 0);
 
                 /* Are we jumping into a block with initalization of an object that
-                   has automatic storage duration? Let's emit a warning. */
+                ** has automatic storage duration? Let's emit a warning.
+                */
                 if ((long)CollLast (AIC) != DOR->LocalsBlockId &&
                     (CollCount (AIC) >= DOR->Depth ||
                     (long)CollLast (AIC) >= (long)DOR->Line))
                     Warning ("Goto at line %d to label %s jumps into a block with "
-                    "initialization of an object that has automatic storage duration.",
+                    "initialization of an object that has automatic storage duration",
                     DOR->Line, Name);
              }
 

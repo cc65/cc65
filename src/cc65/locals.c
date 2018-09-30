@@ -272,8 +272,9 @@ static void ParseAutoDecl (Declaration* Decl)
             Sym->Flags |= SC_REF;
 
             /* Make note of auto variables initialized in current block.
-               We abuse the Collection somewhat by using it to store line
-               numbers. */
+            ** We abuse the Collection somewhat by using it to store line
+            ** numbers.
+            */
             CollReplace (&CurrentFunc->LocalsBlockStack, (void *)(long)GetCurrentLine (),
                 CollCount (&CurrentFunc->LocalsBlockStack) - 1);
 

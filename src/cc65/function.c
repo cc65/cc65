@@ -79,14 +79,14 @@ static Function* NewFunction (struct SymEntry* Sym)
     Function* F = (Function*) xmalloc (sizeof (Function));
 
     /* Initialize the fields */
-    F->FuncEntry        = Sym;
-    F->ReturnType       = GetFuncReturn (Sym->Type);
-    F->Desc             = GetFuncDesc (Sym->Type);
-    F->Reserved         = 0;
-    F->RetLab           = GetLocalLabel ();
-    F->TopLevelSP       = 0;
-    F->RegOffs          = RegisterSpace;
-    F->Flags            = IsTypeVoid (F->ReturnType) ? FF_VOID_RETURN : FF_NONE;
+    F->FuncEntry  = Sym;
+    F->ReturnType = GetFuncReturn (Sym->Type);
+    F->Desc       = GetFuncDesc (Sym->Type);
+    F->Reserved   = 0;
+    F->RetLab     = GetLocalLabel ();
+    F->TopLevelSP = 0;
+    F->RegOffs    = RegisterSpace;
+    F->Flags      = IsTypeVoid (F->ReturnType) ? FF_VOID_RETURN : FF_NONE;
 
     InitCollection (&F->LocalsBlockStack);
 

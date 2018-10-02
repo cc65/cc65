@@ -2426,8 +2426,8 @@ void g_falsejump (unsigned flags attribute ((unused)), unsigned label)
 
 
 void g_lateadjustSP (unsigned label)
-{
 /* Adjust stack based on non-immediate data */
+{
     AddCodeLine ("pha");
     AddCodeLine ("lda %s", LocalLabelName (label));
     AddCodeLine ("clc");

@@ -728,6 +728,7 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
                 /* We're processing a label, let's update all gotos encountered
                 ** so far
                 */
+                g_userodata();
                 g_defdatalabel (DOR->LateSP_Label);
                 g_defdata (CF_CONST | CF_INT, StackPtr - DOR->StackPtr, 0);
 

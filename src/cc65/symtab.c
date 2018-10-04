@@ -838,6 +838,12 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
 
         Type* EType;
 
+        /* Even if the symbol already exists, let's make sure it
+        ** is not an ENUM. See bug #728. */
+        if (Entry->Flags & SC_ENUM) {
+            Fatal ("Conflicting types for `%s'", Name);
+        }
+
         /* We have a symbol with this name already */
         if (Entry->Flags & SC_TYPE) {
             Error ("Multiple definition for `%s'", Name);

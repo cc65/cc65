@@ -413,6 +413,7 @@ Again:
         case '\"':
             NextChar ();
             I = 0;
+            InfoSVal[0] = '\0';
             while (C != EOF && C != '\"') {
                 if (GetEncodedChar (InfoSVal, &I, sizeof InfoSVal) < 0) {
                     if (C == EOF) {

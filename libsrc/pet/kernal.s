@@ -6,11 +6,10 @@
 
         .include "cbm_kernal.inc"
 
-        .export         CHKIN
-        .export         CKOUT, CHKOUT
+        .export         CHKOUT
         .export         CLRCH, CLRCHN
         .export         BASIN, CHRIN
-        .export         BSOUT, CHROUT
+        .export         CHROUT
         .export         STOP
         .export         GETIN
         .export         CLALL

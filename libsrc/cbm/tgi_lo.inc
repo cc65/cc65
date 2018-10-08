@@ -9,13 +9,19 @@
 
         .include        "tgi-kernel.inc"
         .include        "tgi-error.inc"
-        .ifndef __PLUS4__
+        .ifndef DYN_DRV
+        .include        "cbm_kernal.inc"
+        .else
+;        .ifndef __PLUS4__
         .import         PLOT, BSOUT
-        .endif
+;        .endif
         .ifdef __PET__
         .include        "pet.inc"
         .else
+        .ifndef SCREEN
         .import         SCREEN
+        .endif
+        .endif
         .endif
 
         .macpack        generic
@@ -119,9 +125,9 @@ CODE:           .byte   160, 172, 187, 162, 188, 161-128, 191-128, 190-128
 .ifdef __PLUS4__
 .data
 
-PLOT:
+my_PLOT:
                 .byte   $4C, 0, 0
-BSOUT:
+my_BSOUT:
                 .byte   $4C, 0, 0
 .endif
 
@@ -153,9 +159,9 @@ INSTALL:
         asl     xres            ; xres*2
         .else
         lda     libref
-        sta     PLOT+1
+        sta     my_PLOT+1
         lda     libref+1
-        sta     PLOT+2
+        sta     my_PLOT+2
         .endif
 ;       rts
 

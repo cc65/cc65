@@ -9,18 +9,15 @@
 
         .include        "tgi-kernel.inc"
         .include        "tgi-error.inc"
+        .include        "pet.inc"       ; SCR_LINELEN
         .ifndef DYN_DRV
         .include        "cbm_kernal.inc"
         .else
 ;        .ifndef __PLUS4__
         .import         PLOT, BSOUT
 ;        .endif
-        .ifdef __PET__
-        .include        "pet.inc"
-        .else
         .ifndef SCREEN
         .import         SCREEN
-        .endif
         .endif
         .endif
 

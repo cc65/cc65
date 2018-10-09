@@ -836,13 +836,13 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
     /* Do we have an entry with this name already? */
     SymEntry* Entry = FindSymInTable (Tab, Name, HashStr (Name));
     if (Entry) {
-
         Type* EType;
 
-        /* Even if the symbol already exists, let's make sure it
-        ** is not an ENUM. See bug #728. */
+        /* If the existing symbol is an enumerated constant,
+        ** then avoid a compiler crash.  See GitHub issue #728.
+        */
         if (Entry->Flags & SC_ENUM) {
-            Fatal ("Conflicting types for `%s'", Name);
+            Fatal ("Can't redeclare enum constant `%s' as global variable", Name);
         }
 
         /* We have a symbol with this name already */

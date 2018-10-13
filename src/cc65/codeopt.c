@@ -69,7 +69,7 @@
 #include "error.h"
 #include "global.h"
 #include "output.h"
-
+#include "symtab.h"
 
 
 /*****************************************************************************/
@@ -613,7 +613,86 @@ static unsigned OptStackPtrOps (CodeSeg* S)
     return Changes;
 }
 
+static unsigned OptGotoSPAdj (CodeSeg* S)
+/* Remove unnecessary SP adjustment while gotoing
+*/
+{
+    unsigned Changes = 0;
+    unsigned I;
 
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        CodeEntry* L[10], *X;
+        unsigned short adjustment;
+        const char* Arg;
+
+        /* Get next entry */
+        L[0] = CS_GetEntry (S, I);
+
+        /* Check for the sequence */
+        if (L[0]->OPC == OP65_PHA            &&
+            CS_GetEntries (S, L+1, I+1, 9)   &&
+            L[1]->OPC == OP65_LDA            &&
+            L[1]->AM == AM65_ABS             &&
+            L[2]->OPC == OP65_CLC            &&
+            L[3]->OPC == OP65_ADC            &&
+            strcmp (L[3]->Arg, "sp") == 0    &&
+            L[6]->OPC == OP65_ADC            &&
+            strcmp (L[6]->Arg, "sp+1") == 0    &&
+            L[9]->OPC == OP65_JMP
+            ) {
+            printf("Goto SP adjustment found. Jump to: %s, data Label: %s\n", L[9]->Arg, L[1]->Arg);
+            adjustment = FindSPAdjustment(L[1]->Arg);
+
+            if (adjustment == 0) {
+                CS_DelEntries (S, I, 9);
+            }
+            else if (adjustment > 255) {
+                Arg = MakeHexArg (adjustment & 0xff);
+                X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, L[1]->LI);
+                CS_InsertEntry(S, X, I + 1);
+                Arg = MakeHexArg (adjustment >> 8);
+                X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, L[5]->LI);
+                CS_InsertEntry(S, X, I + 6);
+
+                CS_DelEntry(S, I + 2);
+                CS_DelEntry(S, I + 6);
+            }
+            else if (adjustment > 8) {
+                Arg = MakeHexArg (adjustment & 0xff);
+                X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, L[1]->LI);
+                CS_InsertEntry (S, X, I);
+                X = NewCodeEntry (OP65_JSR, AM65_ABS, "addysp", 0, L[1]->LI);
+                CS_InsertEntry (S, X, I + 1);
+
+                CS_DelEntries(S, I + 2, 9);
+            }
+            else {
+                char Buf[20];
+                xsprintf (Buf, sizeof (Buf), "incsp%u", adjustment);
+                X = NewCodeEntry (OP65_JSR, AM65_ABS, Buf, 0, L[1]->LI);
+                CS_InsertEntry (S, X, I);
+
+                CS_DelEntries(S, I + 1, 9);
+            }
+            /* Regenerate register info */
+            CS_GenRegInfo (S);
+
+            /* Remember we had changes */
+            Changes++;
+        } else {
+
+            /* Next entry */
+            ++I;
+        }
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
 
 /*****************************************************************************/
 /*                              struct OptFunc                               */
@@ -675,6 +754,7 @@ static OptFunc DOptDeadCode     = { OptDeadCode,     "OptDeadCode",     100, 0, 
 static OptFunc DOptDeadJumps    = { OptDeadJumps,    "OptDeadJumps",    100, 0, 0, 0, 0, 0 };
 static OptFunc DOptDecouple     = { OptDecouple,     "OptDecouple",     100, 0, 0, 0, 0, 0 };
 static OptFunc DOptDupLoads     = { OptDupLoads,     "OptDupLoads",       0, 0, 0, 0, 0, 0 };
+static OptFunc DOptGotoSPAdj    = { OptGotoSPAdj,    "OptGotoSPAdj",      0, 0, 0, 0, 0, 0 };
 static OptFunc DOptIndLoads1    = { OptIndLoads1,    "OptIndLoads1",      0, 0, 0, 0, 0, 0 };
 static OptFunc DOptIndLoads2    = { OptIndLoads2,    "OptIndLoads2",      0, 0, 0, 0, 0, 0 };
 static OptFunc DOptJumpCascades = { OptJumpCascades, "OptJumpCascades", 100, 0, 0, 0, 0, 0 };
@@ -774,6 +854,7 @@ static OptFunc* OptFuncs[] = {
     &DOptDeadJumps,
     &DOptDecouple,
     &DOptDupLoads,
+    &DOptGotoSPAdj,
     &DOptIndLoads1,
     &DOptIndLoads2,
     &DOptJumpCascades,
@@ -1122,6 +1203,7 @@ static unsigned RunOptGroup1 (CodeSeg* S)
 {
     unsigned Changes = 0;
 
+    Changes += RunOptFunc (S, &DOptGotoSPAdj, 1);
     Changes += RunOptFunc (S, &DOptStackPtrOps, 5);
     Changes += RunOptFunc (S, &DOptPtrStore1, 1);
     Changes += RunOptFunc (S, &DOptPtrStore2, 1);
@@ -1229,6 +1311,7 @@ static unsigned RunOptGroup3 (CodeSeg* S)
         C += RunOptFunc (S, &DOptCmp6, 1);
         C += RunOptFunc (S, &DOptCmp7, 1);
         C += RunOptFunc (S, &DOptCmp9, 1);
+
         C += RunOptFunc (S, &DOptTest1, 1);
         C += RunOptFunc (S, &DOptLoad1, 1);
         C += RunOptFunc (S, &DOptJumpTarget3, 1);       /* After OptCondBranches2 */

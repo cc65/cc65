@@ -92,7 +92,7 @@ static SymTable*        SymTab          = 0;
 static SymTable*        TagTab0         = 0;
 static SymTable*        TagTab          = 0;
 static SymTable*        LabelTab        = 0;
-
+static SymTable*        SPAdjustTab     = 0;
 
 
 /*****************************************************************************/
@@ -225,6 +225,8 @@ void EnterGlobalLevel (void)
 
     /* Create and assign the tag table */
     TagTab0 = TagTab = NewSymTable (SYMTAB_SIZE_GLOBAL);
+
+    SPAdjustTab = NewSymTable (SYMTAB_SIZE_GLOBAL);
 }
 
 
@@ -405,7 +407,7 @@ void LeaveStructLevel (void)
 
 
 
-static SymEntry* FindSymInTable (const SymTable* T, const char* Name, unsigned Hash)
+SymEntry* FindSymInTable (const SymTable* T, const char* Name, unsigned Hash)
 /* Search for an entry in one table */
 {
     /* Get the start of the hash chain */
@@ -660,7 +662,7 @@ SymEntry* AddConstSym (const char* Name, const Type* T, unsigned Flags, long Val
 }
 
 
-DefOrRef* AddDefOrRef(SymEntry* E, unsigned Flags)
+DefOrRef* AddDefOrRef (SymEntry* E, unsigned Flags)
 /* Add definition or reference to the SymEntry and preserve its attributes */
 {
     DefOrRef *DOR;
@@ -675,6 +677,20 @@ DefOrRef* AddDefOrRef(SymEntry* E, unsigned Flags)
     DOR->LateSP_Label = GetLocalLabel ();
 
     return DOR;
+}
+
+unsigned short FindSPAdjustment (const char* Name)
+{
+    SymEntry* Entry = FindSymInTable (SPAdjustTab, Name, HashStr (Name));
+
+    if (Entry) {
+            printf("L: %s sa: %d\n", Name, Entry->V.G.SPAdjustment);
+            return Entry->V.G.SPAdjustment;
+    }
+
+    Fatal("ICE: No label entry found");
+
+    return 0;
 }
 
 SymEntry* AddLabelSym (const char* Name, unsigned Flags)
@@ -728,9 +744,14 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
                 /* We're processing a label, let's update all gotos encountered
                 ** so far
                 */
+                SymEntry *E;
                 g_userodata();
                 g_defdatalabel (DOR->LateSP_Label);
                 g_defdata (CF_CONST | CF_INT, StackPtr - DOR->StackPtr, 0);
+                E = NewSymEntry (LocalLabelName(DOR->LateSP_Label), SC_SPADJUSTMENT);
+                E->V.G.SPAdjustment = StackPtr - DOR->StackPtr;
+                AddSymEntry (SPAdjustTab, E);
+
 
                 /* Are we jumping into a block with initalization of an object that
                 ** has automatic storage duration? Let's emit a warning.

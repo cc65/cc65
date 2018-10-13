@@ -99,6 +99,7 @@ struct LiteralPool;
 #define SC_HAVEATTR     0x10000U        /* Symbol has attributes */
 
 #define SC_GOTO         0x20000U
+#define SC_SPADJUSTMENT 0x40000U
 
 
 
@@ -138,6 +139,10 @@ struct SymEntry {
             unsigned            Label;
             Collection          *DefsOrRefs;
         } L;
+
+        struct {
+            unsigned short      SPAdjustment;
+        } G;
 
         /* Register bank offset and offset of the saved copy on stack for
         ** register variables.

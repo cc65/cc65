@@ -226,6 +226,7 @@ void EnterGlobalLevel (void)
     /* Create and assign the tag table */
     TagTab0 = TagTab = NewSymTable (SYMTAB_SIZE_GLOBAL);
 
+    /* Create and assign the table of SP adjustment symbols */
     SPAdjustTab = NewSymTable (SYMTAB_SIZE_GLOBAL);
 }
 
@@ -681,16 +682,14 @@ DefOrRef* AddDefOrRef (SymEntry* E, unsigned Flags)
 
 unsigned short FindSPAdjustment (const char* Name)
 {
+/* Search for an entry in the table of SP adjustments */
     SymEntry* Entry = FindSymInTable (SPAdjustTab, Name, HashStr (Name));
 
-    if (Entry) {
-            printf("L: %s sa: %d\n", Name, Entry->V.G.SPAdjustment);
-            return Entry->V.G.SPAdjustment;
+    if (!Entry) {
+        Internal ("No SP adjustment label entry found");
     }
 
-    Fatal("ICE: No label entry found");
-
-    return 0;
+    return Entry->V.G.SPAdjustment;
 }
 
 SymEntry* AddLabelSym (const char* Name, unsigned Flags)
@@ -748,10 +747,12 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
                 g_userodata();
                 g_defdatalabel (DOR->LateSP_Label);
                 g_defdata (CF_CONST | CF_INT, StackPtr - DOR->StackPtr, 0);
-                E = NewSymEntry (LocalLabelName(DOR->LateSP_Label), SC_SPADJUSTMENT);
+
+                /* Optimizer will need the information about the value of SP adjustment
+                ** later, so let's preserve it. */
+                E = NewSymEntry (LocalLabelName (DOR->LateSP_Label), SC_SPADJUSTMENT);
                 E->V.G.SPAdjustment = StackPtr - DOR->StackPtr;
                 AddSymEntry (SPAdjustTab, E);
-
 
                 /* Are we jumping into a block with initalization of an object that
                 ** has automatic storage duration? Let's emit a warning.

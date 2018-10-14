@@ -685,7 +685,7 @@ static unsigned OptGotoSPAdj (CodeSeg* S)
                 CS_DelEntry (S, I + 6);
             }
             else if (adjustment > 8) {
-            /* For range (8, 255] we have ldy #0, jsr addysp */
+            /* For range (8, 255] we have ldy #, jsr addysp */
                 Arg = MakeHexArg (adjustment & 0xff);
                 X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, L[1]->LI);
                 CS_InsertEntry (S, X, I + 9);

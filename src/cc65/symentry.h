@@ -140,6 +140,7 @@ struct SymEntry {
             Collection          *DefsOrRefs;
         } L;
 
+        /* Value of SP adjustment needed after forward 'goto' */
         struct {
             unsigned short      SPAdjustment;
         } G;

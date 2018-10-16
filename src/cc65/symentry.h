@@ -141,9 +141,7 @@ struct SymEntry {
         } L;
 
         /* Value of SP adjustment needed after forward 'goto' */
-        struct {
-            unsigned short      SPAdjustment;
-        } G;
+        unsigned short      SPAdjustment;
 
         /* Register bank offset and offset of the saved copy on stack for
         ** register variables.

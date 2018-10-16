@@ -644,11 +644,11 @@ static unsigned OptGotoSPAdj (CodeSeg* S)
             adjustment = FindSPAdjustment (L[1]->Arg);
 
             if (adjustment == 0) {
-            /* No SP adjustment needed, remove the whole sequence */
+                /* No SP adjustment needed, remove the whole sequence */
                 CS_DelEntries (S, I, 9);
             }
             else if (adjustment >= 65536 - 8) {
-            /* If adjustment is in range [-8, 0) we use decsp* calls */
+                /* If adjustment is in range [-8, 0) we use decsp* calls */
                 char Buf[20];
                 adjustment = 65536 - adjustment;
                 xsprintf (Buf, sizeof (Buf), "decsp%u", adjustment);
@@ -659,7 +659,7 @@ static unsigned OptGotoSPAdj (CodeSeg* S)
                 CS_DelEntries (S, I, 9);
             }
             else if (adjustment >= 65536 - 255) {
-            /* For range [-255, -8) we have ldy #, jsr subysp */
+                /* For range [-255, -8) we have ldy #, jsr subysp */
                 adjustment = 65536 - adjustment;
                 Arg = MakeHexArg (adjustment);
                 X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, L[1]->LI);
@@ -671,8 +671,9 @@ static unsigned OptGotoSPAdj (CodeSeg* S)
                 CS_DelEntries (S, I, 9);
             }
             else if (adjustment > 255) {
-            /* For ranges [-32768, 255) and (255, 32767) the only modification
-            ** is to replace the absolute with immediate addressing */
+                /* For ranges [-32768, 255) and (255, 32767) the only modification
+                ** is to replace the absolute with immediate addressing
+                */
                 Arg = MakeHexArg (adjustment & 0xff);
                 X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, L[1]->LI);
                 CS_InsertEntry (S, X, I + 1);
@@ -685,7 +686,7 @@ static unsigned OptGotoSPAdj (CodeSeg* S)
                 CS_DelEntry (S, I + 6);
             }
             else if (adjustment > 8) {
-            /* For range (8, 255] we have ldy #, jsr addysp */
+                /* For range (8, 255] we have ldy #, jsr addysp */
                 Arg = MakeHexArg (adjustment & 0xff);
                 X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, L[1]->LI);
                 CS_InsertEntry (S, X, I + 9);
@@ -696,7 +697,7 @@ static unsigned OptGotoSPAdj (CodeSeg* S)
                 CS_DelEntries (S, I, 9);
             }
             else {
-            /* If adjustment is in range (0, 8] we use incsp* calls */
+                /* If adjustment is in range (0, 8] we use incsp* calls */
                 char Buf[20];
                 xsprintf (Buf, sizeof (Buf), "incsp%u", adjustment);
                 X = NewCodeEntry (OP65_JSR, AM65_ABS, Buf, 0, L[1]->LI);

@@ -5,6 +5,8 @@
 [Wiki](https://github.com/cc65/wiki/wiki)
 
 [![Build Status](https://api.travis-ci.org/cc65/cc65.svg?branch=master)](https://travis-ci.org/cc65/cc65/builds)
+[![Code Quality: Cpp](https://img.shields.io/lgtm/grade/cpp/g/cc65/cc65.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/cc65/cc65/context:cpp)
+[![Total Alerts](https://img.shields.io/lgtm/alerts/g/cc65/cc65.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/cc65/cc65/alerts)
 
 cc65 is a complete cross development package for 65(C)02 systems, including
 a powerful macro assembler, a C compiler, linker, librarian and several

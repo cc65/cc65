@@ -408,7 +408,7 @@ void LeaveStructLevel (void)
 
 
 
-SymEntry* FindSymInTable (const SymTable* T, const char* Name, unsigned Hash)
+static SymEntry* FindSymInTable (const SymTable* T, const char* Name, unsigned Hash)
 /* Search for an entry in one table */
 {
     /* Get the start of the hash chain */
@@ -681,15 +681,15 @@ DefOrRef* AddDefOrRef (SymEntry* E, unsigned Flags)
 }
 
 unsigned short FindSPAdjustment (const char* Name)
-{
 /* Search for an entry in the table of SP adjustments */
+{
     SymEntry* Entry = FindSymInTable (SPAdjustTab, Name, HashStr (Name));
 
     if (!Entry) {
         Internal ("No SP adjustment label entry found");
     }
 
-    return Entry->V.G.SPAdjustment;
+    return Entry->V.SPAdjustment;
 }
 
 SymEntry* AddLabelSym (const char* Name, unsigned Flags)
@@ -749,9 +749,10 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
                 g_defdata (CF_CONST | CF_INT, StackPtr - DOR->StackPtr, 0);
 
                 /* Optimizer will need the information about the value of SP adjustment
-                ** later, so let's preserve it. */
+                ** later, so let's preserve it.
+                */
                 E = NewSymEntry (LocalLabelName (DOR->LateSP_Label), SC_SPADJUSTMENT);
-                E->V.G.SPAdjustment = StackPtr - DOR->StackPtr;
+                E->V.SPAdjustment = StackPtr - DOR->StackPtr;
                 AddSymEntry (SPAdjustTab, E);
 
                 /* Are we jumping into a block with initalization of an object that

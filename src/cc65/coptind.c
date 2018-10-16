@@ -2061,9 +2061,9 @@ unsigned OptPrecalc (CodeSeg* S)
                 ** because ADC/SBC #0 always clears it.
                 */
                 if (In->RegA == 0 && CE_IsKnownImm (E, 0x00) &&
-                (E = CS_GetEntry (S, I + 1))                 &&
-                E->OPC != OP65_BVC                           &&
-                E->OPC != OP65_BVS ) {
+                    (E = CS_GetEntry (S, I + 1))             &&
+                    E->OPC != OP65_BVC                       &&
+                    E->OPC != OP65_BVS ) {
                     /* 0-0 or 0+0 -> remove */
                     CS_DelEntry (S, I);
                     ++Changes;

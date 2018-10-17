@@ -1881,9 +1881,14 @@ unsigned CfgProcess (void)
                 */
 
                 /* Check if the alignment for the segment from the linker
-                ** config. is a multiple for that of the segment.
+                ** config is a multiple for that of the segment.
+                ** If START or OFFSET is provided instead of ALIGN, check
+                ** if its address fits alignment requirements.
                 */
-                if ((S->RunAlignment % S->Seg->Alignment) != 0) {
+                unsigned long AlignedBy = (S->Flags & SF_START) ? S->Addr
+                    : (S->Flags & SF_OFFSET) ? (S->Addr + M->Start)
+                    : S->RunAlignment;
+                if ((AlignedBy % S->Seg->Alignment) != 0) {
                     /* Segment requires another alignment than configured
                     ** in the linker.
                     */

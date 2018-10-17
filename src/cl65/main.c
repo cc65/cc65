@@ -139,6 +139,7 @@ static int Module = 0;
 
 /* Name of the target specific runtime library */
 static char* TargetLib  = 0;
+static int   NoRTL      = 0;
 
 
 
@@ -413,6 +414,12 @@ static void SetTargetFiles (void)
     /* Get a pointer to the system name and its length */
     const char* TargetName = GetTargetName (Target);
     unsigned    TargetNameLen = strlen (TargetName);
+
+    if (NoRTL)
+    {
+        /* Default RunTime Library is disabled */
+        return;
+    }
 
     /* Set the library file */
     TargetLib = xmalloc (TargetNameLen + 4 + 1);
@@ -812,6 +819,7 @@ static void Usage (void)
             "  --memory-model model\t\tSet the memory model\n"
             "  --module\t\t\tLink as a module\n"
             "  --module-id id\t\tSpecify a module ID for the linker\n"
+            "  --no-rtl\t\t\tDon't link default runtime library\n"
             "  --o65-model model\t\tOverride the o65 model\n"
             "  --obj file\t\t\tLink this object file\n"
             "  --obj-path path\t\tSpecify an object file search path\n"
@@ -1167,6 +1175,15 @@ static void OptModuleId (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
+static void OptNoRTL (const char* Opt attribute ((unused)),
+                      const char* Arg attribute ((unused)))
+/* Disable default runtime library */
+{
+    NoRTL = 1;
+}
+
+
+
 static void OptO65Model (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --o65-model option */
 {
@@ -1369,6 +1386,7 @@ int main (int argc, char* argv [])
         { "--memory-model",      1, OptMemoryModel    },
         { "--module",            0, OptModule         },
         { "--module-id",         1, OptModuleId       },
+        { "--no-rtl",            0, OptNoRTL          },
         { "--o65-model",         1, OptO65Model       },
         { "--obj",               1, OptObj            },
         { "--obj-path",          1, OptObjPath        },

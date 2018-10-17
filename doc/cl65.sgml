@@ -103,6 +103,7 @@ Long options:
   --memory-model model          Set the memory model
   --module                      Link as a module
   --module-id id                Specify a module id for the linker
+  --no-rtl                      Don't link default runtime library
   --o65-model model             Override the o65 model
   --obj file                    Link this object file
   --obj-path path               Specify an object file search path
@@ -183,6 +184,11 @@ There are a few remaining options that control the behaviour of cl65:
   and linker) will use the "none" system settings by default, cl65 will use
   "c64" as a target system by default. That was chosen because most people
   seem to use cc65 to develop for the C64.
+
+
+  <tag><tt>--no-rtl</tt></tag>
+
+  This option disables default runtime library of target system.
 
 
   <tag><tt>-Wa options, --asm-args options</tt></tag>

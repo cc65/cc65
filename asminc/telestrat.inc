@@ -149,6 +149,8 @@ SCREEN          := $BB80
 ; ROM entries
 
 ; telemon primitives (2.4 & 3.x)
+
+; all values are used to call bank 7 of telestrat cardridge. It works with 'brk value' 
 XRD0             = $08
 XRDW0            = $0C
 XWR0             = $10 
@@ -158,6 +160,7 @@ XHIRES           = $1A
 XFILLM           = $1C
 XMINMA           = $1F
 XVARS            = $24          ; only in TELEMON 3.x, in telemon 2.4, it's XNOMFI ($24)
+XCRLF            = $25          ; jump a line and return to the beginning of the line
 XFREAD           = $27          ; only in TELEMON 3.x
 XOPEN            = $30          ; only in TELEMON 3.x
 XCOSCR           = $34          ; switch off cursor
@@ -173,6 +176,7 @@ XZAP             = $46
 XSHOOT           = $47
 XMKDIR           = $4B          ; create a folder. Only available in telemon 3.x
 XRM              = $4D          ; remove a folder or a file. Only available in telemon 3.x
+XMALLOC          = $5B          ; only in telemon 3.x
 XSOUT            = $67          ; send accumulator value (A) to RS232, available in telemon 2.4 & 3.x : if RS232 buffer is full, the Oric Telestrat freezes
 XHRSSE           = $8C          ; set hires position cursor
 XDRAWA           = $8D          ; draw a line 

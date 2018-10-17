@@ -3,8 +3,6 @@
 ; 
     .export    _wherey
 	
-    .importzp  sp
-
     .include   "telestrat.inc"
 
 .proc _wherey

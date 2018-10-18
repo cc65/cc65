@@ -1186,7 +1186,21 @@ an explanation on how this is done.
 
 <sect1>Address sizes of symbols<p>
 
+The address size of a symbol can be specified with a prefix:
 
+<itemize>
+<item>z: zeropage addressing (8 bits).
+<item>a: absolute addressing (16 bits).
+<item>f: far addressing (24 bits).
+</itemize>
+
+The zeropage addressing override can be used to ensure the use of optimal
+zeropage instructions, or correct cases where the size isn't yet known
+due to the single-pass assembly model.
+
+The larger addressing overrides can be used to promote a smaller address
+to absolute or far addressing, instead of being automatically fit into
+a smaller addressing type.
 
 
 <sect1>Memory models<p>

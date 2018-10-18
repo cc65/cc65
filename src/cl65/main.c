@@ -139,7 +139,7 @@ static int Module = 0;
 
 /* Name of the target specific runtime library */
 static char* TargetLib  = 0;
-static int   NoCrtLib   = 0;
+static int   NoStdLib   = 0;
 
 
 
@@ -492,20 +492,20 @@ static void Link (void)
         CmdSetTarget (&LD65, Target);
     }
 
-    if (!NoCrtLib)
-    {
-        /* Determine which target libraries are needed */
-        SetTargetFiles ();
-    }
-
     /* Add all object files as parameters */
     for (I = 0; I < LD65.FileCount; ++I) {
         CmdAddArg (&LD65, LD65.Files [I]);
     }
 
-    /* Add the system runtime library */
-    if (TargetLib) {
-        CmdAddArg (&LD65, TargetLib);
+    /* Add the standard runtime library if it is not disabled */
+    if (!NoStdLib)
+    {
+        /* Determine which target library is needed */
+        SetTargetFiles ();
+
+        if (TargetLib) {
+            CmdAddArg (&LD65, TargetLib);
+        }
     }
 
     /* Terminate the argument list with a NULL pointer */
@@ -816,7 +816,7 @@ static void Usage (void)
             "  --memory-model model\t\tSet the memory model\n"
             "  --module\t\t\tLink as a module\n"
             "  --module-id id\t\tSpecify a module ID for the linker\n"
-            "  --no-crt-lib\t\t\tDon't link default C runtime library\n"
+            "  --no-std-lib\t\t\tDon't link standard runtime library\n"
             "  --o65-model model\t\tOverride the o65 model\n"
             "  --obj file\t\t\tLink this object file\n"
             "  --obj-path path\t\tSpecify an object file search path\n"
@@ -1172,11 +1172,11 @@ static void OptModuleId (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
-static void OptNoCrtLib (const char* Opt attribute ((unused)),
-                      const char* Arg attribute ((unused)))
-/* Disable default runtime library */
+static void OptNoStdLib (const char* Opt attribute ((unused)),
+                         const char* Arg attribute ((unused)))
+/* Disable standard runtime library */
 {
-    NoCrtLib = 1;
+    NoStdLib = 1;
 }
 
 
@@ -1383,7 +1383,7 @@ int main (int argc, char* argv [])
         { "--memory-model",      1, OptMemoryModel    },
         { "--module",            0, OptModule         },
         { "--module-id",         1, OptModuleId       },
-        { "--no-crt-lib",        0, OptNoCrtLib       },
+        { "--no-std-lib",        0, OptNoStdLib       },
         { "--o65-model",         1, OptO65Model       },
         { "--obj",               1, OptObj            },
         { "--obj-path",          1, OptObjPath        },

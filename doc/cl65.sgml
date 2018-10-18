@@ -103,7 +103,7 @@ Long options:
   --memory-model model          Set the memory model
   --module                      Link as a module
   --module-id id                Specify a module id for the linker
-  --no-std-lib                  Don't link standard runtime library
+  --no-std-lib                  Don't link the standard library
   --o65-model model             Override the o65 model
   --obj file                    Link this object file
   --obj-path path               Specify an object file search path
@@ -188,8 +188,8 @@ There are a few remaining options that control the behaviour of cl65:
 
   <tag><tt>--no-std-lib</tt></tag>
 
-  This option tells the cl65 to not include standard runtime library into the
-  list of libraries.
+  This option tells the cl65 to not include the standard library into the list
+  of libraries.
 
 
 

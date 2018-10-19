@@ -138,8 +138,8 @@ static int Module = 0;
 #define MODULE_EXT      ".o65"
 
 /* Name of the target specific runtime library */
-static char* TargetLib  = 0;
-static int   NoStdLib   = 0;
+static char* TargetLib   = 0;
+static int   NoTargetLib = 0;
 
 
 
@@ -497,8 +497,8 @@ static void Link (void)
         CmdAddArg (&LD65, LD65.Files [I]);
     }
 
-    /* Add the standard library if it is not disabled */
-    if (!NoStdLib)
+    /* Add the target library if it is not disabled */
+    if (!NoTargetLib)
     {
         /* Determine which target library is needed */
         SetTargetFiles ();
@@ -816,7 +816,7 @@ static void Usage (void)
             "  --memory-model model\t\tSet the memory model\n"
             "  --module\t\t\tLink as a module\n"
             "  --module-id id\t\tSpecify a module ID for the linker\n"
-            "  --no-std-lib\t\t\tDon't link the standard library\n"
+            "  --no-target-lib\t\tDon't link the target library\n"
             "  --o65-model model\t\tOverride the o65 model\n"
             "  --obj file\t\t\tLink this object file\n"
             "  --obj-path path\t\tSpecify an object file search path\n"
@@ -1172,11 +1172,11 @@ static void OptModuleId (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
-static void OptNoStdLib (const char* Opt attribute ((unused)),
-                         const char* Arg attribute ((unused)))
-/* Disable the standard library */
+static void OptNoTargetLib (const char* Opt attribute ((unused)),
+                            const char* Arg attribute ((unused)))
+/* Disable the target library */
 {
-    NoStdLib = 1;
+    NoTargetLib = 1;
 }
 
 
@@ -1383,7 +1383,7 @@ int main (int argc, char* argv [])
         { "--memory-model",      1, OptMemoryModel    },
         { "--module",            0, OptModule         },
         { "--module-id",         1, OptModuleId       },
-        { "--no-std-lib",        0, OptNoStdLib       },
+        { "--no-target-lib",     0, OptNoTargetLib    },
         { "--o65-model",         1, OptO65Model       },
         { "--obj",               1, OptObj            },
         { "--obj-path",          1, OptObjPath        },

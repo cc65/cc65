@@ -1,30 +1,28 @@
 ;
-; Oric Telemon definition
-; Telemon 2.4 & Telemon 3.x
-; For telemon 3.x check http://orix.oric.org
+; Oric TELEMON definition
+; TELEMON 2.4 & TELEMON 3.x
+; For TELEMON 3.x check http://orix.oric.org
 ;
-
 
 ; ---------------------------------------------------------------------------
 ; Constants
 
-SCREEN_XSIZE    = 40            ; screen columns
-SCREEN_YSIZE    = 28            ; screen rows
+SCREEN_XSIZE    = 40            ; Screen columns
+SCREEN_YSIZE    = 28            ; Screen rows
 
 FUNCTKEY        = $A5
 
-FNAME_LEN       = 11            ; maximum length of file-name
+FNAME_LEN       = 11            ; Maximum length of file-name
 
 ; ---------------------------------------------------------------------------
 ; I/O Identifier
-; theses identifers are used for channel management
+; Theses identifers are used for channel management
 ; 
 
-XKBD            = $80           ; keyboard
+XKBD            = $80           ; Keyboard
 XRSE            = $83           ; RS232 in
-XSCR            = $88           ; screen
+XSCR            = $88           ; Screen
 XRSS            = $90           ; RS232 out
-
 
 ; ---------------------------------------------------------------------------
 ; Zero page
@@ -43,7 +41,7 @@ TR5             := $11
 TR6             := $12
 TR7             := $13
 
-PTR_READ_DEST   := $2C           ; used for XFREAD and XWRITE only in telemon 3.x
+PTR_READ_DEST   := $2C           ; Used for XFREAD and XWRITE only in TELEMON 3.x
 
 HRSX            := $46
 HRSY            := $47
@@ -59,7 +57,7 @@ HRSFB           := $57
 ; RS232T
 ; b0-b3 : speed 
 ;         1111 => 19200 bps  (please note that telestrat can't handle this speed without stopping all IRQ except ACIA's one)
-;         1100 =>  9600 bps  (default from telemon)
+;         1100 =>  9600 bps  (default from TELEMON)
 ;         1110 =>  4800 bps 
 ;         1010 =>  2400 bps 
 ;         1000 =>  1200 bps 
@@ -91,8 +89,6 @@ RS232C          := $5A
 ; ---------------------------------------------------------------------------
 ; Low memory
 IRQVec          := $02FB        ; "fast" interrupt vector
-
-
 
 ; ---------------------------------------------------------------------------
 ; I/O locations
@@ -148,39 +144,40 @@ SCREEN          := $BB80
 ; ---------------------------------------------------------------------------
 ; ROM entries
 
-; telemon primitives (2.4 & 3.x)
+; TELEMON primitives (2.4 & 3.x)
 
 ; all values are used to call bank 7 of telestrat cardridge. It works with 'brk value' 
 XRD0             = $08
 XRDW0            = $0C
 XWR0             = $10 
-XWSTR0           = $14          ; write a string in text mode
+XWSTR0           = $14          ; Write a string in text mode
 XTEXT            = $19
 XHIRES           = $1A
 XFILLM           = $1C
 XMINMA           = $1F
-XVARS            = $24          ; only in TELEMON 3.x, in telemon 2.4, it's XNOMFI ($24)
-XCRLF            = $25          ; jump a line and return to the beginning of the line
-XFREAD           = $27          ; only in TELEMON 3.x
-XOPEN            = $30          ; only in TELEMON 3.x
-XCOSCR           = $34          ; switch off cursor
-XCSSCR           = $35          ; switch on cursor
-XCLOSE           = $3A          ; only in TELEMON 3.x Close file
-XFWRITE          = $3B          ; only in TELEMON 3.x write file
+XVARS            = $24          ; Only in TELEMON 3.x, in TELEMON 2.4, it's XNOMFI ($24)
+XCRLF            = $25          ; Jump a line and return to the beginning of the line
+XFREAD           = $27          ; Only in TELEMON 3.x (bank 7 of Orix)
+XOPEN            = $30          ; Only in TELEMON 3.x (bank 7 of Orix)
+XCOSCR           = $34          ; Switch off cursor
+XCSSCR           = $35          ; Switch on cursor
+XCLOSE           = $3A          ; Only in TELEMON 3.x close file (bank 7 of Orix)
+XFWRITE          = $3B          ; Only in TELEMON 3.x write file (bank 7 of Orix)
 XSONPS           = $40
-XOUPS            = $42          ; send Oups sound into PSG
+XOUPS            = $42          ; Send Oups sound into PSG
 XPLAY            = $43
 XSOUND           = $44 
 XMUSIC           = $45 
 XZAP             = $46
 XSHOOT           = $47
-XMKDIR           = $4B          ; create a folder. Only available in telemon 3.x
-XRM              = $4D          ; remove a folder or a file. Only available in telemon 3.x
-XMALLOC          = $5B          ; only in telemon 3.x
-XSOUT            = $67          ; send accumulator value (A) to RS232, available in telemon 2.4 & 3.x : if RS232 buffer is full, the Oric Telestrat freezes
-XHRSSE           = $8C          ; set hires position cursor
-XDRAWA           = $8D          ; draw a line 
-XDRAWR           = $8E          ; draw a line 
+XMKDIR           = $4B          ; Create a folder. Only available in TELEMON 3.x (bank 7 of Orix)
+XRM              = $4D          ; Remove a folder or a file. Only available in TELEMON 3.x (bank 7 of Orix)
+XMALLOC          = $5B          ; Only in TELEMON 3.x (bank 7 of Orix)
+XFREE            = $62          ; Only in TELEMON 3.x (bank 7 of Orix)
+XSOUT            = $67          ; Send accumulator value (A) to RS232, available in TELEMON 2.4 & 3.x : if RS232 buffer is full, the Oric Telestrat freezes
+XHRSSE           = $8C          ; Set hires position cursor
+XDRAWA           = $8D          ; Draw a line 
+XDRAWR           = $8E          ; Draw a line 
 XCIRCL           = $8F
 XCURSE           = $90
 XCURMO           = $91
@@ -190,7 +187,7 @@ XBOX             = $94
 XABOX            = $95
 XFILL            = $96
 XCHAR            = $97
-XSCHAR           = $98          ; draw a string in hires
+XSCHAR           = $98          ; Draw a string in hires
 XEXPLO           = $9C 
 XPING            = $9D
 
@@ -205,7 +202,7 @@ SCRX             := $220
 SCRY             := $224
 ADSCRL           := $218
 ADSCRH           := $21C
-HRSPAT           := $2AA        ; hires pattern : it's used to draw pattern for a line or a circle
+HRSPAT           := $2AA        ; Hires pattern : it's used to draw pattern for a line or a circle
 IRQVECTOR        := $2FA
 
 
@@ -217,10 +214,12 @@ BUFEDT           := $590
 
 MAX_BUFEDT_LENGTH=110
 
+; ---------------------------------------------------------------------------
 ; Hardware
 CH376_DATA       := $340
 CH376_COMMAND    := $341
 
+; ---------------------------------------------------------------------------
 ; MACRO 
 
 .macro  BRK_TELEMON   value

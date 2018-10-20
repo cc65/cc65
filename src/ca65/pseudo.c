@@ -574,7 +574,7 @@ static void DoByte (void)
 
     /* Record type information */
     Span* S = OpenSpan ();
-    StrBuf Type = STATIC_STRBUF_INITIALIZER;
+    StrBuf Type = AUTO_STRBUF_INITIALIZER;
 
     /* Parse arguments */
     while (1) {
@@ -598,9 +598,14 @@ static void DoByte (void)
         }
     }
 
-    /* Close the span, then add type information to it */
+    /* Close the span, then add type information to it.
+    ** Note: empty string operands emit nothing;
+    ** so, add a type only if there's a span.
+    */
     S = CloseSpan (S);
-    SetSpanType (S, GenArrayType (&Type, GetSpanSize (S), EType, sizeof (EType)));
+    if (S != 0) {
+        SetSpanType (S, GenArrayType (&Type, GetSpanSize (S), EType, sizeof (EType)));
+    }
 
     /* Free the type string */
     SB_Done (&Type);

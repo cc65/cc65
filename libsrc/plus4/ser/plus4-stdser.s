@@ -1,14 +1,14 @@
 ;
-; Serial driver for the builtin 6551 ACIA of the Plus/4.
+; Serial driver for the built-in 6551 ACIA of the Plus/4.
 ;
 ; Ullrich von Bassewitz, 2003-12-13
 ;
 ; The driver is based on the cc65 rs232 module, which in turn is based on
-; Craig Bruce device driver for the Switftlink/Turbo-232.
+; Craig Bruce's device driver for the Switftlink/Turbo-232.
 ;
 ; SwiftLink/Turbo-232 v0.90 device driver, by Craig Bruce, 14-Apr-1998.
 ;
-; This software is Public Domain.  It is in Buddy assembler format.
+; This (C. Bruce) software is Public Domain.  It is in Buddy assembler format.
 ;
 ; This device driver uses the SwiftLink RS-232 Serial Cartridge, available from
 ; Creative Micro Designs, Inc, and also supports the extensions of the Turbo232
@@ -17,7 +17,7 @@
 ;
 ; The code assumes that the kernal + I/O are in context.  On the C128, call
 ; it from Bank 15.  On the C64, don't flip out the Kernal unless a suitable
-; NMI catcher is put into the RAM under then Kernal.  For the SuperCPU, the
+; NMI catcher is put into the RAM under the Kernal.  For the SuperCPU, the
 ; interrupt handling assumes that the 65816 is in 6502-emulation mode.
 ;
 
@@ -36,7 +36,7 @@
 
 ; Driver signature
 
-        .byte   $73, $65, $72           ; "ser"
+        .byte   $73, $65, $72           ; ASCII "ser"
         .byte   SER_API_VERSION         ; Serial API version number
 
 ; Library reference
@@ -58,11 +58,11 @@
 ;----------------------------------------------------------------------------
 ; I/O definitions
 
-ACIA            = $DE00
-ACIA_DATA       = ACIA+0        ; Data register
-ACIA_STATUS     = ACIA+1        ; Status register
-ACIA_CMD        = ACIA+2        ; Command register
-ACIA_CTRL       = ACIA+3        ; Control register
+ACIA            := $FD00
+ACIA_DATA       := ACIA+0       ; Data register
+ACIA_STATUS     := ACIA+1       ; Status register
+ACIA_CMD        := ACIA+2       ; Command register
+ACIA_CTRL       := ACIA+3       ; Control register
 
 ;----------------------------------------------------------------------------
 ;

@@ -32,6 +32,11 @@ XRSS            = $90           ; RS232 out
 RES             := $00
 RESB            := $02
 
+DECDEB          := $04
+DECFIN          := $06
+DECCIB          := $08
+DECTRV          := $0A
+
 TR0             := $0C
 TR1             := $0D
 TR2             := $0E
@@ -40,6 +45,9 @@ TR4             := $10
 TR5             := $11
 TR6             := $12
 TR7             := $13
+
+DEFAFF          := $14
+ADSCR           := $26
 
 PTR_READ_DEST   := $2C           ; Used for XFREAD and XWRITE only in TELEMON 3.x
 
@@ -85,6 +93,9 @@ RS232T          := $59
 ;       : 11 SPACE SENT, reception not tested
 
 RS232C          := $5A
+
+VARLNG          := $8C
+VARAPL          := $D0
 
 ; ---------------------------------------------------------------------------
 ; Low memory
@@ -147,10 +158,31 @@ SCREEN          := $BB80
 ; TELEMON primitives (2.4 & 3.x)
 
 ; all values are used to call bank 7 of telestrat cardridge. It works with 'brk value' 
+XOP0             = $00          ; Open device on channel 0
+XOP1             = $01          ; Open device on channel 1
+XOP2             = $02          ; Open device on channel 2
+XOP3             = $03          ; Open device on channel 3
+
+XCL0             = $04          ; Close channel 0
+XCL1             = $05          ; Close channel 1
+XCL2             = $06          ; Close channel 2
+XCL3             = $07          ; Close channel 3
+
 XRD0             = $08
 XRDW0            = $0C
-XWR0             = $10 
-XWSTR0           = $14          ; Write a string in text mode
+
+XWR0             = $10          ; Write a char in channel 0
+XWR1             = $11          ; Write a char in channel 1
+XWR2             = $12          ; Write a char in channel 2
+XWR3             = $13          ; Write a char in channel 3
+
+XWSTR0           = $14          ; Write a string in text mode channel 0
+XWSTR1           = $15          ; Write a string in text mode channel 1
+XWSTR2           = $16          ; Write a string in text mode channel 2
+XWSTR3           = $17          ; Write a string in text mode channel 3
+
+XDECAL           = $18
+
 XTEXT            = $19
 XHIRES           = $1A
 XFILLM           = $1C
@@ -158,43 +190,52 @@ XMINMA           = $1F
 XVARS            = $24          ; Only in TELEMON 3.x, in TELEMON 2.4, it's XNOMFI ($24)
 XCRLF            = $25          ; Jump a line and return to the beginning of the line
 XFREAD           = $27          ; Only in TELEMON 3.x (bank 7 of Orix)
+XHEXA            = $2A          ; Convert a number into hex
+XBINDX           = $28          ; Convert a number into hex and displays on channel 0
 XOPEN            = $30          ; Only in TELEMON 3.x (bank 7 of Orix)
 XCOSCR           = $34          ; Switch off cursor
 XCSSCR           = $35          ; Switch on cursor
+XSCRSE           = $36
 XCLOSE           = $3A          ; Only in TELEMON 3.x close file (bank 7 of Orix)
 XFWRITE          = $3B          ; Only in TELEMON 3.x write file (bank 7 of Orix)
-XSONPS           = $40
+XSONPS           = $40          ; Send data to PSG register (14 values)
 XOUPS            = $42          ; Send Oups sound into PSG
-XPLAY            = $43
+XPLAY            = $43          ; Play a sound
 XSOUND           = $44 
 XMUSIC           = $45 
-XZAP             = $46
+XZAP             = $46          ; Send Zap sound to PSG
 XSHOOT           = $47
 XMKDIR           = $4B          ; Create a folder. Only available in TELEMON 3.x (bank 7 of Orix)
 XRM              = $4D          ; Remove a folder or a file. Only available in TELEMON 3.x (bank 7 of Orix)
+XGOKBD           = $52 
 XMALLOC          = $5B          ; Only in TELEMON 3.x (bank 7 of Orix)
 XFREE            = $62          ; Only in TELEMON 3.x (bank 7 of Orix)
 XSOUT            = $67          ; Send accumulator value (A) to RS232, available in TELEMON 2.4 & 3.x : if RS232 buffer is full, the Oric Telestrat freezes
 XHRSSE           = $8C          ; Set hires position cursor
 XDRAWA           = $8D          ; Draw a line 
-XDRAWR           = $8E          ; Draw a line 
-XCIRCL           = $8F
-XCURSE           = $90
-XCURMO           = $91
+XDRAWR           = $8E          ; Draw a line (relative)
+XCIRCL           = $8F          ; Draw a circle
+XCURSE           = $90          ; Plot a pixel 
+XCURMO           = $91          ; Move to x,y pos in Hires
 XPAPER           = $92
 XINK             = $93
-XBOX             = $94
+XBOX             = $94          ; Draw a box
 XABOX            = $95
 XFILL            = $96
-XCHAR            = $97
+XCHAR            = $97          ; Display a char on the screen in Hires
 XSCHAR           = $98          ; Draw a string in hires
-XEXPLO           = $9C 
-XPING            = $9D
+XEXPLO           = $9C          ; Send Explode sound to PSG
+XPING            = $9D          ; Send Ping sound to PSG
 
 ; ---------------------------------------------------------------------------
 ; ROM entries variables
 
 PWD_PTR          = $00
+
+; ---------------------------------------------------------------------------
+; 
+BUFTRV          := $100         
+
 
 ; ---------------------------------------------------------------------------
 ; Page $200

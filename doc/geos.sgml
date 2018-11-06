@@ -68,7 +68,7 @@ programs.
 The software needed:
 <itemize>
     <item><em/cc65/ Excellent package containing a C crosscompiler, a crossassembler and a linker, you
-		can get it from: <url url="http://cc65.github.io/cc65/">.
+		can get it from: <url url="https://cc65.github.io/">.
     <item><em/VICE/ This is a portable C64, C128 and few other Commodore computers emulator, you
 		can obtain it from: <url url="http://vice-emu.sourceforge.net/">.
 		The VICE package contains the <em/c1541/ program that is able
@@ -80,7 +80,7 @@ The software needed:
     <item><em/opencbm/ A package that allows for communication directly with a 1541 and
 		other Commodore IEC bus drives. It can be a replacement for Star Commander if
 		you only want to transfer files to a disk and unconvert using GEOS program for
-		this purpose. Check out: <url url="http://opencbm.sourceforge.net/">.
+		this purpose. Check out: <url url="https://spiro.trikaliotis.net/opencbm">.
 </itemize>
 <p>
 VICE and cc65 are portable - they run on variety of platforms - DOS, Win32 and UNIX. GEOSLib only

@@ -1,7 +1,7 @@
 ;
 ; Oliver Schmidt, 15.08.2018
 ;
-; int clock_settime (clockid_t clk_id, const struct timespec *tp);
+; int __fastcall__ clock_settime (clockid_t clk_id, const struct timespec *tp);
 ;
 
         .import         __dos_type

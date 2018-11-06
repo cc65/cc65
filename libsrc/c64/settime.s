@@ -1,7 +1,7 @@
 ;
 ; Oliver Schmidt, 16.8.2018
 ;
-; int clock_settime (clockid_t clk_id, const struct timespec *tp);
+; int __fastcall__ clock_settime (clockid_t clk_id, const struct timespec *tp);
 ;
 
         .include        "time.inc"

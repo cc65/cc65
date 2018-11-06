@@ -1,7 +1,7 @@
 ;
 ; Christian Groessler, 27-Feb-2000
 ;
-; void set_brk (unsigned Addr);
+; void __fastcall__ set_brk (unsigned Addr);
 ; void reset_brk (void);
 ;
 

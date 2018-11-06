@@ -1,7 +1,7 @@
 ;
 ; Oliver Schmidt, 14.08.2018
 ;
-; int clock_gettime (clockid_t clk_id, struct timespec *tp);
+; int __fastcall__ clock_gettime (clockid_t clk_id, struct timespec *tp);
 ;
 
         .import         pushax, steaxspidx, incsp1, incsp3, return0

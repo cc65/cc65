@@ -2,7 +2,7 @@
 ; Stefan Haubenthal, 27.7.2009
 ; Oliver Schmidt, 14.8.2018
 ;
-; int clock_gettime (clockid_t clk_id, struct timespec *tp);
+; int __fastcall__ clock_gettime (clockid_t clk_id, struct timespec *tp);
 ;
 
         .include        "time.inc"

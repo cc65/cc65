@@ -329,20 +329,20 @@ unsigned char ScreenMemory[100];
 
 void DisplayList =
 {
-	DL_BLK8,
-	DL_BLK8,
-	DL_BLK8,
-	DL_LMS(DL_CHR20x8x2),
-	ScreenMemory,
-	DL_CHR20x8x2,
-	DL_CHR20x8x2,
-	DL_CHR20x8x2,
-	DL_BLK4,
-	DL_CHR20x8x2,
-	DL_JVB
+    DL_BLK8,
+    DL_BLK8,
+    DL_BLK8,
+    DL_LMS(DL_CHR20x8x2),
+    ScreenMemory,
+    DL_CHR20x8x2,
+    DL_CHR20x8x2,
+    DL_CHR20x8x2,
+    DL_BLK4,
+    DL_CHR20x8x2,
+    DL_JVB
 };
 ...
-POKEW(560,(unsigned int)&amp;DisplayList);		// SDLSTL
+POKEW(560,(unsigned int)&amp;DisplayList);      // SDLSTL
 ...
 </verb>
 
@@ -410,6 +410,29 @@ char* pcAtasciiMappingString = "Hello Atari!";
 </verb>
 
 does not.
+
+<sect1>Keyboard codes<p>
+
+For direct keyboard scanning in conjunction with e.g. the OS location "CH" (764/$2FC),
+all keyboard codes are available as defined values on C and assembler side.
+
+Example:
+<verb>
+...
+    while (!kbhit());
+    switch (PEEK(764))
+    {
+        case KEY_RETURN:
+        ...
+        case KEY_SPACE:
+        ...
+        case KEY_1:
+        ...
+    }
+...
+</verb>
+
+You can find the C defines in the file "<tt/_pokey.h/" or "<tt/atari_pokey.inc/" for the assembler variant.
 
 
 <sect>Loadable drivers<p>
@@ -932,16 +955,16 @@ chunk #2 (RAM memory area).
 The contents of the new NEXEHDR and CHKHDR segments come from this
 file (split.s):
 <tscreen><verb>
-	.import	__CODE_LOAD__, __BSS_LOAD__, __CODE_SIZE__
-	.import	__DATA_LOAD__, __RODATA_LOAD__, __STARTUP_LOAD__
+    .import __CODE_LOAD__, __BSS_LOAD__, __CODE_SIZE__
+    .import __DATA_LOAD__, __RODATA_LOAD__, __STARTUP_LOAD__
 
-	.segment "NEXEHDR"
-	.word	 __STARTUP_LOAD__
-	.word	 __CODE_LOAD__ + __CODE_SIZE__ - 1
+    .segment "NEXEHDR"
+    .word    __STARTUP_LOAD__
+    .word    __CODE_LOAD__ + __CODE_SIZE__ - 1
 
-	.segment "CHKHDR"
-	.word	 __RODATA_LOAD__
-	.word	 __BSS_LOAD__ - 1
+    .segment "CHKHDR"
+    .word    __RODATA_LOAD__
+    .word    __BSS_LOAD__ - 1
 </verb></tscreen>
 <p>
 Compile with
@@ -1008,16 +1031,16 @@ FEATURES {
 
 New contents for NEXEHDR and CHKHDR are needed (split2.s):
 <tscreen><verb>
-	.import	__STARTUP_LOAD__, __BSS_LOAD__, __DATA_SIZE__
-	.import	__DATA_LOAD__, __RODATA_LOAD__
+    .import __STARTUP_LOAD__, __BSS_LOAD__, __DATA_SIZE__
+    .import __DATA_LOAD__, __RODATA_LOAD__
 
-	.segment "NEXEHDR"
-	.word	 __RODATA_LOAD__
-	.word	 __DATA_LOAD__ + __DATA_SIZE__ - 1
+    .segment "NEXEHDR"
+    .word    __RODATA_LOAD__
+    .word    __DATA_LOAD__ + __DATA_SIZE__ - 1
 
-	.segment "CHKHDR"
-	.word	 __STARTUP_LOAD__
-	.word	 __BSS_LOAD__ - 1
+    .segment "CHKHDR"
+    .word    __STARTUP_LOAD__
+    .word    __BSS_LOAD__ - 1
 </verb></tscreen>
 
 Compile with
@@ -1096,14 +1119,14 @@ including commercial applications, and to alter it and redistribute it
 freely, subject to the following restrictions:
 
 <enum>
-<item>	The origin of this software must not be misrepresented; you must not
-	claim that you wrote the original software. If you use this software
-	in a product, an acknowledgment in the product documentation would be
-	appreciated but is not required.
-<item>	Altered source versions must be plainly marked as such, and must not
-	be misrepresented as being the original software.
-<item>	This notice may not be removed or altered from any source
-	distribution.
+<item>  The origin of this software must not be misrepresented; you must not
+    claim that you wrote the original software. If you use this software
+    in a product, an acknowledgment in the product documentation would be
+    appreciated but is not required.
+<item>  Altered source versions must be plainly marked as such, and must not
+    be misrepresented as being the original software.
+<item>  This notice may not be removed or altered from any source
+    distribution.
 </enum>
 
 </article>

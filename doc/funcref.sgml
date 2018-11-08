@@ -748,9 +748,11 @@ communication, see also <tt>testcode/lib/ser-test.c</tt>.
 <sect1><tt/time.h/<label id="time.h"><p>
 
 <itemize>
-<!-- <item><ref id="_systime" name="_systime"> -->
 <!-- <item><ref id="asctime" name="asctime"> -->
 <item><ref id="clock" name="clock">
+<item><ref id="clock_getres" name="clock_getres">
+<item><ref id="clock_gettime" name="clock_gettime">
+<item><ref id="clock_settime" name="clock_settime">
 <!-- <item><ref id="ctime" name="ctime"> -->
 <!-- <item><ref id="gmtime" name="gmtime"> -->
 <!-- <item><ref id="localtime" name="localtime"> -->
@@ -2569,6 +2571,89 @@ changing values.  (See the description of <tt/cbm_k_udtim()/.)
 <tag/See also/
 <ref id="cbm_k_udtim" name="cbm_k_udtim">,
 <ref id="time" name="time">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>clock_getres<label id="clock_getres"><p>
+
+<quote>
+<descrip>
+<tag/Function/Determine the realtime clock resolution.
+<tag/Header/<tt/<ref id="time.h" name="time.h">/
+<tag/Declaration/<tt/int __fastcall__ clock_getres (clockid_t clock_id, struct timespec *res);/
+<tag/Description/The <tt/clock_getres/ function finds the resolution (precision)
+of the realtime clock. <tt/clock_id/ has to be <tt/CLOCK_REALTIME/. If <tt/res/
+is not <tt/NULL/, the resolution of the realtime clock is stored in the location
+pointed to by <tt/res/. If <tt/res/ is <tt/NULL/, the clock resolution is not returned.
+If the <tt/time/ argument of <tt/<ref id="clock_settime" name="clock_settime">/ is not
+a multiple of <tt/res/, then the value is truncated to a multiple of <tt/res/. On
+success, zero is returned. On error, -1 is returned and <tt/errno/ is set to an
+error code describing the reason for the failure.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>Depending on the target either the <tt/tv_sec/ or the <tt/tv_nsec/
+field of the <tt/struct timespec/ returned is zero.
+</itemize>
+<tag/Availability/POSIX 1003.1
+<tag/See also/
+<ref id="clock_gettime" name="clock_gettime">,
+<ref id="clock_settime" name="clock_settime">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>clock_gettime<label id="clock_gettime"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get the time from the realtime clock.
+<tag/Header/<tt/<ref id="time.h" name="time.h">/
+<tag/Declaration/<tt/int __fastcall__ clock_gettime (clockid_t clock_id, struct timespec *tp);/
+<tag/Description/The <tt/clock_gettime/ function retrieves the time since the 1970-01-01 00:00:00
+measured in nanoseconds. <tt/clock_id/ has to be <tt/CLOCK_REALTIME/. On success, zero is
+returned. On error, -1 is returned and <tt/errno/ is set to an error code describing the
+reason for the failure.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>Many platforms supported by cc65 do not have a realtime clock, so the
+retrieved value may not be valid. See also the platform-specific information.
+</itemize>
+<tag/Availability/POSIX 1003.1
+<tag/See also/
+<ref id="clock_getres" name="clock_getres">,
+<ref id="clock_settime" name="clock_settime">
+<ref id="time" name="time">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>clock_settime<label id="clock_settime"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get the time from the realtime clock.
+<tag/Header/<tt/<ref id="time.h" name="time.h">/
+<tag/Declaration/<tt/int __fastcall__ clock_settime (clockid_t clock_id, const struct timespec *tp);/
+<tag/Description/The <tt/clock_settime/ function sets the time since the 1970-01-01 00:00:00
+measured in nanoseconds. <tt/clock_id/ has to be <tt/CLOCK_REALTIME/. On success, zero is
+returned. On error, -1 is returned and <tt/errno/ is set to an error code describing the
+reason for the failure.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>Many platforms supported by cc65 do not have a realtime clock, so
+setting the time may not work. See also the platform-specific information.
+</itemize>
+<tag/Availability/POSIX 1003.1
+<tag/See also/
+<ref id="clock_getres" name="clock_getres">,
+<ref id="clock_gettime" name="clock_gettime">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -7381,7 +7466,8 @@ returned value may not be valid.
 </itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
-<ref id="clock" name="clock">
+<ref id="clock" name="clock">,
+<ref id="clock_gettime" name="clock_gettime">
 <tag/Example/None.
 </descrip>
 </quote>

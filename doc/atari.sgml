@@ -432,7 +432,7 @@ Example:
 ...
 </verb>
 
-You can find the C defines in the file "<tt/_pokey.h/" or "<tt/atari_pokey.inc/" for the assembler variant.
+You can find the C defines in the file "<tt/atari.h/" or "<tt/atari.inc/" for the assembler variant.
 
 
 <sect>Loadable drivers<p>

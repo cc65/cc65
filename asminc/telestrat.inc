@@ -293,6 +293,7 @@ BNKCIB           := $417
 DRIVE            := $500
 ERRNB            := $512
 SAVES            := $513
+BUFNOM           := $517
 VSALO0           := $528
 VSALO1           := $529
 FTYPE            := $52C        ; File type
@@ -300,7 +301,6 @@ DESALO           := $52D
 FISALO           := $52F
 EXSALO           := $531
 EXTDEF           := $55D        ; Default extension. At the start of telemon, it's set to ".COM"
-BUFNOM           := $517
 BUFEDT           := $590        ; Buffer edition 
 
 MAX_BUFEDT_LENGTH=110
@@ -318,8 +318,8 @@ XFST             := $FF11
 XSPUT            := $FF14
 XSTAKE           := $FF17
 XTAKE            := $FF20
-XOPEN            := $FF1A
-XCLOSE           := $FF1D
+XOPENS           := $FF1A       ; XOPEN from Stratsed
+XCLOSES          := $FF1D       ; XCLOSE from Stratsed
 XPUT             := $FF23
 XREWIN           := $FF29
 XJUMP            := $FF2C
@@ -362,9 +362,6 @@ XPRSEC           := $FFA1
 XPBUF1           := $FFA4
 XPMAP            := $FFA7
 XRWTS            := $FFAA
-
-
-
 
 ; ---------------------------------------------------------------------------
 ; MACRO 

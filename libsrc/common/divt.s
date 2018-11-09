@@ -18,12 +18,15 @@
         .importzp       sreg, ptr1, tmp1
 
 _div:   jsr     tosdivax        ; Division-operator does most of the work
-        lda     sreg            ; Unsigned remainder is in sreg
-        ldx     sreg+1
-        ldy     ptr1            ; transfer quotient to sreg
-        sty     sreg
-        ldy     ptr1+1
-        sty     sreg+1
+        
+        ldy     sreg            ; low byte remainder from sreg
+        sta     sreg            ; store low byte quotient to sreg
+        
+        lda     sreg+1          ; high byte remainder from sreg
+        stx     sreg+1          ; store high byte quotient to sreg
+
+        tax                     ; high byte remainder to x
+        tya                     ; low byte remainder to a
 
 ; Adjust the sign of the remainder.
 ; It must be the same as the sign of the dividend.
@@ -33,4 +36,3 @@ _div:   jsr     tosdivax        ; Division-operator does most of the work
         jmp     negax           ; Result is negative, adjust the sign
 
 Pos:    rts
-

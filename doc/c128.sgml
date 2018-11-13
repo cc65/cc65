@@ -343,6 +343,13 @@ The default drivers, <tt/mouse_stddrv (mouse_static_stddrv)/, point to <tt/c128-
 <sect>Limitations<p>
 
 
+<sect1>Realtime clock<p>
+
+The realtime clock functions use the CIA1 TOD clock. As that clock only stores
+the time but not the date, the date set by <tt/clock_settime()/ ist simply stored
+inside the C library for retrieval in the same program via <tt/clock_gettime()/.
+
+
 
 <sect>Other hints<p>
 

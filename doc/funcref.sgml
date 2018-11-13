@@ -2626,7 +2626,7 @@ retrieved value may not be valid. See also the platform-specific information.
 <tag/Availability/POSIX 1003.1
 <tag/See also/
 <ref id="clock_getres" name="clock_getres">,
-<ref id="clock_settime" name="clock_settime">
+<ref id="clock_settime" name="clock_settime">,
 <ref id="time" name="time">
 <tag/Example/None.
 </descrip>
@@ -2637,7 +2637,7 @@ retrieved value may not be valid. See also the platform-specific information.
 
 <quote>
 <descrip>
-<tag/Function/Get the time from the realtime clock.
+<tag/Function/Set the time on the realtime clock.
 <tag/Header/<tt/<ref id="time.h" name="time.h">/
 <tag/Declaration/<tt/int __fastcall__ clock_settime (clockid_t clock_id, const struct timespec *tp);/
 <tag/Description/The <tt/clock_settime/ function sets the time since the 1970-01-01 00:00:00

@@ -227,7 +227,7 @@ No mouse drivers are currently available for the Commodore 610.
 <sect1>Realtime clock<p>
 
 The realtime clock functions use the CIA1 TOD clock. As that clock only stores
-the time but not the date, the date set by <tt/clock_settime()/ ist simply stored
+the time but not the date, the date set by <tt/clock_settime()/ is simply stored
 inside the C library for retrieval in the same program via <tt/clock_gettime()/.
 
 

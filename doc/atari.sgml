@@ -640,7 +640,7 @@ Access to the real time clock is supported only when running on SpartaDOS-X.
 There needs to be an RTC driver installed. This is normally the case
 in the default installation (CONFIG.SYS) of SpartaDOS-X.
 A missing RTC driver in SpartaDOS-X is not supported, and the program
-may crash when calling the <tt/clock_settime()/ or <tt/clock_readtime()/
+may crash when calling the <tt/clock_settime()/ or <tt/clock_gettime()/
 functions.
 
 The resolution of the RTC driver is 1 second.

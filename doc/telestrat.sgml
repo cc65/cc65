@@ -133,28 +133,15 @@ No extended memory drivers are currently available for the Telestrat.
 
 <sect1>Joystick drivers<p>
 
-<descrip>
-
 telemon 2.4 & 3.0 manages joysticks but it had been handled yet.
-
-</descrip>
-
 
 <sect1>Mouse drivers<p>
 
-<descrip>
-
 Telestrat manages also mouse, but it had been no handled yet in this version.
-
-</descrip>
 
 <sect1>RS232 device drivers<p>
 
-<descrip>
-
 Telestrat has a RS232 port, but it's not usable in cc65.
-
-</descrip>
 
 <sect>Limitations<label id="limitations"><p>
 

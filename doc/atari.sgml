@@ -29,7 +29,7 @@ supports XL type or newer machines (excluding the 600XL).
 
 The <tt/atarixl/ runtime makes the whole 64K of memory available, with the
 exception of the I/O area at &dollar;D000 - &dollar;D7FF. Since the
-<tt/atarixl/ runtime has some <ref name="limitations" id="limitations">, it is
+<tt/atarixl/ runtime has some <ref name="limitations" id="xllimitations">, it is
 recommended to use the <tt/atari/ target unless lack of memory dictates the
 use of the <tt/atarixl/ target.
 
@@ -634,7 +634,18 @@ interface module.
 
 <sect>Limitations<p>
 
-<sect1><tt/atarixl/<#if output="info|latex2e"> limitations</#if><label id="limitations"<p>
+<sect1><tt/Realtime clock/<label id="realtimeclock"<p>
+
+Access to the real time clock is supported only when running on SpartaDOS-X.
+There needs to be an RTC driver installed. This is normally the case
+in the default installation (CONFIG.SYS) of SpartaDOS-X.
+A missing RTC driver in SpartaDOS-X is not supported, and the program
+may crash when calling the <tt/clock_settime()/ or <tt/clock_readtime()/
+functions.
+
+The resolution of the RTC driver is 1 second.
+
+<sect1><tt/atarixl target/<#if output="info|latex2e"> limitations</#if><label id="xllimitations"<p>
 
 <itemize>
 <item>The display is cleared at program start and at program termination.  This is a side

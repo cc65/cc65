@@ -2587,7 +2587,7 @@ changing values.  (See the description of <tt/cbm_k_udtim()/.)
 of the realtime clock. <tt/clock_id/ has to be <tt/CLOCK_REALTIME/. If <tt/res/
 is not <tt/NULL/, the resolution of the realtime clock is stored in the location
 pointed to by <tt/res/. If <tt/res/ is <tt/NULL/, the clock resolution is not returned.
-If the <tt/time/ argument of <tt/<ref id="clock_settime" name="clock_settime">/ is not
+If the <tt/tp/ argument of <tt/<ref id="clock_settime" name="clock_settime">/ is not
 a multiple of <tt/res/, then the value is truncated to a multiple of <tt/res/. On
 success, zero is returned. On error, -1 is returned and <tt/errno/ is set to an
 error code describing the reason for the failure.

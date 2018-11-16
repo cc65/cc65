@@ -636,14 +636,14 @@ interface module.
 
 <sect1><tt/Realtime clock/<label id="realtimeclock"<p>
 
-Access to the real time clock is supported only when running on SpartaDOS-X.
-There needs to be an RTC driver installed. This is normally the case
+Access to the realtime clock is supported only when running on SpartaDOS-X.
+There needs to be a realtime clock driver installed. This is normally the case
 in the default installation (CONFIG.SYS) of SpartaDOS-X.
-A missing RTC driver in SpartaDOS-X is not supported, and the program
+A missing realtime clock driver in SpartaDOS-X is not supported, and the program
 may crash when calling the <tt/clock_settime()/ or <tt/clock_gettime()/
 functions.
 
-The resolution of the RTC driver is 1 second.
+The resolution of the realtime clock driver is 1 second.
 
 <sect1><tt/atarixl target/<#if output="info|latex2e"> limitations</#if><label id="xllimitations"<p>
 

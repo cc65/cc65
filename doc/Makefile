@@ -25,7 +25,7 @@ TOC_LEVEL = 2
 
 INSTALL = install
 
-doc: html info pdf
+doc: html info
 
 html: $(addprefix ../html/,$(SGMLS:.sgml=.html) doc.css doc.png)
 
@@ -50,7 +50,7 @@ pdf: $(addprefix ../pdf/,$(SGMLS:.sgml=.pdf))
 ../tex/%.tex: %.sgml | ../tex
 	@cd ../tex && linuxdoc -B latex ../doc/$<
 
-../tex/%.dvi: ../tex/%.tex | ../tex
+.PRECIOUS ../tex/%.dvi: ../tex/%.tex | ../tex
 	@cd ../tex && (latex $< && latex $< && latex $< && latex $<)
 
 ../pdf/%.pdf: ../tex/%.dvi | ../pdf

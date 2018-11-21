@@ -8,6 +8,7 @@ endif
 
 htmldir = $(PREFIX)/share/doc/cc65$(DESTPACKAGE_SUFFIX)/html
 infodir = $(PREFIX)/share/info
+pdfdir = $(PREFIX)/share/doc/cc65$(DESTPACKAGE_SUFFIX)/pdf
 
 ifdef CMD_EXE
 
@@ -24,7 +25,7 @@ TOC_LEVEL = 2
 
 INSTALL = install
 
-doc: html info
+doc: html info pdf
 
 html: $(addprefix ../html/,$(SGMLS:.sgml=.html) doc.css doc.png)
 
@@ -64,9 +65,13 @@ ifeq ($(wildcard ../html),../html)
 	$(INSTALL) -d $(DESTDIR)$(htmldir)
 	$(INSTALL) -m0644 ../html/*.* $(DESTDIR)$(htmldir)
 endif
-ifeq ($(wildcard ../tex),../tex)
-	$(INSTALL) -d $(DESTDIR)$(texdir)
-	$(INSTALL) -m0644 ../tex/*.* $(DESTDIR)$(texdir)
+ifeq ($(wildcard ../info),../info)
+	$(INSTALL) -d $(DESTDIR)$(infodir)
+	$(INSTALL) -m0644 ../info/*.* $(DESTDIR)$(infodir)
+endif
+ifeq ($(wildcard ../pdf),../pdf)
+	$(INSTALL) -d $(DESTDIR)$(pdfdir)
+	$(INSTALL) -m0644 ../pdf/*.* $(DESTDIR)$(pdfdir)
 endif
 
 zip:

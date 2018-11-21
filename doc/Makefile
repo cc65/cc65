@@ -30,7 +30,11 @@ html: $(addprefix ../html/,$(SGMLS:.sgml=.html) doc.css doc.png)
 
 info: $(addprefix ../info/,$(SGMLS:.sgml=.info))
 
-../html ../info:
+tex: $(addprefix ../tex/,$(SGMLS:.sgml=.dvi))
+
+pdf: $(addprefix ../pdf/,$(SGMLS:.sgml=.pdf))
+
+../html ../info ../pdf ../tex:
 	@mkdir $@
 
 ../html/%.html: %.sgml header.html | ../html
@@ -42,8 +46,17 @@ info: $(addprefix ../info/,$(SGMLS:.sgml=.info))
 ../info/%.info: %.sgml | ../info
 	@cd ../info && linuxdoc -B info ../doc/$<
 
+../tex/%.tex: %.sgml | ../tex
+	@cd ../tex && linuxdoc -B latex ../doc/$<
+
+../tex/%.dvi: ../tex/%.tex | ../tex
+	@cd ../tex && (latex $< && latex $< && latex $< && latex $<)
+
+../pdf/%.pdf: ../tex/%.dvi | ../pdf
+	@cd ../pdf && dvipdf $<
+
 clean:
-	$(RM) -r ../html ../info
+	$(RM) -r ../html ../info ../tex ../pdf
 
 install:
 	$(if $(PREFIX),,$(error variable `PREFIX' must be set))
@@ -51,9 +64,9 @@ ifeq ($(wildcard ../html),../html)
 	$(INSTALL) -d $(DESTDIR)$(htmldir)
 	$(INSTALL) -m0644 ../html/*.* $(DESTDIR)$(htmldir)
 endif
-ifeq ($(wildcard ../info),../info)
-	$(INSTALL) -d $(DESTDIR)$(infodir)
-	$(INSTALL) -m0644 ../info/*.* $(DESTDIR)$(infodir)
+ifeq ($(wildcard ../tex),../tex)
+	$(INSTALL) -d $(DESTDIR)$(texdir)
+	$(INSTALL) -m0644 ../tex/*.* $(DESTDIR)$(texdir)
 endif
 
 zip:

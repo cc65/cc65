@@ -38,13 +38,6 @@ KBDREPEATRATE   := $541
 KBDREPEATDELAY  := $542
 
 ; ---------------------------------------------------------------------------
-; Kernal routines
-
-; Direct entries
-CLRSCR          := $D88B
-KBDREAD         := $D8C1
-
-; ---------------------------------------------------------------------------
 ; Vector and other locations
 
 IRQVec          := $0314
@@ -90,5 +83,3 @@ TED_RAMSEL      := $FF3F
 
 ENABLE_ROM      := TED_ROMSEL
 ENABLE_RAM      := TED_RAMSEL
-
-

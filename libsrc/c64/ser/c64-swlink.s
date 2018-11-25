@@ -24,6 +24,7 @@
         .include        "zeropage.inc"
         .include        "ser-kernel.inc"
         .include        "ser-error.inc"
+        .include        "cbm_kernal.inc"
         .include        "c64.inc"
 
         .macpack        module
@@ -45,15 +46,15 @@
 
 ; Jump table
 
-        .word   INSTALL
-        .word   UNINSTALL
-        .word   OPEN
-        .word   CLOSE
-        .word   GET
-        .word   PUT
-        .word   STATUS
-        .word   IOCTL
-        .word   IRQ
+        .word   SWL_INSTALL
+        .word   SWL_UNINSTALL
+        .word   SWL_OPEN
+        .word   SWL_CLOSE
+        .word   SWL_GET
+        .word   SWL_PUT
+        .word   SWL_STATUS
+        .word   SWL_IOCTL
+        .word   SWL_IRQ
 
 ;----------------------------------------------------------------------------
 ; I/O definitions
@@ -136,11 +137,11 @@ ParityTable:
 .code
 
 ;----------------------------------------------------------------------------
-; INSTALL routine. Is called after the driver is loaded into memory. If
+; SWL_INSTALL routine. Is called after the driver is loaded into memory. If
 ; possible, check if the hardware is present.
 ; Must return an SER_ERR_xx code in a/x.
 
-INSTALL:
+SWL_INSTALL:
 
 ; Deactivate DTR and disable 6551 interrupts
 
@@ -165,10 +166,10 @@ SetNMI: sta     NMIVec
         rts
 
 ;----------------------------------------------------------------------------
-; UNINSTALL routine. Is called before the driver is removed from memory.
+; SWL_UNINSTALL routine. Is called before the driver is removed from memory.
 ; Must return an SER_ERR_xx code in a/x.
 
-UNINSTALL:
+SWL_UNINSTALL:
 
 ; Stop interrupts, drop DTR
 
@@ -185,7 +186,7 @@ UNINSTALL:
 ; PARAMS routine. A pointer to a ser_params structure is passed in ptr1.
 ; Must return an SER_ERR_xx code in a/x.
 
-OPEN:
+SWL_OPEN:
 
 ; Check if the handshake setting is valid
 
@@ -256,11 +257,11 @@ InvBaud:
         rts
 
 ;----------------------------------------------------------------------------
-; CLOSE: Close the port, disable interrupts and flush the buffer. Called
+; SWL_CLOSE: Close the port, disable interrupts and flush the buffer. Called
 ; without parameters. Must return an error code in a/x.
 ;
 
-CLOSE:
+SWL_CLOSE:
 
 ; Stop interrupts, drop DTR
 
@@ -278,12 +279,13 @@ CLOSE:
         rts
 
 ;----------------------------------------------------------------------------
-; GET: Will fetch a character from the receive buffer and store it into the
+; SWL_GET: Will fetch a character from the receive buffer and store it into the
 ; variable pointer to by ptr1. If no data is available, SER_ERR_NO_DATA is
 ; return.
 ;
 
-GET:    ldx     SendFreeCnt             ; Send data if necessary
+SWL_GET:
+        ldx     SendFreeCnt             ; Send data if necessary
         inx                             ; X == $FF?
         beq     @L1
         lda     #$00
@@ -322,11 +324,11 @@ GET:    ldx     SendFreeCnt             ; Send data if necessary
         rts
 
 ;----------------------------------------------------------------------------
-; PUT: Output character in A.
+; SWL_PUT: Output character in A.
 ; Must return an error code in a/x.
 ;
 
-PUT:
+SWL_PUT:
 
 ; Try to send
 
@@ -356,31 +358,33 @@ PUT:
         rts
 
 ;----------------------------------------------------------------------------
-; STATUS: Return the status in the variable pointed to by ptr1.
+; SWL_STATUS: Return the status in the variable pointed to by ptr1.
 ; Must return an error code in a/x.
 ;
 
-STATUS: lda     ACIA_STATUS
+SWL_STATUS:
+        lda     ACIA_STATUS
         ldx     #0
         sta     (ptr1,x)
         txa                             ; SER_ERR_OK
         rts
 
 ;----------------------------------------------------------------------------
-; IOCTL: Driver defined entry point. The wrapper will pass a pointer to ioctl
+; SWL_IOCTL: Driver defined entry point. The wrapper will pass a pointer to ioctl
 ; specific data in ptr1, and the ioctl code in A.
 ; Must return an error code in a/x.
 ;
 
-IOCTL:  lda     #<SER_ERR_INV_IOCTL     ; We don't support ioclts for now
+SWL_IOCTL:
+        lda     #<SER_ERR_INV_IOCTL     ; We don't support ioclts for now
         ldx     #>SER_ERR_INV_IOCTL
-       rts
+        rts
 
 ;----------------------------------------------------------------------------
-; IRQ: Not used on the C64
+; SWL_IRQ: Not used on the C64
 ;
 
-IRQ     = $0000
+SWL_IRQ         = $0000
 
 ;----------------------------------------------------------------------------
 ;
@@ -476,4 +480,3 @@ InitBuffers:
         stx     RecvFreeCnt
         stx     SendFreeCnt
         rts
-

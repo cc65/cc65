@@ -6,10 +6,6 @@
 
         .export         _clrscr
 
-        .include        "plus4.inc"
+        .include        "cbm_kernal.inc"
 
 _clrscr = CLRSCR
-
-
-
-

@@ -46,20 +46,6 @@ KBDREPEATRATE   := $028b
 KBDREPEATDELAY  := $028c
 
 ; ---------------------------------------------------------------------------
-; Kernal routines
-
-; Direct entries
-CURS_SET        := $CD57
-CURS_ON         := $CD6F
-CURS_OFF        := $CD9F
-CLRSCR          := $C142
-KBDREAD         := $C006
-NEWLINE         := $C363
-PRINT           := $C322
-NMIEXIT         := $FF33
-INDFET          := $FF74
-
-; ---------------------------------------------------------------------------
 ; Vectors
 
 IRQVec          := $0314

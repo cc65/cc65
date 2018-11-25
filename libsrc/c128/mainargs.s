@@ -25,6 +25,7 @@
         .constructor    initmainargs, 24
         .import         __argc, __argv
 
+        .include        "cbm_kernal.inc"
         .include        "c128.inc"
 
 

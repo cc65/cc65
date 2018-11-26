@@ -2,7 +2,7 @@ ifneq ($(shell echo),)
   CMD_EXE = 1
 endif
 
-.PHONY: all mostlyclean clean install zip doc html info
+.PHONY: all mostlyclean clean install zip doc html info pdf
 
 .SUFFIXES:
 
@@ -12,18 +12,20 @@ pdfdir = $(PREFIX)/share/doc/cc65$(DESTPACKAGE_SUFFIX)/pdf
 
 ifdef CMD_EXE
 
+# building of documentation is not supported on plain Windows
 doc clean install zip:
 
 else # CMD_EXE
 
 SGMLS := $(wildcard *.sgml)
 
-../html/coding.html ../html/index.html: \
-TOC_LEVEL = 0
-
 TOC_LEVEL = 2
 
+../html/coding.html ../html/index.html: TOC_LEVEL = 0
+
+RMDIR = $(RM) -rf
 INSTALL = install
+LATEX = latex
 
 doc: html info
 
@@ -31,11 +33,11 @@ html: $(addprefix ../html/,$(SGMLS:.sgml=.html) doc.css doc.png)
 
 info: $(addprefix ../info/,$(SGMLS:.sgml=.info))
 
-tex: $(addprefix ../tex/,$(SGMLS:.sgml=.dvi))
+docwrk: $(addprefix ../docwrk/,$(SGMLS:.sgml=.dvi))
 
 pdf: $(addprefix ../pdf/,$(SGMLS:.sgml=.pdf))
 
-../html ../info ../pdf ../tex:
+../html ../info ../pdf ../docwrk:
 	@mkdir $@
 
 ../html/%.html: %.sgml header.html | ../html
@@ -47,17 +49,32 @@ pdf: $(addprefix ../pdf/,$(SGMLS:.sgml=.pdf))
 ../info/%.info: %.sgml | ../info
 	@cd ../info && linuxdoc -B info ../doc/$<
 
-../tex/%.tex: %.sgml | ../tex
-	@cd ../tex && linuxdoc -B latex ../doc/$<
+.PRECIOUS: ../docwrk/%.tex
+../docwrk/%.tex: %.sgml | ../docwrk
+	@cd ../docwrk && linuxdoc -B latex ../doc/$<
 
-.PRECIOUS ../tex/%.dvi: ../tex/%.tex | ../tex
-	@cd ../tex && (latex $< && latex $< && latex $< && latex $<)
+../docwrk/%.dvi: ../docwrk/%.tex
+	@cd ../docwrk && \
+	rm -f $*.make.log; \
+	(logHash=aaa; \
+	lastLogHash=bbb; \
+	count=1; \
+	echo -n "Generating $*.pdf : "; \
+	while [ "$$lastLogHash" != "$$logHash" ]; \
+	  do \
+	   echo -n "..$$count"; \
+	   count=$$(expr $$count + 1);\
+	   $(LATEX) $< >> $*.make.log; \
+	   lastLogHash=$$logHash; \
+	   logHash=$$(md5sum $*.log); \
+	done;)
+	@echo "..done."
 
-../pdf/%.pdf: ../tex/%.dvi | ../pdf
+../pdf/%.pdf: ../docwrk/%.dvi | ../pdf
 	@cd ../pdf && dvipdf $<
 
 clean:
-	$(RM) -r ../html ../info ../tex ../pdf
+	$(RMDIR) ../html ../info ../pdf ../docwrk
 
 install:
 	$(if $(PREFIX),,$(error variable `PREFIX' must be set))

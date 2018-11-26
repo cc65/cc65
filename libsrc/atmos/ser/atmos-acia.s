@@ -44,15 +44,15 @@
         .addr   $0000
 
         ; Jump table
-        .addr   INSTALL
-        .addr   UNINSTALL
-        .addr   OPEN
-        .addr   CLOSE
-        .addr   GET
-        .addr   PUT
+        .addr   SER_INSTALL
+        .addr   SER_UNINSTALL
+        .addr   SER_OPEN
+        .addr   SER_CLOSE
+        .addr   SER_GET
+        .addr   SER_PUT
         .addr   SER_STATUS
-        .addr   IOCTL
-        .addr   IRQ
+        .addr   SER_IOCTL
+        .addr   SER_IRQ
 
 ;----------------------------------------------------------------------------
 ; Global variables
@@ -116,23 +116,23 @@ ParityTable:
         .code
 
 ;----------------------------------------------------------------------------
-; INSTALL: Is called after the driver is loaded into memory. If possible,
+; SER_INSTALL: Is called after the driver is loaded into memory. If possible,
 ; check if the hardware is present. Must return an SER_ERR_xx code in a/x.
 ;
 ; Since we don't have to manage the IRQ vector on the Telestrat/Atmos, this is
 ; actually the same as:
 ;
-; UNINSTALL: Is called before the driver is removed from memory.
+; SER_UNINSTALL: Is called before the driver is removed from memory.
 ; No return code required (the driver is removed from memory on return).
 ;
 ; and:
 ;
-; CLOSE: Close the port and disable interrupts. Called without parameters.
+; SER_CLOSE: Close the port and disable interrupts. Called without parameters.
 ; Must return an SER_ERR_xx code in a/x.
 
-INSTALL:
-UNINSTALL:
-CLOSE:
+SER_INSTALL:
+SER_UNINSTALL:
+SER_CLOSE:
         ldx     Index           ; Check for open port
         beq     :+
 
@@ -147,10 +147,10 @@ CLOSE:
         rts
 
 ;----------------------------------------------------------------------------
-; OPEN: A pointer to a ser_params structure is passed in ptr1.
+; SER_OPEN: A pointer to a ser_params structure is passed in ptr1.
 ; Must return an SER_ERR_xx code in a/x.
 
-OPEN:
+SER_OPEN:
         ; Check if the handshake setting is valid
         ldy     #SER_PARAMS::HANDSHAKE  ; Handshake
         lda     (ptr1),y
@@ -220,11 +220,11 @@ InvBaud:lda     #<SER_ERR_BAUD_UNAVAIL
         rts
 
 ;----------------------------------------------------------------------------
-; GET: Will fetch a character from the receive buffer and store it into the
+; SER_GET: Will fetch a character from the receive buffer and store it into the
 ; variable pointed to by ptr1. If no data is available, SER_ERR_NO_DATA is
 ; returned.
 
-GET:
+SER_GET:
         ldy     SendFreeCnt     ; Send data if necessary
         iny                     ; Y == $FF?
         beq     :+
@@ -261,10 +261,10 @@ GET:
         rts
 
 ;----------------------------------------------------------------------------
-; PUT: Output character in A.
+; SER_PUT: Output character in A.
 ; Must return an SER_ERR_xx code in a/x.
 
-PUT:
+SER_PUT:
         ; Try to send
         ldy     SendFreeCnt
         iny                     ; Y = $FF?
@@ -303,22 +303,22 @@ SER_STATUS:
         rts
 
 ;----------------------------------------------------------------------------
-; IOCTL: Driver defined entry point. The wrapper will pass a pointer to ioctl
+; SER_IOCTL: Driver defined entry point. The wrapper will pass a pointer to ioctl
 ; specific data in ptr1, and the ioctl code in A.
 ; Must return an SER_ERR_xx code in a/x.
 
-IOCTL:
+SER_IOCTL:
         lda     #<SER_ERR_INV_IOCTL
         ldx     #>SER_ERR_INV_IOCTL
         rts
 
 ;----------------------------------------------------------------------------
-; IRQ: Called from the builtin runtime IRQ handler as a subroutine. All
+; SER_IRQ: Called from the builtin runtime IRQ handler as a subroutine. All
 ; registers are already saved, no parameters are passed, but the carry flag
 ; is clear on entry. The routine must return with carry set if the interrupt
 ; was handled, otherwise with carry clear.
 
-IRQ:
+SER_IRQ:
         ldx     Index           ; Check for open port
         beq     Done
         lda     ACIA::STATUS,x  ; Check ACIA status for receive interrupt

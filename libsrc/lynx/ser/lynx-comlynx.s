@@ -25,15 +25,15 @@
         .addr   $0000
 
         ; Jump table
-        .addr   INSTALL
-        .addr   UNINSTALL
-        .addr   OPEN
-        .addr   CLOSE
-        .addr   GET
-        .addr   PUT
-        .addr   STATUS
-        .addr   IOCTL
-        .addr   IRQ
+        .addr   SER_INSTALL
+        .addr   SER_UNINSTALL
+        .addr   SER_OPEN
+        .addr   SER_CLOSE
+        .addr   SER_GET
+        .addr   SER_PUT
+        .addr   SER_STATUS
+        .addr   SER_IOCTL
+        .addr   SER_IRQ
 
 ;----------------------------------------------------------------------------
 ; Global variables
@@ -54,25 +54,25 @@ TxDone:         .res    1
         .code
 
 ;----------------------------------------------------------------------------
-; INSTALL: Is called after the driver is loaded into memory.
+; SER_INSTALL: Is called after the driver is loaded into memory.
 ;
 ; Must return an SER_ERR_xx code in a/x.
 
-INSTALL:
+SER_INSTALL:
         ; Set up IRQ vector ?
 
 ;----------------------------------------------------------------------------
-; UNINSTALL: Is called before the driver is removed from memory.
+; SER_UNINSTALL: Is called before the driver is removed from memory.
 ; No return code required (the driver is removed from memory on return).
 ;
 
-UNINSTALL:
+SER_UNINSTALL:
 
 ;----------------------------------------------------------------------------
-; CLOSE: Close the port and disable interrupts. Called without parameters.
+; SER_CLOSE: Close the port and disable interrupts. Called without parameters.
 ; Must return an SER_ERR_xx code in a/x.
 
-CLOSE:
+SER_CLOSE:
         ; Disable interrupts
         ; Done, return an error code
         lda     #<SER_ERR_OK
@@ -80,7 +80,7 @@ CLOSE:
         rts
 
 ;----------------------------------------------------------------------------
-; OPEN: A pointer to a ser_params structure is passed in ptr1.
+; SER_OPEN: A pointer to a ser_params structure is passed in ptr1.
 ;
 ; The Lynx has only two correct serial data formats:
 ; 8 bits, parity mark, 1 stop bit
@@ -101,7 +101,7 @@ CLOSE:
 ;
 ; Must return an SER_ERR_xx code in a/x.
 
-OPEN:   
+SER_OPEN:
         stz     RxPtrIn
         stz     RxPtrOut
         stz     TxPtrIn
@@ -247,11 +247,11 @@ invparameter:
         rts
 
 ;----------------------------------------------------------------------------
-; GET: Will fetch a character from the receive buffer and store it into the
+; SER_GET: Will fetch a character from the receive buffer and store it into the
 ; variable pointed to by ptr1. If no data is available, SER_ERR_NO_DATA is
 ; returned.
 
-GET:
+SER_GET:
         lda     RxPtrIn
         cmp     RxPtrOut
         bne     GetByte
@@ -260,7 +260,7 @@ GET:
         rts
 GetByte:
         ldy     RxPtrOut
-        lda     RxBuffer,y      
+        lda     RxBuffer,y
         inc     RxPtrOut
         ldx     #$00
         sta     (ptr1,x)
@@ -268,10 +268,10 @@ GetByte:
         rts
 
 ;----------------------------------------------------------------------------
-; PUT: Output character in A.
+; SER_PUT: Output character in A.
 ; Must return an SER_ERR_xx code in a/x.
 
-PUT:
+SER_PUT:
         tax
         lda     TxPtrIn
         ina
@@ -301,10 +301,10 @@ PutByte:
         rts
 
 ;----------------------------------------------------------------------------
-; STATUS: Return the status in the variable pointed to by ptr1.
+; SER_STATUS: Return the status in the variable pointed to by ptr1.
 ; Must return an SER_ERR_xx code in a/x.
 
-STATUS:
+SER_STATUS:
         ldy     SerialStat
         ldx     #$00
         sta     (ptr1,x)
@@ -312,17 +312,17 @@ STATUS:
         rts
 
 ;----------------------------------------------------------------------------
-; IOCTL: Driver defined entry point. The wrapper will pass a pointer to ioctl
+; SER_IOCTL: Driver defined entry point. The wrapper will pass a pointer to ioctl
 ; specific data in ptr1, and the ioctl code in A.
 ; Must return an SER_ERR_xx code in a/x.
 
-IOCTL:
+SER_IOCTL:
         lda     #<SER_ERR_INV_IOCTL
         ldx     #>SER_ERR_INV_IOCTL
         rts
 
 ;----------------------------------------------------------------------------
-; IRQ: Called from the builtin runtime IRQ handler as a subroutine. All
+; SER_IRQ: Called from the builtin runtime IRQ handler as a subroutine. All
 ; registers are already saved, no parameters are passed, but the carry flag
 ; is clear on entry. The routine must return with carry set if the interrupt
 ; was handled, otherwise with carry clear.
@@ -330,7 +330,7 @@ IOCTL:
 ; Both the Tx and Rx interrupts are level sensitive instead of edge sensitive.
 ; Due to this bug you have to disable the interrupt before clearing it.
 
-IRQ:
+SER_IRQ:
         lda     INTSET          ; Poll all pending interrupts
         and     #SERIAL_INTERRUPT
         bne     @L0
@@ -411,4 +411,3 @@ IRQ:
 @IRQexit:
         clc
         rts
-

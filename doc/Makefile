@@ -13,7 +13,7 @@ pdfdir = $(PREFIX)/share/doc/cc65$(DESTPACKAGE_SUFFIX)/pdf
 ifdef CMD_EXE
 
 # building of documentation is not supported on plain Windows
-doc clean install zip:
+doc clean install zip mostlyclean:
 
 else # CMD_EXE
 

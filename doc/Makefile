@@ -76,6 +76,9 @@ pdf: $(addprefix ../pdf/,$(SGMLS:.sgml=.pdf))
 clean:
 	$(RMDIR) ../html ../info ../pdf ../docwrk
 
+mostlyclean:
+	$(RMDIR) ../docwrk
+
 install:
 	$(if $(PREFIX),,$(error variable `PREFIX' must be set))
 ifeq ($(wildcard ../html),../html)
@@ -98,4 +101,4 @@ endif
 
 endif # CMD_EXE
 
-all mostlyclean:
+all:

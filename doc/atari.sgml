@@ -203,6 +203,18 @@ is <it/left out/, keep this in mind.
 The values you assign to the two symbols <tt/__AUTOSTART__/ and <tt/__EXEHDR__/
 don't matter.
 
+<sect2><tt/atari-xex.cfg/<p>
+
+This config file allows writing multi segment binaries easily, without having to
+write the header explicitly on each segment.
+
+It is similar to the <tt/atari-asm.cfg/ above, but uses the ATARI (xex) file
+format support on LD65 instead of the standard binary output, so it does not
+have the <tt/__AUTOSTART/ nor the <tt/__EXEHDR__/ symbols.
+
+Note that each <tt/MEMORY/ area in the configuration file will have it's own
+segment in the output file with the correct headers.
+
 <sect2><tt/atari-cart.cfg/<p>
 
 This config file can be used to create 8K or 16K cartridges. It's suited both

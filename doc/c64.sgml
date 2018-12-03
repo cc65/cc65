@@ -404,6 +404,10 @@ The default drivers, <tt/mouse_stddrv (mouse_static_stddrv)/, point to <tt/c64-1
 
 <descrip>
 
+  <tag><tt/c64-up2400.ser (c64_up2400_ser)/</tag>
+  Driver for a VIC-1011A or compatible cartridge. Supports only 2400 BPS.
+  Note that an IOCTL can control the line.
+
   <tag><tt/c64-swlink.ser (c64_swlink_ser)/</tag>
   Driver for the SwiftLink cartridge. Supports up to 38400 BPS, hardware flow
   control (RTS/CTS), and interrupt-driven receives. Note that, because of the

@@ -15,22 +15,23 @@
 
 ; ------------------------------------------------------------------------
 ; Constants
-ribuf = $f7
-robuf = $f9
-baudof = $0299
-ridbe = $029b
-ridbs = $029c
-rodbs = $029d
-rodbe = $029e
-enabl = $02a1
-rstkey = $fe56
-norest = $fe72
-return = $febc
-oldout = $f1ca
-oldchk = $f21b
-findfn = $f30f
-devnum = $f31f
-nofile = $f701
+RecvHead = $b5          ; Head of receive buffer
+ribuf    = $f7
+robuf    = $f9
+baudof := $0299
+ridbe  := $029b
+ridbs  := $029c
+rodbs  := $029d
+rodbe  := $029e
+enabl  := $02a1
+rstkey := $fe56
+norest := $fe72
+return := $febc
+oldout := $f1ca
+oldchk := $f21b
+findfn := $f30f
+devnum := $f31f
+nofile := $f701
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
@@ -71,9 +72,9 @@ full03: .word $0d52     ; 3410
 
 baudrate = 10
 databits = 0
-stopbit = 0
+stopbit  = 0
 
-wire = 1
+wire   = 1
 duplex = 0
 parity = 0
 
@@ -129,6 +130,7 @@ SER_OPEN:
 ; without parameters. Must return an error code in a/x.
 ;
 ; We can omit close now, save for cleaning up ;-)
+
 SER_CLOSE:
         lda     #<SER_ERR_OK
         tax
@@ -189,7 +191,8 @@ SER_STATUS:
 ; specific data in ptr1, and the ioctl code in A.
 ; Must return an error code in a/x.
 ;
-; IOCTL will so the enable / disbale part
+; IOCTL will so the enable / disable part
+
 SER_IOCTL:
       cmp #0
       beq @disable
@@ -251,7 +254,7 @@ mask:
         bcc ckflag      ; no
         lda CIA2_PRA    ; yes, put but on pin m
         and #$fb
-        ora $b5
+        ora RecvHead
         sta CIA2_PRA
 ckflag:
         txa
@@ -319,7 +322,7 @@ chktxd:
 low:
         lda #$00
 store:
-        sta $b5
+        sta RecvHead
 exit:
         jmp return      ; restore regs, rti
 char:
@@ -374,7 +377,7 @@ strtup:
         lda enabl
         and #$01        ; transmitting now?
         bne ret3        ; yes
-        sta $b5         ; no, prep start bit,
+        sta RecvHead    ; no, prep start bit,
         lda #$09
         sta $b4         ;   # bits to send,
         ldy rodbs

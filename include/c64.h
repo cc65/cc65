@@ -154,6 +154,7 @@ extern void c64_1351_mou[];             /* Referred to by mouse_static_stddrv[] 
 extern void c64_joy_mou[];
 extern void c64_inkwell_mou[];
 extern void c64_pot_mou[];
+extern void c64_up2400_ser[];
 extern void c64_swlink_ser[];
 extern void c64_hi_tgi[];               /* Referred to by tgi_static_stddrv[] */
 

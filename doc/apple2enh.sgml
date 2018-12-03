@@ -493,7 +493,7 @@ files show up in a directory as <tt/&lt;NO DATE&gt;/.
 
 There's no common interface to set realtime clocks so if a realtme clock <bf/IS/
 present there's just nothing to do. However, if there's <bf/NO/ realtime clock present,
-the user might very well be interest to "manually" set the RAM location in order to
+the user might very well be interested to "manually" set the RAM location in order to
 have timestamps. But he surely doesn't want to manually set the RAM location over and
 over again. Rather he wants to set it just once after booting ProDOS 8.
 

@@ -195,6 +195,7 @@ XDECAL           = $18
 
 XTEXT            = $19
 XHIRES           = $1A
+XEFFHI           = $1B          ; Clear hires screen
 XFILLM           = $1C
 XMINMA           = $1F
 XVARS            = $24          ; Only in TELEMON 3.x, in TELEMON 2.4, it's XNOMFI ($24)

@@ -332,6 +332,14 @@ The <tt/parameter/ is the field width in pixels (range 1-31) and the mode bits. 
 the string can be filled with zeroes (the string is always 5 characters long) or not and left or right
 justified to the given pixel. See <tt/ggraph.h/ for predefined values for <tt/parameter/.
 
+<sect3>SetNewMode
+<p>
+<tt/void SetNewMode (void)/
+<p>
+This function is intended for use by GEOS 128 only, and will exhibit undefined behavior on the
+C64.  It will toggle between the 40 column screen mode and the 80 column screen mode.  Many C128 GEOS
+programs implement a "Switch 40/80" submenu option under the geos menu.
+
 <sect2>Font Handling
 
 <sect3>GetCharWidth

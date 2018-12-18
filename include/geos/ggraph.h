@@ -45,6 +45,10 @@ void __fastcall__ BitOtherClip(void *proc1, void *proc2, char skipl,
 
 void __fastcall__ GraphicsString(char *myGfxString);
 
+#ifdef __GEOS_CBM__
+void __fastcall__ SetNewMode(void);
+#endif
+
 /* VIC colour constants */
 #define BLACK           0
 #define WHITE           1
@@ -172,5 +176,4 @@ typedef void graphicStr;
 /* ESC_PUTSTRING can't be implemented - it needs text, not pointer to it
    #define ESC_PUTSTRING(x,y,text) (char)6, (unsigned)(x), (char)(y), (text), (char)NULL
 */
-
 #endif

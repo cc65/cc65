@@ -11,8 +11,8 @@
             .include "geossym.inc"
         
 _SetNewMode:
-			lda graphMode
-			eor #$80
-			sta graphMode
-			jsr SetNewMode
-			rts
+            lda graphMode
+            eor #$80
+            sta graphMode
+            jmp SetNewMode
+

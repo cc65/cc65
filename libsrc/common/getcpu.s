@@ -76,7 +76,6 @@ _getcpu:
         nop                     ; prefix to tell next instruction to be 32-bit ZP
         .byte   $b2,regsave     ; LDA (regsave),Z
         cmp     tmp1            ; does the loaded value match what is in $FF?
-        beq     @Is4510         ; matches, so must be a 4510 = C65
         bne     @Is45GS02       ; $200FF and $FF have different values, so must be a MEGA65 45GS02
 @Is4510:
         lda     #3              ; CPU_4510 constant

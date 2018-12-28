@@ -3,7 +3,7 @@
 ;
 ; unsigned char getcpu (void);
 ;
-
+	.include	"zeropage.inc"
         .export         _getcpu
 
 ; ---------------------------------------------------------------------------
@@ -53,63 +53,40 @@ _getcpu:
 
         ; 45GS02 supports 32-bit ZP indirect, so use that to check CPU type
         ; without requiring a functioning MEGA65 hypervisor.
-        ; We setup a read of $200FF, then store a different value in $00FF
-        ; and then re-read $200FF to see if it is unchanged.
+        ; We setup a read of $200xx, then store a different value in $xx
+        ; and then re-read $200xx to see if it is unchanged.
 
-        ; Save the 32-bit ZP pointer and data byte
-        ldx     #4
-@L10:   lda     $fb,x
-        sta     @GetCPUTemp,x
-        dex
-        bpl     @L10
-
-        ; Setup 32-bit pointer to $000200FF
-        lda     #$ff
-        sta     $fb
-        lda     #$00
-        sta     $fc
-        sta     $fe
-        lda     #$02
-        sta     $fd
+        ; Setup 32-bit pointer to $00020000+tmp1
+        lda     #<$020000+tmp1
+        sta     regsave
+        lda     #>$020000+tmp1
+        sta     regsave+1
+        sta     regsave+3       ; also write to upper byte of pointer to save an extra LDA #$00
+        lda     #^$020000+tmp1
+        sta     regsave+2
 
         ; Prefixing LDA ($nn),Z with a NOP uses 32-bit ZP pointer on 45GS02,
         ; but normal 16-bit ZP pointer on 4510
         ; (We assume Z=$00, which will be the normal case)
         nop                     ; prefix to tell next instruction to be 32-bit ZP
-        .byte   $b2,$fb         ; LDA ($nn),Z
+        .byte   $b2,regsave     ; LDA (regsave),Z
         eor     #$ff            ; change the value
-        sta     $ff             ; store in $FF
-        ; now try again to load it: If the same, then 45GS02, as $200FF is unchanged
+        sta     tmp1            ; store in $xx
+        ; now try again to load it: If the same, then 45GS02, as $200xx is unchanged
         nop                     ; prefix to tell next instruction to be 32-bit ZP
-        .byte   $b2,$fb         ; LDA ($nn),Z
-        cmp     $ff             ; does the loaded value match what is in $FF?
+        .byte   $b2,regsave     ; LDA (regsave),Z
+        cmp     tmp1            ; does the loaded value match what is in $FF?
         beq     @Is4510         ; matches, so must be a 4510 = C65
         bne     @Is45GS02       ; $200FF and $FF have different values, so must be a MEGA65 45GS02
 @Is4510:
-        jsr     @RestoreGetCPUTemp
         lda     #3              ; CPU_4510 constant
         ldx     #0              ; load high byte of word
         rts
 
 @Is45GS02:
-        jsr     @RestoreGetCPUTemp
         lda     #8              ; CPU_45GS02 constant
         ldx     #0              ; load high byte of word
         rts
-
-@RestoreGetCPUTemp:
-        ; Save the 32-bit ZP pointer and data byte
-        ldx     #4
-@L11:   lda     @GetCPUTemp,x
-        sta     $fb,x
-        dex
-        bpl     @L11
-        rts
-
-        ; Temporary storage for the ZP locations we modify above
-@GetCPUTemp:    .byte   0,0,0,0,0
-
-
 
 ; 6502 type of cpu, check for a 2a03/2a07
 @IsNMOS:

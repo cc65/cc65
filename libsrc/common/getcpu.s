@@ -75,8 +75,8 @@ _getcpu:
         ; now try again to load it: If the same, then 45GS02, as $200xx is unchanged
         nop                     ; prefix to tell next instruction to be 32-bit ZP
         .byte   $b2,regsave     ; LDA (regsave),Z
-        cmp     tmp1            ; does the loaded value match what is in $FF?
-        bne     @Is45GS02       ; $200FF and $FF have different values, so must be a MEGA65 45GS02
+        cmp     tmp1            ; does the loaded value match what is in $xx?
+        bne     @Is45GS02       ; $200xx and $xx have different values, so must be a MEGA65 45GS02
 @Is4510:
         lda     #3              ; CPU_4510 constant
         ldx     #0              ; load high byte of word

@@ -176,4 +176,5 @@ typedef void graphicStr;
 /* ESC_PUTSTRING can't be implemented - it needs text, not pointer to it
    #define ESC_PUTSTRING(x,y,text) (char)6, (unsigned)(x), (char)(y), (text), (char)NULL
 */
+
 #endif

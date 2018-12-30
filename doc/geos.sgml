@@ -338,7 +338,7 @@ justified to the given pixel. See <tt/ggraph.h/ for predefined values for <tt/pa
 <p>
 This function is intended for use by GEOS 128 only, and will exhibit undefined behavior on the
 C64.  It will toggle between the 40 column screen mode and the 80 column screen mode.  Many C128 GEOS
-programs implement a "Switch 40/80" submenu option under the geos menu.
+programs implement a "Switch 40/80" submenu option under the <tt/geos/ menu.
 
 <sect2>Font Handling
 

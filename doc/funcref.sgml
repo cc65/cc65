@@ -3386,7 +3386,7 @@ used in presence of a prototype.
 <descrip>
 <tag/Function/Load and initialize an extended memory driver.
 <tag/Header/<tt/<ref id="em.h" name="em.h">/
-<tag/Declaration/<tt/void __fastcall__ em_load_driver (const char* name);/
+<tag/Declaration/<tt/unsigned char __fastcall__ em_load_driver (const char* name);/
 <tag/Description/Load an extended memory driver into memory and initialize
 it. The function returns an error code that tells if all this has been
 successful.

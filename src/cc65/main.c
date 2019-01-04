@@ -256,7 +256,7 @@ static void SetSys (const char* Sys)
         case TGT_TELESTRAT:
             DefineNumericMacro ("__TELESTRAT__", 1);
             break;
-                                
+
         case TGT_NES:
             DefineNumericMacro ("__NES__", 1);
             break;
@@ -301,6 +301,10 @@ static void FileNameOption (const char* Opt, const char* Arg, StrBuf* Name)
     /* Cannot have the option twice */
     if (SB_NotEmpty (Name)) {
         AbEnd ("Cannot use option `%s' twice", Opt);
+    }
+    /* A typo in OptTab[] might allow a NULL Arg */
+    if (Arg == 0) {
+        Internal ("Typo in OptTab[]; option '%s' should require an argument", Opt);
     }
     /* Remember the file name for later */
     SB_CopyStr (Name, Arg);
@@ -558,7 +562,7 @@ static void OptDebugOpt (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
-static void OptDebugOptOutput (const char* Opt attribute ((unused)), 
+static void OptDebugOptOutput (const char* Opt attribute ((unused)),
                                const char* Arg attribute ((unused)))
 /* Output optimization steps */
 {

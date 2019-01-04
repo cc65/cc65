@@ -92,7 +92,9 @@ static void AddLabel (unsigned Addr, attr_t Attr, const char* Name)
         ** have a name (you guessed that, didn't you?).
         */
         if (ExistingAttr == Attr &&
-            ((Name == 0 && SymTab[Addr] == 0) || strcmp (SymTab[Addr], Name) == 0)) {
+            ((Name == 0 && SymTab[Addr] == 0) ||
+             (Name != 0 && SymTab[Addr] != 0 &&
+             strcmp (SymTab[Addr], Name) == 0))) {
             return;
         }
         Error ("Duplicate label for address $%04X: %s/%s", Addr, SymTab[Addr], Name);

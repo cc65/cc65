@@ -141,13 +141,13 @@ static void ReadProgramFile (void)
     /* Open the file */
     FILE* F = fopen (ProgramFile, "rb");
     if (F == 0) {
-        Error ("Cannot open `%s': %s", ProgramFile, strerror (errno));
+        Error ("Cannot open '%s': %s", ProgramFile, strerror (errno));
     }
 
     /* Get the CPU type from the file header */
     if ((Val = fgetc(F)) != EOF) {
         if (Val != CPU_6502 && Val != CPU_65C02) {
-            Error ("`%s': Invalid CPU type", ProgramFile);
+            Error ("'%s': Invalid CPU type", ProgramFile);
         }
         CPU = Val;
     }
@@ -155,20 +155,20 @@ static void ReadProgramFile (void)
     /* Read the file body into memory */
     while ((Val = fgetc(F)) != EOF) {
         if (Addr == 0xFF00) {
-            Error ("`%s': To large to fit into $0200-$FFF0", ProgramFile);
+            Error ("'%s': To large to fit into $0200-$FFF0", ProgramFile);
         }
         MemWriteByte (Addr++, (unsigned char) Val);
     }
 
     /* Check for errors */
     if (ferror (F)) {
-        Error ("Error reading from `%s': %s", ProgramFile, strerror (errno));
+        Error ("Error reading from '%s': %s", ProgramFile, strerror (errno));
     }
 
     /* Close the file */
     fclose (F);
 
-    Print (stderr, 1, "Loaded `%s' at $0200-$%04X\n", ProgramFile, Addr - 1);
+    Print (stderr, 1, "Loaded '%s' at $0200-$%04X\n", ProgramFile, Addr - 1);
 }
 
 

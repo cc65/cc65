@@ -133,7 +133,7 @@ void GetEA (EffAddr* A)
                 A->AddrModeSet = AM65_STACK_REL_IND_Y;
                 Consume (IndirectLeave, IndirectExpect);
                 ConsumeComma ();
-                Consume (TOK_Y, "`Y' expected");
+                Consume (TOK_Y, "'Y' expected");
             } else {
                 Error ("Syntax error");
             }
@@ -152,7 +152,7 @@ void GetEA (EffAddr* A)
                     A->AddrModeSet = AM65_DIR_IND;
                     break;
                 default:
-                    Consume (TOK_Y, "`Y' expected");
+                    Consume (TOK_Y, "'Y' expected");
                     A->AddrModeSet = AM65_DIR_IND_Y;
                     break;
                 }
@@ -173,7 +173,7 @@ void GetEA (EffAddr* A)
         if (CurTok.Tok == TOK_COMMA) {
             /* [dir],y */
             NextTok ();
-            Consume (TOK_Y, "`Y' expected");
+            Consume (TOK_Y, "'Y' expected");
             A->AddrModeSet = AM65_DIR_IND_LONG_Y;
         } else {
             /* [dir] */

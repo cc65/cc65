@@ -2730,7 +2730,7 @@ Here's a list of all control commands and a description, what they do:
 
   <tag><tt>at_in_identifiers</tt><label id="at_in_identifiers"></tag>
 
-    Accept the at character (`@') as a valid character in identifiers. The
+    Accept the at character ('@') as a valid character in identifiers. The
     at character is not allowed to start an identifier, even with this
     feature enabled.
 
@@ -2765,13 +2765,13 @@ Here's a list of all control commands and a description, what they do:
 
   <tag><tt>dollar_in_identifiers</tt><label id="dollar_in_identifiers"></tag>
 
-    Accept the dollar sign (`&dollar;') as a valid character in identifiers. The
+    Accept the dollar sign ('&dollar;') as a valid character in identifiers. The
     dollar character is not allowed to start an identifier, even with this
     feature enabled.
 
   <tag><tt>dollar_is_pc</tt><label id="dollar_is_pc"></tag>
 
-    The dollar sign may be used as an alias for the star (`*'), which
+    The dollar sign may be used as an alias for the star ('*'), which
     gives the value of the current PC in expressions.
     Note: Assignment to the pseudo variable is not allowed.
 
@@ -2789,7 +2789,7 @@ Here's a list of all control commands and a description, what they do:
 
   <tag><tt>leading_dot_in_identifiers</tt><label id="leading_dot_in_identifiers"></tag>
 
-    Accept the dot (`.') as the first character of an identifier. This may be
+    Accept the dot ('.') as the first character of an identifier. This may be
     used for example to create macro names that start with a dot emulating
     control directives of other assemblers. Note however, that none of the
     reserved keywords built into the assembler, that starts with a dot, may be
@@ -2825,7 +2825,7 @@ Here's a list of all control commands and a description, what they do:
 
   <tag><tt>pc_assignment</tt><label id="pc_assignment"></tag>
 
-    Allow assignments to the PC symbol (`*' or `&dollar;' if <tt/dollar_is_pc/
+    Allow assignments to the PC symbol ('*' or '&dollar;' if <tt/dollar_is_pc/
     is enabled). Such an assignment is handled identical to the <tt><ref
     id=".ORG" name=".ORG"></tt> command (which is usually not needed, so just
     removing the lines with the assignments may also be an option when porting
@@ -3799,7 +3799,7 @@ Here's a list of all control commands and a description, what they do:
   page and direct (short) addressing is possible for data in this segment.
 
   Beware: Only labels in a segment with the zeropage attribute are marked
-  as reachable by short addressing. The `*' (PC counter) operator will
+  as reachable by short addressing. The '*' (PC counter) operator will
   work as in other segments and will create absolute variable values.
 
   Please note that a segment cannot have two different address sizes. A

@@ -66,7 +66,7 @@ Short options:
   -m name               Create a map file
   -o name               Name the default output file
   -t sys                Set the target system
-  -u sym                Force an import of symbol `sym'
+  -u sym                Force an import of symbol 'sym'
   -v                    Verbose mode
   -vm                   Verbose map file
 
@@ -76,7 +76,7 @@ Long options:
   --dbgfile name        Generate debug information
   --define sym=val      Define a symbol
   --end-group           End a library group
-  --force-import sym    Force an import of symbol `sym'
+  --force-import sym    Force an import of symbol 'sym'
   --help                Help (this text)
   --lib file            Link this library
   --lib-path path       Specify a library search path
@@ -487,7 +487,7 @@ There are of course more attributes for a memory section than just start and
 size. Start and size are mandatory attributes, that means, each memory area
 defined <em/must/ have these attributes given (the linker will check that). I
 will cover other attributes later. As you may have noticed, I've used a
-comment in the example above. Comments start with a hash mark (`#'), the
+comment in the example above. Comments start with a hash mark ('#'), the
 remainder of the line is ignored if this character is found.
 
 
@@ -572,7 +572,7 @@ default behaviour is OK for our purposes, I did not use the attribute in the
 example above. Let's have a look at it now.
 
 The "file" attribute (the keyword may also be written as "FILE" if you like
-that better) takes a string enclosed in double quotes (`&dquot;') that specifies the
+that better) takes a string enclosed in double quotes ('&dquot;') that specifies the
 file, where the data is written. You may specify the same file several times,
 in that case the data for all memory areas having this file name is written
 into this file, in the order of the memory areas defined in the <tt/MEMORY/

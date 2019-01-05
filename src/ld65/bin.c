@@ -154,7 +154,7 @@ static void BinWriteMem (BinDesc* D, MemoryArea* M)
         SegDesc* S = CollAtUnchecked (&M->SegList, I);
 
         /* Keep the user happy */
-        Print (stdout, 1, "    Writing `%s'\n", GetString (S->Name));
+        Print (stdout, 1, "    Writing '%s'\n", GetString (S->Name));
 
         /* Writes do only occur in the load area and not for BSS segments */
         DoWrite = (S->Flags & SF_BSS) == 0      &&      /* No BSS segment */
@@ -286,23 +286,23 @@ void BinWriteTarget (BinDesc* D, struct File* F)
     /* Open the file */
     D->F = fopen (D->Filename, "wb");
     if (D->F == 0) {
-        Error ("Cannot open `%s': %s", D->Filename, strerror (errno));
+        Error ("Cannot open '%s': %s", D->Filename, strerror (errno));
     }
 
     /* Keep the user happy */
-    Print (stdout, 1, "Opened `%s'...\n", D->Filename);
+    Print (stdout, 1, "Opened '%s'...\n", D->Filename);
 
     /* Dump all memory areas */
     for (I = 0; I < CollCount (&F->MemoryAreas); ++I) {
         /* Get this entry */
         MemoryArea* M = CollAtUnchecked (&F->MemoryAreas, I);
-        Print (stdout, 1, "  Dumping `%s'\n", GetString (M->Name));
+        Print (stdout, 1, "  Dumping '%s'\n", GetString (M->Name));
         BinWriteMem (D, M);
     }
 
     /* Close the file */
     if (fclose (D->F) != 0) {
-        Error ("Cannot write to `%s': %s", D->Filename, strerror (errno));
+        Error ("Cannot write to '%s': %s", D->Filename, strerror (errno));
     }
 
     /* Reset the file and filename */

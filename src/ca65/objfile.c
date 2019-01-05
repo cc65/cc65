@@ -113,7 +113,7 @@ static void ObjWriteError (void)
     remove (OutFile);
 
     /* Now abort with a fatal error */
-    Fatal ("Cannot write to output file `%s': %s", OutFile, strerror (Error));
+    Fatal ("Cannot write to output file '%s': %s", OutFile, strerror (Error));
 }
 
 
@@ -170,7 +170,7 @@ void ObjOpen (void)
     /* Create the output file */
     F = fopen (OutFile, "w+b");
     if (F == 0) {
-        Fatal ("Cannot open output file `%s': %s", OutFile, strerror (errno));
+        Fatal ("Cannot open output file '%s': %s", OutFile, strerror (errno));
     }
 
     /* Write a dummy header */

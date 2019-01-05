@@ -1561,7 +1561,7 @@ char text = "foo";
 	DB_VARSTR (TXT_LN_X, TXT_LN_1_Y, &amp;r15),
 	...
 </verb></tscreen>
-will cause the word ``foo'' to appear in the window, but you may store the pointer to any text in
+will cause the word ''foo'' to appear in the window, but you may store the pointer to any text in
 <tt/r15/ (in this case) before the call to DoDlgBox.
 <p>
 <tt/DB_GETSTR(x, y, ptr, length)/ - will add a input-from-keyboard feature. <tt/ptr/ works as in the

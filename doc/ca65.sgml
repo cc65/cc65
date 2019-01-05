@@ -2831,6 +2831,24 @@ Here's a list of all control commands and a description, what they do:
     removing the lines with the assignments may also be an option when porting
     code written for older assemblers).
 
+  <tag><tt>string_escapes</tt><label id="string_escapes"></tag>
+
+    Allow C-style backslash escapes within string constants to embed
+    special characters. The following escapes are accepted:
+
+<itemize>
+<item><tt>\\</tt> backslash (<tt>$5C</tt>)
+<item><tt>\'</tt> single quote (<tt>$27</tt>)
+<item><tt>\&quot;</tt> double quote (<tt>$22</tt>)
+<item><tt>\t</tt> tab (<tt>$09</tt>)
+<item><tt>\r</tt> carriage return (<tt>$0D</tt>)
+<item><tt>\n</tt> newline (<tt>$0A</tt>)
+<item><tt>\xNN</tt>  (<tt>$NN</tt>)
+</itemize>
+
+    Note that <tt>\n</tt> maps to ASCII <tt>$0A</tt>, not a platform specific
+    line ending character.
+
   <tag><tt>ubiquitous_idents</tt><label id="ubiquitous_idents"></tag>
 
     Allow the use of instructions names as names for macros and symbols. This

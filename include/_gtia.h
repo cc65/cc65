@@ -4,9 +4,16 @@
 /*                                                                           */
 /*                  Internal include file, do not use directly               */
 /*                                                                           */
+/* "GTIA, Graphic Television Interface Adaptor, is a custom chip used in the */
+/* Atari 8-bit family of computers and in the Atari 5200 console. In these   */
+/* systems, GTIA chip works together with ANTIC to produce video display.    */
+/* ANTIC generates the playfield graphics (text and bitmap) while GTIA       */
+/* provides the color for the playfield and adds overlay objects known as    */
+/* player/missile graphics (sprites)" - Wikipedia article on "GTIA"          */
 /*                                                                           */
 /*                                                                           */
 /* (C) 2000 Freddy Offenga <taf_offenga@yahoo.com>                           */
+/* 2019-01-12: Bill Kendrick <nbs@sonic.net>: More defines for registers     */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -32,26 +39,33 @@
 #ifndef __GTIA_H
 #define __GTIA_H
 
-/* Define a structure with the gtia register offsets */
+/* Define a structure with the GTIA register offsets for write (W) */
 struct __gtia_write {
-    unsigned char   hposp0; /* 0x00: horizontal position player 0 */
-    unsigned char   hposp1; /* 0x01: horizontal position player 1 */
-    unsigned char   hposp2; /* 0x02: horizontal position player 2 */
-    unsigned char   hposp3; /* 0x03: horizontal position player 3 */
-    unsigned char   hposm0; /* 0x04: horizontal position missile 0 */
-    unsigned char   hposm1; /* 0x05: horizontal position missile 1 */
-    unsigned char   hposm2; /* 0x06: horizontal position missile 2 */
-    unsigned char   hposm3; /* 0x07: horizontal position missile 3 */
+    unsigned char   hposp0; /* 0x00: horizontal position of player 0 */
+    unsigned char   hposp1; /* 0x01: horizontal position of player 1 */
+    unsigned char   hposp2; /* 0x02: horizontal position of player 2 */
+    unsigned char   hposp3; /* 0x03: horizontal position of player 3 */
+    unsigned char   hposm0; /* 0x04: horizontal position of missile 0 */
+    unsigned char   hposm1; /* 0x05: horizontal position of missile 1 */
+    unsigned char   hposm2; /* 0x06: horizontal position of missile 2 */
+    unsigned char   hposm3; /* 0x07: horizontal position of missile 3 */
+
     unsigned char   sizep0; /* 0x08: size of player 0 */
     unsigned char   sizep1; /* 0x09: size of player 1 */
     unsigned char   sizep2; /* 0x0A: size of player 2 */
     unsigned char   sizep3; /* 0x0B: size of player 3 */
     unsigned char   sizem;  /* 0x0C: size of missiles */
-    unsigned char   grafp0; /* 0x0D: graphics shape player 0 */
+
+#define PMG_SIZE_NORMAL 0x0
+#define PMG_SIZE_DOUBLE 0x1
+#define PMG_SIZE_QUAD   0x2
+
+    unsigned char   grafp0; /* 0x0D: graphics shape player 0 (used when ANTIC is not instructed to use DMA; see DMACTL) */
     unsigned char   grafp1; /* 0x0E: graphics shape player 1 */
     unsigned char   grafp2; /* 0x0F: graphics shape player 2 */
     unsigned char   grafp3; /* 0x10: graphics shape player 3 */
     unsigned char   grafm;  /* 0x11: graphics shape missiles */
+
     unsigned char   colpm0; /* 0x12: color player and missile 0 */
     unsigned char   colpm1; /* 0x13: color player and missile 1 */
     unsigned char   colpm2; /* 0x14: color player and missile 2 */
@@ -61,14 +75,47 @@ struct __gtia_write {
     unsigned char   colpf2; /* 0x18: color playfield 2 */
     unsigned char   colpf3; /* 0x19: color playfield 3 */
     unsigned char   colbk;  /* 0x1A: color background */
+
+/* See the "HUE_..." #defines in "atari.h" for the hue values to use with color registers, above */
+/* Bitwise OR (|) with 0x00 (darkest) through 0x0F (lightest) (only even values are unique) */
+
     unsigned char   prior;  /* 0x1B: priority selection */
-    unsigned char   vdelay; /* 0x1C: vertical delay */
+
+#define PRIOR_P03_PF03          0x01 /* Players 0-3, then Playfields 0-3, then background */
+#define PRIOR_P01_PF03_P23      0x02 /* Players 0-1, then Playfields 0-3, then Players 2-3, then background */
+#define PRIOR_PF03_P03          0x04 /* Playfields 0-3, then Players 0-3, then background */
+#define PRIOR_PF01_P03_PF23     0x08 /* Playfields 0-1, then Players 0-3, then Playfields 2-3, then background */
+
+#define PRIOR_5TH_PLAYER        0x10 /* Four missiles combine to be a 5th player (uses COLPF3) */
+#define PRIOR_OVERLAP_3RD_COLOR 0x20 /* Overlap of players 0 and 1, and of players 2 and 3, results in a third color
+                                        (else overlap is black). The resulting color is a logical OR of the two player colors. */
+
+#define PRIOR_GFX_MODE_9        0x40 /* 80x192 16 shade mode (shades of the background (COLBK) hue; brightness in COLBK cause additional effects) */
+#define PRIOR_GFX_MODE_10       0x80 /* 80x192 9 color mode (COLPM0 (acts as background) thru COLPM3, followed by COLPF0 thru COLPF4) */
+#define PRIOR_GFX_MODE_11       0xC0 /* 80x192 16 hue mode (hues of the background (COLBK) brightness) */
+
+    unsigned char   vdelay; /* 0x1C: vertical delay (for one-line resolution movement of vertical position of an object when two line resolution display is enabled */
+
+#define VDELAY_MISSILE0 0x01
+#define VDELAY_MISSILE1 0x02
+#define VDELAY_MISSILE2 0x04
+#define VDELAY_MISSILE3 0x08
+#define VDELAY_PLAYER0  0x10
+#define VDELAY_PLAYER1  0x20
+#define VDELAY_PLAYER2  0x40
+#define VDELAY_PLAYER3  0x80
+
     unsigned char   gractl; /* 0x1D: stick/paddle latch, p/m control */
+
+#define GRACTL_MISSLES              0x01 /* enable missiles */
+#define GRACTL_PLAYERS              0x02 /* enable players */
+#define GRACTL_LATCH_TRIGGER_INPUTS 0x04 /* "latch" triggers; once pressed, will give a continuous pressed input until this bit is cleared */
+
     unsigned char   hitclr; /* 0x1E: clear p/m collision */
     unsigned char   consol; /* 0x1F: builtin speaker */
 };
 
-/* Define a structure with the gtia register offsets */
+/* Define a structure with the GTIA register offsets for read (R) */
 struct __gtia_read {
     unsigned char   m0pf;       /* 0x00: missile 0 to playfield collision */
     unsigned char   m1pf;       /* 0x01: missile 1 to playfield collision */
@@ -86,15 +133,28 @@ struct __gtia_read {
     unsigned char   p1pl;       /* 0x0D: player 1 to player collision */
     unsigned char   p2pl;       /* 0x0E: player 2 to player collision */
     unsigned char   p3pl;       /* 0x0F: player 3 to player collision */
-    unsigned char   trig0;      /* 0x10: joystick trigger 0 */
+
+    unsigned char   trig0;      /* 0x10: joystick trigger 0 (0=pressed, 1=released) */
     unsigned char   trig1;      /* 0x11: joystick trigger 1 */
     unsigned char   trig2;      /* 0x12: joystick trigger 2 */
     unsigned char   trig3;      /* 0x13: joystick trigger 3 */
+
     unsigned char   pal;        /* 0x14: pal/ntsc flag */
+
+#define TV_STD_PAL  0x1
+#define TV_STD_NTSC 0xE
+/* Note: This only tells you whether the GTIA is PAL or NTSC; some NTSC systems are modded with PAL ANTIC chips; testing VCOUNT limits can be done to check for that */
+/* Note: Seems like it's not possible to test for SECAM */
+
     unsigned char   unused[10];
+
     unsigned char   consol;     /* 0x1F: console buttons */
+
+#define CONSOL_START(x)     !((unsigned char)((x) & 1)) /* true if Start pressed */
+#define CONSOL_SELECT(x)    !((unsigned char)((x) & 2)) /* true if Select pressed */
+#define CONSOL_OPTION(x)    !((unsigned char)((x) & 4)) /* true if Option pressed */
+
 };
 
 /* End of _gtia.h */
 #endif /* #ifndef __GTIA_H */
-

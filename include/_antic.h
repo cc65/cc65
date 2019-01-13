@@ -5,15 +5,16 @@
 /*                  Internal include file, do not use directly               */
 /*                                                                           */
 /*                                                                           */
-/* "ANTIC is responsible for the generation of playfield graphics which is   */
-/* delivered as a datastream to the related CTIA/GTIA chip. The CTIA/GTIA    */
-/* provides the coloring of the playfield graphics, and is responsible for   */
-/* adding overlaid sprites referred to as "Player/Missile graphics" by       */
-/* Atari.  Atari advertised it as a true microprocessor, in that it has an   */
-/* instruction set to run programs (called display lists) to process data.   */
-/* ANTIC has no capacity for writing back computed values to memory, it      */
-/* merely reads data from memory and processes it for output to the screen,  */
-/* therefore it is not Turing complete." - Wikipedia article on "ANTIC"      */
+/* "ANTIC, Alphanumeric Television Interface Controller, is responsible for  */
+/* the generation of playfield graphics which is delivered as a datastream   */
+/* to the related CTIA/GTIA chip. The CTIA/GTIA provides the coloring of the */
+/* playfield graphics, and is responsible for adding overlaid sprite         */
+/* (referred to as "Player/Missile graphics" by Atari).  Atari advertised it */
+/* as a true microprocessor, in that it has an instruction set to run        */
+/* programs (called display lists) to process data.  ANTIC has no capacity   */
+/* for writing back computed values to memory, it merely reads data from     */
+/* memory and processes it for output to the screen, therefore it is not     */
+/* Turing complete." - Wikipedia article on "ANTIC" (with edits)             */
 /*                                                                           */
 /* (C) 2000 Freddy Offenga <taf_offenga@yahoo.com>                           */
 /* 24-Jan-2011: Christian Krueger: Added defines for Antic instruction set   */

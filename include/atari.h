@@ -93,7 +93,7 @@
 
 /* luminance values go from 0 (black) to 7 (white) */
 
-/* hue values */
+/* hue values (these can vary depending on TV standard (NTSC vs PAL), tint potentiometer settings, TV tint settings, emulator palette, etc. */
 #define HUE_GREY        0
 #define HUE_GOLD        1
 #define HUE_GOLDORANGE  2

@@ -66,10 +66,12 @@ struct __antic {
 /* Inverted (upside-down) characters */
 #define CHACTL_CHAR_NORMAL    0x00
 #define CHACTL_CHAR_INVERTED  0x04
+
 /* Inverse (reverse-video) characters */
 #define CHACTL_INV_TRANS      0x00 /* chars with high-bit shown */
 #define CHACTL_INV_OPAQUE     0x01 /* chars with high-bit appear as space */
 #define CHACTL_INV_PRESENT    0x02 /* chars with high-bit are reverse-video */
+
 /* N.B. Default is "CHACTL_CHAR_NORMAL | CHACTL_INV_PRESENT", aka decimal 2 */
 
 
@@ -161,15 +163,11 @@ struct __antic {
 /* Modifiers to mode lines */
 #define DL_HSCROL(x)    ((unsigned char)((x) | 16)) /* enable smooth horizontal scrolling on this line; see HSCROL */
 #define DL_VSCROL(x)    ((unsigned char)((x) | 32)) /* enable smooth vertical scrolling on this line; see VSCROL */
-#define DL_LMS(x)       ((unsigned char)((x) | 64)) /* Load Memory Scan (next two bytes must be the LSB/MSB of the data to load */
+#define DL_LMS(x)       ((unsigned char)((x) | 64)) /* Load Memory Scan (next two bytes must be the LSB/MSB of the data to load) */
 
 /* General modifier */
-#define DL_DLI(x)       ((unsigned char)((x) | 128)) /* enable Display List Interrupt on this mode line; requires NMIEN set to enable DLIs */
+#define DL_DLI(x)       ((unsigned char)((x) | 128)) /* enable Display List Interrupt on this mode line; requires NMIEN be set to enable DLIs */
 
-
-/* Macros for the beginning and end of functions used as Display List Interrupts */
-#define DLI_START asm("pha"); asm("txa"); asm("pha"); asm("tya"); asm("pha");
-#define DLI_END asm("pla"); asm("tay"); asm("pla"); asm("tax"); asm("pla"); asm("rti");
 
 /* End of _antic.h */
 #endif /* #ifndef __ANTIC_H */

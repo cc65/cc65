@@ -70,14 +70,14 @@ struct __pokey_write {
 
     unsigned char   audctl; /* audio control */
 
-#define AUDCTL_CLOCKBASE_15HZ 0x01 /* Switch main clock base from 64 KHz to 15 KHz */
-#define AUDCTL_HIGHPASS_CHAN2 0x02 /* Insert high pass filter into channel two, clocked by channel four */
-#define AUDCTL_HIGHPASS_CHAN1 0x04 /* Insert high pass filter into channel one, clocked by channel two */
-#define AUDCTL_JOIN_CHAN34    0x08 /* Join channels four and three (16 bit) */
-#define AUDCTL_JOIN_CHAN12    0x10 /* Join channels two and one (16 bit) */
+#define AUDCTL_CLOCKBASE_15HZ     0x01 /* Switch main clock base from 64 KHz to 15 KHz */
+#define AUDCTL_HIGHPASS_CHAN2     0x02 /* Insert high pass filter into channel two, clocked by channel four */
+#define AUDCTL_HIGHPASS_CHAN1     0x04 /* Insert high pass filter into channel one, clocked by channel two */
+#define AUDCTL_JOIN_CHAN34        0x08 /* Join channels four and three (16 bit) */
+#define AUDCTL_JOIN_CHAN12        0x10 /* Join channels two and one (16 bit) */
 #define AUDCTL_CLOCK_CHAN3_179MHZ 0x20 /* Clock channel three with 1.79 MHz */
 #define AUDCTL_CLOCK_CHAN1_179MHZ 0x40 /* Clock channel one with 1.79 MHz */
-#define AUDCTL_9BIT_POLY      0x80 /* Makes the 17 bit poly counter into nine bit poly (see also: RANDOM) */
+#define AUDCTL_9BIT_POLY          0x80 /* Makes the 17 bit poly counter into nine bit poly (see also: RANDOM) */
 
     unsigned char   stimer; /* start pokey timers */
 

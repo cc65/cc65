@@ -18,7 +18,7 @@
 /*                                                                           */
 /* (C) 2000 Freddy Offenga <taf_offenga@yahoo.com>                           */
 /* 24-Jan-2011: Christian Krueger: Added defines for Antic instruction set   */
-/* 2019-01-12: Bill Kendrick <nbs@sonic.net>: More defines for registers     */
+/* 2019-01-14: Bill Kendrick <nbs@sonic.net>: More defines for registers     */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -47,21 +47,57 @@
 /* Define a structure with the ANTIC coprocessor's register offsets */
 struct __antic {
     unsigned char   dmactl; /* (W) direct memory access control */
+    unsigned char   chactl; /* (W) character mode control */
+    unsigned char   dlistl; /* display list pointer low-byte */
+    unsigned char   dlisth; /* display list pointer high-byte */
+    unsigned char   hscrol; /* (W) horizontal scroll enable */
+    unsigned char   vscrol; /* (W) vertical scroll enable */
+    unsigned char   unuse0; /* unused */
+    unsigned char   pmbase; /* (W) msb of p/m base address (for when DMACTL has player and/or missile DMA enabled) */
+    unsigned char   unuse1; /* unused */
+    unsigned char   chbase; /* (W) msb of character set base address */
+    unsigned char   wsync;  /* (W) wait for horizontal synchronization */
+    unsigned char   vcount; /* (R) vertical line counter */
+    unsigned char   penh;   /* (R) light pen horizontal position */
+    unsigned char   penv;   /* (R) light pen vertical position */
+    unsigned char   nmien;  /* (W) non-maskable interrupt enable */
+    unsigned char   nmires;
+    /* (W) ("NMIRES") nmi reset -- clears the interrupt request register; resets all of the NMI status together
+    ** (R) ("NMIST") nmi status -- holds cause for the NMI interrupt
+    */
+};
+
+
+/* DMACTL register options */
+/* Initialized to 0x22: DMA fetch, normal playfield, no PMG DMA, double-line PMGs */
 
 /* Playfield modes: */
 #define DMACTL_PLAYFIELD_NONE     0x00
 #define DMACTL_PLAYFIELD_NARROW   0x01 /* e.g., 32 bytes per scanline with thick borders */
 #define DMACTL_PLAYFIELD_NORMAL   0x02 /* e.g., 40 bytes per scanline with normal borders */
 #define DMACTL_PLAYFIELD_WIDE     0x03 /* e.g., 48 bytes per scanline with no borders (overscan) */
+
 /* Other options: */
-#define DMACTL_DMA_MISSILES    0x04 /* if not set, GTIA's GRAFP0 thru GRAFP3 used for player shapes; if set, ANTIC's PMBASE will be used to fetch shapes via DMA */
-#define DMACTL_DMA_PLAYERS     0x08 /* (ditto, using GTIA's GRAFM for missile shapes...) */
-#define DMACTL_PMG_SINGLELINE  0x10 /* if not set, default is double-scanline resolution PMGs */
-#define DMACTL_DMA_FETCH       0x20 /* if not set, disables ANTIC operation since it cannot fetch Display List instructions */
-/* Initialized to 0x22 (DMA fetch, normal playfield, no PMG DMA, double-line PMGs) */
+
+/* If not set, GTIA's GRAFP0 thru GRAFP3, and/or GRAFM registers are used for
+** player & missile shapes, respectively.  (Modify the registers during the horizontal blank
+** (Display List Interrupt), a la "racing the beam" on an Atari VCS/2600, )
+** if set, ANTIC's PMBASE will be used to fetch shapes from memory via DMA.
+*/
+#define DMACTL_DMA_MISSILES    0x04
+#define DMACTL_DMA_PLAYERS     0x08
+
+/* Unless set, PMGs (as fetched via DMA) will be double-scanline resolution */
+#define DMACTL_PMG_SINGLELINE  0x10
+
+/* Unless set, ANTIC operation is disabled, since it cannot fetch
+** Display List instructions
+*/
+#define DMACTL_DMA_FETCH       0x20
 
 
-    unsigned char   chactl; /* (W) character mode control */
+/* CHACTL register options */
+/* Initialized to 2 (CHACTL_CHAR_NORMAL | CHACTL_INV_PRESENT) */
 
 /* Inverted (upside-down) characters */
 #define CHACTL_CHAR_NORMAL    0x00
@@ -72,31 +108,25 @@ struct __antic {
 #define CHACTL_INV_OPAQUE     0x01 /* chars with high-bit appear as space */
 #define CHACTL_INV_PRESENT    0x02 /* chars with high-bit are reverse-video */
 
-/* N.B. Default is "CHACTL_CHAR_NORMAL | CHACTL_INV_PRESENT", aka decimal 2 */
 
+/* Register bits for NMIEN (enabling interrupts)
+** and NMIST (determining the cause for the NMI interrupt)
+*/
 
-    unsigned char   dlistl; /* display list pointer low-byte */
-    unsigned char   dlisth; /* display list pointer high-byte */
-    unsigned char   hscrol; /* (W) horizontal scroll enable */
-    unsigned char   vscrol; /* (W) vertical scroll enable */
-    unsigned char   unuse0; /* unused */
-    unsigned char   pmbase; /* (W) msb of p/m base address (for when DMACTL has player and/or missile DMA enabled) */
-    unsigned char   unuse1; /* unused */
-    unsigned char   chbase; /* (W) character set base address */
-    unsigned char   wsync;  /* (W) wait for horizontal synchronization */
-    unsigned char   vcount; /* (R) vertical line counter */
-    unsigned char   penh;   /* (R) light pen horizontal position */
-    unsigned char   penv;   /* (R) light pen vertical position */
+#define NMIEN_DLI   0x80
+/* Display List Interrupts
+** Called on a modeline when "DL_DLI" bit is set the ANTIC instruction,
+** and jumps through VDSLST vector.
+*/
 
-    unsigned char   nmien;  /* (W) non-maskable interrupt enable */
+#define NMIEN_VBI   0x40 
+/* Vertical Blank Interrupt
+** Called during every vertical blank; see SYSVBV, VVBLKI, CRITIC, and VVBLKD,
+** as well as the SETVBV routine.
+*/
 
-/* NMIEN settings: */
-#define NMIEN_DLI   0x80 /* see also: DL_DLI */
-#define NMIEN_VBI   0x40
 #define NMIEN_RESET 0x20
-
-    unsigned char   nmires; /* (W) ("NMIRES") nmi reset; (R) ("NMIST") nmi status */
-};
+/* [Reset] key pressed */
 
 
 /* ANTIC instruction set */

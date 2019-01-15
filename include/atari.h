@@ -86,14 +86,18 @@
 #define CH_HLINE        0x12
 #define CH_VLINE        0x7C
 
-/* color defines */
 
-/* make GTIA color value */
+/* Color definitions */
+
+/* Make a GTIA color value */
 #define _gtia_mkcolor(hue,lum) (((hue) << 4) | ((lum) << 1))
 
-/* luminance values go from 0 (black) to 7 (white) */
+/* Luminance values go from 0 (black) to 7 (white) */
 
-/* hue values (these can vary depending on TV standard (NTSC vs PAL), tint potentiometer settings, TV tint settings, emulator palette, etc.) */
+/* Hue values */
+/* (These can vary depending on TV standard (NTSC vs PAL),
+** tint potentiometer settings, TV tint settings, emulator palette, etc.)
+*/
 #define HUE_GREY        0
 #define HUE_GOLD        1
 #define HUE_GOLDORANGE  2
@@ -112,7 +116,9 @@
 #define HUE_YELLOWRED   15
 
 /* Color defines, similar to c64 colors (untested) */
-/* Note that the conio color implementation is monochrome (bgcolor and textcolor are only placeholders) */
+/* Note that the conio color implementation is monochrome
+** (bgcolor and textcolor are only placeholders)
+*/
 /* Use the defines with the setcolor() or _atari_xxxcolor() functions */
 #define COLOR_BLACK             _gtia_mkcolor(HUE_GREY,0)
 #define COLOR_WHITE             _gtia_mkcolor(HUE_GREY,7)
@@ -256,18 +262,18 @@
 #define KEY_LEFT    (KEY_PLUS | KEY_CTRL)
 #define KEY_RIGHT   (KEY_ASTERISK | KEY_CTRL)
 
-/* color register functions */
+/* Color register functions */
 extern void __fastcall__ _setcolor     (unsigned char color_reg, unsigned char hue, unsigned char luminace);
 extern void __fastcall__ _setcolor_low (unsigned char color_reg, unsigned char color_value);
 extern unsigned char __fastcall__ _getcolor (unsigned char color_reg);
 
-/* other screen functions */
+/* Other screen functions */
 extern int  __fastcall__ _graphics (unsigned char mode); /* mode value same as in BASIC */
 extern void __fastcall__ _scroll (signed char numlines);
                                           /* numlines > 0  scrolls up */
                                           /* numlines < 0  scrolls down */
 
-/* misc. functions */
+/* Misc. functions */
 extern unsigned char get_ostype(void);       /* get ROM version */
 extern unsigned char get_tv(void);           /* get TV system */
 extern void _save_vecs(void);                /* save system vectors */
@@ -275,7 +281,7 @@ extern void _rest_vecs(void);                /* restore system vectors */
 extern char *_getdefdev(void);               /* get default floppy device */
 extern unsigned char _is_cmdline_dos(void);  /* does DOS support command lines */
 
-/* global variables */
+/* Global variables */
 extern unsigned char _dos_type;         /* the DOS flavour */
 #ifndef __ATARIXL__
 extern void atr130_emd[];
@@ -441,7 +447,6 @@ struct __iocb {
 #define IOCB_CHDIR_SPDOS 0x2C  /* change directory (SpartaDOS) */
 #define IOCB_GETCWD      0x30  /* get current directory (MyDOS/SpartaDOS) */
 #define IOCB_FORMAT      0xFE  /* format */
-
 
 
 /* End of atari.h */

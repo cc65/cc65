@@ -447,6 +447,63 @@ extern void atrx15p2_tgi[];
 
 
 /*****************************************************************************/
+/* Shadow registers for hardware registers                                   */
+/*****************************************************************************/
+
+/* GTIA */
+#define STRIG0 (*(unsigned char*)0x284) /* TRIG0 */
+#define STRIG1 (*(unsigned char*)0x285) /* TRIG1 */
+#define STRIG2 (*(unsigned char*)0x286) /* TRIG2 */
+#define STRIG3 (*(unsigned char*)0x287) /* TRIG3 */
+#define PCOLR0 (*(unsigned char*)0x2C0) /* COLPM0 */
+#define PCOLR1 (*(unsigned char*)0x2C1) /* COLPM1 */
+#define PCOLR2 (*(unsigned char*)0x2C2) /* COLPM2 */
+#define PCOLR3 (*(unsigned char*)0x2C3) /* COLPM3 */
+#define COLOR0 (*(unsigned char*)0x2C4) /* COLPF0 */
+#define COLOR1 (*(unsigned char*)0x2C5) /* COLPF1 */
+#define COLOR2 (*(unsigned char*)0x2C6) /* COLPF2 */
+#define COLOR3 (*(unsigned char*)0x2C7) /* COLPF3 */
+#define COLOR4 (*(unsigned char*)0x2C8) /* COLPBK */
+#define GPRIOR (*(unsigned char*)0x264) /* PRIOR */
+
+/* ANTIC */
+#define SDMCTL (*(unsigned char*)0x22F) /* DMACTL */
+#define CHACT  (*(unsigned char*)0x2F3) /* CHACTL */
+#define SDLSTL (*(unsigned char*)0x230) /* DLISTL */
+#define SDLSTH (*(unsigned char*)0x231) /* DLISTH */
+#define SDLST  (*(unsigned int*)0x230)  /* DLISTL/H together */
+#define CHBAS  (*(unsigned char*)0x2F4) /* CHBASE */
+#define LPENH  (*(unsigned char*)0x233) /* PENH */
+#define LPENV  (*(unsigned char*)0x234) /* PENV */
+
+/* POKEY */
+#define PADDL0 (*(unsigned char*)0x270) /* POT0 */
+#define PADDL1 (*(unsigned char*)0x271) /* POT1 */
+#define PADDL2 (*(unsigned char*)0x272) /* POT2 */
+#define PADDL3 (*(unsigned char*)0x273) /* POT3 */
+#define PADDL4 (*(unsigned char*)0x274) /* POT4 */
+#define PADDL5 (*(unsigned char*)0x275) /* POT5 */
+#define PADDL6 (*(unsigned char*)0x276) /* POT6 */
+#define PADDL7 (*(unsigned char*)0x277) /* POT7 */
+#define CH     (*(unsigned char*)0x2FC) /* KBCODE */
+#define POKMSK (*(unsigned char*)0x10)  /* IRQEN */
+
+/* PIA */
+#define STICK0 (*(unsigned char*)0x278) /* PORTA for controller port 1 */
+#define STICK1 (*(unsigned char*)0x279) /* PORTA for controller port 2 */
+#define STICK2 (*(unsigned char*)0x27A) /* PORTB for controller port 3 */
+#define STICK3 (*(unsigned char*)0x27B) /* PORTB for controller port 4 */
+#define PTRIG0 (*(unsigned char*)0x27C) /* PORTA for controller port 1, paddle 1 */
+#define PTRIG1 (*(unsigned char*)0x27D) /* PORTA for controller port 1, paddle 2 */
+#define PTRIG2 (*(unsigned char*)0x27E) /* PORTA for controller port 1, paddle 3 */
+#define PTRIG3 (*(unsigned char*)0x27F) /* PORTA for controller port 1, paddle 4 */
+#define PTRIG4 (*(unsigned char*)0x280) /* PORTA for controller port 2, paddle 5 */
+#define PTRIG5 (*(unsigned char*)0x281) /* PORTA for controller port 2, paddle 6 */
+#define PTRIG6 (*(unsigned char*)0x282) /* PORTA for controller port 2, paddle 7 */
+#define PTRIG7 (*(unsigned char*)0x283) /* PORTA for controller port 2, paddle 8 */
+
+
+/*****************************************************************************/
 /* Device control block                                                      */
 /*****************************************************************************/
 

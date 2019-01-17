@@ -18,7 +18,7 @@
 /*                                                                           */
 /* (C) 2000 Freddy Offenga <taf_offenga@yahoo.com>                           */
 /* 24-Jan-2011: Christian Krueger: Added defines for Antic instruction set   */
-/* 2019-01-14: Bill Kendrick <nbs@sonic.net>: More defines for registers     */
+/* 2019-01-16: Bill Kendrick <nbs@sonic.net>: More defines for registers     */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -44,7 +44,10 @@
 #ifndef __ANTIC_H
 #define __ANTIC_H
 
-/* Define a structure with the ANTIC coprocessor's register offsets */
+/*****************************************************************************/
+/* Define a structure with the ANTIC coprocessor's register offsets          */
+/*****************************************************************************/
+
 struct __antic {
     unsigned char   dmactl; /* (W) direct memory access control */
     unsigned char   chactl; /* (W) character mode control */
@@ -68,7 +71,10 @@ struct __antic {
 };
 
 
-/* DMACTL register options */
+/*****************************************************************************/
+/* DMACTL register options                                                   */
+/*****************************************************************************/
+
 /* Initialized to 0x22: DMA fetch, normal playfield, no PMG DMA, double-line PMGs */
 
 /* Playfield modes: */
@@ -96,7 +102,10 @@ struct __antic {
 #define DMACTL_DMA_FETCH       0x20
 
 
-/* CHACTL register options */
+/*****************************************************************************/
+/* CHACTL register options                                                   */
+/*****************************************************************************/
+
 /* Initialized to 2 (CHACTL_CHAR_NORMAL | CHACTL_INV_PRESENT) */
 
 /* Inverted (upside-down) characters */
@@ -109,27 +118,29 @@ struct __antic {
 #define CHACTL_INV_PRESENT    0x02 /* chars with high-bit are reverse-video */
 
 
-/* Register bits for NMIEN (enabling interrupts)
-** and NMIST (determining the cause for the NMI interrupt)
-*/
+/*****************************************************************************/
+/* Values for NMIEN (enabling interrupts) & NMIST (cause for the interrupt)  */
+/*****************************************************************************/
 
-#define NMIEN_DLI   0x80
 /* Display List Interrupts
 ** Called on a modeline when "DL_DLI" bit is set the ANTIC instruction,
 ** and jumps through VDSLST vector.
 */
+#define NMIEN_DLI   0x80
 
-#define NMIEN_VBI   0x40 
 /* Vertical Blank Interrupt
 ** Called during every vertical blank; see SYSVBV, VVBLKI, CRITIC, and VVBLKD,
 ** as well as the SETVBV routine.
 */
+#define NMIEN_VBI   0x40 
 
-#define NMIEN_RESET 0x20
 /* [Reset] key pressed */
+#define NMIEN_RESET 0x20
 
 
-/* ANTIC instruction set */
+/*****************************************************************************/
+/* ANTIC instruction set                                                     */
+/*****************************************************************************/
 
 /* Absolute instructions (non mode lines) */
 #define DL_JMP  ((unsigned char) 1)
@@ -144,28 +155,63 @@ struct __antic {
 #define DL_BLK7 ((unsigned char) 96)
 #define DL_BLK8 ((unsigned char) 112)
 
+
 /* Absolute instructions (mode lines) */
-/* Note: Actual width varies (e.g., 40 vs 32 vs 48) depending on normal vs narrow vs wide (overscan) playfield setting; see DMACTL */
+
+/* Note: Actual width varies (e.g., 40 vs 32 vs 48) depending on
+** normal vs narrow vs wide (overscan) playfield setting; see DMACTL
+*/
 
 /* Character modes (text, tile graphics, etc.) */
-#define DL_CHR40x8x1    ((unsigned char) 2)      /* monochrome, 40 character & 8 scanlines per mode line (aka Atari BASIC GRAPHICS 0 via OS's CIO routines) */
-#define DL_CHR40x10x1   ((unsigned char) 3)      /* monochrome, 40 character & 10 scanlines per mode line (like GR. 0, with descenders) */
-#define DL_CHR40x8x4    ((unsigned char) 4)      /* colour, 40 character & 8 scanlines per mode line (GR. 12) */
-#define DL_CHR40x16x4   ((unsigned char) 5)      /* colour, 40 character & 16 scanlines per mode line (GR. 13) */
-#define DL_CHR20x8x2    ((unsigned char) 6)      /* colour (duochrome per character), 20 character & 8 scanlines per mode line (GR. 1) */
-#define DL_CHR20x16x2   ((unsigned char) 7)      /* colour (duochrome per character), 20 character & 16 scanlines per mode line (GR. 2) */
+
+/* monochrome, 40 character & 8 scanlines per mode line (aka Atari BASIC GRAPHICS 0 via OS's CIO routines) */
+#define DL_CHR40x8x1    ((unsigned char) 2)
+
+/* monochrome, 40 character & 10 scanlines per mode line (like GR. 0, with descenders) */
+#define DL_CHR40x10x1   ((unsigned char) 3)
+
+/* colour, 40 character & 8 scanlines per mode line (GR. 12) */
+#define DL_CHR40x8x4    ((unsigned char) 4)
+
+/* colour, 40 character & 16 scanlines per mode line (GR. 13) */
+#define DL_CHR40x16x4   ((unsigned char) 5)
+
+/* colour (duochrome per character), 20 character & 8 scanlines per mode line (GR. 1) */
+#define DL_CHR20x8x2    ((unsigned char) 6)
+
+/* colour (duochrome per character), 20 character & 16 scanlines per mode line (GR. 2) */
+#define DL_CHR20x16x2   ((unsigned char) 7)
+
 
 /* Bitmap modes */
-#define DL_MAP40x8x4    ((unsigned char) 8)      /* colour, 40 pixel & 8 scanlines per mode line (GR. 3) */
-#define DL_MAP80x4x2    ((unsigned char) 9)      /* 'duochrome', 80 pixel & 4 scanlines per mode line (GR.4) */
-#define DL_MAP80x4x4    ((unsigned char) 10)     /* colour, 80 pixel & 4 scanlines per mode line (GR.5) */
-#define DL_MAP160x2x2   ((unsigned char) 11)     /* 'duochrome', 160 pixel & 2 scanlines per mode line (GR.6) */
-#define DL_MAP160x1x2   ((unsigned char) 12)     /* 'duochrome', 160 pixel & 1 scanline per mode line (GR.14) */
-#define DL_MAP160x2x4   ((unsigned char) 13)     /* 4 colours, 160 pixel & 2 scanlines per mode line (GR.7) */
-#define DL_MAP160x1x4   ((unsigned char) 14)     /* 4 colours, 160 pixel & 1 scanline per mode line (GR.15) */
-#define DL_MAP320x1x1   ((unsigned char) 15)     /* monochrome, 320 pixel & 1 scanline per mode line (GR.8) */
+
+/* colour, 40 pixel & 8 scanlines per mode line (GR. 3) */
+#define DL_MAP40x8x4    ((unsigned char) 8)
+
+/* 'duochrome', 80 pixel & 4 scanlines per mode line (GR.4) */
+#define DL_MAP80x4x2    ((unsigned char) 9)
+
+/* colour, 80 pixel & 4 scanlines per mode line (GR.5) */
+#define DL_MAP80x4x4    ((unsigned char) 10)
+
+/* 'duochrome', 160 pixel & 2 scanlines per mode line (GR.6) */
+#define DL_MAP160x2x2   ((unsigned char) 11)
+
+/* 'duochrome', 160 pixel & 1 scanline per mode line (GR.14) */
+#define DL_MAP160x1x2   ((unsigned char) 12)
+
+/* 4 colours, 160 pixel & 2 scanlines per mode line (GR.7) */
+#define DL_MAP160x2x4   ((unsigned char) 13)
+
+/* 4 colours, 160 pixel & 1 scanline per mode line (GR.15) */
+#define DL_MAP160x1x4   ((unsigned char) 14)
+
+/* monochrome, 320 pixel & 1 scanline per mode line (GR.8) */
+#define DL_MAP320x1x1   ((unsigned char) 15)
+
 
 /* Equivalents, for people familiar with Atari 8-bit OS */
+
 #define DL_GRAPHICS0    DL_CHR40x8x1
 #define DL_GRAPHICS1    DL_CHR20x8x2
 #define DL_GRAPHICS2    DL_CHR20x16x2
@@ -196,7 +242,7 @@ struct __antic {
 #define DL_LMS(x)       ((unsigned char)((x) | 64)) /* Load Memory Scan (next two bytes must be the LSB/MSB of the data to load) */
 
 /* General modifier */
-#define DL_DLI(x)       ((unsigned char)((x) | 128)) /* enable Display List Interrupt on this mode line; requires NMIEN be set to enable DLIs */
+#define DL_DLI(x)       ((unsigned char)((x) | 128)) /* enable Display List Interrupt on this mode line */
 
 
 /* End of _antic.h */

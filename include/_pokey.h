@@ -14,7 +14,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2000 Freddy Offenga <taf_offenga@yahoo.com>                           */
-/* 2019-01-14: Bill Kendrick <nbs@sonic.net>: More defines for registers     */
+/* 2019-01-16: Bill Kendrick <nbs@sonic.net>: More defines for registers     */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -43,7 +43,10 @@
 
 
 
-/* Define a structure with the POKEY register offsets for write (W) */
+/*****************************************************************************/
+/* Define a structure with the POKEY register offsets for write (W)          */
+/*****************************************************************************/
+
 struct __pokey_write {
     unsigned char   audf1;  /* audio channel #1 frequency */
     unsigned char   audc1;  /* audio channel #1 control */
@@ -69,8 +72,9 @@ struct __pokey_write {
 };
 
 
-
-/* AUDC1-4 register values */
+/*****************************************************************************/
+/* (W) AUDC1-4 register values                                               */
+/*****************************************************************************/
 
 /* Meaningful values for the distortion bits.
 ** The first process is to divide the clock value by the frequency,
@@ -91,7 +95,9 @@ struct __pokey_write {
 #define AUDC_VOLUME_ONLY 0x10
 
 
-/* AUDCTL register values */
+/*****************************************************************************/
+/* (W) AUDCTL register values                                                */
+/*****************************************************************************/
 
 #define AUDCTL_CLOCKBASE_15HZ     0x01 /* Switch main clock base from 64 KHz to 15 KHz */
 #define AUDCTL_HIGHPASS_CHAN2     0x02 /* Insert high pass filter into channel two, clocked by channel four */
@@ -103,7 +109,9 @@ struct __pokey_write {
 #define AUDCTL_9BIT_POLY          0x80 /* Makes the 17 bit poly counter into nine bit poly (see also: RANDOM) */
 
 
-/* IRQEN register values */
+/*****************************************************************************/
+/* (W) IRQEN register values                                                 */
+/*****************************************************************************/
 
 #define IRQEN_TIMER_1                  0x01 /* The POKEY timer one interrupt is enabled */
 #define IRQEN_TIMER_2                  0x02 /* The POKEY timer two interrupt is enabled */
@@ -115,49 +123,57 @@ struct __pokey_write {
 #define IRQEN_BREAK_KEY                0x80 /* The BREAK key is enabled */
 
 
-/* SKCTL register values */
+/*****************************************************************************/
+/* (W) SKCTL register values                                                 */
+/*****************************************************************************/
 
 #define SKCTL_KEYBOARD_DEBOUNCE 0x01 /* Enable keyboard debounce circuits */
 #define SKCTL_KEYBOARD_SCANNING 0x02 /* Enable keyboard scanning circuit */
 
-#define SKCTL_FAST_POT_SCAN     0x04 /* Fast pot scan */
-/* The pot scan counter completes its sequence in two TV line times instead of 
+/* Fast pot scan
+** The pot scan counter completes its sequence in two TV line times instead of 
 ** one frame time (228 scan lines). Not as accurate as the normal pot scan
 */
+#define SKCTL_FAST_POT_SCAN     0x04
 
-#define SKCTL_TWO_TONE_MODE     0x08 /* POKEY two-tone mode */
-/* Serial output is transmitted as a two-tone signal rather than a logic true/false. */
+/* POKEY two-tone mode
+** Serial output is transmitted as a two-tone signal rather than a logic true/false.
+*/
+#define SKCTL_TWO_TONE_MODE     0x08
+
+/* Force break (serial output to zero) */
+#define SKCTL_FORCE_BREAK       0x80
 
 
 /* Bits 4, 5, and 6 of SKCTL set Serial Mode Control: */
 
-#define SKCTL_SER_MODE_TX_EXT_RX_EXT       0x00
 /* Trans. & Receive rates set by external clock; Also internal clock phase reset to zero. */
+#define SKCTL_SER_MODE_TX_EXT_RX_EXT       0x00
 
-#define SKCTL_SER_MODE_TX_EXT_RX_ASYNC     0x10
 /* Trans. rate set by external clock; Receive asynch. (ch. 4) (CH3 and CH4). */
+#define SKCTL_SER_MODE_TX_EXT_RX_ASYNC     0x10
 
-#define SKCTL_SER_MODE_TX_CH4_RX_CH4_BIDIR 0x20
 /* Trans. & Receive rates set by Chan. 4; Chan. 4 output on Bi-Direct. clock line. */
+#define SKCTL_SER_MODE_TX_CH4_RX_CH4_BIDIR 0x20
 
 /* N.B.: Bit combination 0,1,1 not useful */
 
-#define SKCTL_SER_MODE_TX_CH4_RX_EXT       0x40
 /* Trans. rate set by Chan. 4; Receive rate set by external clock. */
+#define SKCTL_SER_MODE_TX_CH4_RX_EXT       0x40
 
 /* N.B.: Bit combination 1,0,1 not useful */
 
-#define SKCTL_SER_MODE_TX_CH2_RX_CH4_BIDIR 0x60
 /* Trans. rate set by Chan. 2; Receive rate set by Chan. 4; Chan. 4 out on Bi-Direct. clock line. */
+#define SKCTL_SER_MODE_TX_CH2_RX_CH4_BIDIR 0x60
 
-#define SKCTL_SER_MODE_TX_CH4_RX_ASYNC     0x70
 /* Trans. rate set by Chan. 2; Receive asynch. (chan 3 & 4); Bi-Direct. clock not used (tri-state condition). */
+#define SKCTL_SER_MODE_TX_CH4_RX_ASYNC     0x70
 
 
-#define SKCTL_FORCE_BREAK       0x80 /* Force break (serial output to zero) */
+/*****************************************************************************/
+/* Define a structure with the POKEY register offsets for read (R)           */
+/*****************************************************************************/
 
-
-/* Define a structure with the POKEY register offsets for read (R) */
 struct __pokey_read {
     unsigned char   pot0;   /* paddle 0 value */
     unsigned char   pot1;   /* paddle 1 value */
@@ -178,7 +194,10 @@ struct __pokey_read {
 };
 
 
-/* SKSTAT register values */
+/*****************************************************************************/
+/* (R) SKSTAT register values                                                */
+/*****************************************************************************/
+
 #define SKSTAT_SERIN_SHIFTREG_BUSY         0x02 /* Serial input shift register busy */
 #define SKSTAT_LASTKEY_PRESSED             0x04 /* the last key is still pressed */
 #define SKSTAT_SHIFTKEY_PRESSED            0x08 /* the [Shift] key is pressed */
@@ -188,119 +207,13 @@ struct __pokey_read {
 #define SKSTAT_INPUT_FRAMEERROR            0x80 /* Serial data input frame error caused by missing or extra bits. Reset latches as above. */          
 
 
-/* KBCODE internal keyboard codes for Atari 8-bit computers*/
-
-/* Defined below in the order the keys appear on a 1200XL keyboard,
-** from top left to bottom right.
-** Note: Numerous Shift+Ctrl+key combos are unavailable.
-** (Source: "Compute!'s Thrid Book of Atari", "Reading the Keyboard Codes")
+/* KBCODE, internal keyboard codes for Atari 8-bit computers,
+** are #defined as "KEY_..." in "atari.h".
+** Note some keys are not read via KBCODE:
+** - Reset
+** - Start, Select, and Option; see CONSOL in "gtia.h"
+** - Break
 */
-
-#define KEYCODE_NONE      255 /* No key pressed (but also Ctrl+Shift+A) */
-
-
-/* Special keys: */
-
-/* N.B. Reset key not handled like other keys */
-
-/* N.B. Select, Start, and Option console keys not handled like other keys;
-** see CONSOL register in GTIA
-*/
-
-/* Fn (function) keys only available on 1200XL */
-#define KEYCODE_F1        3
-#define KEYCODE_F2        4
-#define KEYCODE_F3        19
-#define KEYCODE_F4        20
-
-/* HELP key only available on XL/XE series */
-#define KEYCODE_HELP      17
-
-/* N.B. Break key not handled like other keys */
-
-
-/* Keyboard top row */
-
-#define KEYCODE_ESC       28
-#define KEYCODE_1         31
-#define KEYCODE_2         30
-#define KEYCODE_3         26
-#define KEYCODE_4         24
-#define KEYCODE_5         29
-#define KEYCODE_6         27
-#define KEYCODE_7         51
-#define KEYCODE_8         53
-#define KEYCODE_9         48
-#define KEYCODE_0         50
-#define KEYCODE_LT        54
-#define KEYCODE_GT        55
-#define KEYCODE_BKSPC     52
-
-
-/* Keyboard second row */
-
-#define KEYCODE_TAB       44
-#define KEYCODE_Q         47
-#define KEYCODE_W         46
-#define KEYCODE_E         42
-#define KEYCODE_R         40
-#define KEYCODE_T         45
-#define KEYCODE_Y         43
-#define KEYCODE_U         11
-#define KEYCODE_I         13
-#define KEYCODE_O         8
-#define KEYCODE_P         10
-#define KEYCODE_MINUS     14
-#define KEYCODE_EQUALS    15
-#define KEYCODE_RETURN    12
-
-
-/* Keyboard third row */
-
-#define KEYCODE_CTRL      128 /* binary OR'd */
-/* N.B. Cannot read Ctrl key alone */
-
-#define KEYCODE_A         63
-#define KEYCODE_S         62
-#define KEYCODE_D         58
-#define KEYCODE_F         56
-#define KEYCODE_G         61
-#define KEYCODE_H         57
-#define KEYCODE_J         1
-#define KEYCODE_K         5
-#define KEYCODE_L         0
-#define KEYCODE_SEMICOLON 2
-#define KEYCODE_PLUS      6
-#define KEYCODE_ASTERISK  7
-#define KEYCODE_CAPS      60
-
-
-/* Keyboard bottom row */
-
-#define KEYCODE_SHIFT     64 /* binary OR'd */
-/* N.B. Cannot read Shift key alone via KBCODE;
-** instead, check "Shfit key press" bit of SKSTAT register
-*/
-
-#define KEYCODE_Z         23
-#define KEYCODE_X         22
-#define KEYCODE_C         18
-#define KEYCODE_V         16
-#define KEYCODE_B         21
-#define KEYCODE_N         35
-#define KEYCODE_M         37
-#define KEYCODE_COMMA     32
-#define KEYCODE_PERIOD    34
-#define KEYCODE_SLASH     38
-#define KEYCODE_FUJI      39 /* (as seen on 400/800) */
-#define KEYCODE_INVERSE   39 /* (alternative name; as seen on XL/XE) */
-
-/* N.B. No way to tell left from right Shift keys */
-
-
-/* Keyboard Space key */
-
-#define KEYCODE_SPACE     33
 
 
 /* End of _pokey.h */

@@ -7,11 +7,11 @@
 /* The Peripheral Interface Adapter (PIA) chip provides parallel I/O         */
 /* interfacing; it was used in Atari 400/800 and Commodore PET family of     */
 /* computers, for joystick and interrupts.                                   */
-/* - Sources; various + Wikpedia article on "Peripheral Interface Adapter"   */
+/* Sources; various + Wikpedia article on "Peripheral Interface Adapter".    */
 /*                                                                           */
 /*                                                                           */
 /* (C) 2000 Freddy Offenga <taf_offenga@yahoo.com>                           */
-/* 2019-01-14: Bill Kendrick <nbs@sonic.net>: Defines for registers          */
+/* 2019-01-16: Bill Kendrick <nbs@sonic.net>: Defines for registers          */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -48,7 +48,9 @@ struct __pia {
 };
 
 
-/* PORTA and PORTB register bits */
+/*****************************************************************************/
+/* PORTA and PORTB register bits                                             */
+/*****************************************************************************/
 
 /* See also: "JOY_xxx_MASK" in "atari.h" */
 
@@ -72,23 +74,23 @@ struct __pia {
 ** LED control (1200XL model only) register (read/write):
 */
 
-#define PORTB_OSROM            0x01
 /* If set, the built-in OS is enabled, and occupies the address range $C000-$FFFF
 ** (except that the area $D000-$D7FF will only access the hardware registers.)
 ** If clear, RAM is enabled in this area (again, save for the hole.)
 */
+#define PORTB_OSROM            0x01
 
-#define PORTB_BASICROM         0x02
 /* If set, RAM is enabled for the address range $A000-$BFFF.
 ** If clear, the built-in BASIC ROM is enabled at this address.
 ** And if there is a cartridge installed in the computer, it makes no difference.
 */
+#define PORTB_BASICROM         0x02
 
-#define PORTB_LED1             0x04
-#define PORTB_LED2             0x08
 /* If set, the corresponding LED is turned off. If clear, the LED will be on.
 ** (1200XL only)
 */
+#define PORTB_LED1             0x04
+#define PORTB_LED2             0x08
 
 
 /* On the XE series of computers, PORTB is a bank-selected memory control register (read/write): */
@@ -101,49 +103,59 @@ struct __pia {
 #define PORTB_BANKSELECT3      0x08
 #define PORTB_BANKSELECT4      0x0C
 
-
-#define PORTB_BANKSWITCH_CPU   0x10
-#define PORTB_BANKSWITCH_ANTIC 0x20
 /* If set, the CPU and/or ANTIC chip will access bank-switched memory mapped to the
 ** address range $4000-$7FFF.
 ** If clear, the CPU and/or ANTIC will see normal memory in this region.
 */
+#define PORTB_BANKSWITCH_CPU   0x10
+#define PORTB_BANKSWITCH_ANTIC 0x20
 
-
-#define PORTB_SELFTEST         0x80
 /* If set, RAM is enabled for the address range $5000-$57FF.
 ** If clear, the self-test ROM (physically located at $D000-$D7FF, under the hardware registers)
 ** is remapped to this memory area.
 */
+#define PORTB_SELFTEST         0x80
 
 
-/* PACTL and PBCTL register bits */
+/*****************************************************************************/
+/* PACTL and PBCTL register bits                                             */
+/*****************************************************************************/
 
-#define PxCTL_IRQ_ENABLE       0x01 /* (W) Peripheral A interrupt (IRQ) enable. */
-/* One equals enable. Set by the OS but available to the user; reset on powerup. */
+/* (W) Peripheral A interrupt (IRQ) enable.
+** One equals enable. Set by the OS but available to the user; reset on powerup.
+*/
+#define PxCTL_IRQ_ENABLE       0x01
 
-#define PxCTL_BIT1             0x02 /* "Set to zero" */
+/* "Set to zero" */
+#define PxCTL_BIT1             0x02
 
-#define PxCTL_ADDRESSING       0x04 /* (W) Controls PORTA addressing */
-/* One equals PORTA register; zero equals direction control register */
+/* (W) Controls PORTA addressing
+** One equals PORTA register; zero equals direction control register
+*/
+#define PxCTL_ADDRESSING       0x04
 
 #define PxCTL_BIT4             0x10 /* "Set to one" */
 #define PxCTL_BIT5             0x20 /* "Set to one" */
 #define PxCTL_BIT6             0x40 /* "Set to zero" */
-#define PxCTL_IRQ_STATUS       0x80 /* Peripheral interrupt (IRQ) status bit. */
-/* Set by Peripherals (PORTA / PORTB). Reset by reading PORTA / PORTB. */
+
+/* Peripheral interrupt (IRQ) status bit.
+** Set by Peripherals (PORTA / PORTB). Reset by reading PORTA / PORTB.
+*/
+#define PxCTL_IRQ_STATUS       0x80
 
 
 /* PACTL-specific register bit */
 
-#define PACTL_MOTOR_CONTROL    0x08 /* (W) Peripheral motor control line */
-/* Turn the cassette on or off; zero equals on) */
+/* (W) Peripheral motor control line
+** Turn the cassette on or off; zero equals on)
+*/
+#define PACTL_MOTOR_CONTROL    0x08
 
 
 /* PBCTL-specific register bit */
 
-#define PBCTL_PERIPH_CMD_IDENT 0x08 /* Peripheral command identification (serial bus command) */
-
+/* Peripheral command identification (serial bus command) */
+#define PBCTL_PERIPH_CMD_IDENT 0x08
 
 
 /* End of _pia.h */

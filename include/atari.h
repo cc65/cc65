@@ -6,9 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2018 Mark Keates <markk@dendrite.co.uk>                          */
+/* (C) 2000-2019 Mark Keates <markk@dendrite.co.uk>                          */
 /*               Freddy Offenga <taf_offenga@yahoo.com>                      */
 /*               Christian Groessler <chris@groessler.org>                   */
+/*               Bill Kendrick <nbs@sonic.net>                               */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -44,7 +45,10 @@
 
 
 
-/* Character codes */
+/*****************************************************************************/
+/* Character codes                                                           */
+/*****************************************************************************/
+
 #define CH_DELCHR       0xFE   /* delete char under the cursor */
 #define CH_ENTER        0x9B
 #define CH_ESC          0x1B
@@ -87,7 +91,9 @@
 #define CH_VLINE        0x7C
 
 
-/* Color definitions */
+/*****************************************************************************/
+/* Color definitions                                                         */
+/*****************************************************************************/
 
 /* Make a GTIA color value */
 #define _gtia_mkcolor(hue,lum) (((hue) << 4) | ((lum) << 1))
@@ -155,7 +161,11 @@
 #define TGI_COLOR_LIGHTBLUE     COLOR_LIGHTBLUE
 #define TGI_COLOR_GRAY3         COLOR_GRAY3
 
-/* Masks for joy_read */
+
+/*****************************************************************************/
+/* Masks for joy_read                                                        */
+/*****************************************************************************/
+
 #define JOY_UP_MASK     0x01
 #define JOY_DOWN_MASK   0x02
 #define JOY_LEFT_MASK   0x04
@@ -165,7 +175,11 @@
 #define JOY_FIRE_MASK   JOY_BTN_1_MASK
 #define JOY_FIRE(v)     ((v) & JOY_FIRE_MASK)
 
-/* Keyboard values returned by kbcode / CH */
+
+/*****************************************************************************/
+/* Keyboard values returned by kbcode / CH                                   */
+/*****************************************************************************/
+
 #define KEY_NONE        ((unsigned char) 0xFF)
 
 #define KEY_0           ((unsigned char) 0x32)
@@ -226,15 +240,26 @@
 #define KEY_INVERSE     ((unsigned char) 0x27)
 #define KEY_HELP        ((unsigned char) 0x11)
 
+/* Function keys only exist on the 1200XL model. */
 #define KEY_F1          ((unsigned char) 0x03)
 #define KEY_F2          ((unsigned char) 0x04)
 #define KEY_F3          ((unsigned char) 0x13)
 #define KEY_F4          ((unsigned char) 0x14)
 
+/* N.B. Cannot read Ctrl key alone */
 #define KEY_CTRL        ((unsigned char) 0x80)
+
+/* N.B. Cannot read Shift key alone via KBCODE;
+** instead, check "Shfit key press" bit of SKSTAT register.
+** Also, no way to tell left Shift from right Shift.
+*/
 #define KEY_SHIFT       ((unsigned char) 0x40)
 
-/* Composed keys */
+
+/* Composed keys
+** (Other combinations are possible, including Shift+Ctrl+key,
+** though not all such combinations are available.)
+*/
 
 #define KEY_EXCLAMATIONMARK     (KEY_1 | KEY_SHIFT)
 #define KEY_QUOTE               (KEY_2 | KEY_SHIFT)
@@ -262,18 +287,29 @@
 #define KEY_LEFT    (KEY_PLUS | KEY_CTRL)
 #define KEY_RIGHT   (KEY_ASTERISK | KEY_CTRL)
 
-/* Color register functions */
+
+/*****************************************************************************/
+/* Color register functions                                                  */
+/*****************************************************************************/
+
 extern void __fastcall__ _setcolor     (unsigned char color_reg, unsigned char hue, unsigned char luminace);
 extern void __fastcall__ _setcolor_low (unsigned char color_reg, unsigned char color_value);
 extern unsigned char __fastcall__ _getcolor (unsigned char color_reg);
 
-/* Other screen functions */
+/*****************************************************************************/
+/* Other screen functions                                                    */
+/*****************************************************************************/
+
 extern int  __fastcall__ _graphics (unsigned char mode); /* mode value same as in BASIC */
 extern void __fastcall__ _scroll (signed char numlines);
                                           /* numlines > 0  scrolls up */
                                           /* numlines < 0  scrolls down */
 
-/* Misc. functions */
+
+/*****************************************************************************/
+/* Misc. functions                                                           */
+/*****************************************************************************/
+
 extern unsigned char get_ostype(void);       /* get ROM version */
 extern unsigned char get_tv(void);           /* get TV system */
 extern void _save_vecs(void);                /* save system vectors */
@@ -281,7 +317,11 @@ extern void _rest_vecs(void);                /* restore system vectors */
 extern char *_getdefdev(void);               /* get default floppy device */
 extern unsigned char _is_cmdline_dos(void);  /* does DOS support command lines */
 
-/* Global variables */
+
+/*****************************************************************************/
+/* Global variables                                                          */
+/*****************************************************************************/
+
 extern unsigned char _dos_type;         /* the DOS flavour */
 #ifndef __ATARIXL__
 extern void atr130_emd[];
@@ -335,7 +375,11 @@ extern void atrx15_tgi[];
 extern void atrx15p2_tgi[];
 #endif
 
-/* get_ostype return value defines (for explanation, see ostype.s) */
+
+/*****************************************************************************/
+/* get_ostype return value defines (for explanation, see ostype.s)           */
+/*****************************************************************************/
+
 /* masks */
 #define AT_OS_TYPE_MAIN  7
 #define AT_OS_TYPE_MINOR (7 << 3)
@@ -358,11 +402,19 @@ extern void atrx15p2_tgi[];
 #define AT_OS_XLXE_3   3
 #define AT_OS_XLXE_4   4
 
-/* get_tv return values */
+
+/*****************************************************************************/
+/* get_tv return values                                                      */
+/*****************************************************************************/
+
 #define AT_NTSC     0
 #define AT_PAL      1
 
-/* valid _dos_type values */
+
+/*****************************************************************************/
+/* valid _dos_type values                                                    */
+/*****************************************************************************/
+
 #define SPARTADOS   0
 #define REALDOS     1
 #define BWDOS       2
@@ -372,7 +424,11 @@ extern void atrx15p2_tgi[];
 #define MYDOS       6
 #define NODOS       255
 
-/* Define hardware */
+
+/*****************************************************************************/
+/* Define hardware and where they're mapped in memory                        */
+/*****************************************************************************/
+
 #include <_gtia.h>
 #define GTIA_READ  (*(struct __gtia_read*)0xD000)
 #define GTIA_WRITE (*(struct __gtia_write*)0xD000)
@@ -389,7 +445,11 @@ extern void atrx15p2_tgi[];
 #include <_antic.h>
 #define ANTIC (*(struct __antic*)0xD400)
 
-/* device control block */
+
+/*****************************************************************************/
+/* Device control block                                                      */
+/*****************************************************************************/
+
 struct __dcb {
     unsigned char device;     /* device id */
     unsigned char unit;       /* unit number */
@@ -404,7 +464,11 @@ struct __dcb {
 };
 #define DCB (*(struct __dcb *)0x300)
 
-/* I/O control block */
+
+/*****************************************************************************/
+/* I/O control block                                                         */
+/*****************************************************************************/
+
 struct __iocb {
     unsigned char handler;    /* handler index number (0xff free) */
     unsigned char drive;      /* device number (drive) */

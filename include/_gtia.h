@@ -13,7 +13,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2000 Freddy Offenga <taf_offenga@yahoo.com>                           */
-/* 2019-01-14: Bill Kendrick <nbs@sonic.net>: More defines for registers     */
+/* 2019-01-16: Bill Kendrick <nbs@sonic.net>: More defines for registers     */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -39,7 +39,10 @@
 #ifndef __GTIA_H
 #define __GTIA_H
 
-/* Define a structure with the GTIA register offsets for write (W) */
+/*****************************************************************************/
+/* Define a structure with the GTIA register offsets for write (W)           */
+/*****************************************************************************/
+
 struct __gtia_write {
     unsigned char   hposp0; /* 0x00: horizontal position of player 0 */
     unsigned char   hposp1; /* 0x01: horizontal position of player 1 */
@@ -86,7 +89,10 @@ struct __gtia_write {
 };
 
 
-/* Values for SIZEP0-SIZEP3 and SIZEM registers: */
+/*****************************************************************************/
+/* (W) Values for SIZEP0-SIZEP3 and SIZEM registers:                         */
+/*****************************************************************************/
+
 #define PMG_SIZE_NORMAL 0x0 /* one color clock per pixel */
 #define PMG_SIZE_DOUBLE 0x1 /* two color clocks per pixel */
 #define PMG_SIZE_QUAD   0x2 /* four color clocks per pixel */
@@ -97,7 +103,10 @@ struct __gtia_write {
 ** Bitwise OR (|) with 0x00 (darkest) through 0x0F (lightest) (only even values are unique)
 */
 
-/* PRIOR register values */
+
+/*****************************************************************************/
+/* (W) PRIOR register values                                                 */
+/*****************************************************************************/
 
 #define PRIOR_P03_PF03          0x01 /* Players 0-3, then Playfields 0-3, then background */
 #define PRIOR_P01_PF03_P23      0x02 /* Players 0-1, then Playfields 0-3, then Players 2-3, then background */
@@ -106,35 +115,41 @@ struct __gtia_write {
 
 #define PRIOR_5TH_PLAYER        0x10 /* Four missiles combine to be a 5th player (uses COLPF3) */
 
-#define PRIOR_OVERLAP_3RD_COLOR 0x20 /* Overlap of players result in a 3rd color */
-/* Overlap of players 0 & 1 and of players 2 & 3 results in a third color,
-** the logical OR of the two players' colors;
-** Other overlaps (e.g., players 0 and 2) result in black (0x00).
+/* Causes overlap of players 0 & 1 and of players 2 & 3 to result in a third color,
+** the logical OR of the two players' colors, and other overlaps (e.g., players 0 and 2)
+** to result in black (0x00).
 */
+#define PRIOR_OVERLAP_3RD_COLOR 0x20
 
-/* GTIA special graphics mode options */
+
+/*****************************************************************************/
+/* (W) GTIA special graphics mode options for GPRIOR                         */
+/*****************************************************************************/
+
 /* Pixels are 2 color clocks wide, and one scanline tall
 ** (so 80x192 in normal playfield width).
 ** May be used with both bitmap and character modelines.
 */
 
-#define PRIOR_GFX_MODE_9        0x40
 /* 16 shade shades of the background (COLBK) hue;
 ** Note: brightnesses other than 0 (darkest) in COLBK cause additional effects
 */
+#define PRIOR_GFX_MODE_9        0x40
 
-#define PRIOR_GFX_MODE_10       0x80
 /* 9 color palette mode;
 ** COLPM0 (acts as background) thru COLPM3, followed by COLPF0 thru COLPF3, and COLBK
 */
+#define PRIOR_GFX_MODE_10       0x80
 
-#define PRIOR_GFX_MODE_11       0xC0
 /* 16 hues of the background (COLBK) brightness;
 ** Note: hues other than 0 (greys) in COLBK caus additional effects
 */
+#define PRIOR_GFX_MODE_11       0xC0
 
 
-/* VDELAY register values */
+/*****************************************************************************/
+/* (W) VDELAY register values                                                */
+/*****************************************************************************/
 
 #define VDELAY_MISSILE0 0x01
 #define VDELAY_MISSILE1 0x02
@@ -146,18 +161,23 @@ struct __gtia_write {
 #define VDELAY_PLAYER3  0x80
 
 
-/* GRACTL register values */
+/*****************************************************************************/
+/* (W) GRACTL register values                                                */
+/*****************************************************************************/
 
 #define GRACTL_MISSLES              0x01 /* enable missiles */
 #define GRACTL_PLAYERS              0x02 /* enable players */
 
-#define GRACTL_LATCH_TRIGGER_INPUTS 0x04
 /* "Latch" triggers; once pressed, will give a continuous
 ** pressed input until this bit is cleared
 */
+#define GRACTL_LATCH_TRIGGER_INPUTS 0x04
 
 
-/* Define a structure with the GTIA register offsets for read (R) */
+/*****************************************************************************/
+/* Define a structure with the GTIA register offsets for read (R)            */
+/*****************************************************************************/
+
 struct __gtia_read {
     unsigned char   m0pf;       /* 0x00: missile 0 to playfield collision */
     unsigned char   m1pf;       /* 0x01: missile 1 to playfield collision */
@@ -189,15 +209,22 @@ struct __gtia_read {
 };
 
 
-/* PAL register possible values */
+/*****************************************************************************/
+/* (R) PAL register possible values                                          */
+/*****************************************************************************/
+
+/* Note: This only tells you whether the GTIA is PAL or NTSC; some NTSC
+** systems are modded with PAL ANTIC chips; testing VCOUNT limits can be
+** done to check for that.  Seems like it's not possible to test for SECAM
+*/
 
 #define TV_STD_PAL  0x1
 #define TV_STD_NTSC 0xE
-/* Note: This only tells you whether the GTIA is PAL or NTSC; some NTSC systems are modded with PAL ANTIC chips; testing VCOUNT limits can be done to check for that */
-/* Note: Seems like it's not possible to test for SECAM */
 
 
-/* Reading console keys (Start, Select, Option) via CONSOL register: */
+/*****************************************************************************/
+/* Macros for reading console keys (Start/Select/Option) via CONSOL register */
+/*****************************************************************************/
 
 #define CONSOL_START(x)     !((unsigned char)((x) & 1)) /* true if Start pressed */
 #define CONSOL_SELECT(x)    !((unsigned char)((x) & 2)) /* true if Select pressed */

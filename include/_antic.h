@@ -64,10 +64,15 @@ struct __antic {
     unsigned char   penh;   /* (R) light pen horizontal position */
     unsigned char   penv;   /* (R) light pen vertical position */
     unsigned char   nmien;  /* (W) non-maskable interrupt enable */
-    unsigned char   nmires;
-    /* (W) ("NMIRES") nmi reset -- clears the interrupt request register; resets all of the NMI status together
-    ** (R) ("NMIST") nmi status -- holds cause for the NMI interrupt
-    */
+    union {
+        /* (W) ("NMIRES") nmi reset -- clears the interrupt request register;
+        ** resets all of the NMI status together
+        */
+        unsigned char   nmires;
+
+        /* (R) ("NMIST") nmi status -- holds cause for the NMI interrupt */
+        unsigned char   nmist;
+    };
 };
 
 

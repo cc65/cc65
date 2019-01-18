@@ -46,47 +46,6 @@
 /* the addresses of the static drivers */
 extern void atr5200std_joy[];        /* referred to by joy_static_stddrv[] */
 
-/* make GTIA color value */
-#define _gtia_mkcolor(hue,lum) (((hue) << 4) | ((lum) << 1))
-
-/* luminance values go from 0 (black) to 7 (white) */
-
-/* hue values */
-#define HUE_GREY        0
-#define HUE_GOLD        1
-#define HUE_GOLDORANGE  2
-#define HUE_REDORANGE   3
-#define HUE_ORANGE      4
-#define HUE_MAGENTA     5
-#define HUE_PURPLE      6
-#define HUE_BLUE        7
-#define HUE_BLUE2       8
-#define HUE_CYAN        9
-#define HUE_BLUEGREEN   10
-#define HUE_BLUEGREEN2  11
-#define HUE_GREEN       12
-#define HUE_YELLOWGREEN 13
-#define HUE_YELLOW      14
-#define HUE_YELLOWRED   15
-
-/* Color defines, similar to c64 colors (untested) */
-#define COLOR_BLACK             _gtia_mkcolor(HUE_GREY,0)
-#define COLOR_WHITE             _gtia_mkcolor(HUE_GREY,7)
-#define COLOR_RED               _gtia_mkcolor(HUE_REDORANGE,1)
-#define COLOR_CYAN              _gtia_mkcolor(HUE_CYAN,3)
-#define COLOR_VIOLET            _gtia_mkcolor(HUE_PURPLE,4)
-#define COLOR_GREEN             _gtia_mkcolor(HUE_GREEN,2)
-#define COLOR_BLUE              _gtia_mkcolor(HUE_BLUE,2)
-#define COLOR_YELLOW            _gtia_mkcolor(HUE_YELLOW,7)
-#define COLOR_ORANGE            _gtia_mkcolor(HUE_ORANGE,5)
-#define COLOR_BROWN             _gtia_mkcolor(HUE_YELLOW,2)
-#define COLOR_LIGHTRED          _gtia_mkcolor(HUE_REDORANGE,6)
-#define COLOR_GRAY1             _gtia_mkcolor(HUE_GREY,2)
-#define COLOR_GRAY2             _gtia_mkcolor(HUE_GREY,3)
-#define COLOR_LIGHTGREEN        _gtia_mkcolor(HUE_GREEN,6)
-#define COLOR_LIGHTBLUE         _gtia_mkcolor(HUE_BLUE,6)
-#define COLOR_GRAY3             _gtia_mkcolor(HUE_GREY,5)
-
 /* Masks for joy_read */
 #define JOY_UP_MASK     0x01
 #define JOY_DOWN_MASK   0x02

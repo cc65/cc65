@@ -4,14 +4,14 @@
 /*                                                                           */
 /*                Internal include file, do not use directly                 */
 /*                                                                           */
-/* The Peripheral Interface Adapter (PIA) chip provides parallel I/O         */
-/* interfacing; it was used in Atari 400/800 and Commodore PET family of     */
-/* computers, for joystick and interrupts.                                   */
+/* The Peripheral Interface Adapter (PIA) chip (a 6520 or 6820) provides     */
+/* parallel I/O interfacing; it was used in Atari 400/800 and Commodore PET  */
+/* family of computers, for joystick and some interrupts.                    */
 /* Sources; various + Wikpedia article on "Peripheral Interface Adapter".    */
 /*                                                                           */
 /*                                                                           */
 /* (C) 2000 Freddy Offenga <taf_offenga@yahoo.com>                           */
-/* 2019-01-16: Bill Kendrick <nbs@sonic.net>: Defines for registers          */
+/* 2019-01-17: Bill Kendrick <nbs@sonic.net>: Defines for registers          */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -121,41 +121,45 @@ struct __pia {
 /* PACTL and PBCTL register bits                                             */
 /*****************************************************************************/
 
-/* (W) Peripheral A interrupt (IRQ) enable.
+/* (W) Peripheral PA1/PB1 interrupt (IRQ) ("peripheral proceed line available") enable.
 ** One equals enable. Set by the OS but available to the user; reset on powerup.
+** (PxCTL_IRQ_STATUS (R) bit will get set upon interrupt occurance)
 */
-#define PxCTL_IRQ_ENABLE       0x01
+#define PxCTL_IRQ_ENABLE         0x01 /* bit 0 */
 
-/* "Set to zero" */
-#define PxCTL_BIT1             0x02
+/* Note: Bit 1 is always set to */
 
-/* (W) Controls PORTA addressing
-** One equals PORTA register; zero equals direction control register
+/* (W) Controls PORTA/PORTB addressing
+** 1 = PORTA/PORTB register; read/write to controller port
+** 0 = direction control register; write to direction controls
+**     (allows setting data flow; write 0s & 1s to PORTA/PORTB bits
+**     to set which port's pins are read (input), or write (output),
+**     respectively)
 */
-#define PxCTL_ADDRESSING       0x04
+#define PxCTL_ADDRESSING         0x04 /* bit 2 */
 
-#define PxCTL_BIT4             0x10 /* "Set to one" */
-#define PxCTL_BIT5             0x20 /* "Set to one" */
-#define PxCTL_BIT6             0x40 /* "Set to zero" */
-
-/* Peripheral interrupt (IRQ) status bit.
-** Set by Peripherals (PORTA / PORTB). Reset by reading PORTA / PORTB.
+/* (W) Peripheral motor control line; Turn the cassette on or off
+** (PACTL-specific register bit)
+** 0 = on
+** 1 = off
 */
-#define PxCTL_IRQ_STATUS       0x80
+#define PACTL_MOTOR_CONTROL      0x08 /* bit 3 */
 
-
-/* PACTL-specific register bit */
-
-/* (W) Peripheral motor control line
-** Turn the cassette on or off; zero equals on)
+/* Peripheral command identification (serial bus command line)
+** (PBCTL-specific register bit)
 */
-#define PACTL_MOTOR_CONTROL    0x08
+#define PBCTL_PERIPH_CMD_IDENT   0x08 /* bit 3 */
 
+/* Note: Bits 4 & 5 are always set to 1 */
 
-/* PBCTL-specific register bit */
+/* Note: Bit 6 is always set to 0 */
 
-/* Peripheral command identification (serial bus command) */
-#define PBCTL_PERIPH_CMD_IDENT 0x08
+/* (R) Peripheral interrupt (IRQ) status bit.
+** Set by Peripherals (PORTA / PORTB).  Reset by reading from PORTA / PORTB.
+** PACTL's is interrupt status of PROCEED
+** PBCTL's is interrupt status of SIO
+*/
+#define PxCTL_IRQ_STATUS         0x80
 
 
 /* End of _pia.h */

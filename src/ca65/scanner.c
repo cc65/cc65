@@ -794,6 +794,43 @@ static void ReadStringConst (int StringTerm)
             break;
         }
 
+        if (C == '\\' && StringEscapes) {
+            NextChar ();
+
+            switch (C) {
+                case EOF:
+                    Error ("Unterminated escape sequence in string constant");
+                    break;
+                case '\\':
+                case '\'':
+                case '"':
+                    break;
+                case 't':
+                    C = '\x09';
+                    break;
+                case 'r':
+                    C = '\x0D';
+                    break;
+                case 'n':
+                    C = '\x0A';
+                    break;
+                case 'x':
+                    NextChar ();
+                    if (IsXDigit (C)) {
+                        char high_nibble = DigitVal (C) << 4;
+                        NextChar ();
+                        if (IsXDigit (C)) {
+                            C = high_nibble | DigitVal (C);
+                            break;
+                        }
+                    }
+                    /* otherwise, fall through */
+                default:
+                    Error ("Unsupported escape sequence in string constant");
+                    break;
+            }
+        }
+
         /* Append the char to the string */
         SB_AppendChar (&CurTok.SVal, C);
 

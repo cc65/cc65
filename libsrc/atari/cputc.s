@@ -1,5 +1,5 @@
 ;
-; Mark Keates, Christian Groessler
+; Mark Keates, Christian Groessler, Piotr Fusik
 ;
 ; void cputcxy (unsigned char x, unsigned char y, char c);
 ; void cputc (char c);
@@ -30,16 +30,13 @@ L4:     cmp     #$0A            ; LF
         cmp     #ATEOL          ; Atari-EOL?
         beq     newline
 
-        tay
-        rol     a
-        rol     a
-        rol     a
-        rol     a
-        and     #3
-        tax
-        tya
-        and     #$9f
-        ora     ataint,x
+        asl     a
+        adc     #$c0
+        bpl     intok
+        eor     #$40
+intok:  lsr
+        bcc     cputdirect
+        eor     #$80
 
 cputdirect:                     ; accepts screen code
         jsr     putchar
@@ -89,6 +86,3 @@ putchar:
         ldy     COLCRS
         sta     (ptr4),y
         jmp     setcursor
-
-        .rodata
-ataint: .byte   64,0,32,96

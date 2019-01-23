@@ -30,13 +30,13 @@ L4:     cmp     #$0A            ; LF
         cmp     #ATEOL          ; Atari-EOL?
         beq     newline
 
-        asl     a
-        adc     #$c0
-        bpl     intok
-        eor     #$40
-intok:  lsr
+        asl     a               ; shift out the inverse bit
+        adc     #$c0            ; grab the inverse bit; convert ATASCII to screen code
+        bpl     codeok          ; screen code ok?
+        eor     #$40            ; needs correction
+codeok: lsr     a               ; undo the shift
         bcc     cputdirect
-        eor     #$80
+        eor     #$80            ; restore the inverse bit
 
 cputdirect:                     ; accepts screen code
         jsr     putchar

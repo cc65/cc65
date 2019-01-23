@@ -78,12 +78,12 @@ void LoadCode (void)
     /* Open the file */
     F = fopen (InFile, "rb");
     if (F == 0) {
-        Error ("Cannot open `%s': %s", InFile, strerror (errno));
+        Error ("Cannot open '%s': %s", InFile, strerror (errno));
     }
 
     /* Seek to the end to get the size of the file */
     if (fseek (F, 0, SEEK_END) != 0) {
-        Error ("Cannot seek on file `%s': %s", InFile, strerror (errno));
+        Error ("Cannot seek on file '%s': %s", InFile, strerror (errno));
     }
     Size = ftell (F);
 
@@ -101,7 +101,7 @@ void LoadCode (void)
     ** the file.
     */
     if (fseek (F, InputOffs, SEEK_SET) != 0) {
-        Error ("Cannot seek on file `%s': %s", InFile, strerror (errno));
+        Error ("Cannot seek on file '%s': %s", InFile, strerror (errno));
     }
     Size -= InputOffs;
 
@@ -130,10 +130,10 @@ void LoadCode (void)
 
     /* Check if the size is larger than what we can read */
     if (Size == 0) {
-        Error ("Nothing to read from input file `%s'", InFile);
+        Error ("Nothing to read from input file '%s'", InFile);
     }
     if (Size > MaxCount) {
-        Warning ("File `%s' is too large, ignoring %ld bytes",
+        Warning ("File '%s' is too large, ignoring %ld bytes",
                  InFile, Size - MaxCount);
     } else if (MaxCount > Size) {
         MaxCount = (unsigned) Size;
@@ -142,7 +142,7 @@ void LoadCode (void)
     /* Read from the file and remember the number of bytes read */
     Count = fread (CodeBuf + StartAddr, 1, MaxCount, F);
     if (ferror (F) || Count != MaxCount) {
-        Error ("Error reading from `%s': %s", InFile, strerror (errno));
+        Error ("Error reading from '%s': %s", InFile, strerror (errno));
     }
 
     /* Close the file */

@@ -54,7 +54,7 @@ unsigned HexVal (int C)
 */
 {
     if (!IsXDigit (C)) {
-        Error ("Invalid hexadecimal digit: `%c'", C);
+        Error ("Invalid hexadecimal digit: '%c'", C);
     }
     if (IsDigit (C)) {
         return C - '0';

@@ -617,7 +617,7 @@ int main (int argc, char* argv [])
         } else {
             /* Filename. Check if we already had one */
             if (InFile) {
-                fprintf (stderr, "%s: Don't know what to do with `%s'\n",
+                fprintf (stderr, "%s: Don't know what to do with '%s'\n",
                          ProgName, Arg);
                 exit (EXIT_FAILURE);
             } else {

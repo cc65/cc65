@@ -188,6 +188,14 @@ are covered by new names, but I tried to keep them in the naming convention.
 <p>
 This section covers the drawing package of GEOS along with text output routines.
 
+<sect2>SetNewMode
+<p>
+<tt/void SetNewMode (void)/
+<p>
+This function is intended for use by GEOS 128 only, and will exhibit undefined behavior on the
+C64.  It will toggle between the 40 column screen mode and the 80 column screen mode.  Many C128 GEOS
+programs implement a "Switch 40/80" submenu option under the <tt/geos/ menu.
+
 <sect2>SetPattern
 <p>
 <tt/void SetPattern (char pattern)/
@@ -1553,7 +1561,7 @@ char text = "foo";
 	DB_VARSTR (TXT_LN_X, TXT_LN_1_Y, &amp;r15),
 	...
 </verb></tscreen>
-will cause the word ``foo'' to appear in the window, but you may store the pointer to any text in
+will cause the word ''foo'' to appear in the window, but you may store the pointer to any text in
 <tt/r15/ (in this case) before the call to DoDlgBox.
 <p>
 <tt/DB_GETSTR(x, y, ptr, length)/ - will add a input-from-keyboard feature. <tt/ptr/ works as in the

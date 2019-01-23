@@ -392,7 +392,7 @@ int main (int argc, char* argv [])
             }
         } else {
             /* We don't accept anything else */
-            AbEnd ("Don't know what to do with `%s'", Arg);
+            AbEnd ("Don't know what to do with '%s'", Arg);
         }
 
         /* Next argument */

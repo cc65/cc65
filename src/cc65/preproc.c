@@ -304,7 +304,7 @@ static void OldStyleComment (void)
             }
         } else {
             if (CurC == '/' && NextC == '*') {
-                PPWarning ("`/*' found inside a comment");
+                PPWarning ("'/*' found inside a comment");
             }
             NextChar ();
         }
@@ -491,7 +491,7 @@ static void ReadMacroArgs (MacroExp* E)
             NewStyleComment ();
         } else if (CurC == '\0') {
             /* End of input inside macro argument list */
-            PPError ("Unterminated argument list invoking macro `%s'", E->M->Name);
+            PPError ("Unterminated argument list invoking macro '%s'", E->M->Name);
 
             ClearLine ();
             break;
@@ -611,7 +611,7 @@ static void MacroArgSubst (MacroExp* E)
             NextChar ();
             SkipWhitespace (0);
             if (!IsSym (Ident) || (ArgIdx = FindMacroArg (E->M, Ident)) < 0) {
-                PPError ("`#' is not followed by a macro parameter");
+                PPError ("'#' is not followed by a macro parameter");
             } else {
                 /* Make a valid string from Replacement */
                 Arg = ME_GetActual (E, ArgIdx);
@@ -782,7 +782,7 @@ static void DefineMacro (void)
                 /* Ellipsis */
                 NextChar ();
                 if (CurC != '.' || NextC != '.') {
-                    PPError ("`...' expected");
+                    PPError ("'...' expected");
                     ClearLine ();
                     return;
                 }
@@ -803,7 +803,7 @@ static void DefineMacro (void)
 
                 /* __VA_ARGS__ is only allowed in C89 mode */
                 if (!C89 && strcmp (Ident, "__VA_ARGS__") == 0) {
-                    PPWarning ("`__VA_ARGS__' can only appear in the expansion "
+                    PPWarning ("'__VA_ARGS__' can only appear in the expansion "
                                "of a C99 variadic macro");
                 }
 
@@ -823,7 +823,7 @@ static void DefineMacro (void)
 
         /* Check for a right paren and eat it if we find one */
         if (CurC != ')') {
-            PPError ("`)' expected");
+            PPError ("')' expected");
             ClearLine ();
             return;
         }
@@ -900,7 +900,7 @@ static unsigned Pass1 (StrBuf* Source, StrBuf* Target)
                     if (HaveParen) {
                         SkipWhitespace (0);
                         if (CurC != ')') {
-                            PPError ("`)' expected");
+                            PPError ("')' expected");
                         } else {
                             NextChar ();
                         }
@@ -1138,7 +1138,7 @@ static void DoInclude (void)
             break;
 
         default:
-            PPError ("`\"' or `<' expected");
+            PPError ("'\"' or '<' expected");
             goto Done;
     }
     NextChar ();
@@ -1295,7 +1295,7 @@ void Preprocess (void)
                                 PPError ("Duplicate #else");
                             }
                         } else {
-                            PPError ("Unexpected `#else'");
+                            PPError ("Unexpected '#else'");
                         }
                         break;
 
@@ -1314,7 +1314,7 @@ void Preprocess (void)
                             /* Remove the clause that needs a terminator */
                             Skip = (IfStack[IfIndex--] & IFCOND_SKIP) != 0;
                         } else {
-                            PPError ("Unexpected `#endif'");
+                            PPError ("Unexpected '#endif'");
                         }
                         break;
 
@@ -1387,7 +1387,7 @@ void Preprocess (void)
         }
         if (NextLine () == 0) {
             if (IfIndex >= 0) {
-                PPError ("`#endif' expected");
+                PPError ("'#endif' expected");
             }
             return;
         }

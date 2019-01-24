@@ -12,12 +12,14 @@
 /*                                                                           */
 /*****************************************************************************/
 
-#ifndef _C64_SCREENMAP_H
-#define _C64_SCREENMAP_H
+/* No include guard here! Multiple use in one file may be intentional. */
 
-#pragma charmap ($02, $82)
-#pragma charmap ($01, $81)
+#pragma warn (remap-zero, push, off)
 #pragma charmap ($00, $80)
+#pragma warn (remap-zero, pop)
+
+#pragma charmap ($01, $81)
+#pragma charmap ($02, $82)
 #pragma charmap ($03, $83)
 #pragma charmap ($04, $84)
 #pragma charmap ($05, $85)
@@ -272,4 +274,3 @@
 #pragma charmap ($FE, $7E)
 #pragma charmap ($FF, $5E)
 
-#endif /* _C64_SCREENMAP_H */

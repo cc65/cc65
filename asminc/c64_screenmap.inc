@@ -9,6 +9,7 @@
 ;
 ; If this include is used, no additional macros are needed
 
+; Char $00 ... $1F -> c + 128
 .charmap $00, $80
 .charmap $01, $81
 .charmap $02, $82
@@ -41,6 +42,8 @@
 .charmap $1D, $9D
 .charmap $1E, $9E
 .charmap $1F, $9F
+
+; Char $20 ... $3F -> c = c
 .charmap $20, $20
 .charmap $21, $21
 .charmap $22, $22
@@ -73,6 +76,8 @@
 .charmap $3D, $3D
 .charmap $3E, $3E
 .charmap $3F, $3F
+
+; Char $40 ... $5F -> c - 64
 .charmap $40, $00
 .charmap $41, $01
 .charmap $42, $02
@@ -105,6 +110,8 @@
 .charmap $5D, $1D
 .charmap $5E, $1E
 .charmap $5F, $1F
+
+; Char $60 ... $7F -> c - 32
 .charmap $60, $40
 .charmap $61, $41
 .charmap $62, $42
@@ -137,6 +144,8 @@
 .charmap $7D, $5D
 .charmap $7E, $5E
 .charmap $7F, $5F
+
+; Char $80 ... $9F -> c + 64
 .charmap $80, $C0
 .charmap $81, $C1
 .charmap $82, $C2
@@ -169,6 +178,8 @@
 .charmap $9D, $DD
 .charmap $9E, $DE
 .charmap $9F, $DF
+
+; Char $A0 ... $BF -> c - 64
 .charmap $A0, $60
 .charmap $A1, $61
 .charmap $A2, $62
@@ -201,6 +212,8 @@
 .charmap $BD, $7D
 .charmap $BE, $7E
 .charmap $BF, $7F
+
+; Char $C0 ... $DF -> - 128
 .charmap $C0, $40
 .charmap $C1, $41
 .charmap $C2, $42
@@ -233,6 +246,8 @@
 .charmap $DD, $5D
 .charmap $DE, $5E
 .charmap $DF, $5F
+
+; Char $E0 ... $FE -> - 128
 .charmap $E0, $60
 .charmap $E1, $61
 .charmap $E2, $62
@@ -264,4 +279,5 @@
 .charmap $FC, $7C
 .charmap $FD, $7D
 .charmap $FE, $7E
+
 .charmap $FF, $5E

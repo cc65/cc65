@@ -14,6 +14,7 @@
 
 /* No include guard here! Multiple use in one file may be intentional. */
 
+// Char $00 ... $1F -> c + 128
 #pragma warn (remap-zero, push, off)
 #pragma charmap ($00, $80)
 #pragma warn (remap-zero, pop)
@@ -49,6 +50,8 @@
 #pragma charmap ($1D, $9D)
 #pragma charmap ($1E, $9E)
 #pragma charmap ($1F, $9F)
+
+// Char $20 ... $3F -> c = c
 #pragma charmap ($20, $20)
 #pragma charmap ($21, $21)
 #pragma charmap ($22, $22)
@@ -81,6 +84,8 @@
 #pragma charmap ($3D, $3D)
 #pragma charmap ($3E, $3E)
 #pragma charmap ($3F, $3F)
+
+// Char $40 ... $5F -> c - 64
 #pragma charmap ($40, $00)
 #pragma charmap ($41, $01)
 #pragma charmap ($42, $02)
@@ -113,6 +118,8 @@
 #pragma charmap ($5D, $1D)
 #pragma charmap ($5E, $1E)
 #pragma charmap ($5F, $1F)
+
+// Char $60 ... $7F -> c - 32
 #pragma charmap ($60, $40)
 #pragma charmap ($61, $41)
 #pragma charmap ($62, $42)
@@ -145,6 +152,8 @@
 #pragma charmap ($7D, $5D)
 #pragma charmap ($7E, $5E)
 #pragma charmap ($7F, $5F)
+
+// Char $80 ... $9F -> c + 64
 #pragma charmap ($80, $C0)
 #pragma charmap ($81, $C1)
 #pragma charmap ($82, $C2)
@@ -177,6 +186,8 @@
 #pragma charmap ($9D, $DD)
 #pragma charmap ($9E, $DE)
 #pragma charmap ($9F, $DF)
+
+// Char $A0 ... $BF -> c - 64
 #pragma charmap ($A0, $60)
 #pragma charmap ($A1, $61)
 #pragma charmap ($A2, $62)
@@ -209,6 +220,8 @@
 #pragma charmap ($BD, $7D)
 #pragma charmap ($BE, $7E)
 #pragma charmap ($BF, $7F)
+
+// Char $C0 ... $DF -> c - 128
 #pragma charmap ($C0, $40)
 #pragma charmap ($C1, $41)
 #pragma charmap ($C2, $42)
@@ -241,6 +254,8 @@
 #pragma charmap ($DD, $5D)
 #pragma charmap ($DE, $5E)
 #pragma charmap ($DF, $5F)
+
+// Char $E0 ... $FE -> c - 128
 #pragma charmap ($E0, $60)
 #pragma charmap ($E1, $61)
 #pragma charmap ($E2, $62)

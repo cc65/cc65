@@ -213,7 +213,7 @@
 .charmap $BE, $7E
 .charmap $BF, $7F
 
-; Char $C0 ... $DF -> - 128
+; Char $C0 ... $DF -> c - 128
 .charmap $C0, $40
 .charmap $C1, $41
 .charmap $C2, $42
@@ -247,7 +247,7 @@
 .charmap $DE, $5E
 .charmap $DF, $5F
 
-; Char $E0 ... $FE -> - 128
+; Char $E0 ... $FE -> c - 128
 .charmap $E0, $60
 .charmap $E1, $61
 .charmap $E2, $62

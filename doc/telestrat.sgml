@@ -192,6 +192,7 @@ port cardridge.
 
 <sect1>Joystick drivers<p>
 
+
 <descrip>
 
 Telemon 2.4 & 3.0 manages joysticks but it had been handled yet. This means that 
@@ -200,26 +201,24 @@ joysticks driver could be written easily.
 Telemon 2.4 returns in keyboard buffer the direction of the joysticks. This means that
 if you get input from keyboard by conio cgetc function, you will get direction from joysticks.
 
-</descrip>
-
 
 <sect1>Mouse drivers<p>
+
 
 <descrip>
 
 Telestrat manages also mouse, but it had been no handled yet in this version. 
 Telestrat mouse is really difficult to find.
 
-</descrip>
 
 <sect1>RS232 device drivers<p>
+
 
 <descrip>
 
 Telestrat has a RS232 port, but it's not usable in cc65. It is possible to use 
 RS232 port with Telemon calls (see XSOUT primitive for example)
 
-</descrip>
 
 <sect>Limitations<label id="limitations"><p>
 

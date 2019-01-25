@@ -461,7 +461,7 @@ void GetFuncInfo (const char* Name, unsigned short* Use, unsigned short* Chg)
             ** use and change all registers.
             */
             if (Debug) {
-                fprintf (stderr, "No info about internal function `%s'\n", Name);
+                fprintf (stderr, "No info about internal function '%s'\n", Name);
             }
             *Use = REG_ALL;
             *Chg = REG_ALL;

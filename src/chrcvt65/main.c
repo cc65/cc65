@@ -325,7 +325,7 @@ static void ConvertFile (const char* Input, const char* Output)
     /* Try to open the file for reading */
     FILE* F = fopen (Input, "rb");
     if (F == 0) {
-        Error ("Cannot open input file `%s': %s", Input, strerror (errno));
+        Error ("Cannot open input file '%s': %s", Input, strerror (errno));
     }
 
     /* Seek to the end and determine the size */
@@ -337,9 +337,9 @@ static void ConvertFile (const char* Input, const char* Output)
 
     /* Check if the size is reasonable */
     if (Size > 32*1024) {
-        Error ("Input file `%s' is too large (max = 32k)", Input);
+        Error ("Input file '%s' is too large (max = 32k)", Input);
     } else if (Size < 0x100) {
-        Error ("Input file `%s' is too small to be a vector font file", Input);
+        Error ("Input file '%s' is too small to be a vector font file", Input);
     }
 
     /* Allocate memory for the file */
@@ -347,7 +347,7 @@ static void ConvertFile (const char* Input, const char* Output)
 
     /* Read the file contents into the buffer */
     if (fread (Buf, 1, (size_t) Size, F) != (size_t) Size) {
-        Error ("Error reading from input file `%s'", Input);
+        Error ("Error reading from input file '%s'", Input);
     }
 
     /* Close the file */
@@ -355,14 +355,14 @@ static void ConvertFile (const char* Input, const char* Output)
 
     /* Verify the header */
     if (memcmp (Buf, ChrHeader, sizeof (ChrHeader)) != 0) {
-        Error ("Invalid format for `%s': invalid header", Input);
+        Error ("Invalid format for '%s': invalid header", Input);
     }
     MsgEnd = memchr (Buf + sizeof (ChrHeader), 0x1A, 0x80);
     if (MsgEnd == 0) {
-        Error ("Invalid format for `%s': description not found", Input);
+        Error ("Invalid format for '%s': description not found", Input);
     }
     if (MsgEnd[1] != 0x80 || MsgEnd[2] != 0x00) {
-        Error ("Invalid format for `%s': wrong header size", Input);
+        Error ("Invalid format for '%s': wrong header size", Input);
     }
 
     /* We expect the file to hold chars from 0x20 (space) to 0x7E (tilde) */
@@ -372,9 +372,9 @@ static void ConvertFile (const char* Input, const char* Output)
     if (FirstChar > 0x20 || LastChar < 0x7E) {
         Print (stderr, 1, "FirstChar = $%04X, CharCount = %u\n",
                FirstChar, CharCount);
-        Error ("File `%s' doesn't contain the chars we need", Input);
+        Error ("File '%s' doesn't contain the chars we need", Input);
     } else if (LastChar >= 0x100) {
-        Error ("File `%s' contains too many character definitions", Input);
+        Error ("File '%s' contains too many character definitions", Input);
     }
 
     /* Print the copyright from the header */
@@ -405,7 +405,7 @@ static void ConvertFile (const char* Input, const char* Output)
 
         /* Check if the offset is valid */
         if (Remaining <= 0) {
-            Error ("Invalid data offset in input file `%s'", Input);
+            Error ("Invalid data offset in input file '%s'", Input);
         }
 
         /* Convert the vector data and place it into the buffer */
@@ -422,7 +422,7 @@ static void ConvertFile (const char* Input, const char* Output)
 
     /* The baseline must be zero, otherwise we cannot convert */
     if (Buf[0x89] != 0) {
-        Error ("Baseline of font in `%s' is not zero", Input);
+        Error ("Baseline of font in '%s' is not zero", Input);
     }
 
     /* If the output file is NULL, use the name of the input file with ".tch"
@@ -435,33 +435,33 @@ static void ConvertFile (const char* Input, const char* Output)
     /* Open the output file */
     F = fopen (Output, "wb");
     if (F == 0) {
-        Error ("Cannot open output file `%s': %s", Output, strerror (errno));
+        Error ("Cannot open output file '%s': %s", Output, strerror (errno));
     }
 
     /* Write the header to the output file */
     if (fwrite (TchHeader, 1, sizeof (TchHeader), F) != sizeof (TchHeader)) {
-        Error ("Error writing to `%s' (disk full?)", Output);
+        Error ("Error writing to '%s' (disk full?)", Output);
     }
 
     /* Write the width table to the output file */
     if (fwrite (WidthBuf, 1, 0x5F, F) != 0x5F) {
-        Error ("Error writing to `%s' (disk full?)", Output);
+        Error ("Error writing to '%s' (disk full?)", Output);
     }
 
     /* Write the offsets to the output file */
     if (fwrite (SB_GetConstBuf (&Offsets), 1, 0x5F * 2, F) != 0x5F * 2) {
-        Error ("Error writing to `%s' (disk full?)", Output);
+        Error ("Error writing to '%s' (disk full?)", Output);
     }
 
     /* Write the data to the output file */
     Offs = SB_GetLen (&VectorData);
     if (fwrite (SB_GetConstBuf (&VectorData), 1, Offs, F) != Offs) {
-        Error ("Error writing to `%s' (disk full?)", Output);
+        Error ("Error writing to '%s' (disk full?)", Output);
     }
 
     /* Close the output file */
     if (fclose (F) != 0) {
-        Error ("Error closing to `%s': %s", Output, strerror (errno));
+        Error ("Error closing to '%s': %s", Output, strerror (errno));
     }
 
     /* Done */

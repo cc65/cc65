@@ -981,7 +981,7 @@ static OptFunc* GetOptFunc (const char* Name)
     OptFunc* F = FindOptFunc (Name);
     if (F == 0) {
         /* Not found */
-        AbEnd ("Optimization step `%s' not found", Name);
+        AbEnd ("Optimization step '%s' not found", Name);
     }
     return F;
 }
@@ -1168,10 +1168,10 @@ static void WriteDebugOutput (CodeSeg* S, const char* Step)
         /* Output a header line */
         if (Step == 0) {
             /* Initial output */
-            WriteOutput ("Initial code for function `%s':\n",
+            WriteOutput ("Initial code for function '%s':\n",
                          S->Func? S->Func->Name : "<global>");
         } else {
-            WriteOutput ("Code after applying `%s':\n", Step);
+            WriteOutput ("Code after applying '%s':\n", Step);
         }
 
         /* Output the code segment */
@@ -1512,7 +1512,7 @@ void RunOpt (CodeSeg* S)
 
     /* Print the name of the function we are working on */
     if (S->Func) {
-        Print (stdout, 1, "Running optimizer for function `%s'\n", S->Func->Name);
+        Print (stdout, 1, "Running optimizer for function '%s'\n", S->Func->Name);
     } else {
         Print (stdout, 1, "Running optimizer for global code segment\n");
     }

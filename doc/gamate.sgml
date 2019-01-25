@@ -49,16 +49,6 @@ Programs containing Gamate specific code may use the <tt/gamate.h/ header file.
 </itemize>
 
 
-<sect1>Hardware access<p>
-
-The following pseudo variables declared in the <tt/gamate.inc/ include file do
-allow access to hardware located in the address space.
-
-<descrip>
-
-</descrip><p>
-
-
 
 <sect>Loadable drivers<p>
 
@@ -159,6 +149,3 @@ freely, subject to the following restrictions:
 </enum>
 
 </article>
-
-
-

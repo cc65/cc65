@@ -82,3 +82,28 @@ UDTIM          := $FFEA
   PLOT         := $FFF0
   IOBASE       := $FFF3
 .endif
+
+; ---------------------------------------------------------------------------
+; Kernal routines, direct entries
+
+.if .def(__VIC20__)
+  CLRSCR       := $E55F
+  KBDREAD      := $E5CF
+.elseif .def(__C64__)
+  CLRSCR       := $E544
+  KBDREAD      := $E5B4
+  NMIEXIT      := $FEBC
+.elseif .def(__C128__)
+  CLRSCR       := $C142
+  KBDREAD      := $C006
+  NMIEXIT      := $FF33
+  NEWLINE      := $C363
+  PRINT        := $C322
+  CURS_SET     := $CD57
+  CURS_ON      := $CD6F
+  CURS_OFF     := $CD9F
+  INDFET       := $FF74
+.elseif .def(__C16__)
+  CLRSCR       := $D88B
+  KBDREAD      := $D8C1
+.endif

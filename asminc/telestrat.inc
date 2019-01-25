@@ -73,7 +73,9 @@ XLPRBI          := $48           ; Printer flag (b7)
 
 HRSX40          := $49
 HRSX6           := $4A
+
 ADHRS           := $4B           ; hires screen address (word)
+
 HRS1            := $4D
 HRS2            := $4F
 HRS3            := $51
@@ -229,8 +231,10 @@ XFREAD           = $27          ; Only in TELEMON 3.x (bank 7 of Orix)
 XBINDX           = $28          ; Convert a number into hex and displays on channel 0
 XDECIM           = $29
 XHEXA            = $2A          ; Convert a number into hex
+
 XEDT             = $2D          ; Launch editor
 XINSER           = $2E
+
 XSCELG           = $2F          ; Search a line in editor mode
 XOPEN            = $30          ; Only in TELEMON 3.x (bank 7 of Orix)
 XECRPR           = $33          ; Displays prompt
@@ -299,6 +303,7 @@ BUFTRV          := $100
 ; Page $200
 BNKST            := $200        ; Used to store signature of 8 bank (length : 8 bytes)
 TABDRV           := $208
+
 DRVDEF           := $20C
 FLGTEL           := $20D
 KOROM            := $20E        ; Used to compute the size of all rom bank. The result is store here. The value is in KB
@@ -314,10 +319,12 @@ FLGCUR           := $216        ; cursor management flag
 ; screens position managements
 
 FLGCUR_STATE     := $217        ; cursor state flag
+
 ADSCRL           := $218
 ADSCRH           := $21C
 SCRX             := $220
 SCRY             := $224
+
 SCRDX            := $228
 SCRFX            := $22C
 SCRDY            := $230
@@ -335,15 +342,16 @@ SCRTXT           := $256
 SCRHIR           := $25C
 SCRTRA           := $262        ; 6 bytes lenfth
 
-
 ; Keyboard management
 KBDCOL           := $268        ; 8 bytes length
 KBDFLG_KEY       := $270        ; 0 if no key pressed
 KBDVRR           := $272
+
 KBDVRL           := $273
 FLGKBD           := $275
 KBDFCT           := $276
 KBDSHT           := $278
+
 KBDKEY           := $279
 KBDCTC           := $27E
 LPRX             := $286
@@ -371,6 +379,7 @@ FLGRST           := $2EE
 CSRND            := $2EF
 VNMI             := $2F4
 ADIODB_VECTOR    := $2f7        ; 3 bytes length
+
 IRQVECTOR        := $2FA
 VAPLIC           := $2FD
 
@@ -405,6 +414,59 @@ CH376_COMMAND    := $341
 
 ; RAM overlays buffer
 BUFBUF           := $c080
+
+; ---------------------------------------------------------------------------
+; Stratsed vectors
+; Stratsed is the main OS for Telestrat 
+XMERGE           := $FF0E
+XFST             := $FF11
+XSPUT            := $FF14
+XSTAKE           := $FF17
+XTAKE            := $FF20
+XOPENS           := $FF1A       ; XOPEN from Stratsed
+XCLOSES          := $FF1D       ; XCLOSE from Stratsed
+XPUT             := $FF23
+XREWIN           := $FF29
+XJUMP            := $FF2C
+XLGBUF           := $FF2F
+XERVEC           := $FF32
+XESAVE           := $FF35
+XCOPY            := $FF38
+XDNAME           := $FF3B
+XSTATU           := $FF3E
+XUPDAT           := $FF41
+XFORMA           := $FF44
+XDELBK           := $FF4A
+XDELN            := $FF4D
+XPROT            := $FF50
+XUNPRO           := $FF53
+XDIRN            := $FF56
+XBKP             := $FF59
+XINITI           := $FF5C
+XERREU           := $FF5F
+XLOAD            := $FF62
+XDEFSA           := $FF65
+XDEFLO           := $FF68
+XSAVE            := $FF6B
+XNOMDE           := $FF6E
+XCREAY           := $FF71
+XDETSE           := $FF74
+XLIBSE           := $FF77
+XTRVCA           := $FF7A
+XTRVNM           := $FF7D
+XTRVNX           := $FF80
+XBUCA            := $FF86
+XVBUF1           := $FF89
+XSVSEC           := $FF8C
+XSAY             := $FF8F
+XSBUF1           := $FF92
+XSBUF2           := $FF95
+XSBUF3           := $FF98
+XSCAT            := $FF9B
+XPRSEC           := $FFA1
+XPBUF1           := $FFA4
+XPMAP            := $FFA7
+XRWTS            := $FFAA
 
 ; ---------------------------------------------------------------------------
 ; Stratsed vectors

@@ -143,7 +143,7 @@ static void ParseRegisterDecl (Declaration* Decl, int Reg)
             ** we cannot allow that here.
             */
             if (ParseInit (Sym->Type) != Size) {
-                Error ("Cannot initialize flexible array members of storage class `register'");
+                Error ("Cannot initialize flexible array members of storage class 'register'");
             }
 
             /* Generate code to copy this data into the variable space */
@@ -171,7 +171,7 @@ static void ParseRegisterDecl (Declaration* Decl, int Reg)
 
     /* Cannot allocate a variable of zero size */
     if (Size == 0) {
-        Error ("Variable `%s' has unknown size", Decl->Ident);
+        Error ("Variable '%s' has unknown size", Decl->Ident);
     }
 }
 
@@ -356,7 +356,7 @@ static void ParseAutoDecl (Declaration* Decl)
 
     /* Cannot allocate a variable of zero size */
     if (Size == 0) {
-        Error ("Variable `%s' has unknown size", Decl->Ident);
+        Error ("Variable '%s' has unknown size", Decl->Ident);
     }
 }
 
@@ -410,7 +410,7 @@ static void ParseStaticDecl (Declaration* Decl)
 
     /* Cannot allocate a variable of zero size */
     if (Size == 0) {
-        Error ("Variable `%s' has unknown size", Decl->Ident);
+        Error ("Variable '%s' has unknown size", Decl->Ident);
     }
 }
 

@@ -76,7 +76,7 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
 
     /* Don't allow casts from void to something else. */
     if (IsTypeVoid (OldType)) {
-        Error ("Cannot convert from `void' to something else");
+        Error ("Cannot convert from 'void' to something else");
         goto ExitPoint;
     }
 

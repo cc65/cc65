@@ -147,7 +147,7 @@ void PrintDbgScopes (FILE* F)
                 case SCOPE_ENUM:        fputs (",type=enum", F);        break;
 
                 default:
-                    Error ("Module `%s': Unknown scope type %u",
+                    Error ("Module '%s': Unknown scope type %u",
                            GetObjFileName (O), S->Type);
             }
 

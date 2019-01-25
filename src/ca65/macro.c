@@ -375,7 +375,7 @@ static void MacSkipDef (unsigned Style)
         if (CurTok.Tok != TOK_EOF) {
             SkipUntilSep ();
         } else {
-            Error ("`.ENDMACRO' expected");
+            Error ("'.ENDMACRO' expected");
         }
     } else {
         /* Skip until end of line */
@@ -409,7 +409,7 @@ void MacDef (unsigned Style)
     /* Did we already define that macro? */
     if (HT_Find (&MacroTab, &CurTok.SVal) != 0) {
         /* Macro is already defined */
-        Error ("A macro named `%m%p' is already defined", &CurTok.SVal);
+        Error ("A macro named '%m%p' is already defined", &CurTok.SVal);
         /* Skip tokens until we reach the final .endmacro */
         MacSkipDef (Style);
         return;
@@ -451,7 +451,7 @@ void MacDef (unsigned Style)
                 IdDesc* List = M->Params;
                 while (1) {
                     if (SB_Compare (&List->Id, &CurTok.SVal) == 0) {
-                        Error ("Duplicate symbol `%m%p'", &CurTok.SVal);
+                        Error ("Duplicate symbol '%m%p'", &CurTok.SVal);
                     }
                     if (List->Next == 0) {
                         break;
@@ -500,7 +500,7 @@ void MacDef (unsigned Style)
             }
             /* May not have end of file in a macro definition */
             if (CurTok.Tok == TOK_EOF) {
-                Error ("`.ENDMACRO' expected");
+                Error ("'.ENDMACRO' expected");
                 goto Done;
             }
         } else {
@@ -930,7 +930,7 @@ static void StartExpDefine (MacExp* E)
             if (CurTok.Tok == TOK_COMMA) {
                 NextTok ();
             } else {
-                Error ("`,' expected");
+                Error ("',' expected");
             }
         }
     }

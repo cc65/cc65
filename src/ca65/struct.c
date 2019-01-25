@@ -261,9 +261,9 @@ static long DoStructInternal (long Offs, unsigned Type)
 
     /* End of struct/union definition */
     if (Type == STRUCT) {
-        Consume (TOK_ENDSTRUCT, "`.ENDSTRUCT' expected");
+        Consume (TOK_ENDSTRUCT, "'.ENDSTRUCT' expected");
     } else {
-        Consume (TOK_ENDUNION, "`.ENDUNION' expected");
+        Consume (TOK_ENDUNION, "'.ENDUNION' expected");
     }
 
     /* Return the size of the struct */

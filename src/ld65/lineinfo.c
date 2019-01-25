@@ -162,7 +162,7 @@ void ReadLineInfoList (FILE* F, ObjData* O, Collection* LineInfos)
         ** therefore be part of the line infos read from the object file.
         */
         if (LineInfoIndex >= CollCount (&O->LineInfos)) {
-            Internal ("Invalid line info index %u in module `%s' - max is %u",
+            Internal ("Invalid line info index %u in module '%s' - max is %u",
                       LineInfoIndex,
                       GetObjFileName (O),
                       CollCount (&O->LineInfos));

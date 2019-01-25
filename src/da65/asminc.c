@@ -148,7 +148,7 @@ void AsmInc (const char* Filename, char CommentStart, int IgnoreUnknown)
             ++L;
         } else {
             if (!IgnoreUnknown) {
-                Error ("%s(%u): Missing `='", Filename, Line);
+                Error ("%s(%u): Missing '='", Filename, Line);
             }
             continue;
         }

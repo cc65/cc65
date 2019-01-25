@@ -469,25 +469,47 @@ BASIC.SYSTEM) there are some limitations for DOS 3.3:
 
 <sect1>Direct console I/O<p>
 
-<descrip>
-
-  <tag/Color/
-  The Apple&nbsp;&rsqb;&lsqb; has no color text mode. Therefore the functions textcolor(),
-  bgcolor() and bordercolor() have no effect.
-
-</descrip><p>
+The Apple&nbsp;&rsqb;&lsqb; has no color text mode. Therefore the functions
+<tt/textcolor()/, <tt/bgcolor()/ and <tt/bordercolor()/ have no effect.
 
 
 <sect1>Random number generator<p>
 
-<descrip>
+The random number seed is generated from the time the program waits for user input.
+Therefore it is necessary to wait for at least one user keypress either via Standard
+I/O or via Direct console I/O before initializing the pseudo random number generator.
 
-  <tag/Random number seed/
-  The random number seed is generated from the time the program waits for user input.
-  Therefore it is necessary to wait for at least one user keypress either via Standard
-  I/O or via Direct console I/O before initializing the pseudo random number generator.
 
-</descrip><p>
+<sect1>Realtime clock<p>
+
+There are several types of realtime clocks. It's not desirable to have specific code
+for all of them. As ProDOS 8 supports file timestamps, realtime clock owners usually
+use ProDOS 8 drivers for their realtime clock. Those drivers read the realtime clock
+and write the result to the date/time location in RAM (&dollar;BF90 to &dollar;BF93).
+ProDOS 8 reads the date/time from that RAM location. If there's no realtime clock the
+RAM location keeps containing zeros. ProDOS 8 uses those zeros as timestamps and the
+files show up in a directory as <tt/&lt;NO DATE&gt;/.
+
+There's no common interface to set realtime clocks so if a realtme clock <bf/IS/
+present there's just nothing to do. However, if there's <bf/NO/ realtime clock present,
+the user might very well be interested to "manually" set the RAM location in order to
+have timestamps. But he surely doesn't want to manually set the RAM location over and
+over again. Rather he wants to set it just once after booting ProDOS 8.
+
+From that perspective it makes most sense to not set both the date and the time but
+rather only set the date and have the time just stay zero. Then files show up in a
+directory as <tt/DD-MON-YY  0:00/.
+
+So <tt/clock_settime()/ checks if the current time equals 0:00. If it does <bf/NOT/
+then a realtime clock is supposed to be active and <tt/clock_settime()/ fails with
+<tt/ERANGE/. Otherwise <tt/clock_settime()/ sets the date - and completely ignores
+the time provided as parameter.
+
+<tt/clock_getres()/ too checks if the current time equals 0:00. If it does <bf/NOT/
+then a realtime clock is supposed to be active and <tt/clock_getres()/ returns a time
+resolution of one minute. Otherwise <tt/clock_getres()/ presumes that the only one
+who sets the RAM location is <tt/clock_settime()/ and therefore returns a time
+resolution of one day.
 
 
 

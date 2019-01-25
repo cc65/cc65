@@ -468,7 +468,7 @@ void DbgInfoCheck (void)
         /* Search for the symbol name */
         S->Sym = SymFindAny (S->Scope, GetStrBuf (S->AsmName));
         if (S->Sym == 0) {
-            PError (&S->Pos, "Assembler symbol `%s' not found",
+            PError (&S->Pos, "Assembler symbol '%s' not found",
                     GetString (S->AsmName));
         } else {
             /* Set the backlink */

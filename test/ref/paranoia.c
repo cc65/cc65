@@ -1626,7 +1626,7 @@ part7(){
 overflow:
 	sigsave = 0;
 	Z = V9;
-	printf("Can `Z = -Y' overflow?\n");
+	printf("Can 'Z = -Y' overflow?\n");
 	printf("Trying it on Y = %.17e .\n", Y);
 	V9 = - Y;
 	V0 = V9;
@@ -2087,7 +2087,7 @@ Instructions()
 {
   static char *instr[] = {
 	"Lest this program stop prematurely, i.e. before displaying\n",
-	"    `END OF TEST',\n",
+	"    'END OF TEST',\n",
 	"try to persuade the computer NOT to terminate execution when an",
 	"error like Over/Underflow or Division by Zero occurs, but rather",
 	"to persevere with a surrogate value after, perhaps, displaying some",
@@ -2170,8 +2170,8 @@ History()
 	"   FAILUREs, like 2+2 == 5 .",
 	"Failures may confound subsequent diagnoses.\n",
 	"The diagnostic capabilities of this program go beyond an earlier",
-	"program called `MACHAR', which can be found at the end of the",
-	"book  `Software Manual for the Elementary Functions' (1980) by",
+	"program called 'MACHAR', which can be found at the end of the",
+	"book  'Software Manual for the Elementary Functions' (1980) by",
 	"W. J. Cody and W. Waite. Although both programs try to discover",
 	"the Radix, Precision and range (over/underflow thresholds)",
 	"of the arithmetic, this program tries to cope with a wider variety",

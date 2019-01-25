@@ -2587,7 +2587,7 @@ changing values.  (See the description of <tt/cbm_k_udtim()/.)
 of the realtime clock. <tt/clock_id/ has to be <tt/CLOCK_REALTIME/. If <tt/res/
 is not <tt/NULL/, the resolution of the realtime clock is stored in the location
 pointed to by <tt/res/. If <tt/res/ is <tt/NULL/, the clock resolution is not returned.
-If the <tt/time/ argument of <tt/<ref id="clock_settime" name="clock_settime">/ is not
+If the <tt/tp/ argument of <tt/<ref id="clock_settime" name="clock_settime">/ is not
 a multiple of <tt/res/, then the value is truncated to a multiple of <tt/res/. On
 success, zero is returned. On error, -1 is returned and <tt/errno/ is set to an
 error code describing the reason for the failure.
@@ -2626,7 +2626,7 @@ retrieved value may not be valid. See also the platform-specific information.
 <tag/Availability/POSIX 1003.1
 <tag/See also/
 <ref id="clock_getres" name="clock_getres">,
-<ref id="clock_settime" name="clock_settime">
+<ref id="clock_settime" name="clock_settime">,
 <ref id="time" name="time">
 <tag/Example/None.
 </descrip>
@@ -2637,7 +2637,7 @@ retrieved value may not be valid. See also the platform-specific information.
 
 <quote>
 <descrip>
-<tag/Function/Get the time from the realtime clock.
+<tag/Function/Set the time on the realtime clock.
 <tag/Header/<tt/<ref id="time.h" name="time.h">/
 <tag/Declaration/<tt/int __fastcall__ clock_settime (clockid_t clock_id, const struct timespec *tp);/
 <tag/Description/The <tt/clock_settime/ function sets the time since the 1970-01-01 00:00:00
@@ -3386,7 +3386,7 @@ used in presence of a prototype.
 <descrip>
 <tag/Function/Load and initialize an extended memory driver.
 <tag/Header/<tt/<ref id="em.h" name="em.h">/
-<tag/Declaration/<tt/void __fastcall__ em_load_driver (const char* name);/
+<tag/Declaration/<tt/unsigned char __fastcall__ em_load_driver (const char* name);/
 <tag/Description/Load an extended memory driver into memory and initialize
 it. The function returns an error code that tells if all this has been
 successful.

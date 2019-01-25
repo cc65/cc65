@@ -129,7 +129,7 @@ void CheckAssertions (void)
 
         /* If the expression is not constant, we're not able to handle it */
         if (!IsConstExpr (A->Expr)) {
-            Warning ("Cannot evaluate assertion in module `%s', line %u",
+            Warning ("Cannot evaluate assertion in module '%s', line %u",
                      Module, Line);
         } else if (GetExprVal (A->Expr) == 0) {
 
@@ -149,7 +149,7 @@ void CheckAssertions (void)
                     break;
 
                 default:
-                    Internal ("Invalid assertion action (%u) in module `%s', "
+                    Internal ("Invalid assertion action (%u) in module '%s', "
                               "line %u (file corrupt?)",
                               A->Action, Module, Line);
                     break;

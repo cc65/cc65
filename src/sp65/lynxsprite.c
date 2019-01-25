@@ -80,7 +80,7 @@ static enum Mode GetMode (const Collection* A)
         } else if (strcmp (Mode, "shaped") == 0) {
             return smShaped;
         } else {
-            Error ("Invalid value for attribute `mode'");
+            Error ("Invalid value for attribute 'mode'");
         }
     }
 

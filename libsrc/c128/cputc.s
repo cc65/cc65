@@ -9,8 +9,8 @@
         .export         _cputcxy, _cputc, cputdirect, putchar
         .export         newline, plot
         .import         gotoxy
-        .import         PLOT
 
+        .include        "cbm_kernal.inc"
         .include        "c128.inc"
 
 newline         = NEWLINE
@@ -85,4 +85,3 @@ plot:   ldy     CURS_X
 ; position in Y
 
 putchar = $CC2F
-

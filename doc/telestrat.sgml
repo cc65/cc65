@@ -49,7 +49,7 @@ There is also no software to write a Stratsed dsk file on PC.
 This Telestrat target build an Orix binary file. But, in the future, it will be possible 
 to build a Stratsed disk. Orix uses the same systems calls than Telemon mode.
 
-That is why if you need to do software for telestrat target,you have the choice to:
+That is why if you need to do software for telestrat target, you have the choice to:
 <itemize>
 <item>use cc65 Atmos target and start Telestrat in Atmos mode: A tape file is required.
 <item>use cc65 Atmos target and start Telestrat in Stratoric mode: A dsk file or tape file is required.

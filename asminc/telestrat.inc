@@ -54,7 +54,7 @@ IRQSVY          := $23           ; Used to save Y when a BRK call occurs
 IRQSVP          := $24           ; Used to save P when a BRK call occurs
 
 ADSCR           := $26
-SCRNB           := $28           ; id of the current window
+SCRNB           := $28           ; Id of the current window
 
 ADKBD           := $2A           ; Address ASCII conversion table
 
@@ -74,7 +74,7 @@ XLPRBI          := $48           ; Printer flag (b7)
 HRSX40          := $49
 HRSX6           := $4A
 
-ADHRS           := $4B           ; hires screen address (word)
+ADHRS           := $4B           ; Hires screen address (word)
 
 HRS1            := $4D
 HRS2            := $4F
@@ -315,10 +315,10 @@ TIMEM            := $212
 TIMEH            := $213
 FLGCLK           := $214
 FLGCLK_FLAG      := $215 
-FLGCUR           := $216        ; cursor management flag
+FLGCUR           := $216        ; Cursor management flag
 ; screens position managements
 
-FLGCUR_STATE     := $217        ; cursor state flag
+FLGCUR_STATE     := $217        ; Cursor state flag
 
 ADSCRL           := $218
 ADSCRH           := $21C

@@ -36,7 +36,12 @@ Telestrat can start in Atmos mode with Atmos Cardridge (which is only the atmos
 Basic 1.1 ROM). 
 
 Telestrat can start in Sedoric (Atmos OS) and Atmos mode with Stratoric Cardridge.
-This Cardridge is a Sedoric ROM, Basic 1.1 ROM (Atmos), Basic 1.0 ROM (Oric-1).
+This Cardridge has 3 banks of 16KB of rom with :
+<itemize>
+<item>a Sedoric ROM.
+<item>a Basic 1.1 ROM (Atmos).
+<item>a Basic 1.0 ROM (Oric-1).
+</itemize>
 
 The main Telestrat's configuration is the Telemon/Hyperbasic Cardridge inserted 
 with Stratsed in floppy drive.

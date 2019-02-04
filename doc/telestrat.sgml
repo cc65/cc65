@@ -36,7 +36,7 @@ Telestrat can start in Atmos mode with Atmos Cardridge (which is only the atmos
 Basic 1.1 ROM). 
 
 Telestrat can start in Sedoric (Atmos OS) and Atmos mode with Stratoric Cardridge.
-This Cardridge has 3 banks of 16KB of rom with :
+This Cardridge has 3 banks of 16KB of rom with:
 <itemize>
 <item>a Sedoric ROM.
 <item>a Basic 1.1 ROM (Atmos).
@@ -89,7 +89,7 @@ The only way to load a binary (for Telemon 2.4) is to:
 <item>remove the 20 bytes header
 <item>download <url name="osdk" url="http://osdk.defence-force.org/index?page=download">
 <item>use Floppybuilder in OSDK to insert the binary with the tool (please read 
-FloppyBuilder manual to insert your binary, and to start microdisc boot sector 
+FloppyBuilder manual to learn how to insert your binary and how to start Microdisc boot sector 
 when Telestrat starts)
 </itemize>
 

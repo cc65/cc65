@@ -367,5 +367,5 @@ XRWTS            := $FFAA
 ; MACRO 
 
 .macro  BRK_TELEMON   value
-	.byte $00,value
+        .byte $00,value
 .endmacro

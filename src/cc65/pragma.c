@@ -898,9 +898,9 @@ static void ParsePragma (void)
             FlagPragma (&B, &StaticLocals);
             break;
 
-	case PRAGMA_WRAPPED_CALL:
-	    WrappedCallPragma(&B);
-	    break;
+        case PRAGMA_WRAPPED_CALL:
+            WrappedCallPragma(&B);
+            break;
 
         case PRAGMA_WARN:
             WarnPragma (&B);

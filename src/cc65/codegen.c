@@ -4256,7 +4256,7 @@ void g_initauto (unsigned Label, unsigned Size)
         AddCodeLine ("lda %s,y", GetLabelName (CF_STATIC, Label, 0));
         AddCodeLine ("sta (sp),y");
         AddCodeLine ("iny");
-	AddCmpCodeIfSizeNot256 ("cpy #$%02X", Size);
+        AddCmpCodeIfSizeNot256 ("cpy #$%02X", Size);
         AddCodeLine ("bne %s", LocalLabelName (CodeLabel));
     }
 }
@@ -4281,7 +4281,7 @@ void g_initstatic (unsigned InitLabel, unsigned VarLabel, unsigned Size)
         AddCodeLine ("lda %s,y", GetLabelName (CF_STATIC, InitLabel, 0));
         AddCodeLine ("sta %s,y", GetLabelName (CF_STATIC, VarLabel, 0));
         AddCodeLine ("iny");
-	AddCmpCodeIfSizeNot256 ("cpy #$%02X", Size);
+        AddCmpCodeIfSizeNot256 ("cpy #$%02X", Size);
         AddCodeLine ("bne %s", LocalLabelName (CodeLabel));
     } else {
         /* Use the easy way here: memcpy() */

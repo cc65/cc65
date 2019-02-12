@@ -2347,8 +2347,6 @@ static void OPC_6502_DE (void)
     unsigned char Val;
     Cycles = 7;
     Addr = MemReadWord (Regs.PC+1) + Regs.XR;
-    if (CPU != CPU_6502 && !PAGE_CROSS (Addr, Regs.XR))
-        --Cycles;
     Val = MemReadByte (Addr) - 1;
     MemWriteByte (Addr, Val);
     TEST_ZF (Val);
@@ -2656,8 +2654,6 @@ static void OPC_6502_FE (void)
     unsigned char Val;
     Cycles = 7;
     Addr = MemReadWord (Regs.PC+1) + Regs.XR;
-    if (CPU != CPU_6502 && !PAGE_CROSS (Addr, Regs.XR))
-        --Cycles;
     Val = MemReadByte (Addr) + 1;
     MemWriteByte (Addr, Val);
     TEST_ZF (Val);

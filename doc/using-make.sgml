@@ -76,13 +76,13 @@ ifneq ($(MAKECMDGOALS),clean)
 endif
 
 %.o: %.c
-	$(CC) -c $(CFLAGS) -o $@ $<
+        $(CC) -c $(CFLAGS) -o $@ $<
 
 $(PROGRAM): $(SOURCES:.c=.o)
-	$(CC) $(LDFLAGS) -o $@ $^
+        $(CC) $(LDFLAGS) -o $@ $^
 
 clean:
-	$(RM) $(SOURCES:.c=.o) $(SOURCES:.c=.d) $(PROGRAM) $(PROGRAM).map
+        $(RM) $(SOURCES:.c=.o) $(SOURCES:.c=.d) $(PROGRAM) $(PROGRAM).map
 </verb></tscreen>
 
 <bf/Important:/ When using the sample Makefile above via copy & paste it is

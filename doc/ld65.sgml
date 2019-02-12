@@ -24,21 +24,21 @@ It complements the features that are built into the ca65 macroassembler:
 
 <itemize>
 
-<item>	Accept any number of segments to form an executable module.
+<item>  Accept any number of segments to form an executable module.
 
-<item>	Resolve arbitrary expressions stored in the object files.
+<item>  Resolve arbitrary expressions stored in the object files.
 
-<item>	In case of errors, use the meta information stored in the object files
-	to produce helpful error messages. In case of undefined symbols,
-	expression range errors, or symbol type mismatches, ld65 is able to
-	tell you the exact location in the original assembler source, where
-	the symbol was referenced.
+<item>  In case of errors, use the meta information stored in the object files
+        to produce helpful error messages. In case of undefined symbols,
+        expression range errors, or symbol type mismatches, ld65 is able to
+        tell you the exact location in the original assembler source, where
+        the symbol was referenced.
 
-<item>	Flexible output. The output of ld65 is highly configurable by a config
-	file. Some more-common platforms are supported by default configurations
-	that may be activated by naming the target system. The output
-	generation was designed with different output formats in mind, so
-	adding other formats shouldn't be a great problem.
+<item>  Flexible output. The output of ld65 is highly configurable by a config
+        file. Some more-common platforms are supported by default configurations
+        that may be activated by naming the target system. The output
+        generation was designed with different output formats in mind, so
+        adding other formats shouldn't be a great problem.
 
 </itemize>
 
@@ -1148,14 +1148,14 @@ including commercial applications, and to alter it and redistribute it
 freely, subject to the following restrictions:
 
 <enum>
-<item> 	The origin of this software must not be misrepresented; you must not
-       	claim that you wrote the original software. If you use this software
-       	in a product, an acknowledgment in the product documentation would be
-	appreciated but is not required.
-<item>	Altered source versions must be plainly marked as such, and must not
-	be misrepresented as being the original software.
-<item>	This notice may not be removed or altered from any source
-	distribution.
+<item>  The origin of this software must not be misrepresented; you must not
+        claim that you wrote the original software. If you use this software
+        in a product, an acknowledgment in the product documentation would be
+        appreciated but is not required.
+<item>  Altered source versions must be plainly marked as such, and must not
+        be misrepresented as being the original software.
+<item>  This notice may not be removed or altered from any source
+        distribution.
 </enum>
 
 

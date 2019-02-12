@@ -660,10 +660,10 @@ static unsigned char buf[18830];
 
 int main() {
 
-	unsigned long cksum = adler32(0, NULL, 0);
+        unsigned long cksum = adler32(0, NULL, 0);
 
-	decompress_lz4(compressed, buf, 18830);
-	cksum = adler32(cksum, buf, 18830);
+        decompress_lz4(compressed, buf, 18830);
+        cksum = adler32(cksum, buf, 18830);
 
-	return cksum == 0xf748269d ? 0 : 1;
+        return cksum == 0xf748269d ? 0 : 1;
 }

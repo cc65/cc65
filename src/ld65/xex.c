@@ -233,10 +233,13 @@ static void XexFakeSegment (XexDesc *D, unsigned long Addr)
 
 
 
-static void XexWriteMem (XexDesc* D, MemoryArea* M)
+static unsigned long XexWriteMem (XexDesc* D, MemoryArea* M)
 /* Write the segments of one memory area to a file */
 {
     unsigned I;
+
+    /* Store initial position to get total file size */
+    unsigned long StartPos = ftell (D->F);
 
     /* Always write a segment header for each memory area */
     D->HeadPos = 0;
@@ -355,6 +358,8 @@ static void XexWriteMem (XexDesc* D, MemoryArea* M)
     if (D->HeadSize == 0 && D->HeadPos) {
         fseek (D->F, D->HeadPos, SEEK_SET);
     }
+
+    return ftell (D->F) - StartPos;
 }
 
 
@@ -406,8 +411,7 @@ void XexWriteTarget (XexDesc* D, struct File* F)
         /* See if we have an init address for this area */
         XexInitAd* I = XexSearchInitMem (D, M);
         Print (stdout, 1, "  ATARI EXE Dumping `%s'\n", GetString (M->Name));
-        XexWriteMem (D, M);
-        if (I) {
+        if (XexWriteMem (D, M) && I) {
             Write16 (D->F, 0x2E2);
             Write16 (D->F, 0x2E3);
             Write16 (D->F, GetExportVal (I->InitAd->Exp));

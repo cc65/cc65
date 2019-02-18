@@ -16,8 +16,7 @@
 
 ;DEBUG   =       1
 
-        .export         __SYSTEM_CHECK__: absolute = 1
-        .import         __SYSCHK_LOAD__
+        .export         __SYSTEM_CHECK__, __SYSCHK_END__
         .import         __STARTADDRESS__
 
         ; the following imports are only needed for the 'atari' target version
@@ -25,9 +24,11 @@
         .import         __STACKSIZE__
         .import         __RESERVED_MEMORY__
 
+        ; import our header and trailers
+        .forceimport    __SYSCHKHDR__, __SYSCHKTRL__
+
         .include        "zeropage.inc"
         .include        "atari.inc"
-
 
 .macro print_string text
         .local  start, cont
@@ -229,25 +230,10 @@ delay1: ldx     #0
 
 .endproc
 
-end:
+__SYSTEM_CHECK__=syschk
+__SYSCHK_END__:
 
 .ifndef __ATARIXL__
 tmp:            ; outside of the load chunk, some kind of poor man's .bss
 .endif
 
-; ------------------------------------------------------------------------
-; Chunk header
-
-.segment        "SYSCHKHDR"
-
-        .word   __SYSCHK_LOAD__
-        .word   end - 1
-
-; ------------------------------------------------------------------------
-; Chunk "trailer" - sets INITAD
-
-.segment        "SYSCHKTRL"
-
-        .word   INITAD
-        .word   INITAD+1
-        .word   syschk

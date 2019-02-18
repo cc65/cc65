@@ -69,6 +69,8 @@ void XexWriteTarget (XexDesc* D, File* F);
 void XexSetRunAd (XexDesc* D, Import *RunAd);
 /* Set the RUNAD export */
 
+int XexAddInitAd (XexDesc* D, MemoryArea *InitMem, Import *InitAd);
+/* Sets and INITAD for the given memory area */
 
 /* End of xex.h */
 

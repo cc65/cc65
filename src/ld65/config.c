@@ -1007,6 +1007,7 @@ static void ParseXex (void)
 {
     static const IdentTok Attributes [] = {
         {   "RUNAD",    CFGTOK_RUNAD            },
+        {   "INITAD",   CFGTOK_INITAD           },
     };
 
     /* Remember the attributes read */
@@ -1017,6 +1018,8 @@ static void ParseXex (void)
     };
     unsigned AttrFlags = atNone;
     Import *RunAd = 0;
+    Import *InitAd;
+    MemoryArea *InitMem;
 
     /* Read the attributes */
     while (CfgTok == CFGTOK_IDENT) {
@@ -1044,6 +1047,24 @@ static void ParseXex (void)
                 CollAppend (&RunAd->RefLines, GenLineInfo (&CfgErrorPos));
                 /* Eat the identifier token */
                 CfgNextTok ();
+                break;
+
+            case CFGTOK_INITAD:
+                /* We expect a memory area followed by a colon and an identifier */
+                CfgAssureIdent ();
+                InitMem = CfgGetMemory (GetStrBufId (&CfgSVal));
+                CfgNextTok ();
+                CfgConsumeColon ();
+                CfgAssureIdent ();
+                /* Generate an import for the symbol */
+                InitAd = InsertImport (GenImport (GetStrBufId (&CfgSVal), ADDR_SIZE_ABS));
+                /* Remember the file position */
+                CollAppend (&InitAd->RefLines, GenLineInfo (&CfgErrorPos));
+                /* Eat the identifier token */
+                CfgNextTok ();
+                /* Add to XEX */
+                if (XexAddInitAd (XexFmtDesc, InitMem, InitAd))
+                    CfgError (&CfgErrorPos, "INITAD already given for memory area");
                 break;
 
             default:

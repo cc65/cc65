@@ -14,8 +14,25 @@
         .macpack        atari
 
 ; Default RUNAD is "start", export that:
-        .export         start
+        .export         start, show_load
 
+; Loader
+        .segment        "LOADER"
+show_load:
+        ldx     #0              ; channel 0
+        lda     #<msg_load
+        sta     ICBAL,x         ; address
+        lda     #>msg_load
+        sta     ICBAH,x
+        lda     #$FF
+        sta     ICBLL,x         ; length
+        sta     ICBLH,x
+        lda     #PUTREC
+        sta     ICCOM,x
+        jmp     CIOV
+
+msg_load:
+        .byte   "Loading....", ATEOL
 
 ; We load color values directly into registers
         .segment        "COLOR"

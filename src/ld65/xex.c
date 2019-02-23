@@ -58,6 +58,12 @@
 /*                                   Data                                    */
 /*****************************************************************************/
 
+/* Linked list of memory area initialization addresses */
+typedef struct XexInitAd {
+    MemoryArea *InitMem;
+    Import *InitAd;
+    struct XexInitAd *next;
+} XexInitAd;
 
 
 struct XexDesc {
@@ -65,11 +71,11 @@ struct XexDesc {
     FILE*       F;              /* Output file */
     const char* Filename;       /* Name of output file */
     Import*     RunAd;          /* Run Address */
+    XexInitAd*  InitAds;        /* List of Init Addresses */
     unsigned long HeadPos;      /* Position in the file of current header */
     unsigned long HeadEnd;      /* End address of current header */
     unsigned long HeadSize;     /* Last header size, can be removed if zero */
 };
-
 
 
 /*****************************************************************************/
@@ -89,6 +95,7 @@ XexDesc* NewXexDesc (void)
     D->F        = 0;
     D->Filename = 0;
     D->RunAd    = 0;
+    D->InitAds  = 0;
     D->HeadPos  = 0;
     D->HeadEnd  = 0;
     D->HeadSize = 0;
@@ -113,7 +120,34 @@ void XexSetRunAd (XexDesc* D, Import *RunAd)
     D->RunAd = RunAd;
 }
 
+XexInitAd* XexSearchInitMem(XexDesc* D, MemoryArea *InitMem)
+{
+    XexInitAd* I;
+    for (I=D->InitAds; I != 0; I=I->next)
+    {
+        if (I->InitMem == InitMem)
+            return I;
+    }
+    return NULL;
+}
 
+
+int XexAddInitAd (XexDesc* D, MemoryArea *InitMem, Import *InitAd)
+/* Sets and INITAD for the given memory area */
+{
+    XexInitAd* I;
+
+    /* Search for repeated entry */
+    if (XexSearchInitMem (D, InitMem))
+        return 1;
+
+    I = xmalloc (sizeof (XexInitAd));
+    I->InitAd  = InitAd;
+    I->InitMem = InitMem;
+    I->next    = D->InitAds;
+    D->InitAds = I;
+    return 0;
+}
 
 static unsigned XexWriteExpr (ExprNode* E, int Signed, unsigned Size,
                               unsigned long Offs attribute ((unused)),
@@ -199,10 +233,13 @@ static void XexFakeSegment (XexDesc *D, unsigned long Addr)
 
 
 
-static void XexWriteMem (XexDesc* D, MemoryArea* M)
+static unsigned long XexWriteMem (XexDesc* D, MemoryArea* M)
 /* Write the segments of one memory area to a file */
 {
     unsigned I;
+
+    /* Store initial position to get total file size */
+    unsigned long StartPos = ftell (D->F);
 
     /* Always write a segment header for each memory area */
     D->HeadPos = 0;
@@ -321,6 +358,8 @@ static void XexWriteMem (XexDesc* D, MemoryArea* M)
     if (D->HeadSize == 0 && D->HeadPos) {
         fseek (D->F, D->HeadPos, SEEK_SET);
     }
+
+    return ftell (D->F) - StartPos;
 }
 
 
@@ -369,8 +408,14 @@ void XexWriteTarget (XexDesc* D, struct File* F)
     for (I = 0; I < CollCount (&F->MemoryAreas); ++I) {
         /* Get this entry */
         MemoryArea* M = CollAtUnchecked (&F->MemoryAreas, I);
+        /* See if we have an init address for this area */
+        XexInitAd* I = XexSearchInitMem (D, M);
         Print (stdout, 1, "  ATARI EXE Dumping `%s'\n", GetString (M->Name));
-        XexWriteMem (D, M);
+        if (XexWriteMem (D, M) && I) {
+            Write16 (D->F, 0x2E2);
+            Write16 (D->F, 0x2E3);
+            Write16 (D->F, GetExportVal (I->InitAd->Exp));
+        }
     }
 
     /* Write RUNAD at file end */

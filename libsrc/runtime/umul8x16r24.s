@@ -9,6 +9,7 @@
 
         .include        "zeropage.inc"
 
+        .macpack        cpu
 
 ;---------------------------------------------------------------------------
 ; 8x16 => 24 unsigned multiplication routine. Because the overhead for a
@@ -30,9 +31,14 @@ umul8x16r16:
 
 umul8x16r24m:
 umul8x16r16m:
+.if (.cpu .bitand ::CPU_ISET_65SC02)
+        stz     ptr1+1
+        stz     sreg
+.else
         ldx     #0
         stx     ptr1+1
         stx     sreg
+.endif
 
         ldy     #8              ; Number of bits
         ldx     ptr3            ; Get into register for speed

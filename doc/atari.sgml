@@ -293,6 +293,25 @@ by defining an "UNUSED" memory area that is not written to the output file.
 Programs containing Atari specific code may use the <tt/atari.h/
 header file.
 
+This also includes access to operating system locations (e.g. hardware shadow registers) by a structure called
+"<tt/OS/".
+The names are the usual ones you can find in system reference manuals. Example:
+
+<verb>
+...
+    OS.savmsc = ScreenMemory;
+    OS.color4 = 14;                         // white frame
+    if (OS.stick0 != 15 || OS.ch != 255)    // key or stick input?
+...
+</verb>
+
+Please note that memory location 762/$2FA is called "<tt/char_/" while the orignal name "<tt/char/" conflicts with the C keyword.
+
+If you like to use the OS names and locations for the original Atari 800 operating system, please "<tt/#define OSA/" before including the
+<tt/atari.h/ header file.
+If you like to target the floating point register model of revision 2 machines, put a "<tt/#define OS_REV2/" before including <tt/atari.h/.
+
+Access to the Basic programming language zero page variables is established by the structure "<tt/BASIC/".
 
 <sect1>Atari specific functions<p>
 
@@ -376,7 +395,7 @@ void DisplayList =
     DL_JVB
 };
 ...
-POKEW(560,(unsigned int)&amp;DisplayList);      // SDLSTL
+OS.sdlst = &amp;DisplayList;
 ...
 </verb>
 
@@ -454,7 +473,7 @@ Example:
 <verb>
 ...
     while (!kbhit());
-    switch (PEEK(764))
+    switch (OS.ch)
     {
         case KEY_RETURN:
         ...

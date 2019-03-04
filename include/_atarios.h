@@ -57,7 +57,7 @@
 
 /* I/O control block */
 
-typedef struct {
+struct __iocb {
     unsigned char   handler;    /* handler index number (0xff free) */
     unsigned char   drive;      /* device number (drive) */
     unsigned char   command;    /* command */
@@ -71,22 +71,26 @@ typedef struct {
     unsigned char   aux4;       /* 4th auxiliary byte */
     unsigned char   aux5;       /* 5th auxiliary byte */
     unsigned char   spare;      /* spare byte */
-} IOCB;
+};
+
+typedef struct __iocb IOCB;
 
 
 /* DOS 2.x zeropage variables */
 
-typedef struct {
+struct __dos2x {
     unsigned char*  zbufp;      /* points to user filename */
     unsigned char*  zdrva;      /* points to serveral buffers (mostly VTOC) */
     unsigned char*  zsba;       /* points to sector buffer */
     unsigned char   errno;      /* number of occured error */
-} DOS2X;
+};
+
+typedef struct __dos2x DOS2X;
 
 
 /* A single device handler formed by it's routines */
 
-typedef struct {
+struct __devhdl {
     void *open;                 /* address of OPEN routine -1 */
     void *close;                /* address of CLOSE routine -1 */
     void *get;                  /* address of GET BYTE routine -1 */
@@ -95,26 +99,33 @@ typedef struct {
     void *special;              /* address od SPECIAL routine -1 */
     void (*init)(void);         /* init routine (JMP INIT) */
     void *reserved;             /* unused */
-} DEVHDL;
+};
+
+typedef struct __devhdl DEVHDL;
 
 
 /* List of device handlers, as managed in HATABS */
 
-typedef struct {
+struct __hatabs {
     unsigned char   id;         /* ATASCII code of handler e.g. 'C','D','E','K','P','S','R' */
     DEVHDL*         devhdl;     /* Pointer to routines of device */
-} HATABS;
+};
+
+typedef struct __hatabs HATABS;
+
 
 /* Floating point register */
 
-typedef struct {
+struct __fpreg {
 #ifdef OS_REV2
     unsigned char fr;
     unsigned char frm[5];       /* 5-byte register mantissa */
 #else
     unsigned char fr[6];        /* 6 bytes for single register */
 #endif
-} FPREG;
+};
+
+typedef struct __fpreg FPREG;
 
 enum {                          /* enum for access of floating point registers */
     R0 = 0,                     /* (to use as index) */
@@ -653,3 +664,4 @@ struct __basic {
     unsigned int    binint;                 // = $D4/$D5        USR-CALL RETURN VALUE
 };
 
+#endif

@@ -358,7 +358,7 @@ extern void atrx15p2_tgi[];
 
 #include <_atarios.h>
 #define OS (*(struct __os*)0x0000)
-#define BASIC (*(struct __basic)0x0080)
+#define BASIC (*(struct __basic*)0x0080)
 
 #include <_gtia.h>
 #define GTIA_READ  (*(struct __gtia_read*)0xD000)

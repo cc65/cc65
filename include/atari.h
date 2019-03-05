@@ -37,12 +37,10 @@
 #define _ATARI_H
 
 
-
 /* Check for errors */
 #if !defined(__ATARI__)
 #  error This module may only be used when compiling for the Atari!
 #endif
-
 
 
 /*****************************************************************************/
@@ -358,6 +356,10 @@ extern void atrx15p2_tgi[];
 /* Define hardware and where they're mapped in memory                        */
 /*****************************************************************************/
 
+#include <_atarios.h>
+#define OS (*(struct __os*)0x0000)
+#define BASIC (*(struct __basic*)0x0080)
+
 #include <_gtia.h>
 #define GTIA_READ  (*(struct __gtia_read*)0xD000)
 #define GTIA_WRITE (*(struct __gtia_write*)0xD000)
@@ -487,130 +489,6 @@ extern void atrx15p2_tgi[];
 ** PBCTL's is interrupt status of SIO
 */
 #define PxCTL_IRQ_STATUS         0x80
-
-
-/*****************************************************************************/
-/* Shadow registers for hardware registers                                   */
-/*****************************************************************************/
-
-/* GTIA */
-#define STRIG0 (*(unsigned char*)0x284) /* TRIG0 */
-#define STRIG1 (*(unsigned char*)0x285) /* TRIG1 */
-#define STRIG2 (*(unsigned char*)0x286) /* TRIG2 */
-#define STRIG3 (*(unsigned char*)0x287) /* TRIG3 */
-#define PCOLR0 (*(unsigned char*)0x2C0) /* COLPM0 */
-#define PCOLR1 (*(unsigned char*)0x2C1) /* COLPM1 */
-#define PCOLR2 (*(unsigned char*)0x2C2) /* COLPM2 */
-#define PCOLR3 (*(unsigned char*)0x2C3) /* COLPM3 */
-#define COLOR0 (*(unsigned char*)0x2C4) /* COLPF0 */
-#define COLOR1 (*(unsigned char*)0x2C5) /* COLPF1 */
-#define COLOR2 (*(unsigned char*)0x2C6) /* COLPF2 */
-#define COLOR3 (*(unsigned char*)0x2C7) /* COLPF3 */
-#define COLOR4 (*(unsigned char*)0x2C8) /* COLPBK */
-#define GPRIOR (*(unsigned char*)0x264) /* PRIOR */
-
-/* ANTIC */
-#define SDMCTL (*(unsigned char*)0x22F) /* DMACTL */
-#define CHACT  (*(unsigned char*)0x2F3) /* CHACTL */
-#define SDLSTL (*(unsigned char*)0x230) /* DLISTL */
-#define SDLSTH (*(unsigned char*)0x231) /* DLISTH */
-#define SDLST  (*(unsigned int*)0x230)  /* DLISTL/H together */
-#define CHBAS  (*(unsigned char*)0x2F4) /* CHBASE */
-#define LPENH  (*(unsigned char*)0x233) /* PENH */
-#define LPENV  (*(unsigned char*)0x234) /* PENV */
-
-/* POKEY */
-#define PADDL0 (*(unsigned char*)0x270) /* POT0 */
-#define PADDL1 (*(unsigned char*)0x271) /* POT1 */
-#define PADDL2 (*(unsigned char*)0x272) /* POT2 */
-#define PADDL3 (*(unsigned char*)0x273) /* POT3 */
-#define PADDL4 (*(unsigned char*)0x274) /* POT4 */
-#define PADDL5 (*(unsigned char*)0x275) /* POT5 */
-#define PADDL6 (*(unsigned char*)0x276) /* POT6 */
-#define PADDL7 (*(unsigned char*)0x277) /* POT7 */
-#define CH     (*(unsigned char*)0x2FC) /* KBCODE */
-#define POKMSK (*(unsigned char*)0x10)  /* IRQEN */
-
-/* PIA */
-#define STICK0 (*(unsigned char*)0x278) /* PORTA for controller port 1 */
-#define STICK1 (*(unsigned char*)0x279) /* PORTA for controller port 2 */
-#define STICK2 (*(unsigned char*)0x27A) /* PORTB for controller port 3 */
-#define STICK3 (*(unsigned char*)0x27B) /* PORTB for controller port 4 */
-#define PTRIG0 (*(unsigned char*)0x27C) /* PORTA for controller port 1, paddle 1 */
-#define PTRIG1 (*(unsigned char*)0x27D) /* PORTA for controller port 1, paddle 2 */
-#define PTRIG2 (*(unsigned char*)0x27E) /* PORTA for controller port 1, paddle 3 */
-#define PTRIG3 (*(unsigned char*)0x27F) /* PORTA for controller port 1, paddle 4 */
-#define PTRIG4 (*(unsigned char*)0x280) /* PORTA for controller port 2, paddle 5 */
-#define PTRIG5 (*(unsigned char*)0x281) /* PORTA for controller port 2, paddle 6 */
-#define PTRIG6 (*(unsigned char*)0x282) /* PORTA for controller port 2, paddle 7 */
-#define PTRIG7 (*(unsigned char*)0x283) /* PORTA for controller port 2, paddle 8 */
-
-
-/*****************************************************************************/
-/* Device control block                                                      */
-/*****************************************************************************/
-
-struct __dcb {
-    unsigned char device;     /* device id */
-    unsigned char unit;       /* unit number */
-    unsigned char command;    /* command */
-    unsigned char status;     /* command type / status return */
-    void          *buffer;    /* pointer to buffer */
-    unsigned char timeout;    /* device timeout in seconds */
-    unsigned char unused;
-    unsigned int  xfersize;   /* # of bytes to transfer */
-    unsigned char aux1;       /* 1st command auxiliary byte */
-    unsigned char aux2;       /* 2nd command auxiliary byte */
-};
-#define DCB (*(struct __dcb *)0x300)
-
-
-/*****************************************************************************/
-/* I/O control block                                                         */
-/*****************************************************************************/
-
-struct __iocb {
-    unsigned char handler;    /* handler index number (0xff free) */
-    unsigned char drive;      /* device number (drive) */
-    unsigned char command;    /* command */
-    unsigned char status;     /* status of last operation */
-    void          *buffer;    /* pointer to buffer */
-    void          *put_byte;  /* pointer to device's PUT BYTE routine */
-    unsigned int  buflen;     /* length of buffer */
-    unsigned char aux1;       /* 1st auxiliary byte */
-    unsigned char aux2;       /* 2nd auxiliary byte */
-    unsigned char aux3;       /* 3rd auxiliary byte */
-    unsigned char aux4;       /* 4th auxiliary byte */
-    unsigned char aux5;       /* 5th auxiliary byte */
-    unsigned char spare;      /* spare byte */
-};
-#define ZIOCB (*(struct __iocb *)0x20)  /* zero page IOCB */
-#define IOCB (*(struct __iocb *)0x340)  /* system IOCB buffers */
-
-/* IOCB Command Codes */
-#define IOCB_OPEN        0x03  /* open */
-#define IOCB_GETREC      0x05  /* get record */
-#define IOCB_GETCHR      0x07  /* get character(s) */
-#define IOCB_PUTREC      0x09  /* put record */
-#define IOCB_PUTCHR      0x0B  /* put character(s) */
-#define IOCB_CLOSE       0x0C  /* close */
-#define IOCB_STATIS      0x0D  /* status */
-#define IOCB_SPECIL      0x0E  /* special */
-#define IOCB_DRAWLN      0x11  /* draw line */
-#define IOCB_FILLIN      0x12  /* draw line with right fill */
-#define IOCB_RENAME      0x20  /* rename disk file */
-#define IOCB_DELETE      0x21  /* delete disk file */
-#define IOCB_LOCKFL      0x23  /* lock file (set to read-only) */
-#define IOCB_UNLOCK      0x24  /* unlock file */
-#define IOCB_POINT       0x25  /* point sector */
-#define IOCB_NOTE        0x26  /* note sector */
-#define IOCB_GETFL       0x27  /* get file length */
-#define IOCB_CHDIR_MYDOS 0x29  /* change directory (MyDOS) */
-#define IOCB_MKDIR       0x2A  /* make directory (MyDOS/SpartaDOS) */
-#define IOCB_RMDIR       0x2B  /* remove directory (SpartaDOS) */
-#define IOCB_CHDIR_SPDOS 0x2C  /* change directory (SpartaDOS) */
-#define IOCB_GETCWD      0x30  /* get current directory (MyDOS/SpartaDOS) */
-#define IOCB_FORMAT      0xFE  /* format */
 
 
 /* End of atari.h */

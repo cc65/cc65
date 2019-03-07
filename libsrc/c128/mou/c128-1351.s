@@ -5,6 +5,24 @@
 ; 2009-09-26, Ullrich von Bassewitz
 ; 2014-04-26, Christian Groessler
 ; 2014-04-30, Greg King
+; 2019-03-06, Scott Hutter
+																   
+																	  
+																	 
+																  
+																	   
+																		
+															   
+													  
+ 
+																	   
+																	 
+																	   
+																		
+																		
+																	 
+																 
+																   
 ;
 
         .include        "zeropage.inc"
@@ -77,26 +95,17 @@ Vars:
 OldPotX:        .res    1               ; Old hw counter values
 OldPotY:        .res    1
 
-YPos:           .res    2               ; Current mouse position, Y
 XPos:           .res    2               ; Current mouse position, X
+YPos:           .res    2               ; Current mouse position, Y
+																   
 XMin:           .res    2               ; X1 value of bounding box
 YMin:           .res    2               ; Y1 value of bounding box
 XMax:           .res    2               ; X2 value of bounding box
 YMax:           .res    2               ; Y2 value of bounding box
+Buttons:        .res    1               ; button status bits
 
 OldValue:       .res    1               ; Temp for MoveCheck routine
 NewValue:       .res    1               ; Temp for MoveCheck routine
-
-INIT_save:      .res    1
-Buttons:        .res    1               ; Button mask
-
-; Keyboard buffer fill level at start of interrupt
-
-old_key_count:  .res    1
-
-; original IRQ vector
-
-old_irq:        .res    2
 
 .rodata
 
@@ -104,13 +113,15 @@ old_irq:        .res    2
 ; (We use ".proc" because we want to define both a label and a scope.)
 
 .proc   DefVars
-        .byte   0, 0                    ; OldPotX/OldPotY
+        .byte   0, 0                    ; OldPotX/OldPotY										  
+											  
         .word   SCREEN_HEIGHT/2         ; YPos
         .word   SCREEN_WIDTH/2          ; XPos
         .word   0                       ; XMin
         .word   0                       ; YMin
         .word   SCREEN_WIDTH - 1        ; XMax
         .word   SCREEN_HEIGHT - 1       ; YMax
+        .byte   %00000000               ; Buttons
 .endproc
 
 .code
@@ -121,14 +132,6 @@ old_irq:        .res    2
 ; Must return an MOUSE_ERR_xx code in a/x.
 
 INSTALL:
-
-; Disable the BASIC interpreter's interrupt-driven sprite-motion code.
-; That allows direct access to the VIC-IIe's sprite registers.
-
-        lda     INIT_STATUS
-        sta     INIT_save
-        lda     #%11000000
-        sta     INIT_STATUS
 
 ; Initialize variables. Just copy the default stuff over
 
@@ -150,48 +153,6 @@ INSTALL:
         lda     YPos
         ldx     YPos+1
         jsr     CMOVEY
-
-; Initialize our IRQ magic
-
-        ; remember ROM IRQ continuation address
-        lda     IRQInd+2
-        sta     old_irq+1
-        lda     IRQInd+1
-        sta     old_irq
-
-        lda     libref
-        sta     ptr3
-        lda     libref+1
-        sta     ptr3+1
-
-        ; set ROM IRQ continuation address to point to the provided routine
-        ldy     #2
-        lda     (ptr3),y
-        sta     IRQInd+1
-        iny
-        lda     (ptr3),y
-        sta     IRQInd+2
-
-        ; set address of our IRQ callback routine
-        ; since it's called via "rts" we have to use "address-1"
-        iny
-        lda     #<(callback-1)
-        sta     (ptr3),y
-        iny
-        lda     #>(callback-1)
-        sta     (ptr3),y
-        iny
-
-        ; set ROM entry point vector
-        ; since it's called via "rts" we have to decrement it by one
-        lda     old_irq
-        sec
-        sbc     #1
-        sta     (ptr3),y
-        iny
-        lda     old_irq+1
-        sbc     #0
-        sta     (ptr3),y
         cli
 
 ; Done, return zero (= MOUSE_ERR_OK)
@@ -202,20 +163,9 @@ INSTALL:
 
 ;----------------------------------------------------------------------------
 ; UNINSTALL routine. Is called before the driver is removed from memory.
-; No return code required (the driver is removed from memory on return).
+; No return code required (the driver is removed from memory on return).																			 																																	
 
-UNINSTALL:
-        lda     old_irq
-        sei
-        sta     IRQInd+1
-        lda     old_irq+1
-        sta     IRQInd+2
-        ;cli                            ; This will be done at end of HIDE
-
-        jsr     HIDE                    ; Hide cursor on exit
-        lda     INIT_save
-        sta     INIT_STATUS
-        rts
+UNINSTALL       = HIDE                  ; Hide cursor on exit
 
 ;----------------------------------------------------------------------------
 ; HIDE routine. Is called to hide the mouse pointer. The mouse kernel manages
@@ -270,14 +220,14 @@ GETBOX: sta     ptr1
         stx     ptr1+1                  ; Save data pointer
 
         ldy     #.sizeof (MOUSE_BOX)-1
-        sei
 
+		
 @L1:    lda     XMin,y
         sta     (ptr1),y
         dey
         bpl     @L1
 
-        cli
+		
         rts
 
 ;----------------------------------------------------------------------------
@@ -312,7 +262,8 @@ MOVE:   sei                             ; No interrupts
 
 BUTTONS:
         lda     Buttons
-        ldx     #$00
+        ldx     #0
+        and     #$1F
         rts
 
 ;----------------------------------------------------------------------------
@@ -351,7 +302,7 @@ INFO:   jsr     POS
 
 ; Fill in the button state
 
-        lda     Buttons
+        jsr     BUTTONS                 ; Will not touch ptr1
         ldy     #MOUSE_INFO::BUTTONS
         sta     (ptr1),y
 
@@ -363,7 +314,7 @@ INFO:   jsr     POS
 ; Must return an error code in a/x.
 ;
 
-IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioctls, for now
+IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioctls for now
         ldx     #>MOUSE_ERR_INV_IOCTL
         rts
 
@@ -375,23 +326,29 @@ IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioctls, for now
 ;
 
 IRQ:    jsr     CPREP
-        lda     KEY_COUNT
-        sta     old_key_count
-        lda     #$7F
-        sta     CIA1_PRA
-        lda     CIA1_PRB                ; Read joystick #0
-        and     #$1F
-        eor     #$1F                    ; Make all bits active high
-        sta     Buttons
 
-        lda     SID_ADConv1             ; Get mouse X movement
+; Record the state of the buttons.
+; Avoid crosstalk between the keyboard and the mouse.
+
+        ldy     #%00000000              ; Set ports A and B to input
+        sty     CIA1_DDRB
+        sty     CIA1_DDRA               ; Keyboard won't look like mouse
+        lda     CIA1_PRB                ; Read Control-Port 1
+        dec     CIA1_DDRA               ; Set port A back to output
+        eor     #%11111111              ; Bit goes up when button goes down
+        sta     Buttons
+        beq     @L0                     ;(bze)
+        dec     CIA1_DDRB               ; Mouse won't look like keyboard
+        sty     CIA1_PRB                ; Set "all keys pushed"
+
+@L0:    lda     SID_ADConv1             ; Get mouse X movement
         ldy     OldPotX
         jsr     MoveCheck               ; Calculate movement vector
-        sty     OldPotX
 
 ; Skip processing if nothing has changed
 
         bcc     @SkipX
+        sty     OldPotX
 
 ; Calculate the new X coordinate (--> a/y)
 
@@ -429,11 +386,12 @@ IRQ:    jsr     CPREP
 @SkipX: lda     SID_ADConv2             ; Get mouse Y movement
         ldy     OldPotY
         jsr     MoveCheck               ; Calculate movement
-        sty     OldPotY
+        
 
 ; Skip processing if nothing has changed
 
         bcc     @SkipY
+        sty     OldPotY
 
 ; Calculate the new Y coordinate (--> a/y)
 
@@ -464,7 +422,7 @@ IRQ:    jsr     CPREP
 @L4:    sty     YPos
         stx     YPos+1
 
-; Move the mouse pointer to the new X pos
+; Move the mouse pointer to the new Y pos
 
         tya
         jsr     CMOVEY
@@ -500,7 +458,7 @@ MoveCheck:
         sec
         rts                             ;   return
 
-@L1:    ora     #%11000000              ; else or in high order bits
+@L1:    ora     #%11000000              ; else, "or" in high-order bits
         cmp     #$FF                    ; if (a != -1)
         beq     @L2
         sec
@@ -514,5 +472,3 @@ MoveCheck:
         clc
         rts
 
-.define  OLD_BUTTONS Buttons            ; tells callback.inc where the old port status is stored
-.include "callback.inc"

@@ -55,6 +55,24 @@
 #define IOCB_FORMAT      0xFE  /* format */
 
 
+/* Device control block */
+
+struct __dcb {
+    unsigned char device;     /* device id */
+    unsigned char unit;       /* unit number */
+    unsigned char command;    /* command */
+    unsigned char status;     /* command type / status return */
+    void          *buffer;    /* pointer to buffer */
+    unsigned char timeout;    /* device timeout in seconds */
+    unsigned char unused;
+    unsigned int  xfersize;   /* # of bytes to transfer */
+    unsigned char aux1;       /* 1st command auxiliary byte */
+    unsigned char aux2;       /* 2nd command auxiliary byte */
+};
+
+typedef struct __dcb DCB;
+
+
 /* I/O control block */
 
 struct __iocb {
@@ -540,7 +558,7 @@ struct __os {
     // --- Page 3 ---
 
     union {     
-        unsigned char dcb[0x40];            // = $0300-$03XX    DEVICE CONTROL BLOCK
+        DCB dcb;                            // = $0300-$030B    DEVICE CONTROL BLOCK
         struct {        
             unsigned char ddevic;           // = $0300          PERIPHERAL UNIT 1 BUS I.D. NUMBER
             unsigned char dunit;            // = $0301          UNIT NUMBER
@@ -569,39 +587,40 @@ struct __os {
                     unsigned char daux2;    // = $030B          1-byte second command auxiliary
                 };
             };
-            unsigned int timer1;            // = $030C/$030D    INITIAL TIMER VALUE
-#ifdef OSA           
-            unsigned char addcor;           // = $030E          ##old## ADDITION CORRECTION
-#else           
-            unsigned char jmpers;           // = $030E          ##1200xl## 1-byte jumper options
-#endif
-            unsigned char casflg;           // = $030F          CASSETTE MODE WHEN SET
-            unsigned char timer2;           // = $0310/$0311    2-byte final baud rate timer value
-            unsigned char temp1;            // = $0312          TEMPORARY STORAGE REGISTER
-#ifdef OSA       
-            unsigned char _spare_5;         // = $0313          unused
-            unsigned char temp2;            // = $0314          ##old## TEMPORARY STORAGE REGISTER
-#else                   
-            unsigned char temp2;            // = $0313          ##1200xl## 1-byte temporary
-            unsigned char ptimot;           // = $0314          ##1200xl## 1-byte printer timeout
-#endif      
-            unsigned char temp3;            // = $0315          TEMPORARY STORAGE REGISTER
-            unsigned char savio;            // = $0316          SAVE SERIAL IN DATA PORT
-            unsigned char timflg;           // = $0317          TIME OUT FLAG FOR BAUD RATE CORRECTION
-            unsigned char stackp;           // = $0318          SIO STACK POINTER SAVE CELL
-            unsigned char tstat;            // = $0319          TEMPORARY STATUS HOLDER
-#ifdef OSA   
-            HATABS hatabs[12];              // = $031A-$033D    handler address table
-            unsigned int zeropad;           // = $033E/$033F    zero padding
-#else
-            HATABS hatabs[11];              // = $031A-$033A    handler address table
-            unsigned int zeropad;           // = $033B/$033C    zero padding
-            unsigned char pupbt1;           // = $033D          ##1200xl## 1-byte power-up validation byte 1
-            unsigned char pupbt2;           // = $033E          ##1200xl## 1-byte power-up validation byte 2
-            unsigned char pupbt3;           // = $033F          ##1200xl## 1-byte power-up validation byte 3
-#endif
         };
     };
+    unsigned int timer1;                    // = $030C/$030D    INITIAL TIMER VALUE
+#ifdef OSA                      
+    unsigned char addcor;                   // = $030E          ##old## ADDITION CORRECTION
+#else                       
+    unsigned char jmpers;                   // = $030E          ##1200xl## 1-byte jumper options
+#endif          
+    unsigned char casflg;                   // = $030F          CASSETTE MODE WHEN SET
+    unsigned int  timer2;                   // = $0310/$0311    2-byte final baud rate timer value
+    unsigned char temp1;                    // = $0312          TEMPORARY STORAGE REGISTER
+#ifdef OSA                  
+    unsigned char _spare_5;                 // = $0313          unused
+    unsigned char temp2;                    // = $0314          ##old## TEMPORARY STORAGE REGISTER
+#else                               
+    unsigned char temp2;                    // = $0313          ##1200xl## 1-byte temporary
+    unsigned char ptimot;                   // = $0314          ##1200xl## 1-byte printer timeout
+#endif                  
+    unsigned char temp3;                    // = $0315          TEMPORARY STORAGE REGISTER
+    unsigned char savio;                    // = $0316          SAVE SERIAL IN DATA PORT
+    unsigned char timflg;                   // = $0317          TIME OUT FLAG FOR BAUD RATE CORRECTION
+    unsigned char stackp;                   // = $0318          SIO STACK POINTER SAVE CELL
+    unsigned char tstat;                    // = $0319          TEMPORARY STATUS HOLDER
+#ifdef OSA              
+    HATABS hatabs[12];                      // = $031A-$033D    handler address table
+    unsigned int zeropad;                   // = $033E/$033F    zero padding
+#else           
+    HATABS hatabs[11];                      // = $031A-$033A    handler address table
+    unsigned int zeropad;                   // = $033B/$033C    zero padding
+    unsigned char pupbt1;                   // = $033D          ##1200xl## 1-byte power-up validation byte 1
+    unsigned char pupbt2;                   // = $033E          ##1200xl## 1-byte power-up validation byte 2
+    unsigned char pupbt3;                   // = $033F          ##1200xl## 1-byte power-up validation byte 3
+#endif
+
     IOCB    iocb[8];                        // = $0340-$03BF    8 I/O Control Blocks
     unsigned char prnbuf[40];               // = $03C0-$3E7     PRINTER BUFFER
 #ifdef OSA           

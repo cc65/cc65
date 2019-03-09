@@ -5,24 +5,7 @@
 ; 2009-09-26, Ullrich von Bassewitz
 ; 2014-04-26, Christian Groessler
 ; 2014-04-30, Greg King
-; 2019-03-06, Scott Hutter
-																   
-																	  
-																	 
-																  
-																	   
-																		
-															   
-													  
- 
-																	   
-																	 
-																	   
-																		
-																		
-																	 
-																 
-																   
+; 2019-03-06, Scott Hutter															   
 ;
 
         .include        "zeropage.inc"
@@ -113,8 +96,7 @@ NewValue:       .res    1               ; Temp for MoveCheck routine
 ; (We use ".proc" because we want to define both a label and a scope.)
 
 .proc   DefVars
-        .byte   0, 0                    ; OldPotX/OldPotY										  
-											  
+        .byte   0, 0                    ; OldPotX/OldPotY										  											  
         .word   SCREEN_HEIGHT/2         ; YPos
         .word   SCREEN_WIDTH/2          ; XPos
         .word   0                       ; XMin
@@ -163,7 +145,7 @@ INSTALL:
 
 ;----------------------------------------------------------------------------
 ; UNINSTALL routine. Is called before the driver is removed from memory.
-; No return code required (the driver is removed from memory on return).																			 																																	
+; No return code required (the driver is removed from memory on return).
 
 UNINSTALL       = HIDE                  ; Hide cursor on exit
 

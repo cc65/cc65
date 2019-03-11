@@ -55,6 +55,29 @@
 #define IOCB_FORMAT      0xFE  /* format */
 
 
+/* Device control block */
+
+struct __dcb {
+    unsigned char ddevic;           /* device id */
+    unsigned char dunit;            /* unit number */
+    unsigned char dcomnd;           /* command */
+    unsigned char dstats;           /* command type / status return */
+    void          *dbuf;            /* pointer to buffer */
+    unsigned char dtimlo;           /* device timeout in seconds */
+    unsigned char dunuse;           /* - unused - */
+    unsigned int  dbyt;             /* # of bytes to transfer */
+    union {    
+        struct {
+            unsigned char daux1;    /* 1st command auxiliary byte */
+            unsigned char daux2;    /* 2nd command auxiliary byte */
+        };
+        unsigned int daux;          /* auxiliary as word */
+    };
+};
+
+typedef struct __dcb dcb_t;
+
+
 /* I/O control block */
 
 struct __iocb {
@@ -73,7 +96,7 @@ struct __iocb {
     unsigned char   spare;      /* spare byte */
 };
 
-typedef struct __iocb IOCB;
+typedef struct __iocb iocb_t;
 
 
 /* DOS 2.x zeropage variables */
@@ -85,7 +108,7 @@ struct __dos2x {
     unsigned char   errno;      /* number of occured error */
 };
 
-typedef struct __dos2x DOS2X;
+typedef struct __dos2x dos2x_t;
 
 
 /* A single device handler formed by it's routines */
@@ -101,17 +124,17 @@ struct __devhdl {
     void *reserved;             /* unused */
 };
 
-typedef struct __devhdl DEVHDL;
+typedef struct __devhdl devhdl_t;
 
 
 /* List of device handlers, as managed in HATABS */
 
 struct __hatabs {
     unsigned char   id;         /* ATASCII code of handler e.g. 'C','D','E','K','P','S','R' */
-    DEVHDL*         devhdl;     /* Pointer to routines of device */
+    devhdl_t*       devhdl;     /* Pointer to routines of device */
 };
 
-typedef struct __hatabs HATABS;
+typedef struct __hatabs hatabs_t;
 
 
 /* Floating point register */
@@ -125,7 +148,7 @@ struct __fpreg {
 #endif
 };
 
-typedef struct __fpreg FPREG;
+typedef struct __fpreg fpreg_t;
 
 enum {                          /* enum for access of floating point registers */
     R0 = 0,                     /* (to use as index) */
@@ -183,7 +206,7 @@ struct __os {
 #else               
     unsigned char   abufpt[4];              // = $1C-$1F        ACMI BUFFER POINTER AREA
 #endif              
-    IOCB            ziocb;                  // = $20-$2F        ZERO PAGE I/O CONTROL BLOCK
+    iocb_t          ziocb;                  // = $20-$2F        ZERO PAGE I/O CONTROL BLOCK
                     
     unsigned char   status;                 // = $30            INTERNAL STATUS STORAGE
     unsigned char   chksum;                 // = $31            CHECKSUM (SINGLE BYTE SUM WITH CARRY)
@@ -207,7 +230,7 @@ struct __os {
     unsigned char   freq;                   // = $40            CASSETTE BEEP COUNTER
     unsigned char   soundr;                 // = $41            NOISY I/0 FLAG. (ZERO IS QUIET)
     unsigned char   critic;                 // = $42            DEFINES CRITICAL SECTION (CRITICAL IF NON-Z)
-    DOS2X           fmszpg;                 // = $43-$49        DISK FILE MANAGER SYSTEM ZERO PAGE
+    dos2x_t         fmszpg;                 // = $43-$49        DISK FILE MANAGER SYSTEM ZERO PAGE
 #ifdef OSA                   
     unsigned char   ckey;                   // = $4A            FLAG SET WHEN GAME START PRESSED
     unsigned char   cassbt;                 // = $4B            CASSETTE BOOT FLAG
@@ -268,7 +291,7 @@ struct __os {
     unsigned char   _free_1[0xD4-0x7F-1];   // USER SPACE
     
                                             // Floating Point Package Page Zero Address Equates
-    FPREG           fpreg[4];               // = $D4-$EB        4 REGSITERS, ACCCESS LIKE "fpreg[R0].fr"        
+    fpreg_t         fpreg[4];               // = $D4-$EB        4 REGSITERS, ACCCESS LIKE "fpreg[R0].fr"        
     unsigned char   frx;                    // = $EC            1-BYTE TEMPORARY   
     unsigned char   eexp;                   // = $ED            VALUE OF EXP
 #ifdef OS_REV2          
@@ -293,8 +316,8 @@ struct __os {
         unsigned char   radflg;             // = $FB            ##OLD## 0=RADIANS, 6=DEGREES
     };
             
-    FPREG*          flptr;                  // = $FC/$FD        2-BYTE FLOATING POINT NUMBER POINTER
-    FPREG*          fptr2;                  // = $FE/$FF        2-BYTE FLOATING POINT NUMBER POINTER
+    fpreg_t*        flptr;                  // = $FC/$FD        2-BYTE FLOATING POINT NUMBER POINTER
+    fpreg_t*        fptr2;                  // = $FE/$FF        2-BYTE FLOATING POINT NUMBER POINTER
 
     // --- Page 1 ---
 
@@ -357,7 +380,7 @@ struct __os {
             unsigned char caux1;            // = $023C          COMMAND AUX BYTE 1
             unsigned char caux2;            // = $023D          COMMAND AUX BYTE 2
         };
-        unsigned caux;                      // = $023C/$023D    (same as above as word)
+        unsigned int caux;                  // = $023C/$023D    (same as above as word)
     };
     unsigned char temp;                     // = $023E          TEMPORARY RAM CELL
     unsigned char errflg;                   // = $023F          ERROR FLAG - ANY DEVICE ERROR EXCEPT TIME OUT
@@ -377,7 +400,7 @@ struct __os {
     unsigned char pdvmsk;                   // = $0247          ##rev2## 1-byte parallel device selection mask
     unsigned char shpdvs;                   // = $0248          ##rev2## 1-byte PDVS (parallel device select)
     unsigned char pdimsk;                   // = $0249          ##rev2## 1-byte parallel device IRQ selection
-    unsigned reladr;                        // = $024A/$024B    ##rev2## 2-byte relocating loader relative adr.
+    unsigned int  reladr;                   // = $024A/$024B    ##rev2## 2-byte relocating loader relative adr.
     unsigned char pptmpa;                   // = $024C          ##rev2## 1-byte parallel device handler temporary
     unsigned char pptmpx;                   // = $024D          ##rev2## 1-byte parallel device handler temporary
     unsigned char _reserved_1[29];          // = $024E-$026A    RESERVED
@@ -526,7 +549,7 @@ struct __os {
     unsigned char _spare_4[5];              // = $02F5-$02F9    No OS use.
 #else           
     unsigned char newrow;                   // = $02F5          ##1200xl## 1-byte draw destination row
-    unsigned int newcol;                    // = $02F6/$02F7    ##1200xl## 2-byte draw destination column
+    unsigned int  newcol;                   // = $02F6/$02F7    ##1200xl## 2-byte draw destination column
     unsigned char rowinc;                   // = $02F8          ##1200xl## 1-byte draw row increment
     unsigned char colinc;                   // = $02F9          ##1200xl## 1-byte draw column increment
 #endif      
@@ -539,70 +562,40 @@ struct __os {
         
     // --- Page 3 ---
 
-    union {     
-        unsigned char dcb[0x40];            // = $0300-$03XX    DEVICE CONTROL BLOCK
-        struct {        
-            unsigned char ddevic;           // = $0300          PERIPHERAL UNIT 1 BUS I.D. NUMBER
-            unsigned char dunit;            // = $0301          UNIT NUMBER
-            unsigned char dcomnd;           // = $0302          BUS COMMAND
-            unsigned char dstats;           // = $0303          COMMAND TYPE/STATUS RETURN
-            union {
-                void* dbuf;                 // = $0304/$0305    data buffer address
-                struct {
-                    unsigned char dbuflo;   // = $0304          1-byte low data buffer address
-                    unsigned char dbufhi;   // = $0305          1-byte high data buffer address
-                };
-            };
-            unsigned char dtimlo;           // = $0306          DEVICE TIME OUT IN 1 SECOND UNITS
-            unsigned char dunuse;           // = $0307          UNUSED BYTE
-            union {
-                unsigned int dbyt;          // = $0308/$0309    number of bytes to transfer
-                struct {
-                    unsigned char dbytlo;   // = $0308          1-byte low number of bytes to transfer
-                    unsigned char dbythi;   // = $0309          1-byte high number of bytes to transfer
-                };
-            };
-            union {
-                unsigned int daux;          // = $030A/$030B    first and second auxiliary
-                struct {
-                    unsigned char daux1;    // = $030A          1-byte first command auxiliary
-                    unsigned char daux2;    // = $030B          1-byte second command auxiliary
-                };
-            };
-            unsigned int timer1;            // = $030C/$030D    INITIAL TIMER VALUE
-#ifdef OSA           
-            unsigned char addcor;           // = $030E          ##old## ADDITION CORRECTION
+    dcb_t dcb;                              // = $0300-$030B    DEVICE CONTROL BLOCK
+    unsigned int timer1;                    // = $030C/$030D    INITIAL TIMER VALUE
+#ifdef OSA                      
+    unsigned char addcor;                   // = $030E          ##old## ADDITION CORRECTION
+#else                       
+    unsigned char jmpers;                   // = $030E          ##1200xl## 1-byte jumper options
+#endif          
+    unsigned char casflg;                   // = $030F          CASSETTE MODE WHEN SET
+    unsigned int  timer2;                   // = $0310/$0311    2-byte final baud rate timer value
+    unsigned char temp1;                    // = $0312          TEMPORARY STORAGE REGISTER
+#ifdef OSA                  
+    unsigned char _spare_5;                 // = $0313          unused
+    unsigned char temp2;                    // = $0314          ##old## TEMPORARY STORAGE REGISTER
+#else                               
+    unsigned char temp2;                    // = $0313          ##1200xl## 1-byte temporary
+    unsigned char ptimot;                   // = $0314          ##1200xl## 1-byte printer timeout
+#endif                  
+    unsigned char temp3;                    // = $0315          TEMPORARY STORAGE REGISTER
+    unsigned char savio;                    // = $0316          SAVE SERIAL IN DATA PORT
+    unsigned char timflg;                   // = $0317          TIME OUT FLAG FOR BAUD RATE CORRECTION
+    unsigned char stackp;                   // = $0318          SIO STACK POINTER SAVE CELL
+    unsigned char tstat;                    // = $0319          TEMPORARY STATUS HOLDER
+#ifdef OSA              
+    hatabs_t      hatabs[12];               // = $031A-$033D    handler address table
+    unsigned int  zeropad;                  // = $033E/$033F    zero padding
 #else           
-            unsigned char jmpers;           // = $030E          ##1200xl## 1-byte jumper options
+    hatabs_t      hatabs[11];               // = $031A-$033A    handler address table
+    unsigned int  zeropad;                  // = $033B/$033C    zero padding
+    unsigned char pupbt1;                   // = $033D          ##1200xl## 1-byte power-up validation byte 1
+    unsigned char pupbt2;                   // = $033E          ##1200xl## 1-byte power-up validation byte 2
+    unsigned char pupbt3;                   // = $033F          ##1200xl## 1-byte power-up validation byte 3
 #endif
-            unsigned char casflg;           // = $030F          CASSETTE MODE WHEN SET
-            unsigned char timer2;           // = $0310/$0311    2-byte final baud rate timer value
-            unsigned char temp1;            // = $0312          TEMPORARY STORAGE REGISTER
-#ifdef OSA       
-            unsigned char _spare_5;         // = $0313          unused
-            unsigned char temp2;            // = $0314          ##old## TEMPORARY STORAGE REGISTER
-#else                   
-            unsigned char temp2;            // = $0313          ##1200xl## 1-byte temporary
-            unsigned char ptimot;           // = $0314          ##1200xl## 1-byte printer timeout
-#endif      
-            unsigned char temp3;            // = $0315          TEMPORARY STORAGE REGISTER
-            unsigned char savio;            // = $0316          SAVE SERIAL IN DATA PORT
-            unsigned char timflg;           // = $0317          TIME OUT FLAG FOR BAUD RATE CORRECTION
-            unsigned char stackp;           // = $0318          SIO STACK POINTER SAVE CELL
-            unsigned char tstat;            // = $0319          TEMPORARY STATUS HOLDER
-#ifdef OSA   
-            HATABS hatabs[12];              // = $031A-$033D    handler address table
-            unsigned int zeropad;           // = $033E/$033F    zero padding
-#else
-            HATABS hatabs[11];              // = $031A-$033A    handler address table
-            unsigned int zeropad;           // = $033B/$033C    zero padding
-            unsigned char pupbt1;           // = $033D          ##1200xl## 1-byte power-up validation byte 1
-            unsigned char pupbt2;           // = $033E          ##1200xl## 1-byte power-up validation byte 2
-            unsigned char pupbt3;           // = $033F          ##1200xl## 1-byte power-up validation byte 3
-#endif
-        };
-    };
-    IOCB    iocb[8];                        // = $0340-$03BF    8 I/O Control Blocks
+
+    iocb_t        iocb[8];                  // = $0340-$03BF    8 I/O Control Blocks
     unsigned char prnbuf[40];               // = $03C0-$3E7     PRINTER BUFFER
 #ifdef OSA           
     unsigned char _spare_6[151];            // = $03E8-$047F    unused
@@ -616,7 +609,7 @@ struct __os {
     unsigned char basicf;                   // = $03F8          ##rev2## 1-byte BASIC switch flag
     unsigned char mintlk;                   // = $03F9          ##1200xl## 1-byte ACMI module interlock
     unsigned char gintlk;                   // = $03FA          ##1200xl## 1-byte cartridge interlock
-    void* chlink;                           // = $03FB/$03FC    ##1200xl## 2-byte loaded handler chain link
+    void*         chlink;                   // = $03FB/$03FC    ##1200xl## 2-byte loaded handler chain link
     unsigned char casbuf[131];              // = $03FD-$047F    CASSETTE BUFFER
 #endif
 
@@ -636,32 +629,32 @@ struct __os {
 /* Define a structure with the zero page atari basic register offsets */
 
 struct __basic {
-    void*  lowmem;                          // = $80/$81        POINTER TO BASIC'S LOW MEMORY
-    void*  vntp;                            // = $82/$83        BEGINNING ADDRESS OF THE VARIABLE NAME TABLE
-    void*  vntd;                            // = $84/$85        POINTER TO THE ENDING ADDRESS OF THE VARIABLE NAME TABLE PLUS ONE
-    void*  vvtp;                            // = $86/$87        ADDRESS FOR THE VARIABLE VALUE TABLE
-    void*  stmtab;                          // = $88/$89        ADDRESS OF THE STATEMENT TABLE
-    void*  stmcur;                          // = $8A/$8B        CURRENT BASIC STATEMENT POINTER
-    void*  starp;                           // = $8C/$8D        ADDRESS FOR THE STRING AND ARRAY TABLE
-    void*  runstk;                          // = $8E/$8F        ADDRESS OF THE RUNTIME STACK
-    void*  memtop;                          // = $90/$91        POINTER TO THE TOP OF BASIC MEMORY
+    void*         lowmem;                   // = $80/$81        POINTER TO BASIC'S LOW MEMORY
+    void*         vntp;                     // = $82/$83        BEGINNING ADDRESS OF THE VARIABLE NAME TABLE
+    void*         vntd;                     // = $84/$85        POINTER TO THE ENDING ADDRESS OF THE VARIABLE NAME TABLE PLUS ONE
+    void*         vvtp;                     // = $86/$87        ADDRESS FOR THE VARIABLE VALUE TABLE
+    void*         stmtab;                   // = $88/$89        ADDRESS OF THE STATEMENT TABLE
+    void*         stmcur;                   // = $8A/$8B        CURRENT BASIC STATEMENT POINTER
+    void*         starp;                    // = $8C/$8D        ADDRESS FOR THE STRING AND ARRAY TABLE
+    void*         runstk;                   // = $8E/$8F        ADDRESS OF THE RUNTIME STACK
+    void*         memtop;                   // = $90/$91        POINTER TO THE TOP OF BASIC MEMORY
     
     unsigned char   _internal_1[0xBA-0x91-1];  // INTERNAL DATA
 
-    unsigned int    stopln;                 // = $BA/$BB        LINE WHERE A PROGRAM WAS STOPPED
+    unsigned int  stopln;                   // = $BA/$BB        LINE WHERE A PROGRAM WAS STOPPED
 
     unsigned char   _internal_2[0xC3-0xBB-1];   // INTERNAL DATA
 
-    unsigned char   errsav;                 // = $C3            NUMBER OF THE ERROR CODE
+    unsigned char errsav;                   // = $C3            NUMBER OF THE ERROR CODE
 
     unsigned char   _internal_3[0xC9-0xC3-1];   // INTERNAL DATA
 
-    unsigned char   ptabw;                  // = $C9            NUMBER OF COLUMNS BETWEEN TAB STOPS
-    unsigned char   loadflg;                // = $CA            LIST PROTECTION
+    unsigned char ptabw;                    // = $C9            NUMBER OF COLUMNS BETWEEN TAB STOPS
+    unsigned char loadflg;                  // = $CA            LIST PROTECTION
 
     unsigned char   _internal_4[0xD4-0xCA-1];   // INTERNAL DATA
 
-    unsigned int    binint;                 // = $D4/$D5        USR-CALL RETURN VALUE
+    unsigned int  binint;                   // = $D4/$D5        USR-CALL RETURN VALUE
 };
 
 #endif

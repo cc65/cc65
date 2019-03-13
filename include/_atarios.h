@@ -150,12 +150,12 @@ struct __fpreg {
 
 typedef struct __fpreg fpreg_t;
 
-enum {                          /* enum for access of floating point registers */
+enum FPIDX {                    /* enum for access of floating point registers */
     R0 = 0,                     /* (to use as index) */
     RE = 1,
     R1 = 2,
     R2 = 3
-} FPIDX;
+};
 
 
 /* Define a structure with atari os register offsets */

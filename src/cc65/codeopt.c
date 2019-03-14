@@ -1137,8 +1137,9 @@ static unsigned RunOptGroup1 (CodeSeg* S)
     Changes += RunOptFunc (S, &DOptPtrLoad4, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad5, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad6, 1);
+    Changes += RunOptFunc (S, &DOptPtrLoad18, 1); /* Before OptPtrLoad7 */
+    Changes += RunOptFunc (S, &DOptPtrLoad19, 1); /* Before OptPtrLoad7 */
     Changes += RunOptFunc (S, &DOptPtrLoad7, 1);
-    Changes += RunOptFunc (S, &DOptPtrLoad18, 1); /* Before OptPtrLoad11 */
     Changes += RunOptFunc (S, &DOptPtrLoad11, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad12, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad13, 1);
@@ -1146,7 +1147,6 @@ static unsigned RunOptGroup1 (CodeSeg* S)
     Changes += RunOptFunc (S, &DOptPtrLoad15, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad16, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad17, 1);
-    Changes += RunOptFunc (S, &DOptPtrLoad19, 1);
     Changes += RunOptFunc (S, &DOptBNegAX1, 1);
     Changes += RunOptFunc (S, &DOptBNegAX2, 1);
     Changes += RunOptFunc (S, &DOptBNegAX3, 1);

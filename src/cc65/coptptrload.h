@@ -356,6 +356,27 @@ unsigned OptPtrLoad17 (CodeSeg* S);
 ** the step with less than 200% so it gets executed when -Oi is in effect.
 */
 
+unsigned OptPtrLoad18 (CodeSeg* S);
+/* Search for the sequence:
+**
+**      ldx     #$xx
+**      lda     #$yy
+**      clc
+**      adc     xxx
+**      bcc     L
+**      inx
+** L:   ldy     #$00
+**      jsr     ldauidx
+**
+** and replace it by:
+**
+**      ldy     xxx
+**      ldx     #$00
+**      lda     $xxyy,y
+**
+** This is similar to OptPtrLoad3 but works on a constant address
+** instead of a label. Also, the initial X and A loads are reversed.
+*/
 
 
 /* End of coptptrload.h */

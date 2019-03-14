@@ -379,6 +379,31 @@ unsigned OptPtrLoad18 (CodeSeg* S);
 */
 
 
+unsigned OptPtrLoad19 (CodeSeg* S);
+/* Search for the sequence:
+**
+**	and	#mask		(any value < 128)
+**      jsr     aslax1/shlax1
+**      clc
+**      adc     #<(label+0)
+**      tay
+**      txa
+**      adc     #>(label+0)
+**      tax
+**      tya
+**      ldy     #$01
+**      jsr     ldaxidx
+**
+** and replace it by:
+**
+**	and	#mask		(remove if == 127)
+**	asl
+**	tay
+**	lda	label,y
+**	ldx	label+1,y
+*/
+
+
 /* End of coptptrload.h */
 
 #endif

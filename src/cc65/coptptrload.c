@@ -1557,6 +1557,7 @@ unsigned OptPtrLoad18 (CodeSeg* S)
 unsigned OptPtrLoad19 (CodeSeg* S)
 /* Search for the sequence:
 **
+**      ldx     #0
 **	and	#mask		(any value < 128)
 **      jsr     aslax1/shlax1
 **      clc
@@ -1571,6 +1572,7 @@ unsigned OptPtrLoad19 (CodeSeg* S)
 **
 ** and replace it by:
 **
+**	ldx     #0
 **	and	#mask		(remove if == 127)
 **	asl
 **	tay
@@ -1585,71 +1587,75 @@ unsigned OptPtrLoad19 (CodeSeg* S)
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-        CodeEntry* L[11];
+        CodeEntry* L[12];
 
         /* Get next entry */
         L[0] = CS_GetEntry (S, I);
 
         /* Check for the sequence */
-        if (L[0]->OPC == OP65_AND                               &&
-            L[0]->AM == AM65_IMM                                &&
-            CE_HasNumArg (L[0]) && L[0]->Num <= 127             &&
-            CS_GetEntries (S, L+1, I+1, 10)                     &&
-            L[1]->OPC == OP65_JSR                               &&
-            (strcmp (L[1]->Arg, "aslax1") == 0          ||
-             strcmp (L[1]->Arg, "shlax1") == 0)                 &&
-            L[2]->OPC == OP65_CLC                               &&
-            L[3]->OPC == OP65_ADC                               &&
-            L[4]->OPC == OP65_TAY                               &&
-            L[5]->OPC == OP65_TXA                               &&
-            L[6]->OPC == OP65_ADC                               &&
-            L[7]->OPC == OP65_TAX                               &&
-            L[8]->OPC == OP65_TYA                               &&
-            L[9]->OPC == OP65_LDY                               &&
-            CE_IsKnownImm(L[9], 1)                              &&
-            strlen(L[3]->Arg) >= 3                              &&
-            L[3]->Arg[0] == '<'                                 &&
-            strlen(L[6]->Arg) >= 3                              &&
-            L[6]->Arg[0] == '>'                                 &&
-            !strcmp(L[3]->Arg+1, L[6]->Arg+1)                   &&
-            CE_IsCallTo (L[10], "ldaxidx")                      &&
-            !CS_RangeHasLabel (S, I+1, 10)) {
+        if (L[0]->OPC == OP65_LDX                               &&
+            CE_IsKnownImm(L[0], 0)                              &&
+            CS_GetEntries (S, L+1, I+1, 11)                     &&
+            L[1]->OPC == OP65_AND                               &&
+            L[1]->AM == AM65_IMM                                &&
+            CE_HasNumArg (L[1]) && L[1]->Num <= 127             &&
+            L[2]->OPC == OP65_JSR                               &&
+            (strcmp (L[2]->Arg, "aslax1") == 0          ||
+             strcmp (L[2]->Arg, "shlax1") == 0)                 &&
+            L[3]->OPC == OP65_CLC                               &&
+            L[4]->OPC == OP65_ADC                               &&
+            L[5]->OPC == OP65_TAY                               &&
+            L[6]->OPC == OP65_TXA                               &&
+            L[7]->OPC == OP65_ADC                               &&
+            L[8]->OPC == OP65_TAX                               &&
+            L[9]->OPC == OP65_TYA                               &&
+            L[10]->OPC == OP65_LDY                               &&
+            CE_IsKnownImm(L[10], 1)                              &&
+            strlen(L[4]->Arg) >= 3                              &&
+            L[4]->Arg[0] == '<'                                 &&
+            strlen(L[7]->Arg) >= 3                              &&
+            L[7]->Arg[0] == '>'                                 &&
+            !strcmp(L[4]->Arg+1, L[7]->Arg+1)                   &&
+            CE_IsCallTo (L[11], "ldaxidx")                      &&
+            !CS_RangeHasLabel (S, I+1, 11)) {
 
             CodeEntry* X;
             char* Label;
-            int Len = strlen(L[3]->Arg);
+            int Len = strlen(L[4]->Arg);
 
             /* Track the insertion point */
-            unsigned IP = I + 11;
+            unsigned IP = I + 12;
 
             /* asl a */
-            X = NewCodeEntry (OP65_ASL, AM65_ACC, "a", 0, L[1]->LI);
+            X = NewCodeEntry (OP65_ASL, AM65_ACC, "a", 0, L[2]->LI);
             CS_InsertEntry (S, X, IP++);
 
             /* tay */
-            X = NewCodeEntry (OP65_TAY, AM65_IMP, 0, 0, L[1]->LI);
+            X = NewCodeEntry (OP65_TAY, AM65_IMP, 0, 0, L[2]->LI);
             CS_InsertEntry (S, X, IP++);
 
             /* lda label,y */
-            Label = memcpy (xmalloc (Len-2), L[3]->Arg+2, Len-3);
+            Label = memcpy (xmalloc (Len-2), L[4]->Arg+2, Len-3);
             Label[Len-3] = '\0';
-            X = NewCodeEntry (OP65_LDA, AM65_ABSY, Label, 0, L[9]->LI);
+            X = NewCodeEntry (OP65_LDA, AM65_ABSY, Label, 0, L[10]->LI);
             CS_InsertEntry (S, X, IP++);
             xfree (Label);
 
             /* lda label+1,y */
-            Label = memcpy (xmalloc (Len), L[3]->Arg+2, Len-3);
+            Label = memcpy (xmalloc (Len), L[4]->Arg+2, Len-3);
             strcpy(&Label[Len-3], "+1");
-            X = NewCodeEntry (OP65_LDX, AM65_ABSY, Label, 0, L[9]->LI);
+            X = NewCodeEntry (OP65_LDX, AM65_ABSY, Label, 0, L[10]->LI);
             CS_InsertEntry (S, X, IP++);
             xfree (Label);
 
             /* Remove the old code */
             /* Remove the AND only if it's == 127, since ASL erases high bit */
-            if (L[0]->Num == 127)
-                CS_DelEntries (S, I, 11);
+            if (L[1]->Num == 127)
+                CS_DelEntries (S, I+1, 11);
             else
-                CS_DelEntries (S, I+1, 10);
+                CS_DelEntries (S, I+2, 10);
+            /* Remove the ldx #0 */
+            CS_DelEntry(S, I);
 
             /* Remember, we had changes */
             ++Changes;

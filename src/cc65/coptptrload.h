@@ -382,6 +382,7 @@ unsigned OptPtrLoad18 (CodeSeg* S);
 unsigned OptPtrLoad19 (CodeSeg* S);
 /* Search for the sequence:
 **
+**      ldx     #0
 **	and	#mask		(any value < 128)
 **      jsr     aslax1/shlax1
 **      clc
@@ -396,6 +397,7 @@ unsigned OptPtrLoad19 (CodeSeg* S);
 **
 ** and replace it by:
 **
+**      ldx     #0
 **	and	#mask		(remove if == 127)
 **	asl
 **	tay

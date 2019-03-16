@@ -150,11 +150,11 @@ struct __fpreg {
 
 typedef struct __fpreg fpreg_t;
 
-enum FPIDX {                    /* enum for access of floating point registers */
-    R0 = 0,                     /* (to use as index) */
-    RE = 1,
-    R1 = 2,
-    R2 = 3
+enum {                          /* enum for access of floating point registers */
+    FPIDX_R0 = 0,               /* (to use as index) */
+    FPIDX_RE = 1,
+    FPIDX_R1 = 2,
+    FPIDX_R2 = 3
 };
 
 
@@ -291,7 +291,7 @@ struct __os {
     unsigned char   _free_1[0xD4-0x7F-1];   // USER SPACE
     
                                             // Floating Point Package Page Zero Address Equates
-    fpreg_t         fpreg[4];               // = $D4-$EB        4 REGSITERS, ACCCESS LIKE "fpreg[R0].fr"        
+    fpreg_t         fpreg[4];               // = $D4-$EB        4 REGSITERS, ACCCESS LIKE "fpreg[FPIDX_R0].fr"        
     unsigned char   frx;                    // = $EC            1-BYTE TEMPORARY   
     unsigned char   eexp;                   // = $ED            VALUE OF EXP
 #ifdef OS_REV2          

@@ -1480,7 +1480,7 @@ unsigned OptPtrLoad18 (CodeSeg* S)
 **
 ** This is similar to OptPtrLoad3 but works on a constant address
 ** instead of a label. Also, the initial X and A loads are reversed.
-** Must be run before OptPtrLoad11.
+** Must be run before OptPtrLoad7().
 */
 {
     unsigned Changes = 0;
@@ -1512,10 +1512,10 @@ unsigned OptPtrLoad18 (CodeSeg* S)
             CE_IsCallTo (L[7], "ldauidx")                    &&
             !CS_RangeHasLabel (S, I+1, 5)                    &&
             !CE_HasLabel (L[7])                              &&
-            strlen (L[0]->Arg) == 3                          &&
             L[0]->Arg[0] == '$'                              &&
-            strlen (L[1]->Arg) == 3                          &&
-            L[1]->Arg[0] == '$'                              ) {
+            L[1]->Arg[0] == '$'                              &&
+            strlen (L[0]->Arg) == 3                          &&
+            strlen (L[1]->Arg) == 3                         ) {
 
             CodeEntry* X;
             char* Label;
@@ -1558,7 +1558,7 @@ unsigned OptPtrLoad19 (CodeSeg* S)
 /* Search for the sequence:
 **
 **      ldx     #0
-**	and	#mask		(any value < 128)
+**      and     #mask          (any value < 0x80)
 **      jsr     aslax1/shlax1
 **      clc
 **      adc     #<(label+0)
@@ -1572,12 +1572,11 @@ unsigned OptPtrLoad19 (CodeSeg* S)
 **
 ** and replace it by:
 **
-**	ldx     #0
-**	and	#mask		(remove if == 127)
-**	asl
-**	tay
-**	lda	label,y
-**	ldx	label+1,y
+**      and     #mask          (remove if == 0x7F)
+**      asl
+**      tay
+**      lda     label,y
+**      ldx     label+1,y
 */
 {
     unsigned Changes = 0;
@@ -1598,10 +1597,8 @@ unsigned OptPtrLoad19 (CodeSeg* S)
             CS_GetEntries (S, L+1, I+1, 11)                     &&
             L[1]->OPC == OP65_AND                               &&
             L[1]->AM == AM65_IMM                                &&
-            CE_HasNumArg (L[1]) && L[1]->Num <= 127             &&
+            CE_HasNumArg (L[1]) && L[1]->Num <= 0x7F            &&
             L[2]->OPC == OP65_JSR                               &&
-            (strcmp (L[2]->Arg, "aslax1") == 0          ||
-             strcmp (L[2]->Arg, "shlax1") == 0)                 &&
             L[3]->OPC == OP65_CLC                               &&
             L[4]->OPC == OP65_ADC                               &&
             L[5]->OPC == OP65_TAY                               &&
@@ -1609,13 +1606,15 @@ unsigned OptPtrLoad19 (CodeSeg* S)
             L[7]->OPC == OP65_ADC                               &&
             L[8]->OPC == OP65_TAX                               &&
             L[9]->OPC == OP65_TYA                               &&
-            L[10]->OPC == OP65_LDY                               &&
-            CE_IsKnownImm(L[10], 1)                              &&
-            strlen(L[4]->Arg) >= 3                              &&
+            L[10]->OPC == OP65_LDY                              &&
+            CE_IsKnownImm(L[10], 1)                             &&
             L[4]->Arg[0] == '<'                                 &&
-            strlen(L[7]->Arg) >= 3                              &&
             L[7]->Arg[0] == '>'                                 &&
-            !strcmp(L[4]->Arg+1, L[7]->Arg+1)                   &&
+            strlen(L[4]->Arg) > 3                               &&
+            strlen(L[7]->Arg) > 3                               &&
+            strcmp(L[4]->Arg+1, L[7]->Arg+1) == 0               &&
+            (strcmp (L[2]->Arg, "aslax1") == 0          ||
+             strcmp (L[2]->Arg, "shlax1") == 0)                 &&
             CE_IsCallTo (L[11], "ldaxidx")                      &&
             !CS_RangeHasLabel (S, I+1, 11)) {
 
@@ -1634,26 +1633,30 @@ unsigned OptPtrLoad19 (CodeSeg* S)
             X = NewCodeEntry (OP65_TAY, AM65_IMP, 0, 0, L[2]->LI);
             CS_InsertEntry (S, X, IP++);
 
+            /* allocate Label memory */
+            Label = xmalloc (Len);
             /* lda label,y */
-            Label = memcpy (xmalloc (Len-2), L[4]->Arg+2, Len-3);
+            Label = memcpy (Label, L[4]->Arg+2, Len-3);
             Label[Len-3] = '\0';
             X = NewCodeEntry (OP65_LDA, AM65_ABSY, Label, 0, L[10]->LI);
             CS_InsertEntry (S, X, IP++);
-            xfree (Label);
 
-            /* lda label+1,y */
-            Label = memcpy (xmalloc (Len), L[4]->Arg+2, Len-3);
+            /* ldx label+1,y */
+            Label = memcpy (Label, L[4]->Arg+2, Len-3);
             strcpy(&Label[Len-3], "+1");
             X = NewCodeEntry (OP65_LDX, AM65_ABSY, Label, 0, L[10]->LI);
             CS_InsertEntry (S, X, IP++);
+            /* free Label memory */
             xfree (Label);
 
             /* Remove the old code */
-            /* Remove the AND only if it's == 127, since ASL erases high bit */
-            if (L[1]->Num == 127)
+            /* Remove the AND only if it's == 0x7F, since ASL erases high bit */
+            if (L[1]->Num == 0x7F) {
                 CS_DelEntries (S, I+1, 11);
-            else
+            } else {
                 CS_DelEntries (S, I+2, 10);
+            }
+
             /* Remove the ldx #0 */
             CS_DelEntry(S, I);
 
@@ -1670,6 +1673,3 @@ unsigned OptPtrLoad19 (CodeSeg* S)
     /* Return the number of changes made */
     return Changes;
 }
-
-
-

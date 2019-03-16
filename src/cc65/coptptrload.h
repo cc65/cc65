@@ -383,7 +383,7 @@ unsigned OptPtrLoad19 (CodeSeg* S);
 /* Search for the sequence:
 **
 **      ldx     #0
-**	and	#mask		(any value < 128)
+**      and     #mask          (any value < 0x80)
 **      jsr     aslax1/shlax1
 **      clc
 **      adc     #<(label+0)
@@ -397,12 +397,11 @@ unsigned OptPtrLoad19 (CodeSeg* S);
 **
 ** and replace it by:
 **
-**      ldx     #0
-**	and	#mask		(remove if == 127)
-**	asl
-**	tay
-**	lda	label,y
-**	ldx	label+1,y
+**      and     #mask          (remove if == 0x7F)
+**      asl
+**      tay
+**      lda     label,y
+**      ldx     label+1,y
 */
 
 

@@ -1,7 +1,13 @@
+; memmove.s
 ;
-; 2003-08-20, Ullrich von Bassewitz
-; 2009-09-13, Christian Krueger -- performance increase (about 20%), 2013-07-25 improved unrolling
-; 2015-10-23, Greg King
+; This file is part of
+; cc65 - a freeware C compiler for 6502 based systems
+;
+; https://github.com/cc65/cc65
+;
+; See "CREDITS" file for contributors and "LICENSE" file for legal
+; information.
+;
 ;
 ; void* __fastcall__ memmove (void* dest, const void* src, size_t size);
 ;

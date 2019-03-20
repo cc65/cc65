@@ -1,0 +1,51 @@
+
+This file lists the names of contributors.
+Without their work, cc65 wouldn't be what it currently is.
+Feel free to add your name here if you contributed to cc65, too.
+
+
+Many special thanks go to the guy who started it all:
+
+            John R. Dunning
+
+...and the person who advanced cc65 to a new level:
+
+            Ullrich von Bassewitz
+
+...and the current main maintainer
+
+            Oliver Schmidt <ol.sc@web.de>
+
+
+...and the other important persons (in alphabetical order):
+
+
+Eric Au                         <eric_au@hotmail.com>
+Craig Bruce
+Sidney Cadot                    <sidney@ch.twi.tudelft.nl>
+Piotr Fusik                     <P.Fusik@elka.pw.edu.pl>
+Keith W. Gerdes                 <kwg@netzero.net>
+groepaz                         <groepaz@gmx.net>
+Christian Groessler             <cpg@aladdin.de>
+Stefan A. Haubenthal            <polluks@web.de>
+Shawn Jefferson                 <jefferson_shawn_a8bit@yahoo.com>
+Stephen L. Judd
+Karri Kaksonen                  <karri@sipo.fi>
+Mark Keates                     <Mark.Keates@dendrite.com> 
+Greg King                       <gngking@erols.com>
+Michael Klein                   <michael.klein@puffin.lb.shuttle.de>
+Christian 'Irgendwer' Krueger
+David Lloyd                     <dmlloyd@atari-central.com>
+MagerValp                       <magervalp@cling.gu.se>
+Mirco Miranda                   <mircomir@libero.it>
+Freddy Offenga                  <taf_offenga@yahoo.com>
+Marc 'BlackJack' Rintsch        <blackjack@civitas64.de>
+Kevin Ruland                    <kevin@rodin.wustl.edu>
+Bastian Schick
+Steve Schmidtke                 <steve_schmidtke@hotmail.com>
+Josef Soucek                    <josef.soucek@ct.cz>
+Peter Trauner                   <peter.trauner@utanet.at>
+Maciej Witkowiak                <ytm@friko.onet.pl>
+
+
+Please see also https://github.com/cc65/cc65/graphs/contributors

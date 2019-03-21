@@ -7,7 +7,7 @@
 
         .export         _cputcxy, _cputc
         .export         plot, cputdirect, putchar
-        .import         gotoxy, mul40
+        .import         gotoxy, _mul40
         .importzp       tmp4,ptr4
         .import         _revflag,setcursor
 
@@ -71,8 +71,7 @@ putchar:
         sta     (OLDADR),y
 
         lda     ROWCRS
-        jsr     mul40           ; destroys tmp4
-        clc
+        jsr     _mul40          ; destroys tmp4, carry is cleared
         adc     SAVMSC          ; add start of screen memory
         sta     ptr4
         txa

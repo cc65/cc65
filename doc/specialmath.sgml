@@ -1,0 +1,38 @@
+<!doctype linuxdoc system>
+
+<article>
+<title>Special math functions
+<author>Christian Kr&uuml;ger
+
+<abstract>
+This library provides functions for speed optimized math operations.
+</abstract>
+
+<!-- Table of contents -->
+<toc>
+
+<!-- Begin the document -->
+
+<sect>Multiplication<p>
+
+When accessing screen memory often a multiplication of the vertical position is needed to calculate
+the target address. A quite common horizontal span for 8-bit systems is 20 or 40 bytes (beside e.g. 32 bytes, where the multiplication can be accomplished by shifting 5 times).
+
+<p>
+<tscreen><verb>
+    unsigned int __fastcall__ mul20(unsigned char value);
+</verb></tscreen>
+
+The 8 bit <tt>value</tt> is multiplied by 20 and returned as 16 bit value.
+</p>
+
+<p>
+<tscreen><verb>
+    unsigned int __fastcall__ mul40(unsigned char value);
+</verb></tscreen>
+
+The 8 bit <tt>value</tt> is multiplied by 40 and returned as 16 bit value.
+</p>
+
+
+</article>

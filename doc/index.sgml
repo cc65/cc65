@@ -97,6 +97,9 @@
   Describes Christian Kr&uuml;ger's macro package for writing self modifying
   assembler code.
 
+  <tag><htmlurl url="specialmath.html" name="specialmath.html"></tag>
+  Library for speed optimized math functions.  
+
   <tag><url name="6502 Binary Relocation Format document"
         url="http://www.6502.org/users/andre/o65/fileformat.html"></tag>
   Describes the o65 file format that is used for dynamically loadable modules

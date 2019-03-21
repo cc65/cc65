@@ -578,6 +578,12 @@ communication, see also <tt>testcode/lib/ser-test.c</tt>.
 <item><ref id="signal" name="signal">
 </itemize>
 
+<sect1><tt/specialmath.h/<label id="specialmath.h"><p>
+
+<itemize>
+<item><ref id="_mul20" name="_mul20">
+<item><ref id="_mul40" name="_mul40">
+</itemize>
 
 <sect1><tt/stdarg.h/<label id="stdarg.h"><p>
 
@@ -1020,6 +1026,29 @@ It returns 1 if it does.
 </descrip>
 </quote>
 
+<sect1>_mul20<label id="_mul20"><p>
+
+<quote>
+<descrip>
+<tag/Function/Multiplies argument by 20.
+<tag/Header/<tt/<ref id="specialmath.h" name="specialmath.h">/
+<tag/Declaration/<tt/unsigned int __fastcall__ _mul20(unsigned char value);/
+<tag/Description/Speed optimized function to multiply an 8 bit unsigned value by 20 to get a 16 bit result.
+<tag/Availability/cc65
+</descrip>
+</quote>
+
+<sect1>_mul40<label id="_mul40"><p>
+
+<quote>
+<descrip>
+<tag/Function/Multiplies argument by 40.
+<tag/Header/<tt/<ref id="specialmath.h" name="specialmath.h">/
+<tag/Declaration/<tt/unsigned int __fastcall__ _mul40(unsigned char value);/
+<tag/Description/Speed optimized function to multiply an 8 bit unsigned value by 40 to get a 16 bit result.
+<tag/Availability/cc65
+</descrip>
+</quote>
 
 <sect1>_poserror<label id="_poserror"><p>
 

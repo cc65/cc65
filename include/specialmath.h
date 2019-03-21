@@ -33,12 +33,12 @@
 
 /* Multiply an 8 bit unsigned value by 20 and return the 16 bit unsigned result */
 
-unsigned int __fastcall__ mul20(unsigned char value);
+unsigned int __fastcall__ _mul20(unsigned char value);
 
 
 /* Multiply an 8 bit unsigned value by 40 and return the 16 bit unsigned result */
 
-unsigned int __fastcall__ mul40(unsigned char value);
+unsigned int __fastcall__ _mul40(unsigned char value);
 
 
 

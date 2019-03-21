@@ -4,7 +4,7 @@
 ; cursor handling, internal function
 
         .include "atari.inc"
-        .import cursor,_mul40
+        .import cursor,__mul40
         .export setcursor
 
 .proc   setcursor
@@ -14,7 +14,7 @@
         sta     (OLDADR),y
 
         lda     ROWCRS
-        jsr     _mul40          ; function leaves with carry clear!
+        jsr     __mul40         ; function leaves with carry clear!
         adc     SAVMSC          ; add start of screen memory
         sta     OLDADR
         txa

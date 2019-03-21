@@ -1,4 +1,4 @@
-; mul20.s
+; mul40.s
 ;
 ; This file is part of
 ; cc65 - a freeware C compiler for 6502 based systems
@@ -8,15 +8,15 @@
 ; See "LICENSE" file for legal information.
 ;
 ;
-; unsigned int __fastcall__ mul20(unsigned char value);
+; unsigned int __fastcall__ _mul40(unsigned char value);
 ; 
 ; REMARKS: Function is defined to return with carry-flag cleared
 
 
         .importzp       tmp4
-        .export         _mul20
+        .export         __mul40
 
-.proc   _mul20                  ; = 30 bytes, 41/46 cycles
+.proc   __mul40                 ; = 33 bytes, 48/53 cycles
 
         sta     tmp4            ; remember value for later addition...
         ldx     #0              ; clear high-byte
@@ -39,6 +39,9 @@ mul10:  stx     tmp4            ; continue with classic shifting...
         rol     tmp4                                    
 
         asl     a               ; * 20 
+        rol     tmp4
+
+        asl     a               ; * 40
         rol     tmp4
 
         ldx     tmp4            ; deliver high-byte in X

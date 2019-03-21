@@ -181,7 +181,6 @@ SRCDIRS += common   \
            mouse    \
            runtime  \
            serial   \
-           specialmath \
            tgi      \
            zlib
 

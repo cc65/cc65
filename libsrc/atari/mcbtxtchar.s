@@ -12,7 +12,7 @@
 
         .export         _mouse_txt_callbacks
         .importzp       tmp4
-        .import         _mul40
+        .import         __mul40
         .importzp       mouse_txt_char          ; screen code of mouse cursor
 
         .include        "atari.inc"
@@ -108,7 +108,7 @@ movey:
         lsr     a               ; convert y position to character line
         lsr     a
         lsr     a
-        jsr     _mul40          ; carry is cleared by _mul40
+        jsr     __mul40          ; carry is cleared by _mul40
         adc     SAVMSC
         sta     scrptr
         txa

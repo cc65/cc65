@@ -10,7 +10,7 @@
 
         .export         _cputcxy, _cputc
         .export         plot, cputdirect, putchar
-        .import         gotoxy, _mul20
+        .import         gotoxy, __mul20
         .importzp       ptr4
         .import         setcursor
 
@@ -75,7 +75,7 @@ putchar:
         pha                     ; save char
 
         lda     ROWCRS_5200
-        jsr     _mul20          ; destroys tmp4, carry is cleared
+        jsr     __mul20         ; destroys tmp4, carry is cleared
         adc     SAVMSC          ; add start of screen memory
         sta     ptr4
         txa

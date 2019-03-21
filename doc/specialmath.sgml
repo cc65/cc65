@@ -20,7 +20,7 @@ the target address. A quite common horizontal span for 8-bit systems is 20 or 40
 
 <p>
 <tscreen><verb>
-    unsigned int __fastcall__ mul20(unsigned char value);
+    unsigned int __fastcall__ _mul20(unsigned char value);
 </verb></tscreen>
 
 The 8 bit <tt>value</tt> is multiplied by 20 and returned as 16 bit value.
@@ -28,7 +28,7 @@ The 8 bit <tt>value</tt> is multiplied by 20 and returned as 16 bit value.
 
 <p>
 <tscreen><verb>
-    unsigned int __fastcall__ mul40(unsigned char value);
+    unsigned int __fastcall__ _mul40(unsigned char value);
 </verb></tscreen>
 
 The 8 bit <tt>value</tt> is multiplied by 40 and returned as 16 bit value.

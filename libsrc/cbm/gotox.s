@@ -5,11 +5,9 @@
 ;
 
         .export         _gotox
-        .import         plot           
+        .import         plot
         .importzp       CURS_X
 
 _gotox: sta     CURS_X          ; Set new position
         jmp     plot            ; And activate it
-
-
 

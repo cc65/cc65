@@ -15,7 +15,6 @@
         stx     DEVNUM          ; Device address
         sty     SECADR          ; Secondary address
         rts
-                      
-.endproc
 
+.endproc
 

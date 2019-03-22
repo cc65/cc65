@@ -102,7 +102,7 @@ argloop:lda     BASIC_BUF,x
         inx
         cmp     term
         bne     argloop
-                          
+
 ; We've found the end of the argument. X points one character behind it, and
 ; A contains the terminating character. To make the argument a valid C string,
 ; replace the terminating character by a zero.

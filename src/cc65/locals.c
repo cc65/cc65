@@ -275,8 +275,9 @@ static void ParseAutoDecl (Declaration* Decl)
             ** We abuse the Collection somewhat by using it to store line
             ** numbers.
             */
-            CollReplace (&CurrentFunc->LocalsBlockStack, (void *)(long)GetCurrentLine (),
-                CollCount (&CurrentFunc->LocalsBlockStack) - 1);
+            CollReplace (&CurrentFunc->LocalsBlockStack,
+                    (void *)(size_t)GetCurrentLine (),
+                    CollCount (&CurrentFunc->LocalsBlockStack) - 1);
 
         } else {
             /* Non-initialized local variable. Just keep track of

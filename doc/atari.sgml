@@ -297,13 +297,13 @@ This also includes access to operating system locations (e.g. hardware shadow re
 "<tt/OS/".
 The names are the usual ones you can find in system reference manuals. Example:
 
-<verb>
+<tscreen><verb>
 ...
     OS.savmsc = ScreenMemory;
     OS.color4 = 14;                         // white frame
     if (OS.stick0 != 15 || OS.ch != 255)    // key or stick input?
 ...
-</verb>
+</verb></tscreen>
 
 Please note that memory location 762/$2FA is called "<tt/char_/" while the orignal name "<tt/char/" conflicts with the C keyword.
 
@@ -376,7 +376,7 @@ cc65 supports constructing these display lists by offering defines
 for the instructions. In conjunction with the "void"-variable extension
 of cc65, display lists can be created quite comfortable:
 
-<verb>
+<tscreen><verb>
 ...
 unsigned char ScreenMemory[100];
 
@@ -393,12 +393,12 @@ void DisplayList =
     DL_BLK4,
     DL_CHR20x8x2,
     DL_JVB,
-    &DisplayList
+    &amp;DisplayList
 };
 ...
 OS.sdlst = &amp;DisplayList;
 ...
-</verb>
+</verb></tscreen>
 
 Please inspect the <tt/_antic.h/ header file to detemine the supported
 instruction names. Modifiers on instructions can be nested without need
@@ -445,23 +445,23 @@ A final note: Since cc65 has currently some difficulties with string merging
 under different mappings, defining remapped strings works only flawlessly
 with static array initialization:
 
-<verb>
+<tscreen><verb>
 #include &lt;atari_screen_charmap.h&gt;
 char pcScreenMappingString[] = "Hello Atari!";
 
 #include &lt;atari_atascii_charmap.h&gt;
 char pcAtasciiMappingString[] = "Hello Atari!";
-</verb>
+</verb></tscreen>
 
 delivers correct results, while
 
-<verb>
+<tscreen><verb>
 #include &lt;atari_screen_charmap.h&gt;
 char* pcScreenMappingString = "Hello Atari!";
 
 #include &lt;atari_atascii_charmap.h&gt;
 char* pcAtasciiMappingString = "Hello Atari!";
-</verb>
+</verb></tscreen>
 
 does not.
 
@@ -471,7 +471,7 @@ For direct keyboard scanning in conjunction with e.g. the OS location "CH" (764/
 all keyboard codes are available as defined values on C and assembler side.
 
 Example:
-<verb>
+<tscreen><verb>
 ...
     while (!kbhit());
     switch (OS.ch)
@@ -484,7 +484,7 @@ Example:
         ...
     }
 ...
-</verb>
+</verb></tscreen>
 
 You can find the C defines in the file "<tt/atari.h/" or "<tt/atari.inc/" for the assembler variant.
 

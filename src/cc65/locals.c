@@ -276,7 +276,7 @@ static void ParseAutoDecl (Declaration* Decl)
             ** numbers.
             */
             CollReplace (&CurrentFunc->LocalsBlockStack,
-                    (void *)(size_t)GetCurrentLine (),
+                    (void *)(long)GetCurrentLine (),
                     CollCount (&CurrentFunc->LocalsBlockStack) - 1);
 
         } else {

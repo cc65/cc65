@@ -11,12 +11,12 @@ Compiler is build from cc65-snapshot-2.13.9.20101031 sources.
 Expected results and also what I get from this without any optimisations
 are: 48663 and 49218
 
-When I turn on ``-O``: 58096 and 58096.  After swapping the two variable
-declaration lines in `calculate_checksum()` the results are correct
-with ``-O``.
+When I turn on ''-O'': 58096 and 58096.  After swapping the two variable
+declaration lines in 'calculate_checksum()' the results are correct
+with ''-O''.
 
-But with ``--O --static-locals`` the results are incorrect again (31757
-and 15408).  ``--static-locals`` alone works though.
+But with ''--O --static-locals'' the results are incorrect again (31757
+and 15408).  ''--static-locals'' alone works though.
 */
 
 #include <stdio.h>

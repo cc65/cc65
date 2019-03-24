@@ -178,7 +178,7 @@ static SymTable* NewSymTable (SymTable* Parent, const StrBuf* Name)
                     }
                 } else {
                     /* Duplicate scope name */
-                    Internal ("Duplicate scope name: `%m%p'", Name);
+                    Internal ("Duplicate scope name: '%m%p'", Name);
                 }
             }
         }
@@ -216,7 +216,7 @@ void SymEnterLevel (const StrBuf* ScopeName, unsigned char Type,
 
         /* Check if the scope has been defined before */
         if (CurrentScope->Flags & ST_DEFINED) {
-            Error ("Duplicate scope `%m%p'", ScopeName);
+            Error ("Duplicate scope '%m%p'", ScopeName);
         }
 
     } else {
@@ -502,7 +502,7 @@ static void SymCheckUndefined (SymEntry* S)
             if (Sym->Flags & SF_IMPORT) {
                 /* The symbol is already marked as import */
                 LIError (&S->RefLines,
-                         "Symbol `%s' is already an import",
+                         "Symbol '%s' is already an import",
                          GetString (Sym->Name));
             }
             if ((Sym->Flags & SF_EXPORT) == 0) {
@@ -516,7 +516,7 @@ static void SymCheckUndefined (SymEntry* S)
                 if (Sym->AddrSize > Sym->ExportSize) {
                     /* We're exporting a symbol smaller than it actually is */
                     LIWarning (&Sym->DefLines, 1,
-                               "Symbol `%m%p' is %s but exported %s",
+                               "Symbol '%m%p' is %s but exported %s",
                                GetSymName (Sym),
                                AddrSizeToStr (Sym->AddrSize),
                                AddrSizeToStr (Sym->ExportSize));
@@ -541,7 +541,7 @@ static void SymCheckUndefined (SymEntry* S)
         if (S->Flags & SF_EXPORT) {
             /* We will not auto-import an export */
             LIError (&S->RefLines,
-                     "Exported symbol `%m%p' was never defined",
+                     "Exported symbol '%m%p' was never defined",
                      GetSymName (S));
         } else {
             if (AutoImport) {
@@ -554,7 +554,7 @@ static void SymCheckUndefined (SymEntry* S)
             } else {
                 /* Error */
                 LIError (&S->RefLines,
-                         "Symbol `%m%p' is undefined",
+                         "Symbol '%m%p' is undefined",
                          GetSymName (S));
             }
         }
@@ -616,7 +616,7 @@ void SymCheck (void)
                 ReleaseFullLineInfo (&S->RefLines);
             } else if ((S->Flags & SF_DEFINED) != 0 && (S->Flags & SF_REFERENCED) == 0) {
                 LIWarning (&S->DefLines, 2,
-                           "Symbol `%m%p' is defined but never used",
+                           "Symbol '%m%p' is defined but never used",
                            GetSymName (S));
             }
 
@@ -625,7 +625,7 @@ void SymCheck (void)
                 if ((S->Flags & (SF_REFERENCED | SF_FORCED)) == SF_NONE) {
                     /* Imported symbol is not referenced */
                     LIWarning (&S->DefLines, 2,
-                               "Symbol `%m%p' is imported but never used",
+                               "Symbol '%m%p' is imported but never used",
                                GetSymName (S));
                 } else {
                     /* Give the import an id, count imports */
@@ -653,7 +653,7 @@ void SymCheck (void)
                     } else if (S->AddrSize > S->ExportSize) {
                         /* We're exporting a symbol smaller than it actually is */
                         LIWarning (&S->DefLines, 1,
-                                   "Symbol `%m%p' is %s but exported %s",
+                                   "Symbol '%m%p' is %s but exported %s",
                                    GetSymName (S),
                                    AddrSizeToStr (S->AddrSize),
                                    AddrSizeToStr (S->ExportSize));
@@ -673,7 +673,7 @@ void SymCheck (void)
                     const FilePos* P = S->GuessedUse[S->AddrSize - 1];
                     if (P) {
                         PWarning (P, 0,
-                                  "Didn't use %s addressing for `%m%p'",
+                                  "Didn't use %s addressing for '%m%p'",
                                   AddrSizeToStr (S->AddrSize),
                                   GetSymName (S));
                     }

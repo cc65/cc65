@@ -146,10 +146,10 @@ static PCXHeader* ReadPCXHeader (FILE* F, const char* Name)
 
     /* Check the header data */
     if (P->Id != PCX_MAGIC_ID || P->FileVersion == 1 || P->FileVersion > 5) {
-        Error ("`%s' is not a PCX file", Name);
+        Error ("'%s' is not a PCX file", Name);
     }
     if (P->Compressed > 1) {
-        Error ("Unsupported compression (%d) in PCX file `%s'",
+        Error ("Unsupported compression (%d) in PCX file '%s'",
                P->Compressed, Name);
     }
     /* We support:
@@ -160,15 +160,15 @@ static PCXHeader* ReadPCXHeader (FILE* F, const char* Name)
     if (!((P->BPP == 1 && P->Planes == 1) ||
           (P->BPP == 8 && (P->Planes == 1 || P->Planes == 3 || P->Planes == 4)))) {
         /* We could support others, but currently we don't */
-        Error ("Unsupported PCX format: %u planes, %u bpp in PCX file `%s'",
+        Error ("Unsupported PCX format: %u planes, %u bpp in PCX file '%s'",
                P->Planes, P->BPP, Name);
     }
     if (P->PalInfo != 1 && P->PalInfo != 2) {
-        Error ("Unsupported palette info (%u) in PCX file `%s'",
+        Error ("Unsupported palette info (%u) in PCX file '%s'",
                P->PalInfo, Name);
     }
     if (!ValidBitmapSize (P->Width, P->Height)) {
-        Error ("PCX file `%s' has an unsupported size (w=%u, h=%d)",
+        Error ("PCX file '%s' has an unsupported size (w=%u, h=%d)",
                Name, P->Width, P->Height);
     }
 
@@ -261,7 +261,7 @@ Bitmap* ReadPCXFile (const Collection* A)
     /* Open the file */
     FILE* F = fopen (Name, "rb");
     if (F == 0) {
-        Error ("Cannot open PCX file `%s': %s", Name, strerror (errno));
+        Error ("Cannot open PCX file '%s': %s", Name, strerror (errno));
     }
 
     /* Read the PCX header */
@@ -357,7 +357,7 @@ Bitmap* ReadPCXFile (const Collection* A)
 
                 /* Check for palette marker */
                 if (Read8 (F) != 0x0C) {
-                    Error ("Invalid palette marker in PCX file `%s'", Name);
+                    Error ("Invalid palette marker in PCX file '%s'", Name);
                 }
 
             } else if (EndPos == CurPos) {
@@ -367,12 +367,12 @@ Bitmap* ReadPCXFile (const Collection* A)
 
                 /* Check the maximum index for safety */
                 if (MaxIdx > 15) {
-                    Error ("PCX file `%s' contains more than 16 indexed colors "
+                    Error ("PCX file '%s' contains more than 16 indexed colors "
                            "but no extra palette", Name);
                 }
 
             } else {
-                Error ("Error in PCX file `%s': %lu bytes at end of pixel data",
+                Error ("Error in PCX file '%s': %lu bytes at end of pixel data",
                        Name, EndPos - CurPos);
             }
 

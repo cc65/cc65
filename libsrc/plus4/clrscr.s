@@ -6,6 +6,7 @@
 
         .export         _clrscr
 
+        .include        "cbm_kernal.inc"
         .include        "plus4.inc"
 
 .segment        "LOWCODE"               ; Must go into low memory
@@ -16,9 +17,3 @@
         sta     ENABLE_RAM              ; Switch back to RAM
         rts                             ; Return to caller
 .endproc
-
-
-
-
-
-

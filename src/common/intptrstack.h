@@ -47,8 +47,8 @@
 
 typedef struct IntPtrStack IntPtrStack;
 struct IntPtrInner {
-	long val;
-	void *ptr;
+        long val;
+        void *ptr;
 };
 struct IntPtrStack {
     unsigned    Count;

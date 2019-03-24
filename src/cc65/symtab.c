@@ -168,11 +168,11 @@ static void CheckSymTable (SymTable* Tab)
                     !SymHasAttr (Entry, atUnused)) {
                     if (Flags & SC_PARAM) {
                         if (IS_Get (&WarnUnusedParam)) {
-                            Warning ("Parameter `%s' is never used", Entry->Name);
+                            Warning ("Parameter '%s' is never used", Entry->Name);
                         }
                     } else {
                         if (IS_Get (&WarnUnusedVar)) {
-                            Warning ("`%s' is defined but never used", Entry->Name);
+                            Warning ("'%s' is defined but never used", Entry->Name);
                         }
                     }
                 }
@@ -182,11 +182,11 @@ static void CheckSymTable (SymTable* Tab)
             if (Flags & SC_LABEL) {
                 if (!SymIsDef (Entry)) {
                     /* Undefined label */
-                    Error ("Undefined label: `%s'", Entry->Name);
+                    Error ("Undefined label: '%s'", Entry->Name);
                 } else if (!SymIsRef (Entry)) {
                     /* Defined but not used */
                     if (IS_Get (&WarnUnusedLabel)) {
-                        Warning ("`%s' is defined but never used", Entry->Name);
+                        Warning ("'%s' is defined but never used", Entry->Name);
                     }
                 }
             }
@@ -566,10 +566,10 @@ SymEntry* AddStructSym (const char* Name, unsigned Type, unsigned Size, SymTable
         /* We do have an entry. This may be a forward, so check it. */
         if ((Entry->Flags & SC_TYPEMASK) != Type) {
             /* Existing symbol is not a struct */
-            Error ("Symbol `%s' is already different kind", Name);
+            Error ("Symbol '%s' is already different kind", Name);
         } else if (Size > 0 && Entry->V.S.Size > 0) {
             /* Both structs are definitions. */
-            Error ("Multiple definition for `%s'", Name);
+            Error ("Multiple definition for '%s'", Name);
         } else {
             /* Define the struct size if it is given */
             if (Size > 0) {
@@ -605,7 +605,7 @@ SymEntry* AddBitField (const char* Name, unsigned Offs, unsigned BitOffs, unsign
     if (Entry) {
 
         /* We have a symbol with this name already */
-        Error ("Multiple definition for `%s'", Name);
+        Error ("Multiple definition for '%s'", Name);
 
     } else {
 
@@ -639,9 +639,9 @@ SymEntry* AddConstSym (const char* Name, const Type* T, unsigned Flags, long Val
     SymEntry* Entry = FindSymInTable (Tab, Name, HashStr (Name));
     if (Entry) {
         if ((Entry->Flags & SC_CONST) != SC_CONST) {
-            Error ("Symbol `%s' is already different kind", Name);
+            Error ("Symbol '%s' is already different kind", Name);
         } else {
-            Error ("Multiple definition for `%s'", Name);
+            Error ("Multiple definition for '%s'", Name);
         }
         return Entry;
     }
@@ -706,7 +706,7 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
 
         if (SymIsDef (Entry) && (Flags & SC_DEF) != 0) {
             /* Trying to define the label more than once */
-            Error ("Label `%s' is defined more than once", Name);
+            Error ("Label '%s' is defined more than once", Name);
         }
 
         NewDOR = AddDefOrRef (Entry, Flags);
@@ -809,7 +809,7 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
     if (Entry) {
 
         /* We have a symbol with this name already */
-        Error ("Multiple definition for `%s'", Name);
+        Error ("Multiple definition for '%s'", Name);
 
     } else {
 
@@ -865,12 +865,12 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
         ** then avoid a compiler crash.  See GitHub issue #728.
         */
         if (Entry->Flags & SC_ENUM) {
-            Fatal ("Can't redeclare enum constant `%s' as global variable", Name);
+            Fatal ("Can't redeclare enum constant '%s' as global variable", Name);
         }
 
         /* We have a symbol with this name already */
         if (Entry->Flags & SC_TYPE) {
-            Error ("Multiple definition for `%s'", Name);
+            Error ("Multiple definition for '%s'", Name);
             return Entry;
         }
 
@@ -890,7 +890,7 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
             if ((Size != UNSPECIFIED && ESize != UNSPECIFIED && Size != ESize) ||
                 TypeCmp (T + 1, EType + 1) < TC_EQUAL) {
                 /* Types not identical: Conflicting types */
-                Error ("Conflicting types for `%s'", Name);
+                Error ("Conflicting types for '%s'", Name);
                 return Entry;
             } else {
                 /* Check if we have a size in the existing definition */
@@ -903,7 +903,7 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
         } else {
             /* New type must be identical */
             if (TypeCmp (EType, T) < TC_EQUAL) {
-                Error ("Conflicting types for `%s'", Name);
+                Error ("Conflicting types for '%s'", Name);
                 return Entry;
             }
 
@@ -930,7 +930,7 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
         ** warn about the conflict.  (It will compile a public declaration.)
         */
         if ((Flags & SC_EXTERN) == 0 && (Entry->Flags & SC_EXTERN) != 0) {
-            Warning ("static declaration follows non-static declaration of `%s'.", Name);
+            Warning ("static declaration follows non-static declaration of '%s'.", Name);
         }
 
         /* An extern declaration must not change the current linkage. */
@@ -942,7 +942,7 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
         ** warn about the conflict.  (It will compile a public declaration.)
         */
         if ((Flags & SC_EXTERN) != 0 && (Entry->Flags & SC_EXTERN) == 0) {
-            Warning ("public declaration follows static declaration of `%s'.", Name);
+            Warning ("public declaration follows static declaration of '%s'.", Name);
         }
 
         /* Add the new flags */
@@ -1017,7 +1017,7 @@ void MakeZPSym (const char* Name)
     if (Entry) {
         Entry->Flags |= SC_ZEROPAGE;
     } else {
-        Error ("Undefined symbol: `%s'", Name);
+        Error ("Undefined symbol: '%s'", Name);
     }
 }
 

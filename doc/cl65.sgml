@@ -44,7 +44,7 @@ Short options:
   -o name                       Name the output file
   -r                            Enable register variables
   -t sys                        Set the target system
-  -u sym                        Force an import of symbol `sym'
+  -u sym                        Force an import of symbol 'sym'
   -v                            Verbose mode
   -vm                           Verbose map file
   -C name                       Use linker config file
@@ -90,7 +90,7 @@ Long options:
   --debug                       Debug mode
   --debug-info                  Add debug info
   --feature name                Set an emulation feature
-  --force-import sym            Force an import of symbol `sym'
+  --force-import sym            Force an import of symbol 'sym'
   --help                        Help (this text)
   --include-dir dir             Set a compiler include directory path
   --ld-args options             Pass options to the linker
@@ -236,14 +236,14 @@ package, it tries to be smart about several things.
 
 <itemize>
 
-<item>	If you don't give a target system on the command line, cl65
-	defaults to the C64.
+<item>  If you don't give a target system on the command line, cl65
+        defaults to the C64.
 
 <item>  When linking, cl65 will supply the name of the library file for
         the target system to the linker; so, you don't have to do that.
 
-<item>	If the final step is the linker, and the name of the output file was
-	not explicitly given, cl65 will use the name of the first input file
+<item>  If the final step is the linker, and the name of the output file was
+        not explicitly given, cl65 will use the name of the first input file
         without the extension, provided that the name of that file has an
         extension. So, you don't need to give the executable name in most
         cases; just give the name of your "main" file as the first input file.
@@ -284,24 +284,24 @@ assembler file (irq.s) will need the following separate steps to compile
 into an executable named morse:
 
 <tscreen><verb>
-	cc65 -g -Oi -t c64 morse.c
-	ca65 -g morse.s
-	ca65 -g irq.s
-	ld65 -o morse -t c64 c64.o morse.o irq.o c64.lib
+        cc65 -g -Oi -t c64 morse.c
+        ca65 -g morse.s
+        ca65 -g irq.s
+        ld65 -o morse -t c64 c64.o morse.o irq.o c64.lib
 </verb></tscreen>
 
 When using cl65, this is simplified to
 
 <tscreen><verb>
-	cl65 -g -Oi morse.c irq.s
+        cl65 -g -Oi morse.c irq.s
 </verb></tscreen>
 
 As a general rule, you may use cl65 instead of cc65 at most times,
 especially in makefiles to build object files directly from C files. Use
 
 <tscreen><verb>
-	.c.o:
-	      	cl65 -g -Oi $<
+        .c.o:
+                cl65 -g -Oi $<
 </verb></tscreen>
 
 to do this.
@@ -323,14 +323,14 @@ including commercial applications, and to alter it and redistribute it
 freely, subject to the following restrictions:
 
 <enum>
-<item> 	The origin of this software must not be misrepresented; you must not
-       	claim that you wrote the original software. If you use this software
-       	in a product, an acknowledgment in the product documentation would be
-	appreciated but is not required.
-<item>	Altered source versions must be plainly marked as such, and must not
-	be misrepresented as being the original software.
-<item>	This notice may not be removed or altered from any source
-	distribution.
+<item>  The origin of this software must not be misrepresented; you must not
+        claim that you wrote the original software. If you use this software
+        in a product, an acknowledgment in the product documentation would be
+        appreciated but is not required.
+<item>  Altered source versions must be plainly marked as such, and must not
+        be misrepresented as being the original software.
+<item>  This notice may not be removed or altered from any source
+        distribution.
 </enum>
 
 

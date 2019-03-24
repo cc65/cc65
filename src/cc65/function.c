@@ -422,14 +422,14 @@ void NewFunc (SymEntry* Func)
 
         /* Main cannot be a fastcall function */
         if (IsQualFastcall (Func->Type)) {
-            Error ("`main' cannot be declared as __fastcall__");
+            Error ("'main' cannot be declared as __fastcall__");
         }
 
         /* If cc65 extensions aren't enabled, don't allow a main function that
         ** doesn't return an int.
         */
         if (IS_Get (&Standard) != STD_CC65 && CurrentFunc->ReturnType[0].C != T_INT) {
-            Error ("`main' must always return an int");
+            Error ("'main' must always return an int");
         }
 
         /* Add a forced import of a symbol that is contained in the startup

@@ -166,13 +166,13 @@ Import* ReadImport (FILE* F, ObjData* Obj)
         */
         if (ObjHasFiles (I->Obj)) {
             const LineInfo* LI = GetImportPos (I);
-            Error ("Invalid import size in for `%s', imported from %s(%u): 0x%02X",
+            Error ("Invalid import size in for '%s', imported from %s(%u): 0x%02X",
                    GetString (I->Name),
                    GetSourceName (LI),
                    GetSourceLine (LI),
                    I->AddrSize);
         } else {
-            Error ("Invalid import size in for `%s', imported from %s: 0x%02X",
+            Error ("Invalid import size in for '%s', imported from %s: 0x%02X",
                    GetString (I->Name),
                    GetObjFileName (I->Obj),
                    I->AddrSize);
@@ -199,7 +199,7 @@ Import* GenImport (unsigned Name, unsigned char AddrSize)
         /* We have no object file information and no line info for a new
         ** import
         */
-        Error ("Invalid import size 0x%02X for symbol `%s'",
+        Error ("Invalid import size 0x%02X for symbol '%s'",
                I->AddrSize,
                GetString (I->Name));
     }
@@ -483,7 +483,7 @@ void InsertExport (Export* E)
                     }
                 } else {
                     /* Duplicate entry, ignore it */
-                    Warning ("Duplicate external identifier: `%s'",
+                    Warning ("Duplicate external identifier: '%s'",
                              GetString (L->Name));
                 }
                 return;
@@ -662,7 +662,7 @@ long GetExportVal (const Export* E)
 {
     if (E->Expr == 0) {
         /* OOPS */
-        Internal ("`%s' is an undefined external", GetString (E->Name));
+        Internal ("'%s' is an undefined external", GetString (E->Name));
     }
     return GetExprVal (E->Expr);
 }
@@ -720,9 +720,9 @@ static void CheckSymType (const Export* E)
             }
 
             /* Output the diagnostic */
-            Warning ("Address size mismatch for `%s': "
-                     "Exported from %s as `%s', "
-                     "import in %s as `%s'",
+            Warning ("Address size mismatch for '%s': "
+                     "Exported from %s as '%s', "
+                     "import in %s as '%s'",
                      GetString (E->Name),
                      SB_GetConstBuf (&ExportLoc),
                      ExpAddrSize,
@@ -770,7 +770,7 @@ static void PrintUnresolved (ExpCheckFunc F, void* Data)
             /* Unresolved external */
             Import* Imp = E->ImpList;
             fprintf (stderr,
-                     "Unresolved external `%s' referenced in:\n",
+                     "Unresolved external '%s' referenced in:\n",
                      GetString (E->Name));
             while (Imp) {
                 unsigned J;
@@ -1053,7 +1053,7 @@ void CircularRefError (const Export* E)
 /* Print an error about a circular reference using to define the given export */
 {
     const LineInfo* LI = GetExportPos (E);
-    Error ("Circular reference for symbol `%s', %s(%u)",
+    Error ("Circular reference for symbol '%s', %s(%u)",
            GetString (E->Name),
            GetSourceName (LI),
            GetSourceLine (LI));

@@ -13,7 +13,7 @@ psa:            .word 0
         .bss
 temp_x:         .byte 0
 temp_y:         .byte 0
-temp_a:	        .byte 0
+temp_a:         .byte 0
 irq_count:      .byte 0
 nmi_count:      .byte 0
 psx:            .byte 0
@@ -419,4 +419,3 @@ printsign1:
         ldy     temp_y
         rts
 .endproc
-

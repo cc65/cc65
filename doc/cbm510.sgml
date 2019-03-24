@@ -244,7 +244,7 @@ The default drivers, <tt/mouse_stddrv (mouse_static_stddrv)/, point to <tt/cbm51
 
 <sect1>Realtime clock<p>
 
-The realtime clock functions use the CIA1 TOD clock. As that clock only stores
+The realtime clock functions use the CIA2 TOD clock. As that clock only stores
 the time but not the date, the date set by <tt/clock_settime()/ is simply stored
 inside the C library for retrieval in the same program via <tt/clock_gettime()/.
 
@@ -322,14 +322,14 @@ including commercial applications, and to alter it and redistribute it
 freely, subject to the following restrictions:
 
 <enum>
-<item>	The origin of this software must not be misrepresented; you must not
-	claim that you wrote the original software. If you use this software
-	in a product, an acknowledgment in the product documentation would be
-	appreciated but is not required.
-<item>	Altered source versions must be plainly marked as such, and must not
-	be misrepresented as being the original software.
-<item>	This notice may not be removed or altered from any source
-	distribution.
+<item>  The origin of this software must not be misrepresented; you must not
+        claim that you wrote the original software. If you use this software
+        in a product, an acknowledgment in the product documentation would be
+        appreciated but is not required.
+<item>  Altered source versions must be plainly marked as such, and must not
+        be misrepresented as being the original software.
+<item>  This notice may not be removed or altered from any source
+        distribution.
 </enum>
 
 </article>

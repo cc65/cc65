@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2000-2005 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -466,7 +466,7 @@ Again:
             /* C++ style comment */
             NextChar ();
             if (C != '/') {
-                InfoError ("Invalid token `/'");
+                InfoError ("Invalid token '/'");
             }
             do {
                 NextChar ();
@@ -482,7 +482,7 @@ Again:
             break;
 
         default:
-            InfoError ("Invalid character `%c'", C);
+            InfoError ("Invalid character '%c'", C);
 
     }
 }
@@ -503,7 +503,7 @@ void InfoConsume (unsigned T, const char* Msg)
 void InfoConsumeLCurly (void)
 /* Consume a left curly brace */
 {
-    InfoConsume (INFOTOK_LCURLY, "`{' expected");
+    InfoConsume (INFOTOK_LCURLY, "'{' expected");
 }
 
 
@@ -511,7 +511,7 @@ void InfoConsumeLCurly (void)
 void InfoConsumeRCurly (void)
 /* Consume a right curly brace */
 {
-    InfoConsume (INFOTOK_RCURLY, "`}' expected");
+    InfoConsume (INFOTOK_RCURLY, "'}' expected");
 }
 
 
@@ -519,7 +519,7 @@ void InfoConsumeRCurly (void)
 void InfoConsumeSemi (void)
 /* Consume a semicolon */
 {
-    InfoConsume (INFOTOK_SEMI, "`;' expected");
+    InfoConsume (INFOTOK_SEMI, "';' expected");
 }
 
 
@@ -527,7 +527,7 @@ void InfoConsumeSemi (void)
 void InfoConsumeColon (void)
 /* Consume a colon */
 {
-    InfoConsume (INFOTOK_COLON, "`:' expected");
+    InfoConsume (INFOTOK_COLON, "':' expected");
 }
 
 
@@ -683,7 +683,7 @@ void InfoOpenInput (void)
     /* Open the file */
     InputFile = fopen (InfoFile, "r");
     if (InputFile == 0) {
-        Error ("Cannot open `%s': %s", InfoFile, strerror (errno));
+        Error ("Cannot open '%s': %s", InfoFile, strerror (errno));
     }
 
     /* Initialize variables */

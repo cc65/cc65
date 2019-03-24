@@ -339,7 +339,7 @@ static void CmdAddFile (CmdDesc* Cmd, const char* File)
         for (I = 0; I < Cmd->FileCount; ++I) {
             if (strcmp (Cmd->Files[I], File) == 0) {
                 /* Duplicate file */
-                Warning ("Duplicate file in argument list: `%s'", File);
+                Warning ("Duplicate file in argument list: '%s'", File);
                 /* No need to search further */
                 break;
             }
@@ -447,7 +447,7 @@ static void ExecProgram (CmdDesc* Cmd)
     /* Check the result code */
     if (Status < 0) {
         /* Error executing the program */
-        Error ("Cannot execute `%s': %s", Cmd->Name, strerror (errno));
+        Error ("Cannot execute '%s': %s", Cmd->Name, strerror (errno));
     } else if (Status != 0) {
         /* Called program had an error */
         exit (Status);
@@ -573,7 +573,7 @@ static void AssembleIntermediate (const char* SourceFile)
 
     /* Remove the input file */
     if (remove (AsmName) < 0) {
-        Warning ("Cannot remove temporary file `%s': %s",
+        Warning ("Cannot remove temporary file '%s': %s",
                  AsmName, strerror (errno));
     }
 
@@ -757,7 +757,7 @@ static void Usage (void)
             "  -o name\t\t\tName the output file\n"
             "  -r\t\t\t\tEnable register variables\n"
             "  -t sys\t\t\tSet the target system\n"
-            "  -u sym\t\t\tForce an import of symbol `sym'\n"
+            "  -u sym\t\t\tForce an import of symbol 'sym'\n"
             "  -v\t\t\t\tVerbose mode\n"
             "  -vm\t\t\t\tVerbose map file\n"
             "  -C name\t\t\tUse linker config file\n"
@@ -803,7 +803,7 @@ static void Usage (void)
             "  --debug\t\t\tDebug mode\n"
             "  --debug-info\t\t\tAdd debug info\n"
             "  --feature name\t\tSet an emulation feature\n"
-            "  --force-import sym\t\tForce an import of symbol `sym'\n"
+            "  --force-import sym\t\tForce an import of symbol 'sym'\n"
             "  --help\t\t\tHelp (this text)\n"
             "  --include-dir dir\t\tSet a compiler include directory path\n"
             "  --ld-args options\t\tPass options to the linker\n"
@@ -1296,9 +1296,9 @@ static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
 {
     Target = FindTarget (Arg);
     if (Target == TGT_UNKNOWN) {
-        Error ("No such target system: `%s'", Arg);
+        Error ("No such target system: '%s'", Arg);
     } else if (Target == TGT_MODULE) {
-        Error ("Cannot use `module' as target, use --module instead");
+        Error ("Cannot use 'module' as target, use --module instead");
     }
 }
 
@@ -1631,7 +1631,7 @@ int main (int argc, char* argv [])
                     break;
 
                 default:
-                    Error ("Don't know what to do with `%s'", Arg);
+                    Error ("Don't know what to do with '%s'", Arg);
 
             }
 

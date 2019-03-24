@@ -103,7 +103,7 @@
 ;------------------------------------------------------------------------------
 ; The mouse API version, stored in MOUSE_HDR::VERSION
 
-MOUSE_API_VERSION       = $05
+MOUSE_API_VERSION       = $06
 
 ;------------------------------------------------------------------------------
 ; Bitmapped mouse driver flags, stored in MOUSE_HDR::FLAGS.

@@ -27,19 +27,19 @@ binary needs to be compiled with <tt/--target sim6502/ or <tt/--target sim65c02/
 The simulator is called as follows:
 
 <tscreen><verb>
-	Usage: sim65 [options] file [arguments]
-	Short options:
-	  -h			Help (this text)
-	  -c			Print amount of executed CPU cycles
-	  -v			Increase verbosity
-	  -V			Print the simulator version number
-	  -x <num>		Exit simulator after <num> cycles
+        Usage: sim65 [options] file [arguments]
+        Short options:
+          -h                    Help (this text)
+          -c                    Print amount of executed CPU cycles
+          -v                    Increase verbosity
+          -V                    Print the simulator version number
+          -x <num>              Exit simulator after <num> cycles
 
-	Long options:
-	  --help		Help (this text)
-	  --cycles		Print amount of executed CPU cycles
-	  --verbose		Increase verbosity
-	  --version		Print the simulator version number
+        Long options:
+          --help                Help (this text)
+          --cycles              Print amount of executed CPU cycles
+          --verbose             Increase verbosity
+          --version             Print the simulator version number
 </verb></tscreen>
 
 
@@ -89,7 +89,7 @@ Example output for the command
 sim65 --verbose --verbose samples/gunzip65
 </verb></tscreen>
 <tscreen><verb>
-Loaded `samples/gunzip65' at $0200-$151F
+Loaded 'samples/gunzip65' at $0200-$151F
 PVWrite ($0001, $13C9, $000F)
 GZIP file name:PVWrite ($0001, $151F, $0001)
 
@@ -120,14 +120,14 @@ including commercial applications, and to alter it and redistribute it
 freely, subject to the following restrictions:
 
 <enum>
-<item>	The origin of this software must not be misrepresented; you must not
-	claim that you wrote the original software. If you use this software
-	in a product, an acknowledgment in the product documentation would be
-	appreciated but is not required.
-<item>	Altered source versions must be plainly marked as such, and must not
-	be misrepresented as being the original software.
-<item>	This notice may not be removed or altered from any source
-	distribution.
+<item>  The origin of this software must not be misrepresented; you must not
+        claim that you wrote the original software. If you use this software
+        in a product, an acknowledgment in the product documentation would be
+        appreciated but is not required.
+<item>  Altered source versions must be plainly marked as such, and must not
+        be misrepresented as being the original software.
+<item>  This notice may not be removed or altered from any source
+        distribution.
 </enum>
 
 </article>

@@ -67,7 +67,7 @@ static unsigned GetModule (const char* Name)
     /* Make a module name from the file name */
     const char* Module = FindName (Name);
     if (*Module == 0) {
-        Error ("Cannot make module name from `%s'", Name);
+        Error ("Cannot make module name from '%s'", Name);
     }
     return GetStringId (Module);
 }
@@ -79,7 +79,7 @@ static void ObjReadHeader (FILE* Obj, ObjHeader* H, const char* Name)
 {
     H->Version    = Read16 (Obj);
     if (H->Version != OBJ_VERSION) {
-        Error ("Object file `%s' has wrong version, expected %08X, got %08X",
+        Error ("Object file '%s' has wrong version, expected %08X, got %08X",
                Name, OBJ_VERSION, H->Version);
     }
     H->Flags        = Read16 (Obj);

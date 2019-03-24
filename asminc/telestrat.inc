@@ -54,8 +54,17 @@ IRQSVY          := $23           ; Used to save Y when a BRK call occurs
 IRQSVP          := $24           ; Used to save P when a BRK call occurs
 
 ADSCR           := $26
+SCRNB           := $28           ; Id of the current window
+
+ADKBD           := $2A           ; Address ASCII conversion table
+
 
 PTR_READ_DEST   := $2C           ; Used for XFREAD and XWRITE only in TELEMON 3.x
+
+ADCLK           := $40           ; Address for clock display
+TIMEUS          := $42
+TIMEUD          := $44 
+
 
 HRSX            := $46
 HRSY            := $47
@@ -64,6 +73,9 @@ XLPRBI          := $48           ; Printer flag (b7)
 
 HRSX40          := $49
 HRSX6           := $4A
+
+ADHRS           := $4B           ; Hires screen address (word)
+
 HRS1            := $4D
 HRS2            := $4F
 HRS3            := $51
@@ -71,6 +83,8 @@ HRS4            := $53
 HRS5            := $55
 
 HRSFB           := $57
+
+VABKP1          := $58
 
 ; RS232T
 ; b0-b3 : speed 
@@ -103,6 +117,18 @@ RS232T          := $59
 ;       : 11 SPACE SENT, reception not tested
 
 RS232C          := $5A
+INDRS           := $5B
+
+ACC1E           := $60
+ACC1M           := $61
+
+ACC1S           := $65
+
+FLGMEN          := $68
+ADMEN           := $69
+
+FLSVS           := $89
+FLERR           := $8B
 
 VARLNG          := $8C
 VARAPL          := $D0
@@ -195,14 +221,20 @@ XDECAL           = $18
 
 XTEXT            = $19
 XHIRES           = $1A
+XEFFHI           = $1B          ; Clear hires screen
 XFILLM           = $1C
 XMINMA           = $1F
 XVARS            = $24          ; Only in TELEMON 3.x, in TELEMON 2.4, it's XNOMFI ($24)
 XCRLF            = $25          ; Jump a line and return to the beginning of the line
+XDECAY           = $26
 XFREAD           = $27          ; Only in TELEMON 3.x (bank 7 of Orix)
 XBINDX           = $28          ; Convert a number into hex and displays on channel 0
 XDECIM           = $29
 XHEXA            = $2A          ; Convert a number into hex
+
+XEDT             = $2D          ; Launch editor
+XINSER           = $2E
+
 XSCELG           = $2F          ; Search a line in editor mode
 XOPEN            = $30          ; Only in TELEMON 3.x (bank 7 of Orix)
 XECRPR           = $33          ; Displays prompt
@@ -212,7 +244,12 @@ XSCRSE           = $36
 XSCRNE           = $39          ; Load charset from rom to ram
 XCLOSE           = $3A          ; Only in TELEMON 3.x close file (bank 7 of Orix)
 XFWRITE          = $3B          ; Only in TELEMON 3.x write file (bank 7 of Orix)
-XWRCLK           = $3E          ; Update clock
+
+; Clock primitive
+XRECLK           = $3C          ; Reset clock
+XCLCL            = $3D          ; Close clock
+XWRCLK           = $3E          ; Displays clock in the adress in A & Y registers
+
 XSONPS           = $40          ; Send data to PSG register (14 values)
 XOUPS            = $42          ; Send Oups sound into PSG
 XPLAY            = $43          ; Play a sound
@@ -222,7 +259,17 @@ XZAP             = $46          ; Send Zap sound to PSG
 XSHOOT           = $47
 XMKDIR           = $4B          ; Create a folder. Only available in TELEMON 3.x (bank 7 of Orix)
 XRM              = $4D          ; Remove a folder or a file. Only available in TELEMON 3.x (bank 7 of Orix)
-XGOKBD           = $52 
+XGOKBD           = $52
+
+; Buffer management
+XECRBU           = $54          ; Write A or AY in the buffer
+XLISBU           = $55          ; Read A or AY in the buffer
+XTSTBU           = $56
+XVIDBU           = $57          ; Flush the buffer 
+XINIBU           = $58          ; Initialize the buffer X
+XDEFBU           = $59          ; Reset all value of the buffer
+XBUSY            = $5A          ; Test if the buffer is empty
+
 XMALLOC          = $5B          ; Only in TELEMON 3.x (bank 7 of Orix)
 XFREE            = $62          ; Only in TELEMON 3.x (bank 7 of Orix)
 XSOUT            = $67          ; Send accumulator value (A) to RS232, available in TELEMON 2.4 & 3.x : if RS232 buffer is full, the Oric Telestrat freezes
@@ -256,28 +303,83 @@ BUFTRV          := $100
 ; Page $200
 BNKST            := $200        ; Used to store signature of 8 bank (length : 8 bytes)
 TABDRV           := $208
+
+DRVDEF           := $20C
 FLGTEL           := $20D
 KOROM            := $20E        ; Used to compute the size of all rom bank. The result is store here. The value is in KB
 KORAM            := $20F        ; Used to compute the size of all ram bank. The result is store here. The value is in KB
+; Time management
 TIMED            := $210
 TIMES            := $211
 TIMEM            := $212
+TIMEH            := $213
+FLGCLK           := $214
+FLGCLK_FLAG      := $215 
+FLGCUR           := $216        ; Cursor management flag
+; screens position managements
+
+FLGCUR_STATE     := $217        ; Cursor state flag
+
 ADSCRL           := $218
 ADSCRH           := $21C
 SCRX             := $220
 SCRY             := $224
+
+SCRDX            := $228
+SCRFX            := $22C
+SCRDY            := $230
+SCRFY            := $234
+SCRBAL           := $238
+SCRBAH           := $23C
+SCRCT            := $240
+SCRCF            := $244
+FLGSCR           := $248
+CURSCR           := $24C
+
+HARD_COPY_HIRES  := $250        ; Hard copy vector
+
+SCRTXT           := $256
+SCRHIR           := $25C
+SCRTRA           := $262        ; 6 bytes lenfth
+
+; Keyboard management
+KBDCOL           := $268        ; 8 bytes length
+KBDFLG_KEY       := $270        ; 0 if no key pressed
+KBDVRR           := $272
+
 KBDVRL           := $273
 FLGKBD           := $275
 KBDFCT           := $276
 KBDSHT           := $278
+
+KBDKEY           := $279
 KBDCTC           := $27E
+LPRX             := $286
+LPRY             := $287
 LPRFX            := $288
 LPRFY            := $289
+FLGLPR           := $28A
+
+; Joysticks management
+FLGJCK           := $28C
+JCGVAL           := $28D
+JCDVAL           := $28E
+JCKTAB           := $29D
+
+
 HRSPAT           := $2AA        ; Hires pattern : it's used to draw pattern for a line or a circle
-ADIOB            := $2BE
+HRSERR           := $2AB
+
+IOTAB0           := $2AE
+IOTAB1           := $2B2
+IOTAB2           := $2B6
+IOTAB3           := $2BA
+ADIOB            := $2BE        ; 48 bytes length
 FLGRST           := $2EE
 CSRND            := $2EF
 VNMI             := $2F4
+ADIODB_VECTOR    := $2f7        ; 3 bytes length
+
 IRQVECTOR        := $2FA
 VAPLIC           := $2FD
 
@@ -309,6 +411,9 @@ MAX_BUFEDT_LENGTH=110
 ; Hardware
 CH376_DATA       := $340
 CH376_COMMAND    := $341
+
+; RAM overlays buffer
+BUFBUF           := $c080
 
 ; ---------------------------------------------------------------------------
 ; Stratsed vectors
@@ -367,5 +472,5 @@ XRWTS            := $FFAA
 ; MACRO 
 
 .macro  BRK_TELEMON   value
-	.byte $00,value
+        .byte $00,value
 .endmacro

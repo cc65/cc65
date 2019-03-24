@@ -46,15 +46,15 @@
 
 ; Jump table
 
-        .word   INSTALL
-        .word   UNINSTALL
-        .word   OPEN
-        .word   CLOSE
-        .word   GET
-        .word   PUT
-        .word   STATUS
-        .word   IOCTL
-        .word   IRQ
+        .word   SER_INSTALL
+        .word   SER_UNINSTALL
+        .word   SER_OPEN
+        .word   SER_CLOSE
+        .word   SER_GET
+        .word   SER_PUT
+        .word   SER_STATUS
+        .word   SER_IOCTL
+        .word   SER_IRQ
 
 ;----------------------------------------------------------------------------
 ;
@@ -122,25 +122,25 @@ ParityTable:
 .code
 
 ;----------------------------------------------------------------------------
-; INSTALL routine. Is called after the driver is loaded into memory. If
+; SER_INSTALL routine. Is called after the driver is loaded into memory. If
 ; possible, check if the hardware is present.
 ; Must return an SER_ERR_xx code in a/x.
 ;
 ; Since we don't have to manage the IRQ vector on the Plus/4, this is actually
 ; the same as:
 ;
-; UNINSTALL routine. Is called before the driver is removed from memory.
+; SER_UNINSTALL routine. Is called before the driver is removed from memory.
 ; Must return an SER_ERR_xx code in a/x.
 ;
 ; and:
 ;
-; CLOSE: Close the port, disable interrupts and flush the buffer. Called
+; SER_CLOSE: Close the port, disable interrupts and flush the buffer. Called
 ; without parameters. Must return an error code in a/x.
 ;
 
-INSTALL:
-UNINSTALL:
-CLOSE:
+SER_INSTALL:
+SER_UNINSTALL:
+SER_CLOSE:
 
 ; Deactivate DTR and disable 6551 interrupts
 
@@ -157,7 +157,7 @@ CLOSE:
 ; PARAMS routine. A pointer to a ser_params structure is passed in ptr1.
 ; Must return an SER_ERR_xx code in a/x.
 
-OPEN:
+SER_OPEN:
 
 ; Check if the handshake setting is valid
 
@@ -237,12 +237,13 @@ InvBaud:
         rts
 
 ;----------------------------------------------------------------------------
-; GET: Will fetch a character from the receive buffer and store it into the
+; SER_GET: Will fetch a character from the receive buffer and store it into the
 ; variable pointer to by ptr1. If no data is available, SER_ERR_NO_DATA is
 ; return.
 ;
 
-GET:    ldx     SendFreeCnt             ; Send data if necessary
+SER_GET:
+        ldx     SendFreeCnt             ; Send data if necessary
         inx                             ; X == $FF?
         beq     @L1
         lda     #$00
@@ -281,11 +282,11 @@ GET:    ldx     SendFreeCnt             ; Send data if necessary
         rts
 
 ;----------------------------------------------------------------------------
-; PUT: Output character in A.
+; SER_PUT: Output character in A.
 ; Must return an error code in a/x.
 ;
 
-PUT:
+SER_PUT:
 
 ; Try to send
 
@@ -315,11 +316,12 @@ PUT:
         rts
 
 ;----------------------------------------------------------------------------
-; STATUS: Return the status in the variable pointed to by ptr1.
+; SER_STATUS: Return the status in the variable pointed to by ptr1.
 ; Must return an error code in a/x.
 ;
 
-STATUS: lda     #$0F
+SER_STATUS:
+        lda     #$0F
         sta     IndReg
         ldy     #ACIA::STATUS
         lda     (acia),y
@@ -331,23 +333,25 @@ STATUS: lda     #$0F
         rts
 
 ;----------------------------------------------------------------------------
-; IOCTL: Driver defined entry point. The wrapper will pass a pointer to ioctl
+; SER_IOCTL: Driver defined entry point. The wrapper will pass a pointer to ioctl
 ; specific data in ptr1, and the ioctl code in A.
 ; Must return an error code in a/x.
 ;
 
-IOCTL:  lda     #<SER_ERR_INV_IOCTL     ; We don't support ioclts for now
+SER_IOCTL:
+        lda     #<SER_ERR_INV_IOCTL     ; We don't support ioclts for now
         ldx     #>SER_ERR_INV_IOCTL
         rts
 
 ;----------------------------------------------------------------------------
-; IRQ: Called from the builtin runtime IRQ handler as a subroutine. All
+; SER_IRQ: Called from the builtin runtime IRQ handler as a subroutine. All
 ; registers are already save, no parameters are passed, but the carry flag
 ; is clear on entry. The routine must return with carry set if the interrupt
 ; was handled, otherwise with carry clear.
 ;
 
-IRQ:    lda     #$0F
+SER_IRQ:
+        lda     #$0F
         sta     IndReg          ; Switch to the system bank
         ldy     #ACIA::STATUS
         lda     (acia),y        ; Check ACIA status for receive interrupt
@@ -436,4 +440,3 @@ write:  pha
         lda     ExecReg
         sta     IndReg
         rts
-

@@ -74,8 +74,8 @@ void makepoint(point *p,int x, int y) {
 /* make a rectangle from two points */
 void makerect(rect *d,point p1, point p2) {
 rect r;
-	r.pt1 = p1;
-	r.pt2 = p2;
+        r.pt1 = p1;
+        r.pt2 = p2;
 
         canonrect(d,r);
 }
@@ -97,53 +97,53 @@ odd(struct odd y) {
 
 /* add two points */
 point addpoint(point p1, point p2) {
-	p1.x += p2.x;
-	p1.y += p2.y;
-	return p1;
+        p1.x += p2.x;
+        p1.y += p2.y;
+        return p1;
 }
 /* canonicalize rectangle coordinates */
 rect canonrect(rect r) {
-	rect temp;
+        rect temp;
 
-	temp.pt1.x = min(r.pt1.x, r.pt2.x);
-	temp.pt1.y = min(r.pt1.y, r.pt2.y);
-	temp.pt2.x = max(r.pt1.x, r.pt2.x);
-	temp.pt2.y = max(r.pt1.y, r.pt2.y);
-	return temp;
+        temp.pt1.x = min(r.pt1.x, r.pt2.x);
+        temp.pt1.y = min(r.pt1.y, r.pt2.y);
+        temp.pt2.x = max(r.pt1.x, r.pt2.x);
+        temp.pt2.y = max(r.pt1.y, r.pt2.y);
+        return temp;
 }
 /* make a point from x and y components */
 point makepoint(int x, int y) {
-	point p;
+        point p;
 
-	p.x = x;
-	p.y = y;
-	return p;
+        p.x = x;
+        p.y = y;
+        return p;
 }
 
 /* make a rectangle from two points */
 rect makerect(point p1, point p2) {
-	rect r;
+        rect r;
 
-	r.pt1 = p1;
-	r.pt2 = p2;
-	return canonrect(r);
+        r.pt1 = p1;
+        r.pt2 = p2;
+        return canonrect(r);
 }
 
 struct odd {char a[3]; } y =
 {
 #ifdef NO_SLOPPY_STRUCT_INIT
-	{
+        {
 #endif
-	'a', 'b', 0
+        'a', 'b', 0
 #ifdef NO_SLOPPY_STRUCT_INIT
-	}
+        }
 #endif
 };
 
 odd(struct odd y)
 {
-	struct odd x
-		= y;
+        struct odd x
+                = y;
         printf("%s\n\r", x.a);
 }
 
@@ -157,8 +157,8 @@ int ptinrect(point *p, rect *r) {
 }
 #else
 int ptinrect(point p, rect r) {
-	return p.x >= r.pt1.x && p.x < r.pt2.x
-		&& p.y >= r.pt1.y && p.y < r.pt2.y;
+        return p.x >= r.pt1.x && p.x < r.pt2.x
+                && p.y >= r.pt1.y && p.y < r.pt2.y;
 }
 #endif
 
@@ -212,9 +212,9 @@ point pts[] = { -1, -1, 1, 1, 20, 300, 500, 400 };
 #else
                 if (ptinrect(x, screen) == 0)
 #endif
-		{
+                {
                         printf("not ");
-		}
+                }
                 printf("within (%d,%d; %d,%d)\n\r", screen.pt1.x, screen.pt1.y,
                         screen.pt2.x, screen.pt2.y);
         }
@@ -240,24 +240,24 @@ point pts[] = { -1, -1, 1, 1, 20, 300, 500, 400 };
 #endif
 
 rect screen =
-	makerect(
-		addpoint(maxpt, makepoint(-10, -10)),
-		addpoint(origin, makepoint(10, 10))
-		);
+        makerect(
+                addpoint(maxpt, makepoint(-10, -10)),
+                addpoint(origin, makepoint(10, 10))
+                );
 
-	test1();
-	
-	for (i = 0; i < sizeof pts/sizeof pts[0]; i++) {
-		printf("(%d,%d) is ", pts[i].x,
-			(x = makepoint(pts[i].x, pts[i].y)).y);
-		if (ptinrect(x, screen) == 0)
-			printf("not ");
+        test1();
+        
+        for (i = 0; i < sizeof pts/sizeof pts[0]; i++) {
+                printf("(%d,%d) is ", pts[i].x,
+                        (x = makepoint(pts[i].x, pts[i].y)).y);
+                if (ptinrect(x, screen) == 0)
+                        printf("not ");
                 printf("within (%d,%d; %d,%d)\n\r", screen.pt1.x, screen.pt1.y,
-			screen.pt2.x, screen.pt2.y);
-	}
-	odd(y);
+                        screen.pt2.x, screen.pt2.y);
+        }
+        odd(y);
 
-	return 0;
+        return 0;
 }
 
 #endif /* FUNCS_RETURN_STRUCTS */

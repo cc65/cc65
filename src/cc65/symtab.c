@@ -671,7 +671,7 @@ DefOrRef* AddDefOrRef (SymEntry* E, unsigned Flags)
     DOR = xmalloc (sizeof (DefOrRef));
     CollAppend (E->V.L.DefsOrRefs, DOR);
     DOR->Line = GetCurrentLine ();
-    DOR->LocalsBlockId = CollLast (&CurrentFunc->LocalsBlockStack);
+    DOR->LocalsBlockId = (long)CollLast (&CurrentFunc->LocalsBlockStack);
     DOR->Flags = Flags;
     DOR->StackPtr = StackPtr;
     DOR->Depth = CollCount (&CurrentFunc->LocalsBlockStack);

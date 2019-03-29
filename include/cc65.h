@@ -75,12 +75,12 @@ unsigned long __fastcall__ umul16x8r32 (unsigned lhs, unsigned char rhs);
 unsigned long __fastcall__ umul16x16r32 (unsigned lhs, unsigned rhs);
 /* Multiplicate two unsigned 16 bit to yield an unsigned 32 bit result */
 
-unsigned int __fastcall__ mul20(unsigned char value);
+unsigned int __fastcall__ mul20 (unsigned char value);
 /* Multiply an 8 bit unsigned value by 20 and return the 16 bit unsigned
 ** result
 */
 
-unsigned int __fastcall__ mul40(unsigned char value);
+unsigned int __fastcall__ mul40 (unsigned char value);
 /* Multiply an 8 bit unsigned value by 40 and return the 16 bit unsigned
 ** result
 */

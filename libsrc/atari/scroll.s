@@ -8,7 +8,7 @@
 
         .include        "atari.inc"
         .importzp       tmp1,tmp4,ptr1,ptr2
-        .import         __mul40,_clrscr
+        .import         _mul40,_clrscr
         .export         __scroll
 
 .proc   __scroll
@@ -40,7 +40,7 @@ down_ok:lda     SAVMSC
         sta     ptr2+1
 
         lda     tmp1
-        jsr     __mul40
+        jsr     _mul40
         sta     tmp4
         lda     ptr2
         sec
@@ -103,7 +103,7 @@ up:     sta     tmp1            ; # of lines to scroll
         jmp     _clrscr
 
         ;multiply by 40 (xsize)
-up_ok:  jsr     __mul40         ; carry is cleared by __mul40
+up_ok:  jsr     _mul40          ; carry is cleared by _mul40
         adc     SAVMSC          ; add start of screen mem
         sta     ptr2
         txa

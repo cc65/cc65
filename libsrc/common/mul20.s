@@ -8,15 +8,15 @@
 ; See "LICENSE" file for legal information.
 ;
 ;
-; unsigned int __fastcall__ _mul20(unsigned char value);
+; unsigned int __fastcall__ mul20(unsigned char value);
 ; 
 ; REMARKS: Function is defined to return with carry-flag cleared
 
 
         .importzp       tmp4
-        .export         __mul20
+        .export         _mul20
 
-.proc   __mul20                 ; = 30 bytes, 41/46 cycles
+.proc   _mul20                  ; = 30 bytes, 41/46 cycles
 
         sta     tmp4            ; remember value for later addition...
         ldx     #0              ; clear high-byte
@@ -24,7 +24,7 @@
         bcc     mul4            ; high-byte affected?
         ldx     #2              ; this will be the 1st high-bit soon...
 
-mul4:   asl     a               ; * 4                  
+mul4:   asl     a               ; * 4
         bcc     mul5            ; high-byte affected?
         inx                     ; => yes, apply to 0 high-bit
         clc                     ; prepare addition
@@ -36,9 +36,9 @@ mul5:   adc     tmp4            ; * 5
 mul10:  stx     tmp4            ; continue with classic shifting...
         
         asl     a               ; * 10
-        rol     tmp4                                    
+        rol     tmp4
 
-        asl     a               ; * 20 
+        asl     a               ; * 20
         rol     tmp4
 
         ldx     tmp4            ; deliver high-byte in X

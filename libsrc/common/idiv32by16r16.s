@@ -4,7 +4,7 @@
 ; CC65 library: 32by16 => 16 signed division
 ;
 
-        .export         _cc65_idiv32by16r16
+        .export         _idiv32by16r16
         .import         idiv32by16r16, incsp4
 
         .include        "zeropage.inc"
@@ -13,7 +13,7 @@
 ;---------------------------------------------------------------------------
 ; 32by16 division.
 
-.proc   _cc65_idiv32by16r16
+.proc   _idiv32by16r16
 
         pha                     ; Save rhs
 

@@ -824,7 +824,7 @@ static void ReadStringConst (int StringTerm)
                             break;
                         }
                     }
-                    /* FALLTHRU */
+                    /* FALLTHROUGH */
                 default:
                     Error ("Unsupported escape sequence in string constant");
                     break;

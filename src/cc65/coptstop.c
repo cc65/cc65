@@ -1833,8 +1833,8 @@ static int PreCondOk (StackOpData* D)
     }
 
     /* Determine the zero page locations to use. We've tracked the used
-     * ZP locations, so try to find some for us that are unused.
-     */
+    ** ZP locations, so try to find some for us that are unused.
+    */
     if ((D->ZPUsage & REG_PTR1) == REG_NONE) {
         D->ZPLo = "ptr1";
         D->ZPHi = "ptr1+1";
@@ -2018,12 +2018,12 @@ unsigned OptStackOps (CodeSeg* S)
                 FinalizeLoadInfo (&Data.Rhs, S);
 
                 /* Check if the lhs loads from zeropage. If this is true, these
-                 * zero page locations have to be added to ZPUsage, because
-                 * they cannot be used for intermediate storage. In addition,
-                 * if one of these zero page locations is destroyed between
-                 * pushing the lhs and the actual operation, we cannot use the
-                 * original zero page locations for the final op, but must
-                 * use another ZP location to save them.
+                ** zero page locations have to be added to ZPUsage, because
+                ** they cannot be used for intermediate storage. In addition,
+                ** if one of these zero page locations is destroyed between
+                ** pushing the lhs and the actual operation, we cannot use the
+                ** original zero page locations for the final op, but must
+                ** use another ZP location to save them.
                 */
                 ChangedRegs &= REG_ZP;
                 if (Data.Lhs.A.LoadEntry && Data.Lhs.A.LoadEntry->AM == AM65_ZP) {

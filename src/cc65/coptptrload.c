@@ -1633,16 +1633,14 @@ unsigned OptPtrLoad19 (CodeSeg* S)
             X = NewCodeEntry (OP65_TAY, AM65_IMP, 0, 0, L[2]->LI);
             CS_InsertEntry (S, X, IP++);
 
-            /* allocate Label memory */
-            Label = xmalloc (Len);
             /* lda label,y */
-            Label = memcpy (Label, L[4]->Arg+2, Len-3);
+            /* allocate Label memory */
+            Label = memcpy (xmalloc (Len), L[4]->Arg+2, Len-3);
             Label[Len-3] = '\0';
             X = NewCodeEntry (OP65_LDA, AM65_ABSY, Label, 0, L[10]->LI);
             CS_InsertEntry (S, X, IP++);
 
             /* ldx label+1,y */
-            Label = memcpy (Label, L[4]->Arg+2, Len-3);
             strcpy(&Label[Len-3], "+1");
             X = NewCodeEntry (OP65_LDX, AM65_ABSY, Label, 0, L[10]->LI);
             CS_InsertEntry (S, X, IP++);

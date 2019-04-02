@@ -1,14 +1,11 @@
 ;
-; Christian Groessler, 27-Dec-2002
+; Christian Groessler, 02-Apr-2019
 ;
 
-        .export         _textcolor, _bgcolor, _bordercolor
-        .import         return1
+        .export         _bgcolor
 
         .include        "atari.inc"
 
-
-_textcolor      =       return1
 
 _bgcolor:
         ldx     COLOR2  ; get old value
@@ -23,12 +20,3 @@ bright: lda     #0
         txa
         ldx     #0      ; fix X
         rts
-
-
-_bordercolor:
-        ldx     COLOR4  ; get old value
-        sta     COLOR4  ; set new value
-        txa
-        ldx     #0      ; fix X
-        rts
-

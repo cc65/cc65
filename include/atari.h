@@ -491,7 +491,7 @@ extern void atrx15p2_tgi[];
 #define PxCTL_IRQ_STATUS         0x80
 
 
-/* The following #defines will cause the matching functions calls in conio.h
+/* The following #define will cause the matching function calls in conio.h
 ** to be overlaid by macros with the same names, saving the function call
 ** overhead.
 */

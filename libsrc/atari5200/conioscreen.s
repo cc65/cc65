@@ -8,6 +8,12 @@ SCREEN_BUF_SIZE =       20 * 24
 SCREEN_BUF      =       $4000 - SCREEN_BUF_SIZE
 
                 .export screen_setup_20x24
+                .export screen_width, screen_height
+                .export conio_color
+
+screen_width    =       20
+screen_height   =       24
+
 
                 .segment "ONCE"
 
@@ -57,6 +63,9 @@ clrscr:         sta     (SAVMSC),y
 
                 rts
 
+                .data
+
+conio_color:    .byte   0
 
                 .segment "DLIST"
 

@@ -10,11 +10,7 @@
         .import         gotoxy, putchar, setcursor
         .importzp       tmp1
 
-.ifdef __ATARI5200__
-CHRCODE =       1               ; exclamation mark
-.else
 CHRCODE =       $7C             ; Vertical bar
-.endif
 
 _cvlinexy:
         pha                     ; Save the length

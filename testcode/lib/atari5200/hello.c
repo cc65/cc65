@@ -3,6 +3,7 @@
 **
 ** Ullrich von Bassewitz (ullrich@von-bassewitz.de)
 **
+** TEST version for atari5200 conio, using all four colors
 */
 
 
@@ -33,6 +34,7 @@ static const char Text [] = "Hello world!";
 int main (void)
 {
     unsigned char XSize, YSize;
+    unsigned char PosY;
 
     /* Set screen colors */
     (void) textcolor (COLOR_WHITE);
@@ -66,6 +68,16 @@ int main (void)
     /* Write the greeting in the mid of the screen */
     gotoxy ((XSize - strlen (Text)) / 2, YSize / 2);
     cprintf ("%s", Text);
+
+    PosY = wherey () + 1;
+    textcolor (0); /* switch to color #0 */
+    cputsxy(3, PosY++, "COLOR 0");
+    textcolor (1); /* switch to color #1 */
+    cputsxy(3, PosY++, "COLOR 1");
+    textcolor (2); /* switch to color #2 */
+    cputsxy(3, PosY++, "COLOR 2");
+    textcolor (3); /* switch to color #3 */
+    cputsxy(3, PosY, "COLOR 3");
 
 #if defined(__NES__) || defined(__PCE__) || defined(__GAMATE__) || defined(__ATARI5200__)
 

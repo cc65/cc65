@@ -11,8 +11,9 @@
         .export         _cputcxy, _cputc
         .export         plot, cputdirect, putchar
         .import         gotoxy, _mul20
+        .import         conio_color
+        .importzp       screen_width, screen_height
         .importzp       ptr4
-        .import         setcursor
 
         .constructor    screen_setup, 26
         .import         screen_setup_20x24
@@ -44,7 +45,7 @@ L4:     cmp     #$0A            ; LF
         and     #3
         tax
         tya
-        and     #$9f
+        and     #$9F
         ora     ataint,x
 
 cputdirect:                     ; accepts screen code
@@ -53,7 +54,7 @@ cputdirect:                     ; accepts screen code
 ; advance cursor
         inc     COLCRS_5200
         lda     COLCRS_5200
-        cmp     #20
+        cmp     #screen_width
         bcc     plot
         lda     #0
         sta     COLCRS_5200
@@ -62,12 +63,11 @@ cputdirect:                     ; accepts screen code
 newline:
         inc     ROWCRS_5200
         lda     ROWCRS_5200
-        cmp     #24
+        cmp     #screen_height
         bne     plot
         lda     #0
         sta     ROWCRS_5200
-plot:   jsr     setcursor
-        ldy     COLCRS_5200
+plot:   ldy     COLCRS_5200
         ldx     ROWCRS_5200
         rts
 
@@ -83,10 +83,12 @@ putchar:
         sta     ptr4+1
         pla                     ; get char again
 
+;       and     #$C0            ; without this we are compatible with the old version. user must not try to output a char >= $3F
+        ora     conio_color
+
         ldy     COLCRS_5200
         sta     (ptr4),y
-        jmp     setcursor
+        rts
 
         .rodata
 ataint: .byte   64,0,32,96
-

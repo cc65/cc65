@@ -1,10 +1,10 @@
-; setup default CONIO screen (20x24, Antic mode 6, BASIC mode 1)
+; setup alternative CONIO screen (20x12, Antic mode 7, BASIC mode 2)
 ;
-; 28-May-2014, Christian Groessler <chris@groessler.org>
+; 02-Apr-2019, Christian Groessler <chris@groessler.org>
 
                 .include "atari5200.inc"
 
-SCREEN_BUF_SIZE =       20 * 24
+SCREEN_BUF_SIZE =       20 * 12
 SCREEN_BUF      =       $4000 - SCREEN_BUF_SIZE
 
                 .export screen_setup
@@ -12,7 +12,7 @@ SCREEN_BUF      =       $4000 - SCREEN_BUF_SIZE
                 .export conio_color
 
 screen_width    =       20
-screen_height   =       24
+screen_height   =       12
 
 
                 .segment "ONCE"
@@ -69,17 +69,17 @@ conio_color:    .byte   0
 
                 .segment "DLIST"
 
-; display list for 20x24 text mode
+; display list for 20x12 text mode
 
 dlist:          .repeat 3
                 .byte   DL_BLK8
                 .endrepeat
                 
-                .byte   DL_CHR20x8x2 | DL_LMS
+                .byte   DL_CHR20x16x2 | DL_LMS
                 .word   SCREEN_BUF
 
-                .repeat 23
-                .byte   DL_CHR20x8x2
+                .repeat 11
+                .byte   DL_CHR20x16x2
                 .endrepeat
 
                 .byte  DL_JVB

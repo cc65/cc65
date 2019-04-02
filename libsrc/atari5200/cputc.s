@@ -15,10 +15,9 @@
         .importzp       screen_width, screen_height
         .importzp       ptr4
 
-        .constructor    screen_setup, 26
-        .import         screen_setup_20x24
-screen_setup    = screen_setup_20x24
-
+        .import         screen_setup
+        .constructor    screen_setup_constructor, 26
+screen_setup_constructor = screen_setup
 
 _cputcxy:
         pha                     ; Save C

@@ -6,8 +6,6 @@
         .export         _textcolor
         .import         conio_color
 
-        .include        "atari.inc"
-
 
 _textcolor:
         ; move bits #0 and #1 to bits #6 and #7

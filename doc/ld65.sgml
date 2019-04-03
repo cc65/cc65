@@ -24,21 +24,21 @@ It complements the features that are built into the ca65 macroassembler:
 
 <itemize>
 
-<item>	Accept any number of segments to form an executable module.
+<item>  Accept any number of segments to form an executable module.
 
-<item>	Resolve arbitrary expressions stored in the object files.
+<item>  Resolve arbitrary expressions stored in the object files.
 
-<item>	In case of errors, use the meta information stored in the object files
-	to produce helpful error messages. In case of undefined symbols,
-	expression range errors, or symbol type mismatches, ld65 is able to
-	tell you the exact location in the original assembler source, where
-	the symbol was referenced.
+<item>  In case of errors, use the meta information stored in the object files
+        to produce helpful error messages. In case of undefined symbols,
+        expression range errors, or symbol type mismatches, ld65 is able to
+        tell you the exact location in the original assembler source, where
+        the symbol was referenced.
 
-<item>	Flexible output. The output of ld65 is highly configurable by a config
-	file. Some more-common platforms are supported by default configurations
-	that may be activated by naming the target system. The output
-	generation was designed with different output formats in mind, so
-	adding other formats shouldn't be a great problem.
+<item>  Flexible output. The output of ld65 is highly configurable by a config
+        file. Some more-common platforms are supported by default configurations
+        that may be activated by naming the target system. The output
+        generation was designed with different output formats in mind, so
+        adding other formats shouldn't be a great problem.
 
 </itemize>
 
@@ -894,7 +894,7 @@ look like this:
         }
 </verb></tscreen>
 
-The only other available output format is the o65 format specified by Andre
+There are two other available formats, one is the o65 format specified by Andre
 Fachat (see the <url url="http://www.6502.org/users/andre/o65/fileformat.html"
 name="6502 binary relocation format specification">). It is defined like this:
 
@@ -904,7 +904,20 @@ name="6502 binary relocation format specification">). It is defined like this:
         }
 </verb></tscreen>
 
-The necessary o65 attributes are defined in a special section labeled
+The other format available is the Atari (xex) segmented file format, this is
+the standard format used by Atari DOS 2.0 and upward file managers in the Atari
+8-bit computers, and it is defined like this:
+
+<tscreen><verb>
+        FILES {
+            %O: format = atari;
+        }
+</verb></tscreen>
+
+In the Atari segmented file format, the linker will write each <tt/MEMORY/ area
+as a new segment, including a header with the start and end address.
+
+The necessary o65 or Atari attributes are defined in a special section labeled
 <ref id="FORMAT" name="FORMAT">.
 
 
@@ -925,6 +938,30 @@ has several attributes that may be defined here.
     }
 </verb></tscreen>
 
+The Atari file format has two attributes:
+
+<descrip>
+
+  <tag><tt>RUNAD = symbol</tt></tag>
+
+  Specify a symbol as the run address of the binary, the loader will call this
+  address after all the file is loaded in memory. If the attribute is omitted,
+  no run address is included in the file.
+
+  <tag><tt>INITAD = memory_area : symbol</tt></tag>
+
+  Specify a symbol as the initialization address for the given memory area.
+  The binary loader will call this address just after the memory area is loaded
+  into memory, before continuing loading the rest of the file.
+
+</descrip>
+
+
+<tscreen><verb>
+    FORMATS {
+        atari: runad = _start;
+    }
+</verb></tscreen>
 
 
 <sect1>The FEATURES section<label id="FEATURES"><p>
@@ -1126,14 +1163,14 @@ including commercial applications, and to alter it and redistribute it
 freely, subject to the following restrictions:
 
 <enum>
-<item> 	The origin of this software must not be misrepresented; you must not
-       	claim that you wrote the original software. If you use this software
-       	in a product, an acknowledgment in the product documentation would be
-	appreciated but is not required.
-<item>	Altered source versions must be plainly marked as such, and must not
-	be misrepresented as being the original software.
-<item>	This notice may not be removed or altered from any source
-	distribution.
+<item>  The origin of this software must not be misrepresented; you must not
+        claim that you wrote the original software. If you use this software
+        in a product, an acknowledgment in the product documentation would be
+        appreciated but is not required.
+<item>  Altered source versions must be plainly marked as such, and must not
+        be misrepresented as being the original software.
+<item>  This notice may not be removed or altered from any source
+        distribution.
 </enum>
 
 

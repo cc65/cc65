@@ -5,7 +5,7 @@
 ; unsigned char __fastcall__ set_chameleon_speed (unsigned char speed);
 ;
 ;/* Set the speed of the Chameleon cartridge, the following inputs
-; * are accepted: 
+; * are accepted:
 ; * SPEED_SLOW : 1 Mhz mode
 ; * SPEED_1X   : 1 Mhz mode
 ; * SPEED_2X   : 2 Mhz mode

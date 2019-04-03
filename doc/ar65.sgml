@@ -30,14 +30,14 @@ for the cc65 compiler. ar65 is part of this suite.
 The archiver is called as follows:
 
 <tscreen><verb>
-	Usage: ar65 <operation ...> lib file|module ...
-	Operations are some of:
-		r	Add modules
-		d	Delete modules
-		t	List library table
-		v	Increase verbosity (put before other operation)
-		x	Extract modules
-		V	Print the archiver version
+        Usage: ar65 <operation ...> lib file|module ...
+        Operations are some of:
+                r       Add modules
+                d       Delete modules
+                t       List library table
+                v       Increase verbosity (put before other operation)
+                x       Extract modules
+                V       Print the archiver version
 </verb></tscreen>
 
 You may add modules to a library using the <tt/'r'/ command ('a' is deprecated). If the library
@@ -52,7 +52,7 @@ has a newer timestamp than the one to add.
 Here's an example:
 
 <tscreen><verb>
-	ar65 r mysubs.lib sub1.o sub2.o
+        ar65 r mysubs.lib sub1.o sub2.o
 </verb></tscreen>
 
 This will add two modules to the library 'mysubs.lib' creating the
@@ -62,7 +62,7 @@ sub2.o, they are replaced by the new ones.
 Modules names in the library are stored without the path, so, using
 
 <tscreen><verb>
-	ar65 v v r mysubs.lib ofiles/sub1.o ofiles/sub2.o
+        ar65 v v r mysubs.lib ofiles/sub1.o ofiles/sub2.o
 </verb></tscreen>
 
 will verbose add two modules named 'sub1.o' and 'sub2.o' to the library.
@@ -73,7 +73,7 @@ give a path when naming the modules.
 Example:
 
 <tscreen><verb>
-	ar65 d mysubs.lib sub1.o
+        ar65 d mysubs.lib sub1.o
 </verb></tscreen>
 
 This will delete the module named 'sub1.o' from the library, printing an
@@ -86,7 +86,7 @@ Any module names on the command line are ignored.
 Example:
 
 <tscreen><verb>
-	ar65 tv mysubs.lib
+        ar65 tv mysubs.lib
 </verb></tscreen>
 
 
@@ -103,7 +103,7 @@ this is not a problem.
 Example for extracting a module from the library:
 
 <tscreen><verb>
-	ar65 x mysubs.lib sub1.o
+        ar65 x mysubs.lib sub1.o
 </verb></tscreen>
 
 
@@ -131,17 +131,14 @@ including commercial applications, and to alter it and redistribute it
 freely, subject to the following restrictions:
 
 <enum>
-<item>	The origin of this software must not be misrepresented; you must not
-	claim that you wrote the original software. If you use this software
-	in a product, an acknowledgment in the product documentation would be
-	appreciated but is not required.
-<item>	Altered source versions must be plainly marked as such, and must not
-	be misrepresented as being the original software.
-<item>	This notice may not be removed or altered from any source
-	distribution.
+<item>  The origin of this software must not be misrepresented; you must not
+        claim that you wrote the original software. If you use this software
+        in a product, an acknowledgment in the product documentation would be
+        appreciated but is not required.
+<item>  Altered source versions must be plainly marked as such, and must not
+        be misrepresented as being the original software.
+<item>  This notice may not be removed or altered from any source
+        distribution.
 </enum>
 
 </article>
-
-
-

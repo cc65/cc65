@@ -3,7 +3,7 @@
 ;
 ; unsigned char getcpu (void);
 ;
-	.include	"zeropage.inc"
+        .include        "zeropage.inc"
         .export         _getcpu
 
 ; ---------------------------------------------------------------------------

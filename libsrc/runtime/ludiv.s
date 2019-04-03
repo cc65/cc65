@@ -78,7 +78,7 @@ L0:     asl     ptr1
 ; Do a subtraction. we do not have enough space to store the intermediate
 ; result, so we may have to do the subtraction twice.
 
-        pha
+        tax
         cmp     ptr3
         lda     ptr2+1
         sbc     ptr3+1
@@ -91,9 +91,9 @@ L0:     asl     ptr1
 ; Overflow, do the subtraction again, this time store the result
 
         sta     tmp4            ; We have the high byte already
-        pla
+        txa
         sbc     ptr3            ; byte 0
-        pha
+        tax
         lda     ptr2+1
         sbc     ptr3+1
         sta     ptr2+1          ; byte 1
@@ -102,7 +102,7 @@ L0:     asl     ptr1
         sta     tmp3            ; byte 2
         inc     ptr1            ; Set result bit
 
-L1:     pla
+L1:     txa
         dey
         bne     L0
         sta     ptr2

@@ -11,60 +11,60 @@
 /* TIA write / read registers */
 struct __tia {
     union {
-	unsigned char vsync;
-	unsigned char cxm0p;
+        unsigned char vsync;
+        unsigned char cxm0p;
     };
     union {
-	unsigned char vblank;
-	unsigned char cxm1p;
+        unsigned char vblank;
+        unsigned char cxm1p;
     };
     union {
-	unsigned char wsync;
-	unsigned char cxp0fb;
+        unsigned char wsync;
+        unsigned char cxp0fb;
     };
     union {
-	unsigned char rsync;
-	unsigned char cxp1fb;
+        unsigned char rsync;
+        unsigned char cxp1fb;
     };
     union {
-	unsigned char nusiz0;
-	unsigned char cxm0fb;
+        unsigned char nusiz0;
+        unsigned char cxm0fb;
     };
     union {
-	unsigned char nusiz1;
-	unsigned char cxm1fb;
+        unsigned char nusiz1;
+        unsigned char cxm1fb;
     };
     union {
-	unsigned char colup0;
-	unsigned char cxblpf;
+        unsigned char colup0;
+        unsigned char cxblpf;
     };
     union {
-	unsigned char colup1;
-	unsigned char cxppmm;
+        unsigned char colup1;
+        unsigned char cxppmm;
     };
     union {
-	unsigned char colupf;
-	unsigned char inpt0;
+        unsigned char colupf;
+        unsigned char inpt0;
     };
     union {
-	unsigned char colubk;
-	unsigned char inpt1;
+        unsigned char colubk;
+        unsigned char inpt1;
     };
     union {
-	unsigned char ctrlpf;
-	unsigned char inpt2;
+        unsigned char ctrlpf;
+        unsigned char inpt2;
     };
     union {
-	unsigned char refp0;
-	unsigned char inpt3;
+        unsigned char refp0;
+        unsigned char inpt3;
     };
     union {
-	unsigned char refp1;
-	unsigned char inpt4;
+        unsigned char refp1;
+        unsigned char inpt4;
     };
     union {
-	unsigned char pf0;
-	unsigned char inpt5;
+        unsigned char pf0;
+        unsigned char inpt5;
     };
     unsigned char pf1;
     unsigned char pf2;

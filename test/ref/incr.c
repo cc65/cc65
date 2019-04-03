@@ -13,39 +13,39 @@ int main(void)
 }
 
 memchar() {
-	char x, *p;
+        char x, *p;
 
-	&x, &p;
-	x = *p++;
-	x = *++p;
-	x = *p--;
-	x = *--p;
+        &x, &p;
+        x = *p++;
+        x = *++p;
+        x = *p--;
+        x = *--p;
 }
 
 memint() {
-	int x, *p;
+        int x, *p;
 
-	&x, &p;
-	x = *p++;
-	x = *++p;
-	x = *p--;
-	x = *--p;
+        &x, &p;
+        x = *p++;
+        x = *++p;
+        x = *p--;
+        x = *--p;
 }
 
 regchar() {
-	register char x, *p;
+        register char x, *p;
 
-	x = *p++;
-	x = *++p;
-	x = *p--;
-	x = *--p;
+        x = *p++;
+        x = *++p;
+        x = *p--;
+        x = *--p;
 }
 
 regint() {
-	register int x, *p;
+        register int x, *p;
 
-	x = *p++;
-	x = *++p;
-	x = *p--;
-	x = *--p;
+        x = *p++;
+        x = *++p;
+        x = *p--;
+        x = *--p;
 }

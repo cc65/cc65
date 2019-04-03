@@ -51,6 +51,6 @@ int j, k, m, n;
 #endif
 
 f5(){
-	x=A[k*m]*A[j*m]+B[k*n]*B[j*n];
-	x=A[k*m]*B[j*n]-B[k*n]*A[j*m];
+        x=A[k*m]*A[j*m]+B[k*n]*B[j*n];
+        x=A[k*m]*B[j*n]-B[k*n]*A[j*m];
 }

@@ -68,6 +68,7 @@
 #include "objdata.h"
 #include "scanner.h"
 #include "spool.h"
+#include "xex.h"
 
 
 
@@ -149,6 +150,7 @@ static Collection       CfgSymbols = STATIC_COLLECTION_INITIALIZER;
 /* Descriptor holding information about the binary formats */
 static BinDesc* BinFmtDesc      = 0;
 static O65Desc* O65FmtDesc      = 0;
+static XexDesc* XexFmtDesc      = 0;
 
 
 
@@ -543,6 +545,7 @@ static void ParseFiles (void)
         {   "FORMAT",   CFGTOK_FORMAT   },
     };
     static const IdentTok Formats [] = {
+        {   "ATARI",    CFGTOK_ATARIEXE },
         {   "O65",      CFGTOK_O65      },
         {   "BIN",      CFGTOK_BIN      },
         {   "BINARY",   CFGTOK_BIN      },
@@ -605,6 +608,10 @@ static void ParseFiles (void)
 
                         case CFGTOK_O65:
                             F->Format = BINFMT_O65;
+                            break;
+
+                        case CFGTOK_ATARIEXE:
+                            F->Format = BINFMT_ATARIEXE;
                             break;
 
                         default:
@@ -995,6 +1002,87 @@ static void ParseO65 (void)
 
 
 
+static void ParseXex (void)
+/* Parse the o65 format section */
+{
+    static const IdentTok Attributes [] = {
+        {   "RUNAD",    CFGTOK_RUNAD            },
+        {   "INITAD",   CFGTOK_INITAD           },
+    };
+
+    /* Remember the attributes read */
+    /* Bitmask to remember the attributes we got already */
+    enum {
+        atNone          = 0x0000,
+        atRunAd         = 0x0001,
+    };
+    unsigned AttrFlags = atNone;
+    Import *RunAd = 0;
+    Import *InitAd;
+    MemoryArea *InitMem;
+
+    /* Read the attributes */
+    while (CfgTok == CFGTOK_IDENT) {
+
+        /* Map the identifier to a token */
+        cfgtok_t AttrTok;
+        CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
+        AttrTok = CfgTok;
+
+        /* An optional assignment follows */
+        CfgNextTok ();
+        CfgOptionalAssign ();
+
+        /* Check which attribute was given */
+        switch (AttrTok) {
+
+            case CFGTOK_RUNAD:
+                /* Cannot have this attribute twice */
+                FlagAttr (&AttrFlags, atRunAd, "RUNAD");
+                /* We expect an identifier */
+                CfgAssureIdent ();
+                /* Generate an import for the symbol */
+                RunAd = InsertImport (GenImport (GetStrBufId (&CfgSVal), ADDR_SIZE_ABS));
+                /* Remember the file position */
+                CollAppend (&RunAd->RefLines, GenLineInfo (&CfgErrorPos));
+                /* Eat the identifier token */
+                CfgNextTok ();
+                break;
+
+            case CFGTOK_INITAD:
+                /* We expect a memory area followed by a colon and an identifier */
+                CfgAssureIdent ();
+                InitMem = CfgGetMemory (GetStrBufId (&CfgSVal));
+                CfgNextTok ();
+                CfgConsumeColon ();
+                CfgAssureIdent ();
+                /* Generate an import for the symbol */
+                InitAd = InsertImport (GenImport (GetStrBufId (&CfgSVal), ADDR_SIZE_ABS));
+                /* Remember the file position */
+                CollAppend (&InitAd->RefLines, GenLineInfo (&CfgErrorPos));
+                /* Eat the identifier token */
+                CfgNextTok ();
+                /* Add to XEX */
+                if (XexAddInitAd (XexFmtDesc, InitMem, InitAd))
+                    CfgError (&CfgErrorPos, "INITAD already given for memory area");
+                break;
+
+            default:
+                FAIL ("Unexpected attribute token");
+
+        }
+
+        /* Skip an optional comma */
+        CfgOptionalComma ();
+    }
+
+    /* Set the RUNAD import if we have one */
+    if ( RunAd )
+        XexSetRunAd (XexFmtDesc, RunAd);
+}
+
+
+
 static void ParseFormats (void)
 /* Parse a target format section */
 {
@@ -1002,6 +1090,7 @@ static void ParseFormats (void)
         {   "O65",      CFGTOK_O65      },
         {   "BIN",      CFGTOK_BIN      },
         {   "BINARY",   CFGTOK_BIN      },
+        {   "ATARI",    CFGTOK_ATARIEXE },
     };
 
     while (CfgTok == CFGTOK_IDENT) {
@@ -1020,6 +1109,10 @@ static void ParseFormats (void)
 
             case CFGTOK_O65:
                 ParseO65 ();
+                break;
+
+            case CFGTOK_ATARIEXE:
+                ParseXex ();
                 break;
 
             case CFGTOK_BIN:
@@ -1559,6 +1652,7 @@ void CfgRead (void)
     /* Create the descriptors for the binary formats */
     BinFmtDesc = NewBinDesc ();
     O65FmtDesc = NewO65Desc ();
+    XexFmtDesc = NewXexDesc ();
 
     /* If we have a config name given, open the file, otherwise we will read
     ** from a buffer.
@@ -2096,6 +2190,10 @@ void CfgWriteTarget (void)
 
                     case BINFMT_O65:
                         O65WriteTarget (O65FmtDesc, F);
+                        break;
+
+                    case BINFMT_ATARIEXE:
+                        XexWriteTarget (XexFmtDesc, F);
                         break;
 
                     default:

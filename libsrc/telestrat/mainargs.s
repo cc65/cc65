@@ -24,28 +24,28 @@ initmainargs:
 
         ldx     #0      ; Limit the length
 L0:     lda     BUFEDT,x
-        beq 	L3
-        cmp 	#' '
-        bne 	L1
-        lda 	#0
-        beq 	L3
+        beq     L3
+        cmp     #' '
+        bne     L1
+        lda     #0
+        beq     L3
 L1:     sta     name,x
         inx
-        cpx 	#FNAME_LEN
+        cpx     #FNAME_LEN
         bne     L0
-        lda 	#0
-L3:		
-        sta 	name,x
+        lda     #0
+L3:
+        sta     name,x
         inc     __argc          ; argc always is equal to, at least, 1
 
-		
+
         ldy     #1 * 2          ; Point to second argv slot
-		
+
 next:   lda     BUFEDT,x
         beq     done            ; End of line reached
         inx
         cmp     #' '            ; Skip leading spaces
-        beq     next		
+        beq     next
 
 found:  cmp     #'"'            ; Is the argument quoted?
         beq     setterm         ; Jump if so
@@ -58,12 +58,12 @@ setterm:sta     term            ; Set end of argument marker
 
         txa                     ; Get low byte
         clc
-        adc 	#<BUFEDT
-        bcc 	L4
-        inc 	L5+1
+        adc     #<BUFEDT
+        bcc     L4
+        inc     L5+1
 L4:
         sta     argv,y          ; argv[y]=&arg
-L5:		
+L5:
         lda     #>BUFEDT
         sta     argv+1,y
         iny
@@ -92,16 +92,16 @@ argloop:lda     BUFEDT,x
 
         lda     __argc          ; Get low byte of argument count
         cmp     #MAXARGS        ; Maximum number of arguments reached?
-        bcc     next            ; Parse next one if not		
-		
-		
+        bcc     next            ; Parse next one if not
+
+
 done:   lda     #<argv
         ldx     #>argv
         sta     __argv
         stx     __argv + 1
         rts
-		
-		
+
+
 .segment        "INIT"
 
 term:   .res    1
@@ -113,8 +113,8 @@ name:   .res    FNAME_LEN + 1
 args:   .res    SCREEN_XSIZE * 2 - 1
 
 param_found:
-		.res 1
+                .res 1
 ; char* argv[MAXARGS+1]={name};
-argv:  
-		.addr   name
+argv:
+                .addr   name
         .res    MAXARGS * 2

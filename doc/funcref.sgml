@@ -243,16 +243,19 @@ function.
 <sect1><tt/cc65.h/<label id="cc65.h"><p>
 
 <itemize>
-<!-- <item><ref id="cc65_cos" name="cc65_cos"> -->
-<!-- <item><ref id="cc65_idiv32by16r16" name="cc65_idiv32by16r16"> -->
-<!-- <item><ref id="cc65_imul16x16r32" name="cc65_imul16x16r32"> -->
-<!-- <item><ref id="cc65_imul8x8r16" name="cc65_imul8x8r16"> -->
-<!-- <item><ref id="cc65_sin" name="cc65_sin"> -->
-<!-- <item><ref id="cc65_udiv32by16r16" name="cc65_udiv32by16r16"> -->
-<!-- <item><ref id="cc65_umul16x16r32" name="cc65_umul16x16r32"> -->
-<!-- <item><ref id="cc65_umul16x8r32" name="cc65_umul16x8r32"> -->
-<!-- <item><ref id="cc65_umul8x8r16" name="cc65_umul8x8r16"> -->
+
+<!-- <item><ref id="cos" name="cos"> -->
+<!-- <item><ref id="idiv32by16r16" name="idiv32by16r16"> -->
+<!-- <item><ref id="imul16x16r32" name="imul16x16r32"> -->
+<!-- <item><ref id="imul8x8r16" name="imul8x8r16"> -->
+<!-- <item><ref id="sin" name="sin"> -->
+<!-- <item><ref id="udiv32by16r16" name="udiv32by16r16"> -->
+<!-- <item><ref id="umul16x16r32" name="umul16x16r32"> -->
+<!-- <item><ref id="umul16x8r32" name="umul16x8r32"> -->
+<!-- <item><ref id="umul8x8r16" name="umul8x8r16"> -->
 <item><ref id="doesclrscrafterexit" name="doesclrscrafterexit">
+<item><ref id="mul20" name="mul20">
+<item><ref id="mul40" name="mul40">
 </itemize>
 
 (incomplete)
@@ -577,7 +580,6 @@ communication, see also <tt>testcode/lib/ser-test.c</tt>.
 <item><ref id="raise" name="raise">
 <item><ref id="signal" name="signal">
 </itemize>
-
 
 <sect1><tt/stdarg.h/<label id="stdarg.h"><p>
 
@@ -1019,7 +1021,6 @@ It returns 1 if it does.
 <tag/Availability/cc65 (<tt/atari/ and <tt/atarixl/ platforms)
 </descrip>
 </quote>
-
 
 <sect1>_poserror<label id="_poserror"><p>
 
@@ -5558,6 +5559,29 @@ memory allocated for the driver.
 </descrip>
 </quote>
 
+<sect1>mul20<label id="mul20"><p>
+
+<quote>
+<descrip>
+<tag/Function/Multiplies argument by 20.
+<tag/Header/<tt/<ref id="cc65.h" name="cc65.h">/
+<tag/Declaration/<tt/unsigned int __fastcall__ mul20 (unsigned char value);/
+<tag/Description/Speed optimized function to multiply an 8 bit unsigned value by 20 to get a 16 bit result.
+<tag/Availability/cc65
+</descrip>
+</quote>
+
+<sect1>mul40<label id="mul40"><p>
+
+<quote>
+<descrip>
+<tag/Function/Multiplies argument by 40.
+<tag/Header/<tt/<ref id="cc65.h" name="cc65.h">/
+<tag/Declaration/<tt/unsigned int __fastcall__ mul40 (unsigned char value);/
+<tag/Description/Speed optimized function to multiply an 8 bit unsigned value by 40 to get a 16 bit result.
+<tag/Availability/cc65
+</descrip>
+</quote>
 
 <sect1>offsetof<label id="offsetof"><p>
 

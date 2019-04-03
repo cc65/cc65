@@ -814,6 +814,8 @@ static OptFunc DOptPtrLoad14    = { OptPtrLoad14,    "OptPtrLoad14",    108, 0, 
 static OptFunc DOptPtrLoad15    = { OptPtrLoad15,    "OptPtrLoad15",     86, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad16    = { OptPtrLoad16,    "OptPtrLoad16",    100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad17    = { OptPtrLoad17,    "OptPtrLoad17",    190, 0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad18    = { OptPtrLoad18,    "OptPtrLoad18",    100, 0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad19    = { OptPtrLoad19,    "OptPtrLoad19",     65, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrStore1    = { OptPtrStore1,    "OptPtrStore1",     65, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrStore2    = { OptPtrStore2,    "OptPtrStore2",     65, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrStore3    = { OptPtrStore3,    "OptPtrStore3",    100, 0, 0, 0, 0, 0 };
@@ -905,6 +907,8 @@ static OptFunc* OptFuncs[] = {
     &DOptPtrLoad15,
     &DOptPtrLoad16,
     &DOptPtrLoad17,
+    &DOptPtrLoad18,
+    &DOptPtrLoad19,
     &DOptPtrLoad2,
     &DOptPtrLoad3,
     &DOptPtrLoad4,
@@ -1245,6 +1249,8 @@ static unsigned RunOptGroup1 (CodeSeg* S)
     Changes += RunOptFunc (S, &DOptPtrLoad4, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad5, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad6, 1);
+    Changes += RunOptFunc (S, &DOptPtrLoad18, 1); /* Before OptPtrLoad7 */
+    Changes += RunOptFunc (S, &DOptPtrLoad19, 1); /* Before OptPtrLoad7 */
     Changes += RunOptFunc (S, &DOptPtrLoad7, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad11, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad12, 1);

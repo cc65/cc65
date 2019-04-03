@@ -22,13 +22,11 @@ static char C_dev[] = "C:";
 
 static struct __iocb *findfreeiocb(void)
 {
-    struct __iocb *iocb = &IOCB;  /* first IOCB (#0) */
     int i;
 
     for (i = 0; i < 8; i++) {
-        if (iocb->handler == 0xff)
-            return iocb;
-        iocb++;
+        if (OS.iocb[i].handler == 0xff)
+            return &OS.iocb[i];
     }
     return NULL;
 }
@@ -52,7 +50,7 @@ int main(int argc, char **argv)
         fprintf(stderr, "couldn't find a free iocb\n");
         return 1;
     }
-    iocb_num = (iocb - &IOCB) * 16;
+    iocb_num = (iocb - OS.iocb) * 16;
     if (verbose)
         printf("using iocb index $%02X ($%04X)\n", iocb_num, iocb);
 

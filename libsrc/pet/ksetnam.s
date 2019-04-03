@@ -10,12 +10,11 @@
 
 
 .proc   SETNAM
-        
+
         sta     FNLEN
         stx     FNADR
         sty     FNADR+1
         rts
 
 .endproc
-
 

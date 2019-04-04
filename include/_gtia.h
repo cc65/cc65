@@ -131,44 +131,23 @@ struct __gtia_write {
 #define HUE_YELLOWRED   15
 
 /* Color defines, similar to c64 colors (untested) */
-/* Note that the conio color implementation is monochrome
-** (bgcolor and textcolor are only placeholders)
-*/
-/* Use the defines with the setcolor() or _atari_xxxcolor() functions */
-#define COLOR_BLACK             _gtia_mkcolor(HUE_GREY,0)
-#define COLOR_WHITE             _gtia_mkcolor(HUE_GREY,7)
-#define COLOR_RED               _gtia_mkcolor(HUE_REDORANGE,1)
-#define COLOR_CYAN              _gtia_mkcolor(HUE_CYAN,3)
-#define COLOR_VIOLET            _gtia_mkcolor(HUE_PURPLE,4)
-#define COLOR_GREEN             _gtia_mkcolor(HUE_GREEN,2)
-#define COLOR_BLUE              _gtia_mkcolor(HUE_BLUE,2)
-#define COLOR_YELLOW            _gtia_mkcolor(HUE_YELLOW,7)
-#define COLOR_ORANGE            _gtia_mkcolor(HUE_ORANGE,5)
-#define COLOR_BROWN             _gtia_mkcolor(HUE_YELLOW,2)
-#define COLOR_LIGHTRED          _gtia_mkcolor(HUE_REDORANGE,6)
-#define COLOR_GRAY1             _gtia_mkcolor(HUE_GREY,2)
-#define COLOR_GRAY2             _gtia_mkcolor(HUE_GREY,3)
-#define COLOR_LIGHTGREEN        _gtia_mkcolor(HUE_GREEN,6)
-#define COLOR_LIGHTBLUE         _gtia_mkcolor(HUE_BLUE,6)
-#define COLOR_GRAY3             _gtia_mkcolor(HUE_GREY,5)
-
-/* TGI color defines */
-#define TGI_COLOR_BLACK         COLOR_BLACK
-#define TGI_COLOR_WHITE         COLOR_WHITE
-#define TGI_COLOR_RED           COLOR_RED
-#define TGI_COLOR_CYAN          COLOR_CYAN
-#define TGI_COLOR_VIOLET        COLOR_VIOLET
-#define TGI_COLOR_GREEN         COLOR_GREEN
-#define TGI_COLOR_BLUE          COLOR_BLUE
-#define TGI_COLOR_YELLOW        COLOR_YELLOW
-#define TGI_COLOR_ORANGE        COLOR_ORANGE
-#define TGI_COLOR_BROWN         COLOR_BROWN
-#define TGI_COLOR_LIGHTRED      COLOR_LIGHTRED
-#define TGI_COLOR_GRAY1         COLOR_GRAY1
-#define TGI_COLOR_GRAY2         COLOR_GRAY2
-#define TGI_COLOR_LIGHTGREEN    COLOR_LIGHTGREEN
-#define TGI_COLOR_LIGHTBLUE     COLOR_LIGHTBLUE
-#define TGI_COLOR_GRAY3         COLOR_GRAY3
+/* Hardware palette values (for GTIA colxxx registers) */
+#define GTIA_COLOR_BLACK             _gtia_mkcolor(HUE_GREY,0)
+#define GTIA_COLOR_WHITE             _gtia_mkcolor(HUE_GREY,7)
+#define GTIA_COLOR_RED               _gtia_mkcolor(HUE_REDORANGE,1)
+#define GTIA_COLOR_CYAN              _gtia_mkcolor(HUE_CYAN,3)
+#define GTIA_COLOR_VIOLET            _gtia_mkcolor(HUE_PURPLE,4)
+#define GTIA_COLOR_GREEN             _gtia_mkcolor(HUE_GREEN,2)
+#define GTIA_COLOR_BLUE              _gtia_mkcolor(HUE_BLUE,2)
+#define GTIA_COLOR_YELLOW            _gtia_mkcolor(HUE_YELLOW,7)
+#define GTIA_COLOR_ORANGE            _gtia_mkcolor(HUE_ORANGE,5)
+#define GTIA_COLOR_BROWN             _gtia_mkcolor(HUE_YELLOW,2)
+#define GTIA_COLOR_LIGHTRED          _gtia_mkcolor(HUE_REDORANGE,6)
+#define GTIA_COLOR_GRAY1             _gtia_mkcolor(HUE_GREY,2)
+#define GTIA_COLOR_GRAY2             _gtia_mkcolor(HUE_GREY,3)
+#define GTIA_COLOR_LIGHTGREEN        _gtia_mkcolor(HUE_GREEN,6)
+#define GTIA_COLOR_LIGHTBLUE         _gtia_mkcolor(HUE_BLUE,6)
+#define GTIA_COLOR_GRAY3             _gtia_mkcolor(HUE_GREY,5)
 
 
 /*****************************************************************************/

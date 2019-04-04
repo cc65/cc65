@@ -82,8 +82,8 @@ putchar:
         sta     ptr4+1
         pla                     ; get char again
 
-;       and     #$C0            ; without this we are compatible with the old version. user must not try to output a char >= $3F
-        ora     conio_color
+        and     #$3F            ; clear palette index bits
+        ora     conio_color     ; use currently selected palette
 
         ldy     COLCRS_5200
         sta     (ptr4),y

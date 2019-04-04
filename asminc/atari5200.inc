@@ -111,6 +111,14 @@ ANTIC     = $D400  ; ANTIC area
 POKEY     = $E800  ; POKEY area
 .include  "atari_pokey.inc"
 
+;-------------------------------------------------------------------------
+; conio color defines
+;-------------------------------------------------------------------------
+
+COLOR_WHITE = 0
+COLOR_RED   = 1
+COLOR_GREEN = 2
+COLOR_BLACK = 3
 
 ;-------------------------------------------------------------------------
 ; Cartridge Parameters

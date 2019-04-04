@@ -2,6 +2,8 @@
 ; Christian Groessler, 02-Apr-2019
 ;
 ; unsigned char __fastcall__ textcolor (unsigned char color);
+;
+; "color" value is a palette index (0..3) or COLOR_xxx value (0..3)
 
         .export         _textcolor
         .import         conio_color

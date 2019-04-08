@@ -98,6 +98,12 @@
 
 #define SYM_IS_IMPORT(x)        (((x) & SYM_MASK_IMPORT) == SYM_IMPORT)
 
+/* Weak symbols */
+#define SYM_WEAK                0x0200U /* Weak */
+#define SYM_MASK_WEAK           0x0200U /* Value mask */
+
+#define SYM_IS_WEAK(x)          (((x) & SYM_MASK_WEAK) == SYM_WEAK)
+
 
 
 /* End of symdefs.h */

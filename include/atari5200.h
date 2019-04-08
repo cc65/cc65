@@ -78,10 +78,10 @@ extern void atr5200std_joy[];        /* referred to by joy_static_stddrv[] */
 #define ANTIC (*(struct __antic*)0xD400)
 
 /* conio color defines */
-#define COLOR_WHITE 0x00
-#define COLOR_RED   0x01
-#define COLOR_GREEN 0x02
-#define COLOR_BLACK 0x03
+#define COLOR_WHITE      0x00
+#define COLOR_LIGHTRED   0x01
+#define COLOR_LIGHTGREEN 0x02
+#define COLOR_BLACK      0x03
 
 /* The following #define will cause the matching function calls in conio.h
 ** to be overlaid by macros with the same names, saving the function call

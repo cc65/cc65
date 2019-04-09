@@ -2,7 +2,6 @@
 ; Christian Groessler, 05-Apr-2019
 ;
 
-        .import         conio_colors
         .export         _bgcolor
 
         .include        "atari5200.inc"
@@ -19,7 +18,7 @@ old_bg_color:
 _bgcolor:
         and     #3
         tax
-        lda     conio_colors,x
+        lda     COLOR0,x
         ldx     old_bg_color
         sta     COLOR4                  ; set new value
         sta     old_bg_color
@@ -30,7 +29,7 @@ _bgcolor:
 .segment        "ONCE"
 
 init_old_bgcolor:
-        lda     conio_colors+3          ; see also conioscreen.s for initialization
+        lda     COLOR0+3                ; see also conioscreen.s for initialization
         sta     old_bg_color
         rts
 

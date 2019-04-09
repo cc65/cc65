@@ -7,7 +7,6 @@
 SCREEN_BUF_SIZE =       20 * 24
 SCREEN_BUF      =       $4000 - SCREEN_BUF_SIZE
 
-                .import conio_colors
                 .export screen_setup
                 .export screen_width, screen_height
                 .export conio_color
@@ -44,13 +43,13 @@ clrscr:         sta     (SAVMSC),y
 
                 ; set default colors
 
-                lda     conio_colors
+                lda     #GTIA_COLOR_WHITE
                 sta     COLOR0
-                lda     conio_colors+1
+                lda     #GTIA_COLOR_LIGHTRED
                 sta     COLOR1
-                lda     conio_colors+2
+                lda     #GTIA_COLOR_LIGHTGREEN
                 sta     COLOR2
-                lda     conio_colors+3
+                lda     #GTIA_COLOR_BLACK
                 sta     COLOR3
                 sta     COLOR4          ; background
 

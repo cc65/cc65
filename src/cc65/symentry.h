@@ -101,6 +101,7 @@ struct CodeEntry;
 
 #define SC_GOTO         0x20000U
 #define SC_SPADJUSTMENT 0x40000U
+#define SC_GOTO_IND     0x80000U        /* Indirect goto */
 
 
 

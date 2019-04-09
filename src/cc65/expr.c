@@ -696,6 +696,22 @@ static void Primary (ExprDesc* E)
 
     switch (CurTok.Tok) {
 
+        case TOK_BOOL_AND:
+            /* A computed goto label address */
+            if (IS_Get (&Standard) >= STD_CC65) {
+                NextToken ();
+                SymEntry* Entry = AddLabelSym (CurTok.Ident, SC_REF | SC_GOTO_IND);
+                /* output its label */
+                E->Flags = E_RTYPE_RVAL | E_LOC_STATIC;
+                E->Name = Entry->V.L.Label;
+                E->Type = PointerTo(type_void);
+                NextToken ();
+            } else {
+                Error ("Computed gotos are a C extension, not supported with this --standard");
+                ED_MakeConstAbsInt (E, 1);
+            }
+            break;
+
         case TOK_IDENT:
             /* Identifier. Get a pointer to the symbol table entry */
             Sym = E->Sym = FindSym (CurTok.Ident);

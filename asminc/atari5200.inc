@@ -115,10 +115,10 @@ POKEY     = $E800  ; POKEY area
 ; conio color defines
 ;-------------------------------------------------------------------------
 
-COLOR_WHITE      = 0
-COLOR_LIGHTRED   = 1
-COLOR_LIGHTGREEN = 2
-COLOR_BLACK      = 3
+COLOR_WHITE = 0
+COLOR_RED   = 1
+COLOR_GREEN = 2
+COLOR_BLACK = 3
 
 ;-------------------------------------------------------------------------
 ; Cartridge Parameters

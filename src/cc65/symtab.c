@@ -997,6 +997,12 @@ SymTable* GetGlobalSymTab (void)
     return SymTab0;
 }
 
+SymTable* GetLabelSymTab (void)
+/* Return the global symbol table */
+{
+    return LabelTab;
+}
+
 
 
 int SymIsLocal (SymEntry* Sym)

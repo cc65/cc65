@@ -22,7 +22,7 @@
 
 
 static const char Text [] = "Hello world!";
-static unsigned char colors[] = { COLOR_WHITE, COLOR_LIGHTGREEN, COLOR_LIGHTRED, COLOR_BLACK };
+static unsigned char colors[] = { COLOR_WHITE, COLOR_GREEN, COLOR_RED, COLOR_BLACK };
 
 
 

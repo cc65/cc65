@@ -15,9 +15,9 @@
         .importzp       screen_width, screen_height
         .importzp       ptr4
 
-        .import         screen_setup
-        .constructor    screen_setup_constructor, 26
-screen_setup_constructor = screen_setup
+        .import         initconio
+        .constructor    initconio_constructor
+initconio_constructor = initconio
 
 _cputcxy:
         pha                     ; Save C

@@ -7,7 +7,7 @@
 SCREEN_BUF_SIZE =       20 * 24
 SCREEN_BUF      =       $4000 - SCREEN_BUF_SIZE
 
-                .export screen_setup
+                .export initconio
                 .export screen_width, screen_height
                 .export conio_color
 
@@ -17,7 +17,8 @@ screen_height   =       24
 
                 .segment "ONCE"
 
-screen_setup:
+; initialize color registers, display list, and screen memory
+initconio:
 
                 ; initialize SAVMSC
                 lda     #<SCREEN_BUF
@@ -62,9 +63,9 @@ clrscr:         sta     (SAVMSC),y
 
                 rts
 
-                .data
+                .bss
 
-conio_color:    .byte   0
+conio_color:    .res    1
 
                 .segment "DLIST"
 

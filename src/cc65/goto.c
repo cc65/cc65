@@ -103,7 +103,7 @@ void GotoStatement (void)
 
                 if (CPUIsets[CPU] & CPU_ISET_65SC02) {
                     AddCodeLine ("ldx #$%02X", val * 2);
-                    AddCodeLine ("jmp (%s,x)", arr->AsmName);
+                    AddCodeLine ("jmp (.loword(%s),x)", arr->AsmName);
                 } else {
                     AddCodeLine ("ldy #$%02X", val * 2);
                     AddCodeLine ("lda %s,y", arr->AsmName);
@@ -118,7 +118,7 @@ void GotoStatement (void)
 
                 if (CPUIsets[CPU] & CPU_ISET_65SC02) {
                     AddCodeLine ("tax");
-                    AddCodeLine ("jmp (%s,x)", arr->AsmName);
+                    AddCodeLine ("jmp (.loword(%s),x)", arr->AsmName);
                 } else {
                     AddCodeLine ("tay");
                     AddCodeLine ("lda %s,y", arr->AsmName);

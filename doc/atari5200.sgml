@@ -184,7 +184,7 @@ Using <tt/atari5200-conioscreen-20x12.o/ is as simple as placing it on
 the linker command line like this:
 
 <tscreen><verb>
-cl65 -t atari5200 myprog.c lib/atari5200-conioscreen-20x12.o
+cl65 -t atari5200 myprog.c atari5200-conioscreen-20x12.o
 </verb></tscreen>
 
 

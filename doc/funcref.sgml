@@ -244,11 +244,11 @@ function.
 
 <itemize>
 
-<!-- <item><ref id="cos" name="cos"> -->
+<!-- <item><ref id="_cos" name="_cos"> -->
 <!-- <item><ref id="idiv32by16r16" name="idiv32by16r16"> -->
 <!-- <item><ref id="imul16x16r32" name="imul16x16r32"> -->
 <!-- <item><ref id="imul8x8r16" name="imul8x8r16"> -->
-<!-- <item><ref id="sin" name="sin"> -->
+<!-- <item><ref id="_sin" name="_sin"> -->
 <!-- <item><ref id="udiv32by16r16" name="udiv32by16r16"> -->
 <!-- <item><ref id="umul16x16r32" name="umul16x16r32"> -->
 <!-- <item><ref id="umul16x8r32" name="umul16x8r32"> -->

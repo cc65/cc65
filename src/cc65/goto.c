@@ -90,12 +90,12 @@ void GotoStatement (void)
             ConsumeLBrack ();
 
             /* Find array size */
-            if (!IsTypeArray(arr->Type) || SizeOf(arr->Type) == 0 ||
-                SizeOf(GetElementType(arr->Type)) != 2)
+            if (!IsTypeArray (arr->Type) || SizeOf (arr->Type) == 0 ||
+                SizeOf (GetElementType(arr->Type)) != 2)
                 Error ("Expected array");
-            if (GetElementCount(arr->Type) > 127)
+            if (GetElementCount (arr->Type) > 127)
                 Error ("Only arrays with <= 127 labels are supported, got %lu",
-                       GetElementCount(arr->Type));
+                       GetElementCount (arr->Type));
 
             if (CurTok.Tok == TOK_ICONST) {
                 val = CurTok.IVal;

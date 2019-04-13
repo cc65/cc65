@@ -745,7 +745,7 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
                 */
                 if (DOR->Flags & SC_GOTO) {
                     SymEntry *E;
-                    g_userodata();
+                    g_userodata ();
                     g_defdatalabel (DOR->LateSP_Label);
                     g_defdata (CF_CONST | CF_INT, StackPtr - DOR->StackPtr, 0);
 

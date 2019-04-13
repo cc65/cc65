@@ -704,7 +704,7 @@ static void Primary (ExprDesc* E)
                 /* output its label */
                 E->Flags = E_RTYPE_RVAL | E_LOC_STATIC;
                 E->Name = Entry->V.L.Label;
-                E->Type = PointerTo(type_void);
+                E->Type = PointerTo (type_void);
                 NextToken ();
             } else {
                 Error ("Computed gotos are a C extension, not supported with this --standard");

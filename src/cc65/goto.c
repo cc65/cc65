@@ -87,15 +87,20 @@ void GotoStatement (void)
         if (CurTok.Tok == TOK_IDENT &&
             (arr = FindSym (CurTok.Ident))) {
             NextToken ();
-            ConsumeLBrack ();
 
             /* Find array size */
             if (!IsTypeArray (arr->Type) || SizeOf (arr->Type) == 0 ||
-                SizeOf (GetElementType(arr->Type)) != 2)
+                SizeOf (GetElementType(arr->Type)) != 2) {
                 Error ("Expected array");
-            if (GetElementCount (arr->Type) > 127)
+                return;
+            }
+            if (GetElementCount (arr->Type) > 127) {
                 Error ("Only arrays with <= 127 labels are supported, got %lu",
                        GetElementCount (arr->Type));
+                return;
+            }
+
+            ConsumeLBrack ();
 
             if (CurTok.Tok == TOK_ICONST) {
                 val = CurTok.IVal;

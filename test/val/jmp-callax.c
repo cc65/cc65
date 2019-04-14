@@ -4,7 +4,7 @@ static void foo(void) {
 	val = 5;
 }
 
-static void wrap() {
+static void wrap(void) {
 
 	asm("lda #<%v", foo);
 	asm("ldx #>%v", foo);
@@ -12,7 +12,7 @@ static void wrap() {
 
 }
 
-int main() {
+int main(void) {
 
 	val = 0;
 	wrap();

@@ -699,8 +699,9 @@ static void Primary (ExprDesc* E)
         case TOK_BOOL_AND:
             /* A computed goto label address */
             if (IS_Get (&Standard) >= STD_CC65) {
+                SymEntry* Entry;
                 NextToken ();
-                SymEntry* Entry = AddLabelSym (CurTok.Ident, SC_REF | SC_GOTO_IND);
+                Entry = AddLabelSym (CurTok.Ident, SC_REF | SC_GOTO_IND);
                 /* output its label */
                 E->Flags = E_RTYPE_RVAL | E_LOC_STATIC;
                 E->Name = Entry->V.L.Label;

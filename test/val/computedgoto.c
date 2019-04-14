@@ -43,7 +43,7 @@ static void act(const unsigned char op) {
 	return;
 }
 
-int main() {
+int main(void) {
 
 	val = val2 = 0;
 

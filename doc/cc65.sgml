@@ -776,6 +776,25 @@ This cc65 version has some extensions to the ISO C standard.
         size zero, even if it is initialized.
         <p>
 
+<item>  Computed gotos, a GCC extension, has limited support. With it you can
+        use fast jump tables from C. You can take the address of a label with
+        a double ampersand, putting them in a static const array of type void *.
+        Then you can jump to one of these labels as follows:
+
+        <tscreen><verb>
+        static const void * const jumptable[] = {
+                &amp;&amp;add,
+                &amp;&amp;sub
+        };
+        goto *jumptable[somevar];
+
+        add:
+        ...code...
+        </verb></tscreen>
+
+        In the jump table, no expressions are supported. The array index
+        used in the goto must be a simple variable or a constant.
+
 </itemize>
 <p>
 

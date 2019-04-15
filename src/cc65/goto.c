@@ -90,14 +90,12 @@ void GotoStatement (void)
 
             /* Find array size */
             if (!IsTypeArray (arr->Type) || SizeOf (arr->Type) == 0 ||
+                !(arr->Flags & SC_STATIC) ||
                 SizeOf (GetElementType(arr->Type)) != 2) {
-                Error ("Expected array");
-                return;
-            }
-            if (GetElementCount (arr->Type) > 127) {
+                Error ("Expected a static array");
+            } else if (GetElementCount (arr->Type) > 127) {
                 Error ("Only arrays with <= 127 labels are supported, got %lu",
                        GetElementCount (arr->Type));
-                return;
             }
 
             ConsumeLBrack ();
@@ -153,6 +151,8 @@ void GotoStatement (void)
                     cur = cur->NextSym;
                 }
             }
+        } else { /* It was not TOK_IDENT, or we couldn't find the symbol */
+            Error ("Array name expected");
         }
     } else {
 

@@ -437,51 +437,78 @@ static void AdjustStackOffset (StackOpData* D, unsigned Offs)
 
         CodeEntry* E = CS_GetEntry (D->Code, I);
 
-        int NeedCorrection = 0;
+        /* Check if this entry does a stack access, and if so, if it's a plain
+        ** load from stack, since this is needed later.
+        */
+        int Correction = 0;
         if ((E->Use & REG_SP) != 0) {
 
             /* Check for some things that should not happen */
             CHECK (E->AM == AM65_ZP_INDY || E->RI->In.RegY >= (short) Offs);
             CHECK (strcmp (E->Arg, "sp") == 0);
-
             /* We need to correct this one */
-            NeedCorrection = 1;
+            Correction = (E->OPC == OP65_LDA)? 2 : 1;
 
         } else if (CE_IsCallTo (E, "ldaxysp")) {
-
             /* We need to correct this one */
-            NeedCorrection = 1;
-
+            Correction = 1;
         }
 
-        if (NeedCorrection) {
-
+        if (Correction) {
             /* Get the code entry before this one. If it's a LDY, adjust the
             ** value.
             */
             CodeEntry* P = CS_GetPrevEntry (D->Code, I);
             if (P && P->OPC == OP65_LDY && CE_IsConstImm (P)) {
-
                 /* The Y load is just before the stack access, adjust it */
                 CE_SetNumArg (P, P->Num - Offs);
-
             } else {
-
                 /* Insert a new load instruction before the stack access */
                 const char* Arg = MakeHexArg (E->RI->In.RegY - Offs);
                 CodeEntry* X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
                 InsertEntry (D, X, I++);
-
             }
 
             /* If we need the value of Y later, be sure to reload it */
             if (RegYUsed (D->Code, I+1)) {
+                CodeEntry* N;
                 const char* Arg = MakeHexArg (E->RI->In.RegY);
-                CodeEntry* X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
-                InsertEntry (D, X, I+1);
+                if (Correction == 2 && (N = CS_GetNextEntry(D->Code, I)) != 0 &&
+                    ((N->Info & OF_ZBRA) != 0) && N->JumpTo != 0) {
+                    /* The Y register is used but the load instruction loads A
+                    ** and is followed by a branch that evaluates the zero flag.
+                    ** This means that we cannot just insert the load insn
+                    ** for the Y register at this place, because it would
+                    ** destroy the Z flag. Instead place load insns at the
+                    ** target of the branch and after it.
+                    ** Note: There is a chance that this code won't work. The
+                    ** jump may be a backwards jump (in which case the stack
+                    ** offset has already been adjusted) or there may be other
+                    ** instructions between the load and the conditional jump.
+                    ** Currently the compiler does not generate such code, but
+                    ** it is possible to force the optimizer into something
+                    ** invalid by use of inline assembler.
+                    */
 
-                /* Skip this instruction in the next round */
-                ++I;
+                    /* Add load insn after the branch */
+                    CodeEntry* X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
+                    InsertEntry (D, X, I+2);
+
+                    /* Add load insn before branch target */
+                    CodeEntry* Y = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
+                    int J = CS_GetEntryIndex (D->Code, N->JumpTo->Owner);
+                    CHECK (J > I);      /* Must not happen */
+                    InsertEntry (D, Y, J);
+
+                    /* Move the label to the new insn */
+                    CodeLabel* L = CS_GenLabel (D->Code, Y);
+                    CS_MoveLabelRef (D->Code, N, L);
+                } else {
+                    CodeEntry* X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
+                    InsertEntry (D, X, I+1);
+                    /* Skip this instruction in the next round */
+                    ++I;
+                }
             }
         }
 

@@ -482,9 +482,9 @@ void InsertExport (Export* E)
                         Imp = Imp->Next;
                     }
                 } else {
-                    /* Duplicate entry, ignore it */
-                    Warning ("Duplicate external identifier: '%s'",
-                             GetString (L->Name));
+                    /* Duplicate entry, this is fatal */
+                    Error ("Duplicate external identifier: '%s'",
+                           GetString (L->Name));
                 }
                 return;
             }

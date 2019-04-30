@@ -53,6 +53,7 @@ unsigned char HaveStartAddr = 0;        /* Start address not given */
 unsigned long StartAddr     = 0x200;    /* Start address */
 
 unsigned char VerboseMap    = 0;        /* Verbose map file */
+unsigned char AllowMultDef  = 0;        /* Allow multiple definitions */
 const char* MapFileName     = 0;        /* Name of the map file */
 const char* LabelFileName   = 0;        /* Name of the label file */
 const char* DbgFileName     = 0;        /* Name of the debug file */

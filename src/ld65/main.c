@@ -552,7 +552,7 @@ static void OptVersion (const char* Opt attribute ((unused)),
 
 static void OptMultDef (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
-/* Print the assembler version */
+/* Set flag to allow multiple definitions of a global symbol */
 {
     AllowMultDef = 1;
 }

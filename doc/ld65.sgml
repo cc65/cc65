@@ -808,8 +808,7 @@ segment.
 <sect1>Other SEGMENT attributes<p>
 
 Segments may be aligned to some memory boundary. Specify "<tt/align = num/" to
-request this feature. Num must be a power of two. To align all segments on a
-page boundary, use
+request this feature. To align all segments on a page boundary, use
 
 <tscreen><verb>
         SEGMENTS {

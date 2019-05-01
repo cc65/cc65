@@ -210,6 +210,10 @@ static void InternalDumpExpr (const ExprNode* Expr, const ExprNode* (*ResolveSym
             printf (" WORD1");
             break;
 
+        case EXPR_NEARADDR:
+            printf (" NEARADDR");
+            break;
+
         case EXPR_FARADDR:
             printf (" FARADDR");
             break;

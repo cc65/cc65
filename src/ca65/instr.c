@@ -1217,7 +1217,7 @@ static void EmitCode (EffAddr* A)
                 ** mode, force this address into 16 bit range to allow
                 ** addressing inside a 64K segment.
                 */
-                Emit2 (A->Opcode, GenWordExpr (A->Expr));
+                Emit2 (A->Opcode, GenNearAddrExpr (A->Expr));
             } else {
                 Emit2 (A->Opcode, A->Expr);
             }

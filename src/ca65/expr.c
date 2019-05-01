@@ -1865,6 +1865,28 @@ ExprNode* GenWordExpr (ExprNode* Expr)
 
 
 
+ExprNode* GenNearAddrExpr (ExprNode* Expr)
+/* A word sized expression that will error if given a far expression at assemble time. */
+{
+    long      Val;
+    /* Special handling for const expressions */
+    if (IsEasyConst (Expr, &Val)) {
+        FreeExpr (Expr);
+        Expr = GenLiteralExpr (Val & 0xFFFF);
+        if (Val > 0xFFFF)
+        {
+            Error("Range error: constant too large for assumed near address.");
+        }
+    } else {
+        ExprNode* Operand = Expr;
+        Expr = NewExprNode (EXPR_NEARADDR);
+        Expr->Left = Operand;
+    }
+    return Expr;
+}
+
+
+
 ExprNode* GenFarAddrExpr (ExprNode* Expr)
 /* Force the given expression into a far address and return the result. */
 {

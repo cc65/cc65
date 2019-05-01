@@ -100,7 +100,7 @@ void GotoStatement (void)
             ConsumeLBrack ();
 
             if (CurTok.Tok == TOK_ICONST) {
-                val = CurTok.IVal;
+                val = (unsigned char)CurTok.IVal;
                 NextToken ();
 
                 if (CPUIsets[CPU] & CPU_ISET_65SC02) {

@@ -1278,7 +1278,7 @@ static void StudyDWord (ExprNode* Expr, ExprDesc* D)
 
 
 static void StudyNearAddr (ExprNode* Expr, ExprDesc* D)
-/* Study an EXPR_NearAddr expression node */
+/* Study an EXPR_NEARADDR expression node */
 {
     /* Study the expression */
     StudyExprInternal (Expr->Left, D);

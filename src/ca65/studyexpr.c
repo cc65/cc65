@@ -1447,16 +1447,16 @@ static void StudyExprInternal (ExprNode* Expr, ExprDesc* D)
             StudyWord1 (Expr, D);
             break;
 
-        case EXPR_NEARADDR:
-            StudyNearAddr (Expr, D);
-            break;
-
         case EXPR_FARADDR:
             StudyFarAddr (Expr, D);
             break;
 
         case EXPR_DWORD:
             StudyDWord (Expr, D);
+            break;
+
+        case EXPR_NEARADDR:
+            StudyNearAddr (Expr, D);
             break;
 
         default:

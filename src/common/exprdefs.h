@@ -97,9 +97,9 @@
 #define EXPR_BYTE3              (EXPR_UNARYNODE | 0x0B)
 #define EXPR_WORD0              (EXPR_UNARYNODE | 0x0C)
 #define EXPR_WORD1              (EXPR_UNARYNODE | 0x0D)
-#define EXPR_NEARADDR           (EXPR_UNARYNODE | 0x0E)
-#define EXPR_FARADDR            (EXPR_UNARYNODE | 0x0F)
-#define EXPR_DWORD              (EXPR_UNARYNODE | 0x10)
+#define EXPR_FARADDR            (EXPR_UNARYNODE | 0x0E)
+#define EXPR_DWORD              (EXPR_UNARYNODE | 0x0F)
+#define EXPR_NEARADDR           (EXPR_UNARYNODE | 0x10)
 
 
 

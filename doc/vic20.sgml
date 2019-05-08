@@ -142,7 +142,17 @@ The names in the parentheses denote the symbols to be used for static linking of
 
 <sect1>Graphics drivers<p>
 
-No graphics drivers are currently available for the VIC20.
+<em>Note:</em> All available graphics drivers for the TGI interface will use
+memory area $1000-$1FFF, so standard memory configurations will not work.
+
+<descrip>
+  <tag><tt/vic20-hi.tgi (vic20_hi_tgi)/</tag>
+  This driver features a resolution of 160*192 with two colors and an
+  adjustable palette (that means that the two colors can be chosen out of a
+  palette of the 16 VIC-20 colors).
+  <em>Note:</em> The line drawing routine of this driver uses self-modifying
+  code and thus cannot be run in ROM.
+</descrip><p>
 
 
 <sect1>Extended memory drivers<p>

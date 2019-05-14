@@ -84,7 +84,8 @@ Long options:
   --data-name seg               Set the name of the DATA segment
   --debug                       Debug mode
   --debug-info                  Add debug info to object file
-  --debug-opt name              Debug optimization steps
+  --debug-opt name              Configure optimizations with a file
+  --debug-opt-output            Debug output of each optimization step
   --dep-target target           Use this dependency target
   --disable-opt name            Disable an optimization step
   --eagerly-inline-funcs        Eagerly inline some known functions
@@ -193,8 +194,26 @@ Here is a description of all the command line options:
 
   <tag><tt>-d, --debug</tt></tag>
 
-  Enables debug mode, something that should not be needed for mere
-  mortals:-)
+  Enables debug mode, for debugging the behavior of CC65.
+
+
+  <tag><tt>--debug-opt name</tt></tag>
+
+  The named file contains a list of specific optimization steps to enable or disable.
+  Each line contains the name of an optimization step with either a
+  <tt>+</tt> (enable) or <tt>-</tt> (disable) prefix.
+  The name <tt>all</tt> can be used to enable or disable all optimizations.
+  Comment lines may begin with <tt>#</tt> or <tt>;<tt>.
+
+  Use <tt>--list-opt-steps</tt> to generate a complete list of available optimization steps.
+
+  Use <tt>--debug</tt> to see a list of optimizations applied during compilation.
+
+
+  <tag><tt>--debug-opt-output</tt></tag>
+
+  For debugging the output of each optimization pass, step by step.
+  Generates a <tt>name.opt</tt> output listing for each optimized function <tt>name</tt>.
 
 
   <label id="option-dep-target">

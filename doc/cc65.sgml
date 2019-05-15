@@ -194,7 +194,7 @@ Here is a description of all the command line options:
 
   <tag><tt>-d, --debug</tt></tag>
 
-  Enables debug mode, for debugging the behavior of CC65.
+  Enables debug mode, for debugging the behavior of cc65.
 
 
   <tag><tt>--debug-opt name</tt></tag>

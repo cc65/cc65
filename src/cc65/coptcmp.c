@@ -885,11 +885,16 @@ unsigned OptCmp8 (CodeSeg* S)
                 ++Changes;
             }
 
-            /* If we have made changes above, we may also remove the compare */
-            if (JumpsChanged) {
-                CS_DelEntry (S, I);
-            }
-
+            /* "If we have made changes above, we may also remove the compare."
+            **
+            ** Removing the compare was too aggressive. E.g. for 16-bit compares the compiler
+            ** may generate a branch to a second shared branch that still requires the flag
+            ** result of the first compare instruction.
+            **
+            **if (JumpsChanged) {
+            **    CS_DelEntry (S, I);
+            **}
+            */
         }
 
 NextEntry:

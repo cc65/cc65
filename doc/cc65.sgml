@@ -1448,7 +1448,7 @@ Or, to access a struct member of a static variable:
             unsigned char x;
             unsigned char y;
             unsigned char color;
-            unsigned char aux[32];
+            unsigned char data[32];
         } pixel_t;
         static pixel_t pixel;
         __asm__ ("ldy #%b", offsetof(pixel_t, color));
@@ -1457,7 +1457,7 @@ Or, to access a struct member of a static variable:
         /* or to access an array member */
         static unsigned char i;
         __asm__ ("ldy %v", i);
-        __asm__ ("lda %v+%b,y", pixel, offsetof(pixel_t, aux));
+        __asm__ ("lda %v+%b,y", pixel, offsetof(pixel_t, data));
 </verb></tscreen>
 <p>
 The next example shows how to use global variables to exchange data between C

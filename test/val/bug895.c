@@ -8,12 +8,6 @@
  ** For 8-bit types it worked well, but for larger types it failed
  ** to generate correct code. The bug manifest as a branch on an
  ** uninitialized carry flag.
- **
- ** This does four tests for each type tested:
- **   1: < with carry clear
- **   2: >= with carry clear
- **   3: < with carry set
- **   4: >= with carry set
  */
 
 #include "unittest.h"
@@ -26,56 +20,87 @@ unsigned char uca, ucb;
 unsigned int  uia, uib;
 unsigned long ula, ulb;
 
-#define OPTCMP8TEST(vara,varb,startb,starta,cmpa,setb,printterm,typename,name) \
-    void name ## 1(void) { \
-    varb = startb; \
-    asm("clc"); \
-    vara = starta; \
-    if (vara < cmpa) varb = setb; \
-    ASSERT_AreEqual(startb, varb, printterm, "Incorrect optimization of " typename " comparison (1: < clc)."); \
-    } \
-    void name ## 2(void) { \
-    varb = startb; \
-    asm("sec"); \
-    vara = starta; \
-    if (vara < cmpa) varb = setb; \
-    ASSERT_AreEqual(startb, varb, printterm, "Incorrect optimization of " typename " comparison (2: < sec)."); \
-    } \
-    void name ## 3(void) { \
-    varb = startb; \
-    asm("clc"); \
-    vara = starta; \
-    if (vara >= cmpa) varb = setb; \
-    ASSERT_AreEqual(setb, varb, printterm, "Incorrect optimization of " typename " comparison (3: >= clc)."); \
-    } \
-    void name ## 4(void) { \
-    varb = startb; \
-    asm("sec"); \
-    vara = starta; \
-    if (vara >= cmpa) varb = setb; \
-    ASSERT_AreEqual(setb, varb, printterm, "Incorrect optimization of " typename " comparison (4: >= sec)."); \
+#define OPTCMP8TEST_SINGLE(num,cmpop,asmprefix,vara,varb,b0,b1,a0,a1,typename,name) \
+    typename name ## _ ## num ## (void) { \
+        varb = b0; \
+        asm( asmprefix ); \
+        vara = a0; \
+        if (vara cmpop a1) varb = b1; \
+        return varb; \
     }
 
-#define RUNOPTCMP8TEST(name) \
-    name ## 1(); \
-    name ## 2(); \
-    name ## 3(); \
-    name ## 4();
+#define OPTCMP8TEST_VERIFY(num,b,desc,printterm,name) \
+    ASSERT_AreEqual(name ## _ ## num ##(),b,printterm,"Incorrect optimization of const comparison (" #name "_" #num ": " desc ").");
 
-OPTCMP8TEST(sca,scb,-20,100,50,5,"%d","signed char",signed_char);
-OPTCMP8TEST(uca,ucb,20,100,50,5,"%u","unsigned char",unsigned_char);
-OPTCMP8TEST(sia,sib,-2000,1000,500,50,"%d","signed int",signed_int);
-OPTCMP8TEST(uia,uib,2000,1000,500,50,"%u","unsigned int",unsigned_int);
-OPTCMP8TEST(sla,slb,-200000L,100000L,50000L,5000L,"%d","signed long",signed_long);
-OPTCMP8TEST(ula,ulb,200000UL,100000UL,50000UL,5000UL,"%u","unsigned long",unsigned_long);
+/* Generates a set of comparison tests for one type and set of test values.
+**     name = a name for this test (no spaces)
+**     typename = the type used
+**     b0 = result if comparison is false
+**     b1 = result if comparison is true
+**     a0 = a low value to use for the comparison tests (a0 < a1)
+**     a1 = a high value to use for the comparison tests (a0 < a1)
+**     vara = temporary variable of the type to be examined
+**     varb = temporary variable of the type to be examined
+**     printterm = printf term to display the variable type
+*/
+#define OPTCMP8TEST(name,typename,b0,b1,a0,a1,vara,varb,printterm) \
+    OPTCMP8TEST_SINGLE(1,<,"clc",vara,varb,b0,b1,a0,a1,typename,name); \
+    OPTCMP8TEST_SINGLE(2,<,"sec",vara,varb,b0,b1,a0,a1,typename,name); \
+    OPTCMP8TEST_SINGLE(3,<,"clc",vara,varb,b0,b1,a1,a0,typename,name); \
+    OPTCMP8TEST_SINGLE(4,<,"sec",vara,varb,b0,b1,a1,a0,typename,name); \
+    OPTCMP8TEST_SINGLE(5,>,"clc",vara,varb,b0,b1,a0,a1,typename,name); \
+    OPTCMP8TEST_SINGLE(6,>,"sec",vara,varb,b0,b1,a0,a1,typename,name); \
+    OPTCMP8TEST_SINGLE(7,>,"clc",vara,varb,b0,b1,a1,a0,typename,name); \
+    OPTCMP8TEST_SINGLE(8,>,"sec",vara,varb,b0,b1,a1,a0,typename,name); \
+    OPTCMP8TEST_SINGLE(9,<=,"clc",vara,varb,b0,b1,a0,a1,typename,name); \
+    OPTCMP8TEST_SINGLE(10,<=,"sec",vara,varb,b0,b1,a0,a1,typename,name); \
+    OPTCMP8TEST_SINGLE(11,<=,"clc",vara,varb,b0,b1,a1,a0,typename,name); \
+    OPTCMP8TEST_SINGLE(12,<=,"sec",vara,varb,b0,b1,a1,a0,typename,name); \
+    OPTCMP8TEST_SINGLE(13,>=,"clc",vara,varb,b0,b1,a0,a1,typename,name); \
+    OPTCMP8TEST_SINGLE(14,>=,"sec",vara,varb,b0,b1,a0,a1,typename,name); \
+    OPTCMP8TEST_SINGLE(15,>=,"clc",vara,varb,b0,b1,a1,a0,typename,name); \
+    OPTCMP8TEST_SINGLE(16,>=,"sec",vara,varb,b0,b1,a1,a0,typename,name); \
+    OPTCMP8TEST_SINGLE(17,==,"nop",vara,varb,b0,b1,a0,a1,typename,name); \
+    OPTCMP8TEST_SINGLE(18,==,"nop",vara,varb,b0,b1,a1,a1,typename,name); \
+    OPTCMP8TEST_SINGLE(19,!=,"nop",vara,varb,b0,b1,a0,a1,typename,name); \
+    OPTCMP8TEST_SINGLE(20,!=,"nop",vara,varb,b0,b1,a1,a1,typename,name); \
+    void name ## _ ## test(void) { \
+        OPTCMP8TEST_VERIFY(1,b1,"low < high, clc",printterm,name); \
+        OPTCMP8TEST_VERIFY(2,b1,"low < high, sec",printterm,name); \
+        OPTCMP8TEST_VERIFY(3,b0,"high < low, clc",printterm,name); \
+        OPTCMP8TEST_VERIFY(4,b0,"high < low, sec",printterm,name); \
+        OPTCMP8TEST_VERIFY(5,b0,"low > high, clc",printterm,name); \
+        OPTCMP8TEST_VERIFY(6,b0,"low > high, sec",printterm,name); \
+        OPTCMP8TEST_VERIFY(7,b1,"high > low, clc",printterm,name); \
+        OPTCMP8TEST_VERIFY(8,b1,"high > low, sec",printterm,name); \
+        OPTCMP8TEST_VERIFY(9,b1,"low <= high, clc",printterm,name); \
+        OPTCMP8TEST_VERIFY(10,b1,"low <= high, sec",printterm,name); \
+        OPTCMP8TEST_VERIFY(11,b0,"high <= low, clc",printterm,name); \
+        OPTCMP8TEST_VERIFY(12,b0,"high <= low, sec",printterm,name); \
+        OPTCMP8TEST_VERIFY(13,b0,"low >= high, clc",printterm,name); \
+        OPTCMP8TEST_VERIFY(14,b0,"low >= high, sec",printterm,name); \
+        OPTCMP8TEST_VERIFY(15,b1,"high >= low, clc",printterm,name); \
+        OPTCMP8TEST_VERIFY(16,b1,"high >= low, sec",printterm,name); \
+        OPTCMP8TEST_VERIFY(17,b0,"low == high, nop",printterm,name); \
+        OPTCMP8TEST_VERIFY(18,b1,"high == high, nop",printterm,name); \
+        OPTCMP8TEST_VERIFY(19,b1,"low != high, nop",printterm,name); \
+        OPTCMP8TEST_VERIFY(20,b0,"high != high, nop",printterm,name); \
+    }
+
+OPTCMP8TEST(signed_char,signed char,-20,5,60,100,sca,scb,"%d");
+OPTCMP8TEST(unsigned_char,unsigned char,20,5,60,100,uca,ucb,"%u");
+OPTCMP8TEST(signed_int,signed int,-2000,50,600,1000,sia,sib,"%d");
+OPTCMP8TEST(unsigned_int,unsigned int,2000,50,600,1000,uia,uib,"%u");
+OPTCMP8TEST(signed_long,signed long,-200000L,5000L,60000L,100000L,sla,slb,"%d");
+OPTCMP8TEST(unsigned_long,unsigned long,200000UL,5000UL,60000UL,100000UL,ula,ulb,"%u");
 
 TEST
 {
-    RUNOPTCMP8TEST(signed_char);
-    RUNOPTCMP8TEST(unsigned_char);
-    RUNOPTCMP8TEST(signed_int);
-    RUNOPTCMP8TEST(unsigned_int);
-    RUNOPTCMP8TEST(signed_long);
-    RUNOPTCMP8TEST(unsigned_long);
+    signed_char_test();
+    unsigned_char_test();
+    signed_int_test();
+    unsigned_int_test();
+    signed_long_test();
+    unsigned_long_test();
 }
 ENDTEST

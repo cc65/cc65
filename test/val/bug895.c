@@ -1,13 +1,13 @@
 /** This test is related to GitHub issue 895
  ** https://github.com/cc65/cc65/issues/895
  **
- ** The OptCmp8 optimization attempts to eliminate an unnecessary
+ ** The OptCmp8 optimization attempted to eliminate an unnecessary
  ** comparison and branch when the operands of the comparison are
  ** known to be constant at compile time.
  **
- ** For 8-bit types it worked well, but for larger types it failed
- ** to generate correct code. The bug manifest as a branch on an
- ** uninitialized carry flag.
+ ** For 8-bit types it worked well, but for 16-bit types it failed
+ ** to generate correct code for some cases. The bug manifest as a
+ ** branch on an uninitialized carry flag.
  */
 
 #include "unittest.h"

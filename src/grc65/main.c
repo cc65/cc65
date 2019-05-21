@@ -861,7 +861,7 @@ static char *filterInput (FILE *F, char *tbl)
         }
         if (a == EOF) {
             tbl[i] = '\0';
-            xrealloc (tbl, i + 1);
+            tbl = xrealloc (tbl, i + 1);
             break;
         }
         if (IsSpace (a)) {

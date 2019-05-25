@@ -7,7 +7,7 @@
 
 <abstract>
 sim65 is a simulator for 6502 and 65C02 CPUs. It allows to test target
-independed code.
+independent code.
 </abstract>
 
 <!-- Table of contents -->
@@ -18,8 +18,8 @@ independed code.
 <sect>Overview<p>
 
 
-sim65 is the only solution as part of the toolchain to execute code. The
-binary needs to be compiled with <tt/--target sim6502/ or <tt/--target sim65c02/.
+sim65 is used as part of the toolchain to test 6502 or 65C02 code.
+The binary to test needs to be compiled with <tt/--target sim6502/ or <tt/--target sim65c02/.
 
 
 <sect>Usage<p>
@@ -103,6 +103,59 @@ Not GZIP formatPVWrite ($0001, $151F, $0001)
 PVExit ($01)
 </verb></tscreen>
 
+
+<sect>Creating a Test in C<p>
+
+For a C test compiled and linked with <tt/--target sim65/ the
+command line arguments to <tt/sim65/ will be passed to <tt/main/,
+and the return value from <tt/main/ will become sim65's exit code.
+The <tt/exit/ function may also be used to terminate with an exit code.
+ 
+Exit codes are limited to 8 bits.
+
+In addition to this, the simulator provides a set of built-in functions
+for simple file input and output:
+
+<tscreen><verb>
+  int open (const char* name, int flags, ...);
+  int __fastcall__ close (int fd);
+  int __fastcall__ read (int fd, void* buf, unsigned count);
+  int __fastcall__ write (int fd, const void* buf, unsigned count);
+</verb></tscreen>
+
+
+<sect>Creating a Test in Assembly<p>
+
+Assembly tests may similarly be assembled ant linked with <tt/--target sim65/,
+and the sim65 library provides an <tt/exit/ symbol that the program may <tt/JMP/
+to terminate with the current A register value as an exit code.
+
+Without using the provided target library, there are some relevant internal details:
+
+<itemize>
+
+<item>The binary input file has a 1 byte header. A value of 0 indicates 6502 simulation,
+and 1 indicates 65C02.
+
+<item>The rest of the input file, after the header, will be loaded at <tt/$0200/,
+and execution will begin at <tt/$0200/.
+
+<item>The entire 64 kilobyte address space is writeable RAM.
+Aside from the loaded binary, the reset vector at <tt/$FFFC/ will be
+pre-loaded with <tt/$0200/ as the start address.
+
+<item>The <tt/exit/ address is <tt/$FFF1/.
+Jumping to this address will terminate execution with the A register value as an exit code.
+
+<item>The built-in functions are provided by 6 "paravirtualization" hooks present at
+<tt/$FFF0-$FFF5/. Except for <tt/exit/, a <tt/JSR/ to one of these
+addresses will return immediately after performing a special function,
+intended only for use with the sim65 target C library.
+
+<item><tt/IRQ/ and <tt/NMI/ events will not be generated, though <tt/BRK/
+can be used if the IRQ vector at <tt/$FFFE/ is manually prepared by the test code.
+
+</itemize>
 
 
 <sect>Copyright<p>

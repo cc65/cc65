@@ -19,7 +19,7 @@ independent code.
 
 
 sim65 is used as part of the toolchain to test 6502 or 65C02 code.
-The binary to test needs to be compiled with <tt/--target sim6502/ or <tt/--target sim65c02/.
+The binary to test should be compiled with <tt/--target sim6502/ or <tt/--target sim65c02/.
 
 
 <sect>Usage<p>
@@ -126,7 +126,8 @@ for simple file input and output:
 
 <sect>Creating a Test in Assembly<p>
 
-Assembly tests may similarly be assembled ant linked with <tt/--target sim65/,
+Assembly tests may similarly be assembled and linked with
+<tt/--target sim65/ or <tt/--target sim65c02>,
 and the sim65 library provides an <tt/exit/ symbol that the program may <tt/JMP/
 to terminate with the current A register value as an exit code.
 

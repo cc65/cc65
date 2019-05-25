@@ -106,14 +106,18 @@ PVExit ($01)
 
 <sect>Creating a Test in C<p>
 
-For a C test compiled and linked with <tt/--target sim65/ the
+For a C test compiled and linked with <tt/--target sim6502/ the
 command line arguments to <tt/sim65/ will be passed to <tt/main/,
 and the return value from <tt/main/ will become sim65's exit code.
 The <tt/exit/ function may also be used to terminate with an exit code.
  
 Exit codes are limited to 8 bits.
 
-In addition to this, the simulator provides a set of built-in functions
+The standard C library file input and output is functional,
+with <tt/STDIN_FILENO/, <tt/STDOUT_FILENO/ and <tt/STDERR_FILENO/ mapped to sim65's
+STDIN_FILENO, STDOUT_FILENO and STDERR_FILENO.
+
+These utilize an underlying set of built-in virtual functions
 for simple file input and output:
 
 <tscreen><verb>
@@ -127,7 +131,7 @@ for simple file input and output:
 <sect>Creating a Test in Assembly<p>
 
 Assembly tests may similarly be assembled and linked with
-<tt/--target sim65/ or <tt/--target sim65c02/,
+<tt/--target sim6502/ or <tt/--target sim65c02/,
 and the sim65 library provides an <tt/exit/ symbol that the program may <tt/JMP/
 to terminate with the current A register value as an exit code.
 
@@ -148,7 +152,7 @@ pre-loaded with <tt/$0200/ as the start address.
 <item>The <tt/exit/ address is <tt/$FFF1/.
 Jumping to this address will terminate execution with the A register value as an exit code.
 
-<item>The built-in functions are provided by 6 "paravirtualization" hooks present at
+<item>The built-in functions are provided by 6 paravirtualization hooks present at
 <tt/$FFF0-$FFF5/. Except for <tt/exit/, a <tt/JSR/ to one of these
 addresses will return immediately after performing a special function,
 intended only for use with the sim65 target C library.

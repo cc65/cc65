@@ -127,7 +127,7 @@ for simple file input and output:
 <sect>Creating a Test in Assembly<p>
 
 Assembly tests may similarly be assembled and linked with
-<tt/--target sim65/ or <tt/--target sim65c02>,
+<tt/--target sim65/ or <tt/--target sim65c02/,
 and the sim65 library provides an <tt/exit/ symbol that the program may <tt/JMP/
 to terminate with the current A register value as an exit code.
 

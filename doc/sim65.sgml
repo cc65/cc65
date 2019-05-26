@@ -3,7 +3,9 @@
 <article>
 
 <title>sim65 Users Guide
-<author><url url="mailto:polluks@sdf.lonestar.org" name="Stefan A. Haubenthal">
+<author><url url="mailto:polluks@sdf.lonestar.org" name="Stefan A. Haubenthal">,<newline>
+<url url="mailto:bbbradsmith@users.noreply.github.com" name="Brad Smith">
+
 
 <abstract>
 sim65 is a simulator for 6502 and 65C02 CPUs. It allows to test target

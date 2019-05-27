@@ -115,12 +115,11 @@ The <tt/exit/ function may also be used to terminate with an exit code.
  
 Exit codes are limited to 8 bits.
 
-The standard C library file input and output is functional,
-with <tt/STDIN_FILENO/, <tt/STDOUT_FILENO/ and <tt/STDERR_FILENO/ mapped to sim65's
-STDIN_FILENO, STDOUT_FILENO and STDERR_FILENO.
+The standard C library high level file input and output is functional,
+and can be used like a command line application in sim65.
 
-These utilize an underlying set of built-in virtual functions
-for simple file input and output:
+Lower level file input and output is provided by
+a set of built-in paravirtualization functions:
 
 <tscreen><verb>
   int open (const char* name, int flags, ...);
@@ -128,6 +127,10 @@ for simple file input and output:
   int __fastcall__ read (int fd, void* buf, unsigned count);
   int __fastcall__ write (int fd, const void* buf, unsigned count);
 </verb></tscreen>
+
+These built-in functions can be used with
+<tt/STDIN_FILENO/, <tt/STDOUT_FILENO/ and <tt/STDERR_FILENO/
+which are mapped to sim65's corresponding file descriptors.
 
 
 <sect>Creating a Test in Assembly<p>

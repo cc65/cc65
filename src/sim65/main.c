@@ -132,11 +132,12 @@ static void OptQuitXIns (const char* Opt attribute ((unused)),
     MaxCycles = strtoul(Arg, NULL, 0);
 }
 
-static void ReadProgramFile (void)
+static unsigned char ReadProgramFile (void)
 /* Load program into memory */
 {
     int Val;
     unsigned Addr = 0x0200;
+    unsigned char SPAddr = 0x0000;
 
     /* Open the file */
     FILE* F = fopen (ProgramFile, "rb");
@@ -150,6 +151,11 @@ static void ReadProgramFile (void)
             Error ("'%s': Invalid CPU type", ProgramFile);
         }
         CPU = Val;
+    }
+
+    /* Get the address of sp from the file header */
+    if ((Val = fgetc(F)) != EOF) {
+        SPAddr = Val;
     }
 
     /* Read the file body into memory */
@@ -169,6 +175,8 @@ static void ReadProgramFile (void)
     fclose (F);
 
     Print (stderr, 1, "Loaded '%s' at $0200-$%04X\n", ProgramFile, Addr - 1);
+
+    return SPAddr;
 }
 
 
@@ -184,6 +192,7 @@ int main (int argc, char* argv[])
     };
 
     unsigned I;
+    unsigned char SPAddr;
 
     /* Initialize the cmdline module */
     InitCmdLine (&argc, &argv, "sim65");
@@ -243,11 +252,11 @@ int main (int argc, char* argv[])
         AbEnd ("No program file");
     }
 
-    ParaVirtInit (I);
-
     MemInit ();
 
-    ReadProgramFile ();
+    SPAddr = ReadProgramFile ();
+
+    ParaVirtInit (I, SPAddr);
 
     Reset ();
 

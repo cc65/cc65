@@ -77,6 +77,7 @@
 typedef void (*PVFunc) (CPURegs* Regs);
 
 static unsigned ArgStart;
+static unsigned char SPAddr;
 
 
 
@@ -120,9 +121,9 @@ static unsigned char Pop (CPURegs* Regs)
 
 static unsigned PopParam (unsigned char Incr)
 {
-    unsigned SP = MemReadZPWord (0x00);
+    unsigned SP = MemReadZPWord (SPAddr);
     unsigned Val = MemReadWord (SP);
-    MemWriteWord (0x0000, SP + Incr);
+    MemWriteWord (SPAddr, SP + Incr);
     return Val;
 }
 
@@ -132,7 +133,7 @@ static void PVArgs (CPURegs* Regs)
 {
     unsigned ArgC = ArgCount - ArgStart;
     unsigned ArgV = GetAX (Regs);
-    unsigned SP   = MemReadZPWord (0x00);
+    unsigned SP   = MemReadZPWord (SPAddr);
     unsigned Args = SP - (ArgC + 1) * 2;
 
     Print (stderr, 2, "PVArgs ($%04X)\n", ArgV);
@@ -152,9 +153,9 @@ static void PVArgs (CPURegs* Regs)
         MemWriteWord (Args, SP);
         Args += 2;
     }
-    MemWriteWord (Args, 0x0000);
+    MemWriteWord (Args, SPAddr);
 
-    MemWriteWord (0x0000, SP);
+    MemWriteWord (SPAddr, SP);
     SetAX (Regs, ArgC);
 }
 
@@ -313,10 +314,11 @@ static const PVFunc Hooks[] = {
 
 
 
-void ParaVirtInit (unsigned aArgStart)
+void ParaVirtInit (unsigned aArgStart, unsigned char aSPAddr)
 /* Initialize the paravirtualization subsystem */
 {
     ArgStart = aArgStart;
+    SPAddr = aSPAddr;
 };
 
 

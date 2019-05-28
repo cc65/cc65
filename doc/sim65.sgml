@@ -144,8 +144,9 @@ Without using the provided target library, there are some relevant internal deta
 
 <itemize>
 
-<item>The binary input file has a 1 byte header. A value of 0 indicates 6502 simulation,
-and 1 indicates 65C02.
+<item>The binary input file has a 2 byte header. The first byte indicates CPU type:
+ 0 = 6502, 1 = 65C02. The second byte is the address of the C parameter stack pointer
+ <tt/sp/, used by the paravirtualization functions.
 
 <item>The rest of the input file, after the header, will be loaded at <tt/$0200/,
 and execution will begin at <tt/$0200/.
@@ -160,7 +161,7 @@ Jumping to this address will terminate execution with the A register value as an
 <item>The built-in functions are provided by 6 paravirtualization hooks present at
 <tt/$FFF0-$FFF5/. Except for <tt/exit/, a <tt/JSR/ to one of these
 addresses will return immediately after performing a special function,
-intended only for use with the sim65 target C library.
+intended for use with the sim65 target C library.
 
 <item><tt/IRQ/ and <tt/NMI/ events will not be generated, though <tt/BRK/
 can be used if the IRQ vector at <tt/$FFFE/ is manually prepared by the test code.

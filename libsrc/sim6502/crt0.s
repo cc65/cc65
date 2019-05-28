@@ -5,14 +5,16 @@
 ;
 
         .export         _exit
+        .export         exit
         .export         __STARTUP__ : absolute = 1      ; Mark as startup
         .import         zerobss, callmain
         .import         initlib, donelib
-        .import         exit
         .import         __MAIN_START__, __MAIN_SIZE__   ; Linker generated
         .import         __STACKSIZE__                   ; Linker generated
 
         .include        "zeropage.inc"
+
+exit           := $FFF1
 
         .segment        "STARTUP"
 

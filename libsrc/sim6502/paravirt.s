@@ -8,10 +8,10 @@
 ;
 
         .importzp       sp
-        .export         args, exit, _open, _close, _read, _write
+        .export         args, _open, _close, _read, _write
 
 args            := $FFF0
-exit            := $FFF1
+;exit           := $FFF1 ; crt0.s (not affected by assert below)
 _open           := $FFF2
 _close          := $FFF3
 _read           := $FFF4

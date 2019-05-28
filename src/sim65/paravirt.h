@@ -44,7 +44,7 @@
 
 
 
-void ParaVirtInit (unsigned aArgStart);
+void ParaVirtInit (unsigned aArgStart, unsigned char aSPAddr);
 /* Initialize the paravirtualization subsystem */
 
 void ParaVirtHooks (CPURegs* Regs);

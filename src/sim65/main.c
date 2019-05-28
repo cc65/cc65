@@ -137,7 +137,7 @@ static unsigned char ReadProgramFile (void)
 {
     int Val;
     unsigned Addr = 0x0200;
-    unsigned char SPAddr = 0x0000;
+    unsigned char SPAddr = 0x00;
 
     /* Open the file */
     FILE* F = fopen (ProgramFile, "rb");

@@ -7,6 +7,7 @@
 ; int __fastcall__ write (int fd, const void* buf, unsigned count);
 ;
 
+        .importzp       sp
         .export         args, exit, _open, _close, _read, _write
 
 args            := $FFF0
@@ -15,3 +16,5 @@ _open           := $FFF2
 _close          := $FFF3
 _read           := $FFF4
 _write          := $FFF5
+
+.assert sp=0, error, "sim6502 paravirtualization functions require parameter stack pointer (sp) at $00"

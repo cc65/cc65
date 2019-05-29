@@ -103,15 +103,6 @@ static void SetAX (CPURegs* Regs, unsigned Val)
 
 
 
-static void MemWriteWord (unsigned Addr, unsigned Val)
-{
-    MemWriteByte (Addr, Val);
-    Val >>= 8;
-    MemWriteByte (Addr + 1, Val);
-}
-
-
-
 static unsigned char Pop (CPURegs* Regs)
 {
     return MemReadByte (0x0100 + ++Regs->SP);

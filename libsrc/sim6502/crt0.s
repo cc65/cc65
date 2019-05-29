@@ -5,6 +5,7 @@
 ;
 
         .export         _exit
+        .export         sim65start
         .export         __STARTUP__ : absolute = 1      ; Mark as startup
         .import         zerobss, callmain
         .import         initlib, donelib
@@ -16,6 +17,7 @@
 
         .segment        "STARTUP"
 
+sim65start:
         cld
         ldx     #$FF
         txs

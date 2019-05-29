@@ -140,28 +140,39 @@ Assembly tests may similarly be assembled and linked with
 and the sim65 library provides an <tt/exit/ symbol that the program may <tt/JMP/
 to terminate with the current A register value as an exit code.
 
-Without using the provided target library, there are some relevant internal details:
+The binary file has a 12 byte header:
 
 <itemize>
 
-<item>The binary input file has a 2 byte header. The first byte indicates CPU type:
- 0 = 6502, 1 = 65C02. The second byte is the address of the C parameter stack pointer
- <tt/sp/, used by the paravirtualization functions.
+<item>5 byte **signature**: <tt/$73, $69, $6D, $36, $35/ or <tt/'sim65'/
 
-<item>The rest of the input file, after the header, will be loaded at <tt/$0200/,
-and execution will begin at <tt/$0200/.
+<item>1 byte **version**: <tt/2/
+
+<item>1 byte **CPU type**: <tt/0/ = 6502, <tt/1/ = 65C02
+
+<item>1 byte **sp address**: the zero page address of the C parameter stack pointer <tt/sp/ used by the paravirtualization functions
+
+<item>1 word **load address**: where to load the data from the file into memory (default: <tt/$0200/)
+
+<item>1 word **reset address**: specifies where to begin execution after loading (default: <tt/$0200/)
+
+</itemize>
+
+Other internal details:
+
+<itemize>
 
 <item>The entire 64 kilobyte address space is writeable RAM.
 Aside from the loaded binary, the reset vector at <tt/$FFFC/ will be
-pre-loaded with <tt/$0200/ as the start address.
+pre-loaded with the given **reset address**.
 
 <item>The <tt/exit/ address is <tt/$FFF1/.
 Jumping to this address will terminate execution with the A register value as an exit code.
 
 <item>The built-in functions are provided by 6 paravirtualization hooks present at
 <tt/$FFF0-$FFF5/. Except for <tt/exit/, a <tt/JSR/ to one of these
-addresses will return immediately after performing a special function,
-intended for use with the sim65 target C library.
+addresses will return immediately after performing a special function.
+These use cc65 calling conventions, and are intended for use with the sim65 target C library.
 
 <item><tt/IRQ/ and <tt/NMI/ events will not be generated, though <tt/BRK/
 can be used if the IRQ vector at <tt/$FFFE/ is manually prepared by the test code.

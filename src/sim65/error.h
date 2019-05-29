@@ -44,6 +44,20 @@
 
 
 /*****************************************************************************/
+/*                                   Data                                    */
+/*****************************************************************************/
+
+
+
+#define SIM65_ERROR         256
+/* Does not use EXIT_FAILURE because it may overlap with test results. */
+
+#define SIM65_ERROR_TIMEOUT 257
+/* An error result for max CPU instructions exceeded. */
+
+
+
+/*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
@@ -54,6 +68,9 @@ void Warning (const char* Format, ...) attribute((format(printf,1,2)));
 
 void Error (const char* Format, ...) attribute((noreturn, format(printf,1,2)));
 /* Print an error message and die */
+
+void ErrorCode (int Code, const char* Format, ...) attribute((noreturn, format(printf,2,3)));
+/* Print an error message and die with the given exit code */
 
 void Internal (const char* Format, ...) attribute((noreturn, format(printf,1,2)));
 /* Print an internal error message and die */

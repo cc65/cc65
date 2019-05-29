@@ -7,8 +7,14 @@
 
         .export         __EXEHDR__ : absolute = 1       ; Linker referenced
         .importzp       sp
+        .import         __MAIN_START__
+        .import         sim65start
 
         .segment        "EXEHDR"
 
-        .byte   .defined(__SIM65C02__)
-        .byte   sp
+        .byte   $73, $69, $6D, $36, $35        ; 'sim65'
+        .byte   2                              ; header version
+        .byte   .defined(__SIM65C02__)         ; CPU type
+        .byte   sp                             ; sp address
+        .addr   __MAIN_START__                 ; load address
+        .addr   sim65start                     ; reset address

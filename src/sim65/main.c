@@ -159,7 +159,7 @@ static unsigned char ReadProgramFile (void)
     }
 
     /* Verify the header signature */
-    for (I=0; I<HEADER_SIGNATURE_LENGTH; ++I) {
+    for (I = 0; I < HEADER_SIGNATURE_LENGTH; ++I) {
         if ((Val = fgetc(F)) != HeaderSignature[I]) {
             Error ("'%s': Invalid header signature.", ProgramFile);
         }

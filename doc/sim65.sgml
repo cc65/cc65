@@ -166,13 +166,8 @@ Other internal details:
 Aside from the loaded binary, the reset vector at <tt/$FFFC/ will be
 pre-loaded with the given <bf/reset address/.
 
-<item>The <tt/exit/ address is <tt/$FFF1/.
+<item>The <tt/exit/ address is <tt/$FFF9/.
 Jumping to this address will terminate execution with the A register value as an exit code.
-
-<item>The built-in functions are provided by 6 paravirtualization hooks present at
-<tt/$FFF0-$FFF5/. Except for <tt/exit/, a <tt/JSR/ to one of these
-addresses will return immediately after performing a special function.
-These use cc65 calling conventions, and are intended for use with the sim65 target C library.
 
 <item><tt/IRQ/ and <tt/NMI/ events will not be generated, though <tt/BRK/
 can be used if the IRQ vector at <tt/$FFFE/ is manually prepared by the test code.

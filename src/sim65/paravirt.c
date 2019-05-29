@@ -120,6 +120,18 @@ static unsigned PopParam (unsigned char Incr)
 
 
 
+static void PVExit (CPURegs* Regs)
+{
+    Print (stderr, 1, "PVExit ($%02X)\n", Regs->AC);
+    if (PrintCycles) {
+        Print (stdout, 0, "%lu cycles\n", GetCycles ());
+    }
+
+    exit (Regs->AC);
+}
+
+
+
 static void PVArgs (CPURegs* Regs)
 {
     unsigned ArgC = ArgCount - ArgStart;
@@ -148,18 +160,6 @@ static void PVArgs (CPURegs* Regs)
 
     MemWriteWord (SPAddr, SP);
     SetAX (Regs, ArgC);
-}
-
-
-
-static void PVExit (CPURegs* Regs)
-{
-    Print (stderr, 1, "PVExit ($%02X)\n", Regs->AC);
-    if (PrintCycles) {
-        Print (stdout, 0, "%lu cycles\n", GetCycles ());
-    }
-
-    exit (Regs->AC);
 }
 
 
@@ -295,12 +295,12 @@ static void PVWrite (CPURegs* Regs)
 
 
 static const PVFunc Hooks[] = {
-    PVArgs,
-    PVExit,
     PVOpen,
     PVClose,
     PVRead,
     PVWrite,
+    PVArgs,
+    PVExit,
 };
 
 
@@ -318,13 +318,13 @@ void ParaVirtHooks (CPURegs* Regs)
 /* Potentially execute paravirtualization hooks */
 {
     /* Check for paravirtualization address range */
-    if (Regs->PC <  0xFFF0 ||
-        Regs->PC >= 0xFFF0 + sizeof (Hooks) / sizeof (Hooks[0])) {
+    if (Regs->PC <  0xFFF4 ||
+        Regs->PC >= 0xFFF4 + sizeof (Hooks) / sizeof (Hooks[0])) {
         return;
     }
 
     /* Call paravirtualization hook */
-    Hooks[Regs->PC - 0xFFF0] (Regs);
+    Hooks[Regs->PC - 0xFFF4] (Regs);
 
     /* Simulate RTS */
     Regs->PC = Pop(Regs) + (Pop(Regs) << 8) + 1;

@@ -144,17 +144,17 @@ The binary file has a 12 byte header:
 
 <itemize>
 
-<item>5 byte **signature**: <tt/$73, $69, $6D, $36, $35/ or <tt/'sim65'/
+<item>5 byte <bf/signature/: <tt/$73, $69, $6D, $36, $35/ or <tt/'sim65'/
 
-<item>1 byte **version**: <tt/2/
+<item>1 byte <bf/version/: <tt/2/
 
-<item>1 byte **CPU type**: <tt/0/ = 6502, <tt/1/ = 65C02
+<item>1 byte <bf/CPU type/: <tt/0/ = 6502, <tt/1/ = 65C02
 
-<item>1 byte **sp address**: the zero page address of the C parameter stack pointer <tt/sp/ used by the paravirtualization functions
+<item>1 byte <bf/sp address/: the zero page address of the C parameter stack pointer <tt/sp/ used by the paravirtualization functions
 
-<item>1 word **load address**: where to load the data from the file into memory (default: <tt/$0200/)
+<item>1 word <bf/load address/: where to load the data from the file into memory (default: <tt/$0200/)
 
-<item>1 word **reset address**: specifies where to begin execution after loading (default: <tt/$0200/)
+<item>1 word <bf/reset address/: specifies where to begin execution after loading (default: <tt/$0200/)
 
 </itemize>
 
@@ -164,7 +164,7 @@ Other internal details:
 
 <item>The entire 64 kilobyte address space is writeable RAM.
 Aside from the loaded binary, the reset vector at <tt/$FFFC/ will be
-pre-loaded with the given **reset address**.
+pre-loaded with the given <bf/reset address/.
 
 <item>The <tt/exit/ address is <tt/$FFF1/.
 Jumping to this address will terminate execution with the A register value as an exit code.

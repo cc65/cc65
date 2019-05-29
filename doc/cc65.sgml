@@ -203,7 +203,7 @@ Here is a description of all the command line options:
   Each line contains the name of an optimization step with either a
   <tt>+</tt> (enable) or <tt>-</tt> (disable) prefix.
   The name <tt>all</tt> can be used to enable or disable all optimizations.
-  Comment lines may begin with <tt>#</tt> or <tt>;<tt>.
+  Comment lines may begin with <tt>#</tt> or <tt>;</tt>.
 
   Use <tt>--list-opt-steps</tt> to generate a complete list of available optimization steps.
 

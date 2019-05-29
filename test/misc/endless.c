@@ -9,5 +9,5 @@ int main(void)
         ;
     }
     printf("error: should not come here\n");
-    return EXIT_FAILURE;
+    return EXIT_SUCCESS; /* test verifies failure, not success */
 }

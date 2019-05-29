@@ -1,8 +1,7 @@
 ;
 ; Oliver Schmidt, 2013-05-16
 ;
-; This module supplies a 2 byte header identifying the simulator type,
-; and parameter stack pointer sp.
+; This module supplies a header used by sim65.
 ;
 
         .export         __EXEHDR__ : absolute = 1       ; Linker referenced

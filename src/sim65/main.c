@@ -200,8 +200,8 @@ static unsigned char ReadProgramFile (void)
     /* Read the file body into memory */
     Addr = Load;
     while ((Val = fgetc(F)) != EOF) {
-        if (Addr == 0xFF00) {
-            Error ("'%s': To large to fit into $%04X-$FFF0", ProgramFile, Addr);
+        if (Addr >= PARAVIRT_BASE) {
+            Error ("'%s': To large to fit into $%04X-$%04X", ProgramFile, Addr, PARAVIRT_BASE);
         }
         MemWriteByte (Addr++, (unsigned char) Val);
     }

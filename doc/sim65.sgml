@@ -115,22 +115,12 @@ The <tt/exit/ function may also be used to terminate with an exit code.
  
 Exit codes are limited to 8 bits.
 
-The standard C library high level file input and output is functional,
-and can be used like a command line application in sim65.
+The standard C library high level file input and output is functional.
+A sim65 application can be written like a command line application,
+providing arguments to <tt/main/ and using the <tt/stdio.h/ interfaces.
 
-Lower level file input and output is provided by
-a set of built-in paravirtualization functions:
-
-<tscreen><verb>
-  int open (const char* name, int flags, ...);
-  int __fastcall__ close (int fd);
-  int __fastcall__ read (int fd, void* buf, unsigned count);
-  int __fastcall__ write (int fd, const void* buf, unsigned count);
-</verb></tscreen>
-
-These built-in functions can be used with
-<tt/STDIN_FILENO/, <tt/STDOUT_FILENO/ and <tt/STDERR_FILENO/
-which are mapped to sim65's corresponding file descriptors.
+Internally, file input and output is provided at a lower level by
+a set of built-in paravirtualization functions (<ref id="paravirt-internal" name="see below">).
 
 
 <sect>Creating a Test in Assembly<p>
@@ -168,6 +158,11 @@ pre-loaded with the given <bf/reset address/.
 
 <item>The <tt/exit/ address is <tt/$FFF9/.
 Jumping to this address will terminate execution with the A register value as an exit code.
+
+<label id="paravirt-internal">
+<item>Several bytes immediately below the vector table are reserved for paravirtualization functions.
+Except for <tt/exit/, a <tt/JSR/ to one of these addresses will return immediately after performing a special function.
+These use cc65 calling conventions, and are intended for use with the sim65 target C library.
 
 <item><tt/IRQ/ and <tt/NMI/ events will not be generated, though <tt/BRK/
 can be used if the IRQ vector at <tt/$FFFE/ is manually prepared by the test code.

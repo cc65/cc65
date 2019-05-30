@@ -318,13 +318,13 @@ void ParaVirtHooks (CPURegs* Regs)
 /* Potentially execute paravirtualization hooks */
 {
     /* Check for paravirtualization address range */
-    if (Regs->PC <  0xFFF4 ||
-        Regs->PC >= 0xFFF4 + sizeof (Hooks) / sizeof (Hooks[0])) {
+    if (Regs->PC <  PARAVIRT_BASE ||
+        Regs->PC >= PARAVIRT_BASE + sizeof (Hooks) / sizeof (Hooks[0])) {
         return;
     }
 
     /* Call paravirtualization hook */
-    Hooks[Regs->PC - 0xFFF4] (Regs);
+    Hooks[Regs->PC - PARAVIRT_BASE] (Regs);
 
     /* Simulate RTS */
     Regs->PC = Pop(Regs) + (Pop(Regs) << 8) + 1;

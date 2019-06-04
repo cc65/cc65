@@ -19,14 +19,12 @@ h1, h2, h2 a:link, h2 a:active, h2 a:visited {
 
 h1 {
     font-size:          250%;
-    text-shadow:        2px 2px 6px #505050;
     letter-spacing:     2px;
     padding-top:        40px;
 }
 
 h2 {
     font-size:          160%;
-    text-shadow:        2px 2px 6px #303030;
     letter-spacing:     1px;
     margin-top:         2em;
     margin-bottom:      1em;

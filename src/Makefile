@@ -52,13 +52,13 @@ ifdef USER_CFLAGS
   $(info USER_CFLAGS: $(USER_CFLAGS))
 endif
 
-ifdef GIT_SHA
-  $(info GIT_SHA: $(GIT_SHA))
+ifdef BUILD_ID
+  $(info BUILD_ID: $(BUILD_ID))
 else
-  GIT_SHA := $(shell git rev-parse --short HEAD 2>$(NULLDEV) || svnversion 2>$(NULLDEV))
-  ifneq ($(words $(GIT_SHA)),1)
-    GIT_SHA := N/A
-    $(info GIT_SHA: N/A)
+  BUILD_ID := Git $(shell git rev-parse --short HEAD 2>$(NULLDEV) || svnversion 2>$(NULLDEV))
+  ifneq ($(words $(BUILD_ID)),2)
+    BUILD_ID := N/A
+    $(info BUILD_ID: N/A)
   endif
 endif
 
@@ -66,7 +66,7 @@ CFLAGS += -MMD -MP -O3 -I common \
           -Wall -Wextra -Wno-char-subscripts $(USER_CFLAGS) \
           -DCA65_INC="$(CA65_INC)" -DCC65_INC="$(CC65_INC)" -DCL65_TGT="$(CL65_TGT)" \
           -DLD65_LIB="$(LD65_LIB)" -DLD65_OBJ="$(LD65_OBJ)" -DLD65_CFG="$(LD65_CFG)" \
-          -DGIT_SHA=$(GIT_SHA)
+          -DBUILD_ID="$(BUILD_ID)"
 
 LDLIBS += -lm
 

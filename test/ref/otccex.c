@@ -58,7 +58,7 @@ long fact(n)
 /* Well, we could use printf, but it would be too easy */
 print_num(long n,int b)
 {
-    int tab, p, c;
+    char *tab, *p, c;
     /* Numbers can be entered in decimal, hexadecimal ('0x' prefix) and
        octal ('0' prefix) */
     /* more complex programs use malloc */
@@ -71,7 +71,7 @@ print_num(long n,int b)
             c = c + 'a' - 10;
         else
             c = c + '0';
-        *(char *)p = c;
+        *p = c;
         p++;
         n = n / b;
         /* 'break' is supported */

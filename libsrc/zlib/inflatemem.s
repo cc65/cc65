@@ -1,7 +1,8 @@
 ;
 ; 2017-11-07, Piotr Fusik
 ;
-; unsigned __fastcall__ inflatemem (char* dest, const char* source);
+; unsigned __fastcall__ inflatemem (unsigned char* dest,
+;                                   const unsigned char* source);
 ;
 ; NOTE: Be extremely careful with modifications, because this code is heavily
 ; optimized for size (for example assumes certain register and flag values

@@ -6,11 +6,11 @@
 
 #include <zlib.h>
 
-int __fastcall__ uncompress (char* dest, unsigned* destLen,
-                             const char* source, unsigned sourceLen)
+int __fastcall__ uncompress (unsigned char* dest, unsigned* destLen,
+                             const unsigned char* source, unsigned sourceLen)
 {
         unsigned len;
-        unsigned char* ptr;
+        const unsigned char* ptr = source + sourceLen - 4;
         unsigned long csum;
         /* source[0]: Compression method and flags
             bits 0 to 3: Compression method (must be Z_DEFLATED)
@@ -22,10 +22,9 @@ int __fastcall__ uncompress (char* dest, unsigned* destLen,
         */
         if ((source[0] & 0x8f) != Z_DEFLATED || source[1] & 0x20)
                 return Z_DATA_ERROR;
-        if ((((unsigned) source[0] << 8) | (unsigned char) source[1]) % 31)
+        if ((((unsigned) source[0] << 8) | source[1]) % 31)
                 return Z_DATA_ERROR;
         *destLen = len = inflatemem(dest, source + 2);
-        ptr = (unsigned char*) source + sourceLen - 4;
         csum = adler32(adler32(0L, Z_NULL, 0), dest, len);
         if ((unsigned char) csum != ptr[3]
          || (unsigned char) (csum >> 8) != ptr[2]

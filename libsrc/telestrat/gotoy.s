@@ -3,11 +3,12 @@
 ;
     .export    _gotoy
 
-    .importzp  sp
+    .import    _update_adscr
 
     .include   "telestrat.inc"
 
 .proc _gotoy
    sta     SCRY
+   jsr     _update_adscr
    rts
 .endproc

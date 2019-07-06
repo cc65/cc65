@@ -286,6 +286,7 @@ XZAP             = $46          ; Send Zap sound to PSG
 XSHOOT           = $47
 XMKDIR           = $4B          ; Create a folder. Only available in TELEMON 3.x (bank 7 of Orix)
 XRM              = $4D          ; Remove a folder or a file. Only available in TELEMON 3.x (bank 7 of Orix)
+XFWR             = $4E          ; Put a char on the first screen. Only available in TELEMON 3.x (bank 7 of Orix)
 XGOKBD           = $52
 
 ; Buffer management

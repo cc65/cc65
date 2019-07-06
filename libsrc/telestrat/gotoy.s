@@ -2,6 +2,7 @@
 ; jede jede@oric.org 2017-02-25
 ;
     .export    _gotoy
+    .import    CHARCOLOR_CHANGE, BGCOLOR_CHANGE
 
     .import    _update_adscr
 

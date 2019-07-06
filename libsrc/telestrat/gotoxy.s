@@ -7,8 +7,7 @@
 
         .export         gotoxy, _gotoxy, _update_adscr
 
-        .import         popa,CHARCOLOR_CHANGE,BGCOLOR_CHANGE
-
+        .import         popa, CHARCOLOR_CHANGE, BGCOLOR_CHANGE
 
         .include        "telestrat.inc"
 

@@ -35,7 +35,7 @@ gotoxy: jsr     popa            ; Get Y
         sta     ADSCRL
 
         lda     #>SCREEN
-        sta     ADSCRL+1
+        sta     ADSCRH
 
         ldy     SCRY
         beq     out

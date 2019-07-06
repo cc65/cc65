@@ -212,7 +212,8 @@ RS232 port with Telemon calls (see XSOUT primitive for example)
 Telemon 3.0 handles fopen, fread, fclose primitives. It means that this
 function will crash the Telestrat because Telemon 2.4 does not have these
 primitives. By the way, Telemon 3.0 uses an extension "ch376 card" which
-handles sdcard and FAT 32 usb key. In the next version of Telemon, FT DOS, Sedoric, Stratsed will be handled in these 3 primitives (fopen, fread, fclose).
+handles sdcard and FAT 32 usb key. In the next version of Telemon, FT DOS, 
+Sedoric, Stratsed will be handled in these 3 primitives (fopen, fread, fclose).
 
 <itemize>
 <item>fclose
@@ -220,7 +221,12 @@ handles sdcard and FAT 32 usb key. In the next version of Telemon, FT DOS, Sedor
 <item>fread
 </itemize>
 
-
+<sect1>conio<p>
+Functions textcolor and bgcolor are available only with Telemon 3.0 (Orix). 
+Telemon 2.4 primitives can't handle any change of colors in text mode except with XINK or 
+XPAPER primitives which put on the first and second columns ink and paper attributes. 
+The only way to change color on the same line for text is to handle it in pure assembly 
+without systems calls.
 
 <sect>Other hints<p>
 

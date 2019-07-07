@@ -4,13 +4,13 @@
     .export    _gotoy
     .import    CHARCOLOR_CHANGE, BGCOLOR_CHANGE
 
-    .import    _update_adscr
+    .import    update_adscr
 
     .include   "telestrat.inc"
 
 .proc _gotoy
    sta     SCRY
-   jsr     _update_adscr
+   jsr     update_adscr
 
    ; We change the current line, it means that we need to put color attributes again.
    ; That is not the case with _gotox because, it's on the same line attribute are already set

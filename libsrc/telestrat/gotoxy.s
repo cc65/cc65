@@ -5,7 +5,7 @@
 ; void gotoxy (unsigned char x, unsigned char y);
 ;
 
-        .export         gotoxy, _gotoxy, _update_adscr
+        .export         gotoxy, _gotoxy, update_adscr
 
         .import         popa, CHARCOLOR_CHANGE, BGCOLOR_CHANGE
 
@@ -21,7 +21,7 @@ gotoxy: jsr     popa            ; Get Y
         jsr     popa
         sta     SCRX
         
-        jsr     _update_adscr          ; Update adress video ram position when SCRY et SCRX are modified
+        jsr     update_adscr          ; Update adress video ram position when SCRY et SCRX are modified
         ;       Force to put again attribute when it moves on the screen
         lda     #$01
         sta     CHARCOLOR_CHANGE
@@ -30,7 +30,7 @@ gotoxy: jsr     popa            ; Get Y
 .endproc
 
 
-.proc _update_adscr
+.proc update_adscr
         lda     #<SCREEN
         sta     ADSCRL
 

@@ -7,22 +7,21 @@
         .include        "telestrat.inc"
 
 .proc _textcolor
-    cmp     CHARCOLOR       ; Do we set the same color? if we don't detect it, we loose one char on the screen for each textcolor call with the same color
+    cmp     CHARCOLOR       ; Do we set the same color? If we don't detect it, we loose one char on the screen for each textcolor call with the same color
     bne     out             ; yes
-    lda     #$00
-    sta     CHARCOLOR_CHANGE
     
-    lda     CHARCOLOR       ; return last color
+    ldy     #$00
+    sty     CHARCOLOR_CHANGE
+    
+    lda     CHARCOLOR       ; Return last color
 
     rts
 out:
-    ldx     CHARCOLOR       ; get last color in order to return it
+    ldx     CHARCOLOR       ; Get last color in order to return it
     sta     CHARCOLOR
 
     lda     #$01
     sta     CHARCOLOR_CHANGE
-    txa                     ; return previous color
+    txa                     ; Return previous color
     rts
 .endproc
-
-

@@ -15,7 +15,7 @@
     dec     SCRX
     pha
     lda     CHARCOLOR
-    BRK_TELEMON  $4E             ; Change color on the screen (foreground)
+    BRK_TELEMON  XFWR             ; Change color on the screen (foreground)
     lda     #$00
     sta     CHARCOLOR_CHANGE
     inc     SCRX

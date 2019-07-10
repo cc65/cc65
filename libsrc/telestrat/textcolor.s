@@ -9,11 +9,11 @@
 .proc _textcolor
     cmp     CHARCOLOR       ; Do we set the same color? If we don't detect it, we loose one char on the screen for each textcolor call with the same color
     bne     out             ; yes
-    
+
     ldy     #$00
     sty     CHARCOLOR_CHANGE
     
-    lda     CHARCOLOR       ; Return last color
+    ; Return last color
 
     rts
 out:

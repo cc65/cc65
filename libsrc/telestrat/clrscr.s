@@ -30,14 +30,13 @@
     sta     ADSCRH
 
     ; reset display position
-    lda     #$01
-    sta     SCRY
-    lda     #$00
-    sta     SCRX
+    ldx     #$01
+    stx     SCRY
+    dex
+    stx     SCRX
 
-    lda     #$00
-    sta     CHARCOLOR_CHANGE
-    sta     BGCOLOR_CHANGE
+    stx     CHARCOLOR_CHANGE
+    stx     BGCOLOR_CHANGE
 
     lda     #$07
     sta     CHARCOLOR

@@ -23,14 +23,17 @@ gotoxy: jsr     popa            ; Get Y
         
         jsr     update_adscr          ; Update adress video ram position when SCRY et SCRX are modified
         ;       Force to put again attribute when it moves on the screen
-        lda     #$01
-        sta     CHARCOLOR_CHANGE
-        sta     BGCOLOR_CHANGE
+
         rts
 .endproc
 
 
 .proc update_adscr
+
+        lda     #$01
+        sta     CHARCOLOR_CHANGE
+        sta     BGCOLOR_CHANGE
+
         lda     #<SCREEN
         sta     ADSCRL
 

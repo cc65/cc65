@@ -52,15 +52,13 @@ ifdef USER_CFLAGS
   $(info USER_CFLAGS: $(USER_CFLAGS))
 endif
 
-ifdef BUILD_ID
-  $(info BUILD_ID: $(BUILD_ID))
-else
+ifndef BUILD_ID
   BUILD_ID := Git $(shell git rev-parse --short HEAD 2>$(NULLDEV) || svnversion 2>$(NULLDEV))
   ifneq ($(words $(BUILD_ID)),2)
     BUILD_ID := N/A
-    $(info BUILD_ID: N/A)
   endif
 endif
+$(info BUILD_ID: $(BUILD_ID))
 
 CFLAGS += -MMD -MP -O3 -I common \
           -Wall -Wextra -Wno-char-subscripts $(USER_CFLAGS) \

@@ -9,7 +9,7 @@
 
 static unsigned char flag;
 
-static void trampoline_set() {
+static void trampoline_set(void) {
         asm("ldy tmp4");
         asm("sty %v", flag);
         asm("jsr callptr4");

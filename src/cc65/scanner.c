@@ -464,8 +464,8 @@ static void NumericConst (void)
     unsigned DigitVal;
     unsigned long IVal;         /* Value */
 
-    /* Check for a leading hex or octal prefix and determine the possible
-    ** integer types.
+    /* Check for a leading hex, octal or binary prefix and determine the
+    ** possible integer types.
     */
     if (CurC == '0') {
         /* Gobble 0 and examine next char */
@@ -473,6 +473,9 @@ static void NumericConst (void)
         if (toupper (CurC) == 'X') {
             Base = Prefix = 16;
             NextChar ();        /* gobble "x" */
+        } else if (toupper (CurC) == 'B' && IS_Get (&Standard) >= STD_CC65) {
+            Base = Prefix = 2;
+            NextChar ();        /* gobble 'b' */
         } else {
             Base = 10;          /* Assume 10 for now - see below */
             Prefix = 8;         /* Actual prefix says octal */

@@ -3,12 +3,7 @@
 ;
     .export    _gotox
 
-    .import    popa
-
-    .importzp  sp
-
     .include   "telestrat.inc"
-
 
 .proc _gotox
    sta    SCRX

@@ -19,12 +19,13 @@ gotoxy: jsr     popa            ; Get Y
 ; In telemon, there is a position for the prompt, and another for the cursor.
 
     sta     SCRY
-    jsr     update_adscr          ; Update adress video ram position when SCRY is modified 
+    
 
     jsr     popa
     sta     SCRX
 
-    rts
+    jmp     update_adscr          ; Update adress video ram position when SCRY is modified 
+    
 .endproc
 
 .proc update_adscr

@@ -306,16 +306,13 @@ IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioctls for now
 ;
 
 IRQ:    jsr     CPREP
-
-; Record the state of the buttons.
-; Avoid crosstalk between the keyboard and the mouse.
-
-        ldy     #%00000000              ; Set ports A and B to input
-        sty     CIA1_DDRB
-        sty     CIA1_DDRA               ; Keyboard won't look like mouse
-        lda     CIA1_PRB                ; Read Control-Port 1
-        dec     CIA1_DDRA               ; Set port A back to output
-        eor     #%11111111              ; Bit goes up when button goes down
+        lda     KEY_COUNT
+        sta     old_key_count
+        lda     #$FF
+        sta     CIA1_PRA
+        lda     CIA1_PRB                ; Read joystick #0
+        and     #$1F
+        eor     #$1F                    ; Make all bits active high
         sta     Buttons
         beq     @L0                     ;(bze)
         dec     CIA1_DDRB               ; Mouse won't look like keyboard

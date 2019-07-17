@@ -16,7 +16,7 @@ callback:
         lda     OLD_BUTTONS             ; keypress before?
         bne     @discard_key            ; yes, discard key
 
-        lda     #$7F
+        lda     #$FF
         sta     CIA1_PRA
         lda     CIA1_PRB                ; Read joystick #0
         and     #$1F

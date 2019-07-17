@@ -3,9 +3,8 @@
 ;
 
     .export    _clrscr
-
-
-    .import    CHARCOLOR_CHANGE, CHARCOLOR, BGCOLOR, BGCOLOR_CHANGE
+    .import    OLD_CHARCOLOR, OLD_BGCOLOR, CHARCOLOR, BGCOLOR
+    
     .include   "telestrat.inc"
 
 .proc _clrscr
@@ -34,13 +33,14 @@
     stx     SCRY
     dex
     stx     SCRX
-
-    stx     CHARCOLOR_CHANGE
-    stx     BGCOLOR_CHANGE
+    
+    ; X is equal to 0
+    stx     BGCOLOR
+    stx     OLD_BGCOLOR
 
     lda     #$07
     sta     CHARCOLOR
-    sta     BGCOLOR
+    sta     OLD_CHARCOLOR
 
     rts
 .endproc

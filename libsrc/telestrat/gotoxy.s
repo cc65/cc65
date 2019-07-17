@@ -7,7 +7,7 @@
 
         .export         gotoxy, _gotoxy, update_adscr
 
-        .import         popa, CHARCOLOR_CHANGE, BGCOLOR_CHANGE
+        .import         popa, OLD_CHARCOLOR, OLD_BGCOLOR
 
         .include        "telestrat.inc"
 
@@ -17,41 +17,43 @@ gotoxy: jsr     popa            ; Get Y
 
 ; This function moves only the display cursor; it does not move the prompt position.
 ; In telemon, there is a position for the prompt, and another for the cursor.
-        sta     SCRY
-        jsr     popa
-        sta     SCRX
-        
-        jsr     update_adscr          ; Update adress video ram position when SCRY et SCRX are modified
-        ;       Force to put again attribute when it moves on the screen
 
-        rts
+    sta     SCRY
+    jsr     update_adscr          ; Update adress video ram position when SCRY is modified 
+
+    jsr     popa
+    sta     SCRX
+
+    rts
 .endproc
 
-
 .proc update_adscr
+; Force to set again color if cursor moves       
+; $FF is used because we know that it's impossible to have this value with a color
+; It prevents a bug : If bgcolor or textcolor is set to black for example with no char displays,
+; next cputsxy will not set the attribute if y coordinate changes
+    lda     #$FF                  
+    sta     OLD_CHARCOLOR         
+    sta     OLD_BGCOLOR           
 
-        lda     #$01
-        sta     CHARCOLOR_CHANGE
-        sta     BGCOLOR_CHANGE
+    lda     #<SCREEN
+    sta     ADSCRL
 
-        lda     #<SCREEN
-        sta     ADSCRL
+    lda     #>SCREEN
+    sta     ADSCRH
 
-        lda     #>SCREEN
-        sta     ADSCRH
-
-        ldy     SCRY
-        beq     out
+    ldy     SCRY
+    beq     out
 loop:
-        lda     ADSCRL          
-        clc
-        adc     #$28
-        bcc     skip
-        inc     ADSCRH
+    lda     ADSCRL          
+    clc
+    adc     #$28
+    bcc     skip
+    inc     ADSCRH
 skip:
-        sta     ADSCRL        
-        dey
-        bne     loop
+    sta     ADSCRL        
+    dey
+    bne     loop
 out:        
-        rts
+    rts
 .endproc

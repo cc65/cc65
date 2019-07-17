@@ -9,6 +9,5 @@
 
 .proc _gotoy
     sta     SCRY
-    jsr     update_adscr
-    rts
+    jmp     update_adscr
 .endproc

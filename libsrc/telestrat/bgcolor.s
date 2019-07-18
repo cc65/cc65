@@ -7,6 +7,8 @@
         .include        "telestrat.inc"
 
 .proc _bgcolor
+    ldx     BGCOLOR     ; Get previous color
     sta     BGCOLOR
+    txa                 ; Return previous color
     rts
 .endproc

@@ -24,8 +24,8 @@ gotoxy: jsr     popa            ; Get Y
     jsr     popa
     sta     SCRX
 
-    jmp     update_adscr          ; Update adress video ram position when SCRY is modified 
-    
+; Update adress video ram position when SCRY is modified (update_adscr)
+; Fall through
 .endproc
 
 .proc update_adscr
@@ -48,7 +48,7 @@ gotoxy: jsr     popa            ; Get Y
 loop:
     lda     ADSCRL          
     clc
-    adc     #$28
+    adc     #SCREEN_XSIZE
     bcc     skip
     inc     ADSCRH
 skip:

@@ -34,12 +34,8 @@
     dex
     stx     SCRX
     
-    ; X is equal to 0
-    stx     BGCOLOR
-    stx     OLD_BGCOLOR
-
-    lda     #$07
-    sta     CHARCOLOR
+    lda     #$FF
+    sta     OLD_BGCOLOR
     sta     OLD_CHARCOLOR
 
     rts

@@ -6,6 +6,8 @@
         .include        "telestrat.inc"
 
 .proc _textcolor
+    ldx     CHARCOLOR     ; Get previous color
     sta     CHARCOLOR
+    txa                   ; Return previous color
     rts
 .endproc

@@ -119,14 +119,39 @@ RS232T          := $59
 RS232C          := $5A
 INDRS           := $5B
 
+; Float and integer management
 ACC1E           := $60
 ACC1M           := $61
-
 ACC1S           := $65
+ACC1EX          := $66
+ACC1J           := $67
+ACC2E           := $68
+ACC2M           := $69
+ACC2S           := $6D
+ACCPS           := $6E
+ACC3            := $6F
 
+ACC4E           := $73
+ACC4M           := $74
+
+
+FLDT0           := $74
+FLDT1           := $75
+FLDT2           := $76
+FLSVY           := $77
+FLTR0           := $7D
+FLTR1           := $7E
+
+; Menu management
+MENDDY          := $62
+MENDFY          := $63
+MENX            := $64
+MENDY           := $66
 FLGMEN          := $68
 ADMEN           := $69
 
+FLSGN           := $8A
+FLINT           := $88
 FLSVS           := $89
 FLERR           := $8B
 

@@ -34,9 +34,11 @@
     dex
     stx     SCRX
     
+    ; At this step X is equal to $00
     dex
-    sta     OLD_BGCOLOR
-    sta     OLD_CHARCOLOR
+    ; At this step X is equal to $FF
+    stx     OLD_BGCOLOR
+    stx     OLD_CHARCOLOR
 
     rts
 .endproc

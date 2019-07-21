@@ -34,7 +34,7 @@ do_not_change_color_foreground:
     dec     SCRX                 ; Dec SCRX in order to place attribute before the right position
 
     pha
-    txa                          ; Swap X to A because, X contains CHARCOLOR
+    txa                          ; Swap X to A because, X contains BGCOLOR
     ORA     #%00010000           ; Add 16 because background color is an attribute between 16 and 23. 17 is red background for example
     BRK_TELEMON  XFWR            ; Change color on the screen (background)
     pla

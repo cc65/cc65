@@ -3,7 +3,7 @@
 ;
 
     .export    _clrscr
-    .import    OLD_CHARCOLOR, OLD_BGCOLOR, CHARCOLOR, BGCOLOR
+    .import    OLD_CHARCOLOR, OLD_BGCOLOR
     
     .include   "telestrat.inc"
 

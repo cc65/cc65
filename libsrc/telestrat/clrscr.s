@@ -34,7 +34,7 @@
     dex
     stx     SCRX
     
-    lda     #$FF
+    dex
     sta     OLD_BGCOLOR
     sta     OLD_CHARCOLOR
 

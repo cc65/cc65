@@ -60,16 +60,6 @@ $(WORKDIR)/%.ref: %.c | $(WORKDIR)
 $(DIFF): ../bdiff.c | $(WORKDIR)
 	$(CC) $(CFLAGS) -o $@ $<
 
-# Some files have "K & R"-style syntax.  Therefore, some forward
-# function-declarations don't match the later function definitions.
-# Those programs fail when fastcall is used; but, the cdecl calling convention
-# tolerates those conflicts.  Therefore, make their functions default to cdecl.
-#
-$(WORKDIR)/init.%.prg   \
-$(WORKDIR)/switch.%.prg \
-$(WORKDIR)/yacc.%.prg   \
-$(WORKDIR)/yaccdbg.%.prg: CC65FLAGS += -Wc --all-cdecl
-
 # "yaccdbg.c" includes "yacc.c".
 # yaccdbg's built files must depend on both of them.
 #

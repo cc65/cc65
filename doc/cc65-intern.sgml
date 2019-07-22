@@ -42,7 +42,7 @@ The standard compliant variations <tt/__cdecl__/ and <tt/__fastcall__/ are alway
 If a function has a prototype, parameters are pushed to the C-stack as their respective types
 (i.e. a <tt/char/ parameter will push 1 byte), but if a function has no prototype, default
 promotions will apply. This means that with no prototype, <tt/char/ will be promoted
-to <tt/int/ and be pushed as 2 bytes. K &amp; R style function prototypes may be used,
+to <tt/int/ and be pushed as 2 bytes. "K &amp; R"-style forward declarations may be used,
 but they will function the same as if no prototype was used.
 
 <sect1>Prologue, before the function call<p>
@@ -61,8 +61,8 @@ The rightmost parameter will have the lowest address on the stack,
 and multi-byte parameters will have their least significant byte at the lower address.
 
 The <tt/sp/ pseudo-register is a zeropage pointer to the base of the C-stack.
-If the function has no prototype or is variadic
-the <tt/Y/ register will contain the number of bytes pushed to the stack for this function.
+If the function is variadic, the <tt/Y/ register will contain the number of
+bytes pushed to the stack for this function.
 
 Example:
 <tscreen><verb>
@@ -108,8 +108,9 @@ The C-stack pointer <tt/sp/ must be restored by the function to its value before
 function call prologue. It may pop all of its parameters from the C-stack
 (e.g. using the <tt/runtime/ function <tt/popa/),
 or it could adjust <tt/sp/ directly.
-If the function has no prototype, or is variadic the <tt/Y/ register contains the
-number of bytes pushed to the stack on entry, which may be added to <tt/sp/ to restore its original state.
+If the function is variadic, the <tt/Y/ register contains the number of bytes
+pushed to the stack on entry, which may be added to <tt/sp/ to restore its
+original state.
 
 The internal pseudo-register <tt/regbank/ must not be changed by the function.
 
@@ -136,4 +137,3 @@ it may clobber any of these itself:
 
 
 </article>
-

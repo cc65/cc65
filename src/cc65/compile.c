@@ -171,8 +171,9 @@ static void Parse (void)
                 (CurTok.Tok != TOK_SEMI)) {
 
                 FuncDesc* D = GetFuncDesc (Decl.Type);
+
                 if (D->Flags & FD_EMPTY) {
-                    D->Flags = (D->Flags & ~(FD_EMPTY | FD_VARIADIC)) | FD_VOID_PARAM;
+                    D->Flags = (D->Flags & ~FD_EMPTY) | FD_VOID_PARAM;
                 }
             }
 

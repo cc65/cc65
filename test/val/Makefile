@@ -44,16 +44,6 @@ all: $(TESTS)
 $(WORKDIR):
 	$(call MKDIR,$(WORKDIR))
 
-# Some files have "K & R"-style syntax.  Therefore, some forward
-# function-declarations don't match the later function definitions.
-# Those programs fail when fastcall is used; but, the cdecl calling convention
-# tolerates those conflicts.  Therefore, make their functions default to cdecl.
-#
-$(WORKDIR)/cq4.%.prg  \
-$(WORKDIR)/cq71.%.prg \
-$(WORKDIR)/cq81.%.prg \
-$(WORKDIR)/cq84.%.prg: CC65FLAGS += -Wc --all-cdecl
-
 define PRG_template
 
 $(WORKDIR)/%.$1.$2.prg: %.c | $(WORKDIR)

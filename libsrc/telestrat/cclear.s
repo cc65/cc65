@@ -8,7 +8,7 @@
         .export         _cclearxy, _cclear
         .import         update_adscr
 
-		.importzp       tmp1 
+        .importzp       tmp1 
         .import         popax
         .include        "telestrat.inc"
 
@@ -22,14 +22,14 @@ _cclearxy:
         pla                     ; Restore the length and run into _cclear
 
 _cclear:
-        tax                     ; Is the length zero?
-        beq     @L9             ; Jump if done
+        tax                     ; Is the length equal to zero?
+        beq     @L2             ; Yes we skip
 @L1:
-        stx     tmp1  
-        lda     #' '
+        stx     tmp1            ; Save X
+        lda     #' '            ; Erase current char
         BRK_TELEMON     XFWR
         ldx     tmp1
         dex
         bne     @L1
-@L9:
+@L2:
         rts

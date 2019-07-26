@@ -1132,7 +1132,7 @@ static Type* ParamTypeCvt (Type* T)
 
 
 static void ParseOldStyleParamList (FuncDesc* F)
-/* Parse an old style (K&R) parameter list */
+/* Parse an old-style (K&R) parameter list */
 {
     /* Some fix point tokens that are used for error recovery */
     static const token_t TokenList[] = { TOK_COMMA, TOK_RPAREN, TOK_SEMI };
@@ -1234,7 +1234,7 @@ static void ParseOldStyleParamList (FuncDesc* F)
 
 
 static void ParseAnsiParamList (FuncDesc* F)
-/* Parse a new style (ANSI) parameter list */
+/* Parse a new-style (ANSI) parameter list */
 {
     /* Parse params */
     while (CurTok.Tok != TOK_RPAREN) {
@@ -1330,32 +1330,30 @@ static FuncDesc* ParseFuncDecl (void)
 
     /* Check for several special parameter lists */
     if (CurTok.Tok == TOK_RPAREN) {
-        /* Parameter list is empty */
-        F->Flags |= (FD_EMPTY | FD_VARIADIC);
+        /* Parameter list is empty (K&R-style) */
+        F->Flags |= FD_EMPTY;
     } else if (CurTok.Tok == TOK_VOID && NextTok.Tok == TOK_RPAREN) {
         /* Parameter list declared as void */
         NextToken ();
         F->Flags |= FD_VOID_PARAM;
     } else if (CurTok.Tok == TOK_IDENT &&
                (NextTok.Tok == TOK_COMMA || NextTok.Tok == TOK_RPAREN)) {
-        /* If the identifier is a typedef, we have a new style parameter list,
-        ** if it's some other identifier, it's an old style parameter list.
+        /* If the identifier is a typedef, we have a new-style parameter list;
+        ** if it's some other identifier, it's an old-style parameter list.
         */
         Sym = FindSym (CurTok.Ident);
         if (Sym == 0 || !SymIsTypeDef (Sym)) {
-            /* Old style (K&R) function. */
+            /* Old-style (K&R) function. */
             F->Flags |= FD_OLDSTYLE;
         }
     }
 
     /* Parse params */
     if ((F->Flags & FD_OLDSTYLE) == 0) {
-
-        /* New style function */
+        /* New-style function */
         ParseAnsiParamList (F);
-
     } else {
-        /* Old style function */
+        /* Old-style function */
         ParseOldStyleParamList (F);
     }
 

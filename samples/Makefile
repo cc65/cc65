@@ -90,7 +90,7 @@ ifneq ($(filter disk samples.%,$(MAKECMDGOALS)),)
   # For this one, see https://applecommander.github.io/
   AC ?= ac.jar
 
-  # For this one, see http://www.horus.com/~hias/atari/
+  # For this one, see https://www.horus.com/~hias/atari/
   DIR2ATR ?= dir2atr
 
   DISK_c64       = samples.d64

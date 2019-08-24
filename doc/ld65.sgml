@@ -562,7 +562,8 @@ segment, where this attribute is true, the linker will export three symbols.
 </verb></tscreen>
 
 Replace <tt/NAME/ by the name of the segment, in the example above, this would
-be <tt/BSS/. These symbols may be accessed by your code.
+be <tt/BSS/. These symbols may be accessed by your code once the symbol has
+been imported using the <tt>.IMPORT</tt> directive.
 
 Now, as we've configured the linker to write the first three segments and
 create symbols for the last one, there's only one question left: Where does
@@ -766,7 +767,8 @@ useful for things like a software stack, or an I/O area.
         }
 </verb></tscreen>
 
-This will define some external symbols that may be used in your code:
+This will define some external symbols that may be used in your code once
+the symbol has imported using the <tt>.IMPORT</tt> directive:
 
 <tscreen><verb>
         __STACK_START__         This is set to the start of the memory

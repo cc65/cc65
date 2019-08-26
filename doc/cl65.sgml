@@ -138,7 +138,7 @@ There are a few remaining options that control the behaviour of cl65:
 
   This option is passed to the cc65 compiler; and, it forces cl65 to stop
   before the assembly step. That means that C-level preprocessor directives
-  are obeyed; and, macroes are expanded.  But, the C source isn't compiled.
+  are obeyed; and, macros are expanded.  But, the C source isn't compiled.
   If the <tt/-o/ option isn't used, then the C code results are written into
   files with a ".i" suffix on their base names.  Assembler files, object
   files, and libraries given on the command line are ignored.

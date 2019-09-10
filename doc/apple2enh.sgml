@@ -501,16 +501,14 @@ From that perspective it makes most sense to not set both the date and the time 
 rather only set the date and have the time just stay zero. Then files show up in a
 directory as <tt/DD-MON-YY  0:00/.
 
-So <tt/clock_settime()/ checks if the current time equals 0:00. If it does <bf/NOT/
-then a realtime clock is supposed to be active and <tt/clock_settime()/ fails with
-<tt/ERANGE/. Otherwise <tt/clock_settime()/ sets the date - and completely ignores
-the time provided as parameter.
+So <tt/clock_settime()/ checks if a realtime clock is active. If it is then
+<tt/clock_settime()/ fails with <tt/ERANGE/. Otherwise <tt/clock_settime()/
+sets the date - and completely ignores the time provided as parameter.
 
-<tt/clock_getres()/ too checks if the current time equals 0:00. If it does <bf/NOT/
-then a realtime clock is supposed to be active and <tt/clock_getres()/ returns a time
-resolution of one minute. Otherwise <tt/clock_getres()/ presumes that the only one
-who sets the RAM location is <tt/clock_settime()/ and therefore returns a time
-resolution of one day.
+<tt/clock_getres()/ too checks if a realtime clock is active. If it is then
+<tt/clock_getres()/ returns a time resolution of one minute. Otherwise
+<tt/clock_getres()/ presumes that the only one who sets the RAM location is
+<tt/clock_settime()/ and therefore returns a time resolution of one day.
 
 
 

@@ -27,10 +27,10 @@ _clock_getres:
         ldx     #<day_res
         ldy     #>day_res
 
-        ; Check for existing minutes or hours
-        lda     TIMELO
-        ora     TIMELO+1
-        beq     :+
+        ; Check for realtme clock
+        lda     MACHID
+        lsr     a
+        bcc     :+
 
         ; Switch to minute resolution
         ldx     #<min_res

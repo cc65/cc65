@@ -72,7 +72,7 @@ LFD1F:  jsr     LFE86           ; Shift to find bit that is set (in Y)
         lsr     a               ; Shift out bit zero (only key there is <SHIFT LOCK>)
         asl     a               ; And shift back
         jsr     LFE86           ; Shift to find bit that is set (in Y)
-        beq     LFD47           ; Branch if no keys pressed STM: IS THIS CORRECT?
+        beq     LFD47           ; Branch if no keys pressed
         lda     #$00
 LFD3A:  sta     CTRLSHIFT       ; Save state of <CTRL> and shift keys
 LFD3D:  sta     LASTSCAN
@@ -106,7 +106,6 @@ LFD68:  stx     DBNCCNT
         jsr     LFCBE           ; Write keyboard row
         jsr     LFCCF           ; Read keyboard column
         sta     KBDTMP
-        and     #$01
         tax
         lda     KBDTMP
         and     #$06

@@ -21,7 +21,7 @@ _cgetc:
         lda     (SCREEN_PTR),y  ; fetch current character
         sta     tmp1            ; save it
         lda     #$A1            ; full white square
-        sta     (SCREEN_PTR),y  ; store at cursor position^
+        sta     (SCREEN_PTR),y  ; store at cursor position
 
 nocursor:
         jsr     _kbhit          ; get input character in A

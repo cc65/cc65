@@ -107,7 +107,6 @@ LFD68:  stx     DBNCCNT
         jsr     LFCCF           ; Read keyboard column
         sta     KBDTMP
         tax
-        lda     KBDTMP
         and     #$06
         bne     LFDA2
         bit     LASTSCAN

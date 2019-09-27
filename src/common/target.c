@@ -135,11 +135,11 @@ static const unsigned char CTPET[256] = {
 typedef struct TargetEntry TargetEntry;
 struct TargetEntry {
     char        Name[13];               /* Target name */
-    target_t    Id;                     /* Target id */
+    target_t    Id;                     /* Target ID */
 };
 
-/* Table that maps target names to ids. Sorted alphabetically for bsearch.
-** Allows multiple entries for one target id (target name aliases).
+/* Table that maps target names to IDs. Sorted alphabetically for bsearch().
+** Allows multiple entries for one target ID (target name aliases).
 */
 static const TargetEntry TargetMap[] = {
     {   "apple2",       TGT_APPLE2       },
@@ -157,6 +157,7 @@ static const TargetEntry TargetMap[] = {
     {   "cbm510",       TGT_CBM510       },
     {   "cbm610",       TGT_CBM610       },
     {   "creativision", TGT_CREATIVISION },
+    {   "cx16",         TGT_CX16         },
     {   "gamate",       TGT_GAMATE       },
     {   "geos",         TGT_GEOS_CBM     },
     {   "geos-apple",   TGT_GEOS_APPLE   },
@@ -179,7 +180,7 @@ static const TargetEntry TargetMap[] = {
 #define MAP_ENTRY_COUNT         (sizeof (TargetMap) / sizeof (TargetMap[0]))
 
 
-/* Table with target properties by target id */
+/* Table with target properties by target ID */
 static const TargetProperties PropertyTable[TGT_COUNT] = {
     { "none",           CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "module",         CPU_6502,       BINFMT_O65,         CTNone  },
@@ -213,6 +214,7 @@ static const TargetProperties PropertyTable[TGT_COUNT] = {
     { "pce",            CPU_HUC6280,    BINFMT_BINARY,      CTNone  },
     { "gamate",         CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "c65",            CPU_4510,       BINFMT_BINARY,      CTPET   },
+    { "cx16",           CPU_65C02,      BINFMT_BINARY,      CTPET   },
 };
 
 /* Target system */
@@ -235,7 +237,7 @@ static int Compare (const void* Key, const void* Entry)
 
 
 target_t FindTarget (const char* Name)
-/* Find a target by name and return the target id. TGT_UNKNOWN is returned if
+/* Find a target by name and return the target ID. TGT_UNKNOWN is returned if
 ** the given name is no valid target.
 */
 {
@@ -243,7 +245,7 @@ target_t FindTarget (const char* Name)
     const TargetEntry* T;
     T = bsearch (Name, TargetMap, MAP_ENTRY_COUNT, sizeof (TargetMap[0]), Compare);
 
-    /* Return the target id */
+    /* Return the target ID */
     return (T == 0)? TGT_UNKNOWN : T->Id;
 }
 
@@ -252,7 +254,7 @@ target_t FindTarget (const char* Name)
 const TargetProperties* GetTargetProperties (target_t Target)
 /* Return the properties for a target */
 {
-    /* Must have a valid target id */
+    /* Must have a valid target ID */
     PRECONDITION (Target >= 0 && Target < TGT_COUNT);
 
     /* Return the array entry */

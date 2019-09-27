@@ -402,11 +402,36 @@ RUN
 The emulation, also, supports that method.
 
 
+<sect1>Commander X16
+
+<sect2>x16-emulator<p>
+Available at <url
+url="https://github.com/commanderx16/x16-emulator/releases">:
+
+Emulates the Commander X16 Single Board Computer, with sound, SD card images,
+VGA and NTSC video, and a NES game controller emulation.  Includes a monitor. 
+It runs on all SDL2 platforms.
+
+Compile the tutorial with
+<tscreen><verb>
+cl65 -O -t cx16 hello.c text.s
+</verb></tscreen>
+
+Start the emulator.  Then, type
+<tscreen><verb>
+LOAD"HELLO",1
+RUN
+</verb></tscreen>
+(Type those lines in lower-case; but, they will appear as upper-case.)
+
+On a real computer, you would type an <tt/8/ instead of a <tt/1/.
+
+
 <sect1>Commodore
 
 <sect2>VICE<p>
 Available at <url
-url="http://vice-emu.sourceforge.net/">:
+url="https://vice-emu.sourceforge.net/">:
 
 Emulates Commodore 64/128/VIC-20/PET/CBM II/Plus 4 computers. Supports
 printers, serial port and adapters, stereo sound, disk drives and images, RAM expansions,

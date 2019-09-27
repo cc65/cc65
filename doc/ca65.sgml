@@ -4653,9 +4653,10 @@ compiler, depending on the target system selected:
 <item><tt/__C128__/ - Target system is <tt/c128/
 <item><tt/__C16__/ - Target system is <tt/c16/ or <tt/plus4/
 <item><tt/__C64__/ - Target system is <tt/c64/
-<item><tt/__CBM__/ - Target is a Commodore system
+<item><tt/__CBM__/ - Target is a Commodore or Commodore-alike system
 <item><tt/__CBM510__/ - Target system is <tt/cbm510/
 <item><tt/__CBM610__/ - Target system is <tt/cbm610/
+<item><tt/__CX16__/ - Target system is <tt/cx16/
 <item><tt/__GEOS__/ - Target is a GEOS system
 <item><tt/__GEOS_APPLE__/ - Target system is <tt/geos-apple/
 <item><tt/__GEOS_CBM__/ - Target system is <tt/geos-cbm/

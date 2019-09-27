@@ -901,6 +901,10 @@ The compiler defines several macros at startup:
   <item><tt/__CC65_STD_CC65__/
   </itemize>
 
+  <tag><tt>__CX16__</tt></tag>
+
+  This macro is defined if the target is the Commander X16 (-t cx16).
+
   <tag><tt>__DATE__</tt></tag>
 
   This macro expands to the date of translation of the preprocessing

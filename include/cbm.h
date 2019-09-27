@@ -65,6 +65,8 @@
 #  include <cbm610.h>
 #elif defined(__PET__)    && !defined(_PET_H)
 #  include <pet.h>
+#elif defined(__CX16__)   && !defined(_CX16_H)
+#  include <cx16.h>
 #endif
 
 /* Include definitions for CBM file types */
@@ -300,5 +302,3 @@ void __fastcall__ cbm_closedir (unsigned char lfn);
 
 /* End of cbm.h */
 #endif
-
-

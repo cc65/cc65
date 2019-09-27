@@ -84,6 +84,7 @@ typedef enum {
     TGT_PCENGINE,
     TGT_GAMATE,
     TGT_C65,
+    TGT_CX16,
     TGT_COUNT                   /* Number of target systems */
 } target_t;
 
@@ -102,7 +103,7 @@ extern target_t         Target;
 /* Types of available output formats */
 #define BINFMT_DEFAULT          0       /* Default (binary) */
 #define BINFMT_BINARY           1       /* Straight binary format */
-#define BINFMT_O65              2       /* Andre Fachats o65 format */
+#define BINFMT_O65              2       /* Andre Fachat's o65 format */
 #define BINFMT_ATARIEXE         3       /* Standard Atari binary load */
 
 
@@ -127,5 +128,4 @@ const char* GetTargetName (target_t Target);
 
 
 /* End of target.h */
-
 #endif

@@ -1,14 +1,10 @@
 ;
-; 2019-09-16, Greg King
+; Ullrich von Bassewitz, 26.10.2000
 ;
-; Screen size info
+; Screen size variables
 ;
 
         .export         screensize
+        .import         SCREEN
 
-        .include        "cx16.inc"
-
-screensize:
-        ldx     LLEN
-        ldy     NLINES
-        rts
+screensize      := SCREEN

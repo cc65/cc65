@@ -7,7 +7,7 @@
 
         .import         initlib, donelib
         .import         zerobss, callmain
-        .import         BSOUT
+        .import         CHROUT
         .import         __MAIN_START__, __MAIN_SIZE__   ; Linker-generated
         .importzp       ST
 
@@ -58,8 +58,11 @@ L2:     lda     zpsave,x
 
         ldx     spsave
         txs                     ; Restore stack pointer
-        ldx     banksave
+        ldx     ramsave
         stx     VIA1::PRA2      ; Restore former RAM bank
+        lda     VIA1::PRB
+        and     #<~$07
+        sta     VIA1::PRB       ; Change back to BASIC ROM
 
 ; Back to BASIC.
 
@@ -71,11 +74,16 @@ L2:     lda     zpsave,x
 .segment        "ONCE"
 
 init:
+; Change from BASIC's ROM to Kernal's ROM.
+
+        lda     VIA1::PRB
+        ora     #$07
+        sta     VIA1::PRB
 
 ; Change to the first RAM bank.
 
         lda     VIA1::PRA2
-        sta     banksave        ; Save the current bank number
+        sta     ramsave         ; Save the current RAM bank number
         lda     #$00            ; Choose RAM bank zero
         sta     VIA1::PRA2
 
@@ -97,7 +105,7 @@ L1:     lda     sp,x
 ; Switch to the second charset.
 
         lda     #$0E
-        jsr     BSOUT
+        jsr     CHROUT
 
 ; Call the module constructors.
 
@@ -109,7 +117,7 @@ L1:     lda     sp,x
 
 .segment        "INIT"
 
-banksave:
+ramsave:
         .res    1
 spsave: .res    1
 zpsave: .res    zpspace

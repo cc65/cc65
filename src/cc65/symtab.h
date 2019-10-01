@@ -136,6 +136,8 @@ SymEntry* FindTagSym (const char* Name);
 SymEntry* FindStructField (const Type* TypeArray, const char* Name);
 /* Find a struct field in the fields list */
 
+unsigned short FindSPAdjustment (const char* Name);
+/* Search for an entry in the table of SP adjustments */
 
 
 /*****************************************************************************/

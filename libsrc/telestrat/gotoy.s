@@ -10,4 +10,4 @@
 .proc _gotoy
    sta     SCRY
    rts
-.endproc	
+.endproc

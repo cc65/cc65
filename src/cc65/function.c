@@ -61,26 +61,6 @@
 
 
 
-/* Enumeration for function flags */
-typedef enum {
-    FF_NONE             = 0x0000,
-    FF_HAS_RETURN       = 0x0001,       /* Function has a return statement */
-    FF_IS_MAIN          = 0x0002,       /* This is the main function */
-    FF_VOID_RETURN      = 0x0004,       /* Function returning void */
-} funcflags_t;
-
-/* Structure that holds all data needed for function activation */
-struct Function {
-    struct SymEntry*    FuncEntry;      /* Symbol table entry */
-    Type*               ReturnType;     /* Function return type */
-    FuncDesc*           Desc;           /* Function descriptor */
-    int                 Reserved;       /* Reserved local space */
-    unsigned            RetLab;         /* Return code label */
-    int                 TopLevelSP;     /* SP at function top level */
-    unsigned            RegOffs;        /* Register variable space offset */
-    funcflags_t         Flags;          /* Function flags */
-};
-
 /* Pointer to current function */
 Function* CurrentFunc = 0;
 
@@ -108,6 +88,8 @@ static Function* NewFunction (struct SymEntry* Sym)
     F->RegOffs    = RegisterSpace;
     F->Flags      = IsTypeVoid (F->ReturnType) ? FF_VOID_RETURN : FF_NONE;
 
+    InitCollection (&F->LocalsBlockStack);
+
     /* Return the new structure */
     return F;
 }
@@ -117,6 +99,7 @@ static Function* NewFunction (struct SymEntry* Sym)
 static void FreeFunction (Function* F)
 /* Free a function activation structure */
 {
+    DoneCollection (&F->LocalsBlockStack);
     xfree (F);
 }
 
@@ -439,14 +422,14 @@ void NewFunc (SymEntry* Func)
 
         /* Main cannot be a fastcall function */
         if (IsQualFastcall (Func->Type)) {
-            Error ("`main' cannot be declared as __fastcall__");
+            Error ("'main' cannot be declared as __fastcall__");
         }
 
         /* If cc65 extensions aren't enabled, don't allow a main function that
         ** doesn't return an int.
         */
         if (IS_Get (&Standard) != STD_CC65 && CurrentFunc->ReturnType[0].C != T_INT) {
-            Error ("`main' must always return an int");
+            Error ("'main' must always return an int");
         }
 
         /* Add a forced import of a symbol that is contained in the startup
@@ -540,6 +523,9 @@ void NewFunc (SymEntry* Func)
 
     /* Need a starting curly brace */
     ConsumeLCurly ();
+
+    /* Make sure there is always something on the stack of local variable blocks */
+    CollAppend (&CurrentFunc->LocalsBlockStack, 0);
 
     /* Parse local variable declarations if any */
     DeclareLocals ();

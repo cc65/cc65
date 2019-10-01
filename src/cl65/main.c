@@ -138,7 +138,8 @@ static int Module = 0;
 #define MODULE_EXT      ".o65"
 
 /* Name of the target specific runtime library */
-static char* TargetLib  = 0;
+static char* TargetLib   = 0;
+static int   NoTargetLib = 0;
 
 
 
@@ -338,7 +339,7 @@ static void CmdAddFile (CmdDesc* Cmd, const char* File)
         for (I = 0; I < Cmd->FileCount; ++I) {
             if (strcmp (Cmd->Files[I], File) == 0) {
                 /* Duplicate file */
-                Warning ("Duplicate file in argument list: `%s'", File);
+                Warning ("Duplicate file in argument list: '%s'", File);
                 /* No need to search further */
                 break;
             }
@@ -446,7 +447,7 @@ static void ExecProgram (CmdDesc* Cmd)
     /* Check the result code */
     if (Status < 0) {
         /* Error executing the program */
-        Error ("Cannot execute `%s': %s", Cmd->Name, strerror (errno));
+        Error ("Cannot execute '%s': %s", Cmd->Name, strerror (errno));
     } else if (Status != 0) {
         /* Called program had an error */
         exit (Status);
@@ -491,17 +492,20 @@ static void Link (void)
         CmdSetTarget (&LD65, Target);
     }
 
-    /* Determine which target libraries are needed */
-    SetTargetFiles ();
-
     /* Add all object files as parameters */
     for (I = 0; I < LD65.FileCount; ++I) {
         CmdAddArg (&LD65, LD65.Files [I]);
     }
 
-    /* Add the system runtime library */
-    if (TargetLib) {
-        CmdAddArg (&LD65, TargetLib);
+    /* Add the target library if it is not disabled */
+    if (!NoTargetLib)
+    {
+        /* Determine which target library is needed */
+        SetTargetFiles ();
+
+        if (TargetLib) {
+            CmdAddArg (&LD65, TargetLib);
+        }
     }
 
     /* Terminate the argument list with a NULL pointer */
@@ -569,7 +573,7 @@ static void AssembleIntermediate (const char* SourceFile)
 
     /* Remove the input file */
     if (remove (AsmName) < 0) {
-        Warning ("Cannot remove temporary file `%s': %s",
+        Warning ("Cannot remove temporary file '%s': %s",
                  AsmName, strerror (errno));
     }
 
@@ -753,7 +757,7 @@ static void Usage (void)
             "  -o name\t\t\tName the output file\n"
             "  -r\t\t\t\tEnable register variables\n"
             "  -t sys\t\t\tSet the target system\n"
-            "  -u sym\t\t\tForce an import of symbol `sym'\n"
+            "  -u sym\t\t\tForce an import of symbol 'sym'\n"
             "  -v\t\t\t\tVerbose mode\n"
             "  -vm\t\t\t\tVerbose map file\n"
             "  -C name\t\t\tUse linker config file\n"
@@ -799,7 +803,7 @@ static void Usage (void)
             "  --debug\t\t\tDebug mode\n"
             "  --debug-info\t\t\tAdd debug info\n"
             "  --feature name\t\tSet an emulation feature\n"
-            "  --force-import sym\t\tForce an import of symbol `sym'\n"
+            "  --force-import sym\t\tForce an import of symbol 'sym'\n"
             "  --help\t\t\tHelp (this text)\n"
             "  --include-dir dir\t\tSet a compiler include directory path\n"
             "  --ld-args options\t\tPass options to the linker\n"
@@ -812,6 +816,7 @@ static void Usage (void)
             "  --memory-model model\t\tSet the memory model\n"
             "  --module\t\t\tLink as a module\n"
             "  --module-id id\t\tSpecify a module ID for the linker\n"
+            "  --no-target-lib\t\tDon't link the target library\n"
             "  --o65-model model\t\tOverride the o65 model\n"
             "  --obj file\t\t\tLink this object file\n"
             "  --obj-path path\t\tSpecify an object file search path\n"
@@ -1167,6 +1172,15 @@ static void OptModuleId (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
+static void OptNoTargetLib (const char* Opt attribute ((unused)),
+                            const char* Arg attribute ((unused)))
+/* Disable the target library */
+{
+    NoTargetLib = 1;
+}
+
+
+
 static void OptO65Model (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --o65-model option */
 {
@@ -1282,9 +1296,9 @@ static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
 {
     Target = FindTarget (Arg);
     if (Target == TGT_UNKNOWN) {
-        Error ("No such target system: `%s'", Arg);
+        Error ("No such target system: '%s'", Arg);
     } else if (Target == TGT_MODULE) {
-        Error ("Cannot use `module' as target, use --module instead");
+        Error ("Cannot use 'module' as target, use --module instead");
     }
 }
 
@@ -1369,6 +1383,7 @@ int main (int argc, char* argv [])
         { "--memory-model",      1, OptMemoryModel    },
         { "--module",            0, OptModule         },
         { "--module-id",         1, OptModuleId       },
+        { "--no-target-lib",     0, OptNoTargetLib    },
         { "--o65-model",         1, OptO65Model       },
         { "--obj",               1, OptObj            },
         { "--obj-path",          1, OptObjPath        },
@@ -1616,7 +1631,7 @@ int main (int argc, char* argv [])
                     break;
 
                 default:
-                    Error ("Don't know what to do with `%s'", Arg);
+                    Error ("Don't know what to do with '%s'", Arg);
 
             }
 

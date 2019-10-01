@@ -112,7 +112,7 @@ static void CloseLibrary (Library* L)
 {
     /* Close the library file */
     if (fclose (L->F) != 0) {
-        Error ("Error closing `%s': %s", GetString (L->Name), strerror (errno));
+        Error ("Error closing '%s': %s", GetString (L->Name), strerror (errno));
     }
     L->F = 0;
 }
@@ -144,7 +144,7 @@ static void LibSeek (Library* L, unsigned long Offs)
 /* Do a seek in the library checking for errors */
 {
     if (fseek (L->F, Offs, SEEK_SET) != 0) {
-        Error ("Seek error in `%s' (%lu): %s",
+        Error ("Seek error in '%s' (%lu): %s",
                GetString (L->Name), Offs, strerror (errno));
     }
 }
@@ -158,7 +158,7 @@ static void LibReadHeader (Library* L)
     L->Header.Magic   = LIB_MAGIC;
     L->Header.Version = Read16 (L->F);
     if (L->Header.Version != LIB_VERSION) {
-        Error ("Wrong data version in `%s'", GetString (L->Name));
+        Error ("Wrong data version in '%s'", GetString (L->Name));
     }
     L->Header.Flags   = Read16 (L->F);
     L->Header.IndexOffs = Read32 (L->F);
@@ -171,12 +171,12 @@ static void LibReadObjHeader (Library* L, ObjData* O)
 {
     O->Header.Magic = Read32 (L->F);
     if (O->Header.Magic != OBJ_MAGIC) {
-        Error ("Object file `%s' in library `%s' is invalid",
+        Error ("Object file '%s' in library '%s' is invalid",
                GetObjFileName (O), GetString (L->Name));
     }
     O->Header.Version = Read16 (L->F);
     if (O->Header.Version != OBJ_VERSION) {
-        Error ("Object file `%s' in library `%s' has wrong version",
+        Error ("Object file '%s' in library '%s' has wrong version",
                GetObjFileName (O), GetString (L->Name));
     }
     O->Header.Flags        = Read16 (L->F);

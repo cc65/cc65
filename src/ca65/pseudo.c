@@ -167,13 +167,13 @@ static void SetBoolOption (unsigned char* Flag)
         switch (GetSubKey (Keys, sizeof (Keys) / sizeof (Keys [0]))) {
             case 0:     *Flag = 0; NextTok ();                  break;
             case 1:     *Flag = 1; NextTok ();                  break;
-            default:    ErrorSkip ("`on' or `off' expected");   break;
+            default:    ErrorSkip ("'on' or 'off' expected");   break;
         }
     } else if (TokIsSep (CurTok.Tok)) {
         /* Without anything assume switch on */
         *Flag = 1;
     } else {
-        ErrorSkip ("`on' or `off' expected");
+        ErrorSkip ("'on' or 'off' expected");
     }
 }
 
@@ -574,7 +574,7 @@ static void DoByte (void)
 
     /* Record type information */
     Span* S = OpenSpan ();
-    StrBuf Type = STATIC_STRBUF_INITIALIZER;
+    StrBuf Type = AUTO_STRBUF_INITIALIZER;
 
     /* Parse arguments */
     while (1) {
@@ -598,9 +598,14 @@ static void DoByte (void)
         }
     }
 
-    /* Close the span, then add type information to it */
+    /* Close the span, then add type information to it.
+    ** Note: empty string operands emit nothing;
+    ** so, add a type only if there's a span.
+    */
     S = CloseSpan (S);
-    SetSpanType (S, GenArrayType (&Type, GetSpanSize (S), EType, sizeof (EType)));
+    if (S != 0) {
+        SetSpanType (S, GenArrayType (&Type, GetSpanSize (S), EType, sizeof (EType)));
+    }
 
     /* Free the type string */
     SB_Done (&Type);
@@ -1012,7 +1017,7 @@ static void DoFeature (void)
         /* Set the feature and check for errors */
         if (SetFeature (&CurTok.SVal) == FEAT_UNKNOWN) {
             /* Not found */
-            ErrorSkip ("Invalid feature: `%m%p'", &CurTok.SVal);
+            ErrorSkip ("Invalid feature: '%m%p'", &CurTok.SVal);
             return;
         } else {
             /* Skip the keyword */
@@ -1237,7 +1242,7 @@ static void DoIncBin (void)
         char* PathName = SearchFile (BinSearchPath, SB_GetConstBuf (&Name));
         if (PathName == 0 || (F = fopen (PathName, "rb")) == 0) {
             /* Not found or cannot open, print an error and bail out */
-            ErrorSkip ("Cannot open include file `%m%p': %s", &Name, strerror (errno));
+            ErrorSkip ("Cannot open include file '%m%p': %s", &Name, strerror (errno));
             xfree (PathName);
             goto ExitPoint;
         }
@@ -1263,7 +1268,7 @@ static void DoIncBin (void)
     */
     SB_Terminate (&Name);
     if (FileStat (SB_GetConstBuf (&Name), &StatBuf) != 0) {
-        Fatal ("Cannot stat input file `%m%p': %s", &Name, strerror (errno));
+        Fatal ("Cannot stat input file '%m%p': %s", &Name, strerror (errno));
     }
 
     /* Add the file to the input file table */
@@ -1300,7 +1305,7 @@ static void DoIncBin (void)
         size_t BytesRead = fread (Buf, 1, BytesToRead, F);
         if (BytesToRead != BytesRead) {
             /* Some sort of error */
-            ErrorSkip ("Cannot read from include file `%m%p': %s",
+            ErrorSkip ("Cannot read from include file '%m%p': %s",
                        &Name, strerror (errno));
             break;
         }
@@ -1891,7 +1896,7 @@ static void DoUnDef (void)
 static void DoUnexpected (void)
 /* Got an unexpected keyword */
 {
-    Error ("Unexpected `%m%p'", &Keyword);
+    Error ("Unexpected '%m%p'", &Keyword);
     SkipUntilSep ();
 }
 

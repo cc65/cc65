@@ -317,12 +317,12 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
                 /* Expect zp x indirect */
                 L = SkipSpace (L+1);
                 if (toupper (*L) != 'X') {
-                    Error ("ASM code error: `X' expected");
+                    Error ("ASM code error: 'X' expected");
                     return 0;
                 }
                 L = SkipSpace (L+1);
                 if (*L != ')') {
-                    Error ("ASM code error: `)' expected");
+                    Error ("ASM code error: ')' expected");
                     return 0;
                 }
                 L = SkipSpace (L+1);
@@ -337,7 +337,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
                 if (*L == ',') {
                     L = SkipSpace (L+1);
                     if (toupper (*L) != 'Y') {
-                        Error ("ASM code error: `Y' expected");
+                        Error ("ASM code error: 'Y' expected");
                         return 0;
                     }
                     L = SkipSpace (L+1);
@@ -378,7 +378,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
                     /* Check for subroutine call to local label */
                     if ((OPC->Info & OF_CALL) && IsLocalLabelName (Arg)) {
                         Error ("ASM code error: "
-                               "Cannot use local label `%s' in subroutine call",
+                               "Cannot use local label '%s' in subroutine call",
                                Arg);
                     }
                     AM = AM65_ABS;
@@ -532,7 +532,7 @@ void CS_AddVLine (CodeSeg* S, LineInfo* LI, const char* Format, va_list ap)
         case '.':
             /* Control instruction */
             ReadToken (L, " \t", Token, sizeof (Token));
-            Error ("ASM code error: Pseudo instruction `%s' not supported", Token);
+            Error ("ASM code error: Pseudo instruction '%s' not supported", Token);
             break;
 
         default:
@@ -780,7 +780,7 @@ CodeLabel* CS_AddLabel (CodeSeg* S, const char* Name)
     if (L) {
         /* We found it - be sure it does not already have an owner */
         if (L->Owner) {
-            Error ("ASM label `%s' is already defined", Name);
+            Error ("ASM label '%s' is already defined", Name);
             return L;
         }
     } else {
@@ -790,7 +790,7 @@ CodeLabel* CS_AddLabel (CodeSeg* S, const char* Name)
 
     /* Safety. This call is quite costly, but safety is better */
     if (CollIndex (&S->Labels, L) >= 0) {
-        Error ("ASM label `%s' is already defined", Name);
+        Error ("ASM label '%s' is already defined", Name);
         return L;
     }
 
@@ -906,7 +906,7 @@ void CS_MergeLabels (CodeSeg* S)
 
                 /* Print some debugging output */
                 if (Debug) {
-                    printf ("Removing unused global label `%s'", X->Name);
+                    printf ("Removing unused global label '%s'", X->Name);
                 }
 
                 /* And free the label */

@@ -134,7 +134,7 @@ typedef enum {
 typedef enum {
     AM65_IMP,                   /* implicit */
     AM65_ACC,                   /* accumulator */
-    AM65_IMM,                   /* immidiate */
+    AM65_IMM,                   /* immediate */
     AM65_ZP,                    /* zeropage */
     AM65_ZPX,                   /* zeropage,X */
     AM65_ZPY,                   /* zeropage,Y */

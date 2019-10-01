@@ -10,7 +10,7 @@
 
 
 .proc   CLOSE
-                     
+
         ldx     PET_DETECT
         cpx     #PET_4000
         bne     @L1
@@ -18,5 +18,4 @@
 @L1:    jmp     $F2AE           ; BASIC 2&3
 
 .endproc
-
 

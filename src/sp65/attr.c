@@ -160,7 +160,7 @@ const Attr* NeedAttr (const Collection* C, const char* Name, const char* Op)
     /* Search for the attribute and return it */
     unsigned Index;
     if (!FindAttr (C, Name, &Index)) {
-        Error ("Found no attribute named `%s' for operation %s", Name, Op);
+        Error ("Found no attribute named '%s' for operation %s", Name, Op);
     }
     return CollConstAt (C, Index);
 }
@@ -201,7 +201,7 @@ void AddAttr (Collection* C, const char* Name, const char* Value)
     */
     unsigned Index;
     if (FindAttr (C, Name, &Index)) {
-        Error ("Duplicate command line attribute `%s'", Name);
+        Error ("Duplicate command line attribute '%s'", Name);
     }
 
     /* Insert the attribute */
@@ -221,7 +221,7 @@ void SplitAddAttr (Collection* C, const char* Combined, const char* Name)
     if (Pos == 0) {
         /* Combined is actually a value */
         if (Name == 0) {
-            Error ("Command line attribute `%s' doesn't contain a name", Combined);
+            Error ("Command line attribute '%s' doesn't contain a name", Combined);
         }
         AddAttr (C, Name, Combined);
     } else {

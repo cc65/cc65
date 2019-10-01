@@ -167,7 +167,7 @@ loop:   .repeat 8
 
 ; Done
 
-done:   rts               
+done:   rts
 
 ; ------------------------------------------------------------------------
 ; COPYFROM: Copy from extended into linear memory. A pointer to a structure
@@ -178,7 +178,7 @@ done:   rts
 COPYFROM:
         sta     ptr3
         stx     ptr3+1                  ; Save the passed em_copy pointer
-                       
+
         ldy     #EM_COPY::OFFS
         lda     (ptr3),y
         sta     ptr1

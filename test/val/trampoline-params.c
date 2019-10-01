@@ -10,9 +10,9 @@
 static unsigned char flag;
 
 static void trampoline_set() {
-	asm("ldy tmp4");
-	asm("sty %v", flag);
-	asm("jsr callptr4");
+        asm("ldy tmp4");
+        asm("sty %v", flag);
+        asm("jsr callptr4");
 }
 
 #pragma wrapped-call(push, trampoline_set, 4)
@@ -21,12 +21,12 @@ long adder(long in);
 
 long adder(long in) {
 
-	return in + 7;
+        return in + 7;
 }
 
 int main() {
 
-	flag = 0;
+        flag = 0;
 
-	return adder(70436) == 70436 + 7 && flag == 4 ? 0 : 1;
+        return adder(70436) == 70436 + 7 && flag == 4 ? 0 : 1;
 }

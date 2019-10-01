@@ -102,7 +102,7 @@ static SymEntry* AsmGetSym (unsigned Arg, unsigned Type)
 
     /* Did we find a symbol with this name? */
     if (Sym == 0) {
-        Error ("Undefined symbol `%s' for argument %u", CurTok.Ident, Arg);
+        Error ("Undefined symbol '%s' for argument %u", CurTok.Ident, Arg);
         AsmErrorSkip ();
         return 0;
     }
@@ -238,7 +238,7 @@ static void ParseGVarArg (StrBuf* T, unsigned Arg)
     } else {
         /* Static variable */
         char Buf [16];
-        xsprintf (Buf, sizeof (Buf), "L%04X", Sym->V.Label);
+        xsprintf (Buf, sizeof (Buf), "L%04X", Sym->V.L.Label);
         SB_AppendStr (T, Buf);
     }
 }
@@ -293,7 +293,7 @@ static void ParseLabelArg (StrBuf* T, unsigned Arg attribute ((unused)))
         SymEntry* Entry = AddLabelSym (CurTok.Ident, SC_REF);
 
         /* Append the label name to the buffer */
-        SB_AppendStr (T, LocalLabelName (Entry->V.Label));
+        SB_AppendStr (T, LocalLabelName (Entry->V.L.Label));
 
         /* Eat the label name */
         NextToken ();

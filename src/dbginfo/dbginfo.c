@@ -2687,7 +2687,7 @@ static void NextToken (InputData* D)
             break;
 
         default:
-            ParseError (D, CC65_ERROR, "Invalid input character `%c'", D->C);
+            ParseError (D, CC65_ERROR, "Invalid input character '%c'", D->C);
 
     }
 }

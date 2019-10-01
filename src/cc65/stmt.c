@@ -115,7 +115,7 @@ static void CheckSemi (int* PendingToken)
 {
     int HaveToken = (CurTok.Tok == TOK_SEMI);
     if (!HaveToken) {
-        Error ("`;' expected");
+        Error ("';' expected");
         /* Try to be smart about errors */
         if (CurTok.Tok == TOK_COLON || CurTok.Tok == TOK_COMMA) {
             HaveToken = 1;
@@ -231,7 +231,7 @@ static void DoStatement (void)
     g_defcodelabel (ContinueLabel);
 
     /* Parse the end condition */
-    Consume (TOK_WHILE, "`while' expected");
+    Consume (TOK_WHILE, "'while' expected");
     TestInParens (LoopLabel, 1);
     ConsumeSemi ();
 
@@ -332,7 +332,7 @@ static void ReturnStatement (void)
         }
 
     } else if (!F_HasVoidReturn (CurrentFunc) && !F_HasOldStyleIntRet (CurrentFunc)) {
-        Error ("Function `%s' must return a value", F_GetFuncName (CurrentFunc));
+        Error ("Function '%s' must return a value", F_GetFuncName (CurrentFunc));
     }
 
     /* Mark the function as having a return statement */
@@ -361,7 +361,7 @@ static void BreakStatement (void)
     /* Check if we are inside a loop */
     if (L == 0) {
         /* Error: No current loop */
-        Error ("`break' statement not within loop or switch");
+        Error ("'break' statement not within loop or switch");
         return;
     }
 
@@ -396,7 +396,7 @@ static void ContinueStatement (void)
 
     /* Did we find it? */
     if (L == 0) {
-        Error ("`continue' statement not within a loop");
+        Error ("'continue' statement not within a loop");
         return;
     }
 
@@ -513,6 +513,7 @@ static int CompoundStatement (void)
 
     /* Remember the stack at block entry */
     int OldStack = StackPtr;
+    unsigned OldBlockStackSize = CollCount (&CurrentFunc->LocalsBlockStack);
 
     /* Enter a new lexical level */
     EnterBlockLevel ();
@@ -534,6 +535,14 @@ static int CompoundStatement (void)
     if (!GotBreak) {
         g_space (StackPtr - OldStack);
     }
+
+    /* If the segment had autoinited variables, let's pop it of a stack
+    ** of such blocks.
+    */
+    if (OldBlockStackSize != CollCount (&CurrentFunc->LocalsBlockStack)) {
+        CollPop (&CurrentFunc->LocalsBlockStack);
+    }
+
     StackPtr = OldStack;
 
     /* Emit references to imports/exports for this block */
@@ -582,7 +591,7 @@ int Statement (int* PendingToken)
         case TOK_LCURLY:
             NextToken ();
             GotBreak = CompoundStatement ();
-            CheckTok (TOK_RCURLY, "`{' expected", PendingToken);
+            CheckTok (TOK_RCURLY, "'{' expected", PendingToken);
             return GotBreak;
 
         case TOK_IF:

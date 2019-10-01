@@ -89,7 +89,7 @@ static unsigned GetBytesPerLine (const Collection* A)
     const char* V = GetAttrVal (A, "bytesperline");
     if ((V && sscanf (V, "%u%c", &BytesPerLine, &C) != 1) ||
         (BytesPerLine < 1 || BytesPerLine > 64)) {
-        Error ("Invalid value for attribute `bytesperline'");
+        Error ("Invalid value for attribute 'bytesperline'");
     }
     return BytesPerLine;
 }
@@ -106,7 +106,7 @@ static unsigned GetBase (const Collection* A)
     const char* V = GetAttrVal (A, "base");
     if ((V && sscanf (V, "%u%c", &Base, &C) != 1) ||
         (Base != 2 && Base != 10 && Base != 16)) {
-        Error ("Invalid value for attribute `base'");
+        Error ("Invalid value for attribute 'base'");
     }
     return Base;
 }
@@ -119,7 +119,7 @@ static const char* GetIdentifier (const Collection* A)
     /* Check for a ident attribute */
     const char* Ident = GetAttrVal (A, "ident");
     if (Ident && !ValidIdentifier (Ident)) {
-        Error ("Invalid value for attribute `ident'");
+        Error ("Invalid value for attribute 'ident'");
     }
     return Ident;
 }
@@ -152,7 +152,7 @@ void WriteAsmFile (const StrBuf* Data, const Collection* A, const Bitmap* B)
     /* Open the output file */
     F = fopen (Name, "w");
     if (F == 0) {
-        Error ("Cannot open output file `%s': %s", Name, strerror (errno));
+        Error ("Cannot open output file '%s': %s", Name, strerror (errno));
     }
 
     /* Write a readable header */
@@ -235,6 +235,6 @@ void WriteAsmFile (const StrBuf* Data, const Collection* A, const Bitmap* B)
 
     /* Close the file */
     if (fclose (F) != 0) {
-        Error ("Error closing output file `%s': %s", Name, strerror (errno));
+        Error ("Error closing output file '%s': %s", Name, strerror (errno));
     }
 }

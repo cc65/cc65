@@ -38,14 +38,6 @@ KBDREPEATRATE   := $28b
 KBDREPEATDELAY  := $28c
 
 ; ---------------------------------------------------------------------------
-; Kernal routines
-
-; Direct entries
-CLRSCR          := $E544
-KBDREAD         := $E5B4
-NMIEXIT         := $FEBC
-
-; ---------------------------------------------------------------------------
 ; Vector and other locations
 
 IRQVec          := $0314

@@ -7,7 +7,7 @@
 **
 ** Compile with "-DSTATIC_MOUSE" to statically link all available drivers.
 ** Compile with "-DMOUSE_DRIVER=<driver_sym>" to statically link the given driver.
-**     E.g., -DMOUSE_DRIVER=atrsts_mou to just link with the Atari ST mouse driver.
+**     E.g., -DMOUSE_DRIVER=atrst_mou to just link with the Atari ST mouse driver.
 */
 
 

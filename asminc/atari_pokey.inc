@@ -41,4 +41,3 @@ POTGO   = POKEY + $0B         ;start potentiometer scan sequence
 SEROUT  = POKEY + $0D         ;serial port output
 IRQEN   = POKEY + $0E         ;IRQ interrupt enable
 SKCTL   = POKEY + $0F         ;serial port and keyboard control
-

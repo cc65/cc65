@@ -406,6 +406,9 @@ void g_truejump (unsigned flags, unsigned label);
 void g_falsejump (unsigned flags, unsigned label);
 /* Jump to label if zero flag set */
 
+void g_lateadjustSP (unsigned label);
+/* Adjust stack based on non-immediate data */
+
 void g_drop (unsigned Space);
 /* Drop space allocated on the stack */
 

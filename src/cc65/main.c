@@ -160,7 +160,7 @@ static void SetSys (const char* Sys)
             break;
 
         case TGT_MODULE:
-            AbEnd ("Cannot use `module' as a target for the compiler");
+            AbEnd ("Cannot use 'module' as a target for the compiler");
             break;
 
         case TGT_ATARI2600:
@@ -256,7 +256,7 @@ static void SetSys (const char* Sys)
         case TGT_TELESTRAT:
             DefineNumericMacro ("__TELESTRAT__", 1);
             break;
-                                
+
         case TGT_NES:
             DefineNumericMacro ("__NES__", 1);
             break;
@@ -300,7 +300,11 @@ static void FileNameOption (const char* Opt, const char* Arg, StrBuf* Name)
 {
     /* Cannot have the option twice */
     if (SB_NotEmpty (Name)) {
-        AbEnd ("Cannot use option `%s' twice", Opt);
+        AbEnd ("Cannot use option '%s' twice", Opt);
+    }
+    /* A typo in OptTab[] might allow a NULL Arg */
+    if (Arg == 0) {
+        Internal ("Typo in OptTab[]; option '%s' should require an argument", Opt);
     }
     /* Remember the file name for later */
     SB_CopyStr (Name, Arg);
@@ -358,7 +362,7 @@ static void CheckSegName (const char* Seg)
 {
     /* Print an error and abort if the name is not ok */
     if (!ValidSegName (Seg)) {
-        AbEnd ("Segment name `%s' is invalid", Seg);
+        AbEnd ("Segment name '%s' is invalid", Seg);
     }
 }
 
@@ -455,7 +459,7 @@ static void OptCPU (const char* Opt, const char* Arg)
     CPU = FindCPU (Arg);
     if (CPU != CPU_6502 && CPU != CPU_6502X && CPU != CPU_65SC02 &&
         CPU != CPU_65C02 && CPU != CPU_65816 && CPU != CPU_HUC6280) {
-        AbEnd ("Invalid argument for %s: `%s'", Opt, Arg);
+        AbEnd ("Invalid argument for %s: '%s'", Opt, Arg);
     }
 }
 
@@ -500,7 +504,7 @@ static void OptDebugOpt (const char* Opt attribute ((unused)), const char* Arg)
     /* Open the file */
     FILE* F = fopen (Arg, "r");
     if (F == 0) {
-        AbEnd ("Cannot open `%s': %s", Arg, strerror (errno));
+        AbEnd ("Cannot open '%s': %s", Arg, strerror (errno));
     }
 
     /* Read line by line, ignore empty lines and switch optimization
@@ -558,7 +562,7 @@ static void OptDebugOpt (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
-static void OptDebugOptOutput (const char* Opt attribute ((unused)), 
+static void OptDebugOptOutput (const char* Opt attribute ((unused)),
                                const char* Arg attribute ((unused)))
 /* Output optimization steps */
 {
@@ -671,7 +675,7 @@ static void OptMemoryModel (const char* Opt, const char* Arg)
 
     /* Check the current memory model */
     if (MemoryModel != MMODEL_UNKNOWN) {
-        AbEnd ("Cannot use option `%s' twice", Opt);
+        AbEnd ("Cannot use option '%s' twice", Opt);
     }
 
     /* Translate the memory model name and check it */
@@ -735,7 +739,7 @@ static void OptStandard (const char* Opt, const char* Arg)
     /* Find the standard from the given name */
     standard_t Std = FindStandard (Arg);
     if (Std == STD_UNKNOWN) {
-        AbEnd ("Invalid argument for %s: `%s'", Opt, Arg);
+        AbEnd ("Invalid argument for %s: '%s'", Opt, Arg);
     } else if (IS_Get (&Standard) != STD_UNKNOWN) {
         AbEnd ("Option %s given more than once", Opt);
     } else {
@@ -1065,7 +1069,7 @@ int main (int argc, char* argv[])
 
         /* Write the output to the file */
         WriteAsmOutput ();
-        Print (stdout, 1, "Wrote output to `%s'\n", OutputFilename);
+        Print (stdout, 1, "Wrote output to '%s'\n", OutputFilename);
 
         /* Close the file, check for errors */
         CloseOutputFile ();

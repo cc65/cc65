@@ -356,7 +356,7 @@ static int BoolKeyword (StrBuf* Ident)
     }
 
     /* Error */
-    Error ("Pragma argument must be one of `on', `off', `true' or `false'");
+    Error ("Pragma argument must be one of 'on', 'off', 'true' or 'false'");
     return 0;
 }
 
@@ -453,7 +453,7 @@ static void SegNamePragma (StrBuf* B, segment_t Seg)
     } else {
 
         /* Segment name is invalid */
-        Error ("Illegal segment name: `%s'", Name);
+        Error ("Illegal segment name: '%s'", Name);
 
     }
 
@@ -788,7 +788,7 @@ static void ParsePragma (void)
         ** for unknown pragmas, but warn about them if enabled (the default).
         */
         if (IS_Get (&WarnUnknownPragma)) {
-            Warning ("Unknown pragma `%s'", SB_GetConstBuf (&Ident));
+            Warning ("Unknown pragma '%s'", SB_GetConstBuf (&Ident));
         }
         goto ExitPoint;
     }
@@ -898,9 +898,9 @@ static void ParsePragma (void)
             FlagPragma (&B, &StaticLocals);
             break;
 
-	case PRAGMA_WRAPPED_CALL:
-	    WrappedCallPragma(&B);
-	    break;
+        case PRAGMA_WRAPPED_CALL:
+            WrappedCallPragma(&B);
+            break;
 
         case PRAGMA_WARN:
             WarnPragma (&B);

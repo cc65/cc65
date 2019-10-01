@@ -7,6 +7,7 @@
         .export         _cgetc
         .import         cursor
 
+        .include        "cbm_kernal.inc"
         .include        "plus4.inc"
 
 ; --------------------------------------------------------------------------

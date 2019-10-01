@@ -52,7 +52,7 @@ compare_char_to_lits1 (void)
     failures++;
 }
 
-/* achar0 should be `5' */
+/* achar0 should be '5' */
 void
 compare_char_to_lits2 (void)
 {
@@ -106,7 +106,7 @@ compare_int_to_lits1 (void)
     failures++;
 }
 
-/* aint0 should be `5' */
+/* aint0 should be '5' */
 void
 compare_int_to_lits2 (void)
 {
@@ -123,7 +123,7 @@ compare_int_to_lits2 (void)
     failures++;
 }
 
-/* aint0 should be `0x1234' */
+/* aint0 should be '0x1234' */
 void
 compare_int_to_lits3 (void)
 {

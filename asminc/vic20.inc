@@ -42,13 +42,6 @@ XSIZE           = 22
 YSIZE           = 23
 
 ; ---------------------------------------------------------------------------
-; Kernal routines
-
-; Direct entries
-CLRSCR          := $E55F
-KBDREAD         := $E5CF
-
-; ---------------------------------------------------------------------------
 ; Vector and other locations
 
 IRQVec          := $0314
@@ -59,9 +52,25 @@ NMIVec          := $0318
 ; I/O: 6560 VIC
 
 VIC             := $9000
-VIC_LINES       := $9003        ; Screen lines, bit 7 is bit 0 from VIC_HLINE
-VIC_HLINE       := $9004        ; Rasterline, bits 1-8
-VIC_COLOR       := $900F        ; Border and background color
+VIC_CR0         := VIC+$0
+VIC_CR1         := VIC+$1
+VIC_CR2         := VIC+$2
+VIC_CR3         := VIC+$3
+VIC_LINES       := VIC+$3       ; Screen lines, bit 7 is bit 0 from VIC_HLINE
+VIC_CR4         := VIC+$4
+VIC_HLINE       := VIC+$4       ; Rasterline, bits 1-8
+VIC_CR5         := VIC+$5
+VIC_CR6         := VIC+$6
+VIC_CR7         := VIC+$7
+VIC_CR8         := VIC+$8
+VIC_CR9         := VIC+$9
+VIC_CRA         := VIC+$A
+VIC_CRB         := VIC+$B
+VIC_CRC         := VIC+$C
+VIC_CRD         := VIC+$D
+VIC_CRE         := VIC+$E
+VIC_CRF         := VIC+$F
+VIC_COLOR       := VIC+$F       ; Border and background color
 
 ; ---------------------------------------------------------------------------
 ; I/O: 6522 VIA1

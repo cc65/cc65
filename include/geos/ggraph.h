@@ -45,6 +45,10 @@ void __fastcall__ BitOtherClip(void *proc1, void *proc2, char skipl,
 
 void __fastcall__ GraphicsString(char *myGfxString);
 
+#ifdef __GEOS_CBM__
+void SetNewMode(void);
+#endif
+
 /* VIC colour constants */
 #define BLACK           0
 #define WHITE           1

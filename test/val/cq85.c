@@ -118,10 +118,10 @@ int s85(struct defs *pd0){
      #ifdef NO_FLOATS
      "signed",
      "signed",
-	 #else
+         #else
      "float",
      "double"
-	 #endif
+         #endif
    };
 
    static char aln[] = " alignment: ";
@@ -205,12 +205,12 @@ int s85(struct defs *pd0){
        if(pd0->flgm != 0) printf("Sign extension in fields\n");
      }
      else{
-   	   #ifdef NO_BITFIELDS
-       		if(pd0->flgd != 0) printf("NO_BITFIELDS\n");
-	   #else
-       		if(pd0->flgd != 0) printf(s85er,2);
-       		rc = rc+2;
-	   #endif
+           #ifdef NO_BITFIELDS
+                if(pd0->flgd != 0) printf("NO_BITFIELDS\n");
+           #else
+                if(pd0->flgd != 0) printf(s85er,2);
+                rc = rc+2;
+           #endif
      }
    }
 
@@ -268,9 +268,9 @@ int one();
 *********************************************************************************************/
 
 #ifndef NO_TYPELESS_STRUCT_PTR
-	int section(int j,struct* pd0){
+        int section(int j,struct* pd0){
 #else
-	int section(int j,void* pd0){
+        int section(int j,void* pd0){
 #endif
         switch(j){
                 case 0: return s85(pd0);
@@ -294,7 +294,7 @@ int main(int n,char **args) {
 
 int j;
 static struct defs d0, *pd0;
-	
+        
    d0.flgs = 1;          /* These flags dictate            */
    d0.flgm = 1;          /*     the verbosity of           */
    d0.flgd = 1;          /*         the program.           */

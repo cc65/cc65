@@ -102,9 +102,9 @@ void OpenOutputFile ()
     /* Open the file */
     OutputFile = fopen (OutputFilename, "w");
     if (OutputFile == 0) {
-        Fatal ("Cannot open output file `%s': %s", OutputFilename, strerror (errno));
+        Fatal ("Cannot open output file '%s': %s", OutputFilename, strerror (errno));
     }
-    Print (stdout, 1, "Opened output file `%s'\n", OutputFilename);
+    Print (stdout, 1, "Opened output file '%s'\n", OutputFilename);
 }
 
 
@@ -120,9 +120,9 @@ void OpenDebugOutputFile (const char* Name)
     /* Open the file */
     OutputFile = fopen (Name, "w");
     if (OutputFile == 0) {
-        Fatal ("Cannot open debug output file `%s': %s", Name, strerror (errno));
+        Fatal ("Cannot open debug output file '%s': %s", Name, strerror (errno));
     }
-    Print (stdout, 1, "Opened debug output file `%s'\n", Name);
+    Print (stdout, 1, "Opened debug output file '%s'\n", Name);
 }
 
 
@@ -138,7 +138,7 @@ void CloseOutputFile ()
         remove (OutputFilename);
         Fatal ("Cannot write to output file (disk full?)");
     }
-    Print (stdout, 1, "Closed output file `%s'\n", OutputFilename);
+    Print (stdout, 1, "Closed output file '%s'\n", OutputFilename);
 
     OutputFile = 0;
 }

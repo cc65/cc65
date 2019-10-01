@@ -52,6 +52,7 @@
 #include "standard.h"
 #include "symtab.h"
 #include "typeconv.h"
+#include "input.h"
 
 
 
@@ -142,7 +143,7 @@ static void ParseRegisterDecl (Declaration* Decl, int Reg)
             ** we cannot allow that here.
             */
             if (ParseInit (Sym->Type) != Size) {
-                Error ("Cannot initialize flexible array members of storage class `register'");
+                Error ("Cannot initialize flexible array members of storage class 'register'");
             }
 
             /* Generate code to copy this data into the variable space */
@@ -170,7 +171,7 @@ static void ParseRegisterDecl (Declaration* Decl, int Reg)
 
     /* Cannot allocate a variable of zero size */
     if (Size == 0) {
-        Error ("Variable `%s' has unknown size", Decl->Ident);
+        Error ("Variable '%s' has unknown size", Decl->Ident);
     }
 }
 
@@ -270,6 +271,13 @@ static void ParseAutoDecl (Declaration* Decl)
             /* Mark the variable as referenced */
             Sym->Flags |= SC_REF;
 
+            /* Make note of auto variables initialized in current block.
+            ** We abuse the Collection somewhat by using it to store line
+            ** numbers.
+            */
+            CollReplace (&CurrentFunc->LocalsBlockStack, (void *)(long)GetCurrentLine (),
+                CollCount (&CurrentFunc->LocalsBlockStack) - 1);
+
         } else {
             /* Non-initialized local variable. Just keep track of
             ** the space needed.
@@ -348,7 +356,7 @@ static void ParseAutoDecl (Declaration* Decl)
 
     /* Cannot allocate a variable of zero size */
     if (Size == 0) {
-        Error ("Variable `%s' has unknown size", Decl->Ident);
+        Error ("Variable '%s' has unknown size", Decl->Ident);
     }
 }
 
@@ -402,7 +410,7 @@ static void ParseStaticDecl (Declaration* Decl)
 
     /* Cannot allocate a variable of zero size */
     if (Size == 0) {
-        Error ("Variable `%s' has unknown size", Decl->Ident);
+        Error ("Variable '%s' has unknown size", Decl->Ident);
     }
 }
 
@@ -489,6 +497,9 @@ void DeclareLocals (void)
     /* Remember the current stack pointer */
     int InitialStack = StackPtr;
 
+    /* A place to store info about potential initializations of auto variables */
+    CollAppend (&CurrentFunc->LocalsBlockStack, 0);
+
     /* Loop until we don't find any more variables */
     while (1) {
 
@@ -537,6 +548,11 @@ void DeclareLocals (void)
 
     /* Be sure to allocate any reserved space for locals */
     F_AllocLocalSpace (CurrentFunc);
+
+    /* No auto variables were inited. No new block on the stack then. */
+    if (CollLast (&CurrentFunc->LocalsBlockStack) == NULL) {
+        CollPop (&CurrentFunc->LocalsBlockStack);
+    }
 
     /* In case we've allocated local variables in this block, emit a call to
     ** the stack checking routine if stack checks are enabled.

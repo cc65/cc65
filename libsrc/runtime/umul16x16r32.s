@@ -42,11 +42,11 @@ umul16x16r16m:
 
         clc
         adc     ptr3
-        pha
+        tax
         lda     ptr3+1
         adc     sreg+1
         sta     sreg+1
-        pla
+        txa
 
 @L1:    ror     sreg+1
         ror     a

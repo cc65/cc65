@@ -1062,7 +1062,7 @@ SndSetValues:
                 ldx #4-1
 set0:                ldy SndOffsets,x
                   lda SndChannel+2,y
-                  _IFNE                        ; flag == 0 => don`t set
+                  _IFNE                        ; flag == 0 => don't set
 
             bit #$80
                     _IFNE                       ;

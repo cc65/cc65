@@ -103,6 +103,7 @@ extern target_t         Target;
 #define BINFMT_DEFAULT          0       /* Default (binary) */
 #define BINFMT_BINARY           1       /* Straight binary format */
 #define BINFMT_O65              2       /* Andre Fachats o65 format */
+#define BINFMT_ATARIEXE         3       /* Standard Atari binary load */
 
 
 

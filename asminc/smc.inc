@@ -63,7 +63,7 @@ _SMCDesignator: statement
         ldy #opcode
         sty _SMCDesignator
 .else
-	.error "Invalid usage of macro 'SMC_TransferOpcode'"
+        .error "Invalid usage of macro 'SMC_TransferOpcode'"
 .endif
 .endmacro
 
@@ -75,7 +75,7 @@ _SMCDesignator: statement
 .elseif .match ({register}, y)
         ldy _SMCDesignator
 .else
-	.error "Invalid usage of macro 'SMC_LoadOpcode'"
+        .error "Invalid usage of macro 'SMC_LoadOpcode'"
 .endif
 .endmacro
 
@@ -87,7 +87,7 @@ _SMCDesignator: statement
 .elseif .match ({register}, y)
         sty _SMCDesignator
 .else
-	.error "Invalid usage of macro 'SMC_StoreOpcode'"
+        .error "Invalid usage of macro 'SMC_StoreOpcode'"
 .endif
 .endmacro
 
@@ -102,7 +102,7 @@ _SMCDesignator: statement
         ldy #(<(destination - _SMCDesignator - 2))
         sty _SMCDesignator+1
 .else
-	.error "Invalid usage of macro 'SMC_ChangeBranch'"
+        .error "Invalid usage of macro 'SMC_ChangeBranch'"
 .endif
 .endmacro
 
@@ -117,7 +117,7 @@ _SMCDesignator: statement
         ldy value
         sty _SMCDesignator+1
 .else
-	.error "Invalid usage of macro 'SMC_TransferValue'"
+        .error "Invalid usage of macro 'SMC_TransferValue'"
 .endif
 .endmacro
 
@@ -129,7 +129,7 @@ _SMCDesignator: statement
 .elseif .match ({register}, y)
         ldy _SMCDesignator+1
 .else
-	.error "Invalid usage of macro 'SMC_LoadValue'"
+        .error "Invalid usage of macro 'SMC_LoadValue'"
 .endif
 .endmacro
 
@@ -141,7 +141,7 @@ _SMCDesignator: statement
 .elseif .match ({register}, y)
         sty _SMCDesignator+1
 .else
-	.error "Invalid usage of macro 'SMC_StoreValue'"
+        .error "Invalid usage of macro 'SMC_StoreValue'"
 .endif
 .endmacro
 
@@ -169,7 +169,7 @@ SMC_StoreValue label, register
         ldy value
         sty _SMCDesignator+2
 .else
-	.error "Invalid usage of macro 'SMC_TransferHighByte'"
+        .error "Invalid usage of macro 'SMC_TransferHighByte'"
 .endif
 .endmacro
 
@@ -181,7 +181,7 @@ SMC_StoreValue label, register
 .elseif .match ({register}, y)
         ldy _SMCDesignator+2
 .else
-	.error "Invalid usage of macro 'SMC_LoadHighByte'"
+        .error "Invalid usage of macro 'SMC_LoadHighByte'"
 .endif
 .endmacro
 
@@ -193,7 +193,7 @@ SMC_StoreValue label, register
 .elseif .match ({register}, y)
         sty _SMCDesignator+2
 .else
-	.error "Invalid usage of macro 'SMC_StoreHighByte'"
+        .error "Invalid usage of macro 'SMC_StoreHighByte'"
 .endif
 .endmacro
 
@@ -241,7 +241,7 @@ SMC_StoreValue label, register
                 sty _SMCDesignator+2
         .endif
 .else
-	.error "Invalid usage of macro 'SMC_TransferAddressSingle'"
+        .error "Invalid usage of macro 'SMC_TransferAddressSingle'"
 .endif
 .endmacro
 

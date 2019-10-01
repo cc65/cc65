@@ -195,6 +195,8 @@ chk_supp:
         lda     __dos_type
         cmp     #SPARTADOS
         beq     :+
+        cmp     #BWDOS
+        beq     :+
         cmp     #REALDOS
         bne     ns1
 :       txa

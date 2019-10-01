@@ -36,13 +36,33 @@
 #ifndef FUNCTION_H
 #define FUNCTION_H
 
-
+#include "coll.h"
 
 /*****************************************************************************/
-/*                                   data                                    */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
+/* Enumeration for function flags */
+typedef enum {
+    FF_NONE             = 0x0000,
+    FF_HAS_RETURN       = 0x0001,       /* Function has a return statement */
+    FF_IS_MAIN          = 0x0002,       /* This is the main function */
+    FF_VOID_RETURN      = 0x0004,       /* Function returning void */
+} funcflags_t;
+
+/* Structure that holds all data needed for function activation */
+struct Function {
+    struct SymEntry*    FuncEntry;        /* Symbol table entry */
+    Type*               ReturnType;       /* Function return type */
+    FuncDesc*           Desc;             /* Function descriptor */
+    int                 Reserved;         /* Reserved local space */
+    unsigned            RetLab;           /* Return code label */
+    int                 TopLevelSP;       /* SP at function top level */
+    unsigned            RegOffs;          /* Register variable space offset */
+    funcflags_t         Flags;            /* Function flags */
+    Collection          LocalsBlockStack; /* Stack of blocks with local vars */
+};
 
 /* Structure that holds all data needed for function activation */
 typedef struct Function Function;

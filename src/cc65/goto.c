@@ -61,10 +61,10 @@ void GotoStatement (void)
     } else {
 
         /* Add a new label symbol if we don't have one until now */
-        SymEntry* Entry = AddLabelSym (CurTok.Ident, SC_REF);
+        SymEntry* Entry = AddLabelSym (CurTok.Ident, SC_REF | SC_GOTO);
 
         /* Jump to the label */
-        g_jump (Entry->V.Label);
+        g_jump (Entry->V.L.Label);
     }
 
     /* Eat the label name */
@@ -80,7 +80,7 @@ void DoLabel (void)
     SymEntry* Entry = AddLabelSym (CurTok.Ident, SC_DEF);
 
     /* Emit the jump label */
-    g_defcodelabel (Entry->V.Label);
+    g_defcodelabel (Entry->V.L.Label);
 
     /* Eat the ident and colon */
     NextToken ();

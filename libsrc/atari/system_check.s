@@ -16,8 +16,7 @@
 
 ;DEBUG   =       1
 
-        .export         __SYSTEM_CHECK__: absolute = 1
-        .import         __SYSCHK_LOAD__
+        .export         __SYSTEM_CHECK__, __SYSCHK_END__
         .import         __STARTADDRESS__
 
         ; the following imports are only needed for the 'atari' target version
@@ -25,9 +24,11 @@
         .import         __STACKSIZE__
         .import         __RESERVED_MEMORY__
 
+        ; import our header and trailers
+        .forceimport    __SYSCHKHDR__, __SYSCHKTRL__
+
         .include        "zeropage.inc"
         .include        "atari.inc"
-
 
 .macro print_string text
         .local  start, cont
@@ -77,7 +78,16 @@ cont:   ldx     #0              ; channel 0
 sdcheck:lda     DOS
         cmp     #'S'
         bne     sdcrts0         ; not SpartaDOS, assume RAM is not used
-        lda     DOS+1           ; SD version
+
+; check for BW-DOS, which always reports itself as SpartaDOS, but doesn't use memory under the ROM
+        lda     DOS+3           ; 'B' in BW-DOS
+        cmp     #'B'
+        bne     sdnobw
+        lda     DOS+4           ; 'W' in BW-DOS
+        cmp     #'W'
+        beq     sdcrts0         ; BW-DOS does not use RAM below ROM
+
+sdnobw: lda     DOS+1           ; SD version
         cmp     #$40            ; SD-X has $40 or higher
         bcc     sdcrts1         ; older versions (except maybe 1.x) always use the RAM under the ROM
         ldy     #31             ; offset for OSRMFLG
@@ -220,25 +230,10 @@ delay1: ldx     #0
 
 .endproc
 
-end:
+__SYSTEM_CHECK__=syschk
+__SYSCHK_END__:
 
 .ifndef __ATARIXL__
 tmp:            ; outside of the load chunk, some kind of poor man's .bss
 .endif
 
-; ------------------------------------------------------------------------
-; Chunk header
-
-.segment        "SYSCHKHDR"
-
-        .word   __SYSCHK_LOAD__
-        .word   end - 1
-
-; ------------------------------------------------------------------------
-; Chunk "trailer" - sets INITAD
-
-.segment        "SYSCHKTRL"
-
-        .word   INITAD
-        .word   INITAD+1
-        .word   syschk

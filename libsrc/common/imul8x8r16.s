@@ -5,7 +5,7 @@
 ; CC65 library: 8x8 => 16 signed multiplication
 ;
 
-        .export         _cc65_imul8x8r16
+        .export         _imul8x8r16
         .import         imul8x8r16, popa, ptr1:zp
 
 
@@ -13,7 +13,7 @@
 ; 8x8 => 16 signed multiplication routine.
 
 
-.proc   _cc65_imul8x8r16
+.proc   _imul8x8r16
 
         sta     ptr1
         jsr     popa

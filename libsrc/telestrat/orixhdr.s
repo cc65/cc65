@@ -9,7 +9,7 @@
 
     ; These symbols, also, come from the configuration file.
     .import __AUTORUN__, __PROGFLAG__
-    .import __BASHEAD_START__, __MAIN_LAST__
+    .import __MAIN_START__, __MAIN_LAST__
 
 
 ; ------------------------------------------------------------------------
@@ -17,19 +17,19 @@
 
 .segment        "ORIXHDR"
 
-    .byte   $01, $00                ; non C64 marker (same as o65 format)
+    .byte   $01, $00                ; Non C64 marker (same as o65 format)
 
-    .byte   "ori"                   ; magic number
+    .byte   "ori"                   ; Magic number
 
-    .byte   $01                     ; version of the header
+    .byte   $01                     ; Version of the header
     .byte   $00,%00000000           ; 6502 only
-    .byte   $00,$00                 ; type of language
+    .byte   $00,$00                 ; Type of language
     .byte   $00,$00                 ; OS version 
 
-    .byte   $00                     ;  reserved
-    .byte   $00                     ;  auto or not
+    .byte   $00                     ; Reserved
+    .byte   $00                     ; Auto or not
 
-    .word   __BASHEAD_START__       ; Address of start of file
-    .word   __MAIN_LAST__ - 1       ;  Address of end of file
-    .word   __BASHEAD_START__       ;  Address of start of file
+    .word   __MAIN_START__          ; Address of start of file
+    .word   __MAIN_LAST__ - 1       ; Address of end of file
+    .word   __MAIN_START__          ; Address of start of file
 

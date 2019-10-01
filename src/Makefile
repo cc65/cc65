@@ -107,7 +107,7 @@ $(RM) /usr/local/bin/$(prog)
 endef # UNAVAIL_recipe
 
 install:
-	$(if $(PREFIX),,$(error variable `PREFIX' must be set))
+	$(if $(PREFIX),,$(error variable "PREFIX" must be set))
 	$(INSTALL) -d $(DESTDIR)$(bindir)
 	$(INSTALL) ../bin/* $(DESTDIR)$(bindir)
 

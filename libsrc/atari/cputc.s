@@ -1,5 +1,5 @@
 ;
-; Mark Keates, Christian Groessler
+; Mark Keates, Christian Groessler, Piotr Fusik
 ;
 ; void cputcxy (unsigned char x, unsigned char y, char c);
 ; void cputc (char c);
@@ -7,7 +7,7 @@
 
         .export         _cputcxy, _cputc
         .export         plot, cputdirect, putchar
-        .import         gotoxy, mul40
+        .import         gotoxy, _mul40
         .importzp       tmp4,ptr4
         .import         _revflag,setcursor
 
@@ -30,16 +30,13 @@ L4:     cmp     #$0A            ; LF
         cmp     #ATEOL          ; Atari-EOL?
         beq     newline
 
-        tay
-        rol     a
-        rol     a
-        rol     a
-        rol     a
-        and     #3
-        tax
-        tya
-        and     #$9f
-        ora     ataint,x
+        asl     a               ; shift out the inverse bit
+        adc     #$c0            ; grab the inverse bit; convert ATASCII to screen code
+        bpl     codeok          ; screen code ok?
+        eor     #$40            ; needs correction
+codeok: lsr     a               ; undo the shift
+        bcc     cputdirect
+        eor     #$80            ; restore the inverse bit
 
 cputdirect:                     ; accepts screen code
         jsr     putchar
@@ -74,8 +71,7 @@ putchar:
         sta     (OLDADR),y
 
         lda     ROWCRS
-        jsr     mul40           ; destroys tmp4
-        clc
+        jsr     _mul40          ; destroys tmp4, carry is cleared
         adc     SAVMSC          ; add start of screen memory
         sta     ptr4
         txa
@@ -89,6 +85,3 @@ putchar:
         ldy     COLCRS
         sta     (ptr4),y
         jmp     setcursor
-
-        .rodata
-ataint: .byte   64,0,32,96

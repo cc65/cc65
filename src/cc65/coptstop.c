@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2013, Ullrich von Bassewitz                                      */
+/* (C) 2001-2019, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -122,7 +122,7 @@ struct StackOpData {
     const OptFuncDesc*  OptFunc;
 
     /* ZP register usage inside the sequence */
-    unsigned            UsedRegs;
+    unsigned            ZPUsage;
 
     /* Register load information for lhs and rhs */
     LoadInfo            Lhs;
@@ -1771,7 +1771,7 @@ static void ResetStackOpData (StackOpData* Data)
 /* Reset the given data structure */
 {
     Data->OptFunc       = 0;
-    Data->UsedRegs      = REG_NONE;
+    Data->ZPUsage       = REG_NONE;
 
     ClearLoadInfo (&Data->Lhs);
     ClearLoadInfo (&Data->Rhs);
@@ -1832,14 +1832,16 @@ static int PreCondOk (StackOpData* D)
         return 0;
     }
 
-    /* Determine the zero page locations to use */
-    if ((D->UsedRegs & REG_PTR1) == REG_NONE) {
+    /* Determine the zero page locations to use. We've tracked the used
+    ** ZP locations, so try to find some for us that are unused.
+    */
+    if ((D->ZPUsage & REG_PTR1) == REG_NONE) {
         D->ZPLo = "ptr1";
         D->ZPHi = "ptr1+1";
-    } else if ((D->UsedRegs & REG_SREG) == REG_NONE) {
+    } else if ((D->ZPUsage & REG_SREG) == REG_NONE) {
         D->ZPLo = "sreg";
         D->ZPHi = "sreg+1";
-    } else if ((D->UsedRegs & REG_PTR2) == REG_NONE) {
+    } else if ((D->ZPUsage & REG_PTR2) == REG_NONE) {
         D->ZPLo = "ptr2";
         D->ZPHi = "ptr2+1";
     } else {
@@ -1959,7 +1961,7 @@ unsigned OptStackOps (CodeSeg* S)
                         break;
                     } else {
                         /* Track register usage */
-                        Data.UsedRegs |= (E->Use | E->Chg);
+                        Data.ZPUsage |= (E->Use | E->Chg);
                         TrackLoads (&Data.Rhs, E, I);
                     }
 
@@ -1991,7 +1993,7 @@ unsigned OptStackOps (CodeSeg* S)
 
                 } else {
                     /* Other stuff: Track register usage */
-                    Data.UsedRegs |= (E->Use | E->Chg);
+                    Data.ZPUsage |= (E->Use | E->Chg);
                     TrackLoads (&Data.Rhs, E, I);
                 }
                 /* If the registers from the push (A/X) are used before they're
@@ -2009,21 +2011,32 @@ unsigned OptStackOps (CodeSeg* S)
 
             case FoundOp:
                 /* Track zero page location usage beyond this point */
-                Data.UsedRegs |= GetRegInfo (S, I, REG_SREG | REG_PTR1 | REG_PTR2);
+                Data.ZPUsage |= GetRegInfo (S, I, REG_SREG | REG_PTR1 | REG_PTR2);
 
                 /* Finalize the load info */
                 FinalizeLoadInfo (&Data.Lhs, S);
                 FinalizeLoadInfo (&Data.Rhs, S);
 
-                /* If the Lhs loads do load from zeropage, we have to include
-                ** them into UsedRegs registers used. The Rhs loads have already
-                ** been tracked.
+                /* Check if the lhs loads from zeropage. If this is true, these
+                ** zero page locations have to be added to ZPUsage, because
+                ** they cannot be used for intermediate storage. In addition,
+                ** if one of these zero page locations is destroyed between
+                ** pushing the lhs and the actual operation, we cannot use the
+                ** original zero page locations for the final op, but must
+                ** use another ZP location to save them.
                 */
+                ChangedRegs &= REG_ZP;
                 if (Data.Lhs.A.LoadEntry && Data.Lhs.A.LoadEntry->AM == AM65_ZP) {
-                    Data.UsedRegs |= Data.Lhs.A.LoadEntry->Use;
+                    Data.ZPUsage |= Data.Lhs.A.LoadEntry->Use;
+                    if ((Data.Lhs.A.LoadEntry->Use & ChangedRegs) != 0) {
+                        Data.Lhs.A.Flags &= ~(LI_DIRECT | LI_RELOAD_Y);
+                    }
                 }
                 if (Data.Lhs.X.LoadEntry && Data.Lhs.X.LoadEntry->AM == AM65_ZP) {
-                    Data.UsedRegs |= Data.Lhs.X.LoadEntry->Use;
+                    Data.ZPUsage |= Data.Lhs.X.LoadEntry->Use;
+                    if ((Data.Lhs.X.LoadEntry->Use & ChangedRegs) != 0) {
+                        Data.Lhs.X.Flags &= ~(LI_DIRECT | LI_RELOAD_Y);
+                    }
                 }
 
                 /* Check the preconditions. If they aren't ok, reset the insn

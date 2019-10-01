@@ -2425,6 +2425,19 @@ void g_falsejump (unsigned flags attribute ((unused)), unsigned label)
 }
 
 
+void g_lateadjustSP (unsigned label)
+/* Adjust stack based on non-immediate data */
+{
+    AddCodeLine ("pha");
+    AddCodeLine ("lda %s", LocalLabelName (label));
+    AddCodeLine ("clc");
+    AddCodeLine ("adc sp");
+    AddCodeLine ("sta sp");
+    AddCodeLine ("lda %s+1", LocalLabelName (label));
+    AddCodeLine ("adc sp+1");
+    AddCodeLine ("sta sp+1");
+    AddCodeLine ("pla");
+}
 
 void g_drop (unsigned Space)
 /* Drop space allocated on the stack */
@@ -4243,7 +4256,7 @@ void g_initauto (unsigned Label, unsigned Size)
         AddCodeLine ("lda %s,y", GetLabelName (CF_STATIC, Label, 0));
         AddCodeLine ("sta (sp),y");
         AddCodeLine ("iny");
-	AddCmpCodeIfSizeNot256 ("cpy #$%02X", Size);
+        AddCmpCodeIfSizeNot256 ("cpy #$%02X", Size);
         AddCodeLine ("bne %s", LocalLabelName (CodeLabel));
     }
 }
@@ -4268,7 +4281,7 @@ void g_initstatic (unsigned InitLabel, unsigned VarLabel, unsigned Size)
         AddCodeLine ("lda %s,y", GetLabelName (CF_STATIC, InitLabel, 0));
         AddCodeLine ("sta %s,y", GetLabelName (CF_STATIC, VarLabel, 0));
         AddCodeLine ("iny");
-	AddCmpCodeIfSizeNot256 ("cpy #$%02X", Size);
+        AddCmpCodeIfSizeNot256 ("cpy #$%02X", Size);
         AddCodeLine ("bne %s", LocalLabelName (CodeLabel));
     } else {
         /* Use the easy way here: memcpy() */

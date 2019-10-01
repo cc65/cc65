@@ -25,7 +25,7 @@ clock_t clock(void)
     return mktime(&currentTime);
 }
 
-int clock_gettime(clockid_t, struct timespec *tp)
+int __fastcall__ clock_gettime(clockid_t, struct timespec *tp)
 {
     tp->tv_sec = clock();
     tp->tv_nsec = 0;

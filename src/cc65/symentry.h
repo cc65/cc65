@@ -98,7 +98,22 @@ struct LiteralPool;
 
 #define SC_HAVEATTR     0x10000U        /* Symbol has attributes */
 
+#define SC_GOTO         0x20000U
+#define SC_SPADJUSTMENT 0x40000U
 
+
+
+
+/* Label definition or reference */
+typedef struct DefOrRef DefOrRef;
+struct DefOrRef {
+    unsigned            Line;
+    long                LocalsBlockId;
+    unsigned            Flags;
+    int                 StackPtr;
+    unsigned            Depth;
+    unsigned            LateSP_Label;
+};
 
 /* Symbol table entry */
 typedef struct SymEntry SymEntry;
@@ -120,7 +135,13 @@ struct SymEntry {
         int                     Offs;
 
         /* Label name for static symbols */
-        unsigned                Label;
+        struct {
+            unsigned            Label;
+            Collection          *DefsOrRefs;
+        } L;
+
+        /* Value of SP adjustment needed after forward 'goto' */
+        unsigned short      SPAdjustment;
 
         /* Register bank offset and offset of the saved copy on stack for
         ** register variables.

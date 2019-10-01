@@ -168,7 +168,7 @@ static void NewSymbol (const char* SymName, long Val)
 
     /* Check if have already a symbol with this name */
     if (SymIsDef (Sym)) {
-        AbEnd ("`%s' is already defined", SymName);
+        AbEnd ("'%s' is already defined", SymName);
     }
 
     /* Generate an expression for the symbol */
@@ -201,7 +201,7 @@ static void SetSys (const char* Sys)
             break;
 
         case TGT_MODULE:
-            AbEnd ("Cannot use `module' as a target for the assembler");
+            AbEnd ("Cannot use 'module' as a target for the assembler");
             break;
 
         case TGT_ATARI2600:
@@ -331,7 +331,7 @@ static void SetSys (const char* Sys)
             break;
 
         default:
-            AbEnd ("Invalid target name: `%s'", Sys);
+            AbEnd ("Invalid target name: '%s'", Sys);
 
     }
 
@@ -346,7 +346,7 @@ static void FileNameOption (const char* Opt, const char* Arg, StrBuf* Name)
 {
     /* Cannot have the option twice */
     if (SB_NotEmpty (Name)) {
-        AbEnd ("Cannot use option `%s' twice", Opt);
+        AbEnd ("Cannot use option '%s' twice", Opt);
     }
     /* Remember the file name for later */
     SB_CopyStr (Name, Arg);
@@ -427,7 +427,7 @@ static void OptCPU (const char* Opt attribute ((unused)), const char* Arg)
 {
     cpu_t CPU = FindCPU (Arg);
     if (CPU == CPU_UNKNOWN) {
-        AbEnd ("Invalid CPU: `%s'", Arg);
+        AbEnd ("Invalid CPU: '%s'", Arg);
     } else {
         SetCPU (CPU);
     }
@@ -478,7 +478,7 @@ static void OptFeature (const char* Opt attribute ((unused)), const char* Arg)
 
     /* Set the feature, check for errors */
     if (SetFeature (SB_InitFromString (&Feature, Arg)) == FEAT_UNKNOWN) {
-        AbEnd ("Illegal emulation feature: `%s'", Arg);
+        AbEnd ("Illegal emulation feature: '%s'", Arg);
     }
 }
 
@@ -533,7 +533,7 @@ static void OptListBytes (const char* Opt, const char* Arg)
 
     /* Check the bounds */
     if (Num != 0 && (Num < MIN_LIST_BYTES || Num > MAX_LIST_BYTES)) {
-        AbEnd ("Argument for option `%s' is out of range", Opt);
+        AbEnd ("Argument for option '%s' is out of range", Opt);
     }
 
     /* Use the value */
@@ -549,7 +549,7 @@ static void OptListing (const char* Opt, const char* Arg)
     ** the filename is empty or begins with the option char.
     */
     if (Arg == 0 || *Arg == '\0' || *Arg == '-') {
-        Fatal ("The meaning of `%s' has changed. It does now "
+        Fatal ("The meaning of '%s' has changed. It does now "
                "expect a file name as argument.", Opt);
     }
 
@@ -566,7 +566,7 @@ static void OptMemoryModel (const char* Opt, const char* Arg)
 
     /* Check the current memory model */
     if (MemoryModel != MMODEL_UNKNOWN) {
-        AbEnd ("Cannot use option `%s' twice", Opt);
+        AbEnd ("Cannot use option '%s' twice", Opt);
     }
 
     /* Translate the memory model name and check it */
@@ -762,7 +762,7 @@ static void OneLine (void)
             */
             if (CurTok.Tok != TOK_COLON) {
                 if (HadWS || !NoColonLabels) {
-                    Error ("`:' expected");
+                    Error ("':' expected");
                     /* Try some smart error recovery */
                     if (CurTok.Tok == TOK_NAMESPACE) {
                         NextTok ();
@@ -807,7 +807,7 @@ static void OneLine (void)
     } else if (PCAssignment && (CurTok.Tok == TOK_STAR || CurTok.Tok == TOK_PC)) {
         NextTok ();
         if (CurTok.Tok != TOK_EQ) {
-            Error ("`=' expected");
+            Error ("'=' expected");
             SkipUntilSep ();
         } else {
             /* Skip the equal sign */
@@ -1040,7 +1040,7 @@ int main (int argc, char* argv [])
         } else {
             /* Filename. Check if we already had one */
             if (InFile) {
-                fprintf (stderr, "%s: Don't know what to do with `%s'\n",
+                fprintf (stderr, "%s: Don't know what to do with '%s'\n",
                          ProgName, Arg);
                 exit (EXIT_FAILURE);
             } else {

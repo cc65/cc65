@@ -501,7 +501,7 @@ int NewInputFile (const char* Name)
         /* Main file */
         F = fopen (Name, "r");
         if (F == 0) {
-            Fatal ("Cannot open input file `%s': %s", Name, strerror (errno));
+            Fatal ("Cannot open input file '%s': %s", Name, strerror (errno));
         }
     } else {
         /* We are on include level. Search for the file in the include
@@ -510,7 +510,7 @@ int NewInputFile (const char* Name)
         PathName = SearchFile (IncSearchPath, Name);
         if (PathName == 0 || (F = fopen (PathName, "r")) == 0) {
             /* Not found or cannot open, print an error and bail out */
-            Error ("Cannot open include file `%s': %s", Name, strerror (errno));
+            Error ("Cannot open include file '%s': %s", Name, strerror (errno));
             goto ExitPoint;
         }
 
@@ -527,7 +527,7 @@ int NewInputFile (const char* Name)
     ** here.
     */
     if (FileStat (Name, &Buf) != 0) {
-        Fatal ("Cannot stat input file `%s': %s", Name, strerror (errno));
+        Fatal ("Cannot stat input file '%s': %s", Name, strerror (errno));
     }
 
     /* Add the file to the input file table and remember the index */
@@ -794,6 +794,43 @@ static void ReadStringConst (int StringTerm)
             break;
         }
 
+        if (C == '\\' && StringEscapes) {
+            NextChar ();
+
+            switch (C) {
+                case EOF:
+                    Error ("Unterminated escape sequence in string constant");
+                    break;
+                case '\\':
+                case '\'':
+                case '"':
+                    break;
+                case 't':
+                    C = '\x09';
+                    break;
+                case 'r':
+                    C = '\x0D';
+                    break;
+                case 'n':
+                    C = '\x0A';
+                    break;
+                case 'x':
+                    NextChar ();
+                    if (IsXDigit (C)) {
+                        char high_nibble = DigitVal (C) << 4;
+                        NextChar ();
+                        if (IsXDigit (C)) {
+                            C = high_nibble | DigitVal (C);
+                            break;
+                        }
+                    }
+                    /* FALLTHROUGH */
+                default:
+                    Error ("Unsupported escape sequence in string constant");
+                    break;
+            }
+        }
+
         /* Append the char to the string */
         SB_AppendChar (&CurTok.SVal, C);
 
@@ -1054,7 +1091,7 @@ Again:
                 /* Not found */
                 if (!LeadingDotInIdents) {
                     /* Invalid pseudo instruction */
-                    Error ("`%m%p' is not a recognized control command", &CurTok.SVal);
+                    Error ("'%m%p' is not a recognized control command", &CurTok.SVal);
                     goto Again;
                 }
 

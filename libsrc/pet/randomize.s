@@ -11,7 +11,7 @@
 
         .include        "pet.inc"
 
-__randomize:              
+__randomize:
         ldx     TIME+2
         lda     TIME+1          ; Use 60HZ clock
         jmp     _srand          ; Initialize generator

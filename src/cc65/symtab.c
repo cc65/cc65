@@ -57,6 +57,8 @@
 #include "symentry.h"
 #include "typecmp.h"
 #include "symtab.h"
+#include "function.h"
+#include "input.h"
 
 
 
@@ -90,7 +92,7 @@ static SymTable*        SymTab          = 0;
 static SymTable*        TagTab0         = 0;
 static SymTable*        TagTab          = 0;
 static SymTable*        LabelTab        = 0;
-
+static SymTable*        SPAdjustTab     = 0;
 
 
 /*****************************************************************************/
@@ -166,11 +168,11 @@ static void CheckSymTable (SymTable* Tab)
                     !SymHasAttr (Entry, atUnused)) {
                     if (Flags & SC_PARAM) {
                         if (IS_Get (&WarnUnusedParam)) {
-                            Warning ("Parameter `%s' is never used", Entry->Name);
+                            Warning ("Parameter '%s' is never used", Entry->Name);
                         }
                     } else {
                         if (IS_Get (&WarnUnusedVar)) {
-                            Warning ("`%s' is defined but never used", Entry->Name);
+                            Warning ("'%s' is defined but never used", Entry->Name);
                         }
                     }
                 }
@@ -180,11 +182,11 @@ static void CheckSymTable (SymTable* Tab)
             if (Flags & SC_LABEL) {
                 if (!SymIsDef (Entry)) {
                     /* Undefined label */
-                    Error ("Undefined label: `%s'", Entry->Name);
+                    Error ("Undefined label: '%s'", Entry->Name);
                 } else if (!SymIsRef (Entry)) {
                     /* Defined but not used */
                     if (IS_Get (&WarnUnusedLabel)) {
-                        Warning ("`%s' is defined but never used", Entry->Name);
+                        Warning ("'%s' is defined but never used", Entry->Name);
                     }
                 }
             }
@@ -223,6 +225,9 @@ void EnterGlobalLevel (void)
 
     /* Create and assign the tag table */
     TagTab0 = TagTab = NewSymTable (SYMTAB_SIZE_GLOBAL);
+
+    /* Create and assign the table of SP adjustment symbols */
+    SPAdjustTab = NewSymTable (SYMTAB_SIZE_GLOBAL);
 }
 
 
@@ -561,10 +566,10 @@ SymEntry* AddStructSym (const char* Name, unsigned Type, unsigned Size, SymTable
         /* We do have an entry. This may be a forward, so check it. */
         if ((Entry->Flags & SC_TYPEMASK) != Type) {
             /* Existing symbol is not a struct */
-            Error ("Symbol `%s' is already different kind", Name);
+            Error ("Symbol '%s' is already different kind", Name);
         } else if (Size > 0 && Entry->V.S.Size > 0) {
             /* Both structs are definitions. */
-            Error ("Multiple definition for `%s'", Name);
+            Error ("Multiple definition for '%s'", Name);
         } else {
             /* Define the struct size if it is given */
             if (Size > 0) {
@@ -600,7 +605,7 @@ SymEntry* AddBitField (const char* Name, unsigned Offs, unsigned BitOffs, unsign
     if (Entry) {
 
         /* We have a symbol with this name already */
-        Error ("Multiple definition for `%s'", Name);
+        Error ("Multiple definition for '%s'", Name);
 
     } else {
 
@@ -634,9 +639,9 @@ SymEntry* AddConstSym (const char* Name, const Type* T, unsigned Flags, long Val
     SymEntry* Entry = FindSymInTable (Tab, Name, HashStr (Name));
     if (Entry) {
         if ((Entry->Flags & SC_CONST) != SC_CONST) {
-            Error ("Symbol `%s' is already different kind", Name);
+            Error ("Symbol '%s' is already different kind", Name);
         } else {
-            Error ("Multiple definition for `%s'", Name);
+            Error ("Multiple definition for '%s'", Name);
         }
         return Entry;
     }
@@ -658,18 +663,111 @@ SymEntry* AddConstSym (const char* Name, const Type* T, unsigned Flags, long Val
 }
 
 
+DefOrRef* AddDefOrRef (SymEntry* E, unsigned Flags)
+/* Add definition or reference to the SymEntry and preserve its attributes */
+{
+    DefOrRef *DOR;
+
+    DOR = xmalloc (sizeof (DefOrRef));
+    CollAppend (E->V.L.DefsOrRefs, DOR);
+    DOR->Line = GetCurrentLine ();
+    DOR->LocalsBlockId = (long)CollLast (&CurrentFunc->LocalsBlockStack);
+    DOR->Flags = Flags;
+    DOR->StackPtr = StackPtr;
+    DOR->Depth = CollCount (&CurrentFunc->LocalsBlockStack);
+    DOR->LateSP_Label = GetLocalLabel ();
+
+    return DOR;
+}
+
+unsigned short FindSPAdjustment (const char* Name)
+/* Search for an entry in the table of SP adjustments */
+{
+    SymEntry* Entry = FindSymInTable (SPAdjustTab, Name, HashStr (Name));
+
+    if (!Entry) {
+        Internal ("No SP adjustment label entry found");
+    }
+
+    return Entry->V.SPAdjustment;
+}
 
 SymEntry* AddLabelSym (const char* Name, unsigned Flags)
 /* Add a goto label to the label table */
 {
+    unsigned i;
+    DefOrRef *DOR, *NewDOR;
+    /* We juggle it so much that a shortcut will help with clarity */
+    Collection *AIC = &CurrentFunc->LocalsBlockStack;
+
     /* Do we have an entry with this name already? */
     SymEntry* Entry = FindSymInTable (LabelTab, Name, HashStr (Name));
     if (Entry) {
 
         if (SymIsDef (Entry) && (Flags & SC_DEF) != 0) {
             /* Trying to define the label more than once */
-            Error ("Label `%s' is defined more than once", Name);
+            Error ("Label '%s' is defined more than once", Name);
         }
+
+        NewDOR = AddDefOrRef (Entry, Flags);
+
+        /* Walk through all occurrences of the label so far and evaluate
+        ** their relationship with the one passed to the function.
+        */
+        for (i = 0; i < CollCount (Entry->V.L.DefsOrRefs); i++) {
+            DOR = CollAt (Entry->V.L.DefsOrRefs, i);
+
+            if ((DOR->Flags & SC_DEF) && (Flags & SC_REF) && (Flags & SC_GOTO)) {
+                /* We're processing a goto and here is its destination label.
+                ** This means the difference between SP values is already known,
+                ** so we simply emit the SP adjustment code.
+                */
+                if (StackPtr != DOR->StackPtr) {
+                    g_space (StackPtr - DOR->StackPtr);
+                }
+
+                /* Are we jumping into a block with initalization of an object that
+                ** has automatic storage duration? Let's emit a warning.
+                */
+                if ((long)CollLast (AIC) != DOR->LocalsBlockId &&
+                    (CollCount (AIC) < DOR->Depth ||
+                    (long)CollAt (AIC, DOR->Depth - 1) != DOR->LocalsBlockId)) {
+                    Warning ("Goto at line %d to label %s jumps into a block with "
+                    "initialization of an object that has automatic storage duration",
+                    GetCurrentLine (), Name);
+                }
+            }
+
+
+            if ((DOR->Flags & SC_REF) && (DOR->Flags & SC_GOTO) && (Flags & SC_DEF)) {
+                /* We're processing a label, let's update all gotos encountered
+                ** so far
+                */
+                SymEntry *E;
+                g_userodata();
+                g_defdatalabel (DOR->LateSP_Label);
+                g_defdata (CF_CONST | CF_INT, StackPtr - DOR->StackPtr, 0);
+
+                /* Optimizer will need the information about the value of SP adjustment
+                ** later, so let's preserve it.
+                */
+                E = NewSymEntry (LocalLabelName (DOR->LateSP_Label), SC_SPADJUSTMENT);
+                E->V.SPAdjustment = StackPtr - DOR->StackPtr;
+                AddSymEntry (SPAdjustTab, E);
+
+                /* Are we jumping into a block with initalization of an object that
+                ** has automatic storage duration? Let's emit a warning.
+                */
+                if ((long)CollLast (AIC) != DOR->LocalsBlockId &&
+                    (CollCount (AIC) >= DOR->Depth ||
+                    (long)CollLast (AIC) >= (long)DOR->Line))
+                    Warning ("Goto at line %d to label %s jumps into a block with "
+                    "initialization of an object that has automatic storage duration",
+                    DOR->Line, Name);
+             }
+
+        }
+
         Entry->Flags |= Flags;
 
     } else {
@@ -678,14 +776,23 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
         Entry = NewSymEntry (Name, SC_LABEL | Flags);
 
         /* Set a new label number */
-        Entry->V.Label = GetLocalLabel ();
+        Entry->V.L.Label = GetLocalLabel ();
+
+        /* Create Collection for label definition and references */
+        Entry->V.L.DefsOrRefs = NewCollection ();
+        NewDOR = AddDefOrRef (Entry, Flags);
 
         /* Generate the assembler name of the label */
-        Entry->AsmName = xstrdup (LocalLabelName (Entry->V.Label));
+        Entry->AsmName = xstrdup (LocalLabelName (Entry->V.L.Label));
 
         /* Add the entry to the label table */
         AddSymEntry (LabelTab, Entry);
 
+    }
+
+    /* We are processing a goto, but the label has not yet been defined */
+    if (!SymIsDef (Entry) && (Flags & SC_REF) && (Flags & SC_GOTO)) {
+        g_lateadjustSP (NewDOR->LateSP_Label);
     }
 
     /* Return the entry */
@@ -702,7 +809,7 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
     if (Entry) {
 
         /* We have a symbol with this name already */
-        Error ("Multiple definition for `%s'", Name);
+        Error ("Multiple definition for '%s'", Name);
 
     } else {
 
@@ -717,12 +824,12 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
             Entry->V.R.RegOffs  = Offs;
             Entry->V.R.SaveOffs = StackPtr;
         } else if ((Flags & SC_EXTERN) == SC_EXTERN) {
-            Entry->V.Label = Offs;
+            Entry->V.L.Label = Offs;
             SymSetAsmName (Entry);
         } else if ((Flags & SC_STATIC) == SC_STATIC) {
             /* Generate the assembler name from the label number */
-            Entry->V.Label = Offs;
-            Entry->AsmName = xstrdup (LocalLabelName (Entry->V.Label));
+            Entry->V.L.Label = Offs;
+            Entry->AsmName = xstrdup (LocalLabelName (Entry->V.L.Label));
         } else if ((Flags & SC_STRUCTFIELD) == SC_STRUCTFIELD) {
             Entry->V.Offs = Offs;
         } else {
@@ -752,12 +859,18 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
     /* Do we have an entry with this name already? */
     SymEntry* Entry = FindSymInTable (Tab, Name, HashStr (Name));
     if (Entry) {
-
         Type* EType;
+
+        /* If the existing symbol is an enumerated constant,
+        ** then avoid a compiler crash.  See GitHub issue #728.
+        */
+        if (Entry->Flags & SC_ENUM) {
+            Fatal ("Can't redeclare enum constant '%s' as global variable", Name);
+        }
 
         /* We have a symbol with this name already */
         if (Entry->Flags & SC_TYPE) {
-            Error ("Multiple definition for `%s'", Name);
+            Error ("Multiple definition for '%s'", Name);
             return Entry;
         }
 
@@ -777,7 +890,7 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
             if ((Size != UNSPECIFIED && ESize != UNSPECIFIED && Size != ESize) ||
                 TypeCmp (T + 1, EType + 1) < TC_EQUAL) {
                 /* Types not identical: Conflicting types */
-                Error ("Conflicting types for `%s'", Name);
+                Error ("Conflicting types for '%s'", Name);
                 return Entry;
             } else {
                 /* Check if we have a size in the existing definition */
@@ -790,7 +903,7 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
         } else {
             /* New type must be identical */
             if (TypeCmp (EType, T) < TC_EQUAL) {
-                Error ("Conflicting types for `%s'", Name);
+                Error ("Conflicting types for '%s'", Name);
                 return Entry;
             }
 
@@ -817,7 +930,7 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
         ** warn about the conflict.  (It will compile a public declaration.)
         */
         if ((Flags & SC_EXTERN) == 0 && (Entry->Flags & SC_EXTERN) != 0) {
-            Warning ("static declaration follows non-static declaration of `%s'.", Name);
+            Warning ("static declaration follows non-static declaration of '%s'.", Name);
         }
 
         /* An extern declaration must not change the current linkage. */
@@ -829,7 +942,7 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
         ** warn about the conflict.  (It will compile a public declaration.)
         */
         if ((Flags & SC_EXTERN) != 0 && (Entry->Flags & SC_EXTERN) == 0) {
-            Warning ("public declaration follows static declaration of `%s'.", Name);
+            Warning ("public declaration follows static declaration of '%s'.", Name);
         }
 
         /* Add the new flags */
@@ -904,7 +1017,7 @@ void MakeZPSym (const char* Name)
     if (Entry) {
         Entry->Flags |= SC_ZEROPAGE;
     } else {
-        Error ("Undefined symbol: `%s'", Name);
+        Error ("Undefined symbol: '%s'", Name);
     }
 }
 

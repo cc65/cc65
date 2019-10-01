@@ -35,5 +35,3 @@ utsdata:
         ; machine
         .asciiz         "Commodore 64"
 
-
-         

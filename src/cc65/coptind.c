@@ -2056,8 +2056,14 @@ unsigned OptPrecalc (CodeSeg* S)
                 ** results we don't already have (including the flags), so
                 ** remove it. Something like this is generated as a result of
                 ** a compare where parts of the values are known to be zero.
+                ** The only situation where we need to leave things as they are
+                ** is when V flag is being tested in the next instruction,
+                ** because ADC/SBC #0 always clears it.
                 */
-                if (In->RegA == 0 && CE_IsKnownImm (E, 0x00)) {
+                if (In->RegA == 0 && CE_IsKnownImm (E, 0x00) &&
+                    (E = CS_GetEntry (S, I + 1))             &&
+                    E->OPC != OP65_BVC                       &&
+                    E->OPC != OP65_BVS ) {
                     /* 0-0 or 0+0 -> remove */
                     CS_DelEntry (S, I);
                     ++Changes;

@@ -243,16 +243,19 @@ function.
 <sect1><tt/cc65.h/<label id="cc65.h"><p>
 
 <itemize>
-<!-- <item><ref id="cc65_cos" name="cc65_cos"> -->
-<!-- <item><ref id="cc65_idiv32by16r16" name="cc65_idiv32by16r16"> -->
-<!-- <item><ref id="cc65_imul16x16r32" name="cc65_imul16x16r32"> -->
-<!-- <item><ref id="cc65_imul8x8r16" name="cc65_imul8x8r16"> -->
-<!-- <item><ref id="cc65_sin" name="cc65_sin"> -->
-<!-- <item><ref id="cc65_udiv32by16r16" name="cc65_udiv32by16r16"> -->
-<!-- <item><ref id="cc65_umul16x16r32" name="cc65_umul16x16r32"> -->
-<!-- <item><ref id="cc65_umul16x8r32" name="cc65_umul16x8r32"> -->
-<!-- <item><ref id="cc65_umul8x8r16" name="cc65_umul8x8r16"> -->
+
+<!-- <item><ref id="cos" name="cos"> -->
+<!-- <item><ref id="idiv32by16r16" name="idiv32by16r16"> -->
+<!-- <item><ref id="imul16x16r32" name="imul16x16r32"> -->
+<!-- <item><ref id="imul8x8r16" name="imul8x8r16"> -->
+<!-- <item><ref id="sin" name="sin"> -->
+<!-- <item><ref id="udiv32by16r16" name="udiv32by16r16"> -->
+<!-- <item><ref id="umul16x16r32" name="umul16x16r32"> -->
+<!-- <item><ref id="umul16x8r32" name="umul16x8r32"> -->
+<!-- <item><ref id="umul8x8r16" name="umul8x8r16"> -->
 <item><ref id="doesclrscrafterexit" name="doesclrscrafterexit">
+<item><ref id="mul20" name="mul20">
+<item><ref id="mul40" name="mul40">
 </itemize>
 
 (incomplete)
@@ -578,7 +581,6 @@ communication, see also <tt>testcode/lib/ser-test.c</tt>.
 <item><ref id="signal" name="signal">
 </itemize>
 
-
 <sect1><tt/stdarg.h/<label id="stdarg.h"><p>
 
 (incomplete)
@@ -748,9 +750,11 @@ communication, see also <tt>testcode/lib/ser-test.c</tt>.
 <sect1><tt/time.h/<label id="time.h"><p>
 
 <itemize>
-<!-- <item><ref id="_systime" name="_systime"> -->
 <!-- <item><ref id="asctime" name="asctime"> -->
 <item><ref id="clock" name="clock">
+<item><ref id="clock_getres" name="clock_getres">
+<item><ref id="clock_gettime" name="clock_gettime">
+<item><ref id="clock_settime" name="clock_settime">
 <!-- <item><ref id="ctime" name="ctime"> -->
 <!-- <item><ref id="gmtime" name="gmtime"> -->
 <!-- <item><ref id="localtime" name="localtime"> -->
@@ -1017,7 +1021,6 @@ It returns 1 if it does.
 <tag/Availability/cc65 (<tt/atari/ and <tt/atarixl/ platforms)
 </descrip>
 </quote>
-
 
 <sect1>_poserror<label id="_poserror"><p>
 
@@ -2574,6 +2577,89 @@ changing values.  (See the description of <tt/cbm_k_udtim()/.)
 </quote>
 
 
+<sect1>clock_getres<label id="clock_getres"><p>
+
+<quote>
+<descrip>
+<tag/Function/Determine the realtime clock resolution.
+<tag/Header/<tt/<ref id="time.h" name="time.h">/
+<tag/Declaration/<tt/int __fastcall__ clock_getres (clockid_t clock_id, struct timespec *res);/
+<tag/Description/The <tt/clock_getres/ function finds the resolution (precision)
+of the realtime clock. <tt/clock_id/ has to be <tt/CLOCK_REALTIME/. If <tt/res/
+is not <tt/NULL/, the resolution of the realtime clock is stored in the location
+pointed to by <tt/res/. If <tt/res/ is <tt/NULL/, the clock resolution is not returned.
+If the <tt/tp/ argument of <tt/<ref id="clock_settime" name="clock_settime">/ is not
+a multiple of <tt/res/, then the value is truncated to a multiple of <tt/res/. On
+success, zero is returned. On error, -1 is returned and <tt/errno/ is set to an
+error code describing the reason for the failure.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>Depending on the target either the <tt/tv_sec/ or the <tt/tv_nsec/
+field of the <tt/struct timespec/ returned is zero.
+</itemize>
+<tag/Availability/POSIX 1003.1
+<tag/See also/
+<ref id="clock_gettime" name="clock_gettime">,
+<ref id="clock_settime" name="clock_settime">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>clock_gettime<label id="clock_gettime"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get the time from the realtime clock.
+<tag/Header/<tt/<ref id="time.h" name="time.h">/
+<tag/Declaration/<tt/int __fastcall__ clock_gettime (clockid_t clock_id, struct timespec *tp);/
+<tag/Description/The <tt/clock_gettime/ function retrieves the time since the 1970-01-01 00:00:00
+measured in nanoseconds. <tt/clock_id/ has to be <tt/CLOCK_REALTIME/. On success, zero is
+returned. On error, -1 is returned and <tt/errno/ is set to an error code describing the
+reason for the failure.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>Many platforms supported by cc65 do not have a realtime clock, so the
+retrieved value may not be valid. See also the platform-specific information.
+</itemize>
+<tag/Availability/POSIX 1003.1
+<tag/See also/
+<ref id="clock_getres" name="clock_getres">,
+<ref id="clock_settime" name="clock_settime">,
+<ref id="time" name="time">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>clock_settime<label id="clock_settime"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set the time on the realtime clock.
+<tag/Header/<tt/<ref id="time.h" name="time.h">/
+<tag/Declaration/<tt/int __fastcall__ clock_settime (clockid_t clock_id, const struct timespec *tp);/
+<tag/Description/The <tt/clock_settime/ function sets the time since the 1970-01-01 00:00:00
+measured in nanoseconds. <tt/clock_id/ has to be <tt/CLOCK_REALTIME/. On success, zero is
+returned. On error, -1 is returned and <tt/errno/ is set to an error code describing the
+reason for the failure.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>Many platforms supported by cc65 do not have a realtime clock, so
+setting the time may not work. See also the platform-specific information.
+</itemize>
+<tag/Availability/POSIX 1003.1
+<tag/See also/
+<ref id="clock_getres" name="clock_getres">,
+<ref id="clock_gettime" name="clock_gettime">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>clrscr<label id="clrscr"><p>
 
 <quote>
@@ -3301,7 +3387,7 @@ used in presence of a prototype.
 <descrip>
 <tag/Function/Load and initialize an extended memory driver.
 <tag/Header/<tt/<ref id="em.h" name="em.h">/
-<tag/Declaration/<tt/void __fastcall__ em_load_driver (const char* name);/
+<tag/Declaration/<tt/unsigned char __fastcall__ em_load_driver (const char* name);/
 <tag/Description/Load an extended memory driver into memory and initialize
 it. The function returns an error code that tells if all this has been
 successful.
@@ -5473,6 +5559,29 @@ memory allocated for the driver.
 </descrip>
 </quote>
 
+<sect1>mul20<label id="mul20"><p>
+
+<quote>
+<descrip>
+<tag/Function/Multiplies argument by 20.
+<tag/Header/<tt/<ref id="cc65.h" name="cc65.h">/
+<tag/Declaration/<tt/unsigned int __fastcall__ mul20 (unsigned char value);/
+<tag/Description/Speed optimized function to multiply an 8 bit unsigned value by 20 to get a 16 bit result.
+<tag/Availability/cc65
+</descrip>
+</quote>
+
+<sect1>mul40<label id="mul40"><p>
+
+<quote>
+<descrip>
+<tag/Function/Multiplies argument by 40.
+<tag/Header/<tt/<ref id="cc65.h" name="cc65.h">/
+<tag/Declaration/<tt/unsigned int __fastcall__ mul40 (unsigned char value);/
+<tag/Description/Speed optimized function to multiply an 8 bit unsigned value by 40 to get a 16 bit result.
+<tag/Availability/cc65
+</descrip>
+</quote>
 
 <sect1>offsetof<label id="offsetof"><p>
 
@@ -7381,7 +7490,8 @@ returned value may not be valid.
 </itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
-<ref id="clock" name="clock">
+<ref id="clock" name="clock">,
+<ref id="clock_gettime" name="clock_gettime">
 <tag/Example/None.
 </descrip>
 </quote>

@@ -1,9 +1,13 @@
 ; Convert characters to screen codes
 
-; Helper macro that converts and outputs one character
+; Macro that converts one character.
+; scrbyte() can be used as an instruction operand
+.define scrbyte(code)   (<(.strat ("h@dbdlhh", code >> 5) << 4) ^ code)
+
+; Helper macro that stores one character
 .macro _scrcode char
         .if (char < 256)
-                .byte   <(.strat ("h@dbdlhh", char >> 5) << 4) ^ char
+                .byte   scrbyte {char}
         .else
                 .error  "scrcode: Character constant out of range"
         .endif
@@ -38,13 +42,9 @@
 
         ; Anything else is an error
         .else
-
                 .error  "scrcode: invalid argument type"
-
         .endif
 
         ; Call the macro recursively with the remaining args
         scrcode arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9
 .endmacro
-
-

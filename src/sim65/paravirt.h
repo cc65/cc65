@@ -39,12 +39,23 @@
 
 
 /*****************************************************************************/
+/*                                   Data                                    */
+/*****************************************************************************/
+
+
+
+#define PARAVIRT_BASE        0xFFF4
+/* Lowest address used by a paravirtualization hook */
+
+
+
+/*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
 
 
-void ParaVirtInit (unsigned aArgStart);
+void ParaVirtInit (unsigned aArgStart, unsigned char aSPAddr);
 /* Initialize the paravirtualization subsystem */
 
 void ParaVirtHooks (CPURegs* Regs);

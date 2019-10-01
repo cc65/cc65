@@ -633,7 +633,8 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
     if (E->Op == EXPR_BYTE0   || E->Op == EXPR_BYTE1 ||
         E->Op == EXPR_BYTE2   || E->Op == EXPR_BYTE3 ||
         E->Op == EXPR_WORD0   || E->Op == EXPR_WORD1 ||
-        E->Op == EXPR_FARADDR || E->Op == EXPR_DWORD) {
+        E->Op == EXPR_FARADDR || E->Op == EXPR_DWORD ||
+        E->Op == EXPR_NEARADDR) {
         /* Use the real expression */
         Expr = E->Left;
     }
@@ -678,6 +679,7 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
         case EXPR_WORD1:    BinVal = (BinVal >> 16) & 0xFFFF;   break;
         case EXPR_FARADDR:  BinVal &= 0xFFFFFFUL;               break;
         case EXPR_DWORD:    BinVal &= 0xFFFFFFFFUL;             break;
+        case EXPR_NEARADDR: BinVal &= 0xFFFF;                   break;
     }
     WriteVal (D->F, BinVal, Size);
 

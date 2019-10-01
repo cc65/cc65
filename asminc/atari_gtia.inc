@@ -79,3 +79,41 @@ VDELAY  = GTIA + $1C         ;vertical delay
 GRACTL  = GTIA + $1D         ;graphic control
 HITCLR  = GTIA + $1E         ;collision clear
 
+
+; Hue values
+
+HUE_GREY        = 0
+HUE_GOLD        = 1
+HUE_GOLDORANGE  = 2
+HUE_REDORANGE   = 3
+HUE_ORANGE      = 4
+HUE_MAGENTA     = 5
+HUE_PURPLE      = 6
+HUE_BLUE        = 7
+HUE_BLUE2       = 8
+HUE_CYAN        = 9
+HUE_BLUEGREEN   = 10
+HUE_BLUEGREEN2  = 11
+HUE_GREEN       = 12
+HUE_YELLOWGREEN = 13
+HUE_YELLOW      = 14
+HUE_YELLOWRED   = 15
+
+; Color defines, similar to c64 colors (untested)
+
+GTIA_COLOR_BLACK      = (HUE_GREY << 4)
+GTIA_COLOR_WHITE      = (HUE_GREY << 4 | 7 << 1)
+GTIA_COLOR_RED        = (HUE_REDORANGE << 4 | 1 << 1)
+GTIA_COLOR_CYAN       = (HUE_CYAN << 4 | 3 << 1)
+GTIA_COLOR_VIOLET     = (HUE_PURPLE << 4 | 4 << 1)
+GTIA_COLOR_GREEN      = (HUE_GREEN << 4 | 2 << 1)
+GTIA_COLOR_BLUE       = (HUE_BLUE << 4 | 2 << 1)
+GTIA_COLOR_YELLOW     = (HUE_YELLOW << 4 | 7 << 1)
+GTIA_COLOR_ORANGE     = (HUE_ORANGE << 4 | 5 << 1)
+GTIA_COLOR_BROWN      = (HUE_YELLOW << 4 | 2 << 1)
+GTIA_COLOR_LIGHTRED   = (HUE_REDORANGE << 4 | 6 << 1)
+GTIA_COLOR_GRAY1      = (HUE_GREY << 4 | 2 << 1)
+GTIA_COLOR_GRAY2      = (HUE_GREY << 4 | 3 << 1)
+GTIA_COLOR_LIGHTGREEN = (HUE_GREEN << 4 | 6 << 1)
+GTIA_COLOR_LIGHTBLUE  = (HUE_BLUE << 4 | 6 << 1)
+GTIA_COLOR_GRAY3      = (HUE_GREY << 4 | 5 << 1)

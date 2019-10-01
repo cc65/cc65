@@ -1,4 +1,4 @@
-<!doctype linuxdoc system>      <!-- -*- text-mode -*- -->
+<!doctype linuxdoc system>
 
 <article>
 <title>ca65 Users Guide
@@ -1752,18 +1752,18 @@ either a string or an expression.
 
 <sect1><tt>.SIZEOF</tt><label id=".SIZEOF"><p>
 
-  <tt/.SIZEOF/ is a pseudo function that returns the size of its argument. The
-  argument can be a struct/union, a struct member, a procedure, or a label. In
-  case of a procedure or label, its size is defined by the amount of data
-  placed in the segment where the label is relative to. If a line of code
-  switches segments (for example in a macro) data placed in other segments
-  does not count for the size.
+  <tt/.SIZEOF()/ is a pseudo function that returns the size of its argument.
+  The argument can be a struct/union, a struct member, a scope/procedure, or a
+  label. In the case of a procedure or label, its size is defined by the
+  amount of data placed in the segment where the label is relative to. If a
+  line of code switches segments (for example, in a macro), data placed in
+  other segments does not count for the size.
 
-  Please note that a symbol or scope must exist, before it is used together with
-  <tt/.SIZEOF/ (this may get relaxed later, but will always be true for scopes).
-  A scope has preference over a symbol with the same name, so if the last part
-  of a name represents both, a scope and a symbol, the scope is chosen over the
-  symbol.
+  Please note that a symbol or scope must exist before it can be used together
+  with <tt/.SIZEOF()/ (that may get relaxed later, but always will be true for
+  scopes). A scope has preference over a symbol with the same name; so, if the
+  last part of a name represents both a scope and a symbol, then the scope is
+  chosen over the symbol.
 
   After the following code:
 
@@ -2496,7 +2496,7 @@ Here's a list of all control commands and a description, what they do:
 
 <sect1><tt>.ENDPROC</tt><label id=".ENDPROC"><p>
 
-  End of local lexical level (see <tt><ref id=".PROC" name=".PROC"></tt>).
+  End of the local lexical level (see <tt><ref id=".PROC" name=".PROC"></tt>).
 
 
 <sect1><tt>.ENDREP, .ENDREPEAT</tt><label id=".ENDREPEAT"><p>
@@ -2506,7 +2506,7 @@ Here's a list of all control commands and a description, what they do:
 
 <sect1><tt>.ENDSCOPE</tt><label id=".ENDSCOPE"><p>
 
-  End of local lexical level (see <tt/<ref id=".SCOPE" name=".SCOPE">/).
+  End of the local lexical level (see <tt/<ref id=".SCOPE" name=".SCOPE">/).
 
 
 <sect1><tt>.ENDSTRUCT</tt><label id=".ENDSTRUCT"><p>
@@ -2530,8 +2530,8 @@ Here's a list of all control commands and a description, what they do:
   otherwise the enumeration members are placed in the enclosing scope.
 
   In the enumeration body, symbols are declared. The first symbol has a value
-  of zero, and each following symbol will get the value of the preceding plus
-  one. This behaviour may be overridden by an explicit assignment. Two symbols
+  of zero, and each following symbol will get the value of the preceding, plus
+  one. That behaviour may be overridden by an explicit assignment. Two symbols
   may have the same value.
 
   Example:
@@ -2544,9 +2544,9 @@ Here's a list of all control commands and a description, what they do:
         .endenum
   </verb></tscreen>
 
-  Above example will create a new scope named <tt/errorcodes/ with three
-  symbols in it that get the values 0, 1 and 2 respectively. Another way
-  to write this would have been:
+  The above example will create a new scope named <tt/errorcodes/ with three
+  symbols in it that get the values 0, 1, and 2 respectively. Another way
+  to write that would have been:
 
   <tscreen><verb>
         .scope  errorcodes
@@ -2575,12 +2575,12 @@ Here's a list of all control commands and a description, what they do:
         .endenum
   </verb></tscreen>
 
-  In this example, the enumeration does not have a name, which means that the
-  members will be visible in the enclosing scope and can be used in this scope
+  In that example, the enumeration does not have a name, which means that the
+  members will be visible in the enclosing scope, and can be used in that scope
   without explicit scoping. The first member (<tt/EUNKNOWN/) has the value -1.
-  The value for the following members is incremented by one, so <tt/EOK/ would
-  be zero and so on. <tt/EWOULDBLOCK/ is an alias for <tt/EGAIN/, so it has an
-  override for the value using an already defined symbol.
+  The values for the following members are incremented by one; so, <tt/EOK/
+  would be zero, and so on. <tt/EWOULDBLOCK/ is an alias for <tt/EAGAIN/; so,
+  it has an override for the value, using an already defined symbol.
 
 
 <sect1><tt>.ERROR</tt><label id=".ERROR"><p>
@@ -3444,8 +3444,8 @@ Here's a list of all control commands and a description, what they do:
         atari           Defines the scrcode macro.
         cbm             Defines the scrcode macro.
         cpu             Defines constants for the .CPU variable.
-        generic         Defines generic macroes like add, sub, and blt.
-        longbranch      Defines conditional long-jump macroes.
+        generic         Defines generic macros like add, sub, and blt.
+        longbranch      Defines conditional long-jump macros.
   </verb></tscreen>
 
   Including a macro package twice, or including a macro package that
@@ -4479,8 +4479,8 @@ are:
 
 <sect1><tt>.MACPACK generic</tt><p>
 
-This macro package defines macroes that are useful in almost any program.
-Currently defined macroes are:
+This macro package defines macros that are useful in almost any program.
+Currently defined macros are:
 
 <tscreen><verb>
         .macro  add     Arg     ; add without carry
@@ -4653,9 +4653,10 @@ compiler, depending on the target system selected:
 <item><tt/__C128__/ - Target system is <tt/c128/
 <item><tt/__C16__/ - Target system is <tt/c16/ or <tt/plus4/
 <item><tt/__C64__/ - Target system is <tt/c64/
-<item><tt/__CBM__/ - Target is a Commodore system
+<item><tt/__CBM__/ - Target is a Commodore or Commodore-alike system
 <item><tt/__CBM510__/ - Target system is <tt/cbm510/
 <item><tt/__CBM610__/ - Target system is <tt/cbm610/
+<item><tt/__CX16__/ - Target system is <tt/cx16/
 <item><tt/__GEOS__/ - Target is a GEOS system
 <item><tt/__GEOS_APPLE__/ - Target system is <tt/geos-apple/
 <item><tt/__GEOS_CBM__/ - Target system is <tt/geos-cbm/
@@ -4672,22 +4673,22 @@ compiler, depending on the target system selected:
 </itemize>
 
 
+
 <sect>Structs and unions<label id="structs"><p>
 
 <sect1>Structs and unions Overview<p>
 
 Structs and unions are special forms of <ref id="scopes" name="scopes">.  They
-are to some degree comparable to their C counterparts. Both have a list of
-members. Each member allocates storage and may optionally have a name, which,
-in case of a struct, is the offset from the beginning and, in case of a union,
-is always zero.
+are, to some degree, comparable to their C counterparts. Both have a list of
+members. Each member allocates storage, and optionally may have a name whose
+value, in the case of a struct, usually is the storage offset from the
+beginning, and in the case of a union, doesn't change, and usually is zero.
 
 
 <sect1>Declaration<p>
 
 Here is an example for a very simple struct with two members and a total size
 of 4 bytes:
-
 <tscreen><verb>
       .struct Point
               xcoord  .word
@@ -4695,10 +4696,9 @@ of 4 bytes:
       .endstruct
 </verb></tscreen>
 
-A union shares the total space between all its members, its size is the same
+A union shares the total space between all its members; its size is the same
 as that of the largest member. The offset of all members relative to the union
 is zero.
-
 <tscreen><verb>
       .union  Entry
               index   .word
@@ -4706,13 +4706,12 @@ is zero.
       .endunion
 </verb></tscreen>
 
-A struct or union must not necessarily have a name. If it is anonymous, no
-local scope is opened, the identifiers used to name the members are placed
+A struct or union may not necessarily have a name. If it is anonymous, no
+local scope is opened; the identifiers used to name the members are placed
 into the current scope instead.
 
-A struct may contain unnamed members and definitions of local structs. The
-storage allocators may contain a multiplier, as in the example below:
-
+A struct may contain unnamed members and definitions of local structs/unions.
+The storage allocators may contain a multiplier, as in the example below:
 <tscreen><verb>
       .struct Circle
               .struct Point
@@ -4721,13 +4720,51 @@ storage allocators may contain a multiplier, as in the example below:
               Radius  .word
       .endstruct
 </verb></tscreen>
+The size of the Circle struct is 6 (three words).
+
+
+<sect1>The storage allocator keywords<p>
+
+  <descrip>
+
+  <tag/.BYTE, .RES/
+    Allocates multiples of 1 byte.  <tt/.RES/ requires an operand.
+
+  <tag/.DBYTE, .WORD, .ADDR/
+    Allocates multiples of 2 bytes.
+
+  <tag/.FARADDR/
+    Allocates multiples of 3 bytes.
+
+  <tag/.DWORD/
+    Allocates multiples of 4 bytes.
+
+  </descrip>
+
+
+<sect1>The <tt/.ORG/ keyword<p>
+
+The <tt/.ORG/ keyword changes the offset value that is assigned to subsequent
+member names.  It's useful when using a struct to define the names of the
+registers in an I/O chip.  Example:
+<tscreen><verb>
+; 6551
+.struct ACIA            ; Asynchronous Communications Interface Adapter
+        .org    $031C
+DATA    .byte
+STATUS  .byte
+CMD     .byte           ; Command register
+CTRL    .byte           ; Control register
+.endstruct
+
+        lda     ACIA::DATA      ; Get an RS-232 character
+</verb></tscreen>
 
 
 <sect1>The <tt/.TAG/ keyword<p>
 
-Using the <ref id=".TAG" name=".TAG"> keyword, it is possible to reserve space
-for an already defined struct or unions within another struct:
-
+By using the <ref id=".TAG" name=".TAG"> keyword, it is possible to reserve
+space for an already defined struct or union within another struct:
 <tscreen><verb>
       .struct Point
               xcoord  .word
@@ -4740,33 +4777,30 @@ for an already defined struct or unions within another struct:
       .endstruct
 </verb></tscreen>
 
-Space for a struct or union may be allocated using the <ref id=".TAG"
+Actual space for a struct or union may be allocated by using the <ref id=".TAG"
 name=".TAG"> directive.
-
 <tscreen><verb>
-        C:      .tag    Circle
+C:      .tag    Circle
 </verb></tscreen>
 
 Currently, members are just offsets from the start of the struct or union. To
-access a field of a struct, the member offset has to be added to the address
-of the struct itself:
-
+access a field of a struct, the member offset must be added to the address of
+the struct variable itself:
 <tscreen><verb>
         lda     C+Circle::Radius        ; Load circle radius into A
 </verb></tscreen>
-
-This may change in a future version of the assembler.
+That may change in a future version of the assembler.
 
 
 <sect1>Limitations<p>
 
-Structs and unions are currently implemented as nested symbol tables (in fact,
+Structs and unions currently are implemented as nested symbol tables (in fact,
 they were a by-product of the improved scoping rules). Currently, the
-assembler has no idea of types. This means that the <ref id=".TAG"
-name=".TAG"> keyword will only allocate space. You won't be able to initialize
-variables declared with <ref id=".TAG" name=".TAG">, and adding an embedded
+assembler has no idea of types. That means that the <ref id=".TAG"
+name=".TAG"> keyword only will allocate space. You won't be able to initialize
+variables declared with <ref id=".TAG" name=".TAG">; and, adding an embedded
 structure to another structure with <ref id=".TAG" name=".TAG"> will not make
-this structure accessible by using the '::' operator.
+that added structure accessible by using the '::' operator.
 
 
 

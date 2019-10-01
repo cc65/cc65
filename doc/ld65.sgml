@@ -71,23 +71,24 @@ Short options:
   -vm                   Verbose map file
 
 Long options:
-  --cfg-path path       Specify a config file search path
-  --config name         Use linker config file
-  --dbgfile name        Generate debug information
-  --define sym=val      Define a symbol
-  --end-group           End a library group
-  --force-import sym    Force an import of symbol 'sym'
-  --help                Help (this text)
-  --lib file            Link this library
-  --lib-path path       Specify a library search path
-  --mapfile name        Create a map file
-  --module-id id        Specify a module id
-  --obj file            Link this object file
-  --obj-path path       Specify an object file search path
-  --start-addr addr     Set the default start address
-  --start-group         Start a library group
-  --target sys          Set the target system
-  --version             Print the linker version
+  --allow-multiple-definition   Allow multiple definitions
+  --cfg-path path               Specify a config file search path
+  --config name                 Use linker config file
+  --dbgfile name                Generate debug information
+  --define sym=val              Define a symbol
+  --end-group                   End a library group
+  --force-import sym            Force an import of symbol 'sym'
+  --help                        Help (this text)
+  --lib file                    Link this library
+  --lib-path path               Specify a library search path
+  --mapfile name                Create a map file
+  --module-id id                Specify a module id
+  --obj file                    Link this object file
+  --obj-path path               Specify an object file search path
+  --start-addr addr             Set the default start address
+  --start-group                 Start a library group
+  --target sys                  Set the target system
+  --version                     Print the linker version
 ---------------------------------------------------------------------------
 </verb></tscreen>
 
@@ -97,6 +98,14 @@ Long options:
 Here is a description of all of the command-line options:
 
 <descrip>
+
+  <tag><tt>--allow-multiple-definition</tt></tag>
+
+  Normally when a global symbol is defined multiple times, ld65 will
+  issue an error and not create the output file. This option lets it
+  silently ignore this fact and continue. The first definition of a
+  symbol will be used.
+
 
   <label id="option--start-group">
   <tag><tt>-(, --start-group</tt></tag>
@@ -553,7 +562,8 @@ segment, where this attribute is true, the linker will export three symbols.
 </verb></tscreen>
 
 Replace <tt/NAME/ by the name of the segment, in the example above, this would
-be <tt/BSS/. These symbols may be accessed by your code.
+be <tt/BSS/. These symbols may be accessed by your code when imported using
+the <tt>.IMPORT</tt> directive.
 
 Now, as we've configured the linker to write the first three segments and
 create symbols for the last one, there's only one question left: Where does
@@ -757,7 +767,8 @@ useful for things like a software stack, or an I/O area.
         }
 </verb></tscreen>
 
-This will define some external symbols that may be used in your code:
+This will define some external symbols that may be used in your code when
+imported using the <tt>.IMPORT</tt> directive:
 
 <tscreen><verb>
         __STACK_START__         This is set to the start of the memory
@@ -808,8 +819,7 @@ segment.
 <sect1>Other SEGMENT attributes<p>
 
 Segments may be aligned to some memory boundary. Specify "<tt/align = num/" to
-request this feature. Num must be a power of two. To align all segments on a
-page boundary, use
+request this feature. To align all segments on a page boundary, use
 
 <tscreen><verb>
         SEGMENTS {

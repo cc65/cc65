@@ -717,7 +717,7 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
         for (i = 0; i < CollCount (Entry->V.L.DefsOrRefs); i++) {
             DOR = CollAt (Entry->V.L.DefsOrRefs, i);
 
-            if ((DOR->Flags & SC_DEF) && (Flags & SC_REF) && (Flags & SC_GOTO)) {
+            if ((DOR->Flags & SC_DEF) && (Flags & SC_REF) && (Flags & (SC_GOTO|SC_GOTO_IND))) {
                 /* We're processing a goto and here is its destination label.
                 ** This means the difference between SP values is already known,
                 ** so we simply emit the SP adjustment code.
@@ -739,21 +739,23 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
             }
 
 
-            if ((DOR->Flags & SC_REF) && (DOR->Flags & SC_GOTO) && (Flags & SC_DEF)) {
+            if ((DOR->Flags & SC_REF) && (DOR->Flags & (SC_GOTO|SC_GOTO_IND)) && (Flags & SC_DEF)) {
                 /* We're processing a label, let's update all gotos encountered
                 ** so far
                 */
-                SymEntry *E;
-                g_userodata();
-                g_defdatalabel (DOR->LateSP_Label);
-                g_defdata (CF_CONST | CF_INT, StackPtr - DOR->StackPtr, 0);
+                if (DOR->Flags & SC_GOTO) {
+                    SymEntry *E;
+                    g_userodata ();
+                    g_defdatalabel (DOR->LateSP_Label);
+                    g_defdata (CF_CONST | CF_INT, StackPtr - DOR->StackPtr, 0);
 
-                /* Optimizer will need the information about the value of SP adjustment
-                ** later, so let's preserve it.
-                */
-                E = NewSymEntry (LocalLabelName (DOR->LateSP_Label), SC_SPADJUSTMENT);
-                E->V.SPAdjustment = StackPtr - DOR->StackPtr;
-                AddSymEntry (SPAdjustTab, E);
+                    /* Optimizer will need the information about the value of SP adjustment
+                    ** later, so let's preserve it.
+                    */
+                    E = NewSymEntry (LocalLabelName (DOR->LateSP_Label), SC_SPADJUSTMENT);
+                    E->V.SPAdjustment = StackPtr - DOR->StackPtr;
+                    AddSymEntry (SPAdjustTab, E);
+                }
 
                 /* Are we jumping into a block with initalization of an object that
                 ** has automatic storage duration? Let's emit a warning.
@@ -777,6 +779,7 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
 
         /* Set a new label number */
         Entry->V.L.Label = GetLocalLabel ();
+        Entry->V.L.IndJumpFrom = NULL;
 
         /* Create Collection for label definition and references */
         Entry->V.L.DefsOrRefs = NewCollection ();
@@ -995,6 +998,12 @@ SymTable* GetGlobalSymTab (void)
 /* Return the global symbol table */
 {
     return SymTab0;
+}
+
+SymTable* GetLabelSymTab (void)
+/* Return the global symbol table */
+{
+    return LabelTab;
 }
 
 

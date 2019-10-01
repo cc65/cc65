@@ -53,6 +53,14 @@ extern void atr5200std_joy[];        /* referred to by joy_static_stddrv[] */
 #define JOY_RIGHT_MASK  0x08
 #define JOY_BTN_1_MASK  0x10
 
+/* Character codes */
+#define CH_ULCORNER     0x0B         /* '+' sign */
+#define CH_URCORNER     0x0B
+#define CH_LLCORNER     0x0B
+#define CH_LRCORNER     0x0B
+#define CH_HLINE        0x0D         /* dash */
+#define CH_VLINE        0x01         /* exclamation mark */
+
 /* get_tv return values */
 #define AT_NTSC     0
 #define AT_PAL      1
@@ -68,6 +76,18 @@ extern void atr5200std_joy[];        /* referred to by joy_static_stddrv[] */
 
 #include <_antic.h>
 #define ANTIC (*(struct __antic*)0xD400)
+
+/* conio color defines */
+#define COLOR_WHITE 0x00
+#define COLOR_RED   0x01
+#define COLOR_GREEN 0x02
+#define COLOR_BLACK 0x03
+
+/* The following #define will cause the matching function calls in conio.h
+** to be overlaid by macros with the same names, saving the function call
+** overhead.
+*/
+#define _bordercolor(color) 0
 
 /* End of atari5200.h */
 #endif

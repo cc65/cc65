@@ -819,6 +819,7 @@ unsigned OptCmp8 (CodeSeg* S)
             /* We are able to evaluate the compare at compile time. Check if
             ** one or more branches are ahead.
             */
+            unsigned ProtectCompare = 0;
             unsigned JumpsChanged = 0;
             CodeEntry* N;
             while ((N = CS_GetNextEntry (S, I)) != 0 &&   /* Followed by something.. */
@@ -878,6 +879,21 @@ unsigned OptCmp8 (CodeSeg* S)
                     CodeEntry* X = NewCodeEntry (OP65_JMP, AM65_BRA, LabelName, L, N->LI);
                     CS_InsertEntry (S, X, I+2);
                     CS_DelEntry (S, I+1);
+                    /* Normally we can remove the compare as well,
+                    ** but some comparisons generate code with a
+                    ** shared branch operation. This prevents the unsafe
+                    ** removal of the compare for known problem cases.
+                    */
+                    if (
+                        /* Jump to branch that relies on the comparison. */
+                        (L->Owner->Info & (OF_CBRA | OF_ZBRA)) ||
+                        /* Jump to boolean transformer that relies on the comparison. */
+                        (L->Owner->OPC == OP65_JSR &&
+                         (FindBoolCmpCond (L->Owner->Arg)) != CMP_INV)
+                       )
+                    {
+                        ++ProtectCompare;
+                    }
                 }
 
                 /* Remember, we had changes */
@@ -885,11 +901,10 @@ unsigned OptCmp8 (CodeSeg* S)
                 ++Changes;
             }
 
-            /* If we have made changes above, we may also remove the compare */
-            if (JumpsChanged) {
+            /* Delete the original compare, if safe to do so. */
+            if (JumpsChanged && !ProtectCompare) {
                 CS_DelEntry (S, I);
             }
-
         }
 
 NextEntry:

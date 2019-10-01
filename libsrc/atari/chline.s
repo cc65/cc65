@@ -9,11 +9,7 @@
         .import         gotoxy, cputdirect, setcursor
         .importzp       tmp1
 
-.ifdef __ATARI5200__
-CHRCODE =       14
-.else
 CHRCODE =       $12+64
-.endif
 
 _chlinexy:
         pha                     ; Save the length

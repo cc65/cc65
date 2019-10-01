@@ -85,12 +85,12 @@ unsigned int __fastcall__ mul40 (unsigned char value);
 ** result
 */
 
-int __fastcall__ sin (unsigned x);
+int __fastcall__ _sin (unsigned x);
 /* Return the sine of the argument, which must be in range 0..360. The result
 ** is in 8.8 fixed point format, which means that 1.0 = $100 and -1.0 = $FF00.
 */
 
-int __fastcall__ cos (unsigned x);
+int __fastcall__ _cos (unsigned x);
 /* Return the cosine of the argument, which must be in range 0..360. The result
 ** is in 8.8 fixed point format, which means that 1.0 = $100 and -1.0 = $FF00.
 */

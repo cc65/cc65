@@ -153,7 +153,7 @@ static void DoDiagram (void)
 
         /* Calculate the next points */
         X = (int) (((long) (MaxX - 19) * I) / 360);
-        Y = (int) (((long) Amp * -sin (I)) / 256);
+        Y = (int) (((long) Amp * -_sin (I)) / 256);
 
         /* Draw the line */
         tgi_lineto (XOrigin + X, YOrigin + Y);

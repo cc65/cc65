@@ -52,7 +52,7 @@ Special locations:
   <tag/Text screen/
   The text screen is only enabled if any of the CONIO output functions
   is used in the program. Its size is 20x24 characters (Antic mode 6,
-  BASIC mode 1). The text screen is located at &dollar;3E00. The
+  BASIC mode 1) by default. The text screen is located at &dollar;3E00. The
   address of the screen memory is available at runtime in the variable
   SAVMSC (&dollar;001B).<p>
   If the program doesn't use any CONIO output functions it needs to setup its own
@@ -151,6 +151,43 @@ No serial drivers are available for the Atari 5200.
 
 <sect>Limitations<p>
 
+
+<sect1>Direct console I/O<p>
+
+The <tt/atari5200/ target uses Antic mode 6 (BASIC mode 1) for the console
+screen by default. There are four colors available:
+
+<itemize>
+<item><tt/COLOR_WHITE/
+<item><tt/COLOR_RED/
+<item><tt/COLOR_GREEN/
+<item><tt/COLOR_BLACK/
+</itemize>
+
+Note that the <tt/COLOR_GREEN/ and <tt/COLOR_RED/ colors aren't
+exactly the same colors as the ones with the same name on the
+<tt/atari/ target.
+They are the colors which are available as <tt/COLOR_LIGHTGREEN/
+and <tt/COLOR_LIGHTRED/ there.
+
+One can set the color shadow registers directly with other colors.
+Then the color defines from above will just become placeholders. In
+this scenario it might be more convenient to use index values (0..3)
+instead of the color defines. The index values specify which of the
+system shadow color registers (<tt/COLOR0/ .. <tt/COLOR3/) to use.
+
+The default console screen has a layout of 20x24 characters. An
+alternative layout, 20x12, Antic mode 7, BASIC mode 2, is provided in
+the file <tt/atari5200-conioscreen-20x12.o/.
+
+Using <tt/atari5200-conioscreen-20x12.o/ is as simple as placing it on
+the linker command line like this:
+
+<tscreen><verb>
+cl65 -t atari5200 myprog.c atari5200-conioscreen-20x12.o
+</verb></tscreen>
+
+
 <sect1>Disk I/O<p>
 
 Disk I/O is not supported by the <tt/atari5200/ target. This means that
@@ -171,6 +208,9 @@ you cannot use any of the following functions (and a few others):
 
 <sect>Other hints<p>
 
+AtariROMMaker (<url url="https://www.wudsn.com/index.php/productions-atari800/tools/atarirommaker"> ) 
+can be used to create a <tt/.CAR/ file from the binary ROM image cc65 generates.
+This might be more convenient when working with emulators.
 
 
 <sect>License<p>

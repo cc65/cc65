@@ -378,6 +378,51 @@ extern void atrx15p2_tgi[];
 
 
 /*****************************************************************************/
+/* conio and TGI color defines                                               */
+/*****************************************************************************/
+
+/* Note that the conio color implementation is monochrome
+** (textcolor just sets text brightness low or high, depending on background
+** color)
+** These values can be used with bordercolor(), bgcolor(), and _setcolor_low()
+*/
+#define COLOR_BLACK      GTIA_COLOR_BLACK
+#define COLOR_WHITE      GTIA_COLOR_WHITE
+#define COLOR_RED        GTIA_COLOR_RED
+#define COLOR_CYAN       GTIA_COLOR_CYAN
+#define COLOR_VIOLET     GTIA_COLOR_VIOLET
+#define COLOR_GREEN      GTIA_COLOR_GREEN
+#define COLOR_BLUE       GTIA_COLOR_BLUE
+#define COLOR_YELLOW     GTIA_COLOR_YELLOW
+#define COLOR_ORANGE     GTIA_COLOR_ORANGE
+#define COLOR_BROWN      GTIA_COLOR_BROWN
+#define COLOR_LIGHTRED   GTIA_COLOR_LIGHTRED
+#define COLOR_GRAY1      GTIA_COLOR_GRAY1
+#define COLOR_GRAY2      GTIA_COLOR_GRAY2
+#define COLOR_LIGHTGREEN GTIA_COLOR_LIGHTGREEN
+#define COLOR_LIGHTBLUE  GTIA_COLOR_LIGHTBLUE
+#define COLOR_GRAY3      GTIA_COLOR_GRAY3
+
+/* TGI color defines */
+#define TGI_COLOR_BLACK      COLOR_BLACK
+#define TGI_COLOR_WHITE      COLOR_WHITE
+#define TGI_COLOR_RED        COLOR_RED
+#define TGI_COLOR_CYAN       COLOR_CYAN
+#define TGI_COLOR_VIOLET     COLOR_VIOLET
+#define TGI_COLOR_GREEN      COLOR_GREEN
+#define TGI_COLOR_BLUE       COLOR_BLUE
+#define TGI_COLOR_YELLOW     COLOR_YELLOW
+#define TGI_COLOR_ORANGE     COLOR_ORANGE
+#define TGI_COLOR_BROWN      COLOR_BROWN
+#define TGI_COLOR_LIGHTRED   COLOR_LIGHTRED
+#define TGI_COLOR_GRAY1      COLOR_GRAY1
+#define TGI_COLOR_GRAY2      COLOR_GRAY2
+#define TGI_COLOR_LIGHTGREEN COLOR_LIGHTGREEN
+#define TGI_COLOR_LIGHTBLUE  COLOR_LIGHTBLUE
+#define TGI_COLOR_GRAY3      COLOR_GRAY3
+
+
+/*****************************************************************************/
 /* PIA PORTA and PORTB register bits                                         */
 /*****************************************************************************/
 
@@ -490,6 +535,12 @@ extern void atrx15p2_tgi[];
 */
 #define PxCTL_IRQ_STATUS         0x80
 
+
+/* The following #define will cause the matching function calls in conio.h
+** to be overlaid by macros with the same names, saving the function call
+** overhead.
+*/
+#define _textcolor(color)        COLOR_WHITE
 
 /* End of atari.h */
 #endif

@@ -67,7 +67,7 @@ int main (void)
     gotoxy ((XSize - strlen (Text)) / 2, YSize / 2);
     cprintf ("%s", Text);
 
-#if defined(__NES__) || defined(__PCE__) || defined(__GAMATE__)
+#if defined(__NES__) || defined(__PCE__) || defined(__GAMATE__) || defined(__ATARI5200__)
 
     /* Wait for the user to press a button */
     joy_install (joy_static_stddrv);

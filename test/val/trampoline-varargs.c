@@ -9,7 +9,7 @@
 
 static unsigned char flag;
 
-static void trampoline_set() {
+static void trampoline_set(void) {
         // The Y register is used for variadics - save and restore
         asm("sty tmp3");
 

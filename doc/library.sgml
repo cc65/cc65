@@ -162,6 +162,7 @@ portable. conio implementations exist for the following targets:
   <item>apple2
   <item>apple2enh
   <item>atari
+  <item>atari5200
   <item>atarixl
   <item>atmos
   <item>c16 (works also for the c116 with up to 32K memory)

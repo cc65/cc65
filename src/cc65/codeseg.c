@@ -426,8 +426,10 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
         unsigned Hash = HashStr (Arg) % CS_LABEL_HASH_SIZE;
         Label = CS_FindLabel (S, Arg, Hash);
 
-        /* If we don't have the label, it's a forward ref - create it */
-        if (Label == 0) {
+        /* If we don't have the label, it's a forward ref - create it unless
+        ** it's an external function.
+        */
+        if (Label == 0 && (OPC->OPC != OP65_JMP || IsLocalLabelName (Arg)) ) {
             /* Generate a new label */
             Label = CS_NewCodeLabel (S, Arg, Hash);
         }

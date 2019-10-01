@@ -5,6 +5,7 @@
 ;
 
         .export         _exit
+        .export         startup
         .export         __STARTUP__ : absolute = 1      ; Mark as startup
         .import         zerobss, callmain
         .import         initlib, donelib
@@ -16,7 +17,7 @@
 
         .segment        "STARTUP"
 
-        cld
+startup:cld
         ldx     #$FF
         txs
         lda     #<(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)

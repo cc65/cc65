@@ -58,6 +58,7 @@
 
 struct Segments;
 struct LiteralPool;
+struct CodeEntry;
 
 
 
@@ -100,6 +101,7 @@ struct LiteralPool;
 
 #define SC_GOTO         0x20000U
 #define SC_SPADJUSTMENT 0x40000U
+#define SC_GOTO_IND     0x80000U        /* Indirect goto */
 
 
 
@@ -138,6 +140,7 @@ struct SymEntry {
         struct {
             unsigned            Label;
             Collection          *DefsOrRefs;
+            struct CodeEntry    *IndJumpFrom;
         } L;
 
         /* Value of SP adjustment needed after forward 'goto' */

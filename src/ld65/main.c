@@ -128,23 +128,24 @@ static void Usage (void)
             "  -vm\t\t\tVerbose map file\n"
             "\n"
             "Long options:\n"
-            "  --cfg-path path\tSpecify a config file search path\n"
-            "  --config name\t\tUse linker config file\n"
-            "  --dbgfile name\tGenerate debug information\n"
-            "  --define sym=val\tDefine a symbol\n"
-            "  --end-group\t\tEnd a library group\n"
-            "  --force-import sym\tForce an import of symbol 'sym'\n"
-            "  --help\t\tHelp (this text)\n"
-            "  --lib file\t\tLink this library\n"
-            "  --lib-path path\tSpecify a library search path\n"
-            "  --mapfile name\tCreate a map file\n"
-            "  --module-id id\tSpecify a module id\n"
-            "  --obj file\t\tLink this object file\n"
-            "  --obj-path path\tSpecify an object file search path\n"
-            "  --start-addr addr\tSet the default start address\n"
-            "  --start-group\t\tStart a library group\n"
-            "  --target sys\t\tSet the target system\n"
-            "  --version\t\tPrint the linker version\n",
+            "  --allow-multiple-definition\tAllow multiple definitions\n"
+            "  --cfg-path path\t\tSpecify a config file search path\n"
+            "  --config name\t\t\tUse linker config file\n"
+            "  --dbgfile name\t\tGenerate debug information\n"
+            "  --define sym=val\t\tDefine a symbol\n"
+            "  --end-group\t\t\tEnd a library group\n"
+            "  --force-import sym\t\tForce an import of symbol 'sym'\n"
+            "  --help\t\t\tHelp (this text)\n"
+            "  --lib file\t\t\tLink this library\n"
+            "  --lib-path path\t\tSpecify a library search path\n"
+            "  --mapfile name\t\tCreate a map file\n"
+            "  --module-id id\t\tSpecify a module id\n"
+            "  --obj file\t\t\tLink this object file\n"
+            "  --obj-path path\t\tSpecify an object file search path\n"
+            "  --start-addr addr\t\tSet the default start address\n"
+            "  --start-group\t\t\tStart a library group\n"
+            "  --target sys\t\t\tSet the target system\n"
+            "  --version\t\t\tPrint the linker version\n",
             ProgName);
 }
 
@@ -549,6 +550,15 @@ static void OptVersion (const char* Opt attribute ((unused)),
 
 
 
+static void OptMultDef (const char* Opt attribute ((unused)),
+                        const char* Arg attribute ((unused)))
+/* Set flag to allow multiple definitions of a global symbol */
+{
+    AllowMultDef = 1;
+}
+
+
+
 static void CmdlOptStartGroup (const char* Opt attribute ((unused)),
                                const char* Arg attribute ((unused)))
 /* Remember 'start group' occurrence in input files array */
@@ -599,23 +609,24 @@ static void ParseCommandLine(void)
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
-        { "--cfg-path",         1,      OptCfgPath              },
-        { "--config",           1,      CmdlOptConfig           },
-        { "--dbgfile",          1,      OptDbgFile              },
-        { "--define",           1,      OptDefine               },
-        { "--end-group",        0,      CmdlOptEndGroup         },
-        { "--force-import",     1,      OptForceImport          },
-        { "--help",             0,      OptHelp                 },
-        { "--lib",              1,      OptLib                  },
-        { "--lib-path",         1,      OptLibPath              },
-        { "--mapfile",          1,      OptMapFile              },
-        { "--module-id",        1,      OptModuleId             },
-        { "--obj",              1,      OptObj                  },
-        { "--obj-path",         1,      OptObjPath              },
-        { "--start-addr",       1,      OptStartAddr            },
-        { "--start-group",      0,      CmdlOptStartGroup       },
-        { "--target",           1,      CmdlOptTarget           },
-        { "--version",          0,      OptVersion              },
+        { "--allow-multiple-definition", 0,      OptMultDef              },
+        { "--cfg-path",                  1,      OptCfgPath              },
+        { "--config",                    1,      CmdlOptConfig           },
+        { "--dbgfile",                   1,      OptDbgFile              },
+        { "--define",                    1,      OptDefine               },
+        { "--end-group",                 0,      CmdlOptEndGroup         },
+        { "--force-import",              1,      OptForceImport          },
+        { "--help",                      0,      OptHelp                 },
+        { "--lib",                       1,      OptLib                  },
+        { "--lib-path",                  1,      OptLibPath              },
+        { "--mapfile",                   1,      OptMapFile              },
+        { "--module-id",                 1,      OptModuleId             },
+        { "--obj",                       1,      OptObj                  },
+        { "--obj-path",                  1,      OptObjPath              },
+        { "--start-addr",                1,      OptStartAddr            },
+        { "--start-group",               0,      CmdlOptStartGroup       },
+        { "--target",                    1,      CmdlOptTarget           },
+        { "--version",                   0,      OptVersion              },
     };
 
     unsigned I;

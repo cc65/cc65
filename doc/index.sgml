@@ -145,6 +145,9 @@
   <tag><htmlurl url="creativision.html" name="creativision.html"></tag>
   Topics specific to the Creativision Console.
 
+  <tag><htmlurl url="cx16.html" name="cx16.html"></tag>
+  Topics specific to the Commander X16.
+
   <tag><htmlurl url="gamate.html" name="gamate.html"></tag>
   Topics specific to the Bit Corporation Gamate Console.
 

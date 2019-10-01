@@ -359,8 +359,8 @@ static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall)
                 CHECK ((Param->Flags & SC_PARAM) != 0);
             }
         } else if (!Ellipsis) {
-            /* Too many arguments. Do we have an open param list? */
-            if ((Func->Flags & FD_VARIADIC) == 0) {
+            /* Too many arguments. Do we have an open or empty param. list? */
+            if ((Func->Flags & (FD_VARIADIC | FD_EMPTY)) == 0) {
                 /* End of param list reached, no ellipsis */
                 Error ("Too many arguments in function call");
             }
@@ -401,8 +401,9 @@ static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall)
         Flags |= TypeOf (Expr.Type);
 
         /* If this is a fastcall function, don't push the last argument */
-        if (ParamCount != Func->ParamCount || !IsFastcall) {
+        if ((CurTok.Tok == TOK_COMMA && NextTok.Tok != TOK_RPAREN) || !IsFastcall) {
             unsigned ArgSize = sizeofarg (Flags);
+
             if (FrameSize > 0) {
                 /* We have the space already allocated, store in the frame.
                 ** Because of invalid type conversions (that have produced an
@@ -472,8 +473,14 @@ static void FunctionCall (ExprDesc* Expr)
     /* Handle function pointers transparently */
     IsFuncPtr = IsTypeFuncPtr (Expr->Type);
     if (IsFuncPtr) {
-        /* Check whether it's a fastcall function that has parameters */
-        IsFastcall = (Func->Flags & FD_VARIADIC) == 0 && Func->ParamCount > 0 &&
+        /* Check whether it's a fastcall function that has parameters.
+        ** Note: if a function is forward-declared in the old K & R style, then
+        ** it may be called with any number of arguments, even though its
+        ** parameter count is zero.  Handle K & R functions as though there are
+        ** parameters.
+        */
+        IsFastcall = (Func->Flags & FD_VARIADIC) == 0 &&
+            (Func->ParamCount > 0 || (Func->Flags & FD_EMPTY)) &&
             (AutoCDecl ?
              IsQualFastcall (Expr->Type + 1) :
              !IsQualCDecl (Expr->Type + 1));
@@ -695,6 +702,23 @@ static void Primary (ExprDesc* E)
     }
 
     switch (CurTok.Tok) {
+
+        case TOK_BOOL_AND:
+            /* A computed goto label address */
+            if (IS_Get (&Standard) >= STD_CC65) {
+                SymEntry* Entry;
+                NextToken ();
+                Entry = AddLabelSym (CurTok.Ident, SC_REF | SC_GOTO_IND);
+                /* output its label */
+                E->Flags = E_RTYPE_RVAL | E_LOC_STATIC;
+                E->Name = Entry->V.L.Label;
+                E->Type = PointerTo (type_void);
+                NextToken ();
+            } else {
+                Error ("Computed gotos are a C extension, not supported with this --standard");
+                ED_MakeConstAbsInt (E, 1);
+            }
+            break;
 
         case TOK_IDENT:
             /* Identifier. Get a pointer to the symbol table entry */

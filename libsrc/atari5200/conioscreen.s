@@ -7,11 +7,18 @@
 SCREEN_BUF_SIZE =       20 * 24
 SCREEN_BUF      =       $4000 - SCREEN_BUF_SIZE
 
-                .export screen_setup_20x24
+                .export screen_setup
+                .export screen_width, screen_height
+                .export conio_color
+
+screen_width    =       20
+screen_height   =       24
+
 
                 .segment "ONCE"
 
-screen_setup_20x24:
+; initialize color registers, display list, and screen memory
+screen_setup:
 
                 ; initialize SAVMSC
                 lda     #<SCREEN_BUF
@@ -37,16 +44,15 @@ clrscr:         sta     (SAVMSC),y
 
                 ; set default colors
 
-                lda     #40
+                lda     #GTIA_COLOR_WHITE
                 sta     COLOR0
-                lda     #202
+                lda     #GTIA_COLOR_LIGHTRED
                 sta     COLOR1
-                lda     #148
+                lda     #GTIA_COLOR_LIGHTGREEN
                 sta     COLOR2
-                lda     #70
+                lda     #GTIA_COLOR_BLACK
                 sta     COLOR3
-                lda     #0
-                sta     COLOR4
+                sta     COLOR4          ; background
 
                 ; set display list
 
@@ -57,6 +63,9 @@ clrscr:         sta     (SAVMSC),y
 
                 rts
 
+                .bss
+
+conio_color:    .res    1
 
                 .segment "DLIST"
 

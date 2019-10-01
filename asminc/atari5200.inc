@@ -10,6 +10,16 @@
  
 ATEOL   = $9B      ; END-OF-LINE, used by CONIO
 
+;-------------------------------------------------------------------------
+; CONIO CHARACTER DEFS
+;-------------------------------------------------------------------------
+
+CH_ULCORNER = $0B  ; '+' sign
+CH_URCORNER = $0B
+CH_LLCORNER = $0B
+CH_LRCORNER = $0B
+CH_HLINE    = $0D  ; dash
+CH_VLINE    = $01  ; exclamation mark
 
 ;-------------------------------------------------------------------------
 ; Zero Page
@@ -101,6 +111,14 @@ ANTIC     = $D400  ; ANTIC area
 POKEY     = $E800  ; POKEY area
 .include  "atari_pokey.inc"
 
+;-------------------------------------------------------------------------
+; conio color defines
+;-------------------------------------------------------------------------
+
+COLOR_WHITE = 0
+COLOR_RED   = 1
+COLOR_GREEN = 2
+COLOR_BLACK = 3
 
 ;-------------------------------------------------------------------------
 ; Cartridge Parameters

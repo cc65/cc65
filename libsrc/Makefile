@@ -7,6 +7,7 @@ CBMS = c128   \
        c64    \
        cbm510 \
        cbm610 \
+       cx16   \
        pet    \
        plus4  \
        vic20

@@ -77,6 +77,7 @@
 typedef void (*PVFunc) (CPURegs* Regs);
 
 static unsigned ArgStart;
+static unsigned char SPAddr;
 
 
 
@@ -102,15 +103,6 @@ static void SetAX (CPURegs* Regs, unsigned Val)
 
 
 
-static void MemWriteWord (unsigned Addr, unsigned Val)
-{
-    MemWriteByte (Addr, Val);
-    Val >>= 8;
-    MemWriteByte (Addr + 1, Val);
-}
-
-
-
 static unsigned char Pop (CPURegs* Regs)
 {
     return MemReadByte (0x0100 + ++Regs->SP);
@@ -120,10 +112,22 @@ static unsigned char Pop (CPURegs* Regs)
 
 static unsigned PopParam (unsigned char Incr)
 {
-    unsigned SP = MemReadZPWord (0x00);
+    unsigned SP = MemReadZPWord (SPAddr);
     unsigned Val = MemReadWord (SP);
-    MemWriteWord (0x0000, SP + Incr);
+    MemWriteWord (SPAddr, SP + Incr);
     return Val;
+}
+
+
+
+static void PVExit (CPURegs* Regs)
+{
+    Print (stderr, 1, "PVExit ($%02X)\n", Regs->AC);
+    if (PrintCycles) {
+        Print (stdout, 0, "%lu cycles\n", GetCycles ());
+    }
+
+    exit (Regs->AC);
 }
 
 
@@ -132,7 +136,7 @@ static void PVArgs (CPURegs* Regs)
 {
     unsigned ArgC = ArgCount - ArgStart;
     unsigned ArgV = GetAX (Regs);
-    unsigned SP   = MemReadZPWord (0x00);
+    unsigned SP   = MemReadZPWord (SPAddr);
     unsigned Args = SP - (ArgC + 1) * 2;
 
     Print (stderr, 2, "PVArgs ($%04X)\n", ArgV);
@@ -152,22 +156,10 @@ static void PVArgs (CPURegs* Regs)
         MemWriteWord (Args, SP);
         Args += 2;
     }
-    MemWriteWord (Args, 0x0000);
+    MemWriteWord (Args, SPAddr);
 
-    MemWriteWord (0x0000, SP);
+    MemWriteWord (SPAddr, SP);
     SetAX (Regs, ArgC);
-}
-
-
-
-static void PVExit (CPURegs* Regs)
-{
-    Print (stderr, 1, "PVExit ($%02X)\n", Regs->AC);
-    if (PrintCycles) {
-        Print (stdout, 0, "%lu cycles\n", GetCycles ());
-    }
-
-    exit (Regs->AC);
 }
 
 
@@ -303,20 +295,21 @@ static void PVWrite (CPURegs* Regs)
 
 
 static const PVFunc Hooks[] = {
-    PVArgs,
-    PVExit,
     PVOpen,
     PVClose,
     PVRead,
     PVWrite,
+    PVArgs,
+    PVExit,
 };
 
 
 
-void ParaVirtInit (unsigned aArgStart)
+void ParaVirtInit (unsigned aArgStart, unsigned char aSPAddr)
 /* Initialize the paravirtualization subsystem */
 {
     ArgStart = aArgStart;
+    SPAddr = aSPAddr;
 };
 
 
@@ -325,13 +318,13 @@ void ParaVirtHooks (CPURegs* Regs)
 /* Potentially execute paravirtualization hooks */
 {
     /* Check for paravirtualization address range */
-    if (Regs->PC <  0xFFF0 ||
-        Regs->PC >= 0xFFF0 + sizeof (Hooks) / sizeof (Hooks[0])) {
+    if (Regs->PC <  PARAVIRT_BASE ||
+        Regs->PC >= PARAVIRT_BASE + sizeof (Hooks) / sizeof (Hooks[0])) {
         return;
     }
 
     /* Call paravirtualization hook */
-    Hooks[Regs->PC - 0xFFF0] (Regs);
+    Hooks[Regs->PC - PARAVIRT_BASE] (Regs);
 
     /* Simulate RTS */
     Regs->PC = Pop(Regs) + (Pop(Regs) << 8) + 1;

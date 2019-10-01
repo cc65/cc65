@@ -732,7 +732,7 @@ static void ParseSegments (void)
 
                 case CFGTOK_OFFSET:
                     FlagAttr (&S->Attr, SA_OFFSET, "OFFSET");
-                    S->Addr   = CfgCheckedConstExpr (1, 0x1000000);
+                    S->Addr   = CfgCheckedConstExpr (0, 0x1000000);
                     S->Flags |= SF_OFFSET;
                     break;
 

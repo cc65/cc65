@@ -442,6 +442,10 @@ long GetExprVal (ExprNode* Expr)
         case EXPR_DWORD:
             return GetExprVal (Expr->Left) & 0xFFFFFFFF;
 
+        case EXPR_NEARADDR:
+            /* Assembler was expected to validate this truncation. */
+            return GetExprVal (Expr->Left) & 0xFFFF;
+
         default:
             Internal ("Unknown expression Op type: %u", Expr->Op);
             /* NOTREACHED */

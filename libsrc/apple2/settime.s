@@ -21,11 +21,11 @@ _clock_settime:
         ldy     __dos_type
         beq     enosys
 
-        ; Check for existing minutes or hours
+        ; Check for realtme clock
         tay                     ; Save A
-        lda     TIMELO
-        ora     TIMELO+1
-        bne     erange
+        lda     MACHID
+        lsr     a
+        bcs     erange
         tya                     ; Restore A
 
         ; Get tm

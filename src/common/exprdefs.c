@@ -218,6 +218,10 @@ static void InternalDumpExpr (const ExprNode* Expr, const ExprNode* (*ResolveSym
             printf (" DWORD");
             break;
 
+        case EXPR_NEARADDR:
+            printf (" NEARADDR");
+            break;
+
         default:
             AbEnd ("Unknown Op type: %u", Expr->Op);
 

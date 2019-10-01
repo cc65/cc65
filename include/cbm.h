@@ -121,6 +121,8 @@ extern char _filetype;          /* Defaults to 's' */
 #define CH_STOP           3
 #define CH_LIRA          92
 #define CH_ESC           27
+#define CH_FONT_LOWER    14
+#define CH_FONT_UPPER   142
 
 
 

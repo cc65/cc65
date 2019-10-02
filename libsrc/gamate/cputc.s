@@ -101,7 +101,6 @@ putchar:
         ldy     #$f8
 @copylp1:
         lda     (ptr3),y
-        eor     RVS
         sta     LCD_DATA
         iny
         bne     @copylp1
@@ -124,7 +123,6 @@ putchar:
         ldy     #$f8
 @copylp2:
         lda     (ptr3),y
-        eor     RVS
         sta     LCD_DATA
         iny
         bne     @copylp2

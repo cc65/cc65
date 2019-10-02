@@ -95,20 +95,20 @@ int ValidAddrSizeForCPU (unsigned char AddrSize)
             return 1;
 
         case ADDR_SIZE_ZP:
-            /* Not supported by None and Sweet16 */
-            return (CPU != CPU_NONE && CPU != CPU_SWEET16);
+            /* Not supported by Sweet16 */
+            return (CPU != CPU_SWEET16);
 
         case ADDR_SIZE_ABS:
-            /* Not supported by None */
-            return (CPU != CPU_NONE);
+            /* Always supported */
+            return 1;
 
         case ADDR_SIZE_FAR:
-            /* Only supported by 65816 */
-            return (CPU == CPU_65816);
+            /* Supported by "none" and 65816 */
+            return (CPU == CPU_NONE && CPU == CPU_65816);
 
         case ADDR_SIZE_LONG:
-            /* Not supported by any CPU */
-            return 0;
+            /* "none" supports all sizes */
+            return (CPU == CPU_NONE);
 
         default:
             FAIL ("Invalid address size");

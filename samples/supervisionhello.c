@@ -59,7 +59,7 @@ int main()
         POKE(SV_OFFSET+7 +i*48,bit_reverse(w_char[i]));
         POKE(SV_OFFSET+8 +i*48,bit_reverse(o_char[i]));
         POKE(SV_OFFSET+9 +i*48,bit_reverse(r_char[i]));
-        POKE(SV_OFFSET+10 +i*48,bit_reverse(l_char[i]));
+        POKE(SV_OFFSET+10+i*48,bit_reverse(l_char[i]));
         POKE(SV_OFFSET+11+i*48,bit_reverse(d_char[i]));        
     }
 

@@ -34,18 +34,9 @@ unsigned char bit_reverse(unsigned char n)
     return (bit_reverse_lookup[n&0b1111] << 4) | bit_reverse_lookup[n>>4];
 }
 
-void init_screen(void)
-{
-    SV_LCD.height = 0xA0;
-    SV_LCD.width = 0xA0;
-    SV_BANK = 0xC9;     
-}
-
 int main()
 {
     unsigned char i;
-    
-    init_screen();
     
     clear_screen();
     

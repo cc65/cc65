@@ -67,7 +67,10 @@ not_dma:
 ; Removing this segment gives only a warning.
         .segment "FFF0"
 .proc reset32kcode
-        lda     #(6<<5)
+        lda     #$A0
+        sta     lcd_width
+        sta     lcd_height
+        lda     #$C9
         sta     sv_bank
 ; Now, the 32Kbyte image can reside in the top of 64Kbyte and 128Kbyte ROMs.
         jmp     reset

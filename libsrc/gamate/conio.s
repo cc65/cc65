@@ -13,6 +13,7 @@ initconio:
         lda     #0
         sta     LCD_XPOS
         sta     LCD_YPOS
+        sta     RVS
 
         lda     #LCD_MODE_INC_Y
         sta     LCD_MODE

@@ -23,7 +23,7 @@ void clear_screen(void)
 {
     unsigned short i;
     
-    for(i=0;i<160*160;++i)
+    for(i=0;i<0x2000;++i)
     {
         POKE(SV_VIDEO+i,0);
     }

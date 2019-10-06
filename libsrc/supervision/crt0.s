@@ -67,7 +67,7 @@ not_dma:
 ; Removing this segment gives only a warning.
         .segment "FFEA"
 .proc reset32kcode
-        lda     #$A0
+        lda     #160
         sta     lcd_width
         sta     lcd_height
         lda     #(6<<5) | SV_LCD_ON | SV_NMI_ENABLE_ON 

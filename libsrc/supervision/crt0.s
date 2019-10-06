@@ -65,12 +65,12 @@ not_dma:
 .endproc
 
 ; Removing this segment gives only a warning.
-        .segment "FFF0"
+        .segment "FFEA"
 .proc reset32kcode
         lda     #$A0
         sta     lcd_width
         sta     lcd_height
-        lda     #$C9
+        lda     #(6<<5) | SV_LCD_ON | SV_NMI_ENABLE_ON 
         sta     sv_bank
 ; Now, the 32Kbyte image can reside in the top of 64Kbyte and 128Kbyte ROMs.
         jmp     reset

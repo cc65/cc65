@@ -198,6 +198,9 @@ EXELIST_atarixl = $(EXELIST_atari)
 
 EXELIST_atari2600 = \
         atari2600hello
+        
+EXELIST_supervision = \
+        supervisionhello
 
 # Unlisted targets will try to build everything.
 # That lets us learn what they cannot build, and what settings

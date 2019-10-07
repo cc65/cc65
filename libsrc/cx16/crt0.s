@@ -62,6 +62,7 @@ L2:     lda     zpsave,x
         stx     VIA1::PRA2      ; Restore former RAM bank
         lda     VIA1::PRB
         and     #<~$07
+        ora     #$04
         sta     VIA1::PRB       ; Change back to BASIC ROM
 
 ; Back to BASIC.
@@ -77,7 +78,7 @@ init:
 ; Change from BASIC's ROM to Kernal's ROM.
 
         lda     VIA1::PRB
-        ora     #$07
+        and     #<~$07
         sta     VIA1::PRB
 
 ; Change to the first RAM bank.

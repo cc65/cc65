@@ -9,10 +9,10 @@
 #include <supervision.h>
 #include <peekpoke.h>
 
-// Last 8 bytes are not displayed
+// Number of bytes per screen line (Remark: Last 8 bytes are not displayed)
 #define BYTES_PER_LINE 48
 
-// Characters definitions in 8x8 format
+// Character definitions in 8x8 format
 const unsigned char h_char[] = {0x66,0x66,0x66,0x7E,0x66,0x66,0x66,0x00};
 const unsigned char e_char[] = {0x7E,0x60,0x60,0x78,0x60,0x60,0x7E,0x00};
 const unsigned char l_char[] = {0x60,0x60,0x60,0x60,0x60,0x60,0x7E,0x00};
@@ -32,6 +32,7 @@ void clear_screen(void)
 }
 
 // Necessary conversion to have 2 bits per pixel with darkest hue
+// Remark: The Supervision uses 2 bits per pixel and bits are mapped into pixel in reversed order
 unsigned char reversed_map_one_to_two_lookup[16] = 
 {
     0x00, 0xC0, 0x30, 0xF0, 0x0C, 0xCC, 0x3C, 0xFC,

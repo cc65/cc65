@@ -1,8 +1,18 @@
+/*****************************************************************************/
+/*                                                                           */
+/* Watara Supervision sample C program                                       */
+/*                                                                           */
+/* Fabrizio Caruso (fabrizio_caruso@hotmail.com), 2019                       */
+/*                                                                           */
+/*****************************************************************************/
+
 #include <supervision.h>
 #include <peekpoke.h>
 
+// Last 8 bytes are not displayed
 #define BYTES_PER_LINE 48
 
+// Characters definitions in 8x8 format
 const unsigned char h_char[] = {0x66,0x66,0x66,0x7E,0x66,0x66,0x66,0x00};
 const unsigned char e_char[] = {0x7E,0x60,0x60,0x78,0x60,0x60,0x7E,0x00};
 const unsigned char l_char[] = {0x60,0x60,0x60,0x60,0x60,0x60,0x7E,0x00};
@@ -21,6 +31,7 @@ void clear_screen(void)
     }
 }
 
+// Necessary conversion to have 2 bits per pixel with darkest hue
 unsigned char reversed_map_one_to_two_lookup[16] = 
 {
     0x00, 0xC0, 0x30, 0xF0, 0x0C, 0xCC, 0x3C, 0xFC,

@@ -35,27 +35,17 @@ rand:   .dword   1
 .code
 
 _rand:  clc
-        lda     rand+0          ; SEED *= $01010101
-        adc     rand+1
+        lda     rand+0          ; SEED += $B3
+        adc     #$B3
+        sta     rand+0
+        adc     rand+1          ; SEED *= $01010101
         sta     rand+1
         adc     rand+2
         sta     rand+2
-        adc     rand+3
-        sta     rand+3
-        clc
-        lda     rand+0          ; SEED += $31415927
-        adc     #$27
-        sta     rand+0
-        lda     rand+1
-        adc     #$59
-        sta     rand+1
-        lda     rand+2
-        adc     #$41
-        sta     rand+2
         and     #$7f            ; Suppress sign bit (make it positive)
         tax
-        lda     rand+3
-        adc     #$31
+        lda     rand+2
+        adc     rand+3
         sta     rand+3
         rts                     ; return bit (16-22,24-31) in (X,A)
 

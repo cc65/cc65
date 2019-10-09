@@ -60,8 +60,15 @@ void display_char(const unsigned char x, const unsigned char y, const unsigned c
     } 
 }
 
+void init_lcd(void)
+{
+    SV_LCD.width = 160;
+    SV_LCD.height = 160;
+}
+
 int main()
-{    
+{   
+    init_lcd();
     clear_screen();
     
     display_char(3,2, h_char);

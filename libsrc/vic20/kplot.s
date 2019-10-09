@@ -7,12 +7,13 @@
 
         .export         PLOT
 
+        .include        "vic20.inc"
 
 .proc   PLOT
 
         bcs     @L1
-        jsr     $FFF0                   ; Set cursor position
-        jmp     $EAB2                   ; Set pointer to color RAM
+        jsr     $FFF0                   ; Set cursor position using original ROM PLOT
+        jmp     UPDCRAMPTR              ; Set pointer to color RAM
 
 @L1:    jmp     $FFF0                   ; Get cursor position
 

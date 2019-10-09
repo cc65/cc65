@@ -115,3 +115,8 @@ VIA2_PCR        := VIA2+$C      ; Peripheral control register
 VIA2_IFR        := VIA2+$D      ; Interrupt flag register
 VIA2_IER        := VIA2+$E      ; Interrupt enable register
 VIA2_PA2        := VIA2+$F      ; Port register A w/o handshake
+
+; ---------------------------------------------------------------------------
+; Kernal routines, direct entries
+
+UPDCRAMPTR      := $EAB2        ; Update the color RAM pointer to match the screen RAM pointer

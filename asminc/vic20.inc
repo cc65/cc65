@@ -118,5 +118,11 @@ VIA2_PA2        := VIA2+$F      ; Port register A w/o handshake
 
 ; ---------------------------------------------------------------------------
 ; Kernal routines, direct entries
+;
+; The proper home for this is actually asminc/cbm_kernal.inc, but unfortunately
+; that file cannot be used by conio code because it defines PLOT as the actual
+; PLOT routine in the ROM, conflicting with our replacement for PLOT in
+; libsrc/vic20/kplot.s. It would be nice to work out a better way to handle that
+; conflict so that this could be moved there.
 
 UPDCRAMPTR      := $EAB2        ; Update the color RAM pointer to match the screen RAM pointer

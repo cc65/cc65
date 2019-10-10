@@ -214,3 +214,14 @@ CASSMOT         = $20           ; Cassette motor on
 TP_FAST         = $80           ; Switch Rossmoeller TurboProcess to fast mode
 
 RAMONLY         = $F8           ; (~(LORAM | HIRAM | IOEN)) & $FF
+
+; --------------------------------------------------------------------------
+; Kernal routines, direct entries
+;
+; The proper home for this is actually asminc/cbm_kernal.inc, but unfortunately
+; that file cannot be used by conio code because it defines PLOT as the actual
+; PLOT routine in the ROM, conflicting with our replacement for PLOT in
+; libsrc/c64/kplot.s. It would be nice to work out a better way to handle that
+; conflict so that this could be moved there.
+
+UPDCRAMPTR      := $EA24        ; Update the color RAM pointer to match the screen RAM pointer

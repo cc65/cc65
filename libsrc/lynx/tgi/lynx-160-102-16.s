@@ -1,10 +1,10 @@
 ;
 ; Graphics driver for the 160x102x16 mode on the Lynx.
 ;
-; All the drawing functions are simply done by sprites as the sprite
+; All the drawing functions simply are done by sprites, as the sprite
 ; engine is the only way to do fast graphics on a Lynx.
 ;
-; This code is written by Karri Kaksonen, 2004 for the cc65 compiler.
+; This code was written by Karri Kaksonen, 2004 for the cc65 compiler.
 ;
 
         .include        "zeropage.inc"
@@ -104,8 +104,10 @@ BGINDEX:        .res    1       ; Pen to use for text background
 DRAWPAGE:       .res    1
 SWAPREQUEST:    .res    1
 
+; 8 rows with (one offset-byte plus 20 character bytes plus one fill-byte) plus one 0-offset-byte.
+; (As an experiment, the fill-byte isn't being generated.
+;  It might not be needed to work around a Suzy bug.)
 text_bitmap:    .res    8*(1+20+1)+1
-; 8 rows with (one offset-byte plus 20 character bytes plus one fill-byte) plus one 0-offset-byte
 
 ; Constants and tables
 
@@ -830,7 +832,7 @@ TEXTSTYLE:
 
 ; ------------------------------------------------------------------------
 ; OUTTEXT: Output text at X/Y = ptr1/ptr2 using the current color and the
-; current text style. The text to output is given as a zero terminated
+; current text style. The text to output is given as a zero-terminated
 ; string with address in ptr3.
 ;
 ; Must set an error code: NO
@@ -842,12 +844,11 @@ OUTTEXT:
         lda     TEXTMAGY
         sta     text_sy+1
 
-        stz     text_sprite     ; Set normal sprite
         lda     BGINDEX
-        bne     @L1
-        lda     #4
-        sta     text_sprite     ; Set opaque sprite
+        beq     @L1             ; Choose opaque black sprite?
+        lda     #$04            ; No, choose normal sprite
 @L1:
+        sta     text_sprite
         lda     DRAWINDEX       ; Set color
         asl
         asl
@@ -875,15 +876,18 @@ OUTTEXT:
         ldy     #20
 @L3:
         sty     STRLEN
+        tya
         bne     @L4
-        rts                     ; Zero length string
+        rts                     ; Zero-length string
 @L4:
         iny                     ; Prepare text_bitmap
-        iny
+
+; The next instruction is commented because the code won't include a fill-byte.
+;        iny
         sty     STROFF
 
         ldy     #8-1            ; 8 pixel lines per character
-        ldx     #0
+        ldx     #$00
         clc
 @L5:
         lda     STROFF
@@ -891,45 +895,45 @@ OUTTEXT:
         txa
         adc     STROFF
         tax
-        lda     #$ff
-        sta     text_bitmap-1,x
+
+; This was the fill-byte.
+;        lda     #$FF
+;        sta     text_bitmap-1,x
         dey
         bpl     @L5
         stz     text_bitmap,x
 
         stz     tmp2
-        iny
+        iny                     ;(ldy #$00)
 @L6:
         lda     (STRPTR),y
         sty     tmp1
 
-        sec                     ; (ch-' ') * 8
-        sbc     #32
-        stz     FONTOFF
+        sub     #' '            ; (ch - ' ') * 8
         stz     FONTOFF+1
         asl
         asl
         rol     FONTOFF+1
         asl
         rol     FONTOFF+1
-        clc                     ; Choose font
-        adc     #<font
+        ;clc                    ; (cleared by rol)
+        adc     #<font          ; Choose font
         sta     FONTOFF
         lda     FONTOFF+1
         adc     #>font
         sta     FONTOFF+1
 
-; and now copy the 8 bytes of that char
+; And now, copy the 8 bytes of that glyph.
 
         ldx     tmp2
         inx
         stx     tmp2
 
-; draw char from top to bottom, reading char-data from offset 8-1 to offset 0
+; Draw char. from top to bottom, reading char-data from offset 8-1 to offset 0.
         ldy     #8-1
 @L7:
-        lda     (FONTOFF),y         ; *chptr
-        sta     text_bitmap,x    ;textbuf[y*(1+len+1)+1+x]
+        lda     (FONTOFF),y     ; *chptr
+        sta     text_bitmap,x   ; textbuf[y*(1+len+1)+1+x]
 
         txa
         adc     STROFF
@@ -938,7 +942,7 @@ OUTTEXT:
         dey
         bpl     @L7
 
-        ; goto next char
+        ; Goto next char.
         ldy     tmp1
         iny
         dec     STRLEN

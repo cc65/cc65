@@ -490,7 +490,6 @@ void CfgSpecialToken (const IdentTok* Table, unsigned Size, const char* Name)
 
     /* We need an identifier */
     if (CfgTok == CFGTOK_IDENT) {
-
         /* Make it upper case */
         SB_ToUpper (&CfgSVal);
 
@@ -502,10 +501,13 @@ void CfgSpecialToken (const IdentTok* Table, unsigned Size, const char* Name)
             }
         }
 
+        /* Not found */
+        CfgError (&CfgErrorPos, "%s expected, got '%s'", Name, SB_GetConstBuf(&CfgSVal));
+        return;
     }
 
-    /* Not found or no identifier */
-    CfgError (&CfgErrorPos, "%s expected, got '%s'", Name, SB_GetConstBuf(&CfgSVal));
+    /* No identifier */
+    CfgError (&CfgErrorPos, "%s expected", Name);
 }
 
 

@@ -979,24 +979,24 @@ font:
         .byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF  ;32
         .byte $FF, $E7, $FF, $FF, $E7, $E7, $E7, $E7  ;33
         .byte $FF, $FF, $FF, $FF, $FF, $99, $99, $99  ;34
-        .byte $FF, $99, $99, $00, $99, $00, $99, $99  ;35
+        .byte $FF, $D7, $D7, $01, $D7, $01, $D7, $D7  ;35
         .byte $FF, $E7, $83, $F9, $C3, $9F, $C1, $E7  ;36
         .byte $FF, $B9, $99, $CF, $E7, $F3, $99, $9D  ;37
-        .byte $FF, $C0, $99, $98, $C7, $C3, $99, $C3  ;38
+        .byte $81, $B3, $31, $8F, $87, $33, $87, $FF  ;38
         .byte $FF, $FF, $FF, $FF, $FF, $E7, $F3, $F9  ;39
         .byte $FF, $F3, $E7, $CF, $CF, $CF, $E7, $F3  ;40
         .byte $FF, $CF, $E7, $F3, $F3, $F3, $E7, $CF  ;41
-        .byte $FF, $FF, $99, $C3, $00, $C3, $99, $FF  ;42
+        .byte $FF, $99, $C3, $81, $C3, $99, $FF, $FF  ;42
         .byte $FF, $FF, $E7, $E7, $81, $E7, $E7, $FF  ;43
         .byte $CF, $E7, $E7, $FF, $FF, $FF, $FF, $FF  ;44
         .byte $FF, $FF, $FF, $FF, $81, $FF, $FF, $FF  ;45
         .byte $FF, $E7, $E7, $FF, $FF, $FF, $FF, $FF  ;46
-        .byte $FF, $9F, $CF, $E7, $F3, $F9, $FC, $FF  ;47
+        .byte $FF, $BF, $9F, $CF, $E7, $F3, $F9, $FD  ;47
         .byte $FF, $C3, $99, $99, $89, $91, $99, $C3  ;48
         .byte $FF, $81, $E7, $E7, $E7, $C7, $E7, $E7  ;49
         .byte $FF, $81, $9F, $CF, $F3, $F9, $99, $C3  ;50
         .byte $FF, $C3, $99, $F9, $E3, $F9, $99, $C3  ;51
-        .byte $FF, $F9, $F9, $80, $99, $E1, $F1, $F9  ;52
+        .byte $F3, $F3, $01, $33, $C3, $E3, $FB, $FF  ;52
         .byte $FF, $C3, $99, $F9, $F9, $83, $9F, $81  ;53
         .byte $FF, $C3, $99, $99, $83, $9F, $99, $C3  ;54
         .byte $FF, $E7, $E7, $E7, $E7, $F3, $99, $81  ;55

@@ -1041,7 +1041,7 @@ font:
         .byte $FF, $03, $9D, $CF, $83, $CF, $ED, $F3  ;28
         .byte $FF, $C3, $F3, $F3, $F3, $F3, $F3, $C3  ;29
         .byte $E7, $E7, $E7, $E7, $81, $C3, $E7, $FF  ;30
-        .byte $FF, $EF, $CF, $80, $80, $CF, $EF, $FF  ;31
+        .byte $FF, $DF, $9F, $01, $01, $9F, $DF, $FF  ;31
 
 
 ; gemena

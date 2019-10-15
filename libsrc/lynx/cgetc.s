@@ -20,13 +20,13 @@
 ; So the keyboard returns '1', '2', '3', 'P', 'R', 'F' or '?'.
 
 _cgetc:
-        lda     KBSTL
-        ora     KBEDG
-        bne     @L1
         jsr     _kbhit          ; Check for char available
+        bne     @L1        
         tax                             ; Test result
         bra     _cgetc
 @L1:
+        lda     KBSTL
+        ora     KBEDG
         ldx     #0
         and     #1
         beq     @L6

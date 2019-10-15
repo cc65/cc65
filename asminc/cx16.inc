@@ -285,7 +285,7 @@ NMIVec          := $0318
 .struct VIA2
         .org    $9F70
   PRB   .byte
-  PRA   .byte			; NES controller communication
+  PRA   .byte                   ; NES controller communication
   DDRB  .byte
   DDRA  .byte
   T1    .word
@@ -306,11 +306,12 @@ NMIVec          := $0318
 .struct EMULATOR
                 .org    $9FB0
   DEBUG         .byte           ; Boolean: debugging enabled
-  VIDACCESSLOG  .byte           ; Boolean: log VERA activity
+  VERALOG       .byte           ; Boolean: log VERA activity
   KEYBOARDLOG   .byte           ; Boolean: log keyboard data
-  ECHO          .byte           ; Boolean: echo enabled
+  ECHO          .byte           ; Type of echo that's enabled
   SAVEXIT       .byte           ; Boolean: save on exit
-                .res    $D - $5
-  KEYMAP        .byte           ; Current keyboard layout number
-  DETECT        .byte   2       ; If is "16" string, then running on emulator
+  GIFREC        .byte           ; Method of recording GIF movie
+                .org    $9FBD
+  KEYMAP        .byte           ; Current keyboard layout number (Read-Only)
+  DETECT        .byte   2       ; If is "16" string, then running on emulator (RO)
 .endstruct

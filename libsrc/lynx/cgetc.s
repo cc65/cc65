@@ -22,7 +22,6 @@
 _cgetc:
         jsr     _kbhit          ; Check for char available
         bne     @L1        
-        tax                             ; Test result
         bra     _cgetc
 @L1:
         lda     KBSTL

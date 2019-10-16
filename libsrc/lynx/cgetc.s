@@ -21,49 +21,47 @@
 
 _cgetc:
         jsr     _kbhit          ; Check for char available
-        bne     @L1        
-        bra     _cgetc
-@L1:
+        beq     _cgetc
         lda     KBSTL
         ora     KBEDG
         ldx     #0
         and     #1
-        beq     @L6
+        beq     @L5
         lda     KBEDG           ; Pause button is pressed
         and     #$0c
-        beq     @L3
+        beq     @L2
         ora     KBSTL
-@L2:
+@L1:
         bit     #$04
-        beq     @L4                     ; Pause + Opt 1 = Reset
+        beq     @L3                     ; Pause + Opt 1 = Reset
         bit     #$08
-        beq     @L5                     ; Pause + Opt 2 = Flip
+        beq     @L4                     ; Pause + Opt 2 = Flip
         lda     #'?'                    ; All buttons pressed
         rts
-@L3:
+@L2:
         lda     KBSTL           ; Pause alone was the last placed button
         and     #$0c
-        bne     @L2
+        bne     @L1
         lda     #'P'                    ; Pause pressed
         rts
-@L4:
+@L3:
         lda     #'R'                    ; Reset pressed
         rts
-@L5:
+@L4:
         lda     #'F'                    ; Flip pressed
         rts
-@L6:
+@L5:
         lda     KBEDG           ; No Pause pressed
         ora     KBSTL
         bit     #$08
-        beq     @L8
-        bit     #$04
         beq     @L7
+        bit     #$04
+        beq     @L6
         lda     #'3'                    ; opt 1 + opt 2 pressed
         rts
-@L7:
+@L6:
         lda     #'1'                    ; opt 1 pressed
         rts
-@L8:
+@L7:
         lda     #'2'                    ; opt 2 pressed
         rts

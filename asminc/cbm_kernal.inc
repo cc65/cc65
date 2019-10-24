@@ -100,14 +100,26 @@ UDTIM          := $FFEA
 
 ; ---------------------------------------------------------------------------
 ; Kernal routines, direct entries
+;
+; Unlike the above, these are not standard functions with entries in the jump
+; table. They do not exist in all Kernals, and where they do the entry point is
+; specific to that particular machine and possibly even Kernal version.
+;
+; This list is not comprehensive: missing items for particular machines
+; should be added as needed.
+;
+; UPDCRAMPTR: Updates the color RAM pointer to match the screen RAM pointer.
+;
 
 .if .def(__VIC20__)
   CLRSCR       := $E55F
   KBDREAD      := $E5CF
+  UPDCRAMPTR   := $EAB2
 .elseif .def(__C64__)
   CLRSCR       := $E544
   KBDREAD      := $E5B4
   NMIEXIT      := $FEBC
+  UPDCRAMPTR   := $EA24
 .elseif .def(__C128__)
   CLRSCR       := $C142
   KBDREAD      := $C006

@@ -144,9 +144,10 @@ struct __emul {
     unsigned char       debug;          /* Boolean: debugging enabled */
     unsigned char       vera_action;    /* Boolean: displaying VERA activity */
     unsigned char       keyboard;       /* Boolean: displaying typed keys */
-    unsigned char       echo;           /* Boolean: Kernal output echoed to host */
+    unsigned char       echo;           /* How Kernal output should be echoed to host */
     unsigned char       save_on_exit;   /* Boolean: save SD card when quitting */
-    unsigned char       unused[0xD - 0x5];
+    unsigned char       gif_method;     /* How GIF movie is being recorded */
+    unsigned char       unused[0xD - 0x6];
     unsigned char       keymap;         /* Keyboard layout number */
        const char       detect[2];      /* "16" if running on x16emu */
 };
@@ -173,14 +174,22 @@ signed char get_ostype (void);
 ** Positive -- release build
 */
 
-void __fastcall__ set_tv (unsigned char);
-/* Set the video mode the machine will use.
+void __fastcall__ set_tv (unsigned char type);
+/* Set the video type that the machine will use.
 ** Call with a TV_xx constant.
 */
 
-unsigned char __fastcall__ videomode (unsigned char Mode);
+unsigned char __fastcall__ videomode (unsigned char mode);
 /* Set the video mode, return the old mode. Call with one of the VIDEOMODE_xx
 ** constants.
+*/
+
+unsigned char __fastcall__ vpeek (unsigned long addr);
+/* Get a byte from a location in VERA's internal address space. */
+
+void __fastcall__ vpoke (unsigned char data, unsigned long addr);
+/* Put a byte into a location in VERA's internal address space.
+** (addr is second instead of first for the sake of code efficiency.)
 */
 
 

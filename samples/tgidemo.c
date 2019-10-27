@@ -12,8 +12,8 @@
 #  define DYN_DRV       1
 #endif
 
-#define COLOR_BACK      TGI_COLOR_BLACK
-#define COLOR_FORE      TGI_COLOR_WHITE
+#define COLOR_BACK      0
+#define COLOR_FORE      1
 
 
 /*****************************************************************************/

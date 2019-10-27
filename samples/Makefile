@@ -94,6 +94,7 @@ ifneq ($(filter disk samples.%,$(MAKECMDGOALS)),)
   DIR2ATR ?= dir2atr
 
   DISK_c64       = samples.d64
+  DISK_plus4     = samples.d64
   DISK_apple2    = samples.dsk
   DISK_apple2enh = samples.dsk
   DISK_atari     = samples.atr
@@ -110,6 +111,9 @@ LDFLAGS_mandelbrot_apple2    = --start-addr 0x4000
 LDFLAGS_mandelbrot_apple2enh = --start-addr 0x4000
 LDFLAGS_tgidemo_apple2       = --start-addr 0x4000
 LDFLAGS_tgidemo_apple2enh    = --start-addr 0x4000
+
+LDFLAGS_mandelbrot_plus4     = -C plus4-hires.cfg
+LDFLAGS_tgidemo_plus4        = -C plus4-hires.cfg
 
 # The Apple ][ needs the start address adjusted for the mousedemo
 LDFLAGS_mousedemo_apple2 = --start-addr 0x4000
@@ -164,6 +168,16 @@ EXELIST_c64 =      \
         multdemo   \
         nachtm     \
         ovrldemo   \
+        plasma     \
+        sieve      \
+        tgidemo
+
+EXELIST_plus4 =    \
+        ascii      \
+        enumdevdir \
+        gunzip65   \
+        hello      \
+        mandelbrot \
         plasma     \
         sieve      \
         tgidemo
@@ -228,7 +242,15 @@ multdemo: multidemo.o
 ovrldemo: overlaydemo.o
 	$(LD) $(LDFLAGS) -o $@ -C $(SYS)-overlay.cfg -m $@.map $^ $(SYS).lib
 
-OVERLAYLIST := $(foreach I,1 2 3,multdemo.$I ovrldemo.$I)
+OVERLAYLIST := 
+
+ifneq ($(filter ovrldemo,$(EXELIST_$(SYS))),)
+OVERLAYLIST += $(foreach I,1 2 3,ovrldemo.$I)
+endif
+
+ifneq ($(filter multdemo,$(EXELIST_$(SYS))),)
+OVERLAYLIST += $(foreach I,1 2 3,multdemo.$I)
+endif
 
 # --------------------------------------------------------------------------
 # Rule to make a CBM disk with all samples. Needs the c1541 program that comes

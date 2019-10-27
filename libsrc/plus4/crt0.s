@@ -9,8 +9,7 @@
         .import         callirq_y, initlib, donelib
         .import         callmain, zerobss
         .import         __INTERRUPTOR_COUNT__
-        .import         __MAIN_START__, __MAIN_SIZE__   ; Linker generated
-        .import         __STACKSIZE__                   ; Linker generated
+        .import         __HIMEM__                       ; Linker generated
         .importzp       ST
 
         .include        "zeropage.inc"
@@ -52,8 +51,8 @@ L1:     lda     sp,x
         tsx
         stx     spsave          ; Save system stk ptr
 
-        lda     #<(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
-        ldx     #>(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
+        lda     #<__HIMEM__
+        ldx     #>__HIMEM__
         sta     sp
         stx     sp+1
 

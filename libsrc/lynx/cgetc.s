@@ -20,8 +20,10 @@
 ; So the keyboard returns '1', '2', '3', 'P', 'R', 'F' or '?'.
 
 _cgetc:
+        bne     _start     
         jsr     _kbhit          ; Check for char available
         beq     _cgetc
+_start:
         lda     KBSTL
         ora     KBEDG
         ldx     #0
@@ -52,6 +54,8 @@ _cgetc:
         rts
 @L5:
         lda     KBEDG           ; No Pause pressed
+        ldx     #$00
+        stx     KBEDG
         ora     KBSTL
         bit     #$08
         beq     @L7

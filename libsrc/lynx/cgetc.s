@@ -54,8 +54,7 @@ _start:
         rts
 @L5:
         lda     KBEDG           ; No Pause pressed
-        ldx     #$00
-        stx     KBEDG
+        stz     KBEDG
         ora     KBSTL
         bit     #$08
         beq     @L7

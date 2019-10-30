@@ -20,6 +20,7 @@
 ; So the keyboard returns '1', '2', '3', 'P', 'R', 'F' or '?'.
 
 _cgetc:
+        lda     KBEDG
         bne     _start     
         jsr     _kbhit          ; Check for char available
         beq     _cgetc
@@ -39,19 +40,19 @@ _start:
         bit     #$08
         beq     @L4                     ; Pause + Opt 2 = Flip
         lda     #'?'                    ; All buttons pressed
-        rts
+        bra     reset_and_exit
 @L2:
         lda     KBSTL           ; Pause alone was the last placed button
         and     #$0c
         bne     @L1
         lda     #'P'                    ; Pause pressed
-        rts
+        bra     reset_and_exit
 @L3:
         lda     #'R'                    ; Reset pressed
-        rts
+        bra     reset_and_exit
 @L4:
         lda     #'F'                    ; Flip pressed
-        rts
+        bra     reset_and_exit
 @L5:
         lda     KBEDG           ; No Pause pressed
         stz     KBEDG
@@ -61,10 +62,13 @@ _start:
         bit     #$04
         beq     @L6
         lda     #'3'                    ; opt 1 + opt 2 pressed
-        rts
+        bra     reset_and_exit
 @L6:
         lda     #'1'                    ; opt 1 pressed
-        rts
+        bra reset_and_exit
 @L7:
         lda     #'2'                    ; opt 2 pressed
+
+reset_and_exit:
+        stz     KBEDG
         rts

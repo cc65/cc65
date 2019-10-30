@@ -51,6 +51,6 @@ _kbhit:
         sta     KBNPR           ; inverted previous ones pressed
         stx     KBPRV
         lda     KBEDG
-L1:     ldx     #$00                     
+L1:     tax
         rts
 

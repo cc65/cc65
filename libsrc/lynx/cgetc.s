@@ -19,14 +19,10 @@
 ; and Opt1 + Opt2 pressed '3'.
 ; So the keyboard returns '1', '2', '3', 'P', 'R', 'F' or '?'.
 
-_cgetc:
-        lda     KBEDG
-        bne     _start     
+_cgetc:   
         jsr     _kbhit          ; Check for char available
         beq     _cgetc
-_start:
-        lda     KBSTL
-        ora     KBEDG
+        ora     KBSTL
         ldx     #0
         and     #1
         beq     @L5
@@ -55,7 +51,6 @@ _start:
         bra     reset_and_exit
 @L5:
         lda     KBEDG           ; No Pause pressed
-        stz     KBEDG
         ora     KBSTL
         bit     #$08
         beq     @L7

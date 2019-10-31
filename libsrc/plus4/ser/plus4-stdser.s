@@ -64,9 +64,9 @@ ACIA_STATUS     := ACIA+1       ; Status register
 ACIA_CMD        := ACIA+2       ; Command register
 ACIA_CTRL       := ACIA+3       ; Control register
 
-RecvHead        := $07D1       ; Head of receive buffer
-RecvTail        := $07D2       ; Tail of receive buffer
-RecvFreeCnt     := $07D3       ; Number of bytes in receive buffer
+RecvHead        := $07D1        ; Head of receive buffer
+RecvTail        := $07D2        ; Tail of receive buffer
+RecvFreeCnt     := $07D3        ; Number of bytes in receive buffer
 ;----------------------------------------------------------------------------
 ;
 ; Global variables

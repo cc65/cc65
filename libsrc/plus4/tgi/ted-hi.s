@@ -129,11 +129,11 @@ CHARROM         := $D000                ; Character rom base address
 ; bitmap at $E000 like we do on the C64, and have to use the next lowest
 ; position at $C000.
 
-LBASE           := $0800                ; Luminance memory base address
-VBASE           := $C000                ; Bitmap base address
+LBASE           := $0800        ; Luminance memory base address
+VBASE           := $C000        ; Bitmap base address
 
-CBASE           := LBASE + $400         ; Chrominance memory base address (fixed relative to LBASE)
-CHRBASE         := $0800                ; Base address of text mode data
+CBASE           := LBASE + $400 ; Chrominance memory base address (fixed relative to LBASE)
+CHRBASE         := $0800        ; Base address of text mode data
 
 .assert LBASE .mod $0800 = 0, error, "Luma/Chroma memory base address must be a multiple of 2K"
 .assert VBASE .mod $2000 = 0, error, "Bitmap base address must be a multiple of 8K"
@@ -151,7 +151,7 @@ CHRBASE         := $0800                ; Base address of text mode data
 ;
 
 INSTALL:
-;       rts                     ; fall through
+;       rts                     ; Fall through
 
 
 ; ------------------------------------------------------------------------
@@ -216,7 +216,7 @@ INIT:
 ;
 
 DONE:   lda     $FF12
-        ora     #%00000100      ; fetch from ROM
+        ora     #%00000100      ; Fetch from ROM
         sta     $FF12
         
 .if LBASE <> CHRBASE
@@ -229,7 +229,7 @@ DONE:   lda     $FF12
 .endif
 
         lda     $FF06
-        and     #%11011111      ; exit bitmap mode
+        and     #%11011111      ; Exit bitmap mode
         sta     $FF06
 
         rts
@@ -306,7 +306,7 @@ CLEAR:  ldy     #$00
 ;
 
 SETVIEWPAGE:
-;       rts                     ; fall through
+;       rts                     ; Fall through
 
 ; ------------------------------------------------------------------------
 ; SETDRAWPAGE: Set the drawable page. Called with the new page in A (0..n).
@@ -472,14 +472,14 @@ GETPIXEL:
 
 LINE:
 
-@CHECK: lda     X2           ;Make sure x1<x2
+@CHECK: lda     X2              ; Make sure x1<x2
         sec
         sbc     X1
         tax
         lda     X2+1
         sbc     X1+1
         bpl     @CONT
-        lda     Y2           ;If not, swap P1 and P2
+        lda     Y2              ; If not, swap P1 and P2
         ldy     Y1
         sta     Y1
         sty     Y2
@@ -500,19 +500,19 @@ LINE:
 @CONT:  sta     DX+1
         stx     DX
 
-        ldx     #$C8         ;INY
-        lda     Y2           ;Calculate dy
+        ldx     #$C8            ; INY
+        lda     Y2              ; Calculate dy
         sec
         sbc     Y1
         tay
         lda     Y2+1
         sbc     Y1+1
-        bpl     @DYPOS       ;Is y2>=y1?
-        lda     Y1           ;Otherwise dy=y1-y2
+        bpl     @DYPOS          ; Is y2>=y1?
+        lda     Y1              ; Otherwise dy=y1-y2
         sec
         sbc     Y2
         tay
-        ldx     #$88         ;DEY
+        ldx     #$88            ; DEY
 
 @DYPOS: sty     DY              ; 8-bit DY -- FIX ME?
         stx     YINCDEC
@@ -524,8 +524,8 @@ LINE:
         sta     CHUNK
 
         ldx     DY
-        cpx     DX           ;Who's bigger: dy or dx?
-        bcc     STEPINX      ;If dx, then...
+        cpx     DX              ; Who's bigger: dy or dx?
+        bcc     STEPINX         ; If dx, then...
         lda     DX+1
         bne     STEPINX
 
@@ -543,14 +543,14 @@ LINE:
 ;   Y1 AND #$07
 STEPINY:
         lda     #00
-        sta     OLDCHUNK     ;So plotting routine will work right
+        sta     OLDCHUNK        ; So plotting routine will work right
         lda     CHUNK
-        lsr                  ;Strip the bit
+        lsr                     ; Strip the bit
         eor     CHUNK
         sta     CHUNK
         txa
-        beq     YCONT2       ;If dy=0, it's just a point
-@CONT:  lsr                  ;Init counter to dy/2
+        beq     YCONT2          ; If dy=0, it's just a point
+@CONT:  lsr                     ; Init counter to dy/2
 ;
 ; Main loop
 ;
@@ -562,30 +562,30 @@ YLOOP:  sta     TEMP
         eor     (POINT),y
         sta     (POINT),y
 YINCDEC:
-        iny                  ;Advance Y coordinate
+        iny                     ; Advance Y coordinate
         cpy     #8
-        bcc     @CONT        ;No prob if Y=0..7
+        bcc     @CONT           ; No prob if Y=0..7
         jsr     FIXY
-@CONT:  lda     TEMP         ;Restore A
+@CONT:  lda     TEMP            ; Restore A
         sec
         sbc     DX
         bcc     YFIXX
-YCONT:  dex                  ;X is counter
+YCONT:  dex                     ; X is counter
         bne     YLOOP
-YCONT2: lda     (POINT),y    ;Plot endpoint
+YCONT2: lda     (POINT),y       ; Plot endpoint
         eor     BITMASK
         and     CHUNK
         eor     (POINT),y
         sta     (POINT),y
         rts
 
-YFIXX:                    ;x=x+1
+YFIXX:                          ; X=x+1
         adc     DY
         lsr     CHUNK
-        bne     YCONT        ;If we pass a column boundary...
-        ror     CHUNK        ;then reset CHUNK to $80
+        bne     YCONT           ; If we pass a column boundary...
+        ror     CHUNK           ; Then reset CHUNK to $80
         sta     TEMP2
-        lda     POINT        ;And add 8 to POINT
+        lda     POINT           ; And add 8 to POINT
         adc     #8
         sta     POINT
         bcc     @CONT
@@ -603,34 +603,33 @@ YFIXX:                    ;x=x+1
 
 .bss
 COUNTHI:
-        .byte   $00       ;Temporary counter
-                          ;only used once
+        .byte   $00             ; Temporary counter, only used once.
 .code
 STEPINX:
         ldx     DX
         lda     DX+1
         sta     COUNTHI
         cmp     #$80
-        ror                  ;Need bit for initialization
-        sta     Y1           ;High byte of counter
+        ror                     ; Need bit for initialization
+        sta     Y1              ; High byte of counter
         txa
-        bne     @CONT        ;Could be $100
+        bne     @CONT           ; Could be $100
         dec     COUNTHI
 @CONT:  ror
 ;
 ; Main loop
 ;
 XLOOP:  lsr     CHUNK
-        beq     XFIXC        ;If we pass a column boundary...
+        beq     XFIXC           ; If we pass a column boundary...
 XCONT1: sbc     DY
-        bcc     XFIXY        ;Time to step in Y?
+        bcc     XFIXY           ; Time to step in Y?
 XCONT2: dex
         bne     XLOOP
-        dec     COUNTHI      ;High bits set?
+        dec     COUNTHI         ; High bits set?
         bpl     XLOOP
 
-        lsr     CHUNK        ;Advance to last point
-        jmp     LINEPLOT     ;Plot the last chunk
+        lsr     CHUNK           ; Advance to last point
+        jmp     LINEPLOT        ; Plot the last chunk
 ;
 ; CHUNK has passed a column, so plot and increment pointer
 ; and fix up CHUNK, OLDCHUNK.
@@ -652,22 +651,22 @@ XFIXC:  sta     TEMP
 ; Check to make sure there isn't a high bit, plot chunk,
 ; and update Y-coordinate.
 ;
-XFIXY:  dec     Y1           ;Maybe high bit set
+XFIXY:  dec     Y1              ; Maybe high bit set
         bpl     XCONT2
         adc     DX
         sta     TEMP
         lda     DX+1
-        adc     #$FF         ;Hi byte
+        adc     #$FF            ; Hi byte
         sta     Y1
 
-        jsr     LINEPLOT     ;Plot chunk
+        jsr     LINEPLOT        ; Plot chunk
         lda     CHUNK
         sta     OLDCHUNK
 
         lda     TEMP
 XINCDEC:
-        iny                  ;Y-coord
-        cpy     #8           ;0..7 is ok
+        iny                     ; Y-coord
+        cpy     #8              ; 0..7 is ok
         bcc     XCONT2
         sta     TEMP
         jsr     FIXY
@@ -692,11 +691,11 @@ LINEPLOT:                       ; Plot the line chunk
 ; Subroutine to fix up pointer when Y decreases through
 ; zero or increases through 7.
 ;
-FIXY:   cpy     #255         ;Y=255 or Y=8
+FIXY:   cpy     #255            ; Y=255 or Y=8
         beq     @DECPTR
 
-@INCPTR:                     ;Add 320 to pointer
-        ldy     #0           ;Y increased through 7
+@INCPTR:                        ; Add 320 to pointer
+        ldy     #0              ; Y increased through 7
         lda     POINT
         adc     #<320
         sta     POINT
@@ -705,8 +704,8 @@ FIXY:   cpy     #255         ;Y=255 or Y=8
         sta     POINT+1
         rts
 
-@DECPTR:                     ;Okay, subtract 320 then
-        ldy     #7           ;Y decreased through 0
+@DECPTR:                        ; Okay, subtract 320 then
+        ldy     #7              ; Y decreased through 0
         lda     POINT
         sec
         sbc     #<320
@@ -815,28 +814,6 @@ TEXTSTYLE:
 ;
 
 OUTTEXT:
-
-; Calculate a pointer to the representation of the character in the
-; character ROM
-
-;         ldx     #((>(CHARROM + $0800)) >> 3)
-;         ldy     #0
-;         lda     (TEXT),y
-;         bmi     @L1
-;         ldx     #((>(CHARROM + $0000)) >> 3)
-; @L1:    stx     ptr4+1
-;         asl     a
-;         rol     ptr4+1
-;         asl     a
-;         rol     ptr4+1
-;         asl     a
-;         rol     ptr4+1
-;         sta     ptr4
-
-
-
-
-
         rts
 
 ; ------------------------------------------------------------------------
@@ -862,10 +839,10 @@ CALC:   lda     Y1
         ror     POINT
         cmp     #$80
         ror
-        ror     POINT           ; row*64
-        adc     TEMP2           ; +row*256
+        ror     POINT           ; Row * 64
+        adc     TEMP2           ; + Row * 256
         clc
-        adc     #>VBASE         ; +bitmap base
+        adc     #>VBASE         ; + Bitmap base
         sta     POINT+1
 
         lda     X1

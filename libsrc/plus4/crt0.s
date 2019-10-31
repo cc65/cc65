@@ -58,20 +58,20 @@ L1:     lda     sp,x
 
 ; Set up the IRQ vector in the banked RAM; and, switch off the ROM.
 
-        ldx     #<IRQ
-        ldy     #>IRQ
+        lda     #<IRQ
+        ldx     #>IRQ
         sei                     ; No ints, handler not yet in place
         sta     ENABLE_RAM
-        stx     $FFFE           ; Install interrupt handler
-        sty     $FFFF
-        ldx     IRQVec
-        ldy     IRQVec+1
-        stx     IRQInd+1
-        sty     IRQInd+2
-        ldx     #<IRQStub
-        ldy     #>IRQStub
-        stx     IRQVec
-        sty     IRQVec+1
+        sta     $FFFE           ; Install interrupt handler
+        stx     $FFFF
+        lda     IRQVec
+        ldx     IRQVec+1
+        sta     IRQInd+1
+        stx     IRQInd+2
+        lda     #<IRQStub
+        ldx     #>IRQStub
+        sta     IRQVec
+        stx     IRQVec+1
 
         cli                     ; Allow interrupts
 
@@ -194,18 +194,20 @@ nohandler:
         jmp     (BRKVec)        ; Jump indirect to the break vector
 
 
-; IRQ stub called by the Kernal IRQ handler, via $314.
+; IRQ stub installed at $314, called by our handler above if RAM is banked in,
+; or the Kernal IRQ handler if ROM is banked in.
+
 ; If we have handlers, call them. We will use a flag here instead of loading 
 ; __INTERRUPTOR_COUNT__ directly, since the condes function is not reentrant.
 ; The irqcount flag will be set/reset from the main code, to avoid races.
 IRQStub:
-        cld                             ; Just to be sure
+        cld                     ; Just to be sure
         sta     ENABLE_RAM
         ldy     irqcount
         beq     @L1
-        jsr     callirq_y               ; Call the IRQ functions
+        jsr     callirq_y       ; Call the IRQ functions
 @L1:    sta     ENABLE_ROM
-        jmp     (IRQInd+1)              ; Jump to the saved IRQ vector
+        jmp     (IRQInd+1)      ; Jump to the saved IRQ vector
 
 ; ------------------------------------------------------------------------
 ; Data

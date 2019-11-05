@@ -24,13 +24,17 @@ imul8x8r16:
         sta     ptr3
 
 imul8x8r16m:
+; Extend sign of Left-Hand Side
+        lda     #$7f
+        cmp     ptr3
+        adc     #$80
+        sta     ptr3+1
+
+; Clear .XY accumulator
+        ldy     #<$0000
         ldx     #>$0000
-        bit     ptr3
-        bpl     @L7
-        dex
-@L7:    stx     ptr3+1          ; Extend sign of Left-Hand Side
-        ldy     #<$0000         ; Clear .XY accumulator
-        ldx     #>$0000
+
+; Check the multiplier sign.
         lda     ptr1
         bpl     PosStart
 

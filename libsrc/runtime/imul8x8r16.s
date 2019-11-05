@@ -1,6 +1,7 @@
 ;
 ; 2010-11-02, Ullrich von Bassewitz
 ; 2014-09-10, Greg King
+; 2019-11-05, Piotr Fusik
 ;
 ; CC65 runtime: 8x8 => 16 signed multiplication
 ;
@@ -59,7 +60,8 @@ NegMult:
         bnz     @L2             ; Branch always
 
 @L0:    tya                     ; Subtract current multiplicand
-        sub     ptr3
+;       sec
+        sbc     ptr3
         tay
         txa
         sbc     ptr3+1

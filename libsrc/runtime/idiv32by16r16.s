@@ -29,19 +29,18 @@ idiv32by16r16:
         stx     ptr3+1
 
         lda     ptr2+1
+        cmp     #$80
         eor     tmp1
         sta     tmp1
-        bit     ptr2+1
-        bpl     @L3
+        bcc     @L3
 
 ; Negate the value in ptr1:ptr2
 
         ldx     #0
         ldy     #4
-        sec
-@L2:    lda     ptr1,x
-        eor     #$FF
-        adc     #$00
+;       sec
+@L2:    lda     #$00
+        sbc     ptr1,x
         sta     ptr1,x
         inx
         dey

@@ -1360,8 +1360,8 @@ used in presence of a prototype.
 <tag/Function/Test a condition and possibly abort.
 <tag/Header/<tt/<ref id="assert.h" name="assert.h">/
 <tag/Declaration/<tt/void assert (int cond);/
-<tag/Description/<tt/assert/ is a macro that expands to a <tt/id/
-statement. If the condition evaluates t zero (false), assert prints a message
+<tag/Description/<tt/assert/ is a macro that expands to an <tt/id/
+statement. If the condition evaluates to zero (false), assert prints a message
 on stderr and aborts the program.
 <tag/Notes/<itemize>
 <item>The function is actually a macro.

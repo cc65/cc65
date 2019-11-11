@@ -16,7 +16,7 @@ const graphicStr Table = {
 
 void Exit(void)
 {
-    exit(0);
+    exit(EXIT_SUCCESS);
 }
 
 void Menu = {

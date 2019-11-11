@@ -22,6 +22,8 @@
 #define BADCH    '?'
 #define ENDARGS  "--"
 
+#define NUMARGS 2
+
 int main (int argc, char **argv)
 {
     char *optstring = argv[1];
@@ -34,9 +36,9 @@ int main (int argc, char **argv)
 
     char *opi;
 
-    if (argc == 1) {
+    if (argc != NUMARGS) {
         fprintf (stderr, "Usage: %s optstring args\n", argv0);
-        exit (1);
+        exit (EXIT_FAILURE);
     }
     argv++;
     argc--;

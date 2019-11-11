@@ -58,7 +58,7 @@ static void TestUnsignedLeftShift (void)
                 fprintf (stderr,
                          "Failed: %u << %u != %u (%u)\n",
                          L, R, V, L << R);
-                exit (1);
+                exit (EXIT_FAILURE);
             }
             V = UnsignedShiftLeft1 (V);
         }
@@ -85,7 +85,7 @@ static void TestUnsignedRightShift (void)
                 fprintf (stderr,
                          "Failed: %u >> %u != %u (%u)\n",
                          L, R, V, L >> R);
-                exit (1);
+                exit (EXIT_FAILURE);
             }
             V = UnsignedShiftRight1 (V);
         }
@@ -112,7 +112,7 @@ static void TestSignedRightShift (void)
                 fprintf (stderr,
                          "Failed: %d >> %d != %d (%d)\n",
                          L, R, V, L >> R);
-                exit (1);
+                exit (EXIT_FAILURE);
             }
             V = SignedShiftRight1 (V);
         }

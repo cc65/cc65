@@ -45,7 +45,7 @@ err(s) char *s; {
 int err(char *s) {
 #endif
         printf("? %s\n", s);
-        exit(1);
+        exit(EXIT_FAILURE);
 }
 
 /* getword - get next input word into buf, return 0 on EOF */

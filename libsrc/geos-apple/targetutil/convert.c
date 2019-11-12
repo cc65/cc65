@@ -5,6 +5,7 @@
 #include <dirent.h>
 #include <device.h>
 #include <dio.h>
+#include <cc65.h>
 
 unsigned char info_signature[3] = {3, 21, 63 | 0x80};
 
@@ -69,7 +70,7 @@ static void err_exit(char *operation, unsigned char oserr)
                 operation);
     }
     getchar();
-    exit(EXIT_FAILURE);
+    exit(CC65_EXIT_FAILURE);
 }
 
 
@@ -342,5 +343,5 @@ int main(int argc, char* argv[])
     printf("Convert to '%.*s' successful", dir_entry->storage_length.name_length,
                                            dir_entry->file_name);
     getchar();
-    return EXIT_SUCCESS;
+    return CC65_EXIT_SUCCESS;
 }

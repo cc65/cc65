@@ -16,7 +16,7 @@ void abort (void)
 {
     raise (SIGABRT);
     fputs ("ABNORMAL PROGRAM TERMINATION\n", stderr);
-    exit (3);
+    exit (CC65_EXIT_ABORT);
 }
 
 

@@ -1580,7 +1580,7 @@ void DbgEntry (void)
             case 'q':
                 /* Quit program */
                 clrscr ();
-                exit (1);
+                exit (CC65_EXIT_FAILURE);
 
         }
     }

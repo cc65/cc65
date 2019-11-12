@@ -6,10 +6,11 @@
 
 #include <stdlib.h>
 #include <geos.h>
+#include <cc65.h>
 
 void abort (void)
 {
     ExitTurbo();
     DlgBoxOk(CBOLDON "ABNORMAL PROGRAM", "TERMINATION." CPLAINTEXT);
-    exit(3);
+    exit(CC65_EXIT_ABORT);
 }

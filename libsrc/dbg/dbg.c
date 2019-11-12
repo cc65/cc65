@@ -14,7 +14,7 @@
 #include <ctype.h>
 #include <6502.h>
 #include <dbg.h>
-
+#include <cc65.h>
 
 
 /*****************************************************************************/
@@ -1580,8 +1580,11 @@ void DbgEntry (void)
             case 'q':
                 /* Quit program */
                 clrscr ();
+                
+                /* Exit intentionally with error because one may
+                   say that DbgEntry is always abnormal. */
                 exit (CC65_EXIT_FAILURE);
-
+        
         }
     }
 }

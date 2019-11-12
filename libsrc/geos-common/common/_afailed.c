@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <geos.h>
+#include <cc65.h>
 
 void _afailed (char* file, unsigned line)
 {

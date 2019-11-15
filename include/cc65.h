@@ -36,12 +36,13 @@
 #ifndef _CC65_H
 #define _CC65_H
 
-typedef enum {
-    CC65_EXIT_SUCCESS,
-    CC65_EXIT_FAILURE,
-    CC65_EXIT_AFAILED,
-    CC65_EXIT_ABORT
-} cc65_exit_codes_t;
+
+/* Those cc65 exit constants definitions are in addition the the 
+   constants defined in stdlib.h. The values 0 and 1 are still 
+   reserved for EXIT_SUCCESS and EXIT_FAILURE and should not be
+   redefined */ 
+#define CC65_EXIT_AFAILED 2
+#define CC65_EXIT_ABORT 3
 
 
 /*****************************************************************************/

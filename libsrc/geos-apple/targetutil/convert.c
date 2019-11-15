@@ -70,7 +70,7 @@ static void err_exit(char *operation, unsigned char oserr)
                 operation);
     }
     getchar();
-    exit(CC65_EXIT_FAILURE);
+    exit(EXIT_FAILURE);
 }
 
 
@@ -343,5 +343,5 @@ int main(int argc, char* argv[])
     printf("Convert to '%.*s' successful", dir_entry->storage_length.name_length,
                                            dir_entry->file_name);
     getchar();
-    return CC65_EXIT_SUCCESS;
+    return EXIT_SUCCESS;
 }

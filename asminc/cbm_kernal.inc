@@ -7,18 +7,20 @@
 .if .def(__CX16__)
   ; CX16 extended jump table
   GETJOY       := $FF06
+  MOUSE        := $FF09
+  SCRMOD       := $FF5F
 .endif
 
 .if .def(__C128__)
   ; C128 extended jump table
   C64MODE      := $FF4D
+  SWAPPER      := $FF5F
   SETBNK       := $FF68
 .endif
 
 .if .def(__C128__) || .def(__CX16__)
   ; Extended jump table
   CLSALL       := $FF4A
-  SWAPPER      := $FF5F
   JSRFAR       := $FF6E
   INDFET       := $FF74
   INDSTA       := $FF77

@@ -1,5 +1,5 @@
 ;
-; 2019-09-22, Greg King
+; 2019-11-05, Greg King
 ;
 ; CX16 Kernal functions
 ;
@@ -7,9 +7,10 @@
         .include        "cbm_kernal.inc"
 
         .export         GETJOY
+        .export         MOUSE
+        .export         SCRMOD
 
         .export         CLSALL
-        .export         SWAPPER
         .export         JSRFAR
         .export         INDFET
         .export         INDSTA

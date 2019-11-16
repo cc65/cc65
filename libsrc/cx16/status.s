@@ -1,6 +1,16 @@
 ;
-; 2012-09-30, Oliver Schmidt
-; 2019-09-08, Greg King
+; 2019-11-05, Greg King
 ;
 
-        .exportzp       ST := $90       ; IEC status byte
+        .export         ST: zp
+
+.segment        "EXTZP": zp
+
+; This is a temporary hack.
+
+; A zero-page copy of the IEC status byte.
+; This is needed because the Commander X16's Kernal's status
+; variable was moved out of the zero page.  But, the common
+; CBM file function modules import this as a zero-page variable.
+
+ST:     .res    1

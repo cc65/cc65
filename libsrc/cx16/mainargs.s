@@ -33,7 +33,7 @@ REM      = $8f                  ; BASIC token-code
 NAME_LEN = 16                   ; Maximum length of command-name
 
 ; Get possible command-line arguments. Goes into the special ONCE segment,
-; which may be reused after the startup code is run
+; which may be reused after the startup code is run.
 
 .segment        "ONCE"
 
@@ -64,7 +64,7 @@ L2:     lda     BASIC_BUF,x
         bne     L2
         ldy     #1 * 2
 
-; Find the next argument
+; Find the next argument.
 
 next:   lda     BASIC_BUF,x
         beq     done            ; End of line reached
@@ -74,7 +74,7 @@ next:   lda     BASIC_BUF,x
 
 ; Found start of next argument. We've incremented the pointer in X already, so
 ; it points to the second character of the argument. This is useful since we
-; will check now for a quoted argument, in which case we will have to skip this
+; will check now for a quoted argument, in which case, we will have to skip this
 ; first character.
 
 found:  cmp     #'"'            ; Is the argument quoted?
@@ -95,7 +95,7 @@ setterm:sta     term            ; Set end of argument marker
         iny
         inc     __argc          ; Found another arg
 
-; Search for the end of the argument
+; Search for the end of the argument.
 
 argloop:lda     BASIC_BUF,x
         beq     done

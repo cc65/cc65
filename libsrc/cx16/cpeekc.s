@@ -19,7 +19,7 @@ _cpeekc:
         sta     VERA::ADDR+1    ; set row number
         stz     VERA::ADDR+2
         lda     CURS_X          ; get character column
-        asl     a
+        asl     a               ; each character has two bytes
         sta     VERA::ADDR
         lda     VERA::DATA0     ; get screen code
         plp

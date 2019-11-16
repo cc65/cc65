@@ -3,7 +3,7 @@
 ;
 ; void waitvsync (void);
 ;
-; VERA's vertical sync. causes IRQs which increment the jiffy clock.
+; VERA's vertical sync causes IRQs which increment the jiffy clock.
 ;
 
         .export         _waitvsync

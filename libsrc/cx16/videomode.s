@@ -1,30 +1,44 @@
 ;
-; 2009-09-07, Ullrich von Bassewitz
-; 2019-09-23, Greg King
+; 2019-11-06, Greg King
 ;
-; unsigned __fastcall__ videomode (unsigned Mode);
-; /* Set the video mode, return the old mode. */
+; /* Video mode defines */
+; #define VIDEOMODE_40x30         0x00
+; #define VIDEOMODE_80x60         0x02
+; #define VIDEOMODE_320x240       0x80
+; #define VIDEOMODE_SWAP          (-1)
+;
+; signed char __fastcall__ videomode (signed char Mode);
+; /* Set the video mode, return the old mode.
+; ** Return -1 if Mode isn't valid.
+; ** Call with one of the VIDEOMODE_xx constants.
+; */
 ;
 
         .export         _videomode
-        .import         SWAPPER
 
-        .include        "cx16.inc"
+        .import         SCRMOD
 
 
 .proc   _videomode
-        cmp     LLEN                    ; Do we have this mode already?
-        beq     @L9
+        tax
+        clc                     ; (Get old mode)
+        jsr     SCRMOD
+        pha
+        txa
 
-        lda     LLEN                    ; Get current mode ...
-        pha                             ; ... and save it
+        sec                     ; (Set new mode)
+        jsr     SCRMOD
 
-        jsr     SWAPPER                 ; Toggle the mode
+        pla                     ; Get back old mode
+        bcs     @L1
+        ldx     #>$0000         ; Clear high byte
+        rts
 
-        pla                             ; Get old mode into A
+; The new mode is invalid.  Go back to the old mode.  Return -1.
 
-; Done, old mode is in .A
-
-@L9:    ldx     #>$0000                 ; Clear high byte
+@L1:    sec
+        jsr     SCRMOD
+        lda     #<-1
+        tax
         rts
 .endproc

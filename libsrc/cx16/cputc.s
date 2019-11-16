@@ -78,7 +78,7 @@ plot:   ldy     CURS_X
 
 
 ; Write one screen-code and color to the video RAM without doing anything else.
-; Return the x position in Y.
+; Return the x position in .Y .
 
 putchar:
         ora     RVS             ; Set revers bit
@@ -90,7 +90,7 @@ putchar:
         sta     VERA::ADDR+2
         ldy     CURS_X          ; Get character column
         tya
-        asl     a
+        asl     a               ; Each character has two bytes
         sta     VERA::ADDR
         stx     VERA::DATA0
         lda     CHARCOLOR

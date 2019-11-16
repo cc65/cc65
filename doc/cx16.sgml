@@ -236,7 +236,14 @@ point to <tt/cX16-std.joy (cx16_std_joy)/.
 
 <sect1>Mouse drivers<p>
 
-No mouse drivers are available currently for the CX16.
+The default drivers, <tt/mouse_stddrv (mouse_static_stddrv)/,
+point to <tt/cX16-std.mou (cx16_std_mou)/.
+
+<descrip>
+  <tag><tt/cX16-std.mou (cX16_std_mou)/</tag>
+  Supports a standard 3-button mouse connected to the PS/2 mouse port of the
+  Commander X16.
+</descrip><p>
 
 
 <sect1>RS232 device drivers<p>

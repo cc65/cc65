@@ -115,13 +115,19 @@
 #define TV_NTSC_MONO    6
 #define TV_RGB2         7
 
-/* Video mode defines */
+/* Video modes */
 #define VIDEOMODE_40x30         0x00
 #define VIDEOMODE_80x60         0x02
 #define VIDEOMODE_40COL         VIDEOMODE_40x30
 #define VIDEOMODE_80COL         VIDEOMODE_80x60
 #define VIDEOMODE_320x240       0x80
 #define VIDEOMODE_SWAP          (-1)
+
+/* VERA's interrupt flags */
+#define VERA_IRQ_VSYNC          0b00000001
+#define VERA_IRQ_RASTER         0b00000010
+#define VERA_IRQ_SPR_COLL       0b00000100
+#define VERA_IRQ_UART           0b00001000
 
 
 /* Define hardware */
@@ -163,6 +169,7 @@ struct __emul {
 /* The addresses of the static drivers */
 
 extern void cx16_std_joy[];             /* Referred to by joy_static_stddrv[] */
+extern void cx16_std_mou[];             /* Referred to by mouse_static_stddrv[] */
 
 
 

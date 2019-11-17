@@ -44,42 +44,55 @@
 ; ---------------------------------------------------------------------------
 ; Zero page
 
-; BASIC
-VARTAB          := $2D          ; Pointer to start of BASIC variables
-MEMSIZE         := $37          ; Pointer to highest BASIC RAM location (+1)
-TXTPTR          := $7A          ; Pointer into BASIC source code
-
 ; Kernal
-IN_DEV          := $99          ; Current input device number
-OUT_DEV         := $9A          ; Current output device number
-IMPARM          := $9B          ; Pointer for PRIMM function
-TIME            := $A0          ; 60 Hz. clock
-FNAM_LEN        := $B7          ; Length of filename
-SECADR          := $B9          ; Secondary address
-DEVNUM          := $BA          ; Device number
-FNAM            := $BB          ; Pointer to filename
-KEY_COUNT       := $C6          ; Number of keys in input buffer
-RVS             := $C7          ; Reverse flag
-CURS_FLAG       := $CC          ; 1 = cursor off
-CURS_BLINK      := $CD          ; Blink counter
-CURS_CHAR       := $CE          ; Character under the cursor
-CURS_STATE      := $CF          ; Cursor blink state
-SCREEN_PTR      := $D1          ; Pointer to current row on text screen (16 bits)
-CURS_X          := $D3          ; Cursor column
-CURS_Y          := $D6          ; Cursor row
-LLEN            := $D9          ; Line length
-NLINES          := $DA          ; Number of screen lines
-JOY1            := $EF          ; 3 bytes of NES/SNES gamepad data
-JOY2            := $F2
-FREKZP          := $FB          ; Five unused bytes
+FNAM            := $84          ; Pointer to filename
+KTEMP2          := $86          ; 2 bytes for temporary storage
+SCREEN_PTR      := $88          ; Pointer to current row on text screen (16 bits)
+IMPARM          := $8A          ; Pointer for PRIMM function
+
+; BASIC
+TXTPTR          := $EE          ; Pointer into BASIC source code
 
 ; Page two
 
-BASIC_BUF       := $200         ; Location of command-line
-BASIC_BUF_LEN   = 89            ; Maximum length of command-line
+BASIC_BUF       := $0200        ; Location of command-line
+BASIC_BUF_LEN   = 81            ; Maximum length of command-line
 
-CHARCOLOR       := $286
-CURS_COLOR      := $287         ; Color under the cursor
+CURS_COLOR      := $027E        ; Color under the cursor
+CHARCOLOR       := $0286        ; Cursor's color nybbles (high: background, low: foreground)
+STATUS          := $0287        ; Status from previous I/O operation
+IN_DEV          := $028E        ; Current input device number
+OUT_DEV         := $028F        ; Current output device number
+TIME            := $0292        ; 60 Hz. clock (3 bytes, big-endian)
+FNAM_LEN        := $0298        ; Length of filename
+SECADR          := $029A        ; Secondary address
+DEVNUM          := $029B        ; Device number
+KEY_COUNT       := $029E        ; Number of keys in input buffer
+RVS             := $029F        ; Reverse flag
+CURS_FLAG       := $02A3        ; 1 = cursor off
+CURS_BLINK      := $02A4        ; Blink counter
+CURS_CHAR       := $02A5        ; Character under the cursor
+CURS_STATE      := $02A6        ; Cursor blink state
+CURS_X          := $02A8        ; Cursor column
+CURS_Y          := $02AB        ; Cursor row
+LLEN            := $02AE        ; Line length
+NLINES          := $02AF        ; Number of screen lines
+JOY1            := $02BC        ; 3 bytes of NES/SNES gamepad data
+JOY2            := $02BF
+
+; BASIC
+VARTAB          := $02DD        ; Pointer to start of BASIC variables
+MEMSIZE         := $02E5        ; Pointer to highest BASIC RAM location (+1)
+
+; Kernal mouse
+MSEPAR          := $0371        ; mouse: $8x=sprite on, 1/2: scale
+MOUSEL          := $0372        ; min. x co-ordinate
+MOUSER          := $0374        ; max. x co-ordinate
+MOUSET          := $0376        ; min. y co-ordinate
+MOUSEB          := $0378        ; max. y co-ordinate
+MOUSEX          := $037A        ; x co-ordinate
+MOUSEY          := $037C        ; y co-ordinate
+MOUSEBT         := $037E        ; buttons (bits 2: middle, 1: right, 0: left)
 
 ; ---------------------------------------------------------------------------
 ; Vector and other locations
@@ -121,6 +134,12 @@ NMIVec          := $0318
   INC4096       =       13 << 4
   INC8192       =       14 << 4
   INC16384      =       15 << 4
+  .endenum
+  .enum                         ; Interrupt request flags
+  VERT_SYNC     =       %00000001
+  RASTER        =       %00000010
+  SPR_COLLIDED  =       %00000100
+  UART_IRQ      =       %00001000
   .endenum
   ; Internal RAM and registers
   VRAM          :=      $000000
@@ -263,7 +282,7 @@ NMIVec          := $0318
   .endscope
 .endscope
 
-; 65c22
+; 65C22
 .struct VIA1                    ; Versatile Interface Adapter
         .org    $9F60
   PRB   .byte                   ; ROM bank, IEC  (Port Register B)
@@ -281,10 +300,10 @@ NMIVec          := $0318
   PRA2  .byte                   ; RAM bank  (Port Register A without handshaking)
 .endstruct
 
-; 65c22
+; 65C22
 .struct VIA2
         .org    $9F70
-  PRB   .byte
+  PRB   .byte                   ; Mouse communication ?
   PRA   .byte                   ; NES controller communication
   DDRB  .byte
   DDRA  .byte

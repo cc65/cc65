@@ -100,6 +100,9 @@
 #define JOY_FIRE2_MASK  JOY_BTN_2_MASK
 #define JOY_FIRE2(v)    ((v) & JOY_FIRE2_MASK)
 
+/* Additional mouse button mask */
+#define MOUSE_BTN_MIDDLE     0x02
+
 /* get_tv() return codes
 ** set_tv() argument codes
 */
@@ -112,11 +115,19 @@
 #define TV_NTSC_MONO    6
 #define TV_RGB2         7
 
-/* Video mode defines */
-#define VIDEOMODE_40x30         40u
-#define VIDEOMODE_80x60         80u
+/* Video modes */
+#define VIDEOMODE_40x30         0x00
+#define VIDEOMODE_80x60         0x02
 #define VIDEOMODE_40COL         VIDEOMODE_40x30
 #define VIDEOMODE_80COL         VIDEOMODE_80x60
+#define VIDEOMODE_320x240       0x80
+#define VIDEOMODE_SWAP          (-1)
+
+/* VERA's interrupt flags */
+#define VERA_IRQ_VSYNC          0b00000001
+#define VERA_IRQ_RASTER         0b00000010
+#define VERA_IRQ_SPR_COLL       0b00000100
+#define VERA_IRQ_UART           0b00001000
 
 
 /* Define hardware */
@@ -157,7 +168,8 @@ struct __emul {
 
 /* The addresses of the static drivers */
 
-extern void cx16_stdjoy_joy[];          /* Referred to by joy_static_stddrv[] */
+extern void cx16_std_joy[];             /* Referred to by joy_static_stddrv[] */
+extern void cx16_std_mou[];             /* Referred to by mouse_static_stddrv[] */
 
 
 
@@ -174,14 +186,20 @@ signed char get_ostype (void);
 ** Positive -- release build
 */
 
+unsigned char get_tv (void);
+/* Return the video type that the machine is using.
+** Return a TV_xx constant.
+*/
+
 void __fastcall__ set_tv (unsigned char type);
 /* Set the video type that the machine will use.
 ** Call with a TV_xx constant.
 */
 
-unsigned char __fastcall__ videomode (unsigned char mode);
-/* Set the video mode, return the old mode. Call with one of the VIDEOMODE_xx
-** constants.
+signed char __fastcall__ videomode (signed char mode);
+/* Set the video mode, return the old mode.
+** Return -1 if Mode isn't valid.
+** Call with one of the VIDEOMODE_xx constants.
 */
 
 unsigned char __fastcall__ vpeek (unsigned long addr);

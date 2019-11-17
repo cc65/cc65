@@ -1,5 +1,5 @@
 ;
-; 2019-09-20, Greg King
+; 2019-11-06, Greg King
 ;
 ; unsigned char kbhit (void);
 ; /* Returns non-zero (true) if a typed character is waiting. */
@@ -11,7 +11,7 @@
 
 
 .proc   _kbhit
-        ldx     #>$0000         ; High byte of return
         lda     KEY_COUNT       ; Get number of characters
-        rts
+        tax                     ; High byte of return (only its zero/nonzero ...
+        rts			; ... state matters)
 .endproc

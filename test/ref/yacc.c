@@ -409,7 +409,7 @@ yylook()
                         if(testbreak==5)
                         {
                                 fprintf(yyout,"yylook:   error, aborted after 5 loops\n");
-                                exit(0);
+                                exit(EXIT_FAILURE);
                         }
                         testbreak++;
                         

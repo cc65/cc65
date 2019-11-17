@@ -6,7 +6,6 @@
 
 #include <stdlib.h>
 #include <geos.h>
-#include <cc65.h>
 
 void abort (void)
 {

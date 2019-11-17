@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <stdlib.h> 
 #include <signal.h>
-#include <cc65.h>
 
 
 void abort (void)

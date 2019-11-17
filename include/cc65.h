@@ -41,8 +41,8 @@
    constants defined in stdlib.h. The values 0 and 1 are still 
    reserved for EXIT_SUCCESS and EXIT_FAILURE and should not be
    redefined */ 
-#define CC65_EXIT_AFAILED 2
-#define CC65_EXIT_ABORT 3
+#define EXIT_ASSERT 2
+#define EXIT_ABORT 3
 
 
 /*****************************************************************************/

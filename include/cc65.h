@@ -37,14 +37,6 @@
 #define _CC65_H
 
 
-/* Those cc65 exit constants definitions are in addition the the 
-   constants defined in stdlib.h. The values 0 and 1 are still 
-   reserved for EXIT_SUCCESS and EXIT_FAILURE and should not be
-   redefined */ 
-#define EXIT_ASSERT 2
-#define EXIT_ABORT 3
-
-
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/

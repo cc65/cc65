@@ -10,7 +10,6 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <cc65.h>
 
 
 void __fastcall__ _afailed (char* file, unsigned line)

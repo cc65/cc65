@@ -702,7 +702,7 @@ static void CheckSymType (const Export* E)
                 /* The export is linker generated and we don't have line
                 ** information (likely from command line define)
                 */
-                SB_Printf (&ExportLoc, "linker");
+                SB_Printf (&ExportLoc, "%s", GetObjFileName (E->Obj));
             }
             if (I->Obj) {
                 /* The import comes from an object file */

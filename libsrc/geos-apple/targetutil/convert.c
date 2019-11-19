@@ -5,7 +5,6 @@
 #include <dirent.h>
 #include <device.h>
 #include <dio.h>
-#include <cc65.h>
 
 unsigned char info_signature[3] = {3, 21, 63 | 0x80};
 

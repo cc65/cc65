@@ -1581,7 +1581,8 @@ void DbgEntry (void)
                 clrscr ();
                 
                 /* Exit intentionally with error because one may
-                   say that DbgEntry is always abnormal. */
+                **  say that DbgEntry is always abnormal. 
+                */
                 exit (EXIT_FAILURE);
         
         }

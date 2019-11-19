@@ -139,12 +139,11 @@ The functions listed below are special for the CX16. See the <url
 url="funcref.html" name="function reference"> for declarations and usage.
 
 <itemize>
-<item>get_ostype()
-<item>set_tv()
-<item>videomode()
-<item>vpeek()
-<item>vpoke()
-<item>waitvsync()
+<item>get_ostype
+<item>set_tv
+<item>videomode
+<item>vpeek
+<item>vpoke
 </itemize>
 
 
@@ -155,31 +154,32 @@ machines. See the <url url="funcref.html" name="function reference"> for
 declarations and usage.
 
 <itemize>
-<item>cbm_close()
-<item>cbm_closedir()
-<item>cbm_k_basin()
-<item>cbm_k_bsout()
-<item>cbm_k_chkin()
-<item>cbm_k_ckout()
-<item>cbm_k_close()
-<item>cbm_k_clrch()
-<item>cbm_k_getin()
-<item>cbm_k_load()
-<item>cbm_k_open()
-<item>cbm_k_readst()
-<item>cbm_k_save()
-<item>cbm_k_second()
-<item>cbm_k_setlfs()
-<item>cbm_k_setnam()
-<item>cbm_k_tksa()
-<item>cbm_load()
-<item>cbm_open()
-<item>cbm_opendir()
-<item>cbm_read()
-<item>cbm_readdir()
-<item>cbm_save()
-<item>cbm_write()
-<item>get_tv()
+<item>cbm_close
+<item>cbm_closedir
+<item>cbm_k_basin
+<item>cbm_k_bsout
+<item>cbm_k_chkin
+<item>cbm_k_ckout
+<item>cbm_k_close
+<item>cbm_k_clrch
+<item>cbm_k_getin
+<item>cbm_k_load
+<item>cbm_k_open
+<item>cbm_k_readst
+<item>cbm_k_save
+<item>cbm_k_second
+<item>cbm_k_setlfs
+<item>cbm_k_setnam
+<item>cbm_k_tksa
+<item>cbm_load
+<item>cbm_open
+<item>cbm_opendir
+<item>cbm_read
+<item>cbm_readdir
+<item>cbm_save
+<item>cbm_write
+<item>get_tv
+<item>waitvsync
 </itemize>
 
 

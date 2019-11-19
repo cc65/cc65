@@ -213,8 +213,8 @@ function.
 <!-- <item><ref id="cbm_save" name="cbm_save"> -->
 <!-- <item><ref id="cbm_write" name="cbm_write"> -->
 <!-- <item><ref id="get_tv" name="get_tv"> -->
-<item><ref id="waitvsync" name="waitvsync">
 <item><ref id="kbrepeat" name="kbrepeat">
+<item><ref id="waitvsync" name="waitvsync">
 </itemize>
 
 (incomplete)
@@ -7716,7 +7716,7 @@ name="toggle_videomode">.
 <item>The function is only available as fastcall function, so it may only be
 used in presence of a prototype.
 </itemize>
-<tag/Availability/C128 and enhanced Apple //e
+<tag/Availability/C128, enhanced Apple //e and CX16
 <tag/See also/
 <ref id="fast" name="fast">,
 <ref id="isfast" name="isfast">,

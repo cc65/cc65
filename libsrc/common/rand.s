@@ -3,6 +3,7 @@
 ;
 ; Written and donated by Sidney Cadot - sidney@ch.twi.tudelft.nl
 ; 2016-11-07, modified by Brad Smith
+; 2019-10-07, modified by Lewis "LRFLEW" Fox
 ;
 ; May be distributed with the cc65 runtime using the same license.
 ;
@@ -23,6 +24,17 @@
 ;  low byte A to provide the best entropy in the
 ;  most commonly used part of the return value.
 ;
+;  Uses the following LCG values for ax + c (mod m)
+;  a = $01010101
+;  c = $B3B3B3B3
+;  m = $100000000 (32-bit truncation)
+;
+;  The multiplier was carefully chosen such that it can
+;  be computed with 3 adc instructions, and the increment
+;  was chosen to have the same value in each byte to allow
+;  the addition to be performed in conjunction with the
+;  multiplication, adding only 1 additional adc instruction.
+;
 
         .export         _rand, _srand
 
@@ -35,27 +47,17 @@ rand:   .dword   1
 .code
 
 _rand:  clc
-        lda     rand+0          ; SEED *= $01010101
+        lda     rand+0
+        adc     #$B3
+        sta     rand+0
         adc     rand+1
         sta     rand+1
         adc     rand+2
         sta     rand+2
-        adc     rand+3
-        sta     rand+3
-        clc
-        lda     rand+0          ; SEED += $31415927
-        adc     #$27
-        sta     rand+0
-        lda     rand+1
-        adc     #$59
-        sta     rand+1
-        lda     rand+2
-        adc     #$41
-        sta     rand+2
         and     #$7f            ; Suppress sign bit (make it positive)
         tax
-        lda     rand+3
-        adc     #$31
+        lda     rand+2
+        adc     rand+3
         sta     rand+3
         rts                     ; return bit (16-22,24-31) in (X,A)
 

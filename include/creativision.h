@@ -52,22 +52,22 @@
 #define DYN_DRV 0
 
 /* Colours - from TMS9918 */
-#define C_TRANSPARENT   0
-#define C_BLACK         1
-#define C_MED_GREEN     2
-#define C_LIGHT_GREEN   3
-#define C_DARK_BLUE     4
-#define C_LIGHT_BLUE    5
-#define C_DARK_RED      6
-#define C_CYAN          7
-#define C_MED_RED       8
-#define C_LIGHT_RED     9
-#define C_DARK_YELLOW   10
-#define C_LIGHT_YELLOW  11
-#define C_DARK_GREEN    12
-#define C_MAGENTA       13
-#define C_GREY          14
-#define C_WHITE         15
+#define COLOR_TRANSPARENT   0
+#define COLOR_BLACK         1
+#define COLOR_MED_GREEN     2
+#define COLOR_LIGHT_GREEN   3
+#define COLOR_DARK_BLUE     4
+#define COLOR_LIGHT_BLUE    5
+#define COLOR_DARK_RED      6
+#define COLOR_CYAN          7
+#define COLOR_MED_RED       8
+#define COLOR_LIGHT_RED     9
+#define COLOR_DARK_YELLOW   10
+#define COLOR_LIGHT_YELLOW  11
+#define COLOR_DARK_GREEN    12
+#define COLOR_MAGENTA       13
+#define COLOR_GREY          14
+#define COLOR_WHITE         15
 
 /* Protos */
 void __fastcall__ psg_outb(unsigned char b);

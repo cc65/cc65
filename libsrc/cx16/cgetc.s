@@ -1,5 +1,5 @@
 ;
-; 2019-09-23, Greg King
+; 2019-10-01, Greg King
 ;
 ; char cgetc (void);
 ; /* Return a character from the keyboard. */
@@ -34,7 +34,9 @@ L1:     lda     KEY_COUNT
 
 L3:     ldy     IN_DEV          ; Save current input device
         stz     IN_DEV          ; Keyboard
+        phy
         jsr     GETIN           ; Read char, and return in .A
+        ply
         sty     IN_DEV          ; Restore input device
         ldx     #>$0000
         rts

@@ -1,6 +1,6 @@
 ;
 ; 1998-09-27, Ullrich von Bassewitz
-; 2019-09-08, Greg King
+; 2019-11-06, Greg King
 ;
 ; void __fastcall__ set_brk (unsigned Addr);
 ; void reset_brk (void);
@@ -30,6 +30,7 @@ uservec:        jmp     $FFFF           ; Patched at runtime
 .code
 
 ; Set the break vector
+
 .proc   _set_brk
 
         sta     uservec+1
@@ -40,9 +41,9 @@ uservec:        jmp     $FFFF           ; Patched at runtime
         bne     L1              ; Jump if we installed the handler already
 
         lda     BRKVec
+        ldx     BRKVec+1
         sta     oldvec
-        lda     BRKVec+1
-        sta     oldvec+1        ; Save the old vector
+        stx     oldvec+1        ; Save the old vector
 
 L1:     lda     #<brk_handler   ; Set the break vector to our routine
         ldx     #>brk_handler
@@ -54,6 +55,7 @@ L1:     lda     #<brk_handler   ; Set the break vector to our routine
 
 
 ; Reset the break vector
+
 .proc   _reset_brk
 
         lda     oldvec
@@ -61,13 +63,13 @@ L1:     lda     #<brk_handler   ; Set the break vector to our routine
         beq     @L9             ; Jump if vector not installed
         sta     BRKVec
         stx     BRKVec+1
+
         lda     #$00
         sta     oldvec          ; Clear the old vector
-        stx     oldvec+1
+        sta     oldvec+1
 @L9:    rts
 
 .endproc
-
 
 
 ; Break handler, called if a break occurs
@@ -81,14 +83,13 @@ L1:     lda     #<brk_handler   ; Set the break vector to our routine
         pla
         sta     _brk_a
         pla
-        and     #$EF            ; Clear break bit
         sta     _brk_sr
         pla                     ; PC low
         sec
-        sbc     #2              ; Point to start of brk
+        sbc     #<$0002         ; Point to start of BRK
         sta     _brk_pc
         pla                     ; PC high
-        sbc     #0
+        sbc     #>$0002
         sta     _brk_pc+1
 
         jsr     uservec         ; Call the user's routine
@@ -99,11 +100,9 @@ L1:     lda     #<brk_handler   ; Set the break vector to our routine
         pha
         lda     _brk_sr
         pha
-        ldx     _brk_x
         ldy     _brk_y
+        ldx     _brk_x
         lda     _brk_a
         rti                     ; Jump back...
 
 .endproc
-
-

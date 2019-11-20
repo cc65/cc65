@@ -1,8 +1,8 @@
 ;
 ; Standard joystick driver for the CX16.
-; May be used multiple times when statically linked to the application.
+; May be installed multiple times when statically linked to the application.
 ;
-; 2019-09-23, Greg King
+; 2019-11-15 Greg King
 ;
 
         .include        "joy-kernel.inc"
@@ -18,7 +18,7 @@
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-        module_header   _cx16_stdjoy_joy
+        module_header   _cx16_std_joy
 
 ; Driver signature
 
@@ -48,11 +48,10 @@ JOY_COUNT       = 2             ; Number of joysticks we support
 .code
 
 ; ------------------------------------------------------------------------
-; INSTALL routine. Is called after the driver is loaded into memory.
+; INSTALL routine -- is called after the driver is loaded into memory.
 ; If possible, check if the hardware is present, and determine the amount
 ; of memory available.
-; Must return a JOY_ERR_xx code in a/x.
-;
+; Must return a JOY_ERR_xx code in .XA .
 
 INSTALL:
         lda     #<JOY_ERR_OK
@@ -60,60 +59,67 @@ INSTALL:
 ;       rts                     ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------
-; UNINSTALL routine. Is called before the driver is removed from memory.
-; Can do clean-up or whatever. Must not return anything.
-;
+; UNINSTALL routine -- is called before the driver is removed from memory.
+; Can do clean-up or whatever.  Shouldn't return anything.
 
 UNINSTALL:
         rts
 
 ; ------------------------------------------------------------------------
-; COUNT: Return the total number of possible joysticks in a/x.
-;
+; COUNT: Return the total number of possible joysticks, in .XA .
 
 COUNT:  lda     #<JOY_COUNT
         ldx     #>JOY_COUNT
         rts
 
 ; ------------------------------------------------------------------------
-; READ: Read a particular joystick passed in A.
-;
-; TODO: Find a way to report the SNES controller's extra four lines.
-;
+; READ: Read a particular joystick passed in .A .
 
-READ:   pha
-        jsr     GETJOY
-        pla
-        bne     pad2
+READ:   php
+        bit     #JOY_COUNT - $01
+        sei
+        bnz     pad2
 
 ; Read game pad 1
 
-pad1:   lda     JOY1 + 1
+pad1:   ldy     JOY1            ; Allow JOY1 to be reread between interrupts
+        sty     JOY1 + 2
+
+        lda     JOY1 + 1
         bit     #%00001110
-        beq     nes1
-        asl     JOY1            ; Get SNES's B button
+        bze     nes1
+
+        asl     JOY1 + 2        ; Get SNES's B button
         ror     a               ; Put it next to the A button
-        asl     JOY1            ; Drop SNES's Y button
-        asl     a               ; Get the B button
-        ror     JOY1
+        asl     JOY1 + 2        ; Drop SNES's Y button
+        asl     a               ; Get back the B button
+        ror     JOY1 + 2
         asl     a               ; Get SNES's A button
-        ror     JOY1            ; Make byte look like NES pad
-nes1:   lda     JOY1
-        eor     #%11111111      ; We don't want the pad's negative logic
+        ror     JOY1 + 2        ; Make byte look like NES pad
+
+nes1:   lda     JOY1 + 2
+        plp
+        eor     #%11111111      ; (The controllers use negative logic)
         rts
 
 ; Read game pad 2
 
-pad2:   lda     JOY2 + 1
+pad2:   ldy     JOY2
+        sty     JOY2 + 2
+
+        lda     JOY2 + 1
         bit     #%00001110
-        beq     nes2
-        asl     JOY2
+        bze     nes2
+
+        asl     JOY2 + 2
         ror     a
-        asl     JOY2
+        asl     JOY2 + 2
         asl     a
-        ror     JOY2
+        ror     JOY2 + 2
         asl     a
-        ror     JOY2
-nes2:   lda     JOY2
+        ror     JOY2 + 2
+
+nes2:   lda     JOY2 + 2
+        plp
         eor     #%11111111
         rts

@@ -28,5 +28,5 @@ void _afailed (char* file, unsigned line)
 
     DlgBoxOk(CBOLDON "ASSERTION FAILED", "PROGRAM TERMINATED" CPLAINTEXT);
 
-    exit (2);
+    exit (EXIT_ASSERT);
 }

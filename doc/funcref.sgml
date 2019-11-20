@@ -1,4 +1,4 @@
-<!doctype linuxdoc system>      <!-- -*- text-mode -*- -->
+<!doctype linuxdoc system>
 
 <article>
 <title>cc65 function reference
@@ -213,8 +213,8 @@ function.
 <!-- <item><ref id="cbm_save" name="cbm_save"> -->
 <!-- <item><ref id="cbm_write" name="cbm_write"> -->
 <!-- <item><ref id="get_tv" name="get_tv"> -->
-<item><ref id="waitvsync" name="waitvsync">
 <item><ref id="kbrepeat" name="kbrepeat">
+<item><ref id="waitvsync" name="waitvsync">
 </itemize>
 
 (incomplete)
@@ -1316,16 +1316,16 @@ disabled.
 
 <quote>
 <descrip>
-<tag/Function/Terminates a program abnormally.
+<tag/Function/Terminate a program abnormally.
 <tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
 <tag/Declaration/<tt/void abort (void);/
-<tag/Description/<tt/abort/ raises <tt/SIGABRT/, writes a termination message
-on stderr, then terminates the program with an exit code of 3.
+<tag/Description/<tt/abort()/ raises <tt/SIGABRT/, writes a termination message
+on <tt/stderr/, then terminates the program with an exit code of 3.
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="assert" name="assert">,
 <ref id="exit" name="exit">,
-<ref id="raise" name="raise">
+<ref id="signal" name="signal">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -1357,19 +1357,20 @@ used in presence of a prototype.
 
 <quote>
 <descrip>
-<tag/Function/Test a condition and possibly abort.
+<tag/Function/Test a condition, and possibly abort.
 <tag/Header/<tt/<ref id="assert.h" name="assert.h">/
 <tag/Declaration/<tt/void assert (int cond);/
-<tag/Description/<tt/assert/ is a macro that expands to a <tt/id/
-statement. If the condition evaluates t zero (false), assert prints a message
-on stderr and aborts the program.
+<tag/Description/<tt/assert()/ is a macro that expands to an <tt/if/ statement.
+If the condition evaluates to zero (false), <tt/assert()/ raises <tt/SIGABRT/,
+prints a message on <tt/stderr/, then exits the program with an exit code of 2.
 <tag/Notes/<itemize>
 <item>The function is actually a macro.
 </itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="abort" name="abort">,
-<ref id="exit" name="exit">
+<ref id="exit" name="exit">,
+<ref id="signal" name="signal">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -5820,18 +5821,19 @@ calling convention.
 <tag/Function/Send a signal to the executing program.
 <tag/Header/<tt/<ref id="signal.h" name="signal.h">/
 <tag/Declaration/<tt/int __fastcall__ raise (int sig);/
-<tag/Description/<tt/raise/ sends the given signal to the program. If the
+<tag/Description/<tt/raise()/ sends the given signal to the program. If the
 program has installed a signal handler for the signal, this signal handler
 will be executed. If no handler has been installed, the default action for
 the raised signal will be taken. The function returns zero on success,
-nonzero otherwise.
+non-zero otherwise.
 <tag/Notes/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
+<item>The function is available only as a fastcall function,
+so it may be used only in the presence of a prototype.
 </itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="abort" name="abort">,
+<ref id="assert" name="assert">,
 <ref id="signal" name="signal">
 <tag/Example/None.
 </descrip>
@@ -6654,6 +6656,7 @@ be used in presence of a prototype.
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="abort" name="abort">,
+<ref id="assert" name="assert">,
 <ref id="raise" name="raise">
 <tag/Example/None.
 </descrip>
@@ -7713,7 +7716,7 @@ name="toggle_videomode">.
 <item>The function is only available as fastcall function, so it may only be
 used in presence of a prototype.
 </itemize>
-<tag/Availability/C128 and enhanced Apple //e
+<tag/Availability/C128, enhanced Apple //e and CX16
 <tag/See also/
 <ref id="fast" name="fast">,
 <ref id="isfast" name="isfast">,

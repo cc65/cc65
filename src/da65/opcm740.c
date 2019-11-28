@@ -55,7 +55,7 @@ const OpcDesc OpcTable_M740[256] = {
     {   "",     1,  flIllegal,                OH_Illegal               }, /* $04 */
     {   "ora",  2,  flUseLabel,               OH_Direct                }, /* $05 */
     {   "asl",  2,  flUseLabel,               OH_Direct                }, /* $06 */
-    {   "bbs",  3,  flUseLabel,               OH_ZeroPageBit           }, /* $07 */
+    {   "bbs",  3,  flUseLabel,               OH_BitBranchm740          }, /* $07 */
     {   "php",  1,  flNone,                   OH_Implicit              }, /* $08 */
     {   "ora",  2,  flNone,                   OH_Immediate             }, /* $09 */
     {   "asl",  1,  flNone,                   OH_Accumulator           }, /* $0a */
@@ -71,7 +71,7 @@ const OpcDesc OpcTable_M740[256] = {
     {   "",     1,  flIllegal,                OH_Illegal               }, /* $14 */
     {   "ora",  2,  flUseLabel,               OH_DirectX               }, /* $15 */
     {   "asl",  2,  flUseLabel,               OH_DirectX               }, /* $16 */
-    {   "bbc",  3,  flUseLabel,               OH_ZeroPageBit           }, /* $17 */
+    {   "bbc",  3,  flUseLabel,               OH_BitBranchm740           }, /* $17 */
     {   "clc",  1,  flNone,                   OH_Implicit              }, /* $18 */
     {   "ora",  3,  flUseLabel,               OH_AbsoluteY             }, /* $19 */
     {   "dec",  1,  flNone,                   OH_Accumulator           }, /* $1a */
@@ -87,7 +87,7 @@ const OpcDesc OpcTable_M740[256] = {
     {   "bit",  2,  flUseLabel,               OH_Direct                }, /* $24 */
     {   "and",  2,  flUseLabel,               OH_Direct                }, /* $25 */
     {   "rol",  2,  flUseLabel,               OH_Direct                }, /* $26 */
-    {   "bbs",  3,  flUseLabel,               OH_ZeroPageBit           }, /* $27 */
+    {   "bbs",  3,  flUseLabel,               OH_BitBranchm740           }, /* $27 */
     {   "plp",  1,  flNone,                   OH_Implicit              }, /* $28 */
     {   "and",  2,  flNone,                   OH_Immediate             }, /* $29 */
     {   "rol",  1,  flNone,                   OH_Accumulator           }, /* $2a */
@@ -103,7 +103,7 @@ const OpcDesc OpcTable_M740[256] = {
     {   "",     1,  flIllegal,                OH_Illegal               }, /* $34 */
     {   "and",  2,  flUseLabel,               OH_DirectX               }, /* $35 */
     {   "rol",  2,  flUseLabel,               OH_DirectX               }, /* $36 */
-    {   "bbc",  3,  flUseLabel,               OH_ZeroPageBit           }, /* $37 */
+    {   "bbc",  3,  flUseLabel,               OH_BitBranchm740           }, /* $37 */
     {   "sec",  1,  flNone,                   OH_Implicit              }, /* $38 */
     {   "and",  3,  flUseLabel,               OH_AbsoluteY             }, /* $39 */
     {   "inc",  1,  flNone,                   OH_Accumulator           }, /* $3a */
@@ -119,7 +119,7 @@ const OpcDesc OpcTable_M740[256] = {
     {   "com",  2,  flUseLabel,               OH_Direct                }, /* $44 */
     {   "eor",  2,  flUseLabel,               OH_Direct                }, /* $45 */
     {   "lsr",  2,  flUseLabel,               OH_Direct                }, /* $46 */
-    {   "bbs",  3,  flUseLabel,               OH_ZeroPageBit           }, /* $47 */
+    {   "bbs",  3,  flUseLabel,               OH_BitBranchm740           }, /* $47 */
     {   "pha",  1,  flNone,                   OH_Implicit              }, /* $48 */
     {   "eor",  2,  flNone,                   OH_Immediate             }, /* $49 */
     {   "lsr",  1,  flNone,                   OH_Accumulator           }, /* $4a */
@@ -135,7 +135,7 @@ const OpcDesc OpcTable_M740[256] = {
     {   "",     1,  flIllegal,                OH_Illegal               }, /* $54 */
     {   "eor",  2,  flUseLabel,               OH_DirectX               }, /* $55 */
     {   "lsr",  2,  flUseLabel,               OH_DirectX               }, /* $56 */
-    {   "bbc",  3,  flUseLabel,               OH_ZeroPageBit           }, /* $57 */
+    {   "bbc",  3,  flUseLabel,               OH_BitBranchm740           }, /* $57 */
     {   "cli",  1,  flNone,                   OH_Implicit              }, /* $58 */
     {   "eor",  3,  flUseLabel,               OH_AbsoluteY             }, /* $59 */
     {   "",     1,  flIllegal,                OH_Illegal               }, /* $5a */
@@ -151,7 +151,7 @@ const OpcDesc OpcTable_M740[256] = {
     {   "tst",  2,  flUseLabel,               OH_Direct                }, /* $64 */
     {   "adc",  2,  flUseLabel,               OH_Direct                }, /* $65 */
     {   "ror",  2,  flUseLabel,               OH_Direct                }, /* $66 */
-    {   "bbs",  3,  flUseLabel,               OH_ZeroPageBit           }, /* $67 */
+    {   "bbs",  3,  flUseLabel,               OH_BitBranchm740           }, /* $67 */
     {   "pla",  1,  flNone,                   OH_Implicit              }, /* $68 */
     {   "adc",  2,  flNone,                   OH_Immediate             }, /* $69 */
     {   "ror",  1,  flNone,                   OH_Accumulator           }, /* $6a */
@@ -167,7 +167,7 @@ const OpcDesc OpcTable_M740[256] = {
     {   "",     1,  flIllegal,                OH_Illegal               }, /* $74 */
     {   "adc",  2,  flUseLabel,               OH_DirectX               }, /* $75 */
     {   "ror",  2,  flUseLabel,               OH_DirectX               }, /* $76 */
-    {   "bbc",  3,  flUseLabel,               OH_ZeroPageBit           }, /* $77 */
+    {   "bbc",  3,  flUseLabel,               OH_BitBranchm740           }, /* $77 */
     {   "sei",  1,  flNone,                   OH_Implicit              }, /* $78 */
     {   "adc",  3,  flUseLabel,               OH_AbsoluteY             }, /* $79 */
     {   "",     1,  flIllegal,                OH_Illegal               }, /* $7a */
@@ -183,7 +183,7 @@ const OpcDesc OpcTable_M740[256] = {
     {   "sty",  2,  flUseLabel,               OH_Direct                }, /* $84 */
     {   "sta",  2,  flUseLabel,               OH_Direct                }, /* $85 */
     {   "stx",  2,  flUseLabel,               OH_Direct                }, /* $86 */
-    {   "bbs",  3,  flUseLabel,               OH_ZeroPageBit           }, /* $87 */
+    {   "bbs",  3,  flUseLabel,               OH_BitBranchm740           }, /* $87 */
     {   "dey",  1,  flNone,                   OH_Implicit              }, /* $88 */
     {   "",     1,  flIllegal,                OH_Illegal               }, /* $89 */
     {   "txa",  1,  flNone,                   OH_Implicit              }, /* $8a */
@@ -199,7 +199,7 @@ const OpcDesc OpcTable_M740[256] = {
     {   "sty",  2,  flUseLabel,               OH_DirectX               }, /* $94 */
     {   "sta",  2,  flUseLabel,               OH_DirectX               }, /* $95 */
     {   "stx",  2,  flUseLabel,               OH_DirectY               }, /* $96 */
-    {   "bbc",  3,  flUseLabel,               OH_ZeroPageBit           }, /* $97 */
+    {   "bbc",  3,  flUseLabel,               OH_BitBranchm740           }, /* $97 */
     {   "tya",  1,  flNone,                   OH_Implicit              }, /* $98 */
     {   "sta",  3,  flUseLabel,               OH_AbsoluteY             }, /* $99 */
     {   "txs",  1,  flNone,                   OH_Implicit              }, /* $9a */
@@ -215,7 +215,7 @@ const OpcDesc OpcTable_M740[256] = {
     {   "ldy",  2,  flUseLabel,               OH_Direct                }, /* $a4 */
     {   "lda",  2,  flUseLabel,               OH_Direct                }, /* $a5 */
     {   "ldx",  2,  flUseLabel,               OH_Direct                }, /* $a6 */
-    {   "bbs",  3,  flUseLabel,               OH_ZeroPageBit           }, /* $a7 */
+    {   "bbs",  3,  flUseLabel,               OH_BitBranchm740           }, /* $a7 */
     {   "tay",  1,  flNone,                   OH_Implicit              }, /* $a8 */
     {   "lda",  2,  flNone,                   OH_Immediate             }, /* $a9 */
     {   "tax",  1,  flNone,                   OH_Implicit              }, /* $aa */
@@ -231,7 +231,7 @@ const OpcDesc OpcTable_M740[256] = {
     {   "ldy",  2,  flUseLabel,               OH_DirectX               }, /* $b4 */
     {   "lda",  2,  flUseLabel,               OH_DirectX               }, /* $b5 */
     {   "ldx",  2,  flUseLabel,               OH_DirectY               }, /* $b6 */
-    {   "bbc",  3,  flUseLabel,               OH_ZeroPageBit           }, /* $b7 */
+    {   "bbc",  3,  flUseLabel,               OH_BitBranchm740           }, /* $b7 */
     {   "clv",  1,  flNone,                   OH_Implicit              }, /* $b8 */
     {   "lda",  3,  flUseLabel,               OH_AbsoluteY             }, /* $b9 */
     {   "tsx",  1,  flNone,                   OH_Implicit              }, /* $ba */
@@ -247,7 +247,7 @@ const OpcDesc OpcTable_M740[256] = {
     {   "cpy",  2,  flUseLabel,               OH_Direct                }, /* $c4 */
     {   "cmp",  2,  flUseLabel,               OH_Direct                }, /* $c5 */
     {   "dec",  2,  flUseLabel,               OH_Direct                }, /* $c6 */
-    {   "bbs",  3,  flUseLabel,               OH_ZeroPageBit           }, /* $c7 */
+    {   "bbs",  3,  flUseLabel,               OH_BitBranchm740           }, /* $c7 */
     {   "iny",  1,  flNone,                   OH_Implicit              }, /* $c8 */
     {   "cmp",  2,  flNone,                   OH_Immediate             }, /* $c9 */
     {   "dex",  1,  flNone,                   OH_Implicit              }, /* $ca */
@@ -263,7 +263,7 @@ const OpcDesc OpcTable_M740[256] = {
     {   "",     1,  flIllegal,                OH_Illegal               }, /* $d4 */
     {   "cmp",  2,  flUseLabel,               OH_DirectX               }, /* $d5 */
     {   "dec",  2,  flUseLabel,               OH_DirectX               }, /* $d6 */
-    {   "bbc",  3,  flUseLabel,               OH_ZeroPageBit           }, /* $d7 */
+    {   "bbc",  3,  flUseLabel,               OH_BitBranchm740           }, /* $d7 */
     {   "cld",  1,  flNone,                   OH_Implicit              }, /* $d8 */
     {   "cmp",  3,  flUseLabel,               OH_AbsoluteY             }, /* $d9 */
     {   "",     1,  flIllegal,                OH_Illegal               }, /* $da */
@@ -279,7 +279,7 @@ const OpcDesc OpcTable_M740[256] = {
     {   "cpx",  2,  flUseLabel,               OH_Direct                }, /* $e4 */
     {   "sbc",  2,  flUseLabel,               OH_Direct                }, /* $e5 */
     {   "inc",  2,  flUseLabel,               OH_Direct                }, /* $e6 */
-    {   "bbs",  3,  flUseLabel,               OH_ZeroPageBit           }, /* $e7 */
+    {   "bbs",  3,  flUseLabel,               OH_BitBranchm740           }, /* $e7 */
     {   "inx",  1,  flNone,                   OH_Implicit              }, /* $e8 */
     {   "sbc",  2,  flNone,                   OH_Immediate             }, /* $e9 */
     {   "nop",  1,  flNone,                   OH_Implicit              }, /* $ea */
@@ -295,7 +295,7 @@ const OpcDesc OpcTable_M740[256] = {
     {   "",     1,  flIllegal,                OH_Illegal               }, /* $f4 */
     {   "sbc",  2,  flUseLabel,               OH_DirectX               }, /* $f5 */
     {   "inc",  2,  flUseLabel,               OH_DirectX               }, /* $f6 */
-    {   "bbc",  3,  flUseLabel,               OH_ZeroPageBit           }, /* $f7 */
+    {   "bbc",  3,  flUseLabel,               OH_BitBranchm740           }, /* $f7 */
     {   "sed",  1,  flNone,                   OH_Implicit              }, /* $f8 */
     {   "sbc",  3,  flUseLabel,               OH_AbsoluteY             }, /* $f9 */
     {   "",     1,  flIllegal,                OH_Illegal               }, /* $fa */

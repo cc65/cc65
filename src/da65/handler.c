@@ -476,7 +476,23 @@ void OH_BitBranch (const OpcDesc* D)
     xfree (BranchLabel);
 }
 
+void OH_BitBranchm740 (const OpcDesc* D)
+{
+    unsigned Bit = GetCodeByte (PC) >> 5;
+    unsigned Addr = GetCodeByte (PC+1);
+    signed char BranchOffs = GetCodeByte (PC+2);
 
+    /* Calculate the target address for the branch */
+    unsigned BranchAddr = (((int) PC+3) + BranchOffs) & 0xFFFF;
+
+    /* Generate a label in pass 1 */
+    GenerateLabel (D->Flags, Addr);
+    GenerateLabel (flLabel, BranchAddr);
+
+    /* Output the line */
+    //OneLine (D, "%01X,%s", Bit, GetAddrArg (D->Flags, Addr));
+    OneLine (D, "%01X,%s,%s", Bit, GetAddrArg (D->Flags, Addr), GetAddrArg (flLabel, BranchAddr));
+}
 
 void OH_ImmediateDirect (const OpcDesc* D)
 {

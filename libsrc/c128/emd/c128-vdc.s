@@ -54,7 +54,7 @@ VDC_DATA          = 31
 
 .bss
 
-pagecount:      .res    1                  ; $0000-$3fff as 16k default
+pagecount:      .res    2                  ; $0000-$3fff as 16k default
 curpage:        .res    2                  ; currently mapped-in page (invalid)
 vdc_cset_save:  .res    1
 window:         .res    256                ; memory window

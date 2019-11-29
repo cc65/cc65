@@ -52,13 +52,11 @@ VDC_DATA          = 31
 ; ------------------------------------------------------------------------
 ; Data.
 
-.data
-
-pagecount:      .word  64                  ; $0000-$3fff as 16k default
-curpage:        .word  $ffff               ; currently mapped-in page (invalid)
-
 .bss
 
+pagecount:      .res    1                  ; $0000-$3fff as 16k default
+curpage:        .res    2                  ; currently mapped-in page (invalid)
+vdc_cset_save:  .res    1
 window:         .res    256                ; memory window
 
 .code
@@ -71,11 +69,15 @@ window:         .res    256                ; memory window
 ;
 
 INSTALL:
+        ; reset mapped-in page to invalid
+        lda     #$ff
+        sta     curpage
+        sta     curpage+1
+        
         ; do test for VDC presence here???
-
         ldx     #VDC_CSET       ; determine size of RAM...
         jsr     vdcgetreg
-        sta     tmp1
+        sta     vdc_cset_save
         ora     #%00010000
         jsr     vdcputreg       ; turn on 64k
 
@@ -94,35 +96,39 @@ INSTALL:
         lda     tmp2
         jsr     vdcputbyte      ; restore original value of test byte
 
+        ldx     #0              ; prepare x with hi of default pagecount
+        
         lda     ptr1            ; do bytes match?
         cmp     ptr1+1
         bne     @have64k
         lda     ptr2
         cmp     ptr2+1
         bne     @have64k
-
-        ldx     #VDC_CSET
-        lda     tmp1
-        jsr     vdcputreg       ; restore 16/64k flag
-        jmp     @endok          ; and leave default values for 16k
-
-@have64k:
-        lda     #<256
-        ldx     #>256
+        
+        lda     #64             ; assumes x = 0, here -> p.c = 64
+        bne     @setpagecnt
+@have64k:        
+        txa                     ; assumes x = 0, here
+        inx                     ; so that a/x becomes 0/1 -> p.c. = 256
+@setpagecnt:        
         sta     pagecount
         stx     pagecount+1
-@endok:
+        
+        ldx     #VDC_CSET       ; restore 16/64k flag
+        lda     vdc_cset_save   
+        jsr     vdcputreg        
+
         lda     #<EM_ERR_OK
         ldx     #>EM_ERR_OK
         rts
 
 test64k:
-        sta     tmp1
+        sta     tmp3
         sty     ptr3
         lda     #0
         sta     ptr3+1
         jsr     settestadr1
-        lda     tmp1
+        lda     tmp3
         jsr     vdcputbyte              ; write $55
         jsr     settestadr1
         jsr     vdcgetbyte              ; read here
@@ -199,6 +205,8 @@ transferin:
         lda     VDC_DATA_REG            ; get 2 bytes at a time to speed-up
         sta     (ptr2),y                ; (in fact up to 8 bytes could be fetched with special VDC config)
         iny
+@L1:    bit     VDC_ADDR_REG            ; XXX: Test waiting for register 31
+        bpl     @L1
         lda     VDC_DATA_REG
         sta     (ptr2),y
         iny
@@ -334,6 +342,8 @@ vdcsetsrcaddr:
         dex
         tya
         stx     VDC_ADDR_REG
+@L1:    bit     VDC_ADDR_REG            ; XXX: Test waiting for register 18
+        bpl     @L1
         sta     VDC_DATA_REG
         rts
 

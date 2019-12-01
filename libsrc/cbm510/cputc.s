@@ -65,7 +65,7 @@ L3:     sty     CURS_X
 ; Handle character if high bit set
 
 L10:    and     #$7F
-        cmp     #$7E            ; PI?
+        cmp     #$7F            ; PI?
         bne     L11
         lda     #$5E            ; Load screen code for PI
         bne     cputdirect

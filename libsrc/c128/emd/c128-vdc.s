@@ -104,7 +104,7 @@ INSTALL:
         lda     ptr2
         cmp     ptr2+1
         bne     @have64k
-        
+   
         lda     #64             ; assumes x = 0, here -> p.c = 64
         bne     @setpagecnt
 @have64k:        
@@ -113,22 +113,25 @@ INSTALL:
 @setpagecnt:        
         sta     pagecount
         stx     pagecount+1
+
+        txa
+        bne     @keep64kBit        
         
         ldx     #VDC_CSET       ; restore 16/64k flag
         lda     vdc_cset_save   
-        jsr     vdcputreg        
-
+        jsr     vdcputreg   
+@keep64kBit:
         lda     #<EM_ERR_OK
         ldx     #>EM_ERR_OK
         rts
 
 test64k:
-        sta     tmp3
+        sta     tmp1
         sty     ptr3
         lda     #0
         sta     ptr3+1
         jsr     settestadr1
-        lda     tmp3
+        lda     tmp1
         jsr     vdcputbyte              ; write $55
         jsr     settestadr1
         jsr     vdcgetbyte              ; read here
@@ -146,7 +149,7 @@ settestadr1:
         ldy     #$02                    ; test page 2 (here)
         .byte   $2c
 settestadr2:
-        ldy     #$42                    ; or page 64+2 (there)
+        ldy     #$82                    ; or page 64+2 (there)
         lda     #0
         jmp     vdcsetsrcaddr
 
@@ -334,17 +337,16 @@ COPYTO:
 ;
 
 vdcsetsrcaddr:
-        ldx     #VDC_DATA_LO
+        ldx     #VDC_DATA_HI
         stx     VDC_ADDR_REG
 @L0:    bit     VDC_ADDR_REG
         bpl     @L0
         sta     VDC_DATA_REG
-        dex
-        tya
+        inx
         stx     VDC_ADDR_REG
 @L1:    bit     VDC_ADDR_REG            ; XXX: Test waiting for register 18
         bpl     @L1
-        sta     VDC_DATA_REG
+        sty     VDC_DATA_REG
         rts
 
 vdcgetbyte:

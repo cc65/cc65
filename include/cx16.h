@@ -77,7 +77,8 @@
 #define COLOR_LIGHTBLUE         0x0E
 #define COLOR_GRAY3             0x0F
 
-/* Masks for joy_read() */
+/* NES controller masks for joy_read() */
+
 #define JOY_BTN_1_MASK  0x80
 #define JOY_BTN_2_MASK  0x40
 #define JOY_BTN_3_MASK  0x20
@@ -101,7 +102,7 @@
 #define JOY_FIRE2(v)    ((v) & JOY_FIRE2_MASK)
 
 /* Additional mouse button mask */
-#define MOUSE_BTN_MIDDLE     0x02
+#define MOUSE_BTN_MIDDLE        0x02
 
 /* get_tv() return codes
 ** set_tv() argument codes
@@ -115,7 +116,7 @@
 #define TV_NTSC_MONO    6
 #define TV_RGB2         7
 
-/* Video modes */
+/* Video modes for videomode() */
 #define VIDEOMODE_40x30         0x00
 #define VIDEOMODE_80x60         0x02
 #define VIDEOMODE_40COL         VIDEOMODE_40x30
@@ -130,11 +131,9 @@
 #define VERA_IRQ_UART           0b00001000
 
 
-/* Define hardware */
+/* Define hardware. */
 
-/* Define a structure with the Video Enhanced Retro Adapter's
-** external registers.
-*/
+/* A structure with the Video Enhanced Retro Adapter's external registers */
 struct __vera {
     unsigned short      address;        /* Address for data ports */
     unsigned char       address_hi;
@@ -150,7 +149,7 @@ struct __vera {
 #define VIA1    (*(volatile struct __6522 *)0x9F60)
 #define VIA2    (*(volatile struct __6522 *)0x9F70)
 
-/* Define a structure with the x16emu's settings registers. */
+/* A structure with the x16emu's settings registers */
 struct __emul {
     unsigned char       debug;          /* Boolean: debugging enabled */
     unsigned char       vera_action;    /* Boolean: displaying VERA activity */
@@ -162,7 +161,10 @@ struct __emul {
     unsigned char       keymap;         /* Keyboard layout number */
        const char       detect[2];      /* "16" if running on x16emu */
 };
-#define EMULATOR (*(volatile struct __emul)0x9FB0)
+#define EMULATOR        (*(volatile struct __emul)0x9FB0)
+
+/* An array window into the half Mibibyte or two Mibibytes of banked RAM */
+#define BANK_RAM        ((unsigned char[0x2000])0xA000)
 
 
 

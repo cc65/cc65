@@ -440,7 +440,7 @@ static const struct {
         { "INY",  0x0000001, 0xc8, 0, PutAll },
         { "JMP",  0x0010808, 0x4c, 6, PutAll },
         { "JSR",  0x0000008, 0x20, 7, PutAll },
-        { "LDA",  0x080A26C, 0xa0, 0, PutAll },
+        { "LDA",  0x080A66C, 0xa0, 0, PutAll },
         { "LDX",  0x080030C, 0xa2, 1, PutAll },
         { "LDY",  0x080006C, 0xa0, 1, PutAll },
         { "LSR",  0x000006F, 0x42, 1, PutAll },
@@ -985,7 +985,7 @@ static const struct {
         { "INY",  0x0000001, 0xc8, 0, PutAll },    //OK
         { "JMP",  0x0000C08, 0x00, 12, PutAll },
         { "JSR",  0x0080808, 0x00, 13, PutAll },
-        { "LDA",  0x080A66C, 0xa0, 0, PutAll },    //OK
+        { "LDA",  0x080A26C, 0xa0, 0, PutAll },    //OK
         { "LDM",  0x0000004, 0x3c, 6, PutLDMm740 },
         { "LDX",  0x080030C, 0xa2, 1, PutAll },    //OK
         { "LDY",  0x080006C, 0xa0, 1, PutAll },    //OK

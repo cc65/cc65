@@ -1,5 +1,5 @@
 ;
-; CX16 definitions
+; CX16 r35 definitions
 ;
 
 ; ---------------------------------------------------------------------------
@@ -44,11 +44,128 @@
 ; ---------------------------------------------------------------------------
 ; Zero page
 
+; GEOS and graphics pseudo-registers
+.struct gREG
+                .org    $02
+  .union
+  r0            .word
+  .struct
+  r0L           .byte
+  r0H           .byte
+  .endstruct
+  .endunion
+  .union
+  r1            .word
+  .struct
+  r1L           .byte
+  r1H           .byte
+  .endstruct
+  .endunion
+  .union
+  r2            .word
+  .struct
+  r2L           .byte
+  r2H           .byte
+  .endstruct
+  .endunion
+  .union
+  r3            .word
+  .struct
+  r3L           .byte
+  r3H           .byte
+  .endstruct
+  .endunion
+  .union
+  r4            .word
+  .struct
+  r4L           .byte
+  r4H           .byte
+  .endstruct
+  .endunion
+  .union
+  r5            .word
+  .struct
+  r5L           .byte
+  r5H           .byte
+  .endstruct
+  .endunion
+  .union
+  r6            .word
+  .struct
+  r6L           .byte
+  r6H           .byte
+  .endstruct
+  .endunion
+  .union
+  r7            .word
+  .struct
+  r7L           .byte
+  r7H           .byte
+  .endstruct
+  .endunion
+  .union
+  r8            .word
+  .struct
+  r8L           .byte
+  r8H           .byte
+  .endstruct
+  .endunion
+  .union
+  r9            .word
+  .struct
+  r9L           .byte
+  r9H           .byte
+  .endstruct
+  .endunion
+  .union
+  r10           .word
+  .struct
+  r10L          .byte
+  r10H          .byte
+  .endstruct
+  .endunion
+  .union
+  r11           .word
+  .struct
+  r11L          .byte
+  r11H          .byte
+  .endstruct
+  .endunion
+  .union
+  r12           .word
+  .struct
+  r12L          .byte
+  r12H          .byte
+  .endstruct
+  .endunion
+  .union
+  r13           .word
+  .struct
+  r13L          .byte
+  r13H          .byte
+  .endstruct
+  .endunion
+  .union
+  r14           .word
+  .struct
+  r14L          .byte
+  r14H          .byte
+  .endstruct
+  .endunion
+  .union
+  r15           .word
+  .struct
+  r15L          .byte
+  r15H          .byte
+  .endstruct
+  .endunion
+.endstruct
+
 ; Kernal
 FNAM            := $84          ; Pointer to filename
 KTEMP2          := $86          ; 2 bytes for temporary storage
-SCREEN_PTR      := $88          ; Pointer to current row on text screen (16 bits)
-IMPARM          := $8A          ; Pointer for PRIMM function
+IMPARM          := $88          ; Pointer for PRIMM function
+SCREEN_PTR      := $90          ; Pointer to current row on text screen (16 bits)
 
 ; BASIC
 TXTPTR          := $EE          ; Pointer into BASIC source code
@@ -58,41 +175,27 @@ TXTPTR          := $EE          ; Pointer into BASIC source code
 BASIC_BUF       := $0200        ; Location of command-line
 BASIC_BUF_LEN   = 81            ; Maximum length of command-line
 
-CURS_COLOR      := $027E        ; Color under the cursor
-CHARCOLOR       := $0286        ; Cursor's color nybbles (high: background, low: foreground)
-STATUS          := $0287        ; Status from previous I/O operation
-IN_DEV          := $028E        ; Current input device number
-OUT_DEV         := $028F        ; Current output device number
-TIME            := $0292        ; 60 Hz. clock (3 bytes, big-endian)
-FNAM_LEN        := $0298        ; Length of filename
-SECADR          := $029A        ; Secondary address
-DEVNUM          := $029B        ; Device number
-KEY_COUNT       := $029E        ; Number of keys in input buffer
-RVS             := $029F        ; Reverse flag
-CURS_FLAG       := $02A3        ; 1 = cursor off
-CURS_BLINK      := $02A4        ; Blink counter
-CURS_CHAR       := $02A5        ; Character under the cursor
-CURS_STATE      := $02A6        ; Cursor blink state
-CURS_X          := $02A8        ; Cursor column
-CURS_Y          := $02AB        ; Cursor row
-LLEN            := $02AE        ; Line length
-NLINES          := $02AF        ; Number of screen lines
-JOY1            := $02BC        ; 3 bytes of NES/SNES gamepad data
-JOY2            := $02BF
+STATUS          := $0275        ; Status from previous I/O operation
+IN_DEV          := $0279        ; Current input device number
+OUT_DEV         := $027A        ; Current output device number
+FNAM_LEN        := $027D        ; Length of filename
+SECADR          := $027F        ; Secondary address
+DEVNUM          := $0280        ; Device number
+CURS_COLOR      := $0373        ; Color under the cursor
+CHARCOLOR       := $0377        ; Cursor's color nybbles (high: background, low: foreground)
+RVS             := $0378        ; Reverse flag
+CURS_FLAG       := $037C        ; 1 = cursor off
+CURS_BLINK      := $037D        ; Blink counter
+CURS_CHAR       := $037E        ; Character under the cursor
+CURS_STATE      := $037F        ; Cursor blink state
+CURS_X          := $0381        ; Cursor column
+CURS_Y          := $0384        ; Cursor row
+LLEN            := $0387        ; Line length
+NLINES          := $0388        ; Number of screen lines
 
 ; BASIC
-VARTAB          := $02DD        ; Pointer to start of BASIC variables
-MEMSIZE         := $02E5        ; Pointer to highest BASIC RAM location (+1)
-
-; Kernal mouse
-MSEPAR          := $0371        ; mouse: $8x=sprite on, 1/2: scale
-MOUSEL          := $0372        ; min. x co-ordinate
-MOUSER          := $0374        ; max. x co-ordinate
-MOUSET          := $0376        ; min. y co-ordinate
-MOUSEB          := $0378        ; max. y co-ordinate
-MOUSEX          := $037A        ; x co-ordinate
-MOUSEY          := $037C        ; y co-ordinate
-MOUSEBT         := $037E        ; buttons (bits 2: middle, 1: right, 0: left)
+VARTAB          := $03E3        ; Pointer to start of BASIC variables
+MEMSIZE         := $03EB        ; Pointer to highest BASIC RAM location (+1)
 
 ; ---------------------------------------------------------------------------
 ; Vector and other locations
@@ -141,8 +244,13 @@ NMIVec          := $0318
   SPR_COLLIDED  =       %00000100
   UART_IRQ      =       %00001000
   .endenum
+
   ; Internal RAM and registers
-  VRAM          :=      $000000
+
+  .struct
+                .org    $000000
+  VRAM          .res    $020000 ; 128 Kibibytes
+  .endstruct
   .scope        COMPOSER        ; Display composer
     .struct
                 .org    $0F0000
@@ -226,14 +334,28 @@ NMIVec          := $0318
   .scope        SPRITE
     .struct
                 .org    $0F4000
-    CTRL        .byte           ; Enables sprites
+    CTRL        .byte           ; Enables sprite engine
     COLLISION   .byte
+    .endstruct
+    .struct     ATTRIB          ; Sprite attributes
+                .org    $0F5000
+      ADDR      .addr           ; Address and color mode
+      XX        .word
+      YY        .word
+      Z_FLIP    .byte
+      SIZE_PAL  .byte
     .endstruct
     .enum       FLIP
       NONE      =       0
       HORIZ
       VERT
       BOTH
+    .endenum
+    .enum       DEPTH
+      DISABLE   =       0 << 2
+      CANVAS    =       1 << 2
+      LAYER0    =       2 << 2
+      LAYER1    =       3 << 2
     .endenum
     .enum                       ; Sprite geometry
     WIDTH8      =       0 << 4
@@ -247,13 +369,6 @@ NMIVec          := $0318
     COLORS16    =       0 << 7
     COLORS256   =       1 << 7
     .endenum
-    .enum       DEPTH
-      DISABLE   =       0 << 2
-      CANVAS    =       1 << 2
-      LAYER0    =       2 << 2
-      LAYER1    =       3 << 2
-    .endenum
-    ATTRIB      :=      $0F5000 ; Sprite attributes
   .endscope
   AUDIO         :=      $0F6000
   .scope        SPI
@@ -333,4 +448,16 @@ NMIVec          := $0318
                 .org    $9FBD
   KEYMAP        .byte           ; Current keyboard layout number (Read-Only)
   DETECT        .byte   2       ; If is "16" string, then running on emulator (RO)
+.endstruct
+
+; ---------------------------------------------------------------------------
+; Banked RAM and ROM
+
+KEY_COUNT       := $A00A        ; (bank 0) Number of keys in input buffer
+TIMER           := $A03E        ; (bank 0) 60 Hz. timer (3 bytes, big-endian)
+
+.struct BANK
+        .org    $A000
+  RAM   .res    $2000           ; 8 Kibibyte window into 512 Kibibytes or 2048 Kibibytes
+  ROM   .res    $4000           ; 16 Kibibyte window into 128 Kibibytes
 .endstruct

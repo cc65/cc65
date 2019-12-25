@@ -44,7 +44,19 @@
 
 
 
+/* Additional output character codes */
+#define CH_COLOR_SWAP           0x01
+#define CH_UNDERLINE            0x04
+#define CH_BOLD                 0x06
+#define CH_BACKSPACE            0x08
+#define CH_ITALIC               0x0B
+#define CH_OUTLINE              0x0C
+#define CH_FONT_ISO             0x0F
+#define CH_FONT_PET             0x8F
+
 /* Additional key defines */
+#define CH_SHIFT_TAB            0x18
+#define CH_HELP                 0x84
 #define CH_F1                   0x85
 #define CH_F2                   0x89
 #define CH_F3                   0x86
@@ -163,7 +175,7 @@ struct __emul {
 };
 #define EMULATOR        (*(volatile struct __emul)0x9FB0)
 
-/* An array window into the half Mibibyte or two Mibibytes of banked RAM */
+/* An array window into the half Mebibyte or two Mebibytes of banked RAM */
 #define BANK_RAM        ((unsigned char[0x2000])0xA000)
 
 

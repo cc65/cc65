@@ -1,5 +1,5 @@
 ;
-; 2019-11-14, Greg King
+; 2019-12-22, Greg King
 ;
 ; Link an interrupt handler if joysticks are used by a program.
 ;
@@ -14,7 +14,7 @@ joy_libref:
         lda     VERA::IRQ_FLAGS
         lsr     a
         bcc     not_vsync
-        jsr     GETJOY          ; Bit-bang game controllers
+        jsr     JOYSTICK_SCAN   ; Bit-bang game controllers
         clc                     ; Let other Jiffy handlers run
 not_vsync:
         rts

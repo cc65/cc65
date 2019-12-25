@@ -1,7 +1,7 @@
 ;
 ; Driver for the Commander X16 Kernal's mouse driver.
 ;
-; 2019-11-16, Greg King
+; 2019-12-25, Greg King
 ;
 
         .include        "zeropage.inc"
@@ -66,18 +66,16 @@ SCREEN_HEIGHT   = 480 - 1
 ;----------------------------------------------------------------------------
 ; Global variables.
 
+XPos            := ptr3                 ; Current mouse position, X
+YPos            := ptr4                 ; Current mouse position, Y
+
 .bss
 
-XPos            := MOUSEX               ; Current mouse position, X
-YPos            := MOUSEY               ; Current mouse position, Y
-
-XMin            := MOUSEL               ; X1 value of bounding box
-XMax            := MOUSER               ; X2 value of bounding box
-YMin            := MOUSET               ; Y1 value of bounding box
-YMax            := MOUSEB               ; Y2 value of bounding box
-Box             := XMin
-
-Buttons         := MOUSEBT              ; button status bits
+Box:
+XMin:           .res    2               ; X1 value of bounding box
+XMax:           .res    2               ; X2 value of bounding box
+YMin:           .res    2               ; Y1 value of bounding box
+YMax:           .res    2               ; Y2 value of bounding box
 
 .rodata
 
@@ -121,22 +119,22 @@ INSTALL:
         bpl     @L1
 
         ldx     #$00            ; Don't change sprite's scale
-        lda     #$01            ; Initiate and show sprite
-        jsr     MOUSE
+        lda     #$01            ; Create sprite
+        jsr     MOUSE_CONFIG
 
 ; Be sure the mouse cursor is invisible, and at the default location. We
 ; need to do that here, because the mouse interrupt handler might not set
 ; the mouse position if it hasn't changed.
 
-        sei
         jsr     CHIDE
+.if 0
         lda     XPos
         ldx     XPos+1
         jsr     CMOVEX
         lda     YPos
         ldx     YPos+1
         jsr     CMOVEY
-        cli
+.endif
 
 ; Done, return zero
 
@@ -148,7 +146,10 @@ INSTALL:
 ; UNINSTALL routine -- is called before the driver is removed from memory.
 ; No return code required (the driver is removed from memory on return).
 
-UNINSTALL       := HIDE                 ; Hide cursor on exit
+UNINSTALL:                      ; Disable mouse on exit
+        lda     #$00
+        tax
+        jmp     MOUSE_CONFIG
 
 ;----------------------------------------------------------------------------
 ; HIDE routine -- is called to hide the mouse pointer. The mouse kernel manages
@@ -181,6 +182,7 @@ SETBOX: sta     ptr1
         lda     (ptr1)
         ldy     #$01
 
+        php
         sei
         sta     XMin
         lda     (ptr1),y
@@ -191,9 +193,11 @@ SETBOX: sta     ptr1
         iny
         lda     (ptr1),y
         sta     YMax
-        cli
+        plp
 
         rts
+
+;; Note: SETBOX and GETBOX currently have no effect!
 
 ;----------------------------------------------------------------------------
 ; GETBOX: Return the mouse bounding box. The parameters are passed as they
@@ -222,7 +226,10 @@ GETBOX: sta     ptr1
 ; No checks are done to see if the new position is valid (within
 ; the bounding box or the screen). No return code required.
 
-MOVE:   sei                             ; No interrupts
+;; Note: This function currently has no effect!
+
+MOVE:   php
+        sei                             ; No interrupts
 
         sta     YPos
         stx     YPos+1                  ; New Y position
@@ -237,14 +244,16 @@ MOVE:   sei                             ; No interrupts
         sta     XPos                    ; New X position
         jsr     CMOVEX                  ; Move the cursor
 
-        cli                             ; Allow interrupts
+        plp                             ; Allow interrupts
         rts
 
 ;----------------------------------------------------------------------------
 ; BUTTONS: Return the CBM 1351 button mask in .XA .
 
 BUTTONS:
-        lda     Buttons
+        ldx     #XPos
+        jsr     MOUSE_GET
+
         and     #%00000111
         tax
         lda     ButtMask,x
@@ -255,9 +264,9 @@ BUTTONS:
 ; POS: Return the mouse position in the MOUSE_POS struct pointed to by ptr1.
 ; No return code required.
 
-POS:    ldy     #MOUSE_POS::XCOORD      ; Structure offset
+POS:    jsr     BUTTONS
 
-        sei                             ; Disable interrupts
+POS1:   ldy     #MOUSE_POS::XCOORD      ; Structure offset
         lda     XPos                    ; Transfer the position
         sta     (ptr1),y
         lda     XPos+1
@@ -267,8 +276,6 @@ POS:    ldy     #MOUSE_POS::XCOORD      ; Structure offset
         iny
         sta     (ptr1),y
         lda     YPos+1
-        cli                             ; Enable interrupts
-
         iny
         sta     (ptr1),y                ; Store last byte
         rts                             ; Done
@@ -282,20 +289,15 @@ POS:    ldy     #MOUSE_POS::XCOORD      ; Structure offset
 ; call mouse_pos to initialize the struct pointer, and fill the position
 ; fields.
 
-INFO:   jsr     POS
-
-; Fill in the button state
-
-        jsr     BUTTONS                 ; Will not touch ptr1
+INFO:   jsr     BUTTONS                 ; Will not touch ptr1
         ldy     #MOUSE_INFO::BUTTONS
         sta     (ptr1),y
-        rts
+        jmp     POS1
 
 ;----------------------------------------------------------------------------
 ; IOCTL: Driver defined entry point. The wrapper will pass a pointer to ioctl
 ; specific data in ptr1, and the ioctl code in A.
 ; Must return an error code in .XA .
-;
 
 IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL   ; We don't support ioctls, for now
         ldx     #>MOUSE_ERR_INV_IOCTL

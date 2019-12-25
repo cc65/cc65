@@ -6,9 +6,40 @@
 
 .if .def(__CX16__)
   ; CX16 extended jump table
-  GETJOY       := $FF06
-  MOUSE        := $FF09
-  SCRMOD       := $FF5F
+  FB_INIT                       := $FEF6
+  FB_GET_INFO                   := $FEF9
+  FB_SET_PALETTE                := $FEFC
+  FB_CURSOR_POSITION            := $FEFF
+  FB_CURSOR_NEXT_LINE           := $FF02
+  FB_GET_PIXEL                  := $FF05
+  FB_GET_PIXELS                 := $FF08
+  FB_SET_PIXEL                  := $FF0B
+  FB_SET_PIXELS                 := $FF0E
+  FB_SET_8_PIXELS               := $FF11
+  FB_SET_8_PIXELS_OPAQUE        := $FF14
+  FB_FILL_PIXELS                := $FF17
+  FB_FILTER_PIXELS              := $FF1A
+  FB_MOVE_PIXELS                := $FF1D
+  GRAPH_INIT                    := $FF20
+  GRAPH_CLEAR                   := $FF23
+  GRAPH_SET_WINDOW              := $FF26
+  GRAPH_SET_COLORS              := $FF29
+  GRAPH_DRAW_LINE               := $FF2C
+  GRAPH_DRAW_RECT               := $FF2F
+  GRAPH_MOVE_RECT               := $FF32
+  GRAPH_DRAW_OVAL               := $FF35
+  GRAPH_DRAW_IMAGE              := $FF38
+  GRAPH_SET_FONT                := $FF3B
+  GRAPH_GET_CHAR_SIZE           := $FF3E
+  GRAPH_PUT_CHAR                := $FF41
+  RESTORE_BASIC                 := $FF47
+  CLOCK_SET_DATE_TIME           := $FF4D
+  CLOCK_GET_DATE_TIME           := $FF50
+  JOYSTICK_SCAN                 := $FF53
+  JOYSTICK_GET                  := $FF56
+  SCRMOD                        := $FF5F
+  MOUSE_CONFIG                  := $FF68
+  MOUSE_GET                     := $FF6B
 .endif
 
 .if .def(__C128__)
@@ -21,6 +52,9 @@
 .if .def(__C128__) || .def(__CX16__)
   ; Extended jump table
   CLSALL       := $FF4A
+  LKUPLA       := $FF59
+  LKUPSA       := $FF5C
+  PFKEY        := $FF65
   JSRFAR       := $FF6E
   INDFET       := $FF74
   INDSTA       := $FF77

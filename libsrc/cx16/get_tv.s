@@ -1,5 +1,5 @@
 ;
-; 2019-09-20, Greg King
+; 2019-12-22, Greg King
 ;
 ; unsigned char get_tv (void);
 ; /* Return the video mode the machine is using. */
@@ -11,9 +11,6 @@
 
 
 .proc   _get_tv
-        php
-        sei                             ; Don't let interrupts interfere
-
         ; Point to the video output register.
 
         stz     VERA::CTRL              ; Use port 0
@@ -25,7 +22,6 @@
         sty     VERA::ADDR+2
 
         lda     VERA::DATA0
-        plp                             ; Re-enable interrupts
         and     #$07                    ; Get the type of output signal
         rts
 .endproc

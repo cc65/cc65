@@ -1,5 +1,5 @@
 ;
-; 2019-11-06, Greg King
+; 2019-12-22, Greg King
 ;
 ; void __fastcall__ set_tv (unsigned char);
 ; /* Set the video mode the machine will use. */
@@ -11,9 +11,6 @@
 
 
 .proc   _set_tv
-        php
-        sei                             ; Don't let interrupts interfere
-
         ; Point to the video output register.
 
         stz     VERA::CTRL              ; Use port 0
@@ -25,6 +22,5 @@
         stx     VERA::ADDR+2
 
         sta     VERA::DATA0
-        plp                             ; Re-enable interrupts
         rts
 .endproc

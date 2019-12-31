@@ -1471,7 +1471,7 @@ unsigned OptTransfers2 (CodeSeg* S)
             (N = CS_GetNextEntry (S, I)) != 0       &&
             !CE_HasLabel (N)                        &&
             (N->Info & OF_XFR) != 0                 &&
-            GetRegInfo (S, I+2, E->Chg) != E->Chg) {
+            (GetRegInfo (S, I+2, E->Chg) & E->Chg) == 0) {
 
             CodeEntry* X = 0;
 

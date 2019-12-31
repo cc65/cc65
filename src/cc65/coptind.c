@@ -1948,17 +1948,22 @@ unsigned OptPushPop (CodeSeg* S)
                     !MemAccess (S, Push+1, Pop-1, E)) {
 
                     /* Insert a STA after the PHA */
-                    X = NewCodeEntry (E->OPC, E->AM, E->Arg, E->JumpTo, E->LI);
+                    X = NewCodeEntry (OP65_STA, E->AM, E->Arg, E->JumpTo, E->LI);
                     CS_InsertEntry (S, X, Push+1);
 
                     /* Remove the PHA instead */
                     CS_DelEntry (S, Push);
 
+                    /* Insert a LDA after the PLA */
+                    X = NewCodeEntry (OP65_LDA, E->AM, E->Arg, E->JumpTo, CS_GetEntry (S, Pop)->LI);
+                    CS_InsertEntry (S, X, Pop+1);
+
                     /* Remove the PLA/STA sequence */
-                    CS_DelEntries (S, Pop, 2);
+                    CS_DelEntry (S, Pop);
+                    CS_DelEntry (S, I);
 
                     /* Correct I so we continue with the next insn */
-                    I -= 2;
+                    --I;
 
                     /* Remember we had changes */
                     ++Changes;

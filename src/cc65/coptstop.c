@@ -792,10 +792,6 @@ static unsigned Opt_toseqax_tosneax (StackOpData* D, const char* BoolTransformer
         X = NewCodeEntry (OP65_CMP, LoadA->AM, LoadA->Arg, 0, D->OpEntry->LI);
         InsertEntry (D, X, D->IP++);
 
-        /* Lhs load entries can be removed */
-        D->Lhs.X.Flags |= LI_REMOVE;
-        D->Lhs.A.Flags |= LI_REMOVE;
-
     } else if ((D->Rhs.A.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT &&
                (D->Rhs.X.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT) {
 
@@ -816,9 +812,13 @@ static unsigned Opt_toseqax_tosneax (StackOpData* D, const char* BoolTransformer
         X = NewCodeEntry (OP65_CMP, LoadA->AM, LoadA->Arg, 0, D->OpEntry->LI);
         InsertEntry (D, X, D->IP++);
 
-        /* Rhs load entries can be removed */
-        D->Rhs.X.Flags |= LI_REMOVE;
-        D->Rhs.A.Flags |= LI_REMOVE;
+        /* Rhs load entries must be removed if they are placed after the push */
+        if (D->Rhs.X.LoadIndex > D->PushIndex) {
+            D->Rhs.X.Flags |= LI_REMOVE;
+        }
+        if (D->Rhs.A.LoadIndex > D->PushIndex) {
+            D->Rhs.A.Flags |= LI_REMOVE;
+        }
 
     } else if ((D->Rhs.A.Flags & LI_DIRECT) != 0 &&
                (D->Rhs.X.Flags & LI_DIRECT) != 0) {
@@ -897,11 +897,7 @@ static unsigned Opt_tosshift (StackOpData* D, const char* Name)
         /* ldx */
         X = NewCodeEntry (OP65_LDX, LoadX->AM, LoadX->Arg, 0, D->OpEntry->LI);
         InsertEntry (D, X, D->IP++);
-
-        /* Lhs load entries can be removed */
-        D->Lhs.X.Flags |= LI_REMOVE;
-        D->Lhs.A.Flags |= LI_REMOVE;
-
+ 
     } else {
 
         /* Save lhs into zeropage and reload later */

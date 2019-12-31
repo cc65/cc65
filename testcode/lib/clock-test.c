@@ -1,7 +1,7 @@
 /* Calendar-clock test program
 **
 ** 2018-Sep-25, chris@groessler.org
-** 2019-Dec-27, Greg King
+** 2019-Dec-30, Greg King
 */
 
 #include <stdio.h>
@@ -54,8 +54,10 @@ int main(int argc, char **argv)
     }
 
     if (argc != 2) {
-#ifdef __CC65__
-        printf("Usage: run:rem [YY-MM-DD-HH-MM-SS]\n");
+#if defined(__APPLE2__)
+        printf("USAGE: CALL2051 [:REM YY-MM-DD-HH-MM-SS]\n");
+#elif defined(__ATMOS__) || defined(__CBM__)
+        printf("Usage: run [:rem YY-MM-DD-HH-MM-SS]\n");
 #else
         printf("Usage: %s [YY-MM-DD-HH-MM-SS]\n", argv[0]);
 #endif

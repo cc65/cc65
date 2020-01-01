@@ -1968,7 +1968,7 @@ unsigned OptPushPop (CodeSeg* S)
                     /* Remember we had changes */
                     ++Changes;
 
-                } else if ((E->Info & OF_CBRA) == 0     &&
+                } else if (!CE_UseLoadFlags (E) &&
                            (!RegAUsed (S, I) || !ChgA)) {
 
                     /* We can remove the PHA and PLA instructions */

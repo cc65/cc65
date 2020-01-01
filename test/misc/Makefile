@@ -86,10 +86,6 @@ $(WORKDIR)/sitest.$1.$2.prg: sitest.c | $(WORKDIR)
 	@echo "FIXME: " $$@ "currently will fail."
 	-$(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
 #	-$(SIM65) $(SIM65FLAGS) $$@ $(NULLOUT)
-$(WORKDIR)/cc65141011.$1.$2.prg: cc65141011.c | $(WORKDIR)
-	@echo "FIXME: " $$@ "currently can fail."
-	$(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
-	-$(SIM65) $(SIM65FLAGS) $$@ $(NULLOUT)
 
 endef # PRG_template
 

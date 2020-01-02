@@ -10,9 +10,8 @@
 
         .export         _strlower, _strlwr
         .import         popax
-        .import         __ctype
         .importzp       ptr1, ptr2
-
+        .import         ctype_preprocessor_no_check
         .include        "ctype.inc"
 
 _strlower:
@@ -25,11 +24,11 @@ _strlwr:
 
 loop:   lda     (ptr1),y        ; get character
         beq     L9              ; jump if done
-        tax
-        lda     __ctype,x       ; get character classification
+                                ; get character classification
+        jsr     ctype_preprocessor_no_check        
         and     #CT_UPPER       ; upper case char?
         beq     L1              ; jump if no
-        txa                     ; get character back into accu
+        lda     (ptr1),y        ; fetch character again
         sec
         sbc     #<('A'-'a')     ; make lower case char
         sta     (ptr1),y        ; store back

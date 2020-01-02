@@ -7,9 +7,9 @@
 ;
 
         .export         _strnicmp, _strncasecmp
-        .import         popax, popptr1, __ctype
-        .importzp       ptr1, ptr2, ptr3, tmp1
-
+        .import         popax, popptr1
+        .importzp       ptr1, ptr2, ptr3, tmp1, tmp2
+        .import         ctype_preprocessor_no_check
         .include        "ctype.inc"
 
 _strnicmp:
@@ -46,27 +46,27 @@ Loop:   inc     ptr3
 ; Compare a byte from the strings
 
 Comp:   lda     (ptr2),y
-        tax
-        lda     __ctype,x       ; get character classification
+        sta     tmp2            ; remember original char
+                                ; get character classification
+        jsr     ctype_preprocessor_no_check 
         and     #CT_LOWER       ; lower case char?
         beq     L1              ; jump if no
-        txa                     ; get character back
-        sec
-        sbc     #<('a'-'A')     ; make upper case char
-        tax                     ;
-L1:     stx     tmp1            ; remember upper case equivalent
+        lda     #<('A'-'a')     ; make upper case char
+        adc     tmp2            ; ctype_preprocessor_no_check ensures carry clear!
+        sta     tmp2            ; remember upper case equivalent
 
-        lda     (ptr1),y        ; get character from first string
-        tax
-        lda     __ctype,x       ; get character classification
+L1:     lda     (ptr1),y        ; get character from first string
+        sta     tmp1            ; remember original char
+                                ; get character classification
+        jsr     ctype_preprocessor_no_check 
         and     #CT_LOWER       ; lower case char?
         beq     L2              ; jump if no
-        txa                     ; get character back
-        sec
-        sbc     #<('a'-'A')     ; make upper case char
-        tax
+        lda     #<('A'-'a')     ; make upper case char
+        adc     tmp1            ; ctype_preprocessor_no_check ensures carry clear!
+        sta     tmp1            ; remember upper case equivalent 
 
-L2:     cpx     tmp1            ; compare characters
+L2:     ldx     tmp1
+        cpx     tmp2            ; compare characters
         bne     NotEqual        ; Jump if strings different
         txa                     ; End of strings?
         beq     Equal1          ; Jump if EOS reached, a/x == 0

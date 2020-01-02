@@ -1,21 +1,23 @@
+; islower.s
 ;
-; Ullrich von Bassewitz, 02.06.1998
+; This file is part of
+; cc65 - a freeware C compiler for 6502 based systems
+;
+; https://github.com/cc65/cc65
+;
+; See "LICENSE" file for legal information.
 ;
 ; int islower (int c);
 ;
 
         .export         _islower
         .include        "ctype.inc"
+        .import         ctype_preprocessor        
 
 _islower:
-        cpx     #$00            ; Char range ok?
-        bne     @L1             ; Jump if no
-        tay
-        lda     __ctype,y       ; Get character classification
-        and     #CT_LOWER       ; Mask lower char bit
-        rts
+        jsr     ctype_preprocessor      ; (clears always x)
+        bcs     @L1                     ; out of range? (everything already clear -> false)
+        and     #CT_LOWER               ; mask lower char bit
+@L1:    rts
 
-@L1:    lda     #$00            ; Return false
-        tax
-        rts
 

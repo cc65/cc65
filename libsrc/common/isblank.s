@@ -1,5 +1,11 @@
+; isblank.s
 ;
-; Ullrich von Bassewitz, 02.06.1998
+; This file is part of
+; cc65 - a freeware C compiler for 6502 based systems
+;
+; https://github.com/cc65/cc65
+;
+; See "LICENSE" file for legal information.
 ;
 ; int isblank (int c);
 ;
@@ -8,16 +14,10 @@
 
         .export         _isblank
         .include        "ctype.inc"
+        .import         ctype_preprocessor     
 
 _isblank:
-        cpx     #$00            ; Char range ok?
-        bne     @L1             ; Jump if no
-        tay
-        lda     __ctype,y       ; Get character classification
-        and     #CT_SPACE_TAB   ; Mask blank bit
-        rts
-
-@L1:    lda     #$00            ; Return false
-        tax
-        rts
-
+        jsr     ctype_preprocessor      ; (clears always x)
+        bcs     @L1                     ; out of range? (everything already clear -> false)
+        and     #CT_SPACE_TAB           ; mask blank bit
+ @L1:   rts

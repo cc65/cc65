@@ -249,7 +249,6 @@ Here is a description of all the command line options:
   <item><tt/strcmp()/
   <item><tt/strcpy()/
   <item><tt/strlen()/
-  <item>most of the functions declared in <tt/&lt;ctype.h&gt;/
   </itemize>
 
   Note: This has two consequences:
@@ -259,9 +258,7 @@ Here is a description of all the command line options:
         using <tt/--eagerly-inline-funcs/ actually will break things.
         <p>
   <item>The inlined string and memory functions will not handle strings or
-        memory areas larger than 255 bytes.  Similarly, the inlined <tt/is..()/
-        functions will not work with values outside the char. range (such as
-        <tt/EOF/).
+        memory areas larger than 255 bytes.
         <p>
   </itemize>
 

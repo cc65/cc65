@@ -1,12 +1,14 @@
+; ctype.inc
+;
+; This file is part of
+; cc65 - a freeware C compiler for 6502 based systems
+;
+; https://github.com/cc65/cc65
+;
+; See "LICENSE" file for legal information.
 ;
 ; Definitions for the character type tables
 ;
-; Ullrich von Bassewitz, 08.09.2001
-;
-
-; Make the __ctype table an exported/imported symbol
-
-        .global    __ctype
 
 ; Define bitmapped constants for the table entries
 
@@ -25,5 +27,3 @@ CT_ALNUM        = (CT_LOWER | CT_UPPER | CT_DIGIT)
 CT_ALPHA        = (CT_LOWER | CT_UPPER)
 CT_CTRL_SPACE   = (CT_CTRL | CT_SPACE)
 CT_NOT_PUNCT    = (CT_SPACE | CT_CTRL | CT_DIGIT | CT_UPPER | CT_LOWER)
-
-

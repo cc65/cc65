@@ -10,9 +10,8 @@
 
         .export         _strupper, _strupr
         .import         popax
-        .import         __ctype
         .importzp       ptr1, ptr2
-
+        .import         ctype_preprocessor_no_check
         .include        "ctype.inc"
 
 _strupper:
@@ -25,11 +24,10 @@ _strupr:
 
 loop:   lda     (ptr1),y        ; get character
         beq     L9              ; jump if done
-        tax
-        lda     __ctype,x       ; get character classification
+        jsr     ctype_preprocessor_no_check 
         and     #CT_LOWER       ; lower case char?
         beq     L1              ; jump if no
-        txa                     ; get character back into accu
+        lda     (ptr1),y        ; fetch character again
         clc
         adc     #<('A'-'a')     ; make upper case char
         sta     (ptr1),y        ; store back

@@ -1,4 +1,4 @@
-; ctype.s
+; ctype_common.inc
 ;
 ; This file is part of
 ; cc65 - a freeware C compiler for 6502 based systems
@@ -7,7 +7,7 @@
 ;
 ; See "LICENSE" file for legal information.
 ;
-; ATMOS character specification table.
+; Character specification table for some common targets.
 ;
 
         .include        "ctypetable.inc"
@@ -86,70 +86,6 @@ __ctypeIdx:
         ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 124/7c _____|_____, 125/7d _____}_____
         ct_mix  CT_NONE_IDX, CT_WS_IDX                   ; 126/7e _____~_____, 127/7f ____DEL____
 
-        ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 128/80 ___________, 129/81 ___________
-        ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 130/82 ___________, 131/83 ___________
-        ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 132/84 ___________, 133/85 ___________
-        ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 134/86 ___________, 135/87 ___________
-        ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 136/88 ___________, 137/89 ___________
-        ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 138/8a ___________, 139/8b ___________
-        ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 140/8c ___________, 141/8d ___________
-        ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 142/8e ___________, 143/8f ___________
-        ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 144/90 ___________, 145/91 ___________
-        ct_mix  CT_NONE_IDX, CT_CTRL_IDX                 ; 146/92 ___________, 147/93 ___________
-        ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 148/94 ___________, 149/95 ___________
-        ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 150/96 ___________, 151/97 ___________
-        ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 152/98 ___________, 153/99 ___________
-        ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 154/9a ___________, 155/9b ___________
-        ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 156/9c ___________, 157/9d ___________
-        ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 158/9e ___________, 159/9f ___________
-
-        ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 160/a0 ___________, 161/a1 ___________
-        ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 162/a2 ___________, 163/a3 ___________
-        ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 164/a4 ___________, 165/a5 ___________
-        ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 166/a6 ___________, 167/a7 ___________
-        ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 168/a8 ___________, 169/a9 ___________
-        ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 170/aa ___________, 171/ab ___________
-        ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 172/ac ___________, 173/ad ___________
-        ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 174/ae ___________, 175/af ___________
-        ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 176/b0 ___________, 177/b1 ___________
-        ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 178/b2 ___________, 179/b3 ___________
-        ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 180/b4 ___________, 181/b5 ___________
-        ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 182/b6 ___________, 183/b7 ___________
-        ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 184/b8 ___________, 185/b9 ___________
-        ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 186/ba ___________, 187/bb ___________
-        ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 188/bc ___________, 189/bd ___________
-        ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 190/be ___________, 191/bf ___________
-        
-        ct_mix  CT_UPPER_IDX, CT_UPPER_IDX               ; 192/c0 ___________, 193/c1 ___________
-        ct_mix  CT_UPPER_IDX, CT_UPPER_IDX               ; 194/c2 ___________, 195/c3 ___________
-        ct_mix  CT_UPPER_IDX, CT_UPPER_IDX               ; 196/c4 ___________, 197/c5 ___________
-        ct_mix  CT_UPPER_IDX, CT_UPPER_IDX               ; 198/c6 ___________, 199/c7 ___________
-        ct_mix  CT_UPPER_IDX, CT_UPPER_IDX               ; 200/c8 ___________, 201/c9 ___________
-        ct_mix  CT_UPPER_IDX, CT_UPPER_IDX               ; 202/ca ___________, 203/cb ___________
-        ct_mix  CT_UPPER_IDX, CT_UPPER_IDX               ; 204/cc ___________, 205/cd ___________
-        ct_mix  CT_UPPER_IDX, CT_UPPER_IDX               ; 206/ce ___________, 207/cf ___________
-        ct_mix  CT_UPPER_IDX, CT_UPPER_IDX               ; 208/d0 ___________, 209/d1 ___________
-        ct_mix  CT_UPPER_IDX, CT_UPPER_IDX               ; 210/d2 ___________, 211/d3 ___________
-        ct_mix  CT_UPPER_IDX, CT_UPPER_IDX               ; 212/d4 ___________, 213/d5 ___________
-        ct_mix  CT_UPPER_IDX, CT_UPPER_IDX               ; 214/d6 ___________, 215/d7 ___________
-        ct_mix  CT_UPPER_IDX, CT_UPPER_IDX               ; 216/d8 ___________, 217/d9 ___________
-        ct_mix  CT_UPPER_IDX, CT_UPPER_IDX               ; 218/da ___________, 219/db ___________
-        ct_mix  CT_UPPER_IDX, CT_UPPER_IDX               ; 220/dc ___________, 221/dd ___________
-        ct_mix  CT_UPPER_IDX, CT_NONE_IDX                ; 222/de ___________, 223/df ___________
-
-        ct_mix  CT_LOWER_IDX, CT_LOWER_IDX               ; 224/e0 ___________, 225/e1 ___________
-        ct_mix  CT_LOWER_IDX, CT_LOWER_IDX               ; 226/e2 ___________, 227/e3 ___________
-        ct_mix  CT_LOWER_IDX, CT_LOWER_IDX               ; 228/e4 ___________, 229/e5 ___________
-        ct_mix  CT_LOWER_IDX, CT_LOWER_IDX               ; 230/e6 ___________, 231/e7 ___________
-        ct_mix  CT_LOWER_IDX, CT_LOWER_IDX               ; 232/e8 ___________, 233/e9 ___________
-        ct_mix  CT_LOWER_IDX, CT_LOWER_IDX               ; 234/ea ___________, 235/eb ___________
-        ct_mix  CT_LOWER_IDX, CT_LOWER_IDX               ; 236/ec ___________, 237/ed ___________
-        ct_mix  CT_LOWER_IDX, CT_LOWER_IDX               ; 238/ee ___________, 239/ef ___________
-        ct_mix  CT_LOWER_IDX, CT_LOWER_IDX               ; 240/f0 ___________, 241/f1 ___________
-        ct_mix  CT_LOWER_IDX, CT_LOWER_IDX               ; 242/f2 ___________, 243/f3 ___________
-        ct_mix  CT_LOWER_IDX, CT_LOWER_IDX               ; 244/f4 ___________, 245/f5 ___________
-        ct_mix  CT_LOWER_IDX, CT_LOWER_IDX               ; 246/f6 ___________, 247/f7 ___________
-        ct_mix  CT_LOWER_IDX, CT_LOWER_IDX               ; 248/f8 ___________, 249/f9 ___________
-        ct_mix  CT_LOWER_IDX, CT_LOWER_IDX               ; 250/fa ___________, 251/fb ___________
-        ct_mix  CT_LOWER_IDX, CT_LOWER_IDX               ; 252/fc ___________, 253/fd ___________
-        ct_mix  CT_LOWER_IDX, CT_NONE_IDX                ; 254/fe ___________, 255/ff ___________
+.repeat 64
+        ct_mix  CT_NONE_IDX, CT_NONE_IDX                ; 128-255
+.endrepeat

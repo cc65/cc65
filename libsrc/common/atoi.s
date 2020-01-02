@@ -8,9 +8,8 @@
         .export         _atoi, _atol
         .import         negeax, __ctype
         .importzp       sreg, ptr1, ptr2, tmp1
-
+        .import         ctype_preprocessor_no_check
         .include        "ctype.inc"
-
 ;
 ; Conversion routine (32 bit)
 ;
@@ -27,8 +26,9 @@ _atol:  sta     ptr1            ; Store s
 ; Skip whitespace
 
 L1:     lda     (ptr1),y
-        tax
-        lda     __ctype,x       ; get character classification
+                                ; get character classification
+        jsr     ctype_preprocessor_no_check
+
         and     #CT_SPACE_TAB   ; tab or space?
         beq     L2              ; jump if no
         iny
@@ -36,10 +36,10 @@ L1:     lda     (ptr1),y
         inc     ptr1+1
         bne     L1              ; branch always
 
-; Check for a sign. The character is in X
+; Check for a sign. Refetch character, X is cleared by preprocessor
 
-L2:     txa                     ; get char
-        ldx     #0              ; flag: positive
+L2:     lda     (ptr1),y        ; get char
+                                ; x=0 -> flag: positive
         cmp     #'+'            ; ### portable?
         beq     L3
         cmp     #'-'            ; ### portable?
@@ -54,9 +54,9 @@ L3:     iny
 L5:     stx     tmp1            ; remember sign flag
 
 L6:     lda     (ptr1),y        ; get next char
-        tax
-        lda     __ctype,x       ; get character classification
-        and     #$04            ; digit?
+                                ; get character classification
+        jsr     ctype_preprocessor_no_check
+        and     #CT_DIGIT       ; digit?
         beq     L8              ; done
 
 ; Multiply ptr2 (the converted value) by 10
@@ -91,7 +91,7 @@ L6:     lda     (ptr1),y        ; get next char
 
 ; Get the character back and add it
 
-        txa                     ; get char back
+        lda     (ptr1),y        ; fetch char again
         sec
         sbc     #'0'            ; make numeric value
         clc

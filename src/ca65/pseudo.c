@@ -821,8 +821,17 @@ static void DoDebugInfo (void)
 
 
 static void DoDefine (void)
-/* Define a one line macro */
+/* Define a one-line macro */
 {
+    /* The function is called with the .DEFINE token in place, because we need
+    ** to disable .define macro expansions before reading the next token.
+    ** Otherwise, the name of the macro might be expanded; therefore,
+    ** we never would see it.
+    */
+    DisableDefineStyleMacros ();
+    NextTok ();
+    EnableDefineStyleMacros ();
+
     MacDef (MAC_STYLE_DEFINE);
 }
 
@@ -1871,12 +1880,12 @@ static void DoTag (void)
 
 
 static void DoUnDef (void)
-/* Undefine a define style macro */
+/* Undefine a define-style macro */
 {
     /* The function is called with the .UNDEF token in place, because we need
     ** to disable .define macro expansions before reading the next token.
-    ** Otherwise the name of the macro would be expanded, so we would never
-    ** see it.
+    ** Otherwise, the name of the macro would be expanded; therefore,
+    ** we never would see it.
     */
     DisableDefineStyleMacros ();
     NextTok ();
@@ -1962,7 +1971,7 @@ static void DoZeropage (void)
 /* Control commands flags */
 enum {
     ccNone      = 0x0000,               /* No special flags */
-    ccKeepToken = 0x0001                /* Do not skip the current token */
+    ccKeepToken = 0x0001                /* Do not skip the control token */
 };
 
 /* Control command table */
@@ -2001,7 +2010,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoDbg,          },
     { ccNone,           DoDByt          },
     { ccNone,           DoDebugInfo     },
-    { ccNone,           DoDefine        },
+    { ccKeepToken,      DoDefine        },
     { ccNone,           DoUnexpected    },      /* .DEFINED */
     { ccNone,           DoUnexpected    },      /* .DEFINEDMACRO */
     { ccNone,           DoDelMac        },

@@ -1892,6 +1892,7 @@ unsigned OptPushPop (CodeSeg* S)
     while (I < CS_GetEntryCount (S)) {
 
         CodeEntry* X;
+        CodeEntry* N;
 
         /* Get next entry */
         CodeEntry* E = CS_GetEntry (S, I);
@@ -1944,7 +1945,9 @@ unsigned OptPushPop (CodeSeg* S)
                 if (E->OPC == OP65_STA                          &&
                     (E->AM == AM65_ABS || E->AM == AM65_ZP)     &&
                     !CE_HasLabel (E)                            &&
-                    !RegAUsed (S, I+1)                          &&
+                    ((N = CS_GetNextEntry (S, I)) == 0          ||
+                     (!CE_UseLoadFlags (N)                      &&
+                      !RegAUsed (S, I+1)))                      &&
                     !MemAccess (S, Push+1, Pop-1, E)) {
 
                     /* Insert a STA after the PHA */
@@ -1954,16 +1957,11 @@ unsigned OptPushPop (CodeSeg* S)
                     /* Remove the PHA instead */
                     CS_DelEntry (S, Push);
 
-                    /* Insert a LDA after the PLA */
-                    X = NewCodeEntry (OP65_LDA, E->AM, E->Arg, E->JumpTo, CS_GetEntry (S, Pop)->LI);
-                    CS_InsertEntry (S, X, Pop+1);
-
                     /* Remove the PLA/STA sequence */
-                    CS_DelEntry (S, Pop);
-                    CS_DelEntry (S, I);
+                    CS_DelEntries (S, Pop, 2);
 
                     /* Correct I so we continue with the next insn */
-                    --I;
+                    I -= 2;
 
                     /* Remember we had changes */
                     ++Changes;

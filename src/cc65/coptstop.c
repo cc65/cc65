@@ -60,6 +60,8 @@ typedef enum {
   LI_REMOVE             = 0x04,         /* Load may be removed */
   LI_DONT_REMOVE        = 0x08,         /* Load may not be removed */
   LI_DUP_LOAD           = 0x10,         /* Duplicate load */
+  LI_VOLATILE_SRC       = 0x20,         /* Load src might be modified later */
+  LI_SRC_CHG            = 0x40,         /* Load src is possibly modified */
 } LI_FLAGS;
 
 /* Structure that tells us how to load the lhs values */
@@ -71,6 +73,7 @@ struct LoadRegInfo {
     int                 XferIndex;      /* Index of transfer insn  */
     CodeEntry*          XferEntry;      /* The actual transfer entry */
     int                 Offs;           /* Stack offset if data is on stack */
+    const char*         Arg;            /* Loaded src possibly modified later */
 };
 
 /* Now combined for both registers */
@@ -246,6 +249,40 @@ static void AdjustLoadInfo (LoadInfo* LI, int Index, int Change)
 
 
 
+static int Affected (LoadRegInfo* RI, const CodeEntry* E)
+/* Check if the load src is modified between the pushax and op */
+{
+    if (RI->Flags & LI_VOLATILE_SRC) {
+        if (E->AM == AM65_IMM || E->AM == AM65_ACC || E->AM == AM65_IMP || E->AM == AM65_BRA) {
+            return 0;
+        }
+        if (E->OPC == OP65_JSR) {
+            if (E->Flags & CEF_USERMARK) {
+                /* User subs. Play it safe. */
+                return 1;
+            }
+            /* We could filter the non-modifing functions. */
+            /* But why bother optimizating for such rare cases? */
+            return 1;
+        } else if (E->OPC == OP65_DEC || E->OPC == OP65_INC || 
+                   E->OPC == OP65_ASL || E->OPC == OP65_LSR ||
+                   E->OPC == OP65_ROL || E->OPC == OP65_ROR ||
+                   E->OPC == OP65_TRB || E->OPC == OP65_TSB ||
+                   E->OPC == OP65_STA || E->OPC == OP65_STX || E->OPC == OP65_STY) {
+            if ((E->AM == AM65_ABS || E->AM == AM65_ZP) &&
+                strcmp (RI->Arg, E->Arg) != 0) {
+                return 0;
+            }
+            /* We could've check further for more cases where the load target isn't modified */
+            /* But for now let's save the trouble and just play it safe */
+            return 1;
+        }
+    }
+    return 0;
+}
+
+
+
 static void HonourUseAndChg (LoadRegInfo* RI, unsigned Reg, const CodeEntry* E)
 /* Honour use and change flags for an instruction */
 {
@@ -253,6 +290,9 @@ static void HonourUseAndChg (LoadRegInfo* RI, unsigned Reg, const CodeEntry* E)
         ClearLoadRegInfo (RI);
     } else if ((E->Use & Reg) && RI->LoadIndex >= 0) {
         RI->Flags |= LI_DONT_REMOVE;
+    }
+    if (Affected (RI, E)) {
+        RI->Flags |= LI_SRC_CHG;
     }
 }
 
@@ -288,10 +328,15 @@ static void TrackLoads (LoadInfo* LI, CodeEntry* E, int I)
         RI->XferIndex = -1;
 
         /* Set load flags */
-        RI->Flags    &= ~(LI_DIRECT | LI_RELOAD_Y);
-        if (E->AM == AM65_IMM || E->AM == AM65_ZP || E->AM == AM65_ABS) {
+        RI->Flags    &= ~(LI_DIRECT | LI_RELOAD_Y | LI_VOLATILE_SRC);
+        if (E->AM == AM65_IMM) {
             /* These insns are all ok and replaceable */
             RI->Flags |= LI_DIRECT;
+        } else if (E->AM == AM65_ZP || E->AM == AM65_ABS) {
+            /* These insns are replaceable only if they are not modified later */
+            RI->Flags |= LI_VOLATILE_SRC;
+            /* Watch for any change of the load target */
+            RI->Arg    = E->Arg;
         } else if (E->AM == AM65_ZP_INDY &&
                    RegValIsKnown (E->RI->In.RegY) &&
                    strcmp (E->Arg, "sp") == 0) {
@@ -333,7 +378,7 @@ static void TrackLoads (LoadInfo* LI, CodeEntry* E, int I)
         Tgt->LoadIndex  = Src->LoadIndex;
         Tgt->XferIndex  = I;
         Tgt->Offs       = Src->Offs;
-        Tgt->Flags     &= ~(LI_DIRECT | LI_RELOAD_Y);
+        Tgt->Flags     &= ~(LI_DIRECT | LI_RELOAD_Y | LI_VOLATILE_SRC);
         Tgt->Flags     |= Src->Flags & (LI_DIRECT | LI_RELOAD_Y);
 
     } else if (CE_IsCallTo (E, "ldaxysp") && RegValIsKnown (E->RI->In.RegY)) {

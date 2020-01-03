@@ -375,7 +375,7 @@ static int CompareFuncInfo (const void* Key, const void* Info)
 
 
 
-void GetFuncInfo (const char* Name, unsigned short* Use, unsigned short* Chg)
+fncls_t GetFuncInfo (const char* Name, unsigned short* Use, unsigned short* Chg)
 /* For the given function, lookup register information and store it into
 ** the given variables. If the function is unknown, assume it will use and
 ** load all registers.
@@ -430,7 +430,7 @@ void GetFuncInfo (const char* Name, unsigned short* Use, unsigned short* Chg)
             *Chg = REG_ALL;
 
             /* Done */
-            return;
+            return FNCLS_GLOBAL;
         }
 
     } else if (IsDigit (Name[0]) || Name[0] == '$') {
@@ -441,7 +441,7 @@ void GetFuncInfo (const char* Name, unsigned short* Use, unsigned short* Chg)
         */
         *Use = REG_ALL;
         *Chg = REG_ALL;
-        return;
+        return FNCLS_NUMERIC;
 
     } else {
 
@@ -466,7 +466,7 @@ void GetFuncInfo (const char* Name, unsigned short* Use, unsigned short* Chg)
             *Use = REG_ALL;
             *Chg = REG_ALL;
         }
-        return;
+        return FNCLS_BUILTIN;
     }
 
     /* Function not found - assume that the primary register is input, and all
@@ -474,6 +474,8 @@ void GetFuncInfo (const char* Name, unsigned short* Use, unsigned short* Chg)
     */
     *Use = REG_EAXY;
     *Chg = REG_ALL;
+
+    return FNCLS_UNKNOWN;
 }
 
 

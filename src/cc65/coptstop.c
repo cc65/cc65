@@ -1017,9 +1017,6 @@ static unsigned Opt_tosshift (StackOpData* D, const char* Name)
 {
     CodeEntry*  X;
 
-    /* Store the value into the zeropage instead of pushing it */
-    ReplacePushByStore (D);
-
     /* If the lhs is direct (but not stack relative), we can just reload the
     ** data later.
     */

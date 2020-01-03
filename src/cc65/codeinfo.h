@@ -120,16 +120,27 @@ typedef enum {
 
 
 
+/* Defines for the conditions in a compare */
+typedef enum {
+    FNCLS_UNKNOWN = -1, /* Unknown */
+    FNCLS_BUILTIN,      /* Builtin */
+    FNCLS_GLOBAL,       /* Found in global sym table minus the leading underscore */
+    FNCLS_NUMERIC       /* A call to a numeric address */
+} fncls_t;
+
+
+
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
 
 
-void GetFuncInfo (const char* Name, unsigned short* Use, unsigned short* Chg);
+fncls_t GetFuncInfo (const char* Name, unsigned short* Use, unsigned short* Chg);
 /* For the given function, lookup register information and store it into
 ** the given variables. If the function is unknown, assume it will use and
 ** load all registers.
+** Return the whatever category the function is in.
 */
 
 const ZPInfo* GetZPInfo (const char* Name);

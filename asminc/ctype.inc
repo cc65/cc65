@@ -9,6 +9,8 @@
 ;
 ; Definitions for the character type tables
 ;
+; Ullrich von Bassewitz, 08.09.2001
+;
 
 ; Define bitmapped constants for the table entries
 

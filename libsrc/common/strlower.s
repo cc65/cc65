@@ -28,9 +28,8 @@ loop:   lda     (ptr1),y        ; get character
         jsr     ctype_preprocessor_no_check        
         and     #CT_UPPER       ; upper case char?
         beq     L1              ; jump if no
-        lda     (ptr1),y        ; fetch character again
-        sec
-        sbc     #<('A'-'a')     ; make lower case char
+        lda     (ptr1),y        ; fetch character again      
+        adc     #<('a'-'A')     ; make lower case char (ctype_preprocessor_no_check ensures carry clear)
         sta     (ptr1),y        ; store back
 L1:     iny                     ; next char
         bne     loop

@@ -13,15 +13,12 @@
         .export         _isascii
 
 _isascii:
-        cpx     #$00            ; Char range ok?
-        bne     @L1             ; Jump if no
-
-        tay
-        bmi     @L1
-
-        inx
+        asl		a				; high-bit to carry
+        txa 					; check range of input param
+        bne		@L1				; out-of bounds?
+        adc 	#$FF			; calculate return value based on carry
         rts
 
-@L1:    lda     #$00            ; Return false
+@L1:    lda     #$00            ; return false
         tax
         rts

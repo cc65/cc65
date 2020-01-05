@@ -13,7 +13,7 @@
 .include	"ctype.inc"
 .export		__ctype
 
-; This data is a table of possible ctype combinations, possible during 
+; Table definition covering all possible ctype combinations
 
 .rodata
 __ctype:

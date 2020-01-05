@@ -54,10 +54,11 @@ L3:     iny
 L5:     stx     tmp1            ; remember sign flag
 
 L6:     lda     (ptr1),y        ; get next char
-                                ; get character classification
-        jsr     ctype_preprocessor_no_check
-        and     #CT_DIGIT       ; digit?
-        beq     L8              ; done
+        sec                     ; check if char is in digit space
+        sbc     #'0'            ; so subtract lower limit
+        tax                     ; remember this numeric value
+        cmp     #10             ; and check if upper limit is not crossed
+        bcs     L8              ; done
 
 ; Multiply ptr2 (the converted value) by 10
 
@@ -91,9 +92,7 @@ L6:     lda     (ptr1),y        ; get next char
 
 ; Get the character back and add it
 
-        lda     (ptr1),y        ; fetch char again
-        sec
-        sbc     #'0'            ; make numeric value
+        txa                     ; restore numeric value back to accu
         clc
         adc     ptr2
         sta     ptr2

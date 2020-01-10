@@ -25,7 +25,6 @@
 .endproc
 
 
-
 .proc   _clock
 
         stz     sreg + 1        ; Byte 3 always is zero

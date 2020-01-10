@@ -1,44 +1,29 @@
 ;
 ; Default mouse callbacks for the CX16
 ;
-; 2019-12-25, Greg King
-;
-; All functions in this module should be interrupt-safe
-; because they might be called from an interrupt handler.
+; 2020-01-10, Greg King
 ;
 
         .export         _mouse_def_callbacks
 
+        .import         MOUSE_GET, SPRITE_SET_POSITION
         .include        "cx16.inc"
 
-
-msprite:
-        stz     VERA::CTRL      ; set address for VERA's data port zero
-        lda     #<(VERA::SPRITE::ATTRIB::Z_FLIP + 0 * 8)
-        ldx     #>(VERA::SPRITE::ATTRIB::Z_FLIP + 0 * 8)
-        ldy     #^(VERA::SPRITE::ATTRIB::Z_FLIP + 0 * 8) | VERA::INC0
-        sta     VERA::ADDR
-        stx     VERA::ADDR+1
-        sty     VERA::ADDR+2
-        rts
 
 ; --------------------------------------------------------------------------
 ; Hide the mouse pointer.
 
-hide:   jsr     msprite
-        lda     VERA::DATA0
-        and     #<~VERA::SPRITE::DEPTH::LAYER1
-        sta     VERA::DATA0
-        rts
+hide:   ldx     #%10000000
+        stx     gREG::r0H
+        bra     mse
 
 ; --------------------------------------------------------------------------
 ; Show the mouse pointer.
 
-show:   jsr     msprite
-        lda     VERA::DATA0
-        ora     #VERA::SPRITE::DEPTH::LAYER1
-        sta     VERA::DATA0
-        rts
+show:   ldx     #gREG::r0
+        jsr     MOUSE_GET
+mse:    lda     #$00                    ; mouse sprite
+        jmp     SPRITE_SET_POSITION
 
 ; --------------------------------------------------------------------------
 ; Prepare to move the mouse pointer.
@@ -53,13 +38,13 @@ draw:   ; Fall through
 ; --------------------------------------------------------------------------
 ; Move the mouse pointer X position to the value in .XA .
 
-movex:                          ; Already set by drivers
+movex:                                  ; Already done by Kernal
         ; Fall through
 
 ; --------------------------------------------------------------------------
 ; Move the mouse pointer Y position to the value in .XA .
 
-movey:  rts                     ; Already set by drivers
+movey:  rts                             ; Already done by Kernal
 
 ; --------------------------------------------------------------------------
 ; Callback structure

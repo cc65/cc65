@@ -1,10 +1,10 @@
 ;
-; 2019-11-06, Greg King
+; 2020-01-06, Greg King
 ;
 ; /* Video mode defines */
 ; #define VIDEOMODE_40x30         0x00
 ; #define VIDEOMODE_80x60         0x02
-; #define VIDEOMODE_320x240       0x80
+; #define VIDEOMODE_320x200       0x80
 ; #define VIDEOMODE_SWAP          (-1)
 ;
 ; signed char __fastcall__ videomode (signed char Mode);
@@ -16,29 +16,25 @@
 
         .export         _videomode
 
-        .import         SCRMOD
+        .import         SCREEN_SET_MODE
+        .include        "cx16.inc"
 
 
 .proc   _videomode
-        tax
-        clc                     ; (Get old mode)
-        jsr     SCRMOD
-        pha
-        txa
+        ldx     SCREEN_MODE     ; Get old mode
+        phx
 
-        sec                     ; (Set new mode)
-        jsr     SCRMOD
+        jsr     SCREEN_SET_MODE
 
         pla                     ; Get back old mode
-        bcs     @L1
         ldx     #>$0000         ; Clear high byte
+        bcs     @L1
         rts
 
-; The new mode is invalid.  Go back to the old mode.  Return -1.
+; The new mode is invalid.  Go back to the old one.  Return -1.
 
-@L1:    sec
-        jsr     SCRMOD
-        lda     #<-1
-        tax
+@L1:    sta     SCREEN_MODE
+        dex
+        txa
         rts
 .endproc

@@ -1,11 +1,21 @@
 ;
 ; Olli Savia <ops@iki.fi>
+; Greg King
 ;
-; Commodore Kernal functions
+; Commodore-compatibles Kernal functions
 ;
 
 .if .def(__CX16__)
   ; CX16 extended jump table
+  CONSOLE_INIT                  := $FEDB
+  CONSOLE_PUT_CHAR              := $FEDE
+  CONSOLE_GET_CHAR              := $FEE1
+  MEMORY_FILL                   := $FEE4
+  MEMORY_COPY                   := $FEE7
+  MEMORY_CRC                    := $FEEA
+  MEMORY_DECOMPRESS             := $FEED
+  SPRITE_SET_IMAGE              := $FEF0
+  SPRITE_SET_POSITION           := $FEF3
   FB_INIT                       := $FEF6
   FB_GET_INFO                   := $FEF9
   FB_SET_PALETTE                := $FEFC
@@ -37,7 +47,8 @@
   CLOCK_GET_DATE_TIME           := $FF50
   JOYSTICK_SCAN                 := $FF53
   JOYSTICK_GET                  := $FF56
-  SCRMOD                        := $FF5F
+  SCREEN_SET_MODE               := $FF5F
+  SCREEN_SET_CHARSET            := $FF62
   MOUSE_CONFIG                  := $FF68
   MOUSE_GET                     := $FF6B
 .endif

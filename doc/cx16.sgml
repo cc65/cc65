@@ -46,9 +46,9 @@ file and linker config.
 <sect>Memory layout<p>
 
 cc65-generated programs with the default setup run with the I/O area, RAM bank
-zero, and the Kernal ROM visible.  That means that Kernal entry points can be
-called directly. The usable memory ranges are &dollar;0800 - &dollar;9EFF and
-&dollar;A000 - &dollar;BFFF.
+one, and the Kernal ROM being visible.  That means that Kernal entry points
+can be called directly. The usable memory ranges are &dollar;0800 -
+&dollar;9EFF, &dollar;0400 - &dollar;07FF, and &dollar;A000 - &dollar;BFFF.
 
 Special locations:
 
@@ -77,7 +77,7 @@ The ld65 linker comes with a default config. file for the Commander X16, which
 is used via <tt/-t cx16/. The cx16 package comes with additional secondary
 linker config. files which are used via <tt/-t cx16 -C &lt;configfile&gt;/.
 
-Those files use 126 bytes in the zero page.  (The rest of page zero is reserved
+Those files use 94 bytes in the zero page.  (The rest of page zero is reserved
 for Kernal and BASIC.)
 
 

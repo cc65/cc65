@@ -47,12 +47,32 @@
 /* Additional output character codes */
 #define CH_COLOR_SWAP           0x01
 #define CH_UNDERLINE            0x04
+#define CH_WHITE                0x05
 #define CH_BOLD                 0x06
 #define CH_BACKSPACE            0x08
 #define CH_ITALIC               0x0B
 #define CH_OUTLINE              0x0C
 #define CH_FONT_ISO             0x0F
+#define CH_RED                  0x1C
+#define CH_GREEN                0x1E
+#define CH_BLUE                 0x1F
+#define CH_ORANGE               0x81
 #define CH_FONT_PET             0x8F
+#define CH_BLACK                0x90
+#define CH_ATTR_CLEAR           0x92
+#define CH_BROWN                0x95
+#define CH_PINK                 0x96
+#define CH_LIGHTRED             CH_PINK
+#define CH_GRAY1                0x97
+#define CH_GRAY2                0x98
+#define CH_LIGHTGREEN           0x99
+#define CH_LIGHTBLUE            0x9A
+#define CH_GRAY3                0x9B
+#define CH_PURPLE               0x9C
+#define CH_VIOLET               CH_PURPLE
+#define CH_YELLOW               0x9E
+#define CH_CYAN                 0x9F
+#define CH_SHIFT_SPACE          0xA0
 
 /* Additional key defines */
 #define CH_SHIFT_TAB            0x18
@@ -82,7 +102,8 @@
 #define COLOR_YELLOW            0x07
 #define COLOR_ORANGE            0x08
 #define COLOR_BROWN             0x09
-#define COLOR_LIGHTRED          0x0A
+#define COLOR_PINK              0x0A
+#define COLOR_LIGHTRED          COLOR_PINK
 #define COLOR_GRAY1             0x0B
 #define COLOR_GRAY2             0x0C
 #define COLOR_LIGHTGREEN        0x0D
@@ -91,27 +112,27 @@
 
 /* NES controller masks for joy_read() */
 
-#define JOY_BTN_1_MASK  0x80
-#define JOY_BTN_2_MASK  0x40
-#define JOY_BTN_3_MASK  0x20
-#define JOY_BTN_4_MASK  0x10
-#define JOY_UP_MASK     0x08
-#define JOY_DOWN_MASK   0x04
-#define JOY_LEFT_MASK   0x02
-#define JOY_RIGHT_MASK  0x01
+#define JOY_BTN_1_MASK          0x80
+#define JOY_BTN_2_MASK          0x40
+#define JOY_BTN_3_MASK          0x20
+#define JOY_BTN_4_MASK          0x10
+#define JOY_UP_MASK             0x08
+#define JOY_DOWN_MASK           0x04
+#define JOY_LEFT_MASK           0x02
+#define JOY_RIGHT_MASK          0x01
 
-#define JOY_BTN_A_MASK  JOY_BTN_1_MASK
-#define JOY_BTN_B_MASK  JOY_BTN_2_MASK
-#define JOY_SELECT_MASK JOY_BTN_3_MASK
-#define JOY_START_MASK  JOY_BTN_4_MASK
+#define JOY_BTN_A_MASK          JOY_BTN_1_MASK
+#define JOY_BTN_B_MASK          JOY_BTN_2_MASK
+#define JOY_SELECT_MASK         JOY_BTN_3_MASK
+#define JOY_START_MASK          JOY_BTN_4_MASK
 
-#define JOY_BTN_A(v)    ((v) & JOY_BTN_A_MASK)
-#define JOY_BTN_B(v)    ((v) & JOY_BTN_B_MASK)
-#define JOY_SELECT(v)   ((v) & JOY_SELECT_MASK)
-#define JOY_START(v)    ((v) & JOY_START_MASK)
+#define JOY_BTN_A(v)            ((v) & JOY_BTN_A_MASK)
+#define JOY_BTN_B(v)            ((v) & JOY_BTN_B_MASK)
+#define JOY_SELECT(v)           ((v) & JOY_SELECT_MASK)
+#define JOY_START(v)            ((v) & JOY_START_MASK)
 
-#define JOY_FIRE2_MASK  JOY_BTN_2_MASK
-#define JOY_FIRE2(v)    ((v) & JOY_FIRE2_MASK)
+#define JOY_FIRE2_MASK          JOY_BTN_2_MASK
+#define JOY_FIRE2(v)            ((v) & JOY_FIRE2_MASK)
 
 /* Additional mouse button mask */
 #define MOUSE_BTN_MIDDLE        0x02
@@ -119,21 +140,21 @@
 /* get_tv() return codes
 ** set_tv() argument codes
 */
-#define TV_NONE         0
-#define TV_VGA          1
-#define TV_NTSC_COLOR   2
-#define TV_RGB          3
-#define TV_NONE2        4
-#define TV_VGA2         5
-#define TV_NTSC_MONO    6
-#define TV_RGB2         7
+#define TV_NONE                 0
+#define TV_VGA                  1
+#define TV_NTSC_COLOR           2
+#define TV_RGB                  3
+#define TV_NONE2                4
+#define TV_VGA2                 5
+#define TV_NTSC_MONO            6
+#define TV_RGB2                 7
 
 /* Video modes for videomode() */
 #define VIDEOMODE_40x30         0x00
 #define VIDEOMODE_80x60         0x02
 #define VIDEOMODE_40COL         VIDEOMODE_40x30
 #define VIDEOMODE_80COL         VIDEOMODE_80x60
-#define VIDEOMODE_320x240       0x80
+#define VIDEOMODE_320x200       0x80
 #define VIDEOMODE_SWAP          (-1)
 
 /* VERA's interrupt flags */
@@ -193,6 +214,9 @@ extern void cx16_std_mou[];             /* Referred to by mouse_static_stddrv[] 
 
 
 
+unsigned char get_numbanks (void);
+/* Return the number of RAM banks that the machine has. */
+
 signed char get_ostype (void);
 /* Get the ROM build version.
 ** -1 -- custom build
@@ -201,12 +225,12 @@ signed char get_ostype (void);
 */
 
 unsigned char get_tv (void);
-/* Return the video type that the machine is using.
+/* Return the video signal type that the machine is using.
 ** Return a TV_xx constant.
 */
 
 void __fastcall__ set_tv (unsigned char type);
-/* Set the video type that the machine will use.
+/* Set the video signal type that the machine will use.
 ** Call with a TV_xx constant.
 */
 

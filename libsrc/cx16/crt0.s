@@ -61,7 +61,7 @@ L2:     lda     zpsave,x
         ldx     spsave
         txs                     ; Restore stack pointer
         ldx     ramsave
-        stx     VIA1::PRA2      ; Restore former RAM bank
+        stx     VIA1::PRA       ; Restore former RAM bank
         lda     VIA1::PRB
         and     #<~$07
         ora     #$04
@@ -85,10 +85,10 @@ init:
 
 ; Change to the second RAM bank.
 
-        lda     VIA1::PRA2
+        lda     VIA1::PRA
         sta     ramsave         ; Save the current RAM bank number
         lda     #$01
-        sta     VIA1::PRA2
+        sta     VIA1::PRA
 
 .if 0   ; We don't need to preserve zero-page space for cc65's variables.
 ; Save the zero-page locations that we need.

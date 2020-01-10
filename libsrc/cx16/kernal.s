@@ -1,11 +1,20 @@
 ;
-; 2019-12-22, Greg King
+; 2020-01-06, Greg King
 ;
 ; CX16 Kernal functions
 ;
 
         .include        "cbm_kernal.inc"
 
+        .export CONSOLE_INIT
+        .export CONSOLE_PUT_CHAR
+        .export CONSOLE_GET_CHAR
+        .export MEMORY_FILL
+        .export MEMORY_COPY
+        .export MEMORY_CRC
+        .export MEMORY_DECOMPRESS
+        .export SPRITE_SET_IMAGE
+        .export SPRITE_SET_POSITION
         .export FB_INIT
         .export FB_GET_INFO
         .export FB_SET_PALETTE
@@ -37,7 +46,8 @@
         .export CLOCK_GET_DATE_TIME
         .export JOYSTICK_SCAN
         .export JOYSTICK_GET
-        .export SCRMOD
+        .export SCREEN_SET_MODE
+        .export SCREEN_SET_CHARSET
         .export MOUSE_CONFIG
         .export MOUSE_GET
 

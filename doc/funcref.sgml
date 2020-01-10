@@ -17,9 +17,9 @@ the C functions available in the standard library.
 
 <sect>Introduction<p>
 
-cc65 is a C compiler for 6502 based systems. It implements a subset of the ISO
+cc65 is a C compiler for 6502-based systems. It implements a subset of the ISO
 C standard plus additional functions specially crafted for 6502 systems or
-just some of the supported machines. This function refrence describes the
+just some of the supported machines. This function reference describes the
 available functions together with any limitations.
 
 For an overview about the available libraries, their purpose, and any
@@ -27,8 +27,8 @@ differences to the ISO standard, please have a look at the <url
 url="library.html" name="cc65 Library Overview">.
 
 <em/Note:/ Standard C functions are listed here, but not described in detail.
-Since these functions behave identical on all standard compliant systems, they
-are described in any book covering standard C.
+Because those functions behave identically on all standard-compliant systems,
+they are described in any book covering standard C.
 
 Each entry for a function contains a detailed description
 
@@ -200,6 +200,7 @@ function.
 <item><ref id="cbm_k_second" name="cbm_k_second">
 <item><ref id="cbm_k_setlfs" name="cbm_k_setlfs">
 <item><ref id="cbm_k_setnam" name="cbm_k_setnam">
+<item><ref id="cbm_k_settim" name="cbm_k_settim">
 <item><ref id="cbm_k_talk" name="cbm_k_talk">
 <item><ref id="cbm_k_tksa" name="cbm_k_tksa">
 <item><ref id="cbm_k_udtim" name="cbm_k_udtim">
@@ -321,6 +322,7 @@ function.
 <sect1><tt/cx16.h/<label id="cx16.h"><p>
 
 <itemize>
+<!-- <item><ref id="get_numbanks" name="get_numbanks"> -->
 <!-- <item><ref id="get_ostype" name="get_ostype"> -->
 <!-- <item><ref id="get_tv" name="get_tv"> -->
 <!-- <item><ref id="set_tv" name="set_tv"> -->
@@ -2281,6 +2283,9 @@ only be used in presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
+<ref id="cbm_k_load" name="cbm_k_load">,
+<ref id="cbm_k_open" name="cbm_k_open">,
+<ref id="cbm_k_save" name="cbm_k_save">,
 <ref id="cbm_k_setnam" name="cbm_k_setnam">
 <tag/Example/None.
 </descrip>
@@ -2302,9 +2307,34 @@ only be used in presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
-<ref id="cbm_k_open" name="cbm_k_open">,
 <ref id="cbm_k_load" name="cbm_k_load">,
-<ref id="cbm_k_save" name="cbm_k_save">
+<ref id="cbm_k_open" name="cbm_k_open">,
+<ref id="cbm_k_save" name="cbm_k_save">,
+<ref id="cbm_k_setlfs" name="cbm_k_setlfs">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cbm_k_settim<label id="cbm_k_settim"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set the Jiffy clock.
+<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
+<tag/Declaration/<tt/void __fastcall__ cbm_k_settim (unsigned long timer);/
+<tag/Description/This function changes the Jiffy clock to a different value.
+That clock counts sixtieths of a second.  It is used by the library's
+<tt/clock()/ function.  The Jiffy clock is updated by the Kernal's Interrupt
+Service Routine.
+<tag/Notes/<itemize>
+<item>The function is available only as a fastcall function; therefore, it may
+be used only in the presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cbm_k_udtim" name="cbm_k_udtim">,
+<ref id="clock" name="clock">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -2368,6 +2398,7 @@ then that ISR must call this function, in order to keep the clock valid.
 <tag/Availability/cc65
 <tag/See also/
 <ref id="cbm_k_scnkey" name="cbm_k_scnkey">,
+<ref id="cbm_k_settim" name="cbm_k_settim">,
 <ref id="clock" name="clock">
 <tag/Example/None.
 </descrip>
@@ -2585,6 +2616,7 @@ changing values.  (See the description of <tt/cbm_k_udtim()/.)
 </itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
+<ref id="cbm_k_settim" name="cbm_k_settim">,
 <ref id="cbm_k_udtim" name="cbm_k_udtim">,
 <ref id="time" name="time">
 <tag/Example/None.

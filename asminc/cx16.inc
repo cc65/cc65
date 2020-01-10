@@ -1,5 +1,5 @@
 ;
-; CX16 r35 definitions
+; CX16 r36 definitions
 ;
 
 ; ---------------------------------------------------------------------------
@@ -17,7 +17,8 @@
   YELLOW
   ORANGE
   BROWN
-  LIGHTRED
+  PINK
+  LIGHTRED      = PINK
   GRAY1
   GRAY2
   LIGHTGREEN
@@ -25,20 +26,81 @@
   GRAY3
 .endenum
 
-; Special keys
-.enum KEY
-  F1    = $85
-  F3
-  F5
-  F7
-  F2
-  F4
-  F6
-  F8
-  F9    = $10
-  F10   = $15
-  F11
-  F12
+; Special characters
+.enum CH
+COLOR_SWAP      = $01
+STOP            = $03
+UNDERLINE
+WHITE
+BOLD
+BELL
+BACKSPACE
+TAB
+LINEFEED
+ITALIC
+OUTLINE
+ENTER
+FONT_LOWER
+FONT_ISO
+F9
+CURS_DOWN
+REVERSE
+HOME
+DEL
+F10
+F11
+F12
+SHIFT_TAB
+RED             = $1C
+CURS_RIGHT
+GREEN
+BLUE
+LIRA            = $5C
+ORANGE          = $81
+RUN             = $83
+HELP
+F1
+F3
+F5
+F7
+F2
+F4
+F6
+F8
+SHIFT_ENTER
+FONT_UPPER
+FONT_PET
+BLACK
+CURS_UP
+ATTR_CLEAR
+SCRN_CLEAR
+INS
+BROWN
+PINK
+LIGHTRED        = PINK
+GRAY1
+GRAY2
+LIGHTGREEN
+LIGHTBLUE
+GRAY3
+PURPLE
+VIOLET          = PURPLE
+CURS_LEFT
+YELLOW
+CYAN
+SHIFT_SPACE
+LTEE            = $AB
+LLCORNER        = $AD
+URCORNER
+ULCORNER        = $B0
+BTEE
+TTEE
+RTEE
+LRCORNER        = $BD
+HLINE           = $C0
+CROSS           = $DB
+VLINE           = $DD
+PI
 .endenum
 
 ; ---------------------------------------------------------------------------
@@ -162,10 +224,9 @@
 .endstruct
 
 ; Kernal
-FNAM            := $84          ; Pointer to filename
-KTEMP2          := $86          ; 2 bytes for temporary storage
-IMPARM          := $88          ; Pointer for PRIMM function
-SCREEN_PTR      := $90          ; Pointer to current row on text screen (16 bits)
+KTEMP2          := $80          ; 2 bytes for temporary storage
+IMPARM          := $82          ; Pointer for PRIMM function
+FNAM            := $8C          ; Pointer to filename
 
 ; BASIC
 TXTPTR          := $EE          ; Pointer into BASIC source code
@@ -175,23 +236,25 @@ TXTPTR          := $EE          ; Pointer into BASIC source code
 BASIC_BUF       := $0200        ; Location of command-line
 BASIC_BUF_LEN   = 81            ; Maximum length of command-line
 
-STATUS          := $0275        ; Status from previous I/O operation
-IN_DEV          := $0279        ; Current input device number
-OUT_DEV         := $027A        ; Current output device number
-FNAM_LEN        := $027D        ; Length of filename
-SECADR          := $027F        ; Secondary address
-DEVNUM          := $0280        ; Device number
+SCREEN_MODE     := $0262        ; Current screen mode (set by SCREEN_SET_MODE)
+SCREEN_PTR      := $0263        ; Pointer to current row on text screen (16 bits)
+STATUS          := $0286        ; Status from previous I/O operation
+IN_DEV          := $028A        ; Current input device number
+OUT_DEV         := $028B        ; Current output device number
+FNAM_LEN        := $028E        ; Length of filename
+SECADR          := $0290        ; Secondary address
+DEVNUM          := $0291        ; Device number
 CURS_COLOR      := $0373        ; Color under the cursor
-CHARCOLOR       := $0377        ; Cursor's color nybbles (high: background, low: foreground)
-RVS             := $0378        ; Reverse flag
-CURS_FLAG       := $037C        ; 1 = cursor off
-CURS_BLINK      := $037D        ; Blink counter
-CURS_CHAR       := $037E        ; Character under the cursor
-CURS_STATE      := $037F        ; Cursor blink state
-CURS_X          := $0381        ; Cursor column
-CURS_Y          := $0384        ; Cursor row
-LLEN            := $0387        ; Line length
-NLINES          := $0388        ; Number of screen lines
+CHARCOLOR       := $0376        ; Cursor's color nybbles (high: background, low: foreground)
+RVS             := $0377        ; Reverse flag
+CURS_FLAG       := $037B        ; 1 = cursor off
+CURS_BLINK      := $037C        ; Blink counter
+CURS_CHAR       := $037D        ; Character under the cursor
+CURS_STATE      := $037E        ; Cursor blink state
+CURS_X          := $0380        ; Cursor column
+CURS_Y          := $0383        ; Cursor row
+LLEN            := $0386        ; Line length
+NLINES          := $0387        ; Number of screen lines
 
 ; BASIC
 VARTAB          := $03E3        ; Pointer to start of BASIC variables
@@ -453,7 +516,7 @@ NMIVec          := $0318
 ; ---------------------------------------------------------------------------
 ; Banked RAM and ROM
 
-KEY_COUNT       := $A00A        ; (bank 0) Number of keys in input buffer
+KEY_COUNT       := $A00B        ; (bank 0) Number of keys in input buffer
 TIMER           := $A03E        ; (bank 0) 60 Hz. timer (3 bytes, big-endian)
 
 .struct BANK

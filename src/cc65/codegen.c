@@ -39,6 +39,7 @@
 #include <stdarg.h>
 
 /* common */
+#include "addrsize.h"
 #include "check.h"
 #include "cpu.h"
 #include "inttypes.h"
@@ -260,6 +261,9 @@ void g_usebss (void)
 void g_segname (segment_t Seg)
 /* Emit the name of a segment if necessary */
 {
+    unsigned char AddrSize;
+    const char* Name;
+
     /* Emit a segment directive for the data style segments */
     DataSeg* S;
     switch (Seg) {
@@ -269,7 +273,13 @@ void g_segname (segment_t Seg)
         default:         S = 0;          break;
     }
     if (S) {
-        DS_AddLine (S, ".segment\t\"%s\"", GetSegName (Seg));
+        Name = GetSegName (Seg);
+        AddrSize = GetSegAddrSize (Name);
+        if (AddrSize != ADDR_SIZE_INVALID) {
+            DS_AddLine (S, ".segment\t\"%s\": %s", Name, AddrSizeToStr (AddrSize));
+        } else {
+            DS_AddLine (S, ".segment\t\"%s\"", Name);
+        }
     }
 }
 

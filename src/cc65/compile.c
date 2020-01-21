@@ -37,6 +37,7 @@
 #include <time.h>
 
 /* common */
+#include "addrsize.h"
 #include "debugflag.h"
 #include "segnames.h"
 #include "version.h"
@@ -275,6 +276,17 @@ static void Parse (void)
                         }
                         Entry->V.BssName = xstrdup (bssName);
 
+                        /* This is to make the automatical zeropage setting of the symbol
+                        ** work right.
+                        */
+                        g_usebss ();
+                    }
+                }
+
+                /* Make the symbol zeropage according to the segment address size */
+                if ((Entry->Flags & SC_EXTERN) != 0) {
+                    if (GetSegAddrSize (GetSegName (CS->CurDSeg)) == ADDR_SIZE_ZP) {
+                        Entry->Flags |= SC_ZEROPAGE;
                         /* Check for enum forward declaration.
                         ** Warn about it when extensions are not allowed.
                         */

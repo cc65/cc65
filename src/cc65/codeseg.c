@@ -403,7 +403,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
                 if ((OPC->Info & OF_BRA) != 0) {
                     /* Branch */
                     AM = AM65_BRA;
-                } else if (GetZPInfo(Arg) != 0) {
+                } else if (IsZPArg (Arg)) {
                     AM = AM65_ZP;
                 } else {
                     /* Check for subroutine call to local label */
@@ -424,12 +424,15 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
                     Reg = toupper (*L);
                     L = SkipSpace (L+1);
                     if (Reg == 'X') {
-                        if (GetZPInfo(Arg) != 0) {
+                        if (IsZPArg (Arg)) {
                             AM = AM65_ZPX;
                         } else {
                             AM = AM65_ABSX;
                         }
                     } else if (Reg == 'Y') {
+                        /* On 6502 only LDX and STX support AM65_ZPY.
+                        ** We just play it simple and safe for now.
+                        */
                         AM = AM65_ABSY;
                     } else {
                         Error ("ASM code error: syntax error");

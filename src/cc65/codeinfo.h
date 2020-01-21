@@ -119,7 +119,8 @@ struct RegContents;
 typedef struct ZPInfo ZPInfo;
 struct ZPInfo {
     unsigned char  Len;         /* Length of the following string */
-    char           Name[11];    /* Name of zero page symbol */
+    char           Name[10];    /* Name of zero page symbol */
+    unsigned char  Size;        /* Maximum buffer size of this register */
     unsigned short ByteUse;     /* Register info for this symbol */
     unsigned short WordUse;     /* Register info for 16 bit access */
 };
@@ -161,6 +162,9 @@ typedef enum {
 /*****************************************************************************/
 
 
+
+int IsZPArg (const char* Arg);
+/* Exam if the main part of the arg string indicates a ZP loc */
 
 fncls_t GetFuncInfo (const char* Name, unsigned int* Use, unsigned int* Chg);
 /* For the given function, lookup register information and store it into

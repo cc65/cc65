@@ -349,23 +349,23 @@ static const FuncInfo FuncInfoTable[] = {
 
 /* Table with names of zero page locations used by the compiler */
 static const ZPInfo ZPInfoTable[] = {
-    {   0, "ptr1",      REG_PTR1_LO,    REG_PTR1        },
-    {   0, "ptr1+1",    REG_PTR1_HI,    REG_PTR1        },
-    {   0, "ptr2",      REG_PTR2_LO,    REG_PTR2        },
-    {   0, "ptr2+1",    REG_PTR2_HI,    REG_PTR2        },
-    {   4, "ptr3",      REG_NONE,       REG_NONE        },
-    {   4, "ptr4",      REG_NONE,       REG_NONE        },
-    {   7, "regbank",   REG_NONE,       REG_NONE        },
-    {   0, "regsave",   REG_SAVE_LO,    REG_SAVE        },
-    {   0, "regsave+1", REG_SAVE_HI,    REG_SAVE        },
-    {   0, "sp",        REG_SP_LO,      REG_SP          },
-    {   0, "sp+1",      REG_SP_HI,      REG_SP          },
-    {   0, "sreg",      REG_SREG_LO,    REG_SREG        },
-    {   0, "sreg+1",    REG_SREG_HI,    REG_SREG        },
-    {   0, "tmp1",      REG_TMP1,       REG_TMP1        },
-    {   0, "tmp2",      REG_NONE,       REG_NONE        },
-    {   0, "tmp3",      REG_NONE,       REG_NONE        },
-    {   0, "tmp4",      REG_NONE,       REG_NONE        },
+    {   0, "ptr1",      2,  REG_PTR1_LO,    REG_PTR1    },
+    {   0, "ptr1+1",    1,  REG_PTR1_HI,    REG_PTR1    },
+    {   0, "ptr2",      2,  REG_PTR2_LO,    REG_PTR2    },
+    {   0, "ptr2+1",    1,  REG_PTR2_HI,    REG_PTR2    },
+    {   4, "ptr3",      2,  REG_NONE,       REG_NONE    },
+    {   4, "ptr4",      2,  REG_NONE,       REG_NONE    },
+    {   7, "regbank",   6,  REG_NONE,       REG_NONE    },
+    {   0, "regsave",   4,  REG_SAVE_LO,    REG_SAVE    },
+    {   0, "regsave+1", 3,  REG_SAVE_HI,    REG_SAVE    },
+    {   0, "sp",        2,  REG_SP_LO,      REG_SP      },
+    {   0, "sp+1",      1,  REG_SP_HI,      REG_SP      },
+    {   0, "sreg",      2,  REG_SREG_LO,    REG_SREG    },
+    {   0, "sreg+1",    1,  REG_SREG_HI,    REG_SREG    },
+    {   0, "tmp1",      1,  REG_TMP1,       REG_TMP1    },
+    {   0, "tmp2",      1,  REG_NONE,       REG_NONE    },
+    {   0, "tmp3",      1,  REG_NONE,       REG_NONE    },
+    {   0, "tmp4",      1,  REG_NONE,       REG_NONE    },
 };
 #define ZPInfoCount     (sizeof(ZPInfoTable) / sizeof(ZPInfoTable[0]))
 
@@ -374,6 +374,83 @@ static const ZPInfo ZPInfoTable[] = {
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
+
+
+
+static int IsAddrOnZP (long Address)
+/* Return true if the Address is within the ZP range.
+** FIXME: ZP range may vary depending on the CPU settings.
+*/
+{
+    /* ZP in range [0x00, 0xFF] */
+    return Address >= 0 && Address < 0x100;
+}
+
+
+
+int IsZPArg (const char* Name)
+/* Exam if the main part of the arg string indicates a ZP loc */
+{
+    unsigned short  ArgInfo = 0;
+    long            Offset = 0;
+    StrBuf          NameBuf = AUTO_STRBUF_INITIALIZER;
+    SymEntry*       E = 0;
+    const ZPInfo*   Info = 0;
+
+    if (!ParseOpcArgStr (Name, &ArgInfo, &NameBuf, &Offset)) {
+        /* Parsing failed */
+        SB_Done (&NameBuf);
+        return 0;
+    }
+
+    if ((ArgInfo & AIF_HAS_NAME) == 0) {
+        /* Numeric locs have no names */
+        SB_Done (&NameBuf);
+
+        /* We can check it against the ZP boundary if it is known */
+        return IsAddrOnZP (Offset);
+    }
+
+    if ((ArgInfo & AIF_BUILTIN) != 0) {
+        /* Search for the name in the list of builtin ZPs */
+        Info = GetZPInfo (SB_GetConstBuf (&NameBuf));
+
+        SB_Done (&NameBuf);
+
+        /* Do we know the ZP? */
+        if (Info != 0) {
+            /* Use the information we have */
+            return Offset >= 0 && Offset < (int)Info->Size;
+        }
+
+        /* Assume it be non-ZP */
+        return 0;
+    }
+
+    if ((ArgInfo & AIF_EXTERNAL) == 0) {
+        /* We don't support local variables on ZP */
+        SB_Done (&NameBuf);
+        return 0;
+    }
+
+    /* Search for the symbol in the global symbol table skipping the underline
+    ** in its name.
+    */
+    E = FindGlobalSym (SB_GetConstBuf (&NameBuf) + 1);
+
+    SB_Done (&NameBuf);
+
+    /* We are checking the offset against the symbol size rather than the actual
+    ** zeropage boundary, since we can't magically ensure that until linking and
+    ** can only trust the user in writing the correct code for now.
+    */
+    if (E != 0 && (E->Flags & SC_ZEROPAGE) != 0) {
+        return Offset >= 0 && (unsigned)Offset < CheckedSizeOf (E->Type);
+    }
+
+    /* Not found on ZP */
+    return 0;
+}
 
 
 

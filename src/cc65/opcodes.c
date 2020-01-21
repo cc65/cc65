@@ -649,6 +649,7 @@ unsigned GetInsnSize (opc_t OPC, am_t AM)
         case AM65_IMM:     return 2;
         case AM65_ZP:      return 2;
         case AM65_ZPX:     return 2;
+        case AM65_ZPY:     return 2;
         case AM65_ABS:     return 3;
         case AM65_ABSX:    return 3;
         case AM65_ABSY:    return 3;

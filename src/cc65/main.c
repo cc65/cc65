@@ -897,6 +897,9 @@ int main (int argc, char* argv[])
     /* Initialize the default segment names */
     InitSegNames ();
 
+    /* Initialize the segment address sizes table */
+    InitSegAddrSizes ();
+
     /* Initialize the include search paths */
     InitIncludePaths ();
 
@@ -1088,6 +1091,9 @@ int main (int argc, char* argv[])
 
     /* Done with tracked string buffer allocation */
     DoneDiagnosticStrBufs ();
+
+    /* Free up the segment address sizes table */
+    DoneSegAddrSizes ();
 
     /* Return an apropriate exit code */
     return (ErrorCount > 0)? EXIT_FAILURE : EXIT_SUCCESS;

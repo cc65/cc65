@@ -37,6 +37,7 @@
 #include <string.h>
 
 /* common */
+#include "addrsize.h"
 #include "chartype.h"
 #include "segnames.h"
 #include "tgttrans.h"
@@ -389,7 +390,9 @@ static void SegNamePragma (StrBuf* B, segment_t Seg)
 /* Handle a pragma that expects a segment name parameter */
 {
     const char* Name;
+    unsigned char AddrSize = ADDR_SIZE_INVALID;
     StrBuf S = AUTO_STRBUF_INITIALIZER;
+    StrBuf A = AUTO_STRBUF_INITIALIZER;
     int Push = 0;
 
     /* Check for the "push" or "pop" keywords */
@@ -430,13 +433,35 @@ static void SegNamePragma (StrBuf* B, segment_t Seg)
         goto ExitPoint;
     }
 
-    /* Get the string */
+    /* Get the name string of the segment */
     Name = SB_GetConstBuf (&S);
 
     /* Check if the name is valid */
     if (ValidSegName (Name)) {
 
-        /* Set the new name */
+        /* Skip the following comma */
+        SB_SkipWhite (B);
+        if (SB_Peek (B) == ',') {
+            SB_Skip (B);
+            SB_SkipWhite (B);
+
+            /* A string argument must follow */
+            if (!GetString (B, &A)) {
+                goto ExitPoint;
+            }
+
+            /* Get the address size for the segment */
+            AddrSize = AddrSizeFromStr (SB_GetConstBuf (&A));
+
+            /* Set the address size for the segment if valid */
+            if (AddrSize != ADDR_SIZE_INVALID) {
+                SetSegAddrSize (Name, AddrSize);
+            } else {
+                Warning ("Invalid address size for segment!");
+            }
+        }
+    
+        /* Set the new name and optionally address size */
         if (Push) {
             PushSegName (Seg, Name);
         } else {
@@ -460,6 +485,7 @@ static void SegNamePragma (StrBuf* B, segment_t Seg)
 ExitPoint:
     /* Call the string buf destructor */
     SB_Done (&S);
+    SB_Done (&A);
 }
 
 

@@ -448,11 +448,7 @@ unsigned OptCmp3 (CodeSeg* S)
                         Delete = 1;
                         break;
 
-                    case CMP_UGT:
-                    case CMP_UGE:
-                    case CMP_ULT:
-                    case CMP_ULE:
-                    case CMP_INV:
+                    default:
                         /* Leave it alone */
                         break;
                 }

@@ -64,6 +64,13 @@ static const char CmpSuffixTab [][4] = {
     "eq", "ne", "gt", "ge", "lt", "le", "ugt", "uge", "ult", "ule"
 };
 
+/* Table with the bool transformers */
+static const char BoolTransformerTab [][8] = {
+    "booleq", "boolne",
+    "boolgt", "boolge", "boollt", "boolle",
+    "boolugt", "booluge", "boolult", "boolule"
+};
+
 /* Table listing the function names and code info values for known internally
 ** used functions. This table should get auto-generated in the future.
 */
@@ -838,5 +845,57 @@ cmp_t FindTosCmpCond (const char* Name)
     } else {
         /* Not found */
         return CMP_INV;
+    }
+}
+
+
+
+const char* GetBoolTransformer (cmp_t Cond)
+/* Get the bool transformer corresponding to the given compare condition */
+{
+    if (Cond > CMP_INV && Cond < CMP_END) {
+        return BoolTransformerTab[Cond];
+    }
+
+    /* Not found */
+    return 0;
+}
+
+
+cmp_t GetNegatedCond (cmp_t Cond)
+/* Get the logically opposite compare condition */
+{
+    switch (Cond) {
+    case CMP_EQ: return CMP_NE;
+    case CMP_NE: return CMP_EQ;
+    case CMP_GT: return CMP_LE;
+    case CMP_GE: return CMP_LT;
+    case CMP_LT: return CMP_GE;
+    case CMP_LE: return CMP_GT;
+    case CMP_UGT: return CMP_ULE;
+    case CMP_UGE: return CMP_ULT;
+    case CMP_ULT: return CMP_UGE;
+    case CMP_ULE: return CMP_UGT;
+    default: return CMP_INV;
+    }
+}
+
+
+
+cmp_t GetRevertedCond (cmp_t Cond)
+/* Get the compare condition in reverted order of operands */
+{
+    switch (Cond) {
+    case CMP_EQ: return CMP_EQ;
+    case CMP_NE: return CMP_NE;
+    case CMP_GT: return CMP_LT;
+    case CMP_GE: return CMP_LE;
+    case CMP_LT: return CMP_GT;
+    case CMP_LE: return CMP_GE;
+    case CMP_UGT: return CMP_ULT;
+    case CMP_UGE: return CMP_ULE;
+    case CMP_ULT: return CMP_UGT;
+    case CMP_ULE: return CMP_UGE;
+    default: return CMP_INV;
     }
 }

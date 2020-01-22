@@ -115,7 +115,10 @@ typedef enum {
     CMP_UGT,
     CMP_UGE,
     CMP_ULT,
-    CMP_ULE
+    CMP_ULE,
+
+    /* End of the enumeration */
+    CMP_END
 } cmp_t;
 
 
@@ -184,6 +187,15 @@ cmp_t FindTosCmpCond (const char* Name);
 /* Check if this is a call to one of the TOS compare functions (tosgtax).
 ** Return the condition code or CMP_INV on failure.
 */
+
+const char* GetBoolTransformer (cmp_t Cond);
+/* Get the bool transformer corresponding to the given compare condition */
+
+cmp_t GetNegatedCond (cmp_t Cond);
+/* Get the logically opposite compare condition */
+
+cmp_t GetRevertedCond (cmp_t Cond);
+/* Get the compare condition in reverted order of operands */
 
 
 

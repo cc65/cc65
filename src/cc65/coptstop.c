@@ -59,12 +59,14 @@ typedef enum {
   LI_RELOAD_Y           = 0x02,         /* Reload index register Y */
   LI_REMOVE             = 0x04,         /* Load may be removed */
   LI_DONT_REMOVE        = 0x08,         /* Load may not be removed */
-  LI_MAYBE_DIRECT       = 0x10,         /* Load src might be modified later */
+  LI_CHECK_ARG          = 0x10,         /* Load src might be modified later */
   LI_SRC_CHG            = 0x20,         /* Load src is possibly modified */
   LI_LOAD_INSN          = 0x40,         /* Has a load insn */
+  LI_CHECK_Y            = 0x80,         /* Indexed load src might be modified later */
   LI_USED_BY_A          = 0x100,        /* Content used by RegA */
   LI_USED_BY_X          = 0x200,        /* Content used by RegX */
   LI_USED_BY_Y          = 0x400,        /* Content used by RegY */
+  LI_SP                 = 0x800,        /* Content on stack */
 } LI_FLAGS;
 
 /* Structure that tells us how to load the lhs values */
@@ -73,6 +75,8 @@ struct LoadRegInfo {
     LI_FLAGS            Flags;          /* Tells us how to load */
     int                 LoadIndex;      /* Index of load insn, -1 if invalid */
     CodeEntry*          LoadEntry;      /* The actual entry, 0 if invalid */
+    int                 LoadYIndex;     /* Index of Y-load insn, -1 if invalid  */
+    CodeEntry*          LoadYEntry;     /* The actual Y-load entry, 0 if invalid */
     int                 XferIndex;      /* Index of transfer insn  */
     CodeEntry*          XferEntry;      /* The actual transfer entry */
     int                 Offs;           /* Stack offset if data is on stack */
@@ -178,12 +182,14 @@ struct StackOpData {
 static void ClearLoadRegInfo (LoadRegInfo* RI)
 /* Clear a LoadRegInfo struct */
 {
-    RI->Flags     = LI_NONE;
-    RI->LoadIndex = -1;
-    RI->LoadEntry = 0;
-    RI->XferIndex = -1;
-    RI->XferEntry = 0;
-    RI->Offs      = 0;
+    RI->Flags      = LI_NONE;
+    RI->LoadIndex  = -1;
+    RI->LoadEntry  = 0;
+    RI->LoadYIndex = -1;
+    RI->LoadYEntry = 0;
+    RI->XferIndex  = -1;
+    RI->XferEntry  = 0;
+    RI->Offs       = 0;
 }
 
 
@@ -191,12 +197,14 @@ static void ClearLoadRegInfo (LoadRegInfo* RI)
 static void CopyLoadRegInfo (LoadRegInfo* To, LoadRegInfo* From)
 /* Copy a LoadRegInfo struct */
 {
-    To->Flags     = From->Flags;
-    To->LoadIndex = From->LoadIndex;
-    To->LoadEntry = From->LoadEntry;
-    To->XferIndex = From->XferIndex;
-    To->XferEntry = From->XferEntry;
-    To->Offs      = From->Offs;
+    To->Flags      = From->Flags;
+    To->LoadIndex  = From->LoadIndex;
+    To->LoadEntry  = From->LoadEntry;
+    To->LoadYIndex = From->LoadYIndex;
+    To->LoadYEntry = From->LoadYEntry;
+    To->XferIndex  = From->XferIndex;
+    To->XferEntry  = From->XferEntry;
+    To->Offs       = From->Offs;
 }
 
 
@@ -216,8 +224,18 @@ static void FinalizeLoadRegInfo (LoadRegInfo* RI, CodeSeg* S)
         RI->XferEntry = 0;
     }
     /* Load from src not modified before op can be treated as direct */
-    if ((RI->Flags & (LI_MAYBE_DIRECT | LI_SRC_CHG)) == LI_MAYBE_DIRECT) {
+    if ((RI->Flags & LI_SRC_CHG) == 0 &&
+        (RI->Flags & (LI_CHECK_ARG | LI_CHECK_Y)) != 0) {
         RI->Flags |= LI_DIRECT;
+        if ((RI->Flags & LI_CHECK_Y) != 0) {
+            RI->Flags |= LI_RELOAD_Y;
+        }
+    }
+    /* We cannot ldy src,y */
+    if ((RI->Flags & LI_RELOAD_Y) != 0          &&
+        RI->LoadYEntry != 0                     &&
+        (RI->LoadYEntry->Use & REG_Y) == REG_Y) {
+        RI->Flags &= ~LI_DIRECT;
     }
 }
 
@@ -305,17 +323,27 @@ static int Affected (LoadRegInfo* RI, const CodeEntry* E)
     fncls_t        fncls;
     unsigned short Use;
     unsigned short Chg;
+    unsigned short UseToCheck = 0;
 
-    if (RI->Flags & LI_MAYBE_DIRECT) {
+    if ((RI->Flags & (LI_CHECK_ARG | LI_CHECK_Y)) != 0) {
         if (E->AM == AM65_IMM || E->AM == AM65_ACC || E->AM == AM65_IMP || E->AM == AM65_BRA) {
             return 0;
         }
-        CHECK (RI->LoadEntry != 0);
+        CHECK ((RI->Flags & LI_CHECK_ARG) == 0 || RI->LoadEntry != 0);
+        CHECK ((RI->Flags & LI_CHECK_Y) == 0   || RI->LoadYEntry != 0);
+
+        if ((RI->Flags & LI_CHECK_ARG) != 0) {
+            UseToCheck |= RI->LoadEntry->Use;
+        }
+
+        if ((RI->Flags & LI_CHECK_Y) != 0) {
+            UseToCheck |= RI->LoadYEntry->Use;
+        }
 
         if (E->OPC == OP65_JSR) {
             /* Try to know about the function */
             fncls = GetFuncInfo (E->Arg, &Use, &Chg);           
-            if ((RI->LoadEntry->Use & Chg & REG_ALL) == 0 &&
+            if ((UseToCheck & Chg & REG_ALL) == 0 &&
                 fncls == FNCLS_BUILTIN) {
                 /* Builtin functions are known to be harmless */
                 return 0;
@@ -327,8 +355,15 @@ static int Affected (LoadRegInfo* RI, const CodeEntry* E)
                    E->OPC == OP65_ROL || E->OPC == OP65_ROR ||
                    E->OPC == OP65_TRB || E->OPC == OP65_TSB ||
                    E->OPC == OP65_STA || E->OPC == OP65_STX || E->OPC == OP65_STY) {
-            if ((E->AM == AM65_ABS || E->AM == AM65_ZP) &&
-                strcmp (RI->LoadEntry->Arg, E->Arg) != 0) {
+            if ((E->AM == AM65_ABS || E->AM == AM65_ZP)) {
+                if ((RI->Flags & LI_CHECK_ARG) != 0 && 
+                    strcmp (RI->LoadEntry->Arg, E->Arg) == 0) {
+                    return 1;
+                }
+                if ((RI->Flags & LI_CHECK_Y) != 0 &&
+                    strcmp (RI->LoadYEntry->Arg, E->Arg) == 0) {
+                    return 1;
+                }
                 return 0;
             }
             /* We could've check further for more cases where the load target isn't modified,
@@ -398,11 +433,11 @@ static unsigned int TrackLoads (LoadInfo* LI, LoadInfo* LLI, CodeSeg* S, int I)
             RI->Flags |= LI_DIRECT;
         } else if (E->AM == AM65_ZP || E->AM == AM65_ABS) {
             /* These insns are replaceable only if they are not modified later */
-            RI->Flags |= LI_MAYBE_DIRECT;
-            /* Watch for any change of the load target */
-            RI->LoadEntry = CS_GetEntry (S, I);
+            RI->Flags |= LI_CHECK_ARG;
+        } else if (E->AM == AM65_ZPY || E->AM == AM65_ABSY) {
+            /* These insns are replaceable only if they are not modified later */
+            RI->Flags |= LI_CHECK_ARG | LI_CHECK_Y;
         } else if (E->AM == AM65_ZP_INDY &&
-                   RegValIsKnown (E->RI->In.RegY) &&
                    strcmp (E->Arg, "sp") == 0) {
             /* A load from the stack with known offset is also ok, but in this
             ** case we must reload the index register later. Please note that
@@ -410,16 +445,34 @@ static unsigned int TrackLoads (LoadInfo* LI, LoadInfo* LLI, CodeSeg* S, int I)
             ** these locations may change between the push and the actual
             ** operation.
             */
-            RI->Offs  = (unsigned char) E->RI->In.RegY;
-            RI->Flags |= (LI_DIRECT | LI_RELOAD_Y);
+            RI->Flags |= LI_DIRECT | LI_CHECK_Y | LI_SP;
 
             /* Reg Y can be regarded as unused if this load is removed */
             Used &= ~REG_Y;
-            LI->Y.Flags |= LI_USED_BY_A;
+            if (RI == &LI->A) {
+                LI->Y.Flags |= LI_USED_BY_A;
+            } else {
+                LI->Y.Flags |= LI_USED_BY_X;
+            }
+        }
+
+        /* If the load offset has a known value, we can just remember and reload
+        ** it into the index register later.
+        */
+        if ((RI->Flags & LI_CHECK_Y) != 0) {
+            if (RegValIsKnown (E->RI->In.RegY)) {
+                RI->Offs = (unsigned char)E->RI->In.RegY;
+                RI->Flags &= ~LI_CHECK_Y;
+                RI->Flags |= LI_RELOAD_Y;
+            } else {
+                /* We need to check if the src of Y is changed */
+                RI->LoadYIndex = LI->Y.LoadIndex;
+                RI->LoadYEntry = CS_GetEntry (S, RI->LoadYIndex);
+            }
         }
 
         /* Watch for any change of the load target */
-        if ((RI->Flags & LI_MAYBE_DIRECT) != 0) {
+        if ((RI->Flags & LI_CHECK_ARG) != 0) {
             RI->LoadEntry = CS_GetEntry (S, I);
         }
 
@@ -462,23 +515,25 @@ static unsigned int TrackLoads (LoadInfo* LI, LoadInfo* LLI, CodeSeg* S, int I)
         }
 
         /* Transfer the data */
-        Tgt->LoadIndex = Src->LoadIndex;
-        Tgt->LoadEntry = Src->LoadEntry;
-        Tgt->XferIndex = I;
-        Tgt->Offs      = Src->Offs;
-        Tgt->Flags     = Src->Flags;
+        Tgt->LoadIndex  = Src->LoadIndex;
+        Tgt->LoadEntry  = Src->LoadEntry;
+        Tgt->LoadYIndex = Src->LoadYIndex;
+        Tgt->LoadYEntry = Src->LoadYEntry;
+        Tgt->XferIndex  = I;
+        Tgt->Offs       = Src->Offs;
+        Tgt->Flags      = Src->Flags;
 
     } else if (CE_IsCallTo (E, "ldaxysp") && RegValIsKnown (E->RI->In.RegY)) {
 
         /* Both registers set, Y changed */
         LI->A.LoadIndex = I;
         LI->A.XferIndex = -1;
-        LI->A.Flags     = (LI_LOAD_INSN | LI_DIRECT | LI_RELOAD_Y);
+        LI->A.Flags     = (LI_LOAD_INSN | LI_DIRECT | LI_RELOAD_Y | LI_SP);
         LI->A.Offs      = (unsigned char) E->RI->In.RegY - 1;
 
         LI->X.LoadIndex = I;
         LI->X.XferIndex = -1;
-        LI->X.Flags     = (LI_LOAD_INSN | LI_DIRECT | LI_RELOAD_Y);
+        LI->X.Flags     = (LI_LOAD_INSN | LI_DIRECT | LI_RELOAD_Y | LI_SP);
         LI->X.Offs      = (unsigned char) E->RI->In.RegY;
 
         /* Reg Y can be regarded as unused if this load is removed */
@@ -658,10 +713,10 @@ static void AdjustStackOffset (StackOpData* D, unsigned Offs)
     /* If we have rhs load insns that load from stack, we'll have to adjust
     ** the offsets for these also.
     */
-    if (D->Rhs.A.Flags & LI_RELOAD_Y) {
+    if ((D->Rhs.A.Flags & (LI_RELOAD_Y | LI_SP | LI_CHECK_Y)) == (LI_RELOAD_Y | LI_SP)) {
         D->Rhs.A.Offs -= Offs;
     }
-    if (D->Rhs.X.Flags & LI_RELOAD_Y) {
+    if ((D->Rhs.X.Flags & (LI_RELOAD_Y | LI_SP | LI_CHECK_Y)) == (LI_RELOAD_Y | LI_SP)) {
         D->Rhs.X.Offs -= Offs;
     }
 }
@@ -727,13 +782,22 @@ static void AddOpLow (StackOpData* D, opc_t OPC, LoadInfo* LI)
 
         } else {
 
-            /* ldy #offs */
-            const char* Arg = MakeHexArg (LI->A.Offs);
-            X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
+            if ((LI->A.Flags & LI_CHECK_Y) == 0) {
+                /* ldy #offs */
+                X = NewCodeEntry (OP65_LDY, AM65_IMM, MakeHexArg (LI->A.Offs), 0, D->OpEntry->LI);
+            } else {
+                /* ldy src */
+                X = NewCodeEntry (OP65_LDY, LI->A.LoadYEntry->AM, LI->A.LoadYEntry->Arg, 0, D->OpEntry->LI);
+            }
             InsertEntry (D, X, D->IP++);
 
-            /* opc (sp),y */
-            X = NewCodeEntry (OPC, AM65_ZP_INDY, "sp", 0, D->OpEntry->LI);
+            if (LI->A.LoadEntry->OPC == OP65_JSR) {
+                /* opc (sp),y */
+                X = NewCodeEntry (OPC, AM65_ZP_INDY, "sp", 0, D->OpEntry->LI);
+            } else {
+                /* opc src,y */
+                X = NewCodeEntry (OPC, LI->A.LoadEntry->AM, LI->A.LoadEntry->Arg, 0, D->OpEntry->LI);
+            }
             InsertEntry (D, X, D->IP++);
 
         }
@@ -781,13 +845,22 @@ static void AddOpHigh (StackOpData* D, opc_t OPC, LoadInfo* LI, int KeepResult)
 
         } else {
 
-            /* ldy #const */
-            const char* Arg = MakeHexArg (LI->X.Offs);
-            X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
+            if ((LI->A.Flags & LI_CHECK_Y) == 0) {
+                /* ldy #const */
+                X = NewCodeEntry (OP65_LDY, AM65_IMM, MakeHexArg (LI->X.Offs), 0, D->OpEntry->LI);
+            } else {
+                /* ldy src */
+                X = NewCodeEntry (OP65_LDY, LI->X.LoadYEntry->AM, LI->X.LoadYEntry->Arg, 0, D->OpEntry->LI);
+            }
             InsertEntry (D, X, D->IP++);
 
-            /* opc (sp),y */
-            X = NewCodeEntry (OPC, AM65_ZP_INDY, "sp", 0, D->OpEntry->LI);
+            if (LI->X.LoadEntry->OPC == OP65_JSR) {
+                /* opc (sp),y */
+                X = NewCodeEntry (OPC, AM65_ZP_INDY, "sp", 0, D->OpEntry->LI);
+            } else {
+                /* opc src,y */
+                X = NewCodeEntry (OPC, LI->A.LoadEntry->AM, LI->A.LoadEntry->Arg, 0, D->OpEntry->LI);
+            }
             InsertEntry (D, X, D->IP++);
         }
 
@@ -2047,12 +2120,22 @@ static unsigned Opt_a_tosicmp (StackOpData* D)
                 InsertEntry (D, X, D->IP++);
             } else {
                 /* ldy #offs */
-                X = NewCodeEntry (OP65_LDY, AM65_IMM, MakeHexArg (D->Rhs.A.Offs), 0, D->OpEntry->LI);
-                InsertEntry(D, X, D->IP++);
+                if ((D->Rhs.A.Flags & LI_CHECK_Y) == 0) {
+                    X = NewCodeEntry (OP65_LDY, AM65_IMM, MakeHexArg (D->Rhs.A.Offs), 0, D->OpEntry->LI);
+                } else {
+                    X = NewCodeEntry (OP65_LDY, D->Rhs.A.LoadYEntry->AM, D->Rhs.A.LoadYEntry->Arg, 0, D->OpEntry->LI);
+                }
+                InsertEntry (D, X, D->IP++);
 
-                /* cmp (sp),y */
-                X = NewCodeEntry (OP65_CMP, AM65_ZP_INDY, "sp", 0, D->OpEntry->LI);
-                InsertEntry(D, X, D->IP++);
+                /* cmp src,y OR cmp (sp),y*/
+                if (D->Rhs.A.LoadEntry->OPC == OP65_JSR) {
+                    /* opc (sp),y */
+                    X = NewCodeEntry (OP65_CMP, AM65_ZP_INDY, "sp", 0, D->OpEntry->LI);
+                } else {
+                    /* opc src,y */
+                    X = NewCodeEntry (OP65_CMP, D->Rhs.A.LoadEntry->AM, D->Rhs.A.LoadEntry->Arg, 0, D->OpEntry->LI);
+                }
+                InsertEntry (D, X, D->IP++);
             }
 
             /* RHS may be removed */

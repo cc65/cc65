@@ -898,6 +898,67 @@ static int IsRegVar (StackOpData* D)
 
 
 
+static RegInfo* GetLastChangedRegInfo (StackOpData* D, LoadRegInfo* Reg)
+/* Get RegInfo of the last load insn entry */
+{
+    CodeEntry* E;
+
+    if (Reg->LoadIndex >= 0 && (E = CS_GetEntry (D->Code, Reg->LoadIndex)) != 0) {
+        return E->RI;
+    }
+
+    return 0;
+}
+
+
+
+static int SameRegAValue (StackOpData* D)
+/* Check if Rhs Reg A == Lhs Reg A */
+{
+    RegInfo* LRI = GetLastChangedRegInfo (D, &D->Lhs.A);
+    RegInfo* RRI = GetLastChangedRegInfo (D, &D->Rhs.A);
+
+    /* RHS can have a -1 LoadIndex only if it is carried over from LHS */
+    if (RRI == 0                                    ||
+        (D->Rhs.A.LoadIndex >= 0        &&
+         D->Rhs.A.LoadIndex == D->Lhs.A.LoadIndex)  ||
+        (LRI != 0                       &&
+         RegValIsKnown (LRI->Out.RegA)  &&
+         RegValIsKnown (RRI->Out.RegA)  &&
+         (LRI->Out.RegA & 0xFF) == (RRI->Out.RegA & 0xFF))) {
+
+        return 1;
+    }
+
+    return 0;
+
+}
+
+
+
+static int SameRegXValue (StackOpData* D)
+/* Check if Rhs Reg X == Lhs Reg X */
+{
+    RegInfo* LRI = GetLastChangedRegInfo (D, &D->Lhs.X);
+    RegInfo* RRI = GetLastChangedRegInfo (D, &D->Rhs.X);
+
+    if (RRI == 0                                    ||
+        (D->Rhs.X.LoadIndex >= 0        &&
+         D->Rhs.X.LoadIndex == D->Lhs.X.LoadIndex)  ||
+        (LRI != 0                       &&
+         RegValIsKnown (LRI->Out.RegX)  &&
+         RegValIsKnown (RRI->Out.RegX)  &&
+         (LRI->Out.RegX & 0xFF) == (RRI->Out.RegX & 0xFF))) {
+
+        return 1;
+    }
+
+    return 0;
+
+}
+
+
+
 /*****************************************************************************/
 /*                       Actual optimization functions                       */
 /*****************************************************************************/
@@ -1851,6 +1912,251 @@ static unsigned Opt_tosxorax (StackOpData* D)
 
 
 /*****************************************************************************/
+/*            Optimization functions when hi-bytes can be ignored            */
+/*****************************************************************************/
+
+
+
+static unsigned Opt_a_toscmpbool (StackOpData* D, const char* BoolTransformer)
+/* Optimize the tos compare sequence with a bool transformer */
+{
+    CodeEntry* X;
+    cmp_t      Cond;
+
+    D->IP = D->OpIndex + 1;
+
+    if (!D->RhsMultiChg &&
+        (D->Rhs.A.LoadEntry->Flags & CEF_DONT_REMOVE) == 0 &&
+        (D->Rhs.A.Flags & LI_DIRECT) != 0) {
+
+        /* cmp */
+        AddOpLow (D, OP65_CMP, &D->Rhs);
+
+        /* Rhs low-byte load must be removed and hi-byte load may be removed */
+        D->Rhs.X.Flags |= LI_REMOVE;
+        D->Rhs.A.Flags |= LI_REMOVE;
+
+    } else if ((D->Lhs.A.Flags & LI_DIRECT) != 0) {
+
+        /* If the lhs is direct (but not stack relative), encode compares with lhs
+        ** effectively reverting the order (which doesn't matter for ==).
+        */
+        Cond = FindBoolCmpCond (BoolTransformer);
+        Cond = GetRevertedCond (Cond);
+        BoolTransformer = GetBoolTransformer (Cond);
+
+        /* This shouldn't fail */
+        CHECK (BoolTransformer);
+
+        /* cmp */
+        AddOpLow (D, OP65_CMP, &D->Lhs);
+
+        /* Lhs load entries can be removed if not used later */
+        D->Lhs.X.Flags |= LI_REMOVE;
+        D->Lhs.A.Flags |= LI_REMOVE;
+
+    } else {
+
+        /* We'll do reverse-compare */
+        Cond = FindBoolCmpCond (BoolTransformer);
+        Cond = GetRevertedCond (Cond);
+        BoolTransformer = GetBoolTransformer (Cond);
+
+        /* This shouldn't fail */
+        CHECK (BoolTransformer);
+
+        /* Save lhs into zeropage */
+        AddStoreLhsA (D);
+
+        /* cmp */
+        X = NewCodeEntry (OP65_CMP, AM65_ZP, D->ZPLo, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+    }
+
+    /* Create a call to the boolean transformer function. This is needed for all
+    ** variants.
+    */
+    X = NewCodeEntry (OP65_JSR, AM65_ABS, BoolTransformer, 0, D->OpEntry->LI);
+    InsertEntry (D, X, D->IP++);
+
+    /* Remove the push and the call to the tosgeax function */
+    RemoveRemainders (D);
+
+    /* We changed the sequence */
+    return 1;
+}
+
+
+
+static unsigned Opt_a_toseq (StackOpData* D)
+/* Optimize the toseqax sequence */
+{
+    return Opt_a_toscmpbool (D, "booleq");
+}
+
+
+
+static unsigned Opt_a_tosge (StackOpData* D)
+/* Optimize the tosgeax sequence */
+{
+    return Opt_a_toscmpbool (D, "boolge");
+}
+
+
+
+static unsigned Opt_a_tosgt (StackOpData* D)
+/* Optimize the tosgtax sequence */
+{
+    return Opt_a_toscmpbool (D, "boolgt");
+}
+
+
+
+static unsigned Opt_a_tosicmp (StackOpData* D)
+/* Replace tosicmp with CMP */
+{
+    CodeEntry*  X;
+    RegInfo*    RI;
+    const char* Arg;
+
+    if (!SameRegAValue (D)) {
+        /* Because of SameRegAValue */
+        CHECK (D->Rhs.A.LoadIndex >= 0);
+
+        /* Store LHS in ZP and reload it before op */
+        X = NewCodeEntry (OP65_STA, AM65_ZP, D->ZPLo, 0, D->PushEntry->LI);
+        InsertEntry (D, X, D->PushIndex + 1);
+        X = NewCodeEntry (OP65_LDA, AM65_ZP, D->ZPLo, 0, D->PushEntry->LI);
+        InsertEntry (D, X, D->OpIndex);
+
+        D->IP = D->OpIndex + 1;
+
+        if ((D->Rhs.A.Flags & LI_DIRECT) == 0) {
+            /* RHS src is not directly comparable */
+            X = NewCodeEntry (OP65_STA, AM65_ZP, D->ZPHi, 0, D->OpEntry->LI);
+            InsertEntry (D, X, D->Rhs.A.LoadIndex + 1);
+
+            /* Cmp with stored RHS */
+            X = NewCodeEntry (OP65_CMP, AM65_ZP, D->ZPHi, 0, D->OpEntry->LI);
+            InsertEntry (D, X, D->IP++);
+        } else {
+            if ((D->Rhs.A.Flags & LI_RELOAD_Y) == 0) {
+                /* Cmp directly with RHS src */
+                X = NewCodeEntry (OP65_CMP, AM65_ZP, D->Rhs.A.LoadEntry->Arg, 0, D->OpEntry->LI);
+                InsertEntry (D, X, D->IP++);
+            } else {
+                /* ldy #offs */
+                X = NewCodeEntry (OP65_LDY, AM65_IMM, MakeHexArg (D->Rhs.A.Offs), 0, D->OpEntry->LI);
+                InsertEntry(D, X, D->IP++);
+
+                /* cmp (sp),y */
+                X = NewCodeEntry (OP65_CMP, AM65_ZP_INDY, "sp", 0, D->OpEntry->LI);
+                InsertEntry(D, X, D->IP++);
+            }
+
+            /* RHS may be removed */
+            D->Rhs.A.Flags |= LI_REMOVE;
+            D->Rhs.X.Flags |= LI_REMOVE;
+        }
+
+        /* Fix up the N/V flags: N = ~C, V = 0 */
+        Arg = MakeHexArg (0);
+        X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+        X = NewCodeEntry (OP65_SBC, AM65_IMM, Arg, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+        Arg = MakeHexArg (0x01);
+        X = NewCodeEntry (OP65_ORA, AM65_IMM, Arg, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+        /* jeq L1 */
+        CodeLabel* Label = CS_GenLabel (D->Code, CS_GetEntry (D->Code, D->IP));
+        X = NewCodeEntry (OP65_JEQ, AM65_BRA, Label->Name, Label, X->LI);
+        InsertEntry (D, X, D->IP-3);
+
+    } else {
+        /* Just clear A,Z,N and set C */
+        if ((RI = GetLastChangedRegInfo (D, &D->Lhs.A)) != 0 &&
+            RegValIsKnown (RI->Out.RegA)                     &&
+            (RI->Out.RegA & 0xFF) == 0) {
+            Arg = MakeHexArg (0);
+            X   = NewCodeEntry (OP65_CMP, AM65_IMM, Arg, 0, D->OpEntry->LI);
+            InsertEntry (D, X, D->OpIndex + 1);
+        } else {
+            Arg = MakeHexArg (0);
+            X   = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, D->OpEntry->LI);
+            InsertEntry (D, X, D->OpIndex + 1);
+            X   = NewCodeEntry (OP65_CMP, AM65_IMM, Arg, 0, D->OpEntry->LI);
+            InsertEntry (D, X, D->OpIndex + 2);
+        }
+    }
+
+    /* Remove the push and the call to the operator function */
+    RemoveRemainders (D);
+
+    return 1;
+}
+
+
+
+static unsigned Opt_a_tosle (StackOpData* D)
+/* Optimize the tosleax sequence */
+{
+    return Opt_a_toscmpbool (D, "boolle");
+}
+
+
+
+static unsigned Opt_a_toslt (StackOpData* D)
+/* Optimize the tosltax sequence */
+{
+    return Opt_a_toscmpbool (D, "boollt");
+}
+
+
+
+static unsigned Opt_a_tosne (StackOpData* D)
+/* Optimize the toseqax sequence */
+{
+    return Opt_a_toscmpbool (D, "boolne");
+}
+
+
+
+static unsigned Opt_a_tosuge (StackOpData* D)
+/* Optimize the tosugeax sequence */
+{
+    return Opt_a_toscmpbool (D, "booluge");
+}
+
+
+
+static unsigned Opt_a_tosugt (StackOpData* D)
+/* Optimize the tosugtax sequence */
+{
+    return Opt_a_toscmpbool (D, "boolugt");
+}
+
+
+
+static unsigned Opt_a_tosule (StackOpData* D)
+/* Optimize the tosuleax sequence */
+{
+    return Opt_a_toscmpbool (D, "boolule");
+}
+
+
+
+static unsigned Opt_a_tosult (StackOpData* D)
+/* Optimize the tosultax sequence */
+{
+    return Opt_a_toscmpbool (D, "boolult");
+}
+
+
+
+/*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
@@ -1878,7 +2184,22 @@ static const OptFuncDesc FuncTable[] = {
     { "tosultax",   Opt_tosultax,  REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
     { "tosxorax",   Opt_tosxorax,  REG_NONE, OP_NONE                                   },
 };
-#define FUNC_COUNT (sizeof(FuncTable) / sizeof(FuncTable[0]))
+
+static const OptFuncDesc FuncRegATable[] = {
+    { "toseqax",    Opt_a_toseq,   REG_NONE, OP_NONE                                   },
+    { "tosgeax",    Opt_a_tosge,   REG_NONE, OP_NONE                                   },
+    { "tosgtax",    Opt_a_tosgt,   REG_NONE, OP_NONE                                   },
+    { "tosicmp",    Opt_a_tosicmp, REG_NONE, OP_NONE                                   },
+    { "tosleax",    Opt_a_tosle,   REG_NONE, OP_NONE                                   },
+    { "tosltax",    Opt_a_toslt,   REG_NONE, OP_NONE                                   },
+    { "tosneax",    Opt_a_tosne,   REG_NONE, OP_NONE                                   },
+    { "tosugeax",   Opt_a_tosuge,  REG_NONE, OP_NONE                                   },
+    { "tosugtax",   Opt_a_tosugt,  REG_NONE, OP_NONE                                   },
+    { "tosuleax",   Opt_a_tosule,  REG_NONE, OP_NONE                                   },
+    { "tosultax",   Opt_a_tosult,  REG_NONE, OP_NONE                                   },
+};
+
+#define FUNC_COUNT(Table) (sizeof(Table) / sizeof(Table[0]))
 
 
 
@@ -1890,12 +2211,12 @@ static int CmpFunc (const void* Key, const void* Func)
 
 
 
-static const OptFuncDesc* FindFunc (const char* Name)
+static const OptFuncDesc* FindFunc (const OptFuncDesc FuncTable[], size_t Count, const char* Name)
 /* Find the function with the given name. Return a pointer to the table entry
 ** or NULL if the function was not found.
 */
 {
-    return bsearch (Name, FuncTable, FUNC_COUNT, sizeof(OptFuncDesc), CmpFunc);
+    return bsearch (Name, FuncTable, Count, sizeof(OptFuncDesc), CmpFunc);
 }
 
 
@@ -1990,7 +2311,7 @@ static void ResetStackOpData (StackOpData* Data)
 static int PreCondOk (StackOpData* D)
 /* Check if the preconditions for a call to the optimizer subfunction are
 ** satisfied. As a side effect, this function will also choose the zero page
-** register to use.
+** register to use for temporary storage.
 */
 {
     LoadInfo* Lhs;
@@ -2136,6 +2457,160 @@ static int PreCondOk (StackOpData* D)
 
 
 
+static int RegAPreCondOk (StackOpData* D)
+/* Check if the preconditions for a call to the RegA-only optimizer subfunction
+** are satisfied. As a side effect, this function will also choose the zero page
+** register to use for temporary storage.
+*/
+{
+    LoadInfo* Lhs;
+    LoadInfo* Rhs;
+    LoadRegInfo* LhsLo;
+    LoadRegInfo* RhsLo;
+    short LhsLoVal, LhsHiVal;
+    short RhsLoVal, RhsHiVal;
+    int I;
+    int Passed = 0;
+
+    /* Check the flags */
+    unsigned UnusedRegs = D->OptFunc->UnusedRegs;
+    if (UnusedRegs != REG_NONE &&
+        (GetRegInfo (D->Code, D->OpIndex+1, UnusedRegs) & UnusedRegs) != 0) {
+        /* Cannot optimize */
+        return 0;
+    }
+
+    Passed = 0;
+    LhsLoVal = D->PushEntry->RI->In.RegA;
+    LhsHiVal = D->PushEntry->RI->In.RegX;
+    RhsLoVal = D->OpEntry->RI->In.RegA;
+    RhsHiVal = D->OpEntry->RI->In.RegX;
+    /* Check normally first, then interchange A/X and check again if necessary */
+    for (I = (D->OptFunc->Flags & OP_AX_INTERCHANGE ? 0 : 1); !Passed && I < 2; ++I) {
+
+        do {
+            if (LhsHiVal != RhsHiVal) {
+                /* Cannot optimize */
+                break;
+            }
+            if ((D->OptFunc->Flags & OP_A_KNOWN) != 0 &&
+                RegValIsUnknown (LhsLoVal)) {
+                /* Cannot optimize */
+                break;
+            }
+            if ((D->OptFunc->Flags & OP_X_ZERO) != 0 &&
+                LhsHiVal != 0) {
+                /* Cannot optimize */
+                break;
+            }
+            Passed = 1;
+        } while (0);
+
+        /* Suppress warning about unused assignment in GCC */
+        (void)RhsLoVal;
+
+        /* Interchange A/X */
+        LhsLoVal = D->PushEntry->RI->In.RegX;
+        LhsHiVal = D->PushEntry->RI->In.RegA;
+        RhsLoVal = D->OpEntry->RI->In.RegX;
+        RhsHiVal = D->OpEntry->RI->In.RegA;
+    }
+    if (!Passed) {
+        /* Cannot optimize */
+        return 0;
+    }
+
+    Passed = 0;
+    Lhs = &D->Lhs;
+    Rhs = &D->Rhs;
+    /* Check normally first, then interchange LHS/RHS and check again if necessary */
+    for (I = (D->OptFunc->Flags & OP_LR_INTERCHANGE ? 0 : 1); !Passed && I < 2; ++I) {
+
+        do {
+            LhsLo = &Lhs->A;
+            RhsLo = &Rhs->A;
+            /* Currently we have only LHS/RHS checks with identical requirements for A/X,
+            ** so we don't need to check twice for now.
+            */
+
+            if ((D->OptFunc->Flags & OP_LHS_LOAD) != 0) {
+                if ((LhsLo->Flags & LI_LOAD_INSN) == 0) {
+                    /* Cannot optimize */
+                    break;
+                } else if ((D->OptFunc->Flags & OP_LHS_LOAD_DIRECT) != 0) {
+                    if ((LhsLo->Flags & LI_DIRECT) == 0) {
+                        /* Cannot optimize */
+                        break;
+                    }
+                }
+            }
+            if ((D->OptFunc->Flags & OP_RHS_LOAD) != 0) {
+                if ((RhsLo->Flags & LI_LOAD_INSN) == 0) {
+                    /* Cannot optimize */
+                    break;
+                } else if ((D->OptFunc->Flags & OP_RHS_LOAD_DIRECT) != 0) {
+                    if ((RhsLo->Flags & LI_DIRECT) == 0) {
+                        /* Cannot optimize */
+                        break;
+                    }
+                }
+            }
+            if ((D->OptFunc->Flags & OP_LHS_REMOVE) != 0) {
+                /* Check if the load entries cannot be removed */
+                if ((LhsLo->LoadEntry != 0 && (LhsLo->LoadEntry->Flags & CEF_DONT_REMOVE) != 0)) {
+                    if ((D->OptFunc->Flags & OP_LHS_REMOVE_DIRECT) != 0) {
+                        /* Cannot optimize */
+                        break;
+                    }
+                }
+            }
+            if ((D->OptFunc->Flags & OP_RHS_REMOVE) != 0) {
+                if ((RhsLo->LoadEntry != 0 && (RhsLo->LoadEntry->Flags & CEF_DONT_REMOVE) != 0)) {
+                    if ((D->OptFunc->Flags & OP_RHS_REMOVE_DIRECT) != 0) {
+                        /* Cannot optimize */
+                        break;
+                    }
+                }
+            }
+            if (D->RhsMultiChg && (D->OptFunc->Flags & OP_RHS_REMOVE_DIRECT) != 0) {
+                /* Cannot optimize */
+                break;
+            }
+            Passed = 1;
+        } while (0);
+
+        /* Interchange LHS/RHS for next round */
+        Lhs = &D->Rhs;
+        Rhs = &D->Lhs;
+    }
+    if (!Passed) {
+        /* Cannot optimize */
+        return 0;
+    }
+
+    /* Determine the zero page locations to use. We've tracked the used
+    ** ZP locations, so try to find some for us that are unused.
+    */
+    if ((D->ZPUsage & REG_PTR1) == REG_NONE) {
+        D->ZPLo = "ptr1";
+        D->ZPHi = "ptr1+1";
+    } else if ((D->ZPUsage & REG_SREG) == REG_NONE) {
+        D->ZPLo = "sreg";
+        D->ZPHi = "sreg+1";
+    } else if ((D->ZPUsage & REG_PTR2) == REG_NONE) {
+        D->ZPLo = "ptr2";
+        D->ZPHi = "ptr2+1";
+    } else {
+        /* No registers available */
+        return 0;
+    }
+
+    /* Determine if we have a basic block */
+    return CS_IsBasicBlock (D->Code, D->PushIndex, D->OpIndex);
+}
+
+
+
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
@@ -2191,14 +2666,15 @@ static void ResetDontRemoveEntryFlags (StackOpData* D)
 unsigned OptStackOps (CodeSeg* S)
 /* Optimize operations that take operands via the stack */
 {
-    unsigned            Changes = 0;    /* Number of changes in one run */
-    StackOpData         Data;
-    int                 I;
-    int                 OldEntryCount;  /* Old number of entries */
-    unsigned            Used;           /* What registers would be used */
-    unsigned            PushedRegs;     /* Track if the same regs are used after the push */
-    int                 RhsALoadIndex;  /* Track if rhs is changed more than once */
-    int                 RhsXLoadIndex;  /* Track if rhs is changed more than once */
+    unsigned        Changes = 0;        /* Number of changes in one run */
+    StackOpData     Data;
+    int             I;
+    int             OldEntryCount;      /* Old number of entries */
+    unsigned        Used;               /* What registers would be used */
+    unsigned        PushedRegs;         /* Track if the same regs are used after the push */
+    int             RhsALoadIndex;      /* Track if rhs is changed more than once */
+    int             RhsXLoadIndex;      /* Track if rhs is changed more than once */
+    int             IsRegAOptFunc = 0;  /* Whether to use the RegA-only optimizations */
 
     enum {
         Initialize,
@@ -2225,6 +2701,8 @@ unsigned OptStackOps (CodeSeg* S)
     **
     ** Since we need a zero page register later, do also check the
     ** intermediate code for zero page use.
+    ** When hibytes of both oprands are equal, we may have more specialized
+    ** optimization for the op.
     */
     I = 0;
     while (I < (int)CS_GetEntryCount (S)) {
@@ -2300,7 +2778,14 @@ unsigned OptStackOps (CodeSeg* S)
                     /* Subroutine call: Check if this is one of the functions,
                     ** we're going to replace.
                     */
-                    Data.OptFunc = FindFunc (E->Arg);
+                    if (SameRegXValue (&Data)) {
+                        Data.OptFunc = FindFunc (FuncRegATable, FUNC_COUNT (FuncRegATable), E->Arg);
+                        IsRegAOptFunc = 1;
+                    }
+                    if (Data.OptFunc == 0) {
+                        Data.OptFunc = FindFunc (FuncTable, FUNC_COUNT (FuncTable), E->Arg);
+                        IsRegAOptFunc = 0;
+                    }
                     if (Data.OptFunc) {
                         /* Disallow removing the loads if the registers are used */
                         if (Data.UsedRegs & REG_A) {
@@ -2419,11 +2904,11 @@ unsigned OptStackOps (CodeSeg* S)
                 SetDontRemoveEntryFlags (&Data);
 
                 /* Check the preconditions. If they aren't ok, reset the insn
-                ** pointer to the pushax and start over. We will loose part of
+                ** pointer to the pushax and start over. We will lose part of
                 ** load tracking but at least a/x has probably lost between
                 ** pushax and here and will be tracked again when restarting.
                 */
-                if (!PreCondOk (&Data)) {
+                if (IsRegAOptFunc ? !RegAPreCondOk (&Data) : !PreCondOk (&Data)) {
                     /* Unflag entries that can't be removed */
                     ResetDontRemoveEntryFlags (&Data);
                     I = Data.PushIndex;

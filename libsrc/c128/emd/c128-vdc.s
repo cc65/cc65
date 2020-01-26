@@ -341,12 +341,12 @@ vdcsetsrcaddr:
         stx     VDC_ADDR_REG
 @L0:    bit     VDC_ADDR_REG
         bpl     @L0
-        sta     VDC_DATA_REG
+        sty     VDC_DATA_REG
         inx
         stx     VDC_ADDR_REG
 @L1:    bit     VDC_ADDR_REG            ; XXX: Test waiting for register 18
         bpl     @L1
-        sty     VDC_DATA_REG
+        sta     VDC_DATA_REG
         rts
 
 vdcgetbyte:

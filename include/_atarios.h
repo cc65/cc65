@@ -120,8 +120,9 @@ struct __devhdl {
     void *put;                  /* address of PUT BYTE routine -1 */
     void *status;               /* address of GET STATUS routine -1 */
     void *special;              /* address od SPECIAL routine -1 */
+    unsigned char jmp_inst;     /* a "JMP" byte, should be $4C */
     void (*init)(void);         /* init routine (JMP INIT) */
-    void *reserved;             /* unused */
+    unsigned char reserved;     /* unused */
 };
 
 typedef struct __devhdl devhdl_t;

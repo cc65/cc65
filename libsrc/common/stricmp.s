@@ -3,7 +3,7 @@
 ; This file is part of
 ; cc65 - a freeware C compiler for 6502 based systems
 ;
-; https://github.com/cc65/cc65
+; https://cc65.github.io
 ;
 ; See "LICENSE" file for legal information.
 ;
@@ -27,7 +27,7 @@ _strcasecmp:
 loop:   lda     (ptr2),y        ; get char from second string
         sta     tmp2            ; and save it
                                 ; get character classification
-        jsr     ctype_preprocessor_no_check         
+        jsr     ctype_preprocessor_no_check
         and     #CT_LOWER       ; lower case char?
         beq     L1              ; jump if no
         lda     #<('A'-'a')     ; make upper case char
@@ -37,13 +37,13 @@ loop:   lda     (ptr2),y        ; get char from second string
 L1:     lda     (ptr1),y        ; get character from first string
         sta     tmp1
                                 ; get character classification
-        jsr     ctype_preprocessor_no_check 
+        jsr     ctype_preprocessor_no_check
         and     #CT_LOWER       ; lower case char?
         beq     L2              ; jump if no
         lda     #<('A'-'a')     ; make upper case char
         adc     tmp1            ; ctype_preprocessor_no_check ensures carry clear!
-        sta     tmp1            ; remember upper case equivalent        
-                                
+        sta     tmp1            ; remember upper case equivalent
+
 L2:     ldx     tmp1
         cpx     tmp2            ; compare characters
         bne     L3

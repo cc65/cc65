@@ -3,7 +3,7 @@
 ; This file is part of
 ; cc65 - a freeware C compiler for 6502 based systems
 ;
-; https://github.com/cc65/cc65
+; https://cc65.github.io
 ;
 ; See "LICENSE" file for legal information.
 ;
@@ -13,10 +13,10 @@
         .export         _isascii
 
 _isascii:
-        asl		a				; high-bit to carry
-        txa 					; check range of input param
-        bne		@L1				; out-of bounds?
-        adc 	#$FF			; calculate return value based on carry
+        asl     a               ; high-bit to carry
+        txa                     ; check range of input param
+        bne     @L1             ; out-of bounds?
+        adc     #$FF            ; calculate return value based on carry
         rts
 
 @L1:    lda     #$00            ; return false

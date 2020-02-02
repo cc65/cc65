@@ -3,7 +3,7 @@
 ; This file is part of
 ; cc65 - a freeware C compiler for 6502 based systems
 ;
-; https://github.com/cc65/cc65
+; https://cc65.github.io
 ;
 ; See "LICENSE" file for legal information.
 ;

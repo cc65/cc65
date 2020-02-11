@@ -360,6 +360,10 @@ void CE_SetArg (CodeEntry* E, const char* Arg)
 
     /* Assign the new one */
     E->Arg = GetArgCopy (Arg);
+
+    /* Update the Use and Chg in E */
+    const OPCDesc* D = GetOPCDesc (E->OPC);
+    SetUseChgInfo (E, D);
 }
 
 

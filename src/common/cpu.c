@@ -104,7 +104,7 @@ int ValidAddrSizeForCPU (unsigned char AddrSize)
 
         case ADDR_SIZE_FAR:
             /* Supported by "none" and 65816 */
-            return (CPU == CPU_NONE && CPU == CPU_65816);
+            return (CPU == CPU_NONE || CPU == CPU_65816);
 
         case ADDR_SIZE_LONG:
             /* "none" supports all sizes */

@@ -62,7 +62,7 @@ _videomode:
 done:   lda     #$11            ; Ctrl-char code for 40 cols
         plp
         bpl     :+
-        lda     #$12            ; Ctrl-char code for 80 cols
+        inc     a               ; Ctrl-char code for 80 cols
 :       rts                     ; X was preserved all the way
 
         .endif                  ; __APPLE2ENH__

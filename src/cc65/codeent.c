@@ -615,6 +615,9 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
         case OP65_BRK:
             break;
 
+        case OP65_STP:
+            break;
+
         case OP65_BVC:
             break;
 

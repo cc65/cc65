@@ -615,9 +615,6 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
         case OP65_BRK:
             break;
 
-        case OP65_STP:
-            break;
-
         case OP65_BVC:
             break;
 
@@ -1139,6 +1136,9 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
                 /* Invalidates all ZP registers */
                 RC_InvalidateZP (Out);
             }
+            break;
+
+        case OP65_STP:
             break;
 
         case OP65_STX:

@@ -165,8 +165,26 @@ The names in the parentheses denote the symbols to be used for static linking of
 
 <sect1>Graphics drivers<p>
 
-No graphics drivers are currently available for the Plus/4.
+<descrip>
+  <tag><tt/ted-hi.tgi (ted_hi_tgi)/</tag>
+  This driver features a resolution of 320*200 with two colors and an
+  adjustable palette (that means that the two colors can be chosen out of a
+  palette of the 121 TED colors).
 
+  Note that the text-mode character matrix and color data are destroyed by this
+  driver. The driver calls the Kernal <tt/CLRSCR/ routine to return the text
+  screen to a usable (if empty) state on <tt/tgi_done()/.
+
+  This driver places the bitmap at &dollar;C000-&dollar;E000. Programs using
+  this driver must either be linked with the option <tt/-D
+  __HIMEM__=&dollar;C000/, or use the <tt/plus4-hires.cfg/ linker configuration.
+
+  The <tt/plus4-hires.cfg/ is preferable, as it allows the stack to remain at
+  &dollar;FCFF, and exposes the remaining high memory from the end of the bitmap
+  to the stack top as a <tt/HIBSS/ segment that can be used by the programmer,
+  or given to <tt/_heapadd()/ (using the symbols <tt/_HIBSS_START__/ and
+  <tt/_HIBSS_SIZE__/).
+</descrip><p>
 
 <sect1>Extended memory drivers<p>
 

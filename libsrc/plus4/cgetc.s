@@ -18,11 +18,16 @@ _cgetc: lda     KEY_COUNT       ; Get number of characters
         ora     FKEY_COUNT      ; Or with number of function key chars
         bne     L2              ; Jump if there are already chars waiting
 
+        lda     #%00100000
+        bit     $FF06
+        bne     L2              ; always disable cursor if in bitmap mode
+
 ; Switch on the cursor if needed
 
         ldy     CURS_X
         lda     (CRAM_PTR),y    ; Get current char
         pha                     ; And save it
+
         lda     CHARCOLOR
         sta     (CRAM_PTR),y
 

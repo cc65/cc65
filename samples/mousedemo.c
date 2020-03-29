@@ -77,12 +77,14 @@ static const char *mouse_name;
 static void DoWarning (void)
 /* Warn the user that a driver is needed for this program. */
 {
+    char c;
     cprintf ("Warning: This program needs\r\n"
              "the driver with the name\r\n"
              "    %s\r\n"
              "on a disk! Press 'y' if you have it;\r\n"
              "or, any other key to exit.\r\n", mouse_stddrv);
-    if (tolower (cgetc ()) != 'y') {
+    c = cgetc ();
+    if (! (c == 'y' || c == 'Y')) {
         exit (EXIT_SUCCESS);
     }
     cprintf ("OK. Please wait patiently...\r\n");
@@ -212,7 +214,8 @@ top:
         /* Handle user input */
         if (kbhit ()) {
             cclearxy (1, 9, 23);
-            switch (tolower (C = cgetc ())) {
+            switch ((C = cgetc ())) {
+		case 'D':
                 case 'd':
                     BREAK();
 
@@ -232,11 +235,13 @@ top:
                     /* The debugger changed the screen; restore it. */
                     goto top;
 
+		case 'H':
                 case 'h':
                     mouse_hide ();
                     ShowState (Jailed, ++Invisible);
                     break;
 
+                case 'J':
                 case 'j':
                     if (Jailed) {
                         mouse_setbox (&full_box);
@@ -252,6 +257,7 @@ top:
                     ShowState (Jailed, Invisible);
                     break;
 
+                case 'S':
                 case 's':
                     mouse_show ();
                     if (Invisible) {
@@ -259,6 +265,7 @@ top:
                     }
                     break;
 
+                case 'Q':
                 case 'q':
                     Done = true;
                     break;

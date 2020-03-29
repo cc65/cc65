@@ -4294,7 +4294,8 @@ fastcall function, so it may only be used in presence of a prototype.
 <tag/Header/<tt/<ref id="ctype.h" name="ctype.h">/
 <tag/Declaration/<tt/int __fastcall__ isascii (int c);/
 <tag/Description/The function returns a non zero value if the given argument
-is in the range 0..127 (the range of valid ASCII characters) and zero if not.
+is in the range 0..127 (the range of valid ASCII characters), and zero if not.
+<tag/Notes/<itemize>
 <item>When compiling without <tt/-Os/, the function is only available as
 fastcall function, so it may only be used in presence of a prototype.
 </itemize>
@@ -4392,6 +4393,7 @@ fastcall function, so it may only be used in presence of a prototype.
 <tag/Declaration/<tt/int __fastcall__ isdigit (int c);/
 <tag/Description/The function returns a non zero value if the given argument
 is a digit. The return value is zero if the character is anything else.
+<tag/Notes/<itemize>
 <item>When compiling without <tt/-Os/, the function is only available as
 fastcall function, so it may only be used in presence of a prototype.
 </itemize>

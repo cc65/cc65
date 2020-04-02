@@ -12,10 +12,10 @@
 
         .export         _isdigit
         .include        "ctype.inc"
-        .import         ctype_preprocessor
+        .import         ctypemask
 
 _isdigit:
-        jsr     ctype_preprocessor      ; (always clears X)
+        jsr     ctypemask      ; (always clears X)
         bcs     @L1                     ; out of range? (everything already clear -> false)
         and     #CT_DIGIT               ; mask digit bit
 @L1:    rts

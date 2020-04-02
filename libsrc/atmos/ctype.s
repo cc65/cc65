@@ -11,13 +11,13 @@
 ;
 
         .include        "ctypetable.inc"
-        .export         __ctypeIdx
+        .export         __ctypeidx
 
 ; The tables are readonly, put them into the rodata segment
 
 .rodata
 
-__ctypeIdx:
+__ctypeidx:
         ct_mix  CT_CTRL_IDX, CT_CTRL_IDX                 ;   0/00 ___ctrl_@___,  1/01 ___ctrl_A___
         ct_mix  CT_CTRL_IDX, CT_CTRL_IDX                 ;   2/02 ___ctrl_B___,  3/03 ___ctrl_C___
         ct_mix  CT_CTRL_IDX, CT_CTRL_IDX                 ;   4/04 ___ctrl_D___,  5/05 ___ctrl_E___

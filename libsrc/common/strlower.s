@@ -11,7 +11,7 @@
         .export         _strlower, _strlwr
         .import         popax
         .importzp       ptr1, ptr2
-        .import         ctype_preprocessor_no_check
+        .import         ctypemaskdirect
         .include        "ctype.inc"
 
 _strlower:
@@ -24,12 +24,11 @@ _strlwr:
 
 loop:   lda     (ptr1),y        ; get character
         beq     L9              ; jump if done
-                                ; get character classification
-        jsr     ctype_preprocessor_no_check
+        jsr     ctypemaskdirect ; get character classification
         and     #CT_UPPER       ; upper case char?
         beq     L1              ; jump if no
         lda     (ptr1),y        ; fetch character again
-        adc     #<('a'-'A')     ; make lower case char (ctype_preprocessor_no_check ensures carry clear)
+        adc     #<('a'-'A')     ; make lower case char (ctypemaskdirect ensures carry clear)
         sta     (ptr1),y        ; store back
 L1:     iny                     ; next char
         bne     loop

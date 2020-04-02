@@ -12,10 +12,10 @@
 
         .export         _isgraph
         .include        "ctype.inc"
-        .import         ctype_preprocessor
+        .import         ctypemask
 
 _isgraph:
-        jsr     ctype_preprocessor      ; (always clears X)
+        jsr     ctypemask      ; (always clears X)
         bcs     @L1                     ; out of range? (everything already clear -> false)
         and     #CT_CTRL_SPACE          ; mask character bits
         cmp     #1                      ; if false, then set "borrow" flag

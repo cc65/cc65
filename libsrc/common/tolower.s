@@ -12,17 +12,17 @@
 
         .export         _tolower
         .include        "ctype.inc"
-        .import         ctype_preprocessor_no_check
+        .import         ctypemaskdirect
 
 _tolower:
         cpx     #$00            ; out of range?
         bne     @L2             ; if so, return the argument unchanged
         tay                     ; save char
-        jsr     ctype_preprocessor_no_check
+        jsr     ctypemaskdirect ; get character classification
         and     #CT_UPPER       ; upper case char?
         beq     @L1             ; jump if no
         tya                     ; restore char
-        adc     #<('a'-'A')     ; make lower case char (ctype_preprocessor_no_check ensures carry clear)
+        adc     #<('a'-'A')     ; make lower case char (ctypemaskdirect ensures carry clear)
         rts
 @L1:    tya                     ; restore char
 @L2:    rts

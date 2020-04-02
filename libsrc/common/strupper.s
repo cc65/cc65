@@ -11,7 +11,7 @@
         .export         _strupper, _strupr
         .import         popax
         .importzp       ptr1, ptr2
-        .import         ctype_preprocessor_no_check
+        .import         ctypemaskdirect
         .include        "ctype.inc"
 
 _strupper:
@@ -24,11 +24,11 @@ _strupr:
 
 loop:   lda     (ptr1),y        ; get character
         beq     L9              ; jump if done
-        jsr     ctype_preprocessor_no_check
+        jsr     ctypemaskdirect ; get character classification
         and     #CT_LOWER       ; lower case char?
         beq     L1              ; jump if no
         lda     (ptr1),y        ; fetch character again
-        adc     #<('A'-'a')     ; make upper case char (ctype_preprocessor_no_check ensures carry clear)
+        adc     #<('A'-'a')     ; make upper case char (ctypemaskdirect ensures carry clear)
         sta     (ptr1),y        ; store back
 L1:     iny                     ; next char
         bne     loop

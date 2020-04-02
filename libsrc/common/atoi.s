@@ -8,7 +8,7 @@
         .export         _atoi, _atol
         .import         negeax, __ctype
         .importzp       sreg, ptr1, ptr2, tmp1
-        .import         ctype_preprocessor_no_check
+        .import         ctypemaskdirect
         .include        "ctype.inc"
 ;
 ; Conversion routine (32 bit)
@@ -26,9 +26,7 @@ _atol:  sta     ptr1            ; store s
 ; Skip whitespace
 
 L1:     lda     (ptr1),y
-                                ; get character classification
-        jsr     ctype_preprocessor_no_check
-
+        jsr     ctypemaskdirect ; get character classification
         and     #CT_SPACE_TAB   ; tab or space?
         beq     L2              ; jump if no
         iny

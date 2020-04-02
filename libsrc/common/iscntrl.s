@@ -12,10 +12,10 @@
 
         .export         _iscntrl
         .include        "ctype.inc"
-        .import         ctype_preprocessor
+        .import         ctypemask
 
 _iscntrl:
-        jsr     ctype_preprocessor      ; (always clears X)
+        jsr     ctypemask      ; (always clears X)
         bcs     @L1                     ; out of range? (everything already clear -> false)
         and     #CT_CTRL                ; mask control character bit
 @L1:    rts

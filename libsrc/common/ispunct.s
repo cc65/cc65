@@ -15,7 +15,7 @@
         .import         ctype_preprocessor
 
 _ispunct:
-        jsr     ctype_preprocessor      ; (clears always x)
+        jsr     ctype_preprocessor      ; (always clears X)
         bcs     @L1                     ; out of range? (everything already clear -> false)
         and     #CT_NOT_PUNCT           ; mask relevant bits
         cmp     #1                      ; if false, then set "borrow" flag

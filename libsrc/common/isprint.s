@@ -15,7 +15,7 @@
         .import         ctype_preprocessor
 
 _isprint:
-        jsr     ctype_preprocessor      ; (clears always x)
+        jsr     ctype_preprocessor      ; (always clears X)
         bcs     @L1                     ; out of range? (everything already clear -> false)
         eor     #CT_CTRL                ; NOT a control char
         and     #CT_CTRL                ; mask control char bit

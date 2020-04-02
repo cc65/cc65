@@ -16,7 +16,7 @@
 
 _strupper:
 _strupr:
-        sta     ptr1            ; Save s (working copy)
+        sta     ptr1            ; save s (working copy)
         stx     ptr1+1
         sta     ptr2
         stx     ptr2+1          ; save function result
@@ -24,7 +24,7 @@ _strupr:
 
 loop:   lda     (ptr1),y        ; get character
         beq     L9              ; jump if done
-        jsr     ctype_preprocessor_no_check 
+        jsr     ctype_preprocessor_no_check
         and     #CT_LOWER       ; lower case char?
         beq     L1              ; jump if no
         lda     (ptr1),y        ; fetch character again
@@ -40,6 +40,3 @@ L1:     iny                     ; next char
 L9:     lda     ptr2
         ldx     ptr2+1
         rts
-
-
-

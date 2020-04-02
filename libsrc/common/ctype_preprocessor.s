@@ -29,7 +29,7 @@ ctype_preprocessor:
 ctype_preprocessor_no_check:
         lsr     a
         tax
-        lda     __ctypeIdx, x
+        lda     __ctypeIdx,x
         bcc     @lowerNibble
 @upperNibble:
         lsr     a
@@ -38,13 +38,13 @@ ctype_preprocessor_no_check:
         lsr     a
         clc                     ; remove out of bounds flag
 @lowerNibble:
-        and     #%1111
+        and     #%00001111
         tax
-        lda     __ctype, x
-        ldx     #0
+        lda     __ctype,x
+        ldx     #$00
         rts
 
 SC:     sec
-        lda     #0
+        lda     #$00
         tax
         rts

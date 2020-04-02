@@ -17,7 +17,7 @@
         .import         ctype_preprocessor
 
 _isblank:
-        jsr     ctype_preprocessor      ; (clears always x)
+        jsr     ctype_preprocessor      ; (always clears X)
         bcs     @L1                     ; out of range? (everything already clear -> false)
         and     #CT_SPACE_TAB           ; mask blank bit
- @L1:   rts
+@L1:    rts

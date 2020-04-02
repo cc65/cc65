@@ -15,7 +15,7 @@
         .import         ctype_preprocessor
 
 _isxdigit:
-        jsr     ctype_preprocessor      ; (clears always x)
+        jsr     ctype_preprocessor      ; (always clears X)
         bcs     @L1                     ; out of range? (everything already clear -> false)
         and     #CT_XDIGIT              ; mask xdigit bit
 @L1:    rts

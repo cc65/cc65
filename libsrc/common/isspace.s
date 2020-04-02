@@ -15,7 +15,7 @@
         .import         ctype_preprocessor
 
 _isspace:
-        jsr     ctype_preprocessor              ; (clears always x)
+        jsr     ctype_preprocessor              ; (always clears X)
         bcs     @L1                             ; out of range? (everything already clear -> false)
         and     #(CT_SPACE | CT_OTHER_WS)       ; mask space bits
- @L1:   rts
+@L1:    rts

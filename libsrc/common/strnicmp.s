@@ -41,7 +41,7 @@ _strncasecmp:
 ; Start of compare loop. Check the counter.
 
 Loop:   inc     ptr3
-        beq     IncHi           ; Increment high byte
+        beq     IncHi           ; increment high byte
 
 ; Compare a byte from the strings
 
@@ -58,18 +58,18 @@ Comp:   lda     (ptr2),y
 L1:     lda     (ptr1),y        ; get character from first string
         sta     tmp1            ; remember original char
                                 ; get character classification
-        jsr     ctype_preprocessor_no_check 
+        jsr     ctype_preprocessor_no_check
         and     #CT_LOWER       ; lower case char?
         beq     L2              ; jump if no
         lda     #<('A'-'a')     ; make upper case char
         adc     tmp1            ; ctype_preprocessor_no_check ensures carry clear!
-        sta     tmp1            ; remember upper case equivalent 
+        sta     tmp1            ; remember upper case equivalent
 
 L2:     ldx     tmp1
         cpx     tmp2            ; compare characters
-        bne     NotEqual        ; Jump if strings different
-        txa                     ; End of strings?
-        beq     Equal1          ; Jump if EOS reached, a/x == 0
+        bne     NotEqual        ; jump if strings different
+        txa                     ; end of strings?
+        beq     Equal1          ; jump if EOS reached, a/x == 0
 
 ; Increment the pointers
 
@@ -77,12 +77,12 @@ L2:     ldx     tmp1
         bne     Loop
         inc     ptr1+1
         inc     ptr2+1
-        bne     Loop            ; Branch always
+        bne     Loop            ; branch always
 
 ; Increment hi byte
 
 IncHi:  inc     ptr3+1
-        bne     Comp            ; Jump if counter not zero
+        bne     Comp            ; jump if counter not zero
 
 ; Exit code if strings are equal. a/x not set
 
@@ -94,8 +94,8 @@ Equal1: rts
 
 NotEqual:
         bcs     L3
-        ldx     #$FF            ; Make result negative
+        ldx     #$FF            ; make result negative
         rts
 
-L3:     ldx     #$01            ; Make result positive
+L3:     ldx     #$01            ; make result positive
         rts

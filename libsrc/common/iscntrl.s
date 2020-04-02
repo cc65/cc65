@@ -15,7 +15,7 @@
         .import         ctype_preprocessor
 
 _iscntrl:
-        jsr     ctype_preprocessor      ; (clears always x)
+        jsr     ctype_preprocessor      ; (always clears X)
         bcs     @L1                     ; out of range? (everything already clear -> false)
         and     #CT_CTRL                ; mask control character bit
 @L1:    rts

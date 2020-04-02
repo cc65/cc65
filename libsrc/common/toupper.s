@@ -12,16 +12,17 @@
 
         .export         _toupper
         .include        "ctype.inc"
-        .import         ctype_preprocessor
+        .import         ctype_preprocessor_no_check
 
 _toupper:
-        tay                             ; save char
-        jsr     ctype_preprocessor      ; (always clears X)
-        bcc     @L2                     ; out of range?
-@L1:    tya                             ; if so, return the argument unchanged
+        cpx     #$00            ; out of range?
+        bne     @L2             ; if so, return the argument unchanged
+        tay                     ; save char
+        jsr     ctype_preprocessor_no_check
+        and     #CT_LOWER       ; lower case char?
+        beq     @L1             ; jump if no
+        tya                     ; restore char
+        adc     #<('A'-'a')     ; make upper case char (ctype_preprocessor_no_check ensures carry clear)
         rts
-@L2:    and     #CT_LOWER               ; lower case char?
-        beq     @L1                     ; jump if no
-        tya                             ; restore char
-        adc     #<('A'-'a')             ; make upper case char (ctype_preprocessor ensures carry clear)
-        rts
+@L1:    tya                     ; restore char
+@L2:    rts

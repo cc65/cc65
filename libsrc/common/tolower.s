@@ -1,21 +1,27 @@
+; tolower.s
 ;
-; Ullrich von Bassewitz, 02.06.1998
+; This file is part of
+; cc65 - a freeware C compiler for 6502 based systems
+;
+; https://cc65.github.io
+;
+; See "LICENSE" file for legal information.
 ;
 ; int tolower (int c);
 ;
 
         .export         _tolower
-        .import         __ctype
+        .include        "ctype.inc"
+        .import         ctype_preprocessor
 
 _tolower:
-        cpx     #$00            ; Outside valid range?
-        bne     L9              ; If so, return the argument unchanged
-        tay                     ; Get C into Y
-        lda     __ctype,y       ; Get character classification
-        lsr     a
-        lsr     a               ; Get bit 1 (upper case char) into carry
-        tya                     ; Get char back into A
-        bcc     L9              ; Jump if no upper case char
-        sbc     #<('A'-'a')     ; Make lower case char (carry already set)
-L9:     rts
-
+        tay                             ; save char
+        jsr     ctype_preprocessor      ; (always clears X)
+        bcc     @L2                     ; out of range?
+@L1:    tya                             ; if so, return the argument unchanged
+        rts
+@L2:    and     #CT_UPPER               ; upper case char?
+        beq     @L1                     ; jump if no
+        tya                             ; restore char
+        adc     #<('a'-'A')             ; make lower case char (ctype_preprocessor ensures carry clear)
+        rts

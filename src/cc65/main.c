@@ -289,6 +289,10 @@ static void SetSys (const char* Sys)
             cbmsys ("__CX16__");
             break;
 
+        case TGT_RPC8E:
+            DefineNumericMacro ("__RPC8E__", 1);
+            break;
+
         default:
             AbEnd ("Unknown target system type %d", Target);
     }

@@ -334,6 +334,10 @@ static void SetSys (const char* Sys)
             CBMSystem ("__CX16__");
             break;
 
+        case TGT_RPC8E:
+            NewSymbol ("__RPC8E__", 1);
+            break;
+
         default:
             AbEnd ("Invalid target name: '%s'", Sys);
 

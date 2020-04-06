@@ -1138,6 +1138,9 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
             }
             break;
 
+        case OP65_STP:
+            break;
+
         case OP65_STX:
             if (E->AM == AM65_ZP) {
                 switch (GetKnownReg (E->Chg & REG_ZP, 0)) {

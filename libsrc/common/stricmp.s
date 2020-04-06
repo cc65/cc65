@@ -14,7 +14,7 @@
         .export         _stricmp, _strcasecmp
         .import         popptr1
         .importzp       ptr1, ptr2, tmp1, tmp2
-        .import         ctype_preprocessor_no_check
+        .import         ctypemaskdirect
         .include        "ctype.inc"
 
 _stricmp:
@@ -26,22 +26,20 @@ _strcasecmp:
 
 loop:   lda     (ptr2),y        ; get char from second string
         sta     tmp2            ; and save it
-                                ; get character classification
-        jsr     ctype_preprocessor_no_check
+        jsr     ctypemaskdirect ; get character classification
         and     #CT_LOWER       ; lower case char?
         beq     L1              ; jump if no
         lda     #<('A'-'a')     ; make upper case char
-        adc     tmp2            ; ctype_preprocessor_no_check ensures carry clear!
+        adc     tmp2            ; ctypemaskdirect ensures carry clear!
         sta     tmp2            ; remember upper case equivalent
 
 L1:     lda     (ptr1),y        ; get character from first string
         sta     tmp1
-                                ; get character classification
-        jsr     ctype_preprocessor_no_check
+        jsr     ctypemaskdirect ; get character classification
         and     #CT_LOWER       ; lower case char?
         beq     L2              ; jump if no
         lda     #<('A'-'a')     ; make upper case char
-        adc     tmp1            ; ctype_preprocessor_no_check ensures carry clear!
+        adc     tmp1            ; ctypemaskdirect ensures carry clear!
         sta     tmp1            ; remember upper case equivalent
 
 L2:     ldx     tmp1

@@ -12,10 +12,10 @@
 
         .export         _isalnum
         .include        "ctype.inc"
-        .import         ctype_preprocessor
+        .import         ctypemask
 
 _isalnum:
-        jsr     ctype_preprocessor      ; (clears always x)
+        jsr     ctypemask      ; (always clears X)
         bcs     @L1                     ; out of range? (everything already clear -> false)
         and     #CT_ALNUM               ; mask character/digit bits
 @L1:    rts

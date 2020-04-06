@@ -8,14 +8,14 @@
         .export         _atoi, _atol
         .import         negeax, __ctype
         .importzp       sreg, ptr1, ptr2, tmp1
-        .import         ctype_preprocessor_no_check
+        .import         ctypemaskdirect
         .include        "ctype.inc"
 ;
 ; Conversion routine (32 bit)
 ;
 
 _atoi:
-_atol:  sta     ptr1            ; Store s
+_atol:  sta     ptr1            ; store s
         stx     ptr1+1
         ldy     #0
         sty     ptr2
@@ -26,9 +26,7 @@ _atol:  sta     ptr1            ; Store s
 ; Skip whitespace
 
 L1:     lda     (ptr1),y
-                                ; get character classification
-        jsr     ctype_preprocessor_no_check
-
+        jsr     ctypemaskdirect ; get character classification
         and     #CT_SPACE_TAB   ; tab or space?
         beq     L2              ; jump if no
         iny
@@ -71,7 +69,7 @@ L6:     lda     (ptr1),y        ; get next char
         lda     ptr2+1
         pha
         lda     ptr2
-        pha                     ; Save value
+        pha                     ; save value
 
         jsr     mul2            ; * 4
         jsr     mul2            ; * 8
@@ -118,7 +116,7 @@ L8:     lda     ptr2
 ; Negate the value if necessary, otherwise we're done
 
         ldy     tmp1            ; sign
-        beq     L9              ; Branch if positive
+        beq     L9              ; branch if positive
 
 ; Negate the 32 bit value in ptr2/sreg
 
@@ -133,5 +131,3 @@ mul2:   asl     ptr2
         rol     sreg
         rol     sreg+1          ; * 2
 L9:     rts
-
-

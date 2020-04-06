@@ -1,4 +1,4 @@
-; ctype_preprocessor.s
+; ctypemask.s
 ;
 ; This file is part of
 ; cc65 - a freeware C compiler for 6502 based systems
@@ -7,7 +7,7 @@
 ;
 ; See "LICENSE" file for legal information.
 ;
-; ctype_preprocessor(int c)
+; ctypemask(int c)
 ;
 ; converts a character to test via the is*-functions to the matching ctype-masks 
 ; If c is out of the 8-bit range, the function returns with carry set and accu cleared.
@@ -18,18 +18,18 @@
 ; while calling this function!
 ;
 
-        .export         ctype_preprocessor
-        .export         ctype_preprocessor_no_check
+        .export         ctypemask
+        .export         ctypemaskdirect
         .import         __ctype
-        .import         __ctypeIdx
+        .import         __ctypeidx
 
-ctype_preprocessor:
+ctypemask:
         cpx     #$00            ; char range ok?
         bne     SC              ; branch if not
-ctype_preprocessor_no_check:
+ctypemaskdirect:
         lsr     a
         tax
-        lda     __ctypeIdx, x
+        lda     __ctypeidx,x
         bcc     @lowerNibble
 @upperNibble:
         lsr     a
@@ -38,13 +38,13 @@ ctype_preprocessor_no_check:
         lsr     a
         clc                     ; remove out of bounds flag
 @lowerNibble:
-        and     #%1111
+        and     #%00001111
         tax
-        lda     __ctype, x
-        ldx     #0
+        lda     __ctype,x
+        ldx     #$00
         rts
 
 SC:     sec
-        lda     #0
+        lda     #$00
         tax
         rts

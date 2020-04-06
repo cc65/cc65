@@ -12,13 +12,13 @@
 ; This table is taken from Craig S. Bruce's technical docs. for the ACE OS.
 
         .include        "ctypetable.inc"
-        .export         __ctypeIdx
+        .export         __ctypeidx
         
 ; The tables are readonly, put them into the rodata segment
 
 .rodata
 
-__ctypeIdx:
+__ctypeidx:
         ct_mix  CT_CTRL_IDX, CT_CTRL_IDX                 ;   0/00 ___rvs_@___, 1/01 ___rvs_a___
         ct_mix  CT_CTRL_IDX, CT_CTRL_IDX                 ;   2/02 ___rvs_b___, 3/03 ___rvs_c___
         ct_mix  CT_CTRL_IDX, CT_CTRL_IDX                 ;   4/04 ___rvs_d___, 5/05 ___rvs_e___

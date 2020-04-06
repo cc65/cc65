@@ -12,13 +12,13 @@
 
         .export         _ispunct
         .include        "ctype.inc"
-        .import         ctype_preprocessor
+        .import         ctypemask
 
 _ispunct:
-        jsr     ctype_preprocessor      ; (clears always x)
-        bcs     @L1                     ; out of range? (everything already clear -> false)
-        and     #CT_NOT_PUNCT           ; mask relevant bits
-        cmp     #1                      ; if false, then set "borrow" flag
+        jsr     ctypemask       ; (always clears X)
+        bcs     @L1             ; out of range? (everything already clear -> false)
+        and     #CT_NOT_PUNCT   ; mask relevant bits
+        cmp     #1              ; if false, then set "borrow" flag
         lda     #0
-        sbc     #0                      ; invert logic (return NOT (space | control | digit | alpha))
+        sbc     #0              ; invert logic (return NOT (space | control | digit | alpha))
 @L1:    rts

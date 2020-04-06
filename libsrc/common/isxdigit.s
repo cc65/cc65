@@ -12,10 +12,10 @@
 
         .export         _isxdigit
         .include        "ctype.inc"
-        .import         ctype_preprocessor
+        .import         ctypemask
 
 _isxdigit:
-        jsr     ctype_preprocessor      ; (clears always x)
-        bcs     @L1                     ; out of range? (everything already clear -> false)
-        and     #CT_XDIGIT              ; mask xdigit bit
+        jsr     ctypemask       ; (always clears X)
+        bcs     @L1             ; out of range? (everything already clear -> false)
+        and     #CT_XDIGIT      ; mask xdigit bit
 @L1:    rts

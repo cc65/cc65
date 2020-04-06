@@ -753,7 +753,7 @@ static void ParseSegments (void)
 
                 case CFGTOK_START:
                     FlagAttr (&S->Attr, SA_START, "START");
-                    S->Addr   = CfgCheckedConstExpr (1, 0x1000000);
+                    S->Addr   = CfgCheckedConstExpr (0, 0x1000000);
                     S->Flags |= SF_START;
                     break;
 

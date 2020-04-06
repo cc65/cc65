@@ -12,10 +12,10 @@
 
         .export         _isalpha
         .include        "ctype.inc"
-        .import         ctype_preprocessor
+        .import         ctypemask
 
 _isalpha:
-        jsr     ctype_preprocessor      ; (clears always x)
+        jsr     ctypemask      ; (always clears X)
         bcs     @L1                     ; out of range? (everything already clear -> false)
         and     #CT_ALPHA               ; mask character bits
 @L1:    rts

@@ -11,13 +11,13 @@
 ;
 
         .include        "ctypetable.inc"
-        .export         __ctypeIdx
+        .export         __ctypeidx
 
 ; The tables are readonly, put them into the rodata segment
 
 .rodata
 
-__ctypeIdx:
+__ctypeidx:
 
 .repeat 2       ; 2 times for normal and inverted
 

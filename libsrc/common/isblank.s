@@ -14,10 +14,10 @@
 
         .export         _isblank
         .include        "ctype.inc"
-        .import         ctype_preprocessor
+        .import         ctypemask
 
 _isblank:
-        jsr     ctype_preprocessor      ; (clears always x)
+        jsr     ctypemask      ; (always clears X)
         bcs     @L1                     ; out of range? (everything already clear -> false)
         and     #CT_SPACE_TAB           ; mask blank bit
- @L1:   rts
+@L1:    rts

@@ -16,6 +16,7 @@ Please note:
     at the top of the makefile, specify the system with SYS=<target> on the
     make command line, or set a SYS environment variable.
 
+  * Use "make disk" to build a disk image with all sample programs.
 
 List of supplied sample programs:
 

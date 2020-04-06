@@ -13,13 +13,13 @@
 ; http://lyonlabs.org/commodore/onrequest/geos-manuals/The_Hitchhikers_Guide_to_GEOS.pdf
 
         .include        "ctypetable.inc"
-        .export         __ctypeIdx
+        .export         __ctypeidx
 
 ; The tables are readonly, put them into the rodata segment
 
 .rodata
 
-__ctypeIdx:
+__ctypeidx:
         ct_mix  CT_CTRL_IDX, CT_CTRL_IDX                 ; 0/00 ____NULL___, 1/01 ____N/A____
         ct_mix  CT_CTRL_IDX, CT_CTRL_IDX                 ; 2/02 ____N/A____, 3/03 ____N/A____
         ct_mix  CT_CTRL_IDX, CT_CTRL_IDX                 ; 4/04 ____N/A____, 5/05 ____N/A____

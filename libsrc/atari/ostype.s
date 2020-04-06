@@ -93,7 +93,7 @@ _get_ostype:
         asl     a
         asl     a
         and     #%00111000
-        ora     #%11
+        ora     #%00000011
 _fin:   ldx     #0
         disable_rom_save_a
         rts
@@ -117,7 +117,7 @@ _1200_11:
         lda     #%00010000
 
 _1200_fin:
-        ora     #%010
+        ora     #%00000010
         bne     _fin
 
 ; 400/800 ROM

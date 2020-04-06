@@ -12,10 +12,10 @@
 
         .export         _isupper
         .include        "ctype.inc"
-        .import         ctype_preprocessor
+        .import         ctypemask
 
 _isupper:
-        jsr     ctype_preprocessor      ; (clears always x)
-        bcs     @L1                     ; out of range? (everything already clear -> false)
-        and     #CT_UPPER               ; mask upper char bit
+        jsr     ctypemask       ; (always clears X)
+        bcs     @L1             ; out of range? (everything already clear -> false)
+        and     #CT_UPPER       ; mask upper char bit
 @L1:    rts

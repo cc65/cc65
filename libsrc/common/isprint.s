@@ -12,11 +12,11 @@
 
         .export         _isprint
         .include        "ctype.inc"
-        .import         ctype_preprocessor
+        .import         ctypemask
 
 _isprint:
-        jsr     ctype_preprocessor      ; (clears always x)
-        bcs     @L1                     ; out of range? (everything already clear -> false)
-        eor     #CT_CTRL                ; NOT a control char
-        and     #CT_CTRL                ; mask control char bit
+        jsr     ctypemask       ; (always clears X)
+        bcs     @L1             ; out of range? (everything already clear -> false)
+        eor     #CT_CTRL        ; NOT a control char
+        and     #CT_CTRL        ; mask control char bit
 @L1:    rts

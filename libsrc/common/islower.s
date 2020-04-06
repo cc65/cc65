@@ -12,12 +12,12 @@
 
         .export         _islower
         .include        "ctype.inc"
-        .import         ctype_preprocessor
+        .import         ctypemask
 
 _islower:
-        jsr     ctype_preprocessor      ; (clears always x)
-        bcs     @L1                     ; out of range? (everything already clear -> false)
-        and     #CT_LOWER               ; mask lower char bit
+        jsr     ctypemask       ; (always clears X)
+        bcs     @L1             ; out of range? (everything already clear -> false)
+        and     #CT_LOWER       ; mask lower char bit
 @L1:    rts
 
 

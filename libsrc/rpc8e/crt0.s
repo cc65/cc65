@@ -13,10 +13,15 @@
 .import    copydata, zerobss, initlib, donelib
 
 .include  "zeropage.inc"
+;These are additional zero page variables used for cputc.
+.globalzp  tmp5, ptr5
+tmp5 =  $50
+ptr5 =  $52
 
-.macro MMU     command
-     .byte     $EF
-     .byte     command
+
+.macro SEP30
+     .byte     $E2
+     .byte     $30
 .endmacro
 
 .macro XCE
@@ -33,9 +38,44 @@
 ; ---------------------------------------------------------------------------
 ; A little light 6502 housekeeping
 
-_init:    LDX     #$FF                 ; Initialize stack pointer to $01FF
+_init:    
+		  ;Get the processor into 6502 mode
+		  SEP30
+		  SEC
+		  XCE
+		  LDX     #$FF                 ; Initialize stack pointer to $01FF, actually 2FF because of eloram bug
           TXS
           CLD                          ; Clear decimal mode
+		  lda #$01
+		  pha
+		  lda #$02
+		  pha
+		  lda #$03
+		  pha
+		  
+		  ldx #$04
+		  txa
+		  pha
+		  ldx #$05
+		  txa
+		  pha
+		  ldx #$06
+		  txa
+		  pha
+		  
+		  ldy #$07
+		  tya
+		  pha
+		  ldy #$08
+		  tya
+		  pha
+		  ldy #$09
+		  tya
+		  pha
+
+		  
+		  pha
+		  
 
 ; ---------------------------------------------------------------------------
 ; Set cc65 argument stack pointer

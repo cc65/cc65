@@ -1,0 +1,66 @@
+; void __fastcall__ cputcxy (unsigned char x, unsigned char y, char c);
+; void __fastcall__ cputc (char c);
+;
+		.export         _cputc
+		.import         pusha,pushax,tosaddax,incsp1,incsp2
+		.importzp       sp,tmp5,ptr5
+		
+        .code
+
+; Plot a character - also used as internal function
+
+_cputc:
+        jsr     pusha
+        ldx     #$00
+        lda     $0301
+        jsr     pushax
+        ldx     #$03
+        lda     #$10
+        jsr     tosaddaxTMP5
+        jsr     pushax
+        ldy     #$02
+        ldx     #$00
+        lda     (sp),y
+        ldy     #$00
+        jsr     staspidxTMP5
+        ldx     #$00
+        lda     $0301
+        inc     $0301
+        jsr     incsp1      
+		rts
+
+		
+.proc   staspidxTMP5
+
+        pha
+        sty     tmp5            ; Save Index
+        ldy     #1
+        lda     (sp),y
+        sta     ptr5+1
+        dey
+        lda     (sp),y
+        sta     ptr5            ; Pointer now in ptr1
+        ldy     tmp5            ; Restore offset
+        pla                     ; Restore value
+        sta     (ptr5),y        ; Store
+        jmp     incsp2          ; Drop address
+
+.endproc
+
+tosaddaxTMP5:
+        clc                     ; (2)
+        ldy     #0              ; (4)
+        adc     (sp),y          ; (9) lo byte
+        iny                     ; (11)
+        sta     tmp5            ; (14) save it
+        txa                     ; (16) 
+        adc     (sp),y          ; (21) hi byte
+        tax                     ; (23)
+        clc                     ; (25)
+        lda     sp              ; (28)
+        adc     #2              ; (30)
+        sta     sp              ; (33)
+        bcc     L1              ; (36)
+        inc     sp+1            ; (-1+5)
+L1:     lda     tmp5            ; (39) restore low byte
+        rts                     ; (6502: 45 cycles, 26 bytes <-> 65SC02: 42 cycles, 22 bytes )

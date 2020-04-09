@@ -1,16 +1,18 @@
+
 ; void __fastcall__ cputcxy (unsigned char x, unsigned char y, char c);
 ; void __fastcall__ cputc (char c);
 ;
 		.export         _cputc
-		.import         pusha,pushax,tosaddax,incsp1,incsp2
+		.import         pusha,pushax,tosaddax,incsp1,decsp1,incsp2
 		.importzp       sp,tmp5,ptr5
-		
+
         .code
 
 ; Plot a character - also used as internal function
 
 _cputc:
         jsr     pusha
+		
         ldx     #$00
         lda     $0301
         jsr     pushax
@@ -26,10 +28,11 @@ _cputc:
         ldx     #$00
         lda     $0301
         inc     $0301
-        jsr     incsp1      
+		
+		jsr     incsp1
 		rts
 
-		
+
 .proc   staspidxTMP5
 
         pha
@@ -47,7 +50,7 @@ _cputc:
 
 .endproc
 
-tosaddaxTMP5:
+.proc tosaddaxTMP5
         clc                     ; (2)
         ldy     #0              ; (4)
         adc     (sp),y          ; (9) lo byte
@@ -64,3 +67,5 @@ tosaddaxTMP5:
         inc     sp+1            ; (-1+5)
 L1:     lda     tmp5            ; (39) restore low byte
         rts                     ; (6502: 45 cycles, 26 bytes <-> 65SC02: 42 cycles, 22 bytes )
+		
+.endproc

@@ -7,8 +7,6 @@
 #endif
 extern void __fastcall__ waitTick(void);
 
-register tmp5,ptr5;
-
 #define UINT8_MEMORYROW  (*(unsigned char*)0x0300)
 #define UINT8_CHARX      (*(unsigned char*)0x0301)
 #define UINT8_CHARY      (*(unsigned char*)0x0302)

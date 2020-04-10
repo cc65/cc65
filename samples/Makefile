@@ -6,7 +6,7 @@
 
 # Run 'make SYS=<target>'; or, set a SYS env.
 # var. to build for another target system.
-SYS ?= rpc8e
+SYS ?= c64
 
 # Just the usual way to define a variable
 # containing a single space character.

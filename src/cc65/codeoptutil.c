@@ -52,17 +52,17 @@
 
 
 
-void ClearLoadRegInfo (LoadRegInfo* RI)
+void ClearLoadRegInfo (LoadRegInfo* LRI)
 /* Clear a LoadRegInfo struct */
 {
-    RI->Flags      = LI_NONE;
-    RI->LoadIndex  = -1;
-    RI->LoadEntry  = 0;
-    RI->LoadYIndex = -1;
-    RI->LoadYEntry = 0;
-    RI->XferIndex  = -1;
-    RI->XferEntry  = 0;
-    RI->Offs       = 0;
+    LRI->Flags      = LI_NONE;
+    LRI->LoadIndex  = -1;
+    LRI->LoadEntry  = 0;
+    LRI->LoadYIndex = -1;
+    LRI->LoadYEntry = 0;
+    LRI->ChgIndex   = -1;
+    LRI->ChgEntry   = 0;
+    LRI->Offs       = 0;
 }
 
 
@@ -75,46 +75,52 @@ void CopyLoadRegInfo (LoadRegInfo* To, LoadRegInfo* From)
     To->LoadEntry  = From->LoadEntry;
     To->LoadYIndex = From->LoadYIndex;
     To->LoadYEntry = From->LoadYEntry;
-    To->XferIndex  = From->XferIndex;
-    To->XferEntry  = From->XferEntry;
+    To->ChgIndex   = From->ChgIndex;
+    To->ChgEntry   = From->ChgEntry;
     To->Offs       = From->Offs;
 }
 
 
 
-void FinalizeLoadRegInfo (LoadRegInfo* RI, CodeSeg* S)
+void FinalizeLoadRegInfo (LoadRegInfo* LRI, CodeSeg* S)
 /* Prepare a LoadRegInfo struct for use */
 {
     /* Get the entries */
-    if (RI->LoadIndex >= 0) {
-        RI->LoadEntry = CS_GetEntry (S, RI->LoadIndex);
+    if (LRI->LoadIndex >= 0) {
+        LRI->LoadEntry = CS_GetEntry (S, LRI->LoadIndex);
     } else {
-        RI->LoadEntry = 0;
+        LRI->LoadEntry = 0;
     }
-    if (RI->XferIndex >= 0) {
-        RI->XferEntry = CS_GetEntry (S, RI->XferIndex);
+    if (LRI->LoadYIndex >= 0) {
+        LRI->LoadYEntry = CS_GetEntry (S, LRI->LoadYIndex);
     } else {
-        RI->XferEntry = 0;
+        LRI->LoadYEntry = 0;
     }
+    if (LRI->ChgIndex >= 0) {
+        LRI->ChgEntry = CS_GetEntry (S, LRI->ChgIndex);
+    } else {
+        LRI->ChgEntry = 0;
+    }
+
     /* Load from src not modified before op can be treated as direct */
-    if ((RI->Flags & LI_SRC_CHG) == 0 &&
-        (RI->Flags & (LI_CHECK_ARG | LI_CHECK_Y)) != 0) {
-        RI->Flags |= LI_DIRECT;
-        if ((RI->Flags & LI_CHECK_Y) != 0) {
-            RI->Flags |= LI_RELOAD_Y;
+    if ((LRI->Flags & LI_SRC_CHG) == 0 &&
+        (LRI->Flags & (LI_CHECK_ARG | LI_CHECK_Y)) != 0) {
+        LRI->Flags |= LI_DIRECT;
+        if ((LRI->Flags & LI_CHECK_Y) != 0) {
+            LRI->Flags |= LI_RELOAD_Y;
         }
     }
-    /* We cannot ldy src,y */
-    if ((RI->Flags & LI_RELOAD_Y) != 0          &&
-        RI->LoadYEntry != 0                     &&
-        (RI->LoadYEntry->Use & REG_Y) == REG_Y) {
-        RI->Flags &= ~LI_DIRECT;
+    /* We cannot ldy ??? or ldy src,y */
+    if ((LRI->Flags & LI_CHECK_Y) != 0          &&
+        (LRI->LoadYEntry == 0 ||
+         (LRI->LoadYEntry->Use & REG_Y) == REG_Y)) {
+        LRI->Flags &= ~LI_DIRECT;
     }
 }
 
 
 
-void AdjustLoadRegInfo (LoadRegInfo* RI, int Index, int Change)
+void AdjustLoadRegInfo (LoadRegInfo* LRI, int Index, int Change)
 /* Adjust a load register info struct after deleting or inserting an entry
 ** with a given index
 */
@@ -122,27 +128,37 @@ void AdjustLoadRegInfo (LoadRegInfo* RI, int Index, int Change)
     CHECK (abs (Change) == 1);
     if (Change < 0) {
         /* Deletion */
-        if (Index < RI->LoadIndex) {
-            --RI->LoadIndex;
-        } else if (Index == RI->LoadIndex) {
+        if (Index < LRI->LoadIndex) {
+            --LRI->LoadIndex;
+        } else if (Index == LRI->LoadIndex) {
             /* Has been removed */
-            RI->LoadIndex = -1;
-            RI->LoadEntry = 0;
+            LRI->LoadIndex = -1;
+            LRI->LoadEntry = 0;
         }
-        if (Index < RI->XferIndex) {
-            --RI->XferIndex;
-        } else if (Index == RI->XferIndex) {
+        if (Index < LRI->LoadYIndex) {
+            --LRI->LoadIndex;
+        } else if (Index == LRI->LoadYIndex) {
             /* Has been removed */
-            RI->XferIndex = -1;
-            RI->XferEntry = 0;
+            LRI->LoadYIndex = -1;
+            LRI->LoadYEntry = 0;
+        }
+        if (Index < LRI->ChgIndex) {
+            --LRI->ChgIndex;
+        } else if (Index == LRI->ChgIndex) {
+            /* Has been removed */
+            LRI->ChgIndex = -1;
+            LRI->ChgEntry = 0;
         }
     } else {
         /* Insertion */
-        if (Index <= RI->LoadIndex) {
-            ++RI->LoadIndex;
+        if (Index <= LRI->LoadIndex) {
+            ++LRI->LoadIndex;
         }
-        if (Index <= RI->XferIndex) {
-            ++RI->XferIndex;
+        if (Index <= LRI->LoadYIndex) {
+            ++LRI->LoadYIndex;
+        }
+        if (Index <= LRI->ChgIndex) {
+            ++LRI->ChgIndex;
         }
     }
 }
@@ -191,11 +207,11 @@ void AdjustLoadInfo (LoadInfo* LI, int Index, int Change)
 
 
 RegInfo* GetLastChangedRegInfo (StackOpData* D, LoadRegInfo* Reg)
-/* Get RegInfo of the last load insn entry */
+/* Get RegInfo of the last insn entry that changed the reg */
 {
     CodeEntry* E;
 
-    if (Reg->LoadIndex >= 0 && (E = CS_GetEntry (D->Code, Reg->LoadIndex)) != 0) {
+    if (Reg->ChgIndex >= 0 && (E = CS_GetEntry (D->Code, Reg->ChgIndex)) != 0) {
         return E->RI;
     }
 
@@ -204,82 +220,265 @@ RegInfo* GetLastChangedRegInfo (StackOpData* D, LoadRegInfo* Reg)
 
 
 
-static int Affected (LoadRegInfo* RI, const CodeEntry* E)
-/* Check if the load src may be modified between the pushax and op */
+static int Affected (LoadRegInfo* LRI, const CodeEntry* E)
+/* Check if the result of the same loading code as in LRI may be changed by E */
 {
-    fncls_t      fncls;
-    unsigned int Use;
-    unsigned int Chg;
-    unsigned int UseToCheck = 0;
+    fncls_t         fncls;
+    unsigned int    Use;
+    unsigned int    Chg;
+    unsigned int    UseToCheck = 0;
+    StrBuf          Src, YSrc, New;
+    int             SrcOff = 0, YSrcOff = 0, NewOff = 0;
+    const ZPInfo*   ZI = 0;
 
-    if ((RI->Flags & (LI_CHECK_ARG | LI_CHECK_Y)) != 0) {
-        if (E->AM == AM65_IMM || E->AM == AM65_ACC || E->AM == AM65_IMP || E->AM == AM65_BRA) {
-            return 0;
+    SB_Init (&Src);
+    SB_Init (&YSrc);
+    SB_Init (&New);
+
+    if ((LRI->Flags & (LI_CHECK_ARG | LI_CHECK_Y)) != 0) {
+        if (E->AM == AM65_ACC || E->AM == AM65_BRA || E->AM == AM65_IMM || E->AM == AM65_IMP) {
+            return (LRI->Flags & LI_CHECK_Y) != 0 && (E->Chg & REG_Y) != 0;
         }
-        CHECK ((RI->Flags & LI_CHECK_ARG) == 0 || RI->LoadEntry != 0);
-        CHECK ((RI->Flags & LI_CHECK_Y) == 0   || RI->LoadYEntry != 0);
+        CHECK ((LRI->Flags & LI_CHECK_ARG) == 0 || LRI->LoadIndex < 0  || LRI->LoadEntry != 0);
+        CHECK ((LRI->Flags & LI_CHECK_Y) == 0   || LRI->LoadYIndex < 0 || LRI->LoadYEntry != 0);
 
-        if ((RI->Flags & LI_CHECK_ARG) != 0) {
-            UseToCheck |= RI->LoadEntry->Use;
+        if ((LRI->Flags & LI_CHECK_ARG) != 0) {
+            if (LRI->LoadEntry != 0) {
+                /* We ignore processor flags for loading args.
+                ** Further more, Reg A can't be used as the index.
+                */
+                UseToCheck |= LRI->LoadEntry->Use & ~REG_A & REG_ALL;
+                SB_InitFromString (&Src, xstrdup (LRI->LoadEntry->Arg));
+                if (!ParseOpcArgStr (LRI->LoadEntry->Arg, &Src, &SrcOff)) {
+                    /* Bail out and play it safe*/
+                    goto L_Affected;
+                }
+                ZI = GetZPInfo (SB_GetConstBuf (&Src));
+                if (ZI != 0) {
+                    UseToCheck |= ZI->ByteUse;
+                }
+            } else {
+                /* We don't know what regs could have been used for the src.
+                ** So we just assume all.
+                */
+                UseToCheck |= ~REG_A & REG_ALL;
+            }
         }
 
-        if ((RI->Flags & LI_CHECK_Y) != 0) {
-            UseToCheck |= RI->LoadYEntry->Use;
+        if ((LRI->Flags & LI_CHECK_Y) != 0) {
+            if (LRI->LoadYEntry != 0) {
+                UseToCheck |= LRI->LoadYEntry->Use;
+                SB_InitFromString (&YSrc, xstrdup (LRI->LoadYEntry->Arg));
+                if (!ParseOpcArgStr (LRI->LoadYEntry->Arg, &YSrc, &YSrcOff)) {
+                    /* Bail out and play it safe*/
+                    goto L_Affected;
+                }
+                ZI = GetZPInfo (SB_GetConstBuf (&YSrc));
+                if (ZI != 0) {
+                    UseToCheck |= ZI->ByteUse;
+                }
+            } else {
+                /* We don't know what regs could have been used by Y.
+                ** So we just assume all.
+                */
+                UseToCheck |= ~REG_A & REG_ALL;
+            }
         }
 
         if (E->OPC == OP65_JSR) {
             /* Try to know about the function */
-            fncls = GetFuncInfo (E->Arg, &Use, &Chg);           
+            fncls = GetFuncInfo (E->Arg, &Use, &Chg);
             if ((UseToCheck & Chg & REG_ALL) == 0 &&
                 fncls == FNCLS_BUILTIN) {
                 /* Builtin functions are known to be harmless */
-                return 0;
+                goto L_NotAffected;
             }
             /* Otherwise play it safe */
-            return 1;
-        } else if (E->OPC == OP65_DEC || E->OPC == OP65_INC || 
-                   E->OPC == OP65_ASL || E->OPC == OP65_LSR ||
-                   E->OPC == OP65_ROL || E->OPC == OP65_ROR ||
-                   E->OPC == OP65_TRB || E->OPC == OP65_TSB ||
-                   E->OPC == OP65_STA || E->OPC == OP65_STX || E->OPC == OP65_STY) {
-            if ((E->AM == AM65_ABS || E->AM == AM65_ZP)) {
-                if ((RI->Flags & LI_CHECK_ARG) != 0 && 
-                    strcmp (RI->LoadEntry->Arg, E->Arg) == 0) {
-                    return 1;
+            goto L_Affected;
+
+        } else {
+            if (E->OPC == OP65_DEC || E->OPC == OP65_INC ||
+                E->OPC == OP65_ASL || E->OPC == OP65_LSR ||
+                E->OPC == OP65_ROL || E->OPC == OP65_ROR ||
+                E->OPC == OP65_TRB || E->OPC == OP65_TSB ||
+                E->OPC == OP65_STA || E->OPC == OP65_STX ||
+                E->OPC == OP65_STY || E->OPC == OP65_STZ) {
+
+                SB_InitFromString (&New, xstrdup (E->Arg));
+                if (!ParseOpcArgStr (E->Arg, &New, &NewOff)) {
+                    /* Bail out and play it safe*/
+                    goto L_Affected;
                 }
-                if ((RI->Flags & LI_CHECK_Y) != 0 &&
-                    strcmp (RI->LoadYEntry->Arg, E->Arg) == 0) {
-                    return 1;
+
+                /* These opc may operate on memory locations */
+                if ((E->AM == AM65_ABS || E->AM == AM65_ZP)) {
+                    /* If we don't know what memory locations could have been used for the src,
+                    ** we just assume all.
+                    */
+                    if ((LRI->Flags & LI_CHECK_ARG) != 0) {
+                        if (LRI->LoadEntry == 0                     ||
+                            (LRI->LoadEntry->AM != AM65_ABS &&
+                             LRI->LoadEntry->AM != AM65_ZP  &&
+                             (LRI->LoadEntry->AM != AM65_ZP_INDY ||
+                              SB_CompareStr (&Src, "sp") != 0))     ||
+                            (SB_Compare (&Src, &New) == 0   &&
+                             SrcOff == NewOff)) {
+                            goto L_Affected;
+                        }
+                    }
+
+                    /* If we don't know what memory location could have been used by Y,
+                    ** we just assume all.
+                    */
+                    if ((LRI->Flags & LI_CHECK_Y) != 0) {
+                        if (LRI->LoadYEntry == 0                ||
+                            (LRI->LoadYEntry->AM != AM65_ABS &&
+                             LRI->LoadYEntry->AM != AM65_ZP)    ||
+                            (SB_Compare (&YSrc, &New) == 0   &&
+                             YSrcOff == NewOff)) {
+                            goto L_Affected;
+                        }
+                    }
+
+                    /* Not affected */
+                    goto L_NotAffected;
+
+                } else if (E->AM == AM65_ZP_INDY && SB_CompareStr (&New, "sp") == 0) {
+                    if ((LRI->Flags & LI_CHECK_ARG) != 0) {
+                        if (LRI->LoadEntry == 0                     ||
+                            (LRI->LoadEntry->AM != AM65_ABS &&
+                             LRI->LoadEntry->AM != AM65_ZP  &&
+                             (LRI->LoadEntry->AM != AM65_ZP_INDY ||
+                             SB_Compare (&Src, &New) == 0)  &&
+                             SrcOff == NewOff)) {
+                            goto L_Affected;
+                        }
+                    }
+
+                    /* Not affected */
+                    goto L_NotAffected;
                 }
-                return 0;
+                /* We could've check further for more cases where the load target isn't modified,
+                ** But for now let's save the trouble and just play it safe. */
+                goto L_Affected;
             }
-            /* We could've check further for more cases where the load target isn't modified,
-            ** But for now let's save the trouble and just play it safe. */
-            return 1;
         }
     }
+
+L_NotAffected:
+    SB_Done (&Src);
+    SB_Done (&YSrc);
+    SB_Done (&New);
     return 0;
+
+L_Affected:
+    SB_Done (&Src);
+    SB_Done (&YSrc);
+    SB_Done (&New);
+    return 1;
 }
 
 
 
-static void HonourUseAndChg (LoadRegInfo* RI, unsigned Reg, const CodeEntry* E, int I)
+static void HonourUseAndChg (LoadRegInfo* LRI, unsigned Reg, const CodeEntry* E, int I)
 /* Honour use and change flags for an instruction */
 {
     if ((E->Chg & Reg) != 0) {
-        /* Remember this as an indirect load */
-        ClearLoadRegInfo (RI);
-        RI->LoadIndex = I;
-        RI->XferIndex = -1;
-        RI->Flags = 0;
-    } else if (Affected (RI, E)) {
-        RI->Flags |= LI_SRC_CHG;
+        /* This changes the content of the reg */
+        ClearLoadRegInfo (LRI);
+        LRI->ChgIndex = I;
+        LRI->Flags = 0;
+    } else if (Affected (LRI, E)) {
+        LRI->Flags |= LI_SRC_CHG;
     }
 }
 
 
 
-unsigned int TrackLoads (LoadInfo* LI, LoadInfo* LLI, CodeSeg* S, int I)
+void PrepairLoadRegInfoForArgCheck (CodeSeg* S, LoadRegInfo* LRI, CodeEntry* E)
+/* Set the load src flags and remember to check for load src change if necessary */
+{
+    if (E->AM == AM65_IMM) {
+        /* These insns are all ok and replaceable */
+        LRI->Flags |= LI_DIRECT;
+    } else if (E->AM == AM65_ZP || E->AM == AM65_ABS) {
+        /* These insns are replaceable only if they are not modified later */
+        LRI->Flags |= LI_CHECK_ARG;
+    } else if (E->AM == AM65_ZPY || E->AM == AM65_ABSY) {
+        /* These insns are replaceable only if they are not modified later */
+        LRI->Flags |= LI_CHECK_ARG | LI_CHECK_Y;
+    } else if ((E->AM == AM65_ZP_INDY) &&
+                strcmp (E->Arg, "sp") == 0) {
+        /* A load from the stack with known offset is also ok, but in this
+        ** case we must reload the index register later. Please note that
+        ** a load indirect via other zero page locations is not ok, since
+        ** these locations may change between the push and the actual
+        ** operation.
+        */
+        LRI->Flags |= LI_CHECK_ARG | LI_CHECK_Y;
+    }
+
+    /* If the load offset has a known value, we can just remember and reload
+    ** it into the index register later.
+    */
+    if ((LRI->Flags & LI_CHECK_Y) != 0) {
+        if (RegValIsKnown (E->RI->In.RegY)) {
+            LRI->Offs = (unsigned char)E->RI->In.RegY;
+            LRI->Flags &= ~LI_CHECK_Y;
+            LRI->Flags |= LI_RELOAD_Y;
+        }
+    }
+
+    /* Watch for any change of the load target */
+    if ((LRI->Flags & LI_CHECK_ARG) != 0) {
+        LRI->LoadIndex = CS_GetEntryIndex (S, E);
+        LRI->LoadEntry = E;
+    }
+
+    /* We need to check if the src of Y is changed */
+    if (LRI->LoadYIndex >= 0) {
+        LRI->LoadYEntry = CS_GetEntry (S, LRI->LoadYIndex);
+    } else {
+        LRI->LoadYEntry = 0;
+    }
+}
+
+
+
+void SetIfOperandSrcAffected (LoadInfo* LLI, CodeEntry* E)
+/* Check and flag operand src that may be affected */
+{
+    if (Affected (&LLI->A, E)) {
+        LLI->A.Flags |= LI_SRC_CHG;
+    }
+    if (Affected (&LLI->X, E)) {
+        LLI->X.Flags |= LI_SRC_CHG;
+    }
+    if (Affected (&LLI->Y, E)) {
+        LLI->Y.Flags |= LI_SRC_CHG;
+    }
+}
+
+
+
+void SetIfOperandLoadUnremovable (LoadInfo* LI, unsigned Used)
+/* Check and flag operand load that may be unremovable */
+{
+    /* Disallow removing the loads if the registers are used */
+    if ((Used & REG_A) != 0) {
+        LI->A.Flags |= LI_DONT_REMOVE;
+    }
+    if ((Used & REG_X) != 0) {
+        LI->X.Flags |= LI_DONT_REMOVE;
+    }
+    if ((Used & REG_Y) != 0) {
+        LI->Y.Flags |= LI_DONT_REMOVE;
+    }
+}
+
+
+
+unsigned int TrackLoads (LoadInfo* LI, CodeSeg* S, int I)
 /* Track loads for a code entry.
 ** Return used registers.
 */
@@ -297,33 +496,34 @@ unsigned int TrackLoads (LoadInfo* LI, LoadInfo* LLI, CodeSeg* S, int I)
     */
     if (E->Info & OF_LOAD) {
 
-        LoadRegInfo* RI = 0;
+        LoadRegInfo* LRI = 0;
 
         /* Determine, which register was loaded */
         if (E->Chg & REG_A) {
-            RI = &LI->A;
+            LRI = &LI->A;
         } else if (E->Chg & REG_X) {
-            RI = &LI->X;
+            LRI = &LI->X;
         } else if (E->Chg & REG_Y) {
-            RI = &LI->Y;
+            LRI = &LI->Y;
         }
-        CHECK (RI != 0);
+        CHECK (LRI != 0);
 
         /* Remember the load */
-        RI->LoadIndex = I;
-        RI->XferIndex = -1;
+        LRI->LoadIndex  = I;
+        LRI->ChgIndex   = I;
+        LRI->LoadYIndex = -1;
 
         /* Set load flags */
-        RI->Flags = LI_LOAD_INSN;
+        LRI->Flags = LI_LOAD_INSN;
         if (E->AM == AM65_IMM) {
             /* These insns are all ok and replaceable */
-            RI->Flags |= LI_DIRECT;
+            LRI->Flags |= LI_DIRECT;
         } else if (E->AM == AM65_ZP || E->AM == AM65_ABS) {
             /* These insns are replaceable only if they are not modified later */
-            RI->Flags |= LI_CHECK_ARG;
+            LRI->Flags |= LI_CHECK_ARG;
         } else if (E->AM == AM65_ZPY || E->AM == AM65_ABSY) {
             /* These insns are replaceable only if they are not modified later */
-            RI->Flags |= LI_CHECK_ARG | LI_CHECK_Y;
+            LRI->Flags |= LI_CHECK_ARG | LI_CHECK_Y;
         } else if (E->AM == AM65_ZP_INDY &&
                    strcmp (E->Arg, "sp") == 0) {
             /* A load from the stack with known offset is also ok, but in this
@@ -332,11 +532,11 @@ unsigned int TrackLoads (LoadInfo* LI, LoadInfo* LLI, CodeSeg* S, int I)
             ** these locations may change between the push and the actual
             ** operation.
             */
-            RI->Flags |= LI_DIRECT | LI_CHECK_Y | LI_SP;
+            LRI->Flags |= LI_CHECK_ARG | LI_CHECK_Y | LI_SP;
 
             /* Reg Y can be regarded as unused if this load is removed */
             Used &= ~REG_Y;
-            if (RI == &LI->A) {
+            if (LRI == &LI->A) {
                 LI->Y.Flags |= LI_USED_BY_A;
             } else {
                 LI->Y.Flags |= LI_USED_BY_X;
@@ -346,21 +546,26 @@ unsigned int TrackLoads (LoadInfo* LI, LoadInfo* LLI, CodeSeg* S, int I)
         /* If the load offset has a known value, we can just remember and reload
         ** it into the index register later.
         */
-        if ((RI->Flags & LI_CHECK_Y) != 0) {
+        if ((LRI->Flags & LI_CHECK_Y) != 0) {
             if (RegValIsKnown (E->RI->In.RegY)) {
-                RI->Offs = (unsigned char)E->RI->In.RegY;
-                RI->Flags &= ~LI_CHECK_Y;
-                RI->Flags |= LI_RELOAD_Y;
+                LRI->Offs = (unsigned char)E->RI->In.RegY;
+                LRI->Flags &= ~LI_CHECK_Y;
+                LRI->Flags |= LI_RELOAD_Y;
             } else {
                 /* We need to check if the src of Y is changed */
-                RI->LoadYIndex = LI->Y.LoadIndex;
-                RI->LoadYEntry = CS_GetEntry (S, RI->LoadYIndex);
+                LRI->LoadYIndex = LI->Y.LoadIndex;
             }
         }
 
         /* Watch for any change of the load target */
-        if ((RI->Flags & LI_CHECK_ARG) != 0) {
-            RI->LoadEntry = CS_GetEntry (S, I);
+        if ((LRI->Flags & LI_CHECK_ARG) != 0) {
+            LRI->LoadEntry = CS_GetEntry (S, I);
+        }
+
+        if (LRI->LoadYIndex >= 0) {
+            LRI->LoadYEntry = CS_GetEntry (S, LRI->LoadYIndex);
+        } else {
+            LRI->LoadYEntry = 0;
         }
 
     } else if (E->Info & OF_XFR) {
@@ -376,9 +581,9 @@ unsigned int TrackLoads (LoadInfo* LI, LoadInfo* LLI, CodeSeg* S, int I)
                 Src->Flags |= LI_USED_BY_X;
                 break;
             case OP65_TAY:
-                Src = &LI->A; 
+                Src = &LI->A;
                 Tgt = &LI->Y;
-                Used &= ~REG_A; 
+                Used &= ~REG_A;
                 Src->Flags |= LI_USED_BY_Y;
                 break;
             case OP65_TXA:
@@ -406,7 +611,7 @@ unsigned int TrackLoads (LoadInfo* LI, LoadInfo* LLI, CodeSeg* S, int I)
         Tgt->LoadEntry  = Src->LoadEntry;
         Tgt->LoadYIndex = Src->LoadYIndex;
         Tgt->LoadYEntry = Src->LoadYEntry;
-        Tgt->XferIndex  = I;
+        Tgt->ChgIndex   = I;
         Tgt->Offs       = Src->Offs;
         Tgt->Flags      = Src->Flags;
 
@@ -414,12 +619,12 @@ unsigned int TrackLoads (LoadInfo* LI, LoadInfo* LLI, CodeSeg* S, int I)
 
         /* Both registers set, Y changed */
         LI->A.LoadIndex = I;
-        LI->A.XferIndex = -1;
+        LI->A.ChgIndex  = I;
         LI->A.Flags     = (LI_LOAD_INSN | LI_DIRECT | LI_RELOAD_Y | LI_SP);
         LI->A.Offs      = (unsigned char) E->RI->In.RegY - 1;
 
         LI->X.LoadIndex = I;
-        LI->X.XferIndex = -1;
+        LI->X.ChgIndex  = I;
         LI->X.Flags     = (LI_LOAD_INSN | LI_DIRECT | LI_RELOAD_Y | LI_SP);
         LI->X.Offs      = (unsigned char) E->RI->In.RegY;
 
@@ -431,19 +636,6 @@ unsigned int TrackLoads (LoadInfo* LI, LoadInfo* LLI, CodeSeg* S, int I)
         HonourUseAndChg (&LI->A, REG_A, E, I);
         HonourUseAndChg (&LI->X, REG_X, E, I);
         HonourUseAndChg (&LI->Y, REG_Y, E, I);
-
-        /* The other operand may be affected too */
-        if (LLI != 0) {
-            if (Affected (&LLI->A, E)) {
-                LLI->A.Flags |= LI_SRC_CHG;
-            }
-            if (Affected (&LLI->X, E)) {
-                LLI->X.Flags |= LI_SRC_CHG;
-            }
-            if (Affected (&LLI->Y, E)) {
-                LLI->Y.Flags |= LI_SRC_CHG;
-            }
-        }
     }
 
     return Used;
@@ -451,25 +643,36 @@ unsigned int TrackLoads (LoadInfo* LI, LoadInfo* LLI, CodeSeg* S, int I)
 
 
 
-void SetDontRemoveEntryFlag (LoadRegInfo* RI)
+void SetDontRemoveEntryFlag (LoadRegInfo* LRI)
 /* Flag the entry as non-removable according to register flags */
 {
-    if (RI->Flags & LI_DONT_REMOVE) {
-        if (RI->LoadEntry != 0) {
-            RI->LoadEntry->Flags |= CEF_DONT_REMOVE;
+    if (LRI->Flags & LI_DONT_REMOVE) {
+        if (LRI->LoadEntry != 0) {
+            LRI->LoadEntry->Flags |= CEF_DONT_REMOVE;
+            
+            /* If the load requires Y, then Y shouldn't be removed either */
+            if (LRI->LoadYEntry != 0) {
+                LRI->LoadYEntry->Flags |= CEF_DONT_REMOVE;
+            }
         }
     }
 }
 
 
 
-void ResetDontRemoveEntryFlag (LoadRegInfo* RI)
+void ResetDontRemoveEntryFlag (LoadRegInfo* LRI)
 /* Unflag the entry as non-removable according to register flags */
 {
-    if (RI->Flags & LI_DONT_REMOVE) {
-        if (RI->LoadEntry != 0) {
-            RI->LoadEntry->Flags &= ~CEF_DONT_REMOVE;
-        }
+    if (LRI->LoadEntry != 0) {
+        LRI->LoadEntry->Flags &= ~CEF_DONT_REMOVE;
+    }
+
+    if (LRI->LoadYEntry != 0) {
+        LRI->LoadYEntry->Flags &= ~CEF_DONT_REMOVE;
+    }
+
+    if (LRI->ChgEntry != 0) {
+        LRI->ChgEntry->Flags &= ~CEF_DONT_REMOVE;
     }
 }
 
@@ -480,8 +683,13 @@ void SetDontRemoveEntryFlags (StackOpData* D)
 {
     SetDontRemoveEntryFlag (&D->Lhs.A);
     SetDontRemoveEntryFlag (&D->Lhs.X);
+    SetDontRemoveEntryFlag (&D->Lhs.Y);
     SetDontRemoveEntryFlag (&D->Rhs.A);
     SetDontRemoveEntryFlag (&D->Rhs.X);
+    SetDontRemoveEntryFlag (&D->Rhs.Y);
+    SetDontRemoveEntryFlag (&D->Rv.A);
+    SetDontRemoveEntryFlag (&D->Rv.X);
+    SetDontRemoveEntryFlag (&D->Rv.Y);
 }
 
 
@@ -491,8 +699,13 @@ void ResetDontRemoveEntryFlags (StackOpData* D)
 {
     ResetDontRemoveEntryFlag (&D->Lhs.A);
     ResetDontRemoveEntryFlag (&D->Lhs.X);
+    ResetDontRemoveEntryFlag (&D->Lhs.Y);
     ResetDontRemoveEntryFlag (&D->Rhs.A);
     ResetDontRemoveEntryFlag (&D->Rhs.X);
+    ResetDontRemoveEntryFlag (&D->Rhs.Y);
+    ResetDontRemoveEntryFlag (&D->Rv.A);
+    ResetDontRemoveEntryFlag (&D->Rv.X);
+    ResetDontRemoveEntryFlag (&D->Rv.Y);
 }
 
 
@@ -508,6 +721,7 @@ void ResetStackOpData (StackOpData* Data)
 
     ClearLoadInfo (&Data->Lhs);
     ClearLoadInfo (&Data->Rhs);
+    ClearLoadInfo (&Data->Rv);
 
     Data->PushIndex     = -1;
     Data->OpIndex       = -1;
@@ -881,28 +1095,50 @@ void AddOpHigh (StackOpData* D, opc_t OPC, LoadInfo* LI, int KeepResult)
 void RemoveRegLoads (StackOpData* D, LoadInfo* LI)
 /* Remove register load insns */
 {
-    /* Both registers may be loaded with one insn, but DelEntry will in this
-    ** case clear the other one.
-    */
     if ((LI->A.Flags & LI_REMOVE) == LI_REMOVE) {
         if (LI->A.LoadIndex >= 0 &&
             (LI->A.LoadEntry->Flags & CEF_DONT_REMOVE) == 0) {
             DelEntry (D, LI->A.LoadIndex);
+            LI->A.LoadEntry = 0;
         }
-        if (LI->A.XferIndex >= 0 &&
-            (LI->A.XferEntry->Flags & CEF_DONT_REMOVE) == 0) {
-            DelEntry (D, LI->A.XferIndex);
+        if (LI->A.LoadYIndex >= 0 &&
+            (LI->A.LoadYEntry->Flags & CEF_DONT_REMOVE) == 0) {
+            DelEntry (D, LI->A.LoadYIndex);
+        }
+        if (LI->A.ChgIndex >= 0 &&
+            (LI->A.ChgEntry->Flags & CEF_DONT_REMOVE) == 0) {
+            DelEntry (D, LI->A.ChgIndex);
         }
     }
+
+    if (LI->A.LoadEntry != 0                &&
+        (LI->A.Flags & LI_RELOAD_Y) != 0    &&
+        LI->A.LoadYIndex >= 0) {
+        /* If an entry is using Y and not removed, then its Y load mustn't be removed */
+        LI->A.LoadYEntry->Flags |= CEF_DONT_REMOVE;
+    }
+
     if ((LI->X.Flags & LI_REMOVE) == LI_REMOVE) {
         if (LI->X.LoadIndex >= 0 &&
             (LI->X.LoadEntry->Flags & CEF_DONT_REMOVE) == 0) {
             DelEntry (D, LI->X.LoadIndex);
+            LI->X.LoadEntry = 0;
         }
-        if (LI->X.XferIndex >= 0 &&
-            (LI->X.XferEntry->Flags & CEF_DONT_REMOVE) == 0) {
-            DelEntry (D, LI->X.XferIndex);
+        if (LI->X.LoadYIndex >= 0 &&
+            (LI->X.LoadYEntry->Flags & CEF_DONT_REMOVE) == 0) {
+            DelEntry (D, LI->X.LoadYIndex);
         }
+        if (LI->X.ChgIndex >= 0 &&
+            (LI->X.ChgEntry->Flags & CEF_DONT_REMOVE) == 0) {
+            DelEntry (D, LI->X.ChgIndex);
+        }
+    }
+
+    if (LI->X.LoadEntry != 0                &&
+        (LI->X.Flags & LI_RELOAD_Y) != 0    &&
+        LI->X.LoadYIndex >= 0) {
+        /* If an entry is using Y and not removed, then its Y load mustn't be removed */
+        LI->X.LoadYEntry->Flags |= CEF_DONT_REMOVE;
     }
 }
 
@@ -935,7 +1171,7 @@ int HarmlessCall (const char* Name)
 ** the pushax/op sequence when encountered.
 */
 {
-    const char* const Tab[] = {
+    static const char* const Tab[] = {
         "aslax1",
         "aslax2",
         "aslax3",
@@ -967,6 +1203,8 @@ int HarmlessCall (const char* Name)
         "incax7",
         "incax8",
         "incaxy",
+        "ldaidx",
+        "ldauidx",
         "ldaxidx",
         "ldaxysp",
         "negax",
@@ -991,3 +1229,1821 @@ int HarmlessCall (const char* Name)
 }
 
 
+
+/*****************************************************************************/
+/*                            Load tracking code                             */
+/*****************************************************************************/
+
+
+
+/*****************************************************************************/
+/*                                  Helpers                                  */
+/*****************************************************************************/
+
+
+
+const char* GetZPName (unsigned ZPLoc)
+/* Get the name strings of certain known ZP Regs */
+{
+    if ((ZPLoc & REG_TMP1) != 0) {
+        return "tmp1";
+    }
+    if ((ZPLoc & REG_PTR1_LO) != 0) {
+        return "ptr1";
+    }
+    if ((ZPLoc & REG_PTR1_HI) != 0) {
+        return "ptr1+1";
+    }
+    if ((ZPLoc & REG_PTR2_LO) != 0) {
+        return "ptr2";
+    }
+    if ((ZPLoc & REG_PTR2_HI) != 0) {
+        return "ptr2+1";
+    }
+    if ((ZPLoc & REG_SREG_LO) != 0) {
+        return "sreg";
+    }
+    if ((ZPLoc & REG_SREG_HI) != 0) {
+        return "sreg+1";
+    }
+    if ((ZPLoc & REG_SAVE_LO) != 0) {
+        return "save";
+    }
+    if ((ZPLoc & REG_SAVE_HI) != 0) {
+        return "save+1";
+    }
+    if ((ZPLoc & REG_SP_LO) != 0) {
+        return "sp";
+    }
+    if ((ZPLoc & REG_SP_HI) != 0) {
+        return "sp+1";
+    }
+
+    return 0;
+}
+
+unsigned FindAvailableBackupLoc (BackupInfo* B, unsigned Type)
+/* Find a ZP loc for storing the backup and fill in the info.
+** The allowed types are specified with the Type parameter.
+** For convenience, all types are aloowed if none is specified.
+** Return the type of the found loc.
+*/
+{
+    unsigned SizeType = Type & BU_SIZE_MASK;
+    Type &= BU_TYPE_MASK;
+    if (Type == 0) {
+        Type = BU_TYPE_MASK;
+    }
+
+    if (SizeType == BU_B8 && (Type & BU_REG) != 0 && (B->ZPUsage & REG_Y) == 0) {
+        /* Use the Y Reg only */
+        B->Type = BU_REG | SizeType;
+        B->Where = REG_Y;
+        B->ZPUsage |= REG_Y;
+        return B->Type;
+    }
+
+    if (SizeType == BU_B8 && (Type & BU_ZP) != 0) {
+        /* For now we only check for tmp1 and sreg */
+        if ((B->ZPUsage & REG_TMP1) == 0) {
+            B->Type = BU_ZP | BU_B8;
+            B->Where = REG_TMP1;
+            B->ZPUsage |= REG_TMP1;
+            return B->Type;
+        }
+        if ((B->ZPUsage & REG_SREG_LO) == 0) {
+            B->Type = BU_ZP | BU_B8;
+            B->Where = REG_SREG_LO;
+            B->ZPUsage |= REG_SREG_LO;
+            return B->Type;
+        }
+        if ((B->ZPUsage & REG_SREG_HI) == 0) {
+            B->Type = BU_ZP | BU_B8;
+            B->Where = REG_SREG_HI;
+            B->ZPUsage |= REG_SREG_HI;
+            return B->Type;
+        }
+    }
+
+    if (SizeType == BU_B16 && (Type & BU_ZP) != 0) {
+        /* For now we only check for ptr1, sreg and ptr2 */
+        if ((B->ZPUsage & REG_PTR1) == 0) {
+            B->Type = BU_ZP | BU_B16;
+            B->Where = REG_PTR1;
+            B->ZPUsage |= REG_PTR1;
+            return B->Type;
+        }
+        if ((B->ZPUsage & REG_SREG) == 0) {
+            B->Type = BU_ZP | BU_B16;
+            B->Where = REG_SREG;
+            B->ZPUsage |= REG_SREG;
+            return B->Type;
+        }
+        if ((B->ZPUsage & REG_PTR2) == 0) {
+            B->Type = BU_ZP | BU_B16;
+            B->Where = REG_PTR2;
+            B->ZPUsage |= REG_PTR2;
+            return B->Type;
+        }
+    }
+
+    if (SizeType == BU_B24 && (Type & BU_ZP) != 0) {
+        /* For now we only check for certain combinations of
+        ** tmp1 + (ptr1, sreg or ptr2).
+        */
+        if ((B->ZPUsage & (REG_TMP1 | REG_PTR1)) == 0) {
+            B->Type = BU_ZP | BU_B24;
+            B->Where = REG_TMP1 | REG_PTR1;
+            B->ZPUsage |= REG_TMP1 | REG_PTR1;
+            return B->Type;
+        }
+        if ((B->ZPUsage & (REG_TMP1 | REG_SREG)) == 0) {
+            B->Type = BU_ZP | BU_B24;
+            B->Where = REG_TMP1 | REG_SREG;
+            B->ZPUsage |= REG_TMP1 | REG_SREG;
+            return B->Type;
+        }
+        if ((B->ZPUsage & (REG_TMP1 | REG_PTR2)) == 0) {
+            B->Type = BU_ZP | BU_B24;
+            B->Where = REG_TMP1 | REG_PTR2;
+            B->ZPUsage |= REG_TMP1 | REG_PTR2;
+            return B->Type;
+        }
+    }
+
+    if (SizeType < BU_B32 && (Type & BU_SP6502) != 0) {
+        /* Even for BU_B24, we just push/pop all 3 of AXY */
+        B->Type = BU_SP6502 | BU_B16;
+        B->Where = 0;
+        return B->Type;
+    }
+
+    if (SizeType != BU_B24 && SizeType <= BU_B32 && (Type & BU_SP) != 0) {
+        /* We may also use pusha/popa, pushax/popax and pusheax/popeax */
+        B->Type = BU_SP | SizeType;
+        B->Where = 0;
+        return B->Type;
+    }
+
+    /* No available */
+    return BU_UNKNOWN;
+}
+
+
+
+void AdjustEntryIndices (Collection* Indices, int Index, int Change)
+/* Adjust a load register info struct after deleting or inserting successive
+** entries with a given index.
+*/
+{
+    int I;
+    int* IndexPtr;
+
+    if (Change > 0) {
+        /* Insertion */
+        for (I = 0; I < (int)CollCount (Indices); ++I) {
+            IndexPtr = CollAtUnchecked (Indices, I);
+            if (Index <= *IndexPtr) {
+                *IndexPtr += Change;
+            }
+        }
+    } else if (Change < 0) {
+        /* Deletion */
+        for (I = 0; I < (int)CollCount (Indices); ++I) {
+            IndexPtr = CollAtUnchecked (Indices, I);
+            if (Index <= *IndexPtr + Change) {
+                *IndexPtr += Change;
+            } else if (Index <= *IndexPtr) {
+                /* Has been removed */
+                *IndexPtr = -1;
+                //CollDelete (Indices, I);
+                --I;
+            }
+        }
+    }
+}
+
+
+
+void DelEntryIdx (CodeSeg* S, int Idx, Collection* Indices)
+/* Delete an entry and adjust Indices if necessary */
+{
+    CS_DelEntry (S, Idx);
+    AdjustEntryIndices (Indices, Idx, -1);
+}
+
+
+
+void DelEntriesIdx (CodeSeg* S, int Idx, int Count, Collection* Indices)
+/* Delete entries and adjust Indices if necessary */
+{
+    CS_DelEntries (S, Idx, Count);
+    AdjustEntryIndices (Indices, Idx, -Count);
+}
+
+
+
+void RemoveFlaggedRegLoads (CodeSeg* S, LoadRegInfo* LRI, Collection* Indices)
+/* Remove flagged register load insns */
+{
+    if ((LRI->Flags & LI_REMOVE) == LI_REMOVE) {
+        if (LRI->LoadIndex >= 0 &&
+            (LRI->LoadEntry->Flags & CEF_DONT_REMOVE) == 0) {
+            DelEntryIdx (S, LRI->LoadIndex, Indices);
+            LRI->LoadEntry = 0;
+        }
+        if (LRI->LoadYIndex >= 0 &&
+            (LRI->LoadYEntry->Flags & CEF_DONT_REMOVE) == 0) {
+            DelEntryIdx (S, LRI->LoadYIndex, Indices);
+        }
+        if (LRI->ChgIndex >= 0 &&
+            (LRI->ChgEntry->Flags & CEF_DONT_REMOVE) == 0) {
+            DelEntryIdx (S, LRI->ChgIndex, Indices);
+        }
+    }
+
+    if (LRI->LoadEntry != 0 &&
+        (LRI->Flags & LI_RELOAD_Y) != 0 &&
+        LRI->LoadYIndex >= 0) {
+        /* If an entry is using Y and not removed, then its Y load mustn't be removed */
+        LRI->LoadYEntry->Flags |= CEF_DONT_REMOVE;
+    }
+}
+
+
+void RemoveFlaggedLoads (CodeSeg* S, LoadInfo* LI, Collection* Indices)
+/* Remove flagged load insns */
+{
+    RemoveFlaggedRegLoads (S, &LI->A, Indices);
+    RemoveFlaggedRegLoads (S, &LI->X, Indices);
+    RemoveFlaggedRegLoads (S, &LI->Y, Indices);
+}
+
+
+
+static int BackupAAt (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices, int After)
+/* Backup the content of A Before or After the specified index Idx depending on the After param */
+{
+    CodeEntry* E;
+    CodeEntry* X;
+    int OldIdx;
+
+    /* Adjust the insertion point if necessary */
+    if (After) {
+        ++Idx;
+    }
+    OldIdx = Idx;
+
+    /* Cannot insert after the last insn */
+    CHECK ((unsigned)Idx < CollCount (&S->Entries));
+
+    /* Get the entry at Idx */
+    E = CS_GetEntry (S, Idx);
+
+    if (E->RI != 0 && RegValIsKnown (E->RI->In.RegA)) {
+        /* Just memorize the value */
+        B->Type = BU_IMM | BU_B8;
+        B->Imm = E->RI->In.RegA;
+
+    } else {
+        FindAvailableBackupLoc (B, BU_B8);
+        switch (B->Type & BU_TYPE_MASK) {
+        case BU_REG:
+            if ((B->Where & REG_X) != 0) {
+                X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+                break;
+            } else if ((B->Where & REG_Y) != 0) {
+                X = NewCodeEntry (OP65_TAY, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+                break;
+            }
+            break;
+
+        case BU_ZP:
+            X = NewCodeEntry (OP65_STA, AM65_ZP, GetZPName (B->Where), 0, E->LI);
+            CS_InsertEntry (S, X, Idx++);
+           break;
+
+        case BU_SP6502:
+            X = NewCodeEntry (OP65_PHA, AM65_IMP, 0, 0, E->LI);
+            CS_InsertEntry (S, X, Idx++);
+            break;
+
+        case BU_SP:
+            if ((B->ZPUsage & REG_Y) == 0) {
+                X = NewCodeEntry (OP65_JSR, AM65_ABS, "pusha", 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+                break;
+            }
+
+            /* Unable to do backup */
+            return 0;
+
+        default:
+            /* Unable to do backup */
+            return 0;
+        }
+    }
+
+    /* Adjust all indices at once */
+    AdjustEntryIndices (Indices, OldIdx, Idx - OldIdx);
+
+    /* Move labels if it was an insertion before Idx */
+    if (!After) {
+        CS_MoveLabels (S, E, CS_GetEntry (S, OldIdx));
+    }
+
+    /* Done */
+    return 1;
+}
+
+
+
+static int BackupXAt (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices, int After)
+/* Backup the content of X before or after the specified index Idx depending on the param After */
+{
+    CodeEntry* E;
+    CodeEntry* X;
+    int OldIdx;
+
+    /* Adjust the insertion point if necessary */
+    if (After) {
+        ++Idx;
+    }
+    OldIdx = Idx;
+
+    /* Cannot insert after the last insn */
+    CHECK ((unsigned)Idx < CollCount (&S->Entries));
+
+    /* Get the entry at Idx */
+    E = CS_GetEntry (S, Idx);
+
+    if (E->RI != 0 && RegValIsKnown (E->RI->In.RegX)) {
+        /* Just memorize the value */
+        B->Type = BU_IMM | BU_B8;
+        B->Imm = E->RI->In.RegX;
+
+    } else {
+        FindAvailableBackupLoc (B, BU_B8);
+        switch (B->Type & BU_TYPE_MASK) {
+        case BU_ZP:
+            X = NewCodeEntry (OP65_STX, AM65_ZP, GetZPName(B->Where), 0, E->LI);
+            CS_InsertEntry (S, X, Idx++);
+           break;
+
+        case BU_SP6502:
+            if ((B->ZPUsage & REG_A) == 0) {
+                X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+                X = NewCodeEntry (OP65_PHA, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+                break;
+            }
+
+            /* Unable to do backup */
+            return 0;
+
+        case BU_SP:
+            if ((B->ZPUsage & REG_A) == 0) {
+                X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+                X = NewCodeEntry (OP65_JSR, AM65_ABS, "pusha", 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+                break;
+            }
+
+            /* Unable to do backup */
+            return 0;
+
+        case BU_REG:
+            /* Fallthrough */
+        default:
+
+            /* Unable to do backup */
+            return 0;
+        }
+    }
+
+    /* Adjust all indices at once */
+    AdjustEntryIndices (Indices, OldIdx, Idx - OldIdx);
+
+    /* Move labels if it was an insertion before Idx */
+    if (!After) {
+        CS_MoveLabels (S, E, CS_GetEntry (S, OldIdx));
+    }
+
+    /* Done */
+    return 1;
+}
+
+
+
+static int BackupYAt (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices, int After)
+/* Backup the content of Y before or after the specified index Idx depending on the param After */
+{
+    CodeEntry* E;
+    CodeEntry* X;
+    int OldIdx;
+
+    /* Adjust the insertion point if necessary */
+    if (After) {
+        ++Idx;
+    }
+    OldIdx = Idx;
+
+    /* Cannot insert after the last insn */
+    CHECK ((unsigned)Idx < CollCount (&S->Entries));
+
+    /* Get the entry at Idx */
+    E = CS_GetEntry (S, Idx);
+
+    if (E->RI != 0 && RegValIsKnown (E->RI->In.RegY)) {
+        /* Just memorize the value */
+        B->Type = BU_IMM | BU_B8;
+        B->Imm = E->RI->In.RegY;
+
+    } else {
+        FindAvailableBackupLoc (B, BU_B8);
+        switch (B->Type & BU_TYPE_MASK) {
+        case BU_ZP:
+            X = NewCodeEntry (OP65_STY, AM65_ZP, GetZPName(B->Where), 0, E->LI);
+            CS_InsertEntry (S, X, Idx++);
+           break;
+
+        case BU_SP6502:
+            if ((B->ZPUsage & REG_A) == 0) {
+                X = NewCodeEntry (OP65_TYA, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+                X = NewCodeEntry (OP65_PHA, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+                break;
+            }
+
+            /* Unable to do backup */
+            return 0;
+
+        case BU_SP:
+            if ((B->ZPUsage & REG_A) == 0) {
+                X = NewCodeEntry (OP65_TYA, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+                X = NewCodeEntry (OP65_JSR, AM65_ABS, "pusha", 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+                break;
+            }
+
+            /* Unable to do backup */
+            return 0;
+
+        case BU_REG:
+            /* Fallthrough */
+        default:
+
+            /* Unable to do backup */
+            return 0;
+        }
+    }
+
+    /* Adjust all indices at once */
+    AdjustEntryIndices (Indices, OldIdx, Idx - OldIdx);
+
+    /* Move labels if it was an insertion before Idx */
+    if (!After) {
+        CS_MoveLabels (S, E, CS_GetEntry (S, OldIdx));
+    }
+
+    /* Done */
+    return 1;
+}
+
+
+
+static int BackupAXAt (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices, int After)
+/* Backup the content of AX Before or After the specified index Idx depending on the After param */
+{
+    CodeEntry* E;
+    CodeEntry* X;
+    int OldIdx;
+    StrBuf Arg;
+
+    SB_Init (&Arg);
+
+    /* Adjust the insertion point if necessary */
+    if (After) {
+        ++Idx;
+    }
+    OldIdx = Idx;
+
+    /* Cannot insert after the last insn */
+    CHECK ((unsigned)Idx < CollCount (&S->Entries));
+
+    /* Get the entry at Idx */
+    E = CS_GetEntry (S, Idx);
+
+    if (E->RI != 0 && RegValIsKnown (E->RI->In.RegA) && RegValIsKnown (E->RI->In.RegX)) {
+        /* Just memorize the value */
+        B->Type = BU_IMM | BU_B16;
+        B->Imm = E->RI->In.RegA | (E->RI->In.RegX << 8);
+
+    } else {
+        FindAvailableBackupLoc (B, BU_B16);
+        switch (B->Type & BU_TYPE_MASK) {
+        case BU_ZP:
+            SB_AppendStr (&Arg, GetZPName (B->Where));
+            SB_Terminate (&Arg);
+            X = NewCodeEntry (OP65_STA, AM65_ZP, SB_GetConstBuf (&Arg), 0, E->LI);
+            CS_InsertEntry (S, X, Idx++);
+            SB_AppendStr (&Arg, "+1");
+            SB_Terminate (&Arg);
+            X = NewCodeEntry (OP65_STX, AM65_ZP, SB_GetConstBuf (&Arg), 0, E->LI);
+            CS_InsertEntry (S, X, Idx++);
+            break;
+
+        case BU_SP6502:
+            if ((B->ZPUsage & REG_A) == 0) {
+                X = NewCodeEntry (OP65_PHA, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+                X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+                X = NewCodeEntry (OP65_PHA, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+                break;
+            }
+
+            /* Unable to do backup */
+            return 0;
+
+        case BU_SP:
+            if ((B->ZPUsage & REG_Y) == 0) {
+                X = NewCodeEntry (OP65_JSR, AM65_ABS, "pushax", 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+                break;
+            }
+
+            /* Unable to do backup */
+            return 0;
+
+        case BU_REG:
+            /* Fallthrough */
+
+        default:
+            /* Unable to do backup */
+            return 0;
+        }
+    }
+
+    /* Adjust all indices at once */
+    AdjustEntryIndices (Indices, OldIdx, Idx - OldIdx);
+
+    /* Move labels if it was an insertion before Idx */
+    if (!After) {
+        CS_MoveLabels (S, E, CS_GetEntry (S, OldIdx));
+    }
+
+    SB_Done (&Arg);
+
+    /* Done */
+    return 1;
+}
+
+
+
+static int BackupAXYAt (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices, int After)
+/* Backup the content of AXY before or after the specified index Idx depending on the param After.
+** This doesn't allow separating the backup of Y from that of AX for now.
+*/
+{
+    CodeEntry* E;
+    CodeEntry* X;
+    int OldIdx;
+    StrBuf Arg;
+
+    SB_Init (&Arg);
+
+    /* Adjust the insertion point if necessary */
+    if (After) {
+        ++Idx;
+    }
+    OldIdx = Idx;
+
+    /* Cannot insert after the last insn */
+    CHECK ((unsigned)Idx < CollCount (&S->Entries));
+
+    /* Get the entry at Idx */
+    E = CS_GetEntry (S, Idx);
+
+    if (E->RI != 0 &&
+        RegValIsKnown (E->RI->In.RegA) &&
+        RegValIsKnown (E->RI->In.RegX) &&
+        RegValIsKnown (E->RI->In.RegY)) {
+        /* Just memorize the value */
+        B->Type = BU_IMM | BU_B24;
+        B->Imm = E->RI->In.RegA | (E->RI->In.RegX << 8) | (E->RI->In.RegY << 16);
+
+    } else {
+        FindAvailableBackupLoc (B, BU_B24);
+        switch (B->Type & BU_TYPE_MASK) {
+        case BU_ZP:
+            CHECK ((B->Where & REG_TMP1) != 0);
+            SB_AppendStr (&Arg, GetZPName (B->Where & ~REG_TMP1));
+            SB_Terminate (&Arg);
+            X = NewCodeEntry (OP65_STA, AM65_ZP, SB_GetConstBuf (&Arg), 0, E->LI);
+            CS_InsertEntry (S, X, Idx++);
+            SB_AppendStr (&Arg, "+1");
+            SB_Terminate (&Arg);
+            X = NewCodeEntry (OP65_STX, AM65_ZP, SB_GetConstBuf (&Arg), 0, E->LI);
+            CS_InsertEntry (S, X, Idx++);
+            X = NewCodeEntry (OP65_STY, AM65_ZP, GetZPName (B->Where & REG_TMP1), 0, E->LI);
+            CS_InsertEntry(S, X, Idx++);
+            break;
+
+        case BU_SP6502:
+            if ((B->ZPUsage & REG_A) == 0) {
+                X = NewCodeEntry (OP65_PHA, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+                X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+                X = NewCodeEntry (OP65_PHA, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+                X = NewCodeEntry (OP65_TYA, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+                X = NewCodeEntry (OP65_PHA, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+                break;
+            }
+
+            /* Unable to do backup */
+            return 0;
+
+        case BU_SP:
+            if ((B->ZPUsage & REG_AY) == 0) {
+                X = NewCodeEntry (OP65_JSR, AM65_ABS, "pushax", 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+                X = NewCodeEntry (OP65_TYA, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+                X = NewCodeEntry (OP65_JSR, AM65_ABS, "pusha", 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+                break;
+            }
+
+            /* Unable to do backup */
+            return 0;
+
+        case BU_REG:
+            /* Fallthrough */
+
+        default:
+            /* Unable to do backup */
+            return 0;
+        }
+    }
+
+    /* Adjust all indices at once */
+    AdjustEntryIndices (Indices, OldIdx, Idx - OldIdx);
+
+    /* Move labels if it was an insertion before Idx */
+    if (!After) {
+        CS_MoveLabels (S, E, CS_GetEntry (S, OldIdx));
+    }
+
+    SB_Done (&Arg);
+
+    /* Done */
+    return 1;
+}
+
+
+
+int BackupABefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
+/* Backup the content of A Before the specified index Idx */
+{
+    return BackupAAt (S, B, Idx, Indices, 0);
+}
+
+
+
+int BackupXBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
+/* Backup the content of X before the specified index Idx */
+{
+    return BackupXAt (S, B, Idx, Indices, 0);
+}
+
+
+
+int BackupYBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
+/* Backup the content of Y before the specified index Idx */
+{
+    return BackupYAt (S, B, Idx, Indices, 0);
+}
+
+
+
+int BackupAXBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
+/* Backup the content of AX before the specified index Idx */
+{
+    return BackupAXAt (S, B, Idx, Indices, 0);
+}
+
+
+
+int BackupAXYBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
+/* Backup the content of AXY before the specified index Idx.
+** This doesn't allow separating the backup of Y from that of AX for now.
+*/
+{
+    return BackupAXYAt (S, B, Idx, Indices, 0);
+}
+
+
+
+int BackupAAfter (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
+/* Backup the content of A after the specified index Idx */
+{
+    return BackupAAt (S, B, Idx, Indices, 1);
+}
+
+
+
+int BackupXAfter (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
+/* Backup the content of X after the specified index Idx */
+{
+    return BackupXAt (S, B, Idx, Indices, 1);
+}
+
+
+
+int BackupYAfter (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
+/* Backup the content of Y after the specified index Idx */
+{
+    return BackupYAt (S, B, Idx, Indices, 1);
+}
+
+
+
+int BackupAXAfter (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
+/* Backup the content of AX after the specified index Idx */
+{
+    return BackupAXAt (S, B, Idx, Indices, 1);
+}
+
+
+
+int BackupAXYAfter (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
+/* Backup the content of AXY after the specified index Idx.
+** This doesn't allow separating the backup of Y from that of AX for now.
+*/
+{
+    return BackupAXYAt (S, B, Idx, Indices, 1);
+}
+
+
+
+int RestoreABefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
+/* Restore the content of Y before the specified index Idx */
+{
+    CodeEntry* E;
+    CodeEntry* X;
+    int OldIdx = Idx;
+
+    /* Get the entry at Idx */
+    E = CS_GetEntry (S, Idx);
+
+    switch (B->Type & BU_TYPE_MASK) {
+    case BU_IMM:
+        /* Just use the memorized value */
+        X = NewCodeEntry (OP65_LDA, AM65_IMM, MakeHexArg (B->Imm & 0xFF), 0, E->LI);
+        CS_InsertEntry (S, X, Idx++);
+        break;
+
+    case BU_REG:
+        if ((B->Where & REG_X) != 0) {
+            X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, E->LI);
+            CS_InsertEntry (S, X, Idx++);
+        } else if ((B->Where & REG_Y) != 0) {
+            X = NewCodeEntry (OP65_TYA, AM65_IMP, 0, 0, E->LI);
+            CS_InsertEntry (S, X, Idx++);
+        }
+        break;
+
+    case BU_ZP:
+        X = NewCodeEntry (OP65_LDA, AM65_ZP, GetZPName (B->Where), 0, E->LI);
+        CS_InsertEntry (S, X, Idx++);
+        break;
+
+    case BU_SP6502:
+        X = NewCodeEntry (OP65_PLA, AM65_IMP, 0, 0, E->LI);
+        CS_InsertEntry (S, X, Idx++);
+        break;
+
+    case BU_SP:
+        if ((B->ZPUsage & REG_Y) == 0) {
+            X = NewCodeEntry (OP65_JSR, AM65_ABS, "popa", 0, E->LI);
+            CS_InsertEntry (S, X, Idx++);
+            break;
+        }
+
+        /* Unable to restore */
+        return 0;
+
+    default:
+        /* Unable to restore */
+        return 0;
+    }
+
+    /* Adjust all indices at once */
+    AdjustEntryIndices (Indices, OldIdx, Idx - OldIdx);
+
+    /* Done */
+    return 1;
+}
+
+
+
+int RestoreXBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
+/* Restore the content of X before the specified index Idx */
+{
+    CodeEntry* E;
+    CodeEntry* X;
+    int OldIdx = Idx;
+
+    /* Get the entry at Idx */
+    E = CS_GetEntry (S, Idx);
+
+    switch (B->Type & BU_TYPE_MASK) {
+    case BU_IMM:
+        /* Just use the memorized value */
+        X = NewCodeEntry (OP65_LDX, AM65_IMM, MakeHexArg (B->Imm & 0xFF), 0, E->LI);
+        CS_InsertEntry (S, X, Idx++);
+        break;
+
+    case BU_REG:
+        if ((B->Where & REG_A) != 0) {
+            X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, E->LI);
+            CS_InsertEntry (S, X, Idx++);
+        } else if ((B->Where & REG_Y) != 0) {
+            if ((B->ZPUsage & REG_A) == 0) {
+                X = NewCodeEntry (OP65_PHA, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+            }
+            X = NewCodeEntry (OP65_TYA, AM65_IMP, 0, 0, E->LI);
+            CS_InsertEntry (S, X, Idx++);
+            X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, E->LI);
+            CS_InsertEntry (S, X, Idx++);
+            if ((B->ZPUsage & REG_A) == 0) {
+                X = NewCodeEntry (OP65_PLA, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+            }
+        }
+        break;
+
+    case BU_ZP:
+        X = NewCodeEntry (OP65_LDX, AM65_ZP, GetZPName (B->Where), 0, E->LI);
+        CS_InsertEntry (S, X, Idx++);
+        break;
+
+    case BU_SP6502:
+        if ((B->ZPUsage & REG_A) == 0) {
+            X = NewCodeEntry (OP65_PLA, AM65_IMP, 0, 0, E->LI);
+            CS_InsertEntry (S, X, Idx++);
+            X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, E->LI);
+            CS_InsertEntry (S, X, Idx++);
+            break;
+        }
+
+        /* Unable to restore */
+        return 0;
+
+    case BU_SP:
+        if ((B->ZPUsage & REG_A) == 0) {
+            X = NewCodeEntry (OP65_JSR, AM65_ABS, "popa", 0, E->LI);
+            CS_InsertEntry (S, X, Idx++);
+            X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, E->LI);
+            CS_InsertEntry (S, X, Idx++);
+            break;
+        }
+
+        /* Unable to restore */
+        return 0;
+
+    default:
+        /* Unable to restore */
+        return 0;
+    }
+
+    /* Adjust all indices at once */
+    AdjustEntryIndices (Indices, OldIdx, Idx - OldIdx);
+
+    /* Done */
+    return 1;
+}
+
+
+
+int RestoreYBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
+/* Restore the content of Y before the specified index Idx */
+{
+    CodeEntry* E;
+    CodeEntry* X;
+    int OldIdx = Idx;
+
+    /* Get the entry at Idx */
+    E = CS_GetEntry (S, Idx);
+
+    switch (B->Type & BU_TYPE_MASK) {
+    case BU_IMM:
+        /* Just use the memorized value */
+        X = NewCodeEntry (OP65_LDY, AM65_IMM, MakeHexArg (B->Imm & 0xFF), 0, E->LI);
+        CS_InsertEntry (S, X, Idx++);
+        break;
+
+    case BU_REG:
+        if ((B->Where & REG_A) != 0) {
+            X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, E->LI);
+            CS_InsertEntry (S, X, Idx++);
+        } else if ((B->Where & REG_X) != 0) {
+            if ((B->ZPUsage & REG_A) == 0) {
+                X = NewCodeEntry (OP65_PHA, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+            }
+            X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, E->LI);
+            CS_InsertEntry (S, X, Idx++);
+            X = NewCodeEntry (OP65_TAY, AM65_IMP, 0, 0, E->LI);
+            CS_InsertEntry (S, X, Idx++);
+            if ((B->ZPUsage & REG_A) == 0) {
+                X = NewCodeEntry (OP65_PLA, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+            }
+        }
+        break;
+
+    case BU_ZP:
+        X = NewCodeEntry (OP65_LDY, AM65_ZP, GetZPName (B->Where), 0, E->LI);
+        CS_InsertEntry (S, X, Idx++);
+        break;
+
+    case BU_SP6502:
+        if ((B->ZPUsage & REG_A) == 0) {
+            X = NewCodeEntry (OP65_PLA, AM65_IMP, 0, 0, E->LI);
+            CS_InsertEntry (S, X, Idx++);
+            X = NewCodeEntry (OP65_TAY, AM65_IMP, 0, 0, E->LI);
+            CS_InsertEntry (S, X, Idx++);
+            break;
+        }
+
+        /* Unable to restore */
+        return 0;
+
+    case BU_SP:
+        if ((B->ZPUsage & REG_A) == 0) {
+            X = NewCodeEntry (OP65_JSR, AM65_ABS, "popa", 0, E->LI);
+            CS_InsertEntry (S, X, Idx++);
+            X = NewCodeEntry (OP65_TAY, AM65_IMP, 0, 0, E->LI);
+            CS_InsertEntry (S, X, Idx++);
+            break;
+        }
+
+        /* Unable to restore */
+        return 0;
+
+    default:
+        /* Unable to restore */
+        return 0;
+    }
+
+    /* Adjust all indices at once */
+    AdjustEntryIndices (Indices, OldIdx, Idx - OldIdx);
+
+    /* Done */
+    return 1;
+}
+
+
+
+int RestoreAXBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
+/* Restore the content of AX before the specified index Idx */
+{
+    CodeEntry* E;
+    CodeEntry* X;
+    StrBuf Arg;
+    int OldIdx = Idx;
+
+    SB_Init (&Arg);
+
+    /* Get the entry at Idx */
+    E = CS_GetEntry (S, Idx);
+
+    switch (B->Type & BU_TYPE_MASK) {
+    case BU_REG:
+        /* Just use the memorized value */
+        X = NewCodeEntry (OP65_LDA, AM65_IMM, MakeHexArg (B->Imm & 0xFF), 0, E->LI);
+        CS_InsertEntry (S, X, Idx++);
+        X = NewCodeEntry (OP65_LDX, AM65_IMM, MakeHexArg ((B->Imm >> 8) & 0xFF), 0, E->LI);
+        CS_InsertEntry (S, X, Idx++);
+        break;
+
+    case BU_ZP:
+        SB_AppendStr (&Arg, GetZPName (B->Where));
+        SB_Terminate (&Arg);
+        X = NewCodeEntry (OP65_LDA, AM65_ZP, SB_GetConstBuf (&Arg), 0, E->LI);
+        CS_InsertEntry (S, X, Idx++);
+        SB_AppendStr (&Arg, "+1");
+        SB_Terminate (&Arg);
+        X = NewCodeEntry (OP65_LDX, AM65_ZP, SB_GetConstBuf (&Arg), 0, E->LI);
+        CS_InsertEntry (S, X, Idx++);
+        break;
+
+    case BU_SP6502:
+        if ((B->ZPUsage & REG_A) == 0) {
+            X = NewCodeEntry (OP65_PLA, AM65_IMP, 0, 0, E->LI);
+            CS_InsertEntry (S, X, Idx++);
+            X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, E->LI);
+            CS_InsertEntry (S, X, Idx++);
+            X = NewCodeEntry (OP65_PLA, AM65_IMP, 0, 0, E->LI);
+            CS_InsertEntry (S, X, Idx++);
+            break;
+        }
+
+        /* Unable to restore */
+        return 0;
+
+    case BU_SP:
+        if ((B->ZPUsage & REG_Y) == 0) {
+            X = NewCodeEntry (OP65_JSR, AM65_ABS, "popax", 0, E->LI);
+            CS_InsertEntry (S, X, Idx++);
+            break;
+        }
+
+        /* Unable to restore */
+        return 0;
+
+    default:
+        /* Unable to restore */
+        return 0;
+    }
+
+    /* Adjust all indices at once */
+    AdjustEntryIndices (Indices, OldIdx, Idx - OldIdx);
+
+    SB_Done (&Arg);
+
+    return 1;
+}
+
+
+
+int RestoreAXYBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
+/* Restore the content of AXY before the specified index Idx.
+** This only allows restore from compacted AXY backup for now.
+*/
+{
+    CodeEntry* E;
+    CodeEntry* X;
+    int OldIdx = Idx;
+    StrBuf Arg;
+
+    SB_Init (&Arg);
+
+    /* Get the entry at Idx */
+    E = CS_GetEntry (S, Idx);
+
+    switch (B->Type & BU_TYPE_MASK) {
+    case BU_IMM:
+        /* Just use memorized value */
+        X = NewCodeEntry (OP65_LDA, AM65_IMM, MakeHexArg (B->Imm & 0xFF), 0, E->LI);
+        CS_InsertEntry (S, X, Idx++);
+        X = NewCodeEntry (OP65_LDX, AM65_IMM, MakeHexArg ((B->Imm >> 8) & 0xFF), 0, E->LI);
+        CS_InsertEntry (S, X, Idx++);
+        X = NewCodeEntry (OP65_LDY, AM65_IMM, MakeHexArg ((B->Imm >> 16) & 0xFF), 0, E->LI);
+        CS_InsertEntry (S, X, Idx++);
+        break;
+
+    case BU_ZP:
+        CHECK ((B->Where & REG_TMP1) != 0);
+        SB_AppendStr (&Arg, GetZPName (B->Where & ~REG_TMP1));
+        SB_Terminate (&Arg);
+        X = NewCodeEntry (OP65_LDA, AM65_ZP, SB_GetConstBuf (&Arg), 0, E->LI);
+        CS_InsertEntry (S, X, Idx++);
+        SB_AppendStr (&Arg, "+1");
+        SB_Terminate (&Arg);
+        X = NewCodeEntry (OP65_LDX, AM65_ZP, SB_GetConstBuf (&Arg), 0, E->LI);
+        CS_InsertEntry (S, X, Idx++);
+        X = NewCodeEntry (OP65_LDY, AM65_ZP, GetZPName (B->Where & REG_TMP1), 0, E->LI);
+        CS_InsertEntry (S, X, Idx++);
+        break;
+
+    case BU_SP6502:
+        X = NewCodeEntry (OP65_PLA, AM65_IMP, 0, 0, E->LI);
+        CS_InsertEntry (S, X, Idx++);
+        X = NewCodeEntry (OP65_TAY, AM65_IMP, 0, 0, E->LI);
+        CS_InsertEntry (S, X, Idx++);
+        X = NewCodeEntry (OP65_PLA, AM65_IMP, 0, 0, E->LI);
+        CS_InsertEntry (S, X, Idx++);
+        X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, E->LI);
+        CS_InsertEntry (S, X, Idx++);
+        X = NewCodeEntry (OP65_PLA, AM65_IMP, 0, 0, E->LI);
+        CS_InsertEntry (S, X, Idx++);
+        break;
+
+    case BU_SP:
+        X = NewCodeEntry (OP65_JSR, AM65_ABS, "popa", 0, E->LI);
+        CS_InsertEntry (S, X, Idx++);
+        X = NewCodeEntry (OP65_TAY, AM65_IMP, 0, 0, E->LI);
+        CS_InsertEntry (S, X, Idx++);
+        X = NewCodeEntry (OP65_JSR, AM65_ABS, "popax", 0, E->LI);
+        CS_InsertEntry (S, X, Idx++);
+        break;
+
+    default:
+        /* Unable to restorep */
+        return 0;
+    }
+
+    /* Adjust all indices at once */
+    AdjustEntryIndices (Indices, OldIdx, Idx - OldIdx);
+
+    SB_Done (&Arg);
+
+    /* Done */
+    return 1;
+}
+
+
+
+int BackupArgAfter (CodeSeg* S, BackupInfo* B, int Idx, const CodeEntry* E, Collection* Indices)
+/* Backup the content of the opc arg of the entry E after the specified index Idx.
+** Reg A/Y will be used to transfer the content from a memory location to another
+** regardless of whether it is in use.
+*/
+{
+    CodeEntry* X;
+    int OldIdx = Idx;
+    unsigned ArgSize;
+    unsigned Use, Chg;
+    StrBuf SrcArg;
+    StrBuf DstArg;
+
+    SB_Init (&SrcArg);
+    SB_Init (&DstArg);
+
+    /* We only recognize opc with an arg for now, as well as a special case for ldaxysp */
+    if ((E->OPC != OP65_JSR || strcmp (E->Arg, "ldaxysp") == 0) &&
+        E->AM != AM65_BRA) {
+        /* Get size of the arg */
+        if ((E->Info & OF_LBRA) != 0 || strcmp (E->Arg, "ldaxysp") == 0) {
+            ArgSize = BU_B16;
+        } else {
+            ArgSize = BU_B8;
+        }
+
+        if (E->AM == AM65_IMM && CE_HasNumArg (E)) {
+            /* Just memorize the value */
+            B->Type = BU_IMM | ArgSize;
+            B->Imm = E->Num;
+
+            /* Adjust all indices at once */
+            AdjustEntryIndices (Indices, OldIdx + 1, Idx - OldIdx);
+
+            /* Done */
+            return 1;
+
+        }
+
+        if (E->Size != 1 && E->AM != AM65_IMP) {
+
+            /* We only recognize opc with an arg for now */
+            FindAvailableBackupLoc (B, ArgSize);
+            switch (B->Type & BU_TYPE_MASK) {
+            case BU_ZP:
+                X = NewCodeEntry (OP65_LDA, E->AM, E->Arg, 0, E->LI);
+                CS_InsertEntry (S, X, ++Idx);
+                SB_AppendStr (&DstArg, GetZPName (B->Where));
+                SB_Terminate (&DstArg);
+                X = NewCodeEntry (OP65_STA, AM65_ZP, SB_GetConstBuf (&DstArg), 0, E->LI);
+                CS_InsertEntry (S, X, ++Idx);
+                if (ArgSize == BU_B16) {
+                    SB_AppendStr (&SrcArg, E->Arg);
+                    SB_AppendStr (&SrcArg, "+1");
+                    SB_Terminate (&SrcArg);
+                    X = NewCodeEntry (OP65_LDA, E->AM, SB_GetConstBuf (&SrcArg), 0, E->LI);
+                    CS_InsertEntry (S, X, ++Idx);
+                    SB_AppendStr (&DstArg, "+1");
+                    SB_Terminate (&DstArg);
+                    X = NewCodeEntry (OP65_STA, AM65_ZP, SB_GetConstBuf (&DstArg), 0, E->LI);
+                    CS_InsertEntry (S, X, ++Idx);
+                }
+                break;
+
+            case BU_REG:
+                CHECK (ArgSize == BU_B8 && B->Where == REG_Y);
+                if (E->AM == AM65_ZP || E->AM == AM65_ABS) {
+                    X = NewCodeEntry (OP65_LDY, E->AM, E->Arg, 0, E->LI);
+                    CS_InsertEntry (S, X, ++Idx);
+                } else {
+                    X = NewCodeEntry (OP65_LDA, E->AM, E->Arg, 0, E->LI);
+                    CS_InsertEntry (S, X, ++Idx);
+                    X = NewCodeEntry (OP65_TAY, AM65_IMP, 0, 0, E->LI);
+                    CS_InsertEntry (S, X, ++Idx);
+                }
+                break;
+
+            case BU_SP6502:
+                X = NewCodeEntry (OP65_LDA, E->AM, E->Arg, 0, E->LI);
+                CS_InsertEntry (S, X, ++Idx);
+                X = NewCodeEntry (OP65_PHA, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, ++Idx);
+                if (ArgSize == BU_B16) {
+                    SB_AppendStr (&SrcArg, E->Arg);
+                    SB_AppendStr (&SrcArg, "+1");
+                    SB_Terminate (&SrcArg);
+                    X = NewCodeEntry (OP65_LDA, E->AM, SB_GetConstBuf (&SrcArg), 0, E->LI);
+                    CS_InsertEntry (S, X, ++Idx);
+                    X = NewCodeEntry (OP65_PHA, AM65_IMP, 0, 0, E->LI);
+                    CS_InsertEntry (S, X, ++Idx);
+                }
+                break;
+
+            case BU_SP:
+                X = NewCodeEntry (OP65_LDA, E->AM, E->Arg, 0, E->LI);
+                CS_InsertEntry (S, X, ++Idx);
+                if (ArgSize != BU_B16) {
+                    X = NewCodeEntry (OP65_JSR, AM65_ABS, "pusha", 0, E->LI);
+                    CS_InsertEntry (S, X, ++Idx);
+                } else {
+                    SB_AppendStr (&SrcArg, E->Arg);
+                    SB_AppendStr (&SrcArg, "+1");
+                    SB_Terminate (&SrcArg);
+                    if ((B->ZPUsage & REG_X) == 0) {
+                        if (E->AM == AM65_ZP) {
+                            X = NewCodeEntry (OP65_LDX, E->AM, SB_GetConstBuf (&SrcArg), 0, E->LI);
+                            CS_InsertEntry (S, X, ++Idx);
+                            X = NewCodeEntry (OP65_JSR, AM65_ABS, "pushax", 0, E->LI);
+                            CS_InsertEntry (S, X, ++Idx);
+                        } else {
+                            X = NewCodeEntry (OP65_LDA, E->AM, SB_GetConstBuf (&SrcArg), 0, E->LI);
+                            CS_InsertEntry (S, X, ++Idx);
+                            X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, E->LI);
+                            CS_InsertEntry (S, X, ++Idx);
+                            X = NewCodeEntry (OP65_JSR, AM65_ABS, "pushax", 0, E->LI);
+                            CS_InsertEntry (S, X, ++Idx);
+                        }
+                    } else {
+                        X = NewCodeEntry (OP65_JSR, AM65_ABS, "pusha", 0, E->LI);
+                        CS_InsertEntry (S, X, ++Idx);
+                        X = NewCodeEntry (OP65_LDA, AM65_ZP, SB_GetConstBuf (&DstArg), 0, E->LI);
+                        CS_InsertEntry (S, X, ++Idx);
+                        X = NewCodeEntry (OP65_JSR, AM65_ABS, "pusha", 0, E->LI);
+                        CS_InsertEntry (S, X, ++Idx);
+                    }
+                }
+                break;
+            }
+
+            /* Adjust all indices at once */
+            AdjustEntryIndices (Indices, OldIdx + 1, Idx - OldIdx);
+
+            /* Done */
+            return 1;
+        }
+    } else if (E->OPC == OP65_JSR) {
+        /* For function calls we load their arguments instead */
+        GetFuncInfo (E->Arg, &Use, &Chg);
+        if ((Use & ~REG_AXY) == 0) {
+            if (Use == REG_A) {
+                ArgSize = BU_B8;
+                return BackupAAfter (S, B, Idx, Indices);
+            } else if (Use == REG_AX) {
+                ArgSize = BU_B16;
+                return BackupAXAfter (S, B, Idx, Indices);
+            } else if (Use == REG_AXY) {
+                /* This is actually a 16-bit word plus a 8-bit byte */
+                ArgSize = BU_B24;
+                return BackupAXYAfter (S, B, Idx, Indices);
+            }
+
+            /* We don't recognize other usage patterns for now */
+        }
+    }
+
+    SB_Done (&SrcArg);
+    SB_Done (&DstArg);
+
+    /* Unable to do backup */
+    return 0;
+}
+
+static int LoadAAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices, int After)
+/* Reload into A the same arg according to LoadRegInfo before or after Idx
+** depending on the After param. 
+*/
+{
+    CodeEntry* E;
+    CodeEntry* O;       /* Old entry at Idx */
+    CodeEntry* X;
+    int Success = 0;
+    int OldIdx;
+    unsigned Use, Chg;
+
+    /* Adjust the insertion point if necessary */
+    if (After) {
+        ++Idx;
+    }
+    OldIdx = Idx;
+
+    E = LRI->LoadEntry;
+    CHECK (E != 0);
+
+    O = CS_GetEntry (S, OldIdx);
+    
+    /* We only recognize opc with an arg for now, as well as a special case for ldaxysp */
+    if ((E->OPC != OP65_JSR || strcmp (E->Arg, "ldaxysp") == 0) &&
+        E->AM != AM65_BRA && E->AM != AM65_IMP) {
+        if (E->Size != 1 && E->AM != AM65_IMP) {
+
+            /* FIXME: The load flags only reflect the situation by the time it reaches the range end */
+            if ((LRI->Flags & (LI_DIRECT | LI_CHECK_ARG | LI_CHECK_Y)) != 0) {
+                if ((LRI->Flags & LI_RELOAD_Y) != 0) {
+                    if ((LRI->Flags & LI_CHECK_Y) == 0) {
+                        X = NewCodeEntry (OP65_LDY, AM65_IMM, MakeHexArg (LRI->Offs), 0, E->LI);
+                    } else {
+                        X = NewCodeEntry (OP65_LDY, LRI->LoadYEntry->AM, LRI->LoadYEntry->Arg, 0, E->LI);
+                    }
+                    CS_InsertEntry (S, X, Idx++);
+                }
+                X = NewCodeEntry (OP65_LDA, E->AM, E->Arg, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+
+                Success = 1;
+            }
+        }
+    } else if (E->OPC == OP65_JSR) {
+
+        /* For other function calls we load their arguments instead */
+        GetFuncInfo (E->Arg, &Use, &Chg);
+        if ((Use & ~REG_AXY) == 0) {
+            if (Use == REG_X) {
+                X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+            } else if (Use == REG_A) {
+                X = NewCodeEntry (OP65_TYA, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+            } else if (Use == REG_A) {
+                /* nothing to do */
+            } else {
+                /* We don't recognize other usage patterns for now */
+                return 0;
+            }
+
+            Success = 1;
+        }
+    }
+
+    if (Success) {
+        /* Adjust all indices at once */
+        AdjustEntryIndices (Indices, OldIdx, Idx - OldIdx);
+
+        /* Move labels if it was an insertion before Idx */
+        CS_MoveLabels (S, O, CS_GetEntry (S, OldIdx));
+
+        /* Done */
+        return 1;
+    }
+
+    /* Unable to load */
+    return 0;
+}
+
+
+
+static int LoadXAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices, int After)
+/* Reload into X the same arg according to LoadRegInfo before or after Idx
+** depending on the After param. 
+*/
+{
+    CodeEntry* E;
+    CodeEntry* O;       /* Old entry at Idx */
+    CodeEntry* X;
+    int Success = 0;
+    int OldIdx;
+    unsigned Use, Chg;
+
+    /* Adjust the insertion point if necessary */
+    if (After) {
+        ++Idx;
+    }
+    OldIdx = Idx;
+
+    E = LRI->LoadEntry;
+    CHECK (E != 0);
+
+    O = CS_GetEntry (S, OldIdx);
+
+    /* We only recognize opc with an arg for now, as well as a special case for ldaxysp */
+    if ((E->OPC != OP65_JSR || strcmp (E->Arg, "ldaxysp") == 0) &&
+        E->AM != AM65_BRA && E->AM != AM65_IMP) {
+        if (E->Size != 1 && E->AM != AM65_IMP) {
+
+            /* FIXME: The load flags only reflect the situation by the time it reaches the range end */
+            if ((LRI->Flags & (LI_DIRECT | LI_CHECK_ARG | LI_CHECK_Y)) != 0) {
+                if ((LRI->Flags & LI_RELOAD_Y) != 0) {
+                    if ((LRI->Flags & LI_CHECK_Y) == 0) {
+                        X = NewCodeEntry (OP65_LDY, AM65_IMM, MakeHexArg (LRI->Offs), 0, E->LI);
+                    } else {
+                        X = NewCodeEntry (OP65_LDY, LRI->LoadYEntry->AM, LRI->LoadYEntry->Arg, 0, E->LI);
+                    }
+                    CS_InsertEntry (S, X, Idx++);
+
+                    /* ldx does support AM65_ZPY and AM65_ABSY */
+                    if (E->AM == AM65_ZPY || E->AM == AM65_ABSY) {
+                        X = NewCodeEntry (OP65_LDX, E->AM, E->Arg, 0, E->LI);
+                    } else {
+                        X = NewCodeEntry (OP65_LDA, E->AM, E->Arg, 0, E->LI);
+                        CS_InsertEntry (S, X, Idx++);
+                        X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, E->LI);
+                    }
+                    CS_InsertEntry (S, X, Idx++);
+                } else {
+                    X = NewCodeEntry (OP65_LDX, E->AM, E->Arg, 0, E->LI);
+                    CS_InsertEntry (S, X, Idx++);
+                }
+
+                Success = 1;
+            }
+        }
+    } else if (E->OPC == OP65_JSR) {
+        /* For function calls we load their arguments instead */
+        GetFuncInfo (E->Arg, &Use, &Chg);
+        if ((Use & ~REG_AXY) == 0) {
+            if (Use == REG_A) {
+                X = NewCodeEntry (OP65_TAY, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+            } else if (Use == REG_Y) {
+                X = NewCodeEntry (OP65_PHA, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+                X = NewCodeEntry (OP65_TYA, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+                X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+                X = NewCodeEntry (OP65_PLA, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+            } else if (Use == REG_X) {
+                /* nothing to do */
+            } else {
+                /* We don't recognize other usage patterns for now */
+                return 0;
+            }
+
+            Success = 1;
+        }
+    }
+
+    if (Success) {
+        /* Adjust all indices at once */
+        AdjustEntryIndices (Indices, OldIdx, Idx - OldIdx);
+
+        /* Move labels if it was an insertion before Idx */
+        CS_MoveLabels (S, O, CS_GetEntry (S, OldIdx));
+
+        /* Done */
+        return 1;
+    }
+
+    /* Unable to load */
+    return 0;
+}
+
+
+
+static int LoadYAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices, int After)
+/* Reload into Y the same arg according to LoadRegInfo before or after Idx
+** depending on the After param. 
+*/
+{
+    CodeEntry* E;
+    CodeEntry* O;       /* Old entry at Idx */
+    CodeEntry* X;
+    int Success = 0;
+    int OldIdx;
+    unsigned Use, Chg;
+
+    /* Adjust the insertion point if necessary */
+    if (After) {
+        ++Idx;
+    }
+    OldIdx = Idx;
+
+    E = LRI->LoadEntry;
+    CHECK (E != 0);
+
+    O = CS_GetEntry (S, OldIdx);
+
+    /* We only recognize opc with an arg for now, as well as a special case for ldaxysp */
+    if ((E->OPC != OP65_JSR || strcmp (E->Arg, "ldaxysp") == 0) &&
+        E->AM != AM65_BRA && E->AM != AM65_IMP) {
+        if (E->Size != 1 && E->AM != AM65_IMP) {
+
+            /* FIXME: The load flags only reflect the situation by the time it reaches the range end */
+            if ((LRI->Flags & (LI_DIRECT | LI_CHECK_ARG | LI_CHECK_Y)) != 0) {
+                if ((LRI->Flags & LI_RELOAD_Y) != 0) {
+                    if ((LRI->Flags & LI_CHECK_Y) == 0) {
+                        X = NewCodeEntry (OP65_LDY, AM65_IMM, MakeHexArg (LRI->Offs), 0, E->LI);
+                    } else {
+                        X = NewCodeEntry (OP65_LDY, LRI->LoadYEntry->AM, LRI->LoadYEntry->Arg, 0, E->LI);
+                    }
+                    CS_InsertEntry (S, X, Idx++);
+                    X = NewCodeEntry (OP65_LDA, E->AM, E->Arg, 0, E->LI);
+                    CS_InsertEntry (S, X, Idx++);
+                    X = NewCodeEntry (OP65_TAY, AM65_IMP, 0, 0, E->LI);
+                    CS_InsertEntry (S, X, Idx++);
+                } else {
+                    X = NewCodeEntry (OP65_LDY, E->AM, E->Arg, 0, E->LI);
+                    CS_InsertEntry (S, X, Idx++);
+                }
+
+                Success = 1;
+            }
+        }
+    } else if (E->OPC == OP65_JSR) {
+        /* For function calls we load their arguments instead */
+        GetFuncInfo (E->Arg, &Use, &Chg);
+        if ((Use & ~REG_AXY) == 0) {
+            if (Use == REG_A) {
+                X = NewCodeEntry (OP65_TAY, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+            } else if (Use == REG_X) {
+                X = NewCodeEntry (OP65_PHA, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+                X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+                X = NewCodeEntry (OP65_TAY, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+                X = NewCodeEntry (OP65_PLA, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, Idx++);
+            } else if (Use == REG_Y) {
+                /* nothing to do */
+            } else {
+                /* We don't recognize other usage patterns for now */
+                return 0;
+            }
+
+            Success = 1;
+        }
+    }
+
+    if (Success) {
+        /* Adjust all indices at once */
+        AdjustEntryIndices (Indices, OldIdx, Idx - OldIdx);
+
+        /* Move labels if it was an insertion before Idx */
+        CS_MoveLabels (S, O, CS_GetEntry (S, OldIdx));
+
+        /* Done */
+        return 1;
+    }
+
+    /* Unable to load */
+    return 0;
+}
+
+
+
+int LoadABefore (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices)
+/* Reload into A the same arg according to LoadRegInfo at Idx */
+{
+    return LoadAAt (S, Idx, LRI, Indices, 0);
+}
+
+
+
+int LoadXBefore (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices)
+/* Reload into X the same arg according to LoadRegInfo at Idx */
+{
+    return LoadXAt (S, Idx, LRI, Indices, 0);
+}
+
+
+
+int LoadYBefore (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices)
+/* Reload into Y the same arg according to LoadRegInfo at Idx */
+{
+    return LoadYAt (S, Idx, LRI, Indices, 0);
+}
+
+
+
+int LoadAAfter (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices)
+/* Reload into A the same arg according to LoadRegInfo after Idx */
+{
+    return LoadAAt (S, Idx, LRI, Indices, 1);
+}
+
+
+
+int LoadXAfter (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices)
+/* Reload into X the same arg according to LoadRegInfo after Idx */
+{
+    return LoadXAt (S, Idx, LRI, Indices, 1);
+}
+
+
+
+int LoadYAfter (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices)
+/* Reload into Y the same arg according to LoadRegInfo after Idx */
+{
+    return LoadYAt (S, Idx, LRI, Indices, 1);
+}
+
+
+
+unsigned GetRegAccessedInOpenRange (CodeSeg* S, int First, int Last)
+/* Get what ZPs, registers or processor states are used or changed in the range
+** (First, Last).
+** The code block must be basic without any jump backwards.
+*/
+{
+    CodeEntry* X;
+    unsigned ZPAccessed = 0;
+
+    CHECK (Last <= (int)CollCount (&S->Entries));
+
+    while (++First < Last) {
+        X = CS_GetEntry (S, First);
+        ZPAccessed |= X->Use | X->Chg;
+    }
+
+    return ZPAccessed;
+}
+
+
+
+unsigned GetRegUsageInOpenRange (CodeSeg* S, int First, int Last, unsigned* Use, unsigned* Chg)
+/* Get what ZPs, registers or processor states are used or changed in the range
+** (First, Last) in output parameters Use and Chg.
+** Return what ZP regs are used before changed in this range.
+** The code block must be basic without any jump backwards.
+*/
+{
+    CodeEntry* X;
+    unsigned U = 0;
+    unsigned C = 0;
+
+    CHECK (Last <= (int)CollCount (&S->Entries));
+
+    /* Clear the output flags first */
+    if (Use != 0) {
+        *Use = 0;
+    }
+    if (Chg != 0) {
+        *Chg = 0;
+    }
+
+    while (++First < Last) {
+        X = CS_GetEntry (S, First);
+        if (Use != 0) {
+            *Use |= X->Use;
+        }
+        if (Chg != 0) {
+            *Chg |= X->Chg;
+        }
+        /* Used before changed */
+        U |= ~C & X->Use;
+        C |= X->Chg;
+    }
+
+    return U;
+}
+
+
+
+int FindArgFirstChangeInOpenRange (CodeSeg* S, int First, int Last, CodeEntry* E)
+/* Find the first possible spot where the loaded arg of E might be changed in
+** the range (First, Last). The code block in the range must be basic without
+** any jump backwards.
+** Return the index of the found entry, or Last if not found.
+*/
+{
+    LoadRegInfo LRI;
+    CodeEntry* X;
+
+    CHECK (Last <= (int)CollCount (&S->Entries));
+
+    /* TODO: We'll currently give up finding the src of Y */
+    ClearLoadRegInfo (&LRI);
+    PrepairLoadRegInfoForArgCheck (S, &LRI, E);
+
+    /* TODO: We don't currently check for all cases */
+    if ((LRI.Flags & (LI_DIRECT | LI_CHECK_ARG | LI_CHECK_Y)) == 0) {
+        /* Just bail out as if the src would change right away */
+        return First + 1;
+    }
+
+    /* If there's no need to check */
+    if ((LRI.Flags & (LI_CHECK_ARG | LI_CHECK_Y)) == 0) {
+        return Last;
+    }
+
+    while (++First < Last) {
+        X = CS_GetEntry (S, First);
+        if (Affected (&LRI, X)) {
+            return First;
+        }
+    }
+
+    /* Not found */
+    return Last;
+}
+
+
+
+int FindRegFirstChangeInOpenRange (CodeSeg* S, int First, int Last, unsigned what)
+/* Find the first possible spot where the queried ZPs, registers and/or processor
+** states might be changed in the range (First, Last). The code block in the
+** range must be basic without any jump backwards.
+** Return the index of the found entry, or Last if not found.
+*/
+{
+    CodeEntry* X;
+
+    CHECK (Last <= (int)CollCount (&S->Entries));
+
+    while (++First < Last) {
+        X = CS_GetEntry (S, First);
+        if ((X->Chg & what) != 0) {
+            return First;
+        }
+    }
+
+    /* Not found */
+    return Last;
+}
+
+
+
+int FindRegFirstUseInOpenRange (CodeSeg* S, int First, int Last, unsigned what)
+/* Find the first possible spot where the queried ZPs, registers and/or processor
+** states might be used in the range (First, Last). The code block in the range
+** must be basic without any jump backwards.
+** Return the index of the found entry, or Last if not found.
+*/
+{
+    CodeEntry* X;
+
+    CHECK (Last <= (int)CollCount (&S->Entries));
+
+    while (++First < Last) {
+        X = CS_GetEntry (S, First);
+        if ((X->Use & what) != 0) {
+            return First;
+        }
+    }
+
+    /* Not found */
+    return Last;
+}
+
+
+
+int FindRegLastChangeInOpenRange (CodeSeg* S, int First, int Last, unsigned what)
+/* Find the last possible spot where the queried ZPs, registers and/or processor
+** states might be changed in the range (First, Last). The code block in the
+** range must be basic without any jump backwards.
+** Return the index of the found entry, or -1 if not found.
+*/
+{
+    CodeEntry* X;
+    int Found = -1;
+
+    CHECK (Last <= (int)CollCount (&S->Entries));
+
+    while (++First < Last) {
+        X = CS_GetEntry (S, First);
+        if ((X->Chg & what) != 0) {
+            Found = First;
+        }
+    }
+
+    return Found;
+}
+
+
+
+int FindRegLastUseInOpenRange (CodeSeg* S, int First, int Last, unsigned what)
+/* Find the last possible spot where the queried ZPs, registers and/or processor
+** states might be used in the range (First, Last). The code block in the range
+** must be basic without any jump backwards.
+** Return the index of the found entry, or -1 if not found.
+*/
+{
+    CodeEntry* X;
+    int Found = -1;
+
+    CHECK (Last <= (int)CollCount (&S->Entries));
+
+    while (++First < Last) {
+        X = CS_GetEntry (S, First);
+        if ((X->Use & what) != 0) {
+            Found = First;
+        }
+    }
+
+    return Found;
+}

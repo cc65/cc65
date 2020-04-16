@@ -1541,16 +1541,17 @@ void g_addlocal (unsigned flags, int offs)
 /* Add a local variable to ax */
 {
     unsigned L;
+    int NewOff;
 
     /* Correct the offset and check it */
-    offs -= StackPtr;
-    CheckLocalOffs (offs);
+    NewOff = offs - StackPtr;
+    CheckLocalOffs (NewOff);
 
     switch (flags & CF_TYPEMASK) {
 
         case CF_CHAR:
             L = GetLocalLabel();
-            AddCodeLine ("ldy #$%02X", offs & 0xFF);
+            AddCodeLine ("ldy #$%02X", NewOff & 0xFF);
             AddCodeLine ("clc");
             AddCodeLine ("adc (sp),y");
             AddCodeLine ("bcc %s", LocalLabelName (L));
@@ -1559,7 +1560,7 @@ void g_addlocal (unsigned flags, int offs)
             break;
 
         case CF_INT:
-            AddCodeLine ("ldy #$%02X", offs & 0xFF);
+            AddCodeLine ("ldy #$%02X", NewOff & 0xFF);
             AddCodeLine ("clc");
             AddCodeLine ("adc (sp),y");
             AddCodeLine ("pha");

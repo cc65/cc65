@@ -176,14 +176,14 @@ static int IsImmCmp16 (CodeEntry** L)
 {
     return (L[0]->OPC == OP65_CPX                              &&
             L[0]->AM == AM65_IMM                               &&
-            (L[0]->Flags & CEF_NUMARG) != 0                    &&
+            CE_HasNumArg (L[0])                                &&
             !CE_HasLabel (L[0])                                &&
             (L[1]->OPC == OP65_JNE || L[1]->OPC == OP65_BNE)   &&
             L[1]->JumpTo != 0                                  &&
             !CE_HasLabel (L[1])                                &&
             L[2]->OPC == OP65_CMP                              &&
             L[2]->AM == AM65_IMM                               &&
-            (L[2]->Flags & CEF_NUMARG) != 0                    &&
+            CE_HasNumArg (L[2])                                &&
             (L[3]->Info & OF_CBRA) != 0                        &&
             L[3]->JumpTo != 0                                  &&
             (L[1]->JumpTo->Owner == L[3] || L[1]->JumpTo == L[3]->JumpTo));

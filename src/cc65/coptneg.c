@@ -68,15 +68,15 @@ unsigned OptBNegA1 (CodeSeg* S)
         CodeEntry* E = CS_GetEntry (S, I);
 
         /* Check for a ldx */
-        if (E->OPC == OP65_LDX                  &&
-            E->AM == AM65_IMM                   &&
-            (E->Flags & CEF_NUMARG) != 0        &&
-            E->Num == 0                         &&
-            CS_GetEntries (S, L, I+1, 2)        &&
-            L[0]->OPC == OP65_LDA               &&
-            (L[0]->Use & REG_X) == 0            &&
-            !CE_HasLabel (L[0])                 &&
-            CE_IsCallTo (L[1], "bnega")         &&
+        if (E->OPC == OP65_LDX              &&
+            E->AM == AM65_IMM               &&
+            CE_HasNumArg (E)                &&
+            E->Num == 0                     &&
+            CS_GetEntries (S, L, I+1, 2)    &&
+            L[0]->OPC == OP65_LDA           &&
+            (L[0]->Use & REG_X) == 0        &&
+            !CE_HasLabel (L[0])             &&
+            CE_IsCallTo (L[1], "bnega")     &&
             !CE_HasLabel (L[1])) {
 
             /* Remove the ldx instruction */

@@ -105,6 +105,9 @@ void GotoStatement (void)
                 val = (unsigned char)CurTok.IVal;
                 NextToken ();
 
+                /* Append deferred inc/dec at sequence point */
+                DoDeferred (SQP_KEEP_NONE, &desc);
+
                 if (CPUIsets[CPU] & CPU_ISET_65SC02) {
                     AddCodeLine ("ldx #$%02X", val * 2);
                     AddCodeLine ("jmp (.loword(%s),x)", arr->AsmName);
@@ -118,6 +121,10 @@ void GotoStatement (void)
                        (idx = FindSym (CurTok.Ident))) {
                 hie10 (&desc);
                 LoadExpr (CF_NONE, &desc);
+
+                /* Append deferred inc/dec at sequence point */
+                DoDeferred (SQP_KEEP_EAX, &desc);
+
                 AddCodeLine ("asl a");
 
                 if (CPUIsets[CPU] & CPU_ISET_65SC02) {

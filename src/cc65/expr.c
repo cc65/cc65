@@ -332,6 +332,264 @@ static void WarnConstCompareResult (const ExprDesc* Expr)
 
 
 
+typedef enum {
+    DOT_INC,
+    DOT_DEC,
+} DeferredOpType;
+
+
+typedef struct {
+    ExprDesc        Expr;
+    DeferredOpType  OpType;
+} DeferredOp;
+
+Collection DeferredOps;
+
+
+
+void InitDeferredOps (void)
+/* Init the collection for storing deferred ops */
+{
+    InitCollection (&DeferredOps);
+}
+
+
+
+void DoneDeferredOps (void)
+/* Deinit the collection for storing deferred ops */
+{
+    DoneCollection (&DeferredOps);
+}
+
+
+
+static void DeferInc (const ExprDesc* Expr)
+/* Defer the post-inc and put it in a queue */
+{
+    DeferredOp* Op = xmalloc (sizeof (DeferredOp));
+    memcpy (&Op->Expr, Expr, sizeof (ExprDesc));
+    Op->OpType = DOT_INC;
+    CollAppend (&DeferredOps, Op);
+}
+
+
+
+static void DeferDec (const ExprDesc* Expr)
+/* Defer the post-dec and put it in a queue */
+{
+    DeferredOp* Op = xmalloc (sizeof (DeferredOp));
+    memcpy (&Op->Expr, Expr, sizeof (ExprDesc));
+    Op->OpType = DOT_DEC;
+    CollAppend (&DeferredOps, Op);
+}
+
+
+
+static void DeferredInc (ExprDesc* Expr)
+/* Do the deferred post-inc */
+{
+    unsigned Flags;
+    unsigned long Val;
+
+    /* Get the flags */
+    Flags = TypeOf (Expr->Type) | GlobalModeFlags (Expr) | CF_FORCECHAR | CF_CONST | CF_NOKEEP;
+
+    /* Get the increment value in bytes */
+    Val = IsTypePtr (Expr->Type) ? CheckedSizeOf (Expr->Type + 1) : 1;
+
+    /* Check the location of the data */
+    switch (ED_GetLoc (Expr)) {
+
+        case E_LOC_ABS:
+            /* Absolute: numeric address or const */
+            g_addeqstatic (Flags, Expr->IVal, 0, Val);
+            break;
+
+        case E_LOC_GLOBAL:
+            /* Global variable */
+            g_addeqstatic (Flags, Expr->Name, Expr->IVal, Val);
+            break;
+
+        case E_LOC_STATIC:
+        case E_LOC_LITERAL:
+            /* Static variable or literal in the literal pool */
+            g_addeqstatic (Flags, Expr->Name, Expr->IVal, Val);
+            break;
+
+        case E_LOC_REGISTER:
+            /* Register variable */
+            g_addeqstatic (Flags, Expr->Name, Expr->IVal, Val);
+            break;
+
+        case E_LOC_STACK:
+            /* Value on the stack */
+            g_addeqlocal (Flags, Expr->IVal, Val);
+            break;
+
+        case E_LOC_PRIMARY:
+            /* The primary register */
+            g_inc (Flags, Val);
+            break;
+
+        case E_LOC_EXPR:
+            /* An expression in the primary register */
+            g_addeqind (Flags, Expr->IVal, Val);
+            break;
+
+        default:
+            Internal ("Invalid location in DeferredInc(): 0x%04X", ED_GetLoc (Expr));
+    }
+}
+
+
+
+static void DeferredDec (ExprDesc* Expr)
+/* Do the deferred post-dec */
+{
+    unsigned Flags;
+    unsigned long Val;
+
+    /* Get the flags */
+    Flags = TypeOf (Expr->Type) | GlobalModeFlags (Expr) | CF_FORCECHAR | CF_CONST | CF_NOKEEP;
+
+    /* Get the increment value in bytes */
+    Val = IsTypePtr (Expr->Type) ? CheckedSizeOf (Expr->Type + 1) : 1;
+
+    /* Check the location of the data */
+    switch (ED_GetLoc (Expr)) {
+
+        case E_LOC_ABS:
+            /* Absolute: numeric address or const */
+            g_subeqstatic (Flags, Expr->IVal, 0, Val);
+            break;
+
+        case E_LOC_GLOBAL:
+            /* Global variable */
+            g_subeqstatic (Flags, Expr->Name, Expr->IVal, Val);
+            break;
+
+        case E_LOC_STATIC:
+        case E_LOC_LITERAL:
+            /* Static variable or literal in the literal pool */
+            g_subeqstatic (Flags, Expr->Name, Expr->IVal, Val);
+            break;
+
+        case E_LOC_REGISTER:
+            /* Register variable */
+            g_subeqstatic (Flags, Expr->Name, Expr->IVal, Val);
+            break;
+
+        case E_LOC_STACK:
+            /* Value on the stack */
+            g_subeqlocal (Flags, Expr->IVal, Val);
+            break;
+
+        case E_LOC_PRIMARY:
+            /* The primary register */
+            g_dec (Flags, Val);
+            break;
+
+        case E_LOC_EXPR:
+            /* An expression in the primary register */
+            g_subeqind (Flags, Expr->IVal, Val);
+            break;
+
+        default:
+            Internal ("Invalid location in DeferredDec(): 0x%04X", ED_GetLoc (Expr));
+    }
+}
+
+
+
+int GetDeferredOpCount (void)
+/* Return how many deferred operations are still waiting in the queque */
+{
+    return (int)CollCount (&DeferredOps);
+}
+
+
+
+void CheckDeferredOpAllDone (void)
+/* Check if all deferred operations are done at sequence points.
+** Die off if check fails.
+*/
+{
+    if (GetDeferredOpCount () > 0) {
+        Internal ("Code generation messed up: missing operations past sequence points.");
+    }
+}
+
+
+
+void DoDeferred (unsigned Flags, ExprDesc* Expr)
+/* Do deferred operations such as post-inc/dec at sequence points */
+{
+    int         I;
+    unsigned    Size = 0;
+    int         Count = GetDeferredOpCount ();
+
+    /* Nothing to be done */
+    if (Count <= 0) {
+        return;
+    }
+
+    /* Backup some regs/processor flags around the inc/dec */
+    if ((Flags & SQP_KEEP_TEST) != 0 && ED_NeedsTest (Expr)) {
+        /* Sufficient to add a pair of PHP/PLP for all cases */
+        AddCodeLine ("php");
+    }
+
+    /* Backup the content of EAX around the inc/dec */
+    if ((Flags & SQP_KEEP_EAX) != 0 && ED_NeedsPrimary (Expr)) {
+        /* Get the size */
+        Size = CheckedSizeOf (Expr->Type);
+
+        if (Size < 2) {
+            AddCodeLine ("pha");
+        } else if (Size < 3) {
+            AddCodeLine ("sta regsave");
+            AddCodeLine ("stx regsave+1");
+        } else {
+            AddCodeLine ("jsr saveeax");
+        }
+    }
+
+    for (I = 0; I < Count; ++I) {
+        DeferredOp* Op = CollAtUnchecked (&DeferredOps, I);
+        switch (Op->OpType) {
+
+            case DOT_INC:
+                DeferredInc (&Op->Expr);
+                break;
+
+            case DOT_DEC:
+                DeferredDec (&Op->Expr);
+                break;
+        }
+        xfree (&Op->Expr);
+    }
+    CollDeleteAll (&DeferredOps);
+
+    /* Restore the content of EAX around the inc/dec */
+    if ((Flags & SQP_KEEP_EAX) != 0 && ED_NeedsPrimary (Expr)) {
+        if (Size < 2) {
+            AddCodeLine ("pla");
+        } else if (Size < 3) {
+            AddCodeLine ("lda regsave");
+            AddCodeLine ("ldx regsave+1");
+        } else {
+            AddCodeLine ("jsr resteax");
+        }
+    }
+
+    /* Restore the regs/processor flags around the inc/dec */
+    if ((Flags & SQP_KEEP_TEST) != 0 && ED_NeedsTest (Expr)) {
+        /* Sufficient to pop the processor flags */
+        AddCodeLine ("plp");
+    }
+}
+
+
 static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall, ExprDesc* ED)
 /* Parse a function parameter list, and pass the arguments to the called
 ** function. Depending on several criteria, this may be done by just pushing
@@ -388,11 +646,17 @@ static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall, ExprDesc* ED)
         }
     }
 
+    /* The info of the last argument could be needed out of the loop */
+    ExprDesc Expr;
+    ED_Init (&Expr);
+    Expr.Flags |= ED->Flags & E_MASK_KEEP_SUBEXPR;
+
     /* Parse the actual argument list */
     while (CurTok.Tok != TOK_RPAREN) {
 
         unsigned Flags;     /* Code generator flags, not expression flags */
-        ExprDesc Expr;
+        
+        /* This way the info of the last parameter won't be cleared */
         ED_Init (&Expr);
         Expr.Flags |= ED->Flags & E_MASK_KEEP_SUBEXPR;
 
@@ -513,6 +777,11 @@ static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall, ExprDesc* ED)
     if (PushedCount < Func->ParamCount) {
         Error ("Too few arguments in function call");
     }
+
+    /* Append deferred inc/dec before the function is called.
+    ** The last parameter needs to be restored if it is passed with AX/EAX Regs.
+    */
+    DoDeferred (IsFastcall ? SQP_KEEP_EAX : SQP_KEEP_NONE, &Expr);
 
     /* The function returns the size of all arguments pushed onto the stack.
     ** However, if there are parameters missed (which is an error, and was
@@ -1728,7 +1997,7 @@ static void PreDec (ExprDesc* Expr)
 static void PostInc (ExprDesc* Expr)
 /* Handle the postincrement operator */
 {
-    unsigned Flags;
+    unsigned Flags, Loc;
 
     NextToken ();
 
@@ -1746,33 +2015,49 @@ static void PostInc (ExprDesc* Expr)
     /* Get the data type */
     Flags = TypeOf (Expr->Type);
 
+    /* We are allowed by the C standard to defer the inc operation until 
+    ** the this expression is used, so that we don't need to save and reload
+    ** the original value.
+    */
+
     /* Emit smaller code if a char variable is at a constant location */
-    if ((Flags & CF_CHAR) == CF_CHAR && ED_IsLocConst(Expr)) {
+    if ((Flags & CF_CHAR) == CF_CHAR && ED_IsLocConst (Expr)) {
 
         LoadExpr (CF_NONE, Expr);
-        AddCodeLine ("inc %s", ED_GetLabelName(Expr, 0));
+        AddCodeLine ("inc %s", ED_GetLabelName (Expr, 0));
 
     } else {
 
-        /* Push the address if needed */
-        PushAddr (Expr);
+        Loc = ED_GetLoc (Expr);
+        if (Loc == E_LOC_PRIMARY || Loc == E_LOC_EXPR) {
+            /* Push the address if needed */
+            PushAddr (Expr);
 
-        /* Fetch the value and save it (since it's the result of the expression) */
-        LoadExpr (CF_NONE, Expr);
-        g_save (Flags | CF_FORCECHAR);
+            /* Fetch the value and save it (since it's the result of the expression) */
+            LoadExpr (CF_NONE, Expr);
+            g_save (Flags | CF_FORCECHAR);
 
-        /* If we have a pointer expression, increment by the size of the type */
-        if (IsTypePtr (Expr->Type)) {
-            g_inc (Flags | CF_CONST | CF_FORCECHAR, CheckedSizeOf (Expr->Type + 1));
+            /* If we have a pointer expression, increment by the size of the type */
+            if (IsTypePtr (Expr->Type)) {
+                g_inc (Flags | CF_CONST | CF_FORCECHAR, CheckedSizeOf (Expr->Type + 1));
+            } else {
+                g_inc (Flags | CF_CONST | CF_FORCECHAR, 1);
+            }
+
+            /* Store the result back */
+            Store (Expr, 0);
+
+            /* Restore the original value in the primary register */
+            g_restore (Flags | CF_FORCECHAR);
+
         } else {
-            g_inc (Flags | CF_CONST | CF_FORCECHAR, 1);
+
+            /* Fetch the value and use it (since it's the result of the expression) */
+            LoadExpr (CF_NONE, Expr);
+
+            /* Defer the increment until the value of this expression is used */;
+            DeferInc (Expr);
         }
-
-        /* Store the result back */
-        Store (Expr, 0);
-
-        /* Restore the original value in the primary register */
-        g_restore (Flags | CF_FORCECHAR);
     }
 
     /* The result is always an expression, no reference */
@@ -1784,7 +2069,7 @@ static void PostInc (ExprDesc* Expr)
 static void PostDec (ExprDesc* Expr)
 /* Handle the postdecrement operator */
 {
-    unsigned Flags;
+    unsigned Flags, Loc;
 
     NextToken ();
 
@@ -1803,32 +2088,43 @@ static void PostDec (ExprDesc* Expr)
     Flags = TypeOf (Expr->Type);
 
     /* Emit smaller code if a char variable is at a constant location */
-    if ((Flags & CF_CHAR) == CF_CHAR && ED_IsLocConst(Expr)) {
+    if ((Flags & CF_CHAR) == CF_CHAR && ED_IsLocConst (Expr)) {
 
         LoadExpr (CF_NONE, Expr);
-        AddCodeLine ("dec %s", ED_GetLabelName(Expr, 0));
+        AddCodeLine ("dec %s", ED_GetLabelName (Expr, 0));
 
     } else {
 
-        /* Push the address if needed */
-        PushAddr (Expr);
+        Loc = ED_GetLoc (Expr);
+        if (Loc == E_LOC_PRIMARY || Loc == E_LOC_EXPR) {
+            /* Push the address if needed */
+            PushAddr (Expr);
 
-        /* Fetch the value and save it (since it's the result of the expression) */
-        LoadExpr (CF_NONE, Expr);
-        g_save (Flags | CF_FORCECHAR);
+            /* Fetch the value and save it (since it's the result of the expression) */
+            LoadExpr (CF_NONE, Expr);
+            g_save (Flags | CF_FORCECHAR);
 
-        /* If we have a pointer expression, increment by the size of the type */
-        if (IsTypePtr (Expr->Type)) {
-            g_dec (Flags | CF_CONST | CF_FORCECHAR, CheckedSizeOf (Expr->Type + 1));
+            /* If we have a pointer expression, increment by the size of the type */
+            if (IsTypePtr (Expr->Type)) {
+                g_dec (Flags | CF_CONST | CF_FORCECHAR, CheckedSizeOf (Expr->Type + 1));
+            } else {
+                g_dec (Flags | CF_CONST | CF_FORCECHAR, 1);
+            }
+
+            /* Store the result back */
+            Store (Expr, 0);
+
+            /* Restore the original value in the primary register */
+            g_restore (Flags | CF_FORCECHAR);
+
         } else {
-            g_dec (Flags | CF_CONST | CF_FORCECHAR, 1);
+
+            /* Fetch the value and save it (since it's the result of the expression) */
+            LoadExpr (CF_NONE, Expr);
+
+            /* Defer the decrement until the value of this expression is used */;
+            DeferDec (Expr);
         }
-
-        /* Store the result back */
-        Store (Expr, 0);
-
-        /* Restore the original value in the primary register */
-        g_restore (Flags | CF_FORCECHAR);
     }
 
     /* The result is always an expression, no reference */
@@ -3263,6 +3559,9 @@ static int hieAnd (ExprDesc* Expr, unsigned* TrueLab, int* TrueLabAllocated)
                 /* Load the value */
                 LoadExpr (CF_FORCECHAR, Expr);
 
+                /* Append deferred inc/dec at sequence point */
+                DoDeferred (SQP_KEEP_TEST, Expr);
+
                 /* Clear the test flag */
                 ED_RequireNoTest (Expr);
 
@@ -3275,9 +3574,17 @@ static int hieAnd (ExprDesc* Expr, unsigned* TrueLab, int* TrueLabAllocated)
 
                 /* Generate the jump */
                 g_falsejump (CF_NONE, FalseLab);
-            } else if (Expr->IVal == 0 && !ED_IsAddrExpr (Expr)) {
-                /* Skip remaining */
-                Flags |= E_EVAL_UNEVAL;
+            } else {
+                /* Constant boolean subexpression could still have deferred inc/dec
+                ** operations, so just flush their side-effects at this sequence
+                ** point.
+                */
+                DoDeferred (SQP_KEEP_NONE, Expr);
+
+                if (Expr->IVal == 0 && !ED_IsAddrExpr (Expr)) {
+                    /* Skip remaining */
+                    Flags |= E_EVAL_UNEVAL;
+                }
             }
         }
 
@@ -3306,6 +3613,9 @@ static int hieAnd (ExprDesc* Expr, unsigned* TrueLab, int* TrueLabAllocated)
                     ED_RequireTest (&Expr2);
                     LoadExpr (CF_FORCECHAR, &Expr2);
 
+                    /* Append deferred inc/dec at sequence point */
+                    DoDeferred (SQP_KEEP_TEST, &Expr2);
+
                     /* Do short circuit evaluation */
                     if (CurTok.Tok == TOK_BOOL_AND) {
                         if (HasFalseJump == 0) {
@@ -3319,11 +3629,19 @@ static int hieAnd (ExprDesc* Expr, unsigned* TrueLab, int* TrueLabAllocated)
                         /* We need the true label for the last expression */
                         HasTrueJump = 1;
                     }
-                } else if (Expr2.IVal == 0 && !ED_IsAddrExpr (&Expr2)) {
-                    /* Skip remaining */
-                    Flags |= E_EVAL_UNEVAL;
-                    /* The value of the expression will be false */
-                    ED_MakeConstBool (Expr, 0);
+                } else {
+                    /* Constant boolean subexpression could still have deferred inc/
+                    ** dec operations, so just flush their side-effects at this
+                    ** sequence point.
+                    */
+                    DoDeferred (SQP_KEEP_NONE, &Expr2);
+
+                    if (Expr2.IVal == 0 && !ED_IsAddrExpr (&Expr2)) {
+                        /* Skip remaining */
+                        Flags |= E_EVAL_UNEVAL;
+                        /* The value of the expression will be false */
+                        ED_MakeConstBool (Expr, 0);
+                    }
                 }
             }
         }
@@ -3408,6 +3726,9 @@ static void hieOr (ExprDesc *Expr)
 
                     /* Get first expr */
                     LoadExpr (CF_FORCECHAR, Expr);
+                
+                    /* Append deferred inc/dec at sequence point */
+                    DoDeferred (SQP_KEEP_TEST, Expr);
 
                     /* Clear the test flag */
                     ED_RequireNoTest (Expr);
@@ -3421,9 +3742,17 @@ static void hieOr (ExprDesc *Expr)
                     /* Jump to TrueLab if true */
                     g_truejump (CF_NONE, TrueLab);
                 }
-            } else if (Expr->IVal != 0 || ED_IsAddrExpr (Expr)) {
-                /* Skip remaining */
-                Flags |= E_EVAL_UNEVAL;
+            } else {
+                /* Constant boolean subexpression could still have deferred inc/dec
+                ** operations, so just flush their side-effects at this sequence
+                ** point.
+                */
+                DoDeferred (SQP_KEEP_NONE, Expr);
+
+                if (Expr->IVal != 0 || ED_IsAddrExpr (Expr)) {
+                    /* Skip remaining */
+                    Flags |= E_EVAL_UNEVAL;
+                }
             }
         }
 
@@ -3456,17 +3785,28 @@ static void hieOr (ExprDesc *Expr)
                         ED_RequireTest (&Expr2);
                         LoadExpr (CF_FORCECHAR, &Expr2);
 
+                        /* Append deferred inc/dec at sequence point */
+                        DoDeferred (SQP_KEEP_TEST, &Expr2);
+
                         if (HasTrueJump == 0) {
                             TrueLab = GetLocalLabel();
                             HasTrueJump = 1;
                         }
                         g_truejump (CF_NONE, TrueLab);
                     }
-                } else if (Expr2.IVal != 0 || ED_IsAddrExpr (&Expr2)) {
-                    /* Skip remaining */
-                    Flags |= E_EVAL_UNEVAL;
-                    /* The result is always true */
-                    ED_MakeConstBool (Expr, 1);
+                } else {
+                    /* Constant boolean subexpression could still have deferred inc/
+                    ** dec operations, so just flush their side-effects at this
+                    ** sequence point.
+                    */
+                    DoDeferred (SQP_KEEP_NONE, &Expr2);
+
+                    if (Expr2.IVal != 0 || ED_IsAddrExpr (&Expr2)) {
+                        /* Skip remaining */
+                        Flags |= E_EVAL_UNEVAL;
+                        /* The result is always true */
+                        ED_MakeConstBool (Expr, 1);
+                    }
                 }
             }
 
@@ -3547,11 +3887,22 @@ static void hieQuest (ExprDesc* Expr)
             /* Condition codes not set, request a test */
             ED_RequireTest (Expr);
             LoadExpr (CF_NONE, Expr);
+
+            /* Append deferred inc/dec at sequence point */
+            DoDeferred (SQP_KEEP_TEST, Expr);
+
             FalseLab = GetLocalLabel ();
             g_falsejump (CF_NONE, FalseLab);
-        } else if (Expr->IVal == 0) {
-            /* Remember the current code position */
-            GetCodePos (&SkippedBranch);
+        } else {
+            /* Constant boolean subexpression could still have deferred inc/dec
+            ** operations, so just flush their side-effects at this sequence point.
+            */
+            DoDeferred (SQP_KEEP_NONE, Expr);
+
+            if (Expr->IVal == 0) {
+                /* Remember the current code position */
+                GetCodePos (&SkippedBranch);
+            }
         }
 
         /* Parse second expression. Remember for later if it is a NULL pointer
@@ -3563,7 +3914,17 @@ static void hieQuest (ExprDesc* Expr)
             if (!ConstantCond || !ED_IsConst (&Expr2)) {
                 /* Load it into the primary */
                 LoadExpr (CF_NONE, &Expr2);
+
+                /* Append deferred inc/dec at sequence point */
+                DoDeferred (SQP_KEEP_EXPR, &Expr2);
+
                 ED_FinalizeRValLoad (&Expr2);
+            } else {
+                /* Constant boolean subexpression could still have deferred inc/
+                ** dec operations, so just flush their side-effects at this
+                ** sequence point.
+                */
+                DoDeferred (SQP_KEEP_NONE, &Expr2);
             }
             Expr2.Type = PtrConversion (Expr2.Type);
         }
@@ -3601,7 +3962,17 @@ static void hieQuest (ExprDesc* Expr)
             if (!ConstantCond || !ED_IsConst (&Expr3)) {
                 /* Load it into the primary */
                 LoadExpr (CF_NONE, &Expr3);
+
+                /* Append deferred inc/dec at sequence point */
+                DoDeferred (SQP_KEEP_EXPR, &Expr3);
+
                 ED_FinalizeRValLoad (&Expr3);
+            } else {
+                /* Constant boolean subexpression could still have deferred inc/
+                ** dec operations, so just flush their side-effects at this
+                ** sequence point.
+                */
+                DoDeferred (SQP_KEEP_NONE, &Expr3);
             }
             Expr3.Type = PtrConversion (Expr3.Type);
         }
@@ -4011,6 +4382,9 @@ void hie0 (ExprDesc *Expr)
 
     hie1 (Expr);
     while (CurTok.Tok == TOK_COMMA) {
+        /* Append deferred inc/dec at sequence point */
+        DoDeferred (SQP_KEEP_NONE, Expr);
+
         /* If the expression didn't generate code or isn't cast to type void,
         ** emit a warning.
         */
@@ -4037,7 +4411,9 @@ void hie0 (ExprDesc *Expr)
 
 
 void Expression0 (ExprDesc* Expr)
-/* Evaluate an expression via hie0 and put the result into the primary register */
+/* Evaluate an expression via hie0 and put the result into the primary register.
+** The expression is completely evaluated and all side effects complete.
+*/
 {
     unsigned Flags = Expr->Flags & E_MASK_KEEP_RESULT;
 
@@ -4051,6 +4427,9 @@ void Expression0 (ExprDesc* Expr)
     if (ED_YetToLoad (Expr)) {
         LoadExpr (CF_NONE, Expr);
     }
+
+    /* Append deferred inc/dec at sequence point */
+    DoDeferred (SQP_KEEP_EXPR, Expr);
 }
 
 

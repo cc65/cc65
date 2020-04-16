@@ -66,6 +66,9 @@ unsigned Test (unsigned Label, int Invert)
     /* Check for a constant expression */
     if (ED_IsConstAbs (&Expr)) {
 
+        /* Append deferred inc/dec at sequence point */
+        DoDeferred (SQP_KEEP_NONE, &Expr);
+
         /* Result is constant, so we know the outcome */
         Result = (Expr.IVal != 0);
 
@@ -78,6 +81,9 @@ unsigned Test (unsigned Label, int Invert)
         }
 
     } else if (ED_IsAddrExpr (&Expr)) {
+
+        /* Append deferred inc/dec at sequence point */
+        DoDeferred (SQP_KEEP_NONE, &Expr);
 
         /* Object addresses are non-NULL */
         Result = 1;
@@ -92,6 +98,9 @@ unsigned Test (unsigned Label, int Invert)
 
         /* Load the value into the primary register */
         LoadExpr (CF_FORCECHAR, &Expr);
+
+        /* Append deferred inc/dec at sequence point */
+        DoDeferred (SQP_KEEP_TEST, &Expr);
 
         /* Generate the jump */
         if (Invert) {

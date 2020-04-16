@@ -352,6 +352,9 @@ static void ReturnStatement (void)
                     LoadExpr (CF_NONE, &Expr);
                 }
             }
+
+            /* Append deferred inc/dec at sequence point */
+            DoDeferred (SQP_KEEP_EAX, &Expr);
         }
 
     } else if (!F_HasVoidReturn (CurrentFunc) && !F_HasOldStyleIntRet (CurrentFunc)) {

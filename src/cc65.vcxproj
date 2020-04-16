@@ -87,6 +87,7 @@
     <ClInclude Include="cc65\codeinfo.h" />
     <ClInclude Include="cc65\codelab.h" />
     <ClInclude Include="cc65\codeopt.h" />
+    <ClInclude Include="cc65\codeoptutil.h" />
     <ClInclude Include="cc65\codeseg.h" />
     <ClInclude Include="cc65\compile.h" />
     <ClInclude Include="cc65\coptadd.h" />
@@ -163,6 +164,7 @@
     <ClCompile Include="cc65\codeinfo.c" />
     <ClCompile Include="cc65\codelab.c" />
     <ClCompile Include="cc65\codeopt.c" />
+    <ClCompile Include="cc65\codeoptutil.c" />
     <ClCompile Include="cc65\codeseg.c" />
     <ClCompile Include="cc65\compile.c" />
     <ClCompile Include="cc65\coptadd.c" />

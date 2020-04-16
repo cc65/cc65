@@ -341,6 +341,7 @@ int ParseOpcArgStr (const char* Arg, unsigned short* ArgInfo, struct StrBuf* Nam
     const char*     OffsetPart = 0;
     const char*     NameEnd = 0;
     int             Negative = 0;
+    int             Parentheses = 0;
     unsigned long   NumVal = 0;
     long long       AccOffset = 0;
     char*           End;            /* Used for checking errors */
@@ -357,6 +358,49 @@ int ParseOpcArgStr (const char* Arg, unsigned short* ArgInfo, struct StrBuf* Nam
         SB_Terminate (Name);
         OffsetPart = Arg;
     } else {
+        /* <, >, ^ */
+        if (Arg[0] == '<') {
+            Flags |= AIF_LOBYTE;
+        } else if (Arg[0] == '>') {
+            Flags |= AIF_HIBYTE;
+        } else if (Arg[0] == '^') {
+            Flags |= AIF_BANKBYTE;
+        }
+
+        if ((Flags & (AIF_FAR)) != 0) {
+            /* Skip this char */
+            ++Arg;
+        }
+
+        /* Skip spaces */
+        while (Arg[0] == ' ') {
+            ++Arg;
+        }
+
+        /* Strip parentheses off if exist */
+        if (Arg[0] == '(') {
+            /* Skip this char */
+            ++Arg;
+
+            End = strchr (Arg, ')');
+            if (End == 0 || End[1] != '\0') {
+                /* Not closed at the end, bail out */
+                *Offset = 0;
+                if (ArgInfo != 0) {
+                    *ArgInfo = Flags | AIF_FAILURE;
+                }
+                return 0;
+            }
+
+            /* Found */
+            Parentheses = 1;
+
+            /* Skip spaces */
+            while (Arg[0] == ' ') {
+                ++Arg;
+            }
+        }
+
         /* If the symbol name starts with an underline, it is an external symbol.
         ** If the symbol does not start with an underline, it may be a built-in
         ** symbol.
@@ -384,7 +428,11 @@ int ParseOpcArgStr (const char* Arg, unsigned short* ArgInfo, struct StrBuf* Nam
 
         } else {
             /* No offset */
-            SB_CopyStr (Name, Arg);
+            if (Parentheses == 0) {
+                SB_CopyStr (Name, Arg);
+            } else {
+                SB_CopyBuf (Name, Arg, End - Arg);
+            }
             SB_Terminate (Name);
         }
 
@@ -410,10 +458,27 @@ int ParseOpcArgStr (const char* Arg, unsigned short* ArgInfo, struct StrBuf* Nam
             }
             Flags |= AIF_HAS_NAME;
         }
+
+        /* A byte size expression with no parentheses but an offset is not
+        ** handled correctly for now, so just bail out in such cases.
+        */
+        if ((Flags & AIF_FAR) != 0  &&
+            Parentheses == 0        &&
+            OffsetPart != 0         &&
+            OffsetPart[0] != '\0') {
+            /* Bail out */
+            *Offset = 0;
+            if (ArgInfo != 0) {
+                *ArgInfo = Flags | AIF_FAILURE;
+            }
+            return 0;
+        }
     }
 
     /* Get the offset */
-    while (OffsetPart != 0 && OffsetPart[0] != '\0') {
+    while (OffsetPart != 0       &&
+           OffsetPart[0] != '\0' &&
+           OffsetPart[0] != ')') {
         /* Skip spaces */
         while (OffsetPart[0] == ' ') {
             ++OffsetPart;
@@ -448,7 +513,7 @@ int ParseOpcArgStr (const char* Arg, unsigned short* ArgInfo, struct StrBuf* Nam
         }
 
         /* Check if the conversion was successful */
-        if (*End != '\0' && *End != ' ' && *End != '+' && *End != '-') {
+        if (*End != '\0' && *End != ' ' && *End != '+' && *End != '-' && *End != ')') {
             /* Could not convert */
             *Offset = 0;
             if (ArgInfo != 0) {
@@ -714,11 +779,33 @@ void CE_SetArgBaseAndOff (CodeEntry* E, const char* ArgBase, long ArgOff)
             Str = xmalloc (Len);
         }
 
-        if (CE_HasArgOffset (E)) {
-            sprintf (Str, "%s%+ld", ArgBase, ArgOff);
+        if ((E->ArgInfo & AIF_FAR) == 0) {
+            if (CE_HasArgOffset (E)) {
+                sprintf (Str, "%s%+ld", ArgBase, ArgOff);
+            } else {
+                sprintf (Str, "%s", ArgBase);
+            }
+            CE_SetArg (E, Str);
         } else {
-            sprintf (Str, "%s", ArgBase);
+            /* A byte expression */
+            const char* Expr = "";
+            if ((E->ArgInfo & AIF_FAR) == AIF_LOBYTE) {
+                Expr = "<";
+            } else if ((E->ArgInfo & AIF_FAR) == AIF_HIBYTE) {
+                Expr = ">";
+            } else if ((E->ArgInfo & AIF_FAR) == AIF_BANKBYTE) {
+                Expr = "^";
+            } else {
+                Internal ("Invalid byte size flag in CE_SetArgBaseAndOff");
+            }
+
+            if (CE_HasArgOffset (E)) {
+                sprintf (Str, "%s(%s%+ld)", Expr, ArgBase, ArgOff);
+            } else {
+                sprintf (Str, "%s(%s)", Expr, ArgBase);
+            }
         }
+
         CE_SetArg (E, Str);
 
         if (Str != Buf) {

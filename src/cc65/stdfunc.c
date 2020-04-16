@@ -245,6 +245,9 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         LoadExpr (CF_NONE, &Arg3.Expr);
     }
 
+    /* We still need to append deferred inc/dec before calling into the function */
+    DoDeferred (SQP_KEEP_EAX, &Arg3.Expr);
+
     /* Emit the actual function call. This will also cleanup the stack. */
     g_call (CF_FIXARGC, Func_memcpy, ParamSize);
 
@@ -594,6 +597,9 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         LoadExpr (CF_NONE, &Arg3.Expr);
     }
 
+    /* We still need to append deferred inc/dec before calling into the function */
+    DoDeferred (SQP_KEEP_EAX, &Arg3.Expr);
+
     /* Emit the actual function call. This will also cleanup the stack. */
     g_call (CF_FIXARGC, MemSet? Func_memset : Func__bzero, ParamSize);
 
@@ -808,6 +814,9 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         LoadExpr (CF_NONE, &Arg2.Expr);
     }
 
+    /* We still need to append deferred inc/dec before calling into the function */
+    DoDeferred (SQP_KEEP_EAX, &Arg2.Expr);
+
     /* Emit the actual function call. This will also cleanup the stack. */
     g_call (CF_FIXARGC, Func_strcmp, ParamSize);
 
@@ -1007,6 +1016,9 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         LoadExpr (CF_NONE, &Arg2.Expr);
     }
 
+    /* We still need to append deferred inc/dec before calling into the function */
+    DoDeferred (SQP_KEEP_EAX, &Arg2.Expr);
+
     /* Emit the actual function call. This will also cleanup the stack. */
     g_call (CF_FIXARGC, Func_strcpy, ParamSize);
 
@@ -1192,6 +1204,9 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 
     /* Evaluate the parameter */
     hie1 (&Arg);
+
+    /* We still need to append deferred inc/dec before calling into the function */
+    DoDeferred (SQP_KEEP_EAX, &Arg);
 
     /* Check if the argument is an array. If so, remember the element count.
     ** Otherwise set the element count to undefined.

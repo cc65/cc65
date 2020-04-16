@@ -2302,6 +2302,9 @@ static unsigned ParseScalarInit (Type* T)
     /* Output the data */
     DefineData (&ED);
 
+    /* Do this anyways for safety */
+    DoDeferred (SQP_KEEP_NONE, &ED);
+
     /* Done */
     return SizeOf (T);
 }
@@ -2320,6 +2323,9 @@ static unsigned ParsePointerInit (Type* T)
 
     /* Output the data */
     DefineData (&ED);
+
+    /* Do this anyways for safety */
+    DoDeferred (SQP_KEEP_NONE, &ED);
 
     /* Close eventually opening braces */
     ClosingCurlyBraces (BraceCount);

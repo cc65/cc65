@@ -18,6 +18,19 @@
 
 
 /*****************************************************************************/
+/*                                   data                                    */
+/*****************************************************************************/
+
+
+
+#define SQP_KEEP_NONE	0x00
+#define SQP_KEEP_TEST	0x01U
+#define SQP_KEEP_EAX	0x02U
+#define SQP_KEEP_EXPR	0x03U	/* SQP_KEEP_TEST | SQP_KEEP_EAX */
+
+
+
+/*****************************************************************************/
 /*                                   code                                    */
 /*****************************************************************************/
 
@@ -38,6 +51,23 @@ void PushAddr (const ExprDesc* Expr);
 ** must be saved if it's not constant, before evaluating the rhs.
 */
 
+void InitDeferredOps (void);
+/* Init the collection for storing deferred ops */
+
+void DoneDeferredOps (void);
+/* Deinit the collection for storing deferred ops */
+
+int GetDeferredOpCount (void);
+/* Return how many deferred operations are still waiting in the queque */
+
+void CheckDeferredOpAllDone (void);
+/* Check if all deferred operations are done at sequence points.
+** Die off if check fails.
+*/
+
+void DoDeferred (unsigned Flags, ExprDesc* Expr);
+/* Do deferred operations such as post-inc/dec at sequence points */
+
 void Store (ExprDesc* Expr, const Type* StoreType);
 /* Store the primary register into the location denoted by lval. If StoreType
 ** is given, use this type when storing instead of lval->Type. If StoreType
@@ -52,7 +82,9 @@ int evalexpr (unsigned flags, void (*Func) (ExprDesc*), ExprDesc* Expr);
 */
 
 void Expression0 (ExprDesc* Expr);
-/* Evaluate an expression via hie0 and put the result into the primary register */
+/* Evaluate an expression via hie0 and put the result into the primary register.
+** The expression is completely evaluated and all side effects complete.
+*/
 
 void BoolExpr (void (*Func) (ExprDesc*), ExprDesc* Expr);
 /* Will evaluate an expression via the given function. If the result is not

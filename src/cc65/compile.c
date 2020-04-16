@@ -320,6 +320,9 @@ static void Parse (void)
                 } else {
                     /* Parse the function body */
                     NewFunc (Entry, FuncDef);
+
+                    /* Make sure we aren't omitting any work */
+                    CheckDeferredOpAllDone ();
                 }
             }
 
@@ -394,6 +397,8 @@ void Compile (const char* FileName)
     /* Other standard macros */
     /* DefineNumericMacro ("__STDC__", 1);      <- not now */
     DefineNumericMacro ("__STDC_HOSTED__", 1);
+
+    InitDeferredOps ();
 
     /* Create the base lexical level */
     EnterGlobalLevel ();
@@ -485,6 +490,8 @@ void Compile (const char* FileName)
             }
         }
     }
+
+    DoneDeferredOps ();
 
     if (Debug) {
         PrintMacroStats (stdout);

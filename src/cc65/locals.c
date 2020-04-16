@@ -165,6 +165,8 @@ static void ParseRegisterDecl (Declaration* Decl, int Reg)
             /* Store the value into the variable */
             g_putstatic (CF_REGVAR | TypeOf (Sym->Type), Reg, 0);
 
+            /* This has to be done at sequence point */
+            DoDeferred (SQP_KEEP_NONE, &Expr);
         }
 
         /* Mark the variable as referenced */
@@ -273,6 +275,8 @@ static void ParseAutoDecl (Declaration* Decl)
                 /* Push the value */
                 g_push (Flags | TypeOf (Sym->Type), Expr.IVal);
 
+                /* This has to be done at sequence point */
+                DoDeferred (SQP_KEEP_NONE, &Expr);
             }
 
             /* Mark the variable as referenced */
@@ -349,6 +353,9 @@ static void ParseAutoDecl (Declaration* Decl)
 
                 /* Store the value into the variable */
                 g_putstatic (CF_STATIC | TypeOf (Sym->Type), DataLabel, 0);
+
+                /* This has to be done at sequence point */
+                DoDeferred (SQP_KEEP_NONE, &Expr);
             }
 
             /* Mark the variable as referenced */
@@ -525,6 +532,9 @@ static void ParseOneDecl (const DeclSpec* Spec)
         }
 
     }
+
+    /* Make sure we aren't missing some work */
+    CheckDeferredOpAllDone ();
 }
 
 

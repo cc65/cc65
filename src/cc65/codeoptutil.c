@@ -103,15 +103,15 @@ void FinalizeLoadRegInfo (LoadRegInfo* LRI, CodeSeg* S)
     }
 
     /* Load from src not modified before op can be treated as direct */
-    if ((LRI->Flags & LI_SRC_CHG) == 0 &&
+    if ((LRI->Flags & (LI_SRC_CHG | LI_Y_SRC_CHG)) == 0 &&
         (LRI->Flags & (LI_CHECK_ARG | LI_CHECK_Y)) != 0) {
         LRI->Flags |= LI_DIRECT;
         if ((LRI->Flags & LI_CHECK_Y) != 0) {
             LRI->Flags |= LI_RELOAD_Y;
         }
     }
-    /* We cannot ldy ??? or ldy src,y */
-    if ((LRI->Flags & LI_CHECK_Y) != 0          &&
+    /* We cannot ldy src,y or reload unknown Y */
+    if ((LRI->Flags & (LI_CHECK_Y | LI_RELOAD_Y)) == (LI_CHECK_Y | LI_RELOAD_Y) &&
         (LRI->LoadYEntry == 0 ||
          (LRI->LoadYEntry->Use & REG_Y) == REG_Y)) {
         LRI->Flags &= ~LI_DIRECT;
@@ -221,161 +221,205 @@ RegInfo* GetLastChangedRegInfo (StackOpData* D, LoadRegInfo* Reg)
 
 
 static int Affected (LoadRegInfo* LRI, const CodeEntry* E)
-/* Check if the result of the same loading code as in LRI may be changed by E */
+/* Check if the result of the same loading code as in LRI may be changed by E.
+** If any part of the arg is used, it could be unsafe to add such a store before E.
+** If any part of the arg is changed, it could be unsafe to add such a load after E.
+*/
 {
     fncls_t         fncls;
     unsigned int    Use;
     unsigned int    Chg;
     unsigned int    UseToCheck = 0;
+    unsigned int    ChgToCheck = 0;
     StrBuf          Src, YSrc, New;
     int             SrcOff = 0, YSrcOff = 0, NewOff = 0;
-    const ZPInfo*   ZI = 0;
+    const ZPInfo*   ZI  = 0;
+    unsigned        Res = 0;
+    CodeEntry*      AE  = 0;
+    CodeEntry*      YE  = 0;
+
+    if ((LRI->Flags & (LI_CHECK_ARG | LI_CHECK_Y | LI_RELOAD_Y)) == 0) {
+        /* Nothing to check */
+        return 0;
+    }
 
     SB_Init (&Src);
     SB_Init (&YSrc);
     SB_Init (&New);
 
-    if ((LRI->Flags & (LI_CHECK_ARG | LI_CHECK_Y)) != 0) {
-        if (E->AM == AM65_ACC || E->AM == AM65_BRA || E->AM == AM65_IMM || E->AM == AM65_IMP) {
-            return (LRI->Flags & LI_CHECK_Y) != 0 && (E->Chg & REG_Y) != 0;
-        }
-        CHECK ((LRI->Flags & LI_CHECK_ARG) == 0 || LRI->LoadIndex < 0  || LRI->LoadEntry != 0);
-        CHECK ((LRI->Flags & LI_CHECK_Y) == 0   || LRI->LoadYIndex < 0 || LRI->LoadYEntry != 0);
+    if (E->AM == AM65_ACC || E->AM == AM65_BRA || E->AM == AM65_IMM || E->AM == AM65_IMP) {
+        goto L_Result;
+    }
+    CHECK ((LRI->Flags & LI_CHECK_ARG) == 0 || LRI->LoadIndex < 0 || LRI->LoadEntry != 0);
+    CHECK ((LRI->Flags & (LI_CHECK_Y | LI_RELOAD_Y)) == 0 || LRI->LoadYIndex < 0 || LRI->LoadYEntry != 0);
 
-        if ((LRI->Flags & LI_CHECK_ARG) != 0) {
-            if (LRI->LoadEntry != 0) {
-                /* We ignore processor flags for loading args.
-                ** Further more, Reg A can't be used as the index.
-                */
-                UseToCheck |= LRI->LoadEntry->Use & ~REG_A & REG_ALL;
-                SB_InitFromString (&Src, xstrdup (LRI->LoadEntry->Arg));
-                if (!ParseOpcArgStr (LRI->LoadEntry->Arg, &Src, &SrcOff)) {
-                    /* Bail out and play it safe*/
-                    goto L_Affected;
-                }
-                ZI = GetZPInfo (SB_GetConstBuf (&Src));
-                if (ZI != 0) {
-                    UseToCheck |= ZI->ByteUse;
-                }
-            } else {
-                /* We don't know what regs could have been used for the src.
-                ** So we just assume all.
-                */
-                UseToCheck |= ~REG_A & REG_ALL;
+    if ((LRI->Flags & LI_CHECK_ARG) != 0) {
+        AE = LRI->LoadEntry;
+        if (AE != 0) {
+            /* We ignore processor flags for loading args.
+            ** Further more, Reg A can't be used as the index.
+            */
+            UseToCheck |= AE->Use & ~REG_A & REG_ALL;
+            ChgToCheck |= AE->Chg & ~REG_A & REG_ALL;
+
+            SB_InitFromString (&Src, xstrdup (AE->Arg));
+            if (!ParseOpcArgStr (AE->Arg, &Src, &SrcOff)) {
+                /* Bail out and play it safe*/
+                Res |= LI_SRC_USE | LI_SRC_CHG;
+                goto L_Result;
             }
-        }
-
-        if ((LRI->Flags & LI_CHECK_Y) != 0) {
-            if (LRI->LoadYEntry != 0) {
-                UseToCheck |= LRI->LoadYEntry->Use;
-                SB_InitFromString (&YSrc, xstrdup (LRI->LoadYEntry->Arg));
-                if (!ParseOpcArgStr (LRI->LoadYEntry->Arg, &YSrc, &YSrcOff)) {
-                    /* Bail out and play it safe*/
-                    goto L_Affected;
-                }
-                ZI = GetZPInfo (SB_GetConstBuf (&YSrc));
-                if (ZI != 0) {
-                    UseToCheck |= ZI->ByteUse;
-                }
-            } else {
-                /* We don't know what regs could have been used by Y.
-                ** So we just assume all.
-                */
-                UseToCheck |= ~REG_A & REG_ALL;
+            /* We have to manually set up the use/chg flags for builtin functions */
+            ZI = GetZPInfo (SB_GetConstBuf (&Src));
+            if (ZI != 0) {
+                UseToCheck |= ZI->ByteUse;
+                ChgToCheck |= ZI->ByteUse;
             }
-        }
-
-        if (E->OPC == OP65_JSR) {
-            /* Try to know about the function */
-            fncls = GetFuncInfo (E->Arg, &Use, &Chg);
-            if ((UseToCheck & Chg & REG_ALL) == 0 &&
-                fncls == FNCLS_BUILTIN) {
-                /* Builtin functions are known to be harmless */
-                goto L_NotAffected;
-            }
-            /* Otherwise play it safe */
-            goto L_Affected;
-
         } else {
-            if (E->OPC == OP65_DEC || E->OPC == OP65_INC ||
-                E->OPC == OP65_ASL || E->OPC == OP65_LSR ||
-                E->OPC == OP65_ROL || E->OPC == OP65_ROR ||
-                E->OPC == OP65_TRB || E->OPC == OP65_TSB ||
-                E->OPC == OP65_STA || E->OPC == OP65_STX ||
-                E->OPC == OP65_STY || E->OPC == OP65_STZ) {
-
-                SB_InitFromString (&New, xstrdup (E->Arg));
-                if (!ParseOpcArgStr (E->Arg, &New, &NewOff)) {
-                    /* Bail out and play it safe*/
-                    goto L_Affected;
-                }
-
-                /* These opc may operate on memory locations */
-                if ((E->AM == AM65_ABS || E->AM == AM65_ZP)) {
-                    /* If we don't know what memory locations could have been used for the src,
-                    ** we just assume all.
-                    */
-                    if ((LRI->Flags & LI_CHECK_ARG) != 0) {
-                        if (LRI->LoadEntry == 0                     ||
-                            (LRI->LoadEntry->AM != AM65_ABS &&
-                             LRI->LoadEntry->AM != AM65_ZP  &&
-                             (LRI->LoadEntry->AM != AM65_ZP_INDY ||
-                              SB_CompareStr (&Src, "sp") != 0))     ||
-                            (SB_Compare (&Src, &New) == 0   &&
-                             SrcOff == NewOff)) {
-                            goto L_Affected;
-                        }
-                    }
-
-                    /* If we don't know what memory location could have been used by Y,
-                    ** we just assume all.
-                    */
-                    if ((LRI->Flags & LI_CHECK_Y) != 0) {
-                        if (LRI->LoadYEntry == 0                ||
-                            (LRI->LoadYEntry->AM != AM65_ABS &&
-                             LRI->LoadYEntry->AM != AM65_ZP)    ||
-                            (SB_Compare (&YSrc, &New) == 0   &&
-                             YSrcOff == NewOff)) {
-                            goto L_Affected;
-                        }
-                    }
-
-                    /* Not affected */
-                    goto L_NotAffected;
-
-                } else if (E->AM == AM65_ZP_INDY && SB_CompareStr (&New, "sp") == 0) {
-                    if ((LRI->Flags & LI_CHECK_ARG) != 0) {
-                        if (LRI->LoadEntry == 0                     ||
-                            (LRI->LoadEntry->AM != AM65_ABS &&
-                             LRI->LoadEntry->AM != AM65_ZP  &&
-                             (LRI->LoadEntry->AM != AM65_ZP_INDY ||
-                             SB_Compare (&Src, &New) == 0)  &&
-                             SrcOff == NewOff)) {
-                            goto L_Affected;
-                        }
-                    }
-
-                    /* Not affected */
-                    goto L_NotAffected;
-                }
-                /* We could've check further for more cases where the load target isn't modified,
-                ** But for now let's save the trouble and just play it safe. */
-                goto L_Affected;
-            }
+            /* We don't know what regs could have been used for the src.
+            ** So we just assume all.
+            */
+            UseToCheck |= ~REG_A & REG_ALL;
+            ChgToCheck |= ~REG_A & REG_ALL;
         }
     }
 
-L_NotAffected:
-    SB_Done (&Src);
-    SB_Done (&YSrc);
-    SB_Done (&New);
-    return 0;
+    if ((LRI->Flags & LI_CHECK_Y) != 0) {
+        YE = LRI->LoadYEntry;
+        if (YE != 0) {
+            UseToCheck |= YE->Use;
+            SB_InitFromString (&YSrc, xstrdup (YE->Arg));
+            if (!ParseOpcArgStr (YE->Arg, &YSrc, &YSrcOff)) {
+                /* Bail out and play it safe*/
+                Res |= LI_SRC_USE | LI_SRC_CHG;
+                goto L_Result;
+            }
+            /* We have to manually set up the use/chg flags for builtin functions */
+            ZI = GetZPInfo (SB_GetConstBuf (&YSrc));
+            if (ZI != 0) {
+                UseToCheck |= ZI->ByteUse;
+                ChgToCheck |= ZI->ByteUse;
+            }
+        } else {
+            /* We don't know what regs could have been used by Y.
+            ** So we just assume all.
+            */
+            UseToCheck |= ~REG_A & REG_ALL;
+            ChgToCheck |= ~REG_A & REG_ALL;
+        }
+    }
+
+    if (E->OPC == OP65_JSR) {
+        /* Try to know about the function */
+        fncls = GetFuncInfo (E->Arg, &Use, &Chg);
+        if (fncls == FNCLS_BUILTIN) {
+            /* Builtin functions are usually harmless */
+            if ((ChgToCheck & Use & REG_ALL) != 0) {
+                Res |= LI_SRC_USE;
+            }
+            if ((UseToCheck & Chg & REG_ALL) != 0) {
+                Res |= LI_SRC_CHG;
+            }
+            goto L_Result;
+        }
+        /* Otherwise play it safe */
+        Res |= LI_SRC_USE | LI_SRC_CHG;
+        goto L_Result;
+
+    } else {
+        if ((E->Info & (OF_READ | OF_WRITE)) != 0) {
+
+            SB_InitFromString (&New, xstrdup (E->Arg));
+            if (!ParseOpcArgStr (E->Arg, &New, &NewOff)) {
+                /* Bail out and play it safe*/
+                goto L_Affected;
+            }
+
+            /* These opc may operate on memory locations. In some cases we can
+            ** be sure that the src is unaffected as E doesn't overlap with it.
+            ** However, if we don't know what memory locations could have been
+            ** used for the src, we just assume all.
+            */
+            if (E->AM == AM65_ABS       ||
+                E->AM == AM65_ZP        ||
+                (E->AM == AM65_ZP_INDY && SB_CompareStr (&New, "sp") == 0)
+                ) {
+                if ((LRI->Flags & LI_CHECK_ARG) != 0) {
+                    if (AE == 0                             ||
+                        (AE->AM != AM65_ABS &&
+                         AE->AM != AM65_ZP  &&
+                         (AE->AM != AM65_ZP_INDY ||
+                          SB_CompareStr (&Src, "sp") != 0)) ||
+                         (SrcOff == NewOff &&
+                          SB_Compare (&Src, &New) == 0)) {
+
+                        if ((E->Info & OF_READ) != 0) {
+                            /* Used */
+                            Res |= LI_SRC_USE;
+                        }
+                        if ((E->Info & OF_WRITE) != 0) {
+                            /* Changed */
+                            Res |= LI_SRC_CHG;
+                        }
+                    }
+                }
+
+                if ((LRI->Flags & LI_CHECK_Y) != 0) {
+                    /* If we don't know what memory location could have been used by Y,
+                    ** we just assume all. */
+                    if (YE == 0 ||
+                        (YSrcOff == NewOff && SB_Compare (&YSrc, &New) == 0)) {
+
+                        if ((E->Info & OF_READ) != 0) {
+                            /* Used */
+                            Res |= LI_Y_SRC_USE;
+                        }
+                        if ((E->Info & OF_WRITE) != 0) {
+                            /* Changed */
+                            Res |= LI_Y_SRC_CHG;
+                        }
+                    }
+                }
+
+                /* Otherwise unaffected */
+                goto L_Result;
+            }
+            /* We could've check further for more cases where the load target isn't
+            ** modified, but for now let's save the trouble and just play it safe.
+            */
+            goto L_Affected;
+        }
+    }
 
 L_Affected:
+    if ((E->Info & OF_READ) != 0) {
+        /* Used */
+        Res |= LI_SRC_USE;
+        if ((LRI->Flags & LI_CHECK_Y) != 0) {
+            Res |= LI_Y_SRC_USE;
+        }
+    }
+    if ((E->Info & OF_WRITE) != 0) {
+        /* Changed */
+        Res |= LI_SRC_CHG;
+        if ((LRI->Flags & LI_CHECK_Y) != 0) {
+            Res |= LI_Y_SRC_CHG;
+        }
+    }
+
+L_Result:
+    if ((LRI->Flags & LI_RELOAD_Y) != 0 &&
+        (E->Use & REG_Y) != 0) {
+        Res |= LI_Y_USE;
+    }
+    if ((LRI->Flags & LI_CHECK_Y) != 0 &&
+        (E->Chg & REG_Y) != 0) {
+        Res |= LI_Y_CHG;
+    }
     SB_Done (&Src);
     SB_Done (&YSrc);
     SB_Done (&New);
-    return 1;
+
+    return Res;
 }
 
 
@@ -388,15 +432,17 @@ static void HonourUseAndChg (LoadRegInfo* LRI, unsigned Reg, const CodeEntry* E,
         ClearLoadRegInfo (LRI);
         LRI->ChgIndex = I;
         LRI->Flags = 0;
-    } else if (Affected (LRI, E)) {
-        LRI->Flags |= LI_SRC_CHG;
+    } else {
+        LRI->Flags |= Affected (LRI, E);
     }
 }
 
 
 
 void PrepairLoadRegInfoForArgCheck (CodeSeg* S, LoadRegInfo* LRI, CodeEntry* E)
-/* Set the load src flags and remember to check for load src change if necessary */
+/* Set the load src flags and remember to check for load src change if necessary.
+** Note: this doesn't assume reloading Y.
+*/
 {
     if (E->AM == AM65_IMM) {
         /* These insns are all ok and replaceable */
@@ -448,15 +494,9 @@ void PrepairLoadRegInfoForArgCheck (CodeSeg* S, LoadRegInfo* LRI, CodeEntry* E)
 void SetIfOperandSrcAffected (LoadInfo* LLI, CodeEntry* E)
 /* Check and flag operand src that may be affected */
 {
-    if (Affected (&LLI->A, E)) {
-        LLI->A.Flags |= LI_SRC_CHG;
-    }
-    if (Affected (&LLI->X, E)) {
-        LLI->X.Flags |= LI_SRC_CHG;
-    }
-    if (Affected (&LLI->Y, E)) {
-        LLI->Y.Flags |= LI_SRC_CHG;
-    }
+    LLI->A.Flags |= Affected (&LLI->A, E);
+    LLI->X.Flags |= Affected (&LLI->X, E);
+    LLI->Y.Flags |= Affected (&LLI->Y, E);
 }
 
 
@@ -2914,15 +2954,64 @@ unsigned GetRegUsageInOpenRange (CodeSeg* S, int First, int Last, unsigned* Use,
 
 
 
+int IsArgSameInOpenRange (CodeSeg* S, int First, int Last, CodeEntry* E)
+/* Check if the loading the opc arg gives the same result everywhere between (First, Last).
+** The code block in the range must be basic without any jump backwards.
+** Note: this always checks Y if any of the LI_CHECK_Y / LI_RELOAD_Y flags is set.
+*/
+{
+    LoadRegInfo LRI;
+    CodeEntry*  X;
+    unsigned CheckedFlags = LI_SRC_CHG;
+
+    CHECK (Last <= (int)CollCount (&S->Entries));
+
+    /* TODO: We'll currently give up finding the src of Y */
+    ClearLoadRegInfo (&LRI);
+    PrepairLoadRegInfoForArgCheck (S, &LRI, E);
+
+    /* TODO: We don't currently check for all cases */
+    if ((LRI.Flags & (LI_DIRECT | LI_CHECK_ARG | LI_CHECK_Y | LI_RELOAD_Y)) == 0) {
+        /* Just bail out as if the src would change right away */
+        return 0;
+    }
+
+    /* If there's no need to check */
+    if ((LRI.Flags & (LI_CHECK_ARG | LI_CHECK_Y | LI_RELOAD_Y)) == 0) {
+        return 1;
+    }
+
+    /* This always checks Y */
+    if ((LRI.Flags & (LI_CHECK_Y | LI_RELOAD_Y)) != 0) {
+        LRI.Flags |= LI_CHECK_Y;
+        LRI.Flags &= ~LI_RELOAD_Y;
+        CheckedFlags |= LI_Y_CHG;
+    }
+
+    while (++First < Last) {
+        X = CS_GetEntry (S, First);
+        if ((Affected (&LRI, X) & CheckedFlags) != 0) {
+            return 0;
+        }
+    }
+
+    /* No change found */
+    return 1;
+}
+
+
+
 int FindArgFirstChangeInOpenRange (CodeSeg* S, int First, int Last, CodeEntry* E)
 /* Find the first possible spot where the loaded arg of E might be changed in
 ** the range (First, Last). The code block in the range must be basic without
 ** any jump backwards.
 ** Return the index of the found entry, or Last if not found.
+** Note: changes of Y are always ignored even if the LI_RELOAD_Y flag is not set.
 */
 {
     LoadRegInfo LRI;
     CodeEntry* X;
+    unsigned CheckedFlags = LI_SRC_CHG;
 
     CHECK (Last <= (int)CollCount (&S->Entries));
 
@@ -2943,13 +3032,72 @@ int FindArgFirstChangeInOpenRange (CodeSeg* S, int First, int Last, CodeEntry* E
 
     while (++First < Last) {
         X = CS_GetEntry (S, First);
-        if (Affected (&LRI, X)) {
+        if ((Affected (&LRI, X) & CheckedFlags) != 0) {
             return First;
         }
     }
 
     /* Not found */
     return Last;
+}
+
+
+
+int FindArgLastUsageInOpenRange (CodeSeg* S, int First, int Last, CodeEntry* E, int ReloadY)
+/* Find the last index where the arg of E might be used or changed in the range (First, Last).
+** ReloadY indicates whether Y is supposed to be reloaded.
+** The code block in the range must be basic without any jump backwards.
+** Return the index of the found entry, or -1 if not found.
+*/
+{
+    LoadRegInfo LRI;
+    CodeEntry* X;
+    unsigned CheckedFlags = LI_SRC_USE | LI_SRC_CHG;
+    int Found = -1;
+
+    CHECK (Last <= (int)CollCount (&S->Entries));
+
+    /* TODO: We'll currently give up finding the src of Y */
+    ClearLoadRegInfo (&LRI);
+    PrepairLoadRegInfoForArgCheck (S, &LRI, E);
+
+    /* Whether Y is to be reloaded */
+    if (ReloadY) {
+        /* Always reload Y */
+        if ((LRI.Flags & LI_CHECK_Y) != 0) {
+            LRI.Flags |= LI_RELOAD_Y;
+        }
+    } else if ((LRI.Flags & LI_RELOAD_Y) != 0) {
+        /* Always check Y */
+        LRI.Flags |= LI_CHECK_Y;
+        LRI.Flags &= ~LI_RELOAD_Y;
+    }
+
+    /* TODO: We don't currently check for all cases */
+    if ((LRI.Flags & (LI_DIRECT | LI_CHECK_ARG | LI_CHECK_Y | LI_RELOAD_Y)) == 0) {
+        /* Just bail out as if the src would change right away */
+        return 0;
+    }
+
+    if ((LRI.Flags & LI_CHECK_Y) != 0) {
+        CheckedFlags |= LI_Y_SRC_USE | LI_Y_SRC_CHG;
+    }
+
+    if ((LRI.Flags & LI_RELOAD_Y) != 0) {
+        CheckedFlags |= LI_Y_USE;
+    } else if ((LRI.Flags & LI_CHECK_Y) != 0) {
+        CheckedFlags |= LI_Y_CHG;
+    }
+
+    while (++First < Last) {
+        X = CS_GetEntry (S, First);
+        if ((Affected (&LRI, X) & CheckedFlags) != 0) {
+            Found = First;
+        }
+    }
+
+    /* Result */
+    return Found;
 }
 
 

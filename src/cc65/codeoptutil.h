@@ -58,13 +58,18 @@ typedef enum {
     LI_REMOVE       = 0x04,         /* Load may be removed */
     LI_DONT_REMOVE  = 0x08,         /* Load may not be removed */
     LI_CHECK_ARG    = 0x10,         /* Load src might be modified later */
-    LI_SRC_CHG      = 0x20,         /* Load src is possibly modified */
-    LI_LOAD_INSN    = 0x40,         /* Has a load insn */
-    LI_CHECK_Y      = 0x80,         /* Indexed load src might be modified later */
-    LI_USED_BY_A    = 0x100,        /* Content used by RegA */
-    LI_USED_BY_X    = 0x200,        /* Content used by RegX */
-    LI_USED_BY_Y    = 0x400,        /* Content used by RegY */
-    LI_SP           = 0x800,        /* Content on stack */
+    LI_CHECK_Y      = 0x20,         /* Indexed load src might be modified later */
+    LI_SRC_USE      = 0x40,         /* src of Opc argument is possibly used */
+    LI_SRC_CHG      = 0x80,         /* src of Opc argument is possibly modified */
+    LI_Y_SRC_USE    = 0x0100,       /* src of Opc addressing Y is possibly used */
+    LI_Y_SRC_CHG    = 0x0200,       /* src of Opc addressing Y is possibly modified */
+    LI_Y_USE        = 0x0400,       /* Opc addressing Y is possibly used */
+    LI_Y_CHG        = 0x0800,       /* Opc addressing Y is possibly modified */
+    LI_USED_BY_A    = 0x1000,       /* Content used by RegA */
+    LI_USED_BY_X    = 0x2000,       /* Content used by RegX */
+    LI_USED_BY_Y    = 0x4000,       /* Content used by RegY */
+    LI_SP           = 0x8000,       /* Content on stack */
+    LI_LOAD_INSN    = 0x010000,     /* Is a load insn */
 } LI_FLAGS;
 
 /* Structure that tells us how to load the lhs values */
@@ -410,11 +415,25 @@ unsigned GetRegUsageInOpenRange (CodeSeg* S, int First, int Last, unsigned* Use,
 ** The code block must be basic without any jump backwards.
 */
 
+int IsArgSameInOpenRange (CodeSeg* S, int First, int Last, CodeEntry* E);
+/* Check if the loading the opc arg gives the same result everywhere between (First, Last).
+** The code block in the range must be basic without any jump backwards.
+** Note: this always checks Y if any of the LI_CHECK_Y / LI_RELOAD_Y flags is set.
+*/
+
 int FindArgFirstChangeInOpenRange (CodeSeg* S, int First, int Last, CodeEntry* E);
 /* Find the first possible spot where the loaded arg of E might be changed in
 ** the range (First, Last). The code block in the range must be basic without
 ** any jump backwards.
 ** Return the index of the found entry, or Last if not found.
+** Note: changes of Y are always ignored even if the LI_RELOAD_Y flag is not set.
+*/
+
+int FindArgLastUsageInOpenRange (CodeSeg* S, int First, int Last, CodeEntry* E, int ReloadY);
+/* Find the last index where the arg of E might be used or changed in the range (First, Last).
+** ReloadY indicates whether Y is supposed to be reloaded.
+** The code block in the range must be basic without any jump backwards.
+** Return the index of the found entry, or -1 if not found.
 */
 
 int FindRegFirstChangeInOpenRange (CodeSeg* S, int First, int Last, unsigned what);

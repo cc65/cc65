@@ -89,6 +89,14 @@ struct CodeEntry {
 
 
 
+int ParseOpcArgStr (const char* Arg, struct StrBuf* Name, int* Offset);
+/* Break the opcode argument string into a symbol name/label part plus an offset.
+** Both parts are optional, but if there are any characters in the string that
+** can't be parsed, it's an failure.
+** The caller is responsible for managing the StrBuf.
+** Return whether parsing succeeds or not.
+*/
+
 const char* MakeHexArg (unsigned Num);
 /* Convert Num into a string in the form $XY, suitable for passing it as an
 ** argument to NewCodeEntry, and return a pointer to the string.

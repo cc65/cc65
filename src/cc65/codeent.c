@@ -356,6 +356,106 @@ static void SetUseChgInfo (CodeEntry* E, const OPCDesc* D)
 
 
 
+int ParseOpcArgStr (const char* Arg, struct StrBuf* Name, int* Offset)
+/* Break the opcode argument string into a symbol name/label part plus an offset.
+** Both parts are optional, but if there are any characters in the string that
+** can't be parsed, it's an failure.
+** The caller is responsible for managing the StrBuf.
+** Return whether parsing succeeds or not.
+*/
+{
+    int         NewOff = 0;
+    const char* OffsetPart = 0;
+    const char* NameEnd = 0;
+    int         Negative = 0;
+
+    /* A numeric address is treated as an unnamed address with the numeric part as the offset */
+    if (IsDigit (Arg[0]) || Arg[0] == '$') {
+        /* A call to a numeric address */
+        SB_Clear (Name);
+        SB_Terminate (Name);
+        OffsetPart = Arg;
+    } else {
+        /* If the symbol name starts with an underline, it is an external symbol.
+        ** If the symbol does not start with an underline, it may be a built-in
+        ** symbol.
+        */
+        if (Arg[0] == '_') {
+            /* Skip the underscore */
+            ++Arg;
+        }
+
+        /* Rip off the offset if present. */
+        OffsetPart = strchr (Arg, '+');
+        if (OffsetPart == 0) {
+            OffsetPart = strchr (Arg, '-');
+        }
+        if (OffsetPart != 0) {
+            /* Get the real arg name */
+            NameEnd = strchr (Arg, ' ');
+            if (NameEnd == 0 || NameEnd > OffsetPart) {
+                NameEnd = OffsetPart;
+            }
+            SB_CopyBuf (Name, Arg, NameEnd - Arg);
+            SB_Terminate (Name);
+
+        } else {
+            /* No offset */
+            *Offset = 0;
+            
+            SB_CopyStr (Name, Arg);
+            SB_Terminate (Name);
+
+            return 1;
+        }
+    }
+
+    *Offset = 0;
+
+    /* Get the offset */
+    while (OffsetPart != 0 && OffsetPart[0] != '\0') {
+        if (OffsetPart[0] == '+') {
+            Negative = 0;
+            ++OffsetPart;
+        } else if (OffsetPart[0] == '-') {
+            Negative = 1;
+            ++OffsetPart;
+        }
+
+        /* Skip spaces */
+        while (OffsetPart[0] == ' ') {
+            ++OffsetPart;
+        }
+
+        if (OffsetPart[0] == '$') {
+            if (sscanf (OffsetPart + 1, "%X", &NewOff) != 1) {
+                return 0;
+            }
+        } else {
+            if (sscanf (OffsetPart, "%u", &NewOff) != 1) {
+                return 0;
+            }
+        }
+
+        if (Negative) {
+            NewOff = -NewOff;
+        }
+
+        *Offset += NewOff;
+
+        /* See if there are more */
+        Arg = OffsetPart;
+        OffsetPart = strchr (Arg, '+');
+        if (OffsetPart == 0) {
+            OffsetPart = strchr (Arg, '-');
+        }
+    }
+
+    return 1;
+}
+
+
+
 const char* MakeHexArg (unsigned Num)
 /* Convert Num into a string in the form $XY, suitable for passing it as an
 ** argument to NewCodeEntry, and return a pointer to the string.

@@ -73,13 +73,31 @@ struct CodeEntry {
     char*               Arg;            /* Argument as string */
     unsigned long       Num;            /* Numeric argument */
     unsigned short      Info;           /* Additional code info */
+    unsigned short      ArgInfo;        /* Additional argument info */
     unsigned int        Use;            /* Registers used */
     unsigned int        Chg;            /* Registers changed/destroyed */
     CodeLabel*          JumpTo;         /* Jump label */
     Collection          Labels;         /* Labels for this instruction */
     LineInfo*           LI;             /* Source line info for this insn */
     RegInfo*            RI;             /* Register info for this insn */
+    char*               ArgBase;        /* Argument broken into a base and an offset, */
+    long                ArgOff;         /* only done when requested. */
 };
+
+/* */
+#define AIF_HAS_NAME        0x0001U     /* Argument has a name part */
+#define AIF_HAS_OFFSET      0x0002U     /* Argument has a numeric part */
+#define AIF_BUILTIN         0x0004U     /* The name is built-in */
+#define AIF_EXTERNAL        0x0008U     /* The name is external */
+#define AIF_LOCAL           0x0010U     /* The name is a local label */
+#define AIF_ZP_NAME         0x0020U     /* The name is a zp location */
+#define AIF_LOBYTE          0x0100U
+#define AIF_HIBYTE          0x0200U
+#define AIF_BANKBYTE        0x0400U
+#define AIF_FAILURE         0x8000U     /* Argument was not parsed successfully */
+
+#define AIF_WORD            (AIF_LOBYTE | AIF_HIBYTE)
+#define AIF_FAR             (AIF_LOBYTE | AIF_HIBYTE | AIF_BANKBYTE)
 
 
 
@@ -89,7 +107,7 @@ struct CodeEntry {
 
 
 
-int ParseOpcArgStr (const char* Arg, struct StrBuf* Name, int* Offset);
+int ParseOpcArgStr (const char* Arg, unsigned short* ArgInfo, struct StrBuf* Name, long* Offset);
 /* Break the opcode argument string into a symbol name/label part plus an offset.
 ** Both parts are optional, but if there are any characters in the string that
 ** can't be parsed, it's an failure.
@@ -104,6 +122,9 @@ const char* MakeHexArg (unsigned Num);
 ** gone if you call it twice (and apart from that it's not thread and signal
 ** safe).
 */
+
+void PreparseArg (CodeEntry* E);
+/* Parse the argument string and memorize the result for the code entry */
 
 CodeEntry* NewCodeEntry (opc_t OPC, am_t AM, const char* Arg,
                          CodeLabel* JumpTo, LineInfo* LI);
@@ -205,10 +226,32 @@ INLINE int CE_HasNumArg (const CodeEntry* E)
 void CE_SetArg (CodeEntry* E, const char* Arg);
 /* Replace the argument by the new one. */
 
+void CE_SetArgBaseAndOff (CodeEntry* E, const char* ArgBase, long ArgOff);
+/* Replace the new argument base and offset. Argument base is always applied.
+** Argument offset is applied if and only if E has the AIF_HAS_OFFSET flag set.
+*/
+
+void CE_SetArgBase (CodeEntry* E, const char* ArgBase);
+/* Replace the argument base by the new one.
+** The entry must have an existing base.
+*/
+
+void CE_SetArgOffset (CodeEntry* E, long ArgOff);
+/* Replace the argument offset by the new one */
+
 void CE_SetNumArg (CodeEntry* E, long Num);
 /* Set a new numeric argument for the given code entry that must already
 ** have a numeric argument.
 */
+
+int CE_IsArgStrParsed (const CodeEntry* E);
+/* Return true if the argument of E was successfully parsed last time */
+
+int CE_HasArgBase (const CodeEntry* E);
+/* Return true if the argument of E has a non-blank base name */
+
+int CE_HasArgOffset (const CodeEntry* E);
+/* Return true if the argument of E has a non-zero offset */
 
 int CE_IsConstImm (const CodeEntry* E);
 /* Return true if the argument of E is a constant immediate value */

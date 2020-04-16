@@ -231,8 +231,6 @@ static int Affected (LoadRegInfo* LRI, const CodeEntry* E)
     unsigned int    Chg;
     unsigned int    UseToCheck = 0;
     unsigned int    ChgToCheck = 0;
-    StrBuf          Src, YSrc, New;
-    int             SrcOff = 0, YSrcOff = 0, NewOff = 0;
     const ZPInfo*   ZI  = 0;
     unsigned        Res = 0;
     CodeEntry*      AE  = 0;
@@ -242,10 +240,6 @@ static int Affected (LoadRegInfo* LRI, const CodeEntry* E)
         /* Nothing to check */
         return 0;
     }
-
-    SB_Init (&Src);
-    SB_Init (&YSrc);
-    SB_Init (&New);
 
     if (E->AM == AM65_ACC || E->AM == AM65_BRA || E->AM == AM65_IMM || E->AM == AM65_IMP) {
         goto L_Result;
@@ -262,14 +256,13 @@ static int Affected (LoadRegInfo* LRI, const CodeEntry* E)
             UseToCheck |= AE->Use & ~REG_A & REG_ALL;
             ChgToCheck |= AE->Chg & ~REG_A & REG_ALL;
 
-            SB_InitFromString (&Src, xstrdup (AE->Arg));
-            if (!ParseOpcArgStr (AE->Arg, &Src, &SrcOff)) {
+            /* Check if the argument has been parsed successfully */
+            if (!CE_IsArgStrParsed (AE)) {
                 /* Bail out and play it safe*/
-                Res |= LI_SRC_USE | LI_SRC_CHG;
-                goto L_Result;
+                goto L_Affected;
             }
             /* We have to manually set up the use/chg flags for builtin functions */
-            ZI = GetZPInfo (SB_GetConstBuf (&Src));
+            ZI = GetZPInfo (AE->ArgBase);
             if (ZI != 0) {
                 UseToCheck |= ZI->ByteUse;
                 ChgToCheck |= ZI->ByteUse;
@@ -287,14 +280,14 @@ static int Affected (LoadRegInfo* LRI, const CodeEntry* E)
         YE = LRI->LoadYEntry;
         if (YE != 0) {
             UseToCheck |= YE->Use;
-            SB_InitFromString (&YSrc, xstrdup (YE->Arg));
-            if (!ParseOpcArgStr (YE->Arg, &YSrc, &YSrcOff)) {
+
+            /* Check if the argument has been parsed successfully */
+            if (!CE_IsArgStrParsed (YE)) {
                 /* Bail out and play it safe*/
-                Res |= LI_SRC_USE | LI_SRC_CHG;
-                goto L_Result;
+                goto L_Affected;
             }
             /* We have to manually set up the use/chg flags for builtin functions */
-            ZI = GetZPInfo (SB_GetConstBuf (&YSrc));
+            ZI = GetZPInfo (YE->ArgBase);
             if (ZI != 0) {
                 UseToCheck |= ZI->ByteUse;
                 ChgToCheck |= ZI->ByteUse;
@@ -322,14 +315,13 @@ static int Affected (LoadRegInfo* LRI, const CodeEntry* E)
             goto L_Result;
         }
         /* Otherwise play it safe */
-        Res |= LI_SRC_USE | LI_SRC_CHG;
-        goto L_Result;
+        goto L_Affected;
 
     } else {
         if ((E->Info & (OF_READ | OF_WRITE)) != 0) {
 
-            SB_InitFromString (&New, xstrdup (E->Arg));
-            if (!ParseOpcArgStr (E->Arg, &New, &NewOff)) {
+            /* Check if the argument has been parsed successfully */
+            if (!CE_IsArgStrParsed (E)) {
                 /* Bail out and play it safe*/
                 goto L_Affected;
             }
@@ -341,16 +333,16 @@ static int Affected (LoadRegInfo* LRI, const CodeEntry* E)
             */
             if (E->AM == AM65_ABS       ||
                 E->AM == AM65_ZP        ||
-                (E->AM == AM65_ZP_INDY && SB_CompareStr (&New, "sp") == 0)
+                (E->AM == AM65_ZP_INDY && strcmp (E->ArgBase, "sp") == 0)
                 ) {
                 if ((LRI->Flags & LI_CHECK_ARG) != 0) {
                     if (AE == 0                             ||
                         (AE->AM != AM65_ABS &&
                          AE->AM != AM65_ZP  &&
                          (AE->AM != AM65_ZP_INDY ||
-                          SB_CompareStr (&Src, "sp") != 0)) ||
-                         (SrcOff == NewOff &&
-                          SB_Compare (&Src, &New) == 0)) {
+                          strcmp (AE->ArgBase, "sp") != 0)) ||
+                         (AE->ArgOff == E->ArgOff &&
+                          strcmp (AE->ArgBase, E->ArgBase) == 0)) {
 
                         if ((E->Info & OF_READ) != 0) {
                             /* Used */
@@ -367,7 +359,7 @@ static int Affected (LoadRegInfo* LRI, const CodeEntry* E)
                     /* If we don't know what memory location could have been used by Y,
                     ** we just assume all. */
                     if (YE == 0 ||
-                        (YSrcOff == NewOff && SB_Compare (&YSrc, &New) == 0)) {
+                        (YE->ArgOff == E->ArgOff && strcmp (YE->ArgBase, E->ArgBase) == 0)) {
 
                         if ((E->Info & OF_READ) != 0) {
                             /* Used */
@@ -415,9 +407,6 @@ L_Result:
         (E->Chg & REG_Y) != 0) {
         Res |= LI_Y_CHG;
     }
-    SB_Done (&Src);
-    SB_Done (&YSrc);
-    SB_Done (&New);
 
     return Res;
 }

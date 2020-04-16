@@ -1569,7 +1569,7 @@ static void PreDec (ExprDesc* Expr)
 
         case E_LOC_PRIMARY:
             /* The primary register */
-            g_inc (Flags, Val);
+            g_dec (Flags, Val);
             break;
 
         case E_LOC_EXPR:

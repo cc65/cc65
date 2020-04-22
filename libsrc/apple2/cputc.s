@@ -7,6 +7,7 @@
 
         .ifdef  __APPLE2ENH__
         .constructor    initconio
+        .import         _videomode
         .endif
         .export         _cputcxy, _cputc
         .export         cputdirect, newline, putchar, putchardirect
@@ -18,6 +19,11 @@
 
         .ifdef  __APPLE2ENH__
 initconio:
+        lda     #$11            ; Ctrl-char code for 40 cols
+        bit     $C060           ; 80/40 switch pressed?
+        bmi     :+
+        inc     a               ; Ctrl-char code for 80 cols
+:       jsr     _videomode
         sta     SETALTCHAR      ; Switch in alternate charset
         bit     LORES           ; Limit SET80COL-HISCR to text
         rts

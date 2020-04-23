@@ -471,8 +471,8 @@ BASIC.SYSTEM) there are some limitations for DOS 3.3:
 <sect1>Direct console I/O<p>
 
 The enhanced&nbsp;Apple&nbsp;//e has no color text mode. Therefore the functions
-<tt/textcolor()/, <tt/bgcolor()/ and <tt/bordercolor()/ have no effect.
-The driver checks the Apple&nbsp;//c 80/40 switch on program startup.
+<tt/textcolor()/, <tt/bgcolor()/ and <tt/bordercolor()/ have no effect;
+<tt/cputc()/ checks the Apple&nbsp;//c 80/40 switch on program startup.
 
 
 <sect1>Random number generator<p>

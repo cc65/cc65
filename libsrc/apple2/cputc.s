@@ -19,12 +19,14 @@
 
         .ifdef  __APPLE2ENH__
 initconio:
+        lda     $FBC0           ; Not any //c? See get_ostype()
+        bne     notiic
         lda     #$11            ; Ctrl-char code for 40 cols
         bit     $C060           ; 80/40 switch pressed?
         bmi     :+
         inc     a               ; Ctrl-char code for 80 cols
 :       jsr     _videomode
-        sta     SETALTCHAR      ; Switch in alternate charset
+notiic: sta     SETALTCHAR      ; Switch in alternate charset
         bit     LORES           ; Limit SET80COL-HISCR to text
         rts
         .endif

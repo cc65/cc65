@@ -1,5 +1,5 @@
 ;
-; CX16 r36 definitions
+; CX16 r37 definitions
 ;
 
 ; ---------------------------------------------------------------------------
@@ -516,8 +516,8 @@ NMIVec          := $0318
 ; ---------------------------------------------------------------------------
 ; Banked RAM and ROM
 
-KEY_COUNT       := $A00B        ; (bank 0) Number of keys in input buffer
-TIMER           := $A03E        ; (bank 0) 60 Hz. timer (3 bytes, big-endian)
+KEY_COUNT       := $A00A        ; (bank 0) Number of keys in input buffer
+TIMER           := $A037        ; (bank 0) 60 Hz. timer (3 bytes, big-endian)
 
 .struct BANK
         .org    $A000

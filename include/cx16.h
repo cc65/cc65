@@ -175,6 +175,44 @@ struct __vera {
     unsigned char       control;        /* Control register */
     unsigned char       irq_enable;     /* Interrupt enable bits */
     unsigned char       irq_flags;      /* Interrupt flags */
+    unsigned char       irq_line;       /* IRQ line */
+    union {
+        /* The following 4 registers are available at $9F29-$9F2C when DCSEL=0 */
+        struct {
+            unsigned char       dc_video;       /* Display Composer video */
+            unsigned char       dc_hscale;      /* DC HSCALE */
+            unsigned char       dc_vscale;      /* DC VSCALE */
+            unsigned char       dc_border;      /* DC border */
+        };
+    
+        /* The following 4 registers are available at $9F29-$9F2C when DCSEL=1 */
+        struct {
+            unsigned char       dc_hstart;      /* DC horizontal start */
+            unsigned char       dc_hstop;       /* DC horizontal stop */
+            unsigned char       dc_vstart;      /* DC vertical start */
+            unsigned char       dc_vstop;       /* DC vertical stop */
+        };
+    };
+    unsigned char       l0_config;      /* Layer 0 config */
+    unsigned char       l0_mapbase;     /* Layer 0 mapbase */
+    unsigned char       l0_tilebase;    /* Layer 0 tilebase */
+    unsigned char       l0_hscroll;     /* Layer 0 hscroll */
+    unsigned char       l0_hscroll_hi;
+    unsigned char       l0_vscroll;     /* Layer 0 vscroll */
+    unsigned char       l0_vscroll_hi;
+    unsigned char       l1_config;      /* Layer 1 config */
+    unsigned char       l1_mapbase;     /* Layer 1 mapbase */
+    unsigned char       l1_tilebase;    /* Layer 1 tilebase */
+    unsigned char       l1_hscroll;     /* Layer 1 hscroll */
+    unsigned char       l1_hscroll_hi;
+    unsigned char       l1_vscroll;     /* Layer 1 vscroll */
+    unsigned char       l1_vscroll_hi;
+    unsigned char       audio_ctrl;     /* Audio control */
+    unsigned char       audio_rate;     /* Audio rate */
+    unsigned char       audio_data;     /* Audio data */
+    unsigned char       spi_data;       /* SPI data */
+    unsigned char       spi_ctrl;       /* SPI control */
+
 };
 #define VERA    (*(volatile struct __vera *)0x9F20)
 

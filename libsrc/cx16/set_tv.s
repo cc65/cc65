@@ -7,20 +7,25 @@
 
         .export         _set_tv
 
+        .importzp       tmp1
         .include        "cx16.inc"
 
 
 .proc   _set_tv
         ; Point to the video output register.
 
-        stz     VERA::CTRL              ; Use port 0
-        ldx     #<VERA::COMPOSER::VIDEO
-        ldy     #>VERA::COMPOSER::VIDEO
-        stx     VERA::ADDR
-        sty     VERA::ADDR+1
-        ldx     #^VERA::COMPOSER::VIDEO
-        stx     VERA::ADDR+2
+        ; Only set bits for the Output field (0-1)
+        and     #$03
+        sta     tmp1
 
-        sta     VERA::DATA0
+        ; Clear out bits 0-1 from current DC_VIDEO
+        lda     VERA::DC_VIDEO
+        and     #$FC
+
+        ; Set bits 0-1 from tmp1
+        ora     tmp1
+
+        ; Update DC_VIDEO
+        sta     VERA::DC_VIDEO
         rts
 .endproc

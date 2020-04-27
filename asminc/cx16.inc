@@ -282,6 +282,41 @@ NMIVec          := $0318
   CTRL          .byte           ; Control register
   IRQ_EN        .byte           ; Interrupt enable bits
   IRQ_FLAGS     .byte           ; Interrupt flags
+  IRQ_LINE      .byte           ; IRQ_LINE
+  .union
+  .struct
+  ; Enabled if DCSEL = 0
+  DC_VIDEO      .byte           ; 
+  DC_HSCALE     .byte           ; Active display H-Scale 
+  DC_VSCALE     .byte           ; Active display V-Scale
+  DC_BORDER     .byte           ; Border color
+  .endstruct
+  .struct
+  ; Enabled if DCSEL = 1
+  DC_HSTART     .byte           ; Active display H-Start 9:2
+  DC_HSTOP      .byte           ; Active display H-Stop 9:2
+  DC_VSTART     .byte           ; Active Display V-Start 8:1
+  DC_VSTOP      .byte           ; Active Display V-Stop 8:1
+  .endstruct
+  .endunion
+  L0_CONFIG     .byte           ; Layer 0 configuration
+  L0_MAPBASE    .byte           ; Layer 0 map base address 16:9
+  L0_TILEBASE   .byte           ; Layer 0 tile base address 16:11
+  L0_HSCROLL_L  .byte           ; Layer 0 hscroll 7:0
+  L0_HSCROLL_H  .byte           ; Layer 0 hscroll 11:8
+  L0_VSCROLL_L  .byte           ; Layer 0 vscroll 7:0
+  L0_VSCROLL_H  .byte           ; Layer 0 vscroll 11:8
+  L1_CONFIG     .byte           ; Layer 1 configuration
+  L1_MAPBASE    .byte           ; Layer 1 map base address 16:9
+  L1_TILEBASE   .byte           ; Layer 1 tile base address 16:11
+  L1_HSCROLL_L  .byte           ; Layer 1 hscroll 7:0
+  L1_HSCROLL_H  .byte           ; Layer 1 hscroll 11:8
+  L1_VSCROLL_L  .byte           ; Layer 1 vscroll 7:0
+  L1_VSCROLL_H  .byte           ; Layer 1 vscroll 11:8
+  AUDIO_CTRL    .byte           ; Audio control
+  AUDIO_RATE    .byte           ; PCM sample rate
+  SPI_DATA      .byte           ; SPI Data
+  SPI_CTRL      .byte           ; SPI control
   .endstruct
   .enum                         ; Address automatic increment amounts
   INC0          =       0 << 4
@@ -295,11 +330,11 @@ NMIVec          := $0318
   INC128        =       8 << 4
   INC256        =       9 << 4
   INC512        =       10 << 4
-  INC1024       =       11 << 4
-  INC2048       =       12 << 4
-  INC4096       =       13 << 4
-  INC8192       =       14 << 4
-  INC16384      =       15 << 4
+  INC40         =       11 << 4
+  INC80         =       12 << 4
+  INC160        =       13 << 4
+  INC320        =       14 << 4
+  INC640        =       15 << 4
   .endenum
   .enum                         ; Interrupt request flags
   VERT_SYNC     =       %00000001

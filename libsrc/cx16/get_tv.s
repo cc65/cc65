@@ -11,17 +11,10 @@
 
 
 .proc   _get_tv
-        ; Point to the video output register.
-
-        stz     VERA::CTRL              ; Use port 0
-        lda     #<VERA::COMPOSER::VIDEO
-        ldx     #>VERA::COMPOSER::VIDEO
-        ldy     #^VERA::COMPOSER::VIDEO
-        sta     VERA::ADDR
-        stx     VERA::ADDR+1
-        sty     VERA::ADDR+2
-
-        lda     VERA::DATA0
+        ; Get the current setting from the DC_VIDEO register
+        
+        lda     VERA::DC_VIDEO
         and     #$07                    ; Get the type of output signal
         rts
+
 .endproc

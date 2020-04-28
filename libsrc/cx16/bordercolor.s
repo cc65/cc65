@@ -12,16 +12,11 @@
 _bordercolor:
         tax
 
-        ; Point to the border color register.
+        ; Ensure DCSEL=0
+        lda     VERA::CTRL
+        and     #$01
+        sta     VERA::CTRL
 
-        stz     VERA::CTRL              ; Use port 0
-        lda     #<VERA::COMPOSER::FRAME
-        sta     VERA::ADDR
-        lda     #>VERA::COMPOSER::FRAME
-        sta     VERA::ADDR+1
-        ldy     #^VERA::COMPOSER::FRAME | VERA::INC0
-        sty     VERA::ADDR+2
-
-        lda     VERA::DATA0             ; get old value
-        stx     VERA::DATA0             ; set new value
+        lda     VERA::DC_BORDER             ; get old value
+        stx     VERA::DC_BORDER             ; set new value
         rts

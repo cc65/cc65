@@ -1,7 +1,7 @@
 /*
 ** Program-chaining function for Commodore platforms.
 **
-** 2019-12-25, Greg King
+** 2020-04-27, Greg King
 **
 ** This function exploits the program-chaining feature in Commander X16 BASIC's ROM.
 **
@@ -71,26 +71,28 @@ extern void basbuf_len[];
 
 int __fastcall__ exec (const char* progname, const char* cmdline)
 {
+#if 0
     static int fd;
+#endif
     static unsigned char dv, n;
 
     /* Exclude devices that can't load files. */
     /* (Use hand optimization, to make smaller code.) */
     dv = getcurrentdevice ();
-    if (dv < 8 && __AX__ != 1 || __AX__ > 30) {
+    if (dv < 8 || __A__ > 30) {
         return _mappederrno (9);        /* illegal device number */
     }
     utoa (dv, basic.unit, 10);
 
     /* The emulator supports only loading and saving on its file-system. */
-    if (dv != 1) {
-        /* Don't try to run a program that doesn't exist. */
-        fd = open (progname, O_RDONLY);
-        if (fd < 0) {
-            return _mappederrno (4);    /* file not found */
-        }
-        close (fd);
+#if 0
+    /* Don't try to run a program that doesn't exist. */
+    fd = open (progname, O_RDONLY);
+    if (fd < 0) {
+        return _mappederrno (4);    /* file not found */
     }
+    close (fd);
+#endif
 
     n = 0;
     do {

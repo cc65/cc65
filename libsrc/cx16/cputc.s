@@ -86,9 +86,9 @@ putchar:
         stz     VERA::CTRL      ; Use port 0
         lda     CURS_Y
         sta     VERA::ADDR+1    ; Set row number
-        lda     #VERA::INC1     ; Increment address by one
+        lda     #VERA::INC1     ; Address increments by one
         sta     VERA::ADDR+2
-        ldy     CURS_X          ; Get character column
+        ldy     CURS_X          ; Get character column into .Y
         tya
         asl     a               ; Each character has two bytes
         sta     VERA::ADDR

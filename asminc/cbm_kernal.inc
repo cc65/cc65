@@ -7,6 +7,10 @@
 
 .if .def(__CX16__)
   ; CX16 extended jump table
+  ENTROPY_GET                   := $FECF
+  KEYBRD_BUF_PUT                := $FED2
+  CONSOLE_SET_PAGE_MSG          := $FED5
+  CONSOLE_PUT_IMAGE             := $FED8
   CONSOLE_INIT                  := $FEDB
   CONSOLE_PUT_CHAR              := $FEDE
   CONSOLE_GET_CHAR              := $FEE1

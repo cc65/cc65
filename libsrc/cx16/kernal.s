@@ -1,11 +1,15 @@
 ;
-; 2020-01-06, Greg King
+; 2020-04-27, Greg King
 ;
 ; CX16 Kernal functions
 ;
 
         .include        "cbm_kernal.inc"
 
+        .export ENTROPY_GET
+        .export KEYBRD_BUF_PUT
+        .export CONSOLE_SET_PAGE_MSG
+        .export CONSOLE_PUT_IMAGE
         .export CONSOLE_INIT
         .export CONSOLE_PUT_CHAR
         .export CONSOLE_GET_CHAR

@@ -8,7 +8,6 @@
         .export         vaddr0
 
         .importzp       sreg
-        .importzp       tmp1
         .include        "cx16.inc"
 
 

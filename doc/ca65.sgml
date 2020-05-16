@@ -226,7 +226,7 @@ Here is a description of all the command line options:
   <tag><tt>--large-alignment</tt></tag>
 
   Disable warnings about a large combined alignment. See the discussion of the
-  <tt><ref id=".ALIGN" name=".ALIGN"></tt> directive for futher information.
+  <tt><ref id=".ALIGN" name=".ALIGN"></tt> directive for further information.
 
 
   <label id="option--list-bytes">

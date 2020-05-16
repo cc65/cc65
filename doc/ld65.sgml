@@ -303,7 +303,7 @@ Here is a description of all of the command-line options:
   <tag><tt>--large-alignment</tt></tag>
 
   Disable warnings about a large combined alignment. See the discussion of the
-  <tt/.ALIGN/ directive in the ca65 Users Guide for futher information.
+  <tt/.ALIGN/ directive in the ca65 Users Guide for further information.
 
 
   <tag><tt>--lib file</tt></tag>

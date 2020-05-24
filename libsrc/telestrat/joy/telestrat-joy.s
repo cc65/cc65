@@ -3,7 +3,7 @@
 ;
 ; 2002-12-20, Based on Ullrich von Bassewitz's code.
 ; 2017-11-01, Stefan Haubenthal
-; 2020-05-20n, Jede
+; 2020-05-20, Jede
 ;
 
         .include        "joy-kernel.inc"

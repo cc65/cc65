@@ -198,7 +198,7 @@ The standard driver manages two joysticks. Only one button is managed for theses
 
 Telestrat can handle one button for the left port, and three buttons for the right port (but this port was designed for a mouse).
 
-If you find a Telestrat mouse (which almost impossible :), these driver will work too because there is some extra hardware in the mouse to send direction.
+If you find a Telestrat mouse (which is almost impossible :), these driver will work too because there is some extra hardware in the mouse to send direction.
 
 <sect1>Mouse drivers<p>
 

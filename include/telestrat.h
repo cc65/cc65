@@ -98,7 +98,15 @@ extern void telestrat_240_200_2_tgi[];      /* Referred to by tgi_static_stddrv[
 #define CH_LIRA          95
 #define CH_ESC           27
 
+/* Masks for joy_read */
+#define JOY_UP_MASK     0x10
+#define JOY_DOWN_MASK   0x08
+#define JOY_LEFT_MASK   0x01
+#define JOY_RIGHT_MASK  0x02
+#define JOY_BTN_1_MASK  0x04
 
+/* The addresses of the static drivers */
+extern void telestrat_joy[];           /* Referred to by joy_static_stddrv[] */
 
 void oups();
 void ping();

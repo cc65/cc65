@@ -91,18 +91,22 @@ COUNT:
 
 READ:
         beq     right
-        lda     #%10000000
-        ora     VIA2::PRB
+
+        lda     VIA2::PRB
+        and     #%01111111
+        ora     #%01000000        
         sta     VIA2::PRB
         ; then read
         lda     VIA2::PRB
         eor     #%10011111
  
         rts
-right:        
-        lda     #%01000000
-        ora     VIA2::PRB
-        sta     VIA2::PRB
+right:  
+        lda     VIA2::PRB
+        and     #%10111111
+        ora     #%10000000
+        sta     VIA2::PRB      
+
         ; then read
         lda     VIA2::PRB
         eor     #%01011111

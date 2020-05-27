@@ -10,4 +10,4 @@
 
 .rodata
 
-_joy_stddrv:    .asciiz "telestrat_joy"
+_joy_stddrv:    .asciiz "telestrat.joy"

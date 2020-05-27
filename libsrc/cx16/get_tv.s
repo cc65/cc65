@@ -1,5 +1,5 @@
 ;
-; 2019-12-22, Greg King
+; 2020-05-02, Greg King
 ;
 ; unsigned char get_tv (void);
 ; /* Return the video mode the machine is using. */
@@ -11,17 +11,9 @@
 
 
 .proc   _get_tv
-        ; Point to the video output register.
-
-        stz     VERA::CTRL              ; Use port 0
-        lda     #<VERA::COMPOSER::VIDEO
-        ldx     #>VERA::COMPOSER::VIDEO
-        ldy     #^VERA::COMPOSER::VIDEO
-        sta     VERA::ADDR
-        stx     VERA::ADDR+1
-        sty     VERA::ADDR+2
-
-        lda     VERA::DATA0
-        and     #$07                    ; Get the type of output signal
+        stz     VERA::CTRL              ; Use display register bank 0
+        lda     VERA::DISP::VIDEO
+        and     #%00000111              ; Get the type of output signal
+        ldx     #>$0000                 ; Promote to unsigned int
         rts
 .endproc

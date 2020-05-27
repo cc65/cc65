@@ -79,6 +79,7 @@ Long options:
   --end-group                   End a library group
   --force-import sym            Force an import of symbol 'sym'
   --help                        Help (this text)
+  --large-alignment             Don't warn about large alignments
   --lib file                    Link this library
   --lib-path path               Specify a library search path
   --mapfile name                Create a map file
@@ -297,6 +298,12 @@ Here is a description of all of the command-line options:
   will increase the amount of information available. Please note that debug
   information generation is currently being developed, so the format of the
   file and its contents are subject to change without further notice.
+
+  <label id="option--large-alignment">
+  <tag><tt>--large-alignment</tt></tag>
+
+  Disable warnings about a large combined alignment. See the discussion of the
+  <tt/.ALIGN/ directive in the ca65 Users Guide for further information.
 
 
   <tag><tt>--lib file</tt></tag>

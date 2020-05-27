@@ -50,15 +50,21 @@ LCBANK2 :=      $C083   ; Swap in LC bank 2
 LCBANK1 :=      $C08B   ; Swap in LC bank 1
 
 ; Video mode switches
-TXTCLR  :=      $C050   ; Display graphics
-TXTSET  :=      $C051   ; Display text
-MIXCLR  :=      $C052   ; Disable 4 lines of text
-MIXSET  :=      $C053   ; Enable 4 lines of text
-LOWSCR  :=      $C054   ; Page 1
-HISCR   :=      $C055   ; Page 2
-LORES   :=      $C056   ; Lores graphics
-HIRES   :=      $C057   ; Hires graphics
+TXTCLR     :=   $C050   ; Display graphics
+TXTSET     :=   $C051   ; Display text
+MIXCLR     :=   $C052   ; Disable 4 lines of text
+MIXSET     :=   $C053   ; Enable 4 lines of text
+LOWSCR     :=   $C054   ; Page 1
+HISCR      :=   $C055   ; Page 2
+LORES      :=   $C056   ; Lores graphics
+HIRES      :=   $C057   ; Hires graphics
+DHIRESON   :=   $C05E   ; Enable double-width graphics
+DHIRESOFF  :=   $C05F   ; Disable double-width graphics
 
 ; Game controller
 BUTN0   :=      $C061   ; Open-Apple Key
 BUTN1   :=      $C062   ; Closed-Apple Key
+
+; IOU
+IOUDISON   :=   $C07E   ; Disable IOU
+IOUDISOFF  :=   $C07F   ; Enable IOU

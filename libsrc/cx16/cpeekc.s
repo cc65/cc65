@@ -1,6 +1,6 @@
 ;
 ; 2016-02-28, Groepaz
-; 2019-09-25, Greg King
+; 2020-04-29, Greg King
 ;
 ; char cpeekc (void);
 ; /* Return the character from the current cursor position. */
@@ -12,8 +12,6 @@
 
 
 _cpeekc:
-        php
-        sei                     ; don't let cursor blinking interfere
         stz     VERA::CTRL      ; use port 0
         lda     CURS_Y
         sta     VERA::ADDR+1    ; set row number
@@ -22,7 +20,6 @@ _cpeekc:
         asl     a               ; each character has two bytes
         sta     VERA::ADDR
         lda     VERA::DATA0     ; get screen code
-        plp
         ldx     #>$0000
         and     #<~%10000000    ; remove reverse bit
 

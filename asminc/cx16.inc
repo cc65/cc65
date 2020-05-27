@@ -1,5 +1,5 @@
 ;
-; CX16 r36 definitions
+; CX16 r37 definitions
 ;
 
 ; ---------------------------------------------------------------------------
@@ -236,8 +236,8 @@ TXTPTR          := $EE          ; Pointer into BASIC source code
 BASIC_BUF       := $0200        ; Location of command-line
 BASIC_BUF_LEN   = 81            ; Maximum length of command-line
 
-SCREEN_MODE     := $0262        ; Current screen mode (set by SCREEN_SET_MODE)
-SCREEN_PTR      := $0263        ; Pointer to current row on text screen (16 bits)
+SCREEN_MODE     := $0261        ; Current screen mode (set by SCREEN_SET_MODE)
+SCREEN_PTR      := $0262        ; Pointer to current row on text screen (16 bits)
 STATUS          := $0286        ; Status from previous I/O operation
 IN_DEV          := $028A        ; Current input device number
 OUT_DEV         := $028B        ; Current output device number
@@ -257,8 +257,8 @@ LLEN            := $0386        ; Line length
 NLINES          := $0387        ; Number of screen lines
 
 ; BASIC
-VARTAB          := $03E3        ; Pointer to start of BASIC variables
-MEMSIZE         := $03EB        ; Pointer to highest BASIC RAM location (+1)
+VARTAB          := $03E2        ; Pointer to start of BASIC variables
+MEMSIZE         := $03EA        ; Pointer to highest BASIC RAM location (+1)
 
 ; ---------------------------------------------------------------------------
 ; Vector and other locations
@@ -271,9 +271,11 @@ NMIVec          := $0318
 ; I/O locations
 
 ; Video Enhanced Retro Adapter
-; Has audio, SPI, and UART.
-.scope VERA
+; Has audio and SPI.
+.scope  VERA
+
   ; External registers
+
   .struct
                 .org    $9F20
   ADDR          .faraddr        ; Address for data port access
@@ -282,31 +284,151 @@ NMIVec          := $0318
   CTRL          .byte           ; Control register
   IRQ_EN        .byte           ; Interrupt enable bits
   IRQ_FLAGS     .byte           ; Interrupt flags
+  IRQ_RASTER    .byte           ; Line where IRQ will occur
   .endstruct
   .enum                         ; Address automatic increment amounts
-  INC0          =       0 << 4
-  INC1          =       1 << 4
-  INC2          =       2 << 4
-  INC4          =       3 << 4
-  INC8          =       4 << 4
-  INC16         =       5 << 4
-  INC32         =       6 << 4
-  INC64         =       7 << 4
-  INC128        =       8 << 4
-  INC256        =       9 << 4
-  INC512        =       10 << 4
-  INC1024       =       11 << 4
-  INC2048       =       12 << 4
-  INC4096       =       13 << 4
-  INC8192       =       14 << 4
-  INC16384      =       15 << 4
+  DEC0          =       (($00 << 1) | $01) << 3
+  DEC1          =       (($01 << 1) | $01) << 3
+  DEC2          =       (($02 << 1) | $01) << 3
+  DEC4          =       (($03 << 1) | $01) << 3
+  DEC8          =       (($04 << 1) | $01) << 3
+  DEC16         =       (($05 << 1) | $01) << 3
+  DEC32         =       (($06 << 1) | $01) << 3
+  DEC64         =       (($07 << 1) | $01) << 3
+  DEC128        =       (($08 << 1) | $01) << 3
+  DEC256        =       (($09 << 1) | $01) << 3
+  DEC512        =       (($0A << 1) | $01) << 3
+  DEC40         =       (($0B << 1) | $01) << 3
+  DEC80         =       (($0C << 1) | $01) << 3
+  DEC160        =       (($0D << 1) | $01) << 3
+  DEC320        =       (($0E << 1) | $01) << 3
+  DEC640        =       (($0F << 1) | $01) << 3
+  INC0          =       (($00 << 1) | $00) << 3
+  INC1          =       (($01 << 1) | $00) << 3
+  INC2          =       (($02 << 1) | $00) << 3
+  INC4          =       (($03 << 1) | $00) << 3
+  INC8          =       (($04 << 1) | $00) << 3
+  INC16         =       (($05 << 1) | $00) << 3
+  INC32         =       (($06 << 1) | $00) << 3
+  INC64         =       (($07 << 1) | $00) << 3
+  INC128        =       (($08 << 1) | $00) << 3
+  INC256        =       (($09 << 1) | $00) << 3
+  INC512        =       (($0A << 1) | $00) << 3
+  INC40         =       (($0B << 1) | $00) << 3
+  INC80         =       (($0C << 1) | $00) << 3
+  INC160        =       (($0D << 1) | $00) << 3
+  INC320        =       (($0E << 1) | $00) << 3
+  INC640        =       (($0F << 1) | $00) << 3
   .endenum
   .enum                         ; Interrupt request flags
   VERT_SYNC     =       %00000001
-  RASTER        =       %00000010
+  RASTER_IRQ    =       %00000010
   SPR_COLLIDED  =       %00000100
-  UART_IRQ      =       %00001000
+  AUDIO_LOW     =       %00001000
   .endenum
+  .scope        DISP            ; Display controller
+    SELECT1     =       %00000010
+    .union
+                .org    $9F29
+    .struct
+    ; These four registers are visible when the DCSEL flag = %0
+    VIDEO       .byte
+    HSCALE      .byte
+    VSCALE      .byte
+    FRAME       .byte
+    .endstruct
+    .struct
+    ; These four registers are visible when the DCSEL flag = %1
+    HSTART      .byte
+    HSTOP       .byte
+    VSTART      .byte
+    VSTOP       .byte
+    .endstruct
+    .endunion
+    .enum       MODE            ; Output mode
+      DISABLE   =       $00
+      VGA
+      NTSC
+      RGB                       ; Interlaced, composite sync
+    .endenum
+    .enum       DISABLE
+    COLOR       =       %00000100       ; NTSC monochrome
+    .endenum
+    .enum       ENABLE
+      LAYER0    =       %00010000
+      LAYER1    =       %00100000
+      SPRITES   =       %01000000
+    .endenum
+  .endscope
+  .struct       L0              ; Display layer 0
+                .org    $9F2D
+    CONFIG      .byte
+    MAP_BASE    .byte
+    TILE_BASE   .byte
+    HSCROLL     .word
+    VSCROLL     .word
+  .endstruct
+  .struct       L1              ; Display layer 1
+                .org    $9F34
+    CONFIG      .byte
+    MAP_BASE    .byte
+    TILE_BASE   .byte
+    HSCROLL     .word
+    VSCROLL     .word
+  .endstruct
+  .enum                         ; Layer display modes
+  TILE1BPP      =       %00000000 | $00
+  TILE2BPP
+  TILE4BPP
+  TILE8BPP
+  T256C         =       %00001000
+  BITMAP1BPP    =       %00000100 | $00
+  BITMAP2BPP
+  BITMAP4BPP
+  BITMAP8BPP
+  .endenum
+  .enum         MAP             ; Map geometry
+    WIDTH32     =       $00 << 4
+    WIDTH64     =       $01 << 4
+    WIDTH128    =       $02 << 4
+    WIDTH256    =       $03 << 4
+    HEIGHT32    =       $00 << 6
+    HEIGHT64    =       $01 << 6
+    HEIGHT128   =       $02 << 6
+    HEIGHT256   =       $03 << 6
+  .endenum
+  .enum         TILE            ; Tile geometry
+    WIDTH8      =       $00
+    WIDTH16     =       $01
+    WIDTH320    =       WIDTH8
+    WIDTH640    =       WIDTH16
+    HEIGHT8     =       $00 << 1
+    HEIGHT16    =       $01 << 1
+  .endenum
+  .scope        PCM             ; Pulse-Code Modulator
+    .struct
+                .org    $9F3B
+    CTRL        .byte
+    RATE        .byte
+    DATA        .byte
+    .endstruct
+    .enum
+    STEREO      =       %00010000
+    BITS16      =       %00100000
+    RESET       =       %10000000
+    .endenum
+  .endscope
+  .scope        SPI
+    .struct
+                .org    $9F3E
+    DATA        .byte
+    CTRL        .byte
+    .endstruct
+    .enum
+    SELECT      =       %00000001
+    SLOW        =       %00000010
+    .endenum
+  .endscope
 
   ; Internal RAM and registers
 
@@ -314,150 +436,66 @@ NMIVec          := $0318
                 .org    $000000
   VRAM          .res    $020000 ; 128 Kibibytes
   .endstruct
-  .scope        COMPOSER        ; Display composer
+  .scope        PSG             ; Programmable Sound Generator
     .struct
-                .org    $0F0000
-    VIDEO       .byte
-    HSCALE      .byte
-    VSCALE      .byte
-    FRAME       .byte
-    HSTART_LO   .byte
-    HSTOP_LO    .byte
-    VSTART_LO   .byte
-    VSTOP_LO    .byte
-    STRTSTOP_HI .byte
-    IRQ_LINE    .word
+    PITCH       .word
+    VOL         .byte           ; Left, right channels; volume
+    WAVEFORM    .byte           ; Wave shape, pulse width
     .endstruct
-    .enum       MODE            ; Output mode
-      DISABLE   =       0
-      VGA
-      NTSC
-      RGB                       ; Interlaced, composite sync
-    .endenum
+    LEFT        =       %01 << 6
+    RIGHT       =       %10 << 6
     .enum
-    ENABLE_COLOR        =       0 << 2
-    DISABLE_COLOR       =       1 << 2  ; NTSC monochrome
+    PULSE       =       $00 << 6
+    SAWTOOTH    =       $01 << 6
+    TRIANGLE    =       $02 << 6
+    NOISE       =       $03 << 6
     .endenum
+    .struct
+                .org    $01F9C0
+    VOICES      .res    $10 * 4
+    .endstruct
   .endscope
-  PALETTE       :=      $0F1000
-  .struct       L0              ; Layer 0 registers
-                .org    $0F2000
-    CTRL0       .byte           ; Display mode control
-    CTRL1       .byte           ; Geometry control
-    MAP_BASE    .addr
-    TILE_BASE   .addr
-    HSCROLL     .word           ; Horizontal scroll
-    VSCROLL     .word           ; Vertical scroll
+  .struct
+                .org    $01FA00
+  PALETTE       .word   $0100
   .endstruct
-  .struct       L1              ; Layer 1 registers (same as layer 0)
-                .org    $0F3000
-    CTRL0       .byte
-    CTRL1       .byte
-    MAP_BASE    .addr
-    TILE_BASE   .addr
-    HSCROLL     .word
-    VSCROLL     .word
-  .endstruct
-  .enum         MAP             ; Map geometry
-    WIDTH32     =       0
-    WIDTH64
-    WIDTH128
-    WIDTH256
-    HEIGHT32    =       0 << 2
-    HEIGHT64    =       1 << 2
-    HEIGHT128   =       2 << 2
-    HEIGHT256   =       3 << 2
-  .endenum
-  .scope        TILE            ; Tile geometry
-    .enum
-    WIDTH8      =       0 << 4
-    WIDTH16     =       1 << 4
-    WIDTH320    =       WIDTH8
-    WIDTH640    =       WIDTH16
-    HEIGHT8     =       0 << 5
-    HEIGHT16    =       1 << 5
-    .endenum
-    .enum       FLIP
-      NONE      =       0 << 2
-      HORIZ     =       1 << 2
-      VERT      =       2 << 2
-      BOTH      =       3 << 2
-    .endenum
-  .endscope
-  .enum         DMODE           ; Display modes
-    TEXT16      =       0 << 5
-    TEXT256     =       1 << 5
-    TILE4       =       2 << 5
-    TILE16      =       3 << 5
-    TILE256     =       4 << 5
-    BITMAP4     =       5 << 5
-    BITMAP16    =       6 << 5
-    BITMAP256   =       7 << 5
-  .endenum
   .scope        SPRITE
-    .struct
-                .org    $0F4000
-    CTRL        .byte           ; Enables sprite engine
-    COLLISION   .byte
-    .endstruct
-    .struct     ATTRIB          ; Sprite attributes
-                .org    $0F5000
-      ADDR      .addr           ; Address and color mode
-      XX        .word
-      YY        .word
-      Z_FLIP    .byte
-      SIZE_PAL  .byte
+    .struct                     ; Sprite attributes
+    ADDR        .addr           ; Address and color mode
+    XX          .word           ; Co-ordinates
+    YY          .word
+    Z_FLIP      .byte           ; Collision mask, Z-depth, flip bits
+    SIZE_PAL    .byte
     .endstruct
     .enum       FLIP
-      NONE      =       0
+      NONE      =       %00000000
       HORIZ
       VERT
       BOTH
     .endenum
     .enum       DEPTH
-      DISABLE   =       0 << 2
-      CANVAS    =       1 << 2
-      LAYER0    =       2 << 2
-      LAYER1    =       3 << 2
+      DISABLE   =       $00 << 2
+      CANVAS    =       $01 << 2
+      LAYER0    =       $02 << 2
+      LAYER1    =       $03 << 2
     .endenum
     .enum                       ; Sprite geometry
-    WIDTH8      =       0 << 4
-    WIDTH16     =       1 << 4
-    WIDTH32     =       2 << 4
-    WIDTH64     =       3 << 4
-    HEIGHT8     =       0 << 6
-    HEIGHT16    =       1 << 6
-    HEIGHT32    =       2 << 6
-    HEIGHT64    =       3 << 6
-    COLORS16    =       0 << 7
-    COLORS256   =       1 << 7
+    WIDTH8      =       $00 << 4
+    WIDTH16     =       $01 << 4
+    WIDTH32     =       $02 << 4
+    WIDTH64     =       $03 << 4
+    HEIGHT8     =       $00 << 6
+    HEIGHT16    =       $01 << 6
+    HEIGHT32    =       $02 << 6
+    HEIGHT64    =       $03 << 6
+    COLORS16    =       $00 << 7
+    COLORS256   =       $01 << 7
     .endenum
   .endscope
-  AUDIO         :=      $0F6000
-  .scope        SPI
-    .struct
-                .org    $0F7000
-    DATA        .byte
-    CONTROL     .byte
-    .endstruct
-    .enum
-    DESELECT    =       0
-    SELECT
-    BUSY_MASK   =       1 << 1
-    .endenum
-  .endscope
-  .scope        UART            ; Universal Asyncronous Receiver Transmitter
-    .struct
-                .org    $0F8000
-    DATA        .byte
-    STATUS      .byte
-    BPS_DIV     .word
-    .endstruct
-    .enum       MASK
-      RECEIVE   =       1 << 0
-      TRANSMIT  =       1 << 1
-    .endenum
-  .endscope
+  .struct
+                .org    $01FC00
+  SPRITES       .res    128 * 8
+  .endstruct
 .endscope
 
 ; 65C22
@@ -516,8 +554,8 @@ NMIVec          := $0318
 ; ---------------------------------------------------------------------------
 ; Banked RAM and ROM
 
-KEY_COUNT       := $A00B        ; (bank 0) Number of keys in input buffer
-TIMER           := $A03E        ; (bank 0) 60 Hz. timer (3 bytes, big-endian)
+KEY_COUNT       := $A00A        ; (bank 0) Number of keys in input buffer
+TIMER           := $A037        ; (bank 0) 60 Hz. timer (3 bytes, big-endian)
 
 .struct BANK
         .org    $A000

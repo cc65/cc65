@@ -22,7 +22,7 @@
 Start:  tsx
         stx     spsave          ; Save the system stack ptr
 
-; Save space by putting some of the start-up code in the ONCE segment,
+; Save space by putting some of the start-up code in the ONCE segment
 ; which will be re-used by the BSS segment, the heap, and the C stack.
 
         jsr     init
@@ -31,7 +31,7 @@ Start:  tsx
 
         jsr     zerobss
 
-; Push the command-line arguments; and, call main().
+; Push the command-line arguments, and call main().
 
         jsr     callmain
 
@@ -46,7 +46,7 @@ _exit:
 
         jsr     donelib
 
-.if 0   ; We don't need to preserve zero-page space for cc65's variables.
+.if 0   ; (We don't need to preserve zero-page space for cc65's variables.)
 ; Copy back the zero-page stuff.
 
         ldx     #zpspace-1
@@ -90,7 +90,7 @@ init:
         lda     #$01
         sta     VIA1::PRA
 
-.if 0   ; We don't need to preserve zero-page space for cc65's variables.
+.if 0   ; (We don't need to preserve zero-page space for cc65's variables.)
 ; Save the zero-page locations that we need.
 
         ldx     #zpspace-1

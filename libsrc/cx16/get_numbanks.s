@@ -1,11 +1,12 @@
 ;
-; 2020-01-10, Greg King
+; 2020-01-29, Greg King
 ;
-; unsigned char get_numbanks (void);
+; unsigned short get_numbanks (void);
 ; /* Return the number of RAM banks that the machine has. */
 ;
 ; The Commander X16 version of MEMTOP returns with an extra value:
 ; The accumulator describes the number of RAM banks that exist on the hardware.
+; A zero accumulator means that there are 256 RAM banks.
 ;
 
         .export         _get_numbanks
@@ -17,4 +18,7 @@ _get_numbanks:
         sec
         jsr     MEMTOP
         ldx     #>$0000
-        rts
+        cmp     #<$0100         ; are there 256 banks?
+        bne     :+
+        inx                     ; yes
+:       rts

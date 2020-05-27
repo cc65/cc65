@@ -2,7 +2,8 @@
 /*                                                                           */
 /*                                  cx16.h                                   */
 /*                                                                           */
-/*                     CX16 system-specific definitions                      */
+/*                      CX16 system-specific definitions                     */
+/*                             For prerelease 37                             */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided "as-is", without any expressed or implied       */
@@ -140,14 +141,16 @@
 /* get_tv() return codes
 ** set_tv() argument codes
 */
-#define TV_NONE                 0
-#define TV_VGA                  1
-#define TV_NTSC_COLOR           2
-#define TV_RGB                  3
-#define TV_NONE2                4
-#define TV_VGA2                 5
-#define TV_NTSC_MONO            6
-#define TV_RGB2                 7
+enum {
+    TV_NONE                     = 0x00,
+    TV_VGA,
+    TV_NTSC_COLOR,
+    TV_RGB,
+    TV_NONE2,
+    TV_VGA2,
+    TV_NTSC_MONO,
+    TV_RGB2
+};
 
 /* Video modes for videomode() */
 #define VIDEOMODE_40x30         0x00
@@ -157,11 +160,47 @@
 #define VIDEOMODE_320x200       0x80
 #define VIDEOMODE_SWAP          (-1)
 
+/* VERA's address increment/decrement numbers */
+enum {
+    VERA_DEC_0                  = ((0 << 1) | 1) << 3,
+    VERA_DEC_1                  = ((1 << 1) | 1) << 3,
+    VERA_DEC_2                  = ((2 << 1) | 1) << 3,
+    VERA_DEC_4                  = ((3 << 1) | 1) << 3,
+    VERA_DEC_8                  = ((4 << 1) | 1) << 3,
+    VERA_DEC_16                 = ((5 << 1) | 1) << 3,
+    VERA_DEC_32                 = ((6 << 1) | 1) << 3,
+    VERA_DEC_64                 = ((7 << 1) | 1) << 3,
+    VERA_DEC_128                = ((8 << 1) | 1) << 3,
+    VERA_DEC_256                = ((9 << 1) | 1) << 3,
+    VERA_DEC_512                = ((10 << 1) | 1) << 3,
+    VERA_DEC_40                 = ((11 << 1) | 1) << 3,
+    VERA_DEC_80                 = ((12 << 1) | 1) << 3,
+    VERA_DEC_160                = ((13 << 1) | 1) << 3,
+    VERA_DEC_320                = ((14 << 1) | 1) << 3,
+    VERA_DEC_640                = ((15 << 1) | 1) << 3,
+    VERA_INC_0                  = ((0 << 1) | 0) << 3,
+    VERA_INC_1                  = ((1 << 1) | 0) << 3,
+    VERA_INC_2                  = ((2 << 1) | 0) << 3,
+    VERA_INC_4                  = ((3 << 1) | 0) << 3,
+    VERA_INC_8                  = ((4 << 1) | 0) << 3,
+    VERA_INC_16                 = ((5 << 1) | 0) << 3,
+    VERA_INC_32                 = ((6 << 1) | 0) << 3,
+    VERA_INC_64                 = ((7 << 1) | 0) << 3,
+    VERA_INC_128                = ((8 << 1) | 0) << 3,
+    VERA_INC_256                = ((9 << 1) | 0) << 3,
+    VERA_INC_512                = ((10 << 1) | 0) << 3,
+    VERA_INC_40                 = ((11 << 1) | 0) << 3,
+    VERA_INC_80                 = ((12 << 1) | 0) << 3,
+    VERA_INC_160                = ((13 << 1) | 0) << 3,
+    VERA_INC_320                = ((14 << 1) | 0) << 3,
+    VERA_INC_640                = ((15 << 1) | 0) << 3
+};
+
 /* VERA's interrupt flags */
 #define VERA_IRQ_VSYNC          0b00000001
 #define VERA_IRQ_RASTER         0b00000010
 #define VERA_IRQ_SPR_COLL       0b00000100
-#define VERA_IRQ_UART           0b00001000
+#define VERA_IRQ_AUDIO_LOW      0b00001000
 
 
 /* Define hardware. */
@@ -175,6 +214,44 @@ struct __vera {
     unsigned char       control;        /* Control register */
     unsigned char       irq_enable;     /* Interrupt enable bits */
     unsigned char       irq_flags;      /* Interrupt flags */
+    unsigned char       irq_raster;     /* Line where IRQ will occur */
+    union {
+        struct {                        /* Visible when DCSEL flag = 0 */
+            unsigned char video;        /* Flags to enable video layers */
+            unsigned char hscale;       /* Horizontal scale factor */
+            unsigned char vscale;       /* Vertical scale factor */
+            unsigned char border;       /* Border color (NTSC mode) */
+        };
+        struct {                        /* Visible when DCSEL flag = 1 */
+            unsigned char hstart;       /* Horizontal start position */
+            unsigned char hstop;        /* Horizontal stop position */
+            unsigned char vstart;       /* Vertical start position */
+            unsigned char vstop;        /* Vertical stop position */
+        };
+    } display;
+    struct {
+        unsigned char   config;         /* Layer map geometry */
+        unsigned char   mapbase;        /* Map data address */
+        unsigned char   tilebase;       /* Tile address and geometry */
+        unsigned int    hscroll;        /* Smooth scroll horizontal offset */
+        unsigned int    vscroll;        /* Smooth scroll vertical offset */
+    } layer0;
+    struct {
+        unsigned char   config;
+        unsigned char   mapbase;
+        unsigned char   tilebase;
+        unsigned int    hscroll;
+        unsigned int    vscroll;
+    } layer1;
+    struct {
+        unsigned char   control;        /* PCM format */
+        unsigned char   rate;           /* Sample rate */
+        unsigned char   data;           /* PCM output queue */
+    } audio;                            /* Pulse-Code Modulation registers */
+    struct {
+        unsigned char   data;
+        unsigned char   control;
+    } spi;                              /* SD card interface */
 };
 #define VERA    (*(volatile struct __vera *)0x9F20)
 
@@ -214,7 +291,7 @@ extern void cx16_std_mou[];             /* Referred to by mouse_static_stddrv[] 
 
 
 
-unsigned char get_numbanks (void);
+unsigned short get_numbanks (void);
 /* Return the number of RAM banks that the machine has. */
 
 signed char get_ostype (void);
@@ -232,6 +309,17 @@ unsigned char get_tv (void);
 void __fastcall__ set_tv (unsigned char type);
 /* Set the video signal type that the machine will use.
 ** Call with a TV_xx constant.
+*/
+
+unsigned char __fastcall__ vera_layer_enable (unsigned char layers);
+/* Display the layers that are "named" by the bit flags in layers.
+** A value of 0b01 shows layer 0, a value of 0b10 shows layer 1,
+** a value of 0b11 shows both layers.  Return the previous value.
+*/
+
+unsigned char __fastcall__ vera_sprites_enable (unsigned char mode);
+/* Enable the sprite engine when mode is non-zero (true);
+** disable sprites when mode is zero.  Return the previous mode.
 */
 
 signed char __fastcall__ videomode (signed char mode);

@@ -98,7 +98,7 @@ READ:
         sta     VIA2::PRB
         ; then read
         lda     VIA2::PRB
-        eor     #%10011111
+        eor     #%01011111
  
         rts
 right:  
@@ -109,6 +109,6 @@ right:
 
         ; then read
         lda     VIA2::PRB
-        eor     #%01011111
+        eor     #%10011111
 
         rts

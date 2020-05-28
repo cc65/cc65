@@ -55,9 +55,6 @@
 #define TGI_COLOR_RED           7
 
 
-extern void telestrat_228_200_3_tgi[];
-extern void telestrat_240_200_2_tgi[];      /* Referred to by tgi_static_stddrv[] */
-
 /* Define hardware */
 #include <_6522.h>
 #define VIA     (*(struct __6522*)0x300)
@@ -110,7 +107,10 @@ extern void telestrat_240_200_2_tgi[];      /* Referred to by tgi_static_stddrv[
 
 
 /* The addresses of the static drivers */
-extern void telestrat_joy[];           /* Referred to by joy_static_stddrv[] */
+extern void telestrat_joy[];            /* Referred to by joy_static_stddrv[] */
+extern void telestrat_228_200_3_tgi[];
+extern void telestrat_240_200_2_tgi[];  /* Referred to by tgi_static_stddrv[] */
+
 
 void oups();
 void ping();
@@ -119,7 +119,3 @@ void shoot();
 void explode();
 
 void kbdclick1();
-
-
-
-

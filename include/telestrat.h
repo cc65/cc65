@@ -105,6 +105,10 @@ extern void telestrat_240_200_2_tgi[];      /* Referred to by tgi_static_stddrv[
 #define JOY_RIGHT_MASK  0x02
 #define JOY_BTN_1_MASK  0x04
 
+#define JOY_FIRE_MASK   JOY_BTN_1_MASK
+#define JOY_FIRE(v)     ((v) & JOY_FIRE_MASK)
+
+
 /* The addresses of the static drivers */
 extern void telestrat_joy[];           /* Referred to by joy_static_stddrv[] */
 

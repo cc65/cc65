@@ -227,8 +227,9 @@ static void BinWriteMem (BinDesc* D, MemoryArea* M)
             SegWrite (D->Filename, D->F, S->Seg, BinWriteExpr, D);
             PrintNumVal ("Wrote", (unsigned long) (ftell (D->F) - P));
             /* If we have just written an OVERWRITE segement, move position to the
-             * end of file, so that subsequent segments are written in the correct
-             * place. */
+            ** end of file, so that subsequent segments are written in the correct
+            ** place.
+            */
             if (S->Flags & SF_OVERWRITE) {
                 fseek (D->F, 0, SEEK_END);
             }

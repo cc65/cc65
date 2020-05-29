@@ -2111,8 +2111,8 @@ unsigned CfgProcess (void)
             ** unless it's an OVERWRITE segment.
             */
             if (S->Load == M &&
-                ((S->Flags & SF_BSS) == 0 || (M->Flags & MF_FILL) != 0)
-                    && (S->Flags & SF_OVERWRITE) == 0) {
+                ((S->Flags & SF_BSS) == 0 || (M->Flags & MF_FILL) != 0) &&
+                    (S->Flags & SF_OVERWRITE) == 0) {
                 M->F->Size += Addr - StartAddr;
             }
         }

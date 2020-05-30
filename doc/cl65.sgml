@@ -94,7 +94,6 @@ Long options:
   --help                        Help (this text)
   --include-dir dir             Set a compiler include directory path
   --ld-args options             Pass options to the linker
-  --lib file                    Link this library
   --lib-path path               Specify a library search path
   --list-targets                List all available targets
   --listing name                Create an assembler listing file

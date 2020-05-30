@@ -807,7 +807,6 @@ static void Usage (void)
             "  --help\t\t\tHelp (this text)\n"
             "  --include-dir dir\t\tSet a compiler include directory path\n"
             "  --ld-args options\t\tPass options to the linker\n"
-            "  --lib file\t\t\tLink this library\n"
             "  --lib-path path\t\tSpecify a library search path\n"
             "  --list-targets\t\tList all available targets\n"
             "  --listing name\t\tCreate an assembler listing file\n"
@@ -1076,14 +1075,6 @@ static void OptLdArgs (const char* Opt attribute ((unused)), const char* Arg)
 /* Pass arguments to the linker */
 {
     CmdAddArgList (&LD65, Arg);
-}
-
-
-
-static void OptLib (const char* Opt attribute ((unused)), const char* Arg)
-/* Library file follows (linker) */
-{
-    CmdAddArg2 (&LD65, "--lib", Arg);
 }
 
 
@@ -1374,7 +1365,6 @@ int main (int argc, char* argv [])
         { "--help",              0, OptHelp           },
         { "--include-dir",       1, OptIncludeDir     },
         { "--ld-args",           1, OptLdArgs         },
-        { "--lib",               1, OptLib            },
         { "--lib-path",          1, OptLibPath        },
         { "--list-targets",      0, OptListTargets    },
         { "--listing",           1, OptListing        },

@@ -289,13 +289,13 @@ void OutputSegments (const Segments* S)
     /* Output the text segment */
     TS_Output (S->Text);
 
+    /* Output the code segment */
+    CS_Output (S->Code);
+
     /* Output the three data segments */
     DS_Output (S->Data);
     DS_Output (S->ROData);
     DS_Output (S->BSS);
-
-    /* Output the code segment */
-    CS_Output (S->Code);
 
     /* Output the code segment epiloque */
     CS_OutputEpilogue (S->Code);

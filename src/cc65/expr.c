@@ -3456,28 +3456,32 @@ static void addsubeq (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
         ** break, so this is the best error recovery.
         */
     }
-    if (ED_IsConstAbs (&Expr2)) {
-        /* The resulting value is a constant. Scale it. */
-        if (MustScale) {
-            Expr2.IVal *= CheckedSizeOf (Indirect (Expr->Type));
-        }
-        rflags |= CF_CONST;
-        lflags |= CF_CONST;
-    } else {
-        /* Not constant, load into the primary */
-        LoadExpr (CF_NONE, &Expr2);
-        if (MustScale) {
-            /* lhs is a pointer, scale rhs */
-            g_scale (TypeOf (Expr2.Type), CheckedSizeOf (Indirect (Expr->Type)));
-        }
-    }
 
     /* Setup the code generator flags */
     lflags |= TypeOf (Expr->Type) | GlobalModeFlags (Expr) | CF_FORCECHAR;
     rflags |= TypeOf (Expr2.Type) | CF_FORCECHAR;
 
-    /* Convert the type of the lhs to that of the rhs */
-    g_typecast (lflags, rflags);
+    if (ED_IsConstAbs (&Expr2)) {
+        /* The resulting value is a constant */
+        rflags |= CF_CONST;
+        lflags |= CF_CONST;
+
+        /* Scale it */
+        if (MustScale) {
+            Expr2.IVal *= CheckedSizeOf (Indirect (Expr->Type));
+        }
+    } else {
+        /* Not constant, load into the primary */
+        LoadExpr (CF_NONE, &Expr2);
+
+        /* Convert the type of the rhs to that of the lhs */
+        g_typecast (lflags, rflags & ~CF_FORCECHAR);
+
+        if (MustScale) {
+            /* lhs is a pointer, scale rhs */
+            g_scale (TypeOf (Expr2.Type), CheckedSizeOf (Indirect (Expr->Type)));
+        }
+    }
 
     /* Output apropriate code depending on the location */
     switch (ED_GetLoc (Expr)) {

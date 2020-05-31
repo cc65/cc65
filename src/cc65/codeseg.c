@@ -1353,7 +1353,7 @@ void CS_OutputEpilogue (const CodeSeg* S)
 */
 {
     if (S->Func) {
-        WriteOutput ("\n.endproc\n\n");
+        WriteOutput (".endproc\n\n");
     }
 }
 
@@ -1422,6 +1422,9 @@ void CS_Output (CodeSeg* S)
         /* Output the code */
         CE_Output (E);
     }
+
+    /* Prettyier formatting */
+    WriteOutput ("\n");
 
     /* If debug info is enabled, terminate the last line number information */
     if (DebugInfo) {

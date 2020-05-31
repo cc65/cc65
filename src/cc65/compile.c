@@ -453,7 +453,7 @@ void FinishCompile (void)
     }
 
     /* Output the literal pool */
-    OutputLiteralPool ();
+    OutputGlobalLiteralPool ();
 
     /* Emit debug infos if enabled */
     EmitDebugInfo ();

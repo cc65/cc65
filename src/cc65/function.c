@@ -582,6 +582,11 @@ void NewFunc (SymEntry* Func)
     /* Restore the old literal pool, remembering the one for the function */
     Func->V.F.LitPool = PopLiteralPool ();
 
+    /* If --local-strings was given, output the literals now */
+    if (IS_Get (&LocalStrings)) {
+        OutputLocalLiteralPool (Func->V.F.LitPool);
+    }
+
     /* Switch back to the old segments */
     PopSegments ();
 

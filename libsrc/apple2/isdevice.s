@@ -10,10 +10,6 @@
 isdevice:
         ldy     DEVCNT
 :       lda     DEVLST,y
-        lsr
-        lsr
-        lsr
-        lsr
         sta     tmp1
         cpx     tmp1
         beq     :+

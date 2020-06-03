@@ -9,6 +9,7 @@
 
         .include        "errno.inc"
         .include        "mli.inc"
+        .include        "zeropage.inc"
 
 _dio_open:
         ; Check for ProDOS 8
@@ -17,8 +18,24 @@ _dio_open:
         lda     #$01            ; "Bad system call number"
         bne     oserr           ; Branch always
 
+        ; Convert from 00DDDSSS format to DSSS00DD format
+:		tax
+        clc
+        asl
+        asl
+        asl
+        asl
+        sta     tmp1
+        txa
+        lsr
+        lsr
+        lsr
+        lsr
+        ora     tmp1
+
         ; Check for valid device
-:       tax
+        tax
+
         jsr     isdevice
         beq     :+
         lda     #$28            ; "No device connected"
@@ -29,10 +46,7 @@ oserr:  sta     __oserror
 
         ; Return success
 :       txa
-        asl
-        asl
-        asl
-        asl
+
         ldx     #$00
         stx     __oserror
         rts

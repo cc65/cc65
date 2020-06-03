@@ -8,10 +8,16 @@
         .include        "mli.inc"
 
 isdevice:
+        lda     $bfff
+        cmp     #$25
+        lda     #$f0
+        bcc     :+
+        lda     #$f3
+:       sta     tmp1
         ldy     DEVCNT
-:       lda     DEVLST,y
-        sta     tmp1
-        cpx     tmp1
+:       txa
+        eor     DEVLST,y
+        and     tmp1
         beq     :+
         dey
         bpl     :-

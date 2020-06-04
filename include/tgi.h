@@ -134,7 +134,7 @@ void __fastcall__ tgi_setdrawpage (unsigned char page);
 /* Set the drawable page. Will set an error if the page is not available. */
 
 unsigned char tgi_getcolorcount (void);
-/* Get the number of available colors. */
+/* Get the number of available colors. Zero means 256 colors. */
 
 unsigned char tgi_getmaxcolor (void);
 /* Return the maximum supported color number (the number of colors would

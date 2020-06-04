@@ -44,25 +44,37 @@ PREAD   :=      $FB1E   ; Read paddle in X, return AD conv. value in Y
 
 ; Library reference
 
-        .addr   $0000
+libref: .addr   $0000
 
 ; Jump table
 
         .addr   INSTALL
         .addr   UNINSTALL
         .addr   COUNT
-        .addr   READJOY
+        .addr   READ
 
 ; ------------------------------------------------------------------------
 
-        .code
+        .data
+
+maxnum: .byte   $00             ; Maximum joystick number (0 or 1)
 
 ; INSTALL routine. Is called after the driver is loaded into memory. If
 ; possible, check if the hardware is present and determine the amount of
 ; memory available.
 ; Must return an JOY_ERR_xx code in a/x.
 INSTALL:
-        lda     #<JOY_ERR_OK
+        lda     libref
+        ldx     libref+1
+        sta     ostype+1
+        stx     ostype+2
+ostype: jsr     $0000
+        and     #$F0            ; Mask variants
+        cmp     #$50            ; Any Apple //c
+        beq     :+              ; Only one joystick
+        inc     maxnum
+
+:       lda     #<JOY_ERR_OK
         ldx     #>JOY_ERR_OK
         ; Fall through
 
@@ -71,16 +83,22 @@ INSTALL:
 UNINSTALL:
         rts
 
+; ------------------------------------------------------------------------
+
+        .code
+
 ; COUNT: Return the total number of available joysticks in a/x.
 COUNT:
-        lda     #$02            ; Number of joysticks we support
+        ldx     maxnum
+        inx
+        txa                     ; Number of joysticks we support
         ldx     #$00
         rts
 
 ; READ: Read a particular joystick passed in A.
-READJOY:
+READ:
         bit     $C082           ; Switch in ROM
-        and     #$01            ; Restrict joystick number
+        and     maxnum          ; Restrict joystick number
 
         ; Read horizontal paddle
         asl                     ; Joystick number -> paddle number

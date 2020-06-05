@@ -38,8 +38,9 @@ static unsigned AspectRatio;
 static void CheckError (const char* S)
 {
     unsigned char Error = tgi_geterror ();
+
     if (Error != TGI_ERR_OK) {
-        printf ("%s: %d\n", S, Error);
+        printf ("%s: %u\n", S, Error);
         if (doesclrscrafterexit ()) {
             cgetc ();
         }
@@ -74,19 +75,19 @@ static void DoCircles (void)
     unsigned Y = MaxY / 2;
 
     tgi_setpalette (Palette);
+    tgi_setcolor (COLOR_FORE);
+    tgi_clear ();
+    tgi_line (0, 0, MaxX, MaxY);
+    tgi_line (0, MaxY, MaxX, 0);
     while (!kbhit ()) {
-        tgi_setcolor (COLOR_FORE);
-        tgi_line (0, 0, MaxX, MaxY);
-        tgi_line (0, MaxY, MaxX, 0);
+        Color = (Color == COLOR_FORE) ? COLOR_BACK : COLOR_FORE;
         tgi_setcolor (Color);
         for (I = 10; I < 240; I += 10) {
             tgi_ellipse (X, Y, I, tgi_imulround (I, AspectRatio));
         }
-        Color = Color == COLOR_FORE ? COLOR_BACK : COLOR_FORE;
     }
 
     cgetc ();
-    tgi_clear ();
 }
 
 
@@ -95,19 +96,19 @@ static void DoCheckerboard (void)
 {
     static const unsigned char Palette[2] = { TGI_COLOR_WHITE, TGI_COLOR_BLACK };
     unsigned X, Y;
-    unsigned char Color;
+    unsigned char Color = COLOR_BACK;
 
     tgi_setpalette (Palette);
-    Color = COLOR_BACK;
+    tgi_clear ();
+
     while (1) {
         for (Y = 0; Y <= MaxY; Y += 10) {
             for (X = 0; X <= MaxX; X += 10) {
+                Color = (Color == COLOR_FORE) ? COLOR_BACK : COLOR_FORE;
                 tgi_setcolor (Color);
                 tgi_bar (X, Y, X+9, Y+9);
-                Color = Color == COLOR_FORE ? COLOR_BACK : COLOR_FORE;
                 if (kbhit ()) {
                     cgetc ();
-                    tgi_clear ();
                     return;
                 }
             }
@@ -129,6 +130,7 @@ static void DoDiagram (void)
 
     tgi_setpalette (Palette);
     tgi_setcolor (COLOR_FORE);
+    tgi_clear ();
 
     /* Determine zero and aplitude */
     YOrigin = MaxY / 2;
@@ -158,7 +160,6 @@ static void DoDiagram (void)
     }
 
     cgetc ();
-    tgi_clear ();
 }
 
 
@@ -170,6 +171,7 @@ static void DoLines (void)
 
     tgi_setpalette (Palette);
     tgi_setcolor (COLOR_FORE);
+    tgi_clear ();
 
     for (X = 0; X <= MaxY; X += 10) {
         tgi_line (0, 0, MaxY, X);
@@ -179,7 +181,6 @@ static void DoLines (void)
     }
 
     cgetc ();
-    tgi_clear ();
 }
 
 
@@ -203,7 +204,6 @@ int main (void)
 
     tgi_init ();
     CheckError ("tgi_init");
-    tgi_clear ();
 
     /* Get stuff from the driver */
     MaxX = tgi_getmaxx ();

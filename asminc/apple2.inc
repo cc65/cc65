@@ -62,9 +62,19 @@ DHIRESON   :=   $C05E   ; Enable double-width graphics
 DHIRESOFF  :=   $C05F   ; Disable double-width graphics
 
 ; Game controller
-BUTN0   :=      $C061   ; Open-Apple Key
-BUTN1   :=      $C062   ; Closed-Apple Key
+TAPEIN  :=      $C060   ; Read casette input / Switch input 3
+BUTN0   :=      $C061   ; Switch input 0 / Open-Apple key
+BUTN1   :=      $C062   ; Switch input 1 / Closed-Apple key
+BUTN2   :=      $C063   ; Switch input 2 / Shift key
+PADDL0  :=      $C064   ; Analog input 0
+PADDL1  :=      $C065   ; Analog input 1
+PADDL2  :=      $C066   ; Analog input 2
+PADDL3  :=      $C067   ; Analog input 3
+PTRIG   :=      $C070   ; Analog input reset
 
-; IOU
+; Input/Output Unit
 IOUDISON   :=   $C07E   ; Disable IOU
 IOUDISOFF  :=   $C07F   ; Enable IOU
+
+; Control Your Apple
+CYAREG  :=      $C036   ; Bits 0-3=disk detect 4=shadow all banks 7=fast

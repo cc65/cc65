@@ -241,13 +241,33 @@ color = tgi_getcolor();
 <tag/Function/Get the number of available colors.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
 <tag/Declaration/<tt/unsigned char tgi_getcolorcount (void);/
-<tag/Description/Tgi platforms use indexed color palettes. This function
+<tag/Description/TGI platforms use indexed color palettes. This function
 returns the number of entries we can use in the palette.
+
+<tt/tgi_setcolor()/ can accept numbers from <tt/0/ to <tt/255/.  That is 256
+possible colors, but an <tt/(unsigned char)/ cannot hold that number.
+Therefore, the number zero is used to indicate when a palette has 256 entries.
+A portable program should test for that number, and do appropriate actions.
+A program might assign the count to an <tt/unsigned int/ (and change a zero to
+a 256).  Or, it might rely on the fact that <tt/(unsigned char)/ will
+"wrap-around" when it is incremented beyond 255.
 <tag/Availability/cc65
 <tag/See also/Other tgi functions
-<tag/Example/<verb>
+<tag/Examples/<verb>
 if (tgi_getcolorcount() == 2) {
   printf("Only monochrome graphics is supported\n");
+}
+
+static unsigned char num_colors;
+static unsigned char color;
+...
+num_colors = tgi_getcolorcount();
+...
+++color;
+if (num_colors == 0) {
+  tgi_setcolor(color);
+} else {
+  tgi_setcolor(color % num_colors);
 }
 </verb>
 </descrip>

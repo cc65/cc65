@@ -252,7 +252,12 @@ A program might assign the count to an <tt/unsigned int/ (and change a zero to
 a 256).  Or, it might rely on the fact that <tt/(unsigned char)/ will
 "wrap-around" when it is incremented beyond 255.
 <tag/Availability/cc65
-<tag/See also/Other tgi functions
+<tag/See also/<ref id="tgi_getcolor" name="tgi_getcolor()">,
+<ref id="tgi_getdefpalette" name="tgi_getdefpalette()">,
+<ref id="tgi_getmaxcolor" name="tgi_getmaxcolor()">,
+<ref id="tgi_getpalette" name="tgi_getpalette()">,
+<ref id="tgi_setcolor" name="tgi_setcolor()">,
+<ref id="tgi_setpalette" name="tgi_setpalette()">
 <tag/Examples/<tscreen><verb>
 if (tgi_getcolorcount() == 2) {
   printf("Only monochrome graphics is supported\n");
@@ -336,7 +341,12 @@ be used in presence of a prototype.
 <tag/Declaration/<tt/unsigned char tgi_getmaxcolor (void);/
 <tag/Description/Get the highest index of the palette.
 <tag/Availability/cc65
-<tag/See also/Other tgi functions
+<tag/See also/<ref id="tgi_getcolor" name="tgi_getcolor()">,
+<ref id="tgi_getcolorcount" name="tgi_getcolorcount()">,
+<ref id="tgi_getdefpalette" name="tgi_getdefpalette()">,
+<ref id="tgi_getpalette" name="tgi_getpalette()">,
+<ref id="tgi_setcolor" name="tgi_setcolor()">,
+<ref id="tgi_setpalette" name="tgi_setpalette()">
 <tag/Example/None.
 </descrip>
 </quote>

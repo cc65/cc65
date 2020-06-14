@@ -49,13 +49,13 @@ value:  .byte   $38, $10           ; Apple ][
         .byte   $EA, $AD, $11      ; Apple ][+
         .byte   $EA, $8A, $20      ; Apple /// (emulation)
         .byte   $06, $EA, $30      ; Apple //e
-        .byte   $06, $E0, $02, $40 ; Apple //e Option Card
+        .byte   $06, $E0, $02, $32 ; Apple //e Option Card
         .byte   $06, $E0, $31      ; Apple //e (enhanced)
-        .byte   $06, $00, $FF, $50 ; Apple //c
-        .byte   $06, $00, $00, $51 ; Apple //c (3.5 ROM)
-        .byte   $06, $00, $03, $53 ; Apple //c (Mem. Exp.)
-        .byte   $06, $00, $04, $54 ; Apple //c (Rev. Mem. Exp.)
-        .byte   $06, $00, $05, $55 ; Apple //c Plus
+        .byte   $06, $00, $FF, $40 ; Apple //c
+        .byte   $06, $00, $00, $41 ; Apple //c (3.5 ROM)
+        .byte   $06, $00, $03, $43 ; Apple //c (Mem. Exp.)
+        .byte   $06, $00, $04, $44 ; Apple //c (Rev. Mem. Exp.)
+        .byte   $06, $00, $05, $45 ; Apple //c Plus
         .byte   $00
 
         .code

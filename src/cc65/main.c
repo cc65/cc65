@@ -116,7 +116,7 @@ static void Usage (void)
             "  --debug\t\t\tDebug mode\n"
             "  --debug-info\t\t\tAdd debug info to object file\n"
             "  --debug-opt name\t\tDebug optimization steps\n"
-            "  --debug-opt-output\t\t\tOutput extra files containing optimization steps\n"
+            "  --debug-opt-output\t\tOutput extra files containing optimization steps\n"
             "  --dep-target target\t\tUse this dependency target\n"
             "  --disable-opt name\t\tDisable an optimization step\n"
             "  --eagerly-inline-funcs\tEagerly inline some known functions\n"

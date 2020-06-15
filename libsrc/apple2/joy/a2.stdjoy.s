@@ -52,8 +52,7 @@ libref: .addr   $0000
 
         .bss
 
-maxnum: .res    1               ; Maximum joystick number (0 or 1)
-iigs:   .res    1
+ostype: .res    1
 value0: .res    1
 value1: .res    1
 
@@ -68,20 +67,10 @@ value1: .res    1
 INSTALL:
         lda     libref
         ldx     libref+1
-        sta     ostype+1
-        stx     ostype+2
-ostype: jsr     $0000           ; X = 0
-        and     #$F0            ; Mask variants
-        cmp     #$50            ; Any Apple //c
-        beq     :+              ; Only one joystick
-        inx
-:       stx     maxnum
-        ldx     #$00
-        cmp     #$80            ; Any Apple IIgs
-        bne     :+
-        inx
-:       stx     iigs
-
+        sta     gettype+1
+        stx     gettype+2
+gettype:jsr     $0000
+        sta     ostype
         lda     #<JOY_ERR_OK
         ldx     #>JOY_ERR_OK
         ; Fall through
@@ -97,9 +86,11 @@ UNINSTALL:
 
 ; COUNT routine. Return the total number of available joysticks in a/x.
 COUNT:
-        ldx     maxnum
-        inx
-        txa                     ; Number of joysticks we support
+        ldx     #$02
+        bit     ostype
+        bvc     noiic           ; Not $4x
+        dex                     ; Only one joystick for the //c
+noiic:  txa                     ; Number of joysticks we support
         ldx     #$00
         rts
 
@@ -112,14 +103,15 @@ READ:
         sty     value1
 
         ; If IIgs -> set speed to normal
-        lda     iigs
-        beq     nogs1
+        bit     ostype
+        bpl     nogs1           ; Not $8x
         lda     CYAREG
         pha
         and     #%01111111
         sta     CYAREG
 
-        ; Read both paddles simultaneously
+        ; Read both paddles simultaneously according to:
+        ; Apple IIe Technote #6, The Apple II Paddle Circuits
 nogs1:  lda     PTRIG           ; Trigger paddles
 loop:   lda     PADDL0,x        ; Read paddle (0 or 2)
         bmi     set0            ; Cycles:   2   3
@@ -140,8 +132,8 @@ nop1:                           ;           -   -
         bne     loop
 
         ; If IIgs -> restore speed
-        lda     iigs
-        beq     nogs2
+        bit     ostype
+        bpl     nogs2           ; Not $8x
         pla
         sta     CYAREG
 

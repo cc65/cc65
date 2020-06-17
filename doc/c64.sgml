@@ -318,6 +318,10 @@ Note that the graphics drivers are incompatible with the
   A driver for the ISEPIC cartridge. This driver offers just 8 pages of 256
   bytes each. Written and contributed by Marco van den Heuvel.
 
+  <tag><tt/c64-kerberos.emd (c64_kerberos_emd)/</tag>
+  A driver for the Kerberos MIDI Cartridge. The cartridge has 256
+  pages of 256 bytes for a total of 128KB.
+
   <tag><tt/c64-ram.emd (c64_ram_emd)/</tag>
   A driver for the hidden RAM below the I/O area and kernal ROM. Supports 47
   256 byte pages. Please note that this driver is incompatible with any of the
@@ -336,10 +340,6 @@ Note that the graphics drivers are incompatible with the
   Witkowiak. Can be used if the program is running in C64 mode of the C128.
   Autodetects the amount of memory available (16 or 64K) and offers 64 or 256
   pages of 256 bytes each.
-
-  <tag><tt/c64-kerberos.emd (c64_kerberos_emd)/</tag>
-  A driver for the Kerberos MIDI Cartridge. The cartridge has 256
-  pages of 256 bytes for a total of 128KB.
 
   <tag><tt/dtv-himem.emd (dtv_himem_emd)/</tag>
   A driver for the C64 D2TV (the second or PAL version). This driver offers

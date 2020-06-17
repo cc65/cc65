@@ -43,10 +43,9 @@ static void cmp (unsigned page, register const unsigned* buf,
     }
 }
 
-static const char* em_error(int e)
+static const char* em_error (int e)
 {
-  switch(e)
-    {
+  switch (e) {
     case EM_ERR_OK: return "ok";
     case EM_ERR_NO_DRIVER: return "no driver";
     case EM_ERR_CANNOT_LOAD: return "cannot load";

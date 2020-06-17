@@ -337,6 +337,10 @@ Note that the graphics drivers are incompatible with the
   Autodetects the amount of memory available (16 or 64K) and offers 64 or 256
   pages of 256 bytes each.
 
+  <tag><tt/c64-kerberos.emd (c64_kerberos_emd)/</tag>
+  A driver for the Kerberos MIDI Cartridge. The cartridge has 256
+  pages of 256 bytes for a total of 128KB.
+
   <tag><tt/dtv-himem.emd (dtv_himem_emd)/</tag>
   A driver for the C64 D2TV (the second or PAL version). This driver offers
   indeed 7680 pages of 256 bytes each.

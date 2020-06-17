@@ -52,44 +52,44 @@ RAMC_PAGE_HI      = $DE3F                 ; Page register high
 ;
 
 INSTALL:
-	;; write $55 into first page
-	lda	#0
-	sta	RAMC_PAGE_LO
-	sta	RAMC_PAGE_HI
-	lda	#$55
-	sta	RAMC_WINDOW
+        ;; write $55 into first page
+        lda     #0
+        sta     RAMC_PAGE_LO
+        sta     RAMC_PAGE_HI
+        lda     #$55
+        sta     RAMC_WINDOW
 
-	;; write $AA into second page
-	lda	#1
-	sta	RAMC_PAGE_LO
-	sta	RAMC_PAGE_HI
-	lda	#$AA
-	sta	RAMC_WINDOW
+        ;; write $AA into second page
+        lda     #1
+        sta     RAMC_PAGE_LO
+        sta     RAMC_PAGE_HI
+        lda     #$AA
+        sta     RAMC_WINDOW
 
-	;; check $55 in first page
-	lda	#0
-	sta	RAMC_PAGE_LO
-	sta	RAMC_PAGE_HI
-	lda	RAMC_WINDOW
-	cmp	#$55
-	bne	@notpresent
+        ;; check $55 in first page
+        lda     #0
+        sta     RAMC_PAGE_LO
+        sta     RAMC_PAGE_HI
+        lda     RAMC_WINDOW
+        cmp     #$55
+        bne     @notpresent
 
-	;; check $AA in first page
-	lda	#1
-	sta	RAMC_PAGE_LO
-	sta	RAMC_PAGE_HI
-	lda	RAMC_WINDOW
-	cmp	#$AA
-	bne	@notpresent
+        ;; check $AA in first page
+        lda     #1
+        sta     RAMC_PAGE_LO
+        sta     RAMC_PAGE_HI
+        lda     RAMC_WINDOW
+        cmp     #$AA
+        bne     @notpresent
 
-	lda     #<EM_ERR_OK
+        lda     #<EM_ERR_OK
         ldx     #>EM_ERR_OK
-	rts
+        rts
 
 @notpresent:
         lda     #<EM_ERR_NO_DEVICE
         ldx     #>EM_ERR_NO_DEVICE
-	; use rts from UNINSTALL below
+        ; use rts from UNINSTALL below
 
 ; ------------------------------------------------------------------------
 ; UNINSTALL routine. Is called before the driver is removed from memory.
@@ -122,8 +122,8 @@ USE     = MAP
 ;
 
 MAP:    sta     RAMC_PAGE_LO
-	txa
-	and	#1
+        txa
+        and     #1
         sta     RAMC_PAGE_HI
         lda     #<RAMC_WINDOW
         ldx     #>RAMC_WINDOW

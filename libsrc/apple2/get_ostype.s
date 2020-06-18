@@ -4,7 +4,7 @@
 ; unsigned char get_ostype (void)
 ;
 
-        .constructor    initostype
+        .constructor    initostype, 9
         .export         _get_ostype
 
 ; Identify machine according to:

@@ -149,7 +149,7 @@ unsigned short FindSPAdjustment (const char* Name);
 SymEntry* AddStructSym (const char* Name, unsigned Type, unsigned Size, SymTable* Tab);
 /* Add a struct/union entry and return it */
 
-SymEntry* AddBitField (const char* Name, unsigned Offs, unsigned BitOffs, unsigned Width);
+SymEntry* AddBitField (const char* Name, unsigned Offs, unsigned BitOffs, unsigned BitWidth);
 /* Add a bit field to the local symbol table and return the symbol entry */
 
 SymEntry* AddConstSym (const char* Name, const Type* T, unsigned Flags, long Val);

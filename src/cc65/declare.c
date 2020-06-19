@@ -714,7 +714,7 @@ static SymEntry* ParseStructDecl (const char* Name)
 
     unsigned  StructSize;
     int       FlexibleMember;
-    int       BitOffs;          /* Bit offset for bit-fields */
+    unsigned  BitOffs;          /* Bit offset for bit-fields */
     int       FieldWidth;       /* Width in bits, -1 if not a bit-field */
     SymTable* FieldTab;
 
@@ -770,7 +770,7 @@ static SymEntry* ParseStructDecl (const char* Name)
             ** a member with an anonymous name.
             */
             if (BitOffs > 0) {
-                if (FieldWidth <= 0 || (BitOffs + FieldWidth) > (int) INT_BITS) {
+                if (FieldWidth <= 0 || (BitOffs + FieldWidth) > INT_BITS) {
 
                     /* We need an anonymous name */
                     AnonName (Ident, "bit-field");
@@ -839,7 +839,7 @@ static SymEntry* ParseStructDecl (const char* Name)
                 unsigned Offs = StructSize + (BitOffs / CHAR_BITS);
                 AddBitField (Decl.Ident, Offs, BitOffs % CHAR_BITS, FieldWidth);
                 BitOffs += FieldWidth;
-                CHECK (BitOffs <= (int) INT_BITS);
+                CHECK (BitOffs <= INT_BITS);
                 if (BitOffs == INT_BITS) {
                     StructSize += SIZEOF_INT;
                     BitOffs = 0;

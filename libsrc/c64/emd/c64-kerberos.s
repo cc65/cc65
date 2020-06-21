@@ -104,8 +104,8 @@ UNINSTALL:
 ;
 
 PAGECOUNT:
-        lda     #0
-        ldx     #2
+        lda     #<(128 * 1024 / 256)
+        ldx     #>(128 * 1024 / 256)
         rts
 
 ; ------------------------------------------------------------------------
@@ -154,7 +154,7 @@ COPYFROM:
 ;   - X contains the page offset
 ;   - Y contains zero
 
-        jmp     @L5
+        beq     @L5 ; will always branch, because setup ends with ldy #0
 
 @L1:    lda     RAMC_WINDOW,x
         sta     (ptr2),y
@@ -202,7 +202,7 @@ COPYTO:
 ;   - X contains the page offset
 ;   - Y contains zero
 
-        jmp     @L5
+        beq     @L5 ; will always branch, because setup ends with ldy #0
 
 @L1:    lda     (ptr2),y
         sta     RAMC_WINDOW,x

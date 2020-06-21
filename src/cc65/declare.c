@@ -2092,7 +2092,11 @@ static unsigned ParseStructInit (Type* T, int AllowFlexibleMembers)
 
             /* Account for the data and output it if we have a full word */
             SI.ValBits += Entry->V.B.BitWidth;
-            /* Make sure unsigned is bit enough to hold the value, 30 bits. */
+            /* Make sure unsigned is big enough to hold the value, 30 bits.
+            ** This is 30 and not 32 bits because a 16-bit bit-field will
+            ** always be byte aligned, so will have padding before it.
+            ** 15 bits twice is the most we can have.
+            */
             CHECK (SI.ValBits <= CHAR_BIT * sizeof(SI.BitVal));
             CHECK (SI.ValBits < 2 * (INT_BITS - 1));
             if (SI.ValBits >= INT_BITS) {

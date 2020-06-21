@@ -833,19 +833,16 @@ static SymEntry* ParseStructDecl (const char* Name)
 
             /* Add a field entry to the table */
             if (FieldWidth > 0) {
-                /* Add full byte from the bit offset to the variable offset.
-                ** This simplifies handling he bit-field as a char type
-                ** in expressions.
+                /* Full bytes have already been added to the StructSize,
+                ** which is passed to the offset of AddBitField.  BitOffs
+                ** is always within a char, which simplifies handling the
+                ** bit-field as a char type in expressions.
                 */
-                unsigned Offs = StructSize + (BitOffs / CHAR_BITS);
-                AddBitField (Decl.Ident, Offs, BitOffs % CHAR_BITS, FieldWidth);
+                CHECK (BitOffs < CHAR_BITS);
+                AddBitField (Decl.Ident, StructSize, BitOffs, FieldWidth);
                 BitOffs += FieldWidth;
                 CHECK (BitOffs <= INT_BITS);
-                /* The code above should either be rewritten to use these
-                ** values, or overlap of bit-field storage units should be
-                ** made into an option or controlled by something like
-                ** __attribute__((__packed__)).
-                */
+                /* Add any full bytes to the struct size. */
                 StructSize += BitOffs / CHAR_BITS;
                 BitOffs %= CHAR_BITS;
             } else {

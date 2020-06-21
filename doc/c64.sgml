@@ -319,7 +319,7 @@ Note that the graphics drivers are incompatible with the
   bytes each. Written and contributed by Marco van den Heuvel.
 
   <tag><tt/c64-kerberos.emd (c64_kerberos_emd)/</tag>
-  A driver for the Kerberos MIDI Cartridge. The cartridge has 256
+  A driver for the Kerberos MIDI Cartridge. The cartridge has 512
   pages of 256 bytes for a total of 128KB.
 
   <tag><tt/c64-ram.emd (c64_ram_emd)/</tag>

@@ -116,6 +116,9 @@ unsigned __fastcall__ videomode (unsigned mode);
 ** constants.
 */
 
+void waitvsync (void);
+/* Wait for start of next frame */
+
 
 
 /* End of apple2enh.h */

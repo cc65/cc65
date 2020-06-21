@@ -332,10 +332,9 @@ usage.
 <item>get_ostype
 <item>rebootafterexit
 <item>ser_apple2_slot
-<item>textframe
-<item>textframexy
 <item>tgi_apple2_mix
 <item>videomode
+<item>waitvsync
 </itemize>
 
 

@@ -773,7 +773,7 @@ static SymEntry* ParseStructDecl (const char* Name)
             if (BitOffs > 0) {
                 if (FieldWidth <= 0 || (BitOffs + FieldWidth) > INT_BITS) {
                     /* Bits needed to byte-align the next field. */
-                    unsigned PaddingBitWidth = -BitOffs % CHAR_BITS;
+                    unsigned PaddingBits = -BitOffs % CHAR_BITS;
 
                     /* We need an anonymous name */
                     AnonName (Ident, "bit-field");
@@ -781,10 +781,10 @@ static SymEntry* ParseStructDecl (const char* Name)
                     /* Add an anonymous bit-field that aligns to the next
                     ** byte.
                     */
-                    AddBitField (Ident, StructSize, BitOffs, PaddingBitWidth);
+                    AddBitField (Ident, StructSize, BitOffs, PaddingBits);
 
                     /* No bits left */
-                    StructSize += (BitOffs + PaddingBitWidth) / CHAR_BITS;
+                    StructSize += (BitOffs + PaddingBits) / CHAR_BITS;
                     BitOffs = 0;
                 }
             }

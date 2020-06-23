@@ -40,11 +40,7 @@ void testdefault1(unsigned char i) {
 /* we want a signed char */
 #ifdef REFCC
 
-#ifdef REFCC_UNSIGNED_CHARS
 signed char k;
-#else
-char k;
-#endif
         
 #else
         
@@ -145,11 +141,7 @@ void testdefault2(unsigned char i) {
 /* we want a unsigned char */
 #ifdef REFCC
 
-#ifdef REFCC_UNSIGNED_CHARS
-char k;
-#else
 unsigned char k;
-#endif
         
 #else
         

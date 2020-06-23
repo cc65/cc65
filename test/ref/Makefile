@@ -54,7 +54,7 @@ $(WORKDIR):
 
 $(WORKDIR)/%.ref: %.c | $(WORKDIR)
 	$(if $(QUIET),echo ref/$*.host)
-	$(CC) $(CFLAGS) -o $(WORKDIR)/$*.host $< $(NULLERR)
+	$(CC) $(CFLAGS) -DREFCC -DREFCC_UNSIGNED_CHARS -o $(WORKDIR)/$*.host $< $(NULLERR)
 	$(WORKDIR)$S$*.host > $@
 
 $(DIFF): ../bdiff.c | $(WORKDIR)

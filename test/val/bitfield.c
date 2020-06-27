@@ -20,20 +20,20 @@ static struct four_bits {
 static void test_four_bits(void)
 {
     if (sizeof(struct four_bits) != 1) {
-        fprintf(stderr, "Got sizeof(struct four_bits) = %zu, expected 1.\n",
-                sizeof(struct four_bits));
+        printf("Got sizeof(struct four_bits) = %zu, expected 1.\n",
+               sizeof(struct four_bits));
         failures++;
     }
 
     if (fb.x != 1) {
-        fprintf(stderr, "Got fb.x = %u, expected 1.\n", fb.x);
+        printf("Got fb.x = %u, expected 1.\n", fb.x);
         failures++;
     }
 
     fb.x = 3;
 
     if (fb.x != 3) {
-        fprintf(stderr, "Got fb.x = %u, expected 3.\n", fb.x);
+        printf("Got fb.x = %u, expected 3.\n", fb.x);
         failures++;
     }
 }
@@ -47,19 +47,18 @@ static void test_four_bits_with_int(void)
 {
     /* We would like this to be 3.  https://github.com/cc65/cc65/issues/1054 */
     if (sizeof(struct four_bits_with_int) != 4) {
-        fprintf(stderr,
-                "Got sizeof(struct four_bits_with_int) = %zu, expected 4.\n",
-                sizeof(struct four_bits_with_int));
+        printf("Got sizeof(struct four_bits_with_int) = %zu, expected 4.\n",
+               sizeof(struct four_bits_with_int));
         failures++;
     }
 
     if (fbi.x != 1) {
-        fprintf(stderr, "Got fbi.x = %u, expected 1.\n", fbi.x);
+        printf("Got fbi.x = %u, expected 1.\n", fbi.x);
         failures++;
     }
 
     if (fbi.y != 2) {
-        fprintf(stderr, "Got fbi.y = %u, expected 2.\n", fbi.y);
+        printf("Got fbi.y = %u, expected 2.\n", fbi.y);
         failures++;
     }
 
@@ -67,12 +66,12 @@ static void test_four_bits_with_int(void)
     fbi.y = 17;
 
     if (fbi.x != 3) {
-        fprintf(stderr, "Got fbi.x = %u, expected 3.\n", fbi.x);
+        printf("Got fbi.x = %u, expected 3.\n", fbi.x);
         failures++;
     }
 
     if (fbi.y != 17) {
-        fprintf(stderr, "Got fbi.y = %u, expected 17.\n", fbi.y);
+        printf("Got fbi.y = %u, expected 17.\n", fbi.y);
         failures++;
     }
 }
@@ -86,18 +85,18 @@ static struct overlap {
 static void test_overlap(void)
 {
     if (sizeof(struct overlap) != 3) {
-        fprintf(stderr, "Got sizeof(struct overlap) = %zu, expected 3.\n",
-                sizeof(struct overlap));
+        printf("Got sizeof(struct overlap) = %zu, expected 3.\n",
+               sizeof(struct overlap));
         failures++;
     }
 
     if (o.x != 11) {
-        fprintf(stderr, "Got o.x = %u, expected 11.\n", o.x);
+        printf("Got o.x = %u, expected 11.\n", o.x);
         failures++;
     }
 
     if (o.y != 22) {
-        fprintf(stderr, "Got o.y = %u, expected 22.\n", o.y);
+        printf("Got o.y = %u, expected 22.\n", o.y);
         failures++;
     }
 
@@ -105,12 +104,12 @@ static void test_overlap(void)
     o.y = 44;
 
     if (o.x != 33) {
-        fprintf(stderr, "Got o.x = %u, expected 33.\n", o.x);
+        printf("Got o.x = %u, expected 33.\n", o.x);
         failures++;
     }
 
     if (o.y != 44) {
-        fprintf(stderr, "Got o.y = %u, expected 44.\n", o.y);
+        printf("Got o.y = %u, expected 44.\n", o.y);
         failures++;
     }
 }
@@ -120,5 +119,6 @@ int main(void)
     test_four_bits();
     test_four_bits_with_int();
     test_overlap();
+    printf("failures: %u\n", failures);
     return failures;
 }

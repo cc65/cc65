@@ -38,6 +38,11 @@ static void test_four_bits(void)
     }
 }
 
+/*
+  Logic is somewhat diferent for bit-fields that end a struct vs
+  having additional fields.
+*/
+
 static struct four_bits_with_int {
     unsigned int x : 4;
     unsigned int y;

@@ -1814,17 +1814,17 @@ static void OutputBitFieldData (StructInitData* SI)
     if (SI->ValBits > 0) {
 
         /* Output the data */
-        g_defdata (CF_INT | CF_UNSIGNED | CF_CONST, SI->BitVal, 0);
+        g_defdata (CF_CHAR | CF_UNSIGNED | CF_CONST, SI->BitVal, 0);
 
         /* Update the data from SI and account for the size */
-        if (SI->ValBits >= INT_BITS) {
-            SI->BitVal >>= INT_BITS;
-            SI->ValBits -= INT_BITS;
+        if (SI->ValBits >= CHAR_BITS) {
+            SI->BitVal >>= CHAR_BITS;
+            SI->ValBits -= CHAR_BITS;
         } else {
             SI->BitVal  = 0;
             SI->ValBits = 0;
         }
-        SI->Offs += SIZEOF_INT;
+        SI->Offs += SIZEOF_CHAR;
     }
 }
 
@@ -2062,8 +2062,8 @@ static unsigned ParseStructInit (Type* T, int AllowFlexibleMembers)
                 ** These will be packed into 3 bytes.
                 */
                 SI.ValBits += Entry->V.B.BitWidth;
-                CHECK (SI.ValBits <= 2 * (INT_BITS - 1));
-                if (SI.ValBits >= INT_BITS) {
+                CHECK (SI.ValBits <= CHAR_BITS + INT_BITS - 2);
+                while (SI.ValBits >= CHAR_BITS) {
                     OutputBitFieldData (&SI);
                 }
                 goto NextMember;
@@ -2089,14 +2089,15 @@ static unsigned ParseStructInit (Type* T, int AllowFlexibleMembers)
 
             /* Account for the data and output it if we have a full word */
             SI.ValBits += Entry->V.B.BitWidth;
-            /* Make sure unsigned is big enough to hold the value, 30 bits.
-            ** This is 30 and not 32 bits because a 16-bit bit-field will
-            ** always be byte aligned, so will have padding before it.
-            ** 15 bits twice is the most we can have.
+            /* Make sure unsigned is big enough to hold the value, 22 bits.
+            ** This is 22 bits because the most we can have is 7 bits left
+            ** over from the previous OutputBitField call, plus 15 bits
+            ** from this field.  A 16-bit bit-field will always be byte
+            ** aligned, so will have padding before it.
             */
             CHECK (SI.ValBits <= CHAR_BIT * sizeof(SI.BitVal));
-            CHECK (SI.ValBits < 2 * (INT_BITS - 1));
-            if (SI.ValBits >= INT_BITS) {
+            CHECK (SI.ValBits <= CHAR_BITS + INT_BITS - 2);
+            while (SI.ValBits >= CHAR_BITS) {
                 OutputBitFieldData (&SI);
             }
 

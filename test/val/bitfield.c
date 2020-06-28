@@ -119,11 +119,62 @@ static void test_overlap(void)
     }
 }
 
+static struct overlap_with_int {
+    unsigned int x : 10;
+    unsigned int y : 10;
+    unsigned int z;
+} oi = {111, 222, 333};
+
+static void test_overlap_with_int(void)
+{
+    /* We would like this to be 5. */
+    if (sizeof(struct overlap_with_int) != 6) {
+        printf("Got sizeof(struct overlap_with_int) = %zu, expected 6.\n",
+               sizeof(struct overlap_with_int));
+        failures++;
+    }
+
+    if (oi.x != 111) {
+        printf("Got oi.x = %u, expected 111.\n", oi.x);
+        failures++;
+    }
+
+    if (oi.y != 222) {
+        printf("Got oi.y = %u, expected 222.\n", oi.y);
+        failures++;
+    }
+
+    if (oi.z != 333) {
+        printf("Got oi.z = %u, expected 333.\n", oi.z);
+        failures++;
+    }
+
+    oi.x = 444;
+    oi.y = 555;
+    oi.z = 666;
+
+    if (oi.x != 444) {
+        printf("Got oi.x = %u, expected 444.\n", oi.x);
+        failures++;
+    }
+
+    if (oi.y != 555) {
+        printf("Got oi.y = %u, expected 555.\n", oi.y);
+        failures++;
+    }
+
+    if (oi.z != 666) {
+        printf("Got oi.z = %u, expected 666.\n", oi.z);
+        failures++;
+    }
+}
+
 int main(void)
 {
     test_four_bits();
     test_four_bits_with_int();
     test_overlap();
+    test_overlap_with_int();
     printf("failures: %u\n", failures);
     return failures;
 }

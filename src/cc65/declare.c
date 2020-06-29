@@ -2137,7 +2137,7 @@ NextMember:
     ConsumeRCurly ();
 
     /* If we have data from a bit-field left, output it now */
-    CHECK(SI.ValBits < CHAR_BITS);
+    CHECK (SI.ValBits < CHAR_BITS);
     OutputBitFieldData (&SI);
 
     /* If there are struct fields left, reserve additional storage */

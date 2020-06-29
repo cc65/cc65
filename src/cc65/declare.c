@@ -2087,7 +2087,7 @@ static unsigned ParseStructInit (Type* T, int AllowFlexibleMembers)
             Shift = (Entry->V.B.Offs - SI.Offs) * CHAR_BITS + Entry->V.B.BitOffs;
             SI.BitVal |= (Val << Shift);
 
-            /* Account for the data and output it if we have a full word */
+            /* Account for the data and output any full bytes we have. */
             SI.ValBits += Entry->V.B.BitWidth;
             /* Make sure unsigned is big enough to hold the value, 22 bits.
             ** This is 22 bits because the most we can have is 7 bits left

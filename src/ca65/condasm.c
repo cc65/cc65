@@ -32,6 +32,8 @@
 /*****************************************************************************/
 
 
+#include "addrsize.h"
+#include "scopedefs.h"
 
 /* ca65 */
 #include "error.h"
@@ -42,6 +44,7 @@
 #include "symbol.h"
 #include "symtab.h"
 #include "condasm.h"
+#include "pseudo.h"
 
 
 
@@ -193,7 +196,7 @@ static void FreeIf (void)
     int Done;
     do {
         IfDesc* ID = GetCurrentIf();
-        if (ID == 0) {
+        if (ID == 0 || strcmp(ID->Name, ".WEAKPROC") == 0) {
             Error (" Unexpected .ENDIF");
             Done = 1;
         } else {
@@ -201,6 +204,23 @@ static void FreeIf (void)
             ReleaseFullLineInfo (&ID->LineInfos);
             DoneCollection (&ID->LineInfos);
             --IfCount;
+        }
+    } while (!Done);
+}
+
+static void CheckNoWeak (void)
+{
+    int Done = 0;
+
+    do {
+        IfDesc* ID = GetCurrentIf();
+        if (ID == 0) {
+            Done = 1;
+        } else {
+            if (strcmp(ID->Name, ".WEAKPROC") == 0) {
+                Error (".WEAKPROC nesting not allowed");
+                Done = 1;
+            }
         }
     } while (!Done);
 }
@@ -275,6 +295,27 @@ void DoConditionals (void)
                 /* Be sure not to read the next token until the .IF stack
                 ** has been cleanup up, since we may be at end of file.
                 */
+                NextTok ();
+                ExpectSep ();
+
+                /* Get the new overall condition */
+                CalcOverallIfCond ();
+                break;
+
+            case TOK_ENDWEAK:
+                D = GetCurrentIf();
+                if (D == 0 || strcmp(D->Name, ".WEAKPROC") != 0) {
+                    Error ("Unexpected .ENDWEAK");
+                } else {
+                    ReleaseFullLineInfo (&D->LineInfos);
+                    DoneCollection (&D->LineInfos);
+                    --IfCount;
+                }
+                if (CurrentScope->Type != SCOPE_SCOPE || CurrentScope->Label == 0) {
+                } else {
+                    SymLeaveLevel ();
+                }
+
                 NextTok ();
                 ExpectSep ();
 
@@ -437,6 +478,23 @@ void DoConditionals (void)
                 CalcOverallIfCond ();
                 break;
 
+            case TOK_WEAKPROC:
+                CheckNoWeak();
+                D = AllocIf (".WEAKPROC", 1);
+                NextTok ();
+                if (IfCond) {
+                    SymEntry* Sym = ParseAnySymName (SYM_FIND_EXISTING);
+                    SetIfCond (D, Sym != 0 && SymIsRef (Sym));
+
+                    if (Sym != 0) {
+                        SymDef (Sym, GenCurrentPC (), ADDR_SIZE_DEFAULT, SF_LABEL);
+                        SymEnterLevel (&CurTok.SVal, SCOPE_SCOPE, ADDR_SIZE_DEFAULT, Sym);
+                    }
+                    ExpectSep ();
+                }
+                CalcOverallIfCond ();
+                break;
+
             default:
                 /* Skip tokens */
                 NextTok ();
@@ -458,6 +516,7 @@ int CheckConditionals (void)
         case TOK_ELSE:
         case TOK_ELSEIF:
         case TOK_ENDIF:
+        case TOK_ENDWEAK:
         case TOK_IF:
         case TOK_IFBLANK:
         case TOK_IFCONST:

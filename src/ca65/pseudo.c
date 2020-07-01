@@ -2027,6 +2027,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoEndScope      },
     { ccNone,           DoUnexpected    },      /* .ENDSTRUCT */
     { ccNone,           DoUnexpected    },      /* .ENDUNION */
+    { ccKeepToken,      DoConditionals  },      /* .ENDWEAK */
     { ccNone,           DoEnum          },
     { ccNone,           DoError         },
     { ccNone,           DoExitMacro     },
@@ -2121,6 +2122,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoUnion         },
     { ccNone,           DoUnexpected    },      /* .VERSION */
     { ccNone,           DoWarning       },
+    { ccKeepToken,      DoConditionals  },      /* .WEAKPROC */
     { ccNone,           DoWord          },
     { ccNone,           DoUnexpected    },      /* .XMATCH */
     { ccNone,           DoZeropage      },

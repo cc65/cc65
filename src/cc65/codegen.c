@@ -1479,48 +1479,9 @@ void g_scale (unsigned flags, long val)
 
         /* Scale down */
         val = -val;
-        if ((p2 = PowerOf2 (val)) > 0 && p2 <= 4) {
 
-            /* Factor is 2, 4, 8 and 16 use special function */
-            switch (flags & CF_TYPEMASK) {
-
-                case CF_CHAR:
-                    if (flags & CF_FORCECHAR) {
-                        if (flags & CF_UNSIGNED) {
-                            while (p2--) {
-                                AddCodeLine ("lsr a");
-                            }
-                            break;
-                        } else if (p2 <= 2) {
-                            AddCodeLine ("cmp #$80");
-                            AddCodeLine ("ror a");
-                            break;
-                        }
-                    }
-                    /* FALLTHROUGH */
-
-                case CF_INT:
-                    if (flags & CF_UNSIGNED) {
-                        AddCodeLine ("jsr lsrax%d", p2);
-                    } else {
-                        AddCodeLine ("jsr asrax%d", p2);
-                    }
-                    break;
-
-                case CF_LONG:
-                    if (flags & CF_UNSIGNED) {
-                        AddCodeLine ("jsr lsreax%d", p2);
-                    } else {
-                        AddCodeLine ("jsr asreax%d", p2);
-                    }
-                    break;
-
-                default:
-                    typeerror (flags);
-
-            }
-
-        } else if (val != 1) {
+        /* g_div will use asr if feasible */
+        if (val != 1) {
 
             /* Use a division instead */
             g_div (flags | CF_CONST, val);
@@ -2668,11 +2629,52 @@ void g_div (unsigned flags, unsigned long val)
         "tosdivax", "tosudivax", "tosdiveax", "tosudiveax"
     };
 
+    unsigned DoShiftLabel, EndLabel;
+
     /* Do strength reduction if the value is constant and a power of two */
     int p2;
     if ((flags & CF_CONST) && (p2 = PowerOf2 (val)) >= 0) {
         /* Generate a shift instead */
-        g_asr (flags, p2);
+        if (flags & CF_UNSIGNED) {
+            g_asr (flags, p2);
+        } else if (p2 > 0) {
+            /* GitHub #169 - if abs(expr) < abs(val), the result is always 0 */
+            DoShiftLabel = GetLocalLabel ();
+            EndLabel = GetLocalLabel ();
+            switch (flags & CF_TYPEMASK) {
+                case CF_CHAR:
+                    if (flags & CF_FORCECHAR) {
+                        AddCodeLine ("cmp #$00");
+                        AddCodeLine ("bpl %s", LocalLabelName (DoShiftLabel));
+                        break;
+                    }
+                    /* FALLTHROUGH */
+
+                case CF_INT:
+                    AddCodeLine ("cpx #$00");
+                    AddCodeLine ("bpl %s", LocalLabelName (DoShiftLabel));
+                    break;
+
+                case CF_LONG:
+                    AddCodeLine ("ldy sreg+1");
+                    AddCodeLine ("bpl %s", LocalLabelName (DoShiftLabel));
+                    break;
+
+                default:
+                    typeerror (flags);
+                    break;
+            }
+            g_save (flags);
+            g_le (flags, (unsigned long)-(signed long)val);
+            AddCodeLine ("lsr a");
+            g_restore (flags);
+            AddCodeLine ("bcs %s", LocalLabelName (DoShiftLabel));
+            g_getimmed (flags | CF_ABSOLUTE, 0, 0);
+            g_jump (EndLabel);
+            g_defcodelabel (DoShiftLabel);
+            g_asr (flags, p2);
+            g_defcodelabel (EndLabel);
+        }
     } else {
         /* Generate a division */
         if (flags & CF_CONST) {
@@ -2956,6 +2958,22 @@ void g_asr (unsigned flags, unsigned long val)
         switch (flags & CF_TYPEMASK) {
 
             case CF_CHAR:
+                if (flags & CF_FORCECHAR) {
+                    if ((flags & CF_UNSIGNED) != 0 && val <= 4) {
+                        while (val--) {
+                            AddCodeLine ("lsr a");
+                        }
+                        return;
+                    } else if (val <= 2) {
+                        while (val--) {
+                            AddCodeLine ("cmp #$80");
+                            AddCodeLine ("ror a");
+                        }
+                        return;
+                    }
+                }
+                /* FALLTHROUGH */
+
             case CF_INT:
                 val &= 0x0F;
                 if (val >= 8) {

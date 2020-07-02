@@ -2565,13 +2565,26 @@ void g_mul (unsigned flags, unsigned long val)
         "tosmulax", "tosumulax", "tosmuleax", "tosumuleax"
     };
 
-    int p2;
-
     /* Do strength reduction if the value is constant and a power of two */
-    if (flags & CF_CONST && (p2 = PowerOf2 (val)) >= 0) {
-        /* Generate a shift instead */
-        g_asl (flags, p2);
-        return;
+    if (flags & CF_CONST) {
+
+        /* Deal with negative values if it's signed multiplication */
+        int Negation = (flags & CF_UNSIGNED) == 0 && (signed long)val < 0;
+        int p2 = PowerOf2 (Negation ? (unsigned long)-(signed long)val : val);
+
+        /* Check if we can use shift instead of multiplication */
+        if (p2 == 0 || (p2 > 0 && IS_Get (&CodeSizeFactor) >= (Negation ? 100 : 0))) {
+            /* Generate a shift instead */
+            g_asl (flags, p2);
+
+            /* Negate the result if val is negative */
+            if (Negation) {
+                g_neg (flags);
+            }
+
+            /* Done */
+            return;
+        }
     }
 
     /* If the right hand side is const, the lhs is not on stack but still

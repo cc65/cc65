@@ -1496,54 +1496,14 @@ void g_scale (unsigned flags, long val)
 ** pointer points to.
 */
 {
-    int p2;
-
     /* Value may not be zero */
     if (val == 0) {
         Internal ("Data type has no size");
     } else if (val > 0) {
 
-        /* Scale up */
-        if ((p2 = PowerOf2 (val)) > 0 && p2 <= 4) {
-
-            /* Factor is 2, 4, 8 and 16, use special function */
-            switch (flags & CF_TYPEMASK) {
-
-                case CF_CHAR:
-                    if (flags & CF_FORCECHAR) {
-                        while (p2--) {
-                            AddCodeLine ("asl a");
-                        }
-                        break;
-                    }
-                    /* FALLTHROUGH */
-
-                case CF_INT:
-                    if (flags & CF_UNSIGNED) {
-                        AddCodeLine ("jsr shlax%d", p2);
-                    } else {
-                        AddCodeLine ("jsr aslax%d", p2);
-                    }
-                    break;
-
-                case CF_LONG:
-                    if (flags & CF_UNSIGNED) {
-                        AddCodeLine ("jsr shleax%d", p2);
-                    } else {
-                        AddCodeLine ("jsr asleax%d", p2);
-                    }
-                    break;
-
-                default:
-                    typeerror (flags);
-
-            }
-
-        } else if (val != 1) {
-
-            /* Use a multiplication instead */
+        /* Use a multiplication instead */
+        if (val != 1) {
             g_mul (flags | CF_CONST, val);
-
         }
 
     } else {
@@ -3224,7 +3184,6 @@ void g_asl (unsigned flags, unsigned long val)
         "tosaslax", "tosshlax", "tosasleax", "tosshleax"
     };
 
-
     /* If the right hand side is const, the lhs is not on stack but still
     ** in the primary register.
     */
@@ -3233,6 +3192,14 @@ void g_asl (unsigned flags, unsigned long val)
         switch (flags & CF_TYPEMASK) {
 
             case CF_CHAR:
+                if ((flags & CF_FORCECHAR) != 0 && val <= 4) {
+                    while (val--) {
+                        AddCodeLine ("asl a");
+                    }
+                    return;
+                }
+                /* FALLTHROUGH */
+
             case CF_INT:
                 val &= 0x0F;
                 if (val >= 8) {

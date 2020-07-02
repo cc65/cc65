@@ -2628,24 +2628,34 @@ void g_div (unsigned flags, unsigned long val)
 
     unsigned DoShiftLabel, EndLabel;
 
-    /* -Val truncated to the correct size */
+    /* Deal with negative values as well as different sizes */
+    int Negation;
     unsigned long NegatedVal;
+    unsigned MaskedVal;
 
     /* Do strength reduction if the value is constant and a power of two */
     int p2;
-    if ((flags & CF_CONST) && (p2 = PowerOf2 (val)) >= 0) {
-        /* Generate a shift instead */
-        if (flags & CF_UNSIGNED) {
-            g_asr (flags, p2);
-        } else if (p2 > 0) {
-            /* GitHub #169 - if abs(expr) < abs(val), the result is always 0 */
-            DoShiftLabel = GetLocalLabel ();
-            EndLabel = GetLocalLabel ();
-            NegatedVal = (unsigned long)-(signed long)val;
-            switch (flags & CF_TYPEMASK) {
+    if (flags & CF_CONST) {
+        Negation = (flags & CF_UNSIGNED) == 0 && (signed long)val < 0;
+        NegatedVal = (unsigned long)-(signed long)val;
+        p2 = PowerOf2 (Negation ? NegatedVal : val);
+        if (p2 >= 0) {
+            /* Generate a shift instead */
+            if (flags & CF_UNSIGNED) {
+                g_asr (flags, p2);
+                return;
+            }
+
+            /* Generate a conditional shift instead */
+            if (p2 > 0) {
+                /* GitHub #169 - if abs(expr) < abs(val), the result is always 0 */
+                DoShiftLabel = GetLocalLabel ();
+                EndLabel     = GetLocalLabel ();
+                MaskedVal    = Negation ? val : NegatedVal;
+                switch (flags & CF_TYPEMASK) {
                 case CF_CHAR:
                     if (flags & CF_FORCECHAR) {
-                        NegatedVal &= 0xFF;
+                        MaskedVal &= 0xFF;
                         AddCodeLine ("cmp #$00");
                         AddCodeLine ("bpl %s", LocalLabelName (DoShiftLabel));
                         break;
@@ -2653,13 +2663,13 @@ void g_div (unsigned flags, unsigned long val)
                     /* FALLTHROUGH */
 
                 case CF_INT:
-                    NegatedVal &= 0xFFFF;
+                    MaskedVal &= 0xFFFF;
                     AddCodeLine ("cpx #$00");
                     AddCodeLine ("bpl %s", LocalLabelName (DoShiftLabel));
                     break;
 
                 case CF_LONG:
-                    NegatedVal &= 0xFFFFFFFF;
+                    MaskedVal &= 0xFFFFFFFF;
                     AddCodeLine ("ldy sreg+1");
                     AddCodeLine ("bpl %s", LocalLabelName (DoShiftLabel));
                     break;
@@ -2667,27 +2677,38 @@ void g_div (unsigned flags, unsigned long val)
                 default:
                     typeerror (flags);
                     break;
+                }
+                g_save (flags);
+                g_le (flags | CF_UNSIGNED, MaskedVal);
+                AddCodeLine ("lsr a");
+                g_restore (flags);
+                AddCodeLine ("bcs %s", LocalLabelName (DoShiftLabel));
+                g_getimmed (flags | CF_ABSOLUTE, 0, 0);
+                g_jump (EndLabel);
+                g_defcodelabel (DoShiftLabel);
+                g_asr (flags, p2);
+                g_defcodelabel (EndLabel);
             }
-            g_save (flags);
-            g_le (flags | CF_UNSIGNED, NegatedVal);
-            AddCodeLine ("lsr a");
-            g_restore (flags);
-            AddCodeLine ("bcs %s", LocalLabelName (DoShiftLabel));
-            g_getimmed (flags | CF_ABSOLUTE, 0, 0);
-            g_jump (EndLabel);
-            g_defcodelabel (DoShiftLabel);
-            g_asr (flags, p2);
-            g_defcodelabel (EndLabel);
+
+            /* Negate the result if val is negative */
+            if (Negation) {
+                g_neg (flags);
+            }
+
+            /* Done */
+            return;
         }
-    } else {
-        /* Generate a division */
-        if (flags & CF_CONST) {
-            /* lhs is not on stack */
-            flags &= ~CF_FORCECHAR;     /* Handle chars as ints */
-            g_push (flags & ~CF_CONST, 0);
-        }
-        oper (flags, val, ops);
+
+        /* If we go here, we didn't emit code. Push the lhs on stack and fall
+        ** into the normal, non-optimized stuff.
+        */
+        flags &= ~CF_FORCECHAR; /* Handle chars as ints */
+        g_push (flags & ~CF_CONST, 0);
     }
+
+    /* Generate a division */
+    oper (flags, val, ops);
+
 }
 
 

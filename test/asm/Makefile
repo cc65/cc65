@@ -41,6 +41,9 @@ CPUDETECT_BINS = $(foreach cpu,$(CPUDETECT_CPUS),$(WORKDIR)/$(cpu)-cpudetect.bin
 
 all: $(OPCODE_BINS) $(CPUDETECT_BINS)
 
+# cpudetect.o is written by multiple rules
+.NOTPARALLEL:
+
 $(WORKDIR):
 	$(call MKDIR,$(WORKDIR))
 

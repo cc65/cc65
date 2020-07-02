@@ -3,6 +3,7 @@
   !!ORIGIN!!      cc65 regression tests
   !!LICENCE!!     zlib
   !!AUTHOR!!      Jesse Rosenstock
+  !!COPYRIGHT!!   Copyright 2020 Google LLC
 */
 
 /*

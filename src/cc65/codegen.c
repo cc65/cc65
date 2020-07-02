@@ -1480,12 +1480,9 @@ void g_scale (unsigned flags, long val)
         /* Scale down */
         val = -val;
 
-        /* g_div will use asr if feasible */
+        /* Use a division instead */
         if (val != 1) {
-
-            /* Use a division instead */
             g_div (flags | CF_CONST, val);
-
         }
     }
 }
@@ -2631,6 +2628,9 @@ void g_div (unsigned flags, unsigned long val)
 
     unsigned DoShiftLabel, EndLabel;
 
+    /* -Val truncated to the correct size */
+    unsigned long NegatedVal;
+
     /* Do strength reduction if the value is constant and a power of two */
     int p2;
     if ((flags & CF_CONST) && (p2 = PowerOf2 (val)) >= 0) {
@@ -2641,9 +2641,11 @@ void g_div (unsigned flags, unsigned long val)
             /* GitHub #169 - if abs(expr) < abs(val), the result is always 0 */
             DoShiftLabel = GetLocalLabel ();
             EndLabel = GetLocalLabel ();
+            NegatedVal = (unsigned long)-(signed long)val;
             switch (flags & CF_TYPEMASK) {
                 case CF_CHAR:
                     if (flags & CF_FORCECHAR) {
+                        NegatedVal &= 0xFF;
                         AddCodeLine ("cmp #$00");
                         AddCodeLine ("bpl %s", LocalLabelName (DoShiftLabel));
                         break;
@@ -2651,11 +2653,13 @@ void g_div (unsigned flags, unsigned long val)
                     /* FALLTHROUGH */
 
                 case CF_INT:
+                    NegatedVal &= 0xFFFF;
                     AddCodeLine ("cpx #$00");
                     AddCodeLine ("bpl %s", LocalLabelName (DoShiftLabel));
                     break;
 
                 case CF_LONG:
+                    NegatedVal &= 0xFFFFFFFF;
                     AddCodeLine ("ldy sreg+1");
                     AddCodeLine ("bpl %s", LocalLabelName (DoShiftLabel));
                     break;
@@ -2665,7 +2669,7 @@ void g_div (unsigned flags, unsigned long val)
                     break;
             }
             g_save (flags);
-            g_le (flags, (unsigned long)-(signed long)val);
+            g_le (flags | CF_UNSIGNED, NegatedVal);
             AddCodeLine ("lsr a");
             g_restore (flags);
             AddCodeLine ("bcs %s", LocalLabelName (DoShiftLabel));

@@ -321,7 +321,7 @@ static void CmdAddFile (CmdDesc* Cmd, const char* File)
     /* Expand the file vector if needed */
     if (Cmd->FileCount == Cmd->FileMax) {
         Cmd->FileMax += 10;
-        Cmd->Files    = xrealloc (Cmd->Files, Cmd->FileMax * sizeof(char*));
+        Cmd->Files    = xrealloc (Cmd->Files, Cmd->FileMax * sizeof (char*));
     }
 
     /* If the file name is not NULL (which is legal and is used to terminate

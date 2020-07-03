@@ -462,6 +462,7 @@ static void ExecProgram (CmdDesc* Cmd)
 static void RemoveTempFiles (void)
 {
     unsigned I;
+
     for (I = 0; I < RM.FileCount; ++I) {
         if (remove (RM.Files[I]) < 0) {
             Warning ("Cannot remove temporary file '%s': %s",

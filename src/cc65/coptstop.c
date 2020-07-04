@@ -946,7 +946,8 @@ static unsigned Opt_toseqax_tosneax (StackOpData* D, const char* BoolTransformer
         D->Lhs.A.Flags |= LI_REMOVE;
 
     } else if ((D->Rhs.A.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT &&
-               (D->Rhs.X.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT) {
+               (D->Rhs.X.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT &&
+               D->RhsMultiChg == 0) {
 
         CodeEntry* LoadX = D->Rhs.X.LoadEntry;
         CodeEntry* LoadA = D->Rhs.A.LoadEntry;

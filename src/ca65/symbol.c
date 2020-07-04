@@ -178,6 +178,9 @@ SymEntry* ParseScopedSymName (SymFindAction Action)
         */
         if (NoScope && (Action & SYM_ALLOC_NEW) == 0) {
             Sym = SymFindAny (Scope, &Ident);
+            if (!Sym) {
+                Sym = SymFindInChildren(Scope, &Ident);
+            }
         } else {
             /* If we are processing a symbol within an expression, which the
             ** parser expects to be constant, that symbol had to be defined
@@ -193,10 +196,11 @@ SymEntry* ParseScopedSymName (SymFindAction Action)
                     Sym = SymFindAny (Scope, &Ident);
                 }
             }
+
             /* If still not found, or if in non-const expression, it will just
             ** get added to the current scope.
             */
-            if (!Sym  ) {
+            if (!Sym) {
                 Sym = SymFind (Scope, &Ident, Action);
             }
         }

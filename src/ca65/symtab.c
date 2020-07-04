@@ -431,9 +431,9 @@ SymEntry* SymFindInChildren (SymTable* Parent, const StrBuf* Name)
 
     if (Scope) {
         do {
-            Sym = SymFind(Scope, Name, SYM_CHECK_ONLY);
+            Sym = SymFind (Scope, Name, SYM_CHECK_ONLY);
             Scope = Scope->Next;
-        } while (Scope && !Sym);
+        } while (Sym == 0 && Scope != 0);
     }
 
     return Sym;

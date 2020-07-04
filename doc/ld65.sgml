@@ -932,7 +932,8 @@ the standard format used by Atari DOS 2.0 and upward file managers in the Atari
 </verb></tscreen>
 
 In the Atari segmented file format, the linker will write each <tt/MEMORY/ area
-as a new segment, including a header with the start and end address.
+as including a header with the start and end address. If two memory areas are
+contiguous, the headers will be joined if possible.
 
 The necessary o65 or Atari attributes are defined in a special section labeled
 <ref id="FORMAT" name="FORMAT">.

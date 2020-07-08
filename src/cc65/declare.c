@@ -772,7 +772,11 @@ static SymEntry* ParseStructDecl (const char* Name)
             */
             if (BitOffs > 0) {
                 if (FieldWidth <= 0 || (BitOffs + FieldWidth) > INT_BITS) {
-                    /* Bits needed to byte-align the next field. */
+                    /* Bits needed to byte-align the next field.  MSVC complains
+                    ** about unary negation of unsigned, but it's intended.
+                    ** Disable the warning for the next line only.
+                    */
+                    #pragma warning(disable: 4146)
                     unsigned PaddingBits = -BitOffs % CHAR_BITS;
 
                     /* We need an anonymous name */

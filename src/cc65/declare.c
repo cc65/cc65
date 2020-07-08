@@ -776,7 +776,9 @@ static SymEntry* ParseStructDecl (const char* Name)
                     ** about unary negation of unsigned, but it's intended.
                     ** Disable the warning for the next line only.
                     */
+                    #ifdef _MSC_VER
                     #pragma warning(disable: 4146)
+                    #endif
                     unsigned PaddingBits = -BitOffs % CHAR_BITS;
 
                     /* We need an anonymous name */

@@ -772,14 +772,11 @@ static SymEntry* ParseStructDecl (const char* Name)
             */
             if (BitOffs > 0) {
                 if (FieldWidth <= 0 || (BitOffs + FieldWidth) > INT_BITS) {
-                    /* Bits needed to byte-align the next field.  MSVC complains
-                    ** about unary negation of unsigned, but it's intended.
-                    ** Disable the warning for the next line only.
+                    /* Bits needed to byte-align the next field.
+                    ** MSVC complains about unary negation of unsigned,
+                    ** so it has been rewritten as subtraction.
                     */
-                    #ifdef _MSC_VER
-                    #pragma warning(disable: 4146)
-                    #endif
-                    unsigned PaddingBits = -BitOffs % CHAR_BITS;
+                    unsigned PaddingBits = (0 - BitOffs) % CHAR_BITS;
 
                     /* We need an anonymous name */
                     AnonName (Ident, "bit-field");

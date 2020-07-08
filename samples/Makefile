@@ -231,6 +231,20 @@ ovrldemo: overlaydemo.o
 OVERLAYLIST := $(foreach I,1 2 3,multdemo.$I ovrldemo.$I)
 
 # --------------------------------------------------------------------------
+# TGI programs on the VIC-20 need a special ld65 configuration file.
+
+ifeq ($(SYS),vic20)
+mandelbrot.o: override CFLAGS += -D DYN_DRV=0
+mandelbrot: mandelbrot.o
+	$(LD) $(LDFLAGS) -o $@ -C vic20-tgi.cfg -m $@.map $^ $(SYS).lib
+
+# tgidemo needs at least 16K of RAM expansion.
+tgidemo.o: override CFLAGS += -D DYN_DRV=0
+tgidemo: tgidemo.o
+	$(LD) -D __HIMEM__=0x6000 $(LDFLAGS) -o $@ -C vic20-tgi.cfg -m $@.map $^ $(SYS).lib
+endif
+
+# --------------------------------------------------------------------------
 # Rule to make a CBM disk with all samples. Needs the c1541 program that comes
 # with the VICE emulator.
 

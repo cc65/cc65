@@ -63,9 +63,9 @@ static struct four_bits_with_int {
 
 static void test_four_bits_with_int(void)
 {
-    /* We would like this to be 3.  https://github.com/cc65/cc65/issues/1054 */
-    if (sizeof(struct four_bits_with_int) != 4) {
-        printf("Got sizeof(struct four_bits_with_int) = %zu, expected 4.\n",
+    /* The first 4-bit bit-field just takes one byte, so the size is 3.  */
+    if (sizeof(struct four_bits_with_int) != 3) {
+        printf("Got sizeof(struct four_bits_with_int) = %zu, expected 3.\n",
                sizeof(struct four_bits_with_int));
         failures++;
     }
@@ -140,9 +140,9 @@ static struct overlap_with_int {
 
 static void test_overlap_with_int(void)
 {
-    /* We would like this to be 5. */
-    if (sizeof(struct overlap_with_int) != 6) {
-        printf("Got sizeof(struct overlap_with_int) = %zu, expected 6.\n",
+    /* First two fields in 3 bytes, then another 2 bytes. */
+    if (sizeof(struct overlap_with_int) != 5) {
+        printf("Got sizeof(struct overlap_with_int) = %zu, expected 5.\n",
                sizeof(struct overlap_with_int));
         failures++;
     }

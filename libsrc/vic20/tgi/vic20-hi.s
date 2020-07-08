@@ -261,16 +261,15 @@ PATTERN_SOLID:
         sta     tmp2+1
         inx                     ; (ldx #$00)
         stx     ERROR           ; Set to TGI_ERR_OK
+        clc
 
 @NEXT_ROW:
         ldy     #$00
         txa
-        clc
         adc     #$10
 
 @NEXT_COLUMN:
         sta     (tmp2),y
-        clc
         adc     #ROWS
         iny
         cpy     #COLS
@@ -282,10 +281,8 @@ PATTERN_SOLID:
         clc
         adc     #COLS
         sta     tmp2
-        bcc     @L1
-        inc     tmp2+1
 
-@L1:    inx
+        inx
         cpx     #ROWS
         bne     @NEXT_ROW
 

@@ -399,9 +399,11 @@ void LibClose (void)
         Error ("Problem closing '%s': %s", LibName, strerror (errno));
     }
     if (NewLib && fclose (NewLib) != 0) {
-        Error ("Problem closing temporary library file: %s", strerror (errno));
+        Error ("Problem closing temporary library file '%s': %s",
+               NewLibName, strerror (errno));
     }
     if (NewLibName && remove (NewLibName) != 0) {
-        Error ("Problem deleting temporary library file: %s", strerror (errno));
+        Error ("Problem deleting temporary library file '%s': %s",
+               NewLibName, strerror (errno));
     }
 }

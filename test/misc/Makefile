@@ -50,6 +50,11 @@ TESTS += $(foreach option,$(OPTIONS),$(SOURCES:%.c=$(WORKDIR)/%.$(option).65c02.
 
 all: $(TESTS)
 
+# The same input file is processed with different cl65 args,
+# but cl65 uses the input file name to make the temp file name,
+# and they stomp each other.
+.NOTPARALLEL:
+
 $(WORKDIR):
 	$(call MKDIR,$(WORKDIR))
 

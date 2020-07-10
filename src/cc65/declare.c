@@ -772,17 +772,19 @@ static SymEntry* ParseStructDecl (const char* Name)
             */
             if (BitOffs > 0) {
                 if (FieldWidth <= 0 || (BitOffs + FieldWidth) > INT_BITS) {
+                    /* Bits needed to byte-align the next field. */
+                    unsigned PaddingBits = -BitOffs % CHAR_BITS;
 
                     /* We need an anonymous name */
                     AnonName (Ident, "bit-field");
 
                     /* Add an anonymous bit-field that aligns to the next
-                    ** storage unit.
+                    ** byte.
                     */
-                    AddBitField (Ident, StructSize, BitOffs, INT_BITS - BitOffs);
+                    AddBitField (Ident, StructSize, BitOffs, PaddingBits);
 
                     /* No bits left */
-                    StructSize += SIZEOF_INT;
+                    StructSize += (BitOffs + PaddingBits) / CHAR_BITS;
                     BitOffs = 0;
                 }
             }
@@ -1814,17 +1816,17 @@ static void OutputBitFieldData (StructInitData* SI)
     if (SI->ValBits > 0) {
 
         /* Output the data */
-        g_defdata (CF_INT | CF_UNSIGNED | CF_CONST, SI->BitVal, 0);
+        g_defdata (CF_CHAR | CF_UNSIGNED | CF_CONST, SI->BitVal, 0);
 
         /* Update the data from SI and account for the size */
-        if (SI->ValBits >= INT_BITS) {
-            SI->BitVal >>= INT_BITS;
-            SI->ValBits -= INT_BITS;
+        if (SI->ValBits >= CHAR_BITS) {
+            SI->BitVal >>= CHAR_BITS;
+            SI->ValBits -= CHAR_BITS;
         } else {
             SI->BitVal  = 0;
             SI->ValBits = 0;
         }
-        SI->Offs += SIZEOF_INT;
+        SI->Offs += SIZEOF_CHAR;
     }
 }
 
@@ -2062,8 +2064,8 @@ static unsigned ParseStructInit (Type* T, int AllowFlexibleMembers)
                 ** These will be packed into 3 bytes.
                 */
                 SI.ValBits += Entry->V.B.BitWidth;
-                CHECK (SI.ValBits <= 2 * (INT_BITS - 1));
-                if (SI.ValBits >= INT_BITS) {
+                CHECK (SI.ValBits <= CHAR_BITS + INT_BITS - 2);
+                while (SI.ValBits >= CHAR_BITS) {
                     OutputBitFieldData (&SI);
                 }
                 goto NextMember;
@@ -2087,16 +2089,17 @@ static unsigned ParseStructInit (Type* T, int AllowFlexibleMembers)
             Shift = (Entry->V.B.Offs - SI.Offs) * CHAR_BITS + Entry->V.B.BitOffs;
             SI.BitVal |= (Val << Shift);
 
-            /* Account for the data and output it if we have a full word */
+            /* Account for the data and output any full bytes we have. */
             SI.ValBits += Entry->V.B.BitWidth;
-            /* Make sure unsigned is big enough to hold the value, 30 bits.
-            ** This is 30 and not 32 bits because a 16-bit bit-field will
-            ** always be byte aligned, so will have padding before it.
-            ** 15 bits twice is the most we can have.
+            /* Make sure unsigned is big enough to hold the value, 22 bits.
+            ** This is 22 bits because the most we can have is 7 bits left
+            ** over from the previous OutputBitField call, plus 15 bits
+            ** from this field.  A 16-bit bit-field will always be byte
+            ** aligned, so will have padding before it.
             */
             CHECK (SI.ValBits <= CHAR_BIT * sizeof(SI.BitVal));
-            CHECK (SI.ValBits < 2 * (INT_BITS - 1));
-            if (SI.ValBits >= INT_BITS) {
+            CHECK (SI.ValBits <= CHAR_BITS + INT_BITS - 2);
+            while (SI.ValBits >= CHAR_BITS) {
                 OutputBitFieldData (&SI);
             }
 
@@ -2136,6 +2139,7 @@ NextMember:
     ConsumeRCurly ();
 
     /* If we have data from a bit-field left, output it now */
+    CHECK (SI.ValBits < CHAR_BITS);
     OutputBitFieldData (&SI);
 
     /* If there are struct fields left, reserve additional storage */

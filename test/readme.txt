@@ -9,6 +9,12 @@ compiler.
 
 /err  - contains tests that MUST NOT compile
 
+/todo - these tests fail due to open compiler issues
+
+/asm  - contains the assembler regression tests
+
+/dasm - contains the disassembler regression tests
+
 /misc - a few tests that need special care of some sort
 
 

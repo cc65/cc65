@@ -145,6 +145,9 @@ struct StackOpData {
     /* Freedom of registers inside the sequence */
     unsigned            UsedRegs;       /* Registers used */
 
+    /* Whether the rhs is changed multiple times */
+    int                 RhsMultiChg;
+
     /* Register load information for lhs and rhs */
     LoadInfo            Lhs;
     LoadInfo            Rhs;
@@ -943,7 +946,8 @@ static unsigned Opt_toseqax_tosneax (StackOpData* D, const char* BoolTransformer
         D->Lhs.A.Flags |= LI_REMOVE;
 
     } else if ((D->Rhs.A.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT &&
-               (D->Rhs.X.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT) {
+               (D->Rhs.X.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT &&
+               D->RhsMultiChg == 0) {
 
         CodeEntry* LoadX = D->Rhs.X.LoadEntry;
         CodeEntry* LoadA = D->Rhs.A.LoadEntry;
@@ -1972,6 +1976,7 @@ static void ResetStackOpData (StackOpData* Data)
     Data->ZPUsage       = REG_NONE;
     Data->ZPChanged     = REG_NONE;
     Data->UsedRegs      = REG_NONE;
+    Data->RhsMultiChg   = 0;
 
     ClearLoadInfo (&Data->Lhs);
     ClearLoadInfo (&Data->Rhs);
@@ -2092,6 +2097,10 @@ static int PreCondOk (StackOpData* D)
                     }
                 }
             }
+            if (D->RhsMultiChg && (D->OptFunc->Flags & OP_RHS_REMOVE_DIRECT) != 0) {
+                /* Cannot optimize */
+                break;
+            }
             Passed = 1;
         } while (0);
 
@@ -2188,6 +2197,8 @@ unsigned OptStackOps (CodeSeg* S)
     int                 OldEntryCount;  /* Old number of entries */
     unsigned            Used;           /* What registers would be used */
     unsigned            PushedRegs;     /* Track if the same regs are used after the push */
+    int                 RhsALoadIndex;  /* Track if rhs is changed more than once */
+    int                 RhsXLoadIndex;  /* Track if rhs is changed more than once */
 
     enum {
         Initialize,
@@ -2335,6 +2346,10 @@ unsigned OptStackOps (CodeSeg* S)
 
                 }
 
+                /* Memorize the old rhs load indices before refreshing them */
+                RhsALoadIndex = Data.Rhs.A.LoadIndex;
+                RhsXLoadIndex = Data.Rhs.X.LoadIndex;
+
                 /* Track register usage */
                 Used = TrackLoads (&Data.Rhs, &Data.Lhs, Data.Code, I);
                 Data.ZPUsage   |= (E->Use | E->Chg);
@@ -2357,6 +2372,16 @@ unsigned OptStackOps (CodeSeg* S)
                         }
                     }
                     PushedRegs &= ~E->Chg;
+                }
+                /* Check if rhs is changed again after the push */
+                if ((RhsALoadIndex != Data.Lhs.A.LoadIndex &&
+                     RhsALoadIndex != Data.Rhs.A.LoadIndex)     ||
+                    (RhsXLoadIndex != Data.Lhs.X.LoadIndex &&
+                     RhsXLoadIndex != Data.Rhs.X.LoadIndex)) {
+                    /* This will disable those sub-opts that require removing
+                    ** the rhs as they can't handle such cases correctly.
+                    */
+                    Data.RhsMultiChg = 1;
                 }
                 break;
 

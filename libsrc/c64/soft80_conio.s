@@ -67,8 +67,7 @@ firstinit:
 
         inc     soft80_first_init
 
-        ; save 4 bytes due to soft80_lo_charset and soft80_hi_charset being
-        ; page-aligned.
+        ; soft80_lo_charset and soft80_hi_charset are page-aligned
         ldy     #0
         lda     #<soft80_charset
         ldx     #>soft80_charset

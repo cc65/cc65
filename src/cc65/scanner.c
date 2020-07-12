@@ -561,7 +561,7 @@ static void NumericConst (void)
                 Types = IT_INT | IT_LONG | IT_ULONG;
                 WarnTypes = IT_LONG | IT_ULONG;
             } else {
-                /* Binary, octal or hex constants can be of any type */
+                /* Binary, octal and hex constants can be of any type */
                 Types = IT_INT | IT_UINT | IT_LONG | IT_ULONG;
             }
         }

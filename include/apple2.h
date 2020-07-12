@@ -207,6 +207,8 @@ void rebootafterexit (void);
 #define _textcolor(color)       COLOR_WHITE
 #define _bgcolor(color)         COLOR_BLACK
 #define _bordercolor(color)     COLOR_BLACK
+#define _cpeekcolor()           COLOR_WHITE
+#define _cpeekrevers()          0
 
 
 

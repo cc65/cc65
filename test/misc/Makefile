@@ -63,6 +63,36 @@ $(DIFF): ../bdiff.c | $(WORKDIR)
 
 define PRG_template
 
+# should compile, but gives an error
+$(WORKDIR)/bug975.$1.$2.prg: bug975.c | $(WORKDIR)
+	$(if $(QUIET),echo misc/bug975.$1.$2.prg)
+	-$(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
+
+# should compile, but gives an error
+$(WORKDIR)/bug250.$1.$2.prg: bug250.c | $(WORKDIR)
+	$(if $(QUIET),echo misc/bug250.$1.$2.prg)
+	-$(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
+
+# should compile, but gives an error
+$(WORKDIR)/bug760.$1.$2.prg: bug760.c | $(WORKDIR)
+	$(if $(QUIET),echo misc/bug760.$1.$2.prg)
+	-$(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
+
+# this should fail to compile, because cc65 does not support returning structs
+$(WORKDIR)/bug264.$1.$2.prg: bug264.c | $(WORKDIR)
+	$(if $(QUIET),echo misc/bug264.$1.$2.prg)
+	-$(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
+
+# this should fail to compile, because there are errors in the code
+$(WORKDIR)/bug1048.$1.$2.prg: bug1048.c | $(WORKDIR)
+	$(if $(QUIET),echo misc/bug1048.$1.$2.prg)
+	-$(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
+
+# internal compiler error
+$(WORKDIR)/bug1075.$1.$2.prg: bug1075.c | $(WORKDIR)
+	$(if $(QUIET),echo misc/bug1075.$1.$2.prg)
+	-$(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
+
 # should compile, but then hangs in an endless loop
 $(WORKDIR)/endless.$1.$2.prg: endless.c | $(WORKDIR)
 	$(if $(QUIET),echo misc/endless.$1.$2.prg)

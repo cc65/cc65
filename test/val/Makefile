@@ -24,7 +24,7 @@ ifdef QUIET
   NULLERR = 2>$(NULLDEV)
 endif
 
-SIM65FLAGS = -x 200000000
+SIM65FLAGS = -x 5000000000
 
 CL65 := $(if $(wildcard ../../bin/cl65*),..$S..$Sbin$Scl65,cl65)
 SIM65 := $(if $(wildcard ../../bin/sim65*),..$S..$Sbin$Ssim65,sim65)

@@ -270,16 +270,14 @@ PATTERN_SOLID:
 
 @NEXT_COLUMN:
         sta     (tmp2),y
-        adc     #ROWS
         iny
-        cpy     #COLS
-        bne     @NEXT_COLUMN
+        adc     #ROWS
+        bcc     @NEXT_COLUMN
 
 ; Step to next row on screen.
 
         lda     tmp2
-        clc
-        adc     #COLS
+        adc     #COLS-1         ; Carry is set
         sta     tmp2
 
         inx

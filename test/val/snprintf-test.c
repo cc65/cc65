@@ -137,8 +137,9 @@ unsigned char main(void)
     } else {
         printf("There were no");
     }
-    printf(" failures.\nTap a key. ");
+    printf(" failures.\nTap a key.\n");
+#if defined(__CC65__) && !defined(__SIM6502__) && !defined(__SIM65C02__)
     cgetc();
-
+#endif
     return failures;
 }

@@ -1,7 +1,11 @@
 #include <stdio.h>
+#include <string.h>
 #include <time.h>
 
+#define EXPECTSTR "3DD173D1 - Tue Nov 12 21:34:09 2002\n"
+char result[0x100];
 
+int fails = 0;
 
 int main (void)
 {
@@ -23,16 +27,27 @@ int main (void)
     t = mktime (&tm);
     printf ("Test passes if the following lines are\n"
             "all identical:\n");
-    printf ("3DD173D1 - Tue Nov 12 21:34:09 2002\n");
-    printf ("%08lX - %s", t, asctime (&tm));
-    printf ("%08lX - %s", t, asctime (gmtime (&t)));
+    printf (EXPECTSTR);
+
+    sprintf (result, "%08lX - %s", t, asctime (&tm));
+    printf (result);
+    if (strcmp(result, EXPECTSTR) != 0) { fails++; }
+
+    sprintf (result, "%08lX - %s", t, asctime (gmtime (&t)));
+    printf (result);
+    if (strcmp(result, EXPECTSTR) != 0) { fails++; }
+
     strftime (buf, sizeof (buf), "%c", &tm);
-    printf ("%08lX - %s\n", t, buf);
+    sprintf (result, "%08lX - %s\n", t, buf);
+    printf (result);
+    if (strcmp(result, EXPECTSTR) != 0) { fails++; }
+
     strftime (buf, sizeof (buf), "%a %b %d %H:%M:%S %Y", &tm);
-    printf ("%08lX - %s\n", t, buf);
+    sprintf (result, "%08lX - %s\n", t, buf);
+    printf (result);
+    if (strcmp(result, EXPECTSTR) != 0) { fails++; }
+    
+    printf("fails: %d\n", fails);
 
-    return 0;
+    return fails;
 }
-
-
-

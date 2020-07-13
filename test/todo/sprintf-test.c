@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
-#if defined(__CC65__)
+#if defined(__CC65__) && !defined(__SIM6502__) && !defined(__SIM65C02__)
 #include <conio.h>
 #endif
 
 
 /* Flag to #ifdef the tests out that crash the old implementation */
-/*#define NOCRASH         1 */
+#define NOCRASH         1
 
 
 
@@ -532,9 +532,9 @@ int main (void)
     /* Alternative form with zero value */
 #ifndef NOCRASH
     OneTest (__LINE__, "0",                        1, "%#o", 0U);
+#endif
     OneTest (__LINE__, "0",                        1, "%#x", 0U);
     OneTest (__LINE__, "0",                        1, "%#X", 0U);
-#endif
 
     /* Alternative form with zero value and precision 1 */
     OneTest (__LINE__, "0",                        1, "%#.1o", 0U);
@@ -570,8 +570,8 @@ int main (void)
     }
 
     /* Wait for a key so we can read the result */
-#if defined(__CC65__)
+#if defined(__CC65__) && !defined(__SIM6502__) && !defined(__SIM65C02__)
     cgetc ();
 #endif
-    return 0;
+    return Failures;
 }

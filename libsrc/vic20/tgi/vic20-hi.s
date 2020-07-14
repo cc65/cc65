@@ -254,13 +254,13 @@ PATTERN_SOLID:
         ldy     #$FF
         sty     BITMASK
         iny                     ; (ldy #$00)
+        sty     ERROR           ; Set to TGI_ERR_OK
 
 ; Make screen columns.
 
         sty     tmp2
         lda     #>SBASE
         sta     tmp2+1
-        sty     ERROR           ; Set to TGI_ERR_OK
         clc
         ldx     #$10
 

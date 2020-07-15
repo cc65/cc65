@@ -98,7 +98,7 @@ void Assignment (ExprDesc* Expr)
         if (UseReg) {
             PushAddr (Expr);
         } else {
-            ED_MakeRVal (Expr);
+            ED_MarkExprAsRVal (Expr);
             LoadExpr (CF_NONE, Expr);
             g_push (CF_PTR | CF_UNSIGNED, 0);
         }
@@ -127,7 +127,7 @@ void Assignment (ExprDesc* Expr)
             } else {
 
                 /* We will use memcpy. Push the address of the rhs */
-                ED_MakeRVal (&Expr2);
+                ED_MarkExprAsRVal (&Expr2);
                 LoadExpr (CF_NONE, &Expr2);
 
                 /* Push the address (or whatever is in ax in case of errors) */
@@ -264,5 +264,5 @@ void Assignment (ExprDesc* Expr)
     }
 
     /* Value is still in primary and not an lvalue */
-    ED_MakeRValExpr (Expr);
+    ED_FinalizeRValLoad (Expr);
 }

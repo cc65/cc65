@@ -100,6 +100,11 @@ static const char* GetLabelName (unsigned Flags, uintptr_t Label, long Offs)
     /* Create the correct label name */
     switch (Flags & CF_ADDRMASK) {
 
+        case CF_IMM:
+            /* Immediate constant values */
+            xsprintf (Buf, sizeof (Buf), "$%04X", (unsigned)((Offs) & 0xFFFF));
+            break;
+
         case CF_STATIC:
             /* Static memory cell */
             if (Offs) {

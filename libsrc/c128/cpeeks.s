@@ -11,9 +11,6 @@
         .importzp       ptr1, ptr2, ptr3, tmp1, tmp2
 
         .macpack        generic
-
-; FIXME c128 needs special version that handles the 80-column VDC.
-
         .include        "c128.inc"
 
 _cpeeks:
@@ -97,7 +94,7 @@ c80:
         stx     ptr1+1
         ldx     #<$0000
         stx     ptr1
-        bze     L3a              ; branch always
+        bze     L3a             ; branch always
 
 L4a:
         lda     ptr2

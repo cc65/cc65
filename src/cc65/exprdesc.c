@@ -80,6 +80,39 @@ void ED_MakeBitField (ExprDesc* Expr, unsigned BitOffs, unsigned BitWidth)
 
 
 
+#if !defined(HAVE_INLINE)
+int ED_IsLocQuasiConst (const ExprDesc* Expr)
+/* Return true if the expression is a constant location of some sort or on the
+** stack.
+*/
+{
+    return ED_IsLocConst (Expr) || ED_IsLocStack (Expr);
+}
+#endif
+
+
+
+#if !defined(HAVE_INLINE)
+int ED_IsLocPrimaryOrExpr (const ExprDesc* Expr)
+/* Return true if the expression is E_LOC_PRIMARY or E_LOC_EXPR */
+{
+    return ED_IsLocPrimary (Expr) || ED_IsLocExpr (Expr);
+}
+#endif
+
+
+
+#if !defined(HAVE_INLINE)
+int ED_IsIndExpr (const ExprDesc* Expr)
+/* Check if the expression is a reference to its value */
+{
+    return (Expr->Flags & E_ADDRESS_OF) == 0 &&
+           !ED_IsLocNone (Expr) && !ED_IsLocPrimary (Expr);
+}
+#endif
+
+
+
 void ED_SetCodeRange (ExprDesc* Expr, const CodeMark* Start, const CodeMark* End)
 /* Set the code range for this expression */
 {
@@ -115,8 +148,9 @@ const char* ED_GetLabelName (const ExprDesc* Expr, long Offs)
     /* Generate a label depending on the location */
     switch (ED_GetLoc (Expr)) {
 
+        case E_LOC_NONE:
         case E_LOC_ABS:
-            /* Absolute: numeric address or const */
+            /* Absolute numeric addressed variable */
             SB_Printf (&Buf, "$%04X", (int)(Offs & 0xFFFF));
             break;
 
@@ -168,11 +202,11 @@ int ED_GetStackOffs (const ExprDesc* Expr, int Offs)
 
 
 ExprDesc* ED_MakeConstAbs (ExprDesc* Expr, long Value, Type* Type)
-/* Make Expr an absolute const with the given value and type. */
+/* Replace Expr with an absolute const with the given value and type */
 {
     Expr->Sym   = 0;
     Expr->Type  = Type;
-    Expr->Flags = E_LOC_ABS | E_RTYPE_RVAL | (Expr->Flags & E_HAVE_MARKS);
+    Expr->Flags = E_LOC_NONE | E_RTYPE_RVAL | (Expr->Flags & E_HAVE_MARKS);
     Expr->Name  = 0;
     Expr->IVal  = Value;
     Expr->FVal  = FP_D_Make (0.0);
@@ -182,11 +216,11 @@ ExprDesc* ED_MakeConstAbs (ExprDesc* Expr, long Value, Type* Type)
 
 
 ExprDesc* ED_MakeConstAbsInt (ExprDesc* Expr, long Value)
-/* Make Expr a constant integer expression with the given value */
+/* Replace Expr with a constant integer expression with the given value */
 {
     Expr->Sym   = 0;
     Expr->Type  = type_int;
-    Expr->Flags = E_LOC_ABS | E_RTYPE_RVAL | (Expr->Flags & E_HAVE_MARKS);
+    Expr->Flags = E_LOC_NONE | E_RTYPE_RVAL | (Expr->Flags & E_HAVE_MARKS);
     Expr->Name  = 0;
     Expr->IVal  = Value;
     Expr->FVal  = FP_D_Make (0.0);
@@ -195,14 +229,13 @@ ExprDesc* ED_MakeConstAbsInt (ExprDesc* Expr, long Value)
 
 
 
-ExprDesc* ED_MakeRValExpr (ExprDesc* Expr)
-/* Convert Expr into a rvalue which is in the primary register without an
-** offset.
-*/
+ExprDesc* ED_FinalizeRValLoad (ExprDesc* Expr)
+/* Finalize the result of LoadExpr to be an rvalue in the primary register */
 {
     Expr->Sym   = 0;
-    Expr->Flags &= ~(E_MASK_LOC | E_MASK_RTYPE | E_BITFIELD | E_NEED_TEST | E_CC_SET);
-    Expr->Flags |= (E_LOC_EXPR | E_RTYPE_RVAL);
+    Expr->Flags &= ~(E_MASK_LOC | E_MASK_RTYPE | E_BITFIELD | E_ADDRESS_OF);
+    Expr->Flags &= ~(E_NEED_TEST | E_CC_SET);
+    Expr->Flags |= (E_LOC_PRIMARY | E_RTYPE_RVAL);
     Expr->Name  = 0;
     Expr->IVal  = 0;    /* No offset */
     Expr->FVal  = FP_D_Make (0.0);
@@ -211,18 +244,106 @@ ExprDesc* ED_MakeRValExpr (ExprDesc* Expr)
 
 
 
-ExprDesc* ED_MakeLValExpr (ExprDesc* Expr)
-/* Convert Expr into a lvalue which is in the primary register without an
-** offset.
+ExprDesc* ED_AddrExpr (ExprDesc* Expr)
+/* Take address of Expr. The result is always an rvalue */
+{
+    switch (Expr->Flags & E_MASK_LOC) {
+        case E_LOC_NONE:
+            Error ("Cannot get the address of a numeric constant");
+            break;
+
+        case E_LOC_EXPR:
+            Expr->Flags &= ~(E_MASK_LOC | E_MASK_RTYPE);
+            Expr->Flags |= E_LOC_PRIMARY | E_RTYPE_RVAL;
+            break;
+
+        default:
+            if ((Expr->Flags & E_ADDRESS_OF) == 0) {
+                Expr->Flags &= ~E_MASK_RTYPE;
+                Expr->Flags |= E_ADDRESS_OF | E_RTYPE_RVAL;
+            } else {
+                /* Due to the way we handle arrays, this may happen if we take
+                ** the address of a pointer to an array element.
+                */
+                if (!IsTypePtr (Expr->Type)) {
+                    Error ("Cannot get the address of an address");
+                }
+                Expr->Flags &= ~E_MASK_RTYPE;
+                Expr->Flags |= E_RTYPE_RVAL;
+            }
+            break;
+    }
+    return Expr;
+}
+
+
+
+ExprDesc* ED_IndExpr (ExprDesc* Expr)
+/* Dereference Expr */
+{
+    switch (Expr->Flags & E_MASK_LOC) {
+        case E_LOC_NONE:
+            Expr->Flags &= ~(E_MASK_LOC | E_MASK_RTYPE);
+            Expr->Flags |= E_LOC_ABS | E_RTYPE_LVAL;
+            break;
+
+        case E_LOC_PRIMARY:
+            Expr->Flags &= ~(E_MASK_LOC | E_MASK_RTYPE);
+            Expr->Flags |= E_LOC_EXPR | E_RTYPE_LVAL;
+            break;
+
+        default:
+            if ((Expr->Flags & E_ADDRESS_OF) != 0) {
+                Expr->Flags &= ~(E_MASK_RTYPE | E_ADDRESS_OF);
+                Expr->Flags |= E_RTYPE_LVAL;
+            } else {
+                /* Due to the limitation of LoadExpr, this may happen after we
+                ** have loaded the value from a referenced address, in which
+                ** case the content in the primary no longer refers to the
+                ** original address. We simply mark this as E_LOC_EXPR so that
+                ** some info about the original location can be retained.
+                ** If it's really meant to dereference a "pointer value", it
+                ** should be done in two steps where the pointervalue should
+                ** be the manually loaded first before a call into this, and
+                ** the offset should be manually cleared somewhere outside.
+                */
+                Expr->Flags &= ~(E_MASK_LOC | E_MASK_RTYPE);
+                Expr->Flags |= E_LOC_EXPR | E_RTYPE_LVAL;
+            }
+            break;
+    }
+    return Expr;
+}
+
+
+
+#if !defined(HAVE_INLINE)
+int ED_IsAbs (const ExprDesc* Expr)
+/* Return true if the expression denotes a numeric value or address. */
+{
+    return (Expr->Flags & (E_MASK_LOC)) == (E_LOC_NONE) ||
+           (Expr->Flags & (E_MASK_LOC|E_ADDRESS_OF)) == (E_LOC_ABS|E_ADDRESS_OF);
+}
+#endif
+
+
+
+#if !defined(HAVE_INLINE)
+int ED_IsConstAbs (const ExprDesc* Expr)
+/* Return true if the expression denotes a constant absolute value. This can be
+** a numeric constant, cast to any type.
 */
 {
-    Expr->Sym   = 0;
-    Expr->Flags &= ~(E_MASK_LOC | E_MASK_RTYPE | E_BITFIELD | E_NEED_TEST | E_CC_SET);
-    Expr->Flags |= (E_LOC_EXPR | E_RTYPE_LVAL);
-    Expr->Name  = 0;
-    Expr->IVal  = 0;    /* No offset */
-    Expr->FVal  = FP_D_Make (0.0);
-    return Expr;
+    return ED_IsRVal (Expr) && ED_IsAbs (Expr);
+}
+#endif
+
+
+
+int ED_IsConstAbsInt (const ExprDesc* Expr)
+/* Return true if the expression is a constant (numeric) integer. */
+{
+    return ED_IsConstAbs (Expr) && IsClassInt (Expr->Type);
 }
 
 
@@ -233,16 +354,27 @@ int ED_IsConst (const ExprDesc* Expr)
 ** similar.
 */
 {
-    return ED_IsRVal (Expr) && (Expr->Flags & E_LOC_CONST) != 0;
+    return (Expr->Flags & E_MASK_LOC) == E_LOC_NONE || ED_IsConstAddr (Expr);
 }
 
 
 
-int ED_IsConstAbsInt (const ExprDesc* Expr)
-/* Return true if the expression is a constant (numeric) integer. */
+int ED_IsConstAddr (const ExprDesc* Expr)
+/* Return true if the expression denotes a constant address of some sort. This
+** can be the address of a global variable (maybe with offset) or similar.
+*/
 {
-    return (Expr->Flags & (E_MASK_LOC|E_MASK_RTYPE)) == (E_LOC_ABS|E_RTYPE_RVAL) &&
-           IsClassInt (Expr->Type);
+    return ED_IsAddrExpr (Expr) && ED_IsLocConst (Expr);
+}
+
+
+
+int ED_IsQuasiConstAddr (const ExprDesc* Expr)
+/* Return true if the expression denotes a quasi-constant address of some sort.
+** This can be a constant address or a stack variable address.
+*/
+{
+    return ED_IsAddrExpr (Expr) && ED_IsLocQuasiConst (Expr);
 }
 
 
@@ -251,7 +383,7 @@ int ED_IsNullPtr (const ExprDesc* Expr)
 /* Return true if the given expression is a NULL pointer constant */
 {
     return (Expr->Flags & (E_MASK_LOC|E_MASK_RTYPE|E_BITFIELD)) ==
-                                (E_LOC_ABS|E_RTYPE_RVAL) &&
+                                (E_LOC_NONE|E_RTYPE_RVAL) &&
            Expr->IVal == 0                               &&
            IsClassInt (Expr->Type);
 }
@@ -293,6 +425,11 @@ void PrintExprDesc (FILE* F, ExprDesc* E)
     Flags = E->Flags;
     Sep   = '(';
     fprintf (F, "Flags:    0x%04X ", Flags);
+    if ((Flags & E_MASK_LOC) == E_LOC_NONE) {
+        fprintf (F, "%cE_LOC_NONE", Sep);
+        Flags &= ~E_LOC_NONE;
+        Sep = ',';
+    }
     if (Flags & E_LOC_ABS) {
         fprintf (F, "%cE_LOC_ABS", Sep);
         Flags &= ~E_LOC_ABS;
@@ -351,6 +488,11 @@ void PrintExprDesc (FILE* F, ExprDesc* E)
     if (Flags & E_CC_SET) {
         fprintf (F, "%cE_CC_SET", Sep);
         Flags &= ~E_CC_SET;
+        Sep = ',';
+    }
+    if (Flags & E_ADDRESS_OF) {
+        fprintf (F, "%cE_ADDRESS_OF", Sep);
+        Flags &= ~E_ADDRESS_OF;
         Sep = ',';
     }
     if (Flags) {

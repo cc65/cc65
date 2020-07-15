@@ -260,7 +260,7 @@ static void ParseAutoDecl (Declaration* Decl)
                     Flags |= CF_CONST;
                 } else {
                     LoadExpr (CF_NONE, &Expr);
-                    ED_MakeRVal (&Expr);
+                    ED_MarkExprAsRVal (&Expr);
                 }
 
                 /* Push the value */

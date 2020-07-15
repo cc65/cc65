@@ -70,7 +70,7 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
     ** conversion void -> void.
     */
     if (IsTypeVoid (NewType)) {
-        ED_MakeRVal (Expr);     /* Never an lvalue */
+        ED_MarkExprAsRVal (Expr);     /* Never an lvalue */
         goto ExitPoint;
     }
 
@@ -105,10 +105,10 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
             g_typecast (TypeOf (NewType), TypeOf (OldType) | CF_FORCECHAR);
 
             /* Value is now in primary and an rvalue */
-            ED_MakeRValExpr (Expr);
+            ED_FinalizeRValLoad (Expr);
         }
 
-    } else if (ED_IsLocAbs (Expr)) {
+    } else if (ED_IsConstAbs (Expr)) {
 
         /* A cast of a constant numeric value to another type. Be sure
         ** to handle sign extension correctly.
@@ -136,6 +136,15 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
             }
         }
 
+        /* Do the integer constant <-> absolute address conversion if necessary */
+        if (IsClassPtr (NewType)) {
+            Expr->Flags &= ~E_LOC_NONE;
+            Expr->Flags |= E_LOC_ABS | E_ADDRESS_OF;
+        } else if (IsClassInt (NewType)) {
+            Expr->Flags &= ~(E_LOC_ABS | E_ADDRESS_OF);
+            Expr->Flags |= E_LOC_NONE;
+        }
+
     } else {
 
         /* The value is not a constant. If the sizes of the types are
@@ -150,8 +159,8 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
             /* Emit typecast code. */
             g_typecast (TypeOf (NewType), TypeOf (OldType) | CF_FORCECHAR);
 
-            /* Value is now a rvalue in the primary */
-            ED_MakeRValExpr (Expr);
+            /* Value is now an rvalue in the primary */
+            ED_FinalizeRValLoad (Expr);
         }
     }
 

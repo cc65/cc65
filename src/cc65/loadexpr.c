@@ -48,14 +48,14 @@
 
 
 
-static void LoadConstant (unsigned Flags, ExprDesc* Expr)
-/* Load the primary register with some constant value. */
+static void LoadAddress (unsigned Flags, ExprDesc* Expr)
+/* Load the primary register with some address value. */
 {
     switch (ED_GetLoc (Expr)) {
 
         case E_LOC_ABS:
-            /* Number constant */
-            g_getimmed (Flags | TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
+            /* Numberic address */
+            g_getimmed (Flags | CF_IMM | CF_CONST, Expr->IVal, 0);
             break;
 
         case E_LOC_GLOBAL:
@@ -83,25 +83,38 @@ static void LoadConstant (unsigned Flags, ExprDesc* Expr)
             g_leasp (Expr->IVal);
             break;
 
+        case E_LOC_EXPR:
+            if (Expr->IVal != 0) {
+                /* We have an expression in the primary plus a constant
+                ** offset. Adjust the value in the primary accordingly.
+                */
+                g_inc (Flags | CF_CONST, Expr->IVal);
+            }
+            break;
+
         default:
-            Internal ("Unknown constant type: %04X", Expr->Flags);
+            Internal ("Unknown address type: %04X", Expr->Flags);
     }
 }
 
 
 
 void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
-/* Load an expression into the primary register if it is not already there. */
+/* Load an expression into the primary register if it is not already there.
+** Note: This function can't modify the content in Expr since there are many
+** instances of the "GetCodePos + LoadExpr (maybe indirectly) + RemoveCode"
+** code pattern here and there which assumes that Expr should be unchanged,
+** unfortunately.
+*/
 {
-    if (ED_IsLVal (Expr)) {
+    if (!ED_IsAddrExpr (Expr)) {
 
-        /* Dereferenced lvalue. If this is a bit field its type is unsigned.
-        ** But if the field is completely contained in the lower byte, we will
-        ** throw away the high byte anyway and may therefore load just the
-        ** low byte.
+        /* Lvalue. If this is a bit field its type is unsigned. But if the
+        ** field is completely contained in the lower byte, we will throw away
+        ** the high byte anyway and may therefore load just the low byte.
         */
         if (ED_IsBitField (Expr)) {
-            Flags |= (Expr->BitOffs + Expr->BitWidth <= CHAR_BITS)? CF_CHAR : CF_INT;
+            Flags |= (Expr->BitOffs + Expr->BitWidth <= CHAR_BITS) ? CF_CHAR : CF_INT;
             Flags |= CF_UNSIGNED;
         } else {
             Flags |= TypeOf (Expr->Type);
@@ -110,10 +123,16 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
             Flags |= CF_TEST;
         }
 
+        /* Load the content of Expr */
         switch (ED_GetLoc (Expr)) {
 
+            case E_LOC_NONE:
+                /* Immediate number constant */
+                g_getimmed (Flags | CF_IMM | TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
+                break;
+
             case E_LOC_ABS:
-                /* Absolute: numeric address or const */
+                /* Absolute numeric addressed variable */
                 g_getstatic (Flags | CF_ABSOLUTE, Expr->IVal, 0);
                 break;
 
@@ -139,7 +158,15 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
                 break;
 
             case E_LOC_PRIMARY:
-                /* The primary register - just test if necessary */
+                /* The primary register */
+                if (Expr->IVal != 0) {
+                    /* We have an expression in the primary plus a constant
+                    ** offset. Adjust the value in the primary accordingly.
+                    */
+                    g_inc (Flags | CF_CONST, Expr->IVal);
+
+                    /* We might want to clear the offset, but we can't */
+                }
                 if (Flags & CF_TEST) {
                     g_test (Flags);
                 }
@@ -148,6 +175,13 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
             case E_LOC_EXPR:
                 /* Reference to address in primary with offset in Expr */
                 g_getind (Flags, Expr->IVal);
+
+                /* Since the content in primary is now overwritten with the
+                ** dereference value, we might want to change the expression
+                ** loc to E_LOC_PRIMARY as well. That way we could be able to
+                ** call this function as many times as we want. Unfortunately,
+                ** we can't.
+                */
                 break;
 
             default:
@@ -173,24 +207,14 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
         ED_TestDone (Expr);
 
     } else {
-        /* An rvalue */
-        if (ED_IsLocExpr (Expr)) {
-            if (Expr->IVal != 0) {
-                /* We have an expression in the primary plus a constant
-                ** offset. Adjust the value in the primary accordingly.
-                */
-                Flags |= TypeOf (Expr->Type);
-                g_inc (Flags | CF_CONST, Expr->IVal);
-            }
-        } else {
-            /* Constant of some sort, load it into the primary */
-            LoadConstant (Flags, Expr);
-        }
+        /* An address */
+        Flags |= CF_INT | CF_UNSIGNED;
+        /* Constant of some sort, load it into the primary */
+        LoadAddress (Flags, Expr);
 
         /* Are we testing this value? */
         if (ED_NeedsTest (Expr)) {
             /* Yes, force a test */
-            Flags |= TypeOf (Expr->Type);
             g_test (Flags);
             ED_TestDone (Expr);
         }

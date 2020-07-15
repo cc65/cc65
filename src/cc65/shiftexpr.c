@@ -173,8 +173,8 @@ void ShiftExpr (struct ExprDesc* Expr)
                 goto Next;
             }
 
-            /* If we're shifting an integer or unsigned to the right, the
-            ** lhs has a const address, and the shift count is larger than 8,
+            /* If we're shifting an integer or unsigned to the right, the lhs
+            ** has a quasi-const address, and the shift count is larger than 8,
             ** we can load just the high byte as a char with the correct
             ** signedness, and reduce the shift count by 8. If the remaining
             ** shift count is zero, we're done.
@@ -182,7 +182,7 @@ void ShiftExpr (struct ExprDesc* Expr)
             if (Tok == TOK_SHR &&
                 IsTypeInt (Expr->Type) &&
                 ED_IsLVal (Expr) &&
-                (ED_IsLocConst (Expr) || ED_IsLocStack (Expr)) &&
+                ED_IsLocQuasiConst (Expr) &&
                 Expr2.IVal >= 8) {
 
                 Type* OldType; 
@@ -227,8 +227,8 @@ void ShiftExpr (struct ExprDesc* Expr)
         }
 
 MakeRVal:
-        /* We have a rvalue in the primary now */
-        ED_MakeRValExpr (Expr);
+        /* We have an rvalue in the primary now */
+        ED_FinalizeRValLoad (Expr);
 
 Next:
         /* Set the type of the result */

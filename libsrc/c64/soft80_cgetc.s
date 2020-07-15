@@ -46,6 +46,9 @@ invertcursor:
         lda     #$34
         sta     $01
 
+        ; do not use soft80_putcolor here to make sure the cursor is always
+        ; shown using the current textcolor without disturbing the "color voodoo"
+        ; in soft80_cputc
         ldy     #0
         bcs     @set
         ; restore old value
@@ -71,11 +74,6 @@ invertcursor:
         sta     $01             ; enable I/O
         cli
         rts
-
-        ; do not use soft80_putcolor here to make sure the cursor is always
-        ; shown using the current textcolor without disturbing the "color voodoo"
-        ; in soft80_cputc
-
 
         .rodata
 nibble: .byte $f0, $0f

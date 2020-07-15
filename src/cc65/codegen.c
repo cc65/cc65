@@ -1349,7 +1349,7 @@ unsigned g_typeadjust (unsigned lhs, unsigned rhs)
         rtype = CF_LONG;
     } else if (ltype != CF_LONG && (lhs & CF_CONST) == 0 && rtype == CF_LONG) {
         /* We must promote the lhs to long */
-        if (lhs & CF_REG) {
+        if (lhs & CF_PRIMARY) {
             g_reglong (lhs);
         } else {
             g_toslong (lhs);
@@ -2338,7 +2338,7 @@ void g_call (unsigned Flags, const char* Label, unsigned ArgSize)
 void g_callind (unsigned Flags, unsigned ArgSize, int Offs)
 /* Call subroutine indirect */
 {
-    if ((Flags & CF_LOCAL) == 0) {
+    if ((Flags & CF_STACK) == 0) {
         /* Address is in a/x */
         if ((Flags & CF_FIXARGC) == 0) {
             /* Pass arg count */

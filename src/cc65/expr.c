@@ -88,10 +88,10 @@ static unsigned GlobalModeFlags (const ExprDesc* Expr)
         case E_LOC_GLOBAL:      return CF_EXTERNAL;
         case E_LOC_STATIC:      return CF_STATIC;
         case E_LOC_REGISTER:    return CF_REGVAR;
-        case E_LOC_STACK:       return CF_NONE;
-        case E_LOC_PRIMARY:     return CF_NONE;
-        case E_LOC_EXPR:        return CF_NONE;
-        case E_LOC_LITERAL:     return CF_STATIC;       /* Same as static */
+        case E_LOC_STACK:       return CF_STACK;
+        case E_LOC_PRIMARY:     return CF_PRIMARY;
+        case E_LOC_EXPR:        return CF_EXPR;
+        case E_LOC_LITERAL:     return CF_LITERAL;
         default:
             Internal ("GlobalModeFlags: Invalid location flags value: 0x%04X", Expr->Flags);
             /* NOTREACHED */
@@ -189,7 +189,7 @@ static unsigned typeadjust (ExprDesc* lhs, ExprDesc* rhs, int NoPush)
     }
     if (NoPush) {
         /* Value is in primary register*/
-        ltype |= CF_REG;
+        ltype |= CF_PRIMARY;
     }
     rtype = TypeOf (rhst);
     if (ED_IsLocNone (rhs)) {
@@ -587,7 +587,7 @@ static void FunctionCall (ExprDesc* Expr)
             ** Since fastcall functions may never be variadic, we can use the
             ** index register for this purpose.
             */
-            g_callind (CF_LOCAL, ParamSize, PtrOffs);
+            g_callind (CF_STACK, ParamSize, PtrOffs);
         }
 
         /* If we have a pointer on stack, remove it */
@@ -2068,7 +2068,7 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
             if ((Gen->Flags & GEN_NOPUSH) == 0) {
                 g_push (ltype, 0);
             } else {
-                ltype |= CF_REG;        /* Value is in register */
+                ltype |= CF_PRIMARY;        /* Value is in register */
             }
 
             /* Determine the type of the operation result. */
@@ -2100,7 +2100,7 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
                 }
                 if ((Gen->Flags & GEN_NOPUSH) != 0) {
                     RemoveCode (&Mark2);
-                    ltype |= CF_REG;    /* Value is in register */
+                    ltype |= CF_PRIMARY;    /* Value is in register */
                 }
             }
 
@@ -2276,7 +2276,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                 flags |= CF_CONST;
                 if ((Gen->Flags & GEN_NOPUSH) != 0) {
                     RemoveCode (&Mark2);
-                    ltype |= CF_REG;    /* Value is in register */
+                    ltype |= CF_PRIMARY;    /* Value is in register */
                 }
             }
 
@@ -2550,7 +2550,7 @@ static void parseadd (ExprDesc* Expr)
                 flags |= CF_CONST;
             } else {
                 /* Constant address label */
-                flags |= GlobalModeFlags (Expr) | CF_CONSTADDR;
+                flags |= GlobalModeFlags (Expr);
             }
 
             /* Check for pointer arithmetic */

@@ -1,10 +1,15 @@
 ;----------------------------------------------------------------------------
 ; VGA font for the PC-Engine conio implementation
 
+        .export _pce_font
+
 ; The character tiles use only two colors from each pallette.  Color zero
 ; comes from pallette zero; color one is different in each pallette.  The
 ; color of a character is set by choosing one of the 16 pallettes.
 
+.rodata
+
+_pce_font:
         .byte   $00, $00, $00, $00, $00, $00, $00, $00
 
         .byte   %00000000

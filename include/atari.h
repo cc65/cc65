@@ -209,7 +209,7 @@
 #define KEY_CLEAR               (KEY_LESSTHAN | KEY_SHIFT)
 #define KEY_INSERT              (KEY_GREATERTHAN | KEY_SHIFT)
 
-#define KEY_UP      (KEY_UNDERLINE | KEY_CTRL)
+#define KEY_UP      (KEY_DASH | KEY_CTRL)
 #define KEY_DOWN    (KEY_EQUALS | KEY_CTRL)
 #define KEY_LEFT    (KEY_PLUS | KEY_CTRL)
 #define KEY_RIGHT   (KEY_ASTERISK | KEY_CTRL)

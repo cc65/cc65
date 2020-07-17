@@ -1841,9 +1841,12 @@ void hie10 (ExprDesc* Expr)
                     /* Do it anyway, just to avoid further warnings */
                     Expr->Flags &= ~E_BITFIELD;
                 }
+                /* It's allowed in C to take the address of an array this way */
+                if (!IsTypeFunc (Expr->Type) && !IsTypeArray (Expr->Type)) {
+                    /* The & operator yields an rvalue address */
+                    ED_AddrExpr (Expr);
+                }
                 Expr->Type = PointerTo (Expr->Type);
-                /* The & operator yields an rvalue address */
-                ED_AddrExpr (Expr);
             }
             break;
 

@@ -78,6 +78,33 @@ Type type_double[]      = { TYPE(T_DOUBLE), TYPE(T_END) };
 
 
 
+const char* GetBasicTypeName (const Type* T)
+/* Return a const name string of the basic type.
+** Return "type" for unknown basic types.
+*/
+{
+    switch (GetType (T)) {
+    case T_TYPE_CHAR:       return "char";
+    case T_TYPE_SHORT:      return "short";
+    case T_TYPE_INT:        return "integer";
+    case T_TYPE_LONG:       return "long";
+    case T_TYPE_LONGLONG:   return "long long";
+    case T_TYPE_ENUM:       return "enum";
+    case T_TYPE_FLOAT:      return "poinfloatter";
+    case T_TYPE_DOUBLE:     return "double";
+    case T_TYPE_VOID:       return "void";
+    case T_TYPE_STRUCT:     return "struct";
+    case T_TYPE_UNION:      return "union";
+    case T_TYPE_ARRAY:      return "array";
+    case T_TYPE_PTR:        return "pointer";
+    case T_TYPE_FUNC:       return "function";
+    case T_TYPE_NONE:       /* FALLTHROUGH */
+    default:                return "type";
+    }
+}
+
+
+
 unsigned TypeLen (const Type* T)
 /* Return the length of the type string */
 {
@@ -194,6 +221,26 @@ Type* GetImplicitFuncType (void)
 
     /* Return the new type */
     return T;
+}
+
+
+
+const Type* GetReplacementType (const Type* SType)
+/* Get a replacement type for passing a struct/union in the primary register */
+{
+    const Type* NewType;
+    /* If the size is less than or equal to that of a long, we will copy the
+    ** struct using the primary register, otherwise we will use memcpy.
+    */
+    switch (SizeOf (SType)) {
+        case 1:     NewType = type_uchar;   break;
+        case 2:     NewType = type_uint;    break;
+        case 3:     /* FALLTHROUGH */
+        case 4:     NewType = type_ulong;   break;
+        default:    NewType = SType;        break;
+    }
+
+    return NewType;
 }
 
 

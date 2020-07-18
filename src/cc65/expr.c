@@ -470,6 +470,7 @@ static void FunctionCall (ExprDesc* Expr)
     int           PtrOffs = 0;    /* Offset of function pointer on stack */
     int           IsFastcall = 0; /* True if it's a fast-call function */
     int           PtrOnStack = 0; /* True if a pointer copy is on stack */
+    Type*         ReturnType;
 
     /* Skip the left paren */
     NextToken ();
@@ -648,7 +649,19 @@ static void FunctionCall (ExprDesc* Expr)
 
     /* The function result is an rvalue in the primary register */
     ED_FinalizeRValLoad (Expr);
-    Expr->Type = GetFuncReturn (Expr->Type);
+    ReturnType = GetFuncReturn (Expr->Type);
+
+    /* Handle struct specially */
+    if (IsTypeStruct (ReturnType)) {
+        /* If there is no replacement type, then it is just the address */
+        if (ReturnType == GetReplacementType (ReturnType)) {
+            /* Dereference it */
+            ED_IndExpr (Expr);
+            ED_MarkExprAsRVal (Expr);
+        }
+    }
+
+    Expr->Type = ReturnType;
 }
 
 
@@ -1206,12 +1219,20 @@ static void StructRef (ExprDesc* Expr)
         return;
     }
 
-    if (IsTypePtr (Expr->Type)) {
-        /* If we have a struct pointer that is an lvalue and not already in the
-        ** primary, load its content now.
-        */
-        if (!ED_IsConst (Expr)) {
-            /* Load into the primary */
+    /* A struct is usually an lvalue. If not, it is a struct passed in the
+    ** primary register, which is usually a result returned from a function.
+    ** However, it is possible that this rvalue is a result of certain
+    ** operations on an lvalue, and there are no reasons to disallow that.
+    ** So we just rely on the check on function returns to catch the errors
+    ** and dereference the rvalue address of the struct here.
+    */
+    if (IsTypePtr (Expr->Type)      ||
+        (ED_IsRVal (Expr)       &&
+         ED_IsLocPrimary (Expr) &&
+         Expr->Type == GetReplacementType (Expr->Type))) {
+
+        if (!ED_IsConst (Expr) && !ED_IsLocPrimary (Expr)) {
+            /* If we have a non-const struct pointer, load its content now */
             LoadExpr (CF_NONE, Expr);
 
             /* Clear the offset */
@@ -1241,27 +1262,25 @@ static void StructRef (ExprDesc* Expr)
         FinalType->C |= Q;
     }
 
-    /* A struct is usually an lvalue. If not, it is a struct referenced in the
-    ** primary register, which is likely to be returned from a function.
-    */
-    if (ED_IsRVal (Expr) && ED_IsLocExpr (Expr) && !IsTypePtr (Expr->Type)) {
+    if (ED_IsRVal (Expr) && ED_IsLocPrimary (Expr) && !IsTypePtr (Expr->Type)) {
 
         unsigned Flags = 0;
         unsigned BitOffs;
 
         /* Get the size of the type */
-        unsigned Size = SizeOf (Expr->Type);
+        unsigned StructSize = SizeOf (Expr->Type);
+        unsigned FieldSize  = SizeOf (Field->Type);
 
         /* Safety check */
-        CHECK (Field->V.Offs + Size <= SIZEOF_LONG);
+        CHECK (Field->V.Offs + FieldSize <= StructSize);
 
         /* The type of the operation depends on the type of the struct */
-        switch (Size) {
-            case 1:     Flags = CF_CHAR | CF_UNSIGNED | CF_CONST;       break;
-            case 2:     Flags = CF_INT  | CF_UNSIGNED | CF_CONST;       break;
+        switch (StructSize) {
+            case 1:     Flags = CF_CHAR | CF_UNSIGNED | CF_CONST;           break;
+            case 2:     Flags = CF_INT  | CF_UNSIGNED | CF_CONST;           break;
             case 3:     /* FALLTHROUGH */
-            case 4:     Flags = CF_LONG | CF_UNSIGNED | CF_CONST;       break;
-            default:    Internal ("Invalid struct size: %u", Size);     break;
+            case 4:     Flags = CF_LONG | CF_UNSIGNED | CF_CONST;           break;
+            default:    Internal ("Invalid struct size: %u", StructSize);   break;
         }
 
         /* Generate a shift to get the field in the proper position in the
@@ -1274,7 +1293,7 @@ static void StructRef (ExprDesc* Expr)
             /* Mask the value. This is unnecessary if the shift executed above
             ** moved only zeroes into the value.
             */
-            if (BitOffs + Field->V.B.BitWidth != Size * CHAR_BITS) {
+            if (BitOffs + Field->V.B.BitWidth != FieldSize * CHAR_BITS) {
                 g_and (CF_INT | CF_UNSIGNED | CF_CONST,
                        (0x0001U << Field->V.B.BitWidth) - 1U);
             }

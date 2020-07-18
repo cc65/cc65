@@ -1,0 +1,8 @@
+all-alphanumeric-iso8859.bin
+all-alphanumeric-petscii.bin
+all-iso8859.bin
+all-petscii.bin
+all-printable-iso8859.bin
+all-printable-petscii.bin
+*.out
+cbmcvt

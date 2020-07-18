@@ -395,11 +395,17 @@ static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall)
 
         }
 
+        /* Handle struct/union specially */
+        if (IsTypeStruct (Expr.Type) || IsTypeUnion (Expr.Type)) {
+            /* Use the replacement type */
+            Flags |= TypeOf (GetReplacementType (Expr.Type));
+        } else {
+            /* Use the type of the argument for the push */
+            Flags |= TypeOf (Expr.Type);
+        }
+
         /* Load the value into the primary if it is not already there */
         LoadExpr (Flags, &Expr);
-
-        /* Use the type of the argument for the push */
-        Flags |= TypeOf (Expr.Type);
 
         /* If this is a fastcall function, don't push the last argument */
         if ((CurTok.Tok == TOK_COMMA && NextTok.Tok != TOK_RPAREN) || !IsFastcall) {
@@ -651,8 +657,8 @@ static void FunctionCall (ExprDesc* Expr)
     ED_FinalizeRValLoad (Expr);
     ReturnType = GetFuncReturn (Expr->Type);
 
-    /* Handle struct specially */
-    if (IsTypeStruct (ReturnType)) {
+    /* Handle struct/union specially */
+    if (IsTypeStruct (ReturnType) || IsTypeUnion (ReturnType)) {
         /* If there is no replacement type, then it is just the address */
         if (ReturnType == GetReplacementType (ReturnType)) {
             /* Dereference it */

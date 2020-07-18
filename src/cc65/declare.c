@@ -1780,7 +1780,7 @@ static void DefineData (ExprDesc* Expr)
 
         case E_LOC_ABS:
             /* Absolute numeric address */
-            g_defdata (CF_ABSOLUTE | TypeOf(Expr->Type) | CF_CONST, Expr->IVal, 0);
+            g_defdata (CF_ABSOLUTE | TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
             break;
 
         case E_LOC_GLOBAL:

@@ -1029,7 +1029,6 @@ static void ArrayRef (ExprDesc* Expr)
             /* Adjust the offset */
             Expr->IVal += Subscript.IVal;
 
-
         } else {
 
             /* Scale the rhs value according to the element type */

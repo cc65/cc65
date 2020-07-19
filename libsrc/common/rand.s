@@ -54,11 +54,13 @@ _rand:  clc
         sta     rand+1
         adc     rand+2
         sta     rand+2
+        eor     rand+0
         and     #$7f            ; Suppress sign bit (make it positive)
         tax
         lda     rand+2
         adc     rand+3
         sta     rand+3
+        eor     rand+1
         rts                     ; return bit (16-22,24-31) in (X,A)
 
 _srand: sta     rand+0          ; Store the seed

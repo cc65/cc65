@@ -278,6 +278,16 @@ INLINE int ED_IsBitField (const ExprDesc* Expr)
 #  define ED_IsBitField(Expr)   (((Expr)->Flags & E_BITFIELD) != 0)
 #endif
 
+#if defined(HAVE_INLINE)
+INLINE void ED_DisBitField (ExprDesc* Expr)
+/* Make the expression no longer a bit field */
+{
+    Expr->Flags &= ~E_BITFIELD;
+}
+#else
+#  define ED_DisBitField(Expr)  ((Expr)->Flags &= ~E_BITFIELD)
+#endif
+
 void ED_MakeBitField (ExprDesc* Expr, unsigned BitOffs, unsigned BitWidth);
 /* Make this expression a bit field expression */
 

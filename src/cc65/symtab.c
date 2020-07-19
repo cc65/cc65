@@ -819,7 +819,8 @@ SymEntry* AddStructSym (const char* Name, unsigned Flags, unsigned Size, SymTabl
 
 
 
-SymEntry* AddBitField (const char* Name, unsigned Offs, unsigned BitOffs, unsigned BitWidth)
+SymEntry* AddBitField (const char* Name, const Type* T, unsigned Offs,
+                       unsigned BitOffs, unsigned BitWidth, int SignednessSpecified)
 /* Add a bit field to the local symbol table and return the symbol entry */
 {
     /* Do we have an entry with this name already? */
@@ -834,11 +835,20 @@ SymEntry* AddBitField (const char* Name, unsigned Offs, unsigned BitOffs, unsign
         /* Create a new entry */
         Entry = NewSymEntry (Name, SC_BITFIELD);
 
-        /* Set the symbol attributes. Bit-fields are always of type unsigned */
-        Entry->Type         = type_uint;
+        /* Set the symbol attributes. Bit-fields are always integral types. */
+        Entry->Type         = TypeDup (T);
         Entry->V.B.Offs     = Offs;
         Entry->V.B.BitOffs  = BitOffs;
         Entry->V.B.BitWidth = BitWidth;
+
+        if (!SignednessSpecified) {
+            /* int is treated as signed int everywhere except bit-fields; switch it to unsigned,
+            ** since this is allowed for bit-fields and avoids sign-extension, so is much faster.
+            */
+            CHECK ((Entry->Type->C & T_MASK_SIGN) == T_SIGN_SIGNED);
+            Entry->Type->C &= ~T_MASK_SIGN;
+            Entry->Type->C |= T_SIGN_UNSIGNED;
+        }
 
         /* Add the entry to the symbol table */
         AddSymEntry (SymTab, Entry);

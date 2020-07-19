@@ -155,7 +155,8 @@ SymEntry* AddEnumSym (const char* Name, unsigned Flags, const Type* Type, SymTab
 SymEntry* AddStructSym (const char* Name, unsigned Flags, unsigned Size, SymTable* Tab);
 /* Add a struct/union entry and return it */
 
-SymEntry* AddBitField (const char* Name, unsigned Offs, unsigned BitOffs, unsigned BitWidth);
+SymEntry* AddBitField (const char* Name, const Type* Type, unsigned Offs,
+                       unsigned BitOffs, unsigned BitWidth, int SignednessSpecified);
 /* Add a bit field to the local symbol table and return the symbol entry */
 
 SymEntry* AddConstSym (const char* Name, const Type* T, unsigned Flags, long Val);

@@ -4455,7 +4455,7 @@ void g_testbitfield (unsigned Flags, unsigned BitOffs, unsigned BitWidth)
 
 
 
-void g_extractbitfield (unsigned Flags, unsigned FullWidthFlags,
+void g_extractbitfield (unsigned Flags, unsigned FullWidthFlags, int IsSigned,
                         unsigned BitOffs, unsigned BitWidth)
 /* Extract bits from bit-field in ax. */
 {
@@ -4465,18 +4465,79 @@ void g_extractbitfield (unsigned Flags, unsigned FullWidthFlags,
     g_asr (Flags | CF_CONST, BitOffs);
 
     /* Since we have now shifted down, we could do char ops when the width fits in a char, but we
-    ** also need to clear the high byte since we've been using CF_FORCECHAR up to now.
+    ** also need to clear (or set) the high byte since we've been using CF_FORCECHAR up to now.
     */
+    unsigned Mask = (1U << BitWidth) - 1;
 
-    /* And by the width if the field doesn't end on a char or int boundary.  If it does end on
-    ** a boundary, then zeros have already been shifted in, but we need to clear the high byte
-    ** for char.  g_and emits no code if the mask is all ones.
+    /* To zero-extend, we will and by the width if the field doesn't end on a char or
+    ** int boundary.  If it does end on a boundary, then zeros will have already been shifted in,
+    ** but we need to clear the high byte for char.  g_and emits no code if the mask is all ones.
+    ** This is here so the signed and unsigned branches can use it.
     */
+    unsigned ZeroExtendMask = 0;  /* Zero if we don't need to zero-extend. */
     if (EndBit == CHAR_BITS) {
         /* We need to clear the high byte, since CF_FORCECHAR was set. */
-        g_and (FullWidthFlags | CF_CONST, 0xFF);
+        ZeroExtendMask = 0xFF;
     } else if (EndBit != INT_BITS) {
-        g_and (FullWidthFlags | CF_CONST, (0x0001U << BitWidth) - 1U);
+        ZeroExtendMask = (1U << BitWidth) - 1;
+    }
+
+    /* Handle signed bit-fields. */
+    if (IsSigned) {
+        /* Push A, since the sign bit test will destroy it. */
+        AddCodeLine ("pha");
+
+        /* Check sign bit */
+        unsigned SignBitPos = BitWidth - 1U;
+        unsigned SignBitByte = SignBitPos / CHAR_BITS;
+        unsigned SignBitPosInByte = SignBitPos % CHAR_BITS;
+        unsigned SignBitMask = 1U << SignBitPosInByte;
+
+        /* Move the correct byte to A.  This can only be X for now,
+        ** but more cases will be needed to support long.
+        */
+        switch (SignBitByte) {
+          case 0:
+            break;
+          case 1:
+            AddCodeLine ("txa");
+            break;
+          default:
+            FAIL ("Invalid Byte for sign bit");
+        }
+
+        /* Test the sign bit */
+        AddCodeLine ("and #$%02X", SignBitMask);
+        unsigned ZeroExtendLabel = GetLocalLabel ();
+        AddCodeLine ("beq %s", LocalLabelName (ZeroExtendLabel));
+
+        /* Pop A back and sign extend if required; operating on the full result need
+        ** to sign-extend into high byte, too.
+        */
+        AddCodeLine ("pla");
+        g_or (FullWidthFlags | CF_CONST, ~Mask);
+
+        /* Apparently, there is no unconditional branch BRA, so use JMP. */
+        unsigned DoneLabel = GetLocalLabel ();
+        AddCodeLine ("jmp %s", LocalLabelName (DoneLabel));
+
+        /* Pop A back, then zero-extend; we need to duplicate the PLA rather than move it before
+        ** the branch to share with the other label because PLA sets the condition codes.
+        */
+        g_defcodelabel (ZeroExtendLabel);
+        AddCodeLine ("pla");
+
+        /* Zero the upper bits, the same as the unsigned path. */
+        if (ZeroExtendMask != 0) {
+            g_and (FullWidthFlags | CF_CONST, ZeroExtendMask);
+        }
+
+        g_defcodelabel (DoneLabel);
+    } else {
+        /* Unsigned bit-field, only needs zero-extension. */
+        if (ZeroExtendMask != 0) {
+            g_and (FullWidthFlags | CF_CONST, ZeroExtendMask);
+        }
     }
 }
 

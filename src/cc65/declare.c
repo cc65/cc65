@@ -41,6 +41,7 @@
 /* common */
 #include "addrsize.h"
 #include "mmodel.h"
+#include "shift.h"
 #include "xmalloc.h"
 
 /* cc65 */
@@ -87,7 +88,8 @@ struct StructInitData {
 
 
 
-static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers);
+static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
+                           int* SignednessSpecified);
 /* Parse a type specifier */
 
 static unsigned ParseInitInternal (Type* T, int* Braces, int AllowFlexibleMembers);
@@ -252,12 +254,15 @@ static void OptionalInt (void)
 
 
 
-static void OptionalSigned (void)
+static void OptionalSigned (int* SignednessSpecified)
 /* Eat an optional "signed" token */
 {
     if (CurTok.Tok == TOK_SIGNED) {
         /* Skip it */
         NextToken ();
+        if (SignednessSpecified != NULL) {
+            *SignednessSpecified = 1;
+        }
     }
 }
 
@@ -728,6 +733,9 @@ static int ParseFieldWidth (Declaration* Decl)
         return -1;
     }
 
+    /* TODO: This can be relaxed to be any integral type, but
+    ** ParseStructInit currently only supports up to int.
+    */
     if (SizeOf (Decl->Type) != SizeOf (type_uint)) {
         /* Only int sized types may be used for bit-fields for now */
         Error ("cc65 currently only supports unsigned int bit-fields");
@@ -774,7 +782,8 @@ static unsigned PadWithBitField (unsigned StructSize, unsigned BitOffs)
     /* Add an anonymous bit-field that aligns to the next
     ** byte.
     */
-    AddBitField (Ident, StructSize, BitOffs, PaddingBits);
+    AddBitField (Ident, type_uchar, StructSize, BitOffs, PaddingBits,
+                 /*SignednessSpecified=*/1);
 
     return PaddingBits;
 }
@@ -866,8 +875,9 @@ static SymEntry* ParseUnionDecl (const char* Name)
 
         /* Get the type of the entry */
         DeclSpec Spec;
+        int SignednessSpecified = 0;
         InitDeclSpec (&Spec);
-        ParseTypeSpec (&Spec, -1, T_QUAL_NONE);
+        ParseTypeSpec (&Spec, -1, T_QUAL_NONE, &SignednessSpecified);
 
         /* Read fields with this type */
         while (1) {
@@ -909,7 +919,11 @@ static SymEntry* ParseUnionDecl (const char* Name)
 
             /* Add a field entry to the table. */
             if (FieldWidth > 0) {
-                AddBitField (Decl.Ident, 0, 0, FieldWidth);
+                /* For a union, allocate space for the type specified by the
+                ** bit-field.
+                */
+                AddBitField (Decl.Ident, Decl.Type, 0, 0, FieldWidth,
+                             SignednessSpecified);
             } else {
                 if (IsAnonName (Decl.Ident)) {
                     Entry = AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, 0);
@@ -997,8 +1011,9 @@ static SymEntry* ParseStructDecl (const char* Name)
             continue;
         }
 
+        int SignednessSpecified = 0;
         InitDeclSpec (&Spec);
-        ParseTypeSpec (&Spec, -1, T_QUAL_NONE);
+        ParseTypeSpec (&Spec, -1, T_QUAL_NONE, &SignednessSpecified);
 
         /* Read fields with this type */
         while (1) {
@@ -1020,12 +1035,13 @@ static SymEntry* ParseStructDecl (const char* Name)
             FieldWidth = ParseFieldWidth (&Decl);
 
             /* If this is not a bit field, or the bit field is too large for
-            ** the remainder of the current member, or we have a bit field
+            ** the remainder of the allocated unit, or we have a bit field
             ** with width zero, align the struct to the next member by adding
             ** a member with an anonymous name.
             */
             if (BitOffs > 0) {
-                if (FieldWidth <= 0 || (BitOffs + FieldWidth) > INT_BITS) {
+                if (FieldWidth <= 0 ||
+                    (BitOffs + FieldWidth) > CHAR_BITS * SizeOf (Decl.Type)) {
                     /* Add an anonymous bit-field that aligns to the next
                     ** byte.
                     */
@@ -1087,9 +1103,10 @@ static SymEntry* ParseStructDecl (const char* Name)
                 ** bit-field as a char type in expressions.
                 */
                 CHECK (BitOffs < CHAR_BITS);
-                AddBitField (Decl.Ident, StructSize, BitOffs, FieldWidth);
+                AddBitField (Decl.Ident, Decl.Type, StructSize, BitOffs,
+                             FieldWidth, SignednessSpecified);
                 BitOffs += FieldWidth;
-                CHECK (BitOffs <= INT_BITS);
+                CHECK (BitOffs <= CHAR_BITS * SizeOf (Decl.Type));
                 /* Add any full bytes to the struct size. */
                 StructSize += BitOffs / CHAR_BITS;
                 BitOffs %= CHAR_BITS;
@@ -1145,11 +1162,19 @@ NextMember: if (CurTok.Tok != TOK_COMMA) {
 
 
 
-static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers)
-/* Parse a type specifier */
+static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
+                           int* SignednessSpecified)
+/* Parse a type specifier.  Store whether one of "signed" or "unsigned" was
+** specified, so bit-fields of unspecified signedness can be treated as
+** unsigned; without special handling, it would be treated as signed.
+*/
 {
     ident       Ident;
     SymEntry*   Entry;
+
+    if (SignednessSpecified != NULL) {
+        *SignednessSpecified = 0;
+    }
 
     /* Assume we have an explicit type */
     D->Flags &= ~DS_DEF_TYPE;
@@ -1176,12 +1201,15 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers)
         case TOK_LONG:
             NextToken ();
             if (CurTok.Tok == TOK_UNSIGNED) {
+                if (SignednessSpecified != NULL) {
+                    *SignednessSpecified = 1;
+                }
                 NextToken ();
                 OptionalInt ();
                 D->Type[0].C = T_ULONG;
                 D->Type[1].C = T_END;
             } else {
-                OptionalSigned ();
+                OptionalSigned (SignednessSpecified);
                 OptionalInt ();
                 D->Type[0].C = T_LONG;
                 D->Type[1].C = T_END;
@@ -1191,12 +1219,15 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers)
         case TOK_SHORT:
             NextToken ();
             if (CurTok.Tok == TOK_UNSIGNED) {
+                if (SignednessSpecified != NULL) {
+                    *SignednessSpecified = 1;
+                }
                 NextToken ();
                 OptionalInt ();
                 D->Type[0].C = T_USHORT;
                 D->Type[1].C = T_END;
             } else {
-                OptionalSigned ();
+                OptionalSigned (SignednessSpecified);
                 OptionalInt ();
                 D->Type[0].C = T_SHORT;
                 D->Type[1].C = T_END;
@@ -1210,6 +1241,9 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers)
             break;
 
        case TOK_SIGNED:
+            if (SignednessSpecified != NULL) {
+                *SignednessSpecified = 1;
+            }
             NextToken ();
             switch (CurTok.Tok) {
 
@@ -1245,6 +1279,9 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers)
             break;
 
         case TOK_UNSIGNED:
+            if (SignednessSpecified != NULL) {
+                *SignednessSpecified = 1;
+            }
             NextToken ();
             switch (CurTok.Tok) {
 
@@ -1835,7 +1872,7 @@ Type* ParseType (Type* T)
 
     /* Get a type without a default */
     InitDeclSpec (&Spec);
-    ParseTypeSpec (&Spec, -1, T_QUAL_NONE);
+    ParseTypeSpec (&Spec, -1, T_QUAL_NONE, NULL);
 
     /* Parse additional declarators */
     ParseDecl (&Spec, &Decl, DM_NO_IDENT);
@@ -1967,7 +2004,7 @@ void ParseDeclSpec (DeclSpec* D, unsigned DefStorage, long DefType)
     ParseStorageClass (D, DefStorage);
 
     /* Parse the type specifiers passing any initial type qualifiers */
-    ParseTypeSpec (D, DefType, Qualifiers);
+    ParseTypeSpec (D, DefType, Qualifiers, NULL);
 }
 
 
@@ -2362,6 +2399,7 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
             ** into 3 bytes.
             */
             SI.ValBits += Entry->V.B.BitWidth;
+            /* TODO: Generalize this so any type can be used. */
             CHECK (SI.ValBits <= CHAR_BITS + INT_BITS - 2);
             while (SI.ValBits >= CHAR_BITS) {
                 OutputBitFieldData (&SI);
@@ -2393,16 +2431,34 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
                    SI.Offs         * CHAR_BITS + SI.ValBits);
 
             /* Read the data, check for a constant integer, do a range check */
-            ParseScalarInitInternal (type_uint, &ED);
+            ParseScalarInitInternal (Entry->Type, &ED);
             if (!ED_IsConstAbsInt (&ED)) {
                 Error ("Constant initializer expected");
                 ED_MakeConstAbsInt (&ED, 1);
             }
-            if (ED.IVal > (long) Mask) {
-                Warning ("Truncating value in bit-field initializer");
-                ED.IVal &= (long) Mask;
+
+            /* Truncate the initializer value to the width of the bit-field and check if we lost
+            ** any useful bits.
+            */
+            Val = (unsigned) ED.IVal & Mask;
+            if (IsSignUnsigned (Entry->Type)) {
+                if (ED.IVal < 0 || (unsigned long) ED.IVal != Val) {
+                    Warning ("Implicit truncation from '%s' to '%s : %u' in bit-field initializer"
+                             " changes value from %ld to %u",
+                             GetFullTypeName (ED.Type), GetFullTypeName (Entry->Type),
+                             Entry->V.B.BitWidth, ED.IVal, Val);
+                }
+            } else {
+                /* Sign extend back to full width of host long. */
+                unsigned ShiftBits = sizeof (long) * CHAR_BIT - Entry->V.B.BitWidth;
+                long RestoredVal = asr_l(asl_l (Val, ShiftBits), ShiftBits);
+                if (ED.IVal != RestoredVal) {
+                    Warning ("Implicit truncation from '%s' to '%s : %u' in bit-field initializer "
+                             "changes value from %ld to %d",
+                             GetFullTypeName (ED.Type), GetFullTypeName (Entry->Type),
+                             Entry->V.B.BitWidth, ED.IVal, Val);
+                }
             }
-            Val = (unsigned) ED.IVal;
 
             /* Add the value to the currently stored bit-field value */
             Shift = (Entry->V.B.Offs - SI.Offs) * CHAR_BITS + Entry->V.B.BitOffs;
@@ -2417,6 +2473,7 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
             ** aligned, so will have padding before it.
             */
             CHECK (SI.ValBits <= CHAR_BIT * sizeof(SI.BitVal));
+            /* TODO: Generalize this so any type can be used. */
             CHECK (SI.ValBits <= CHAR_BITS + INT_BITS - 2);
             while (SI.ValBits >= CHAR_BITS) {
                 OutputBitFieldData (&SI);
@@ -2425,7 +2482,8 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
         } else {
 
             /* Standard member. We should never have stuff from a
-            ** bit-field left
+            ** bit-field left because an anonymous member was added
+            ** for padding by ParseStructDecl.
             */
             CHECK (SI.ValBits == 0);
 

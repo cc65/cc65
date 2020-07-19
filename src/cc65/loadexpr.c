@@ -123,7 +123,9 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
             ** supported.
             */
             Flags |= (EndBit <= CHAR_BITS) ? CF_CHAR : CF_INT;
-            Flags |= CF_UNSIGNED;
+            if (IsSignUnsigned (Expr->Type)) {
+                Flags |= CF_UNSIGNED;
+            }
 
             /* Flags we need operate on the whole bit-field, without CF_FORCECHAR.  */
             BitFieldFullWidthFlags = Flags;
@@ -133,7 +135,11 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
             ** type is not CF_CHAR.
             */
             if (AdjustBitField) {
-                Flags |= CF_FORCECHAR;
+                /* If adjusting, then we're sign extending manually, so do everything unsigned
+                ** to make shifts faster.
+                */
+                Flags |= CF_UNSIGNED | CF_FORCECHAR;
+                BitFieldFullWidthFlags |= CF_UNSIGNED;
             }
         } else if ((Flags & CF_TYPEMASK) == 0) {
             Flags |= TypeOf (Expr->Type);
@@ -231,7 +237,8 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
             if (ED_NeedsTest (Expr)) {
                 g_testbitfield (Flags, Expr->BitOffs, Expr->BitWidth);
             } else {
-                g_extractbitfield (Flags, BitFieldFullWidthFlags, Expr->BitOffs, Expr->BitWidth);
+                g_extractbitfield (Flags, BitFieldFullWidthFlags, IsSignSigned (Expr->Type),
+                                   Expr->BitOffs, Expr->BitWidth);
             }
         }
 

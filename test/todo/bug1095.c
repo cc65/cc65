@@ -30,7 +30,8 @@ static struct signed_ints {
     signed int a : 3;
     signed int b : 3;
     signed int c : 3;
-} si = {-4, -1, 3};
+    signed int d : 10;
+} si = {-4, -1, 3, -500};
 
 static void test_signed_bitfield(void)
 {
@@ -61,9 +62,19 @@ static void test_signed_bitfield(void)
         failures++;
     }
 
+    if (si.d >= 0) {
+        printf("Got si.d = %d, expected negative.\n", si.d);
+        failures++;
+    }
+    if (si.d != -500) {
+        printf("Got si.d = %d, expected -500.\n", si.d);
+        failures++;
+    }
+
     si.a = -3;
     si.b = 1;
     si.c = -2;
+    si.d = 500;
 
     if (si.a >= 0) {
         printf("Got si.a = %d, expected negative.\n", si.a);
@@ -89,6 +100,15 @@ static void test_signed_bitfield(void)
     }
     if (si.c != -2) {
         printf("Got si.c = %d, expected -2.\n", si.c);
+        failures++;
+    }
+
+    if (si.d <= 0) {
+        printf("Got si.d = %d, expected positive.\n", si.d);
+        failures++;
+    }
+    if (si.d != 500) {
+        printf("Got si.d = %d, expected 500.\n", si.d);
         failures++;
     }
 }

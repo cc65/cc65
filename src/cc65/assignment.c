@@ -55,15 +55,15 @@
 
 
 static int CopyStruct (ExprDesc* LExpr, ExprDesc* RExpr)
-/* Copy the struct represented by RExpr to the one represented by LExpr */
+/* Copy the struct/union represented by RExpr to the one represented by LExpr */
 {
     /* If the size is that of a basic type (char, int, long), we will copy
     ** the struct using the primary register, otherwise we use memcpy. In
     ** the former case, push the address only if really needed.
     */
     const Type* ltype  = LExpr->Type;
-    const Type* stype  = GetReplacementType (ltype);
-    int         UseReg = (stype != LExpr->Type);
+    const Type* stype  = GetStructReplacementType (ltype);
+    int         UseReg = (stype != ltype);
 
     if (UseReg) {
         PushAddr (LExpr);
@@ -105,7 +105,7 @@ static int CopyStruct (ExprDesc* LExpr, ExprDesc* RExpr)
         /* Push the address (or whatever is in ax in case of errors) */
         g_push (CF_PTR | CF_UNSIGNED, 0);
 
-        /* Load the size of the struct into the primary */
+        /* Load the size of the struct or union into the primary */
         g_getimmed (CF_INT | CF_UNSIGNED | CF_CONST, CheckedSizeOf (ltype), 0);
 
         /* Call the memcpy function */
@@ -137,12 +137,13 @@ void Assignment (ExprDesc* Expr)
     /* Skip the '=' token */
     NextToken ();
 
-    /* cc65 does not have full support for handling structs by value. Since
-    ** assigning structs is one of the more useful operations from this
-    ** family, allow it here.
+    /* cc65 does not have full support for handling structs or unions. Since
+    ** assigning structs is one of the more useful operations from this family,
+    ** allow it here.
+    ** Note: IsClassStruct() is also true for union types. 
     */
     if (IsClassStruct (ltype)) {
-        /* Copy the struct by value */
+        /* Copy the struct or union by value */
         CopyStruct (Expr, &Expr2);
 
     } else if (ED_IsBitField (Expr)) {

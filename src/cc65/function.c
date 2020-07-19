@@ -478,7 +478,7 @@ void NewFunc (SymEntry* Func)
         } else {
             /* Handle struct/union specially */
             if (IsTypeStruct (D->LastParam->Type) || IsTypeUnion (D->LastParam->Type)) {
-                Flags = TypeOf (GetReplacementType (D->LastParam->Type)) | CF_FORCECHAR;
+                Flags = TypeOf (GetStructReplacementType (D->LastParam->Type)) | CF_FORCECHAR;
             } else {
                 Flags = TypeOf (D->LastParam->Type) | CF_FORCECHAR;
             }
@@ -507,7 +507,7 @@ void NewFunc (SymEntry* Func)
         /* Check if we need copy for struct/union type */
         RType = Param->Type;
         if (IsTypeStruct (RType) || IsTypeUnion (RType)) {
-            RType = GetReplacementType (RType);
+            RType = GetStructReplacementType (RType);
 
             /* If there is no replacement type, then it is just the address.
             ** We don't currently support this case.

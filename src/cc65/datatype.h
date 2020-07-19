@@ -243,7 +243,7 @@ Type* GetCharArrayType (unsigned Len);
 Type* GetImplicitFuncType (void);
 /* Return a type string for an inplicitly declared function */
 
-const Type* GetReplacementType (const Type* SType);
+const Type* GetStructReplacementType (const Type* SType);
 /* Get a replacement type for passing a struct/union in the primary register */
 
 Type* PointerTo (const Type* T);
@@ -483,7 +483,7 @@ INLINE int IsClassPtr (const Type* T)
 
 #if defined(HAVE_INLINE)
 INLINE int IsClassStruct (const Type* T)
-/* Return true if this is a struct type */
+/* Return true if this is a struct or union type */
 {
     return (GetClass (T) == T_CLASS_STRUCT);
 }

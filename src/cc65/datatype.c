@@ -225,7 +225,7 @@ Type* GetImplicitFuncType (void)
 
 
 
-const Type* GetReplacementType (const Type* SType)
+const Type* GetStructReplacementType (const Type* SType)
 /* Get a replacement type for passing a struct/union in the primary register */
 {
     const Type* NewType;

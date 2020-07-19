@@ -331,7 +331,7 @@ static void ReturnStatement (void)
             /* Load the value into the primary */
             if (IsTypeStruct (Expr.Type) || IsTypeUnion (Expr.Type)) {
                 /* Handle struct/union specially */
-                ReturnType = GetReplacementType (Expr.Type);
+                ReturnType = GetStructReplacementType (Expr.Type);
                 if (ReturnType == Expr.Type) {
                     Error ("Returning %s of this size by value is not supported", GetBasicTypeName (Expr.Type));
                 }

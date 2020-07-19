@@ -488,24 +488,24 @@ SymEntry* FindTagSym (const char* Name)
 
 
 SymEntry* FindStructField (const Type* T, const char* Name)
-/* Find a struct field in the fields list */
+/* Find a struct/union field in the fields list */
 {
     SymEntry* Field = 0;
 
-    /* The given type may actually be a pointer to struct */
+    /* The given type may actually be a pointer to struct/union */
     if (IsTypePtr (T)) {
         ++T;
     }
 
-    /* Non-structs do not have any struct fields... */
+    /* Only structs/unions have struct/union fields... */
     if (IsClassStruct (T)) {
 
         /* Get a pointer to the struct/union type */
         const SymEntry* Struct = GetSymEntry (T);
         CHECK (Struct != 0);
 
-        /* Now search in the struct symbol table. Beware: The table may not
-        ** exist.
+        /* Now search in the struct/union symbol table. Beware: The table may
+        ** not exist.
         */
         if (Struct->V.S.SymTab) {
             Field = FindSymInTable (Struct->V.S.SymTab, Name, HashStr (Name));

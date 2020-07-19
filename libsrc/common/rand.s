@@ -15,14 +15,14 @@
 ;  Multiplier must be 1 (mod 4)
 ;  Added value must be 1 (mod 2)
 ;  This guarantees max. period (2**32)
-;  The lowest bits have poor entropy and
-;  exhibit easily detectable patterns, so
-;  only the upper bits 16-22 and 24-31 of the
-;  4-byte state are returned.
+;  The quality of entropy in the bits of the seed are poorest in the lowest
+;  bits, and best in the highest bits.
 ;
-;  The best 8 bits, 24-31 are returned in the
-;  low byte A to provide the best entropy in the
-;  most commonly used part of the return value.
+;  The high 8 bits are used for the low byte A to provide the best entropy in
+;  the most commonly used part of the return value.
+;
+;  Finally XOR with the lower 2 bytes is used on the output, which breaks up
+;  some minor deficient sequential patterns. (#951)
 ;
 ;  Uses the following LCG values for ax + c (mod m)
 ;  a = $01010101

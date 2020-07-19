@@ -169,9 +169,7 @@ ExitPoint:
     ReplaceType (Expr, NewType);
 
     /* Bit-fields are converted to integers */
-    if (ED_IsBitField (Expr)) {
-        ED_DisBitField (Expr);
-    }
+    ED_DisBitField (Expr);
 }
 
 

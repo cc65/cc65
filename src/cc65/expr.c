@@ -1219,7 +1219,7 @@ static void StructRef (ExprDesc* Expr)
     NextToken ();
     Field = FindStructField (Expr->Type, Ident);
     if (Field == 0) {
-        Error ("No field named '%s' found in %s", GetBasicTypeName (Expr->Type), Ident);
+        Error ("No field named '%s' found in %s", Ident, GetBasicTypeName (Expr->Type));
         /* Make the expression an integer at address zero */
         ED_MakeConstAbs (Expr, 0, type_int);
         return;

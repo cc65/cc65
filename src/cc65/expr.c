@@ -396,7 +396,7 @@ static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall)
         }
 
         /* Handle struct/union specially */
-        if (IsTypeStruct (Expr.Type) || IsTypeUnion (Expr.Type)) {
+        if (IsClassStruct (Expr.Type)) {
             /* Use the replacement type */
             Flags |= TypeOf (GetStructReplacementType (Expr.Type));
         } else {
@@ -658,7 +658,7 @@ static void FunctionCall (ExprDesc* Expr)
     ReturnType = GetFuncReturn (Expr->Type);
 
     /* Handle struct/union specially */
-    if (IsTypeStruct (ReturnType) || IsTypeUnion (ReturnType)) {
+    if (IsClassStruct (ReturnType)) {
         /* If there is no replacement type, then it is just the address */
         if (ReturnType == GetStructReplacementType (ReturnType)) {
             /* Dereference it */

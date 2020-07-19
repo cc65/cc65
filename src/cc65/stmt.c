@@ -329,7 +329,7 @@ static void ReturnStatement (void)
             TypeConversion (&Expr, F_GetReturnType (CurrentFunc));
 
             /* Load the value into the primary */
-            if (IsTypeStruct (Expr.Type) || IsTypeUnion (Expr.Type)) {
+            if (IsClassStruct (Expr.Type)) {
                 /* Handle struct/union specially */
                 ReturnType = GetStructReplacementType (Expr.Type);
                 if (ReturnType == Expr.Type) {

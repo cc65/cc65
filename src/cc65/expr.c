@@ -1867,23 +1867,23 @@ void hie10 (ExprDesc* Expr)
             NextToken ();
             ExprWithCheck (hie10, Expr);
             /* The & operator may be applied to any lvalue, and it may be
-            ** applied to functions, even if they're no lvalues.
+            ** applied to functions and arrays, even if they're not lvalues.
             */
-            if (ED_IsRVal (Expr) && !IsTypeFunc (Expr->Type) && !IsTypeArray (Expr->Type)) {
-                Error ("Illegal address");
-            } else {
+            if (!IsTypeFunc (Expr->Type) && !IsTypeArray (Expr->Type)) {
+                if (ED_IsRVal (Expr)) {
+                    Error ("Illegal address");
+                    break;
+                }
+
                 if (ED_IsBitField (Expr)) {
                     Error ("Cannot take address of bit-field");
                     /* Do it anyway, just to avoid further warnings */
-                    Expr->Flags &= ~E_BITFIELD;
+                    ED_DisBitField (Expr);
                 }
-                /* It's allowed in C to take the address of an array this way */
-                if (!IsTypeFunc (Expr->Type) && !IsTypeArray (Expr->Type)) {
-                    /* The & operator yields an rvalue address */
-                    ED_AddrExpr (Expr);
-                }
-                Expr->Type = PointerTo (Expr->Type);
+                /* The & operator yields an rvalue address */
+                ED_AddrExpr (Expr);
             }
+            Expr->Type = PointerTo (Expr->Type);
             break;
 
         case TOK_SIZEOF:

@@ -54,6 +54,69 @@
 
 
 
+static int CopyStruct (ExprDesc* LExpr, ExprDesc* RExpr)
+/* Copy the struct/union represented by RExpr to the one represented by LExpr */
+{
+    /* If the size is that of a basic type (char, int, long), we will copy
+    ** the struct using the primary register, otherwise we use memcpy. In
+    ** the former case, push the address only if really needed.
+    */
+    const Type* ltype  = LExpr->Type;
+    const Type* stype  = GetStructReplacementType (ltype);
+    int         UseReg = (stype != ltype);
+
+    if (UseReg) {
+        PushAddr (LExpr);
+    } else {
+        ED_MarkExprAsRVal (LExpr);
+        LoadExpr (CF_NONE, LExpr);
+        g_push (CF_PTR | CF_UNSIGNED, 0);
+    }
+
+    /* Get the expression on the right of the '=' into the primary */
+    hie1 (RExpr);
+
+    /* Check for equality of the structs */
+    if (TypeCmp (ltype, RExpr->Type) < TC_STRICT_COMPATIBLE) {
+        Error ("Incompatible types");
+    }
+
+    /* Do we copy using the primary? */
+    if (UseReg) {
+
+        /* Check if the right hand side is an lvalue */
+        if (ED_IsLVal (RExpr)) {
+            /* Just load the value into the primary as the replacement type. */
+            LoadExpr (TypeOf (stype) | CF_FORCECHAR, RExpr);
+        }
+
+        /* Store it into the new location */
+        Store (LExpr, stype);
+
+    } else {
+
+        /* Check if the right hand side is an lvalue */
+        if (ED_IsLVal (RExpr)) {
+            /* We will use memcpy. Push the address of the rhs */
+            ED_MarkExprAsRVal (RExpr);
+            LoadExpr (CF_NONE, RExpr);
+        }
+
+        /* Push the address (or whatever is in ax in case of errors) */
+        g_push (CF_PTR | CF_UNSIGNED, 0);
+
+        /* Load the size of the struct or union into the primary */
+        g_getimmed (CF_INT | CF_UNSIGNED | CF_CONST, CheckedSizeOf (ltype), 0);
+
+        /* Call the memcpy function */
+        g_call (CF_FIXARGC, Func_memcpy, 4);
+    }
+
+    return 0;
+}
+
+
+
 void Assignment (ExprDesc* Expr)
 /* Parse an assignment */
 {
@@ -74,90 +137,14 @@ void Assignment (ExprDesc* Expr)
     /* Skip the '=' token */
     NextToken ();
 
-    /* cc65 does not have full support for handling structs by value. Since
-    ** assigning structs is one of the more useful operations from this
-    ** family, allow it here.
+    /* cc65 does not have full support for handling structs or unions. Since
+    ** assigning structs is one of the more useful operations from this family,
+    ** allow it here.
+    ** Note: IsClassStruct() is also true for union types. 
     */
     if (IsClassStruct (ltype)) {
-
-        /* Get the size of the left hand side. */
-        unsigned Size = SizeOf (ltype);
-
-        /* If the size is that of a basic type (char, int, long), we will copy
-        ** the struct using the primary register, otherwise we use memcpy. In
-        ** the former case, push the address only if really needed.
-        */
-        int UseReg = 1;
-        Type* stype;
-        switch (Size) {
-            case SIZEOF_CHAR:   stype = type_uchar;             break;
-            case SIZEOF_INT:    stype = type_uint;              break;
-            case SIZEOF_LONG:   stype = type_ulong;             break;
-            default:            stype = ltype; UseReg = 0;      break;
-        }
-        if (UseReg) {
-            PushAddr (Expr);
-        } else {
-            ED_MarkExprAsRVal (Expr);
-            LoadExpr (CF_NONE, Expr);
-            g_push (CF_PTR | CF_UNSIGNED, 0);
-        }
-
-        /* Get the expression on the right of the '=' into the primary */
-        hie1 (&Expr2);
-
-        /* Check for equality of the structs */
-        if (TypeCmp (ltype, Expr2.Type) < TC_STRICT_COMPATIBLE) {
-            Error ("Incompatible types");
-        }
-
-        /* Check if the right hand side is an lvalue */
-        if (ED_IsLVal (&Expr2)) {
-            /* We have an lvalue. Do we copy using the primary? */
-            if (UseReg) {
-                /* Just use the replacement type */
-                Expr2.Type = stype;
-
-                /* Load the value into the primary */
-                LoadExpr (CF_FORCECHAR, &Expr2);
-
-                /* Store it into the new location */
-                Store (Expr, stype);
-
-            } else {
-
-                /* We will use memcpy. Push the address of the rhs */
-                ED_MarkExprAsRVal (&Expr2);
-                LoadExpr (CF_NONE, &Expr2);
-
-                /* Push the address (or whatever is in ax in case of errors) */
-                g_push (CF_PTR | CF_UNSIGNED, 0);
-
-                /* Load the size of the struct into the primary */
-                g_getimmed (CF_INT | CF_UNSIGNED | CF_CONST, CheckedSizeOf (ltype), 0);
-
-                /* Call the memcpy function */
-                g_call (CF_FIXARGC, Func_memcpy, 4);
-            }
-
-        } else {
-
-            /* We have an rvalue. This can only happen if a function returns
-            ** a struct, since there is no other way to generate an expression
-            ** that has a struct as an rvalue result. We allow only 1, 2, and 4
-            ** byte sized structs, and do direct assignment.
-            */
-            if (UseReg) {
-                /* Do the store */
-                Store (Expr, stype);
-            } else {
-                /* Print a diagnostic */
-                Error ("Structs of this size are not supported");
-                /* Adjust the stack so we won't run in an internal error later */
-                pop (CF_PTR);
-            }
-
-        }
+        /* Copy the struct or union by value */
+        CopyStruct (Expr, &Expr2);
 
     } else if (ED_IsBitField (Expr)) {
 

@@ -116,7 +116,7 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
         if (ED_IsBitField (Expr)) {
             Flags |= (Expr->BitOffs + Expr->BitWidth <= CHAR_BITS) ? CF_CHAR : CF_INT;
             Flags |= CF_UNSIGNED;
-        } else {
+        } else if ((Flags & CF_TYPEMASK) == 0) {
             Flags |= TypeOf (Expr->Type);
         }
         if (ED_NeedsTest (Expr)) {

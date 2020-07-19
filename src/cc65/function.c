@@ -380,6 +380,7 @@ void NewFunc (SymEntry* Func)
 {
     int         C99MainFunc = 0;/* Flag for C99 main function returning int */
     SymEntry*   Param;
+    const Type* RType;          /* Real type used for struct parameters */
 
     /* Get the function descriptor from the function entry */
     FuncDesc* D = Func->V.F.Func;
@@ -475,7 +476,12 @@ void NewFunc (SymEntry* Func)
             /* Pointer to function */
             Flags = CF_PTR;
         } else {
-            Flags = TypeOf (D->LastParam->Type) | CF_FORCECHAR;
+            /* Handle struct/union specially */
+            if (IsClassStruct (D->LastParam->Type)) {
+                Flags = TypeOf (GetStructReplacementType (D->LastParam->Type)) | CF_FORCECHAR;
+            } else {
+                Flags = TypeOf (D->LastParam->Type) | CF_FORCECHAR;
+            }
         }
         g_push (Flags, 0);
     }
@@ -498,11 +504,25 @@ void NewFunc (SymEntry* Func)
     Param = D->SymTab->SymHead;
     while (Param && (Param->Flags & SC_PARAM) != 0) {
 
+        /* Check if we need copy for struct/union type */
+        RType = Param->Type;
+        if (IsClassStruct (RType)) {
+            RType = GetStructReplacementType (RType);
+
+            /* If there is no replacement type, then it is just the address.
+            ** We don't currently support this case.
+            */
+            if (RType == Param->Type) {
+                Error ("Passing %s of this size by value is not supported", GetBasicTypeName (Param->Type));
+            }
+        }
+
+
         /* Check for a register variable */
         if (SymIsRegVar (Param)) {
 
             /* Allocate space */
-            int Reg = F_AllocRegVar (CurrentFunc, Param->Type);
+            int Reg = F_AllocRegVar (CurrentFunc, RType);
 
             /* Could we allocate a register? */
             if (Reg < 0) {
@@ -513,7 +533,7 @@ void NewFunc (SymEntry* Func)
                 Param->V.R.RegOffs = Reg;
 
                 /* Generate swap code */
-                g_swap_regvars (Param->V.R.SaveOffs, Reg, CheckedSizeOf (Param->Type));
+                g_swap_regvars (Param->V.R.SaveOffs, Reg, CheckedSizeOf (RType));
             }
         }
 

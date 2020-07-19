@@ -395,11 +395,17 @@ static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall)
 
         }
 
+        /* Handle struct/union specially */
+        if (IsClassStruct (Expr.Type)) {
+            /* Use the replacement type */
+            Flags |= TypeOf (GetStructReplacementType (Expr.Type));
+        } else {
+            /* Use the type of the argument for the push */
+            Flags |= TypeOf (Expr.Type);
+        }
+
         /* Load the value into the primary if it is not already there */
         LoadExpr (Flags, &Expr);
-
-        /* Use the type of the argument for the push */
-        Flags |= TypeOf (Expr.Type);
 
         /* If this is a fastcall function, don't push the last argument */
         if ((CurTok.Tok == TOK_COMMA && NextTok.Tok != TOK_RPAREN) || !IsFastcall) {
@@ -470,6 +476,7 @@ static void FunctionCall (ExprDesc* Expr)
     int           PtrOffs = 0;    /* Offset of function pointer on stack */
     int           IsFastcall = 0; /* True if it's a fast-call function */
     int           PtrOnStack = 0; /* True if a pointer copy is on stack */
+    Type*         ReturnType;
 
     /* Skip the left paren */
     NextToken ();
@@ -648,7 +655,19 @@ static void FunctionCall (ExprDesc* Expr)
 
     /* The function result is an rvalue in the primary register */
     ED_FinalizeRValLoad (Expr);
-    Expr->Type = GetFuncReturn (Expr->Type);
+    ReturnType = GetFuncReturn (Expr->Type);
+
+    /* Handle struct/union specially */
+    if (IsClassStruct (ReturnType)) {
+        /* If there is no replacement type, then it is just the address */
+        if (ReturnType == GetStructReplacementType (ReturnType)) {
+            /* Dereference it */
+            ED_IndExpr (Expr);
+            ED_MarkExprAsRVal (Expr);
+        }
+    }
+
+    Expr->Type = ReturnType;
 }
 
 
@@ -1179,7 +1198,7 @@ static void ArrayRef (ExprDesc* Expr)
 
 
 static void StructRef (ExprDesc* Expr)
-/* Process struct field after . or ->. */
+/* Process struct/union field after . or ->. */
 {
     ident Ident;
     SymEntry* Field;
@@ -1195,30 +1214,41 @@ static void StructRef (ExprDesc* Expr)
         return;
     }
 
-    /* Get the symbol table entry and check for a struct field */
+    /* Get the symbol table entry and check for a struct/union field */
     strcpy (Ident, CurTok.Ident);
     NextToken ();
     Field = FindStructField (Expr->Type, Ident);
     if (Field == 0) {
-        Error ("Struct/union has no field named '%s'", Ident);
+        Error ("No field named '%s' found in %s", Ident, GetBasicTypeName (Expr->Type));
         /* Make the expression an integer at address zero */
         ED_MakeConstAbs (Expr, 0, type_int);
         return;
     }
 
-    if (IsTypePtr (Expr->Type)) {
-        /* If we have a struct pointer that is an lvalue and not already in the
-        ** primary, load its content now.
-        */
-        if (!ED_IsConst (Expr)) {
-            /* Load into the primary */
+    /* A struct/union is usually an lvalue. If not, it is a struct/union passed
+    ** in the primary register, which is usually the result returned from a
+    ** function. However, it is possible that this rvalue is the result of
+    ** certain kind of operations on an lvalue such as assignment, and there
+    ** are no reasons to disallow such use cases. So we just rely on the check
+    ** upon function returns to catch the unsupported cases and dereference the
+    ** rvalue address of the struct/union here all the time.
+    */
+    if (IsTypePtr (Expr->Type)      ||
+        (ED_IsRVal (Expr)       &&
+         ED_IsLocPrimary (Expr) &&
+         Expr->Type == GetStructReplacementType (Expr->Type))) {
+
+        if (!ED_IsConst (Expr) && !ED_IsLocPrimary (Expr)) {
+            /* If we have a non-const struct/union pointer that is not in the
+            ** primary yet, load its content now.
+            */
             LoadExpr (CF_NONE, Expr);
 
             /* Clear the offset */
             Expr->IVal = 0;
         }
 
-        /* Dereference the expression */
+        /* Dereference the address expression */
         ED_IndExpr (Expr);
 
     } else if (!ED_IsLocQuasiConst (Expr) && !ED_IsLocPrimaryOrExpr (Expr)) {
@@ -1228,7 +1258,7 @@ static void StructRef (ExprDesc* Expr)
         LoadExpr (CF_NONE, Expr);
     }
 
-    /* The type is the type of the field plus any qualifiers from the struct */
+    /* The type is the field type plus any qualifiers from the struct/union */
     if (IsClassStruct (Expr->Type)) {
         Q = GetQualifier (Expr->Type);
     } else {
@@ -1241,27 +1271,34 @@ static void StructRef (ExprDesc* Expr)
         FinalType->C |= Q;
     }
 
-    /* A struct is usually an lvalue. If not, it is a struct referenced in the
-    ** primary register, which is likely to be returned from a function.
-    */
-    if (ED_IsRVal (Expr) && ED_IsLocExpr (Expr) && !IsTypePtr (Expr->Type)) {
+    if (ED_IsRVal (Expr) && ED_IsLocPrimary (Expr) && !IsTypePtr (Expr->Type)) {
 
         unsigned Flags = 0;
         unsigned BitOffs;
 
         /* Get the size of the type */
-        unsigned Size = SizeOf (Expr->Type);
+        unsigned StructSize = SizeOf (Expr->Type);
+        unsigned FieldSize  = SizeOf (Field->Type);
 
         /* Safety check */
-        CHECK (Field->V.Offs + Size <= SIZEOF_LONG);
+        CHECK (Field->V.Offs + FieldSize <= StructSize);
 
-        /* The type of the operation depends on the type of the struct */
-        switch (Size) {
-            case 1:     Flags = CF_CHAR | CF_UNSIGNED | CF_CONST;       break;
-            case 2:     Flags = CF_INT  | CF_UNSIGNED | CF_CONST;       break;
-            case 3:     /* FALLTHROUGH */
-            case 4:     Flags = CF_LONG | CF_UNSIGNED | CF_CONST;       break;
-            default:    Internal ("Invalid struct size: %u", Size);     break;
+        /* The type of the operation depends on the type of the struct/union */
+        switch (StructSize) {
+            case 1:
+                Flags = CF_CHAR | CF_UNSIGNED | CF_CONST;
+                break;
+            case 2:
+                Flags = CF_INT  | CF_UNSIGNED | CF_CONST;
+                break;
+            case 3:
+                /* FALLTHROUGH */
+            case 4:
+                Flags = CF_LONG | CF_UNSIGNED | CF_CONST;
+                break;
+            default:
+                Internal ("Invalid %s size: %u", GetBasicTypeName (Expr->Type), StructSize);
+                break;
         }
 
         /* Generate a shift to get the field in the proper position in the
@@ -1274,7 +1311,7 @@ static void StructRef (ExprDesc* Expr)
             /* Mask the value. This is unnecessary if the shift executed above
             ** moved only zeroes into the value.
             */
-            if (BitOffs + Field->V.B.BitWidth != Size * CHAR_BITS) {
+            if (BitOffs + Field->V.B.BitWidth != FieldSize * CHAR_BITS) {
                 g_and (CF_INT | CF_UNSIGNED | CF_CONST,
                        (0x0001U << Field->V.B.BitWidth) - 1U);
             }
@@ -1287,16 +1324,16 @@ static void StructRef (ExprDesc* Expr)
 
     } else {
 
-        /* Set the struct field offset */
+        /* Set the struct/union field offset */
         Expr->IVal += Field->V.Offs;
 
         /* Use the new type */
         Expr->Type = FinalType;
 
-        /* An struct member is actually a variable. So the rules for variables
-        ** with respect to the reference type apply: If it's an array, it is
+        /* The usual rules for variables with respect to the reference types
+        ** apply to struct/union fields as well: If a field is an array, it is
         ** virtually an rvalue address, otherwise it's an lvalue reference. (A
-        ** function would also be an rvalue address, but a struct field cannot
+        ** function would also be an rvalue address, but a struct/union cannot
         ** contain functions).
         */
         if (IsTypeArray (Expr->Type)) {
@@ -1351,7 +1388,7 @@ static void hie11 (ExprDesc *Expr)
 
             case TOK_DOT:
                 if (!IsClassStruct (Expr->Type)) {
-                    Error ("Struct expected");
+                    Error ("Struct or union expected");
                 }
                 StructRef (Expr);
                 break;
@@ -1362,7 +1399,7 @@ static void hie11 (ExprDesc *Expr)
                     Expr->Type = ArrayToPtr (Expr->Type);
                 }
                 if (!IsClassPtr (Expr->Type) || !IsClassStruct (Indirect (Expr->Type))) {
-                    Error ("Struct pointer expected");
+                    Error ("Struct pointer or union pointer expected");
                 }
                 StructRef (Expr);
                 break;

@@ -309,7 +309,8 @@ static void WhileStatement (void)
 static void ReturnStatement (void)
 /* Handle the 'return' statement */
 {
-    ExprDesc Expr;
+    ExprDesc    Expr;
+    const Type* ReturnType;
 
     NextToken ();
     if (CurTok.Tok != TOK_SEMI) {
@@ -328,7 +329,18 @@ static void ReturnStatement (void)
             TypeConversion (&Expr, F_GetReturnType (CurrentFunc));
 
             /* Load the value into the primary */
-            LoadExpr (CF_NONE, &Expr);
+            if (IsClassStruct (Expr.Type)) {
+                /* Handle struct/union specially */
+                ReturnType = GetStructReplacementType (Expr.Type);
+                if (ReturnType == Expr.Type) {
+                    Error ("Returning %s of this size by value is not supported", GetBasicTypeName (Expr.Type));
+                }
+                LoadExpr (TypeOf (ReturnType), &Expr);
+
+            } else {
+                /* Load the value into the primary */
+                LoadExpr (CF_NONE, &Expr);
+            }
         }
 
     } else if (!F_HasVoidReturn (CurrentFunc) && !F_HasOldStyleIntRet (CurrentFunc)) {

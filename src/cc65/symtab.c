@@ -821,7 +821,7 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
 
         /* Set the symbol attributes */
         Entry->Type = TypeDup (T);
-        if ((Flags & SC_AUTO) == SC_AUTO) {
+        if ((Flags & SC_AUTO) == SC_AUTO || (Flags & SC_TYPEDEF) == SC_TYPEDEF) {
             Entry->V.Offs = Offs;
         } else if ((Flags & SC_REGISTER) == SC_REGISTER) {
             Entry->V.R.RegOffs  = Offs;
@@ -872,7 +872,7 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
         }
 
         /* We have a symbol with this name already */
-        if (Entry->Flags & SC_TYPE) {
+        if (Entry->Flags & SC_TYPEMASK) {
             Error ("Multiple definition for '%s'", Name);
             return Entry;
         }
@@ -1109,7 +1109,7 @@ void EmitDebugInfo (void)
         }
         Sym = SymTab->SymHead;
         while (Sym) {
-            if ((Sym->Flags & (SC_CONST|SC_TYPE)) == 0) {
+            if ((Sym->Flags & (SC_CONST|SC_TYPEMASK)) == 0) {
                 if (Sym->Flags & SC_AUTO) {
                     AddTextLine ("%s, \"%s\", \"00\", auto, %d",
                                  Head, Sym->Name, Sym->V.Offs);

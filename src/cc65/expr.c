@@ -758,7 +758,7 @@ static void Primary (ExprDesc* E)
 
                 /* Check for illegal symbol types */
                 CHECK ((Sym->Flags & SC_LABEL) != SC_LABEL);
-                if (Sym->Flags & SC_TYPE) {
+                if (Sym->Flags & SC_ESUTYPEMASK) {
                     /* Cannot use type symbols */
                     Error ("Variable identifier expected");
                     /* Assume an int type to make E valid */

@@ -112,7 +112,7 @@ static void Parse (void)
         ParseDeclSpec (&Spec, SC_EXTERN | SC_STATIC, T_INT);
 
         /* Don't accept illegal storage classes */
-        if ((Spec.StorageClass & SC_TYPE) == 0) {
+        if ((Spec.StorageClass & SC_TYPEMASK) == 0) {
             if ((Spec.StorageClass & SC_AUTO) != 0 ||
                 (Spec.StorageClass & SC_REGISTER) != 0) {
                 Error ("Illegal storage class");

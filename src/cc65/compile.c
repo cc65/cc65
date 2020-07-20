@@ -151,14 +151,17 @@ static void Parse (void)
             ** This means that "extern int i;" will not get storage allocated.
             */
             if ((Decl.StorageClass & SC_FUNC) != SC_FUNC          &&
-                (Decl.StorageClass & SC_TYPEMASK) != SC_TYPEDEF    &&
-                ((Spec.Flags & DS_DEF_STORAGE) != 0         ||
-                 (Decl.StorageClass & (SC_EXTERN|SC_STATIC)) == SC_STATIC ||
-                 ((Decl.StorageClass & SC_EXTERN) != 0 &&
-                  CurTok.Tok == TOK_ASSIGN))) {
-
-                /* We will allocate storage */
-                Decl.StorageClass |= SC_STORAGE;
+                (Decl.StorageClass & SC_TYPEMASK) != SC_TYPEDEF) {
+                if ((Spec.Flags & DS_DEF_STORAGE) != 0                       ||
+                    (Decl.StorageClass & (SC_EXTERN|SC_STATIC)) == SC_STATIC ||
+                    ((Decl.StorageClass & SC_EXTERN) != 0 &&
+                     CurTok.Tok == TOK_ASSIGN)) {
+                    /* We will allocate storage */
+                    Decl.StorageClass |= SC_STORAGE;
+                } else {
+                    /* It's a declaration */
+                    Decl.StorageClass |= SC_DECL;
+                }
             }
 
             /* If this is a function declarator that is not followed by a comma
@@ -243,7 +246,11 @@ static void Parse (void)
                         if (!IsTypeArray (Decl.Type)) {
                             Error ("Variable '%s' has unknown size", Decl.Ident);
                         }
-                        Entry->Flags &= ~(SC_STORAGE | SC_DEF);
+                        /* Do this only if the same array has not been defined */
+                        if (!SymIsDef (Entry)) {
+                            Entry->Flags &= ~(SC_STORAGE | SC_DEF);
+                            Entry->Flags |= SC_DECL;
+                        }
                     } else {
                         /* A global (including static) uninitialized variable is
                         ** only a tentative definition. For example, this is valid:

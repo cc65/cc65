@@ -802,7 +802,7 @@ static void Primary (ExprDesc* E)
                     E->Name  = Sym->V.R.RegOffs;
                 } else if ((Sym->Flags & SC_STATIC) == SC_STATIC) {
                     /* Static variable */
-                    if (Sym->Flags & (SC_EXTERN | SC_STORAGE)) {
+                    if (Sym->Flags & (SC_EXTERN | SC_STORAGE | SC_DECL)) {
                         E->Flags = E_LOC_GLOBAL | E_RTYPE_LVAL;
                         E->Name = (uintptr_t) Sym->Name;
                     } else {

@@ -7,34 +7,31 @@
 
 unsigned char x = 0;
 
-unsigned char PrintVar1(void)
+static unsigned char PrintVar1(void)
 {
     unsigned char cx = x + 1;
+
     printf("cx:%d x:%d\n", cx, x);
     return cx == 0;
 }
 
-unsigned char PrintVar2(void)
+static unsigned char PrintVar2(void)
 {
     unsigned char cx = x + 1;
     unsigned char cy;
+
     cy = x + 1;
     printf("cx:%d cy:%d x:%d\n", cx, cy, x);
     return cx != cy;
 }
 
-#pragma static-locals (off)
-
-unsigned char n;
-unsigned char ret = 0;
+static unsigned char ret = 0;
 
 int main(void)
 {
-    for (n = 0; n < 10; n++) {
-        ++x;
+    do {
         ret |= PrintVar1();
         ret |= PrintVar2();
-    }
+    } while (++x < 10);
     return ret;
 }
-

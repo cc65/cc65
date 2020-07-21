@@ -65,9 +65,8 @@ _rand:  clc
 
 _srand: sta     rand+0          ; Store the seed
         stx     rand+1
-        lda     #0
-        sta     rand+2          ; Set MSW to zero
-        sta     rand+3
+        stx     rand+2          ; fill MSW: anything is OK here
+        sta     rand+3          ; as long as it's consistent.
         rts
 
 

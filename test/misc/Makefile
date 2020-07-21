@@ -93,12 +93,6 @@ $(WORKDIR)/bug1048.$1.$2.prg: bug1048.c | $(WORKDIR)
 	$(if $(QUIET),echo misc/bug1048.$1.$2.prg)
 	$(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
 
-# compiles, but we cant easily check if it works
-$(WORKDIR)/bug1075.$1.$2.prg: bug1075.c | $(WORKDIR)
-	$(if $(QUIET),echo misc/bug1075.$1.$2.prg)
-	$(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
-	$(SIM65) $(SIM65FLAGS) $$@ $(NULLOUT) $(NULLERR)
-
 # should compile, but then hangs in an endless loop
 $(WORKDIR)/endless.$1.$2.prg: endless.c | $(WORKDIR)
 	$(if $(QUIET),echo misc/endless.$1.$2.prg)

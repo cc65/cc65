@@ -6,33 +6,18 @@
 
 #include <stdio.h>
 #include <limits.h>
+#include <stdint.h>
+
+/* #define SUPPORT_BIT_TYPES */
 
 unsigned char success=0;
 unsigned char failures=0;
 unsigned char dummy=0;
 
-#ifdef SIZEOF_INT_16BIT
-#if defined(__LINUX__) || defined(LINUX)
-unsigned short aint0 = 0;
-unsigned short aint1 = 0;
-unsigned short aint2 = 0;
-unsigned short aint3 = 0;
-
-#else
-unsigned int aint0 = 0;
-unsigned int aint1 = 0;
-unsigned int aint2 = 0;
-unsigned int aint3 = 0;
-
-#endif
-
-#else
-unsigned int aint0 = 0;
-unsigned int aint1 = 0;
-unsigned int aint2 = 0;
-unsigned int aint3 = 0;
-
-#endif
+uint16_t aint0 = 0;
+uint16_t aint1 = 0;
+uint16_t aint2 = 0;
+uint16_t aint3 = 0;
 
 unsigned char achar0 = 0;
 unsigned char achar1 = 0;

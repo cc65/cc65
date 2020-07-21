@@ -8,15 +8,14 @@
         .export         _atoi, _atol
         .import         negeax, __ctype
         .importzp       sreg, ptr1, ptr2, tmp1
-
+        .import         ctypemaskdirect
         .include        "ctype.inc"
-
 ;
 ; Conversion routine (32 bit)
 ;
 
 _atoi:
-_atol:  sta     ptr1            ; Store s
+_atol:  sta     ptr1            ; store s
         stx     ptr1+1
         ldy     #0
         sty     ptr2
@@ -27,8 +26,7 @@ _atol:  sta     ptr1            ; Store s
 ; Skip whitespace
 
 L1:     lda     (ptr1),y
-        tax
-        lda     __ctype,x       ; get character classification
+        jsr     ctypemaskdirect ; get character classification
         and     #CT_SPACE_TAB   ; tab or space?
         beq     L2              ; jump if no
         iny
@@ -36,10 +34,10 @@ L1:     lda     (ptr1),y
         inc     ptr1+1
         bne     L1              ; branch always
 
-; Check for a sign. The character is in X
+; Check for a sign. Refetch character, X is cleared by preprocessor
 
-L2:     txa                     ; get char
-        ldx     #0              ; flag: positive
+L2:     lda     (ptr1),y        ; get char
+                                ; x=0 -> flag: positive
         cmp     #'+'            ; ### portable?
         beq     L3
         cmp     #'-'            ; ### portable?
@@ -54,10 +52,11 @@ L3:     iny
 L5:     stx     tmp1            ; remember sign flag
 
 L6:     lda     (ptr1),y        ; get next char
-        tax
-        lda     __ctype,x       ; get character classification
-        and     #$04            ; digit?
-        beq     L8              ; done
+        sec                     ; check if char is in digit space
+        sbc     #'0'            ; so subtract lower limit
+        tax                     ; remember this numeric value
+        cmp     #10             ; and check if upper limit is not crossed
+        bcs     L8              ; done
 
 ; Multiply ptr2 (the converted value) by 10
 
@@ -70,7 +69,7 @@ L6:     lda     (ptr1),y        ; get next char
         lda     ptr2+1
         pha
         lda     ptr2
-        pha                     ; Save value
+        pha                     ; save value
 
         jsr     mul2            ; * 4
         jsr     mul2            ; * 8
@@ -91,9 +90,7 @@ L6:     lda     (ptr1),y        ; get next char
 
 ; Get the character back and add it
 
-        txa                     ; get char back
-        sec
-        sbc     #'0'            ; make numeric value
+        txa                     ; restore numeric value back to accu
         clc
         adc     ptr2
         sta     ptr2
@@ -119,7 +116,7 @@ L8:     lda     ptr2
 ; Negate the value if necessary, otherwise we're done
 
         ldy     tmp1            ; sign
-        beq     L9              ; Branch if positive
+        beq     L9              ; branch if positive
 
 ; Negate the 32 bit value in ptr2/sreg
 
@@ -134,5 +131,3 @@ mul2:   asl     ptr2
         rol     sreg
         rol     sreg+1          ; * 2
 L9:     rts
-
-

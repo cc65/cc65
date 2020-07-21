@@ -1,7 +1,7 @@
 /* expr.c
 **
 ** 1998-06-21, Ullrich von Bassewitz
-** 2017-12-05, Greg King
+** 2020-01-25, Greg King
 */
 
 
@@ -83,14 +83,15 @@ static unsigned GlobalModeFlags (const ExprDesc* Expr)
 /* Return the addressing mode flags for the given expression */
 {
     switch (ED_GetLoc (Expr)) {
+        case E_LOC_NONE:        return CF_IMM;
         case E_LOC_ABS:         return CF_ABSOLUTE;
         case E_LOC_GLOBAL:      return CF_EXTERNAL;
         case E_LOC_STATIC:      return CF_STATIC;
         case E_LOC_REGISTER:    return CF_REGVAR;
-        case E_LOC_STACK:       return CF_NONE;
-        case E_LOC_PRIMARY:     return CF_NONE;
-        case E_LOC_EXPR:        return CF_NONE;
-        case E_LOC_LITERAL:     return CF_STATIC;       /* Same as static */
+        case E_LOC_STACK:       return CF_STACK;
+        case E_LOC_PRIMARY:     return CF_PRIMARY;
+        case E_LOC_EXPR:        return CF_EXPR;
+        case E_LOC_LITERAL:     return CF_LITERAL;
         default:
             Internal ("GlobalModeFlags: Invalid location flags value: 0x%04X", Expr->Flags);
             /* NOTREACHED */
@@ -183,15 +184,15 @@ static unsigned typeadjust (ExprDesc* lhs, ExprDesc* rhs, int NoPush)
 
     /* Generate type adjustment code if needed */
     ltype = TypeOf (lhst);
-    if (ED_IsLocAbs (lhs)) {
+    if (ED_IsLocNone (lhs)) {
         ltype |= CF_CONST;
     }
     if (NoPush) {
         /* Value is in primary register*/
-        ltype |= CF_REG;
+        ltype |= CF_PRIMARY;
     }
     rtype = TypeOf (rhst);
-    if (ED_IsLocAbs (rhs)) {
+    if (ED_IsLocNone (rhs)) {
         rtype |= CF_CONST;
     }
     flags = g_typeadjust (ltype, rtype);
@@ -278,9 +279,9 @@ static void WarnConstCompareResult (void)
 
 
 static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall)
-/* Parse a function parameter list and pass the parameters to the called
-** function. Depending on several criteria this may be done by just pushing
-** each parameter separately, or creating the parameter frame once and then
+/* Parse a function parameter list, and pass the parameters to the called
+** function. Depending on several criteria, this may be done by just pushing
+** each parameter separately, or creating the parameter frame once, and then
 ** storing into this frame.
 ** The function returns the size of the parameters pushed.
 */
@@ -322,7 +323,7 @@ static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall)
 
         /* Do we have more than one parameter in the frame? */
         if (FrameParams > 1) {
-            /* Okeydokey, setup the frame */
+            /* Okeydokey, set up the frame */
             FrameOffs = StackPtr;
             g_space (FrameSize);
             StackPtr -= FrameSize;
@@ -343,7 +344,7 @@ static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall)
         /* Fetch the pointer to the next argument, check for too many args */
         if (ParamCount <= Func->ParamCount) {
             /* Beware: If there are parameters with identical names, they
-            ** cannot go into the same symbol table, which means that in this
+            ** cannot go into the same symbol table, which means that, in this
             ** case of errorneous input, the number of nodes in the symbol
             ** table and ParamCount are NOT equal. We have to handle this case
             ** below to avoid segmentation violations. Since we know that this
@@ -364,7 +365,7 @@ static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall)
                 /* End of param list reached, no ellipsis */
                 Error ("Too many arguments in function call");
             }
-            /* Assume an ellipsis even in case of errors to avoid an error
+            /* Assume an ellipsis even in case of errors, to avoid an error
             ** message for each other argument.
             */
             Ellipsis = 1;
@@ -373,7 +374,7 @@ static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall)
         /* Evaluate the parameter expression */
         hie1 (&Expr);
 
-        /* If we don't have an argument spec, accept anything, otherwise
+        /* If we don't have an argument spec., accept anything; otherwise,
         ** convert the actual argument to the type needed.
         */
         Flags = CF_NONE;
@@ -394,11 +395,17 @@ static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall)
 
         }
 
+        /* Handle struct/union specially */
+        if (IsClassStruct (Expr.Type)) {
+            /* Use the replacement type */
+            Flags |= TypeOf (GetStructReplacementType (Expr.Type));
+        } else {
+            /* Use the type of the argument for the push */
+            Flags |= TypeOf (Expr.Type);
+        }
+
         /* Load the value into the primary if it is not already there */
         LoadExpr (Flags, &Expr);
-
-        /* Use the type of the argument for the push */
-        Flags |= TypeOf (Expr.Type);
 
         /* If this is a fastcall function, don't push the last argument */
         if ((CurTok.Tok == TOK_COMMA && NextTok.Tok != TOK_RPAREN) || !IsFastcall) {
@@ -433,6 +440,12 @@ static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall)
             break;
         }
         NextToken ();
+
+        /* Check for stray comma */
+        if (CurTok.Tok == TOK_RPAREN) {
+            Error ("Argument expected after comma");
+            break;
+        }
     }
 
     /* Check if we had enough parameters */
@@ -441,11 +454,11 @@ static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall)
     }
 
     /* The function returns the size of all parameters pushed onto the stack.
-    ** However, if there are parameters missing (which is an error and was
-    ** flagged by the compiler) AND a stack frame was preallocated above,
-    ** we would loose track of the stackpointer and generate an internal error
+    ** However, if there are parameters missing (which is an error, and was
+    ** flagged by the compiler), AND a stack frame was preallocated above,
+    ** we would loose track of the stackpointer, and generate an internal error
     ** later. So we correct the value by the parameters that should have been
-    ** pushed to avoid an internal compiler error. Since an error was
+    ** pushed, to avoid an internal compiler error. Since an error was
     ** generated before, no code will be output anyway.
     */
     return ParamSize + FrameSize;
@@ -463,6 +476,7 @@ static void FunctionCall (ExprDesc* Expr)
     int           PtrOffs = 0;    /* Offset of function pointer on stack */
     int           IsFastcall = 0; /* True if it's a fast-call function */
     int           PtrOnStack = 0; /* True if a pointer copy is on stack */
+    Type*         ReturnType;
 
     /* Skip the left paren */
     NextToken ();
@@ -500,7 +514,7 @@ static void FunctionCall (ExprDesc* Expr)
             ** the pointer into the primary and mark it as an expression.
             */
             LoadExpr (CF_NONE, Expr);
-            ED_MakeRValExpr (Expr);
+            ED_FinalizeRValLoad (Expr);
 
             /* Remember the code position */
             GetCodePos (&Mark);
@@ -580,7 +594,7 @@ static void FunctionCall (ExprDesc* Expr)
             ** Since fastcall functions may never be variadic, we can use the
             ** index register for this purpose.
             */
-            g_callind (CF_LOCAL, ParamSize, PtrOffs);
+            g_callind (CF_STACK, ParamSize, PtrOffs);
         }
 
         /* If we have a pointer on stack, remove it */
@@ -640,8 +654,20 @@ static void FunctionCall (ExprDesc* Expr)
     }
 
     /* The function result is an rvalue in the primary register */
-    ED_MakeRValExpr (Expr);
-    Expr->Type = GetFuncReturn (Expr->Type);
+    ED_FinalizeRValLoad (Expr);
+    ReturnType = GetFuncReturn (Expr->Type);
+
+    /* Handle struct/union specially */
+    if (IsClassStruct (ReturnType)) {
+        /* If there is no replacement type, then it is just the address */
+        if (ReturnType == GetStructReplacementType (ReturnType)) {
+            /* Dereference it */
+            ED_IndExpr (Expr);
+            ED_MarkExprAsRVal (Expr);
+        }
+    }
+
+    Expr->Type = ReturnType;
 }
 
 
@@ -657,7 +683,7 @@ static void Primary (ExprDesc* E)
     /* Character and integer constants. */
     if (CurTok.Tok == TOK_ICONST || CurTok.Tok == TOK_CCONST) {
         E->IVal  = CurTok.IVal;
-        E->Flags = E_LOC_ABS | E_RTYPE_RVAL;
+        E->Flags = E_LOC_NONE | E_RTYPE_RVAL;
         E->Type  = CurTok.Type;
         NextToken ();
         return;
@@ -666,7 +692,7 @@ static void Primary (ExprDesc* E)
     /* Floating point constant */
     if (CurTok.Tok == TOK_FCONST) {
         E->FVal  = CurTok.FVal;
-        E->Flags = E_LOC_ABS | E_RTYPE_RVAL;
+        E->Flags = E_LOC_NONE | E_RTYPE_RVAL;
         E->Type  = CurTok.Type;
         NextToken ();
         return;
@@ -710,7 +736,7 @@ static void Primary (ExprDesc* E)
                 NextToken ();
                 Entry = AddLabelSym (CurTok.Ident, SC_REF | SC_GOTO_IND);
                 /* output its label */
-                E->Flags = E_RTYPE_RVAL | E_LOC_STATIC;
+                E->Flags = E_RTYPE_RVAL | E_LOC_STATIC | E_ADDRESS_OF;
                 E->Name = Entry->V.L.Label;
                 E->Type = PointerTo (type_void);
                 NextToken ();
@@ -750,7 +776,7 @@ static void Primary (ExprDesc* E)
                 /* Check for legal symbol types */
                 if ((Sym->Flags & SC_CONST) == SC_CONST) {
                     /* Enum or some other numeric constant */
-                    E->Flags = E_LOC_ABS | E_RTYPE_RVAL;
+                    E->Flags = E_LOC_NONE | E_RTYPE_RVAL;
                     E->IVal = Sym->V.ConstVal;
                 } else if ((Sym->Flags & SC_FUNC) == SC_FUNC) {
                     /* Function */
@@ -791,12 +817,12 @@ static void Primary (ExprDesc* E)
 
                 /* We've made all variables lvalues above. However, this is
                 ** not always correct: An array is actually the address of its
-                ** first element, which is a rvalue, and a function is a
+                ** first element, which is an rvalue, and a function is an
                 ** rvalue, too, because we cannot store anything in a function.
                 ** So fix the flags depending on the type.
                 */
                 if (IsTypeArray (E->Type) || IsTypeFunc (E->Type)) {
-                    ED_MakeRVal (E);
+                    ED_AddrExpr (E);
                 }
 
             } else {
@@ -839,7 +865,7 @@ static void Primary (ExprDesc* E)
             /* String literal */
             E->LVal  = UseLiteral (CurTok.SVal);
             E->Type  = GetCharArrayType (GetLiteralSize (CurTok.SVal));
-            E->Flags = E_LOC_LITERAL | E_RTYPE_RVAL;
+            E->Flags = E_LOC_LITERAL | E_RTYPE_RVAL | E_ADDRESS_OF;
             E->IVal  = 0;
             E->Name  = GetLiteralLabel (CurTok.SVal);
             NextToken ();
@@ -848,7 +874,7 @@ static void Primary (ExprDesc* E)
         case TOK_ASM:
             /* ASM statement */
             AsmStatement ();
-            E->Flags = E_LOC_EXPR | E_RTYPE_RVAL;
+            E->Flags = E_RTYPE_RVAL;
             E->Type  = type_void;
             break;
 
@@ -906,12 +932,11 @@ static void ArrayRef (ExprDesc* Expr)
 
     /* We can apply a special treatment for arrays that have a const base
     ** address. This is true for most arrays and will produce a lot better
-    ** code. Check if this is a const base address.
+    ** code. Check if this is a "quasi-const base" address.
     */
-    ConstBaseAddr = ED_IsRVal (Expr) &&
-                    (ED_IsLocConst (Expr) || ED_IsLocStack (Expr));
+    ConstBaseAddr = ED_IsRVal (Expr) && ED_IsLocQuasiConst (Expr);
 
-    /* If we have a constant base, we delay the address fetch */
+    /* If we have a quasi-const base address, we delay the address fetch */
     GetCodePos (&Mark1);
     if (!ConstBaseAddr) {
         /* Get a pointer to the array into the primary */
@@ -978,7 +1003,7 @@ static void ArrayRef (ExprDesc* Expr)
     /* If the subscript is a bit-field, load it and make it an rvalue */
     if (ED_IsBitField (&Subscript)) {
         LoadExpr (CF_NONE, &Subscript);
-        ED_MakeRValExpr (&Subscript);
+        ED_FinalizeRValLoad (&Subscript);
     }
 
     /* Check if the subscript is constant absolute value */
@@ -1009,24 +1034,19 @@ static void ArrayRef (ExprDesc* Expr)
             ** already in Expr. If the base address was a constant, we can even
             ** remove the code that loaded the address into the primary.
             */
-            if (IsTypeArray (Expr->Type)) {
-
-                /* Adjust the offset */
-                Expr->IVal += Subscript.IVal;
-
-            } else {
-
+            if (!IsTypeArray (Expr->Type)) {
+ 
                 /* It's a pointer, so we do have to load it into the primary
                 ** first (if it's not already there).
                 */
-                if (ConstBaseAddr || ED_IsLVal (Expr)) {
+                if (!ConstBaseAddr && ED_IsLVal (Expr)) {
                     LoadExpr (CF_NONE, Expr);
-                    ED_MakeRValExpr (Expr);
+                    ED_FinalizeRValLoad (Expr);
                 }
-
-                /* Use the offset */
-                Expr->IVal = Subscript.IVal;
             }
+
+            /* Adjust the offset */
+            Expr->IVal += Subscript.IVal;
 
         } else {
 
@@ -1100,7 +1120,7 @@ static void ArrayRef (ExprDesc* Expr)
             ** subscript was not scaled, that is, if this was a byte array
             ** or pointer.
             */
-            if ((ED_IsLocConst (&Subscript) || ED_IsLocStack (&Subscript)) &&
+            if (ED_IsLocQuasiConst (&Subscript) &&
                 CheckedSizeOf (ElementType) == SIZEOF_CHAR) {
 
                 unsigned Flags;
@@ -1125,12 +1145,13 @@ static void ArrayRef (ExprDesc* Expr)
                 }
             } else {
 
-                if (ED_IsLocAbs (Expr)) {
+                if (ED_IsLocNone (Expr) ||
+                    (ED_IsLocAbs (Expr) && ED_IsAddrExpr (Expr))) {
                     /* Constant numeric address. Just add it */
                     g_inc (CF_INT, Expr->IVal);
                 } else if (ED_IsLocStack (Expr)) {
                     /* Base address is a local variable address */
-                    if (IsTypeArray (Expr->Type)) {
+                    if (ED_IsAddrExpr (Expr)) {
                         g_addaddr_local (CF_INT, Expr->IVal);
                     } else {
                         g_addlocal (CF_PTR, Expr->IVal);
@@ -1138,7 +1159,7 @@ static void ArrayRef (ExprDesc* Expr)
                 } else {
                     /* Base address is a static variable address */
                     unsigned Flags = CF_INT | GlobalModeFlags (Expr);
-                    if (ED_IsRVal (Expr)) {
+                    if (ED_IsAddrExpr (Expr)) {
                         /* Add the address of the location */
                         g_addaddr_static (Flags, Expr->Name, Expr->IVal);
                     } else {
@@ -1147,27 +1168,27 @@ static void ArrayRef (ExprDesc* Expr)
                     }
                 }
             }
-
-
         }
 
-        /* The result is an expression in the primary */
-        ED_MakeRValExpr (Expr);
+        /* The pointer is an rvalue in the primary */
+        ED_FinalizeRValLoad (Expr);
 
     }
 
-    /* Result is of element type */
+    /* The result is usually an lvalue expression of element type referenced in
+    ** the primary, unless it's an array which is a rare case. We can just
+    ** assume the usual case first, and change it later if necessary.
+    */
+    ED_IndExpr (Expr);
     Expr->Type = ElementType;
 
-    /* An array element is actually a variable. So the rules for variables
-    ** with respect to the reference type apply: If it's an array, it is
-    ** a rvalue, otherwise it's an lvalue. (A function would also be a rvalue,
-    ** but an array cannot contain functions).
+    /* An array element is actually a variable. So the rules for variables with
+    ** respect to the reference type apply: If it's an array, it is virtually
+    ** an rvalue address, otherwise it's an lvalue reference. (A function would
+    ** also be an rvalue address, but an array cannot contain functions).
     */
     if (IsTypeArray (Expr->Type)) {
-        ED_MakeRVal (Expr);
-    } else {
-        ED_MakeLVal (Expr);
+        ED_AddrExpr (Expr);
     }
 
     /* Consume the closing bracket */
@@ -1177,7 +1198,7 @@ static void ArrayRef (ExprDesc* Expr)
 
 
 static void StructRef (ExprDesc* Expr)
-/* Process struct field after . or ->. */
+/* Process struct/union field after . or ->. */
 {
     ident Ident;
     SymEntry* Field;
@@ -1193,30 +1214,51 @@ static void StructRef (ExprDesc* Expr)
         return;
     }
 
-    /* Get the symbol table entry and check for a struct field */
+    /* Get the symbol table entry and check for a struct/union field */
     strcpy (Ident, CurTok.Ident);
     NextToken ();
     Field = FindStructField (Expr->Type, Ident);
     if (Field == 0) {
-        Error ("Struct/union has no field named '%s'", Ident);
+        Error ("No field named '%s' found in %s", Ident, GetBasicTypeName (Expr->Type));
         /* Make the expression an integer at address zero */
         ED_MakeConstAbs (Expr, 0, type_int);
         return;
     }
 
-    /* If we have a struct pointer that is an lvalue and not already in the
-    ** primary, load it now.
+    /* A struct/union is usually an lvalue. If not, it is a struct/union passed
+    ** in the primary register, which is usually the result returned from a
+    ** function. However, it is possible that this rvalue is the result of
+    ** certain kind of operations on an lvalue such as assignment, and there
+    ** are no reasons to disallow such use cases. So we just rely on the check
+    ** upon function returns to catch the unsupported cases and dereference the
+    ** rvalue address of the struct/union here all the time.
     */
-    if (ED_IsLVal (Expr) && IsTypePtr (Expr->Type)) {
+    if (IsTypePtr (Expr->Type)      ||
+        (ED_IsRVal (Expr)       &&
+         ED_IsLocPrimary (Expr) &&
+         Expr->Type == GetStructReplacementType (Expr->Type))) {
 
-        /* Load into the primary */
+        if (!ED_IsConst (Expr) && !ED_IsLocPrimary (Expr)) {
+            /* If we have a non-const struct/union pointer that is not in the
+            ** primary yet, load its content now.
+            */
+            LoadExpr (CF_NONE, Expr);
+
+            /* Clear the offset */
+            Expr->IVal = 0;
+        }
+
+        /* Dereference the address expression */
+        ED_IndExpr (Expr);
+
+    } else if (!ED_IsLocQuasiConst (Expr) && !ED_IsLocPrimaryOrExpr (Expr)) {
+        /* Load the base address into the primary (and use it as a reference
+        ** later) if it's not quasi-const or in the primary already.
+        */
         LoadExpr (CF_NONE, Expr);
-
-        /* Make it an lvalue expression */
-        ED_MakeLValExpr (Expr);
     }
 
-    /* The type is the type of the field plus any qualifiers from the struct */
+    /* The type is the field type plus any qualifiers from the struct/union */
     if (IsClassStruct (Expr->Type)) {
         Q = GetQualifier (Expr->Type);
     } else {
@@ -1229,27 +1271,34 @@ static void StructRef (ExprDesc* Expr)
         FinalType->C |= Q;
     }
 
-    /* A struct is usually an lvalue. If not, it is a struct in the primary
-    ** register.
-    */
-    if (ED_IsRVal (Expr) && ED_IsLocExpr (Expr) && !IsTypePtr (Expr->Type)) {
+    if (ED_IsRVal (Expr) && ED_IsLocPrimary (Expr) && !IsTypePtr (Expr->Type)) {
 
         unsigned Flags = 0;
         unsigned BitOffs;
 
         /* Get the size of the type */
-        unsigned Size = SizeOf (Expr->Type);
+        unsigned StructSize = SizeOf (Expr->Type);
+        unsigned FieldSize  = SizeOf (Field->Type);
 
         /* Safety check */
-        CHECK (Field->V.Offs + Size <= SIZEOF_LONG);
+        CHECK (Field->V.Offs + FieldSize <= StructSize);
 
-        /* The type of the operation depends on the type of the struct */
-        switch (Size) {
-            case 1:     Flags = CF_CHAR | CF_UNSIGNED | CF_CONST;       break;
-            case 2:     Flags = CF_INT  | CF_UNSIGNED | CF_CONST;       break;
-            case 3:     /* FALLTHROUGH */
-            case 4:     Flags = CF_LONG | CF_UNSIGNED | CF_CONST;       break;
-            default:    Internal ("Invalid struct size: %u", Size);     break;
+        /* The type of the operation depends on the type of the struct/union */
+        switch (StructSize) {
+            case 1:
+                Flags = CF_CHAR | CF_UNSIGNED | CF_CONST;
+                break;
+            case 2:
+                Flags = CF_INT  | CF_UNSIGNED | CF_CONST;
+                break;
+            case 3:
+                /* FALLTHROUGH */
+            case 4:
+                Flags = CF_LONG | CF_UNSIGNED | CF_CONST;
+                break;
+            default:
+                Internal ("Invalid %s size: %u", GetBasicTypeName (Expr->Type), StructSize);
+                break;
         }
 
         /* Generate a shift to get the field in the proper position in the
@@ -1262,7 +1311,7 @@ static void StructRef (ExprDesc* Expr)
             /* Mask the value. This is unnecessary if the shift executed above
             ** moved only zeroes into the value.
             */
-            if (BitOffs + Field->V.B.BitWidth != Size * CHAR_BITS) {
+            if (BitOffs + Field->V.B.BitWidth != FieldSize * CHAR_BITS) {
                 g_and (CF_INT | CF_UNSIGNED | CF_CONST,
                        (0x0001U << Field->V.B.BitWidth) - 1U);
             }
@@ -1275,21 +1324,20 @@ static void StructRef (ExprDesc* Expr)
 
     } else {
 
-        /* Set the struct field offset */
+        /* Set the struct/union field offset */
         Expr->IVal += Field->V.Offs;
 
         /* Use the new type */
         Expr->Type = FinalType;
 
-        /* An struct member is actually a variable. So the rules for variables
-        ** with respect to the reference type apply: If it's an array, it is
-        ** a rvalue, otherwise it's an lvalue. (A function would also be a rvalue,
-        ** but a struct field cannot be a function).
+        /* The usual rules for variables with respect to the reference types
+        ** apply to struct/union fields as well: If a field is an array, it is
+        ** virtually an rvalue address, otherwise it's an lvalue reference. (A
+        ** function would also be an rvalue address, but a struct/union cannot
+        ** contain functions).
         */
         if (IsTypeArray (Expr->Type)) {
-            ED_MakeRVal (Expr);
-        } else {
-            ED_MakeLVal (Expr);
+            ED_AddrExpr (Expr);
         }
 
         /* Make the expression a bit field if necessary */
@@ -1340,7 +1388,7 @@ static void hie11 (ExprDesc *Expr)
 
             case TOK_DOT:
                 if (!IsClassStruct (Expr->Type)) {
-                    Error ("Struct expected");
+                    Error ("Struct or union expected");
                 }
                 StructRef (Expr);
                 break;
@@ -1351,7 +1399,7 @@ static void hie11 (ExprDesc *Expr)
                     Expr->Type = ArrayToPtr (Expr->Type);
                 }
                 if (!IsClassPtr (Expr->Type) || !IsClassStruct (Indirect (Expr->Type))) {
-                    Error ("Struct pointer expected");
+                    Error ("Struct pointer or union pointer expected");
                 }
                 StructRef (Expr);
                 break;
@@ -1385,7 +1433,7 @@ void Store (ExprDesc* Expr, const Type* StoreType)
     switch (ED_GetLoc (Expr)) {
 
         case E_LOC_ABS:
-            /* Absolute: numeric address or const */
+            /* Absolute numeric addressed variable */
             g_putstatic (Flags, Expr->IVal, 0);
             break;
 
@@ -1415,8 +1463,12 @@ void Store (ExprDesc* Expr, const Type* StoreType)
             break;
 
         case E_LOC_EXPR:
-            /* An expression in the primary register */
+            /* An expression referenced in the primary register */
             g_putind (Flags, Expr->IVal);
+            break;
+
+        case E_LOC_NONE:
+            /* We may get here as a result of previous compiler errors */
             break;
 
         default:
@@ -1460,7 +1512,7 @@ static void PreInc (ExprDesc* Expr)
     switch (ED_GetLoc (Expr)) {
 
         case E_LOC_ABS:
-            /* Absolute: numeric address or const */
+            /* Absolute numeric addressed variable */
             g_addeqstatic (Flags, Expr->IVal, 0, Val);
             break;
 
@@ -1491,7 +1543,7 @@ static void PreInc (ExprDesc* Expr)
             break;
 
         case E_LOC_EXPR:
-            /* An expression in the primary register */
+            /* An expression referenced in the primary register */
             g_addeqind (Flags, Expr->IVal, Val);
             break;
 
@@ -1500,7 +1552,7 @@ static void PreInc (ExprDesc* Expr)
     }
 
     /* Result is an expression, no reference */
-    ED_MakeRValExpr (Expr);
+    ED_FinalizeRValLoad (Expr);
 }
 
 
@@ -1536,7 +1588,7 @@ static void PreDec (ExprDesc* Expr)
     switch (ED_GetLoc (Expr)) {
 
         case E_LOC_ABS:
-            /* Absolute: numeric address or const */
+            /* Absolute numeric addressed variable */
             g_subeqstatic (Flags, Expr->IVal, 0, Val);
             break;
 
@@ -1563,7 +1615,7 @@ static void PreDec (ExprDesc* Expr)
 
         case E_LOC_PRIMARY:
             /* The primary register */
-            g_inc (Flags, Val);
+            g_dec (Flags, Val);
             break;
 
         case E_LOC_EXPR:
@@ -1576,7 +1628,7 @@ static void PreDec (ExprDesc* Expr)
     }
 
     /* Result is an expression, no reference */
-    ED_MakeRValExpr (Expr);
+    ED_FinalizeRValLoad (Expr);
 }
 
 
@@ -1632,7 +1684,7 @@ static void PostInc (ExprDesc* Expr)
     }
 
     /* The result is always an expression, no reference */
-    ED_MakeRValExpr (Expr);
+    ED_FinalizeRValLoad (Expr);
 }
 
 
@@ -1688,7 +1740,7 @@ static void PostDec (ExprDesc* Expr)
     }
 
     /* The result is always an expression, no reference */
-    ED_MakeRValExpr (Expr);
+    ED_FinalizeRValLoad (Expr);
 }
 
 
@@ -1735,8 +1787,8 @@ static void UnaryOp (ExprDesc* Expr)
             default:        Internal ("Unexpected token: %d", Tok);
         }
 
-        /* The result is a rvalue in the primary */
-        ED_MakeRValExpr (Expr);
+        /* The result is an rvalue in the primary */
+        ED_FinalizeRValLoad (Expr);
     }
 }
 
@@ -1770,7 +1822,7 @@ void hie10 (ExprDesc* Expr)
                 Expr->IVal = !Expr->IVal;
             } else {
                 g_bneg (TypeOf (Expr->Type));
-                ED_MakeRValExpr (Expr);
+                ED_FinalizeRValLoad (Expr);
                 ED_TestDone (Expr);             /* bneg will set cc */
             }
             break;
@@ -1778,13 +1830,14 @@ void hie10 (ExprDesc* Expr)
         case TOK_STAR:
             NextToken ();
             ExprWithCheck (hie10, Expr);
-            if (ED_IsLVal (Expr) || !(ED_IsLocConst (Expr) || ED_IsLocStack (Expr))) {
-                /* Not a const, load it into the primary and make it a
+            if (ED_IsLVal (Expr) || !ED_IsLocQuasiConst (Expr)) {
+                /* Not a const, load the pointer into the primary and make it a
                 ** calculated value.
                 */
                 LoadExpr (CF_NONE, Expr);
-                ED_MakeRValExpr (Expr);
+                ED_FinalizeRValLoad (Expr);
             }
+
             /* If the expression is already a pointer to function, the
             ** additional dereferencing operator must be ignored. A function
             ** itself is represented as "pointer to function", so any number
@@ -1793,7 +1846,7 @@ void hie10 (ExprDesc* Expr)
             */
             if (IsTypeFuncPtr (Expr->Type) || IsTypeFunc (Expr->Type)) {
                 /* Expression not storable */
-                ED_MakeRVal (Expr);
+                ED_MarkExprAsRVal (Expr);
             } else {
                 if (IsClassPtr (Expr->Type)) {
                     Expr->Type = Indirect (Expr->Type);
@@ -1804,8 +1857,8 @@ void hie10 (ExprDesc* Expr)
                 ** address -- it already is the location of the first element.
                 */
                 if (!IsTypeArray (Expr->Type)) {
-                    /* The * operator yields an lvalue */
-                    ED_MakeLVal (Expr);
+                    /* The * operator yields an lvalue reference */
+                    ED_IndExpr (Expr);
                 }
             }
             break;
@@ -1814,20 +1867,23 @@ void hie10 (ExprDesc* Expr)
             NextToken ();
             ExprWithCheck (hie10, Expr);
             /* The & operator may be applied to any lvalue, and it may be
-            ** applied to functions, even if they're no lvalues.
+            ** applied to functions and arrays, even if they're not lvalues.
             */
-            if (ED_IsRVal (Expr) && !IsTypeFunc (Expr->Type) && !IsTypeArray (Expr->Type)) {
-                Error ("Illegal address");
-            } else {
+            if (!IsTypeFunc (Expr->Type) && !IsTypeArray (Expr->Type)) {
+                if (ED_IsRVal (Expr)) {
+                    Error ("Illegal address");
+                    break;
+                }
+
                 if (ED_IsBitField (Expr)) {
                     Error ("Cannot take address of bit-field");
                     /* Do it anyway, just to avoid further warnings */
-                    Expr->Flags &= ~E_BITFIELD;
+                    ED_DisBitField (Expr);
                 }
-                Expr->Type = PointerTo (Expr->Type);
-                /* The & operator yields an rvalue */
-                ED_MakeRVal (Expr);
+                /* The & operator yields an rvalue address */
+                ED_AddrExpr (Expr);
             }
+            Expr->Type = PointerTo (Expr->Type);
             break;
 
         case TOK_SIZEOF:
@@ -1842,14 +1898,19 @@ void hie10 (ExprDesc* Expr)
                 CodeMark Mark;
                 GetCodePos (&Mark);
                 hie10 (Expr);
-                /* If the expression is a literal string, release it, so it
-                ** won't be output as data if not used elsewhere.
-                */
-                if (ED_IsLocLiteral (Expr)) {
-                    ReleaseLiteral (Expr->LVal);
+                if (ED_IsBitField (Expr)) {
+                    Error ("Cannot apply 'sizeof' to bit-field");
+                    Size = 0;
+                } else {
+                    /* If the expression is a literal string, release it, so it
+                    ** won't be output as data if not used elsewhere.
+                    */
+                    if (ED_IsLocLiteral (Expr)) {
+                        ReleaseLiteral (Expr->LVal);
+                    }
+                    /* Calculate the size */
+                    Size = CheckedSizeOf (Expr->Type);
                 }
-                /* Calculate the size */
-                Size = CheckedSizeOf (Expr->Type);
                 /* Remove any generated code */
                 RemoveCode (&Mark);
             }
@@ -2051,7 +2112,7 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
             if ((Gen->Flags & GEN_NOPUSH) == 0) {
                 g_push (ltype, 0);
             } else {
-                ltype |= CF_REG;        /* Value is in register */
+                ltype |= CF_PRIMARY;        /* Value is in register */
             }
 
             /* Determine the type of the operation result. */
@@ -2061,8 +2122,8 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
             /* Generate code */
             Gen->Func (type, Expr->IVal);
 
-            /* We have a rvalue in the primary now */
-            ED_MakeRValExpr (Expr);
+            /* We have an rvalue in the primary now */
+            ED_FinalizeRValLoad (Expr);
 
         } else {
 
@@ -2083,7 +2144,7 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
                 }
                 if ((Gen->Flags & GEN_NOPUSH) != 0) {
                     RemoveCode (&Mark2);
-                    ltype |= CF_REG;    /* Value is in register */
+                    ltype |= CF_PRIMARY;    /* Value is in register */
                 }
             }
 
@@ -2094,8 +2155,8 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
             /* Generate code */
             Gen->Func (type, Expr2.IVal);
 
-            /* We have a rvalue in the primary now */
-            ED_MakeRValExpr (Expr);
+            /* We have an rvalue in the primary now */
+            ED_FinalizeRValLoad (Expr);
         }
     }
 }
@@ -2259,7 +2320,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                 flags |= CF_CONST;
                 if ((Gen->Flags & GEN_NOPUSH) != 0) {
                     RemoveCode (&Mark2);
-                    ltype |= CF_REG;    /* Value is in register */
+                    ltype |= CF_PRIMARY;    /* Value is in register */
                 }
             }
 
@@ -2435,7 +2496,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             GenFunc (flags, Expr2.IVal);
 
             /* The result is an rvalue in the primary */
-            ED_MakeRValExpr (Expr);
+            ED_FinalizeRValLoad (Expr);
         }
 
         /* Result type is always int */
@@ -2528,12 +2589,12 @@ static void parseadd (ExprDesc* Expr)
             rhst = Expr2.Type;
 
             /* Setup flags */
-            if (ED_IsLocAbs (Expr)) {
+            if (ED_IsLocNone (Expr)) {
                 /* A numerical constant */
                 flags |= CF_CONST;
             } else {
                 /* Constant address label */
-                flags |= GlobalModeFlags (Expr) | CF_CONSTADDR;
+                flags |= GlobalModeFlags (Expr);
             }
 
             /* Check for pointer arithmetic */
@@ -2543,7 +2604,7 @@ static void parseadd (ExprDesc* Expr)
                 /* Operate on pointers, result type is a pointer */
                 flags |= CF_PTR;
                 /* Generate the code for the add */
-                if (ED_GetLoc (Expr) == E_LOC_ABS) {
+                if (ED_GetLoc (Expr) == E_LOC_NONE) {
                     /* Numeric constant */
                     g_inc (flags, Expr->IVal);
                 } else {
@@ -2563,7 +2624,7 @@ static void parseadd (ExprDesc* Expr)
                 ** not a numeric constant, and the scale factor is not one
                 ** (no scaling), we must take the long way over the stack.
                 */
-                if (ED_IsLocAbs (Expr)) {
+                if (ED_IsLocNone (Expr)) {
                     /* Numeric constant, scale lhs */
                     Expr->IVal *= ScaleFactor;
                     /* Generate the code for the add */
@@ -2582,7 +2643,7 @@ static void parseadd (ExprDesc* Expr)
                 /* Integer addition */
                 flags |= typeadjust (Expr, &Expr2, 1);
                 /* Generate the code for the add */
-                if (ED_IsLocAbs (Expr)) {
+                if (ED_IsLocNone (Expr)) {
                     /* Numeric constant */
                     g_inc (flags, Expr->IVal);
                 } else {
@@ -2595,8 +2656,8 @@ static void parseadd (ExprDesc* Expr)
                 flags = CF_INT;
             }
 
-            /* Result is a rvalue in primary register */
-            ED_MakeRValExpr (Expr);
+            /* Result is an rvalue in primary register */
+            ED_FinalizeRValLoad (Expr);
         }
 
     } else {
@@ -2686,8 +2747,8 @@ static void parseadd (ExprDesc* Expr)
 
         }
 
-        /* Result is a rvalue in primary register */
-        ED_MakeRValExpr (Expr);
+        /* Result is an rvalue in primary register */
+        ED_FinalizeRValLoad (Expr);
     }
 
     /* Condition codes not set */
@@ -2819,8 +2880,8 @@ static void parsesub (ExprDesc* Expr)
                 g_scale (flags, -rscale);
             }
 
-            /* Result is a rvalue in the primary register */
-            ED_MakeRValExpr (Expr);
+            /* Result is an rvalue in the primary register */
+            ED_FinalizeRValLoad (Expr);
             ED_MarkAsUntested (Expr);
 
         }
@@ -2854,8 +2915,8 @@ static void parsesub (ExprDesc* Expr)
             ** the lhs is const, we have to remove this mark, since this is no
             ** longer true, lhs is on stack instead.
             */
-            if (ED_IsLocAbs (Expr)) {
-                ED_MakeRValExpr (Expr);
+            if (ED_IsLocNone (Expr)) {
+                ED_FinalizeRValLoad (Expr);
             }
             /* Adjust operand types */
             flags = typeadjust (Expr, &Expr2, 0);
@@ -2873,8 +2934,8 @@ static void parsesub (ExprDesc* Expr)
             g_scale (flags, -rscale);
         }
 
-        /* Result is a rvalue in the primary register */
-        ED_MakeRValExpr (Expr);
+        /* Result is an rvalue in the primary register */
+        ED_FinalizeRValLoad (Expr);
         ED_MarkAsUntested (Expr);
     }
 }
@@ -3064,7 +3125,7 @@ static void hieAnd (ExprDesc* Expr, unsigned TrueLab, int* BoolOp)
         g_defcodelabel (FalseLab);
 
         /* The result is an rvalue in primary */
-        ED_MakeRValExpr (Expr);
+        ED_FinalizeRValLoad (Expr);
         ED_TestDone (Expr);     /* Condition codes are set */
     }
 }
@@ -3127,7 +3188,7 @@ static void hieOr (ExprDesc *Expr)
         }
 
         /* The result is an rvalue in primary */
-        ED_MakeRValExpr (Expr);
+        ED_FinalizeRValLoad (Expr);
         ED_TestDone (Expr);                     /* Condition codes are set */
     }
 
@@ -3183,7 +3244,7 @@ static void hieQuest (ExprDesc* Expr)
         if (!IsTypeVoid (Expr2.Type)) {
             /* Load it into the primary */
             LoadExpr (CF_NONE, &Expr2);
-            ED_MakeRValExpr (&Expr2);
+            ED_FinalizeRValLoad (&Expr2);
             Expr2.Type = PtrConversion (Expr2.Type);
         }
 
@@ -3206,7 +3267,7 @@ static void hieQuest (ExprDesc* Expr)
         if (!IsTypeVoid (Expr3.Type)) {
             /* Load it into the primary */
             LoadExpr (CF_NONE, &Expr3);
-            ED_MakeRValExpr (&Expr3);
+            ED_FinalizeRValLoad (&Expr3);
             Expr3.Type = PtrConversion (Expr3.Type);
         }
 
@@ -3272,7 +3333,7 @@ static void hieQuest (ExprDesc* Expr)
         g_defcodelabel (TrueLab);
 
         /* Setup the target expression */
-        ED_MakeRValExpr (Expr);
+        ED_FinalizeRValLoad (Expr);
         Expr->Type  = ResultType;
     }
 }
@@ -3288,7 +3349,7 @@ static void opeq (const GenDesc* Gen, ExprDesc* Expr, const char* Op)
     int MustScale;
 
     /* op= can only be used with lvalues */
-    if (!ED_IsLVal (Expr)) {
+    if (ED_IsRVal (Expr)) {
         Error ("Invalid lvalue in assignment");
         return;
     }
@@ -3390,7 +3451,7 @@ static void opeq (const GenDesc* Gen, ExprDesc* Expr, const char* Op)
         Gen->Func (g_typeadjust (flags, TypeOf (Expr2.Type)), 0);
     }
     Store (Expr, 0);
-    ED_MakeRValExpr (Expr);
+    ED_FinalizeRValLoad (Expr);
 }
 
 
@@ -3404,7 +3465,7 @@ static void addsubeq (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
     int      MustScale;
 
 
-    /* We're currently only able to handle some adressing modes */
+    /* We're currently only able to handle some addressing modes */
     if (ED_GetLoc (Expr) == E_LOC_EXPR || ED_GetLoc (Expr) == E_LOC_PRIMARY) {
         /* Use generic routine */
         opeq (Gen, Expr, Op);
@@ -3450,34 +3511,38 @@ static void addsubeq (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
         ** break, so this is the best error recovery.
         */
     }
+
+    /* Setup the code generator flags */
+    lflags |= TypeOf (Expr->Type) | GlobalModeFlags (Expr) | CF_FORCECHAR;
+    rflags |= TypeOf (Expr2.Type) | CF_FORCECHAR;
+
     if (ED_IsConstAbs (&Expr2)) {
-        /* The resulting value is a constant. Scale it. */
+        /* The resulting value is a constant */
+        rflags |= CF_CONST;
+        lflags |= CF_CONST;
+
+        /* Scale it */
         if (MustScale) {
             Expr2.IVal *= CheckedSizeOf (Indirect (Expr->Type));
         }
-        rflags |= CF_CONST;
-        lflags |= CF_CONST;
     } else {
         /* Not constant, load into the primary */
         LoadExpr (CF_NONE, &Expr2);
+
+        /* Convert the type of the rhs to that of the lhs */
+        g_typecast (lflags, rflags & ~CF_FORCECHAR);
+
         if (MustScale) {
             /* lhs is a pointer, scale rhs */
             g_scale (TypeOf (Expr2.Type), CheckedSizeOf (Indirect (Expr->Type)));
         }
     }
 
-    /* Setup the code generator flags */
-    lflags |= TypeOf (Expr->Type) | GlobalModeFlags (Expr) | CF_FORCECHAR;
-    rflags |= TypeOf (Expr2.Type) | CF_FORCECHAR;
-
-    /* Convert the type of the lhs to that of the rhs */
-    g_typecast (lflags, rflags);
-
     /* Output apropriate code depending on the location */
     switch (ED_GetLoc (Expr)) {
 
         case E_LOC_ABS:
-            /* Absolute: numeric address or const */
+            /* Absolute numeric addressed variable */
             if (Gen->Tok == TOK_PLUS_ASSIGN) {
                 g_addeqstatic (lflags, Expr->Name, Expr->IVal, Expr2.IVal);
             } else {
@@ -3526,8 +3591,8 @@ static void addsubeq (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
             Internal ("Invalid location in Store(): 0x%04X", ED_GetLoc (Expr));
     }
 
-    /* Expression is a rvalue in the primary now */
-    ED_MakeRValExpr (Expr);
+    /* Expression is an rvalue in the primary now */
+    ED_FinalizeRValLoad (Expr);
 }
 
 

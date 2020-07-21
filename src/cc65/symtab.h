@@ -134,7 +134,7 @@ SymEntry* FindTagSym (const char* Name);
 /* Find the symbol with the given name in the tag table */
 
 SymEntry* FindStructField (const Type* TypeArray, const char* Name);
-/* Find a struct field in the fields list */
+/* Find a struct/union field in the fields list */
 
 unsigned short FindSPAdjustment (const char* Name);
 /* Search for an entry in the table of SP adjustments */
@@ -149,7 +149,7 @@ unsigned short FindSPAdjustment (const char* Name);
 SymEntry* AddStructSym (const char* Name, unsigned Type, unsigned Size, SymTable* Tab);
 /* Add a struct/union entry and return it */
 
-SymEntry* AddBitField (const char* Name, unsigned Offs, unsigned BitOffs, unsigned Width);
+SymEntry* AddBitField (const char* Name, unsigned Offs, unsigned BitOffs, unsigned BitWidth);
 /* Add a bit field to the local symbol table and return the symbol entry */
 
 SymEntry* AddConstSym (const char* Name, const Type* T, unsigned Flags, long Val);

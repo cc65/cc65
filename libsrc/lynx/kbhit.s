@@ -29,6 +29,8 @@ KBNPR:          .byte   0
 
         .code
 _kbhit:
+        lda     KBEDG
+        bne     L1 
         lda     $FCB0           ; Read the Opt buttons
         and     #$0c
         sta     KBTMP
@@ -49,8 +51,6 @@ _kbhit:
         sta     KBNPR           ; inverted previous ones pressed
         stx     KBPRV
         lda     KBEDG
-        beq     @L1
-        jmp     return1         ; Key hit
-
-@L1:    tax                     ; No new keys hit
+L1:     tax
         rts
+

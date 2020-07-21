@@ -41,11 +41,11 @@ of range.
 <ref id="tgi_ellipse" name="tgi_ellipse">,
 <ref id="tgi_pieslice" name="tgi_pieslice">,
 <ref id="tgi_setcolor" name="tgi_setcolor">
-<tag/Example/<verb>
+<tag/Example/<tscreen><verb>
 /* Draw the upper half of an ellipse */
 tgi_setcolor(TGI_COLOR_BLUE);
 tgi_arc (50, 50, 40, 20, 0, 180);
-</verb>
+</verb></tscreen>
 </descrip>
 </quote>
 
@@ -66,10 +66,10 @@ be used in presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/Other tgi function
-<tag/Example/<verb>
+<tag/Example/<tscreen><verb>
 tgi_setcolor(TGI_COLOR_GREEN);
 tgi_bar(10, 10, 100, 60);
-</verb>
+</verb></tscreen>
 </descrip>
 </quote>
 
@@ -93,10 +93,10 @@ be used in presence of a prototype.
 <ref id="tgi_ellipse" name="tgi_ellipse">,
 <ref id="tgi_pieslice" name="tgi_pieslice">,
 <ref id="tgi_setcolor" name="tgi_setcolor">
-<tag/Example/<verb>
+<tag/Example/<tscreen><verb>
 tgi_setcolor(TGI_COLOR_BLACK);
 tgi_circle(50, 40, 40);
-</verb>
+</verb></tscreen>
 </descrip>
 </quote>
 
@@ -153,10 +153,10 @@ be used in presence of a prototype.
 <ref id="tgi_circle" name="tgi_circle">,
 <ref id="tgi_pieslice" name="tgi_pieslice">,
 <ref id="tgi_setcolor" name="tgi_setcolor">
-<tag/Example/<verb>
+<tag/Example/<tscreen><verb>
 tgi_setcolor(TGI_COLOR_RED);
 tgi_ellipse (50, 40, 40, 20);
-</verb>
+</verb></tscreen>
 </descrip>
 </quote>
 
@@ -227,9 +227,9 @@ and then you change the green of the palette to blue using tgi_setpalette then
 after this painting in TGI_COLOR_GREEN will actually be blue.
 <tag/Availability/cc65
 <tag/See also/Other tgi functions
-<tag/Example/<verb>
+<tag/Example/<tscreen><verb>
 color = tgi_getcolor();
-</verb>
+</verb></tscreen>
 </descrip>
 </quote>
 
@@ -241,15 +241,40 @@ color = tgi_getcolor();
 <tag/Function/Get the number of available colors.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
 <tag/Declaration/<tt/unsigned char tgi_getcolorcount (void);/
-<tag/Description/Tgi platforms use indexed color palettes. This function
+<tag/Description/TGI platforms use indexed color palettes. This function
 returns the number of entries we can use in the palette.
+
+<tt/tgi_setcolor()/ can accept numbers from <tt/0/ to <tt/255/.  That is 256
+possible colors, but an <tt/(unsigned char)/ cannot hold that number.
+Therefore, the number zero is used to indicate when a palette has 256 entries.
+A portable program should test for that number, and do appropriate actions.
+A program might assign the count to an <tt/unsigned int/ (and change a zero to
+a 256).  Or, it might rely on the fact that <tt/(unsigned char)/ will
+"wrap-around" when it is incremented beyond 255.
 <tag/Availability/cc65
-<tag/See also/Other tgi functions
-<tag/Example/<verb>
+<tag/See also/<ref id="tgi_getcolor" name="tgi_getcolor()">,
+<ref id="tgi_getdefpalette" name="tgi_getdefpalette()">,
+<ref id="tgi_getmaxcolor" name="tgi_getmaxcolor()">,
+<ref id="tgi_getpalette" name="tgi_getpalette()">,
+<ref id="tgi_setcolor" name="tgi_setcolor()">,
+<ref id="tgi_setpalette" name="tgi_setpalette()">
+<tag/Examples/<tscreen><verb>
 if (tgi_getcolorcount() == 2) {
   printf("Only monochrome graphics is supported\n");
 }
-</verb>
+
+static unsigned char num_colors;
+static unsigned char color;
+...
+num_colors = tgi_getcolorcount();
+...
+++color;
+if (num_colors == 0) {
+  tgi_setcolor(color);
+} else {
+  tgi_setcolor(color % num_colors);
+}
+</verb></tscreen>
 </descrip>
 </quote>
 
@@ -316,7 +341,12 @@ be used in presence of a prototype.
 <tag/Declaration/<tt/unsigned char tgi_getmaxcolor (void);/
 <tag/Description/Get the highest index of the palette.
 <tag/Availability/cc65
-<tag/See also/Other tgi functions
+<tag/See also/<ref id="tgi_getcolor" name="tgi_getcolor()">,
+<ref id="tgi_getcolorcount" name="tgi_getcolorcount()">,
+<ref id="tgi_getdefpalette" name="tgi_getdefpalette()">,
+<ref id="tgi_getpalette" name="tgi_getpalette()">,
+<ref id="tgi_setcolor" name="tgi_setcolor()">,
+<ref id="tgi_setpalette" name="tgi_setpalette()">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -511,10 +541,10 @@ name="tgi_clear">/ after <tt/tgi_init/.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/Other tgi functions.
-<tag/Example/<verb>
+<tag/Example/<tscreen><verb>
 tgi_install(tgi_static_stddrv); //Include the driver statically instead of loading it.
 tgi_init(); //Set up the default palette and clear the screen.
-</verb>
+</verb></tscreen>
 </descrip>
 </quote>
 
@@ -538,10 +568,10 @@ used in presence of a prototype.
 <ref id="tgi_load_driver" name="tgi_load_driver">,
 <ref id="tgi_uninstall" name="tgi_uninstall">,
 <ref id="tgi_unload" name="tgi_unload">
-<tag/Example/<verb>
+<tag/Example/<tscreen><verb>
 tgi_install(tgi_static_stddrv); //Include the driver statically instead of loading it.
 tgi_init(); //Set up the default palette and clear the screen.
-</verb>
+</verb></tscreen>
 </descrip>
 </quote>
 
@@ -587,7 +617,7 @@ be used in presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/Other tgi functions.
-<tag/Example/<verb>
+<tag/Example/<tscreen><verb>
 #define tgi_sprite(spr) tgi_ioctl(0, (void*)(spr))
 #define tgi_flip() tgi_ioctl(1, (void*)0)
 #define tgi_setbgcolor(bgcol) tgi_ioctl(2, (void*)(bgcol))
@@ -600,7 +630,7 @@ if (!tgi_busy()) {
   tgi_outttextxy(20,40,"Hello World");
   tgi_updatedisplay();
 }
-</verb>
+</verb></tscreen>
 </descrip>
 </quote>
 
@@ -759,11 +789,11 @@ of range.
 <ref id="tgi_circle" name="tgi_circle">,
 <ref id="tgi_ellipse" name="tgi_ellipse">,
 <ref id="tgi_setcolor" name="tgi_setcolor">
-<tag/Example/<verb>
+<tag/Example/<tscreen><verb>
 /* Draw the closed upper half of an ellipse */
 tgi_setcolor(TGI_COLOR_BLUE);
 tgi_pieslice (50, 50, 40, 20, 0, 180);
-</verb>
+</verb></tscreen>
 </descrip>
 </quote>
 
@@ -814,12 +844,12 @@ be used in presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/Other tgi functions.
-<tag/Example/<verb>
+<tag/Example/<tscreen><verb>
 tgi_setcolor(TGI_COLOR_BLACK);
 tgi_bar(0,0,30,30);
 tgi_setcolor(TGI_COLOR_WHITE);
 tgi_bar(10,10,20,20);
-</verb>
+</verb></tscreen>
 </descrip>
 </quote>
 
@@ -841,7 +871,7 @@ be used in presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/Other tgi functions.
-<tag/Example/<verb>
+<tag/Example/<tscreen><verb>
 tgi_setdrawpage(1);
 tgi_outtextxy(10, 10, "Hello World");
 tgi_setviewpage(1); // Show page 1
@@ -849,7 +879,7 @@ tgi_setdrawpage(0);
 tgi_outtextxy(10, 10, "Creating next frame");
 ...
 tgi_setviewpage(0); // Show page 0
-</verb>
+</verb></tscreen>
 </descrip>
 </quote>
 
@@ -953,7 +983,7 @@ be used in presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/Other tgi functions.
-<tag/Example/<verb>
+<tag/Example/<tscreen><verb>
 tgi_setdrawpage(1);
 tgi_outtextxy(10, 10, "Hello World");
 tgi_setviewpage(1); // Show page 1
@@ -961,7 +991,7 @@ tgi_setdrawpage(0);
 tgi_outtextxy(10, 10, "Creating next frame");
 ...
 tgi_setviewpage(0); // Show page 0
-</verb>
+</verb></tscreen>
 </descrip>
 </quote>
 

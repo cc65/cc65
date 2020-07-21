@@ -62,34 +62,38 @@
 #define CF_NONE         0x0000  /* No special flags */
 
 /* Values for the actual type */
-#define CF_CHAR         0x0003  /* Operation on characters */
-#define CF_INT          0x0001  /* Operation on ints */
+#define CF_CHAR         0x0007  /* Operation on characters */
+#define CF_INT          0x0003  /* Operation on ints */
+#define CF_SHORT        CF_INT  /* Alias */
 #define CF_PTR          CF_INT  /* Alias for readability */
-#define CF_LONG         0x0000  /* Operation on longs */
-#define CF_FLOAT        0x0004  /* Operation on a float */
+#define CF_LONG         0x0001  /* Operation on longs */
+#define CF_FLOAT        0x0010  /* Operation on a float */
 
 /* Signedness */
 #define CF_UNSIGNED     0x0008  /* Value is unsigned */
 
 /* Masks for retrieving type information */
-#define CF_TYPEMASK     0x0007  /* Type information */
-#define CF_STYPEMASK    0x000F  /* Includes signedness */
+#define CF_TYPEMASK     0x0017  /* Type information */
+#define CF_STYPEMASK    0x001F  /* Includes signedness */
 
-#define CF_NOKEEP       0x0010  /* Value may get destroyed when storing */
-#define CF_CONST        0x0020  /* Constant value available */
-#define CF_CONSTADDR    0x0040  /* Constant address value available */
+#define CF_CONST        0x0040  /* Constant value available */
 #define CF_TEST         0x0080  /* Test value */
 #define CF_FIXARGC      0x0100  /* Function has fixed arg count */
 #define CF_FORCECHAR    0x0200  /* Handle chars as chars, not ints */
-#define CF_REG          0x0800  /* Value is in primary register */
+#define CF_NOKEEP       0x0400  /* Value may get destroyed when storing */
 
-/* Type of static address */
-#define CF_ADDRMASK     0xF000  /* Type of address */
-#define CF_STATIC       0x0000  /* Static local */
-#define CF_EXTERNAL     0x1000  /* Static external */
-#define CF_ABSOLUTE     0x2000  /* Numeric absolute address */
-#define CF_LOCAL        0x4000  /* Auto variable */
-#define CF_REGVAR       0x8000  /* Register variable */
+/* Type of address */
+#define CF_ADDRMASK     0xF000  /* Bit mask of address type */
+#define CF_IMM          0x0000  /* Value is pure rvalue and has no storage */
+#define CF_ABSOLUTE     0x1000  /* Numeric absolute address */
+#define CF_EXTERNAL     0x2000  /* External */
+#define CF_REGVAR       0x4000  /* Register variable */
+#define CF_LITERAL      0x7000  /* Literal */
+#define CF_PRIMARY      0x8000  /* Value is in primary register */
+#define CF_EXPR         0x9000  /* Value is addressed by primary register */
+#define CF_STATIC       0xA000  /* Local static */
+#define CF_CODE         0xB000  /* C code label location */
+#define CF_STACK        0xC000  /* Function-local auto on stack */
 
 
 

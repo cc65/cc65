@@ -61,6 +61,7 @@
 /* Flags used */
 #define CEF_USERMARK    0x0001U         /* Generic mark by user functions */
 #define CEF_NUMARG      0x0002U         /* Insn has numerical argument */
+#define CEF_DONT_REMOVE 0x0004U         /* Insn shouldn't be removed, marked by user functions */
 
 /* Code entry structure */
 typedef struct CodeEntry CodeEntry;

@@ -59,8 +59,8 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
 /* Emit code to convert the given expression to a new type. */
 {
     Type*    OldType;
-    unsigned OldSize;
-    unsigned NewSize;
+    unsigned OldBits;
+    unsigned NewBits;
 
 
     /* Remember the old type */
@@ -70,7 +70,7 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
     ** conversion void -> void.
     */
     if (IsTypeVoid (NewType)) {
-        ED_MakeRVal (Expr);     /* Never an lvalue */
+        ED_MarkExprAsRVal (Expr);     /* Never an lvalue */
         goto ExitPoint;
     }
 
@@ -83,8 +83,12 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
     /* Get the sizes of the types. Since we've excluded void types, checking
     ** for known sizes makes sense here.
     */
-    OldSize = CheckedSizeOf (OldType);
-    NewSize = CheckedSizeOf (NewType);
+    if (ED_IsBitField (Expr)) {
+        OldBits = Expr->BitWidth;
+    } else {
+        OldBits = CheckedSizeOf (OldType) * CHAR_BITS;
+    }
+    NewBits = CheckedSizeOf (NewType) * CHAR_BITS;
 
     /* lvalue? */
     if (ED_IsLVal (Expr)) {
@@ -97,7 +101,7 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
         ** If both sizes are equal, do also leave the value alone.
         ** If the new size is larger, we must convert the value.
         */
-        if (NewSize > OldSize) {
+        if (NewBits > OldBits) {
             /* Load the value into the primary */
             LoadExpr (CF_NONE, Expr);
 
@@ -105,18 +109,14 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
             g_typecast (TypeOf (NewType), TypeOf (OldType) | CF_FORCECHAR);
 
             /* Value is now in primary and an rvalue */
-            ED_MakeRValExpr (Expr);
+            ED_FinalizeRValLoad (Expr);
         }
 
-    } else if (ED_IsLocAbs (Expr)) {
+    } else if (ED_IsConstAbs (Expr)) {
 
         /* A cast of a constant numeric value to another type. Be sure
         ** to handle sign extension correctly.
         */
-
-        /* Get the current and new size of the value */
-        unsigned OldBits = OldSize * 8;
-        unsigned NewBits = NewSize * 8;
 
         /* Check if the new datatype will have a smaller range. If it
         ** has a larger range, things are OK, since the value is
@@ -136,13 +136,22 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
             }
         }
 
+        /* Do the integer constant <-> absolute address conversion if necessary */
+        if (IsClassPtr (NewType)) {
+            Expr->Flags &= ~E_LOC_NONE;
+            Expr->Flags |= E_LOC_ABS | E_ADDRESS_OF;
+        } else if (IsClassInt (NewType)) {
+            Expr->Flags &= ~(E_LOC_ABS | E_ADDRESS_OF);
+            Expr->Flags |= E_LOC_NONE;
+        }
+
     } else {
 
         /* The value is not a constant. If the sizes of the types are
         ** not equal, add conversion code. Be sure to convert chars
         ** correctly.
         */
-        if (OldSize != NewSize) {
+        if (OldBits != NewBits) {
 
             /* Load the value into the primary */
             LoadExpr (CF_NONE, Expr);
@@ -150,14 +159,17 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
             /* Emit typecast code. */
             g_typecast (TypeOf (NewType), TypeOf (OldType) | CF_FORCECHAR);
 
-            /* Value is now a rvalue in the primary */
-            ED_MakeRValExpr (Expr);
+            /* Value is now an rvalue in the primary */
+            ED_FinalizeRValLoad (Expr);
         }
     }
 
 ExitPoint:
     /* The expression has always the new type */
     ReplaceType (Expr, NewType);
+
+    /* Bit-fields are converted to integers */
+    ED_DisBitField (Expr);
 }
 
 

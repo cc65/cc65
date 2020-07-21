@@ -59,7 +59,12 @@ typedef enum {
   LI_RELOAD_Y           = 0x02,         /* Reload index register Y */
   LI_REMOVE             = 0x04,         /* Load may be removed */
   LI_DONT_REMOVE        = 0x08,         /* Load may not be removed */
-  LI_DUP_LOAD           = 0x10,         /* Duplicate load */
+  LI_MAYBE_DIRECT       = 0x10,         /* Load src might be modified later */
+  LI_SRC_CHG            = 0x20,         /* Load src is possibly modified */
+  LI_LOAD_INSN          = 0x40,         /* Has a load insn */
+  LI_USED_BY_A          = 0x100,        /* Content used by RegA */
+  LI_USED_BY_X          = 0x200,        /* Content used by RegX */
+  LI_USED_BY_Y          = 0x400,        /* Content used by RegY */
 } LI_FLAGS;
 
 /* Structure that tells us how to load the lhs values */
@@ -91,13 +96,25 @@ struct LoadInfo {
 
 /* Flags for the functions */
 typedef enum {
-    OP_NONE             = 0x00,         /* Nothing special */
-    OP_A_KNOWN          = 0x01,         /* Value of A must be known */
-    OP_X_ZERO           = 0x02,         /* X must be zero */
-    OP_LHS_LOAD         = 0x04,         /* Must have load insns for LHS */
-    OP_LHS_LOAD_DIRECT  = 0x0C,         /* Must have direct load insn for LHS */
-    OP_RHS_LOAD         = 0x10,         /* Must have load insns for RHS */
-    OP_RHS_LOAD_DIRECT  = 0x30,         /* Must have direct load insn for RHS */
+    OP_NONE              = 0x00,         /* Nothing special */
+    OP_A_KNOWN           = 0x01,         /* Value of A must be known */
+    OP_X_ZERO            = 0x02,         /* X must be zero */
+    OP_LHS_LOAD          = 0x04,         /* Must have load insns for LHS */
+    OP_LHS_SAME_BY_OP    = 0x08,         /* Load result of LHS must be the same if relocated to op */
+    OP_LHS_LOAD_DIRECT   = 0x0C,         /* Must have direct load insn for LHS */
+    OP_RHS_LOAD          = 0x10,         /* Must have load insns for RHS */
+    OP_RHS_SAME_BY_OP    = 0x20,         /* Load result of RHS must be the same if relocated to op */
+    OP_RHS_LOAD_DIRECT   = 0x30,         /* Must have direct load insn for RHS */
+    OP_AX_INTERCHANGE    = 0x40,         /* Preconditions of A/X may be interchanged */
+    OP_LR_INTERCHANGE    = 0x80,         /* Preconditions of LHS/RHS may be interchanged */
+    OP_LHS_SAME_BY_PUSH  = 0x0100,       /* LHS must load the same content if relocated to push */
+    OP_RHS_SAME_BY_PUSH  = 0x0200,       /* RHS must load the same content if relocated to push */
+    OP_LHS_SAME_BY_RHS   = 0x0400,       /* LHS must load the same content if relocated to RHS */
+    OP_RHS_SAME_BY_LHS   = 0x0800,       /* RHS must load the same content if relocated to LHS */
+    OP_LHS_REMOVE        = 0x1000,       /* LHS must be removable or RHS may use ZP store/load */
+    OP_LHS_REMOVE_DIRECT = 0x3000,       /* LHS must be directly removable */
+    OP_RHS_REMOVE        = 0x4000,       /* RHS must be removable or LHS may use ZP store/load */
+    OP_RHS_REMOVE_DIRECT = 0xC000,       /* RHS must be directly removable */
 } OP_FLAGS;
 
 /* Structure forward decl */
@@ -123,6 +140,13 @@ struct StackOpData {
 
     /* ZP register usage inside the sequence */
     unsigned            ZPUsage;
+    unsigned            ZPChanged;
+
+    /* Freedom of registers inside the sequence */
+    unsigned            UsedRegs;       /* Registers used */
+
+    /* Whether the rhs is changed multiple times */
+    int                 RhsMultiChg;
 
     /* Register load information for lhs and rhs */
     LoadInfo            Lhs;
@@ -156,8 +180,23 @@ static void ClearLoadRegInfo (LoadRegInfo* RI)
 {
     RI->Flags     = LI_NONE;
     RI->LoadIndex = -1;
+    RI->LoadEntry = 0;
     RI->XferIndex = -1;
+    RI->XferEntry = 0;
     RI->Offs      = 0;
+}
+
+
+
+static void CopyLoadRegInfo (LoadRegInfo* To, LoadRegInfo* From)
+/* Copy a LoadRegInfo struct */
+{
+    To->Flags     = From->Flags;
+    To->LoadIndex = From->LoadIndex;
+    To->LoadEntry = From->LoadEntry;
+    To->XferIndex = From->XferIndex;
+    To->XferEntry = From->XferEntry;
+    To->Offs      = From->Offs;
 }
 
 
@@ -176,6 +215,10 @@ static void FinalizeLoadRegInfo (LoadRegInfo* RI, CodeSeg* S)
     } else {
         RI->XferEntry = 0;
     }
+    /* Load from src not modified before op can be treated as direct */
+    if ((RI->Flags & (LI_MAYBE_DIRECT | LI_SRC_CHG)) == LI_MAYBE_DIRECT) {
+        RI->Flags |= LI_DIRECT;
+    }
 }
 
 
@@ -186,6 +229,16 @@ static void ClearLoadInfo (LoadInfo* LI)
     ClearLoadRegInfo (&LI->A);
     ClearLoadRegInfo (&LI->X);
     ClearLoadRegInfo (&LI->Y);
+}
+
+
+
+static void CopyLoadInfo (LoadInfo* To, LoadInfo* From)
+/* Copy a LoadInfo struct */
+{
+    CopyLoadRegInfo (&To->A, &From->A);
+    CopyLoadRegInfo (&To->X, &From->X);
+    CopyLoadRegInfo (&To->Y, &From->Y);
 }
 
 
@@ -246,21 +299,80 @@ static void AdjustLoadInfo (LoadInfo* LI, int Index, int Change)
 
 
 
-static void HonourUseAndChg (LoadRegInfo* RI, unsigned Reg, const CodeEntry* E)
+static int Affected (LoadRegInfo* RI, const CodeEntry* E)
+/* Check if the load src may be modified between the pushax and op */
+{
+    fncls_t        fncls;
+    unsigned short Use;
+    unsigned short Chg;
+
+    if (RI->Flags & LI_MAYBE_DIRECT) {
+        if (E->AM == AM65_IMM || E->AM == AM65_ACC || E->AM == AM65_IMP || E->AM == AM65_BRA) {
+            return 0;
+        }
+        CHECK (RI->LoadEntry != 0);
+
+        if (E->OPC == OP65_JSR) {
+            /* Try to know about the function */
+            fncls = GetFuncInfo (E->Arg, &Use, &Chg);           
+            if ((RI->LoadEntry->Use & Chg & REG_ALL) == 0 &&
+                fncls == FNCLS_BUILTIN) {
+                /* Builtin functions are known to be harmless */
+                return 0;
+            }
+            /* Otherwise play it safe */
+            return 1;
+        } else if (E->OPC == OP65_DEC || E->OPC == OP65_INC || 
+                   E->OPC == OP65_ASL || E->OPC == OP65_LSR ||
+                   E->OPC == OP65_ROL || E->OPC == OP65_ROR ||
+                   E->OPC == OP65_TRB || E->OPC == OP65_TSB ||
+                   E->OPC == OP65_STA || E->OPC == OP65_STX || E->OPC == OP65_STY) {
+            if ((E->AM == AM65_ABS || E->AM == AM65_ZP) &&
+                strcmp (RI->LoadEntry->Arg, E->Arg) != 0) {
+                return 0;
+            }
+            /* We could've check further for more cases where the load target isn't modified,
+            ** But for now let's save the trouble and just play it safe. */
+            return 1;
+        }
+    }
+    return 0;
+}
+
+
+
+static void HonourUseAndChg (LoadRegInfo* RI, unsigned Reg, const CodeEntry* E, int I)
 /* Honour use and change flags for an instruction */
 {
-    if (E->Chg & Reg) {
+    if ((E->Chg & Reg) != 0) {
+        /* Remember this as an indirect load */
         ClearLoadRegInfo (RI);
-    } else if ((E->Use & Reg) && RI->LoadIndex >= 0) {
-        RI->Flags |= LI_DONT_REMOVE;
+        RI->LoadIndex = I;
+        RI->XferIndex = -1;
+        RI->Flags = 0;
+    } else if (Affected (RI, E)) {
+        RI->Flags |= LI_SRC_CHG;
     }
 }
 
 
 
-static void TrackLoads (LoadInfo* LI, CodeEntry* E, int I)
-/* Track loads for a code entry */
+static unsigned int TrackLoads (LoadInfo* LI, LoadInfo* LLI, CodeSeg* S, int I)
+/* Track loads for a code entry.
+** Return used registers.
+*/
 {
+    unsigned Used;
+    CodeEntry* E = CS_GetEntry (S, I);
+    CHECK (E != 0);
+
+    /* By default */
+    Used = E->Use;
+
+    /* Whether we had a load or xfer op before or not, the newly loaded value
+    ** will be the real one used for the pushax/op unless it's overwritten,
+    ** so we can just reset the flags about it in such cases.
+    */
     if (E->Info & OF_LOAD) {
 
         LoadRegInfo* RI = 0;
@@ -275,23 +387,20 @@ static void TrackLoads (LoadInfo* LI, CodeEntry* E, int I)
         }
         CHECK (RI != 0);
 
-        /* If we had a load or xfer op before, this is a duplicate load which
-        ** can cause problems if it encountered between the pushax and the op,
-        ** so remember it.
-        */
-        if (RI->LoadIndex >= 0 || RI->XferIndex >= 0) {
-            RI->Flags |= LI_DUP_LOAD;
-        }
-
         /* Remember the load */
         RI->LoadIndex = I;
         RI->XferIndex = -1;
 
         /* Set load flags */
-        RI->Flags    &= ~(LI_DIRECT | LI_RELOAD_Y);
-        if (E->AM == AM65_IMM || E->AM == AM65_ZP || E->AM == AM65_ABS) {
+        RI->Flags = LI_LOAD_INSN;
+        if (E->AM == AM65_IMM) {
             /* These insns are all ok and replaceable */
             RI->Flags |= LI_DIRECT;
+        } else if (E->AM == AM65_ZP || E->AM == AM65_ABS) {
+            /* These insns are replaceable only if they are not modified later */
+            RI->Flags |= LI_MAYBE_DIRECT;
+            /* Watch for any change of the load target */
+            RI->LoadEntry = CS_GetEntry (S, I);
         } else if (E->AM == AM65_ZP_INDY &&
                    RegValIsKnown (E->RI->In.RegY) &&
                    strcmp (E->Arg, "sp") == 0) {
@@ -303,8 +412,16 @@ static void TrackLoads (LoadInfo* LI, CodeEntry* E, int I)
             */
             RI->Offs  = (unsigned char) E->RI->In.RegY;
             RI->Flags |= (LI_DIRECT | LI_RELOAD_Y);
+
+            /* Reg Y can be regarded as unused if this load is removed */
+            Used &= ~REG_Y;
+            LI->Y.Flags |= LI_USED_BY_A;
         }
 
+        /* Watch for any change of the load target */
+        if ((RI->Flags & LI_MAYBE_DIRECT) != 0) {
+            RI->LoadEntry = CS_GetEntry (S, I);
+        }
 
     } else if (E->Info & OF_XFR) {
 
@@ -312,60 +429,82 @@ static void TrackLoads (LoadInfo* LI, CodeEntry* E, int I)
         LoadRegInfo* Src;
         LoadRegInfo* Tgt;
         switch (E->OPC) {
-            case OP65_TAX:      Src = &LI->A; Tgt = &LI->X; break;
-            case OP65_TAY:      Src = &LI->A; Tgt = &LI->Y; break;
-            case OP65_TXA:      Src = &LI->X; Tgt = &LI->A; break;
-            case OP65_TYA:      Src = &LI->Y; Tgt = &LI->A; break;
-            case OP65_TSX:      ClearLoadRegInfo (&LI->X);  return;
-            case OP65_TXS:                                  return;
+            case OP65_TAX:
+                Src = &LI->A;
+                Tgt = &LI->X;
+                Used &= ~REG_A;
+                Src->Flags |= LI_USED_BY_X;
+                break;
+            case OP65_TAY:
+                Src = &LI->A; 
+                Tgt = &LI->Y;
+                Used &= ~REG_A; 
+                Src->Flags |= LI_USED_BY_Y;
+                break;
+            case OP65_TXA:
+                Src = &LI->X;
+                Tgt = &LI->A;
+                Used &= ~REG_X;
+                Src->Flags |= LI_USED_BY_A;
+                break;
+            case OP65_TYA:
+                Src = &LI->Y;
+                Tgt = &LI->A;
+                Used &= ~REG_Y;
+                Src->Flags |= LI_USED_BY_A;
+                break;
+            case OP65_TSX:
+                ClearLoadRegInfo (&LI->X);
+                return Used;
+            case OP65_TXS:
+                return Used;
             default:            Internal ("Unknown XFR insn in TrackLoads");
         }
 
-        /* If we had a load or xfer op before, this is a duplicate load which
-        ** can cause problems if it encountered between the pushax and the op,
-        ** so remember it.
-        */
-        if (Tgt->LoadIndex >= 0 || Tgt->XferIndex >= 0) {
-            Tgt->Flags |= LI_DUP_LOAD;
-        }
-
         /* Transfer the data */
-        Tgt->LoadIndex  = Src->LoadIndex;
-        Tgt->XferIndex  = I;
-        Tgt->Offs       = Src->Offs;
-        Tgt->Flags     &= ~(LI_DIRECT | LI_RELOAD_Y);
-        Tgt->Flags     |= Src->Flags & (LI_DIRECT | LI_RELOAD_Y);
+        Tgt->LoadIndex = Src->LoadIndex;
+        Tgt->LoadEntry = Src->LoadEntry;
+        Tgt->XferIndex = I;
+        Tgt->Offs      = Src->Offs;
+        Tgt->Flags     = Src->Flags;
 
     } else if (CE_IsCallTo (E, "ldaxysp") && RegValIsKnown (E->RI->In.RegY)) {
-
-        /* If we had a load or xfer op before, this is a duplicate load which
-        ** can cause problems if it encountered between the pushax and the op,
-        ** so remember it for both registers involved.
-        */
-        if (LI->A.LoadIndex >= 0 || LI->A.XferIndex >= 0) {
-            LI->A.Flags |= LI_DUP_LOAD;
-        }
-        if (LI->X.LoadIndex >= 0 || LI->X.XferIndex >= 0) {
-            LI->X.Flags |= LI_DUP_LOAD;
-        }
 
         /* Both registers set, Y changed */
         LI->A.LoadIndex = I;
         LI->A.XferIndex = -1;
-        LI->A.Flags    |= (LI_DIRECT | LI_RELOAD_Y);
+        LI->A.Flags     = (LI_LOAD_INSN | LI_DIRECT | LI_RELOAD_Y);
         LI->A.Offs      = (unsigned char) E->RI->In.RegY - 1;
 
         LI->X.LoadIndex = I;
         LI->X.XferIndex = -1;
-        LI->X.Flags    |= (LI_DIRECT | LI_RELOAD_Y);
+        LI->X.Flags     = (LI_LOAD_INSN | LI_DIRECT | LI_RELOAD_Y);
         LI->X.Offs      = (unsigned char) E->RI->In.RegY;
 
-        ClearLoadRegInfo (&LI->Y);
+        /* Reg Y can be regarded as unused if this load is removed */
+        Used &= ~REG_Y;
+        LI->Y.Flags |= LI_USED_BY_A | LI_USED_BY_X;
+
     } else {
-        HonourUseAndChg (&LI->A, REG_A, E);
-        HonourUseAndChg (&LI->X, REG_X, E);
-        HonourUseAndChg (&LI->Y, REG_Y, E);
+        HonourUseAndChg (&LI->A, REG_A, E, I);
+        HonourUseAndChg (&LI->X, REG_X, E, I);
+        HonourUseAndChg (&LI->Y, REG_Y, E, I);
+
+        /* The other operand may be affected too */
+        if (LLI != 0) {
+            if (Affected (&LLI->A, E)) {
+                LLI->A.Flags |= LI_SRC_CHG;
+            }
+            if (Affected (&LLI->X, E)) {
+                LLI->X.Flags |= LI_SRC_CHG;
+            }
+            if (Affected (&LLI->Y, E)) {
+                LLI->Y.Flags |= LI_SRC_CHG;
+            }
+        }
     }
+
+    return Used;
 }
 
 
@@ -529,7 +668,7 @@ static void AdjustStackOffset (StackOpData* D, unsigned Offs)
 
 
 
-static void AddStoreA (StackOpData* D)
+static void AddStoreLhsA (StackOpData* D)
 /* Add a store to zero page after the push insn */
 {
     CodeEntry* X = NewCodeEntry (OP65_STA, AM65_ZP, D->ZPLo, 0, D->PushEntry->LI);
@@ -538,7 +677,7 @@ static void AddStoreA (StackOpData* D)
 
 
 
-static void AddStoreX (StackOpData* D)
+static void AddStoreLhsX (StackOpData* D)
 /* Add a store to zero page after the push insn */
 {
     CodeEntry* X = NewCodeEntry (OP65_STX, AM65_ZP, D->ZPHi, 0, D->PushEntry->LI);
@@ -558,10 +697,10 @@ static void ReplacePushByStore (StackOpData* D)
     ** byte first so that the store is later in A/X order.
     */
     if ((D->Lhs.X.Flags & LI_DIRECT) == 0) {
-        AddStoreX (D);
+        AddStoreLhsX (D);
     }
     if ((D->Lhs.A.Flags & LI_DIRECT) == 0) {
-        AddStoreA (D);
+        AddStoreLhsA (D);
     }
 }
 
@@ -680,19 +819,23 @@ static void RemoveRegLoads (StackOpData* D, LoadInfo* LI)
     /* Both registers may be loaded with one insn, but DelEntry will in this
     ** case clear the other one.
     */
-    if ((LI->A.Flags & (LI_REMOVE | LI_DONT_REMOVE)) == LI_REMOVE) {
-        if (LI->A.LoadIndex >= 0) {
+    if ((LI->A.Flags & LI_REMOVE) == LI_REMOVE) {
+        if (LI->A.LoadIndex >= 0 &&
+            (LI->A.LoadEntry->Flags & CEF_DONT_REMOVE) == 0) {
             DelEntry (D, LI->A.LoadIndex);
         }
-        if (LI->A.XferIndex >= 0) {
+        if (LI->A.XferIndex >= 0 &&
+            (LI->A.XferEntry->Flags & CEF_DONT_REMOVE) == 0) {
             DelEntry (D, LI->A.XferIndex);
         }
     }
-    if ((LI->X.Flags & (LI_REMOVE | LI_DONT_REMOVE)) == LI_REMOVE) {
-        if (LI->X.LoadIndex >= 0) {
+    if ((LI->X.Flags & LI_REMOVE) == LI_REMOVE) {
+        if (LI->X.LoadIndex >= 0 &&
+            (LI->X.LoadEntry->Flags & CEF_DONT_REMOVE) == 0) {
             DelEntry (D, LI->X.LoadIndex);
         }
-        if (LI->X.XferIndex >= 0) {
+        if (LI->X.XferIndex >= 0 &&
+            (LI->X.XferEntry->Flags & CEF_DONT_REMOVE) == 0) {
             DelEntry (D, LI->X.XferIndex);
         }
     }
@@ -703,7 +846,7 @@ static void RemoveRegLoads (StackOpData* D, LoadInfo* LI)
 static void RemoveRemainders (StackOpData* D)
 /* Remove the code that is unnecessary after translation of the sequence */
 {
-    /* Remove the register loads for lhs and rhs */
+    /* Remove the register loads for lhs and rhs if nothing prevents that */
     RemoveRegLoads (D, &D->Lhs);
     RemoveRegLoads (D, &D->Rhs);
 
@@ -715,14 +858,20 @@ static void RemoveRemainders (StackOpData* D)
 
 
 static int IsRegVar (StackOpData* D)
-/* If the value pushed is that of a zeropage variable, replace ZPLo and ZPHi
-** in the given StackOpData struct by the variable and return true. Otherwise
-** leave D untouched and return false.
+/* If the value pushed is that of a zeropage variable that is unchanged until Op,
+** replace ZPLo and ZPHi in the given StackOpData struct by the variable and return true.
+** Otherwise leave D untouched and return false.
 */
 {
     CodeEntry*  LoadA = D->Lhs.A.LoadEntry;
     CodeEntry*  LoadX = D->Lhs.X.LoadEntry;
     unsigned    Len;
+
+    /* Must be unchanged till Op */
+    if ((D->Lhs.A.Flags & (LI_DIRECT | LI_RELOAD_Y)) != LI_DIRECT ||
+        (D->Lhs.X.Flags & (LI_DIRECT | LI_RELOAD_Y)) != LI_DIRECT) {
+        return 0;
+    }
 
     /* Must have both load insns */
     if (LoadA == 0 || LoadX == 0) {
@@ -792,12 +941,13 @@ static unsigned Opt_toseqax_tosneax (StackOpData* D, const char* BoolTransformer
         X = NewCodeEntry (OP65_CMP, LoadA->AM, LoadA->Arg, 0, D->OpEntry->LI);
         InsertEntry (D, X, D->IP++);
 
-        /* Lhs load entries can be removed */
+        /* Lhs load entries can be removed if not used later */
         D->Lhs.X.Flags |= LI_REMOVE;
         D->Lhs.A.Flags |= LI_REMOVE;
 
     } else if ((D->Rhs.A.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT &&
-               (D->Rhs.X.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT) {
+               (D->Rhs.X.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT &&
+               D->RhsMultiChg == 0) {
 
         CodeEntry* LoadX = D->Rhs.X.LoadEntry;
         CodeEntry* LoadA = D->Rhs.A.LoadEntry;
@@ -816,7 +966,7 @@ static unsigned Opt_toseqax_tosneax (StackOpData* D, const char* BoolTransformer
         X = NewCodeEntry (OP65_CMP, LoadA->AM, LoadA->Arg, 0, D->OpEntry->LI);
         InsertEntry (D, X, D->IP++);
 
-        /* Rhs load entries can be removed */
+        /* Rhs load entries must be removed */
         D->Rhs.X.Flags |= LI_REMOVE;
         D->Rhs.A.Flags |= LI_REMOVE;
 
@@ -838,8 +988,8 @@ static unsigned Opt_toseqax_tosneax (StackOpData* D, const char* BoolTransformer
     } else {
 
         /* Save lhs into zeropage, then compare */
-        AddStoreX (D);
-        AddStoreA (D);
+        AddStoreLhsX (D);
+        AddStoreLhsA (D);
 
         D->IP = D->OpIndex+1;
 
@@ -871,9 +1021,6 @@ static unsigned Opt_tosshift (StackOpData* D, const char* Name)
 {
     CodeEntry*  X;
 
-    /* Store the value into the zeropage instead of pushing it */
-    ReplacePushByStore (D);
-
     /* If the lhs is direct (but not stack relative), we can just reload the
     ** data later.
     */
@@ -897,16 +1044,16 @@ static unsigned Opt_tosshift (StackOpData* D, const char* Name)
         /* ldx */
         X = NewCodeEntry (OP65_LDX, LoadX->AM, LoadX->Arg, 0, D->OpEntry->LI);
         InsertEntry (D, X, D->IP++);
-
-        /* Lhs load entries can be removed */
+ 
+        /* Lhs load entries can be removed if not used later */
         D->Lhs.X.Flags |= LI_REMOVE;
         D->Lhs.A.Flags |= LI_REMOVE;
 
     } else {
 
         /* Save lhs into zeropage and reload later */
-        AddStoreX (D);
-        AddStoreA (D);
+        AddStoreLhsX (D);
+        AddStoreLhsA (D);
 
         /* Be sure to setup IP after adding the stores, otherwise it will get
         ** messed up.
@@ -950,8 +1097,8 @@ static unsigned Opt___bzero (StackOpData* D)
     /* Check if we're using a register variable */
     if (!IsRegVar (D)) {
         /* Store the value into the zeropage instead of pushing it */
-        AddStoreX (D);
-        AddStoreA (D);
+        AddStoreLhsX (D);
+        AddStoreLhsA (D);
     }
 
     /* If the return value of __bzero is used, we have to add code to reload
@@ -1042,8 +1189,8 @@ static unsigned Opt_staspidx (StackOpData* D)
     /* Check if we're using a register variable */
     if (!IsRegVar (D)) {
         /* Store the value into the zeropage instead of pushing it */
-        AddStoreX (D);
-        AddStoreA (D);
+        AddStoreLhsX (D);
+        AddStoreLhsA (D);
     }
 
     /* Replace the store subroutine call by a direct op */
@@ -1067,8 +1214,8 @@ static unsigned Opt_staxspidx (StackOpData* D)
     /* Check if we're using a register variable */
     if (!IsRegVar (D)) {
         /* Store the value into the zeropage instead of pushing it */
-        AddStoreX (D);
-        AddStoreA (D);
+        AddStoreLhsX (D);
+        AddStoreLhsA (D);
     }
 
     /* Inline the store */
@@ -1146,8 +1293,8 @@ static unsigned Opt_tosaddax (StackOpData* D)
         int Signed = (strcmp (N->Arg, "ldaidx") == 0);
 
         /* Store the value into the zeropage instead of pushing it */
-        AddStoreX (D);
-        AddStoreA (D);
+        AddStoreLhsX (D);
+        AddStoreLhsA (D);
 
         /* Replace the ldy by a tay. Be sure to create the new entry before
         ** deleting the ldy, since we will reference the line info from this
@@ -1345,6 +1492,10 @@ static unsigned Opt_tosgeax (StackOpData* D)
     X = NewCodeEntry (OP65_ROL, AM65_ACC, "a", 0, D->OpEntry->LI);
     InsertEntry (D, X, D->IP++);
 
+    /* Rhs load entries must be removed */
+    D->Rhs.X.Flags |= LI_REMOVE;
+    D->Rhs.A.Flags |= LI_REMOVE;
+
     /* Remove the push and the call to the tosgeax function */
     RemoveRemainders (D);
 
@@ -1398,6 +1549,10 @@ static unsigned Opt_tosltax (StackOpData* D)
     /* rol a */
     X = NewCodeEntry (OP65_ROL, AM65_ACC, "a", 0, D->OpEntry->LI);
     InsertEntry (D, X, D->IP++);
+
+    /* Rhs load entries must be removed */
+    D->Rhs.X.Flags |= LI_REMOVE;
+    D->Rhs.A.Flags |= LI_REMOVE;
 
     /* Remove the push and the call to the tosltax function */
     RemoveRemainders (D);
@@ -1476,6 +1631,10 @@ static unsigned Opt_tossubax (StackOpData* D)
     /* Add code for high operand */
     AddOpHigh (D, OP65_SBC, &D->Rhs, 1);
 
+    /* Rhs load entries must be removed */
+    D->Rhs.X.Flags |= LI_REMOVE;
+    D->Rhs.A.Flags |= LI_REMOVE;
+
     /* Remove the push and the call to the tossubax function */
     RemoveRemainders (D);
 
@@ -1514,6 +1673,10 @@ static unsigned Opt_tosugeax (StackOpData* D)
     /* rol a */
     X = NewCodeEntry (OP65_ROL, AM65_ACC, "a", 0, D->OpEntry->LI);
     InsertEntry (D, X, D->IP++);
+
+    /* Rhs load entries must be removed */
+    D->Rhs.X.Flags |= LI_REMOVE;
+    D->Rhs.A.Flags |= LI_REMOVE;
 
     /* Remove the push and the call to the tosugeax function */
     RemoveRemainders (D);
@@ -1558,6 +1721,10 @@ static unsigned Opt_tosugtax (StackOpData* D)
     X = NewCodeEntry (OP65_JSR, AM65_ABS, "boolugt", 0, D->OpEntry->LI);
     InsertEntry (D, X, D->IP++);
 
+    /* Rhs load entries must be removed */
+    D->Rhs.X.Flags |= LI_REMOVE;
+    D->Rhs.A.Flags |= LI_REMOVE;
+
     /* Remove the push and the call to the operator function */
     RemoveRemainders (D);
 
@@ -1601,6 +1768,10 @@ static unsigned Opt_tosuleax (StackOpData* D)
     X = NewCodeEntry (OP65_JSR, AM65_ABS, "boolule", 0, D->OpEntry->LI);
     InsertEntry (D, X, D->IP++);
 
+    /* Rhs load entries must be removed */
+    D->Rhs.X.Flags |= LI_REMOVE;
+    D->Rhs.A.Flags |= LI_REMOVE;
+
     /* Remove the push and the call to the operator function */
     RemoveRemainders (D);
 
@@ -1631,6 +1802,10 @@ static unsigned Opt_tosultax (StackOpData* D)
     /* Transform to boolean */
     X = NewCodeEntry (OP65_JSR, AM65_ABS, "boolult", 0, D->OpEntry->LI);
     InsertEntry (D, X, D->IP++);
+
+    /* Rhs load entries must be removed */
+    D->Rhs.X.Flags |= LI_REMOVE;
+    D->Rhs.A.Flags |= LI_REMOVE;
 
     /* Remove the push and the call to the operator function */
     RemoveRemainders (D);
@@ -1682,26 +1857,26 @@ static unsigned Opt_tosxorax (StackOpData* D)
 
 
 static const OptFuncDesc FuncTable[] = {
-    { "__bzero",    Opt___bzero,   REG_NONE, OP_X_ZERO | OP_A_KNOWN     },
-    { "staspidx",   Opt_staspidx,  REG_NONE, OP_NONE                    },
-    { "staxspidx",  Opt_staxspidx, REG_AX,   OP_NONE                    },
-    { "tosaddax",   Opt_tosaddax,  REG_NONE, OP_NONE                    },
-    { "tosandax",   Opt_tosandax,  REG_NONE, OP_NONE                    },
-    { "tosaslax",   Opt_tosaslax,  REG_NONE, OP_NONE                    },
-    { "tosasrax",   Opt_tosasrax,  REG_NONE, OP_NONE                    },
-    { "toseqax",    Opt_toseqax,   REG_NONE, OP_NONE                    },
-    { "tosgeax",    Opt_tosgeax,   REG_NONE, OP_RHS_LOAD_DIRECT         },
-    { "tosltax",    Opt_tosltax,   REG_NONE, OP_RHS_LOAD_DIRECT         },
-    { "tosneax",    Opt_tosneax,   REG_NONE, OP_NONE                    },
-    { "tosorax",    Opt_tosorax,   REG_NONE, OP_NONE                    },
-    { "tosshlax",   Opt_tosshlax,  REG_NONE, OP_NONE                    },
-    { "tosshrax",   Opt_tosshrax,  REG_NONE, OP_NONE                    },
-    { "tossubax",   Opt_tossubax,  REG_NONE, OP_RHS_LOAD_DIRECT         },
-    { "tosugeax",   Opt_tosugeax,  REG_NONE, OP_RHS_LOAD_DIRECT         },
-    { "tosugtax",   Opt_tosugtax,  REG_NONE, OP_RHS_LOAD_DIRECT         },
-    { "tosuleax",   Opt_tosuleax,  REG_NONE, OP_RHS_LOAD_DIRECT         },
-    { "tosultax",   Opt_tosultax,  REG_NONE, OP_RHS_LOAD_DIRECT         },
-    { "tosxorax",   Opt_tosxorax,  REG_NONE, OP_NONE                    },
+    { "__bzero",    Opt___bzero,   REG_NONE, OP_X_ZERO | OP_A_KNOWN                    },
+    { "staspidx",   Opt_staspidx,  REG_NONE, OP_NONE                                   },
+    { "staxspidx",  Opt_staxspidx, REG_AX,   OP_NONE                                   },
+    { "tosaddax",   Opt_tosaddax,  REG_NONE, OP_NONE                                   },
+    { "tosandax",   Opt_tosandax,  REG_NONE, OP_NONE                                   },
+    { "tosaslax",   Opt_tosaslax,  REG_NONE, OP_NONE                                   },
+    { "tosasrax",   Opt_tosasrax,  REG_NONE, OP_NONE                                   },
+    { "toseqax",    Opt_toseqax,   REG_NONE, OP_LR_INTERCHANGE | OP_RHS_REMOVE_DIRECT  },
+    { "tosgeax",    Opt_tosgeax,   REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
+    { "tosltax",    Opt_tosltax,   REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
+    { "tosneax",    Opt_tosneax,   REG_NONE, OP_LR_INTERCHANGE | OP_RHS_REMOVE_DIRECT  },
+    { "tosorax",    Opt_tosorax,   REG_NONE, OP_NONE                                   },
+    { "tosshlax",   Opt_tosshlax,  REG_NONE, OP_NONE                                   },
+    { "tosshrax",   Opt_tosshrax,  REG_NONE, OP_NONE                                   },
+    { "tossubax",   Opt_tossubax,  REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
+    { "tosugeax",   Opt_tosugeax,  REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
+    { "tosugtax",   Opt_tosugtax,  REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
+    { "tosuleax",   Opt_tosuleax,  REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
+    { "tosultax",   Opt_tosultax,  REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
+    { "tosxorax",   Opt_tosxorax,  REG_NONE, OP_NONE                                   },
 };
 #define FUNC_COUNT (sizeof(FuncTable) / sizeof(FuncTable[0]))
 
@@ -1799,6 +1974,9 @@ static void ResetStackOpData (StackOpData* Data)
 {
     Data->OptFunc       = 0;
     Data->ZPUsage       = REG_NONE;
+    Data->ZPChanged     = REG_NONE;
+    Data->UsedRegs      = REG_NONE;
+    Data->RhsMultiChg   = 0;
 
     ClearLoadInfo (&Data->Lhs);
     ClearLoadInfo (&Data->Rhs);
@@ -1815,6 +1993,17 @@ static int PreCondOk (StackOpData* D)
 ** register to use.
 */
 {
+    LoadInfo* Lhs;
+    LoadInfo* Rhs;
+    LoadRegInfo* LhsLo;
+    LoadRegInfo* LhsHi;
+    LoadRegInfo* RhsLo;
+    LoadRegInfo* RhsHi;
+    short LoVal;
+    short HiVal;
+    int I;
+    int Passed = 0;
+
     /* Check the flags */
     unsigned UnusedRegs = D->OptFunc->UnusedRegs;
     if (UnusedRegs != REG_NONE &&
@@ -1822,39 +2011,104 @@ static int PreCondOk (StackOpData* D)
         /* Cannot optimize */
         return 0;
     }
-    if ((D->OptFunc->Flags & OP_A_KNOWN) != 0 &&
-        RegValIsUnknown (D->OpEntry->RI->In.RegA)) {
+
+    Passed = 0;
+    LoVal = D->OpEntry->RI->In.RegA;
+    HiVal = D->OpEntry->RI->In.RegX;
+    /* Check normally first, then interchange A/X and check again if necessary */
+    for (I = (D->OptFunc->Flags & OP_AX_INTERCHANGE ? 0 : 1); !Passed && I < 2; ++I) {
+
+        do {
+            if ((D->OptFunc->Flags & OP_A_KNOWN) != 0 &&
+                RegValIsUnknown (LoVal)) {
+                /* Cannot optimize */
+                break;
+            }
+            if ((D->OptFunc->Flags & OP_X_ZERO) != 0 &&
+                HiVal != 0) {
+                /* Cannot optimize */
+                break;
+            }
+            Passed = 1;
+        } while (0);
+
+        /* Interchange A/X */
+        LoVal = D->OpEntry->RI->In.RegX;
+        HiVal = D->OpEntry->RI->In.RegA;
+    }
+    if (!Passed) {
         /* Cannot optimize */
         return 0;
     }
-    if ((D->OptFunc->Flags & OP_X_ZERO) != 0 &&
-        D->OpEntry->RI->In.RegX != 0) {
-        /* Cannot optimize */
-        return 0;
-    }
-    if ((D->OptFunc->Flags & OP_LHS_LOAD) != 0) {
-        if (D->Lhs.A.LoadIndex < 0 || D->Lhs.X.LoadIndex < 0) {
-            /* Cannot optimize */
-            return 0;
-        } else if ((D->OptFunc->Flags & OP_LHS_LOAD_DIRECT) != 0) {
-            if ((D->Lhs.A.Flags & D->Lhs.X.Flags & LI_DIRECT) == 0) {
-                /* Cannot optimize */
-                return 0;
+
+    Passed = 0;
+    Lhs = &D->Lhs;
+    Rhs = &D->Rhs;
+    /* Check normally first, then interchange LHS/RHS and check again if necessary */
+    for (I = (D->OptFunc->Flags & OP_LR_INTERCHANGE ? 0 : 1); !Passed && I < 2; ++I) {
+
+        do {
+            LhsLo = &Lhs->A;
+            LhsHi = &Lhs->X;
+            RhsLo = &Rhs->A;
+            RhsHi = &Rhs->X;
+            /* Currently we have only LHS/RHS checks with identical requirements for A/X,
+            ** so we don't need to check twice for now.
+            */
+
+            if ((D->OptFunc->Flags & OP_LHS_LOAD) != 0) {
+                if ((LhsLo->Flags & LhsHi->Flags & LI_LOAD_INSN) == 0) {
+                    /* Cannot optimize */
+                    break;
+                } else if ((D->OptFunc->Flags & OP_LHS_LOAD_DIRECT) != 0) {
+                    if ((LhsLo->Flags & LhsHi->Flags & LI_DIRECT) == 0) {
+                        /* Cannot optimize */
+                        break;
+                    }
+                }
             }
-        }
-    }
-    if ((D->OptFunc->Flags & OP_RHS_LOAD) != 0) {
-        if (D->Rhs.A.LoadIndex < 0 || D->Rhs.X.LoadIndex < 0) {
-            /* Cannot optimize */
-            return 0;
-        } else if ((D->OptFunc->Flags & OP_RHS_LOAD_DIRECT) != 0) {
-            if ((D->Rhs.A.Flags & D->Rhs.X.Flags & LI_DIRECT) == 0) {
-                /* Cannot optimize */
-                return 0;
+            if ((D->OptFunc->Flags & OP_RHS_LOAD) != 0) {
+                if ((RhsLo->Flags & RhsHi->Flags & LI_LOAD_INSN) == 0) {
+                    /* Cannot optimize */
+                    break;
+                } else if ((D->OptFunc->Flags & OP_RHS_LOAD_DIRECT) != 0) {
+                    if ((RhsLo->Flags & RhsHi->Flags & LI_DIRECT) == 0) {
+                        /* Cannot optimize */
+                        break;
+                    }
+                }
             }
-        }
+            if ((D->OptFunc->Flags & OP_LHS_REMOVE) != 0) {
+                /* Check if the load entries cannot be removed */
+                if ((LhsLo->LoadEntry != 0 && (LhsLo->LoadEntry->Flags & CEF_DONT_REMOVE) != 0) ||
+                    (LhsHi->LoadEntry != 0 && (LhsHi->LoadEntry->Flags & CEF_DONT_REMOVE) != 0)) {
+                    if ((D->OptFunc->Flags & OP_LHS_REMOVE_DIRECT) != 0) {
+                        /* Cannot optimize */
+                        break;
+                    }
+                }
+            }
+            if ((D->OptFunc->Flags & OP_RHS_REMOVE) != 0) {
+                if ((RhsLo->LoadEntry != 0 && (RhsLo->LoadEntry->Flags & CEF_DONT_REMOVE) != 0) ||
+                    (RhsHi->LoadEntry != 0 && (RhsHi->LoadEntry->Flags & CEF_DONT_REMOVE) != 0)) {
+                    if ((D->OptFunc->Flags & OP_RHS_REMOVE_DIRECT) != 0) {
+                        /* Cannot optimize */
+                        break;
+                    }
+                }
+            }
+            if (D->RhsMultiChg && (D->OptFunc->Flags & OP_RHS_REMOVE_DIRECT) != 0) {
+                /* Cannot optimize */
+                break;
+            }
+            Passed = 1;
+        } while (0);
+
+        /* Interchange LHS/RHS for next round */
+        Lhs = &D->Rhs;
+        Rhs = &D->Lhs;
     }
-    if ((D->Rhs.A.Flags | D->Rhs.X.Flags) & LI_DUP_LOAD) {
+    if (!Passed) {
         /* Cannot optimize */
         return 0;
     }
@@ -1888,6 +2142,52 @@ static int PreCondOk (StackOpData* D)
 
 
 
+static void SetDontRemoveEntryFlag (LoadRegInfo* RI)
+/* Flag the entry as non-removable according to register flags */
+{
+    if (RI->Flags & LI_DONT_REMOVE) {
+        if (RI->LoadEntry != 0) {
+            RI->LoadEntry->Flags |= CEF_DONT_REMOVE;
+        }
+    }
+}
+
+
+
+static void ResetDontRemoveEntryFlag (LoadRegInfo* RI)
+/* Unflag the entry as non-removable according to register flags */
+{
+    if (RI->Flags & LI_DONT_REMOVE) {
+        if (RI->LoadEntry != 0) {
+            RI->LoadEntry->Flags &= ~CEF_DONT_REMOVE;
+        }
+    }
+}
+
+
+
+static void SetDontRemoveEntryFlags (StackOpData* D)
+/* Flag the entries as non-removable according to register flags */
+{
+    SetDontRemoveEntryFlag (&D->Lhs.A);
+    SetDontRemoveEntryFlag (&D->Lhs.X);
+    SetDontRemoveEntryFlag (&D->Rhs.A);
+    SetDontRemoveEntryFlag (&D->Rhs.X);
+}
+
+
+
+static void ResetDontRemoveEntryFlags (StackOpData* D)
+/* Unflag the entries as non-removable according to register flags */
+{
+    ResetDontRemoveEntryFlag (&D->Lhs.A);
+    ResetDontRemoveEntryFlag (&D->Lhs.X);
+    ResetDontRemoveEntryFlag (&D->Rhs.A);
+    ResetDontRemoveEntryFlag (&D->Rhs.X);
+}
+
+
+
 unsigned OptStackOps (CodeSeg* S)
 /* Optimize operations that take operands via the stack */
 {
@@ -1895,9 +2195,10 @@ unsigned OptStackOps (CodeSeg* S)
     StackOpData         Data;
     int                 I;
     int                 OldEntryCount;  /* Old number of entries */
-    unsigned            UsedRegs = 0;   /* Registers used */
-    unsigned            ChangedRegs = 0;/* Registers changed */
-
+    unsigned            Used;           /* What registers would be used */
+    unsigned            PushedRegs;     /* Track if the same regs are used after the push */
+    int                 RhsALoadIndex;  /* Track if rhs is changed more than once */
+    int                 RhsXLoadIndex;  /* Track if rhs is changed more than once */
 
     enum {
         Initialize,
@@ -1936,7 +2237,6 @@ unsigned OptStackOps (CodeSeg* S)
 
             case Initialize:
                 ResetStackOpData (&Data);
-                UsedRegs = ChangedRegs = REG_NONE;
                 State = Search;
                 /* FALLTHROUGH */
 
@@ -1945,15 +2245,39 @@ unsigned OptStackOps (CodeSeg* S)
                 ** what is in a register once pushax is encountered.
                 */
                 if (CE_HasLabel (E)) {
-                    /* Currently we don't track across branches */
+                    /* Currently we don't track across branches.
+                    ** Remember this as an indirect load.
+                    */
                     ClearLoadInfo (&Data.Lhs);
+                    Data.Lhs.A.LoadIndex = I;
+                    Data.Lhs.X.LoadIndex = I;
+                    Data.Lhs.Y.LoadIndex = I;
                 }
                 if (CE_IsCallTo (E, "pushax")) {
+                    /* Disallow removing the loads if the registers are used */
+                    if (Data.UsedRegs & REG_A) {
+                        Data.Lhs.A.Flags |= LI_DONT_REMOVE;
+                    }
+                    if (Data.UsedRegs & REG_X) {
+                        Data.Lhs.X.Flags |= LI_DONT_REMOVE;
+                    }
+                    if (Data.UsedRegs & REG_Y) {
+                        Data.Lhs.Y.Flags |= LI_DONT_REMOVE;
+                    }
+
+                    /* The LHS regs are also used as the default RHS until changed */
+                    PushedRegs    = REG_AXY;
+                    Data.UsedRegs = REG_AXY;
+                    CopyLoadInfo (&Data.Rhs, &Data.Lhs);
+
                     Data.PushIndex = I;
+                    Data.PushEntry = E;
                     State = FoundPush;
                 } else {
                     /* Track load insns */
-                    TrackLoads (&Data.Lhs, E, I);
+                    Used = TrackLoads (&Data.Lhs, 0, Data.Code, I);
+                    Data.UsedRegs &= ~E->Chg;
+                    Data.UsedRegs |= Used;
                 }
                 break;
 
@@ -1963,8 +2287,13 @@ unsigned OptStackOps (CodeSeg* S)
                 ** for code that will disable us from translating the sequence.
                 */
                 if (CE_HasLabel (E)) {
-                    /* Currently we don't track across branches */
+                    /* Currently we don't track across branches.
+                    ** Remember this as an indirect load.
+                    */
                     ClearLoadInfo (&Data.Rhs);
+                    Data.Rhs.A.LoadIndex = I;
+                    Data.Rhs.X.LoadIndex = I;
+                    Data.Rhs.Y.LoadIndex = I;
                 }
                 if (E->OPC == OP65_JSR) {
 
@@ -1973,6 +2302,16 @@ unsigned OptStackOps (CodeSeg* S)
                     */
                     Data.OptFunc = FindFunc (E->Arg);
                     if (Data.OptFunc) {
+                        /* Disallow removing the loads if the registers are used */
+                        if (Data.UsedRegs & REG_A) {
+                            Data.Rhs.A.Flags |= LI_DONT_REMOVE;
+                        }
+                        if (Data.UsedRegs & REG_X) {
+                            Data.Rhs.X.Flags |= LI_DONT_REMOVE;
+                        }
+                        if (Data.UsedRegs & REG_Y) {
+                            Data.Rhs.Y.Flags |= LI_DONT_REMOVE;
+                        }
                         /* Remember the op index and go on */
                         Data.OpIndex = I;
                         Data.OpEntry = E;
@@ -1986,22 +2325,9 @@ unsigned OptStackOps (CodeSeg* S)
                         I = Data.PushIndex;
                         State = Initialize;
                         break;
-                    } else {
-                        /* Track register usage */
-                        Data.ZPUsage |= (E->Use | E->Chg);
-                        TrackLoads (&Data.Rhs, E, I);
                     }
 
-                } else if (E->Info & OF_STORE && (E->Chg & REG_ZP) == 0) {
-
-                    /* Too dangerous - there may be a change of a variable
-                    ** within the sequence.
-                    */
-                    I = Data.PushIndex;
-                    State = Initialize;
-                    break;
-
-                } else if ((E->Use & REG_SP) != 0                       &&
+                } else if ((E->Use & REG_SP) != 0               &&
                            (E->AM != AM65_ZP_INDY               ||
                             RegValIsUnknown (E->RI->In.RegY)    ||
                             E->RI->In.RegY < 2)) {
@@ -2018,22 +2344,45 @@ unsigned OptStackOps (CodeSeg* S)
                     State = Initialize;
                     break;
 
-                } else {
-                    /* Other stuff: Track register usage */
-                    Data.ZPUsage |= (E->Use | E->Chg);
-                    TrackLoads (&Data.Rhs, E, I);
                 }
-                /* If the registers from the push (A/X) are used before they're
-                ** changed, we cannot change the sequence, because this would
-                ** with a high probability change the register contents.
-                */
-                UsedRegs |= E->Use;
-                if ((UsedRegs & ~ChangedRegs) & REG_AX) {
-                    I = Data.PushIndex;
-                    State = Initialize;
-                    break;
+
+                /* Memorize the old rhs load indices before refreshing them */
+                RhsALoadIndex = Data.Rhs.A.LoadIndex;
+                RhsXLoadIndex = Data.Rhs.X.LoadIndex;
+
+                /* Track register usage */
+                Used = TrackLoads (&Data.Rhs, &Data.Lhs, Data.Code, I);
+                Data.ZPUsage   |= (E->Use | E->Chg);
+                /* The changes could depend on the use */
+                Data.UsedRegs  &= ~E->Chg;
+                Data.UsedRegs  |= Used;
+                Data.ZPChanged |= E->Chg;
+
+                /* Check if any parts of Lhs are used again before overwritten */
+                if (PushedRegs != 0) {
+                    if ((PushedRegs & E->Use) != 0) {
+                        if ((PushedRegs & E->Use & REG_A) != 0) {
+                            Data.Lhs.A.Flags |= LI_DONT_REMOVE;
+                        }
+                        if ((PushedRegs & E->Use & REG_X) != 0) {
+                            Data.Lhs.X.Flags |= LI_DONT_REMOVE;
+                        }
+                        if ((PushedRegs & E->Use & REG_Y) != 0) {
+                            Data.Lhs.Y.Flags |= LI_DONT_REMOVE;
+                        }
+                    }
+                    PushedRegs &= ~E->Chg;
                 }
-                ChangedRegs |= E->Chg;
+                /* Check if rhs is changed again after the push */
+                if ((RhsALoadIndex != Data.Lhs.A.LoadIndex &&
+                     RhsALoadIndex != Data.Rhs.A.LoadIndex)     ||
+                    (RhsXLoadIndex != Data.Lhs.X.LoadIndex &&
+                     RhsXLoadIndex != Data.Rhs.X.LoadIndex)) {
+                    /* This will disable those sub-opts that require removing
+                    ** the rhs as they can't handle such cases correctly.
+                    */
+                    Data.RhsMultiChg = 1;
+                }
                 break;
 
             case FoundOp:
@@ -2052,19 +2401,22 @@ unsigned OptStackOps (CodeSeg* S)
                 ** original zero page locations for the final op, but must
                 ** use another ZP location to save them.
                 */
-                ChangedRegs &= REG_ZP;
+                Data.ZPChanged &= REG_ZP;
                 if (Data.Lhs.A.LoadEntry && Data.Lhs.A.LoadEntry->AM == AM65_ZP) {
                     Data.ZPUsage |= Data.Lhs.A.LoadEntry->Use;
-                    if ((Data.Lhs.A.LoadEntry->Use & ChangedRegs) != 0) {
+                    if ((Data.Lhs.A.LoadEntry->Use & Data.ZPChanged) != 0) {
                         Data.Lhs.A.Flags &= ~(LI_DIRECT | LI_RELOAD_Y);
                     }
                 }
                 if (Data.Lhs.X.LoadEntry && Data.Lhs.X.LoadEntry->AM == AM65_ZP) {
                     Data.ZPUsage |= Data.Lhs.X.LoadEntry->Use;
-                    if ((Data.Lhs.X.LoadEntry->Use & ChangedRegs) != 0) {
+                    if ((Data.Lhs.X.LoadEntry->Use & Data.ZPChanged) != 0) {
                         Data.Lhs.X.Flags &= ~(LI_DIRECT | LI_RELOAD_Y);
                     }
                 }
+
+                /* Flag entries that can't be removed */
+                SetDontRemoveEntryFlags (&Data);
 
                 /* Check the preconditions. If they aren't ok, reset the insn
                 ** pointer to the pushax and start over. We will loose part of
@@ -2072,6 +2424,8 @@ unsigned OptStackOps (CodeSeg* S)
                 ** pushax and here and will be tracked again when restarting.
                 */
                 if (!PreCondOk (&Data)) {
+                    /* Unflag entries that can't be removed */
+                    ResetDontRemoveEntryFlags (&Data);
                     I = Data.PushIndex;
                     State = Initialize;
                     break;
@@ -2096,6 +2450,9 @@ unsigned OptStackOps (CodeSeg* S)
 
                 /* Call the optimizer function */
                 Changes += Data.OptFunc->Func (&Data);
+
+                /* Unflag entries that can't be removed */
+                ResetDontRemoveEntryFlags (&Data);
 
                 /* Since the function may have added or deleted entries,
                 ** correct the index.

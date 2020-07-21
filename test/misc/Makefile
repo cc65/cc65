@@ -50,6 +50,11 @@ TESTS += $(foreach option,$(OPTIONS),$(SOURCES:%.c=$(WORKDIR)/%.$(option).65c02.
 
 all: $(TESTS)
 
+# The same input file is processed with different cl65 args,
+# but cl65 uses the input file name to make the temp file name,
+# and they stomp each other.
+.NOTPARALLEL:
+
 $(WORKDIR):
 	$(call MKDIR,$(WORKDIR))
 
@@ -57,6 +62,36 @@ $(DIFF): ../bdiff.c | $(WORKDIR)
 	$(CC) $(CFLAGS) -o $@ $<
 
 define PRG_template
+
+# should compile, but gives an error
+$(WORKDIR)/bug975.$1.$2.prg: bug975.c | $(WORKDIR)
+	$(if $(QUIET),echo misc/bug975.$1.$2.prg)
+	-$(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
+
+# should compile, but gives an error
+$(WORKDIR)/bug250.$1.$2.prg: bug250.c | $(WORKDIR)
+	$(if $(QUIET),echo misc/bug250.$1.$2.prg)
+	-$(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
+
+# should compile, but gives an error
+$(WORKDIR)/bug760.$1.$2.prg: bug760.c | $(WORKDIR)
+	$(if $(QUIET),echo misc/bug760.$1.$2.prg)
+	-$(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
+
+# this should fail to compile, because cc65 does not support returning structs
+$(WORKDIR)/bug264.$1.$2.prg: bug264.c | $(WORKDIR)
+	$(if $(QUIET),echo misc/bug264.$1.$2.prg)
+	-$(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
+
+# this should fail to compile, because there are errors in the code
+$(WORKDIR)/bug1048.$1.$2.prg: bug1048.c | $(WORKDIR)
+	$(if $(QUIET),echo misc/bug1048.$1.$2.prg)
+	-$(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
+
+# internal compiler error
+$(WORKDIR)/bug1075.$1.$2.prg: bug1075.c | $(WORKDIR)
+	$(if $(QUIET),echo misc/bug1075.$1.$2.prg)
+	-$(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
 
 # should compile, but then hangs in an endless loop
 $(WORKDIR)/endless.$1.$2.prg: endless.c | $(WORKDIR)
@@ -69,13 +104,13 @@ $(WORKDIR)/endless.$1.$2.prg: endless.c | $(WORKDIR)
 $(WORKDIR)/limits.$1.$2.prg: limits.c $(DIFF)
 	$(if $(QUIET),echo misc/limits.$1.$2.prg)
 	$(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
-	$(SIM65) $(SIM65FLAGS) $$@ > $(WORKDIR)/limits.$1.out
-	$(DIFF) $(WORKDIR)/limits.$1.out limits.ref
+	$(SIM65) $(SIM65FLAGS) $$@ > $(WORKDIR)/limits.$1.$2.out
+	$(DIFF) $(WORKDIR)/limits.$1.$2.out limits.ref
 
 $(WORKDIR)/goto.$1.$2.prg: goto.c $(DIFF)
 	$(if $(QUIET),echo misc/goto.$1.$2.prg)
-	$(CL65) -t sim$2 -$1 -o $$@ $$< 2>$(WORKDIR)/goto.$1.out
-	$(DIFF) $(WORKDIR)/goto.$1.out goto.ref
+	$(CL65) -t sim$2 -$1 -o $$@ $$< 2>$(WORKDIR)/goto.$1.$2.out
+	$(DIFF) $(WORKDIR)/goto.$1.$2.out goto.ref
 
 # the rest are tests that fail currently for one reason or another
 $(WORKDIR)/fields.$1.$2.prg: fields.c | $(WORKDIR)
@@ -86,10 +121,6 @@ $(WORKDIR)/sitest.$1.$2.prg: sitest.c | $(WORKDIR)
 	@echo "FIXME: " $$@ "currently will fail."
 	-$(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
 #	-$(SIM65) $(SIM65FLAGS) $$@ $(NULLOUT)
-$(WORKDIR)/cc65141011.$1.$2.prg: cc65141011.c | $(WORKDIR)
-	@echo "FIXME: " $$@ "currently can fail."
-	$(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
-	-$(SIM65) $(SIM65FLAGS) $$@ $(NULLOUT)
 
 endef # PRG_template
 

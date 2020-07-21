@@ -15,8 +15,7 @@
 #include <stdint.h>
 
 /* for faster execution */
-/*#pragma static-locals (on)*/
-/* disabled: enabling this seems to break o0 result with -O ? investigate */
+#pragma static-locals (on)
 
 /* values tested per seed */
 #define SUBTESTS 50

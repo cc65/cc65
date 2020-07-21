@@ -12,15 +12,11 @@
 #define BUF_SIZE        (PAGE_SIZE + PAGE_SIZE/2)
 static unsigned buf[BUF_SIZE];
 
-
-
 static void cleanup (void)
 /* Remove the driver on exit */
 {
     em_unload ();
 }
-
-
 
 static void fill (register unsigned* page, register unsigned char count, register unsigned num)
 {
@@ -29,8 +25,6 @@ static void fill (register unsigned* page, register unsigned char count, registe
         *page = num;
     }
 }
-
-
 
 static void cmp (unsigned page, register const unsigned* buf,
                  register unsigned char count, register unsigned num)
@@ -47,6 +41,19 @@ static void cmp (unsigned page, register const unsigned* buf,
             exit (EXIT_FAILURE);
         }
     }
+}
+
+static const char* em_error (int e)
+{
+  switch (e) {
+    case EM_ERR_OK: return "ok";
+    case EM_ERR_NO_DRIVER: return "no driver";
+    case EM_ERR_CANNOT_LOAD: return "cannot load";
+    case EM_ERR_INV_DRIVER: return "invalid driver";
+    case EM_ERR_NO_DEVICE: return "no device";
+    case EM_ERR_INSTALLED: return "already installed";
+    }
+  return "unknown";
 }
 
 typedef struct emd_test_s {
@@ -88,6 +95,7 @@ static emd_test_t drivers[] = {
     { '7', "C128 VDC (in C64 mode)", "c64-vdc.emd" },
     { '8', "C64DTV himem", "dtv-himem.emd" },
     { '9', "65816 extra banks", "c64-65816.emd" },
+    { 'k', "Kerberos", "c64-kerberos.emd" },
 #endif
 
 #if defined(__C128__)
@@ -142,7 +150,7 @@ int main (void)
     clrscr ();
     Res = em_load_driver (drivers[valid_key].drivername);
     if (Res != EM_ERR_OK) {
-        cprintf ("Error in em_load_driver: %u\r\n", Res);
+        cprintf ("Error in em_load_driver: %u\r\n%s\r\n", Res, em_error(Res));
         cprintf ("os: %u, %s\r\n", _oserror, _stroserror (_oserror));
 #ifdef __ATARI__
         cgetc ();
@@ -263,5 +271,4 @@ int main (void)
 #endif
 
     return 0;
-
 }

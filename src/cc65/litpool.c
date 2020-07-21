@@ -147,18 +147,6 @@ Literal* UseLiteral (Literal* L)
     /* Increase the reference count */
     ++L->RefCount;
 
-    /* If --local-strings was given, immediately output the literal */
-    if (IS_Get (&LocalStrings)) {
-        /* Switch to the proper data segment */
-        if (IS_Get (&WritableStrings)) {
-            g_usedata ();
-        } else {
-            g_userodata ();
-        }
-        /* Output the literal */
-        OutputLiteral (L);
-    }
-
     /* Return the literal */
     return L;
 }
@@ -454,12 +442,20 @@ static void OutputReadOnlyLiterals (Collection* Literals)
 
 
 
-void OutputLiteralPool (void)
-/* Output the global literal pool */
+void OutputLocalLiteralPool (LiteralPool* Pool)
+/* Output the local literal pool */
 {
     /* Output both sorts of literals */
-    OutputWritableLiterals (&GlobalPool->WritableLiterals);
-    OutputReadOnlyLiterals (&GlobalPool->ReadOnlyLiterals);
+    OutputWritableLiterals (&Pool->WritableLiterals);
+    OutputReadOnlyLiterals (&Pool->ReadOnlyLiterals);
+}
+
+
+
+void OutputGlobalLiteralPool (void)
+/* Output the global literal pool */
+{
+    OutputLocalLiteralPool (GlobalPool);
 }
 
 

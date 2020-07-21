@@ -33,6 +33,7 @@
 
 
 
+#include <limits.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -714,7 +715,7 @@ static SymEntry* ParseStructDecl (const char* Name)
 
     unsigned  StructSize;
     int       FlexibleMember;
-    int       BitOffs;          /* Bit offset for bit-fields */
+    unsigned  BitOffs;          /* Bit offset for bit-fields */
     int       FieldWidth;       /* Width in bits, -1 if not a bit-field */
     SymTable* FieldTab;
 
@@ -770,18 +771,23 @@ static SymEntry* ParseStructDecl (const char* Name)
             ** a member with an anonymous name.
             */
             if (BitOffs > 0) {
-                if (FieldWidth <= 0 || (BitOffs + FieldWidth) > (int) INT_BITS) {
+                if (FieldWidth <= 0 || (BitOffs + FieldWidth) > INT_BITS) {
+                    /* Bits needed to byte-align the next field.
+                    ** MSVC complains about unary negation of unsigned,
+                    ** so it has been rewritten as subtraction.
+                    */
+                    unsigned PaddingBits = (0 - BitOffs) % CHAR_BITS;
 
                     /* We need an anonymous name */
                     AnonName (Ident, "bit-field");
 
                     /* Add an anonymous bit-field that aligns to the next
-                    ** storage unit.
+                    ** byte.
                     */
-                    AddBitField (Ident, StructSize, BitOffs, INT_BITS - BitOffs);
+                    AddBitField (Ident, StructSize, BitOffs, PaddingBits);
 
                     /* No bits left */
-                    StructSize += SIZEOF_INT;
+                    StructSize += (BitOffs + PaddingBits) / CHAR_BITS;
                     BitOffs = 0;
                 }
             }
@@ -832,18 +838,18 @@ static SymEntry* ParseStructDecl (const char* Name)
 
             /* Add a field entry to the table */
             if (FieldWidth > 0) {
-                /* Add full byte from the bit offset to the variable offset.
-                ** This simplifies handling he bit-field as a char type
-                ** in expressions.
+                /* Full bytes have already been added to the StructSize,
+                ** which is passed to the offset of AddBitField.  BitOffs
+                ** is always within a char, which simplifies handling the
+                ** bit-field as a char type in expressions.
                 */
-                unsigned Offs = StructSize + (BitOffs / CHAR_BITS);
-                AddBitField (Decl.Ident, Offs, BitOffs % CHAR_BITS, FieldWidth);
+                CHECK (BitOffs < CHAR_BITS);
+                AddBitField (Decl.Ident, StructSize, BitOffs, FieldWidth);
                 BitOffs += FieldWidth;
-                CHECK (BitOffs <= (int) INT_BITS);
-                if (BitOffs == INT_BITS) {
-                    StructSize += SIZEOF_INT;
-                    BitOffs = 0;
-                }
+                CHECK (BitOffs <= INT_BITS);
+                /* Add any full bytes to the struct size. */
+                StructSize += BitOffs / CHAR_BITS;
+                BitOffs %= CHAR_BITS;
             } else {
                 AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, StructSize);
                 if (!FlexibleMember) {
@@ -1767,9 +1773,14 @@ static void DefineData (ExprDesc* Expr)
 {
     switch (ED_GetLoc (Expr)) {
 
+        case E_LOC_NONE:
+            /* Immediate numeric value with no storage */
+            g_defdata (CF_IMM | TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
+            break;
+
         case E_LOC_ABS:
-            /* Absolute: numeric address or const */
-            g_defdata (TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
+            /* Absolute numeric address */
+            g_defdata (CF_ABSOLUTE | TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
             break;
 
         case E_LOC_GLOBAL:
@@ -1813,12 +1824,17 @@ static void OutputBitFieldData (StructInitData* SI)
     if (SI->ValBits > 0) {
 
         /* Output the data */
-        g_defdata (CF_INT | CF_UNSIGNED | CF_CONST, SI->BitVal, 0);
+        g_defdata (CF_CHAR | CF_UNSIGNED | CF_CONST, SI->BitVal, 0);
 
-        /* Clear the data from SI and account for the size */
-        SI->BitVal  = 0;
-        SI->ValBits = 0;
-        SI->Offs   += SIZEOF_INT;
+        /* Update the data from SI and account for the size */
+        if (SI->ValBits >= CHAR_BITS) {
+            SI->BitVal >>= CHAR_BITS;
+            SI->ValBits -= CHAR_BITS;
+        } else {
+            SI->BitVal  = 0;
+            SI->ValBits = 0;
+        }
+        SI->Offs += SIZEOF_CHAR;
     }
 }
 
@@ -2050,10 +2066,14 @@ static unsigned ParseStructInit (Type* T, int AllowFlexibleMembers)
             ** have an initializer.
             */
             if (IsAnonName (Entry->Name)) {
-                /* Account for the data and output it if we have a full word */
+                /* Account for the data and output it if we have at least a
+                ** full word.  We may have more if there was storage unit
+                ** overlap, for example two consecutive 10 bit fields.
+                ** These will be packed into 3 bytes.
+                */
                 SI.ValBits += Entry->V.B.BitWidth;
-                CHECK (SI.ValBits <= INT_BITS);
-                if (SI.ValBits == INT_BITS) {
+                CHECK (SI.ValBits <= CHAR_BITS + INT_BITS - 2);
+                while (SI.ValBits >= CHAR_BITS) {
                     OutputBitFieldData (&SI);
                 }
                 goto NextMember;
@@ -2077,10 +2097,17 @@ static unsigned ParseStructInit (Type* T, int AllowFlexibleMembers)
             Shift = (Entry->V.B.Offs - SI.Offs) * CHAR_BITS + Entry->V.B.BitOffs;
             SI.BitVal |= (Val << Shift);
 
-            /* Account for the data and output it if we have a full word */
+            /* Account for the data and output any full bytes we have. */
             SI.ValBits += Entry->V.B.BitWidth;
-            CHECK (SI.ValBits <= INT_BITS);
-            if (SI.ValBits == INT_BITS) {
+            /* Make sure unsigned is big enough to hold the value, 22 bits.
+            ** This is 22 bits because the most we can have is 7 bits left
+            ** over from the previous OutputBitField call, plus 15 bits
+            ** from this field.  A 16-bit bit-field will always be byte
+            ** aligned, so will have padding before it.
+            */
+            CHECK (SI.ValBits <= CHAR_BIT * sizeof(SI.BitVal));
+            CHECK (SI.ValBits <= CHAR_BITS + INT_BITS - 2);
+            while (SI.ValBits >= CHAR_BITS) {
                 OutputBitFieldData (&SI);
             }
 
@@ -2120,6 +2147,7 @@ NextMember:
     ConsumeRCurly ();
 
     /* If we have data from a bit-field left, output it now */
+    CHECK (SI.ValBits < CHAR_BITS);
     OutputBitFieldData (&SI);
 
     /* If there are struct fields left, reserve additional storage */

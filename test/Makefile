@@ -16,8 +16,6 @@ WORKDIR = ../testwrk
 
 all: dotests
 
-.NOTPARALLEL:
-
 dotests: mostlyclean continue
 
 continue:

@@ -1353,7 +1353,7 @@ void CS_OutputEpilogue (const CodeSeg* S)
 */
 {
     if (S->Func) {
-        WriteOutput ("\n.endproc\n\n");
+        WriteOutput (".endproc\n\n");
     }
 }
 
@@ -1422,6 +1422,9 @@ void CS_Output (CodeSeg* S)
         /* Output the code */
         CE_Output (E);
     }
+
+    /* Prettyier formatting */
+    WriteOutput ("\n");
 
     /* If debug info is enabled, terminate the last line number information */
     if (DebugInfo) {
@@ -1557,9 +1560,9 @@ void CS_GenRegInfo (CodeSeg* S)
 
             /* If this insn is a branch on zero flag, we may have more info on
             ** register contents for one of both flow directions, but only if
-            ** there is a previous instruction.
+            ** we've gone through a previous instruction.
             */
-            if ((E->Info & OF_ZBRA) != 0 && (P = CS_GetPrevEntry (S, I)) != 0) {
+            if (LabelCount == 0 && (E->Info & OF_ZBRA) != 0 && (P = CS_GetPrevEntry (S, I)) != 0) {
 
                 /* Get the branch condition */
                 bc_t BC = GetBranchCond (E->OPC);

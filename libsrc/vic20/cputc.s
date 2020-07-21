@@ -10,8 +10,29 @@
         .import         gotoxy
         .import         PLOT
 
+.scope  KERNAL
+        .include        "cbm_kernal.inc"
+.endscope
+
         .include        "vic20.inc"
 
+; VIC-20 KERNAL routines (such as PLOT) do not always leave the color RAM
+; pointer CRAM_PTR pointing at the color RAM location matching the screen
+; RAM pointer SCREEN_PTR. Instead they update it when they need it to be
+; correct by calling UPDCRAMPTR.
+;
+; We make things more efficient by having conio always update CRAM_PTR when
+; we move the screen pointer to avoid extra calls to ensure it's updated
+; before doing screen output. (Among other things, We replace the ROM
+; version of PLOT with our own in libsrc/vic20/kplot.s to ensure this
+; precondition.)
+;
+; However, this means that CRAM_PTR may be (and is, after a cold boot)
+; incorrect for us at program startup, causing cputc() not to work. We fix
+; this with a constructor that ensures CRAM_PTR matches SCREEN_PTR.
+;
+        UPDCRAMPTR := KERNAL::UPDCRAMPTR    ; .constructor doesn't understand namespaces
+        .constructor    UPDCRAMPTR
 
 _cputcxy:
         pha                     ; Save C
@@ -74,10 +95,9 @@ L5:     inc     CURS_Y
 ; Handle character if high bit set
 
 L10:    and     #$7F
-        cmp     #$7E            ; PI?
+        cmp     #$7F            ; PI?
         bne     L11
         lda     #$5E            ; Load screen code for PI
-        bne     cputdirect
 L11:    ora     #$40
         bne     cputdirect
 

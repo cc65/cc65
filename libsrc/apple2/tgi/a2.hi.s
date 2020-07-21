@@ -175,6 +175,10 @@ INIT:
         ; Switch into graphics mode
         bit     MIXCLR
         bit     HIRES
+        .ifdef  __APPLE2ENH__
+        sta     IOUDISON
+        bit     DHIRESOFF
+        .endif
         bit     TXTCLR
 
         ; Beagle Bros Shape Mechanic fonts don't

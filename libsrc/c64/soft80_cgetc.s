@@ -46,17 +46,16 @@ invertcursor:
         lda     #$34
         sta     $01
 
-        ldy     #$00
         jsr     setcolor
 
         ldx     soft80_internal_cursorxlsb
+        ldy     #7
 @lp1:
         lda     (SCREEN_PTR),y
         eor     nibble,x
         sta     (SCREEN_PTR),y
-        iny
-        cpy     #8
-        bne     @lp1
+        dey
+        bpl     @lp1
 
         pla
         sta     $01             ; enable I/O
@@ -67,7 +66,7 @@ invertcursor:
         ; shown using the current textcolor without disturbing the "color voodoo"
         ; in soft80_cputc
 setcolor:
-        ;ldy     #0              ; is 0
+        ldy     #0
         bcs     @set
         ; restore old value
         lda     tmp1

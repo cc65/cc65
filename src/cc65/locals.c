@@ -260,7 +260,7 @@ static void ParseAutoDecl (Declaration* Decl)
                     Flags |= CF_CONST;
                 } else {
                     LoadExpr (CF_NONE, &Expr);
-                    ED_MakeRVal (&Expr);
+                    ED_MarkExprAsRVal (&Expr);
                 }
 
                 /* Push the value */
@@ -340,7 +340,7 @@ static void ParseAutoDecl (Declaration* Decl)
                 LoadExpr (CF_NONE, &Expr);
 
                 /* Store the value into the variable */
-                g_putstatic (TypeOf (Sym->Type), DataLabel, 0);
+                g_putstatic (CF_STATIC | TypeOf (Sym->Type), DataLabel, 0);
             }
 
             /* Mark the variable as referenced */

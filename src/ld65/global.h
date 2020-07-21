@@ -54,6 +54,8 @@ extern unsigned long    StartAddr;      /* Start address */
 
 extern unsigned char    VerboseMap;     /* Verbose map file */
 extern unsigned char    AllowMultDef;   /* Allow multiple definitions */
+extern unsigned char    LargeAlignment; /* Don't warn about large alignments */
+
 extern const char*      MapFileName;    /* Name of the map file */
 extern const char*      LabelFileName;  /* Name of the label file */
 extern const char*      DbgFileName;    /* Name of the debug file */

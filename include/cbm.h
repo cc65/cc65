@@ -168,7 +168,7 @@ unsigned char __fastcall__ kbrepeat (unsigned char mode);
 
 #if !defined(__CBM610__) && !defined(__PET__)
 void waitvsync (void);
-/* Wait for the start of the next frame */
+/* Wait for the start of the next video field. */
 #endif
 
 /*****************************************************************************/
@@ -208,6 +208,7 @@ void __fastcall__ cbm_k_second (unsigned char addr);
 void __fastcall__ cbm_k_setlfs (unsigned char LFN, unsigned char DEV,
                                 unsigned char SA);
 void __fastcall__ cbm_k_setnam (const char* Name);
+void __fastcall__ cbm_k_settim (unsigned long timer);
 void __fastcall__ cbm_k_talk (unsigned char dev);
 void __fastcall__ cbm_k_tksa (unsigned char addr);
 void cbm_k_udtim (void);

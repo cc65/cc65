@@ -7,6 +7,10 @@
 
 static int datavar = 10;
 
+static char hex[16] = { "0123456789abcdef" };
+static char charbuf[0x20];
+static char colbuf[0x20];
+
 void main(void)
 {
         int stackvar = 42;
@@ -21,11 +25,27 @@ void main(void)
         screensize(&xsize, &ysize);
 
         cputs("hello world");
+        gotoxy(0,0);
+        cpeeks(charbuf, 11);
+        gotoxy(12,0);
+        cputs(charbuf);
+
         cputsxy(0, 2, "colors:" );
         for (i = 0; i < 16; ++i) {
                 textcolor(i);
-                cputc('X');
+                cputc(hex[i]);
         }
+        for (i = 0; i < 16; ++i) {
+            gotoxy(7 + i, 2);
+            charbuf[i] = cpeekc();
+            colbuf[i] = cpeekcolor();
+        }
+        gotoxy(25, 2);
+        for (i = 0; i < 16; ++i) {
+            textcolor(colbuf[i]);
+            cputc(charbuf[i]);
+        }
+
         textcolor(1);
 
         gotoxy(0,4);
@@ -114,6 +134,17 @@ void main(void)
                 cputc(nn ? 'R' : ' ');
                 cputs(" revers");
                 revers(0);
+
+                for (i = 0; i < 9; ++i) {
+                    gotoxy(xsize - 10 + i, 3);
+                    charbuf[i] = cpeekc();
+                    colbuf[i] = cpeekrevers();
+                }
+                gotoxy(xsize - 10, 4);
+                for (i = 0; i < 9; ++i) {
+                    revers(colbuf[i]);
+                    cputc(charbuf[i]);
+                }
 
                 if ((n & 0x1f) == 0x00) {
                         nn = p[15];

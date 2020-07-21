@@ -225,6 +225,7 @@ declaration and usage.
 <item>cbm_save
 <item>cbm_write
 <item>get_tv
+<item>waitvsync
 </itemize>
 
 
@@ -316,6 +317,10 @@ Note that the graphics drivers are incompatible with the
   <tag><tt/c64-isepic.emd (c64_isepic_emd)/</tag>
   A driver for the ISEPIC cartridge. This driver offers just 8 pages of 256
   bytes each. Written and contributed by Marco van den Heuvel.
+
+  <tag><tt/c64-kerberos.emd (c64_kerberos_emd)/</tag>
+  A driver for the Kerberos MIDI Cartridge. The cartridge has 512
+  pages of 256 bytes for a total of 128KB.
 
   <tag><tt/c64-ram.emd (c64_ram_emd)/</tag>
   A driver for the hidden RAM below the I/O area and kernal ROM. Supports 47

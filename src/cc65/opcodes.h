@@ -114,6 +114,7 @@ typedef enum {
     OP65_SED,
     OP65_SEI,
     OP65_STA,
+    OP65_STP,                   /* 65c02, 65816 stop */
     OP65_STX,
     OP65_STY,
     OP65_STZ,

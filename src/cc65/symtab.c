@@ -488,24 +488,24 @@ SymEntry* FindTagSym (const char* Name)
 
 
 SymEntry* FindStructField (const Type* T, const char* Name)
-/* Find a struct field in the fields list */
+/* Find a struct/union field in the fields list */
 {
     SymEntry* Field = 0;
 
-    /* The given type may actually be a pointer to struct */
+    /* The given type may actually be a pointer to struct/union */
     if (IsTypePtr (T)) {
         ++T;
     }
 
-    /* Non-structs do not have any struct fields... */
+    /* Only structs/unions have struct/union fields... */
     if (IsClassStruct (T)) {
 
         /* Get a pointer to the struct/union type */
         const SymEntry* Struct = GetSymEntry (T);
         CHECK (Struct != 0);
 
-        /* Now search in the struct symbol table. Beware: The table may not
-        ** exist.
+        /* Now search in the struct/union symbol table. Beware: The table may
+        ** not exist.
         */
         if (Struct->V.S.SymTab) {
             Field = FindSymInTable (Struct->V.S.SymTab, Name, HashStr (Name));
@@ -597,7 +597,7 @@ SymEntry* AddStructSym (const char* Name, unsigned Type, unsigned Size, SymTable
 
 
 
-SymEntry* AddBitField (const char* Name, unsigned Offs, unsigned BitOffs, unsigned Width)
+SymEntry* AddBitField (const char* Name, unsigned Offs, unsigned BitOffs, unsigned BitWidth)
 /* Add a bit field to the local symbol table and return the symbol entry */
 {
     /* Do we have an entry with this name already? */
@@ -616,7 +616,7 @@ SymEntry* AddBitField (const char* Name, unsigned Offs, unsigned BitOffs, unsign
         Entry->Type         = type_uint;
         Entry->V.B.Offs     = Offs;
         Entry->V.B.BitOffs  = BitOffs;
-        Entry->V.B.BitWidth = Width;
+        Entry->V.B.BitWidth = BitWidth;
 
         /* Add the entry to the symbol table */
         AddSymEntry (SymTab, Entry);

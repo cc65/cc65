@@ -226,7 +226,7 @@ Here is a description of all the command line options:
   <tag><tt>--large-alignment</tt></tag>
 
   Disable warnings about a large combined alignment. See the discussion of the
-  <tt><ref id=".ALIGN" name=".ALIGN"></tt> directive for futher information.
+  <tt><ref id=".ALIGN" name=".ALIGN"></tt> directive for further information.
 
 
   <label id="option--list-bytes">
@@ -622,7 +622,7 @@ problem in most cases.
 <tabular ca="clc">
 <bf/Operator/| <bf/Description/| <bf/Precedence/@<hline>
 | Built-in string functions| 0@
-||~@
+~|~|~@
 | Built-in pseudo-variables| 1@
 | Built-in pseudo-functions| 1@
 +| Unary positive| 1@
@@ -635,7 +635,7 @@ problem in most cases.
 .HIBYTE| Unary high-byte operator| 1@
 ^<newline>
 .BANKBYTE| Unary bank-byte operator| 1@
-||~@
+~|~|~@
 *| Multiplication| 2@
 /| Division| 2@
 .MOD| Modulo operator| 2@
@@ -647,28 +647,28 @@ problem in most cases.
 .SHL| Shift-left operator| 2@
 &gt;&gt;<newline>
 .SHR| Shift-right operator| 2@
-||~@
+~|~|~@
 +| Binary addition| 3@
 -| Binary subtraction| 3@
 &verbar;<newline>
 .BITOR| Bitwise or| 3@
-||~@
+~|~|~@
 = | Compare operator (equal)| 4@
 &lt;&gt;| Compare operator (not equal)| 4@
 &lt;| Compare operator (less)| 4@
 &gt;| Compare operator (greater)| 4@
 &lt;=| Compare operator (less or equal)| 4@
 &gt;=| Compare operator (greater or equal)| 4@
-||~@
+~|~|~@
 &amp;&amp;<newline>
 .AND| Boolean and| 5@
 .XOR| Boolean xor| 5@
-||~@
+~|~|~@
 &verbar;&verbar;<newline>
 .OR| Boolean or| 6@
-||~@
+~|~|~@
 !<newline>
-.NOT| Boolean not| 7@<hline>
+.NOT| Boolean not| 7
 </tabular>
 <caption>Available operators, sorted by precedence
 </table>

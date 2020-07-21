@@ -9,7 +9,16 @@ compiler.
 
 /err  - contains tests that MUST NOT compile
 
+/todo - these tests fail due to open compiler issues.
+        when an issue was fixed, the test should get moved to /var
+
+/asm  - contains the assembler regression tests
+
+/dasm - contains the disassembler regression tests
+
 /misc - a few tests that need special care of some sort
+        tests that (incorrectly) fail to compile and other tests that fail and
+        do NOT return an exit code are collected here.
 
 
 to run the tests use "make" in this (top) directory, the makefile should exit

@@ -1,6 +1,7 @@
 ;
 ; 2010-11-02, Ullrich von Bassewitz
 ; 2014-09-10, Greg King
+; 2019-11-05, Piotr Fusik
 ;
 ; CC65 runtime: 8x8 => 16 signed multiplication
 ;
@@ -23,32 +24,19 @@ imul8x8r16:
         sta     ptr3
 
 imul8x8r16m:
+; Extend sign of Left-Hand Side
+        lda     #$7f
+        cmp     ptr3
+        adc     #$80
+        sta     ptr3+1
+
+; Clear .XY accumulator
+        ldy     #<$0000
         ldx     #>$0000
-        bit     ptr3
-        bpl     @L7
-        dex
-@L7:    stx     ptr3+1          ; Extend sign of Left-Hand Side
-        ldy     #<$0000         ; Clear .XY accumulator
-        ldx     #>$0000
+
+; Check the multiplier sign.
         lda     ptr1
-        bmi     NegMult
-        bpl     @L2             ; Branch always
-
-@L0:    tya                     ; Add current multiplicand
-        add     ptr3
-        tay
-        txa
-        adc     ptr3+1
-        tax
-
-@L1:    asl     ptr3
-        rol     ptr3+1
-@L2:    lsr     ptr1            ; Get next bit of Right-Hand Side into carry
-        bcs     @L0
-        bnz     @L1             ; Loop if more one-bits in multiplier
-
-        tya                     ; Put result into cc65's accumulator
-        rts
+        bpl     PosStart
 
 ; The multiplier is negative.
 ; Therefore, make it positive; and, subtract when multiplying.
@@ -56,20 +44,45 @@ NegMult:
         eor     #%11111111
         sta     ptr1
         inc     ptr1
-        bnz     @L2             ; Branch always
+        bnz     NegStart        ; Branch always
 
-@L0:    tya                     ; Subtract current multiplicand
-        sub     ptr3
+NegAdd:
+        tya                     ; Subtract current multiplicand
+;       sec
+        sbc     ptr3
         tay
         txa
         sbc     ptr3+1
         tax
 
-@L1:    asl     ptr3
+NegShift:
+        asl     ptr3
         rol     ptr3+1
-@L2:    lsr     ptr1            ; Get next bit of Right-Hand Side into carry
-        bcs     @L0
-        bnz     @L1             ; Loop if more one-bits in multiplier
+NegStart:
+        lsr     ptr1            ; Get next bit of Right-Hand Side into carry
+        bcs     NegAdd
+        bnz     NegShift        ; Loop if more one-bits in multiplier
+
+        tya                     ; Put result into cc65's accumulator
+        rts
+
+; The multiplier is positive.
+
+PosAdd:
+        tya                     ; Add current multiplicand
+        add     ptr3
+        tay
+        txa
+        adc     ptr3+1
+        tax
+
+PosShift:
+        asl     ptr3
+        rol     ptr3+1
+PosStart:
+        lsr     ptr1            ; Get next bit of Right-Hand Side into carry
+        bcs     PosAdd
+        bnz     PosShift        ; Loop if more one-bits in multiplier
 
         tya                     ; Put result into cc65's accumulator
         rts

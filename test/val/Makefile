@@ -24,7 +24,7 @@ ifdef QUIET
   NULLERR = 2>$(NULLDEV)
 endif
 
-SIM65FLAGS = -x 200000000
+SIM65FLAGS = -x 5000000000
 
 CL65 := $(if $(wildcard ../../bin/cl65*),..$S..$Sbin$Scl65,cl65)
 SIM65 := $(if $(wildcard ../../bin/sim65*),..$S..$Sbin$Ssim65,sim65)
@@ -40,6 +40,11 @@ TESTS  = $(foreach option,$(OPTIONS),$(SOURCES:%.c=$(WORKDIR)/%.$(option).6502.p
 TESTS += $(foreach option,$(OPTIONS),$(SOURCES:%.c=$(WORKDIR)/%.$(option).65c02.prg))
 
 all: $(TESTS)
+
+# The same input file is processed with different cl65 args,
+# but cl65 uses the input file name to make the temp file name,
+# and they stomp each other.
+.NOTPARALLEL:
 
 $(WORKDIR):
 	$(call MKDIR,$(WORKDIR))

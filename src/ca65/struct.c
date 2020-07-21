@@ -87,6 +87,7 @@ static long Member (long AllocSize)
     /* Check the size for a reasonable value */
     if (AllocSize >= 0x1000000) {
         ErrorSkip ("Range error");
+        AllocSize = 1;
     }
 
     /* Return the size */
@@ -193,7 +194,13 @@ static long DoStructInternal (long Offs, unsigned Type)
                 if (CurTok.Tok == TOK_SEP) {
                     ErrorSkip ("Address is missing");
                 } else {
-                    Offs = Member (1);
+                    Offs = ConstExpression ();
+
+                    /* Check the address for a reasonable value */
+                    if (Offs >= 0x1000000) {
+                        ErrorSkip ("Range error");
+                        Offs = 0;
+                    }
                 }
                 break;
 

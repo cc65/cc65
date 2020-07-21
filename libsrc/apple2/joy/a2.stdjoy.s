@@ -19,13 +19,8 @@
 
 ; Constants
 
-THRESHOLD =     20      ; Deviation from center triggering movement
-
-; ------------------------------------------------------------------------
-
-; ROM entry points
-
-PREAD   :=      $FB1E   ; Read paddle in X, return AD conv. value in Y
+LOWER_THRESHOLD =   05
+UPPER_THRESHOLD =   85
 
 ; ------------------------------------------------------------------------
 
@@ -44,24 +39,38 @@ PREAD   :=      $FB1E   ; Read paddle in X, return AD conv. value in Y
 
 ; Library reference
 
-        .addr   $0000
+libref: .addr   $0000
 
 ; Jump table
 
         .addr   INSTALL
         .addr   UNINSTALL
         .addr   COUNT
-        .addr   READJOY
+        .addr   READ
 
 ; ------------------------------------------------------------------------
 
-        .code
+        .bss
+
+ostype: .res    1
+value0: .res    1
+value1: .res    1
+
+; ------------------------------------------------------------------------
+
+        .data
 
 ; INSTALL routine. Is called after the driver is loaded into memory. If
 ; possible, check if the hardware is present and determine the amount of
 ; memory available.
 ; Must return an JOY_ERR_xx code in a/x.
 INSTALL:
+        lda     libref
+        ldx     libref+1
+        sta     gettype+1
+        stx     gettype+2
+gettype:jsr     $0000
+        sta     ostype
         lda     #<JOY_ERR_OK
         ldx     #>JOY_ERR_OK
         ; Fall through
@@ -71,57 +80,94 @@ INSTALL:
 UNINSTALL:
         rts
 
-; COUNT: Return the total number of available joysticks in a/x.
+; ------------------------------------------------------------------------
+
+        .code
+
+; COUNT routine. Return the total number of available joysticks in a/x.
 COUNT:
-        lda     #$02            ; Number of joysticks we support
+        ldx     #$02
+        bit     ostype
+        bvc     noiic           ; Not $4x
+        dex                     ; Only one joystick for the //c
+noiic:  txa                     ; Number of joysticks we support
         ldx     #$00
         rts
 
-; READ: Read a particular joystick passed in A.
-READJOY:
-        bit     $C082           ; Switch in ROM
-        and     #$01            ; Restrict joystick number
-
-        ; Read horizontal paddle
+; READ routine. Read a particular joystick passed in A.
+READ:
         asl                     ; Joystick number -> paddle number
-        tax                     ; Set paddle number (0, 2)
-        jsr     PREAD           ; Read paddle value
-        lda     #$00            ; 0 0 0 0 0 0 0 0
-        cpy     #127 - THRESHOLD
-        ror                     ; !LEFT 0 0 0 0 0 0 0
-        cpy     #127 + THRESHOLD
-        ror                     ; RIGHT !LEFT 0 0 0 0 0 0
+        tax
+        ldy     #$00
+        sty     value0
+        sty     value1
 
-        ; Read vertical paddle
+        ; If IIgs -> set speed to normal
+        bit     ostype
+        bpl     nogs1           ; Not $8x
+        lda     CYAREG
         pha
-        inx                     ; Set paddle number (1, 3)
-        jsr     PREAD           ; Read paddle value
+        and     #%01111111
+        sta     CYAREG
+
+        ; Read both paddles simultaneously according to:
+        ; Apple IIe Technote #6, The Apple II Paddle Circuits
+nogs1:  lda     PTRIG           ; Trigger paddles
+loop:   lda     PADDL0,x        ; Read paddle (0 or 2)
+        bmi     set0            ; Cycles:   2   3
+        nop                     ; Cycles:   2
+        bpl     nop0            ; Cycles:   3
+set0:   sty     value0          ; Cycles:       4
+nop0:                           ;           -   -
+                                ; Cycles:   7   7
+        lda     PADDL1,x        ; Read paddle (1 or 3)
+        bmi     set1            ; Cycles:   2   3
+        nop                     ; Cycles:   2
+        bpl     nop1            ; Cycles:   3
+set1:   sty     value1          ; Cycles:       4
+nop1:                           ;           -   -
+                                ; Cycles:   7   7
+        iny
+        cpy     #UPPER_THRESHOLD+1
+        bne     loop
+
+        ; If IIgs -> restore speed
+        bit     ostype
+        bpl     nogs2           ; Not $8x
         pla
-        cpy     #127 - THRESHOLD
+        sta     CYAREG
+
+        ; Transform paddle readings to directions
+nogs2:  lda     #$00            ; 0 0 0 0 0 0 0 0
+        ldy     value0
+        cpy     #LOWER_THRESHOLD
+        ror                     ; !LEFT 0 0 0 0 0 0 0
+        cpy     #UPPER_THRESHOLD
+        ror                     ; RIGHT !LEFT 0 0 0 0 0 0
+        ldy     value1
+        cpy     #LOWER_THRESHOLD
         ror                     ; !UP RIGHT !LEFT 0 0 0 0 0
-        cpy     #127 + THRESHOLD
+        cpy     #UPPER_THRESHOLD
         ror                     ; DOWN !UP RIGHT !LEFT 0 0 0 0
 
         ; Read primary button
         tay
-        lda     BUTN0-1,x       ; Check button (1, 3)
+        lda     BUTN0,x         ; Check button (0 or 2)
         asl
         tya
-        ror                     ; BTN DOWN !UP RIGHT !LEFT 0 0 0
+        ror                     ; BTN_1 DOWN !UP RIGHT !LEFT 0 0 0
 
         ; Read secondary button
         tay
-        inx
         txa
-        and     #$03            ; IIgs has fourth button at TAPEIN
+        eor     #$02            ; IIgs has fourth button at TAPEIN
         tax
-        lda     BUTN0-1,x       ; Check button (2, 0)
+        lda     TAPEIN,x        ; Check button (1 or 3)
         asl
         tya
-        ror                     ; BTN2 BTN DOWN !UP RIGHT !LEFT 0 0
+        ror                     ; BTN_2 BTN_1 DOWN !UP RIGHT !LEFT 0 0
 
         ; Finalize
-        eor     #%00010100      ; BTN2 BTN DOWN UP RIGHT LEFT 0 0
+        eor     #%00010100      ; BTN_2 BTN_1 DOWN UP RIGHT LEFT 0 0
         ldx     #$00
-        bit     $C080           ; Switch in LC bank 2 for R/O
         rts

@@ -1,21 +1,21 @@
+; isalpha.s
 ;
-; Ullrich von Bassewitz, 02.06.1998
+; This file is part of
+; cc65 - a freeware C compiler for 6502 based systems
+;
+; https://cc65.github.io
+;
+; See "LICENSE" file for legal information.
 ;
 ; int isalpha (int c);
 ;
 
         .export         _isalpha
         .include        "ctype.inc"
+        .import         ctypemask
 
 _isalpha:
-        cpx     #$00            ; Char range ok?
-        bne     @L1             ; Jump if no
-        tay
-        lda     __ctype,y       ; Get character classification
-        and     #CT_ALPHA       ; Mask character bits
-        rts
-
-@L1:    lda     #$00            ; Return false
-        tax
-        rts
-
+        jsr     ctypemask      ; (always clears X)
+        bcs     @L1                     ; out of range? (everything already clear -> false)
+        and     #CT_ALPHA               ; mask character bits
+@L1:    rts

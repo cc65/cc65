@@ -753,7 +753,7 @@ static void ParseSegments (void)
 
                 case CFGTOK_START:
                     FlagAttr (&S->Attr, SA_START, "START");
-                    S->Addr   = CfgCheckedConstExpr (1, 0x1000000);
+                    S->Addr   = CfgCheckedConstExpr (0, 0x1000000);
                     S->Flags |= SF_START;
                     break;
 
@@ -2107,10 +2107,12 @@ unsigned CfgProcess (void)
             Addr += S->Seg->Size;
 
             /* If this segment will go out to the file, or its place
-            ** in the file will be filled, then increase the file size.
+            ** in the file will be filled, then increase the file size,
+            ** unless it's an OVERWRITE segment.
             */
             if (S->Load == M &&
-                ((S->Flags & SF_BSS) == 0 || (M->Flags & MF_FILL) != 0)) {
+                ((S->Flags & SF_BSS) == 0 || (M->Flags & MF_FILL) != 0) &&
+                    (S->Flags & SF_OVERWRITE) == 0) {
                 M->F->Size += Addr - StartAddr;
             }
         }

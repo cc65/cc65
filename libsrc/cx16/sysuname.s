@@ -9,7 +9,7 @@
 
         .import         utscopy
 
-__sysuname 	:= 	utscopy
+__sysuname      :=      utscopy
 
 ;--------------------------------------------------------------------------
 ; Data. We define a fixed utsname struct here, and just copy it.

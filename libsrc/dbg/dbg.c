@@ -16,7 +16,6 @@
 #include <dbg.h>
 
 
-
 /*****************************************************************************/
 /*                             Function forwards                             */
 /*****************************************************************************/
@@ -1580,8 +1579,12 @@ void DbgEntry (void)
             case 'q':
                 /* Quit program */
                 clrscr ();
-                exit (1);
-
+                
+                /* Exit intentionally with error because one may
+                **  say that DbgEntry is always abnormal. 
+                */
+                exit (EXIT_FAILURE);
+        
         }
     }
 }

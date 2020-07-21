@@ -343,7 +343,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             ** address calculation could overflow in the linker.
             */
             int AllowOneIndex = !ED_IsLocRegister (&Arg2.Expr) &&
-                                !(ED_IsLocAbs (&Arg2.Expr) && Arg2.Expr.IVal < 256);
+                                !(ED_IsLocNone (&Arg2.Expr) && Arg2.Expr.IVal < 256);
 
             /* Calculate the real stack offset */
             Offs = ED_GetStackOffs (&Arg1.Expr, 0);
@@ -421,7 +421,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             ** address calculation could overflow in the linker.
             */
             int AllowOneIndex = !ED_IsLocRegister (&Arg1.Expr) &&
-                                !(ED_IsLocAbs (&Arg1.Expr) && Arg1.Expr.IVal < 256);
+                                !(ED_IsLocNone (&Arg1.Expr) && Arg1.Expr.IVal < 256);
 
             /* Calculate the real stack offset */
             Offs = ED_GetStackOffs (&Arg2.Expr, 0);
@@ -520,7 +520,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             AddCodeLine ("lda ptr1");
 
             /* The function result is an rvalue in the primary register */
-            ED_MakeRValExpr (Expr);
+            ED_FinalizeRValLoad (Expr);
             Expr->Type = GetFuncReturn (Expr->Type);
 
             /* Bail out, no need for further processing */
@@ -529,7 +529,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     }
 
     /* The function result is an rvalue in the primary register */
-    ED_MakeRValExpr (Expr);
+    ED_FinalizeRValLoad (Expr);
     Expr->Type = GetFuncReturn (Expr->Type);
 
 ExitPoint:
@@ -743,7 +743,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             AddCodeLine ("lda ptr1");
 
             /* The function result is an rvalue in the primary register */
-            ED_MakeRValExpr (Expr);
+            ED_FinalizeRValLoad (Expr);
             Expr->Type = GetFuncReturn (Expr->Type);
 
             /* Bail out, no need for further processing */
@@ -752,7 +752,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     }
 
     /* The function result is an rvalue in the primary register */
-    ED_MakeRValExpr (Expr);
+    ED_FinalizeRValLoad (Expr);
     Expr->Type = GetFuncReturn (Expr->Type);
 
 ExitPoint:
@@ -955,7 +955,7 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     }
 
     /* The function result is an rvalue in the primary register */
-    ED_MakeRValExpr (Expr);
+    ED_FinalizeRValLoad (Expr);
     Expr->Type = GetFuncReturn (Expr->Type);
 
     /* We expect the closing brace */
@@ -1069,7 +1069,7 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             ** address calculation could overflow in the linker.
             */
             int AllowOneIndex = !ED_IsLocRegister (&Arg1.Expr) &&
-                                !(ED_IsLocAbs (&Arg1.Expr) && Arg1.Expr.IVal < 256);
+                                !(ED_IsLocNone (&Arg1.Expr) && Arg1.Expr.IVal < 256);
 
             /* Calculate the real stack offset */
             int Offs = ED_GetStackOffs (&Arg2.Expr, 0);
@@ -1116,7 +1116,7 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             ** address calculation could overflow in the linker.
             */
             int AllowOneIndex = !ED_IsLocRegister (&Arg2.Expr) &&
-                                !(ED_IsLocAbs (&Arg2.Expr) && Arg2.Expr.IVal < 256);
+                                !(ED_IsLocNone (&Arg2.Expr) && Arg2.Expr.IVal < 256);
 
             /* Calculate the real stack offset */
             int Offs = ED_GetStackOffs (&Arg1.Expr, 0);
@@ -1153,7 +1153,7 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     }
 
     /* The function result is an rvalue in the primary register */
-    ED_MakeRValExpr (Expr);
+    ED_FinalizeRValLoad (Expr);
     Expr->Type = GetFuncReturn (Expr->Type);
 
 ExitPoint:
@@ -1250,7 +1250,7 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             AddCodeLine ("tya");
 
             /* The function result is an rvalue in the primary register */
-            ED_MakeRValExpr (Expr);
+            ED_FinalizeRValLoad (Expr);
             Expr->Type = type_size_t;
 
             /* Bail out, no need for further processing */
@@ -1279,7 +1279,7 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             AddCodeLine ("ldx #$00");
 
             /* The function result is an rvalue in the primary register */
-            ED_MakeRValExpr (Expr);
+            ED_FinalizeRValLoad (Expr);
             Expr->Type = type_size_t;
 
             /* Bail out, no need for further processing */
@@ -1304,7 +1304,7 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             AddCodeLine ("tya");
 
             /* The function result is an rvalue in the primary register */
-            ED_MakeRValExpr (Expr);
+            ED_FinalizeRValLoad (Expr);
             Expr->Type = type_size_t;
 
             /* Bail out, no need for further processing */
@@ -1333,7 +1333,7 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             AddCodeLine ("tya");
 
             /* The function result is an rvalue in the primary register */
-            ED_MakeRValExpr (Expr);
+            ED_FinalizeRValLoad (Expr);
             Expr->Type = type_size_t;
 
             /* Bail out, no need for further processing */
@@ -1348,7 +1348,7 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     AddCodeLine ("jsr _%s", Func_strlen);
 
     /* The function result is an rvalue in the primary register */
-    ED_MakeRValExpr (Expr);
+    ED_FinalizeRValLoad (Expr);
     Expr->Type = type_size_t;
 
 ExitPoint:

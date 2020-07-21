@@ -58,6 +58,9 @@ endef # OPCODE_template
 
 $(foreach cpu,$(OPCODE_CPUS),$(eval $(call OPCODE_template,$(cpu))))
 
+# cpudetect.o is written by multiple rules
+.NOTPARALLEL:
+
 define CPUDETECT_template
 
 $(WORKDIR)/$1-cpudetect.bin: cpudetect.s $(DIFF)

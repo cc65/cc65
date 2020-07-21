@@ -1,30 +1,40 @@
 ;
-; 2009-09-07, Ullrich von Bassewitz
-; 2019-09-23, Greg King
+; 2020-01-06, Greg King
 ;
-; unsigned __fastcall__ videomode (unsigned Mode);
-; /* Set the video mode, return the old mode. */
+; /* Video mode defines */
+; #define VIDEOMODE_40x30         0x00
+; #define VIDEOMODE_80x60         0x02
+; #define VIDEOMODE_320x200       0x80
+; #define VIDEOMODE_SWAP          (-1)
+;
+; signed char __fastcall__ videomode (signed char Mode);
+; /* Set the video mode, return the old mode.
+; ** Return -1 if Mode isn't valid.
+; ** Call with one of the VIDEOMODE_xx constants.
+; */
 ;
 
         .export         _videomode
-        .import         SWAPPER
 
+        .import         SCREEN_SET_MODE
         .include        "cx16.inc"
 
 
 .proc   _videomode
-        cmp     LLEN                    ; Do we have this mode already?
-        beq     @L9
+        ldx     SCREEN_MODE     ; Get old mode
+        phx
 
-        lda     LLEN                    ; Get current mode ...
-        pha                             ; ... and save it
+        jsr     SCREEN_SET_MODE
 
-        jsr     SWAPPER                 ; Toggle the mode
+        pla                     ; Get back old mode
+        ldx     #>$0000         ; Clear high byte
+        bcs     @L1
+        rts
 
-        pla                             ; Get old mode into A
+; The new mode is invalid.  Go back to the old one.  Return -1.
 
-; Done, old mode is in .A
-
-@L9:    ldx     #>$0000                 ; Clear high byte
+@L1:    sta     SCREEN_MODE
+        dex
+        txa
         rts
 .endproc

@@ -71,8 +71,8 @@ define PRG_template
 $(WORKDIR)/%.$1.$2.prg: %.c $(WORKDIR)/%.ref $(DIFF)
 	$(if $(QUIET),echo ref/$$*.$1.$2.prg)
 	$(CL65) -t sim$2 $$(CC65FLAGS) -$1 -o $$@ $$< $(NULLERR)
-	$(SIM65) $(SIM65FLAGS) $$@ > $(WORKDIR)/$$*.out
-	$(DIFF) $(WORKDIR)/$$*.out $(WORKDIR)/$$*.ref
+	$(SIM65) $(SIM65FLAGS) $$@ > $(WORKDIR)/$$*.$1.$2.out
+	$(DIFF) $(WORKDIR)/$$*.$1.$2.out $(WORKDIR)/$$*.ref
 
 endef # PRG_template
 

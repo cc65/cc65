@@ -633,7 +633,7 @@ SymEntry* AddConstSym (const char* Name, const Type* T, unsigned Flags, long Val
 /* Add an constant symbol to the symbol table and return it */
 {
     /* Enums must be inserted in the global symbol table */
-    SymTable* Tab = ((Flags & SC_ENUM) == SC_ENUM)? SymTab0 : SymTab;
+    SymTable* Tab = ((Flags & SC_ENUMERATOR) == SC_ENUMERATOR) ? SymTab0 : SymTab;
 
     /* Do we have an entry with this name already? */
     SymEntry* Entry = FindSymInTable (Tab, Name, HashStr (Name));
@@ -867,8 +867,8 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
         /* If the existing symbol is an enumerated constant,
         ** then avoid a compiler crash.  See GitHub issue #728.
         */
-        if (Entry->Flags & SC_ENUM) {
-            Fatal ("Can't redeclare enum constant '%s' as global variable", Name);
+        if (Entry->Flags & SC_ENUMERATOR) {
+            Fatal ("Can't redeclare enumerator constant '%s' as global variable", Name);
         }
 
         /* We have a symbol with this name already */

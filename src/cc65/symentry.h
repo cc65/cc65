@@ -72,9 +72,10 @@ struct CodeEntry;
 #define SC_NONE         0x0000U         /* Nothing */
 #define SC_STRUCT       0x0001U         /* Struct */
 #define SC_UNION        0x0002U         /* Union */
-#define SC_TYPEDEF      0x0004U         /* A typedef */
+#define SC_ENUM         0x0003U         /* Enum */
+#define SC_TYPEDEF      0x0004U         /* Typedef */
 #define SC_ESUTYPEMASK  0x0007U         /* Mask for above types */
-#define SC_ENUM         0x0008U         /* An enumerator */
+#define SC_ENUMERATOR   0x0008U         /* An enumerator */
 #define SC_BITFIELD     0x0010U         /* A bit-field inside a struct or union */
 #define SC_TYPEMASK     0x001FU         /* Mask for above types */
 

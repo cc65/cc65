@@ -113,26 +113,29 @@ void DumpSymEntry (FILE* F, const SymEntry* E)
         { "SC_TYPEDEF",     SC_TYPEDEF          },
         { "SC_UNION",       SC_UNION            },
         { "SC_STRUCT",      SC_STRUCT           },
+        { "SC_ENUM",        SC_ENUM             },
     };
 
-    static SCFlagTable Flags[] = {
-        /* Beware: Order is important! */
+    static SCFlagTable Types[] = {
         { "SC_BITFIELD",    SC_BITFIELD         },
         { "SC_STRUCTFIELD", SC_STRUCTFIELD      },
-        { "SC_AUTO",        SC_AUTO             },
-        { "SC_REGISTER",    SC_REGISTER         },
-        { "SC_STATIC",      SC_STATIC           },
-        { "SC_EXTERN",      SC_EXTERN           },
-        { "SC_ENUM",        SC_ENUM             },
+        { "SC_ENUMERATOR",  SC_ENUMERATOR       },
         { "SC_CONST",       SC_CONST            },
         { "SC_LABEL",       SC_LABEL            },
         { "SC_PARAM",       SC_PARAM            },
         { "SC_FUNC",        SC_FUNC             },
+    };
+
+    static SCFlagTable Storages[] = {
+        { "SC_AUTO",        SC_AUTO             },
+        { "SC_REGISTER",    SC_REGISTER         },
+        { "SC_STATIC",      SC_STATIC           },
+        { "SC_EXTERN",      SC_EXTERN           },
         { "SC_STORAGE",     SC_STORAGE          },
+        { "SC_ZEROPAGE",    SC_ZEROPAGE         },
         { "SC_DECL",        SC_DECL             },
         { "SC_DEF",         SC_DEF              },
         { "SC_REF",         SC_REF              },
-        { "SC_ZEROPAGE",    SC_ZEROPAGE         },
     };
 
     unsigned I;
@@ -149,18 +152,28 @@ void DumpSymEntry (FILE* F, const SymEntry* E)
     /* Print the flags */
     SymFlags = E->Flags;
     fprintf (F, "    Flags:");
+    /* Enum, struct, union and typedefs */
     if ((SymFlags & SC_ESUTYPEMASK) != 0) {
         for (I = 0; I < sizeof (ESUTypes) / sizeof (ESUTypes[0]); ++I) {
             if ((SymFlags & SC_ESUTYPEMASK) == ESUTypes[I].Val) {
                 SymFlags &= ~SC_ESUTYPEMASK;
                 fprintf (F, " %s", ESUTypes[I].Name);
+                break;
             }
         }
     }
-    for (I = 0; I < sizeof (Flags) / sizeof (Flags[0]) && SymFlags != 0; ++I) {
-        if ((SymFlags & Flags[I].Val) == Flags[I].Val) {
-            SymFlags &= ~Flags[I].Val;
-            fprintf (F, " %s", Flags[I].Name);
+    /* Other type flags */
+    for (I = 0; I < sizeof (Types) / sizeof (Types[0]) && SymFlags != 0; ++I) {
+        if ((SymFlags & Types[I].Val) == Types[I].Val) {
+            SymFlags &= ~Types[I].Val;
+            fprintf (F, " %s", Types[I].Name);
+        }
+    }
+    /* Storage flags */
+    for (I = 0; I < sizeof (Storages) / sizeof (Storages[0]) && SymFlags != 0; ++I) {
+        if ((SymFlags & Storages[I].Val) == Storages[I].Val) {
+            SymFlags &= ~Storages[I].Val;
+            fprintf (F, " %s", Storages[I].Name);
         }
     }
     if (SymFlags != 0) {

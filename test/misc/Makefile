@@ -64,11 +64,6 @@ $(DIFF): ../bdiff.c | $(WORKDIR)
 define PRG_template
 
 # should compile, but gives an error
-$(WORKDIR)/bug975.$1.$2.prg: bug975.c | $(WORKDIR)
-	$(if $(QUIET),echo misc/bug975.$1.$2.prg)
-	$(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
-
-# should compile, but gives an error
 $(WORKDIR)/bug250.$1.$2.prg: bug250.c | $(WORKDIR)
 	@echo "FIXME: " $$@ "currently does not compile."
 	$(if $(QUIET),echo misc/bug250.$1.$2.prg)
@@ -98,7 +93,7 @@ $(WORKDIR)/bug1048.$1.$2.prg: bug1048.c | $(WORKDIR)
 	$(if $(QUIET),echo misc/bug1048.$1.$2.prg)
 	$(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
 
-# internal compiler error
+# compiles, but we cant easily check if it works
 $(WORKDIR)/bug1075.$1.$2.prg: bug1075.c | $(WORKDIR)
 	$(if $(QUIET),echo misc/bug1075.$1.$2.prg)
 	$(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
@@ -123,11 +118,6 @@ $(WORKDIR)/goto.$1.$2.prg: goto.c $(DIFF) | $(WORKDIR)
 	$(DIFF) $(WORKDIR)/goto.$1.$2.out goto.ref
 
 # the rest are tests that fail currently for one reason or another
-$(WORKDIR)/fields.$1.$2.prg: fields.c | $(WORKDIR)
-	@echo "FIXME: " $$@ "currently will fail."
-	$(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
-	$(SIM65) $(SIM65FLAGS) $$@ $(NULLOUT)
-
 $(WORKDIR)/sitest.$1.$2.prg: sitest.c | $(WORKDIR)
 	@echo "FIXME: " $$@ "currently does not compile."
 	$(NOT) $(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)

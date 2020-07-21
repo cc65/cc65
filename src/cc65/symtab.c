@@ -717,7 +717,7 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
         for (i = 0; i < CollCount (Entry->V.L.DefsOrRefs); i++) {
             DOR = CollAt (Entry->V.L.DefsOrRefs, i);
 
-            if ((DOR->Flags & SC_DEF) && (Flags & SC_REF) && (Flags & (SC_GOTO|SC_GOTO_IND))) {
+            if ((DOR->Flags & SC_DEF) && (Flags & SC_REF) && (Flags & (SC_GOTO | SC_GOTO_IND))) {
                 /* We're processing a goto and here is its destination label.
                 ** This means the difference between SP values is already known,
                 ** so we simply emit the SP adjustment code.
@@ -739,7 +739,7 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
             }
 
 
-            if ((DOR->Flags & SC_REF) && (DOR->Flags & (SC_GOTO|SC_GOTO_IND)) && (Flags & SC_DEF)) {
+            if ((DOR->Flags & SC_REF) && (DOR->Flags & (SC_GOTO | SC_GOTO_IND)) && (Flags & SC_DEF)) {
                 /* We're processing a label, let's update all gotos encountered
                 ** so far
                 */
@@ -1109,7 +1109,7 @@ void EmitDebugInfo (void)
         }
         Sym = SymTab->SymHead;
         while (Sym) {
-            if ((Sym->Flags & (SC_CONST|SC_TYPEMASK)) == 0) {
+            if ((Sym->Flags & (SC_CONST | SC_TYPEMASK)) == 0) {
                 if (Sym->Flags & SC_AUTO) {
                     AddTextLine ("%s, \"%s\", \"00\", auto, %d",
                                  Head, Sym->Name, Sym->V.Offs);

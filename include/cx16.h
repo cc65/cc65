@@ -290,7 +290,7 @@ struct __emul {
     unsigned char       keymap;         /* Keyboard layout number */
        const char       detect[2];      /* "16" if running on x16emu */
 };
-#define EMULATOR        (*(volatile struct __emul)0x9FB0)
+#define EMULATOR        (*(volatile struct __emul *)0x9FB0)
 
 /* An array window into the half Mebibyte or two Mebibytes of banked RAM */
 #define BANK_RAM        ((unsigned char[0x2000])0xA000)

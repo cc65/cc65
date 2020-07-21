@@ -74,24 +74,22 @@ struct CodeEntry;
 #define SC_UNION        0x0002U         /* Union */
 #define SC_TYPEDEF      0x0004U         /* A typedef */
 #define SC_ESUTYPEMASK  0x0007U         /* Mask for above types */
-#define SC_ENUM         0x0008U         /* An enum */
+#define SC_ENUM         0x0008U         /* An enumerator */
 #define SC_BITFIELD     0x0010U         /* A bit-field inside a struct or union */
 #define SC_TYPEMASK     0x001FU         /* Mask for above types */
 
-#define SC_CONST        0x0020U         /* A numeric constant with a type */
+#define SC_FUNC         0x0020U         /* A function */
 #define SC_LABEL        0x0040U         /* A goto code label */
-#define SC_PARAM        0x0080U         /* A function parameter */
-#define SC_FUNC         0x0100U         /* A function */
+#define SC_CONST        0x0080U         /* A numeric constant with a type */
+#define SC_PARAM        0x0100U         /* A function parameter */
 #define SC_DEFTYPE      0x0200U         /* Parameter has default type (=int, old style) */
 #define SC_STRUCTFIELD  0x0400U         /* Struct or union field */
 
-#define SC_DECL         0x0800U         /* Symbol is declared in global scope */
+#define SC_ZEROPAGE     0x0800U         /* Symbol marked as zeropage */
 
 #define SC_DEF          0x1000U         /* Symbol is defined */
 #define SC_REF          0x2000U         /* Symbol is referenced */
-
-#define SC_ZEROPAGE     0x4000U         /* Symbol marked as zeropage */
-
+#define SC_DECL         0x4000U         /* Symbol is declared in global scope */
 #define SC_STORAGE      0x8000U         /* Symbol with associated storage */
 
 #define SC_AUTO         0x010000U       /* Auto variable */
@@ -217,10 +215,10 @@ INLINE int SymIsBitField (const SymEntry* Sym)
 INLINE int SymIsTypeDef (const SymEntry* Sym)
 /* Return true if the given entry is a typedef entry */
 {
-    return ((Sym->Flags & SC_TYPEDEF) == SC_TYPEDEF);
+    return ((Sym->Flags & SC_TYPEMASK) == SC_TYPEDEF);
 }
 #else
-#  define SymIsTypeDef(Sym)     (((Sym)->Flags & SC_TYPEDEF) == SC_TYPEDEF)
+#  define SymIsTypeDef(Sym)     (((Sym)->Flags & SC_TYPEMASK) == SC_TYPEDEF)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -251,7 +249,7 @@ INLINE int SymIsRegVar (const SymEntry* Sym)
     return ((Sym->Flags & (SC_REGISTER|SC_TYPEMASK)) == SC_REGISTER);
 }
 #else
-#  define SymIsRegVar(Sym)  (((Sym)->Flags & (SC_REGISTER|SC_ESUTYPEMASK)) == SC_REGISTER)
+#  define SymIsRegVar(Sym)  (((Sym)->Flags & (SC_REGISTER|SC_TYPEMASK)) == SC_REGISTER)
 #endif
 
 int SymIsOutputFunc (const SymEntry* Sym);

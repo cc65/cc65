@@ -821,7 +821,7 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
 
         /* Set the symbol attributes */
         Entry->Type = TypeDup (T);
-        if ((Flags & SC_AUTO) == SC_AUTO || (Flags & SC_TYPEDEF) == SC_TYPEDEF) {
+        if ((Flags & SC_AUTO) == SC_AUTO || (Flags & SC_TYPEMASK) == SC_TYPEDEF) {
             Entry->V.Offs = Offs;
         } else if ((Flags & SC_REGISTER) == SC_REGISTER) {
             Entry->V.R.RegOffs  = Offs;

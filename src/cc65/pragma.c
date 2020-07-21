@@ -523,7 +523,7 @@ static void WrappedCallPragma (StrBuf* B)
     Entry = FindSym(Name);
 
     /* Check if the name is valid */
-    if (Entry && Entry->Flags & SC_FUNC) {
+    if (Entry && (Entry->Flags & SC_FUNC) == SC_FUNC) {
 
         PushWrappedCall(Entry, (unsigned char) Val);
         Entry->Flags |= SC_REF;

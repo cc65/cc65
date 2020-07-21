@@ -97,6 +97,7 @@ $(WORKDIR)/bug1048.$1.$2.prg: bug1048.c | $(WORKDIR)
 $(WORKDIR)/bug1075.$1.$2.prg: bug1075.c | $(WORKDIR)
 	$(if $(QUIET),echo misc/bug1075.$1.$2.prg)
 	$(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
+	$(SIM65) $(SIM65FLAGS) $$@ $(NULLOUT) $(NULLERR)
 
 # should compile, but then hangs in an endless loop
 $(WORKDIR)/endless.$1.$2.prg: endless.c | $(WORKDIR)

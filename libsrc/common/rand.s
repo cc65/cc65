@@ -46,6 +46,11 @@ rand:   .dword $B5B5B4B4
 
 .code
 
+_srand: sta     rand+0          ; Store the seed
+        stx     rand+1
+        sta     rand+2          ; argument << 16 is convenient fill for MSW
+        stx     rand+3
+        ; fall through to rand() to sufficiently "shuffle" first rand() result
 _rand:  clc
         lda     rand+0
         adc     #$B3
@@ -62,9 +67,3 @@ _rand:  clc
         sta     rand+3
         eor     rand+1
         rts                     ; return bit (16-22,24-31) in (X,A)
-
-_srand: sta     rand+0          ; Store the seed
-        stx     rand+1
-        sta     rand+2          ; argument << 16 is convenient fill for MSW
-        stx     rand+3
-        jmp     _rand           ; to sufficiently "shuffle" first rand() result

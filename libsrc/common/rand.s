@@ -51,6 +51,7 @@ _srand: sta     rand+0          ; Store the seed
         sta     rand+2          ; argument << 16 is convenient fill for MSW
         stx     rand+3
         ; fall through to rand() to sufficiently "shuffle" first rand() result
+
 _rand:  clc
         lda     rand+0
         adc     #$B3

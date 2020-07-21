@@ -26,18 +26,6 @@
 
 static uint32_t seed;
 
-void ref_srand(int ax)
-{
-	uint32_t l = (ax >> 0) & 0xFF;
-	uint32_t h = (ax >> 8) & 0xFF;
-	uint32_t o = l ^ 0xE5;
-	seed =
-		(l << 0) |
-		(h << 8) |
-		(o << 16) |
-		(o << 24);
-}
-
 int ref_rand()
 {
 	uint16_t output;
@@ -54,6 +42,13 @@ int ref_rand()
 		output = o0 | (o1 << 8);
 	}
 	return (int)(output & 0x7FFF);
+}
+
+void ref_srand(int ax)
+{
+	uint32_t s = (unsigned int)ax;
+	seed = s | (s << 16); /* low 16 bits is convenient filler for high 16 bits */
+	ref_rand(); /* one pre-call "shuffles" the first rand() result so it isn't too predictable */
 }
 
 int main(void)

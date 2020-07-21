@@ -490,7 +490,7 @@ static void ParseEnumDecl (void)
         }
 
         /* Add an entry to the symbol table */
-        AddConstSym (Ident, type_int, SC_ENUMERATOR|SC_CONST, EnumVal++);
+        AddConstSym (Ident, type_int, SC_ENUMERATOR | SC_CONST, EnumVal++);
 
         /* Check for end of definition */
         if (CurTok.Tok != TOK_COMMA)

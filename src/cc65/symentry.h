@@ -247,10 +247,10 @@ INLINE int SymIsRegVar (const SymEntry* Sym)
 /* Return true if the given entry is a register variable */
 /* ### HACK! Fix the ugly type flags! */
 {
-    return ((Sym->Flags & (SC_REGISTER|SC_TYPEMASK)) == SC_REGISTER);
+    return ((Sym->Flags & (SC_REGISTER | SC_TYPEMASK)) == SC_REGISTER);
 }
 #else
-#  define SymIsRegVar(Sym)  (((Sym)->Flags & (SC_REGISTER|SC_TYPEMASK)) == SC_REGISTER)
+#  define SymIsRegVar(Sym)  (((Sym)->Flags & (SC_REGISTER | SC_TYPEMASK)) == SC_REGISTER)
 #endif
 
 int SymIsOutputFunc (const SymEntry* Sym);

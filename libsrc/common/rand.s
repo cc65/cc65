@@ -42,7 +42,10 @@
 
 ; The seed. When srand() is not called, the C standard says that that rand()
 ; should behave as if srand() was called with an argument of 1 before.
-rand:   .dword   1
+rand:   .byte $01
+        .byte $00
+        .byte $E4
+        .byte $E4
 
 .code
 
@@ -65,8 +68,7 @@ _rand:  clc
 
 _srand: sta     rand+0          ; Store the seed
         stx     rand+1
-        stx     rand+2          ; fill MSW: anything is OK here
-        sta     rand+3          ; as long as it's consistent.
+        eor     #$E5
+        sta     rand+2          ; fill MSW with something that will
+        sta     rand+3          ; obfuscate the seed value on first rand()
         rts
-
-

@@ -15,7 +15,8 @@
 #include <stdint.h>
 
 /* for faster execution */
-#pragma static-locals (on)
+/*#pragma static-locals (on)*/
+/* disabled: enabling this seems to break o0 result with -O ? investigate */
 
 /* values tested per seed */
 #define SUBTESTS 50
@@ -26,40 +27,57 @@
 
 static uint32_t seed;
 
-void ref_srand(int x)
+void ref_srand(int ax)
 {
-	uint32_t l = (x >> 0) & 0xFF;
-	uint32_t h = (x >> 8) & 0xFF;
+	uint32_t l = (ax >> 0) & 0xFF;
+	uint32_t h = (ax >> 8) & 0xFF;
+	uint32_t o = l ^ 0xE5;
 	seed =
 		(l << 0) |
 		(h << 8) |
-		(h << 16) |
-		(l << 24);
+		(o << 16) |
+		(o << 24);
 }
 
 int ref_rand()
 {
-	int output;
+	uint16_t output;
 	/* seed follows the LCG sequence * 0x01010101 + 0xB3B3B3B3 */
 	seed = seed * 0x01010101UL + 0xB3B3B3B3UL;
 	/* output uses the top two bytes (reversed) XOR with bottom two bytes */
 	{
-		int s0 = (seed >>  0) & 0xFF;
-		int s1 = (seed >>  8) & 0xFF;
-		int s2 = (seed >> 16) & 0xFF;
-		int s3 = (seed >> 24) & 0xFF;
-		int o0 = s3 ^ s1;
-		int o1 = s2 ^ s0;
+		uint16_t s0 = (seed >>  0) & 0xFF;
+		uint16_t s1 = (seed >>  8) & 0xFF;
+		uint16_t s2 = (seed >> 16) & 0xFF;
+		uint16_t s3 = (seed >> 24) & 0xFF;
+		uint16_t o0 = s3 ^ s1;
+		uint16_t o1 = s2 ^ s0;
 		output = o0 | (o1 << 8);
 	}
-	return output & 0x7FFF;
+	return (int)(output & 0x7FFF);
 }
 
 int main(void)
 {
 	unsigned int i,j;
 	int a,b;
-	
+
+	/* test that startup state is equivalent to srand(1) */
+	{
+		//srand(1); // implied
+		ref_srand(1);
+		for (j=0; j<SUBTESTS; ++j)
+		{
+			a = rand();
+			b = ref_rand();
+			if (a != b)
+			{
+				printf("failed startup seed at test %d. rand()=%d reference=%d\n",j,a,b);
+				return EXIT_FAILURE;
+			}
+		}
+	}
+
 	/* test every power of 2 seed */
 	for (i = 0; i < 16; ++i)
 	{

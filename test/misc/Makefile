@@ -78,6 +78,11 @@ $(WORKDIR)/bug760.$1.$2.prg: bug760.c | $(WORKDIR)
 	$(if $(QUIET),echo misc/bug760.$1.$2.prg)
 	-$(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
 
+# should compile, but gives an error
+$(WORKDIR)/pptest2.$1.$2.prg: pptest2.c | $(WORKDIR)
+	$(if $(QUIET),echo misc/pptest2.$1.$2.prg)
+	-$(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
+
 # this should fail to compile, because cc65 does not support returning structs
 $(WORKDIR)/bug264.$1.$2.prg: bug264.c | $(WORKDIR)
 	$(if $(QUIET),echo misc/bug264.$1.$2.prg)

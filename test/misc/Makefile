@@ -93,6 +93,24 @@ $(WORKDIR)/bug1048.$1.$2.prg: bug1048.c | $(WORKDIR)
 	$(if $(QUIET),echo misc/bug1048.$1.$2.prg)
 	$(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
 
+# this should fail to compile, because there are errors in the code
+$(WORKDIR)/bug1098.$1.$2.prg: bug1098.c | $(WORKDIR)
+	@echo "FIXME: " $$@ "compiles but should give an error."
+	$(if $(QUIET),echo misc/bug1098.$1.$2.prg)
+	$(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
+
+# this should fail to compile, because there are errors in the code
+$(WORKDIR)/bug1098a.$1.$2.prg: bug1098a.c | $(WORKDIR)
+	@echo "FIXME: " $$@ "compiles but should give an error."
+	$(if $(QUIET),echo misc/bug1098a.$1.$2.prg)
+	$(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
+
+# this should fail to compile, because there are errors in the code
+$(WORKDIR)/bug1098b.$1.$2.prg: bug1098b.c | $(WORKDIR)
+	@echo "FIXME: " $$@ "compiles but should give an error."
+	$(if $(QUIET),echo misc/bug1098b.$1.$2.prg)
+	$(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
+
 # should compile, but then hangs in an endless loop
 $(WORKDIR)/endless.$1.$2.prg: endless.c | $(WORKDIR)
 	$(if $(QUIET),echo misc/endless.$1.$2.prg)

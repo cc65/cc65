@@ -111,6 +111,13 @@ $(WORKDIR)/bug1098b.$1.$2.prg: bug1098b.c | $(WORKDIR)
 	$(if $(QUIET),echo misc/bug1098b.$1.$2.prg)
 	$(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
 
+# this should fail to compile, because there are errors in the code
+# instead, the compiler crashes
+$(WORKDIR)/bug1113.$1.$2.prg: bug1113.c | $(WORKDIR)
+	@echo "FIXME: " $$@ "compiler crashes but should give an error."
+	$(if $(QUIET),echo misc/bug1113.$1.$2.prg)
+	$(NOT) $(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
+
 # should compile, but then hangs in an endless loop
 $(WORKDIR)/endless.$1.$2.prg: endless.c | $(WORKDIR)
 	$(if $(QUIET),echo misc/endless.$1.$2.prg)

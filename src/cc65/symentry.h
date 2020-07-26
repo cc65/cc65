@@ -165,6 +165,12 @@ struct SymEntry {
             unsigned            Size;     /* Size of the union/struct */
         } S;
 
+        /* Data for enums */
+        struct {
+            struct SymTable*    SymTab;   /* Member symbol table */
+            const Type*         Type;     /* Underlying type */
+        } E;
+
         /* Data for bit fields */
         struct {
             unsigned            Offs;     /* Byte offset into struct */

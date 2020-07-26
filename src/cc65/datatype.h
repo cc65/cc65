@@ -96,37 +96,39 @@ enum {
 
     /* Type size modifiers */
     T_SIZE_NONE     = 0x000000,
-    T_SIZE_SHORT    = 0x000200,
-    T_SIZE_LONG     = 0x000400,
-    T_SIZE_LONGLONG = 0x000600,
-    T_MASK_SIZE     = 0x000600,
+    T_SIZE_CHAR     = 0x000200,
+    T_SIZE_SHORT    = 0x000400,
+    T_SIZE_INT      = 0x000600,
+    T_SIZE_LONG     = 0x000800,
+    T_SIZE_LONGLONG = 0x000A00,
+    T_MASK_SIZE     = 0x000E00,
 
     /* Type qualifiers */
     T_QUAL_NONE     = 0x000000,
-    T_QUAL_CONST    = 0x000800,
-    T_QUAL_VOLATILE = 0x001000,
-    T_QUAL_RESTRICT = 0x002000,
-    T_QUAL_NEAR     = 0x004000,
-    T_QUAL_FAR      = 0x008000,
+    T_QUAL_CONST    = 0x001000,
+    T_QUAL_VOLATILE = 0x002000,
+    T_QUAL_RESTRICT = 0x004000,
+    T_QUAL_NEAR     = 0x008000,
+    T_QUAL_FAR      = 0x010000,
     T_QUAL_ADDRSIZE = T_QUAL_NEAR | T_QUAL_FAR,
-    T_QUAL_FASTCALL = 0x010000,
-    T_QUAL_CDECL    = 0x020000,
+    T_QUAL_FASTCALL = 0x020000,
+    T_QUAL_CDECL    = 0x040000,
     T_QUAL_CCONV    = T_QUAL_FASTCALL | T_QUAL_CDECL,
-    T_MASK_QUAL     = 0x03F800,
+    T_MASK_QUAL     = 0x07F000,
 
     /* Types */
-    T_CHAR      = T_TYPE_CHAR     | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_NONE,
-    T_SCHAR     = T_TYPE_CHAR     | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_NONE,
-    T_UCHAR     = T_TYPE_CHAR     | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_NONE,
+    T_CHAR      = T_TYPE_CHAR     | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_CHAR,
+    T_SCHAR     = T_TYPE_CHAR     | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_CHAR,
+    T_UCHAR     = T_TYPE_CHAR     | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_CHAR,
     T_SHORT     = T_TYPE_SHORT    | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_SHORT,
     T_USHORT    = T_TYPE_SHORT    | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_SHORT,
-    T_INT       = T_TYPE_INT      | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_NONE,
-    T_UINT      = T_TYPE_INT      | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_NONE,
+    T_INT       = T_TYPE_INT      | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_INT,
+    T_UINT      = T_TYPE_INT      | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_INT,
     T_LONG      = T_TYPE_LONG     | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_LONG,
     T_ULONG     = T_TYPE_LONG     | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_LONG,
     T_LONGLONG  = T_TYPE_LONGLONG | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_LONGLONG,
     T_ULONGLONG = T_TYPE_LONGLONG | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_LONGLONG,
-    T_ENUM      = T_TYPE_ENUM     | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_NONE,
+    T_ENUM      = T_TYPE_ENUM     | T_CLASS_INT    | T_SIGN_NONE     | T_SIZE_NONE,
     T_FLOAT     = T_TYPE_FLOAT    | T_CLASS_FLOAT  | T_SIGN_NONE     | T_SIZE_NONE,
     T_DOUBLE    = T_TYPE_DOUBLE   | T_CLASS_FLOAT  | T_SIGN_NONE     | T_SIZE_NONE,
     T_VOID      = T_TYPE_VOID     | T_CLASS_NONE   | T_SIGN_NONE     | T_SIZE_NONE,
@@ -246,6 +248,12 @@ Type* GetImplicitFuncType (void);
 const Type* GetStructReplacementType (const Type* SType);
 /* Get a replacement type for passing a struct/union in the primary register */
 
+long GetIntegerTypeMin (const Type* Type);
+/* Get the smallest possible value of the integer type */
+
+unsigned long GetIntegerTypeMax (const Type* Type);
+/* Get the largest possible value of the integer type */
+
 Type* PointerTo (const Type* T);
 /* Return a type string that is "pointer to T". The type string is allocated
 ** on the heap and may be freed after use.
@@ -283,6 +291,14 @@ INLINE TypeCode UnqualifiedType (TypeCode T)
 #  define UnqualifiedType(T)    ((T) & ~T_MASK_QUAL)
 #endif
 
+const Type* GetUnderlyingType (const Type* Type);
+/* Get the underlying type of an enum or other integer class type */
+
+TypeCode GetUnderlyingTypeCode (const Type* Type);
+/* Get the type code of the unqualified underlying type of TCode.
+** Return TCode if it is not scalar.
+*/
+
 unsigned SizeOf (const Type* T);
 /* Compute size of object represented by type array. */
 
@@ -312,123 +328,163 @@ Type* ArrayToPtr (Type* T);
 /* Convert an array to a pointer to it's first element */
 
 #if defined(HAVE_INLINE)
-INLINE TypeCode GetType (const Type* T)
+INLINE TypeCode GetRawType (const Type* T)
 /* Get the raw type */
 {
     return (T->C & T_MASK_TYPE);
 }
 #else
-#  define GetType(T)    ((T)->C & T_MASK_TYPE)
+#  define GetRawType(T)         ((T)->C & T_MASK_TYPE)
 #endif
 
 #if defined(HAVE_INLINE)
 INLINE int IsTypeChar (const Type* T)
 /* Return true if this is a character type */
 {
-    return (GetType (T) == T_TYPE_CHAR);
+    return (GetRawType (GetUnderlyingType (T)) == T_TYPE_CHAR);
 }
 #else
-#  define IsTypeChar(T)         (GetType (T) == T_TYPE_CHAR)
+#  define IsTypeChar(T)         (GetRawType (GetUnderlyingType (T)) == T_TYPE_CHAR)
 #endif
 
 #if defined(HAVE_INLINE)
 INLINE int IsTypeInt (const Type* T)
 /* Return true if this is an int type (signed or unsigned) */
 {
-    return (GetType (T) == T_TYPE_INT);
+    return (GetRawType (GetUnderlyingType (T)) == T_TYPE_INT);
 }
 #else
-#  define IsTypeInt(T)          (GetType (T) == T_TYPE_INT)
+#  define IsTypeInt(T)          (GetRawType (GetUnderlyingType (T)) == T_TYPE_INT)
 #endif
 
 #if defined(HAVE_INLINE)
 INLINE int IsTypeLong (const Type* T)
 /* Return true if this is a long type (signed or unsigned) */
 {
-    return (GetType (T) == T_TYPE_LONG);
+    return (GetRawType (GetUnderlyingType (T)) == T_TYPE_LONG);
 }
 #else
-#  define IsTypeLong(T)         (GetType (T) == T_TYPE_LONG)
+#  define IsTypeLong(T)         (GetRawType (GetUnderlyingType (T)) == T_TYPE_LONG)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsRawTypeChar (const Type* T)
+/* Return true if this is a character raw type */
+{
+    return (GetRawType (T) == T_TYPE_CHAR);
+}
+#else
+#  define IsRawTypeChar(T)      (GetRawType (T) == T_TYPE_CHAR)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsRawTypeInt (const Type* T)
+/* Return true if this is an int raw type (signed or unsigned) */
+{
+    return (GetRawType (T) == T_TYPE_INT);
+}
+#else
+#  define IsRawTypeInt(T)       (GetRawType (T) == T_TYPE_INT)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsRawTypeLong (const Type* T)
+/* Return true if this is a long raw type (signed or unsigned) */
+{
+    return (GetRawType (T) == T_TYPE_LONG);
+}
+#else
+#  define IsRawTypeLong(T)      (GetRawType (T) == T_TYPE_LONG)
 #endif
 
 #if defined(HAVE_INLINE)
 INLINE int IsTypeFloat (const Type* T)
 /* Return true if this is a float type */
 {
-    return (GetType (T) == T_TYPE_FLOAT);
+    return (GetRawType (T) == T_TYPE_FLOAT);
 }
 #else
-#  define IsTypeFloat(T)        (GetType (T) == T_TYPE_FLOAT)
+#  define IsTypeFloat(T)        (GetRawType (T) == T_TYPE_FLOAT)
 #endif
 
 #if defined(HAVE_INLINE)
 INLINE int IsTypeDouble (const Type* T)
 /* Return true if this is a double type */
 {
-    return (GetType (T) == T_TYPE_DOUBLE);
+    return (GetRawType (T) == T_TYPE_DOUBLE);
 }
 #else
-#  define IsTypeDouble(T)       (GetType (T) == T_TYPE_DOUBLE)
+#  define IsTypeDouble(T)       (GetRawType (T) == T_TYPE_DOUBLE)
 #endif
 
 #if defined(HAVE_INLINE)
 INLINE int IsTypePtr (const Type* T)
 /* Return true if this is a pointer type */
 {
-    return (GetType (T) == T_TYPE_PTR);
+    return (GetRawType (T) == T_TYPE_PTR);
 }
 #else
-#  define IsTypePtr(T)          (GetType (T) == T_TYPE_PTR)
+#  define IsTypePtr(T)          (GetRawType (T) == T_TYPE_PTR)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsTypeEnum (const Type* T)
+/* Return true if this is an enum type */
+{
+    return (GetRawType (T) == T_TYPE_ENUM);
+}
+#else
+#  define IsTypeEnum(T)         (GetRawType (T) == T_TYPE_ENUM)
 #endif
 
 #if defined(HAVE_INLINE)
 INLINE int IsTypeStruct (const Type* T)
 /* Return true if this is a struct type */
 {
-    return (GetType (T) == T_TYPE_STRUCT);
+    return (GetRawType (T) == T_TYPE_STRUCT);
 }
 #else
-#  define IsTypeStruct(T)       (GetType (T) == T_TYPE_STRUCT)
+#  define IsTypeStruct(T)       (GetRawType (T) == T_TYPE_STRUCT)
 #endif
 
 #if defined(HAVE_INLINE)
 INLINE int IsTypeUnion (const Type* T)
 /* Return true if this is a union type */
 {
-    return (GetType (T) == T_TYPE_UNION);
+    return (GetRawType (T) == T_TYPE_UNION);
 }
 #else
-#  define IsTypeUnion(T)       (GetType (T) == T_TYPE_UNION)
+#  define IsTypeUnion(T)       (GetRawType (T) == T_TYPE_UNION)
 #endif
 
 #if defined(HAVE_INLINE)
 INLINE int IsTypeArray (const Type* T)
 /* Return true if this is an array type */
 {
-    return (GetType (T) == T_TYPE_ARRAY);
+    return (GetRawType (T) == T_TYPE_ARRAY);
 }
 #else
-#  define IsTypeArray(T)        (GetType (T) == T_TYPE_ARRAY)
+#  define IsTypeArray(T)        (GetRawType (T) == T_TYPE_ARRAY)
 #endif
 
 #if defined(HAVE_INLINE)
 INLINE int IsTypeVoid (const Type* T)
 /* Return true if this is a void type */
 {
-    return (GetType (T) == T_TYPE_VOID);
+    return (GetRawType (T) == T_TYPE_VOID);
 }
 #else
-#  define IsTypeVoid(T)         (GetType (T) == T_TYPE_VOID)
+#  define IsTypeVoid(T)         (GetRawType (T) == T_TYPE_VOID)
 #endif
 
 #if defined(HAVE_INLINE)
 INLINE int IsTypeFunc (const Type* T)
 /* Return true if this is a function class */
 {
-    return (GetType (T) == T_TYPE_FUNC);
+    return (GetRawType (T) == T_TYPE_FUNC);
 }
 #else
-#  define IsTypeFunc(T)         (GetType (T) == T_TYPE_FUNC)
+#  define IsTypeFunc(T)         (GetRawType (T) == T_TYPE_FUNC)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -502,13 +558,23 @@ INLINE int IsClassFunc (const Type* T)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE TypeCode GetSignedness (const Type* T)
-/* Get the sign of a type */
+INLINE TypeCode GetRawSignedness (const Type* T)
+/* Get the raw signedness of a type */
 {
-    return (T->C & T_MASK_SIGN);
+    return ((T)->C & T_MASK_SIGN);
 }
 #else
-#  define GetSignedness(T)      ((T)->C & T_MASK_SIGN)
+#  define GetRawSignedness(T)   ((T)->C & T_MASK_SIGN)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE TypeCode GetSignedness (const Type* T)
+/* Get the signedness of a type */
+{
+    return (GetUnderlyingTypeCode (T) & T_MASK_SIGN);
+}
+#else
+#  define GetSignedness(T)      (GetUnderlyingTypeCode (T) & T_MASK_SIGN)
 #endif
 
 #if defined(HAVE_INLINE)

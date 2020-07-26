@@ -132,7 +132,7 @@ void SwitchStatement (void)
 
     /* Setup the control structure, save the old and activate the new one */
     SwitchData.Nodes        = NewCollection ();
-    SwitchData.ExprType     = UnqualifiedType (SwitchExpr.Type[0].C);
+    SwitchData.ExprType     = GetUnderlyingTypeCode (&SwitchExpr.Type[0]);
     SwitchData.Depth        = SizeOf (SwitchExpr.Type);
     SwitchData.DefaultLabel = 0;
     OldSwitch = Switch;

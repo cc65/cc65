@@ -214,9 +214,9 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
             return;
         }
 
-        /* Get the raw left and right types, signs and qualifiers */
-        LeftType  = GetType (lhs);
-        RightType = GetType (rhs);
+        /* Get the left and right types, signs and qualifiers */
+        LeftType  = GetUnderlyingTypeCode (lhs);
+        RightType = GetUnderlyingTypeCode (rhs);
         LeftSign  = GetSignedness (lhs);
         RightSign = GetSignedness (rhs);
         LeftQual  = GetQualifier (lhs);
@@ -229,7 +229,7 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
             RightType = T_TYPE_PTR;
         }
 
-        /* If the raw types are not identical, the types are incompatible */
+        /* If the underlying types are not identical, the types are incompatible */
         if (LeftType != RightType) {
             SetResult (Result, TC_INCOMPATIBLE);
             return;

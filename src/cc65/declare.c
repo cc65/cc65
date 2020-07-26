@@ -453,27 +453,99 @@ static void ParseStorageClass (DeclSpec* D, unsigned DefStorage)
 
 
 
-static void ParseEnumDecl (void)
-/* Process an enum declaration . */
+static SymEntry* ESUForwardDecl (const char* Name, unsigned Type)
+/* Handle an enum, struct or union forward decl */
 {
-    int EnumVal;
-    ident Ident;
+    /* Try to find an enum/struct/union with the given name. If there is none,
+    ** insert a forward declaration into the current lexical level.
+    */
+    SymEntry* Entry = FindTagSym (Name);
+    if (Entry == 0) {
+        if (Type != SC_ENUM) {
+            Entry = AddStructSym (Name, Type, 0, 0);
+        } else {
+            Entry = AddEnumSym (Name, 0, 0);
+        }
+    } else if ((Entry->Flags & SC_TYPEMASK) != Type) {
+        /* Already defined, but not the same type class */
+        Error ("Symbol '%s' is already different kind", Name);
+    }
+    return Entry;
+}
+
+
+
+static const Type* GetEnumeratorType (long Min, unsigned long Max, int Signed)
+/* GitHub #1093 - We use unsigned types to save spaces whenever possible.
+** If both the signed and unsigned integer types of the same minimum size
+** capable of representing all values of the enum, we prefer the unsigned
+** one.
+** Return 0 if impossible to represent Min and Max as the same integer type.
+*/
+{
+    const Type* Underlying = type_int;      /* default type */
+
+    /* Change the underlying type if necessary */
+    if (Min < 0 || Signed) {
+        /* We can't use unsigned types if there are any negative values */
+        if (Max > (unsigned long)INT32_MAX) {
+            /* No way to represent both Min and Max as the same integer type */
+            Underlying = 0;
+        } else if (Min < INT16_MIN || Max > (unsigned long)INT16_MAX) {
+            Underlying = type_long;
+        } else if (Min < INT8_MIN || Max > (unsigned long)INT8_MAX) {
+            Underlying = type_int;
+        } else {
+            Underlying = type_schar;
+        }
+    } else {
+        if (Max > UINT16_MAX) {
+            Underlying = type_ulong;
+        } else if (Max > UINT8_MAX) {
+            Underlying = type_uint;
+        } else {
+            Underlying = type_uchar;
+        }
+    }
+
+    return Underlying;
+}
+
+
+
+static SymEntry* ParseEnumDecl (const char* Name)
+/* Process an enum declaration */
+{
+    SymTable*       FieldTab;
+    long            EnumVal;
+    int             IsSigned;
+    int             IsIncremented;
+    ident           Ident;
+    long            MinConstant = 0;
+    unsigned long   MaxConstant = 0;
+    const Type*     NewType     = type_int;  /* new enumerator type */
+    const Type*     MemberType  = type_int;  /* default enumerator type */
 
     /* Accept forward definitions */
     if (CurTok.Tok != TOK_LCURLY) {
-        return;
+        return ESUForwardDecl (Name, SC_ENUM);
     }
+
+    /* Add the enum tag */
+    AddEnumSym (Name, 0, 0);
 
     /* Skip the opening curly brace */
     NextToken ();
 
     /* Read the enum tags */
-    EnumVal = 0;
+    EnumVal = -1L;
     while (CurTok.Tok != TOK_RCURLY) {
 
         /* We expect an identifier */
         if (CurTok.Tok != TOK_IDENT) {
-            Error ("Identifier expected");
+            Error ("Identifier expected for enumerator declarator");
+            /* Avoid excessive errors */
+            NextToken ();
             continue;
         }
 
@@ -483,21 +555,116 @@ static void ParseEnumDecl (void)
 
         /* Check for an assigned value */
         if (CurTok.Tok == TOK_ASSIGN) {
+
             ExprDesc Expr;
             NextToken ();
             ConstAbsIntExpr (hie1, &Expr);
-            EnumVal = Expr.IVal;
+            EnumVal       = Expr.IVal;
+            MemberType    = Expr.Type;
+            IsSigned      = IsSignSigned (MemberType);
+            IsIncremented = 0;
+
+        } else {
+
+             /* Defaulted with the same signedness as the previous member's */
+            IsSigned = IsSignSigned (MemberType) &&
+                       (unsigned long)EnumVal != GetIntegerTypeMax (MemberType);
+
+            /* Enumerate. Signed integer overflow is UB but unsigned integers
+            ** are guaranteed to wrap around.
+            */
+            EnumVal = (long)((unsigned long)EnumVal + 1UL);
+
+            if (UnqualifiedType (MemberType->C) == T_ULONG && EnumVal == 0) {
+                /* Warn on 'unsigned long' overflow in enumeration */
+                Warning ("Enumerator '%s' overflows the range of '%s'",
+                         Ident,
+                         GetBasicTypeName (type_ulong));
+            }
+
+            IsIncremented = 1;
         }
 
-        /* Add an entry to the symbol table */
-        AddConstSym (Ident, type_int, SC_ENUMERATOR | SC_CONST, EnumVal++);
+        /* Track down the min/max values and evaluate the type of EnumVal
+        ** using GetEnumeratorType in a tricky way.
+        */
+        if (!IsSigned || EnumVal >= 0) {
+            if ((unsigned long)EnumVal > MaxConstant) {
+                MaxConstant = (unsigned long)EnumVal;
+            }
+            NewType = GetEnumeratorType (0, EnumVal, IsSigned);
+        } else {
+            if (EnumVal < MinConstant) {
+                MinConstant = EnumVal;
+            }
+            NewType = GetEnumeratorType (EnumVal, 0, 1);
+        }
+
+        /* GetEnumeratorType above should never fail, but just in case */
+        if (NewType == 0) {
+            Internal ("Unexpected failure with GetEnumeratorType: %lx", EnumVal);
+            NewType = type_ulong;
+        } else if (SizeOf (NewType) < SizeOf (type_int)) {
+            /* Integer constants are not shorter than int */
+            NewType = type_int;
+        }
+
+        /* Warn if the incremented value exceeds the range of the previous
+        ** type.
+        */
+        if (IsIncremented   &&
+            EnumVal >= 0    &&
+            NewType->C != UnqualifiedType (MemberType->C)) {
+            /* The possible overflow here can only be when EnumVal > 0 */
+            Warning ("Enumerator '%s' (value = %lu) is of type '%s'",
+                     Ident,
+                     (unsigned long)EnumVal,
+                     GetBasicTypeName (NewType));
+        }
+
+        /* Warn if the value exceeds range of 'int' in standard mode */
+        if (IS_Get (&Standard) != STD_CC65 && NewType->C != T_INT) {
+            if (!IsSigned || EnumVal >= 0) {
+                Warning ("ISO C restricts enumerator values to range of 'int'\n"
+                         "\tEnumerator '%s' (value = %lu) is too large",
+                         Ident,
+                         (unsigned long)EnumVal);
+            } else {
+                Warning ("ISO C restricts enumerator values to range of 'int'\n"
+                         "\tEnumerator '%s' (value = %ld) is too small",
+                         Ident,
+                         EnumVal);
+            }
+        }
+
+        /* Add an entry of the enumerator to the symbol table */
+        AddConstSym (Ident, NewType, SC_ENUMERATOR | SC_CONST, EnumVal);
+
+        /* Use this type for following members */
+        MemberType = NewType;
 
         /* Check for end of definition */
-        if (CurTok.Tok != TOK_COMMA)
+        if (CurTok.Tok != TOK_COMMA) {
             break;
+        }
         NextToken ();
     }
     ConsumeRCurly ();
+
+    /* This evaluates the underlying type of the whole enum */
+    MemberType = GetEnumeratorType (MinConstant, MaxConstant, 0);
+    if (MemberType == 0) {
+        /* It is very likely that the program is wrong */
+        Error ("Enumeration values cannot be represented all as 'long'\n"
+               "\tMin enumerator value = %ld, Max enumerator value = %lu",
+               MinConstant, MaxConstant);
+
+        /* Avoid more errors */
+        MemberType = type_long;
+    }
+
+    FieldTab = GetSymTab ();
+    return AddEnumSym (Name, MemberType, FieldTab);
 }
 
 
@@ -537,24 +704,6 @@ static int ParseFieldWidth (Declaration* Decl)
 
     /* Return the field width */
     return (int) Expr.IVal;
-}
-
-
-
-static SymEntry* StructOrUnionForwardDecl (const char* Name, unsigned Type)
-/* Handle a struct or union forward decl */
-{
-    /* Try to find a struct/union with the given name. If there is none,
-    ** insert a forward declaration into the current lexical level.
-    */
-    SymEntry* Entry = FindTagSym (Name);
-    if (Entry == 0) {
-        Entry = AddStructSym (Name, Type, 0, 0);
-    } else if ((Entry->Flags & SC_TYPEMASK) != Type) {
-        /* Already defined, but no struct */
-        Error ("Symbol '%s' is already different kind", Name);
-    }
-    return Entry;
 }
 
 
@@ -617,7 +766,7 @@ static SymEntry* ParseUnionDecl (const char* Name)
 
     if (CurTok.Tok != TOK_LCURLY) {
         /* Just a forward declaration. */
-        return StructOrUnionForwardDecl (Name, SC_UNION);
+        return ESUForwardDecl (Name, SC_UNION);
     }
 
     /* Add a forward declaration for the struct in the current lexical level */
@@ -722,7 +871,7 @@ static SymEntry* ParseStructDecl (const char* Name)
 
     if (CurTok.Tok != TOK_LCURLY) {
         /* Just a forward declaration. */
-        return StructOrUnionForwardDecl (Name, SC_STRUCT);
+        return ESUForwardDecl (Name, SC_STRUCT);
     }
 
     /* Add a forward declaration for the struct in the current lexical level */
@@ -1069,29 +1218,23 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers)
 
         case TOK_ENUM:
             NextToken ();
-            if (CurTok.Tok != TOK_LCURLY) {
-                /* Named enum */
-                if (CurTok.Tok == TOK_IDENT) {
-                    /* Find an entry with this name */
-                    Entry = FindTagSym (CurTok.Ident);
-                    if (Entry) {
-                        if (SymIsLocal (Entry) && (Entry->Flags & SC_ENUM) == 0) {
-                            Error ("Symbol '%s' is already different kind", Entry->Name);
-                        }
-                    } else {
-                        /* Insert entry into table ### */
-                    }
-                    /* Skip the identifier */
-                    NextToken ();
-                } else {
+            /* Named enum */
+            if (CurTok.Tok == TOK_IDENT) {
+                strcpy (Ident, CurTok.Ident);
+                NextToken ();
+            } else {
+                if (CurTok.Tok != TOK_LCURLY) {
                     Error ("Identifier expected");
+                } else {
+                    AnonName (Ident, "enum");
                 }
             }
             /* Remember we have an extra type decl */
             D->Flags |= DS_EXTRA_TYPE;
             /* Parse the enum decl */
-            ParseEnumDecl ();
-            D->Type[0].C = T_INT;
+            Entry = ParseEnumDecl (Ident);
+            D->Type[0].C |= T_ENUM;
+            SetSymEntry (D->Type, Entry);
             D->Type[1].C = T_END;
             break;
 
@@ -1624,7 +1767,7 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
         /* The return type must not be qualified */
         if (GetQualifier (RetType) != T_QUAL_NONE && RetType[1].C == T_END) {
 
-            if (GetType (RetType) == T_TYPE_VOID) {
+            if (GetRawType (RetType) == T_TYPE_VOID) {
                 /* A qualified void type is always an error */
                 Error ("function definition has qualified void return type");
             } else {
@@ -1916,7 +2059,7 @@ static unsigned ParseArrayInit (Type* T, int AllowFlexibleMembers)
     long ElementCount    = GetElementCount (T);
 
     /* Special handling for a character array initialized by a literal */
-    if (IsTypeChar (ElementType) &&
+    if (IsRawTypeChar (ElementType) &&
         (CurTok.Tok == TOK_SCONST || CurTok.Tok == TOK_WCSCONST ||
         (CurTok.Tok == TOK_LCURLY &&
          (NextTok.Tok == TOK_SCONST || NextTok.Tok == TOK_WCSCONST)))) {
@@ -2180,7 +2323,7 @@ static unsigned ParseVoidInit (Type* T)
     Size = 0;
     do {
         ConstExpr (hie1, &Expr);
-        switch (UnqualifiedType (Expr.Type[0].C)) {
+        switch (GetUnderlyingTypeCode (&Expr.Type[0])) {
 
             case T_SCHAR:
             case T_UCHAR:
@@ -2244,7 +2387,7 @@ static unsigned ParseVoidInit (Type* T)
 static unsigned ParseInitInternal (Type* T, int AllowFlexibleMembers)
 /* Parse initialization of variables. Return the number of data bytes. */
 {
-    switch (UnqualifiedType (T->C)) {
+    switch (GetUnderlyingTypeCode (T)) {
 
         case T_SCHAR:
         case T_UCHAR:

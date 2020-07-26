@@ -61,6 +61,7 @@
 #include "pragma.h"
 #include "preproc.h"
 #include "standard.h"
+#include "staticassert.h"
 #include "symtab.h"
 
 
@@ -105,6 +106,12 @@ static void Parse (void)
         /* Check for a #pragma */
         if (CurTok.Tok == TOK_PRAGMA) {
             DoPragma ();
+            continue;
+        }
+
+        /* Check for a _Static_assert */
+        if (CurTok.Tok == TOK_STATIC_ASSERT) {
+            ParseStaticAssert ();
             continue;
         }
 

@@ -1,15 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 assert.h                                  */
+/*                               staticassert.h                              */
 /*                                                                           */
-/*                                Diagnostics                                */
+/*          _Static_assert handling for the cc65 C compiler                  */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2015, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
+/* Copyright 2020 Google LLC                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,29 +30,22 @@
 
 
 
-#ifndef _ASSERT_H
-#define _ASSERT_H
+#ifndef STATICASSERT_H
+#define STATICASSERT_H
 
 
 
-#undef assert
-#ifdef NDEBUG
-#  define assert(expr)
-#else
-extern void __fastcall__ _afailed (const char*, unsigned);
-#  define assert(expr)  ((expr)? (void)0 : _afailed(__FILE__, __LINE__))
+/*****************************************************************************/
+/*                                   Code                                    */
+/*****************************************************************************/
+
+
+
+void ParseStaticAssert (void);
+/* Handle _Static_assert. These are a C11 feature. */
+
+
+
+/* End of staticassert.h */
+
 #endif
-
-/*
-** TODO: Guard with #if __STDC_VERSION__ >= 201112L or similar when there
-** is a C11 mode.
-*/
-#define static_assert _Static_assert
-
-
-
-/* End of assert.h */
-#endif
-
-
-

@@ -88,12 +88,6 @@ $(WORKDIR)/bug264.$1.$2.prg: bug264.c | $(WORKDIR)
 	$(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
 
 # this should fail to compile, because there are errors in the code
-$(WORKDIR)/bug1048.$1.$2.prg: bug1048.c | $(WORKDIR)
-	@echo "FIXME: " $$@ "compiles but should give an error."
-	$(if $(QUIET),echo misc/bug1048.$1.$2.prg)
-	$(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
-
-# this should fail to compile, because there are errors in the code
 $(WORKDIR)/bug1098.$1.$2.prg: bug1098.c | $(WORKDIR)
 	@echo "FIXME: " $$@ "compiles but should give an error."
 	$(if $(QUIET),echo misc/bug1098.$1.$2.prg)

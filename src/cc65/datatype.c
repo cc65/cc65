@@ -83,14 +83,9 @@ const char* GetBasicTypeName (const Type* T)
 ** Return "type" for unknown basic types.
 */
 {
-    switch (GetType (T)) {
-    case T_TYPE_CHAR:       return "char";
-    case T_TYPE_SHORT:      return "short";
-    case T_TYPE_INT:        return "integer";
-    case T_TYPE_LONG:       return "long";
-    case T_TYPE_LONGLONG:   return "long long";
+    switch (GetRawType (T)) {
     case T_TYPE_ENUM:       return "enum";
-    case T_TYPE_FLOAT:      return "poinfloatter";
+    case T_TYPE_FLOAT:      return "float";
     case T_TYPE_DOUBLE:     return "double";
     case T_TYPE_VOID:       return "void";
     case T_TYPE_STRUCT:     return "struct";
@@ -99,8 +94,42 @@ const char* GetBasicTypeName (const Type* T)
     case T_TYPE_PTR:        return "pointer";
     case T_TYPE_FUNC:       return "function";
     case T_TYPE_NONE:       /* FALLTHROUGH */
-    default:                return "type";
+    default:                break;
     }
+    if (IsClassInt (T)) {
+        if (IsSignSigned (T)) {
+            switch (GetRawType (T)) {
+            case T_TYPE_CHAR:       return "signed char";
+            case T_TYPE_SHORT:      return "short";
+            case T_TYPE_INT:        return "int";
+            case T_TYPE_LONG:       return "long";
+            case T_TYPE_LONGLONG:   return "long long";
+            default:
+                return "signed integer";
+            }
+        } else if (IsSignUnsigned (T)) {
+            switch (GetRawType (T)) {
+            case T_TYPE_CHAR:       return "unsigned char";
+            case T_TYPE_SHORT:      return "unsigned short";
+            case T_TYPE_INT:        return "unsigned int";
+            case T_TYPE_LONG:       return "unsigned long";
+            case T_TYPE_LONGLONG:   return "unsigned long long";
+            default:
+                return "unsigned integer";
+            }
+        } else {
+            switch (GetRawType (T)) {
+            case T_TYPE_CHAR:       return "char";
+            case T_TYPE_SHORT:      return "short";
+            case T_TYPE_INT:        return "int";
+            case T_TYPE_LONG:       return "long";
+            case T_TYPE_LONGLONG:   return "long long";
+            default:
+                return "integer";
+            }
+        }
+    }
+    return "type";
 }
 
 
@@ -245,6 +274,49 @@ const Type* GetStructReplacementType (const Type* SType)
 
 
 
+long GetIntegerTypeMin (const Type* Type)
+/* Get the smallest possible value of the integer type */
+{
+    if (IsSignSigned (Type)) {
+        return (long)(0xFFFFFFFF << (CHAR_BITS * SizeOf (Type) - 1U));
+    } else {
+        return 0;
+    }
+}
+
+
+
+unsigned long GetIntegerTypeMax (const Type* Type)
+/* Get the largest possible value of the integer type */
+{
+    if (IsSignSigned (Type)) {
+        return (1UL << (CHAR_BITS * SizeOf (Type) - 1U)) - 1UL;
+    } else {
+        return (1UL << (CHAR_BITS * SizeOf (Type))) - 1UL;
+    }
+}
+
+
+
+static unsigned TypeOfBySize (const Type* Type)
+/* Get the code generator replacement type of the object by its size */
+{
+    unsigned NewType;
+    /* If the size is less than or equal to that of a a long, we will copy
+    ** the struct using the primary register, otherwise we use memcpy.
+    */
+    switch (SizeOf (Type)) {
+        case 1:     NewType = CF_CHAR;  break;
+        case 2:     NewType = CF_INT;   break;
+        case 3:     /* FALLTHROUGH */
+        case 4:     NewType = CF_LONG;  break;
+        default:    NewType = CF_NONE;  break;
+    }
+
+    return NewType;
+}
+
+
 Type* PointerTo (const Type* T)
 /* Return a type string that is "pointer to T". The type string is allocated
 ** on the heap and may be freed after use.
@@ -320,6 +392,9 @@ void PrintType (FILE* F, const Type* T)
                 break;
             case T_TYPE_LONGLONG:
                 fprintf (F, "long long");
+                break;
+            case T_TYPE_ENUM:
+                fprintf (F, "enum");
                 break;
             case T_TYPE_FLOAT:
                 fprintf (F, "float");
@@ -430,10 +505,68 @@ int TypeHasAttr (const Type* T)
 
 
 
+const Type* GetUnderlyingType (const Type* Type)
+/* Get the underlying type of an enum or other integer class type */
+{
+    if (IsTypeEnum (Type)) {
+
+        /* This should not happen, but just in case */
+        if (Type->A.P == 0) {
+            Internal ("Enum tag type error in GetUnderlyingTypeCode");
+        }
+
+        return ((SymEntry*)Type->A.P)->V.E.Type;
+    }
+
+    return Type;
+}
+
+
+
+TypeCode GetUnderlyingTypeCode (const Type* Type)
+/* Get the type code of the unqualified underlying type of TCode.
+** Return UnqualifiedType (TCode) if TCode is not scalar.
+*/
+{
+    TypeCode Underlying = UnqualifiedType (Type->C);
+    TypeCode TCode;
+
+    /* We could also support other T_CLASS_INT types, but just enums for now */
+    if (IsTypeEnum (Type)) {
+
+        /* This should not happen, but just in case */
+        if (Type->A.P == 0) {
+            Internal ("Enum tag type error in GetUnderlyingTypeCode");
+        }
+
+        /* Inspect the underlying type of the enum */
+        if (((SymEntry*)Type->A.P)->V.E.Type == 0) {
+            /* Incomplete enum type is used */
+            return Underlying;
+        }
+        TCode = UnqualifiedType (((SymEntry*)Type->A.P)->V.E.Type->C);
+
+        /* Replace the type code with integer */
+        Underlying = (TCode & ~T_MASK_TYPE);
+        switch (TCode & T_MASK_SIZE) {
+            case T_SIZE_INT:      Underlying |= T_TYPE_INT;      break;
+            case T_SIZE_LONG:     Underlying |= T_TYPE_LONG;     break;
+            case T_SIZE_SHORT:    Underlying |= T_TYPE_SHORT;    break;
+            case T_SIZE_CHAR:     Underlying |= T_TYPE_CHAR;     break;
+            case T_SIZE_LONGLONG: Underlying |= T_TYPE_LONGLONG; break;
+            default:              Underlying |= T_TYPE_INT;      break;
+        }
+    }
+
+    return Underlying;
+}
+
+
+
 unsigned SizeOf (const Type* T)
 /* Compute size of object represented by type array. */
 {
-    switch (UnqualifiedType (T->C)) {
+    switch (GetUnderlyingTypeCode (T)) {
 
         case T_VOID:
             /* A void variable is a cc65 extension.
@@ -470,9 +603,6 @@ unsigned SizeOf (const Type* T)
         case T_ULONGLONG:
             return SIZEOF_LONGLONG;
 
-        case T_ENUM:
-            return SIZEOF_INT;
-
         case T_FLOAT:
             return SIZEOF_FLOAT;
 
@@ -491,7 +621,12 @@ unsigned SizeOf (const Type* T)
                 return T->A.U * SizeOf (T + 1);
             }
 
+        case T_ENUM:
+            /* Incomplete enum type */
+            return 0;
+
         default:
+
             Internal ("Unknown type in SizeOf: %04lX", T->C);
             return 0;
 
@@ -547,7 +682,9 @@ unsigned CheckedPSizeOf (const Type* T)
 unsigned TypeOf (const Type* T)
 /* Get the code generator base type of the object */
 {
-    switch (UnqualifiedType (T->C)) {
+    unsigned NewType;
+
+    switch (GetUnderlyingTypeCode (T)) {
 
         case T_SCHAR:
             return CF_CHAR;
@@ -557,7 +694,6 @@ unsigned TypeOf (const Type* T)
 
         case T_SHORT:
         case T_INT:
-        case T_ENUM:
             return CF_INT;
 
         case T_USHORT:
@@ -582,6 +718,10 @@ unsigned TypeOf (const Type* T)
 
         case T_STRUCT:
         case T_UNION:
+            NewType = TypeOfBySize (T);
+            if (NewType != CF_NONE) {
+                return NewType;
+            }
             /* Address of ... */
             return CF_INT | CF_UNSIGNED;
 
@@ -726,8 +866,8 @@ Type* GetBaseElementType (Type* T)
 SymEntry* GetSymEntry (const Type* T)
 /* Return a SymEntry pointer from a type */
 {
-    /* Only structs or unions have a SymEntry attribute */
-    CHECK (IsClassStruct (T));
+    /* Only enums, structs or unions have a SymEntry attribute */
+    CHECK (IsClassStruct (T) || IsTypeEnum (T));
 
     /* Return the attribute */
     return T->A.P;
@@ -738,8 +878,8 @@ SymEntry* GetSymEntry (const Type* T)
 void SetSymEntry (Type* T, SymEntry* S)
 /* Set the SymEntry pointer for a type */
 {
-    /* Only structs or unions have a SymEntry attribute */
-    CHECK (IsClassStruct (T));
+    /* Only enums, structs or unions have a SymEntry attribute */
+    CHECK (IsClassStruct (T) || IsTypeEnum (T));
 
     /* Set the attribute */
     T->A.P = S;

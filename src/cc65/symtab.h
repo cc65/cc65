@@ -146,6 +146,9 @@ unsigned short FindSPAdjustment (const char* Name);
 
 
 
+SymEntry* AddEnumSym (const char* Name, const Type* Type, SymTable* Tab);
+/* Add an enum entry and return it */
+
 SymEntry* AddStructSym (const char* Name, unsigned Type, unsigned Size, SymTable* Tab);
 /* Add a struct/union entry and return it */
 

@@ -551,6 +551,50 @@ static void AddSymEntry (SymTable* T, SymEntry* S)
 
 
 
+SymEntry* AddEnumSym (const char* Name, const Type* Type, SymTable* Tab)
+/* Add an enum entry and return it */
+{
+    /* Do we have an entry with this name already? */
+    SymEntry* Entry = FindSymInTable (TagTab, Name, HashStr (Name));
+    if (Entry) {
+
+        /* We do have an entry. This may be a forward, so check it. */
+        if ((Entry->Flags & SC_TYPEMASK) != SC_ENUM) {
+            /* Existing symbol is not an enum */
+            Error ("Symbol '%s' is already different kind", Name);
+        } else {
+            /* Define the struct size if the underlying type is given. */
+            if (Type != 0) {
+                if (Type !=0 && Entry->V.E.Type != 0) {
+                    /* Both are definitions. */
+                    Error ("Multiple definition for enum '%s'", Name);
+                }
+                Entry->Type       = 0;
+                Entry->V.E.SymTab = Tab;
+                Entry->V.E.Type   = Type;
+            }
+        }
+
+    } else {
+
+        /* Create a new entry */
+        Entry = NewSymEntry (Name, SC_ENUM);
+
+        /* Set the enum type data */
+        Entry->Type       = 0;
+        Entry->V.E.SymTab = Tab;
+        Entry->V.E.Type   = Type;
+
+        /* Add it to the current table */
+        AddSymEntry (TagTab, Entry);
+    }
+
+    /* Return the entry */
+    return Entry;
+}
+
+
+
 SymEntry* AddStructSym (const char* Name, unsigned Type, unsigned Size, SymTable* Tab)
 /* Add a struct/union entry and return it */
 {
@@ -649,10 +693,10 @@ SymEntry* AddConstSym (const char* Name, const Type* T, unsigned Flags, long Val
     /* Create a new entry */
     Entry = NewSymEntry (Name, Flags);
 
-    /* Enum values are ints */
+    /* We only have integer constants for now */
     Entry->Type = TypeDup (T);
 
-    /* Set the enum data */
+    /* Set the constant data */
     Entry->V.ConstVal = Val;
 
     /* Add the entry to the symbol table */

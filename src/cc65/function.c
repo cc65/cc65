@@ -452,7 +452,7 @@ void NewFunc (SymEntry* Func)
         /* Determine if this is a main function in a C99 environment that
         ** returns an int.
         */
-        if (IsTypeInt (F_GetReturnType (CurrentFunc)) &&
+        if (IsRawTypeInt (F_GetReturnType (CurrentFunc)) &&
             IS_Get (&Standard) == STD_C99) {
             C99MainFunc = 1;
         }

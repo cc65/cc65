@@ -1,15 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 assert.h                                  */
+/*                               staticassert.h                              */
 /*                                                                           */
-/*                                Diagnostics                                */
+/*          _Static_assert handling for the cc65 C compiler                  */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2015, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
+/* Copyright 2020 Google LLC                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,29 +30,67 @@
 
 
 
-#ifndef _ASSERT_H
-#define _ASSERT_H
+/* cc65 */
+#include "error.h"
+#include "expr.h"
+#include "litpool.h"
+#include "scanner.h"
+#include "staticassert.h"
 
 
 
-#undef assert
-#ifdef NDEBUG
-#  define assert(expr)
-#else
-extern void __fastcall__ _afailed (const char*, unsigned);
-#  define assert(expr)  ((expr)? (void)0 : _afailed(__FILE__, __LINE__))
-#endif
-
-/*
-** TODO: Guard with #if __STDC_VERSION__ >= 201112L or similar when there
-** is a C11 mode.
-*/
-#define static_assert _Static_assert
+/*****************************************************************************/
+/*                      _Static_assert handling functions                    */
+/*****************************************************************************/
 
 
 
-/* End of assert.h */
-#endif
+void ParseStaticAssert ()
+{
+    /*
+    ** static_assert-declaration ::=
+    **     _Static_assert ( constant-expression , string-literal ) ;
+    */
+    ExprDesc Expr;
+    int failed;
 
+    /* Skip the _Static_assert token itself */
+    CHECK (CurTok.Tok == TOK_STATIC_ASSERT);
+    NextToken ();
 
+    /* We expect an opening paren */
+    if (!ConsumeLParen ()) {
+        return;
+    }
 
+    /* Parse assertion condition */
+    ConstAbsIntExpr (hie1, &Expr);
+    failed = !Expr.IVal;
+
+    /* We expect a comma */
+    if (!ConsumeComma ()) {
+        return;
+    }
+
+    /* String literal */
+    if (CurTok.Tok != TOK_SCONST) {
+        Error ("String literal expected for static_assert message");
+        return;
+    }
+
+    /* Issue an error including the message if the static_assert failed. */
+    if (failed) {
+        Error ("static_assert failed '%s'", GetLiteralStr (CurTok.SVal));
+    }
+
+    /* Consume the string constant, now that we don't need it anymore.
+    ** This should never fail since we checked the token type above.
+    */
+    if (!Consume (TOK_SCONST, "String literal expected")) {
+        return;
+    }
+
+    /* Closing paren and semi-colon needed */
+    ConsumeRParen ();
+    ConsumeSemi ();
+}

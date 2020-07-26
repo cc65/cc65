@@ -50,6 +50,7 @@
 #include "locals.h"
 #include "stackptr.h"
 #include "standard.h"
+#include "staticassert.h"
 #include "symtab.h"
 #include "typeconv.h"
 #include "input.h"
@@ -511,6 +512,13 @@ void DeclareLocals (void)
         ** declarations.
         */
         DeclSpec Spec;
+
+        /* Check for a _Static_assert */
+        if (CurTok.Tok == TOK_STATIC_ASSERT) {
+            ParseStaticAssert ();
+            continue;
+        }
+
         ParseDeclSpec (&Spec, SC_AUTO, T_INT);
         if ((Spec.Flags & DS_DEF_STORAGE) != 0 &&       /* No storage spec */
             (Spec.Flags & DS_DEF_TYPE) != 0    &&       /* No type given */

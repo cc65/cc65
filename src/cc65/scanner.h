@@ -173,6 +173,7 @@ typedef enum token_t {
     TOK_WCSCONST,
 
     TOK_ATTRIBUTE,
+    TOK_STATIC_ASSERT,
     TOK_FAR,
     TOK_NEAR,
     TOK_A,

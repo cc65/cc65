@@ -58,6 +58,7 @@
 #include "pragma.h"
 #include "scanner.h"
 #include "standard.h"
+#include "staticassert.h"
 #include "symtab.h"
 #include "wrappedcall.h"
 #include "typeconv.h"
@@ -935,6 +936,13 @@ static SymEntry* ParseStructDecl (const char* Name)
 
         /* Get the type of the entry */
         DeclSpec Spec;
+
+        /* Check for a _Static_assert */
+        if (CurTok.Tok == TOK_STATIC_ASSERT) {
+            ParseStaticAssert ();
+            continue;
+        }
+
         InitDeclSpec (&Spec);
         ParseTypeSpec (&Spec, -1, T_QUAL_NONE);
 

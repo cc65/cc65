@@ -676,11 +676,8 @@ SymEntry* AddBitField (const char* Name, unsigned Offs, unsigned BitOffs, unsign
 SymEntry* AddConstSym (const char* Name, const Type* T, unsigned Flags, long Val)
 /* Add an constant symbol to the symbol table and return it */
 {
-    /* Enums must be inserted in the global symbol table */
-    SymTable* Tab = ((Flags & SC_ENUMERATOR) == SC_ENUMERATOR) ? SymTab0 : SymTab;
-
     /* Do we have an entry with this name already? */
-    SymEntry* Entry = FindSymInTable (Tab, Name, HashStr (Name));
+    SymEntry* Entry = FindSymInTable (SymTab, Name, HashStr (Name));
     if (Entry) {
         if ((Entry->Flags & SC_CONST) != SC_CONST) {
             Error ("Symbol '%s' is already different kind", Name);
@@ -700,7 +697,7 @@ SymEntry* AddConstSym (const char* Name, const Type* T, unsigned Flags, long Val
     Entry->V.ConstVal = Val;
 
     /* Add the entry to the symbol table */
-    AddSymEntry (Tab, Entry);
+    AddSymEntry (SymTab, Entry);
 
     /* Return the entry */
     return Entry;

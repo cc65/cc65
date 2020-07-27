@@ -26,7 +26,7 @@ compiler.
         do NOT return an exit code are collected here. The makefile _expects_
         those tests to fail, so when an issue is fixed it will break the CI.
         When this happens, the PR fixing the issue should also "invert" the
-        failing condition in the makefile by removing the $(NOT) before the
+        failing condition in the makefile by adding a $(NOT) before the
         offending line (or removing it when it is already there), which will
         make the CI pass again. The test should then be moved elsewhere later,
         which will require additional changes to the makefile(s).

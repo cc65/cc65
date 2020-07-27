@@ -686,7 +686,7 @@ static int ParseFieldWidth (Declaration* Decl)
     ConstAbsIntExpr (hie1, &Expr);
     if (!IsClassInt (Decl->Type)) {
         /* Only integer types may be used for bit-fields */
-        Error ("Bit-field has invalid type ''");
+        Error ("Bit-field has invalid type '%s'", GetBasicTypeName (Decl->Type));
         return -1;
     }
     if (Expr.IVal < 0) {

@@ -12,11 +12,9 @@ endif
 
 WORKDIR = ../testwrk
 
-.PHONY: all dotests continue mostlyclean clean
+.PHONY: test continue mostlyclean clean
 
-all: dotests
-
-dotests: mostlyclean continue
+test: mostlyclean continue
 
 continue:
 	@$(MAKE) -C asm all

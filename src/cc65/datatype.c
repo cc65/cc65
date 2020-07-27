@@ -278,7 +278,8 @@ long GetIntegerTypeMin (const Type* Type)
 /* Get the smallest possible value of the integer type */
 {
     if (IsSignSigned (Type)) {
-        return (long)(0xFFFFFFFF << (CHAR_BITS * SizeOf (Type) - 1U));
+        /* The smallest possible signed value of N-byte integer is -pow(2, 8*N-1) */
+        return (long)((unsigned long)(-1L) << (CHAR_BITS * SizeOf (Type) - 1U));
     } else {
         return 0;
     }
@@ -290,9 +291,14 @@ unsigned long GetIntegerTypeMax (const Type* Type)
 /* Get the largest possible value of the integer type */
 {
     if (IsSignSigned (Type)) {
+        /* Min signed value of N-byte integer is pow(2, 8*N-1) - 1 */
         return (1UL << (CHAR_BITS * SizeOf (Type) - 1U)) - 1UL;
     } else {
-        return (1UL << (CHAR_BITS * SizeOf (Type))) - 1UL;
+        /* Max signed value of N-byte integer is pow(2, 8*N) - 1. However,
+        ** workaround is needed as in ISO C it is UB if the shift count is
+        ** equal to the bit width of the left operand type.
+        */
+        return (1UL << 1U << (CHAR_BITS * SizeOf (Type) - 1U)) - 1UL;
     }
 }
 

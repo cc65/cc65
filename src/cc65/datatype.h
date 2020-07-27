@@ -249,10 +249,14 @@ const Type* GetStructReplacementType (const Type* SType);
 /* Get a replacement type for passing a struct/union in the primary register */
 
 long GetIntegerTypeMin (const Type* Type);
-/* Get the smallest possible value of the integer type */
+/* Get the smallest possible value of the integer type.
+** The type must have a known size.
+*/
 
 unsigned long GetIntegerTypeMax (const Type* Type);
-/* Get the largest possible value of the integer type */
+/* Get the largest possible value of the integer type.
+** The type must have a known size.
+*/
 
 Type* PointerTo (const Type* T);
 /* Return a type string that is "pointer to T". The type string is allocated

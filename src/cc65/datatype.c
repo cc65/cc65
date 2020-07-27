@@ -275,8 +275,14 @@ const Type* GetStructReplacementType (const Type* SType)
 
 
 long GetIntegerTypeMin (const Type* Type)
-/* Get the smallest possible value of the integer type */
+/* Get the smallest possible value of the integer type.
+** The type must have a known size.
+*/
 {
+    if (SizeOf (Type) == 0) {
+        Internal ("Incomplete type used in GetIntegerTypeMin");
+    }
+
     if (IsSignSigned (Type)) {
         /* The smallest possible signed value of N-byte integer is -pow(2, 8*N-1) */
         return (long)((unsigned long)(-1L) << (CHAR_BITS * SizeOf (Type) - 1U));
@@ -288,8 +294,14 @@ long GetIntegerTypeMin (const Type* Type)
 
 
 unsigned long GetIntegerTypeMax (const Type* Type)
-/* Get the largest possible value of the integer type */
+/* Get the largest possible value of the integer type.
+** The type must have a known size.
+*/
 {
+    if (SizeOf (Type) == 0) {
+        Internal ("Incomplete type used in GetIntegerTypeMax");
+    }
+
     if (IsSignSigned (Type)) {
         /* Min signed value of N-byte integer is pow(2, 8*N-1) - 1 */
         return (1UL << (CHAR_BITS * SizeOf (Type) - 1U)) - 1UL;

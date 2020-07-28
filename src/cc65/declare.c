@@ -692,7 +692,7 @@ static int ParseFieldWidth (Declaration* Decl)
 
     if (SizeOf (Decl->Type) != SizeOf (type_uint)) {
         /* Only int sized types may be used for bit-fields for now */
-        Error ("CC65 currently only supports unsigned int bit-fields");
+        Error ("cc65 currently only supports unsigned int bit-fields");
         return -1;
     }
 

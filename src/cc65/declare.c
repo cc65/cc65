@@ -689,6 +689,13 @@ static int ParseFieldWidth (Declaration* Decl)
         Error ("Bit-field has invalid type '%s'", GetBasicTypeName (Decl->Type));
         return -1;
     }
+
+    if (SizeOf (Decl->Type) != SizeOf (type_uint)) {
+        /* Only int sized types may be used for bit-fields for now */
+        Error ("CC65 currently only supports unsigned int bit-fields");
+        return -1;
+    }
+
     if (Expr.IVal < 0) {
         Error ("Negative width in bit-field");
         return -1;

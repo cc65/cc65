@@ -602,6 +602,26 @@ INLINE int IsSignSigned (const Type* T)
 #endif
 
 #if defined(HAVE_INLINE)
+INLINE TypeCode GetRawSizeModifier(const Type* T)
+/* Get the size modifier of a raw type */
+{
+    return (T->C & T_MASK_SIZE);
+}
+#else
+#  define GetRawSizeModifier(T) ((T)->C & T_MASK_SIZE)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE TypeCode GetSizeModifier (const Type* T)
+/* Get the size modifier of a type */
+{
+    return (GetUnderlyingTypeCode (T) & T_MASK_SIZE);
+}
+#else
+#  define GetSizeModifier(T)    (GetUnderlyingTypeCode (T) & T_MASK_SIZE)
+#endif
+
+#if defined(HAVE_INLINE)
 INLINE TypeCode GetQualifier (const Type* T)
 /* Get the qualifier from the given type string */
 {
@@ -695,16 +715,6 @@ int IsVariadicFunc (const Type* T) attribute ((const));
 /* Return true if this is a function type or pointer to function type with
 ** variable parameter list
 */
-
-#if defined(HAVE_INLINE)
-INLINE TypeCode GetSizeModifier (const Type* T)
-/* Get the size modifier of a type */
-{
-    return (T->C & T_MASK_SIZE);
-}
-#else
-#  define GetSizeModifier(T)      ((T)->C & T_MASK_SIZE)
-#endif
 
 FuncDesc* GetFuncDesc (const Type* T) attribute ((const));
 /* Get the FuncDesc pointer from a function or pointer-to-function type */

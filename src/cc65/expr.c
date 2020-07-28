@@ -758,7 +758,7 @@ static void Primary (ExprDesc* E)
 
                 /* Check for illegal symbol types */
                 CHECK ((Sym->Flags & SC_LABEL) != SC_LABEL);
-                if (Sym->Flags & SC_TYPE) {
+                if (Sym->Flags & SC_ESUTYPEMASK) {
                     /* Cannot use type symbols */
                     Error ("Variable identifier expected");
                     /* Assume an int type to make E valid */
@@ -802,7 +802,7 @@ static void Primary (ExprDesc* E)
                     E->Name  = Sym->V.R.RegOffs;
                 } else if ((Sym->Flags & SC_STATIC) == SC_STATIC) {
                     /* Static variable */
-                    if (Sym->Flags & (SC_EXTERN | SC_STORAGE)) {
+                    if (Sym->Flags & (SC_EXTERN | SC_STORAGE | SC_DECL)) {
                         E->Flags = E_LOC_GLOBAL | E_RTYPE_LVAL;
                         E->Name = (uintptr_t) Sym->Name;
                     } else {
@@ -1867,23 +1867,23 @@ void hie10 (ExprDesc* Expr)
             NextToken ();
             ExprWithCheck (hie10, Expr);
             /* The & operator may be applied to any lvalue, and it may be
-            ** applied to functions, even if they're no lvalues.
+            ** applied to functions and arrays, even if they're not lvalues.
             */
-            if (ED_IsRVal (Expr) && !IsTypeFunc (Expr->Type) && !IsTypeArray (Expr->Type)) {
-                Error ("Illegal address");
-            } else {
+            if (!IsTypeFunc (Expr->Type) && !IsTypeArray (Expr->Type)) {
+                if (ED_IsRVal (Expr)) {
+                    Error ("Illegal address");
+                    break;
+                }
+
                 if (ED_IsBitField (Expr)) {
                     Error ("Cannot take address of bit-field");
                     /* Do it anyway, just to avoid further warnings */
-                    Expr->Flags &= ~E_BITFIELD;
+                    ED_DisBitField (Expr);
                 }
-                /* It's allowed in C to take the address of an array this way */
-                if (!IsTypeFunc (Expr->Type) && !IsTypeArray (Expr->Type)) {
-                    /* The & operator yields an rvalue address */
-                    ED_AddrExpr (Expr);
-                }
-                Expr->Type = PointerTo (Expr->Type);
+                /* The & operator yields an rvalue address */
+                ED_AddrExpr (Expr);
             }
+            Expr->Type = PointerTo (Expr->Type);
             break;
 
         case TOK_SIZEOF:
@@ -1898,14 +1898,19 @@ void hie10 (ExprDesc* Expr)
                 CodeMark Mark;
                 GetCodePos (&Mark);
                 hie10 (Expr);
-                /* If the expression is a literal string, release it, so it
-                ** won't be output as data if not used elsewhere.
-                */
-                if (ED_IsLocLiteral (Expr)) {
-                    ReleaseLiteral (Expr->LVal);
+                if (ED_IsBitField (Expr)) {
+                    Error ("Cannot apply 'sizeof' to bit-field");
+                    Size = 0;
+                } else {
+                    /* If the expression is a literal string, release it, so it
+                    ** won't be output as data if not used elsewhere.
+                    */
+                    if (ED_IsLocLiteral (Expr)) {
+                        ReleaseLiteral (Expr->LVal);
+                    }
+                    /* Calculate the size */
+                    Size = CheckedSizeOf (Expr->Type);
                 }
-                /* Calculate the size */
-                Size = CheckedSizeOf (Expr->Type);
                 /* Remove any generated code */
                 RemoveCode (&Mark);
             }

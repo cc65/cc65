@@ -12,11 +12,9 @@ endif
 
 WORKDIR = ../testwrk
 
-.PHONY: all dotests continue mostlyclean clean
+.PHONY: test continue mostlyclean clean
 
-all: dotests
-
-dotests: mostlyclean continue
+test: mostlyclean continue
 
 continue:
 	@$(MAKE) -C asm all
@@ -25,6 +23,7 @@ continue:
 	@$(MAKE) -C ref all
 	@$(MAKE) -C err all
 	@$(MAKE) -C misc all
+	@$(MAKE) -C todo all
 
 mostlyclean:
 	@$(MAKE) -C asm clean
@@ -33,6 +32,7 @@ mostlyclean:
 	@$(MAKE) -C ref clean
 	@$(MAKE) -C err clean
 	@$(MAKE) -C misc clean
+	@$(MAKE) -C todo clean
 
 clean: mostlyclean
 	@$(call RMDIR,$(WORKDIR))

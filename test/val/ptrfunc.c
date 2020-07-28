@@ -6,7 +6,7 @@
 
 #include <stdio.h>
 
-#define NO_IMPLICIT_FUNCPTR_CONV
+/* #define SUPPORT_BIT_TYPES */
 
 unsigned char success=0;
 unsigned char failures=0;
@@ -33,15 +33,9 @@ volatile unsigned char uchar1 = 0;
 volatile unsigned char uchar2 = 0;
 #endif
 
-#ifdef NO_IMPLICIT_FUNCPTR_CONV
 void (*pfunc)(void);
 void (*p1func)(void);
 unsigned char (*pcfunc)(void);
-#else
-void (*pfunc)();
-void (*p1func)();
-unsigned char (*pcfunc)();
-#endif
 
 void done()
 {
@@ -79,11 +73,7 @@ void docall1()
         }
 }
 
-#ifdef NO_IMPLICIT_FUNCPTR_CONV
-void docall2( void(*pf)(void) )
-#else
 void docall2( void(*pf)() )
-#endif
 {
         unsigned char i;
         for(i = 0; i < 2; i++) {

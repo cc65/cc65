@@ -633,7 +633,7 @@ SymEntry* AddConstSym (const char* Name, const Type* T, unsigned Flags, long Val
 /* Add an constant symbol to the symbol table and return it */
 {
     /* Enums must be inserted in the global symbol table */
-    SymTable* Tab = ((Flags & SC_ENUM) == SC_ENUM)? SymTab0 : SymTab;
+    SymTable* Tab = ((Flags & SC_ENUMERATOR) == SC_ENUMERATOR) ? SymTab0 : SymTab;
 
     /* Do we have an entry with this name already? */
     SymEntry* Entry = FindSymInTable (Tab, Name, HashStr (Name));
@@ -717,7 +717,7 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
         for (i = 0; i < CollCount (Entry->V.L.DefsOrRefs); i++) {
             DOR = CollAt (Entry->V.L.DefsOrRefs, i);
 
-            if ((DOR->Flags & SC_DEF) && (Flags & SC_REF) && (Flags & (SC_GOTO|SC_GOTO_IND))) {
+            if ((DOR->Flags & SC_DEF) && (Flags & SC_REF) && (Flags & (SC_GOTO | SC_GOTO_IND))) {
                 /* We're processing a goto and here is its destination label.
                 ** This means the difference between SP values is already known,
                 ** so we simply emit the SP adjustment code.
@@ -739,7 +739,7 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
             }
 
 
-            if ((DOR->Flags & SC_REF) && (DOR->Flags & (SC_GOTO|SC_GOTO_IND)) && (Flags & SC_DEF)) {
+            if ((DOR->Flags & SC_REF) && (DOR->Flags & (SC_GOTO | SC_GOTO_IND)) && (Flags & SC_DEF)) {
                 /* We're processing a label, let's update all gotos encountered
                 ** so far
                 */
@@ -821,7 +821,7 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
 
         /* Set the symbol attributes */
         Entry->Type = TypeDup (T);
-        if ((Flags & SC_AUTO) == SC_AUTO) {
+        if ((Flags & SC_AUTO) == SC_AUTO || (Flags & SC_TYPEMASK) == SC_TYPEDEF) {
             Entry->V.Offs = Offs;
         } else if ((Flags & SC_REGISTER) == SC_REGISTER) {
             Entry->V.R.RegOffs  = Offs;
@@ -867,12 +867,12 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
         /* If the existing symbol is an enumerated constant,
         ** then avoid a compiler crash.  See GitHub issue #728.
         */
-        if (Entry->Flags & SC_ENUM) {
-            Fatal ("Can't redeclare enum constant '%s' as global variable", Name);
+        if (Entry->Flags & SC_ENUMERATOR) {
+            Fatal ("Can't redeclare enumerator constant '%s' as global variable", Name);
         }
 
         /* We have a symbol with this name already */
-        if (Entry->Flags & SC_TYPE) {
+        if (Entry->Flags & SC_TYPEMASK) {
             Error ("Multiple definition for '%s'", Name);
             return Entry;
         }
@@ -1109,7 +1109,7 @@ void EmitDebugInfo (void)
         }
         Sym = SymTab->SymHead;
         while (Sym) {
-            if ((Sym->Flags & (SC_CONST|SC_TYPE)) == 0) {
+            if ((Sym->Flags & (SC_CONST | SC_TYPEMASK)) == 0) {
                 if (Sym->Flags & SC_AUTO) {
                     AddTextLine ("%s, \"%s\", \"00\", auto, %d",
                                  Head, Sym->Name, Sym->V.Offs);

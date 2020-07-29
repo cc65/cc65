@@ -688,15 +688,15 @@ static int ParseFieldWidth (Declaration* Decl)
         return -1;
     }
 
-    /* Read the width */
-    NextToken ();
-    ConstAbsIntExpr (hie1, &Expr);
-
     if (SizeOf (Decl->Type) != SizeOf (type_uint)) {
         /* Only int sized types may be used for bit-fields for now */
         Error ("cc65 currently only supports unsigned int bit-fields");
         return -1;
     }
+
+    /* Read the width */
+    NextToken ();
+    ConstAbsIntExpr (hie1, &Expr);
 
     if (Expr.IVal < 0) {
         Error ("Negative width in bit-field");

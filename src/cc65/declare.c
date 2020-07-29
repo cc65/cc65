@@ -2230,6 +2230,13 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
 
         /* Check for excess elements */
         if (Entry == 0) {
+            /* Is there just one trailing comma before a closing curly? */
+            if (NextTok.Tok == TOK_RCURLY && CurTok.Tok == TOK_COMMA) {
+                /* Skip comma and exit scope */
+                NextToken ();
+                break;
+            }
+
             if (HasCurly) {
                 Error ("Excess elements in %s initializer", GetBasicTypeName (T));
                 SkipInitializer (HasCurly);

@@ -725,6 +725,29 @@ static int ParseFieldWidth (Declaration* Decl)
 
 
 
+static unsigned PadWithBitField (unsigned StructSize, unsigned BitOffs)
+/* Pad the current struct with an anonymous bit-field aligned to the next byte.
+** Return how many bits are used to pad.
+*/
+{
+    /* MSVC complains about unary negation of unsigned,
+    ** so it has been rewritten as subtraction.
+    */
+    unsigned PaddingBits = (0 - BitOffs) % CHAR_BITS;
+
+    /* We need an anonymous name */
+    ident Ident;
+    AnonName (Ident, "bit-field");
+
+    /* Add an anonymous bit-field that aligns to the next
+    ** byte.
+    */
+    AddBitField (Ident, StructSize, BitOffs, PaddingBits);
+
+    return PaddingBits;
+}
+
+
 static unsigned AliasAnonStructFields (const Declaration* Decl, SymEntry* Anon)
 /* Create alias fields from an anon union/struct in the current lexical level.
 ** The function returns the count of created aliases.
@@ -927,7 +950,6 @@ static SymEntry* ParseStructDecl (const char* Name)
         while (1) {
 
             Declaration Decl;
-            ident       Ident;
 
             /* If we had a flexible array member before, no other fields can
             ** follow.
@@ -950,19 +972,10 @@ static SymEntry* ParseStructDecl (const char* Name)
             */
             if (BitOffs > 0) {
                 if (FieldWidth <= 0 || (BitOffs + FieldWidth) > INT_BITS) {
-                    /* Bits needed to byte-align the next field.
-                    ** MSVC complains about unary negation of unsigned,
-                    ** so it has been rewritten as subtraction.
-                    */
-                    unsigned PaddingBits = (0 - BitOffs) % CHAR_BITS;
-
-                    /* We need an anonymous name */
-                    AnonName (Ident, "bit-field");
-
                     /* Add an anonymous bit-field that aligns to the next
                     ** byte.
                     */
-                    AddBitField (Ident, StructSize, BitOffs, PaddingBits);
+                    unsigned PaddingBits = PadWithBitField (StructSize, BitOffs);
 
                     /* No bits left */
                     StructSize += (BitOffs + PaddingBits) / CHAR_BITS;
@@ -1047,9 +1060,12 @@ NextMember: if (CurTok.Tok != TOK_COMMA) {
         ConsumeSemi ();
     }
 
-    /* If we have bits from bit-fields left, add them to the size. */
     if (BitOffs > 0) {
-        StructSize += ((BitOffs + CHAR_BITS - 1) / CHAR_BITS);
+        /* If we have bits from bit-fields left, pad the struct to next byte */
+        unsigned PaddingBits = PadWithBitField (StructSize, BitOffs);
+
+        /* No bits left */
+        StructSize += (BitOffs + PaddingBits) / CHAR_BITS;
     }
 
     /* Skip the closing brace */

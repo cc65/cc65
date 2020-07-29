@@ -2092,6 +2092,7 @@ static unsigned ParseArrayInit (Type* T, int* Braces, int AllowFlexibleMembers)
 /* Parse initializaton for arrays. Return the number of data bytes. */
 {
     int Count;
+    int HasCurly = 0;
 
     /* Get the array data */
     Type* ElementType    = GetElementType (T);
@@ -2144,8 +2145,12 @@ static unsigned ParseArrayInit (Type* T, int* Braces, int AllowFlexibleMembers)
 
     } else {
 
-        /* Curly brace */
-        ConsumeLCurly ();
+        /* Arrays can be initialized without a pair of curly braces */
+        if (*Braces == 0 || CurTok.Tok == TOK_LCURLY) {
+            /* Consume the opening curly brace */
+            HasCurly = ConsumeLCurly ();
+            *Braces += HasCurly;
+        }
 
         /* Initialize the array members */
         Count = 0;
@@ -2161,8 +2166,10 @@ static unsigned ParseArrayInit (Type* T, int* Braces, int AllowFlexibleMembers)
             NextToken ();
         }
 
-        /* Closing curly braces */
-        ConsumeRCurly ();
+        if (HasCurly) {
+            /* Closing curly braces */
+            ConsumeRCurly ();
+        }
     }
 
     if (ElementCount == UNSPECIFIED) {
@@ -2176,7 +2183,7 @@ static unsigned ParseArrayInit (Type* T, int* Braces, int AllowFlexibleMembers)
         ElementCount = Count;
     } else if (Count < ElementCount) {
         g_zerobytes ((ElementCount - Count) * ElementSize);
-    } else if (Count > ElementCount) {
+    } else if (Count > ElementCount && HasCurly) {
         Error ("Excess elements in array initializer");
     }
     return ElementCount * ElementSize;

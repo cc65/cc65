@@ -133,8 +133,11 @@ SymEntry* FindLocalSym (const char* Name);
 SymEntry* FindTagSym (const char* Name);
 /* Find the symbol with the given name in the tag table */
 
-SymEntry* FindStructField (const Type* TypeArray, const char* Name);
-/* Find a struct/union field in the fields list */
+SymEntry FindStructField (const Type* TypeArray, const char* Name);
+/* Find a struct/union field in the fields list.
+** Return the info about the found field symbol filled in an entry struct by
+** value, or an empty entry struct if the field is not found.
+*/
 
 unsigned short FindSPAdjustment (const char* Name);
 /* Search for an entry in the table of SP adjustments */

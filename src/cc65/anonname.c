@@ -61,6 +61,17 @@ static const char AnonTag[] = "$anon";
 
 
 
+char* AnonFieldName (char* Buf, const char* Spec, int ANumber)
+/* Get a name for an anonymous field of a struct or union. The given buffer is
+** expected to be IDENTSIZE characters long. A pointer to the buffer is returned.
+*/
+{
+    xsprintf (Buf, IDENTSIZE, "%s-%s-%04X", AnonTag, Spec, ANumber);
+    return Buf;
+}
+
+
+
 char* AnonName (char* Buf, const char* Spec)
 /* Get a name for an anonymous variable or type. The given buffer is expected
 ** to be IDENTSIZE characters long. A pointer to the buffer is returned.

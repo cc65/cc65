@@ -487,10 +487,15 @@ SymEntry* FindTagSym (const char* Name)
 
 
 
-SymEntry* FindStructField (const Type* T, const char* Name)
-/* Find a struct/union field in the fields list */
+SymEntry FindStructField (const Type* T, const char* Name)
+/* Find a struct/union field in the fields list.
+** Return the info about the found field symbol filled in an entry struct by
+** value, or an empty entry struct if the field is not found.
+*/
 {
-    SymEntry* Field = 0;
+    SymEntry* Entry = 0;
+    SymEntry  Field;
+    int       Offs  = 0;
 
     /* The given type may actually be a pointer to struct/union */
     if (IsTypePtr (T)) {
@@ -508,8 +513,24 @@ SymEntry* FindStructField (const Type* T, const char* Name)
         ** not exist.
         */
         if (Struct->V.S.SymTab) {
-            Field = FindSymInTable (Struct->V.S.SymTab, Name, HashStr (Name));
+            Entry = FindSymInTable (Struct->V.S.SymTab, Name, HashStr (Name));
+            
+            if (Entry != 0) {
+                Offs = Entry->V.Offs;
+            }
+
+            while (Entry != 0 && (Entry->Flags & SC_ALIAS) == SC_ALIAS) {
+                /* Get the real field */
+                Entry = Entry->V.A.Field;
+            }
         }
+    }
+
+    if (Entry != 0) {
+        Field = *Entry;
+        Field.V.Offs = Offs;
+    } else {
+        memset (&Field, 0, sizeof(SymEntry));
     }
 
     return Field;
@@ -862,7 +883,13 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
 
         /* Set the symbol attributes */
         Entry->Type = TypeDup (T);
-        if ((Flags & SC_AUTO) == SC_AUTO || (Flags & SC_TYPEMASK) == SC_TYPEDEF) {
+
+        if ((Flags & SC_STRUCTFIELD) == SC_STRUCTFIELD ||
+            (Flags & SC_TYPEDEF) == SC_TYPEDEF) {
+            if ((Flags & SC_ALIAS) != SC_ALIAS) {
+                Entry->V.Offs = Offs;
+            }
+        } else if ((Flags & SC_AUTO) == SC_AUTO) {
             Entry->V.Offs = Offs;
         } else if ((Flags & SC_REGISTER) == SC_REGISTER) {
             Entry->V.R.RegOffs  = Offs;
@@ -874,8 +901,6 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
             /* Generate the assembler name from the label number */
             Entry->V.L.Label = Offs;
             Entry->AsmName = xstrdup (LocalLabelName (Entry->V.L.Label));
-        } else if ((Flags & SC_STRUCTFIELD) == SC_STRUCTFIELD) {
-            Entry->V.Offs = Offs;
         } else {
             Internal ("Invalid flags in AddLocalSym: %04X", Flags);
         }

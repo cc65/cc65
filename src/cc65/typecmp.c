@@ -215,8 +215,8 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
         }
 
         /* Get the left and right types, signs and qualifiers */
-        LeftType  = GetUnderlyingTypeCode (lhs);
-        RightType = GetUnderlyingTypeCode (rhs);
+        LeftType  = (GetUnderlyingTypeCode (lhs) & T_MASK_TYPE);
+        RightType = (GetUnderlyingTypeCode (rhs) & T_MASK_TYPE);
         LeftSign  = GetSignedness (lhs);
         RightSign = GetSignedness (rhs);
         LeftQual  = GetQualifier (lhs);

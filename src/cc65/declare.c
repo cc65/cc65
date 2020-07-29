@@ -681,14 +681,16 @@ static int ParseFieldWidth (Declaration* Decl)
         return -1;
     }
 
+    if (!IsClassInt (Decl->Type)) {
+        /* Only integer types may be used for bit-fields */
+        Error ("Bit-field has invalid type '%s', must be integral",
+               GetBasicTypeName (Decl->Type));
+        return -1;
+    }
+
     /* Read the width */
     NextToken ();
     ConstAbsIntExpr (hie1, &Expr);
-    if (!IsClassInt (Decl->Type)) {
-        /* Only integer types may be used for bit-fields */
-        Error ("Bit-field has invalid type '%s'", GetBasicTypeName (Decl->Type));
-        return -1;
-    }
 
     if (SizeOf (Decl->Type) != SizeOf (type_uint)) {
         /* Only int sized types may be used for bit-fields for now */
@@ -700,20 +702,10 @@ static int ParseFieldWidth (Declaration* Decl)
         Error ("Negative width in bit-field");
         return -1;
     }
-    /* FIXME: We should compare with the width of the specified type */
-#if 0
-    /* Use is when we really support non-uint16_t bit-fields */
     if (Expr.IVal > (long)(SizeOf (Decl->Type) * CHAR_BITS)) {
         Error ("Width of bit-field exceeds its type");
         return -1;
     }
-#else
-    /* This is what we currenty do */
-    if (Expr.IVal > (long)(SizeOf (type_uint) * CHAR_BITS)) {
-        Error ("Width of bit-field exceeds 16");
-        return -1;
-    }
-#endif
     if (Expr.IVal == 0 && Decl->Ident[0] != '\0') {
         Error ("Zero width for named bit-field");
         return -1;

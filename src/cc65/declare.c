@@ -89,7 +89,7 @@ struct StructInitData {
 static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers);
 /* Parse a type specifier */
 
-static unsigned ParseInitInternal (Type* T, int AllowFlexibleMembers);
+static unsigned ParseInitInternal (Type* T, int* Braces, int AllowFlexibleMembers);
 /* Parse initialization of variables. Return the number of data bytes. */
 
 
@@ -717,16 +717,16 @@ static int ParseFieldWidth (Declaration* Decl)
 
 
 
-static unsigned CopyAnonStructFields (const Declaration* Decl, int Offs)
-/* Copy fields from an anon union/struct into the current lexical level. The
-** function returns the size of the embedded struct/union.
+static unsigned AliasAnonStructFields (const Declaration* Decl, SymEntry* Anon)
+/* Create alias fields from an anon union/struct in the current lexical level.
+** The function returns the count of created aliases.
 */
 {
+    unsigned Count = 0;
+    SymEntry* Alias;
+
     /* Get the pointer to the symbol table entry of the anon struct */
     SymEntry* Entry = GetSymEntry (Decl->Type);
-
-    /* Get the size of the anon struct */
-    unsigned Size = Entry->V.S.Size;
 
     /* Get the symbol table containing the fields. If it is empty, there has
     ** been an error before, so bail out.
@@ -734,7 +734,7 @@ static unsigned CopyAnonStructFields (const Declaration* Decl, int Offs)
     SymTable* Tab = Entry->V.S.SymTab;
     if (Tab == 0) {
         /* Incomplete definition - has been flagged before */
-        return Size;
+        return 0;
     }
 
     /* Get a pointer to the list of symbols. Then walk the list adding copies
@@ -743,10 +743,13 @@ static unsigned CopyAnonStructFields (const Declaration* Decl, int Offs)
     Entry = Tab->SymHead;
     while (Entry) {
 
-        /* Enter a copy of this symbol adjusting the offset. We will just
-        ** reuse the type string here.
-        */
-        AddLocalSym (Entry->Name, Entry->Type, SC_STRUCTFIELD, Offs + Entry->V.Offs);
+        /* Enter an alias of this symbol */
+        if (!IsAnonName (Entry->Name)) {
+            Alias = AddLocalSym (Entry->Name, Entry->Type, SC_STRUCTFIELD|SC_ALIAS, 0);
+            Alias->V.A.Field = Entry;
+            Alias->V.A.Offs  = Anon->V.Offs + Entry->V.Offs;
+            ++Count;
+        }
 
         /* Currently, there can not be any attributes, but if there will be
         ** some in the future, we want to know this.
@@ -757,8 +760,8 @@ static unsigned CopyAnonStructFields (const Declaration* Decl, int Offs)
         Entry = Entry->NextSym;
     }
 
-    /* Return the size of the embedded struct */
-    return Size;
+    /* Return the count of created aliases */
+    return Count;
 }
 
 
@@ -771,6 +774,8 @@ static SymEntry* ParseUnionDecl (const char* Name)
     unsigned  FieldSize;
     int       FieldWidth;       /* Width in bits, -1 if not a bit-field */
     SymTable* FieldTab;
+    SymEntry* StructTypeEntry;
+    SymEntry* Entry;
 
 
     if (CurTok.Tok != TOK_LCURLY) {
@@ -779,7 +784,9 @@ static SymEntry* ParseUnionDecl (const char* Name)
     }
 
     /* Add a forward declaration for the struct in the current lexical level */
-    AddStructSym (Name, SC_UNION, 0, 0);
+    StructTypeEntry = AddStructSym (Name, SC_UNION, 0, 0);
+
+    StructTypeEntry->V.S.ACount = 0;
 
     /* Skip the curly brace */
     NextToken ();
@@ -821,16 +828,11 @@ static SymEntry* ParseUnionDecl (const char* Name)
                     /* This is an anonymous struct or union. Copy the fields
                     ** into the current level.
                     */
-                    FieldSize = CopyAnonStructFields (&Decl, 0);
-                    if (FieldSize > UnionSize) {
-                        UnionSize = FieldSize;
-                    }
-
+                    AnonFieldName (Decl.Ident, "field", StructTypeEntry->V.S.ACount);
                 } else {
                     /* A non bit-field without a name is legal but useless */
                     Warning ("Declaration does not declare anything");
                 }
-                goto NextMember;
             }
 
             /* Handle sizes */
@@ -843,7 +845,13 @@ static SymEntry* ParseUnionDecl (const char* Name)
             if (FieldWidth > 0) {
                 AddBitField (Decl.Ident, 0, 0, FieldWidth);
             } else {
-                AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, 0);
+                if (IsAnonName (Decl.Ident)) {
+                    Entry = AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, 0);
+                    Entry->V.A.ANumber = StructTypeEntry->V.S.ACount++;
+                    AliasAnonStructFields (&Decl, Entry);
+                } else {
+                    AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, 0);
+                }
             }
 
 NextMember: if (CurTok.Tok != TOK_COMMA) {
@@ -876,6 +884,8 @@ static SymEntry* ParseStructDecl (const char* Name)
     unsigned  BitOffs;          /* Bit offset for bit-fields */
     int       FieldWidth;       /* Width in bits, -1 if not a bit-field */
     SymTable* FieldTab;
+    SymEntry* StructTypeEntry;
+    SymEntry* Entry;
 
 
     if (CurTok.Tok != TOK_LCURLY) {
@@ -884,7 +894,9 @@ static SymEntry* ParseStructDecl (const char* Name)
     }
 
     /* Add a forward declaration for the struct in the current lexical level */
-    AddStructSym (Name, SC_STRUCT, 0, 0);
+    StructTypeEntry = AddStructSym (Name, SC_STRUCT, 0, 0);
+
+    StructTypeEntry->V.S.ACount = 0;
 
     /* Skip the curly brace */
     NextToken ();
@@ -981,13 +993,11 @@ static SymEntry* ParseStructDecl (const char* Name)
                         /* This is an anonymous struct or union. Copy the
                         ** fields into the current level.
                         */
-                        StructSize += CopyAnonStructFields (&Decl, StructSize);
-
+                        AnonFieldName (Decl.Ident, "field", StructTypeEntry->V.S.ACount);
                     } else {
                         /* A non bit-field without a name is legal but useless */
                         Warning ("Declaration does not declare anything");
                     }
-                    goto NextMember;
                 } else {
                     /* A bit-field without a name will get an anonymous one */
                     AnonName (Decl.Ident, "bit-field");
@@ -1009,7 +1019,13 @@ static SymEntry* ParseStructDecl (const char* Name)
                 StructSize += BitOffs / CHAR_BITS;
                 BitOffs %= CHAR_BITS;
             } else {
-                AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, StructSize);
+                if (IsAnonName (Decl.Ident)) {
+                    Entry = AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, StructSize);
+                    Entry->V.A.ANumber = StructTypeEntry->V.S.ACount++;
+                    AliasAnonStructFields (&Decl, Entry);
+                } else {
+                    AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, StructSize);
+                }
                 if (!FlexibleMember) {
                     StructSize += CheckedSizeOf (Decl.Type);
                 }
@@ -1874,18 +1890,20 @@ void CheckEmptyDecl (const DeclSpec* D)
 
 
 
-static void SkipInitializer (unsigned BracesExpected)
+static void SkipInitializer (int BracesExpected)
 /* Skip the remainder of an initializer in case of errors. Try to be somewhat
 ** smart so we don't have too many following errors.
 */
 {
-    while (CurTok.Tok != TOK_CEOF && CurTok.Tok != TOK_SEMI && BracesExpected > 0) {
+    while (CurTok.Tok != TOK_CEOF && CurTok.Tok != TOK_SEMI && BracesExpected >= 0) {
         switch (CurTok.Tok) {
             case TOK_RCURLY:    --BracesExpected;   break;
             case TOK_LCURLY:    ++BracesExpected;   break;
             default:                                break;
         }
-        NextToken ();
+        if (BracesExpected >= 0) {
+            NextToken ();
+        }
     }
 }
 
@@ -1917,6 +1935,7 @@ static void ClosingCurlyBraces (unsigned BracesExpected)
 */
 {
     while (BracesExpected) {
+        /* TODO: Skip all excess initializers until next closing curly brace */
         if (CurTok.Tok == TOK_RCURLY) {
             NextToken ();
         } else if (CurTok.Tok == TOK_COMMA && NextTok.Tok == TOK_RCURLY) {
@@ -2069,7 +2088,7 @@ static unsigned ParsePointerInit (Type* T)
 
 
 
-static unsigned ParseArrayInit (Type* T, int AllowFlexibleMembers)
+static unsigned ParseArrayInit (Type* T, int* Braces, int AllowFlexibleMembers)
 /* Parse initializaton for arrays. Return the number of data bytes. */
 {
     int Count;
@@ -2135,7 +2154,7 @@ static unsigned ParseArrayInit (Type* T, int AllowFlexibleMembers)
             ** an array (because the size of each element may differ
             ** otherwise).
             */
-            ParseInitInternal (ElementType, 0);
+            ParseInitInternal (ElementType, Braces, 0);
             ++Count;
             if (CurTok.Tok != TOK_COMMA)
                 break;
@@ -2158,23 +2177,29 @@ static unsigned ParseArrayInit (Type* T, int AllowFlexibleMembers)
     } else if (Count < ElementCount) {
         g_zerobytes ((ElementCount - Count) * ElementSize);
     } else if (Count > ElementCount) {
-        Error ("Too many initializers");
+        Error ("Excess elements in array initializer");
     }
     return ElementCount * ElementSize;
 }
 
 
 
-static unsigned ParseStructInit (Type* T, int AllowFlexibleMembers)
+static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
 /* Parse initialization of a struct or union. Return the number of data bytes. */
 {
     SymEntry*       Entry;
     SymTable*       Tab;
     StructInitData  SI;
+    int             HasCurly  = 0;
+    int             SkipComma = 0;
 
 
-    /* Consume the opening curly brace */
-    ConsumeLCurly ();
+    /* Fields can be initialized without a pair of curly braces */
+    if (*Braces == 0 || CurTok.Tok == TOK_LCURLY) {
+        /* Consume the opening curly brace */
+        HasCurly = ConsumeLCurly ();
+        *Braces += HasCurly;
+    }
 
     /* Get a pointer to the struct entry from the type */
     Entry = GetSymEntry (T);
@@ -2189,7 +2214,7 @@ static unsigned ParseStructInit (Type* T, int AllowFlexibleMembers)
     if (Tab == 0) {
         Error ("Cannot initialize variables with incomplete type");
         /* Try error recovery */
-        SkipInitializer (1);
+        SkipInitializer (HasCurly);
         /* Nothing initialized */
         return 0;
     }
@@ -2203,18 +2228,50 @@ static unsigned ParseStructInit (Type* T, int AllowFlexibleMembers)
     SI.ValBits = 0;
     while (CurTok.Tok != TOK_RCURLY) {
 
-        /* */
+        /* Check for excess elements */
         if (Entry == 0) {
-            Error ("Too many initializers");
-            SkipInitializer (1);
+            if (HasCurly) {
+                Error ("Excess elements in %s initializer", GetBasicTypeName (T));
+                SkipInitializer (HasCurly);
+            }
             return SI.Offs;
         }
 
-        /* Parse initialization of one field. Bit-fields need a special
-        ** handling.
+        /* Check for special members that don't consume the initializer */
+        if ((Entry->Flags & SC_ALIAS) == SC_ALIAS) {
+            /* Just skip */
+            goto NextMember;
+        }
+
+        /* This may be an anonymous bit-field, in which case it doesn't
+        ** have an initializer.
         */
+        if (SymIsBitField (Entry) && (IsAnonName (Entry->Name))) {
+            /* Account for the data and output it if we have at least a full
+            ** word. We may have more if there was storage unit overlap, for
+            ** example two consecutive 10 bit fields. These will be packed
+            ** into 3 bytes.
+            */
+            SI.ValBits += Entry->V.B.BitWidth;
+            CHECK (SI.ValBits <= CHAR_BITS + INT_BITS - 2);
+            while (SI.ValBits >= CHAR_BITS) {
+                OutputBitFieldData (&SI);
+            }
+            /* Avoid consuming the comma if any */
+            goto NextMember;
+        }
+
+        /* Skip comma this round */
+        if (SkipComma) {
+            NextToken ();
+            SkipComma = 0;
+        }
+
         if (SymIsBitField (Entry)) {
 
+            /* Parse initialization of one field. Bit-fields need a special
+            ** handling.
+            */
             ExprDesc ED;
             unsigned Val;
             unsigned Shift;
@@ -2226,36 +2283,17 @@ static unsigned ParseStructInit (Type* T, int AllowFlexibleMembers)
             CHECK (Entry->V.B.Offs * CHAR_BITS + Entry->V.B.BitOffs ==
                    SI.Offs         * CHAR_BITS + SI.ValBits);
 
-            /* This may be an anonymous bit-field, in which case it doesn't
-            ** have an initializer.
-            */
-            if (IsAnonName (Entry->Name)) {
-                /* Account for the data and output it if we have at least a
-                ** full word.  We may have more if there was storage unit
-                ** overlap, for example two consecutive 10 bit fields.
-                ** These will be packed into 3 bytes.
-                */
-                SI.ValBits += Entry->V.B.BitWidth;
-                CHECK (SI.ValBits <= CHAR_BITS + INT_BITS - 2);
-                while (SI.ValBits >= CHAR_BITS) {
-                    OutputBitFieldData (&SI);
-                }
-                goto NextMember;
-            } else {
-                /* Read the data, check for a constant integer, do a range
-                ** check.
-                */
-                ParseScalarInitInternal (type_uint, &ED);
-                if (!ED_IsConstAbsInt (&ED)) {
-                    Error ("Constant initializer expected");
-                    ED_MakeConstAbsInt (&ED, 1);
-                }
-                if (ED.IVal > (long) Mask) {
-                    Warning ("Truncating value in bit-field initializer");
-                    ED.IVal &= (long) Mask;
-                }
-                Val = (unsigned) ED.IVal;
+            /* Read the data, check for a constant integer, do a range check */
+            ParseScalarInitInternal (type_uint, &ED);
+            if (!ED_IsConstAbsInt (&ED)) {
+                Error ("Constant initializer expected");
+                ED_MakeConstAbsInt (&ED, 1);
             }
+            if (ED.IVal > (long) Mask) {
+                Warning ("Truncating value in bit-field initializer");
+                ED.IVal &= (long) Mask;
+            }
+            Val = (unsigned) ED.IVal;
 
             /* Add the value to the currently stored bit-field value */
             Shift = (Entry->V.B.Offs - SI.Offs) * CHAR_BITS + Entry->V.B.BitOffs;
@@ -2285,7 +2323,7 @@ static unsigned ParseStructInit (Type* T, int AllowFlexibleMembers)
             /* Flexible array members may only be initialized if they are
             ** the last field (or part of the last struct field).
             */
-            SI.Offs += ParseInitInternal (Entry->Type, AllowFlexibleMembers && Entry->NextSym == 0);
+            SI.Offs += ParseInitInternal (Entry->Type, Braces, AllowFlexibleMembers && Entry->NextSym == 0);
         }
 
         /* More initializers? */
@@ -2293,8 +2331,8 @@ static unsigned ParseStructInit (Type* T, int AllowFlexibleMembers)
             break;
         }
 
-        /* Skip the comma */
-        NextToken ();
+        /* Skip the comma next round */
+        SkipComma = 1;
 
 NextMember:
         /* Next member. For unions, only the first one can be initialized */
@@ -2307,8 +2345,10 @@ NextMember:
         }
     }
 
-    /* Consume the closing curly brace */
-    ConsumeRCurly ();
+    if (HasCurly) {
+        /* Consume the closing curly brace */
+        ConsumeRCurly ();
+    }
 
     /* If we have data from a bit-field left, output it now */
     CHECK (SI.ValBits < CHAR_BITS);
@@ -2405,7 +2445,7 @@ static unsigned ParseVoidInit (Type* T)
 
 
 
-static unsigned ParseInitInternal (Type* T, int AllowFlexibleMembers)
+static unsigned ParseInitInternal (Type* T, int *Braces, int AllowFlexibleMembers)
 /* Parse initialization of variables. Return the number of data bytes. */
 {
     switch (GetUnderlyingTypeCode (T)) {
@@ -2426,11 +2466,11 @@ static unsigned ParseInitInternal (Type* T, int AllowFlexibleMembers)
             return ParsePointerInit (T);
 
         case T_ARRAY:
-            return ParseArrayInit (T, AllowFlexibleMembers);
+            return ParseArrayInit (T, Braces, AllowFlexibleMembers);
 
         case T_STRUCT:
         case T_UNION:
-            return ParseStructInit (T, AllowFlexibleMembers);
+            return ParseStructInit (T, Braces, AllowFlexibleMembers);
 
         case T_VOID:
             if (IS_Get (&Standard) == STD_CC65) {
@@ -2451,10 +2491,13 @@ static unsigned ParseInitInternal (Type* T, int AllowFlexibleMembers)
 unsigned ParseInit (Type* T)
 /* Parse initialization of variables. Return the number of data bytes. */
 {
+    /* Current curly braces layers */
+    int Braces = 0;
+
     /* Parse the initialization. Flexible array members can only be initialized
     ** in cc65 mode.
     */
-    unsigned Size = ParseInitInternal (T, IS_Get (&Standard) == STD_CC65);
+    unsigned Size = ParseInitInternal (T, &Braces, IS_Get (&Standard) == STD_CC65);
 
     /* The initialization may not generate code on global level, because code
     ** outside function scope will never get executed.

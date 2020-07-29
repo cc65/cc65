@@ -105,6 +105,7 @@ struct CodeEntry;
 #define SC_SPADJUSTMENT 0x400000U
 #define SC_GOTO_IND     0x800000U       /* Indirect goto */
 
+#define SC_ALIAS        0x01000000U     /* Alias of anonymous field */
 
 
 
@@ -138,6 +139,14 @@ struct SymEntry {
         /* Offset for locals or struct members */
         int                     Offs;
 
+        /* Data for anonymous struct or union members */
+        struct {
+            int                 Offs;     /* Byte offset into struct */
+            unsigned            ANumber;  /* Numeric ID */
+            SymEntry*           Field;    /* The real field aliased */
+        } A;
+
+
         /* Label name for static symbols */
         struct {
             unsigned            Label;
@@ -163,6 +172,7 @@ struct SymEntry {
         struct {
             struct SymTable*    SymTab;   /* Member symbol table */
             unsigned            Size;     /* Size of the union/struct */
+            unsigned            ACount;   /* Count of anonymous fields */
         } S;
 
         /* Data for enums */

@@ -1201,7 +1201,6 @@ static void StructRef (ExprDesc* Expr)
 /* Process struct/union field after . or ->. */
 {
     ident Ident;
-    SymEntry* Field;
     Type* FinalType;
     TypeCode Q;
 
@@ -1217,8 +1216,8 @@ static void StructRef (ExprDesc* Expr)
     /* Get the symbol table entry and check for a struct/union field */
     strcpy (Ident, CurTok.Ident);
     NextToken ();
-    Field = FindStructField (Expr->Type, Ident);
-    if (Field == 0) {
+    const SymEntry Field = FindStructField (Expr->Type, Ident);
+    if (Field.Type == 0) {
         Error ("No field named '%s' found in %s", Ident, GetBasicTypeName (Expr->Type));
         /* Make the expression an integer at address zero */
         ED_MakeConstAbs (Expr, 0, type_int);
@@ -1264,10 +1263,10 @@ static void StructRef (ExprDesc* Expr)
     } else {
         Q = GetQualifier (Indirect (Expr->Type));
     }
-    if (GetQualifier (Field->Type) == (GetQualifier (Field->Type) | Q)) {
-        FinalType = Field->Type;
+    if (GetQualifier (Field.Type) == (GetQualifier (Field.Type) | Q)) {
+        FinalType = Field.Type;
     } else {
-        FinalType = TypeDup (Field->Type);
+        FinalType = TypeDup (Field.Type);
         FinalType->C |= Q;
     }
 
@@ -1278,10 +1277,10 @@ static void StructRef (ExprDesc* Expr)
 
         /* Get the size of the type */
         unsigned StructSize = SizeOf (Expr->Type);
-        unsigned FieldSize  = SizeOf (Field->Type);
+        unsigned FieldSize  = SizeOf (Field.Type);
 
         /* Safety check */
-        CHECK (Field->V.Offs + FieldSize <= StructSize);
+        CHECK (Field.V.Offs + FieldSize <= StructSize);
 
         /* The type of the operation depends on the type of the struct/union */
         switch (StructSize) {
@@ -1304,16 +1303,16 @@ static void StructRef (ExprDesc* Expr)
         /* Generate a shift to get the field in the proper position in the
         ** primary. For bit fields, mask the value.
         */
-        BitOffs = Field->V.Offs * CHAR_BITS;
-        if (SymIsBitField (Field)) {
-            BitOffs += Field->V.B.BitOffs;
+        BitOffs = Field.V.Offs * CHAR_BITS;
+        if (SymIsBitField (&Field)) {
+            BitOffs += Field.V.B.BitOffs;
             g_asr (Flags, BitOffs);
             /* Mask the value. This is unnecessary if the shift executed above
             ** moved only zeroes into the value.
             */
-            if (BitOffs + Field->V.B.BitWidth != FieldSize * CHAR_BITS) {
+            if (BitOffs + Field.V.B.BitWidth != FieldSize * CHAR_BITS) {
                 g_and (CF_INT | CF_UNSIGNED | CF_CONST,
-                       (0x0001U << Field->V.B.BitWidth) - 1U);
+                       (0x0001U << Field.V.B.BitWidth) - 1U);
             }
         } else {
             g_asr (Flags, BitOffs);
@@ -1325,7 +1324,7 @@ static void StructRef (ExprDesc* Expr)
     } else {
 
         /* Set the struct/union field offset */
-        Expr->IVal += Field->V.Offs;
+        Expr->IVal += Field.V.Offs;
 
         /* Use the new type */
         Expr->Type = FinalType;
@@ -1341,8 +1340,8 @@ static void StructRef (ExprDesc* Expr)
         }
 
         /* Make the expression a bit field if necessary */
-        if (SymIsBitField (Field)) {
-            ED_MakeBitField (Expr, Field->V.B.BitOffs, Field->V.B.BitWidth);
+        if (SymIsBitField (&Field)) {
+            ED_MakeBitField (Expr, Field.V.B.BitOffs, Field.V.B.BitWidth);
         }
     }
 

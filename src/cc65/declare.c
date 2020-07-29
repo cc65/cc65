@@ -1248,11 +1248,23 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers)
             break;
 
         case TOK_IDENT:
-            Entry = FindSym (CurTok.Ident);
-            if (Entry && SymIsTypeDef (Entry)) {
-                /* It's a typedef */
-                NextToken ();
-                TypeCopy (D->Type, Entry->Type);
+            /* This could be a label */
+            if (NextTok.Tok != TOK_COLON) {
+                Entry = FindSym (CurTok.Ident);
+                if (Entry && SymIsTypeDef (Entry)) {
+                    /* It's a typedef */
+                    NextToken ();
+                    TypeCopy (D->Type, Entry->Type);
+                    break;
+                }
+            } else {
+                /* This is a label. Use the default type flag to end the loop
+                ** in DeclareLocals. The type code used here doesn't matter as
+                ** long as it has no qualifiers.
+                */
+                D->Flags |= DS_DEF_TYPE;
+                D->Type[0].C = T_QUAL_NONE;
+                D->Type[1].C = T_END;
                 break;
             }
             /* FALL THROUGH */

@@ -193,10 +193,26 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
         ** operations.
         */
         if (ED_IsBitField (Expr)) {
-            unsigned F = CF_INT | CF_UNSIGNED | CF_CONST | (Flags & CF_TEST);
+            /* If the field was loaded as a char, force the shift/mask ops to be char ops.
+            ** If it is a char, the load has already put 0 in the upper byte, so that can remain.
+            ** CF_FORCECHAR does nothing if the type is not CF_CHAR.
+            */
+            unsigned F = Flags | CF_FORCECHAR | CF_CONST;
+
             /* Shift right by the bit offset */
             g_asr (F, Expr->BitOffs);
-            /* And by the width if the field doesn't end on an int boundary */
+
+            /* Since we have now shifted down, we can do char ops as long as the width fits in
+            ** a char.
+            */
+            if (Expr->BitWidth <= CHAR_BITS) {
+                F |= CF_CHAR;
+            }
+
+            /* And by the width if the field doesn't end on a char or int boundary.  If it does
+            ** end on a boundary, then zeros have already been shifted in.  g_and emits no code
+            ** if the mask is all ones.
+            */
             if (Expr->BitOffs + Expr->BitWidth != CHAR_BITS &&
                 Expr->BitOffs + Expr->BitWidth != INT_BITS) {
                 g_and (F, (0x0001U << Expr->BitWidth) - 1U);

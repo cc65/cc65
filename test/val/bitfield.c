@@ -182,12 +182,104 @@ static void test_overlap_with_int(void)
     }
 }
 
+static struct full_width {
+    unsigned int x : 8;
+    unsigned int y : 16;
+} fw = {255, 17};
+
+static void test_full_width(void)
+{
+    if (sizeof(struct full_width) != 3) {
+        printf("Got sizeof(struct full_width) = %zu, expected 3.\n",
+               sizeof(struct full_width));
+        failures++;
+    }
+
+    if (fw.x != 255) {
+        printf("Got fw.x = %u, expected 255.\n", fw.x);
+        failures++;
+    }
+
+    if (fw.y != 17) {
+        printf("Got fw.y = %u, expected 17.\n", fw.y);
+        failures++;
+    }
+
+    fw.x = 42;
+    fw.y = 1023;
+
+    if (fw.x != 42) {
+        printf("Got fw.x = %u, expected 42.\n", fw.x);
+        failures++;
+    }
+
+    if (fw.y != 1023) {
+        printf("Got fw.y = %u, expected 1023.\n", fw.y);
+        failures++;
+    }
+}
+
+static struct aligned_end {
+    unsigned int : 2;
+    unsigned int x : 6;
+    unsigned int : 3;
+    unsigned int y : 13;
+    /* z crosses a byte boundary, but fits in a byte when shifted. */
+    unsigned int : 6;
+    unsigned int z : 7;
+} ae = {63, 17, 100};
+
+static void test_aligned_end(void)
+{
+    if (sizeof(struct aligned_end) != 5) {
+        printf("Got sizeof(struct aligned_end) = %zu, expected 5.\n",
+               sizeof(struct aligned_end));
+        failures++;
+    }
+
+    if (ae.x != 63) {
+        printf("Got ae.x = %u, expected 63.\n", ae.x);
+        failures++;
+    }
+
+    if (ae.y != 17) {
+        printf("Got ae.y = %u, expected 17.\n", ae.y);
+        failures++;
+    }
+
+    if (ae.z != 100) {
+        printf("Got ae.z = %u, expected 100.\n", ae.z);
+        failures++;
+    }
+
+    ae.x = 42;
+    ae.y = 1023;
+    ae.z = 66;
+
+    if (ae.x != 42) {
+        printf("Got ae.x = %u, expected 42.\n", ae.x);
+        failures++;
+    }
+
+    if (ae.y != 1023) {
+        printf("Got ae.y = %u, expected 1023.\n", ae.y);
+        failures++;
+    }
+
+    if (ae.z != 66) {
+        printf("Got ae.z = %u, expected 66.\n", ae.z);
+        failures++;
+    }
+}
+
 int main(void)
 {
     test_four_bits();
     test_four_bits_with_int();
     test_overlap();
     test_overlap_with_int();
+    test_full_width();
+    test_aligned_end();
     printf("failures: %u\n", failures);
     return failures;
 }

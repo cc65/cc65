@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* Copyright 2020 Google LLC                                                 */
+/* Copyright 2020 The cc65 Authors                                           */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */

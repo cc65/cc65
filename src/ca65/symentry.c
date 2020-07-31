@@ -452,6 +452,11 @@ void SymGlobal (SymEntry* S, unsigned char AddrSize, unsigned Flags)
         return;
     }
 
+    /* In any case, mark the symbol as "weak", if it is not an import. This will
+    ** allow declaring a global or an export, then "weaken" it afterwards.
+    */
+    S->Flags |= (Flags & SF_WEAK);
+
     /* If the symbol is already an export: If it is not defined, the address
     ** sizes must match.
     */

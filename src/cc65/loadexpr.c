@@ -221,7 +221,7 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
                 ** the result of that.
                 */
 
-                /* Avoid overly large shift. */
+                /* Avoid overly large shift on host platform. */
                 if (EndBit == sizeof (unsigned long) * CHAR_BIT) {
                     g_and (F, (~0UL << Expr->BitOffs));
                 } else {

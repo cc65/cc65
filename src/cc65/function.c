@@ -487,7 +487,7 @@ void NewFunc (SymEntry* Func)
     }
 
     /* Generate function entry code if needed */
-    g_enter (TypeOf (Func->Type), F_GetParamSize (CurrentFunc));
+    g_enter (FuncTypeOf (Func->Type), F_GetParamSize (CurrentFunc));
 
     /* If stack checking code is requested, emit a call to the helper routine */
     if (IS_Get (&CheckStack)) {

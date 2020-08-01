@@ -732,7 +732,8 @@ unsigned TypeOf (const Type* T)
             return CF_FLOAT;
 
         case T_FUNC:
-            return (((FuncDesc*) T->A.P)->Flags & FD_VARIADIC)? 0 : CF_FIXARGC;
+            /* Treat this as a function pointer */
+            return CF_INT | CF_UNSIGNED;
 
         case T_STRUCT:
         case T_UNION:
@@ -746,6 +747,22 @@ unsigned TypeOf (const Type* T)
         default:
             Error ("Illegal type %04lX", T->C);
             return CF_INT;
+    }
+}
+
+
+
+unsigned FuncTypeOf (const Type* T)
+/* Get the code generator flag for calling the function */
+{
+    switch (GetUnderlyingTypeCode (T)) {
+
+        case T_FUNC:
+            return (((FuncDesc*) T->A.P)->Flags & FD_VARIADIC) ? 0 : CF_FIXARGC;
+
+        default:
+            Error ("Illegal function type %04lX", T->C);
+            return 0;
     }
 }
 

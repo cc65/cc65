@@ -323,6 +323,9 @@ unsigned CheckedPSizeOf (const Type* T);
 unsigned TypeOf (const Type* T);
 /* Get the code generator base type of the object */
 
+unsigned FuncTypeOf (const Type* T);
+/* Get the code generator flag for calling the function */
+
 Type* Indirect (Type* T);
 /* Do one indirection for the given type, that is, return the type where the
 ** given type points to.

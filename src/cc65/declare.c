@@ -410,6 +410,48 @@ static void FixQualifiers (Type* DataType)
 
 
 
+static unsigned ParseOneStorageClass (void)
+/* Parse and return a storage class */
+{
+    unsigned StorageClass = 0;
+
+    /* Check the storage class given */
+    switch (CurTok.Tok) {
+
+        case TOK_EXTERN:
+            StorageClass = SC_EXTERN | SC_STATIC;
+            NextToken ();
+            break;
+
+        case TOK_STATIC:
+            StorageClass = SC_STATIC;
+            NextToken ();
+            break;
+
+        case TOK_REGISTER:
+            StorageClass = SC_REGISTER | SC_STATIC;
+            NextToken ();
+            break;
+
+        case TOK_AUTO:
+            StorageClass = SC_AUTO;
+            NextToken ();
+            break;
+
+        case TOK_TYPEDEF:
+            StorageClass = SC_TYPEDEF;
+            NextToken ();
+            break;
+
+        default:
+            break;
+    }
+
+    return StorageClass;
+}
+
+
+
 static void ParseStorageClass (DeclSpec* D, unsigned DefStorage)
 /* Parse a storage class */
 {
@@ -417,38 +459,21 @@ static void ParseStorageClass (DeclSpec* D, unsigned DefStorage)
     D->Flags &= ~DS_DEF_STORAGE;
 
     /* Check the storage class given */
-    switch (CurTok.Tok) {
-
-        case TOK_EXTERN:
-            D->StorageClass = SC_EXTERN | SC_STATIC;
-            NextToken ();
-            break;
-
-        case TOK_STATIC:
-            D->StorageClass = SC_STATIC;
-            NextToken ();
-            break;
-
-        case TOK_REGISTER:
-            D->StorageClass = SC_REGISTER | SC_STATIC;
-            NextToken ();
-            break;
-
-        case TOK_AUTO:
-            D->StorageClass = SC_AUTO;
-            NextToken ();
-            break;
-
-        case TOK_TYPEDEF:
-            D->StorageClass = SC_TYPEDEF;
-            NextToken ();
-            break;
-
-        default:
-            /* No storage class given, use default */
-            D->Flags |= DS_DEF_STORAGE;
-            D->StorageClass = DefStorage;
-            break;
+    D->StorageClass = ParseOneStorageClass ();
+    if (D->StorageClass == 0) {
+        /* No storage class given, use default */
+        D->Flags |= DS_DEF_STORAGE;
+        D->StorageClass = DefStorage;
+    } else {
+        unsigned StorageClass = ParseOneStorageClass ();
+        while (StorageClass != 0) {
+            if (D->StorageClass == StorageClass) {
+                Warning ("Duplicate storage class specifier");
+            } else {
+                Error ("Conflicting storage class specifier");
+            }
+            StorageClass = ParseOneStorageClass ();
+        }
     }
 }
 

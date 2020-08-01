@@ -135,6 +135,7 @@
     <ClInclude Include="cc65\shiftexpr.h" />
     <ClInclude Include="cc65\stackptr.h" />
     <ClInclude Include="cc65\standard.h" />
+    <ClInclude Include="cc65\staticassert.h" />
     <ClInclude Include="cc65\stdfunc.h" />
     <ClInclude Include="cc65\stdnames.h" />
     <ClInclude Include="cc65\stmt.h" />
@@ -209,6 +210,7 @@
     <ClCompile Include="cc65\shiftexpr.c" />
     <ClCompile Include="cc65\stackptr.c" />
     <ClCompile Include="cc65\standard.c" />
+    <ClCompile Include="cc65\staticassert.c" />
     <ClCompile Include="cc65\stdfunc.c" />
     <ClCompile Include="cc65\stdnames.c" />
     <ClCompile Include="cc65\stmt.c" />

@@ -21,4 +21,4 @@ jobs:
 
   - os: windows
     script:
-      - make --version
+      - mingw32-make.exe --version

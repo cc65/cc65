@@ -21,4 +21,4 @@ jobs:
 
   - os: windows
     script:
-      - printenv
+      - ls -l $VS140COMNTOOLS

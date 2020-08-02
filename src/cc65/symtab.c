@@ -549,7 +549,8 @@ SymEntry FindStructField (const Type* T, const char* Name)
 
 static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags)
 /* Check and handle redefinition of existing symbols.
-** Return ture if there *is* an error.
+** Complete array sizes and function descriptors as well.
+** Return true if there *is* an error.
 */
 {
     /* Get the type info of the existing symbol */
@@ -594,8 +595,8 @@ static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags
             */
             if (IsTypeFunc (T)) {
 
-                /* New type must be identical */
-                if (TypeCmp (Entry->Type, T) < TC_EQUAL) {
+                /* New type must be equivalent */
+                if (TypeCmp (E_Type, T) < TC_EQUAL) {
                     Error ("Conflicting function types for '%s'", Entry->Name);
                     Entry = 0;
                 } else {
@@ -614,6 +615,7 @@ static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags
                 Error ("Redefinition of function '%s' as different kind of symbol", Entry->Name);
                 Entry = 0;
             }
+
         } else if (E_SCType == SC_TYPEDEF) {
 
             if (SCType == SC_TYPEDEF) {
@@ -622,9 +624,7 @@ static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags
                     Error ("Conflicting types for typedef '%s'", Entry->Name);
                     Entry = 0;
                 }
-
             } else {
-
                 Error ("Redefinition of typedef '%s' as different kind of symbol", Entry->Name);
                 Entry = 0;
             }
@@ -639,7 +639,10 @@ static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags
                 Error ("Conflicting types for '%s'", Entry->Name);
                 Entry = 0;
             } else if (E_SCType == SC_ENUMERATOR) {
-                /* Current code logic won't reach here, but still... */
+                /* Enumerators aren't allowed to be redeclared at all, even if
+                ** all occurences are identical. The current code logic won't
+                ** get here, but let's just do it.
+                */
                 Error ("Redeclaration of enumerator constant '%s'", Entry->Name);
                 Entry = 0;
             }

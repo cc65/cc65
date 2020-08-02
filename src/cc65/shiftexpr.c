@@ -139,9 +139,14 @@ void ShiftExpr (struct ExprDesc* Expr)
             ** the operand, the behaviour is undefined according to the
             ** standard.
             */
-            if (Expr2.IVal < 0 || Expr2.IVal >= (long) ExprBits) {
+            if (Expr2.IVal < 0) {
 
-                Warning ("Shift count too large for operand type");
+                Warning ("Shift count '%ld' is negative", Expr2.IVal);
+                Expr2.IVal &= ExprBits - 1;
+
+            } else if (Expr2.IVal >= (long) ExprBits) {
+
+                Warning ("Shift count '%ld' >= width of type", Expr2.IVal);
                 Expr2.IVal &= ExprBits - 1;
 
             }

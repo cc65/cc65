@@ -747,11 +747,11 @@ Type* GetBaseElementType (Type* T);
 ** the element type that is not an array.
 */
 
-struct SymEntry* GetSymEntry (const Type* T) attribute ((const));
-/* Return a SymEntry pointer from a type */
+struct SymEntry* GetESUSymEntry (const Type* T) attribute ((const));
+/* Return a SymEntry pointer from an enum/struct/union type */
 
-void SetSymEntry (Type* T, struct SymEntry* S);
-/* Set the SymEntry pointer for a type */
+void SetESUSymEntry (Type* T, struct SymEntry* S);
+/* Set the SymEntry pointer for an enum/struct/union type */
 
 Type* IntPromotion (Type* T);
 /* Apply the integer promotions to T and return the result. The returned type

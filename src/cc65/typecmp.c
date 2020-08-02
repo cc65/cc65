@@ -368,8 +368,8 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
                 ** pointer to the struct definition from the type, and compare
                 ** the fields.
                 */
-                Sym1 = GetSymEntry (lhs);
-                Sym2 = GetSymEntry (rhs);
+                Sym1 = GetESUSymEntry (lhs);
+                Sym2 = GetESUSymEntry (rhs);
 
                 /* If one symbol has a name, the names must be identical */
                 if (!HasAnonName (Sym1) || !HasAnonName (Sym2)) {

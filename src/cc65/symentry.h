@@ -304,6 +304,16 @@ void SymSetAsmName (SymEntry* Sym);
 void CvtRegVarToAuto (SymEntry* Sym);
 /* Convert a register variable to an auto variable */
 
+SymEntry* GetSymType (const Type* T);
+/* Get the symbol entry of the enum/struct/union type
+** Return 0 if it is not an enum/struct/union.
+*/
+
+const char* GetSymTypeName (const Type* T);
+/* Return a name string of the type or the symbol name if it is an ESU type.
+** Note: This may use a static buffer that could be overwritten by other calls.
+*/
+
 void ChangeSymType (SymEntry* Entry, Type* T);
 /* Change the type of the given symbol */
 

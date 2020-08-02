@@ -766,6 +766,7 @@ static unsigned PadWithBitField (unsigned StructSize, unsigned BitOffs)
 }
 
 
+
 static unsigned AliasAnonStructFields (const Declaration* Decl, SymEntry* Anon)
 /* Create alias fields from an anon union/struct in the current lexical level.
 ** The function returns the count of created aliases.
@@ -775,7 +776,7 @@ static unsigned AliasAnonStructFields (const Declaration* Decl, SymEntry* Anon)
     SymEntry* Alias;
 
     /* Get the pointer to the symbol table entry of the anon struct */
-    SymEntry* Entry = GetSymEntry (Decl->Type);
+    SymEntry* Entry = GetESUSymEntry (Decl->Type);
 
     /* Get the symbol table containing the fields. If it is empty, there has
     ** been an error before, so bail out.
@@ -1267,7 +1268,7 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers)
             Entry = ParseUnionDecl (Ident);
             /* Encode the union entry into the type */
             D->Type[0].C = T_UNION;
-            SetSymEntry (D->Type, Entry);
+            SetESUSymEntry (D->Type, Entry);
             D->Type[1].C = T_END;
             break;
 
@@ -1286,7 +1287,7 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers)
             Entry = ParseStructDecl (Ident);
             /* Encode the struct entry into the type */
             D->Type[0].C = T_STRUCT;
-            SetSymEntry (D->Type, Entry);
+            SetESUSymEntry (D->Type, Entry);
             D->Type[1].C = T_END;
             break;
 
@@ -1308,7 +1309,7 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers)
             /* Parse the enum decl */
             Entry = ParseEnumDecl (Ident);
             D->Type[0].C |= T_ENUM;
-            SetSymEntry (D->Type, Entry);
+            SetESUSymEntry (D->Type, Entry);
             D->Type[1].C = T_END;
             break;
 
@@ -2258,7 +2259,7 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
     }
 
     /* Get a pointer to the struct entry from the type */
-    Entry = GetSymEntry (T);
+    Entry = GetESUSymEntry (T);
 
     /* Get the size of the struct from the symbol table entry */
     SI.Size = Entry->V.S.Size;

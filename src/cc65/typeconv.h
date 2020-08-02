@@ -52,7 +52,7 @@
 void TypeCompatibilityDiagnostic (const Type* NewType, const Type* OldType, int IsError, const char* Msg);
 /* Print error or warning message about type conversion with proper type names */
 
-void TypeConversion (ExprDesc* Expr, Type* NewType);
+void TypeConversion (ExprDesc* Expr, const Type* NewType);
 /* Do an automatic conversion of the given expression to the new type. Output
 ** warnings or errors where this automatic conversion is suspicious or
 ** impossible.

@@ -184,7 +184,7 @@ static void IntError (const char* Filename, unsigned LineNo, const char* Msg, va
         Print (stderr, 1, "Input: %.*s\n", (int) SB_GetLen (Line), SB_GetConstBuf (Line));
     }
     ++ErrorCount;
-    if (ErrorCount > 10) {
+    if (ErrorCount > 20) {
         Fatal ("Too many errors");
     }
 }

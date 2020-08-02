@@ -755,14 +755,11 @@ unsigned TypeOf (const Type* T)
 unsigned FuncTypeOf (const Type* T)
 /* Get the code generator flag for calling the function */
 {
-    switch (GetUnderlyingTypeCode (T)) {
-
-        case T_FUNC:
-            return (((FuncDesc*) T->A.P)->Flags & FD_VARIADIC) ? 0 : CF_FIXARGC;
-
-        default:
-            Error ("Illegal function type %04lX", T->C);
-            return 0;
+    if (GetUnderlyingTypeCode (T) == T_FUNC) {
+        return (((FuncDesc*) T->A.P)->Flags & FD_VARIADIC) ? 0 : CF_FIXARGC;
+    } else {
+        Error ("Illegal function type %04lX", T->C);
+        return 0;
     }
 }
 

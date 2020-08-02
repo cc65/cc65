@@ -581,6 +581,7 @@ int Statement (int* PendingToken)
     ExprDesc Expr;
     int GotBreak;
     CodeMark Start, End;
+    unsigned PrevErrorCount = ErrorCount;
 
     /* Assume no pending token */
     if (PendingToken) {
@@ -681,7 +682,8 @@ int Statement (int* PendingToken)
             GetCodePos (&End);
             if (CodeRangeIsEmpty (&Start, &End) &&
                 !IsTypeVoid (Expr.Type)         &&
-                IS_Get (&WarnNoEffect)) {
+                IS_Get (&WarnNoEffect)          &&
+                PrevErrorCount == ErrorCount) {
                 Warning ("Statement has no effect");
             }
             CheckSemi (PendingToken);

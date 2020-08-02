@@ -148,6 +148,11 @@ static void Parse (void)
                 break;
             }
 
+            if ((Decl.StorageClass & SC_ALIAS) == SC_ALIAS) {
+                /* Failed parsing */
+                goto SkipOneDecl;
+            }
+
             /* Check if we must reserve storage for the variable. We do this,
             **
             **   - if it is not a typedef or function,
@@ -276,6 +281,7 @@ static void Parse (void)
 
             }
 
+SkipOneDecl:
             /* Check for end of declaration list */
             if (CurTok.Tok == TOK_COMMA) {
                 NextToken ();

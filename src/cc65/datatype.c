@@ -974,6 +974,11 @@ unsigned TypeOf (const Type* T)
             /* Address of ... */
             return CF_INT | CF_UNSIGNED;
 
+        case T_ENUM:
+            /* Incomplete enum type */
+            Error ("Incomplete enum type");
+            return CF_INT;
+
         default:
             Error ("Illegal type %04lX", T->C);
             return CF_INT;

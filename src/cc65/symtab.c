@@ -801,7 +801,7 @@ SymEntry* AddBitField (const char* Name, unsigned Offs, unsigned BitOffs, unsign
     if (Entry) {
 
         /* We have a symbol with this name already */
-        Error ("Multiple definition for '%s'", Name);
+        Error ("Multiple definition for bit-field '%s'", Name);
 
     } else {
 
@@ -834,7 +834,7 @@ SymEntry* AddConstSym (const char* Name, const Type* T, unsigned Flags, long Val
         if ((Entry->Flags & SC_CONST) != SC_CONST) {
             Error ("Symbol '%s' is already different kind", Name);
         } else {
-            Error ("Multiple definition for '%s'", Name);
+            Error ("Multiple definition for constant '%s'", Name);
         }
         return Entry;
     }

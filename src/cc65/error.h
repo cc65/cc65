@@ -72,6 +72,9 @@ extern IntStack WarnUnusedLabel;        /* - unused labels */
 extern IntStack WarnUnusedParam;        /* - unused parameters */
 extern IntStack WarnUnusedVar;          /* - unused variables */
 
+/* Forward */
+struct StrBuf;
+
 
 
 /*****************************************************************************/
@@ -114,6 +117,18 @@ void ListWarnings (FILE* F);
 
 void ErrorReport (void);
 /* Report errors (called at end of compile) */
+
+void InitDiagnosticStrBufs (void);
+/* Init tracking string buffers used for diagnostics */
+
+void DoneDiagnosticStrBufs (void);
+/* Done with tracked string buffers used for diagnostics */
+
+void ClearDiagnosticStrBufs (void);
+/* Free all tracked string buffers */
+
+struct StrBuf* NewDiagnosticStrBuf (void);
+/* Get a new tracked string buffer */
 
 
 

@@ -1060,6 +1060,9 @@ int main (int argc, char* argv[])
         IS_Set (&Standard, STD_DEFAULT);
     }
 
+    /* Track string buffer allocation */
+    InitDiagnosticStrBufs ();
+
     /* Go! */
     Compile (InputFile);
 
@@ -1082,6 +1085,9 @@ int main (int argc, char* argv[])
         /* Create dependencies if requested */
         CreateDependencies ();
     }
+
+    /* Done with tracked string buffer allocation */
+    DoneDiagnosticStrBufs ();
 
     /* Return an apropriate exit code */
     return (ErrorCount > 0)? EXIT_FAILURE : EXIT_SUCCESS;

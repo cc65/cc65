@@ -273,15 +273,12 @@ const char* GetBasicTypeName (const Type* T)
 
 
 const char* GetFullTypeName (const Type* T)
-/* Return the full name string of the given type.
-** Note: This may use a static buffer that could be overwritten by other calls.
-*/
+/* Return the full name string of the given type */
 {
-    static struct StrBuf Buf = STATIC_STRBUF_INITIALIZER;
-    SB_Clear (&Buf);
-    GetFullTypeNameBuf (&Buf, T);
+    struct StrBuf* Buf = NewDiagnosticStrBuf ();
+    GetFullTypeNameBuf (Buf, T);
 
-    return SB_GetConstBuf (&Buf);
+    return SB_GetConstBuf (Buf);
 }
 
 

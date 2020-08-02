@@ -21,4 +21,4 @@ jobs:
 
   - os: windows
     script:
-      - ls -l "$VS140COMNTOOLS"
+      - make --version

@@ -23,4 +23,4 @@ jobs:
   - os: windows
     name: Windows
     script:
-      - src/msbuild.cmd scr\\cc65.sln
+      - src/msbuild.cmd src\\cc65.sln

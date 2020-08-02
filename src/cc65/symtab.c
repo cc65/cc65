@@ -172,7 +172,7 @@ static void CheckSymTable (SymTable* Tab)
                         }
                     } else {
                         if (IS_Get (&WarnUnusedVar)) {
-                            Warning ("'%s' is defined but never used", Entry->Name);
+                            Warning ("Variable '%s' is defined but never used", Entry->Name);
                         }
                     }
                 }
@@ -186,7 +186,7 @@ static void CheckSymTable (SymTable* Tab)
                 } else if (!SymIsRef (Entry)) {
                     /* Defined but not used */
                     if (IS_Get (&WarnUnusedLabel)) {
-                        Warning ("'%s' is defined but never used", Entry->Name);
+                        Warning ("Label '%s' is defined but never used", Entry->Name);
                     }
                 }
             }

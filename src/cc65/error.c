@@ -325,7 +325,8 @@ void ListWarnings (FILE* F)
 void ErrorReport (void)
 /* Report errors (called at end of compile) */
 {
-    Print (stdout, 1, "%u errors, %u warnings\n", ErrorCount, WarningCount);
+    unsigned int V = (ErrorCount != 0 ? 0 : 1);
+    Print (stdout, V, "%u errors and %u warnings generated.\n", ErrorCount, WarningCount);
 }
 
 

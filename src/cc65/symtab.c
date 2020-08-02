@@ -52,13 +52,13 @@
 #include "declare.h"
 #include "error.h"
 #include "funcdesc.h"
+#include "function.h"
 #include "global.h"
+#include "input.h"
 #include "stackptr.h"
 #include "symentry.h"
 #include "typecmp.h"
 #include "symtab.h"
-#include "function.h"
-#include "input.h"
 
 
 
@@ -728,6 +728,10 @@ SymEntry* AddEnumSym (const char* Name, const Type* Type, SymTable* Tab)
         Entry->V.E.SymTab = Tab;
         Entry->V.E.Type   = Type;
 
+        if (Type != 0) {
+            Entry->Flags |= SC_DEF;
+        }
+
         /* Add it to the current table */
         AddSymEntry (CurTagTab, Entry);
     }
@@ -738,11 +742,12 @@ SymEntry* AddEnumSym (const char* Name, const Type* Type, SymTable* Tab)
 
 
 
-SymEntry* AddStructSym (const char* Name, unsigned Type, unsigned Size, SymTable* Tab)
+SymEntry* AddStructSym (const char* Name, unsigned Flags, unsigned Size, SymTable* Tab)
 /* Add a struct/union entry and return it */
 {
     SymTable* CurTagTab = TagTab;
     SymEntry* Entry;
+    unsigned Type = (Flags & SC_TYPEMASK);
 
     /* Type must be struct or union */
     PRECONDITION (Type == SC_STRUCT || Type == SC_UNION);
@@ -756,13 +761,14 @@ SymEntry* AddStructSym (const char* Name, unsigned Type, unsigned Size, SymTable
             /* Existing symbol is not a struct */
             Error ("Symbol '%s' is already different kind", Name);
             Entry = 0;
-        } else if (Size > 0 && Entry->V.S.Size > 0) {
+        } else if ((Entry->Flags & Flags & SC_DEF) == SC_DEF) {
             /* Both structs are definitions. */
             Error ("Multiple definition for '%s'", Name);
             Entry = 0;
         } else {
-            /* Define the struct size if it is given */
-            if (Size > 0) {
+            /* Define the struct size if it is a definition */
+            if ((Flags & SC_DEF) == SC_DEF) {
+                Entry->Flags      = Flags;
                 Entry->V.S.SymTab = Tab;
                 Entry->V.S.Size   = Size;
             }
@@ -777,7 +783,7 @@ SymEntry* AddStructSym (const char* Name, unsigned Type, unsigned Size, SymTable
     if (Entry == 0) {
 
         /* Create a new entry */
-        Entry = NewSymEntry (Name, Type);
+        Entry = NewSymEntry (Name, Flags);
 
         /* Set the struct data */
         Entry->V.S.SymTab = Tab;

@@ -920,7 +920,7 @@ NextMember: if (CurTok.Tok != TOK_COMMA) {
     LeaveStructLevel ();
 
     /* Make a real entry from the forward decl and return it */
-    return AddStructSym (Name, SC_UNION, UnionSize, FieldTab);
+    return AddStructSym (Name, SC_UNION | SC_DEF, UnionSize, FieldTab);
 }
 
 
@@ -1102,7 +1102,7 @@ NextMember: if (CurTok.Tok != TOK_COMMA) {
     LeaveStructLevel ();
 
     /* Make a real entry from the forward decl and return it */
-    return AddStructSym (Name, SC_STRUCT, StructSize, FieldTab);
+    return AddStructSym (Name, SC_STRUCT | SC_DEF, StructSize, FieldTab);
 }
 
 

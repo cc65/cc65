@@ -276,6 +276,15 @@ static void Parse (void)
                                    Entry->Name, Entry->V.BssName);
                         }
                         Entry->V.BssName = xstrdup (bssName);
+
+                        /* Check for enum forward declaration.
+                        ** Warn about it when extensions are not allowed.
+                        */
+                        if (Size == 0 && IsTypeEnum (Decl.Type)) {
+                            if (IS_Get (&Standard) != STD_CC65) {
+                                Warning ("ISO C forbids forward references to 'enum' types");
+                            }
+                        }
                     }
                 }
 

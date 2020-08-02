@@ -578,6 +578,12 @@ INLINE int IsClassFunc (const Type* T)
 #  define IsClassFunc(T)        (GetClass (T) == T_CLASS_FUNC)
 #endif
 
+int IsClassArithmetic (const Type* T);
+/* Return true if this is an arithmetic type */
+
+int IsCastType (const Type* T);
+/* Return true if this type can be used for casting */
+
 #if defined(HAVE_INLINE)
 INLINE TypeCode GetRawSignedness (const Type* T)
 /* Get the raw signedness of a type */

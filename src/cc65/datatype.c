@@ -1018,6 +1018,22 @@ Type* ArrayToPtr (Type* T)
 
 
 
+int IsClassArithmetic (const Type* T)
+/* Return true if this is an arithmetic type */
+{
+    return IsClassInt (T) || IsClassFloat (T);
+}
+
+
+
+int IsCastType (const Type* T)
+/* Return true if this type can be used for casting */
+{
+    return IsClassArithmetic (T) || IsClassPtr (T) || IsTypeVoid (T);
+}
+
+
+
 int IsVariadicFunc (const Type* T)
 /* Return true if this is a function type or pointer to function type with
 ** variable parameter list

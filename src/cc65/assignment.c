@@ -78,7 +78,8 @@ static int CopyStruct (ExprDesc* LExpr, ExprDesc* RExpr)
 
     /* Check for equality of the structs */
     if (TypeCmp (ltype, RExpr->Type) < TC_STRICT_COMPATIBLE) {
-        Error ("Incompatible types");
+        TypeCompatibilityDiagnostic (ltype, RExpr->Type, 1,
+            "Incompatible types in assignment to '%s' from '%s'");
     }
 
     /* Do we copy using the primary? */

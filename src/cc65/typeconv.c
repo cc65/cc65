@@ -55,6 +55,24 @@
 
 
 
+void TypeCompatibilityDiagnostic (const Type* NewType, const Type* OldType, int IsError, const char* Msg)
+/* Print error or warning message about type conversion with proper type names */
+{
+    StrBuf NewTypeName = STATIC_STRBUF_INITIALIZER;
+    StrBuf OldTypeName = STATIC_STRBUF_INITIALIZER;
+    GetFullTypeNameBuf (&NewTypeName, NewType);
+    GetFullTypeNameBuf (&OldTypeName, OldType);
+    if (IsError) {
+        Error (Msg, SB_GetConstBuf (&NewTypeName), SB_GetConstBuf (&OldTypeName));
+    } else {
+        Warning (Msg, SB_GetConstBuf (&NewTypeName), SB_GetConstBuf (&OldTypeName));
+    }
+    SB_Done (&OldTypeName);
+    SB_Done (&NewTypeName);
+}
+
+
+
 static void DoConversion (ExprDesc* Expr, const Type* NewType)
 /* Emit code to convert the given expression to a new type. */
 {
@@ -189,6 +207,11 @@ void TypeConversion (ExprDesc* Expr, Type* NewType)
     printf ("\n");
     PrintRawType (stdout, NewType);
 #endif
+    int HasWarning  = 0;
+    int HasError    = 0;
+    const char* Msg = 0;
+    const Type* OldType = Expr->Type;
+
 
     /* First, do some type checking */
     if (IsTypeVoid (NewType) || IsTypeVoid (Expr->Type)) {
@@ -199,7 +222,7 @@ void TypeConversion (ExprDesc* Expr, Type* NewType)
     }
 
     /* If Expr is a function, convert it to pointer to function */
-    if (IsTypeFunc(Expr->Type)) {
+    if (IsTypeFunc (Expr->Type)) {
         Expr->Type = PointerTo (Expr->Type);
     }
 
@@ -220,15 +243,12 @@ void TypeConversion (ExprDesc* Expr, Type* NewType)
             }
             Warning ("Converting pointer to integer without a cast");
         } else if (!IsClassInt (Expr->Type) && !IsClassFloat (Expr->Type)) {
-            Error ("Incompatible types");
+            HasError = 1;
         }
-
     } else if (IsClassFloat (NewType)) {
-
         if (!IsClassFloat (Expr->Type) && !IsClassInt (Expr->Type)) {
-            Error ("Incompatible types");
+            HasError = 1;
         }
-
     } else if (IsClassPtr (NewType)) {
 
         /* Handle conversions to pointer type */
@@ -248,17 +268,19 @@ void TypeConversion (ExprDesc* Expr, Type* NewType)
                 /* Compare the types */
                 switch (TypeCmp (NewType, Expr->Type)) {
 
-                    case TC_INCOMPATIBLE:
-                        Error ("Incompatible pointer types at '%s'", (Expr->Sym? Expr->Sym->Name : "Unknown"));
-                        break;
+                case TC_INCOMPATIBLE:
+                    HasWarning = 1;
+                    Msg = "Incompatible pointer assignment to '%s' from '%s'";
+                    break;
 
-                    case TC_QUAL_DIFF:
-                        Error ("Pointer types differ in type qualifiers");
-                        break;
+                case TC_QUAL_DIFF:
+                    HasWarning = 1;
+                    Msg = "Pointer assignment to '%s' from '%s' discards qualifiers";
+                    break;
 
-                    default:
-                        /* Ok */
-                        break;
+                default:
+                    /* Ok */
+                    break;
                 }
             }
 
@@ -268,18 +290,28 @@ void TypeConversion (ExprDesc* Expr, Type* NewType)
                 Warning ("Converting integer to pointer without a cast");
             }
         } else {
-            Error ("Incompatible types");
+            HasError = 1;
         }
 
     } else {
-
-        /* Invalid automatic conversion */
-        Error ("Incompatible types");
-
+         /* Invalid automatic conversion */
+         HasError = 1;
     }
 
-    /* Do the actual conversion */
-    DoConversion (Expr, NewType);
+    if (Msg == 0) {
+        Msg = "Converting to '%s' from '%s'";
+    }
+
+    if (HasError) {
+        TypeCompatibilityDiagnostic (NewType, OldType, 1, Msg);
+    } else {
+        if (HasWarning) {
+            TypeCompatibilityDiagnostic (NewType, OldType, 0, Msg);
+        }
+
+        /* Do the actual conversion */
+        DoConversion (Expr, NewType);
+    }
 }
 
 
@@ -301,9 +333,19 @@ void TypeCast (ExprDesc* Expr)
     /* Read the expression we have to cast */
     hie10 (Expr);
 
-    /* Convert functions and arrays to "pointer to" object */
-    Expr->Type = PtrConversion (Expr->Type);
-
-    /* Convert the value. */
-    DoConversion (Expr, NewType);
+    /* Only allow casts to arithmetic or pointer types, or just changing the
+    ** qualifiers.
+    */
+    if (TypeCmp (NewType, Expr->Type) >= TC_QUAL_DIFF) {
+        /* The expression has always the new type */
+        ReplaceType (Expr, NewType);
+    } else if (IsCastType (NewType)) {
+        /* Convert functions and arrays to "pointer to" object */
+        Expr->Type = PtrConversion (Expr->Type);
+        /* Convert the value */
+        DoConversion (Expr, NewType);
+    } else {
+        Error ("Arithmetic or pointer type expected but '%s' is used",
+               GetFullTypeName (NewType));
+    }
 }

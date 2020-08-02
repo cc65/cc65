@@ -117,12 +117,27 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
         */
         unsigned EndBit = 0;  /* End bit for bit-fields, or zero if non-bit-field. */
         int AdjustBitField = 0;
+        unsigned BitFieldFullWidthFlags = 0;
         if (ED_IsBitField (Expr)) {
             EndBit = Expr->BitOffs + Expr->BitWidth;
             AdjustBitField = Expr->BitOffs != 0 || (EndBit != CHAR_BITS && EndBit != INT_BITS);
 
+            /* TODO: This probably needs to be guarded by AdjustBitField when long bit-fields are
+            ** supported.
+            */
             Flags |= (EndBit <= CHAR_BITS) ? CF_CHAR : CF_INT;
             Flags |= CF_UNSIGNED;
+
+            /* Flags we need operate on the whole bit-field, without CF_FORCECHAR.  */
+            BitFieldFullWidthFlags = Flags;
+
+            /* If we're adjusting, then only load a char (not an int) and do only char ops;
+            ** We will clear the high byte in the adjustment.  CF_FORCECHAR does nothing if the
+            ** type is not CF_CHAR.
+            */
+            if (AdjustBitField) {
+                Flags |= CF_FORCECHAR;
+            }
         } else if ((Flags & CF_TYPEMASK) == 0) {
             Flags |= TypeOf (Expr->Type);
         }
@@ -211,10 +226,7 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
         ** so be sure to always use unsigned ints for the operations.
         */
         if (AdjustBitField) {
-            /* If the field was loaded as a char, force the shift/mask ops to be char ops.
-            ** If it is a char, the load has already put 0 in the upper byte, so that can remain.
-            */
-            unsigned F = Flags | CF_FORCECHAR | CF_CONST;
+            unsigned F = Flags | CF_CONST;
 
             /* We always need to do something with the low byte, so there is no opportunity
             ** for optimization by skipping it.
@@ -242,19 +254,21 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
                 /* Shift right by the bit offset; no code is emitted if BitOffs is zero */
                 g_asr (F, Expr->BitOffs);
 
-                /* Since we have now shifted down, we can do char ops as long as the width fits in
-                ** a char.
+                /* Since we have now shifted down, we could do char ops when the width fits in
+                ** a char, but we also need to clear the high byte since we've been using
+                ** CF_FORCECHAR up to now.
                 */
-                if (Expr->BitWidth <= CHAR_BITS) {
-                    F |= CF_CHAR;
-                }
 
                 /* And by the width if the field doesn't end on a char or int boundary.
-                ** If it does end on a boundary, then zeros have already been shifted in.
-                ** g_and emits no code if the mask is all ones.
+                ** If it does end on a boundary, then zeros have already been shifted in,
+                ** but we need to clear the high byte for char.  g_and emits no code if the mask
+                ** is all ones.
                 */
-                if (EndBit != CHAR_BITS && EndBit != INT_BITS) {
-                    g_and (F, (0x0001U << Expr->BitWidth) - 1U);
+                if (EndBit == CHAR_BITS) {
+                    /* We need to clear the high byte, since CF_FORCECHAR was set. */
+                    g_and (BitFieldFullWidthFlags | CF_CONST, 0xFF);
+                } else if (EndBit != INT_BITS) {
+                    g_and (BitFieldFullWidthFlags | CF_CONST, (0x0001U << Expr->BitWidth) - 1U);
                 }
             }
         }

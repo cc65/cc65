@@ -1218,7 +1218,7 @@ static void StructRef (ExprDesc* Expr)
     NextToken ();
     const SymEntry Field = FindStructField (Expr->Type, Ident);
     if (Field.Type == 0) {
-        Error ("No field named '%s' found in %s", Ident, GetBasicTypeName (Expr->Type));
+        Error ("No field named '%s' found in '%s'", Ident, GetFullTypeName (Expr->Type));
         /* Make the expression an integer at address zero */
         ED_MakeConstAbs (Expr, 0, type_int);
         return;
@@ -1296,7 +1296,7 @@ static void StructRef (ExprDesc* Expr)
                 Flags = CF_LONG | CF_UNSIGNED | CF_CONST;
                 break;
             default:
-                Internal ("Invalid %s size: %u", GetBasicTypeName (Expr->Type), StructSize);
+                Internal ("Invalid '%s' size: %u", GetFullTypeName (Expr->Type), StructSize);
                 break;
         }
 

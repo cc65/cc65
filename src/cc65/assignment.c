@@ -127,7 +127,13 @@ void Assignment (ExprDesc* Expr)
 
     /* We must have an lvalue for an assignment */
     if (ED_IsRVal (Expr)) {
-        Error ("Invalid lvalue in assignment");
+        if (IsTypeArray (Expr->Type)) {
+            Error ("Array type '%s' is not assignable", GetFullTypeName (Expr->Type));
+        } else if (IsTypeFunc (Expr->Type)) {
+            Error ("Function type '%s' is not assignable", GetFullTypeName (Expr->Type));
+        } else {
+            Error ("Assignment to rvalue");
+        }
     }
 
     /* Check for assignment to const */

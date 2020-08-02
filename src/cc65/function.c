@@ -513,7 +513,7 @@ void NewFunc (SymEntry* Func)
             ** We don't currently support this case.
             */
             if (RType == Param->Type) {
-                Error ("Passing %s of this size by value is not supported", GetBasicTypeName (Param->Type));
+                Error ("Passing '%s' of this size by value is not supported", GetFullTypeName (Param->Type));
             }
         }
 

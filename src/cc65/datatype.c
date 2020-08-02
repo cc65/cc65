@@ -903,7 +903,7 @@ unsigned CheckedSizeOf (const Type* T)
 {
     unsigned Size = SizeOf (T);
     if (Size == 0) {
-        Error ("Size of data type is unknown");
+        Error ("Size of type '%s' is unknown", GetFullTypeName (T));
         Size = SIZEOF_CHAR;     /* Don't return zero */
     }
     return Size;
@@ -919,7 +919,7 @@ unsigned CheckedPSizeOf (const Type* T)
 {
     unsigned Size = PSizeOf (T);
     if (Size == 0) {
-        Error ("Size of data type is unknown");
+        Error ("Size of type '%s' is unknown", GetFullTypeName (T));
         Size = SIZEOF_CHAR;     /* Don't return zero */
     }
     return Size;

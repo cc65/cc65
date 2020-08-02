@@ -1814,6 +1814,9 @@ Type* ParseType (Type* T)
 void ParseDecl (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
 /* Parse a variable, type or function declaration */
 {
+    /* Used to check if we have any errors during parsing this */
+    unsigned PrevErrorCount = ErrorCount;
+
     /* Initialize the Declaration struct */
     InitDeclaration (D);
 
@@ -1891,8 +1894,8 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
         }
     }
 
-    /* Check the size of the generated type */
     if (!IsTypeFunc (D->Type) && !IsTypeVoid (D->Type)) {
+        /* Check the size of the generated type */
         unsigned Size = SizeOf (D->Type);
         if (Size >= 0x10000) {
             if (D->Ident[0] != '\0') {
@@ -1901,8 +1904,12 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
                 Error ("Invalid size in declaration (0x%06X)", Size);
             }
         }
-    }
 
+        if (PrevErrorCount != ErrorCount) {
+            /* Don't give storage if the declaration is not parsed correctly */
+            D->StorageClass |= SC_DECL | SC_ALIAS;
+        }
+    }
 }
 
 

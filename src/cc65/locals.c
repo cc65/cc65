@@ -443,13 +443,14 @@ static void ParseOneDecl (const DeclSpec* Spec)
     }
 
     /* If the symbol is not marked as external, it will be defined now */
-    if ((Decl.StorageClass & SC_EXTERN) == 0) {
+    if ((Decl.StorageClass & SC_ALIAS) == 0 &&
+        (Decl.StorageClass & SC_EXTERN) == 0) {
         Decl.StorageClass |= SC_DEF;
     }
 
     /* Handle anything that needs storage (no functions, no typdefs) */
-    if ((Decl.StorageClass & SC_FUNC) != SC_FUNC &&
-         (Decl.StorageClass & SC_TYPEMASK) != SC_TYPEDEF) {
+    if ((Decl.StorageClass & SC_DEF) == SC_DEF &&
+        (Decl.StorageClass & SC_TYPEMASK) != SC_TYPEDEF) {
 
         /* If we have a register variable, try to allocate a register and
         ** convert the declaration to "auto" if this is not possible.
@@ -468,13 +469,6 @@ static void ParseOneDecl (const DeclSpec* Spec)
         } else if ((Decl.StorageClass & SC_AUTO) == SC_AUTO) {
             /* Auto variable */
             ParseAutoDecl (&Decl);
-        } else if ((Decl.StorageClass & SC_EXTERN) == SC_EXTERN) {
-            /* External identifier - may not get initialized */
-            if (CurTok.Tok == TOK_ASSIGN) {
-                Error ("Cannot initialize externals");
-            }
-            /* Add the external symbol to the symbol table */
-            AddLocalSym (Decl.Ident, Decl.Type, Decl.StorageClass, 0);
         } else if ((Decl.StorageClass & SC_STATIC) == SC_STATIC) {
             /* Static variable */
             ParseStaticDecl (&Decl);
@@ -483,6 +477,13 @@ static void ParseOneDecl (const DeclSpec* Spec)
         }
 
     } else {
+
+        if ((Decl.StorageClass & SC_EXTERN) == SC_EXTERN) {
+            /* External identifier - may not get initialized */
+            if (CurTok.Tok == TOK_ASSIGN) {
+                Error ("Cannot initialize externals");
+            }
+        }
 
         /* Add the symbol to the symbol table */
         AddLocalSym (Decl.Ident, Decl.Type, Decl.StorageClass, 0);

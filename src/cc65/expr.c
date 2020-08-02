@@ -2242,7 +2242,8 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
         /* Make sure, the types are compatible */
         if (IsClassInt (Expr->Type)) {
             if (!IsClassInt (Expr2.Type) && !(IsClassPtr(Expr2.Type) && ED_IsNullPtr(Expr))) {
-                Error ("Incompatible types");
+                TypeCompatibilityDiagnostic (Expr->Type, Expr2.Type, 1,
+                    "Incompatible types comparing '%s' with '%s'");
             }
         } else if (IsClassPtr (Expr->Type)) {
             if (IsClassPtr (Expr2.Type)) {
@@ -2253,10 +2254,12 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                 Type* right = Indirect (Expr2.Type);
                 if (TypeCmp (left, right) < TC_QUAL_DIFF && left->C != T_VOID && right->C != T_VOID) {
                     /* Incompatible pointers */
-                    Error ("Incompatible types");
+                    TypeCompatibilityDiagnostic (Expr->Type, Expr2.Type, 1,
+                        "Incompatible pointer types comparing '%s' with '%s'");
                 }
             } else if (!ED_IsNullPtr (&Expr2)) {
-                Error ("Incompatible types");
+                TypeCompatibilityDiagnostic (Expr->Type, Expr2.Type, 1,
+                    "Comparing pointer type '%s' with '%s'");
             }
         }
 
@@ -3324,7 +3327,8 @@ static void hieQuest (ExprDesc* Expr)
             /* Result type is void */
             ResultType = Expr3.Type;
         } else {
-            Error ("Incompatible types");
+            TypeCompatibilityDiagnostic (Expr2.Type, Expr3.Type, 1,
+                "Incompatible types in ternary '%s' with '%s'");
             ResultType = Expr2.Type;            /* Doesn't matter here */
         }
 

@@ -333,7 +333,7 @@ static void ReturnStatement (void)
                 /* Handle struct/union specially */
                 ReturnType = GetStructReplacementType (Expr.Type);
                 if (ReturnType == Expr.Type) {
-                    Error ("Returning %s of this size by value is not supported", GetBasicTypeName (Expr.Type));
+                    Error ("Returning '%s' of this size by value is not supported", GetFullTypeName (Expr.Type));
                 }
                 LoadExpr (TypeOf (ReturnType), &Expr);
 

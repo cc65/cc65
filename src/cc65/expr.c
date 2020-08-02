@@ -920,8 +920,35 @@ static void Primary (ExprDesc* E)
             /* Illegal primary. Be sure to skip the token to avoid endless
             ** error loops.
             */
-            Error ("Expression expected");
-            NextToken ();
+            {
+                /* Let's see if this is a C99-style declaration */
+                DeclSpec    Spec;
+                InitDeclSpec (&Spec);
+                ParseDeclSpec (&Spec, -1, T_QUAL_NONE);
+
+                if (Spec.Type->C != T_END) {
+
+                    Error ("Mixed declarations and code are not supported in cc65");
+                    while (CurTok.Tok != TOK_SEMI) {
+                        Declaration Decl;
+
+                        /* Parse one declaration */
+                        ParseDecl (&Spec, &Decl, DM_ACCEPT_IDENT);
+                        if (CurTok.Tok == TOK_ASSIGN) {
+                            NextToken ();
+                            ParseInit (Decl.Type);
+                        }
+                        if (CurTok.Tok == TOK_COMMA) {
+                            NextToken ();
+                        } else {
+                            break;
+                        }
+                    }
+                } else {
+                    Error ("Expression expected");
+                    NextToken ();
+                }
+            }
             ED_MakeConstAbsInt (E, 1);
             break;
     }

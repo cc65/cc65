@@ -263,7 +263,7 @@ static void OptionalSigned (void)
 
 
 
-static void InitDeclSpec (DeclSpec* D)
+void InitDeclSpec (DeclSpec* D)
 /* Initialize the DeclSpec struct for use */
 {
     D->StorageClass     = 0;

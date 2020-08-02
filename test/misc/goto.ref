@@ -1,7 +1,7 @@
 goto.c(8): Warning: Goto at line 8 to label start jumps into a block with initialization of an object that has automatic storage duration
-goto.c(97): Warning: 'a' is defined but never used
-goto.c(117): Warning: 'a' is defined but never used
-goto.c(137): Warning: 'a' is defined but never used
+goto.c(97): Warning: Variable 'a' is defined but never used
+goto.c(117): Warning: Variable 'a' is defined but never used
+goto.c(137): Warning: Variable 'a' is defined but never used
 goto.c(159): Warning: Goto at line 23 to label l8 jumps into a block with initialization of an object that has automatic storage duration
 goto.c(159): Warning: Goto at line 44 to label l8 jumps into a block with initialization of an object that has automatic storage duration
 goto.c(159): Warning: Goto at line 65 to label l8 jumps into a block with initialization of an object that has automatic storage duration

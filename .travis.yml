@@ -4,6 +4,7 @@ jobs:
   include:
 
   - os: linux
+    name: Linux
     install:
       - sudo apt-get update
       - sudo apt-get install linuxdoc-tools linuxdoc-tools-info binutils-mingw-w64-i686 gcc-mingw-w64-i686 sshpass
@@ -20,5 +21,6 @@ jobs:
       - make -f Makefile.travis
 
   - os: windows
+    name: Windows
     script:
-      - MSBuild.exe scr/cc65.sln
+      - src/msbuild.cmd scr/cc65.sln

@@ -248,15 +248,10 @@ static void Parse (void)
                         /* We cannot declare variables of type void */
                         Error ("Illegal type for variable '%s'", Decl.Ident);
                         Entry->Flags &= ~(SC_STORAGE | SC_DEF);
-                    } else if (Size == 0) {
+                    } else if (Size == 0 && SymIsDef (Entry)) {
                         /* Size is unknown. Is it an array? */
                         if (!IsTypeArray (Decl.Type)) {
                             Error ("Variable '%s' has unknown size", Decl.Ident);
-                        }
-                        /* Do this only if the same array has not been defined */
-                        if (!SymIsDef (Entry)) {
-                            Entry->Flags &= ~(SC_STORAGE | SC_DEF);
-                            Entry->Flags |= SC_DECL;
                         }
                     } else {
                         /* A global (including static) uninitialized variable is
@@ -432,17 +427,42 @@ void Compile (const char* FileName)
         for (Entry = GetGlobalSymTab ()->SymHead; Entry; Entry = Entry->NextSym) {
             if ((Entry->Flags & (SC_STORAGE | SC_DEF | SC_STATIC)) == (SC_STORAGE | SC_STATIC)) {
                 /* Assembly definition of uninitialized global variable */
+                SymEntry* Sym = GetSymType (Entry->Type);
+                unsigned Size = SizeOf (Entry->Type);
+                if (Size == 0 && IsTypeArray (Entry->Type)) {
+                    if (GetElementCount (Entry->Type) == UNSPECIFIED) {
+                        /* Assume array size of 1 */
+                        SetElementCount (Entry->Type, 1);
+                        Size = SizeOf (Entry->Type);
+                        Warning ("Tentative array '%s[]' assumed to have one element", Entry->Name);
+                    }
 
-                /* Set the segment name only when it changes */
-                if (strcmp (GetSegName (SEG_BSS), Entry->V.BssName) != 0) {
-                    SetSegName (SEG_BSS, Entry->V.BssName);
-                    g_segname (SEG_BSS);
+                    Sym = GetSymType (GetElementType (Entry->Type));
+                    if (Size == 0 && Sym != 0 && SymIsDef (Sym)) {
+                        /* Array of 0-size elements */
+                        Warning ("Array '%s[]' has 0-sized elements", Entry->Name);
+                    }
                 }
-                g_usebss ();
-                g_defgloblabel (Entry->Name);
-                g_res (SizeOf (Entry->Type));
-                /* Mark as defined; so that it will be exported, not imported */
-                Entry->Flags |= SC_DEF;
+
+                /* For non-ESU types, Size != 0 */
+                if (Size != 0 || (Sym != 0 && SymIsDef (Sym))) {
+                    /* Set the segment name only when it changes */
+                    if (strcmp (GetSegName (SEG_BSS), Entry->V.BssName) != 0) {
+                        SetSegName (SEG_BSS, Entry->V.BssName);
+                        g_segname (SEG_BSS);
+                    }
+                    g_usebss ();
+                    g_defgloblabel (Entry->Name);
+                    g_res (Size);
+
+                    /* Mark as defined; so that it will be exported, not imported */
+                    Entry->Flags |= SC_DEF;
+                } else {
+                    /* Tentative declared variable is still of incomplete type */
+                    Error ("Tentative definition of '%s' of type '%s' is incomplete",
+                           Entry->Name,
+                           GetFullTypeName (Entry->Type));
+                }
             }
         }
     }

@@ -1,16 +1,24 @@
-language:
-  - c
-install:
-  - sudo apt-get update
-  - sudo apt-get install linuxdoc-tools linuxdoc-tools-info binutils-mingw-w64-i686 gcc-mingw-w64-i686 sshpass
-script:
-  - make bin USER_CFLAGS=-Werror
-  - make lib QUIET=1
-  - make test QUIET=1
-  - make samples
-  - make -C src clean
-  - make bin USER_CFLAGS=-Werror CROSS_COMPILE=i686-w64-mingw32-
-  - make -C samples clean
-  - make doc zip
-after_success:
-  - make -f Makefile.travis
+language: c
+
+jobs:
+  include:
+
+  - os: linux
+    install:
+      - sudo apt-get update
+      - sudo apt-get install linuxdoc-tools linuxdoc-tools-info binutils-mingw-w64-i686 gcc-mingw-w64-i686 sshpass
+    script:
+      - make bin USER_CFLAGS=-Werror
+      - make lib QUIET=1
+      - make test QUIET=1
+      - make samples
+      - make -C src clean
+      - make bin USER_CFLAGS=-Werror CROSS_COMPILE=i686-w64-mingw32-
+      - make -C samples clean
+      - make doc zip
+    after_success:
+      - make -f Makefile.travis
+
+  - os: windows
+    script:
+      - MSBuild.exe scr/cc65.sln

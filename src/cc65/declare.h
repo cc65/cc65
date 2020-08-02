@@ -93,6 +93,9 @@ typedef enum {
 
 
 
+void InitDeclSpec (DeclSpec* D);
+/* Initialize the DeclSpec struct for use */
+
 Type* ParseType (Type* Type);
 /* Parse a complete type specification */
 

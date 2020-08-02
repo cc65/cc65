@@ -1069,7 +1069,7 @@ int main (int argc, char* argv[])
     /* Create the output file if we didn't had any errors */
     if (PreprocessOnly == 0 && (ErrorCount == 0 || Debug)) {
 
-        /* Emit literals, externals, do cleanup and optimizations */
+        /* Emit literals, do cleanup and optimizations */
         FinishCompile ();
 
         /* Open the file */

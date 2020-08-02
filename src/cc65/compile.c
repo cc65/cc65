@@ -415,9 +415,36 @@ void Compile (const char* FileName)
 
     } else {
 
+        /* Used for emitting externals */
+        SymEntry* Entry;
+
         /* Ok, start the ball rolling... */
         Parse ();
 
+        /* Reset the BSS segment name to its default; so that the below strcmp()
+        ** will work as expected, at the beginning of the list of variables
+        */
+        SetSegName (SEG_BSS, SEGNAME_BSS);
+
+        /* Walk over all global symbols and generate code for uninitialized
+        ** global variables.
+        */
+        for (Entry = GetGlobalSymTab ()->SymHead; Entry; Entry = Entry->NextSym) {
+            if ((Entry->Flags & (SC_STORAGE | SC_DEF | SC_STATIC)) == (SC_STORAGE | SC_STATIC)) {
+                /* Assembly definition of uninitialized global variable */
+
+                /* Set the segment name only when it changes */
+                if (strcmp (GetSegName (SEG_BSS), Entry->V.BssName) != 0) {
+                    SetSegName (SEG_BSS, Entry->V.BssName);
+                    g_segname (SEG_BSS);
+                }
+                g_usebss ();
+                g_defgloblabel (Entry->Name);
+                g_res (SizeOf (Entry->Type));
+                /* Mark as defined; so that it will be exported, not imported */
+                Entry->Flags |= SC_DEF;
+            }
+        }
     }
 
     if (Debug) {
@@ -431,18 +458,12 @@ void Compile (const char* FileName)
 
 
 void FinishCompile (void)
-/* Emit literals, externals, debug info, do cleanup and optimizations */
+/* Emit literals, debug info, do cleanup and optimizations */
 {
     SymEntry* Entry;
 
-    /* Reset the BSS segment name to its default; so that the below strcmp()
-    ** will work as expected, at the beginning of the list of variables
-    */
-    SetSegName (SEG_BSS, SEGNAME_BSS);
-
-    /* Walk over all global symbols:
-    ** - for functions, do clean-up and optimizations
-    ** - generate code for uninitialized global variables
+    /* Walk over all global symbols and do clean-up and optimizations for
+    ** functions.
     */
     for (Entry = GetGlobalSymTab ()->SymHead; Entry; Entry = Entry->NextSym) {
         if (SymIsOutputFunc (Entry)) {
@@ -450,19 +471,6 @@ void FinishCompile (void)
             MoveLiteralPool (Entry->V.F.LitPool);
             CS_MergeLabels (Entry->V.F.Seg->Code);
             RunOpt (Entry->V.F.Seg->Code);
-        } else if ((Entry->Flags & (SC_STORAGE | SC_DEF | SC_STATIC)) == (SC_STORAGE | SC_STATIC)) {
-            /* Assembly definition of uninitialized global variable */
-
-            /* Set the segment name only when it changes */
-            if (strcmp (GetSegName (SEG_BSS), Entry->V.BssName) != 0) {
-                SetSegName (SEG_BSS, Entry->V.BssName);
-                g_segname (SEG_BSS);
-            }
-            g_usebss ();
-            g_defgloblabel (Entry->Name);
-            g_res (SizeOf (Entry->Type));
-            /* Mark as defined; so that it will be exported, not imported */
-            Entry->Flags |= SC_DEF;
         }
     }
 

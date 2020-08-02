@@ -244,6 +244,23 @@ static int TypeSpecAhead (void)
 
 
 
+static unsigned ExprCheckedSizeOf (const Type* T)
+/* Specially checked SizeOf() used in 'sizeof' expressions */
+{
+    unsigned Size = SizeOf (T);
+    SymEntry* Sym;
+
+    if (Size == 0) {
+        Sym = GetSymType (T);
+        if (Sym == 0 || !SymIsDef (Sym)) {
+            Error ("Cannot apply 'sizeof' to incomplete type '%s'", GetFullTypeName (T));
+        }
+    }
+    return Size;
+}
+
+
+
 void PushAddr (const ExprDesc* Expr)
 /* If the expression contains an address that was somehow evaluated,
 ** push this address on the stack. This is a helper function for all
@@ -1890,7 +1907,7 @@ void hie10 (ExprDesc* Expr)
             if (TypeSpecAhead ()) {
                 Type T[MAXTYPELEN];
                 NextToken ();
-                Size = CheckedSizeOf (ParseType (T));
+                Size = ExprCheckedSizeOf (ParseType (T));
                 ConsumeRParen ();
             } else {
                 /* Remember the output queue pointer */
@@ -1908,7 +1925,7 @@ void hie10 (ExprDesc* Expr)
                         ReleaseLiteral (Expr->LVal);
                     }
                     /* Calculate the size */
-                    Size = CheckedSizeOf (Expr->Type);
+                    Size = ExprCheckedSizeOf (Expr->Type);
                 }
                 /* Remove any generated code */
                 RemoveCode (&Mark);

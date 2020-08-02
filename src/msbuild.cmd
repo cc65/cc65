@@ -1,5 +1,4 @@
 call "%VS140COMNTOOLS%vsvars32.bat"
-where /R c:\ Microsoft.Cpp.targets
-set VCTargetsPath=%VCInstallDir%\VCTargets\
+where /R "c:\Program Files (x86)" VsDevCmd.bat
 set
 msbuild.exe %*

@@ -192,7 +192,7 @@ ExitPoint:
 
 
 
-void TypeConversion (ExprDesc* Expr, Type* NewType)
+void TypeConversion (ExprDesc* Expr, const Type* NewType)
 /* Do an automatic conversion of the given expression to the new type. Output
 ** warnings or errors where this automatic conversion is suspicious or
 ** impossible.
@@ -264,7 +264,7 @@ void TypeConversion (ExprDesc* Expr, Type* NewType)
             **   - the rhs pointer is a void pointer, or
             **   - the lhs pointer is a void pointer.
             */
-            if (!IsTypeVoid (Indirect (NewType)) && !IsTypeVoid (Indirect (Expr->Type))) {
+            if (!IsTypeVoid (IndirectConst (NewType)) && !IsTypeVoid (Indirect (Expr->Type))) {
                 /* Compare the types */
                 switch (TypeCmp (NewType, Expr->Type)) {
 

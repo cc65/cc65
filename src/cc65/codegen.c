@@ -3642,7 +3642,7 @@ void g_lt (unsigned flags, unsigned long val)
 
             /* Give a warning in some special cases */
             if (val == 0) {
-                Warning ("Condition is never true");
+                Warning ("Comparison of unsigned type < 0 is always false");
                 AddCodeLine ("jsr return0");
                 return;
             }

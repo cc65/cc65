@@ -895,8 +895,8 @@ Type* GetBaseElementType (Type* T)
 
 
 
-SymEntry* GetSymEntry (const Type* T)
-/* Return a SymEntry pointer from a type */
+SymEntry* GetESUSymEntry (const Type* T)
+/* Return a SymEntry pointer from an enum/struct/union type */
 {
     /* Only enums, structs or unions have a SymEntry attribute */
     CHECK (IsClassStruct (T) || IsTypeEnum (T));
@@ -907,8 +907,8 @@ SymEntry* GetSymEntry (const Type* T)
 
 
 
-void SetSymEntry (Type* T, SymEntry* S)
-/* Set the SymEntry pointer for a type */
+void SetESUSymEntry (Type* T, SymEntry* S)
+/* Set the SymEntry pointer for an enum/struct/union type */
 {
     /* Only enums, structs or unions have a SymEntry attribute */
     CHECK (IsClassStruct (T) || IsTypeEnum (T));

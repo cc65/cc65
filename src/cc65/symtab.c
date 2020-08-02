@@ -509,7 +509,7 @@ SymEntry FindStructField (const Type* T, const char* Name)
     if (IsClassStruct (T)) {
 
         /* Get a pointer to the struct/union type */
-        const SymEntry* Struct = GetSymEntry (T);
+        const SymEntry* Struct = GetESUSymEntry (T);
         CHECK (Struct != 0);
 
         /* Now search in the struct/union symbol table. Beware: The table may

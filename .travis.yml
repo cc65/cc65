@@ -21,4 +21,4 @@ jobs:
 
   - os: windows
     script:
-      - ls -l $VS140COMNTOOLS
+      - ls -l "$VS140COMNTOOLS"

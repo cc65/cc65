@@ -127,12 +127,19 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
             Flags |= TypeOf (Expr->Type);
         }
 
-        /* Setting CF_TEST will cause the load to perform optimizations and not actually load all
-        ** bits of the bit-field, instead just computing the condition codes.  Therefore, if
-        ** adjustment is required, we do not set CF_TEST here, but handle it below.
-        */
-        if (ED_NeedsTest (Expr) && !AdjustBitField) {
-            Flags |= CF_TEST;
+        if (ED_NeedsTest (Expr)) {
+            /* If we're only testing, we do not need to promote char to int.
+            ** CF_FORCECHAR does nothing if the type is not CF_CHAR.
+            */
+            Flags |= CF_FORCECHAR;
+
+            /* Setting CF_TEST will cause the load to perform optimizations and not actually load
+            ** all bits of the bit-field, instead just computing the condition codes.  Therefore,
+            ** if adjustment is required, we do not set CF_TEST here, but handle it below.
+            */
+            if (!AdjustBitField) {
+                Flags |= CF_TEST;
+            }
         }
 
         /* Load the content of Expr */
@@ -206,7 +213,6 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
         if (AdjustBitField) {
             /* If the field was loaded as a char, force the shift/mask ops to be char ops.
             ** If it is a char, the load has already put 0 in the upper byte, so that can remain.
-            ** CF_FORCECHAR does nothing if the type is not CF_CHAR.
             */
             unsigned F = Flags | CF_FORCECHAR | CF_CONST;
 

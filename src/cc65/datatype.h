@@ -203,6 +203,8 @@ extern Type type_double[];
 /* Forward for the SymEntry struct */
 struct SymEntry;
 
+/* Forward for the StrBuf struct */
+struct StrBuf;
 
 
 /*****************************************************************************/
@@ -214,6 +216,20 @@ struct SymEntry;
 const char* GetBasicTypeName (const Type* T);
 /* Return a const name string of the basic type.
 ** Return "type" for unknown basic types.
+*/
+
+const char* GetFullTypeName (const Type* T);
+/* Return the full name string of the given type.
+** Note: This may use a static buffer that could be overwritten by other calls.
+*/
+
+struct StrBuf* GetFullTypeNameBuf (struct StrBuf* S, const Type* T);
+/* Return the full name string of the given type */
+
+int GetQualifierTypeCodeNameBuf (struct StrBuf* S, TypeCode Qual, TypeCode IgnoredQual);
+/* Return the names of the qualifiers of the type.
+** Qualifiers to be ignored can be specified with the IgnoredQual flags.
+** Return the count of added qualifier names.
 */
 
 unsigned TypeLen (const Type* T);

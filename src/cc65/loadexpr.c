@@ -238,7 +238,6 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
                 ** when EndBit <= 24 is possible.
                 */
                 g_test (F);
-                ED_TestDone (Expr);
             } else {
                 /* Shift right by the bit offset; no code is emitted if BitOffs is zero */
                 g_asr (F, Expr->BitOffs);

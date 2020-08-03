@@ -919,7 +919,7 @@ unsigned CheckedPSizeOf (const Type* T)
 {
     unsigned Size = PSizeOf (T);
     if (Size == 0) {
-        Error ("Size of type '%s' is unknown", GetFullTypeName (T));
+        Error ("Size of type '%s' is unknown", GetFullTypeName (T + 1));
         Size = SIZEOF_CHAR;     /* Don't return zero */
     }
     return Size;

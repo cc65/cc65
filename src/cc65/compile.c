@@ -449,7 +449,7 @@ void Compile (const char* FileName)
                         /* Assume array size of 1 */
                         SetElementCount (Entry->Type, 1);
                         Size = SizeOf (Entry->Type);
-                        Warning ("Tentative array '%s[]' assumed to have one element", Entry->Name);
+                        Warning ("Incomplete array '%s[]' assumed to have one element", Entry->Name);
                     }
 
                     Sym = GetSymType (GetElementType (Entry->Type));
@@ -474,7 +474,7 @@ void Compile (const char* FileName)
                     Entry->Flags |= SC_DEF;
                 } else {
                     /* Tentative declared variable is still of incomplete type */
-                    Error ("Tentative definition of '%s' of type '%s' is incomplete",
+                    Error ("Definition of '%s' has type '%s' that is never completed",
                            Entry->Name,
                            GetFullTypeName (Entry->Type));
                 }

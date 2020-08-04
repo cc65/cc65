@@ -919,6 +919,11 @@ NextMember: if (CurTok.Tok != TOK_COMMA) {
     FieldTab = GetSymTab ();
     LeaveStructLevel ();
 
+    /* Empty union is not supported now */
+    if (UnionSize == 0) {
+        Error ("Empty union type '%s' is not supported", Name);
+    }
+
     /* Make a real entry from the forward decl and return it */
     return AddStructSym (Name, SC_UNION | SC_DEF, UnionSize, FieldTab);
 }
@@ -1100,6 +1105,11 @@ NextMember: if (CurTok.Tok != TOK_COMMA) {
     /* Remember the symbol table and leave the struct level */
     FieldTab = GetSymTab ();
     LeaveStructLevel ();
+
+    /* Empty struct is not supported now */
+    if (StructSize == 0) {
+        Error ("Empty struct type '%s' is not supported", Name);
+    }
 
     /* Make a real entry from the forward decl and return it */
     return AddStructSym (Name, SC_STRUCT | SC_DEF, StructSize, FieldTab);

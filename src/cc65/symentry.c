@@ -303,7 +303,8 @@ const char* GetSymTypeName (const Type* T)
     if (Sym == 0) {
         return GetBasicTypeName (T);
     }
-    sprintf (TypeName, "%s %s", GetBasicTypeName (T), Sym->Name ? Sym->Name : "<unknown>");
+    sprintf (TypeName, "%s %s", GetBasicTypeName (T),
+             Sym->Name[0] != '\0' ? Sym->Name : "<unknown>");
 
     return TypeName;
 }

@@ -426,13 +426,25 @@ static void ParseOneDecl (const DeclSpec* Spec)
     /* Read the declaration */
     ParseDecl (Spec, &Decl, DM_NEED_IDENT);
 
-    /* Set the correct storage class for functions */
+    /* Check if there are any non-extern storage classes set for function
+    ** declarations. The only valid storage class for function declarations
+    ** inside functions is 'extern'.
+    */
     if ((Decl.StorageClass & SC_FUNC) == SC_FUNC) {
-        /* Function prototypes are always external */
-        if ((Decl.StorageClass & SC_EXTERN) == 0) {
-            Warning ("Function must be extern");
+
+        /* Check if there are explicitly specified non-external storage classes */
+        if ((Spec->Flags & DS_DEF_STORAGE) != DS_DEF_STORAGE    &&
+            (Decl.StorageClass & SC_EXTERN) == 0                &&
+            (Decl.StorageClass & SC_STORAGEMASK) != 0) {
+            Error ("Illegal storage class on function");
         }
+
+        /* The default storage class could be wrong. Just use 'extern' in all
+        ** cases.
+        */
+        Decl.StorageClass &= ~SC_STORAGEMASK;
         Decl.StorageClass |= SC_EXTERN;
+
     }
 
     /* If we don't have a name, this was flagged as an error earlier.

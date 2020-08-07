@@ -107,13 +107,13 @@ static int CopyStruct (ExprDesc* LExpr, ExprDesc* RExpr)
         g_push (CF_PTR | CF_UNSIGNED, 0);
 
         /* Load the size of the struct or union into the primary */
-        g_getimmed (CF_INT | CF_UNSIGNED | CF_CONST, CheckedSizeOf (ltype), 0);
+        g_getimmed (CF_INT | CF_UNSIGNED | CF_CONST, SizeOf (ltype), 0);
 
         /* Call the memcpy function */
         g_call (CF_FIXARGC, Func_memcpy, 4);
     }
 
-    return 0;
+    return 1;
 }
 
 

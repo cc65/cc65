@@ -190,6 +190,7 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
         */
         if (LeftType == T_TYPE_PTR && RightType == T_TYPE_ARRAY) {
             RightType = T_TYPE_PTR;
+            SetResult (Result, TC_STRICT_COMPATIBLE);
         }
 
         /* If the underlying types are not identical, the types are incompatible */
@@ -350,12 +351,14 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
                 /* Check member count */
                 LeftCount  = GetElementCount (lhs);
                 RightCount = GetElementCount (rhs);
-                if (LeftCount  != UNSPECIFIED &&
-                    RightCount != UNSPECIFIED &&
-                    LeftCount  != RightCount) {
-                    /* Member count given but different */
-                    SetResult (Result, TC_INCOMPATIBLE);
-                    return;
+                if (LeftCount != RightCount) {
+                    if (LeftCount  != UNSPECIFIED &&
+                        RightCount != UNSPECIFIED) {
+                        /* Member count given but different */
+                        SetResult (Result, TC_INCOMPATIBLE);
+                        return;
+                    }
+                    SetResult (Result, TC_EQUAL);
                 }
                 break;
 

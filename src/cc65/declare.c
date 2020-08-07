@@ -549,8 +549,8 @@ static SymEntry* ParseEnumDecl (const char* Name)
     ident           Ident;
     long            MinConstant = 0;
     unsigned long   MaxConstant = 0;
-    const Type*     NewType     = type_int;  /* new enumerator type */
-    const Type*     MemberType  = type_int;  /* default enumerator type */
+    const Type*     NewType     = 0;        /* new member type */
+    const Type*     MemberType  = type_int; /* default member type */
 
     /* Accept forward definitions */
     if (CurTok.Tok != TOK_LCURLY) {
@@ -676,6 +676,11 @@ static SymEntry* ParseEnumDecl (const char* Name)
         NextToken ();
     }
     ConsumeRCurly ();
+
+    /* Check if there have been any members. Error if none */
+    if (NewType == 0) {
+        Error ("Empty enum is invalid");
+    }
 
     /* This evaluates the underlying type of the whole enum */
     MemberType = GetEnumeratorType (MinConstant, MaxConstant, 0);

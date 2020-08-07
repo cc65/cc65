@@ -133,7 +133,7 @@ static struct StrBuf* GetFullTypeNameWestEast (struct StrBuf* West, struct StrBu
         if ((F->Flags & FD_VARIADIC) == 0) {
             if (F->ParamCount > 0) {
                 SB_AppendStr (&ParamList, SB_GetConstBuf (GetFullTypeNameBuf (&Buf, Param->Type)));
-            } else {
+            } else if ((F->Flags & FD_EMPTY) == 0) {
                 SB_AppendStr (&ParamList, "void");
             }
         } else {

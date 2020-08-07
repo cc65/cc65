@@ -976,7 +976,7 @@ unsigned TypeOf (const Type* T)
 
         case T_ENUM:
             /* Incomplete enum type */
-            Error ("Incomplete enum type");
+            Error ("Incomplete type '%s'", GetFullTypeName (T));
             return CF_INT;
 
         default:

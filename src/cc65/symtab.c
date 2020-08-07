@@ -1019,9 +1019,18 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
 
         /* We have a symbol with this name already */
         if (HandleSymRedefinition (Entry, T, Flags)) {
-            /* Use the fail-safe table for fictitious symbols */
-            Tab   = FailSafeTab;
             Entry = 0;
+        } else if ((Flags & SC_ESUTYPEMASK) != SC_TYPEDEF) {
+            /* Redefinitions are not allowed */
+            if (SymIsDef (Entry) && (Flags & SC_DEF) == SC_DEF) {
+                Error ("Multiple definition of '%s'", Entry->Name);
+                Entry = 0;
+            }
+        }
+
+        if (Entry == 0) {
+            /* Use the fail-safe table for fictitious symbols */
+            Tab = FailSafeTab;
         }
     }
     
@@ -1033,7 +1042,7 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
         Entry->Type = TypeDup (T);
 
         if ((Flags & SC_STRUCTFIELD) == SC_STRUCTFIELD ||
-            (Flags & SC_TYPEDEF) == SC_TYPEDEF) {
+            (Flags & SC_ESUTYPEMASK) == SC_TYPEDEF) {
             if ((Flags & SC_ALIAS) != SC_ALIAS) {
                 Entry->V.Offs = Offs;
             }

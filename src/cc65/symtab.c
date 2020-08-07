@@ -697,18 +697,17 @@ SymEntry* AddEnumSym (const char* Name, const Type* Type, SymTable* Tab)
             /* Existing symbol is not an enum */
             Error ("Symbol '%s' is already different kind", Name);
             Entry = 0;
-        } else {
+        } else if (Type != 0) {
             /* Define the struct size if the underlying type is given. */
-            if (Type != 0) {
-                if (Type !=0 && Entry->V.E.Type != 0) {
-                    /* Both are definitions. */
-                    Error ("Multiple definition for enum '%s'", Name);
-                    Entry = 0;
-                } else {
-                    Entry->Type       = 0;
-                    Entry->V.E.SymTab = Tab;
-                    Entry->V.E.Type   = Type;
-                }
+            if (Entry->V.E.Type != 0) {
+                /* Both are definitions. */
+                Error ("Multiple definition for 'enum %s'", Name);
+                Entry = 0;
+            } else {
+                Entry->V.E.SymTab = Tab;
+                Entry->V.E.Type   = Type;
+                Entry->Flags     &= ~SC_DECL;
+                Entry->Flags     |= SC_DEF;
             }
         }
 
@@ -724,7 +723,6 @@ SymEntry* AddEnumSym (const char* Name, const Type* Type, SymTable* Tab)
         Entry = NewSymEntry (Name, SC_ENUM);
 
         /* Set the enum type data */
-        Entry->Type       = 0;
         Entry->V.E.SymTab = Tab;
         Entry->V.E.Type   = Type;
 

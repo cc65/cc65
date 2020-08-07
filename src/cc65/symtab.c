@@ -558,34 +558,46 @@ static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags
     unsigned E_SCType = Entry->Flags & SC_TYPEMASK;
     unsigned SCType   = Flags & SC_TYPEMASK;
 
-    /* Some symbols may be redeclared if certain requirements are met */
-    if (IsTypeArray (T) && IsTypeArray (E_Type)) {
+    /* Existing typedefs cannot be redeclared as anything different */
+    if (E_SCType == SC_TYPEDEF) {
 
-        /* Get the array sizes */
-        long Size  = GetElementCount (T);
-        long ESize = GetElementCount (E_Type);
-
-        /* If we are handling arrays, the old entry or the new entry may be
-        ** an incomplete declaration. Accept this, and if the exsting entry
-        ** is incomplete, complete it.
-        */
-        if ((Size != UNSPECIFIED && ESize != UNSPECIFIED && Size != ESize) ||
-            TypeCmp (T + 1, E_Type + 1) < TC_EQUAL) {
-            /* Types not identical: Conflicting types */
-            Error ("Conflicting array types for '%s[]'", Entry->Name);
-            Entry = 0;
-        } else {
-            /* Check if we have a size in the existing definition */
-            if (ESize == UNSPECIFIED) {
-                /* Existing, size not given, use size from new def */
-                SetElementCount (E_Type, Size);
+        if (SCType == SC_TYPEDEF) {
+            if (TypeCmp (E_Type, T) < TC_IDENTICAL) {
+                Error ("Conflicting types for typedef '%s'", Entry->Name);
+                Entry = 0;
             }
+        } else {
+            Error ("Redefinition of typedef '%s' as different kind of symbol", Entry->Name);
+            Entry = 0;
         }
 
     } else {
 
-        /* We have a symbol with this name already */
-        if ((Entry->Flags & SC_FUNC) == SC_FUNC) {
+        /* Some symbols may be redeclared if certain requirements are met */
+        if (IsTypeArray (T) && IsTypeArray (E_Type)) {
+
+            /* Get the array sizes */
+            long Size  = GetElementCount (T);
+            long ESize = GetElementCount (E_Type);
+
+            /* If we are handling arrays, the old entry or the new entry may be
+            ** an incomplete declaration. Accept this, and if the exsting entry
+            ** is incomplete, complete it.
+            */
+            if ((Size != UNSPECIFIED && ESize != UNSPECIFIED && Size != ESize) ||
+                TypeCmp (T + 1, E_Type + 1) < TC_EQUAL) {
+                /* Conflicting element types */
+                Error ("Conflicting array types for '%s[]'", Entry->Name);
+                Entry = 0;
+            } else {
+                /* Check if we have a size in the existing definition */
+                if (ESize == UNSPECIFIED) {
+                    /* Existing, size not given, use size from new def */
+                    SetElementCount (E_Type, Size);
+                }
+            }
+
+        } else if ((Entry->Flags & SC_FUNC) == SC_FUNC) {
 
             /* In case of a function, use the new type descriptor, since it
             ** contains pointers to the new symbol tables that are needed if
@@ -616,22 +628,9 @@ static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags
                 Entry = 0;
             }
 
-        } else if (E_SCType == SC_TYPEDEF) {
-
-            if (SCType == SC_TYPEDEF) {
-                /* New typedef must be identical */
-                if (TypeCmp (E_Type, T) < TC_EQUAL) {
-                    Error ("Conflicting types for typedef '%s'", Entry->Name);
-                    Entry = 0;
-                }
-            } else {
-                Error ("Redefinition of typedef '%s' as different kind of symbol", Entry->Name);
-                Entry = 0;
-            }
-
         } else {
 
-            /* New type must be identical */
+            /* New type must be equivalent */
             if (SCType != E_SCType) {
                 Error ("Redefinition of '%s' as different kind of symbol", Entry->Name);
                 Entry = 0;

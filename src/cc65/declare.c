@@ -2543,6 +2543,12 @@ static unsigned ParseInitInternal (Type* T, int *Braces, int AllowFlexibleMember
         case T_UNION:
             return ParseStructInit (T, Braces, AllowFlexibleMembers);
 
+        case T_ENUM:
+            /* Incomplete enum type must have already raised errors.
+            ** Just proceed to consume the value.
+            */
+            return ParseScalarInit (T);
+
         case T_VOID:
             if (IS_Get (&Standard) == STD_CC65) {
                 /* Special cc65 extension in non-ANSI mode */

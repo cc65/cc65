@@ -761,7 +761,11 @@ SymEntry* AddStructSym (const char* Name, unsigned Flags, unsigned Size, SymTabl
             Entry = 0;
         } else if ((Entry->Flags & Flags & SC_DEF) == SC_DEF) {
             /* Both structs are definitions. */
-            Error ("Multiple definition for '%s'", Name);
+            if (Type == SC_STRUCT) {
+                Error ("Multiple definition for 'struct %s'", Name);
+            } else {
+                Error ("Multiple definition for 'union %s'", Name);
+            }
             Entry = 0;
         } else {
             /* Define the struct size if it is a definition */

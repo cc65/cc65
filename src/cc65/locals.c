@@ -493,7 +493,10 @@ static void ParseOneDecl (const DeclSpec* Spec)
         if ((Decl.StorageClass & SC_EXTERN) == SC_EXTERN) {
             /* External identifier - may not get initialized */
             if (CurTok.Tok == TOK_ASSIGN) {
-                Error ("Cannot initialize externals");
+                Error ("Cannot initialize extern variable '%s'", Decl.Ident);
+                /* Avoid excess errors */
+                NextToken ();
+                ParseInit (Decl.Type);
             }
         }
 

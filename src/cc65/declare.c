@@ -1907,7 +1907,7 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
 
         if (PrevErrorCount != ErrorCount) {
             /* Don't give storage if the declaration is not parsed correctly */
-            D->StorageClass |= SC_DECL | SC_ALIAS;
+            D->StorageClass |= SC_DECL | SC_FICTITIOUS;
         }
     }
 }

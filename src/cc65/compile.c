@@ -148,7 +148,7 @@ static void Parse (void)
                 break;
             }
 
-            if ((Decl.StorageClass & SC_ALIAS) == SC_ALIAS) {
+            if ((Decl.StorageClass & SC_FICTITIOUS) == SC_FICTITIOUS) {
                 /* Failed parsing */
                 goto SkipOneDecl;
             }

@@ -106,6 +106,7 @@ struct CodeEntry;
 #define SC_GOTO_IND     0x800000U       /* Indirect goto */
 
 #define SC_ALIAS        0x01000000U     /* Alias of anonymous field */
+#define SC_FICTITIOUS   0x02000000U     /* Symbol is fictitious */
 
 
 

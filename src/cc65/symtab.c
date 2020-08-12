@@ -1045,6 +1045,22 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
             if (SymIsDef (Entry) && (Flags & SC_DEF) == SC_DEF) {
                 Error ("Multiple definition of '%s'", Entry->Name);
                 Entry = 0;
+            } else if ((Flags & (SC_AUTO | SC_REGISTER)) != 0 &&
+                       (Entry->Flags & SC_EXTERN) != 0) {
+                /* Check for local storage class conflict */
+                Error ("Declaration of '%s' with no linkage follows extern declaration",
+                       Name);
+                Entry = 0;
+            } else {
+                /* If a static declaration follows a non-static declaration,
+                ** then it is an error.
+                */
+                if ((Flags & SC_DEF)            &&
+                    (Flags & SC_EXTERN) == 0    &&
+                    (Entry->Flags & SC_EXTERN) != 0) {
+                    Error ("Static declaration of '%s' follows extern declaration", Name);
+                    Entry = 0;
+                }
             }
         }
 
@@ -1104,38 +1120,62 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
     if (Entry) {
         /* We have a symbol with this name already */
         if (HandleSymRedefinition (Entry, T, Flags)) {
-            /* Use the fail-safe table for fictitious symbols */
-            Tab   = FailSafeTab;
             Entry = 0;
-
-        } else {
-
+        } else if ((Entry->Flags & (SC_AUTO | SC_REGISTER)) != 0) {
+            /* Check for local storage class conflict */
+            Error ("Extern declaration of '%s' follows declaration with no linkage",
+                   Name);
+            Entry = 0;
+        } else if ((Flags & SC_ESUTYPEMASK) != SC_TYPEDEF) {
             /* If a static declaration follows a non-static declaration, then
-            ** warn about the conflict. It will compile an extern declaration.
+            ** diagnose the conflict. It will warn and compile an extern
+            ** declaration if both declarations are global, otherwise give an
+            ** error.
             */
-            if ((Flags & SC_EXTERN) == 0 && (Entry->Flags & SC_EXTERN) != 0) {
-                Warning ("static declaration follows non-static declaration of '%s'.", Name);
+            if (Tab == SymTab0 &&
+                (Flags & SC_EXTERN) == 0    &&
+                (Entry->Flags & SC_EXTERN) != 0) {
+                Warning ("Static declaration of '%s' follows non-static declaration", Name);
+            } else if ((Flags & SC_EXTERN) != 0                                     &&
+                       (Entry->Owner == SymTab0 || (Entry->Flags & SC_DEF) != 0)    &&
+                       (Entry->Flags & SC_EXTERN) == 0) {
+                /* It is OK if a global extern declaration follows a global
+                ** non-static declaration, but an error if either of them is
+                ** local, as the two would be referring to different objects.
+                ** It is an error as well if a global non-static declaration
+                ** follows a global static declaration.
+                */
+                if (Entry->Owner == SymTab0) {
+                    if ((Flags & SC_STORAGE) == 0) {
+                        /* Linkage must be unchanged */
+                        Flags &= ~SC_EXTERN;
+                    } else {
+                        Error ("Non-static declaration of '%s' follows static declaration", Name);
+                    }
+                } else {
+                    Error ("Extern declaration of '%s' follows static declaration", Name);
+                    Entry = 0;
+                }
             }
 
-            /* If an extern declaration follows a static declaration, then
-            ** warn about the conflict. It will compile an extern declaration.
-            */
-            if ((Flags & SC_EXTERN) != 0 && (Entry->Flags & SC_EXTERN) == 0) {
-                Warning ("extern declaration follows static declaration of '%s'.", Name);
-            }
+            if (Entry) {
+                /* Update existing function type if this is a definition */
+                if (IsTypeFunc (Entry->Type)    &&
+                    !SymIsDef (Entry)           &&
+                    (Flags & SC_DEF) == SC_DEF) {
+                    TypeFree (Entry->Type);
+                    Entry->Type = TypeDup (T);
+                }
 
-            /* Update existing function type if this is a definition */
-            if (IsTypeFunc (Entry->Type)    &&
-                !SymIsDef (Entry)           &&
-                (Flags & SC_DEF) == SC_DEF) {
-                TypeFree (Entry->Type);
-                Entry->Type = TypeDup (T);
+                /* Add the new flags */
+                Entry->Flags |= Flags;
             }
-
-            /* Add the new flags */
-            Entry->Flags |= Flags & ~SC_EXTERN;
         }
 
+        if (Entry == 0) {
+            /* Use the fail-safe table for fictitious symbols */
+            Tab = FailSafeTab;
+        }
     } 
     
     if (Entry == 0 || Entry->Owner != Tab) {

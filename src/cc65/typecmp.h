@@ -70,6 +70,8 @@ typedef enum {
 typecmp_t TypeCmp (const Type* lhs, const Type* rhs);
 /* Compare two types and return the result */
 
+FuncDesc* RefineFuncDesc (Type* OldType, const Type* NewType);
+/* Refine the existing function descriptor with a new one */
 
 
 /* End of typecmp.h */

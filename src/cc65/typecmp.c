@@ -421,3 +421,137 @@ typecmp_t TypeCmp (const Type* lhs, const Type* rhs)
     /* Return the result */
     return Result;
 }
+
+
+
+static Type* DoComposite (Type* lhs, const Type* rhs);
+
+static void CompositeFuncParams (const FuncDesc* F1, const FuncDesc* F2)
+/* Composite two function symbol tables regarding function parameters */
+{
+    /* Get the symbol tables */
+    const SymTable* Tab1 = F1->SymTab;
+    const SymTable* Tab2 = F2->SymTab;
+
+    /* Composite the parameter lists */
+    const SymEntry* Sym1 = Tab1->SymHead;
+    const SymEntry* Sym2 = Tab2->SymHead;
+
+    /* Composite the fields */
+    while (Sym1 && (Sym1->Flags & SC_PARAM) && Sym2 && (Sym2->Flags & SC_PARAM)) {
+
+        /* Get the symbol types */
+        Type* Type1 = Sym1->Type;
+        Type* Type2 = Sym2->Type;
+
+        /* If either of both functions is old style, apply the default
+        ** promotions to the parameter type.
+        */
+        if (F1->Flags & FD_OLDSTYLE) {
+            if (IsClassInt (Type1)) {
+                Type1 = IntPromotion (Type1);
+            }
+        }
+        if (F2->Flags & FD_OLDSTYLE) {
+            if (IsClassInt (Type2)) {
+                Type2 = IntPromotion (Type2);
+            }
+        }
+
+        /* Composite this field */
+        DoComposite (Type1, Type2);
+
+        /* Get the pointers to the next fields */
+        Sym1 = Sym1->NextSym;
+        Sym2 = Sym2->NextSym;
+    }
+}
+
+
+
+static Type* DoComposite (Type* lhs, const Type* rhs)
+/* Recursively composite two types into lhs */
+{
+    FuncDesc*   F1;
+    FuncDesc*   F2;
+    long LeftCount, RightCount;
+
+    /* Composite two types */
+    while (lhs->C != T_END) {
+
+        /* Check if the end of the type string is reached */
+        if (rhs->C == T_END) {
+            return lhs;
+        }
+
+        /* Check for sanity */
+        CHECK (GetUnderlyingTypeCode (lhs) == GetUnderlyingTypeCode (rhs));
+
+        /* Check for special type elements */
+
+        if (IsTypeFunc (lhs)) {
+            /* Composite the function descriptors */
+            F1 = GetFuncDesc (lhs);
+            F2 = GetFuncDesc (rhs);
+
+            /* If one of both functions has an empty parameter list (which
+            ** does also mean, it is not a function definition, because the
+            ** flag is reset in this case), it is replaced by the other
+            ** definition, provided that the other has no default
+            ** promotions in the parameter list. If none of both parameter
+            ** lists is empty, we have to composite the parameter lists and
+            ** other attributes.
+            */
+            if ((F1->Flags & FD_EMPTY) == FD_EMPTY) {
+                if ((F2->Flags & FD_EMPTY) == 0) {
+                    /* Copy the parameters and flags */
+                    TypeCopy (lhs, rhs);
+                    F1->Flags = F2->Flags;
+                }
+            } else if ((F2->Flags & FD_EMPTY) == 0) {
+                /* Composite the parameter lists */
+                CompositeFuncParams (F1, F2);
+            }
+
+        } else if (IsTypeArray (lhs)) {
+            /* Check member count */
+            LeftCount  = GetElementCount (lhs);
+            RightCount = GetElementCount (rhs);
+
+            /* Set composite type if it is requested */
+            if (LeftCount != UNSPECIFIED) {
+                SetElementCount (lhs, LeftCount);
+            } else if (RightCount != UNSPECIFIED) {
+                SetElementCount (lhs, RightCount);
+            }
+        }
+
+        /* Next type string element */
+        ++lhs;
+        ++rhs;
+    }
+
+    return lhs;
+}
+
+
+
+FuncDesc* RefineFuncDesc (Type* OldType, const Type* NewType)
+/* Refine the existing function descriptor with a new one */
+{
+    FuncDesc* Old = GetFuncDesc (OldType);
+    FuncDesc* New = GetFuncDesc (NewType);
+
+    CHECK (Old != 0 && New != 0);
+
+    if ((New->Flags & FD_EMPTY) == 0) {
+        if ((Old->Flags & FD_EMPTY) == 0) {
+            DoComposite (OldType, NewType);
+        } else {
+            TypeCopy (OldType, NewType);
+            Old->Flags &= ~FD_EMPTY;
+        }
+    }
+
+    return Old;
+}

@@ -1726,7 +1726,7 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
             /* Was there a previous entry? If so, copy WrappedCall info from it */
             PrevEntry = FindGlobalSym (D->Ident);
             if (PrevEntry && PrevEntry->Flags & SC_FUNC) {
-                FuncDesc* D = PrevEntry->V.F.Func;
+                FuncDesc* D = GetFuncDesc (PrevEntry->Type);
                 if (D->WrappedCall && !F->WrappedCall) {
                     F->WrappedCall = D->WrappedCall;
                     F->WrappedCallData = D->WrappedCallData;

@@ -45,6 +45,7 @@
 #include "xmalloc.h"
 
 /* cc65 */
+#include "anonname.h"
 #include "asmcode.h"
 #include "asmlabel.h"
 #include "codegen.h"
@@ -558,9 +559,10 @@ static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags
     unsigned E_SCType = Entry->Flags & SC_TYPEMASK;
     unsigned SCType   = Flags & SC_TYPEMASK;
 
-    /* Existing typedefs cannot be redeclared as anything different */
+    /* Some symbols may be redeclared if certain requirements are met */
     if (E_SCType == SC_TYPEDEF) {
 
+        /* Existing typedefs cannot be redeclared as anything different */
         if (SCType == SC_TYPEDEF) {
             if (TypeCmp (E_Type, T) < TC_IDENTICAL) {
                 Error ("Conflicting types for typedef '%s'", Entry->Name);
@@ -571,9 +573,42 @@ static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags
             Entry = 0;
         }
 
+    } else if ((Entry->Flags & SC_FUNC) == SC_FUNC) {
+
+        /* In case of a function, use the new type descriptor, since it
+        ** contains pointers to the new symbol tables that are needed if
+        ** an actual function definition follows. Be sure not to use the
+        ** new descriptor if it contains a function declaration with an
+        ** empty parameter list.
+        */
+        if (IsTypeFunc (T)) {
+
+            /* Check for duplicate function definitions */
+            if (SymIsDef (Entry) && (Flags & SC_DEF) == SC_DEF) {
+                Error ("Body for function '%s' has already been defined",
+                        Entry->Name);
+                Entry = 0;
+            } else {
+                /* New type must be compatible with the composite prototype */
+                if (TypeCmp (GetFuncCompositeType (Entry), T) < TC_EQUAL) {
+                    Error ("Conflicting function types for '%s'", Entry->Name);
+                    Entry = 0;
+                } else {
+                    /* Refine the existing composite prototype with this new
+                    ** one.
+                    */
+                    RefineFuncDesc (GetFuncCompositeType (Entry), T);
+                }
+            }
+
+        } else {
+            Error ("Redefinition of function '%s' as different kind of symbol", Entry->Name);
+            Entry = 0;
+        }
+
     } else {
 
-        /* Some symbols may be redeclared if certain requirements are met */
+        /* Redeclarations of ESU types are checked elsewhere */
         if (IsTypeArray (T) && IsTypeArray (E_Type)) {
 
             /* Get the array sizes */
@@ -595,37 +630,6 @@ static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags
                     /* Existing, size not given, use size from new def */
                     SetElementCount (E_Type, Size);
                 }
-            }
-
-        } else if ((Entry->Flags & SC_FUNC) == SC_FUNC) {
-
-            /* In case of a function, use the new type descriptor, since it
-            ** contains pointers to the new symbol tables that are needed if
-            ** an actual function definition follows. Be sure not to use the
-            ** new descriptor if it contains a function declaration with an
-            ** empty parameter list.
-            */
-            if (IsTypeFunc (T)) {
-
-                /* New type must be equivalent */
-                if (TypeCmp (E_Type, T) < TC_EQUAL) {
-                    Error ("Conflicting function types for '%s'", Entry->Name);
-                    Entry = 0;
-                } else {
-                    /* Get the function descriptor from the new type */
-                    FuncDesc* F = GetFuncDesc (T);
-                    /* Use this new function descriptor if it doesn't contain
-                    ** an empty parameter list.
-                    */
-                    if ((F->Flags & FD_EMPTY) == 0) {
-                        Entry->V.F.Func = F;
-                        SetFuncDesc (E_Type, F);
-                    }
-                }
-
-            } else {
-                Error ("Redefinition of function '%s' as different kind of symbol", Entry->Name);
-                Entry = 0;
             }
 
         } else {
@@ -1052,7 +1056,8 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
         } else if ((Flags & SC_REGISTER) == SC_REGISTER) {
             Entry->V.R.RegOffs  = Offs;
             Entry->V.R.SaveOffs = StackPtr;
-        } else if ((Flags & SC_EXTERN) == SC_EXTERN) {
+        } else if ((Flags & SC_EXTERN) == SC_EXTERN ||
+                   (Flags & SC_FUNC) == SC_FUNC) {
             Entry->V.L.Label = Offs;
             SymSetAsmName (Entry);
         } else if ((Flags & SC_STATIC) == SC_STATIC) {
@@ -1065,7 +1070,6 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
 
         /* Add the entry to the symbol table */
         AddSymEntry (Tab, Entry);
-
     }
 
     /* Return the entry */
@@ -1077,16 +1081,12 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
 SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
 /* Add an external or global symbol to the symbol table and return the entry */
 {
-    /* There is some special handling for functions, so check if it is one */
-    int IsFunc = IsTypeFunc (T);
-
-    /* Functions must be inserted in the global symbol table */
-    SymTable* Tab = IsFunc ? SymTab0 : SymTab;
+    /* Use the global symbol table */
+    SymTable* Tab = SymTab;
 
     /* Do we have an entry with this name already? */
-    SymEntry* Entry = FindSymInTable (Tab, Name, HashStr (Name));
+    SymEntry* Entry = FindSymInTree (Tab, Name);
     if (Entry) {
-
         /* We have a symbol with this name already */
         if (HandleSymRedefinition (Entry, T, Flags)) {
             /* Use the fail-safe table for fictitious symbols */
@@ -1096,31 +1096,34 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
         } else {
 
             /* If a static declaration follows a non-static declaration, then
-            ** warn about the conflict.  (It will compile a public declaration.)
+            ** warn about the conflict. It will compile an extern declaration.
             */
             if ((Flags & SC_EXTERN) == 0 && (Entry->Flags & SC_EXTERN) != 0) {
                 Warning ("static declaration follows non-static declaration of '%s'.", Name);
             }
 
-            /* An extern declaration must not change the current linkage. */
-            if (IsFunc || (Flags & (SC_EXTERN | SC_STORAGE)) == SC_EXTERN) {
-                Flags &= ~SC_EXTERN;
-            }
-
-            /* If a public declaration follows a static declaration, then
-            ** warn about the conflict.  (It will compile a public declaration.)
+            /* If an extern declaration follows a static declaration, then
+            ** warn about the conflict. It will compile an extern declaration.
             */
             if ((Flags & SC_EXTERN) != 0 && (Entry->Flags & SC_EXTERN) == 0) {
-                Warning ("public declaration follows static declaration of '%s'.", Name);
+                Warning ("extern declaration follows static declaration of '%s'.", Name);
+            }
+
+            /* Update existing function type if this is a definition */
+            if (IsTypeFunc (Entry->Type)    &&
+                !SymIsDef (Entry)           &&
+                (Flags & SC_DEF) == SC_DEF) {
+                TypeFree (Entry->Type);
+                Entry->Type = TypeDup (T);
             }
 
             /* Add the new flags */
-            Entry->Flags |= Flags;
+            Entry->Flags |= Flags & ~SC_EXTERN;
         }
 
     } 
     
-    if (Entry == 0) {
+    if (Entry == 0 || Entry->Owner != Tab) {
 
         /* Create a new entry */
         Entry = NewSymEntry (Name, Flags);
@@ -1128,12 +1131,18 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
         /* Set the symbol attributes */
         Entry->Type = TypeDup (T);
 
-        /* If this is a function, set the function descriptor and clear
+        /* If this is a function, set the function composite typeand clear
         ** additional fields.
         */
-        if (IsFunc) {
-            Entry->V.F.Func = GetFuncDesc (Entry->Type);
-            Entry->V.F.Seg  = 0;
+        if (IsTypeFunc (T)) {
+            /* GitHub #1167 - Make a composite prototype */
+            ident Ident;
+            AnonName (Ident, "prototype");
+            Entry->V.F.Composite = NewSymEntry (Ident, SC_EXTERN | SC_DECL | SC_ALIAS | SC_FUNC);
+            Entry->V.F.Composite->Type = TypeDup (T);
+            AddSymEntry (SymTab0, Entry->V.F.Composite);
+
+            Entry->V.F.Seg = 0;
         }
 
         /* Add the assembler name of the symbol */

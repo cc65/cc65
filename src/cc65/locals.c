@@ -427,8 +427,8 @@ static void ParseOneDecl (const DeclSpec* Spec)
     ParseDecl (Spec, &Decl, DM_NEED_IDENT);
 
     /* Check if there are any non-extern storage classes set for function
-    ** declarations. The only valid storage class for function declarations
-    ** inside functions is 'extern'.
+    ** declarations. Function can only be declared inside functions with the
+    ** 'extern' storage class specifier or no storage class specifier at all.
     */
     if ((Decl.StorageClass & SC_FUNC) == SC_FUNC) {
 
@@ -439,12 +439,11 @@ static void ParseOneDecl (const DeclSpec* Spec)
             Error ("Illegal storage class on function");
         }
 
-        /* The default storage class could be wrong. Just use 'extern' in all
-        ** cases.
-        */
+        /* The default storage class could be wrong. Just clear them */
         Decl.StorageClass &= ~SC_STORAGEMASK;
-        Decl.StorageClass |= SC_EXTERN;
 
+        /* This is always a declaration */
+        Decl.StorageClass |= SC_DECL;
     }
 
     /* If we don't have a name, this was flagged as an error earlier.
@@ -456,6 +455,7 @@ static void ParseOneDecl (const DeclSpec* Spec)
 
     /* If the symbol is not marked as external, it will be defined now */
     if ((Decl.StorageClass & SC_FICTITIOUS) == 0 &&
+        (Decl.StorageClass & SC_DECL) == 0  &&
         (Decl.StorageClass & SC_EXTERN) == 0) {
         Decl.StorageClass |= SC_DEF;
     }
@@ -500,8 +500,14 @@ static void ParseOneDecl (const DeclSpec* Spec)
             }
         }
 
-        /* Add the symbol to the symbol table */
-        AddLocalSym (Decl.Ident, Decl.Type, Decl.StorageClass, 0);
+        if ((Decl.StorageClass & SC_EXTERN) == SC_EXTERN ||
+            (Decl.StorageClass & SC_FUNC) == SC_FUNC) {
+            /* Add the global symbol to the local symbol table */
+            AddGlobalSym (Decl.Ident, Decl.Type, Decl.StorageClass);
+        } else {
+            /* Add the local symbol to the local symbol table */
+            AddLocalSym (Decl.Ident, Decl.Type, Decl.StorageClass, 0);
+        }
 
     }
 }

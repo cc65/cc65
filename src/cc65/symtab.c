@@ -682,13 +682,21 @@ static void AddSymEntry (SymTable* T, SymEntry* S)
 
 
 
-SymEntry* AddEnumSym (const char* Name, const Type* Type, SymTable* Tab)
+SymEntry* AddEnumSym (const char* Name, unsigned Flags, const Type* Type, SymTable* Tab)
 /* Add an enum entry and return it */
 {
     SymTable* CurTagTab = TagTab;
+    SymEntry* Entry;
 
-    /* Do we have an entry with this name already? */
-    SymEntry* Entry = FindSymInTable (CurTagTab, Name, HashStr (Name));
+    if ((Flags & SC_FICTITIOUS) == 0) {
+        /* Do we have an entry with this name already? */
+        Entry = FindSymInTable (CurTagTab, Name, HashStr (Name));
+    } else {
+        /* Add a fictitious symbol in the fail-safe table */
+        Entry = 0;
+        CurTagTab = FailSafeTab;
+    }
+
     if (Entry) {
 
         /* We do have an entry. This may be a forward, so check it. */
@@ -749,8 +757,15 @@ SymEntry* AddStructSym (const char* Name, unsigned Flags, unsigned Size, SymTabl
     /* Type must be struct or union */
     PRECONDITION (Type == SC_STRUCT || Type == SC_UNION);
 
-    /* Do we have an entry with this name already? */
-    Entry = FindSymInTable (CurTagTab, Name, HashStr (Name));
+    if ((Flags & SC_FICTITIOUS) == 0) {
+        /* Do we have an entry with this name already? */
+        Entry = FindSymInTable (CurTagTab, Name, HashStr (Name));
+    } else {
+        /* Add a fictitious symbol in the fail-safe table */
+        Entry = 0;
+        CurTagTab = FailSafeTab;
+    }
+
     if (Entry) {
 
         /* We do have an entry. This may be a forward, so check it. */

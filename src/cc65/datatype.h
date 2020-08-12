@@ -583,11 +583,44 @@ INLINE int IsClassFunc (const Type* T)
 #  define IsClassFunc(T)        (GetClass (T) == T_CLASS_FUNC)
 #endif
 
+int IsClassObject (const Type* T);
+/* Return true if this is a fully described object type */
+
+int IsClassIncomplete (const Type* T);
+/* Return true if this is an object type lacking size info */
+
 int IsClassArithmetic (const Type* T);
-/* Return true if this is an arithmetic type */
+/* Return true if this is an integer or real floating type */
+
+int IsClassBasic (const Type* T);
+/* Return true if this is a char, integer or floating type */
+
+int IsClassScalar (const Type* T);
+/* Return true if this is an arithmetic or pointer type */
+
+int IsClassDerived (const Type* T);
+/* Return true if this is an array, struct, union, function or pointer type */
+
+int IsClassAggregate (const Type* T);
+/* Return true if this is an array or struct type */
+
+int IsRelationType (const Type* T);
+/* Return true if this is an arithmetic, array or pointer type */
 
 int IsCastType (const Type* T);
 /* Return true if this type can be used for casting */
+
+int IsESUType (const Type* T);
+/* Return true if this is an enum/struct/union type */
+
+int IsIncompleteESUType (const Type* T);
+/* Return true if this is an incomplete ESU type */
+
+int IsEmptiableObjectType (const Type* T);
+/* Return true if this is a struct/union/void type that can have zero size */
+
+int HasUnknownSize (const Type* T);
+/* Return true if this is an incomplete ESU type or an array of unknown size */
 
 #if defined(HAVE_INLINE)
 INLINE TypeCode GetRawSignedness (const Type* T)

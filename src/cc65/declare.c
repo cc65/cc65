@@ -479,7 +479,7 @@ static void ParseStorageClass (DeclSpec* D, unsigned DefStorage)
 
 
 
-static SymEntry* ESUForwardDecl (const char* Name, unsigned Type)
+static SymEntry* ESUForwardDecl (const char* Name, unsigned Flags)
 /* Handle an enum, struct or union forward decl */
 {
     /* Try to find an enum/struct/union with the given name. If there is none,
@@ -487,12 +487,12 @@ static SymEntry* ESUForwardDecl (const char* Name, unsigned Type)
     */
     SymEntry* Entry = FindTagSym (Name);
     if (Entry == 0) {
-        if (Type != SC_ENUM) {
-            Entry = AddStructSym (Name, Type, 0, 0);
+        if ((Flags & SC_ESUTYPEMASK) != SC_ENUM) {
+            Entry = AddStructSym (Name, Flags, 0, 0);
         } else {
-            Entry = AddEnumSym (Name, 0, 0);
+            Entry = AddEnumSym (Name, Flags, 0, 0);
         }
-    } else if ((Entry->Flags & SC_TYPEMASK) != Type) {
+    } else if ((Entry->Flags & SC_TYPEMASK) != (Flags & SC_ESUTYPEMASK)) {
         /* Already defined, but not the same type class */
         Error ("Symbol '%s' is already different kind", Name);
     }
@@ -551,14 +551,17 @@ static SymEntry* ParseEnumDecl (const char* Name)
     unsigned long   MaxConstant = 0;
     const Type*     NewType     = 0;        /* new member type */
     const Type*     MemberType  = type_int; /* default member type */
+    unsigned        Flags       = 0;
+    unsigned        PrevErrorCount = ErrorCount;
 
-    /* Accept forward definitions */
+
     if (CurTok.Tok != TOK_LCURLY) {
+        /* Just a forward definition */
         return ESUForwardDecl (Name, SC_ENUM);
     }
 
-    /* Add the enum tag */
-    AddEnumSym (Name, 0, 0);
+    /* Add a forward declaration for the enum tag in the current lexical level */
+    AddEnumSym (Name, 0, 0, 0);
 
     /* Skip the opening curly brace */
     NextToken ();
@@ -695,7 +698,13 @@ static SymEntry* ParseEnumDecl (const char* Name)
     }
 
     FieldTab = GetSymTab ();
-    return AddEnumSym (Name, MemberType, FieldTab);
+
+    /* Return a fictitious symbol if errors occurred during parsing */
+    if (PrevErrorCount != ErrorCount) {
+        Flags |= SC_FICTITIOUS;
+    }
+
+    return AddEnumSym (Name, Flags, MemberType, FieldTab);
 }
 
 
@@ -829,19 +838,21 @@ static SymEntry* ParseUnionDecl (const char* Name)
     unsigned  FieldSize;
     int       FieldWidth;       /* Width in bits, -1 if not a bit-field */
     SymTable* FieldTab;
-    SymEntry* StructTypeEntry;
+    SymEntry* UnionTagEntry;
     SymEntry* Entry;
+    unsigned  Flags = 0;
+    unsigned  PrevErrorCount = ErrorCount;
 
 
     if (CurTok.Tok != TOK_LCURLY) {
-        /* Just a forward declaration. */
+        /* Just a forward declaration */
         return ESUForwardDecl (Name, SC_UNION);
     }
 
-    /* Add a forward declaration for the struct in the current lexical level */
-    StructTypeEntry = AddStructSym (Name, SC_UNION, 0, 0);
+    /* Add a forward declaration for the union tag in the current lexical level */
+    UnionTagEntry = AddStructSym (Name, SC_UNION, 0, 0);
 
-    StructTypeEntry->V.S.ACount = 0;
+    UnionTagEntry->V.S.ACount = 0;
 
     /* Skip the curly brace */
     NextToken ();
@@ -883,7 +894,7 @@ static SymEntry* ParseUnionDecl (const char* Name)
                     /* This is an anonymous struct or union. Copy the fields
                     ** into the current level.
                     */
-                    AnonFieldName (Decl.Ident, "field", StructTypeEntry->V.S.ACount);
+                    AnonFieldName (Decl.Ident, "field", UnionTagEntry->V.S.ACount);
                 } else {
                     /* A non bit-field without a name is legal but useless */
                     Warning ("Declaration does not declare anything");
@@ -902,7 +913,7 @@ static SymEntry* ParseUnionDecl (const char* Name)
             } else {
                 if (IsAnonName (Decl.Ident)) {
                     Entry = AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, 0);
-                    Entry->V.A.ANumber = StructTypeEntry->V.S.ACount++;
+                    Entry->V.A.ANumber = UnionTagEntry->V.S.ACount++;
                     AliasAnonStructFields (&Decl, Entry);
                 } else {
                     AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, 0);
@@ -929,8 +940,13 @@ NextMember: if (CurTok.Tok != TOK_COMMA) {
         Error ("Empty union type '%s' is not supported", Name);
     }
 
+    /* Return a fictitious symbol if errors occurred during parsing */
+    if (PrevErrorCount != ErrorCount) {
+        Flags |= SC_FICTITIOUS;
+    }
+
     /* Make a real entry from the forward decl and return it */
-    return AddStructSym (Name, SC_UNION | SC_DEF, UnionSize, FieldTab);
+    return AddStructSym (Name, SC_UNION | SC_DEF | Flags, UnionSize, FieldTab);
 }
 
 
@@ -944,19 +960,21 @@ static SymEntry* ParseStructDecl (const char* Name)
     unsigned  BitOffs;          /* Bit offset for bit-fields */
     int       FieldWidth;       /* Width in bits, -1 if not a bit-field */
     SymTable* FieldTab;
-    SymEntry* StructTypeEntry;
+    SymEntry* StructTagEntry;
     SymEntry* Entry;
+    unsigned  Flags = 0;
+    unsigned  PrevErrorCount = ErrorCount;
 
 
     if (CurTok.Tok != TOK_LCURLY) {
-        /* Just a forward declaration. */
+        /* Just a forward declaration */
         return ESUForwardDecl (Name, SC_STRUCT);
     }
 
-    /* Add a forward declaration for the struct in the current lexical level */
-    StructTypeEntry = AddStructSym (Name, SC_STRUCT, 0, 0);
+    /* Add a forward declaration for the struct tag in the current lexical level */
+    StructTagEntry = AddStructSym (Name, SC_STRUCT, 0, 0);
 
-    StructTypeEntry->V.S.ACount = 0;
+    StructTagEntry->V.S.ACount = 0;
 
     /* Skip the curly brace */
     NextToken ();
@@ -1050,7 +1068,7 @@ static SymEntry* ParseStructDecl (const char* Name)
                         /* This is an anonymous struct or union. Copy the
                         ** fields into the current level.
                         */
-                        AnonFieldName (Decl.Ident, "field", StructTypeEntry->V.S.ACount);
+                        AnonFieldName (Decl.Ident, "field", StructTagEntry->V.S.ACount);
                     } else {
                         /* A non bit-field without a name is legal but useless */
                         Warning ("Declaration does not declare anything");
@@ -1078,7 +1096,7 @@ static SymEntry* ParseStructDecl (const char* Name)
             } else {
                 if (IsAnonName (Decl.Ident)) {
                     Entry = AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, StructSize);
-                    Entry->V.A.ANumber = StructTypeEntry->V.S.ACount++;
+                    Entry->V.A.ANumber = StructTagEntry->V.S.ACount++;
                     AliasAnonStructFields (&Decl, Entry);
                 } else {
                     AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, StructSize);
@@ -1116,8 +1134,13 @@ NextMember: if (CurTok.Tok != TOK_COMMA) {
         Error ("Empty struct type '%s' is not supported", Name);
     }
 
+    /* Return a fictitious symbol if errors occurred during parsing */
+    if (PrevErrorCount != ErrorCount) {
+        Flags |= SC_FICTITIOUS;
+    }
+
     /* Make a real entry from the forward decl and return it */
-    return AddStructSym (Name, SC_STRUCT | SC_DEF, StructSize, FieldTab);
+    return AddStructSym (Name, SC_STRUCT | SC_DEF | Flags, StructSize, FieldTab);
 }
 
 

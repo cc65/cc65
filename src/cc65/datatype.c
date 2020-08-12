@@ -1037,10 +1037,69 @@ Type* ArrayToPtr (Type* T)
 
 
 
+int IsClassObject (const Type* T)
+/* Return true if this is a fully described object type */
+{
+    return !IsTypeFunc (T) && !IsClassIncomplete (T);
+}
+
+
+
+int IsClassIncomplete (const Type* T)
+/* Return true if this is an object type lacking size info */
+{
+    if (IsTypeArray (T)) {
+        return GetElementCount (T) == UNSPECIFIED;
+    }
+    return IsTypeVoid (T) || IsIncompleteESUType (T);
+}
+
+
+
 int IsClassArithmetic (const Type* T)
-/* Return true if this is an arithmetic type */
+/* Return true if this is an integer or real floating type */
 {
     return IsClassInt (T) || IsClassFloat (T);
+}
+
+
+
+int IsClassBasic (const Type* T)
+/* Return true if this is a char, integer or floating type */
+{
+    return IsRawTypeChar (T) || IsClassInt (T) || IsClassFloat (T);
+}
+
+
+
+int IsClassScalar (const Type* T)
+/* Return true if this is an arithmetic or pointer type */
+{
+    return IsClassArithmetic (T) || IsTypePtr (T);
+}
+
+
+
+int IsClassDerived (const Type* T)
+/* Return true if this is an array, struct, union, function or pointer type */
+{
+    return IsTypeArray (T) || IsClassStruct (T) || IsClassFunc (T) || IsTypePtr (T);
+}
+
+
+
+int IsClassAggregate (const Type* T)
+/* Return true if this is an array or struct type */
+{
+    return IsTypeArray (T) || IsTypeStruct (T);
+}
+
+
+
+int IsRelationType (const Type* T)
+/* Return true if this is an arithmetic, array or pointer type */
+{
+    return IsClassArithmetic (T) || IsClassPtr (T);
 }
 
 
@@ -1048,7 +1107,44 @@ int IsClassArithmetic (const Type* T)
 int IsCastType (const Type* T)
 /* Return true if this type can be used for casting */
 {
-    return IsClassArithmetic (T) || IsClassPtr (T) || IsTypeVoid (T);
+    return IsClassScalar (T) || IsTypeVoid (T);
+}
+
+
+
+int IsESUType (const Type* T)
+/* Return true if this is an enum/struct/union type */
+{
+    return IsClassStruct (T) || IsTypeEnum (T);
+}
+
+
+
+int IsIncompleteESUType (const Type* T)
+/* Return true if this is an incomplete ESU type */
+{
+    SymEntry* Sym = GetSymType (T);
+
+    return Sym != 0 && !SymIsDef (Sym);
+}
+
+
+
+int IsEmptiableObjectType (const Type* T)
+/* Return true if this is a struct/union/void type that can have zero size */
+{
+    return IsClassStruct (T) || IsTypeVoid (T);
+}
+
+
+
+int HasUnknownSize (const Type* T)
+/* Return true if this is an incomplete ESU type or an array of unknown size */
+{
+    if (IsTypeArray (T)) {
+        return GetElementCount (T) == UNSPECIFIED;
+    }
+    return IsIncompleteESUType (T);
 }
 
 

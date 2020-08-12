@@ -295,7 +295,7 @@ static void F_RestoreRegVars (Function* F)
     }
 
     /* Get the first symbol from the function symbol table */
-    Sym = F->FuncEntry->V.F.Func->SymTab->SymHead;
+    Sym = GetFuncDesc (F->FuncEntry->Type)->SymTab->SymHead;
 
     /* Walk through all symbols checking for register variables */
     while (Sym) {
@@ -383,7 +383,7 @@ void NewFunc (SymEntry* Func)
     const Type* RType;          /* Real type used for struct parameters */
 
     /* Get the function descriptor from the function entry */
-    FuncDesc* D = Func->V.F.Func;
+    FuncDesc* D = GetFuncDesc (Func->Type);
 
     /* Allocate the function activation record for the function */
     CurrentFunc = NewFunction (Func);

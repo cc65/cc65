@@ -177,18 +177,23 @@ static void Parse (void)
             }
 
             /* If this is a function declarator that is not followed by a comma
-            ** or semicolon, it must be followed by a function body. If this is
-            ** the case, convert an empty parameter list into one accepting no
-            ** parameters (same as void) as required by the standard.
+            ** or semicolon, it must be followed by a function body.
             */
-            if ((Decl.StorageClass & SC_FUNC) != 0 &&
-                (CurTok.Tok != TOK_COMMA)          &&
-                (CurTok.Tok != TOK_SEMI)) {
+            if ((Decl.StorageClass & SC_FUNC) != 0) {
+                if (CurTok.Tok != TOK_COMMA && CurTok.Tok != TOK_SEMI) {
+                    /* A definition */
+                    Decl.StorageClass |= SC_DEF;
 
-                FuncDesc* D = GetFuncDesc (Decl.Type);
-
-                if (D->Flags & FD_EMPTY) {
-                    D->Flags = (D->Flags & ~FD_EMPTY) | FD_VOID_PARAM;
+                    /* Convert an empty parameter list into one accepting no
+                    ** parameters (same as void) as required by the standard.
+                    */
+                    FuncDesc* D = GetFuncDesc (Decl.Type);
+                    if (D->Flags & FD_EMPTY) {
+                        D->Flags = (D->Flags & ~FD_EMPTY) | FD_VOID_PARAM;
+                    }
+                } else {
+                    /* Just a declaration */
+                    Decl.StorageClass |= SC_DECL;
                 }
             }
 
@@ -309,13 +314,6 @@ SkipOneDecl:
                     /* Prototype only */
                     NextToken ();
                 } else {
-
-                    /* Function body. Check for duplicate function definitions */
-                    if (SymIsDef (Entry)) {
-                        Error ("Body for function '%s' has already been defined",
-                               Entry->Name);
-                    }
-
                     /* Parse the function body */
                     NewFunc (Entry);
                 }

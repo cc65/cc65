@@ -643,6 +643,16 @@ INLINE TypeCode GetSignedness (const Type* T)
 #endif
 
 #if defined(HAVE_INLINE)
+INLINE int IsRawSignUnsigned (const Type* T)
+/* Return true if this is an unsigned raw type */
+{
+    return (GetRawSignedness (T) == T_SIGN_UNSIGNED);
+}
+#else
+#  define IsRawSignUnsigned(T)  (GetRawSignedness (T) == T_SIGN_UNSIGNED)
+#endif
+
+#if defined(HAVE_INLINE)
 INLINE int IsSignUnsigned (const Type* T)
 /* Return true if this is an unsigned type */
 {
@@ -650,6 +660,16 @@ INLINE int IsSignUnsigned (const Type* T)
 }
 #else
 #  define IsSignUnsigned(T)     (GetSignedness (T) == T_SIGN_UNSIGNED)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsRawSignSigned (const Type* T)
+/* Return true if this is a signed raw type */
+{
+    return (GetRawSignedness (T) == T_SIGN_SIGNED);
+}
+#else
+#  define IsRawSignSigned(T)    (GetRawSignedness (T) == T_SIGN_SIGNED)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -663,7 +683,7 @@ INLINE int IsSignSigned (const Type* T)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE TypeCode GetRawSizeModifier(const Type* T)
+INLINE TypeCode GetRawSizeModifier (const Type* T)
 /* Get the size modifier of a raw type */
 {
     return (T->C & T_MASK_SIZE);

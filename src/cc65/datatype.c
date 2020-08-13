@@ -235,7 +235,7 @@ const char* GetBasicTypeName (const Type* T)
     default:                break;
     }
     if (IsClassInt (T)) {
-        if (IsSignSigned (T)) {
+        if (IsRawSignSigned (T)) {
             switch (GetRawType (T)) {
             case T_TYPE_CHAR:       return "signed char";
             case T_TYPE_SHORT:      return "short";
@@ -245,7 +245,7 @@ const char* GetBasicTypeName (const Type* T)
             default:
                 return "signed integer";
             }
-        } else if (IsSignUnsigned (T)) {
+        } else if (IsRawSignUnsigned (T)) {
             switch (GetRawType (T)) {
             case T_TYPE_CHAR:       return "unsigned char";
             case T_TYPE_SHORT:      return "unsigned short";

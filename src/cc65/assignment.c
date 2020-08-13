@@ -58,22 +58,23 @@ static int CopyStruct (ExprDesc* LExpr, ExprDesc* RExpr)
 /* Copy the struct/union represented by RExpr to the one represented by LExpr */
 {
     /* If the size is that of a basic type (char, int, long), we will copy
-    ** the struct using the primary register, otherwise we use memcpy. In
-    ** the former case, push the address only if really needed.
+    ** the struct using the primary register, otherwise we will use memcpy.
     */
     const Type* ltype  = LExpr->Type;
     const Type* stype  = GetStructReplacementType (ltype);
     int         UseReg = (stype != ltype);
 
     if (UseReg) {
+        /* Back up the address of lhs only if it is in the primary */
         PushAddr (LExpr);
     } else {
-        ED_MarkExprAsRVal (LExpr);
+        /* Push the address of lhs as the destination of memcpy */
+        ED_AddrExpr (LExpr);
         LoadExpr (CF_NONE, LExpr);
         g_push (CF_PTR | CF_UNSIGNED, 0);
     }
 
-    /* Get the expression on the right of the '=' into the primary */
+    /* Get the expression on the right of the '=' */
     hie1 (RExpr);
 
     /* Check for equality of the structs */
@@ -82,28 +83,27 @@ static int CopyStruct (ExprDesc* LExpr, ExprDesc* RExpr)
             "Incompatible types in assignment to '%s' from '%s'");
     }
 
-    /* Do we copy using the primary? */
+    /* Do we copy the value directly using the primary? */
     if (UseReg) {
 
-        /* Check if the right hand side is an lvalue */
-        if (ED_IsLVal (RExpr)) {
+        /* Check if the value of the rhs is not in the primary yet */
+        if (!ED_IsLocPrimary (RExpr)) {
             /* Just load the value into the primary as the replacement type. */
             LoadExpr (TypeOf (stype) | CF_FORCECHAR, RExpr);
         }
 
-        /* Store it into the new location */
+        /* Store it into the location referred in the primary */
         Store (LExpr, stype);
 
     } else {
 
-        /* Check if the right hand side is an lvalue */
-        if (ED_IsLVal (RExpr)) {
-            /* We will use memcpy. Push the address of the rhs */
-            ED_MarkExprAsRVal (RExpr);
+        /* The only way this can happen is in chained assignments */
+        if (!ED_IsLocPrimary (RExpr)) {
+            ED_AddrExpr (RExpr);
             LoadExpr (CF_NONE, RExpr);
         }
 
-        /* Push the address (or whatever is in ax in case of errors) */
+        /* Push the address of the rhs as the source of memcpy */
         g_push (CF_PTR | CF_UNSIGNED, 0);
 
         /* Load the size of the struct or union into the primary */
@@ -111,6 +111,9 @@ static int CopyStruct (ExprDesc* LExpr, ExprDesc* RExpr)
 
         /* Call the memcpy function */
         g_call (CF_FIXARGC, Func_memcpy, 4);
+
+        /* Restore the indirection level of lhs */
+        ED_IndExpr (LExpr);
     }
 
     return 1;
@@ -257,6 +260,6 @@ void Assignment (ExprDesc* Expr)
 
     }
 
-    /* Value is still in primary and not an lvalue */
+    /* Value might be still in primary and not an lvalue */
     ED_FinalizeRValLoad (Expr);
 }

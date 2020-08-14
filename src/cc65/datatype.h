@@ -117,7 +117,7 @@ enum {
     T_MASK_QUAL     = 0x07F000,
 
     /* Types */
-    T_CHAR      = T_TYPE_CHAR     | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_CHAR,
+    T_CHAR      = T_TYPE_CHAR     | T_CLASS_INT    | T_SIGN_NONE     | T_SIZE_CHAR,
     T_SCHAR     = T_TYPE_CHAR     | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_CHAR,
     T_UCHAR     = T_TYPE_CHAR     | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_CHAR,
     T_SHORT     = T_TYPE_SHORT    | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_SHORT,
@@ -189,6 +189,7 @@ struct Type {
 #define PTR_BITS        (8 * SIZEOF_PTR)
 
 /* Predefined type strings */
+extern Type type_char[];
 extern Type type_schar[];
 extern Type type_uchar[];
 extern Type type_int[];
@@ -249,9 +250,6 @@ void TypeFree (Type* T);
 
 int SignExtendChar (int C);
 /* Do correct sign extension of a character */
-
-TypeCode GetDefaultChar (void);
-/* Return the default char type (signed/unsigned) depending on the settings */
 
 Type* GetCharArrayType (unsigned Len);
 /* Return the type for a char array of the given length */
@@ -365,7 +363,7 @@ INLINE TypeCode GetRawType (const Type* T)
 
 #if defined(HAVE_INLINE)
 INLINE int IsTypeChar (const Type* T)
-/* Return true if this is a character type */
+/* Return true if this is a char type */
 {
     return (GetRawType (GetUnderlyingType (T)) == T_TYPE_CHAR);
 }
@@ -395,7 +393,7 @@ INLINE int IsTypeInt (const Type* T)
 
 #if defined(HAVE_INLINE)
 INLINE int IsTypeLong (const Type* T)
-/* Return true if this is a long type (signed or unsigned) */
+/* Return true if this is a long int type (signed or unsigned) */
 {
     return (GetRawType (GetUnderlyingType (T)) == T_TYPE_LONG);
 }
@@ -404,8 +402,30 @@ INLINE int IsTypeLong (const Type* T)
 #endif
 
 #if defined(HAVE_INLINE)
+INLINE int IsISOChar (const Type* T)
+/* Return true if this is a narrow character type (without signed/unsigned) */
+{
+    return (UnqualifiedType (T->C) == T_CHAR);
+}
+#else
+#  define IsISOChar(T)          (UnqualifiedType ((T)->C) == T_CHAR)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsClassChar (const Type* T)
+/* Return true if this is a narrow character type (including signed/unsigned).
+** For now this is the same as IsRawTypeChar(T).
+*/
+{
+    return (GetRawType (T) == T_TYPE_CHAR);
+}
+#else
+#  define IsClassChar(T)        (GetRawType (T) == T_TYPE_CHAR)
+#endif
+
+#if defined(HAVE_INLINE)
 INLINE int IsRawTypeChar (const Type* T)
-/* Return true if this is a character raw type */
+/* Return true if this is a char raw type (including signed/unsigned) */
 {
     return (GetRawType (T) == T_TYPE_CHAR);
 }

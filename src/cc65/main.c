@@ -731,7 +731,7 @@ static void OptRodataName (const char* Opt attribute ((unused)), const char* Arg
 
 static void OptSignedChars (const char* Opt attribute ((unused)),
                             const char* Arg attribute ((unused)))
-/* Make default characters signed */
+/* Use 'signed char' as the underlying type of 'char' */
 {
     IS_Set (&SignedChars, 1);
 }

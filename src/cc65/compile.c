@@ -218,14 +218,16 @@ static void Parse (void)
                     ** void types in ISO modes.
                     */
                     if (Size == 0) {
-                        if (!IsTypeVoid (Decl.Type)) {
+                        if (!IsEmptiableObjectType (Decl.Type)) {
                             if (!IsTypeArray (Decl.Type)) {
                                 /* Size is unknown and not an array */
-                                Error ("Variable '%s' has unknown size", Decl.Ident);
+                                Error ("Cannot initialize variable '%s' of unknown size", Decl.Ident);
                             }
                         } else if (IS_Get (&Standard) != STD_CC65) {
                             /* We cannot declare variables of type void */
-                            Error ("Illegal type for variable '%s'", Decl.Ident);
+                            Error ("Illegal type '%s' for variable '%s'",
+                                   GetFullTypeName (Decl.Type),
+                                   Decl.Ident);
                         }
                     }
 
@@ -253,7 +255,7 @@ static void Parse (void)
                         /* We cannot declare variables of type void */
                         Error ("Illegal type for variable '%s'", Decl.Ident);
                         Entry->Flags &= ~(SC_STORAGE | SC_DEF);
-                    } else if (Size == 0 && SymIsDef (Entry)) {
+                    } else if (Size == 0 && SymIsDef (Entry) && !IsEmptiableObjectType (Decl.Type)) {
                         /* Size is unknown. Is it an array? */
                         if (!IsTypeArray (Decl.Type)) {
                             Error ("Variable '%s' has unknown size", Decl.Ident);

@@ -81,6 +81,12 @@ extern Function* CurrentFunc;
 
 
 
+int F_CheckParamList (FuncDesc* D, int RequireAll);
+/* Check and set the parameter sizes.
+** If RequireAll is true, emit errors on parameters of incomplete types.
+** Return true if all parameters have complete types.
+*/
+
 const char* F_GetFuncName (const Function* F);
 /* Return the name of the current function */
 

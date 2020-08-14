@@ -207,27 +207,30 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
     printf ("\n");
     PrintRawType (stdout, NewType);
 #endif
+    /* First, do some type checking */
     int HasWarning  = 0;
     int HasError    = 0;
     const char* Msg = 0;
     const Type* OldType = Expr->Type;
 
 
-    /* First, do some type checking */
-    if (IsTypeVoid (NewType) || IsTypeVoid (Expr->Type)) {
-        /* If one of the sides are of type void, output a more apropriate
-        ** error message.
-        */
-        Error ("Illegal type");
+    /* If one of the sides is of type void, it is an error */
+    if (IsTypeVoid (NewType) || IsTypeVoid (OldType)) {
+        HasError = 1;
     }
 
-    /* If Expr is a function, convert it to pointer to function */
-    if (IsTypeFunc (Expr->Type)) {
-        Expr->Type = PointerTo (Expr->Type);
+    /* If both types are strictly compatible, no conversion is needed */
+    if (TypeCmp (NewType, OldType) >= TC_STRICT_COMPATIBLE) {
+        /* We're already done */
+        return;
     }
 
-    /* If both types are equal, no conversion is needed */
-    if (TypeCmp (Expr->Type, NewType) >= TC_EQUAL) {
+    /* If Expr is an array or a function, convert it to a pointer */
+    Expr->Type = PtrConversion (Expr->Type);
+
+    /* If we have changed the type, check again for strictly compatibility */
+    if (Expr->Type != OldType &&
+        TypeCmp (NewType, Expr->Type) >= TC_STRICT_COMPATIBLE) {
         /* We're already done */
         return;
     }
@@ -237,10 +240,6 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
 
         /* Handle conversions to int type */
         if (IsClassPtr (Expr->Type)) {
-            /* Pointer -> int conversion. Convert array to pointer */
-            if (IsTypeArray (Expr->Type)) {
-                Expr->Type = ArrayToPtr (Expr->Type);
-            }
             Warning ("Converting pointer to integer without a cast");
         } else if (!IsClassInt (Expr->Type) && !IsClassFloat (Expr->Type)) {
             HasError = 1;
@@ -254,11 +253,6 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
         /* Handle conversions to pointer type */
         if (IsClassPtr (Expr->Type)) {
 
-            /* Convert array to pointer */
-            if (IsTypeArray (Expr->Type)) {
-                Expr->Type = ArrayToPtr (Expr->Type);
-            }
-
             /* Pointer to pointer assignment is valid, if:
             **   - both point to the same types, or
             **   - the rhs pointer is a void pointer, or
@@ -271,11 +265,15 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
                 case TC_INCOMPATIBLE:
                     HasWarning = 1;
                     Msg = "Incompatible pointer assignment to '%s' from '%s'";
+                    /* Use the pointer type in the diagnostic */
+                    OldType = Expr->Type;
                     break;
 
                 case TC_QUAL_DIFF:
                     HasWarning = 1;
                     Msg = "Pointer assignment to '%s' from '%s' discards qualifiers";
+                    /* Use the pointer type in the diagnostic */
+                    OldType = Expr->Type;
                     break;
 
                 default:
@@ -309,8 +307,21 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
             TypeCompatibilityDiagnostic (NewType, OldType, 0, Msg);
         }
 
-        /* Do the actual conversion */
-        DoConversion (Expr, NewType);
+        /* Both types must be complete */
+        if (!IsIncompleteESUType (NewType) && !IsIncompleteESUType (Expr->Type)) {
+            /* Do the actual conversion */
+            DoConversion (Expr, NewType);
+        } else {
+            /* We should have already generated error elsewhere so that we
+            ** could just silently fail here to avoid excess errors, but to
+            ** be safe, we must ensure that we do have errors.
+            */
+            if (IsIncompleteESUType (NewType)) {
+                Error ("Conversion to incomplete type '%s'", GetFullTypeName (NewType));
+            } else {
+                Error ("Conversion from incomplete type '%s'", GetFullTypeName (Expr->Type));
+            }
+        }
     }
 }
 
@@ -333,19 +344,30 @@ void TypeCast (ExprDesc* Expr)
     /* Read the expression we have to cast */
     hie10 (Expr);
 
-    /* Only allow casts to arithmetic or pointer types, or just changing the
-    ** qualifiers.
-    */
-    if (TypeCmp (NewType, Expr->Type) >= TC_QUAL_DIFF) {
-        /* The expression has always the new type */
-        ReplaceType (Expr, NewType);
-    } else if (IsCastType (NewType)) {
-        /* Convert functions and arrays to "pointer to" object */
-        Expr->Type = PtrConversion (Expr->Type);
-        /* Convert the value */
-        DoConversion (Expr, NewType);
+    /* Only allow casts to arithmetic, pointer or void types */
+    if (IsCastType (NewType)) {
+        if (!IsIncompleteESUType (NewType)) {
+            /* Convert functions and arrays to "pointer to" object */
+            Expr->Type = PtrConversion (Expr->Type);
+
+            if (TypeCmp (NewType, Expr->Type) >= TC_QUAL_DIFF) {
+                /* If the new type only differs in qualifiers, just use it to
+                ** replace the old one.
+                */
+                ReplaceType (Expr, NewType);
+            } else if (IsCastType (Expr->Type)) {
+                /* Convert the value. The rsult has always the new type */
+                DoConversion (Expr, NewType);
+            } else {
+                TypeCompatibilityDiagnostic (NewType, Expr->Type, 1,
+                    "Cast to incompatible type '%s' from '%s'");
+            }
+        } else {
+            Error ("Cast to incomplete type '%s'",
+                   GetFullTypeName (NewType));
+        }
     } else {
-        Error ("Arithmetic or pointer type expected but '%s' is used",
-               GetFullTypeName (NewType));
+        Error ("Arithmetic or pointer type expected but %s is used",
+               GetBasicTypeName (NewType));
     }
 }

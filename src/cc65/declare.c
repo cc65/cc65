@@ -1492,13 +1492,27 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
 
 
 static Type* ParamTypeCvt (Type* T)
-/* If T is an array, convert it to a pointer else do nothing. Return the
-** resulting type.
+/* If T is an array or a function, convert it to a pointer else do nothing.
+** Return the resulting type.
 */
 {
+    Type* Tmp = 0;
+
     if (IsTypeArray (T)) {
-        T->C = T_PTR;
+        Tmp = ArrayToPtr (T);
+    } else if (IsTypeFunc (T)) {
+        Tmp = PointerTo (T);
     }
+    
+    if (Tmp != 0) {
+        /* Do several fixes on qualifiers */
+        FixQualifiers (Tmp);
+
+        /* Replace the type */
+        TypeCopy (T, Tmp);
+        TypeFree (Tmp);
+    }
+
     return T;
 }
 

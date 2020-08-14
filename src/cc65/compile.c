@@ -140,19 +140,10 @@ static void Parse (void)
         comma = 0;
         while (1) {
 
-            Declaration         Decl;
+            Declaration Decl;
 
             /* Read the next declaration */
             ParseDecl (&Spec, &Decl, DM_NEED_IDENT);
-            if (Decl.Ident[0] == '\0') {
-                NextToken ();
-                break;
-            }
-
-            if ((Decl.StorageClass & SC_FICTITIOUS) == SC_FICTITIOUS) {
-                /* Failed parsing */
-                goto SkipOneDecl;
-            }
 
             /* Check if we must reserve storage for the variable. We do this,
             **
@@ -163,8 +154,9 @@ static void Parse (void)
             **
             ** This means that "extern int i;" will not get storage allocated.
             */
-            if ((Decl.StorageClass & SC_FUNC) != SC_FUNC          &&
-                (Decl.StorageClass & SC_TYPEMASK) != SC_TYPEDEF) {
+            if ((Decl.StorageClass & SC_FUNC) != SC_FUNC        &&
+                (Decl.StorageClass & SC_TYPEMASK) != SC_TYPEDEF &&
+                (Decl.StorageClass & SC_FICTITIOUS) != SC_FICTITIOUS) {
                 if ((Spec.Flags & DS_DEF_STORAGE) != 0                       ||
                     (Decl.StorageClass & (SC_EXTERN|SC_STATIC)) == SC_STATIC ||
                     ((Decl.StorageClass & SC_EXTERN) != 0 &&
@@ -296,7 +288,6 @@ static void Parse (void)
 
             }
 
-SkipOneDecl:
             /* Check for end of declaration list */
             if (CurTok.Tok == TOK_COMMA) {
                 NextToken ();
@@ -452,10 +443,6 @@ void Compile (const char* FileName)
                     }
 
                     Sym = GetSymType (GetElementType (Entry->Type));
-                    if (Size == 0 && Sym != 0 && SymIsDef (Sym)) {
-                        /* Array of 0-size elements */
-                        Warning ("Array '%s[]' has 0-sized elements", Entry->Name);
-                    }
                 }
 
                 /* For non-ESU types, Size != 0 */

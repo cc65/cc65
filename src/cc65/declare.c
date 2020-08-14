@@ -457,6 +457,37 @@ static unsigned ParseOneStorageClass (void)
 
 
 
+static void CheckArrayElementType (Type* DataType)
+/* Check if data type consists of arrays of incomplete element types */
+{
+    Type* T = DataType;
+
+    while (T->C != T_END) {
+        if (IsTypeArray (T)) {
+            ++T;
+            if (IsIncompleteESUType (T)) {
+                /* We cannot have an array of incomplete elements */
+                Error ("Array of incomplete element type '%s'", GetFullTypeName (T));
+            } else if (SizeOf (T) == 0) {
+                /* If the array is multi-dimensional, try to get the true
+                ** element type.
+                */
+                if (IsTypeArray (T)) {
+                    continue;
+                }
+                /* We could support certain 0-size element types as an extension */
+                if (!IsTypeVoid (T) || IS_Get (&Standard) != STD_CC65) {
+                    Error ("Array of 0-size element type '%s'", GetFullTypeName (T));
+                }
+            }
+        } else {
+            ++T;
+        }
+    }
+}
+
+
+
 static void ParseStorageClass (DeclSpec* D, unsigned DefStorage)
 /* Parse a storage class */
 {
@@ -956,14 +987,14 @@ NextMember: if (CurTok.Tok != TOK_COMMA) {
     FieldTab = GetSymTab ();
     LeaveStructLevel ();
 
-    /* Empty union is not supported now */
-    if (UnionSize == 0) {
-        Error ("Empty union type '%s' is not supported", Name);
-    }
-
     /* Return a fictitious symbol if errors occurred during parsing */
     if (PrevErrorCount != ErrorCount) {
         Flags |= SC_FICTITIOUS;
+    }
+
+    /* Empty union is not supported now */
+    if (UnionSize == 0) {
+        Error ("Empty union type '%s' is not supported", Name);
     }
 
     /* Make a real entry from the forward decl and return it */
@@ -1160,14 +1191,14 @@ NextMember: if (CurTok.Tok != TOK_COMMA) {
     FieldTab = GetSymTab ();
     LeaveStructLevel ();
 
-    /* Empty struct is not supported now */
-    if (StructSize == 0) {
-        Error ("Empty struct type '%s' is not supported", Name);
-    }
-
     /* Return a fictitious symbol if errors occurred during parsing */
     if (PrevErrorCount != ErrorCount) {
         Flags |= SC_FICTITIOUS;
+    }
+
+    /* Empty struct is not supported now */
+    if (StructSize == 0) {
+        Error ("Empty struct type '%s' is not supported", Name);
     }
 
     /* Make a real entry from the forward decl and return it */
@@ -1922,6 +1953,9 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
     /* Do several fixes on qualifiers */
     FixQualifiers (D->Type);
 
+    /* Check if the data type consists of any arrays of forbidden types */
+    CheckArrayElementType (D->Type);
+
     /* If we have a function, add a special storage class */
     if (IsTypeFunc (D->Type)) {
         D->StorageClass |= SC_FUNC;
@@ -1993,10 +2027,15 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
                 Error ("Invalid size in declaration (0x%06X)", Size);
             }
         }
+    }
 
-        if (PrevErrorCount != ErrorCount) {
-            /* Don't give storage if the declaration is not parsed correctly */
-            D->StorageClass |= SC_DECL | SC_FICTITIOUS;
+    if (PrevErrorCount != ErrorCount) {
+        /* Make the declaration fictitious if is is not parsed correctly */
+        D->StorageClass |= SC_DECL | SC_FICTITIOUS;
+
+        if (Mode == DM_NEED_IDENT && D->Ident[0] == '\0') {
+            /* Use a fictitious name for the identifier if it is missing */
+            AnonName (D->Ident, "global");
         }
     }
 }
@@ -2242,7 +2281,7 @@ static unsigned ParseArrayInit (Type* T, int* Braces, int AllowFlexibleMembers)
 
     /* Get the array data */
     Type* ElementType    = GetElementType (T);
-    unsigned ElementSize = CheckedSizeOf (ElementType);
+    unsigned ElementSize = SizeOf (ElementType);
     long ElementCount    = GetElementCount (T);
 
     /* Special handling for a character array initialized by a literal */

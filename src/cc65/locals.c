@@ -174,8 +174,8 @@ static void ParseRegisterDecl (Declaration* Decl, int Reg)
         Sym->Flags |= SC_REF;
     }
 
-    /* Cannot allocate a variable of zero size */
-    if (Size == 0) {
+    /* Cannot allocate a variable of unknown size */
+    if (HasUnknownSize (Sym->Type)) {
         if (IsTypeArray (Decl->Type)) {
             Error ("Array '%s' has unknown size", Decl->Ident);
         } else {
@@ -370,8 +370,8 @@ static void ParseAutoDecl (Declaration* Decl)
         }
     }
 
-    /* Cannot allocate a variable of zero size */
-    if (Size == 0) {
+    /* Cannot allocate an incomplete variable */
+    if (HasUnknownSize (Sym->Type)) {
         if (IsTypeArray (Decl->Type)) {
             Error ("Array '%s' has unknown size", Decl->Ident);
         } else {
@@ -428,8 +428,8 @@ static void ParseStaticDecl (Declaration* Decl)
 
     }
 
-    /* Cannot allocate a variable of zero size */
-    if (Size == 0) {
+    /* Cannot allocate an incomplete variable */
+    if (HasUnknownSize (Sym->Type)) {
         if (IsTypeArray (Decl->Type)) {
             Error ("Array '%s' has unknown size", Decl->Ident);
         } else {

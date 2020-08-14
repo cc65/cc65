@@ -318,28 +318,38 @@ static void ReturnStatement (void)
         /* Evaluate the return expression */
         hie0 (&Expr);
 
-        /* If we return something in a void function, print an error and
-        ** ignore the value. Otherwise convert the value to the type of the
-        ** return.
+        /* If we return something in a function with void or incomplete return
+        ** type, print an error and ignore the value. Otherwise convert the
+        ** value to the type of the return.
         */
         if (F_HasVoidReturn (CurrentFunc)) {
-            Error ("Returning a value in function with return type void");
+            Error ("Returning a value in function with return type 'void'");
         } else {
-            /* Convert the return value to the type of the function result */
-            TypeConversion (&Expr, F_GetReturnType (CurrentFunc));
 
-            /* Load the value into the primary */
-            if (IsClassStruct (Expr.Type)) {
-                /* Handle struct/union specially */
-                ReturnType = GetStructReplacementType (Expr.Type);
-                if (ReturnType == Expr.Type) {
-                    Error ("Returning '%s' of this size by value is not supported", GetFullTypeName (Expr.Type));
+            /* Check the return type first */
+            ReturnType = F_GetReturnType (CurrentFunc);
+            if (IsIncompleteESUType (ReturnType)) {
+                /* Avoid excess errors */
+                if (ErrorCount == 0) {
+                    Error ("Returning a value in function with incomplete return type");
                 }
-                LoadExpr (TypeOf (ReturnType), &Expr);
-
             } else {
+                /* Convert the return value to the type of the function result */
+                TypeConversion (&Expr, ReturnType);
+
                 /* Load the value into the primary */
-                LoadExpr (CF_NONE, &Expr);
+                if (IsClassStruct (Expr.Type)) {
+                    /* Handle struct/union specially */
+                    ReturnType = GetStructReplacementType (Expr.Type);
+                    if (ReturnType == Expr.Type) {
+                        Error ("Returning '%s' of this size by value is not supported", GetFullTypeName (Expr.Type));
+                    }
+                    LoadExpr (TypeOf (ReturnType), &Expr);
+
+                } else {
+                    /* Load the value into the primary */
+                    LoadExpr (CF_NONE, &Expr);
+                }
             }
         }
 

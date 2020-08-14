@@ -410,8 +410,10 @@ fncls_t GetFuncInfo (const char* Name, unsigned short* Use, unsigned short* Chg)
                        (AutoCDecl ?
                         IsQualFastcall (E->Type) :
                         !IsQualCDecl (E->Type))) {
-                /* Will use registers depending on the last param. */
-                switch (CheckedSizeOf (D->LastParam->Type)) {
+                /* Will use registers depending on the last param. If the last
+                ** param has incomplete type, just assume __EAX__.
+                */
+                switch (SizeOf (D->LastParam->Type)) {
                     case 1u:
                         *Use = REG_A;
                         break;

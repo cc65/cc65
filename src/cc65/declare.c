@@ -1704,7 +1704,6 @@ static void ParseAnsiParamList (FuncDesc* F)
 static FuncDesc* ParseFuncDecl (void)
 /* Parse the argument list of a function. */
 {
-    unsigned Offs;
     SymEntry* Sym;
     SymEntry* WrappedCall;
     unsigned char WrappedCallData;
@@ -1751,23 +1750,10 @@ static FuncDesc* ParseFuncDecl (void)
     */
     F->LastParam = GetSymTab()->SymTail;
 
-    /* Assign offsets. If the function has a variable parameter list,
-    ** there's one additional byte (the arg size).
+    /* It is allowed to use incomplete types in function prototypes, so we
+    ** won't always get to know the parameter sizes here and may do that later.
     */
-    Offs = (F->Flags & FD_VARIADIC)? 1 : 0;
-    Sym = F->LastParam;
-    while (Sym) {
-        unsigned Size = CheckedSizeOf (Sym->Type);
-        if (SymIsRegVar (Sym)) {
-            Sym->V.R.SaveOffs = Offs;
-        } else {
-            Sym->V.Offs = Offs;
-        }
-        Offs += Size;
-        F->ParamSize += Size;
-        Sym = Sym->PrevSym;
-    }
-
+ 
     /* Leave the lexical level remembering the symbol tables */
     RememberFunctionLevel (F);
 

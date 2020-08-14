@@ -1856,8 +1856,8 @@ static void UnaryOp (ExprDesc* Expr)
         /* Value is not constant */
         LoadExpr (CF_NONE, Expr);
 
-        /* Get the type of the expression */
-        Flags = TypeOf (Expr->Type);
+        /* Adjust the type of the value */
+        Flags = g_typeadjust (TypeOf (Expr->Type), TypeOf (type_int) | CF_CONST);
 
         /* Handle the operation */
         switch (Tok) {
@@ -1870,6 +1870,9 @@ static void UnaryOp (ExprDesc* Expr)
         /* The result is an rvalue in the primary */
         ED_FinalizeRValLoad (Expr);
     }
+
+    /* Adjust the type of the expression */
+    Expr->Type = IntPromotion (Expr->Type);
 }
 
 

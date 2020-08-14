@@ -107,6 +107,7 @@ struct CodeEntry;
 
 #define SC_ALIAS        0x01000000U     /* Alias of anonymous field */
 #define SC_FICTITIOUS   0x02000000U     /* Symbol is fictitious */
+#define SC_HAVEFAM      0x04000000U     /* Type has a Flexible Array Member */
 
 
 
@@ -271,6 +272,16 @@ INLINE int SymIsRegVar (const SymEntry* Sym)
 
 int SymIsOutputFunc (const SymEntry* Sym);
 /* Return true if this is a function that must be output */
+
+#if defined(HAVE_INLINE)
+INLINE int SymHasFlexibleArrayMember (const SymEntry* Sym)
+/* Return true if the given entry has a flexible array member */
+{
+    return ((Sym->Flags & SC_HAVEFAM) == SC_HAVEFAM);
+}
+#else
+#  define SymHasFlexibleArrayMember(Sym)    (((Sym)->Flags & SC_HAVEFAM) == SC_HAVEFAM)
+#endif
 
 #if defined(HAVE_INLINE)
 INLINE const char* SymGetAsmName (const SymEntry* Sym)

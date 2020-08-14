@@ -484,7 +484,7 @@ static void ParseStorageClass (DeclSpec* D, unsigned DefStorage)
 
 
 
-static SymEntry* ESUForwardDecl (const char* Name, unsigned Flags)
+static SymEntry* ESUForwardDecl (const char* Name, unsigned Flags, unsigned* DSFlags)
 /* Handle an enum, struct or union forward decl */
 {
     /* Try to find an enum/struct/union with the given name. If there is none,
@@ -493,9 +493,9 @@ static SymEntry* ESUForwardDecl (const char* Name, unsigned Flags)
     SymEntry* Entry = FindTagSym (Name);
     if (Entry == 0) {
         if ((Flags & SC_ESUTYPEMASK) != SC_ENUM) {
-            Entry = AddStructSym (Name, Flags, 0, 0);
+            Entry = AddStructSym (Name, Flags, 0, 0, DSFlags);
         } else {
-            Entry = AddEnumSym (Name, Flags, 0, 0);
+            Entry = AddEnumSym (Name, Flags, 0, 0, DSFlags);
         }
     } else if ((Entry->Flags & SC_TYPEMASK) != (Flags & SC_ESUTYPEMASK)) {
         /* Already defined, but not the same type class */
@@ -544,7 +544,7 @@ static const Type* GetEnumeratorType (long Min, unsigned long Max, int Signed)
 
 
 
-static SymEntry* ParseEnumDecl (const char* Name)
+static SymEntry* ParseEnumDecl (const char* Name, unsigned* DSFlags)
 /* Process an enum declaration */
 {
     SymTable*       FieldTab;
@@ -562,11 +562,11 @@ static SymEntry* ParseEnumDecl (const char* Name)
 
     if (CurTok.Tok != TOK_LCURLY) {
         /* Just a forward definition */
-        return ESUForwardDecl (Name, SC_ENUM);
+        return ESUForwardDecl (Name, SC_ENUM, DSFlags);
     }
 
     /* Add a forward declaration for the enum tag in the current lexical level */
-    AddEnumSym (Name, 0, 0, 0);
+    AddEnumSym (Name, 0, 0, 0, DSFlags);
 
     /* Skip the opening curly brace */
     NextToken ();
@@ -709,7 +709,7 @@ static SymEntry* ParseEnumDecl (const char* Name)
         Flags |= SC_FICTITIOUS;
     }
 
-    return AddEnumSym (Name, Flags, MemberType, FieldTab);
+    return AddEnumSym (Name, Flags, MemberType, FieldTab, DSFlags);
 }
 
 
@@ -839,7 +839,7 @@ static unsigned AliasAnonStructFields (const Declaration* Decl, SymEntry* Anon)
 
 
 
-static SymEntry* ParseUnionDecl (const char* Name)
+static SymEntry* ParseUnionDecl (const char* Name, unsigned* DSFlags)
 /* Parse a union declaration. */
 {
 
@@ -855,11 +855,11 @@ static SymEntry* ParseUnionDecl (const char* Name)
 
     if (CurTok.Tok != TOK_LCURLY) {
         /* Just a forward declaration */
-        return ESUForwardDecl (Name, SC_UNION);
+        return ESUForwardDecl (Name, SC_UNION, DSFlags);
     }
 
     /* Add a forward declaration for the union tag in the current lexical level */
-    UnionTagEntry = AddStructSym (Name, SC_UNION, 0, 0);
+    UnionTagEntry = AddStructSym (Name, SC_UNION, 0, 0, DSFlags);
 
     UnionTagEntry->V.S.ACount = 0;
 
@@ -960,12 +960,12 @@ NextMember: if (CurTok.Tok != TOK_COMMA) {
     }
 
     /* Make a real entry from the forward decl and return it */
-    return AddStructSym (Name, SC_UNION | SC_DEF | Flags, UnionSize, FieldTab);
+    return AddStructSym (Name, SC_UNION | SC_DEF | Flags, UnionSize, FieldTab, DSFlags);
 }
 
 
 
-static SymEntry* ParseStructDecl (const char* Name)
+static SymEntry* ParseStructDecl (const char* Name, unsigned* DSFlags)
 /* Parse a struct declaration. */
 {
 
@@ -982,11 +982,11 @@ static SymEntry* ParseStructDecl (const char* Name)
 
     if (CurTok.Tok != TOK_LCURLY) {
         /* Just a forward declaration */
-        return ESUForwardDecl (Name, SC_STRUCT);
+        return ESUForwardDecl (Name, SC_STRUCT, DSFlags);
     }
 
     /* Add a forward declaration for the struct tag in the current lexical level */
-    StructTagEntry = AddStructSym (Name, SC_STRUCT, 0, 0);
+    StructTagEntry = AddStructSym (Name, SC_STRUCT, 0, 0, DSFlags);
 
     StructTagEntry->V.S.ACount = 0;
 
@@ -1157,7 +1157,7 @@ NextMember: if (CurTok.Tok != TOK_COMMA) {
     }
 
     /* Make a real entry from the forward decl and return it */
-    return AddStructSym (Name, SC_STRUCT | SC_DEF | Flags, StructSize, FieldTab);
+    return AddStructSym (Name, SC_STRUCT | SC_DEF | Flags, StructSize, FieldTab, DSFlags);
 }
 
 
@@ -1340,7 +1340,7 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
             /* Remember we have an extra type decl */
             D->Flags |= DS_EXTRA_TYPE;
             /* Declare the union in the current scope */
-            Entry = ParseUnionDecl (Ident);
+            Entry = ParseUnionDecl (Ident, &D->Flags);
             /* Encode the union entry into the type */
             D->Type[0].C = T_UNION;
             SetESUSymEntry (D->Type, Entry);
@@ -1359,7 +1359,7 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
             /* Remember we have an extra type decl */
             D->Flags |= DS_EXTRA_TYPE;
             /* Declare the struct in the current scope */
-            Entry = ParseStructDecl (Ident);
+            Entry = ParseStructDecl (Ident, &D->Flags);
             /* Encode the struct entry into the type */
             D->Type[0].C = T_STRUCT;
             SetESUSymEntry (D->Type, Entry);
@@ -1382,7 +1382,8 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
             /* Remember we have an extra type decl */
             D->Flags |= DS_EXTRA_TYPE;
             /* Parse the enum decl */
-            Entry = ParseEnumDecl (Ident);
+            Entry = ParseEnumDecl (Ident, &D->Flags);
+            /* Encode the enum entry into the type */
             D->Type[0].C |= T_ENUM;
             SetESUSymEntry (D->Type, Entry);
             D->Type[1].C = T_END;
@@ -1521,6 +1522,13 @@ static void ParseOldStyleParamList (FuncDesc* F)
 
             /* Read the parameter */
             ParseDecl (&Spec, &Decl, DM_NEED_IDENT);
+
+            /* Warn about new local type declaration */
+            if ((Spec.Flags & DS_NEW_TYPE_DECL) != 0) {
+                Warning ("'%s' will be invisible out of this function",
+                         GetFullTypeName (Spec.Type));
+            }
+
             if (Decl.Ident[0] != '\0') {
 
                 /* We have a name given. Search for the symbol */
@@ -1586,6 +1594,12 @@ static void ParseAnsiParamList (FuncDesc* F)
         } else {
             Error ("Illegal storage class");
             Spec.StorageClass = SC_AUTO | SC_PARAM | SC_DEF;
+        }
+
+        /* Warn about new local type declaration */
+        if ((Spec.Flags & DS_NEW_TYPE_DECL) != 0) {
+            Warning ("'%s' will be invisible out of this function",
+                     GetFullTypeName (Spec.Type));
         }
 
         /* Allow parameters without a name, but remember if we had some to

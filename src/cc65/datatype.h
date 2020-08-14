@@ -278,13 +278,13 @@ Type* PointerTo (const Type* T);
 */
 
 void PrintType (FILE* F, const Type* T);
-/* Output translation of type array. */
-
-void PrintRawType (FILE* F, const Type* T);
-/* Print a type string in raw format (for debugging) */
+/* Print fulle name of the type */
 
 void PrintFuncSig (FILE* F, const char* Name, Type* T);
-/* Print a function signature. */
+/* Print a function signature */
+
+void PrintRawType (FILE* F, const Type* T);
+/* Print a type string in raw hex format (for debugging) */
 
 int TypeHasAttr (const Type* T);
 /* Return true if the given type has attribute data */

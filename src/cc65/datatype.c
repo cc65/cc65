@@ -83,7 +83,7 @@ static struct StrBuf* GetFullTypeNameWestEast (struct StrBuf* West, struct StrBu
 ** eastern part.
 */
 {
-    struct StrBuf Buf = STATIC_STRBUF_INITIALIZER;
+    struct StrBuf Buf = AUTO_STRBUF_INITIALIZER;
 
     if (IsTypeArray (T)) {
 
@@ -117,28 +117,27 @@ static struct StrBuf* GetFullTypeNameWestEast (struct StrBuf* West, struct StrBu
 
     } else if (IsTypeFunc (T)) {
 
-        FuncDesc* F             = GetFuncDesc (T);
-        struct StrBuf ParamList = STATIC_STRBUF_INITIALIZER;
+        FuncDesc* D             = GetFuncDesc (T);
+        struct StrBuf ParamList = AUTO_STRBUF_INITIALIZER;
 
         /* First argument */
-        SymEntry* Param = F->SymTab->SymHead;
-        for (unsigned I = 1; I < F->ParamCount; ++I) {
-            CHECK (Param->NextSym != 0 && (Param->Flags & SC_PARAM) != 0);
+        SymEntry* Param = D->SymTab->SymHead;
+        for (unsigned I = 0; I < D->ParamCount; ++I) {
+            CHECK (Param != 0 && (Param->Flags & SC_PARAM) != 0);
+            if (I > 0) {
+                SB_AppendStr (&ParamList, ", ");
+            }
             SB_AppendStr (&ParamList, SB_GetConstBuf (GetFullTypeNameBuf (&Buf, Param->Type)));
-            SB_AppendStr (&ParamList, ", ");
             SB_Clear (&Buf);
             /* Next argument */
             Param = Param->NextSym;
         }
-        if ((F->Flags & FD_VARIADIC) == 0) {
-            if (F->ParamCount > 0) {
-                SB_AppendStr (&ParamList, SB_GetConstBuf (GetFullTypeNameBuf (&Buf, Param->Type)));
-            } else if ((F->Flags & FD_EMPTY) == 0) {
+        if ((D->Flags & FD_VARIADIC) == 0) {
+            if (D->ParamCount == 0 && (D->Flags & FD_EMPTY) == 0) {
                 SB_AppendStr (&ParamList, "void");
             }
         } else {
-            if (F->ParamCount > 0) {
-                SB_AppendStr (&ParamList, SB_GetConstBuf (GetFullTypeNameBuf (&Buf, Param->Type)));
+            if (D->ParamCount > 0) {
                 SB_AppendStr (&ParamList, ", ...");
             } else {
                 SB_AppendStr (&ParamList, "...");
@@ -286,7 +285,7 @@ const char* GetFullTypeName (const Type* T)
 struct StrBuf* GetFullTypeNameBuf (struct StrBuf* S, const Type* T)
 /* Return the full name string of the given type */
 {
-    struct StrBuf East = STATIC_STRBUF_INITIALIZER;
+    struct StrBuf East = AUTO_STRBUF_INITIALIZER;
     GetFullTypeNameWestEast (S, &East, T);
 
     /* Join West and East */
@@ -586,155 +585,85 @@ Type* PointerTo (const Type* T)
 
 
 
-static TypeCode PrintTypeComp (FILE* F, TypeCode C, TypeCode Mask, const char* Name)
-/* Check for a specific component of the type. If it is there, print the
-** name and remove it. Return the type with the component removed.
-*/
-{
-    if ((C & Mask) == Mask) {
-        fprintf (F, "%s ", Name);
-        C &= ~Mask;
-    }
-    return C;
-}
-
-
-
 void PrintType (FILE* F, const Type* T)
-/* Output translation of type array. */
+/* Print fulle name of the type */
 {
-    /* Walk over the type string */
-    while (T->C != T_END) {
-
-        /* Get the type code */
-        TypeCode C = T->C;
-
-        /* Print any qualifiers */
-        C = PrintTypeComp (F, C, T_QUAL_CONST, "const");
-        C = PrintTypeComp (F, C, T_QUAL_VOLATILE, "volatile");
-        C = PrintTypeComp (F, C, T_QUAL_RESTRICT, "restrict");
-        C = PrintTypeComp (F, C, T_QUAL_NEAR, "__near__");
-        C = PrintTypeComp (F, C, T_QUAL_FAR, "__far__");
-        C = PrintTypeComp (F, C, T_QUAL_FASTCALL, "__fastcall__");
-        C = PrintTypeComp (F, C, T_QUAL_CDECL, "__cdecl__");
-
-        /* Signedness. Omit the signedness specifier for long and int */
-        if ((C & T_MASK_TYPE) != T_TYPE_INT && (C & T_MASK_TYPE) != T_TYPE_LONG) {
-            C = PrintTypeComp (F, C, T_SIGN_SIGNED, "signed");
-        }
-        C = PrintTypeComp (F, C, T_SIGN_UNSIGNED, "unsigned");
-
-        /* Now check the real type */
-        switch (C & T_MASK_TYPE) {
-            case T_TYPE_CHAR:
-                fprintf (F, "char");
-                break;
-            case T_TYPE_SHORT:
-                fprintf (F, "short");
-                break;
-            case T_TYPE_INT:
-                fprintf (F, "int");
-                break;
-            case T_TYPE_LONG:
-                fprintf (F, "long");
-                break;
-            case T_TYPE_LONGLONG:
-                fprintf (F, "long long");
-                break;
-            case T_TYPE_ENUM:
-                fprintf (F, "enum");
-                break;
-            case T_TYPE_FLOAT:
-                fprintf (F, "float");
-                break;
-            case T_TYPE_DOUBLE:
-                fprintf (F, "double");
-                break;
-            case T_TYPE_VOID:
-                fprintf (F, "void");
-                break;
-            case T_TYPE_STRUCT:
-                fprintf (F, "struct %s", ((SymEntry*) T->A.P)->Name);
-                break;
-            case T_TYPE_UNION:
-                fprintf (F, "union %s", ((SymEntry*) T->A.P)->Name);
-                break;
-            case T_TYPE_ARRAY:
-                /* Recursive call */
-                PrintType (F, T + 1);
-                if (T->A.L == UNSPECIFIED) {
-                    fprintf (F, " []");
-                } else {
-                    fprintf (F, " [%ld]", T->A.L);
-                }
-                return;
-            case T_TYPE_PTR:
-                /* Recursive call */
-                PrintType (F, T + 1);
-                fprintf (F, " *");
-                return;
-            case T_TYPE_FUNC:
-                fprintf (F, "function returning ");
-                break;
-            default:
-                fprintf (F, "unknown type: %04lX", T->C);
-        }
-
-        /* Next element */
-        ++T;
-    }
+    StrBuf Buf = AUTO_STRBUF_INITIALIZER;
+    fprintf (F, "%s", SB_GetConstBuf (GetFullTypeNameBuf (&Buf, T)));
+    SB_Done (&Buf);
 }
 
 
 
 void PrintFuncSig (FILE* F, const char* Name, Type* T)
-/* Print a function signature. */
+/* Print a function signature */
 {
+    StrBuf Buf       = AUTO_STRBUF_INITIALIZER;
+    StrBuf ParamList = AUTO_STRBUF_INITIALIZER;
+    StrBuf East      = AUTO_STRBUF_INITIALIZER;
+    StrBuf West      = AUTO_STRBUF_INITIALIZER;
+
     /* Get the function descriptor */
     const FuncDesc* D = GetFuncDesc (T);
 
-    /* Print a comment with the function signature */
-    PrintType (F, GetFuncReturn (T));
-    if (IsQualNear (T)) {
-        fprintf (F, " __near__");
+    /* Get the parameter list string. Start from the first parameter */
+    SymEntry* Param = D->SymTab->SymHead;
+    for (unsigned I = 0; I < D->ParamCount; ++I) {
+        CHECK (Param != 0 && (Param->Flags & SC_PARAM) != 0);
+        if (I > 0) {
+            SB_AppendStr (&ParamList, ", ");
+        }
+        if (SymIsRegVar (Param)) {
+            SB_AppendStr (&ParamList, "register ");
+        }
+        if (!HasAnonName (Param)) {
+            SB_AppendStr (&Buf, Param->Name);
+        }
+        SB_AppendStr (&ParamList, SB_GetConstBuf (GetFullTypeNameBuf (&Buf, Param->Type)));
+        SB_Clear (&Buf);
+        /* Next argument */
+        Param = Param->NextSym;
     }
-    if (IsQualFar (T)) {
-        fprintf (F, " __far__");
-    }
-    if (IsQualFastcall (T)) {
-        fprintf (F, " __fastcall__");
-    }
-    if (IsQualCDecl (T)) {
-        fprintf (F, " __cdecl__");
-    }
-    fprintf (F, " %s (", Name);
-
-    /* Parameters */
-    if (D->Flags & FD_VOID_PARAM) {
-        fprintf (F, "void");
+    if ((D->Flags & FD_VARIADIC) == 0) {
+        if (D->ParamCount == 0 && (D->Flags & FD_EMPTY) == 0) {
+            SB_AppendStr (&ParamList, "void");
+        }
     } else {
-        unsigned I;
-        SymEntry* E = D->SymTab->SymHead;
-        for (I = 0; I < D->ParamCount; ++I) {
-            if (I > 0) {
-                fprintf (F, ", ");
-            }
-            if (SymIsRegVar (E)) {
-                fprintf (F, "register ");
-            }
-            PrintType (F, E->Type);
-            E = E->NextSym;
+        if (D->ParamCount > 0) {
+            SB_AppendStr (&ParamList, ", ...");
+        } else {
+            SB_AppendStr (&ParamList, "...");
         }
     }
+    SB_Terminate (&ParamList);
 
-    /* End of parameter list */
-    fprintf (F, ")");
+    /* Get the function qualifiers */
+    if (GetQualifierTypeCodeNameBuf (&Buf, T->C, T_QUAL_NONE) > 0) {
+        /* Append a space between the qualifiers and the name */
+        SB_AppendChar (&Buf, ' ');
+    }
+    SB_Terminate (&Buf);
+
+    /* Get the signature string without the return type */
+    SB_Printf (&West, "%s%s (%s)", SB_GetConstBuf (&Buf), Name, SB_GetConstBuf (&ParamList));
+    SB_Done (&Buf);
+    SB_Done (&ParamList);
+
+    /* Complete with the return type */
+    GetFullTypeNameWestEast (&West, &East, GetFuncReturn (T));
+    SB_Append (&West, &East);
+    SB_Terminate (&West);
+
+    /* Output */
+    fprintf (F, "%s", SB_GetConstBuf (&West));
+    SB_Done (&East);
+    SB_Done (&West);
 }
 
 
 
 void PrintRawType (FILE* F, const Type* T)
-/* Print a type string in raw format (for debugging) */
+/* Print a type string in raw hex format (for debugging) */
 {
     while (T->C != T_END) {
         fprintf (F, "%04lX ", T->C);

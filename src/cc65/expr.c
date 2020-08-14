@@ -140,27 +140,61 @@ void MarkedExprWithCheck (void (*Func) (ExprDesc*), ExprDesc* Expr)
 
 
 
-static Type* promoteint (Type* lhst, Type* rhst)
-/* In an expression with two ints, return the type of the result */
+static Type* ArithmeticConvert (Type* lhst, Type* rhst)
+/* Perform the usual arithmetic conversions for binary operators. */
 {
-    /* Rules for integer types:
-    **   - If one of the values is a long, the result is long.
-    **   - If one of the values is unsigned, the result is also unsigned.
-    **   - Otherwise the result is an int.
+    /* https://port70.net/~nsz/c/c89/c89-draft.html#3.2.1.5
+    ** Many binary operators that expect operands of arithmetic type cause conversions and yield
+    ** result types in a similar way. The purpose is to yield a common type, which is also the type
+    ** of the result. This pattern is called the usual arithmetic conversions.
+    */
+
+    /* There are additional rules for floating point types that we don't bother with, since
+    ** floating point types are not (yet) supported.
+    ** The integral promotions are performed on both operands.
+    */
+    lhst = IntPromotion (lhst);
+    rhst = IntPromotion (rhst);
+
+    /* If either operand has type unsigned long int, the other operand is converted to
+    ** unsigned long int.
+    */
+    if ((IsTypeLong (lhst) && IsSignUnsigned (lhst)) ||
+        (IsTypeLong (rhst) && IsSignUnsigned (rhst))) {
+        return type_ulong;
+    }
+
+    /* Otherwise, if one operand has type long int and the other has type unsigned int,
+    ** if a long int can represent all values of an unsigned int, the operand of type unsigned int
+    ** is converted to long int ; if a long int cannot represent all the values of an unsigned int,
+    ** both operands are converted to unsigned long int.
+    */
+    if ((IsTypeLong (lhst) && IsTypeInt (rhst) && IsSignUnsigned (rhst)) ||
+        (IsTypeLong (rhst) && IsTypeInt (lhst) && IsSignUnsigned (lhst))) {
+        /* long can represent all unsigneds, so we are in the first sub-case. */
+        return type_long;
+    }
+
+    /* Otherwise, if either operand has type long int, the other operand is converted to long int.
     */
     if (IsTypeLong (lhst) || IsTypeLong (rhst)) {
-        if (IsSignUnsigned (lhst) || IsSignUnsigned (rhst)) {
-            return type_ulong;
-        } else {
-            return type_long;
-        }
-    } else {
-        if (IsSignUnsigned (lhst) || IsSignUnsigned (rhst)) {
-            return type_uint;
-        } else {
-            return type_int;
-        }
+        return type_long;
     }
+
+    /* Otherwise, if either operand has type unsigned int, the other operand is converted to
+    ** unsigned int.
+    */
+    if ((IsTypeInt (lhst) && IsSignUnsigned (lhst)) ||
+        (IsTypeInt (rhst) && IsSignUnsigned (rhst))) {
+        return type_uint;
+    }
+
+    /* Otherwise, both operands have type int. */
+    CHECK (IsTypeInt (lhst));
+    CHECK (IsSignSigned (lhst));
+    CHECK (IsTypeInt (rhst));
+    CHECK (IsSignSigned (rhst));
+    return type_int;
 }
 
 
@@ -198,7 +232,7 @@ static unsigned typeadjust (ExprDesc* lhs, ExprDesc* rhs, int NoPush)
     flags = g_typeadjust (ltype, rtype);
 
     /* Set the type of the result */
-    lhs->Type = promoteint (lhst, rhst);
+    lhs->Type = ArithmeticConvert (lhst, rhst);
 
     /* Return the code generator flags */
     return flags;
@@ -2066,7 +2100,7 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
             RemoveCode (&Mark1);
 
             /* Get the type of the result */
-            Expr->Type = promoteint (Expr->Type, Expr2.Type);
+            Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
 
             /* Handle the op differently for signed and unsigned types */
             if (IsSignSigned (Expr->Type)) {
@@ -2163,7 +2197,7 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
 
             /* Determine the type of the operation result. */
             type |= g_typeadjust (ltype, rtype);
-            Expr->Type = promoteint (Expr->Type, Expr2.Type);
+            Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
 
             /* Generate code */
             Gen->Func (type, Expr->IVal);
@@ -2196,7 +2230,7 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
 
             /* Determine the type of the operation result. */
             type |= g_typeadjust (ltype, rtype);
-            Expr->Type = promoteint (Expr->Type, Expr2.Type);
+            Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
 
             /* Generate code */
             Gen->Func (type, Expr2.IVal);
@@ -3340,7 +3374,7 @@ static void hieQuest (ExprDesc* Expr)
 
 
             /* Get common type */
-            ResultType = promoteint (Expr2.Type, Expr3.Type);
+            ResultType = ArithmeticConvert (Expr2.Type, Expr3.Type);
 
             /* Convert the third expression to this type if needed */
             TypeConversion (&Expr3, ResultType);

@@ -117,6 +117,11 @@ int F_CheckParamList (FuncDesc* D, int RequireAll)
     unsigned    ParamSize = 0;
     unsigned    IncompleteCount = 0;
 
+    /* Don't bother to check unnecessarily */
+    if ((D->Flags & FD_INCOMPLETE_PARAM) == 0) {
+        return 1;
+    }
+
     /* Assign offsets. If the function has a variable parameter list,
     ** there's one additional byte (the arg size).
     */
@@ -147,11 +152,12 @@ int F_CheckParamList (FuncDesc* D, int RequireAll)
         ++I;
     }
 
-    /* If all parameters have complete types, set the total size description
-    ** and return true.
+    /* If all parameters have complete types, set the total size description,
+    ** clear the FD_INCOMPLETE_PARAM flag and return true.
     */
     if (IncompleteCount == 0) {
         D->ParamSize = ParamSize;
+        D->Flags &= ~FD_INCOMPLETE_PARAM;
         return 1;
     }
 

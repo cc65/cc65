@@ -1753,6 +1753,7 @@ static FuncDesc* ParseFuncDecl (void)
     /* It is allowed to use incomplete types in function prototypes, so we
     ** won't always get to know the parameter sizes here and may do that later.
     */
+    F->Flags |= FD_INCOMPLETE_PARAM;
  
     /* Leave the lexical level remembering the symbol tables */
     RememberFunctionLevel (F);

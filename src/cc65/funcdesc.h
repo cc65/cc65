@@ -49,13 +49,14 @@
 #define FD_EMPTY                0x0001U /* Function with empty param list    */
 #define FD_VOID_PARAM           0x0002U /* Function with a void param list   */
 #define FD_VARIADIC             0x0004U /* Function with variable param list */
+#define FD_INCOMPLETE_PARAM     0x0008U /* Function with param of unknown size */
 #define FD_OLDSTYLE             0x0010U /* Old style (K&R) function          */
 #define FD_OLDSTYLE_INTRET      0x0020U /* K&R func has implicit int return  */
 #define FD_UNNAMED_PARAMS       0x0040U /* Function has unnamed params       */
 #define FD_CALL_WRAPPER         0x0080U /* This function is used as a wrapper */
 
 /* Bits that must be ignored when comparing funcs */
-#define FD_IGNORE       (FD_OLDSTYLE | FD_OLDSTYLE_INTRET | FD_UNNAMED_PARAMS | FD_CALL_WRAPPER)
+#define FD_IGNORE   (FD_INCOMPLETE_PARAM | FD_OLDSTYLE | FD_OLDSTYLE_INTRET | FD_UNNAMED_PARAMS | FD_CALL_WRAPPER)
 
 
 

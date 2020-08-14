@@ -925,12 +925,19 @@ static SymEntry* ParseUnionDecl (const char* Name)
                 AddBitField (Decl.Ident, Decl.Type, 0, 0, FieldWidth,
                              SignednessSpecified);
             } else {
+                Entry = AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, 0);
                 if (IsAnonName (Decl.Ident)) {
-                    Entry = AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, 0);
                     Entry->V.A.ANumber = UnionTagEntry->V.S.ACount++;
                     AliasAnonStructFields (&Decl, Entry);
-                } else {
-                    AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, 0);
+                }
+
+                /* Check if the field itself has a flexible array member */
+                if (IsClassStruct (Decl.Type)) {
+                    SymEntry* Sym = GetSymType (Decl.Type);
+                    if (Sym && SymHasFlexibleArrayMember (Sym)) {
+                        Entry->Flags |= SC_HAVEFAM;
+                        Flags        |= SC_HAVEFAM;
+                    }
                 }
             }
 
@@ -1069,6 +1076,8 @@ static SymEntry* ParseStructDecl (const char* Name)
                     Error ("Flexible array member cannot be first struct field");
                 }
                 FlexibleMember = 1;
+                Flags |= SC_HAVEFAM;
+
                 /* Assume zero for size calculations */
                 SetElementCount (Decl.Type, FLEXIBLE);
             }
@@ -1111,13 +1120,21 @@ static SymEntry* ParseStructDecl (const char* Name)
                 StructSize += BitOffs / CHAR_BITS;
                 BitOffs %= CHAR_BITS;
             } else {
+                Entry = AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, StructSize);
                 if (IsAnonName (Decl.Ident)) {
-                    Entry = AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, StructSize);
                     Entry->V.A.ANumber = StructTagEntry->V.S.ACount++;
                     AliasAnonStructFields (&Decl, Entry);
-                } else {
-                    AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, StructSize);
                 }
+
+                /* Check if the field itself has a flexible array member */
+                if (IsClassStruct (Decl.Type)) {
+                    SymEntry* Sym = GetSymType (Decl.Type);
+                    if (Sym && SymHasFlexibleArrayMember (Sym)) {
+                        Entry->Flags |= SC_HAVEFAM;
+                        Flags        |= SC_HAVEFAM;
+                    }
+                }
+
                 if (!FlexibleMember) {
                     StructSize += CheckedSizeOf (Decl.Type);
                 }
@@ -2308,11 +2325,17 @@ static unsigned ParseArrayInit (Type* T, int* Braces, int AllowFlexibleMembers)
         /* Number of elements determined by initializer */
         SetElementCount (T, Count);
         ElementCount = Count;
-    } else if (ElementCount == FLEXIBLE && AllowFlexibleMembers) {
-        /* In non ANSI mode, allow initialization of flexible array
-        ** members.
-        */
-        ElementCount = Count;
+    } else if (ElementCount == FLEXIBLE) {
+        if (AllowFlexibleMembers) {
+            /* In non ANSI mode, allow initialization of flexible array
+            ** members.
+            */
+            ElementCount = Count;
+        } else {
+            /* Forbid */
+            Error ("Initializing flexible array member is forbidden");
+            ElementCount = Count;
+        }
     } else if (Count < ElementCount) {
         g_zerobytes ((ElementCount - Count) * ElementSize);
     } else if (Count > ElementCount && HasCurly) {

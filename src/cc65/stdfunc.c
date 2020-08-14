@@ -783,8 +783,8 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     int      Offs;
 
     /* Setup the argument type string */
-    Arg1Type[1].C = GetDefaultChar () | T_QUAL_CONST;
-    Arg2Type[1].C = GetDefaultChar () | T_QUAL_CONST;
+    Arg1Type[1].C = T_CHAR | T_QUAL_CONST;
+    Arg2Type[1].C = T_CHAR | T_QUAL_CONST;
 
     /* Argument #1 */
     ParseArg (&Arg1, Arg1Type);
@@ -983,8 +983,8 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     unsigned L1;
 
     /* Setup the argument type string */
-    Arg1Type[1].C = GetDefaultChar ();
-    Arg2Type[1].C = GetDefaultChar () | T_QUAL_CONST;
+    Arg1Type[1].C = T_CHAR;
+    Arg2Type[1].C = T_CHAR | T_QUAL_CONST;
 
     /* Argument #1 */
     ParseArg (&Arg1, Arg1Type);
@@ -1181,7 +1181,7 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     unsigned    L;
 
     /* Setup the argument type string */
-    ArgType[1].C = GetDefaultChar () | T_QUAL_CONST;
+    ArgType[1].C = T_CHAR | T_QUAL_CONST;
 
     /* Evaluate the parameter */
     hie1 (&Arg);

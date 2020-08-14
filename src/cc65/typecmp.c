@@ -233,6 +233,12 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
 
         }
 
+        /* 'char' is neither 'signed char' nor 'unsigned char' */
+        if ((IsISOChar (lhs) && !IsISOChar (rhs)) ||
+            (!IsISOChar (lhs) && IsISOChar (rhs))) {
+            SetResult (Result, TC_COMPATIBLE);
+        }
+
         /* On indirection level zero, a qualifier or sign difference is
         ** accepted. The types are no longer equal, but compatible.
         */

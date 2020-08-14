@@ -1169,7 +1169,7 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers)
 
         case TOK_CHAR:
             NextToken ();
-            D->Type[0].C = GetDefaultChar();
+            D->Type[0].C = T_CHAR;
             D->Type[1].C = T_END;
             break;
 
@@ -2195,7 +2195,7 @@ static unsigned ParseArrayInit (Type* T, int* Braces, int AllowFlexibleMembers)
     long ElementCount    = GetElementCount (T);
 
     /* Special handling for a character array initialized by a literal */
-    if (IsRawTypeChar (ElementType) &&
+    if (IsClassChar (ElementType) &&
         (CurTok.Tok == TOK_SCONST || CurTok.Tok == TOK_WCSCONST ||
         (CurTok.Tok == TOK_LCURLY &&
          (NextTok.Tok == TOK_SCONST || NextTok.Tok == TOK_WCSCONST)))) {

@@ -59,6 +59,7 @@
 
 
 /* Predefined type strings */
+Type type_char[]        = { TYPE(T_CHAR),   TYPE(T_END) };
 Type type_schar[]       = { TYPE(T_SCHAR),  TYPE(T_END) };
 Type type_uchar[]       = { TYPE(T_UCHAR),  TYPE(T_END) };
 Type type_int[]         = { TYPE(T_INT),    TYPE(T_END) };
@@ -431,14 +432,6 @@ int SignExtendChar (int C)
 
 
 
-TypeCode GetDefaultChar (void)
-/* Return the default char type (signed/unsigned) depending on the settings */
-{
-    return IS_Get (&SignedChars)? T_SCHAR : T_UCHAR;
-}
-
-
-
 Type* GetCharArrayType (unsigned Len)
 /* Return the type for a char array of the given length */
 {
@@ -448,7 +441,7 @@ Type* GetCharArrayType (unsigned Len)
     /* Fill the type string */
     T[0].C   = T_ARRAY;
     T[0].A.L = Len;             /* Array length is in the L attribute */
-    T[1].C   = GetDefaultChar ();
+    T[1].C   = T_CHAR;
     T[2].C   = T_END;
 
     /* Return the new type */
@@ -685,8 +678,9 @@ int TypeHasAttr (const Type* T)
 const Type* GetUnderlyingType (const Type* Type)
 /* Get the underlying type of an enum or other integer class type */
 {
-    if (IsTypeEnum (Type)) {
-
+    if (IsISOChar (Type)) {
+        return IS_Get (&SignedChars) ? type_schar : type_uchar;
+    } else if (IsTypeEnum (Type)) {
         /* This should not happen, but just in case */
         if (Type->A.P == 0) {
             Internal ("Enum tag type error in GetUnderlyingTypeCode");
@@ -708,8 +702,11 @@ TypeCode GetUnderlyingTypeCode (const Type* Type)
     TypeCode Underlying = UnqualifiedType (Type->C);
     TypeCode TCode;
 
-    /* We could also support other T_CLASS_INT types, but just enums for now */
-    if (IsTypeEnum (Type)) {
+    if (IsISOChar (Type)) {
+
+        return IS_Get (&SignedChars) ? T_SCHAR : T_UCHAR;
+
+    } else if (IsTypeEnum (Type)) {
 
         /* This should not happen, but just in case */
         if (Type->A.P == 0) {
@@ -996,7 +993,7 @@ int IsClassArithmetic (const Type* T)
 int IsClassBasic (const Type* T)
 /* Return true if this is a char, integer or floating type */
 {
-    return IsRawTypeChar (T) || IsClassInt (T) || IsClassFloat (T);
+    return IsClassChar (T) || IsClassInt (T) || IsClassFloat (T);
 }
 
 

@@ -1327,26 +1327,52 @@ void g_reglong (unsigned Flags)
 
 
 
+static unsigned g_intpromotion (unsigned flags)
+/* Return new flags for integral promotions for types smaller than int. */
+{
+    /* https://port70.net/~nsz/c/c89/c89-draft.html#3.2.1.1
+    ** A char, a short int, or an int bit-field, or their signed or unsigned varieties, or an
+    ** object that has enumeration type, may be used in an expression wherever an int or
+    ** unsigned int may be used. If an int can represent all values of the original type, the value
+    ** is converted to an int; otherwise it is converted to an unsigned int.
+    ** These are called the integral promotions.
+    */
+
+    if ((flags & CF_TYPEMASK) == CF_CHAR) {
+        /* int can represent all unsigned chars, so unsigned char is promoted to int. */
+        flags &= ~CF_TYPEMASK;
+        flags &= ~CF_UNSIGNED;
+        flags |= CF_INT;
+        return flags;
+    } else if ((flags & CF_TYPEMASK) == CF_SHORT) {
+        /* int cannot represent all unsigned shorts, so unsigned short is promoted to
+        ** unsigned int.
+        */
+        flags &= ~CF_TYPEMASK;
+        flags |= CF_INT;
+        return flags;
+    } else {
+        /* Otherwise, the type is not smaller than int, so leave it alone. */
+        return flags;
+    }
+}
+
+
+
 unsigned g_typeadjust (unsigned lhs, unsigned rhs)
 /* Adjust the integer operands before doing a binary operation. lhs is a flags
 ** value, that corresponds to the value on TOS, rhs corresponds to the value
 ** in (e)ax. The return value is the the flags value for the resulting type.
 */
 {
-    unsigned ltype, rtype;
-    unsigned result;
-
     /* Get the type spec from the flags */
-    ltype = lhs & CF_TYPEMASK;
-    rtype = rhs & CF_TYPEMASK;
+    unsigned ltype = lhs & CF_TYPEMASK;
+    unsigned rtype = rhs & CF_TYPEMASK;
 
     /* Check if a conversion is needed */
     if (ltype == CF_LONG && rtype != CF_LONG && (rhs & CF_CONST) == 0) {
         /* We must promote the primary register to long */
         g_reglong (rhs);
-        /* Get the new rhs type */
-        rhs = (rhs & ~CF_TYPEMASK) | CF_LONG;
-        rtype = CF_LONG;
     } else if (ltype != CF_LONG && (lhs & CF_CONST) == 0 && rtype == CF_LONG) {
         /* We must promote the lhs to long */
         if (lhs & CF_PRIMARY) {
@@ -1354,25 +1380,64 @@ unsigned g_typeadjust (unsigned lhs, unsigned rhs)
         } else {
             g_toslong (lhs);
         }
-        /* Get the new rhs type */
-        lhs = (lhs & ~CF_TYPEMASK) | CF_LONG;
-        ltype = CF_LONG;
     }
 
-    /* Determine the result type for the operation:
-    **  - The result is const if both operands are const.
-    **  - The result is unsigned if one of the operands is unsigned.
-    **  - The result is long if one of the operands is long.
-    **  - Otherwise the result is int sized.
+    /* Result is const if both operands are const. */
+    unsigned const_flag = (lhs & CF_CONST) & (rhs & CF_CONST);
+
+    /* https://port70.net/~nsz/c/c89/c89-draft.html#3.2.1.5
+    ** Many binary operators that expect operands of arithmetic type cause conversions and yield
+    ** result types in a similar way. The purpose is to yield a common type, which is also the type
+    ** of the result. This pattern is called the usual arithmetic conversions.
     */
-    result = (lhs & CF_CONST) & (rhs & CF_CONST);
-    result |= (lhs & CF_UNSIGNED) | (rhs & CF_UNSIGNED);
-    if (rtype == CF_LONG || ltype == CF_LONG) {
-        result |= CF_LONG;
-    } else {
-        result |= CF_INT;
+
+    /* Note that this logic is largely duplicated by ArithmeticConvert. */
+
+    /* Apply integral promotions for types char/short. */
+    lhs = g_intpromotion (lhs);
+    rhs = g_intpromotion (rhs);
+    ltype = lhs & CF_TYPEMASK;
+    rtype = rhs & CF_TYPEMASK;
+
+    /* If either operand has type unsigned long int, the other operand is converted to
+    ** unsigned long int.
+    */
+    if ((ltype == CF_LONG && (lhs & CF_UNSIGNED)) ||
+        (rtype == CF_LONG && (rhs & CF_UNSIGNED))) {
+        return const_flag | CF_UNSIGNED | CF_LONG;
     }
-    return result;
+
+    /* Otherwise, if one operand has type long int and the other has type unsigned int,
+    ** if a long int can represent all values of an unsigned int, the operand of type unsigned int
+    ** is converted to long int ; if a long int cannot represent all the values of an unsigned int,
+    ** both operands are converted to unsigned long int.
+    */
+    if ((ltype == CF_LONG && rtype == CF_INT && (rhs & CF_UNSIGNED)) ||
+        (rtype == CF_LONG && ltype == CF_INT && (rhs & CF_UNSIGNED))) {
+        /* long can represent all unsigneds, so we are in the first sub-case. */
+        return const_flag | CF_LONG;
+    }
+
+    /* Otherwise, if either operand has type long int, the other operand is converted to long int.
+    */
+    if (ltype == CF_LONG || rtype == CF_LONG) {
+        return const_flag | CF_LONG;
+    }
+
+    /* Otherwise, if either operand has type unsigned int, the other operand is converted to
+    ** unsigned int.
+    */
+    if ((ltype == CF_INT && (lhs & CF_UNSIGNED)) ||
+        (rtype == CF_INT && (rhs & CF_UNSIGNED))) {
+        return const_flag | CF_UNSIGNED | CF_INT;
+    }
+
+    /* Otherwise, both operands have type int. */
+    CHECK (ltype == CF_INT);
+    CHECK (!(lhs & CF_UNSIGNED));
+    CHECK (rtype == CF_INT);
+    CHECK (!(rhs & CF_UNSIGNED));
+    return const_flag | CF_INT;
 }
 
 

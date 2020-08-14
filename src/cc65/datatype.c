@@ -1214,12 +1214,26 @@ Type* IntPromotion (Type* T)
     /* We must have an int to apply int promotions */
     PRECONDITION (IsClassInt (T));
 
-    /* An integer can represent all values from either signed or unsigned char,
-    ** so convert chars to int and leave all other types alone.
+    /* https://port70.net/~nsz/c/c89/c89-draft.html#3.2.1.1
+    ** A char, a short int, or an int bit-field, or their signed or unsigned varieties, or an
+    ** object that has enumeration type, may be used in an expression wherever an int or
+    ** unsigned int may be used. If an int can represent all values of the original type, the value
+    ** is converted to an int; otherwise it is converted to an unsigned int.
+    ** These are called the integral promotions.
     */
+
     if (IsTypeChar (T)) {
+        /* An integer can represent all values from either signed or unsigned char, so convert
+        ** chars to int.
+        */
         return type_int;
+    } else if (IsTypeShort (T)) {
+        /* An integer cannot represent all values from unsigned short, so convert unsigned short
+        ** to unsigned int.
+        */
+        return IsSignUnsigned (T) ? type_uint : type_int;
     } else {
+        /* Otherwise, the type is not smaller than int, so leave it alone. */
         return T;
     }
 }

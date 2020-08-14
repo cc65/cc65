@@ -374,6 +374,16 @@ INLINE int IsTypeChar (const Type* T)
 #endif
 
 #if defined(HAVE_INLINE)
+INLINE int IsTypeShort (const Type* T)
+/* Return true if this is a short type (signed or unsigned) */
+{
+    return (GetRawType (GetUnderlyingType (T)) == T_TYPE_SHORT);
+}
+#else
+#  define IsTypeShort(T)         (GetRawType (GetUnderlyingType (T)) == T_TYPE_SHORT)
+#endif
+
+#if defined(HAVE_INLINE)
 INLINE int IsTypeInt (const Type* T)
 /* Return true if this is an int type (signed or unsigned) */
 {

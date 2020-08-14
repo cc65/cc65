@@ -911,8 +911,15 @@ static SymEntry* ParseUnionDecl (const char* Name)
                 }
             }
 
+            /* Check for incomplete type */
+            if (IsIncompleteESUType (Decl.Type)) {
+                Error ("Field '%s' has incomplete type '%s'",
+                       Decl.Ident,
+                       GetFullTypeName (Decl.Type));
+            }
+
             /* Handle sizes */
-            FieldSize = CheckedSizeOf (Decl.Type);
+            FieldSize = SizeOf (Decl.Type);
             if (FieldSize > UnionSize) {
                 UnionSize = FieldSize;
             }
@@ -1095,6 +1102,13 @@ static SymEntry* ParseStructDecl (const char* Name)
                 }
             }
 
+            /* Check for incomplete type */
+            if (IsIncompleteESUType (Decl.Type)) {
+                Error ("Field '%s' has incomplete type '%s'",
+                       Decl.Ident,
+                       GetFullTypeName (Decl.Type));
+            }
+
             /* Add a field entry to the table */
             if (FieldWidth > 0) {
                 /* Full bytes have already been added to the StructSize,
@@ -1119,7 +1133,7 @@ static SymEntry* ParseStructDecl (const char* Name)
                     AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, StructSize);
                 }
                 if (!FlexibleMember) {
-                    StructSize += CheckedSizeOf (Decl.Type);
+                    StructSize += SizeOf (Decl.Type);
                 }
             }
 

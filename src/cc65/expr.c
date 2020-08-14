@@ -1301,6 +1301,9 @@ static void StructRef (ExprDesc* Expr)
         LoadExpr (CF_NONE, Expr);
     }
 
+    /* Clear the tested flag set during loading */
+    ED_MarkAsUntested (Expr);
+
     /* The type is the field type plus any qualifiers from the struct/union */
     if (IsClassStruct (Expr->Type)) {
         Q = GetQualifier (Expr->Type);

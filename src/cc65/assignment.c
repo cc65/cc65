@@ -77,7 +77,7 @@ static int CopyStruct (ExprDesc* LExpr, ExprDesc* RExpr)
     /* Get the expression on the right of the '=' */
     hie1 (RExpr);
 
-    /* Check for equality of the structs */
+    /* Check for equality of the structs/unions */
     if (TypeCmp (ltype, RExpr->Type) < TC_STRICT_COMPATIBLE) {
         TypeCompatibilityDiagnostic (ltype, RExpr->Type, 1,
             "Incompatible types in assignment to '%s' from '%s'");
@@ -114,6 +114,12 @@ static int CopyStruct (ExprDesc* LExpr, ExprDesc* RExpr)
 
         /* Restore the indirection level of lhs */
         ED_IndExpr (LExpr);
+
+        /* Clear the tested flag set during loading. This is not neccessary
+        ** currently (and probably ever) as a struct/union cannot be converted
+        ** to a boolean in C, but there is no harm to be future-proof.
+        */
+        ED_MarkAsUntested (LExpr);
     }
 
     return 1;

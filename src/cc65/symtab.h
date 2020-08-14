@@ -149,10 +149,10 @@ unsigned short FindSPAdjustment (const char* Name);
 
 
 
-SymEntry* AddEnumSym (const char* Name, unsigned Flags, const Type* Type, SymTable* Tab);
+SymEntry* AddEnumSym (const char* Name, unsigned Flags, const Type* Type, SymTable* Tab, unsigned* DSFlags);
 /* Add an enum entry and return it */
 
-SymEntry* AddStructSym (const char* Name, unsigned Flags, unsigned Size, SymTable* Tab);
+SymEntry* AddStructSym (const char* Name, unsigned Flags, unsigned Size, SymTable* Tab, unsigned* DSFlags);
 /* Add a struct/union entry and return it */
 
 SymEntry* AddBitField (const char* Name, const Type* Type, unsigned Offs,

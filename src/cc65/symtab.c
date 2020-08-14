@@ -686,7 +686,7 @@ static void AddSymEntry (SymTable* T, SymEntry* S)
 
 
 
-SymEntry* AddEnumSym (const char* Name, unsigned Flags, const Type* Type, SymTable* Tab)
+SymEntry* AddEnumSym (const char* Name, unsigned Flags, const Type* Type, SymTable* Tab, unsigned* DSFlags)
 /* Add an enum entry and return it */
 {
     SymTable* CurTagTab = TagTab;
@@ -719,6 +719,11 @@ SymEntry* AddEnumSym (const char* Name, unsigned Flags, const Type* Type, SymTab
                 Entry->V.E.Type   = Type;
                 Entry->Flags     &= ~SC_DECL;
                 Entry->Flags     |= SC_DEF;
+
+                /* Remember this is the first definition of this type */
+                if (DSFlags != 0) {
+                    *DSFlags |= DS_NEW_TYPE_DEF;
+                }
             }
         }
 
@@ -741,6 +746,14 @@ SymEntry* AddEnumSym (const char* Name, unsigned Flags, const Type* Type, SymTab
             Entry->Flags |= SC_DEF;
         }
 
+        /* Remember this is the first definition of this type */
+        if (CurTagTab != FailSafeTab && DSFlags != 0) {
+            if ((Entry->Flags & SC_DEF) != 0) {
+                *DSFlags |= DS_NEW_TYPE_DEF;
+            }
+            *DSFlags |= DS_NEW_TYPE_DECL;
+        }
+
         /* Add it to the current table */
         AddSymEntry (CurTagTab, Entry);
     }
@@ -751,7 +764,7 @@ SymEntry* AddEnumSym (const char* Name, unsigned Flags, const Type* Type, SymTab
 
 
 
-SymEntry* AddStructSym (const char* Name, unsigned Flags, unsigned Size, SymTable* Tab)
+SymEntry* AddStructSym (const char* Name, unsigned Flags, unsigned Size, SymTable* Tab, unsigned* DSFlags)
 /* Add a struct/union entry and return it */
 {
     SymTable* CurTagTab = TagTab;
@@ -791,6 +804,11 @@ SymEntry* AddStructSym (const char* Name, unsigned Flags, unsigned Size, SymTabl
                 Entry->Flags      = Flags;
                 Entry->V.S.SymTab = Tab;
                 Entry->V.S.Size   = Size;
+
+                /* Remember this is the first definition of this type */
+                if (DSFlags != 0) {
+                    *DSFlags |= DS_NEW_TYPE_DEF;
+                }
             }
         }
 
@@ -808,6 +826,14 @@ SymEntry* AddStructSym (const char* Name, unsigned Flags, unsigned Size, SymTabl
         /* Set the struct data */
         Entry->V.S.SymTab = Tab;
         Entry->V.S.Size   = Size;
+
+        /* Remember this is the first definition of this type */
+        if (CurTagTab != FailSafeTab && DSFlags != 0) {
+            if ((Entry->Flags & SC_DEF) != 0) {
+                *DSFlags |= DS_NEW_TYPE_DEF;
+            }
+            *DSFlags |= DS_NEW_TYPE_DECL;
+        }
 
         /* Add it to the current tag table */
         AddSymEntry (CurTagTab, Entry);

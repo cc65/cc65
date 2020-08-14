@@ -370,4 +370,7 @@ void TypeCast (ExprDesc* Expr)
         Error ("Arithmetic or pointer type expected but %s is used",
                GetBasicTypeName (NewType));
     }
+
+    /* The result is always an rvalue */
+    ED_MarkExprAsRVal (Expr);
 }

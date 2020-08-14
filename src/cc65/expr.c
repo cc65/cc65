@@ -2303,16 +2303,21 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             LoadExpr (CF_NONE, &Expr2);
         }
 
+        /* Check if operands have allowed types for this operation */
+        if (!IsRelationType (Expr->Type) || !IsRelationType (Expr2.Type)) {
+            /* Output only one message even if both sides are wrong */
+            TypeCompatibilityDiagnostic (Expr->Type, Expr2.Type, 1,
+                "Comparing types '%s' with '%s' is invalid");
+            /* Avoid further errors */
+            ED_MakeConstAbsInt (Expr, 0);
+            ED_MakeConstAbsInt (&Expr2, 0);
+        }
+
         /* Some operations aren't allowed on function pointers */
         if ((Gen->Flags & GEN_NOFUNC) != 0) {
-            /* Output only one message even if both sides are wrong */
-            if (IsTypeFuncPtr (Expr->Type)) {
-                Error ("Invalid left operand for relational operator");
-                /* Avoid further errors */
-                ED_MakeConstAbsInt (Expr, 0);
-                ED_MakeConstAbsInt (&Expr2, 0);
-            } else if (IsTypeFuncPtr (Expr2.Type)) {
-                Error ("Invalid right operand for relational operator");
+            if ((IsTypeFuncPtr (Expr->Type) || IsTypeFuncPtr (Expr2.Type))) {
+                /* Output only one message even if both sides are wrong */
+                Error ("Cannot use function pointers in this relation operation");
                 /* Avoid further errors */
                 ED_MakeConstAbsInt (Expr, 0);
                 ED_MakeConstAbsInt (&Expr2, 0);
@@ -2321,9 +2326,14 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
         /* Make sure, the types are compatible */
         if (IsClassInt (Expr->Type)) {
-            if (!IsClassInt (Expr2.Type) && !(IsClassPtr(Expr2.Type) && ED_IsNullPtr(Expr))) {
-                TypeCompatibilityDiagnostic (Expr->Type, Expr2.Type, 1,
-                    "Incompatible types comparing '%s' with '%s'");
+            if (!IsClassInt (Expr2.Type) && !ED_IsNullPtr (Expr)) {
+                if (IsClassPtr (Expr2.Type)) {
+                    TypeCompatibilityDiagnostic (Expr->Type, PtrConversion (Expr2.Type), 0,
+                        "Comparing integer '%s' with pointer '%s'");
+                } else {
+                    TypeCompatibilityDiagnostic (Expr->Type, Expr2.Type, 1,
+                        "Comparing types '%s' with '%s' is invalid");
+                }
             }
         } else if (IsClassPtr (Expr->Type)) {
             if (IsClassPtr (Expr2.Type)) {
@@ -2334,12 +2344,17 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                 Type* right = Indirect (Expr2.Type);
                 if (TypeCmp (left, right) < TC_QUAL_DIFF && left->C != T_VOID && right->C != T_VOID) {
                     /* Incompatible pointers */
-                    TypeCompatibilityDiagnostic (Expr->Type, Expr2.Type, 1,
+                    TypeCompatibilityDiagnostic (PtrConversion (Expr->Type), PtrConversion (Expr2.Type), 0,
                         "Incompatible pointer types comparing '%s' with '%s'");
                 }
             } else if (!ED_IsNullPtr (&Expr2)) {
-                TypeCompatibilityDiagnostic (Expr->Type, Expr2.Type, 1,
-                    "Comparing pointer type '%s' with '%s'");
+                if (IsClassInt (Expr2.Type)) {
+                    TypeCompatibilityDiagnostic (PtrConversion (Expr->Type), Expr2.Type, 0,
+                        "Comparing pointer type '%s' with integer type '%s'");
+                } else {
+                    TypeCompatibilityDiagnostic (Expr->Type, Expr2.Type, 1,
+                        "Comparing types '%s' with '%s' is invalid");
+                }
             }
         }
 

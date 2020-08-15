@@ -1032,6 +1032,7 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
 /* Add a local symbol and return the symbol entry */
 {
     SymTable* Tab = SymTab;
+    ident Ident;
 
     /* Do we have an entry with this name already? */
     SymEntry* Entry = FindSymInTable (Tab, Name, HashStr (Name));
@@ -1065,8 +1066,13 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
         }
 
         if (Entry == 0) {
-            /* Use the fail-safe table for fictitious symbols */
-            Tab = FailSafeTab;
+            if ((Flags & SC_PARAM) != 0) {
+                /* Use anonymous names */
+                Name = AnonName (Ident, "param");
+            } else {
+                /* Use the fail-safe table for fictitious symbols */
+                Tab = FailSafeTab;
+            }
         }
     }
     

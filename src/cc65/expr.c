@@ -330,32 +330,30 @@ static void WarnConstCompareResult (void)
 
 
 static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall)
-/* Parse a function parameter list, and pass the parameters to the called
+/* Parse a function parameter list, and pass the arguments to the called
 ** function. Depending on several criteria, this may be done by just pushing
-** each parameter separately, or creating the parameter frame once, and then
-** storing into this frame.
-** The function returns the size of the parameters pushed.
+** into each parameter separately, or creating the parameter frame once, and
+** then storing into this frame.
+** The function returns the size of the arguments pushed in bytes.
 */
 {
-    ExprDesc Expr;
-
     /* Initialize variables */
     SymEntry* Param       = 0;  /* Keep gcc silent */
-    unsigned  ParamSize   = 0;  /* Size of parameters pushed */
-    unsigned  ParamCount  = 0;  /* Number of parameters pushed */
+    unsigned  PushedSize  = 0;  /* Size of arguments pushed */
+    unsigned  PushedCount = 0;  /* Number of arguments pushed */
     unsigned  FrameSize   = 0;  /* Size of parameter frame */
-    unsigned  FrameParams = 0;  /* Number of params in frame */
+    unsigned  FrameParams = 0;  /* Number of parameters in frame */
     int       FrameOffs   = 0;  /* Offset into parameter frame */
     int       Ellipsis    = 0;  /* Function is variadic */
 
     /* As an optimization, we may allocate the complete parameter frame at
-    ** once instead of pushing each parameter as it comes. We may do that,
+    ** once instead of pushing into each parameter as it comes. We may do that,
     ** if...
     **
     **  - optimizations that increase code size are enabled (allocating the
     **    stack frame at once gives usually larger code).
-    **  - we have more than one parameter to push (don't count the last param
-    **    for __fastcall__ functions).
+    **  - we have more than one parameter to push into (don't count the last
+    **    parameter for __fastcall__ functions).
     **
     ** The FrameSize variable will contain a value > 0 if storing into a frame
     ** (instead of pushing) is enabled.
@@ -367,7 +365,7 @@ static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall)
         FrameParams = Func->ParamCount;
         FrameSize   = Func->ParamSize;
         if (FrameParams > 0 && IsFastcall) {
-            /* Last parameter is not pushed */
+            /* Last parameter is not pushed into */
             FrameSize -= CheckedSizeOf (Func->LastParam->Type);
             --FrameParams;
         }
@@ -384,25 +382,26 @@ static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall)
         }
     }
 
-    /* Parse the actual parameter list */
+    /* Parse the actual argument list */
     while (CurTok.Tok != TOK_RPAREN) {
 
         unsigned Flags;
+        ExprDesc Expr;
 
         /* Count arguments */
-        ++ParamCount;
+        ++PushedCount;
 
         /* Fetch the pointer to the next argument, check for too many args */
-        if (ParamCount <= Func->ParamCount) {
+        if (PushedCount <= Func->ParamCount) {
             /* Beware: If there are parameters with identical names, they
             ** cannot go into the same symbol table, which means that, in this
             ** case of errorneous input, the number of nodes in the symbol
-            ** table and ParamCount are NOT equal. We have to handle this case
+            ** table and PushedCount are NOT equal. We have to handle this case
             ** below to avoid segmentation violations. Since we know that this
             ** problem can only occur if there is more than one parameter,
             ** we will just use the last one.
             */
-            if (ParamCount == 1) {
+            if (PushedCount == 1) {
                 /* First argument */
                 Param = Func->SymTab->SymHead;
             } else if (Param->NextSym != 0) {
@@ -422,11 +421,11 @@ static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall)
             Ellipsis = 1;
         }
 
-        /* Evaluate the parameter expression */
+        /* Evaluate the argument expression */
         hie1 (&Expr);
 
-        /* If we don't have an argument spec., accept anything; otherwise,
-        ** convert the actual argument to the type needed.
+        /* If we don't have a prototype, accept anything; otherwise, convert
+        ** the actual argument to the parameter type needed.
         */
         Flags = CF_NONE;
         if (!Ellipsis) {
@@ -483,7 +482,7 @@ static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall)
             }
 
             /* Calculate total parameter size */
-            ParamSize += ArgSize;
+            PushedSize += ArgSize;
         }
 
         /* Check for end of argument list */
@@ -499,20 +498,20 @@ static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall)
         }
     }
 
-    /* Check if we had enough parameters */
-    if (ParamCount < Func->ParamCount) {
+    /* Check if we had enough arguments */
+    if (PushedCount < Func->ParamCount) {
         Error ("Too few arguments in function call");
     }
 
-    /* The function returns the size of all parameters pushed onto the stack.
-    ** However, if there are parameters missing (which is an error, and was
+    /* The function returns the size of all arguments pushed onto the stack.
+    ** However, if there are parameters missed (which is an error, and was
     ** flagged by the compiler), AND a stack frame was preallocated above,
     ** we would loose track of the stackpointer, and generate an internal error
     ** later. So we correct the value by the parameters that should have been
-    ** pushed, to avoid an internal compiler error. Since an error was
+    ** pushed into, to avoid an internal compiler error. Since an error was
     ** generated before, no code will be output anyway.
     */
-    return ParamSize + FrameSize;
+    return PushedSize + FrameSize;
 }
 
 

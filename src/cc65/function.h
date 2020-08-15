@@ -67,6 +67,9 @@ struct Function {
 /* Structure that holds all data needed for function activation */
 typedef struct Function Function;
 
+/* Forward declaration */
+struct FuncDesc;
+
 /* Function activation data for current function (or NULL) */
 extern Function* CurrentFunc;
 
@@ -138,7 +141,7 @@ int F_AllocRegVar (Function* F, const Type* Type);
 ** bank (zero page storage). If there is no register space left, return -1.
 */
 
-void NewFunc (struct SymEntry* Func);
+void NewFunc (struct SymEntry* Func, struct FuncDesc* D);
 /* Parse argument declarations and function body. */
 
 

@@ -392,7 +392,7 @@ fncls_t GetFuncInfo (const char* Name, unsigned short* Use, unsigned short* Chg)
 
         /* Did we find it in the top-level table? */
         if (E && IsTypeFunc (E->Type)) {
-            FuncDesc* D = GetFuncCompositeDesc (E);
+            FuncDesc* D = GetFuncDesc (E->Type);
 
             /* A variadic function will use the Y register (the parameter list
             ** size is passed there). A fastcall function will use the A or A/X

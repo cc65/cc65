@@ -527,7 +527,7 @@ static void WrappedCallPragma (StrBuf* B)
 
         PushWrappedCall(Entry, (unsigned char) Val);
         Entry->Flags |= SC_REF;
-        GetFuncCompositeDesc (Entry)->Flags |= FD_CALL_WRAPPER;
+        GetFuncDesc (Entry->Type)->Flags |= FD_CALL_WRAPPER;
 
     } else {
 

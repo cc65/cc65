@@ -191,7 +191,6 @@ struct SymEntry {
 
         /* Data for functions */
         struct {
-            SymEntry*           Composite;/* Entry to hold composite function type */
             struct Segments*    Seg;      /* Segments for this function */
             struct LiteralPool* LitPool;  /* Literal pool for this function */
         } F;

@@ -590,14 +590,14 @@ static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags
                 Entry = 0;
             } else {
                 /* New type must be compatible with the composite prototype */
-                if (TypeCmp (GetFuncCompositeType (Entry), T) < TC_EQUAL) {
+                if (TypeCmp (Entry->Type, T) < TC_EQUAL) {
                     Error ("Conflicting function types for '%s'", Entry->Name);
                     Entry = 0;
                 } else {
                     /* Refine the existing composite prototype with this new
                     ** one.
                     */
-                    RefineFuncDesc (GetFuncCompositeType (Entry), T);
+                    RefineFuncDesc (Entry->Type, T);
                 }
             }
 
@@ -1165,14 +1165,6 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
             }
 
             if (Entry) {
-                /* Update existing function type if this is a definition */
-                if (IsTypeFunc (Entry->Type)    &&
-                    !SymIsDef (Entry)           &&
-                    (Flags & SC_DEF) == SC_DEF) {
-                    TypeFree (Entry->Type);
-                    Entry->Type = TypeDup (T);
-                }
-
                 /* Add the new flags */
                 Entry->Flags |= Flags;
             }
@@ -1192,17 +1184,8 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
         /* Set the symbol attributes */
         Entry->Type = TypeDup (T);
 
-        /* If this is a function, set the function composite typeand clear
-        ** additional fields.
-        */
+        /* If this is a function, clear additional fields */
         if (IsTypeFunc (T)) {
-            /* GitHub #1167 - Make a composite prototype */
-            ident Ident;
-            AnonName (Ident, "prototype");
-            Entry->V.F.Composite = NewSymEntry (Ident, SC_EXTERN | SC_DECL | SC_ALIAS | SC_FUNC);
-            Entry->V.F.Composite->Type = TypeDup (T);
-            AddSymEntry (SymTab0, Entry->V.F.Composite);
-
             Entry->V.F.Seg = 0;
         }
 

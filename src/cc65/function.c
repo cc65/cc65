@@ -72,7 +72,7 @@ Function* CurrentFunc = 0;
 
 
 
-static Function* NewFunction (struct SymEntry* Sym)
+static Function* NewFunction (struct SymEntry* Sym, FuncDesc* D)
 /* Create a new function activation structure and return it */
 {
     /* Allocate a new structure */
@@ -81,7 +81,7 @@ static Function* NewFunction (struct SymEntry* Sym)
     /* Initialize the fields */
     F->FuncEntry  = Sym;
     F->ReturnType = GetFuncReturn (Sym->Type);
-    F->Desc       = GetFuncDesc (Sym->Type);
+    F->Desc       = D;
     F->Reserved   = 0;
     F->RetLab     = GetLocalLabel ();
     F->TopLevelSP = 0;
@@ -295,7 +295,7 @@ static void F_RestoreRegVars (Function* F)
     }
 
     /* Get the first symbol from the function symbol table */
-    Sym = GetFuncDesc (F->FuncEntry->Type)->SymTab->SymHead;
+    Sym = F->Desc->SymTab->SymHead;
 
     /* Walk through all symbols checking for register variables */
     while (Sym) {
@@ -375,18 +375,15 @@ static void F_EmitDebugInfo (void)
 
 
 
-void NewFunc (SymEntry* Func)
+void NewFunc (SymEntry* Func, FuncDesc* D)
 /* Parse argument declarations and function body. */
 {
     int         C99MainFunc = 0;/* Flag for C99 main function returning int */
     SymEntry*   Param;
     const Type* RType;          /* Real type used for struct parameters */
 
-    /* Get the function descriptor from the function entry */
-    FuncDesc* D = GetFuncDesc (Func->Type);
-
     /* Allocate the function activation record for the function */
-    CurrentFunc = NewFunction (Func);
+    CurrentFunc = NewFunction (Func, D);
 
     /* Reenter the lexical level */
     ReenterFunctionLevel (D);

@@ -1140,28 +1140,6 @@ Type* GetFuncReturn (Type* T)
 
 
 
-Type* GetFuncCompositeType (SymEntry* Func)
-/* Get the composite function type */
-{
-    /* Be sure it's a function type */
-    CHECK (IsClassFunc (Func->Type));
-
-    return Func->V.F.Composite->Type;
-}
-
-
-
-FuncDesc* GetFuncCompositeDesc (SymEntry* Func)
-/* Get the composite function type descriptor */
-{
-    /* Be sure it's a function type */
-    CHECK (IsClassFunc (Func->Type));
-
-    return GetFuncDesc (Func->V.F.Composite->Type);
-}
-
-
-
 long GetElementCount (const Type* T)
 /* Get the element count of the array specified in T (which must be of
 ** array type).

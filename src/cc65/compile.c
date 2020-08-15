@@ -77,6 +77,7 @@ static void Parse (void)
 {
     int comma;
     SymEntry* Entry;
+    FuncDesc* FuncDef = 0;
 
     /* Go... */
     NextToken ();
@@ -187,9 +188,9 @@ static void Parse (void)
                     /* Convert an empty parameter list into one accepting no
                     ** parameters (same as void) as required by the standard.
                     */
-                    FuncDesc* D = GetFuncDesc (Decl.Type);
-                    if (D->Flags & FD_EMPTY) {
-                        D->Flags = (D->Flags & ~FD_EMPTY) | FD_VOID_PARAM;
+                    FuncDef = GetFuncDesc (Decl.Type);
+                    if (FuncDef->Flags & FD_EMPTY) {
+                        FuncDef->Flags = (FuncDef->Flags & ~FD_EMPTY) | FD_VOID_PARAM;
                     }
                 } else {
                     /* Just a declaration */
@@ -315,7 +316,7 @@ SkipOneDecl:
                     NextToken ();
                 } else {
                     /* Parse the function body */
-                    NewFunc (Entry);
+                    NewFunc (Entry, FuncDef);
                 }
             }
 

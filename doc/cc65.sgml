@@ -792,6 +792,21 @@ This cc65 version has some extensions to the ISO C standard.
         size zero, even if it is initialized.
         <p>
 
+<item>  cc65 supports <tt/_Static_assert/ from C11 and C2X.  This is similar
+        to <tt/#error/ but happens at a later stage of translation, so types
+        can be used.
+
+        <tscreen><verb>
+        /* C11 version with message. */
+        _Static_assert (sizeof (int) == 2, "Expected 2-bytes ints.");
+
+        /* C2X version without message. */
+        _Static_assert (sizeof (int) == 2);
+        </verb></tscreen>
+
+        <tt/_Static_assert/ is also available as the macro <tt/static_assert/ in
+        <tt/assert.h/.
+
 <item>  Computed gotos, a GCC extension, has limited support. With it you can
         use fast jump tables from C. You can take the address of a label with
         a double ampersand, putting them in a static const array of type void *.

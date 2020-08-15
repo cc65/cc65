@@ -27,6 +27,7 @@
 #include <assert.h>
 
 _Static_assert (1, "1 should be true.");
+_Static_assert (1);  /* Support C2x syntax with no message. */
 _Static_assert (!0, "!0 should be true.");
 _Static_assert (1 == 1, "1 == 1 should be true.");
 _Static_assert (1 == 1L, "1 == 1L should be true.");
@@ -46,6 +47,7 @@ _Static_assert (k == 1, "k should be 1.");
 
 /* Just test the macro version once. */
 static_assert (1, "1 should be true.");
+static_assert (1);
 
 /* _Static_assert can appear anywhere a declaration can. */
 void f (void)

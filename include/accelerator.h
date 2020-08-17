@@ -202,20 +202,20 @@ unsigned char __fastcall__ set_chameleon_speed (unsigned char speed);
 
 unsigned char get_chameleon_speed (void);
 
-;/* Get the speed of the C64 Chameleon cartridge.
-; *
-; * Possible return values:
-; * SPEED_SLOW  : Slow mode
-; * SPEED_2X    : 2Mhz mode
-; * SPEED_3X    : 3Mhz mode
-; * SPEED_4X    : 4Mhz mode
-; * SPEED_5X    : 5Mhz mode
-; * SPEED_6X    : 6Mhz mode
-; * SPEED_FAST  : Maximum speed mode
-; *
-; * This function does not check for the presence of the C64 Chameleon cartridge,
-; * make sure you use 'detect_chameleon();' before using.
-; */
+/* Get the speed of the C64 Chameleon cartridge.
+ *
+ * Possible return values:
+ * SPEED_SLOW  : Slow mode
+ * SPEED_2X    : 2Mhz mode
+ * SPEED_3X    : 3Mhz mode
+ * SPEED_4X    : 4Mhz mode
+ * SPEED_5X    : 5Mhz mode
+ * SPEED_6X    : 6Mhz mode
+ * SPEED_FAST  : Maximum speed mode
+ *
+ * This function does not check for the presence of the C64 Chameleon cartridge,
+ * make sure you use 'detect_chameleon();' before using.
+ */
 
 unsigned char detect_chameleon (void);
 
@@ -302,6 +302,67 @@ unsigned char detect_turbomaster (void);
  * Possible return values:
  * 0x00  : C64 Turbo Master cartridge not present
  * 0x01  : C64 Turbo Master cartridge present
+ */
+
+
+/* Apple IIe Fast Chip slot card */
+
+unsigned char __fastcall__ set_fastchip_speed (unsigned char speed);
+
+/* Set the speed of the Apple IIe Fast Chip slot card, the following inputs
+ * are accepted: 
+ * SPEED_SLOW : 1 Mhz mode
+ * SPEED_1X   : 1 Mhz mode
+ * SPEED_2X   : 2 Mhz mode
+ * SPEED_3X   : 3.1 Mhz mode
+ * SPEED_4X   : 4.1 Mhz mode
+ * SPEED_5X   : 5 Mhz mode
+ * SPEED_6X   : 6.2 Mhz mode
+ * SPEED_7X   : 7.1 Mhz mode
+ * SPEED_8X   : 8.3 Mhz mode
+ * SPEED_10X  : 10 Mhz mode
+ * SPEED_12X  : 12.5 Mhz mode
+ * SPEED_16X  : 16.6 Mhz mode
+ *
+ * Note that any value higher or equal to SPEED_16X will switch to 16 Mhz mode.
+ * SPEED_13X, SPEED_14X and SPEED15X will switch to 12 Mhz mode.
+ * SPEED_11X will switch to 10 Mhz mode, and SPEED_9X will switch to 10 Mhz mode.
+ *
+ * This function will return the actual speed the CPU is at after trying
+ * to set the requested speed, to my knowledge the switching should not fail.
+ *
+ * This function does not check for the presence of the Apple IIe Fast Chip
+ * slot card, make sure you use 'detect_fastchip();' before using.
+ */
+
+unsigned char get_fastchip_speed (void);
+
+/* Get the speed of the Apple IIe Fast Chip slot card.
+ *
+ * Possible return values:
+ * SPEED_1X    : 1 Mhz mode
+ * SPEED_2X    : 2 Mhz mode
+ * SPEED_3X    : 3.1 Mhz mode
+ * SPEED_4X    : 4.1 Mhz mode
+ * SPEED_5X    : 5 Mhz mode
+ * SPEED_6X    : 6.2 Mhz mode
+ * SPEED_7X    : 7.1 Mhz mode
+ * SPEED_8X    : 8.3 Mhz mode
+ * SPEED_10X   : 10 Mhz mode
+ * SPEED_12X   : 12.5 Mhz mode
+ * SPEED 16X   : 16.6 Mhz mode
+ *
+ * This function does not check for the presence of the Apple IIe Fast Chip
+ * slot carde, make sure you use 'detect_fastchip();' before using.
+ */
+
+unsigned char detect_fastchip (void);
+
+/* Check for the presence of the Apple IIe Fast Chip slot card.
+ *
+ * Possible return values:
+ * 0x00  : Apple II Fast Chip slot card not present
+ * 0x01  : Apple II Fast Chip slot card present
  */
 
 /* End of accelerator.h */

@@ -2,7 +2,7 @@ CL ?= cl65
 
 all:	c64-scpu-test.prg c128-scpu-test.prg c64dtv-test.prg \
 	c64-c128-test.prg c128-test.prg chameleon-test.prg \
-	c65-test.prg turbomaster-test.prg
+	c65-test.prg turbomaster-test.prg fastchip-test.bin
 
 c64-scpu-test.prg: c64-c128-scpu-test.c
 	$(CL) -t c64 c64-c128-scpu-test.c -o c64-scpu-test.prg
@@ -27,3 +27,6 @@ c65-test.prg: c65-test.c
 
 turbomaster-test.prg: turbomaster-test.c
 	$(CL) -t c64 turbomaster-test.c -o turbomaster-test.prg
+
+fastchip-test.bin: fastchip-test.c
+	$(CL) -t apple2 fastchip-test.c -o fastchip-test.bin

@@ -9,7 +9,29 @@
 #include <stdio.h>
 #include <conio.h>
 #include <stdlib.h>
+#include <target.h>
+#include <peekpoke.h>
 
+#ifdef __APPLE2__
+static void print_time_taken(void)
+{
+    unsigned char vbl = 0;
+    unsigned long i;
+    unsigned long jiffies = 0;
+    char buffer[10];
+
+    for (i = 0; i < 0x1000; i++) {
+       if (PEEK(0xc019) >> 7 != vbl) {
+           vbl = !vbl;
+           if (vbl) {
+               ++jiffies;
+           }
+       }
+    }
+    ultoa(jiffies, buffer, 10);
+    printf("Time taken : %s\n", buffer);
+}
+#else
 static void print_time_taken(void)
 {
     clock_t curtime = clock();
@@ -23,6 +45,7 @@ static void print_time_taken(void)
     ultoa(newtime, buffer, 10);
     printf("Time taken : %s\n", buffer);
 }
+#endif
 
 static void print_current_speed(void)
 {
@@ -36,6 +59,15 @@ void main(void)
 {
     unsigned char status;
     unsigned char speed = 0;
+
+#ifdef __APPLE2__
+    unsigned char ostype = get_ostype();
+
+    if (ostype != APPLE_IIE && ostype != APPLE_IIEENH && ostype != APPLE_IIECARD) {
+        printf("This test can currently only be run on an Apple IIe\n");
+        exit(1);
+    }
+#endif
 
     status = ACC_DETECT();
     clrscr();

@@ -338,6 +338,18 @@ usage.
 </itemize>
 
 
+<sect1>Enhanced&nbsp;Apple&nbsp;//e specific accelerator functions<p>
+
+The functions listed below are accelerator functions for the enhanced&nbsp;Apple&nbsp;//e.
+See the <url url="funcref.html" name="function reference"> for declaration and usage.
+
+<itemize>
+<item>detect_fastchip
+<item>get_fastchip_speed
+<item>set_fastchip_speed
+</itemize>
+
+
 <sect1>Hardware access<p>
 
 There's currently no support for direct hardware access. This does not mean

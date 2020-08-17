@@ -33,6 +33,7 @@
 
 
 
+#include <limits.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
@@ -4419,6 +4420,63 @@ void g_initstatic (unsigned InitLabel, unsigned VarLabel, unsigned Size)
         AddCodeLine ("jsr pushax");
         g_getimmed (CF_INT | CF_UNSIGNED | CF_CONST, Size, 0);
         AddCodeLine ("jsr %s", GetLabelName (CF_EXTERNAL, (uintptr_t) "memcpy", 0));
+    }
+}
+
+
+
+/*****************************************************************************/
+/*                                Bit-fields                                 */
+/*****************************************************************************/
+
+
+
+void g_testbitfield (unsigned Flags, unsigned BitOffs, unsigned BitWidth)
+/* Test bit-field in ax. */
+{
+    unsigned EndBit = BitOffs + BitWidth;
+
+    /* If we need to do a test, then we avoid shifting (ASR only shifts one bit at a time,
+    ** so is slow) and just AND with the appropriate mask, then test the result of that.
+    */
+
+    /* Avoid overly large shift on host platform. */
+    if (EndBit == sizeof (unsigned long) * CHAR_BIT) {
+        g_and (Flags | CF_CONST, (~0UL << BitOffs));
+    } else {
+        g_and (Flags | CF_CONST, ((1UL << EndBit) - 1) & (~0UL << BitOffs));
+    }
+
+    /* TODO: When long bit-fields are supported, an optimization to test only 3 bytes when
+    ** EndBit <= 24 is possible.
+    */
+    g_test (Flags | CF_CONST);
+}
+
+
+
+void g_extractbitfield (unsigned Flags, unsigned FullWidthFlags,
+                        unsigned BitOffs, unsigned BitWidth)
+/* Extract bits from bit-field in ax. */
+{
+    unsigned EndBit = BitOffs + BitWidth;
+
+    /* Shift right by the bit offset; no code is emitted if BitOffs is zero */
+    g_asr (Flags | CF_CONST, BitOffs);
+
+    /* Since we have now shifted down, we could do char ops when the width fits in a char, but we
+    ** also need to clear the high byte since we've been using CF_FORCECHAR up to now.
+    */
+
+    /* And by the width if the field doesn't end on a char or int boundary.  If it does end on
+    ** a boundary, then zeros have already been shifted in, but we need to clear the high byte
+    ** for char.  g_and emits no code if the mask is all ones.
+    */
+    if (EndBit == CHAR_BITS) {
+        /* We need to clear the high byte, since CF_FORCECHAR was set. */
+        g_and (FullWidthFlags | CF_CONST, 0xFF);
+    } else if (EndBit != INT_BITS) {
+        g_and (FullWidthFlags | CF_CONST, (0x0001U << BitWidth) - 1U);
     }
 }
 

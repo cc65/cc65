@@ -380,7 +380,7 @@ void g_restore (unsigned flags);
 /* Copy hold register to primary. */
 
 void g_cmp (unsigned flags, unsigned long val);
-/* Immidiate compare. The primary register will not be changed, Z flag
+/* Immediate compare. The primary register will not be changed, Z flag
 ** will be set.
 */
 
@@ -409,6 +409,11 @@ void g_truejump (unsigned flags, unsigned label);
 
 void g_falsejump (unsigned flags, unsigned label);
 /* Jump to label if zero flag set */
+
+void g_branch (unsigned Label);
+/* Branch unconditionally to Label if the CPU has the BRA instruction.
+** Otherwise, jump to Label.
+*/
 
 void g_lateadjustSP (unsigned label);
 /* Adjust stack based on non-immediate data */

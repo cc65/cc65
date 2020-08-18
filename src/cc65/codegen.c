@@ -2207,7 +2207,7 @@ void g_restore (unsigned flags)
 
 
 void g_cmp (unsigned flags, unsigned long val)
-/* Immidiate compare. The primary register will not be changed, Z flag
+/* Immediate compare. The primary register will not be changed, Z flag
 ** will be set.
 */
 {
@@ -2453,6 +2453,21 @@ void g_falsejump (unsigned flags attribute ((unused)), unsigned label)
 {
     AddCodeLine ("jeq %s", LocalLabelName (label));
 }
+
+
+
+void g_branch (unsigned Label)
+/* Branch unconditionally to Label if the CPU has the BRA instruction.
+** Otherwise, jump to Label.
+*/
+{
+    if ((CPUIsets[CPU] & CPU_ISET_65SC02) != 0) {
+        AddCodeLine ("bra %s", LocalLabelName (Label));
+    } else {
+        g_jump (Label);
+    }
+}
+
 
 
 void g_lateadjustSP (unsigned label)
@@ -2761,12 +2776,14 @@ void g_div (unsigned flags, unsigned long val)
                 AddCodeLine ("lsr a");
                 g_restore (flags);
                 AddCodeLine ("bcs %s", LocalLabelName (DoShiftLabel));
- 
+
                 /* The result is 0. We can just load 0 and skip the shifting. */
                 g_getimmed (flags | CF_ABSOLUTE, 0, 0);
+
+                /* TODO: replace with BEQ? Would it be optimized? */
                 g_jump (EndLabel);
 
-                /* Do the shift. The sign of the result may need be corrected
+                /* Do the shift. The sign of the result may need to be corrected
                 ** later.
                 */
                 g_defcodelabel (DoShiftLabel);
@@ -4511,18 +4528,17 @@ void g_extractbitfield (unsigned Flags, unsigned FullWidthFlags, int IsSigned,
         unsigned ZeroExtendLabel = GetLocalLabel ();
         AddCodeLine ("beq %s", LocalLabelName (ZeroExtendLabel));
 
-        /* Pop A back and sign extend if required; operating on the full result need
+        /* Pop A back and sign-extend if required; operating on the full result needs
         ** to sign-extend into high byte, too.
         */
         AddCodeLine ("pla");
         g_or (FullWidthFlags | CF_CONST, ~Mask);
 
-        /* Apparently, there is no unconditional branch BRA, so use JMP. */
         unsigned DoneLabel = GetLocalLabel ();
-        AddCodeLine ("jmp %s", LocalLabelName (DoneLabel));
+        g_branch (DoneLabel);
 
-        /* Pop A back, then zero-extend; we need to duplicate the PLA rather than move it before
-        ** the branch to share with the other label because PLA sets the condition codes.
+        /* Pop A back, then zero-extend. We need to duplicate the PLA, rather than move it before
+        ** the branch to share with the other label, because PLA changes some condition codes.
         */
         g_defcodelabel (ZeroExtendLabel);
         AddCodeLine ("pla");
@@ -4534,7 +4550,7 @@ void g_extractbitfield (unsigned Flags, unsigned FullWidthFlags, int IsSigned,
 
         g_defcodelabel (DoneLabel);
     } else {
-        /* Unsigned bit-field, only needs zero-extension. */
+        /* Unsigned bit-field, needs only zero-extension. */
         if (ZeroExtendMask != 0) {
             g_and (FullWidthFlags | CF_CONST, ZeroExtendMask);
         }

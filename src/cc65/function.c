@@ -382,6 +382,9 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
     SymEntry*   Param;
     const Type* RType;          /* Real type used for struct parameters */
 
+    /* Remember this function descriptor used for definition */
+    GetFuncDesc (Func->Type)->FuncDef = D;
+
     /* Allocate the function activation record for the function */
     CurrentFunc = NewFunction (Func, D);
 

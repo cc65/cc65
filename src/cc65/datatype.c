@@ -596,8 +596,8 @@ void PrintFuncSig (FILE* F, const char* Name, Type* T)
     StrBuf East      = AUTO_STRBUF_INITIALIZER;
     StrBuf West      = AUTO_STRBUF_INITIALIZER;
 
-    /* Get the function descriptor */
-    const FuncDesc* D = GetFuncDesc (T);
+    /* Get the function descriptor used in definition */
+    const FuncDesc* D = GetFuncDefinitionDesc (T);
 
     /* Get the parameter list string. Start from the first parameter */
     SymEntry* Param = D->SymTab->SymHead;
@@ -1133,6 +1133,20 @@ Type* GetFuncReturn (Type* T)
 
     /* Return a pointer to the return type */
     return T + 1;
+}
+
+
+
+FuncDesc* GetFuncDefinitionDesc (Type* T)
+/* Get the function descriptor of the function definition */
+{
+    FuncDesc* D;
+
+    /* Be sure it's a function type */
+    CHECK (IsClassFunc (T));
+
+    D = GetFuncDesc (T);
+    return D->FuncDef != 0 ? D->FuncDef : D;
 }
 
 

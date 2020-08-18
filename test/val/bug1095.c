@@ -1,5 +1,5 @@
 /*
-  Copyright 2020 the cc65 authors
+  Copyright 2020 The cc65 Authors
 
   This software is provided 'as-is', without any express or implied
   warranty. In no event will the authors be held liable for any damages

@@ -836,6 +836,9 @@ void SetFuncDesc (Type* T, FuncDesc* F);
 Type* GetFuncReturn (Type* T) attribute ((const));
 /* Return a pointer to the return type of a function or pointer-to-function type */
 
+FuncDesc* GetFuncDefinitionDesc (struct Type* T);
+/* Get the function descriptor of the function definition */
+
 long GetElementCount (const Type* T);
 /* Get the element count of the array specified in T (which must be of
 ** array type).

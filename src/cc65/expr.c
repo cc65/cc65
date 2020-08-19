@@ -3184,58 +3184,135 @@ static void hieOrPP (ExprDesc *Expr)
 
 
 
-static void hieAnd (ExprDesc* Expr, unsigned TrueLab, int* BoolOp)
-/* Process "exp && exp" */
+static int hieAnd (ExprDesc* Expr, unsigned TrueLab, int* UsedTrueLab)
+/* Process "exp && exp". This should only be called within hieOr.
+** Return true if logic AND does occur.
+*/
 {
-    int FalseLab;
+    unsigned Flags = Expr->Flags & E_MASK_KEEP_SUBEXPR;
+    int HasFalseJump = 0, HasTrueJump = 0;
+    CodeMark Start;
+
+    /* Get a label that we will use for false expressions */
+    int FalseLab = GetLocalLabel ();
+
+    /* Get lhs */
+    GetCodePos (&Start);
     ExprWithCheck (hie2, Expr);
+    if ((Flags & E_EVAL_UNEVAL) == E_EVAL_UNEVAL) {
+        RemoveCode (&Start);
+    }
+
     if (CurTok.Tok == TOK_BOOL_AND) {
 
-        /* Tell our caller that we're evaluating a boolean */
-        *BoolOp = 1;
+        ExprDesc Expr2;
 
-        /* Get a label that we will use for false expressions */
-        FalseLab = GetLocalLabel ();
+        /* Check type */
+        if (!ED_IsBool (Expr)) {
+            Error ("Scalar expression expected");
+            ED_MakeConstBool (Expr, 0);
+        } else if ((Flags & E_EVAL_UNEVAL) != E_EVAL_UNEVAL) {
+            if (!ED_IsConstAbs (Expr)) {
+                /* Set the test flag */
+                ED_RequireTest (Expr);
 
-        /* Set the test flag */
-        ED_RequireTest (Expr);
+                /* Load the value */
+                LoadExpr (CF_FORCECHAR, Expr);
 
-        /* Load the value */
-        LoadExpr (CF_FORCECHAR, Expr);
+                /* Remember that the jump is used */
+                HasFalseJump = 1;
 
-        /* Generate the jump */
-        g_falsejump (CF_NONE, FalseLab);
+                /* Generate the jump */
+                g_falsejump (CF_NONE, FalseLab);
+            } else if (Expr->IVal == 0) {
+                /* Skip remaining */
+                Flags |= E_EVAL_UNEVAL;
+            }
+        }
 
         /* Parse more boolean and's */
         while (CurTok.Tok == TOK_BOOL_AND) {
 
-            ExprDesc Expr2;
             ED_Init (&Expr2);
+            Expr2.Flags = Flags;
 
             /* Skip the && */
             NextToken ();
 
             /* Get rhs */
+            GetCodePos (&Start);
             hie2 (&Expr2);
-            ED_RequireTest (&Expr2);
-            LoadExpr (CF_FORCECHAR, &Expr2);
+            if ((Flags & E_EVAL_UNEVAL) == E_EVAL_UNEVAL) {
+                RemoveCode (&Start);
+            }
 
-            /* Do short circuit evaluation */
-            if (CurTok.Tok == TOK_BOOL_AND) {
-                g_falsejump (CF_NONE, FalseLab);
-            } else {
-                /* Last expression - will evaluate to true */
-                g_truejump (CF_NONE, TrueLab);
+            /* Check type */
+            if (!ED_IsBool (&Expr2)) {
+                Error ("Scalar expression expected");
+                ED_MakeConstBool (&Expr2, 0);
+            } else if ((Flags & E_EVAL_UNEVAL) != E_EVAL_UNEVAL) {
+                if (!ED_IsConstAbs (&Expr2)) {
+                    ED_RequireTest (&Expr2);
+                    LoadExpr (CF_FORCECHAR, &Expr2);
+
+                    /* Do short circuit evaluation */
+                    if (CurTok.Tok == TOK_BOOL_AND) {
+                        HasFalseJump = 1;
+                        g_falsejump (CF_NONE, FalseLab);
+                    } else {
+                        /* We need the true label for the last expression */
+                        HasTrueJump = 1;
+                    }
+                } else if (Expr2.IVal == 0) {
+                    /* Skip remaining */
+                    Flags |= E_EVAL_UNEVAL;
+                    /* The value of the expression will be false */
+                    ED_MakeConstBool (Expr, 0);
+                }
             }
         }
 
-        /* Define the false jump label here */
-        g_defcodelabel (FalseLab);
+        /* Last expression */
+        if ((Flags & E_EVAL_UNEVAL) != E_EVAL_UNEVAL) {
+            if (HasFalseJump || HasTrueJump) {
+                /* In either case we need the true label anyways */
+                HasTrueJump = 1;
+                if (!ED_IsConstAbs (&Expr2)) {
+                    /* Will branch to true and fall to false */
+                    g_truejump (CF_NONE, TrueLab);
+                } else {
+                    /* Will jump away */
+                    g_jump (TrueLab);
+                }
+                /* The result is an rvalue in primary */
+                ED_FinalizeRValLoad (Expr);
+                /* No need to test as the result will be jumped to */
+                ED_TestDone (Expr);
+            }
+        }
 
-        /* The result is an rvalue in primary */
-        ED_FinalizeRValLoad (Expr);
-        ED_TestDone (Expr);     /* Condition codes are set */
+        if (HasFalseJump) {
+            /* Define the false jump label here */
+            g_defcodelabel (FalseLab);
+        }
+
+        /* Convert to bool */
+        if (ED_IsConstAbs (Expr) && Expr->IVal != 0) {
+            ED_MakeConstBool (Expr, 1);
+        } else {
+            Expr->Type = type_bool;
+        }
+
+        /* Tell our caller that we're used the true label */
+        if (HasTrueJump) {
+            *UsedTrueLab = 1;
+        }
+
+        /* Tell our caller that we're evaluating a boolean */
+        return 1;
     }
+
+    return 0;
 }
 
 
@@ -3243,69 +3320,131 @@ static void hieAnd (ExprDesc* Expr, unsigned TrueLab, int* BoolOp)
 static void hieOr (ExprDesc *Expr)
 /* Process "exp || exp". */
 {
-    int BoolOp = 0;             /* Did we have a boolean op? */
-    int AndOp;                  /* Did we have a && operation? */
+    unsigned Flags = Expr->Flags & E_MASK_KEEP_SUBEXPR;
+    int      AndOp;             /* Did we have a && operation? */
     unsigned TrueLab;           /* Jump to this label if true */
     unsigned DoneLab;
+    int      HasTrueJump = 0;
+    int      HasNewTrueJump;
+    CodeMark Start;
 
-    /* Get a label */
+    /* Get a label that we will use for true expressions */
     TrueLab = GetLocalLabel ();
 
     /* Call the next level parser */
-    hieAnd (Expr, TrueLab, &BoolOp);
+    GetCodePos (&Start);
+    AndOp = hieAnd (Expr, TrueLab, &HasNewTrueJump);
+    if ((Flags & E_EVAL_UNEVAL) == E_EVAL_UNEVAL) {
+        RemoveCode (&Start);
+    } else {
+        /* Remember the jump */
+        HasTrueJump = HasNewTrueJump;
+    }
 
     /* Any boolean or's? */
     if (CurTok.Tok == TOK_BOOL_OR) {
 
-        /* Set the test flag */
-        ED_RequireTest (Expr);
+        /* Check type */
+        if (!ED_IsBool (Expr)) {
+            Error ("Scalar expression expected");
+            ED_MakeConstBool (Expr, 0);
+        } else if ((Flags & E_EVAL_UNEVAL) != E_EVAL_UNEVAL) {
+ 
+            if (!ED_IsConstAbs (Expr)) {
+                /* Test the lhs if we haven't had && operators. If we had them, the
+                ** jump is already in place and there's no need to do the test.
+                */
+                if (!AndOp) {
+                    /* Set the test flag */
+                    ED_RequireTest (Expr);
 
-        /* Get first expr */
-        LoadExpr (CF_FORCECHAR, Expr);
+                    /* Get first expr */
+                    LoadExpr (CF_FORCECHAR, Expr);
 
-        /* For each expression jump to TrueLab if true. Beware: If we
-        ** had && operators, the jump is already in place!
-        */
-        if (!BoolOp) {
-            g_truejump (CF_NONE, TrueLab);
+                    /* Remember that the jump is used */
+                    HasTrueJump = 1;
+
+                    /* Jump to TrueLab if true */
+                    g_truejump (CF_NONE, TrueLab);
+                }
+            } else if (Expr->IVal != 0) {
+                /* Skip remaining */
+                Flags |= E_EVAL_UNEVAL;
+            }
         }
-
-        /* Remember that we had a boolean op */
-        BoolOp = 1;
 
         /* while there's more expr */
         while (CurTok.Tok == TOK_BOOL_OR) {
 
             ExprDesc Expr2;
             ED_Init (&Expr2);
+            Expr2.Flags = Flags;
 
             /* skip the || */
             NextToken ();
 
-            /* Get a subexpr */
-            AndOp = 0;
-            hieAnd (&Expr2, TrueLab, &AndOp);
-            ED_RequireTest (&Expr2);
-            LoadExpr (CF_FORCECHAR, &Expr2);
+            /* Get rhs subexpression */
+            GetCodePos (&Start);
+            AndOp = hieAnd (&Expr2, TrueLab, &HasNewTrueJump);
+            if ((Flags & E_EVAL_UNEVAL) == E_EVAL_UNEVAL) {
+                RemoveCode (&Start);
+            } else {
+                /* Remember the jump */
+                HasTrueJump = HasTrueJump || HasNewTrueJump;
+            }
 
-            /* If there is more to come, add shortcut boolean eval. */
-            g_truejump (CF_NONE, TrueLab);
+            /* Check type */
+            if (!ED_IsBool (&Expr2)) {
+                Error ("Scalar expression expected");
+                ED_MakeConstBool (&Expr2, 0);
+            } else if ((Flags & E_EVAL_UNEVAL) != E_EVAL_UNEVAL) {
+
+                if (!ED_IsConstAbs (&Expr2)) {
+                    /* If there is more to come, add shortcut boolean eval */
+                    if (!AndOp) {
+                        ED_RequireTest (&Expr2);
+                        LoadExpr (CF_FORCECHAR, &Expr2);
+
+                        HasTrueJump = 1;                        
+                        g_truejump (CF_NONE, TrueLab);
+                    }
+                } else if (Expr2.IVal != 0) {
+                    /* Skip remaining */
+                    Flags |= E_EVAL_UNEVAL;
+                    /* The result is always true */
+                    ED_MakeConstBool (Expr, 1);
+                }
+            }
 
         }
 
-        /* The result is an rvalue in primary */
-        ED_FinalizeRValLoad (Expr);
-        ED_TestDone (Expr);                     /* Condition codes are set */
+        /* Convert to bool */
+        if (ED_IsConstAbs (Expr) && Expr->IVal != 0) {
+            ED_MakeConstBool (Expr, 1);
+        } else {
+            Expr->Type = type_bool;
+        }
     }
 
-    /* If we really had boolean ops, generate the end sequence */
-    if (BoolOp) {
+    /* If we really had boolean ops, generate the end sequence if necessary */
+    if (HasTrueJump) {
+        /* False case needs to jump over true case */
         DoneLab = GetLocalLabel ();
-        g_getimmed (CF_INT | CF_CONST, 0, 0);   /* Load FALSE */
-        g_falsejump (CF_NONE, DoneLab);
+        if ((Flags & E_EVAL_UNEVAL) != E_EVAL_UNEVAL) {
+            /* Load false only if the result is not true */
+            g_getimmed (CF_INT | CF_CONST, 0, 0);   /* Load FALSE */
+            g_falsejump (CF_NONE, DoneLab);
+        }
+
+        /* Load the true value */
         g_defcodelabel (TrueLab);
         g_getimmed (CF_INT | CF_CONST, 1, 0);   /* Load TRUE */
         g_defcodelabel (DoneLab);
+
+        /* The result is an rvalue in primary */
+        ED_FinalizeRValLoad (Expr);
+        /* Condition codes are set */
+        ED_TestDone (Expr);
     }
 }
 

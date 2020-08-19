@@ -216,8 +216,7 @@ void CaseLabel (void)
     NextToken ();
 
     /* Read the selector expression */
-    ED_Init (&CaseExpr);
-    ConstAbsIntExpr (hie1, &CaseExpr);
+    CaseExpr = StaticConstAbsIntExpr (hie1);
     Val = CaseExpr.IVal;
 
     /* Now check if we're inside a switch statement */

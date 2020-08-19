@@ -590,10 +590,8 @@ static SymEntry* ParseEnumDecl (const char* Name)
         /* Check for an assigned value */
         if (CurTok.Tok == TOK_ASSIGN) {
 
-            ExprDesc Expr;
-            ED_Init (&Expr);
             NextToken ();
-            ConstAbsIntExpr (hie1, &Expr);
+            ExprDesc Expr = StaticConstAbsIntExpr (hie1);
             EnumVal       = Expr.IVal;
             MemberType    = Expr.Type;
             IsSigned      = IsSignSigned (MemberType);
@@ -720,9 +718,6 @@ static int ParseFieldWidth (Declaration* Decl)
 ** otherwise the width of the field.
 */
 {
-    ExprDesc Expr;
-    ED_Init (&Expr);
-
     if (CurTok.Tok != TOK_COLON) {
         /* No bit-field declaration */
         return -1;
@@ -746,7 +741,7 @@ static int ParseFieldWidth (Declaration* Decl)
 
     /* Read the width */
     NextToken ();
-    ConstAbsIntExpr (hie1, &Expr);
+    ExprDesc Expr = StaticConstAbsIntExpr (hie1);
 
     if (Expr.IVal < 0) {
         Error ("Negative width in bit-field");
@@ -1819,9 +1814,7 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
 
             /* Read the size if it is given */
             if (CurTok.Tok != TOK_RBRACK) {
-                ExprDesc Expr;
-                ED_Init (&Expr);
-                ConstAbsIntExpr (hie1, &Expr);
+                ExprDesc Expr = StaticConstAbsIntExpr (hie1);
                 if (Expr.IVal <= 0) {
                     if (D->Ident[0] != '\0') {
                         Error ("Size of array '%s' is invalid", D->Ident);
@@ -2158,7 +2151,7 @@ static void OutputBitFieldData (StructInitData* SI)
 
 
 
-static void ParseScalarInitInternal (Type* T, ExprDesc* ED)
+static ExprDesc ParseScalarInitInternal (Type* T)
 /* Parse initializaton for scalar data types. This function will not output the
 ** data but return it in ED.
 */
@@ -2174,11 +2167,13 @@ static void ParseScalarInitInternal (Type* T, ExprDesc* ED)
     }
 
     /* Get the expression and convert it to the target type */
-    ConstExpr (hie1, ED);
-    TypeConversion (ED, T);
+    ExprDesc ED = StaticConstExpr (hie1);
+    TypeConversion (&ED, T);
 
     /* Close eventually opening braces */
     ClosingCurlyBraces (BraceCount);
+
+    return ED;
 }
 
 
@@ -2186,11 +2181,8 @@ static void ParseScalarInitInternal (Type* T, ExprDesc* ED)
 static unsigned ParseScalarInit (Type* T)
 /* Parse initializaton for scalar data types. Return the number of data bytes. */
 {
-    ExprDesc ED;
-    ED_Init (&ED);
-
     /* Parse initialization */
-    ParseScalarInitInternal (T, &ED);
+    ExprDesc ED = ParseScalarInitInternal (T);
 
     /* Output the data */
     DefineData (&ED);
@@ -2208,10 +2200,7 @@ static unsigned ParsePointerInit (Type* T)
     unsigned BraceCount = OpeningCurlyBraces (0);
 
     /* Expression */
-    ExprDesc ED;
-    ED_Init (&ED);
-
-    ConstExpr (hie1, &ED);
+    ExprDesc ED = StaticConstExpr (hie1);
     TypeConversion (&ED, T);
 
     /* Output the data */
@@ -2438,7 +2427,7 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
                    SI.Offs         * CHAR_BITS + SI.ValBits);
 
             /* Read the data, check for a constant integer, do a range check */
-            ParseScalarInitInternal (Entry->Type, &ED);
+            ED = ParseScalarInitInternal (Entry->Type);
             if (!ED_IsConstAbsInt (&ED)) {
                 Error ("Constant initializer expected");
                 ED_MakeConstAbsInt (&ED, 1);
@@ -2556,10 +2545,7 @@ static unsigned ParseVoidInit (Type* T)
     /* Allow an arbitrary list of values */
     Size = 0;
     do {
-        ExprDesc Expr;
-        ED_Init (&Expr);
-
-        ConstExpr (hie1, &Expr);
+        ExprDesc Expr = StaticConstExpr (hie1);
         switch (GetUnderlyingTypeCode (&Expr.Type[0])) {
 
             case T_SCHAR:

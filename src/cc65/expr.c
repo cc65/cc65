@@ -3147,17 +3147,14 @@ static void hieAndPP (ExprDesc* Expr)
 ** called recursively from the preprocessor.
 */
 {
-    ConstAbsIntExpr (hie2, Expr);
+    *Expr = StaticConstAbsIntExpr (hie2);
     while (CurTok.Tok == TOK_BOOL_AND) {
-
-        ExprDesc Expr2;
-        ED_Init (&Expr2);
 
         /* Skip the && */
         NextToken ();
 
         /* Get rhs */
-        ConstAbsIntExpr (hie2, &Expr2);
+        ExprDesc Expr2 = StaticConstAbsIntExpr (hie2);
 
         /* Combine the two */
         Expr->IVal = (Expr->IVal && Expr2.IVal);
@@ -3171,17 +3168,14 @@ static void hieOrPP (ExprDesc *Expr)
 ** called recursively from the preprocessor.
 */
 {
-    ConstAbsIntExpr (hieAndPP, Expr);
+    *Expr = StaticConstAbsIntExpr (hieAndPP);
     while (CurTok.Tok == TOK_BOOL_OR) {
-
-        ExprDesc Expr2;
-        ED_Init (&Expr2);
 
         /* Skip the && */
         NextToken ();
 
         /* Get rhs */
-        ConstAbsIntExpr (hieAndPP, &Expr2);
+        ExprDesc Expr2 = StaticConstAbsIntExpr (hieAndPP);
 
         /* Combine the two */
         Expr->IVal = (Expr->IVal || Expr2.IVal);
@@ -3900,24 +3894,6 @@ void Expression0 (ExprDesc* Expr)
 
 
 
-void ConstExpr (void (*Func) (ExprDesc*), ExprDesc* Expr)
-/* Will evaluate an expression via the given function. If the result is not
-** a constant of some sort, a diagnostic will be printed, and the value is
-** replaced by a constant one to make sure there are no internal errors that
-** result from this input error.
-*/
-{
-    Expr->Flags |= E_EVAL_CONST;
-    ExprWithCheck (Func, Expr);
-    if (!ED_IsConst (Expr)) {
-        Error ("Constant expression expected");
-        /* To avoid any compiler errors, make the expression a valid const */
-        ED_MakeConstAbsInt (Expr, 1);
-    }
-}
-
-
-
 void BoolExpr (void (*Func) (ExprDesc*), ExprDesc* Expr)
 /* Will evaluate an expression via the given function. If the result is not
 ** something that may be evaluated in a boolean context, a diagnostic will be
@@ -3927,26 +3903,56 @@ void BoolExpr (void (*Func) (ExprDesc*), ExprDesc* Expr)
 {
     ExprWithCheck (Func, Expr);
     if (!ED_IsBool (Expr)) {
-        Error ("Boolean expression expected");
+        Error ("Scalar expression expected");
         /* To avoid any compiler errors, make the expression a valid int */
-        ED_MakeConstAbsInt (Expr, 1);
+        ED_MakeConstBool (Expr, 1);
     }
 }
 
 
 
-void ConstAbsIntExpr (void (*Func) (ExprDesc*), ExprDesc* Expr)
-/* Will evaluate an expression via the given function. If the result is not
-** a constant numeric integer value, a diagnostic will be printed, and the
+ExprDesc StaticConstExpr (void (*Func) (ExprDesc*))
+/* Will evaluate an expression via the given function. If the result is not a
+** static constant expression, a diagnostic will be printed, and the value is
+** replaced by a constant one to make sure there are no internal errors that
+** result from this input error.
+*/
+{
+    ExprDesc Expr;
+    ED_Init (&Expr);
+
+    Expr.Flags |= E_EVAL_C_CONST;
+    MarkedExprWithCheck (Func, &Expr);
+    if (!ED_IsConst (&Expr) || !ED_CodeRangeIsEmpty (&Expr)) {
+        Error ("Constant expression expected");
+        /* To avoid any compiler errors, make the expression a valid const */
+        ED_MakeConstAbsInt (&Expr, 1);
+    }
+
+    /* Return by value */
+    return Expr;
+}
+
+
+
+ExprDesc StaticConstAbsIntExpr (void (*Func) (ExprDesc*))
+/* Will evaluate an expression via the given function. If the result is not a
+** static constant numeric integer value, a diagnostic will be printed, and the
 ** value is replaced by a constant one to make sure there are no internal
 ** errors that result from this input error.
 */
 {
-    Expr->Flags |= E_EVAL_CONST;
-    ExprWithCheck (Func, Expr);
-    if (!ED_IsConstAbsInt (Expr)) {
+    ExprDesc Expr;
+    ED_Init (&Expr);
+
+    Expr.Flags |= E_EVAL_C_CONST;
+    MarkedExprWithCheck (Func, &Expr);
+    if (!ED_IsConstAbsInt (&Expr) || !ED_CodeRangeIsEmpty (&Expr)) {
         Error ("Constant integer expression expected");
         /* To avoid any compiler errors, make the expression a valid const */
-        ED_MakeConstAbsInt (Expr, 1);
+        ED_MakeConstAbsInt (&Expr, 1);
     }
+
+    /* Return by value */
+    return Expr;
 }

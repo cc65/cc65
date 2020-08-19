@@ -1908,14 +1908,19 @@ void hie10 (ExprDesc* Expr)
 
         case TOK_BOOL_NOT:
             NextToken ();
-            if (evalexpr (CF_NONE, hie10, Expr) == 0) {
+            BoolExpr (hie10, Expr);
+            if (ED_IsConstAbs (Expr)) {
                 /* Constant expression */
                 Expr->IVal = !Expr->IVal;
             } else {
+                /* Not constant, load into the primary */
+                LoadExpr (CF_NONE, Expr);
                 g_bneg (TypeOf (Expr->Type));
                 ED_FinalizeRValLoad (Expr);
                 ED_TestDone (Expr);             /* bneg will set cc */
             }
+            /* The result type is always boolean */
+            Expr->Type = type_bool;
             break;
 
         case TOK_STAR:
@@ -3976,29 +3981,6 @@ void hie0 (ExprDesc *Expr)
         Expr->Flags = Flags;
         NextToken ();
         hie1 (Expr);
-    }
-}
-
-
-
-int evalexpr (unsigned Flags, void (*Func) (ExprDesc*), ExprDesc* Expr)
-/* Will evaluate an expression via the given function. If the result is a
-** constant, 0 is returned and the value is put in the Expr struct. If the
-** result is not constant, LoadExpr is called to bring the value into the
-** primary register and 1 is returned.
-*/
-{
-    /* Evaluate */
-    ExprWithCheck (Func, Expr);
-
-    /* Check for a constant expression */
-    if (ED_IsConstAbs (Expr)) {
-        /* Constant expression */
-        return 0;
-    } else {
-        /* Not constant, load into the primary */
-        LoadExpr (Flags, Expr);
-        return 1;
     }
 }
 

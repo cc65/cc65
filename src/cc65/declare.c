@@ -2389,6 +2389,11 @@ static unsigned ParseArrayInit (Type* T, int* Braces, int AllowFlexibleMembers)
         }
     }
 
+    /* Size of 'void' elements are determined after initialization */
+    if (ElementSize == 0) {
+        ElementSize = SizeOf (ElementType);
+    }
+
     if (ElementCount == UNSPECIFIED) {
         /* Number of elements determined by initializer */
         SetElementCount (T, Count);
@@ -2695,7 +2700,11 @@ static unsigned ParseVoidInit (Type* T)
     ConsumeRCurly ();
 
     /* Number of bytes determined by initializer */
-    T->A.U = Size;
+    if (T->A.U != 0 && T->A.U != Size) {
+        Error ("'void' array initialized with elements of variant sizes");
+    } else {
+        T->A.U = Size;
+    }
 
     /* Return the number of bytes initialized */
     return Size;

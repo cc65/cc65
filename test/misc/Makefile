@@ -37,7 +37,7 @@ WORKDIR = ..$S..$Stestwrk$Smisc
 
 OPTIONS = g O Os Osi Osir Osr Oi Oir Or
 
-DIFF = $(WORKDIR)$Sbdiff$(EXE)
+DIFF = $(WORKDIR)$Sisequal$(EXE)
 
 CC = gcc
 CFLAGS = -O2
@@ -58,7 +58,7 @@ all: $(TESTS)
 $(WORKDIR):
 	$(call MKDIR,$(WORKDIR))
 
-$(DIFF): ../bdiff.c | $(WORKDIR)
+$(DIFF): ../isequal.c | $(WORKDIR)
 	$(CC) $(CFLAGS) -o $@ $<
 
 define PRG_template

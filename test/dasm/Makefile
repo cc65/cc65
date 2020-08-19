@@ -25,7 +25,7 @@ DA65 := $(if $(wildcard ../../bin/da65*),../../bin/da65,da65)
 
 WORKDIR = ../../testwrk/dasm
 
-DIFF = $(WORKDIR)/bdiff$(EXE)
+DIFF = $(WORKDIR)/isequal$(EXE)
 
 CC = gcc
 CFLAGS = -O2
@@ -44,7 +44,7 @@ all: $(BINS)
 $(WORKDIR):
 	$(call MKDIR,$(WORKDIR))
 
-$(DIFF): ../bdiff.c | $(WORKDIR)
+$(DIFF): ../isequal.c | $(WORKDIR)
 	$(CC) $(CFLAGS) -o $@ $<
 
 define DISASS_template

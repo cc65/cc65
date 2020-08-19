@@ -35,7 +35,7 @@ WORKDIR = ..$S..$Stestwrk$Sref
 
 OPTIONS = g O Os Osi Osir Osr Oi Oir Or
 
-DIFF = $(WORKDIR)$Sbdiff$(EXE)
+DIFF = $(WORKDIR)$Sisequal$(EXE)
 
 CC = gcc
 CFLAGS = -O2 -Wall -W -Wextra -funsigned-char -fwrapv -fno-strict-overflow
@@ -57,7 +57,7 @@ $(WORKDIR)/%.ref: %.c | $(WORKDIR)
 	$(CC) $(CFLAGS) -o $(WORKDIR)/$*.host $< $(NULLERR)
 	$(WORKDIR)$S$*.host > $@
 
-$(DIFF): ../bdiff.c | $(WORKDIR)
+$(DIFF): ../isequal.c | $(WORKDIR)
 	$(CC) $(CFLAGS) -o $@ $<
 
 # "yaccdbg.c" includes "yacc.c".

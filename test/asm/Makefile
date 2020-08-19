@@ -24,7 +24,7 @@ CL65 := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)
 
 WORKDIR = ../../testwrk/asm
 
-DIFF = $(WORKDIR)/bdiff$(EXE)
+DIFF = $(WORKDIR)/isequal$(EXE)
 
 CC = gcc
 CFLAGS = -O2
@@ -44,7 +44,7 @@ all: $(OPCODE_BINS) $(CPUDETECT_BINS)
 $(WORKDIR):
 	$(call MKDIR,$(WORKDIR))
 
-$(DIFF): ../bdiff.c | $(WORKDIR)
+$(DIFF): ../isequal.c | $(WORKDIR)
 	$(CC) $(CFLAGS) -o $@ $<
 
 define OPCODE_template

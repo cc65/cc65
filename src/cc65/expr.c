@@ -2428,6 +2428,33 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             */
             WarnConstCompareResult (Expr);
 
+        } else if (ED_CodeRangeIsEmpty (&Expr2) &&
+                   ((ED_IsAddrExpr (Expr) && ED_IsNullPtr (&Expr2)) ||
+                    (ED_IsNullPtr (Expr) && (ED_IsAddrExpr (&Expr2))))) {
+
+            /* Object addresses are inequal to null pointer */
+            Expr->IVal = (Tok != TOK_EQ);
+            if (ED_IsNullPtr (&Expr2)) {
+                if (Tok == TOK_LT || Tok == TOK_LE) {
+                    Expr->IVal = 0;
+                }
+            } else {
+                if (Tok == TOK_GT || Tok == TOK_GE) {
+                    Expr->IVal = 0;
+                }
+            }
+
+            /* Get rid of unwanted flags */
+            ED_MakeConstBool (Expr, Expr->IVal);
+
+            /* If the result is constant, this is suspicious when not in
+            ** preprocessor mode.
+            */
+            WarnConstCompareResult (Expr);
+
+            /* Both operands are static, remove the generated code */
+            RemoveCode (&Mark1);
+
         } else {
 
             /* Determine the signedness of the operands */
@@ -2485,7 +2512,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
                     case TOK_EQ:
                         if (Expr2.IVal < LeftMin || Expr2.IVal > LeftMax) {
-                            ED_MakeConstAbsInt (Expr, 0);
+                            ED_MakeConstBool (Expr, 0);
                             WarnConstCompareResult (Expr);
                             goto Done;
                         }
@@ -2493,7 +2520,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
                     case TOK_NE:
                         if (Expr2.IVal < LeftMin || Expr2.IVal > LeftMax) {
-                            ED_MakeConstAbsInt (Expr, 1);
+                            ED_MakeConstBool (Expr, 1);
                             WarnConstCompareResult (Expr);
                             goto Done;
                         }
@@ -2501,7 +2528,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
                     case TOK_LT:
                         if (Expr2.IVal <= LeftMin || Expr2.IVal > LeftMax) {
-                            ED_MakeConstAbsInt (Expr, Expr2.IVal > LeftMax);
+                            ED_MakeConstBool (Expr, Expr2.IVal > LeftMax);
                             WarnConstCompareResult (Expr);
                             goto Done;
                         }
@@ -2509,7 +2536,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
                     case TOK_LE:
                         if (Expr2.IVal < LeftMin || Expr2.IVal >= LeftMax) {
-                            ED_MakeConstAbsInt (Expr, Expr2.IVal >= LeftMax);
+                            ED_MakeConstBool (Expr, Expr2.IVal >= LeftMax);
                             WarnConstCompareResult (Expr);
                             goto Done;
                         }
@@ -2517,7 +2544,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
                     case TOK_GE:
                         if (Expr2.IVal <= LeftMin || Expr2.IVal > LeftMax) {
-                            ED_MakeConstAbsInt (Expr, Expr2.IVal <= LeftMin);
+                            ED_MakeConstBool (Expr, Expr2.IVal <= LeftMin);
                             WarnConstCompareResult (Expr);
                             goto Done;
                         }
@@ -2525,7 +2552,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
                     case TOK_GT:
                         if (Expr2.IVal < LeftMin || Expr2.IVal >= LeftMax) {
-                            ED_MakeConstAbsInt (Expr, Expr2.IVal < LeftMin);
+                            ED_MakeConstBool (Expr, Expr2.IVal < LeftMin);
                             WarnConstCompareResult (Expr);
                             goto Done;
                         }

@@ -95,10 +95,13 @@ static int CopyStruct (ExprDesc* LExpr, ExprDesc* RExpr)
         /* Store it into the location referred in the primary */
         Store (LExpr, stype);
 
+        /* Value is in primary as an rvalue */
+        ED_FinalizeRValLoad (LExpr);
+
     } else {
 
-        /* The only way this can happen is in chained assignments */
-        if (!ED_IsLocPrimary (RExpr)) {
+        /* The rhs cannot happen to be loaded in the primary as it is too big */
+        if (!ED_IsLocExpr (RExpr)) {
             ED_AddrExpr (RExpr);
             LoadExpr (CF_NONE, RExpr);
         }
@@ -112,15 +115,18 @@ static int CopyStruct (ExprDesc* LExpr, ExprDesc* RExpr)
         /* Call the memcpy function */
         g_call (CF_FIXARGC, Func_memcpy, 4);
 
+        /* The result is an rvalue referenced in the primary */
+        ED_FinalizeRValLoad (LExpr);
+
         /* Restore the indirection level of lhs */
         ED_IndExpr (LExpr);
-
-        /* Clear the tested flag set during loading. This is not neccessary
-        ** currently (and probably ever) as a struct/union cannot be converted
-        ** to a boolean in C, but there is no harm to be future-proof.
-        */
-        ED_MarkAsUntested (LExpr);
     }
+
+    /* Clear the tested flag set during loading. This is not neccessary
+    ** currently (and probably ever) as a struct/union cannot be converted
+    ** to a boolean in C, but there is no harm to be future-proof.
+    */
+    ED_MarkAsUntested (LExpr);
 
     return 1;
 }
@@ -247,6 +253,9 @@ void Assignment (ExprDesc* Expr)
         /* Restore the expression type */
         Expr->Type = ltype;
 
+        /* Value is in primary as an rvalue */
+        ED_FinalizeRValLoad (Expr);
+
     } else {
 
         /* Get the address on stack if needed */
@@ -264,8 +273,8 @@ void Assignment (ExprDesc* Expr)
         /* Generate a store instruction */
         Store (Expr, 0);
 
-    }
+        /* Value is in primary as an rvalue */
+        ED_FinalizeRValLoad (Expr);
 
-    /* Value might be still in primary and not an lvalue */
-    ED_FinalizeRValLoad (Expr);
+    }
 }

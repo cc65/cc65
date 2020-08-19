@@ -2595,13 +2595,13 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
             /* The result is an rvalue in the primary */
             ED_FinalizeRValLoad (Expr);
+
+            /* Condition codes are set */
+            ED_TestDone (Expr);
         }
 
-        /* Result type is always int */
-        Expr->Type = type_int;
-
-Done:   /* Condition codes are set */
-        ED_TestDone (Expr);
+        /* Result type is always boolean */
+Done:   Expr->Type = type_bool;
     }
 }
 

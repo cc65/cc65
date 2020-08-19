@@ -229,6 +229,20 @@ ExprDesc* ED_MakeConstAbsInt (ExprDesc* Expr, long Value)
 
 
 
+ExprDesc* ED_MakeConstBool (ExprDesc* Expr, long Value)
+/* Replace Expr with a constant boolean expression with the given value */
+{
+    Expr->Sym   = 0;
+    Expr->Type  = type_bool;
+    Expr->Flags = E_LOC_NONE | E_RTYPE_RVAL | (Expr->Flags & E_HAVE_MARKS);
+    Expr->Name  = 0;
+    Expr->IVal  = Value;
+    Expr->FVal  = FP_D_Make (0.0);
+    return Expr;
+}
+
+
+
 ExprDesc* ED_FinalizeRValLoad (ExprDesc* Expr)
 /* Finalize the result of LoadExpr to be an rvalue in the primary register */
 {

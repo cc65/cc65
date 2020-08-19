@@ -1043,8 +1043,8 @@ parameter with the <tt/#pragma/.
 <sect1><tt>#pragma bss-name (&lsqb;push,&rsqb; &lt;name&gt;)</tt><label id="pragma-bss-name"><p>
 
   This pragma changes the name used for the BSS segment (the BSS segment
-  is used to store uninitialized data). The argument is a string enclosed
-  in double quotes.
+  is used to store variables with static storage duration and no explicit
+  initializer). The argument is a string enclosed in double quotes.
 
   Note: The default linker configuration file does only map the standard
   segments. If you use other segments, you have to create a new linker
@@ -1052,7 +1052,8 @@ parameter with the <tt/#pragma/.
 
   Beware: The startup code will zero only the default BSS segment. If you
   use another BSS segment, you have to do that yourself, otherwise
-  uninitialized variables do not have the value zero.
+  variables with static storage duration and no explicit initializer will
+  not have the value zero.
 
   The <tt/#pragma/ understands the push and pop parameters as explained above.
 

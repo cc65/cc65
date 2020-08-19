@@ -640,6 +640,9 @@ int ED_IsConstAbs (const ExprDesc* Expr);
 int ED_IsConstAbsInt (const ExprDesc* Expr);
 /* Return true if the expression is a constant (numeric) integer. */
 
+int ED_IsConstBool (const ExprDesc* Expr);
+/* Return true if the expression can be constantly evaluated as a boolean. */
+
 int ED_IsConst (const ExprDesc* Expr);
 /* Return true if the expression denotes a constant of some sort. This can be a
 ** numeric constant, the address of a global variable (maybe with offset) or

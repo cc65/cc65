@@ -77,6 +77,11 @@ unsigned Test (unsigned Label, int Invert)
             g_jump (Label);
         }
 
+    } else if (ED_IsAddrExpr (&Expr)) {
+
+        /* Object addresses are non-NULL */
+        Result = 1;
+
     } else {
 
         /* Result is unknown */

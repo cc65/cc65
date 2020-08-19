@@ -1912,6 +1912,9 @@ void hie10 (ExprDesc* Expr)
             if (ED_IsConstAbs (Expr)) {
                 /* Constant expression */
                 Expr->IVal = !Expr->IVal;
+            } else if (ED_IsAddrExpr (Expr)) {
+                /* Address != NULL, so !Address == 0 */
+                ED_MakeConstBool (Expr, 0);
             } else {
                 /* Not constant, load into the primary */
                 LoadExpr (CF_NONE, Expr);
@@ -3222,7 +3225,7 @@ static int hieAnd (ExprDesc* Expr, unsigned* TrueLab, int* TrueLabAllocated)
             Error ("Scalar expression expected");
             ED_MakeConstBool (Expr, 0);
         } else if ((Flags & E_EVAL_UNEVAL) != E_EVAL_UNEVAL) {
-            if (!ED_IsConstAbs (Expr)) {
+            if (!ED_IsConstBool (Expr)) {
                 /* Set the test flag */
                 ED_RequireTest (Expr);
 
@@ -3237,7 +3240,7 @@ static int hieAnd (ExprDesc* Expr, unsigned* TrueLab, int* TrueLabAllocated)
 
                 /* Generate the jump */
                 g_falsejump (CF_NONE, FalseLab);
-            } else if (Expr->IVal == 0) {
+            } else if (Expr->IVal == 0 && !ED_IsAddrExpr (Expr)) {
                 /* Skip remaining */
                 Flags |= E_EVAL_UNEVAL;
             }
@@ -3264,7 +3267,7 @@ static int hieAnd (ExprDesc* Expr, unsigned* TrueLab, int* TrueLabAllocated)
                 Error ("Scalar expression expected");
                 ED_MakeConstBool (&Expr2, 0);
             } else if ((Flags & E_EVAL_UNEVAL) != E_EVAL_UNEVAL) {
-                if (!ED_IsConstAbs (&Expr2)) {
+                if (!ED_IsConstBool (&Expr2)) {
                     ED_RequireTest (&Expr2);
                     LoadExpr (CF_FORCECHAR, &Expr2);
 
@@ -3276,7 +3279,7 @@ static int hieAnd (ExprDesc* Expr, unsigned* TrueLab, int* TrueLabAllocated)
                         /* We need the true label for the last expression */
                         HasTrueJump = 1;
                     }
-                } else if (Expr2.IVal == 0) {
+                } else if (Expr2.IVal == 0 && !ED_IsAddrExpr (&Expr2)) {
                     /* Skip remaining */
                     Flags |= E_EVAL_UNEVAL;
                     /* The value of the expression will be false */
@@ -3313,7 +3316,8 @@ static int hieAnd (ExprDesc* Expr, unsigned* TrueLab, int* TrueLabAllocated)
         }
 
         /* Convert to bool */
-        if (ED_IsConstAbs (Expr) && Expr->IVal != 0) {
+        if ((ED_IsConstAbs (Expr) && Expr->IVal != 0) ||
+            ED_IsAddrExpr (Expr)) {
             ED_MakeConstBool (Expr, 1);
         } else {
             Expr->Type = type_bool;
@@ -3354,7 +3358,7 @@ static void hieOr (ExprDesc *Expr)
             ED_MakeConstBool (Expr, 0);
         } else if ((Flags & E_EVAL_UNEVAL) != E_EVAL_UNEVAL) {
  
-            if (!ED_IsConstAbs (Expr)) {
+            if (!ED_IsConstBool (Expr)) {
                 /* Test the lhs if we haven't had && operators. If we had them, the
                 ** jump is already in place and there's no need to do the test.
                 */
@@ -3377,7 +3381,7 @@ static void hieOr (ExprDesc *Expr)
                     /* Jump to TrueLab if true */
                     g_truejump (CF_NONE, TrueLab);
                 }
-            } else if (Expr->IVal != 0) {
+            } else if (Expr->IVal != 0 || ED_IsAddrExpr (Expr)) {
                 /* Skip remaining */
                 Flags |= E_EVAL_UNEVAL;
             }
@@ -3406,7 +3410,7 @@ static void hieOr (ExprDesc *Expr)
                 ED_MakeConstBool (&Expr2, 0);
             } else if ((Flags & E_EVAL_UNEVAL) != E_EVAL_UNEVAL) {
 
-                if (!ED_IsConstAbs (&Expr2)) {
+                if (!ED_IsConstBool (&Expr2)) {
                     /* If there is more to come, add shortcut boolean eval */
                     if (!AndOp) {
                         ED_RequireTest (&Expr2);
@@ -3418,7 +3422,7 @@ static void hieOr (ExprDesc *Expr)
                         }
                         g_truejump (CF_NONE, TrueLab);
                     }
-                } else if (Expr2.IVal != 0) {
+                } else if (Expr2.IVal != 0 || ED_IsAddrExpr (&Expr2)) {
                     /* Skip remaining */
                     Flags |= E_EVAL_UNEVAL;
                     /* The result is always true */
@@ -3429,7 +3433,8 @@ static void hieOr (ExprDesc *Expr)
         }
 
         /* Convert to bool */
-        if (ED_IsConstAbs (Expr) && Expr->IVal != 0) {
+        if ((ED_IsConstAbs (Expr) && Expr->IVal != 0) ||
+            ED_IsAddrExpr (Expr)) {
             ED_MakeConstBool (Expr, 1);
         } else {
             Expr->Type = type_bool;
@@ -3483,7 +3488,7 @@ static void hieQuest (ExprDesc* Expr)
     /* Check if it's a ternary expression */
     if (CurTok.Tok == TOK_QUEST) {
 
-        int ConstantCond = ED_IsConstAbsInt (Expr);
+        int ConstantCond = ED_IsConstBool (Expr);
         unsigned Flags   = Expr->Flags & E_MASK_KEEP_RESULT;
 
         ED_Init (&Expr2);
@@ -3492,6 +3497,11 @@ static void hieQuest (ExprDesc* Expr)
         Expr3.Flags = Flags;
 
         NextToken ();
+
+        /* Convert non-integer constant boolean */
+        if (ED_IsAddrExpr (Expr)) {
+            ED_MakeConstBool (Expr, 1);
+        }
 
         if (!ConstantCond) {
             /* Condition codes not set, request a test */

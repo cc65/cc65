@@ -58,7 +58,7 @@ ExprDesc* ED_Init (ExprDesc* Expr)
 {
     Expr->Sym       = 0;
     Expr->Type      = 0;
-    Expr->Flags     = 0;
+    Expr->Flags     = E_NEED_EAX;
     Expr->Name      = 0;
     Expr->IVal      = 0;
     Expr->FVal      = FP_D_Make (0.0);
@@ -110,6 +110,24 @@ int ED_IsIndExpr (const ExprDesc* Expr)
            !ED_IsLocNone (Expr) && !ED_IsLocPrimary (Expr);
 }
 #endif
+
+
+
+int ED_YetToLoad (const ExprDesc* Expr)
+/* Check if the expression needs to be loaded somehow. */
+{
+    return ED_NeedsPrimary (Expr)   ||
+           ED_YetToTest (Expr)      ||
+           (ED_IsLVal (Expr) && IsQualVolatile (Expr->Type));
+}
+
+
+
+void ED_MarkForUneval (ExprDesc* Expr)
+/* Mark the expression as not to be evaluated */
+{
+    Expr->Flags = (Expr->Flags & ~E_MASK_EVAL) | E_EVAL_UNEVAL;
+}
 
 
 
@@ -206,7 +224,7 @@ ExprDesc* ED_MakeConstAbs (ExprDesc* Expr, long Value, Type* Type)
 {
     Expr->Sym   = 0;
     Expr->Type  = Type;
-    Expr->Flags = E_LOC_NONE | E_RTYPE_RVAL | (Expr->Flags & E_HAVE_MARKS);
+    Expr->Flags = E_LOC_NONE | E_RTYPE_RVAL | (Expr->Flags & E_MASK_KEEP_MAKE);
     Expr->Name  = 0;
     Expr->IVal  = Value;
     Expr->FVal  = FP_D_Make (0.0);
@@ -220,7 +238,7 @@ ExprDesc* ED_MakeConstAbsInt (ExprDesc* Expr, long Value)
 {
     Expr->Sym   = 0;
     Expr->Type  = type_int;
-    Expr->Flags = E_LOC_NONE | E_RTYPE_RVAL | (Expr->Flags & E_HAVE_MARKS);
+    Expr->Flags = E_LOC_NONE | E_RTYPE_RVAL | (Expr->Flags & E_MASK_KEEP_MAKE);
     Expr->Name  = 0;
     Expr->IVal  = Value;
     Expr->FVal  = FP_D_Make (0.0);
@@ -412,7 +430,8 @@ int ED_IsBool (const ExprDesc* Expr)
     /* Either ints, floats, or pointers can be used in a boolean context */
     return IsClassInt (Expr->Type)   ||
            IsClassFloat (Expr->Type) ||
-           IsClassPtr (Expr->Type);
+           IsClassPtr (Expr->Type)   ||
+           IsClassFunc (Expr->Type);
 }
 
 

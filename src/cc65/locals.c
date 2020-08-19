@@ -122,8 +122,6 @@ static void ParseRegisterDecl (Declaration* Decl, int Reg)
     /* Check for an optional initialization */
     if (CurTok.Tok == TOK_ASSIGN) {
 
-        ExprDesc Expr;
-
         /* Skip the '=' */
         NextToken ();
 
@@ -151,6 +149,9 @@ static void ParseRegisterDecl (Declaration* Decl, int Reg)
             g_initregister (InitLabel, Reg, Size);
 
         } else {
+
+            ExprDesc Expr;
+            ED_Init (&Expr);
 
             /* Parse the expression */
             hie1 (&Expr);
@@ -203,8 +204,6 @@ static void ParseAutoDecl (Declaration* Decl)
         /* Check for an optional initialization */
         if (CurTok.Tok == TOK_ASSIGN) {
 
-            ExprDesc Expr;
-
             /* Skip the '=' */
             NextToken ();
 
@@ -241,6 +240,9 @@ static void ParseAutoDecl (Declaration* Decl)
                 g_initauto (InitLabel, Size);
 
             } else {
+
+                ExprDesc Expr;
+                ED_Init (&Expr);
 
                 /* Allocate previously reserved local space */
                 F_AllocLocalSpace (CurrentFunc);
@@ -303,8 +305,6 @@ static void ParseAutoDecl (Declaration* Decl)
         /* Allow assignments */
         if (CurTok.Tok == TOK_ASSIGN) {
 
-            ExprDesc Expr;
-
             /* Skip the '=' */
             NextToken ();
 
@@ -327,6 +327,9 @@ static void ParseAutoDecl (Declaration* Decl)
                 g_initstatic (InitLabel, DataLabel, Size);
 
             } else {
+
+                ExprDesc Expr;
+                ED_Init (&Expr);
 
                 /* Allocate space for the variable */
                 AllocStorage (DataLabel, g_usebss, Size);

@@ -55,6 +55,8 @@ void ParseStaticAssert ()
     ExprDesc Expr;
     int failed;
 
+    ED_Init (&Expr);
+
     /* Skip the _Static_assert token itself */
     CHECK (CurTok.Tok == TOK_STATIC_ASSERT);
     NextToken ();

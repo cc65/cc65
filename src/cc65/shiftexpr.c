@@ -61,7 +61,6 @@
 void ShiftExpr (struct ExprDesc* Expr)
 /* Parse the << and >> operators. */
 {
-    ExprDesc Expr2;
     CodeMark Mark1;
     CodeMark Mark2;
     token_t Tok;                        /* The operator token */
@@ -77,6 +76,10 @@ void ShiftExpr (struct ExprDesc* Expr)
     ExprWithCheck (hie8, Expr);
 
     while (CurTok.Tok == TOK_SHL || CurTok.Tok == TOK_SHR) {
+
+        ExprDesc Expr2;
+        ED_Init (&Expr2);
+        Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
 
         /* All operators that call this function expect an int on the lhs */
         if (!IsClassInt (Expr->Type)) {

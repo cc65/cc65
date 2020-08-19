@@ -152,6 +152,9 @@ static void ParseArg (ArgDesc* Arg, Type* Type)
     /* Remember the required argument type */
     Arg->ArgType = Type;
 
+    /* Init expression */
+    ED_Init (&Arg->Expr);
+
     /* Read the expression we're going to pass to the function */
     MarkedExprWithCheck (hie1, &Arg->Expr);
 
@@ -1179,6 +1182,8 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     int         IsByteIndex;
     long        ECount;
     unsigned    L;
+
+    ED_Init (&Arg);
 
     /* Setup the argument type string */
     ArgType[1].C = T_CHAR | T_QUAL_CONST;

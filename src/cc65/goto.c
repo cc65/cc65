@@ -80,6 +80,8 @@ void GotoStatement (void)
         CodeEntry *E;
         unsigned char val;
 
+        ED_Init (&desc);
+
         NextToken ();
 
         /* arr[foo], we only support simple foo for now */

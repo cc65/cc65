@@ -139,6 +139,7 @@ void Assignment (ExprDesc* Expr)
     ExprDesc Expr2;
     Type* ltype = Expr->Type;
 
+    ED_Init (&Expr2);
 
     /* We must have an lvalue for an assignment */
     if (ED_IsRVal (Expr)) {

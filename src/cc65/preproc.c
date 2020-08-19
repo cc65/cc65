@@ -1043,6 +1043,7 @@ static int DoIf (int Skip)
 /* Process #if directive */
 {
     ExprDesc Expr;
+    ED_Init (&Expr);
 
     /* We're about to abuse the compiler expression parser to evaluate the
     ** #if expression. Save the current tokens to come back here later.

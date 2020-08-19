@@ -58,6 +58,8 @@ unsigned Test (unsigned Label, int Invert)
     ExprDesc Expr;
     unsigned Result;
 
+    ED_Init (&Expr);
+
     /* Read a boolean expression */
     BoolExpr (hie0, &Expr);
 
@@ -80,10 +82,8 @@ unsigned Test (unsigned Label, int Invert)
         /* Result is unknown */
         Result = TESTEXPR_UNKNOWN;
 
-        /* If the expr hasn't set condition codes, set the force-test flag */
-        if (!ED_IsTested (&Expr)) {
-            ED_MarkForTest (&Expr);
-        }
+        /* Set the test flag */
+        ED_RequireTest (&Expr);
 
         /* Load the value into the primary register */
         LoadExpr (CF_FORCECHAR, &Expr);

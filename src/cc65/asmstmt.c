@@ -132,6 +132,8 @@ static void ParseByteArg (StrBuf* T, unsigned Arg)
     ExprDesc Expr;
     char     Buf [16];
 
+    ED_Init (&Expr);
+
     /* We expect an argument separated by a comma */
     ConsumeComma ();
 
@@ -166,6 +168,8 @@ static void ParseWordArg (StrBuf* T, unsigned Arg)
     ExprDesc Expr;
     char     Buf [16];
 
+    ED_Init (&Expr);
+
     /* We expect an argument separated by a comma */
     ConsumeComma ();
 
@@ -199,6 +203,8 @@ static void ParseLongArg (StrBuf* T, unsigned Arg attribute ((unused)))
 {
     ExprDesc Expr;
     char     Buf [16];
+
+    ED_Init (&Expr);
 
     /* We expect an argument separated by a comma */
     ConsumeComma ();
@@ -308,6 +314,8 @@ static void ParseStrArg (StrBuf* T, unsigned Arg attribute ((unused)))
 {
     ExprDesc Expr;
     char Buf [64];
+
+    ED_Init (&Expr);
 
     /* We expect an argument separated by a comma */
     ConsumeComma ();

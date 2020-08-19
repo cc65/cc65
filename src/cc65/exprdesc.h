@@ -94,7 +94,7 @@ enum {
     ** E_LOC_<else>   -- dereference  -> E_LOC_EXPR (pointed-to-value, must load)
     ** + E_ADDRESS_OF -- dereference  -> (lvalue reference)
     */
-    E_MASK_LOC          = 0x00FF,
+    E_MASK_LOC          = 0x01FF,
     E_LOC_NONE          = 0x0000,       /* Pure rvalue with no storage */
     E_LOC_ABS           = 0x0001,       /* Absolute numeric addressed variable */
     E_LOC_GLOBAL        = 0x0002,       /* Global variable */
@@ -104,29 +104,58 @@ enum {
     E_LOC_PRIMARY       = 0x0020,       /* Temporary in primary register */
     E_LOC_EXPR          = 0x0040,       /* A location that the primary register points to */
     E_LOC_LITERAL       = 0x0080,       /* Literal in the literal pool */
+    E_LOC_CODE          = 0x0100,       /* C code label location (&&Label) */
 
-    /* Constant location of some sort (only if rval) */
+    /* Immutable location addresses (immutable bases and offsets) */
     E_LOC_CONST         = E_LOC_NONE | E_LOC_ABS | E_LOC_GLOBAL | E_LOC_STATIC |
-                          E_LOC_REGISTER | E_LOC_LITERAL,
+                          E_LOC_REGISTER | E_LOC_LITERAL | E_LOC_CODE,
+
+    /* Not-so-immutable location addresses (stack offsets can change) */
+    E_LOC_QUASICONST    = E_LOC_CONST | E_LOC_STACK,
+
+    /* Expression type modifiers */
+    E_BITFIELD          = 0x0200,       /* Expression is a bit-field */
+    E_ADDRESS_OF        = 0x0400,       /* Expression is the address of the lvalue */
 
     /* lvalue/rvalue in C language's sense */
-    E_MASK_RTYPE        = 0x0100,
+    E_MASK_RTYPE        = 0x0800,
     E_RTYPE_RVAL        = 0x0000,
-    E_RTYPE_LVAL        = 0x0100,
+    E_RTYPE_LVAL        = 0x0800,
 
-    /* Bit-field? */
-    E_BITFIELD          = 0x0200,
+    /* Expression status */
+    E_LOADED            = 0x1000,       /* Expression is loaded in primary */
+    E_CC_SET            = 0x2000,       /* Condition codes are set */
+    E_HAVE_MARKS        = 0x4000,       /* Code marks are valid */
 
-    /* Test */
-    E_NEED_TEST         = 0x0400,       /* Expression needs a test to set cc */
-    E_CC_SET            = 0x0800,       /* Condition codes are set */
+    /* Optimization hints */
+    E_MASK_NEED         = 0x030000,
+    E_NEED_EAX          = 0x000000,     /* Expression needs to be loaded in Primary */
+    E_NEED_NONE         = 0x010000,     /* Expression value is unused */
+    E_NEED_TEST         = 0x020000,     /* Expression needs a test to set cc */
 
-    E_HAVE_MARKS        = 0x1000,       /* Code marks are valid */
+    /* Expression evaluation requirements.
+    ** Usage: (Flags & E_EVAL_<Flag>) == E_EVAL_<Flag>
+    */
+    E_MASK_EVAL         = 0xFC0000,
+    E_EVAL_NONE         = 0x000000,     /* No requirements */
+    E_EVAL_CONST        = 0x040000,     /* Result must be immutable */
+    E_EVAL_COMPILE_TIME = 0x0C0000,     /* Result must be known at compile time */
+    E_EVAL_PURE         = 0x100000,     /* Evaluation must have no side effects */
+    E_EVAL_STATIC       = 0x340000,     /* Evaluation must generate no code */
+    E_EVAL_MAYBE_UNUSED = 0x400000,     /* Result may be unused */
+    E_EVAL_UNEVAL       = 0xC00000,     /* Expression is unevaluated */
 
-    E_LOADED            = 0x4000,       /* Expression is loaded in primary */
+    /* Expression must be static and have result known at compile time */
+    E_EVAL_C_CONST      = E_EVAL_COMPILE_TIME | E_EVAL_STATIC,
 
-    E_ADDRESS_OF        = 0x8000,       /* Expression is the address of the lvalue */
+    /* Flags to keep in subexpressions */
+    E_MASK_KEEP_SUBEXPR = E_MASK_EVAL,
 
+    /* Flags to keep in ternary subexpressions */
+    E_MASK_KEEP_RESULT  = E_MASK_NEED | E_MASK_EVAL,
+
+    /* Flags to keep when using the ED_Make functions */
+    E_MASK_KEEP_MAKE    = E_HAVE_MARKS | E_MASK_KEEP_RESULT,
 };
 
 /* Forward */
@@ -292,13 +321,33 @@ void ED_MakeBitField (ExprDesc* Expr, unsigned BitOffs, unsigned BitWidth);
 /* Make this expression a bit field expression */
 
 #if defined(HAVE_INLINE)
-INLINE void ED_MarkForTest (ExprDesc* Expr)
+INLINE void ED_RequireTest (ExprDesc* Expr)
 /* Mark the expression for a test. */
 {
     Expr->Flags |= E_NEED_TEST;
 }
 #else
-#  define ED_MarkForTest(Expr)  do { (Expr)->Flags |= E_NEED_TEST; } while (0)
+#  define ED_RequireTest(Expr)  do { (Expr)->Flags |= E_NEED_TEST; } while (0)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int ED_GetNeeds (const ExprDesc* Expr)
+/* Get flags about what the expression needs. */
+{
+    return (Expr->Flags & E_MASK_NEED);
+}
+#else
+#  define ED_GetNeeds(Expr)     ((Expr)->Flags & E_MASK_NEED)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int ED_NeedsPrimary (const ExprDesc* Expr)
+/* Check if the expression needs to be in Primary. */
+{
+    return (Expr->Flags & E_MASK_NEED) == E_NEED_EAX;
+}
+#else
+#  define ED_NeedsPrimary(Expr) (((Expr)->Flags & E_MASK_NEED) == E_NEED_EAX)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -312,14 +361,24 @@ INLINE int ED_NeedsTest (const ExprDesc* Expr)
 #endif
 
 #if defined(HAVE_INLINE)
+INLINE int ED_YetToTest (const ExprDesc* Expr)
+/* Check if the expression needs to be tested but not yet. */
+{
+    return ((Expr)->Flags & (E_NEED_TEST | E_CC_SET)) == E_NEED_TEST;
+}
+#else
+#  define ED_YetToTest(Expr)    (((Expr)->Flags & (E_NEED_TEST | E_CC_SET)) == E_NEED_TEST)
+#endif
+
+#if defined(HAVE_INLINE)
 INLINE void ED_TestDone (ExprDesc* Expr)
 /* Mark the expression as tested and condition codes set. */
 {
-    Expr->Flags = (Expr->Flags & ~E_NEED_TEST) | E_CC_SET;
+    Expr->Flags |= E_CC_SET;
 }
 #else
 #  define ED_TestDone(Expr)     \
-    do { (Expr)->Flags = ((Expr)->Flags & ~E_NEED_TEST) | E_CC_SET; } while (0)
+    do { (Expr)->Flags |= E_CC_SET; } while (0)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -352,6 +411,42 @@ INLINE int ED_IsLoaded (const ExprDesc* Expr)
 }
 #else
 #  define ED_IsLoaded(Expr)   (((Expr)->Flags & E_LOADED) != 0)
+#endif
+
+int ED_YetToLoad (const ExprDesc* Expr);
+/* Check if the expression is yet to be loaded somehow. */
+
+#if defined(HAVE_INLINE)
+INLINE int ED_NeedsConst (const ExprDesc* Expr)
+/* Check if the expression need be immutable */
+{
+    return (Expr->Flags & E_EVAL_CONST) == E_EVAL_CONST;
+}
+#else
+#  define ED_NeedsConst(Expr)   (((Expr)->Flags & E_EVAL_CONST) == E_EVAL_CONST)
+#endif
+
+void ED_MarkForUneval (ExprDesc* Expr);
+/* Mark the expression as not to be evaluated */
+
+#if defined(HAVE_INLINE)
+INLINE int ED_MayBeUneval (const ExprDesc* Expr)
+/* Check if the expression may be uevaluated */
+{
+    return (Expr->Flags & E_EVAL_UNEVAL) == E_EVAL_UNEVAL;
+}
+#else
+#  define ED_MayBeUneval(Expr)  (((Expr)->Flags & E_EVAL_UNEVAL) == E_EVAL_UNEVAL)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int ED_MayHaveNoEffect (const ExprDesc* Expr)
+/* Check if the expression may be present without effects */
+{
+    return (Expr->Flags & E_EVAL_MAYBE_UNUSED) == E_EVAL_MAYBE_UNUSED;
+}
+#else
+#  define ED_MayHaveNoEffect(Expr)  (((Expr)->Flags & E_EVAL_MAYBE_UNUSED) == E_EVAL_MAYBE_UNUSED)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -522,7 +617,7 @@ int ED_IsNullPtr (const ExprDesc* Expr);
 
 int ED_IsBool (const ExprDesc* Expr);
 /* Return true of the expression can be treated as a boolean, that is, it can
-** be an operand to a compare operation.
+** be an operand to a compare operation with 0/NULL.
 */
 
 void PrintExprDesc (FILE* F, ExprDesc* Expr);

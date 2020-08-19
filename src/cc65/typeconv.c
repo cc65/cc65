@@ -371,6 +371,11 @@ void TypeCast (ExprDesc* Expr)
                GetBasicTypeName (NewType));
     }
 
+    /* If the new type is void, the cast expression can have no effects */
+    if (IsTypeVoid (NewType)) {
+        Expr->Flags |= E_EVAL_MAYBE_UNUSED;
+    }
+
     /* The result is always an rvalue */
     ED_MarkExprAsRVal (Expr);
 }

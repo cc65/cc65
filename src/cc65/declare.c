@@ -591,6 +591,7 @@ static SymEntry* ParseEnumDecl (const char* Name)
         if (CurTok.Tok == TOK_ASSIGN) {
 
             ExprDesc Expr;
+            ED_Init (&Expr);
             NextToken ();
             ConstAbsIntExpr (hie1, &Expr);
             EnumVal       = Expr.IVal;
@@ -720,6 +721,7 @@ static int ParseFieldWidth (Declaration* Decl)
 */
 {
     ExprDesc Expr;
+    ED_Init (&Expr);
 
     if (CurTok.Tok != TOK_COLON) {
         /* No bit-field declaration */
@@ -1818,6 +1820,7 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
             /* Read the size if it is given */
             if (CurTok.Tok != TOK_RBRACK) {
                 ExprDesc Expr;
+                ED_Init (&Expr);
                 ConstAbsIntExpr (hie1, &Expr);
                 if (Expr.IVal <= 0) {
                     if (D->Ident[0] != '\0') {
@@ -2184,6 +2187,7 @@ static unsigned ParseScalarInit (Type* T)
 /* Parse initializaton for scalar data types. Return the number of data bytes. */
 {
     ExprDesc ED;
+    ED_Init (&ED);
 
     /* Parse initialization */
     ParseScalarInitInternal (T, &ED);
@@ -2205,6 +2209,8 @@ static unsigned ParsePointerInit (Type* T)
 
     /* Expression */
     ExprDesc ED;
+    ED_Init (&ED);
+
     ConstExpr (hie1, &ED);
     TypeConversion (&ED, T);
 
@@ -2420,6 +2426,7 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
             ** handling.
             */
             ExprDesc ED;
+            ED_Init (&ED);
             unsigned Val;
             unsigned Shift;
 
@@ -2541,7 +2548,6 @@ static unsigned ParseVoidInit (Type* T)
 ** Return the number of bytes initialized.
 */
 {
-    ExprDesc Expr;
     unsigned Size;
 
     /* Opening brace */
@@ -2550,6 +2556,9 @@ static unsigned ParseVoidInit (Type* T)
     /* Allow an arbitrary list of values */
     Size = 0;
     do {
+        ExprDesc Expr;
+        ED_Init (&Expr);
+
         ConstExpr (hie1, &Expr);
         switch (GetUnderlyingTypeCode (&Expr.Type[0])) {
 

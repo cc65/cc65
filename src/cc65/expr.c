@@ -557,7 +557,7 @@ static void FunctionCall (ExprDesc* Expr)
         ** For fastcall functions we do also need to place a copy of the
         ** pointer on stack, since we cannot use a/x.
         */
-        PtrOnStack = IsFastcall || !ED_IsConst (Expr);
+        PtrOnStack = IsFastcall || !ED_IsConstAddr (Expr);
         if (PtrOnStack) {
 
             /* Not a global or local variable, or a fastcall function. Load
@@ -1083,12 +1083,13 @@ static void ArrayRef (ExprDesc* Expr)
         ED_FinalizeRValLoad (&Subscript);
     }
 
-    /* Check if the subscript is constant absolute value */
+    /* Make the address of the array element from the base and subscript */
     if (ED_IsConstAbs (&Subscript) && ED_CodeRangeIsEmpty (&Subscript)) {
 
-        /* The array subscript is a numeric constant. If we had pushed the
-        ** array base address onto the stack before, we can remove this value,
-        ** since we can generate expression+offset.
+        /* The array subscript is a constant. Since we can have the element
+        ** address directly as base+offset, we can remove the array address
+        ** push onto the stack before if loading subscript doesn't tamper that
+        ** address in the primary. 
         */
         if (!ConstBaseAddr) {
             RemoveCode (&Mark2);
@@ -1127,7 +1128,7 @@ static void ArrayRef (ExprDesc* Expr)
 
         } else {
 
-            /* Scale the rhs value according to the element type */
+            /* Scale the lhs value according to the element type */
             g_scale (TypeOf (tptr1), CheckedSizeOf (ElementType));
 
             /* Add the subscript. Since arrays are indexed by integers,
@@ -1247,13 +1248,13 @@ static void ArrayRef (ExprDesc* Expr)
             }
         }
 
-        /* The pointer is an rvalue in the primary */
+        /* The address of the element is an rvalue in the primary */
         ED_FinalizeRValLoad (Expr);
 
     }
 
-    /* The result is usually an lvalue expression of element type referenced in
-    ** the primary, unless it's an array which is a rare case. We can just
+    /* The final result is usually an lvalue expression of element type
+    ** referenced in the primary, unless it is once again an array. We can just
     ** assume the usual case first, and change it later if necessary.
     */
     ED_IndExpr (Expr);

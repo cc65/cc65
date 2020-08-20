@@ -2554,8 +2554,8 @@ void g_mul (unsigned flags, unsigned long val)
     if (flags & CF_CONST) {
 
         /* Deal with negative values if it's signed multiplication */
-        int Negation = (flags & CF_UNSIGNED) == 0 && (signed long)val < 0;
-        int p2 = PowerOf2 (Negation ? (unsigned long)-(signed long)val : val);
+        int Negation = (flags & CF_UNSIGNED) == 0 && (long)val < 0;
+        int p2 = PowerOf2 (Negation ? 0UL - val : val);
 
         /* Check if we can use shift instead of multiplication */
         if (p2 == 0 || (p2 > 0 && IS_Get (&CodeSizeFactor) >= (Negation ? 100 : 0))) {
@@ -2675,7 +2675,7 @@ void g_div (unsigned flags, unsigned long val)
 
         /* Deal with negative values as well as different sizes */
         int           Negation   = (flags & CF_UNSIGNED) == 0 && (long)val < 0;
-        unsigned long NegatedVal = (unsigned long)-(long)val;
+        unsigned long NegatedVal = 0UL - val;
         int           p2         = PowerOf2 (Negation ? NegatedVal : val);
 
         /* Generate a shift instead */

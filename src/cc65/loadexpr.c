@@ -142,6 +142,10 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
                 BitFieldFullWidthFlags |= CF_UNSIGNED;
             }
         } else if ((Flags & CF_TYPEMASK) == 0) {
+            /* If Expr is an incomplete ESY type, bail out */
+            if (IsIncompleteESUType (Expr->Type)) {
+                return;
+            }
             Flags |= TypeOf (Expr->Type);
         }
 

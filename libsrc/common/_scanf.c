@@ -183,7 +183,7 @@ static void PushBack (void)
     asm ("jsr pushax");
 
     /* Copy D into the zero-page. */
-    (const struct scanfdata*) __AX__ = D_;
+    __AX__ = (unsigned) D_;
     asm ("sta ptr1");
     asm ("stx ptr1+1");
 
@@ -272,7 +272,7 @@ static void __fastcall__ Error (unsigned char /* Code */)
 /* Does a longjmp using the given code */
 {
     asm ("pha");
-    (char*) __AX__ = JumpBuf;
+    __AX__ = (unsigned) JumpBuf;
     asm ("jsr pushax");
     asm ("pla");
     asm ("ldx #>$0000");
@@ -389,7 +389,7 @@ static void AssignInt (void)
     if (NoAssign == false) {
 
         /* Get the next argument pointer */
-        (void*) __AX__ = va_arg (ap, void*);
+        __AX__ = (unsigned) va_arg (ap, void*);
 
         /* Put the argument pointer into the zero-page. */
         asm ("sta ptr1");
@@ -468,7 +468,7 @@ static char GetFormat (void)
 /* Pick up the next character from the format string. */
 {
 /*  return (F = *format++); */
-    (const char*) __AX__ = format;
+    __AX__ = (unsigned) format;
     asm ("sta regsave");
     asm ("stx regsave+1");
     ++format;

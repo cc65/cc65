@@ -156,6 +156,11 @@ void Assignment (ExprDesc* Expr)
         Error ("Assignment to const");
     }
 
+    /* Check for assignment to incomplete type */
+    if (IsIncompleteESUType (ltype)) {
+        Error ("Assignment to incomplete type '%s'", GetFullTypeName (ltype));
+    }
+
     /* Skip the '=' token */
     NextToken ();
 

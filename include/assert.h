@@ -46,16 +46,14 @@ extern void __fastcall__ _afailed (const char*, unsigned);
 #  define assert(expr)  ((expr)? (void)0 : _afailed(__FILE__, __LINE__))
 #endif
 
-/*
-** TODO: Guard with #if __STDC_VERSION__ >= 201112L or similar when there
+/* TODO: Guard with #if __CC65_STD__ >= __CC65_STD_C11__ if there
 ** is a C11 mode.
 */
-#define static_assert _Static_assert
+#if __CC65_STD__ > __CC65_STD_C99__
+#  define static_assert _Static_assert
+#endif
 
 
 
 /* End of assert.h */
 #endif
-
-
-

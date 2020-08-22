@@ -148,9 +148,6 @@ void g_defcodelabel (unsigned label);
 void g_defdatalabel (unsigned label);
 /* Define a local data label */
 
-void g_aliasdatalabel (unsigned label, unsigned baselabel, long offs);
-/* Define label as a local alias for baselabel+offs */
-
 
 
 /*****************************************************************************/
@@ -161,6 +158,12 @@ void g_aliasdatalabel (unsigned label, unsigned baselabel, long offs);
 
 void g_defgloblabel (const char* Name);
 /* Define a global label with the given name */
+
+void g_defliterallabel (unsigned label);
+/* Define a literal data label */
+
+void g_aliasliterallabel (unsigned label, unsigned baselabel, long offs);
+/* Define label as an alias for baselabel+offs */
 
 void g_defexport (const char* Name, int ZP);
 /* Export the given label */

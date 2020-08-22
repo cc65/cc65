@@ -190,9 +190,9 @@ const char* ED_GetLabelName (const ExprDesc* Expr, long Offs)
         case E_LOC_LITERAL:
             /* Literal in the literal pool */
             if (Offs) {
-                SB_Printf (&Buf, "%s%+ld", LocalLabelName (Expr->Name), Offs);
+                SB_Printf (&Buf, "%s%+ld", PooledLiteralLabelName (Expr->Name), Offs);
             } else {
-                SB_Printf (&Buf, "%s", LocalLabelName (Expr->Name));
+                SB_Printf (&Buf, "%s", PooledLiteralLabelName (Expr->Name));
             }
             break;
 

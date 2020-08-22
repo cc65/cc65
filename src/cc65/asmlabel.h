@@ -56,6 +56,14 @@ const char* LocalLabelName (unsigned L);
 int IsLocalLabelName (const char* Name);
 /* Return true if Name is the name of a local label */
 
+unsigned GetPooledLiteralLabel (void);
+/* Get an unused literal label. Will never return zero. */
+
+const char* PooledLiteralLabelName (unsigned L);
+/* Make a litral label name from the given label number. The label name will be
+** created in static storage and overwritten when calling the function again.
+*/
+
 
 
 /* End of asmlabel.h */

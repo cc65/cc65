@@ -64,9 +64,13 @@ static void LoadAddress (unsigned Flags, ExprDesc* Expr)
             break;
 
         case E_LOC_STATIC:
-        case E_LOC_LITERAL:
-            /* Static symbol or literal, load address */
+            /* Static symbol, load address */
             g_getimmed ((Flags | CF_STATIC) & ~CF_CONST, Expr->Name, Expr->IVal);
+            break;
+
+        case E_LOC_LITERAL:
+            /* Literal, load address */
+            g_getimmed ((Flags | CF_LITERAL) & ~CF_CONST, Expr->Name, Expr->IVal);
             break;
 
         case E_LOC_REGISTER:
@@ -183,9 +187,13 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
                 break;
 
             case E_LOC_STATIC:
-            case E_LOC_LITERAL:
-                /* Static variable or literal in the literal pool */
+                /* Static variable */
                 g_getstatic (Flags | CF_STATIC, Expr->Name, Expr->IVal);
+                break;
+
+            case E_LOC_LITERAL:
+                /* Literal in the literal pool */
+                g_getstatic (Flags | CF_LITERAL, Expr->Name, Expr->IVal);
                 break;
 
             case E_LOC_REGISTER:

@@ -2157,9 +2157,13 @@ static void DefineData (ExprDesc* Expr)
             break;
 
         case E_LOC_STATIC:
-        case E_LOC_LITERAL:
-            /* Static variable or literal in the literal pool */
+            /* Static variable */
             g_defdata (CF_STATIC, Expr->Name, Expr->IVal);
+            break;
+
+        case E_LOC_LITERAL:
+            /* Literal in the literal pool */
+            g_defdata (CF_LITERAL, Expr->Name, Expr->IVal);
             break;
 
         case E_LOC_REGISTER:

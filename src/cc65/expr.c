@@ -3184,7 +3184,7 @@ static void hieOrPP (ExprDesc *Expr)
 
 
 
-static int hieAnd (ExprDesc* Expr, unsigned TrueLab, int* UsedTrueLab)
+static int hieAnd (ExprDesc* Expr, unsigned* TrueLab, int* TrueLabAllocated)
 /* Process "exp && exp". This should only be called within hieOr.
 ** Return true if logic AND does occur.
 */
@@ -3275,14 +3275,17 @@ static int hieAnd (ExprDesc* Expr, unsigned TrueLab, int* UsedTrueLab)
         /* Last expression */
         if ((Flags & E_EVAL_UNEVAL) != E_EVAL_UNEVAL) {
             if (HasFalseJump || HasTrueJump) {
-                /* In either case we need the true label anyways */
-                HasTrueJump = 1;
+                if (*TrueLabAllocated == 0) {
+                    /* Get a label that we will use for true expressions */
+                    *TrueLab = GetLocalLabel ();
+                    *TrueLabAllocated = 1;
+                }
                 if (!ED_IsConstAbs (&Expr2)) {
                     /* Will branch to true and fall to false */
-                    g_truejump (CF_NONE, TrueLab);
+                    g_truejump (CF_NONE, *TrueLab);
                 } else {
                     /* Will jump away */
-                    g_jump (TrueLab);
+                    g_jump (*TrueLab);
                 }
                 /* The result is an rvalue in primary */
                 ED_FinalizeRValLoad (Expr);
@@ -3303,11 +3306,6 @@ static int hieAnd (ExprDesc* Expr, unsigned TrueLab, int* UsedTrueLab)
             Expr->Type = type_bool;
         }
 
-        /* Tell our caller that we're used the true label */
-        if (HasTrueJump) {
-            *UsedTrueLab = 1;
-        }
-
         /* Tell our caller that we're evaluating a boolean */
         return 1;
     }
@@ -3325,20 +3323,13 @@ static void hieOr (ExprDesc *Expr)
     unsigned TrueLab;           /* Jump to this label if true */
     unsigned DoneLab;
     int      HasTrueJump = 0;
-    int      HasNewTrueJump;
     CodeMark Start;
-
-    /* Get a label that we will use for true expressions */
-    TrueLab = GetLocalLabel ();
 
     /* Call the next level parser */
     GetCodePos (&Start);
-    AndOp = hieAnd (Expr, TrueLab, &HasNewTrueJump);
+    AndOp = hieAnd (Expr, &TrueLab, &HasTrueJump);
     if ((Flags & E_EVAL_UNEVAL) == E_EVAL_UNEVAL) {
         RemoveCode (&Start);
-    } else {
-        /* Remember the jump */
-        HasTrueJump = HasNewTrueJump;
     }
 
     /* Any boolean or's? */
@@ -3361,8 +3352,11 @@ static void hieOr (ExprDesc *Expr)
                     /* Get first expr */
                     LoadExpr (CF_FORCECHAR, Expr);
 
-                    /* Remember that the jump is used */
-                    HasTrueJump = 1;
+                    if (HasTrueJump == 0) {
+                        /* Get a label that we will use for true expressions */
+                        TrueLab = GetLocalLabel();
+                        HasTrueJump = 1;
+                    }
 
                     /* Jump to TrueLab if true */
                     g_truejump (CF_NONE, TrueLab);
@@ -3385,12 +3379,9 @@ static void hieOr (ExprDesc *Expr)
 
             /* Get rhs subexpression */
             GetCodePos (&Start);
-            AndOp = hieAnd (&Expr2, TrueLab, &HasNewTrueJump);
+            AndOp = hieAnd (&Expr2, &TrueLab, &HasTrueJump);
             if ((Flags & E_EVAL_UNEVAL) == E_EVAL_UNEVAL) {
                 RemoveCode (&Start);
-            } else {
-                /* Remember the jump */
-                HasTrueJump = HasTrueJump || HasNewTrueJump;
             }
 
             /* Check type */
@@ -3405,7 +3396,10 @@ static void hieOr (ExprDesc *Expr)
                         ED_RequireTest (&Expr2);
                         LoadExpr (CF_FORCECHAR, &Expr2);
 
-                        HasTrueJump = 1;                        
+                        if (HasTrueJump == 0) {
+                            TrueLab = GetLocalLabel();
+                            HasTrueJump = 1;
+                        }
                         g_truejump (CF_NONE, TrueLab);
                     }
                 } else if (Expr2.IVal != 0) {

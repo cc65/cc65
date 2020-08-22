@@ -389,6 +389,12 @@ void Compile (const char* FileName)
     /* Create the global code and data segments */
     CreateGlobalSegments ();
 
+    /* There shouldn't be needs for local labels outside a function, but the
+    ** current code generator still tries to get some at times even though the
+    ** code were ill-formed. So just set it up with the global segment list.
+    */
+    UseLabelPoolFromSegments (GS);
+
     /* Initialize the literal pool */
     InitLiteralPool ();
 
@@ -488,6 +494,9 @@ void FinishCompile (void)
     */
     for (Entry = GetGlobalSymTab ()->SymHead; Entry; Entry = Entry->NextSym) {
         if (SymIsOutputFunc (Entry)) {
+            /* Continue with previous label numbers */
+            UseLabelPoolFromSegments (Entry->V.F.Seg);
+
             /* Function which is defined and referenced or extern */
             MoveLiteralPool (Entry->V.F.LitPool);
             CS_MergeLabels (Entry->V.F.Seg->Code);

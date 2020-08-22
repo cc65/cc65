@@ -83,7 +83,7 @@ static Function* NewFunction (struct SymEntry* Sym, FuncDesc* D)
     F->ReturnType = GetFuncReturn (Sym->Type);
     F->Desc       = D;
     F->Reserved   = 0;
-    F->RetLab     = GetLocalLabel ();
+    F->RetLab     = 0;
     F->TopLevelSP = 0;
     F->RegOffs    = RegisterSpace;
     F->Flags      = IsTypeVoid (F->ReturnType) ? FF_VOID_RETURN : FF_NONE;
@@ -251,6 +251,14 @@ int F_HasOldStyleIntRet (const Function* F)
 /* Return true if this is an old style (K&R) function with an implicit int return */
 {
     return (F->Desc->Flags & FD_OLDSTYLE_INTRET) != 0;
+}
+
+
+
+void F_SetRetLab (Function* F, unsigned NewRetLab)
+/* Change the return jump label */
+{
+    F->RetLab = NewRetLab;
 }
 
 
@@ -539,6 +547,12 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
 
     /* Allocate code and data segments for this function */
     Func->V.F.Seg = PushSegments (Func);
+
+    /* Use the info in the segments for generating new local labels */
+    UseLabelPoolFromSegments (Func->V.F.Seg);
+
+    /* Set return label. This has to be done after the segments are pushed */
+    F_SetRetLab (CurrentFunc, GetLocalLabel ());
 
     /* Allocate a new literal pool */
     PushLiteralPool (Func);

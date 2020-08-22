@@ -143,12 +143,14 @@ static Segments* NewSegments (SymEntry* Func)
     Segments* S = xmalloc (sizeof (Segments));
 
     /* Initialize the fields */
-    S->Text     = NewTextSeg (Func);
-    S->Code     = NewCodeSeg (GetSegName (SEG_CODE), Func);
-    S->Data     = NewDataSeg (GetSegName (SEG_DATA), Func);
-    S->ROData   = NewDataSeg (GetSegName (SEG_RODATA), Func);
-    S->BSS      = NewDataSeg (GetSegName (SEG_BSS), Func);
-    S->CurDSeg  = SEG_DATA;
+    S->Text    = NewTextSeg (Func);
+    S->Code    = NewCodeSeg (GetSegName (SEG_CODE), Func);
+    S->Data    = NewDataSeg (GetSegName (SEG_DATA), Func);
+    S->ROData  = NewDataSeg (GetSegName (SEG_RODATA), Func);
+    S->BSS     = NewDataSeg (GetSegName (SEG_BSS), Func);
+    S->CurDSeg = SEG_DATA;
+    S->NextLabel     = 0;
+    S->NextDataLabel = 0;
 
     /* Return the new struct */
     return S;

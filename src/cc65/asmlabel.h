@@ -39,13 +39,26 @@
 
 
 /*****************************************************************************/
+/*                                 Forwards                                  */
+/*****************************************************************************/
+
+
+
+struct Segments;
+
+
+
+/*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
 
 
+void UseLabelPoolFromSegments (struct Segments* Seg);
+/* Use the info in segments for generating new label numbers */
+
 unsigned GetLocalLabel (void);
-/* Get an unused assembler label. Will never return zero. */
+/* Get an unused assembler label for the function. Will never return zero. */
 
 const char* LocalLabelName (unsigned L);
 /* Make a label name from the given label number. The label name will be

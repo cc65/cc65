@@ -1540,19 +1540,13 @@ void Store (ExprDesc* Expr, const Type* StoreType)
             break;
 
         case E_LOC_GLOBAL:
-            /* Global variable */
-            g_putstatic (Flags, Expr->Name, Expr->IVal);
-            break;
-
         case E_LOC_STATIC:
+        case E_LOC_REGISTER:
         case E_LOC_LITERAL:
         case E_LOC_CODE:
-            /* Static variable, pooled literal or code label location */
-            g_putstatic (Flags, Expr->Name, Expr->IVal);
-            break;
-
-        case E_LOC_REGISTER:
-            /* Register variable */
+            /* Global variabl, static variable, register variable, pooled
+            ** literal or code label location.
+            */
             g_putstatic (Flags, Expr->Name, Expr->IVal);
             break;
 
@@ -1620,19 +1614,13 @@ static void PreInc (ExprDesc* Expr)
             break;
 
         case E_LOC_GLOBAL:
-            /* Global variable */
-            g_addeqstatic (Flags, Expr->Name, Expr->IVal, Val);
-            break;
-
         case E_LOC_STATIC:
+        case E_LOC_REGISTER:
         case E_LOC_LITERAL:
         case E_LOC_CODE:
-            /* Static variable, pooled literal or code label location */
-            g_addeqstatic (Flags, Expr->Name, Expr->IVal, Val);
-            break;
-
-        case E_LOC_REGISTER:
-            /* Register variable */
+            /* Global variabl, static variable, register variable, pooled
+            ** literal or code label location.
+            */
             g_addeqstatic (Flags, Expr->Name, Expr->IVal, Val);
             break;
 
@@ -1697,19 +1685,13 @@ static void PreDec (ExprDesc* Expr)
             break;
 
         case E_LOC_GLOBAL:
-            /* Global variable */
-            g_subeqstatic (Flags, Expr->Name, Expr->IVal, Val);
-            break;
-
         case E_LOC_STATIC:
+        case E_LOC_REGISTER:
         case E_LOC_LITERAL:
         case E_LOC_CODE:
-            /* Static variable, pooled literal or code label location */
-            g_subeqstatic (Flags, Expr->Name, Expr->IVal, Val);
-            break;
-
-        case E_LOC_REGISTER:
-            /* Register variable */
+            /* Global variabl, static variable, register variable, pooled
+            ** literal or code label location.
+            */
             g_subeqstatic (Flags, Expr->Name, Expr->IVal, Val);
             break;
 
@@ -3863,36 +3845,15 @@ static void addsubeq (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
     switch (ED_GetLoc (Expr)) {
 
         case E_LOC_ABS:
-            /* Absolute numeric addressed variable */
-            if (Gen->Tok == TOK_PLUS_ASSIGN) {
-                g_addeqstatic (lflags, Expr->Name, Expr->IVal, Expr2.IVal);
-            } else {
-                g_subeqstatic (lflags, Expr->Name, Expr->IVal, Expr2.IVal);
-            }
-            break;
-
         case E_LOC_GLOBAL:
-            /* Global variable */
-            if (Gen->Tok == TOK_PLUS_ASSIGN) {
-                g_addeqstatic (lflags, Expr->Name, Expr->IVal, Expr2.IVal);
-            } else {
-                g_subeqstatic (lflags, Expr->Name, Expr->IVal, Expr2.IVal);
-            }
-            break;
-
         case E_LOC_STATIC:
+        case E_LOC_REGISTER:
         case E_LOC_LITERAL:
         case E_LOC_CODE:
-            /* Static variable, pooled literal or code label location */
-            if (Gen->Tok == TOK_PLUS_ASSIGN) {
-                g_addeqstatic (lflags, Expr->Name, Expr->IVal, Expr2.IVal);
-            } else {
-                g_subeqstatic (lflags, Expr->Name, Expr->IVal, Expr2.IVal);
-            }
-            break;
-
-        case E_LOC_REGISTER:
-            /* Register variable */
+            /* Absolute numeric addressed variable, global variable, local
+            ** static variable, register variable, pooled literal or code
+            ** label location.
+            */
             if (Gen->Tok == TOK_PLUS_ASSIGN) {
                 g_addeqstatic (lflags, Expr->Name, Expr->IVal, Expr2.IVal);
             } else {

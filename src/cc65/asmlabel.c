@@ -101,6 +101,35 @@ int IsLocalLabelName (const char* Name)
 
 
 
+unsigned GetLocalDataLabel (void)
+/* Get an unused local data label. Will never return zero. */
+{
+    /* Number to generate unique labels */
+    static unsigned NextLabel = 0;
+
+    /* Check for an overflow */
+    if (NextLabel >= 0xFFFF) {
+        Internal ("Local data label overflow");
+    }
+
+    /* Return the next label */
+    return ++NextLabel;
+}
+
+
+
+const char* LocalDataLabelName (unsigned L)
+/* Make a label name from the given data label number. The label name will be
+** created in static storage and overwritten when calling the function again.
+*/
+{
+    static char Buf[64];
+    sprintf (Buf, "M%04X", L);
+    return Buf;
+}
+
+
+
 unsigned GetPooledLiteralLabel (void)
 /* Get an unused literal label. Will never return zero. */
 {

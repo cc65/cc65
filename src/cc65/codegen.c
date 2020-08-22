@@ -107,11 +107,11 @@ static const char* GetLabelName (unsigned Flags, uintptr_t Label, long Offs)
             break;
 
         case CF_STATIC:
-            /* Static memory cell */
+            /* Local static memory cell */
             if (Offs) {
-                xsprintf (Buf, sizeof (Buf), "%s%+ld", LocalLabelName (Label), Offs);
+                xsprintf (Buf, sizeof (Buf), "%s%+ld", LocalDataLabelName (Label), Offs);
             } else {
-                xsprintf (Buf, sizeof (Buf), "%s", LocalLabelName (Label));
+                xsprintf (Buf, sizeof (Buf), "%s", LocalDataLabelName (Label));
             }
             break;
 
@@ -142,6 +142,15 @@ static const char* GetLabelName (unsigned Flags, uintptr_t Label, long Offs)
         case CF_REGVAR:
             /* Variable in register bank */
             xsprintf (Buf, sizeof (Buf), "regbank+%u", (unsigned)((Label+Offs) & 0xFFFF));
+            break;
+
+        case CF_CODE:
+            /* Code label location */
+            if (Offs) {
+                xsprintf (Buf, sizeof (Buf), "%s%+ld", LocalLabelName (Label), Offs);
+            } else {
+                xsprintf (Buf, sizeof (Buf), "%s", LocalLabelName (Label));
+            }
             break;
 
         default:
@@ -360,7 +369,7 @@ void g_defcodelabel (unsigned label)
 void g_defdatalabel (unsigned label)
 /* Define a local data label */
 {
-    AddDataLine ("%s:", LocalLabelName (label));
+    AddDataLine ("%s:", LocalDataLabelName (label));
 }
 
 
@@ -2453,11 +2462,11 @@ void g_lateadjustSP (unsigned label)
 /* Adjust stack based on non-immediate data */
 {
     AddCodeLine ("pha");
-    AddCodeLine ("lda %s", LocalLabelName (label));
+    AddCodeLine ("lda %s", LocalDataLabelName (label));
     AddCodeLine ("clc");
     AddCodeLine ("adc sp");
     AddCodeLine ("sta sp");
-    AddCodeLine ("lda %s+1", LocalLabelName (label));
+    AddCodeLine ("lda %s+1", LocalDataLabelName (label));
     AddCodeLine ("adc sp+1");
     AddCodeLine ("sta sp+1");
     AddCodeLine ("pla");

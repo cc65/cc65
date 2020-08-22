@@ -92,6 +92,7 @@ static unsigned GlobalModeFlags (const ExprDesc* Expr)
         case E_LOC_PRIMARY:     return CF_PRIMARY;
         case E_LOC_EXPR:        return CF_EXPR;
         case E_LOC_LITERAL:     return CF_LITERAL;
+        case E_LOC_CODE:        return CF_CODE;
         default:
             Internal ("GlobalModeFlags: Invalid location flags value: 0x%04X", Expr->Flags);
             /* NOTREACHED */
@@ -794,7 +795,7 @@ static void Primary (ExprDesc* E)
                 NextToken ();
                 Entry = AddLabelSym (CurTok.Ident, SC_REF | SC_GOTO_IND);
                 /* output its label */
-                E->Flags = E_RTYPE_RVAL | E_LOC_STATIC | E_ADDRESS_OF;
+                E->Flags = E_RTYPE_RVAL | E_LOC_CODE | E_ADDRESS_OF;
                 E->Name = Entry->V.L.Label;
                 E->Type = PointerTo (type_void);
                 NextToken ();
@@ -1545,7 +1546,8 @@ void Store (ExprDesc* Expr, const Type* StoreType)
 
         case E_LOC_STATIC:
         case E_LOC_LITERAL:
-            /* Static variable or literal in the literal pool */
+        case E_LOC_CODE:
+            /* Static variable, pooled literal or code label location */
             g_putstatic (Flags, Expr->Name, Expr->IVal);
             break;
 
@@ -1624,7 +1626,8 @@ static void PreInc (ExprDesc* Expr)
 
         case E_LOC_STATIC:
         case E_LOC_LITERAL:
-            /* Static variable or literal in the literal pool */
+        case E_LOC_CODE:
+            /* Static variable, pooled literal or code label location */
             g_addeqstatic (Flags, Expr->Name, Expr->IVal, Val);
             break;
 
@@ -1700,7 +1703,8 @@ static void PreDec (ExprDesc* Expr)
 
         case E_LOC_STATIC:
         case E_LOC_LITERAL:
-            /* Static variable or literal in the literal pool */
+        case E_LOC_CODE:
+            /* Static variable, pooled literal or code label location */
             g_subeqstatic (Flags, Expr->Name, Expr->IVal, Val);
             break;
 
@@ -3878,7 +3882,8 @@ static void addsubeq (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
 
         case E_LOC_STATIC:
         case E_LOC_LITERAL:
-            /* Static variable or literal in the literal pool */
+        case E_LOC_CODE:
+            /* Static variable, pooled literal or code label location */
             if (Gen->Tok == TOK_PLUS_ASSIGN) {
                 g_addeqstatic (lflags, Expr->Name, Expr->IVal, Expr2.IVal);
             } else {

@@ -196,6 +196,15 @@ const char* ED_GetLabelName (const ExprDesc* Expr, long Offs)
             }
             break;
 
+        case E_LOC_CODE:
+            /* Code label location */
+            if (Offs) {
+                SB_Printf (&Buf, "%s%+ld", LocalLabelName (Expr->Name), Offs);
+            } else {
+                SB_Printf (&Buf, "%s", LocalLabelName (Expr->Name));
+            }
+            break;
+
         default:
             Internal ("Invalid location in ED_GetLabelName: 0x%04X", ED_GetLoc (Expr));
     }
@@ -503,9 +512,9 @@ void PrintExprDesc (FILE* F, ExprDesc* E)
         Flags &= ~E_LOC_LITERAL;
         Sep = ',';
     }
-    if (Flags & E_RTYPE_LVAL) {
-        fprintf (F, "%cE_RTYPE_LVAL", Sep);
-        Flags &= ~E_RTYPE_LVAL;
+    if (Flags & E_LOC_CODE) {
+        fprintf (F, "%cE_LOC_CODE", Sep);
+        Flags &= ~E_LOC_CODE;
         Sep = ',';
     }
     if (Flags & E_BITFIELD) {
@@ -521,6 +530,11 @@ void PrintExprDesc (FILE* F, ExprDesc* E)
     if (Flags & E_CC_SET) {
         fprintf (F, "%cE_CC_SET", Sep);
         Flags &= ~E_CC_SET;
+        Sep = ',';
+    }
+    if (Flags & E_RTYPE_LVAL) {
+        fprintf (F, "%cE_RTYPE_LVAL", Sep);
+        Flags &= ~E_RTYPE_LVAL;
         Sep = ',';
     }
     if (Flags & E_ADDRESS_OF) {

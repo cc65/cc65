@@ -931,7 +931,7 @@ DefOrRef* AddDefOrRef (SymEntry* E, unsigned Flags)
     DOR->Flags = Flags;
     DOR->StackPtr = StackPtr;
     DOR->Depth = CollCount (&CurrentFunc->LocalsBlockStack);
-    DOR->LateSP_Label = GetLocalLabel ();
+    DOR->LateSP_Label = GetLocalDataLabel ();
 
     return DOR;
 }
@@ -953,7 +953,7 @@ unsigned short FindSPAdjustment (const char* Name)
 
 
 SymEntry* AddLabelSym (const char* Name, unsigned Flags)
-/* Add a goto label to the label table */
+/* Add a C goto label to the label table */
 {
     unsigned i;
     DefOrRef *DOR, *NewDOR;
@@ -1012,7 +1012,7 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
                     /* Optimizer will need the information about the value of SP adjustment
                     ** later, so let's preserve it.
                     */
-                    E = NewSymEntry (LocalLabelName (DOR->LateSP_Label), SC_SPADJUSTMENT);
+                    E = NewSymEntry (LocalDataLabelName (DOR->LateSP_Label), SC_SPADJUSTMENT);
                     E->V.SPAdjustment = StackPtr - DOR->StackPtr;
                     AddSymEntry (SPAdjustTab, E);
                 }
@@ -1134,9 +1134,9 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
             Entry->V.L.Label = Offs;
             SymSetAsmName (Entry);
         } else if ((Flags & SC_STATIC) == SC_STATIC) {
-            /* Generate the assembler name from the label number */
+            /* Generate the assembler name from the data label number */
             Entry->V.L.Label = Offs;
-            Entry->AsmName = xstrdup (LocalLabelName (Entry->V.L.Label));
+            Entry->AsmName = xstrdup (LocalDataLabelName (Entry->V.L.Label));
         } else {
             Internal ("Invalid flags in AddLocalSym: %04X", Flags);
         }

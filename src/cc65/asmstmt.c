@@ -286,7 +286,7 @@ static void ParseLabelArg (StrBuf* T, unsigned Arg attribute ((unused)))
 
     } else {
 
-        /* Add a new label symbol if we don't have one until now */
+        /* Add a new C label symbol if we don't have one until now */
         SymEntry* Entry = AddLabelSym (CurTok.Ident, SC_REF);
 
         /* Append the label name to the buffer */

@@ -2204,6 +2204,11 @@ static void DefineData (ExprDesc* Expr)
             g_defdata (CF_REGVAR, Expr->Name, Expr->IVal);
             break;
 
+        case E_LOC_CODE:
+            /* Code label location */
+            g_defdata (CF_CODE, Expr->Name, Expr->IVal);
+            break;
+
         case E_LOC_STACK:
         case E_LOC_PRIMARY:
         case E_LOC_EXPR:

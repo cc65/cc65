@@ -56,6 +56,14 @@ const char* LocalLabelName (unsigned L);
 int IsLocalLabelName (const char* Name);
 /* Return true if Name is the name of a local label */
 
+unsigned GetLocalDataLabel (void);
+/* Get an unused local data label. Will never return zero. */
+
+const char* LocalDataLabelName (unsigned L);
+/* Make a label name from the given data label number. The label name will be
+** created in static storage and overwritten when calling the function again.
+*/
+
 unsigned GetPooledLiteralLabel (void);
 /* Get an unused literal label. Will never return zero. */
 

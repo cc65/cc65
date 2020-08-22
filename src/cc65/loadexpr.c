@@ -83,6 +83,11 @@ static void LoadAddress (unsigned Flags, ExprDesc* Expr)
             g_getimmed ((Flags | CF_REGVAR) & ~CF_CONST, Expr->Name, Expr->IVal);
             break;
 
+        case E_LOC_CODE:
+            /* Code label, load address */
+            g_getimmed ((Flags | CF_CODE) & ~CF_CONST, Expr->Name, Expr->IVal);
+            break;
+
         case E_LOC_STACK:
             g_leasp (Expr->IVal);
             break;
@@ -199,6 +204,11 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
             case E_LOC_REGISTER:
                 /* Register variable */
                 g_getstatic (Flags | CF_REGVAR, Expr->Name, Expr->IVal);
+                break;
+
+            case E_LOC_CODE:
+                /* Code label location */
+                g_getstatic (Flags | CF_CODE, Expr->Name, Expr->IVal);
                 break;
 
             case E_LOC_STACK:

@@ -86,6 +86,8 @@ struct Segments {
     struct DataSeg*     ROData;         /* Readonly data segment */
     struct DataSeg*     BSS;            /* Segment for uninitialized data */
     segment_t           CurDSeg;        /* Current data segment */
+    unsigned            NextLabel;      /* Number to generate unique code labels */
+    unsigned            NextDataLabel;  /* Number to generate unique data labels */
 };
 
 /* Pointer to the current segment list. Output goes here. */

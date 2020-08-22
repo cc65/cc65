@@ -42,6 +42,17 @@
 /* cc65 */
 #include "asmlabel.h"
 #include "error.h"
+#include "segments.h"
+
+
+
+/*****************************************************************************/
+/*                                   Data                                    */
+/*****************************************************************************/
+
+
+
+static struct Segments* CurrentFunctionSegment;
 
 
 
@@ -51,19 +62,26 @@
 
 
 
-unsigned GetLocalLabel (void)
-/* Get an unused label. Will never return zero. */
+void UseLabelPoolFromSegments (struct Segments* Seg)
+/* Use the info in segments for generating new label numbers */
 {
-    /* Number to generate unique labels */
-    static unsigned NextLabel = 0;
+    CurrentFunctionSegment = Seg;
+}
+
+
+
+unsigned GetLocalLabel (void)
+/* Get an unused assembler label for the function. Will never return zero. */
+{
+    PRECONDITION (CurrentFunctionSegment != 0);
 
     /* Check for an overflow */
-    if (NextLabel >= 0xFFFF) {
+    if (CurrentFunctionSegment->NextLabel >= 0xFFFF) {
         Internal ("Local label overflow");
     }
 
     /* Return the next label */
-    return ++NextLabel;
+    return ++CurrentFunctionSegment->NextLabel;
 }
 
 
@@ -104,16 +122,15 @@ int IsLocalLabelName (const char* Name)
 unsigned GetLocalDataLabel (void)
 /* Get an unused local data label. Will never return zero. */
 {
-    /* Number to generate unique labels */
-    static unsigned NextLabel = 0;
+    PRECONDITION (CurrentFunctionSegment != 0);
 
     /* Check for an overflow */
-    if (NextLabel >= 0xFFFF) {
+    if (CurrentFunctionSegment->NextDataLabel >= 0xFFFF) {
         Internal ("Local data label overflow");
     }
 
     /* Return the next label */
-    return ++NextLabel;
+    return ++CurrentFunctionSegment->NextDataLabel;
 }
 
 

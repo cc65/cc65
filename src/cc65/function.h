@@ -120,6 +120,9 @@ int F_IsOldStyle (const Function* F);
 int F_HasOldStyleIntRet (const Function* F);
 /* Return true if this is an old style (K&R) function with an implicit int return */
 
+void F_SetRetLab (Function* F, unsigned NewRetLab);
+/* Change the return jump label */
+
 unsigned F_GetRetLab (const Function* F);
 /* Return the return jump label */
 

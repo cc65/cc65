@@ -19,7 +19,7 @@
 */
 
 /*
-  Test of indirect goto with dynamic labels and order label def, label ref, goto.
+  Test of indirect goto without dynamic labels and order label def, label ref, goto.
   https://github.com/cc65/cc65/issues/1209
   This should compile and should be moved to tests/val/ when the bug is fixed.
 */
@@ -28,13 +28,14 @@
 #include <stdlib.h>
 
 /* When operating correctly, this returns 0. */
-int f (void)
-{
-    static void *x[1];
-    /* Define the label before referencing it with indirect label syntax. */
-L:  if (x[0] != 0) return 0;
-    x[0] = &&L;
-    goto *x[0];
+static unsigned char y = 0;
+int f (void) {
+L:  if (y) return 0;
+    {
+        static const void *const x[1] = {&&L};
+        y = 1;
+        goto *x[0];
+    }
 }
 
 static unsigned char failures = 0;

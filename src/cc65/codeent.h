@@ -180,6 +180,16 @@ INLINE CodeLabel* CE_GetLabel (CodeEntry* E, unsigned Index)
 #  define CE_GetLabel(E, Index) CollAt (&(E)->Labels, (Index))
 #endif
 
+#if defined(HAVE_INLINE)
+INLINE void CE_ReplaceLabel (CodeEntry* E, CodeLabel* L, unsigned Index)
+/* Replace the code label at the specified index with L */
+{
+    return CollReplace (&E->Labels, L, Index);
+}
+#else
+#  define CE_ReplaceLabel(E, L, Index) CollReplace (&(E)->Labels, (L), (Index))
+#endif
+
 void CE_MoveLabel (CodeLabel* L, CodeEntry* E);
 /* Move the code label L from it's former owner to the code entry E. */
 

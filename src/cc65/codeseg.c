@@ -183,6 +183,37 @@ static void CS_RemoveLabelFromHash (CodeSeg* S, CodeLabel* L)
 
 
 
+static CodeLabel* PickRefLab (CodeEntry* E)
+/* Pick a reference label and move it to index 0 in E. */
+{
+    unsigned I;
+    unsigned LabelCount = CE_GetLabelCount (E);
+    CHECK (LabelCount > 0);
+    /* Use either the first one as reference label, or a label with a Ref that has no JumpTo.
+    ** This is a hack to partially work around #1211.  Refs with no JumpTo are labels used
+    ** in data segments.  (They are not tracked.)  If a data segment is the only reference,
+    ** the label will be pruned away, but the data reference will remain, causing linking to fail.
+    */
+    CodeLabel* L0 = CE_GetLabel (E, 0);
+    for (I = 1; I < LabelCount; ++I) {
+        unsigned J;
+        CodeLabel* L = CE_GetLabel (E, I);
+        unsigned RefCount = CL_GetRefCount (L);
+        for (J = 0; J < RefCount; ++J) {
+            CodeEntry* EJ = CL_GetRef (L, J);
+            if (EJ->JumpTo == NULL) {
+                /* Move it to the beginning since it's simpler to handle the removal this way. */
+                CE_ReplaceLabel (E, L, 0);
+                CE_ReplaceLabel (E, L0, I);
+                return L;
+            }
+        }
+    }
+    return L0;
+}
+
+
+
 /*****************************************************************************/
 /*                    Functions for parsing instructions                     */
 /*****************************************************************************/
@@ -935,8 +966,10 @@ void CS_MergeLabels (CodeSeg* S)
             continue;
         }
 
-        /* We have at least one label. Use the first one as reference label. */
-        RefLab = CE_GetLabel (E, 0);
+        /* Pick a label to keep, all references will be moved to this one, and the other labels
+        ** will be deleted.  PickRefLab moves this to index 0.
+        */
+        RefLab = PickRefLab (E);
 
         /* Walk through the remaining labels and change references to these
         ** labels to a reference to the one and only label. Delete the labels

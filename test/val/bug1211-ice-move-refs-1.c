@@ -21,7 +21,8 @@
 /*
   Test of indirect goto with label merge ICE.
   https://github.com/cc65/cc65/issues/1211
-  This should compile and should be moved to tests/val/ when the bug is fixed.
+  This test case works because CS_MergeLabels has a hack to keep the "unreferenced" label
+  (i.e. the one referenced in a data segment).
 */
 
 #include <stdio.h>

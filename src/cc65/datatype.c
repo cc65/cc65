@@ -903,6 +903,7 @@ unsigned TypeOf (const Type* T)
             /* Address of ... */
             return CF_INT | CF_UNSIGNED;
 
+        case T_VOID:
         case T_ENUM:
             /* Incomplete enum type */
             Error ("Incomplete type '%s'", GetFullTypeName (T));

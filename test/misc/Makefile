@@ -64,12 +64,6 @@ $(DIFF): ../isequal.c | $(WORKDIR)
 define PRG_template
 
 # should compile, but gives an error
-$(WORKDIR)/bug250.$1.$2.prg: bug250.c | $(WORKDIR)
-	@echo "FIXME: " $$@ "currently does not compile."
-	$(if $(QUIET),echo misc/bug250.$1.$2.prg)
-	$(NOT) $(CL65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
-
-# should compile, but gives an error
 $(WORKDIR)/bug760.$1.$2.prg: bug760.c | $(WORKDIR)
 	@echo "FIXME: " $$@ "currently does not compile."
 	$(if $(QUIET),echo misc/bug760.$1.$2.prg)

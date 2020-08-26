@@ -14,9 +14,7 @@
 /* Define USE_STDIO, when you want to use the stdio functions.
 ** Do not define it, when you want to use the conio functions.
 */
-/*
 #define USE_STDIO
-*/
 
 #include <stdio.h>
 #include <string.h>
@@ -35,22 +33,23 @@
 
 #define ARRAYSIZE(a) (sizeof (a) / sizeof (a)[0])
 
+typedef enum {
+    INT,
+    CHAR
+} TYPE;
+
+typedef union {
+    int nvalue;
+    const char *svalue;
+} VALUE;
+
 static const struct {
         const char *input, *format;
         int rvalue;
-        enum TYPE {
-                INT,
-                CHAR
-                } type1;
-        union {
-                int nvalue;
-                const char *svalue;
-                } v1;
-        enum TYPE type2;
-        union {
-                int nvalue;
-                const char *svalue;
-                } v2;
+        TYPE type1;
+        VALUE v1;
+        TYPE type2;
+        VALUE v2;
         } test_data[] = {
 /* Input sequences for character specifiers must be less than 80 characters
 ** long.  These format strings are allowwed a maximum of two assignment

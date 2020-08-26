@@ -29,7 +29,9 @@ else
   LD := $(if $(wildcard ../../../bin/ld65*),../../../bin/ld65,ld65)
 endif
 
-all: hgr.dsk dhgr.dsk
+all: hgrshow hgrtest dhgrshow
+
+disk: hgr.dsk dhgr.dsk
 
 hgr.dsk: hgrshow hgrtest
 	cp prodos.dsk $@
@@ -66,3 +68,4 @@ clean:
 	$(RM) hgr.dsk dhgr.dsk
 	$(RM) hgrshow hgrshow.map	
 	$(RM) hgrtest hgrtest.map
+	$(RM) dhgrshow dhgrshow.map

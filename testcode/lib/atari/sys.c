@@ -10,6 +10,8 @@
 #include <6502.h>
 #include <conio.h>
 
+#define IOCB    (OS.iocb[0])
+
 static struct regs regs;
 static struct __iocb *iocb = &IOCB;  /* use IOCB #0 */
 

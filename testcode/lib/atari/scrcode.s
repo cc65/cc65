@@ -43,15 +43,20 @@ key:            lda     CH
 dispdata:       scrcode         "fooBa", 'r', $66, 3+4
 disp_len        =       * - dispdata
 
+.export         __AUTOSTART__: absolute = 1
 .segment        "AUTOSTRT"
 
                 .word   $02E0
                 .word   $02E1
                 .word   __CODE_LOAD__+1
 
+.export         __EXEHDR__: absolute = 1
 .segment        "EXEHDR"
 
                 .word   $FFFF
+
+.segment        "MAINHDR"
+
                 .word   __CODE_LOAD__
                 .word   __BSS_LOAD__ - 1
 

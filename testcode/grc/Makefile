@@ -34,10 +34,19 @@ all: test.s vlir.cvt
 test.s: test.grc
 	$(GRC) -s test.s test.grc
 
-vlir.cvt: vlir.grc
-	$(GRC) -s vlir.s test.grc
-	$(CL) -t geos -C geos-cbm-overlay.cfg -o vlir.cvt vlir.s vlir0.s vlir1.s vlir2.s
+vlir.cvt: vlir.grc vlir0.s vlir1.s vlir2.s
+# using seperate calls here for demonstration purposes:
+	$(GRC) -t geos-cbm -s vlir.s vlir.grc
+	$(AS) -t geos-cbm vlir.s
+	$(AS) -t geos-cbm vlir0.s
+	$(AS) -t geos-cbm vlir1.s
+	$(AS) -t geos-cbm vlir2.s
+	$(LD) -t geos-cbm -o vlir.cvt vlir.o vlir0.o vlir1.o vlir2.o geos-cbm.lib
+
+# you can also do the above in one command:
+#	$(CL) -t geos-cbm -o vlir.cvt vlir.grc vlir0.s vlir1.s vlir2.s
 	
 clean:
 	$(RM) test.s test.h
-	$(RM) vlir.s vlir.cvt
+	$(RM) vlir.s vlir.cvt vlir.c vlir.h
+	$(RM) *.o

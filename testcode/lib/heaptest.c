@@ -214,10 +214,10 @@ int main (void)
 
     /* Show info at start */
     ShowInfo ();
-
+#if !defined(__APPLE2__)
     /* Remember the time */
     T = clock ();
-
+#endif
     /* Do the tests */
     Test1 ();
     Test2 ();
@@ -226,10 +226,11 @@ int main (void)
     Test5 ();
     Test6 ();
 
+#if !defined(__APPLE2__)
     /* Calculate the time and print it */
     T = clock () - T;
     printf ("Time needed: %lu ticks\n", T);
-
+#endif
     /* Done */
     return EXIT_SUCCESS;
 }

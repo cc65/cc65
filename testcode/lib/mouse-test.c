@@ -190,7 +190,7 @@ int main (void)
 #endif
 
     /* Set dark-on-light colors.  Clear the screen. */
-#ifdef __CBM__
+#if defined(__CBM__) && !defined(__VIC20__)
     (void) bordercolor (COLOR_GRAY2);
     (void) bgcolor (COLOR_WHITE);
     (void) textcolor (COLOR_GRAY1);

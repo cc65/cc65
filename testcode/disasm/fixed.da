@@ -7,7 +7,7 @@
 #ifndef TARGET_BANK
 #define TARGET_BANK -1
 global {
-    inputoffs $1C010;
+    inputoffs $0C010;
     inputsize $4000;
     startaddr $C000;
     cpu "6502";

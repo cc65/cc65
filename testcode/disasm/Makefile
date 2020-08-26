@@ -31,15 +31,17 @@ else
   DA := $(if $(wildcard ../../../bin/da65*),../../../bin/da65,da65)
 endif
 
-CPP = env LANG=C cpp
-CPPFLAGS = # -DTEST_ERROR
+CPP = cpp
+#CPPFLAGS = -DTEST_ERROR
 
 ASMS = fixed.s bank0.s bank1.s
 DAIS = fixed.dai bank0.dai bank1.dai
 
 .SUFFIXES: .da .dai .s
-.PHONY: all clean maintainer-clean
-.SECONDARY: $(DAIS)
+
+all: image.bin $(ASMS)
+
+$(DAIS): fixed.da
 
 .da.dai:
 	$(CPP) -o $@ $(CPPFLAGS) $<
@@ -47,12 +49,11 @@ DAIS = fixed.dai bank0.dai bank1.dai
 .dai.s:
 	$(DA) --sync-lines -o $@ -i $< image.bin
 
-all: $(ASMS)
+image.bin: image.s image.cfg
+	$(CL) -t none -C image.cfg -o image.bin image.s
 
 clean:
 	$(RM) $(ASMS)
-
-maintainer-clean: clean
 	$(RM) $(DAIS)
+	$(RM) image.bin
 
-$(DAIS): fixed.da

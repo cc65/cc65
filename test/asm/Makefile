@@ -8,23 +8,22 @@ ifdef CMD_EXE
   EXE = .exe
   MKDIR = mkdir $(subst /,\,$1)
   RMDIR = -rmdir /s /q $(subst /,\,$1)
-  DEL = del /f $(subst /,\,$1)
 else
   EXE =
   MKDIR = mkdir -p $1
   RMDIR = $(RM) -r $1
-  DEL = $(RM) $1
 endif
 
 ifdef QUIET
   .SILENT:
 endif
 
-CL65 := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)
+CA65 := $(if $(wildcard ../../bin/ca65*),../../bin/ca65,ca65)
+LD65 := $(if $(wildcard ../../bin/ld65*),../../bin/ld65,ld65)
 
 WORKDIR = ../../testwrk/asm
 
-DIFF = $(WORKDIR)/isequal$(EXE)
+ISEQUAL = $(WORKDIR)/isequal$(EXE)
 
 CC = gcc
 CFLAGS = -O2
@@ -44,29 +43,28 @@ all: $(OPCODE_BINS) $(CPUDETECT_BINS)
 $(WORKDIR):
 	$(call MKDIR,$(WORKDIR))
 
-$(DIFF): ../isequal.c | $(WORKDIR)
+$(ISEQUAL): ../isequal.c | $(WORKDIR)
 	$(CC) $(CFLAGS) -o $@ $<
 
 define OPCODE_template
 
-$(WORKDIR)/$1-opcodes.bin: $1-opcodes.s $(DIFF)
+$(WORKDIR)/$1-opcodes.bin: $1-opcodes.s $(ISEQUAL)
 	$(if $(QUIET),echo asm/$1-opcodes.bin)
-	$(CL65) --cpu $1 -t none -l $(WORKDIR)/$1-opcodes.lst -o $$@ $$<
-	$(DIFF) $$@ $1-opcodes.ref
+	$(CA65) --cpu $1 -t none -l $(WORKDIR)/$1-opcodes.lst -o $(WORKDIR)/$1-opcodes.o $$<
+	$(LD65) -t none -o $$@ $(WORKDIR)/$1-opcodes.o none.lib
+	$(ISEQUAL) $$@ $1-opcodes.ref
 
 endef # OPCODE_template
 
 $(foreach cpu,$(OPCODE_CPUS),$(eval $(call OPCODE_template,$(cpu))))
 
-# cpudetect.o is written by multiple rules
-.NOTPARALLEL:
-
 define CPUDETECT_template
 
-$(WORKDIR)/$1-cpudetect.bin: cpudetect.s $(DIFF)
+$(WORKDIR)/$1-cpudetect.bin: cpudetect.s $(ISEQUAL)
 	$(if $(QUIET),echo asm/$1-cpudetect.bin)
-	$(CL65) --cpu $1 -t none -l $(WORKDIR)/$1-cpudetect.lst -o $$@ $$<
-	$(DIFF) $$@ $1-cpudetect.ref
+	$(CA65) --cpu $1 -t none -l $(WORKDIR)/$1-cpudetect.lst -o $(WORKDIR)/$1-cpudetect.o $$<
+	$(LD65) -t none -o $$@ $(WORKDIR)/$1-cpudetect.o none.lib
+	$(ISEQUAL) $$@ $1-cpudetect.ref
 
 endef # CPUDETECT_template
 
@@ -74,4 +72,3 @@ $(foreach cpu,$(CPUDETECT_CPUS),$(eval $(call CPUDETECT_template,$(cpu))))
 
 clean:
 	@$(call RMDIR,$(WORKDIR))
-	@$(call DEL,$(OPCODE_REFS:.ref=.o) cpudetect.o)

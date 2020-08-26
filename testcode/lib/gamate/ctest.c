@@ -25,19 +25,19 @@ int main(int argc, char *argv[])
         gotoxy(0,2);cprintf("%04x %02x %02x %02x", n, x, y, *((unsigned char*)JOY_DATA));
 
         switch((*((unsigned char*)JOY_DATA))) {
-            case 0xff ^ JOY_DATA_UP:
+            case 0xff ^ JOY_UP_MASK:
                 ++y; if (y == 0xc8) y = 0;
                 break;
-            case 0xff ^ JOY_DATA_DOWN:
+            case 0xff ^ JOY_DOWN_MASK:
                 --y; if (y == 0xff) y = 0xc7;
                 break;
-            case 0xff ^ JOY_DATA_LEFT:
+            case 0xff ^ JOY_LEFT_MASK:
                 ++x;
                 break;
-            case 0xff ^ JOY_DATA_RIGHT:
+            case 0xff ^ JOY_RIGHT_MASK:
                 --x;
                 break;
-            case 0xff ^ JOY_DATA_FIRE_A:
+            case 0xff ^ JOY_BTN_A_MASK:
                 break;
         }
 

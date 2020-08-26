@@ -19,9 +19,13 @@
 #include <string.h>
 #include <errno.h>
 #include <dirent.h>
-#include <cbm.h>
 #include <conio.h>
 
+#if defined(__CBM__)
+#include <cbm.h>
+#elif defined(__APPLE2__)
+#include <apple2.h>
+#endif
 
 int main(void)
 {
@@ -51,9 +55,13 @@ int main(void)
     printf("contents of \"%s\":\n", name);
     while ((E = readdir (D)) != 0) {
         printf ("dirent.d_name[] : \"%s\"\n", E->d_name);
+#if !defined(__ATARI__)
         printf ("dirent.d_blocks : %10u\n",   E->d_blocks);
+#endif
         printf ("dirent.d_type   : %10d\n",   E->d_type);
+#if !defined(__APPLE2__) && !defined(__ATARI__)
         printf ("telldir()       : %10lu\n",  telldir (D));
+#endif
         printf ("---\n");
         if (!go) {
             switch (cgetc ()) {
@@ -63,14 +71,16 @@ int main(void)
 
                 case 'q':
                     goto done;
-
+#if !defined(__APPLE2__) && !defined(__ATARI__)
                 case 'r':
                     seekdir (D, E->d_off);
                     break;
-
+#endif
+#if !defined(__ATARI__)
                 case 's':
                     rewinddir (D);
                     break;
+#endif
 
             }
         }

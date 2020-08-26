@@ -23,23 +23,23 @@ ifdef QUIET
   NULLERR = 2>$(NULLDEV)
 endif
 
-CL65 := $(if $(wildcard ../../bin/cl65*),..$S..$Sbin$Scl65,cl65)
+CC65 := $(if $(wildcard ../../bin/cc65*),..$S..$Sbin$Scc65,cc65)
 
 WORKDIR = ../../testwrk/err
 
 .PHONY: all clean
 
 SOURCES := $(wildcard *.c)
-TESTS = $(patsubst %.c,$(WORKDIR)/%.prg,$(SOURCES))
+TESTS = $(patsubst %.c,$(WORKDIR)/%.s,$(SOURCES))
 
 all: $(TESTS)
 
 $(WORKDIR):
 	$(call MKDIR,$(WORKDIR))
 
-$(WORKDIR)/%.prg: %.c | $(WORKDIR)
+$(WORKDIR)/%.s: %.c | $(WORKDIR)
 	$(if $(QUIET),echo err/$*.s)
-	$(NOT) $(CL65) -o $@ $< $(NULLERR)
+	$(NOT) $(CC65) -o $@ $< $(NULLERR)
 
 clean:
 	@$(call RMDIR,$(WORKDIR))

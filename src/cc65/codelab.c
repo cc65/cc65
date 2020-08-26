@@ -112,6 +112,7 @@ void CL_MoveRefs (CodeLabel* OldLabel, CodeLabel* NewLabel)
         CodeEntry* E = CL_GetRef (OldLabel, Count);
 
         /* Change the reference to the new label */
+        CHECK (E->JumpTo != NULL);
         CHECK (E->JumpTo == OldLabel);
         CL_AddRef (NewLabel, E);
 

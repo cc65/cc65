@@ -173,7 +173,11 @@ static void ParseRegisterDecl (Declaration* Decl, int Reg)
 
     /* Cannot allocate a variable of zero size */
     if (Size == 0) {
-        Error ("Variable '%s' has unknown size", Decl->Ident);
+        if (IsTypeArray (Decl->Type)) {
+            Error ("Array '%s' has unknown size", Decl->Ident);
+        } else {
+            Error ("Variable '%s' has unknown size", Decl->Ident);
+        }
     }
 }
 
@@ -360,7 +364,11 @@ static void ParseAutoDecl (Declaration* Decl)
 
     /* Cannot allocate a variable of zero size */
     if (Size == 0) {
-        Error ("Variable '%s' has unknown size", Decl->Ident);
+        if (IsTypeArray (Decl->Type)) {
+            Error ("Array '%s' has unknown size", Decl->Ident);
+        } else {
+            Error ("Variable '%s' has unknown size", Decl->Ident);
+        }
     }
 }
 
@@ -414,7 +422,11 @@ static void ParseStaticDecl (Declaration* Decl)
 
     /* Cannot allocate a variable of zero size */
     if (Size == 0) {
-        Error ("Variable '%s' has unknown size", Decl->Ident);
+        if (IsTypeArray (Decl->Type)) {
+            Error ("Array '%s' has unknown size", Decl->Ident);
+        } else {
+            Error ("Variable '%s' has unknown size", Decl->Ident);
+        }
     }
 }
 

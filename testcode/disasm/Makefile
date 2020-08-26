@@ -1,3 +1,5 @@
+# Sample makefile using a preprocessor against info files
+# and the --sync-lines option
 
 # Just the usual way to find out if we're
 # using cmd.exe to execute make rules.
@@ -20,39 +22,37 @@ ifdef CC65_HOME
   CC = $(CC65_HOME)/bin/cc65
   CL = $(CC65_HOME)/bin/cl65
   LD = $(CC65_HOME)/bin/ld65
+  DA = $(CC65_HOME)/bin/da65
 else
   AS := $(if $(wildcard ../../../bin/ca65*),../../../bin/ca65,ca65)
   CC := $(if $(wildcard ../../../bin/cc65*),../../../bin/cc65,cc65)
   CL := $(if $(wildcard ../../../bin/cl65*),../../../bin/cl65,cl65)
   LD := $(if $(wildcard ../../../bin/ld65*),../../../bin/ld65,ld65)
+  DA := $(if $(wildcard ../../../bin/da65*),../../../bin/da65,da65)
 endif
 
-.PHONY: all clean test
+CPP = env LANG=C cpp
+CPPFLAGS = # -DTEST_ERROR
 
-# Size of cartridge to generate.
-# Possible values:
-#  8K = 0x2000
-# 16K = 0x4000
-# 32K = 0x8000
-CARTSIZE := 0x2000
+ASMS = fixed.s bank0.s bank1.s
+DAIS = fixed.dai bank0.dai bank1.dai
 
-ifeq (${CARTSIZE},0x8000)
-COUNT := 3
-else
-COUNT := 1
-endif
+.SUFFIXES: .da .dai .s
+.PHONY: all clean maintainer-clean
+.SECONDARY: $(DAIS)
 
-all: conio.pce
+.da.dai:
+	$(CPP) -o $@ $(CPPFLAGS) $<
 
-%.pce: %.bin
-	dd if=$< bs=8K skip=${COUNT} > $@
-	dd if=$< bs=8K count=${COUNT} >> $@
+.dai.s:
+	$(DA) --sync-lines -o $@ -i $< image.bin
 
-%.bin: %.c ../../../lib/pce.lib
-	../../../bin/cl65 -t pce $< -Wl -D__CARTSIZE__=${CARTSIZE} -m $*.map -o $@
+all: $(ASMS)
 
 clean:
-	$(RM) conio.o conio.???
+	$(RM) $(ASMS)
 
-test: conio.pce
-	mednafen -force_module pce $<
+maintainer-clean: clean
+	$(RM) $(DAIS)
+
+$(DAIS): fixed.da

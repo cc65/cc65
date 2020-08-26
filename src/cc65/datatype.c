@@ -687,7 +687,10 @@ const Type* GetUnderlyingType (const Type* Type)
             Internal ("Enum tag type error in GetUnderlyingTypeCode");
         }
 
-        return ((SymEntry*)Type->A.P)->V.E.Type;
+        /* If incomplete enum type is used, just return its raw type */
+        if (((SymEntry*)Type->A.P)->V.E.Type != 0) {
+            return ((SymEntry*)Type->A.P)->V.E.Type;
+        }
     }
 
     return Type;
@@ -1247,9 +1250,14 @@ Type* IntPromotion (Type* T)
         ** to unsigned int.
         */
         return IsSignUnsigned (T) ? type_uint : type_int;
-    } else {
-        /* Otherwise, the type is not smaller than int, so leave it alone. */
+    } else if (!IsIncompleteESUType (T)) {
+        /* The type is a complete type not smaller than int, so leave it alone. */
         return T;
+    } else {
+        /* Otherwise, this is an incomplete enum, and there is expceted to be an error already.
+        ** Assume int to avoid further errors.
+        */
+        return type_int;
     }
 }
 

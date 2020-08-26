@@ -20,39 +20,33 @@ ifdef CC65_HOME
   CC = $(CC65_HOME)/bin/cc65
   CL = $(CC65_HOME)/bin/cl65
   LD = $(CC65_HOME)/bin/ld65
+  GRC = $(CC65_HOME)/bin/grc65
 else
   AS := $(if $(wildcard ../../../bin/ca65*),../../../bin/ca65,ca65)
   CC := $(if $(wildcard ../../../bin/cc65*),../../../bin/cc65,cc65)
   CL := $(if $(wildcard ../../../bin/cl65*),../../../bin/cl65,cl65)
   LD := $(if $(wildcard ../../../bin/ld65*),../../../bin/ld65,ld65)
+  GRC := $(if $(wildcard ../../../bin/grc65*),../../../bin/grc65,grc65)
 endif
 
-.PHONY: all clean test
+all: test.s vlir.cvt
 
-# Size of cartridge to generate.
-# Possible values:
-#  8K = 0x2000
-# 16K = 0x4000
-# 32K = 0x8000
-CARTSIZE := 0x2000
+test.s: test.grc
+	$(GRC) -s test.s test.grc
 
-ifeq (${CARTSIZE},0x8000)
-COUNT := 3
-else
-COUNT := 1
-endif
+vlir.cvt: vlir.grc vlir0.s vlir1.s vlir2.s
+# using seperate calls here for demonstration purposes:
+	$(GRC) -t geos-cbm -s vlir.s vlir.grc
+	$(AS) -t geos-cbm vlir.s
+	$(AS) -t geos-cbm vlir0.s
+	$(AS) -t geos-cbm vlir1.s
+	$(AS) -t geos-cbm vlir2.s
+	$(LD) -t geos-cbm -o vlir.cvt vlir.o vlir0.o vlir1.o vlir2.o geos-cbm.lib
 
-all: conio.pce
-
-%.pce: %.bin
-	dd if=$< bs=8K skip=${COUNT} > $@
-	dd if=$< bs=8K count=${COUNT} >> $@
-
-%.bin: %.c ../../../lib/pce.lib
-	../../../bin/cl65 -t pce $< -Wl -D__CARTSIZE__=${CARTSIZE} -m $*.map -o $@
-
+# you can also do the above in one command:
+#	$(CL) -t geos-cbm -o vlir.cvt vlir.grc vlir0.s vlir1.s vlir2.s
+	
 clean:
-	$(RM) conio.o conio.???
-
-test: conio.pce
-	mednafen -force_module pce $<
+	$(RM) test.s test.h
+	$(RM) vlir.s vlir.cvt vlir.c vlir.h
+	$(RM) *.o

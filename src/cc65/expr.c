@@ -959,7 +959,16 @@ static void Primary (ExprDesc* E)
             /* Illegal primary. Be sure to skip the token to avoid endless
             ** error loops.
             */
-            {
+            if (CurTok.Tok == TOK_LCURLY) {
+                /* Statement block */
+                NextToken ();
+                Error ("Expression expected");
+                hie0 (E);
+                if (CurTok.Tok == TOK_RCURLY) {
+                    NextToken ();
+                }
+                break;
+            } else {
                 /* Let's see if this is a C99-style declaration */
                 DeclSpec    Spec;
                 InitDeclSpec (&Spec);

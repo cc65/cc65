@@ -3150,14 +3150,14 @@ static void hieAndPP (ExprDesc* Expr)
 ** called recursively from the preprocessor.
 */
 {
-    *Expr = StaticConstAbsIntExpr (hie2);
+    *Expr = NoCodeConstAbsIntExpr (hie2);
     while (CurTok.Tok == TOK_BOOL_AND) {
 
         /* Skip the && */
         NextToken ();
 
         /* Get rhs */
-        ExprDesc Expr2 = StaticConstAbsIntExpr (hie2);
+        ExprDesc Expr2 = NoCodeConstAbsIntExpr (hie2);
 
         /* Combine the two */
         Expr->IVal = (Expr->IVal && Expr2.IVal);
@@ -3171,14 +3171,14 @@ static void hieOrPP (ExprDesc *Expr)
 ** called recursively from the preprocessor.
 */
 {
-    *Expr = StaticConstAbsIntExpr (hieAndPP);
+    *Expr = NoCodeConstAbsIntExpr (hieAndPP);
     while (CurTok.Tok == TOK_BOOL_OR) {
 
         /* Skip the && */
         NextToken ();
 
         /* Get rhs */
-        ExprDesc Expr2 = StaticConstAbsIntExpr (hieAndPP);
+        ExprDesc Expr2 = NoCodeConstAbsIntExpr (hieAndPP);
 
         /* Combine the two */
         Expr->IVal = (Expr->IVal || Expr2.IVal);
@@ -4047,11 +4047,11 @@ void BoolExpr (void (*Func) (ExprDesc*), ExprDesc* Expr)
 
 
 
-ExprDesc StaticConstExpr (void (*Func) (ExprDesc*))
-/* Will evaluate an expression via the given function. If the result is not a
-** static constant expression, a diagnostic will be printed, and the value is
-** replaced by a constant one to make sure there are no internal errors that
-** result from this input error.
+ExprDesc NoCodeConstExpr (void (*Func) (ExprDesc*))
+/* Get an expression evaluated via the given function. If the result is not a
+** constant expression without runtime code generated, a diagnostic will be
+** printed, and the value is replaced by a constant one to make sure there are
+** no internal errors that result from this input error.
 */
 {
     ExprDesc Expr;
@@ -4071,11 +4071,11 @@ ExprDesc StaticConstExpr (void (*Func) (ExprDesc*))
 
 
 
-ExprDesc StaticConstAbsIntExpr (void (*Func) (ExprDesc*))
-/* Will evaluate an expression via the given function. If the result is not a
-** static constant numeric integer value, a diagnostic will be printed, and the
-** value is replaced by a constant one to make sure there are no internal
-** errors that result from this input error.
+ExprDesc NoCodeConstAbsIntExpr (void (*Func) (ExprDesc*))
+/* Get an expression evaluated via the given function. If the result is not a
+** constant numeric integer value without runtime code generated, a diagnostic
+** will be printed, and the value is replaced by a constant one to make sure
+** there are no internal errors that result from this input error.
 */
 {
     ExprDesc Expr;

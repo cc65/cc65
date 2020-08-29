@@ -1076,7 +1076,7 @@ static int DoIf (int Skip)
     NextToken ();
 
     /* Call the expression parser */
-    ExprDesc Expr = StaticConstExpr (hie1);
+    ExprDesc Expr = NoCodeConstExpr (hie1);
 
     /* End preprocessing mode */
     Preprocessing = 0;

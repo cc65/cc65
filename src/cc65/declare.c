@@ -622,7 +622,7 @@ static SymEntry* ParseEnumDecl (const char* Name)
         if (CurTok.Tok == TOK_ASSIGN) {
 
             NextToken ();
-            ExprDesc Expr = StaticConstAbsIntExpr (hie1);
+            ExprDesc Expr = NoCodeConstAbsIntExpr (hie1);
             EnumVal       = Expr.IVal;
             MemberType    = Expr.Type;
             IsSigned      = IsSignSigned (MemberType);
@@ -772,7 +772,7 @@ static int ParseFieldWidth (Declaration* Decl)
 
     /* Read the width */
     NextToken ();
-    ExprDesc Expr = StaticConstAbsIntExpr (hie1);
+    ExprDesc Expr = NoCodeConstAbsIntExpr (hie1);
 
     if (Expr.IVal < 0) {
         Error ("Negative width in bit-field");
@@ -1859,7 +1859,7 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
 
             /* Read the size if it is given */
             if (CurTok.Tok != TOK_RBRACK) {
-                ExprDesc Expr = StaticConstAbsIntExpr (hie1);
+                ExprDesc Expr = NoCodeConstAbsIntExpr (hie1);
                 if (Expr.IVal <= 0) {
                     if (D->Ident[0] != '\0') {
                         Error ("Size of array '%s' is invalid", D->Ident);
@@ -2220,7 +2220,7 @@ static ExprDesc ParseScalarInitInternal (Type* T)
     }
 
     /* Get the expression and convert it to the target type */
-    ExprDesc ED = StaticConstExpr (hie1);
+    ExprDesc ED = NoCodeConstExpr (hie1);
     TypeConversion (&ED, T);
 
     /* Close eventually opening braces */
@@ -2253,7 +2253,7 @@ static unsigned ParsePointerInit (Type* T)
     unsigned BraceCount = OpeningCurlyBraces (0);
 
     /* Expression */
-    ExprDesc ED = StaticConstExpr (hie1);
+    ExprDesc ED = NoCodeConstExpr (hie1);
     TypeConversion (&ED, T);
 
     /* Output the data */
@@ -2598,7 +2598,7 @@ static unsigned ParseVoidInit (Type* T)
     /* Allow an arbitrary list of values */
     Size = 0;
     do {
-        ExprDesc Expr = StaticConstExpr (hie1);
+        ExprDesc Expr = NoCodeConstExpr (hie1);
         switch (GetUnderlyingTypeCode (&Expr.Type[0])) {
 
             case T_SCHAR:

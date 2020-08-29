@@ -135,7 +135,7 @@ static void ParseByteArg (StrBuf* T, unsigned Arg)
     ConsumeComma ();
 
     /* Evaluate the expression */
-    ExprDesc Expr = StaticConstAbsIntExpr (hie1);
+    ExprDesc Expr = NoCodeConstAbsIntExpr (hie1);
 
     /* Check the range but allow negative values if the type is signed */
     if (IsSignUnsigned (Expr.Type)) {
@@ -168,7 +168,7 @@ static void ParseWordArg (StrBuf* T, unsigned Arg)
     ConsumeComma ();
 
     /* Evaluate the expression */
-    ExprDesc Expr = StaticConstAbsIntExpr (hie1);
+    ExprDesc Expr = NoCodeConstAbsIntExpr (hie1);
 
     /* Check the range but allow negative values if the type is signed */
     if (IsSignUnsigned (Expr.Type)) {
@@ -201,7 +201,7 @@ static void ParseLongArg (StrBuf* T, unsigned Arg attribute ((unused)))
     ConsumeComma ();
 
     /* Evaluate the expression */
-    ExprDesc Expr = StaticConstAbsIntExpr (hie1);
+    ExprDesc Expr = NoCodeConstAbsIntExpr (hie1);
 
     /* Convert into a hex number */
     xsprintf (Buf, sizeof (Buf), "$%08lX", Expr.IVal & 0xFFFFFFFF);
@@ -325,7 +325,7 @@ static void ParseStrArg (StrBuf* T, unsigned Arg attribute ((unused)))
             break;
 
         default:
-            Expr = StaticConstAbsIntExpr (hie1);
+            Expr = NoCodeConstAbsIntExpr (hie1);
             xsprintf (Buf, sizeof (Buf), "%ld", Expr.IVal);
             SB_AppendStr (T, Buf);
             break;

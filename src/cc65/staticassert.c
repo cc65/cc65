@@ -65,7 +65,7 @@ void ParseStaticAssert ()
     }
 
     /* Parse assertion condition */
-    Expr = StaticConstAbsIntExpr (hie1);
+    Expr = NoCodeConstAbsIntExpr (hie1);
     failed = !Expr.IVal;
 
     /* If there is a comma, we also have an error message.  The message is optional because we

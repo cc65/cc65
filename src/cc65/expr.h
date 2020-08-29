@@ -61,18 +61,18 @@ void BoolExpr (void (*Func) (ExprDesc*), ExprDesc* Expr);
 ** are no internal errors that result from this input error.
 */
 
-ExprDesc StaticConstExpr (void (*Func) (ExprDesc*));
+ExprDesc NoCodeConstExpr (void (*Func) (ExprDesc*));
 /* Get an expression evaluated via the given function. If the result is not a
-** static constant expression, a diagnostic will be printed, and the value is
-** replaced by a constant one to make sure there are no internal errors that
-** result from this input error.
+** constant expression without runtime code generated, a diagnostic will be
+** printed, and the value is replaced by a constant one to make sure there are
+** no internal errors that result from this input error.
 */
 
-ExprDesc StaticConstAbsIntExpr (void (*Func) (ExprDesc*));
-/* Get an expression evaluate via the given function. If the result is not a
-** static constant numeric integer value, a diagnostic will be printed, and the
-** value is replaced by a constant one to make sure there are no internal
-** errors that result from this input error.
+ExprDesc NoCodeConstAbsIntExpr (void (*Func) (ExprDesc*));
+/* Get an expression evaluated via the given function. If the result is not a
+** constant numeric integer value without runtime code generated, a diagnostic
+** will be printed, and the value is replaced by a constant one to make sure
+** there are no internal errors that result from this input error.
 */
 
 void hie10 (ExprDesc* lval);

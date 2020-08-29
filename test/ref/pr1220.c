@@ -1,24 +1,28 @@
-/* PR #1220 - test constant AND/OR */
+/* PR #1220 - test constant ternary, AND and OR */
 
 #include <stdio.h>
 
+/* test AND/OR, results as integers */
 #define CONTEXT_A(x)    do {\
                         s = 0, flags = 0, t = (x),\
                         printf("%3d %2X: %d\n", s, flags, t);\
                         } while (0)
 
+/* test AND/OR in ternary context */
 #define CONTEXT_B(x)    do {\
                         s = 0, flags = 0,\
                         (x ? printf("%3d %2X: 1\n", s, flags) : printf("%3d %2X: 0\n", s, flags));\
                         } while (0)
 
 int s, t;
-void *p;
 unsigned flags;
 
 int f(x)
+/* The call to this function should be and only be skipped strictly according to
+** the short-circuit evaluation rule.
+*/
 {
-    flags |= 1U << s;
+    flags |= (x != 0) << s;
     ++s;
     return x;
 }
@@ -31,6 +35,7 @@ int f(x)
 #define _F (f(-1), 0)
 
 void f0()
+/* constant short-circuit */
 {
     printf("f0()\n");
 
@@ -59,6 +64,7 @@ void f0()
 }
 
 void f1(int a, int b, int c)
+/* AND */
 {
     printf("f1(%d, %d, %d)\n", a, b, c);
 
@@ -80,6 +86,7 @@ void f1(int a, int b, int c)
 }
 
 void f2(int a, int b, int c)
+/* OR */
 {
     printf("f2(%d, %d, %d)\n", a, b, c);
 
@@ -101,6 +108,7 @@ void f2(int a, int b, int c)
 }
 
 void f3(int a, int b, int c, int d)
+/* AND and OR */
 {
     printf("f3(%d, %d, %d, %d)\n", a, b, c, d);
 
@@ -122,6 +130,7 @@ void f3(int a, int b, int c, int d)
 }
 
 void f4(int a, int b, int c, int d)
+/* AND as top-level expression inside OR context */
 {
     printf("f4(%d, %d, %d, %d)\n", a, b, c, d);
 
@@ -143,6 +152,7 @@ void f4(int a, int b, int c, int d)
 }
 
 void f5(int a, int b, int c, int d)
+/* OR as top-level expression inside AND context */
 {
     printf("f5(%d, %d, %d, %d)\n", a, b, c, d);
 
@@ -164,6 +174,7 @@ void f5(int a, int b, int c, int d)
 }
 
 void f0_B()
+/* constant short-circuit */
 {
     printf("f0()\n");
 
@@ -192,6 +203,7 @@ void f0_B()
 }
 
 void f1_B(int a, int b, int c)
+/* AND */
 {
     printf("f1(%d, %d, %d)\n", a, b, c);
 
@@ -213,6 +225,7 @@ void f1_B(int a, int b, int c)
 }
 
 void f2_B(int a, int b, int c)
+/* OR */
 {
     printf("f2(%d, %d, %d)\n", a, b, c);
 
@@ -234,6 +247,7 @@ void f2_B(int a, int b, int c)
 }
 
 void f3_B(int a, int b, int c, int d)
+/* AND and OR */
 {
     printf("f3(%d, %d, %d, %d)\n", a, b, c, d);
 
@@ -255,6 +269,7 @@ void f3_B(int a, int b, int c, int d)
 }
 
 void f4_B(int a, int b, int c, int d)
+/* AND as top-level expression inside OR context */
 {
     printf("f4(%d, %d, %d, %d)\n", a, b, c, d);
 
@@ -276,6 +291,7 @@ void f4_B(int a, int b, int c, int d)
 }
 
 void f5_B(int a, int b, int c, int d)
+/* OR as top-level expression inside AND context */
 {
     printf("f5(%d, %d, %d, %d)\n", a, b, c, d);
 

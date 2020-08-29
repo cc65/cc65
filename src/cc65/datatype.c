@@ -979,7 +979,7 @@ int IsClassIncomplete (const Type* T)
 /* Return true if this is an object type lacking size info */
 {
     if (IsTypeArray (T)) {
-        return GetElementCount (T) == UNSPECIFIED;
+        return GetElementCount (T) == UNSPECIFIED || IsClassIncomplete (T + 1);
     }
     return IsTypeVoid (T) || IsIncompleteESUType (T);
 }
@@ -1072,7 +1072,7 @@ int HasUnknownSize (const Type* T)
 /* Return true if this is an incomplete ESU type or an array of unknown size */
 {
     if (IsTypeArray (T)) {
-        return GetElementCount (T) == UNSPECIFIED;
+        return GetElementCount (T) == UNSPECIFIED || HasUnknownSize (T + 1);
     }
     return IsIncompleteESUType (T);
 }

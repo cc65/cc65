@@ -942,8 +942,8 @@ static SymEntry* ParseUnionDecl (const char* Name, unsigned* DSFlags)
                 }
             }
 
-            /* Check for incomplete type */
-            if (IsIncompleteESUType (Decl.Type)) {
+            /* Check for incomplete types including 'void' */
+            if (IsClassIncomplete (Decl.Type)) {
                 Error ("Field '%s' has incomplete type '%s'",
                        Decl.Ident,
                        GetFullTypeName (Decl.Type));
@@ -1142,8 +1142,8 @@ static SymEntry* ParseStructDecl (const char* Name, unsigned* DSFlags)
                 }
             }
 
-            /* Check for incomplete type */
-            if (IsIncompleteESUType (Decl.Type)) {
+            /* Check for incomplete types including 'void' */
+            if (IsClassIncomplete (Decl.Type)) {
                 Error ("Field '%s' has incomplete type '%s'",
                        Decl.Ident,
                        GetFullTypeName (Decl.Type));

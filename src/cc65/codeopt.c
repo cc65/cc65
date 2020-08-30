@@ -1241,10 +1241,10 @@ static unsigned RunOptGroup1 (CodeSeg* S)
 
     Changes += RunOptFunc (S, &DOptGotoSPAdj, 1);
     Changes += RunOptFunc (S, &DOptStackPtrOps, 5);
+    Changes += RunOptFunc (S, &DOptAdd3, 1);    /* Before OptPtrLoad5! */
     Changes += RunOptFunc (S, &DOptPtrStore1, 1);
     Changes += RunOptFunc (S, &DOptPtrStore2, 1);
     Changes += RunOptFunc (S, &DOptPtrStore3, 1);
-    Changes += RunOptFunc (S, &DOptAdd3, 1);    /* Before OptPtrLoad5! */
     Changes += RunOptFunc (S, &DOptPtrLoad1, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad2, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad3, 1);
@@ -1332,7 +1332,6 @@ static unsigned RunOptGroup3 (CodeSeg* S)
         C += RunOptFunc (S, &DOptAdd6, 1);
         C += RunOptFunc (S, &DOptJumpCascades, 1);
         C += RunOptFunc (S, &DOptDeadJumps, 1);
-        C += RunOptFunc (S, &DOptRTS, 1);
         C += RunOptFunc (S, &DOptDeadCode, 1);
         C += RunOptFunc (S, &DOptBoolTrans, 1);
         C += RunOptFunc (S, &DOptJumpTarget1, 1);
@@ -1487,11 +1486,16 @@ static unsigned RunOptGroup7 (CodeSeg* S)
     /* Adjust branch distances */
     Changes += RunOptFunc (S, &DOptBranchDist, 3);
 
-    /* Replace conditional branches to RTS. If we had changes, we must run dead
-    ** code elimination again, since the change may have introduced dead code.
-    */
+    /* Replace conditional branches to RTS */
     C = RunOptFunc (S, &DOptRTSJumps2, 1);
+
+    /* Replace JSR followed by RTS to JMP */
+    C += RunOptFunc (S, &DOptRTS, 1);
+
     Changes += C;
+    /* If we had changes, we must run dead code elimination again,
+    ** since the changes may have introduced dead code.
+    */
     if (C) {
         Changes += RunOptFunc (S, &DOptDeadCode, 1);
     }

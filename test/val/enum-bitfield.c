@@ -149,10 +149,117 @@ static void test_enum_bitfield_int(void)
     }
 }
 
+/* Enum with underlying type unsigned char. */
+enum e7uc {
+    E7UC_100 = 100,
+};
+
+static struct enum_bitfield_uchar {
+    enum e7uc x : 1;
+    enum e7uc y : 4;
+    enum e7uc z : 8;
+} e7ucbf = {0, 10, E7UC_100};
+
+static void test_enum_bitfield_uchar(void)
+{
+    if (sizeof (struct enum_bitfield_uchar) != 2) {
+        printf ("Got sizeof(struct enum_bitfield_uchar) = %zu, expected 2.\n",
+                sizeof(struct enum_bitfield_uchar));
+        failures++;
+    }
+
+    if (e7ucbf.x != 0) {
+        printf ("Got e7ucbf.x = %u, expected 0.\n", e7ucbf.x);
+        failures++;
+    }
+    if (e7ucbf.y != 10) {
+        printf ("Got e7ucbf.y = %u, expected 10.\n", e7ucbf.y);
+        failures++;
+    }
+    if (e7ucbf.z != 100) {
+        printf ("Got e7ucbf.z = %u, expected 100.\n", e7ucbf.z);
+        failures++;
+    }
+
+    e7ucbf.x = -1;  /* Will store 1. */
+    e7ucbf.y = -1;  /* Will store 15. */
+    e7ucbf.z = 127;
+
+    /* Both signed char and unsigned char are converted to int in arithmetic expressions,
+    ** so we write this test differently to enum_bitfield_int.
+    */
+    if (e7ucbf.x != 1) {
+        printf ("Got e7ucbf.x = %u, expected 1.\n", e7ucbf.x);
+        failures++;
+    }
+
+    if (e7ucbf.y != 15) {
+        printf ("Got e7ucbf.y = %u, expected 15.\n", e7ucbf.y);
+        failures++;
+    }
+    if (e7ucbf.z != 127) {
+        printf ("Got e7ucbf.z = %u, expected 127.\n", e7ucbf.z);
+        failures++;
+    }
+}
+
+/* Enum with underlying type signed char. */
+enum e8sc {
+    E8SC_M1 = -1,
+    E8SC_100 = 100,
+};
+
+static struct enum_bitfield_char {
+    enum e8sc x : 1;
+    enum e8sc y : 4;
+    enum e8sc z : 8;
+} e8scbf = {0, 5, E8SC_100};
+
+static void test_enum_bitfield_char(void)
+{
+    if (sizeof (struct enum_bitfield_char) != 2) {
+        printf ("Got sizeof(struct enum_bitfield_char) = %zu, expected 2.\n",
+                sizeof(struct enum_bitfield_char));
+        failures++;
+    }
+
+    if (e8scbf.x != 0) {
+        printf ("Got e8scbf.x = %d, expected 0.\n", e8scbf.x);
+        failures++;
+    }
+    if (e8scbf.y != 5) {
+        printf ("Got e8scbf.y = %d, expected 10.\n", e8scbf.y);
+        failures++;
+    }
+    if (e8scbf.z != 100) {
+        printf ("Got e8scbf.z = %d, expected 100.\n", e8scbf.z);
+        failures++;
+    }
+
+    e8scbf.x = -1;
+    e8scbf.y = -3;
+    e8scbf.z = 127;
+
+    if (e8scbf.x != -1) {
+        printf ("Got e8scbf.x = %d, expected -1.\n", e8scbf.x);
+        failures++;
+    }
+    if (e8scbf.y != -3) {
+        printf ("Got e8scbf.y = %d, expected -3.\n", e8scbf.y);
+        failures++;
+    }
+    if (e8scbf.z != 127) {
+        printf ("Got e8scbf.z = %d, expected 127.\n", e8scbf.z);
+        failures++;
+    }
+}
+
 int main(void)
 {
     test_enum_bitfield_uint();
     test_enum_bitfield_int();
+    test_enum_bitfield_uchar();
+    test_enum_bitfield_char();
     printf("failures: %u\n", failures);
     return failures;
 }

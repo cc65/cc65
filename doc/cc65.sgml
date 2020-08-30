@@ -807,6 +807,11 @@ This cc65 version has some extensions to the ISO C standard.
         <tt/_Static_assert/ is also available as the macro <tt/static_assert/ in
         <tt/assert.h/.
 
+<item>  cc65 supports bit-fields of any integral type that is int-sized or
+        smaller, and enumerated types with those types as their underlying
+        type.  (Only <tt/int/, <tt/signed int/, and <tt/unsigned int/ are
+        required.)
+
 <item>  Computed gotos, a GCC extension, has limited support. With it you can
         use fast jump tables from C. You can take the address of a label with
         a double ampersand, putting them in a static const array of type void *.

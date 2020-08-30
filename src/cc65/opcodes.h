@@ -128,7 +128,10 @@ typedef enum {
     OP65_TYA,
 
     /* Number of opcodes available */
-    OP65_COUNT
+    OP65_COUNT,
+
+    /* Invalid opcode */
+    OP65_INVALID = OP65_COUNT,
 } opc_t;
 
 /* 65XX addressing modes */

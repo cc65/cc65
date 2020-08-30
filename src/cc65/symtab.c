@@ -870,9 +870,13 @@ SymEntry* AddBitField (const char* Name, const Type* T, unsigned Offs,
         if (!SignednessSpecified) {
             /* int is treated as signed int everywhere except bit-fields; switch it to unsigned,
             ** since this is allowed for bit-fields and avoids sign-extension, so is much faster.
-            ** enums set SignednessSpecified to 1 to avoid this adjustment.
+            ** enums set SignednessSpecified to 1 to avoid this adjustment.  Character types
+            ** actually distinguish 3 types of char; char may either be signed or unsigned, which
+            ** is controlled by `--signed-chars`.  In bit-fields, however, we perform the same
+            ** `char -> unsigned char` adjustment that is performed with other integral types.
             */
-            CHECK ((Entry->Type->C & T_MASK_SIGN) == T_SIGN_SIGNED);
+            CHECK ((Entry->Type->C & T_MASK_SIGN) == T_SIGN_SIGNED ||
+                   IsTypeChar (Entry->Type));
             Entry->Type->C &= ~T_MASK_SIGN;
             Entry->Type->C |= T_SIGN_UNSIGNED;
         }

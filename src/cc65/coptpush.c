@@ -56,12 +56,14 @@ unsigned OptPush1 (CodeSeg* S)
 **
 **     ldy     #xx+2
 **     jsr     pushwysp
+**     ldy     #$00     ; present if later code expects Y = 0
 **
-** saving 3 bytes and several cycles.
+** saving several cycles.
 */
 {
     unsigned I;
     unsigned Changes = 0;
+    unsigned R;
 
     /* Walk over the entries */
     I = 0;
@@ -79,7 +81,7 @@ unsigned OptPush1 (CodeSeg* S)
             (L[1] = CS_GetNextEntry (S, I)) != 0        &&
             !CE_HasLabel (L[1])                         &&
             CE_IsCallTo (L[1], "pushax")                &&
-            !RegAXUsed (S, I+2)) {
+            ((R = (GetRegInfo (S, I+2, REG_AXY))) & REG_AX) == 0) {
 
             /* Insert new code behind the pushax */
             const char* Arg;
@@ -94,12 +96,25 @@ unsigned OptPush1 (CodeSeg* S)
             X = NewCodeEntry (OP65_JSR, AM65_ABS, "pushwysp", 0, L[1]->LI);
             CS_InsertEntry (S, X, I+3);
 
+            /* pushax sets Y = 0 and following code might rely on this */
+            if ((R & REG_Y) != 0) {
+                /* ldy     #0 */
+                X = NewCodeEntry (OP65_LDY, AM65_IMM, MakeHexArg (0), 0, L[1]->LI);
+                CS_InsertEntry (S, X, I+4);
+            }
+
             /* Delete the old code */
             CS_DelEntries (S, I, 2);
 
             /* Remember, we had changes */
             ++Changes;
 
+            /* Skip the handled lines */
+            if ((R & REG_Y) == 0) {
+                ++I;
+            } else {
+                I += 2;
+            }
         }
 
         /* Next entry */

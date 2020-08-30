@@ -3460,11 +3460,6 @@ static void hieQuest (ExprDesc* Expr)
     int         Expr3IsNULL;    /* Expression 3 is a NULL pointer */
     Type*       ResultType;     /* Type of result */
 
-    ED_Init (&Expr2);
-    Expr2.Flags = Expr->Flags & E_MASK_KEEP_RESULT;
-    ED_Init (&Expr3);
-    Expr3.Flags = Expr->Flags & E_MASK_KEEP_RESULT;
-
     /* Call the lower level eval routine */
     if (Preprocessing) {
         ExprWithCheck (hieOrPP, Expr);
@@ -3476,6 +3471,13 @@ static void hieQuest (ExprDesc* Expr)
     if (CurTok.Tok == TOK_QUEST) {
 
         int ConstantCond = ED_IsConstAbsInt (Expr);
+        unsigned Flags   = Expr->Flags & E_MASK_KEEP_RESULT;
+
+        ED_Init (&Expr2);
+        Expr2.Flags = Flags;
+        ED_Init (&Expr3);
+        Expr3.Flags = Flags;
+
         NextToken ();
 
         if (!ConstantCond) {
@@ -3616,7 +3618,10 @@ static void hieQuest (ExprDesc* Expr)
         if (!ConstantCond) {
             /* Define the final label */
             g_defcodelabel (TrueLab);
+            /* Set up the result expression type */
             ED_FinalizeRValLoad (Expr);
+            /* Restore the original evaluation flags */
+            Expr->Flags = (Expr->Flags & ~E_MASK_KEEP_RESULT) | Flags;
         } else {
             if (Expr->IVal != 0) {
                 *Expr = Expr2;

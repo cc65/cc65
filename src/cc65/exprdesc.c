@@ -266,7 +266,7 @@ ExprDesc* ED_FinalizeRValLoad (ExprDesc* Expr)
 {
     Expr->Sym   = 0;
     Expr->Flags &= ~(E_MASK_LOC | E_MASK_RTYPE | E_BITFIELD | E_ADDRESS_OF);
-    Expr->Flags &= ~(E_NEED_TEST | E_CC_SET);
+    Expr->Flags &= ~E_CC_SET;
     Expr->Flags |= (E_LOC_PRIMARY | E_RTYPE_RVAL);
     Expr->Name  = 0;
     Expr->IVal  = 0;    /* No offset */

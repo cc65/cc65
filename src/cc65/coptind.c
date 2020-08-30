@@ -1147,8 +1147,9 @@ unsigned OptDupLoads (CodeSeg* S)
         /* Get next entry */
         CodeEntry* E = CS_GetEntry (S, I);
 
-        /* Assume we won't delete the entry */
+        /* Assume we won't delete or replace the entry */
         int Delete = 0;
+        opc_t NewOPC = OP65_INVALID;
 
         /* Get a pointer to the input registers of the insn */
         const RegContents* In  = &E->RI->In;
@@ -1218,7 +1219,7 @@ unsigned OptDupLoads (CodeSeg* S)
                            E->AM != AM65_ABSY         &&
                            E->AM != AM65_ZPY) {
                     /* Use the A register instead */
-                    CE_ReplaceOPC (E, OP65_STA);
+                    NewOPC = OP65_STA;
                 }
                 break;
 
@@ -1242,11 +1243,11 @@ unsigned OptDupLoads (CodeSeg* S)
                 */
                 } else if (RegValIsKnown (In->RegY)) {
                     if (In->RegY == In->RegA) {
-                        CE_ReplaceOPC (E, OP65_STA);
+                        NewOPC = OP65_STA;
                     } else if (In->RegY == In->RegX   &&
                                E->AM != AM65_ABSX     &&
                                E->AM != AM65_ZPX) {
-                        CE_ReplaceOPC (E, OP65_STX);
+                        NewOPC = OP65_STX;
                     }
                 }
                 break;
@@ -1318,6 +1319,14 @@ unsigned OptDupLoads (CodeSeg* S)
             ++Changes;
 
         } else {
+
+            if (NewOPC != OP65_INVALID) {
+                /* Replace the opcode */
+                CE_ReplaceOPC (E, NewOPC);
+
+                /* Remember, we had changes */
+                ++Changes;
+            }
 
             /* Next entry */
             ++I;

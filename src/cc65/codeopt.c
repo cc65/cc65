@@ -1029,7 +1029,9 @@ void ListOptSteps (FILE* F)
     
     fprintf (F, "any\n");
     for (I = 0; I < OPTFUNC_COUNT; ++I) {
-        fprintf (F, "%s\n", OptFuncs[I]->Name);
+        if (OptFuncs[I]->Func != 0) {
+            fprintf (F, "%s\n", OptFuncs[I]->Name);
+        }
     }
 }
 
@@ -1190,10 +1192,10 @@ static unsigned RunOptFunc (CodeSeg* S, OptFunc* F, unsigned Max)
 {
     unsigned Changes, C;
 
-    /* Don't run the function if it is disabled or if it is prohibited by the
+    /* Don't run the function if it is removed, disabled or prohibited by the
     ** code size factor
     */
-    if (F->Disabled || F->CodeSizeFactor > S->CodeSizeFactor) {
+    if (F->Func == 0 || F->Disabled || F->CodeSizeFactor > S->CodeSizeFactor) {
         return 0;
     }
 

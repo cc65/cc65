@@ -365,6 +365,16 @@ INLINE void ED_RequireTest (ExprDesc* Expr)
 #endif
 
 #if defined(HAVE_INLINE)
+INLINE void ED_RequireNoTest (ExprDesc* Expr)
+/* Mark the expression not for a test. */
+{
+    Expr->Flags &= ~E_NEED_TEST;
+}
+#else
+#  define ED_RequireNoTest(Expr)    do { (Expr)->Flags &= ~E_NEED_TEST; } while (0)
+#endif
+
+#if defined(HAVE_INLINE)
 INLINE int ED_GetNeeds (const ExprDesc* Expr)
 /* Get flags about what the expression needs. */
 {

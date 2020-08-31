@@ -3223,6 +3223,9 @@ static int hieAnd (ExprDesc* Expr, unsigned* TrueLab, int* TrueLabAllocated)
                 /* Load the value */
                 LoadExpr (CF_FORCECHAR, Expr);
 
+                /* Clear the test flag */
+                ED_RequireNoTest (Expr);
+
                 /* Remember that the jump is used */
                 HasFalseJump = 1;
 
@@ -3355,6 +3358,9 @@ static void hieOr (ExprDesc *Expr)
 
                     /* Get first expr */
                     LoadExpr (CF_FORCECHAR, Expr);
+
+                    /* Clear the test flag */
+                    ED_RequireNoTest (Expr);
 
                     if (HasTrueJump == 0) {
                         /* Get a label that we will use for true expressions */

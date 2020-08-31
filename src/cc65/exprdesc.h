@@ -474,13 +474,13 @@ void ED_MarkForUneval (ExprDesc* Expr);
 /* Mark the expression as not to be evaluated */
 
 #if defined(HAVE_INLINE)
-INLINE int ED_MayBeUneval (const ExprDesc* Expr)
-/* Check if the expression may be uevaluated */
+INLINE int ED_IsUneval (const ExprDesc* Expr)
+/* Check if the expression is not to be evaluated */
 {
     return (Expr->Flags & E_EVAL_UNEVAL) == E_EVAL_UNEVAL;
 }
 #else
-#  define ED_MayBeUneval(Expr)  (((Expr)->Flags & E_EVAL_UNEVAL) == E_EVAL_UNEVAL)
+#  define ED_IsUneval(Expr)     (((Expr)->Flags & E_EVAL_UNEVAL) == E_EVAL_UNEVAL)
 #endif
 
 #if defined(HAVE_INLINE)

@@ -141,7 +141,7 @@ static long ArrayElementCount (const ArgDesc* Arg)
 
 
 
-static void ParseArg (ArgDesc* Arg, Type* Type)
+static void ParseArg (ArgDesc* Arg, Type* Type, ExprDesc* Expr)
 /* Parse one argument but do not push it onto the stack. Make all fields in
 ** Arg valid.
 */
@@ -154,6 +154,7 @@ static void ParseArg (ArgDesc* Arg, Type* Type)
 
     /* Init expression */
     ED_Init (&Arg->Expr);
+    Arg->Expr.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
 
     /* Read the expression we're going to pass to the function */
     MarkedExprWithCheck (hie1, &Arg->Expr);
@@ -221,14 +222,14 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     int      Offs;
 
     /* Argument #1 */
-    ParseArg (&Arg1, Arg1Type);
+    ParseArg (&Arg1, Arg1Type, Expr);
     g_push (Arg1.Flags, Arg1.Expr.IVal);
     GetCodePos (&Arg1.End);
     ParamSize += SizeOf (Arg1Type);
     ConsumeComma ();
 
     /* Argument #2 */
-    ParseArg (&Arg2, Arg2Type);
+    ParseArg (&Arg2, Arg2Type, Expr);
     g_push (Arg2.Flags, Arg2.Expr.IVal);
     GetCodePos (&Arg2.End);
     ParamSize += SizeOf (Arg2Type);
@@ -239,7 +240,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     ** also ignored for the calculation of the parameter size, since it is
     ** not passed via the stack.
     */
-    ParseArg (&Arg3, Arg3Type);
+    ParseArg (&Arg3, Arg3Type, Expr);
     if (Arg3.Flags & CF_CONST) {
         LoadExpr (CF_NONE, &Arg3.Expr);
     }
@@ -562,7 +563,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     unsigned Label;
 
     /* Argument #1 */
-    ParseArg (&Arg1, Arg1Type);
+    ParseArg (&Arg1, Arg1Type, Expr);
     g_push (Arg1.Flags, Arg1.Expr.IVal);
     GetCodePos (&Arg1.End);
     ParamSize += SizeOf (Arg1Type);
@@ -571,7 +572,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     /* Argument #2. This argument is special in that we will call another
     ** function if it is a constant zero.
     */
-    ParseArg (&Arg2, Arg2Type);
+    ParseArg (&Arg2, Arg2Type, Expr);
     if ((Arg2.Flags & CF_CONST) != 0 && Arg2.Expr.IVal == 0) {
         /* Don't call memset, call bzero instead */
         MemSet = 0;
@@ -588,7 +589,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     ** also ignored for the calculation of the parameter size, since it is
     ** not passed via the stack.
     */
-    ParseArg (&Arg3, Arg3Type);
+    ParseArg (&Arg3, Arg3Type, Expr);
     if (Arg3.Flags & CF_CONST) {
         LoadExpr (CF_NONE, &Arg3.Expr);
     }
@@ -790,13 +791,13 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     Arg2Type[1].C = T_CHAR | T_QUAL_CONST;
 
     /* Argument #1 */
-    ParseArg (&Arg1, Arg1Type);
+    ParseArg (&Arg1, Arg1Type, Expr);
     g_push (Arg1.Flags, Arg1.Expr.IVal);
     ParamSize += SizeOf (Arg1Type);
     ConsumeComma ();
 
     /* Argument #2. */
-    ParseArg (&Arg2, Arg2Type);
+    ParseArg (&Arg2, Arg2Type, Expr);
 
     /* Since strcmp is a fastcall function, we must load the
     ** arg into the primary if it is not already there. This parameter is
@@ -990,7 +991,7 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     Arg2Type[1].C = T_CHAR | T_QUAL_CONST;
 
     /* Argument #1 */
-    ParseArg (&Arg1, Arg1Type);
+    ParseArg (&Arg1, Arg1Type, Expr);
     g_push (Arg1.Flags, Arg1.Expr.IVal);
     GetCodePos (&Arg1.End);
     ParamSize += SizeOf (Arg1Type);
@@ -1001,7 +1002,7 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     ** also ignored for the calculation of the parameter size, since it is
     ** not passed via the stack.
     */
-    ParseArg (&Arg2, Arg2Type);
+    ParseArg (&Arg2, Arg2Type, Expr);
     if (Arg2.Flags & CF_CONST) {
         LoadExpr (CF_NONE, &Arg2.Expr);
     }
@@ -1184,6 +1185,7 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     unsigned    L;
 
     ED_Init (&Arg);
+    Arg.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
 
     /* Setup the argument type string */
     ArgType[1].C = T_CHAR | T_QUAL_CONST;

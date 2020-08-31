@@ -136,10 +136,11 @@ static int CopyStruct (ExprDesc* LExpr, ExprDesc* RExpr)
 void Assignment (ExprDesc* Expr)
 /* Parse an assignment */
 {
-    ExprDesc Expr2;
     Type* ltype = Expr->Type;
 
+    ExprDesc Expr2;
     ED_Init (&Expr2);
+    Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
 
     /* We must have an lvalue for an assignment */
     if (ED_IsRVal (Expr)) {

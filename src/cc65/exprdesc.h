@@ -65,16 +65,16 @@ enum {
     ** - E_LOC_<else> refers to any other than E_LOC_NONE and E_LOC_PRIMARY.
     ** - E_LOC_EXPR can be regarded as a generalized E_LOC_<else>.
     ** - E_LOC_NONE can be regarded as E_LOC_PRIMARY + E_ADDRESS_OF unless
-    **   remarked otherwise (see below).
+    **    remarked otherwise (see below).
     ** - An E_LOC_NONE value is not considered to be an "address".
     ** - ref-load doesn't change the location, while rval-load puts into the
-    **   primary register a "temporary" that is the straight integer rvalue or
-    **   a "delegate" to the real rvalue somewhere else.
+    **    primary register a "temporary" that is the straight integer rvalue or
+    **    a "delegate" to the real rvalue somewhere else.
     ** - ref-load doesn't change the rval/lval category of the expression,
-    **   while rval-load converts it to an rvalue if it wasn't.
+    **    while rval-load converts it to an rvalue if it wasn't.
     ** - In practice, ref-load is unimplemented, and can be simulated with
-    **   adding E_ADDRESS_OF temporaily through LoadExpr + FinalizeLoad, 
-    **   whilst val-load is done with LoadExpr + FinalizeRValLoad.
+    **    adding E_ADDRESS_OF temporaily through LoadExpr + FinalizeLoad, 
+    **    whilst val-load is done with LoadExpr + FinalizeRValLoad.
     **
     ** E_LOC_NONE     -- ref-load     -> + E_LOADED (int rvalue)
     ** E_LOC_PRIMARY  -- ref-load     -> + E_LOADED (unchanged)
@@ -94,7 +94,7 @@ enum {
     ** E_LOC_<else>   -- dereference  -> E_LOC_EXPR (pointed-to-value, must load)
     ** + E_ADDRESS_OF -- dereference  -> (lvalue reference)
     */
-    E_MASK_LOC          = 0x00FF,
+    E_MASK_LOC          = 0x01FF,
     E_LOC_NONE          = 0x0000,       /* Pure rvalue with no storage */
     E_LOC_ABS           = 0x0001,       /* Absolute numeric addressed variable */
     E_LOC_GLOBAL        = 0x0002,       /* Global variable */
@@ -104,29 +104,92 @@ enum {
     E_LOC_PRIMARY       = 0x0020,       /* Temporary in primary register */
     E_LOC_EXPR          = 0x0040,       /* A location that the primary register points to */
     E_LOC_LITERAL       = 0x0080,       /* Literal in the literal pool */
+    E_LOC_CODE          = 0x0100,       /* C code label location (&&Label) */
 
-    /* Constant location of some sort (only if rval) */
+    /* Immutable location addresses (immutable bases and offsets) */
     E_LOC_CONST         = E_LOC_NONE | E_LOC_ABS | E_LOC_GLOBAL | E_LOC_STATIC |
-                          E_LOC_REGISTER | E_LOC_LITERAL,
+                          E_LOC_REGISTER | E_LOC_LITERAL | E_LOC_CODE,
+
+    /* Not-so-immutable location addresses (stack offsets may change dynamically) */
+    E_LOC_QUASICONST    = E_LOC_CONST | E_LOC_STACK,
+
+    /* Expression type modifiers */
+    E_BITFIELD          = 0x0200,       /* Expression is a bit-field */
+    E_ADDRESS_OF        = 0x0400,       /* Expression is the address of the lvalue */
 
     /* lvalue/rvalue in C language's sense */
-    E_MASK_RTYPE        = 0x0100,
+    E_MASK_RTYPE        = 0x0800,
     E_RTYPE_RVAL        = 0x0000,
-    E_RTYPE_LVAL        = 0x0100,
+    E_RTYPE_LVAL        = 0x0800,
 
-    /* Bit-field? */
-    E_BITFIELD          = 0x0200,
+    /* Expression status */
+    E_LOADED            = 0x1000,       /* Expression is loaded in primary */
+    E_CC_SET            = 0x2000,       /* Condition codes are set */
+    E_HAVE_MARKS        = 0x4000,       /* Code marks are valid */
 
-    /* Test */
-    E_NEED_TEST         = 0x0400,       /* Expression needs a test to set cc */
-    E_CC_SET            = 0x0800,       /* Condition codes are set */
+    /* Optimization hints */
+    E_MASK_NEED         = 0x030000,
+    E_NEED_EAX          = 0x000000,     /* Expression result needs to be loaded in Primary */
+    E_NEED_NONE         = 0x010000,     /* Expression result is unused */
+    E_NEED_TEST         = 0x020000,     /* Expression needs a test to set cc */
 
-    E_HAVE_MARKS        = 0x1000,       /* Code marks are valid */
+    /* Expression evaluation requirements.
+    ** Usage: (Flags & E_EVAL_<Flag>) == E_EVAL_<Flag>
+    **
+    ** Remark:
+    ** - Expression result, that is the "final value" of the expression, is no
+    **    more than one of the effects of the whole expression. Effects other
+    **    than it are usually consided "side-effects" in this regard.
+    ** - The compiler front end cannot know things determined by the linker,
+    **    such as the actual address of an object with static storage. What it
+    **    can know is categorized as "compiler-known" here. 
+    ** - The concept "immutable" here means that once something is determined
+    **    (not necessarily by the compiler), it will never change. This is not
+    **    the same meaning as the "constant" word in the C standard.
+    ** - The concept "compile-time" ( not to be confued with "compiler-known"),
+    **    or "static" (compared to "run-time" as in "_Static_assert" in C, not
+    **    to be confused with the "static" storage) here means that something
+    **    has no run-time behaviors, enforced by the fact that it generates no
+    **    target code (hence "no-code"). It is closely related to the concepts
+    **    above but not the same.
+    ** - An "unevaluated" expression is special and different from the above:
+    **    while it generates no code, cannot change its "value" (it actually has
+    **    no value), and must be completely handled by the compiler front-end,
+    **    it is unique in that it is not "evaluated" while the others are, and
+    **    the codegen routine of such an expression is usually separated from
+    **    the normally evaluated ones. Therefore it is treated differently from
+    **    the above and uses a separate flag that implies none of the above.
+    ** - The "maybe-unused" flag is to suppress the checking and warning on
+    **    expressions with no effects. It doesn't have any special meanings
+    **    beyond that, and is independent from the E_NEED_<flag>s. All
+    **    "unevaluated" expressions are  flagged as "maybe-unused" just to
+    **    avoid unnecessary warnings.
+    **
+    ** Relationship of some concepts:
+    ** - "no-code" implies "no-side-effects"
+    ** - "immutable" = "compiler-known" OR "no-code"
+    ** - "constant expression" in C = "compiler-known" AND "no-code", with minor differences
+    */
+    E_MASK_EVAL             = 0xFC0000,
+    E_EVAL_NONE             = 0x000000, /* No requirements */
+    E_EVAL_IMMUTABLE_RESULT = 0x040000, /* Expression result must be immutable */
+    E_EVAL_COMPILER_KNOWN   = 0x0C0000, /* Expression result must be known to the compiler */
+    E_EVAL_NO_SIDE_EFFECTS  = 0x100000, /* Evaluation must have no side effects */
+    E_EVAL_NO_CODE          = 0x340000, /* Evaluation must generate no code */
+    E_EVAL_MAYBE_UNUSED     = 0x400000, /* Expression result may be unused */
+    E_EVAL_UNEVAL           = 0xC00000, /* Expression is unevaluated */
 
-    E_LOADED            = 0x4000,       /* Expression is loaded in primary */
+    /* Expression result must be known to the compiler and generate no code to load */
+    E_EVAL_C_CONST          = E_EVAL_COMPILER_KNOWN | E_EVAL_NO_CODE,
 
-    E_ADDRESS_OF        = 0x8000,       /* Expression is the address of the lvalue */
+    /* Flags to keep in subexpressions of most operations other than ternary */
+    E_MASK_KEEP_SUBEXPR     = E_MASK_EVAL,
 
+    /* Flags to keep for the two result subexpressions of the ternary operation */
+    E_MASK_KEEP_RESULT      = E_MASK_NEED | E_MASK_EVAL,
+
+    /* Flags to keep when using the ED_Make functions */
+    E_MASK_KEEP_MAKE        = E_HAVE_MARKS | E_MASK_KEEP_RESULT,
 };
 
 /* Forward */
@@ -292,13 +355,33 @@ void ED_MakeBitField (ExprDesc* Expr, unsigned BitOffs, unsigned BitWidth);
 /* Make this expression a bit field expression */
 
 #if defined(HAVE_INLINE)
-INLINE void ED_MarkForTest (ExprDesc* Expr)
+INLINE void ED_RequireTest (ExprDesc* Expr)
 /* Mark the expression for a test. */
 {
     Expr->Flags |= E_NEED_TEST;
 }
 #else
-#  define ED_MarkForTest(Expr)  do { (Expr)->Flags |= E_NEED_TEST; } while (0)
+#  define ED_RequireTest(Expr)  do { (Expr)->Flags |= E_NEED_TEST; } while (0)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int ED_GetNeeds (const ExprDesc* Expr)
+/* Get flags about what the expression needs. */
+{
+    return (Expr->Flags & E_MASK_NEED);
+}
+#else
+#  define ED_GetNeeds(Expr)     ((Expr)->Flags & E_MASK_NEED)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int ED_NeedsPrimary (const ExprDesc* Expr)
+/* Check if the expression needs to be in Primary. */
+{
+    return (Expr->Flags & E_MASK_NEED) == E_NEED_EAX;
+}
+#else
+#  define ED_NeedsPrimary(Expr) (((Expr)->Flags & E_MASK_NEED) == E_NEED_EAX)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -312,14 +395,24 @@ INLINE int ED_NeedsTest (const ExprDesc* Expr)
 #endif
 
 #if defined(HAVE_INLINE)
+INLINE int ED_YetToTest (const ExprDesc* Expr)
+/* Check if the expression needs to be tested but not yet. */
+{
+    return ((Expr)->Flags & (E_NEED_TEST | E_CC_SET)) == E_NEED_TEST;
+}
+#else
+#  define ED_YetToTest(Expr)    (((Expr)->Flags & (E_NEED_TEST | E_CC_SET)) == E_NEED_TEST)
+#endif
+
+#if defined(HAVE_INLINE)
 INLINE void ED_TestDone (ExprDesc* Expr)
 /* Mark the expression as tested and condition codes set. */
 {
-    Expr->Flags = (Expr->Flags & ~E_NEED_TEST) | E_CC_SET;
+    Expr->Flags |= E_CC_SET;
 }
 #else
 #  define ED_TestDone(Expr)     \
-    do { (Expr)->Flags = ((Expr)->Flags & ~E_NEED_TEST) | E_CC_SET; } while (0)
+    do { (Expr)->Flags |= E_CC_SET; } while (0)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -352,6 +445,42 @@ INLINE int ED_IsLoaded (const ExprDesc* Expr)
 }
 #else
 #  define ED_IsLoaded(Expr)   (((Expr)->Flags & E_LOADED) != 0)
+#endif
+
+int ED_YetToLoad (const ExprDesc* Expr);
+/* Check if the expression is yet to be loaded somehow. */
+
+#if defined(HAVE_INLINE)
+INLINE int ED_NeedsConst (const ExprDesc* Expr)
+/* Check if the expression need be immutable */
+{
+    return (Expr->Flags & E_EVAL_IMMUTABLE_RESULT) == E_EVAL_IMMUTABLE_RESULT;
+}
+#else
+#  define ED_NeedsConst(Expr)   (((Expr)->Flags & E_EVAL_IMMUTABLE_RESULT) == E_EVAL_IMMUTABLE_RESULT)
+#endif
+
+void ED_MarkForUneval (ExprDesc* Expr);
+/* Mark the expression as not to be evaluated */
+
+#if defined(HAVE_INLINE)
+INLINE int ED_MayBeUneval (const ExprDesc* Expr)
+/* Check if the expression may be uevaluated */
+{
+    return (Expr->Flags & E_EVAL_UNEVAL) == E_EVAL_UNEVAL;
+}
+#else
+#  define ED_MayBeUneval(Expr)  (((Expr)->Flags & E_EVAL_UNEVAL) == E_EVAL_UNEVAL)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int ED_MayHaveNoEffect (const ExprDesc* Expr)
+/* Check if the expression may be present without effects */
+{
+    return (Expr->Flags & E_EVAL_MAYBE_UNUSED) == E_EVAL_MAYBE_UNUSED;
+}
+#else
+#  define ED_MayHaveNoEffect(Expr)  (((Expr)->Flags & E_EVAL_MAYBE_UNUSED) == E_EVAL_MAYBE_UNUSED)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -410,6 +539,9 @@ ExprDesc* ED_MakeConstAbs (ExprDesc* Expr, long Value, Type* Type);
 
 ExprDesc* ED_MakeConstAbsInt (ExprDesc* Expr, long Value);
 /* Replace Expr with an constant integer with the given value */
+
+ExprDesc* ED_MakeConstBool (ExprDesc* Expr, long Value);
+/* Replace Expr with a constant boolean expression with the given value */
 
 ExprDesc* ED_FinalizeRValLoad (ExprDesc* Expr);
 /* Finalize the result of LoadExpr to be an rvalue in the primary register */
@@ -519,7 +651,7 @@ int ED_IsNullPtr (const ExprDesc* Expr);
 
 int ED_IsBool (const ExprDesc* Expr);
 /* Return true of the expression can be treated as a boolean, that is, it can
-** be an operand to a compare operation.
+** be an operand to a compare operation with 0/NULL.
 */
 
 void PrintExprDesc (FILE* F, ExprDesc* Expr);

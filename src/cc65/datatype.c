@@ -66,6 +66,7 @@ Type type_int[]         = { TYPE(T_INT),    TYPE(T_END) };
 Type type_uint[]        = { TYPE(T_UINT),   TYPE(T_END) };
 Type type_long[]        = { TYPE(T_LONG),   TYPE(T_END) };
 Type type_ulong[]       = { TYPE(T_ULONG),  TYPE(T_END) };
+Type type_bool[]        = { TYPE(T_INT),    TYPE(T_END) };
 Type type_void[]        = { TYPE(T_VOID),   TYPE(T_END) };
 Type type_size_t[]      = { TYPE(T_SIZE_T), TYPE(T_END) };
 Type type_float[]       = { TYPE(T_FLOAT),  TYPE(T_END) };

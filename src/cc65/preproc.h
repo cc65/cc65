@@ -44,7 +44,7 @@
 
 
 
-/* Set when the preprocessor calls ConstExpr() recursively */
+/* Set when the preprocessor calls NoCodeConstExpr() recursively */
 extern unsigned char Preprocessing;
 
 

@@ -196,6 +196,7 @@ extern Type type_int[];
 extern Type type_uint[];
 extern Type type_long[];
 extern Type type_ulong[];
+extern Type type_bool[];
 extern Type type_void[];
 extern Type type_size_t[];
 extern Type type_float[];

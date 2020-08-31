@@ -311,13 +311,15 @@ void PushAddr (const ExprDesc* Expr)
 
 
 
-static void WarnConstCompareResult (void)
+static void WarnConstCompareResult (const ExprDesc* Expr)
 /* If the result of a comparison is constant, this is suspicious when not in
 ** preprocessor mode.
 */
 {
-    if (!Preprocessing && IS_Get (&WarnConstComparison) != 0) {
-        Warning ("Result of comparison is constant");
+    if (!Preprocessing          &&
+        !ED_NeedsConst (Expr)   &&
+        IS_Get (&WarnConstComparison) != 0) {
+        Warning ("Result of comparison is always %s", Expr->IVal != 0 ? "true" : "false");
     }
 }
 
@@ -390,6 +392,7 @@ static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall)
 
         unsigned Flags;
         ExprDesc Expr;
+        ED_Init (&Expr);
 
         /* Count arguments */
         ++PushedCount;
@@ -733,23 +736,20 @@ static void Primary (ExprDesc* E)
 {
     SymEntry* Sym;
 
-    /* Initialize fields in the expression stucture */
-    ED_Init (E);
-
     /* Character and integer constants. */
     if (CurTok.Tok == TOK_ICONST || CurTok.Tok == TOK_CCONST) {
-        E->IVal  = CurTok.IVal;
-        E->Flags = E_LOC_NONE | E_RTYPE_RVAL;
-        E->Type  = CurTok.Type;
+        E->IVal   = CurTok.IVal;
+        E->Flags |= E_LOC_NONE | E_RTYPE_RVAL;
+        E->Type   = CurTok.Type;
         NextToken ();
         return;
     }
 
     /* Floating point constant */
     if (CurTok.Tok == TOK_FCONST) {
-        E->FVal  = CurTok.FVal;
-        E->Flags = E_LOC_NONE | E_RTYPE_RVAL;
-        E->Type  = CurTok.Type;
+        E->FVal   = CurTok.FVal;
+        E->Flags |= E_LOC_NONE | E_RTYPE_RVAL;
+        E->Type   = CurTok.Type;
         NextToken ();
         return;
     }
@@ -782,6 +782,8 @@ static void Primary (ExprDesc* E)
         ED_MakeConstAbsInt (E, 1);
         return;
     }
+
+    unsigned Flags = E->Flags & E_MASK_KEEP_MAKE;
 
     switch (CurTok.Tok) {
 
@@ -818,8 +820,8 @@ static void Primary (ExprDesc* E)
                     /* Cannot use type symbols */
                     Error ("Variable identifier expected");
                     /* Assume an int type to make E valid */
-                    E->Flags = E_LOC_STACK | E_RTYPE_LVAL;
-                    E->Type  = type_int;
+                    E->Flags |= E_LOC_STACK | E_RTYPE_LVAL;
+                    E->Type   = type_int;
                     return;
                 }
 
@@ -930,7 +932,7 @@ static void Primary (ExprDesc* E)
         case TOK_ASM:
             /* ASM statement */
             AsmStatement ();
-            E->Flags = E_RTYPE_RVAL;
+            E->Flags = E_RTYPE_RVAL | E_EVAL_MAYBE_UNUSED;
             E->Type  = type_void;
             break;
 
@@ -1000,6 +1002,8 @@ static void Primary (ExprDesc* E)
             ED_MakeConstAbsInt (E, 1);
             break;
     }
+
+    E->Flags |= Flags;
 }
 
 
@@ -1015,6 +1019,8 @@ static void ArrayRef (ExprDesc* Expr)
     Type*       ElementType;
     Type*       tptr1;
 
+    ED_Init (&Subscript);
+    Subscript.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
 
     /* Skip the bracket */
     NextToken ();
@@ -2047,7 +2053,6 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
                           int* UsedGen)
 /* Helper function */
 {
-    ExprDesc Expr2;
     CodeMark Mark1;
     CodeMark Mark2;
     const GenDesc* Gen;
@@ -2061,6 +2066,10 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
 
     *UsedGen = 0;
     while ((Gen = FindGen (CurTok.Tok, Ops)) != 0) {
+
+        ExprDesc Expr2;
+        ED_Init (&Expr2);
+        Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
 
         /* Tell the caller that we handled it's ops */
         *UsedGen = 1;
@@ -2266,7 +2275,6 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                          void (*hienext) (ExprDesc*))
 /* Helper function for the compare operators */
 {
-    ExprDesc Expr2;
     CodeMark Mark0;
     CodeMark Mark1;
     CodeMark Mark2;
@@ -2280,6 +2288,10 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
     ExprWithCheck (hienext, Expr);
 
     while ((Gen = FindGen (CurTok.Tok, Ops)) != 0) {
+
+        ExprDesc Expr2;
+        ED_Init (&Expr2);
+        Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
 
         /* Remember the generator function */
         void (*GenFunc) (unsigned, unsigned long) = Gen->Func;
@@ -2380,11 +2392,6 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
         /* Check for const operands */
         if (ED_IsConstAbs (Expr) && rconst) {
 
-            /* If the result is constant, this is suspicious when not in
-            ** preprocessor mode.
-            */
-            WarnConstCompareResult ();
-
             /* Both operands are constant, remove the generated code */
             RemoveCode (&Mark1);
 
@@ -2420,6 +2427,11 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                     default:     Internal ("hie_compare: got token 0x%X\n", Tok);
                 }
             }
+
+            /* If the result is constant, this is suspicious when not in
+            ** preprocessor mode.
+            */
+            WarnConstCompareResult (Expr);
 
         } else {
 
@@ -2479,7 +2491,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                     case TOK_EQ:
                         if (Expr2.IVal < LeftMin || Expr2.IVal > LeftMax) {
                             ED_MakeConstAbsInt (Expr, 0);
-                            WarnConstCompareResult ();
+                            WarnConstCompareResult (Expr);
                             goto Done;
                         }
                         break;
@@ -2487,7 +2499,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                     case TOK_NE:
                         if (Expr2.IVal < LeftMin || Expr2.IVal > LeftMax) {
                             ED_MakeConstAbsInt (Expr, 1);
-                            WarnConstCompareResult ();
+                            WarnConstCompareResult (Expr);
                             goto Done;
                         }
                         break;
@@ -2495,7 +2507,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                     case TOK_LT:
                         if (Expr2.IVal <= LeftMin || Expr2.IVal > LeftMax) {
                             ED_MakeConstAbsInt (Expr, Expr2.IVal > LeftMax);
-                            WarnConstCompareResult ();
+                            WarnConstCompareResult (Expr);
                             goto Done;
                         }
                         break;
@@ -2503,7 +2515,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                     case TOK_LE:
                         if (Expr2.IVal < LeftMin || Expr2.IVal >= LeftMax) {
                             ED_MakeConstAbsInt (Expr, Expr2.IVal >= LeftMax);
-                            WarnConstCompareResult ();
+                            WarnConstCompareResult (Expr);
                             goto Done;
                         }
                         break;
@@ -2511,7 +2523,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                     case TOK_GE:
                         if (Expr2.IVal <= LeftMin || Expr2.IVal > LeftMax) {
                             ED_MakeConstAbsInt (Expr, Expr2.IVal <= LeftMin);
-                            WarnConstCompareResult ();
+                            WarnConstCompareResult (Expr);
                             goto Done;
                         }
                         break;
@@ -2519,7 +2531,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                     case TOK_GT:
                         if (Expr2.IVal < LeftMin || Expr2.IVal >= LeftMax) {
                             ED_MakeConstAbsInt (Expr, Expr2.IVal < LeftMin);
-                            WarnConstCompareResult ();
+                            WarnConstCompareResult (Expr);
                             goto Done;
                         }
                         break;
@@ -2613,13 +2625,13 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
             /* The result is an rvalue in the primary */
             ED_FinalizeRValLoad (Expr);
+
+            /* Condition codes are set */
+            ED_TestDone (Expr);
         }
 
-        /* Result type is always int */
-        Expr->Type = type_int;
-
-Done:   /* Condition codes are set */
-        ED_TestDone (Expr);
+        /* Result type is always boolean */
+Done:   Expr->Type = type_bool;
     }
 }
 
@@ -2652,6 +2664,9 @@ static void parseadd (ExprDesc* Expr)
     CodeMark Mark;              /* Remember code position */
     Type* lhst;                 /* Type of left hand side */
     Type* rhst;                 /* Type of right hand side */
+
+    ED_Init (&Expr2);
+    Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
 
     /* Skip the PLUS token */
     NextToken ();
@@ -2887,6 +2902,8 @@ static void parsesub (ExprDesc* Expr)
     CodeMark Mark2;             /* Another position in the queue */
     int rscale;                 /* Scale factor for the result */
 
+    ED_Init (&Expr2);
+    Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
 
     /* lhs cannot be function or pointer to function */
     if (IsTypeFunc (Expr->Type) || IsTypeFuncPtr (Expr->Type)) {
@@ -3148,16 +3165,14 @@ static void hieAndPP (ExprDesc* Expr)
 ** called recursively from the preprocessor.
 */
 {
-    ExprDesc Expr2;
-
-    ConstAbsIntExpr (hie2, Expr);
+    *Expr = NoCodeConstAbsIntExpr (hie2);
     while (CurTok.Tok == TOK_BOOL_AND) {
 
         /* Skip the && */
         NextToken ();
 
         /* Get rhs */
-        ConstAbsIntExpr (hie2, &Expr2);
+        ExprDesc Expr2 = NoCodeConstAbsIntExpr (hie2);
 
         /* Combine the two */
         Expr->IVal = (Expr->IVal && Expr2.IVal);
@@ -3171,16 +3186,14 @@ static void hieOrPP (ExprDesc *Expr)
 ** called recursively from the preprocessor.
 */
 {
-    ExprDesc Expr2;
-
-    ConstAbsIntExpr (hieAndPP, Expr);
+    *Expr = NoCodeConstAbsIntExpr (hieAndPP);
     while (CurTok.Tok == TOK_BOOL_OR) {
 
         /* Skip the && */
         NextToken ();
 
         /* Get rhs */
-        ConstAbsIntExpr (hieAndPP, &Expr2);
+        ExprDesc Expr2 = NoCodeConstAbsIntExpr (hieAndPP);
 
         /* Combine the two */
         Expr->IVal = (Expr->IVal || Expr2.IVal);
@@ -3189,61 +3202,133 @@ static void hieOrPP (ExprDesc *Expr)
 
 
 
-static void hieAnd (ExprDesc* Expr, unsigned TrueLab, int* BoolOp)
-/* Process "exp && exp" */
+static int hieAnd (ExprDesc* Expr, unsigned* TrueLab, int* TrueLabAllocated)
+/* Process "exp && exp". This should only be called within hieOr.
+** Return true if logic AND does occur.
+*/
 {
-    int FalseLab;
-    ExprDesc Expr2;
+    unsigned Flags = Expr->Flags & E_MASK_KEEP_SUBEXPR;
+    int HasFalseJump = 0, HasTrueJump = 0;
+    CodeMark Start;
 
+    /* Get a label that we will use for false expressions */
+    int FalseLab = GetLocalLabel ();
+
+    /* Get lhs */
+    GetCodePos (&Start);
     ExprWithCheck (hie2, Expr);
+    if ((Flags & E_EVAL_UNEVAL) == E_EVAL_UNEVAL) {
+        RemoveCode (&Start);
+    }
+
     if (CurTok.Tok == TOK_BOOL_AND) {
 
-        /* Tell our caller that we're evaluating a boolean */
-        *BoolOp = 1;
+        ExprDesc Expr2;
 
-        /* Get a label that we will use for false expressions */
-        FalseLab = GetLocalLabel ();
+        /* Check type */
+        if (!ED_IsBool (Expr)) {
+            Error ("Scalar expression expected");
+            ED_MakeConstBool (Expr, 0);
+        } else if ((Flags & E_EVAL_UNEVAL) != E_EVAL_UNEVAL) {
+            if (!ED_IsConstAbs (Expr)) {
+                /* Set the test flag */
+                ED_RequireTest (Expr);
 
-        /* If the expr hasn't set condition codes, set the force-test flag */
-        if (!ED_IsTested (Expr)) {
-            ED_MarkForTest (Expr);
+                /* Load the value */
+                LoadExpr (CF_FORCECHAR, Expr);
+
+                /* Remember that the jump is used */
+                HasFalseJump = 1;
+
+                /* Generate the jump */
+                g_falsejump (CF_NONE, FalseLab);
+            } else if (Expr->IVal == 0) {
+                /* Skip remaining */
+                Flags |= E_EVAL_UNEVAL;
+            }
         }
-
-        /* Load the value */
-        LoadExpr (CF_FORCECHAR, Expr);
-
-        /* Generate the jump */
-        g_falsejump (CF_NONE, FalseLab);
 
         /* Parse more boolean and's */
         while (CurTok.Tok == TOK_BOOL_AND) {
+
+            ED_Init (&Expr2);
+            Expr2.Flags = Flags;
 
             /* Skip the && */
             NextToken ();
 
             /* Get rhs */
+            GetCodePos (&Start);
             hie2 (&Expr2);
-            if (!ED_IsTested (&Expr2)) {
-                ED_MarkForTest (&Expr2);
+            if ((Flags & E_EVAL_UNEVAL) == E_EVAL_UNEVAL) {
+                RemoveCode (&Start);
             }
-            LoadExpr (CF_FORCECHAR, &Expr2);
 
-            /* Do short circuit evaluation */
-            if (CurTok.Tok == TOK_BOOL_AND) {
-                g_falsejump (CF_NONE, FalseLab);
-            } else {
-                /* Last expression - will evaluate to true */
-                g_truejump (CF_NONE, TrueLab);
+            /* Check type */
+            if (!ED_IsBool (&Expr2)) {
+                Error ("Scalar expression expected");
+                ED_MakeConstBool (&Expr2, 0);
+            } else if ((Flags & E_EVAL_UNEVAL) != E_EVAL_UNEVAL) {
+                if (!ED_IsConstAbs (&Expr2)) {
+                    ED_RequireTest (&Expr2);
+                    LoadExpr (CF_FORCECHAR, &Expr2);
+
+                    /* Do short circuit evaluation */
+                    if (CurTok.Tok == TOK_BOOL_AND) {
+                        HasFalseJump = 1;
+                        g_falsejump (CF_NONE, FalseLab);
+                    } else {
+                        /* We need the true label for the last expression */
+                        HasTrueJump = 1;
+                    }
+                } else if (Expr2.IVal == 0) {
+                    /* Skip remaining */
+                    Flags |= E_EVAL_UNEVAL;
+                    /* The value of the expression will be false */
+                    ED_MakeConstBool (Expr, 0);
+                }
             }
         }
 
-        /* Define the false jump label here */
-        g_defcodelabel (FalseLab);
+        /* Last expression */
+        if ((Flags & E_EVAL_UNEVAL) != E_EVAL_UNEVAL) {
+            if (HasFalseJump || HasTrueJump) {
+                if (*TrueLabAllocated == 0) {
+                    /* Get a label that we will use for true expressions */
+                    *TrueLab = GetLocalLabel ();
+                    *TrueLabAllocated = 1;
+                }
+                if (!ED_IsConstAbs (&Expr2)) {
+                    /* Will branch to true and fall to false */
+                    g_truejump (CF_NONE, *TrueLab);
+                } else {
+                    /* Will jump away */
+                    g_jump (*TrueLab);
+                }
+                /* The result is an rvalue in primary */
+                ED_FinalizeRValLoad (Expr);
+                /* No need to test as the result will be jumped to */
+                ED_TestDone (Expr);
+            }
+        }
 
-        /* The result is an rvalue in primary */
-        ED_FinalizeRValLoad (Expr);
-        ED_TestDone (Expr);     /* Condition codes are set */
+        if (HasFalseJump) {
+            /* Define the false jump label here */
+            g_defcodelabel (FalseLab);
+        }
+
+        /* Convert to bool */
+        if (ED_IsConstAbs (Expr) && Expr->IVal != 0) {
+            ED_MakeConstBool (Expr, 1);
+        } else {
+            Expr->Type = type_bool;
+        }
+
+        /* Tell our caller that we're evaluating a boolean */
+        return 1;
     }
+
+    return 0;
 }
 
 
@@ -3251,71 +3336,127 @@ static void hieAnd (ExprDesc* Expr, unsigned TrueLab, int* BoolOp)
 static void hieOr (ExprDesc *Expr)
 /* Process "exp || exp". */
 {
-    ExprDesc Expr2;
-    int BoolOp = 0;             /* Did we have a boolean op? */
-    int AndOp;                  /* Did we have a && operation? */
+    unsigned Flags = Expr->Flags & E_MASK_KEEP_SUBEXPR;
+    int      AndOp;             /* Did we have a && operation? */
     unsigned TrueLab;           /* Jump to this label if true */
     unsigned DoneLab;
-
-    /* Get a label */
-    TrueLab = GetLocalLabel ();
+    int      HasTrueJump = 0;
+    CodeMark Start;
 
     /* Call the next level parser */
-    hieAnd (Expr, TrueLab, &BoolOp);
+    GetCodePos (&Start);
+    AndOp = hieAnd (Expr, &TrueLab, &HasTrueJump);
+    if ((Flags & E_EVAL_UNEVAL) == E_EVAL_UNEVAL) {
+        RemoveCode (&Start);
+    }
 
     /* Any boolean or's? */
     if (CurTok.Tok == TOK_BOOL_OR) {
 
-        /* If the expr hasn't set condition codes, set the force-test flag */
-        if (!ED_IsTested (Expr)) {
-            ED_MarkForTest (Expr);
+        /* Check type */
+        if (!ED_IsBool (Expr)) {
+            Error ("Scalar expression expected");
+            ED_MakeConstBool (Expr, 0);
+        } else if ((Flags & E_EVAL_UNEVAL) != E_EVAL_UNEVAL) {
+ 
+            if (!ED_IsConstAbs (Expr)) {
+                /* Test the lhs if we haven't had && operators. If we had them, the
+                ** jump is already in place and there's no need to do the test.
+                */
+                if (!AndOp) {
+                    /* Set the test flag */
+                    ED_RequireTest (Expr);
+
+                    /* Get first expr */
+                    LoadExpr (CF_FORCECHAR, Expr);
+
+                    if (HasTrueJump == 0) {
+                        /* Get a label that we will use for true expressions */
+                        TrueLab = GetLocalLabel();
+                        HasTrueJump = 1;
+                    }
+
+                    /* Jump to TrueLab if true */
+                    g_truejump (CF_NONE, TrueLab);
+                }
+            } else if (Expr->IVal != 0) {
+                /* Skip remaining */
+                Flags |= E_EVAL_UNEVAL;
+            }
         }
-
-        /* Get first expr */
-        LoadExpr (CF_FORCECHAR, Expr);
-
-        /* For each expression jump to TrueLab if true. Beware: If we
-        ** had && operators, the jump is already in place!
-        */
-        if (!BoolOp) {
-            g_truejump (CF_NONE, TrueLab);
-        }
-
-        /* Remember that we had a boolean op */
-        BoolOp = 1;
 
         /* while there's more expr */
         while (CurTok.Tok == TOK_BOOL_OR) {
 
+            ExprDesc Expr2;
+            ED_Init (&Expr2);
+            Expr2.Flags = Flags;
+
             /* skip the || */
             NextToken ();
 
-            /* Get a subexpr */
-            AndOp = 0;
-            hieAnd (&Expr2, TrueLab, &AndOp);
-            if (!ED_IsTested (&Expr2)) {
-                ED_MarkForTest (&Expr2);
+            /* Get rhs subexpression */
+            GetCodePos (&Start);
+            AndOp = hieAnd (&Expr2, &TrueLab, &HasTrueJump);
+            if ((Flags & E_EVAL_UNEVAL) == E_EVAL_UNEVAL) {
+                RemoveCode (&Start);
             }
-            LoadExpr (CF_FORCECHAR, &Expr2);
 
-            /* If there is more to come, add shortcut boolean eval. */
-            g_truejump (CF_NONE, TrueLab);
+            /* Check type */
+            if (!ED_IsBool (&Expr2)) {
+                Error ("Scalar expression expected");
+                ED_MakeConstBool (&Expr2, 0);
+            } else if ((Flags & E_EVAL_UNEVAL) != E_EVAL_UNEVAL) {
+
+                if (!ED_IsConstAbs (&Expr2)) {
+                    /* If there is more to come, add shortcut boolean eval */
+                    if (!AndOp) {
+                        ED_RequireTest (&Expr2);
+                        LoadExpr (CF_FORCECHAR, &Expr2);
+
+                        if (HasTrueJump == 0) {
+                            TrueLab = GetLocalLabel();
+                            HasTrueJump = 1;
+                        }
+                        g_truejump (CF_NONE, TrueLab);
+                    }
+                } else if (Expr2.IVal != 0) {
+                    /* Skip remaining */
+                    Flags |= E_EVAL_UNEVAL;
+                    /* The result is always true */
+                    ED_MakeConstBool (Expr, 1);
+                }
+            }
 
         }
 
-        /* The result is an rvalue in primary */
-        ED_FinalizeRValLoad (Expr);
-        ED_TestDone (Expr);                     /* Condition codes are set */
+        /* Convert to bool */
+        if (ED_IsConstAbs (Expr) && Expr->IVal != 0) {
+            ED_MakeConstBool (Expr, 1);
+        } else {
+            Expr->Type = type_bool;
+        }
     }
 
-    /* If we really had boolean ops, generate the end sequence */
-    if (BoolOp) {
+    /* If we really had boolean ops, generate the end sequence if necessary */
+    if (HasTrueJump) {
+        /* False case needs to jump over true case */
         DoneLab = GetLocalLabel ();
-        g_getimmed (CF_INT | CF_CONST, 0, 0);   /* Load FALSE */
-        g_falsejump (CF_NONE, DoneLab);
+        if ((Flags & E_EVAL_UNEVAL) != E_EVAL_UNEVAL) {
+            /* Load false only if the result is not true */
+            g_getimmed (CF_INT | CF_CONST, 0, 0);   /* Load FALSE */
+            g_falsejump (CF_NONE, DoneLab);
+        }
+
+        /* Load the true value */
         g_defcodelabel (TrueLab);
         g_getimmed (CF_INT | CF_CONST, 1, 0);   /* Load TRUE */
         g_defcodelabel (DoneLab);
+
+        /* The result is an rvalue in primary */
+        ED_FinalizeRValLoad (Expr);
+        /* Condition codes are set */
+        ED_TestDone (Expr);
     }
 }
 
@@ -3326,13 +3467,13 @@ static void hieQuest (ExprDesc* Expr)
 {
     int         FalseLab;
     int         TrueLab;
+    CodeMark    SkippedBranch;
     CodeMark    TrueCodeEnd;
     ExprDesc    Expr2;          /* Expression 2 */
     ExprDesc    Expr3;          /* Expression 3 */
     int         Expr2IsNULL;    /* Expression 2 is a NULL pointer */
     int         Expr3IsNULL;    /* Expression 3 is a NULL pointer */
     Type*       ResultType;     /* Type of result */
-
 
     /* Call the lower level eval routine */
     if (Preprocessing) {
@@ -3343,14 +3484,27 @@ static void hieQuest (ExprDesc* Expr)
 
     /* Check if it's a ternary expression */
     if (CurTok.Tok == TOK_QUEST) {
+
+        int ConstantCond = ED_IsConstAbsInt (Expr);
+        unsigned Flags   = Expr->Flags & E_MASK_KEEP_RESULT;
+
+        ED_Init (&Expr2);
+        Expr2.Flags = Flags;
+        ED_Init (&Expr3);
+        Expr3.Flags = Flags;
+
         NextToken ();
-        if (!ED_IsTested (Expr)) {
+
+        if (!ConstantCond) {
             /* Condition codes not set, request a test */
-            ED_MarkForTest (Expr);
+            ED_RequireTest (Expr);
+            LoadExpr (CF_NONE, Expr);
+            FalseLab = GetLocalLabel ();
+            g_falsejump (CF_NONE, FalseLab);
+        } else if (Expr->IVal == 0) {
+            /* Remember the current code position */
+            GetCodePos (&SkippedBranch);
         }
-        LoadExpr (CF_NONE, Expr);
-        FalseLab = GetLocalLabel ();
-        g_falsejump (CF_NONE, FalseLab);
 
         /* Parse second expression. Remember for later if it is a NULL pointer
         ** expression, then load it into the primary.
@@ -3358,22 +3512,37 @@ static void hieQuest (ExprDesc* Expr)
         ExprWithCheck (hie1, &Expr2);
         Expr2IsNULL = ED_IsNullPtr (&Expr2);
         if (!IsTypeVoid (Expr2.Type)) {
-            /* Load it into the primary */
-            LoadExpr (CF_NONE, &Expr2);
-            ED_FinalizeRValLoad (&Expr2);
+            if (!ConstantCond || !ED_IsConst (&Expr2)) {
+                /* Load it into the primary */
+                LoadExpr (CF_NONE, &Expr2);
+                ED_FinalizeRValLoad (&Expr2);
+            }
             Expr2.Type = PtrConversion (Expr2.Type);
         }
 
-        /* Remember the current code position */
-        GetCodePos (&TrueCodeEnd);
+        if (!ConstantCond) {
+            /* Remember the current code position */
+            GetCodePos (&TrueCodeEnd);
 
-        /* Jump around the evaluation of the third expression */
-        TrueLab = GetLocalLabel ();
-        ConsumeColon ();
-        g_jump (TrueLab);
+            /* Jump around the evaluation of the third expression */
+            TrueLab = GetLocalLabel ();
 
-        /* Jump here if the first expression was false */
-        g_defcodelabel (FalseLab);
+            ConsumeColon ();
+
+            g_jump (TrueLab);
+
+            /* Jump here if the first expression was false */
+            g_defcodelabel (FalseLab);
+        } else {
+            if (Expr->IVal == 0) {
+                /* Remove the load code of Expr2 */
+                RemoveCode (&SkippedBranch);
+            } else {
+                /* Remember the current code position */
+                GetCodePos (&SkippedBranch);
+            }
+            ConsumeColon();
+        }
 
         /* Parse third expression. Remember for later if it is a NULL pointer
         ** expression, then load it into the primary.
@@ -3381,10 +3550,17 @@ static void hieQuest (ExprDesc* Expr)
         ExprWithCheck (hie1, &Expr3);
         Expr3IsNULL = ED_IsNullPtr (&Expr3);
         if (!IsTypeVoid (Expr3.Type)) {
-            /* Load it into the primary */
-            LoadExpr (CF_NONE, &Expr3);
-            ED_FinalizeRValLoad (&Expr3);
+            if (!ConstantCond || !ED_IsConst (&Expr3)) {
+                /* Load it into the primary */
+                LoadExpr (CF_NONE, &Expr3);
+                ED_FinalizeRValLoad (&Expr3);
+            }
             Expr3.Type = PtrConversion (Expr3.Type);
+        }
+
+        if (ConstantCond && Expr->IVal != 0) {
+            /* Remove the load code of Expr3 */
+            RemoveCode (&SkippedBranch);
         }
 
         /* Check if any conversions are needed, if so, do them.
@@ -3419,9 +3595,11 @@ static void hieQuest (ExprDesc* Expr)
             TypeConversion (&Expr2, ResultType);
             GetCodePos (&CvtCodeEnd);
 
-            /* If we had conversion code, move it to the right place */
-            if (!CodeRangeIsEmpty (&CvtCodeStart, &CvtCodeEnd)) {
-                MoveCode (&CvtCodeStart, &CvtCodeEnd, &TrueCodeEnd);
+            if (!ConstantCond) {
+                /* If we had conversion code, move it to the right place */
+                if (!CodeRangeIsEmpty (&CvtCodeStart, &CvtCodeEnd)) {
+                    MoveCode (&CvtCodeStart, &CvtCodeEnd, &TrueCodeEnd);
+                }
             }
 
         } else if (IsClassPtr (Expr2.Type) && IsClassPtr (Expr3.Type)) {
@@ -3441,16 +3619,33 @@ static void hieQuest (ExprDesc* Expr)
             /* Result type is void */
             ResultType = Expr3.Type;
         } else {
-            TypeCompatibilityDiagnostic (Expr2.Type, Expr3.Type, 1,
-                "Incompatible types in ternary '%s' with '%s'");
-            ResultType = Expr2.Type;            /* Doesn't matter here */
+            if (IsClassStruct (Expr2.Type) && IsClassStruct (Expr3.Type) &&
+                TypeCmp (Expr2.Type, Expr3.Type) == TC_IDENTICAL) {
+                /* Result type is struct/union */
+                ResultType = Expr2.Type;
+            } else {
+                TypeCompatibilityDiagnostic (Expr2.Type, Expr3.Type, 1,
+                    "Incompatible types in ternary '%s' with '%s'");
+                ResultType = Expr2.Type;            /* Doesn't matter here */
+            }
         }
 
-        /* Define the final label */
-        g_defcodelabel (TrueLab);
+        if (!ConstantCond) {
+            /* Define the final label */
+            g_defcodelabel (TrueLab);
+            /* Set up the result expression type */
+            ED_FinalizeRValLoad (Expr);
+            /* Restore the original evaluation flags */
+            Expr->Flags = (Expr->Flags & ~E_MASK_KEEP_RESULT) | Flags;
+        } else {
+            if (Expr->IVal != 0) {
+                *Expr = Expr2;
+            } else {
+                *Expr = Expr3;
+            }
+        }
 
         /* Setup the target expression */
-        ED_FinalizeRValLoad (Expr);
         Expr->Type  = ResultType;
     }
 }
@@ -3460,7 +3655,6 @@ static void hieQuest (ExprDesc* Expr)
 static void opeq (const GenDesc* Gen, ExprDesc* Expr, const char* Op)
 /* Process "op=" operators. */
 {
-    ExprDesc Expr2;
     unsigned flags;
     CodeMark Mark;
     int MustScale;
@@ -3500,6 +3694,10 @@ static void opeq (const GenDesc* Gen, ExprDesc* Expr, const char* Op)
     /* Bring the lhs on stack */
     GetCodePos (&Mark);
     g_push (flags, 0);
+
+    ExprDesc Expr2;
+    ED_Init (&Expr2);
+    Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
 
     /* Evaluate the rhs */
     MarkedExprWithCheck (hie1, &Expr2);
@@ -3581,6 +3779,8 @@ static void addsubeq (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
     unsigned rflags;
     int      MustScale;
 
+    ED_Init (&Expr2);
+    Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
 
     /* We're currently only able to handle some addressing modes */
     if (ED_GetLoc (Expr) == E_LOC_EXPR || ED_GetLoc (Expr) == E_LOC_PRIMARY) {
@@ -3774,8 +3974,33 @@ void hie1 (ExprDesc* Expr)
 void hie0 (ExprDesc *Expr)
 /* Parse comma operator. */
 {
+    unsigned Flags = Expr->Flags & E_MASK_KEEP_MAKE;
+    unsigned PrevErrorCount = ErrorCount;
+    CodeMark Start, End;
+
+    /* Remember the current code position */
+    GetCodePos (&Start);
+
     hie1 (Expr);
     while (CurTok.Tok == TOK_COMMA) {
+        /* If the expression didn't generate code or isn't cast to type void,
+        ** emit a warning.
+        */
+        GetCodePos (&End);
+        if (!ED_MayHaveNoEffect (Expr)      &&
+            CodeRangeIsEmpty (&Start, &End) &&
+            IS_Get (&WarnNoEffect)          &&
+            PrevErrorCount == ErrorCount) {
+            Warning ("Expression result unused");
+        }
+
+        PrevErrorCount = ErrorCount;
+        /* Remember the current code position */
+        GetCodePos (&Start);
+
+        /* Reset the expression */
+        ED_Init (Expr);
+        Expr->Flags = Flags;
         NextToken ();
         hie1 (Expr);
     }
@@ -3809,24 +4034,17 @@ int evalexpr (unsigned Flags, void (*Func) (ExprDesc*), ExprDesc* Expr)
 void Expression0 (ExprDesc* Expr)
 /* Evaluate an expression via hie0 and put the result into the primary register */
 {
+    unsigned Flags = Expr->Flags & E_MASK_KEEP_RESULT;
+
+    /* Only check further after the expression is evaluated */
     ExprWithCheck (hie0, Expr);
-    LoadExpr (CF_NONE, Expr);
-}
 
+    if ((Expr->Flags & Flags & E_MASK_EVAL) != (Flags & E_MASK_EVAL)) {
+        Internal ("Expression flags tampered: %08X", Flags);
+    }
 
-
-void ConstExpr (void (*Func) (ExprDesc*), ExprDesc* Expr)
-/* Will evaluate an expression via the given function. If the result is not
-** a constant of some sort, a diagnostic will be printed, and the value is
-** replaced by a constant one to make sure there are no internal errors that
-** result from this input error.
-*/
-{
-    ExprWithCheck (Func, Expr);
-    if (!ED_IsConst (Expr)) {
-        Error ("Constant expression expected");
-        /* To avoid any compiler errors, make the expression a valid const */
-        ED_MakeConstAbsInt (Expr, 1);
+    if (ED_YetToLoad (Expr)) {
+        LoadExpr (CF_NONE, Expr);
     }
 }
 
@@ -3841,25 +4059,56 @@ void BoolExpr (void (*Func) (ExprDesc*), ExprDesc* Expr)
 {
     ExprWithCheck (Func, Expr);
     if (!ED_IsBool (Expr)) {
-        Error ("Boolean expression expected");
+        Error ("Scalar expression expected");
         /* To avoid any compiler errors, make the expression a valid int */
-        ED_MakeConstAbsInt (Expr, 1);
+        ED_MakeConstBool (Expr, 1);
     }
 }
 
 
 
-void ConstAbsIntExpr (void (*Func) (ExprDesc*), ExprDesc* Expr)
-/* Will evaluate an expression via the given function. If the result is not
-** a constant numeric integer value, a diagnostic will be printed, and the
-** value is replaced by a constant one to make sure there are no internal
-** errors that result from this input error.
+ExprDesc NoCodeConstExpr (void (*Func) (ExprDesc*))
+/* Get an expression evaluated via the given function. If the result is not a
+** constant expression without runtime code generated, a diagnostic will be
+** printed, and the value is replaced by a constant one to make sure there are
+** no internal errors that result from this input error.
 */
 {
-    ExprWithCheck (Func, Expr);
-    if (!ED_IsConstAbsInt (Expr)) {
+    ExprDesc Expr;
+    ED_Init (&Expr);
+
+    Expr.Flags |= E_EVAL_C_CONST;
+    MarkedExprWithCheck (Func, &Expr);
+    if (!ED_IsConst (&Expr) || !ED_CodeRangeIsEmpty (&Expr)) {
+        Error ("Constant expression expected");
+        /* To avoid any compiler errors, make the expression a valid const */
+        ED_MakeConstAbsInt (&Expr, 1);
+    }
+
+    /* Return by value */
+    return Expr;
+}
+
+
+
+ExprDesc NoCodeConstAbsIntExpr (void (*Func) (ExprDesc*))
+/* Get an expression evaluated via the given function. If the result is not a
+** constant numeric integer value without runtime code generated, a diagnostic
+** will be printed, and the value is replaced by a constant one to make sure
+** there are no internal errors that result from this input error.
+*/
+{
+    ExprDesc Expr;
+    ED_Init (&Expr);
+
+    Expr.Flags |= E_EVAL_C_CONST;
+    MarkedExprWithCheck (Func, &Expr);
+    if (!ED_IsConstAbsInt (&Expr) || !ED_CodeRangeIsEmpty (&Expr)) {
         Error ("Constant integer expression expected");
         /* To avoid any compiler errors, make the expression a valid const */
-        ED_MakeConstAbsInt (Expr, 1);
+        ED_MakeConstAbsInt (&Expr, 1);
     }
+
+    /* Return by value */
+    return Expr;
 }

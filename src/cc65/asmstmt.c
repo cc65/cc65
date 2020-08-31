@@ -129,14 +129,13 @@ static SymEntry* AsmGetSym (unsigned Arg, unsigned Type)
 static void ParseByteArg (StrBuf* T, unsigned Arg)
 /* Parse the %b format specifier */
 {
-    ExprDesc Expr;
     char     Buf [16];
 
     /* We expect an argument separated by a comma */
     ConsumeComma ();
 
     /* Evaluate the expression */
-    ConstAbsIntExpr (hie1, &Expr);
+    ExprDesc Expr = NoCodeConstAbsIntExpr (hie1);
 
     /* Check the range but allow negative values if the type is signed */
     if (IsSignUnsigned (Expr.Type)) {
@@ -163,14 +162,13 @@ static void ParseByteArg (StrBuf* T, unsigned Arg)
 static void ParseWordArg (StrBuf* T, unsigned Arg)
 /* Parse the %w format specifier */
 {
-    ExprDesc Expr;
     char     Buf [16];
 
     /* We expect an argument separated by a comma */
     ConsumeComma ();
 
     /* Evaluate the expression */
-    ConstAbsIntExpr (hie1, &Expr);
+    ExprDesc Expr = NoCodeConstAbsIntExpr (hie1);
 
     /* Check the range but allow negative values if the type is signed */
     if (IsSignUnsigned (Expr.Type)) {
@@ -197,14 +195,13 @@ static void ParseWordArg (StrBuf* T, unsigned Arg)
 static void ParseLongArg (StrBuf* T, unsigned Arg attribute ((unused)))
 /* Parse the %l format specifier */
 {
-    ExprDesc Expr;
     char     Buf [16];
 
     /* We expect an argument separated by a comma */
     ConsumeComma ();
 
     /* Evaluate the expression */
-    ConstAbsIntExpr (hie1, &Expr);
+    ExprDesc Expr = NoCodeConstAbsIntExpr (hie1);
 
     /* Convert into a hex number */
     xsprintf (Buf, sizeof (Buf), "$%08lX", Expr.IVal & 0xFFFFFFFF);
@@ -328,7 +325,7 @@ static void ParseStrArg (StrBuf* T, unsigned Arg attribute ((unused)))
             break;
 
         default:
-            ConstAbsIntExpr (hie1, &Expr);
+            Expr = NoCodeConstAbsIntExpr (hie1);
             xsprintf (Buf, sizeof (Buf), "%ld", Expr.IVal);
             SB_AppendStr (T, Buf);
             break;

@@ -149,7 +149,7 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
             Flags |= TypeOf (Expr->Type);
         }
 
-        if (ED_NeedsTest (Expr)) {
+        if (ED_YetToTest (Expr)) {
             /* If we're only testing, we do not need to promote char to int.
             ** CF_FORCECHAR does nothing if the type is not CF_CHAR.
             */
@@ -238,7 +238,7 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
             */
             CHECK (Expr->BitOffs < CHAR_BITS);
 
-            if (ED_NeedsTest (Expr)) {
+            if (ED_YetToTest (Expr)) {
                 g_testbitfield (Flags, Expr->BitOffs, Expr->BitWidth);
             } else {
                 g_extractbitfield (Flags, BitFieldFullWidthFlags, IsSignSigned (Expr->Type),
@@ -256,7 +256,7 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
         LoadAddress (Flags, Expr);
 
         /* Are we testing this value? */
-        if (ED_NeedsTest (Expr)) {
+        if (ED_YetToTest (Expr)) {
             /* Yes, force a test */
             g_test (Flags);
             ED_TestDone (Expr);

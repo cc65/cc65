@@ -54,13 +54,6 @@ int evalexpr (unsigned flags, void (*Func) (ExprDesc*), ExprDesc* Expr);
 void Expression0 (ExprDesc* Expr);
 /* Evaluate an expression via hie0 and put the result into the primary register */
 
-void ConstExpr (void (*Func) (ExprDesc*), ExprDesc* Expr);
-/* Will evaluate an expression via the given function. If the result is not
-** a constant of some sort, a diagnostic will be printed, and the value is
-** replaced by a constant one to make sure there are no internal errors that
-** result from this input error.
-*/
-
 void BoolExpr (void (*Func) (ExprDesc*), ExprDesc* Expr);
 /* Will evaluate an expression via the given function. If the result is not
 ** something that may be evaluated in a boolean context, a diagnostic will be
@@ -68,11 +61,18 @@ void BoolExpr (void (*Func) (ExprDesc*), ExprDesc* Expr);
 ** are no internal errors that result from this input error.
 */
 
-void ConstAbsIntExpr (void (*Func) (ExprDesc*), ExprDesc* Expr);
-/* Will evaluate an expression via the given function. If the result is not
-** a constant numeric integer value, a diagnostic will be printed, and the
-** value is replaced by a constant one to make sure there are no internal
-** errors that result from this input error.
+ExprDesc NoCodeConstExpr (void (*Func) (ExprDesc*));
+/* Get an expression evaluated via the given function. If the result is not a
+** constant expression without runtime code generated, a diagnostic will be
+** printed, and the value is replaced by a constant one to make sure there are
+** no internal errors that result from this input error.
+*/
+
+ExprDesc NoCodeConstAbsIntExpr (void (*Func) (ExprDesc*));
+/* Get an expression evaluated via the given function. If the result is not a
+** constant numeric integer value without runtime code generated, a diagnostic
+** will be printed, and the value is replaced by a constant one to make sure
+** there are no internal errors that result from this input error.
 */
 
 void hie10 (ExprDesc* lval);

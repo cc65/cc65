@@ -593,7 +593,7 @@ static void FunctionCall (ExprDesc* Expr)
         }
 
         /* Check for known standard functions and inline them */
-        if (Expr->Name != 0) {
+        if (Expr->Name != 0 && !ED_IsUneval (Expr)) {
             int StdFunc = FindStdFunc ((const char*) Expr->Name);
             if (StdFunc >= 0) {
                 /* Inline this function */

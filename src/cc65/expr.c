@@ -923,7 +923,11 @@ static void Primary (ExprDesc* E)
         case TOK_SCONST:
         case TOK_WCSCONST:
             /* String literal */
-            E->LVal  = UseLiteral (CurTok.SVal);
+            if ((Flags & E_EVAL_UNEVAL) != E_EVAL_UNEVAL) {
+                E->LVal = UseLiteral (CurTok.SVal);
+            } else {
+                E->LVal = CurTok.SVal;
+            }
             E->Type  = GetCharArrayType (GetLiteralSize (CurTok.SVal));
             E->Flags = E_LOC_LITERAL | E_RTYPE_RVAL | E_ADDRESS_OF;
             E->IVal  = 0;
@@ -1996,19 +2000,18 @@ void hie10 (ExprDesc* Expr)
                 /* Remember the output queue pointer */
                 CodeMark Mark;
                 GetCodePos (&Mark);
-                hie10 (Expr);
-                if (ED_IsBitField (Expr)) {
+
+                /* The expression shall be unevaluated */
+                ExprDesc Uneval;
+                ED_Init (&Uneval);
+                ED_MarkForUneval (&Uneval);
+                hie10 (&Uneval);
+                if (ED_IsBitField (&Uneval)) {
                     Error ("Cannot apply 'sizeof' to bit-field");
                     Size = 0;
                 } else {
-                    /* If the expression is a literal string, release it, so it
-                    ** won't be output as data if not used elsewhere.
-                    */
-                    if (ED_IsLocLiteral (Expr)) {
-                        ReleaseLiteral (Expr->LVal);
-                    }
                     /* Calculate the size */
-                    Size = ExprCheckedSizeOf (Expr->Type);
+                    Size = ExprCheckedSizeOf (Uneval.Type);
                 }
                 /* Remove any generated code */
                 RemoveCode (&Mark);

@@ -57,6 +57,16 @@ typedef size_t uintptr_t;
 typedef ptrdiff_t intmax_t;
 typedef size_t uintmax_t;
 
+#define INT8_MAX (0x7F)
+#define INT16_MAX (0x7FFF)
+#define INT32_MAX (0x7FFFFFFF)
+
+#define INT8_MIN (-INT8_MAX - 1)
+#define INT16_MIN (-INT16_MAX - 1)
+
+#define UINT8_MAX (0xFF)
+#define UINT16_MAX (0xFFFF)
+
 #endif
 
 

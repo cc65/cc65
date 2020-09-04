@@ -762,11 +762,11 @@ static int ParseFieldWidth (Declaration* Decl)
     }
 
     /* TODO: This can be relaxed to be any integral type, but
-    ** ParseStructInit currently only supports up to int.
+    ** ParseStructInit currently supports only up to int.
     */
     if (SizeOf (Decl->Type) > SizeOf (type_uint)) {
-        /* Only int-sized or smaller types may be used for bit-fields for now */
-        Error ("cc65 currently only supports char-sized and int-sized bit-fields");
+        /* Only int-sized or smaller types may be used for bit-fields, for now */
+        Error ("cc65 currently supports only char-sized and int-sized bit-field types");
         return -1;
     }
 

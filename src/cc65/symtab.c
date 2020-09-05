@@ -870,6 +870,7 @@ SymEntry* AddBitField (const char* Name, const Type* T, unsigned Offs,
         if (!SignednessSpecified) {
             /* int is treated as signed int everywhere except bit-fields; switch it to unsigned,
             ** since this is allowed for bit-fields and avoids sign-extension, so is much faster.
+            ** enums set SignednessSpecified to 1 to avoid this adjustment.
             */
             CHECK ((Entry->Type->C & T_MASK_SIGN) == T_SIGN_SIGNED);
             Entry->Type->C &= ~T_MASK_SIGN;

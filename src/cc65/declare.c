@@ -1446,6 +1446,12 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
             D->Type[0].C |= T_ENUM;
             SetESUSymEntry (D->Type, Entry);
             D->Type[1].C = T_END;
+            /* The signedness of enums is determined by the type, so say this is specified to avoid
+            ** the int -> unsigned int handling for plain int bit-fields in AddBitField.
+            */
+            if (SignednessSpecified) {
+                *SignednessSpecified = 1;
+            }
             break;
 
         case TOK_IDENT:

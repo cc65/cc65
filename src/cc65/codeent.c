@@ -851,7 +851,9 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
                 if ((In->RegA & 0x0F) >= 8) {
                     Out->RegA = 0;
                 }
-            } else if (FindBoolCmpCond (E->Arg) != CMP_INV ||
+            } else if (strcmp (E->Arg, "bcastax") == 0     ||
+                       strcmp (E->Arg, "bnegax") == 0      ||
+                       FindBoolCmpCond (E->Arg) != CMP_INV ||
                        FindTosCmpCond (E->Arg) != CMP_INV) {
                 /* Result is boolean value, so X is zero on output */
                 Out->RegX = 0;

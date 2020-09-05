@@ -2328,6 +2328,7 @@ static int HarmlessCall (const char* Name)
         "asrax3",
         "asrax4",
         "asraxy",
+        "bcastax",
         "bnegax",
         "complax",
         "decax1",

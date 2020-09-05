@@ -476,6 +476,11 @@ int CE_UseLoadFlags (CodeEntry* E)
         }
     }
 
+    /* PHP will use all flags */
+    if (E->OPC == OP65_PHP) {
+        return 1;
+    }
+
     /* Anything else */
     return 0;
 }

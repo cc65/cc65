@@ -197,7 +197,21 @@ cmp_t GetNegatedCond (cmp_t Cond);
 cmp_t GetRevertedCond (cmp_t Cond);
 /* Get the compare condition in reverted order of operands */
 
+const char* GetCmpSuffix (cmp_t Cond);
+/* Return the compare suffix by the given a compare condition or 0 on failure */
 
+char* GetBoolCmpSuffix (char* Buf, cmp_t Cond);
+/* Search for a boolean transformer subroutine (eg. booleq) by the given compare
+** condition.
+** Return the output buffer filled with the name of the correct subroutine or 0
+** on failure.
+*/
+
+char* GetTosCmpSuffix (char* Buf, cmp_t Cond);
+/* Search for a TOS compare function (eg. tosgtax) by the given compare condition.
+** Return the output buffer filled with the name of the correct function or 0 on
+** failure.
+*/
 
 /* End of codeinfo.h */
 

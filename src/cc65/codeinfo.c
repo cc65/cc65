@@ -850,6 +850,63 @@ cmp_t FindTosCmpCond (const char* Name)
 
 
 
+const char* GetCmpSuffix (cmp_t Cond)
+/* Return the compare suffix by the given a compare condition or 0 on failure */
+{
+    /* Check for the correct subroutine name */
+    if (Cond >= 0       &&
+        Cond != CMP_INV &&
+        (unsigned)Cond < sizeof (CmpSuffixTab) / sizeof (CmpSuffixTab[0])) {
+        return CmpSuffixTab[Cond];
+    } else {
+        /* Not found */
+        return 0;
+    }
+}
+
+
+
+char* GetBoolCmpSuffix (char* Buf, cmp_t Cond)
+/* Search for a boolean transformer subroutine (eg. booleq) by the given compare
+** condition.
+** Return the output buffer filled with the name of the correct subroutine or 0
+** on failure.
+*/
+{
+    /* Check for the correct boolean transformer subroutine name */
+    const char* Suf = GetCmpSuffix (Cond);
+
+    if (Suf != 0) {
+        sprintf (Buf, "bool%s", Suf);
+        return Buf;
+    } else {
+        /* Not found */
+        return 0;
+    }
+}
+
+
+
+char* GetTosCmpSuffix (char* Buf, cmp_t Cond)
+/* Search for a TOS compare function (eg. tosgtax) by the given compare condition.
+** Return the output buffer filled with the name of the correct function or 0 on
+** failure.
+*/
+{
+    /* Check for the correct TOS function name */
+    const char* Suf = GetCmpSuffix (Cond);
+
+    if (Suf != 0) {
+        sprintf (Buf, "tos%sax", Suf);
+        return Buf;
+    } else {
+        /* Not found */
+        return 0;
+    }
+}
+
+
+
 const char* GetBoolTransformer (cmp_t Cond)
 /* Get the bool transformer corresponding to the given compare condition */
 {

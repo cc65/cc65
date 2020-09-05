@@ -102,7 +102,7 @@ static const FuncInfo FuncInfoTable[] = {
     { "asreax4",        REG_EAX,              REG_EAXY | REG_TMP1            },
     { "bnega",          REG_A,                REG_AX                         },
     { "bnegax",         REG_AX,               REG_AX                         },
-    { "bnegeax",        REG_EAX,              REG_EAX                        },
+    { "bnegeax",        REG_EAX,              REG_EAX | REG_TMP1             },
     { "booleq",         REG_NONE,             REG_AX                         },
     { "boolge",         REG_NONE,             REG_AX                         },
     { "boolgt",         REG_NONE,             REG_AX                         },

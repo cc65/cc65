@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 coptind.h                                 */
+/*                                codemisc.h                                 */
 /*                                                                           */
-/*              Environment independent low level optimizations              */
+/*                   Miscellaneous optimization operations                   */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2009, Ullrich von Bassewitz                                      */
+/* (C) 2001-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -33,8 +33,8 @@
 
 
 
-#ifndef COPTIND_H
-#define COPTIND_H
+#ifndef COPTMISC_H
+#define COPTMISC_H
 
 
 
@@ -49,49 +49,65 @@
 
 
 
-unsigned OptUnusedLoads (CodeSeg* S);
-/* Remove loads of registers where the value loaded is not used later. */
-
-unsigned OptUnusedStores (CodeSeg* S);
-/* Remove stores into zero page registers that aren't used later */
-
-unsigned OptLoad3 (CodeSeg* S);
-/* Remove repeated loads from one and the same memory location */
-
-unsigned OptDupLoads (CodeSeg* S);
-/* Remove loads of registers where the value loaded is already in the register. */
-
-unsigned OptStoreLoad (CodeSeg* S);
-/* Remove a store followed by a load from the same location. */
-
-unsigned OptTransfers1 (CodeSeg* S);
-/* Remove transfers from one register to another and back */
-
-unsigned OptTransfers2 (CodeSeg* S);
-/* Replace loads followed by a register transfer by a load with the second
-** register if possible.
+unsigned OptDecouple (CodeSeg* S);
+/* Decouple operations, that is, do the following replacements:
+**
+**   dex        -> ldx #imm
+**   inx        -> ldx #imm
+**   dey        -> ldy #imm
+**   iny        -> ldy #imm
+**   tax        -> ldx #imm
+**   txa        -> lda #imm
+**   tay        -> ldy #imm
+**   tya        -> lda #imm
+**   lda zp     -> lda #imm
+**   ldx zp     -> ldx #imm
+**   ldy zp     -> ldy #imm
+**
+** Provided that the register values are known of course.
 */
 
-unsigned OptTransfers3 (CodeSeg* S);
-/* Replace a register transfer followed by a store of the second register by a
-** store of the first register if this is possible.
+unsigned OptIndLoads1 (CodeSeg* S);
+/* Change
+**
+**     lda      (zp),y
+**
+** into
+**
+**     lda      (zp,x)
+**
+** provided that x and y are both zero.
 */
 
-unsigned OptTransfers4 (CodeSeg* S);
-/* Replace a load of a register followed by a transfer insn of the same register
-** by a load of the second register if possible.
+unsigned OptIndLoads2 (CodeSeg* S);
+/* Change
+**
+**     lda      (zp,x)
+**
+** into
+**
+**     lda      (zp),y
+**
+** provided that x and y are both zero.
 */
 
-unsigned OptPushPop (CodeSeg* S);
-/* Remove a PHA/PLA sequence were A is not used later */
-
-unsigned OptPrecalc (CodeSeg* S);
-/* Replace immediate operations with the accu where the current contents are
-** known by a load of the final value.
+unsigned OptStackPtrOps (CodeSeg* S);
+/* Merge adjacent calls to decsp into one. NOTE: This function won't merge all
+** known cases!
 */
 
+unsigned OptGotoSPAdj (CodeSeg* S);
+/* Optimize SP adjustment for forward 'goto' */
+
+unsigned OptLoad1 (CodeSeg* S);
+/* Search for a call to ldaxysp where X is not used later and replace it by
+** a load of just the A register.
+*/
+
+unsigned OptLoad2 (CodeSeg* S);
+/* Replace calls to ldaxysp by inline code */
 
 
-/* End of coptind.h */
+/* End of coptmisc.h */
 
 #endif

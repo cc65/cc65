@@ -38,7 +38,8 @@
 
 
 
-/* If we have <stdint.h>, include it; otherwise, adapt types from <stddef.h>.
+/* If we have <stdint.h>, include it; otherwise, adapt types from <stddef.h>
+** and define integer boundary constants.
 ** gcc and msvc don't define __STDC_VERSION__ without special flags, so check
 ** for them explicitly.  Undefined symbols are replaced by zero; so, checks for
 ** defined(__GNUC__) and defined(_MSC_VER) aren't necessary.

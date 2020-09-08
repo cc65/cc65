@@ -744,7 +744,7 @@ static SymEntry* ParseEnumDecl (const char* Name, unsigned* DSFlags)
 
 
 
-static int ParseFieldWidth (Declaration* Decl)
+static int ParseFieldWidth (Declaration* D)
 /* Parse an optional field width. Returns -1 if no field width is specified,
 ** otherwise the width of the field.
 */
@@ -754,20 +754,26 @@ static int ParseFieldWidth (Declaration* Decl)
         return -1;
     }
 
-    if (!IsClassInt (Decl->Type)) {
+    if (!IsClassInt (D->Type)) {
         /* Only integer types may be used for bit-fields */
         Error ("Bit-field has invalid type '%s', must be integral",
-               GetBasicTypeName (Decl->Type));
-        return -1;
+               GetBasicTypeName (D->Type));
+
+        /* Avoid a diagnostic storm by giving the bit-field the widest valid
+        ** signed type, and continuing to parse.
+        */
+        D->Type[0].C = T_INT;
     }
 
     /* TODO: This can be relaxed to be any integral type, but
     ** ParseStructInit currently supports only up to int.
     */
-    if (SizeOf (Decl->Type) > SizeOf (type_uint)) {
+    if (SizeOf (D->Type) > SizeOf (type_uint)) {
         /* Only int-sized or smaller types may be used for bit-fields, for now */
         Error ("cc65 currently supports only char-sized and int-sized bit-field types");
-        return -1;
+
+        /* Avoid a diagnostic storm */
+        D->Type[0].C = T_INT;
     }
 
     /* Read the width */
@@ -778,11 +784,11 @@ static int ParseFieldWidth (Declaration* Decl)
         Error ("Negative width in bit-field");
         return -1;
     }
-    if (Expr.IVal > (long)(SizeOf (Decl->Type) * CHAR_BITS)) {
+    if (Expr.IVal > (long)(SizeOf (D->Type) * CHAR_BITS)) {
         Error ("Width of bit-field exceeds its type");
         return -1;
     }
-    if (Expr.IVal == 0 && Decl->Ident[0] != '\0') {
+    if (Expr.IVal == 0 && D->Ident[0] != '\0') {
         Error ("Zero width for named bit-field");
         return -1;
     }
@@ -818,7 +824,7 @@ static unsigned PadWithBitField (unsigned StructSize, unsigned BitOffs)
 
 
 
-static unsigned AliasAnonStructFields (const Declaration* Decl, SymEntry* Anon)
+static unsigned AliasAnonStructFields (const Declaration* D, SymEntry* Anon)
 /* Create alias fields from an anon union/struct in the current lexical level.
 ** The function returns the count of created aliases.
 */
@@ -827,7 +833,7 @@ static unsigned AliasAnonStructFields (const Declaration* Decl, SymEntry* Anon)
     SymEntry* Alias;
 
     /* Get the pointer to the symbol table entry of the anon struct */
-    SymEntry* Entry = GetESUSymEntry (Decl->Type);
+    SymEntry* Entry = GetESUSymEntry (D->Type);
 
     /* Get the symbol table containing the fields. If it is empty, there has
     ** been an error before, so bail out.

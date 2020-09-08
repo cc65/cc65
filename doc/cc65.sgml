@@ -810,7 +810,7 @@ This cc65 version has some extensions to the ISO C standard.
 <item>  cc65 supports bit-fields of any integral type that is int-sized or
         smaller, and enumerated types with those types as their underlying
         type.  (Only <tt/int/, <tt/signed int/, and <tt/unsigned int/ are
-        required.)
+        required by the standard.)
 
 <item>  Computed gotos, a GCC extension, has limited support. With it you can
         use fast jump tables from C. You can take the address of a label with

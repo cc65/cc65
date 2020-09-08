@@ -50,6 +50,7 @@
 #include "codelab.h"
 #include "opcodes.h"
 #include "output.h"
+#include "reginfo.h"
 
 
 
@@ -1901,6 +1902,7 @@ static char* RegInfoDesc (unsigned U, char* Buf)
     strcat (Buf, U & REG_PTR2?    "2" : "_");
     strcat (Buf, U & REG_SAVE?    "V"  : "_");
     strcat (Buf, U & REG_SP?      "S" : "_");
+    sprintf (Buf + 10, "_%02X", (U & PSTATE_ALL) >> PSTATE_BITS_SHIFT);
 
     return Buf;
 }
@@ -1925,11 +1927,59 @@ static char* RegContentDesc (const RegContents* RC, char* Buf)
     }
     B += 5;
     if (RegValIsUnknown (RC->RegY)) {
-        strcpy (B, "Y:XX");
+        strcpy (B, "Y:XX ");
     } else {
-        sprintf (B, "Y:%02X", RC->RegY);
+        sprintf (B, "Y:%02X ", RC->RegY);
     }
-    B += 4;
+    B += 5;
+    if (PStatesAreUnknown (RC->PFlags, PSTATE_C)) {
+        strcpy (B, "~");
+    } else {
+        strcpy (B, RC->PFlags & PFVAL_C ? "C" : "_");
+    }
+    B += 1;
+    if (PStatesAreUnknown (RC->PFlags, PSTATE_Z)) {
+        strcpy (B, "~");
+    } else {
+        strcpy (B, RC->PFlags & PFVAL_Z ? "Z" : "_");
+    }
+    B += 1;
+    if (PStatesAreUnknown (RC->PFlags, PSTATE_I)) {
+        strcpy (B, "~");
+    } else {
+        strcpy (B, RC->PFlags & PFVAL_I ? "I" : "_");
+    }
+    B += 1;
+    if (PStatesAreUnknown (RC->PFlags, PSTATE_D)) {
+        strcpy (B, "~");
+    } else {
+        strcpy (B, RC->PFlags & PFVAL_D ? "D" : "_");
+    }
+    B += 1;
+    if (PStatesAreUnknown (RC->PFlags, PSTATE_U)) {
+        strcpy (B, "~");
+    } else {
+        strcpy (B, RC->PFlags & PFVAL_U ? "U" : "_");
+    }
+    B += 1;
+    if (PStatesAreUnknown (RC->PFlags, PSTATE_B)) {
+        strcpy (B, "~");
+    } else {
+        strcpy (B, RC->PFlags & PFVAL_B ? "B" : "_");
+    }
+    B += 1;
+    if (PStatesAreUnknown (RC->PFlags, PSTATE_V)) {
+        strcpy (B, "~");
+    } else {
+        strcpy (B, RC->PFlags & PFVAL_V ? "V" : "_");
+    }
+    B += 1;
+    if (PStatesAreUnknown (RC->PFlags, PSTATE_N)) {
+        strcpy (B, "~");
+    } else {
+        strcpy (B, RC->PFlags & PFVAL_N ? "N" : "_");
+    }
+    B += 1;
 
     return Buf;
 }
@@ -2024,7 +2074,7 @@ void CE_Output (const CodeEntry* E)
     if (Debug) {
         char Use [128];
         char Chg [128];
-        WriteOutput ("%*s; USE: %-12s CHG: %-12s SIZE: %u",
+        WriteOutput ("%*s; USE: %-15s CHG: %-15s SIZE: %u",
                      (int)(30-Chars), "",
                      RegInfoDesc (E->Use, Use),
                      RegInfoDesc (E->Chg, Chg),
@@ -2033,7 +2083,7 @@ void CE_Output (const CodeEntry* E)
         if (E->RI) {
             char RegIn[32];
             char RegOut[32];
-            WriteOutput ("    In %s  Out %s",
+            WriteOutput ("   In %s   Out %s",
                          RegContentDesc (&E->RI->In, RegIn),
                          RegContentDesc (&E->RI->Out, RegOut));
         }

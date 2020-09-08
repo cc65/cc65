@@ -1933,13 +1933,6 @@ void hie10 (ExprDesc* Expr)
         case TOK_STAR:
             NextToken ();
             ExprWithCheck (hie10, Expr);
-            if (ED_IsLVal (Expr) || !ED_IsLocQuasiConst (Expr)) {
-                /* Not a const, load the pointer into the primary and make it a
-                ** calculated value.
-                */
-                LoadExpr (CF_NONE, Expr);
-                ED_FinalizeRValLoad (Expr);
-            }
 
             /* If the expression is already a pointer to function, the
             ** additional dereferencing operator must be ignored. A function
@@ -1951,6 +1944,14 @@ void hie10 (ExprDesc* Expr)
                 /* Expression not storable */
                 ED_MarkExprAsRVal (Expr);
             } else {
+                if (!ED_IsQuasiConstAddr (Expr)) {
+                    /* Not a constant address, load the pointer into the primary
+                    ** and make it a calculated value.
+                    */
+                    LoadExpr (CF_NONE, Expr);
+                    ED_FinalizeRValLoad (Expr);
+                }
+
                 if (IsClassPtr (Expr->Type)) {
                     Expr->Type = Indirect (Expr->Type);
                 } else {

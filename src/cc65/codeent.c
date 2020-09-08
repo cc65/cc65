@@ -889,12 +889,38 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
                         Val = In->SRegHi;
                         break;
                 }
+            } else if (CE_IsConstImm (E)) {
+                /* 65C02 special */
+                Val = (short) E->Num;
             }
-            Out->PFlags &= ~UNKNOWN_PFVAL_V;
-            if (Val & PFVAL_V) {
-                Out->PFlags |= PFVAL_V;
+
+            /* BIT is unique with regards to the Z/V/N flags:
+            ** - The Z is set/cleared according to whether the AND result is zero.
+            ** - The V is coped directly from Bit 6 of the orginal argument.
+            ** - The N is coped directly from Bit 7 of the orginal argument.
+            ** Note the V/N flags are not affected in imm addressing mode supported by 65c02!
+            */
+            if (E->AM == AM65_IMM) {
+                if (RegValIsKnown (Val)) {
+                    Out->PFlags &= ~(UNKNOWN_PFVAL_V | UNKNOWN_PFVAL_N);
+                    if (Val & PFVAL_V) {
+                        Out->PFlags |= PFVAL_V;
+                    }
+                    Out->PFlags &= ~UNKNOWN_PFVAL_V;
+                    if (Val & PFVAL_V) {
+                        Out->PFlags |= PFVAL_V;
+                    }
+                } else {
+                    Out->PFlags |= UNKNOWN_PFVAL_V | UNKNOWN_PFVAL_N;
+                }
             }
-            DeduceZN (Out, Val);
+            if ((RegValIsKnown (Val) && RegValIsKnown (In->RegA))) {
+                Val &= In->RegA;
+            } else if (((RegValIsKnown (Val) && Val == 0) ||
+                        (RegValIsKnown (In->RegA) && In->RegA == 0))) {
+                Val = 0;
+            }
+            DeduceZ (Out, Val);
             break;
 
         case OP65_BMI:

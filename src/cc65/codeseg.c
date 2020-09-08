@@ -1468,6 +1468,7 @@ void CS_GenRegInfo (CodeSeg* S)
 
         /* On entry, the register contents are unknown */
         RC_Invalidate (&Regs);
+        RC_InvalidatePS (&Regs);
         CurrentRegs = &Regs;
 
         /* Walk over all insns and note just the changes from one insn to the
@@ -1502,6 +1503,7 @@ void CS_GenRegInfo (CodeSeg* S)
                         Regs = J->RI->Out2;
                     } else {
                         RC_Invalidate (&Regs);
+                        RC_InvalidatePS (&Regs);
                     }
                     Entry = 1;
                 } else {
@@ -1521,6 +1523,7 @@ void CS_GenRegInfo (CodeSeg* S)
                         */
                         Done = 0;
                         RC_Invalidate (&Regs);
+                        RC_InvalidatePS (&Regs);
                         break;
                     }
                     if (J->RI->Out2.RegA != Regs.RegA) {
@@ -1541,6 +1544,9 @@ void CS_GenRegInfo (CodeSeg* S)
                     if (J->RI->Out2.Tmp1 != Regs.Tmp1) {
                         Regs.Tmp1 = UNKNOWN_REGVAL;
                     }
+                    unsigned PF = J->RI->Out2.PFlags ^ Regs.PFlags;
+                    Regs.PFlags |= ((PF >> 8) | PF | (PF << 8)) & UNKNOWN_PFVAL_ALL;
+                    Regs.ZNRegs &= J->RI->Out2.ZNRegs;
                     ++Entry;
                 }
 

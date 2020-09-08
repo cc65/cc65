@@ -320,10 +320,10 @@ static void AdjustLoadInfo (LoadInfo* LI, int Index, int Change)
 static int Affected (LoadRegInfo* RI, const CodeEntry* E)
 /* Check if the load src may be modified between the pushax and op */
 {
-    fncls_t        fncls;
-    unsigned short Use;
-    unsigned short Chg;
-    unsigned short UseToCheck = 0;
+    fncls_t      fncls;
+    unsigned int Use;
+    unsigned int Chg;
+    unsigned int UseToCheck = 0;
 
     if ((RI->Flags & (LI_CHECK_ARG | LI_CHECK_Y)) != 0) {
         if (E->AM == AM65_IMM || E->AM == AM65_ACC || E->AM == AM65_IMP || E->AM == AM65_BRA) {

@@ -176,13 +176,16 @@ typedef enum {
 #define OF_XFR          0x0100U /* Transfer instruction */
 #define OF_CALL         0x0200U /* A subroutine call */
 #define OF_REG_INCDEC   0x0400U /* A register increment or decrement */
-#define OF_SETF         0x0800U /* Insn will set all load flags (not carry) */
+#define OF_SETF         0x0800U /* Insn will set both Z and N flags according to the result */
 #define OF_CMP          0x1000U /* A compare A/X/Y instruction */
 #define OF_NOIMP        0x2000U /* Implicit addressing mode is actually A */
+#define OF_READ         0x4000U /* Read from the memory address */
+#define OF_WRITE        0x8000U /* Write to the memory address */
 
 /* Combined infos */
 #define OF_BRA  (OF_UBRA | OF_CBRA)     /* Operation is a jump/branch */
 #define OF_DEAD (OF_UBRA | OF_RET)      /* Dead end - no exec behind this point */
+#define OF_RMW  (OF_READ | OF_WRITE)    /* Read, Modify and Write */
 
 /* Opcode description */
 typedef struct {

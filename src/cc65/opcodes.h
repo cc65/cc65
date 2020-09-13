@@ -192,9 +192,9 @@ typedef struct {
     opc_t           OPC;                /* Opcode */
     char            Mnemo[9];           /* Mnemonic */
     unsigned char   Size;               /* Size, 0 = check addressing mode */
-    unsigned short  Use;                /* Registers used by this insn */
-    unsigned short  Chg;                /* Registers changed by this insn */
     unsigned short  Info;               /* Additional information */
+    unsigned int    Use;                /* Registers used by this insn */
+    unsigned int    Chg;                /* Registers changed by this insn */
 } OPCDesc;
 
 /* Opcode description table */

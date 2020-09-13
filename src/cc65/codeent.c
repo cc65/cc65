@@ -206,6 +206,145 @@ static void SetUseChgInfo (CodeEntry* E, const OPCDesc* D)
                 /* Keep gcc silent */
                 break;
         }
+
+        /* Append processor flags as well as special usages */
+        switch (E->OPC) {
+
+            case OP65_ADC:
+            case OP65_SBC:
+                E->Use |= PSTATE_C;
+                E->Chg |= PSTATE_CZVN;
+                break;
+            case OP65_ROL:
+            case OP65_ROR:
+                E->Use |= PSTATE_C;
+                E->Chg |= PSTATE_CZN;
+                break;
+            case OP65_ASL:
+            case OP65_LSR:
+                E->Chg |= PSTATE_CZN;
+                break;
+            case OP65_CMP:
+            case OP65_CPX:
+            case OP65_CPY:
+                E->Chg |= PSTATE_CZN;
+                break;
+            case OP65_BIT:
+                E->Chg |= PSTATE_ZVN;
+                if (E->AM != AM65_IMM) {
+                    E->Chg &= ~(PSTATE_V | PSTATE_N);
+                }
+                break;
+            case OP65_BRK:
+                E->Chg |= PSTATE_B;
+                break;
+            case OP65_CLC:
+            case OP65_SEC:
+                E->Chg |= PSTATE_C;
+                break;
+            case OP65_CLD:
+            case OP65_SED:
+                E->Chg |= PSTATE_D;
+                break;
+            case OP65_CLI:
+            case OP65_SEI:
+                E->Chg |= PSTATE_I;
+                break;
+            case OP65_CLV:
+                E->Chg |= PSTATE_V;
+                break;
+            case OP65_TRB:
+            case OP65_TSB:
+                E->Chg |= PSTATE_Z;
+                break;
+            case OP65_BCC:
+            case OP65_BCS:
+            case OP65_JCC:
+            case OP65_JCS:
+                E->Use |= PSTATE_C;
+                break;
+            case OP65_BEQ:
+            case OP65_BNE:
+            case OP65_JEQ:
+            case OP65_JNE:
+                E->Use |= PSTATE_Z;
+                break;
+            case OP65_BMI:
+            case OP65_BPL:
+            case OP65_JMI:
+            case OP65_JPL:
+                E->Use |= PSTATE_N;
+                break;
+            case OP65_BVC:
+            case OP65_BVS:
+            case OP65_JVC:
+            case OP65_JVS:
+                E->Use |= PSTATE_V;
+                break;
+            case OP65_BRA:
+            case OP65_JMP:
+                break;
+            case OP65_AND:
+            case OP65_EOR:
+            case OP65_ORA:
+            case OP65_DEA:
+            case OP65_DEC:
+            case OP65_DEX:
+            case OP65_DEY:
+            case OP65_INA:
+            case OP65_INC:
+            case OP65_INX:
+            case OP65_INY:
+            case OP65_LDA:
+            case OP65_LDX:
+            case OP65_LDY:
+            case OP65_TAX:
+            case OP65_TAY:
+            case OP65_TXA:
+            case OP65_TYA:
+                E->Chg |= PSTATE_ZN;
+                break;
+            case OP65_TSX:
+                E->Use |= SLV_SP65;
+                E->Chg |= PSTATE_ZN;
+                break;
+            case OP65_TXS:
+                E->Chg |= SLV_SP65;
+                break;
+            case OP65_PLA:
+            case OP65_PLX:
+            case OP65_PLY:
+                E->Use |= SLV_SP65;
+                E->Chg |= SLV_PL65 | PSTATE_ZN;
+                break;
+            case OP65_PLP:
+                E->Use |= SLV_SP65;
+                E->Chg |= SLV_PL65 | PSTATE_ALL;
+                break;
+            case OP65_PHA:
+            case OP65_PHX:
+            case OP65_PHY:
+                E->Use |= SLV_SP65;
+                E->Chg |= SLV_PH65;
+                break;
+            case OP65_PHP:
+                E->Use |= SLV_SP65 | PSTATE_ALL;
+                E->Chg |= SLV_PH65;
+                break;
+            case OP65_RTI:
+                E->Chg |= PSTATE_ALL;
+                break;
+            case OP65_RTS:
+                break;
+            case OP65_STA:
+            case OP65_STX:
+            case OP65_STY:
+            case OP65_STZ:
+            case OP65_JSR:
+            case OP65_NOP:
+            default:
+                break;
+        }
     }
 }
 

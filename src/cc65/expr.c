@@ -3237,8 +3237,8 @@ static int hieAnd (ExprDesc* Expr, unsigned* TrueLab, int* TrueLabAllocated)
     int HasFalseJump = 0, HasTrueJump = 0;
     CodeMark Start;
 
-    /* Get a label that we will use for false expressions */
-    int FalseLab = GetLocalLabel ();
+    /* The label that we will use for false expressions */
+    int FalseLab = 0;
 
     /* Get lhs */
     GetCodePos (&Start);
@@ -3266,8 +3266,12 @@ static int hieAnd (ExprDesc* Expr, unsigned* TrueLab, int* TrueLabAllocated)
                 /* Clear the test flag */
                 ED_RequireNoTest (Expr);
 
-                /* Remember that the jump is used */
-                HasFalseJump = 1;
+                if (HasFalseJump == 0) {
+                    /* Remember that the jump is used */
+                    HasFalseJump = 1;
+                    /* Get a label for false expressions */
+                    FalseLab = GetLocalLabel ();
+                }
 
                 /* Generate the jump */
                 g_falsejump (CF_NONE, FalseLab);
@@ -3304,7 +3308,12 @@ static int hieAnd (ExprDesc* Expr, unsigned* TrueLab, int* TrueLabAllocated)
 
                     /* Do short circuit evaluation */
                     if (CurTok.Tok == TOK_BOOL_AND) {
-                        HasFalseJump = 1;
+                        if (HasFalseJump == 0) {
+                            /* Remember that the jump is used */
+                            HasFalseJump = 1;
+                            /* Get a label for false expressions */
+                            FalseLab = GetLocalLabel ();
+                        }
                         g_falsejump (CF_NONE, FalseLab);
                     } else {
                         /* We need the true label for the last expression */

@@ -1418,10 +1418,10 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
                     Out->RegX = (In->RegX ^ 0xFF);
                 }
             } else if (strcmp (E->Arg, "tosandax") == 0) {
-                if (In->RegA == 0) {
+                if (RegValIsKnown (In->RegA) && In->RegA == 0) {
                     Out->RegA = 0;
                 }
-                if (In->RegX == 0) {
+                if (RegValIsKnown (In->RegX) && In->RegX == 0) {
                     Out->RegX = 0;
                 }
             } else if (strcmp (E->Arg, "tosaslax") == 0) {
@@ -1430,15 +1430,19 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
                     Out->RegA = 0;
                 }
             } else if (strcmp (E->Arg, "tosorax") == 0) {
-                if (In->RegA == 0xFF) {
+                if (RegValIsKnown (In->RegA) && In->RegA == 0xFF) {
                     Out->RegA = 0xFF;
                 }
-                if (In->RegX == 0xFF) {
+                if (RegValIsKnown (In->RegX) && In->RegX == 0xFF) {
                     Out->RegX = 0xFF;
                 }
             } else if (strcmp (E->Arg, "tosshlax") == 0) {
-                if ((In->RegA & 0x0F) >= 8) {
+                if (RegValIsKnown (In->RegA) && (In->RegA & 0x0F) >= 8) {
                     Out->RegA = 0;
+                }
+            } else if (strcmp (E->Arg, "tosshrax") == 0) {
+                if (RegValIsKnown (In->RegA) && (In->RegA & 0x0F) >= 8) {
+                    Out->RegX = 0;
                 }
             } else if (strcmp (E->Arg, "bcastax") == 0     ||
                        strcmp (E->Arg, "bnegax") == 0      ||

@@ -75,6 +75,8 @@ struct RegContents;
 #define REG_SP_HI       0x2000U
 
 /* Defines for some special register usage */
+#define SLV_IND         0x00010000U     /* Accesses (sp),y */
+#define SLV_TOP         0x00020000U     /* Accesses (sp),0 */
 #define SLV_SP65        0x00200000U     /* Accesses 6502 stack pointer */
 #define SLV_PH65        0x00400000U     /* Pushes onto 6502 stack */
 #define SLV_PL65        0x00800000U     /* Pops from 6502 stack */
@@ -104,6 +106,7 @@ struct RegContents;
 #define REG_EAXY        (REG_EAX | REG_Y)
 #define REG_ZP          0xFFF8U
 #define REG_ALL         0xFFFFU
+
 #define PSTATE_CZ       (PSTATE_C | PSTATE_Z)
 #define PSTATE_CZN      (PSTATE_C | PSTATE_Z | PSTATE_N)
 #define PSTATE_CZVN     (PSTATE_C | PSTATE_Z | PSTATE_V | PSTATE_N)

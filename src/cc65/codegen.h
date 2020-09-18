@@ -416,6 +416,8 @@ void g_falsejump (unsigned flags, unsigned label);
 void g_branch (unsigned Label);
 /* Branch unconditionally to Label if the CPU has the BRA instruction.
 ** Otherwise, jump to Label.
+** Use this function, instead of g_jump(), only where it is certain that
+** the label cannot be farther away from the branch than -128/+127 bytes.
 */
 
 void g_lateadjustSP (unsigned label);

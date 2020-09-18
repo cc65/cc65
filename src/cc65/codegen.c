@@ -2447,6 +2447,8 @@ void g_falsejump (unsigned flags attribute ((unused)), unsigned label)
 void g_branch (unsigned Label)
 /* Branch unconditionally to Label if the CPU has the BRA instruction.
 ** Otherwise, jump to Label.
+** Use this function, instead of g_jump(), only where it is certain that
+** the label cannot be farther away from the branch than -128/+127 bytes.
 */
 {
     if ((CPUIsets[CPU] & CPU_ISET_65SC02) != 0) {
@@ -4542,6 +4544,10 @@ void g_extractbitfield (unsigned Flags, unsigned FullWidthFlags, int IsSigned,
         AddCodeLine ("pla");
         g_or (FullWidthFlags | CF_CONST, ~Mask);
 
+        /* We can generate a branch, instead of a jump, here because we know
+        ** that only a few instructions will be put between here and where
+        ** DoneLabel will be defined.
+        */
         unsigned DoneLabel = GetLocalLabel ();
         g_branch (DoneLabel);
 

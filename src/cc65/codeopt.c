@@ -178,6 +178,7 @@ static OptFunc DOptShift3       = { OptShift3,       "OptShift3",        17, 0, 
 static OptFunc DOptShift4       = { OptShift4,       "OptShift4",       100, 0, 0, 0, 0, 0 };
 static OptFunc DOptShift5       = { OptShift5,       "OptShift5",       110, 0, 0, 0, 0, 0 };
 static OptFunc DOptShift6       = { OptShift6,       "OptShift6",       200, 0, 0, 0, 0, 0 };
+static OptFunc DOptShiftBack    = { OptShiftBack,    "OptShiftBack",      0, 0, 0, 0, 0, 0 };
 static OptFunc DOptSignExtended = { OptSignExtended, "OptSignExtended",   0, 0, 0, 0, 0, 0 };
 static OptFunc DOptSize1        = { OptSize1,        "OptSize1",        100, 0, 0, 0, 0, 0 };
 static OptFunc DOptSize2        = { OptSize2,        "OptSize2",        100, 0, 0, 0, 0, 0 };
@@ -281,6 +282,7 @@ static OptFunc* OptFuncs[] = {
     &DOptShift4,
     &DOptShift5,
     &DOptShift6,
+    &DOptShiftBack,
     &DOptSignExtended,
     &DOptSize1,
     &DOptSize2,
@@ -715,6 +717,7 @@ static unsigned RunOptGroup3 (CodeSeg* S)
         C += RunOptFunc (S, &DOptPushPop1, 1);
         C += RunOptFunc (S, &DOptPushPop2, 1);
         C += RunOptFunc (S, &DOptPrecalc, 1);
+        C += RunOptFunc (S, &DOptShiftBack, 1);
         C += RunOptFunc (S, &DOptSignExtended, 1);
 
         Changes += C;

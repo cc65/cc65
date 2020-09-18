@@ -93,6 +93,11 @@ unsigned OptPrecalc (CodeSeg* S);
 ** known by a load of the final value.
 */
 
+unsigned OptShiftBack (CodeSeg* S);
+/* Remove a pair of shifts to the opposite directions if none of the bits of
+** the register A or the Z/N flags modified by these shifts are used later.
+*/
+
 unsigned OptSignExtended (CodeSeg* S);
 /* Change
 **

@@ -1477,6 +1477,60 @@ unsigned OptPrecalc (CodeSeg* S)
 
 
 
+unsigned OptShiftBack (CodeSeg* S)
+/* Remove a pair of shifts to the opposite directions if none of the bits of
+** the register A or the Z/N flags modified by these shifts are used later.
+*/
+{
+    unsigned Changes = 0;
+    CodeEntry* E;
+    CodeEntry* N;
+    unsigned CheckStates;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        /* Get next entry */
+        E = CS_GetEntry (S, I);
+
+        /* Check if it's a register load or transfer insn */
+        if (E->OPC == OP65_ROL                  &&
+            (N = CS_GetNextEntry (S, I)) != 0   &&
+            (N->OPC == OP65_LSR ||
+             N->OPC == OP65_ROR)                &&
+            !CE_HasLabel (N)) {
+            
+            CheckStates = PSTATE_ZN;
+            
+            if (N->OPC == OP65_LSR &&
+                !PStatesAreClear (E->RI->Out.PFlags, PSTATE_C)) {
+                CheckStates |= REG_A;
+            }
+            
+            if ((GetRegInfo (S, I+2, CheckStates) & CheckStates) == 0) {
+
+                /* Remove the shifts */
+                CS_DelEntries (S, I, 2);
+
+                /* Remember, we had changes */
+                ++Changes;
+
+                /* Continue with next insn */
+                continue;
+            }
+        }
+
+        /* Next entry */
+        ++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
 unsigned OptSignExtended (CodeSeg* S)
 /* Change
 **

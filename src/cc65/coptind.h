@@ -82,8 +82,11 @@ unsigned OptTransfers4 (CodeSeg* S);
 ** by a load of the second register if possible.
 */
 
-unsigned OptPushPop (CodeSeg* S);
-/* Remove a PHA/PLA sequence were A is not used later */
+unsigned OptPushPop1 (CodeSeg* S);
+/* Remove a PHA/PLA sequence were A not used later */
+
+unsigned OptPushPop2 (CodeSeg* S);
+/* Remove a PHP/PLP sequence were no processor flags changed inside */
 
 unsigned OptPrecalc (CodeSeg* S);
 /* Replace immediate operations with the accu where the current contents are

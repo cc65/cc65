@@ -172,6 +172,10 @@ static void SetUseChgInfo (CodeEntry* E, const OPCDesc* D)
                 if (Info && Info->ByteUse != REG_NONE) {
                     /* These addressing modes will never change the zp loc */
                     E->Use |= Info->WordUse;
+
+                    if ((E->Use & REG_SP) != 0) {
+                        E->Use |= SLV_IND;
+                    }
                 }
                 break;
 

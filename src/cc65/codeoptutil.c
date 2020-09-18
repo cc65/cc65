@@ -1224,66 +1224,43 @@ static int CmpHarmless (const void* Key, const void* Entry)
 
 
 
-int HarmlessCall (const char* Name)
+int HarmlessCall (const CodeEntry* E, int PushedBytes)
 /* Check if this is a call to a harmless subroutine that will not interrupt
 ** the pushax/op sequence when encountered.
 */
 {
-    static const char* const Tab[] = {
-        "aslax1",
-        "aslax2",
-        "aslax3",
-        "aslax4",
-        "aslaxy",
-        "asrax1",
-        "asrax2",
-        "asrax3",
-        "asrax4",
-        "asraxy",
-        "bcastax",
-        "bnegax",
-        "complax",
-        "decax1",
-        "decax2",
-        "decax3",
-        "decax4",
-        "decax5",
-        "decax6",
-        "decax7",
-        "decax8",
-        "decaxy",
-        "incax1",
-        "incax2",
-        "incax3",
-        "incax4",
-        "incax5",
-        "incax6",
-        "incax7",
-        "incax8",
-        "incaxy",
-        "ldaidx",
-        "ldauidx",
-        "ldaxidx",
-        "ldaxysp",
-        "negax",
-        "shlax1",
-        "shlax2",
-        "shlax3",
-        "shlax4",
-        "shlaxy",
-        "shrax1",
-        "shrax2",
-        "shrax3",
-        "shrax4",
-        "shraxy",
-    };
+    unsigned Use = 0, Chg = 0;
+    if (GetFuncInfo (E->Arg, &Use, &Chg) == FNCLS_BUILTIN) {
+        if ((Chg & REG_SP) != 0) {
+            return 0;
+        }
+        if ((Use & REG_SP) != 0                     &&
+            ((Use & (SLV_IND | SLV_TOP)) != SLV_IND ||
+             RegValIsUnknown (E->RI->In.RegY)       ||
+             E->RI->In.RegY < PushedBytes)) {
+            /* If we are using the stack, and we don't have "indirect"
+            ** addressing mode, or the value of Y is unknown, or less
+            ** than two, we cannot cope with this piece of code. Having
+            ** an unknown value of Y means that we cannot correct the
+            ** stack offset, while having an offset less than PushedBytes
+            ** means that the code works with the value on stack which
+            ** is to be removed.
+            */
+            return 0;
+        }
+        return 1;
+    } else {
+        static const char* const Tab[] = {
+            "_abs",
+        };
 
-    void* R = bsearch (Name,
-                       Tab,
-                       sizeof (Tab) / sizeof (Tab[0]),
-                       sizeof (Tab[0]),
-                       CmpHarmless);
-    return (R != 0);
+        void* R = bsearch (E->Arg,
+                            Tab,
+                            sizeof (Tab) / sizeof (Tab[0]),
+                            sizeof (Tab[0]),
+                            CmpHarmless);
+        return (R != 0);
+    }
 }
 
 

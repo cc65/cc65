@@ -480,7 +480,7 @@ unsigned OptNegAX2 (CodeSeg* S)
 **      eor     #$FF
 **      clc
 **      adc     #$01
-**      bne     L1
+**      bcc     L1
 **      inx
 ** L1:
 **
@@ -528,8 +528,8 @@ unsigned OptNegAX2 (CodeSeg* S)
             /* Get the label attached to the insn following the call */
             L = CS_GenLabel (S, P);
 
-            /* bne L */
-            X = NewCodeEntry (OP65_BNE, AM65_BRA, L->Name, L, E->LI);
+            /* bcc L */
+            X = NewCodeEntry (OP65_BCC, AM65_BRA, L->Name, L, E->LI);
             CS_InsertEntry (S, X, I+5);
 
             /* inx */

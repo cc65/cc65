@@ -1069,8 +1069,8 @@ unsigned OptTransfers4 (CodeSeg* S)
 
 
 
-unsigned OptPushPop (CodeSeg* S)
-/* Remove a PHA/PLA sequence were A is not used later */
+unsigned OptPushPop1 (CodeSeg* S)
+/* Remove a PHA/PLA sequence were A not used later */
 {
     unsigned Changes = 0;
     unsigned Push    = 0;       /* Index of push insn */
@@ -1183,6 +1183,95 @@ unsigned OptPushPop (CodeSeg* S)
                     ++Changes;
 
                 }
+                /* Go into search mode again */
+                State = Searching;
+                break;
+
+        }
+
+        /* Next entry */
+        ++I;
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptPushPop2 (CodeSeg* S)
+/* Remove a PHP/PLP sequence were no processor flags changed inside */
+{
+    unsigned Changes = 0;
+    unsigned Push    = 0;       /* Index of push insn */
+    unsigned Pop     = 0;       /* Index of pop insn */
+    enum {
+        Searching,
+        FoundPush,
+        FoundPop
+    } State = Searching;
+
+    /* Walk over the entries. Look for a push instruction that is followed by
+    ** a pop later, where the pop is not followed by an conditional branch,
+    ** and where the value of the A register is not used later on.
+    ** Look out for the following problems:
+    **
+    **  - There may be another PHP/PLP inside the sequence: Restart it.
+    **  - All jumps inside the sequence must not go outside the sequence,
+    **    otherwise it would be too complicated to remove the PHP/PLP.
+    */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        /* Get next entry */
+        CodeEntry* E = CS_GetEntry (S, I);
+
+        switch (State) {
+
+            case Searching:
+                if (E->OPC == OP65_PHP) {
+                    /* Found start of sequence */
+                    Push  = I;
+                    State = FoundPush;
+                }
+                break;
+
+            case FoundPush:
+                if (E->OPC == OP65_PHP) {
+                    /* Inner push/pop, restart */
+                    Push = I;
+                } else if (E->OPC == OP65_PLP) {
+                    /* Found a matching pop */
+                    Pop = I;
+                    /* Check that the block between Push and Pop is a basic
+                    ** block (one entry, one exit). Otherwise ignore it.
+                    */
+                    if (CS_IsBasicBlock (S, Push, Pop)) {
+                        State = FoundPop;
+                    } else {
+                        /* Go into searching mode again */
+                        State = Searching;
+                    }
+                } else if ((E->Info & OF_BRA)   == 0 && 
+                           (E->Info & OF_STORE) == 0 &&
+                           E->OPC != OP65_NOP        &&
+                           E->OPC != OP65_TSX) {
+                    /* Don't bother skipping dead code */
+                    State = Searching;
+                }
+                break;
+
+            case FoundPop:
+                /* We can remove the PHP and PLP instructions */
+                CS_DelEntry (S, Pop);
+                CS_DelEntry (S, Push);
+
+                /* Correct I so we continue with THIS insn */
+                I -= 3;
+
+                /* Remember we had changes */
+                ++Changes;
+
                 /* Go into search mode again */
                 State = Searching;
                 break;

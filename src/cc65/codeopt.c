@@ -167,7 +167,8 @@ static OptFunc DOptPtrStore2    = { OptPtrStore2,    "OptPtrStore2",     65, 0, 
 static OptFunc DOptPtrStore3    = { OptPtrStore3,    "OptPtrStore3",    100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPush1        = { OptPush1,        "OptPush1",         65, 0, 0, 0, 0, 0 };
 static OptFunc DOptPush2        = { OptPush2,        "OptPush2",         50, 0, 0, 0, 0, 0 };
-static OptFunc DOptPushPop      = { OptPushPop,      "OptPushPop",        0, 0, 0, 0, 0, 0 };
+static OptFunc DOptPushPop1     = { OptPushPop1,     "OptPushPop1",       0, 0, 0, 0, 0, 0 };
+static OptFunc DOptPushPop2     = { OptPushPop2,     "OptPushPop2",       0, 0, 0, 0, 0, 0 };
 static OptFunc DOptRTS          = { OptRTS,          "OptRTS",          100, 0, 0, 0, 0, 0 };
 static OptFunc DOptRTSJumps1    = { OptRTSJumps1,    "OptRTSJumps1",    100, 0, 0, 0, 0, 0 };
 static OptFunc DOptRTSJumps2    = { OptRTSJumps2,    "OptRTSJumps2",    100, 0, 0, 0, 0, 0 };
@@ -269,7 +270,7 @@ static OptFunc* OptFuncs[] = {
     &DOptPtrStore3,
     &DOptPush1,
     &DOptPush2,
-    &DOptPushPop,
+    &DOptPushPop1,
     &DOptRTS,
     &DOptRTSJumps1,
     &DOptRTSJumps2,
@@ -709,7 +710,8 @@ static unsigned RunOptGroup3 (CodeSeg* S)
         C += RunOptFunc (S, &DOptTransfers4, 1);
         C += RunOptFunc (S, &DOptStore1, 1);
         C += RunOptFunc (S, &DOptStore5, 1);
-        C += RunOptFunc (S, &DOptPushPop, 1);
+        C += RunOptFunc (S, &DOptPushPop1, 1);
+        C += RunOptFunc (S, &DOptPushPop2, 1);
         C += RunOptFunc (S, &DOptPrecalc, 1);
 
         Changes += C;

@@ -93,6 +93,31 @@ unsigned OptPrecalc (CodeSeg* S);
 ** known by a load of the final value.
 */
 
+unsigned OptSignExtended (CodeSeg* S);
+/* Change
+**
+**      lda     xxx     ; X is 0
+**      bpl     L1
+**      dex/ldx #$FF
+**  L1: cpx     #$00
+**      bpl     L2
+**
+** or
+**
+**      lda     xxx     ; X is 0
+**      bpl     L1
+**      dex/ldx #$FF
+**  L1: cpx     #$80
+**      bcc/bmi L2
+**
+** into
+**      lda     xxx     ; X is 0
+**      bpl     L2
+**      dex/ldx #$FF
+**
+** provided the C flag isn't used later.
+*/
+
 
 
 /* End of coptind.h */

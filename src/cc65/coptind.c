@@ -1474,3 +1474,95 @@ unsigned OptPrecalc (CodeSeg* S)
     /* Return the number of changes made */
     return Changes;
 }
+
+
+
+unsigned OptSignExtended (CodeSeg* S)
+/* Change
+**
+**      lda     xxx     ; X is 0
+**      bpl     L1
+**      dex/ldx #$FF
+**  L1: cpx     #$00
+**      bpl     L2
+**
+** or
+**
+**      lda     xxx     ; X is 0
+**      bpl     L1
+**      dex/ldx #$FF
+**  L1: cpx     #$80
+**      bcc/bmi L2
+**
+** into
+**      lda     xxx     ; X is 0
+**      bpl     L2
+**      dex/ldx #$FF
+**
+** provided the C flag isn't used later.
+*/
+{
+    unsigned Changes = 0;
+    CodeEntry* L[5];
+    CodeEntry* X;
+    unsigned CheckStates;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        /* Get next entry */
+        L[0] = CS_GetEntry (S, I);
+
+        /* Check if it's a register load or transfer insn */
+        if (L[0]->OPC == OP65_LDA                   &&
+            CS_GetEntries (S, L+1, I+1, 4)          &&
+            !CS_RangeHasLabel (S, I+1, 2)           &&
+            CE_GetLabelCount (L[3]) == 1            &&
+            L[1]->JumpTo == CE_GetLabel (L[3], 0)   &&
+            (L[1]->Info & OF_CBRA) != 0             &&
+            GetBranchCond (L[1]->OPC) == BC_PL      &&
+            RegValIsKnown (L[2]->RI->Out.RegX)      &&
+            L[2]->RI->Out.RegX == 0xFF              &&
+            L[2]->OPC != OP65_JSR                   &&
+            (L[2]->Chg & REG_AXY) == REG_X) {
+
+            /* We find a sign extention */
+            CheckStates = PSTATE_CZN;
+            if (L[3]->OPC == OP65_CPX                       &&
+                CE_IsConstImm (L[3])                        &&
+                (L[4]->Info & OF_CBRA) != 0                 &&
+                ((L[3]->Num == 0x00                     &&
+                  GetBranchCond (L[4]->OPC) == BC_PL)       ||
+                ((L[3]->Num == 0x80                     &&
+                  GetBranchCond (L[4]->OPC) == BC_CC &&
+                  GetBranchCond (L[4]->OPC) == BC_MI)))) {
+
+                /* Check if the processor states set by the CPX are unused later */
+                if ((GetRegInfo (S, I+5, CheckStates) & CheckStates) == 0) {
+
+                    /* Change the target of the sign extention branch */
+                    X = NewCodeEntry (OP65_JPL, L[4]->AM, L[4]->Arg, L[4]->JumpTo, L[4]->LI);
+                    CS_InsertEntry (S, X, I+1);
+                    CS_DelEntry (S, I+2);
+
+                    /* Remove the old conditional branch */
+                    CS_DelEntries (S, I+3, 2);
+
+                    /* Remember, we had changes */
+                    ++Changes;
+
+                    /* Continue with the current insn */
+                    continue;
+                }
+            }
+        }
+
+        /* Next entry */
+        ++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}

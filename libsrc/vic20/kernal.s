@@ -1,10 +1,14 @@
 ;
 ; Ullrich von Bassewitz, 19.11.2002
 ;
-; VIC20 kernal functions
+; VIC20 Kernal functions
 ;
 
         .include "cbm_kernal.inc"
+
+        .export         CLRSCR
+        .export         KBDREAD
+        .export         UPDCRAMPTR
 
         .export         CINT
         .export         IOINIT

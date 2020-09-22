@@ -8,7 +8,6 @@
 
         .export         CLRSCR
         .export         KBDREAD
-        .export         UPDCRAMPTR
 
         .export         CINT
         .export         IOINIT

@@ -13,7 +13,7 @@ compiler.
 
         The makefile in this directory _expects_ the tests to fail, because of
         that when an issue was fixed it will break the CI. The test should get 
-        moved to /var in the PR fixing the issue, which will make CI pass again.
+        moved to /val in the PR fixing the issue, which will make CI pass again.
         No changes to makefiles are required!
 
 /asm  - contains the assembler regression tests

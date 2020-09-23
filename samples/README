@@ -18,6 +18,10 @@ Please note:
 
   * Use "make disk" to build a disk image with all sample programs.
 
+  * All programs in the root of the "samples" directory have been written to
+    be portable and work on more than one target. Programs that are specific
+    to a certain target live in a subdirectory with the name of the target.
+
 List of supplied sample programs:
 
 -----------------------------------------------------------------------------

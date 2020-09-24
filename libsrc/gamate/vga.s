@@ -1,8 +1,8 @@
 ; VGA charset for the Gamate conio implementation
 
-.export fontdata
+        .export fontdata
 
-.rodata
+        .rodata
 
 fontdata:
 

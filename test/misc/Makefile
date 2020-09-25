@@ -100,6 +100,12 @@ $(WORKDIR)/bug1263.$1.$2.prg: bug1263.c | $(WORKDIR)
 	$(if $(QUIET),echo misc/bug1263.$1.$2.prg)
 	$(NOT) $(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
 
+# should compile, but gives an error
+$(WORKDIR)/bug1094.$1.$2.prg: bug1094.c | $(WORKDIR)
+	@echo "FIXME: " $$@ "currently does not compile."
+	$(if $(QUIET),echo misc/bug1094.$1.$2.prg)
+	$(NOT) $(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
+
 # this one requires --std=c89, it fails with --std=c99
 # it fails currently at runtime
 $(WORKDIR)/bug1265.$1.$2.prg: bug1265.c | $(WORKDIR)

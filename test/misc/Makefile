@@ -95,7 +95,7 @@ $(WORKDIR)/pptest2.$1.$2.prg: pptest2.c | $(WORKDIR)
 	$(NOT) $(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
 
 # should compile, but gives an error
-$(WORKDIR)/bug1263.$1.$2.prg: pptest2.c | $(WORKDIR)
+$(WORKDIR)/bug1263.$1.$2.prg: bug1263.c | $(WORKDIR)
 	@echo "FIXME: " $$@ "currently does not compile."
 	$(if $(QUIET),echo misc/bug1263.$1.$2.prg)
 	$(NOT) $(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)

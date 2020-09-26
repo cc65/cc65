@@ -2567,9 +2567,9 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
                 long RestoredVal = asr_l(asl_l (Val, ShiftBits), ShiftBits);
                 if (ED.IVal != RestoredVal) {
                     Warning ("Implicit truncation from '%s' to '%s : %u' in bit-field initializer "
-                             "changes value from %ld to %d",
+                             "changes value from %ld to %ld",
                              GetFullTypeName (ED.Type), GetFullTypeName (Entry->Type),
-                             Entry->V.B.BitWidth, ED.IVal, Val);
+                             Entry->V.B.BitWidth, ED.IVal, RestoredVal);
                 }
             }
 

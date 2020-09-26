@@ -1468,6 +1468,15 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
                     /* It's a typedef */
                     NextToken ();
                     TypeCopy (D->Type, Entry->Type);
+                    /* If it's a typedef, we should actually use whether the signedness was
+                    ** specified on the typedef, but that information has been lost.  Treat the
+                    ** signedness as being specified to work around the ICE in #1267.
+                    ** Unforunately, this will cause plain int bit-fields defined via typedefs
+                    ** to be treated as signed rather than unsigned.
+                    */
+                    if (SignednessSpecified) {
+                        *SignednessSpecified = 1;
+                    }
                     break;
                 }
             } else {

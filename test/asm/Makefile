@@ -38,7 +38,7 @@ CPUDETECT_REFS := $(wildcard *-cpudetect.ref)
 CPUDETECT_CPUS = $(foreach ref,$(CPUDETECT_REFS),$(ref:%-cpudetect.ref=%))
 CPUDETECT_BINS = $(foreach cpu,$(CPUDETECT_CPUS),$(WORKDIR)/$(cpu)-cpudetect.bin)
 
-all: $(OPCODE_BINS) $(CPUDETECT_BINS)
+all: $(OPCODE_BINS) $(CPUDETECT_BINS) paramcount.o
 
 $(WORKDIR):
 	$(call MKDIR,$(WORKDIR))
@@ -69,6 +69,9 @@ $(WORKDIR)/$1-cpudetect.bin: cpudetect.s $(ISEQUAL)
 endef # CPUDETECT_template
 
 $(foreach cpu,$(CPUDETECT_CPUS),$(eval $(call CPUDETECT_template,$(cpu))))
+
+paramcount.o: paramcount.s
+	$(CA65) -o $(WORKDIR)/paramcount.o -l $(WORKDIR)/paramcount.lst paramcount.s
 
 clean:
 	@$(call RMDIR,$(WORKDIR))

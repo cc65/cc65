@@ -92,7 +92,7 @@ static void PutSEP (const InsDesc* Ins);
 /* Emit a SEP instruction (65816), track register sizes */
 
 static void PutTAMn (const InsDesc* Ins);
-/* Emit a TAMn instruction (HuC6280). Since this is a two byte instruction with
+/* Emit a TAMn instruction (HuC6280). Because this is a two-byte instruction with
 ** implicit addressing mode, the opcode byte in the table is actually the
 ** second operand byte. The TAM instruction is the more generic form, it takes
 ** an immediate argument.
@@ -104,9 +104,9 @@ static void PutTMA (const InsDesc* Ins);
 */
 
 static void PutTMAn (const InsDesc* Ins);
-/* Emit a TMAn instruction (HuC6280). Since this is a two byte instruction with
+/* Emit a TMAn instruction (HuC6280). Because this is a two-byte instruction with
 ** implicit addressing mode, the opcode byte in the table is actually the
-** second operand byte. The TAM instruction is the more generic form, it takes
+** second operand byte. The TMA instruction is the more generic form, it takes
 ** an immediate argument.
 */
 
@@ -1093,7 +1093,7 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
     A->AddrModeSet &= Ins->AddrMode;
 
     /* If we have an expression, check it and remove any addressing modes that
-    ** are too small for the expression size. Since we have to study the
+    ** are too small for the expression size. Because we have to study the
     ** expression anyway, do also replace it by a simpler one if possible.
     */
     if (A->Expr) {
@@ -1414,7 +1414,7 @@ static void PutSEP (const InsDesc* Ins)
 
 
 static void PutTAMn (const InsDesc* Ins)
-/* Emit a TAMn instruction (HuC6280). Since this is a two byte instruction with
+/* Emit a TAMn instruction (HuC6280). Because this is a two-byte instruction with
 ** implicit addressing mode, the opcode byte in the table is actually the
 ** second operand byte. The TAM instruction is the more generic form, it takes
 ** an immediate argument.
@@ -1444,7 +1444,7 @@ static void PutTMA (const InsDesc* Ins)
     } else {
         /* Make sure just one bit is set */
         if ((Val & (Val - 1)) != 0) {
-            Error ("Argument to TAM must be a power of two");
+            Error ("Argument of TMA must be a power of two");
         }
     }
 }
@@ -1452,9 +1452,9 @@ static void PutTMA (const InsDesc* Ins)
 
 
 static void PutTMAn (const InsDesc* Ins)
-/* Emit a TMAn instruction (HuC6280). Since this is a two byte instruction with
+/* Emit a TMAn instruction (HuC6280). Because this is a two-byte instruction with
 ** implicit addressing mode, the opcode byte in the table is actually the
-** second operand byte. The TAM instruction is the more generic form, it takes
+** second operand byte. The TMA instruction is the more generic form, it takes
 ** an immediate argument.
 */
 {

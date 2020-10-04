@@ -585,8 +585,7 @@ const char* MakeHexArg (unsigned Num)
 void PreparseArg (CodeEntry* E)
 /* Parse the argument string and memorize the result for the code entry */
 {
-    StrBuf B;
-    SB_InitFromString (&B, xmalloc (strlen (E->Arg) + 1));
+    StrBuf B = AUTO_STRBUF_INITIALIZER;
 
     /* Parse the argument string */
     if (ParseOpcArgStr (E->Arg, &E->ArgInfo, &B, &E->ArgOff)) {

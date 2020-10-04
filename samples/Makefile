@@ -330,7 +330,7 @@ install:
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)/geos
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)/tutorial
 	$(INSTALL) -m0644 *.* $(DESTDIR)$(samplesdir)
-	$(INSTALL) -m0644 README $(DESTDIR)$(samplesdir)
+	$(INSTALL) -m0644 readme.txt $(DESTDIR)$(samplesdir)
 	$(INSTALL) -m0644 Makefile $(DESTDIR)$(samplesdir)
 	$(INSTALL) -m0644 geos/*.* $(DESTDIR)$(samplesdir)/geos
 	$(INSTALL) -m0644 tutorial/*.* $(DESTDIR)$(samplesdir)/tutorial

@@ -1171,16 +1171,16 @@ static void Primary (ExprDesc* E)
 
                 /* IDENT is either an auto-declared function or an undefined variable. */
                 if (CurTok.Tok == TOK_LPAREN) {
-                    /* C99 doesn't allow calls to undefined functions, so
+                    /* C99 doesn't allow calls to undeclared functions, so
                     ** generate an error and otherwise a warning. Declare a
                     ** function returning int. For that purpose, prepare a
                     ** function signature for a function having an empty param
                     ** list and returning int.
                     */
                     if (IS_Get (&Standard) >= STD_C99) {
-                        Error ("Call to undefined function '%s'", Ident);
+                        Error ("Call to undeclared function '%s'", Ident);
                     } else {
-                        Warning ("Call to undefined function '%s'", Ident);
+                        Warning ("Call to undeclared function '%s'", Ident);
                     }
                     Sym = AddGlobalSym (Ident, GetImplicitFuncType(), SC_EXTERN | SC_REF | SC_FUNC);
                     E->Type  = Sym->Type;

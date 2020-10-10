@@ -462,7 +462,7 @@ Type* GetImplicitFuncType (void)
     Type* T = TypeAlloc (3);    /* func/returns int/terminator */
 
     /* Prepare the function descriptor */
-    F->Flags  = FD_EMPTY | FD_VARIADIC;
+    F->Flags  = FD_EMPTY;
     F->SymTab = &EmptySymTab;
     F->TagTab = &EmptySymTab;
 

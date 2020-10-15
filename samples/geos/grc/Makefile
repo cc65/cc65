@@ -47,6 +47,6 @@ vlir.cvt: vlir.grc vlir0.s vlir1.s vlir2.s
 #	$(CL) -t geos-cbm -o vlir.cvt vlir.grc vlir0.s vlir1.s vlir2.s
 	
 clean:
-	$(RM) test.s test.h
-	$(RM) vlir.s vlir.cvt vlir.c vlir.h
-	$(RM) *.o
+	$(DEL) test.s test.h 2>$(NULLDEV)
+	$(DEL) vlir.s vlir.cvt vlir.c vlir.h 2>$(NULLDEV)
+	$(DEL) *.o 2>$(NULLDEV)

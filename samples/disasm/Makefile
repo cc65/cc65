@@ -53,7 +53,7 @@ image.bin: image.s image.cfg
 	$(CL) -t none -C image.cfg -o image.bin image.s
 
 clean:
-	$(RM) $(ASMS)
-	$(RM) $(DAIS)
-	$(RM) image.bin
+	$(DEL) $(ASMS) 2>$(NULLDEV)
+	$(DEL) $(DAIS) 2>$(NULLDEV)
+	$(DEL) image.bin 2>$(NULLDEV)
 

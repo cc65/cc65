@@ -153,7 +153,8 @@ endif
 # --------------------------------------------------------------------------
 # Lists of subdirectories
 
-DIRLIST = tutorial
+# disasm depends on cpp
+DIRLIST = tutorial geos
 
 # --------------------------------------------------------------------------
 # Lists of executables

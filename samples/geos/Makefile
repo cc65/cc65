@@ -26,17 +26,17 @@ ifdef CC65_HOME
   LD = $(CC65_HOME)/bin/ld65
   SP = $(CC65_HOME)/bin/sp65
 else
-  AS := $(if $(wildcard ../bin/ca65*),../bin/ca65,ca65)
-  CC := $(if $(wildcard ../bin/cc65*),../bin/cc65,cc65)
-  CL := $(if $(wildcard ../bin/cl65*),../bin/cl65,cl65)
-  LD := $(if $(wildcard ../bin/ld65*),../bin/ld65,ld65)
-  SP := $(if $(wildcard ../bin/sp65*),../bin/sp65,sp65)
+  AS := $(if $(wildcard ../../bin/ca65*),../../bin/ca65,ca65)
+  CC := $(if $(wildcard ../../bin/cc65*),../../bin/cc65,cc65)
+  CL := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)
+  LD := $(if $(wildcard ../../bin/ld65*),../../bin/ld65,ld65)
+  SP := $(if $(wildcard ../../bin/sp65*),../../bin/sp65,sp65)
 endif 
 
 # omitted: dialog.c grphstr.c inittab.c menu.c
 
 # TODO: geosconio.cvt rmvprot.cvt
-all: bitmap-demo.cvt filesel.cvt geosver.cvt getid.cvt hello1.cvt hello2.cvt \
+samples: bitmap-demo.cvt filesel.cvt geosver.cvt getid.cvt hello1.cvt hello2.cvt \
 	overlay-demo.cvt vector-demo.cvt yesno.cvt
 
 bitmap.c: logo.pcx

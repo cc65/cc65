@@ -24,11 +24,11 @@ ifdef CC65_HOME
   LD = $(CC65_HOME)/bin/ld65
   DA = $(CC65_HOME)/bin/da65
 else
-  AS := $(if $(wildcard ../../../bin/ca65*),../../../bin/ca65,ca65)
-  CC := $(if $(wildcard ../../../bin/cc65*),../../../bin/cc65,cc65)
-  CL := $(if $(wildcard ../../../bin/cl65*),../../../bin/cl65,cl65)
-  LD := $(if $(wildcard ../../../bin/ld65*),../../../bin/ld65,ld65)
-  DA := $(if $(wildcard ../../../bin/da65*),../../../bin/da65,da65)
+  AS := $(if $(wildcard ../../bin/ca65*),../../bin/ca65,ca65)
+  CC := $(if $(wildcard ../../bin/cc65*),../../bin/cc65,cc65)
+  CL := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)
+  LD := $(if $(wildcard ../../bin/ld65*),../../bin/ld65,ld65)
+  DA := $(if $(wildcard ../../bin/da65*),../../bin/da65,da65)
 endif
 
 CPP = cpp
@@ -39,7 +39,7 @@ DAIS = fixed.dai bank0.dai bank1.dai
 
 .SUFFIXES: .da .dai .s
 
-all: image.bin $(ASMS)
+samples: image.bin $(ASMS)
 
 $(DAIS): fixed.da
 

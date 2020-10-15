@@ -260,17 +260,23 @@ endif
 # Rule to make a CBM disk with all samples. Needs the c1541 program that comes
 # with the VICE emulator.
 
-define D64_WRITE_recipe
+define D64_WRITE_PRG_recipe
 
-$(C1541) -attach $@ -write "$(subst ?,$(SPACE),$(file))" $(notdir $(file)) >$(NULLDEV)
+$(C1541) -attach $@ -write "$(subst ?,$(SPACE),$(file))" $(notdir $(file)),p >$(NULLDEV)
 
-endef # D64_WRITE_recipe
+endef # D64_WRITE_PRG_recipe
+
+define D64_WRITE_SEQ_recipe
+
+$(C1541) -attach $@ -write "$(subst ?,$(SPACE),$(file))" $(notdir $(file)),s >$(NULLDEV)
+
+endef # D64_WRITE_SEQ_recipe
 
 samples.d64: samples
 	@$(C1541) -format samples,AA d64 $@ >$(NULLDEV)
-	$(foreach file,$(EXELIST_$(SYS)),$(D64_WRITE_recipe))
-	$(foreach file,$(OVERLAYLIST),$(D64_WRITE_recipe))
-	$(foreach file,$(EMD) $(MOU) $(TGI),$(D64_WRITE_recipe))
+	$(foreach file,$(EXELIST_$(SYS)),$(D64_WRITE_PRG_recipe))
+	$(foreach file,$(OVERLAYLIST),$(D64_WRITE_PRG_recipe))
+	$(foreach file,$(EMD) $(MOU) $(TGI),$(D64_WRITE_SEQ_recipe))
 
 # --------------------------------------------------------------------------
 # Rule to make an Apple II disk with all samples. Needs the AppleCommander

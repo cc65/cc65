@@ -36,4 +36,4 @@ petscii.prg: petscii.c
 	$(CL) -t $(SYS) -O -o petscii.prg petscii.c
 
 clean:
-	$(DEL) petscii.prg
+	@$(DEL) petscii.prg 2>$(NULLDEV)

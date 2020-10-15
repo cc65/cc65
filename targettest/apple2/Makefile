@@ -65,7 +65,7 @@ dhgrshow: dhgrshow.c
 	$(CL) -Oirs -t apple2enh --start-addr 0x4000 -m dhgrshow.map $^
 
 clean:
-	$(RM) hgr.dsk dhgr.dsk
-	$(RM) hgrshow hgrshow.map	
-	$(RM) hgrtest hgrtest.map
-	$(RM) dhgrshow dhgrshow.map
+	@$(DEL) hgr.dsk dhgr.dsk 2>$(NULLDEV)
+	@$(DEL) hgrshow hgrshow.map 2>$(NULLDEV)
+	@$(DEL) hgrtest hgrtest.map 2>$(NULLDEV)
+	@$(DEL) dhgrshow dhgrshow.map 2>$(NULLDEV)

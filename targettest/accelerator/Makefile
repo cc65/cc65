@@ -55,4 +55,4 @@ turbomaster-test.prg: turbomaster-test.c
 	$(CL) -t c64 turbomaster-test.c -o turbomaster-test.prg
 
 clean:
-	$(RM) *.prg
+	@$(DEL) *.prg 2>$(NULLDEV)

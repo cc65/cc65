@@ -33,4 +33,4 @@ hello: hello.c
 	$(CL) -t atari5200 -o hello hello.c
 	
 clean:
-	$(RM) hello
+	@$(DEL) hello 2>$(NULLDEV)

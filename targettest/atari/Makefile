@@ -50,12 +50,12 @@ sys.xex: sys.c
 	$(CL) -t atari -o sys.xex sys.c
 
 clean:
-	$(RM) charmapping.xex
-	$(RM) defdev.xex
-	$(RM) displaylist.xex
-	$(RM) mem.xex
-	$(RM) multi.xex
-	$(RM) ostype.xex
-	$(RM) scrcode.o
-	$(RM) scrcode.com
-	$(RM) sys.xex
+	@$(DEL) charmapping.xex 2>$(NULLDEV)
+	@$(DEL) defdev.xex 2>$(NULLDEV)
+	@$(DEL) displaylist.xex 2>$(NULLDEV)
+	@$(DEL) mem.xex 2>$(NULLDEV)
+	@$(DEL) multi.xex 2>$(NULLDEV)
+	@$(DEL) ostype.xex 2>$(NULLDEV)
+	@$(DEL) scrcode.o 2>$(NULLDEV)
+	@$(DEL) scrcode.com 2>$(NULLDEV)
+	@$(DEL) sys.xex 2>$(NULLDEV)

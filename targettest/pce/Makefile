@@ -52,7 +52,7 @@ all: conio.pce
 	../../../bin/cl65 -t pce $< -Wl -D__CARTSIZE__=${CARTSIZE} -m $*.map -o $@
 
 clean:
-	$(RM) conio.o conio.???
+	@$(DEL) conio.o conio.??? 2>$(NULLDEV)
 
 test: conio.pce
 	mednafen -force_module pce $<

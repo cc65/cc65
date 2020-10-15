@@ -86,8 +86,8 @@ yesno.cvt: yesnores.grc yesno.c
 
 	
 clean:
-	$(DEL) overlay-demores.h 2>$(NULLDEV)
-	$(DEL) bitmap.c 2>$(NULLDEV)
-	$(DEL) *.cvt 2>$(NULLDEV)
-	$(DEL) *.map 2>$(NULLDEV)
+	@$(DEL) overlay-demores.h 2>$(NULLDEV)
+	@$(DEL) bitmap.c 2>$(NULLDEV)
+	@$(DEL) *.cvt 2>$(NULLDEV)
+	@$(DEL) *.map 2>$(NULLDEV)
 	$(foreach dir,$(DIRLIST),$(SUBDIR_recipe))

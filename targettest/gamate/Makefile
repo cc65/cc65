@@ -49,6 +49,6 @@ testn: nachtm.bin
 	cd ~/Desktop/mame/winmess/ && wine mess.exe gamate -window -skip_gameinfo -cart ~/Desktop/cc65/github/cc65/testcode/lib/gamate/nachtm.bin
 
 clean:
-	$(RM) lcdtest.o audiotest.o ctest.o
-	$(RM) lcdtest.bin audiotest.bin ctest.bin nachtm.bin
-	$(RM) audiotest.lst lcdtest.lst ctest.lst
+	@$(DEL) lcdtest.o audiotest.o ctest.o 2>$(NULLDEV)
+	@$(DEL) lcdtest.bin audiotest.bin ctest.bin nachtm.bin 2>$(NULLDEV)
+	@$(DEL) audiotest.lst lcdtest.lst ctest.lst 2>$(NULLDEV)

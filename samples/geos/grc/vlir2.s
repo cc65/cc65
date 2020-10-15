@@ -5,10 +5,10 @@
 
 ; similar to vlir1.s except the fact that this is chain #2
 
-            .include "../../libsrc/geos-common/const.inc"
-            .include "../../libsrc/geos-cbm/jumptab.inc"
-            .include "../../libsrc/geos-cbm/geossym.inc"
-            .include "../../libsrc/geos-common/geosmac.inc"
+            .include "../../../libsrc/geos-common/const.inc"
+            .include "../../../libsrc/geos-cbm/jumptab.inc"
+            .include "../../../libsrc/geos-cbm/geossym.inc"
+            .include "../../../libsrc/geos-common/geosmac.inc"
 
             .export OVERLAY2_Function1
             .export OVERLAY2_Function2

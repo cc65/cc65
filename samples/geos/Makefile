@@ -33,11 +33,20 @@ else
   SP := $(if $(wildcard ../../bin/sp65*),../../bin/sp65,sp65)
 endif 
 
+DIRLIST = grc
+
+define SUBDIR_recipe
+
+@$(MAKE) -C $(dir) --no-print-directory $@
+
+endef # SUBDIR_recipe
+
 # omitted: dialog.c grphstr.c inittab.c menu.c
 
 # TODO: geosconio.cvt rmvprot.cvt
 samples: bitmap-demo.cvt filesel.cvt geosver.cvt getid.cvt hello1.cvt hello2.cvt \
 	overlay-demo.cvt vector-demo.cvt yesno.cvt
+	$(foreach dir,$(DIRLIST),$(SUBDIR_recipe))
 
 bitmap.c: logo.pcx
 	$(SP) -r logo.pcx -c geos-bitmap -w bitmap.c,ident=bitmap
@@ -77,6 +86,8 @@ yesno.cvt: yesnores.grc yesno.c
 
 	
 clean:
+	$(RM) overlay-demores.h
 	$(RM) bitmap.c
 	$(RM) *.cvt
 	$(RM) *.map
+	$(foreach dir,$(DIRLIST),$(SUBDIR_recipe))

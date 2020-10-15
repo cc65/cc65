@@ -5,10 +5,10 @@
 
     ; include some GEOS defines
 
-            .include "../../libsrc/geos-common/const.inc"
-            .include "../../libsrc/geos-cbm/jumptab.inc"
-            .include "../../libsrc/geos-cbm/geossym.inc"
-            .include "../../libsrc/geos-common/geosmac.inc"
+            .include "../../../libsrc/geos-common/const.inc"
+            .include "../../../libsrc/geos-cbm/jumptab.inc"
+            .include "../../../libsrc/geos-cbm/geossym.inc"
+            .include "../../../libsrc/geos-common/geosmac.inc"
 
     ; export names of functions that will be used in the main program
 

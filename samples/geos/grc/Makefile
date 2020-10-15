@@ -29,16 +29,7 @@ else
   GRC := $(if $(wildcard ../../../bin/grc65*),../../../bin/grc65,grc65)
 endif
 
-DIRLIST = grc
-
-define SUBDIR_recipe
-
-@$(MAKE) -C $(dir) --no-print-directory $@
-
-endef # SUBDIR_recipe
-
 samples: test.s vlir.cvt
-	$(foreach dir,$(DIRLIST),$(SUBDIR_recipe))
 
 test.s: test.grc
 	$(GRC) -s test.s test.grc
@@ -59,4 +50,3 @@ clean:
 	$(RM) test.s test.h
 	$(RM) vlir.s vlir.cvt vlir.c vlir.h
 	$(RM) *.o
-	$(foreach dir,$(DIRLIST),$(SUBDIR_recipe))

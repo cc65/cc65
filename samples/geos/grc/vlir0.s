@@ -5,10 +5,10 @@
 
     ; include some GEOS defines
 
-            .include "../../libsrc/geos-common/const.inc"
-            .include "../../libsrc/geos-cbm/jumptab.inc"
-            .include "../../libsrc/geos-cbm/geossym.inc"
-            .include "../../libsrc/geos-common/geosmac.inc"
+            .include "../../../libsrc/geos-common/const.inc"
+            .include "../../../libsrc/geos-cbm/jumptab.inc"
+            .include "../../../libsrc/geos-cbm/geossym.inc"
+            .include "../../../libsrc/geos-common/geosmac.inc"
 
     ; import load addresses for all VLIR chains
     ; these labels are defined upon linking with ld65

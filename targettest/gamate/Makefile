@@ -39,15 +39,6 @@ nachtm.bin: nachtm.c
 	$(CL) -Os -l nachtm.lst -t gamate -o nachtm.bin nachtm.c
 	gamate-fixcart nachtm.bin
 
-test1: lcdtest.bin
-	cd ~/Desktop/mame/winmess/ && wine mess.exe gamate -window -skip_gameinfo -cart ~/Desktop/cc65/github/cc65/testcode/lib/gamate/lcdtest.bin
-test2: audiotest.bin
-	cd ~/Desktop/mame/winmess/ && wine mess.exe gamate -window -skip_gameinfo -cart ~/Desktop/cc65/github/cc65/testcode/lib/gamate/audiotest.bin
-testc: ctest.bin
-	cd ~/Desktop/mame/winmess/ && wine mess.exe gamate -window -skip_gameinfo -cart ~/Desktop/cc65/github/cc65/testcode/lib/gamate/ctest.bin
-testn: nachtm.bin
-	cd ~/Desktop/mame/winmess/ && wine mess.exe gamate -window -skip_gameinfo -cart ~/Desktop/cc65/github/cc65/testcode/lib/gamate/nachtm.bin
-
 clean:
 	@$(DEL) lcdtest.o audiotest.o ctest.o 2>$(NULLDEV)
 	@$(DEL) lcdtest.bin audiotest.bin ctest.bin nachtm.bin 2>$(NULLDEV)

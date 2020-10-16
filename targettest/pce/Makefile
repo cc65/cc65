@@ -48,11 +48,8 @@ all: conio.pce
 	dd if=$< bs=8K skip=${COUNT} > $@
 	dd if=$< bs=8K count=${COUNT} >> $@
 
-%.bin: %.c ../../../lib/pce.lib
-	../../../bin/cl65 -t pce $< -Wl -D__CARTSIZE__=${CARTSIZE} -m $*.map -o $@
+%.bin: %.c
+	$(CL) -t pce $< -Wl -D__CARTSIZE__=${CARTSIZE} -m $*.map -o $@
 
 clean:
 	@$(DEL) conio.o conio.??? 2>$(NULLDEV)
-
-test: conio.pce
-	mednafen -force_module pce $<

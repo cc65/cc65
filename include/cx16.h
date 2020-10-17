@@ -3,7 +3,7 @@
 /*                                  cx16.h                                   */
 /*                                                                           */
 /*                      CX16 system-specific definitions                     */
-/*                             For prerelease 37                             */
+/*                             For prerelease 38                             */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided "as-is", without any expressed or implied       */
@@ -283,12 +283,14 @@ struct __emul {
     unsigned char       debug;          /* Boolean: debugging enabled */
     unsigned char       vera_action;    /* Boolean: displaying VERA activity */
     unsigned char       keyboard;       /* Boolean: displaying typed keys */
-    unsigned char       echo;           /* How Kernal output should be echoed to host */
-    unsigned char       save_on_exit;   /* Boolean: save SD card when quitting */
+    unsigned char       echo;           /* How to send Kernal output to host */
+    unsigned char       save_on_exit;   /* Boolean: save machine state on exit */
     unsigned char       gif_method;     /* How GIF movie is being recorded */
-    unsigned char       unused[0xD - 0x6];
-    unsigned char       keymap;         /* Keyboard layout number */
-       const char       detect[2];      /* "16" if running on x16emu */
+    unsigned char const unused1[2];
+    unsigned long const cycle_count;    /* Running total of CPU cycles (8 MHz.) */
+    unsigned char const unused2[1];
+    unsigned char const keymap;         /* Keyboard layout number */
+             char const detect[2];      /* "16" if running on x16emu */
 };
 #define EMULATOR        (*(volatile struct __emul *)0x9FB0)
 

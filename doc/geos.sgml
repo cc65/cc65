@@ -722,9 +722,9 @@ disk. Otherwise they will be lost. Operating area is the <tt/curDirHead/.
 This function returns the number of free blocks on the current disk. It is counted using data in
 <tt/curDirHead/ so you must initialize the disk before calling it.
 
-<sect3>ChkDskGEOS
+<sect3>ChkDkGEOS
 <p>
-<tt/char ChkDskGEOS (void)/
+<tt/char ChkDkGEOS (void)/
 <p>
 This functions checks <tt/curDirHead/ for the GEOS Format identifier. It returns either true or false,
 and also sets <tt/isGEOS/ properly. You must initialize the disk before using this.
@@ -987,7 +987,7 @@ a particular file.
 <p>
 In GEOS there can be only one file opened at a time. Upon opening a VLIR file some information
 about it is copied into memory. You can retrieve the records table at <tt/fileTrScTab/ (table of
-128 <tt/struct tr_se/) and from <tt/VLIRInfo/ (<tt/struct VLIR_info/.
+128 <tt/struct tr_se/) and from <tt/VLIRInfo/ (<tt/struct VLIR_info/).
 E.g. the size of whole VLIR file can be retrieved by reading <tt/VLIRInfo.fileSize/.
 
 <sect3>OpenRecordFile

@@ -446,10 +446,10 @@ Here is a description of all the command line options:
 
   Use static storage for local variables instead of storage on the stack.
   Since the stack is emulated in software, this gives shorter and usually
-  faster code, but the code is no longer reentrant. The difference between
-  <tt/-Cl/ and declaring local variables as static yourself is, that
-  initializer code is executed each time, the function is entered. So when
-  using
+  faster code, but the code is no longer reentrant as required for recursion.
+  The difference between <tt/-Cl/ and declaring local variables as static
+  yourself is, that initializer code is executed each time, the function is
+  entered. So when using
 
   <tscreen><verb>
         void f (void)

@@ -2,6 +2,8 @@ ifneq ($(shell echo),)
   CMD_EXE = 1
 endif
 
+PREFIX ?= /usr/local
+
 .PHONY: all mostlyclean clean install zip doc html info
 
 .SUFFIXES:
@@ -46,7 +48,6 @@ clean:
 	$(RM) -r ../html ../info
 
 install:
-	$(if $(PREFIX),,$(error variable "PREFIX" must be set))
 ifeq ($(wildcard ../html),../html)
 	$(INSTALL) -d $(DESTDIR)$(htmldir)
 	$(INSTALL) -m0644 ../html/*.* $(DESTDIR)$(htmldir)

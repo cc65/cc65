@@ -2,6 +2,8 @@ ifneq ($(shell echo),)
   CMD_EXE = 1
 endif
 
+PREFIX ?= /usr/local
+
 CBMS = c128   \
        c16    \
        c64    \
@@ -94,7 +96,6 @@ INSTALL = install
 
 define INSTALL_recipe
 
-$(if $(PREFIX),,$(error variable "PREFIX" must be set))
 $(INSTALL) -d $(DESTDIR)$(datadir)/$(dir)
 $(INSTALL) -m0644 ../$(dir)/*.* $(DESTDIR)$(datadir)/$(dir)
 

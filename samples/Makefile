@@ -4,6 +4,8 @@
 # This Makefile requires GNU make
 #
 
+PREFIX ?= /usr/local
+
 # Run 'make SYS=<target>'; or, set a SYS env.
 # var. to build for another target system.
 SYS ?= c64
@@ -332,7 +334,6 @@ INSTALL = install
 samplesdir = $(PREFIX)/share/cc65/samples
 
 install:
-	$(if $(PREFIX),,$(error variable "PREFIX" must be set))
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)/geos
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)/tutorial

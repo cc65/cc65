@@ -2,6 +2,8 @@ ifneq ($(shell echo),)
   CMD_EXE = 1
 endif
 
+PREFIX ?= /usr/local
+
 PROGS = ar65     \
         ca65     \
         cc65     \
@@ -105,7 +107,6 @@ $(RM) /usr/local/bin/$(prog)
 endef # UNAVAIL_recipe
 
 install:
-	$(if $(PREFIX),,$(error variable "PREFIX" must be set))
 	$(INSTALL) -d $(DESTDIR)$(bindir)
 	$(INSTALL) ../bin/* $(DESTDIR)$(bindir)
 

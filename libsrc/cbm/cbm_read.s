@@ -69,15 +69,11 @@ _cbm_read:
 
 ; Loop
 
-@L1:    jsr     READST
-        cmp     #0              ; Status ok?
-        bne     @L4
-
-        jsr     BASIN           ; Read next char from file
+@L1:    jsr     BASIN           ; Read next char from file
         sta     tmp1            ; Save it for later
 
         jsr     READST
-        and     #$BF
+        cmp     #0              ; Status ok?
         bne     @L4
 
         lda     tmp1

@@ -84,8 +84,9 @@ extern struct _timezone {
 
 
 #if defined(__ATARI__)
-/* The clock depends on the video standard, so read it at runtime */
-unsigned _clocks_per_sec (void);
+   /* The clock depends on the video standard, so read it at runtime
+   */
+   unsigned _clocks_per_sec (void);   
 #  define CLK_TCK               _clocks_per_sec()
 #  define CLOCKS_PER_SEC        _clocks_per_sec()
 #elif defined(__ATARI5200__)
@@ -96,7 +97,8 @@ unsigned _clocks_per_sec (void);
 #  define CLOCKS_PER_SEC        100     /* ANSI */
 #elif defined(__CBM__)
 #  if defined(__CBM510__) || defined(__CBM610__)
-/* The 510/610 gets its clock from the AC current */
+     /* The 510/610 gets its clock from the AC current
+	 */
 #    define CLK_TCK             50      /* POSIX */
 #    define CLOCKS_PER_SEC      50      /* ANSI */
 #  else
@@ -116,12 +118,23 @@ unsigned _clocks_per_sec (void);
 #  define CLK_TCK               1       /* POSIX */
 #  define CLOCKS_PER_SEC        1       /* ANSI */
 #elif defined(__LYNX__)
-/* The clock-rate depends on the video scan-rate;
-** so, read it at run-time.
-*/
-extern clock_t _clk_tck (void);
+   /* The clock-rate depends on the video scan-rate;
+   ** so, read it at run-time.
+   */
+   extern clock_t _clk_tck (void);
+   
 #  define CLK_TCK               _clk_tck()
 #  define CLOCKS_PER_SEC        _clk_tck()
+#else
+   /* The clock-rate, if undefined, is provided in a separate user defined funtion.
+   */
+   extern clock_t _clk_tck (void);
+#  if !defined (CLK_TCK)
+#    define CLK_TCK             _clk_tck()
+#  endif
+#  if !defined (CLOCKS_PER_SEC)
+#    define CLOCKS_PER_SEC      _clk_tck()
+#  endif
 #endif
 #define CLOCK_REALTIME          0
 

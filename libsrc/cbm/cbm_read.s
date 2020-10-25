@@ -73,8 +73,10 @@ _cbm_read:
         sta     tmp1            ; Save it for later
 
         jsr     READST
+        cmp     #$40
+        beq     @L4             ; Done
         cmp     #0              ; Status ok?
-        bne     @L4
+        bne     @E1
 
         lda     tmp1
         ldy     #0
@@ -106,4 +108,3 @@ _cbm_read:
         lda     #$FF
         tax
         rts                     ; return -1
-

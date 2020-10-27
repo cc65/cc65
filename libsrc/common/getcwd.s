@@ -23,7 +23,7 @@
         stx     ptr2+1
         tax
         inx
-        stx     ptr2
+        stx     ptr2            ; Save size with each byte incremented separately
 
         jsr     popptr1         ; Get buf to ptr1
 

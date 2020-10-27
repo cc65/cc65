@@ -43,7 +43,7 @@ _cbm_write:
         stx     ptr1+1
         tax
         inx
-        stx     ptr1            ; Save size with each byte incremented
+        stx     ptr1            ; Save size with both bytes incremented separately
 
         jsr     popax
         sta     ptr2

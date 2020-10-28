@@ -227,7 +227,7 @@ extern unsigned char __fastcall__ _getcolor (unsigned char color_reg);
 /* Other screen functions                                                    */
 /*****************************************************************************/
 
-extern void waitvsync (void);                            /* Wait for start of next frame */
+extern void waitvsync (void);                            /* wait for start of next frame */
 extern int  __fastcall__ _graphics (unsigned char mode); /* mode value same as in BASIC */
 extern void __fastcall__ _scroll (signed char numlines);
                                           /* numlines > 0  scrolls up */

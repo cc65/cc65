@@ -68,7 +68,8 @@ void test_mul (void)
 #endif
 
     /* The unsigned chars get promoted to int, so this is -511.
-    ** We should also be able to observe that the generated code uses mul, not umul.
+    ** We should also be able to observe that, due to optimizations from #1315, the generated code
+    ** uses umul, not mul.
     */
     if (two_fifty_five * two_fifty_five != -511) {
         fprintf (stderr, "Expected two_fifty_five * two_fifty_five == -511\n");
@@ -89,7 +90,9 @@ void test_div (void)
     const u8 seventeen = 17;
     const u8 three = 3;
 
-    /* We should also be able to observe that the generated code uses div, not udiv. */
+    /* We should also be able to observe that, due to optimizations from #1315, the generated code
+    ** uses udiv, not div.
+    */
     if (seventeen / three != 5) {
         fprintf (stderr, "Expected seventeen / three == 5, got: %d\n", seventeen / three);
         failures++;
@@ -105,7 +108,9 @@ void test_shr (void)
     const unsigned int forty_two = 42;
     const unsigned int two = 2;
 
-    /* We should also be able to observe that the generated code uses asr, not shr. */
+    /* We should also be able to observe that, due to optimizations from #1315, the generated code
+    ** uses shr, not asr.
+    */
     if (forty_two >> two != 10) {
         fprintf (stderr, "Expected forty_two / two == 10, got: %d\n", forty_two >> two);
         failures++;

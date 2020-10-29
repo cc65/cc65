@@ -5,7 +5,7 @@
 
 ; struct filehandle* Get1stDirEntry (void);
 
-            .import __oserror
+            .import __oserror, return0
             .export _Get1stDirEntry
 
             .include "diskdrv.inc"
@@ -14,6 +14,10 @@
 _Get1stDirEntry:
         jsr Get1stDirEntry
         stx __oserror
-        lda r5L
+        txa
+        beq L0                  ; error?
+        jmp return0             ; return NULL
+
+L0:     lda r5L
         ldx r5H
         rts

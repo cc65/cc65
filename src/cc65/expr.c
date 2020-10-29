@@ -251,6 +251,42 @@ static unsigned typeadjust (ExprDesc* lhs, ExprDesc* rhs, int NoPush)
 
 
 
+static void LimitExprValue (ExprDesc* Expr)
+/* Limit the constant value of the expression to the range of its type */
+{
+    switch (GetUnderlyingTypeCode (Expr->Type)) {
+        case T_INT:
+        case T_SHORT:
+            Expr->IVal = (int16_t)Expr->IVal;
+            break;
+
+        case T_UINT:
+        case T_USHORT:
+        case T_PTR:
+        case T_ARRAY:
+            Expr->IVal = (uint16_t)Expr->IVal;
+            break;
+
+        case T_LONG:
+        case T_ULONG:
+            /* No need to do anything */
+            break;
+
+        case T_SCHAR:
+            Expr->IVal = (int8_t)Expr->IVal;
+            break;
+
+        case T_UCHAR:
+            Expr->IVal = (uint8_t)Expr->IVal;
+            break;
+
+        default:
+            Internal ("hie_internal: constant result type %s\n", GetFullTypeName (Expr->Type));
+    }
+}
+
+
+
 static const GenDesc* FindGen (token_t Tok, const GenDesc* Table)
 /* Find a token in a generator table */
 {
@@ -2159,15 +2195,19 @@ static void UnaryOp (ExprDesc* Expr)
         ED_MakeConstAbsInt (Expr, 1);
     }
 
-    /* Check for a constant expression */
+    /* Check for a constant numeric expression */
     if (ED_IsConstAbs (Expr)) {
-        /* Value is constant */
+        /* Value is numeric */
         switch (Tok) {
             case TOK_MINUS: Expr->IVal = -Expr->IVal;   break;
             case TOK_PLUS:                              break;
             case TOK_COMP:  Expr->IVal = ~Expr->IVal;   break;
             default:        Internal ("Unexpected token: %d", Tok);
         }
+
+        /* Limit the calculated value to the range of its type */
+        LimitExprValue (Expr);
+
     } else {
         /* Value is not constant */
         LoadExpr (CF_NONE, Expr);
@@ -2218,7 +2258,7 @@ void hie10 (ExprDesc* Expr)
             NextToken ();
             BoolExpr (hie10, Expr);
             if (ED_IsConstAbs (Expr)) {
-                /* Constant expression */
+                /* Constant numeric expression */
                 Expr->IVal = !Expr->IVal;
             } else if (ED_IsAddrExpr (Expr)) {
                 /* Address != NULL, so !Address == 0 */
@@ -2508,6 +2548,9 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
                         Internal ("hie_internal: got token 0x%X\n", Tok);
                 }
             }
+
+            /* Limit the calculated value to the range of its type */
+            LimitExprValue (Expr);
 
         } else if (lconst && (Gen->Flags & GEN_COMM) && !rconst) {
             /* If the LHS constant is an int that fits into an unsigned char, change the
@@ -3042,6 +3085,9 @@ static void parseadd (ExprDesc* Expr)
                 /* Integer addition */
                 Expr->IVal += Expr2.IVal;
                 typeadjust (Expr, &Expr2, 1);
+
+                /* Limit the calculated value to the range of its type */
+                LimitExprValue (Expr);
             } else {
                 /* OOPS */
                 Error ("Invalid operands for binary operator '+'");
@@ -3225,7 +3271,7 @@ static void parseadd (ExprDesc* Expr)
         ED_FinalizeRValLoad (Expr);
     }
 
-    /* Condition codes not set */
+    /* Condition code not set */
     ED_MarkAsUntested (Expr);
 }
 
@@ -3309,13 +3355,13 @@ static void parsesub (ExprDesc* Expr)
                 /* Integer subtraction */
                 typeadjust (Expr, &Expr2, 1);
                 Expr->IVal -= Expr2.IVal;
+
+                /* Limit the calculated value to the range of its type */
+                LimitExprValue (Expr);
             } else {
                 /* OOPS */
                 Error ("Invalid operands for binary operator '-'");
             }
-
-            /* Result is constant, condition codes not set */
-            ED_MarkAsUntested (Expr);
 
         } else {
 
@@ -3358,8 +3404,6 @@ static void parsesub (ExprDesc* Expr)
 
             /* Result is an rvalue in the primary register */
             ED_FinalizeRValLoad (Expr);
-            ED_MarkAsUntested (Expr);
-
         }
 
     } else {
@@ -3412,8 +3456,10 @@ static void parsesub (ExprDesc* Expr)
 
         /* Result is an rvalue in the primary register */
         ED_FinalizeRValLoad (Expr);
-        ED_MarkAsUntested (Expr);
     }
+
+    /* Condition code not set */
+    ED_MarkAsUntested (Expr);
 }
 
 

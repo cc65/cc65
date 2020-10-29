@@ -1,7 +1,7 @@
 ;
-; Maciej 'YTM/Alliance' Witkowiak
+; 1999-10-26, Maciej 'YTM/Alliance' Witkowiak
+; 2020-10-29, Greg King
 ;
-; 26.10.99
 
 ; struct filehandle* Get1stDirEntry (void);
 
@@ -15,9 +15,9 @@ _Get1stDirEntry:
         jsr Get1stDirEntry
         stx __oserror
         txa
-        beq L0                  ; error?
-        jmp return0             ; return NULL
-
-L0:     lda r5L
+        bne L1                  ; jump if disk error
+        lda r5L
         ldx r5H
         rts
+
+L1:     jmp return0             ; return NULL if not valid entry

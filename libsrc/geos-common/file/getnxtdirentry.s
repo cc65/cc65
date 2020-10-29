@@ -1,7 +1,7 @@
 ;
-; Maciej 'YTM/Alliance' Witkowiak
+; 1999-10-26, Maciej 'YTM/Alliance' Witkowiak
+; 2020-10-29, Greg King
 ;
-; 26.10.99
 
 ; struct filehandle* GetNxtDirEntry (void);
 
@@ -15,11 +15,11 @@ _GetNxtDirEntry:
         jsr GetNxtDirEntry
         stx __oserror
         txa
-        beq L0                  ; error?
+        bne L1                  ; jump if disk error
         tya
-        beq L0                  ; end of dir?
-        jmp return0             ; return NULL
-
-L0:     lda r5L
+        bne L1                  ; jump when no more entries
+        lda r5L
         ldx r5H
         rts
+
+L1:     jmp return0             ; return NULL if not valid entry

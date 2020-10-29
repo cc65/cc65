@@ -858,20 +858,21 @@ The functions described here are common for SEQ and VLIR structures.
 <p>
 <tt/struct filehandle *GetNxtDirEntry (void)/
 <p>
-These two functions are best suited for scanning the whole directory for particular files. Note that
-the returned filehandles describe all file slots in the directory - even those with deleted files.
-The return value can be obtained by casting both sides to <tt/unsigned/ - as in the <tt/SetNextFree/
-function or read directly after a call to those two functions from <tt/r5/. The current sector number
-is in <tt/r1/ and the sector data itself is in <tt/diskBlkBuf/.
+Those two functions are best suited for scanning the whole directory for particular files. Note that
+the returned filehandles describe all file slots in the directory -- even those with deleted files.
+The return value is <tt/NULL/ if there are no more slots, or if there was a disk error.  The
+<tt/_oserror/ variable is non-zero if it was a disk error (see <tt>geos/gdisk.h</tt>).  The current
+directory track and sector numbers are in <tt/r1L/ and <tt/r1H/.  The sector data itself is in
+<tt/diskBlkBuf/.
 
 <sect3>FindFile
 <p>
 <tt/char FindFile (char *fName)/
 <p>
-This function scans the whole directory for the given filename. It returns either 0 (success) or 5
-(FILE_NOT_FOUND, defined in <tt/gdisk.h/) or any other fatal disk read error. After a successful
-<tt/FindFile/ you will have <tt/struct filehandle/ at <tt/dirEntryBuf/ filled with the file's data and
-other registers set as described in <tt/GetNxtDirEntry/.
+This function scans the whole directory for the given filename. It returns either 0 (success), 5
+(FILE_NOT_FOUND, defined in <tt>geos/gdisk.h</tt>), or any other fatal disk read error. After a successful
+<tt/FindFile()/, you will have <tt/struct filehandle/ at <tt/dirEntryBuf/ filled with the file's data, and
+other registers set as described in <tt/GetNxtDirEntry()/.
 
 <sect3>FindFTypes
 <p>

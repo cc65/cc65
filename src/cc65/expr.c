@@ -219,6 +219,13 @@ static unsigned typeadjust (ExprDesc* lhs, ExprDesc* rhs, int NoPush)
 
     /* Generate type adjustment code if needed */
     ltype = TypeOf (lhst);
+    if (ED_IsConstAbsInt (lhs) && ltype == CF_INT && lhs->IVal >= 0 && lhs->IVal < 256) {
+        /* If the lhs is a int constant that fits in an unsigned char, use unsigned char.
+        ** g_typeadjust will either promote this to int or unsigned int as appropriate
+        ** based on the other operand.  See comment in hie_internal.
+        */
+        ltype = CF_CHAR | CF_UNSIGNED;
+    }
     if (ED_IsLocNone (lhs)) {
         ltype |= CF_CONST;
     }
@@ -227,6 +234,9 @@ static unsigned typeadjust (ExprDesc* lhs, ExprDesc* rhs, int NoPush)
         ltype |= CF_PRIMARY;
     }
     rtype = TypeOf (rhst);
+    if (ED_IsConstAbsInt (rhs) && rtype == CF_INT && rhs->IVal >= 0 && rhs->IVal < 256) {
+        rtype = CF_CHAR | CF_UNSIGNED;
+    }
     if (ED_IsLocNone (rhs)) {
         rtype |= CF_CONST;
     }
@@ -2502,6 +2512,15 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
             }
 
         } else if (lconst && (Gen->Flags & GEN_COMM) && !rconst) {
+            /* If the LHS constant is an int that fits into an unsigned char, change the
+            ** codegen type to unsigned char.  If the RHS is also an unsigned char, then
+            ** g_typeadjust will return unsigned int (instead of int, which would be
+            ** returned without this modification).  This allows more efficient operations,
+            ** but does not affect correctness for the same reasons explained in g_typeadjust.
+            */
+            if (ltype == CF_INT && Expr->IVal >= 0 && Expr->IVal < 256) {
+                ltype = CF_CHAR | CF_UNSIGNED;
+            }
 
             /* The left side is constant, the right side is not, and the
             ** operator allows swapping the operands. We haven't pushed the
@@ -2536,6 +2555,10 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
             unsigned rtype = TypeOf (Expr2.Type);
             type = 0;
             if (rconst) {
+                /* As above, but for the RHS. */
+                if (rtype == CF_INT && Expr2.IVal >= 0 && Expr2.IVal < 256) {
+                    rtype = CF_CHAR | CF_UNSIGNED;
+                }
                 /* Second value is constant - check for div */
                 type |= CF_CONST;
                 rtype |= CF_CONST;

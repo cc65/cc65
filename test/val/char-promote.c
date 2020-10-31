@@ -54,6 +54,8 @@ void test_sub (void)
 void test_mul (void)
 {
     const u8 two_fifty_five = 255;
+    const u8 sixteen = 16;
+    int x;
 
     if (255U * 255U != 65025U) {
         fprintf (stderr, "Expected 255U * 255U == 65025U\n");
@@ -83,12 +85,20 @@ void test_mul (void)
         failures++;
     }
 #endif
+
+    /* This should compile to a shift. */
+    x = sixteen * 4;
+    if (x != 64) {
+        fprintf (stderr, "Expected sixteen * 4 == 64, got: %d\n", x);
+        failures++;
+    }
 }
 
 void test_div (void)
 {
     const u8 seventeen = 17;
     const u8 three = 3;
+    int x;
 
     /* We should also be able to observe that, due to optimizations from #1315, the generated code
     ** uses udiv, not div.
@@ -101,22 +111,55 @@ void test_div (void)
         fprintf (stderr, "Expected (u8) 17 / (u8) 3 == 5, got: %d\n", (u8) 17 / (u8) 3);
         failures++;
     }
+
+    /* Ideally, this would compile to a logical shift, but that does not happen currently. */
+    x = seventeen / 4;
+    if (x != 4) {
+        fprintf (stderr, "Expected seventeen / 4 == 4, got: %d\n", x);
+        failures++;
+    }
+}
+
+void test_mod (void)
+{
+    const u8 seventeen = 17;
+    /* Ideally, this would compile to a bitwise and, but that does not happen currently. */
+    int x = seventeen % 4;
+    if (x != 1) {
+        fprintf (stderr, "Expected seventeen %% 4 == 1, got: %d\n", x);
+        failures++;
+    }
 }
 
 void test_shr (void)
 {
     const unsigned int forty_two = 42;
     const unsigned int two = 2;
+    int x;
 
     /* We should also be able to observe that, due to optimizations from #1315, the generated code
     ** uses shr, not asr.
     */
     if (forty_two >> two != 10) {
-        fprintf (stderr, "Expected forty_two / two == 10, got: %d\n", forty_two >> two);
+        fprintf (stderr, "Expected forty_two >> two == 10, got: %d\n", forty_two >> two);
         failures++;
     }
     if ((u8) 42 >> (u8) 2 != 10) {
         fprintf (stderr, "Expected (u8) 42 >> (u8) 2 == 10, got: %d\n", (u8) 42 >> (u8) 3);
+        failures++;
+    }
+
+    /* Ideally, this would compile to a logical shift, but that does not happen currently. */
+    x = forty_two >> 2;
+    if (x != 10) {
+        fprintf (stderr, "Expected forty_two >> 2 == 10, got: %d\n", x);
+        failures++;
+    }
+
+    /* Ideally, this would compile to a logical shift, but that does not happen currently. */
+    x = 42 >> two;
+    if (x != 10) {
+        fprintf (stderr, "Expected 42 >> two == 10, got: %d\n", x);
         failures++;
     }
 }
@@ -126,6 +169,7 @@ int main (void)
     test_sub ();
     test_mul ();
     test_div ();
+    test_mod ();
     test_shr ();
     printf ("failures: %u\n", failures);
     return failures;

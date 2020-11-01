@@ -83,9 +83,9 @@
 
 ; Decrement count
 
-@L2:    inc     ptr2
+@L2:    dec     ptr2
         bne     @L0
-        inc     ptr2+1
+        dec     ptr2+1
         bne     @L0
 
 ; Wrote all chars or disk full. Close the output channel

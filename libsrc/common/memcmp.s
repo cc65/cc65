@@ -13,11 +13,11 @@ _memcmp:
 ; Calculate (-count-1) and store it into ptr3. This is some overhead here but
 ; saves time in the compare loop
 
-        eor     #$FF
-        sta     ptr3
-        txa
-        eor     #$FF
-        sta     ptr3+1
+        inx
+        stx     ptr3+1
+        tax
+        inx
+        stx     ptr3            ; Save count with each byte incremented separately
 
 ; Get the pointer parameters
 
@@ -33,7 +33,7 @@ _memcmp:
 
 ; Head of compare loop: Test for the end condition
 
-Loop:   inx                     ; Bump low byte of (-count-1)
+Loop:   dex                     ; Bump low byte of (-count-1)
         beq     BumpHiCnt       ; Jump on overflow
 
 ; Do the compare
@@ -53,7 +53,7 @@ Comp:   lda     (ptr1),y
 ; Entry on low counter byte overflow
 
 BumpHiCnt:
-        inc     ptr3+1          ; Bump high byte of (-count-1)
+        dec     ptr3+1          ; Bump high byte of (-count-1)
         bne     Comp            ; Jump if not done
         jmp     return0         ; Count is zero, areas are identical
 
@@ -67,4 +67,3 @@ NotEqual:
 Greater:
         ldx     #$01            ; Make result positive
         rts
-

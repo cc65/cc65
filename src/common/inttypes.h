@@ -64,9 +64,11 @@ typedef size_t uintmax_t;
 
 #define INT8_MIN (-INT8_MAX - 1)
 #define INT16_MIN (-INT16_MAX - 1)
+#define INT32_MIN (-INT32_MAX - 1)
 
 #define UINT8_MAX (0xFF)
 #define UINT16_MAX (0xFFFF)
+#define UINT32_MAX (0xFFFFFFFF)
 
 #endif
 

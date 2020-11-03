@@ -51,11 +51,9 @@ LINEDIST        =       $20             ; Offset in video RAM between two lines
         sta     load
         stx     load+1
 
-        ldx     #<load_size
-        inx
+        ldx     #(<load_size) + 1
         stx     count
-        ldx     #>load_size
-        inx
+        ldx     #(>load_size) + 1
         stx     count+1                 ; save size with each byte incremented separately
 
 L1:     dec     count                   ; pre-count one's-complement upwards

@@ -34,8 +34,8 @@ _strncasecmp:
 
 ; Start of compare loop. Check the counter.
 
-Loop:   dec     ptr3
-        beq     IncHi           ; increment high byte
+Loop:   dec     ptr3            ; decrement high byte
+        beq     IncHi
 
 ; Compare a byte from the strings
 

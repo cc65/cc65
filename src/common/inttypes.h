@@ -51,6 +51,7 @@
 /* Assume that ptrdiff_t and size_t are wide enough to hold pointers.
 ** Assume that they are the widest type.
 */
+#include <limits.h>
 #include <stddef.h>
 
 typedef ptrdiff_t intptr_t;
@@ -69,6 +70,50 @@ typedef size_t uintmax_t;
 #define UINT8_MAX (0xFF)
 #define UINT16_MAX (0xFFFF)
 #define UINT32_MAX (0xFFFFFFFF)
+
+#if UCHAR_MAX == UINT8_MAX
+typedef unsigned char uint8_t;
+#else
+#error "No suitable type for uint8_t found."
+#endif
+
+#if SCHAR_MIN == INT8_MIN && SCHAR_MAX == INT8_MAX
+typedef signed char int8_t;
+#else
+#error "No suitable type for int8_t found."
+#endif
+
+#if UINT_MAX == UINT16_MAX
+typedef unsigned int uint16_t;
+#elif USHRT_MAX == UINT16_MAX
+typedef unsigned short uint16_t;
+#else
+#error "No suitable type for uint16_t found."
+#endif
+
+#if INT_MIN == INT16_MIN && INT_MAX == INT16_MAX
+typedef int int16_t;
+#elif SHRT_MIN == INT16_MIN && SHRT_MAX == INT16_MAX
+typedef short int16_t;
+#else
+#error "No suitable type for int16_t found."
+#endif
+
+#if UINT_MAX == UINT32_MAX
+typedef unsigned int uint32_t;
+#elif ULONG_MAX == UINT32_MAX
+typedef unsigned long uint32_t;
+#else
+#error "No suitable type for uint32_t found."
+#endif
+
+#if INT_MIN == INT32_MIN && INT_MAX == INT32_MAX
+typedef int int32_t;
+#elif LONG_MIN == INT32_MIN && LONG_MAX == INT32_MAX
+typedef long int32_t;
+#else
+#error "No suitable type for int32_t found."
+#endif
 
 #endif
 

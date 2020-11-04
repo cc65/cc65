@@ -30,14 +30,14 @@ else
   LD := $(if $(wildcard ../../../bin/ld65*),../../../bin/ld65,ld65)
 endif
 
-all: bug-1306.prg petscii.prg
+all: read.prg petscii.prg
 
-bug-1306.prg: bug-1306.c
-	$(CL) -t $(SYS) -O -o bug-1306.prg bug-1306.c
+read.prg: read.c
+	$(CL) -t $(SYS) -O -o read.prg read.c
 
 petscii.prg: petscii.c
 	$(CL) -t $(SYS) -O -o petscii.prg petscii.c
 
 clean:
-	@$(DEL) bug-1306.prg 2>$(NULLDEV)
+	@$(DEL) read.prg 2>$(NULLDEV)
 	@$(DEL) petscii.prg 2>$(NULLDEV)

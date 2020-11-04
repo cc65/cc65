@@ -8,7 +8,7 @@
         .include        "cbm.inc"
 
         .export         _cbm_read
-        .export         cbm_read_ended_files = ended_files
+        .export         cbm_read_eofs = eofs
         .importzp       ptr1, ptr2, ptr3, tmp1
         .import         popax, popa
         .import         __oserror
@@ -17,16 +17,16 @@ MAX_LFNS        =   10          ; Maximum number of logical file numbers open at
 
         .data
 
-ended_files:    .res MAX_LFNS
+eofs:   .res MAX_LFNS
 
         .code
 
 _cbm_read:
-        eor     #$FF
-        sta     ptr1
-        txa
-        eor     #$FF
-        sta     ptr1+1          ; Save -size-1
+        inx
+        stx     ptr1+1
+        tax
+        inx
+        stx     ptr1            ; Save size with each byte incremented separately
 
         jsr     popax
         sta     ptr2
@@ -44,13 +44,13 @@ _cbm_read:
         bcs     @E1             ; Branch on error
 
 ; Check if file has been read completely already.
+
         ldx     #MAX_LFNS - 1
-@L5:    cmp ended_files,x
+@L5:    cmp eofs,x
         beq     @L4
         dex
         bpl     @L5
-
-        bmi     @L3             ; (jmp)
+        bmi     @L9             ; (jmp)
 
 ; Loop
 
@@ -66,15 +66,15 @@ _cbm_read:
         bne     @L3
         inc     ptr3+1          ; ++bytesread;
 
-        jsr     READST
+@L3:    jsr     READST
         cmp     #$40
         beq     @L6             ; Done
         cmp     #0              ; Status ok?
         bne     @E1
 
-@L3:    inc     ptr1
+@L9:    dec     ptr1
         bne     @L1
-        inc     ptr1+1
+        dec     ptr1+1
         bne     @L1
 
 @L4:    jsr     CLRCH
@@ -84,9 +84,10 @@ _cbm_read:
 
         rts
 
-; EOF reached, add LFN to list.
+; EOF reached, add LFN to list of completed files.
+
 @L6:    ldx     #MAX_LFNS - 1
-@L7:    lda     ended_files,x
+@L7:    lda     eofs,x
         beq     @L8
         dex
         bpl     @L7
@@ -99,5 +100,5 @@ _cbm_read:
         rts                     ; return -1
 
 @L8:    lda     $B8             ; LFN
-        sta     ended_files,x
+        sta     eofs,x
         bne     @L4             ; (jmp)

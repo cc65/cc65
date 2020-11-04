@@ -6,8 +6,8 @@
 void
 main ()
 {
-    char * data = malloc (1024);
-    unsigned len;
+    char *  data = malloc (1024);
+    int     len;
 
     cbm_open (8, 8, 8, "read.c");
 

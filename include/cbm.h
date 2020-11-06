@@ -274,6 +274,7 @@ int __fastcall__ cbm_read (unsigned char lfn, void* buffer, unsigned int size);
 ** Returns the number of actually-read bytes, 0 if there are no bytes left.
 ** -1 in case of an error; then, _oserror contains an error-code (see table
 ** above).  (Remember:  0 means end-of-file; -1 means error.)
+** Trying to read from an empty file will return 1 first, then 0.
 */
 
 int __fastcall__ cbm_write (unsigned char lfn, const void* buffer,

@@ -186,6 +186,7 @@ void g_preamble (void)
     switch (CPU) {
         case CPU_6502:      AddTextLine ("\t.setcpu\t\t\"6502\"");      break;
         case CPU_6502X:     AddTextLine ("\t.setcpu\t\t\"6502X\"");     break;
+        case CPU_6502DTV:   AddTextLine ("\t.setcpu\t\t\"6502DTV\"");   break;
         case CPU_65SC02:    AddTextLine ("\t.setcpu\t\t\"65SC02\"");    break;
         case CPU_65C02:     AddTextLine ("\t.setcpu\t\t\"65C02\"");     break;
         case CPU_65816:     AddTextLine ("\t.setcpu\t\t\"65816\"");     break;
@@ -2474,7 +2475,7 @@ void g_branch (unsigned Label)
 ** the label cannot be farther away from the branch than -128/+127 bytes.
 */
 {
-    if ((CPUIsets[CPU] & CPU_ISET_65SC02) != 0) {
+    if ((CPUIsets[CPU] & (CPU_ISET_65SC02 | CPU_ISET_6502DTV)) != 0) {
         AddCodeLine ("bra %s", LocalLabelName (Label));
     } else {
         g_jump (Label);

@@ -463,7 +463,8 @@ static void OptCPU (const char* Opt, const char* Arg)
     /* Find the CPU from the given name */
     CPU = FindCPU (Arg);
     if (CPU != CPU_6502 && CPU != CPU_6502X && CPU != CPU_65SC02 &&
-        CPU != CPU_65C02 && CPU != CPU_65816 && CPU != CPU_HUC6280) {
+        CPU != CPU_65C02 && CPU != CPU_65816 && CPU != CPU_HUC6280 &&
+        CPU != CPU_6502DTV) {
         AbEnd ("Invalid argument for %s: '%s'", Opt, Arg);
     }
 }

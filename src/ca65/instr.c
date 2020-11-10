@@ -303,6 +303,97 @@ static const struct {
     }
 };
 
+/* Instruction table for the 6502 with illegal instructions (X) and DTV 
+** extra opcodes (DTV). Some illegal instructions (X, -DTV?) might be not 
+** supported by DTV. They should be tested on the DTV hardware. 
+*/
+static const struct {
+    unsigned Count;
+    InsDesc  Ins[78];
+} InsTab6502DTV = {
+    sizeof (InsTab6502DTV.Ins) / sizeof (InsTab6502DTV.Ins[0]),
+    {
+        { "ADC",  0x080A26C, 0x60, 0, PutAll },
+        { "ALR",  0x0800000, 0x4B, 0, PutAll },         /* X */
+        { "ANC",  0x0800000, 0x0B, 0, PutAll },         /* X -DTV? */
+        { "AND",  0x080A26C, 0x20, 0, PutAll },
+        { "ANE",  0x0800000, 0x8B, 0, PutAll },         /* X */
+        { "ARR",  0x0800000, 0x6B, 0, PutAll },         /* X */
+        { "ASL",  0x000006e, 0x02, 1, PutAll },
+        { "AXS",  0x0800000, 0xCB, 0, PutAll },         /* X, -DTV? */
+        { "BCC",  0x0020000, 0x90, 0, PutPCRel8 },
+        { "BCS",  0x0020000, 0xb0, 0, PutPCRel8 },
+        { "BEQ",  0x0020000, 0xf0, 0, PutPCRel8 },
+        { "BIT",  0x000000C, 0x00, 2, PutAll },
+        { "BMI",  0x0020000, 0x30, 0, PutPCRel8 },
+        { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
+        { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
+        { "BRA",  0x0020000, 0x12, 0, PutPCRel8 },      /* DTV */
+        { "BRK",  0x0000001, 0x00, 0, PutAll },
+        { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
+        { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
+        { "CLC",  0x0000001, 0x18, 0, PutAll },
+        { "CLD",  0x0000001, 0xd8, 0, PutAll },
+        { "CLI",  0x0000001, 0x58, 0, PutAll },
+        { "CLV",  0x0000001, 0xb8, 0, PutAll },
+        { "CMP",  0x080A26C, 0xc0, 0, PutAll },
+        { "CPX",  0x080000C, 0xe0, 1, PutAll },
+        { "CPY",  0x080000C, 0xc0, 1, PutAll },
+        { "DCP",  0x000A26C, 0xC3, 0, PutAll },         /* X */
+        { "DEC",  0x000006C, 0x00, 3, PutAll },
+        { "DEX",  0x0000001, 0xca, 0, PutAll },
+        { "DEY",  0x0000001, 0x88, 0, PutAll },
+        { "EOR",  0x080A26C, 0x40, 0, PutAll },
+        { "INC",  0x000006c, 0x00, 4, PutAll },
+        { "INX",  0x0000001, 0xe8, 0, PutAll },
+        { "INY",  0x0000001, 0xc8, 0, PutAll },
+        { "ISC",  0x000A26C, 0xE3, 0, PutAll },         /* X */
+        { "JAM",  0x0000001, 0x02, 0, PutAll },         /* X, -DTV? */
+        { "JMP",  0x0000808, 0x4c, 6, PutJMP },
+        { "JSR",  0x0000008, 0x20, 7, PutAll },
+        { "LAS",  0x0000200, 0xBB, 0, PutAll },         /* X, -DTV? */
+        { "LAX",  0x080A30C, 0xA3, 11, PutAll },        /* X */
+        { "LDA",  0x080A26C, 0xa0, 0, PutAll },
+        { "LDX",  0x080030C, 0xa2, 1, PutAll },
+        { "LDY",  0x080006C, 0xa0, 1, PutAll },
+        { "LSR",  0x000006F, 0x42, 1, PutAll },
+        { "NOP",  0x080006D, 0x00, 10, PutAll },        /* X */
+        { "ORA",  0x080A26C, 0x00, 0, PutAll },
+        { "PHA",  0x0000001, 0x48, 0, PutAll },
+        { "PHP",  0x0000001, 0x08, 0, PutAll },
+        { "PLA",  0x0000001, 0x68, 0, PutAll },
+        { "PLP",  0x0000001, 0x28, 0, PutAll },
+        { "RLA",  0x000A26C, 0x23, 0, PutAll },         /* X */
+        { "ROL",  0x000006F, 0x22, 1, PutAll },
+        { "ROR",  0x000006F, 0x62, 1, PutAll },
+        { "RRA",  0x000A26C, 0x63, 0, PutAll },         /* X */
+        { "RTI",  0x0000001, 0x40, 0, PutAll },
+        { "RTS",  0x0000001, 0x60, 0, PutAll },
+        { "SAC",  0x0800000, 0x32, 0, PutAll },         /* DTV */
+        { "SAX",  0x000810C, 0x83, 1, PutAll },         /* X */
+        { "SBC",  0x080A26C, 0xe0, 0, PutAll },
+        { "SEC",  0x0000001, 0x38, 0, PutAll },
+        { "SED",  0x0000001, 0xf8, 0, PutAll },
+        { "SEI",  0x0000001, 0x78, 0, PutAll },
+        { "SHA",  0x0002200, 0x93, 1, PutAll },         /* X, -DTV? */
+        { "SHX",  0x0000200, 0x9e, 1, PutAll },         /* X, -DTV? */
+        { "SHY",  0x0000040, 0x9c, 1, PutAll },         /* X, -DTV? */
+        { "SIR",  0x0800000, 0x32, 0, PutAll },         /* DTV */
+        { "SLO",  0x000A26C, 0x03, 0, PutAll },         /* X */
+        { "SRE",  0x000A26C, 0x43, 0, PutAll },         /* X */
+        { "STA",  0x000A26C, 0x80, 0, PutAll },
+        { "STX",  0x000010c, 0x82, 1, PutAll },
+        { "STY",  0x000002c, 0x80, 1, PutAll },
+        { "TAS",  0x0000200, 0x9b, 0, PutAll },         /* X */
+        { "TAX",  0x0000001, 0xaa, 0, PutAll },
+        { "TAY",  0x0000001, 0xa8, 0, PutAll },
+        { "TSX",  0x0000001, 0xba, 0, PutAll },
+        { "TXA",  0x0000001, 0x8a, 0, PutAll },
+        { "TXS",  0x0000001, 0x9a, 0, PutAll },
+        { "TYA",  0x0000001, 0x98, 0, PutAll }
+    }
+};
+
 /* Instruction table for the 65SC02 */
 static const struct {
     unsigned Count;
@@ -930,6 +1021,7 @@ static const InsTable* InsTabs[CPU_COUNT] = {
     (const InsTable*) &InsTabNone,
     (const InsTable*) &InsTab6502,
     (const InsTable*) &InsTab6502X,
+    (const InsTable*) &InsTab6502DTV,
     (const InsTable*) &InsTab65SC02,
     (const InsTable*) &InsTab65C02,
     (const InsTable*) &InsTab65816,

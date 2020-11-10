@@ -90,6 +90,7 @@
     <ClCompile Include="da65\opc4510.c" />
     <ClCompile Include="da65\opc6502.c" />
     <ClCompile Include="da65\opc6502x.c" />
+    <ClCompile Include="da65\opc6502dtv.c" />
     <ClCompile Include="da65\opc65816.c" />
     <ClCompile Include="da65\opc65c02.c" />
     <ClCompile Include="da65\opc65sc02.c" />
@@ -114,6 +115,7 @@
     <ClInclude Include="da65\opc4510.h" />
     <ClInclude Include="da65\opc6502.h" />
     <ClInclude Include="da65\opc6502x.h" />
+    <ClInclude Include="da65\opc6502dtv.h" />
     <ClInclude Include="da65\opc65816.h" />
     <ClInclude Include="da65\opc65c02.h" />
     <ClInclude Include="da65\opc65sc02.h" />

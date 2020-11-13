@@ -1433,17 +1433,20 @@ unsigned g_typeadjust (unsigned lhs, unsigned rhs)
 
     /* Note that this logic is largely duplicated by ArithmeticConvert. */
 
-    /* Before we apply the integral promotions, we check if both types are unsigned char.
-    ** If so, we return unsigned int, rather than int, which would be returned by the standard
-    ** rules.  This is only a performance optimization and does not affect correctness, as
-    ** the flags are only used for code generation, and not to determine types of other
-    ** expressions containing this one.  All unsigned char bit-patterns are valid as both int
-    ** and unsigned int and represent the same value, so either signed or unsigned int operations
-    ** can be used.  This special case part is not duplicated by ArithmeticConvert.
+    /* Before we apply the integral promotions, we check if both types are the same character type.
+    ** If so, we return that type, rather than int, which would be returned by the standard
+    ** rules.  This is only a performance optimization allowing the use of unsigned and/or char
+    ** operations; it does not affect correctness, as the flags are only used for code generation,
+    ** and not to determine types of other expressions containing this one.  For codgen, CF_CHAR
+    ** means the operands are char and the result is int (unless CF_FORCECHAR is also set, in
+    ** which case the result is char).  This special case part is not duplicated by
+    ** ArithmeticConvert.
     */
-    if ((lhs & CF_TYPEMASK) == CF_CHAR && (lhs & CF_UNSIGNED) &&
-        (rhs & CF_TYPEMASK) == CF_CHAR && (rhs & CF_UNSIGNED)) {
-        return const_flag | CF_UNSIGNED | CF_INT;
+    if ((lhs & CF_TYPEMASK) == CF_CHAR && (rhs & CF_TYPEMASK) == CF_CHAR &&
+        (lhs & CF_UNSIGNED) == (rhs & CF_UNSIGNED)) {
+        /* Signedness flags are the same, so just use one of them. */
+        const unsigned unsigned_flag = lhs & CF_UNSIGNED;
+        return const_flag | unsigned_flag | CF_CHAR;
     }
 
     /* Apply integral promotions for types char/short. */

@@ -315,7 +315,7 @@ static const struct {
     {
         { "ADC",  0x080A26C, 0x60, 0, PutAll },
         { "ALR",  0x0800000, 0x4B, 0, PutAll },         /* X */
-        { "ANC",  0x0800000, 0x0B, 0, PutAll },         /* X -DTV? */
+        { "ANC",  0x0800000, 0x0B, 0, PutAll },         /* X, -DTV? */
         { "AND",  0x080A26C, 0x20, 0, PutAll },
         { "ANE",  0x0800000, 0x8B, 0, PutAll },         /* X */
         { "ARR",  0x0800000, 0x6B, 0, PutAll },         /* X */

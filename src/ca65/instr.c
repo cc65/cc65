@@ -303,24 +303,25 @@ static const struct {
     }
 };
 
-/* Instruction table for the 6502 with illegal instructions (X) and DTV 
-** extra opcodes (DTV). Some illegal instructions (X, -DTV?) might be not 
-** supported by DTV. They should be tested on the DTV hardware. 
+/* Instruction table for the 6502 with DTV extra opcodes (DTV) and 
+** those illegal instructions (X) which are supported by DTV.
+** Note: illegals opcodes which contain more subinstructions 
+** (ASO, DCM, LSE, LXA, SBX and SHS) are not enlisted.
 */
 static const struct {
     unsigned Count;
-    InsDesc  Ins[78];
+    InsDesc  Ins[71];
 } InsTab6502DTV = {
     sizeof (InsTab6502DTV.Ins) / sizeof (InsTab6502DTV.Ins[0]),
     {
         { "ADC",  0x080A26C, 0x60, 0, PutAll },
         { "ALR",  0x0800000, 0x4B, 0, PutAll },         /* X */
-        { "ANC",  0x0800000, 0x0B, 0, PutAll },         /* X, -DTV? */
+        { "ANC",  0x0800000, 0x0B, 0, PutAll },         /* X */
         { "AND",  0x080A26C, 0x20, 0, PutAll },
         { "ANE",  0x0800000, 0x8B, 0, PutAll },         /* X */
         { "ARR",  0x0800000, 0x6B, 0, PutAll },         /* X */
         { "ASL",  0x000006e, 0x02, 1, PutAll },
-        { "AXS",  0x0800000, 0xCB, 0, PutAll },         /* X, -DTV? */
+        { "AXS",  0x0800000, 0xCB, 0, PutAll },         /* X */
         { "BCC",  0x0020000, 0x90, 0, PutPCRel8 },
         { "BCS",  0x0020000, 0xb0, 0, PutPCRel8 },
         { "BEQ",  0x0020000, 0xf0, 0, PutPCRel8 },
@@ -339,7 +340,6 @@ static const struct {
         { "CMP",  0x080A26C, 0xc0, 0, PutAll },
         { "CPX",  0x080000C, 0xe0, 1, PutAll },
         { "CPY",  0x080000C, 0xc0, 1, PutAll },
-        { "DCP",  0x000A26C, 0xC3, 0, PutAll },         /* X */
         { "DEC",  0x000006C, 0x00, 3, PutAll },
         { "DEX",  0x0000001, 0xca, 0, PutAll },
         { "DEY",  0x0000001, 0x88, 0, PutAll },
@@ -347,11 +347,9 @@ static const struct {
         { "INC",  0x000006c, 0x00, 4, PutAll },
         { "INX",  0x0000001, 0xe8, 0, PutAll },
         { "INY",  0x0000001, 0xc8, 0, PutAll },
-        { "ISC",  0x000A26C, 0xE3, 0, PutAll },         /* X */
-        { "JAM",  0x0000001, 0x02, 0, PutAll },         /* X, -DTV? */
         { "JMP",  0x0000808, 0x4c, 6, PutJMP },
         { "JSR",  0x0000008, 0x20, 7, PutAll },
-        { "LAS",  0x0000200, 0xBB, 0, PutAll },         /* X, -DTV? */
+        { "LAS",  0x0000200, 0xBB, 0, PutAll },         /* X */
         { "LAX",  0x080A30C, 0xA3, 11, PutAll },        /* X */
         { "LDA",  0x080A26C, 0xa0, 0, PutAll },
         { "LDX",  0x080030C, 0xa2, 1, PutAll },
@@ -370,21 +368,17 @@ static const struct {
         { "RTI",  0x0000001, 0x40, 0, PutAll },
         { "RTS",  0x0000001, 0x60, 0, PutAll },
         { "SAC",  0x0800000, 0x32, 0, PutAll },         /* DTV */
-        { "SAX",  0x000810C, 0x83, 1, PutAll },         /* X */
         { "SBC",  0x080A26C, 0xe0, 0, PutAll },
         { "SEC",  0x0000001, 0x38, 0, PutAll },
         { "SED",  0x0000001, 0xf8, 0, PutAll },
         { "SEI",  0x0000001, 0x78, 0, PutAll },
-        { "SHA",  0x0002200, 0x93, 1, PutAll },         /* X, -DTV? */
-        { "SHX",  0x0000200, 0x9e, 1, PutAll },         /* X, -DTV? */
-        { "SHY",  0x0000040, 0x9c, 1, PutAll },         /* X, -DTV? */
+        { "SHA",  0x0002200, 0x93, 1, PutAll },         /* X */
+        { "SHX",  0x0000200, 0x9e, 1, PutAll },         /* X */
+        { "SHY",  0x0000040, 0x9c, 1, PutAll },         /* X */
         { "SIR",  0x0800000, 0x32, 0, PutAll },         /* DTV */
-        { "SLO",  0x000A26C, 0x03, 0, PutAll },         /* X */
-        { "SRE",  0x000A26C, 0x43, 0, PutAll },         /* X */
         { "STA",  0x000A26C, 0x80, 0, PutAll },
         { "STX",  0x000010c, 0x82, 1, PutAll },
         { "STY",  0x000002c, 0x80, 1, PutAll },
-        { "TAS",  0x0000200, 0x9b, 0, PutAll },         /* X */
         { "TAX",  0x0000001, 0xaa, 0, PutAll },
         { "TAY",  0x0000001, 0xa8, 0, PutAll },
         { "TSX",  0x0000001, 0xba, 0, PutAll },

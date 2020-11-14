@@ -45,18 +45,18 @@
 
 
 
-/* Descriptions for all opcodes. Base table from opc6502.c with illegal
-** opcodes from http://www.oxyron.de/html/opcodes02.html and DTV opcodes
+/* Descriptions for all opcodes. Base table from opc6502x.c with DTV opcodes,
+** where illegal opcodes are filtered based on their support on DTV.
 */
 const OpcDesc OpcTable_6502DTV[256] = {
     {   "brk",  1,  flNone,                   OH_Implicit              }, /* $00 */
     {   "ora",  2,  flUseLabel,               OH_DirectXIndirect       }, /* $01 */
-    {   "jam",  1,  flNone,                   OH_Implicit              }, /* $02 */
-    {   "slo",  2,  flUseLabel,               OH_DirectXIndirect       }, /* $03 */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $02 */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $03 */
     {   "nop",  2,  flUseLabel,               OH_Direct                }, /* $04 */
     {   "ora",  2,  flUseLabel,               OH_Direct                }, /* $05 */
     {   "asl",  2,  flUseLabel,               OH_Direct                }, /* $06 */
-    {   "slo",  2,  flUseLabel,               OH_Direct                }, /* $07 */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $07 */
     {   "php",  1,  flNone,                   OH_Implicit              }, /* $08 */
     {   "ora",  2,  flNone,                   OH_Immediate             }, /* $09 */
     {   "asl",  1,  flNone,                   OH_Accumulator           }, /* $0a */
@@ -64,26 +64,26 @@ const OpcDesc OpcTable_6502DTV[256] = {
     {   "nop",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $0c */
     {   "ora",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $0d */
     {   "asl",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $0e */
-    {   "slo",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $0f */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $0f */
     {   "bpl",  2,  flLabel,                  OH_Relative              }, /* $10 */
     {   "ora",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $11 */
     {   "bra",  2,  flLabel,                  OH_Relative              }, /* $12 */
-    {   "slo",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $13 */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $13 */
     {   "nop",  2,  flUseLabel,               OH_DirectX               }, /* $14 */
     {   "ora",  2,  flUseLabel,               OH_DirectX               }, /* $15 */
     {   "asl",  2,  flUseLabel,               OH_DirectX               }, /* $16 */
-    {   "slo",  2,  flUseLabel,               OH_DirectX               }, /* $17 */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $17 */
     {   "clc",  1,  flNone,                   OH_Implicit              }, /* $18 */
     {   "ora",  3,  flUseLabel,               OH_AbsoluteY             }, /* $19 */
     {   "nop",  1,  flNone,                   OH_Implicit              }, /* $1a */
-    {   "slo",  3,  flUseLabel,               OH_AbsoluteY             }, /* $1b */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $1b */
     {   "nop",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $1c */
     {   "ora",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $1d */
     {   "asl",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $1e */
-    {   "slo",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $1f */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $1f */
     {   "jsr",  3,  flLabel,                  OH_Absolute              }, /* $20 */
     {   "and",  2,  flUseLabel,               OH_DirectXIndirect       }, /* $21 */
-    {   "jam",  1,  flNone,                   OH_Implicit,             }, /* $22 */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $22 */
     {   "rla",  2,  flUseLabel,               OH_DirectXIndirect       }, /* $23 */
     {   "bit",  2,  flUseLabel,               OH_Direct                }, /* $24 */
     {   "and",  2,  flUseLabel,               OH_Direct                }, /* $25 */
@@ -116,11 +116,11 @@ const OpcDesc OpcTable_6502DTV[256] = {
     {   "rti",  1,  flNone,                   OH_Rts                   }, /* $40 */
     {   "eor",  2,  flUseLabel,               OH_DirectXIndirect       }, /* $41 */
     {   "sir",  1,  flNone,                   OH_Implicit              }, /* $42 */
-    {   "sre",  2,  flUseLabel,               OH_DirectXIndirect       }, /* $43 */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $43 */
     {   "nop",  2,  flUseLabel,               OH_Direct                }, /* $44 */
     {   "eor",  2,  flUseLabel,               OH_Direct                }, /* $45 */
     {   "lsr",  2,  flUseLabel,               OH_Direct                }, /* $46 */
-    {   "sre",  2,  flUseLabel,               OH_Direct                }, /* $47 */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $47 */
     {   "pha",  1,  flNone,                   OH_Implicit              }, /* $48 */
     {   "eor",  2,  flNone,                   OH_Immediate             }, /* $49 */
     {   "lsr",  1,  flNone,                   OH_Accumulator           }, /* $4a */
@@ -128,26 +128,26 @@ const OpcDesc OpcTable_6502DTV[256] = {
     {   "jmp",  3,  flLabel,                  OH_JmpAbsolute           }, /* $4c */
     {   "eor",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $4d */
     {   "lsr",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $4e */
-    {   "sre",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $4f */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $4f */
     {   "bvc",  2,  flLabel,                  OH_Relative              }, /* $50 */
     {   "eor",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $51 */
-    {   "jam",  1,  flNone,                   OH_Implicit              }, /* $52 */
-    {   "sre",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $53 */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $52 */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $53 */
     {   "nop",  2,  flUseLabel,               OH_DirectX               }, /* $54 */
     {   "eor",  2,  flUseLabel,               OH_DirectX               }, /* $55 */
     {   "lsr",  2,  flUseLabel,               OH_DirectX               }, /* $56 */
-    {   "sre",  2,  flUseLabel,               OH_DirectX               }, /* $57 */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $57 */
     {   "cli",  1,  flNone,                   OH_Implicit              }, /* $58 */
     {   "eor",  3,  flUseLabel,               OH_AbsoluteY             }, /* $59 */
     {   "nop",  1,  flNone,                   OH_Implicit              }, /* $5a */
-    {   "sre",  3,  flUseLabel,               OH_AbsoluteY             }, /* $5b */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $5b */
     {   "nop",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $5c */
     {   "eor",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $5d */
     {   "lsr",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $5e */
-    {   "sre",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $5f */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $5f */
     {   "rts",  1,  flNone,                   OH_Rts                   }, /* $60 */
     {   "adc",  2,  flUseLabel,               OH_DirectXIndirect       }, /* $61 */
-    {   "jam",  1,  flNone,                   OH_Implicit              }, /* $62 */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $62 */
     {   "rra",  2,  flUseLabel,               OH_DirectXIndirect       }, /* $63 */
     {   "nop",  2,  flUseLabel,               OH_Direct                }, /* $64 */
     {   "adc",  2,  flUseLabel,               OH_Direct                }, /* $65 */
@@ -163,7 +163,7 @@ const OpcDesc OpcTable_6502DTV[256] = {
     {   "rra",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $6f */
     {   "bvs",  2,  flLabel,                  OH_Relative              }, /* $70 */
     {   "adc",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $71 */
-    {   "jam",  1,  flNone,                   OH_Implicit              }, /* $72 */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $72 */
     {   "rra",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $73 */
     {   "nop",  2,  flUseLabel,               OH_DirectX               }, /* $74 */
     {   "adc",  2,  flUseLabel,               OH_DirectX               }, /* $75 */
@@ -180,35 +180,35 @@ const OpcDesc OpcTable_6502DTV[256] = {
     {   "nop",  2,  flNone,                   OH_Immediate             }, /* $80 */
     {   "sta",  2,  flUseLabel,               OH_DirectXIndirect       }, /* $81 */
     {   "nop",  2,  flNone,                   OH_Immediate             }, /* $82 */
-    {   "sax",  2,  flUseLabel,               OH_DirectXIndirect       }, /* $83 */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $83 */
     {   "sty",  2,  flUseLabel,               OH_Direct                }, /* $84 */
     {   "sta",  2,  flUseLabel,               OH_Direct                }, /* $85 */
     {   "stx",  2,  flUseLabel,               OH_Direct                }, /* $86 */
-    {   "sax",  2,  flUseLabel,               OH_Direct                }, /* $87 */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $87 */
     {   "dey",  1,  flNone,                   OH_Implicit              }, /* $88 */
     {   "nop",  2,  flNone,                   OH_Immediate             }, /* $89 */
     {   "txa",  1,  flNone,                   OH_Implicit              }, /* $8a */
-    {   "xaa",  2,  flNone,                   OH_Immediate             }, /* $8b */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $8b */
     {   "sty",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $8c */
     {   "sta",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $8d */
     {   "stx",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $8e */
-    {   "sax",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $8f */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $8f */
     {   "bcc",  2,  flLabel,                  OH_Relative              }, /* $90 */
     {   "sta",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $91 */
-    {   "jam",  1,  flNone,                   OH_Implicit              }, /* $92 */
-    {   "ahx",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $93 */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $92 */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $93 */
     {   "sty",  2,  flUseLabel,               OH_DirectX               }, /* $94 */
     {   "sta",  2,  flUseLabel,               OH_DirectX               }, /* $95 */
     {   "stx",  2,  flUseLabel,               OH_DirectY               }, /* $96 */
-    {   "sax",  2,  flUseLabel,               OH_DirectY               }, /* $97 */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $97 */
     {   "tya",  1,  flNone,                   OH_Implicit              }, /* $98 */
     {   "sta",  3,  flUseLabel,               OH_AbsoluteY             }, /* $99 */
     {   "txs",  1,  flNone,                   OH_Implicit              }, /* $9a */
-    {   "tas",  3,  flUseLabel,               OH_AbsoluteY             }, /* $9b */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $9b */
     {   "shy",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $9c */
     {   "sta",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $9d */
     {   "shx",  3,  flUseLabel,               OH_AbsoluteY             }, /* $9e */
-    {   "ahx",  3,  flUseLabel,               OH_AbsoluteY             }, /* $9f */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $9f */
     {   "ldy",  2,  flNone,                   OH_Immediate             }, /* $a0 */
     {   "lda",  2,  flUseLabel,               OH_DirectXIndirect       }, /* $a1 */
     {   "ldx",  2,  flNone,                   OH_Immediate             }, /* $a2 */
@@ -227,7 +227,7 @@ const OpcDesc OpcTable_6502DTV[256] = {
     {   "lax",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $af */
     {   "bcs",  2,  flLabel,                  OH_Relative              }, /* $b0 */
     {   "lda",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $b1 */
-    {   "jam",  1,  flNone,                   OH_Implicit              }, /* $b2 */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $b2 */
     {   "lax",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $b3 */
     {   "ldy",  2,  flUseLabel,               OH_DirectX               }, /* $b4 */
     {   "lda",  2,  flUseLabel,               OH_DirectX               }, /* $b5 */
@@ -244,11 +244,11 @@ const OpcDesc OpcTable_6502DTV[256] = {
     {   "cpy",  2,  flNone,                   OH_Immediate             }, /* $c0 */
     {   "cmp",  2,  flUseLabel,               OH_DirectXIndirect       }, /* $c1 */
     {   "nop",  2,  flNone,                   OH_Immediate             }, /* $c2 */
-    {   "dcp",  2,  flUseLabel,               OH_DirectXIndirect       }, /* $c3 */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $c3 */
     {   "cpy",  2,  flUseLabel,               OH_Direct                }, /* $c4 */
     {   "cmp",  2,  flUseLabel,               OH_Direct                }, /* $c5 */
     {   "dec",  2,  flUseLabel,               OH_Direct                }, /* $c6 */
-    {   "dcp",  2,  flUseLabel,               OH_Direct                }, /* $c7 */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $c7 */
     {   "iny",  1,  flNone,                   OH_Implicit              }, /* $c8 */
     {   "cmp",  2,  flNone,                   OH_Immediate             }, /* $c9 */
     {   "dex",  1,  flNone,                   OH_Implicit              }, /* $ca */
@@ -256,31 +256,31 @@ const OpcDesc OpcTable_6502DTV[256] = {
     {   "cpy",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $cc */
     {   "cmp",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $cd */
     {   "dec",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $ce */
-    {   "dcp",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $cf */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $cf */
     {   "bne",  2,  flLabel,                  OH_Relative              }, /* $d0 */
     {   "cmp",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $d1 */
-    {   "jam",  1,  flNone,                   OH_Implicit              }, /* $d2 */
-    {   "dcp",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $d3 */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $d2 */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $d3 */
     {   "nop",  2,  flUseLabel,               OH_DirectX               }, /* $d4 */
     {   "cmp",  2,  flUseLabel,               OH_DirectX               }, /* $d5 */
     {   "dec",  2,  flUseLabel,               OH_DirectX               }, /* $d6 */
-    {   "dcp",  2,  flUseLabel,               OH_DirectX               }, /* $d7 */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $d7 */
     {   "cld",  1,  flNone,                   OH_Implicit              }, /* $d8 */
     {   "cmp",  3,  flUseLabel,               OH_AbsoluteY             }, /* $d9 */
     {   "nop",  1,  flNone,                   OH_Implicit              }, /* $da */
-    {   "dcp",  3,  flUseLabel,               OH_AbsoluteY             }, /* $db */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $db */
     {   "nop",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $dc */
     {   "cmp",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $dd */
     {   "dec",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $de */
-    {   "dcp",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $df */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $df */
     {   "cpx",  2,  flNone,                   OH_Immediate             }, /* $e0 */
     {   "sbc",  2,  flUseLabel,               OH_DirectXIndirect       }, /* $e1 */
     {   "nop",  2,  flNone,                   OH_Immediate             }, /* $e2 */
-    {   "isc",  2,  flUseLabel,               OH_DirectXIndirect       }, /* $e3 */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $e3 */
     {   "cpx",  2,  flUseLabel,               OH_Direct                }, /* $e4 */
     {   "sbc",  2,  flUseLabel,               OH_Direct                }, /* $e5 */
     {   "inc",  2,  flUseLabel,               OH_Direct                }, /* $e6 */
-    {   "isc",  2,  flUseLabel,               OH_Direct                }, /* $e7 */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $e7 */
     {   "inx",  1,  flNone,                   OH_Implicit              }, /* $e8 */
     {   "sbc",  2,  flNone,                   OH_Immediate             }, /* $e9 */
     {   "nop",  1,  flNone,                   OH_Implicit              }, /* $ea */
@@ -288,21 +288,21 @@ const OpcDesc OpcTable_6502DTV[256] = {
     {   "cpx",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $ec */
     {   "sbc",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $ed */
     {   "inc",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $ee */
-    {   "isc",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $ef */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $ef */
     {   "beq",  2,  flLabel,                  OH_Relative              }, /* $f0 */
     {   "sbc",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $f1 */
-    {   "jam",  1,  flNone,                   OH_Implicit              }, /* $f2 */
-    {   "isc",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $f3 */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $f2 */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $f3 */
     {   "nop",  2,  flUseLabel,               OH_DirectX               }, /* $f4 */
     {   "sbc",  2,  flUseLabel,               OH_DirectX               }, /* $f5 */
     {   "inc",  2,  flUseLabel,               OH_DirectX               }, /* $f6 */
-    {   "isc",  2,  flUseLabel,               OH_DirectX               }, /* $f7 */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $f7 */
     {   "sed",  1,  flNone,                   OH_Implicit              }, /* $f8 */
     {   "sbc",  3,  flUseLabel,               OH_AbsoluteY             }, /* $f9 */
     {   "nop",  1,  flNone,                   OH_Implicit              }, /* $fa */
-    {   "isc",  3,  flUseLabel,               OH_AbsoluteY             }, /* $fb */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $fb */
     {   "nop",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $fc */
     {   "sbc",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $fd */
     {   "inc",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $fe */
-    {   "isc",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $ff */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $ff */
 };

@@ -3104,16 +3104,14 @@ void g_asr (unsigned flags, unsigned long val)
         "tosasrax", "tosshrax", "tosasreax", "tosshreax"
     };
 
-    /* If the right hand side is const, the lhs is not on stack but still
+    /* If the right hand side is const, the lhs is not on stack, but still
     ** in the primary register.
     */
     if (flags & CF_CONST) {
-
         switch (flags & CF_TYPEMASK) {
-
             case CF_CHAR:
                 if (flags & CF_FORCECHAR) {
-                    if ((flags & CF_UNSIGNED) != 0 && val <= 4) {
+                    if ((flags & CF_UNSIGNED) != 0 && val < 8) {
                         while (val--) {
                             AddCodeLine ("lsr a");
                         }
@@ -3125,19 +3123,28 @@ void g_asr (unsigned flags, unsigned long val)
                         }
                         return;
                     }
+                    AddCodeLine ("ldx #$00");
+                    if ((flags & CF_UNSIGNED) == 0) {
+                        unsigned L = GetLocalLabel ();
+
+                        AddCodeLine ("cmp #$80");   /* Sign bit into carry */
+                        AddCodeLine ("bcc %s", LocalLabelName (L));
+                        AddCodeLine ("dex");        /* Make $FF */
+                        g_defcodelabel (L);
+                    }
                 }
                 /* FALLTHROUGH */
 
             case CF_INT:
                 val &= 0x0F;
                 if (val >= 8) {
+                    AddCodeLine ("txa");
                     if (flags & CF_UNSIGNED) {
-                        AddCodeLine ("txa");
                         AddCodeLine ("ldx #$00");
                     } else {
-                        unsigned L = GetLocalLabel();
+                        unsigned L = GetLocalLabel ();
+
                         AddCodeLine ("cpx #$80");   /* Sign bit into carry */
-                        AddCodeLine ("txa");
                         AddCodeLine ("ldx #$00");
                         AddCodeLine ("bcc %s", LocalLabelName (L));
                         AddCodeLine ("dex");        /* Make $FF */
@@ -3155,9 +3162,9 @@ void g_asr (unsigned flags, unsigned long val)
                 }
                 if (val > 0) {
                     if (flags & CF_UNSIGNED) {
-                        AddCodeLine ("jsr shrax%ld", val);
+                        AddCodeLine ("jsr shrax%lu", val);
                     } else {
-                        AddCodeLine ("jsr asrax%ld", val);
+                        AddCodeLine ("jsr asrax%lu", val);
                     }
                 }
                 return;
@@ -3168,7 +3175,8 @@ void g_asr (unsigned flags, unsigned long val)
                     AddCodeLine ("ldx #$00");
                     AddCodeLine ("lda sreg+1");
                     if ((flags & CF_UNSIGNED) == 0) {
-                        unsigned L = GetLocalLabel();
+                        unsigned L = GetLocalLabel ();
+
                         AddCodeLine ("bpl %s", LocalLabelName (L));
                         AddCodeLine ("dex");
                         g_defcodelabel (L);
@@ -3181,7 +3189,8 @@ void g_asr (unsigned flags, unsigned long val)
                     AddCodeLine ("ldy #$00");
                     AddCodeLine ("ldx sreg+1");
                     if ((flags & CF_UNSIGNED) == 0) {
-                        unsigned L = GetLocalLabel();
+                        unsigned L = GetLocalLabel ();
+
                         AddCodeLine ("bpl %s", LocalLabelName (L));
                         AddCodeLine ("dey");
                         g_defcodelabel (L);
@@ -3197,7 +3206,8 @@ void g_asr (unsigned flags, unsigned long val)
                     AddCodeLine ("ldy sreg+1");
                     AddCodeLine ("sty sreg");
                     if ((flags & CF_UNSIGNED) == 0) {
-                        unsigned L = GetLocalLabel();
+                        unsigned L = GetLocalLabel ();
+
                         AddCodeLine ("cpy #$80");
                         AddCodeLine ("ldy #$00");
                         AddCodeLine ("bcc %s", LocalLabelName (L));
@@ -3219,9 +3229,9 @@ void g_asr (unsigned flags, unsigned long val)
                 }
                 if (val > 0) {
                     if (flags & CF_UNSIGNED) {
-                        AddCodeLine ("jsr shreax%ld", val);
+                        AddCodeLine ("jsr shreax%lu", val);
                     } else {
-                        AddCodeLine ("jsr asreax%ld", val);
+                        AddCodeLine ("jsr asreax%lu", val);
                     }
                 }
                 return;
@@ -3251,15 +3261,13 @@ void g_asl (unsigned flags, unsigned long val)
         "tosaslax", "tosshlax", "tosasleax", "tosshleax"
     };
 
-    /* If the right hand side is const, the lhs is not on stack but still
+    /* If the right hand side is const, the lhs is not on stack, but still
     ** in the primary register.
     */
     if (flags & CF_CONST) {
-
         switch (flags & CF_TYPEMASK) {
-
             case CF_CHAR:
-                if ((flags & CF_FORCECHAR) != 0 && val <= 4) {
+                if ((flags & CF_FORCECHAR) != 0 && val <= 6) {
                     while (val--) {
                         AddCodeLine ("asl a");
                     }
@@ -3284,9 +3292,9 @@ void g_asl (unsigned flags, unsigned long val)
                 }
                 if (val > 0) {
                     if (flags & CF_UNSIGNED) {
-                        AddCodeLine ("jsr shlax%ld", val);
+                        AddCodeLine ("jsr shlax%lu", val);
                     } else {
-                        AddCodeLine ("jsr aslax%ld", val);
+                        AddCodeLine ("jsr aslax%lu", val);
                     }
                 }
                 return;
@@ -3325,9 +3333,9 @@ void g_asl (unsigned flags, unsigned long val)
                 }
                 if (val > 0) {
                     if (flags & CF_UNSIGNED) {
-                        AddCodeLine ("jsr shleax%ld", val);
+                        AddCodeLine ("jsr shleax%lu", val);
                     } else {
-                        AddCodeLine ("jsr asleax%ld", val);
+                        AddCodeLine ("jsr asleax%lu", val);
                     }
                 }
                 return;

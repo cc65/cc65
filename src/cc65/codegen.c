@@ -3111,9 +3111,26 @@ void g_asr (unsigned flags, unsigned long val)
         switch (flags & CF_TYPEMASK) {
             case CF_CHAR:
                 if (flags & CF_FORCECHAR) {
-                    if ((flags & CF_UNSIGNED) != 0 && val < 8) {
-                        while (val--) {
-                            AddCodeLine ("lsr a");
+                    val &= 7;
+                    if ((flags & CF_UNSIGNED) != 0) {
+                        /* Instead of `val` right shifts, we can also do `9 - val` left rotates
+                        ** and a mask.  This saves 3 bytes and 8 cycles for `val == 7` and
+                        ** 1 byte and 4 cycles for `val == 6`.
+                        */
+                        if (val < 6) {
+                            while (val--) {
+                                AddCodeLine ("lsr a");  /* 1 byte, 2 cycles */
+                            }
+                        } else {
+                            unsigned i;
+                            /* The first ROL shifts in garbage and sets carry to the high bit.
+                            ** The garbage is cleaned up by the mask.
+                            */
+                            for (i = val; i < 9; ++i) {
+                                AddCodeLine ("rol a");  /* 1 byte,  2 cycles */
+                            }
+                            /* 2 bytes, 2 cycles */
+                            AddCodeLine ("and #$%02X", 0xFF >> val);
                         }
                         return;
                     } else if (val <= 2) {
@@ -3267,9 +3284,21 @@ void g_asl (unsigned flags, unsigned long val)
     if (flags & CF_CONST) {
         switch (flags & CF_TYPEMASK) {
             case CF_CHAR:
-                if ((flags & CF_FORCECHAR) != 0 && val <= 6) {
-                    while (val--) {
-                        AddCodeLine ("asl a");
+                if ((flags & CF_FORCECHAR) != 0) {
+                    val &= 7;
+                    /* Large shifts are faster and smaller with ROR.  See g_asr for detailed
+                    ** byte and cycle counts.
+                    */
+                    if (val < 6) {
+                        while (val--) {
+                            AddCodeLine ("asl a");
+                        }
+                    } else {
+                        unsigned i;
+                        for (i = val; i < 9; ++i) {
+                            AddCodeLine ("ror a");
+                        }
+                        AddCodeLine ("and #$%02X", (~0U << val) & 0xFF);
                     }
                     return;
                 }

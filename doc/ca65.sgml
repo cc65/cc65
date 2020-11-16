@@ -419,6 +419,8 @@ The assembler accepts
       <tt><ref id=".P02" name=".P02"></tt> command was given).
 <item>all valid 6502 mnemonics plus a set of illegal instructions when in
       <ref id="6502X-mode" name="6502X mode">.
+<item>all valid 6502DTV mnemonics when in 6502DTV mode (after the
+      <tt><ref id=".PDTV" name=".PDTV"></tt> command was given).
 <item>all valid 65SC02 mnemonics when in 65SC02 mode (after the
       <tt><ref id=".PSC02" name=".PSC02"></tt> command was given).
 <item>all valid 65C02 mnemonics when in 65C02 mode (after the
@@ -3153,6 +3155,12 @@ Here's a list of all control commands and a description, what they do:
   (see <tt><ref id=".PC02" name=".PC02"></tt> command).
 
 
+<sect1><tt>.IFPDTV</tt><label id=".IFPDTV"><p>
+
+  Conditional assembly: Check if the assembler is currently in 6502DTV mode
+  (see <tt><ref id=".PDTV" name=".PDTV"></tt> command).
+
+
 <sect1><tt>.IFPSC02</tt><label id=".IFPSC02"><p>
 
   Conditional assembly: Check if the assembler is currently in 65SC02 mode
@@ -3585,6 +3593,14 @@ Here's a list of all control commands and a description, what they do:
   <tt><ref id=".P4510" name=".P4510"></tt>
 
 
+<sect1><tt>.PDTV</tt><label id=".PDTV"><p>
+
+  Enable the 6502DTV instruction set. This is a superset of the 6502 
+  instruction set.
+
+  See: <tt><ref id=".P02" name=".P02"></tt></tt>
+
+
 <sect1><tt>.POPCPU</tt><label id=".POPCPU"><p>
 
   Pop the last CPU setting from the stack, and activate it.
@@ -3848,10 +3864,11 @@ Here's a list of all control commands and a description, what they do:
   Switch the CPU instruction set. The command is followed by a string that
   specifies the CPU. Possible values are those that can also be supplied to
   the <tt><ref id="option--cpu" name="--cpu"></tt> command line option,
-  namely: 6502, 6502X, 65SC02, 65C02, 65816, 4510 and HuC6280.
+  namely: 6502, 6502X, 6502DTV, 65SC02, 65C02, 65816, 4510 and HuC6280.
 
   See: <tt><ref id=".CPU" name=".CPU"></tt>,
        <tt><ref id=".IFP02" name=".IFP02"></tt>,
+       <tt><ref id=".IFPDTV" name=".IFPDTV"></tt>,
        <tt><ref id=".IFP816" name=".IFP816"></tt>,
        <tt><ref id=".IFPC02" name=".IFPC02"></tt>,
        <tt><ref id=".IFPSC02" name=".IFPSC02"></tt>,
@@ -4586,6 +4603,7 @@ each supported CPU a constant similar to
     CPU_SWEET16
     CPU_HUC6280
     CPU_4510
+    CPU_6502DTV
 </verb></tscreen>
 
 is defined. These constants may be used to determine the exact type of the
@@ -4600,6 +4618,7 @@ another constant is defined:
     CPU_ISET_SWEET16
     CPU_ISET_HUC6280
     CPU_ISET_4510
+    CPU_ISET_6502DTV
 </verb></tscreen>
 
 The value read from the <tt/<ref id=".CPU" name=".CPU">/ pseudo variable may

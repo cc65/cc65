@@ -60,7 +60,7 @@ $(foreach cpu,$(OPCODE_CPUS),$(eval $(call OPCODE_template,$(cpu))))
 
 define CPUDETECT_template
 
-$(WORKDIR)/$1-cpudetect.bin: cpudetect.s $(ISEQUAL)
+$(WORKDIR)/$1-cpudetect.bin: cpudetect.s $1-cpudetect.ref $(ISEQUAL)
 	$(if $(QUIET),echo asm/$1-cpudetect.bin)
 	$(CA65) -t none --cpu $1 -l $$(@:.bin=.lst) -o $$(@:.bin=.o) $$<
 	$(LD65) -t none -o $$@ $$(@:.bin=.o) none.lib

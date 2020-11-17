@@ -7,7 +7,7 @@ endif
 ifdef CMD_EXE
   EXE = .exe
   MKDIR = mkdir $(subst /,\,$1)
-  RMDIR = -rmdir /s /q $(subst /,\,$1)
+  RMDIR = -rmdir /q /s $(subst /,\,$1)
 else
   EXE =
   MKDIR = mkdir -p $1
@@ -23,7 +23,7 @@ DA65 := $(if $(wildcard ../../bin/da65*),../../bin/da65,da65)
 
 WORKDIR = ../../testwrk/dasm
 
-ISEQUAL = $(WORKDIR)/isequal$(EXE)
+ISEQUAL = ../../testwrk/isequal$(EXE)
 
 CC = gcc
 CFLAGS = -O2
@@ -33,10 +33,9 @@ START = --start-addr 0x8000
 .PHONY: all clean
 
 SOURCES := $(wildcard *.s)
-CPUS = $(foreach src,$(SOURCES),$(src:%-disass.s=%))
-BINS = $(foreach cpu,$(CPUS),$(WORKDIR)/$(cpu)-reass.bin)
+BINS = $(SOURCES:%disass.s=$(WORKDIR)/%reass.bin)
+CPUS = $(SOURCES:%-disass.s=%)
 
-# default target defined later
 all: $(BINS)
 
 $(WORKDIR):
@@ -56,7 +55,7 @@ $(WORKDIR)/$1-reass.s: $(WORKDIR)/$1-disass.bin
 $(WORKDIR)/$1-reass.bin: $(WORKDIR)/$1-reass.s $(ISEQUAL)
 	$(if $(QUIET),echo dasm/$1-reass.bin)
 	$(CL65) --cpu $1 -t none $(START) -o $$@ $$<
-	$(ISEQUAL) $$@ $(WORKDIR)/$1-disass.bin
+	$(ISEQUAL) $(WORKDIR)/$1-disass.bin $$@
 
 endef # DISASS_template
 

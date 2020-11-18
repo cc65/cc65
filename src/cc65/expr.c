@@ -3871,8 +3871,8 @@ static void hieOr (ExprDesc *Expr)
 static void hieQuest (ExprDesc* Expr)
 /* Parse the ternary operator */
 {
-    int         FalseLab;
-    int         TrueLab;
+    int         FalseLab = 0;
+    int         TrueLab = 0;
     CodeMark    SkippedBranch;
     CodeMark    TrueCodeEnd;
     ExprDesc    Expr2;          /* Expression 2 */

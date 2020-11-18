@@ -1732,7 +1732,7 @@ unsigned OptStackOps (CodeSeg* S)
     int             I;
     int             OldEntryCount;      /* Old number of entries */
     unsigned        Used;               /* What registers would be used */
-    unsigned        PushedRegs;         /* Track if the same regs are used after the push */
+    unsigned        PushedRegs = 0;     /* Track if the same regs are used after the push */
     int             RhsAChgIndex;       /* Track if rhs is changed more than once */
     int             RhsXChgIndex;       /* Track if rhs is changed more than once */
     int             IsRegAOptFunc = 0;  /* Whether to use the RegA-only optimizations */

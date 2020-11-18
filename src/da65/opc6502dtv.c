@@ -115,7 +115,7 @@ const OpcDesc OpcTable_6502DTV[256] = {
     {   "rla",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $3f */
     {   "rti",  1,  flNone,                   OH_Rts                   }, /* $40 */
     {   "eor",  2,  flUseLabel,               OH_DirectXIndirect       }, /* $41 */
-    {   "sir",  1,  flNone,                   OH_Implicit              }, /* $42 */
+    {   "sir",  2,  flNone,                   OH_Immediate             }, /* $42 */
     {   "",     1,  flIllegal,                OH_Illegal,              }, /* $43 */
     {   "nop",  2,  flUseLabel,               OH_Direct                }, /* $44 */
     {   "eor",  2,  flUseLabel,               OH_Direct                }, /* $45 */

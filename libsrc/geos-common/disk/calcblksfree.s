@@ -13,6 +13,10 @@
             .include "geossym.inc"
         
 _CalcBlksFree:
+        lda #>curDirHead
+        sta r5H
+        lda #<curDirHead
+        sta r5L
         jsr CalcBlksFree
         stx __oserror
         lda r4L

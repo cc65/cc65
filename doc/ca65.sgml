@@ -3598,7 +3598,7 @@ Here's a list of all control commands and a description, what they do:
   Enable the 6502DTV instruction set. This is a superset of the 6502 
   instruction set.
 
-  See: <tt><ref id=".P02" name=".P02"></tt></tt>
+  See: <tt><ref id=".P02" name=".P02"></tt>
 
 
 <sect1><tt>.POPCPU</tt><label id=".POPCPU"><p>

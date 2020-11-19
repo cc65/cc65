@@ -367,7 +367,7 @@ static const struct {
         { "RRA",  0x000A26C, 0x63, 0, PutAll },         /* X */
         { "RTI",  0x0000001, 0x40, 0, PutAll },
         { "RTS",  0x0000001, 0x60, 0, PutAll },
-        { "SAC",  0x0800000, 0x32, 0, PutAll },         /* DTV */
+        { "SAC",  0x0800000, 0x32, 1, PutAll },         /* DTV */
         { "SBC",  0x080A26C, 0xe0, 0, PutAll },
         { "SEC",  0x0000001, 0x38, 0, PutAll },
         { "SED",  0x0000001, 0xf8, 0, PutAll },
@@ -375,7 +375,7 @@ static const struct {
         { "SHA",  0x0002200, 0x93, 1, PutAll },         /* X */
         { "SHX",  0x0000200, 0x9e, 1, PutAll },         /* X */
         { "SHY",  0x0000040, 0x9c, 1, PutAll },         /* X */
-        { "SIR",  0x0800000, 0x32, 0, PutAll },         /* DTV */
+        { "SIR",  0x0800000, 0x42, 1, PutAll },         /* DTV */
         { "STA",  0x000A26C, 0x80, 0, PutAll },
         { "STX",  0x000010c, 0x82, 1, PutAll },
         { "STY",  0x000002c, 0x80, 1, PutAll },

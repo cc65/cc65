@@ -25,7 +25,7 @@
 .endif
 
 .ifpdtv
-   sac #00
+   sac #$00
 .endif
 
 

@@ -23,7 +23,7 @@ leftover dummy opcode parameters with something more recognizable.
 
 The testcases for 6502, 6502x, 65sc02, 65c02, 4510, and huc6280 have been
 put together by Sven Oliver ("SvOlli") Moll, as well as a template for the
-m740 instructions set.
+m740 instructions set. Later 6502dtv support was also added.
 
 Still to do is to find a way to implement an opcode testcase for the 65816
 processor, since it's capable of executing instructions with an 8-bit and

@@ -1,7 +1,7 @@
 /*****************************************************************************\
 ** plasma test program for cc65.                                             **
 **                                                                           **
-** (w)2001 by groepaz/hitmen                                                 **
+** (w)2001 by groepaz                                                        **
 **                                                                           **
 ** Cleanup and porting by Ullrich von Bassewitz.                             **
 **                                                                           **
@@ -52,7 +52,6 @@
 
 /* Use static local variables for speed */
 #pragma static-locals (1);
-
 
 
 static const unsigned char sinustable[0x100] = {
@@ -131,8 +130,6 @@ static void doplasma (register unsigned char* scrn)
     }
 }
 
-
-
 static void makechar (void)
 {
     static const unsigned char bittab[8] = {
@@ -147,7 +144,7 @@ static void makechar (void)
         for (i = 0; i < 8; ++i){
             b = 0;
             for (ii = 0; ii < 8; ++ii) {
-                if ((rand() & 0xFF) > s) {
+                if ((rand() & 0xFFu) > s) {
                     b |= bittab[ii];
                 }
             }

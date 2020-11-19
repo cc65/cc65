@@ -17,7 +17,6 @@ including
   - VIC20
   - C16/C116 and Plus/4
   - C64
-  - C64DTV
   - C128
   - CBM 510 (aka P500)
   - the 600/700 family

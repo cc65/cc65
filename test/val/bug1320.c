@@ -1,5 +1,5 @@
 /*
-  Copyright 2020 The cc65 Authors
+  Copyright 2020, The cc65 Authors
 
   This software is provided "as-is", without any express or implied
   warranty. In no event will the authors be held liable for any damages
@@ -21,18 +21,23 @@
 /*
   Test of a post-counted pointer argument,
   followed by a (nested) function-call argument.
+  Test that compiling it doesn't cause a seg-fault.
 
   https://github.com/cc65/cc65/issues/1320
-
-  After the bug is fixed, this file should be moved to "test/val/".
 */
 
 static char *var;
 
-void foo (char *, char);
-char bar (void);
+static void foo (char *, char)
+{
+}
 
-void main (void)
+static char bar (void)
+{
+    return 'b';
+}
+
+int main (void)
 {
     foo (var++, bar ());
     return 0;

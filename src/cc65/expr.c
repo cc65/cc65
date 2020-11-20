@@ -1,7 +1,7 @@
 /* expr.c
 **
 ** 1998-06-21, Ullrich von Bassewitz
-** 2020-01-25, Greg King
+** 2020-11-20, Greg King
 */
 
 
@@ -608,6 +608,8 @@ static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall, ExprDesc* ED)
 ** The function returns the size of the arguments pushed in bytes.
 */
 {
+    ExprDesc  Expr;
+
     /* Initialize variables */
     SymEntry* Param       = 0;  /* Keep gcc silent */
     unsigned  PushedSize  = 0;  /* Size of arguments pushed */
@@ -634,7 +636,6 @@ static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall, ExprDesc* ED)
     **
     */
     if (ParamComplete && IS_Get (&CodeSizeFactor) >= 200) {
-
         /* Calculate the number and size of the parameters */
         FrameParams = Func->ParamCount;
         FrameSize   = Func->ParamSize;
@@ -656,18 +657,13 @@ static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall, ExprDesc* ED)
         }
     }
 
-    /* The info of the last argument could be needed out of the loop */
-    ExprDesc Expr;
-    ED_Init (&Expr);
-    Expr.Flags |= ED->Flags & E_MASK_KEEP_SUBEXPR;
-
     /* Parse the actual argument list */
     while (CurTok.Tok != TOK_RPAREN) {
-
         unsigned Flags;     /* Code generator flags, not expression flags */
-        
-        /* This way the info of the last parameter won't be cleared */
+
         ED_Init (&Expr);
+
+        /* This way, the info of the last parameter won't be cleared */
         Expr.Flags |= ED->Flags & E_MASK_KEEP_SUBEXPR;
 
         /* Count arguments */
@@ -781,17 +777,19 @@ static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall, ExprDesc* ED)
             Error ("Argument expected after comma");
             break;
         }
+
+        DoDeferred (SQP_KEEP_NONE, &Expr);
     }
+
+    /* Append last deferred inc/dec before the function is called.
+    ** The last parameter needs to be preserved if it is passed in AX/EAX Regs.
+    */
+    DoDeferred (IsFastcall ? SQP_KEEP_EAX : SQP_KEEP_NONE, &Expr);
 
     /* Check if we had enough arguments */
     if (PushedCount < Func->ParamCount) {
         Error ("Too few arguments in function call");
     }
-
-    /* Append deferred inc/dec before the function is called.
-    ** The last parameter needs to be restored if it is passed with AX/EAX Regs.
-    */
-    DoDeferred (IsFastcall ? SQP_KEEP_EAX : SQP_KEEP_NONE, &Expr);
 
     /* The function returns the size of all arguments pushed onto the stack.
     ** However, if there are parameters missed (which is an error, and was
@@ -1395,7 +1393,7 @@ static void ArrayRef (ExprDesc* Expr)
         /* The array subscript is a constant. Since we can have the element
         ** address directly as base+offset, we can remove the array address
         ** push onto the stack before if loading subscript doesn't tamper that
-        ** address in the primary. 
+        ** address in the primary.
         */
         if (!ConstBaseAddr) {
             RemoveCode (&Mark2);
@@ -1419,7 +1417,7 @@ static void ArrayRef (ExprDesc* Expr)
             ** remove the code that loaded the address into the primary.
             */
             if (!IsTypeArray (Expr->Type)) {
- 
+
                 /* It's a pointer, so we do have to load it into the primary
                 ** first (if it's not already there).
                 */
@@ -2025,8 +2023,8 @@ static void PostInc (ExprDesc* Expr)
     /* Get the data type */
     Flags = TypeOf (Expr->Type);
 
-    /* We are allowed by the C standard to defer the inc operation until 
-    ** the this expression is used, so that we don't need to save and reload
+    /* We are allowed by the C standard to defer the inc operation until after
+    ** the expression is used, so that we don't need to save and reload
     ** the original value.
     */
 
@@ -2065,7 +2063,7 @@ static void PostInc (ExprDesc* Expr)
             /* Fetch the value and use it (since it's the result of the expression) */
             LoadExpr (CF_NONE, Expr);
 
-            /* Defer the increment until the value of this expression is used */;
+            /* Defer the increment until after the value of this expression is used */
             DeferInc (Expr);
         }
     }
@@ -2132,7 +2130,7 @@ static void PostDec (ExprDesc* Expr)
             /* Fetch the value and save it (since it's the result of the expression) */
             LoadExpr (CF_NONE, Expr);
 
-            /* Defer the decrement until the value of this expression is used */;
+            /* Defer the decrement until after the value of this expression is used */
             DeferDec (Expr);
         }
     }
@@ -3738,7 +3736,7 @@ static void hieOr (ExprDesc *Expr)
             Error ("Scalar expression expected");
             ED_MakeConstBool (Expr, 0);
         } else if ((Flags & E_EVAL_UNEVAL) != E_EVAL_UNEVAL) {
- 
+
             if (!ED_IsConstBool (Expr)) {
                 /* Test the lhs if we haven't had && operators. If we had them, the
                 ** jump is already in place and there's no need to do the test.
@@ -3749,7 +3747,7 @@ static void hieOr (ExprDesc *Expr)
 
                     /* Get first expr */
                     LoadExpr (CF_FORCECHAR, Expr);
-                
+
                     /* Append deferred inc/dec at sequence point */
                     DoDeferred (SQP_KEEP_TEST, Expr);
 

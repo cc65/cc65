@@ -24,7 +24,7 @@
 
   https://github.com/cc65/cc65/issues/1320
 
-  After the bug is fixed, this file should be moved to "test/misc/".
+  After the bug is fixed, this file should be moved to "test/val/".
 */
 
 static char *var;
@@ -35,4 +35,5 @@ char bar (void);
 void main (void)
 {
     foo (var++, bar ());
+    return 0;
 }

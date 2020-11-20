@@ -50,6 +50,7 @@ typedef enum {
     CPU_NONE,                   /* No CPU - for assembler */
     CPU_6502,
     CPU_6502X,                  /* "Extended", that is: with illegal opcodes */
+    CPU_6502DTV,                /* CPU_6502 + DTV extra and illegal opcodes */
     CPU_65SC02,
     CPU_65C02,
     CPU_65816,
@@ -65,6 +66,7 @@ enum {
     CPU_ISET_NONE       = 1 << CPU_NONE,
     CPU_ISET_6502       = 1 << CPU_6502,
     CPU_ISET_6502X      = 1 << CPU_6502X,
+    CPU_ISET_6502DTV    = 1 << CPU_6502DTV,
     CPU_ISET_65SC02     = 1 << CPU_65SC02,
     CPU_ISET_65C02      = 1 << CPU_65C02,
     CPU_ISET_65816      = 1 << CPU_65816,

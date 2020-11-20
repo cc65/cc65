@@ -944,7 +944,9 @@ unsigned OptCmp9 (CodeSeg* S)
         if (L[0]->OPC == OP65_SBC                       &&
             CS_GetEntries (S, L+1, I+1, 4)              &&
             (L[1]->OPC == OP65_BVC              ||
-             L[1]->OPC == OP65_BVS)                     &&
+             L[1]->OPC == OP65_BVS              ||
+             L[1]->OPC == OP65_JVC              ||
+             L[1]->OPC == OP65_JVS)                     &&
             L[1]->JumpTo != 0                           &&
             L[1]->JumpTo->Owner == L[3]                 &&
             L[2]->OPC == OP65_EOR                       &&

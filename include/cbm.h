@@ -166,7 +166,7 @@ unsigned char get_tv (void);
 unsigned char __fastcall__ kbrepeat (unsigned char mode);
 /* Changes which keys have automatic repeat. */
 
-#if !defined(__CBM610__) && !defined(__PET__)
+#if !defined(__CBM610__)
 void waitvsync (void);
 /* Wait for the start of the next video field. */
 #endif

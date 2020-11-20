@@ -4,15 +4,17 @@
 ; void cputc (char c);
 ;
 
-        .export         _cputc, CHARCOLOR, OLD_CHARCOLOR, BGCOLOR, OLD_BGCOLOR
+        .export         _cputc, cputdirect
+        .export         CHARCOLOR, OLD_CHARCOLOR, BGCOLOR, OLD_BGCOLOR
 
         .include        "telestrat.inc"
 
+cputdirect:
 .proc _cputc
     ldx     CHARCOLOR
     cpx     OLD_CHARCOLOR
     beq     do_not_change_color_foreground
-    
+
     stx     OLD_CHARCOLOR         ; Store CHARCOLOR into OLD_CHARCOLOR
 
     dec     SCRX
@@ -47,8 +49,8 @@ do_not_change_color:
 CHARCOLOR:
     .res 1
 OLD_CHARCOLOR:
-    .res 1    
+    .res 1
 BGCOLOR:
-    .res 1    
+    .res 1
 OLD_BGCOLOR:
     .res 1

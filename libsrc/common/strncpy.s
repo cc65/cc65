@@ -24,7 +24,7 @@
 
 ; Copy src -> dest up to size bytes
 
-        ldx     tmp1            ; Load low byte of ones complement of size
+        ldx     tmp1
         ldy     #$00
 L1:     dex
         bne     L2
@@ -43,7 +43,7 @@ L2:     lda     (ptr1),y        ; Copy one character
 ; Fill the remaining bytes.
 
 L3:     dex                     ; Counter low byte
-        beq     L6              ; Branch on overflow
+        beq     L6
 L4:     sta     (ptr2),y        ; Clear one byte
 L5:     iny                     ; Bump pointer
         bne     L3

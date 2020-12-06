@@ -6,8 +6,9 @@
 <url url="mailto:gregdk@users.sf.net" name="Greg King">
 
 <abstract>
-cc65 is a C compiler for 6502 targets. It supports several 6502 based home
-computers like the Commodore and Atari machines, but it is easily retargetable.
+cc65 is a C compiler for 6502 targets. It supports several 6502-based home
+computers such as the Commodore and Atari machines, but it easily is
+retargetable.
 </abstract>
 
 <!-- Table of contents -->
@@ -1011,7 +1012,7 @@ The compiler defines several macros at startup:
   <tag><tt>__TELESTRAT__</tt></tag>
 
   This macro is defined if the target is the Telestrat (-t telestrat).
-  
+
   <tag><tt>__TIME__</tt></tag>
 
   This macro expands to the time of translation of the preprocessing
@@ -1045,26 +1046,39 @@ parameter with the <tt/#pragma/.
   The <tt/#pragma/ understands the push and pop parameters as explained above.
 
 
-<sect1><tt>#pragma bss-name (&lsqb;push,&rsqb; &lt;name&gt;)</tt><label id="pragma-bss-name"><p>
+<sect1><tt>#pragma bss-name ([push, ]&lt;name>[ ,&lt;addrsize>])</tt><label id="pragma-bss-name"><p>
 
-  This pragma changes the name used for the BSS segment (the BSS segment
-  is used to store variables with static storage duration and no explicit
-  initializer). The argument is a string enclosed in double quotes.
+  This pragma changes the name used for the BSS segment (the BSS segment is
+  used to store variables with static storage duration and no explicit
+  initializers). The <tt/name/ argument is a string enclosed in quotation
+  marks.
 
-  Note: The default linker configuration file does only map the standard
-  segments. If you use other segments, you have to create a new linker
-  configuration file.
+  <tt/addrsize/ is an optional string that gives a hint about where the
+  <tt/name/ segment will be put in the CPU's address space.  It describes the
+  width of address numbers that point into that segment.  Only words that
+  are known to ca65 are allowed:
+  <enum>
+  <item>"zp", "zeropage", "direct"
+  <item>"abs", "absolute", "near", "default"
+  <item>"far"
+  <item>"long", "dword"
+  </enum>
 
-  Beware: The startup code will zero only the default BSS segment. If you
-  use another BSS segment, you have to do that yourself, otherwise
-  variables with static storage duration and no explicit initializer will
-  not have the value zero.
+  Note: The default linker configuration file maps only the standard segments.
+  If you use other segments, you must create a new linker configuration file.
 
-  The <tt/#pragma/ understands the push and pop parameters as explained above.
+  Beware: The start-up code will zero only the default BSS segment. If you use
+  another BSS segment, then you must do that yourself; otherwise, variables
+  with static storage duration and no explicit initializer will not have the
+  value zero.
 
-  Example:
+  The <tt/#pragma/ understands the push and pop parameters, as explained above.
+
+  Examples:
   <tscreen><verb>
-        #pragma bss-name ("MyBSS")
+  #pragma bss-name ("MyBSS")
+  #pragma bss-name (push, "MyBSS")
+  #pragma bss-name ("MyBSS", "zp")
   </verb></tscreen>
 
 
@@ -1120,21 +1134,33 @@ parameter with the <tt/#pragma/.
   The <tt/#pragma/ understands the push and pop parameters as explained above.
 
 
-<sect1><tt>#pragma code-name ([push,] &lt;name&gt;)</tt><label id="pragma-code-name"><p>
+<sect1><tt>#pragma code-name ([push, ]&lt;name>[ ,&lt;addrsize>])</tt><label id="pragma-code-name"><p>
 
-  This pragma changes the name used for the CODE segment (the CODE segment
-  is used to store executable code). The argument is a string enclosed in
-  double quotes.
+  This pragma changes the name used for the CODE segment (the CODE segment is
+  used to store executable code). The <tt/name/ argument is a string enclosed
+  in quotation marks.
 
-  Note: The default linker configuration file does only map the standard
-  segments. If you use other segments, you have to create a new linker
-  configuration file.
+  <tt/addrsize/ is an optional string that gives a hint about where the
+  <tt/name/ segment will be put in the CPU's address space.  It describes the
+  width of address numbers that point into that segment.  Only words that
+  are known to ca65 are allowed:
+  <enum>
+  <item>"zp", "zeropage", "direct"
+  <item>"abs", "absolute", "near", "default"
+  <item>"far"
+  <item>"long", "dword"
+  </enum>
 
-  The <tt/#pragma/ understands the push and pop parameters as explained above.
+  Note: The default linker configuration file maps only the standard segments.
+  If you use other segments, you must create a new linker configuration file.
 
-  Example:
+  The <tt/#pragma/ understands the push and pop parameters, as explained above.
+
+  Examples:
   <tscreen><verb>
-        #pragma code-name ("MyCODE")
+  #pragma code-name ("MyCODE")
+  #pragma code-name (push, "MyCODE")
+  #pragma code-name (push, "MyCODE", "far")
   </verb></tscreen>
 
 
@@ -1148,21 +1174,33 @@ parameter with the <tt/#pragma/.
   The <tt/#pragma/ understands the push and pop parameters as explained above.
 
 
-<sect1><tt>#pragma data-name ([push,] &lt;name&gt;)</tt><label id="pragma-data-name"><p>
+<sect1><tt>#pragma data-name ([push, ]&lt;name>[ ,&lt;addrsize>])</tt><label id="pragma-data-name"><p>
 
-  This pragma changes the name used for the DATA segment (the DATA segment
-  is used to store initialized data). The argument is a string enclosed in
-  double quotes.
+  This pragma changes the name used for the DATA segment (the DATA segment is
+  used to store initialized data). The <tt/name/ argument is a string enclosed
+  in quotation marks.
 
-  Note: The default linker configuration file does only map the standard
-  segments. If you use other segments, you have to create a new linker
-  configuration file.
+  <tt/addrsize/ is an optional string that gives a hint about where the
+  <tt/name/ segment will be put in the CPU's address space.  It describes the
+  width of address numbers that point into that segment.  Only words that
+  are known to ca65 are allowed:
+  <enum>
+  <item>"zp", "zeropage", "direct"
+  <item>"abs", "absolute", "near", "default"
+  <item>"far"
+  <item>"long", "dword"
+  </enum>
 
-  The <tt/#pragma/ understands the push and pop parameters as explained above.
+  Note: The default linker configuration file maps only the standard segments.
+  If you use other segments, you must create a new linker configuration file.
 
-  Example:
+  The <tt/#pragma/ understands the push and pop parameters, as explained above.
+
+  Examples:
   <tscreen><verb>
-        #pragma data-name ("MyDATA")
+  #pragma data-name ("MyDATA")
+  #pragma data-name (push, "MyDATA")
+  #pragma data-name ("MyDATA", "zeropage")
   </verb></tscreen>
 
 
@@ -1224,21 +1262,32 @@ parameter with the <tt/#pragma/.
   The <tt/#pragma/ understands the push and pop parameters as explained above.
 
 
-<sect1><tt>#pragma rodata-name ([push,] &lt;name&gt;)</tt><label id="pragma-rodata-name"><p>
+<sect1><tt>#pragma rodata-name ([push, ]&lt;name>[ ,&lt;addrsize>])</tt><label id="pragma-rodata-name"><p>
 
-  This pragma changes the name used for the RODATA segment (the RODATA
-  segment is used to store readonly data). The argument is a string
-  enclosed in double quotes.
+  This pragma changes the name used for the RODATA segment (the RODATA segment
+  is used to store read-only data). The <tt/name/ argument is a string enclosed
+  in quotation marks.
 
-  Note: The default linker configuration file does only map the standard
-  segments. If you use other segments, you have to create a new linker
-  configuration file.
+  <tt/addrsize/ is an optional string that gives a hint about where the
+  <tt/name/ segment will be put in the CPU's address space.  It describes the
+  width of address numbers that point into that segment.  Only words that
+  are known to ca65 are allowed:
+  <enum>
+  <item>"zp", "zeropage", "direct"
+  <item>"abs", "absolute", "near", "default"
+  <item>"far"
+  <item>"long", "dword"
+  </enum>
 
-  The <tt/#pragma/ understands the push and pop parameters as explained above.
+  Note: The default linker configuration file maps only the standard segments.
+  If you use other segments, you must create a new linker configuration file.
 
-  Example:
+  The <tt/#pragma/ understands the push and pop parameters, as explained above.
+
+  Examples:
   <tscreen><verb>
-        #pragma rodata-name ("MyRODATA")
+  #pragma rodata-name ("MyRODATA")
+  #pragma rodata-name (push, "MyRODATA")
   </verb></tscreen>
 
 

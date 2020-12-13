@@ -136,10 +136,10 @@ SymTable* ParseScopedIdent (StrBuf* Name, StrBuf* FullName)
         SB_Append (FullName, Name);
 
         /* Search for the child scope */
-        Scope = SymFindScope (Scope, Name, SYM_FIND_EXISTING);
+        Scope = SymFindScope (Scope, Name, SYM_ALLOC_NEW);
         if (Scope == 0) {
             /* Scope not found */
-            Error ("No such scope: `%m%p'", FullName);
+            Error ("Can't create scope: `%m%p'", FullName);
             return 0;
         }
 

@@ -65,6 +65,10 @@ extern void atr5200std_joy[];        /* referred to by joy_static_stddrv[] */
 #define AT_NTSC     0
 #define AT_PAL      1
 
+/* Define variables used by the OS*/
+#include <_atari5200os.h>
+#define OS (*(struct __os*)0x0000)
+
 /* define hardware */
 #include <_gtia.h>
 #define GTIA_READ  (*(struct __gtia_read*)0xC000)

@@ -49,12 +49,12 @@ struct __os {
     unsigned char pcolr1;            // = $09       PM color 1
     unsigned char pcolr2;            // = $0A       PM color 2
     unsigned char pcolr3;            // = $0B       PM color 3
-    unsigned char color0;            // = $0C       PF Color 0
-    unsigned char color1;            // = $0D       PF Color 1
-    unsigned char color2;            // = $0E       PF Color 2
-    unsigned char color3;            // = $0F       PF Color 3
-    unsigned char color4;            // = $10       PF Color 4
-    unsigned char __filler[0xEF];    // = $11-$FF   Filler
+    unsigned char color0;            // = $0C       PF color 0
+    unsigned char color1;            // = $0D       PF color 1
+    unsigned char color2;            // = $0E       PF color 2
+    unsigned char color3;            // = $0F       PF color 3
+    unsigned char color4;            // = $10       PF color 4
+    unsigned char _free_1[0xEF];     // = $11-$FF   User space
     
     /*Stack*/
     unsigned char stack[0x100];      // = $100-$1FF Stack
@@ -65,9 +65,9 @@ struct __os {
     void (*vvblkd)(void);            // = $204      Deferred VBI vector
     void (*vdslst)(void);            // = $206      DLI vector
     void (*vkeybd)(void);            // = $208      Keyboard IRQ vector
-    void (*vkeypd)(void);            // = $20A      Keypad continue vector
+    void (*vkeypd)(void);            // = $20A      Keyboard continuation vector
     void (*vbrkky)(void);            // = $20C      Break key interrupt vector
-    void (*vbreak)(void);            // = $20E      Break instruction interrupt vector
+    void (*vbreak)(void);            // = $20E      BRK instruction interrupt vector
     void (*vserin)(void);            // = $210      Serial input ready vector
     void (*vseror)(void);            // = $212      Serial output data needed vector
     void (*vseroc)(void);            // = $214      Serial output completed vector

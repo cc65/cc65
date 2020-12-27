@@ -10,8 +10,8 @@
 
 _memcmp:
 
-; Calculate (-count-1) and store it into ptr3. This is some overhead here but
-; saves time in the compare loop
+; Calculate a special count, and store it into ptr3. That is some overhead here,
+; but saves time in the compare loop
 
         inx
         stx     ptr3+1
@@ -29,12 +29,12 @@ _memcmp:
 ; Loop initialization
 
         ;ldy     #$00           ; Initialize pointer (Y=0 guaranteed by popptr1)
-        ldx     ptr3            ; Load low counter byte into X
+        ldx     ptr3            ; Load inner counter byte into .X
 
 ; Head of compare loop: Test for the end condition
 
-Loop:   dex                     ; Bump low byte of (-count-1)
-        beq     BumpHiCnt       ; Jump on overflow
+Loop:   dex
+        beq     BumpHiCnt       ; Jump on end of inner count
 
 ; Do the compare
 
@@ -50,10 +50,10 @@ Comp:   lda     (ptr1),y
         inc     ptr2+1
         bne     Loop            ; Branch always (pointer wrap is illegal)
 
-; Entry on low counter byte overflow
+; Entry on inner loop end
 
 BumpHiCnt:
-        dec     ptr3+1          ; Bump high byte of (-count-1)
+        dec     ptr3+1
         bne     Comp            ; Jump if not done
         jmp     return0         ; Count is zero, areas are identical
 

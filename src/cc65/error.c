@@ -74,6 +74,7 @@ IntStack WarnUnknownPragma  = INTSTACK(1);  /* - unknown #pragmas */
 IntStack WarnUnusedLabel    = INTSTACK(1);  /* - unused labels */
 IntStack WarnUnusedParam    = INTSTACK(1);  /* - unused parameters */
 IntStack WarnUnusedVar      = INTSTACK(1);  /* - unused variables */
+IntStack WarnReturnType     = INTSTACK(1);  /* - control reaches end of non-void function */
 
 /* Map the name of a warning to the intstack that holds its state */
 typedef struct WarnMapEntry WarnMapEntry;
@@ -92,6 +93,7 @@ static WarnMapEntry WarnMap[] = {
     { &WarnUnusedLabel,         "unused-label"          },
     { &WarnUnusedParam,         "unused-param"          },
     { &WarnUnusedVar,           "unused-var"            },
+    { &WarnReturnType,          "return-type"           },
 };
 
 Collection DiagnosticStrBufs;

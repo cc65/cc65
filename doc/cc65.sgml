@@ -731,10 +731,7 @@ This cc65 version has some extensions to the ISO C standard.
 <item>  There is pseudo variable named <tt/__A__/ that indicates accumulator register. 
         It can be used to highlight the returned variable in non-void
         function where result is hidden in the <tt/asm/ section.
-        every other variable. They are most useful together with short
-        sequences of assembler code. 
-
-    For example, in the function below
+        For example, in the function below
 
         <tscreen><verb>
         BYTE get_key_via_atarixl_romcall_device_k(void)      \

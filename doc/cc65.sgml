@@ -739,7 +739,7 @@ This cc65 version has some extensions to the ISO C standard.
             asm("PHA");         \
             asm("LDA $E424");   \
             asm("PHA");         \
-            asm("RTA");         \
+            asm("RTS");         \
             return __A__;
         </verb></tscreen>
 

@@ -709,7 +709,7 @@ This cc65 version has some extensions to the ISO C standard.
         places.
         <p>
 
-<item>  There are two pseudo variables named <tt/__AX__/ and <tt/__EAX__/.
+<item>  There are two pseudo variables named <tt/__A__, __AX__/ and <tt/__EAX__/.
         Both refer to the primary register that is used by the compiler to
         evaluate expressions or return function results. <tt/__AX__/ is of
         type <tt/unsigned int/ and <tt/__EAX__/ of type <tt/long unsigned int/
@@ -726,26 +726,6 @@ This cc65 version has some extensions to the ISO C standard.
         </verb></tscreen>
 
         will give the high byte of any unsigned value.
-        <p>
-
-<item>  There is pseudo variable named <tt/__A__/ that indicates accumulator register. 
-        It can be used to highlight the returned variable in non-void
-        function where result is hidden in the <tt/asm/ section.
-        For example, in the function below
-
-        <tscreen><verb>
-        BYTE get_key_via_atarixl_romcall_device_k(void)      \
-            asm("LDA $E425");   \
-            asm("PHA");         \
-            asm("LDA $E424");   \
-            asm("PHA");         \
-            asm("RTS");         \
-            return __A__;
-        </verb></tscreen>
-
-        <tt/return __A__;/ will indicate that result is stored in the accumulator
-        and suppress warning that function has no return statement. Instead, you can
-        also use <tt/#pragma warn (return-type, off) ... pragma warn (return-type, on)/
         <p>
 
 <item>  Inside a function, the identifier <tt/__func__/ gives the name of the

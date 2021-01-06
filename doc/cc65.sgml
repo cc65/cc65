@@ -709,12 +709,13 @@ This cc65 version has some extensions to the ISO C standard.
         places.
         <p>
 
-<item>  There are two pseudo variables named <tt/__A__, __AX__/ and <tt/__EAX__/.
-        Both refer to the primary register that is used by the compiler to
-        evaluate expressions or return function results. <tt/__AX__/ is of
-        type <tt/unsigned int/ and <tt/__EAX__/ of type <tt/long unsigned int/
-        respectively. The pseudo variables may be used as lvalue and rvalue as
-        every other variable. They are most useful together with short
+<item>  There are three pseudo variables named <tt/__A__/, <tt/__AX__/ and
+        <tt/__EAX__/. They all refer to the primary register that is used
+        by the compiler to evaluate expressions or return function results.
+        <tt/__A__/ is of type <tt/unsigned char/, <tt/__AX__/ is of type
+        <tt/unsigned int/ and <tt/__EAX__/ of type <tt/long unsigned int/
+        respectively. The pseudo variables may be used as lvalue and rvalue
+        as every other variable. They are most useful together with short
         sequences of assembler code. For example, the macro
 
         <tscreen><verb>

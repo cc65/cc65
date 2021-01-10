@@ -466,6 +466,22 @@ char* pcAtasciiMappingString = "Hello Atari!";
 
 does not.
 
+<sect1>ATASCII string definitions<p>
+
+To ease the use of graphic symbols or inverse video characters of the ATASCII
+charset, string defintions for all characters are available.
+
+The defintions can be used consecutively to form longer stings.
+Example:
+<tscreen><verb>
+cputs(CS_BALL " Hello " CSI_A CSI_t CSI_a CSI_r CSI_i " " CS_BALL);
+</verb></tscreen>
+
+Inspect the "<tt/atari.h/" include file for the definitions.
+
+Please note, that the plain heart symbol is not suitable for such use, as it
+is represented by 0x00, which indicates a string end in C.
+
 <sect1>Keyboard codes<p>
 
 For direct keyboard scanning in conjunction with e.g. the OS location "CH" (764/$2FC),

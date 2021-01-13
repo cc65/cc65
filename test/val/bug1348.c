@@ -1,27 +1,26 @@
-
-/* bug#1348, wrongly optimized integer promotion in comparison */
+/* bug #1348, wrongly optimized integer promotion in comparison */
 
 #include <stdio.h>
 
-int notrandtab[] = {
+static const int notrandtab[] = {
     0xffff, 0x7fff, 0x3fff, 0x1fff,
     0x0fff, 0x07ff, 0x03ff, 0x01ff,
     0x00ff, 0x007f, 0x003f, 0x001f,
     0x000f, 0x0007, 0x0003, 0x0001
 };
 
-unsigned char notrandcount = 0;
+static unsigned char notrandcount = 0;
 
-int notrand(void)
+static int notrand(void)
 {
     return notrandtab[notrandcount & 0x0f];
 }
 
-unsigned char n1, n2;
-unsigned char i, ii, s;
-unsigned char err = 0;
+static unsigned char n1, n2;
+static unsigned char i, ii, s;
+static unsigned char err = 0;
 
-unsigned char cmptab[] = {
+static const unsigned char cmptab[] = {
     0xff, 0x7f, 0x3f, 0x1f,
     0x0f, 0x07, 0x03, 0x01,
     0x80, 0x40, 0x20, 0x10,
@@ -40,13 +39,14 @@ int main(void)
             if ((notrand() & 0xffu) > s) {
                 n2 = 1;
             }
-            printf("%5d>%3d %d(%02x) %d(%02x)  %s\n",
-                   notrandtab[notrandcount & 0x0f], s,
+            printf("%5d > %3d %u(%02x) %u(%02x)  %s\n",
+                   notrandtab[i], s,
                    n1, (notrand() & 0xff),
                    n2, (notrand() & 0xffu),
-                   n1 == n2 ? "=" : "!="
-                  );
-            if (n1 != n2) err = 1;
+                   n1 == n2 ? "=" : "!=");
+            if (n1 != n2) {
+                err = 1;
+            }
             notrandcount++;
         }
     }

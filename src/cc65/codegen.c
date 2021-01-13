@@ -1433,17 +1433,20 @@ unsigned g_typeadjust (unsigned lhs, unsigned rhs)
 
     /* Note that this logic is largely duplicated by ArithmeticConvert. */
 
-    /* Before we apply the integral promotions, we check if both types are unsigned char.
-    ** If so, we return unsigned int, rather than int, which would be returned by the standard
-    ** rules.  This is only a performance optimization and does not affect correctness, as
-    ** the flags are only used for code generation, and not to determine types of other
-    ** expressions containing this one.  All unsigned char bit-patterns are valid as both int
-    ** and unsigned int and represent the same value, so either signed or unsigned int operations
-    ** can be used.  This special case part is not duplicated by ArithmeticConvert.
+    /* Before we apply the integral promotions, we check if both types are the same character type.
+    ** If so, we return that type, rather than int, which would be returned by the standard
+    ** rules.  This is only a performance optimization allowing the use of unsigned and/or char
+    ** operations; it does not affect correctness, as the flags are only used for code generation,
+    ** and not to determine types of other expressions containing this one.  For codgen, CF_CHAR
+    ** means the operands are char and the result is int (unless CF_FORCECHAR is also set, in
+    ** which case the result is char).  This special case part is not duplicated by
+    ** ArithmeticConvert.
     */
-    if ((lhs & CF_TYPEMASK) == CF_CHAR && (lhs & CF_UNSIGNED) &&
-        (rhs & CF_TYPEMASK) == CF_CHAR && (rhs & CF_UNSIGNED)) {
-        return const_flag | CF_UNSIGNED | CF_INT;
+    if ((lhs & CF_TYPEMASK) == CF_CHAR && (rhs & CF_TYPEMASK) == CF_CHAR &&
+        (lhs & CF_UNSIGNED) == (rhs & CF_UNSIGNED)) {
+        /* Signedness flags are the same, so just use one of them. */
+        const unsigned unsigned_flag = lhs & CF_UNSIGNED;
+        return const_flag | unsigned_flag | CF_CHAR;
     }
 
     /* Apply integral promotions for types char/short. */
@@ -3111,9 +3114,26 @@ void g_asr (unsigned flags, unsigned long val)
         switch (flags & CF_TYPEMASK) {
             case CF_CHAR:
                 if (flags & CF_FORCECHAR) {
-                    if ((flags & CF_UNSIGNED) != 0 && val < 8) {
-                        while (val--) {
-                            AddCodeLine ("lsr a");
+                    val &= 7;
+                    if ((flags & CF_UNSIGNED) != 0) {
+                        /* Instead of `val` right shifts, we can also do `9 - val` left rotates
+                        ** and a mask.  This saves 3 bytes and 8 cycles for `val == 7` and
+                        ** 1 byte and 4 cycles for `val == 6`.
+                        */
+                        if (val < 6) {
+                            while (val--) {
+                                AddCodeLine ("lsr a");  /* 1 byte, 2 cycles */
+                            }
+                        } else {
+                            unsigned i;
+                            /* The first ROL shifts in garbage and sets carry to the high bit.
+                            ** The garbage is cleaned up by the mask.
+                            */
+                            for (i = val; i < 9; ++i) {
+                                AddCodeLine ("rol a");  /* 1 byte,  2 cycles */
+                            }
+                            /* 2 bytes, 2 cycles */
+                            AddCodeLine ("and #$%02X", 0xFF >> val);
                         }
                         return;
                     } else if (val <= 2) {
@@ -3267,9 +3287,21 @@ void g_asl (unsigned flags, unsigned long val)
     if (flags & CF_CONST) {
         switch (flags & CF_TYPEMASK) {
             case CF_CHAR:
-                if ((flags & CF_FORCECHAR) != 0 && val <= 6) {
-                    while (val--) {
-                        AddCodeLine ("asl a");
+                if ((flags & CF_FORCECHAR) != 0) {
+                    val &= 7;
+                    /* Large shifts are faster and smaller with ROR.  See g_asr for detailed
+                    ** byte and cycle counts.
+                    */
+                    if (val < 6) {
+                        while (val--) {
+                            AddCodeLine ("asl a");
+                        }
+                    } else {
+                        unsigned i;
+                        for (i = val; i < 9; ++i) {
+                            AddCodeLine ("ror a");
+                        }
+                        AddCodeLine ("and #$%02X", (~0U << val) & 0xFF);
                     }
                     return;
                 }

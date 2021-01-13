@@ -1,7 +1,6 @@
 ;
-; Vic20 generic definitions. Stolen mostly from c64.inc - Steve Schmidtke
+; VIC-20 generic definitions. Stolen mostly from c64.inc -- Steve Schmidtke
 ;
-
 
 ; ---------------------------------------------------------------------------
 ; Zero page, Commodore stuff
@@ -12,8 +11,8 @@ TXTPTR          := $7A          ; Pointer into BASIC source code
 STATUS          := $90          ; Kernal I/O completion status
 TIME            := $A0          ; 60HZ clock
 FNAM_LEN        := $B7          ; Length of filename
-SECADR          := $B9          ; Secondary address
-DEVNUM          := $BA          ; Device number
+SECADR          := $B9          ; Second address
+DEVNUM          := $BA          ; Device number (first address)
 FNAM            := $BB          ; Pointer to filename
 KEY_COUNT       := $C6          ; Number of keys in input buffer
 RVS             := $C7          ; Reverse flag
@@ -35,6 +34,8 @@ CURS_COLOR      := $287         ; Color under the cursor
 KBDREPEAT       := $28a
 KBDREPEATRATE   := $28b
 KBDREPEATDELAY  := $28c
+
+RSSTAT          := $297         ; RS-232 device driver status
 
 ; ---------------------------------------------------------------------------
 ; Screen size

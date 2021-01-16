@@ -109,6 +109,28 @@ $(WORKDIR)/bug1265.$1.$2.prg: bug1265.c | $(WORKDIR)
 	$(LD65) -t sim$2 -o $$@ $$(@:.prg=.o) sim$2.lib $(NULLERR)
 	$(NOT) $(SIM65) $(SIM65FLAGS) $$@ $(NULLOUT) $(NULLERR)
 
+# this one fails with optimizations enabled
+$(WORKDIR)/bug1374.g.6502.prg: bug1374.c | $(WORKDIR)
+	$(if $(QUIET),echo misc/bug1374.g.6502.prg)
+	$(CC65) -t sim$2 -g -o $$(@:.prg=.s) $$< $(NULLERR)
+	$(CA65) -t sim$2 -o $$(@:.prg=.o) $$(@:.prg=.s) $(NULLERR)
+	$(LD65) -t sim$2 -o $$@ $$(@:.prg=.o) sim$2.lib $(NULLERR)
+	$(SIM65) $(SIM65FLAGS) $$@ $(NULLOUT) $(NULLERR)
+
+$(WORKDIR)/bug1374.g.65c02.prg: bug1374.c | $(WORKDIR)
+	$(if $(QUIET),echo misc/bug1374.g.65c02.prg)
+	$(CC65) -t sim$2 -g -o $$(@:.prg=.s) $$< $(NULLERR)
+	$(CA65) -t sim$2 -o $$(@:.prg=.o) $$(@:.prg=.s) $(NULLERR)
+	$(LD65) -t sim$2 -o $$@ $$(@:.prg=.o) sim$2.lib $(NULLERR)
+	$(SIM65) $(SIM65FLAGS) $$@ $(NULLOUT) $(NULLERR)
+
+$(WORKDIR)/bug1374.$1.$2.prg: bug1374.c | $(WORKDIR)
+	$(if $(QUIET),echo misc/bug1374.$1.$2.prg)
+	$(CC65) -t sim$2 -$1 -o $$(@:.prg=.s) $$< $(NULLERR)
+	$(CA65) -t sim$2 -o $$(@:.prg=.o) $$(@:.prg=.s) $(NULLERR)
+	$(LD65) -t sim$2 -o $$@ $$(@:.prg=.o) sim$2.lib $(NULLERR)
+	$(NOT) $(SIM65) $(SIM65FLAGS) $$@ $(NULLOUT) $(NULLERR)
+
 # should compile, but then hangs in an endless loop
 $(WORKDIR)/endless.$1.$2.prg: endless.c | $(WORKDIR)
 	$(if $(QUIET),echo misc/endless.$1.$2.prg)

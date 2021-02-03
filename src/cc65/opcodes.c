@@ -734,7 +734,7 @@ opc_t MakeShortBranch (opc_t OPC)
         case OP65_BVS:
         case OP65_JVS:  return OP65_BVS;
         case OP65_BRA:
-        case OP65_JMP:  return (CPUIsets[CPU] & CPU_ISET_65SC02)? OP65_BRA : OP65_JMP;
+        case OP65_JMP:  return (CPUIsets[CPU] & (CPU_ISET_65SC02 | CPU_ISET_6502DTV)) ? OP65_BRA : OP65_JMP;
         default:
             Internal ("MakeShortBranch: Invalid opcode: %d", OPC);
             return 0;

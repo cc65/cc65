@@ -186,6 +186,7 @@ void g_preamble (void)
     switch (CPU) {
         case CPU_6502:      AddTextLine ("\t.setcpu\t\t\"6502\"");      break;
         case CPU_6502X:     AddTextLine ("\t.setcpu\t\t\"6502X\"");     break;
+        case CPU_6502DTV:   AddTextLine ("\t.setcpu\t\t\"6502DTV\"");   break;
         case CPU_65SC02:    AddTextLine ("\t.setcpu\t\t\"65SC02\"");    break;
         case CPU_65C02:     AddTextLine ("\t.setcpu\t\t\"65C02\"");     break;
         case CPU_65816:     AddTextLine ("\t.setcpu\t\t\"65816\"");     break;
@@ -1432,6 +1433,22 @@ unsigned g_typeadjust (unsigned lhs, unsigned rhs)
 
     /* Note that this logic is largely duplicated by ArithmeticConvert. */
 
+    /* Before we apply the integral promotions, we check if both types are the same character type.
+    ** If so, we return that type, rather than int, which would be returned by the standard
+    ** rules.  This is only a performance optimization allowing the use of unsigned and/or char
+    ** operations; it does not affect correctness, as the flags are only used for code generation,
+    ** and not to determine types of other expressions containing this one.  For codgen, CF_CHAR
+    ** means the operands are char and the result is int (unless CF_FORCECHAR is also set, in
+    ** which case the result is char).  This special case part is not duplicated by
+    ** ArithmeticConvert.
+    */
+    if ((lhs & CF_TYPEMASK) == CF_CHAR && (rhs & CF_TYPEMASK) == CF_CHAR &&
+        (lhs & CF_UNSIGNED) == (rhs & CF_UNSIGNED)) {
+        /* Signedness flags are the same, so just use one of them. */
+        const unsigned unsigned_flag = lhs & CF_UNSIGNED;
+        return const_flag | unsigned_flag | CF_CHAR;
+    }
+
     /* Apply integral promotions for types char/short. */
     lhs = g_intpromotion (lhs);
     rhs = g_intpromotion (rhs);
@@ -2461,7 +2478,7 @@ void g_branch (unsigned Label)
 ** the label cannot be farther away from the branch than -128/+127 bytes.
 */
 {
-    if ((CPUIsets[CPU] & CPU_ISET_65SC02) != 0) {
+    if ((CPUIsets[CPU] & (CPU_ISET_65SC02 | CPU_ISET_6502DTV)) != 0) {
         AddCodeLine ("bra %s", LocalLabelName (Label));
     } else {
         g_jump (Label);
@@ -3090,18 +3107,33 @@ void g_asr (unsigned flags, unsigned long val)
         "tosasrax", "tosshrax", "tosasreax", "tosshreax"
     };
 
-    /* If the right hand side is const, the lhs is not on stack but still
+    /* If the right hand side is const, the lhs is not on stack, but still
     ** in the primary register.
     */
     if (flags & CF_CONST) {
-
         switch (flags & CF_TYPEMASK) {
-
             case CF_CHAR:
                 if (flags & CF_FORCECHAR) {
-                    if ((flags & CF_UNSIGNED) != 0 && val <= 4) {
-                        while (val--) {
-                            AddCodeLine ("lsr a");
+                    val &= 7;
+                    if ((flags & CF_UNSIGNED) != 0) {
+                        /* Instead of `val` right shifts, we can also do `9 - val` left rotates
+                        ** and a mask.  This saves 3 bytes and 8 cycles for `val == 7` and
+                        ** 1 byte and 4 cycles for `val == 6`.
+                        */
+                        if (val < 6) {
+                            while (val--) {
+                                AddCodeLine ("lsr a");  /* 1 byte, 2 cycles */
+                            }
+                        } else {
+                            unsigned i;
+                            /* The first ROL shifts in garbage and sets carry to the high bit.
+                            ** The garbage is cleaned up by the mask.
+                            */
+                            for (i = val; i < 9; ++i) {
+                                AddCodeLine ("rol a");  /* 1 byte,  2 cycles */
+                            }
+                            /* 2 bytes, 2 cycles */
+                            AddCodeLine ("and #$%02X", 0xFF >> val);
                         }
                         return;
                     } else if (val <= 2) {
@@ -3111,19 +3143,28 @@ void g_asr (unsigned flags, unsigned long val)
                         }
                         return;
                     }
+                    AddCodeLine ("ldx #$00");
+                    if ((flags & CF_UNSIGNED) == 0) {
+                        unsigned L = GetLocalLabel ();
+
+                        AddCodeLine ("cmp #$80");   /* Sign bit into carry */
+                        AddCodeLine ("bcc %s", LocalLabelName (L));
+                        AddCodeLine ("dex");        /* Make $FF */
+                        g_defcodelabel (L);
+                    }
                 }
                 /* FALLTHROUGH */
 
             case CF_INT:
                 val &= 0x0F;
                 if (val >= 8) {
+                    AddCodeLine ("txa");
                     if (flags & CF_UNSIGNED) {
-                        AddCodeLine ("txa");
                         AddCodeLine ("ldx #$00");
                     } else {
-                        unsigned L = GetLocalLabel();
+                        unsigned L = GetLocalLabel ();
+
                         AddCodeLine ("cpx #$80");   /* Sign bit into carry */
-                        AddCodeLine ("txa");
                         AddCodeLine ("ldx #$00");
                         AddCodeLine ("bcc %s", LocalLabelName (L));
                         AddCodeLine ("dex");        /* Make $FF */
@@ -3141,9 +3182,9 @@ void g_asr (unsigned flags, unsigned long val)
                 }
                 if (val > 0) {
                     if (flags & CF_UNSIGNED) {
-                        AddCodeLine ("jsr shrax%ld", val);
+                        AddCodeLine ("jsr shrax%lu", val);
                     } else {
-                        AddCodeLine ("jsr asrax%ld", val);
+                        AddCodeLine ("jsr asrax%lu", val);
                     }
                 }
                 return;
@@ -3154,7 +3195,8 @@ void g_asr (unsigned flags, unsigned long val)
                     AddCodeLine ("ldx #$00");
                     AddCodeLine ("lda sreg+1");
                     if ((flags & CF_UNSIGNED) == 0) {
-                        unsigned L = GetLocalLabel();
+                        unsigned L = GetLocalLabel ();
+
                         AddCodeLine ("bpl %s", LocalLabelName (L));
                         AddCodeLine ("dex");
                         g_defcodelabel (L);
@@ -3167,7 +3209,8 @@ void g_asr (unsigned flags, unsigned long val)
                     AddCodeLine ("ldy #$00");
                     AddCodeLine ("ldx sreg+1");
                     if ((flags & CF_UNSIGNED) == 0) {
-                        unsigned L = GetLocalLabel();
+                        unsigned L = GetLocalLabel ();
+
                         AddCodeLine ("bpl %s", LocalLabelName (L));
                         AddCodeLine ("dey");
                         g_defcodelabel (L);
@@ -3183,7 +3226,8 @@ void g_asr (unsigned flags, unsigned long val)
                     AddCodeLine ("ldy sreg+1");
                     AddCodeLine ("sty sreg");
                     if ((flags & CF_UNSIGNED) == 0) {
-                        unsigned L = GetLocalLabel();
+                        unsigned L = GetLocalLabel ();
+
                         AddCodeLine ("cpy #$80");
                         AddCodeLine ("ldy #$00");
                         AddCodeLine ("bcc %s", LocalLabelName (L));
@@ -3205,9 +3249,9 @@ void g_asr (unsigned flags, unsigned long val)
                 }
                 if (val > 0) {
                     if (flags & CF_UNSIGNED) {
-                        AddCodeLine ("jsr shreax%ld", val);
+                        AddCodeLine ("jsr shreax%lu", val);
                     } else {
-                        AddCodeLine ("jsr asreax%ld", val);
+                        AddCodeLine ("jsr asreax%lu", val);
                     }
                 }
                 return;
@@ -3237,17 +3281,27 @@ void g_asl (unsigned flags, unsigned long val)
         "tosaslax", "tosshlax", "tosasleax", "tosshleax"
     };
 
-    /* If the right hand side is const, the lhs is not on stack but still
+    /* If the right hand side is const, the lhs is not on stack, but still
     ** in the primary register.
     */
     if (flags & CF_CONST) {
-
         switch (flags & CF_TYPEMASK) {
-
             case CF_CHAR:
-                if ((flags & CF_FORCECHAR) != 0 && val <= 4) {
-                    while (val--) {
-                        AddCodeLine ("asl a");
+                if ((flags & CF_FORCECHAR) != 0) {
+                    val &= 7;
+                    /* Large shifts are faster and smaller with ROR.  See g_asr for detailed
+                    ** byte and cycle counts.
+                    */
+                    if (val < 6) {
+                        while (val--) {
+                            AddCodeLine ("asl a");
+                        }
+                    } else {
+                        unsigned i;
+                        for (i = val; i < 9; ++i) {
+                            AddCodeLine ("ror a");
+                        }
+                        AddCodeLine ("and #$%02X", (~0U << val) & 0xFF);
                     }
                     return;
                 }
@@ -3270,9 +3324,9 @@ void g_asl (unsigned flags, unsigned long val)
                 }
                 if (val > 0) {
                     if (flags & CF_UNSIGNED) {
-                        AddCodeLine ("jsr shlax%ld", val);
+                        AddCodeLine ("jsr shlax%lu", val);
                     } else {
-                        AddCodeLine ("jsr aslax%ld", val);
+                        AddCodeLine ("jsr aslax%lu", val);
                     }
                 }
                 return;
@@ -3311,9 +3365,9 @@ void g_asl (unsigned flags, unsigned long val)
                 }
                 if (val > 0) {
                     if (flags & CF_UNSIGNED) {
-                        AddCodeLine ("jsr shleax%ld", val);
+                        AddCodeLine ("jsr shleax%lu", val);
                     } else {
-                        AddCodeLine ("jsr asleax%ld", val);
+                        AddCodeLine ("jsr asleax%lu", val);
                     }
                 }
                 return;

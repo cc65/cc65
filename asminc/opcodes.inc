@@ -505,4 +505,12 @@ OPC_ISC_aby = $FB
 OPC_NOP_abx = $FC
 OPC_ISC_abx = $FF
 
+.if (.cpu .bitand ::CPU_ISET_6502DTV)
+
+OPC_BRA     = $12
+OPC_SAC_imm = $32
+OPC_SIR_imm = $42
+
+.endif
+
 .endif

@@ -287,7 +287,7 @@ static unsigned Opt_tosshift (StackOpData* D, const char* Name)
         /* ldx */
         X = NewCodeEntry (OP65_LDX, LoadX->AM, LoadX->Arg, 0, D->OpEntry->LI);
         InsertEntry (D, X, D->IP++);
- 
+
         /* Lhs load entries can be removed if not used later */
         D->Lhs.X.Flags |= LI_REMOVE;
         D->Lhs.A.Flags |= LI_REMOVE;
@@ -1100,7 +1100,7 @@ static unsigned Opt_tosxorax (StackOpData* D)
 
 
 static unsigned Opt_a_toscmpbool (StackOpData* D, const char* BoolTransformer)
-/* Optimize the tos compare sequence with a bool transformer */
+/* Optimize the TOS compare sequence with a bool transformer */
 {
     CodeEntry* X;
     cmp_t      Cond;
@@ -1119,9 +1119,8 @@ static unsigned Opt_a_toscmpbool (StackOpData* D, const char* BoolTransformer)
         D->Rhs.A.Flags |= LI_REMOVE;
 
     } else if ((D->Lhs.A.Flags & LI_DIRECT) != 0) {
-
-        /* If the lhs is direct (but not stack relative), encode compares with lhs
-        ** effectively reverting the order (which doesn't matter for ==).
+        /* If the lhs is direct (but not stack relative), encode compares with lhs,
+        ** effectively reversing the order (which doesn't matter for == and !=).
         */
         Cond = FindBoolCmpCond (BoolTransformer);
         Cond = GetRevertedCond (Cond);
@@ -1138,7 +1137,6 @@ static unsigned Opt_a_toscmpbool (StackOpData* D, const char* BoolTransformer)
         D->Lhs.A.Flags |= LI_REMOVE;
 
     } else {
-
         /* We'll do reverse-compare */
         Cond = FindBoolCmpCond (BoolTransformer);
         Cond = GetRevertedCond (Cond);
@@ -1162,7 +1160,7 @@ static unsigned Opt_a_toscmpbool (StackOpData* D, const char* BoolTransformer)
     X = NewCodeEntry (OP65_JSR, AM65_ABS, BoolTransformer, 0, D->OpEntry->LI);
     InsertEntry (D, X, D->IP++);
 
-    /* Remove the push and the call to the tosgeax function */
+    /* Remove the push and the call to the TOS function */
     RemoveRemainders (D);
 
     /* We changed the sequence */
@@ -1175,22 +1173,6 @@ static unsigned Opt_a_toseq (StackOpData* D)
 /* Optimize the toseqax sequence */
 {
     return Opt_a_toscmpbool (D, "booleq");
-}
-
-
-
-static unsigned Opt_a_tosge (StackOpData* D)
-/* Optimize the tosgeax sequence */
-{
-    return Opt_a_toscmpbool (D, "boolge");
-}
-
-
-
-static unsigned Opt_a_tosgt (StackOpData* D)
-/* Optimize the tosgtax sequence */
-{
-    return Opt_a_toscmpbool (D, "boolgt");
 }
 
 
@@ -1236,7 +1218,7 @@ static unsigned Opt_a_tosicmp (StackOpData* D)
                 }
                 InsertEntry (D, X, D->IP++);
 
-                /* cmp src,y OR cmp (sp),y*/
+                /* cmp src,y OR cmp (sp),y */
                 if (D->Rhs.A.LoadEntry->OPC == OP65_JSR) {
                     /* opc (sp),y */
                     X = NewCodeEntry (OP65_CMP, AM65_ZP_INDY, "sp", 0, D->OpEntry->LI);
@@ -1268,18 +1250,18 @@ static unsigned Opt_a_tosicmp (StackOpData* D)
         InsertEntry (D, X, D->IP-3);
 
     } else {
-        /* Just clear A,Z,N and set C */
+        /* Just clear A,Z,N; and set C */
+        Arg = MakeHexArg (0);
         if ((RI = GetLastChangedRegInfo (D, &D->Lhs.A)) != 0 &&
             RegValIsKnown (RI->Out.RegA)                     &&
             (RI->Out.RegA & 0xFF) == 0) {
-            Arg = MakeHexArg (0);
-            X   = NewCodeEntry (OP65_CMP, AM65_IMM, Arg, 0, D->OpEntry->LI);
+
+            X = NewCodeEntry (OP65_CMP, AM65_IMM, Arg, 0, D->OpEntry->LI);
             InsertEntry (D, X, D->OpIndex + 1);
         } else {
-            Arg = MakeHexArg (0);
-            X   = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, D->OpEntry->LI);
+            X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, D->OpEntry->LI);
             InsertEntry (D, X, D->OpIndex + 1);
-            X   = NewCodeEntry (OP65_CMP, AM65_IMM, Arg, 0, D->OpEntry->LI);
+            X = NewCodeEntry (OP65_CMP, AM65_IMM, Arg, 0, D->OpEntry->LI);
             InsertEntry (D, X, D->OpIndex + 2);
         }
     }
@@ -1292,24 +1274,8 @@ static unsigned Opt_a_tosicmp (StackOpData* D)
 
 
 
-static unsigned Opt_a_tosle (StackOpData* D)
-/* Optimize the tosleax sequence */
-{
-    return Opt_a_toscmpbool (D, "boolle");
-}
-
-
-
-static unsigned Opt_a_toslt (StackOpData* D)
-/* Optimize the tosltax sequence */
-{
-    return Opt_a_toscmpbool (D, "boollt");
-}
-
-
-
 static unsigned Opt_a_tosne (StackOpData* D)
-/* Optimize the toseqax sequence */
+/* Optimize the tosneax sequence */
 {
     return Opt_a_toscmpbool (D, "boolne");
 }
@@ -1317,7 +1283,7 @@ static unsigned Opt_a_tosne (StackOpData* D)
 
 
 static unsigned Opt_a_tosuge (StackOpData* D)
-/* Optimize the tosugeax sequence */
+/* Optimize the tosgeax and tosugeax sequences */
 {
     return Opt_a_toscmpbool (D, "booluge");
 }
@@ -1325,7 +1291,7 @@ static unsigned Opt_a_tosuge (StackOpData* D)
 
 
 static unsigned Opt_a_tosugt (StackOpData* D)
-/* Optimize the tosugtax sequence */
+/* Optimize the tosgtax and tosugtax sequences */
 {
     return Opt_a_toscmpbool (D, "boolugt");
 }
@@ -1333,7 +1299,7 @@ static unsigned Opt_a_tosugt (StackOpData* D)
 
 
 static unsigned Opt_a_tosule (StackOpData* D)
-/* Optimize the tosuleax sequence */
+/* Optimize the tosleax and tosuleax sequences */
 {
     return Opt_a_toscmpbool (D, "boolule");
 }
@@ -1341,7 +1307,7 @@ static unsigned Opt_a_tosule (StackOpData* D)
 
 
 static unsigned Opt_a_tosult (StackOpData* D)
-/* Optimize the tosultax sequence */
+/* Optimize the tosltax and tosultax sequences */
 {
     return Opt_a_toscmpbool (D, "boolult");
 }
@@ -1353,6 +1319,8 @@ static unsigned Opt_a_tosult (StackOpData* D)
 /*****************************************************************************/
 
 
+
+/* The first column of these two tables must be sorted in lexical order */
 
 static const OptFuncDesc FuncTable[] = {
     { "__bzero",    Opt___bzero,   REG_NONE, OP_X_ZERO | OP_A_KNOWN                    },
@@ -1379,11 +1347,11 @@ static const OptFuncDesc FuncTable[] = {
 
 static const OptFuncDesc FuncRegATable[] = {
     { "toseqax",    Opt_a_toseq,   REG_NONE, OP_NONE                                   },
-    { "tosgeax",    Opt_a_tosge,   REG_NONE, OP_NONE                                   },
-    { "tosgtax",    Opt_a_tosgt,   REG_NONE, OP_NONE                                   },
+    { "tosgeax",    Opt_a_tosuge,  REG_NONE, OP_NONE                                   },
+    { "tosgtax",    Opt_a_tosugt,  REG_NONE, OP_NONE                                   },
     { "tosicmp",    Opt_a_tosicmp, REG_NONE, OP_NONE                                   },
-    { "tosleax",    Opt_a_tosle,   REG_NONE, OP_NONE                                   },
-    { "tosltax",    Opt_a_toslt,   REG_NONE, OP_NONE                                   },
+    { "tosleax",    Opt_a_tosule,  REG_NONE, OP_NONE                                   },
+    { "tosltax",    Opt_a_tosult,  REG_NONE, OP_NONE                                   },
     { "tosneax",    Opt_a_tosne,   REG_NONE, OP_NONE                                   },
     { "tosugeax",   Opt_a_tosuge,  REG_NONE, OP_NONE                                   },
     { "tosugtax",   Opt_a_tosugt,  REG_NONE, OP_NONE                                   },
@@ -1732,7 +1700,7 @@ unsigned OptStackOps (CodeSeg* S)
     int             I;
     int             OldEntryCount;      /* Old number of entries */
     unsigned        Used;               /* What registers would be used */
-    unsigned        PushedRegs;         /* Track if the same regs are used after the push */
+    unsigned        PushedRegs = 0;     /* Track if the same regs are used after the push */
     int             RhsAChgIndex;       /* Track if rhs is changed more than once */
     int             RhsXChgIndex;       /* Track if rhs is changed more than once */
     int             IsRegAOptFunc = 0;  /* Whether to use the RegA-only optimizations */

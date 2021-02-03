@@ -1159,12 +1159,13 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
 SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
 /* Add an external or global symbol to the symbol table and return the entry */
 {
-    /* Use the global symbol table */
+    /* Start from the local symbol table */
     SymTable* Tab = SymTab;
 
     /* Do we have an entry with this name already? */
     SymEntry* Entry = FindSymInTree (Tab, Name);
     if (Entry) {
+
         /* We have a symbol with this name already */
         if (HandleSymRedefinition (Entry, T, Flags)) {
             Entry = 0;
@@ -1215,7 +1216,11 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
             /* Use the fail-safe table for fictitious symbols */
             Tab = FailSafeTab;
         }
-    } 
+
+    } else if ((Flags & (SC_EXTERN | SC_FUNC)) != 0) {
+        /* Add the new declaration to the global symbol table instead */
+        Tab = SymTab0;
+    }
     
     if (Entry == 0 || Entry->Owner != Tab) {
 

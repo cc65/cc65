@@ -17,4 +17,3 @@ _kbhit:
 @no_char_action:
         tax        
         rts
-

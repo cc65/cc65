@@ -13,7 +13,6 @@
         .import         zerobss, copydata
 
         .include        "zeropage.inc"
-        .include        "atari5200.inc"
 
 start:
 

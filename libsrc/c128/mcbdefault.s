@@ -19,12 +19,12 @@
 
 ; Sprite definitions. The first value can be changed to adjust the number
 ; of the sprite used for the mouse. All others depend on this value.
-MOUSE_SPR       = 0                             ; Sprite used for the mouse
-MOUSE_SPR_MEM   = $0E00                         ; Memory location
-MOUSE_SPR_MASK  = $01 .shl MOUSE_SPR            ; Positive mask
-MOUSE_SPR_NMASK = .lobyte(.not MOUSE_SPR_MASK)  ; Negative mask
-VIC_SPR_X       = (VIC_SPR0_X + 2*MOUSE_SPR)    ; Sprite X register
-VIC_SPR_Y       = (VIC_SPR0_Y + 2*MOUSE_SPR)    ; Sprite Y register
+MOUSE_SPR       = 0                                     ; Sprite used for the mouse
+MOUSE_SPR_MEM   = $0E00                                 ; Memory location
+MOUSE_SPR_MASK  = $01 .shl MOUSE_SPR                    ; Positive mask
+MOUSE_SPR_NMASK = .lobyte(.bitnot MOUSE_SPR_MASK)       ; Negative mask
+VIC_SPR_X       = (VIC_SPR0_X + 2*MOUSE_SPR)            ; Sprite X register
+VIC_SPR_Y       = (VIC_SPR0_Y + 2*MOUSE_SPR)            ; Sprite Y register
 
 ; --------------------------------------------------------------------------
 ; Initialize the mouse sprite.

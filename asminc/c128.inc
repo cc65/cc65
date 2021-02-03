@@ -7,6 +7,7 @@
 ; Zero page, Commodore stuff
 
 TXTPTR          := $3D          ; Pointer into BASIC source code
+STATUS          := $90          ; Kernal I/O completion status
 TIME            := $A0          ; 60HZ clock
 FNAM_LEN        := $B7          ; Length of filename
 SECADR          := $B9          ; Secondary address

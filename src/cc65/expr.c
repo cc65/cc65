@@ -1,7 +1,7 @@
 /* expr.c
 **
 ** 1998-06-21, Ullrich von Bassewitz
-** 2020-01-25, Greg King
+** 2020-11-20, Greg King
 */
 
 
@@ -219,6 +219,13 @@ static unsigned typeadjust (ExprDesc* lhs, ExprDesc* rhs, int NoPush)
 
     /* Generate type adjustment code if needed */
     ltype = TypeOf (lhst);
+    if (ED_IsConstAbsInt (lhs) && ltype == CF_INT && lhs->IVal >= 0 && lhs->IVal < 256) {
+        /* If the lhs is a int constant that fits in an unsigned char, use unsigned char.
+        ** g_typeadjust will either promote this to int or unsigned int as appropriate
+        ** based on the other operand.  See comment in hie_internal.
+        */
+        ltype = CF_CHAR | CF_UNSIGNED;
+    }
     if (ED_IsLocNone (lhs)) {
         ltype |= CF_CONST;
     }
@@ -227,6 +234,9 @@ static unsigned typeadjust (ExprDesc* lhs, ExprDesc* rhs, int NoPush)
         ltype |= CF_PRIMARY;
     }
     rtype = TypeOf (rhst);
+    if (ED_IsConstAbsInt (rhs) && rtype == CF_INT && rhs->IVal >= 0 && rhs->IVal < 256) {
+        rtype = CF_CHAR | CF_UNSIGNED;
+    }
     if (ED_IsLocNone (rhs)) {
         rtype |= CF_CONST;
     }
@@ -598,6 +608,8 @@ static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall, ExprDesc* ED)
 ** The function returns the size of the arguments pushed in bytes.
 */
 {
+    ExprDesc  Expr;
+
     /* Initialize variables */
     SymEntry* Param       = 0;  /* Keep gcc silent */
     unsigned  PushedSize  = 0;  /* Size of arguments pushed */
@@ -624,7 +636,6 @@ static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall, ExprDesc* ED)
     **
     */
     if (ParamComplete && IS_Get (&CodeSizeFactor) >= 200) {
-
         /* Calculate the number and size of the parameters */
         FrameParams = Func->ParamCount;
         FrameSize   = Func->ParamSize;
@@ -646,18 +657,13 @@ static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall, ExprDesc* ED)
         }
     }
 
-    /* The info of the last argument could be needed out of the loop */
-    ExprDesc Expr;
-    ED_Init (&Expr);
-    Expr.Flags |= ED->Flags & E_MASK_KEEP_SUBEXPR;
-
     /* Parse the actual argument list */
     while (CurTok.Tok != TOK_RPAREN) {
-
         unsigned Flags;     /* Code generator flags, not expression flags */
-        
-        /* This way the info of the last parameter won't be cleared */
+
         ED_Init (&Expr);
+
+        /* This way, the info of the last parameter won't be cleared */
         Expr.Flags |= ED->Flags & E_MASK_KEEP_SUBEXPR;
 
         /* Count arguments */
@@ -771,17 +777,19 @@ static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall, ExprDesc* ED)
             Error ("Argument expected after comma");
             break;
         }
+
+        DoDeferred (SQP_KEEP_NONE, &Expr);
     }
+
+    /* Append last deferred inc/dec before the function is called.
+    ** The last parameter needs to be preserved if it is passed in AX/EAX Regs.
+    */
+    DoDeferred (IsFastcall ? SQP_KEEP_EAX : SQP_KEEP_NONE, &Expr);
 
     /* Check if we had enough arguments */
     if (PushedCount < Func->ParamCount) {
         Error ("Too few arguments in function call");
     }
-
-    /* Append deferred inc/dec before the function is called.
-    ** The last parameter needs to be restored if it is passed with AX/EAX Regs.
-    */
-    DoDeferred (IsFastcall ? SQP_KEEP_EAX : SQP_KEEP_NONE, &Expr);
 
     /* The function returns the size of all arguments pushed onto the stack.
     ** However, if there are parameters missed (which is an error, and was
@@ -1163,16 +1171,16 @@ static void Primary (ExprDesc* E)
 
                 /* IDENT is either an auto-declared function or an undefined variable. */
                 if (CurTok.Tok == TOK_LPAREN) {
-                    /* C99 doesn't allow calls to undefined functions, so
+                    /* C99 doesn't allow calls to undeclared functions, so
                     ** generate an error and otherwise a warning. Declare a
                     ** function returning int. For that purpose, prepare a
                     ** function signature for a function having an empty param
                     ** list and returning int.
                     */
                     if (IS_Get (&Standard) >= STD_C99) {
-                        Error ("Call to undefined function '%s'", Ident);
+                        Error ("Call to undeclared function '%s'", Ident);
                     } else {
-                        Warning ("Call to undefined function '%s'", Ident);
+                        Warning ("Call to undeclared function '%s'", Ident);
                     }
                     Sym = AddGlobalSym (Ident, GetImplicitFuncType(), SC_EXTERN | SC_REF | SC_FUNC);
                     E->Type  = Sym->Type;
@@ -1385,7 +1393,7 @@ static void ArrayRef (ExprDesc* Expr)
         /* The array subscript is a constant. Since we can have the element
         ** address directly as base+offset, we can remove the array address
         ** push onto the stack before if loading subscript doesn't tamper that
-        ** address in the primary. 
+        ** address in the primary.
         */
         if (!ConstBaseAddr) {
             RemoveCode (&Mark2);
@@ -1409,7 +1417,7 @@ static void ArrayRef (ExprDesc* Expr)
             ** remove the code that loaded the address into the primary.
             */
             if (!IsTypeArray (Expr->Type)) {
- 
+
                 /* It's a pointer, so we do have to load it into the primary
                 ** first (if it's not already there).
                 */
@@ -2015,8 +2023,8 @@ static void PostInc (ExprDesc* Expr)
     /* Get the data type */
     Flags = TypeOf (Expr->Type);
 
-    /* We are allowed by the C standard to defer the inc operation until 
-    ** the this expression is used, so that we don't need to save and reload
+    /* We are allowed by the C standard to defer the inc operation until after
+    ** the expression is used, so that we don't need to save and reload
     ** the original value.
     */
 
@@ -2055,7 +2063,7 @@ static void PostInc (ExprDesc* Expr)
             /* Fetch the value and use it (since it's the result of the expression) */
             LoadExpr (CF_NONE, Expr);
 
-            /* Defer the increment until the value of this expression is used */;
+            /* Defer the increment until after the value of this expression is used */
             DeferInc (Expr);
         }
     }
@@ -2122,7 +2130,7 @@ static void PostDec (ExprDesc* Expr)
             /* Fetch the value and save it (since it's the result of the expression) */
             LoadExpr (CF_NONE, Expr);
 
-            /* Defer the decrement until the value of this expression is used */;
+            /* Defer the decrement until after the value of this expression is used */
             DeferDec (Expr);
         }
     }
@@ -2502,6 +2510,15 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
             }
 
         } else if (lconst && (Gen->Flags & GEN_COMM) && !rconst) {
+            /* If the LHS constant is an int that fits into an unsigned char, change the
+            ** codegen type to unsigned char.  If the RHS is also an unsigned char, then
+            ** g_typeadjust will return unsigned int (instead of int, which would be
+            ** returned without this modification).  This allows more efficient operations,
+            ** but does not affect correctness for the same reasons explained in g_typeadjust.
+            */
+            if (ltype == CF_INT && Expr->IVal >= 0 && Expr->IVal < 256) {
+                ltype = CF_CHAR | CF_UNSIGNED;
+            }
 
             /* The left side is constant, the right side is not, and the
             ** operator allows swapping the operands. We haven't pushed the
@@ -2536,6 +2553,10 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
             unsigned rtype = TypeOf (Expr2.Type);
             type = 0;
             if (rconst) {
+                /* As above, but for the RHS. */
+                if (rtype == CF_INT && Expr2.IVal >= 0 && Expr2.IVal < 256) {
+                    rtype = CF_CHAR | CF_UNSIGNED;
+                }
                 /* Second value is constant - check for div */
                 type |= CF_CONST;
                 rtype |= CF_CONST;
@@ -3715,7 +3736,7 @@ static void hieOr (ExprDesc *Expr)
             Error ("Scalar expression expected");
             ED_MakeConstBool (Expr, 0);
         } else if ((Flags & E_EVAL_UNEVAL) != E_EVAL_UNEVAL) {
- 
+
             if (!ED_IsConstBool (Expr)) {
                 /* Test the lhs if we haven't had && operators. If we had them, the
                 ** jump is already in place and there's no need to do the test.
@@ -3726,7 +3747,7 @@ static void hieOr (ExprDesc *Expr)
 
                     /* Get first expr */
                     LoadExpr (CF_FORCECHAR, Expr);
-                
+
                     /* Append deferred inc/dec at sequence point */
                     DoDeferred (SQP_KEEP_TEST, Expr);
 
@@ -3848,8 +3869,8 @@ static void hieOr (ExprDesc *Expr)
 static void hieQuest (ExprDesc* Expr)
 /* Parse the ternary operator */
 {
-    int         FalseLab;
-    int         TrueLab;
+    int         FalseLab = 0;
+    int         TrueLab = 0;
     CodeMark    SkippedBranch;
     CodeMark    TrueCodeEnd;
     ExprDesc    Expr2;          /* Expression 2 */

@@ -68,6 +68,14 @@ int main (void)
         failures++;
     }
 
+    if (-32768U != 32768U) {
+        fprintf (stderr, "Expected -32768U == 32768U, got: %ld\n", (long)-32768U);
+        failures++;
+    }
+    if (~32767U != 32768U) {
+        fprintf (stderr, "Expected ~32767U == 32768U, got: %ld\n", (long)~32767U);
+        failures++;
+    }
     printf ("failures: %u\n", failures);
     return failures;
 }

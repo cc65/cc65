@@ -10,12 +10,8 @@
 
 _kbhit:
         BRK_TELEMON XRD0
-        bcs     @no_char_action
-        ldx     #$00 
-        lda     #$01
+        ldx     #$00
+        txa
+        rol
+        eor     #$01
         rts
-@no_char_action:
-        lda     #$00
-        tax        
-        rts
-

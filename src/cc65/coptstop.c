@@ -1292,6 +1292,58 @@ static unsigned Opt_a_tosne (StackOpData* D)
 
 
 
+static unsigned Opt_a_tossub (StackOpData* D)
+/* Optimize the tossubax sequence. */
+{
+    CodeEntry*  X;
+
+
+    /* Inline the sbc */
+    D->IP = D->OpIndex+1;
+
+    /* Must be true because of OP_RHS_LOAD */
+    CHECK ((D->Rhs.A.Flags & D->Rhs.X.Flags & LI_DIRECT) != 0);
+
+    /* sec */
+    X = NewCodeEntry (OP65_SEC, AM65_IMP, 0, 0, D->OpEntry->LI);
+    InsertEntry (D, X, D->IP++);
+
+    /* Add code for low operand */
+    AddOpLow (D, OP65_SBC, &D->Rhs);
+
+    /* Do sign-extension as high-byte operation only when its result is used */
+    if ((GetRegInfo (D->Code, D->IP, REG_X) & REG_X) != 0) {
+        CodeLabel* L;
+        CodeEntry* N;
+
+        X = NewCodeEntry (OP65_LDX, AM65_IMM, MakeHexArg (0), 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+        /* Add sign extension - N is unused now */
+        N = CS_GetEntry (D->Code, D->IP);
+        CHECK (N != 0);
+        L = CS_GenLabel (D->Code, N);
+
+        X = NewCodeEntry (OP65_BCS, AM65_BRA, L->Name, L, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+        X = NewCodeEntry (OP65_DEX, AM65_IMP, 0, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+    }
+
+    /* Rhs load entries must be removed */
+    D->Rhs.X.Flags |= LI_REMOVE;
+    D->Rhs.A.Flags |= LI_REMOVE;
+
+    /* Remove the push and the call to the tossubax function */
+    RemoveRemainders (D);
+
+    /* We changed the sequence */
+    return 1;
+}
+
+
+
 static unsigned Opt_a_tosuge (StackOpData* D)
 /* Optimize the tosgeax and tosugeax sequences */
 {
@@ -1363,6 +1415,7 @@ static const OptFuncDesc FuncRegATable[] = {
     { "tosleax",    Opt_a_tosule,  REG_NONE, OP_NONE                                   },
     { "tosltax",    Opt_a_tosult,  REG_NONE, OP_NONE                                   },
     { "tosneax",    Opt_a_tosne,   REG_NONE, OP_NONE                                   },
+    { "tossubax",   Opt_a_tossub,  REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
     { "tosugeax",   Opt_a_tosuge,  REG_NONE, OP_NONE                                   },
     { "tosugtax",   Opt_a_tosugt,  REG_NONE, OP_NONE                                   },
     { "tosuleax",   Opt_a_tosule,  REG_NONE, OP_NONE                                   },

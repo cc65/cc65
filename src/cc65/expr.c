@@ -3353,7 +3353,7 @@ static void parsesub (ExprDesc* Expr)
                     Error ("Incompatible pointer types");
                 } else {
                     Expr->IVal = (Expr->IVal - Expr2.IVal) /
-                                      CheckedPSizeOf (lhst);
+                                      (long)CheckedPSizeOf (lhst);
                 }
                 /* Operate on pointers, result type is an integer */
                 Expr->Type = type_int;

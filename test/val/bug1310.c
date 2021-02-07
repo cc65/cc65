@@ -76,6 +76,12 @@ int main (void)
         fprintf (stderr, "Expected ~32767U == 32768U, got: %ld\n", (long)~32767U);
         failures++;
     }
+
+    if ((long*)0x1000 - (long*)0x2000 >= 0) {
+        fprintf (stderr, "Expected (long*)0x1000 - (long*)0x2000 < 0, got: %ld\n", (long*)0x1000 - (long*)0x2000);
+        failures++;
+    }
     printf ("failures: %u\n", failures);
+
     return failures;
 }

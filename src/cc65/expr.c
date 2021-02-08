@@ -3045,6 +3045,9 @@ static void parseadd (ExprDesc* Expr)
     CodeMark Mark;              /* Remember code position */
     Type* lhst;                 /* Type of left hand side */
     Type* rhst;                 /* Type of right hand side */
+    int lscale;
+    int rscale;
+    int AddDone;                /* No need to generate runtime code */
 
     ED_Init (&Expr2);
     Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
@@ -3055,44 +3058,133 @@ static void parseadd (ExprDesc* Expr)
     /* Get the left hand side type, initialize operation flags */
     lhst = Expr->Type;
     flags = 0;
+    lscale = rscale = 1;
+    AddDone = 0;
 
-    /* Check for constness on both sides */
-    if (ED_IsConst (Expr)) {
+    /* We can only do constant expressions for:
+    ** - integer addition:
+    **   - numeric + numeric
+    **   - (integer)(base + offset) + numeric
+    **   - numeric + (integer)(base + offset)
+    ** - pointer offset:
+    **   - (pointer)numeric + numeric * scale
+    **   - (base + offset) + numeric * scale
+    **   - (pointer)numeric + (integer)(base + offset) * 1
+    **   - numeric * scale + (pointer)numeric
+    **   - numeric * scale + (base + offset)
+    **   - (integer)(base + offset) * 1 + (pointer)numeric
+    */
+    if (ED_IsQuasiConst (Expr)) {
 
         /* The left hand side is a constant of some sort. Good. Get rhs */
         ExprWithCheck (hie9, &Expr2);
-        if (ED_IsConstAbs (&Expr2)) {
 
-            /* Right hand side is a constant numeric value. Get the rhs type */
-            rhst = Expr2.Type;
+        /* Right hand side is constant. Get the rhs type */
+        rhst = Expr2.Type;
+        if (ED_IsQuasiConst (&Expr2)) {
 
             /* Both expressions are constants. Check for pointer arithmetic */
             if (IsClassPtr (lhst) && IsClassInt (rhst)) {
                 /* Left is pointer, right is int, must scale rhs */
-                Expr->IVal += Expr2.IVal * CheckedPSizeOf (lhst);
-                /* Result type is a pointer */
+                rscale = CheckedPSizeOf (lhst);
+                /* Operate on pointers, result type is a pointer */
+                flags = CF_PTR;
             } else if (IsClassInt (lhst) && IsClassPtr (rhst)) {
                 /* Left is int, right is pointer, must scale lhs */
-                Expr->IVal = Expr->IVal * CheckedPSizeOf (rhst) + Expr2.IVal;
-                /* Result type is a pointer */
-                Expr->Type = Expr2.Type;
+                lscale = CheckedPSizeOf (rhst);
+                /* Operate on pointers, result type is a pointer */
+                flags = CF_PTR;
             } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
                 /* Integer addition */
-                Expr->IVal += Expr2.IVal;
-                typeadjust (Expr, &Expr2, 1);
-
-                /* Limit the calculated value to the range of its type */
-                LimitExprValue (Expr);
+                flags = CF_INT;
             } else {
                 /* OOPS */
-                Error ("Invalid operands for binary operator '+'");
+                AddDone = -1;
+            }
+
+            if (ED_IsAbs (&Expr2) &&
+                (ED_IsAbs (Expr) || lscale == 1)) {
+                if (IsClassInt (lhst) && IsClassInt (rhst)) {
+                    typeadjust (Expr, &Expr2, 1);
+                }
+                Expr->IVal = Expr->IVal * lscale + Expr2.IVal * rscale;
+                AddDone = 1;
+            } else if (ED_IsAbs (Expr) &&
+                (ED_IsAbs (&Expr2) || rscale == 1)) {
+                if (IsClassInt (lhst) && IsClassInt (rhst)) {
+                    typeadjust (&Expr2, Expr, 1);
+                }
+                Expr2.IVal = Expr->IVal * lscale + Expr2.IVal * rscale;
+                /* Adjust the flags */
+                Expr2.Flags |= Expr->Flags & ~E_MASK_KEEP_SUBEXPR;
+                /* Get the symbol and the name */
+                *Expr = Expr2;
+                AddDone = 1;
+            }
+
+            if (AddDone) {
+                /* Adjust the result */
+                if (IsClassPtr (lhst)) {
+                    /* Result type is a pointer */
+                    Expr->Type = PtrConversion (lhst);
+                } else if (IsClassPtr (rhst)) {
+                    /* Result type is a pointer */
+                    Expr->Type = PtrConversion (rhst);
+                } else {
+                    /* Limit the calculated value to the range of its type */
+                    LimitExprValue (Expr);
+                }
+
+                /* The result is always an rvalue */
+                ED_MarkExprAsRVal (Expr);
+            } else {
+                /* Decide the order */
+                if (!ED_IsAbs (&Expr2) && rscale > 1) {
+                    /* Rhs needs scaling but is not numeric. Load it. */
+                    LoadExpr (CF_NONE, &Expr2);
+                    /* Scale rhs */
+                    g_scale (CF_INT, rscale);
+                    /* Generate the code for the add */
+                    if (ED_IsAbs (Expr)) {
+                        /* Numeric constant */
+                        g_inc (flags | CF_CONST, Expr->IVal);
+                    } else if (ED_IsLocStack (Expr)) {
+                        /* Local stack address */
+                        g_addaddr_local (flags, Expr->IVal);
+                    } else {
+                        /* Static address */
+                        g_addaddr_static (flags | GlobalModeFlags (Expr), Expr->Name, Expr->IVal);
+                    }
+                } else {
+                    /* Lhs is not numeric. Load it. */
+                    LoadExpr (CF_NONE, Expr);
+                    /* Scale lhs if necessary */
+                    if (lscale != 1) {
+                        g_scale (CF_INT, lscale);
+                    }
+                    /* Generate the code for the add */
+                    if (ED_IsAbs (&Expr2)) {
+                        /* Numeric constant */
+                        g_inc (flags | CF_CONST, Expr2.IVal);
+                    } else if (ED_IsLocStack (&Expr2)) {
+                        /* Local stack address */
+                        g_addaddr_local (flags, Expr2.IVal);
+                    } else {
+                        /* Static address */
+                        g_addaddr_static (flags | GlobalModeFlags (&Expr2), Expr2.Name, Expr2.IVal);
+                    }
+                }
+
+                /* Result is an rvalue in primary register */
+                ED_FinalizeRValLoad (Expr);
             }
 
         } else {
 
-            /* lhs is a constant and rhs is not constant. Load rhs into
-            ** the primary.
+            /* lhs is constant and rhs is not constant. Load rhs into the
+            ** primary.
             */
+            GetCodePos (&Mark);
             LoadExpr (CF_NONE, &Expr2);
 
             /* Beware: The check above (for lhs) lets not only pass numeric
@@ -3100,11 +3192,8 @@ static void parseadd (ExprDesc* Expr)
             ** with an offset. We have to check for that here.
             */
 
-            /* First, get the rhs type. */
-            rhst = Expr2.Type;
-
             /* Setup flags */
-            if (ED_IsLocNone (Expr)) {
+            if (ED_IsAbs (Expr)) {
                 /* A numerical constant */
                 flags |= CF_CONST;
             } else {
@@ -3115,62 +3204,72 @@ static void parseadd (ExprDesc* Expr)
             /* Check for pointer arithmetic */
             if (IsClassPtr (lhst) && IsClassInt (rhst)) {
                 /* Left is pointer, right is int, must scale rhs */
-                g_scale (CF_INT, CheckedPSizeOf (lhst));
+                rscale = CheckedPSizeOf (lhst);
+                g_scale (CF_INT, rscale);
                 /* Operate on pointers, result type is a pointer */
                 flags |= CF_PTR;
-                /* Generate the code for the add */
-                if (ED_GetLoc (Expr) == E_LOC_NONE) {
-                    /* Numeric constant */
-                    g_inc (flags, Expr->IVal);
-                } else {
-                    /* Constant address */
-                    g_addaddr_static (flags, Expr->Name, Expr->IVal);
-                }
             } else if (IsClassInt (lhst) && IsClassPtr (rhst)) {
-
                 /* Left is int, right is pointer, must scale lhs. */
-                unsigned ScaleFactor = CheckedPSizeOf (rhst);
-
+                lscale = CheckedPSizeOf (rhst);
                 /* Operate on pointers, result type is a pointer */
                 flags |= CF_PTR;
                 Expr->Type = Expr2.Type;
-
-                /* Since we do already have rhs in the primary, if lhs is
-                ** not a numeric constant, and the scale factor is not one
-                ** (no scaling), we must take the long way over the stack.
-                */
-                if (ED_IsLocNone (Expr)) {
-                    /* Numeric constant, scale lhs */
-                    Expr->IVal *= ScaleFactor;
-                    /* Generate the code for the add */
-                    g_inc (flags, Expr->IVal);
-                } else if (ScaleFactor == 1) {
-                    /* Constant address but no need to scale */
-                    g_addaddr_static (flags, Expr->Name, Expr->IVal);
-                } else {
-                    /* Constant address that must be scaled */
-                    g_push (TypeOf (Expr2.Type), 0);    /* rhs --> stack */
-                    g_getimmed (flags, Expr->Name, Expr->IVal);
-                    g_scale (CF_PTR, ScaleFactor);
-                    g_add (CF_PTR, 0);
-                }
             } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
                 /* Integer addition */
                 flags |= typeadjust (Expr, &Expr2, 1);
-                /* Generate the code for the add */
-                if (ED_IsLocNone (Expr)) {
-                    /* Numeric constant */
-                    g_inc (flags, Expr->IVal);
-                } else {
-                    /* Constant address */
-                    g_addaddr_static (flags, Expr->Name, Expr->IVal);
-                }
             } else {
                 /* OOPS */
-                Error ("Invalid operands for binary operator '+'");
-                flags = CF_INT;
+                AddDone = -1;
             }
 
+            /* Generate the code for the add */
+            if (!AddDone) {
+                if (ED_IsAbs (Expr) &&
+                    Expr->IVal >= 0 &&
+                    Expr->IVal * lscale < 256) {
+                    /* Numeric constant */
+                    g_inc (flags, Expr->IVal * lscale);
+                    AddDone = 1;
+                }
+            }
+
+            if (!AddDone) {
+                if (ED_IsLocQuasiConst (&Expr2) &&
+                    rscale == 1                 &&
+                    CheckedSizeOf (rhst) == SIZEOF_CHAR) {
+                    /* Change the order back */
+                    RemoveCode (&Mark);
+                    /* Load lhs */
+                    LoadExpr (CF_NONE, Expr);
+                    /* Use new flags */
+                    flags = CF_CHAR | GlobalModeFlags (&Expr2);
+                    /* Add the variable */
+                    if (ED_IsLocStack (&Expr2)) {
+                        g_addlocal (flags, Expr2.IVal);
+                    } else {
+                        g_addstatic (flags, Expr2.Name, Expr2.IVal);
+                    }
+                } else if (ED_IsAbs (Expr)) {
+                    /* Numeric constant */
+                    g_inc (flags, Expr->IVal * lscale);
+                } else if (lscale == 1) {
+                    if (ED_IsLocStack (Expr)) {
+                        /* Constant address */
+                        g_addaddr_local (flags, Expr->IVal);
+                    } else {
+                        g_addaddr_static (flags, Expr->Name, Expr->IVal);
+                    }
+                } else {
+                    /* Since we do already have rhs in the primary, if lhs is
+                    ** not a numeric constant, and the scale factor is not one
+                    ** (no scaling), we must take the long way over the stack.
+                    */
+                    g_push (TypeOf (Expr2.Type), 0);    /* rhs --> stack */
+                    LoadExpr (CF_NONE, Expr);
+                    g_scale (CF_PTR, lscale);
+                    g_add (CF_PTR, 0);
+                }
+            }
             /* Array and function types must be converted to pointer types */
             Expr->Type = PtrConversion (Expr->Type);
 
@@ -3181,20 +3280,21 @@ static void parseadd (ExprDesc* Expr)
     } else {
 
         /* Left hand side is not constant. Get the value onto the stack. */
-        LoadExpr (CF_NONE, Expr);              /* --> primary register */
+        LoadExpr (CF_NONE, Expr);               /* --> primary register */
         GetCodePos (&Mark);
-        g_push (TypeOf (Expr->Type), 0);        /* --> stack */
+        flags = TypeOf (Expr->Type);            /* default codegen type */
+        g_push (flags, 0);                      /* --> stack */
 
         /* Evaluate the rhs */
         MarkedExprWithCheck (hie9, &Expr2);
 
+        /* Get the rhs type */
+        rhst = Expr2.Type;
+
         /* Check for a constant rhs expression */
         if (ED_IsConstAbs (&Expr2) && ED_CodeRangeIsEmpty (&Expr2)) {
 
-            /* Right hand side is a constant. Get the rhs type */
-            rhst = Expr2.Type;
-
-            /* Remove pushed value from stack */
+            /* Rhs is a constant. Remove pushed lhs from stack. */
             RemoveCode (&Mark);
 
             /* Check for pointer arithmetic */
@@ -3214,8 +3314,7 @@ static void parseadd (ExprDesc* Expr)
                 flags = typeadjust (Expr, &Expr2, 1);
             } else {
                 /* OOPS */
-                Error ("Invalid operands for binary operator '+'");
-                flags = CF_INT;
+                AddDone = -1;
             }
 
             /* Generate code for the add */
@@ -3223,23 +3322,37 @@ static void parseadd (ExprDesc* Expr)
 
         } else {
 
-            /* Not constant, load into the primary */
-            LoadExpr (CF_NONE, &Expr2);
-
-            /* lhs and rhs are not constant. Get the rhs type. */
-            rhst = Expr2.Type;
-
-            /* Check for pointer arithmetic */
+            /* Lhs and rhs are not so constant. Check for pointer arithmetic. */
             if (IsClassPtr (lhst) && IsClassInt (rhst)) {
                 /* Left is pointer, right is int, must scale rhs */
-                g_scale (CF_INT, CheckedPSizeOf (lhst));
+                rscale = CheckedPSizeOf (lhst);
+                if (ED_IsAbs (&Expr2)) {
+                    Expr2.IVal *= rscale;
+                    /* Load rhs into the primary */
+                    LoadExpr (CF_NONE, &Expr2);
+                } else {
+                    /* Load rhs into the primary */
+                    LoadExpr (CF_NONE, &Expr2);
+                    g_scale (CF_INT, rscale);
+                }
                 /* Operate on pointers, result type is a pointer */
                 flags = CF_PTR;
             } else if (IsClassInt (lhst) && IsClassPtr (rhst)) {
                 /* Left is int, right is pointer, must scale lhs */
-                g_tosint (TypeOf (lhst));       /* Make sure TOS is int */
-                g_swap (CF_INT);                /* Swap TOS and primary */
-                g_scale (CF_INT, CheckedPSizeOf (rhst));
+                lscale = CheckedPSizeOf (rhst);
+                if (ED_CodeRangeIsEmpty (&Expr2)) {
+                    RemoveCode (&Mark);             /* Remove pushed value from stack */
+                    g_scale (CF_INT, lscale);
+                    g_push (CF_PTR, 0);             /* --> stack */
+                    LoadExpr (CF_NONE, &Expr2);     /* Load rhs into primary register */
+                } else {
+                    g_tosint (TypeOf (lhst));       /* Make sure TOS is int */
+                    LoadExpr (CF_NONE, &Expr2);     /* Load rhs into primary register */
+                    if (lscale != 1) {
+                        g_swap (CF_INT);            /* Swap TOS and primary */
+                        g_scale (CF_INT, CheckedPSizeOf (rhst));
+                    }
+                }
                 /* Operate on pointers, result type is a pointer */
                 flags = CF_PTR;
                 Expr->Type = Expr2.Type;
@@ -3254,10 +3367,12 @@ static void parseadd (ExprDesc* Expr)
                 ** when trying to apply another solution.
                 */
                 flags = typeadjust (Expr, &Expr2, 0) & ~CF_CONST;
+                /* Load rhs into the primary */
+                LoadExpr (CF_NONE, &Expr2);
             } else {
                 /* OOPS */
-                Error ("Invalid operands for binary operator '+'");
-                flags = CF_INT;
+                AddDone = -1;
+                /* We can't just goto End as that would leave the stack unbalanced */
             }
 
             /* Generate code for the add */
@@ -3265,8 +3380,18 @@ static void parseadd (ExprDesc* Expr)
 
         }
 
+        /* Array and function types must be converted to pointer types */
+        Expr->Type = PtrConversion (Expr->Type);
+
         /* Result is an rvalue in primary register */
         ED_FinalizeRValLoad (Expr);
+    }
+
+    if (AddDone < 0) {
+        Error ("Invalid operands for binary operator '+'");
+    } else {
+        /* Array and function types must be converted to pointer types */
+        Expr->Type = PtrConversion (Expr->Type);
     }
 
     /* Condition code not set */

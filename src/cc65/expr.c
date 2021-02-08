@@ -3287,7 +3287,8 @@ static void parsesub (ExprDesc* Expr)
     Type* rhst;                 /* Type of right hand side */
     CodeMark Mark1;             /* Save position of output queue */
     CodeMark Mark2;             /* Another position in the queue */
-    int rscale;                 /* Scale factor for the result */
+    int rscale;                 /* Scale factor for pointer arithmetics */
+    int SubDone;                /* No need to generate runtime code */
 
     ED_Init (&Expr2);
     Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
@@ -3304,7 +3305,9 @@ static void parsesub (ExprDesc* Expr)
 
     /* Get the left hand side type, initialize operation flags */
     lhst = Expr->Type;
+    flags = CF_INT;             /* Default result type */
     rscale = 1;                 /* Scale by 1, that is, don't scale */
+    SubDone = 0;                /* Generate runtime code by default */
 
     /* Remember the output queue position, then bring the value onto the stack */
     GetCodePos (&Mark1);
@@ -3322,67 +3325,148 @@ static void parsesub (ExprDesc* Expr)
         Expr2.Type = type_uchar;
     }
 
-    /* Check for a constant rhs expression */
-    if (ED_IsConstAbs (&Expr2) && ED_CodeRangeIsEmpty (&Expr2)) {
+    /* Get the rhs type */
+    rhst = Expr2.Type;
 
-        /* The right hand side is constant. Get the rhs type. */
-        rhst = Expr2.Type;
+    /* We can only do constant expressions for:
+    ** - integer subtraction:
+    **   - numeric - numeric
+    **   - (integer)(base + offset) - numeric
+    **   - (integer)(same_base + offset) - (integer)(same_base + offset)
+    ** - pointer offset:
+    **   - (pointer)numeric - numeric * scale
+    **   - (base + offset) - numeric * scale
+    **   - (same_base + offset) - (integer)(same_base + offset) * 1
+    ** - pointer diff:
+    **   - (numeric - numeric) / scale
+    **   - ((same_base + offset) - (same_base + offset)) / scale
+    **   - ((base + offset) - (pointer)numeric) / 1
+    */
+    if (IsClassPtr (lhst) && IsClassPtr (rhst)) {
 
-        /* Check left hand side */
-        if (ED_IsConstAbs (Expr)) {
+        /* Pointer diff */
+        if (TypeCmp (Indirect (lhst), Indirect (rhst)) < TC_QUAL_DIFF) {
+            Error ("Incompatible pointer types");
+        }
 
-            /* Both sides are constant, remove generated code */
+        /* Operate on pointers, result type is an integer */
+        flags = CF_PTR;
+        Expr->Type = type_int;
+
+        /* We'll have to scale the result */
+        rscale = CheckedPSizeOf (lhst);
+
+        /* Check for a constant rhs expression */
+        if (ED_IsQuasiConst (&Expr2) && ED_CodeRangeIsEmpty (&Expr2)) {
+            /* The right hand side is constant. Check left hand side. */
+            if (ED_IsQuasiConst (Expr)) {
+                /* We can't do all 'ptr1 - ptr2' constantly at the moment */
+                if (Expr->Sym == Expr2.Sym) {
+                    Expr->IVal = (Expr->IVal - Expr2.IVal) / rscale;
+                    /* Get rid of unneeded flags etc. */
+                    ED_MakeConstAbsInt (Expr, Expr->IVal);
+                    /* No runtime code */
+                    SubDone = 1;
+                } else if (rscale == 1 && ED_IsConstAbs (&Expr2)) {
+                    Expr->IVal = (Expr->IVal - Expr2.IVal) / rscale;
+                    /* No runtime code */
+                    SubDone = 1;
+                }
+            }
+        }
+
+        if (!SubDone) {
+            /* We'll do runtime code */
+            if (ED_IsConstAbs (&Expr2) && ED_CodeRangeIsEmpty (&Expr2)) {
+                /* Remove pushed value from stack */
+                RemoveCode (&Mark2);
+                /* Do the subtraction */
+                g_dec (CF_INT | CF_CONST, Expr2.IVal);
+            } else {
+                /* load into the primary */
+                LoadExpr (CF_NONE, &Expr2);
+                /* Generate code for the sub */
+                g_sub (CF_INT, 0);
+            }
+            /* We must scale the result */
+            if (rscale != 1) {
+                g_scale (CF_INT, -rscale);
+            }
+            /* Result is an rvalue in the primary register */
+            ED_FinalizeRValLoad (Expr);
+        } else {
+            /* Remove pushed value from stack */
             RemoveCode (&Mark1);
+            /* The result is always an rvalue */
+            ED_MarkExprAsRVal (Expr);
+        }
 
-            /* Check for pointer arithmetic */
+    } else if (ED_IsQuasiConst (&Expr2) && ED_CodeRangeIsEmpty (&Expr2)) {
+
+        /* Right hand side is constant. Check left hand side. */
+        if (ED_IsQuasiConst (Expr)) {
+
+            /* Both sides are constant. Check for pointer arithmetic */
             if (IsClassPtr (lhst) && IsClassInt (rhst)) {
                 /* Left is pointer, right is int, must scale rhs */
-                Expr->IVal -= Expr2.IVal * CheckedPSizeOf (lhst);
+                rscale = CheckedPSizeOf (lhst);
                 /* Operate on pointers, result type is a pointer */
-            } else if (IsClassPtr (lhst) && IsClassPtr (rhst)) {
-                /* Left is pointer, right is pointer, must scale result */
-                if (TypeCmp (Indirect (lhst), Indirect (rhst)) < TC_QUAL_DIFF) {
-                    Error ("Incompatible pointer types");
-                } else {
-                    Expr->IVal = (Expr->IVal - Expr2.IVal) /
-                                      (long)CheckedPSizeOf (lhst);
-                }
-                /* Operate on pointers, result type is an integer */
-                Expr->Type = type_int;
+                flags = CF_PTR;
             } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
                 /* Integer subtraction */
-                typeadjust (Expr, &Expr2, 1);
-                Expr->IVal -= Expr2.IVal;
-
-                /* Limit the calculated value to the range of its type */
-                LimitExprValue (Expr);
+                flags = typeadjust (Expr, &Expr2, 1);
             } else {
                 /* OOPS */
                 Error ("Invalid operands for binary operator '-'");
             }
 
+            /* We can't make all subtraction expressions constant */
+            if (ED_IsConstAbs (&Expr2)) {
+                Expr->IVal -= Expr2.IVal * rscale;
+                /* No runtime code */
+                SubDone = 1;
+            } else if (rscale == 1 && Expr->Sym == Expr2.Sym) {
+                /* The result is the diff of the offsets */
+                Expr->IVal -= Expr2.IVal;
+                /* Get rid of unneeded bases and flags etc. */
+                ED_MakeConstAbs (Expr, Expr->IVal, Expr->Type);
+                /* No runtime code */
+                SubDone = 1;
+            }
+
+            if (SubDone) {
+                /* Remove pushed value from stack */
+                RemoveCode (&Mark1);
+                if (IsClassInt (lhst)) {
+                    /* Limit the calculated value to the range of its type */
+                    LimitExprValue (Expr);
+                }
+                /* The result is always an rvalue */
+                ED_MarkExprAsRVal (Expr);
+            } else {
+                if (ED_IsConstAbs (&Expr2)) {
+                    /* Remove pushed value from stack */
+                    RemoveCode (&Mark2);
+                    /* Do the subtraction */
+                    g_dec (flags | CF_CONST, Expr2.IVal);
+                } else {
+                    /* Load into the primary */
+                    LoadExpr (CF_NONE, &Expr2);
+                    /* Generate code for the sub (the & is a hack here) */
+                    g_sub (flags & ~CF_CONST, 0);
+                }
+                /* Result is an rvalue in the primary register */
+                ED_FinalizeRValLoad (Expr);
+            }
+
         } else {
 
-            /* Left hand side is not constant, right hand side is.
-            ** Remove pushed value from stack.
-            */
-            RemoveCode (&Mark2);
-
+            /* Left hand side is not constant, right hand side is */
             if (IsClassPtr (lhst) && IsClassInt (rhst)) {
                 /* Left is pointer, right is int, must scale rhs */
                 Expr2.IVal *= CheckedPSizeOf (lhst);
                 /* Operate on pointers, result type is a pointer */
                 flags = CF_PTR;
-            } else if (IsClassPtr (lhst) && IsClassPtr (rhst)) {
-                /* Left is pointer, right is pointer, must scale result */
-                if (TypeCmp (Indirect (lhst), Indirect (rhst)) < TC_QUAL_DIFF) {
-                    Error ("Incompatible pointer types");
-                } else {
-                    rscale = CheckedPSizeOf (lhst);
-                }
-                /* Operate on pointers, result type is an integer */
-                flags = CF_PTR;
-                Expr->Type = type_int;
             } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
                 /* Integer subtraction */
                 flags = typeadjust (Expr, &Expr2, 1);
@@ -3392,12 +3476,16 @@ static void parsesub (ExprDesc* Expr)
                 flags = CF_INT;
             }
 
-            /* Do the subtraction */
-            g_dec (flags | CF_CONST, Expr2.IVal);
-
-            /* If this was a pointer subtraction, we must scale the result */
-            if (rscale != 1) {
-                g_scale (flags, -rscale);
+            if (ED_IsConstAbs (&Expr2)) {
+                /* Remove pushed value from stack */
+                RemoveCode (&Mark2);
+                /* Do the subtraction */
+                g_dec (flags | CF_CONST, Expr2.IVal);
+            } else {
+                /* Rhs is not numeric, load into the primary */
+                LoadExpr (CF_NONE, &Expr2);
+                /* Generate code for the sub (the & is a hack here) */
+                g_sub (flags & ~CF_CONST, 0);
             }
 
             /* Result is an rvalue in the primary register */
@@ -3406,11 +3494,8 @@ static void parsesub (ExprDesc* Expr)
 
     } else {
 
-        /* Not constant, load into the primary */
+        /* Right hand side is not constant, load into the primary */
         LoadExpr (CF_NONE, &Expr2);
-
-        /* Right hand side is not constant. Get the rhs type. */
-        rhst = Expr2.Type;
 
         /* Check for pointer arithmetic */
         if (IsClassPtr (lhst) && IsClassInt (rhst)) {
@@ -3418,43 +3503,23 @@ static void parsesub (ExprDesc* Expr)
             g_scale (CF_INT, CheckedPSizeOf (lhst));
             /* Operate on pointers, result type is a pointer */
             flags = CF_PTR;
-        } else if (IsClassPtr (lhst) && IsClassPtr (rhst)) {
-            /* Left is pointer, right is pointer, must scale result */
-            if (TypeCmp (Indirect (lhst), Indirect (rhst)) < TC_QUAL_DIFF) {
-                Error ("Incompatible pointer types");
-            } else {
-                rscale = CheckedPSizeOf (lhst);
-            }
-            /* Operate on pointers, result type is an integer */
-            flags = CF_PTR;
-            Expr->Type = type_int;
         } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
-            /* Integer subtraction. If the left hand side descriptor says that
-            ** the lhs is const, we have to remove this mark, since this is no
-            ** longer true, lhs is on stack instead.
-            */
-            if (ED_IsLocNone (Expr)) {
-                ED_FinalizeRValLoad (Expr);
-            }
             /* Adjust operand types */
             flags = typeadjust (Expr, &Expr2, 0);
         } else {
             /* OOPS */
             Error ("Invalid operands for binary operator '-'");
-            flags = CF_INT;
         }
 
         /* Generate code for the sub (the & is a hack here) */
         g_sub (flags & ~CF_CONST, 0);
 
-        /* If this was a pointer subtraction, we must scale the result */
-        if (rscale != 1) {
-            g_scale (flags, -rscale);
-        }
-
         /* Result is an rvalue in the primary register */
         ED_FinalizeRValLoad (Expr);
     }
+
+    /* Result type is either a pointer or an integer */
+    Expr->Type = PtrConversion (Expr->Type);
 
     /* Condition code not set */
     ED_MarkAsUntested (Expr);

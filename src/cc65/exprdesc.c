@@ -408,6 +408,15 @@ int ED_IsConst (const ExprDesc* Expr)
 
 
 
+int ED_IsQuasiConst (const ExprDesc* Expr)
+/* Return true if the expression denotes a quasi-constant of some sort. This
+** can be a numeric constant, a constant address or a stack variable address.
+*/
+{
+    return (Expr->Flags & E_MASK_LOC) == E_LOC_NONE || ED_IsQuasiConstAddr (Expr);
+}
+
+
 int ED_IsConstAddr (const ExprDesc* Expr)
 /* Return true if the expression denotes a constant address of some sort. This
 ** can be the address of a global variable (maybe with offset) or similar.

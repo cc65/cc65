@@ -649,6 +649,11 @@ int ED_IsConst (const ExprDesc* Expr);
 ** similar.
 */
 
+int ED_IsQuasiConst (const ExprDesc* Expr);
+/* Return true if the expression denotes a quasi-constant of some sort. This
+** can be a numeric constant, a constant address or a stack variable address.
+*/
+
 int ED_IsConstAddr (const ExprDesc* Expr);
 /* Return true if the expression denotes a constant address of some sort. This
 ** can be the address of a global variable (maybe with offset) or similar.

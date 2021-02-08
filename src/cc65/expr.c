@@ -74,9 +74,18 @@ static GenDesc GenOASGN  = { TOK_OR_ASSIGN,     GEN_NOPUSH,     g_or  };
 
 
 /*****************************************************************************/
-/*                             Helper functions                              */
+/*                           Forward declarations                            */
 /*****************************************************************************/
 
+
+
+static void parseadd (ExprDesc* Expr, int DoArrayRef);
+
+
+
+/*****************************************************************************/
+/*                             Helper functions                              */
+/*****************************************************************************/
 
 
 static unsigned GlobalModeFlags (const ExprDesc* Expr)
@@ -1333,294 +1342,6 @@ static void Primary (ExprDesc* E)
 
 
 
-static void ArrayRef (ExprDesc* Expr)
-/* Handle an array reference. This function needs a rewrite. */
-{
-    int         ConstBaseAddr;
-    ExprDesc    Subscript;
-    CodeMark    Mark1;
-    CodeMark    Mark2;
-    TypeCode    Qualifiers;
-    Type*       ElementType;
-    Type*       tptr1;
-
-    ED_Init (&Subscript);
-    Subscript.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
-
-    /* Skip the bracket */
-    NextToken ();
-
-    /* Get the type of left side */
-    tptr1 = Expr->Type;
-
-    /* We can apply a special treatment for arrays that have a const base
-    ** address. This is true for most arrays and will produce a lot better
-    ** code. Check if this is a "quasi-const base" address.
-    */
-    ConstBaseAddr = ED_IsRVal (Expr) && ED_IsLocQuasiConst (Expr);
-
-    /* If we have a quasi-const base address, we delay the address fetch */
-    GetCodePos (&Mark1);
-    if (!ConstBaseAddr) {
-        /* Get a pointer to the array into the primary */
-        LoadExpr (CF_NONE, Expr);
-
-        /* Get the array pointer on stack. Do not push more than 16
-        ** bit, even if this value is greater, since we cannot handle
-        ** other than 16bit stuff when doing indexing.
-        */
-        GetCodePos (&Mark2);
-        g_push (CF_PTR, 0);
-    }
-
-    /* TOS now contains ptr to array elements. Get the subscript. */
-    MarkedExprWithCheck (hie0, &Subscript);
-
-    /* Check the types of array and subscript. We can either have a
-    ** pointer/array to the left, in which case the subscript must be of an
-    ** integer type, or we have an integer to the left, in which case the
-    ** subscript must be a pointer/array.
-    ** Since we do the necessary checking here, we can rely later on the
-    ** correct types.
-    */
-    Qualifiers = T_QUAL_NONE;
-    if (IsClassPtr (Expr->Type)) {
-        if (!IsClassInt (Subscript.Type))  {
-            Error ("Array subscript is not an integer");
-            /* To avoid any compiler errors, make the expression a valid int */
-            ED_MakeConstAbsInt (&Subscript, 0);
-        }
-        if (IsTypeArray (Expr->Type)) {
-            Qualifiers = GetQualifier (Expr->Type);
-        }
-        ElementType = Indirect (Expr->Type);
-    } else if (IsClassInt (Expr->Type)) {
-        if (!IsClassPtr (Subscript.Type)) {
-            Error ("Subscripted value is neither array nor pointer");
-            /* To avoid compiler errors, make the subscript a char[] at
-            ** address 0.
-            */
-            ED_MakeConstAbs (&Subscript, 0, GetCharArrayType (1));
-        } else if (IsTypeArray (Subscript.Type)) {
-            Qualifiers = GetQualifier (Subscript.Type);
-        }
-        ElementType = Indirect (Subscript.Type);
-    } else {
-        Error ("Cannot subscript");
-        /* To avoid compiler errors, fake both the array and the subscript, so
-        ** we can just proceed.
-        */
-        ED_MakeConstAbs (Expr, 0, GetCharArrayType (1));
-        ED_MakeConstAbsInt (&Subscript, 0);
-        ElementType = Indirect (Expr->Type);
-    }
-
-    /* The element type has the combined qualifiers from itself and the array,
-    ** it is a member of (if any).
-    */
-    if (GetQualifier (ElementType) != (GetQualifier (ElementType) | Qualifiers)) {
-        ElementType = TypeDup (ElementType);
-        ElementType->C |= Qualifiers;
-    }
-
-    /* If the subscript is a bit-field, load it and make it an rvalue */
-    if (ED_IsBitField (&Subscript)) {
-        LoadExpr (CF_NONE, &Subscript);
-        ED_FinalizeRValLoad (&Subscript);
-    }
-
-    /* Make the address of the array element from the base and subscript */
-    if (ED_IsConstAbs (&Subscript) && ED_CodeRangeIsEmpty (&Subscript)) {
-
-        /* The array subscript is a constant. Since we can have the element
-        ** address directly as base+offset, we can remove the array address
-        ** push onto the stack before if loading subscript doesn't tamper that
-        ** address in the primary.
-        */
-        if (!ConstBaseAddr) {
-            RemoveCode (&Mark2);
-        } else {
-            /* Get an array pointer into the primary */
-            LoadExpr (CF_NONE, Expr);
-        }
-
-        if (IsClassPtr (Expr->Type)) {
-
-            /* Lhs is pointer/array. Scale the subscript value according to
-            ** the element size.
-            */
-            Subscript.IVal *= CheckedSizeOf (ElementType);
-
-            /* Remove the address load code */
-            RemoveCode (&Mark1);
-
-            /* In case of an array, we can adjust the offset of the expression
-            ** already in Expr. If the base address was a constant, we can even
-            ** remove the code that loaded the address into the primary.
-            */
-            if (!IsTypeArray (Expr->Type)) {
-
-                /* It's a pointer, so we do have to load it into the primary
-                ** first (if it's not already there).
-                */
-                if (!ConstBaseAddr && ED_IsLVal (Expr)) {
-                    LoadExpr (CF_NONE, Expr);
-                    ED_FinalizeRValLoad (Expr);
-                }
-            }
-
-            /* Adjust the offset */
-            Expr->IVal += Subscript.IVal;
-
-        } else {
-
-            /* Scale the lhs value according to the element type */
-            g_scale (TypeOf (tptr1), CheckedSizeOf (ElementType));
-
-            /* Add the subscript. Since arrays are indexed by integers,
-            ** we will ignore the true type of the subscript here and
-            ** use always an int. #### Use offset but beware of LoadExpr!
-            */
-            g_inc (CF_INT | CF_CONST, Subscript.IVal);
-
-        }
-
-    } else {
-
-        /* Array subscript is not constant. Load it into the primary */
-        GetCodePos (&Mark2);
-        LoadExpr (CF_NONE, &Subscript);
-
-        /* Do scaling */
-        if (IsClassPtr (Expr->Type)) {
-
-            /* Indexing is based on unsigneds, so we will just use the integer
-            ** portion of the index (which is in (e)ax, so there's no further
-            ** action required).
-            */
-            g_scale (CF_INT, CheckedSizeOf (ElementType));
-
-        } else {
-
-            /* Get the int value on top. If we come here, we're sure, both
-            ** values are 16 bit (the first one was truncated if necessary
-            ** and the second one is a pointer). Note: If ConstBaseAddr is
-            ** true, we don't have a value on stack, so to "swap" both, just
-            ** push the subscript.
-            */
-            if (ConstBaseAddr) {
-                g_push (CF_INT, 0);
-                LoadExpr (CF_NONE, Expr);
-                ConstBaseAddr = 0;
-            } else {
-                g_swap (CF_INT);
-            }
-
-            /* Scale it */
-            g_scale (TypeOf (tptr1), CheckedSizeOf (ElementType));
-
-        }
-
-        /* The offset is now in the primary register. It we didn't have a
-        ** constant base address for the lhs, the lhs address is already
-        ** on stack, and we must add the offset. If the base address was
-        ** constant, we call special functions to add the address to the
-        ** offset value.
-        */
-        if (!ConstBaseAddr) {
-
-            /* The array base address is on stack and the subscript is in the
-            ** primary. Add both.
-            */
-            g_add (CF_INT, 0);
-
-        } else {
-
-            /* The subscript is in the primary, and the array base address is
-            ** in Expr. If the subscript has itself a constant address, it is
-            ** often a better idea to reverse again the order of the
-            ** evaluation. This will generate better code if the subscript is
-            ** a byte sized variable. But beware: This is only possible if the
-            ** subscript was not scaled, that is, if this was a byte array
-            ** or pointer.
-            */
-            if (ED_IsLocQuasiConst (&Subscript) &&
-                CheckedSizeOf (ElementType) == SIZEOF_CHAR) {
-
-                unsigned Flags;
-
-                /* Reverse the order of evaluation */
-                if (CheckedSizeOf (Subscript.Type) == SIZEOF_CHAR) {
-                    Flags = CF_CHAR;
-                } else {
-                    Flags = CF_INT;
-                }
-                RemoveCode (&Mark2);
-
-                /* Get a pointer to the array into the primary. */
-                LoadExpr (CF_NONE, Expr);
-
-                /* Add the variable */
-                if (ED_IsLocStack (&Subscript)) {
-                    g_addlocal (Flags, Subscript.IVal);
-                } else {
-                    Flags |= GlobalModeFlags (&Subscript);
-                    g_addstatic (Flags, Subscript.Name, Subscript.IVal);
-                }
-            } else {
-
-                if (ED_IsLocNone (Expr) ||
-                    (ED_IsLocAbs (Expr) && ED_IsAddrExpr (Expr))) {
-                    /* Constant numeric address. Just add it */
-                    g_inc (CF_INT, Expr->IVal);
-                } else if (ED_IsLocStack (Expr)) {
-                    /* Base address is a local variable address */
-                    if (ED_IsAddrExpr (Expr)) {
-                        g_addaddr_local (CF_INT, Expr->IVal);
-                    } else {
-                        g_addlocal (CF_PTR, Expr->IVal);
-                    }
-                } else {
-                    /* Base address is a static variable address */
-                    unsigned Flags = CF_INT | GlobalModeFlags (Expr);
-                    if (ED_IsAddrExpr (Expr)) {
-                        /* Add the address of the location */
-                        g_addaddr_static (Flags, Expr->Name, Expr->IVal);
-                    } else {
-                        /* Add the contents of the location */
-                        g_addstatic (Flags, Expr->Name, Expr->IVal);
-                    }
-                }
-            }
-        }
-
-        /* The address of the element is an rvalue in the primary */
-        ED_FinalizeRValLoad (Expr);
-
-    }
-
-    /* The final result is usually an lvalue expression of element type
-    ** referenced in the primary, unless it is once again an array. We can just
-    ** assume the usual case first, and change it later if necessary.
-    */
-    ED_IndExpr (Expr);
-    Expr->Type = ElementType;
-
-    /* An array element is actually a variable. So the rules for variables with
-    ** respect to the reference type apply: If it's an array, it is virtually
-    ** an rvalue address, otherwise it's an lvalue reference. (A function would
-    ** also be an rvalue address, but an array cannot contain functions).
-    */
-    if (IsTypeArray (Expr->Type)) {
-        ED_AddrExpr (Expr);
-    }
-
-    /* Consume the closing bracket */
-    ConsumeRBrack ();
-}
-
-
-
 static void StructRef (ExprDesc* Expr)
 /* Process struct/union field after . or ->. */
 {
@@ -1793,7 +1514,7 @@ static void hie11 (ExprDesc *Expr)
 
             case TOK_LBRACK:
                 /* Array reference */
-                ArrayRef (Expr);
+                parseadd (Expr, 1);
                 break;
 
             case TOK_LPAREN:
@@ -3034,10 +2755,11 @@ static void hie9 (ExprDesc *Expr)
 
 
 
-static void parseadd (ExprDesc* Expr)
-/* Parse an expression with the binary plus operator. Expr contains the
-** unprocessed left hand side of the expression and will contain the
-** result of the expression on return.
+static void parseadd (ExprDesc* Expr, int DoArrayRef)
+/* Parse an expression with the binary plus or subscript operator. Expr contains
+** the unprocessed left hand side of the expression and will contain the result
+** of the expression on return. If DoArrayRef is zero, this evaluates the binary
+** plus operation. Otherwise, this evaluates the subscript operation.
 */
 {
     ExprDesc Expr2;
@@ -3052,7 +2774,7 @@ static void parseadd (ExprDesc* Expr)
     ED_Init (&Expr2);
     Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
 
-    /* Skip the PLUS token */
+    /* Skip the PLUS or opening bracket token */
     NextToken ();
 
     /* Get the left hand side type, initialize operation flags */
@@ -3077,7 +2799,7 @@ static void parseadd (ExprDesc* Expr)
     if (ED_IsQuasiConst (Expr)) {
 
         /* The left hand side is a constant of some sort. Good. Get rhs */
-        ExprWithCheck (hie9, &Expr2);
+        ExprWithCheck (DoArrayRef ? hie0 : hie9, &Expr2);
 
         /* Right hand side is constant. Get the rhs type */
         rhst = Expr2.Type;
@@ -3094,7 +2816,7 @@ static void parseadd (ExprDesc* Expr)
                 lscale = CheckedPSizeOf (rhst);
                 /* Operate on pointers, result type is a pointer */
                 flags = CF_PTR;
-            } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
+            } else if (!DoArrayRef && IsClassInt (lhst) && IsClassInt (rhst)) {
                 /* Integer addition */
                 flags = CF_INT;
             } else {
@@ -3123,20 +2845,22 @@ static void parseadd (ExprDesc* Expr)
             }
 
             if (AddDone) {
-                /* Adjust the result */
-                if (IsClassPtr (lhst)) {
-                    /* Result type is a pointer */
-                    Expr->Type = PtrConversion (lhst);
-                } else if (IsClassPtr (rhst)) {
-                    /* Result type is a pointer */
-                    Expr->Type = PtrConversion (rhst);
-                } else {
-                    /* Limit the calculated value to the range of its type */
-                    LimitExprValue (Expr);
-                }
+                /* Adjust the result for addition */
+                if (!DoArrayRef) {
+                    if (IsClassPtr (lhst)) {
+                        /* Result type is a pointer */
+                        Expr->Type = lhst;
+                    } else if (IsClassPtr (rhst)) {
+                        /* Result type is a pointer */
+                        Expr->Type = rhst;
+                    } else {
+                        /* Limit the calculated value to the range of its type */
+                        LimitExprValue (Expr);
+                    }
 
-                /* The result is always an rvalue */
-                ED_MarkExprAsRVal (Expr);
+                    /* The result is always an rvalue */
+                    ED_MarkExprAsRVal (Expr);
+                }
             } else {
                 /* Decide the order */
                 if (!ED_IsAbs (&Expr2) && rscale > 1) {
@@ -3214,7 +2938,7 @@ static void parseadd (ExprDesc* Expr)
                 /* Operate on pointers, result type is a pointer */
                 flags |= CF_PTR;
                 Expr->Type = Expr2.Type;
-            } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
+            } else if (!DoArrayRef && IsClassInt (lhst) && IsClassInt (rhst)) {
                 /* Integer addition */
                 flags |= typeadjust (Expr, &Expr2, 1);
             } else {
@@ -3270,8 +2994,6 @@ static void parseadd (ExprDesc* Expr)
                     g_add (CF_PTR, 0);
                 }
             }
-            /* Array and function types must be converted to pointer types */
-            Expr->Type = PtrConversion (Expr->Type);
 
             /* Result is an rvalue in primary register */
             ED_FinalizeRValLoad (Expr);
@@ -3286,7 +3008,7 @@ static void parseadd (ExprDesc* Expr)
         g_push (flags, 0);                      /* --> stack */
 
         /* Evaluate the rhs */
-        MarkedExprWithCheck (hie9, &Expr2);
+        MarkedExprWithCheck (DoArrayRef ? hie0 : hie9, &Expr2);
 
         /* Get the rhs type */
         rhst = Expr2.Type;
@@ -3309,7 +3031,7 @@ static void parseadd (ExprDesc* Expr)
                 /* Operate on pointers, result type is a pointer */
                 flags = CF_PTR;
                 Expr->Type = Expr2.Type;
-            } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
+            } else if (!DoArrayRef && IsClassInt (lhst) && IsClassInt (rhst)) {
                 /* Integer addition */
                 flags = typeadjust (Expr, &Expr2, 1);
             } else {
@@ -3356,7 +3078,7 @@ static void parseadd (ExprDesc* Expr)
                 /* Operate on pointers, result type is a pointer */
                 flags = CF_PTR;
                 Expr->Type = Expr2.Type;
-            } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
+            } else if (!DoArrayRef && IsClassInt (lhst) && IsClassInt (rhst)) {
                 /* Integer addition. Note: Result is never constant.
                 ** Problem here is that typeadjust does not know if the
                 ** variable is an rvalue or lvalue, so if both operands
@@ -3380,18 +3102,69 @@ static void parseadd (ExprDesc* Expr)
 
         }
 
-        /* Array and function types must be converted to pointer types */
-        Expr->Type = PtrConversion (Expr->Type);
-
         /* Result is an rvalue in primary register */
         ED_FinalizeRValLoad (Expr);
     }
 
-    if (AddDone < 0) {
-        Error ("Invalid operands for binary operator '+'");
+    /* Deal with array ref */
+    if (DoArrayRef) {
+        TypeCode Qualifiers = T_QUAL_NONE;
+        Type* ElementType;
+
+        /* Check the types of array and subscript */
+        if (IsClassPtr (lhst)) {
+            if (!IsClassInt (rhst))  {
+                Error ("Array subscript is not an integer");
+                ED_MakeConstAbs (Expr, 0, GetCharArrayType (1));
+            } else if (IsTypeArray (lhst)) {
+                Qualifiers = GetQualifier (lhst);
+            }
+        } else if (IsClassInt (lhst)) {
+            if (!IsClassPtr (rhst)) {
+                Error ("Subscripted value is neither array nor pointer");
+                ED_MakeConstAbs (Expr, 0, GetCharArrayType (1));
+            } else if (IsTypeArray (rhst)) {
+                Qualifiers = GetQualifier (rhst);
+            }
+        } else {
+            Error ("Cannot subscript");
+            ED_MakeConstAbs (Expr, 0, GetCharArrayType (1));
+        }
+
+        /* The element type has the combined qualifiers from itself and the array,
+        ** it is a member of (if any).
+        */
+        ElementType = Indirect (Expr->Type);
+        if (GetQualifier (ElementType) != (GetQualifier (ElementType) | Qualifiers)) {
+            ElementType = TypeDup (ElementType);
+            ElementType->C |= Qualifiers;
+        }
+
+        /* The final result is usually an lvalue expression of element type
+        ** referenced in the primary, unless it is once again an array. We can just
+        ** assume the usual case first, and change it later if necessary.
+        */
+        ED_IndExpr (Expr);
+        Expr->Type = ElementType;
+
+        /* An array element is actually a variable. So the rules for variables with
+        ** respect to the reference type apply: If it's an array, it is virtually
+        ** an rvalue address, otherwise it's an lvalue reference. (A function would
+        ** also be an rvalue address, but an array cannot contain functions).
+        */
+        if (IsTypeArray (Expr->Type)) {
+            ED_AddrExpr (Expr);
+        }
+
+        /* Consume the closing bracket */
+        ConsumeRBrack ();
     } else {
-        /* Array and function types must be converted to pointer types */
-        Expr->Type = PtrConversion (Expr->Type);
+        if (AddDone < 0) {
+            Error ("Invalid operands for binary operator '+'");
+        } else {
+            /* Array and function types must be converted to pointer types */
+            Expr->Type = PtrConversion (Expr->Type);
+        }
     }
 
     /* Condition code not set */
@@ -3436,7 +3209,7 @@ static void parsesub (ExprDesc* Expr)
 
     /* Remember the output queue position, then bring the value onto the stack */
     GetCodePos (&Mark1);
-    LoadExpr (CF_NONE, Expr);  /* --> primary register */
+    LoadExpr (CF_NONE, Expr);   /* --> primary register */
     GetCodePos (&Mark2);
     g_push (TypeOf (lhst), 0);  /* --> stack */
 
@@ -3658,7 +3431,7 @@ void hie8 (ExprDesc* Expr)
     ExprWithCheck (hie9, Expr);
     while (CurTok.Tok == TOK_PLUS || CurTok.Tok == TOK_MINUS) {
         if (CurTok.Tok == TOK_PLUS) {
-            parseadd (Expr);
+            parseadd (Expr, 0);
         } else {
             parsesub (Expr);
         }

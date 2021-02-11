@@ -921,9 +921,8 @@ name="6502 binary relocation format specification">). It is defined like this:
         }
 </verb></tscreen>
 
-The other format available is the Atari (xex) segmented file format, this is
-the standard format used by Atari DOS 2.0 and upward file managers in the Atari
-8-bit computers, and it is defined like this:
+The other format available is the Atari segmented file format (xex), this is
+the standard format used by Atari DOS 2.0 and upwards, and it is defined like this:
 
 <tscreen><verb>
         FILES {
@@ -1140,17 +1139,25 @@ The builtin config files do contain segments that have a special meaning for
 the compiler and the libraries that come with it. If you replace the builtin
 config files, you will need the following information.
 
+<sect1>INIT<p>
+
+The INIT segment is some kind of 'bss' segment since it contains
+uninitialized data. Unlike <tt>.bss</tt> itself, its contents aren't
+initialized to zero at program startup . It's mostly used by
+constructors in the startup code. An example for the use of the INIT
+segment is saving/restoring the zero page area used by cc65.
+
+<sect1>LOWCODE<p>
+
+For the LOWCODE segment, it is guaranteed that it won't be banked out, so it
+is reachable at any time by interrupt handlers or similar.
+
 <sect1>ONCE<p>
 
 The ONCE segment is used for initialization code run only once before
 execution reaches main() - provided that the program runs in RAM. You
 may for example add the ONCE segment to the heap in really memory
 constrained systems.
-
-<sect1>LOWCODE<p>
-
-For the LOWCODE segment, it is guaranteed that it won't be banked out, so it
-is reachable at any time by interrupt handlers or similar.
 
 <sect1>STARTUP<p>
 

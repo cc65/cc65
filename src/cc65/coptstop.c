@@ -453,6 +453,7 @@ static unsigned Opt_staxspidx (StackOpData* D)
 /* Optimize the staxspidx sequence */
 {
     CodeEntry* X;
+    const char* Arg = 0;
 
     /* Check if we're using a register variable */
     if (!IsRegVar (D)) {
@@ -469,7 +470,7 @@ static unsigned Opt_staxspidx (StackOpData* D)
 
     if (RegValIsKnown (D->OpEntry->RI->In.RegY)) {
         /* Value of Y is known */
-        const char* Arg = MakeHexArg (D->OpEntry->RI->In.RegY + 1);
+        Arg = MakeHexArg (D->OpEntry->RI->In.RegY + 1);
         X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
     } else {
         X = NewCodeEntry (OP65_INY, AM65_IMP, 0, 0, D->OpEntry->LI);
@@ -478,7 +479,7 @@ static unsigned Opt_staxspidx (StackOpData* D)
 
     if (RegValIsKnown (D->OpEntry->RI->In.RegX)) {
         /* Value of X is known */
-        const char* Arg = MakeHexArg (D->OpEntry->RI->In.RegX);
+        Arg = MakeHexArg (D->OpEntry->RI->In.RegX);
         X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, D->OpEntry->LI);
     } else {
         /* Value unknown */
@@ -493,7 +494,12 @@ static unsigned Opt_staxspidx (StackOpData* D)
     /* If we remove staxspidx, we must restore the Y register to what the
     ** function would return.
     */
-    X = NewCodeEntry (OP65_LDY, AM65_IMM, "$00", 0, D->OpEntry->LI);
+    if (RegValIsKnown (D->OpEntry->RI->In.RegY)) {
+        Arg = MakeHexArg (D->OpEntry->RI->In.RegY);
+        X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
+    } else {
+        X = NewCodeEntry (OP65_DEY, AM65_IMP, 0, 0, D->OpEntry->LI);
+    }
     InsertEntry (D, X, D->OpIndex+5);
 
     /* Remove the push and the call to the staxspidx function */

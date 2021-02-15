@@ -2793,6 +2793,9 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                 }
             }
 
+            /* Get rid of unwanted flags */
+            ED_MakeConstBool (Expr, Expr->IVal);
+
             /* If the result is constant, this is suspicious when not in
             ** preprocessor mode.
             */

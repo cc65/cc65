@@ -460,7 +460,7 @@ static void SegNamePragma (StrBuf* B, segment_t Seg)
                 Warning ("Invalid address size for segment!");
             }
         }
-    
+
         /* Set the new name and optionally address size */
         if (Push) {
             PushSegName (Seg, Name);

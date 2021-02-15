@@ -678,7 +678,7 @@ void SetDontRemoveEntryFlag (LoadRegInfo* LRI)
     if (LRI->Flags & LI_DONT_REMOVE) {
         if (LRI->LoadEntry != 0) {
             LRI->LoadEntry->Flags |= CEF_DONT_REMOVE;
-            
+
             /* If the load requires Y, then Y shouldn't be removed either */
             if (LRI->LoadYEntry != 0) {
                 LRI->LoadYEntry->Flags |= CEF_DONT_REMOVE;
@@ -2562,7 +2562,7 @@ int BackupArgAfter (CodeSeg* S, BackupInfo* B, int Idx, const CodeEntry* E, Coll
 
 static int LoadAAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices, int After)
 /* Reload into A the same arg according to LoadRegInfo before or after Idx
-** depending on the After param. 
+** depending on the After param.
 */
 {
     CodeEntry* E;
@@ -2582,7 +2582,7 @@ static int LoadAAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Ind
     CHECK (E != 0);
 
     O = CS_GetEntry (S, OldIdx);
-    
+
     /* We only recognize opc with an arg for now, as well as a special case for ldaxysp */
     if ((E->OPC != OP65_JSR || strcmp (E->Arg, "ldaxysp") == 0) &&
         E->AM != AM65_BRA && E->AM != AM65_IMP) {
@@ -2645,7 +2645,7 @@ static int LoadAAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Ind
 
 static int LoadXAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices, int After)
 /* Reload into X the same arg according to LoadRegInfo before or after Idx
-** depending on the After param. 
+** depending on the After param.
 */
 {
     CodeEntry* E;
@@ -2744,7 +2744,7 @@ static int LoadXAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Ind
 
 static int LoadYAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices, int After)
 /* Reload into Y the same arg according to LoadRegInfo before or after Idx
-** depending on the After param. 
+** depending on the After param.
 */
 {
     CodeEntry* E;

@@ -73,7 +73,7 @@ enum {
     ** - ref-load doesn't change the rval/lval category of the expression,
     **    while rval-load converts it to an rvalue if it wasn't.
     ** - In practice, ref-load is unimplemented, and can be simulated with
-    **    adding E_ADDRESS_OF temporaily through LoadExpr + FinalizeLoad, 
+    **    adding E_ADDRESS_OF temporaily through LoadExpr + FinalizeLoad,
     **    whilst val-load is done with LoadExpr + FinalizeRValLoad.
     **
     ** E_LOC_NONE     -- ref-load     -> + E_LOADED (int rvalue)
@@ -142,7 +142,7 @@ enum {
     **    than it are usually consided "side-effects" in this regard.
     ** - The compiler front end cannot know things determined by the linker,
     **    such as the actual address of an object with static storage. What it
-    **    can know is categorized as "compiler-known" here. 
+    **    can know is categorized as "compiler-known" here.
     ** - The concept "immutable" here means that once something is determined
     **    (not necessarily by the compiler), it will never change. This is not
     **    the same meaning as the "constant" word in the C standard.
@@ -299,7 +299,7 @@ INLINE int ED_IsLocExpr (const ExprDesc* Expr)
 #if defined(HAVE_INLINE)
 INLINE int ED_IsLocLiteral (const ExprDesc* Expr)
 /* Return true if the expression is a string from the literal pool */
-{               
+{
     return (Expr->Flags & E_MASK_LOC) == E_LOC_LITERAL;
 }
 #else

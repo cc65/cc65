@@ -169,7 +169,7 @@ void Assignment (ExprDesc* Expr)
     /* cc65 does not have full support for handling structs or unions. Since
     ** assigning structs is one of the more useful operations from this family,
     ** allow it here.
-    ** Note: IsClassStruct() is also true for union types. 
+    ** Note: IsClassStruct() is also true for union types.
     */
     if (IsClassStruct (ltype)) {
         /* Copy the struct or union by value */

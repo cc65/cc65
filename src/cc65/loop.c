@@ -39,7 +39,7 @@
 
 /* cc65 */
 #include "error.h"
-#include "loop.h" 
+#include "loop.h"
 #include "stackptr.h"
 
 

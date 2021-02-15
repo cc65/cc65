@@ -518,7 +518,7 @@ SymEntry FindStructField (const Type* T, const char* Name)
         */
         if (Struct->V.S.SymTab) {
             Entry = FindSymInTable (Struct->V.S.SymTab, Name, HashStr (Name));
-            
+
             if (Entry != 0) {
                 Offs = Entry->V.Offs;
             }
@@ -732,7 +732,7 @@ SymEntry* AddEnumSym (const char* Name, unsigned Flags, const Type* Type, SymTab
             CurTagTab = FailSafeTab;
         }
     }
-    
+
     if (Entry == 0) {
 
         /* Create a new entry */
@@ -817,7 +817,7 @@ SymEntry* AddStructSym (const char* Name, unsigned Flags, unsigned Size, SymTabl
             CurTagTab = FailSafeTab;
         }
     }
-    
+
     if (Entry == 0) {
 
         /* Create a new entry */
@@ -1116,7 +1116,7 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
             }
         }
     }
-    
+
     if (Entry == 0) {
         /* Create a new entry */
         Entry = NewSymEntry (Name, Flags);
@@ -1221,7 +1221,6 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
         /* Add the new declaration to the global symbol table instead */
         Tab = SymTab0;
     }
-    
     if (Entry == 0 || Entry->Owner != Tab) {
 
         /* Create a new entry */

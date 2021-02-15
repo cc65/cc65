@@ -261,7 +261,7 @@ ExprDesc* ED_MakeConstBool (ExprDesc* Expr, long Value)
 {
     Expr->Sym   = 0;
     Expr->Type  = type_bool;
-    Expr->Flags = E_LOC_NONE | E_RTYPE_RVAL | (Expr->Flags & E_HAVE_MARKS);
+    Expr->Flags = E_LOC_NONE | E_RTYPE_RVAL | (Expr->Flags & E_MASK_KEEP_MAKE);
     Expr->Name  = 0;
     Expr->IVal  = Value;
     Expr->FVal  = FP_D_Make (0.0);

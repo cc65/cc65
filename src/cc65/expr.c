@@ -2361,7 +2361,6 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                          void (*hienext) (ExprDesc*))
 /* Helper function for the compare operators */
 {
-    CodeMark Mark0;
     CodeMark Mark1;
     CodeMark Mark2;
     const GenDesc* Gen;
@@ -2370,7 +2369,6 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
     int rconst;                         /* Operand is a constant */
 
 
-    GetCodePos (&Mark0);
     ExprWithCheck (hienext, Expr);
 
     while ((Gen = FindGen (CurTok.Tok, Ops)) != 0) {
@@ -2395,11 +2393,11 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
         GetCodePos (&Mark1);
         ltype = TypeOf (Expr->Type);
         if (ED_IsConstAbs (Expr)) {
-            /* Constant value */
+            /* Numeric constant value */
             GetCodePos (&Mark2);
             g_push (ltype | CF_CONST, Expr->IVal);
         } else {
-            /* Value not constant */
+            /* Value not numeric constant */
             LoadExpr (CF_NONE, Expr);
             GetCodePos (&Mark2);
             g_push (ltype, 0);
@@ -2413,10 +2411,10 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             Expr2.Type = PointerTo (Expr2.Type);
         }
 
-        /* Check for a constant expression */
+        /* Check for a numeric constant expression */
         rconst = (ED_IsConstAbs (&Expr2) && ED_CodeRangeIsEmpty (&Expr2));
         if (!rconst) {
-            /* Not constant, load into the primary */
+            /* Not numeric constant, load into the primary */
             LoadExpr (CF_NONE, &Expr2);
         }
 
@@ -2475,10 +2473,76 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             }
         }
 
-        /* Check for const operands */
-        if (ED_IsConstAbs (Expr) && rconst) {
+        /* Check for numeric constant operands */
+        if ((ED_IsAddrExpr (Expr) && ED_IsNullPtr (&Expr2)) ||
+            (ED_IsNullPtr (Expr) && ED_IsAddrExpr (&Expr2))) {
 
-            /* Both operands are constant, remove the generated code */
+            /* Object addresses are inequal to null pointer */
+            Expr->IVal = (Tok != TOK_EQ);
+            if (ED_IsNullPtr (&Expr2)) {
+                if (Tok == TOK_LT || Tok == TOK_LE) {
+                    Expr->IVal = 0;
+                }
+            } else {
+                if (Tok == TOK_GT || Tok == TOK_GE) {
+                    Expr->IVal = 0;
+                }
+            }
+
+            /* Get rid of unwanted flags */
+            ED_MakeConstBool (Expr, Expr->IVal);
+
+            /* The result is constant, this is suspicious when not in
+            ** preprocessor mode.
+            */
+            WarnConstCompareResult (Expr);
+
+            if (ED_CodeRangeIsEmpty (&Expr2)) {
+                /* Both operands are static, remove the load code */
+                RemoveCode (&Mark1);
+            } else {
+                /* Drop pushed lhs */
+                g_drop (sizeofarg (ltype));
+                pop (ltype);
+            }
+
+        } else if (ED_IsAddrExpr (Expr)     &&
+                   ED_IsAddrExpr (&Expr2)   &&
+                   Expr->Sym == Expr2.Sym) {
+
+            /* Evaluate the result for static addresses */
+            unsigned long Val1 = Expr->IVal;
+            unsigned long Val2 = Expr2.IVal;
+            switch (Tok) {
+                case TOK_EQ: Expr->IVal = (Val1 == Val2);   break;
+                case TOK_NE: Expr->IVal = (Val1 != Val2);   break;
+                case TOK_LT: Expr->IVal = (Val1 < Val2);    break;
+                case TOK_LE: Expr->IVal = (Val1 <= Val2);   break;
+                case TOK_GE: Expr->IVal = (Val1 >= Val2);   break;
+                case TOK_GT: Expr->IVal = (Val1 > Val2);    break;
+                default:     Internal ("hie_compare: got token 0x%X\n", Tok);
+            }
+
+            /* Get rid of unwanted flags */
+            ED_MakeConstBool (Expr, Expr->IVal);
+
+            /* If the result is constant, this is suspicious when not in
+            ** preprocessor mode.
+            */
+            WarnConstCompareResult (Expr);
+
+            if (ED_CodeRangeIsEmpty (&Expr2)) {
+                /* Both operands are static, remove the load code */
+                RemoveCode (&Mark1);
+            } else {
+                /* Drop pushed lhs */
+                g_drop (sizeofarg (ltype));
+                pop (ltype);
+            }
+
+        } else if (ED_IsConstAbs (Expr) && rconst) {
+
+            /* Both operands are numeric constant, remove the generated code */
             RemoveCode (&Mark1);
 
             /* Determine if this is a signed or unsigned compare */
@@ -2521,33 +2585,6 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             ** preprocessor mode.
             */
             WarnConstCompareResult (Expr);
-
-        } else if (ED_CodeRangeIsEmpty (&Expr2) &&
-                   ((ED_IsAddrExpr (Expr) && ED_IsNullPtr (&Expr2)) ||
-                    (ED_IsNullPtr (Expr) && (ED_IsAddrExpr (&Expr2))))) {
-
-            /* Object addresses are inequal to null pointer */
-            Expr->IVal = (Tok != TOK_EQ);
-            if (ED_IsNullPtr (&Expr2)) {
-                if (Tok == TOK_LT || Tok == TOK_LE) {
-                    Expr->IVal = 0;
-                }
-            } else {
-                if (Tok == TOK_GT || Tok == TOK_GE) {
-                    Expr->IVal = 0;
-                }
-            }
-
-            /* Get rid of unwanted flags */
-            ED_MakeConstBool (Expr, Expr->IVal);
-
-            /* If the result is constant, this is suspicious when not in
-            ** preprocessor mode.
-            */
-            WarnConstCompareResult (Expr);
-
-            /* Both operands are static, remove the generated code */
-            RemoveCode (&Mark1);
 
         } else {
 

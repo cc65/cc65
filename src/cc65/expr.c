@@ -3185,6 +3185,9 @@ static void parseadd (ExprDesc* Expr)
                 flags = CF_INT;
             }
 
+            /* Array and function types must be converted to pointer types */
+            Expr->Type = PtrConversion (Expr->Type);
+
             /* Result is an rvalue in primary register */
             ED_FinalizeRValLoad (Expr);
         }

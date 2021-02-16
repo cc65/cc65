@@ -249,9 +249,10 @@ void LibOpen (const char* Name, int MustExist, int NeedTemp)
     if (NeedTemp) {
 
         /* Create the temporary library name */
-        NewLibName = xmalloc (strlen (Name) + strlen (".temp") + 1);
+        NewLibName = xmalloc (strlen (Name) + strlen (".temp-") + 8 + 1);
         strcpy (NewLibName, Name);
-        strcat (NewLibName, ".temp");
+        strcat (NewLibName, ".temp-");
+        sprintf (NewLibName + strlen (NewLibName), "%X", (unsigned int)getpid());
 
         /* Create the temporary library */
         NewLib = fopen (NewLibName, "w+b");

@@ -237,5 +237,8 @@ MakeRVal:
 
         /* Set the type of the result */
         Expr->Type = ResultType;
+
+        /* Propagate from subexpressions */
+        Expr->Flags |= Expr2.Flags & E_MASK_VIRAL;
     }
 }

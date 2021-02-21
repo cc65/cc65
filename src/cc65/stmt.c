@@ -613,12 +613,13 @@ static void Statement (int* PendingToken)
     ** void, emit a warning.
     */
     GetCodePos (&End);
-    if (!ED_YetToLoad (&Expr)           &&
-        !ED_MayHaveNoEffect (&Expr)     &&
-        CodeRangeIsEmpty (&Start, &End) &&
-        IS_Get (&WarnNoEffect)          &&
+    if (!ED_YetToLoad (&Expr)                   &&
+        !ED_MayHaveNoEffect (&Expr)             &&
+        (CodeRangeIsEmpty (&Start, &End) ||
+         (Expr.Flags & E_SIDE_EFFECTS) == 0)    &&
+        IS_Get (&WarnNoEffect)                  &&
         PrevErrorCount == ErrorCount) {
-        Warning ("Expression result unused");
+        Warning ("Statement has no effect");
     }
     CheckSemi (PendingToken);
 }

@@ -376,6 +376,9 @@ void DoneDeferredOps (void)
 static void DeferInc (const ExprDesc* Expr)
 /* Defer the post-inc and put it in a queue */
 {
+    if (ED_IsUneval (Expr)) {
+        return;
+    }
     DeferredOp* Op = xmalloc (sizeof (DeferredOp));
     memcpy (&Op->Expr, Expr, sizeof (ExprDesc));
     Op->OpType = DOT_INC;
@@ -387,6 +390,9 @@ static void DeferInc (const ExprDesc* Expr)
 static void DeferDec (const ExprDesc* Expr)
 /* Defer the post-dec and put it in a queue */
 {
+    if (ED_IsUneval (Expr)) {
+        return;
+    }
     DeferredOp* Op = xmalloc (sizeof (DeferredOp));
     memcpy (&Op->Expr, Expr, sizeof (ExprDesc));
     Op->OpType = DOT_DEC;

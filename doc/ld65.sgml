@@ -1009,7 +1009,8 @@ The <tt/CONDES/ feature has several attributes:
   <tag><tt>segment</tt></tag>
 
   This attribute tells the linker into which segment the table should be
-  placed. If the segment does not exist, it is created.
+  placed. If the segment does not exist in any object file, it is created
+  in the final object code.
 
 
   <tag><tt>type</tt></tag>
@@ -1058,7 +1059,7 @@ The <tt/CONDES/ feature has several attributes:
 Without specifying the <tt/CONDES/ feature, the linker will not create any
 tables, even if there are <tt/condes/ entries in the object files.
 
-For more information see the <tt/.CONDES/ command in the <url
+For more information, see the <tt/.CONDES/ command in the <url
 url="ca65.html" name="ca65 manual">.
 
 

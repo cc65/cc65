@@ -278,4 +278,8 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
         }
     }
 
+    if (ED_IsLVal (Expr) && IsQualVolatile (Expr->Type)) {
+        /* Expression has had side effects */
+        Expr->Flags |= E_SIDE_EFFECTS;
+    }
 }

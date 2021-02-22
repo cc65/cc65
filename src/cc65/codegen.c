@@ -2112,29 +2112,38 @@ void g_addaddr_local (unsigned flags attribute ((unused)), int offs)
 
     /* Add the offset */
     offs -= StackPtr;
-    if (offs != 0) {
-        /* We cannot address more then 256 bytes of locals anyway */
-        L = GetLocalLabel();
-        CheckLocalOffs (offs);
-        AddCodeLine ("clc");
-        AddCodeLine ("adc #$%02X", offs & 0xFF);
-        /* Do also skip the CLC insn below */
-        AddCodeLine ("bcc %s", LocalLabelName (L));
-        AddCodeLine ("inx");
-    }
+    if (IS_Get (&CodeSizeFactor) <= 100) {
+        if (offs != 0) {
+            /* We cannot address more then 256 bytes of locals anyway */
+            g_inc (CF_INT | CF_CONST, offs);
+        }
+        /* Add the current stackpointer value */
+        AddCodeLine ("jsr leaaxsp");
+    } else {
+        if (offs != 0) {
+            /* We cannot address more then 256 bytes of locals anyway */
+            L = GetLocalLabel();
+            CheckLocalOffs (offs);
+            AddCodeLine ("clc");
+            AddCodeLine ("adc #$%02X", offs & 0xFF);
+            /* Do also skip the CLC insn below */
+            AddCodeLine ("bcc %s", LocalLabelName (L));
+            AddCodeLine ("inx");
+        }
 
-    /* Add the current stackpointer value */
-    AddCodeLine ("clc");
-    if (L != 0) {
-        /* Label was used above */
-        g_defcodelabel (L);
+        /* Add the current stackpointer value */
+        AddCodeLine ("clc");
+        if (L != 0) {
+            /* Label was used above */
+            g_defcodelabel (L);
+        }
+        AddCodeLine ("adc sp");
+        AddCodeLine ("tay");
+        AddCodeLine ("txa");
+        AddCodeLine ("adc sp+1");
+        AddCodeLine ("tax");
+        AddCodeLine ("tya");
     }
-    AddCodeLine ("adc sp");
-    AddCodeLine ("tay");
-    AddCodeLine ("txa");
-    AddCodeLine ("adc sp+1");
-    AddCodeLine ("tax");
-    AddCodeLine ("tya");
 }
 
 

@@ -464,6 +464,12 @@ static void GetSegExprValInternal (ExprNode* Expr, SegExprDesc* D, int Sign)
 {
     Export* E;
 
+    if (Expr == 0)
+    {
+        D->TooComplex = 1;
+        return;
+    }
+
     switch (Expr->Op) {
 
         case EXPR_LITERAL:

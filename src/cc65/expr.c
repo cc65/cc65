@@ -4188,19 +4188,25 @@ void hie0 (ExprDesc *Expr)
         /* Append deferred inc/dec at sequence point */
         DoDeferred (SQP_KEEP_NONE, Expr);
 
-        /* If the expression didn't generate code or isn't cast to type void,
-        ** emit a warning.
+        /* If the expression has no observable effect and isn't cast to type
+        ** void, emit a warning and remove useless code if any.
         */
         GetCodePos (&End);
-        if (!ED_MayHaveNoEffect (Expr)              &&
-            (CodeRangeIsEmpty (&Start, &End) ||
-             (Expr->Flags & E_SIDE_EFFECTS) == 0)   &&
-            IS_Get (&WarnNoEffect)                  &&
-            PrevErrorCount == ErrorCount) {
-            Warning ("Left-hand operand of comma expression has no effect");
+        if (CodeRangeIsEmpty (&Start, &End) ||
+            (Expr->Flags & E_SIDE_EFFECTS) == 0) {
+
+            if (!ED_MayHaveNoEffect (Expr)  &&
+                IS_Get (&WarnNoEffect)      &&
+                PrevErrorCount == ErrorCount) {
+                Warning ("Left-hand operand of comma expression has no effect");
+            }
+
+            /* Remove code with no effect */
+            RemoveCode (&Start);
         }
 
         PrevErrorCount = ErrorCount;
+
         /* Remember the current code position */
         GetCodePos (&Start);
 

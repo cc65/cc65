@@ -2845,7 +2845,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             }
 
             /* Determine the type of the operation. */
-            if (IsTypeChar (Expr->Type) && rconst) {
+            if (IsTypeChar (Expr->Type) && rconst && RightSigned) {
 
                 /* Left side is unsigned char, right side is constant.
                 ** Determine the minimum and maximum values
@@ -2857,20 +2857,6 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                 } else {
                     LeftMin = 0;
                     LeftMax = 255;
-                }
-                /* An integer value is always represented as a signed in the
-                ** ExprDesc structure. This may lead to false results below,
-                ** if it is actually unsigned, but interpreted as signed
-                ** because of the representation. Fortunately, in this case,
-                ** the actual value doesn't matter, since it's always greater
-                ** than what can be represented in a char. So correct the
-                ** value accordingly.
-                */
-                if (!RightSigned && Expr2.IVal < 0) {
-                    /* Correct the value so it is an unsigned. It will then
-                    ** anyway match one of the cases below.
-                    */
-                    Expr2.IVal = LeftMax + 1;
                 }
 
                 /* Comparing a char against a constant may have a constant
@@ -2951,7 +2937,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                 if (rconst) {
                     flags |= CF_FORCECHAR;
                 }
-                if (!LeftSigned) {
+                if (!LeftSigned || !RightSigned) {
                     flags |= CF_UNSIGNED;
                 }
             } else {
@@ -2959,11 +2945,11 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                 flags |= g_typeadjust (ltype, rtype);
             }
 
-            /* If the left side is an unsigned and the right is a constant,
-            ** we may be able to change the compares to something more
+            /* If the comparison is made as unsigned types and the right is a
+            ** constant, we may be able to change the compares to something more
             ** effective.
             */
-            if (!LeftSigned && rconst) {
+            if ((!LeftSigned || !RightSigned) && rconst) {
 
                 switch (Tok) {
 

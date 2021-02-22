@@ -464,8 +464,7 @@ static void GetSegExprValInternal (ExprNode* Expr, SegExprDesc* D, int Sign)
 {
     Export* E;
 
-    if (Expr == 0)
-    {
+    if (Expr == 0) {
         return;
     }
 

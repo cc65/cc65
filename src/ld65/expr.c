@@ -466,7 +466,6 @@ static void GetSegExprValInternal (ExprNode* Expr, SegExprDesc* D, int Sign)
 
     if (Expr == 0)
     {
-        D->TooComplex = 1;
         return;
     }
 

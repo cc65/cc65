@@ -2845,7 +2845,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             }
 
             /* Determine the type of the operation. */
-            if (IsTypeChar (Expr->Type) && rconst && RightSigned) {
+            if (IsTypeChar (Expr->Type) && rconst && (!LeftSigned || RightSigned)) {
 
                 /* Left side is unsigned char, right side is constant.
                 ** Determine the minimum and maximum values
@@ -2923,7 +2923,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                 ** since the right side constant is in a valid range.
                 */
                 flags |= (CF_CHAR | CF_FORCECHAR);
-                if (!LeftSigned) {
+                if (!LeftSigned || !RightSigned) {
                     flags |= CF_UNSIGNED;
                 }
 

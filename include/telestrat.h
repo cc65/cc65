@@ -85,6 +85,8 @@
 #define CH_LTEE         '+'
 #define CH_RTEE         '+'
 #define CH_CROSS        '+'
+#define CH_HLINE        '-'
+#define CH_VLINE        '|'
 #define CH_CURS_UP       11
 #define CH_CURS_DOWN     10
 #define CH_CURS_LEFT      8

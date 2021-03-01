@@ -173,7 +173,7 @@ unsigned OptBranchDist (CodeSeg* S)
 
             }
 
-        } else if ((CPUIsets[CPU] & CPU_ISET_65SC02) != 0 &&
+        } else if ((CPUIsets[CPU] & (CPU_ISET_65SC02 |CPU_ISET_6502DTV)) != 0 &&
                    (E->Info & OF_UBRA) != 0               &&
                    E->JumpTo != 0                         &&
                    IsShortDist (GetBranchDist (S, I, E->JumpTo->Owner))) {

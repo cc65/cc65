@@ -1080,7 +1080,7 @@ void AddOpHigh (StackOpData* D, opc_t OPC, LoadInfo* LI, int KeepResult)
 
         } else {
 
-            if ((LI->A.Flags & LI_CHECK_Y) == 0) {
+            if ((LI->X.Flags & LI_CHECK_Y) == 0) {
                 /* ldy #const */
                 X = NewCodeEntry (OP65_LDY, AM65_IMM, MakeHexArg (LI->X.Offs), 0, D->OpEntry->LI);
             } else {
@@ -1094,7 +1094,7 @@ void AddOpHigh (StackOpData* D, opc_t OPC, LoadInfo* LI, int KeepResult)
                 X = NewCodeEntry (OPC, AM65_ZP_INDY, "sp", 0, D->OpEntry->LI);
             } else {
                 /* opc src,y */
-                X = NewCodeEntry (OPC, LI->A.LoadEntry->AM, LI->A.LoadEntry->Arg, 0, D->OpEntry->LI);
+                X = NewCodeEntry (OPC, LI->X.LoadEntry->AM, LI->X.LoadEntry->Arg, 0, D->OpEntry->LI);
             }
             InsertEntry (D, X, D->IP++);
         }

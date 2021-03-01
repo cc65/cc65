@@ -83,46 +83,31 @@ extern struct _timezone {
 
 
 
-#if defined(__ATARI__)
-/* The clock depends on the video standard, so read it at runtime */
-unsigned _clocks_per_sec (void);
-#  define CLK_TCK               _clocks_per_sec()
-#  define CLOCKS_PER_SEC        _clocks_per_sec()
-#elif defined(__ATARI5200__)
-#  define CLK_TCK               60      /* POSIX */
-#  define CLOCKS_PER_SEC        60      /* ANSI */
+#if defined(__ATARI5200__)
+#  define CLOCKS_PER_SEC        60
 #elif defined(__ATMOS__)
-#  define CLK_TCK               100     /* POSIX */
-#  define CLOCKS_PER_SEC        100     /* ANSI */
+#  define CLOCKS_PER_SEC        100
 #elif defined(__CBM__)
 #  if defined(__CBM510__) || defined(__CBM610__)
 /* The 510/610 gets its clock from the AC current */
-#    define CLK_TCK             50      /* POSIX */
-#    define CLOCKS_PER_SEC      50      /* ANSI */
+#    define CLOCKS_PER_SEC      50
 #  else
-#    define CLK_TCK             60      /* POSIX */
-#    define CLOCKS_PER_SEC      60      /* ANSI */
+#    define CLOCKS_PER_SEC      60
 #  endif
 #elif defined(__NES__)
-#  define CLK_TCK               50      /* POSIX */
-#  define CLOCKS_PER_SEC        50      /* ANSI */
+#  define CLOCKS_PER_SEC        50
 #elif defined(__PCE__)
-#  define CLK_TCK               60      /* POSIX */
-#  define CLOCKS_PER_SEC        60      /* ANSI */
+#  define CLOCKS_PER_SEC        60
 #elif  defined(__GAMATE__)
-#  define CLK_TCK               135     /* POSIX */     /* FIXME */
-#  define CLOCKS_PER_SEC        135     /* ANSI */      /* FIXME */
+#  define CLOCKS_PER_SEC        135   /* FIXME */
 #elif  defined(__GEOS__)
-#  define CLK_TCK               1       /* POSIX */
-#  define CLOCKS_PER_SEC        1       /* ANSI */
-#elif defined(__LYNX__)
-/* The clock-rate depends on the video scan-rate;
-** so, read it at run-time.
-*/
-extern clock_t _clk_tck (void);
-#  define CLK_TCK               _clk_tck()
-#  define CLOCKS_PER_SEC        _clk_tck()
+#  define CLOCKS_PER_SEC        1
+#else
+/* Read the clock rate at runtime */
+clock_t _clocks_per_sec (void);
+#  define CLOCKS_PER_SEC        _clocks_per_sec()
 #endif
+#define CLK_TCK                 CLOCKS_PER_SEC
 #define CLOCK_REALTIME          0
 
 
@@ -149,6 +134,3 @@ int __fastcall__ clock_settime (clockid_t clock_id, const struct timespec *tp);
 /* End of time.h */
 
 #endif
-
-
-

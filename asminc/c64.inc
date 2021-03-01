@@ -9,6 +9,7 @@
 VARTAB          := $2D          ; Pointer to start of BASIC variables
 MEMSIZE         := $37          ; Pointer to highest BASIC RAM location (+1)
 TXTPTR          := $7A          ; Pointer into BASIC source code
+STATUS          := $90          ; Kernal I/O completion status
 TIME            := $A0          ; 60 HZ clock
 FNAM_LEN        := $B7          ; Length of filename
 SECADR          := $B9          ; Secondary address

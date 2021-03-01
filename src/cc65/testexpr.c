@@ -63,7 +63,7 @@ unsigned Test (unsigned Label, int Invert)
     /* Read a boolean expression */
     BoolExpr (hie0, &Expr);
 
-    /* Check for a constant expression */
+    /* Check for a constant numeric expression */
     if (ED_IsConstAbs (&Expr)) {
 
         /* Append deferred inc/dec at sequence point */

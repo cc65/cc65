@@ -35,7 +35,7 @@ WORKDIR = ..$S..$Stestwrk$Sref
 
 OPTIONS = g O Os Osi Osir Osr Oi Oir Or
 
-ISEQUAL = $(WORKDIR)$Sisequal$(EXE)
+ISEQUAL = ..$S..$Stestwrk$Sisequal$(EXE)
 
 CC = gcc
 CFLAGS = -O2 -Wall -W -Wextra -funsigned-char -fwrapv -fno-strict-overflow

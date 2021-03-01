@@ -71,6 +71,7 @@ extern IntStack WarnUnknownPragma;      /* - unknown #pragmas */
 extern IntStack WarnUnusedLabel;        /* - unused labels */
 extern IntStack WarnUnusedParam;        /* - unused parameters */
 extern IntStack WarnUnusedVar;          /* - unused variables */
+extern IntStack WarnReturnType;         /* - control reaches end of non-void function */
 
 /* Forward */
 struct StrBuf;

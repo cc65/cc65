@@ -29,6 +29,3 @@ __syschdir:
         BRK_TELEMON(XPUTCWD)
         
         rts
-
-
-

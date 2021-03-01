@@ -124,7 +124,8 @@ static struct StrBuf* GetFullTypeNameWestEast (struct StrBuf* West, struct StrBu
 
         /* First argument */
         SymEntry* Param = D->SymTab->SymHead;
-        for (unsigned I = 0; I < D->ParamCount; ++I) {
+        unsigned I;
+        for (I = 0; I < D->ParamCount; ++I) {
             CHECK (Param != 0 && (Param->Flags & SC_PARAM) != 0);
             if (I > 0) {
                 SB_AppendStr (&ParamList, ", ");
@@ -461,7 +462,7 @@ Type* GetImplicitFuncType (void)
     Type* T = TypeAlloc (3);    /* func/returns int/terminator */
 
     /* Prepare the function descriptor */
-    F->Flags  = FD_EMPTY | FD_VARIADIC;
+    F->Flags  = FD_EMPTY;
     F->SymTab = &EmptySymTab;
     F->TagTab = &EmptySymTab;
 
@@ -602,7 +603,8 @@ void PrintFuncSig (FILE* F, const char* Name, Type* T)
 
     /* Get the parameter list string. Start from the first parameter */
     SymEntry* Param = D->SymTab->SymHead;
-    for (unsigned I = 0; I < D->ParamCount; ++I) {
+    unsigned I;
+    for (I = 0; I < D->ParamCount; ++I) {
         CHECK (Param != 0 && (Param->Flags & SC_PARAM) != 0);
         if (I > 0) {
             SB_AppendStr (&ParamList, ", ");

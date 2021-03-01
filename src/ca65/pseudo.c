@@ -1552,6 +1552,14 @@ static void DoP4510 (void)
 
 
 
+static void DoPDTV (void)
+/* Switch to C64DTV CPU */
+{
+    SetCPU (CPU_6502DTV);
+}
+
+
+
 static void DoPageLength (void)
 /* Set the page length for the listing */
 {
@@ -2058,6 +2066,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccKeepToken,      DoConditionals  },      /* .IFP4510 */
     { ccKeepToken,      DoConditionals  },      /* .IFP816 */
     { ccKeepToken,      DoConditionals  },      /* .IFPC02 */
+    { ccKeepToken,      DoConditionals  },      /* .IFPDTV */
     { ccKeepToken,      DoConditionals  },      /* .IFPSC02 */
     { ccKeepToken,      DoConditionals  },      /* .IFREF */
     { ccNone,           DoImport        },
@@ -2091,6 +2100,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoPageLength    },
     { ccNone,           DoUnexpected    },      /* .PARAMCOUNT */
     { ccNone,           DoPC02          },
+    { ccNone,           DoPDTV          },
     { ccNone,           DoPopCPU        },
     { ccNone,           DoPopSeg        },
     { ccNone,           DoProc          },

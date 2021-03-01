@@ -78,5 +78,3 @@ not_dma:
 .word   nmi
 .word   reset32kcode
 .word   irq
-
-

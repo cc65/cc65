@@ -39,7 +39,7 @@ _cputcxy:
     ldx     CHARCOLOR
     cpx     OLD_CHARCOLOR
     beq     do_not_change_color_foreground
-    
+
     stx     OLD_CHARCOLOR         ; Store CHARCOLOR into OLD_CHARCOLOR
 
 
@@ -93,9 +93,9 @@ do_not_change_color:
 CHARCOLOR:
     .res 1
 OLD_CHARCOLOR:
-    .res 1    
+    .res 1
 BGCOLOR:
-    .res 1    
+    .res 1
 OLD_BGCOLOR:
     .res 1
 

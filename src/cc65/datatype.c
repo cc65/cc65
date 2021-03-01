@@ -755,8 +755,9 @@ unsigned SizeOf (const Type* T)
             return T->A.U;
 
         /* Beware: There's a chance that this triggers problems in other parts
-           of the compiler. The solution is to fix the callers, because calling
-           SizeOf() with a function type as argument is bad. */
+        ** of the compiler. The solution is to fix the callers, because calling
+        ** SizeOf() with a function type as argument is bad.
+        */
         case T_FUNC:
             return 0;   /* Size of function is unknown */
 

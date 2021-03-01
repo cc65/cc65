@@ -2822,7 +2822,8 @@ void g_div (unsigned flags, unsigned long val)
             }
 
             /* Negate the result as long as val < 0, even if val == -1 and no
-            ** shift was generated. */
+            ** shift was generated.
+            */
             if (Negation) {
                 g_neg (flags);
             }

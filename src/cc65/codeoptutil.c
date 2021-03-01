@@ -356,8 +356,9 @@ static int Affected (LoadRegInfo* LRI, const CodeEntry* E)
                 }
 
                 if ((LRI->Flags & LI_CHECK_Y) != 0) {
-                    /* If we don't know what memory location could have been used by Y,
-                    ** we just assume all. */
+                    /* If we don't know what memory location could have been
+                    ** used by Y, we just assume all.
+                    */
                     if (YE == 0 ||
                         (YE->ArgOff == E->ArgOff && strcmp (YE->ArgBase, E->ArgBase) == 0)) {
 
@@ -375,8 +376,9 @@ static int Affected (LoadRegInfo* LRI, const CodeEntry* E)
                 /* Otherwise unaffected */
                 goto L_Result;
             }
-            /* We could've check further for more cases where the load target isn't
-            ** modified, but for now let's save the trouble and just play it safe.
+            /* We could've check further for more cases where the load target
+            ** isn't modified, but for now let's save the trouble and just play
+            ** it safe.
             */
             goto L_Affected;
         }

@@ -4,7 +4,7 @@
 ; void cputc (char c);
 ;
 
-        .export         _cputc, _cputcxy, display_conio, CHARCOLOR, OLD_CHARCOLOR, BGCOLOR, OLD_BGCOLOR
+        .export         _cputc, _cputcxy, cputdirect, display_conio, CHARCOLOR, OLD_CHARCOLOR, BGCOLOR, OLD_BGCOLOR
 
         
         .import         update_adscr
@@ -12,6 +12,7 @@
 
         .include        "telestrat.inc"
 
+cputdirect:
 _cputcxy:
     pha                     ; Save C
     jsr     popax           ; Get X and Y
@@ -69,9 +70,8 @@ do_not_change_color:
 
 .endproc
 
-
-
 .proc display_conio
+    ; This routine is used to displays char on screen
     ldy     SCRX
     sta     (ADSCR),y
     iny

@@ -4,7 +4,8 @@
 ; void cputc (char c);
 ;
 
-        .export         _cputc, _cputcxy, cputdirect, display_conio, CHARCOLOR, OLD_CHARCOLOR, BGCOLOR, OLD_BGCOLOR
+        .export         _cputc, _cputcxy, cputdirect, display_conio
+        .export         CHARCOLOR, OLD_CHARCOLOR, BGCOLOR, OLD_BGCOLOR
 
         
         .import         update_adscr
@@ -14,10 +15,10 @@
 
 cputdirect:
 _cputcxy:
-    pha                     ; Save C
-    jsr     popax           ; Get X and Y
-    sta     SCRY            ; Store Y
-    stx     SCRX            ; Store X
+    pha                           ; Save C
+    jsr     popax                 ; Get X and Y
+    sta     SCRY                  ; Store Y
+    stx     SCRX                  ; Store X
     jsr     update_adscr
     pla        
 
@@ -34,9 +35,7 @@ _cputcxy:
     inc     SCRY
     jmp     update_adscr
 
-
 @not_LF:
-
     ldx     CHARCOLOR
     cpx     OLD_CHARCOLOR
     beq     do_not_change_color_foreground
@@ -86,8 +85,6 @@ do_not_change_color:
     sty     SCRX
     rts
 .endproc
-
-
 
 .bss
 CHARCOLOR:

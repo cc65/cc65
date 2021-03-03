@@ -23,9 +23,9 @@
 
 
     ; reset prompt position
-    lda     #<(SCREEN)
+    lda     #<SCREEN
     sta     ADSCR
-    lda     #>(SCREEN)
+    lda     #>SCREEN
     sta     ADSCR+1
 
     lda     #$00
@@ -36,10 +36,10 @@
     stx     SCRY
     stx     SCRX
     
-    stx     OLD_BGCOLOR     ; black
+    stx     OLD_BGCOLOR                             ; Black
     stx     BGCOLOR
     
-    ldx     #$07            ; white
+    ldx     #$07                                    ; White
     stx     OLD_CHARCOLOR
     stx     CHARCOLOR
     

@@ -121,3 +121,9 @@ void shoot();
 void explode();
 
 void kbdclick1();
+
+/* The following #defines will cause the matching functions calls in conio.h
+** to be overlaid by macros with the same names, saving the function call
+** overhead.
+*/
+#define _bordercolor(color)     COLOR_BLACK

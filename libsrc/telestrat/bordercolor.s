@@ -9,8 +9,5 @@
 
         .include        "telestrat.inc"
 
-_bordercolor:
-        ; Nothing to do
-        ; Oric can't handle his border
-        rts
+_bordercolor    := return0
 

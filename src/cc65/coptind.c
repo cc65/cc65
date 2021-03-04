@@ -990,7 +990,7 @@ unsigned OptTransfers4 (CodeSeg* S)
                 ** isn't used later, and we have an address mode match, we can
                 ** replace the transfer by a load and remove the initial load.
                 */
-                if ((GetRegInfo (S, I, LoadEntry->Chg & REG_ALL) & 
+                if ((GetRegInfo (S, I, LoadEntry->Chg & REG_ALL) &
                     LoadEntry->Chg & REG_ALL) == 0                              &&
                     (LoadEntry->AM == AM65_ABS ||
                      LoadEntry->AM == AM65_ZP  ||
@@ -1252,7 +1252,7 @@ unsigned OptPushPop2 (CodeSeg* S)
                         /* Go into searching mode again */
                         State = Searching;
                     }
-                } else if ((E->Info & OF_BRA)   == 0 && 
+                } else if ((E->Info & OF_BRA)   == 0 &&
                            (E->Info & OF_STORE) == 0 &&
                            E->OPC != OP65_NOP        &&
                            E->OPC != OP65_TSX) {
@@ -1500,14 +1500,11 @@ unsigned OptShiftBack (CodeSeg* S)
             (N->OPC == OP65_LSR ||
              N->OPC == OP65_ROR)                &&
             !CE_HasLabel (N)) {
-            
             CheckStates = PSTATE_ZN;
-            
             if (N->OPC == OP65_LSR &&
                 !PStatesAreClear (E->RI->Out.PFlags, PSTATE_C)) {
                 CheckStates |= REG_A;
             }
-            
             if ((GetRegInfo (S, I+2, CheckStates) & CheckStates) == 0) {
 
                 /* Remove the shifts */

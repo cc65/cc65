@@ -251,6 +251,42 @@ static unsigned typeadjust (ExprDesc* lhs, ExprDesc* rhs, int NoPush)
 
 
 
+static void LimitExprValue (ExprDesc* Expr)
+/* Limit the constant value of the expression to the range of its type */
+{
+    switch (GetUnderlyingTypeCode (Expr->Type)) {
+        case T_INT:
+        case T_SHORT:
+            Expr->IVal = (int16_t)Expr->IVal;
+            break;
+
+        case T_UINT:
+        case T_USHORT:
+        case T_PTR:
+        case T_ARRAY:
+            Expr->IVal = (uint16_t)Expr->IVal;
+            break;
+
+        case T_LONG:
+        case T_ULONG:
+            /* No need to do anything */
+            break;
+
+        case T_SCHAR:
+            Expr->IVal = (int8_t)Expr->IVal;
+            break;
+
+        case T_UCHAR:
+            Expr->IVal = (uint8_t)Expr->IVal;
+            break;
+
+        default:
+            Internal ("hie_internal: constant result type %s\n", GetFullTypeName (Expr->Type));
+    }
+}
+
+
+
 static const GenDesc* FindGen (token_t Tok, const GenDesc* Table)
 /* Find a token in a generator table */
 {
@@ -376,6 +412,9 @@ void DoneDeferredOps (void)
 static void DeferInc (const ExprDesc* Expr)
 /* Defer the post-inc and put it in a queue */
 {
+    if (ED_IsUneval (Expr)) {
+        return;
+    }
     DeferredOp* Op = xmalloc (sizeof (DeferredOp));
     memcpy (&Op->Expr, Expr, sizeof (ExprDesc));
     Op->OpType = DOT_INC;
@@ -387,6 +426,9 @@ static void DeferInc (const ExprDesc* Expr)
 static void DeferDec (const ExprDesc* Expr)
 /* Defer the post-dec and put it in a queue */
 {
+    if (ED_IsUneval (Expr)) {
+        return;
+    }
     DeferredOp* Op = xmalloc (sizeof (DeferredOp));
     memcpy (&Op->Expr, Expr, sizeof (ExprDesc));
     Op->OpType = DOT_DEC;
@@ -1171,16 +1213,16 @@ static void Primary (ExprDesc* E)
 
                 /* IDENT is either an auto-declared function or an undefined variable. */
                 if (CurTok.Tok == TOK_LPAREN) {
-                    /* C99 doesn't allow calls to undefined functions, so
+                    /* C99 doesn't allow calls to undeclared functions, so
                     ** generate an error and otherwise a warning. Declare a
                     ** function returning int. For that purpose, prepare a
                     ** function signature for a function having an empty param
                     ** list and returning int.
                     */
                     if (IS_Get (&Standard) >= STD_C99) {
-                        Error ("Call to undefined function '%s'", Ident);
+                        Error ("Call to undeclared function '%s'", Ident);
                     } else {
-                        Warning ("Call to undefined function '%s'", Ident);
+                        Warning ("Call to undeclared function '%s'", Ident);
                     }
                     Sym = AddGlobalSym (Ident, GetImplicitFuncType(), SC_EXTERN | SC_REF | SC_FUNC);
                     E->Type  = Sym->Type;
@@ -2159,15 +2201,19 @@ static void UnaryOp (ExprDesc* Expr)
         ED_MakeConstAbsInt (Expr, 1);
     }
 
-    /* Check for a constant expression */
+    /* Check for a constant numeric expression */
     if (ED_IsConstAbs (Expr)) {
-        /* Value is constant */
+        /* Value is numeric */
         switch (Tok) {
             case TOK_MINUS: Expr->IVal = -Expr->IVal;   break;
             case TOK_PLUS:                              break;
             case TOK_COMP:  Expr->IVal = ~Expr->IVal;   break;
             default:        Internal ("Unexpected token: %d", Tok);
         }
+
+        /* Limit the calculated value to the range of its type */
+        LimitExprValue (Expr);
+
     } else {
         /* Value is not constant */
         LoadExpr (CF_NONE, Expr);
@@ -2218,7 +2264,7 @@ void hie10 (ExprDesc* Expr)
             NextToken ();
             BoolExpr (hie10, Expr);
             if (ED_IsConstAbs (Expr)) {
-                /* Constant expression */
+                /* Constant numeric expression */
                 Expr->IVal = !Expr->IVal;
             } else if (ED_IsAddrExpr (Expr)) {
                 /* Address != NULL, so !Address == 0 */
@@ -2509,6 +2555,9 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
                 }
             }
 
+            /* Limit the calculated value to the range of its type */
+            LimitExprValue (Expr);
+
         } else if (lconst && (Gen->Flags & GEN_COMM) && !rconst) {
             /* If the LHS constant is an int that fits into an unsigned char, change the
             ** codegen type to unsigned char.  If the RHS is also an unsigned char, then
@@ -2744,6 +2793,9 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                 }
             }
 
+            /* Get rid of unwanted flags */
+            ED_MakeConstBool (Expr, Expr->IVal);
+
             /* If the result is constant, this is suspicious when not in
             ** preprocessor mode.
             */
@@ -2796,7 +2848,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             }
 
             /* Determine the type of the operation. */
-            if (IsTypeChar (Expr->Type) && rconst) {
+            if (IsTypeChar (Expr->Type) && rconst && (!LeftSigned || RightSigned)) {
 
                 /* Left side is unsigned char, right side is constant.
                 ** Determine the minimum and maximum values
@@ -2808,20 +2860,6 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                 } else {
                     LeftMin = 0;
                     LeftMax = 255;
-                }
-                /* An integer value is always represented as a signed in the
-                ** ExprDesc structure. This may lead to false results below,
-                ** if it is actually unsigned, but interpreted as signed
-                ** because of the representation. Fortunately, in this case,
-                ** the actual value doesn't matter, since it's always greater
-                ** than what can be represented in a char. So correct the
-                ** value accordingly.
-                */
-                if (!RightSigned && Expr2.IVal < 0) {
-                    /* Correct the value so it is an unsigned. It will then
-                    ** anyway match one of the cases below.
-                    */
-                    Expr2.IVal = LeftMax + 1;
                 }
 
                 /* Comparing a char against a constant may have a constant
@@ -2888,7 +2926,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                 ** since the right side constant is in a valid range.
                 */
                 flags |= (CF_CHAR | CF_FORCECHAR);
-                if (!LeftSigned) {
+                if (!LeftSigned || !RightSigned) {
                     flags |= CF_UNSIGNED;
                 }
 
@@ -2902,7 +2940,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                 if (rconst) {
                     flags |= CF_FORCECHAR;
                 }
-                if (!LeftSigned) {
+                if (!LeftSigned || !RightSigned) {
                     flags |= CF_UNSIGNED;
                 }
             } else {
@@ -2910,11 +2948,11 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                 flags |= g_typeadjust (ltype, rtype);
             }
 
-            /* If the left side is an unsigned and the right is a constant,
-            ** we may be able to change the compares to something more
+            /* If the comparison is made as unsigned types and the right is a
+            ** constant, we may be able to change the compares to something more
             ** effective.
             */
-            if (!LeftSigned && rconst) {
+            if ((!LeftSigned || !RightSigned) && rconst) {
 
                 switch (Tok) {
 
@@ -3042,6 +3080,9 @@ static void parseadd (ExprDesc* Expr)
                 /* Integer addition */
                 Expr->IVal += Expr2.IVal;
                 typeadjust (Expr, &Expr2, 1);
+
+                /* Limit the calculated value to the range of its type */
+                LimitExprValue (Expr);
             } else {
                 /* OOPS */
                 Error ("Invalid operands for binary operator '+'");
@@ -3129,6 +3170,9 @@ static void parseadd (ExprDesc* Expr)
                 Error ("Invalid operands for binary operator '+'");
                 flags = CF_INT;
             }
+
+            /* Array and function types must be converted to pointer types */
+            Expr->Type = PtrConversion (Expr->Type);
 
             /* Result is an rvalue in primary register */
             ED_FinalizeRValLoad (Expr);
@@ -3225,7 +3269,7 @@ static void parseadd (ExprDesc* Expr)
         ED_FinalizeRValLoad (Expr);
     }
 
-    /* Condition codes not set */
+    /* Condition code not set */
     ED_MarkAsUntested (Expr);
 }
 
@@ -3301,7 +3345,7 @@ static void parsesub (ExprDesc* Expr)
                     Error ("Incompatible pointer types");
                 } else {
                     Expr->IVal = (Expr->IVal - Expr2.IVal) /
-                                      CheckedPSizeOf (lhst);
+                                      (long)CheckedPSizeOf (lhst);
                 }
                 /* Operate on pointers, result type is an integer */
                 Expr->Type = type_int;
@@ -3309,13 +3353,13 @@ static void parsesub (ExprDesc* Expr)
                 /* Integer subtraction */
                 typeadjust (Expr, &Expr2, 1);
                 Expr->IVal -= Expr2.IVal;
+
+                /* Limit the calculated value to the range of its type */
+                LimitExprValue (Expr);
             } else {
                 /* OOPS */
                 Error ("Invalid operands for binary operator '-'");
             }
-
-            /* Result is constant, condition codes not set */
-            ED_MarkAsUntested (Expr);
 
         } else {
 
@@ -3358,8 +3402,6 @@ static void parsesub (ExprDesc* Expr)
 
             /* Result is an rvalue in the primary register */
             ED_FinalizeRValLoad (Expr);
-            ED_MarkAsUntested (Expr);
-
         }
 
     } else {
@@ -3412,8 +3454,10 @@ static void parsesub (ExprDesc* Expr)
 
         /* Result is an rvalue in the primary register */
         ED_FinalizeRValLoad (Expr);
-        ED_MarkAsUntested (Expr);
     }
+
+    /* Condition code not set */
+    ED_MarkAsUntested (Expr);
 }
 
 

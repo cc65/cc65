@@ -1522,7 +1522,7 @@ static Type* ParamTypeCvt (Type* T)
     } else if (IsTypeFunc (T)) {
         Tmp = PointerTo (T);
     }
-    
+
     if (Tmp != 0) {
         /* Do several fixes on qualifiers */
         FixQualifiers (Tmp);
@@ -1786,7 +1786,7 @@ static FuncDesc* ParseFuncDecl (void)
     ** won't always get to know the parameter sizes here and may do that later.
     */
     F->Flags |= FD_INCOMPLETE_PARAM;
- 
+
     /* Leave the lexical level remembering the symbol tables */
     RememberFunctionLevel (F);
 

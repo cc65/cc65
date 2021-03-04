@@ -193,7 +193,7 @@ void ShiftExpr (struct ExprDesc* Expr)
                 ED_IsLocQuasiConst (Expr) &&
                 Expr2.IVal >= 8) {
 
-                Type* OldType; 
+                Type* OldType;
 
                 /* Increase the address by one and decrease the shift count */
                 ++Expr->IVal;

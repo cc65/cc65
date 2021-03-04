@@ -233,7 +233,7 @@ unsigned OptPtrLoad11 (CodeSeg* S);
 */
 
 unsigned OptPtrLoad12 (CodeSeg* S);
-/* Search for the sequence:       
+/* Search for the sequence:
 **
 **      lda     regbank+n
 **      ldx     regbank+n+1

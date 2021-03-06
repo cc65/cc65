@@ -6,7 +6,7 @@
 
         .export         __syschdir
         .import         addysp, popax
-        .importzp       tmp1
+	    .importzp       tmp1
         .import         initcwd
 
         .include        "telestrat.inc"
@@ -29,4 +29,6 @@ __syschdir:
         
         BRK_TELEMON(XPUTCWD)
 
-        jmp     initcwd      ; Update cwd
+        jsr     initcwd      ; Update cwd
+        
+        rts

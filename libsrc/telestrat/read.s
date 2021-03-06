@@ -8,33 +8,21 @@
 
     .include        "zeropage.inc"
     .include        "telestrat.inc"
-    .include        "fcntl.inc"
 
 ;int read (int fd, void* buf, unsigned count);
 
 .proc   _read
-    sta     ptr1             ; count
-    stx     ptr1+1           ; count
-    jsr     popax            ; get buf
+    sta     ptr1 ; count
+    stx     ptr1+1 ; count
+    jsr     popax ; get buf
 
     sta     PTR_READ_DEST
     stx     PTR_READ_DEST+1
-    sta     ptr2             ; in order to calculate nb of bytes read
+    sta     ptr2 ; in order to calculate nb of bytes read
     stx     ptr2+1 ;
 
-    jsr     popax            ; fp pointer don't care in this version
-    cpx     #$00
-    bne     @is_not_stdin
-    cmp     #STDIN_FILENO
-    bne     @is_not_stdin
-    ; stdin
-@L1:
-    BRK_TELEMON XRD0         ; waits until key is pressed
-    bcs     @L1
-    
-    rts 
+    ; jsr popax ; fp pointer don't care in this version
 
-@is_not_stdin:
     lda     ptr1 ;
     ldy     ptr1+1 ;
     BRK_TELEMON     XFREAD ; calls telemon30 routine

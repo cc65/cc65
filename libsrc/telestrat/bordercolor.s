@@ -4,8 +4,9 @@
 ; unsigned char __fastcall__ bordercolor (unsigned char color);
 ;
 
-
         .export         _bordercolor
+
+        .import         return0
 
         .include        "telestrat.inc"
 

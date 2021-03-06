@@ -10,7 +10,8 @@
 
 
 initcwd:
-        BRK_TELEMON(XGETCWD)
+        ldx     #PWD_PTR
+        BRK_TELEMON XVARS
 
         sta     ptr1
         sty     ptr1+1

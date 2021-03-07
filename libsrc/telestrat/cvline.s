@@ -28,7 +28,11 @@ _cvline:
 @L1:
         lda     #'|'
         ora     rvs
-        jsr     display_conio
+        ldy     SCRX
+        sta     (ADSCR),y
+        ; compute next line
+        inc     SCRY
+        jsr     update_adscr
 @L2:    dex
         bne     @L1
 @L9:    rts

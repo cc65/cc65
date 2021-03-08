@@ -6,14 +6,13 @@
 
         .export         _cputc, _cputcxy, cputdirect, display_conio
         .export         CHARCOLOR, OLD_CHARCOLOR, BGCOLOR, OLD_BGCOLOR
-
         
         .import         update_adscr
         .import         popax
 
         .include        "telestrat.inc"
 
-cputdirect:
+
 _cputcxy:
     pha                           ; Save C
     jsr     popax                 ; Get X and Y
@@ -22,7 +21,7 @@ _cputcxy:
     jsr     update_adscr
     pla        
 
-.proc _cputc
+_cputc:
     cmp     #$0D
     bne     @not_CR
     ldy     #$00
@@ -30,12 +29,13 @@ _cputcxy:
     rts
 @not_CR:
     cmp     #$0A
-    bne     @not_LF
+    bne     not_LF
 
     inc     SCRY
     jmp     update_adscr
 
-@not_LF:
+cputdirect:
+not_LF:
     ldx     CHARCOLOR
     cpx     OLD_CHARCOLOR
     beq     do_not_change_color_foreground
@@ -67,7 +67,7 @@ do_not_change_color_foreground:
 do_not_change_color:
     ; it continues to display_conio
 
-.endproc
+
 
 .proc display_conio
     ; This routine is used to displays char on screen

@@ -78,6 +78,8 @@ do_not_change_color:
     bne     @no_inc
     ldy     #$00
     sty     SCRX
+
+    inc     SCRY
     
     jmp     update_adscr
     

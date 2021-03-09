@@ -85,6 +85,8 @@
 #define CH_LTEE         '+'
 #define CH_RTEE         '+'
 #define CH_CROSS        '+'
+#define CH_HLINE        '-'
+#define CH_VLINE        '|'
 #define CH_CURS_UP       11
 #define CH_CURS_DOWN     10
 #define CH_CURS_LEFT      8
@@ -119,3 +121,9 @@ void shoot();
 void explode();
 
 void kbdclick1();
+
+/* The following #defines will cause the matching functions calls in conio.h
+** to be overlaid by macros with the same names, saving the function call
+** overhead.
+*/
+#define _bordercolor(color)     COLOR_BLACK

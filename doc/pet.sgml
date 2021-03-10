@@ -105,6 +105,7 @@ declaration and usage.
 <item>cbm_save
 <item>cbm_write
 <item>get_tv
+<item>waitvsync
 </itemize>
 
 

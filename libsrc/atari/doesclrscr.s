@@ -1,7 +1,7 @@
 ;
 ; Christian Groessler, June-2016
 ;
-; unsigned char doesclrscr(void);
+; unsigned char doesclrscrafterexit (void);
 ;
 ; returns 0/1 if after program termination the screen isn't/is cleared
 ;

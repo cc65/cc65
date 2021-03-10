@@ -228,7 +228,7 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
                             return;
                         }
                     }
-                }                
+                }
             }
 
         }

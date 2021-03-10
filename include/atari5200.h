@@ -35,7 +35,7 @@
 
 
 
-/* Check for errors */
+/* check for errors */
 #if !defined(__ATARI5200__)
 #  error This module may only be used when compiling for the Atari 5200!
 #endif
@@ -46,14 +46,14 @@
 /* the addresses of the static drivers */
 extern void atr5200std_joy[];        /* referred to by joy_static_stddrv[] */
 
-/* Masks for joy_read */
+/* masks for joy_read */
 #define JOY_UP_MASK     0x01
 #define JOY_DOWN_MASK   0x02
 #define JOY_LEFT_MASK   0x04
 #define JOY_RIGHT_MASK  0x08
 #define JOY_BTN_1_MASK  0x10
 
-/* Character codes */
+/* character codes */
 #define CH_ULCORNER     0x0B         /* '+' sign */
 #define CH_URCORNER     0x0B
 #define CH_LLCORNER     0x0B
@@ -65,7 +65,11 @@ extern void atr5200std_joy[];        /* referred to by joy_static_stddrv[] */
 #define AT_NTSC     0
 #define AT_PAL      1
 
-/* Define hardware */
+/* Define variables used by the OS*/
+#include <_atari5200os.h>
+#define OS (*(struct __os*)0x0000)
+
+/* define hardware */
 #include <_gtia.h>
 #define GTIA_READ  (*(struct __gtia_read*)0xC000)
 #define GTIA_WRITE (*(struct __gtia_write*)0xC000)
@@ -89,5 +93,8 @@ extern void atr5200std_joy[];        /* referred to by joy_static_stddrv[] */
 */
 #define _bordercolor(color) 0
 
-/* End of atari5200.h */
+/* wait for start of next frame */
+extern void waitvsync (void);
+
+/* end of atari5200.h */
 #endif

@@ -460,7 +460,7 @@ static void SegNamePragma (StrBuf* B, segment_t Seg)
                 Warning ("Invalid address size for segment!");
             }
         }
-    
+
         /* Set the new name and optionally address size */
         if (Push) {
             PushSegName (Seg, Name);
@@ -677,7 +677,7 @@ static void WarnPragma (StrBuf* B)
 
 
 static void FlagPragma (StrBuf* B, IntStack* Stack)
-/* Handle a pragma that expects a boolean paramater */
+/* Handle a pragma that expects a boolean parameter */
 {
     StrBuf Ident = AUTO_STRBUF_INITIALIZER;
     long   Val;
@@ -727,7 +727,7 @@ ExitPoint:
 
 
 static void IntPragma (StrBuf* B, IntStack* Stack, long Low, long High)
-/* Handle a pragma that expects an int paramater */
+/* Handle a pragma that expects an int parameter */
 {
     long  Val;
     int   Push;

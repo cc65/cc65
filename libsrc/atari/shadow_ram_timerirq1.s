@@ -11,6 +11,7 @@
 SHRAM_HANDLERS  =       1
                 .include        "atari.inc"
                 .include        "romswitch.inc"
+                .import         __CHARGEN_START__
                 .export         set_VTIMR1_handler
 
 

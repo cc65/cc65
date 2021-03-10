@@ -654,8 +654,8 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
     ** environment returning int, output a warning if we didn't see a return
     ** statement.
     */
-    if (!F_HasVoidReturn (CurrentFunc) && !F_HasReturn (CurrentFunc) && !C99MainFunc) {
-        Warning ("Control reaches end of non-void function");
+    if (!F_HasVoidReturn (CurrentFunc) && !F_HasReturn (CurrentFunc) && !C99MainFunc && IS_Get (&WarnReturnType)) {
+        Warning ("Control reaches end of non-void function [-Wreturn-type]");
     }
 
     /* If this is the main function in a C99 environment returning an int, let

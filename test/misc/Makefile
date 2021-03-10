@@ -37,7 +37,7 @@ WORKDIR = ..$S..$Stestwrk$Smisc
 
 OPTIONS = g O Os Osi Osir Osr Oi Oir Or
 
-ISEQUAL = $(WORKDIR)$Sisequal$(EXE)
+ISEQUAL = ..$S..$Stestwrk$Sisequal$(EXE)
 
 CC = gcc
 CFLAGS = -O2
@@ -101,14 +101,13 @@ $(WORKDIR)/bug1263.$1.$2.prg: bug1263.c | $(WORKDIR)
 	$(NOT) $(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
 
 # this one requires --std=c89, it fails with --std=c99
-# it fails currently at runtime
 $(WORKDIR)/bug1265.$1.$2.prg: bug1265.c | $(WORKDIR)
 	$(if $(QUIET),echo misc/bug1265.$1.$2.prg)
 	$(CC65) --standard c89 -t sim$2 -$1 -o $$(@:.prg=.s) $$< $(NULLERR)
 	$(CA65) -t sim$2 -o $$(@:.prg=.o) $$(@:.prg=.s) $(NULLERR)
 	$(LD65) -t sim$2 -o $$@ $$(@:.prg=.o) sim$2.lib $(NULLERR)
-	$(NOT) $(SIM65) $(SIM65FLAGS) $$@ $(NULLOUT) $(NULLERR)
-	
+	$(SIM65) $(SIM65FLAGS) $$@ $(NULLOUT) $(NULLERR)
+
 # should compile, but then hangs in an endless loop
 $(WORKDIR)/endless.$1.$2.prg: endless.c | $(WORKDIR)
 	$(if $(QUIET),echo misc/endless.$1.$2.prg)

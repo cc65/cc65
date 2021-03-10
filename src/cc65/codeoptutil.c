@@ -356,8 +356,9 @@ static int Affected (LoadRegInfo* LRI, const CodeEntry* E)
                 }
 
                 if ((LRI->Flags & LI_CHECK_Y) != 0) {
-                    /* If we don't know what memory location could have been used by Y,
-                    ** we just assume all. */
+                    /* If we don't know what memory location could have been
+                    ** used by Y, we just assume all.
+                    */
                     if (YE == 0 ||
                         (YE->ArgOff == E->ArgOff && strcmp (YE->ArgBase, E->ArgBase) == 0)) {
 
@@ -375,8 +376,9 @@ static int Affected (LoadRegInfo* LRI, const CodeEntry* E)
                 /* Otherwise unaffected */
                 goto L_Result;
             }
-            /* We could've check further for more cases where the load target isn't
-            ** modified, but for now let's save the trouble and just play it safe.
+            /* We could've check further for more cases where the load target
+            ** isn't modified, but for now let's save the trouble and just play
+            ** it safe.
             */
             goto L_Affected;
         }
@@ -678,7 +680,7 @@ void SetDontRemoveEntryFlag (LoadRegInfo* LRI)
     if (LRI->Flags & LI_DONT_REMOVE) {
         if (LRI->LoadEntry != 0) {
             LRI->LoadEntry->Flags |= CEF_DONT_REMOVE;
-            
+
             /* If the load requires Y, then Y shouldn't be removed either */
             if (LRI->LoadYEntry != 0) {
                 LRI->LoadYEntry->Flags |= CEF_DONT_REMOVE;
@@ -1080,7 +1082,7 @@ void AddOpHigh (StackOpData* D, opc_t OPC, LoadInfo* LI, int KeepResult)
 
         } else {
 
-            if ((LI->A.Flags & LI_CHECK_Y) == 0) {
+            if ((LI->X.Flags & LI_CHECK_Y) == 0) {
                 /* ldy #const */
                 X = NewCodeEntry (OP65_LDY, AM65_IMM, MakeHexArg (LI->X.Offs), 0, D->OpEntry->LI);
             } else {
@@ -1094,7 +1096,7 @@ void AddOpHigh (StackOpData* D, opc_t OPC, LoadInfo* LI, int KeepResult)
                 X = NewCodeEntry (OPC, AM65_ZP_INDY, "sp", 0, D->OpEntry->LI);
             } else {
                 /* opc src,y */
-                X = NewCodeEntry (OPC, LI->A.LoadEntry->AM, LI->A.LoadEntry->Arg, 0, D->OpEntry->LI);
+                X = NewCodeEntry (OPC, LI->X.LoadEntry->AM, LI->X.LoadEntry->Arg, 0, D->OpEntry->LI);
             }
             InsertEntry (D, X, D->IP++);
         }
@@ -2562,7 +2564,7 @@ int BackupArgAfter (CodeSeg* S, BackupInfo* B, int Idx, const CodeEntry* E, Coll
 
 static int LoadAAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices, int After)
 /* Reload into A the same arg according to LoadRegInfo before or after Idx
-** depending on the After param. 
+** depending on the After param.
 */
 {
     CodeEntry* E;
@@ -2582,7 +2584,7 @@ static int LoadAAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Ind
     CHECK (E != 0);
 
     O = CS_GetEntry (S, OldIdx);
-    
+
     /* We only recognize opc with an arg for now, as well as a special case for ldaxysp */
     if ((E->OPC != OP65_JSR || strcmp (E->Arg, "ldaxysp") == 0) &&
         E->AM != AM65_BRA && E->AM != AM65_IMP) {
@@ -2645,7 +2647,7 @@ static int LoadAAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Ind
 
 static int LoadXAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices, int After)
 /* Reload into X the same arg according to LoadRegInfo before or after Idx
-** depending on the After param. 
+** depending on the After param.
 */
 {
     CodeEntry* E;
@@ -2744,7 +2746,7 @@ static int LoadXAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Ind
 
 static int LoadYAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices, int After)
 /* Reload into Y the same arg according to LoadRegInfo before or after Idx
-** depending on the After param. 
+** depending on the After param.
 */
 {
     CodeEntry* E;

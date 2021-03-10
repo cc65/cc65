@@ -12,21 +12,19 @@
 ;int read (int fd, void* buf, unsigned count);
 
 .proc   _read
-    sta     ptr1 ; count
-    stx     ptr1+1 ; count
-    jsr     popax ; get buf
+    sta     ptr1            ; Count low
+    stx     ptr1+1          ; Count high
+    jsr     popax           ; Get buf
 
     sta     PTR_READ_DEST
     stx     PTR_READ_DEST+1
-    sta     ptr2 ; in order to calculate nb of bytes read
-    stx     ptr2+1 ;
+    sta     ptr2            ; In order to calculate nb of bytes read
+    stx     ptr2+1 
 
-    ; jsr popax ; fp pointer don't care in this version
-
-    lda     ptr1 ;
-    ldy     ptr1+1 ;
-    BRK_TELEMON     XFREAD ; calls telemon30 routine
-    ;  compute nb of bytes read
+    lda     ptr1 
+    ldy     ptr1+1 
+    BRK_TELEMON     XFREAD  ; Calls telemon30 routine
+    ;  Compute nb of bytes read
     lda     PTR_READ_DEST+1
     sec
     sbc     ptr2+1

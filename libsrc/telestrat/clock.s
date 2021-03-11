@@ -20,11 +20,9 @@
 ; Read the timer
 
         sei                     ; Disable interrupts
-        lda     TIMEUD           ; TIMED contains 1/10 of a second from clock. Telestrat main cardridge simulate a clock from VIA6522 timer
+        lda     TIMEUD          ; TIMED contains 1/10 of a second from clock. Telestrat main cardridge simulate a clock from VIA6522 timer
         ldx     TIMEUD+1
         cli                     ; Reenable interrupts
 
         rts
 .endproc
-
-

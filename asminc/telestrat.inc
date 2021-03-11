@@ -48,33 +48,33 @@ TR7             := $13
 
 DEFAFF          := $14
 
-IRQSVA          := $21           ; Used to save A when a BRK call occurs
-IRQSVX          := $22           ; Used to save X when a BRK call occurs
-IRQSVY          := $23           ; Used to save Y when a BRK call occurs
-IRQSVP          := $24           ; Used to save P when a BRK call occurs
+IRQSVA          := $21          ; Used to save A when a BRK call occurs
+IRQSVX          := $22          ; Used to save X when a BRK call occurs
+IRQSVY          := $23          ; Used to save Y when a BRK call occurs
+IRQSVP          := $24          ; Used to save P when a BRK call occurs
 
 ADSCR           := $26
-SCRNB           := $28           ; Id of the current window
+SCRNB           := $28          ; Id of the current window
 
-ADKBD           := $2A           ; Address ASCII conversion table
+ADKBD           := $2A          ; Address ASCII conversion table
 
 
-PTR_READ_DEST   := $2C           ; Used for XFREAD and XWRITE only in TELEMON 3.x
+PTR_READ_DEST   := $2C          ; Used for XFREAD and XWRITE only in TELEMON 3.x
 
-ADCLK           := $40           ; Address for clock display
+ADCLK           := $40          ; Address for clock display
 TIMEUS          := $42
-TIMEUD          := $44           ; Counter clock (1/10 of a second)
+TIMEUD          := $44          ; Counter clock (1/10 of a second)
 
 
 HRSX            := $46
 HRSY            := $47
 
-XLPRBI          := $48           ; Printer flag (b7)
+XLPRBI          := $48          ; Printer flag (b7)
 
 HRSX40          := $49
 HRSX6           := $4A
 
-ADHRS           := $4B           ; Hires screen address (word)
+ADHRS           := $4B          ; Hires screen address (word)
 
 HRS1            := $4D
 HRS2            := $4F

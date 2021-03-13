@@ -3987,24 +3987,24 @@ static void hieQuest (ExprDesc* Expr)
         */
         ExprWithCheck (hie1, &Expr2);
         Expr2IsNULL = ED_IsNullPtr (&Expr2);
-        if (!IsTypeVoid (Expr2.Type)) {
-            if (!ConstantCond || !ED_IsConst (&Expr2)) {
-                /* Load it into the primary */
-                LoadExpr (CF_NONE, &Expr2);
+        if (!IsTypeVoid (Expr2.Type)    &&
+            ED_YetToLoad (&Expr2)       &&
+            (!ConstantCond || !ED_IsConst (&Expr2))) {
+            /* Load it into the primary */
+            LoadExpr (CF_NONE, &Expr2);
 
-                /* Append deferred inc/dec at sequence point */
-                DoDeferred (SQP_KEEP_EXPR, &Expr2);
+            /* Append deferred inc/dec at sequence point */
+            DoDeferred (SQP_KEEP_EXPR, &Expr2);
 
-                ED_FinalizeRValLoad (&Expr2);
-            } else {
-                /* Constant boolean subexpression could still have deferred inc/
-                ** dec operations, so just flush their side-effects at this
-                ** sequence point.
-                */
-                DoDeferred (SQP_KEEP_NONE, &Expr2);
-            }
-            Expr2.Type = PtrConversion (Expr2.Type);
+            ED_FinalizeRValLoad (&Expr2);
+        } else {
+            /* Constant boolean subexpression could still have deferred inc/
+            ** dec operations, so just flush their side-effects at this
+            ** sequence point.
+            */
+            DoDeferred (SQP_KEEP_NONE, &Expr2);
         }
+        Expr2.Type = PtrConversion (Expr2.Type);
 
         if (!ConstantCond) {
             /* Remember the current code position */
@@ -4021,6 +4021,9 @@ static void hieQuest (ExprDesc* Expr)
             g_defcodelabel (FalseLab);
         } else {
             if (Expr->IVal == 0) {
+                /* Expr2 is unevaluated when the condition is false */
+                Expr2.Flags |= E_EVAL_UNEVAL;
+
                 /* Remove the load code of Expr2 */
                 RemoveCode (&SkippedBranch);
             } else {
@@ -4035,26 +4038,29 @@ static void hieQuest (ExprDesc* Expr)
         */
         ExprWithCheck (hie1, &Expr3);
         Expr3IsNULL = ED_IsNullPtr (&Expr3);
-        if (!IsTypeVoid (Expr3.Type)) {
-            if (!ConstantCond || !ED_IsConst (&Expr3)) {
-                /* Load it into the primary */
-                LoadExpr (CF_NONE, &Expr3);
+        if (!IsTypeVoid (Expr3.Type)    &&
+            ED_YetToLoad (&Expr3)       &&
+            (!ConstantCond || !ED_IsConst (&Expr3))) {
+            /* Load it into the primary */
+            LoadExpr (CF_NONE, &Expr3);
 
-                /* Append deferred inc/dec at sequence point */
-                DoDeferred (SQP_KEEP_EXPR, &Expr3);
+            /* Append deferred inc/dec at sequence point */
+            DoDeferred (SQP_KEEP_EXPR, &Expr3);
 
-                ED_FinalizeRValLoad (&Expr3);
-            } else {
-                /* Constant boolean subexpression could still have deferred inc/
-                ** dec operations, so just flush their side-effects at this
-                ** sequence point.
-                */
-                DoDeferred (SQP_KEEP_NONE, &Expr3);
-            }
-            Expr3.Type = PtrConversion (Expr3.Type);
+            ED_FinalizeRValLoad (&Expr3);
+        } else {
+            /* Constant boolean subexpression could still have deferred inc/
+            ** dec operations, so just flush their side-effects at this
+            ** sequence point.
+            */
+            DoDeferred (SQP_KEEP_NONE, &Expr3);
         }
+        Expr3.Type = PtrConversion (Expr3.Type);
 
         if (ConstantCond && Expr->IVal != 0) {
+            /* Expr3 is unevaluated when the condition is true */
+            Expr3.Flags |= E_EVAL_UNEVAL;
+
             /* Remove the load code of Expr3 */
             RemoveCode (&SkippedBranch);
         }

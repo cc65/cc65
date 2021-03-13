@@ -3658,7 +3658,7 @@ static int hieAnd (ExprDesc* Expr, unsigned* TrueLab, int* TrueLabAllocated)
                 */
                 DoDeferred (SQP_KEEP_NONE, Expr);
 
-                if (Expr->IVal == 0 && !ED_IsAddrExpr (Expr)) {
+                if (ED_IsConstFalse (Expr)) {
                     /* Skip remaining */
                     Flags |= E_EVAL_UNEVAL;
                 }
@@ -3713,7 +3713,7 @@ static int hieAnd (ExprDesc* Expr, unsigned* TrueLab, int* TrueLabAllocated)
                     */
                     DoDeferred (SQP_KEEP_NONE, &Expr2);
 
-                    if (Expr2.IVal == 0 && !ED_IsAddrExpr (&Expr2)) {
+                    if (ED_IsConstFalse (&Expr2)) {
                         /* Skip remaining */
                         Flags |= E_EVAL_UNEVAL;
                         /* The value of the expression will be false */
@@ -3826,7 +3826,7 @@ static void hieOr (ExprDesc *Expr)
                 */
                 DoDeferred (SQP_KEEP_NONE, Expr);
 
-                if (Expr->IVal != 0 || ED_IsAddrExpr (Expr)) {
+                if (ED_IsConstTrue (Expr)) {
                     /* Skip remaining */
                     Flags |= E_EVAL_UNEVAL;
                 }
@@ -3878,7 +3878,7 @@ static void hieOr (ExprDesc *Expr)
                     */
                     DoDeferred (SQP_KEEP_NONE, &Expr2);
 
-                    if (Expr2.IVal != 0 || ED_IsAddrExpr (&Expr2)) {
+                    if (ED_IsConstTrue (&Expr2)) {
                         /* Skip remaining */
                         Flags |= E_EVAL_UNEVAL;
                         /* The result is always true */
@@ -3945,6 +3945,7 @@ static void hieQuest (ExprDesc* Expr)
     /* Check if it's a ternary expression */
     if (CurTok.Tok == TOK_QUEST) {
 
+        /* The constant condition must be compile-time known as well */
         int ConstantCond = ED_IsConstBool (Expr);
         unsigned Flags   = Expr->Flags & E_MASK_KEEP_RESULT;
 
@@ -3955,9 +3956,13 @@ static void hieQuest (ExprDesc* Expr)
 
         NextToken ();
 
-        /* Convert non-integer constant boolean */
-        if (ED_IsAddrExpr (Expr)) {
+        /* Convert non-integer constant to boolean constant, so that we may just
+        ** check it in the same way.
+        */
+        if (ED_IsConstTrue (Expr)) {
             ED_MakeConstBool (Expr, 1);
+        } else if (ED_IsConstFalse (Expr)) {
+            ED_MakeConstBool (Expr, 0);
         }
 
         if (!ConstantCond) {

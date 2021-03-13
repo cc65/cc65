@@ -643,6 +643,16 @@ int ED_IsConstAbsInt (const ExprDesc* Expr);
 int ED_IsConstBool (const ExprDesc* Expr);
 /* Return true if the expression can be constantly evaluated as a boolean. */
 
+int ED_IsConstTrue (const ExprDesc* Expr);
+/* Return true if the constant expression can be evaluated as boolean true at
+** compile time.
+*/
+
+int ED_IsConstFalse (const ExprDesc* Expr);
+/* Return true if the constant expression can be evaluated as boolean false at
+** compile time.
+*/
+
 int ED_IsConst (const ExprDesc* Expr);
 /* Return true if the expression denotes a constant of some sort. This can be a
 ** numeric constant, the address of a global variable (maybe with offset) or
@@ -668,7 +678,7 @@ int ED_IsNullPtr (const ExprDesc* Expr);
 /* Return true if the given expression is a NULL pointer constant */
 
 int ED_IsBool (const ExprDesc* Expr);
-/* Return true of the expression can be treated as a boolean, that is, it can
+/* Return true if the expression can be treated as a boolean, that is, it can
 ** be an operand to a compare operation with 0/NULL.
 */
 

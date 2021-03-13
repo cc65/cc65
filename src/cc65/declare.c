@@ -2080,7 +2080,7 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
 
     if (PrevErrorCount != ErrorCount) {
         /* Make the declaration fictitious if is is not parsed correctly */
-        D->StorageClass |= SC_DECL | SC_FICTITIOUS;
+        D->StorageClass |= SC_FICTITIOUS;
 
         if (Mode == DM_NEED_IDENT && D->Ident[0] == '\0') {
             /* Use a fictitious name for the identifier if it is missing */

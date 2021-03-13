@@ -3973,7 +3973,7 @@ static void hieQuest (ExprDesc* Expr)
         /* Parse second expression. Remember for later if it is a NULL pointer
         ** expression, then load it into the primary.
         */
-        ExprWithCheck (hie1, &Expr2);
+        ExprWithCheck (hie0, &Expr2);
         Expr2IsNULL = ED_IsNullPtr (&Expr2);
         if (!IsTypeVoid (Expr2.Type)    &&
             ED_YetToLoad (&Expr2)       &&

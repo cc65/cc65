@@ -155,9 +155,8 @@ static void Parse (void)
             **
             ** This means that "extern int i;" will not get storage allocated.
             */
-            if ((Decl.StorageClass & SC_FUNC) != SC_FUNC        &&
-                (Decl.StorageClass & SC_TYPEMASK) != SC_TYPEDEF &&
-                (Decl.StorageClass & SC_FICTITIOUS) != SC_FICTITIOUS) {
+            if ((Decl.StorageClass & SC_FUNC) != SC_FUNC &&
+                (Decl.StorageClass & SC_TYPEMASK) != SC_TYPEDEF) {
                 if ((Spec.Flags & DS_DEF_STORAGE) != 0                       ||
                     (Decl.StorageClass & (SC_EXTERN|SC_STATIC)) == SC_STATIC ||
                     ((Decl.StorageClass & SC_EXTERN) != 0 &&

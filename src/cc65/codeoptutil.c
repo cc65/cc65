@@ -2614,7 +2614,7 @@ static int LoadAAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Ind
             if (Use == REG_X) {
                 X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, E->LI);
                 CS_InsertEntry (S, X, Idx++);
-            } else if (Use == REG_A) {
+            } else if (Use == REG_Y) {
                 X = NewCodeEntry (OP65_TYA, AM65_IMP, 0, 0, E->LI);
                 CS_InsertEntry (S, X, Idx++);
             } else if (Use == REG_A) {

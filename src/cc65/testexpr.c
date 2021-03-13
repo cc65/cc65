@@ -70,7 +70,7 @@ unsigned Test (unsigned Label, int Invert)
         DoDeferred (SQP_KEEP_NONE, &Expr);
 
         /* Result is constant, so we know the outcome */
-        Result = (Expr.IVal != 0);
+        Result = (Expr.IVal != 0) ? TESTEXPR_TRUE : TESTEXPR_FALSE;
 
         /* Constant rvalue */
         if (!Invert && Expr.IVal == 0) {
@@ -86,7 +86,12 @@ unsigned Test (unsigned Label, int Invert)
         DoDeferred (SQP_KEEP_NONE, &Expr);
 
         /* Object addresses are non-NULL */
-        Result = 1;
+        Result = TESTEXPR_TRUE;
+
+        /* Condition is always true */
+        if (Invert) {
+            g_jump (Label);
+        }
 
     } else {
 

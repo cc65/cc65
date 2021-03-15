@@ -1821,7 +1821,7 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
         NextToken ();
 
         /* Allow const, restrict, and volatile qualifiers */
-        Qualifiers |= OptionalQualifiers (T_QUAL_CONST | T_QUAL_VOLATILE | T_QUAL_RESTRICT);
+        Qualifiers |= OptionalQualifiers (T_QUAL_CVR);
 
         /* Parse the type that the pointer points to */
         Declarator (Spec, D, Mode);

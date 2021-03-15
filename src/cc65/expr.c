@@ -2447,15 +2447,11 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             }
         } else if (IsClassPtr (Expr->Type)) {
             if (IsClassPtr (Expr2.Type)) {
-                /* Both pointers are allowed in comparison if they point to
-                ** the same type, or if one of them is a void pointer.
-                */
-                Type* left  = Indirect (Expr->Type);
-                Type* right = Indirect (Expr2.Type);
-                if (TypeCmp (left, right) < TC_QUAL_DIFF && left->C != T_VOID && right->C != T_VOID) {
-                    /* Incompatible pointers */
+                /* Pointers are allowed in comparison */
+                if (TypeCmp (Expr->Type, Expr2.Type).C < TC_STRICT_COMPATIBLE) {
+                    /* Warn about distinct pointer types */
                     TypeCompatibilityDiagnostic (PtrConversion (Expr->Type), PtrConversion (Expr2.Type), 0,
-                        "Incompatible pointer types comparing '%s' with '%s'");
+                        "Distinct pointer types comparing '%s' with '%s'");
                 }
             } else if (!ED_IsNullPtr (&Expr2)) {
                 if (IsClassInt (Expr2.Type)) {
@@ -3268,16 +3264,24 @@ static void parsesub (ExprDesc* Expr)
     if (IsClassPtr (lhst) && IsClassPtr (rhst)) {
 
         /* Pointer diff */
-        if (TypeCmp (Indirect (lhst), Indirect (rhst)) < TC_QUAL_DIFF) {
-            Error ("Incompatible pointer types");
+        if (TypeCmp (lhst, rhst).C >= TC_STRICT_COMPATIBLE) {
+            /* We'll have to scale the result */
+            rscale = PSizeOf (lhst);
+            /* We cannot scale by 0-size or unknown-size */
+            if (rscale == 0) {
+                TypeCompatibilityDiagnostic (lhst, rhst,
+                    1, "Invalid pointer types in subtraction: '%s' and '%s'");
+                /* Avoid further errors */
+                rscale = 1;
+            }
+        } else {
+            TypeCompatibilityDiagnostic (lhst, rhst,
+                1, "Incompatible pointer types in subtraction: '%s' and '%s'");
         }
 
         /* Operate on pointers, result type is an integer */
         flags = CF_PTR;
         Expr->Type = type_int;
-
-        /* We'll have to scale the result */
-        rscale = CheckedPSizeOf (lhst);
 
         /* Check for a constant rhs expression */
         if (ED_IsQuasiConst (&Expr2) && ED_CodeRangeIsEmpty (&Expr2)) {
@@ -4069,13 +4073,17 @@ static void hieQuest (ExprDesc* Expr)
         ** Conversion rules for ?: expression are:
         **   - if both expressions are int expressions, default promotion
         **     rules for ints apply.
-        **   - if both expressions are pointers of the same type, the
-        **     result of the expression is of this type.
+        **   - if both expressions have the same structure, union or void type,
+        **     the result has the same type.
+        **   - if both expressions are pointers to compatible types (possibly
+        **     qualified differently), the result of the expression is an
+        **     appropriately qualified version of the composite type.
+        **   - if one of the expressions is a pointer and the other is a
+        **     pointer to (possibly qualified) void, the resulting type is a
+        **     pointer to appropriately qualified void.
         **   - if one of the expressions is a pointer and the other is
-        **     a zero constant, the resulting type is that of the pointer
-        **     type.
-        **   - if both expressions are void expressions, the result is of
-        **     type void.
+        **     a null pointer constant, the resulting type is that of the
+        **     pointer type.
         **   - all other cases are flagged by an error.
         */
         if (IsClassInt (Expr2.Type) && IsClassInt (Expr3.Type)) {
@@ -4105,12 +4113,28 @@ static void hieQuest (ExprDesc* Expr)
             }
 
         } else if (IsClassPtr (Expr2.Type) && IsClassPtr (Expr3.Type)) {
-            /* Must point to same type */
-            if (TypeCmp (Indirect (Expr2.Type), Indirect (Expr3.Type)) < TC_EQUAL) {
-                Error ("Incompatible pointer types");
+            /* If one of the two is 'void *', the result type is a pointer to
+            ** appropriately qualified void.
+            */
+            if (IsTypeVoid (Indirect (Expr2.Type))) {
+                ResultType = PointerTo (Indirect (Expr2.Type));
+                ResultType[1].C |= GetQualifier (Indirect (Expr3.Type));
+            } else if (IsTypeVoid (Indirect (Expr3.Type))) {
+                ResultType = PointerTo (Indirect (Expr3.Type));
+                ResultType[1].C |= GetQualifier (Indirect (Expr2.Type));
+            } else {
+                /* Must point to compatible types */
+                if (TypeCmp (Expr2.Type, Expr3.Type).C < TC_VOID_PTR) {
+                    TypeCompatibilityDiagnostic (Expr2.Type, Expr3.Type,
+                        1, "Incompatible pointer types in ternary: '%s' and '%s'");
+                    /* Avoid further errors */
+                    ResultType = PointerTo (type_void);
+                } else {
+                    /* Result has the composite type */
+                    ResultType = TypeDup (Expr2.Type);
+                    TypeComposition (ResultType, Expr3.Type);
+                }
             }
-            /* Result has the common type */
-            ResultType = Expr2.Type;
         } else if (IsClassPtr (Expr2.Type) && Expr3IsNULL) {
             /* Result type is pointer, no cast needed */
             ResultType = Expr2.Type;
@@ -4119,10 +4143,10 @@ static void hieQuest (ExprDesc* Expr)
             ResultType = Expr3.Type;
         } else if (IsTypeVoid (Expr2.Type) && IsTypeVoid (Expr3.Type)) {
             /* Result type is void */
-            ResultType = Expr3.Type;
+            ResultType = type_void;
         } else {
             if (IsClassStruct (Expr2.Type) && IsClassStruct (Expr3.Type) &&
-                TypeCmp (Expr2.Type, Expr3.Type) == TC_IDENTICAL) {
+                TypeCmp (Expr2.Type, Expr3.Type).C == TC_IDENTICAL) {
                 /* Result type is struct/union */
                 ResultType = Expr2.Type;
             } else {
@@ -4148,7 +4172,7 @@ static void hieQuest (ExprDesc* Expr)
         }
 
         /* Setup the target expression */
-        Expr->Type  = ResultType;
+        Expr->Type = ResultType;
     }
 }
 

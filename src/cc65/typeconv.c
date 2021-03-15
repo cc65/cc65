@@ -43,7 +43,6 @@
 #include "error.h"
 #include "expr.h"
 #include "loadexpr.h"
-#include "scanner.h"
 #include "typecmp.h"
 #include "typeconv.h"
 
@@ -52,24 +51,6 @@
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
-
-
-
-void TypeCompatibilityDiagnostic (const Type* NewType, const Type* OldType, int IsError, const char* Msg)
-/* Print error or warning message about type conversion with proper type names */
-{
-    StrBuf NewTypeName = STATIC_STRBUF_INITIALIZER;
-    StrBuf OldTypeName = STATIC_STRBUF_INITIALIZER;
-    GetFullTypeNameBuf (&NewTypeName, NewType);
-    GetFullTypeNameBuf (&OldTypeName, OldType);
-    if (IsError) {
-        Error (Msg, SB_GetConstBuf (&NewTypeName), SB_GetConstBuf (&OldTypeName));
-    } else {
-        Warning (Msg, SB_GetConstBuf (&NewTypeName), SB_GetConstBuf (&OldTypeName));
-    }
-    SB_Done (&OldTypeName);
-    SB_Done (&NewTypeName);
-}
 
 
 
@@ -208,9 +189,10 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
     PrintRawType (stdout, NewType);
 #endif
     /* First, do some type checking */
-    int HasWarning  = 0;
-    int HasError    = 0;
-    const char* Msg = 0;
+    typecmp_t Result    = TYPECMP_INITIALIZER;
+    int HasWarning      = 0;
+    int HasError        = 0;
+    const char* Msg     = 0;
     const Type* OldType = Expr->Type;
 
 
@@ -219,20 +201,13 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
         HasError = 1;
     }
 
-    /* If both types are strictly compatible, no conversion is needed */
-    if (TypeCmp (NewType, OldType) >= TC_STRICT_COMPATIBLE) {
-        /* We're already done */
-        return;
-    }
-
-    /* If Expr is an array or a function, convert it to a pointer */
-    Expr->Type = PtrConversion (Expr->Type);
-
-    /* If we have changed the type, check again for strictly compatibility */
-    if (Expr->Type != OldType &&
-        TypeCmp (NewType, Expr->Type) >= TC_STRICT_COMPATIBLE) {
-        /* We're already done */
-        return;
+    /* If both types are the same, no conversion is needed */
+    Result = TypeCmp (NewType, OldType);
+    if (Result.C < TC_IDENTICAL && (IsTypeArray (OldType) || IsTypeFunc (OldType))) {
+        /* If Expr is an array or a function, convert it to a pointer */
+        Expr->Type = PtrConversion (Expr->Type);
+        /* Recompare */
+        Result = TypeCmp (NewType, Expr->Type);
     }
 
     /* Check for conversion problems */
@@ -253,37 +228,27 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
         /* Handle conversions to pointer type */
         if (IsClassPtr (Expr->Type)) {
 
-            /* Pointer to pointer assignment is valid, if:
+            /* Implicit pointer-to-pointer conversion is valid, if:
             **   - both point to the same types, or
             **   - the rhs pointer is a void pointer, or
             **   - the lhs pointer is a void pointer.
             */
-            if (!IsTypeVoid (IndirectConst (NewType)) && !IsTypeVoid (Indirect (Expr->Type))) {
-                /* Compare the types */
-                switch (TypeCmp (NewType, Expr->Type)) {
-
-                case TC_INCOMPATIBLE:
-                    HasWarning = 1;
-                    Msg = "Incompatible pointer assignment to '%s' from '%s'";
-                    /* Use the pointer type in the diagnostic */
-                    OldType = Expr->Type;
-                    break;
-
-                case TC_QUAL_DIFF:
-                    HasWarning = 1;
-                    Msg = "Pointer assignment to '%s' from '%s' discards qualifiers";
-                    /* Use the pointer type in the diagnostic */
-                    OldType = Expr->Type;
-                    break;
-
-                default:
-                    /* Ok */
-                    break;
-                }
+            if (Result.C <= TC_PTR_INCOMPATIBLE ||
+                (Result.F & TCF_INCOMPATIBLE_QUAL) != 0)
+            {
+                HasWarning = 1;
+                Msg = "Incompatible pointer conversion to '%s' from '%s'";
+                /* Use the pointer type in the diagnostic */
+                OldType = Expr->Type;
+            } else if ((Result.F & TCF_PTR_QUAL_DIFF) != 0) {
+                HasWarning = 1;
+                Msg = "Pointer conversion to '%s' from '%s' discards qualifiers";
+                /* Use the pointer type in the diagnostic */
+                OldType = Expr->Type;
             }
 
         } else if (IsClassInt (Expr->Type)) {
-            /* Int to pointer assignment is valid only for constant zero */
+            /* Int to pointer conversion is valid only for constant zero */
             if (!ED_IsConstAbsInt (Expr) || Expr->IVal != 0) {
                 Warning ("Converting integer to pointer without a cast");
             }
@@ -291,11 +256,12 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
             HasError = 1;
         }
 
-    } else {
+    } else if (Result.C < TC_IDENTICAL) {
          /* Invalid automatic conversion */
          HasError = 1;
     }
 
+    /* Set default diagnostic message */
     if (Msg == 0) {
         Msg = "Converting to '%s' from '%s'";
     }
@@ -350,13 +316,13 @@ void TypeCast (ExprDesc* Expr)
             /* Convert functions and arrays to "pointer to" object */
             Expr->Type = PtrConversion (Expr->Type);
 
-            if (TypeCmp (NewType, Expr->Type) >= TC_QUAL_DIFF) {
-                /* If the new type only differs in qualifiers, just use it to
-                ** replace the old one.
+            if (TypeCmp (NewType, Expr->Type).C >= TC_PTR_INCOMPATIBLE) {
+                /* If the new type has the same underlying presentation, just
+                ** use it to replace the old one.
                 */
                 ReplaceType (Expr, NewType);
             } else if (IsCastType (Expr->Type)) {
-                /* Convert the value. The rsult has always the new type */
+                /* Convert the value. The result has always the new type */
                 DoConversion (Expr, NewType);
             } else {
                 TypeCompatibilityDiagnostic (NewType, Expr->Type, 1,
@@ -378,4 +344,143 @@ void TypeCast (ExprDesc* Expr)
 
     /* The result is always an rvalue */
     ED_MarkExprAsRVal (Expr);
+}
+
+
+
+static void CompositeFuncParamList (const FuncDesc* F1, const FuncDesc* F2)
+/* Composite two function symbol tables regarding function parameters */
+{
+    /* Get the symbol tables */
+    const SymTable* Tab1 = F1->SymTab;
+    const SymTable* Tab2 = F2->SymTab;
+
+    /* Composite the parameter lists */
+    const SymEntry* Sym1 = Tab1->SymHead;
+    const SymEntry* Sym2 = Tab2->SymHead;
+
+    /* Composite the fields */
+    while (Sym1 && (Sym1->Flags & SC_PARAM) && Sym2 && (Sym2->Flags & SC_PARAM)) {
+
+        /* Get the symbol types */
+        Type* Type1 = Sym1->Type;
+        Type* Type2 = Sym2->Type;
+
+        /* If either of both functions is old style, apply the default
+        ** promotions to the parameter type.
+        */
+        if (F1->Flags & FD_OLDSTYLE) {
+            if (IsClassInt (Type1)) {
+                Type1 = IntPromotion (Type1);
+            }
+        }
+        if (F2->Flags & FD_OLDSTYLE) {
+            if (IsClassInt (Type2)) {
+                Type2 = IntPromotion (Type2);
+            }
+        }
+
+        /* Compose this field */
+        TypeComposition (Type1, Type2);
+
+        /* Get the pointers to the next fields */
+        Sym1 = Sym1->NextSym;
+        Sym2 = Sym2->NextSym;
+    }
+}
+
+
+
+void TypeComposition (Type* lhs, const Type* rhs)
+/* Recursively compose two types into lhs. The two types must have compatible
+** type or this fails with a critical check.
+*/
+{
+    FuncDesc*   F1;
+    FuncDesc*   F2;
+    long LeftCount, RightCount;
+
+    /* Composite two types */
+    while (lhs->C != T_END) {
+
+        /* Check if the end of the type string is reached */
+        if (rhs->C == T_END) {
+            break;
+        }
+
+        /* Check for sanity */
+        CHECK (GetUnderlyingTypeCode (lhs) == GetUnderlyingTypeCode (rhs));
+
+        /* Check for special type elements */
+        if (IsTypeFunc (lhs)) {
+            /* Composite the function descriptors */
+            F1 = GetFuncDesc (lhs);
+            F2 = GetFuncDesc (rhs);
+
+            /* If one of both functions has an empty parameter list (which
+            ** does also mean, it is not a function definition, because the
+            ** flag is reset in this case), it is replaced by the other
+            ** definition, provided that the other has no default
+            ** promotions in the parameter list. If none of both parameter
+            ** lists is empty, we have to composite the parameter lists and
+            ** other attributes.
+            */
+            if ((F1->Flags & FD_EMPTY) == FD_EMPTY) {
+                if ((F2->Flags & FD_EMPTY) == 0) {
+                    /* Copy the parameters and flags */
+                    TypeCopy (lhs, rhs);
+                    F1->Flags = F2->Flags;
+                }
+            } else if ((F2->Flags & FD_EMPTY) == 0) {
+                /* Composite the parameter lists */
+                CompositeFuncParamList (F1, F2);
+            }
+        } else if (IsTypeArray (lhs)) {
+            /* Check member count */
+            LeftCount  = GetElementCount (lhs);
+            RightCount = GetElementCount (rhs);
+
+            /* Set composite type if it is requested */
+            if (LeftCount != UNSPECIFIED) {
+                SetElementCount (lhs, LeftCount);
+            } else if (RightCount != UNSPECIFIED) {
+                SetElementCount (lhs, RightCount);
+            }
+        } else {
+            /* Combine the qualifiers */
+            if (IsClassPtr (lhs)) {
+                ++lhs;
+                ++rhs;
+                lhs->C |= GetQualifier (rhs);
+            }
+        }
+
+        /* Next type string element */
+        ++lhs;
+        ++rhs;
+    }
+
+    return;
+}
+
+
+
+FuncDesc* RefineFuncDesc (Type* OldType, const Type* NewType)
+/* Refine the existing function descriptor with a new one */
+{
+    FuncDesc* Old = GetFuncDesc (OldType);
+    FuncDesc* New = GetFuncDesc (NewType);
+
+    CHECK (Old != 0 && New != 0);
+
+    if ((New->Flags & FD_EMPTY) == 0) {
+        if ((Old->Flags & FD_EMPTY) == 0) {
+            TypeComposition (OldType, NewType);
+        } else {
+            TypeCopy (OldType, NewType);
+            Old->Flags &= ~FD_EMPTY;
+        }
+    }
+
+    return Old;
 }

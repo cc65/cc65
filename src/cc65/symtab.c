@@ -59,6 +59,7 @@
 #include "stackptr.h"
 #include "symentry.h"
 #include "typecmp.h"
+#include "typeconv.h"
 #include "symtab.h"
 
 
@@ -549,6 +550,19 @@ SymEntry FindStructField (const Type* T, const char* Name)
 
 
 
+static int IsDistinctRedef (const Type* lhst, const Type* rhst, typecmpcode_t Code, typecmpflag_t Flags)
+/* Return if type compatibility result is "worse" than Code or if any bit of
+** qualifier Flags is set.
+*/
+{
+    typecmp_t Result = TypeCmp (lhst, rhst);
+    if (Result.C < Code || (Result.F & TCF_MASK_QUAL & Flags) != 0) {
+        return 1;
+    }
+    return 0;
+}
+
+
 static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags)
 /* Check and handle redefinition of existing symbols.
 ** Complete array sizes and function descriptors as well.
@@ -565,7 +579,7 @@ static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags
 
         /* Existing typedefs cannot be redeclared as anything different */
         if (SCType == SC_TYPEDEF) {
-            if (TypeCmp (E_Type, T) < TC_IDENTICAL) {
+            if (IsDistinctRedef (E_Type, T, TC_IDENTICAL, TCF_MASK_QUAL)) {
                 Error ("Conflicting types for typedef '%s'", Entry->Name);
                 Entry = 0;
             }
@@ -591,7 +605,7 @@ static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags
                 Entry = 0;
             } else {
                 /* New type must be compatible with the composite prototype */
-                if (TypeCmp (Entry->Type, T) < TC_EQUAL) {
+                if (IsDistinctRedef (E_Type, T, TC_EQUAL, TCF_MASK_QUAL)) {
                     Error ("Conflicting function types for '%s'", Entry->Name);
                     Entry = 0;
                 } else {
@@ -621,7 +635,7 @@ static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags
             ** is incomplete, complete it.
             */
             if ((Size != UNSPECIFIED && ESize != UNSPECIFIED && Size != ESize) ||
-                TypeCmp (T + 1, E_Type + 1) < TC_EQUAL) {
+                IsDistinctRedef (E_Type + 1, T + 1, TC_IDENTICAL, TCF_MASK_QUAL)) {
                 /* Conflicting element types */
                 Error ("Conflicting array types for '%s[]'", Entry->Name);
                 Entry = 0;
@@ -639,7 +653,7 @@ static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags
             if (SCType != E_SCType) {
                 Error ("Redefinition of '%s' as different kind of symbol", Entry->Name);
                 Entry = 0;
-            } else if (TypeCmp (E_Type, T) < TC_EQUAL) {
+            } else if (IsDistinctRedef (E_Type, T, TC_EQUAL, TCF_MASK_QUAL)) {
                 Error ("Conflicting types for '%s'", Entry->Name);
                 Entry = 0;
             } else if (E_SCType == SC_ENUMERATOR) {

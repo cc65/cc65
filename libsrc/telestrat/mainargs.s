@@ -22,7 +22,7 @@ MAXARGS  = 10                   ; Maximum number of arguments allowed
 ; statement.  Save the "most-recent filename" as argument #0.
 initmainargs:
 
-        ldx     #0      ; Limit the length
+        ldx     #0              ; Limit the length
 L0:     lda     BUFEDT,x
         beq     L3
         cmp     #' '

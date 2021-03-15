@@ -361,12 +361,12 @@ TEXTSTYLE:
 ;
 
 OUTTEXT:
-        ; put hires cursor in X & Y
+        ; Put hires cursor in X & Y
         lda   #$00
         jsr   SETPIXELSETMODE
         
         
-        ; count the length of the string
+        ; Count the length of the string
         ldy   #$00
 loop:        
         lda   (ptr3),y
@@ -375,7 +375,7 @@ loop:
         bne   loop
 out:
         ; XSCHAR routine from telemon needs to have the length of the string in X register
-        ; copy Y register to X register. It could be optimized in 65C02 with TYX
+        ; Copy Y register to X register. It could be optimized in 65C02 with TYX
         tya 
         tax
     

@@ -11,18 +11,18 @@
 .proc   _write
 
         sta     ptr3
-        stx     ptr3+1          ; save count as result
+        stx     ptr3+1          ; Save count as result
 
         inx
         stx     ptr2+1
         tax
         inx
-        stx     ptr2            ; save count with each byte incremented separately
+        stx     ptr2            ; Save count with each byte incremented separately
 
-        jsr     popptr1         ; get buf
-        jsr     popax           ; get fd and discard
+        jsr     popptr1         ; Get buf
+        jsr     popax           ; Get fd and discard
 
-        ; if fd=0001 then it stdout
+        ; If fd=0001 then it stdout
         cpx     #0
         beq     next
         jmp     L1
@@ -30,7 +30,7 @@ next:
         cmp     #1
         beq     L1
 
-        ; here it's a file opened
+        ; Here it's a file opened
         lda     ptr1
         sta     PTR_READ_DEST
         lda     ptr1+1
@@ -38,7 +38,7 @@ next:
         lda     ptr3
         ldy     ptr3+1
         BRK_TELEMON  XFWRITE
-        ;  compute nb of bytes written
+        ;  Compute nb of bytes written
 
 
         lda     PTR_READ_DEST+1
@@ -58,16 +58,16 @@ L1:     dec     ptr2
 L2:     ldy     #0
         lda     (ptr1),y
         tax
-        cpx     #$0A            ; check for \n
+        cpx     #$0A            ; Check for \n
         bne     L3
-        BRK_TELEMON  XWR0       ; macro send char to screen (channel 0 in telemon terms)
-        lda     #$0D            ; return to the beggining of the line
-        BRK_TELEMON  XWR0       ; macro
+        BRK_TELEMON  XWR0       ; Macro send char to screen (channel 0 in telemon terms)
+        lda     #$0D            ; Return to the beggining of the line
+        BRK_TELEMON  XWR0       ; Macro
 
 
         ldx     #$0D
 L3:
-        BRK_TELEMON  XWR0       ; macro
+        BRK_TELEMON  XWR0       ; Macro
 
         inc     ptr1
         bne     L1

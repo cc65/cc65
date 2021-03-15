@@ -28,14 +28,16 @@ parmok:
 ; Get the filename from stack and parse it. Bail out if is not ok
     jsr         popax       ; Get name
     ldy         tmp3        ; Get flags again
-    BRK_TELEMON XOPEN       ; launch primitive ROM
+    BRK_TELEMON XOPEN       ; Launch primitive ROM
+
     cmp         #$00
-    beq         @convert_to_FF
+    bne         @next
     cpx         #$00
-    beq         @convert_to_FF
-    rts
-@convert_to_FF:
+    bne         @next
+
     lda         #$FF
     tax
+    rts
+@next:
     rts    
 .endproc

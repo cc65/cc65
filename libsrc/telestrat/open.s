@@ -29,5 +29,13 @@ parmok:
     jsr         popax       ; Get name
     ldy         tmp3        ; Get flags again
     BRK_TELEMON XOPEN       ; launch primitive ROM
+    cmp         #$00
+    beq         @convert_to_FF
+    cpx         #$00
+    beq         @convert_to_FF
     rts
+@convert_to_FF:
+    lda         #$FF
+    tax
+    rts    
 .endproc

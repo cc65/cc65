@@ -78,7 +78,7 @@ static int CopyStruct (ExprDesc* LExpr, ExprDesc* RExpr)
     hie1 (RExpr);
 
     /* Check for equality of the structs/unions */
-    if (TypeCmp (ltype, RExpr->Type) < TC_STRICT_COMPATIBLE) {
+    if (TypeCmp (ltype, RExpr->Type).C < TC_STRICT_COMPATIBLE) {
         TypeCompatibilityDiagnostic (ltype, RExpr->Type, 1,
             "Incompatible types in assignment to '%s' from '%s'");
     }

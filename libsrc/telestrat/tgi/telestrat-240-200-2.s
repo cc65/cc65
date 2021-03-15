@@ -247,16 +247,14 @@ GETDEFPALETTE:
 ;
 
 SETPIXEL:
-        lda #$80       ; curset on 
+        lda     #$80       ; Curset on 
 SETPIXELSETMODE:        
-        sta HRSFB
+        sta     HRSFB
         
-        lda X1
-        sta HRS1
-        lda Y1
-        sta HRS2
-        
-        
+        lda     X1
+        sta     HRS1
+        lda     Y1
+        sta     HRS2
         
         BRK_TELEMON(XCURSE)
 
@@ -331,7 +329,7 @@ CIRCLE:
 ;
 
 BAR:
-        ; not done yet
+        ; Not done yet
         rts
 
 ; ------------------------------------------------------------------------
@@ -354,12 +352,11 @@ TEXTSTYLE:
 ;
 
 OUTTEXT:
-        ; put hires cursor in X & Y
+        ; Put hires cursor in X & Y
         lda   #$00
         jsr   SETPIXELSETMODE
         
-        
-        ; count the length of the string
+        ; Count the length of the string
         ldy   #$00
 loop:        
         lda   (ptr3),y
@@ -368,11 +365,11 @@ loop:
         bne   loop
 out:
         ; XSCHAR routine from telemon needs to have the length of the string in X register
-        ; copy Y register to X register. It could be optimized in 65C02 with TYX
+        ; Copy Y register to X register. It could be optimized in 65C02 with TYX
         tya 
         tax
     
-        lda   ptr3     ; XSCHAR needs in A and Y the adress of the string        
+        lda   ptr3         ; XSCHAR needs in A and Y the adress of the string        
         ldy   ptr3+1    
         BRK_TELEMON(XSCHAR)
         rts

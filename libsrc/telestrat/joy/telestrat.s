@@ -37,7 +37,7 @@
 ; ------------------------------------------------------------------------
 ; Constants
 
-JOY_COUNT       = 2             ; Number of joysticks we support
+JOY_COUNT       = 2                     ; Number of joysticks we support
 
 .code
 
@@ -56,7 +56,7 @@ INSTALL:
         ; But if some one press fire or press direction, we could reach others values which could break joystick detection.
         lda     #<JOY_ERR_OK
         ldx     #>JOY_ERR_OK
-;       rts                     ; Run into UNINSTALL instead
+;       rts                             ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------
 ; UNINSTALL routine. Is called before the driver is removed from memory.

@@ -10,7 +10,7 @@
     BRK_TELEMON XSONPS
     rts
 sound_bip_keyboard:
-    .byte $1f,$00,$00,$00,$00,$00,$00,$3e,$10,$00,$00,$1f,$00,$00
+    .byte $1F,$00,$00,$00,$00,$00,$00,$3E,$10,$00,$00,$1F,$00,$00
 .endproc
 
 .proc _explode

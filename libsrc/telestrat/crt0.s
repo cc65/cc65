@@ -1,7 +1,7 @@
 ;
 ; Startup code for cc65 (Oric version)
 ;
-; By Debrune Jérôme <jede@oric.org> and Ullrich von Bassewitz <uz@cc65.org>
+; By Debrune Jerome <jede@oric.org> and Ullrich von Bassewitz <uz@cc65.org>
 ;
 
         .export         _exit

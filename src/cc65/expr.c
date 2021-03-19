@@ -2861,17 +2861,18 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                 AddDone = -1;
             }
 
+            /* Do constant calculation if we can */
             if (ED_IsAbs (&Expr2) &&
                 (ED_IsAbs (Expr) || lscale == 1)) {
                 if (IsClassInt (lhst) && IsClassInt (rhst)) {
-                    typeadjust (Expr, &Expr2, 1);
+                    Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
                 }
                 Expr->IVal = Expr->IVal * lscale + Expr2.IVal * rscale;
                 AddDone = 1;
             } else if (ED_IsAbs (Expr) &&
                 (ED_IsAbs (&Expr2) || rscale == 1)) {
                 if (IsClassInt (lhst) && IsClassInt (rhst)) {
-                    typeadjust (&Expr2, Expr, 1);
+                    Expr2.Type = ArithmeticConvert (Expr2.Type, Expr->Type);
                 }
                 Expr2.IVal = Expr->IVal * lscale + Expr2.IVal * rscale;
                 /* Adjust the flags */
@@ -3053,7 +3054,7 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
         /* Check for a constant rhs expression */
         if (ED_IsConstAbs (&Expr2) && ED_CodeRangeIsEmpty (&Expr2)) {
 
-            /* Rhs is a constant. Remove pushed lhs from stack. */
+            /* Rhs is a numeric constant. Remove pushed lhs from stack. */
             RemoveCode (&Mark);
 
             /* Check for pointer arithmetic */
@@ -3081,7 +3082,7 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
 
         } else {
 
-            /* Lhs and rhs are not so constant. Check for pointer arithmetic. */
+            /* Lhs and rhs are not so "numeric constant". Check for pointer arithmetic. */
             if (IsClassPtr (lhst) && IsClassInt (rhst)) {
                 /* Left is pointer, right is int, must scale rhs */
                 rscale = CheckedPSizeOf (lhst);
@@ -3116,16 +3117,8 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                 flags = CF_PTR;
                 Expr->Type = Expr2.Type;
             } else if (!DoArrayRef && IsClassInt (lhst) && IsClassInt (rhst)) {
-                /* Integer addition. Note: Result is never constant.
-                ** Problem here is that typeadjust does not know if the
-                ** variable is an rvalue or lvalue, so if both operands
-                ** are dereferenced constant numeric addresses, typeadjust
-                ** thinks the operation works on constants. Removing
-                ** CF_CONST here means handling the symptoms, however, the
-                ** whole parser is such a mess that I fear to break anything
-                ** when trying to apply another solution.
-                */
-                flags = typeadjust (Expr, &Expr2, 0) & ~CF_CONST;
+                /* Integer addition */
+                flags = typeadjust (Expr, &Expr2, 0);
                 /* Load rhs into the primary */
                 LoadExpr (CF_NONE, &Expr2);
             } else {
@@ -3134,8 +3127,8 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                 /* We can't just goto End as that would leave the stack unbalanced */
             }
 
-            /* Generate code for the add */
-            g_add (flags, 0);
+            /* Generate code for the add (the & is a hack here) */
+            g_add (flags & ~CF_CONST, 0);
 
         }
 
@@ -3348,8 +3341,7 @@ static void parsesub (ExprDesc* Expr)
                 /* Operate on pointers, result type is a pointer */
                 flags = CF_PTR;
             } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
-                /* Integer subtraction */
-                flags = typeadjust (Expr, &Expr2, 1);
+                /* Integer subtraction. We'll adjust the types later */
             } else {
                 /* OOPS */
                 Error ("Invalid operands for binary operator '-'");
@@ -3370,10 +3362,12 @@ static void parsesub (ExprDesc* Expr)
             }
 
             if (SubDone) {
-                /* Remove pushed value from stack */
+                /* Remove loaded and pushed value from stack */
                 RemoveCode (&Mark1);
                 if (IsClassInt (lhst)) {
-                    /* Limit the calculated value to the range of its type */
+                    /* Just adjust the result type */
+                    Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
+                    /* And limit the calculated value to the range of it */
                     LimitExprValue (Expr);
                 }
                 /* The result is always an rvalue */
@@ -3382,10 +3376,18 @@ static void parsesub (ExprDesc* Expr)
                 if (ED_IsConstAbs (&Expr2)) {
                     /* Remove pushed value from stack */
                     RemoveCode (&Mark2);
+                    if (IsClassInt (lhst)) {
+                        /* Adjust the types */
+                        flags = typeadjust (Expr, &Expr2, 1);
+                    }
                     /* Do the subtraction */
                     g_dec (flags | CF_CONST, Expr2.IVal);
                 } else {
-                    /* Load into the primary */
+                    if (IsClassInt (lhst)) {
+                        /* Adjust the types */
+                        flags = typeadjust (Expr, &Expr2, 0);
+                    }
+                    /* Load rhs into the primary */
                     LoadExpr (CF_NONE, &Expr2);
                     /* Generate code for the sub (the & is a hack here) */
                     g_sub (flags & ~CF_CONST, 0);
@@ -3403,8 +3405,7 @@ static void parsesub (ExprDesc* Expr)
                 /* Operate on pointers, result type is a pointer */
                 flags = CF_PTR;
             } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
-                /* Integer subtraction */
-                flags = typeadjust (Expr, &Expr2, 1);
+                /* Integer subtraction. We'll adjust the types later */
             } else {
                 /* OOPS */
                 Error ("Invalid operands for binary operator '-'");
@@ -3414,10 +3415,18 @@ static void parsesub (ExprDesc* Expr)
             if (ED_IsConstAbs (&Expr2)) {
                 /* Remove pushed value from stack */
                 RemoveCode (&Mark2);
+                if (IsClassInt (lhst)) {
+                    /* Adjust the types */
+                    flags = typeadjust (Expr, &Expr2, 1);
+                }
                 /* Do the subtraction */
                 g_dec (flags | CF_CONST, Expr2.IVal);
             } else {
-                /* Rhs is not numeric, load into the primary */
+                if (IsClassInt (lhst)) {
+                    /* Adjust the types */
+                    flags = typeadjust (Expr, &Expr2, 0);
+                }
+                /* Load rhs into the primary */
                 LoadExpr (CF_NONE, &Expr2);
                 /* Generate code for the sub (the & is a hack here) */
                 g_sub (flags & ~CF_CONST, 0);
@@ -3428,6 +3437,9 @@ static void parsesub (ExprDesc* Expr)
         }
 
     } else {
+
+        /* We'll use the pushed lhs on stack instead of the original source */
+        ED_FinalizeRValLoad (Expr);
 
         /* Right hand side is not constant, load into the primary */
         LoadExpr (CF_NONE, &Expr2);

@@ -1170,7 +1170,7 @@ When using cl65, you can leave it out with this command line:
 cl65 -Wl -D__SYSTEM_CHECK__=1 <arguments>
 </verb></tscreen>
 
-The value you assign to <tt/__SYSTEM_CHECK_/ doesn't matter. If the
+The value you assign to <tt/__SYSTEM_CHECK__/ doesn't matter. If the
 <tt/__SYSTEM_CHECK__/ symbol is defined, the load chunk won't be included.
 
 

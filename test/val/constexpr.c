@@ -88,19 +88,18 @@ void test2(void)
     TESTEXPR(&s[0].b < &s[1].a);
 }
 
-/* FIXME: how to deal with the extern stuff in the testbench? */
-extern int g();
+/* we abuse the close function here, close(-1) will return -1 */
+extern int close(int fd);
 
 void test3(void)
 {
-#if 0
-    TESTEXPR(g());            /* Pure: No;  Static: No;   Immutable: No;  Compile-Time-Known: No   */
-    TESTEXPR(g(), 1);         /* Pure: No;  Static: No;   Immutable: Yes; Compile-Time-Known: Yes  */
-    TESTEXPR((void)g());      /* Pure: No;  Static: No;   Immutable: Yes; Compile-Time-Known: Yes  */
-    TESTEXPR(sizeof(g()));    /* Pure: Yes; Static: Yes;  Immutable: Yes; Compile-Time-Known: Yes  */
+    TESTEXPR(close(-1));            /* Pure: No;  Static: No;   Immutable: No;  Compile-Time-Known: No   */
+    TESTEXPR((close(-1), 1))        /* Pure: No;  Static: No;   Immutable: Yes; Compile-Time-Known: Yes  */
+/* Error: Scalar expression expected */
+//    TESTEXPR((void)close(-1));      /* Pure: No;  Static: No;   Immutable: Yes; Compile-Time-Known: Yes  */
+    TESTEXPR(sizeof(close(-1)));    /* Pure: Yes; Static: Yes;  Immutable: Yes; Compile-Time-Known: Yes  */
     /* NOT detected by the compiler as constant */
-    TESTEXPR(g() * 0);        /* Pure: No;  Static: No;   Immutable: Yes; Compile-Time-Known: Yes  */
-#endif
+    TESTEXPRFALSE(close(-1) * 0);   /* Pure: No;  Static: No;   Immutable: Yes; Compile-Time-Known: Yes  */
 }
 
 int main(void)

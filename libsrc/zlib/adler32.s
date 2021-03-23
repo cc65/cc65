@@ -2,7 +2,8 @@
 ; 2001-11-18, Piotr Fusik
 ; 2018-05-20, Christian Kruger
 ;
-; unsigned long __fastcall__ adler32 (unsigned long adler, unsigned char* buf,
+; unsigned long __fastcall__ adler32 (unsigned long adler,
+;                                     const unsigned char* buf,
 ;                                     unsigned len);
 ;
 

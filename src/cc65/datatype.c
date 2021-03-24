@@ -1085,11 +1085,26 @@ int HasUnknownSize (const Type* T)
 
 int IsVariadicFunc (const Type* T)
 /* Return true if this is a function type or pointer to function type with
-** variable parameter list
+** variable parameter list.
+** Check fails if the type is not a function or a pointer to function.
 */
 {
-    FuncDesc* F = GetFuncDesc (T);
-    return (F->Flags & FD_VARIADIC) != 0;
+    return (GetFuncDesc (T)->Flags & FD_VARIADIC) != 0;
+}
+
+
+
+int IsFastcallFunc (const Type* T)
+/* Return true if this is a function type or pointer to function type by
+** __fastcall__ calling convention.
+** Check fails if the type is not a function or a pointer to function.
+*/
+{
+    if (UnqualifiedType (T->C) == T_PTR) {
+        /* Pointer to function */
+        ++T;
+    }
+    return !IsVariadicFunc (T) && (AutoCDecl ? IsQualFastcall (T) : !IsQualCDecl (T));
 }
 
 

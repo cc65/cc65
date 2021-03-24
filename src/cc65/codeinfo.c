@@ -493,17 +493,14 @@ fncls_t GetFuncInfo (const char* Name, unsigned int* Use, unsigned int* Chg)
                 ** registers.
                 */
                 *Use = REG_EAXY;
-            } else if ((D->ParamCount > 0 ||
-                       (D->Flags & FD_EMPTY) != 0) &&
-                       (AutoCDecl ?
-                        IsQualFastcall (E->Type) :
-                        !IsQualCDecl (E->Type))) {
+            } else if ((D->ParamCount > 0 || (D->Flags & FD_EMPTY) != 0) &&
+                       IsFastcallFunc (E->Type)) {
                 /* Will use registers depending on the last param. If the last
                 ** param has incomplete type, or if the function has not been
                 ** prototyped yet, just assume __EAX__.
                 */
                 if (D->LastParam != 0) {
-                    switch (SizeOf(D->LastParam->Type)) {
+                    switch (SizeOf (D->LastParam->Type)) {
                         case 1u:
                             *Use = REG_A;
                             break;

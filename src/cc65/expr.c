@@ -863,7 +863,7 @@ static void FunctionCall (ExprDesc* Expr)
     unsigned      ParamSize;      /* Number of parameter bytes */
     CodeMark      Mark;
     int           PtrOffs = 0;    /* Offset of function pointer on stack */
-    int           IsFastcall = 0; /* True if it's a fast-call function */
+    int           IsFastcall = 0; /* True if we are fast-calling the function */
     int           PtrOnStack = 0; /* True if a pointer copy is on stack */
     Type*         ReturnType;
 
@@ -882,11 +882,8 @@ static void FunctionCall (ExprDesc* Expr)
         ** parameter count is zero.  Handle K & R functions as though there are
         ** parameters.
         */
-        IsFastcall = (Func->Flags & FD_VARIADIC) == 0 &&
-            (Func->ParamCount > 0 || (Func->Flags & FD_EMPTY)) &&
-            (AutoCDecl ?
-             IsQualFastcall (Expr->Type + 1) :
-             !IsQualCDecl (Expr->Type + 1));
+        IsFastcall = (Func->ParamCount > 0 || (Func->Flags & FD_EMPTY) != 0) &&
+                     IsFastcallFunc (Expr->Type + 1);
 
         /* Things may be difficult, depending on where the function pointer
         ** resides. If the function pointer is an expression of some sort
@@ -931,10 +928,7 @@ static void FunctionCall (ExprDesc* Expr)
         }
 
         /* If we didn't inline the function, get fastcall info */
-        IsFastcall = (Func->Flags & FD_VARIADIC) == 0 &&
-            (AutoCDecl ?
-             IsQualFastcall (Expr->Type) :
-             !IsQualCDecl (Expr->Type));
+        IsFastcall = IsFastcallFunc (Expr->Type);
     }
 
     /* Parse the parameter list */

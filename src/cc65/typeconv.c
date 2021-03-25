@@ -190,7 +190,6 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
 #endif
     /* First, do some type checking */
     typecmp_t Result    = TYPECMP_INITIALIZER;
-    int HasWarning      = 0;
     int HasError        = 0;
     const char* Msg     = 0;
     const Type* OldType = Expr->Type;
@@ -232,19 +231,28 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
             **   - both point to the same types, or
             **   - the rhs pointer is a void pointer, or
             **   - the lhs pointer is a void pointer.
+            ** Note: We additionally allow converting function pointers to and from
+            **       void pointers, just with warnings.
             */
-            if (Result.C <= TC_PTR_INCOMPATIBLE ||
-                (Result.F & TCF_INCOMPATIBLE_QUAL) != 0)
-            {
-                HasWarning = 1;
-                Msg = "Incompatible pointer conversion to '%s' from '%s'";
-                /* Use the pointer type in the diagnostic */
-                OldType = Expr->Type;
-            } else if ((Result.F & TCF_PTR_QUAL_DIFF) != 0) {
-                HasWarning = 1;
-                Msg = "Pointer conversion to '%s' from '%s' discards qualifiers";
-                /* Use the pointer type in the diagnostic */
-                OldType = Expr->Type;
+            if (Result.C == TC_PTR_SIGN_DIFF) {
+                /* Specific warning for pointee signedness difference */
+                if (IS_Get (&WarnPointerSign)) {
+                    TypeCompatibilityDiagnostic (NewType, Expr->Type,
+                        0, "Pointer conversion to '%s' from '%s' changes pointee signedness");
+                }
+            } else if ((Result.C <= TC_PTR_INCOMPATIBLE ||
+                 (Result.F & TCF_INCOMPATIBLE_QUAL) != 0)) {
+                /* Incompatible pointee types or qualifiers */
+                if (IS_Get (&WarnPointerTypes)) {
+                    TypeCompatibilityDiagnostic (NewType, Expr->Type,
+                        0, "Incompatible pointer conversion to '%s' from '%s'");
+                }
+            }
+
+            if ((Result.F & TCF_PTR_QUAL_DIFF) != 0) {
+                /* Discarding qualifiers is a bad thing and we always warn */
+                TypeCompatibilityDiagnostic (NewType, Expr->Type,
+                    0, "Pointer conversion to '%s' from '%s' discards qualifiers");
             }
 
         } else if (IsClassInt (Expr->Type)) {
@@ -269,10 +277,6 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
     if (HasError) {
         TypeCompatibilityDiagnostic (NewType, OldType, 1, Msg);
     } else {
-        if (HasWarning) {
-            TypeCompatibilityDiagnostic (NewType, OldType, 0, Msg);
-        }
-
         /* Both types must be complete */
         if (!IsIncompleteESUType (NewType) && !IsIncompleteESUType (Expr->Type)) {
             /* Do the actual conversion */

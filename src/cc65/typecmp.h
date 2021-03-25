@@ -52,6 +52,7 @@
 typedef enum {
     TC_INCOMPATIBLE,        /* Distinct types */
     TC_SIGN_DIFF,           /* Signedness differs */
+    TC_PTR_SIGN_DIFF,       /* Pointee signedness differs */
     TC_PTR_INCOMPATIBLE,    /* Distinct pointer types */
     TC_VOID_PTR,            /* Non-void and void pointers */
     TC_STRICT_COMPATIBLE,   /* Strict compatibility according to the C Standard */

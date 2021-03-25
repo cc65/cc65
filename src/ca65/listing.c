@@ -305,22 +305,26 @@ void NewMacroDataForListingLine (MacroListingData* MLD)
 void InitCopyListingLine (MacroListingData* MLD)
 /* start copying of ListingData because the macro is used */
 {
-    CHECK ((MLD != 0) && (MLD->Active == 0));
+    /* Store only if listing is enabled */
+    if (SB_GetLen (&ListingName) > 0) {
 
-    MLD->Active             = 1;
-    MLD->LineCurCopy        = MLD->LineStart;
-    MLD->CopyLineLastNumber = CurTok.Pos.Line;
+        CHECK ((MLD != 0) && (MLD->Active == 0));
 
-    ++ListingMacroDepth;
+        MLD->Active             = 1;
+        MLD->LineCurCopy        = MLD->LineStart;
+        MLD->CopyLineLastNumber = CurTok.Pos.Line;
 
-    if (LineCur->Next != 0 && MLD->LineLastCopy == 0) {
-        MLD->LineLastCopy   = LineLast;
+        ++ListingMacroDepth;
 
-        CHECK (LineCur->Next == LineLast);
-        LineLast = LineCur;
+        if (LineCur->Next != 0 && MLD->LineLastCopy == 0) {
+            MLD->LineLastCopy   = LineLast;
+
+            CHECK (LineCur->Next == LineLast);
+            LineLast = LineCur;
+        }
+
+        CopyListingLine (MLD);
     }
-
-    CopyListingLine (MLD);
 }
 
 
@@ -362,22 +366,26 @@ void CopyListingLine (MacroListingData* MLD)
 void CopyLastListingLine (MacroListingData* MLD)
 /* Copy the last listing line of a macro */
 {
-    CHECK ((MLD != 0) && (MLD->Active != 0));
+    /* Store only if listing is enabled */
+    if (SB_GetLen (&ListingName) > 0) {
 
-    CopyListingLine (MLD);
+        CHECK ((MLD != 0) && (MLD->Active != 0));
 
-    CHECK (LineCur->Next == 0);
-    LineCur->Next = MLD->LineLastCopy;
+        CopyListingLine (MLD);
 
-    if (LineCur->Next != 0) {
-        LineLast  = LineCur->Next;
+        CHECK (LineCur->Next == 0);
+        LineCur->Next = MLD->LineLastCopy;
+
+        if (LineCur->Next != 0) {
+            LineLast  = LineCur->Next;
+        }
+
+        MLD->LineLastCopy = NULL;
+
+        --ListingMacroDepth;
+
+        MLD->Active = 0;
     }
-
-    MLD->LineLastCopy = NULL;
-
-    --ListingMacroDepth;
-
-    MLD->Active = 0;
 }
 
 

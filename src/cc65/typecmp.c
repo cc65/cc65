@@ -143,6 +143,7 @@ static void SetResult (typecmp_t* Result, typecmpcode_t Val)
     if (Val < Result->C) {
         if (Result->Indirections > 0) {
             if (Val >= TC_STRICT_COMPATIBLE) {
+                /* Arrays etc. */
                 Result->C = Val;
             } else if (Result->Indirections == 1) {
                 /* C Standard allows implicit conversion as long as one side is
@@ -150,10 +151,17 @@ static void SetResult (typecmp_t* Result, typecmpcode_t Val)
                 */
                 if ((Result->F & TCF_MASK_VOID_PTR) != 0) {
                     Result->C = TC_VOID_PTR;
+                } else if (Val == TC_SIGN_DIFF) {
+                    /* Special treatment with pointee signedness difference */
+                    Result->C = TC_PTR_SIGN_DIFF;
                 } else {
+                    /* Incompatible */
                     Result->C = TC_PTR_INCOMPATIBLE;
                 }
             } else {
+                /* Pointer-to-pointer types must have compatible pointte types,
+                ** or they are just incompatible.
+                */
                 Result->C = TC_PTR_INCOMPATIBLE;
             }
         } else {

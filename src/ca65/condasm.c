@@ -38,6 +38,7 @@
 #include "expr.h"
 #include "instr.h"
 #include "lineinfo.h"
+#include "listing.h"
 #include "nexttok.h"
 #include "symbol.h"
 #include "symtab.h"
@@ -117,6 +118,13 @@ static void CalcOverallIfCond (void)
 /* Calculate the overall condition, based on all conditions on the stack. */
 {
     IfCond = GetOverallIfCond ();
+
+    if (IfCond == 0) {
+        EnableSuppressListingLine (LISTING_SUPPRESS_REASON_CONDITIONAL);
+    }
+    else {
+        DisableSuppressListingLine (LISTING_SUPPRESS_REASON_CONDITIONAL);
+    }
 }
 
 

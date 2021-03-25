@@ -62,6 +62,16 @@ struct StrBuf;
 /* Length of the header of a listing line */
 #define LINE_HEADER_LEN         24
 
+/* enum for giving the reason why an output is suppressed.
+** The values for everything but LISTING_SUPPRESS_REASON_NONE
+** have to be powers of 2, as it is used as a bit mask.
+**/
+enum ListingSuppressReason_e {
+    LISTING_SUPPRESS_REASON_NONE        = 0,
+    LISTING_SUPPRESS_REASON_CONDITIONAL = 1,
+    LISTING_SUPPRESS_REASON_MACRO       = 2,
+};
+
 /* One listing line as it is stored in memory */
 typedef struct ListLine ListLine;
 struct ListLine {
@@ -73,6 +83,7 @@ struct ListLine {
     unsigned char       File;           /* From which file is the line? */
     unsigned char       Depth;          /* Include depth */
     unsigned char       Output;         /* Should we output this line? */
+    unsigned char       Suppress;       /* Should we suppress this line, because it does not have any effect? */
     unsigned char       ListBytes;      /* How many bytes at max? */
     char                Line[1];        /* Line with dynamic length */
 };
@@ -108,6 +119,19 @@ void EnableListing (void);
 
 void DisableListing (void);
 /* Disable output of lines to the listing */
+
+void EnableSuppressListingLine (enum ListingSuppressReason_e Reason);
+/* suppress output of the current listing line because of conditionals
+** or macro definition
+*/
+
+void DisableSuppressListingLine (enum ListingSuppressReason_e Reason);
+/* disable suppressing output of the current listing line because of
+** conditionals or macro definition
+*/
+
+void SetFullListing (void);
+/* Set option: Output full assembler listing */
 
 void SetListBytes (int Bytes);
 /* Set the maximum number of bytes listed for one line */

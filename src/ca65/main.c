@@ -98,6 +98,7 @@ static void Usage (void)
             "  -V\t\t\t\tPrint the assembler version\n"
             "  -W n\t\t\t\tSet warning level n\n"
             "  -d\t\t\t\tDebug mode\n"
+            "  -f\t\t\t\tCreate a full listing file if -l is given\n"
             "  -g\t\t\t\tAdd debug info to object file\n"
             "  -h\t\t\t\tHelp (this text)\n"
             "  -i\t\t\t\tIgnore case of symbols\n"
@@ -117,6 +118,7 @@ static void Usage (void)
             "  --debug\t\t\tDebug mode\n"
             "  --debug-info\t\t\tAdd debug info to object file\n"
             "  --feature name\t\tSet an emulation feature\n"
+            "  --full-listing\t\tCreate a full listing file if --listing is given\n"
             "  --help\t\t\tHelp (this text)\n"
             "  --ignore-case\t\t\tIgnore case of symbols\n"
             "  --include-dir dir\t\tSet an include directory search path\n"
@@ -563,6 +565,15 @@ static void OptListing (const char* Opt, const char* Arg)
 
 
 
+static void OptFullListing (const char* Opt attribute ((unused)),
+                            const char* Arg attribute ((unused)))
+/* Create a full listing file */
+{
+    SetFullListing ();
+}
+
+
+
 static void OptMemoryModel (const char* Opt, const char* Arg)
 /* Set the memory model */
 {
@@ -921,6 +932,7 @@ int main (int argc, char* argv [])
         { "--large-alignment",  0,      OptLargeAlignment       },
         { "--list-bytes",       1,      OptListBytes            },
         { "--listing",          1,      OptListing              },
+        { "--full-listing",     0,      OptFullListing          },
         { "--memory-model",     1,      OptMemoryModel          },
         { "--pagelength",       1,      OptPageLength           },
         { "--relax-checks",     0,      OptRelaxChecks          },
@@ -974,6 +986,10 @@ int main (int argc, char* argv [])
 
                 case 'd':
                     OptDebug (Arg, 0);
+                    break;
+
+                case 'f':
+                    OptFullListing (Arg, 0);
                     break;
 
                 case 'g':

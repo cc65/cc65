@@ -74,6 +74,15 @@ static unsigned ListBytes  = 12;        /* Number of bytes to list for one line 
 /* Switch the listing on/off */
 static int      ListingEnabled = 1;     /* Enabled if > 0 */
 
+/* Switch the listing suppression on/off */
+static int      ListingSuppressEnabled     = LISTING_SUPPRESS_REASON_NONE; /* Enabled if not LISTING_SUPPRESS_REASON_NONE */
+
+/* show the lines that are suppressed ("full listing") */
+static int      ListingShowSuppressedLines = 0; /* Enabled if != 0 */
+
+
+static void     ProceedToCurrentListingLine (void);
+
 
 
 /*****************************************************************************/
@@ -110,6 +119,7 @@ void NewListingLine (const StrBuf* Line, unsigned char File, unsigned char Depth
         L->File         = File;
         L->Depth        = Depth;
         L->Output       = (ListingEnabled > 0);
+        L->Suppress     = (ListingSuppressEnabled != LISTING_SUPPRESS_REASON_NONE);
         L->ListBytes    = (unsigned char) ListBytes;
         memcpy (L->Line, SB_GetConstBuf (Line), Len);
         L->Line[Len] = '\0';
@@ -130,6 +140,7 @@ void EnableListing (void)
 /* Enable output of lines to the listing */
 {
     if (SB_GetLen (&ListingName) > 0) {
+
         /* If we're about to enable the listing, do this for the current line
         ** also, so we will see the source line that did this.
         */
@@ -156,6 +167,46 @@ void DisableListing (void)
 
 
 
+void EnableSuppressListingLine (enum ListingSuppressReason_e Reason)
+/* suppress output of the current listing line because of conditionals
+** or macro definition
+*/
+{
+    if (SB_GetLen (&ListingName) > 0) {
+        ListingSuppressEnabled |= Reason;
+
+        /* if we already have a new listing line, mark
+        ** that one, too.
+        */
+        if (LineCur) {
+            LineCur->Suppress = 1;
+        }
+    }
+}
+
+
+
+void DisableSuppressListingLine (enum ListingSuppressReason_e Reason)
+/* disable suppressing output of the current listing line because of
+** conditionals or macro definition
+*/
+{
+    if (SB_GetLen (&ListingName) > 0) {
+        /* make sure all lines in-between are not output */
+        ProceedToCurrentListingLine ();
+
+        ListingSuppressEnabled &= ~Reason;
+    }
+}
+
+
+
+void SetFullListing (void)
+/* Set option: Output full assembler listing */
+{
+    ListingShowSuppressedLines = 1;
+}
+
 void SetListBytes (int Bytes)
 /* Set the maximum number of bytes listed for one line */
 {
@@ -167,8 +218,7 @@ void SetListBytes (int Bytes)
 
 
 
-void InitListingLine (void)
-/* Initialize the current listing line */
+static void ProceedToCurrentListingLine (void)
 {
     if (SB_GetLen (&ListingName) > 0) {
         /* Make the last loaded line the current line */
@@ -184,16 +234,26 @@ void InitListingLine (void)
                 L->PC            = GetPC ();
                 L->Reloc         = GetRelocMode ();
                 L->Output        = (ListingEnabled > 0);
+                L->Suppress      = (ListingSuppressEnabled != LISTING_SUPPRESS_REASON_NONE);
                 L->ListBytes = (unsigned char) ListBytes;
             } while (L->Next != LineLast);
         }
         LineCur = LineLast;
+    }
+}
+void InitListingLine (void)
+/* Initialize the current listing line */
+{
+    if (SB_GetLen (&ListingName) > 0) {
+        /* make the last loaded line the current line */
+        ProceedToCurrentListingLine ();
 
         /* Set the values for this line */
         CHECK (LineCur != 0);
         LineCur->PC         = GetPC ();
         LineCur->Reloc      = GetRelocMode ();
         LineCur->Output     = (ListingEnabled > 0);
+        LineCur->Suppress   = (ListingSuppressEnabled != LISTING_SUPPRESS_REASON_NONE);
         LineCur->ListBytes  = (unsigned char) ListBytes;
     }
 }
@@ -278,13 +338,18 @@ static char* MakeLineHeader (char* H, const ListLine* L)
     char Depth;
 
     /* Setup the PC mode */
-    Mode = (L->Reloc)? 'r' : ' ';
+    Mode = (L->Suppress ? 'i' : (L->Reloc)? 'r' : ' ' );
 
     /* Set up the include depth */
     Depth = (L->Depth < 10)? L->Depth + '0' : '+';
 
     /* Format the line */
-    sprintf (H, "%06lX%c %c", L->PC, Mode, Depth);
+    if (L->Suppress) {
+        sprintf (H, "------%c %c", Mode, Depth);
+    }
+    else {
+        sprintf (H, "%06lX%c %c", L->PC, Mode, Depth);
+    }
     memset (H+9, ' ', LINE_HEADER_LEN-9);
 
     /* Return the buffer */
@@ -330,6 +395,13 @@ void CreateListing (void)
         if (L->Output == 0) {
             L = L->Next;
             continue;
+        }
+
+        if (L->Suppress != 0) {
+            if (!ListingShowSuppressedLines) {
+                L = L->Next;
+                continue;
+            }
         }
 
         /* If we don't have a fragment list for this line, things are easy */
@@ -398,7 +470,7 @@ void CreateListing (void)
         ** where
         **
         **      PPPPPP  is the PC
-        **      m       is the mode ('r' or empty)
+        **      m       is the mode ('i' if line has no effect, otherwise 'r' or empty)
         **      I       is the include level
         **      11 ..   are code or data bytes
         */

@@ -88,6 +88,9 @@ struct ListLine {
     char                Line[1];        /* Line with dynamic length */
 };
 
+typedef struct MacroListingData MacroListingData;
+struct MacroListingData;
+
 /* Single linked list of lines */
 extern ListLine*        LineList;       /* List of listing lines */
 extern ListLine*        LineCur;        /* Current listing line */
@@ -138,6 +141,21 @@ void SetListBytes (int Bytes);
 
 void InitListingLine (void);
 /* Initialize the current listing line */
+
+unsigned NewMacroDataForListingLineSize ();
+/* get size of struct MacroListingData so that it can xmalloc()ed inside of the struct Macro */
+
+void NewMacroDataForListingLine (MacroListingData* MLD);
+/* initialize MacroListingData on macro definition */
+
+void InitCopyListingLine (MacroListingData* MLD);
+/* start copying of ListingData because the macro is used */
+
+void CopyListingLine (MacroListingData* MLD);
+/* Copy one or more lines of the macro to the output */
+
+void CopyLastListingLine (MacroListingData* MLD);
+/* Copy the last listing line of a macro */
 
 void CreateListing (void);
 /* Create the listing */

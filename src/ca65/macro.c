@@ -48,6 +48,7 @@
 #include "global.h"
 #include "instr.h"
 #include "istack.h"
+#include "listing.h"
 #include "lineinfo.h"
 #include "nexttok.h"
 #include "pseudo.h"
@@ -106,6 +107,8 @@ struct Macro {
     unsigned        Expansions; /* Number of active macro expansions */
     unsigned char   Style;      /* Macro style */
     unsigned char   Incomplete; /* Macro is currently built */
+    MacroListingData* ListingData; /* Data for listing line processing */
+    unsigned char   ExtraData[0];
 };
 
 /* Hash table functions */
@@ -236,7 +239,7 @@ static Macro* NewMacro (const StrBuf* Name, unsigned char Style)
 /* Generate a new macro entry, initialize and return it */
 {
     /* Allocate memory */
-    Macro* M = xmalloc (sizeof (Macro));
+    Macro* M = xmalloc (sizeof (Macro) + NewMacroDataForListingLineSize());
 
     /* Initialize the macro struct */
     InitHashNode (&M->Node);
@@ -249,9 +252,12 @@ static Macro* NewMacro (const StrBuf* Name, unsigned char Style)
     M->TokLast    = 0;
     SB_Init (&M->Name);
     SB_Copy (&M->Name, Name);
+    M->ListingData = (MacroListingData*) M->ExtraData;
     M->Expansions = 0;
     M->Style      = Style;
     M->Incomplete = 1;
+
+    NewMacroDataForListingLine (M->ListingData);
 
     /* Insert the macro into the hash table */
     HT_Insert (&MacroTab, &M->Node);
@@ -417,6 +423,9 @@ void MacDef (unsigned Style)
 
     /* Define the macro */
     M = NewMacro (&CurTok.SVal, Style);
+
+    /* suppress printing the assembly lines */
+    EnableSuppressListingLine (LISTING_SUPPRESS_REASON_MACRO);
 
     /* Switch to raw token mode and skip the macro name */
     EnterRawTokenMode ();
@@ -588,6 +597,9 @@ void MacDef (unsigned Style)
     /* Reset the Incomplete flag now that parsing is done */
     M->Incomplete = 0;
 
+    /* stop suppressing printing the assembly lines */
+    DisableSuppressListingLine (LISTING_SUPPRESS_REASON_MACRO);
+
 Done:
     /* Switch out of raw token mode */
     LeaveRawTokenMode ();
@@ -681,6 +693,10 @@ ExpandParam:
         /* Use next macro token */
         TokSet (Mac->Exp);
 
+        if (CurTok.Tok == TOK_SEP) {
+            CopyListingLine (Mac->M->ListingData);
+        }
+
         /* Create new line info for this token */
         if (Mac->LI) {
             EndLine (Mac->LI);
@@ -747,6 +763,8 @@ ExpandParam:
     /* No more macro tokens. Do we have a final token? */
     if (Mac->Final) {
 
+        CopyLastListingLine (Mac->M->ListingData);
+
         /* Set the final token and remove it */
         TokSet (Mac->Final);
         FreeTokNode (Mac->Final);
@@ -770,6 +788,8 @@ ExpandParam:
     }
 
 MacEnd:
+    CopyLastListingLine (Mac->M->ListingData);
+
     /* End of macro expansion */
     FreeMacExp (Mac);
 
@@ -789,6 +809,8 @@ static void StartExpClassic (MacExp* E)
 
     /* Skip the macro name */
     NextTok ();
+
+    InitCopyListingLine (E->M->ListingData);
 
     /* Does this invocation have any arguments? */
     if (!TokIsSep (CurTok.Tok)) {

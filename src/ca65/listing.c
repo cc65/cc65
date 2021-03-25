@@ -50,6 +50,7 @@
 #include "filetab.h"
 #include "global.h"
 #include "listing.h"
+#include "scanner.h"
 #include "segment.h"
 
 
@@ -57,6 +58,18 @@
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
+
+
+
+/* Struct that describes a the listing data definitions of a macro */
+struct MacroListingData {
+    int       Active;
+    ListLine* LineStart;           /* Current listing line when the macro started */
+    ListLine* LineCurCopy;         /* Current Listing line for copying */
+    ListLine* LineLastCopy;        /* Copy of last line */
+    unsigned  CopyLineStartNumber; /* line number of last copied listing line */
+    unsigned  CopyLineLastNumber;  /* line number of last copied listing line */
+};
 
 
 
@@ -79,6 +92,8 @@ static int      ListingSuppressEnabled     = LISTING_SUPPRESS_REASON_NONE; /* En
 
 /* show the lines that are suppressed ("full listing") */
 static int      ListingShowSuppressedLines = 0; /* Enabled if != 0 */
+
+static int      ListingMacroDepth = 0;  /* nesting depth of macro expansion */
 
 
 static void     ProceedToCurrentListingLine (void);
@@ -219,6 +234,7 @@ void SetListBytes (int Bytes)
 
 
 static void ProceedToCurrentListingLine (void)
+/* go through the listing lines and set the correct parameter for output */
 {
     if (SB_GetLen (&ListingName) > 0) {
         /* Make the last loaded line the current line */
@@ -241,6 +257,9 @@ static void ProceedToCurrentListingLine (void)
         LineCur = LineLast;
     }
 }
+
+
+
 void InitListingLine (void)
 /* Initialize the current listing line */
 {
@@ -256,6 +275,109 @@ void InitListingLine (void)
         LineCur->Suppress   = (ListingSuppressEnabled != LISTING_SUPPRESS_REASON_NONE);
         LineCur->ListBytes  = (unsigned char) ListBytes;
     }
+}
+
+
+
+unsigned NewMacroDataForListingLineSize ()
+/* get size of struct MacroListingData so that it can xmalloc()ed inside of the struct Macro */
+{
+    return sizeof (MacroListingData);
+}
+
+
+
+void NewMacroDataForListingLine (MacroListingData* MLD)
+/* initialize MacroListingData on macro definition */
+{
+    CHECK (MLD != 0);
+
+    MLD->Active              = 0;
+    MLD->LineStart           = LineCur;
+    MLD->LineCurCopy         = LineCur;
+    MLD->LineLastCopy        = NULL;
+    MLD->CopyLineStartNumber = CurTok.Pos.Line;
+    MLD->CopyLineLastNumber  = 0;
+}
+
+
+
+void InitCopyListingLine (MacroListingData* MLD)
+/* start copying of ListingData because the macro is used */
+{
+    CHECK ((MLD != 0) && (MLD->Active == 0));
+
+    MLD->Active             = 1;
+    MLD->LineCurCopy        = MLD->LineStart;
+    MLD->CopyLineLastNumber = CurTok.Pos.Line;
+
+    ++ListingMacroDepth;
+
+    if (LineCur->Next != 0 && MLD->LineLastCopy == 0) {
+        MLD->LineLastCopy   = LineLast;
+
+        CHECK (LineCur->Next == LineLast);
+        LineLast = LineCur;
+    }
+
+    CopyListingLine (MLD);
+}
+
+
+
+void CopyListingLine (MacroListingData* MLD)
+/* Copy one or more lines of the macro to the output */
+{
+    /* Store only if listing is enabled */
+    if (SB_GetLen (&ListingName) > 0) {
+
+        CHECK ((MLD != 0) && (MLD->Active != 0));
+
+        if (MLD->CopyLineLastNumber > CurTok.Pos.Line) {
+            MLD->CopyLineLastNumber = CurTok.Pos.Line;
+        }
+
+        do {
+            StrBuf* s = NewStrBuf ();
+
+            SB_InitFromString (s, MLD->LineCurCopy->Line);
+
+            NewListingLine (s, MLD->LineCurCopy->File, MLD->LineCurCopy->Depth + ListingMacroDepth);
+
+            LineCur = LineLast;
+
+            MLD->LineCurCopy = MLD->LineCurCopy->Next;
+            ++MLD->CopyLineLastNumber;
+
+            if (CurTok.Pos.Line >= MLD->CopyLineLastNumber) {
+                LineCur->Suppress |= LISTING_SUPPRESS_REASON_CONDITIONAL;
+            }
+
+        } while (CurTok.Pos.Line >= MLD->CopyLineLastNumber);
+    }
+}
+
+
+
+void CopyLastListingLine (MacroListingData* MLD)
+/* Copy the last listing line of a macro */
+{
+    CHECK ((MLD != 0) && (MLD->Active != 0));
+
+    CopyListingLine (MLD);
+
+    CHECK (LineCur->Next == 0);
+    LineCur->Next = MLD->LineLastCopy;
+
+    if (LineCur->Next != 0) {
+        LineLast  = LineCur->Next;
+    }
+
+    MLD->LineLastCopy = NULL;
+
+    --ListingMacroDepth;
+
+    MLD->Active = 0;
 }
 
 

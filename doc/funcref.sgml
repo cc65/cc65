@@ -2813,6 +2813,8 @@ location of the cursor in the display screen RAM.  That number can be passed to
 done to make it obvious that peeking doesn't move the cursor in any way.  Your
 program must place the cursor where it wants to peek before it calls any of
 those functions.
+<item>On the cx16 (Commander X16) target, this function returns two values: the
+background color, in the high nybble, and the text color, in the low nybble.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/

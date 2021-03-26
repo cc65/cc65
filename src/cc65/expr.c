@@ -835,7 +835,7 @@ static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall, ExprDesc* ED)
     /* Append last deferred inc/dec before the function is called.
     ** The last parameter needs to be preserved if it is passed in AX/EAX Regs.
     */
-    DoDeferred (IsFastcall ? SQP_KEEP_EAX : SQP_KEEP_NONE, &Expr);
+    DoDeferred (IsFastcall && PushedCount > 0 ? SQP_KEEP_EAX : SQP_KEEP_NONE, &Expr);
 
     /* Check if we had enough arguments */
     if (PushedCount < Func->ParamCount) {
@@ -928,7 +928,8 @@ static void FunctionCall (ExprDesc* Expr)
         }
 
         /* If we didn't inline the function, get fastcall info */
-        IsFastcall = IsFastcallFunc (Expr->Type);
+        IsFastcall = (Func->ParamCount > 0 || (Func->Flags & FD_EMPTY) != 0) &&
+                     IsFastcallFunc (Expr->Type);
     }
 
     /* Parse the parameter list */

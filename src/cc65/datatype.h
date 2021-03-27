@@ -825,7 +825,14 @@ INLINE int IsQualCConv (const Type* T)
 
 int IsVariadicFunc (const Type* T) attribute ((const));
 /* Return true if this is a function type or pointer to function type with
-** variable parameter list
+** variable parameter list.
+** Check fails if the type is not a function or a pointer to function.
+*/
+
+int IsFastcallFunc (const Type* T) attribute ((const));
+/* Return true if this is a function type or pointer to function type by
+** __fastcall__ calling convention.
+** Check fails if the type is not a function or a pointer to function.
 */
 
 FuncDesc* GetFuncDesc (const Type* T) attribute ((const));

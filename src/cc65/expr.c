@@ -2850,27 +2850,31 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
             } else {
                 /* OOPS */
                 AddDone = -1;
+                /* Avoid further errors */
+                ED_MakeConstAbsInt (Expr, 0);
             }
 
-            /* Do constant calculation if we can */
-            if (ED_IsAbs (&Expr2) &&
-                (ED_IsAbs (Expr) || lscale == 1)) {
-                if (IsClassInt (lhst) && IsClassInt (rhst)) {
-                    Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
+            if (!AddDone) {
+                /* Do constant calculation if we can */
+                if (ED_IsAbs (&Expr2) &&
+                    (ED_IsAbs (Expr) || lscale == 1)) {
+                    if (IsClassInt (lhst) && IsClassInt (rhst)) {
+                        Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
+                    }
+                    Expr->IVal = Expr->IVal * lscale + Expr2.IVal * rscale;
+                    AddDone = 1;
+                } else if (ED_IsAbs (Expr) &&
+                    (ED_IsAbs (&Expr2) || rscale == 1)) {
+                    if (IsClassInt (lhst) && IsClassInt (rhst)) {
+                        Expr2.Type = ArithmeticConvert (Expr2.Type, Expr->Type);
+                    }
+                    Expr2.IVal = Expr->IVal * lscale + Expr2.IVal * rscale;
+                    /* Adjust the flags */
+                    Expr2.Flags |= Expr->Flags & ~E_MASK_KEEP_SUBEXPR;
+                    /* Get the symbol and the name */
+                    *Expr = Expr2;
+                    AddDone = 1;
                 }
-                Expr->IVal = Expr->IVal * lscale + Expr2.IVal * rscale;
-                AddDone = 1;
-            } else if (ED_IsAbs (Expr) &&
-                (ED_IsAbs (&Expr2) || rscale == 1)) {
-                if (IsClassInt (lhst) && IsClassInt (rhst)) {
-                    Expr2.Type = ArithmeticConvert (Expr2.Type, Expr->Type);
-                }
-                Expr2.IVal = Expr->IVal * lscale + Expr2.IVal * rscale;
-                /* Adjust the flags */
-                Expr2.Flags |= Expr->Flags & ~E_MASK_KEEP_SUBEXPR;
-                /* Get the symbol and the name */
-                *Expr = Expr2;
-                AddDone = 1;
             }
 
             if (AddDone) {

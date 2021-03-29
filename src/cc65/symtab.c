@@ -92,6 +92,7 @@ static SymTable*        SymTab0         = 0;
 static SymTable*        SymTab          = 0;
 static SymTable*        TagTab0         = 0;
 static SymTable*        TagTab          = 0;
+static SymTable*        FieldTab        = 0;
 static SymTable*        LabelTab        = 0;
 static SymTable*        SPAdjustTab     = 0;
 static SymTable*        FailSafeTab     = 0;    /* For errors */
@@ -390,9 +391,9 @@ void EnterStructLevel (void)
     ** nested in struct scope are NOT local to the struct but visible in the
     ** outside scope. So we will NOT create a new struct or enum table.
     */
-    S = NewSymTable (SYMTAB_SIZE_BLOCK);
-    S->PrevTab  = SymTab;
-    SymTab      = S;
+    S = NewSymTable (SYMTAB_SIZE_STRUCT);
+    S->PrevTab  = FieldTab;
+    FieldTab    = S;
 }
 
 
@@ -401,7 +402,7 @@ void LeaveStructLevel (void)
 /* Leave a nested block for a struct definition */
 {
     /* Don't delete the table */
-    SymTab = SymTab->PrevTab;
+    FieldTab = FieldTab->PrevTab;
 }
 
 
@@ -850,7 +851,7 @@ SymEntry* AddBitField (const char* Name, const Type* T, unsigned Offs,
 /* Add a bit field to the local symbol table and return the symbol entry */
 {
     /* Do we have an entry with this name already? */
-    SymEntry* Entry = FindSymInTable (SymTab, Name, HashStr (Name));
+    SymEntry* Entry = FindSymInTable (FieldTab, Name, HashStr (Name));
     if (Entry) {
 
         /* We have a symbol with this name already */
@@ -882,7 +883,7 @@ SymEntry* AddBitField (const char* Name, const Type* T, unsigned Offs,
         }
 
         /* Add the entry to the symbol table */
-        AddSymEntry (SymTab, Entry);
+        AddSymEntry (FieldTab, Entry);
 
     }
 
@@ -1070,9 +1071,9 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
 
 
 SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs)
-/* Add a local symbol and return the symbol entry */
+/* Add a local or struct/union field symbol and return the symbol entry */
 {
-    SymTable* Tab = SymTab;
+    SymTable* Tab = (Flags & SC_STRUCTFIELD) == 0 ? SymTab : FieldTab;
     ident Ident;
 
     /* Do we have an entry with this name already? */
@@ -1266,6 +1267,16 @@ SymTable* GetGlobalSymTab (void)
 {
     return SymTab0;
 }
+
+
+
+SymTable* GetFieldSymTab (void)
+/* Return the current field symbol table */
+{
+    return FieldTab;
+}
+
+
 
 SymTable* GetLabelSymTab (void)
 /* Return the global symbol table */

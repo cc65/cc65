@@ -965,7 +965,7 @@ static SymEntry* ParseUnionDecl (const char* Name, unsigned* DSFlags)
                 */
                 AddBitField (Decl.Ident, Decl.Type, 0, 0, FieldWidth,
                              SignednessSpecified);
-            } else {
+            } else if (Decl.Ident[0] != '\0') {
                 Entry = AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, 0);
                 if (IsAnonName (Decl.Ident)) {
                     Entry->V.A.ANumber = UnionTagEntry->V.S.ACount++;
@@ -994,7 +994,7 @@ NextMember: if (CurTok.Tok != TOK_COMMA) {
     NextToken ();
 
     /* Remember the symbol table and leave the struct level */
-    FieldTab = GetSymTab ();
+    FieldTab = GetFieldSymTab ();
     LeaveStructLevel ();
 
     /* Return a fictitious symbol if errors occurred during parsing */
@@ -1167,7 +1167,7 @@ static SymEntry* ParseStructDecl (const char* Name, unsigned* DSFlags)
                 /* Add any full bytes to the struct size. */
                 StructSize += BitOffs / CHAR_BITS;
                 BitOffs %= CHAR_BITS;
-            } else {
+            } else if (Decl.Ident[0] != '\0') {
                 Entry = AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, StructSize);
                 if (IsAnonName (Decl.Ident)) {
                     Entry->V.A.ANumber = StructTagEntry->V.S.ACount++;
@@ -1208,7 +1208,7 @@ NextMember: if (CurTok.Tok != TOK_COMMA) {
     NextToken ();
 
     /* Remember the symbol table and leave the struct level */
-    FieldTab = GetSymTab ();
+    FieldTab = GetFieldSymTab ();
     LeaveStructLevel ();
 
     /* Return a fictitious symbol if errors occurred during parsing */

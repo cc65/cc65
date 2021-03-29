@@ -166,7 +166,7 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags);
 /* Add a goto label to the symbol table */
 
 SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs);
-/* Add a local symbol and return the symbol entry */
+/* Add a local or struct/union field symbol and return the symbol entry */
 
 SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags);
 /* Add an external or global symbol to the symbol table and return the entry */
@@ -184,6 +184,9 @@ SymTable* GetSymTab (void);
 
 SymTable* GetGlobalSymTab (void);
 /* Return the global symbol table */
+
+SymTable* GetFieldSymTab (void);
+/* Return the current field symbol table */
 
 SymTable* GetLabelSymTab (void);
 /* Return the label symbol table */

@@ -284,7 +284,7 @@ SymEntry* GetSymType (const Type* T)
 */
 {
     if ((IsClassStruct (T) || IsTypeEnum (T))) {
-        return T->A.P;
+        return T->A.S;
     }
     return 0;
 }

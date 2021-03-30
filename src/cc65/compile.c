@@ -53,6 +53,7 @@
 #include "declare.h"
 #include "error.h"
 #include "expr.h"
+#include "funcdesc.h"
 #include "function.h"
 #include "global.h"
 #include "input.h"

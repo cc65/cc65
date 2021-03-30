@@ -37,6 +37,7 @@
 
 /* cc65 */
 #include "error.h"
+#include "funcdesc.h"
 #include "global.h"
 #include "symtab.h"
 #include "typecmp.h"

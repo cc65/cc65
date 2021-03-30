@@ -1891,7 +1891,7 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
             /* Add the function type. Be sure to bounds check the type buffer */
             NeedTypeSpace (D, 1);
             D->Type[D->Index].C = T_FUNC | Qualifiers;
-            D->Type[D->Index].A.P = F;
+            D->Type[D->Index].A.F = F;
             ++D->Index;
 
             /* Qualifiers now used */

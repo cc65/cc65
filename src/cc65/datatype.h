@@ -45,15 +45,22 @@
 #include "inline.h"
 #include "mmodel.h"
 
-/* cc65 */
-#include "funcdesc.h"
+
+
+/*****************************************************************************/
+/*                           Forward declarations                            */
+/*****************************************************************************/
+
+
+
+typedef struct FuncDesc FuncDesc;
+typedef struct SymEntry SymEntry;
 
 
 
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
-
 
 
 
@@ -153,7 +160,8 @@ typedef struct Type Type;
 struct Type {
     TypeCode            C;      /* Code for this entry */
     union {
-        void*           P;      /* Arbitrary attribute pointer */
+        FuncDesc*       F;      /* Function description pointer */
+        SymEntry*       S;      /* Enum/struct/union tag symbol entry pointer */
         long            L;      /* Numeric attribute value */
         unsigned long   U;      /* Dito, unsigned */
     } A;                        /* Type attribute if necessary */

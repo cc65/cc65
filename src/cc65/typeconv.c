@@ -42,6 +42,7 @@
 #include "declare.h"
 #include "error.h"
 #include "expr.h"
+#include "funcdesc.h"
 #include "loadexpr.h"
 #include "typecmp.h"
 #include "typeconv.h"

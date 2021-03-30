@@ -352,18 +352,21 @@ void TypeCast (ExprDesc* Expr)
 
 
 
-static void CompositeFuncParamList (const FuncDesc* F1, const FuncDesc* F2)
-/* Composite two function symbol tables regarding function parameters */
+static void ComposeFuncParamList (const FuncDesc* F1, const FuncDesc* F2)
+/* Compose two function symbol tables regarding function parameters into F1 */
 {
     /* Get the symbol tables */
     const SymTable* Tab1 = F1->SymTab;
     const SymTable* Tab2 = F2->SymTab;
 
-    /* Composite the parameter lists */
-    const SymEntry* Sym1 = Tab1->SymHead;
-    const SymEntry* Sym2 = Tab2->SymHead;
+    /* Compose the parameter lists */
+    SymEntry* Sym1 = Tab1->SymHead;
+    SymEntry* Sym2 = Tab2->SymHead;
 
-    /* Composite the fields */
+    /* Sanity check */
+    CHECK ((F1->Flags & FD_EMPTY) == 0 && (F2->Flags & FD_EMPTY) == 0);
+
+    /* Compose the fields */
     while (Sym1 && (Sym1->Flags & SC_PARAM) && Sym2 && (Sym2->Flags & SC_PARAM)) {
 
         /* Get the symbol types */
@@ -384,8 +387,19 @@ static void CompositeFuncParamList (const FuncDesc* F1, const FuncDesc* F2)
             }
         }
 
+        /* When we compose two function parameter lists with any FD_OLDSTYLE
+        ** flags set, we are either refining the declaration of the function
+        ** with its definition seen, or determining the result type of a
+        ** ternary operation. In either case, we can just replace the types
+        ** with the promoted ones since the original types of the parameters
+        ** only matters inside the function definition.
+        */
+        if (Type1 != Sym1->Type) {
+            Sym1->Type = TypeDup (Type1);
+        }
+
         /* Compose this field */
-        TypeComposition (Type1, Type2);
+        TypeComposition (Sym1->Type, Type2);
 
         /* Get the pointers to the next fields */
         Sym1 = Sym1->NextSym;
@@ -404,7 +418,7 @@ void TypeComposition (Type* lhs, const Type* rhs)
     FuncDesc*   F2;
     long LeftCount, RightCount;
 
-    /* Composite two types */
+    /* Compose two types */
     while (lhs->C != T_END) {
 
         /* Check if the end of the type string is reached */
@@ -417,17 +431,15 @@ void TypeComposition (Type* lhs, const Type* rhs)
 
         /* Check for special type elements */
         if (IsTypeFunc (lhs)) {
-            /* Composite the function descriptors */
+            /* Compose the function descriptors */
             F1 = GetFuncDesc (lhs);
             F2 = GetFuncDesc (rhs);
 
-            /* If one of both functions has an empty parameter list (which
-            ** does also mean, it is not a function definition, because the
-            ** flag is reset in this case), it is replaced by the other
-            ** definition, provided that the other has no default
-            ** promotions in the parameter list. If none of both parameter
-            ** lists is empty, we have to composite the parameter lists and
-            ** other attributes.
+            /* If F1 has an empty parameter list (which does also mean, it is
+            ** not a function definition, because the flag is reset in this
+            ** case), its declaration is replaced by the other declaration. If
+            ** neither of the parameter lists is empty, we have to compose them
+            ** as well as other attributes.
             */
             if ((F1->Flags & FD_EMPTY) == FD_EMPTY) {
                 if ((F2->Flags & FD_EMPTY) == 0) {
@@ -436,8 +448,12 @@ void TypeComposition (Type* lhs, const Type* rhs)
                     F1->Flags = F2->Flags;
                 }
             } else if ((F2->Flags & FD_EMPTY) == 0) {
-                /* Composite the parameter lists */
-                CompositeFuncParamList (F1, F2);
+                /* Compose the parameter lists */
+                ComposeFuncParamList (F1, F2);
+                /* Prefer non-old-style */
+                if ((F2->Flags & FD_OLDSTYLE) == 0) {
+                    F1->Flags &= ~FD_OLDSTYLE;
+                }
             }
         } else if (IsTypeArray (lhs)) {
             /* Check member count */

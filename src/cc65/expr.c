@@ -651,11 +651,11 @@ void DoDeferred (unsigned Flags, ExprDesc* Expr)
 }
 
 
-static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall, ExprDesc* ED)
-/* Parse a function parameter list, and pass the arguments to the called
-** function. Depending on several criteria, this may be done by just pushing
-** into each parameter separately, or creating the parameter frame once, and
-** then storing into this frame.
+static unsigned FunctionArgList (FuncDesc* Func, int IsFastcall, ExprDesc* ED)
+/* Parse the argument list of the called function and pass the arguments to it.
+** Depending on several criteria, this may be done by just pushing into each
+** parameter separately, or creating the parameter frame once and then storing
+** arguments into this frame one by one.
 ** The function returns the size of the arguments pushed in bytes.
 */
 {
@@ -860,7 +860,7 @@ static void FunctionCall (ExprDesc* Expr)
 {
     FuncDesc*     Func;           /* Function descriptor */
     int           IsFuncPtr;      /* Flag */
-    unsigned      ParamSize;      /* Number of parameter bytes */
+    unsigned      ArgSize;        /* Number of arguments bytes */
     CodeMark      Mark;
     int           PtrOffs = 0;    /* Offset of function pointer on stack */
     int           IsFastcall = 0; /* True if we are fast-calling the function */
@@ -932,8 +932,8 @@ static void FunctionCall (ExprDesc* Expr)
                      IsFastcallFunc (Expr->Type);
     }
 
-    /* Parse the parameter list */
-    ParamSize = FunctionParamList (Func, IsFastcall, Expr);
+    /* Parse the argument list and pass them to the called function */
+    ArgSize = FunctionArgList (Func, IsFastcall, Expr);
 
     /* We need the closing paren here */
     ConsumeRParen ();
@@ -952,11 +952,11 @@ static void FunctionCall (ExprDesc* Expr)
 
             /* Not a fastcall function - we may use the primary */
             if (PtrOnStack) {
-                /* If we have no parameters, the pointer is still in the
+                /* If we have no arguments, the pointer is still in the
                 ** primary. Remove the code to push it and correct the
                 ** stack pointer.
                 */
-                if (ParamSize == 0) {
+                if (ArgSize == 0) {
                     RemoveCode (&Mark);
                     PtrOnStack = 0;
                 } else {
@@ -969,7 +969,7 @@ static void FunctionCall (ExprDesc* Expr)
             }
 
             /* Call the function */
-            g_callind (FuncTypeOf (Expr->Type+1), ParamSize, PtrOffs);
+            g_callind (FuncTypeOf (Expr->Type+1), ArgSize, PtrOffs);
 
         } else {
 
@@ -978,7 +978,7 @@ static void FunctionCall (ExprDesc* Expr)
             ** Since fastcall functions may never be variadic, we can use the
             ** index register for this purpose.
             */
-            g_callind (CF_STACK, ParamSize, PtrOffs);
+            g_callind (CF_STACK, ArgSize, PtrOffs);
         }
 
         /* If we have a pointer on stack, remove it */
@@ -1030,9 +1030,9 @@ static void FunctionCall (ExprDesc* Expr)
 
             SB_Done (&S);
 
-            g_call (FuncTypeOf (Expr->Type), Func->WrappedCall->Name, ParamSize);
+            g_call (FuncTypeOf (Expr->Type), Func->WrappedCall->Name, ArgSize);
         } else {
-            g_call (FuncTypeOf (Expr->Type), (const char*) Expr->Name, ParamSize);
+            g_call (FuncTypeOf (Expr->Type), (const char*) Expr->Name, ArgSize);
         }
 
     }

@@ -468,7 +468,7 @@ Type* GetImplicitFuncType (void)
 
     /* Fill the type string */
     T[0].C   = T_FUNC | CodeAddrSizeQualifier ();
-    T[0].A.P = F;
+    T[0].A.F = F;
     T[1].C   = T_INT;
     T[2].C   = T_END;
 
@@ -685,13 +685,13 @@ const Type* GetUnderlyingType (const Type* Type)
         return IS_Get (&SignedChars) ? type_schar : type_uchar;
     } else if (IsTypeEnum (Type)) {
         /* This should not happen, but just in case */
-        if (Type->A.P == 0) {
+        if (Type->A.S == 0) {
             Internal ("Enum tag type error in GetUnderlyingTypeCode");
         }
 
         /* If incomplete enum type is used, just return its raw type */
-        if (((SymEntry*)Type->A.P)->V.E.Type != 0) {
-            return ((SymEntry*)Type->A.P)->V.E.Type;
+        if (Type->A.S->V.E.Type != 0) {
+            return Type->A.S->V.E.Type;
         }
     }
 
@@ -715,16 +715,16 @@ TypeCode GetUnderlyingTypeCode (const Type* Type)
     } else if (IsTypeEnum (Type)) {
 
         /* This should not happen, but just in case */
-        if (Type->A.P == 0) {
+        if (Type->A.S == 0) {
             Internal ("Enum tag type error in GetUnderlyingTypeCode");
         }
 
         /* Inspect the underlying type of the enum */
-        if (((SymEntry*)Type->A.P)->V.E.Type == 0) {
+        if (Type->A.S->V.E.Type == 0) {
             /* Incomplete enum type is used */
             return Underlying;
         }
-        TCode = UnqualifiedType (((SymEntry*)Type->A.P)->V.E.Type->C);
+        TCode = UnqualifiedType (Type->A.S->V.E.Type->C);
 
         /* Replace the type code with integer */
         Underlying = (TCode & ~T_MASK_TYPE);
@@ -792,7 +792,7 @@ unsigned SizeOf (const Type* T)
 
         case T_STRUCT:
         case T_UNION:
-            return ((SymEntry*) T->A.P)->V.S.Size;
+            return T->A.S->V.S.Size;
 
         case T_ARRAY:
             if (T->A.L == UNSPECIFIED) {
@@ -925,7 +925,7 @@ unsigned FuncTypeOf (const Type* T)
 /* Get the code generator flag for calling the function */
 {
     if (GetUnderlyingTypeCode (T) == T_FUNC) {
-        return (((FuncDesc*) T->A.P)->Flags & FD_VARIADIC) ? 0 : CF_FIXARGC;
+        return (T->A.F->Flags & FD_VARIADIC) ? 0 : CF_FIXARGC;
     } else {
         Error ("Illegal function type %04lX", T->C);
         return 0;
@@ -1121,7 +1121,7 @@ FuncDesc* GetFuncDesc (const Type* T)
     CHECK (IsClassFunc (T));
 
     /* Get the function descriptor from the type attributes */
-    return T->A.P;
+    return T->A.F;
 }
 
 
@@ -1138,7 +1138,7 @@ void SetFuncDesc (Type* T, FuncDesc* F)
     CHECK (IsClassFunc (T));
 
     /* Set the function descriptor */
-    T->A.P = F;
+    T->A.F = F;
 }
 
 
@@ -1226,7 +1226,7 @@ SymEntry* GetESUSymEntry (const Type* T)
     CHECK (IsClassStruct (T) || IsTypeEnum (T));
 
     /* Return the attribute */
-    return T->A.P;
+    return T->A.S;
 }
 
 
@@ -1238,7 +1238,7 @@ void SetESUSymEntry (Type* T, SymEntry* S)
     CHECK (IsClassStruct (T) || IsTypeEnum (T));
 
     /* Set the attribute */
-    T->A.P = S;
+    T->A.S = S;
 }
 
 

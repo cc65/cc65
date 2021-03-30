@@ -46,6 +46,7 @@
 #include "codeseg.h"
 #include "datatype.h"
 #include "error.h"
+#include "funcdesc.h"
 #include "global.h"
 #include "reginfo.h"
 #include "symtab.h"

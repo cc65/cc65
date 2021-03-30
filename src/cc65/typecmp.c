@@ -49,40 +49,6 @@
 
 
 
-static int ParamsHaveDefaultPromotions (const FuncDesc* F)
-/* Check if any of the parameters of function F has a default promotion. In
-** this case, the function is not compatible with an empty parameter name list
-** declaration.
-*/
-{
-    /* Get the symbol table */
-    const SymTable* Tab = F->SymTab;
-
-    /* Get the first parameter in the list */
-    const SymEntry* Sym = Tab->SymHead;
-
-    /* Walk over all parameters */
-    while (Sym && (Sym->Flags & SC_PARAM)) {
-
-        /* If this is an integer type, check if the promoted type is equal
-        ** to the original type. If not, we have a default promotion.
-        */
-        if (IsClassInt (Sym->Type)) {
-            if (IntPromotion (Sym->Type) != Sym->Type) {
-                return 1;
-            }
-        }
-
-        /* Get the pointer to the next param */
-        Sym = Sym->NextSym;
-    }
-
-    /* No default promotions in the parameter list */
-    return 0;
-}
-
-
-
 static int EqualFuncParams (const FuncDesc* F1, const FuncDesc* F2)
 /* Compare two function symbol tables regarding function parameters. Return 1
 ** if they are equal and 0 otherwise.
@@ -385,29 +351,16 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
                 F1 = GetFuncDesc (lhs);
                 F2 = GetFuncDesc (rhs);
 
-                /* If one of both functions has an empty parameter list (which
-                ** does also mean, it is not a function definition, because the
-                ** flag is reset in this case), it is considered equal to any
-                ** other definition, provided that the other has no default
-                ** promotions in the parameter list. If none of both parameter
-                ** lists is empty, we have to check the parameter lists and
-                ** other attributes.
+                /* If one of both function declarations has an empty parameter
+                ** list (which does also mean, it is not a function definition,
+                ** because the flag is reset in this case), it is ignored for
+                ** parameter comparison and considered equal to the other one,
+                ** provided both have the same return type and other attributes.
+                ** If neither of both parameter lists is empty, we have to check
+                ** the parameter lists.
                 */
-                if (F1->Flags & FD_EMPTY) {
-                    if ((F2->Flags & FD_EMPTY) == 0) {
-                        if (ParamsHaveDefaultPromotions (F2)) {
-                            /* Flags differ */
-                            SetResult (Result, TC_INCOMPATIBLE);
-                            return;
-                        }
-                    }
-                } else if (F2->Flags & FD_EMPTY) {
-                    if (ParamsHaveDefaultPromotions (F1)) {
-                        /* Flags differ */
-                        SetResult (Result, TC_INCOMPATIBLE);
-                        return;
-                    }
-                } else {
+                if ((F1->Flags & FD_EMPTY) == 0 &&
+                    (F2->Flags & FD_EMPTY) == 0) {
 
                     /* Check the remaining flags */
                     if ((F1->Flags & ~FD_IGNORE) != (F2->Flags & ~FD_IGNORE)) {

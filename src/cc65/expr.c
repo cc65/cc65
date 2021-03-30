@@ -4096,7 +4096,7 @@ static void hieQuest (ExprDesc* Expr)
 
 
             /* Get common type */
-            ResultType = ArithmeticConvert (Expr2.Type, Expr3.Type);
+            ResultType = TypeDup (ArithmeticConvert (Expr2.Type, Expr3.Type));
 
             /* Convert the third expression to this type if needed */
             TypeConversion (&Expr3, ResultType);
@@ -4140,22 +4140,22 @@ static void hieQuest (ExprDesc* Expr)
             }
         } else if (IsClassPtr (Expr2.Type) && Expr3IsNULL) {
             /* Result type is pointer, no cast needed */
-            ResultType = Expr2.Type;
+            ResultType = TypeDup (Expr2.Type);
         } else if (Expr2IsNULL && IsClassPtr (Expr3.Type)) {
             /* Result type is pointer, no cast needed */
-            ResultType = Expr3.Type;
+            ResultType = TypeDup (Expr3.Type);
         } else if (IsTypeVoid (Expr2.Type) && IsTypeVoid (Expr3.Type)) {
             /* Result type is void */
-            ResultType = type_void;
+            ResultType = TypeDup (type_void);
         } else {
             if (IsClassStruct (Expr2.Type) && IsClassStruct (Expr3.Type) &&
                 TypeCmp (Expr2.Type, Expr3.Type).C == TC_IDENTICAL) {
                 /* Result type is struct/union */
-                ResultType = Expr2.Type;
+                ResultType = TypeDup (Expr2.Type);
             } else {
                 TypeCompatibilityDiagnostic (Expr2.Type, Expr3.Type, 1,
                     "Incompatible types in ternary '%s' with '%s'");
-                ResultType = Expr2.Type;            /* Doesn't matter here */
+                ResultType = TypeDup (Expr2.Type);      /* Doesn't matter here */
             }
         }
 

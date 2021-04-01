@@ -10,6 +10,7 @@
 
         .export         __STARTUP__ : absolute = 1      ; Mark as startup
         .export         _exit, start, excexit, SP_save
+        .export         __LMARGN_save                   ; original LMARGN setting
 
         .import         initlib, donelib
         .import         callmain, zerobss
@@ -82,14 +83,10 @@ start:
 
 .endif
 
-; Call the module constructors.
-
-        jsr     initlib
-
 ; Set the left margin to 0.
 
         lda     LMARGN
-        sta     LMARGN_save
+        sta     __LMARGN_save
         ldy     #0
         sty     LMARGN
 
@@ -103,6 +100,10 @@ start:
 
         dey                     ; Set Y to $FF
         sty     CH              ; remove keypress which might be in the input buffer
+
+; Call the module constructors.
+
+        jsr     initlib
 
 ; Push the command-line arguments; and, call main().
 
@@ -119,7 +120,7 @@ excexit:jsr     donelib         ; Run module destructors; 'excexit' is called fr
 
 ; Restore the left margin.
 
-        lda     LMARGN_save
+        lda     __LMARGN_save
         sta     LMARGN
 
 ; Restore the kb mode.
@@ -196,7 +197,7 @@ excexit:jsr     donelib         ; Run module destructors; 'excexit' is called fr
 
 SP_save:        .res    1
 SHFLOK_save:    .res    1
-LMARGN_save:    .res    1
+__LMARGN_save:  .res    1
 .ifndef __ATARIXL__
 APPMHI_save:    .res    2
 .endif

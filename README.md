@@ -36,7 +36,10 @@ including
 - the Lynx console.
 - the Ohio Scientific Challenger 1P.
 - the Commander X16.
+<<<<<<< HEAD
 - the Synertek Systems Sym-1.
+=======
+>>>>>>> 2583dfb71 (Update README.md)
 
 The libraries are fairly portable, so creating a version for other 6502s
 shouldn't be too much work.

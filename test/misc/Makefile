@@ -64,6 +64,11 @@ $(WORKDIR)/bug760.$1.$2.prg: bug760.c | $(WORKDIR)
 	$(if $(QUIET),echo misc/bug760.$1.$2.prg)
 	$(NOT) $(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
 
+$(WORKDIR)/bug1437.$1.$2.prg: bug1437.c | $(WORKDIR)
+	@echo "FIXME: " $$@ "currently does not compile."
+	$(if $(QUIET),echo misc/bug1437.$1.$2.prg)
+	$(NOT) $(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
+
 # should compile, but gives an error
 $(WORKDIR)/bug1209-ind-goto-rev.$1.$2.prg: bug1209-ind-goto-rev.c | $(WORKDIR)
 	@echo "FIXME: " $$@ "currently does not compile."

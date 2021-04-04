@@ -2,7 +2,8 @@
 ; 2001-11-14, Piotr Fusik
 ; 2018-05-20, Christian Kruger
 ;
-; unsigned long __fastcall__ crc32 (unsigned long crc, unsigned char* buf,
+; unsigned long __fastcall__ crc32 (unsigned long crc,
+;                                   const unsigned char* buf,
 ;                                   unsigned len);
 ;
 

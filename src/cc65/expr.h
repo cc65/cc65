@@ -74,13 +74,6 @@ void Store (ExprDesc* Expr, const Type* StoreType);
 ** is NULL, use lval->Type instead.
 */
 
-int evalexpr (unsigned flags, void (*Func) (ExprDesc*), ExprDesc* Expr);
-/* Will evaluate an expression via the given function. If the result is a
-** constant, 0 is returned and the value is put in the Expr struct. If the
-** result is not constant, LoadExpr is called to bring the value into the
-** primary register and 1 is returned.
-*/
-
 void Expression0 (ExprDesc* Expr);
 /* Evaluate an expression via hie0 and put the result into the primary register.
 ** The expression is completely evaluated and all side effects complete.

@@ -8,6 +8,7 @@
 
         .export         CLRCH
         .export         BASIN
+        .export         CHRIN
         .export         STOP
         .export         GETIN
         .export         CLALL

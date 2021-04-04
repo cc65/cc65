@@ -85,6 +85,8 @@
 #define CH_LTEE         '+'
 #define CH_RTEE         '+'
 #define CH_CROSS        '+'
+#define CH_HLINE        '-'
+#define CH_VLINE        '|'
 #define CH_CURS_UP       11
 #define CH_CURS_DOWN     10
 #define CH_CURS_LEFT      8
@@ -98,8 +100,8 @@
 /* Masks for joy_read */
 #define JOY_UP_MASK     0x10
 #define JOY_DOWN_MASK   0x08
-#define JOY_LEFT_MASK   0x01
-#define JOY_RIGHT_MASK  0x02
+#define JOY_LEFT_MASK   0x02
+#define JOY_RIGHT_MASK  0x01
 #define JOY_BTN_1_MASK  0x04
 
 #define JOY_FIRE_MASK   JOY_BTN_1_MASK
@@ -119,3 +121,9 @@ void shoot();
 void explode();
 
 void kbdclick1();
+
+/* The following #defines will cause the matching functions calls in conio.h
+** to be overlaid by macros with the same names, saving the function call
+** overhead.
+*/
+#define _bordercolor(color)     COLOR_BLACK

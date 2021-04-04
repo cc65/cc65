@@ -1,7 +1,6 @@
 ;
-; Vic20 generic definitions. Stolen mostly from c64.inc - Steve Schmidtke
+; VIC-20 generic definitions. Stolen mostly from c64.inc -- Steve Schmidtke
 ;
-
 
 ; ---------------------------------------------------------------------------
 ; Zero page, Commodore stuff
@@ -35,6 +34,8 @@ CURS_COLOR      := $287         ; Color under the cursor
 KBDREPEAT       := $28a
 KBDREPEATRATE   := $28b
 KBDREPEATDELAY  := $28c
+
+RSSTAT          := $297         ; RS-232 device driver status
 
 ; ---------------------------------------------------------------------------
 ; Screen size

@@ -433,7 +433,7 @@ int FindArgLastUsageInOpenRange (CodeSeg* S, int First, int Last, CodeEntry* E, 
 /* Find the last index where the arg of E might be used or changed in the range (First, Last).
 ** ReloadY indicates whether Y is supposed to be reloaded.
 ** The code block in the range must be basic without any jump backwards.
-** Return the index of the found entry, or -1 if not found.
+** Return the index of the found entry, or First if not found.
 */
 
 int FindRegFirstChangeInOpenRange (CodeSeg* S, int First, int Last, unsigned what);
@@ -454,14 +454,14 @@ int FindRegLastChangeInOpenRange (CodeSeg* S, int First, int Last, unsigned what
 /* Find the last possible spot where the queried ZPs, registers and/or processor
 ** states might be changed in the range (First, Last). The code block in the
 ** range must be basic without any jump backwards.
-** Return the index of the found entry, or -1 if not found.
+** Return the index of the found entry, or First if not found.
 */
 
 int FindRegLastUseInOpenRange (CodeSeg* S, int First, int Last, unsigned what);
 /* Find the last possible spot where the queried ZPs, registers and/or processor
 ** states might be used in the range (First, Last). The code block in the range
 ** must be basic without any jump backwards.
-** Return the index of the found entry, or -1 if not found.
+** Return the index of the found entry, or First if not found.
 */
 
 /* End of codeoptutil.h */

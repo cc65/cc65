@@ -68,6 +68,8 @@ IntStack WarningsAreErrors  = INTSTACK(0);  /* Treat warnings as errors */
                                             /* Warn about: */
 IntStack WarnConstComparison= INTSTACK(1);  /* - constant comparison results */
 IntStack WarnNoEffect       = INTSTACK(1);  /* - statements without an effect */
+IntStack WarnPointerSign    = INTSTACK(1);  /* - pointer conversion to pointer differing in signedness */
+IntStack WarnPointerTypes   = INTSTACK(1);  /* - pointer conversion to incompatible pointer type */
 IntStack WarnRemapZero      = INTSTACK(1);  /* - remapping character code zero */
 IntStack WarnStructParam    = INTSTACK(0);  /* - structs passed by val */
 IntStack WarnUnknownPragma  = INTSTACK(1);  /* - unknown #pragmas */
@@ -87,6 +89,8 @@ static WarnMapEntry WarnMap[] = {
     { &WarnConstComparison,     "const-comparison"      },
     { &WarningsAreErrors,       "error"                 },
     { &WarnNoEffect,            "no-effect"             },
+    { &WarnPointerSign,         "pointer-sign"          },
+    { &WarnPointerTypes,        "pointer-types"         },
     { &WarnRemapZero,           "remap-zero"            },
     { &WarnStructParam,         "struct-param"          },
     { &WarnUnknownPragma,       "unknown-pragma"        },

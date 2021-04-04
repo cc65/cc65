@@ -59,6 +59,7 @@
 #include "stackptr.h"
 #include "symentry.h"
 #include "typecmp.h"
+#include "typeconv.h"
 #include "symtab.h"
 
 
@@ -92,6 +93,7 @@ static SymTable*        SymTab0         = 0;
 static SymTable*        SymTab          = 0;
 static SymTable*        TagTab0         = 0;
 static SymTable*        TagTab          = 0;
+static SymTable*        FieldTab        = 0;
 static SymTable*        LabelTab        = 0;
 static SymTable*        SPAdjustTab     = 0;
 static SymTable*        FailSafeTab     = 0;    /* For errors */
@@ -390,9 +392,9 @@ void EnterStructLevel (void)
     ** nested in struct scope are NOT local to the struct but visible in the
     ** outside scope. So we will NOT create a new struct or enum table.
     */
-    S = NewSymTable (SYMTAB_SIZE_BLOCK);
-    S->PrevTab  = SymTab;
-    SymTab      = S;
+    S = NewSymTable (SYMTAB_SIZE_STRUCT);
+    S->PrevTab  = FieldTab;
+    FieldTab    = S;
 }
 
 
@@ -401,7 +403,7 @@ void LeaveStructLevel (void)
 /* Leave a nested block for a struct definition */
 {
     /* Don't delete the table */
-    SymTab = SymTab->PrevTab;
+    FieldTab = FieldTab->PrevTab;
 }
 
 
@@ -548,6 +550,19 @@ SymEntry FindStructField (const Type* T, const char* Name)
 
 
 
+static int IsDistinctRedef (const Type* lhst, const Type* rhst, typecmpcode_t Code, typecmpflag_t Flags)
+/* Return if type compatibility result is "worse" than Code or if any bit of
+** qualifier Flags is set.
+*/
+{
+    typecmp_t Result = TypeCmp (lhst, rhst);
+    if (Result.C < Code || (Result.F & TCF_MASK_QUAL & Flags) != 0) {
+        return 1;
+    }
+    return 0;
+}
+
+
 static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags)
 /* Check and handle redefinition of existing symbols.
 ** Complete array sizes and function descriptors as well.
@@ -564,7 +579,7 @@ static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags
 
         /* Existing typedefs cannot be redeclared as anything different */
         if (SCType == SC_TYPEDEF) {
-            if (TypeCmp (E_Type, T) < TC_IDENTICAL) {
+            if (IsDistinctRedef (E_Type, T, TC_IDENTICAL, TCF_MASK_QUAL)) {
                 Error ("Conflicting types for typedef '%s'", Entry->Name);
                 Entry = 0;
             }
@@ -590,7 +605,7 @@ static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags
                 Entry = 0;
             } else {
                 /* New type must be compatible with the composite prototype */
-                if (TypeCmp (Entry->Type, T) < TC_EQUAL) {
+                if (IsDistinctRedef (E_Type, T, TC_EQUAL, TCF_MASK_QUAL)) {
                     Error ("Conflicting function types for '%s'", Entry->Name);
                     Entry = 0;
                 } else {
@@ -620,7 +635,7 @@ static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags
             ** is incomplete, complete it.
             */
             if ((Size != UNSPECIFIED && ESize != UNSPECIFIED && Size != ESize) ||
-                TypeCmp (T + 1, E_Type + 1) < TC_EQUAL) {
+                IsDistinctRedef (E_Type + 1, T + 1, TC_IDENTICAL, TCF_MASK_QUAL)) {
                 /* Conflicting element types */
                 Error ("Conflicting array types for '%s[]'", Entry->Name);
                 Entry = 0;
@@ -638,7 +653,7 @@ static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags
             if (SCType != E_SCType) {
                 Error ("Redefinition of '%s' as different kind of symbol", Entry->Name);
                 Entry = 0;
-            } else if (TypeCmp (E_Type, T) < TC_EQUAL) {
+            } else if (IsDistinctRedef (E_Type, T, TC_EQUAL, TCF_MASK_QUAL)) {
                 Error ("Conflicting types for '%s'", Entry->Name);
                 Entry = 0;
             } else if (E_SCType == SC_ENUMERATOR) {
@@ -850,7 +865,7 @@ SymEntry* AddBitField (const char* Name, const Type* T, unsigned Offs,
 /* Add a bit field to the local symbol table and return the symbol entry */
 {
     /* Do we have an entry with this name already? */
-    SymEntry* Entry = FindSymInTable (SymTab, Name, HashStr (Name));
+    SymEntry* Entry = FindSymInTable (FieldTab, Name, HashStr (Name));
     if (Entry) {
 
         /* We have a symbol with this name already */
@@ -882,7 +897,7 @@ SymEntry* AddBitField (const char* Name, const Type* T, unsigned Offs,
         }
 
         /* Add the entry to the symbol table */
-        AddSymEntry (SymTab, Entry);
+        AddSymEntry (FieldTab, Entry);
 
     }
 
@@ -1070,9 +1085,9 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
 
 
 SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs)
-/* Add a local symbol and return the symbol entry */
+/* Add a local or struct/union field symbol and return the symbol entry */
 {
-    SymTable* Tab = SymTab;
+    SymTable* Tab = (Flags & SC_STRUCTFIELD) == 0 ? SymTab : FieldTab;
     ident Ident;
 
     /* Do we have an entry with this name already? */
@@ -1266,6 +1281,16 @@ SymTable* GetGlobalSymTab (void)
 {
     return SymTab0;
 }
+
+
+
+SymTable* GetFieldSymTab (void)
+/* Return the current field symbol table */
+{
+    return FieldTab;
+}
+
+
 
 SymTable* GetLabelSymTab (void)
 /* Return the global symbol table */

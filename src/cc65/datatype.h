@@ -108,6 +108,7 @@ enum {
     T_QUAL_CONST    = 0x001000,
     T_QUAL_VOLATILE = 0x002000,
     T_QUAL_RESTRICT = 0x004000,
+    T_QUAL_CVR      = T_QUAL_CONST | T_QUAL_VOLATILE | T_QUAL_RESTRICT,
     T_QUAL_NEAR     = 0x008000,
     T_QUAL_FAR      = 0x010000,
     T_QUAL_ADDRSIZE = T_QUAL_NEAR | T_QUAL_FAR,
@@ -825,7 +826,14 @@ INLINE int IsQualCConv (const Type* T)
 
 int IsVariadicFunc (const Type* T) attribute ((const));
 /* Return true if this is a function type or pointer to function type with
-** variable parameter list
+** variable parameter list.
+** Check fails if the type is not a function or a pointer to function.
+*/
+
+int IsFastcallFunc (const Type* T) attribute ((const));
+/* Return true if this is a function type or pointer to function type by
+** __fastcall__ calling convention.
+** Check fails if the type is not a function or a pointer to function.
 */
 
 FuncDesc* GetFuncDesc (const Type* T) attribute ((const));

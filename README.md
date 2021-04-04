@@ -35,6 +35,7 @@ including
 - the Oric Telestrat.
 - the Lynx console.
 - the Ohio Scientific Challenger 1P.
+- the Commander X16.
 
 The libraries are fairly portable, so creating a version for other 6502s
 shouldn't be too much work.

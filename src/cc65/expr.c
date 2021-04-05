@@ -3132,36 +3132,20 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
 
     /* Deal with array ref */
     if (DoArrayRef) {
-        TypeCode Qualifiers = T_QUAL_NONE;
-        Type* ElementType;
-
         /* Check the types of array and subscript */
         if (IsClassPtr (lhst)) {
             if (!IsClassInt (rhst))  {
                 Error ("Array subscript is not an integer");
                 ED_MakeConstAbs (Expr, 0, GetCharArrayType (1));
-            } else if (IsTypeArray (lhst)) {
-                Qualifiers = GetQualifier (lhst);
             }
         } else if (IsClassInt (lhst)) {
             if (!IsClassPtr (rhst)) {
                 Error ("Subscripted value is neither array nor pointer");
                 ED_MakeConstAbs (Expr, 0, GetCharArrayType (1));
-            } else if (IsTypeArray (rhst)) {
-                Qualifiers = GetQualifier (rhst);
             }
         } else {
             Error ("Cannot subscript");
             ED_MakeConstAbs (Expr, 0, GetCharArrayType (1));
-        }
-
-        /* The element type has the combined qualifiers from itself and the array,
-        ** it is a member of (if any).
-        */
-        ElementType = Indirect (Expr->Type);
-        if (GetQualifier (ElementType) != (GetQualifier (ElementType) | Qualifiers)) {
-            ElementType = TypeDup (ElementType);
-            ElementType->C |= Qualifiers;
         }
 
         /* The final result is usually an lvalue expression of element type
@@ -3169,7 +3153,7 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
         ** assume the usual case first, and change it later if necessary.
         */
         ED_IndExpr (Expr);
-        Expr->Type = ElementType;
+        Expr->Type = Indirect (Expr->Type);
 
         /* An array element is actually a variable. So the rules for variables with
         ** respect to the reference type apply: If it's an array, it is virtually

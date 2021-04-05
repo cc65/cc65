@@ -212,9 +212,9 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 /* Handle the memcpy function */
 {
     /* Argument types: (void*, const void*, size_t) */
-    static const Type Arg1Type[] = { TYPE(T_PTR), TYPE(T_VOID), TYPE(T_END) };
-    static const Type Arg2Type[] = { TYPE(T_PTR), TYPE(T_VOID|T_QUAL_CONST), TYPE(T_END) };
-    static const Type Arg3Type[] = { TYPE(T_SIZE_T), TYPE(T_END) };
+    static const Type* Arg1Type = type_void_p;
+    static const Type* Arg2Type = type_c_void_p;
+    static const Type* Arg3Type = type_size_t;
 
     ArgDesc  Arg1, Arg2, Arg3;
     unsigned ParamSize = 0;
@@ -556,9 +556,9 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 /* Handle the memset function */
 {
     /* Argument types: (void*, int, size_t) */
-    static const Type Arg1Type[] = { TYPE(T_PTR), TYPE(T_VOID), TYPE(T_END) };
-    static const Type Arg2Type[] = { TYPE(T_INT), TYPE(T_END) };
-    static const Type Arg3Type[] = { TYPE(T_SIZE_T), TYPE(T_END) };
+    static const Type* Arg1Type = type_void_p;
+    static const Type* Arg2Type = type_int;
+    static const Type* Arg3Type = type_size_t;
 
     ArgDesc  Arg1, Arg2, Arg3;
     int      MemSet    = 1;             /* Use real memset if true */
@@ -782,8 +782,8 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 /* Handle the strcmp function */
 {
     /* Argument types: (const char*, const char*) */
-    static const Type Arg1Type[] = { TYPE(T_PTR), TYPE(T_CHAR|T_QUAL_CONST), TYPE(T_END) };
-    static const Type Arg2Type[] = { TYPE(T_PTR), TYPE(T_CHAR|T_QUAL_CONST), TYPE(T_END) };
+    static const Type* Arg1Type = type_c_char_p;
+    static const Type* Arg2Type = type_c_char_p;
 
     ArgDesc  Arg1, Arg2;
     unsigned ParamSize = 0;
@@ -983,8 +983,8 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 /* Handle the strcpy function */
 {
     /* Argument types: (char*, const char*) */
-    static const Type Arg1Type[] = { TYPE(T_PTR), TYPE(T_CHAR), TYPE(T_END) };
-    static const Type Arg2Type[] = { TYPE(T_PTR), TYPE(T_CHAR|T_QUAL_CONST), TYPE(T_END) };
+    static const Type* Arg1Type = type_char_p;
+    static const Type* Arg2Type = type_c_char_p;
 
     ArgDesc  Arg1, Arg2;
     unsigned ParamSize = 0;
@@ -1180,7 +1180,7 @@ ExitPoint:
 static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 /* Handle the strlen function */
 {
-    static const Type ArgType[] = { TYPE(T_PTR), TYPE(T_CHAR|T_QUAL_CONST), TYPE(T_END) };
+    static const Type* ArgType = type_c_char_p;
     ExprDesc    Arg;
     int         IsArray;
     int         IsPtr;

@@ -353,11 +353,6 @@ Type* Indirect (Type* T);
 ** given type points to.
 */
 
-const Type* IndirectConst (const Type* T);
-/* Do one indirection for the given type, that is, return the type where the
-** given type points to.
-*/
-
 Type* ArrayToPtr (Type* T);
 /* Convert an array to a pointer to it's first element */
 

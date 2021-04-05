@@ -141,7 +141,7 @@ static long ArrayElementCount (const ArgDesc* Arg)
 
 
 
-static void ParseArg (ArgDesc* Arg, Type* Type, ExprDesc* Expr)
+static void ParseArg (ArgDesc* Arg, const Type* Type, ExprDesc* Expr)
 /* Parse one argument but do not push it onto the stack. Make all fields in
 ** Arg valid.
 */
@@ -212,9 +212,9 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 /* Handle the memcpy function */
 {
     /* Argument types: (void*, const void*, size_t) */
-    static Type Arg1Type[] = { TYPE(T_PTR), TYPE(T_VOID), TYPE(T_END) };
-    static Type Arg2Type[] = { TYPE(T_PTR), TYPE(T_VOID|T_QUAL_CONST), TYPE(T_END) };
-    static Type Arg3Type[] = { TYPE(T_SIZE_T), TYPE(T_END) };
+    static const Type Arg1Type[] = { TYPE(T_PTR), TYPE(T_VOID), TYPE(T_END) };
+    static const Type Arg2Type[] = { TYPE(T_PTR), TYPE(T_VOID|T_QUAL_CONST), TYPE(T_END) };
+    static const Type Arg3Type[] = { TYPE(T_SIZE_T), TYPE(T_END) };
 
     ArgDesc  Arg1, Arg2, Arg3;
     unsigned ParamSize = 0;
@@ -556,9 +556,9 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 /* Handle the memset function */
 {
     /* Argument types: (void*, int, size_t) */
-    static Type Arg1Type[] = { TYPE(T_PTR), TYPE(T_VOID), TYPE(T_END) };
-    static Type Arg2Type[] = { TYPE(T_INT), TYPE(T_END) };
-    static Type Arg3Type[] = { TYPE(T_SIZE_T), TYPE(T_END) };
+    static const Type Arg1Type[] = { TYPE(T_PTR), TYPE(T_VOID), TYPE(T_END) };
+    static const Type Arg2Type[] = { TYPE(T_INT), TYPE(T_END) };
+    static const Type Arg3Type[] = { TYPE(T_SIZE_T), TYPE(T_END) };
 
     ArgDesc  Arg1, Arg2, Arg3;
     int      MemSet    = 1;             /* Use real memset if true */
@@ -782,8 +782,8 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 /* Handle the strcmp function */
 {
     /* Argument types: (const char*, const char*) */
-    static Type Arg1Type[] = { TYPE(T_PTR), TYPE(T_CHAR|T_QUAL_CONST), TYPE(T_END) };
-    static Type Arg2Type[] = { TYPE(T_PTR), TYPE(T_CHAR|T_QUAL_CONST), TYPE(T_END) };
+    static const Type Arg1Type[] = { TYPE(T_PTR), TYPE(T_CHAR|T_QUAL_CONST), TYPE(T_END) };
+    static const Type Arg2Type[] = { TYPE(T_PTR), TYPE(T_CHAR|T_QUAL_CONST), TYPE(T_END) };
 
     ArgDesc  Arg1, Arg2;
     unsigned ParamSize = 0;
@@ -791,10 +791,6 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     long     ECount2;
     int      IsArray;
     int      Offs;
-
-    /* Setup the argument type string */
-    Arg1Type[1].C = T_CHAR | T_QUAL_CONST;
-    Arg2Type[1].C = T_CHAR | T_QUAL_CONST;
 
     /* Argument #1 */
     ParseArg (&Arg1, Arg1Type, Expr);
@@ -987,17 +983,13 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 /* Handle the strcpy function */
 {
     /* Argument types: (char*, const char*) */
-    static Type Arg1Type[] = { TYPE(T_PTR), TYPE(T_CHAR), TYPE(T_END) };
-    static Type Arg2Type[] = { TYPE(T_PTR), TYPE(T_CHAR|T_QUAL_CONST), TYPE(T_END) };
+    static const Type Arg1Type[] = { TYPE(T_PTR), TYPE(T_CHAR), TYPE(T_END) };
+    static const Type Arg2Type[] = { TYPE(T_PTR), TYPE(T_CHAR|T_QUAL_CONST), TYPE(T_END) };
 
     ArgDesc  Arg1, Arg2;
     unsigned ParamSize = 0;
     long     ECount;
     unsigned L1;
-
-    /* Setup the argument type string */
-    Arg1Type[1].C = T_CHAR;
-    Arg2Type[1].C = T_CHAR | T_QUAL_CONST;
 
     /* Argument #1 */
     ParseArg (&Arg1, Arg1Type, Expr);
@@ -1188,7 +1180,7 @@ ExitPoint:
 static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 /* Handle the strlen function */
 {
-    static Type ArgType[] = { TYPE(T_PTR), TYPE(T_CHAR|T_QUAL_CONST), TYPE(T_END) };
+    static const Type ArgType[] = { TYPE(T_PTR), TYPE(T_CHAR|T_QUAL_CONST), TYPE(T_END) };
     ExprDesc    Arg;
     int         IsArray;
     int         IsPtr;
@@ -1198,9 +1190,6 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 
     ED_Init (&Arg);
     Arg.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
-
-    /* Setup the argument type string */
-    ArgType[1].C = T_CHAR | T_QUAL_CONST;
 
     /* Evaluate the parameter */
     hie1 (&Arg);

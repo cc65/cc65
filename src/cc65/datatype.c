@@ -948,20 +948,6 @@ Type* Indirect (Type* T)
 
 
 
-const Type* IndirectConst (const Type* T)
-/* Do one indirection for the given type, that is, return the type where the
-** given type points to.
-*/
-{
-    /* We are expecting a pointer expression */
-    CHECK (IsClassPtr (T));
-
-    /* Skip the pointer or array token itself */
-    return T + 1;
-}
-
-
-
 Type* ArrayToPtr (Type* T)
 /* Convert an array to a pointer to it's first element */
 {

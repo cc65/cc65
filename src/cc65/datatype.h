@@ -288,33 +288,6 @@ unsigned long GetIntegerTypeMax (const Type* Type);
 ** The type must have a known size.
 */
 
-Type* NewPointerTo (const Type* T);
-/* Return a type string that is "pointer to T". The type string is allocated
-** on the heap and may be freed after use.
-*/
-
-void PrintType (FILE* F, const Type* T);
-/* Print fulle name of the type */
-
-void PrintFuncSig (FILE* F, const char* Name, const Type* T);
-/* Print a function signature */
-
-void PrintRawType (FILE* F, const Type* T);
-/* Print a type string in raw hex format (for debugging) */
-
-int TypeHasAttr (const Type* T);
-/* Return true if the given type has attribute data */
-
-#if defined(HAVE_INLINE)
-INLINE void CopyTypeAttr (const Type* Src, Type* Dest)
-/* Copy attribute data from Src to Dest */
-{
-    Dest->A = Src->A;
-}
-#else
-#  define CopyTypeAttr(Src, Dest)       ((Dest)->A = (Src)->A)
-#endif
-
 #if defined(HAVE_INLINE)
 INLINE TypeCode UnqualifiedType (TypeCode T)
 /* Return the unqalified type code */
@@ -366,8 +339,38 @@ Type* IndirectModifiable (Type* T);
 ** given type points to.
 */
 
+Type* NewPointerTo (const Type* T);
+/* Return a type string that is "pointer to T". The type string is allocated
+** on the heap and may be freed after use.
+*/
+
+const Type* AddressOf (const Type* T);
+/* Return a type string that is "address of T". The type string is allocated
+** on the heap and may be freed after use.
+*/
+
 Type* ArrayToPtr (const Type* T);
 /* Convert an array to a pointer to it's first element */
+
+const Type* PtrConversion (const Type* T);
+/* If the type is a function, convert it to pointer to function. If the
+** expression is an array, convert it to pointer to first element. Otherwise
+** return T.
+*/
+
+const Type* IntPromotion (const Type* T);
+/* Apply the integer promotions to T and return the result. The returned type
+** string may be T if there is no need to change it.
+*/
+
+const Type* ArithmeticConvert (const Type* lhst, const Type* rhst);
+/* Perform the usual arithmetic conversions for binary operators. */
+
+const Type* SignedType (const Type* T);
+/* Get signed counterpart of the integral type */
+
+const Type* UnsignedType (const Type* T);
+/* Get unsigned counterpart of the integral type */
 
 #if defined(HAVE_INLINE)
 INLINE TypeCode GetRawType (const Type* T)
@@ -892,17 +895,6 @@ struct SymEntry* GetESUSymEntry (const Type* T) attribute ((const));
 void SetESUSymEntry (Type* T, struct SymEntry* S);
 /* Set the SymEntry pointer for an enum/struct/union type */
 
-const Type* IntPromotion (const Type* T);
-/* Apply the integer promotions to T and return the result. The returned type
-** string may be T if there is no need to change it.
-*/
-
-const Type* PtrConversion (const Type* T);
-/* If the type is a function, convert it to pointer to function. If the
-** expression is an array, convert it to pointer to first element. Otherwise
-** return T.
-*/
-
 TypeCode AddrSizeQualifier (unsigned AddrSize);
 /* Return T_QUAL_NEAR or T_QUAL_FAR depending on the address size */
 
@@ -925,6 +917,28 @@ INLINE TypeCode DataAddrSizeQualifier (void)
 #else
 #  define DataAddrSizeQualifier()      (AddrSizeQualifier (DataAddrSize))
 #endif
+
+int TypeHasAttr (const Type* T);
+/* Return true if the given type has attribute data */
+
+#if defined(HAVE_INLINE)
+INLINE void CopyTypeAttr (const Type* Src, Type* Dest)
+/* Copy attribute data from Src to Dest */
+{
+    Dest->A = Src->A;
+}
+#else
+#  define CopyTypeAttr(Src, Dest)       ((Dest)->A = (Src)->A)
+#endif
+
+void PrintType (FILE* F, const Type* T);
+/* Print fulle name of the type */
+
+void PrintFuncSig (FILE* F, const char* Name, const Type* T);
+/* Print a function signature */
+
+void PrintRawType (FILE* F, const Type* T);
+/* Print a type string in raw hex format (for debugging) */
 
 
 

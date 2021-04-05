@@ -146,6 +146,10 @@ enum {
     T_PTR       = T_TYPE_PTR      | T_CLASS_PTR    | T_SIGN_NONE     | T_SIZE_NONE,
     T_FUNC      = T_TYPE_FUNC     | T_CLASS_FUNC   | T_SIGN_NONE     | T_SIZE_NONE,
 
+    /* More types for convenience */
+    T_C_CHAR    = T_CHAR | T_QUAL_CONST,
+    T_C_VOID    = T_VOID | T_QUAL_CONST,
+
     /* Aliases */
     T_SIZE_T    = T_UINT,
 };
@@ -210,6 +214,12 @@ extern const Type type_void[];
 extern const Type type_size_t[];
 extern const Type type_float[];
 extern const Type type_double[];
+
+/* More predefined type strings */
+extern const Type type_char_p[];
+extern const Type type_c_char_p[];
+extern const Type type_void_p[];
+extern const Type type_c_void_p[];
 
 /* Forward for the SymEntry struct */
 struct SymEntry;

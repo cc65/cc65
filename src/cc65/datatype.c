@@ -72,6 +72,12 @@ const Type type_size_t[]    = { TYPE(T_SIZE_T), TYPE(T_END) };
 const Type type_float[]     = { TYPE(T_FLOAT),  TYPE(T_END) };
 const Type type_double[]    = { TYPE(T_DOUBLE), TYPE(T_END) };
 
+/* More predefined type strings */
+const Type type_char_p[]    = { TYPE(T_PTR),    TYPE(T_CHAR),   TYPE(T_END) };
+const Type type_c_char_p[]  = { TYPE(T_PTR),    TYPE(T_C_CHAR), TYPE(T_END) };
+const Type type_void_p[]    = { TYPE(T_PTR),    TYPE(T_VOID),   TYPE(T_END) };
+const Type type_c_void_p[]  = { TYPE(T_PTR),    TYPE(T_C_VOID), TYPE(T_END) };
+
 
 
 /*****************************************************************************/

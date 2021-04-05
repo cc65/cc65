@@ -311,7 +311,7 @@ const char* GetSymTypeName (const Type* T)
 
 
 
-void ChangeSymType (SymEntry* Entry, Type* T)
+void ChangeSymType (SymEntry* Entry, const Type* T)
 /* Change the type of the given symbol */
 {
     TypeFree (Entry->Type);

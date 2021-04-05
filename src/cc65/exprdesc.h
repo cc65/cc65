@@ -199,7 +199,7 @@ struct Literal;
 typedef struct ExprDesc ExprDesc;
 struct ExprDesc {
     struct SymEntry*    Sym;            /* Symbol table entry if known */
-    Type*               Type;           /* Type array of expression */
+    const Type*         Type;           /* Type array of expression */
     unsigned            Flags;
     uintptr_t           Name;           /* Name pointer or label number */
     long                IVal;           /* Integer value if expression constant */
@@ -544,7 +544,7 @@ int ED_GetStackOffs (const ExprDesc* Expr, int Offs);
 ** an additional offset in Offs.
 */
 
-ExprDesc* ED_MakeConstAbs (ExprDesc* Expr, long Value, Type* Type);
+ExprDesc* ED_MakeConstAbs (ExprDesc* Expr, long Value, const Type* Type);
 /* Replace Expr with an absolute const with the given value and type */
 
 ExprDesc* ED_MakeConstAbsInt (ExprDesc* Expr, long Value);
@@ -685,7 +685,7 @@ int ED_IsBool (const ExprDesc* Expr);
 void PrintExprDesc (FILE* F, ExprDesc* Expr);
 /* Print an ExprDesc */
 
-Type* ReplaceType (ExprDesc* Expr, const Type* NewType);
+const Type* ReplaceType (ExprDesc* Expr, const Type* NewType);
 /* Replace the type of Expr by a copy of Newtype and return the old type string */
 
 

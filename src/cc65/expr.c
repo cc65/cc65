@@ -150,7 +150,7 @@ void MarkedExprWithCheck (void (*Func) (ExprDesc*), ExprDesc* Expr)
 
 
 
-static Type* ArithmeticConvert (Type* lhst, Type* rhst)
+static const Type* ArithmeticConvert (const Type* lhst, const Type* rhst)
 /* Perform the usual arithmetic conversions for binary operators. */
 {
     /* https://port70.net/~nsz/c/c89/c89-draft.html#3.2.1.5
@@ -209,7 +209,7 @@ static Type* ArithmeticConvert (Type* lhst, Type* rhst)
 
 
 
-static unsigned typeadjust (ExprDesc* lhs, ExprDesc* rhs, int NoPush)
+static unsigned typeadjust (ExprDesc* lhs, const ExprDesc* rhs, int NoPush)
 /* Adjust the two values for a binary operation. lhs is expected on stack or
 ** to be constant, rhs is expected to be in the primary register or constant.
 ** The function will put the type of the result into lhs and return the
@@ -223,8 +223,8 @@ static unsigned typeadjust (ExprDesc* lhs, ExprDesc* rhs, int NoPush)
     unsigned flags;
 
     /* Get the type strings */
-    Type* lhst = lhs->Type;
-    Type* rhst = rhs->Type;
+    const Type* lhst = lhs->Type;
+    const Type* rhst = rhs->Type;
 
     /* Generate type adjustment code if needed */
     ltype = TypeOf (lhst);
@@ -865,7 +865,7 @@ static void FunctionCall (ExprDesc* Expr)
     int           PtrOffs = 0;    /* Offset of function pointer on stack */
     int           IsFastcall = 0; /* True if we are fast-calling the function */
     int           PtrOnStack = 0; /* True if a pointer copy is on stack */
-    Type*         ReturnType;
+    const Type*   ReturnType;
 
     /* Skip the left paren */
     NextToken ();
@@ -1121,7 +1121,7 @@ static void Primary (ExprDesc* E)
                 /* output its label */
                 E->Flags = E_RTYPE_RVAL | E_LOC_CODE | E_ADDRESS_OF;
                 E->Name = Entry->V.L.Label;
-                E->Type = PointerTo (type_void);
+                E->Type = NewPointerTo (type_void);
                 NextToken ();
             } else {
                 Error ("Computed gotos are a C extension, not supported with this --standard");
@@ -2052,7 +2052,7 @@ void hie10 (ExprDesc* Expr)
                 /* The & operator yields an rvalue address */
                 ED_AddrExpr (Expr);
             }
-            Expr->Type = PointerTo (Expr->Type);
+            Expr->Type = NewPointerTo (Expr->Type);
             break;
 
         case TOK_SIZEOF:
@@ -2380,7 +2380,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
         /* If lhs is a function, convert it to pointer to function */
         if (IsTypeFunc (Expr->Type)) {
-            Expr->Type = PointerTo (Expr->Type);
+            Expr->Type = NewPointerTo (Expr->Type);
         }
 
         /* Get the lhs on stack */
@@ -2402,7 +2402,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
         /* If rhs is a function, convert it to pointer to function */
         if (IsTypeFunc (Expr2.Type)) {
-            Expr2.Type = PointerTo (Expr2.Type);
+            Expr2.Type = NewPointerTo (Expr2.Type);
         }
 
         /* Check for a numeric constant expression */
@@ -2792,8 +2792,8 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
     ExprDesc Expr2;
     unsigned flags;             /* Operation flags */
     CodeMark Mark;              /* Remember code position */
-    Type* lhst;                 /* Type of left hand side */
-    Type* rhst;                 /* Type of right hand side */
+    const Type* lhst;           /* Type of left hand side */
+    const Type* rhst;           /* Type of right hand side */
     int lscale;
     int rscale;
     int AddDone;                /* No need to generate runtime code */
@@ -3189,8 +3189,8 @@ static void parsesub (ExprDesc* Expr)
 {
     ExprDesc Expr2;
     unsigned flags;             /* Operation flags */
-    Type* lhst;                 /* Type of left hand side */
-    Type* rhst;                 /* Type of right hand side */
+    const Type* lhst;           /* Type of left hand side */
+    const Type* rhst;           /* Type of right hand side */
     CodeMark Mark1;             /* Save position of output queue */
     CodeMark Mark2;             /* Another position in the queue */
     int rscale;                 /* Scale factor for pointer arithmetics */
@@ -4104,10 +4104,10 @@ static void hieQuest (ExprDesc* Expr)
             ** appropriately qualified void.
             */
             if (IsTypeVoid (Indirect (Expr2.Type))) {
-                ResultType = PointerTo (Indirect (Expr2.Type));
+                ResultType = NewPointerTo (Indirect (Expr2.Type));
                 ResultType[1].C |= GetQualifier (Indirect (Expr3.Type));
             } else if (IsTypeVoid (Indirect (Expr3.Type))) {
-                ResultType = PointerTo (Indirect (Expr3.Type));
+                ResultType = NewPointerTo (Indirect (Expr3.Type));
                 ResultType[1].C |= GetQualifier (Indirect (Expr2.Type));
             } else {
                 /* Must point to compatible types */
@@ -4115,7 +4115,7 @@ static void hieQuest (ExprDesc* Expr)
                     TypeCompatibilityDiagnostic (Expr2.Type, Expr3.Type,
                         1, "Incompatible pointer types in ternary: '%s' and '%s'");
                     /* Avoid further errors */
-                    ResultType = PointerTo (type_void);
+                    ResultType = NewPointerTo (type_void);
                 } else {
                     /* Result has the composite type */
                     ResultType = TypeDup (Expr2.Type);

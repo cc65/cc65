@@ -59,18 +59,18 @@
 
 
 /* Predefined type strings */
-Type type_char[]        = { TYPE(T_CHAR),   TYPE(T_END) };
-Type type_schar[]       = { TYPE(T_SCHAR),  TYPE(T_END) };
-Type type_uchar[]       = { TYPE(T_UCHAR),  TYPE(T_END) };
-Type type_int[]         = { TYPE(T_INT),    TYPE(T_END) };
-Type type_uint[]        = { TYPE(T_UINT),   TYPE(T_END) };
-Type type_long[]        = { TYPE(T_LONG),   TYPE(T_END) };
-Type type_ulong[]       = { TYPE(T_ULONG),  TYPE(T_END) };
-Type type_bool[]        = { TYPE(T_INT),    TYPE(T_END) };
-Type type_void[]        = { TYPE(T_VOID),   TYPE(T_END) };
-Type type_size_t[]      = { TYPE(T_SIZE_T), TYPE(T_END) };
-Type type_float[]       = { TYPE(T_FLOAT),  TYPE(T_END) };
-Type type_double[]      = { TYPE(T_DOUBLE), TYPE(T_END) };
+const Type type_char[]      = { TYPE(T_CHAR),   TYPE(T_END) };
+const Type type_schar[]     = { TYPE(T_SCHAR),  TYPE(T_END) };
+const Type type_uchar[]     = { TYPE(T_UCHAR),  TYPE(T_END) };
+const Type type_int[]       = { TYPE(T_INT),    TYPE(T_END) };
+const Type type_uint[]      = { TYPE(T_UINT),   TYPE(T_END) };
+const Type type_long[]      = { TYPE(T_LONG),   TYPE(T_END) };
+const Type type_ulong[]     = { TYPE(T_ULONG),  TYPE(T_END) };
+const Type type_bool[]      = { TYPE(T_INT),    TYPE(T_END) };
+const Type type_void[]      = { TYPE(T_VOID),   TYPE(T_END) };
+const Type type_size_t[]    = { TYPE(T_SIZE_T), TYPE(T_END) };
+const Type type_float[]     = { TYPE(T_FLOAT),  TYPE(T_END) };
+const Type type_double[]    = { TYPE(T_DOUBLE), TYPE(T_END) };
 
 
 
@@ -559,7 +559,8 @@ static unsigned TypeOfBySize (const Type* Type)
 }
 
 
-Type* PointerTo (const Type* T)
+
+Type* NewPointerTo (const Type* T)
 /* Return a type string that is "pointer to T". The type string is allocated
 ** on the heap and may be freed after use.
 */
@@ -590,7 +591,7 @@ void PrintType (FILE* F, const Type* T)
 
 
 
-void PrintFuncSig (FILE* F, const char* Name, Type* T)
+void PrintFuncSig (FILE* F, const char* Name, const Type* T)
 /* Print a function signature */
 {
     StrBuf Buf       = AUTO_STRBUF_INITIALIZER;
@@ -713,7 +714,6 @@ TypeCode GetUnderlyingTypeCode (const Type* Type)
         return IS_Get (&SignedChars) ? T_SCHAR : T_UCHAR;
 
     } else if (IsTypeEnum (Type)) {
-
         /* This should not happen, but just in case */
         if (Type->A.S == 0) {
             Internal ("Enum tag type error in GetUnderlyingTypeCode");
@@ -934,7 +934,7 @@ unsigned FuncTypeOf (const Type* T)
 
 
 
-Type* Indirect (Type* T)
+const Type* Indirect (const Type* T)
 /* Do one indirection for the given type, that is, return the type where the
 ** given type points to.
 */
@@ -948,11 +948,25 @@ Type* Indirect (Type* T)
 
 
 
-Type* ArrayToPtr (Type* T)
+Type* IndirectModifiable (Type* T)
+/* Do one indirection for the given type, that is, return the type where the
+** given type points to.
+*/
+{
+    /* We are expecting a pointer expression */
+    CHECK (IsClassPtr (T));
+
+    /* Skip the pointer or array token itself */
+    return T + 1;
+}
+
+
+
+Type* ArrayToPtr (const Type* T)
 /* Convert an array to a pointer to it's first element */
 {
     /* Return pointer to first element */
-    return PointerTo (GetElementType (T));
+    return NewPointerTo (GetElementType (T));
 }
 
 
@@ -1129,7 +1143,7 @@ void SetFuncDesc (Type* T, FuncDesc* F)
 
 
 
-Type* GetFuncReturn (Type* T)
+const Type* GetFuncReturn (const Type* T)
 /* Return a pointer to the return type of a function or pointer-to-function type */
 {
     if (UnqualifiedType (T->C) == T_PTR) {
@@ -1146,10 +1160,27 @@ Type* GetFuncReturn (Type* T)
 
 
 
-FuncDesc* GetFuncDefinitionDesc (Type* T)
+Type* GetFuncReturnModifiable (Type* T)
+/* Return a non-const pointer to the return type of a function or pointer-to-function type */
+{
+    if (UnqualifiedType (T->C) == T_PTR) {
+        /* Pointer to function */
+        ++T;
+    }
+
+    /* Be sure it's a function type */
+    CHECK (IsClassFunc (T));
+
+    /* Return a pointer to the return type */
+    return T + 1;
+}
+
+
+
+const FuncDesc* GetFuncDefinitionDesc (const Type* T)
 /* Get the function descriptor of the function definition */
 {
-    FuncDesc* D;
+    const FuncDesc* D;
 
     /* Be sure it's a function type */
     CHECK (IsClassFunc (T));
@@ -1182,7 +1213,7 @@ void SetElementCount (Type* T, long Count)
 
 
 
-Type* GetElementType (Type* T)
+const Type* GetElementType (const Type* T)
 /* Return the element type of the given array type. */
 {
     CHECK (IsTypeArray (T));
@@ -1191,7 +1222,7 @@ Type* GetElementType (Type* T)
 
 
 
-Type* GetBaseElementType (Type* T)
+const Type* GetBaseElementType (const Type* T)
 /* Return the base element type of a given type. If T is not an array, this
 ** will return. Otherwise it will return the base element type, which means
 ** the element type that is not an array.
@@ -1229,7 +1260,7 @@ void SetESUSymEntry (Type* T, SymEntry* S)
 
 
 
-Type* IntPromotion (Type* T)
+const Type* IntPromotion (const Type* T)
 /* Apply the integer promotions to T and return the result. The returned type
 ** string may be T if there is no need to change it.
 */
@@ -1268,14 +1299,14 @@ Type* IntPromotion (Type* T)
 
 
 
-Type* PtrConversion (Type* T)
+const Type* PtrConversion (const Type* T)
 /* If the type is a function, convert it to pointer to function. If the
 ** expression is an array, convert it to pointer to first element. Otherwise
 ** return T.
 */
 {
     if (IsTypeFunc (T)) {
-        return PointerTo (T);
+        return NewPointerTo (T);
     } else if (IsTypeArray (T)) {
         return ArrayToPtr (T);
     } else {

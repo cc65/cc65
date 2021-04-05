@@ -136,7 +136,7 @@ static int CopyStruct (ExprDesc* LExpr, ExprDesc* RExpr)
 void Assignment (ExprDesc* Expr)
 /* Parse an assignment */
 {
-    Type* ltype = Expr->Type;
+    const Type* ltype = Expr->Type;
 
     ExprDesc Expr2;
     ED_Init (&Expr2);

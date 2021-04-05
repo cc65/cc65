@@ -64,8 +64,8 @@ void ShiftExpr (struct ExprDesc* Expr)
     CodeMark Mark1;
     CodeMark Mark2;
     token_t Tok;                        /* The operator token */
-    Type* EffType;                      /* Effective lhs type */
-    Type* ResultType;                   /* Type of the result */
+    const Type* EffType;                /* Effective lhs type */
+    const Type* ResultType;             /* Type of the result */
     unsigned ExprBits;                  /* Bits of the lhs operand */
     unsigned GenFlags;                  /* Generator flags */
     unsigned ltype;
@@ -193,7 +193,7 @@ void ShiftExpr (struct ExprDesc* Expr)
                 ED_IsLocQuasiConst (Expr) &&
                 Expr2.IVal >= 8) {
 
-                Type* OldType;
+                const Type* OldType;
 
                 /* Increase the address by one and decrease the shift count */
                 ++Expr->IVal;

@@ -198,18 +198,18 @@ struct Type {
 #define PTR_BITS        (8 * SIZEOF_PTR)
 
 /* Predefined type strings */
-extern Type type_char[];
-extern Type type_schar[];
-extern Type type_uchar[];
-extern Type type_int[];
-extern Type type_uint[];
-extern Type type_long[];
-extern Type type_ulong[];
-extern Type type_bool[];
-extern Type type_void[];
-extern Type type_size_t[];
-extern Type type_float[];
-extern Type type_double[];
+extern const Type type_char[];
+extern const Type type_schar[];
+extern const Type type_uchar[];
+extern const Type type_int[];
+extern const Type type_uint[];
+extern const Type type_long[];
+extern const Type type_ulong[];
+extern const Type type_bool[];
+extern const Type type_void[];
+extern const Type type_size_t[];
+extern const Type type_float[];
+extern const Type type_double[];
 
 /* Forward for the SymEntry struct */
 struct SymEntry;
@@ -280,7 +280,7 @@ unsigned long GetIntegerTypeMax (const Type* Type);
 ** The type must have a known size.
 */
 
-Type* PointerTo (const Type* T);
+Type* NewPointerTo (const Type* T);
 /* Return a type string that is "pointer to T". The type string is allocated
 ** on the heap and may be freed after use.
 */
@@ -288,7 +288,7 @@ Type* PointerTo (const Type* T);
 void PrintType (FILE* F, const Type* T);
 /* Print fulle name of the type */
 
-void PrintFuncSig (FILE* F, const char* Name, Type* T);
+void PrintFuncSig (FILE* F, const char* Name, const Type* T);
 /* Print a function signature */
 
 void PrintRawType (FILE* F, const Type* T);
@@ -348,12 +348,17 @@ unsigned TypeOf (const Type* T);
 unsigned FuncTypeOf (const Type* T);
 /* Get the code generator flag for calling the function */
 
-Type* Indirect (Type* T);
+const Type* Indirect (const Type* T);
 /* Do one indirection for the given type, that is, return the type where the
 ** given type points to.
 */
 
-Type* ArrayToPtr (Type* T);
+Type* IndirectModifiable (Type* T);
+/* Do one indirection for the given type, that is, return the type where the
+** given type points to.
+*/
+
+Type* ArrayToPtr (const Type* T);
 /* Convert an array to a pointer to it's first element */
 
 #if defined(HAVE_INLINE)
@@ -845,10 +850,13 @@ FuncDesc* GetFuncDesc (const Type* T) attribute ((const));
 void SetFuncDesc (Type* T, FuncDesc* F);
 /* Set the FuncDesc pointer in a function or pointer-to-function type */
 
-Type* GetFuncReturn (Type* T) attribute ((const));
+const Type* GetFuncReturn (const Type* T) attribute ((const));
 /* Return a pointer to the return type of a function or pointer-to-function type */
 
-FuncDesc* GetFuncDefinitionDesc (struct Type* T);
+Type* GetFuncReturnModifiable (Type* T) attribute ((const));
+/* Return a non-const pointer to the return type of a function or pointer-to-function type */
+
+const FuncDesc* GetFuncDefinitionDesc (const Type* T) attribute ((const));
 /* Get the function descriptor of the function definition */
 
 long GetElementCount (const Type* T);
@@ -861,10 +869,10 @@ void SetElementCount (Type* T, long Count);
 ** array type).
 */
 
-Type* GetElementType (Type* T);
+const Type* GetElementType (const Type* T);
 /* Return the element type of the given array type. */
 
-Type* GetBaseElementType (Type* T);
+const Type* GetBaseElementType (const Type* T);
 /* Return the base element type of a given type. If T is not an array, this
 ** will return. Otherwise it will return the base element type, which means
 ** the element type that is not an array.
@@ -876,12 +884,12 @@ struct SymEntry* GetESUSymEntry (const Type* T) attribute ((const));
 void SetESUSymEntry (Type* T, struct SymEntry* S);
 /* Set the SymEntry pointer for an enum/struct/union type */
 
-Type* IntPromotion (Type* T);
+const Type* IntPromotion (const Type* T);
 /* Apply the integer promotions to T and return the result. The returned type
 ** string may be T if there is no need to change it.
 */
 
-Type* PtrConversion (Type* T);
+const Type* PtrConversion (const Type* T);
 /* If the type is a function, convert it to pointer to function. If the
 ** expression is an array, convert it to pointer to first element. Otherwise
 ** return T.

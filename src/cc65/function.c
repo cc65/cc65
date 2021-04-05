@@ -191,7 +191,7 @@ unsigned F_GetParamSize (const Function* F)
 
 
 
-Type* F_GetReturnType (Function* F)
+const Type* F_GetReturnType (Function* F)
 /* Get the return type for the function */
 {
     return F->ReturnType;

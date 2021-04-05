@@ -325,7 +325,7 @@ const char* GetSymTypeName (const Type* T);
 ** Note: This may use a static buffer that could be overwritten by other calls.
 */
 
-void ChangeSymType (SymEntry* Entry, Type* T);
+void ChangeSymType (SymEntry* Entry, const Type* T);
 /* Change the type of the given symbol */
 
 void ChangeAsmName (SymEntry* Entry, const char* NewAsmName);

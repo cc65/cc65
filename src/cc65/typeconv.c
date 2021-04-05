@@ -58,9 +58,9 @@
 static void DoConversion (ExprDesc* Expr, const Type* NewType)
 /* Emit code to convert the given expression to a new type. */
 {
-    Type*    OldType;
-    unsigned OldBits;
-    unsigned NewBits;
+    const Type* OldType;
+    unsigned    OldBits;
+    unsigned    NewBits;
 
 
     /* Remember the old type */
@@ -371,8 +371,8 @@ static void ComposeFuncParamList (const FuncDesc* F1, const FuncDesc* F2)
     while (Sym1 && (Sym1->Flags & SC_PARAM) && Sym2 && (Sym2->Flags & SC_PARAM)) {
 
         /* Get the symbol types */
-        Type* Type1 = Sym1->Type;
-        Type* Type2 = Sym2->Type;
+        const Type* Type1 = Sym1->Type;
+        const Type* Type2 = Sym2->Type;
 
         /* If either of both functions is old style, apply the default
         ** promotions to the parameter type.

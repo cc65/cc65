@@ -153,65 +153,6 @@ void MarkedExprWithCheck (void (*Func) (ExprDesc*), ExprDesc* Expr)
 
 
 
-static const Type* ArithmeticConvert (const Type* lhst, const Type* rhst)
-/* Perform the usual arithmetic conversions for binary operators. */
-{
-    /* https://port70.net/~nsz/c/c89/c89-draft.html#3.2.1.5
-    ** Many binary operators that expect operands of arithmetic type cause conversions and yield
-    ** result types in a similar way. The purpose is to yield a common type, which is also the type
-    ** of the result. This pattern is called the usual arithmetic conversions.
-    */
-
-    /* There are additional rules for floating point types that we don't bother with, since
-    ** floating point types are not (yet) supported.
-    ** The integral promotions are performed on both operands.
-    */
-    lhst = IntPromotion (lhst);
-    rhst = IntPromotion (rhst);
-
-    /* If either operand has type unsigned long int, the other operand is converted to
-    ** unsigned long int.
-    */
-    if ((IsTypeLong (lhst) && IsSignUnsigned (lhst)) ||
-        (IsTypeLong (rhst) && IsSignUnsigned (rhst))) {
-        return type_ulong;
-    }
-
-    /* Otherwise, if one operand has type long int and the other has type unsigned int,
-    ** if a long int can represent all values of an unsigned int, the operand of type unsigned int
-    ** is converted to long int ; if a long int cannot represent all the values of an unsigned int,
-    ** both operands are converted to unsigned long int.
-    */
-    if ((IsTypeLong (lhst) && IsTypeInt (rhst) && IsSignUnsigned (rhst)) ||
-        (IsTypeLong (rhst) && IsTypeInt (lhst) && IsSignUnsigned (lhst))) {
-        /* long can represent all unsigneds, so we are in the first sub-case. */
-        return type_long;
-    }
-
-    /* Otherwise, if either operand has type long int, the other operand is converted to long int.
-    */
-    if (IsTypeLong (lhst) || IsTypeLong (rhst)) {
-        return type_long;
-    }
-
-    /* Otherwise, if either operand has type unsigned int, the other operand is converted to
-    ** unsigned int.
-    */
-    if ((IsTypeInt (lhst) && IsSignUnsigned (lhst)) ||
-        (IsTypeInt (rhst) && IsSignUnsigned (rhst))) {
-        return type_uint;
-    }
-
-    /* Otherwise, both operands have type int. */
-    CHECK (IsTypeInt (lhst));
-    CHECK (IsSignSigned (lhst));
-    CHECK (IsTypeInt (rhst));
-    CHECK (IsSignSigned (rhst));
-    return type_int;
-}
-
-
-
 static unsigned typeadjust (ExprDesc* lhs, const ExprDesc* rhs, int NoPush)
 /* Adjust the two values for a binary operation. lhs is expected on stack or
 ** to be constant, rhs is expected to be in the primary register or constant.
@@ -263,7 +204,7 @@ static unsigned typeadjust (ExprDesc* lhs, const ExprDesc* rhs, int NoPush)
 
 
 
-static void LimitExprValue (ExprDesc* Expr)
+void LimitExprValue (ExprDesc* Expr)
 /* Limit the constant value of the expression to the range of its type */
 {
     switch (GetUnderlyingTypeCode (Expr->Type)) {

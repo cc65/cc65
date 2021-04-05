@@ -44,6 +44,9 @@ void MarkedExprWithCheck (void (*Func) (ExprDesc*), ExprDesc* Expr);
 ** generated code.
 */
 
+void LimitExprValue (ExprDesc* Expr);
+/* Limit the constant value of the expression to the range of its type */
+
 void PushAddr (const ExprDesc* Expr);
 /* If the expression contains an address that was somehow evaluated,
 ** push this address on the stack. This is a helper function for all

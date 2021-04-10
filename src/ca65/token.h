@@ -138,6 +138,7 @@ typedef enum token_t {
     TOK_BYTE,
     TOK_CASE,
     TOK_CHARMAP,
+    TOK_CHARSET,
     TOK_CODE,
     TOK_CONCAT,
     TOK_CONDES,

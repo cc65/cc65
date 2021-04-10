@@ -125,7 +125,8 @@ const TargetProperties* GetTargetProperties (target_t Target);
 const char* GetTargetName (target_t Target);
 /* Return the name of a target */
 
-
+const unsigned char *GetCharTable(target_t Target, const char *name);
+/* Return the character translation table */
 
 /* End of target.h */
 #endif

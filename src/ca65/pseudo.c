@@ -653,6 +653,48 @@ static void DoCharMap (void)
 
 
 
+static void DoCharSet (void)
+/* Load/Save/Restore a character set */
+{
+    /* Must have an identifier */
+    if (CurTok.Tok != TOK_IDENT) {
+        ErrorSkip ("Identifier expected");
+        return;
+    }
+
+    SB_ToLower(&CurTok.SVal);
+    if (SB_CompareStr(&CurTok.SVal, "save") == 0) {
+       TgtSaveSet();
+    }
+    else if(SB_CompareStr(&CurTok.SVal, "restore") == 0) {
+       TgtRestoreSet();
+    }
+    else if(SB_CompareStr(&CurTok.SVal, "load") == 0)
+    {
+      NextTok ();
+      if (CurTok.Tok != TOK_STRCON) {
+            ErrorSkip ("String expected");
+            return;
+      }
+      /* Load translate table */
+      SB_ToLower(&CurTok.SVal);
+      SB_Terminate(&CurTok.SVal);
+      int res = TgtLoadSet(SB_GetConstBuf(&CurTok.SVal));
+      if (res==-1) {
+          ErrorSkip ("Invalid character set");
+          return;
+      }
+    }
+    else
+    {
+        ErrorSkip ("Invalid identifier");
+        return;
+    }
+    NextTok ();
+}
+
+
+
 static void DoCode (void)
 /* Switch to the code segment */
 {
@@ -2008,6 +2050,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoByte          },
     { ccNone,           DoCase          },
     { ccNone,           DoCharMap       },
+    { ccNone,           DoCharSet       },
     { ccNone,           DoCode          },
     { ccNone,           DoUnexpected,   },      /* .CONCAT */
     { ccNone,           DoConDes        },

@@ -269,3 +269,30 @@ const char* GetTargetName (target_t Target)
     /* Return the array entry */
     return GetTargetProperties (Target)->Name;
 }
+
+
+
+const unsigned char *GetCharTable(target_t Target, const char *name)
+{
+    if (strcmp(name,"atari") == 0)
+    {
+        return CTAtari;
+    }
+    else if (strcmp(name,"native") == 0)
+    {
+        return CTNone;
+    }
+    else if (strcmp(name,"osic1p") == 0)
+    {
+        return CTOSI;
+    }
+    else if (strcmp(name,"petscii") == 0)
+    {
+        return CTPET;
+    }
+    else if (strcmp(name,"target") == 0)
+    {
+        return GetTargetProperties (Target)->CharMap;
+    }
+    return 0; //Not found
+}

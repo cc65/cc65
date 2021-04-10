@@ -155,6 +155,7 @@ struct DotKeyword {
     { ".BYTE",          TOK_BYTE                },
     { ".CASE",          TOK_CASE                },
     { ".CHARMAP",       TOK_CHARMAP             },
+    { ".CHARSET",       TOK_CHARSET             },
     { ".CODE",          TOK_CODE                },
     { ".CONCAT",        TOK_CONCAT              },
     { ".CONDES",        TOK_CONDES              },

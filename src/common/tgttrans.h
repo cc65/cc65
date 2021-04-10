@@ -70,7 +70,16 @@ void TgtTranslateStrBuf (StrBuf* Buf);
 void TgtTranslateSet (unsigned Index, unsigned char C);
 /* Set the translation code for the given character */
 
+int TgtLoadSet(const char* name);
+/* Load a predefined translation table */
 
+void TgtSaveSet(void);
+/* Save the current translation table */
+
+void TgtRestoreSet(void);
+/* Restore a previously saved translation table.
+** If nothing was saved, restores the target table
+*/
 
 /* End of tgttrans.h */
 

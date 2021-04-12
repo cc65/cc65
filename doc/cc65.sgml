@@ -555,6 +555,8 @@ Here is a description of all the command line options:
         Warn when passing structs by value.
   <tag><tt/unknown-pragma/</tag>
         Warn about #pragmas that aren't recognized by cc65.
+  <tag><tt/unreachable-code/</tag>
+        Warn about unreachable code in cases of comparing constants, etc.
   <tag><tt/unused-label/</tag>
         Warn about unused labels.
   <tag><tt/unused-param/</tag>

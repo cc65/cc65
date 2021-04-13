@@ -54,6 +54,10 @@
 
 
 
+#ifdef _STDIO_H
+#warning Mixing stdio with conio can have unexpected results
+#endif
+
 #include <stdarg.h>
 #include <target.h>
 

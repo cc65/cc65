@@ -3250,6 +3250,20 @@ static void parsesub (ExprDesc* Expr)
     /* Get the rhs type */
     rhst = Expr2.Type;
 
+    if (IsClassPtr (lhst)) {
+        /* We'll have to scale the result */
+        rscale = PSizeOf (lhst);
+        /* We cannot scale by 0-size or unknown-size */
+        if (rscale == 0 && (IsClassPtr (rhst) || IsClassInt (rhst))) {
+            TypeCompatibilityDiagnostic (lhst, rhst,
+                1, "Invalid pointer types in subtraction: '%s' and '%s'");
+            /* Avoid further errors */
+            rscale = 1;
+        }
+        /* Generate code for pointer subtraction */
+        flags = CF_PTR;
+    }
+
     /* We can only do constant expressions for:
     ** - integer subtraction:
     **   - numeric - numeric
@@ -3266,24 +3280,14 @@ static void parsesub (ExprDesc* Expr)
     */
     if (IsClassPtr (lhst) && IsClassPtr (rhst)) {
 
-        /* Pointer diff */
-        if (TypeCmp (lhst, rhst).C >= TC_STRICT_COMPATIBLE) {
-            /* We'll have to scale the result */
-            rscale = PSizeOf (lhst);
-            /* We cannot scale by 0-size or unknown-size */
-            if (rscale == 0) {
-                TypeCompatibilityDiagnostic (lhst, rhst,
-                    1, "Invalid pointer types in subtraction: '%s' and '%s'");
-                /* Avoid further errors */
-                rscale = 1;
-            }
-        } else {
+        /* Pointer Diff. We've got the scale factor and flags above */
+        typecmp_t Cmp = TypeCmp (lhst, rhst);
+        if (Cmp.C < TC_STRICT_COMPATIBLE) {
             TypeCompatibilityDiagnostic (lhst, rhst,
                 1, "Incompatible pointer types in subtraction: '%s' and '%s'");
         }
 
         /* Operate on pointers, result type is an integer */
-        flags = CF_PTR;
         Expr->Type = type_int;
 
         /* Check for a constant rhs expression */
@@ -3338,10 +3342,7 @@ static void parsesub (ExprDesc* Expr)
 
             /* Both sides are constant. Check for pointer arithmetic */
             if (IsClassPtr (lhst) && IsClassInt (rhst)) {
-                /* Left is pointer, right is int, must scale rhs */
-                rscale = CheckedPSizeOf (lhst);
-                /* Operate on pointers, result type is a pointer */
-                flags = CF_PTR;
+                /* Pointer subtraction. We've got the scale factor and flags above */
             } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
                 /* Integer subtraction. We'll adjust the types later */
             } else {
@@ -3383,7 +3384,7 @@ static void parsesub (ExprDesc* Expr)
                         flags = typeadjust (Expr, &Expr2, 1);
                     }
                     /* Do the subtraction */
-                    g_dec (flags | CF_CONST, Expr2.IVal);
+                    g_dec (flags | CF_CONST, Expr2.IVal * rscale);
                 } else {
                     if (IsClassInt (lhst)) {
                         /* Adjust the types */
@@ -3391,6 +3392,7 @@ static void parsesub (ExprDesc* Expr)
                     }
                     /* Load rhs into the primary */
                     LoadExpr (CF_NONE, &Expr2);
+                    g_scale (TypeOf (rhst), rscale);
                     /* Generate code for the sub (the & is a hack here) */
                     g_sub (flags & ~CF_CONST, 0);
                 }
@@ -3402,10 +3404,7 @@ static void parsesub (ExprDesc* Expr)
 
             /* Left hand side is not constant, right hand side is */
             if (IsClassPtr (lhst) && IsClassInt (rhst)) {
-                /* Left is pointer, right is int, must scale rhs */
-                Expr2.IVal *= CheckedPSizeOf (lhst);
-                /* Operate on pointers, result type is a pointer */
-                flags = CF_PTR;
+                /* Pointer subtraction. We've got the scale factor and flags above */
             } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
                 /* Integer subtraction. We'll adjust the types later */
             } else {
@@ -3422,7 +3421,7 @@ static void parsesub (ExprDesc* Expr)
                     flags = typeadjust (Expr, &Expr2, 1);
                 }
                 /* Do the subtraction */
-                g_dec (flags | CF_CONST, Expr2.IVal);
+                g_dec (flags | CF_CONST, Expr2.IVal * rscale);
             } else {
                 if (IsClassInt (lhst)) {
                     /* Adjust the types */
@@ -3430,6 +3429,7 @@ static void parsesub (ExprDesc* Expr)
                 }
                 /* Load rhs into the primary */
                 LoadExpr (CF_NONE, &Expr2);
+                g_scale (TypeOf (rhst), rscale);
                 /* Generate code for the sub (the & is a hack here) */
                 g_sub (flags & ~CF_CONST, 0);
             }
@@ -3449,9 +3449,7 @@ static void parsesub (ExprDesc* Expr)
         /* Check for pointer arithmetic */
         if (IsClassPtr (lhst) && IsClassInt (rhst)) {
             /* Left is pointer, right is int, must scale rhs */
-            g_scale (CF_INT, CheckedPSizeOf (lhst));
-            /* Operate on pointers, result type is a pointer */
-            flags = CF_PTR;
+            g_scale (CF_INT, rscale);
         } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
             /* Adjust operand types */
             flags = typeadjust (Expr, &Expr2, 0);

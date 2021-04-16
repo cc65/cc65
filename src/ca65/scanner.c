@@ -1078,13 +1078,11 @@ Again:
         NextChar ();
 
         /* String like? */
-        if (C == '\'')
-        {
+        if (C == '\'') {
             CurTok.Flags |= TOK_FLAG_RAWSTR;
             goto HandleSingleQuote;
         }
-        if (C == '\"')
-        {
+        if (C == '\"') {
             CurTok.Flags |= TOK_FLAG_RAWSTR;
             goto HandleDoubleQuote;
         }

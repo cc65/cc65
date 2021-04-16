@@ -890,8 +890,7 @@ static ExprNode* FuncStrAt (void)
     ** the target character set if not a raw string.
     */
     C = SB_At (&Str, (unsigned)Index);
-    if (!(Flag & TOK_FLAG_RAWSTR))
-    {
+    if (!(Flag & TOK_FLAG_RAWSTR)) {
         C = TgtTranslateChar (C);
     }
 
@@ -1021,8 +1020,7 @@ static ExprNode* Factor (void)
             break;
 
         case TOK_CHARCON:
-            if (CurTok.Flags & TOK_FLAG_RAWSTR)
-            {
+            if (CurTok.Flags & TOK_FLAG_RAWSTR) {
                 N = GenLiteralExpr (CurTok.IVal);
             } else {
                 N = GenLiteralExpr (TgtTranslateChar (CurTok.IVal));

@@ -162,9 +162,8 @@ static void FuncConcat (void)
         }
 
         /* Append the string, translate if appropriate */
-        if (!(CurTok.Flags & TOK_FLAG_RAWSTR))
-        {
-            TgtTranslateStrBuf(&CurTok.SVal);
+        if (!(CurTok.Flags & TOK_FLAG_RAWSTR)) {
+            TgtTranslateStrBuf (&CurTok.SVal);
         }
         SB_Append (&Buf, &CurTok.SVal);
 

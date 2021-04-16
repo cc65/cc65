@@ -40,6 +40,7 @@
 #include "chartype.h"
 #include "check.h"
 #include "strbuf.h"
+#include "tgttrans.h"
 
 /* ca65 */
 #include "condasm.h"
@@ -160,7 +161,11 @@ static void FuncConcat (void)
             return;
         }
 
-        /* Append the string */
+        /* Append the string, translate if appropriate */
+        if (!(CurTok.Flags & TOK_FLAG_RAWSTR))
+        {
+            TgtTranslateStrBuf(&CurTok.SVal);
+        }
         SB_Append (&Buf, &CurTok.SVal);
 
         /* Skip the string token */
@@ -182,6 +187,8 @@ static void FuncConcat (void)
         Error ("')' expected");
     } else {
         CurTok.Tok = TOK_STRCON;
+        /* Make it raw to avoid further translation */
+        CurTok.Flags |= TOK_FLAG_RAWSTR;
         SB_Copy (&CurTok.SVal, &Buf);
         SB_Terminate (&CurTok.SVal);
     }

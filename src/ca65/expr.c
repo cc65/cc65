@@ -860,6 +860,7 @@ static ExprNode* FuncStrAt (void)
     StrBuf Str = STATIC_STRBUF_INITIALIZER;
     long Index;
     unsigned char C = 0;
+    int Flag;
 
     /* String constant expected */
     if (CurTok.Tok != TOK_STRCON) {
@@ -870,6 +871,7 @@ static ExprNode* FuncStrAt (void)
 
     /* Remember the string and skip it */
     SB_Copy (&Str, &CurTok.SVal);
+    Flag = CurTok.Flags;
     NextTok ();
 
     /* Comma must follow */
@@ -888,7 +890,7 @@ static ExprNode* FuncStrAt (void)
     ** the target character set if not a raw string.
     */
     C = SB_At (&Str, (unsigned)Index);
-    if (!(CurTok.Flags & TOK_FLAG_RAWSTR))
+    if (!(Flag & TOK_FLAG_RAWSTR))
     {
         C = TgtTranslateChar (C);
     }

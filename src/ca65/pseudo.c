@@ -1568,6 +1568,19 @@ static void DoPageLength (void)
 
 
 
+static void DoPopCharmap (void)
+/* Restore a charmap */
+{
+    if (TgtTranslateStackIsEmpty ()) {
+        ErrorSkip ("Charmap stack is empty");
+        return;
+    }
+
+    TgtTranslatePop ();
+}
+
+
+
 static void DoPopCPU (void)
 /* Pop an old CPU setting from the CPU stack */
 {
@@ -1653,6 +1666,16 @@ static void DoPSC02 (void)
 /* Switch to 65SC02 CPU */
 {
     SetCPU (CPU_65SC02);
+}
+
+
+
+static void DoPushCharmap (void)
+/* Save the current charmap */
+{
+    if (!TgtTranslatePush ()) {
+        ErrorSkip ("Charmap stack overflow");
+    }
 }
 
 
@@ -2101,10 +2124,12 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoUnexpected    },      /* .PARAMCOUNT */
     { ccNone,           DoPC02          },
     { ccNone,           DoPDTV          },
+    { ccNone,           DoPopCharmap    },
     { ccNone,           DoPopCPU        },
     { ccNone,           DoPopSeg        },
     { ccNone,           DoProc          },
     { ccNone,           DoPSC02         },
+    { ccNone,           DoPushCharmap   },
     { ccNone,           DoPushCPU       },
     { ccNone,           DoPushSeg       },
     { ccNone,           DoUnexpected    },      /* .REFERENCED */
@@ -2182,5 +2207,8 @@ void CheckPseudo (void)
     }
     if (!IS_IsEmpty (&CPUStack)) {
         Warning (1, "CPU stack is not empty");
+    }
+    if (!TgtTranslateStackIsEmpty ()) {
+        Warning (1, "Charmap stack is not empty");
     }
 }

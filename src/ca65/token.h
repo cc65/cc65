@@ -243,6 +243,7 @@ typedef enum token_t {
     TOK_RES,
     TOK_RIGHT,
     TOK_RODATA,
+    TOK_RSTRING,
     TOK_SCOPE,
     TOK_SEGMENT,
     TOK_SET,

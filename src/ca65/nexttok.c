@@ -624,7 +624,7 @@ static void FuncSPrintF (void)
 
 
 
-static void FuncString (void)
+static void FuncString (int Flag)
 /* Handle the .STRING function */
 {
     StrBuf Buf = STATIC_STRBUF_INITIALIZER;
@@ -670,6 +670,7 @@ static void FuncString (void)
         Error ("')' expected");
     } else {
         CurTok.Tok = TOK_STRCON;
+        CurTok.Flags |= (Flag & TOK_FLAG_RAWSTR);
         SB_Copy (&CurTok.SVal, &Buf);
         SB_Terminate (&CurTok.SVal);
     }
@@ -719,7 +720,11 @@ void NextTok (void)
                 break;
 
             case TOK_STRING:
-                FuncString ();
+                FuncString (TOK_FLAG_NONE);
+                break;
+
+            case TOK_RSTRING:
+                FuncString (TOK_FLAG_RAWSTR);
                 break;
 
             default:

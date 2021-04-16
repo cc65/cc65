@@ -2121,6 +2121,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoRes           },
     { ccNone,           DoInvalid       },      /* .RIGHT */
     { ccNone,           DoROData        },
+    { ccNone,           DoUnexpected    },      /* .RSTRING */
     { ccNone,           DoScope         },
     { ccNone,           DoSegment       },
     { ccNone,           DoUnexpected    },      /* .SET */

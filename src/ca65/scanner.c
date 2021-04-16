@@ -273,6 +273,7 @@ struct DotKeyword {
     { ".RES",           TOK_RES                 },
     { ".RIGHT",         TOK_RIGHT               },
     { ".RODATA",        TOK_RODATA              },
+    { ".RSTRING",       TOK_RSTRING             },
     { ".SCOPE",         TOK_SCOPE               },
     { ".SEGMENT",       TOK_SEGMENT             },
     { ".SET",           TOK_SET                 },

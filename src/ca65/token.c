@@ -66,9 +66,9 @@ void CopyToken (Token* Dst, const Token* Src)
 */
 {
     /* Copy the fields */
-    Dst->Tok  = Src->Tok;
-    Dst->WS   = Src->WS;
-    Dst->IVal = Src->IVal;
+    Dst->Tok   = Src->Tok;
+    Dst->Flags = Src->Flags;
+    Dst->IVal  = Src->IVal;
     SB_Copy (&Dst->SVal, &Src->SVal);
-    Dst->Pos  = Src->Pos;
+    Dst->Pos   = Src->Pos;
 }

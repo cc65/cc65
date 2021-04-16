@@ -433,8 +433,12 @@ static void DoASCIIZ (void)
             return;
         }
 
-        /* Translate into target charset and emit */
-        TgtTranslateStrBuf (&CurTok.SVal);
+        if (!(CurTok.Flags & TOK_FLAG_RAWSTR))
+        {
+            /* Translate into target charset */
+            TgtTranslateStrBuf (&CurTok.SVal);
+        }
+        /* Emit */
         EmitStrBuf (&CurTok.SVal);
         NextTok ();
         if (CurTok.Tok == TOK_COMMA) {
@@ -579,8 +583,12 @@ static void DoByte (void)
     /* Parse arguments */
     while (1) {
         if (CurTok.Tok == TOK_STRCON) {
-            /* A string, translate into target charset and emit */
-            TgtTranslateStrBuf (&CurTok.SVal);
+            if (!(CurTok.Flags & TOK_FLAG_RAWSTR))
+            {
+                /* A string, translate into target charset */
+                TgtTranslateStrBuf (&CurTok.SVal);
+            }
+            /* Emit */
             EmitStrBuf (&CurTok.SVal);
             NextTok ();
         } else {

@@ -707,7 +707,7 @@ static void OneLine (void)
         (CurTok.Tok == TOK_IDENT && Instr < 0 && Mac == 0)) {
 
         /* Did we have whitespace before the ident? */
-        int HadWS = CurTok.WS;
+        int HadWS = CurTok.Flags & TOK_FLAG_WS ;
 
         /* Generate the symbol table entry, then skip the name */
         Sym = ParseAnySymName (SYM_ALLOC_NEW);

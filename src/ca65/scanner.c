@@ -901,8 +901,10 @@ Restart:
     }
 
 Again:
+    CurTok.Flags = TOK_FLAG_NONE;
     /* Skip whitespace, remember if we had some */
-    if ((CurTok.WS = IsBlank (C)) != 0) {
+    if (IsBlank (C) != 0) {
+        CurTok.Flags = TOK_FLAG_WS;
         do {
             NextChar ();
         } while (IsBlank (C));
@@ -1065,6 +1067,40 @@ Again:
 
         /* This is an integer constant */
         CurTok.Tok = TOK_INTCON;
+        return;
+    }
+
+    /* Is this a raw string? */
+    if (C == 'r') {
+
+        /* Remember and skip the raw marker */
+        NextChar ();
+
+        /* String like? */
+        if (C == '\'')
+        {
+            CurTok.Flags |= TOK_FLAG_RAWSTR;
+            goto HandleSingleQuote;
+        }
+        if (C == '\"')
+        {
+            CurTok.Flags |= TOK_FLAG_RAWSTR;
+            goto HandleDoubleQuote;
+        }
+
+        /* Just an identifier */
+        SB_AppendChar (&CurTok.SVal, 'r');
+        ReadIdent ();
+
+        if ((M = FindDefine (&CurTok.SVal)) != 0) {
+            /* This is a define style macro - expand it */
+                MacExpandStart (M);
+                goto Restart;
+        }
+
+        /* Just an identifier */
+        CurTok.Tok = TOK_IDENT;
+
         return;
     }
 
@@ -1435,6 +1471,7 @@ CharAgain:
             CurTok.Tok = TOK_NOT;
             return;
 
+HandleSingleQuote:
         case '\'':
             /* Hack: If we allow ' as terminating character for strings, read
             ** the following stuff as a string, and check for a one character
@@ -1468,6 +1505,7 @@ CharAgain:
             }
             return;
 
+HandleDoubleQuote:
         case '\"':
             ReadStringConst ('\"');
             CurTok.Tok = TOK_STRCON;

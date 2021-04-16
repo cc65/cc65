@@ -269,13 +269,18 @@ typedef enum token_t {
     TOK_COUNT           /* Count of tokens */
 } token_t;
 
+typedef enum flags_t {
+    TOK_FLAG_NONE   = 0x0000,
+    TOK_FLAG_WS     = 0x0001,
+    TOK_FLAG_RAWSTR = 0x0002
+} flags_t;
 
 
 /* Complete token including attributes and flags */
 typedef struct Token Token;
 struct Token {
     token_t     Tok;            /* The actual token value */
-    int         WS;             /* Flag for "whitespace before token" */
+    int         Flags;          /* Flags for the token */
     long        IVal;           /* Integer attribute value */
     StrBuf      SVal;           /* String attribute value */
     FilePos     Pos;            /* Position from which token was read */
@@ -284,7 +289,7 @@ struct Token {
 /* Initializer value for a token */
 #define STATIC_TOKEN_INITIALIZER {      \
     TOK_NONE,                           \
-    0,                                  \
+    TOK_FLAG_NONE,                      \
     0,                                  \
     STATIC_STRBUF_INITIALIZER,          \
     STATIC_FILEPOS_INITIALIZER          \

@@ -39,6 +39,8 @@
 #include "check.h"
 #include "target.h"
 #include "tgttrans.h"
+#include "coll.h"
+#include "xmalloc.h"
 
 
 
@@ -68,11 +70,16 @@ static unsigned char Tab[256] = {
     0xF0,0xF1,0xF2,0xF3,0xF4,0xF5,0xF6,0xF7,0xF8,0xF9,0xFA,0xFB,0xFC,0xFD,0xFE,0xFF,
 };
 
+#define MAX_CHARMAP_STACK   16
+static Collection CharmapStack = STATIC_COLLECTION_INITIALIZER;
+
 
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
+
+
 
 
 
@@ -126,4 +133,53 @@ void TgtTranslateSet (unsigned Index, unsigned char C)
 {
     CHECK (Index < sizeof (Tab));
     Tab[Index] = C;
+}
+
+
+
+int TgtTranslatePush (void)
+/* Pushes the current translation table to the internal stack
+** Returns 1 on success, 0 on stack full
+*/
+{
+    unsigned char* TempTab;
+
+    if (CollCount (&CharmapStack) >= MAX_CHARMAP_STACK) {
+        return 0;
+    }
+
+    TempTab = xmalloc (sizeof (Tab));
+    memcpy (TempTab, Tab, sizeof (Tab));
+
+    CollAppend (&CharmapStack, TempTab);
+    return 1;
+}
+
+
+
+int TgtTranslatePop (void)
+/* Pops a translation table from the internal stack into the current table
+** Returns 1 on success, 0 on stack empty
+*/
+{
+    unsigned char* TempTab;
+
+    if (CollCount (&CharmapStack) == 0) {
+        return 0;
+    }
+
+    TempTab = CollPop (&CharmapStack);
+
+    memcpy (Tab, TempTab, sizeof (Tab));
+
+    xfree (TempTab);
+    return 1;
+}
+
+
+
+int TgtTranslateStackIsEmpty (void)
+/* Returns 1 if the internal stack is empty */
+{
+    return CollCount (&CharmapStack) == 0;
 }

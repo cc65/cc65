@@ -885,9 +885,13 @@ static ExprNode* FuncStrAt (void)
     }
 
     /* Get the char, handle as unsigned. Be sure to translate it into
-    ** the target character set.
+    ** the target character set if not a raw string.
     */
-    C = TgtTranslateChar (SB_At (&Str, (unsigned)Index));
+    C = SB_At (&Str, (unsigned)Index);
+    if (!(CurTok.Flags & TOK_FLAG_RAWSTR))
+    {
+        C = TgtTranslateChar (C);
+    }
 
 ExitPoint:
     /* Free string buffer memory */
@@ -1015,7 +1019,12 @@ static ExprNode* Factor (void)
             break;
 
         case TOK_CHARCON:
-            N = GenLiteralExpr (TgtTranslateChar (CurTok.IVal));
+            if (CurTok.Flags & TOK_FLAG_RAWSTR)
+            {
+                N = GenLiteralExpr (CurTok.IVal);
+            } else {
+                N = GenLiteralExpr (TgtTranslateChar (CurTok.IVal));
+            }
             NextTok ();
             break;
 
@@ -1208,7 +1217,12 @@ static ExprNode* Factor (void)
             if (LooseCharTerm && CurTok.Tok == TOK_STRCON &&
                 SB_GetLen (&CurTok.SVal) == 1) {
                 /* A character constant */
-                N = GenLiteralExpr (TgtTranslateChar (SB_At (&CurTok.SVal, 0)));
+                if (CurTok.Flags & TOK_FLAG_RAWSTR)
+                {
+                    N = GenLiteralExpr (SB_At (&CurTok.SVal, 0));
+                } else {
+                    N = GenLiteralExpr (TgtTranslateChar (SB_At (&CurTok.SVal, 0)));
+                }
             } else {
                 N = GenLiteral0 ();     /* Dummy */
                 Error ("Syntax error");

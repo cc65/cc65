@@ -50,21 +50,6 @@
 
 
 /*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
-
-
-
-/* Map a generator function and its attributes to a token */
-typedef struct GenDesc {
-    token_t       Tok;                  /* Token to map to */
-    unsigned      Flags;                /* Flags for generator function */
-    void          (*Func) (unsigned, unsigned long);    /* Generator func */
-} GenDesc;
-
-
-
-/*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 

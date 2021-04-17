@@ -206,7 +206,7 @@ void SwitchStatement (void)
 
 
 void CaseLabel (void)
-/* Handle a case sabel */
+/* Handle a case label */
 {
     ExprDesc CaseExpr;          /* Case label expression */
     long     Val;               /* Case label value */

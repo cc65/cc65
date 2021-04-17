@@ -48,13 +48,6 @@
 
 
 
-/* Map a generator function and its attributes to a token */
-typedef struct GenDesc {
-    token_t       Tok;                  /* Token to map to */
-    unsigned      Flags;                /* Flags for generator function */
-    void          (*Func) (unsigned, unsigned long);    /* Generator func */
-} GenDesc;
-
 /* Descriptors for the operations */
 static GenDesc GenPASGN  = { TOK_PLUS_ASSIGN,   GEN_NOPUSH,     g_add };
 static GenDesc GenSASGN  = { TOK_MINUS_ASSIGN,  GEN_NOPUSH,     g_sub };
@@ -243,7 +236,7 @@ static const GenDesc* FindGen (token_t Tok, const GenDesc* Table)
 /* Find a token in a generator table */
 {
     while (Table->Tok != TOK_INVALID) {
-        if (Table->Tok == Tok) {
+        if ((token_t)Table->Tok == Tok) {
             return Table;
         }
         ++Table;

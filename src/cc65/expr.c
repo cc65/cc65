@@ -3775,7 +3775,6 @@ static void hieOr (ExprDesc *Expr)
     unsigned Flags = Expr->Flags & E_MASK_KEEP_SUBEXPR;
     int      AndOp;             /* Did we have a && operation? */
     unsigned TrueLab;           /* Jump to this label if true */
-    unsigned DoneLab;
     int      HasTrueJump = 0;
     CodeMark Start;
 
@@ -3902,18 +3901,22 @@ static void hieOr (ExprDesc *Expr)
 
     /* If we really had boolean ops, generate the end sequence if necessary */
     if (HasTrueJump) {
-        /* False case needs to jump over true case */
-        DoneLab = GetLocalLabel ();
         if ((Flags & E_EVAL_UNEVAL) != E_EVAL_UNEVAL) {
+            /* False case needs to jump over true case */
+            unsigned DoneLab = GetLocalLabel ();
             /* Load false only if the result is not true */
             g_getimmed (CF_INT | CF_CONST, 0, 0);   /* Load FALSE */
             g_falsejump (CF_NONE, DoneLab);
+ 
+            /* Load the true value */
+            g_defcodelabel (TrueLab);
+            g_getimmed (CF_INT | CF_CONST, 1, 0);   /* Load TRUE */
+            g_defcodelabel (DoneLab);
+        } else {
+            /* Load the true value */
+            g_defcodelabel (TrueLab);
+            g_getimmed (CF_INT | CF_CONST, 1, 0);   /* Load TRUE */
         }
-
-        /* Load the true value */
-        g_defcodelabel (TrueLab);
-        g_getimmed (CF_INT | CF_CONST, 1, 0);   /* Load TRUE */
-        g_defcodelabel (DoneLab);
 
         /* The result is an rvalue in primary */
         ED_FinalizeRValLoad (Expr);

@@ -26,8 +26,6 @@
 ;/*                                                                           */
 ;/*****************************************************************************/
 
-;/* No include guard here!  Multiple use in one file might be intentional. */
-
 .charmap $00, $00
 .charmap $01, $01
 .charmap $02, $02

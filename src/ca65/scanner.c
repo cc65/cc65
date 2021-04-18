@@ -234,6 +234,7 @@ struct DotKeyword {
     { ".LINECONT",      TOK_LINECONT            },
     { ".LIST",          TOK_LIST                },
     { ".LISTBYTES",     TOK_LISTBYTES           },
+    { ".LITERAL",       TOK_LITERAL             },
     { ".LOBYTE",        TOK_LOBYTE              },
     { ".LOBYTES",       TOK_LOBYTES             },
     { ".LOCAL",         TOK_LOCAL               },

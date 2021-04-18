@@ -2084,7 +2084,11 @@ Here's a list of all control commands and a description, what they do:
 
   This will put the string "Hello world" followed by a binary zero into
   the current segment. There may be more strings separated by commas, but
-  the binary zero is only appended once (after the last one).
+  the binary zero is only appended once (after the last one). Strings will
+  be translated using the current character mapping definition.
+
+See: <tt><ref id=".BYTE" name=".BYTE"></tt>,<tt><ref id=".CHARMAP" name=".CHARMAP"></tt>,
+     <tt><ref id=".LITERAL" name=".LITERAL"></tt>
 
 
 <sect1><tt>.ASSERT</tt><label id=".ASSERT"><p>
@@ -2180,7 +2184,8 @@ Here's a list of all control commands and a description, what they do:
 <sect1><tt>.BYT, .BYTE</tt><label id=".BYTE"><p>
 
   Define byte sized data. Must be followed by a sequence of (byte ranged)
-  expressions or strings.
+  expressions or strings. Strings will be translated using the current
+  character mapping definition.
 
   Example:
 
@@ -2188,6 +2193,9 @@ Here's a list of all control commands and a description, what they do:
         .byte   "Hello "
         .byt    "world", $0D, $00
   </verb></tscreen>
+
+See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CHARMAP"></tt>
+     <tt><ref id=".LITERAL" name=".LITERAL"></tt>
 
 
 <sect1><tt>.CASE</tt><label id=".CASE"><p>
@@ -2207,8 +2215,10 @@ Here's a list of all control commands and a description, what they do:
 
 <sect1><tt>.CHARMAP</tt><label id=".CHARMAP"><p>
 
-  Apply a custom mapping for characters. The command is followed by two
-  numbers. The first one is the index of the source character (range 0..255);
+  Apply a custom mapping for characters for the commands <tt><ref id=".ASCIIZ"
+  name=".ASCIIZ"></tt> and <tt><ref id=".BYTE" name=".BYTE"></tt>. The command
+  is followed by two numbers. The first one is the index of the source character
+  (range 0..255);
   the second one is the mapping (range 0..255). The mapping applies to all
   character and string constants <em/when/ they generate output; and, overrides
   a mapping table specified with the <tt><ref id="option-t" name="-t"></tt>
@@ -3354,6 +3364,22 @@ Here's a list of all control commands and a description, what they do:
         .listbytes      12              ; List the first 12 bytes
         .incbin         "data.bin"      ; Include large binary file
   </verb></tscreen>
+
+
+<sect1><tt>.LITERAL</tt><label id=".LITERAL"><p>
+
+  Define byte sized data. Must be followed by a sequence of (byte ranged)
+  expressions or strings. Strings will disregard the current character
+  mapping definition and will be interpreted literally.
+
+  Example:
+
+  <tscreen><verb>
+        .literal    "Hello "
+        .literal    "world", $0D, $00
+  </verb></tscreen>
+
+See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"></tt>
 
 
 <sect1><tt>.LOBYTES</tt><label id=".LOBYTES"><p>

@@ -278,6 +278,9 @@ struct __vera {
 #define VIA1    (*(volatile struct __6522 *)0x9F60)
 #define VIA2    (*(volatile struct __6522 *)0x9F70)
 
+#define RAM_BANK        (VIA1.pra)
+#define ROM_BANK        (VIA1.prb)
+
 /* A structure with the x16emu's settings registers */
 struct __emul {
     unsigned char       debug;          /* Boolean: debugging enabled */
@@ -295,7 +298,7 @@ struct __emul {
 #define EMULATOR        (*(volatile struct __emul *)0x9FB0)
 
 /* An array window into the half Mebibyte or two Mebibytes of banked RAM */
-#define BANK_RAM        ((unsigned char[0x2000])0xA000)
+#define BANK_RAM        ((unsigned char *)0xA000)
 
 
 

@@ -14,7 +14,9 @@
     <ProjectGuid>{4388D1AF-C7EA-4AD4-8E80-CA1FB7BF76BF}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
-  <Import Project="cc65.props" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="cc65.props" />
+  </ImportGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>

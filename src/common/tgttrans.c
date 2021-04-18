@@ -81,8 +81,6 @@ static Collection CharmapStack = STATIC_COLLECTION_INITIALIZER;
 
 
 
-
-
 void TgtTranslateInit (void)
 /* Initialize the translation tables */
 {

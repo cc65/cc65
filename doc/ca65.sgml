@@ -3601,6 +3601,21 @@ Here's a list of all control commands and a description, what they do:
   See: <tt><ref id=".P02" name=".P02"></tt>
 
 
+<sect1><tt>.POPCHARMAP</tt><label id=".POPCHARMAP"><p>
+
+  Pop the last character mapping from the stack, and activate it.
+
+  This command will switch back to the character mapping that was last pushed onto the
+  character mapping stack using the <tt><ref id=".PUSHCHARMAP" name=".PUSHCHARMAP"></tt>
+  command, and remove this entry from the stack.
+
+  The assembler will print an error message if the mappting stack is empty when
+  this command is issued.
+
+  See: <tt><ref id=".CHARMAP" name=".CHARMAP"></tt>, <tt><ref id=".PUSHCHARMAP"
+  name=".PUSHCHARMAP"></tt>
+
+
 <sect1><tt>.POPCPU</tt><label id=".POPCPU"><p>
 
   Pop the last CPU setting from the stack, and activate it.
@@ -3673,6 +3688,22 @@ Here's a list of all control commands and a description, what they do:
   See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PC02"
   name=".PC02"></tt>, <tt><ref id=".P816" name=".P816"></tt> and
   <tt><ref id=".P4510" name=".P4510"></tt>
+
+
+<sect1><tt>.PUSHCHARMAP</tt><label id=".PUSHCHARMAP"><p>
+
+  Push the currently active character mapping onto a stack. The stack has a size of 16
+  entries.
+
+  <tt/.PUSHCHARMAP/ allows together with <tt><ref id=".POPCHARMAP"
+  name=".POPCHARMAP"></tt> to switch to another character mapping and to restore the old
+  characther mapping later, without knowledge of the current mapping.
+
+  The assembler will print an error message if the character mapping stack is already full,
+  when this command is issued.
+
+  See: <tt><ref id=".CHARMAP" name=".CHARMAP"></tt>, <tt><ref id=".POPCHARMAP"
+  name=".POPCHARMAP"></tt>
 
 
 <sect1><tt>.PUSHCPU</tt><label id=".PUSHCPU"><p>

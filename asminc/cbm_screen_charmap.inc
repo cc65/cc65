@@ -12,8 +12,6 @@
 ;/*                                                                           */
 ;/*****************************************************************************/
 
-;/* No include guard here! Multiple use in one file may be intentional. */
-
 ; Char $00 -> c + 128
 .charmap $00, $80
 

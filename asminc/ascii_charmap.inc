@@ -26,10 +26,6 @@
 ;/*                                                                           */
 ;/*****************************************************************************/
 
-;/* No include guard here.  Each charmap header
-;** may be included many times in a source file.
-;*/
-
 ;/* ASCII */
 .charmap $00, $00
 .charmap $01, $01

@@ -28,8 +28,6 @@
 ;/*                                                                           */
 ;/*****************************************************************************/
 
-;/* No include guard here! Multiple use in one file may be intentional. */
-
 .charmap $00, $40
 .charmap $01, $41
 .charmap $02, $42

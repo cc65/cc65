@@ -210,6 +210,7 @@ typedef enum token_t {
     TOK_LINECONT,
     TOK_LIST,
     TOK_LISTBYTES,
+    TOK_LITERAL,
     TOK_LOBYTE,
     TOK_LOBYTES,
     TOK_LOCAL,

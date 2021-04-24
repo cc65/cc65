@@ -1878,24 +1878,6 @@ either a string or an expression value.
   </descrip>
 
 
-<sect1><tt>.STRAT</tt><label id=".STRAT"><p>
-
-  Builtin function. The function accepts a string and an index as
-  arguments and returns the value of the character at the given position
-  as an integer value. The index is zero based.
-
-  Example:
-
-  <tscreen><verb>
-        .macro  M       Arg
-                ; Check if the argument string starts with '#'
-                .if (.strat (Arg, 0) = '#')
-                ...
-                .endif
-        .endmacro
-  </verb></tscreen>
-
-
 <sect1><tt>.SPRINTF</tt><label id=".SPRINTF"><p>
 
   Builtin function. It expects a format string as first argument. The number
@@ -1912,6 +1894,24 @@ either a string or an expression value.
 
         ; Generate an identifier:
         .ident (.sprintf ("%s%03d", "label", num)):
+  </verb></tscreen>
+
+
+<sect1><tt>.STRAT</tt><label id=".STRAT"><p>
+
+  Builtin function. The function accepts a string and an index as
+  arguments and returns the value of the character at the given position
+  as an integer value. The index is zero based.
+
+  Example:
+
+  <tscreen><verb>
+        .macro  M       Arg
+                ; Check if the argument string starts with '#'
+                .if (.strat (Arg, 0) = '#')
+                ...
+                .endif
+        .endmacro
   </verb></tscreen>
 
 

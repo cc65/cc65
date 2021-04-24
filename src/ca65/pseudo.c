@@ -1734,8 +1734,7 @@ static void DoReferTo (void)
 /* Mark given symbol as referenced */
 {
     SymEntry* Sym = ParseAnySymName (SYM_ALLOC_NEW);
-    if (Sym)
-    {
+    if (Sym) {
         SymRef (Sym);
     }
 }

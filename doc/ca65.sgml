@@ -3213,7 +3213,8 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
         .endif
   </verb></tscreen>
 
-  See also: <tt><ref id=".REFERENCED" name=".REFERENCED"></tt>
+  See also: <tt><ref id=".REFERENCED" name=".REFERENCED"></tt>, and
+  <tt><ref id=".REFERTO" name=".REFERTO"></tt>
 
 
 <sect1><tt>.IMPORT</tt><label id=".IMPORT"><p>
@@ -3762,6 +3763,33 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   full, when this command is issued.
 
   See: <tt><ref id=".POPSEG" name=".POPSEG"></tt>
+
+
+<sect1><tt>.REFERTO</tt><label id=".REFERTO"><p>
+
+  Mark a symbol as referenced.
+
+  It is useful in combination with the <tt><ref id=".IFREF" name=".IFREF"></tt>
+  command. A subroutine with two entry points can be created. When the first
+  entry point is called, it sets some default value as an argument, and falls
+  through into the second entry point. <tt>.REFERTO</tt> helps to ensure that
+  the second part is included into binary when only the first entry point is
+  actually used from the code.
+
+  Example:
+
+  <tscreen><verb>
+        .ifref ResetValue               ; If this subroutine is used
+        ResetValue:                     ; Define it
+                lda     #0              ; Set a default value
+                .referto SetValue       ; Ensure that SetValue will be included
+        .endif
+        .ifref SetValue                 ; If this or previous subroutine is used
+        SetValue:
+                sta     Value
+                rts
+        .endif
+  </verb></tscreen>
 
 
 <sect1><tt>.RELOC</tt><label id=".RELOC"><p>

@@ -241,6 +241,7 @@ typedef enum token_t {
     TOK_PUSHCPU,
     TOK_PUSHSEG,
     TOK_REFERENCED,
+    TOK_REFERTO,
     TOK_RELOC,
     TOK_REPEAT,
     TOK_RES,

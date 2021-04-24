@@ -1730,6 +1730,18 @@ static void DoPushSeg (void)
 
 
 
+static void DoReferenced (void)
+/* Mark given symbol as referenced */
+{
+    SymEntry* Sym = ParseAnySymName (SYM_ALLOC_NEW);
+    if (Sym)
+    {
+        SymRef (Sym);
+    }
+}
+
+
+
 static void DoReloc (void)
 /* Enter relocatable mode */
 {
@@ -2153,7 +2165,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoPushCharmap   },
     { ccNone,           DoPushCPU       },
     { ccNone,           DoPushSeg       },
-    { ccNone,           DoUnexpected    },      /* .REFERENCED */
+    { ccNone,           DoReferenced    },      /* .REFERENCED */
     { ccNone,           DoReloc         },
     { ccNone,           DoRepeat        },
     { ccNone,           DoRes           },

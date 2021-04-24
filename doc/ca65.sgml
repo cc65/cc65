@@ -1353,15 +1353,15 @@ writable.
 
 <sect>Pseudo functions<label id="pseudo-functions"><p>
 
-Pseudo functions expect their arguments in parenthesis, and they have a result,
-either a string or an expression.
+Pseudo functions expect their arguments in parentheses, and they have a result,
+either a string or an expression value.
 
 
 <sect1><tt>.ADDRSIZE</tt><label id=".ADDRSIZE"><p>
 
-  The <tt/.ADDRSIZE/ function is used to return the interal address size
+  The <tt/.ADDRSIZE/ function is used to return the internal address size
   associated with a symbol. This can be helpful in macros when knowing the address
-  size of symbol can help with custom instructions.
+  size of a symbol can help with custom instructions.
 
   Example:
 
@@ -1389,7 +1389,7 @@ either a string or an expression.
 <sect1><tt>.BANK</tt><label id=".BANK"><p>
 
   The <tt/.BANK/ function is used to support systems with banked memory. The
-  argument is an expression with exactly one segment reference - usually a
+  argument is an expression with exactly one segment reference -- usually a
   label. The function result is the value of the <tt/bank/ attribute assigned
   to the run memory area of the segment. Please see the linker documentation
   for more information about memory areas and their attributes.
@@ -1397,13 +1397,13 @@ either a string or an expression.
   The value of <tt/.BANK/ can be used to switch memory so that a memory bank
   containing specific data is available.
 
-  The <tt/bank/ attribute is a 32 bit integer and so is the result of the
+  The <tt/bank/ attribute is a 32-bit integer, and so is the result of the
   <tt/.BANK/ function. You will have to use <tt><ref id=".LOBYTE"
   name=".LOBYTE"></tt> or similar functions to address just part of it.
 
-  Please note that <tt/.BANK/ will always get evaluated in the link stage, so
-  an expression containing <tt/.BANK/ can never be used where a constant known
-  result is expected (for example with <tt/.RES/).
+  Please note that <tt/.BANK/ always will get evaluated in the link stage, so
+  an expression containing <tt/.BANK/ never can be used where a constant, known
+  result is expected (for example, with <tt/.RES/).
 
   Example:
 
@@ -1440,7 +1440,7 @@ either a string or an expression.
 
 <sect1><tt>.BLANK</tt><label id=".BLANK"><p>
 
-  Builtin function. The function evaluates its argument in braces and yields
+  Builtin function. The function evaluates its argument in parentheses and yields
   "false" if the argument is non blank (there is an argument), and "true" if
   there is no argument.  The token list that makes up the function argument
   may optionally be enclosed in curly braces. This allows the inclusion of
@@ -1479,13 +1479,48 @@ either a string or an expression.
 
 <sect1><tt>.CONST</tt><label id=".CONST"><p>
 
-  Builtin function. The function evaluates its argument in braces and
+  Builtin function. The function evaluates its argument in parentheses and
   yields "true" if the argument is a constant expression (that is, an
   expression that yields a constant value at assembly time) and "false"
   otherwise. As an example, the .IFCONST statement may be replaced by
 
   <tscreen><verb>
         .if     .const(a + 3)
+  </verb></tscreen>
+
+
+<sect1><tt>.DEF, .DEFINED</tt><label id=".DEFINED"><p>
+
+  Builtin function. The function expects an identifier as argument in parentheses.
+  The argument is evaluated, and the function yields "true" if the identifier
+  is a symbol that already is defined somewhere in the source file up to the
+  current position. Otherwise, the function yields false. As an example, the
+  <tt><ref id=".IFDEF" name=".IFDEF"></tt> statement may be replaced by
+
+  <tscreen><verb>
+        .if     .defined(a)
+  </verb></tscreen>
+
+
+<sect1><tt>.DEFINEDMACRO</tt><label id=".DEFINEDMACRO"><p>
+
+  Builtin function. The function expects an identifier as argument in parentheses.
+  The argument is evaluated, and the function yields "true" if the identifier
+  already has been defined as the name of a macro. Otherwise, the function yields
+  false. Example:
+
+  <tscreen><verb>
+        .macro add foo
+                clc
+                adc foo
+        .endmacro
+
+        .if     .definedmacro(add)
+                add #$01
+        .else
+                clc
+                adc #$01
+        .endif
   </verb></tscreen>
 
 
@@ -1522,6 +1557,23 @@ either a string or an expression.
                 makelabel       "foo", "bar"
 
                 .word           foobar          ; Valid label
+  </verb></tscreen>
+
+
+<sect1><tt>.ISMNEM, .ISMNEMONIC</tt><label id=".ISMNEMONIC"><p>
+
+  Builtin function. The function expects an identifier as argument in parentheses.
+  The argument is evaluated, and the function yields "true" if the identifier
+  is defined as an instruction mnemonic that is recognized by the assembler.
+  Example:
+
+  <tscreen><verb>
+        .if     .not .ismnemonic(ina)
+                .macro ina
+                        clc
+                        adc #$01
+                .endmacro
+        .endif
   </verb></tscreen>
 
 
@@ -1719,7 +1771,7 @@ either a string or an expression.
 
 <sect1><tt>.REF, .REFERENCED</tt><label id=".REFERENCED"><p>
 
-  Builtin function. The function expects an identifier as argument in braces.
+  Builtin function. The function expects an identifier as argument in parentheses.
   The argument is evaluated, and the function yields "true" if the identifier
   is a symbol that has already been referenced somewhere in the source file up
   to the current position. Otherwise the function yields false. As an example,
@@ -1865,7 +1917,7 @@ either a string or an expression.
 
 <sect1><tt>.STRING</tt><label id=".STRING"><p>
 
-  Builtin function. The function accepts an argument in braces and converts
+  Builtin function. The function accepts an argument in parentheses and converts
   this argument into a string constant. The argument may be an identifier, or
   a constant numeric value.
 
@@ -1884,7 +1936,7 @@ either a string or an expression.
 
 <sect1><tt>.STRLEN</tt><label id=".STRLEN"><p>
 
-  Builtin function. The function accepts a string argument in braces and
+  Builtin function. The function accepts a string argument in parentheses and
   evaluates to the length of the string.
 
   Example:
@@ -1901,7 +1953,7 @@ either a string or an expression.
 
 <sect1><tt>.TCOUNT</tt><label id=".TCOUNT"><p>
 
-  Builtin function. The function accepts a token list in braces. The function
+  Builtin function. The function accepts a token list in parentheses. The function
   result is the number of tokens given as argument. The token list may
   optionally be enclosed into curly braces which are not considered part of
   the list and not counted. Enclosement in curly braces allows the inclusion
@@ -2366,7 +2418,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
 
   Start a define style macro definition. The command is followed by an
   identifier (the macro name) and optionally by a list of formal arguments
-  in braces.
+  in parentheses.
 
   Please note that <tt/.DEFINE/ shares most disadvantages with its C
   counterpart, so the general advice is, <bf/NOT/ do use <tt/.DEFINE/ if you
@@ -2388,41 +2440,6 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
        <tt><ref id=".MACRO" name=".MACRO"></tt>
 
   See also section <ref id="macros" name="Macros">.
-
-
-<sect1><tt>.DEF, .DEFINED</tt><label id=".DEFINED"><p>
-
-  Builtin function. The function expects an identifier as argument in braces.
-  The argument is evaluated, and the function yields "true" if the identifier
-  is a symbol that is already defined somewhere in the source file up to the
-  current position. Otherwise the function yields false. As an example, the
-  <tt><ref id=".IFDEF" name=".IFDEF"></tt> statement may be replaced by
-
-  <tscreen><verb>
-        .if     .defined(a)
-  </verb></tscreen>
-
-
-<sect1><tt>.DEFINEDMACRO</tt><label id=".DEFINEDMACRO"><p>
-
-  Builtin function. The function expects an identifier as argument in braces.
-  The argument is evaluated, and the function yields "true" if the identifier
-  has already been defined as the name of a macro. Otherwise the function yields
-  false. Example:
-
-  <tscreen><verb>
-        .macro add foo
-                clc
-                adc foo
-        .endmacro
-
-        .if     .definedmacro(add)
-                add #$01
-        .else
-                clc
-                adc #$01
-        .endif
-  </verb></tscreen>
 
 
 <sect1><tt>.DESTRUCTOR</tt><label id=".DESTRUCTOR"><p>
@@ -3292,23 +3309,6 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
   See the <tt><ref id=".CONDES" name=".CONDES"></tt> command and the separate
   section <ref id="condes" name="Module constructors/destructors"> explaining
   the feature in more detail.
-
-
-<sect1><tt>.ISMNEM, .ISMNEMONIC</tt><label id=".ISMNEMONIC"><p>
-
-  Builtin function. The function expects an identifier as argument in braces.
-  The argument is evaluated, and the function yields "true" if the identifier
-  is defined as an instruction mnemonic that is recognized by the assembler.
-  Example:
-
-  <tscreen><verb>
-        .if     .not .ismnemonic(ina)
-                .macro ina
-                        clc
-                        adc #$01
-                .endmacro
-        .endif
-  </verb></tscreen>
 
 
 <sect1><tt>.LINECONT</tt><label id=".LINECONT"><p>
@@ -4399,8 +4399,8 @@ different:
         For this macro type, the number of actual parameters must match
         exactly the number of formal parameters.
 
-        To make this possible, formal parameters are enclosed in braces when
-        defining the macro. If there are no parameters, the empty braces may
+        To make this possible, formal parameters are enclosed in parentheses when
+        defining the macro. If there are no parameters, the empty parentheses may
         be omitted.
 
 <item>  Since <tt><ref id=".DEFINE" name=".DEFINE"></tt> style macros may not
@@ -4450,8 +4450,8 @@ Macros with parameters may also be useful:
 
 Note that, while formal parameters have to be placed in parentheses,
 the actual argument used when invoking the macro should not be.
-The invoked arguments are separated by commas only, if parentheses are
-used by accident they will become part of the replaced token.
+The invoked arguments are separated by commas only; if parentheses are
+used by accident, they will become part of the replaced token.
 
 If you wish to have an expression follow the macro invocation, the
 last parameter can be enclosed in curly braces {} to indicate the end of that

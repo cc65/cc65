@@ -510,6 +510,22 @@ void MacDef (unsigned Style)
             }
         }
 
+        if (CurTok.Tok == TOK_INCLUDE) {
+            /* Include another file */
+            NextTok ();
+            /* Name must follow */
+            if (CurTok.Tok != TOK_STRCON) {
+                ErrorSkip ("String constant expected");
+            } else {
+                SB_Terminate (&CurTok.SVal);
+                if (NewInputFile (SB_GetConstBuf (&CurTok.SVal)) == 0) {
+                    /* Error opening the file, skip remainder of line */
+                    SkipUntilSep ();
+                }
+            }
+            NextTok ();
+        }
+
         /* Check for a .LOCAL declaration */
         if (CurTok.Tok == TOK_LOCAL && Style == MAC_STYLE_CLASSIC) {
 

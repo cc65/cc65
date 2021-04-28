@@ -3765,7 +3765,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   See: <tt><ref id=".POPSEG" name=".POPSEG"></tt>
 
 
-<sect1><tt>.REFERTO</tt><label id=".REFERTO"><p>
+<sect1><tt>.REFERTO, .REFTO</tt><label id=".REFERTO"><p>
 
   Mark a symbol as referenced.
 
@@ -3779,11 +3779,24 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   Example:
 
   <tscreen><verb>
+        .ifref NegateValue              ; If this subroutine is used
+        NegateValue:                    ; Define it
+                lda     #0
+                sec
+                sbc     Value
+            .ifref ResetValue           ; If the ResetValue is also used
+                jmp     SetValue        ; Jump over it
+            .else
+                .refto  SetValue        ; Ensure that SetValue will be included
+            .endif
+        .endif
+
         .ifref ResetValue               ; If this subroutine is used
         ResetValue:                     ; Define it
                 lda     #0              ; Set a default value
-                .referto SetValue       ; Ensure that SetValue will be included
+                .refto  SetValue        ; Ensure that SetValue will be included
         .endif
+
         .ifref SetValue                 ; If this or previous subroutine is used
         SetValue:
                 sta     Value

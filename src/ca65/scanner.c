@@ -272,6 +272,7 @@ struct DotKeyword {
     { ".REF",           TOK_REFERENCED          },
     { ".REFERENCED",    TOK_REFERENCED          },
     { ".REFERTO",       TOK_REFERTO             },
+    { ".REFTO",         TOK_REFERTO             },
     { ".RELOC",         TOK_RELOC               },
     { ".REPEAT",        TOK_REPEAT              },
     { ".RES",           TOK_RES                 },

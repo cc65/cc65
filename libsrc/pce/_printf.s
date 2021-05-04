@@ -1,7 +1,8 @@
 ;
 ; _printf: Basic layer for all printf type functions.
 ;
-; Ullrich von Bassewitz, 2000-10-21
+; 2000-10-21, Ullrich von Bassewitz
+; 2021-05-04, Greg King
 ;
 
         .include        "zeropage.inc"
@@ -243,7 +244,12 @@ __printf:
 
         pha                             ; Save low byte of ap
         ldy     #5
-Save:   lda     regbank,y
+
+; The PC-Engine puts the zero-page at $2000. The indexed-by-.Y addressing mode
+; doesn't allow zero-page addressing. Therefore, the operand must be redirected
+; explicitly.
+
+Save:   lda     regbank+$2000,y
         sta     RegSave,y
         dey
         bpl     Save
@@ -351,6 +357,10 @@ MainLoop:
 
         ldx     #5
 Rest:   lda     RegSave,x
+
+; The indexed-by-.X addressing mode does allow zero-page addressing.
+; Therefore, this operand doesn't need to be redirected explicitly.
+
         sta     regbank,x
         dex
         bpl     Rest

@@ -1388,7 +1388,10 @@ parameter with the <tt/#pragma/.
   the <tt/Y/ register if it wraps any variadic functions (they have "<tt/.../"
   in their prototypes).
 
-  The identifier is an 8-bit number that's set into <tt/tmp4/.
+  The identifier is an 8-bit number that's set into <tt/tmp4/. If the identifier
+  is "bank", then a <tt><htmlurl url="ca65.html#.BANK" name=".bank"></tt> operator will be used
+  to determine the number from the bank attribute defined in the linker config,
+  see <htmlurl url="ld65.html#MEMORY" name="Other MEMORY area attributes">.
 
   The address of a wrapped function is passed in <tt/ptr4/.  The wrapper can
   call that function by using "<tt/jsr callptr4/".

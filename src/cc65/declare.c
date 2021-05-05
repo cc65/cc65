@@ -1739,6 +1739,7 @@ static FuncDesc* ParseFuncDecl (void)
     SymEntry* Sym;
     SymEntry* WrappedCall;
     unsigned char WrappedCallData;
+    int WrappedCallUseBank;
 
     /* Create a new function descriptor */
     FuncDesc* F = NewFuncDesc ();
@@ -1791,10 +1792,11 @@ static FuncDesc* ParseFuncDecl (void)
     RememberFunctionLevel (F);
 
     /* Did we have a WrappedCall for this function? */
-    GetWrappedCall((void **) &WrappedCall, &WrappedCallData);
+    GetWrappedCall((void **) &WrappedCall, &WrappedCallData, &WrappedCallUseBank);
     if (WrappedCall) {
         F->WrappedCall = WrappedCall;
         F->WrappedCallData = WrappedCallData;
+        F->WrappedCallUseBank = WrappedCallUseBank;
     }
 
     /* Return the function descriptor */

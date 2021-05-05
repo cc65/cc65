@@ -497,6 +497,7 @@ static void WrappedCallPragma (StrBuf* B)
     const char *Name;
     long Val;
     SymEntry *Entry;
+    int UseBank = 0;
 
     /* Check for the "push" or "pop" keywords */
     switch (ParsePushPop (B)) {
@@ -535,12 +536,15 @@ static void WrappedCallPragma (StrBuf* B)
         goto ExitPoint;
     }
 
-    if (!GetNumber (B, &Val)) {
+    /* Next must be either a numeric value, or "bank" */
+    if (HasStr (B, "bank")) {
+        UseBank = 1;
+    } else if (!GetNumber (B, &Val)) {
         Error ("Value required for wrapped-call identifier");
         goto ExitPoint;
     }
 
-    if (Val < 0 || Val > 255) {
+    if (!UseBank && (Val < 0 || Val > 255)) {
         Error ("Identifier must be between 0-255");
         goto ExitPoint;
     }
@@ -552,7 +556,7 @@ static void WrappedCallPragma (StrBuf* B)
     /* Check if the name is valid */
     if (Entry && (Entry->Flags & SC_FUNC) == SC_FUNC) {
 
-        PushWrappedCall(Entry, (unsigned char) Val);
+        PushWrappedCall(Entry, (unsigned char) Val, UseBank);
         Entry->Flags |= SC_REF;
         GetFuncDesc (Entry->Type)->Flags |= FD_CALL_WRAPPER;
 

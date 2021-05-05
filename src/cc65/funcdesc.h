@@ -72,6 +72,7 @@ struct FuncDesc {
     struct FuncDesc*    FuncDef;        /* Descriptor used in definition     */
     struct SymEntry*    WrappedCall;    /* Pointer to the WrappedCall        */
     unsigned char       WrappedCallData;/* The WrappedCall's user data       */
+    int                 WrappedCallUseBank;/* Flag: does WrappedCall use .bank() or literal value */
 };
 
 

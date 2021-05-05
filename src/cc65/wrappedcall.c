@@ -64,13 +64,13 @@ static IntPtrStack WrappedCalls;
 
 
 
-void PushWrappedCall (void *Ptr, unsigned char Val)
+void PushWrappedCall (void *Ptr, unsigned char Val, int UseBank)
 /* Push the current WrappedCall */
 {
     if (IPS_IsFull (&WrappedCalls)) {
         Error ("WrappedCall stack overflow");
     } else {
-        IPS_Push (&WrappedCalls, Val, Ptr);
+        IPS_Push (&WrappedCalls, Val | (UseBank << 8), Ptr);
     }
 }
 
@@ -88,7 +88,7 @@ void PopWrappedCall (void)
 
 
 
-void GetWrappedCall (void **Ptr, unsigned char *Val)
+void GetWrappedCall (void **Ptr, unsigned char *Val, int *UseBank)
 /* Get the current WrappedCall */
 {
     if (IPS_GetCount (&WrappedCalls) < 1) {
@@ -97,6 +97,7 @@ void GetWrappedCall (void **Ptr, unsigned char *Val)
     } else {
         long Temp;
         IPS_Get (&WrappedCalls, &Temp, Ptr);
-        *Val = (unsigned char) Temp;
+        *UseBank = (int) Temp >> 8;
+        *Val = (unsigned char) Temp & 0xff;
     }
 }

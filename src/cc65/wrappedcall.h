@@ -50,13 +50,13 @@
 
 
 
-void PushWrappedCall (void *Ptr, unsigned char Val);
+void PushWrappedCall (void *Ptr, unsigned char Val, int usebank);
 /* Push the current WrappedCall */
 
 void PopWrappedCall (void);
 /* Pop the current WrappedCall */
 
-void GetWrappedCall (void **Ptr, unsigned char *Val);
+void GetWrappedCall (void **Ptr, unsigned char *Val, int *usebank);
 /* Get the current WrappedCall, if any */
 
 

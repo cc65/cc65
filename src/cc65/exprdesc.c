@@ -228,7 +228,7 @@ int ED_GetStackOffs (const ExprDesc* Expr, int Offs)
 
 
 
-ExprDesc* ED_MakeConstAbs (ExprDesc* Expr, long Value, Type* Type)
+ExprDesc* ED_MakeConstAbs (ExprDesc* Expr, long Value, const Type* Type)
 /* Replace Expr with an absolute const with the given value and type */
 {
     Expr->Sym   = 0;
@@ -595,10 +595,10 @@ void PrintExprDesc (FILE* F, ExprDesc* E)
 
 
 
-Type* ReplaceType (ExprDesc* Expr, const Type* NewType)
+const Type* ReplaceType (ExprDesc* Expr, const Type* NewType)
 /* Replace the type of Expr by a copy of Newtype and return the old type string */
 {
-    Type* OldType = Expr->Type;
+    const Type* OldType = Expr->Type;
     Expr->Type = TypeDup (NewType);
     return OldType;
 }

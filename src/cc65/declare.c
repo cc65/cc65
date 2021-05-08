@@ -1510,7 +1510,7 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
 
 
 
-static Type* ParamTypeCvt (Type* T)
+static const Type* ParamTypeCvt (Type* T)
 /* If T is an array or a function, convert it to a pointer else do nothing.
 ** Return the resulting type.
 */
@@ -1520,7 +1520,7 @@ static Type* ParamTypeCvt (Type* T)
     if (IsTypeArray (T)) {
         Tmp = ArrayToPtr (T);
     } else if (IsTypeFunc (T)) {
-        Tmp = PointerTo (T);
+        Tmp = NewPointerTo (T);
     }
 
     if (Tmp != 0) {
@@ -1891,7 +1891,7 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
             /* Add the function type. Be sure to bounds check the type buffer */
             NeedTypeSpace (D, 1);
             D->Type[D->Index].C = T_FUNC | Qualifiers;
-            D->Type[D->Index].A.P = F;
+            D->Type[D->Index].A.F = F;
             ++D->Index;
 
             /* Qualifiers now used */
@@ -2017,7 +2017,7 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
     if (IsTypeFunc (D->Type) || IsTypeFuncPtr (D->Type)) {
 
         /* A function. Check the return type */
-        Type* RetType = GetFuncReturn (D->Type);
+        Type* RetType = GetFuncReturnModifiable (D->Type);
 
         /* Functions may not return functions or arrays */
         if (IsTypeFunc (RetType)) {
@@ -2343,7 +2343,7 @@ static unsigned ParseArrayInit (Type* T, int* Braces, int AllowFlexibleMembers)
     int HasCurly = 0;
 
     /* Get the array data */
-    Type* ElementType    = GetElementType (T);
+    Type* ElementType    = IndirectModifiable (T);
     unsigned ElementSize = SizeOf (ElementType);
     long ElementCount    = GetElementCount (T);
 

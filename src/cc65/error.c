@@ -71,12 +71,14 @@ IntStack WarnNoEffect       = INTSTACK(1);  /* - statements without an effect */
 IntStack WarnPointerSign    = INTSTACK(1);  /* - pointer conversion to pointer differing in signedness */
 IntStack WarnPointerTypes   = INTSTACK(1);  /* - pointer conversion to incompatible pointer type */
 IntStack WarnRemapZero      = INTSTACK(1);  /* - remapping character code zero */
+IntStack WarnReturnType     = INTSTACK(1);  /* - control reaches end of non-void function */
 IntStack WarnStructParam    = INTSTACK(0);  /* - structs passed by val */
 IntStack WarnUnknownPragma  = INTSTACK(1);  /* - unknown #pragmas */
+IntStack WarnUnreachableCode= INTSTACK(1);  /* - unreachable code */
 IntStack WarnUnusedLabel    = INTSTACK(1);  /* - unused labels */
 IntStack WarnUnusedParam    = INTSTACK(1);  /* - unused parameters */
 IntStack WarnUnusedVar      = INTSTACK(1);  /* - unused variables */
-IntStack WarnReturnType     = INTSTACK(1);  /* - control reaches end of non-void function */
+IntStack WarnUnusedFunc     = INTSTACK(1);  /* - unused functions */
 
 /* Map the name of a warning to the intstack that holds its state */
 typedef struct WarnMapEntry WarnMapEntry;
@@ -92,12 +94,14 @@ static WarnMapEntry WarnMap[] = {
     { &WarnPointerSign,         "pointer-sign"          },
     { &WarnPointerTypes,        "pointer-types"         },
     { &WarnRemapZero,           "remap-zero"            },
+    { &WarnReturnType,          "return-type"           },
     { &WarnStructParam,         "struct-param"          },
     { &WarnUnknownPragma,       "unknown-pragma"        },
+    { &WarnUnreachableCode,     "unreachable-code"      },
+    { &WarnUnusedFunc,          "unused-func"           },
     { &WarnUnusedLabel,         "unused-label"          },
     { &WarnUnusedParam,         "unused-param"          },
     { &WarnUnusedVar,           "unused-var"            },
-    { &WarnReturnType,          "return-type"           },
 };
 
 Collection DiagnosticStrBufs;

@@ -150,7 +150,7 @@ void MarkedExprWithCheck (void (*Func) (ExprDesc*), ExprDesc* Expr)
 
 
 
-static Type* ArithmeticConvert (Type* lhst, Type* rhst)
+static const Type* ArithmeticConvert (const Type* lhst, const Type* rhst)
 /* Perform the usual arithmetic conversions for binary operators. */
 {
     /* https://port70.net/~nsz/c/c89/c89-draft.html#3.2.1.5
@@ -209,7 +209,7 @@ static Type* ArithmeticConvert (Type* lhst, Type* rhst)
 
 
 
-static unsigned typeadjust (ExprDesc* lhs, ExprDesc* rhs, int NoPush)
+static unsigned typeadjust (ExprDesc* lhs, const ExprDesc* rhs, int NoPush)
 /* Adjust the two values for a binary operation. lhs is expected on stack or
 ** to be constant, rhs is expected to be in the primary register or constant.
 ** The function will put the type of the result into lhs and return the
@@ -223,8 +223,8 @@ static unsigned typeadjust (ExprDesc* lhs, ExprDesc* rhs, int NoPush)
     unsigned flags;
 
     /* Get the type strings */
-    Type* lhst = lhs->Type;
-    Type* rhst = rhs->Type;
+    const Type* lhst = lhs->Type;
+    const Type* rhst = rhs->Type;
 
     /* Generate type adjustment code if needed */
     ltype = TypeOf (lhst);
@@ -865,7 +865,7 @@ static void FunctionCall (ExprDesc* Expr)
     int           PtrOffs = 0;    /* Offset of function pointer on stack */
     int           IsFastcall = 0; /* True if we are fast-calling the function */
     int           PtrOnStack = 0; /* True if a pointer copy is on stack */
-    Type*         ReturnType;
+    const Type*   ReturnType;
 
     /* Skip the left paren */
     NextToken ();
@@ -1121,7 +1121,7 @@ static void Primary (ExprDesc* E)
                 /* output its label */
                 E->Flags = E_RTYPE_RVAL | E_LOC_CODE | E_ADDRESS_OF;
                 E->Name = Entry->V.L.Label;
-                E->Type = PointerTo (type_void);
+                E->Type = NewPointerTo (type_void);
                 NextToken ();
             } else {
                 Error ("Computed gotos are a C extension, not supported with this --standard");
@@ -1340,7 +1340,6 @@ static void Primary (ExprDesc* E)
 static void StructRef (ExprDesc* Expr)
 /* Process struct/union field after . or ->. */
 {
-    ident Ident;
     Type* FinalType;
     TypeCode Q;
 
@@ -1354,40 +1353,40 @@ static void StructRef (ExprDesc* Expr)
     }
 
     /* Get the symbol table entry and check for a struct/union field */
-    strcpy (Ident, CurTok.Ident);
     NextToken ();
-    const SymEntry Field = FindStructField (Expr->Type, Ident);
+    const SymEntry Field = FindStructField (Expr->Type, CurTok.Ident);
     if (Field.Type == 0) {
-        Error ("No field named '%s' found in '%s'", Ident, GetFullTypeName (Expr->Type));
+        Error ("No field named '%s' found in '%s'", CurTok.Ident, GetFullTypeName (Expr->Type));
         /* Make the expression an integer at address zero */
         ED_MakeConstAbs (Expr, 0, type_int);
         return;
     }
 
-    /* A struct/union is usually an lvalue. If not, it is a struct/union passed
-    ** in the primary register, which is usually the result returned from a
-    ** function. However, it is possible that this rvalue is the result of
-    ** certain kind of operations on an lvalue such as assignment, and there
-    ** are no reasons to disallow such use cases. So we just rely on the check
-    ** upon function returns to catch the unsupported cases and dereference the
-    ** rvalue address of the struct/union here all the time.
-    */
-    if (IsTypePtr (Expr->Type)      ||
-        (ED_IsRVal (Expr)       &&
-         ED_IsLocPrimary (Expr) &&
-         Expr->Type == GetStructReplacementType (Expr->Type))) {
+    if (IsTypePtr (Expr->Type)) {
 
-        if (!ED_IsConst (Expr) && !ED_IsLocPrimary (Expr)) {
+        /* pointer->field */
+        if (!ED_IsQuasiConst (Expr) && !ED_IsLocPrimary (Expr)) {
             /* If we have a non-const struct/union pointer that is not in the
-            ** primary yet, load its content now.
+            ** primary yet, load its content now to get the base address.
             */
             LoadExpr (CF_NONE, Expr);
-
-            /* Clear the offset */
-            Expr->IVal = 0;
+            ED_FinalizeRValLoad (Expr);
         }
-
         /* Dereference the address expression */
+        ED_IndExpr (Expr);
+
+    } else if (ED_IsRVal (Expr)       &&
+               ED_IsLocPrimary (Expr) &&
+               Expr->Type == GetStructReplacementType (Expr->Type)) {
+
+        /* A struct/union is usually an lvalue. If not, it is a struct/union
+        ** passed in the primary register, which is usually the result returned
+        ** from a function. However, it is possible that this rvalue is the
+        ** result of certain kind of operations on an lvalue such as assignment,
+        ** and there are no reasons to disallow such use cases. So we just rely
+        ** on the check upon function returns to catch the unsupported cases and
+        ** dereference the rvalue address of the struct/union here all the time.
+        */
         ED_IndExpr (Expr);
 
     } else if (!ED_IsLocQuasiConst (Expr) && !ED_IsLocPrimaryOrExpr (Expr)) {
@@ -2053,7 +2052,7 @@ void hie10 (ExprDesc* Expr)
                 /* The & operator yields an rvalue address */
                 ED_AddrExpr (Expr);
             }
-            Expr->Type = PointerTo (Expr->Type);
+            Expr->Type = NewPointerTo (Expr->Type);
             break;
 
         case TOK_SIZEOF:
@@ -2381,7 +2380,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
         /* If lhs is a function, convert it to pointer to function */
         if (IsTypeFunc (Expr->Type)) {
-            Expr->Type = PointerTo (Expr->Type);
+            Expr->Type = NewPointerTo (Expr->Type);
         }
 
         /* Get the lhs on stack */
@@ -2403,7 +2402,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
         /* If rhs is a function, convert it to pointer to function */
         if (IsTypeFunc (Expr2.Type)) {
-            Expr2.Type = PointerTo (Expr2.Type);
+            Expr2.Type = NewPointerTo (Expr2.Type);
         }
 
         /* Check for a numeric constant expression */
@@ -2793,8 +2792,8 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
     ExprDesc Expr2;
     unsigned flags;             /* Operation flags */
     CodeMark Mark;              /* Remember code position */
-    Type* lhst;                 /* Type of left hand side */
-    Type* rhst;                 /* Type of right hand side */
+    const Type* lhst;           /* Type of left hand side */
+    const Type* rhst;           /* Type of right hand side */
     int lscale;
     int rscale;
     int AddDone;                /* No need to generate runtime code */
@@ -3133,36 +3132,20 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
 
     /* Deal with array ref */
     if (DoArrayRef) {
-        TypeCode Qualifiers = T_QUAL_NONE;
-        Type* ElementType;
-
         /* Check the types of array and subscript */
         if (IsClassPtr (lhst)) {
             if (!IsClassInt (rhst))  {
                 Error ("Array subscript is not an integer");
                 ED_MakeConstAbs (Expr, 0, GetCharArrayType (1));
-            } else if (IsTypeArray (lhst)) {
-                Qualifiers = GetQualifier (lhst);
             }
         } else if (IsClassInt (lhst)) {
             if (!IsClassPtr (rhst)) {
                 Error ("Subscripted value is neither array nor pointer");
                 ED_MakeConstAbs (Expr, 0, GetCharArrayType (1));
-            } else if (IsTypeArray (rhst)) {
-                Qualifiers = GetQualifier (rhst);
             }
         } else {
             Error ("Cannot subscript");
             ED_MakeConstAbs (Expr, 0, GetCharArrayType (1));
-        }
-
-        /* The element type has the combined qualifiers from itself and the array,
-        ** it is a member of (if any).
-        */
-        ElementType = Indirect (Expr->Type);
-        if (GetQualifier (ElementType) != (GetQualifier (ElementType) | Qualifiers)) {
-            ElementType = TypeDup (ElementType);
-            ElementType->C |= Qualifiers;
         }
 
         /* The final result is usually an lvalue expression of element type
@@ -3170,7 +3153,7 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
         ** assume the usual case first, and change it later if necessary.
         */
         ED_IndExpr (Expr);
-        Expr->Type = ElementType;
+        Expr->Type = Indirect (Expr->Type);
 
         /* An array element is actually a variable. So the rules for variables with
         ** respect to the reference type apply: If it's an array, it is virtually
@@ -3206,8 +3189,8 @@ static void parsesub (ExprDesc* Expr)
 {
     ExprDesc Expr2;
     unsigned flags;             /* Operation flags */
-    Type* lhst;                 /* Type of left hand side */
-    Type* rhst;                 /* Type of right hand side */
+    const Type* lhst;           /* Type of left hand side */
+    const Type* rhst;           /* Type of right hand side */
     CodeMark Mark1;             /* Save position of output queue */
     CodeMark Mark2;             /* Another position in the queue */
     int rscale;                 /* Scale factor for pointer arithmetics */
@@ -3251,6 +3234,20 @@ static void parsesub (ExprDesc* Expr)
     /* Get the rhs type */
     rhst = Expr2.Type;
 
+    if (IsClassPtr (lhst)) {
+        /* We'll have to scale the result */
+        rscale = PSizeOf (lhst);
+        /* We cannot scale by 0-size or unknown-size */
+        if (rscale == 0 && (IsClassPtr (rhst) || IsClassInt (rhst))) {
+            TypeCompatibilityDiagnostic (lhst, rhst,
+                1, "Invalid pointer types in subtraction: '%s' and '%s'");
+            /* Avoid further errors */
+            rscale = 1;
+        }
+        /* Generate code for pointer subtraction */
+        flags = CF_PTR;
+    }
+
     /* We can only do constant expressions for:
     ** - integer subtraction:
     **   - numeric - numeric
@@ -3267,24 +3264,14 @@ static void parsesub (ExprDesc* Expr)
     */
     if (IsClassPtr (lhst) && IsClassPtr (rhst)) {
 
-        /* Pointer diff */
-        if (TypeCmp (lhst, rhst).C >= TC_STRICT_COMPATIBLE) {
-            /* We'll have to scale the result */
-            rscale = PSizeOf (lhst);
-            /* We cannot scale by 0-size or unknown-size */
-            if (rscale == 0) {
-                TypeCompatibilityDiagnostic (lhst, rhst,
-                    1, "Invalid pointer types in subtraction: '%s' and '%s'");
-                /* Avoid further errors */
-                rscale = 1;
-            }
-        } else {
+        /* Pointer Diff. We've got the scale factor and flags above */
+        typecmp_t Cmp = TypeCmp (lhst, rhst);
+        if (Cmp.C < TC_STRICT_COMPATIBLE) {
             TypeCompatibilityDiagnostic (lhst, rhst,
                 1, "Incompatible pointer types in subtraction: '%s' and '%s'");
         }
 
         /* Operate on pointers, result type is an integer */
-        flags = CF_PTR;
         Expr->Type = type_int;
 
         /* Check for a constant rhs expression */
@@ -3339,10 +3326,7 @@ static void parsesub (ExprDesc* Expr)
 
             /* Both sides are constant. Check for pointer arithmetic */
             if (IsClassPtr (lhst) && IsClassInt (rhst)) {
-                /* Left is pointer, right is int, must scale rhs */
-                rscale = CheckedPSizeOf (lhst);
-                /* Operate on pointers, result type is a pointer */
-                flags = CF_PTR;
+                /* Pointer subtraction. We've got the scale factor and flags above */
             } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
                 /* Integer subtraction. We'll adjust the types later */
             } else {
@@ -3384,7 +3368,7 @@ static void parsesub (ExprDesc* Expr)
                         flags = typeadjust (Expr, &Expr2, 1);
                     }
                     /* Do the subtraction */
-                    g_dec (flags | CF_CONST, Expr2.IVal);
+                    g_dec (flags | CF_CONST, Expr2.IVal * rscale);
                 } else {
                     if (IsClassInt (lhst)) {
                         /* Adjust the types */
@@ -3392,6 +3376,7 @@ static void parsesub (ExprDesc* Expr)
                     }
                     /* Load rhs into the primary */
                     LoadExpr (CF_NONE, &Expr2);
+                    g_scale (TypeOf (rhst), rscale);
                     /* Generate code for the sub (the & is a hack here) */
                     g_sub (flags & ~CF_CONST, 0);
                 }
@@ -3403,10 +3388,7 @@ static void parsesub (ExprDesc* Expr)
 
             /* Left hand side is not constant, right hand side is */
             if (IsClassPtr (lhst) && IsClassInt (rhst)) {
-                /* Left is pointer, right is int, must scale rhs */
-                Expr2.IVal *= CheckedPSizeOf (lhst);
-                /* Operate on pointers, result type is a pointer */
-                flags = CF_PTR;
+                /* Pointer subtraction. We've got the scale factor and flags above */
             } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
                 /* Integer subtraction. We'll adjust the types later */
             } else {
@@ -3423,7 +3405,7 @@ static void parsesub (ExprDesc* Expr)
                     flags = typeadjust (Expr, &Expr2, 1);
                 }
                 /* Do the subtraction */
-                g_dec (flags | CF_CONST, Expr2.IVal);
+                g_dec (flags | CF_CONST, Expr2.IVal * rscale);
             } else {
                 if (IsClassInt (lhst)) {
                     /* Adjust the types */
@@ -3431,6 +3413,7 @@ static void parsesub (ExprDesc* Expr)
                 }
                 /* Load rhs into the primary */
                 LoadExpr (CF_NONE, &Expr2);
+                g_scale (TypeOf (rhst), rscale);
                 /* Generate code for the sub (the & is a hack here) */
                 g_sub (flags & ~CF_CONST, 0);
             }
@@ -3450,9 +3433,7 @@ static void parsesub (ExprDesc* Expr)
         /* Check for pointer arithmetic */
         if (IsClassPtr (lhst) && IsClassInt (rhst)) {
             /* Left is pointer, right is int, must scale rhs */
-            g_scale (CF_INT, CheckedPSizeOf (lhst));
-            /* Operate on pointers, result type is a pointer */
-            flags = CF_PTR;
+            g_scale (CF_INT, rscale);
         } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
             /* Adjust operand types */
             flags = typeadjust (Expr, &Expr2, 0);
@@ -3776,7 +3757,6 @@ static void hieOr (ExprDesc *Expr)
     unsigned Flags = Expr->Flags & E_MASK_KEEP_SUBEXPR;
     int      AndOp;             /* Did we have a && operation? */
     unsigned TrueLab;           /* Jump to this label if true */
-    unsigned DoneLab;
     int      HasTrueJump = 0;
     CodeMark Start;
 
@@ -3903,18 +3883,22 @@ static void hieOr (ExprDesc *Expr)
 
     /* If we really had boolean ops, generate the end sequence if necessary */
     if (HasTrueJump) {
-        /* False case needs to jump over true case */
-        DoneLab = GetLocalLabel ();
         if ((Flags & E_EVAL_UNEVAL) != E_EVAL_UNEVAL) {
+            /* False case needs to jump over true case */
+            unsigned DoneLab = GetLocalLabel ();
             /* Load false only if the result is not true */
             g_getimmed (CF_INT | CF_CONST, 0, 0);   /* Load FALSE */
             g_falsejump (CF_NONE, DoneLab);
+ 
+            /* Load the true value */
+            g_defcodelabel (TrueLab);
+            g_getimmed (CF_INT | CF_CONST, 1, 0);   /* Load TRUE */
+            g_defcodelabel (DoneLab);
+        } else {
+            /* Load the true value */
+            g_defcodelabel (TrueLab);
+            g_getimmed (CF_INT | CF_CONST, 1, 0);   /* Load TRUE */
         }
-
-        /* Load the true value */
-        g_defcodelabel (TrueLab);
-        g_getimmed (CF_INT | CF_CONST, 1, 0);   /* Load TRUE */
-        g_defcodelabel (DoneLab);
 
         /* The result is an rvalue in primary */
         ED_FinalizeRValLoad (Expr);
@@ -4097,7 +4081,7 @@ static void hieQuest (ExprDesc* Expr)
 
 
             /* Get common type */
-            ResultType = ArithmeticConvert (Expr2.Type, Expr3.Type);
+            ResultType = TypeDup (ArithmeticConvert (Expr2.Type, Expr3.Type));
 
             /* Convert the third expression to this type if needed */
             TypeConversion (&Expr3, ResultType);
@@ -4121,10 +4105,10 @@ static void hieQuest (ExprDesc* Expr)
             ** appropriately qualified void.
             */
             if (IsTypeVoid (Indirect (Expr2.Type))) {
-                ResultType = PointerTo (Indirect (Expr2.Type));
+                ResultType = NewPointerTo (Indirect (Expr2.Type));
                 ResultType[1].C |= GetQualifier (Indirect (Expr3.Type));
             } else if (IsTypeVoid (Indirect (Expr3.Type))) {
-                ResultType = PointerTo (Indirect (Expr3.Type));
+                ResultType = NewPointerTo (Indirect (Expr3.Type));
                 ResultType[1].C |= GetQualifier (Indirect (Expr2.Type));
             } else {
                 /* Must point to compatible types */
@@ -4132,7 +4116,7 @@ static void hieQuest (ExprDesc* Expr)
                     TypeCompatibilityDiagnostic (Expr2.Type, Expr3.Type,
                         1, "Incompatible pointer types in ternary: '%s' and '%s'");
                     /* Avoid further errors */
-                    ResultType = PointerTo (type_void);
+                    ResultType = NewPointerTo (type_void);
                 } else {
                     /* Result has the composite type */
                     ResultType = TypeDup (Expr2.Type);
@@ -4141,22 +4125,22 @@ static void hieQuest (ExprDesc* Expr)
             }
         } else if (IsClassPtr (Expr2.Type) && Expr3IsNULL) {
             /* Result type is pointer, no cast needed */
-            ResultType = Expr2.Type;
+            ResultType = TypeDup (Expr2.Type);
         } else if (Expr2IsNULL && IsClassPtr (Expr3.Type)) {
             /* Result type is pointer, no cast needed */
-            ResultType = Expr3.Type;
+            ResultType = TypeDup (Expr3.Type);
         } else if (IsTypeVoid (Expr2.Type) && IsTypeVoid (Expr3.Type)) {
             /* Result type is void */
-            ResultType = type_void;
+            ResultType = TypeDup (type_void);
         } else {
             if (IsClassStruct (Expr2.Type) && IsClassStruct (Expr3.Type) &&
                 TypeCmp (Expr2.Type, Expr3.Type).C == TC_IDENTICAL) {
                 /* Result type is struct/union */
-                ResultType = Expr2.Type;
+                ResultType = TypeDup (Expr2.Type);
             } else {
                 TypeCompatibilityDiagnostic (Expr2.Type, Expr3.Type, 1,
                     "Incompatible types in ternary '%s' with '%s'");
-                ResultType = Expr2.Type;            /* Doesn't matter here */
+                ResultType = TypeDup (Expr2.Type);      /* Doesn't matter here */
             }
         }
 

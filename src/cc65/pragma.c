@@ -46,6 +46,7 @@
 #include "codegen.h"
 #include "error.h"
 #include "expr.h"
+#include "funcdesc.h"
 #include "global.h"
 #include "litpool.h"
 #include "scanner.h"

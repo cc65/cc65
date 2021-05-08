@@ -546,6 +546,12 @@ Here is a description of all the command line options:
         Treat all warnings as errors.
   <tag><tt/no-effect/</tag>
         Warn about statements that don't have an effect.
+  <tag><tt/pointer-sign/</tag>
+        Warn if a pointer assignment changes the signedness of the target
+        of a pointer value, and the new signedness wasn't cast explicitly.
+  <tag><tt/pointer-types/</tag>
+        Warn if a pointer assignment changes the type of the target
+        of a pointer value, and the new type wasn't cast explicitly.
   <tag><tt/remap-zero/</tag>
         Warn about a <tt/<ref id="pragma-charmap" name="#pragma charmap()">/
         that changes a character's code number from/to 0x00.
@@ -555,6 +561,10 @@ Here is a description of all the command line options:
         Warn when passing structs by value.
   <tag><tt/unknown-pragma/</tag>
         Warn about #pragmas that aren't recognized by cc65.
+  <tag><tt/unreachable-code/</tag>
+        Warn about unreachable code in cases of comparing constants, etc.
+  <tag><tt/unused-func/</tag>
+        Warn about unused functions.
   <tag><tt/unused-label/</tag>
         Warn about unused labels.
   <tag><tt/unused-param/</tag>

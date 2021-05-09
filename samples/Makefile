@@ -135,31 +135,37 @@ LDFLAGS_tgidemo_atarixl    = --start-addr 0x4000
 %: %.s
 
 .c.o:
-	$(CC) $(CFLAGS) -Ors --codesize 500 -T -g -t $(SYS) $<
+	$(CC) $(CFLAGS) -Ors --codesize 500 -T -g -t $(MACHINE) $<
 	$(AS) $(<:.c=.s)
 
 .s.o:
-	$(AS) $(ASFLAGS) -t $(SYS) $<
+	$(AS) $(ASFLAGS) -t $(MACHINE) $<
 
 .PRECIOUS: %.o
 
 .o:
 ifeq ($(SYS),vic20)
 	$(LD) $(LDFLAGS_$(@F)_$(SYS)) $(LDFLAGS) -o $@ -C vic20-32k.cfg -m $@.map $^ $(SYS).lib
+else ifeq ($(SYS),sym1)
+	$(LD) $(LDFLAGS_$(@F)_$(SYS)) $(LDFLAGS) -o $@.bin -C sym1.cfg -m $@.map $^ $(SYS).lib
 else
-	$(LD) $(LDFLAGS_$(@F)_$(SYS)) $(LDFLAGS) -o $@ -t $(SYS) -m $@.map $^ $(SYS).lib
+	$(LD) $(LDFLAGS_$(@F)_$(SYS)) $(LDFLAGS) -o $@ -t $(MACHINE) -m $@.map $^ $(SYS).lib
 endif
 
 # --------------------------------------------------------------------------
 # Lists of subdirectories
 
 # disasm depends on cpp
-DIRLIST = tutorial geos
+
+ifneq ($(SYS),sym1)
+  DIRLIST = tutorial geos
+endif
 
 # --------------------------------------------------------------------------
 # Lists of executables
 
 EXELIST_c64 =      \
+        helloworld \
         ascii      \
         enumdevdir \
         fire       \
@@ -175,6 +181,7 @@ EXELIST_c64 =      \
         tgidemo
 
 EXELIST_apple2 =   \
+        helloworld \
         ascii      \
         diodemo    \
         enumdevdir \
@@ -190,6 +197,7 @@ EXELIST_apple2 =   \
 EXELIST_apple2enh = $(EXELIST_apple2)
 
 EXELIST_atari =    \
+        helloworld \
         ascii      \
         gunzip65   \
         hello      \
@@ -208,6 +216,12 @@ EXELIST_atari2600 = \
 EXELIST_supervision = \
         supervisionhello
 
+EXELIST_sym1 =     \
+        helloworld \
+        symHello   \
+        symTiny    \
+        symDisplay
+
 # Unlisted targets will try to build everything.
 # That lets us learn what they cannot build, and what settings
 # we need to use for programs that can be built and run.
@@ -215,11 +229,12 @@ ifndef EXELIST_$(SYS)
 EXELIST_$(SYS) := ${patsubst %.c,%,$(wildcard *.c)}
 endif
 
-define SUBDIR_recipe
+define  SUBDIR_recipe
 
 @$(MAKE) -C $(dir) --no-print-directory $@
 
 endef # SUBDIR_recipe
+
 
 # --------------------------------------------------------------------------
 # Rules to make the binaries and the disk
@@ -352,9 +367,10 @@ zip:
 # Clean-up rules
 
 mostlyclean:
-	@$(DEL) *.lbl *.map *.o *.s 2>$(NULLDEV)
+	@$(DEL) *.lbl *.map *.bin *.hex *.o *.s 2>$(NULLDEV)
 
 clean: mostlyclean
 	@$(DEL) $(EXELIST_$(SYS)) $(DISK_$(SYS)) 2>$(NULLDEV)
 	@$(DEL) multdemo.? ovrldemo.? 2>$(NULLDEV)
-	$(foreach dir,$(DIRLIST),$(SUBDIR_recipe))
+	@$(foreach dir,$(DIRLIST),$(SUBDIR_recipe))
+

@@ -34,6 +34,7 @@ TARGETS = apple2       \
           sim6502      \
           sim65c02     \
           supervision  \
+          sym1         \
           telestrat
 
 DRVTYPES = emd \
@@ -148,18 +149,26 @@ GEOSDIRS = common      \
            runtime     \
            system
 
+# MACHINE set independently of TARGET lets us easily define new targets
+# without  changing target.h and target.c in  cc65/src/common.   Useful
+# for initial testing of ports to new systems.
+
 ifeq ($(TARGET),apple2enh)
   SRCDIR = apple2
   OBJPFX = a2
   DRVPFX = a2e
+  MACHINE = $(TARGET)
 else ifeq ($(TARGET),atarixl)
   SRCDIR = atari
   OBJPFX = atr
   DRVPFX = atrx
+  MACHINE = $(TARGET)
 else ifeq ($(TARGET),sim65c02)
   SRCDIR = sim6502
+  MACHINE = $(TARGET)
 else
   SRCDIR = $(TARGET)
+  MACHINE = $(TARGET)
 endif
 
 SRCDIRS = $(SRCDIR)
@@ -173,16 +182,26 @@ ifeq ($(TARGET),$(filter $(TARGET),$(GEOS)))
   SRCDIRS += $(addprefix geos-common/,$(GEOSDIRS))
 endif
 
-SRCDIRS += common   \
-           conio    \
-           dbg      \
-           em       \
-           joystick \
-           mouse    \
-           runtime  \
-           serial   \
-           tgi      \
-           zlib
+ifeq ($(TARGET),sym1)
+  SRCDIRS += common   \
+             conio    \
+             dbg      \
+             em       \
+             runtime  \
+             serial   \
+             sym1
+else
+  SRCDIRS += common   \
+             conio    \
+             dbg      \
+             em       \
+             joystick \
+             mouse    \
+             runtime  \
+             serial   \
+             tgi      \
+             zlib
+endif
 
 vpath %.s $(SRCDIRS)
 vpath %.c $(SRCDIRS)
@@ -231,7 +250,7 @@ $1_DRVS = $$(patsubst $$($1_DYNPAT),$$($1_DRVPAT),$$($1_DYNS))
 
 $$($1_STCPAT): $$($1_SRCPAT)
 	@echo $$(TARGET) - $$< - static
-	@$$(CA65) -t $$(TARGET) -D DYN_DRV=0 $$(CA65FLAGS) --create-dep $$(@:.o=.d) -o $$@ $$<
+	@$$(CA65) -t $$(MACHINE) -D DYN_DRV=0 $$(CA65FLAGS) --create-dep $$(@:.o=.d) -o $$@ $$<
 
 OBJS += $$($1_STCS)
 DEPS += $$($1_STCS:.o=.d)
@@ -263,15 +282,15 @@ export CC65_HOME := $(abspath ..)
 define ASSEMBLE_recipe
 
 $(if $(QUIET),,@echo $(TARGET) - $<)
-@$(CA65) -t $(TARGET) $(CA65FLAGS) --create-dep $(@:.o=.d) -o $@ $<
+@$(CA65) -t $(MACHINE) $(CA65FLAGS) --create-dep $(@:.o=.d) -o $@ $<
 
 endef # ASSEMBLE_recipe
 
 define COMPILE_recipe
 
 $(if $(QUIET),,@echo $(TARGET) - $<)
-@$(CC65) -t $(TARGET) $(CC65FLAGS) --create-dep $(@:.o=.d) --dep-target $@ -o $(@:.o=.s) $<
-@$(CA65) -t $(TARGET) -o $@ $(@:.o=.s)
+@$(CC65) -t $(MACHINE) $(CC65FLAGS) --create-dep $(@:.o=.d) --dep-target $@ -o $(@:.o=.s) $<
+@$(CA65) -t $(MACHINE) -o $@ $(@:.o=.s)
 
 endef # COMPILE_recipe
 
@@ -283,7 +302,7 @@ endef # COMPILE_recipe
 
 $(EXTRA_OBJPAT): $(EXTRA_SRCPAT) | ../libwrk/$(TARGET) ../lib
 	@echo $(TARGET) - $(<F)
-	@$(CA65) -t $(TARGET) $(CA65FLAGS) --create-dep $(@:../lib/%.o=../libwrk/$(TARGET)/%.d) -o $@ $<
+	@$(CA65) -t $(MACHINE) $(CA65FLAGS) --create-dep $(@:../lib/%.o=../libwrk/$(TARGET)/%.d) -o $@ $<
 
 ../lib/$(TARGET).lib: $(OBJS) | ../lib
 	$(AR65) a $@ $?

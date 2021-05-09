@@ -290,6 +290,9 @@ static void SetSys (const char* Sys)
             cbmsys ("__CX16__");
             break;
 
+        case TGT_NONE:
+            break;
+
         default:
             AbEnd ("Unknown target system type %d", Target);
     }

@@ -8,6 +8,10 @@
 # var. to build for another target system.
 SYS ?= c64
 
+# New targets can define MACHINE separately
+# from target if needed.
+MACHINE=$(SYS)
+
 # Just the usual way to define a variable
 # containing a single space character.
 SPACE :=

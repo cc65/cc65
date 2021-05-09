@@ -334,6 +334,9 @@ static void SetSys (const char* Sys)
             CBMSystem ("__CX16__");
             break;
 
+        case TGT_SYM1:
+            break;
+
         default:
             AbEnd ("Invalid target name: '%s'", Sys);
 

@@ -1396,7 +1396,7 @@ void Preprocess (void)
 
 Done:
     if (Verbosity > 1 && SB_NotEmpty (Line)) {
-        printf ("%s(%u): %.*s\n", GetCurrentFile (), GetCurrentLine (),
+        printf ("%s:%u: %.*s\n", GetCurrentFile (), GetCurrentLine (),
                 (int) SB_GetLen (Line), SB_GetConstBuf (Line));
     }
 }

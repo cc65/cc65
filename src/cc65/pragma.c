@@ -784,7 +784,7 @@ static void IntPragma (StrBuf* B, IntStack* Stack, long Low, long High)
 
 static void MakeMessage (const char* Message)
 {
-    fprintf (stderr, "%s(%u): Note: %s\n", GetInputName (CurTok.LI), GetInputLine (CurTok.LI), Message);
+    fprintf (stderr, "%s:%u: Note: %s\n", GetInputName (CurTok.LI), GetInputLine (CurTok.LI), Message);
 }
 
 

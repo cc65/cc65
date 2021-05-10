@@ -774,17 +774,19 @@ static void PrintUnresolved (ExpCheckFunc F, void* Data)
         if (E->Expr == 0 && E->ImpCount > 0 && F (E->Name, Data) == 0) {
             /* Unresolved external */
             Import* Imp = E->ImpList;
+            const char * name = GetString (E->Name);
             fprintf (stderr,
                      "Unresolved external '%s' referenced in:\n",
-                     GetString (E->Name));
+                     name);
             while (Imp) {
                 unsigned J;
                 for (J = 0; J < CollCount (&Imp->RefLines); ++J) {
                     const LineInfo* LI = CollConstAt (&Imp->RefLines, J);
                     fprintf (stderr,
-                         "  %s(%u)\n",
+                         "  %s:%u: Error: Unresolved external '%s'\n",
                          GetSourceName (LI),
-                         GetSourceLine (LI));
+                         GetSourceLine (LI),
+                         name);
                 }
                 Imp = Imp->Next;
             }

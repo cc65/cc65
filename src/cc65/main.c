@@ -290,7 +290,7 @@ static void SetSys (const char* Sys)
             cbmsys ("__CX16__");
             break;
 
-        case TGT_NONE:
+        case TGT_SYM1:
             break;
 
         default:

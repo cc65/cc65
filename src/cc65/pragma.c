@@ -532,7 +532,7 @@ static void WrappedCallPragma (StrBuf* B)
     /* Skip the following comma */
     if (!GetComma (B)) {
         /* Error already flagged by GetComma */
-        Error ("Value required for wrapped-call identifier");
+        Error ("Value or the word 'bank' required for wrapped-call identifier");
         goto ExitPoint;
     }
 

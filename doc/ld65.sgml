@@ -760,7 +760,7 @@ There's a library subroutine called <tt/copydata/ (in a module named
 look at it's inner workings before using it!
 
 
-<sect1>Other MEMORY area attributes<p>
+<sect1>Other MEMORY area attributes<label id="MEMORY"><p>
 
 There are some other attributes not covered above. Before starting the
 reference section, I will discuss the remaining things here.
@@ -821,7 +821,6 @@ has a builtin function named <tt/.BANK/ which may be used with an argument
 that has a segment reference (for example a symbol). The result of this
 function is the value of the bank attribute for the run memory area of the
 segment.
-
 
 <sect1>Other SEGMENT attributes<p>
 

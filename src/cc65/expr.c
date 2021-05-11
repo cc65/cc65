@@ -997,9 +997,16 @@ static void FunctionCall (ExprDesc* Expr)
             char tmp[64];
             StrBuf S = AUTO_STRBUF_INITIALIZER;
 
-            /* Store the WrappedCall data in tmp4 */
-            sprintf(tmp, "ldy #%u", Func->WrappedCallData);
-            SB_AppendStr (&S, tmp);
+            if (Func->WrappedCallData == WRAPPED_CALL_USE_BANK) {
+                /* Store the bank attribute in tmp4 */
+                SB_AppendStr (&S, "ldy #<.bank(_");
+                SB_AppendStr (&S, (const char*) Expr->Name);
+                SB_AppendChar (&S, ')');
+            } else {
+                /* Store the WrappedCall data in tmp4 */
+                sprintf(tmp, "ldy #%u", Func->WrappedCallData);
+                SB_AppendStr (&S, tmp);
+            }
             g_asmcode (&S);
             SB_Clear(&S);
 

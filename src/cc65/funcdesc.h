@@ -58,7 +58,7 @@
 /* Bits that must be ignored when comparing funcs */
 #define FD_IGNORE   (FD_INCOMPLETE_PARAM | FD_OLDSTYLE | FD_OLDSTYLE_INTRET | FD_UNNAMED_PARAMS | FD_CALL_WRAPPER)
 
-
+#define WRAPPED_CALL_USE_BANK   0x0100U /* WrappedCall uses .bank() */
 
 /* Function descriptor */
 typedef struct FuncDesc FuncDesc;
@@ -71,7 +71,7 @@ struct FuncDesc {
     struct SymEntry*    LastParam;       /* Pointer to last parameter         */
     struct FuncDesc*    FuncDef;         /* Descriptor used in definition     */
     struct SymEntry*    WrappedCall;     /* Pointer to the WrappedCall        */
-    unsigned char       WrappedCallData; /* The WrappedCall's user data       */
+    unsigned int        WrappedCallData; /* The WrappedCall's user data       */
 };
 
 

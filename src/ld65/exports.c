@@ -690,12 +690,12 @@ static void CheckSymType (const Export* E)
             */
             if (E->Obj) {
                 /* The export comes from an object file */
-                SB_Printf (&ExportLoc, "%s, %s(%u)",
+                SB_Printf (&ExportLoc, "%s, %s:%u",
                            GetString (E->Obj->Name),
                            GetSourceName (ExportLI),
                            GetSourceLine (ExportLI));
             } else if (ExportLI) {
-                SB_Printf (&ExportLoc, "%s(%u)",
+                SB_Printf (&ExportLoc, "%s:%u",
                            GetSourceName (ExportLI),
                            GetSourceLine (ExportLI));
             } else {
@@ -706,7 +706,7 @@ static void CheckSymType (const Export* E)
             }
             if (I->Obj) {
                 /* The import comes from an object file */
-                SB_Printf (&ImportLoc, "%s, %s(%u)",
+                SB_Printf (&ImportLoc, "%s, %s:%u",
                            GetString (I->Obj->Name),
                            GetSourceName (ImportLI),
                            GetSourceLine (ImportLI));
@@ -714,7 +714,7 @@ static void CheckSymType (const Export* E)
                 /* The import is linker generated and we have line
                 ** information
                 */
-                SB_Printf (&ImportLoc, "%s(%u)",
+                SB_Printf (&ImportLoc, "%s:%u",
                            GetSourceName (ImportLI),
                            GetSourceLine (ImportLI));
             } else {
@@ -995,7 +995,7 @@ void PrintImportMap (FILE* F)
                 const LineInfo* LI = GetImportPos (Imp);
                 if (LI) {
                     fprintf (F,
-                             "    %-25s %s(%u)\n",
+                             "    %-25s %s:%u\n",
                              GetObjFileName (Imp->Obj),
                              GetSourceName (LI),
                              GetSourceLine (LI));

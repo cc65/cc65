@@ -997,7 +997,7 @@ static void FunctionCall (ExprDesc* Expr)
             char tmp[64];
             StrBuf S = AUTO_STRBUF_INITIALIZER;
 
-            if (Func->WrappedCallUseBank) {
+            if (Func->WrappedCallData == WRAPPED_CALL_USE_BANK) {
                 /* Store the bank attribute in tmp4 */
                 SB_AppendStr (&S, "ldy #<.bank(_");
                 SB_AppendStr (&S, (const char*) Expr->Name);

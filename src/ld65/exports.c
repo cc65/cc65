@@ -166,7 +166,7 @@ Import* ReadImport (FILE* F, ObjData* Obj)
         */
         if (ObjHasFiles (I->Obj)) {
             const LineInfo* LI = GetImportPos (I);
-            Error ("Invalid import size in for '%s', imported from %s(%u): 0x%02X",
+            Error ("Invalid import size in for '%s', imported from %s:%u: 0x%02X",
                    GetString (I->Name),
                    GetSourceName (LI),
                    GetSourceLine (LI),
@@ -1057,7 +1057,7 @@ void CircularRefError (const Export* E)
 /* Print an error about a circular reference using to define the given export */
 {
     const LineInfo* LI = GetExportPos (E);
-    Error ("Circular reference for symbol '%s', %s(%u)",
+    Error ("Circular reference for symbol '%s', %s:%u",
            GetString (E->Name),
            GetSourceName (LI),
            GetSourceLine (LI));

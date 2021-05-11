@@ -1738,7 +1738,7 @@ static FuncDesc* ParseFuncDecl (void)
 {
     SymEntry* Sym;
     SymEntry* WrappedCall;
-    unsigned char WrappedCallData;
+    unsigned int WrappedCallData;
 
     /* Create a new function descriptor */
     FuncDesc* F = NewFuncDesc ();

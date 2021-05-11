@@ -129,7 +129,7 @@ void Fatal (const char* Format, ...)
         LineNum  = GetCurrentLine ();
     }
 
-    fprintf (stderr, "%s(%u): Fatal: ", FileName, LineNum);
+    fprintf (stderr, "%s:%u: Fatal: ", FileName, LineNum);
 
     va_start (ap, Format);
     vfprintf (stderr, Format, ap);
@@ -159,7 +159,7 @@ void Internal (const char* Format, ...)
         LineNum  = GetCurrentLine ();
     }
 
-    fprintf (stderr, "%s(%u): Internal compiler error:\n",
+    fprintf (stderr, "%s:%u: Internal compiler error:\n",
              FileName, LineNum);
 
     va_start (ap, Format);
@@ -186,7 +186,7 @@ void Internal (const char* Format, ...)
 static void IntError (const char* Filename, unsigned LineNo, const char* Msg, va_list ap)
 /* Print an error message - internal function*/
 {
-    fprintf (stderr, "%s(%u): Error: ", Filename, LineNo);
+    fprintf (stderr, "%s:%u: Error: ", Filename, LineNo);
     vfprintf (stderr, Msg, ap);
     fprintf (stderr, "\n");
 
@@ -250,7 +250,7 @@ static void IntWarning (const char* Filename, unsigned LineNo, const char* Msg, 
 
     } else if (IS_Get (&WarnEnable)) {
 
-        fprintf (stderr, "%s(%u): Warning: ", Filename, LineNo);
+        fprintf (stderr, "%s:%u: Warning: ", Filename, LineNo);
         vfprintf (stderr, Msg, ap);
         fprintf (stderr, "\n");
 

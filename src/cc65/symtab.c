@@ -173,6 +173,10 @@ static void CheckSymTable (SymTable* Tab)
                         if (IS_Get (&WarnUnusedParam)) {
                             Warning ("Parameter '%s' is never used", Entry->Name);
                         }
+                    } else if (Flags & SC_FUNC) {
+                        if (IS_Get (&WarnUnusedFunc)) {
+                            Warning ("Function '%s' is defined but never used", Entry->Name);
+                        }
                     } else {
                         if (IS_Get (&WarnUnusedVar)) {
                             Warning ("Variable '%s' is defined but never used", Entry->Name);

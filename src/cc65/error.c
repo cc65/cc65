@@ -78,6 +78,7 @@ IntStack WarnUnreachableCode= INTSTACK(1);  /* - unreachable code */
 IntStack WarnUnusedLabel    = INTSTACK(1);  /* - unused labels */
 IntStack WarnUnusedParam    = INTSTACK(1);  /* - unused parameters */
 IntStack WarnUnusedVar      = INTSTACK(1);  /* - unused variables */
+IntStack WarnUnusedFunc     = INTSTACK(1);  /* - unused functions */
 
 /* Map the name of a warning to the intstack that holds its state */
 typedef struct WarnMapEntry WarnMapEntry;
@@ -97,6 +98,7 @@ static WarnMapEntry WarnMap[] = {
     { &WarnStructParam,         "struct-param"          },
     { &WarnUnknownPragma,       "unknown-pragma"        },
     { &WarnUnreachableCode,     "unreachable-code"      },
+    { &WarnUnusedFunc,          "unused-func"           },
     { &WarnUnusedLabel,         "unused-label"          },
     { &WarnUnusedParam,         "unused-param"          },
     { &WarnUnusedVar,           "unused-var"            },

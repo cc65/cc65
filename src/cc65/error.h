@@ -75,6 +75,7 @@ extern IntStack WarnUnreachableCode;    /* - unreachable code */
 extern IntStack WarnUnusedLabel;        /* - unused labels */
 extern IntStack WarnUnusedParam;        /* - unused parameters */
 extern IntStack WarnUnusedVar;          /* - unused variables */
+extern IntStack WarnUnusedFunc;         /* - unused functions */
 
 /* Forward */
 struct StrBuf;

@@ -113,6 +113,7 @@ All the samples will run on the &quot;stock&quot; 4k Sym-1, except for symio.c, 
 <item>symTiny does the same as symhello, but does it with puts() rather than printf() to show the difference in compiled binary size.</item>
 <item>symDisplay allows entry of a message, which is then displayed by scrolling it across the front panel display.</item>
 <item>symIO allows access to the Sym-1 digital I/O ports.</item>
+<item>symNotepad is a simple text entry/retrieval program that uses tape storage.</item>
 </itemize>
 
 <sect>License<p>

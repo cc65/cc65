@@ -21,7 +21,7 @@ __syschdir:
 
         ; Get name
         jsr     popax
-		
+
         stx     tmp1
         ldy     tmp1
         

@@ -99,21 +99,21 @@ void main(void) {
                p--;
             }
          }
-	 else if( c == 0x13 ) {        // Save
+         else if( c == 0x13 ) {        // Save
             puts( "\n========================= Save =========================" );
             puts( "\nPress any key to save." );
             c = getchar();
             for( l = 0; l <= p; l++ ) {
                tapio[l] = buffer[l];
             }
-	    l++;
+            l++;
             tapio[l] = 0x00;
             puts( "Saving to tape." );
             error = dumpt( 'N', (int) tapio, (int) tapio+p );
             if( error ) {
                puts( "\nTape error." );
             }
-	    else
+            else
             {
                putchar( '\r' );
                for( l = 0; l < 25; l++ ) {
@@ -196,3 +196,4 @@ void main(void) {
 
    return;
 }
+

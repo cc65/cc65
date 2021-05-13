@@ -43,7 +43,7 @@ void main (void) {
       if( (c >= '0') && (c <= '9') ) { // between 1 and 9 loops allowed
          z = 1;                        // a number was pressed 
          t = c - '0';                  // convert char to int
-	 puts( "\n\nLook at the front panel.\n" );
+         puts( "\n\nLook at the front panel.\n" );
       }
       else {
          puts( "\nWhat?" );
@@ -185,7 +185,7 @@ void main (void) {
                set_D3( get_D4() );
                set_D4( get_D5() );
                set_D5( get_D6() );
-	       set_D6( DISP_M_1 );
+               set_D6( DISP_M_1 );
                for( d = 0; d < flashes ; d++ ) {
                   fdisp();             // Display
                }
@@ -198,7 +198,7 @@ void main (void) {
                set_D3( get_D4() );
                set_D4( get_D5() );
                set_D5( get_D6() );
-	       set_D6( DISP_M_1 );
+               set_D6( DISP_M_1 );
                for( d = 0; d < flashes ; d++ ) {
                   fdisp();             // Display
                }
@@ -259,7 +259,7 @@ void main (void) {
                set_D3( get_D4() );
                set_D4( get_D5() );
                set_D5( get_D6() );
-	       set_D6( DISP_M_1 );
+               set_D6( DISP_M_1 );
                for( d = 0; d < flashes ; d++ ) {
                   fdisp();             // Display
                }
@@ -272,7 +272,7 @@ void main (void) {
                set_D3( get_D4() );
                set_D4( get_D5() );
                set_D5( get_D6() );
-	       set_D6( DISP_M_1 );
+               set_D6( DISP_M_1 );
                for( d = 0; d < flashes ; d++ ) {
                   fdisp();             // Display
                }
@@ -285,7 +285,7 @@ void main (void) {
                set_D3( get_D4() );
                set_D4( get_D5() );
                set_D5( get_D6() );
-	       set_D6( DISP_M_1 );
+               set_D6( DISP_M_1 );
                for( d = 0; d < flashes ; d++ ) {
                   fdisp();             // Display
                }
@@ -298,7 +298,7 @@ void main (void) {
                set_D3( get_D4() );
                set_D4( get_D5() );
                set_D5( get_D6() );
-	       set_D6( DISP_M_1 );
+               set_D6( DISP_M_1 );
                for( d = 0; d < flashes ; d++ ) {
                   fdisp();             // Display
                }
@@ -344,10 +344,10 @@ void main (void) {
                set_D6( DISP_BACKSLASH );
                break;
             default:
-	       displayable = 0;        // Character not mapped
+               displayable = 0;        // Character not mapped
          }
 
-	 if( displayable ) {
+         if( displayable ) {
 
             putchar( buffer[l] );      // Send it to the console
 
@@ -382,3 +382,4 @@ void main (void) {
 
    return;
 }
+

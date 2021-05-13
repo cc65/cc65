@@ -66,7 +66,7 @@ void main(void) {
          puts( "instructions again and type 'stop' to end the program.\n");
          puts( "Available registers:   DDR1A, IOR1A, DDR1B, IOR1B, DDR2A" );
          puts( "IOR2A, DDR2B, IOR2B, DDR3A, IOR3A, DDR3B and IOR3B." );
-	 instr = 0;
+         instr = 0;
       }
 
       printf( "\n Command:  " );

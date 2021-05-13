@@ -45,6 +45,9 @@
 #include "inline.h"
 #include "mmodel.h"
 
+/* cc65 */
+#include "funcdesc.h"
+
 
 
 /*****************************************************************************/
@@ -53,8 +56,8 @@
 
 
 
-typedef struct FuncDesc FuncDesc;
-typedef struct SymEntry SymEntry;
+struct StrBuf;
+struct SymEntry;
 
 
 
@@ -162,12 +165,12 @@ typedef unsigned long TypeCode;
 /* Type entry */
 typedef struct Type Type;
 struct Type {
-    TypeCode            C;      /* Code for this entry */
+    TypeCode             C;     /* Code for this entry */
     union {
-        FuncDesc*       F;      /* Function description pointer */
-        SymEntry*       S;      /* Enum/struct/union tag symbol entry pointer */
-        long            L;      /* Numeric attribute value */
-        unsigned long   U;      /* Dito, unsigned */
+        struct FuncDesc* F;     /* Function description pointer */
+        struct SymEntry* S;     /* Enum/struct/union tag symbol entry pointer */
+        long             L;     /* Numeric attribute value */
+        unsigned long    U;     /* Dito, unsigned */
     } A;                        /* Type attribute if necessary */
 };
 
@@ -221,11 +224,6 @@ extern const Type type_c_char_p[];
 extern const Type type_void_p[];
 extern const Type type_c_void_p[];
 
-/* Forward for the SymEntry struct */
-struct SymEntry;
-
-/* Forward for the StrBuf struct */
-struct StrBuf;
 
 
 /*****************************************************************************/
@@ -849,7 +847,7 @@ int IsVariadicFunc (const Type* T) attribute ((const));
 */
 
 int IsFastcallFunc (const Type* T) attribute ((const));
-/* Return true if this is a function type or pointer to function type by
+/* Return true if this is a function type or pointer to function type with
 ** __fastcall__ calling convention.
 ** Check fails if the type is not a function or a pointer to function.
 */

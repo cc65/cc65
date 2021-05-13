@@ -1242,7 +1242,7 @@ const Type* GetBaseElementType (const Type* T)
 
 
 
-SymEntry* GetESUSymEntry (const Type* T)
+struct SymEntry* GetESUSymEntry (const Type* T)
 /* Return a SymEntry pointer from an enum/struct/union type */
 {
     /* Only enums, structs or unions have a SymEntry attribute */
@@ -1254,7 +1254,7 @@ SymEntry* GetESUSymEntry (const Type* T)
 
 
 
-void SetESUSymEntry (Type* T, SymEntry* S)
+void SetESUSymEntry (Type* T, struct SymEntry* S)
 /* Set the SymEntry pointer for an enum/struct/union type */
 {
     /* Only enums, structs or unions have a SymEntry attribute */

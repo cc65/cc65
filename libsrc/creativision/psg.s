@@ -1,63 +1,67 @@
 ; void __fastcall__ psg_outb (unsigned char b);
-; void __fastcall__ psg_delay (unsigned char c);
-; void __fastcall__ bios_playsound (const void *b, unsigned char c);
+; void __fastcall__ psg_delay (unsigned char b);
+; void __fastcall__ bios_playsound (void *a, unsigned char b);
 ; void psg_silence (void);
 
-        .export          _psg_outb, _psg_silence, _psg_delay
-        .export          _bios_playsound
-        .import          popa
+
+        .export         _psg_outb, _psg_silence, _psg_delay
+        .export         _bios_playsound
+
+        .import         popax
+
         .include        "creativision.inc"
 
-_psg_outb:
 
-        ;* Let BIOS output the value
-        jmp $FE77
+songptr :=      $00             ; Points to current tune data
+volptr  :=      $04             ; Points to current volume table
+
+_psg_outb:
+        ;* Let BIOS output the value.
+        jmp     $FE77
+
 
 _psg_silence:
-
-        jmp $FE54
+        jmp     $FE54
 
 
 _psg_delay:
-
         tay
-l1:     lda #200
-l2:     sbc #1
-        bne l2
+l1:     lda     #200
+l2:     sbc     #1
+        bne     l2
 
-        lda #200
-l3:     sbc #1
-        bne l3
+        lda     #200
+l3:     sbc     #1
+        bne     l3
 
         dey
-        bne l1
-
+        bne     l1
         rts
 
 
 ;* Creativision Sound Player
+;* Based on BIOS song player.
 ;*
-;* Based on BIOS sound player.
-;* Pass a pointer to a set of note triples, terminated with a tempo byte
-;* and the len (max 255)
+;* Pass a pointer to a set of note triples, terminated with a tempo byte;
+;* and pass the length of the triples and tempo (max 255).
+;*
+;* Note: tune data must be stored backwards.
 
 _bios_playsound:
-
-        pha                     ; Save Length Byte
+        php
+        pha                     ; Save tune length
         sei
 
-        lda         #$D5        ; BIOS volume table low
-        sta         $4
-        lda         #$FC        ; BIOS volume table high
-        sta         $5
+        lda     #<$FCD5         ; A BIOS volume table
+        ldx     #>$FCD5
+        sta     volptr
+        stx     volptr+1
 
-        jsr         popa        ; Get Sound table pointer low
-        sta         $0
-        jsr         popa        ; Get Sound table pointer high
-        sta         $1
+        jsr     popax           ; Get tune array pointer
+        sta     songptr
+        stx     songptr+1
 
         pla
-        tay                     ; Put length in Y
-        dey
-        php
-        jmp         $FBED       ; Let BIOS do it's thing
+        tay
+        dey                     ; Point to tempo byte
+        jmp     $FBED           ; Let BIOS do its thing

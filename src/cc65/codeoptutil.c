@@ -1447,7 +1447,7 @@ void AdjustEntryIndices (Collection* Indices, int Index, int Change)
             } else if (Index <= *IndexPtr) {
                 /* Has been removed */
                 *IndexPtr = -1;
-                //CollDelete (Indices, I);
+                /*CollDelete (Indices, I);*/
                 --I;
             }
         }

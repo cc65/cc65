@@ -5186,7 +5186,7 @@ the module just loaded. Possible error codes are:
 <item><tt/MLOAD_ERR_MEM/ - Not enough memory
 </itemize>
 <tag/Notes/<itemize>
-<item>The <htmlurl url="ld65.html" name="ld65"> linker is needed to create
+<item>The <url url="ld65.html" name="ld65 linker"> is needed to create
 relocatable o65 modules for use with this function.
 <item>The function is available only as a fastcall function; so, it may be used
 only in the presence of a prototype.

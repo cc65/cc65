@@ -1391,9 +1391,9 @@ parameter with the <tt/#pragma/.
   in their prototypes).
 
   The identifier is an 8-bit number that's set into <tt/tmp4/. If the identifier
-  is "bank", then a <tt><url url="ca65.html#.BANK" name=".bank"></tt> operator will be used
+  is "bank", then ca65's <tt><url url="ca65.html#.BANK" name=".bank"></tt> function will be used
   to determine the number from the bank attribute defined in the linker config,
-  see <htmlurl url="ld65.html#MEMORY" name="Other MEMORY area attributes">. Note that
+  see <url url="ld65.html#MEMORY" name="Other MEMORY area attributes">. Note that
   this currently implies that only the least significant 8 bits of the bank attribute
   can be used.
 

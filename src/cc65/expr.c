@@ -1301,6 +1301,7 @@ static void Primary (ExprDesc* E)
                 /* Statement block */
                 NextToken ();
                 Error ("Expression expected");
+                E->Flags |= E_EVAL_MAYBE_UNUSED;
                 hie0 (E);
                 if (CurTok.Tok == TOK_RCURLY) {
                     NextToken ();
@@ -1332,6 +1333,7 @@ static void Primary (ExprDesc* E)
                     }
                 } else {
                     Error ("Expression expected");
+                    E->Flags |= E_EVAL_MAYBE_UNUSED;
                     NextToken ();
                 }
             }

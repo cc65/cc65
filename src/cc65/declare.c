@@ -2243,7 +2243,7 @@ static void DefineData (ExprDesc* Expr)
 
 
 
-static void OutputBitFieldData (StructInitData* SI)
+static void DefineBitFieldData (StructInitData* SI)
 /* Output bit field data */
 {
     /* Ignore if we have no data */
@@ -2266,7 +2266,18 @@ static void OutputBitFieldData (StructInitData* SI)
 
 
 
-static ExprDesc ParseScalarInitInternal (Type* T)
+static void DefineStrData (Literal* Lit, unsigned Count)
+{   
+    /* Translate into target charset */
+    TranslateLiteral (Lit);
+
+    /* Output the data */
+    g_defbytes (GetLiteralStr (Lit), Count);
+}
+
+
+
+static ExprDesc ParseScalarInitInternal (const Type* T)
 /* Parse initializaton for scalar data types. This function will not output the
 ** data but return it in ED.
 */
@@ -2293,7 +2304,7 @@ static ExprDesc ParseScalarInitInternal (Type* T)
 
 
 
-static unsigned ParseScalarInit (Type* T)
+static unsigned ParseScalarInit (const Type* T)
 /* Parse initializaton for scalar data types. Return the number of data bytes. */
 {
     /* Parse initialization */
@@ -2311,7 +2322,7 @@ static unsigned ParseScalarInit (Type* T)
 
 
 
-static unsigned ParsePointerInit (Type* T)
+static unsigned ParsePointerInit (const Type* T)
 /* Parse initializaton for pointer data types. Return the number of data bytes. */
 {
     /* Optional opening brace */
@@ -2364,9 +2375,6 @@ static unsigned ParseArrayInit (Type* T, int* Braces, int AllowFlexibleMembers)
             NextToken ();
         }
 
-        /* Translate into target charset */
-        TranslateLiteral (CurTok.SVal);
-
         /* If the array is one too small for the string literal, omit the
         ** trailing zero.
         */
@@ -2379,7 +2387,7 @@ static unsigned ParseArrayInit (Type* T, int* Braces, int AllowFlexibleMembers)
         }
 
         /* Output the data */
-        g_defbytes (GetLiteralStr (CurTok.SVal), Count);
+        DefineStrData (CurTok.SVal, Count);
 
         /* Skip the string */
         NextToken ();
@@ -2453,7 +2461,7 @@ static unsigned ParseArrayInit (Type* T, int* Braces, int AllowFlexibleMembers)
 static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
 /* Parse initialization of a struct or union. Return the number of data bytes. */
 {
-    SymEntry*       Entry;
+    SymEntry*       Sym;
     SymTable*       Tab;
     StructInitData  SI;
     int             HasCurly  = 0;
@@ -2468,15 +2476,15 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
     }
 
     /* Get a pointer to the struct entry from the type */
-    Entry = GetESUSymEntry (T);
+    Sym = GetESUSymEntry (T);
 
     /* Get the size of the struct from the symbol table entry */
-    SI.Size = Entry->V.S.Size;
+    SI.Size = Sym->V.S.Size;
 
     /* Check if this struct definition has a field table. If it doesn't, it
     ** is an incomplete definition.
     */
-    Tab = Entry->V.S.SymTab;
+    Tab = Sym->V.S.SymTab;
     if (Tab == 0) {
         Error ("Cannot initialize variables with incomplete type");
         /* Try error recovery */
@@ -2486,7 +2494,7 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
     }
 
     /* Get a pointer to the list of symbols */
-    Entry = Tab->SymHead;
+    Sym = Tab->SymHead;
 
     /* Initialize fields */
     SI.Offs    = 0;
@@ -2495,7 +2503,7 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
     while (CurTok.Tok != TOK_RCURLY) {
 
         /* Check for excess elements */
-        if (Entry == 0) {
+        if (Sym == 0) {
             /* Is there just one trailing comma before a closing curly? */
             if (NextTok.Tok == TOK_RCURLY && CurTok.Tok == TOK_COMMA) {
                 /* Skip comma and exit scope */
@@ -2511,7 +2519,7 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
         }
 
         /* Check for special members that don't consume the initializer */
-        if ((Entry->Flags & SC_ALIAS) == SC_ALIAS) {
+        if ((Sym->Flags & SC_ALIAS) == SC_ALIAS) {
             /* Just skip */
             goto NextMember;
         }
@@ -2519,17 +2527,17 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
         /* This may be an anonymous bit-field, in which case it doesn't
         ** have an initializer.
         */
-        if (SymIsBitField (Entry) && (IsAnonName (Entry->Name))) {
+        if (SymIsBitField (Sym) && (IsAnonName (Sym->Name))) {
             /* Account for the data and output it if we have at least a full
             ** word. We may have more if there was storage unit overlap, for
             ** example two consecutive 10 bit fields. These will be packed
             ** into 3 bytes.
             */
-            SI.ValBits += Entry->V.B.BitWidth;
+            SI.ValBits += Sym->V.B.BitWidth;
             /* TODO: Generalize this so any type can be used. */
             CHECK (SI.ValBits <= CHAR_BITS + INT_BITS - 2);
             while (SI.ValBits >= CHAR_BITS) {
-                OutputBitFieldData (&SI);
+                DefineBitFieldData (&SI);
             }
             /* Avoid consuming the comma if any */
             goto NextMember;
@@ -2541,7 +2549,7 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
             SkipComma = 0;
         }
 
-        if (SymIsBitField (Entry)) {
+        if (SymIsBitField (Sym)) {
 
             /* Parse initialization of one field. Bit-fields need a special
             ** handling.
@@ -2552,14 +2560,14 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
             unsigned Shift;
 
             /* Calculate the bitmask from the bit-field data */
-            unsigned Mask = (1U << Entry->V.B.BitWidth) - 1U;
+            unsigned Mask = (1U << Sym->V.B.BitWidth) - 1U;
 
             /* Safety ... */
-            CHECK (Entry->V.B.Offs * CHAR_BITS + Entry->V.B.BitOffs ==
-                   SI.Offs         * CHAR_BITS + SI.ValBits);
+            CHECK (Sym->V.B.Offs * CHAR_BITS + Sym->V.B.BitOffs ==
+                   SI.Offs       * CHAR_BITS + SI.ValBits);
 
             /* Read the data, check for a constant integer, do a range check */
-            ED = ParseScalarInitInternal (Entry->Type);
+            ED = ParseScalarInitInternal (Sym->Type);
             if (!ED_IsConstAbsInt (&ED)) {
                 Error ("Constant initializer expected");
                 ED_MakeConstAbsInt (&ED, 1);
@@ -2569,31 +2577,31 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
             ** any useful bits.
             */
             Val = (unsigned) ED.IVal & Mask;
-            if (IsSignUnsigned (Entry->Type)) {
+            if (IsSignUnsigned (Sym->Type)) {
                 if (ED.IVal < 0 || (unsigned long) ED.IVal != Val) {
                     Warning ("Implicit truncation from '%s' to '%s : %u' in bit-field initializer"
                              " changes value from %ld to %u",
-                             GetFullTypeName (ED.Type), GetFullTypeName (Entry->Type),
-                             Entry->V.B.BitWidth, ED.IVal, Val);
+                             GetFullTypeName (ED.Type), GetFullTypeName (Sym->Type),
+                             Sym->V.B.BitWidth, ED.IVal, Val);
                 }
             } else {
                 /* Sign extend back to full width of host long. */
-                unsigned ShiftBits = sizeof (long) * CHAR_BIT - Entry->V.B.BitWidth;
+                unsigned ShiftBits = sizeof (long) * CHAR_BIT - Sym->V.B.BitWidth;
                 long RestoredVal = asr_l(asl_l (Val, ShiftBits), ShiftBits);
                 if (ED.IVal != RestoredVal) {
                     Warning ("Implicit truncation from '%s' to '%s : %u' in bit-field initializer "
                              "changes value from %ld to %ld",
-                             GetFullTypeName (ED.Type), GetFullTypeName (Entry->Type),
-                             Entry->V.B.BitWidth, ED.IVal, RestoredVal);
+                             GetFullTypeName (ED.Type), GetFullTypeName (Sym->Type),
+                             Sym->V.B.BitWidth, ED.IVal, RestoredVal);
                 }
             }
 
             /* Add the value to the currently stored bit-field value */
-            Shift = (Entry->V.B.Offs - SI.Offs) * CHAR_BITS + Entry->V.B.BitOffs;
+            Shift = (Sym->V.B.Offs - SI.Offs) * CHAR_BITS + Sym->V.B.BitOffs;
             SI.BitVal |= (Val << Shift);
 
             /* Account for the data and output any full bytes we have. */
-            SI.ValBits += Entry->V.B.BitWidth;
+            SI.ValBits += Sym->V.B.BitWidth;
             /* Make sure unsigned is big enough to hold the value, 22 bits.
             ** This is 22 bits because the most we can have is 7 bits left
             ** over from the previous OutputBitField call, plus 15 bits
@@ -2604,7 +2612,7 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
             /* TODO: Generalize this so any type can be used. */
             CHECK (SI.ValBits <= CHAR_BITS + INT_BITS - 2);
             while (SI.ValBits >= CHAR_BITS) {
-                OutputBitFieldData (&SI);
+                DefineBitFieldData (&SI);
             }
 
         } else {
@@ -2618,7 +2626,7 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
             /* Flexible array members may only be initialized if they are
             ** the last field (or part of the last struct field).
             */
-            SI.Offs += ParseInitInternal (Entry->Type, Braces, AllowFlexibleMembers && Entry->NextSym == 0);
+            SI.Offs += ParseInitInternal (Sym->Type, Braces, AllowFlexibleMembers && Sym->NextSym == 0);
         }
 
         /* More initializers? */
@@ -2633,10 +2641,10 @@ NextMember:
         /* Next member. For unions, only the first one can be initialized */
         if (IsTypeUnion (T)) {
             /* Union */
-            Entry = 0;
+            Sym = 0;
         } else {
             /* Struct */
-            Entry = Entry->NextSym;
+            Sym = Sym->NextSym;
         }
     }
 
@@ -2647,7 +2655,7 @@ NextMember:
 
     /* If we have data from a bit-field left, output it now */
     CHECK (SI.ValBits < CHAR_BITS);
-    OutputBitFieldData (&SI);
+    DefineBitFieldData (&SI);
 
     /* If there are struct fields left, reserve additional storage */
     if (SI.Offs < SI.Size) {

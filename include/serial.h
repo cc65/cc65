@@ -136,7 +136,7 @@ unsigned char __fastcall__ ser_load_driver (const char* driver);
 unsigned char ser_unload (void);
 /* Uninstall, then unload the currently loaded driver. */
 
-unsigned char __fastcall__ ser_install (void* driver);
+unsigned char __fastcall__ ser_install (const void* driver);
 /* Install an already loaded driver. Return an error code. */
 
 unsigned char ser_uninstall (void);

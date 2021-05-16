@@ -644,7 +644,7 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
 
     /* Now process statements in this block */
     while (CurTok.Tok != TOK_RCURLY && CurTok.Tok != TOK_CEOF) {
-        Statement (0);
+        AnyStatement (0);
     }
 
     /* If this is not a void function, and not the main function in a C99

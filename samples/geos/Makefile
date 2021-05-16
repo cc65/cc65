@@ -3,6 +3,17 @@
 # var. to build for another target system.
 SYS ?= geos-cbm
 
+# If SYS was given on the commandline, redirect "c64" to "geos-cbm" and
+# "apple2enh" to "geos-apple"
+ifeq "$(origin SYS)" "command line"
+ifeq "$(SYS)" "c64"
+  override SYS = geos-cbm
+endif
+ifeq "$(SYS)" "apple2enh"
+  override SYS = geos-apple
+endif
+endif
+
 # Just the usual way to find out if we're
 # using cmd.exe to execute make rules.
 ifneq ($(shell echo),)

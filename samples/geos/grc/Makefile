@@ -43,6 +43,9 @@ else
 samples:
   ifeq ($(MAKELEVEL),0)
 	@echo "info: grc sample not available for" $(SYS)
+  else
+# suppress the "nothing to be done for 'samples' message
+	@echo > $(NULLDEV)
   endif
 endif
 

@@ -84,10 +84,12 @@ else
 samples:
   ifeq ($(MAKELEVEL),0)
 	@echo "info: geos samples not available for" $(SYS)
+  else
+# suppress the "nothing to be done for 'samples' message
+	@echo > $(NULLDEV)
   endif
 endif
 
-	
 bitmap.c: logo.pcx
 	$(SP) -r logo.pcx -c geos-bitmap -w bitmap.c,ident=bitmap
 

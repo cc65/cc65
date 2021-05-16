@@ -5,13 +5,15 @@ SYS ?= geos-cbm
 
 # If SYS was given on the commandline, redirect "c64" to "geos-cbm" and
 # "apple2enh" to "geos-apple"
-ifeq "$(origin SYS)" "command line"
-ifeq "$(SYS)" "c64"
-  override SYS = geos-cbm
-endif
-ifeq "$(SYS)" "apple2enh"
-  override SYS = geos-apple
-endif
+ifeq ($(origin SYS),command line)
+  ifeq ($(SYS),c64)
+    override SYS = geos-cbm
+    $(info GEOS: c64 -> geos-cbm)
+  endif
+  ifeq ($(SYS),apple2enh)
+    override SYS = geos-apple
+    $(info GEOS: apple2enh -> geos-apple)
+  endif
 endif
 
 # Just the usual way to find out if we're
@@ -80,7 +82,9 @@ samples: $(EXELIST_$(SYS))
 	$(foreach dir,$(DIRLIST),$(SUBDIR_recipe))
 else
 samples:
-	@echo "warning: geos samples not available for" $(SYS)
+  ifeq ($(MAKELEVEL),0)
+	@echo "info: geos samples not available for" $(SYS)
+  endif
 endif
 
 	

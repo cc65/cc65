@@ -344,7 +344,9 @@ samples: $(EXELIST_$(SYS))
 
 # empty target used to skip systems that will not work with any program in this dir
 notavailable:
-	@echo "warning: generic samples not available for" $(SYS)
+ifeq ($(MAKELEVEL),0)
+	@echo "info: generic samples not available for" $(SYS)
+endif
 
 disk: $(DISK_$(SYS))
 

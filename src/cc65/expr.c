@@ -4217,7 +4217,8 @@ ExprDesc NoCodeConstExpr (void (*Func) (ExprDesc*))
     if (!ED_IsConst (&Expr) || !ED_CodeRangeIsEmpty (&Expr)) {
         Error ("Constant expression expected");
         /* To avoid any compiler errors, make the expression a valid const */
-        ED_MakeConstAbsInt (&Expr, 1);
+        Expr.Flags &= E_MASK_RTYPE | E_MASK_KEEP_RESULT;
+        Expr.Flags |= E_LOC_NONE;
     }
 
     /* Return by value */

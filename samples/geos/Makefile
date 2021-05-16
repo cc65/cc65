@@ -37,17 +37,42 @@ DIRLIST = grc
 
 define SUBDIR_recipe
 
-@$(MAKE) -C $(dir) --no-print-directory $@
+@$(MAKE) SYS=$(SYS) -C $(dir) --no-print-directory $@
 
 endef # SUBDIR_recipe
 
+EXELIST_geos-cbm = \
+	bitmap-demo.cvt \
+	filesel.cvt \
+	geosver.cvt \
+	getid.cvt \
+	hello1.cvt \
+	hello2.cvt \
+	overlay-demo.cvt \
+	vector-demo.cvt \
+	yesno.cvt
+
+EXELIST_geos-apple = \
+	bitmap-demo.cvt \
+	filesel.cvt \
+	hello1.cvt \
+	hello2.cvt \
+	overlay-demo.cvt \
+	vector-demo.cvt \
+	yesno.cvt
+
 # omitted: dialog.c grphstr.c inittab.c menu.c
-
 # TODO: geosconio.cvt rmvprot.cvt
-samples: bitmap-demo.cvt filesel.cvt geosver.cvt getid.cvt hello1.cvt hello2.cvt \
-	overlay-demo.cvt vector-demo.cvt yesno.cvt
-	$(foreach dir,$(DIRLIST),$(SUBDIR_recipe))
 
+ifneq ($(EXELIST_$(SYS)),)
+samples: $(EXELIST_$(SYS))
+	$(foreach dir,$(DIRLIST),$(SUBDIR_recipe))
+else
+samples:
+	@echo "warning: geos samples not available for" $(SYS)
+endif
+
+	
 bitmap.c: logo.pcx
 	$(SP) -r logo.pcx -c geos-bitmap -w bitmap.c,ident=bitmap
 

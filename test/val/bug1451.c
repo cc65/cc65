@@ -15,7 +15,7 @@ int main(void)
     S b = {1, 4};
     S m[1] = {{6, 3}};
     S *p = &a;
-	
+
     (&a)->a += b.a;
     p->b += b.b;
     m->a += b.a;

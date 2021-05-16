@@ -184,7 +184,7 @@ INLINE CodeLabel* CE_GetLabel (CodeEntry* E, unsigned Index)
 INLINE void CE_ReplaceLabel (CodeEntry* E, CodeLabel* L, unsigned Index)
 /* Replace the code label at the specified index with L */
 {
-    return CollReplace (&E->Labels, L, Index);
+    CollReplace (&E->Labels, L, Index);
 }
 #else
 #  define CE_ReplaceLabel(E, L, Index) CollReplace (&(E)->Labels, (L), (Index))

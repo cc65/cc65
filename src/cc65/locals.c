@@ -476,8 +476,7 @@ static void ParseOneDecl (const DeclSpec* Spec)
     }
 
     /* If the symbol is not marked as external, it will be defined now */
-    if ((Decl.StorageClass & SC_FICTITIOUS) == 0 &&
-        (Decl.StorageClass & SC_DECL) == 0  &&
+    if ((Decl.StorageClass & SC_DECL) == 0 &&
         (Decl.StorageClass & SC_EXTERN) == 0) {
         Decl.StorageClass |= SC_DEF;
     }

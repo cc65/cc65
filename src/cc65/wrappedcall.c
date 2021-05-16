@@ -64,7 +64,7 @@ static IntPtrStack WrappedCalls;
 
 
 
-void PushWrappedCall (void *Ptr, unsigned char Val)
+void PushWrappedCall (void *Ptr, unsigned int Val)
 /* Push the current WrappedCall */
 {
     if (IPS_IsFull (&WrappedCalls)) {
@@ -88,7 +88,7 @@ void PopWrappedCall (void)
 
 
 
-void GetWrappedCall (void **Ptr, unsigned char *Val)
+void GetWrappedCall (void **Ptr, unsigned int *Val)
 /* Get the current WrappedCall */
 {
     if (IPS_GetCount (&WrappedCalls) < 1) {
@@ -97,6 +97,6 @@ void GetWrappedCall (void **Ptr, unsigned char *Val)
     } else {
         long Temp;
         IPS_Get (&WrappedCalls, &Temp, Ptr);
-        *Val = (unsigned char) Temp;
+        *Val = (unsigned int) Temp;
     }
 }

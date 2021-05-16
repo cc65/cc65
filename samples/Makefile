@@ -271,8 +271,7 @@ EXELIST_geos-cbm = \
         diodemo
 
 EXELIST_geos-apple = \
-        ascii        \
-        diodemo
+        ascii
 
 EXELIST_lunix = \
         notavailable

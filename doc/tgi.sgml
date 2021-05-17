@@ -555,7 +555,7 @@ tgi_init(); //Set up the default palette and clear the screen.
 <descrip>
 <tag/Function/Install an already loaded driver and return an error code.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/unsigned char __fastcall__ tgi_install (void* driver);/
+<tag/Declaration/<tt/unsigned char __fastcall__ tgi_install (const void* driver);/
 <tag/Description/The function installs a driver that was already loaded into
 memory (or linked statically to the program). It returns an error code
 (<tt/TGI_ERR_OK/ in case of success).

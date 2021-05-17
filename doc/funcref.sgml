@@ -3410,7 +3410,7 @@ loaded.
 <descrip>
 <tag/Function/Install an already loaded extended memory driver.
 <tag/Header/<tt/<ref id="em.h" name="em.h">/
-<tag/Declaration/<tt/unsigned char _fastcall__ em_install (void* driver);/
+<tag/Declaration/<tt/unsigned char _fastcall__ em_install (const void* driver);/
 <tag/Description/The function installs an already loaded extended memory driver
 and returns an error code. The function may be used to install a driver linked
 statically to the program.
@@ -4733,7 +4733,7 @@ There's no way to check for the number of actually connected joysticks.
 <descrip>
 <tag/Function/Install an already loaded driver and return an error code.
 <tag/Header/<tt/<ref id="joystick.h" name="joystick.h">/
-<tag/Declaration/<tt/unsigned char __fastcall__ joy_install (void* driver);/
+<tag/Declaration/<tt/unsigned char __fastcall__ joy_install (const void* driver);/
 <tag/Description/The function installs a driver that was already loaded into
 memory (or linked statically to the program). It returns an error code
 (<tt/JOY_ERR_OK/ in case of success).
@@ -6198,7 +6198,7 @@ while (ser_get(&amp;ch) == SER_ERR_NO_DATA)
 <descrip>
 <tag/Function/Install an already loaded driver and return an error code.
 <tag/Header/<tt/<ref id="serial.h" name="serial.h">/
-<tag/Declaration/<tt/unsigned char __fastcall__ ser_install (void* driver);/
+<tag/Declaration/<tt/unsigned char __fastcall__ ser_install (const void* driver);/
 <tag/Description/The function installs a driver that was already loaded into
 memory (or linked statically to the program). It returns an error code
 (<tt/SER_ERR_OK/ in case of success).

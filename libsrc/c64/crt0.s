@@ -46,13 +46,26 @@ Start:
 
         jsr     callmain
 
-; Back from main() [this is also the exit() entry]. Run the module destructors.
+        ; Avoid a re-entrance of donelib. This is also the exit() entry.
+_exit:
+        sta     stsave            ; Save the return code
 
-_exit:  pha                     ; Save the return code on stack
+        ldx     #<exit
+        lda     #>exit
+        jsr     setnmi
+
+; Run the module destructors.
+
         jsr     donelib
 
-; Copy back the zero-page stuff.
+; Restore the original NMI vector.
+exit:   ldx     #$01
+:       lda     nmisave,x
+        sta     $0318,x
+        dex
+        bpl     :-
 
+; Copy back the zero-page stuff.
         ldx     #zpspace-1
 L2:     lda     zpsave,x
         sta     sp,x
@@ -61,7 +74,7 @@ L2:     lda     zpsave,x
 
 ; Place the program return code into BASIC's status variable.
 
-        pla
+        lda     stsave
         sta     ST
 
 ; Restore the system stuff.
@@ -75,6 +88,37 @@ L2:     lda     zpsave,x
 
         rts
 
+.segment        "CODE"
+setnmi:
+        stx     $0318
+        sta     $0319
+        rts
+
+exitnmi:
+        pha
+        ; save $01
+        lda     $01
+        pha
+        ; enable i/o (switch to standard memory config)
+        lda     #$36
+        sta     $01
+        ; check run/stop
+        lda     #$7f
+        sta     $dc00
+        lda     $dc01
+        bpl     :+              ; branch if pressed
+        ; restore $01
+        pla
+        sta     $01
+        pla
+        ; continue with saved system vector
+        jmp     (nmisave)
+:
+        ; throw away saved $01 value and akku (keep memory config)
+        pla
+        pla
+        lda     #$ff    ; exit code (-1)
+        jmp     _exit
 
 ; ------------------------------------------------------------------------
 
@@ -90,6 +134,13 @@ L1:     lda     sp,x
         dex
         bpl     L1
 
+; save original NMI vector
+        ldx     #$01
+:       lda     $0318,x
+        sta     nmisave,x
+        dex
+        bpl     :-
+
 ; Set up the stack.
 
         lda     #<(__MAIN_START__ + __MAIN_SIZE__)
@@ -102,6 +153,11 @@ L1:     lda     sp,x
         lda     #14
         jsr     BSOUT
 
+; set NMI vector to our exit nmi
+        ldx     #<exitnmi
+        lda     #>exitnmi
+        jsr     setnmi
+
 ; Call the module constructors.
 
         jmp     initlib
@@ -112,6 +168,8 @@ L1:     lda     sp,x
 
 .segment        "INIT"
 
-mmusave:.res    1
-spsave: .res    1
-zpsave: .res    zpspace
+mmusave:    .res    1
+spsave:     .res    1
+zpsave:     .res    zpspace
+stsave:     .res    1
+nmisave:    .res    2

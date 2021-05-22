@@ -47,13 +47,8 @@
 
 
 
-/* Generator attributes */
-#define GEN_NOPUSH      0x01            /* Don't push lhs */
-#define GEN_COMM        0x02            /* Operator is commutative */
-#define GEN_NOFUNC      0x04            /* Not allowed for function pointers */
-
 /* Map a generator function and its attributes to a token */
-typedef struct {
+typedef struct GenDesc {
     token_t       Tok;                  /* Token to map to */
     unsigned      Flags;                /* Flags for generator function */
     void          (*Func) (unsigned, unsigned long);    /* Generator func */
@@ -91,7 +86,7 @@ static void PostDec (ExprDesc* Expr);
 
 
 
-static unsigned GlobalModeFlags (const ExprDesc* Expr)
+unsigned GlobalModeFlags (const ExprDesc* Expr)
 /* Return the addressing mode flags for the given expression */
 {
     switch (ED_GetLoc (Expr)) {
@@ -390,117 +385,175 @@ static void DeferDec (const ExprDesc* Expr)
 
 
 
-static void DeferredInc (ExprDesc* Expr)
-/* Do the deferred post-inc */
+static void DoInc (ExprDesc* Expr, unsigned KeepResult)
+/* Do increment */
 {
     unsigned Flags;
-    unsigned long Val;
-
-    /* Get the flags */
-    Flags = TypeOf (Expr->Type) | GlobalModeFlags (Expr) | CF_FORCECHAR | CF_CONST | CF_NOKEEP;
+    long Val;
 
     /* Get the increment value in bytes */
     Val = IsTypePtr (Expr->Type) ? CheckedSizeOf (Expr->Type + 1) : 1;
 
-    /* Check the location of the data */
-    switch (ED_GetLoc (Expr)) {
+    /* Special treatment is needed for bit-fields */
+    if (IsTypeBitField (Expr->Type)) {
+        DoIncDecBitField (Expr, Val, KeepResult);
+        return;
+    }
 
-        case E_LOC_ABS:
-            /* Absolute: numeric address or const */
-            g_addeqstatic (Flags, Expr->IVal, 0, Val);
-            break;
+    /* Get the flags */
+    Flags = TypeOf (Expr->Type) | GlobalModeFlags (Expr) | CF_FORCECHAR | CF_CONST;
+    if (KeepResult != OA_NEED_NEW) {
+        /* No need to get the result */
+        Flags |= CF_NOKEEP;
+    }
 
-        case E_LOC_GLOBAL:
-            /* Global variable */
-            g_addeqstatic (Flags, Expr->Name, Expr->IVal, Val);
-            break;
+    if (KeepResult == OA_NEED_OLD) {
 
-        case E_LOC_STATIC:
-        case E_LOC_LITERAL:
-            /* Static variable or literal in the literal pool */
-            g_addeqstatic (Flags, Expr->Name, Expr->IVal, Val);
-            break;
+        Flags |= CF_FORCECHAR;
 
-        case E_LOC_REGISTER:
-            /* Register variable */
-            g_addeqstatic (Flags, Expr->Name, Expr->IVal, Val);
-            break;
+        /* Push the address if needed */
+        PushAddr (Expr);
 
-        case E_LOC_STACK:
-            /* Value on the stack */
-            g_addeqlocal (Flags, Expr->IVal, Val);
-            break;
+        /* Save the original value */
+        LoadExpr (CF_NONE, Expr);
+        g_save (Flags);
 
-        case E_LOC_PRIMARY:
-            /* The primary register */
-            g_inc (Flags, Val);
-            break;
+        /* Do the increment */
+        g_inc (Flags | CF_CONST, Val);
 
-        case E_LOC_EXPR:
-            /* An expression in the primary register */
-            g_addeqind (Flags, Expr->IVal, Val);
-            break;
+        /* Store the result back */
+        Store (Expr, 0);
 
-        default:
-            Internal ("Invalid location in DeferredInc(): 0x%04X", ED_GetLoc (Expr));
+        /* Restore the original value */
+        g_restore (Flags);
+
+    } else {
+
+        /* Check the location of the data */
+        switch (ED_GetLoc (Expr)) {
+
+            case E_LOC_ABS:
+                /* Absolute numeric addressed variable */
+                g_addeqstatic (Flags, Expr->IVal, 0, Val);
+                break;
+
+            case E_LOC_GLOBAL:
+            case E_LOC_STATIC:
+            case E_LOC_REGISTER:
+            case E_LOC_LITERAL:
+            case E_LOC_CODE:
+                /* Global variabl, static variable, register variable, pooled
+                ** literal or code label location.
+                */
+                g_addeqstatic (Flags, Expr->Name, Expr->IVal, Val);
+                break;
+
+            case E_LOC_STACK:
+                /* Value on the stack */
+                g_addeqlocal (Flags, Expr->IVal, Val);
+                break;
+
+            case E_LOC_PRIMARY:
+                /* The primary register */
+                g_inc (Flags, Val);
+                break;
+
+            case E_LOC_EXPR:
+                /* An expression referenced in the primary register */
+                g_addeqind (Flags, Expr->IVal, Val);
+                break;
+
+            default:
+                Internal ("Invalid location in DoInc(): 0x%04X", ED_GetLoc (Expr));
+        }
+
     }
 }
 
 
 
-static void DeferredDec (ExprDesc* Expr)
-/* Do the deferred post-dec */
+static void DoDec (ExprDesc* Expr, unsigned KeepResult)
+/* Do decrement */
 {
     unsigned Flags;
-    unsigned long Val;
+    long Val;
 
-    /* Get the flags */
-    Flags = TypeOf (Expr->Type) | GlobalModeFlags (Expr) | CF_FORCECHAR | CF_CONST | CF_NOKEEP;
-
-    /* Get the increment value in bytes */
+    /* Get the decrement value in bytes */
     Val = IsTypePtr (Expr->Type) ? CheckedSizeOf (Expr->Type + 1) : 1;
 
-    /* Check the location of the data */
-    switch (ED_GetLoc (Expr)) {
+    /* Special treatment is needed for bit-fields */
+    if (IsTypeBitField (Expr->Type)) {
+        DoIncDecBitField (Expr, -Val, KeepResult);
+        return;
+    }
 
-        case E_LOC_ABS:
-            /* Absolute: numeric address or const */
-            g_subeqstatic (Flags, Expr->IVal, 0, Val);
-            break;
+    /* Get the flags */
+    Flags = TypeOf (Expr->Type) | GlobalModeFlags (Expr) | CF_FORCECHAR | CF_CONST;
+    if (KeepResult != OA_NEED_NEW) {
+        /* No need to get the result */
+        Flags |= CF_NOKEEP;
+    }
 
-        case E_LOC_GLOBAL:
-            /* Global variable */
-            g_subeqstatic (Flags, Expr->Name, Expr->IVal, Val);
-            break;
+    if (KeepResult == OA_NEED_OLD) {
 
-        case E_LOC_STATIC:
-        case E_LOC_LITERAL:
-            /* Static variable or literal in the literal pool */
-            g_subeqstatic (Flags, Expr->Name, Expr->IVal, Val);
-            break;
+        Flags |= CF_FORCECHAR;
 
-        case E_LOC_REGISTER:
-            /* Register variable */
-            g_subeqstatic (Flags, Expr->Name, Expr->IVal, Val);
-            break;
+        /* Push the address if needed */
+        PushAddr (Expr);
 
-        case E_LOC_STACK:
-            /* Value on the stack */
-            g_subeqlocal (Flags, Expr->IVal, Val);
-            break;
+        /* Save the original value */
+        LoadExpr (CF_NONE, Expr);
+        g_save (Flags);
 
-        case E_LOC_PRIMARY:
-            /* The primary register */
-            g_dec (Flags, Val);
-            break;
+        /* Do the decrement */
+        g_dec (Flags | CF_CONST, Val);
 
-        case E_LOC_EXPR:
-            /* An expression in the primary register */
-            g_subeqind (Flags, Expr->IVal, Val);
-            break;
+        /* Store the result back */
+        Store (Expr, 0);
 
-        default:
-            Internal ("Invalid location in DeferredDec(): 0x%04X", ED_GetLoc (Expr));
+        /* Restore the original value */
+        g_restore (Flags);
+
+    } else {
+
+        /* Check the location of the data */
+        switch (ED_GetLoc (Expr)) {
+
+            case E_LOC_ABS:
+                /* Absolute numeric addressed variable */
+                g_subeqstatic (Flags, Expr->IVal, 0, Val);
+                break;
+
+            case E_LOC_GLOBAL:
+            case E_LOC_STATIC:
+            case E_LOC_REGISTER:
+            case E_LOC_LITERAL:
+            case E_LOC_CODE:
+                /* Global variabl, static variable, register variable, pooled
+                ** literal or code label location.
+                */
+                g_subeqstatic (Flags, Expr->Name, Expr->IVal, Val);
+                break;
+
+            case E_LOC_STACK:
+                /* Value on the stack */
+                g_subeqlocal (Flags, Expr->IVal, Val);
+                break;
+
+            case E_LOC_PRIMARY:
+                /* The primary register */
+                g_dec (Flags, Val);
+                break;
+
+            case E_LOC_EXPR:
+                /* An expression referenced in the primary register */
+                g_subeqind (Flags, Expr->IVal, Val);
+                break;
+
+            default:
+                Internal ("Invalid location in DoDec(): 0x%04X", ED_GetLoc (Expr));
+        }
+
     }
 }
 
@@ -564,11 +617,11 @@ void DoDeferred (unsigned Flags, ExprDesc* Expr)
         switch (Op->OpType) {
 
             case DOT_INC:
-                DeferredInc (&Op->Expr);
+                DoInc (&Op->Expr, OA_NEED_NONE);
                 break;
 
             case DOT_DEC:
-                DeferredDec (&Op->Expr);
+                DoDec (&Op->Expr, OA_NEED_NONE);
                 break;
         }
         xfree (&Op->Expr);
@@ -593,6 +646,7 @@ void DoDeferred (unsigned Flags, ExprDesc* Expr)
         AddCodeLine ("plp");
     }
 }
+
 
 
 static unsigned FunctionArgList (FuncDesc* Func, int IsFastcall, ExprDesc* ED)
@@ -724,13 +778,16 @@ static unsigned FunctionArgList (FuncDesc* Func, int IsFastcall, ExprDesc* ED)
             if (IsClassStruct (Expr.Type)) {
                 /* Use the replacement type */
                 Flags |= TypeOf (GetStructReplacementType (Expr.Type));
+
+                /* Load the value into the primary if it is not already there */
+                LoadExpr (Flags, &Expr);
             } else {
+                /* Load the value into the primary if it is not already there */
+                LoadExpr (CF_NONE, &Expr);
+
                 /* Use the type of the argument for the push */
                 Flags |= TypeOf (Expr.Type);
             }
-
-            /* Load the value into the primary if it is not already there */
-            LoadExpr (Flags, &Expr);
 
             /* If this is a fastcall function, don't push the last argument */
             if ((CurTok.Tok == TOK_COMMA && NextTok.Tok != TOK_RPAREN) || !IsFastcall) {
@@ -1023,7 +1080,7 @@ static void Primary (ExprDesc* E)
 
     /* Floating point constant */
     if (CurTok.Tok == TOK_FCONST) {
-        E->FVal   = CurTok.FVal;
+        E->V.FVal = CurTok.FVal;
         E->Flags |= E_LOC_NONE | E_RTYPE_RVAL;
         E->Type   = CurTok.Type;
         NextToken ();
@@ -1198,9 +1255,9 @@ static void Primary (ExprDesc* E)
         case TOK_WCSCONST:
             /* String literal */
             if ((Flags & E_EVAL_UNEVAL) != E_EVAL_UNEVAL) {
-                E->LVal = UseLiteral (CurTok.SVal);
+                E->V.LVal = UseLiteral (CurTok.SVal);
             } else {
-                E->LVal = CurTok.SVal;
+                E->V.LVal = CurTok.SVal;
             }
             E->Type  = GetCharArrayType (GetLiteralSize (CurTok.SVal));
             E->Flags = E_LOC_LITERAL | E_RTYPE_RVAL | E_ADDRESS_OF;
@@ -1400,14 +1457,14 @@ static void StructRef (ExprDesc* Expr)
         */
         BitOffs = Field.V.Offs * CHAR_BITS;
         if (SymIsBitField (&Field)) {
-            BitOffs += Field.V.B.BitOffs;
+            BitOffs += Field.Type->A.B.Offs;
             g_asr (Flags, BitOffs);
             /* Mask the value. This is unnecessary if the shift executed above
             ** moved only zeroes into the value.
             */
-            if (BitOffs + Field.V.B.BitWidth != FieldSize * CHAR_BITS) {
+            if (BitOffs + Field.Type->A.B.Width != FieldSize * CHAR_BITS) {
                 g_and (CF_INT | CF_UNSIGNED | CF_CONST,
-                       (0x0001U << Field.V.B.BitWidth) - 1U);
+                       (0x0001U << Field.Type->A.B.Width) - 1U);
             }
         } else {
             g_asr (Flags, BitOffs);
@@ -1434,12 +1491,7 @@ static void StructRef (ExprDesc* Expr)
             ED_AddrExpr (Expr);
         }
 
-        /* Make the expression a bit field if necessary */
-        if (SymIsBitField (&Field)) {
-            ED_MakeBitField (Expr, Field.V.B.BitOffs, Field.V.B.BitWidth);
-        }
     }
-
 }
 
 
@@ -1582,9 +1634,6 @@ void Store (ExprDesc* Expr, const Type* StoreType)
 static void PreInc (ExprDesc* Expr)
 /* Handle the preincrement operators */
 {
-    unsigned Flags;
-    unsigned long Val;
-
     /* Skip the operator token */
     NextToken ();
 
@@ -1600,49 +1649,8 @@ static void PreInc (ExprDesc* Expr)
         Error ("Increment of read-only variable");
     }
 
-    /* Get the data type */
-    Flags = TypeOf (Expr->Type) | GlobalModeFlags (Expr) | CF_FORCECHAR | CF_CONST;
-
-    /* Get the increment value in bytes */
-    Val = IsTypePtr (Expr->Type)? CheckedPSizeOf (Expr->Type) : 1;
-
-    /* Check the location of the data */
-    switch (ED_GetLoc (Expr)) {
-
-        case E_LOC_ABS:
-            /* Absolute numeric addressed variable */
-            g_addeqstatic (Flags, Expr->IVal, 0, Val);
-            break;
-
-        case E_LOC_GLOBAL:
-        case E_LOC_STATIC:
-        case E_LOC_REGISTER:
-        case E_LOC_LITERAL:
-        case E_LOC_CODE:
-            /* Global variabl, static variable, register variable, pooled
-            ** literal or code label location.
-            */
-            g_addeqstatic (Flags, Expr->Name, Expr->IVal, Val);
-            break;
-
-        case E_LOC_STACK:
-            /* Value on the stack */
-            g_addeqlocal (Flags, Expr->IVal, Val);
-            break;
-
-        case E_LOC_PRIMARY:
-            /* The primary register */
-            g_inc (Flags, Val);
-            break;
-
-        case E_LOC_EXPR:
-            /* An expression referenced in the primary register */
-            g_addeqind (Flags, Expr->IVal, Val);
-            break;
-
-        default:
-            Internal ("Invalid location in PreInc(): 0x%04X", ED_GetLoc (Expr));
-    }
+    /* Do the increment */
+    DoInc (Expr, OA_NEED_NEW);
 
     /* Result is an expression, no reference */
     ED_FinalizeRValLoad (Expr);
@@ -1653,9 +1661,6 @@ static void PreInc (ExprDesc* Expr)
 static void PreDec (ExprDesc* Expr)
 /* Handle the predecrement operators */
 {
-    unsigned Flags;
-    unsigned long Val;
-
     /* Skip the operator token */
     NextToken ();
 
@@ -1671,49 +1676,8 @@ static void PreDec (ExprDesc* Expr)
         Error ("Decrement of read-only variable");
     }
 
-    /* Get the data type */
-    Flags = TypeOf (Expr->Type) | GlobalModeFlags (Expr) | CF_FORCECHAR | CF_CONST;
-
-    /* Get the increment value in bytes */
-    Val = IsTypePtr (Expr->Type)? CheckedPSizeOf (Expr->Type) : 1;
-
-    /* Check the location of the data */
-    switch (ED_GetLoc (Expr)) {
-
-        case E_LOC_ABS:
-            /* Absolute numeric addressed variable */
-            g_subeqstatic (Flags, Expr->IVal, 0, Val);
-            break;
-
-        case E_LOC_GLOBAL:
-        case E_LOC_STATIC:
-        case E_LOC_REGISTER:
-        case E_LOC_LITERAL:
-        case E_LOC_CODE:
-            /* Global variabl, static variable, register variable, pooled
-            ** literal or code label location.
-            */
-            g_subeqstatic (Flags, Expr->Name, Expr->IVal, Val);
-            break;
-
-        case E_LOC_STACK:
-            /* Value on the stack */
-            g_subeqlocal (Flags, Expr->IVal, Val);
-            break;
-
-        case E_LOC_PRIMARY:
-            /* The primary register */
-            g_dec (Flags, Val);
-            break;
-
-        case E_LOC_EXPR:
-            /* An expression in the primary register */
-            g_subeqind (Flags, Expr->IVal, Val);
-            break;
-
-        default:
-            Internal ("Invalid location in PreDec(): 0x%04X", ED_GetLoc (Expr));
-    }
+    /* Do the decrement */
+    DoDec (Expr, OA_NEED_NEW);
 
     /* Result is an expression, no reference */
     ED_FinalizeRValLoad (Expr);
@@ -1724,7 +1688,7 @@ static void PreDec (ExprDesc* Expr)
 static void PostInc (ExprDesc* Expr)
 /* Handle the postincrement operator */
 {
-    unsigned Flags, Loc;
+    unsigned Flags;
 
     NextToken ();
 
@@ -1748,34 +1712,17 @@ static void PostInc (ExprDesc* Expr)
     */
 
     /* Emit smaller code if a char variable is at a constant location */
-    if ((Flags & CF_CHAR) == CF_CHAR && ED_IsLocConst (Expr)) {
+    if ((Flags & CF_TYPEMASK) == CF_CHAR && ED_IsLocConst (Expr) && !IsTypeBitField (Expr->Type)) {
 
         LoadExpr (CF_NONE, Expr);
         AddCodeLine ("inc %s", ED_GetLabelName (Expr, 0));
 
     } else {
 
-        Loc = ED_GetLoc (Expr);
-        if (Loc == E_LOC_PRIMARY || Loc == E_LOC_EXPR) {
-            /* Push the address if needed */
-            PushAddr (Expr);
+        if (ED_IsLocPrimaryOrExpr (Expr)) {
 
-            /* Fetch the value and save it (since it's the result of the expression) */
-            LoadExpr (CF_NONE, Expr);
-            g_save (Flags | CF_FORCECHAR);
-
-            /* If we have a pointer expression, increment by the size of the type */
-            if (IsTypePtr (Expr->Type)) {
-                g_inc (Flags | CF_CONST | CF_FORCECHAR, CheckedSizeOf (Expr->Type + 1));
-            } else {
-                g_inc (Flags | CF_CONST | CF_FORCECHAR, 1);
-            }
-
-            /* Store the result back */
-            Store (Expr, 0);
-
-            /* Restore the original value in the primary register */
-            g_restore (Flags | CF_FORCECHAR);
+            /* Do the increment */
+            DoInc (Expr, OA_NEED_OLD);
 
         } else {
 
@@ -1787,6 +1734,11 @@ static void PostInc (ExprDesc* Expr)
         }
     }
 
+    /* Adjust the type of the expression */
+    if (IsClassInt (Expr->Type)) {
+        Expr->Type = IntPromotion (Expr->Type);
+    }
+
     /* The result is always an expression, no reference */
     ED_FinalizeRValLoad (Expr);
 }
@@ -1796,11 +1748,11 @@ static void PostInc (ExprDesc* Expr)
 static void PostDec (ExprDesc* Expr)
 /* Handle the postdecrement operator */
 {
-    unsigned Flags, Loc;
+    unsigned Flags;
 
     NextToken ();
 
-    /* The expression to increment must be an lvalue */
+    /* The expression to decrement must be an lvalue */
     if (!ED_IsLVal (Expr)) {
         Error ("Invalid lvalue");
         return;
@@ -1815,34 +1767,17 @@ static void PostDec (ExprDesc* Expr)
     Flags = TypeOf (Expr->Type);
 
     /* Emit smaller code if a char variable is at a constant location */
-    if ((Flags & CF_CHAR) == CF_CHAR && ED_IsLocConst (Expr)) {
+    if ((Flags & CF_TYPEMASK) == CF_CHAR && ED_IsLocConst (Expr) && !IsTypeBitField (Expr->Type)) {
 
         LoadExpr (CF_NONE, Expr);
         AddCodeLine ("dec %s", ED_GetLabelName (Expr, 0));
 
     } else {
 
-        Loc = ED_GetLoc (Expr);
-        if (Loc == E_LOC_PRIMARY || Loc == E_LOC_EXPR) {
-            /* Push the address if needed */
-            PushAddr (Expr);
+        if (ED_IsLocPrimaryOrExpr (Expr)) {
 
-            /* Fetch the value and save it (since it's the result of the expression) */
-            LoadExpr (CF_NONE, Expr);
-            g_save (Flags | CF_FORCECHAR);
-
-            /* If we have a pointer expression, increment by the size of the type */
-            if (IsTypePtr (Expr->Type)) {
-                g_dec (Flags | CF_CONST | CF_FORCECHAR, CheckedSizeOf (Expr->Type + 1));
-            } else {
-                g_dec (Flags | CF_CONST | CF_FORCECHAR, 1);
-            }
-
-            /* Store the result back */
-            Store (Expr, 0);
-
-            /* Restore the original value in the primary register */
-            g_restore (Flags | CF_FORCECHAR);
+            /* Do the decrement */
+            DoDec (Expr, OA_NEED_OLD);
 
         } else {
 
@@ -1854,6 +1789,11 @@ static void PostDec (ExprDesc* Expr)
         }
     }
 
+    /* Adjust the type of the expression */
+    if (IsClassInt (Expr->Type)) {
+        Expr->Type = IntPromotion (Expr->Type);
+    }
+
     /* The result is always an expression, no reference */
     ED_FinalizeRValLoad (Expr);
 }
@@ -1863,8 +1803,6 @@ static void PostDec (ExprDesc* Expr)
 static void UnaryOp (ExprDesc* Expr)
 /* Handle unary -/+ and ~ */
 {
-    unsigned Flags;
-
     /* Remember the operator token and skip it */
     token_t Tok = CurTok.Tok;
     NextToken ();
@@ -1888,15 +1826,24 @@ static void UnaryOp (ExprDesc* Expr)
             default:        Internal ("Unexpected token: %d", Tok);
         }
 
+        /* Adjust the type of the expression */
+        Expr->Type = IntPromotion (Expr->Type);
+
         /* Limit the calculated value to the range of its type */
         LimitExprValue (Expr);
 
     } else {
+        unsigned Flags;
+
         /* Value is not constant */
         LoadExpr (CF_NONE, Expr);
 
-        /* Adjust the type of the value */
-        Flags = g_typeadjust (TypeOf (Expr->Type), TypeOf (type_int) | CF_CONST);
+        /* Adjust the type of the expression */
+        Expr->Type = IntPromotion (Expr->Type);
+        TypeConversion (Expr, Expr->Type);
+
+        /* Get code generation flags */
+        Flags = TypeOf (Expr->Type);
 
         /* Handle the operation */
         switch (Tok) {
@@ -1909,9 +1856,6 @@ static void UnaryOp (ExprDesc* Expr)
         /* The result is an rvalue in the primary */
         ED_FinalizeRValLoad (Expr);
     }
-
-    /* Adjust the type of the expression */
-    Expr->Type = IntPromotion (Expr->Type);
 }
 
 
@@ -2003,13 +1947,13 @@ void hie10 (ExprDesc* Expr)
             if (!IsTypeFunc (Expr->Type) && !IsTypeArray (Expr->Type)) {
                 if (ED_IsRVal (Expr)) {
                     Error ("Illegal address");
-                    break;
+                    /* Continue anyway, just to avoid further warnings */
                 }
 
-                if (ED_IsBitField (Expr)) {
+                if (IsTypeBitField (Expr->Type)) {
                     Error ("Cannot take address of bit-field");
-                    /* Do it anyway, just to avoid further warnings */
-                    ED_DisBitField (Expr);
+                    /* Continue anyway, just to avoid further warnings */
+                    Expr->Type = GetUnderlyingType (Expr->Type);
                 }
                 /* The & operator yields an rvalue address */
                 ED_AddrExpr (Expr);
@@ -2034,7 +1978,7 @@ void hie10 (ExprDesc* Expr)
                 ED_Init (&Uneval);
                 ED_MarkForUneval (&Uneval);
                 hie10 (&Uneval);
-                if (ED_IsBitField (&Uneval)) {
+                if (IsTypeBitField (Uneval.Type)) {
                     Error ("Cannot apply 'sizeof' to bit-field");
                     Size = 0;
                 } else {
@@ -2536,6 +2480,8 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             /* Determine the signedness of the operands */
             int LeftSigned  = IsSignSigned (Expr->Type);
             int RightSigned = IsSignSigned (Expr2.Type);
+            int CmpSigned   = IsClassInt (Expr->Type) && IsClassInt (Expr2.Type) &&
+                              IsSignSigned (ArithmeticConvert (Expr->Type, Expr2.Type));
 
             /* If the right hand side is constant, and the generator function
             ** expects the lhs in the primary, remove the push of the primary
@@ -2630,6 +2576,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                 */
                 flags |= (CF_CHAR | CF_FORCECHAR);
                 if (!LeftSigned || !RightSigned) {
+                    CmpSigned = 0;
                     flags |= CF_UNSIGNED;
                 }
 
@@ -2644,10 +2591,15 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                     flags |= CF_FORCECHAR;
                 }
                 if (!LeftSigned || !RightSigned) {
+                    CmpSigned = 0;
                     flags |= CF_UNSIGNED;
                 }
             } else {
                 unsigned rtype = TypeOf (Expr2.Type) | (flags & CF_CONST);
+                if (CmpSigned) {
+                    ltype &= ~CF_UNSIGNED;
+                    rtype &= ~CF_UNSIGNED;
+                }
                 flags |= g_typeadjust (ltype, rtype);
             }
 
@@ -2655,7 +2607,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             ** constant, we may be able to change the compares to something more
             ** effective.
             */
-            if ((!LeftSigned || !RightSigned) && rconst) {
+            if (!CmpSigned && rconst) {
 
                 switch (Tok) {
 
@@ -4121,248 +4073,6 @@ static void hieQuest (ExprDesc* Expr)
 
 
 
-static void opeq (const GenDesc* Gen, ExprDesc* Expr, const char* Op)
-/* Process "op=" operators. */
-{
-    unsigned flags;
-    CodeMark Mark;
-    int MustScale;
-
-    /* op= can only be used with lvalues */
-    if (ED_IsRVal (Expr)) {
-        Error ("Invalid lvalue in assignment");
-        return;
-    }
-
-    /* The left side must not be const qualified */
-    if (IsQualConst (Expr->Type)) {
-        Error ("Assignment to const");
-    }
-
-    /* There must be an integer or pointer on the left side */
-    if (!IsClassInt (Expr->Type) && !IsTypePtr (Expr->Type)) {
-        Error ("Invalid left operand for binary operator '%s'", Op);
-        /* Continue. Wrong code will be generated, but the compiler won't
-        ** break, so this is the best error recovery.
-        */
-    }
-
-    /* Skip the operator token */
-    NextToken ();
-
-    /* Determine the type of the lhs */
-    flags = TypeOf (Expr->Type);
-    MustScale = (Gen->Func == g_add || Gen->Func == g_sub) && IsTypePtr (Expr->Type);
-
-    /* Get the lhs address on stack (if needed) */
-    PushAddr (Expr);
-
-    /* Fetch the lhs into the primary register if needed */
-    LoadExpr (CF_NONE, Expr);
-
-    /* Bring the lhs on stack */
-    GetCodePos (&Mark);
-    g_push (flags, 0);
-
-    ExprDesc Expr2;
-    ED_Init (&Expr2);
-    Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
-
-    /* Evaluate the rhs */
-    MarkedExprWithCheck (hie1, &Expr2);
-
-    /* The rhs must be an integer (or a float, but we don't support that yet */
-    if (!IsClassInt (Expr2.Type)) {
-        Error ("Invalid right operand for binary operator '%s'", Op);
-        /* Continue. Wrong code will be generated, but the compiler won't
-        ** break, so this is the best error recovery.
-        */
-    }
-
-    /* Check for a constant expression */
-    if (ED_IsConstAbs (&Expr2) && ED_CodeRangeIsEmpty (&Expr2)) {
-        /* The resulting value is a constant. If the generator has the NOPUSH
-        ** flag set, don't push the lhs.
-        */
-        if (Gen->Flags & GEN_NOPUSH) {
-            RemoveCode (&Mark);
-        }
-        if (MustScale) {
-            /* lhs is a pointer, scale rhs */
-            Expr2.IVal *= CheckedSizeOf (Expr->Type+1);
-        }
-
-        /* If the lhs is character sized, the operation may be later done
-        ** with characters.
-        */
-        if (CheckedSizeOf (Expr->Type) == SIZEOF_CHAR) {
-            flags |= CF_FORCECHAR;
-        }
-
-        /* Special handling for add and sub - some sort of a hack, but short code */
-        if (Gen->Func == g_add) {
-            g_inc (flags | CF_CONST, Expr2.IVal);
-        } else if (Gen->Func == g_sub) {
-            g_dec (flags | CF_CONST, Expr2.IVal);
-        } else {
-            if (Expr2.IVal == 0) {
-                /* Check for div by zero/mod by zero */
-                if (Gen->Func == g_div) {
-                    Error ("Division by zero");
-                } else if (Gen->Func == g_mod) {
-                    Error ("Modulo operation with zero");
-                }
-            }
-            Gen->Func (flags | CF_CONST, Expr2.IVal);
-        }
-    } else {
-
-        /* rhs is not constant. Load into the primary */
-        LoadExpr (CF_NONE, &Expr2);
-        if (MustScale) {
-            /* lhs is a pointer, scale rhs */
-            g_scale (TypeOf (Expr2.Type), CheckedSizeOf (Expr->Type+1));
-        }
-
-        /* If the lhs is character sized, the operation may be later done
-        ** with characters.
-        */
-        if (CheckedSizeOf (Expr->Type) == SIZEOF_CHAR) {
-            flags |= CF_FORCECHAR;
-        }
-
-        /* Adjust the types of the operands if needed */
-        Gen->Func (g_typeadjust (flags, TypeOf (Expr2.Type)), 0);
-    }
-    Store (Expr, 0);
-    ED_FinalizeRValLoad (Expr);
-}
-
-
-
-static void addsubeq (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
-/* Process the += and -= operators */
-{
-    ExprDesc Expr2;
-    unsigned lflags;
-    unsigned rflags;
-    int      MustScale;
-
-    ED_Init (&Expr2);
-    Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
-
-    /* We're currently only able to handle some addressing modes */
-    if (ED_GetLoc (Expr) == E_LOC_EXPR || ED_GetLoc (Expr) == E_LOC_PRIMARY) {
-        /* Use generic routine */
-        opeq (Gen, Expr, Op);
-        return;
-    }
-
-    /* We must have an lvalue */
-    if (ED_IsRVal (Expr)) {
-        Error ("Invalid lvalue in assignment");
-        return;
-    }
-
-    /* The left side must not be const qualified */
-    if (IsQualConst (Expr->Type)) {
-        Error ("Assignment to const");
-    }
-
-    /* There must be an integer or pointer on the left side */
-    if (!IsClassInt (Expr->Type) && !IsTypePtr (Expr->Type)) {
-        Error ("Invalid left operand for binary operator '%s'", Op);
-        /* Continue. Wrong code will be generated, but the compiler won't
-        ** break, so this is the best error recovery.
-        */
-    }
-
-    /* Skip the operator */
-    NextToken ();
-
-    /* Check if we have a pointer expression and must scale rhs */
-    MustScale = IsTypePtr (Expr->Type);
-
-    /* Initialize the code generator flags */
-    lflags = 0;
-    rflags = 0;
-
-    /* Evaluate the rhs. We expect an integer here, since float is not
-    ** supported
-    */
-    hie1 (&Expr2);
-    if (!IsClassInt (Expr2.Type)) {
-        Error ("Invalid right operand for binary operator '%s'", Op);
-        /* Continue. Wrong code will be generated, but the compiler won't
-        ** break, so this is the best error recovery.
-        */
-    }
-
-    /* Setup the code generator flags */
-    lflags |= TypeOf (Expr->Type) | GlobalModeFlags (Expr) | CF_FORCECHAR;
-    rflags |= TypeOf (Expr2.Type) | CF_FORCECHAR;
-
-    if (ED_IsConstAbs (&Expr2)) {
-        /* The resulting value is a constant */
-        rflags |= CF_CONST;
-        lflags |= CF_CONST;
-
-        /* Scale it */
-        if (MustScale) {
-            Expr2.IVal *= CheckedSizeOf (Indirect (Expr->Type));
-        }
-    } else {
-        /* Not constant, load into the primary */
-        LoadExpr (CF_NONE, &Expr2);
-
-        /* Convert the type of the rhs to that of the lhs */
-        g_typecast (lflags, rflags & ~CF_FORCECHAR);
-
-        if (MustScale) {
-            /* lhs is a pointer, scale rhs */
-            g_scale (TypeOf (Expr2.Type), CheckedSizeOf (Indirect (Expr->Type)));
-        }
-    }
-
-    /* Output apropriate code depending on the location */
-    switch (ED_GetLoc (Expr)) {
-
-        case E_LOC_ABS:
-        case E_LOC_GLOBAL:
-        case E_LOC_STATIC:
-        case E_LOC_REGISTER:
-        case E_LOC_LITERAL:
-        case E_LOC_CODE:
-            /* Absolute numeric addressed variable, global variable, local
-            ** static variable, register variable, pooled literal or code
-            ** label location.
-            */
-            if (Gen->Tok == TOK_PLUS_ASSIGN) {
-                g_addeqstatic (lflags, Expr->Name, Expr->IVal, Expr2.IVal);
-            } else {
-                g_subeqstatic (lflags, Expr->Name, Expr->IVal, Expr2.IVal);
-            }
-            break;
-
-        case E_LOC_STACK:
-            /* Value on the stack */
-            if (Gen->Tok == TOK_PLUS_ASSIGN) {
-                g_addeqlocal (lflags, Expr->IVal, Expr2.IVal);
-            } else {
-                g_subeqlocal (lflags, Expr->IVal, Expr2.IVal);
-            }
-            break;
-
-        default:
-            Internal ("Invalid location in Store(): 0x%04X", ED_GetLoc (Expr));
-    }
-
-    /* Expression is an rvalue in the primary now */
-    ED_FinalizeRValLoad (Expr);
-}
-
-
-
 void hie1 (ExprDesc* Expr)
 /* Parse first level of expression hierarchy. */
 {
@@ -4370,47 +4080,47 @@ void hie1 (ExprDesc* Expr)
     switch (CurTok.Tok) {
 
         case TOK_ASSIGN:
-            Assignment (Expr);
+            OpAssign (0, Expr, "=");
             break;
 
         case TOK_PLUS_ASSIGN:
-            addsubeq (&GenPASGN, Expr, "+=");
+            OpAddSubAssign (&GenPASGN, Expr, "+=");
             break;
 
         case TOK_MINUS_ASSIGN:
-            addsubeq (&GenSASGN, Expr, "-=");
+            OpAddSubAssign (&GenSASGN, Expr, "-=");
             break;
 
         case TOK_MUL_ASSIGN:
-            opeq (&GenMASGN, Expr, "*=");
+            OpAssign (&GenMASGN, Expr, "*=");
             break;
 
         case TOK_DIV_ASSIGN:
-            opeq (&GenDASGN, Expr, "/=");
+            OpAssign (&GenDASGN, Expr, "/=");
             break;
 
         case TOK_MOD_ASSIGN:
-            opeq (&GenMOASGN, Expr, "%=");
+            OpAssign (&GenMOASGN, Expr, "%=");
             break;
 
         case TOK_SHL_ASSIGN:
-            opeq (&GenSLASGN, Expr, "<<=");
+            OpAssign (&GenSLASGN, Expr, "<<=");
             break;
 
         case TOK_SHR_ASSIGN:
-            opeq (&GenSRASGN, Expr, ">>=");
+            OpAssign (&GenSRASGN, Expr, ">>=");
             break;
 
         case TOK_AND_ASSIGN:
-            opeq (&GenAASGN, Expr, "&=");
+            OpAssign (&GenAASGN, Expr, "&=");
             break;
 
         case TOK_XOR_ASSIGN:
-            opeq (&GenXOASGN, Expr, "^=");
+            OpAssign (&GenXOASGN, Expr, "^=");
             break;
 
         case TOK_OR_ASSIGN:
-            opeq (&GenOASGN, Expr, "|=");
+            OpAssign (&GenOASGN, Expr, "|=");
             break;
 
         default:

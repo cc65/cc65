@@ -2533,7 +2533,7 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
             ** example two consecutive 10 bit fields. These will be packed
             ** into 3 bytes.
             */
-            SI.ValBits += Sym->V.B.BitWidth;
+            SI.ValBits += Sym->Type->A.B.Width;
             /* TODO: Generalize this so any type can be used. */
             CHECK (SI.ValBits <= CHAR_BITS + INT_BITS - 2);
             while (SI.ValBits >= CHAR_BITS) {
@@ -2560,14 +2560,14 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
             unsigned Shift;
 
             /* Calculate the bitmask from the bit-field data */
-            unsigned Mask = (1U << Sym->V.B.BitWidth) - 1U;
+            unsigned Mask = (1U << Sym->Type->A.B.Width) - 1U;
 
             /* Safety ... */
-            CHECK (Sym->V.B.Offs * CHAR_BITS + Sym->V.B.BitOffs ==
-                   SI.Offs       * CHAR_BITS + SI.ValBits);
+            CHECK (Sym->V.Offs * CHAR_BITS + Sym->Type->A.B.Offs ==
+                   SI.Offs     * CHAR_BITS + SI.ValBits);
 
             /* Read the data, check for a constant integer, do a range check */
-            ED = ParseScalarInitInternal (Sym->Type);
+            ED = ParseScalarInitInternal (IntPromotion (Sym->Type));
             if (!ED_IsConstAbsInt (&ED)) {
                 Error ("Constant initializer expected");
                 ED_MakeConstAbsInt (&ED, 1);
@@ -2582,26 +2582,26 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
                     Warning ("Implicit truncation from '%s' to '%s : %u' in bit-field initializer"
                              " changes value from %ld to %u",
                              GetFullTypeName (ED.Type), GetFullTypeName (Sym->Type),
-                             Sym->V.B.BitWidth, ED.IVal, Val);
+                             Sym->Type->A.B.Width, ED.IVal, Val);
                 }
             } else {
                 /* Sign extend back to full width of host long. */
-                unsigned ShiftBits = sizeof (long) * CHAR_BIT - Sym->V.B.BitWidth;
+                unsigned ShiftBits = sizeof (long) * CHAR_BIT - Sym->Type->A.B.Width;
                 long RestoredVal = asr_l(asl_l (Val, ShiftBits), ShiftBits);
                 if (ED.IVal != RestoredVal) {
                     Warning ("Implicit truncation from '%s' to '%s : %u' in bit-field initializer "
                              "changes value from %ld to %ld",
                              GetFullTypeName (ED.Type), GetFullTypeName (Sym->Type),
-                             Sym->V.B.BitWidth, ED.IVal, RestoredVal);
+                             Sym->Type->A.B.Width, ED.IVal, RestoredVal);
                 }
             }
 
             /* Add the value to the currently stored bit-field value */
-            Shift = (Sym->V.B.Offs - SI.Offs) * CHAR_BITS + Sym->V.B.BitOffs;
+            Shift = (Sym->V.Offs - SI.Offs) * CHAR_BITS + Sym->Type->A.B.Offs;
             SI.BitVal |= (Val << Shift);
 
             /* Account for the data and output any full bytes we have. */
-            SI.ValBits += Sym->V.B.BitWidth;
+            SI.ValBits += Sym->Type->A.B.Width;
             /* Make sure unsigned is big enough to hold the value, 22 bits.
             ** This is 22 bits because the most we can have is 7 bits left
             ** over from the previous OutputBitField call, plus 15 bits

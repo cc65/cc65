@@ -83,10 +83,15 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
     /* Get the sizes of the types. Since we've excluded void types, checking
     ** for known sizes makes sense here.
     */
-    if (ED_IsBitField (Expr)) {
-        OldBits = Expr->BitWidth;
+    if (IsTypeBitField (OldType)) {
+        OldBits = OldType->A.B.Width;
     } else {
         OldBits = CheckedSizeOf (OldType) * CHAR_BITS;
+    }
+
+    /* If the new type is a bit-field, we use its underlying type instead */
+    if (IsTypeBitField (NewType)) {
+        NewType = GetUnderlyingType (NewType);
     }
     NewBits = CheckedSizeOf (NewType) * CHAR_BITS;
 
@@ -167,9 +172,6 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
 ExitPoint:
     /* The expression has always the new type */
     ReplaceType (Expr, NewType);
-
-    /* Bit-fields are converted to integers */
-    ED_DisBitField (Expr);
 }
 
 

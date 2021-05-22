@@ -114,7 +114,6 @@ enum {
     E_LOC_QUASICONST    = E_LOC_CONST | E_LOC_STACK,
 
     /* Expression type modifiers */
-    E_BITFIELD          = 0x0200,       /* Expression is a bit-field */
     E_ADDRESS_OF        = 0x0400,       /* Expression is the address of the lvalue */
 
     /* lvalue/rvalue in C language's sense */
@@ -198,17 +197,15 @@ struct Literal;
 /* Describe the result of an expression */
 typedef struct ExprDesc ExprDesc;
 struct ExprDesc {
-    struct SymEntry*    Sym;            /* Symbol table entry if known */
-    const Type*         Type;           /* Type array of expression */
-    unsigned            Flags;
+    const Type*         Type;           /* C type of the expression */
+    unsigned            Flags;          /* Properties of the expression */
     uintptr_t           Name;           /* Name pointer or label number */
+    struct SymEntry*    Sym;            /* Symbol table entry if any */
     long                IVal;           /* Integer value if expression constant */
-    Double              FVal;           /* Floating point value */
-    struct Literal*     LVal;           /* Literal value */
-
-    /* Bit field stuff */
-    unsigned            BitOffs;        /* Bit offset for bit fields */
-    unsigned            BitWidth;       /* Bit width for bit fields */
+    union {
+        Double          FVal;           /* Floating point value */
+        struct Literal* LVal;           /* Literal value */
+    } V;
 
     /* Start and end of generated code */
     CodeMark            Start;
@@ -330,29 +327,6 @@ int ED_IsLocQuasiConst (const ExprDesc* Expr);
 ** can be the address of a global variable (maybe with offset) or similar.
 */
 #endif
-
-#if defined(HAVE_INLINE)
-INLINE int ED_IsBitField (const ExprDesc* Expr)
-/* Return true if the expression is a bit field */
-{
-    return (Expr->Flags & E_BITFIELD) != 0;
-}
-#else
-#  define ED_IsBitField(Expr)   (((Expr)->Flags & E_BITFIELD) != 0)
-#endif
-
-#if defined(HAVE_INLINE)
-INLINE void ED_DisBitField (ExprDesc* Expr)
-/* Make the expression no longer a bit field */
-{
-    Expr->Flags &= ~E_BITFIELD;
-}
-#else
-#  define ED_DisBitField(Expr)  ((Expr)->Flags &= ~E_BITFIELD)
-#endif
-
-void ED_MakeBitField (ExprDesc* Expr, unsigned BitOffs, unsigned BitWidth);
-/* Make this expression a bit field expression */
 
 #if defined(HAVE_INLINE)
 INLINE void ED_RequireTest (ExprDesc* Expr)

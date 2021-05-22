@@ -972,12 +972,12 @@ static void MakeNiceScreen (void)
 
     /* Clear the screen hide the cursor, set colors */
 #ifdef __CBM610__
-    textcolor (COLOR_WHITE);
+    (void)textcolor (COLOR_WHITE);
 #else
-    textcolor (COLOR_GRAY3);
+    (void)textcolor (COLOR_GRAY3);
 #endif
-    bordercolor (COLOR_BLACK);
-    bgcolor (COLOR_BLACK);
+    (void)bordercolor (COLOR_BLACK);
+    (void)bgcolor (COLOR_BLACK);
     clrscr ();
     cursor (0);
 

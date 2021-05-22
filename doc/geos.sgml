@@ -205,7 +205,7 @@ see them together in the filling box in GeoPaint.
 
 <sect2>GraphicsString
 <p>
-<tt/void GraphicsString (char *myGString)/
+<tt/void GraphicsString (const void *myGString)/
 <p>
 One of the more powerfull routines of GEOS. This function calls other graphic functions depending
 on the given command string. See the structures chapter for a more detailed description.

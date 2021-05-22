@@ -159,21 +159,6 @@ DIRLIST = tutorial geos
 # --------------------------------------------------------------------------
 # Lists of executables
 
-EXELIST_c64 =      \
-        ascii      \
-        enumdevdir \
-        fire       \
-        gunzip65   \
-        hello      \
-        mandelbrot \
-        mousedemo  \
-        multdemo   \
-        nachtm     \
-        ovrldemo   \
-        plasma     \
-        sieve      \
-        tgidemo
-
 EXELIST_apple2 =   \
         ascii      \
         diodemo    \
@@ -204,9 +189,139 @@ EXELIST_atarixl = $(EXELIST_atari)
 
 EXELIST_atari2600 = \
         atari2600hello
-        
+
+EXELIST_atmos =    \
+        ascii      \
+        hello      \
+        mandelbrot \
+        sieve
+
+EXELIST_bbc = \
+        notavailable
+
+EXELIST_c64 =      \
+        ascii      \
+        enumdevdir \
+        fire       \
+        gunzip65   \
+        hello      \
+        mandelbrot \
+        mousedemo  \
+        multdemo   \
+        nachtm     \
+        ovrldemo   \
+        plasma     \
+        sieve      \
+        tgidemo
+
+EXELIST_c128 =     \
+        ascii      \
+        enumdevdir \
+        fire       \
+        gunzip65   \
+        hello      \
+        mandelbrot \
+        mousedemo  \
+        nachtm     \
+        plasma     \
+        sieve      \
+        tgidemo
+
+EXELIST_c16 =      \
+        ascii      \
+        enumdevdir \
+        hello
+
+EXELIST_cbm510 =   \
+        ascii      \
+        fire       \
+        gunzip65   \
+        hello      \
+        mousedemo  \
+        nachtm     \
+        plasma     \
+        sieve
+
+EXELIST_cbm610 =   \
+        ascii      \
+        gunzip65   \
+        hello      \
+        nachtm     \
+        sieve
+
+EXELIST_creativision = \
+        ascii          \
+        hello
+
+EXELIST_cx16 =     \
+        ascii      \
+        enumdevdir \
+        gunzip65   \
+        hello      \
+        mandelbrot \
+        mousedemo  \
+        sieve      \
+        tgidemo
+
+EXELIST_gamate =   \
+        hello
+
+EXELIST_geos-cbm = \
+        ascii      \
+        diodemo
+
+EXELIST_geos-apple = \
+        ascii
+
+EXELIST_lunix = \
+        notavailable
+
+EXELIST_lynx = \
+        notavailable
+
+EXELIST_nes = \
+        hello
+
+EXELIST_osic1p = \
+        notavailable
+
+EXELIST_pce = \
+        hello
+
+EXELIST_pet =      \
+        ascii      \
+        enumdevdir \
+        hello      \
+        sieve
+
+EXELIST_plus4 =    \
+        ascii      \
+        enumdevdir \
+        gunzip65   \
+        hello      \
+        plasma     \
+        sieve
+
+EXELIST_sim6502 =  \
+        gunzip65
+
+EXELIST_sim65c02 = $(EXELIST_sim6502)
+
 EXELIST_supervision = \
         supervisionhello
+
+EXELIST_telestrat = \
+        ascii       \
+        gunzip65    \
+        hello
+
+EXELIST_vic20 =    \
+        ascii      \
+        enumdevdir \
+        hello      \
+        mandelbrot \
+        sieve      \
+        tgidemo
 
 # Unlisted targets will try to build everything.
 # That lets us learn what they cannot build, and what settings
@@ -226,6 +341,12 @@ endef # SUBDIR_recipe
 
 samples: $(EXELIST_$(SYS))
 	$(foreach dir,$(DIRLIST),$(SUBDIR_recipe))
+
+# empty target used to skip systems that will not work with any program in this dir
+notavailable:
+ifeq ($(MAKELEVEL),0)
+	@echo "info: generic samples not available for" $(SYS)
+endif
 
 disk: $(DISK_$(SYS))
 

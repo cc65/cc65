@@ -124,38 +124,40 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
         */
         int AdjustBitField = 0;
         unsigned BitFieldFullWidthFlags = 0;
-        if (ED_IsBitField (Expr)) {
-            unsigned EndBit = Expr->BitOffs + Expr->BitWidth;
-            AdjustBitField = Expr->BitOffs != 0 || (EndBit != CHAR_BITS && EndBit != INT_BITS);
+        if ((Flags & CF_TYPEMASK) == 0) {
+            if (IsTypeBitField (Expr->Type)) {
+                unsigned EndBit = Expr->Type->A.B.Offs + Expr->Type->A.B.Width;
+                AdjustBitField = Expr->Type->A.B.Offs != 0 || (EndBit != CHAR_BITS && EndBit != INT_BITS);
 
-            /* TODO: This probably needs to be guarded by AdjustBitField when long bit-fields are
-            ** supported.
-            */
-            Flags |= (EndBit <= CHAR_BITS) ? CF_CHAR : CF_INT;
-            if (IsSignUnsigned (Expr->Type)) {
-                Flags |= CF_UNSIGNED;
-            }
-
-            /* Flags we need operate on the whole bit-field, without CF_FORCECHAR.  */
-            BitFieldFullWidthFlags = Flags;
-
-            /* If we're adjusting, then only load a char (not an int) and do only char ops;
-            ** We will clear the high byte in the adjustment.  CF_FORCECHAR does nothing if the
-            ** type is not CF_CHAR.
-            */
-            if (AdjustBitField) {
-                /* If adjusting, then we're sign extending manually, so do everything unsigned
-                ** to make shifts faster.
+                /* TODO: This probably needs to be guarded by AdjustBitField when long bit-fields are
+                ** supported.
                 */
-                Flags |= CF_UNSIGNED | CF_FORCECHAR;
-                BitFieldFullWidthFlags |= CF_UNSIGNED;
+                Flags |= (EndBit <= CHAR_BITS) ? CF_CHAR : CF_INT;
+                if (IsSignUnsigned (Expr->Type)) {
+                    Flags |= CF_UNSIGNED;
+                }
+
+                /* Flags we need operate on the whole bit-field, without CF_FORCECHAR.  */
+                BitFieldFullWidthFlags = Flags;
+
+                /* If we're adjusting, then only load a char (not an int) and do only char ops;
+                ** We will clear the high byte in the adjustment.  CF_FORCECHAR does nothing if the
+                ** type is not CF_CHAR.
+                */
+                if (AdjustBitField) {
+                    /* If adjusting, then we're sign extending manually, so do everything unsigned
+                    ** to make shifts faster.
+                    */
+                    Flags |= CF_UNSIGNED | CF_FORCECHAR;
+                    BitFieldFullWidthFlags |= CF_UNSIGNED;
+                }
+            } else {
+                /* If Expr is an incomplete ESY type, bail out */
+                if (IsIncompleteESUType (Expr->Type)) {
+                    return;
+                }
+                Flags |= TypeOf (Expr->Type);
             }
-        } else if ((Flags & CF_TYPEMASK) == 0) {
-            /* If Expr is an incomplete ESY type, bail out */
-            if (IsIncompleteESUType (Expr->Type)) {
-                return;
-            }
-            Flags |= TypeOf (Expr->Type);
         }
 
         if (ED_YetToTest (Expr)) {
@@ -254,13 +256,13 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
             /* We always need to do something with the low byte, so there is no opportunity
             ** for optimization by skipping it.
             */
-            CHECK (Expr->BitOffs < CHAR_BITS);
+            CHECK (Expr->Type->A.B.Offs < CHAR_BITS);
 
             if (ED_YetToTest (Expr)) {
-                g_testbitfield (Flags, Expr->BitOffs, Expr->BitWidth);
+                g_testbitfield (Flags, Expr->Type->A.B.Offs, Expr->Type->A.B.Width);
             } else {
                 g_extractbitfield (Flags, BitFieldFullWidthFlags, IsSignSigned (Expr->Type),
-                                   Expr->BitOffs, Expr->BitWidth);
+                                   Expr->Type->A.B.Offs, Expr->Type->A.B.Width);
             }
         }
 

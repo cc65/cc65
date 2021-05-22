@@ -207,7 +207,11 @@ static struct StrBuf* GetFullTypeNameWestEast (struct StrBuf* West, struct StrBu
             }
         }
 
-        SB_AppendStr (&Buf, GetSymTypeName (T));
+        if (!IsTypeBitField (T)) {
+            SB_AppendStr (&Buf, GetSymTypeName (T));
+        } else {
+            SB_AppendStr (&Buf, GetBasicTypeName (T + 1));
+        }
 
         if (!SB_IsEmpty (West)) {
             SB_AppendChar (&Buf, ' ');
@@ -231,6 +235,7 @@ const char* GetBasicTypeName (const Type* T)
 {
     switch (GetRawType (T)) {
     case T_TYPE_ENUM:       return "enum";
+    case T_TYPE_BITFIELD:   return "bit-field";
     case T_TYPE_FLOAT:      return "float";
     case T_TYPE_DOUBLE:     return "double";
     case T_TYPE_VOID:       return "void";
@@ -581,6 +586,18 @@ const Type* GetUnderlyingType (const Type* Type)
         if (Type->A.S->V.E.Type != 0) {
             return Type->A.S->V.E.Type;
         }
+    } else if (IsTypeBitField (Type)) {
+        /* We consider the smallest type that can represent all values of the
+        ** bit-field, instead of the type used in the declaration, the truly
+        ** underlying of the bit-field.
+        */
+        unsigned Size = (int)(Type->A.B.Width - 1) / (int)CHAR_BITS + 1;
+        switch (Size) {
+            case SIZEOF_CHAR: Type = IsSignSigned (Type) ? type_schar : type_uchar; break;
+            case SIZEOF_INT:  Type = IsSignSigned (Type) ? type_int   : type_uint;  break;
+            case SIZEOF_LONG: Type = IsSignSigned (Type) ? type_long  : type_ulong; break;
+            default:          Type = IsSignSigned (Type) ? type_int   : type_uint;  break;
+        }
     }
 
     return Type;
@@ -594,13 +611,14 @@ TypeCode GetUnderlyingTypeCode (const Type* Type)
 */
 {
     TypeCode Underlying = UnqualifiedType (Type->C);
-    TypeCode TCode;
 
     if (IsISOChar (Type)) {
 
         return IS_Get (&SignedChars) ? T_SCHAR : T_UCHAR;
 
     } else if (IsTypeEnum (Type)) {
+        TypeCode TCode;
+
         /* This should not happen, but just in case */
         if (Type->A.S == 0) {
             Internal ("Enum tag type error in GetUnderlyingTypeCode");
@@ -623,6 +641,21 @@ TypeCode GetUnderlyingTypeCode (const Type* Type)
             case T_SIZE_LONGLONG: Underlying |= T_TYPE_LONGLONG; break;
             default:              Underlying |= T_TYPE_INT;      break;
         }
+    } else if (IsTypeBitField (Type)) {
+        /* We consider the smallest type that can represent all values of the
+        ** bit-field, instead of the type used in the declaration, the truly
+        ** underlying of the bit-field.
+        */
+        unsigned Size = (int)(Type->A.B.Width - 1) / (int)CHAR_BITS + 1;
+        switch (Size) {
+            case SIZEOF_CHAR:     Underlying = T_CHAR;      break;
+            case SIZEOF_INT:      Underlying = T_INT;       break;
+            case SIZEOF_LONG:     Underlying = T_LONG;      break;
+            case SIZEOF_LONGLONG: Underlying = T_LONGLONG;  break;
+            default:              Underlying = T_INT;       break;
+        }
+        Underlying &= ~T_MASK_SIGN;
+        Underlying |= Type->C & T_MASK_SIGN;
     }
 
     return Underlying;
@@ -933,7 +966,11 @@ const Type* IntPromotion (const Type* T)
     ** These are called the integral promotions.
     */
 
-    if (IsTypeChar (T)) {
+    if (IsTypeBitField (T)) {
+        /* The standard rule is OK for now as we don't support bit-fields with widths > 16.
+        */
+        return T->A.B.Width >= INT_BITS && IsSignUnsigned (T) ? type_uint : type_int;
+    } else if (IsTypeChar (T)) {
         /* An integer can represent all values from either signed or unsigned char, so convert
         ** chars to int.
         */
@@ -1055,6 +1092,37 @@ const Type* UnsignedType (const Type* T)
             Internal ("Unknown type code: %lX", GetUnderlyingTypeCode (T));
             return T;
     }
+}
+
+
+
+Type* NewBitFieldType (const Type* T, unsigned BitOffs, unsigned BitWidth)
+/* Return a type string that is "T : BitWidth" aligned on BitOffs. The type
+** string is allocated on the heap and may be freed after use.
+*/
+{
+    Type* P;
+
+    /* The type specifier must be integeral */
+    CHECK (IsClassInt (T));
+    
+    /* Allocate the new type string */
+    P = TypeAlloc (3);
+
+    /* Create the return type... */
+    P[0].C = IsSignSigned (T) ? T_SBITFIELD : T_UBITFIELD;
+    P[0].C |= (T[0].C & T_QUAL_ADDRSIZE);
+    P[0].A.B.Offs  = BitOffs;
+    P[0].A.B.Width = BitWidth;
+
+    /* Get the declaration type */
+    memcpy (&P[1], GetUnderlyingType (T), sizeof (P[1]));
+
+    /* Get done... */
+    P[2].C = T_END;
+
+    /* ...and return it */
+    return P;
 }
 
 

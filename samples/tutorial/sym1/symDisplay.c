@@ -184,12 +184,8 @@ void main (void) {
                set_D2( get_D3() );
                set_D3( get_D4() );
                set_D4( get_D5() );
-               set_D5( get_D6() );
-               set_D6( DISP_M_1 );
-               for( d = 0; d < flashes ; d++ ) {
-                  fdisp();             // Display
-               }
-               set_D6( DISP_M_2 );
+               set_D5( DISP_M_1 );
+	       set_D6( DISP_M_2 );
                break;
             case 'm':
                set_D0( get_D1() );
@@ -197,12 +193,8 @@ void main (void) {
                set_D2( get_D3() );
                set_D3( get_D4() );
                set_D4( get_D5() );
-               set_D5( get_D6() );
-               set_D6( DISP_M_1 );
-               for( d = 0; d < flashes ; d++ ) {
-                  fdisp();             // Display
-               }
-               set_D6( DISP_M_2 );
+               set_D5( DISP_M_1 );
+	       set_D6( DISP_M_2 );
                break;
             case 'N':
                set_D6( DISP_n );
@@ -258,11 +250,7 @@ void main (void) {
                set_D2( get_D3() );
                set_D3( get_D4() );
                set_D4( get_D5() );
-               set_D5( get_D6() );
-               set_D6( DISP_M_1 );
-               for( d = 0; d < flashes ; d++ ) {
-                  fdisp();             // Display
-               }
+               set_D5( DISP_V_1 );
                set_D6( DISP_V_2 );
                break;
             case 'v':
@@ -271,11 +259,7 @@ void main (void) {
                set_D2( get_D3() );
                set_D3( get_D4() );
                set_D4( get_D5() );
-               set_D5( get_D6() );
-               set_D6( DISP_M_1 );
-               for( d = 0; d < flashes ; d++ ) {
-                  fdisp();             // Display
-               }
+               set_D5( DISP_V_1 );
                set_D6( DISP_V_2 );
                break;
             case 'W':
@@ -284,11 +268,7 @@ void main (void) {
                set_D2( get_D3() );
                set_D3( get_D4() );
                set_D4( get_D5() );
-               set_D5( get_D6() );
-               set_D6( DISP_M_1 );
-               for( d = 0; d < flashes ; d++ ) {
-                  fdisp();             // Display
-               }
+               set_D5( DISP_W_1 );
                set_D6( DISP_W_2 );
                break;
             case 'w':
@@ -297,11 +277,7 @@ void main (void) {
                set_D2( get_D3() );
                set_D3( get_D4() );
                set_D4( get_D5() );
-               set_D5( get_D6() );
-               set_D6( DISP_M_1 );
-               for( d = 0; d < flashes ; d++ ) {
-                  fdisp();             // Display
-               }
+               set_D5( DISP_W_1 );
                set_D6( DISP_W_2 );
                break;
             case 'Y':
@@ -382,4 +358,3 @@ void main (void) {
 
    return;
 }
-

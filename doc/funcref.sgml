@@ -298,6 +298,16 @@ function.
 </itemize>
 
 
+<sect1><tt/creativision.h/<label id="creativision.h"><p>
+
+<itemize>
+<item><ref id="bios_playsound" name="bios_playsound">
+<item><ref id="psg_delay" name="psg_delay">
+<item><ref id="psg_outb" name="psg_outb">
+<item><ref id="psg_silence" name="psg_silence">
+</itemize>
+
+
 <sect1><tt/ctype.h/<label id="ctype.h"><p>
 
 <itemize>
@@ -1655,6 +1665,41 @@ used in presence of a prototype.
 <ref id="ultoa" name="ultoa">,
 <ref id="utoa" name="utoa">
 <tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>bios_playsound<label id="bios_playsound"><p>
+
+<quote>
+<descrip>
+<tag/Function/Play sound sequence.
+<tag/Header/<tt/<ref id="creativision.h" name="creativision.h">/
+<tag/Declaration/<tt/void __fastcall__ bios_playsound(void *a, unsigned char b);/
+<tag/Description/The function may play chords based on a BASIC statement,
+note and duration are defined in the manual chapter 13 on page 102 resp. 103.
+<tag/Notes/<itemize>
+<item>BASIC has a fixed tempo of 18.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/Creativision
+<tag/See also/
+<ref id="psg_delay" name="psg_delay">,
+<ref id="psg_outb" name="psg_outb">
+<tag/Example/
+<verb>
+static const unsigned char notes[] = {
+  0x77, 0x4F, 0x37,
+  0x4B, 0x05, 0xBB,
+  0x4F, 0x27, 0x83,
+  0x93, 0x9B, 0x93,
+  0x17, 0x4F, 0x96,
+  0xAB, 0x17, 0x4F,
+  0x0E
+};
+bios_playsound (notes, sizeof notes);
+</verb>
 </descrip>
 </quote>
 
@@ -5764,6 +5809,73 @@ be used in presence of a prototype.
 <ref id="peekbsys" name="peekbsys">,
 <ref id="peekwsys" name="peekwsys">,
 <ref id="pokebsys" name="pokebsys">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>psg_delay<label id="psg_delay"><p>
+
+<quote>
+<descrip>
+<tag/Function/Delay for a short period of time.
+<tag/Header/<tt/<ref id="creativision.h" name="creativision.h">/
+<tag/Declaration/<tt/void __fastcall__ psg_delay(unsigned char b);/
+<tag/Description/The function specifies how long each note or pause between
+notes should last.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/Creativision
+<tag/See also/
+<ref id="psg_outb" name="psg_outb">,
+<ref id="psg_silence" name="psg_silence">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>psg_outb<label id="psg_outb"><p>
+
+<quote>
+<descrip>
+<tag/Function/Output a byte.
+<tag/Header/<tt/<ref id="creativision.h" name="creativision.h">/
+<tag/Declaration/<tt/void __fastcall__ psg_outb(unsigned char b);/
+<tag/Description/The function will send a PSG byte and wait for acknowledge.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/Creativision
+<tag/See also/
+<ref id="psg_delay" name="psg_delay">,
+<ref id="psg_silence" name="psg_silence">
+<tag/Example/
+<verb>
+psg_outb (0x80); // Latch frequency
+psg_outb (0x07); // Frequency byte 2 
+psg_outb (0x90); // Channel 0 full volume
+</verb>
+</descrip>
+</quote>
+
+
+<sect1>psg_silence<label id="psg_silence"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set volume off on each channel.
+<tag/Header/<tt/<ref id="creativision.h" name="creativision.h">/
+<tag/Declaration/<tt/void psg_silence(void);/
+<tag/Description/The function sends $9F, $BF, $DF, $FF to the PSG.
+<tag/Notes/<itemize>
+</itemize>
+<tag/Availability/Creativision
+<tag/See also/
+<ref id="psg_delay" name="psg_delay">,
+<ref id="psg_outb" name="psg_outb">
 <tag/Example/None.
 </descrip>
 </quote>

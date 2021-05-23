@@ -131,7 +131,7 @@ int   __fastcall__   vsscanf (const char* s, const char* format, va_list ap);
 #define DISP_APOSTR    0x20   // '''
 #define DISP_EQUAL     0x41   // '='
 #define DISP_3_BAR     0x49   // '='
-#define DISP_BOTTOM    0x04   // '_'
+#define DISP_BOTTOM    0x08   // '_'
 #define DISP_TOP       0x01   // Top segment
 #define DISP_LEFT      0x30   // '|' Left side, both segments
 #define DISP_RIGHT     0x06   // '|' Right side, both segments

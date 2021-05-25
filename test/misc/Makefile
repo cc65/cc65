@@ -112,6 +112,12 @@ $(WORKDIR)/bug1357.$1.$2.prg: bug1357.c | $(WORKDIR)
 	$(if $(QUIET),echo misc/bug1357.$1.$2.prg)
 	$(NOT) $(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
 
+# should compile, but compiler exits with internal error
+$(WORKDIR)/bug1211-ice-move-refs-2.$1.$2.prg: bug1211-ice-move-refs-2.c | $(WORKDIR)
+	@echo "FIXME: " $$@ "currently does not compile."
+	$(if $(QUIET),echo misc/bug1211-ice-move-refs-2.$1.$2.prg)
+	$(NOT) $(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
+
 # this one requires --std=c89, it fails with --std=c99
 $(WORKDIR)/bug1265.$1.$2.prg: bug1265.c | $(WORKDIR)
 	$(if $(QUIET),echo misc/bug1265.$1.$2.prg)

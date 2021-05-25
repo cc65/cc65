@@ -190,6 +190,9 @@ EXELIST_atarixl = $(EXELIST_atari)
 EXELIST_atari2600 = \
         atari2600hello
 
+EXELIST_atari5200 = \
+        notavailable
+
 EXELIST_atmos =    \
         ascii      \
         hello      \

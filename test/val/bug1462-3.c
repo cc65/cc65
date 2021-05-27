@@ -1,6 +1,6 @@
 
 /* issue #1462 - Bit-fields are still broken */
-/* More testson "op= expression result value" that a naive fix might fail with */
+/* More tests on "op= expression result value" that a naive fix might fail with */
 
 #include <stdio.h>
 
@@ -27,26 +27,26 @@ void test1(void)
     T1 a = { 3, 3, 3, 3 };
     int i;
 
-    i = a.a += a.b + a.c;
-    if (i != 1) {
+    i = a.a -= a.b + a.c;
+    if (i != -3 || a.a != -3) {
         ++failures1;
     }
     printf("i = %d, a.a = %d\n", i, a.a);
 
-    i = a.b *= -1;
-    if (i != 5 || a.b != 5) {
+    a.b = i = a.b / -1;
+    if (i != -3 || a.b != 5) {
         ++failures1;
     }
     printf("i = %d, a.b = %d\n", i, a.b);
 
-    i = a.c * -1;
-    if (i != -3) {
+    i = a.c = 0;
+    if (i != 0 || a.c != 0) {
         ++failures1;
     }
     printf("i = %d, a.c = %d\n", i, a.c);
 
-    i = a.d ^= -1;
-    if (i != 4 || a.d != 4) {
+    i = a.d /= -1;
+    if (i != 5 || a.d != 5) {
         ++failures1;
     }
     printf("i = %d, a.d = %d\n", i, a.d);

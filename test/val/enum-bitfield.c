@@ -23,6 +23,7 @@
 */
 
 #include <stdio.h>
+#include <limits.h>
 
 static unsigned char failures = 0;
 
@@ -35,7 +36,7 @@ enum e10u {
 static struct enum_bitfield_uint {
     enum e10u x : 1;
     enum e10u y : 8;
-    enum e10u z : 16;
+    enum e10u z : CHAR_BIT * sizeof (enum e10u);
 } e10ubf = {0, E10U_200, E10U_1000};
 
 static void test_enum_bitfield_uint(void)
@@ -68,11 +69,11 @@ static void test_enum_bitfield_uint(void)
         failures++;
     }
 
-    /* Check signedness, should be unsigned. */
+    /* Check signedness, should be signed. */
     {
         long v = e10ubf.x - 2;
-        if (v < 0) {
-            printf ("Got negative v = %ld, expected large positive.\n", v);
+        if (v >= 0) {
+            printf ("Got non-negative v (= e10ubf.x - 2) = %ld, expected negative.\n", v);
             failures++;
         }
     }
@@ -84,6 +85,15 @@ static void test_enum_bitfield_uint(void)
     if (e10ubf.z != 1023) {
         printf ("Got e10ubf.z = %u, expected 1023.\n", e10ubf.z);
         failures++;
+    }
+
+    /* Check signedness, should be unsigned. */
+    {
+        long v = e10ubf.z - 1024;
+        if (v < 0) {
+            printf ("Got negative v (= e10ubf.z - 1024) = %ld, expected positive.\n", v);
+            failures++;
+        }
     }
 }
 
@@ -97,7 +107,7 @@ enum e11i {
 static struct enum_bitfield_int {
     enum e11i x : 2;
     enum e11i y : 8;
-    enum e11i z : 16;
+    enum e11i z : CHAR_BIT * sizeof (enum e11i);
 } e11ibf = {E11I_M1, E11I_100, E11I_1000};
 
 static void test_enum_bitfield_int(void)
@@ -133,8 +143,8 @@ static void test_enum_bitfield_int(void)
     /* Check signedness, should be signed. */
     {
         long v = e11ibf.x - 2;
-        if (v > 0) {
-            printf ("Got positive v = %ld, expected negative.\n", v);
+        if (v >= 0) {
+            printf ("Got non-negative v (= e11ibf.x - 2) = %ld, expected negative.\n", v);
             failures++;
         }
     }
@@ -147,6 +157,15 @@ static void test_enum_bitfield_int(void)
         printf ("Got e11ibf.z = %d, expected 1023.\n", e11ibf.z);
         failures++;
     }
+
+    /* Check signedness, should be signed. */
+    {
+        long v = e11ibf.z - 1024;
+        if (v >= 0) {
+            printf ("Got non-negative v (= e11ibf.z - 1024) = %ld, expected negative.\n", v);
+            failures++;
+        }
+    }
 }
 
 /* Enum with underlying type unsigned char. */
@@ -157,7 +176,7 @@ enum e7uc {
 static struct enum_bitfield_uchar {
     enum e7uc x : 1;
     enum e7uc y : 4;
-    enum e7uc z : 8;
+    enum e7uc z : CHAR_BIT;
 } e7ucbf = {0, 10, E7UC_100};
 
 static void test_enum_bitfield_uchar(void)
@@ -212,7 +231,7 @@ enum e8sc {
 static struct enum_bitfield_char {
     enum e8sc x : 1;
     enum e8sc y : 4;
-    enum e8sc z : 8;
+    enum e8sc z : CHAR_BIT;
 } e8scbf = {0, 5, E8SC_100};
 
 static void test_enum_bitfield_char(void)

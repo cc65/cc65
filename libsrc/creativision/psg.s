@@ -1,7 +1,7 @@
-; void __fastcall__ psg_outb( unsigned char b );
-; void __fastcall__ psg_delayms( unsigned char c);
-; void __fastcall__ bios_playsound( void *b, unsigned char c);
-; void psg_silence( void );
+; void __fastcall__ psg_outb (unsigned char b);
+; void __fastcall__ psg_delay (unsigned char c);
+; void __fastcall__ bios_playsound (const void *b, unsigned char c);
+; void psg_silence (void);
 
         .export          _psg_outb, _psg_silence, _psg_delay
         .export          _bios_playsound

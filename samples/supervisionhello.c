@@ -3,89 +3,93 @@
 /* Watara Supervision sample C program                                       */
 /*                                                                           */
 /* Fabrizio Caruso (fabrizio_caruso@hotmail.com), 2019                       */
+/* Greg King       (greg.king5@verizon.net), 2021                            */
 /*                                                                           */
 /*****************************************************************************/
 
 #include <supervision.h>
-#include <peekpoke.h>
+#include <string.h>
 
-// Number of bytes per screen line (Remark: Last 8 bytes are not displayed)
-#define BYTES_PER_LINE 48
+/* Number of words per screen line (Remark: Last 4 words aren't displayed) */
+#define WORDS_PER_LINE (160/8+4)
 
-// Character definitions in 8x8 format
-const unsigned char h_char[] = {0x66,0x66,0x66,0x7E,0x66,0x66,0x66,0x00};
-const unsigned char e_char[] = {0x7E,0x60,0x60,0x78,0x60,0x60,0x7E,0x00};
-const unsigned char l_char[] = {0x60,0x60,0x60,0x60,0x60,0x60,0x7E,0x00};
-const unsigned char o_char[] = {0x3C,0x66,0x66,0x66,0x66,0x66,0x3C,0x00};
-const unsigned char w_char[] = {0x63,0x63,0x63,0x6B,0x7F,0x77,0x63,0x00};
-const unsigned char r_char[] = {0x7C,0x66,0x66,0x7C,0x78,0x6C,0x66,0x00};
-const unsigned char d_char[] = {0x78,0x6C,0x66,0x66,0x66,0x6C,0x78,0x00};
+struct sv_vram {
+    unsigned int v[160/8][8][WORDS_PER_LINE];
+};
+#define SV_VRAM ((*(struct sv_vram *)0x4000).v)
 
-void clear_screen(void)
+/* Character definitions in 8x8 format */
+/* That format gives us a screen of 20 columns and 20 rows */
+static const unsigned char h_char[] = {0x66,0x66,0x66,0x7E,0x66,0x66,0x66,0x00};
+static const unsigned char e_char[] = {0x7E,0x60,0x60,0x78,0x60,0x60,0x7E,0x00};
+static const unsigned char l_char[] = {0x60,0x60,0x60,0x60,0x60,0x60,0x7E,0x00};
+static const unsigned char o_char[] = {0x3C,0x66,0x66,0x66,0x66,0x66,0x3C,0x00};
+static const unsigned char w_char[] = {0x63,0x63,0x63,0x6B,0x7F,0x77,0x63,0x00};
+static const unsigned char r_char[] = {0x7C,0x66,0x66,0x7C,0x78,0x6C,0x66,0x00};
+static const unsigned char d_char[] = {0x78,0x6C,0x66,0x66,0x66,0x6C,0x78,0x00};
+
+static void clear_screen(void)
 {
-    unsigned short i;
-    
-    for(i=0;i<0x2000;++i)
+    memset(SV_VIDEO, 0, 0x2000);
+}
+
+/* Necessary conversion to have 2 bits per pixel with darkest hue */
+/* Remark: The Supervision uses 2 bits per pixel, and bits are mapped into pixels in reversed order */
+static unsigned int __fastcall__ double_reversed_bits(unsigned char)
+{
+    __asm__("stz ptr2");
+    __asm__("stz ptr2+1");
+    __asm__("ldy #$08");
+L1: __asm__("lsr a");
+    __asm__("php");
+    __asm__("rol ptr2");
+    __asm__("rol ptr2+1");
+    __asm__("plp");
+    __asm__("rol ptr2");
+    __asm__("rol ptr2+1");
+    __asm__("dey");
+    __asm__("bne %g", L1);
+    __asm__("lda ptr2");
+    __asm__("ldx ptr2+1");
+    return __AX__;
+}
+
+static void display_char(const unsigned char x, const unsigned char y, const unsigned char *ch)
+{
+    unsigned char k;
+
+    for(k=0;k<8;++k)
     {
-        POKE(SV_VIDEO+i,0);
+        SV_VRAM[y][k][x] = double_reversed_bits(ch[k]);
     }
 }
 
-// Necessary conversion to have 2 bits per pixel with darkest hue
-// Remark: The Supervision uses 2 bits per pixel and bits are mapped into pixel in reversed order
-unsigned char reversed_map_one_to_two_lookup[16] = 
-{
-    0x00, 0xC0, 0x30, 0xF0, 0x0C, 0xCC, 0x3C, 0xFC,
-    0x03, 0xC3, 0x33, 0xF3, 0x0F, 0xCF, 0x3F, 0xFF
-};
-
-unsigned char left_map_one_to_two(unsigned char n)
-{
-    return reversed_map_one_to_two_lookup[n >> 4];
-}
-
-unsigned char right_map_one_to_two(unsigned char n)
-{
-    return reversed_map_one_to_two_lookup[n&0x0F];
-}
-
-void display_char(const unsigned char x, const unsigned char y, const unsigned char *ch)
-{
-    unsigned char k;
-    
-    for(k=0;k<8;++k)
-    { \
-        SV_VIDEO[2*(y)+BYTES_PER_LINE*k+BYTES_PER_LINE*(x<<3)]    = left_map_one_to_two(ch[k]); 
-        SV_VIDEO[2*(y)+BYTES_PER_LINE*k+BYTES_PER_LINE*(x<<3)+1]  = right_map_one_to_two(ch[k]); 
-    } 
-}
-
-void init_lcd(void)
+static void init_lcd(void)
 {
     SV_LCD.width = 160;
     SV_LCD.height = 160;
 }
 
-int main()
-{   
-    init_lcd();
-    clear_screen();
-    
-    display_char(3,2, h_char);
-    display_char(3,3, e_char);
-    display_char(3,4, l_char);
-    display_char(3,5, l_char);
-    display_char(3,6, o_char);
-    
-    display_char(3,8, w_char);
-    display_char(3,9, o_char);
-    display_char(3,10,r_char);
-    display_char(3,11,l_char);
-    display_char(3,12,d_char);    
+static void hello(unsigned char x, unsigned char y)
+{
+    display_char(x+ 0,y,h_char);
+    display_char(x+ 1,y,e_char);
+    display_char(x+ 2,y,l_char);
+    display_char(x+ 3,y,l_char);
+    display_char(x+ 4,y,o_char);
 
-    while(1) {};
-    
-    return 0;
+    display_char(x+ 6,y,w_char);
+    display_char(x+ 7,y,o_char);
+    display_char(x+ 8,y,r_char);
+    display_char(x+ 9,y,l_char);
+    display_char(x+10,y,d_char);
 }
 
+void main(void)
+{
+    init_lcd();
+    clear_screen();
 
+    hello(2,3);
+    hello(7,16);
+}

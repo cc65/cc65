@@ -457,16 +457,14 @@ long GetExprVal (ExprNode* Expr)
 
 static void GetSegExprValInternal (ExprNode* Expr, SegExprDesc* D, int Sign)
 /* Check if the given expression consists of a segment reference and only
-** constant values, additions and subtractions. If anything else is found,
+** constant values, additions, and subtractions. If anything else is found,
 ** set D->TooComplex to true.
 ** Internal, recursive routine.
 */
 {
     Export* E;
 
-    if (Expr == 0) {
-        return;
-    }
+    CHECK (Expr != 0);
 
     switch (Expr->Op) {
 
@@ -483,7 +481,7 @@ static void GetSegExprValInternal (ExprNode* Expr, SegExprDesc* D, int Sign)
             */
             if (ExportHasMark (E)) {
                 CircularRefError (E);
-            } else {
+            } else if (E->Expr != 0) {
                 MarkExport (E);
                 GetSegExprValInternal (E->Expr, D, Sign);
                 UnmarkExport (E);

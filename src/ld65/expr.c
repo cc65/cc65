@@ -403,17 +403,20 @@ long GetExprVal (ExprNode* Expr)
 
         case EXPR_BANK:
             GetSegExprVal (Expr->Left, &D);
-            if (D.TooComplex || D.Seg == 0) {
-                Error ("Argument for .BANK is not segment relative or too complex");
+            if (D.TooComplex) {
+                Error ("Argument of .BANK() is too complex");
+            }
+            if (D.Seg == 0) {
+                Error ("Argument of .BANK() isn't a label attached to a segment");
             }
             if (D.Seg->MemArea == 0) {
-                Error ("Segment '%s' is referenced by .BANK but "
-                       "not assigned to a memory area",
+                Error ("Segment '%s' is referenced by .BANK(),"
+                       " but not assigned to a memory area",
                        GetString (D.Seg->Name));
             }
             if (D.Seg->MemArea->BankExpr == 0) {
-                Error ("Memory area '%s' is referenced by .BANK but "
-                       "has no BANK attribute",
+                Error ("Memory area '%s' is referenced by .BANK(),"
+                       " but has no BANK attribute",
                        GetString (D.Seg->MemArea->Name));
             }
             return GetExprVal (D.Seg->MemArea->BankExpr);

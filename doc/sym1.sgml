@@ -38,7 +38,7 @@ Special locations:
   Conio support is not currently available for the Sym-1.  But stdio console functions are available.
 
   <tag/Stack/
-  The C runtime stack is located at &dollar;0FFF on 4kb Syms, or at &dollar;7FFFfor 32kb systems.  The stack always grows downwards. 
+  The C runtime stack is located at &dollar;0FFF on 4KB Syms, or at &dollar;7FFFfor 32KB systems.  The stack always grows downwards. 
 
   <tag/Heap/
   The C heap is located at the end of the program and grows towards the C
@@ -101,7 +101,7 @@ But there is another header available, which exposes Sym-specific I/O functions 
 
 <sect2>Limited memory applications<p>
 
-As stated earlier, there are config files for 4kb and 32kb systems.  If you have 32kb RAM, then you will probably want to use the sym1_32k configuration, but if not - if you are using the sym1_32k configuration - then you may want to use functions like getchar, putchar, gets and puts rather than printf.  Printf requires about 1kb because it needs to know how to process all the format specifiers.
+As stated earlier, there are config files for 4KB and 32KB systems.  If you have 32KB RAM, then you will probably want to use the sym1_32k configuration, but if not - if you are using the sym1_32k configuration - then you may want to use functions like getchar, putchar, gets and puts rather than printf.  Printf requires about 1KB because it needs to know how to process all the format specifiers.
 
 <sect3>Sample programs<p>
 

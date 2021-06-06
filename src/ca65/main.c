@@ -335,6 +335,7 @@ static void SetSys (const char* Sys)
             break;
 
         case TGT_SYM1:
+            NewSymbol ("__SYM1__", 1);
             break;
 
         default:

@@ -101,7 +101,7 @@ But there is another header available, which exposes Sym-specific I/O functions 
 
 <sect2>Limited memory applications<p>
 
-As stated earlier, there are config files for 4KB and 32KB systems.  If you have 32KB RAM, then you will probably want to use the sym1_32k configuration, but if not - if you are using the sym1_32k configuration - then you may want to use functions like getchar, putchar, gets and puts rather than printf.  Printf requires about 1KB because it needs to know how to process all the format specifiers.
+As stated earlier, there are config files for 4KB and 32KB systems.  If you have 32KB RAM, then you will probably want to use the sym1-32k configuration, but if not - if you are using the sym1-4k configuration - then you may want to use functions like getchar, putchar, gets and puts rather than printf.  Printf requires about 1KB because it needs to know how to process all the format specifiers.
 
 <sect3>Sample programs<p>
 

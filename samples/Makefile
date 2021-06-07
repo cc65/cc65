@@ -475,7 +475,7 @@ zip:
 # Clean-up rules
 
 mostlyclean:
-	@$(DEL) *.lbl *.map *.bin *.hex *.o *.s 2>$(NULLDEV)
+	@$(DEL) *.lbl *.map *.o *.s 2>$(NULLDEV)
 
 clean: mostlyclean
 	@$(DEL) $(EXELIST_$(SYS)) $(DISK_$(SYS)) 2>$(NULLDEV)

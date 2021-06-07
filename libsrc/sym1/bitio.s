@@ -48,7 +48,7 @@
 .proc _get_DDR1A: near
 
         lda     DDR1A            ;  Read data direction register for port 1A
-        ldx     #$00             ;
+        ldx     #>$0000          ;
         rts                      ;  Return DDR1A
 
 .endproc
@@ -63,7 +63,7 @@
 .proc _get_IOR1A: near
 
         lda     OR1A             ;  Read I/O register for port 1A
-        ldx     #$00             ;
+        ldx     #>$0000          ;
         rts                      ;  Return OR1A
 
 .endproc
@@ -78,7 +78,7 @@
 .proc _get_DDR1B: near
 
         lda     DDR1B            ;  Read data direction register for port 1B
-        ldx     #$00             ;
+        ldx     #>$0000          ;
         rts                      ;  Return DDR1B
 
 .endproc
@@ -93,7 +93,7 @@
 .proc _get_IOR1B: near
 
         lda     OR1B             ;  Read I/O register for port 1B
-        ldx     #$00             ;
+        ldx     #>$0000          ;
         rts                      ;  Return OR1B
 
 .endproc
@@ -108,7 +108,7 @@
 .proc _get_DDR2A: near
 
         lda     DDR2A            ;  Read data direction register for port 2A
-        ldx     #$00             ;
+        ldx     #>$0000          ;
         rts                      ;  Return DDR2A
 
 .endproc
@@ -123,7 +123,7 @@
 .proc _get_IOR2A: near
 
         lda     OR2A             ;  Read I/O register for port 2A
-        ldx     #$00             ;
+        ldx     #>$0000          ;
         rts                      ;  Return OR2A
 
 .endproc
@@ -138,7 +138,7 @@
 .proc _get_DDR2B: near
 
         lda     DDR2B            ;  Read data direction register for port 2B
-        ldx     #$00             ;
+        ldx     #>$0000          ;
         rts                      ;  Return DDR2B
 
 .endproc
@@ -153,7 +153,7 @@
 .proc _get_IOR2B: near
 
         lda     OR2B             ;  Read I/O register for port 2B
-        ldx     #$00             ;
+        ldx     #>$0000          ;
         rts                      ;  Return OR2B
 
 .endproc
@@ -168,7 +168,7 @@
 .proc _get_DDR3A: near
 
         lda     DDR3A            ;  Read data direction register for port 3A
-        ldx     #$00             ;
+        ldx     #>$0000          ;
         rts                      ;  Return DDR3A
 
 .endproc
@@ -183,7 +183,7 @@
 .proc _get_IOR3A: near
 
         lda     OR3A             ;  Read I/O register for port 3A
-        ldx     #$00             ;
+        ldx     #>$0000          ;
         rts                      ;  Return OR3A
 
 .endproc
@@ -198,7 +198,7 @@
 .proc _get_DDR3B: near
 
         lda     DDR3B            ;  Read data direction register for port 3B
-        ldx     #$00             ;
+        ldx     #>$0000          ;
         rts                      ;  Return DDR3B
 
 .endproc
@@ -213,7 +213,7 @@
 .proc _get_IOR3B: near
 
         lda     OR3B             ;  Read I/O register for port 3B
-        ldx     #$00             ;
+        ldx     #>$0000          ;
         rts                      ;  Return OR3B
 
 .endproc

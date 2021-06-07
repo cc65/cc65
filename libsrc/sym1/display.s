@@ -44,7 +44,7 @@
 .proc _get_D0:  near
 
         lda     DISBUF0          ;  Read Digit 0
-        ldx     #$00             ;
+        ldx     #>$0000          ;
         rts                      ;  Return DISBUF0
 
 .endproc
@@ -59,7 +59,7 @@
 .proc _get_D1:  near
 
         lda     DISBUF1          ;  Read Digit 1
-        ldx     #$00             ;
+        ldx     #>$0000          ;
         rts
 
 .endproc
@@ -74,7 +74,7 @@
 .proc _get_D2:  near
 
         lda     DISBUF2          ;  Read Digit 2
-        ldx     #$00             ;
+        ldx     #>$0000          ;
         rts                      ;  Return DISBUF2
 
 .endproc
@@ -89,7 +89,7 @@
 .proc _get_D3:  near
 
         lda     DISBUF3          ;  Read Digit 3
-        ldx     #$00             ;
+        ldx     #>$0000          ;
         rts                      ;  Return DISBUF3
 
 .endproc
@@ -104,7 +104,7 @@
 .proc _get_D4:  near
 
         lda     DISBUF4          ;  Read Digit 4
-        ldx     #$00             ;
+        ldx     #>$0000          ;
         rts                      ;  Return DISBUF4
 
 .endproc
@@ -119,7 +119,7 @@
 .proc _get_D5:  near
 
         lda     DISBUF5          ;  Read Digit 5
-        ldx     #$00             ;
+        ldx     #>$0000          ;
         rts                      ;  Return DISBUF5
 
 .endproc
@@ -134,7 +134,7 @@
 .proc _get_D6:  near
 
         lda     DISBUF6          ;  Read byte to the right of display
-        ldx     #$00             ;
+        ldx     #>$0000          ;
         rts                      ;  Return DISBUF6
 
 .endproc

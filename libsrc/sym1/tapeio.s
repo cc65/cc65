@@ -24,7 +24,7 @@
         lda     #$00
         ldx     #$00             ; Return 0000 if successful
         jmp     done
-error:  ldx     #$00
+error:  ldx     #>$0000
         lda     #$FF             ; or 00FF if not
 done:   rts
 
@@ -47,7 +47,7 @@ done:   rts
         lda     #$00
         ldx     #$00             ; Return 0000 if successful
         jmp     done
-error:  ldx     #$00
+error:  ldx     #>$0000
         lda     #$FF             ; or 00FF if not
 done:   rts
 

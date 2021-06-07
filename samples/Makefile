@@ -334,12 +334,11 @@ ifndef EXELIST_$(SYS)
 EXELIST_$(SYS) := ${patsubst %.c,%,$(wildcard *.c)}
 endif
 
-define  SUBDIR_recipe
+define SUBDIR_recipe
 
 @$(MAKE) -C $(dir) --no-print-directory $@
 
 endef # SUBDIR_recipe
-
 
 # --------------------------------------------------------------------------
 # Rules to make the binaries and the disk
@@ -481,5 +480,4 @@ mostlyclean:
 clean: mostlyclean
 	@$(DEL) $(EXELIST_$(SYS)) $(DISK_$(SYS)) 2>$(NULLDEV)
 	@$(DEL) multdemo.? ovrldemo.? 2>$(NULLDEV)
-	@$(foreach dir,$(DIRLIST),$(SUBDIR_recipe))
-
+	$(foreach dir,$(DIRLIST),$(SUBDIR_recipe))

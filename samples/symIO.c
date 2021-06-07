@@ -6,10 +6,10 @@
 // wayne@parhamdata.com
 // --------------------------------------------------------------------------
 
-#include <stdio.h>;
-#include <symio.h>;
-#include <stdlib.h>;
-#include <string.h>;
+#include <sym1.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 void main(void) {
    int ddr1a    =   0x00;

@@ -1,12 +1,6 @@
-; ---------------------------------------------------------------------------
-; crt0.s
 ;
-; for Sym-1
+; Startup code for cc65 (Sym-1 version)
 ;
-; Wayne Parham
-;
-; wayne@parhamdata.com
-; ---------------------------------------------------------------------------
 
         .export         _init, _exit
         .export         __STARTUP__ : absolute = 1      ; Mark as startup
@@ -19,40 +13,40 @@
         .include        "zeropage.inc"
         .include        "sym1.inc"
 
-; ---------------------------------------------------------------------------
+
 ; Place the startup code in a special segment
 
 .segment  "STARTUP"
 
-; ---------------------------------------------------------------------------
+
 ; A little light housekeeping
 
 _init:    jsr     ACCESS               ; Unlock System RAM
           cld                          ; Clear decimal mode
-; ---------------------------------------------------------------------------
+
 ; Turn off console echo
 
           lda     TECHO
           and     #$7F
           sta     TECHO
-; ---------------------------------------------------------------------------
+
 ; Set cc65 argument stack pointer
 
           lda     #<(__RAM_START__ + __RAM_SIZE__)
           sta     sp
           lda     #>(__RAM_START__ + __RAM_SIZE__)
           sta     sp+1
-; ---------------------------------------------------------------------------
+
 ; Initialize memory storage
 
           jsr     zerobss              ; Clear BSS segment
           jsr     copydata             ; Initialize DATA segment
           jsr     initlib              ; Run constructors
-; ---------------------------------------------------------------------------
+
 ; Call main()
 
           jsr     _main
-; ---------------------------------------------------------------------------
+
 ; Back from main (this is also the _exit entry)
 
 _exit:    jsr     donelib              ; Run destructors
@@ -61,5 +55,5 @@ _exit:    jsr     donelib              ; Run destructors
           sta     TECHO
           jsr     NACCES               ; Lock System RAM
           rts                          ; Re-enter Sym-1 monitor
-; ---------------------------------------------------------------------------
+
 

@@ -1,12 +1,8 @@
-; ---------------------------------------------------------------------------
-; read.s
 ;
-; for Sym-1
+; Wayne Parham (wayne@parhamdata.com)
 ;
-; Wayne Parham
+; int read (int fd, void* buf, unsigned count);
 ;
-; wayne@parhamdata.com
-; ---------------------------------------------------------------------------
 
 .include        "sym1.inc"
 
@@ -16,7 +12,7 @@
 .export         _read
 
 .proc           _read
-; ---------------------------------------------------------------------------
+
         sta     ptr3
         stx     ptr3+1           ; Count in ptr3
         inx
@@ -49,6 +45,6 @@ putch:  ldy     #$00             ; Put char into return buffer
 done:   lda     ptr3
         ldx     ptr3+1
         rts                      ; Return count                       
-; ---------------------------------------------------------------------------
+
 .endproc
 

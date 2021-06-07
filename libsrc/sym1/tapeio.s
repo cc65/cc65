@@ -1,12 +1,9 @@
-; ---------------------------------------------------------------------------
-; tapeio.s
 ;
-; for Sym-1
+; Wayne Parham (wayne@parhamdata.com)
 ;
-; Wayne Parham
+; int loadt (int id);
+; int dumpt (int id, int start_addr, int end_addr);
 ;
-; wayne@parhamdata.com
-; ---------------------------------------------------------------------------
 
 .include        "sym1.inc"
 
@@ -17,7 +14,7 @@
 .segment        "CODE"
 
 .proc _loadt:   near
-; ---------------------------------------------------------------------------
+
         sta     P1L              ; Tape record ID to P1L
         ldx     #$00
         stx     P1H
@@ -30,11 +27,11 @@
 error:  ldx     #$00
         lda     #$FF             ; or 00FF if not
 done:   rts
-; ---------------------------------------------------------------------------
+
 .endproc
 
 .proc _dumpt:  near
-; ---------------------------------------------------------------------------
+
         sta     P3L              ; End address
         stx     P3H
         jsr     popax
@@ -53,6 +50,6 @@ done:   rts
 error:  ldx     #$00
         lda     #$FF             ; or 00FF if not
 done:   rts
-; ---------------------------------------------------------------------------
+
 .endproc
 

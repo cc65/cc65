@@ -48,7 +48,7 @@ Special locations:
 
 <sect>Platform specific header files<p>
 
-Programs containing Sym-1 code may use the <tt/symio.h/ header file.  See the header file for more information.
+Programs containing Sym-1 code may use the <tt/sym1.h/ header file.  See the header file for more information.
 
 <sect1>Hardware access<p>
 
@@ -94,10 +94,8 @@ To be more specific, this limitation means that you cannot use any of the follow
 
 <sect>Other hints<p>
 
-<sect1>symio.h<p>
-You can use stdio.h if you wish, which provides console I/O (like printf) but does not have access to a filesystem, as mentioned above.
-
-But there is another header available, which exposes Sym-specific I/O functions that are useful for reading and writing its ports and front panel.  It also exposes functions normally included using stdio.h but <i>only</i> the console I/O functions and not the filesystem functions.  See the symio.h include file for a list of the functions available.
+<sect1>sym1.h<p>
+This header exposes Sym-specific I/O functions that are useful for reading and writing its ports and front panel.  See the sym1.h include file for a list of the functions available.
 
 <sect2>Limited memory applications<p>
 

@@ -12,9 +12,10 @@
 //
 // --------------------------------------------------------------------------
 
-#include <symio.h>;
-#include <stdlib.h>;
-#include <string.h>;
+#include <sym1.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define     TAPIO_ADDRESS      0xE000
 #define     TAPIO_MAX_SIZE     0x0FFF

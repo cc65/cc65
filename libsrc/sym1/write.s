@@ -1,12 +1,8 @@
-; ---------------------------------------------------------------------------
-; write.s
 ;
-; for Sym-1
+; Wayne Parham (wayne@parhamdata.com)
 ;
-; Wayne Parham
+; int write (int fd, const void* buf, int count);
 ;
-; wayne@parhamdata.com
-; ---------------------------------------------------------------------------
 
 .include        "sym1.inc"
 
@@ -16,7 +12,7 @@
 .export         _write
 
 .proc           _write
-; ---------------------------------------------------------------------------
+
         sta     ptr3            
         stx     ptr3+1          ; Count in ptr3
         inx
@@ -48,6 +44,6 @@ next:   inc     ptr1
 done:   lda     ptr3
         ldx     ptr3+1
         rts                     ; Return count
-; ---------------------------------------------------------------------------
+
 .endproc
 

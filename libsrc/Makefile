@@ -232,7 +232,7 @@ $1_DRVS = $$(patsubst $$($1_DYNPAT),$$($1_DRVPAT),$$($1_DYNS))
 
 $$($1_STCPAT): $$($1_SRCPAT)
 	@echo $$(TARGET) - $$< - static
-	@$$(CA65) -t $$(MACHINE) -D DYN_DRV=0 $$(CA65FLAGS) --create-dep $$(@:.o=.d) -o $$@ $$<
+	@$$(CA65) -t $$(TARGET) -D DYN_DRV=0 $$(CA65FLAGS) --create-dep $$(@:.o=.d) -o $$@ $$<
 
 OBJS += $$($1_STCS)
 DEPS += $$($1_STCS:.o=.d)
@@ -264,15 +264,15 @@ export CC65_HOME := $(abspath ..)
 define ASSEMBLE_recipe
 
 $(if $(QUIET),,@echo $(TARGET) - $<)
-@$(CA65) -t $(MACHINE) $(CA65FLAGS) --create-dep $(@:.o=.d) -o $@ $<
+@$(CA65) -t $(TARGET) $(CA65FLAGS) --create-dep $(@:.o=.d) -o $@ $<
 
 endef # ASSEMBLE_recipe
 
 define COMPILE_recipe
 
 $(if $(QUIET),,@echo $(TARGET) - $<)
-@$(CC65) -t $(MACHINE) $(CC65FLAGS) --create-dep $(@:.o=.d) --dep-target $@ -o $(@:.o=.s) $<
-@$(CA65) -t $(MACHINE) -o $@ $(@:.o=.s)
+@$(CC65) -t $(TARGET) $(CC65FLAGS) --create-dep $(@:.o=.d) --dep-target $@ -o $(@:.o=.s) $<
+@$(CA65) -t $(TARGET) -o $@ $(@:.o=.s)
 
 endef # COMPILE_recipe
 
@@ -284,7 +284,7 @@ endef # COMPILE_recipe
 
 $(EXTRA_OBJPAT): $(EXTRA_SRCPAT) | ../libwrk/$(TARGET) ../lib
 	@echo $(TARGET) - $(<F)
-	@$(CA65) -t $(MACHINE) $(CA65FLAGS) --create-dep $(@:../lib/%.o=../libwrk/$(TARGET)/%.d) -o $@ $<
+	@$(CA65) -t $(TARGET) $(CA65FLAGS) --create-dep $(@:../lib/%.o=../libwrk/$(TARGET)/%.d) -o $@ $<
 
 ../lib/$(TARGET).lib: $(OBJS) | ../lib
 	$(AR65) a $@ $?

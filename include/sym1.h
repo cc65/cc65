@@ -100,53 +100,53 @@
 
 int __fastcall__ beep (void);                // Beep sound
 void __fastcall__ set_D0 (unsigned char);    // Set display digit 0
-int __fastcall__ get_D0 (void);              // Get value of display digit 0
+unsigned char __fastcall__ get_D0 (void);    // Get value of display digit 0
 void __fastcall__ set_D1 (unsigned char);    // Set display digit 1
-int __fastcall__ get_D1 (void);              // Get value of display digit 1
+unsigned char __fastcall__ get_D1 (void);    // Get value of display digit 1
 void __fastcall__ set_D2 (unsigned char);    // Set display digit 2
-int __fastcall__ get_D2 (void);              // Get value of display digit 2
+unsigned char __fastcall__ get_D2 (void);    // Get value of display digit 2
 void __fastcall__ set_D3 (unsigned char);    // Set display digit 3
-int __fastcall__ get_D3 (void);              // Get value of display digit 3
+unsigned char __fastcall__ get_D3 (void);    // Get value of display digit 3
 void __fastcall__ set_D4 (unsigned char);    // Set display digit 4
-int __fastcall__ get_D4 (void);              // Get value of display digit 4
+unsigned char __fastcall__ get_D4 (void);    // Get value of display digit 4
 void __fastcall__ set_D5 (unsigned char);    // Set display digit 5
-int __fastcall__ get_D5 (void);              // Get value of display digit 5
+unsigned char __fastcall__ get_D5 (void);    // Get value of display digit 5
 void __fastcall__ set_D6 (unsigned char);    // Set byte to the right of display (leading buffer)
-int __fastcall__ get_D6 (void);              // Get value of memory byte to the right of display
+unsigned char __fastcall__ get_D6 (void);    // Get value of memory byte to the right of display
 void __fastcall__ fdisp (void);              // Flash display
 
 int __fastcall__ loadt (int);                // Read from tape (id)
 int __fastcall__ dumpt (int, int, int);      // Write to tape (id, start_addr, end_addr)
 
 void __fastcall__ set_DDR1A (unsigned char); // Set data direction register 1A           (U25)
-int __fastcall__ get_DDR1A (void);           // Get value of data direction register 1A
+unsigned char __fastcall__ get_DDR1A (void); // Get value of data direction register 1A
 void __fastcall__ set_IOR1A (unsigned char); // Set I/O register 1A
-int __fastcall__ get_IOR1A (void);           // Get value of I/O register 1A
+unsigned char __fastcall__ get_IOR1A (void); // Get value of I/O register 1A
 
 void __fastcall__ set_DDR1B (unsigned char); // Set data direction register 1B           (U25)
-int __fastcall__ get_DDR1B (void);           // Get value of data direction register 1B
+unsigned char __fastcall__ get_DDR1B (void); // Get value of data direction register 1B
 void __fastcall__ set_IOR1B (unsigned char); // Set I/O register 1B
-int __fastcall__ get_IOR1B (void);           // Get value of I/O register 1B
+unsigned char __fastcall__ get_IOR1B (void); // Get value of I/O register 1B
 
 void __fastcall__ set_DDR2A (unsigned char); // Set data direction register 2A           (U28)
-int __fastcall__ get_DDR2A (void);           // Get value of data direction register 2A
+unsigned char __fastcall__ get_DDR2A (void); // Get value of data direction register 2A
 void __fastcall__ set_IOR2A (unsigned char); // Set I/O register 2A
-int __fastcall__ get_IOR2A (void);           // Get value of I/O register 2A
+unsigned char __fastcall__ get_IOR2A (void); // Get value of I/O register 2A
 
 void __fastcall__ set_DDR2B (unsigned char); // Set data direction register 2B           (U28)
-int __fastcall__ get_DDR2B (void);           // Get value of data direction register 2B
+unsigned char __fastcall__ get_DDR2B (void); // Get value of data direction register 2B
 void __fastcall__ set_IOR2B (unsigned char); // Set I/O register 2B
-int __fastcall__ get_IOR2B (void);           // Get value of I/O register 2B
+unsigned char __fastcall__ get_IOR2B (void); // Get value of I/O register 2B
 
 void __fastcall__ set_DDR3A (unsigned char); // Set data direction register 3A           (U29)
-int __fastcall__ get_DDR3A (void);           // Get value of data direction register 3A
+unsigned char __fastcall__ get_DDR3A (void); // Get value of data direction register 3A
 void __fastcall__ set_IOR3A (unsigned char); // Set I/O register 3A
-int __fastcall__ get_IOR3A (void);           // Get value of I/O register 3A
+unsigned char __fastcall__ get_IOR3A (void); // Get value of I/O register 3A
 
 void __fastcall__ set_DDR3B (unsigned char); // Set data direction register 3B           (U29)
-int __fastcall__ get_DDR3B (void);           // Get value of data direction register 3B
+unsigned char __fastcall__ get_DDR3B (void); // Get value of data direction register 3B
 void __fastcall__ set_IOR3B (unsigned char); // Set I/O register 3B
-int __fastcall__ get_IOR3B (void);           // Get value of I/O register 3B
+unsigned char __fastcall__ get_IOR3B (void); // Get value of I/O register 3B
 
 
 

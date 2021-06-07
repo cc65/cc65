@@ -6,7 +6,8 @@
 // wayne@parhamdata.com
 // --------------------------------------------------------------------------
 
-#include <symio.h>
+#include <stdio.h>
+#include <sym1.h>
 
 void main (void) {
    int  delay = 10;

@@ -193,7 +193,5 @@ void main(void) {
    free( buffer );
 
    puts( "\nEnjoy your day!\n" );
-
-   return;
 }
 

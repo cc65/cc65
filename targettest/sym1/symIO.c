@@ -165,6 +165,4 @@ void main(void) {
          }
       }
    }
-
-   return;
 }

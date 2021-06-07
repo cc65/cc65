@@ -355,6 +355,4 @@ void main (void) {
    }
 
    puts( "\n\nEnjoy your day!\n\n" );
-
-   return;
 }

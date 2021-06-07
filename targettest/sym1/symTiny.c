@@ -37,6 +37,4 @@ void main(void) {
       for( d = 0; d < 10 ; d++ ) {
       }
    }
-
-   return;
 }

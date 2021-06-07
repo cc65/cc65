@@ -7,7 +7,7 @@
 
 .include        "sym1.inc"
 
-.import         popax
+.import         popax, return0, return1
 
 .export         _loadt, _dumpt
 
@@ -21,12 +21,8 @@
         ldy     #$80
         jsr     LOADT            ; Read data from tape
         bcs     error
-        lda     #$00
-        ldx     #$00             ; Return 0000 if successful
-        jmp     done
-error:  ldx     #>$0000
-        lda     #$FF             ; or 00FF if not
-done:   rts
+        jmp     return 0         ; Return 0 if sucessful
+error:  jmp     return 1         ; or 1 if not
 
 .endproc
 
@@ -44,12 +40,8 @@ done:   rts
         ldy     #$80
         jsr     DUMPT            ; Write data to tape
         bcs     error
-        lda     #$00
-        ldx     #$00             ; Return 0000 if successful
-        jmp     done
-error:  ldx     #>$0000
-        lda     #$FF             ; or 00FF if not
-done:   rts
+        jmp     return 0         ; Return 0 if sucessful
+error:  jmp     return 1         ; or 1 if not
 
 .endproc
 

@@ -21,8 +21,8 @@
         ldy     #$80
         jsr     LOADT            ; Read data from tape
         bcs     error
-        jmp     return 0         ; Return 0 if sucessful
-error:  jmp     return 1         ; or 1 if not
+        jmp     return0          ; Return 0 if sucessful
+error:  jmp     return1          ; or 1 if not
 
 .endproc
 
@@ -40,8 +40,8 @@ error:  jmp     return 1         ; or 1 if not
         ldy     #$80
         jsr     DUMPT            ; Write data to tape
         bcs     error
-        jmp     return 0         ; Return 0 if sucessful
-error:  jmp     return 1         ; or 1 if not
+        jmp     return0          ; Return 0 if sucessful
+error:  jmp     return1          ; or 1 if not
 
 .endproc
 

@@ -149,26 +149,18 @@ GEOSDIRS = common      \
            runtime     \
            system
 
-# MACHINE set independently of TARGET lets us easily define new targets
-# without  changing target.h and target.c in  cc65/src/common.   Useful
-# for initial testing of ports to new systems.
-
 ifeq ($(TARGET),apple2enh)
   SRCDIR = apple2
   OBJPFX = a2
   DRVPFX = a2e
-  MACHINE = $(TARGET)
 else ifeq ($(TARGET),atarixl)
   SRCDIR = atari
   OBJPFX = atr
   DRVPFX = atrx
-  MACHINE = $(TARGET)
 else ifeq ($(TARGET),sim65c02)
   SRCDIR = sim6502
-  MACHINE = $(TARGET)
 else
   SRCDIR = $(TARGET)
-  MACHINE = $(TARGET)
 endif
 
 SRCDIRS = $(SRCDIR)
@@ -182,26 +174,16 @@ ifeq ($(TARGET),$(filter $(TARGET),$(GEOS)))
   SRCDIRS += $(addprefix geos-common/,$(GEOSDIRS))
 endif
 
-ifeq ($(TARGET),sym1)
-  SRCDIRS += common   \
-             conio    \
-             dbg      \
-             em       \
-             runtime  \
-             serial   \
-             sym1
-else
-  SRCDIRS += common   \
-             conio    \
-             dbg      \
-             em       \
-             joystick \
-             mouse    \
-             runtime  \
-             serial   \
-             tgi      \
-             zlib
-endif
+SRCDIRS += common   \
+           conio    \
+           dbg      \
+           em       \
+           joystick \
+           mouse    \
+           runtime  \
+           serial   \
+           tgi      \
+           zlib
 
 vpath %.s $(SRCDIRS)
 vpath %.c $(SRCDIRS)

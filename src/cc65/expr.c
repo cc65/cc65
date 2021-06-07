@@ -1127,7 +1127,7 @@ static void Primary (ExprDesc* E)
                 /* output its label */
                 E->Flags = E_RTYPE_RVAL | E_LOC_CODE | E_ADDRESS_OF;
                 E->Name = Entry->V.L.Label;
-                E->Type = NewPointerTo (type_void);
+                E->Type = type_void_p;
                 NextToken ();
             } else {
                 Error ("Computed gotos are a C extension, not supported with this --standard");
@@ -1946,7 +1946,7 @@ void hie10 (ExprDesc* Expr)
                 /* The & operator yields an rvalue address */
                 ED_AddrExpr (Expr);
             }
-            Expr->Type = NewPointerTo (Expr->Type);
+            Expr->Type = AddressOf (Expr->Type);
             break;
 
         case TOK_SIZEOF:
@@ -2265,9 +2265,9 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
         Tok = CurTok.Tok;
         NextToken ();
 
-        /* If lhs is a function, convert it to pointer to function */
+        /* If lhs is a function, convert it to the address of the function */
         if (IsTypeFunc (Expr->Type)) {
-            Expr->Type = NewPointerTo (Expr->Type);
+            Expr->Type = AddressOf (Expr->Type);
         }
 
         /* Get the lhs on stack */
@@ -2287,9 +2287,9 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
         /* Get the right hand side */
         MarkedExprWithCheck (hienext, &Expr2);
 
-        /* If rhs is a function, convert it to pointer to function */
+        /* If rhs is a function, convert it to the address of the function */
         if (IsTypeFunc (Expr2.Type)) {
-            Expr2.Type = NewPointerTo (Expr2.Type);
+            Expr2.Type = AddressOf (Expr2.Type);
         }
 
         /* Check for a numeric constant expression */

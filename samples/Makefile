@@ -8,10 +8,6 @@
 # var. to build for another target system.
 SYS ?= c64
 
-# New targets can define MACHINE separately
-# from target if needed.
-MACHINE=$(SYS)
-
 # Just the usual way to define a variable
 # containing a single space character.
 SPACE :=
@@ -139,21 +135,19 @@ LDFLAGS_tgidemo_atarixl    = --start-addr 0x4000
 %: %.s
 
 .c.o:
-	$(CC) $(CFLAGS) -Ors --codesize 500 -T -g -t $(MACHINE) $<
+	$(CC) $(CFLAGS) -Ors --codesize 500 -T -g -t $(SYS) $<
 	$(AS) $(<:.c=.s)
 
 .s.o:
-	$(AS) $(ASFLAGS) -t $(MACHINE) $<
+	$(AS) $(ASFLAGS) -t $(SYS) $<
 
 .PRECIOUS: %.o
 
 .o:
 ifeq ($(SYS),vic20)
 	$(LD) $(LDFLAGS_$(@F)_$(SYS)) $(LDFLAGS) -o $@ -C vic20-32k.cfg -m $@.map $^ $(SYS).lib
-else ifeq ($(SYS),sym1)
-	$(LD) $(LDFLAGS_$(@F)_$(SYS)) $(LDFLAGS) -o $@.bin -C sym1.cfg -m $@.map $^ $(SYS).lib
 else
-	$(LD) $(LDFLAGS_$(@F)_$(SYS)) $(LDFLAGS) -o $@ -t $(MACHINE) -m $@.map $^ $(SYS).lib
+	$(LD) $(LDFLAGS_$(@F)_$(SYS)) $(LDFLAGS) -o $@ -t $(SYS) -m $@.map $^ $(SYS).lib
 endif
 
 # --------------------------------------------------------------------------
@@ -161,9 +155,7 @@ endif
 
 # disasm depends on cpp
 
-ifneq ($(SYS),sym1)
-  DIRLIST = tutorial geos
-endif
+DIRLIST = tutorial geos
 
 # --------------------------------------------------------------------------
 # Lists of executables
@@ -276,12 +268,10 @@ EXELIST_gamate =   \
         hello
 
 EXELIST_geos-cbm = \
-        helloworld \
         ascii      \
         diodemo
 
 EXELIST_geos-apple = \
-        helloworld   \
         ascii
 
 EXELIST_lunix = \
@@ -322,10 +312,7 @@ EXELIST_supervision = \
         supervisionhello
         
 EXELIST_sym1 =     \
-        helloworld \
-        symHello   \
-        symTiny    \
-        symDisplay
+        helloworld
 
 EXELIST_telestrat = \
         ascii       \

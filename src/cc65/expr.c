@@ -765,9 +765,10 @@ static unsigned FunctionArgList (FuncDesc* Func, int IsFastcall, ExprDesc* ED)
             } else {
 
                 /* No prototype available. Convert array to "pointer to first
-                ** element", and function to "pointer to function".
+                ** element", function to "pointer to function" and do integral
+                ** promotion if necessary.
                 */
-                Expr.Type = PtrConversion (Expr.Type);
+                TypeConversion (&Expr, StdConversion (Expr.Type));
 
             }
 
@@ -3062,7 +3063,7 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
             Error ("Invalid operands for binary operator '+'");
         } else {
             /* Array and function types must be converted to pointer types */
-            Expr->Type = PtrConversion (Expr->Type);
+            Expr->Type = StdConversion (Expr->Type);
         }
     }
 
@@ -3341,7 +3342,7 @@ static void parsesub (ExprDesc* Expr)
     }
 
     /* Result type is either a pointer or an integer */
-    Expr->Type = PtrConversion (Expr->Type);
+    Expr->Type = StdConversion (Expr->Type);
 
     /* Condition code not set */
     ED_MarkAsUntested (Expr);

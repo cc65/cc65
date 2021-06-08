@@ -1007,6 +1007,25 @@ const Type* PtrConversion (const Type* T)
 
 
 
+const Type* StdConversion (const Type* T)
+/* If the type is a function, convert it to pointer to function. If the
+** expression is an array, convert it to pointer to first element. If the
+** type is an integer, do integeral promotion. Otherwise return T.
+*/
+{
+    if (IsTypeFunc (T)) {
+        return AddressOf (T);
+    } else if (IsTypeArray (T)) {
+        return AddressOf (GetElementType (T));
+    } else if (IsClassInt (T)) {
+        return IntPromotion (T);
+    } else {
+        return T;
+    }
+}
+
+
+
 const Type* IntPromotion (const Type* T)
 /* Apply the integer promotions to T and return the result. The returned type
 ** string may be T if there is no need to change it.

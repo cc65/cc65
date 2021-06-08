@@ -1,9 +1,11 @@
 
+#include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
 
+#ifdef __CC65__
 #define testasm1(C) (__AX__ = (C),   \
                      asm("and #$3f"),\
                     __AX__)
@@ -11,6 +13,22 @@
 #define testasm2(C) (__A__ = (C),   \
                      asm("and #$3f"),\
                     __A__)
+#else
+/* Non-cc65 compiler. Just make the code compile and work. */
+uint16_t testasm1(uint16_t C)
+{
+    uint16_t AX = C;
+    AX &= 0x3f;
+    return AX;
+}
+
+uint8_t testasm2(uint8_t C)
+{
+    uint8_t A = C;
+    A &= 0x3f;
+    return A;
+}
+#endif
 
 uint8_t src[32]  = { 0x10, 0x41, 0x62, 0x83, 0xb4, 0xf5,  0xe6,  0xc7, 0, 0 };
 uint8_t src2[32] = { 0xc1, 0xc2, 0xc3, 0xc4, 0xc5, 0xc6,  0xc7,  0xc8, 0, 0 };
@@ -46,7 +64,7 @@ void dotest1b(uint8_t *s, uint8_t *d)
 void dotest2a (void)
 {
   char *p = &src2[0];
-  uint16_t scaddr=&dest[0];     //output to line 11 on the screen
+  uintptr_t scaddr=&dest[0];     //output to line 11 on the screen
 
     printf("dotest2a\n");
     while (*p != 0) {
@@ -58,7 +76,7 @@ void dotest2a (void)
 void dotest2b (void)
 {
   char *p = &src2[0];
-  uint16_t scaddr=&dest[0];     //output to line 11 on the screen
+  uintptr_t scaddr=&dest[0];     //output to line 11 on the screen
 
     printf("dotest2b\n");
     while (*p != 0) {

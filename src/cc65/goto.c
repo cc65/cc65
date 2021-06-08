@@ -43,6 +43,7 @@
 #include "expr.h"
 #include "loadexpr.h"
 #include "scanner.h"
+#include "seqpoint.h"
 #include "standard.h"
 #include "symtab.h"
 #include "goto.h"

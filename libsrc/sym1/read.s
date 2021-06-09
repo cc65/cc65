@@ -29,7 +29,11 @@ begin:  dec     ptr2
         beq     done             ; If buffer full, return
 
 getch:  jsr     INTCHR           ; Get character using Monitor ROM call
-        and     #$7F             ; Clear hi bit
+        jsr     OUTCHR           ; Echo it
+        and     #$7F             ; Clear hi bit and check for '\r'
+        cmp     #$0D
+        bne     putch
+        lda     #$0A             ; Replace with '\n' and set count to zero
 
 putch:  ldy     #$00             ; Put char into return buffer
         sta     (ptr1),y

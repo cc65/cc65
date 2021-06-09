@@ -91,6 +91,30 @@
 #define DISP_LOW_LEFT  0x10   // Lower left segment
 
 
+/*****************************************************************************/
+/*                                 Hardware                                  */
+/*****************************************************************************/
+
+
+
+#include <_6522.h>
+#define VIA1    (*(struct __6522*)0xA000)    // U25
+#define VIA2    (*(struct __6522*)0xA800)    // U28
+#define VIA3    (*(struct __6522*)0xAC00)    // U29
+
+
+struct _display {
+    unsigned char d0;   // left-most seven-segment display
+    unsigned char d1;   // second seven-segment display
+    unsigned char d2;   // third seven-segment display
+    unsigned char d3;   // fouth seven-segment display
+    unsigned char d4;   // fifth seven-segment display
+    unsigned char d5;   // sixth seven-segment display
+    unsigned char d6;   // buffer byte to the right
+};
+#define DISPLAY (*(struct _display*)0xA640)
+
+
 
 /*****************************************************************************/
 /*                                   Code                                    */
@@ -98,55 +122,10 @@
 
 
 
-int __fastcall__ beep (void);                // Beep sound
-void __fastcall__ set_D0 (unsigned char);    // Set display digit 0
-unsigned char __fastcall__ get_D0 (void);    // Get value of display digit 0
-void __fastcall__ set_D1 (unsigned char);    // Set display digit 1
-unsigned char __fastcall__ get_D1 (void);    // Get value of display digit 1
-void __fastcall__ set_D2 (unsigned char);    // Set display digit 2
-unsigned char __fastcall__ get_D2 (void);    // Get value of display digit 2
-void __fastcall__ set_D3 (unsigned char);    // Set display digit 3
-unsigned char __fastcall__ get_D3 (void);    // Get value of display digit 3
-void __fastcall__ set_D4 (unsigned char);    // Set display digit 4
-unsigned char __fastcall__ get_D4 (void);    // Get value of display digit 4
-void __fastcall__ set_D5 (unsigned char);    // Set display digit 5
-unsigned char __fastcall__ get_D5 (void);    // Get value of display digit 5
-void __fastcall__ set_D6 (unsigned char);    // Set byte to the right of display (leading buffer)
-unsigned char __fastcall__ get_D6 (void);    // Get value of memory byte to the right of display
-void __fastcall__ fdisp (void);              // Flash display
-
-int __fastcall__ loadt (int);                // Read from tape (id)
-int __fastcall__ dumpt (int, int, int);      // Write to tape (id, start_addr, end_addr)
-
-void __fastcall__ set_DDR1A (unsigned char); // Set data direction register 1A           (U25)
-unsigned char __fastcall__ get_DDR1A (void); // Get value of data direction register 1A
-void __fastcall__ set_IOR1A (unsigned char); // Set I/O register 1A
-unsigned char __fastcall__ get_IOR1A (void); // Get value of I/O register 1A
-
-void __fastcall__ set_DDR1B (unsigned char); // Set data direction register 1B           (U25)
-unsigned char __fastcall__ get_DDR1B (void); // Get value of data direction register 1B
-void __fastcall__ set_IOR1B (unsigned char); // Set I/O register 1B
-unsigned char __fastcall__ get_IOR1B (void); // Get value of I/O register 1B
-
-void __fastcall__ set_DDR2A (unsigned char); // Set data direction register 2A           (U28)
-unsigned char __fastcall__ get_DDR2A (void); // Get value of data direction register 2A
-void __fastcall__ set_IOR2A (unsigned char); // Set I/O register 2A
-unsigned char __fastcall__ get_IOR2A (void); // Get value of I/O register 2A
-
-void __fastcall__ set_DDR2B (unsigned char); // Set data direction register 2B           (U28)
-unsigned char __fastcall__ get_DDR2B (void); // Get value of data direction register 2B
-void __fastcall__ set_IOR2B (unsigned char); // Set I/O register 2B
-unsigned char __fastcall__ get_IOR2B (void); // Get value of I/O register 2B
-
-void __fastcall__ set_DDR3A (unsigned char); // Set data direction register 3A           (U29)
-unsigned char __fastcall__ get_DDR3A (void); // Get value of data direction register 3A
-void __fastcall__ set_IOR3A (unsigned char); // Set I/O register 3A
-unsigned char __fastcall__ get_IOR3A (void); // Get value of I/O register 3A
-
-void __fastcall__ set_DDR3B (unsigned char); // Set data direction register 3B           (U29)
-unsigned char __fastcall__ get_DDR3B (void); // Get value of data direction register 3B
-void __fastcall__ set_IOR3B (unsigned char); // Set I/O register 3B
-unsigned char __fastcall__ get_IOR3B (void); // Get value of I/O register 3B
+void beep (void);                                                  // Beep sound
+void fdisp (void);                                                 // Flash display
+int __fastcall__ loadt (unsigned char);                            // Read from tape (id)
+int __fastcall__ dumpt (unsigned char, const void*, const void*);  // Write to tape (id, start_addr, end_addr)
 
 
 

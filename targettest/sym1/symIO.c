@@ -12,24 +12,24 @@
 #include <string.h>
 
 void main(void) {
-   int ddr1a    =   0x00;
-   int ior1a    =   0x00;
-   int ddr1b    =   0x00;
-   int ior1b    =   0x00;
-   int ddr2a    =   0x00;
-   int ior2a    =   0x00;
-   int ddr2b    =   0x00;
-   int ior2b    =   0x00;
-   int ddr3a    =   0x00;
-   int ior3a    =   0x00;
-   int ddr3b    =   0x00;
-   int ior3b    =   0x00;
-   int     l    =   0x00;
-   int   val    =   0x00;
-   int going    =   0x01;
-   int instr    =   0x01;
-   char* vp     =   0x00;
-   char cmd[20] =  { 0x00 };
+   unsigned char ddr1a =   0x00;
+   unsigned char ior1a =   0x00;
+   unsigned char ddr1b =   0x00;
+   unsigned char ior1b =   0x00;
+   unsigned char ddr2a =   0x00;
+   unsigned char ior2a =   0x00;
+   unsigned char ddr2b =   0x00;
+   unsigned char ior2b =   0x00;
+   unsigned char ddr3a =   0x00;
+   unsigned char ior3a =   0x00;
+   unsigned char ddr3b =   0x00;
+   unsigned char ior3b =   0x00;
+   unsigned char   val =   0x00;
+   int           going =   0x01;
+   int           instr =   0x01;
+   int               l =   0x00;
+   char*            vp =   0x00;
+   char        cmd[20] = { 0x00 };
 
    while( going ) {
 
@@ -38,18 +38,18 @@ void main(void) {
          putchar( '\n' );
       }
 
-      ddr1a = get_DDR1A();
-      ior1a = get_IOR1A();
-      ddr1b = get_DDR1B();
-      ior1b = get_IOR1B();
-      ddr2a = get_DDR2A();
-      ior2a = get_IOR2A();
-      ddr2b = get_DDR2B();
-      ior2b = get_IOR2B();
-      ddr3a = get_DDR3A();
-      ior3a = get_IOR3A();
-      ddr3b = get_DDR3B();
-      ior3b = get_IOR3B();
+      ddr1a = VIA1.ddra;
+      ior1a = VIA1.pra;
+      ddr1b = VIA1.ddrb;
+      ior1b = VIA1.prb;
+      ddr2a = VIA2.ddra;
+      ior2a = VIA2.pra;
+      ddr2b = VIA2.ddrb;
+      ior2b = VIA2.prb;
+      ddr3a = VIA3.ddra;
+      ior3a = VIA3.pra;
+      ddr3b = VIA3.ddrb;
+      ior3b = VIA3.prb;
 
       puts( "================== Digital I/O Status ==================" );
       puts( "     Port1A   Port1B   Port2A   Port2B   Port3A   Port3B" );    
@@ -63,7 +63,7 @@ void main(void) {
          puts( "bits  off  and  the bottom three on,  type  'IOR2A  07'." );
          puts( "Press  ENTER without any command to see register  values" );
          puts( "without changing any of them.   Type 'help' to see these" );
-         puts( "instructions again and type 'stop' to end the program.\n");
+         puts( "instructions again and type 'quit' to end the program.\n");
          puts( "Available registers:   DDR1A, IOR1A, DDR1B, IOR1B, DDR2A" );
          puts( "IOR2A, DDR2B, IOR2B, DDR3A, IOR3A, DDR3B and IOR3B." );
          instr = 0;
@@ -74,7 +74,7 @@ void main(void) {
       fgets(cmd, sizeof(cmd)-1, stdin);
       cmd[strlen(cmd)-1] = '\0';
 
-      if( strncasecmp(cmd, "stop", 4) == 0) {
+      if( strncasecmp(cmd, "quit", 4) == 0) {
          going = 0;  
       }
       else if( strncasecmp(cmd, "help", 4) == 0) {
@@ -83,85 +83,85 @@ void main(void) {
       else if( strncasecmp(cmd, "ddr1a", 5) == 0) {
          vp = strchr(cmd, ' ');
          if( vp ) {
-            val = atoi( vp );
-            set_DDR1A( val );
+            val = (unsigned char) strtol( vp, NULL, 0 );
+            VIA1.ddra = val;
          }
       }
       else if( strncasecmp(cmd, "ior1a", 5) == 0) {
          vp = strchr(cmd, ' ');
          if( vp ) {
-            val = atoi( vp );
-            set_IOR1A( val );
+            val = (unsigned char) strtol( vp, NULL, 0 );
+            VIA1.pra = val;
          }
       }
       else if( strncasecmp(cmd, "ddr1b", 5) == 0) {
          vp = strchr(cmd, ' ');
          if( vp ) {
-            val = atoi( vp );
-            set_DDR1B( val );
+            val = (unsigned char) strtol( vp, NULL, 0 );
+            VIA1.ddrb = val;
          }
       }
       else if( strncasecmp(cmd, "ior1b", 5) == 0) {
          vp = strchr(cmd, ' ');
          if( vp ) {
-            val = atoi( vp );
-            set_IOR1B( val );
+            val = (unsigned char) strtol( vp, NULL, 0 );
+            VIA1.prb = val;
          }
       }
       else if( strncasecmp(cmd, "ddr2a", 5) == 0) {
          vp = strchr(cmd, ' ');
          if( vp ) {
-            val = atoi( vp );
-            set_DDR2A( val );
+            val = (unsigned char) strtol( vp, NULL, 0 );
+            VIA2.ddra = val;
          }
       }
       else if( strncasecmp(cmd, "ior2a", 5) == 0) {
          vp = strchr(cmd, ' ');
          if( vp ) {
-            val = atoi( vp );
-            set_IOR2A( val );
+            val = (unsigned char) strtol( vp, NULL, 0 );
+            VIA2.pra = val;
          }
       }
       else if( strncasecmp(cmd, "ddr2b", 5) == 0) {
          vp = strchr(cmd, ' ');
          if( vp ) {
-            val = atoi( vp );
-            set_DDR2B( val );
+            val = (unsigned char) strtol( vp, NULL, 0 );
+            VIA2.ddrb = val;
          }
       }
       else if( strncasecmp(cmd, "ior2b", 5) == 0) {
          vp = strchr(cmd, ' ');
          if( vp ) {
-            val = atoi( vp );
-            set_IOR2B( val );
+            val = (unsigned char) strtol( vp, NULL, 0 );
+            VIA2.prb = val;
          }
       }
       else if( strncasecmp(cmd, "ddr3a", 5) == 0) {
          vp = strchr(cmd, ' ');
          if( vp ) {
-            val = atoi( vp );
-            set_DDR3A( val );
+            val = (unsigned char) strtol( vp, NULL, 0 );
+            VIA3.ddra = val;
          }
       }
       else if( strncasecmp(cmd, "ior3a", 5) == 0) {
          vp = strchr(cmd, ' ');
          if( vp ) {
-            val = atoi( vp );
-            set_IOR3A( val );
+            val = (unsigned char) strtol( vp, NULL, 0 );
+            VIA3.pra = val;
          }
       }
       else if( strncasecmp(cmd, "ddr3b", 5) == 0) {
          vp = strchr(cmd, ' ');
          if( vp ) {
-            val = atoi( vp );
-            set_DDR3B( val );
+            val = (unsigned char) strtol( vp, NULL, 0 );
+            VIA3.ddrb = val;
          }
       }
       else if( strncasecmp(cmd, "ior3b", 5) == 0) {
          vp = strchr(cmd, ' ');
          if( vp ) {
-            val = atoi( vp );
-            set_IOR3B( val );
+            val = (unsigned char) strtol( vp, NULL, 0 );
+            VIA3.prb = val;
          }
       }
    }

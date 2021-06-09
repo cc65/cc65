@@ -26,9 +26,8 @@ void main(void) {
       }
    }
 
-   while( c != '\r' ) {
+   while( c != '\n' ) {
       c = getchar();
-      putchar( c );
    }
 
    puts( "\n\nThanks!\n" );

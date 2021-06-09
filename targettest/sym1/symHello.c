@@ -23,9 +23,8 @@ void main(void) {
    }
    printf( "Type a line and press ENTER, please.\n\n" );
 
-   while( c != '\r' ) {
+   while( c != '\n' ) {
       c = getchar();
-      putchar( c );
    }
 
    printf( "\n\nThanks!\n\n" );

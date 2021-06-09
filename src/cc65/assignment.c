@@ -155,7 +155,6 @@ void DoIncDecBitField (ExprDesc* Expr, long Val, unsigned KeepResult)
     unsigned    Mask;
     unsigned    ChunkFlags;
     const Type* ChunkType;
-    const Type* ResType;
 
     /* If the bit-field fits within one byte, do the following operations
     ** with bytes.
@@ -190,11 +189,6 @@ void DoIncDecBitField (ExprDesc* Expr, long Val, unsigned KeepResult)
     /* Fetch the lhs into the primary register if needed */
     LoadExpr (CF_NONE, Expr);
 
-    if (KeepResult == OA_NEED_OLD) {
-        /* Save the original expression value */
-        g_save (Flags | CF_FORCECHAR);
-    }
-
     /* Handle for add and sub */
     if (Val > 0) {
         g_inc (Flags | CF_CONST, Val);
@@ -204,11 +198,6 @@ void DoIncDecBitField (ExprDesc* Expr, long Val, unsigned KeepResult)
 
     /* Apply the mask */
     g_and (Flags | CF_CONST, Mask);
-
-    if (KeepResult == OA_NEED_NEW) {
-        /* Save the result value */
-        g_save (Flags | CF_FORCECHAR);
-    }
 
     /* Do integral promotion without sign-extension if needed */
     g_typecast (ChunkFlags | CF_UNSIGNED, Flags);
@@ -229,6 +218,11 @@ void DoIncDecBitField (ExprDesc* Expr, long Val, unsigned KeepResult)
     /* Load the whole data chunk containing the bits to be changed */
     LoadExpr (ChunkFlags, Expr);
 
+    if (KeepResult == OA_NEED_OLD) {
+        /* Save the original expression value */
+        g_save (ChunkFlags | CF_FORCECHAR);
+    }
+
     /* Get the bits that are not to be affected */
     g_and (ChunkFlags | CF_CONST, ~(Mask << Expr->Type->A.B.Offs));
 
@@ -238,39 +232,10 @@ void DoIncDecBitField (ExprDesc* Expr, long Val, unsigned KeepResult)
     /* Store the whole data chunk containing the changed bits back */
     Store (Expr, ChunkType);
 
-    /* Cache the expression result type */
-    ResType = IntPromotion (Expr->Type);
-
-    if (KeepResult != OA_NEED_NONE) {
-        /* Restore the expression result value */
-        g_restore (Flags | CF_FORCECHAR);
-
-        /* Promote if needed */
-        if (KeepResult != OA_NEED_OLD) {
-            /* Do unsigned promotion first */
-            g_typecast (TypeOf (ResType) | CF_UNSIGNED, Flags);
-
-            /* Then do sign-extension */
-            if (IsSignSigned (Expr->Type) &&
-                Expr->Type->A.B.Width < CHAR_BITS * SizeOf (ResType)) {
-                /* The way is:
-                **   x = bits & bit_mask
-                **   m = 1 << (bit_width - 1)
-                **   r = (x ^ m) - m
-                ** Since we have already masked bits with bit_mask, we may skip the
-                ** first step.
-                */
-                g_xor (Flags | CF_CONST, 1U << (Expr->Type->A.B.Width - 1U));
-                g_dec ((Flags & ~CF_FORCECHAR) | CF_CONST, 1U << (Expr->Type->A.B.Width - 1U));
-            }
-        } else {
-            /* Do promotion with sign-extension */
-            g_typecast (TypeOf (ResType), Flags);
-        }
+    if (KeepResult == OA_NEED_OLD) {
+        /* Restore the original expression value */
+        g_restore (ChunkFlags | CF_FORCECHAR);
     }
-
-    /* Get the expression result type */
-    Expr->Type = ResType;
 }
 
 
@@ -285,10 +250,6 @@ static void OpAssignBitField (const GenDesc* Gen, ExprDesc* Expr, const char* Op
     unsigned Flags;
     unsigned ChunkFlags;
     const Type* ChunkType;
-    const Type* ResType;
-
-    /* Cache the expression result type */
-    ResType = IntPromotion (Expr->Type);
 
     ED_Init (&Expr2);
     Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
@@ -373,15 +334,6 @@ static void OpAssignBitField (const GenDesc* Gen, ExprDesc* Expr, const char* Op
             /* Store the whole data chunk containing the changed bits back */
             Store (Expr, ChunkType);
 
-            /* Load the expression result value */
-            if (IsSignSigned (Expr->Type)) {
-                unsigned SignExtensionMask = 1 << (Expr->Type->A.B.Width - 1);
-                Val = (Val^ SignExtensionMask) - SignExtensionMask;
-            }
-            ED_MakeConstAbs (Expr, Val, ResType);
-            LimitExprValue (Expr);
-            LoadExpr (CF_NONE, Expr);
-
             /* Done */
             goto Done;
 
@@ -459,9 +411,6 @@ static void OpAssignBitField (const GenDesc* Gen, ExprDesc* Expr, const char* Op
     /* Apply the mask */
     g_and (Flags | CF_CONST, Mask);
 
-    /* Save the expression result value */
-    g_save (Flags);
-
     /* Do integral promotion without sign-extension if needed */
     g_typecast (ChunkFlags | CF_UNSIGNED, Flags);
 
@@ -490,30 +439,7 @@ static void OpAssignBitField (const GenDesc* Gen, ExprDesc* Expr, const char* Op
     /* Store the whole data chunk containing the changed bits back */
     Store (Expr, ChunkType);
 
-    /* Restore the expression result value */
-    g_restore (Flags);
-
-    /* Do unsigned promotion first */
-    g_typecast (TypeOf (ResType) | CF_UNSIGNED, Flags);
-
-    /* Then do sign-extension */
-    if (IsSignSigned (Expr->Type) &&
-        Expr->Type->A.B.Width < CHAR_BITS * SizeOf (ResType)) {
-        /* The way is:
-        **   x = bits & bit_mask
-        **   m = 1 << (bit_width - 1)
-        **   r = (x ^ m) - m
-        ** Since we have already masked bits with bit_mask, we may skip the
-        ** first step.
-        */
-        g_xor (Flags | CF_CONST, 1U << (Expr->Type->A.B.Width - 1U));
-        g_dec ((Flags & ~CF_FORCECHAR) | CF_CONST, 1U << (Expr->Type->A.B.Width - 1U));
-    }
-
 Done:
-
-    /* Get the expression result type */
-    Expr->Type = ResType;
 
     /* Value is in primary as an rvalue */
     ED_FinalizeRValLoad (Expr);
@@ -642,11 +568,6 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
 
     /* Generate a store instruction */
     Store (Expr, 0);
-
-    /* Get the expression result type */
-    if (IsClassInt (Expr->Type)) {
-        Expr->Type = IntPromotion (Expr->Type);
-    }
 
     /* Value is in primary as an rvalue */
     ED_FinalizeRValLoad (Expr);
@@ -822,11 +743,6 @@ void OpAddSubAssign (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
 
         default:
             Internal ("Invalid location in Store(): 0x%04X", ED_GetLoc (Expr));
-    }
-
-    /* Get the expression result type */
-    if (IsClassInt (Expr->Type)) {
-        Expr->Type = IntPromotion (Expr->Type);
     }
 
     /* Expression is an rvalue in the primary now */

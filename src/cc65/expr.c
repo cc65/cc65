@@ -1726,17 +1726,12 @@ static void PostInc (ExprDesc* Expr)
 
         } else {
 
-            /* Fetch the value and use it (since it's the result of the expression) */
-            LoadExpr (CF_NONE, Expr);
-
             /* Defer the increment until after the value of this expression is used */
             DeferInc (Expr);
-        }
-    }
 
-    /* Adjust the type of the expression */
-    if (IsClassInt (Expr->Type)) {
-        Expr->Type = IntPromotion (Expr->Type);
+            /* Just return */
+            return;
+        }
     }
 
     /* The result is always an expression, no reference */
@@ -1781,17 +1776,12 @@ static void PostDec (ExprDesc* Expr)
 
         } else {
 
-            /* Fetch the value and save it (since it's the result of the expression) */
-            LoadExpr (CF_NONE, Expr);
-
             /* Defer the decrement until after the value of this expression is used */
             DeferDec (Expr);
-        }
-    }
 
-    /* Adjust the type of the expression */
-    if (IsClassInt (Expr->Type)) {
-        Expr->Type = IntPromotion (Expr->Type);
+            /* Just return */
+            return;
+        }
     }
 
     /* The result is always an expression, no reference */

@@ -11,12 +11,14 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <device.h>
 #include <dirent.h>
 #include <cc65.h>
 
 
-int printdir (char *newdir)
+/* returns true for error, false for OK */
+bool printdir (char *newdir)
 {
     char *olddir;
     char *curdir;
@@ -27,10 +29,9 @@ int printdir (char *newdir)
     unsigned num;
 
     olddir = malloc (FILENAME_MAX);
-    if (olddir != NULL) {
-
+    if (olddir == NULL) {
       perror ("cannot allocate memory");
-      return 1;
+      return true;
     }
 
     getcwd (olddir, FILENAME_MAX);
@@ -41,14 +42,13 @@ int printdir (char *newdir)
         */
         printf ("  Dir  %s\n", newdir);
         free (olddir);
-        return 0;
+        return false;
     }
 
     curdir = malloc (FILENAME_MAX);
-    if (curdir != NULL) {
-
+    if (curdir == NULL) {
       perror ("cannot allocate memory");
-      return 1;
+      return true;
     }
 
     /* We call getcwd() in order to print the
@@ -88,7 +88,7 @@ int printdir (char *newdir)
 
     chdir (olddir);
     free (olddir);
-    return 0;
+    return false;
 }
 
 
@@ -98,8 +98,7 @@ void main (void)
     char *devicedir;
 
     devicedir = malloc (FILENAME_MAX);
-    if (devicedir != NULL) {
-
+    if (devicedir == NULL) {
       perror ("cannot allocate memory");
       return;
     }

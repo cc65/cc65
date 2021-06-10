@@ -45,6 +45,8 @@ EOF             = -1
 FILENAME_MAX    = 64+1
 .elseif .defined(__ATARI__)
 FILENAME_MAX    = 63+1
+.elseif .defined(__CBM__)
+FILENAME_MAX    = 256+1
 .elseif .defined(__LUNIX__)
 FILENAME_MAX    = 80+1
 .elseif .defined(__TELESTRAT__)

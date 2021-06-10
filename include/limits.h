@@ -68,6 +68,8 @@
 #  define PATH_MAX      (64+1)
 #elif defined(__ATARI__)
 #  define PATH_MAX      (63+1)
+#elif defined(__CBM__)
+#  define PATH_MAX      (256+1)
 #elif defined(__LUNIX__)
 #  define PATH_MAX      (80+1)
 #elif defined(__TELESTRAT__)

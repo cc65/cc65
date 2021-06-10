@@ -44,7 +44,7 @@ EOF             = -1
 .if .defined(__APPLE2__)
 FILENAME_MAX    = 64+1
 .elseif .defined(__ATARI__)
-FILENAME_MAX    = 12+1
+FILENAME_MAX    = 63+1
 .elseif .defined(__LUNIX__)
 FILENAME_MAX    = 80+1
 .elseif .defined(__TELESTRAT__)

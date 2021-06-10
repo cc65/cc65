@@ -16,31 +16,47 @@
 #include <cc65.h>
 
 
-void printdir (char *newdir)
+int printdir (char *newdir)
 {
-    char olddir[FILENAME_MAX];
-    char curdir[FILENAME_MAX];
+    char *olddir;
+    char *curdir;
     DIR *dir;
     struct dirent *ent;
     char *subdirs = NULL;
     unsigned dirnum = 0;
     unsigned num;
 
-    getcwd (olddir, sizeof (olddir));
+    olddir = malloc (FILENAME_MAX);
+    if (olddir != NULL) {
+
+      perror ("cannot allocate memory");
+      return 1;
+    }
+
+    getcwd (olddir, FILENAME_MAX);
     if (chdir (newdir)) {
 
         /* If chdir() fails we just print the
         ** directory name - as done for files.
         */
         printf ("  Dir  %s\n", newdir);
-        return;
+        free (olddir);
+        return 0;
+    }
+
+    curdir = malloc (FILENAME_MAX);
+    if (curdir != NULL) {
+
+      perror ("cannot allocate memory");
+      return 1;
     }
 
     /* We call getcwd() in order to print the
     ** absolute pathname for a subdirectory.
     */
-    getcwd (curdir, sizeof (curdir));
+    getcwd (curdir, FILENAME_MAX);
     printf (" Dir %s:\n", curdir);
+    free (curdir);
 
     /* Calling opendir() always with "." avoids
     ** fiddling around with pathname separators.
@@ -65,18 +81,28 @@ void printdir (char *newdir)
     closedir (dir);
 
     for (num = 0; num < dirnum; ++num) {
-        printdir (subdirs + FILENAME_MAX * num);
+        if (printdir (subdirs + FILENAME_MAX * num))
+            break;
     }
     free (subdirs);
 
     chdir (olddir);
+    free (olddir);
+    return 0;
 }
 
 
 void main (void)
 {
     unsigned char device;
-    char devicedir[FILENAME_MAX];
+    char *devicedir;
+
+    devicedir = malloc (FILENAME_MAX);
+    if (devicedir != NULL) {
+
+      perror ("cannot allocate memory");
+      return;
+    }
 
     /* Calling getfirstdevice()/getnextdevice() does _not_ turn on the motor
     ** of a drive-type device and does _not_ check for a disk in the drive.
@@ -88,7 +114,7 @@ void main (void)
         /* Calling getdevicedir() _does_ check for a (formatted) disk in a
         ** floppy-disk-type device and returns NULL if that check fails.
         */
-        if (getdevicedir (device, devicedir, sizeof (devicedir))) {
+        if (getdevicedir (device, devicedir, FILENAME_MAX)) {
             printdir (devicedir);
         } else {
             printf (" N/A\n");
@@ -100,4 +126,6 @@ void main (void)
     if (doesclrscrafterexit ()) {
         getchar ();
     }
+
+    free (devicedir);
 }

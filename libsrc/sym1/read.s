@@ -30,7 +30,7 @@ begin:  dec     ptr2
 
 getch:  jsr     INTCHR           ; Get character using Monitor ROM call
         jsr     OUTCHR           ; Echo it
-        and     #$7F             ; Clear hi bit
+        and     #$7F             ; Clear top bit
         cmp     #$07             ; Check for '\a'
         bne     chkcr            ; ...if BEL character
         jsr     BEEP             ; Make beep sound

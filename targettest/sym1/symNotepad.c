@@ -110,7 +110,7 @@ void main(void) {
             l++;
             tapio[l] = 0x00;
             puts( "Saving to tape." );
-            error = dumpt( 'N', (int) tapio, (int) tapio+p );
+            error = dumpt( 'N', tapio, tapio+p );
             if( error ) {
                puts( "\nTape error." );
             }
@@ -124,9 +124,6 @@ void main(void) {
             puts( "===================== Sym-1 Notepad ====================\n" );
             for( l = 0; l <= p; l++ ) {
                putchar( buffer[l] );
-               if( buffer[l] == '\r' ) {
-                  putchar( '\n' );
-               }
             }
          }
          else if( c == 0x0C ) {        // Load
@@ -155,9 +152,6 @@ void main(void) {
 
                for( l = 0; l <= p; l++ ) {
                   putchar( buffer[l] );
-                  if( buffer[l] == '\r' ) {
-                     putchar( '\n' );
-                  }
                }
             }
          }
@@ -180,11 +174,10 @@ void main(void) {
                puts( "Buffer full." );
             }
             else {
-               if( c == '\r' ) {
+               if( c == '\n' ) {
                   putchar( '\n' );
                }
                buffer[p] = c;
-               putchar( c );
             }
             p++;
          }

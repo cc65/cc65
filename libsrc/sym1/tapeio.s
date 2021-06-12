@@ -1,13 +1,13 @@
 ;
 ; Wayne Parham (wayne@parhamdata.com)
 ;
-; int loadt (int id);
-; int dumpt (int id, int start_addr, int end_addr);
+; int __fastcall__ loadt (unsigned char id);
+; int __fastcall__ dumpt (unsigned char id, void* start_addr, void* end_addr);
 ;
 
 .include        "sym1.inc"
 
-.import         popax, return0, return1
+.import         popa, popax, return0, return1
 
 .export         _loadt, _dumpt
 
@@ -33,7 +33,7 @@ error:  jmp     return1          ; or 1 if not
         jsr     popax
         sta     P2L              ; Start address
         stx     P2H
-        jsr     popax
+        jsr     popa
         sta     P1L              ; Tape Record ID
         ldx     #$00
         stx     P1H

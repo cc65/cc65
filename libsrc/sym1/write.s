@@ -7,7 +7,7 @@
 .include        "sym1.inc"
 
 .import         popax, popptr1
-.importzp       ptr1, ptr2, ptr3, tmp1
+.importzp       ptr1, ptr2, ptr3
 
 .export         _write
 
@@ -28,12 +28,15 @@ begin:  dec     ptr2
         dec     ptr2+1
         beq     done
 
-outch : ldy     #0
+outch:  ldy     #0
         lda     (ptr1),y
         jsr     OUTCHR          ; Send character using Monitor call
-        cmp     #$0A
-        bne     next
-        lda     #$0D            ; If it is LF, add CR
+        cmp     #$07            ; Check for '\a'
+        bne     chklf           ; ...if BEL character
+        jsr     BEEP            ; Make beep sound
+chklf:  cmp     #$0A            ; Check for 'n'
+        bne     next            ; ...if LF character
+        lda     #$0D            ; Add a carriage return
         jsr     OUTCHR
 
 next:   inc     ptr1

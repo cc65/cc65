@@ -94,7 +94,7 @@ To be more specific, this limitation means that you cannot use any of the follow
 <sect>Other hints<p>
 
 <sect1>sym1.h<p>
-This header exposes Sym-specific I/O functions that are useful for reading and writing its ports and front panel.  See the sym1.h include file for a list of the functions available.
+This header exposes Sym-specific I/O functions that are useful for reading and writing its ports and front panel.  See the <tt/sym1.h/ include file for a list of the functions available.
 
 <sect2>Limited memory applications<p>
 
@@ -102,7 +102,7 @@ As stated earlier, there are config files for 4KB and 32KB systems.  If you have
 
 <sect3>Sample programs<p>
 
-All the samples will run on the &quot;stock&quot; 4KB Sym-1, except for symIO and symNotepad, which require 32KB.  Information on building and running the sample programs are in the targettest/sym1 directory.
+All the samples will run on the &quot;stock&quot; 4KB Sym-1, except for symIO and symNotepad, which require 32KB.  These sample programs can be found in the samples and targettest/sym1 directories:
 
 <itemize>
 <item>helloworld is the traditional &quot;Hello World!&quot; program, using printf().</item>

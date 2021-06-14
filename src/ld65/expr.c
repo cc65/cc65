@@ -321,20 +321,18 @@ long GetExprVal (ExprNode* Expr)
             return GetExprVal (Expr->Left) * GetExprVal (Expr->Right);
 
         case EXPR_DIV:
-            Left  = GetExprVal (Expr->Left);
             Right = GetExprVal (Expr->Right);
             if (Right == 0) {
                 Error ("Division by zero");
             }
-            return Left / Right;
+            return GetExprVal (Expr->Left) / Right;
 
         case EXPR_MOD:
-            Left  = GetExprVal (Expr->Left);
             Right = GetExprVal (Expr->Right);
             if (Right == 0) {
                 Error ("Modulo operation with zero");
             }
-            return Left % Right;
+            return GetExprVal (Expr->Left) % Right;
 
         case EXPR_OR:
             return GetExprVal (Expr->Left) | GetExprVal (Expr->Right);

@@ -106,7 +106,7 @@ All the samples will run on the &quot;stock&quot; 4KB Sym-1, except for symIO an
 
 <itemize>
 <item>symHello prints &quot;Hello World!&quot; and then inputs characters, which are echoed on the screen.  It also makes a &quot;beep&quot; sound.</item>
-<item>symTiny does the same as symhello, but does it with puts() rather than printf() to show the difference in compiled binary size.</item>
+<item>symTiny does the same as symHello, but does it with puts() rather than printf() to show the difference in compiled binary size.</item>
 <item>symDisplay allows entry of a message, which is then displayed by scrolling it across the front panel display.</item>
 <item>symIO allows access to the Sym-1 digital I/O ports.</item>
 <item>symNotepad is a simple text entry/retrieval program that uses tape storage.</item>

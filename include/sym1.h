@@ -1,8 +1,33 @@
-// sym1.h
-//
-// I/O primitives for Sym-1
-//
-// Wayne Parham
+/*****************************************************************************/
+/*                                                                           */
+/*                                  sym1.h                                   */
+/*                                                                           */
+/*                     Sym-1 system-specific definitions                     */
+/*                                                                           */
+/*                                                                           */
+/*                                                                           */
+/* (C) 2020      Wayne Parham                                                */
+/* EMail:        wayne@parhamdata.com                                        */
+/*                                                                           */
+/*                                                                           */
+/* This software is provided 'as-is', without any expressed or implied       */
+/* warranty.  In no event will the authors be held liable for any damages    */
+/* arising from the use of this software.                                    */
+/*                                                                           */
+/* Permission is granted to anyone to use this software for any purpose,     */
+/* including commercial applications, and to alter it and redistribute it    */
+/* freely, subject to the following restrictions:                            */
+/*                                                                           */
+/* 1. The origin of this software must not be misrepresented; you must not   */
+/*    claim that you wrote the original software. If you use this software   */
+/*    in a product, an acknowledgment in the product documentation would be  */
+/*    appreciated but is not required.                                       */
+/* 2. Altered source versions must be plainly marked as such, and must not   */
+/*    be misrepresented as being the original software.                      */
+/* 3. This notice may not be removed or altered from any source              */
+/*    distribution.                                                          */
+/*                                                                           */
+/*****************************************************************************/
 
 
 
@@ -122,10 +147,17 @@ struct _display {
 
 
 
-void beep (void);                                                  // Beep sound
-void fdisp (void);                                                 // Flash display
-int __fastcall__ loadt (unsigned char);                            // Read from tape (id)
-int __fastcall__ dumpt (unsigned char, const void*, const void*);  // Write to tape (id, start_addr, end_addr)
+void beep (void);
+/* Beep sound. */
+
+void fdisp (void);
+/* Flash display */
+
+int __fastcall__ loadt (unsigned char);
+/* Read from tape */
+
+int __fastcall__ dumpt (unsigned char, const void*, const void*);
+/* Write to tape */
 
 
 

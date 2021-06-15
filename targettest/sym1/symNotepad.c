@@ -17,18 +17,18 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define     TAPIO_ADDRESS      0xE000
-#define     TAPIO_MAX_SIZE     0x0FFF
+#define TAPIO_ADDRESS  0xE000
+#define TAPIO_MAX_SIZE 0x0FFF
 
 void main(void) {
-   char  c                 =   0x00;
-   int   l                 =   0x00;
-   int   p                 =   0x00;
-   int   error             =   0x00;
-   int   running           =   0x01;
-   int   writing           =   0x01;
-   int instruction_needed  =   0x01;
-   int   heap_size         =   0x00;
+   cha c                  = 0x00;
+   int l                  = 0x00;
+   int p                  = 0x00;
+   int error              = 0x00;
+   int running            = 0x01;
+   int writing            = 0x01;
+   int instruction_needed = 0x01;
+   int heap_size          = 0x00;
    char* tapio  = (char*) TAPIO_ADDRESS;
    char* buffer;
 
@@ -183,9 +183,6 @@ void main(void) {
          }
       }
    }
-
    free( buffer );
-
    puts( "\nEnjoy your day!\n" );
 }
-

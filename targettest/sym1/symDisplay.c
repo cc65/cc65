@@ -10,18 +10,18 @@
 #include <sym1.h>
 
 void main (void) {
-   int  delay = 10;
-   int  flashes = 255;
+   int  delay       = 10;
+   int  flashes     = 255;
    int  displayable = 1;
-   int  e = 0;
-   int  r = 0;  
-   int  d = 0;
-   int  i = 0;
-   int  l = 0;
-   int  t = 0;
-   int  z = 0;
-   char c = 0x00;
-   char buffer[41] = { 0x00 };
+   int  e           = 0;
+   int  r           = 0;  
+   int  d           = 0;
+   int  i           = 0;
+   int  l           = 0;
+   int  t           = 0;
+   int  z           = 0;
+   char c           = 0x00;
+   char buffer[41]  = { 0x00 };
 
    puts( "\nType a message (40 chars max) and press ENTER, please:\n" );
 
@@ -351,6 +351,5 @@ void main (void) {
          }
       }
    }
-
    puts( "\n\nEnjoy your day!\n\n" );
 }

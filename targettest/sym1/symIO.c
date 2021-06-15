@@ -12,24 +12,24 @@
 #include <string.h>
 
 void main(void) {
-   unsigned char ddr1a =   0x00;
-   unsigned char ior1a =   0x00;
-   unsigned char ddr1b =   0x00;
-   unsigned char ior1b =   0x00;
-   unsigned char ddr2a =   0x00;
-   unsigned char ior2a =   0x00;
-   unsigned char ddr2b =   0x00;
-   unsigned char ior2b =   0x00;
-   unsigned char ddr3a =   0x00;
-   unsigned char ior3a =   0x00;
-   unsigned char ddr3b =   0x00;
-   unsigned char ior3b =   0x00;
-   unsigned char   val =   0x00;
-   int           going =   0x01;
-   int           instr =   0x01;
-   int               l =   0x00;
-   char*            vp =   0x00;
-   char        cmd[20] = { 0x00 };
+   unsigned char ddr1a = 0x00;
+   unsigned char ior1a = 0x00;
+   unsigned char ddr1b = 0x00;
+   unsigned char ior1b = 0x00;
+   unsigned char ddr2a = 0x00;
+   unsigned char ior2a = 0x00;
+   unsigned char ddr2b = 0x00;
+   unsigned char ior2b = 0x00;
+   unsigned char ddr3a = 0x00;
+   unsigned char ior3a = 0x00;
+   unsigned char ddr3b = 0x00;
+   unsigned char ior3b = 0x00;
+   unsigned char   val = 0x00;
+   int going           = 0x01;
+   int instr           = 0x01;
+   int l               = 0x00;
+   char* vp            = 0x00;
+   char cmd[20]        = { 0x00 };
 
    while( going ) {
 

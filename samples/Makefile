@@ -312,7 +312,7 @@ EXELIST_supervision = \
         supervisionhello
         
 EXELIST_sym1 =     \
-        helloworld
+        notavailable
 
 EXELIST_telestrat = \
         ascii       \

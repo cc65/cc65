@@ -1,7 +1,3 @@
-# Run 'make SYS=<target>'; or, set a SYS env.
-# var. to build for another target system.
-SYS ?= sym1
-
 # Just the usual way to find out if we're
 # using cmd.exe to execute make rules.
 ifneq ($(shell echo),)
@@ -33,19 +29,19 @@ endif
 all: symHello.bin symTiny.bin symDisplay.bin symIO.bin symNotepad.bin
 
 symHello.bin: symHello.c
-	$(CL) -t $(SYS) -C sym1-4k.cfg -O -o symHello.bin symHello.c
+	$(CL) -t sym1 -O -o symHello.bin symHello.c
 
 symTiny.bin: symTiny.c
-	$(CL) -t $(SYS) -C sym1-4k.cfg -O -o symTiny.bin symTiny.c
+	$(CL) -t sym1 -O -o symTiny.bin symTiny.c
 
 symDisplay.bin: symDisplay.c
-	$(CL) -t $(SYS) -C sym1-4k.cfg -O -o symDisplay.bin symDisplay.c
+	$(CL) -t sym1 -O -o symDisplay.bin symDisplay.c
 
 symIO.bin: symIO.c
-	$(CL) -t $(SYS) -C sym1-32k.cfg -O -o symIO.bin symIO.c
+	$(CL) -t sym1 -C sym1-32k.cfg -O -o symIO.bin symIO.c
 
 symNotepad.bin: symNotepad.c
-	$(CL) -t $(SYS) -C sym1-32k.cfg -O -o symNotepad.bin symNotepad.c
+	$(CL) -t sym1 -C sym1-32k.cfg -O -o symNotepad.bin symNotepad.c
 
 clean:
 	@$(DEL) symHello.bin 2>$(NULLDEV)

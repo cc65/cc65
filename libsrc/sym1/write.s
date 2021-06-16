@@ -49,4 +49,3 @@ done:   lda     ptr3
         rts                     ; Return count
 
 .endproc
-

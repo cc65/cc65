@@ -154,7 +154,6 @@ endif
 # Lists of subdirectories
 
 # disasm depends on cpp
-
 DIRLIST = tutorial geos
 
 # --------------------------------------------------------------------------

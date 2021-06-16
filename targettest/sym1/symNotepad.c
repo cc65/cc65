@@ -20,7 +20,7 @@
 #define TAPIO_ADDRESS  0xE000
 #define TAPIO_MAX_SIZE 0x0FFF
 
-int main(void) {
+int main (void) {
    char c                 = 0x00;
    int l                  = 0x00;
    int p                  = 0x00;
@@ -42,7 +42,7 @@ int main(void) {
    memset( buffer, 0x00, heap_size );
 
    if( buffer == 0x00 ) {
-      puts( "Memory full." );
+      puts ("Memory full.");
       running = 0;
    }
 
@@ -78,16 +78,16 @@ int main(void) {
          putchar( '\n' );
       }
 
-      puts( "===================== Sym-1 Notepad ====================" );
+      puts ("===================== Sym-1 Notepad ====================");
 
       if( instruction_needed ) {
-         puts( "Enter  text  and you can save it to tape  for  reloading" );
-         puts( "later.  There are four special 'command' characters:\n" );
-         puts( "   Control-S   Save to tape" );
-         puts( "   Control-L   Load from tape" );
-         puts( "   Control-C   Clear memory" );
-         puts( "   Control-X   Exit" );
-         puts( "========================================================\n" );
+         puts ("Enter  text  and you can save it to tape  for  reloading");
+         puts ("later.  There are four special 'command' characters:\n");
+         puts ("   Control-S   Save to tape");
+         puts ("   Control-L   Load from tape");
+         puts ("   Control-C   Clear memory");
+         puts ("   Control-X   Exit");
+         puts ("========================================================\n");
       }
 
       while( writing ) {
@@ -101,18 +101,18 @@ int main(void) {
             }
          }
          else if( c == 0x13 ) {        // Save
-            puts( "\n========================= Save =========================" );
-            puts( "\nPress any key to save." );
+            puts ("\n========================= Save =========================");
+            puts ("\nPress any key to save.");
             c = getchar();
             for( l = 0; l <= p; l++ ) {
                tapio[l] = buffer[l];
             }
             l++;
             tapio[l] = 0x00;
-            puts( "Saving to tape." );
+            puts ("Saving to tape.");
             error = dumpt( 'N', tapio, tapio+p );
             if( error ) {
-               puts( "\nTape error." );
+               puts ("\nTape error.");
             }
             else
             {
@@ -121,20 +121,20 @@ int main(void) {
                   putchar( '\n' );
                }
             }
-            puts( "===================== Sym-1 Notepad ====================\n" );
+            puts ("===================== Sym-1 Notepad ====================\n");
             for( l = 0; l <= p; l++ ) {
                putchar( buffer[l] );
             }
          }
          else if( c == 0x0C ) {        // Load
             p = 0;
-            puts( "\nLoading from tape." );
+            puts ("\nLoading from tape.");
             memset( buffer, 0, heap_size );
             memset( tapio, 0, TAPIO_MAX_SIZE );
             error = loadt( 'N' );
             if( error ) {
-               puts( "\nTape error." );
-               puts( "===================== Sym-1 Notepad ====================\n" );
+               puts ("\nTape error.");
+               puts ("===================== Sym-1 Notepad ====================\n");
             }
             else
             {
@@ -148,7 +148,7 @@ int main(void) {
                for( l = 0; l < 25; l++ ) {
                   putchar( '\n' );
                }
-               puts( "===================== Sym-1 Notepad ====================\n" );
+               puts ("===================== Sym-1 Notepad ====================\n");
 
                for( l = 0; l <= p; l++ ) {
                   putchar( buffer[l] );
@@ -162,7 +162,7 @@ int main(void) {
             for( l = 0; l < 25; l++ ) {
                putchar( '\n' );
             }
-            puts( "===================== Sym-1 Notepad ====================\n" );
+            puts ("===================== Sym-1 Notepad ====================\n");
          }
          else if( c == 0x18 ) {        // Exit
             writing = 0;
@@ -170,8 +170,8 @@ int main(void) {
          }
          else {
             if( p >= heap_size - 1 ) {
-               puts( "\n========================= End  =========================" );
-               puts( "Buffer full." );
+               puts ("\n========================= End  =========================");
+               puts ("Buffer full.");
             }
             else {
                if( c == '\n' ) {
@@ -186,7 +186,7 @@ int main(void) {
 
    free( buffer );
 
-   puts( "\nEnjoy your day!\n" );
+   puts ("\nEnjoy your day!\n");
 
    return 0;
 }

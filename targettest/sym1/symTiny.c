@@ -11,14 +11,14 @@
 #include <stdio.h>
 #include <sym1.h>
 
-int main(void) {
+int main (void) {
    char c = 0x00;
    int  d = 0x00;
    int  l = 0x00;
 
-   puts( "Hello World!\n" );
+   puts ("Hello World!\n");
 
-   puts( "Type a line and press ENTER, please:\n" );
+   puts ("Type a line and press ENTER, please:\n");
 
    for( l = 0; l < 2; l++ ) {
       beep();
@@ -30,7 +30,7 @@ int main(void) {
       c = getchar();
    }
 
-   puts( "\n\nThanks!\n" );
+   puts ("\n\nThanks!\n");
 
    for( l = 0; l < 5; l++ ) {
       beep();

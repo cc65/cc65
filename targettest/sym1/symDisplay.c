@@ -30,22 +30,22 @@ int main (void) {
       buffer[i] = c;
       i++;
       if( i == 40 ) {
-         puts( "\n\n--- Reached 40 character limit. ---" );
+         puts ("\n\n--- Reached 40 character limit. ---");
       }
    }
 
    i--;                                // index is one past end
 
    while( z == 0 ) {
-      puts( "\n\nHow many times (0 for forever) to repeat?" );
+      puts ("\n\nHow many times (0 for forever) to repeat?");
       c = getchar();
       if( (c >= '0') && (c <= '9') ) { // between 1 and 9 loops allowed
          z = 1;                        // a number was pressed 
          t = c - '0';                  // convert char to int
-         puts( "\n\nLook at the front panel.\n" );
+         puts ("\n\nLook at the front panel.\n");
       }
       else {
-         puts( "\nWhat?" );
+         puts ("\nWhat?");
          z = 0;                        // keep asking for a number
       }
    }
@@ -352,7 +352,7 @@ int main (void) {
       }
    }
 
-   puts( "\n\nEnjoy your day!\n\n" );
+   puts ("\n\nEnjoy your day!\n\n");
 
    return 0;
 }

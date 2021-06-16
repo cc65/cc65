@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <sym1.h>
 
-int main(void) {
+int main (void) {
    char c = 0x00;
    int  d = 0x00;
    int  l = 0x00;

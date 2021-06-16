@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int main(void) {
+int main (void) {
    unsigned char ddr1a = 0x00;
    unsigned char ior1a = 0x00;
    unsigned char ddr1b = 0x00;
@@ -51,21 +51,21 @@ int main(void) {
       ddr3b = VIA3.ddrb;
       ior3b = VIA3.prb;
 
-      puts( "================== Digital I/O Status ==================" );
-      puts( "     Port1A   Port1B   Port2A   Port2B   Port3A   Port3B" );    
+      puts ("================== Digital I/O Status ==================");
+      puts ("     Port1A   Port1B   Port2A   Port2B   Port3A   Port3B" );    
       printf( "DDR    %02X       %02X       %02X       %02X       %02X       %02X\n\r",ddr1a,ddr1b,ddr2a,ddr2b,ddr3a,ddr3b );
       printf( "IOR    %02X       %02X       %02X       %02X       %02X       %02X\n\r",ior1a,ior1b,ior2a,ior2b,ior3a,ior3b );
-      puts( "========================================================\n" );
+      puts ("========================================================\n");
 
       if( instr ) {
-         puts( "You  can set any register by typing 'register value'  so" );
-         puts( "as  an example, to set register IOR2A with the top  five" );
-         puts( "bits  off  and  the bottom three on,  type  'IOR2A  07'." );
-         puts( "Press  ENTER without any command to see register  values" );
-         puts( "without changing any of them.   Type 'help' to see these" );
-         puts( "instructions again and type 'quit' to end the program.\n");
-         puts( "Available registers:   DDR1A, IOR1A, DDR1B, IOR1B, DDR2A" );
-         puts( "IOR2A, DDR2B, IOR2B, DDR3A, IOR3A, DDR3B and IOR3B." );
+         puts ("You  can set any register by typing 'register value'  so");
+         puts ("as  an example, to set register IOR2A with the top  five");
+         puts ("bits  off  and  the bottom three on,  type  'IOR2A  07'.");
+         puts ("Press  ENTER without any command to see register  values");
+         puts ("without changing any of them.   Type 'help' to see these");
+         puts ("instructions again and type 'quit' to end the program.\n");
+         puts ("Available registers:   DDR1A, IOR1A, DDR1B, IOR1B, DDR2A");
+         puts ("IOR2A, DDR2B, IOR2B, DDR3A, IOR3A, DDR3B and IOR3B.");
          instr = 0;
       }
 
@@ -166,7 +166,7 @@ int main(void) {
       }
    }
 
-   puts( "\n\nEnjoy your day!\n\n" );
+   puts ("\n\nEnjoy your day!\n\n");
 
    return 0;
 }

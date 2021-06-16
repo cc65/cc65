@@ -55,5 +55,3 @@ _exit:    jsr     donelib              ; Run destructors
           sta     TECHO
           jsr     NACCES               ; Lock System RAM
           rts                          ; Re-enter Sym-1 monitor
-
-

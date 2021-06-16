@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void main(void) {
+int main(void) {
    unsigned char ddr1a = 0x00;
    unsigned char ior1a = 0x00;
    unsigned char ddr1b = 0x00;
@@ -165,4 +165,8 @@ void main(void) {
          }
       }
    }
+
+   puts( "\n\nEnjoy your day!\n\n" );
+
+   return 0;
 }

@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <sym1.h>
 
-void main (void) {
+int main (void) {
    int  delay       = 10;
    int  flashes     = 255;
    int  displayable = 1;
@@ -351,5 +351,8 @@ void main (void) {
          }
       }
    }
+
    puts( "\n\nEnjoy your day!\n\n" );
+
+   return 0;
 }

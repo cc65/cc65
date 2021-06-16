@@ -1,7 +1,7 @@
 ;
 ; Wayne Parham (wayne@parhamdata.com)
 ;
-; int read (int fd, void* buf, unsigned count);
+; int __fastcall__ read (int fd, void* buf, unsigned count);
 ;
 
 .include        "sym1.inc"
@@ -37,6 +37,7 @@ getch:  jsr     INTCHR           ; Get character using Monitor ROM call
 chkcr:  cmp     #$0D             ; Check for '\r'
         bne     putch            ; ...if CR character
         lda     #$0A             ; Replace with '\n'
+        jsr     OUTCHR           ; and echo it
 
 putch:  ldy     #$00             ; Put char into return buffer
         sta     (ptr1),y

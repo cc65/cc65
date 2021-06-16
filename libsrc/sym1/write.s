@@ -1,7 +1,7 @@
 ;
 ; Wayne Parham (wayne@parhamdata.com)
 ;
-; int write (int fd, const void* buf, int count);
+; int __fastcall__ write (int fd, const void* buf, int count);
 ;
 
 .include        "sym1.inc"

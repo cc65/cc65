@@ -31,11 +31,11 @@ int main (void) {
    char* vp            = 0x00;
    char cmd[20]        = { 0x00 };
 
-   while( going ) {
+   while ( going ) {
 
-      putchar( '\r' );
-      for( l = 0; l < 25; l++ ) {
-         putchar( '\n' );
+      putchar ( '\r' );
+      for ( l = 0; l < 25; l++ ) {
+         putchar ( '\n' );
       }
 
       ddr1a = VIA1.ddra;
@@ -53,11 +53,11 @@ int main (void) {
 
       puts ("================== Digital I/O Status ==================");
       puts ("     Port1A   Port1B   Port2A   Port2B   Port3A   Port3B" );    
-      printf( "DDR    %02X       %02X       %02X       %02X       %02X       %02X\n\r",ddr1a,ddr1b,ddr2a,ddr2b,ddr3a,ddr3b );
-      printf( "IOR    %02X       %02X       %02X       %02X       %02X       %02X\n\r",ior1a,ior1b,ior2a,ior2b,ior3a,ior3b );
+      printf ("DDR    %02X       %02X       %02X       %02X       %02X       %02X\n\r",ddr1a,ddr1b,ddr2a,ddr2b,ddr3a,ddr3b);
+      printf ("IOR    %02X       %02X       %02X       %02X       %02X       %02X\n\r",ior1a,ior1b,ior2a,ior2b,ior3a,ior3b);
       puts ("========================================================\n");
 
-      if( instr ) {
+      if ( instr ) {
          puts ("You  can set any register by typing 'register value'  so");
          puts ("as  an example, to set register IOR2A with the top  five");
          puts ("bits  off  and  the bottom three on,  type  'IOR2A  07'.");
@@ -69,97 +69,97 @@ int main (void) {
          instr = 0;
       }
 
-      printf( "\n Command:  " );
+      printf ("\n Command:  ");
 
-      fgets(cmd, sizeof(cmd)-1, stdin);
+      fgets ( cmd, sizeof(cmd)-1, stdin );
       cmd[strlen(cmd)-1] = '\0';
 
-      if( strncasecmp(cmd, "quit", 4) == 0) {
+      if ( strncasecmp(cmd, "quit", 4) == 0 ) {
          going = 0;  
       }
-      else if( strncasecmp(cmd, "help", 4) == 0) {
+      else if ( strncasecmp(cmd, "help", 4) == 0 ) {
          instr = 1;
       }
-      else if( strncasecmp(cmd, "ddr1a", 5) == 0) {
-         vp = strchr(cmd, ' ');
-         if( vp ) {
+      else if ( strncasecmp(cmd, "ddr1a", 5) == 0 ) {
+         vp = strchr ( cmd, ' ' );
+         if ( vp ) {
             val = (unsigned char) strtol( vp, NULL, 0 );
             VIA1.ddra = val;
          }
       }
-      else if( strncasecmp(cmd, "ior1a", 5) == 0) {
-         vp = strchr(cmd, ' ');
-         if( vp ) {
+      else if ( strncasecmp(cmd, "ior1a", 5) == 0 ) {
+         vp = strchr ( cmd, ' ' );
+         if ( vp ) {
             val = (unsigned char) strtol( vp, NULL, 0 );
             VIA1.pra = val;
          }
       }
-      else if( strncasecmp(cmd, "ddr1b", 5) == 0) {
-         vp = strchr(cmd, ' ');
-         if( vp ) {
+      else if ( strncasecmp(cmd, "ddr1b", 5) == 0 ) {
+         vp = strchr ( cmd, ' ' );
+         if ( vp ) {
             val = (unsigned char) strtol( vp, NULL, 0 );
             VIA1.ddrb = val;
          }
       }
-      else if( strncasecmp(cmd, "ior1b", 5) == 0) {
-         vp = strchr(cmd, ' ');
-         if( vp ) {
+      else if ( strncasecmp(cmd, "ior1b", 5) == 0 ) {
+         vp = strchr ( cmd, ' ' );
+         if ( vp ) {
             val = (unsigned char) strtol( vp, NULL, 0 );
             VIA1.prb = val;
          }
       }
-      else if( strncasecmp(cmd, "ddr2a", 5) == 0) {
-         vp = strchr(cmd, ' ');
-         if( vp ) {
+      else if ( strncasecmp(cmd, "ddr2a", 5) == 0 ) {
+         vp = strchr ( cmd, ' ' );
+         if ( vp ) {
             val = (unsigned char) strtol( vp, NULL, 0 );
             VIA2.ddra = val;
          }
       }
-      else if( strncasecmp(cmd, "ior2a", 5) == 0) {
-         vp = strchr(cmd, ' ');
-         if( vp ) {
+      else if ( strncasecmp(cmd, "ior2a", 5) == 0 ) {
+         vp = strchr ( cmd, ' ' );
+         if ( vp ) {
             val = (unsigned char) strtol( vp, NULL, 0 );
             VIA2.pra = val;
          }
       }
-      else if( strncasecmp(cmd, "ddr2b", 5) == 0) {
-         vp = strchr(cmd, ' ');
-         if( vp ) {
+      else if ( strncasecmp(cmd, "ddr2b", 5) == 0 ) {
+         vp = strchr ( cmd, ' ' );
+         if ( vp ) {
             val = (unsigned char) strtol( vp, NULL, 0 );
             VIA2.ddrb = val;
          }
       }
-      else if( strncasecmp(cmd, "ior2b", 5) == 0) {
-         vp = strchr(cmd, ' ');
-         if( vp ) {
+      else if ( strncasecmp(cmd, "ior2b", 5) == 0 ) {
+         vp = strchr ( cmd, ' ' );
+         if ( vp ) {
             val = (unsigned char) strtol( vp, NULL, 0 );
             VIA2.prb = val;
          }
       }
-      else if( strncasecmp(cmd, "ddr3a", 5) == 0) {
-         vp = strchr(cmd, ' ');
-         if( vp ) {
+      else if ( strncasecmp(cmd, "ddr3a", 5) == 0 ) {
+         vp = strchr ( cmd, ' ' );
+         if ( vp ) {
             val = (unsigned char) strtol( vp, NULL, 0 );
             VIA3.ddra = val;
          }
       }
-      else if( strncasecmp(cmd, "ior3a", 5) == 0) {
-         vp = strchr(cmd, ' ');
-         if( vp ) {
+      else if ( strncasecmp(cmd, "ior3a", 5) == 0 ) {
+         vp = strchr ( cmd, ' ' );
+         if ( vp ) {
             val = (unsigned char) strtol( vp, NULL, 0 );
             VIA3.pra = val;
          }
       }
-      else if( strncasecmp(cmd, "ddr3b", 5) == 0) {
-         vp = strchr(cmd, ' ');
-         if( vp ) {
+      else if ( strncasecmp(cmd, "ddr3b", 5) == 0 ) {
+         vp = strchr ( cmd, ' ' );
+         if ( vp ) {
             val = (unsigned char) strtol( vp, NULL, 0 );
             VIA3.ddrb = val;
          }
       }
-      else if( strncasecmp(cmd, "ior3b", 5) == 0) {
-         vp = strchr(cmd, ' ');
-         if( vp ) {
+      else if ( strncasecmp(cmd, "ior3b", 5) == 0 ) {
+         vp = strchr (cmd, ' ' );
+         if ( vp ) {
             val = (unsigned char) strtol( vp, NULL, 0 );
             VIA3.prb = val;
          }

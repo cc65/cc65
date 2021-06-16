@@ -23,23 +23,23 @@ int main (void) {
    char c           = 0x00;
    char buffer[41]  = { 0x00 };
 
-   puts( "\nType a message (40 chars max) and press ENTER, please:\n" );
+   puts ("\nType a message (40 chars max) and press ENTER, please:\n");
 
-   while( (c != '\n') && (i < 40) ) {
+   while ( (c != '\n') && (i < 40) ) {
       c = getchar();
       buffer[i] = c;
       i++;
-      if( i == 40 ) {
+      if ( i == 40 ) {
          puts ("\n\n--- Reached 40 character limit. ---");
       }
    }
 
    i--;                                // index is one past end
 
-   while( z == 0 ) {
+   while ( z == 0 ) {
       puts ("\n\nHow many times (0 for forever) to repeat?");
       c = getchar();
-      if( (c >= '0') && (c <= '9') ) { // between 1 and 9 loops allowed
+      if ( (c >= '0') && (c <= '9') ) {// between 1 and 9 loops allowed
          z = 1;                        // a number was pressed 
          t = c - '0';                  // convert char to int
          puts ("\n\nLook at the front panel.\n");
@@ -51,11 +51,11 @@ int main (void) {
    }
 
    z = 0;
-   while( (z < t) || (t == 0) ) {
+   while ( (z < t) || (t == 0) ) {
 
       z++;
 
-      putchar( '\r' );                 // Send CR to console
+      putchar ( '\r' );                // Send CR to console
 
       DISPLAY.d0 = DISP_SPACE;         // Clear the display
       DISPLAY.d1 = DISP_SPACE;
@@ -65,15 +65,15 @@ int main (void) {
       DISPLAY.d5 = DISP_SPACE;
       DISPLAY.d6 = DISP_SPACE;
 
-      for( d = 0; d < flashes ; d++ ) {
+      for ( d = 0; d < flashes ; d++ ) {
          fdisp();                      // Display
       }
 
-      for( l = 0; l <= i; l++ ) {
+      for ( l = 0; l <= i; l++ ) {
 
          displayable = 1;              // Assume character is mapped
 
-         switch( buffer[l] ) {         // Put the typed charaters
+         switch ( buffer[l] ) {        // Put the typed charaters
             case '1':                  // into the display buffer
                DISPLAY.d6 = DISP_1;    // one at a time
                break;
@@ -321,9 +321,9 @@ int main (void) {
                displayable = 0;        // Character not mapped
          }
 
-         if( displayable ) {
+         if ( displayable ) {
 
-            putchar( buffer[l] );      // Send it to the console
+            putchar ( buffer[l] );     // Send it to the console
 
             DISPLAY.d0 = DISPLAY.d1;   // Scroll to the left
             DISPLAY.d1 = DISPLAY.d2;
@@ -332,13 +332,13 @@ int main (void) {
             DISPLAY.d4 = DISPLAY.d5;
             DISPLAY.d5 = DISPLAY.d6;
 
-            for( d = 0; d < flashes ; d++ ) {
+            for ( d = 0; d < flashes ; d++ ) {
                fdisp();                // Display
             }
          }
       }
 
-      for( e = 0; e < 6; e++ ) {       // Gradually fill the
+      for ( e = 0; e < 6; e++ ) {      // Gradually fill the
          DISPLAY.d0 = DISPLAY.d1;      // display with spaces
          DISPLAY.d1 = DISPLAY.d2;
          DISPLAY.d2 = DISPLAY.d3;
@@ -346,7 +346,7 @@ int main (void) {
          DISPLAY.d4 = DISPLAY.d5;
          DISPLAY.d5 = DISP_SPACE;
          DISPLAY.d6 = DISP_SPACE;
-         for( d = 0; d < flashes ; d++ ) {
+         for ( d = 0; d < flashes ; d++ ) {
             fdisp();                   // Display
          }
       }

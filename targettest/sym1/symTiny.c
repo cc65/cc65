@@ -20,21 +20,21 @@ int main (void) {
 
    puts ("Type a line and press ENTER, please:\n");
 
-   for( l = 0; l < 2; l++ ) {
+   for ( l = 0; l < 2; l++ ) {
       beep();
-      for( d = 0; d < 10 ; d++ ) {
+      for ( d = 0; d < 10 ; d++ ) {
       }
    }
 
-   while( c != '\n' ) {
+   while ( c != '\n' ) {
       c = getchar();
    }
 
    puts ("\n\nThanks!\n");
 
-   for( l = 0; l < 5; l++ ) {
+   for ( l = 0; l < 5; l++ ) {
       beep();
-      for( d = 0; d < 10 ; d++ ) {
+      for ( d = 0; d < 10 ; d++ ) {
       }
    }
 

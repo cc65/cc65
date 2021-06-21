@@ -5880,8 +5880,6 @@ void main (void)
 <tag/Declaration/<tt/void psg_silence (void);/
 <tag/Description/The function resets the Programmable Sound Generator,
 then sends $9F, $BF, $DF, $FF to the PSG.
-<tag/Notes/<itemize>
-</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="psg_delay" name="psg_delay">,

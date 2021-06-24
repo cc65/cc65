@@ -1022,6 +1022,10 @@ The compiler defines several macros at startup:
 
   This macro is defined if the target is the Supervision (-t supervision).
 
+  <tag><tt>__SYM1__</tt></tag>
+
+  This macro is defined if the target is the Sym-1 (-t sym1).
+
   <tag><tt>__TELESTRAT__</tt></tag>
 
   This macro is defined if the target is the Telestrat (-t telestrat).

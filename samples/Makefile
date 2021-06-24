@@ -312,6 +312,9 @@ EXELIST_sim65c02 = $(EXELIST_sim6502)
 
 EXELIST_supervision = \
         supervisionhello
+        
+EXELIST_sym1 =     \
+        notavailable
 
 EXELIST_telestrat = \
         ascii       \

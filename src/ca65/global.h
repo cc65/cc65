@@ -60,6 +60,9 @@ extern StrBuf           FullDepName;        /* Name of full dependencies file */
 extern const char       ObjExt[];           /* Default object extension */
 
 extern char             LocalStart;         /* This char starts local symbols */
+extern unsigned char    ProcessingConst;    /* Currently processed expression
+                                            ** is supposed to be const
+                                            */
 
 extern unsigned char    IgnoreCase;         /* Ignore case on identifiers? */
 extern unsigned char    AutoImport;         /* Mark unresolveds as import */

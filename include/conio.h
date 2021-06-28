@@ -35,16 +35,16 @@
 
 /*
 ** This is the direct console interface for cc65. I do not like the function
-** names very much, but the first version started as a rewrite of Borland's
-** conio, and, even if the interface has changed, the names did not.
+** names very much; but, the first version started as a rewrite of Borland's
+** conio; and, even if the interface has changed, the names did not.
 **
-** The interface does direct screen I/O, so it is fast enough for most
-** programs. I did not implement text windows, since many applications do
-** not need them and should not pay for the additional overhead. It should
-** be easy to add text windows on a higher level if needed,
+** The interface does direct screen I/O; so, it is fast enough for most
+** programs. I did not implement text windows because many applications do
+** not need them, and should not pay for the additional overhead. It should
+** be easy to add text windows on a higher level if needed.
 **
-** Most routines do not check the parameters. This may be unfortunate but is
-** also related to speed. The coordinates are always 0/0 based.
+** Most routines do not check the parameters. That might be unfortunate;
+** but also is related to speed. The coordinates are always (0,0)-based.
 */
 
 
@@ -191,10 +191,10 @@ void __fastcall__ cputhex16 (unsigned val);
 
 
 /* On some platforms, functions are not available or are dummys. To suppress
-** the call to these functions completely, the platform header files may
-** define macros for these functions that start with an underline. If such a
-** macro exists, a new macro is defined here, that expands to the one with the
-** underline. The reason for this two stepped approach is that it is sometimes
+** the call to those functions completely, the platform header files may
+** define macros for those functions that start with an underscore. If such a
+** macro exists, a new macro is defined here that expands to the one with the
+** underscore. The reason for this two-stepped approach is that it is sometimes
 ** necessary to take the address of the function, which is not possible when
 ** using a macro. Since the function prototype is still present, #undefining
 ** the macro will give access to the actual function.

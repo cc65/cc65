@@ -914,6 +914,12 @@ static unsigned Pass1 (StrBuf* Source, StrBuf* Target)
                 SB_AppendStr (Target, Ident);
             }
         } else if (IsQuote (CurC)) {
+            /* Remove digit separators between two digits. This is a C++14 feature supported as an extension in the CC65 standard mode. */
+            if (IS_Get (&Standard) >= STD_CC65 && (IsDigit (SB_LookAtLast (Target)) && IsDigit (NextC))) {
+                NextChar ();
+                continue;
+            }
+
             CopyQuotedString (Target);
         } else if (CurC == '/' && NextC == '*') {
             if (!IsSpace (SB_LookAtLast (Target))) {

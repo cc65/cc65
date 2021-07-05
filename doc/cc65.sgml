@@ -853,6 +853,16 @@ This cc65 version has some extensions to the ISO C standard.
         unsigned char foo = 0b101; // sets it to 5
         </verb></tscreen>
 
+<item>  Digit separators in literals, a C++14 feature, are accepted. They are
+        often used to separate thousands in decimal or bit groups in binary literals.
+        They can be disabled with the <tt><ref id="option--standard"
+        name="--standard"></tt> option.
+
+        <tscreen><verb>
+        unsigned char foo = 0b11'00'11'00; // sets foo to 0b11001100
+        unsigned int bar  = 42'069;        // sets bar to 42069
+        </verb></tscreen>
+
 </itemize>
 <p>
 

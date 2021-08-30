@@ -832,8 +832,8 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         */
         if (ED_IsLocLiteral (&Arg2.Expr) &&
             IS_Get (&WritableStrings) == 0 &&
-            GetLiteralSize (Arg2.Expr.LVal) == 1 &&
-            GetLiteralStr (Arg2.Expr.LVal)[0] == '\0') {
+            GetLiteralSize (Arg2.Expr.V.LVal) == 1 &&
+            GetLiteralStr (Arg2.Expr.V.LVal)[0] == '\0') {
 
             /* Drop the generated code so we have the first argument in the
             ** primary
@@ -841,7 +841,7 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             RemoveCode (&Arg1.Push);
 
             /* We don't need the literal any longer */
-            ReleaseLiteral (Arg2.Expr.LVal);
+            ReleaseLiteral (Arg2.Expr.V.LVal);
 
             /* We do now have Arg1 in the primary. Load the first character from
             ** this string and cast to int. This is the function result.
@@ -1232,10 +1232,10 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         if (ED_IsLocLiteral (&Arg) && IS_Get (&WritableStrings) == 0) {
 
             /* Constant string literal */
-            ED_MakeConstAbs (Expr, GetLiteralSize (Arg.LVal) - 1, type_size_t);
+            ED_MakeConstAbs (Expr, GetLiteralSize (Arg.V.LVal) - 1, type_size_t);
 
             /* We don't need the literal any longer */
-            ReleaseLiteral (Arg.LVal);
+            ReleaseLiteral (Arg.V.LVal);
 
             /* Bail out, no need for further improvements */
             goto ExitPoint;

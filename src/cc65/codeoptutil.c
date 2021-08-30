@@ -827,21 +827,28 @@ void AdjustStackOffset (StackOpData* D, unsigned Offs)
 
         CodeEntry* E = CS_GetEntry (D->Code, I);
 
+        /* Check against some things that should not happen */
+        CHECK ((E->Use & SLV_TOP) != SLV_TOP);
+
         /* Check if this entry does a stack access, and if so, if it's a plain
         ** load from stack, since this is needed later.
         */
         int Correction = 0;
-        if ((E->Use & REG_SP) != 0) {
+        if ((E->Use & SLV_IND) == SLV_IND) {
 
-            /* Check for some things that should not happen */
-            CHECK (E->AM == AM65_ZP_INDY || E->RI->In.RegY >= (short) Offs);
-            CHECK (strcmp (E->Arg, "sp") == 0);
-            /* We need to correct this one */
-            Correction = (E->OPC == OP65_LDA)? 2 : 1;
+            if (E->OPC != OP65_JSR) {
+                /* Check against some things that should not happen */
+                CHECK (E->AM == AM65_ZP_INDY && E->RI->In.RegY >= (short) Offs);
+                CHECK (strcmp (E->Arg, "sp") == 0);
 
-        } else if (CE_IsCallTo (E, "ldaxysp")) {
-            /* We need to correct this one */
-            Correction = 1;
+                /* We need to correct this one */
+                Correction = 2;
+
+            } else {
+                /* We need to correct this one */
+                Correction = 1;
+            }
+
         }
 
         if (Correction) {
@@ -849,7 +856,7 @@ void AdjustStackOffset (StackOpData* D, unsigned Offs)
             ** value.
             */
             CodeEntry* P = CS_GetPrevEntry (D->Code, I);
-            if (P && P->OPC == OP65_LDY && CE_IsConstImm (P)) {
+            if (P && P->OPC == OP65_LDY && CE_IsConstImm (P) && !CE_HasLabel (E)) {
                 /* The Y load is just before the stack access, adjust it */
                 CE_SetNumArg (P, P->Num - Offs);
             } else {
@@ -860,39 +867,59 @@ void AdjustStackOffset (StackOpData* D, unsigned Offs)
             }
 
             /* If we need the value of Y later, be sure to reload it */
-            if (RegYUsed (D->Code, I+1)) {
-                CodeEntry* N;
+            unsigned R = REG_Y | (E->Chg & ~REG_A);
+            R = GetRegInfo (D->Code, I + 1, R) & R;
+            if ((R & REG_Y) != 0) {
                 const char* Arg = MakeHexArg (E->RI->In.RegY);
-                if (Correction == 2 && (N = CS_GetNextEntry(D->Code, I)) != 0 &&
-                    ((N->Info & OF_ZBRA) != 0) && N->JumpTo != 0) {
-                    /* The Y register is used but the load instruction loads A
-                    ** and is followed by a branch that evaluates the zero flag.
-                    ** This means that we cannot just insert the load insn
-                    ** for the Y register at this place, because it would
-                    ** destroy the Z flag. Instead place load insns at the
-                    ** target of the branch and after it.
-                    ** Note: There is a chance that this code won't work. The
-                    ** jump may be a backwards jump (in which case the stack
-                    ** offset has already been adjusted) or there may be other
-                    ** instructions between the load and the conditional jump.
-                    ** Currently the compiler does not generate such code, but
-                    ** it is possible to force the optimizer into something
-                    ** invalid by use of inline assembler.
-                    */
+                if ((R & PSTATE_ZN) != 0 && (R & ~(REG_Y | PSTATE_ZN)) == 0) {
+                    CodeEntry* N;
+                    if ((N = CS_GetNextEntry (D->Code, I)) != 0 &&
+                        ((N->Info & OF_ZBRA) != 0) && N->JumpTo != 0) {
+                        /* The Y register is used but the load instruction loads A
+                        ** and is followed by a branch that evaluates the zero flag.
+                        ** This means that we cannot just insert the load insn
+                        ** for the Y register at this place, because it would
+                        ** destroy the Z flag. Instead place load insns at the
+                        ** target of the branch and after it.
+                        ** Note: There is a chance that this code won't work. The
+                        ** jump may be a backwards jump (in which case the stack
+                        ** offset has already been adjusted) or there may be other
+                        ** instructions between the load and the conditional jump.
+                        ** Currently the compiler does not generate such code, but
+                        ** it is possible to force the optimizer into something
+                        ** invalid by use of inline assembler.
+                        ** Note: In reality, this route is never taken as all
+                        ** callers of this function will just give up with
+                        ** optimization whenever they detect a branch.
+                        */
 
-                    /* Add load insn after the branch */
-                    CodeEntry* X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
-                    InsertEntry (D, X, I+2);
+                        /* Add load insn after the branch */
+                        CodeEntry* X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
+                        InsertEntry (D, X, I+2);
 
-                    /* Add load insn before branch target */
-                    CodeEntry* Y = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
-                    int J = CS_GetEntryIndex (D->Code, N->JumpTo->Owner);
-                    CHECK (J > I);      /* Must not happen */
-                    InsertEntry (D, Y, J);
+                        /* Add load insn before branch target */
+                        CodeEntry* Y = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
+                        int J = CS_GetEntryIndex (D->Code, N->JumpTo->Owner);
+                        CHECK (J > I);      /* Must not happen */
+                        InsertEntry (D, Y, J);
 
-                    /* Move the label to the new insn */
-                    CodeLabel* L = CS_GenLabel (D->Code, Y);
-                    CS_MoveLabelRef (D->Code, N, L);
+                        /* Move the label to the new insn */
+                        CodeLabel* L = CS_GenLabel (D->Code, Y);
+                        CS_MoveLabelRef (D->Code, N, L);
+
+                        /* Skip the next two instructions in the next round */
+                        I += 2;
+                    } else {
+                        /* This could be suboptimal but it will always work (unless stack overflows) */
+                        CodeEntry* X = NewCodeEntry (OP65_PHP, AM65_IMP, 0, 0, E->LI);
+                        InsertEntry (D, X, I+1);
+                        X = NewCodeEntry (OP65_LDY, AM65_IMM, 0, 0, E->LI);
+                        InsertEntry (D, X, I+2);
+                        X = NewCodeEntry (OP65_PLP, AM65_IMP, 0, 0, E->LI);
+                        InsertEntry (D, X, I+3);
+                        /* Skip the three inserted instructions in the next round */
+                        I += 3;
+                    }
                 } else {
                     CodeEntry* X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
                     InsertEntry (D, X, I+1);
@@ -1197,66 +1224,43 @@ static int CmpHarmless (const void* Key, const void* Entry)
 
 
 
-int HarmlessCall (const char* Name)
+int HarmlessCall (const CodeEntry* E, int PushedBytes)
 /* Check if this is a call to a harmless subroutine that will not interrupt
 ** the pushax/op sequence when encountered.
 */
 {
-    static const char* const Tab[] = {
-        "aslax1",
-        "aslax2",
-        "aslax3",
-        "aslax4",
-        "aslaxy",
-        "asrax1",
-        "asrax2",
-        "asrax3",
-        "asrax4",
-        "asraxy",
-        "bcastax",
-        "bnegax",
-        "complax",
-        "decax1",
-        "decax2",
-        "decax3",
-        "decax4",
-        "decax5",
-        "decax6",
-        "decax7",
-        "decax8",
-        "decaxy",
-        "incax1",
-        "incax2",
-        "incax3",
-        "incax4",
-        "incax5",
-        "incax6",
-        "incax7",
-        "incax8",
-        "incaxy",
-        "ldaidx",
-        "ldauidx",
-        "ldaxidx",
-        "ldaxysp",
-        "negax",
-        "shlax1",
-        "shlax2",
-        "shlax3",
-        "shlax4",
-        "shlaxy",
-        "shrax1",
-        "shrax2",
-        "shrax3",
-        "shrax4",
-        "shraxy",
-    };
+    unsigned Use = 0, Chg = 0;
+    if (GetFuncInfo (E->Arg, &Use, &Chg) == FNCLS_BUILTIN) {
+        if ((Chg & REG_SP) != 0) {
+            return 0;
+        }
+        if ((Use & REG_SP) != 0                     &&
+            ((Use & (SLV_IND | SLV_TOP)) != SLV_IND ||
+             RegValIsUnknown (E->RI->In.RegY)       ||
+             E->RI->In.RegY < PushedBytes)) {
+            /* If we are using the stack, and we don't have "indirect"
+            ** addressing mode, or the value of Y is unknown, or less
+            ** than two, we cannot cope with this piece of code. Having
+            ** an unknown value of Y means that we cannot correct the
+            ** stack offset, while having an offset less than PushedBytes
+            ** means that the code works with the value on stack which
+            ** is to be removed.
+            */
+            return 0;
+        }
+        return 1;
+    } else {
+        static const char* const Tab[] = {
+            "_abs",
+        };
 
-    void* R = bsearch (Name,
-                       Tab,
-                       sizeof (Tab) / sizeof (Tab[0]),
-                       sizeof (Tab[0]),
-                       CmpHarmless);
-    return (R != 0);
+        void* R = bsearch (E->Arg,
+                            Tab,
+                            sizeof (Tab) / sizeof (Tab[0]),
+                            sizeof (Tab[0]),
+                            CmpHarmless);
+        return (R != 0);
+    }
 }
 
 

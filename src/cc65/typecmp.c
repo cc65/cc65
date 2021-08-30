@@ -278,6 +278,21 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
             SetResult (Result, TC_STRICT_COMPATIBLE);
         }
 
+        /* Bit-fields are considered compatible if they have the same
+        ** signedness, bit-offset and bit-width.
+        */
+        if (IsTypeBitField (lhs) || IsTypeBitField (rhs)) {
+            if (!IsTypeBitField (lhs)           ||
+                !IsTypeBitField (rhs)           ||
+                lhs->A.B.Offs  != rhs->A.B.Offs ||
+                lhs->A.B.Width != rhs->A.B.Width) {
+                SetResult (Result, TC_INCOMPATIBLE);
+            }
+            if (LeftType != RightType) {
+                SetResult (Result, TC_STRICT_COMPATIBLE);
+            }
+        }
+
         /* If the underlying types are not identical, the types are incompatible */
         if (LeftType != RightType) {
             SetResult (Result, TC_INCOMPATIBLE);

@@ -1820,20 +1820,18 @@ unsigned OptStackOps (CodeSeg* S)
                         Data.OpEntry = E;
                         State = FoundOp;
                         break;
-                    } else if (!HarmlessCall (E->Arg)) {
-                        /* A call to an unkown subroutine: We need to start
-                        ** over after the last pushax. Note: This will also
-                        ** happen if we encounter a call to pushax!
+                    } else if (!HarmlessCall (E, 2)) {
+                        /* The call might use or change the content that we are
+                        ** going to access later via the stack pointer. In any
+                        ** case, we need to start over after the last pushax.
+                        ** Note: This will also happen if we encounter a call
+                        ** to pushax!
                         */
                         I = Data.PushIndex;
                         State = Initialize;
                         break;
                     }
-
-                } else if ((E->Use & REG_SP) != 0               &&
-                           (E->AM != AM65_ZP_INDY               ||
-                            RegValIsUnknown (E->RI->In.RegY)    ||
-                            E->RI->In.RegY < 2)) {
+                } else if (((E->Chg | E->Use) & REG_SP) != 0) {
 
                     /* If we are using the stack, and we don't have "indirect Y"
                     ** addressing mode, or the value of Y is unknown, or less
@@ -1843,9 +1841,14 @@ unsigned OptStackOps (CodeSeg* S)
                     ** that the code works with the value on stack which is to
                     ** be removed.
                     */
-                    I = Data.PushIndex;
-                    State = Initialize;
-                    break;
+                    if (E->AM == AM65_ZPX_IND               ||
+                        ((E->Chg | E->Use) & SLV_IND) == 0  ||
+                        (RegValIsUnknown (E->RI->In.RegY)   ||
+                         E->RI->In.RegY < 2)) {
+                        I = Data.PushIndex;
+                        State = Initialize;
+                        break;
+                    }
 
                 }
 

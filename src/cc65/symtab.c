@@ -37,6 +37,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#include <errno.h>
 
 /* common */
 #include "check.h"
@@ -68,8 +69,6 @@
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 /* An empty symbol table */
 SymTable        EmptySymTab = {
     0,          /* PrevTab */
@@ -98,6 +97,7 @@ static SymTable*        LabelTab        = 0;
 static SymTable*        SPAdjustTab     = 0;
 static SymTable*        FailSafeTab     = 0;    /* For errors */
 
+static FILE* DebugTableFile = 0;
 
 /*****************************************************************************/
 /*                              struct SymTable                              */
@@ -219,11 +219,25 @@ unsigned GetLexicalLevel (void)
     return LexicalLevel;
 }
 
-
-
 void EnterGlobalLevel (void)
 /* Enter the program global lexical level */
 {
+    const char* OutName = NULL;
+    if (!SB_IsEmpty (&DebugTableName)) {
+        OutName = SB_GetConstBuf (&DebugTableName);
+    }
+
+    if (OutName) {
+        /* Open the table file */
+        DebugTableFile = fopen (OutName, "w");
+        if (DebugTableFile == 0) {
+            Error ("Cannot create table dump file '%s': %s", OutName, strerror (errno));
+        }
+    }
+    else if (Debug) {
+        DebugTableFile = stdout;
+    }
+
     /* Safety */
     PRECONDITION (++LexicalLevel == LEX_LEVEL_GLOBAL);
 
@@ -240,8 +254,6 @@ void EnterGlobalLevel (void)
     FailSafeTab = NewSymTable (SYMTAB_SIZE_GLOBAL);
 }
 
-
-
 void LeaveGlobalLevel (void)
 /* Leave the program global lexical level */
 {
@@ -252,9 +264,41 @@ void LeaveGlobalLevel (void)
     CheckSymTable (SymTab0);
 
     /* Dump the tables if requested */
-    if (Debug) {
-        PrintSymTable (SymTab0, stdout, "Global symbol table");
-        PrintSymTable (TagTab0, stdout, "Global tag table");
+    if (DebugTableFile) {
+        SymEntry* Entry;
+        StrBuf* Header;
+
+        PrintSymTable (SymTab0, DebugTableFile, "Global symbol table");
+        PrintSymTable (TagTab0, DebugTableFile, "Global tag table");
+
+        Entry = TagTab0->SymHead;
+        if (Entry) {
+            fputs ("\nGlobal struct and union definitions", DebugTableFile);
+            fputs ("\n=========================\n", DebugTableFile);
+
+            do {
+                if (!((Entry->Flags & SC_STRUCT) || (Entry->Flags & SC_UNION)) || !Entry->V.S.SymTab) {
+                    continue;
+                }
+
+                Header = NewStrBuf();
+                if(Entry->Flags & SC_STRUCT) {
+                    SB_AppendStr (Header, "SC_STRUCT: ");
+                }
+                else {
+                    SB_AppendStr (Header, "SC_UNION: ");
+                }
+                SB_AppendStr (Header, Entry->Name);
+                SB_Terminate (Header);
+
+                PrintSymTable (Entry->V.S.SymTab, DebugTableFile, SB_GetConstBuf (Header));
+            } while ((Entry = Entry->NextSym));
+        }
+
+        /* Close the file */
+        if (DebugTableFile != stdout && fclose (DebugTableFile) != 0) {
+            Error ("Error closing table dump file '%s': %s", SB_GetConstBuf(&DebugTableName), strerror (errno));
+        }
     }
 
     /* Don't delete the symbol and struct tables! */
@@ -336,6 +380,18 @@ void LeaveFunctionLevel (void)
     /* Check the tables */
     CheckSymTable (SymTab);
     CheckSymTable (LabelTab);
+
+    /* Dump the tables if requested */
+    if (DebugTableFile) {
+        StrBuf* SymbolHeader = NewStrBuf();
+
+        SB_AppendStr (SymbolHeader, "SC_FUNC: ");
+        SB_AppendStr (SymbolHeader, CurrentFunc->FuncEntry->AsmName);
+        SB_AppendStr (SymbolHeader, ": Symbol table");
+        SB_Terminate (SymbolHeader);
+
+        PrintSymTable (SymTab, DebugTableFile, SB_GetConstBuf(SymbolHeader));
+    }
 
     /* Drop the label table if it is empty */
     if (LabelTab->SymCount == 0) {

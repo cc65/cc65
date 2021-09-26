@@ -195,10 +195,10 @@ No mouse drivers are currently available for the Plus/4.
 
   <tag><tt/plus4-stdser.ser (plus4_stdser_ser)/</tag>
   Driver for the 6551 ACIA chip built into the Plus/4. Supports up to 19200
-  baud, hardware flow control (RTS/CTS) and interrupt driven receives. Note
-  that because of the peculiarities of the 6551 chip transmits are not
-  interrupt driven, and the transceiver blocks if the receiver asserts flow
-  control because of a full buffer.
+  baud, requires hardware flow control (RTS/CTS) and does interrupt driven
+  receives. Note that because of the peculiarities of the 6551 chip transmits
+  are not interrupt driven, and the transceiver blocks if the receiver asserts
+  flow control because of a full buffer.
 
   You need an adapter to use the builtin port, since the output levels
   available at the user port don't follow the RS232 standard.

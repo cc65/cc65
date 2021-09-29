@@ -11,7 +11,7 @@ jobs:
     script:
       - make -j2 bin USER_CFLAGS=-Werror
       - make -j2 lib QUIET=1
-      - make -j2 test QUIET=1
+      - make test QUIET=1
       - make -j2 samples
       - make -C src clean
       - make -j2 bin USER_CFLAGS=-Werror CROSS_COMPILE=i686-w64-mingw32-

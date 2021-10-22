@@ -154,7 +154,7 @@ endif
 # Lists of subdirectories
 
 # disasm depends on cpp
-DIRLIST = tutorial geos
+DIRLIST = tutorial geos atari2600 supervision cbm
 
 # --------------------------------------------------------------------------
 # Lists of executables
@@ -205,28 +205,22 @@ EXELIST_bbc = \
 EXELIST_c64 =      \
         ascii      \
         enumdevdir \
-        fire       \
         gunzip65   \
         hello      \
         mandelbrot \
         mousedemo  \
         multdemo   \
-        nachtm     \
         ovrldemo   \
-        plasma     \
         sieve      \
         tgidemo
 
 EXELIST_c128 =     \
         ascii      \
         enumdevdir \
-        fire       \
         gunzip65   \
         hello      \
         mandelbrot \
         mousedemo  \
-        nachtm     \
-        plasma     \
         sieve      \
         tgidemo
 
@@ -237,19 +231,15 @@ EXELIST_c16 =      \
 
 EXELIST_cbm510 =   \
         ascii      \
-        fire       \
         gunzip65   \
         hello      \
         mousedemo  \
-        nachtm     \
-        plasma     \
         sieve
 
 EXELIST_cbm610 =   \
         ascii      \
         gunzip65   \
         hello      \
-        nachtm     \
         sieve
 
 EXELIST_creativision = \
@@ -302,7 +292,6 @@ EXELIST_plus4 =    \
         enumdevdir \
         gunzip65   \
         hello      \
-        plasma     \
         sieve
 
 EXELIST_sim6502 =  \
@@ -311,7 +300,7 @@ EXELIST_sim6502 =  \
 EXELIST_sim65c02 = $(EXELIST_sim6502)
 
 EXELIST_supervision = \
-        supervisionhello
+        notavailable
 
 EXELIST_telestrat = \
         ascii       \
@@ -398,7 +387,7 @@ $(C1541) -attach $@ -write "$(subst ?,$(SPACE),$(file))" $(notdir $(file)),s >$(
 endef # D64_WRITE_SEQ_recipe
 
 samples.d64: samples
-	@$(C1541) -format samples,AA d64 $@ >$(NULLDEV)
+	@$(C1541) -format "samples,00" d64 $@ >$(NULLDEV)
 	$(foreach file,$(EXELIST_$(SYS)),$(D64_WRITE_PRG_recipe))
 	$(foreach file,$(OVERLAYLIST),$(D64_WRITE_PRG_recipe))
 	$(foreach file,$(EMD) $(MOU) $(TGI),$(D64_WRITE_SEQ_recipe))
@@ -460,11 +449,17 @@ install:
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)/geos
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)/tutorial
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/atari2600
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/cbm
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/supervision
 	$(INSTALL) -m0644 *.* $(DESTDIR)$(samplesdir)
 	$(INSTALL) -m0644 readme.txt $(DESTDIR)$(samplesdir)
 	$(INSTALL) -m0644 Makefile $(DESTDIR)$(samplesdir)
 	$(INSTALL) -m0644 geos/*.* $(DESTDIR)$(samplesdir)/geos
 	$(INSTALL) -m0644 tutorial/*.* $(DESTDIR)$(samplesdir)/tutorial
+	$(INSTALL) -m0644 atari2600/*.* $(DESTDIR)$(samplesdir)/atari2600
+	$(INSTALL) -m0644 cbm/*.* $(DESTDIR)$(samplesdir)/cbm
+	$(INSTALL) -m0644 supervision/*.* $(DESTDIR)$(samplesdir)/supervision
 
 # --------------------------------------------------------------------------
 # Packaging rules

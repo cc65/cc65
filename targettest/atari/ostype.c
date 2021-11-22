@@ -9,9 +9,9 @@
 
 int main(void)
 {
+    char *rev;
     unsigned int t, v;
     unsigned char palntsc;
-    unsigned char *rev;
     unsigned char minor;
     unsigned char c;
 

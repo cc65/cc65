@@ -428,8 +428,8 @@ The names in the parentheses denote the symbols to be used for static linking of
 
   <tag><tt/a2.ssc.ser (a2_ssc_ser)/</tag>
   Driver for the Apple&nbsp;II Super Serial Card. Supports up to 19200 baud,
-  hardware flow control (RTS/CTS) and interrupt driven receives. Note
-  that because of the peculiarities of the 6551 chip transmits are not
+  requires hardware flow control (RTS/CTS) and does interrupt driven receives.
+  Note that because of the peculiarities of the 6551 chip transmits are not
   interrupt driven, and the transceiver blocks if the receiver asserts
   flow control because of a full buffer.
 

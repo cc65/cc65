@@ -1113,9 +1113,9 @@ static unsigned Opt_a_toscmpbool (StackOpData* D, const char* BoolTransformer)
 
     D->IP = D->OpIndex + 1;
 
-    if (!D->RhsMultiChg &&
-        (D->Rhs.A.LoadEntry->Flags & CEF_DONT_REMOVE) == 0 &&
-        (D->Rhs.A.Flags & LI_DIRECT) != 0) {
+    if (!D->RhsMultiChg                     &&
+        (D->Rhs.A.Flags & LI_DIRECT) != 0   &&
+        (D->Rhs.A.LoadEntry->Flags & CEF_DONT_REMOVE) == 0) {
 
         /* cmp */
         AddOpLow (D, OP65_CMP, &D->Rhs);

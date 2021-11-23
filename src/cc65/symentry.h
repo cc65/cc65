@@ -183,13 +183,6 @@ struct SymEntry {
             const Type*         Type;     /* Underlying type */
         } E;
 
-        /* Data for bit fields */
-        struct {
-            unsigned            Offs;     /* Byte offset into struct */
-            unsigned            BitOffs;  /* Bit offset into storage unit */
-            unsigned            BitWidth; /* Width in bits */
-        } B;
-
         /* Data for functions */
         struct {
             struct Segments*    Seg;      /* Segments for this function */

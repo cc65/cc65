@@ -261,7 +261,7 @@ void RemoveRegLoads (StackOpData* D, LoadInfo* LI);
 void RemoveRemainders (StackOpData* D);
 /* Remove the code that is unnecessary after translation of the sequence */
 
-int HarmlessCall (const char* Name);
+int HarmlessCall (const CodeEntry* E, int PushedBytes);
 /* Check if this is a call to a harmless subroutine that will not interrupt
 ** the pushax/op sequence when encountered.
 */

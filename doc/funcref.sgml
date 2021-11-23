@@ -298,6 +298,16 @@ function.
 </itemize>
 
 
+<sect1><tt/creativision.h/<label id="creativision.h"><p>
+
+<itemize>
+<item><ref id="bios_playsound" name="bios_playsound">
+<item><ref id="psg_delay" name="psg_delay">
+<item><ref id="psg_outb" name="psg_outb">
+<item><ref id="psg_silence" name="psg_silence">
+</itemize>
+
+
 <sect1><tt/ctype.h/<label id="ctype.h"><p>
 
 <itemize>
@@ -1684,6 +1694,44 @@ used in presence of a prototype.
 </quote>
 
 
+<sect1>bios_playsound<label id="bios_playsound"><p>
+
+<quote>
+<descrip>
+<tag/Function/Play a sequence of musical notes.
+<tag/Header/<tt/<ref id="creativision.h" name="creativision.h">/
+<tag/Declaration/<tt/void __fastcall__ bios_playsound (const void *a, unsigned char b);/
+<tag/Description/The function plays chords based on a BASIC statement. Notes and
+durations are defined in the BASIC manual, chapter 13 on pages 102 resp. 103.
+<tag/Notes/<itemize>
+<item>BASIC has a fixed tempo of 18.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="psg_delay" name="psg_delay">,
+<ref id="psg_outb" name="psg_outb">
+<tag/Example/<verb>
+#include <creativision.h>
+void main (void)
+{
+  static const unsigned char notes[] = {
+    0x77, 0x4F, 0x37,
+    0x4B, 0x05, 0xBB,
+    0x4F, 0x27, 0x83,
+    0x93, 0x9B, 0x93,
+    0x17, 0x4F, 0x96,  // played backwards
+    0xAB, 0x17, 0x4F,  // three-note chords
+    0x0E               // tempo
+  };
+  bios_playsound (notes, sizeof notes);
+}
+</verb>
+</descrip>
+</quote>
+
+
 <sect1>bordercolor<label id="bordercolor"><p>
 
 <quote>
@@ -1778,7 +1826,7 @@ be used in presence of a prototype.
 <item>The function is specific to the C128.
 <item>The function will not return to the caller.
 </itemize>
-<tag/Availability/C128
+<tag/Availability/cc65
 <tag/Example/None.
 </descrip>
 </quote>
@@ -3410,7 +3458,7 @@ loaded.
 <descrip>
 <tag/Function/Install an already loaded extended memory driver.
 <tag/Header/<tt/<ref id="em.h" name="em.h">/
-<tag/Declaration/<tt/unsigned char _fastcall__ em_install (void* driver);/
+<tag/Declaration/<tt/unsigned char _fastcall__ em_install (const void* driver);/
 <tag/Description/The function installs an already loaded extended memory driver
 and returns an error code. The function may be used to install a driver linked
 statically to the program.
@@ -4733,7 +4781,7 @@ There's no way to check for the number of actually connected joysticks.
 <descrip>
 <tag/Function/Install an already loaded driver and return an error code.
 <tag/Header/<tt/<ref id="joystick.h" name="joystick.h">/
-<tag/Declaration/<tt/unsigned char __fastcall__ joy_install (void* driver);/
+<tag/Declaration/<tt/unsigned char __fastcall__ joy_install (const void* driver);/
 <tag/Description/The function installs a driver that was already loaded into
 memory (or linked statically to the program). It returns an error code
 (<tt/JOY_ERR_OK/ in case of success).
@@ -5769,6 +5817,78 @@ be used in presence of a prototype.
 </quote>
 
 
+<sect1>psg_delay<label id="psg_delay"><p>
+
+<quote>
+<descrip>
+<tag/Function/Delay for a short period of time.
+<tag/Header/<tt/<ref id="creativision.h" name="creativision.h">/
+<tag/Declaration/<tt/void __fastcall__ psg_delay (unsigned char b);/
+<tag/Description/The function specifies how long each note or pause between
+notes should last.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="psg_outb" name="psg_outb">,
+<ref id="psg_silence" name="psg_silence">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>psg_outb<label id="psg_outb"><p>
+
+<quote>
+<descrip>
+<tag/Function/Output a byte to the PSG.
+<tag/Header/<tt/<ref id="creativision.h" name="creativision.h">/
+<tag/Declaration/<tt/void __fastcall__ psg_outb (unsigned char b);/
+<tag/Description/The function sends a byte to the Programmable Sound
+Generator, then waits for the PSG to acknowledge.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="psg_delay" name="psg_delay">,
+<ref id="psg_silence" name="psg_silence">
+<tag/Example/<verb>
+#include <creativision.h>
+void main (void)
+{
+  psg_outb (0x80); // Latch frequency
+  psg_outb (0x07); // Frequency byte 2
+  psg_outb (0x90); // Channel 0 full volume
+  psg_delay (100);
+  psg_silence ();
+}
+</verb>
+</descrip>
+</quote>
+
+
+<sect1>psg_silence<label id="psg_silence"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set volume off on each PSG channel.
+<tag/Header/<tt/<ref id="creativision.h" name="creativision.h">/
+<tag/Declaration/<tt/void psg_silence (void);/
+<tag/Description/The function resets the Programmable Sound Generator,
+then sends $9F, $BF, $DF, $FF to the PSG.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="psg_delay" name="psg_delay">,
+<ref id="psg_outb" name="psg_outb">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>qsort<label id="qsort"><p>
 
 <quote>
@@ -6198,7 +6318,7 @@ while (ser_get(&amp;ch) == SER_ERR_NO_DATA)
 <descrip>
 <tag/Function/Install an already loaded driver and return an error code.
 <tag/Header/<tt/<ref id="serial.h" name="serial.h">/
-<tag/Declaration/<tt/unsigned char __fastcall__ ser_install (void* driver);/
+<tag/Declaration/<tt/unsigned char __fastcall__ ser_install (const void* driver);/
 <tag/Description/The function installs a driver that was already loaded into
 memory (or linked statically to the program). It returns an error code
 (<tt/SER_ERR_OK/ in case of success).

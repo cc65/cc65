@@ -1166,7 +1166,9 @@ void g_putind (unsigned Flags, unsigned Offs)
         /* Overflow - we need to add the low byte also */
         AddCodeLine ("ldy #$00");
         AddCodeLine ("clc");
-        AddCodeLine ("pha");
+        if ((Flags & CF_NOKEEP) == 0) {
+            AddCodeLine ("pha");
+        }
         AddCodeLine ("lda #$%02X", Offs & 0xFF);
         AddCodeLine ("adc (sp),y");
         AddCodeLine ("sta (sp),y");
@@ -1174,7 +1176,9 @@ void g_putind (unsigned Flags, unsigned Offs)
         AddCodeLine ("lda #$%02X", (Offs >> 8) & 0xFF);
         AddCodeLine ("adc (sp),y");
         AddCodeLine ("sta (sp),y");
-        AddCodeLine ("pla");
+        if ((Flags & CF_NOKEEP) == 0) {
+            AddCodeLine ("pla");
+        }
 
         /* Complete address is on stack, new offset is zero */
         Offs = 0;
@@ -1184,12 +1188,15 @@ void g_putind (unsigned Flags, unsigned Offs)
         /* We can just add the high byte */
         AddCodeLine ("ldy #$01");
         AddCodeLine ("clc");
-        AddCodeLine ("pha");
+        if ((Flags & CF_NOKEEP) == 0) {
+            AddCodeLine ("pha");
+        }
         AddCodeLine ("lda #$%02X", (Offs >> 8) & 0xFF);
         AddCodeLine ("adc (sp),y");
         AddCodeLine ("sta (sp),y");
-        AddCodeLine ("pla");
-
+        if ((Flags & CF_NOKEEP) == 0) {
+            AddCodeLine ("pla");
+        }
         /* Offset is now just the low byte */
         Offs &= 0x00FF;
     }
@@ -1696,7 +1703,9 @@ void g_addeqstatic (unsigned flags, uintptr_t label, long offs,
                 if (flags & CF_CONST) {
                     if (val == 1) {
                         AddCodeLine ("inc %s", lbuf);
-                        AddCodeLine ("lda %s", lbuf);
+                        if ((flags & CF_NOKEEP) == 0) {
+                            AddCodeLine ("lda %s", lbuf);
+                        }
                     } else {
                         AddCodeLine ("lda #$%02X", (int)(val & 0xFF));
                         AddCodeLine ("clc");
@@ -1726,8 +1735,10 @@ void g_addeqstatic (unsigned flags, uintptr_t label, long offs,
                     AddCodeLine ("bne %s", LocalLabelName (L));
                     AddCodeLine ("inc %s+1", lbuf);
                     g_defcodelabel (L);
-                    AddCodeLine ("lda %s", lbuf);               /* Hmmm... */
-                    AddCodeLine ("ldx %s+1", lbuf);
+                    if ((flags & CF_NOKEEP) == 0) {
+                        AddCodeLine ("lda %s", lbuf);               /* Hmmm... */
+                        AddCodeLine ("ldx %s+1", lbuf);
+                    }
                 } else {
                     AddCodeLine ("lda #$%02X", (int)(val & 0xFF));
                     AddCodeLine ("clc");
@@ -1738,13 +1749,17 @@ void g_addeqstatic (unsigned flags, uintptr_t label, long offs,
                         AddCodeLine ("bcc %s", LocalLabelName (L));
                         AddCodeLine ("inc %s+1", lbuf);
                         g_defcodelabel (L);
-                        AddCodeLine ("ldx %s+1", lbuf);
+                        if ((flags & CF_NOKEEP) == 0) {
+                            AddCodeLine ("ldx %s+1", lbuf);
+                        }
                     } else {
                         AddCodeLine ("lda #$%02X", (unsigned char)(val >> 8));
                         AddCodeLine ("adc %s+1", lbuf);
                         AddCodeLine ("sta %s+1", lbuf);
-                        AddCodeLine ("tax");
-                        AddCodeLine ("lda %s", lbuf);
+                        if ((flags & CF_NOKEEP) == 0) {
+                            AddCodeLine ("tax");
+                            AddCodeLine ("lda %s", lbuf);
+                        }
                     }
                 }
             } else {
@@ -1754,8 +1769,10 @@ void g_addeqstatic (unsigned flags, uintptr_t label, long offs,
                 AddCodeLine ("txa");
                 AddCodeLine ("adc %s+1", lbuf);
                 AddCodeLine ("sta %s+1", lbuf);
-                AddCodeLine ("tax");
-                AddCodeLine ("lda %s", lbuf);
+                if ((flags & CF_NOKEEP) == 0) {
+                    AddCodeLine ("tax");
+                    AddCodeLine ("lda %s", lbuf);
+                }
             }
             break;
 
@@ -1837,9 +1854,11 @@ void g_addeqlocal (unsigned flags, int Offs, unsigned long val)
                     AddCodeLine ("lda #$%02X", (int) ((val >> 8) & 0xFF));
                     AddCodeLine ("adc (sp),y");
                     AddCodeLine ("sta (sp),y");
-                    AddCodeLine ("tax");
-                    AddCodeLine ("dey");
-                    AddCodeLine ("lda (sp),y");
+                    if ((flags & CF_NOKEEP) == 0) {
+                        AddCodeLine ("tax");
+                        AddCodeLine ("dey");
+                        AddCodeLine ("lda (sp),y");
+                    }
                 } else {
                     g_getimmed (flags, val, 0);
                     AddCodeLine ("jsr addeqysp");
@@ -1919,7 +1938,9 @@ void g_subeqstatic (unsigned flags, uintptr_t label, long offs,
                 if (flags & CF_CONST) {
                     if (val == 1) {
                         AddCodeLine ("dec %s", lbuf);
-                        AddCodeLine ("lda %s", lbuf);
+                        if ((flags & CF_NOKEEP) == 0) {
+                            AddCodeLine ("lda %s", lbuf);
+                        }
                     } else {
                         AddCodeLine ("lda %s", lbuf);
                         AddCodeLine ("sec");
@@ -1953,13 +1974,17 @@ void g_subeqstatic (unsigned flags, uintptr_t label, long offs,
                     AddCodeLine ("bcs %s", LocalLabelName (L));
                     AddCodeLine ("dec %s+1", lbuf);
                     g_defcodelabel (L);
-                    AddCodeLine ("ldx %s+1", lbuf);
+                    if ((flags & CF_NOKEEP) == 0) {
+                        AddCodeLine ("ldx %s+1", lbuf);
+                    }
                 } else {
                     AddCodeLine ("lda %s+1", lbuf);
                     AddCodeLine ("sbc #$%02X", (unsigned char)(val >> 8));
                     AddCodeLine ("sta %s+1", lbuf);
-                    AddCodeLine ("tax");
-                    AddCodeLine ("lda %s", lbuf);
+                    if ((flags & CF_NOKEEP) == 0) {
+                        AddCodeLine ("tax");
+                        AddCodeLine ("lda %s", lbuf);
+                    }
                 }
             } else {
                 AddCodeLine ("eor #$FF");
@@ -1970,8 +1995,10 @@ void g_subeqstatic (unsigned flags, uintptr_t label, long offs,
                 AddCodeLine ("eor #$FF");
                 AddCodeLine ("adc %s+1", lbuf);
                 AddCodeLine ("sta %s+1", lbuf);
-                AddCodeLine ("tax");
-                AddCodeLine ("lda %s", lbuf);
+                if ((flags & CF_NOKEEP) == 0) {
+                    AddCodeLine ("tax");
+                    AddCodeLine ("lda %s", lbuf);
+                }
             }
             break;
 

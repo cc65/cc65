@@ -295,7 +295,7 @@ static void SetSys (const char* Sys)
             break;
 
         default:
-            AbEnd ("Unknown target system type %d", Target);
+            AbEnd ("Unknown target system '%s'", Sys);
     }
 
     /* Initialize the translation tables for the target system */

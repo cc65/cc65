@@ -41,7 +41,12 @@ ifneq ($(EXELIST_$(SYS)),)
 samples: $(EXELIST_$(SYS))
 else
 samples:
-	@echo "warning: grc sample not available for" $(SYS)
+  ifeq ($(MAKELEVEL),0)
+	@echo "info: grc sample not available for" $(SYS)
+  else
+# suppress the "nothing to be done for 'samples' message
+	@echo > $(NULLDEV)
+  endif
 endif
 
 test.s: test.grc

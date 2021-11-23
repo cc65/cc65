@@ -78,54 +78,55 @@ enum {
     T_TYPE_INT      = 0x000003,
     T_TYPE_LONG     = 0x000004,
     T_TYPE_LONGLONG = 0x000005,
-    T_TYPE_ENUM     = 0x000006,
-    T_TYPE_FLOAT    = 0x000007,
-    T_TYPE_DOUBLE   = 0x000008,
-    T_TYPE_VOID     = 0x000009,
-    T_TYPE_STRUCT   = 0x00000A,
-    T_TYPE_UNION    = 0x00000B,
-    T_TYPE_ARRAY    = 0x00000C,
-    T_TYPE_PTR      = 0x00000D,
-    T_TYPE_FUNC     = 0x00000E,
-    T_MASK_TYPE     = 0x00000F,
+    T_TYPE_ENUM     = 0x000008,
+    T_TYPE_BITFIELD = 0x000009,
+    T_TYPE_FLOAT    = 0x00000A,
+    T_TYPE_DOUBLE   = 0x00000B,
+    T_TYPE_VOID     = 0x000010,
+    T_TYPE_STRUCT   = 0x000011,
+    T_TYPE_UNION    = 0x000012,
+    T_TYPE_ARRAY    = 0x000018,
+    T_TYPE_PTR      = 0x000019,
+    T_TYPE_FUNC     = 0x00001A,
+    T_MASK_TYPE     = 0x00001F,
 
     /* Type classes */
     T_CLASS_NONE    = 0x000000,
-    T_CLASS_INT     = 0x000010,
-    T_CLASS_FLOAT   = 0x000020,
-    T_CLASS_PTR     = 0x000030,
-    T_CLASS_STRUCT  = 0x000040,
-    T_CLASS_FUNC    = 0x000050,
-    T_MASK_CLASS    = 0x000070,
+    T_CLASS_INT     = 0x000020,
+    T_CLASS_FLOAT   = 0x000040,
+    T_CLASS_PTR     = 0x000060,
+    T_CLASS_STRUCT  = 0x000080,
+    T_CLASS_FUNC    = 0x0000A0,
+    T_MASK_CLASS    = 0x0000E0,
 
     /* Type signedness */
     T_SIGN_NONE     = 0x000000,
-    T_SIGN_UNSIGNED = 0x000080,
-    T_SIGN_SIGNED   = 0x000100,
-    T_MASK_SIGN     = 0x000180,
+    T_SIGN_UNSIGNED = 0x000100,
+    T_SIGN_SIGNED   = 0x000200,
+    T_MASK_SIGN     = 0x000300,
 
     /* Type size modifiers */
     T_SIZE_NONE     = 0x000000,
-    T_SIZE_CHAR     = 0x000200,
-    T_SIZE_SHORT    = 0x000400,
-    T_SIZE_INT      = 0x000600,
-    T_SIZE_LONG     = 0x000800,
-    T_SIZE_LONGLONG = 0x000A00,
-    T_MASK_SIZE     = 0x000E00,
+    T_SIZE_CHAR     = 0x001000,
+    T_SIZE_SHORT    = 0x002000,
+    T_SIZE_INT      = 0x003000,
+    T_SIZE_LONG     = 0x004000,
+    T_SIZE_LONGLONG = 0x005000,
+    T_MASK_SIZE     = 0x00F000,
 
     /* Type qualifiers */
     T_QUAL_NONE     = 0x000000,
-    T_QUAL_CONST    = 0x001000,
-    T_QUAL_VOLATILE = 0x002000,
-    T_QUAL_RESTRICT = 0x004000,
+    T_QUAL_CONST    = 0x010000,
+    T_QUAL_VOLATILE = 0x020000,
+    T_QUAL_RESTRICT = 0x040000,
     T_QUAL_CVR      = T_QUAL_CONST | T_QUAL_VOLATILE | T_QUAL_RESTRICT,
-    T_QUAL_NEAR     = 0x008000,
-    T_QUAL_FAR      = 0x010000,
+    T_QUAL_NEAR     = 0x080000,
+    T_QUAL_FAR      = 0x100000,
     T_QUAL_ADDRSIZE = T_QUAL_NEAR | T_QUAL_FAR,
-    T_QUAL_FASTCALL = 0x020000,
-    T_QUAL_CDECL    = 0x040000,
+    T_QUAL_FASTCALL = 0x200000,
+    T_QUAL_CDECL    = 0x400000,
     T_QUAL_CCONV    = T_QUAL_FASTCALL | T_QUAL_CDECL,
-    T_MASK_QUAL     = 0x07F000,
+    T_MASK_QUAL     = 0x7F0000,
 
     /* Types */
     T_CHAR      = T_TYPE_CHAR     | T_CLASS_INT    | T_SIGN_NONE     | T_SIZE_CHAR,
@@ -140,6 +141,8 @@ enum {
     T_LONGLONG  = T_TYPE_LONGLONG | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_LONGLONG,
     T_ULONGLONG = T_TYPE_LONGLONG | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_LONGLONG,
     T_ENUM      = T_TYPE_ENUM     | T_CLASS_INT    | T_SIGN_NONE     | T_SIZE_NONE,
+    T_SBITFIELD = T_TYPE_BITFIELD | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_NONE,
+    T_UBITFIELD = T_TYPE_BITFIELD | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_NONE,
     T_FLOAT     = T_TYPE_FLOAT    | T_CLASS_FLOAT  | T_SIGN_NONE     | T_SIZE_NONE,
     T_DOUBLE    = T_TYPE_DOUBLE   | T_CLASS_FLOAT  | T_SIGN_NONE     | T_SIZE_NONE,
     T_VOID      = T_TYPE_VOID     | T_CLASS_NONE   | T_SIGN_NONE     | T_SIZE_NONE,
@@ -171,6 +174,10 @@ struct Type {
         struct SymEntry* S;     /* Enum/struct/union tag symbol entry pointer */
         long             L;     /* Numeric attribute value */
         unsigned long    U;     /* Dito, unsigned */
+        struct {
+            unsigned     Offs;  /* Bit offset into storage unit */
+            unsigned     Width; /* Width in bits */
+        } B;                    /* Data for bit fields */
     } A;                        /* Type attribute if necessary */
 };
 
@@ -288,33 +295,6 @@ unsigned long GetIntegerTypeMax (const Type* Type);
 ** The type must have a known size.
 */
 
-Type* NewPointerTo (const Type* T);
-/* Return a type string that is "pointer to T". The type string is allocated
-** on the heap and may be freed after use.
-*/
-
-void PrintType (FILE* F, const Type* T);
-/* Print fulle name of the type */
-
-void PrintFuncSig (FILE* F, const char* Name, const Type* T);
-/* Print a function signature */
-
-void PrintRawType (FILE* F, const Type* T);
-/* Print a type string in raw hex format (for debugging) */
-
-int TypeHasAttr (const Type* T);
-/* Return true if the given type has attribute data */
-
-#if defined(HAVE_INLINE)
-INLINE void CopyTypeAttr (const Type* Src, Type* Dest)
-/* Copy attribute data from Src to Dest */
-{
-    Dest->A = Src->A;
-}
-#else
-#  define CopyTypeAttr(Src, Dest)       ((Dest)->A = (Src)->A)
-#endif
-
 #if defined(HAVE_INLINE)
 INLINE TypeCode UnqualifiedType (TypeCode T)
 /* Return the unqalified type code */
@@ -366,8 +346,43 @@ Type* IndirectModifiable (Type* T);
 ** given type points to.
 */
 
+Type* NewPointerTo (const Type* T);
+/* Return a type string that is "pointer to T". The type string is allocated
+** on the heap and may be freed after use.
+*/
+
+const Type* AddressOf (const Type* T);
+/* Return a type string that is "address of T". The type string is allocated
+** on the heap and may be freed after use.
+*/
+
 Type* ArrayToPtr (const Type* T);
 /* Convert an array to a pointer to it's first element */
+
+const Type* PtrConversion (const Type* T);
+/* If the type is a function, convert it to pointer to function. If the
+** expression is an array, convert it to pointer to first element. Otherwise
+** return T.
+*/
+
+const Type* IntPromotion (const Type* T);
+/* Apply the integer promotions to T and return the result. The returned type
+** string may be T if there is no need to change it.
+*/
+
+const Type* ArithmeticConvert (const Type* lhst, const Type* rhst);
+/* Perform the usual arithmetic conversions for binary operators. */
+
+const Type* SignedType (const Type* T);
+/* Get signed counterpart of the integral type */
+
+const Type* UnsignedType (const Type* T);
+/* Get unsigned counterpart of the integral type */
+
+Type* NewBitFieldType (const Type* T, unsigned BitOffs, unsigned BitWidth);
+/* Return a type string that is "T : BitWidth" aligned on BitOffs. The type
+** string is allocated on the heap and may be freed after use.
+*/
 
 #if defined(HAVE_INLINE)
 INLINE TypeCode GetRawType (const Type* T)
@@ -509,6 +524,36 @@ INLINE int IsTypeEnum (const Type* T)
 }
 #else
 #  define IsTypeEnum(T)         (GetRawType (T) == T_TYPE_ENUM)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsTypeSignedBitField (const Type* T)
+/* Return true if this is a signed bit-field */
+{
+    return (UnqualifiedType (T->C) == T_SBITFIELD);
+}
+#else
+#  define IsTypeSignedBitField(T)   (UnqualifiedType ((T)->C) == T_SBITFIELD)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsTypeUnsignedBitField (const Type* T)
+/* Return true if this is an unsigned bit-field */
+{
+    return (UnqualifiedType (T->C) == T_UBITFIELD);
+}
+#else
+#  define IsTypeUnsignedBitField(T) (UnqualifiedType ((T)->C) == T_UBITFIELD)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsTypeBitField (const Type* T)
+/* Return true if this is a bit-field (either signed or unsigned) */
+{
+    return IsTypeSignedBitField (T) || IsTypeUnsignedBitField (T);
+}
+#else
+#  define IsTypeBitField(T)     (IsTypeSignedBitField (T) || IsTypeUnsignedBitField (T))
 #endif
 
 #if defined(HAVE_INLINE)
@@ -892,17 +937,6 @@ struct SymEntry* GetESUSymEntry (const Type* T) attribute ((const));
 void SetESUSymEntry (Type* T, struct SymEntry* S);
 /* Set the SymEntry pointer for an enum/struct/union type */
 
-const Type* IntPromotion (const Type* T);
-/* Apply the integer promotions to T and return the result. The returned type
-** string may be T if there is no need to change it.
-*/
-
-const Type* PtrConversion (const Type* T);
-/* If the type is a function, convert it to pointer to function. If the
-** expression is an array, convert it to pointer to first element. Otherwise
-** return T.
-*/
-
 TypeCode AddrSizeQualifier (unsigned AddrSize);
 /* Return T_QUAL_NEAR or T_QUAL_FAR depending on the address size */
 
@@ -925,6 +959,28 @@ INLINE TypeCode DataAddrSizeQualifier (void)
 #else
 #  define DataAddrSizeQualifier()      (AddrSizeQualifier (DataAddrSize))
 #endif
+
+int TypeHasAttr (const Type* T);
+/* Return true if the given type has attribute data */
+
+#if defined(HAVE_INLINE)
+INLINE void CopyTypeAttr (const Type* Src, Type* Dest)
+/* Copy attribute data from Src to Dest */
+{
+    Dest->A = Src->A;
+}
+#else
+#  define CopyTypeAttr(Src, Dest)       ((Dest)->A = (Src)->A)
+#endif
+
+void PrintType (FILE* F, const Type* T);
+/* Print fulle name of the type */
+
+void PrintFuncSig (FILE* F, const char* Name, const Type* T);
+/* Print a function signature */
+
+void PrintRawType (FILE* F, const Type* T);
+/* Print a type string in raw hex format (for debugging) */
 
 
 

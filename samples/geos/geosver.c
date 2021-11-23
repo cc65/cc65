@@ -8,8 +8,8 @@ struct window wholeScreen = {0, SC_PIX_HEIGHT-1, 0, SC_PIX_WIDTH-1};
 void main (void)
 {
     unsigned char os = get_ostype();
-    unsigned char *machine = NULL;
-    unsigned char *version = NULL;
+    char *machine = NULL;
+    char *version = NULL;
     unsigned char good = 1;
 
     SetPattern(0);

@@ -71,7 +71,7 @@
 unsigned char Preprocessing = 0;
 
 /* Management data for #if */
-#define MAX_IFS         64
+#define MAX_IFS         256
 #define IFCOND_NONE     0x00U
 #define IFCOND_SKIP     0x01U
 #define IFCOND_ELSE     0x02U

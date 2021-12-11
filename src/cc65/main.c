@@ -31,6 +31,8 @@
 /*                                                                           */
 /*****************************************************************************/
 
+This line was added to break the build in order to test github actions building
+of pull requests.
 
 
 #include <stdio.h>

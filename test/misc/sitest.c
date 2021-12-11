@@ -19,8 +19,9 @@
         NOTE:   This is not a thorough validation test of the facilities.
 */
 
+#define STANDARD_CC65
+#define NO_WCHAR
 #define NO_INTERNAL_WCHAR
-/*#define STANDALONE*/
 
 #include        <errno.h>
 #include        <limits.h>              /* for CHAR_BIT */
@@ -37,7 +38,7 @@
 
 #ifdef NO_WCHAR
 
-#warn "this test checks C99 features, but NO_WCHAR is defined so the test will most definetly fails."
+#warn "this test checks C99 features, but NO_WCHAR is defined so the test will most definitely fail."
 
 #endif
 
@@ -50,16 +51,6 @@
 #endif
 
 #include        <inttypes.h>            /* test idempotency */
-
-#ifdef STANDALONE
-
-FILE *outfile=NULL;
-#define opentest(x) outfile=stdout;
-#define closetest(x)
-
-#else
-
-#endif
 
 #if     __STDC_VERSION__ >= 199901
 #ifndef __Q8_QT

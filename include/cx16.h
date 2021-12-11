@@ -3,7 +3,7 @@
 /*                                  cx16.h                                   */
 /*                                                                           */
 /*                      CX16 system-specific definitions                     */
-/*                             For prerelease 37                             */
+/*                             For prerelease 38                             */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided "as-is", without any expressed or implied       */
@@ -110,6 +110,25 @@
 #define COLOR_LIGHTGREEN        0x0D
 #define COLOR_LIGHTBLUE         0x0E
 #define COLOR_GRAY3             0x0F
+
+/* TGI color defines */
+#define TGI_COLOR_BLACK         COLOR_BLACK
+#define TGI_COLOR_WHITE         COLOR_WHITE
+#define TGI_COLOR_RED           COLOR_RED
+#define TGI_COLOR_CYAN          COLOR_CYAN
+#define TGI_COLOR_VIOLET        COLOR_VIOLET
+#define TGI_COLOR_PURPLE        COLOR_PURPLE
+#define TGI_COLOR_GREEN         COLOR_GREEN
+#define TGI_COLOR_BLUE          COLOR_BLUE
+#define TGI_COLOR_YELLOW        COLOR_YELLOW
+#define TGI_COLOR_ORANGE        COLOR_ORANGE
+#define TGI_COLOR_BROWN         COLOR_BROWN
+#define TGI_COLOR_LIGHTRED      COLOR_LIGHTRED
+#define TGI_COLOR_GRAY1         COLOR_GRAY1
+#define TGI_COLOR_GRAY2         COLOR_GRAY2
+#define TGI_COLOR_LIGHTGREEN    COLOR_LIGHTGREEN
+#define TGI_COLOR_LIGHTBLUE     COLOR_LIGHTBLUE
+#define TGI_COLOR_GRAY3         COLOR_GRAY3
 
 /* NES controller masks for joy_read() */
 
@@ -259,29 +278,35 @@ struct __vera {
 #define VIA1    (*(volatile struct __6522 *)0x9F60)
 #define VIA2    (*(volatile struct __6522 *)0x9F70)
 
+#define RAM_BANK        (VIA1.pra)
+#define ROM_BANK        (VIA1.prb)
+
 /* A structure with the x16emu's settings registers */
 struct __emul {
     unsigned char       debug;          /* Boolean: debugging enabled */
     unsigned char       vera_action;    /* Boolean: displaying VERA activity */
     unsigned char       keyboard;       /* Boolean: displaying typed keys */
-    unsigned char       echo;           /* How Kernal output should be echoed to host */
-    unsigned char       save_on_exit;   /* Boolean: save SD card when quitting */
+    unsigned char       echo;           /* How to send Kernal output to host */
+    unsigned char       save_on_exit;   /* Boolean: save machine state on exit */
     unsigned char       gif_method;     /* How GIF movie is being recorded */
-    unsigned char       unused[0xD - 0x6];
-    unsigned char       keymap;         /* Keyboard layout number */
-       const char       detect[2];      /* "16" if running on x16emu */
+    unsigned char const unused1[2];
+    unsigned long const cycle_count;    /* Running total of CPU cycles (8 MHz.) */
+    unsigned char const unused2[1];
+    unsigned char const keymap;         /* Keyboard layout number */
+             char const detect[2];      /* "16" if running on x16emu */
 };
-#define EMULATOR        (*(volatile struct __emul)0x9FB0)
+#define EMULATOR        (*(volatile struct __emul *)0x9FB0)
 
 /* An array window into the half Mebibyte or two Mebibytes of banked RAM */
-#define BANK_RAM        ((unsigned char[0x2000])0xA000)
+#define BANK_RAM        ((unsigned char *)0xA000)
 
 
 
 /* The addresses of the static drivers */
 
-extern void cx16_std_joy[];             /* Referred to by joy_static_stddrv[] */
-extern void cx16_std_mou[];             /* Referred to by mouse_static_stddrv[] */
+extern void cx16_std_joy[];             /* Referenced by joy_static_stddrv[] */
+extern void cx16_std_mou[];             /* Referenced by mouse_static_stddrv[] */
+extern void cx320p1_tgi[];              /* Referenced by tgi_static_stddrv[] */
 
 
 

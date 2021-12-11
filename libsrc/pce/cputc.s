@@ -68,10 +68,10 @@ putchar:
         sty     VDC_DATA_LO
         stx     VDC_DATA_HI
 
-        st0     #VDC_VWR
+        st0     #VDC_VWR        ; VRAM Write Register
         sta     VDC_DATA_LO     ; character
 
-        lda     CHARCOLOR       ; pallette number
+        lda     CHARCOLOR       ; palette number
         asl     a
         asl     a
         asl     a

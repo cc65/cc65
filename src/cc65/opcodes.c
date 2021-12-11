@@ -61,394 +61,394 @@ const OPCDesc OPCTable[OP65_COUNT] = {
     {   OP65_ADC,                               /* opcode */
         "adc",                                  /* mnemonic */
         0,                                      /* size */
-        REG_A,                                  /* use */
-        REG_A,                                  /* chg */
-        OF_SETF                                 /* flags */
+        OF_SETF | OF_READ,                      /* flags */
+        REG_A | PSTATE_C,                       /* use */
+        REG_A | PSTATE_CZVN                     /* chg */
     },
     {   OP65_AND,                               /* opcode */
         "and",                                  /* mnemonic */
         0,                                      /* size */
+        OF_SETF | OF_READ,                      /* flags */
         REG_A,                                  /* use */
-        REG_A,                                  /* chg */
-        OF_SETF                                 /* flags */
+        REG_A | PSTATE_ZN                       /* chg */
     },
     {   OP65_ASL,                               /* opcode */
         "asl",                                  /* mnemonic */
         0,                                      /* size */
+        OF_SETF | OF_NOIMP | OF_RMW,            /* flags */
         REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_SETF | OF_NOIMP                      /* flags */
+        PSTATE_CZN                              /* chg */
     },
     {   OP65_BCC,                               /* opcode */
         "bcc",                                  /* mnemonic */
         2,                                      /* size */
-        REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_CBRA                                 /* flags */
+        OF_CBRA,                                /* flags */
+        PSTATE_C,                               /* use */
+        REG_NONE                                /* chg */
     },
     {   OP65_BCS,                               /* opcode */
         "bcs",                                  /* mnemonic */
         2,                                      /* size */
-        REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_CBRA                                 /* flags */
+        OF_CBRA,                                /* flags */
+        PSTATE_C,                               /* use */
+        REG_NONE                                /* chg */
     },
     {   OP65_BEQ,                               /* opcode */
         "beq",                                  /* mnemonic */
         2,                                      /* size */
-        REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_CBRA | OF_ZBRA | OF_FBRA             /* flags */
+        OF_CBRA | OF_ZBRA | OF_FBRA,            /* flags */
+        PSTATE_Z,                               /* use */
+        REG_NONE                                /* chg */
     },
     {   OP65_BIT,                               /* opcode */
         "bit",                                  /* mnemonic */
         0,                                      /* size */
+        OF_READ,                                /* flags */
         REG_A,                                  /* use */
-        REG_NONE,                               /* chg */
-        OF_SETF                                 /* flags */
+        PSTATE_ZVN                              /* chg */
     },
     {   OP65_BMI,                               /* opcode */
         "bmi",                                  /* mnemonic */
         2,                                      /* size */
-        REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_CBRA | OF_FBRA                       /* flags */
+        OF_CBRA | OF_FBRA,                      /* flags */
+        PSTATE_N,                               /* use */
+        REG_NONE                                /* chg */
     },
     {   OP65_BNE,                               /* opcode */
         "bne",                                  /* mnemonic */
         2,                                      /* size */
-        REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_CBRA | OF_ZBRA | OF_FBRA             /* flags */
+        OF_CBRA | OF_ZBRA | OF_FBRA,            /* flags */
+        PSTATE_Z,                               /* use */
+        REG_NONE                                /* chg */
     },
     {   OP65_BPL,                               /* opcode */
         "bpl",                                  /* mnemonic */
         2,                                      /* size */
-        REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_CBRA | OF_FBRA                       /* flags */
+        OF_CBRA | OF_FBRA,                      /* flags */
+        PSTATE_N,                               /* use */
+        REG_NONE                                /* chg */
     },
     {   OP65_BRA,                               /* opcode */
         "bra",                                  /* mnemonic */
         2,                                      /* size */
+        OF_UBRA,                                /* flags */
         REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_UBRA                                 /* flags */
+        REG_NONE                                /* chg */
     },
     {   OP65_BRK,                               /* opcode */
         "brk",                                  /* mnemonic */
         1,                                      /* size */
+        OF_NONE,                                /* flags */
         REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_NONE                                 /* flags */
+        PSTATE_B                                /* chg */
     },
     {   OP65_BVC,                               /* opcode */
         "bvc",                                  /* mnemonic */
         2,                                      /* size */
-        REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_CBRA                                 /* flags */
+        OF_CBRA,                                /* flags */
+        PSTATE_V,                               /* use */
+        REG_NONE                                /* chg */
     },
     {   OP65_BVS,                               /* opcode */
         "bvs",                                  /* mnemonic */
         2,                                      /* size */
-        REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_CBRA                                 /* flags */
+        OF_CBRA,                                /* flags */
+        PSTATE_V,                               /* use */
+        REG_NONE                                /* chg */
     },
     {   OP65_CLC,                               /* opcode */
         "clc",                                  /* mnemonic */
         1,                                      /* size */
+        OF_NONE,                                /* flags */
         REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_NONE                                 /* flags */
+        PSTATE_C                                /* chg */
     },
     {   OP65_CLD,                               /* opcode */
         "cld",                                  /* mnemonic */
         1,                                      /* size */
+        OF_NONE,                                /* flags */
         REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_NONE                                 /* flags */
+        PSTATE_D                                /* chg */
     },
     {   OP65_CLI,                               /* opcode */
         "cli",                                  /* mnemonic */
         1,                                      /* size */
+        OF_NONE,                                /* flags */
         REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_NONE                                 /* flags */
+        PSTATE_I                                /* chg */
     },
     {   OP65_CLV,                               /* opcode */
         "clv",                                  /* mnemonic */
         1,                                      /* size */
+        OF_NONE,                                /* flags */
         REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_NONE                                 /* flags */
+        PSTATE_V                                /* chg */
     },
     {   OP65_CMP,                               /* opcode */
         "cmp",                                  /* mnemonic */
         0,                                      /* size */
+        OF_SETF | OF_CMP | OF_READ,             /* flags */
         REG_A,                                  /* use */
-        REG_NONE,                               /* chg */
-        OF_SETF | OF_CMP                        /* flags */
+        PSTATE_CZN                              /* chg */
     },
     {   OP65_CPX,                               /* opcode */
         "cpx",                                  /* mnemonic */
         0,                                      /* size */
+        OF_SETF | OF_CMP | OF_READ,             /* flags */
         REG_X,                                  /* use */
-        REG_NONE,                               /* chg */
-        OF_SETF | OF_CMP                        /* flags */
+        PSTATE_CZN                              /* chg */
     },
     {   OP65_CPY,                               /* opcode */
         "cpy",                                  /* mnemonic */
         0,                                      /* size */
+        OF_SETF | OF_CMP | OF_READ,             /* flags */
         REG_Y,                                  /* use */
-        REG_NONE,                               /* chg */
-        OF_SETF | OF_CMP                        /* flags */
+        PSTATE_CZN                              /* chg */
     },
     {   OP65_DEA,                               /* opcode */
         "dea",                                  /* mnemonic */
         1,                                      /* size */
+        OF_REG_INCDEC | OF_SETF,                /* flags */
         REG_A,                                  /* use */
-        REG_A,                                  /* chg */
-        OF_REG_INCDEC | OF_SETF                 /* flags */
+        REG_A | PSTATE_ZN                       /* chg */
     },
     {   OP65_DEC,                               /* opcode */
         "dec",                                  /* mnemonic */
         0,                                      /* size */
+        OF_SETF | OF_NOIMP | OF_RMW,            /* flags */
         REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_SETF | OF_NOIMP                      /* flags */
+        PSTATE_ZN                               /* chg */
     },
     {   OP65_DEX,                               /* opcode */
         "dex",                                  /* mnemonic */
         1,                                      /* size */
+        OF_REG_INCDEC | OF_SETF,                /* flags */
         REG_X,                                  /* use */
-        REG_X,                                  /* chg */
-        OF_REG_INCDEC | OF_SETF                 /* flags */
+        REG_X | PSTATE_ZN                       /* chg */
     },
     {   OP65_DEY,                               /* opcode */
         "dey",                                  /* mnemonic */
         1,                                      /* size */
+        OF_REG_INCDEC | OF_SETF,                /* flags */
         REG_Y,                                  /* use */
-        REG_Y,                                  /* chg */
-        OF_REG_INCDEC | OF_SETF                 /* flags */
+        REG_Y | PSTATE_ZN                       /* chg */
     },
     {   OP65_EOR,                               /* opcode */
         "eor",                                  /* mnemonic */
         0,                                      /* size */
+        OF_SETF | OF_READ,                      /* flags */
         REG_A,                                  /* use */
-        REG_A,                                  /* chg */
-        OF_SETF                                 /* flags */
+        REG_A | PSTATE_ZN                       /* chg */
     },
     {   OP65_INA,                               /* opcode */
         "ina",                                  /* mnemonic */
         1,                                      /* size */
+        OF_REG_INCDEC | OF_SETF,                /* flags */
         REG_A,                                  /* use */
-        REG_A,                                  /* chg */
-        OF_REG_INCDEC | OF_SETF                 /* flags */
+        REG_A | PSTATE_ZN                       /* chg */
     },
     {   OP65_INC,                               /* opcode */
         "inc",                                  /* mnemonic */
         0,                                      /* size */
+        OF_SETF | OF_NOIMP | OF_RMW,            /* flags */
         REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_SETF | OF_NOIMP                      /* flags */
+        PSTATE_ZN                               /* chg */
     },
     {   OP65_INX,                               /* opcode */
         "inx",                                  /* mnemonic */
         1,                                      /* size */
+        OF_REG_INCDEC | OF_SETF,                /* flags */
         REG_X,                                  /* use */
-        REG_X,                                  /* chg */
-        OF_REG_INCDEC | OF_SETF                 /* flags */
+        REG_X | PSTATE_ZN                       /* chg */
     },
     {   OP65_INY,                               /* opcode */
         "iny",                                  /* mnemonic */
         1,                                      /* size */
+        OF_REG_INCDEC | OF_SETF,                /* flags */
         REG_Y,                                  /* use */
-        REG_Y,                                  /* chg */
-        OF_REG_INCDEC | OF_SETF                 /* flags */
+        REG_Y | PSTATE_ZN                       /* chg */
     },
     {   OP65_JCC,                               /* opcode */
         "jcc",                                  /* mnemonic */
         5,                                      /* size */
-        REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_CBRA | OF_LBRA                       /* flags */
+        OF_CBRA | OF_LBRA,                      /* flags */
+        PSTATE_C,                               /* use */
+        REG_NONE                                /* chg */
     },
     {   OP65_JCS,                               /* opcode */
         "jcs",                                  /* mnemonic */
         5,                                      /* size */
-        REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_CBRA | OF_LBRA                       /* flags */
+        OF_CBRA | OF_LBRA,                      /* flags */
+        PSTATE_C,                               /* use */
+        REG_NONE                                /* chg */
     },
     {   OP65_JEQ,                               /* opcode */
         "jeq",                                  /* mnemonic */
         5,                                      /* size */
-        REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_CBRA | OF_LBRA | OF_ZBRA | OF_FBRA   /* flags */
+        OF_CBRA | OF_LBRA | OF_ZBRA | OF_FBRA,  /* flags */
+        PSTATE_Z,                               /* use */
+        REG_NONE                                /* chg */
     },
     {   OP65_JMI,                               /* opcode */
         "jmi",                                  /* mnemonic */
         5,                                      /* size */
-        REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_CBRA | OF_LBRA | OF_FBRA             /* flags */
+        OF_CBRA | OF_LBRA | OF_FBRA,            /* flags */
+        PSTATE_N,                               /* use */
+        REG_NONE                                /* chg */
     },
     {   OP65_JMP,                               /* opcode */
         "jmp",                                  /* mnemonic */
         3,                                      /* size */
+        OF_UBRA | OF_LBRA | OF_READ,            /* flags */
         REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_UBRA | OF_LBRA                       /* flags */
+        REG_NONE                                /* chg */
     },
     {   OP65_JNE,                               /* opcode */
         "jne",                                  /* mnemonic */
         5,                                      /* size */
-        REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_CBRA | OF_LBRA | OF_ZBRA | OF_FBRA   /* flags */
+        OF_CBRA | OF_LBRA | OF_ZBRA | OF_FBRA,  /* flags */
+        PSTATE_Z,                               /* use */
+        REG_NONE                                /* chg */
     },
     {   OP65_JPL,                               /* opcode */
         "jpl",                                  /* mnemonic */
         5,                                      /* size */
-        REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_CBRA | OF_LBRA | OF_FBRA             /* flags */
+        OF_CBRA | OF_LBRA | OF_FBRA,            /* flags */
+        PSTATE_N,                               /* use */
+        REG_NONE                                /* chg */
     },
     {   OP65_JSR,                               /* opcode */
         "jsr",                                  /* mnemonic */
         3,                                      /* size */
+        OF_CALL | OF_READ,                      /* flags */
         REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_CALL                                 /* flags */
+        REG_NONE                                /* chg */
     },
     {   OP65_JVC,                               /* opcode */
         "jvc",                                  /* mnemonic */
         5,                                      /* size */
-        REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_CBRA | OF_LBRA                       /* flags */
+        OF_CBRA | OF_LBRA,                      /* flags */
+        PSTATE_V,                               /* use */
+        REG_NONE                                /* chg */
     },
     {   OP65_JVS,                               /* opcode */
         "jvs",                                  /* mnemonic */
         5,                                      /* size */
-        REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_CBRA | OF_LBRA                       /* flags */
+        OF_CBRA | OF_LBRA,                      /* flags */
+        PSTATE_V,                               /* use */
+        REG_NONE                                /* chg */
     },
     {   OP65_LDA,                               /* opcode */
         "lda",                                  /* mnemonic */
         0,                                      /* size */
+        OF_LOAD | OF_SETF | OF_READ,            /* flags */
         REG_NONE,                               /* use */
-        REG_A,                                  /* chg */
-        OF_LOAD | OF_SETF                       /* flags */
+        REG_A | PSTATE_ZN                       /* chg */
     },
     {   OP65_LDX,                               /* opcode */
         "ldx",                                  /* mnemonic */
         0,                                      /* size */
+        OF_LOAD | OF_SETF | OF_READ,            /* flags */
         REG_NONE,                               /* use */
-        REG_X,                                  /* chg */
-        OF_LOAD | OF_SETF                       /* flags */
+        REG_X | PSTATE_ZN                       /* chg */
     },
     {   OP65_LDY,                               /* opcode */
         "ldy",                                  /* mnemonic */
         0,                                      /* size */
+        OF_LOAD | OF_SETF | OF_READ,            /* flags */
         REG_NONE,                               /* use */
-        REG_Y,                                  /* chg */
-        OF_LOAD | OF_SETF                       /* flags */
+        REG_Y | PSTATE_ZN                       /* chg */
     },
     {   OP65_LSR,                               /* opcode */
         "lsr",                                  /* mnemonic */
         0,                                      /* size */
+        OF_SETF | OF_NOIMP | OF_RMW,            /* flags */
         REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_SETF | OF_NOIMP                      /* flags */
+        PSTATE_CZN                              /* chg */
     },
     {   OP65_NOP,                               /* opcode */
         "nop",                                  /* mnemonic */
         1,                                      /* size */
+        OF_NONE,                                /* flags */
         REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_NONE                                 /* flags */
+        REG_NONE                                /* chg */
     },
     {   OP65_ORA,                               /* opcode */
         "ora",                                  /* mnemonic */
         0,                                      /* size */
+        OF_SETF | OF_READ,                      /* flags */
         REG_A,                                  /* use */
-        REG_A,                                  /* chg */
-        OF_SETF                                 /* flags */
+        REG_A | PSTATE_ZN                       /* chg */
     },
     {   OP65_PHA,                               /* opcode */
         "pha",                                  /* mnemonic */
         1,                                      /* size */
+        OF_NONE,                                /* flags */
         REG_A,                                  /* use */
-        REG_NONE,                               /* chg */
-        OF_NONE                                 /* flags */
+        REG_NONE                                /* chg */
     },
     {   OP65_PHP,                               /* opcode */
         "php",                                  /* mnemonic */
         1,                                      /* size */
-        REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_NONE                                 /* flags */
+        OF_NONE,                                /* flags */
+        PSTATE_ALL,                             /* use */
+        REG_NONE                                /* chg */
     },
     {   OP65_PHX,                               /* opcode */
         "phx",                                  /* mnemonic */
         1,                                      /* size */
+        OF_NONE,                                /* flags */
         REG_X,                                  /* use */
-        REG_NONE,                               /* chg */
-        OF_NONE                                 /* flags */
+        REG_NONE                                /* chg */
     },
     {   OP65_PHY,                               /* opcode */
         "phy",                                  /* mnemonic */
         1,                                      /* size */
+        OF_NONE,                                /* flags */
         REG_Y,                                  /* use */
-        REG_NONE,                               /* chg */
-        OF_NONE                                 /* flags */
+        REG_NONE                                /* chg */
     },
     {   OP65_PLA,                               /* opcode */
         "pla",                                  /* mnemonic */
         1,                                      /* size */
+        OF_SETF,                                /* flags */
         REG_NONE,                               /* use */
-        REG_A,                                  /* chg */
-        OF_SETF                                 /* flags */
+        REG_A | PSTATE_ZN                       /* chg */
     },
     {   OP65_PLP,                               /* opcode */
         "plp",                                  /* mnemonic */
         1,                                      /* size */
+        OF_NONE,                                /* flags */
         REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_NONE                                 /* flags */
+        PSTATE_ALL                              /* chg */
     },
     {   OP65_PLX,                               /* opcode */
         "plx",                                  /* mnemonic */
         1,                                      /* size */
+        OF_SETF,                                /* flags */
         REG_NONE,                               /* use */
-        REG_X,                                  /* chg */
-        OF_SETF                                 /* flags */
+        REG_X | PSTATE_ZN                       /* chg */
     },
     {   OP65_PLY,                               /* opcode */
         "ply",                                  /* mnemonic */
         1,                                      /* size */
+        OF_SETF,                                /* flags */
         REG_NONE,                               /* use */
-        REG_Y,                                  /* chg */
-        OF_SETF                                 /* flags */
+        REG_Y | PSTATE_ZN                       /* chg */
     },
     {   OP65_ROL,                               /* opcode */
         "rol",                                  /* mnemonic */
         0,                                      /* size */
-        REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_SETF | OF_NOIMP                      /* flags */
+        OF_SETF | OF_NOIMP | OF_RMW,            /* flags */
+        PSTATE_C,                               /* use */
+        PSTATE_CZN                              /* chg */
     },
     {   OP65_ROR,                               /* opcode */
         "ror",                                  /* mnemonic */
         0,                                      /* size */
-        REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_SETF | OF_NOIMP                      /* flags */
+        OF_SETF | OF_NOIMP | OF_RMW,            /* flags */
+        PSTATE_C,                               /* use */
+        PSTATE_CZN                              /* chg */
     },
     /* Mark RTI as "uses all registers but doesn't change them", so the
     ** optimizer won't remove preceeding loads.
@@ -456,135 +456,135 @@ const OPCDesc OPCTable[OP65_COUNT] = {
     {   OP65_RTI,                               /* opcode */
         "rti",                                  /* mnemonic */
         1,                                      /* size */
+        OF_RET,                                 /* flags */
         REG_AXY,                                /* use */
-        REG_NONE,                               /* chg */
-        OF_RET                                  /* flags */
+        PSTATE_ALL                              /* chg */
     },
     {   OP65_RTS,                               /* opcode */
         "rts",                                  /* mnemonic */
         1,                                      /* size */
+        OF_RET,                                 /* flags */
         REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_RET                                  /* flags */
+        REG_NONE                                /* chg */
     },
     {   OP65_SBC,                               /* opcode */
         "sbc",                                  /* mnemonic */
         0,                                      /* size */
-        REG_A,                                  /* use */
-        REG_A,                                  /* chg */
-        OF_SETF                                 /* flags */
+        OF_SETF | OF_READ,                      /* flags */
+        REG_A | PSTATE_C,                       /* use */
+        REG_A | PSTATE_CZVN                     /* chg */
     },
     {   OP65_SEC,                               /* opcode */
         "sec",                                  /* mnemonic */
         1,                                      /* size */
+        OF_NONE,                                /* flags */
         REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_NONE                                 /* flags */
+        PSTATE_C                                /* chg */
     },
     {   OP65_SED,                               /* opcode */
         "sed",                                  /* mnemonic */
         1,                                      /* size */
+        OF_NONE,                                /* flags */
         REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_NONE                                 /* flags */
+        PSTATE_D                                /* chg */
     },
     {   OP65_SEI,                               /* opcode */
         "sei",                                  /* mnemonic */
         1,                                      /* size */
+        OF_NONE,                                /* flags */
         REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_NONE                                 /* flags */
+        PSTATE_I                                /* chg */
     },
     {   OP65_STA,                               /* opcode */
         "sta",                                  /* mnemonic */
         0,                                      /* size */
+        OF_STORE | OF_WRITE,                    /* flags */
         REG_A,                                  /* use */
-        REG_NONE,                               /* chg */
-        OF_STORE                                /* flags */
+        REG_NONE                                /* chg */
     },
     {   OP65_STP,                               /* opcode */
         "stp",                                  /* mnemonic */
         1,                                      /* size */
+        OF_NONE,                                /* flags */
         REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_NONE                                 /* flags */
+        REG_NONE                                /* chg */
     },
     {   OP65_STX,                               /* opcode */
         "stx",                                  /* mnemonic */
         0,                                      /* size */
+        OF_STORE | OF_WRITE,                    /* flags */
         REG_X,                                  /* use */
-        REG_NONE,                               /* chg */
-        OF_STORE                                /* flags */
+        REG_NONE                                /* chg */
     },
     {   OP65_STY,                               /* opcode */
         "sty",                                  /* mnemonic */
         0,                                      /* size */
+        OF_STORE | OF_WRITE,                    /* flags */
         REG_Y,                                  /* use */
-        REG_NONE,                               /* chg */
-        OF_STORE                                /* flags */
+        REG_NONE                                /* chg */
     },
     {   OP65_STZ,                               /* opcode */
         "stz",                                  /* mnemonic */
         0,                                      /* size */
+        OF_STORE | OF_WRITE,                    /* flags */
         REG_NONE,                               /* use */
-        REG_NONE,                               /* chg */
-        OF_STORE                                /* flags */
+        REG_NONE                                /* chg */
     },
     {   OP65_TAX,                               /* opcode */
         "tax",                                  /* mnemonic */
         1,                                      /* size */
+        OF_XFR | OF_SETF,                       /* flags */
         REG_A,                                  /* use */
-        REG_X,                                  /* chg */
-        OF_XFR | OF_SETF                        /* flags */
+        REG_X | PSTATE_ZN                       /* chg */
     },
     {   OP65_TAY,                               /* opcode */
         "tay",                                  /* mnemonic */
         1,                                      /* size */
+        OF_XFR | OF_SETF,                       /* flags */
         REG_A,                                  /* use */
-        REG_Y,                                  /* chg */
-        OF_XFR | OF_SETF                        /* flags */
+        REG_Y | PSTATE_ZN                       /* chg */
     },
     {   OP65_TRB,                               /* opcode */
         "trb",                                  /* mnemonic */
         0,                                      /* size */
+        OF_RMW,                                 /* flags */
         REG_A,                                  /* use */
-        REG_NONE,                               /* chg */
-        OF_SETF                                 /* flags */
+        PSTATE_Z                                /* chg */
     },
     {   OP65_TSB,                               /* opcode */
         "tsb",                                  /* mnemonic */
         0,                                      /* size */
+        OF_RMW,                                 /* flags */
         REG_A,                                  /* use */
-        REG_NONE,                               /* chg */
-        OF_SETF                                 /* flags */
+        PSTATE_Z                                /* chg */
     },
     {   OP65_TSX,                               /* opcode */
         "tsx",                                  /* mnemonic */
         1,                                      /* size */
+        OF_XFR | OF_SETF,                       /* flags */
         REG_NONE,                               /* use */
-        REG_X,                                  /* chg */
-        OF_XFR | OF_SETF                        /* flags */
+        REG_X | PSTATE_ZN                       /* chg */
     },
     {   OP65_TXA,                               /* opcode */
         "txa",                                  /* mnemonic */
         1,                                      /* size */
+        OF_XFR | OF_SETF,                       /* flags */
         REG_X,                                  /* use */
-        REG_A,                                  /* chg */
-        OF_XFR | OF_SETF                        /* flags */
+        REG_A | PSTATE_ZN                       /* chg */
     },
     {   OP65_TXS,                               /* opcode */
         "txs",                                  /* mnemonic */
         1,                                      /* size */
+        OF_XFR,                                 /* flags */
         REG_X,                                  /* use */
-        REG_NONE,                               /* chg */
-        OF_XFR                                  /* flags */
+        REG_NONE                                /* chg */
     },
     {   OP65_TYA,                               /* opcode */
         "tya",                                  /* mnemonic */
         1,                                      /* size */
+        OF_XFR | OF_SETF,                       /* flags */
         REG_Y,                                  /* use */
-        REG_A,                                  /* chg */
-        OF_XFR | OF_SETF                        /* flags */
+        REG_A | PSTATE_ZN                       /* chg */
     },
 };
 
@@ -649,6 +649,7 @@ unsigned GetInsnSize (opc_t OPC, am_t AM)
         case AM65_IMM:     return 2;
         case AM65_ZP:      return 2;
         case AM65_ZPX:     return 2;
+        case AM65_ZPY:     return 2;
         case AM65_ABS:     return 3;
         case AM65_ABSX:    return 3;
         case AM65_ABSY:    return 3;
@@ -733,7 +734,7 @@ opc_t MakeShortBranch (opc_t OPC)
         case OP65_BVS:
         case OP65_JVS:  return OP65_BVS;
         case OP65_BRA:
-        case OP65_JMP:  return (CPUIsets[CPU] & CPU_ISET_65SC02)? OP65_BRA : OP65_JMP;
+        case OP65_JMP:  return (CPUIsets[CPU] & (CPU_ISET_65SC02 | CPU_ISET_6502DTV)) ? OP65_BRA : OP65_JMP;
         default:
             Internal ("MakeShortBranch: Invalid opcode: %d", OPC);
             return 0;

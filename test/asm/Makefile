@@ -7,24 +7,23 @@ endif
 ifdef CMD_EXE
   EXE = .exe
   MKDIR = mkdir $(subst /,\,$1)
-  RMDIR = -rmdir /s /q $(subst /,\,$1)
-  DEL = del /f $(subst /,\,$1)
+  RMDIR = -rmdir /q /s $(subst /,\,$1)
 else
   EXE =
   MKDIR = mkdir -p $1
   RMDIR = $(RM) -r $1
-  DEL = $(RM) $1
 endif
 
 ifdef QUIET
   .SILENT:
 endif
 
-CL65 := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)
+CA65 := $(if $(wildcard ../../bin/ca65*),../../bin/ca65,ca65)
+LD65 := $(if $(wildcard ../../bin/ld65*),../../bin/ld65,ld65)
 
 WORKDIR = ../../testwrk/asm
 
-DIFF = $(WORKDIR)/bdiff$(EXE)
+ISEQUAL = ../../testwrk/isequal$(EXE)
 
 CC = gcc
 CFLAGS = -O2
@@ -32,27 +31,28 @@ CFLAGS = -O2
 .PHONY: all clean
 
 OPCODE_REFS := $(wildcard *-opcodes.ref)
-OPCODE_CPUS = $(foreach ref,$(OPCODE_REFS),$(ref:%-opcodes.ref=%))
-OPCODE_BINS = $(foreach cpu,$(OPCODE_CPUS),$(WORKDIR)/$(cpu)-opcodes.bin)
+OPCODE_BINS = $(OPCODE_REFS:%.ref=$(WORKDIR)/%.bin)
+OPCODE_CPUS = $(OPCODE_REFS:%-opcodes.ref=%)
 
 CPUDETECT_REFS := $(wildcard *-cpudetect.ref)
-CPUDETECT_CPUS = $(foreach ref,$(CPUDETECT_REFS),$(ref:%-cpudetect.ref=%))
-CPUDETECT_BINS = $(foreach cpu,$(CPUDETECT_CPUS),$(WORKDIR)/$(cpu)-cpudetect.bin)
+CPUDETECT_BINS = $(CPUDETECT_REFS:%.ref=$(WORKDIR)/%.bin)
+CPUDETECT_CPUS = $(CPUDETECT_REFS:%-cpudetect.ref=%)
 
-all: $(OPCODE_BINS) $(CPUDETECT_BINS)
+all: $(OPCODE_BINS) $(CPUDETECT_BINS) $(WORKDIR)/paramcount.o
 
 $(WORKDIR):
 	$(call MKDIR,$(WORKDIR))
 
-$(DIFF): ../bdiff.c | $(WORKDIR)
+$(ISEQUAL): ../isequal.c | $(WORKDIR)
 	$(CC) $(CFLAGS) -o $@ $<
 
 define OPCODE_template
 
-$(WORKDIR)/$1-opcodes.bin: $1-opcodes.s $(DIFF)
+$(WORKDIR)/$1-opcodes.bin: $1-opcodes.s $(ISEQUAL)
 	$(if $(QUIET),echo asm/$1-opcodes.bin)
-	$(CL65) --cpu $1 -t none -l $(WORKDIR)/$1-opcodes.lst -o $$@ $$<
-	$(DIFF) $$@ $1-opcodes.ref
+	$(CA65) -t none --cpu $1 -l $$(@:.bin=.lst) -o $$(@:.bin=.o) $$<
+	$(LD65) -t none -o $$@ $$(@:.bin=.o) none.lib
+	$(ISEQUAL) $1-opcodes.ref $$@
 
 endef # OPCODE_template
 
@@ -60,15 +60,18 @@ $(foreach cpu,$(OPCODE_CPUS),$(eval $(call OPCODE_template,$(cpu))))
 
 define CPUDETECT_template
 
-$(WORKDIR)/$1-cpudetect.bin: cpudetect.s $(DIFF)
+$(WORKDIR)/$1-cpudetect.bin: cpudetect.s $1-cpudetect.ref $(ISEQUAL)
 	$(if $(QUIET),echo asm/$1-cpudetect.bin)
-	$(CL65) --cpu $1 -t none -l $(WORKDIR)/$1-cpudetect.lst -o $$@ $$<
-	$(DIFF) $$@ $1-cpudetect.ref
+	$(CA65) -t none --cpu $1 -l $$(@:.bin=.lst) -o $$(@:.bin=.o) $$<
+	$(LD65) -t none -o $$@ $$(@:.bin=.o) none.lib
+	$(ISEQUAL) $1-cpudetect.ref $$@
 
 endef # CPUDETECT_template
 
 $(foreach cpu,$(CPUDETECT_CPUS),$(eval $(call CPUDETECT_template,$(cpu))))
 
+$(WORKDIR)/%.o: %.s | $(WORKDIR)
+	$(CA65) -l $(@:.o=.lst) -o $@ $<
+
 clean:
 	@$(call RMDIR,$(WORKDIR))
-	@$(call DEL,$(OPCODE_REFS:.ref=.o) cpudetect.o)

@@ -11,5 +11,5 @@ void abort (void)
 {
     ExitTurbo();
     DlgBoxOk(CBOLDON "ABNORMAL PROGRAM", "TERMINATION." CPLAINTEXT);
-    exit(3);
+    exit(EXIT_ABORT);
 }

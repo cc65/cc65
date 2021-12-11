@@ -1,0 +1,260 @@
+<!doctype linuxdoc system>
+
+<article>
+<title>Oric Telestrat-specific information for cc65
+<author>
+<url url="mailto:jede@oric.org" name="Jede">
+
+<abstract>
+An overview over the Telestrat (Telemon 2.4 & Telemon 3.x : http://orix.oric.org) runtime system as it is implemented for the cc65 C compiler.
+</abstract>
+
+<!-- Table of contents -->
+<toc>
+
+<!-- Begin the document -->
+
+<sect>Overview<p>
+
+This file contains an overview of the Telestrat runtime system as it comes
+with the cc65 C compiler. It describes the memory layout, Telestrat-specific
+header files, available drivers, and any pitfalls specific to that platform.
+
+Please note that Telestrat-specific functions are just mentioned here, they are
+described in detail in the separate <url url="funcref.html" name="function
+reference">. Even functions marked as "platform dependent" may be available on
+more than one platform. Please see the function reference for more
+information.
+
+Oric Telestrat is the last Oric computer (Released in 1986, mainly in France).
+This computer is an Atmos with extra hardware: RS232, cardridge(banking system),
+joysticks (2 ports) or mouse (on joystick port), FDC.
+
+Video chip, CPU, keyboard management, tape hardware are the same than Atmos.
+
+Telestrat can start in Atmos mode with Atmos Cardridge (which is only the atmos
+Basic 1.1 ROM).
+
+Telestrat can start in Sedoric (Atmos OS) and Atmos mode with Stratoric Cardridge.
+This Cardridge has 3 banks of 16KB of rom with:
+<itemize>
+<item>a Sedoric ROM.
+<item>a Basic 1.1 ROM (Atmos).
+<item>a Basic 1.0 ROM (Oric-1).
+</itemize>
+
+The main Telestrat's configuration is the Telemon/Hyperbasic Cardridge inserted
+with Stratsed in floppy drive.
+
+Anyway, there is no way to load a tape file in Telemon/Hyperbasic mode without
+alternative program.
+
+There is also no software to write a Stratsed dsk file on PC.
+
+This Telestrat target build an Orix binary file. But, in the future, it will be possible
+to build a Stratsed disk. Orix uses the same systems calls than Telemon mode.
+
+That is why if you need to do software for telestrat target, you have the choice to:
+<itemize>
+<item>use cc65 Atmos target and start Telestrat in Atmos mode: A tape file is required.
+<item>use cc65 Atmos target and start Telestrat in Stratoric mode: A dsk file or tape file is required.
+<item>use cc65 Telestrat target and start Telestrat in Orix mode (see <url
+name="here" url="http://orix.oric.org/download/">).
+<item>use cc65 Telestrat target, remove Orix header from binary, code a dsk tool for Stratsed,
+add Stratsed header on your binary,insert your binary on floppy disk (this solution will be possible is the future).
+</itemize>
+
+Telestrat (from cardridge) can handle 8 banks (from $C000 to $FFFF): Bank 0 is the overlay ram. Others banks can be ROM or RAM.
+
+<sect>Binary format<p>
+
+The standard binary output format generated the linker for the Telestrat
+target is a machine language program with a 20 bytes header described <url
+name="here" url="http://orix.oric.org/orix-header/">
+
+This header is used for Telemon 3.0.
+
+Anyway, for Telemon 2.4, there is no file management, there is no TAPE routine
+in Telemon, there is no way to load a binary easily.
+
+Stratsed (the Telestrat operating system) handles files management. Stratsed
+is loaded to memory from floppy disk. Stratsed vector are declared in asminc/telestrat.inc.
+But, reverse engineering is required to find how theses vectors works. Please, note that
+Stratsed is located in overlay memory (bank 0)
+
+There is no tool to insert a binary in a Stratsed floppy disk.
+
+The only way to load a binary (for Telemon 2.4) is to:
+<itemize>
+<item>remove the 20 bytes header
+<item>download <url name="osdk" url="http://osdk.defence-force.org/index?page=download">
+<item>use Floppybuilder in OSDK to insert the binary with the tool (please read
+FloppyBuilder manual to learn how to insert your binary and how to start Microdisc boot sector
+when Telestrat starts)
+</itemize>
+
+Please note also, that the binary converted into TAP file, will not produce
+a right stratsed file when tap2dsk and old2mfm are used. You will be in the
+case that Telestrat/Stratsed crashed when you do "DIR" command.
+
+If you know the Stratsed disk format, please contact the author of this doc.
+
+
+<sect>Memory layout<p>
+
+In the standard setup, cc65-generated programs use the memory from
+&dollar;0801 to &dollar;9800; so, nearly 37K of memory (including the stack) is
+available. ROM calls are possible with BRK feature.
+
+
+Special locations:
+
+<descrip>
+  <tag/Stack/
+  The C runtime stack is located at &dollar;97FF (or &dollar;B3FF), and grows
+  downwards.
+
+  <tag/Heap/
+  The C heap is located at the end of the program, and grows towards the C
+  runtime stack.
+
+</descrip><p>
+
+
+
+<sect>Platform-specific header files<p>
+
+Programs containing Telestrat-specific code may use the <tt/telestrat.h/ header file.
+
+
+<sect1>Telestrat-specific functions<p>
+
+The functions listed below are special for the Telestrat. See the <url
+url="funcref.html" name="function reference"> for declaration and usage.
+
+<itemize>
+<item>explode
+<item>ping
+<item>shoot
+<item>zap
+<item>oups
+</itemize>
+
+
+<sect1>Hardware access<p>
+
+The following pseudo variables declared in the <tt/telestrat.h/ header file do allow
+access to hardware located in the address space. Some variables are
+structures; accessing the struct fields will access the chip registers.
+
+<descrip>
+
+  <tag><tt/VIA/</tag>
+  Access to the VIA (Versatile Interface Adapter) chip is available via the
+  <tt/VIA/ variable. The structure behind this variable is explained in <tt/_6522.h/.
+
+  <tag><tt/VIA2/</tag>
+  Access to the VIA2 (Versatile Interface Adapter) chip is available via the
+  <tt/VIA2/ variable. The structure behind this variable is explained in <tt/_6522.h/.
+
+  <tag><tt/ACIA/</tag>
+  Access to the 6551 ACIA chip is available via the
+  <tt/ACIA/ variable. The structure behind this variable is explained in <tt/_6551.h/.
+
+</descrip><p>
+
+
+<sect>Loadable drivers<p>
+
+<sect1>TGI<p>
+
+TGI drivers is available on Oric Telestrat with some functions:
+
+<itemize>
+<item>tgi_clear
+<item>tgi_done
+<item>tgi_init
+<item>tgi_install
+<item>tgi_line
+<item>tgi_outtext
+<item>tgi_setpixel
+</itemize>
+
+
+<sect1>Extended memory drivers<p>
+
+No extended memory drivers are currently available for the Telestrat.
+This feature could be done because telestrat can manage RAM inserted in his
+port cardridge.
+
+<sect1>Joystick drivers<p>
+
+Telemon 2.4 returns in keyboard buffer the direction of the joysticks. This means that
+if you get input from keyboard by conio cgetc function, you will get direction from joysticks.
+
+Anyway, if you don't want to use ROM, you can use joysticks standard drivers in your code. 
+
+The standard driver manages two joysticks. Only one button is managed for theses joysticks. 
+
+Telestrat can handle one button for the left port, and three buttons for the right port (but this port was designed for a mouse).
+
+If you find a Telestrat mouse (which is almost impossible :), these driver will work too because there is some extra hardware in the mouse to send direction.
+
+<sect1>Mouse drivers<p>
+
+Telestrat manages also mouse (Joystick port)
+Telestrat mouse is really difficult to find.
+
+<sect1>RS232 device drivers<p>
+
+Telestrat has a RS232 port, but it's not usable in cc65. It is possible to use
+RS232 port with Telemon calls (see XSOUT primitive for example)
+
+<sect>Limitations<label id="limitations"><p>
+
+<sect1>Disk I/O<p>
+
+Telemon 3.0 handles fopen, fread, fclose primitives. It means that this
+function will crash the Telestrat because Telemon 2.4 does not have these
+primitives. By the way, Telemon 3.0 uses an extension "ch376 card" which
+handles sdcard and FAT 32 usb key. In the next version of Telemon, FT DOS, 
+Sedoric, Stratsed will be handled in these 3 primitives (fopen, fread, fclose).
+
+<itemize>
+<item>fclose
+<item>fopen
+<item>fread
+</itemize>
+
+<sect1>conio<p>
+Functions textcolor and bgcolor are available only with Telemon 3.0 (Orix). 
+Telemon 2.4 primitives can't handle any change of colors in text mode except with XINK or 
+XPAPER primitives which put on the first and second columns ink and paper attributes. 
+The only way to change color on the same line for text is to handle it in pure assembly 
+without systems calls.
+
+<sect>Other hints<p>
+
+
+<sect>License<p>
+
+This software is provided 'as-is', without any expressed or implied
+warranty.  In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+<enum>
+<item>  The origin of this software must not be misrepresented; you must not
+        claim that you wrote the original software. If you use this software
+        in a product, an acknowledgment in the product documentation would be
+        appreciated but is not required.
+<item>  Altered source versions must be plainly marked as such, and must not
+        be misrepresented as being the original software.
+<item>  This notice may not be removed or altered from any source
+        distribution.
+</enum>
+
+</article>

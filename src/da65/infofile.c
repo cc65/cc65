@@ -59,6 +59,7 @@
 #include "opctable.h"
 #include "scanner.h"
 #include "segment.h"
+#include "handler.h"
 
 
 
@@ -376,17 +377,19 @@ static void LabelSection (void)
 /* Parse a label section */
 {
     static const IdentTok LabelDefs[] = {
-        {   "COMMENT",  INFOTOK_COMMENT },
-        {   "ADDR",     INFOTOK_ADDR    },
-        {   "NAME",     INFOTOK_NAME    },
-        {   "SIZE",     INFOTOK_SIZE    },
+        {   "COMMENT",      INFOTOK_COMMENT     },
+        {   "ADDR",         INFOTOK_ADDR        },
+        {   "NAME",         INFOTOK_NAME        },
+        {   "SIZE",         INFOTOK_SIZE        },
+        {   "PARAMSIZE",    INFOTOK_PARAMSIZE   },
     };
 
     /* Locals - initialize to avoid gcc warnings */
-    char* Name    = 0;
-    char* Comment = 0;
-    long Value    = -1;
-    long Size     = -1;
+    char* Name      = 0;
+    char* Comment   = 0;
+    long Value      = -1;
+    long Size       = -1;
+    long ParamSize  = -1;
 
     /* Skip the token */
     InfoNextTok ();
@@ -448,6 +451,17 @@ static void LabelSection (void)
                 InfoNextTok ();
                 break;
 
+            case INFOTOK_PARAMSIZE:
+                InfoNextTok ();
+                if (ParamSize >= 0) {
+                    InfoError ("ParamSize already given");
+                }
+                InfoAssureInt ();
+                InfoRangeCheck (1, 0x10000);
+                ParamSize = InfoIVal;
+                InfoNextTok ();
+                break;
+
             default:
                 Internal ("Unexpected token: %u", InfoTok);
         }
@@ -483,6 +497,9 @@ static void LabelSection (void)
         AddUnnamedLabel (Value);
     } else {
         AddExtLabelRange ((unsigned) Value, Name, Size);
+    }
+    if (ParamSize >= 0) {
+        SetSubroutineParamSize ((unsigned) Value, (unsigned) ParamSize);
     }
 
     /* Define the comment */

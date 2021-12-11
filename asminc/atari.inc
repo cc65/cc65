@@ -7,6 +7,7 @@
 ; - Atari OS manual - XL addendum
 ; - Atari XL/XE rev.2 source code, Atari 1984
 ; - Mapping the Atari - revised edition, Ian Chadwick 1985
+; - SpartaDOS-X User Guide  (Aug-8-2016)
 ;
 ; ##old##       old OS rev.B label - moved or deleted
 ; ##1200xl##    new label introduced in 1200XL OS (rev.10/11)
@@ -106,7 +107,7 @@ SIO_WRPERCOM = $4F      ;write PERCOM block (XF551)
 SIO_WRITE    = $50      ;write sector
 SIO_READ     = $52      ;read sector
 SIO_STAT     = $53      ;get status information
-SIO_VERIFY   = $56      ;verify sector 
+SIO_VERIFY   = $56      ;verify sector
 SIO_WRITEV   = $57      ;write sector with verify
 SIO_WRITETRK = $60      ;write track (Speedy)
 SIO_READTRK  = $62      ;read track (Speedy)
@@ -183,6 +184,7 @@ FNTFND  = 170           ;($AA) file not found
 PNTINV  = 171           ;($AB) point invalid
 BADDSK  = 173           ;($AD) bad disk
 INCFMT  = 176           ;($B0) DOS 3: incompatible file system
+XNTBIN  = 180           ;($B4) XDOS: file not binary
 
 ; DCB Device Bus Equates
 
@@ -689,7 +691,7 @@ CASFLG  = $030F         ;CASSETTE MODE WHEN SET
 TIMER2  = $0310         ;2-byte final baud rate timer value
 TEMP1   = $0312         ;TEMPORARY STORAGE REGISTER
 ;TEMP2  = $0314         ;##old## TEMPORARY STORAGE REGISTER
-TEMP2   = $0313         ;##1200xl## 1-byte temporary 
+TEMP2   = $0313         ;##1200xl## 1-byte temporary
 PTIMOT  = $0314         ;##1200xl## 1-byte printer timeout
 TEMP3   = $0315         ;TEMPORARY STORAGE REGISTER
 SAVIO   = $0316         ;SAVE SERIAL IN DATA PORT
@@ -757,6 +759,34 @@ FPSCR1  = $05EC         ;6-byte floating point temporary
 DOS     = $0700
 
 ;-------------------------------------------------------------------------
+; SpartaDOS-X Definitions
+;-------------------------------------------------------------------------
+
+SDX_FLAG     = DOS              ; 'S' for SpartaDOS
+SDX_VERSION  = $0701            ; SD version (e.g. $32 = 3.2, $40 = 4.0)
+                                ; address $0702 contains sub-version, e.g.
+                                ; 8 in case of SDX 4.48
+SDX_KERNEL   = $0703            ; SDX kernel entry point
+SDX_BLOCK_IO = $0706            ; block I/O entry point
+SDX_MISC     = $0709            ; "misc" entry point
+SDX_DEVICE   = $0761
+SDX_DATE     = $077B            ; day, month, year (3 bytes)
+SDX_TIME     = $077E            ; hour, min, sec (3 bytes)
+SDX_DATESET  = $0781
+SDX_PATH     = $07A0            ; 64 bytes
+SDX_IFSYMBOL = $07EB            ; only valid on SDX 4.40 or newer
+SDX_S_LOOKUP = SDX_IFSYMBOL     ; alternative name for SDX_IFSYMBOL
+
+; values for SDX_DEVICE
+
+SDX_CLK_DEV  = $10              ; clock device
+
+; clock device functions
+
+SDX_KD_GETTD = 100              ; get time and date
+SDX_KD_SETTD = 101              ; set time and date
+
+;-------------------------------------------------------------------------
 ; Cartridge Address Equates
 ;-------------------------------------------------------------------------
 
@@ -765,7 +795,7 @@ CART    = $BFFC         ;##rev2## 1-byte cartridge present indicator
                         ;0=Cart Exists
 CARTFG  = $BFFD         ;##rev2## 1-byte cartridge flags
                         ;D7  0=Not a Diagnostic Cart
-                        ;    1=Is a Diagnostic cart and control is 
+                        ;    1=Is a Diagnostic cart and control is
                         ;      given to cart before any OS is init.
                         ;D2  0=Init but Do not Start Cart
                         ;    1=Init and Start Cart
@@ -800,6 +830,104 @@ PDVS    = $D1FF         ;##rev2## parallel device select
 
 POKEY     = $D200         ;POKEY area
 .include  "atari_pokey.inc"
+
+; POKEY KBCODE Values
+
+KEY_NONE    = $FF
+
+KEY_0       = $32
+KEY_1       = $1F
+KEY_2       = $1E
+KEY_3       = $1A
+KEY_4       = $18
+KEY_5       = $1D
+KEY_6       = $1B
+KEY_7       = $33
+KEY_8       = $35
+KEY_9       = $30
+
+KEY_A       = $3F
+KEY_B       = $15
+KEY_C       = $12
+KEY_D       = $3A
+KEY_E       = $2A
+KEY_F       = $38
+KEY_G       = $3D
+KEY_H       = $39
+KEY_I       = $0D
+KEY_J       = $01
+KEY_K       = $05
+KEY_L       = $00
+KEY_M       = $25
+KEY_N       = $23
+KEY_O       = $08
+KEY_P       = $0A
+KEY_Q       = $2F
+KEY_R       = $28
+KEY_S       = $3E
+KEY_T       = $2D
+KEY_U       = $0B
+KEY_V       = $10
+KEY_W       = $2E
+KEY_X       = $16
+KEY_Y       = $2B
+KEY_Z       = $17
+
+KEY_COMMA       = $20
+KEY_PERIOD      = $22
+KEY_SLASH       = $26
+KEY_SEMICOLON   = $02
+KEY_PLUS        = $06
+KEY_ASTERISK    = $07
+KEY_DASH        = $0E
+KEY_EQUALS      = $0F
+KEY_LESSTHAN    = $36
+KEY_GREATERTHAN = $37
+
+KEY_ESC     = $1C
+KEY_TAB     = $2C
+KEY_SPACE   = $21
+KEY_RETURN  = $0C
+KEY_DELETE  = $34
+KEY_CAPS    = $3C
+KEY_INVERSE = $27
+KEY_HELP    = $11
+
+KEY_F1      = $03
+KEY_F2      = $04
+KEY_F3      = $13
+KEY_F4      = $14
+
+KEY_SHIFT   = $40
+KEY_CTRL    = $80
+
+; Composed keys
+
+KEY_EXCLAMATIONMARK = KEY_1 | KEY_SHIFT
+KEY_QUOTE           = KEY_2 | KEY_SHIFT
+KEY_HASH            = KEY_3 | KEY_SHIFT
+KEY_DOLLAR          = KEY_4 | KEY_SHIFT
+KEY_PERCENT         = KEY_5 | KEY_SHIFT
+KEY_AMPERSAND       = KEY_6 | KEY_SHIFT
+KEY_APOSTROPHE      = KEY_7 | KEY_SHIFT
+KEY_AT              = KEY_8 | KEY_SHIFT
+KEY_OPENINGPARAN    = KEY_9 | KEY_SHIFT
+KEY_CLOSINGPARAN    = KEY_0 | KEY_SHIFT
+KEY_UNDERLINE       = KEY_DASH | KEY_SHIFT
+KEY_BAR             = KEY_EQUALS | KEY_SHIFT
+KEY_COLON           = KEY_SEMICOLON | KEY_SHIFT
+KEY_BACKSLASH       = KEY_PLUS | KEY_SHIFT
+KEY_CIRCUMFLEX      = KEY_ASTERISK | KEY_SHIFT
+KEY_OPENINGBRACKET  = KEY_COMMA | KEY_SHIFT
+KEY_CLOSINGBRACKET  = KEY_PERIOD | KEY_SHIFT
+KEY_QUESTIONMARK    = KEY_SLASH | KEY_SHIFT
+KEY_CLEAR           = KEY_LESSTHAN | KEY_SHIFT
+KEY_INSERT          = KEY_GREATERTHAN | KEY_SHIFT
+
+KEY_UP              = KEY_DASH | KEY_CTRL
+KEY_DOWN            = KEY_EQUALS | KEY_CTRL
+KEY_LEFT            = KEY_PLUS | KEY_CTRL
+KEY_RIGHT           = KEY_ASTERISK | KEY_CTRL
 
 ;-------------------------------------------------------------------------
 ; ANTIC Address Equates
@@ -889,6 +1017,10 @@ SETVBV_org  = $E45C     ;vector to set VBLANK parameters
 CIOV    = $E456         ;vector to CIO
 SIOV    = $E459         ;vector to SIO
 SETVBV  = $E45C         ;vector to set VBLANK parameters
+; aliases in order not to have to sprinkle common code with .ifdefs
+CIOV_org    = CIOV
+SIOV_org    = SIOV
+SETVBV_org  = SETVBV
 .endif
 SYSVBV  = $E45F         ;vector to process immediate VBLANK
 XITVBV  = $E462         ;vector to process deferred VBLANK
@@ -925,7 +1057,7 @@ RADON   = 0             ;INDICATES RADIANS
 DEGON   = 6             ;INDICATES DEGREES
 
 ASCZER  = '0'           ;ASCII ZERO
-COLON   = $3A           ;ASCII COLON 
+COLON   = $3A           ;ASCII COLON
 CR      = $9B           ;SYSTEM EOL (CARRIAGE RETURN)
 
 ;-------------------------------------------------------------------------
@@ -997,12 +1129,40 @@ diopp_size   = 5        ; size of structure
 ; VALUES for dos_type
 ;-------------------------------------------------------------------------
 
-ATARIDOS     = 0
-SPARTADOS    = 1
-OSADOS       = 2        ; OS/A+
-MYDOS        = 3
+SPARTADOS    = 0
+REALDOS      = 1
+BWDOS        = 2
+OSADOS       = 3        ; OS/A+
 XDOS         = 4
+ATARIDOS     = 5
+MYDOS        = 6
 NODOS        = 255
+; The DOSes with dos_type below or equal MAX_DOS_WITH_CMDLINE do support
+; command line arguments.
+MAX_DOS_WITH_CMDLINE = XDOS
+
+;-------------------------------------------------------------------------
+; XDOS defines (version 2.4, taken from xdos24.pdf)
+;-------------------------------------------------------------------------
+
+XOPT         = $070B    ; XDOS options
+XCAR         = $070C    ; XDOS cartridge address (+ $70D)
+XPAT         = $086F    ; XDOS bugfix and patch number
+XVER         = $0870    ; XDOS version number
+XFILE        = $087D    ; XDOS filename buffer
+XLINE        = $0880    ; XDOS DUP input line
+XGLIN        = $0871    ; get line
+XSKIP        = $0874    ; skip parameter
+.ifdef __ATARIXL__
+.ifndef SHRAM_HANDLERS
+.import XMOVE_handler
+.endif
+.define XMOVE XMOVE_handler
+XMOVE_org    = $0877    ; move filename
+.else
+XMOVE        = $0877    ; move filename
+.endif
+XGNUM        = $087A    ; get number
 
 ;-------------------------------------------------------------------------
 ; End of atari.inc

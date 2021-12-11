@@ -5,7 +5,7 @@
 ;
 
         .export         RDTIM
-        
+
         .include        "pet.inc"
 
 
@@ -19,5 +19,4 @@
         rts
 
 .endproc
-
 

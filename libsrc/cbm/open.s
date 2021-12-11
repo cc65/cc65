@@ -2,16 +2,11 @@
 ; Ullrich von Bassewitz, 16.11.2002
 ;
 ; int open (const char* name, int flags, ...);  /* May take a mode argument */
-;
-; Be sure to keep the value priority of closeallfiles lower than that of
-; closeallstreams (which is the high level C file I/O counterpart and must be
-; called before closeallfiles).
 
 
         .export         _open
         .destructor     closeallfiles, 5
 
-        .import         SETLFS, OPEN, CLOSE
         .import         addysp, popax
         .import         scratch, fnparse, fnaddmode, fncomplete, fnset
         .import         opencmdchannel, closecmdchannel, readdiskerror
@@ -22,6 +17,7 @@
         .include        "errno.inc"
         .include        "fcntl.inc"
         .include        "filedes.inc"
+        .include        "cbm.inc"
 
 
 ;--------------------------------------------------------------------------
@@ -198,5 +194,3 @@ nofile:                         ; ... else use SA=0 (read)
 
 .endproc
 
-
-           

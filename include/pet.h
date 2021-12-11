@@ -55,6 +55,13 @@
 #define COLOR_BLACK             0x00
 #define COLOR_WHITE             0x01
 
+/* Masks for joy_read */
+#define JOY_UP_MASK             0x01
+#define JOY_DOWN_MASK           0x02
+#define JOY_LEFT_MASK           0x04
+#define JOY_RIGHT_MASK          0x08
+#define JOY_BTN_1_MASK          0x10
+
 /* Define hardware */
 #include <_pia.h>
 #define PIA1    (*(struct __pia*)0xE810)
@@ -98,6 +105,7 @@ extern void pet_stdjoy_joy[];       /* Referred to by joy_static_stddrv[] */
 #define _textcolor(color)       COLOR_WHITE
 #define _bgcolor(color)         COLOR_BLACK
 #define _bordercolor(color)     COLOR_BLACK
+#define _cpeekcolor(color)      COLOR_WHITE
 
 
 

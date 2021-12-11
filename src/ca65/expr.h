@@ -109,6 +109,9 @@ ExprNode* GenByteExpr (ExprNode* Expr);
 ExprNode* GenWordExpr (ExprNode* Expr);
 /* Force the given expression into a word and return the result. */
 
+ExprNode* GenNearAddrExpr (ExprNode* Expr);
+/* A word sized expression that will error if given a far expression at assemble time. */
+
 ExprNode* GenFarAddrExpr (ExprNode* Expr);
 /* Force the given expression into a far address and return the result. */
 

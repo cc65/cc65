@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -13,65 +13,39 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B17EDBD5-DC04-4970-9CBD-56A98B6A3FCA}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>cc65</RootNamespace>
   </PropertyGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="cc65.props" />
+  </ImportGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IntDir>$(SolutionDir)..\wrk\$(ProjectName)\$(Configuration)\</IntDir>
-    <OutDir>$(SolutionDir)..\bin\</OutDir>
-    <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IntDir>$(SolutionDir)..\wrk\$(ProjectName)\$(Configuration)\</IntDir>
-    <OutDir>$(SolutionDir)..\bin\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
-      <PreprocessorDefinitions>_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CONSOLE;_DEBUG</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>common</AdditionalIncludeDirectories>
-      <WarningLevel>Level3</WarningLevel>
-      <TreatWarningAsError>true</TreatWarningAsError>
+      <PreprocessorDefinitions>_CONSOLE;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(IntDir)..\..\common\$(Configuration)\common.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
-      <PreprocessorDefinitions>_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CONSOLE;NDEBUG</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>common</AdditionalIncludeDirectories>
-      <TreatWarningAsError>true</TreatWarningAsError>
+      <PreprocessorDefinitions>_CONSOLE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>$(IntDir)..\..\common\$(Configuration)\common.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -86,12 +60,15 @@
     <ClInclude Include="cc65\codeinfo.h" />
     <ClInclude Include="cc65\codelab.h" />
     <ClInclude Include="cc65\codeopt.h" />
+    <ClInclude Include="cc65\codeoptutil.h" />
     <ClInclude Include="cc65\codeseg.h" />
     <ClInclude Include="cc65\compile.h" />
     <ClInclude Include="cc65\coptadd.h" />
     <ClInclude Include="cc65\coptc02.h" />
     <ClInclude Include="cc65\coptcmp.h" />
     <ClInclude Include="cc65\coptind.h" />
+    <ClInclude Include="cc65\coptjmp.h" />
+    <ClInclude Include="cc65\coptmisc.h" />
     <ClInclude Include="cc65\coptneg.h" />
     <ClInclude Include="cc65\coptptrload.h" />
     <ClInclude Include="cc65\coptptrstore.h" />
@@ -134,6 +111,7 @@
     <ClInclude Include="cc65\shiftexpr.h" />
     <ClInclude Include="cc65\stackptr.h" />
     <ClInclude Include="cc65\standard.h" />
+    <ClInclude Include="cc65\staticassert.h" />
     <ClInclude Include="cc65\stdfunc.h" />
     <ClInclude Include="cc65\stdnames.h" />
     <ClInclude Include="cc65\stmt.h" />
@@ -145,6 +123,7 @@
     <ClInclude Include="cc65\typecmp.h" />
     <ClInclude Include="cc65\typeconv.h" />
     <ClInclude Include="cc65\util.h" />
+    <ClInclude Include="cc65\wrappedcall.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cc65\anonname.c" />
@@ -158,12 +137,15 @@
     <ClCompile Include="cc65\codeinfo.c" />
     <ClCompile Include="cc65\codelab.c" />
     <ClCompile Include="cc65\codeopt.c" />
+    <ClCompile Include="cc65\codeoptutil.c" />
     <ClCompile Include="cc65\codeseg.c" />
     <ClCompile Include="cc65\compile.c" />
     <ClCompile Include="cc65\coptadd.c" />
     <ClCompile Include="cc65\coptc02.c" />
     <ClCompile Include="cc65\coptcmp.c" />
     <ClCompile Include="cc65\coptind.c" />
+    <ClCompile Include="cc65\coptjmp.c" />
+    <ClCompile Include="cc65\coptmisc.c" />
     <ClCompile Include="cc65\coptneg.c" />
     <ClCompile Include="cc65\coptptrload.c" />
     <ClCompile Include="cc65\coptptrstore.c" />
@@ -207,6 +189,7 @@
     <ClCompile Include="cc65\shiftexpr.c" />
     <ClCompile Include="cc65\stackptr.c" />
     <ClCompile Include="cc65\standard.c" />
+    <ClCompile Include="cc65\staticassert.c" />
     <ClCompile Include="cc65\stdfunc.c" />
     <ClCompile Include="cc65\stdnames.c" />
     <ClCompile Include="cc65\stmt.c" />
@@ -218,6 +201,7 @@
     <ClCompile Include="cc65\typecmp.c" />
     <ClCompile Include="cc65\typeconv.c" />
     <ClCompile Include="cc65\util.c" />
+    <ClCompile Include="cc65\wrappedcall.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -75,5 +75,5 @@ static void DefaultCheckFailed (const char* Msg, const char* Cond,
                                 const char* File, unsigned Line)
 {
     /* Output a diagnostic and abort */
-    AbEnd ("%s%s, file `%s', line %u", Msg, Cond, File, Line);
+    AbEnd ("%s%s, file '%s', line %u", Msg, Cond, File, Line);
 }

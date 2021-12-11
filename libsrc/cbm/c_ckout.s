@@ -4,8 +4,9 @@
 ; unsigned char __fastcall__ cbm_k_ckout (unsigned char FN);
 ;
 
+        .include        "cbm.inc"
+
         .export         _cbm_k_ckout
-        .import         CKOUT
 
 
 _cbm_k_ckout:

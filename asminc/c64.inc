@@ -9,6 +9,7 @@
 VARTAB          := $2D          ; Pointer to start of BASIC variables
 MEMSIZE         := $37          ; Pointer to highest BASIC RAM location (+1)
 TXTPTR          := $7A          ; Pointer into BASIC source code
+STATUS          := $90          ; Kernal I/O completion status
 TIME            := $A0          ; 60 HZ clock
 FNAM_LEN        := $B7          ; Length of filename
 SECADR          := $B9          ; Secondary address
@@ -33,14 +34,9 @@ CHARCOLOR       := $286
 CURS_COLOR      := $287         ; Color under the cursor
 PALFLAG         := $2A6         ; $01 = PAL, $00 = NTSC
 
-
-; ---------------------------------------------------------------------------
-; Kernal routines
-
-; Direct entries
-CLRSCR          := $E544
-KBDREAD         := $E5B4
-NMIEXIT         := $FEBC
+KBDREPEAT       := $28a
+KBDREPEATRATE   := $28b
+KBDREPEATDELAY  := $28c
 
 ; ---------------------------------------------------------------------------
 ; Vector and other locations
@@ -81,6 +77,8 @@ VIC_SPR_EXP_Y   := $D017
 VIC_SPR_EXP_X   := $D01D
 VIC_SPR_MCOLOR  := $D01C
 VIC_SPR_BG_PRIO := $D01B
+VIC_SPR_COLL    := $D01E
+VIC_SPR_BG_COLL := $D01F
 
 VIC_SPR_MCOLOR0 := $D025
 VIC_SPR_MCOLOR1 := $D026
@@ -162,30 +160,36 @@ VDC_INDEX       := $D600
 VDC_DATA        := $D601
 
 ; ---------------------------------------------------------------------------
-; I/O: CIAs
+; I/O: Complex Interface Adapters
 
 CIA1            := $DC00
-CIA1_PRA        := $DC00
-CIA1_PRB        := $DC01
-CIA1_DDRA       := $DC02
-CIA1_DDRB       := $DC03
-CIA1_TOD10      := $DC08
-CIA1_TODSEC     := $DC09
-CIA1_TODMIN     := $DC0A
-CIA1_TODHR      := $DC0B
-CIA1_ICR        := $DC0D
-CIA1_CRA        := $DC0E
-CIA1_CRB        := $DC0F
+CIA1_PRA        := $DC00        ; Port A
+CIA1_PRB        := $DC01        ; Port B
+CIA1_DDRA       := $DC02        ; Data direction register for port A
+CIA1_DDRB       := $DC03        ; Data direction register for port B
+CIA1_TA         := $DC04        ; 16-bit timer A
+CIA1_TB         := $DC06        ; 16-bit timer B
+CIA1_TOD10      := $DC08        ; Time-of-day tenths of a second
+CIA1_TODSEC     := $DC09        ; Time-of-day seconds
+CIA1_TODMIN     := $DC0A        ; Time-of-day minutes
+CIA1_TODHR      := $DC0B        ; Time-of-day hours
+CIA1_SDR        := $DC0C        ; Serial data register
+CIA1_ICR        := $DC0D        ; Interrupt control register
+CIA1_CRA        := $DC0E        ; Control register for timer A
+CIA1_CRB        := $DC0F        ; Control register for timer B
 
 CIA2            := $DD00
 CIA2_PRA        := $DD00
 CIA2_PRB        := $DD01
 CIA2_DDRA       := $DD02
 CIA2_DDRB       := $DD03
+CIA2_TA         := $DD04
+CIA2_TB         := $DD06
 CIA2_TOD10      := $DD08
 CIA2_TODSEC     := $DD09
 CIA2_TODMIN     := $DD0A
 CIA2_TODHR      := $DD0B
+CIA2_SDR        := $DD0C
 CIA2_ICR        := $DD0D
 CIA2_CRA        := $DD0E
 CIA2_CRB        := $DD0F

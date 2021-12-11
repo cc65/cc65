@@ -55,6 +55,8 @@ REU_TRIGGER     = $FF00                 ; REU command trigger
 OP_COPYFROM     = $ED
 OP_COPYTO       = $EC
 
+OP_COPYFROM_ALOAD = $B1
+OP_COPYTO_ALOAD   = $B0
 
 ; ------------------------------------------------------------------------
 ; Data.
@@ -92,17 +94,56 @@ INSTALL:
         cmp     REU_REUADDR             ; Check for presence of REU
         bne     nodevice
 
-        ldy     #>(128*4)               ; Assume 128KB
-        lda     REU_STATUS
-        and     #$10                    ; Check size bit
-        beq     @L1
-        ldy     #>(256*4)               ; 256KB when size bit is set
-@L1:    sty     pagecount+1
-
+; determine the size
+        php
+        sei
         ldy     #$FF
-        sty     curpage
-        sty     curpage+1               ; Invalidate the current page
-        txa                             ; X = A = EM_ERR_OK
+loop:
+        sty     window
+        jsr     reu_size_check_common
+        ldx     #OP_COPYTO_ALOAD
+        stx     REU_COMMAND
+        dey
+        cpy     #$FF
+        bne     loop
+        iny
+size_loop:
+        jsr     reu_size_check_common
+        ldx     #OP_COPYFROM_ALOAD
+        stx     REU_COMMAND
+        cpy     window
+        bne     size_found
+        iny
+        bne     size_loop
+size_found:
+        plp
+        ldx     #$00
+        cpy     #$00                    ; too many pages, shave off 2
+        bne     pagecount_ok
+        dex
+        dex
+        dey
+pagecount_ok:
+        stx     pagecount
+        sty     pagecount+1
+        lda     #<EM_ERR_OK
+        ldx     #>EM_ERR_OK
+        rts
+
+; common REU setup for size check
+reu_size_check_common:
+        sty     REU_REUADDR+2
+        ldx     #<window
+        stx     REU_C64ADDR
+        ldx     #>window
+        stx     REU_C64ADDR+1
+        ldx     #$00
+        stx     REU_REUADDR
+        stx     REU_REUADDR+1
+        stx     REU_COUNT+1
+        stx     REU_CONTROL
+        inx
+        stx     REU_COUNT
         rts
 
 ; No REU found

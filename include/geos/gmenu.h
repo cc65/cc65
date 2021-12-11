@@ -7,9 +7,7 @@
 #ifndef _GMENU_H
 #define _GMENU_H
 
-#ifndef _GSTRUCT_H
 #include <geos/gstruct.h>
-#endif
 
 void __fastcall__ DoMenu(struct menu *myMenu);
 void ReDoMenu(void);

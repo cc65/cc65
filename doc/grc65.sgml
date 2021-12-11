@@ -1,13 +1,11 @@
 <!doctype linuxdoc system>
+
 <article>
-
-<!-- Title information -->
-
 <title>grc65 -- GEOS Resource Compiler
 <author>
 <url url="mailto:ytm@elysium.pl" name="Maciej 'YTM/Elysium' Witkowiak">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
-<date>2014-04-24
+
 <abstract>
 This document describes a compiler that can create GEOS headers and menues for
 cc65-compiled programs.
@@ -383,11 +381,11 @@ HEADER APPLICATION "MyFirstApp" "Class Name" "V1.0"
 ; file named MyFirstApp with the Class-string "Class Name V1.0"
 {
 ; Not all fields are required, default and current values will be used.
-    author "Maciej Witkowiak"	; always in quotes!
-    info "Information text"	; always in quotes!
-;    date yy mm dd hh ss	; always 5 fields!
-;    dostype seq		; can be:  PRG, SEQ, USR (only all UPPER- or lower-case)
-;    structure seq		; can be:  SEQ, VLIR (only UPPER- or lower-case)
-    mode c64only		; can be:  any, 40only, 80only, c64only
+    author "Maciej Witkowiak"   ; always in quotes!
+    info "Information text"     ; always in quotes!
+;    date yy mm dd hh ss        ; always 5 fields!
+;    dostype seq                ; can be:  PRG, SEQ, USR (only all UPPER- or lower-case)
+;    structure seq              ; can be:  SEQ, VLIR (only UPPER- or lower-case)
+    mode c64only                ; can be:  any, 40only, 80only, c64only
 }</verb></tscreen>
 </article>

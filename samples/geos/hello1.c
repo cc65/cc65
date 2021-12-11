@@ -26,7 +26,7 @@ void main (void)
     //  MainLoop();
     // we can do:
     //  (nothing as this is the end of main function)
-    //  exit(0);
+    //  exit(EXIT_SUCCESS);
     //  return;
 
     return;

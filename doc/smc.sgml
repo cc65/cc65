@@ -3,7 +3,6 @@
 <article>
 <title>ca65 Macros for Self Modifying Code
 <author>Christian Kr&uuml;ger
-<date>2014-04-24
 
 <abstract>
 The 'smc.inc' macro package for ca65 eases the use, increases the safeness and
@@ -471,7 +470,7 @@ SMC instructions.
 
   Example:
 <tscreen><verb>
-    SMC_OperateOnValue ASL, LoadMask	; shift mask to left
+    SMC_OperateOnValue ASL, LoadMask    ; shift mask to left
     ...
 SMC LoadMask, { LDA #$20 }
 </verb></tscreen>
@@ -556,14 +555,14 @@ allowing reuse of some instructions.
  5:     SMC StoreAccuFirstSection, { sta SMC_AbsAdr, Y }
  6:             ...
  7: RestoreCodeBranchBaseAdr:
- 8:     SMC FirstIncHighByte, { SMC_OperateOnHighByte inc, StoreAccuFirstSection }		; code will be overwritten to 'beq RestoreCode' (*)
+ 8:     SMC FirstIncHighByte, { SMC_OperateOnHighByte inc, StoreAccuFirstSection }              ; code will be overwritten to 'beq RestoreCode' (*)
  9:     ...
-10:     SMC_TransferOpcode FirstIncHighByte, OPC_BEQ , x					; change code marked above with (*)
-11:     SMC_TransferValue FirstIncHighByte, #(restoreCode - RestoreCodeBranchBaseAdr-2), x	; set relative address to 'RestoreCode'
+10:     SMC_TransferOpcode FirstIncHighByte, OPC_BEQ , x                                        ; change code marked above with (*)
+11:     SMC_TransferValue FirstIncHighByte, #(restoreCode - RestoreCodeBranchBaseAdr-2), x      ; set relative address to 'RestoreCode'
 12:     ...
 13: restoreCode:
-14:     SMC_TransferOpcode FirstIncHighByte, OPC_INC_abs , x					; restore original code...
-15:     SMC_TransferValue FirstIncHighByte, #(<(StoreToFirstSection+2)), x			; (second byte of inc contained low-byte of address)
+14:     SMC_TransferOpcode FirstIncHighByte, OPC_INC_abs , x                                    ; restore original code...
+15:     SMC_TransferValue FirstIncHighByte, #(<(StoreToFirstSection+2)), x                      ; (second byte of inc contained low-byte of address)
 16:             ...
 </verb></tscreen>
 

@@ -13,9 +13,11 @@
 
 ; ------------------------------------------------------------------------
 
-.segment        "INIT"
+.segment        "ONCE"
 
 initirq:
+        lda     #$4C                    ; JMP opcode
+        sta     IRQInd
         lda     VVBLKD
         ldx     VVBLKD+1
         sta     IRQInd+1
@@ -46,16 +48,21 @@ IRQStub:
         lda     CHBAS
         pha
 .endif
+.endif
         lda     PORTB
         pha
-        and     #$FE
-        sta     PORTB                   ; disable ROM
+.ifdef __ATARIXL__
+        and     #$FE                    ; disable ROM
+.endif
+        ora     #$10                    ; map main memory into $4000..$7FFF area
+        sta     PORTB
+.ifdef __ATARIXL__
         set_chbase >__CHARGEN_START__
 .endif
         jsr     callirq                 ; Call the functions
-.ifdef __ATARIXL__
         pla
-        sta     PORTB                   ; restore old ROM setting
+        sta     PORTB                   ; restore old memory settings
+.ifdef __ATARIXL__
 .ifdef CHARGEN_RELOC
         pla
         sta     CHBAS
@@ -66,6 +73,8 @@ IRQStub:
 
 ; ------------------------------------------------------------------------
 
-.data
+.segment        "LOWBSS"
 
-IRQInd: jmp     $0000
+IRQInd: .res    3
+
+.end

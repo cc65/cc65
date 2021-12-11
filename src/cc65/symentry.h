@@ -58,6 +58,7 @@
 
 struct Segments;
 struct LiteralPool;
+struct CodeEntry;
 
 
 
@@ -68,37 +69,58 @@ struct LiteralPool;
 
 
 /* Storage classes and flags */
-#define SC_AUTO         0x0001U         /* Auto variable */
-#define SC_REGISTER     0x0002U         /* Register variable */
-#define SC_STATIC       0x0004U         /* Static */
-#define SC_EXTERN       0x0008U         /* Extern linkage */
+#define SC_NONE         0x0000U         /* Nothing */
+#define SC_STRUCT       0x0001U         /* Struct */
+#define SC_UNION        0x0002U         /* Union */
+#define SC_ENUM         0x0003U         /* Enum */
+#define SC_TYPEDEF      0x0004U         /* Typedef */
+#define SC_ESUTYPEMASK  0x0007U         /* Mask for above types */
+#define SC_ENUMERATOR   0x0008U         /* An enumerator */
+#define SC_BITFIELD     0x0010U         /* A bit-field inside a struct or union */
+#define SC_TYPEMASK     0x001FU         /* Mask for above types */
 
-#define SC_ENUM         0x0030U         /* An enum */
-#define SC_CONST        0x0020U         /* A numeric constant with a type */
-#define SC_LABEL        0x0040U         /* A goto label */
-#define SC_PARAM        0x0080U         /* A function parameter */
-#define SC_FUNC         0x0100U         /* A function */
-
+#define SC_FUNC         0x0020U         /* A function */
+#define SC_LABEL        0x0040U         /* A goto code label */
+#define SC_CONST        0x0080U         /* A numeric constant with a type */
+#define SC_PARAM        0x0100U         /* A function parameter */
 #define SC_DEFTYPE      0x0200U         /* Parameter has default type (=int, old style) */
-#define SC_STORAGE      0x0400U         /* Symbol with associated storage */
-#define SC_DEFAULT      0x0800U         /* Flag: default storage class was used */
+#define SC_STRUCTFIELD  0x0400U         /* Struct or union field */
+
+#define SC_ZEROPAGE     0x0800U         /* Symbol marked as zeropage */
 
 #define SC_DEF          0x1000U         /* Symbol is defined */
 #define SC_REF          0x2000U         /* Symbol is referenced */
+#define SC_DECL         0x4000U         /* Symbol is declared in global scope */
+#define SC_STORAGE      0x8000U         /* Symbol with associated storage */
 
-#define SC_TYPE         0x4000U         /* This is a type, struct, typedef, etc. */
-#define SC_STRUCT       0x4001U         /* Struct */
-#define SC_UNION        0x4002U         /* Union */
-#define SC_STRUCTFIELD  0x4003U         /* Struct or union field */
-#define SC_BITFIELD     0x4004U         /* A bit-field inside a struct or union */
-#define SC_TYPEDEF      0x4005U         /* A typedef */
-#define SC_TYPEMASK     0x400FU         /* Mask for above types */
+#define SC_AUTO         0x010000U       /* Auto variable */
+#define SC_REGISTER     0x020000U       /* Register variable */
+#define SC_STATIC       0x040000U       /* Static - not to be confused with other *_STATIC */
+#define SC_EXTERN       0x080000U       /* Extern linkage */
+#define SC_STORAGEMASK  0x0F0000U       /* Storage type mask */
 
-#define SC_ZEROPAGE     0x8000U         /* Symbol marked as zeropage */
+#define SC_HAVEATTR     0x100000U       /* Symbol has attributes */
 
-#define SC_HAVEATTR     0x10000U        /* Symbol has attributes */
+#define SC_GOTO         0x200000U
+#define SC_SPADJUSTMENT 0x400000U
+#define SC_GOTO_IND     0x800000U       /* Indirect goto */
+
+#define SC_ALIAS        0x01000000U     /* Alias of anonymous field */
+#define SC_FICTITIOUS   0x02000000U     /* Symbol is fictitious */
+#define SC_HAVEFAM      0x04000000U     /* Type has a Flexible Array Member */
 
 
+
+/* Label definition or reference */
+typedef struct DefOrRef DefOrRef;
+struct DefOrRef {
+    unsigned            Line;
+    long                LocalsBlockId;
+    unsigned            Flags;
+    int                 StackPtr;
+    unsigned            Depth;
+    unsigned            LateSP_Label;
+};
 
 /* Symbol table entry */
 typedef struct SymEntry SymEntry;
@@ -119,8 +141,23 @@ struct SymEntry {
         /* Offset for locals or struct members */
         int                     Offs;
 
+        /* Data for anonymous struct or union members */
+        struct {
+            int                 Offs;     /* Byte offset into struct */
+            unsigned            ANumber;  /* Numeric ID */
+            SymEntry*           Field;    /* The real field aliased */
+        } A;
+
+
         /* Label name for static symbols */
-        unsigned                Label;
+        struct {
+            unsigned            Label;
+            Collection          *DefsOrRefs;
+            struct CodeEntry    *IndJumpFrom;
+        } L;
+
+        /* Value of SP adjustment needed after forward 'goto' */
+        unsigned short      SPAdjustment;
 
         /* Register bank offset and offset of the saved copy on stack for
         ** register variables.
@@ -137,22 +174,23 @@ struct SymEntry {
         struct {
             struct SymTable*    SymTab;   /* Member symbol table */
             unsigned            Size;     /* Size of the union/struct */
+            unsigned            ACount;   /* Count of anonymous fields */
         } S;
 
-        /* Data for bit fields */
+        /* Data for enums */
         struct {
-            unsigned            Offs;     /* Byte offset into struct */
-            unsigned            BitOffs;  /* Bit offset into storage unit */
-            unsigned            BitWidth; /* Width in bits */
-        } B;
+            struct SymTable*    SymTab;   /* Member symbol table */
+            const Type*         Type;     /* Underlying type */
+        } E;
 
         /* Data for functions */
         struct {
-            struct FuncDesc*    Func;     /* Function descriptor */
             struct Segments*    Seg;      /* Segments for this function */
             struct LiteralPool* LitPool;  /* Literal pool for this function */
         } F;
 
+        /* Segment name for tentantive global definitions */
+        const char*             BssName;
     } V;
     char                       Name[1]; /* Name, dynamically allocated */
 };
@@ -188,10 +226,10 @@ INLINE int SymIsBitField (const SymEntry* Sym)
 INLINE int SymIsTypeDef (const SymEntry* Sym)
 /* Return true if the given entry is a typedef entry */
 {
-    return ((Sym->Flags & SC_TYPEDEF) == SC_TYPEDEF);
+    return ((Sym->Flags & SC_TYPEMASK) == SC_TYPEDEF);
 }
 #else
-#  define SymIsTypeDef(Sym)     (((Sym)->Flags & SC_TYPEDEF) == SC_TYPEDEF)
+#  define SymIsTypeDef(Sym)     (((Sym)->Flags & SC_TYPEMASK) == SC_TYPEDEF)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -219,14 +257,24 @@ INLINE int SymIsRegVar (const SymEntry* Sym)
 /* Return true if the given entry is a register variable */
 /* ### HACK! Fix the ugly type flags! */
 {
-    return ((Sym->Flags & (SC_REGISTER|SC_TYPE)) == SC_REGISTER);
+    return ((Sym->Flags & (SC_REGISTER | SC_TYPEMASK)) == SC_REGISTER);
 }
 #else
-#  define SymIsRegVar(Sym)      (((Sym)->Flags & (SC_REGISTER|SC_TYPE)) == SC_REGISTER)
+#  define SymIsRegVar(Sym)  (((Sym)->Flags & (SC_REGISTER | SC_TYPEMASK)) == SC_REGISTER)
 #endif
 
 int SymIsOutputFunc (const SymEntry* Sym);
 /* Return true if this is a function that must be output */
+
+#if defined(HAVE_INLINE)
+INLINE int SymHasFlexibleArrayMember (const SymEntry* Sym)
+/* Return true if the given entry has a flexible array member */
+{
+    return ((Sym->Flags & SC_HAVEFAM) == SC_HAVEFAM);
+}
+#else
+#  define SymHasFlexibleArrayMember(Sym)    (((Sym)->Flags & SC_HAVEFAM) == SC_HAVEFAM)
+#endif
 
 #if defined(HAVE_INLINE)
 INLINE const char* SymGetAsmName (const SymEntry* Sym)
@@ -260,7 +308,17 @@ void SymSetAsmName (SymEntry* Sym);
 void CvtRegVarToAuto (SymEntry* Sym);
 /* Convert a register variable to an auto variable */
 
-void ChangeSymType (SymEntry* Entry, Type* T);
+SymEntry* GetSymType (const Type* T);
+/* Get the symbol entry of the enum/struct/union type
+** Return 0 if it is not an enum/struct/union.
+*/
+
+const char* GetSymTypeName (const Type* T);
+/* Return a name string of the type or the symbol name if it is an ESU type.
+** Note: This may use a static buffer that could be overwritten by other calls.
+*/
+
+void ChangeSymType (SymEntry* Entry, const Type* T);
 /* Change the type of the given symbol */
 
 void ChangeAsmName (SymEntry* Entry, const char* NewAsmName);

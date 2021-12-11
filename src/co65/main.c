@@ -112,7 +112,7 @@ static void CheckLabelName (const char* Label)
     }
 
     if (*L) {
-        Error ("Label name `%s' is invalid", Label);
+        Error ("Label name '%s' is invalid", Label);
     }
 }
 
@@ -123,7 +123,7 @@ static void CheckSegName (const char* Seg)
 {
     /* Print an error and abort if the name is not ok */
     if (!ValidSegName (Seg)) {
-        Error ("Segment name `%s' is invalid", Seg);
+        Error ("Segment name '%s' is invalid", Seg);
     }
 }
 
@@ -244,7 +244,7 @@ static void OptO65Model (const char* Opt attribute ((unused)), const char* Arg)
     /* Search for the model name */
     Model = FindModel (Arg);
     if (Model == O65_MODEL_INVALID) {
-        Error ("Unknown o65 model `%s'", Arg);
+        Error ("Unknown o65 model '%s'", Arg);
     }
 }
 
@@ -263,7 +263,8 @@ static void OptVersion (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
 /* Print the assembler version */
 {
-    fprintf (stderr, "co65 V%s\n", GetVersionAsString ());
+    fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
+    exit(EXIT_SUCCESS);
 }
 
 
@@ -386,7 +387,7 @@ int main (int argc, char* argv [])
         } else {
             /* Filename. Check if we already had one */
             if (InputName) {
-                Error ("Don't know what to do with `%s'", Arg);
+                Error ("Don't know what to do with '%s'", Arg);
             } else {
                 InputName = Arg;
             }

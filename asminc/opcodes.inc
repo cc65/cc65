@@ -241,12 +241,11 @@ OPC_BIT_abx = $3C
 ; OPC_NOP   = $44               ; doublet
 ; OPC_NOP   = $4B               ; doublet
 
-OPC_EOR_izp = $52               
+OPC_EOR_izp = $52
 ; OPC_NOP   = $53               ; doublet
 ; OPC_NOP   = $54               ; doublet
 ; OPC_NOP   = $5A               ; doublet
 ; OPC_NOP   = $5B               ; doublet
-OPC_EOR_abx = $5C
 
 ; OPC_NOP   = $62               ; doublet
 ; OPC_NOP   = $63               ; doublet
@@ -505,5 +504,13 @@ OPC_NOP_FA  = $FA
 OPC_ISC_aby = $FB
 OPC_NOP_abx = $FC
 OPC_ISC_abx = $FF
+
+.if (.cpu .bitand ::CPU_ISET_6502DTV)
+
+OPC_BRA     = $12
+OPC_SAC_imm = $32
+OPC_SIR_imm = $42
+
+.endif
 
 .endif

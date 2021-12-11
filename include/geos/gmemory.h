@@ -7,9 +7,7 @@
 #ifndef _GMEMORY_H
 #define _GMEMORY_H
 
-#ifndef _GSTRUCT_H
 #include <geos/gstruct.h>
-#endif
 
 void __fastcall__ CopyString(char *dest, const char *source);
 char __fastcall__ CmpString(const char *dest, const char *source);

@@ -1507,175 +1507,175 @@ initial         (5,2)       |    (5,2)    |  (12,10)
    }
 
    #ifdef NO_FLOATS
-   		fl = 5; cr = 2;
-   		fl /= cr;
-   		if(fl != 2){
-     		lrc = 232;
-     		if(prlc) printf(f,lrc);
-   		}
-   		fl = 5; sr = 2;
-   		fl /= sr;
-   		if(fl != 2){
-     		lrc = 233;
-     		if(prlc) printf(f,lrc);
-   		}
-   		fl = 5; ir = 2;
-   		fl /= ir;
-   		if(fl != 2){
-     		lrc = 234;
-     		if(prlc) printf(f,lrc);
-   		}
-   		fl = 5; lr = 2;
-   		fl /= lr;
-   		if(fl != 2){
-     		lrc = 235;
-     		if(prlc) printf(f,lrc);
-   		}
-   		fl = 5; ur = 2;
-   		fl /= ur;
-   		if(fl != 2){
-     		lrc = 236;
-     		if(prlc) printf(f,lrc);
-   		}
-   		fl = 5; fr = 2;
-   		fl /= fr;
-   		if(fl != 2){
-     		lrc = 237;
-     		if(prlc) printf(f,lrc);
-   		}
-   		fl = 5; dr = 2;
-   		fl /= dr;
-   		if(fl != 2){
-     		lrc = 238;
-     		if(prlc) printf(f,lrc);
-   		}
-   		dl = 5; cr = 2;
-   		dl /= cr;
-   		if(dl != 2){
-     		lrc = 239;
-     		if(prlc) printf(f,lrc);
-   		}
-   		dl = 5; sr = 2;
-   		dl /= sr;
-   		if(dl != 2){
-     		lrc = 240;
-     		if(prlc) printf(f,lrc);
-   		}
-   		dl = 5; ir = 2;
-   		dl /= ir;
-   		if(dl != 2){
-     		lrc = 241;
-     		if(prlc) printf(f,lrc);
-   		}
-   		dl = 5; lr = 2;
-   		dl /= lr;
-   		if(dl != 2){
-     		lrc = 242;
-     		if(prlc) printf(f,lrc);
-   		}
-   		dl = 5; ur = 2;
-   		dl /= ur;
-   		if(dl != 2){
-     		lrc = 243;
-     		if(prlc) printf(f,lrc);
-   		}
-   		dl = 5; fr = 2;
-   		dl /= fr;
-   		if(dl != 2){
-     		lrc = 244;
-     		if(prlc) printf(f,lrc);
-   		}
-   		dl = 5; dr = 2;
-   		dl /= dr;
-   		if(dl != 2){
-     		lrc = 245;
-     		if(prlc) printf(f,lrc);
-   		}
+                fl = 5; cr = 2;
+                fl /= cr;
+                if(fl != 2){
+                lrc = 232;
+                if(prlc) printf(f,lrc);
+                }
+                fl = 5; sr = 2;
+                fl /= sr;
+                if(fl != 2){
+                lrc = 233;
+                if(prlc) printf(f,lrc);
+                }
+                fl = 5; ir = 2;
+                fl /= ir;
+                if(fl != 2){
+                lrc = 234;
+                if(prlc) printf(f,lrc);
+                }
+                fl = 5; lr = 2;
+                fl /= lr;
+                if(fl != 2){
+                lrc = 235;
+                if(prlc) printf(f,lrc);
+                }
+                fl = 5; ur = 2;
+                fl /= ur;
+                if(fl != 2){
+                lrc = 236;
+                if(prlc) printf(f,lrc);
+                }
+                fl = 5; fr = 2;
+                fl /= fr;
+                if(fl != 2){
+                lrc = 237;
+                if(prlc) printf(f,lrc);
+                }
+                fl = 5; dr = 2;
+                fl /= dr;
+                if(fl != 2){
+                lrc = 238;
+                if(prlc) printf(f,lrc);
+                }
+                dl = 5; cr = 2;
+                dl /= cr;
+                if(dl != 2){
+                lrc = 239;
+                if(prlc) printf(f,lrc);
+                }
+                dl = 5; sr = 2;
+                dl /= sr;
+                if(dl != 2){
+                lrc = 240;
+                if(prlc) printf(f,lrc);
+                }
+                dl = 5; ir = 2;
+                dl /= ir;
+                if(dl != 2){
+                lrc = 241;
+                if(prlc) printf(f,lrc);
+                }
+                dl = 5; lr = 2;
+                dl /= lr;
+                if(dl != 2){
+                lrc = 242;
+                if(prlc) printf(f,lrc);
+                }
+                dl = 5; ur = 2;
+                dl /= ur;
+                if(dl != 2){
+                lrc = 243;
+                if(prlc) printf(f,lrc);
+                }
+                dl = 5; fr = 2;
+                dl /= fr;
+                if(dl != 2){
+                lrc = 244;
+                if(prlc) printf(f,lrc);
+                }
+                dl = 5; dr = 2;
+                dl /= dr;
+                if(dl != 2){
+                lrc = 245;
+                if(prlc) printf(f,lrc);
+                }
    #else
-   		fl = 5; cr = 2;
-   		fl /= cr;
-   		if(fl != 2.5){
-     		lrc = 232;
-     		if(prlc) printf(f,lrc);
-   		}
-   		fl = 5; sr = 2;
-   		fl /= sr;
-   		if(fl != 2.5){
-     		lrc = 233;
-     		if(prlc) printf(f,lrc);
-   		}
-   		fl = 5; ir = 2;
-   		fl /= ir;
-   		if(fl != 2.5){
-     		lrc = 234;
-     		if(prlc) printf(f,lrc);
-   		}
-   		fl = 5; lr = 2;
-   		fl /= lr;
-   		if(fl != 2.5){
-     		lrc = 235;
-     		if(prlc) printf(f,lrc);
-   		}
-   		fl = 5; ur = 2;
-   		fl /= ur;
-   		if(fl != 2.5){
-     		lrc = 236;
-     		if(prlc) printf(f,lrc);
-   		}
-   		fl = 5; fr = 2;
-   		fl /= fr;
-   		if(fl != 2.5){
-     		lrc = 237;
-     		if(prlc) printf(f,lrc);
-   		}
-   		fl = 5; dr = 2;
-   		fl /= dr;
-   		if(fl != 2.5){
-     		lrc = 238;
-     		if(prlc) printf(f,lrc);
-   		}
-   		dl = 5; cr = 2;
-   		dl /= cr;
-   		if(dl != 2.5){
-     		lrc = 239;
-     		if(prlc) printf(f,lrc);
-   		}
-   		dl = 5; sr = 2;
-   		dl /= sr;
-   		if(dl != 2.5){
-     		lrc = 240;
-     		if(prlc) printf(f,lrc);
-   		}
-   		dl = 5; ir = 2;
-   		dl /= ir;
-   		if(dl != 2.5){
-     		lrc = 241;
-     		if(prlc) printf(f,lrc);
-   		}
-   		dl = 5; lr = 2;
-   		dl /= lr;
-   		if(dl != 2.5){
-     		lrc = 242;
-     		if(prlc) printf(f,lrc);
-   		}
-   		dl = 5; ur = 2;
-   		dl /= ur;
-   		if(dl != 2.5){
-     		lrc = 243;
-     		if(prlc) printf(f,lrc);
-   		}
-   		dl = 5; fr = 2;
-   		dl /= fr;
-   		if(dl != 2.5){
-     		lrc = 244;
-     		if(prlc) printf(f,lrc);
-   		}
-   		dl = 5; dr = 2;
-   		dl /= dr;
-   		if(dl != 2.5){
-     		lrc = 245;
-     		if(prlc) printf(f,lrc);
-   		}
+                fl = 5; cr = 2;
+                fl /= cr;
+                if(fl != 2.5){
+                lrc = 232;
+                if(prlc) printf(f,lrc);
+                }
+                fl = 5; sr = 2;
+                fl /= sr;
+                if(fl != 2.5){
+                lrc = 233;
+                if(prlc) printf(f,lrc);
+                }
+                fl = 5; ir = 2;
+                fl /= ir;
+                if(fl != 2.5){
+                lrc = 234;
+                if(prlc) printf(f,lrc);
+                }
+                fl = 5; lr = 2;
+                fl /= lr;
+                if(fl != 2.5){
+                lrc = 235;
+                if(prlc) printf(f,lrc);
+                }
+                fl = 5; ur = 2;
+                fl /= ur;
+                if(fl != 2.5){
+                lrc = 236;
+                if(prlc) printf(f,lrc);
+                }
+                fl = 5; fr = 2;
+                fl /= fr;
+                if(fl != 2.5){
+                lrc = 237;
+                if(prlc) printf(f,lrc);
+                }
+                fl = 5; dr = 2;
+                fl /= dr;
+                if(fl != 2.5){
+                lrc = 238;
+                if(prlc) printf(f,lrc);
+                }
+                dl = 5; cr = 2;
+                dl /= cr;
+                if(dl != 2.5){
+                lrc = 239;
+                if(prlc) printf(f,lrc);
+                }
+                dl = 5; sr = 2;
+                dl /= sr;
+                if(dl != 2.5){
+                lrc = 240;
+                if(prlc) printf(f,lrc);
+                }
+                dl = 5; ir = 2;
+                dl /= ir;
+                if(dl != 2.5){
+                lrc = 241;
+                if(prlc) printf(f,lrc);
+                }
+                dl = 5; lr = 2;
+                dl /= lr;
+                if(dl != 2.5){
+                lrc = 242;
+                if(prlc) printf(f,lrc);
+                }
+                dl = 5; ur = 2;
+                dl /= ur;
+                if(dl != 2.5){
+                lrc = 243;
+                if(prlc) printf(f,lrc);
+                }
+                dl = 5; fr = 2;
+                dl /= fr;
+                if(dl != 2.5){
+                lrc = 244;
+                if(prlc) printf(f,lrc);
+                }
+                dl = 5; dr = 2;
+                dl /= dr;
+                if(dl != 2.5){
+                lrc = 245;
+                if(prlc) printf(f,lrc);
+                }
    #endif
    cl = 5; cr = 2;
    cl %= cr;
@@ -1750,9 +1750,9 @@ initial         (5,2)       |    (5,2)    |  (12,10)
 *********************************************************************************************/
 
 #ifndef NO_TYPELESS_STRUCT_PTR
-	int section(int j,struct* pd0){
+        int section(int j,struct* pd0){
 #else
-	int section(int j,void* pd0){
+        int section(int j,void* pd0){
 #endif
         switch(j){
                 case 0: return s714(pd0);
@@ -1776,7 +1776,7 @@ int main(int n,char **args) {
 
 int j;
 static struct defs d0, *pd0;
-	
+        
    d0.flgs = 1;          /* These flags dictate            */
    d0.flgm = 1;          /*     the verbosity of           */
    d0.flgd = 1;          /*         the program.           */

@@ -1,19 +1,18 @@
 ;
 ; Ullrich von Bassewitz, 06.08.1998
 ;
-; void cputsxy (unsigned char x, unsigned char y, char* s);
-; void cputs (char* s);
+; void cputsxy (unsigned char x, unsigned char y, const char* s);
+; void cputs (const char* s);
 ;
 
         .export         _cputsxy, _cputs
-        .import         popa, _gotoxy, _cputc
+        .import         gotoxy, _cputc
         .importzp       ptr1, tmp1
                  
 _cputsxy:
         sta     ptr1            ; Save s for later
         stx     ptr1+1
-        jsr     popa            ; Get Y
-        jsr     _gotoxy         ; Set cursor, pop x
+        jsr     gotoxy          ; Set cursor, pop x and y
         jmp     L0              ; Same as cputs...
 
 _cputs: sta     ptr1            ; Save s

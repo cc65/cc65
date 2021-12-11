@@ -29,24 +29,12 @@
 
         .addr   $0000
 
-; Button state masks (8 values)
-
-        .byte   $10                     ; JOY_UP
-        .byte   $20                     ; JOY_DOWN
-        .byte   $40                     ; JOY_LEFT
-        .byte   $80                     ; JOY_RIGHT
-        .byte   $01                     ; JOY_FIRE      (A)
-        .byte   $02                     ; JOY_FIRE2     (B)
-        .byte   $04                     ;               (Select)
-        .byte   $08                     ;               (Start)
-
 ; Jump table.
 
         .addr   INSTALL
         .addr   UNINSTALL
         .addr   COUNT
         .addr   READJOY
-        .addr   0                       ; IRQ entry unused
 
 ; ------------------------------------------------------------------------
 ; Constants

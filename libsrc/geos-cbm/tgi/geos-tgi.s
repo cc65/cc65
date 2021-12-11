@@ -74,7 +74,6 @@ aspect: .word $00D4             ; Aspect ratio (based on 4/3 display)
         .addr BAR
         .addr TEXTSTYLE
         .addr OUTTEXT
-        .addr 0                 ; IRQ entry is unused
 
 ; ------------------------------------------------------------------------
 ; Data.

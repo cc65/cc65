@@ -1,36 +1,28 @@
+        .constructor    initconio, 24
+
+        .import         vdc_init
+        .import         psg_init
+        .import         colors
+        .import         _pce_font
+        .importzp       ptr1, tmp1
+
         .include        "pce.inc"
         .include        "extzp.inc"
 
-        .import         vce_init
-        .import         psg_init
-        .import         colors
-        .importzp       ptr1, tmp1
-
-        .constructor    initconio
-
-        .macpack        longbranch
-
-        .segment        "INIT"
+        .segment        "ONCE"
 initconio:
-        jsr     vce_init
+        jsr     vdc_init
         jsr     psg_init
-        jsr     conio_init
-        jsr     set_palette
-
-        st0     #VDC_CR
-        st1     #<$0088
-        st2     #>$0088
-        rts
+        jsr     load_font
 
 set_palette:
         stz     VCE_ADDR_LO
         stz     VCE_ADDR_HI
 
-        ldx     #0
-@lp:
-        ldy     #16
-@lp1:
-        lda     colors,x
+        clx
+@lp:    ldy     #16             ; size of a palette
+
+@lp1:   lda     colors,x
         sta     VCE_DATA_LO
         lda     colors+1,x
         sta     VCE_DATA_HI
@@ -39,79 +31,57 @@ set_palette:
 
         inx
         inx
-        cpx     #16*2
-        jne     @lp
+        cpx     #16 * 2         ; 16 palettes
+        bne     @lp
 
-        stz     VCE_ADDR_LO
-        stz     VCE_ADDR_HI
-        stz     VCE_DATA_LO
-        stz     VCE_DATA_HI
+        sty     BGCOLOR         ; white on black
+        iny
+        sty     CHARCOLOR
 
+        VREG    VDC_CR, $0088   ; enable background and vertical-blank interrupt
         rts
 
-conio_init:
-        ; Load font
-        st0     #VDC_MAWR
-        st1     #<$2000
-        st2     #>$2000
+; Load the conio font into the VDC.
+load_font:
+        VREG    VDC_MAWR, $2000
+        st0     #VDC_VWR
 
-        ; ptr to font data
-        lda     #<font
+        stz     tmp1            ; #%00000000
+        bsr     copy            ; make normal characters
+
+        dec     tmp1            ; #%11111111
+;       bsr     copy            ; make reversed characters
+;       rts                     ; (fall through)
+
+; Point to the font data.
+copy:   lda     #<_pce_font
+        ldx     #>_pce_font
         sta     ptr1
-        lda     #>font
-        sta     ptr1+1
+        stx     ptr1+1
 
-        st0     #VDC_VWR        ; VWR
-
-        lda     #0
-        sta     tmp1
-        jsr     copy
-
-        lda     #<font
-        sta     ptr1
-        lda     #>font
-        sta     ptr1+1
-
-        lda     #$ff
-        sta     tmp1
-        jsr     copy
-
-        ldx     #0
-        stx     BGCOLOR
-        inx
-        stx     CHARCOLOR
-
-        rts
-
-copy:
         ldy     #$80            ; 128 chars
 charloop:
         ldx     #$08            ; 8 bytes/char
 lineloop:
         lda     (ptr1)
         eor     tmp1
-        sta     a:VDC_DATA_LO   ; bitplane 0
-        stz     a:VDC_DATA_HI   ; bitplane 1
+        sta     VDC_DATA_LO     ; bitplane 0
+        st2     #>$0000         ; bitplane 1
 
-        clc                     ; increment font pointer
-        lda     ptr1
-        adc     #$01
-        sta     ptr1
-        lda     ptr1+1
-        adc     #$00
-        sta     ptr1+1
-        dex
-        bne     lineloop        ; next bitplane 0 byte
-        ldx     #$08            ; fill bitplane 2/3 with 0
+        inc     ptr1            ; increment font pointer
+        bne     @noC
+        inc     ptr1+1
+@noC:   dex
+        bne     lineloop        ; next bitplane-0 byte
+
+        ldx     #$08            ; fill bitplanes 2 and 3 with 0
 fillloop:
-        st1     #$00
-        st2     #$00
+        st1     #<$0000
+        st2     #>$0000
         dex
         bne     fillloop        ; next byte
+
         dey
         bne     charloop        ; next character
 
         rts
-
-font:
-        .include        "vga.inc"

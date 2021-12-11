@@ -11,8 +11,8 @@
  *******************************************************************************
  * Bug reports, patches, comments, suggestions should be sent to:
  *
- *	Ben Smith, Rick Grehan or Tom Yager
- *	ben@bytepb.byte.com   rick_g@bytepb.byte.com   tyager@bytepb.byte.com
+ *      Ben Smith, Rick Grehan or Tom Yager
+ *      ben@bytepb.byte.com   rick_g@bytepb.byte.com   tyager@bytepb.byte.com
  *
  *******************************************************************************
  *  Modification Log:
@@ -38,53 +38,53 @@ void mov(unsigned char n,unsigned char f,unsigned char t)
 {
 char o;
 
-	if(n == 1)
-	{
-		num[f]--;
-		num[t]++;
-	}
-	else
-	{
-		o = (6-(f+t));
-		mov(n-1,f,o);
-		mov(1,f,t);
-		mov(n-1,o,t);
-	}
+        if(n == 1)
+        {
+                num[f]--;
+                num[t]++;
+        }
+        else
+        {
+                o = (6-(f+t));
+                mov(n-1,f,o);
+                mov(1,f,t);
+                mov(n-1,o,t);
+        }
 
-	#ifdef VERBOSE
-	printf("%2d: %2d %2d %2d %2d\n",
-		(int)iter,(int)num[0],(int)num[1],(int)num[2],(int)num[3]);
-	#endif
+        #ifdef VERBOSE
+        printf("%2d: %2d %2d %2d %2d\n",
+                (int)iter,(int)num[0],(int)num[1],(int)num[2],(int)num[3]);
+        #endif
 }
 
 int main(int argc,char **argv)
 {
-	#ifdef USECMDLINE
-	if (argc < 2) {
-		printf("Usage: %s [duration] [disks]\n", argv[0]);
-		exit(1);
-	}
-	else
-	{
-		if(argc > 1) duration = atoi(argv[1]);
-		if(argc > 2) disk = atoi(argv[2]);
-	}
-	#endif
+        #ifdef USECMDLINE
+        if (argc < 2) {
+                printf("Usage: %s [duration] [disks]\n", argv[0]);
+                exit(EXIT_FAILURE);
+        }
+        else
+        {
+                if(argc > 1) duration = atoi(argv[1]);
+                if(argc > 2) disk = atoi(argv[2]);
+        }
+        #endif
 
-	printf("towers of hanoi\ndisks: %d\n\n",disk);
+        printf("towers of hanoi\ndisks: %d\n\n",disk);
 
-	num[1] = disk;
+        num[1] = disk;
 
-	#ifdef VERBOSE
-	printf("%2d: %2d %2d %2d %2d\n",
-		(int)iter,(int)num[0],(int)num[1],(int)num[2],(int)num[3]);
-	#endif
+        #ifdef VERBOSE
+        printf("%2d: %2d %2d %2d %2d\n",
+                (int)iter,(int)num[0],(int)num[1],(int)num[2],(int)num[3]);
+        #endif
 
-	while(num[3]<disk)
-	{
-		mov(disk,1,3);
-		++iter;
-	}
+        while(num[3]<disk)
+        {
+                mov(disk,1,3);
+                ++iter;
+        }
 
-	return 0;
+        return 0;
 }

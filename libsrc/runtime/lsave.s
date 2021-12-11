@@ -1,7 +1,8 @@
 ;
 ; Ullrich von Bassewitz, 08.08.1998
+; Christian Krueger, 11-Mar-2017, optimization
 ;
-; CC65 runtime: save ax into temp storage/restore ax from temp storage
+; CC65 runtime: save eax into temp storage/restore eax from temp storage
 ;
 
         .export         saveeax, resteax
@@ -10,11 +11,10 @@
 saveeax:
         sta     regsave
         stx     regsave+1
-        lda     sreg
-        sta     regsave+2
-        lda     sreg+1
-        sta     regsave+3
-        lda     regsave
+        ldy     sreg
+        sty     regsave+2
+        ldy     sreg+1
+        sty     regsave+3
         rts
 
 resteax:
@@ -25,4 +25,3 @@ resteax:
         ldx     regsave+1
         lda     regsave
         rts
-

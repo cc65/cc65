@@ -1,12 +1,10 @@
 <!doctype linuxdoc system>
 
 <article>
-
 <title>Commodore PET-specific information for cc65
 <author>
 <url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:polluks@sdf.lonestar.org" name="Stefan A. Haubenthal">
-<date>2014-04-12
 
 <abstract>
 An overview over the PET runtime system as it is implemented for the cc65 C
@@ -107,6 +105,7 @@ declaration and usage.
 <item>cbm_save
 <item>cbm_write
 <item>get_tv
+<item>waitvsync
 </itemize>
 
 
@@ -155,8 +154,9 @@ The default drivers, <tt/joy_stddrv (joy_static_stddrv)/, point to <tt/pet-stdjo
 
   <tag><tt/pet-ptvjoy.joy (pet_ptvjoy_joy)/</tag>
   Driver for the Protovision 4-player adapter contributed by Groepaz. See
-  <url url="http://www.protovision-online.de/hardw/hardwstart.htm"> for prices and
-  building instructions. Up to two joysticks are supported.
+  <url url="http://www.protovision-online.de/hardw/4_player.php?language=en"
+  name="Protovision shop"> for prices and building instructions. Up to two
+  joysticks are supported.
 
   <tag><tt/pet-stdjoy.joy (pet_stdjoy_joy)/</tag>
   Driver for the standard PET userport joystick.
@@ -243,14 +243,14 @@ including commercial applications, and to alter it and redistribute it
 freely, subject to the following restrictions:
 
 <enum>
-<item>	The origin of this software must not be misrepresented; you must not
-	claim that you wrote the original software. If you use this software
-	in a product, an acknowledgment in the product documentation would be
-	appreciated but is not required.
-<item>	Altered source versions must be plainly marked as such, and must not
-	be misrepresented as being the original software.
-<item>	This notice may not be removed or altered from any source
-	distribution.
+<item>  The origin of this software must not be misrepresented; you must not
+        claim that you wrote the original software. If you use this software
+        in a product, an acknowledgment in the product documentation would be
+        appreciated but is not required.
+<item>  Altered source versions must be plainly marked as such, and must not
+        be misrepresented as being the original software.
+<item>  This notice may not be removed or altered from any source
+        distribution.
 </enum>
 
 </article>

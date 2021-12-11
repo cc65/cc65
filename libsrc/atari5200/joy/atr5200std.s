@@ -27,24 +27,12 @@
 
         .addr   $0000
 
-; Button state masks (8 values)
-
-        .byte   $01             ; JOY_UP
-        .byte   $02             ; JOY_DOWN
-        .byte   $04             ; JOY_LEFT
-        .byte   $08             ; JOY_RIGHT
-        .byte   $10             ; JOY_FIRE
-        .byte   $20             ; JOY_FIRE2
-        .byte   $00             ; Future expansion
-        .byte   $00             ; Future expansion
-
 ; Jump table.
 
         .addr   INSTALL
         .addr   UNINSTALL
         .addr   COUNT
         .addr   READJOY
-        .addr   0               ; IRQ entry not used
 
 .code
 
@@ -56,6 +44,8 @@
 ;
 
 INSTALL:
+        lda     #$04            ; enable POT input from the joystick ports, see section "GTIA" in 
+        sta     CONSOL          ;   http://www.atarimuseum.com/videogames/consoles/5200/conv_to_5200.html
         lda     #JOY_ERR_OK
         ldx     #0
 ;       rts                     ; Run into UNINSTALL instead
@@ -92,6 +82,7 @@ SENSIVITY       = 16
 
 READJOY:
         and     #3              ; put joystick number in range, just in case
+        sta     jsnum           ; remember joystick number
         tay
         asl     a
         tax                     ; Joystick number * 2 (0-6) into X, index into ZP shadow registers
@@ -99,7 +90,7 @@ READJOY:
         lda     #0              ; Initialize return value
         cmp     TRIG0,y
         bne     @notrg
-        lda     #$10            ; JOY_FIRE
+        ora     #$10            ; JOY_BTN
 
 ; Read joystick
 
@@ -129,4 +120,15 @@ READJOY:
 
         ora     #2              ; JOY_DOWN
 
-@done:  rts
+@done:  ldx     #0
+        ldy     jsnum
+        cmp     oldval,y
+        beq     @ret
+        sta     oldval,y
+        stx     ATRACT
+@ret:   rts
+
+.bss
+
+oldval:.res     4
+jsnum: .res     1

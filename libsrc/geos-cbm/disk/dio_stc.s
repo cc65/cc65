@@ -1,6 +1,6 @@
 ;
-; Maciej 'YTM/Elysium' Witkowiak
-; 2.7.2001
+; 2001-07-02, Maciej 'YTM/Elysium' Witkowiak
+; 2015-08-27, Greg King
 ;
 ; unsigned char __fastcall__ dio_log_to_phys (dhandle_t handle,
 ;                                             unsigned *sectnum,        /* input */
@@ -55,7 +55,7 @@ _dio_log_to_phys:
         lda (ptr3),y
         tay 
         lda driveType,y
-        and #%00000011          ; this is for RamDrive compatibility
+        and #%00001111          ; remove ramDisk flags
         cmp #DRV_1541
         beq dio_stc1541
         cmp #DRV_1571
@@ -63,7 +63,7 @@ _dio_log_to_phys:
         cmp #DRV_1581
         beq dio_stc1581
             
-        lda #DEV_NOT_FOUND      ; unknown device
+        lda #INCOMPATIBLE       ; unsupported device
         ldx #0
         beq _ret
 
@@ -86,7 +86,7 @@ _inv_data:
         lda #INV_TRACK
         .byte $2c
 _inv_hand:
-        lda #INCOMPATIBLE
+        lda #DEV_NOT_FOUND
         ldx #0
         beq _ret
 
@@ -102,8 +102,8 @@ _loop41:
         bne _nxt
         lda tmp1
         cmp sectab_1541_l+1,x
-        bcc _found
-_nxt:   inx 
+_nxt:   bcc _found
+        inx
         cpx #35
         bne _loop41
         beq _inv_data
@@ -124,12 +124,11 @@ dio_stc1571:
 ; - fall down to 1541
         lda tmp2
         cmp #>683
-        bne _cnt71
+        bne _if71
         lda tmp1
         cmp #<683
-        bcc dio_stc1541
+_if71:  bcc dio_stc1541
             
-_cnt71:     
         lda tmp1
         sec 
         sbc #<683
@@ -138,6 +137,8 @@ _cnt71:
         sbc #>683
         sta tmp2
         jsr dio_stc1541         ; will fall through here
+        tay
+        bne _ret                ; result beyond track 70
             
         ldy #diopp_track
         lda (ptr1),y
@@ -166,7 +167,7 @@ _sub81: lda tmp1
         sbc #0
         sta tmp2
         inx 
-        cpx #81
+        cpx #80
         bne _loop81
         beq _inv_data
             

@@ -4,8 +4,9 @@
 ; unsigned char cbm_k_acptr (void);
 ;
 
+        .include        "cbm.inc"
+
         .export         _cbm_k_acptr
-        .import         ACPTR
 
 
 _cbm_k_acptr:

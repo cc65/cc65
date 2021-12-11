@@ -7,6 +7,7 @@ CBMS = c128   \
        c64    \
        cbm510 \
        cbm610 \
+       cx16   \
        pet    \
        plus4  \
        vic20
@@ -14,22 +15,27 @@ CBMS = c128   \
 GEOS = geos-apple \
        geos-cbm
 
-TARGETS = apple2    \
-          apple2enh \
-          atari     \
-          atarixl   \
-          atari5200 \
-          atmos     \
-          $(CBMS)   \
-          $(GEOS)   \
-          gamate    \
-          lynx      \
-          nes       \
-          osic1p    \
-          pce       \
-          sim6502   \
-          sim65c02  \
-          supervision
+TARGETS = apple2       \
+          apple2enh    \
+          atari        \
+          atarixl      \
+          atari2600    \
+          atari5200    \
+          atmos        \
+          creativision \
+          $(CBMS)      \
+          $(GEOS)      \
+          gamate       \
+          lynx         \
+          nes          \
+          none         \
+          osic1p       \
+          pce          \
+          sim6502      \
+          sim65c02     \
+          supervision  \
+          sym1         \
+          telestrat
 
 DRVTYPES = emd \
            joy \
@@ -37,13 +43,13 @@ DRVTYPES = emd \
            ser \
            tgi
 
-OUTPUTDIRS := lib         \
-              $(DRVTYPES) \
-              targetutil  \
-              asminc      \
-              cfg         \
-              include     \
-              $(subst ../,,$(filter-out $(wildcard ../include/*.*),$(wildcard ../include/*)))
+OUTPUTDIRS := lib                                                                             \
+              asminc                                                                          \
+              cfg                                                                             \
+              include                                                                         \
+              $(subst ../,,$(filter-out $(wildcard ../include/*.*),$(wildcard ../include/*))) \
+              $(subst ../,,$(wildcard ../target/*/drv/*))                                     \
+              $(subst ../,,$(wildcard ../target/*/util))
 
 .PHONY: all mostlyclean clean install zip lib $(TARGETS)
 
@@ -69,7 +75,7 @@ endif
 
 ifndef TARGET
 
-datadir = $(prefix)/share/cc65
+datadir = $(PREFIX)/share/cc65
 
 all lib: $(TARGETS)
 
@@ -77,7 +83,7 @@ mostlyclean:
 	$(call RMDIR,../libwrk)
 
 clean:
-	$(call RMDIR,../libwrk ../lib ../targetutil $(addprefix ../,$(DRVTYPES)))
+	$(call RMDIR,../libwrk ../lib ../target)
 
 ifdef CMD_EXE
 
@@ -89,9 +95,9 @@ INSTALL = install
 
 define INSTALL_recipe
 
-$(if $(prefix),,$(error variable `prefix' must be set))
+$(if $(PREFIX),,$(error variable "PREFIX" must be set))
 $(INSTALL) -d $(DESTDIR)$(datadir)/$(dir)
-$(INSTALL) -m644 ../$(dir)/*.* $(DESTDIR)$(datadir)/$(dir)
+$(INSTALL) -m0644 ../$(dir)/*.* $(DESTDIR)$(datadir)/$(dir)
 
 endef # INSTALL_recipe
 
@@ -128,8 +134,7 @@ MKINC = $(GEOS) \
 
 TARGETUTIL = apple2    \
              apple2enh \
-             atari     \
-             geos-apple
+             atari
 
 GEOSDIRS = common      \
            conio       \
@@ -193,6 +198,7 @@ DEPS = $(OBJS:.o=.d)
 EXTRA_SRCPAT = $(SRCDIR)/extra/%.s
 EXTRA_OBJPAT = ../lib/$(TARGET)-%.o
 EXTRA_OBJS := $(patsubst $(EXTRA_SRCPAT),$(EXTRA_OBJPAT),$(wildcard $(SRCDIR)/extra/*.s))
+DEPS += $(EXTRA_OBJS:../lib/%.o=../libwrk/$(TARGET)/%.d)
 
 ZPOBJ = ../libwrk/$(TARGET)/zeropage.o
 ifeq ($(TARGET),$(filter $(TARGET),$(EXTZP)))
@@ -212,7 +218,7 @@ define DRVTYPE_template
 $1_SRCDIR = $$(SRCDIR)/$1
 $1_STCDIR = ../libwrk/$$(TARGET)
 $1_DYNDIR = ../libwrk/$$(TARGET)/$1
-$1_DRVDIR = ../$1
+$1_DRVDIR = ../target/$$(TARGET)/drv/$1
 
 $1_SRCPAT = $$($1_SRCDIR)/$$(OBJPFX)%.s
 $1_STCPAT = $$($1_STCDIR)/$$(OBJPFX)%-$1.o
@@ -276,14 +282,14 @@ endef # COMPILE_recipe
 ../libwrk/$(TARGET)/%.o: %.c | ../libwrk/$(TARGET)
 	$(COMPILE_recipe)
 
-$(EXTRA_OBJPAT): $(EXTRA_SRCPAT) | ../lib
+$(EXTRA_OBJPAT): $(EXTRA_SRCPAT) | ../libwrk/$(TARGET) ../lib
 	@echo $(TARGET) - $(<F)
-	@$(CA65) -t $(TARGET) $(CA65FLAGS) -o $@ $<
+	@$(CA65) -t $(TARGET) $(CA65FLAGS) --create-dep $(@:../lib/%.o=../libwrk/$(TARGET)/%.d) -o $@ $<
 
 ../lib/$(TARGET).lib: $(OBJS) | ../lib
 	$(AR65) a $@ $?
 
-../libwrk/$(TARGET) ../lib ../targetutil:
+../libwrk/$(TARGET) ../lib ../target/$(TARGET)/util:
 	@$(call MKDIR,$@)
 
 $(TARGET): $(EXTRA_OBJS) ../lib/$(TARGET).lib

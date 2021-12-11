@@ -1,130 +1,112 @@
 ;
-; Startup code for cc65 (PCEngine version)
+; Start-up code for cc65 (PC-Engine version)
 ;
-; by Groepaz/Hitmen <groepaz@gmx.net>
+; by Groepaz/Hitmen <groepaz@gmx.net>,
 ; based on code by Ullrich von Bassewitz <uz@cc65.org>
 ;
-; This must be the *first* file on the linker command line
+; 2018-02-24, Greg King
 ;
 
         .export         _exit
-        .export         __STARTUP__ : absolute = 1      ; Mark as startup
+        .export         __STARTUP__ : absolute = 1      ; Mark as start-up
 
         .import         initlib, donelib
-        .import         push0, _main, zerobss
-        .import         initheap
-        .import         IRQStub
+        .import         push0, _main
+        .import         IRQStub, __nmi
+        .importzp       sp
 
-        ; Linker generated
-        .import         __RAM_START__, __RAM_SIZE__
-        .import         __ROM0_START__, __ROM0_SIZE__
-        .import         __ROM_START__, __ROM_SIZE__
-        .import         __STARTUP_LOAD__,__STARTUP_RUN__, __STARTUP_SIZE__
-        .import         __CODE_LOAD__,__CODE_RUN__, __CODE_SIZE__
-        .import         __RODATA_LOAD__,__RODATA_RUN__, __RODATA_SIZE__
-        .import         __DATA_LOAD__,__DATA_RUN__, __DATA_SIZE__
-        .import         __BSS_SIZE__
+        ; Linker-generated
+        .import         __CARTSIZE__
+        .import         __DATA_LOAD__, __DATA_RUN__, __DATA_SIZE__
+        .import         __BSS_RUN__, __BSS_SIZE__
+        .import         __MAIN_START__, __MAIN_SIZE__, __STACKSIZE__
 
         .include        "pce.inc"
         .include        "extzp.inc"
 
-        .importzp       sp
-        .importzp       ptr1,ptr2
-        .importzp       tmp1,tmp2,tmp3
-
 ; ------------------------------------------------------------------------
-; Place the startup code in a special segment.
+; Place the start-up code in a special segment.
 
-        .segment "STARTUP"
+.segment        "STARTUP"
 
-start:
-
-        ; setup the CPU and System-IRQ
-
-        ; Initialize CPU
-
-        sei
+        ; Initialize the CPU.
+start:  sei
         nop
-        csh                     ; set high speed CPU mode
-        nop
-        cld
+        csh                     ; Set high-speed CPU mode
         nop
 
-        ; Setup stack and memory mapping
+        ; Set up the stack and the memory mapping.
         ldx     #$FF            ; Stack top ($21FF)
         txs
 
-        ; at startup all MPRs are set to 0, so init them
-        lda     #$ff
-        tam     #%00000001      ; 0000-1FFF = Hardware page
+        ; At power-on, most MPRs have random values; so, initiate them.
+        lda     #$FF
+        tam     #%00000001      ; $0000-$1FFF = Hardware bank
         lda     #$F8
-        tam     #%00000010      ; 2000-3FFF = Work RAM
-
-        ; FIXME: setup a larger block of memory to use with C-code
+        tam     #%00000010      ; $2000-$3FFF = Work RAM
         ;lda     #$F7
-        ;tam     #%00000100      ; 4000-5FFF = Save RAM
-        ;lda     #1
-        ;tam     #%00001000      ; 6000-7FFF  Page 2
-        ;lda     #2
-        ;tam     #%00010000      ; 8000-9FFF  Page 3
-        ;lda     #3
-        ;tam     #%00100000      ; A000-BFFF  Page 4
+        ;tam     #%00000100      ; $4000-$47FF = 2K Battery-backed RAM
         ;lda     #4
-        ;tam     #%01000000      ; C000-DFFF  Page 5
-        ;lda     #0
-        ;tam     #%10000000      ; e000-fFFF  hucard/syscard bank 0
+        ;tam     #%00001000      ; $6000-$7FFF
 
-        ; Clear work RAM (2000-3FFF)
-        stz     <$00
-        tii     $2000, $2001, $1FFF
+        lda     #$01
+        ldx     #>$8000
+        cpx     #>__CARTSIZE__
+        bcc     @L1             ;(blt)
+        tam     #%00010000      ; $8000-$9FFF = ROM bank 1 (32K block of ROM)
+        inc     a
+        tam     #%00100000      ; $A000-$BFFF = ROM bank 2
+        inc     a
+@L1:    tam     #%01000000      ; $C000-$DFFF = ROM bank 3 (32K) or 1 (16K)
+        ;lda    #$00            ; (The reset default)
+        ;tam    #%10000000      ; $E000-$FFFF  Hucard/Syscard bank 0
 
-        ; Initialize hardware
+        ; Initialize the hardware.
         stz     TIMER_CTRL      ; Timer off
-        lda     #$07
+        lda     #%00000111
         sta     IRQ_MASK        ; Interrupts off
-        stz     IRQ_STATUS      ; Acknowledge timer
 
-        ; FIXME; i dont know why the heck this one doesnt work when called from a constructor :/
+        ; FIXME; I don't know why the heck this one doesn't work when called from a constructor. -Groepaz :-/
+.if 0   ; It now seems to work (at least, in Mednafen). -Greg King
         .import vdc_init
         jsr     vdc_init
+.endif
 
-        ; Turn on background and VD interrupt/IRQ1
-        lda     #$05
-        sta     IRQ_MASK        ; IRQ1=on
-
-        ; Clear the BSS data
-        jsr     zerobss
+        ; Allow interrupts from the VDC.
+        lda     #%00000101
+        sta     IRQ_MASK        ; IRQ1 = on
 
         ; Copy the .data segment to RAM
         tii     __DATA_LOAD__, __DATA_RUN__, __DATA_SIZE__
 
-        ; setup the stack
-        lda     #<(__RAM_START__+__RAM_SIZE__)
-        sta     sp
-        lda     #>(__RAM_START__+__RAM_SIZE__)
-        sta     sp + 1
+        ; Clear the .bss segment
+        stz     __BSS_RUN__
+        tii     __BSS_RUN__, __BSS_RUN__ + 1, __BSS_SIZE__ - 1
 
-        ; Call module constructors
+        ; Set up the stack
+        lda     #<(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
+        ldx     #>(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
+        sta     sp
+        stx     sp+1
+
+        ; Call the module constructors.
         jsr     initlib
 
-        cli     ; allow IRQ only after constructors have run
+        stz     IRQ_STATUS      ; Clear IRQs
+        cli                     ; Allow IRQ only after constructors have run
 
         ; Pass an empty command line
         jsr     push0           ; argc
         jsr     push0           ; argv
 
         ldy     #4              ; Argument size
-        jsr     _main           ; call the users code
+        jsr     _main           ; Call the user's code
 
-        ; Call module destructors. This is also the _exit entry.
-_exit:
-        jsr     donelib         ; Run module destructors
+        ; Call the module destructors. This is also the exit() entry.
+_exit:  jsr     donelib
 
-        ; reset the PCEngine (start over)
+        ; Reset the PCEngine (start over).
         jmp     start
-
-_nmi:
-        rti
 
         .export initmainargs
 initmainargs:
@@ -133,10 +115,10 @@ initmainargs:
 ; ------------------------------------------------------------------------
 ; hardware vectors
 ; ------------------------------------------------------------------------
-        .segment "VECTORS"
+.segment        "VECTORS"
 
-        .word   IRQStub         ; $fff6 IRQ2 (External IRQ, BRK)
-        .word   IRQStub         ; $fff8 IRQ1 (VDC)
-        .word   IRQStub         ; $fffa Timer
-        .word   _nmi            ; $fffc NMI
-        .word   start           ; $fffe reset
+        .word   IRQStub         ; $FFF6 IRQ2 (External IRQ, BRK)
+        .word   IRQStub         ; $FFF8 IRQ1 (VDC)
+        .word   IRQStub         ; $FFFA Timer
+        .word   __nmi           ; $FFFC NMI
+        .word   start           ; $FFFE reset

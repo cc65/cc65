@@ -3,7 +3,7 @@
 ; Based on on code by Christian Groessler
 ;
 ; unsigned char __fastcall__ _syschdir (const char* name);
-; for SpartaDOS and MyDOS
+; for SpartaDOS, RealDOS, and MyDOS
 ;
 
         .include "atari.inc"
@@ -64,6 +64,10 @@ ucok1:
         tax
         lda     __dos_type
         cmp     #SPARTADOS
+        beq     :+
+        cmp     #REALDOS
+        beq     :+
+        cmp     #BWDOS
         beq     :+
         lda     #CHDIR_MYDOS
         .byte   $2C             ; BIT <abs>

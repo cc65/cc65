@@ -6,9 +6,11 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2006 Mark Keates <markk@dendrite.co.uk>                          */
+/* (C) 2000-2021 Mark Keates <markk@dendrite.co.uk>                          */
 /*               Freddy Offenga <taf_offenga@yahoo.com>                      */
 /*               Christian Groessler <chris@groessler.org>                   */
+/*               Bill Kendrick <nbs@sonic.net>                               */
+/*               et al.                                                      */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -36,15 +38,16 @@
 #define _ATARI_H
 
 
-
 /* Check for errors */
 #if !defined(__ATARI__)
 #  error This module may only be used when compiling for the Atari!
 #endif
 
 
+/*****************************************************************************/
+/* Character codes                                                           */
+/*****************************************************************************/
 
-/* Character codes */
 #define CH_DELCHR       0xFE   /* delete char under the cursor */
 #define CH_ENTER        0x9B
 #define CH_ESC          0x1B
@@ -86,88 +89,168 @@
 #define CH_HLINE        0x12
 #define CH_VLINE        0x7C
 
-/* color defines */
 
-/* make GTIA color value */
-#define _gtia_mkcolor(hue,lum) (((hue) << 4) | ((lum) << 1))
+/*****************************************************************************/
+/* Masks for joy_read                                                        */
+/*****************************************************************************/
 
-/* luminance values go from 0 (black) to 7 (white) */
+#define JOY_UP_MASK     0x01
+#define JOY_DOWN_MASK   0x02
+#define JOY_LEFT_MASK   0x04
+#define JOY_RIGHT_MASK  0x08
+#define JOY_BTN_1_MASK  0x10
 
-/* hue values */
-#define HUE_GREY        0
-#define HUE_GOLD        1
-#define HUE_GOLDORANGE  2
-#define HUE_REDORANGE   3
-#define HUE_ORANGE      4
-#define HUE_MAGENTA     5
-#define HUE_PURPLE      6
-#define HUE_BLUE        7
-#define HUE_BLUE2       8
-#define HUE_CYAN        9
-#define HUE_BLUEGREEN   10
-#define HUE_BLUEGREEN2  11
-#define HUE_GREEN       12
-#define HUE_YELLOWGREEN 13
-#define HUE_YELLOW      14
-#define HUE_YELLOWRED   15
+#define JOY_FIRE_MASK   JOY_BTN_1_MASK
+#define JOY_FIRE(v)     ((v) & JOY_FIRE_MASK)
 
-/* Color defines, similar to c64 colors (untested) */
-/* Note that the conio color implementation is monochrome (bgcolor and textcolor are only placeholders) */
-/* Use the defines with the setcolor() or _atari_xxxcolor() functions */
-#define COLOR_BLACK             _gtia_mkcolor(HUE_GREY,0)
-#define COLOR_WHITE             _gtia_mkcolor(HUE_GREY,7)
-#define COLOR_RED               _gtia_mkcolor(HUE_REDORANGE,1)
-#define COLOR_CYAN              _gtia_mkcolor(HUE_CYAN,3)
-#define COLOR_VIOLET            _gtia_mkcolor(HUE_PURPLE,4)
-#define COLOR_GREEN             _gtia_mkcolor(HUE_GREEN,2)
-#define COLOR_BLUE              _gtia_mkcolor(HUE_BLUE,2)
-#define COLOR_YELLOW            _gtia_mkcolor(HUE_YELLOW,7)
-#define COLOR_ORANGE            _gtia_mkcolor(HUE_ORANGE,5)
-#define COLOR_BROWN             _gtia_mkcolor(HUE_YELLOW,2)
-#define COLOR_LIGHTRED          _gtia_mkcolor(HUE_REDORANGE,6)
-#define COLOR_GRAY1             _gtia_mkcolor(HUE_GREY,2)
-#define COLOR_GRAY2             _gtia_mkcolor(HUE_GREY,3)
-#define COLOR_LIGHTGREEN        _gtia_mkcolor(HUE_GREEN,6)
-#define COLOR_LIGHTBLUE         _gtia_mkcolor(HUE_BLUE,6)
-#define COLOR_GRAY3             _gtia_mkcolor(HUE_GREY,5)
 
-/* TGI color defines */
-#define TGI_COLOR_BLACK         COLOR_BLACK
-#define TGI_COLOR_WHITE         COLOR_WHITE
-#define TGI_COLOR_RED           COLOR_RED
-#define TGI_COLOR_CYAN          COLOR_CYAN
-#define TGI_COLOR_VIOLET        COLOR_VIOLET
-#define TGI_COLOR_GREEN         COLOR_GREEN
-#define TGI_COLOR_BLUE          COLOR_BLUE
-#define TGI_COLOR_YELLOW        COLOR_YELLOW
-#define TGI_COLOR_ORANGE        COLOR_ORANGE
-#define TGI_COLOR_BROWN         COLOR_BROWN
-#define TGI_COLOR_LIGHTRED      COLOR_LIGHTRED
-#define TGI_COLOR_GRAY1         COLOR_GRAY1
-#define TGI_COLOR_GRAY2         COLOR_GRAY2
-#define TGI_COLOR_LIGHTGREEN    COLOR_LIGHTGREEN
-#define TGI_COLOR_LIGHTBLUE     COLOR_LIGHTBLUE
-#define TGI_COLOR_GRAY3         COLOR_GRAY3
+/*****************************************************************************/
+/* Keyboard values returned by kbcode / CH                                   */
+/*****************************************************************************/
 
-/* color register functions */
-extern void __fastcall__ _setcolor     (unsigned char color_reg, unsigned char hue, unsigned char luminace);
+#define KEY_NONE        ((unsigned char) 0xFF)
+
+#define KEY_0           ((unsigned char) 0x32)
+#define KEY_1           ((unsigned char) 0x1F)
+#define KEY_2           ((unsigned char) 0x1E)
+#define KEY_3           ((unsigned char) 0x1A)
+#define KEY_4           ((unsigned char) 0x18)
+#define KEY_5           ((unsigned char) 0x1D)
+#define KEY_6           ((unsigned char) 0x1B)
+#define KEY_7           ((unsigned char) 0x33)
+#define KEY_8           ((unsigned char) 0x35)
+#define KEY_9           ((unsigned char) 0x30)
+
+#define KEY_A           ((unsigned char) 0x3F)
+#define KEY_B           ((unsigned char) 0x15)
+#define KEY_C           ((unsigned char) 0x12)
+#define KEY_D           ((unsigned char) 0x3A)
+#define KEY_E           ((unsigned char) 0x2A)
+#define KEY_F           ((unsigned char) 0x38)
+#define KEY_G           ((unsigned char) 0x3D)
+#define KEY_H           ((unsigned char) 0x39)
+#define KEY_I           ((unsigned char) 0x0D)
+#define KEY_J           ((unsigned char) 0x01)
+#define KEY_K           ((unsigned char) 0x05)
+#define KEY_L           ((unsigned char) 0x00)
+#define KEY_M           ((unsigned char) 0x25)
+#define KEY_N           ((unsigned char) 0x23)
+#define KEY_O           ((unsigned char) 0x08)
+#define KEY_P           ((unsigned char) 0x0A)
+#define KEY_Q           ((unsigned char) 0x2F)
+#define KEY_R           ((unsigned char) 0x28)
+#define KEY_S           ((unsigned char) 0x3E)
+#define KEY_T           ((unsigned char) 0x2D)
+#define KEY_U           ((unsigned char) 0x0B)
+#define KEY_V           ((unsigned char) 0x10)
+#define KEY_W           ((unsigned char) 0x2E)
+#define KEY_X           ((unsigned char) 0x16)
+#define KEY_Y           ((unsigned char) 0x2B)
+#define KEY_Z           ((unsigned char) 0x17)
+
+#define KEY_COMMA       ((unsigned char) 0x20)
+#define KEY_PERIOD      ((unsigned char) 0x22)
+#define KEY_SLASH       ((unsigned char) 0x26)
+#define KEY_SEMICOLON   ((unsigned char) 0x02)
+#define KEY_PLUS        ((unsigned char) 0x06)
+#define KEY_ASTERISK    ((unsigned char) 0x07)
+#define KEY_DASH        ((unsigned char) 0x0E)
+#define KEY_EQUALS      ((unsigned char) 0x0F)
+#define KEY_LESSTHAN    ((unsigned char) 0x36)
+#define KEY_GREATERTHAN ((unsigned char) 0x37)
+
+#define KEY_ESC         ((unsigned char) 0x1C)
+#define KEY_TAB         ((unsigned char) 0x2C)
+#define KEY_SPACE       ((unsigned char) 0x21)
+#define KEY_RETURN      ((unsigned char) 0x0C)
+#define KEY_DELETE      ((unsigned char) 0x34)
+#define KEY_CAPS        ((unsigned char) 0x3C)
+#define KEY_INVERSE     ((unsigned char) 0x27)
+#define KEY_HELP        ((unsigned char) 0x11)
+
+/* Function keys only exist on the 1200XL model. */
+#define KEY_F1          ((unsigned char) 0x03)
+#define KEY_F2          ((unsigned char) 0x04)
+#define KEY_F3          ((unsigned char) 0x13)
+#define KEY_F4          ((unsigned char) 0x14)
+
+/* N.B. Cannot read Ctrl key alone */
+#define KEY_CTRL        ((unsigned char) 0x80)
+
+/* N.B. Cannot read Shift key alone via KBCODE;
+** instead, check "Shfit key press" bit of SKSTAT register.
+** Also, no way to tell left Shift from right Shift.
+*/
+#define KEY_SHIFT       ((unsigned char) 0x40)
+
+
+/* Composed keys
+** (Other combinations are possible, including Shift+Ctrl+key,
+** though not all such combinations are available.)
+*/
+
+#define KEY_EXCLAMATIONMARK     (KEY_1 | KEY_SHIFT)
+#define KEY_QUOTE               (KEY_2 | KEY_SHIFT)
+#define KEY_HASH                (KEY_3 | KEY_SHIFT)
+#define KEY_DOLLAR              (KEY_4 | KEY_SHIFT)
+#define KEY_PERCENT             (KEY_5 | KEY_SHIFT)
+#define KEY_AMPERSAND           (KEY_6 | KEY_SHIFT)
+#define KEY_APOSTROPHE          (KEY_7 | KEY_SHIFT)
+#define KEY_AT                  (KEY_8 | KEY_SHIFT)
+#define KEY_OPENINGPARAN        (KEY_9 | KEY_SHIFT)
+#define KEY_CLOSINGPARAN        (KEY_0 | KEY_SHIFT)
+#define KEY_UNDERLINE           (KEY_DASH | KEY_SHIFT)
+#define KEY_BAR                 (KEY_EQUALS | KEY_SHIFT)
+#define KEY_COLON               (KEY_SEMICOLON | KEY_SHIFT)
+#define KEY_BACKSLASH           (KEY_PLUS | KEY_SHIFT)
+#define KEY_CIRCUMFLEX          (KEY_ASTERISK | KEY_SHIFT)
+#define KEY_OPENINGBRACKET      (KEY_COMMA | KEY_SHIFT)
+#define KEY_CLOSINGBRACKET      (KEY_PERIOD | KEY_SHIFT)
+#define KEY_QUESTIONMARK        (KEY_SLASH | KEY_SHIFT)
+#define KEY_CLEAR               (KEY_LESSTHAN | KEY_SHIFT)
+#define KEY_INSERT              (KEY_GREATERTHAN | KEY_SHIFT)
+
+#define KEY_UP      (KEY_DASH | KEY_CTRL)
+#define KEY_DOWN    (KEY_EQUALS | KEY_CTRL)
+#define KEY_LEFT    (KEY_PLUS | KEY_CTRL)
+#define KEY_RIGHT   (KEY_ASTERISK | KEY_CTRL)
+
+
+/*****************************************************************************/
+/* Color register functions                                                  */
+/*****************************************************************************/
+
+extern void __fastcall__ _setcolor     (unsigned char color_reg, unsigned char hue, unsigned char luminance);
 extern void __fastcall__ _setcolor_low (unsigned char color_reg, unsigned char color_value);
 extern unsigned char __fastcall__ _getcolor (unsigned char color_reg);
 
-/* other screen functions */
+/*****************************************************************************/
+/* Other screen functions                                                    */
+/*****************************************************************************/
+
+extern void waitvsync (void);                            /* wait for start of next frame */
 extern int  __fastcall__ _graphics (unsigned char mode); /* mode value same as in BASIC */
 extern void __fastcall__ _scroll (signed char numlines);
                                           /* numlines > 0  scrolls up */
                                           /* numlines < 0  scrolls down */
 
-/* misc. functions */
-extern unsigned char get_ostype(void);  /* get ROM version */
-extern unsigned char get_tv(void);      /* get TV system */
-extern void _save_vecs(void);           /* save system vectors */
-extern void _rest_vecs(void);           /* restore system vectors */
-extern char *_getdefdev(void);          /* get default floppy device */
 
-/* global variables */
+/*****************************************************************************/
+/* Misc. functions                                                           */
+/*****************************************************************************/
+
+extern unsigned char get_ostype(void);       /* get ROM version */
+extern unsigned char get_tv(void);           /* get TV system */
+extern void _save_vecs(void);                /* save system vectors */
+extern void _rest_vecs(void);                /* restore system vectors */
+extern char *_getdefdev(void);               /* get default floppy device */
+extern unsigned char _is_cmdline_dos(void);  /* does DOS support command lines */
+
+
+/*****************************************************************************/
+/* Global variables                                                          */
+/*****************************************************************************/
+
 extern unsigned char _dos_type;         /* the DOS flavour */
 #ifndef __ATARIXL__
 extern void atr130_emd[];
@@ -221,19 +304,11 @@ extern void atrx15_tgi[];
 extern void atrx15p2_tgi[];
 #endif
 
-/* provide old names for backwards compatibility */
-#ifdef ATARI_COMPAT_PRE_2_11
-#define setcolor     _setcolor
-#define setcolor_low _setcolor_low
-#define getcolor     _getcolor
-#define graphics     _graphics
-#define scroll       _scroll
-#define save_vecs    _save_vecs
-#define rest_vecs    _rest_vecs
-#define getdefdev    _getdefdev
-#endif  /* #ifdef ATARI_COMPAT_PRE_2_11 */
 
-/* get_ostype return value defines (for explanation, see ostype.s) */
+/*****************************************************************************/
+/* get_ostype return value defines (for explanation, see ostype.s)           */
+/*****************************************************************************/
+
 /* masks */
 #define AT_OS_TYPE_MAIN  7
 #define AT_OS_TYPE_MINOR (7 << 3)
@@ -256,19 +331,37 @@ extern void atrx15p2_tgi[];
 #define AT_OS_XLXE_3   3
 #define AT_OS_XLXE_4   4
 
-/* get_tv return values */
+
+/*****************************************************************************/
+/* get_tv return values                                                      */
+/*****************************************************************************/
+
 #define AT_NTSC     0
 #define AT_PAL      1
 
-/* valid _dos_type values */
-#define ATARIDOS    0
-#define SPARTADOS   1
-#define OSADOS      2
-#define MYDOS       3
+
+/*****************************************************************************/
+/* valid _dos_type values                                                    */
+/*****************************************************************************/
+
+#define SPARTADOS   0
+#define REALDOS     1
+#define BWDOS       2
+#define OSADOS      3
 #define XDOS        4
+#define ATARIDOS    5
+#define MYDOS       6
 #define NODOS       255
 
-/* Define hardware */
+
+/*****************************************************************************/
+/* Define hardware and where they're mapped in memory                        */
+/*****************************************************************************/
+
+#include <_atarios.h>
+#define OS (*(struct __os*)0x0000)
+#define BASIC (*(struct __basic*)0x0080)
+
 #include <_gtia.h>
 #define GTIA_READ  (*(struct __gtia_read*)0xD000)
 #define GTIA_WRITE (*(struct __gtia_write*)0xD000)
@@ -285,64 +378,171 @@ extern void atrx15p2_tgi[];
 #include <_antic.h>
 #define ANTIC (*(struct __antic*)0xD400)
 
-/* device control block */
-struct __dcb {
-    unsigned char device;     /* device id */
-    unsigned char unit;       /* unit number */
-    unsigned char command;    /* command */
-    unsigned char status;     /* command type / status return */
-    void          *buffer;    /* pointer to buffer */
-    unsigned char timeout;    /* device timeout in seconds */
-    unsigned char unused;
-    unsigned int  xfersize;   /* # of bytes to transfer */
-    unsigned char aux1;       /* 1st command auxiliary byte */
-    unsigned char aux2;       /* 2nd command auxiliary byte */
-};
-#define DCB (*(struct __dcb *)0x300)
 
-/* I/O control block */
-struct __iocb {
-    unsigned char handler;    /* handler index number (0xff free) */
-    unsigned char drive;      /* device number (drive) */
-    unsigned char command;    /* command */
-    unsigned char status;     /* status of last operation */
-    void          *buffer;    /* pointer to buffer */
-    void          *put_byte;  /* pointer to device's PUT BYTE routine */
-    unsigned int  buflen;     /* length of buffer */
-    unsigned char aux1;       /* 1st auxiliary byte */
-    unsigned char aux2;       /* 2nd auxiliary byte */
-    unsigned char aux3;       /* 3rd auxiliary byte */
-    unsigned char aux4;       /* 4th auxiliary byte */
-    unsigned char aux5;       /* 5th auxiliary byte */
-    unsigned char spare;      /* spare byte */
-};
-#define ZIOCB (*(struct __iocb *)0x20)  /* zero page IOCB */
-#define IOCB (*(struct __iocb *)0x340)  /* system IOCB buffers */
+/*****************************************************************************/
+/* conio and TGI color defines                                               */
+/*****************************************************************************/
 
-/* IOCB Command Codes */
-#define IOCB_OPEN        0x03  /* open */
-#define IOCB_GETREC      0x05  /* get record */
-#define IOCB_GETCHR      0x07  /* get character(s) */
-#define IOCB_PUTREC      0x09  /* put record */
-#define IOCB_PUTCHR      0x0B  /* put character(s) */
-#define IOCB_CLOSE       0x0C  /* close */
-#define IOCB_STATIS      0x0D  /* status */
-#define IOCB_SPECIL      0x0E  /* special */
-#define IOCB_DRAWLN      0x11  /* draw line */
-#define IOCB_FILLIN      0x12  /* draw line with right fill */
-#define IOCB_RENAME      0x20  /* rename disk file */
-#define IOCB_DELETE      0x21  /* delete disk file */
-#define IOCB_LOCKFL      0x23  /* lock file (set to read-only) */
-#define IOCB_UNLOCK      0x24  /* unlock file */
-#define IOCB_POINT       0x25  /* point sector */
-#define IOCB_NOTE        0x26  /* note sector */
-#define IOCB_GETFL       0x27  /* get file length */
-#define IOCB_CHDIR_MYDOS 0x29  /* change directory (MyDOS) */
-#define IOCB_MKDIR       0x2A  /* make directory (MyDOS/SpartaDOS) */
-#define IOCB_RMDIR       0x2B  /* remove directory (SpartaDOS) */
-#define IOCB_CHDIR_SPDOS 0x2C  /* change directory (SpartaDOS) */
-#define IOCB_GETCWD      0x30  /* get current directory (MyDOS/SpartaDOS) */
-#define IOCB_FORMAT      0xFE  /* format */
+/* Note that the conio color implementation is monochrome
+** (textcolor just sets text brightness low or high, depending on background
+** color)
+** These values can be used with bordercolor(), bgcolor(), and _setcolor_low()
+*/
+#define COLOR_BLACK      GTIA_COLOR_BLACK
+#define COLOR_WHITE      GTIA_COLOR_WHITE
+#define COLOR_RED        GTIA_COLOR_RED
+#define COLOR_CYAN       GTIA_COLOR_CYAN
+#define COLOR_VIOLET     GTIA_COLOR_VIOLET
+#define COLOR_GREEN      GTIA_COLOR_GREEN
+#define COLOR_BLUE       GTIA_COLOR_BLUE
+#define COLOR_YELLOW     GTIA_COLOR_YELLOW
+#define COLOR_ORANGE     GTIA_COLOR_ORANGE
+#define COLOR_BROWN      GTIA_COLOR_BROWN
+#define COLOR_LIGHTRED   GTIA_COLOR_LIGHTRED
+#define COLOR_GRAY1      GTIA_COLOR_GRAY1
+#define COLOR_GRAY2      GTIA_COLOR_GRAY2
+#define COLOR_LIGHTGREEN GTIA_COLOR_LIGHTGREEN
+#define COLOR_LIGHTBLUE  GTIA_COLOR_LIGHTBLUE
+#define COLOR_GRAY3      GTIA_COLOR_GRAY3
+
+/* TGI color defines */
+#define TGI_COLOR_BLACK      COLOR_BLACK
+#define TGI_COLOR_WHITE      COLOR_WHITE
+#define TGI_COLOR_RED        COLOR_RED
+#define TGI_COLOR_CYAN       COLOR_CYAN
+#define TGI_COLOR_VIOLET     COLOR_VIOLET
+#define TGI_COLOR_GREEN      COLOR_GREEN
+#define TGI_COLOR_BLUE       COLOR_BLUE
+#define TGI_COLOR_YELLOW     COLOR_YELLOW
+#define TGI_COLOR_ORANGE     COLOR_ORANGE
+#define TGI_COLOR_BROWN      COLOR_BROWN
+#define TGI_COLOR_LIGHTRED   COLOR_LIGHTRED
+#define TGI_COLOR_GRAY1      COLOR_GRAY1
+#define TGI_COLOR_GRAY2      COLOR_GRAY2
+#define TGI_COLOR_LIGHTGREEN COLOR_LIGHTGREEN
+#define TGI_COLOR_LIGHTBLUE  COLOR_LIGHTBLUE
+#define TGI_COLOR_GRAY3      COLOR_GRAY3
+
+
+/*****************************************************************************/
+/* PIA PORTA and PORTB register bits                                         */
+/*****************************************************************************/
+
+/* See also: "JOY_xxx_MASK" in "atari.h" */
+
+/* Paddle 0-3 triggers (per PORTA bits) */
+#define PORTA_PTRIG3 0x80
+#define PORTA_PTRIG2 0x40
+#define PORTA_PTRIG1 0x08
+#define PORTA_PTRIG0 0x04
+
+
+/* On the Atari 400/800, PORTB is the same as PORTA, but for controller ports 3 & 4. */
+
+/* Paddle 4-7 triggers (per PORTB bits); only 400/800 had four controller ports */
+#define PORTB_PTRIG7 0x80
+#define PORTB_PTRIG6 0x40
+#define PORTB_PTRIG5 0x08
+#define PORTB_PTRIG4 0x04
+
+
+/* On the XL series of computers, PORTB has been changed to a memory and
+** LED control (1200XL model only) register (read/write):
+*/
+
+/* If set, the built-in OS is enabled, and occupies the address range $C000-$FFFF
+** (except that the area $D000-$D7FF will only access the hardware registers.)
+** If clear, RAM is enabled in this area (again, save for the hole.)
+*/
+#define PORTB_OSROM            0x01
+
+/* If set, RAM is enabled for the address range $A000-$BFFF.
+** If clear, the built-in BASIC ROM is enabled at this address.
+** And if there is a cartridge installed in the computer, it makes no difference.
+*/
+#define PORTB_BASICROM         0x02
+
+/* If set, the corresponding LED is turned off. If clear, the LED will be on.
+** (1200XL only)
+*/
+#define PORTB_LED1             0x04
+#define PORTB_LED2             0x08
+
+
+/* On the XE series of computers, PORTB is a bank-selected memory control register (read/write): */
+
+/* These bits determine which memory bank is visible to the CPU and/or ANTIC chip
+** when their Bank Switch bit is set. There are four possible banks of 16KB each.
+*/
+#define PORTB_BANKSELECT1      0x00
+#define PORTB_BANKSELECT2      0x04
+#define PORTB_BANKSELECT3      0x08
+#define PORTB_BANKSELECT4      0x0C
+
+/* If set, the CPU and/or ANTIC chip will access bank-switched memory mapped to the
+** address range $4000-$7FFF.
+** If clear, the CPU and/or ANTIC will see normal memory in this region.
+*/
+#define PORTB_BANKSWITCH_CPU   0x10
+#define PORTB_BANKSWITCH_ANTIC 0x20
+
+/* If set, RAM is enabled for the address range $5000-$57FF.
+** If clear, the self-test ROM (physically located at $D000-$D7FF, under the hardware registers)
+** is remapped to this memory area.
+*/
+#define PORTB_SELFTEST         0x80
+
+
+/*****************************************************************************/
+/* PACTL and PBCTL register bits                                             */
+/*****************************************************************************/
+
+/* (W) Peripheral PA1/PB1 interrupt (IRQ) ("peripheral proceed line available") enable.
+** One equals enable. Set by the OS but available to the user; reset on powerup.
+** (PxCTL_IRQ_STATUS (R) bit will get set upon interrupt occurance)
+*/
+#define PxCTL_IRQ_ENABLE         0x01 /* bit 0 */
+
+/* Note: Bit 1 is always set to */
+
+/* (W) Controls PORTA/PORTB addressing
+** 1 = PORTA/PORTB register; read/write to controller port
+** 0 = direction control register; write to direction controls
+**     (allows setting data flow; write 0s & 1s to PORTA/PORTB bits
+**     to set which port's pins are read (input), or write (output),
+**     respectively)
+*/
+#define PxCTL_ADDRESSING         0x04 /* bit 2 */
+
+/* (W) Peripheral motor control line; Turn the cassette on or off
+** (PACTL-specific register bit)
+** 0 = on
+** 1 = off
+*/
+#define PACTL_MOTOR_CONTROL      0x08 /* bit 3 */
+
+/* Peripheral command identification (serial bus command line)
+** (PBCTL-specific register bit)
+*/
+#define PBCTL_PERIPH_CMD_IDENT   0x08 /* bit 3 */
+
+/* Note: Bits 4 & 5 are always set to 1 */
+
+/* Note: Bit 6 is always set to 0 */
+
+/* (R) Peripheral interrupt (IRQ) status bit.
+** Set by Peripherals (PORTA / PORTB).  Reset by reading from PORTA / PORTB.
+** PACTL's is interrupt status of PROCEED
+** PBCTL's is interrupt status of SIO
+*/
+#define PxCTL_IRQ_STATUS         0x80
+
+
+/* The following #define will cause the matching function calls in conio.h
+** to be overlaid by macros with the same names, saving the function call
+** overhead.
+*/
+#define _textcolor(color)        COLOR_WHITE
 
 /* End of atari.h */
-#endif /* #ifndef _ATARI_H */
+#endif

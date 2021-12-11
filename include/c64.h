@@ -99,6 +99,13 @@
 #define TGI_COLOR_LIGHTBLUE     COLOR_LIGHTBLUE
 #define TGI_COLOR_GRAY3         COLOR_GRAY3
 
+/* Masks for joy_read */
+#define JOY_UP_MASK             0x01
+#define JOY_DOWN_MASK           0x02
+#define JOY_LEFT_MASK           0x04
+#define JOY_RIGHT_MASK          0x08
+#define JOY_BTN_1_MASK          0x10
+
 /* Define hardware */
 #include <_vic2.h>
 #define VIC     (*(struct __vic2*)0xD000)
@@ -130,10 +137,12 @@
 
 
 /* The addresses of the static drivers */
+extern void c64_65816_emd[];
 extern void c64_c256k_emd[];
 extern void c64_dqbb_emd[];
 extern void c64_georam_emd[];
 extern void c64_isepic_emd[];
+extern void c64_kerberos_emd[];
 extern void c64_ram_emd[];
 extern void c64_ramcart_emd[];
 extern void c64_reu_emd[];

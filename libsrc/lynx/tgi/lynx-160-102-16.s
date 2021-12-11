@@ -1,10 +1,10 @@
 ;
 ; Graphics driver for the 160x102x16 mode on the Lynx.
 ;
-; All the drawing functions are simply done by sprites as the sprite
+; All the drawing functions simply are done by sprites, as the sprite
 ; engine is the only way to do fast graphics on a Lynx.
 ;
-; This code is written by Karri Kaksonen, 2004 for the cc65 compiler.
+; This code was written by Karri Kaksonen, 2004 for the cc65 compiler.
 ;
 
         .include        "zeropage.inc"
@@ -29,7 +29,7 @@
 
         .byte   $74, $67, $69           ; "tgi"
         .byte   TGI_API_VERSION         ; TGI API version number
-        .addr   $0000                   ; Library reference
+libref: .addr   $0000                   ; Library reference
         .word   160                     ; X resolution
         .word   102                     ; Y resolution
         .byte   16                      ; Number of drawing colors
@@ -64,7 +64,6 @@
         .addr   BAR
         .addr   TEXTSTYLE
         .addr   OUTTEXT
-        .addr   IRQ
 
 
 ; ------------------------------------------------------------------------
@@ -105,8 +104,10 @@ BGINDEX:        .res    1       ; Pen to use for text background
 DRAWPAGE:       .res    1
 SWAPREQUEST:    .res    1
 
+; 8 rows with (one offset-byte plus 20 character bytes plus one fill-byte) plus one 0-offset-byte.
+; (As an experiment, the fill-byte isn't being generated.
+;  It might not be needed to work around a Suzy bug.)
 text_bitmap:    .res    8*(1+20+1)+1
-; 8 rows with (one offset-byte plus 20 character bytes plus one fill-byte) plus one 0-offset-byte
 
 ; Constants and tables
 
@@ -164,6 +165,18 @@ INSTALL:
         stz     BGINDEX
         stz     DRAWPAGE
         stz     SWAPREQUEST
+        lda     libref
+        ldx     libref+1
+        sta     ptr1
+        stx     ptr1+1
+        ldy     #1
+        lda     #<irq
+        sta     (ptr1),y
+        iny
+        lda     #>irq
+        sta     (ptr1),y
+        lda     #$4C            ; Jump opcode
+        sta     (ptr1)          ; Activate IRQ routine
         rts
 
 
@@ -175,6 +188,12 @@ INSTALL:
 ;
 
 UNINSTALL:
+        lda     libref
+        ldx     libref+1
+        sta     ptr1
+        stx     ptr1+1
+        lda     #$60            ; RTS opcode
+        sta     (ptr1)          ; Disable IRQ routine
         rts
 
 
@@ -466,14 +485,10 @@ SETDRAWPAGE:
         stx     DRAWPAGEH
         rts
 
-; ------------------------------------------------------------------------
-; IRQ: VBL interrupt handler
-;
-
-IRQ:
+irq:
         lda     INTSET          ; Poll all pending interrupts
         and     #VBL_INTERRUPT
-        beq     IRQEND          ; Exit if not a VBL interrupt
+        beq     @L0             ; Exit if not a VBL interrupt
 
         lda     SWAPREQUEST
         beq     @L0
@@ -485,7 +500,6 @@ IRQ:
         jsr     SETDRAWPAGE
         stz     SWAPREQUEST
 @L0:
-IRQEND:
         clc
         rts
 
@@ -818,7 +832,7 @@ TEXTSTYLE:
 
 ; ------------------------------------------------------------------------
 ; OUTTEXT: Output text at X/Y = ptr1/ptr2 using the current color and the
-; current text style. The text to output is given as a zero terminated
+; current text style. The text to output is given as a zero-terminated
 ; string with address in ptr3.
 ;
 ; Must set an error code: NO
@@ -830,12 +844,11 @@ OUTTEXT:
         lda     TEXTMAGY
         sta     text_sy+1
 
-        stz     text_sprite     ; Set normal sprite
         lda     BGINDEX
-        bne     @L1
-        lda     #4
-        sta     text_sprite     ; Set opaque sprite
+        beq     @L1             ; Choose opaque black sprite?
+        lda     #$04            ; No, choose normal sprite
 @L1:
+        sta     text_sprite
         lda     DRAWINDEX       ; Set color
         asl
         asl
@@ -863,15 +876,18 @@ OUTTEXT:
         ldy     #20
 @L3:
         sty     STRLEN
+        tya
         bne     @L4
-        rts                     ; Zero length string
+        rts                     ; Zero-length string
 @L4:
         iny                     ; Prepare text_bitmap
-        iny
+
+; The next instruction is commented because the code won't include a fill-byte.
+;        iny
         sty     STROFF
 
         ldy     #8-1            ; 8 pixel lines per character
-        ldx     #0
+        ldx     #$00
         clc
 @L5:
         lda     STROFF
@@ -879,45 +895,45 @@ OUTTEXT:
         txa
         adc     STROFF
         tax
-        lda     #$ff
-        sta     text_bitmap-1,x
+
+; This was the fill-byte.
+;        lda     #$FF
+;        sta     text_bitmap-1,x
         dey
         bpl     @L5
         stz     text_bitmap,x
 
         stz     tmp2
-        iny
+        iny                     ;(ldy #$00)
 @L6:
         lda     (STRPTR),y
         sty     tmp1
 
-        sec                     ; (ch-' ') * 8
-        sbc     #32
-        stz     FONTOFF
+        sub     #' '            ; (ch - ' ') * 8
         stz     FONTOFF+1
         asl
         asl
         rol     FONTOFF+1
         asl
         rol     FONTOFF+1
-        clc                     ; Choose font
-        adc     #<font
+        ;clc                    ; (cleared by rol)
+        adc     #<font          ; Choose font
         sta     FONTOFF
         lda     FONTOFF+1
         adc     #>font
         sta     FONTOFF+1
 
-; and now copy the 8 bytes of that char
+; And now, copy the 8 bytes of that glyph.
 
         ldx     tmp2
         inx
         stx     tmp2
 
-; draw char from top to bottom, reading char-data from offset 8-1 to offset 0
+; Draw char. from top to bottom, reading char-data from offset 8-1 to offset 0.
         ldy     #8-1
 @L7:
-        lda     (FONTOFF),y         ; *chptr
-        sta     text_bitmap,x    ;textbuf[y*(1+len+1)+1+x]
+        lda     (FONTOFF),y     ; *chptr
+        sta     text_bitmap,x   ; textbuf[y*(1+len+1)+1+x]
 
         txa
         adc     STROFF
@@ -926,7 +942,7 @@ OUTTEXT:
         dey
         bpl     @L7
 
-        ; goto next char
+        ; Goto next char.
         ldy     tmp1
         iny
         dec     STRLEN
@@ -963,24 +979,24 @@ font:
         .byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF  ;32
         .byte $FF, $E7, $FF, $FF, $E7, $E7, $E7, $E7  ;33
         .byte $FF, $FF, $FF, $FF, $FF, $99, $99, $99  ;34
-        .byte $FF, $99, $99, $00, $99, $00, $99, $99  ;35
+        .byte $FF, $D7, $D7, $01, $D7, $01, $D7, $D7  ;35
         .byte $FF, $E7, $83, $F9, $C3, $9F, $C1, $E7  ;36
         .byte $FF, $B9, $99, $CF, $E7, $F3, $99, $9D  ;37
-        .byte $FF, $C0, $99, $98, $C7, $C3, $99, $C3  ;38
+        .byte $81, $B3, $31, $8F, $87, $33, $87, $FF  ;38
         .byte $FF, $FF, $FF, $FF, $FF, $E7, $F3, $F9  ;39
         .byte $FF, $F3, $E7, $CF, $CF, $CF, $E7, $F3  ;40
         .byte $FF, $CF, $E7, $F3, $F3, $F3, $E7, $CF  ;41
-        .byte $FF, $FF, $99, $C3, $00, $C3, $99, $FF  ;42
+        .byte $FF, $99, $C3, $81, $C3, $99, $FF, $FF  ;42
         .byte $FF, $FF, $E7, $E7, $81, $E7, $E7, $FF  ;43
         .byte $CF, $E7, $E7, $FF, $FF, $FF, $FF, $FF  ;44
         .byte $FF, $FF, $FF, $FF, $81, $FF, $FF, $FF  ;45
         .byte $FF, $E7, $E7, $FF, $FF, $FF, $FF, $FF  ;46
-        .byte $FF, $9F, $CF, $E7, $F3, $F9, $FC, $FF  ;47
+        .byte $FF, $BF, $9F, $CF, $E7, $F3, $F9, $FD  ;47
         .byte $FF, $C3, $99, $99, $89, $91, $99, $C3  ;48
         .byte $FF, $81, $E7, $E7, $E7, $C7, $E7, $E7  ;49
         .byte $FF, $81, $9F, $CF, $F3, $F9, $99, $C3  ;50
         .byte $FF, $C3, $99, $F9, $E3, $F9, $99, $C3  ;51
-        .byte $FF, $F9, $F9, $80, $99, $E1, $F1, $F9  ;52
+        .byte $FF, $F3, $F3, $01, $33, $C3, $E3, $FB  ;52
         .byte $FF, $C3, $99, $F9, $F9, $83, $9F, $81  ;53
         .byte $FF, $C3, $99, $99, $83, $9F, $99, $C3  ;54
         .byte $FF, $E7, $E7, $E7, $E7, $F3, $99, $81  ;55
@@ -1007,7 +1023,7 @@ font:
         .byte $FF, $C7, $93, $F3, $F3, $F3, $F3, $E1  ;10
         .byte $FF, $99, $93, $87, $8F, $87, $93, $99  ;11
         .byte $FF, $81, $9F, $9F, $9F, $9F, $9F, $9F  ;12
-        .byte $FF, $9C, $9C, $9C, $94, $80, $88, $9C  ;13
+        .byte $FF, $39, $39, $39, $29, $01, $11, $39  ;13
         .byte $FF, $99, $99, $91, $81, $81, $89, $99  ;14
         .byte $FF, $C3, $99, $99, $99, $99, $99, $C3  ;15
         .byte $FF, $9F, $9F, $9F, $83, $99, $99, $83  ;16
@@ -1017,7 +1033,7 @@ font:
         .byte $FF, $E7, $E7, $E7, $E7, $E7, $E7, $81  ;20
         .byte $FF, $C3, $99, $99, $99, $99, $99, $99  ;21
         .byte $FF, $E7, $C3, $99, $99, $99, $99, $99  ;22
-        .byte $FF, $9C, $88, $80, $94, $9C, $9C, $9C  ;23
+        .byte $FF, $39, $11, $01, $29, $39, $39, $39  ;23
         .byte $FF, $99, $99, $C3, $E7, $C3, $99, $99  ;24
         .byte $FF, $E7, $E7, $E7, $C3, $99, $99, $99  ;25
         .byte $FF, $81, $9F, $CF, $E7, $F3, $F9, $81  ;26
@@ -1025,7 +1041,7 @@ font:
         .byte $FF, $03, $9D, $CF, $83, $CF, $ED, $F3  ;28
         .byte $FF, $C3, $F3, $F3, $F3, $F3, $F3, $C3  ;29
         .byte $E7, $E7, $E7, $E7, $81, $C3, $E7, $FF  ;30
-        .byte $FF, $EF, $CF, $80, $80, $CF, $EF, $FF  ;31
+        .byte $FF, $DF, $9F, $01, $01, $9F, $DF, $FF  ;31
 
 
 ; gemena
@@ -1042,7 +1058,7 @@ font:
         .byte $C3, $F9, $F9, $F9, $F9, $FF, $F9, $FF  ;234
         .byte $FF, $99, $93, $87, $93, $9F, $9F, $FF  ;235
         .byte $FF, $C3, $E7, $E7, $E7, $E7, $C7, $FF  ;236
-        .byte $FF, $9C, $94, $80, $80, $99, $FF, $FF  ;237
+        .byte $FF, $39, $29, $01, $83, $93, $FF, $FF  ;237
         .byte $FF, $99, $99, $99, $99, $83, $FF, $FF  ;238
         .byte $FF, $C3, $99, $99, $99, $C3, $FF, $FF  ;239
         .byte $9F, $9F, $83, $99, $99, $83, $FF, $FF  ;240
@@ -1052,7 +1068,7 @@ font:
         .byte $FF, $F1, $E7, $E7, $E7, $81, $E7, $FF  ;244
         .byte $FF, $C1, $99, $99, $99, $99, $FF, $FF  ;245
         .byte $FF, $E7, $C3, $99, $99, $99, $FF, $FF  ;246
-        .byte $FF, $C9, $C1, $80, $94, $9C, $FF, $FF  ;247
+        .byte $FF, $93, $83, $01, $29, $39, $FF, $FF  ;247
         .byte $FF, $99, $C3, $E7, $C3, $99, $FF, $FF  ;248
         .byte $87, $F3, $C1, $99, $99, $99, $FF, $FF  ;249
         .byte $FF, $81, $CF, $E7, $F3, $81, $FF, $FF  ;250
@@ -1060,4 +1076,4 @@ font:
         .byte $FF, $03, $9D, $CF, $83, $CF, $ED, $F3  ;252
         .byte $FF, $C3, $F3, $F3, $F3, $F3, $F3, $C3  ;253
         .byte $E7, $E7, $E7, $E7, $81, $C3, $E7, $FF  ;254
-        .byte $FF, $EF, $CF, $80, $80, $CF, $EF, $FF  ;255
+        .byte $FF, $DF, $9F, $01, $01, $9F, $DF, $FF  ;255

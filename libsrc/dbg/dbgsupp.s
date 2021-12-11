@@ -6,7 +6,7 @@
 
         .export         _DbgInit
         .export         _DbgSP, _DbgCS, _DbgHI
-        .import         popax, return0, _DbgEntry, _set_brk, _end_brk
+        .import         popptr1, return0, _DbgEntry, _set_brk, _end_brk
         .import         _DbgBreaks
         .import         _brk_pc
         .import         __ZP_START__            ; Linker generated
@@ -170,9 +170,7 @@ L12:    ldy     #1              ; Force != 0
         .export         _DbgIsBreak
 
 _DbgIsBreak:
-        jsr     popax           ; Get address
-        sta     ptr1
-        stx     ptr1+1
+        jsr     popptr1         ; Get address
         ldx     #0
 L20:    lda     _DbgBreaks+3,x  ; Get bk_use
         beq     L21             ; Jump if not set

@@ -1,6 +1,7 @@
         .include        "gamate.inc"
         .include        "extzp.inc"
 
+        .import         fontdata
         .import         colors
         .importzp       ptr1, tmp1
 
@@ -8,11 +9,12 @@
 
         .macpack        longbranch
 
-        .segment        "INIT"
+        .segment        "ONCE"
 initconio:
         lda     #0
         sta     LCD_XPOS
         sta     LCD_YPOS
+        sta     RVS
 
         lda     #LCD_MODE_INC_Y
         sta     LCD_MODE
@@ -23,8 +25,3 @@ initconio:
         sta     BGCOLOR
         rts
 
-        .segment        "RODATA"
-
-        .export         fontdata
-fontdata:
-        .include        "vga.inc"

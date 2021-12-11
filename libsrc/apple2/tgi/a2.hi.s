@@ -115,7 +115,6 @@ pages:  .byte   2               ; Number of screens available
         .addr   BAR
         .addr   TEXTSTYLE
         .addr   OUTTEXT
-        .addr   0               ; IRQ entry is unused
 
 ; ------------------------------------------------------------------------
 
@@ -176,6 +175,10 @@ INIT:
         ; Switch into graphics mode
         bit     MIXCLR
         bit     HIRES
+        .ifdef  __APPLE2ENH__
+        sta     IOUDISON
+        bit     DHIRESOFF
+        .endif
         bit     TXTCLR
 
         ; Beagle Bros Shape Mechanic fonts don't

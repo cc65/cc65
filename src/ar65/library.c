@@ -36,6 +36,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#if defined(_WIN32)
+#  include <process.h>
+#else
+#  include <sys/types.h>
+#  include <unistd.h>
+#endif
 
 /* common */
 #include "cmdline.h"
@@ -95,11 +101,11 @@ static void ReadHeader (void)
     /* Read the header fields, checking magic and version */
     Header.Magic   = Read32 (Lib);
     if (Header.Magic != LIB_MAGIC) {
-        Error ("`%s' is not a valid library file", LibName);
+        Error ("'%s' is not a valid library file", LibName);
     }
     Header.Version = Read16 (Lib);
     if (Header.Version != LIB_VERSION) {
-        Error ("Wrong data version in `%s'", LibName);
+        Error ("Wrong data version in '%s'", LibName);
     }
     Header.Flags   = Read16 (Lib);
     Header.IndexOffs = Read32 (Lib);
@@ -229,11 +235,11 @@ void LibOpen (const char* Name, int MustExist, int NeedTemp)
 
         /* File does not exist */
         if (MustExist) {
-            Error ("Library `%s' does not exist", Name);
+            Error ("Library '%s' does not exist", Name);
         } else {
             /* Announce the library's creation if ar65 is verbose. */
             Print (stdout, 1,
-                   "%s: Library `%s' will be created.\n", ProgName, Name);
+                   "%s: Library '%s' will be created.\n", ProgName, Name);
         }
 
     } else {
@@ -249,9 +255,8 @@ void LibOpen (const char* Name, int MustExist, int NeedTemp)
     if (NeedTemp) {
 
         /* Create the temporary library name */
-        NewLibName = xmalloc (strlen (Name) + strlen (".temp") + 1);
-        strcpy (NewLibName, Name);
-        strcat (NewLibName, ".temp");
+        NewLibName = xmalloc (strlen (Name) + (sizeof (".temp-") - 1)  + 2 * sizeof (unsigned int) + 1);
+        sprintf (NewLibName, "%s.temp-%X", Name, (unsigned int)getpid ());
 
         /* Create the temporary library */
         NewLib = fopen (NewLibName, "w+b");
@@ -317,7 +322,7 @@ static void LibCheckExports (ObjData* O)
     unsigned I;
 
     /* Let the user know what we do */
-    Print (stdout, 2, "Module `%s' (%u exports):\n", O->Name, CollCount (&O->Exports));
+    Print (stdout, 2, "Module '%s' (%u exports):\n", O->Name, CollCount (&O->Exports));
 
     /* Insert the exports into the global table */
     for (I = 0; I < CollCount (&O->Exports); ++I) {
@@ -381,7 +386,7 @@ void LibClose (void)
         /* Reopen the library and truncate it */
         Lib = fopen (LibName, "wb");
         if (Lib == 0) {
-            Error ("Cannot open library `%s' for writing: %s",
+            Error ("Cannot open library '%s' for writing: %s",
                    LibName, strerror (errno));
         }
 
@@ -389,19 +394,21 @@ void LibClose (void)
         fseek (NewLib, 0, SEEK_SET);
         while ((Count = fread (Buf, 1, sizeof (Buf), NewLib)) != 0) {
             if (fwrite (Buf, 1, Count, Lib) != Count) {
-                Error ("Cannot write to `%s': %s", LibName, strerror (errno));
+                Error ("Cannot write to '%s': %s", LibName, strerror (errno));
             }
         }
     }
 
     /* Close both files */
     if (Lib && fclose (Lib) != 0) {
-        Error ("Problem closing `%s': %s", LibName, strerror (errno));
+        Error ("Problem closing '%s': %s", LibName, strerror (errno));
     }
     if (NewLib && fclose (NewLib) != 0) {
-        Error ("Problem closing temporary library file: %s", strerror (errno));
+        Error ("Problem closing temporary library file '%s': %s",
+               NewLibName, strerror (errno));
     }
     if (NewLibName && remove (NewLibName) != 0) {
-        Error ("Problem deleting temporary library file: %s", strerror (errno));
+        Error ("Problem deleting temporary library file '%s': %s",
+               NewLibName, strerror (errno));
     }
 }

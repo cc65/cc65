@@ -48,6 +48,18 @@ typedef unsigned size_t;
 #define EXIT_SUCCESS    0
 #define EXIT_FAILURE    1
 
+#if __CC65_STD__ == __CC65_STD_CC65__
+
+/* Those non-standard cc65 exit constants definitions are in addition
+** to the EXIT_SUCCESS and EXIT_FAILURE constants, which should not be
+** redefined 
+*/ 
+#define EXIT_ASSERT 2
+#define EXIT_ABORT 3
+
+#endif
+
+
 /* Return type of the div function */
 typedef struct {
     int rem;

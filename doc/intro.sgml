@@ -1,14 +1,13 @@
 <!doctype linuxdoc system>
 
 <article>
-
 <title>cc65 Compiler Intro
 <author>
 <url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:cbmnut@hushmail.com" name="CbmNut">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">,<newline>
+<url url="mailto:groepaz@gmx.net" name="Groepaz">,<newline>
 <url url="mailto:stephan.muehlstrasser@web.de" name="Stephan M&uuml;hlstrasser">
-<date>2015-03-07
 
 <abstract>
 How to use the cc65 C language system -- an introduction.
@@ -246,13 +245,13 @@ varies in its start and exit conditions.
 
 <sect2>AppleWin<p>
 Available at <url
-url="http://applewin.berlios.de/">:
+url="https://github.com/AppleWin/AppleWin">:
 
 Emulates Apple&nbsp;&rsqb;&lsqb;/enhanced&nbsp;Apple&nbsp;//e computers, with
 sound, video, joysticks, serial port, and disk images. Includes monitor. Only
 for Windows. The package comes with a DOS 3.3 disk (called "master.dsk") image;
-however, you will need <bf/AppleCommander 1.3.5/ or later (available at <url
-url="http://applecommander.sourceforge.net/">).
+however, you will need <bf/AppleCommander 1.4.0/ or later (available at <url
+url="https://applecommander.github.io/">).
 
 Compile the tutorial with
 
@@ -270,14 +269,13 @@ the <tt/master.dsk/ which comes with <bf/AppleWin/, and rename it to
 <tt/cc65.dsk/, then use <bf/AppleCommander/:
 
 <tscreen><verb>
-java -jar ac.jar -cc65 cc65.dsk test B < hello
+java -jar ac.jar -as cc65.dsk test < hello
 </verb></tscreen>
 
 Note that a convention in the Apple world is that "hello" is the file which is
 run automatically upon booting a DOS disk, sort of like the "autoexec.bat" of
-the MSDOS/Windows world.  We've avoided that in the example, however.  Also,
-the <tt/B/ parameter must be in caps., and "test" is the name of the program as
-it will appear on the Apple disk.
+the MSDOS/Windows world.  We've avoided that in the example, however by using
+"test" as the name of the program as it will appear on the Apple disk.
 
 Start the emulator, click on the <bf/Disk 1/ icon, and point to <bf/cc65.dsk/;
 then, click the big Apple logo, to boot the system.  Then, type this on the
@@ -335,6 +333,35 @@ your harddrive directly.
 to the DOS menu.  Your C program should wait for a keypress if you want to see
 any output.
 
+<sect2>Stella<p>
+Available at <url
+url="http://stella.sourceforge.net">:
+
+Stella is a multi-platform Atari 2600 VCS emulator. The latest version
+is available on the emulator's website. It is also available through
+the package manager of most Linux distributions (Fedora, Ubuntu, ..).
+
+Compile the Atari 2600 sample with
+
+<tscreen><verb>
+make SYS=atari2600 samples
+</verb></tscreen>
+
+Then execute it with
+
+<tscreen><verb>
+stella samples/atari2600hello
+</verb></tscreen>
+
+<sect2>Harmony Cartridge<p>
+Available at <url
+url="http://harmony.atariage.com/Site/Harmony.html">:
+
+The Harmony Cartridge allows running any Atari 2600 binary on real
+hardware. The binary must be copied on an SD card, to be inserted in
+the Harmony Cartridge. It can then be inserted on an Atari 2600
+console, and run any binary on the SD card.
+
 
 <sect1>Atmos
 
@@ -376,11 +403,36 @@ RUN
 The emulation, also, supports that method.
 
 
+<sect1>Commander X16
+
+<sect2>x16-emulator<p>
+Available at <url
+url="https://github.com/commanderx16/x16-emulator/releases">:
+
+Emulates the Commander X16 Single Board Computer, with sound, SD card images,
+VGA and NTSC video, and a NES game controller emulation.  Includes a monitor. 
+It runs on all SDL2 platforms.
+
+Compile the tutorial with
+<tscreen><verb>
+cl65 -O -t cx16 hello.c text.s
+</verb></tscreen>
+
+Start the emulator.  Then, type
+<tscreen><verb>
+LOAD"HELLO",1
+RUN
+</verb></tscreen>
+(Type those lines in lower-case; but, they will appear as upper-case.)
+
+On a real computer, you would type an <tt/8/ instead of a <tt/1/.
+
+
 <sect1>Commodore
 
 <sect2>VICE<p>
 Available at <url
-url="http://vice-emu.sourceforge.net/">:
+url="https://vice-emu.sourceforge.net/">:
 
 Emulates Commodore 64/128/VIC-20/PET/CBM II/Plus 4 computers. Supports
 printers, serial port and adapters, stereo sound, disk drives and images, RAM expansions,
@@ -407,12 +459,8 @@ Substitute the name of a Commodore computer for that <tt/&lt;sys&gt;/:
 Start the desired version of the emulator (CBM610 programs run on
 the CBM II &lsqb;<tt/xcbm2/&rsqb; emulator).
 
-In the Windows versions of VICE, choose <bf>File&gt;Autoboot disk/tape
-image...</bf>, choose your executable, and click <bf/OK/.
-
-In the Unix versions, hold down the mouse's first button. Move the pointer to
-<bf>Smart-attach disk/tape...</bf>, and release the button. Choose your
-executable, and click <bf/Autostart/.
+Choose <bf>File&gt;Autostart disk/tape image...</bf>, choose your executable, 
+and click <bf/OK/.
 
 The file has a 14-byte header which corresponds to a PRG-format BASIC program,
 consisting of a single line, similar to this:
@@ -446,6 +494,29 @@ RUN "HELLO"
 
 The output will appear on a separate line, and you will be returned to a BASIC
 prompt.
+
+
+<sect1>Gamate<p>
+
+Before you can run the cartridge image produced by the linker, the binary has to
+be patched using the <bf/gamate-fixcart/ tool that is included in the cc65
+package in the util/gamata directory.
+
+<tscreen><verb>
+gamate-fixcart <image.bin>
+</verb></tscreen>
+
+<sect2>MESS<p>
+Available at <url
+url="https://www.mamedev.org">:
+
+MESS (Multiple Emulator Super System) is a multi system emulator that emulates
+various cc65 targets. It once started as a MAME fork, but was marged into MAME
+again at some point.
+
+<tscreen><verb>
+mess gamate -debug -window -skip_gameinfo -cart <image.bin>
+</verb></tscreen>
 
 
 <sect1>GEOS<p>
@@ -484,17 +555,8 @@ feature on.
 </quote>
 
 <quote>
-VICE even has different ways that depend on which operating system is running
-the emulator.
-<itemize>
-<item>In Windows, you must click on <bf/Options/ (in an always visible menu).
-      Then, you must click on <bf/True drive emulation/.
-<item>In Unix, you must <em/hold down/ the second button on your mouse.  Move
-      the pointer down to <bf/Drive settings/.  Then, move the pointer over to
-      <bf/Enable true drive emulation/.  (If there is a check-mark in front of
-      those words, that feature already is turned on -- then, move the pointer
-      off of that menu.) Release the mouse button.
-</itemize>
+In VICE, got to <bf/Settings/ -> <bf/Settings/, then <bf/Peripherial devices/ ->
+<bf/Drive/. Then, you must enable the <bf/True drive emulation/ checkbox.
 </quote>
 
 Find the <bf/CONVERT/ program on the boot disk &lsqb;tap the 6-key; then, you
@@ -520,6 +582,29 @@ directory notePad.  Look at the eight file-positions on each page until you see
 
 The output is shown in a GEOS dialog box; click <bf/OK/ when you have finished
 reading it.
+
+Alternatively you can use the <bf/c1541/ program that comes with VICE to write the
+file to a disk image directly in GEOS format, so it can be used in GEOS directly
+without having to use the <bf/CONVERT/ program.
+
+<tscreen><verb>
+c1541 -attach geos.d64 -geoswrite hello1
+</verb></tscreen>
+
+
+<sect1>Nintendo Entertainment System<p>
+
+<sect2>Mednafen (NES)<p>
+Available at <url
+url="https://mednafen.github.io/releases/">:
+
+Mednafen is a multi system emulator that emulates a couple of the supported
+targets of cc65: Apple II/II+, Atari Lynx, Nintendo Entertainment System and
+PC Engine/TurboGrafx 16.
+
+<tscreen><verb>
+mednafen -force_module nes <image.bin>
+</verb></tscreen>
 
 
 <sect1>Ohio Scientific Challenger 1P<p>
@@ -641,6 +726,32 @@ Press <RETURN>.
 </verb></tscreen>
 
 After hitting the RETURN key, you should see the boot prompt again.
+
+
+<sect1>PC Engine/TurboGrafx 16<p>
+
+For the cartridge image produced by the linker to work in emulators and on real
+hardware, its content must be rearranged so the first 8k block becomes the last
+8k block in the image.
+
+For example, for a 32k image this can be done using <bf/dd/ as follows:
+
+<tscreen><verb>
+dd if=infile.bin bs=8K skip=3 > outfile.pce
+dd if=infile.bin bs=8K count=3 >> outfile.pce
+</verb></tscreen>
+
+<sect2>Mednafen<p>
+Available at <url
+url="https://mednafen.github.io/releases/">:
+
+Mednafen is a multi system emulator that emulates a couple of the supported
+targets of cc65: Apple II/II+, Atari Lynx, Nintendo Entertainment System and
+PC Engine/TurboGrafx 16.
+
+<tscreen><verb>
+mednafen -force_module pce <image.pce>
+</verb></tscreen>
 
 
 <sect1>Contributions wanted<p>

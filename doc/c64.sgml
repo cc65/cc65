@@ -1,10 +1,9 @@
 <!doctype linuxdoc system>
 
 <article>
-
 <title>Commodore 64-specific information for cc65
-<author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2014-04-14
+<author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz"><newline>
+<url url="mailto:greg.king5@verizon.net" name="Greg King">
 
 <abstract>
 An overview over the C64 runtime system as it is implemented for the cc65 C
@@ -121,8 +120,8 @@ since the program must be loaded to the BASIC start address.
 <sect1>80 Columns conio driver<p>
 
 The C64 package comes with an alternative software driven 80 columns
-module <tt/c64-soft80.o/ which uses the memory under I/O between &dollar;d000
-and &dollar;ffff.
+module <tt/c64-soft80.o/ which uses the memory under I/O between &dollar;D000
+and &dollar;FF3F.
 
 In memory constrained situations the memory from &dollar;400 to &dollar;7FF
 can be made available to a program by calling <tt/_heapadd ((void *) 0x0400, 0x0400);/
@@ -168,6 +167,33 @@ url="funcref.html" name="function reference"> for declaration and usage.
 </itemize>
 
 
+<sect1>C64-specific accelerator functions<p>
+
+The functions listed below are accelerator functions for the C64. See the <url
+url="funcref.html" name="function reference"> for declaration and usage.
+
+<itemize>
+<item>detect_c128
+<item>detect_c64dtv
+<item>detect_c65
+<item>detect_chameleon
+<item>detect_scpu
+<item>detect_turbomaster
+<item>get_c128_speed
+<item>get_c64dtv_speed
+<item>get_c65_speed
+<item>get_chameleon_speed
+<item>get_scpu_speed
+<item>get_turbomaster_speed
+<item>set_c128_speed
+<item>set_c64dtv_speed
+<item>set_c65_speed
+<item>set_chameleon_speed
+<item>set_scpu_speed
+<item>set_turbomaster_speed
+</itemize>
+
+
 <sect1>CBM-specific functions<p>
 
 Some functions are available for all (or at least most) of the Commodore
@@ -189,6 +215,8 @@ declaration and usage.
 <item>cbm_k_basin
 <item>cbm_k_bsout
 <item>cbm_k_clrch
+<item>cbm_k_tksa
+<item>cbm_k_second
 <item>cbm_load
 <item>cbm_open
 <item>cbm_opendir
@@ -197,6 +225,7 @@ declaration and usage.
 <item>cbm_save
 <item>cbm_write
 <item>get_tv
+<item>waitvsync
 </itemize>
 
 
@@ -235,12 +264,22 @@ structures, accessing the struct fields will access the chip registers.
 The names in the parentheses denote the symbols to be used for static linking of the drivers.
 
 
+<label id="graphics-drivers">
 <sect1>Graphics drivers<p>
 
 <em>Note:</em> All available graphics drivers for the TGI interface will use
-the space below the I/O area and kernal ROM, so you can have hires graphics in
-the standard setup without any memory loss or need for a changed
-configuration.
+the space below the I/O area and Kernal ROM; so, you can have hires graphics in
+the standard setup without any memory loss or need for a changed configuration.
+
+You can use a mouse driver at the same time that you use a TGI driver.  But, if
+you want to see the default mouse pointer on the graphics screen, then you
+explicitly must link a special object file into your program.  It will put the
+arrow into the "high RAM" area where the bitmaps are put.  Its name is
+"<tt/c64-tgimousedata.o/".  Example:
+
+<tscreen><verb>
+cl65 -t c64 -o program-file main-code.c subroutines.s c64-tgimousedata.o
+</verb></tscreen>
 
 <descrip>
   <tag><tt/c64-hi.tgi (c64_hi_tgi)/</tag>
@@ -251,11 +290,16 @@ configuration.
 
 Note that the graphics drivers are incompatible with the
 <tt/c64-ram.emd (c64_ram_emd)/ extended memory driver and the
- <tt/c64-soft80.o/ software 80 columns conio driver.
+ <tt/c64-soft80.o/ software 80-columns conio driver.
+
 
 <sect1>Extended memory drivers<p>
 
 <descrip>
+
+  <tag><tt/c64-65816.emd (c64_65816_emd)/</tag>
+  Extended memory driver for 65816 (eg SCPU) based extra RAM.
+  Written and contributed by Marco van den Heuvel.
 
   <tag><tt/c64-c256k.emd (c64_c256k_emd)/</tag>
   A driver for the C64 256K memory expansion. This driver offers 768 pages of
@@ -274,8 +318,12 @@ Note that the graphics drivers are incompatible with the
   A driver for the ISEPIC cartridge. This driver offers just 8 pages of 256
   bytes each. Written and contributed by Marco van den Heuvel.
 
+  <tag><tt/c64-kerberos.emd (c64_kerberos_emd)/</tag>
+  A driver for the Kerberos MIDI Cartridge. The cartridge has 512
+  pages of 256 bytes for a total of 128KB.
+
   <tag><tt/c64-ram.emd (c64_ram_emd)/</tag>
-  A driver for the hidden RAM below the I/O area and kernal ROM. Supports 48
+  A driver for the hidden RAM below the I/O area and kernal ROM. Supports 47
   256 byte pages. Please note that this driver is incompatible with any of the
   graphics drivers, or the soft80 conio driver!
 
@@ -284,10 +332,8 @@ Note that the graphics drivers are incompatible with the
   Will test the hardware for the available RAM.
 
   <tag><tt/c64-reu.emd (c64_reu_emd)/</tag>
-  A driver for the CBM REUs. The driver will determine from the connected REU
-  if it supports 128KB of RAM or more. In the latter case, 256KB are assumed,
-  but since there are no range checks, the application can use more memory if
-  it has better knowledge about the hardware than the driver.
+  A driver for the CBM REUs. The driver will test the connected REU to find
+  out how much RAM is present.
 
   <tag><tt/c64-vdc.emd (c64_vdc_emd)/</tag>
   A driver for the VDC memory of the C128. Written and contributed by Maciej
@@ -315,8 +361,9 @@ The default drivers, <tt/joy_stddrv (joy_static_stddrv)/, point to <tt/c64-stdjo
 
   <tag><tt/c64-ptvjoy.joy (c64_ptvjoy_joy)/</tag>
   Driver for the Protovision 4-player adapter contributed by Groepaz. See
-  <url url="http://www.protovision-online.de/hardw/hardwstart.htm"> for prices and
-  building instructions. Up to four joysticks are supported.
+  <url url="http://www.protovision-online.de/hardw/4_player.php?language=en"
+  name="Protovision shop"> for prices and building instructions. Up to four
+  joysticks are supported.
 
   <tag><tt/c64-stdjoy.joy (c64_stdjoy_joy)/</tag>
   Supports up to two standard joysticks connected to the joysticks port of
@@ -330,6 +377,9 @@ The default drivers, <tt/joy_stddrv (joy_static_stddrv)/, point to <tt/c64-stdjo
 
 
 <sect1>Mouse drivers<p>
+
+You can use these drivers in text-mode or graphics-mode (TGI) programs.  See
+the description of <ref id="graphics-drivers" name="the graphics drivers">.
 
 The default drivers, <tt/mouse_stddrv (mouse_static_stddrv)/, point to <tt/c64-1351.mou (c64_1351_mou)/.
 
@@ -360,9 +410,9 @@ The default drivers, <tt/mouse_stddrv (mouse_static_stddrv)/, point to <tt/c64-1
 <descrip>
 
   <tag><tt/c64-swlink.ser (c64_swlink_ser)/</tag>
-  Driver for the SwiftLink cartridge. Supports up to 38400 BPS, hardware flow
-  control (RTS/CTS), and interrupt-driven receives. Note that, because of the
-  peculiarities of the 6551 chip, together with the use of the NMI, transmits
+  Driver for the SwiftLink cartridge. Supports up to 38400 baud, requires hardware
+  flow control (RTS/CTS) and does interrupt driven receives. Note that, because of
+  the peculiarities of the 6551 chip, together with the use of the NMI, transmits
   are not interrupt driven; and, the transceiver blocks if the receiver asserts
   flow control because of a full buffer.
 
@@ -371,6 +421,13 @@ The default drivers, <tt/mouse_stddrv (mouse_static_stddrv)/, point to <tt/c64-1
 
 
 <sect>Limitations<p>
+
+
+<sect1>Realtime clock<p>
+
+The realtime clock functions use the CIA1 TOD clock. As that clock only stores
+the time but not the date, the date set by <tt/clock_settime()/ is simply stored
+inside the C library for retrieval in the same program via <tt/clock_gettime()/.
 
 
 
@@ -429,14 +486,14 @@ including commercial applications, and to alter it and redistribute it
 freely, subject to the following restrictions:
 
 <enum>
-<item>	The origin of this software must not be misrepresented; you must not
-	claim that you wrote the original software. If you use this software
-	in a product, an acknowledgment in the product documentation would be
-	appreciated but is not required.
-<item>	Altered source versions must be plainly marked as such, and must not
-	be misrepresented as being the original software.
-<item>	This notice may not be removed or altered from any source
-	distribution.
+<item>  The origin of this software must not be misrepresented; you must not
+        claim that you wrote the original software. If you use this software
+        in a product, an acknowledgment in the product documentation would be
+        appreciated but is not required.
+<item>  Altered source versions must be plainly marked as such, and must not
+        be misrepresented as being the original software.
+<item>  This notice may not be removed or altered from any source
+        distribution.
 </enum>
 
 </article>

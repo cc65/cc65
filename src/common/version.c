@@ -47,7 +47,7 @@
 
 
 #define VER_MAJOR       2U
-#define VER_MINOR       15U
+#define VER_MINOR       19U
 
 
 
@@ -61,8 +61,8 @@ const char* GetVersionAsString (void)
 /* Returns the version number as a string in a static buffer */
 {
     static char Buf[60];
-#if defined(GIT_SHA)
-    xsnprintf (Buf, sizeof (Buf), "%u.%u - Git %s", VER_MAJOR, VER_MINOR, STRINGIZE (GIT_SHA));
+#if defined(BUILD_ID)
+    xsnprintf (Buf, sizeof (Buf), "%u.%u - %s", VER_MAJOR, VER_MINOR, STRINGIZE (BUILD_ID));
 #else
     xsnprintf (Buf, sizeof (Buf), "%u.%u", VER_MAJOR, VER_MINOR);
 #endif

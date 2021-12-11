@@ -7,18 +7,18 @@
 
         .constructor    initiobuf
         .export         iobuf_alloc, iobuf_free
-        .import         __STARTUP_RUN__
-        .import         incsp2, popax
+        .import         __MAIN_START__
+        .import         incsp2, popptr1
 
         .include        "zeropage.inc"
         .include        "errno.inc"
         .include        "../filedes.inc"
 
-        .segment        "INIT"
+        .segment        "ONCE"
 
 initiobuf:
         ; Convert end address highbyte to table index
-        lda     #>__STARTUP_RUN__
+        lda     #>__MAIN_START__
         sec
         sbc     #>$0800
         lsr
@@ -41,9 +41,7 @@ initiobuf:
 iobuf_alloc:
         ; Get and save "memptr"
         jsr     incsp2
-        jsr     popax
-        sta     ptr1
-        stx     ptr1+1
+        jsr     popptr1
 
         ; Search table for free entry
         ldx     #$00
@@ -90,6 +88,6 @@ iobuf_free:
 
 ; ------------------------------------------------------------------------
 
-        .bss
+        .data
 
 table:  .res    MAX_FDS

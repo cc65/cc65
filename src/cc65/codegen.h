@@ -40,6 +40,7 @@
 
 /* common */
 #include "coll.h"
+#include "inttypes.h"
 
 /* cc65 */
 #include "segments.h"
@@ -61,34 +62,38 @@
 #define CF_NONE         0x0000  /* No special flags */
 
 /* Values for the actual type */
-#define CF_CHAR         0x0003  /* Operation on characters */
-#define CF_INT          0x0001  /* Operation on ints */
+#define CF_CHAR         0x0007  /* Operation on characters */
+#define CF_INT          0x0003  /* Operation on ints */
+#define CF_SHORT        CF_INT  /* Alias */
 #define CF_PTR          CF_INT  /* Alias for readability */
-#define CF_LONG         0x0000  /* Operation on longs */
-#define CF_FLOAT        0x0004  /* Operation on a float */
+#define CF_LONG         0x0001  /* Operation on longs */
+#define CF_FLOAT        0x0010  /* Operation on a float */
 
 /* Signedness */
 #define CF_UNSIGNED     0x0008  /* Value is unsigned */
 
 /* Masks for retrieving type information */
-#define CF_TYPEMASK     0x0007  /* Type information */
-#define CF_STYPEMASK    0x000F  /* Includes signedness */
+#define CF_TYPEMASK     0x0017  /* Type information */
+#define CF_STYPEMASK    0x001F  /* Includes signedness */
 
-#define CF_NOKEEP       0x0010  /* Value may get destroyed when storing */
-#define CF_CONST        0x0020  /* Constant value available */
-#define CF_CONSTADDR    0x0040  /* Constant address value available */
+#define CF_CONST        0x0040  /* Constant value available */
 #define CF_TEST         0x0080  /* Test value */
 #define CF_FIXARGC      0x0100  /* Function has fixed arg count */
 #define CF_FORCECHAR    0x0200  /* Handle chars as chars, not ints */
-#define CF_REG          0x0800  /* Value is in primary register */
+#define CF_NOKEEP       0x0400  /* Value may get destroyed when storing */
 
-/* Type of static address */
-#define CF_ADDRMASK     0xF000  /* Type of address */
-#define CF_STATIC       0x0000  /* Static local */
-#define CF_EXTERNAL     0x1000  /* Static external */
-#define CF_ABSOLUTE     0x2000  /* Numeric absolute address */
-#define CF_LOCAL        0x4000  /* Auto variable */
-#define CF_REGVAR       0x8000  /* Register variable */
+/* Type of address */
+#define CF_ADDRMASK     0xF000  /* Bit mask of address type */
+#define CF_IMM          0x0000  /* Value is pure rvalue and has no storage */
+#define CF_ABSOLUTE     0x1000  /* Numeric absolute address */
+#define CF_EXTERNAL     0x2000  /* External */
+#define CF_REGVAR       0x4000  /* Register variable */
+#define CF_LITERAL      0x7000  /* Literal */
+#define CF_PRIMARY      0x8000  /* Value is in primary register */
+#define CF_EXPR         0x9000  /* Value is addressed by primary register */
+#define CF_STATIC       0xA000  /* Local static */
+#define CF_CODE         0xB000  /* C code label location */
+#define CF_STACK        0xC000  /* Function-local auto on stack */
 
 
 
@@ -143,9 +148,6 @@ void g_defcodelabel (unsigned label);
 void g_defdatalabel (unsigned label);
 /* Define a local data label */
 
-void g_aliasdatalabel (unsigned label, unsigned baselabel, long offs);
-/* Define label as a local alias for baselabel+offs */
-
 
 
 /*****************************************************************************/
@@ -156,6 +158,12 @@ void g_aliasdatalabel (unsigned label, unsigned baselabel, long offs);
 
 void g_defgloblabel (const char* Name);
 /* Define a global label with the given name */
+
+void g_defliterallabel (unsigned label);
+/* Define a literal data label */
+
+void g_aliasliterallabel (unsigned label, unsigned baselabel, long offs);
+/* Define label as an alias for baselabel+offs */
 
 void g_defexport (const char* Name, int ZP);
 /* Export the given label */
@@ -266,7 +274,7 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes);
 void g_getimmed (unsigned Flags, unsigned long Val, long Offs);
 /* Load a constant into the primary register */
 
-void g_getstatic (unsigned Flags, unsigned long Label, long Offs);
+void g_getstatic (unsigned Flags, uintptr_t Label, long Offs);
 /* Fetch an static memory cell into the primary register */
 
 void g_getlocal (unsigned Flags, int Offs);
@@ -293,7 +301,7 @@ void g_leavariadic (int Offs);
 
 
 
-void g_putstatic (unsigned flags, unsigned long label, long offs);
+void g_putstatic (unsigned flags, uintptr_t label, long offs);
 /* Store the primary register into the specified static memory cell */
 
 void g_putlocal (unsigned Flags, int Offs, long Val);
@@ -315,7 +323,7 @@ void g_putind (unsigned flags, unsigned offs);
 void g_addlocal (unsigned flags, int offs);
 /* Add a local variable to ax */
 
-void g_addstatic (unsigned flags, unsigned long label, long offs);
+void g_addstatic (unsigned flags, uintptr_t label, long offs);
 /* Add a static variable to ax */
 
 
@@ -326,7 +334,7 @@ void g_addstatic (unsigned flags, unsigned long label, long offs);
 
 
 
-void g_addeqstatic (unsigned flags, unsigned long label, long offs,
+void g_addeqstatic (unsigned flags, uintptr_t label, long offs,
                     unsigned long val);
 /* Emit += for a static variable */
 
@@ -336,7 +344,7 @@ void g_addeqlocal (unsigned flags, int offs, unsigned long val);
 void g_addeqind (unsigned flags, unsigned offs, unsigned long val);
 /* Emit += for the location with address in ax */
 
-void g_subeqstatic (unsigned flags, unsigned long label, long offs,
+void g_subeqstatic (unsigned flags, uintptr_t label, long offs,
                     unsigned long val);
 /* Emit -= for a static variable */
 
@@ -357,7 +365,7 @@ void g_subeqind (unsigned flags, unsigned offs, unsigned long val);
 void g_addaddr_local (unsigned flags, int offs);
 /* Add the address of a local variable to ax */
 
-void g_addaddr_static (unsigned flags, unsigned long label, long offs);
+void g_addaddr_static (unsigned flags, uintptr_t label, long offs);
 /* Add the address of a static variable to ax */
 
 
@@ -375,7 +383,7 @@ void g_restore (unsigned flags);
 /* Copy hold register to primary. */
 
 void g_cmp (unsigned flags, unsigned long val);
-/* Immidiate compare. The primary register will not be changed, Z flag
+/* Immediate compare. The primary register will not be changed, Z flag
 ** will be set.
 */
 
@@ -404,6 +412,16 @@ void g_truejump (unsigned flags, unsigned label);
 
 void g_falsejump (unsigned flags, unsigned label);
 /* Jump to label if zero flag set */
+
+void g_branch (unsigned Label);
+/* Branch unconditionally to Label if the CPU has the BRA instruction.
+** Otherwise, jump to Label.
+** Use this function, instead of g_jump(), only where it is certain that
+** the label cannot be farther away from the branch than -128/+127 bytes.
+*/
+
+void g_lateadjustSP (unsigned label);
+/* Adjust stack based on non-immediate data */
 
 void g_drop (unsigned Space);
 /* Drop space allocated on the stack */
@@ -462,6 +480,17 @@ void g_initstatic (unsigned InitLabel, unsigned VarLabel, unsigned Size);
 /* Initialize a static local variable from static initialization data */
 
 
+
+/*****************************************************************************/
+/*                                Bit-fields                                 */
+/*****************************************************************************/
+
+void g_testbitfield (unsigned Flags, unsigned BitOffs, unsigned BitWidth);
+/* Test bit-field in ax. */
+
+void g_extractbitfield (unsigned Flags, unsigned FullWidthFlags, int IsSigned,
+                        unsigned BitOffs, unsigned BitWidth);
+/* Extract bits from bit-field in ax. */
 
 /*****************************************************************************/
 /*                             Switch statement                              */

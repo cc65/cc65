@@ -1,8 +1,8 @@
 ;
-; Maciej 'YTM/Elysium' Witkowiak
+; 2001-07-02, Maciej 'YTM/Elysium' Witkowiak
+; 2015-08-24, Greg King
 ;
 ; based on Atari version by Christian Groessler
-; 2.7.2001
 ;
 ; dhandle_t     __fastcall__ dio_open  (unsigned char device);
 ; unsigned char __fastcall__ dio_close (dhandle_t handle);
@@ -27,11 +27,13 @@ sectsizetab:
 .code
 
 _dio_open:
-        pha
+        cmp #4
+        bcs _inv_drive
         tax
         lda driveType,x         ; check if there's a device
         beq _inv_drive
         txa
+        pha
         clc
         adc #8                  ; normalize devnum
         sta curDevice

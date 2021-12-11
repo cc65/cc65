@@ -3,7 +3,6 @@
 <article>
 <title>Diskette Sector I/O Routines
 <author><url url="mailto:chris@groessler.org" name="Christian Groessler">
-<date>2014-04-10
 
 <abstract>
 The cc65 library provides functions to read and write raw disk sectors.
@@ -25,8 +24,7 @@ released with the <tt>dio_close</tt> function.
     dhandle_t __fastcall__ dio_open (unsigned char device);
 </verb></tscreen>
 
-The <tt>device</tt> specifies the device to access, with 0 being the first
-device, 1 the second, and so on.
+The <tt>device</tt> specifies the device to access.
 
 <tscreen><verb>
     unsigned char __fastcall__ dio_close (dhandle_t handle);

@@ -94,6 +94,11 @@ int PushSearchPath (SearchPaths* P, const char* NewPath);
 void PopSearchPath (SearchPaths* P);
 /* Remove a search path from the head of an existing search path list */
 
+char* GetSearchPath (SearchPaths* P, unsigned Index);
+/* Return the search path at the given index, if the index is valid, return an
+** empty string otherwise.
+*/
+
 char* SearchFile (const SearchPaths* P, const char* File);
 /* Search for a file in a list of directories. Return a pointer to a malloced
 ** area that contains the complete path, if found, return 0 otherwise.

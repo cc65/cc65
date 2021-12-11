@@ -62,9 +62,9 @@ static void Usage (void)
 {
     fprintf (stderr, "Usage: %s <operation ...> lib file|module ...\n"
             "Operations are some of:\n"
-            "\ta\tAdd modules\n"
+            "\tr\tAdd modules\n"
             "\td\tDelete modules\n"
-            "\tl\tList library contents\n"
+            "\tt\tList library table\n"
             "\tv\tIncrease verbosity (put before other operation)\n"
             "\tx\tExtract modules\n"
             "\tV\tPrint the archiver version\n",
@@ -94,13 +94,10 @@ int main (int argc, char* argv [])
         /* Get the argument */
         const char* Arg = ArgVec [I];
 
-        /* Check for an option */
-        if (strlen (Arg) != 1) {
-            Usage ();
-        }
         switch (Arg [0]) {
 
-            case 'a':
+            case 'r': /* POSIX.2 */
+            case 'a': /* staying compatible */
                 AddObjFiles (ArgCount - I - 1, &ArgVec[I+1]);
                 break;
 
@@ -108,7 +105,11 @@ int main (int argc, char* argv [])
                 DelObjFiles (ArgCount - I - 1, &ArgVec [I+1]);
                 break;
 
-            case 'l':
+            case 't': /* POSIX.2 */
+            case 'l': /* staying compatible */
+                if (Arg [1] == 'v') {
+                    ++Verbosity;
+                }
                 ListObjFiles (ArgCount - I - 1, &ArgVec [I+1]);
                 break;
 
@@ -121,7 +122,7 @@ int main (int argc, char* argv [])
                 break;
 
             case 'V':
-                fprintf (stderr, "ar65 V%s\n", GetVersionAsString ());
+                fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
                 break;
 
             default:

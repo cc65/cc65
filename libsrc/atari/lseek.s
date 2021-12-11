@@ -176,7 +176,7 @@ seek:   jsr     ldax0sp         ; get lower word of new offset
 
 .endproc
 
-; check, whether seeking is supported
+; check whether seeking is supported
 ; tmp3:         iocb
 ; X:            index into fd_table
 ;
@@ -194,8 +194,12 @@ chk_supp:
 ; do the test
         lda     __dos_type
         cmp     #SPARTADOS
+        beq     :+
+        cmp     #BWDOS
+        beq     :+
+        cmp     #REALDOS
         bne     ns1
-        txa
+:       txa
         pha
         lda     DOS+1           ; get SpartaDOS version
         cmp     #$40

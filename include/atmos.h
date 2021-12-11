@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002       Debrune Jérome, <jede@oric.org>                            */
+/* (C) 2002       Debrune JÃ©rome, <jede@oric.org>                            */
 /* (C) 2003-2013  Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
@@ -113,6 +113,18 @@
 
 
 
+/* Masks for joy_read */
+#define JOY_UP_MASK     0x10
+#define JOY_DOWN_MASK   0x08
+#define JOY_LEFT_MASK   0x01
+#define JOY_RIGHT_MASK  0x02
+#define JOY_BTN_1_MASK  0x20
+
+#define JOY_FIRE_MASK   JOY_BTN_1_MASK
+#define JOY_FIRE(v)     ((v) & JOY_FIRE_MASK)
+
+
+
 /* No support for dynamically loadable drivers */
 #define DYN_DRV         0
 
@@ -120,6 +132,7 @@
 
 /* The addresses of the static drivers */
 extern void atmos_pase_joy[];           /* Referred to by joy_static_stddrv[] */
+extern void atmos_ijk_joy[];
 extern void atmos_acia_ser[];
 extern void atmos_228_200_3_tgi[];
 extern void atmos_240_200_2_tgi[];      /* Referred to by tgi_static_stddrv[] */

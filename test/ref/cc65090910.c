@@ -17,7 +17,7 @@ with compiler option -O but does _not_ show up with -Oi.
 
 unsigned htons(unsigned val)
 {
-	return (((unsigned) (val)) << 8) | (((unsigned) (val)) >> 8);
+        return (((unsigned) (val)) << 8) | (((unsigned) (val)) >> 8);
 }
 
 int main(void)

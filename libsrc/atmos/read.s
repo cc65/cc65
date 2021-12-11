@@ -9,7 +9,7 @@
         .export         _read
         .constructor    initstdin
 
-        .import         popax
+        .import         popax, popptr1
         .importzp       ptr1, ptr2, ptr3
         .forceimport    disable_caps
 
@@ -20,20 +20,19 @@
 
         sta     ptr3
         stx     ptr3+1          ; save count as result
-        eor     #$FF
-        sta     ptr2
-        txa
-        eor     #$FF
-        sta     ptr2+1          ; Remember -count-1
 
-        jsr     popax           ; get buf
-        sta     ptr1
-        stx     ptr1+1
+        inx
+        stx     ptr2+1
+        tax
+        inx
+        stx     ptr2            ; save count with each byte incremented separately
+
+        jsr     popptr1         ; get buf
         jsr     popax           ; get fd and discard
 
-L1:     inc     ptr2
+L1:     dec     ptr2
         bnz     L2
-        inc     ptr2+1
+        dec     ptr2+1
         bze     L9              ; no more room in buf
 
 ; If there are no more characters in BASIC's input buffer, then get a line from
@@ -69,7 +68,7 @@ L9:     lda     ptr3
 ;--------------------------------------------------------------------------
 ; initstdin:  Reset the stdin console.
 
-.segment        "INIT"
+.segment        "ONCE"
 
 initstdin:
         ldx     #<-1
@@ -79,8 +78,7 @@ initstdin:
 
 ;--------------------------------------------------------------------------
 
-.bss
+.segment        "INIT"
 
 text_count:
         .res    1
-

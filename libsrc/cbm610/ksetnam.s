@@ -12,7 +12,7 @@
 
         .import         sys_bank, restore_bank
         .import         sysp0: zp, ktmp: zp
-                                                  
+
         .include        "cbm610.inc"
 
 .proc   SETNAM
@@ -40,6 +40,4 @@
         jmp     restore_bank
 
 .endproc
-
-
 

@@ -46,10 +46,7 @@
 
 
 /* We need NULL. */
-
-#if !defined(_STDDEF_H)
-#  include <stddef.h>
-#endif
+#include <stddef.h>
 
 /* Load the system-specific files here, if needed. */
 #if   defined(__C64__)    && !defined(_C64_H)
@@ -68,10 +65,17 @@
 #  include <cbm610.h>
 #elif defined(__PET__)    && !defined(_PET_H)
 #  include <pet.h>
+#elif defined(__CX16__)   && !defined(_CX16_H)
+#  include <cx16.h>
 #endif
 
 /* Include definitions for CBM file types */
 #include <cbm_filetype.h>
+
+
+
+#define JOY_FIRE_MASK   JOY_BTN_1_MASK
+#define JOY_FIRE(v)     ((v) & JOY_FIRE_MASK)
 
 
 
@@ -117,6 +121,8 @@ extern char _filetype;          /* Defaults to 's' */
 #define CH_STOP           3
 #define CH_LIRA          92
 #define CH_ESC           27
+#define CH_FONT_LOWER    14
+#define CH_FONT_UPPER   142
 
 
 
@@ -153,7 +159,17 @@ struct cbm_dirent {
 unsigned char get_tv (void);
 /* Return the video mode the machine is using. */
 
+#define KBREPEAT_CURSOR 0x00
+#define KBREPEAT_NONE   0x40
+#define KBREPEAT_ALL    0x80
 
+unsigned char __fastcall__ kbrepeat (unsigned char mode);
+/* Changes which keys have automatic repeat. */
+
+#if !defined(__CBM610__)
+void waitvsync (void);
+/* Wait for the start of the next video field. */
+#endif
 
 /*****************************************************************************/
 /*                           CBM kernal functions                            */
@@ -175,6 +191,8 @@ unsigned char cbm_k_acptr (void);
 unsigned char cbm_k_basin (void);
 void __fastcall__ cbm_k_bsout (unsigned char C);
 unsigned char __fastcall__ cbm_k_chkin (unsigned char FN);
+unsigned char cbm_k_chrin (void);
+void __fastcall__ cbm_k_chrout (unsigned char C);
 void __fastcall__ cbm_k_ciout (unsigned char C);
 unsigned char __fastcall__ cbm_k_ckout (unsigned char FN);
 void cbm_k_clall (void);
@@ -187,11 +205,17 @@ unsigned int __fastcall__ cbm_k_load(unsigned char flag, unsigned addr);
 unsigned char cbm_k_open (void);
 unsigned char cbm_k_readst (void);
 unsigned char __fastcall__ cbm_k_save(unsigned int start, unsigned int end);
+void cbm_k_scnkey (void);
+void __fastcall__ cbm_k_second (unsigned char addr);
 void __fastcall__ cbm_k_setlfs (unsigned char LFN, unsigned char DEV,
                                 unsigned char SA);
 void __fastcall__ cbm_k_setnam (const char* Name);
+void __fastcall__ cbm_k_settim (unsigned long timer);
 void __fastcall__ cbm_k_talk (unsigned char dev);
+void __fastcall__ cbm_k_tksa (unsigned char addr);
+void cbm_k_udtim (void);
 void cbm_k_unlsn (void);
+void cbm_k_untlk (void);
 
 
 
@@ -273,7 +297,15 @@ unsigned char __fastcall__ cbm_readdir (unsigned char lfn,
 /* Reads one directory line into cbm_dirent structure.
 ** Returns 0 if reading directory-line was successful.
 ** Returns non-zero if reading directory failed, or no more file-names to read.
-** Returns 2 on last line.  Then, l_dirent->size = the number of "blocks free."
+** Returns 2 on last line.  Then, l_dirent->size = the number of "blocks free",
+** "blocks used", or "mb free".  Return codes:
+** 0 = read file-name
+** 1 = couldn't read directory
+** 2 = read "blocks free", "blocks used", or "mb free"
+** 3 = couldn't find start of file-name
+** 4 = couldn't find end of file-name
+** 5 = couldn't read file-type
+** 6 = premature end of file
 */
 
 void __fastcall__ cbm_closedir (unsigned char lfn);
@@ -283,5 +315,3 @@ void __fastcall__ cbm_closedir (unsigned char lfn);
 
 /* End of cbm.h */
 #endif
-
-

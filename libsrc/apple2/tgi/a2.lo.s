@@ -58,8 +58,8 @@ Y2      :=      ptr4
         .word   48              ; Y resolution
         .byte   16              ; Number of drawing colors
         .byte   1               ; Number of screens available
-        .byte   8               ; System font X size
-        .byte   8               ; System font Y size
+        .byte   0               ; System font X size
+        .byte   0               ; System font Y size
         .word   $0198           ; Aspect ratio (based on 4/3 display)
         .byte   0               ; TGI driver flags
 
@@ -85,7 +85,6 @@ Y2      :=      ptr4
         .addr   BAR
         .addr   TEXTSTYLE
         .addr   OUTTEXT
-        .addr   0               ; IRQ entry is unused
 
 ; ------------------------------------------------------------------------
 
@@ -127,6 +126,10 @@ INIT:
         bit     $C082           ; Switch in ROM
         jsr     SETGR
         bit     MIXCLR
+        .ifdef  __APPLE2ENH__
+        sta     IOUDISON
+        bit     DHIRESOFF
+        .endif
         bit     $C080           ; Switch in LC bank 2 for R/O
 
         ; Done, reset the error code

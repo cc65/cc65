@@ -7,7 +7,7 @@
 ;*                                                                          *
 ;*                                                                          *
 ;*(C) 2003-2006, Ullrich von Bassewitz                                      *
-;*               Römerstrasse 52                                            *
+;*               Roemerstrasse 52                                           *
 ;*               D-70794 Filderstadt                                        *
 ;*EMail:         uz@cc65.org                                                *
 ;*                                                                          *
@@ -41,15 +41,15 @@
         VERSION .byte   1       ; Interface version
         LIBREF  .addr           ; Library reference
         JUMPTAB .struct
-            INSTALL     .addr   ; INSTALL routine
-            UNINSTALL   .addr   ; UNINSTALL routine
-            OPEN        .addr   ; OPEN routine
-            CLOSE       .addr   ; CLOSE routine
-            GET         .addr   ; GET routine
-            PUT         .addr   ; PUT routine
-            STATUS      .addr   ; STATUS routine
-            IOCTL       .addr   ; IOCTL routine
-            IRQ         .addr   ; IRQ routine
+            SER_INSTALL   .addr   ; SER_INSTALL routine
+            SER_UNINSTALL .addr   ; SER_UNINSTALL routine
+            SER_OPEN      .addr   ; SER_OPEN routine
+            SER_CLOSE     .addr   ; SER_CLOSE routine
+            SER_GET       .addr   ; SER_GET routine
+            SER_PUT       .addr   ; SER_PUT routine
+            SER_STATUS    .addr   ; SER_STATUS routine
+            SER_IOCTL     .addr   ; SER_IOCTL routine
+            SER_IRQ       .addr   ; SER_IRQ routine
         .endstruct
 .endstruct
 
@@ -160,4 +160,3 @@ SER_STATUS_DSR          =       $40     ; NOT data set ready
         .global _ser_ioctl
 
         .global _ser_clear_ptr
-

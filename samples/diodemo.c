@@ -36,6 +36,7 @@
 #include <conio.h>
 #include <ctype.h>
 #include <errno.h>
+#include <cc65.h>
 #include <dio.h>
 
 
@@ -122,6 +123,11 @@ int main (int argc, const char* argv[])
 
     clrscr ();
     screensize (&ScreenX, &ScreenY);
+
+    /* Allow user to read exit messages */
+    if (doesclrscrafterexit ()) {
+        atexit ((void (*)) cgetc);
+    }
 
     cputs ("Floppy Disk Copy\r\n");
     chline (16);

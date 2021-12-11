@@ -37,7 +37,7 @@
 #define LINEINFO_H
 
 
-                   
+
 /* common */
 #include "strbuf.h"
 
@@ -50,7 +50,7 @@
 
 
 /* Input file structure */
-struct IFile;           
+struct IFile;
 
 
 

@@ -7,7 +7,8 @@
 ;
 
         .export         _cputcxy, _cputc
-        .export         setscrptr, putchar
+        .export         setscrptr, cputdirect, putchar
+        .constructor    initcputc
         .import         rvs
         .import         popax
         .importzp       ptr2
@@ -31,13 +32,13 @@ _cputc: cmp     #$0D            ; CR?
         rts
 
 L1:     cmp     #$0A            ; LF?
-        bne     output
+        bne     cputdirect
         inc     CURS_Y          ; Newline
         rts
 
 ; Output the character, then advance the cursor position
 
-output:
+cputdirect:
         jsr     putchar
 
 advance:
@@ -95,3 +96,13 @@ ScrTabHi:
                 .byte   >(SCREEN + Line * SCREEN_XSIZE)
         .endrep
 
+; ------------------------------------------------------------------------
+; Switch the cursor off. Code goes into the ONCE segment,
+; which will be reused after it is run.
+
+.segment        "ONCE"
+
+initcputc:
+        lsr     STATUS
+        asl     STATUS          ; Clear bit zero
+        rts

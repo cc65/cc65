@@ -6,14 +6,17 @@
 
         .include "atari.inc"
 
-        .export         _gotoxy
+        .export         gotoxy, _gotoxy
         .import         popa
         .import         setcursor
+
+gotoxy:
+        jsr     popa            ; Get Y
 
 _gotoxy:                        ; Set the cursor position
         sta     ROWCRS          ; Set Y
         jsr     popa            ; Get X
         sta     COLCRS          ; Set X
         lda     #0
-        sta     COLCRS+1        ;
+        sta     COLCRS+1
         jmp     setcursor

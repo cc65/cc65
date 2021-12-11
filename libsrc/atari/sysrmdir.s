@@ -26,11 +26,12 @@
 
         pha
         lda     __dos_type
-        beq     not_impl                ; AtariDOS
         cmp     #OSADOS+1
         bcc     do_sparta               ; OS/A and SpartaDOS
+        cmp     #MYDOS
+        bne     not_impl                ; neither MyDOS, OS/A, nor SpartaDOS
         pla
-        jmp     __sysremove             ; MyDOS and others (TODO: check XDOS)
+        jmp     __sysremove             ; MyDOS
 
 not_impl:
         pla

@@ -5,7 +5,8 @@
 ;
 
         .export         _lseek
-        .import         popax
+        .import         popax, popptr1
+        .macpack        cpu
 
         .include        "zeropage.inc"
         .include        "errno.inc"
@@ -18,11 +19,10 @@ _lseek:
         stx     tmp2
 
         ; Get and save offset
-        jsr     popax
-        sta     ptr1
-        stx     ptr1+1
+        jsr     popptr1
         jsr     popax
         sta     ptr2
+        stx     ptr2+1
 
         ; Get and process fd
         jsr     popax
@@ -79,6 +79,9 @@ seek_common:
         tya
         adc     ptr2
         sta     mliparam + MLI::MARK::POSITION+2
+        lda     #$00
+        adc     ptr2+1
+        bne     einval          ; less than 0 or greater than 2^24 - 1
 
         ; Set file pointer
         lda     #SET_MARK_CALL
@@ -86,13 +89,31 @@ seek_common:
         jsr     callmli
         bcs     oserr
 
+        ; Need to return the position in EAX
+.if (.cpu .bitand ::CPU_ISET_65SC02)
+        stz     sreg+1
+.else
+        lda     #$00
+        sta     sreg+1
+.endif
+        lda     mliparam + MLI::MARK::POSITION+2
+        sta     sreg
+        ldx     mliparam + MLI::MARK::POSITION+1
+        lda     mliparam + MLI::MARK::POSITION
+
         rts
 
         ; Load errno code
 einval: lda     #EINVAL
 
         ; Set __errno
-errno:  jmp     __directerrno
+errno:  jsr     __directerrno   ; leaves -1 in AX
+        stx     sreg            ; extend return value to 32 bits
+        stx     sreg+1
+        rts
 
         ; Set __oserror
-oserr:  jmp     __mappederrno
+oserr:  jsr     __mappederrno   ; leaves -1 in AX
+        stx     sreg            ; extend return value to 32 bits
+        stx     sreg+1
+        rts

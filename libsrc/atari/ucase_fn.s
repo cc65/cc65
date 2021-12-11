@@ -40,7 +40,9 @@
         stx     ptr4+1
 
 .ifdef  DEFAULT_DEVICE
-        ; bit #0 of tmp2 is used as a flag whether device name is present in passed string (1 = present, 0 = not present)
+        lda     tmp2
+        beq     hasdev          ; don't fiddle with device part
+        ; bit #0 of tmp2 is used as an additional flag whether device name is present in passed string (1 = present, 0 = not present)
         ldy     #1
         inc     tmp2            ; initialize flag: device present
         lda     #':'
@@ -81,11 +83,11 @@ copy_end:
 
 .ifdef  DEFAULT_DEVICE
         lda     #1
-        bit     tmp2
+        bit     tmp2            ; is a device present in the string?
         bne     hasdev2         ; yes, don't prepend something
-        bpl     hasdev2
+        bpl     hasdev2         ; check input parameter (tmp2 != $80)
 
-        ldy     #128+3          ; no, prepend "D:" (or other device)
+        ldy     #128+3          ; no, prepend "Dn:" (__defdev)
         sty     tmp3            ; adjust stack size used
         ldy     #3
         jsr     subysp          ; adjust stack pointer

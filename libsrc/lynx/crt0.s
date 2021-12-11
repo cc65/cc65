@@ -22,7 +22,7 @@
         .import         zerobss
         .import         callmain
         .import         _main
-        .import         __RAM_START__, __RAM_SIZE__, __STACKSIZE__
+        .import         __MAIN_START__, __MAIN_SIZE__, __STACKSIZE__
 
         .include        "zeropage.inc"
         .include        "extzp.inc"
@@ -47,7 +47,6 @@ MikeyInitData:  .byte $9e,$18,$68,$1f,$00,$00,$00,$00,$00,$ff,$1a,$1b,$04,$0d,$2
 ; Set up the system.
 
         sei
-        cld
         ldx     #$FF
         txs
 
@@ -69,7 +68,7 @@ MikeyInitData:  .byte $9e,$18,$68,$1f,$00,$00,$00,$00,$00,$ff,$1a,$1b,$04,$0d,$2
 
 ; Disable the TX/RX IRQ; set to 8E1.
 
-        lda     #%11101
+        lda     #%00011101
         sta     SERCTL
 
 ; Clear all pending interrupts.
@@ -79,10 +78,10 @@ MikeyInitData:  .byte $9e,$18,$68,$1f,$00,$00,$00,$00,$00,$ff,$1a,$1b,$04,$0d,$2
 
 ; Set up the stack.
 
-        lda     #<(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
+        lda     #<(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
+        ldx     #>(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
         sta     sp
-        lda     #>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
-        sta     sp+1
+        stx     sp+1
 
 ; Init Mickey.
 

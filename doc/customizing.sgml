@@ -3,7 +3,6 @@
 <article>
 <title>Defining a Custom cc65 Target
 <author>Bruce Reidenbach
-<date>2015-03-13
 
 <abstract>
 This section provides step-by-step instructions on how to use the cc65
@@ -78,15 +77,15 @@ vectors at the proper memory locations.  The segment definition is:
 
 <tscreen><code>
 SEGMENTS {
-    ZEROPAGE:  load = ZP,  type = zp,  define   = yes;
-    DATA:      load = ROM, type = rw,  define   = yes, run = RAM;
-    BSS:       load = RAM, type = bss, define   = yes;
-    HEAP:      load = RAM, type = bss, optional = yes;
-    STARTUP:   load = ROM, type = ro;
-    INIT:      load = ROM, type = ro,  optional = yes;
-    CODE:      load = ROM, type = ro;
-    RODATA:    load = ROM, type = ro;
-    VECTORS:   load = ROM, type = ro,  start    = $FFFA;
+    ZEROPAGE: load = ZP,  type = zp,  define   = yes;
+    DATA:     load = ROM, type = rw,  define   = yes, run = RAM;
+    BSS:      load = RAM, type = bss, define   = yes;
+    HEAP:     load = RAM, type = bss, optional = yes;
+    STARTUP:  load = ROM, type = ro;
+    ONCE:     load = ROM, type = ro,  optional = yes;
+    CODE:     load = ROM, type = ro;
+    RODATA:   load = ROM, type = ro;
+    VECTORS:  load = ROM, type = ro,  start    = $FFFA;
 }
 </code></tscreen>
 
@@ -97,7 +96,7 @@ The meaning of each of these segments is as follows.
 <p><tt>       BSS:       </tt>Uninitialized data stored in RAM (used for variable storage)
 <p><tt>       HEAP:      </tt>Uninitialized C-level heap storage in RAM, optional
 <p><tt>       STARTUP:   </tt>The program initialization code, stored in ROM
-<p><tt>       INIT:      </tt>The code needed to initialize the system, stored in ROM
+<p><tt>       ONCE:      </tt>The code run once to initialize the system, stored in ROM
 <p><tt>       CODE:      </tt>The program code, stored in ROM
 <p><tt>       RODATA:    </tt>Initialized data that cannot be modified by the program, stored in ROM
 <p><tt>       VECTORS:   </tt>The interrupt vector table, stored in ROM at location $FFFA

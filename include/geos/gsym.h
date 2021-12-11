@@ -7,9 +7,7 @@
 #ifndef _GSYM_H
 #define _GSYM_H
 
-#ifndef _GSTRUCT_H
 #include <geos/gstruct.h>
-#endif
 
 #define r0              (*(unsigned*)(R_BASE + 0x00))
 #define r0L             (*(char*)(R_BASE + 0x00))

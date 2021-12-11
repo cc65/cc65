@@ -1,10 +1,8 @@
 <!doctype linuxdoc system>
 
 <article>
-
 <title>Watara Supervision specific information for cc65
 <author><url url="mailto:polluks@sdf.lonestar.org" name="Stefan A. Haubenthal">
-<date>2014-04-12
 
 <abstract>
 An overview over the Supervision runtime system as it is implemented for the
@@ -63,14 +61,6 @@ Special locations:
 Programs containing Supervision specific code may use the <tt/supervision.h/ header file.
 
 
-<sect1>Supervision specific functions<p>
-
-<itemize>
-<item>waitvblank
-</itemize>
-
-
-
 <sect1>Hardware access<p>
 
 The following pseudo variables declared in the <tt/supervision.inc/ include file do
@@ -102,11 +92,12 @@ No extended memory drivers are currently available for the Supervision.
 
 <sect1>Joystick drivers<p>
 
-No joystick drivers are currently available for the Supervision.
-<!--A joystick driver for the standard buttons is available, but must be
-statically linked, because no file I/O is available. See the documentation for
-the <url url="co65.html" name="co65 utility"> for information on how to do
-that.-->
+<descrip>
+
+  <tag><tt/supervision-stdjoy.joy (supervision_stdjoy_joy)/</tag>
+  A joystick driver for the standard two buttons joypad is available.
+
+</descrip><p>
 
 <sect1>Mouse drivers<p>
 
@@ -157,14 +148,14 @@ including commercial applications, and to alter it and redistribute it
 freely, subject to the following restrictions:
 
 <enum>
-<item>	The origin of this software must not be misrepresented; you must not
-	claim that you wrote the original software. If you use this software
-	in a product, an acknowledgment in the product documentation would be
-	appreciated but is not required.
-<item>	Altered source versions must be plainly marked as such, and must not
-	be misrepresented as being the original software.
-<item>	This notice may not be removed or altered from any source
-	distribution.
+<item>  The origin of this software must not be misrepresented; you must not
+        claim that you wrote the original software. If you use this software
+        in a product, an acknowledgment in the product documentation would be
+        appreciated but is not required.
+<item>  Altered source versions must be plainly marked as such, and must not
+        be misrepresented as being the original software.
+<item>  This notice may not be removed or altered from any source
+        distribution.
 </enum>
 
 </article>

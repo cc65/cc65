@@ -2,8 +2,7 @@
 
 <article>
 <title>cc65 Documentation Overview
-<author><url url="http://cc65.github.io/doc">
-<date>
+<author><url url="https://cc65.github.io/doc">
 
 <sect>Program documentation<p>
 
@@ -18,7 +17,7 @@
   <tag><htmlurl url="cc65.html" name="cc65.html"></tag>
   Describes the cc65 C compiler.
 
-  <tag><htmlurl url="chrcvt.html" name="chrcvt.html"></tag>
+  <tag><htmlurl url="chrcvt65.html" name="chrcvt65.html"></tag>
   Describes the vector font converter.
 
   <tag><htmlurl url="cl65.html" name="cl65.html"></tag>
@@ -31,7 +30,7 @@
   Describes the da65 6502/65C02 disassembler.
 
   <tag><htmlurl url="grc65.html" name="grc65.html"></tag>
-  Describes the GEOS resource compiler (grc65).
+  Describes the GEOS resource compiler.
 
   <tag><htmlurl url="ld65.html" name="ld65.html"></tag>
   Describes the ld65 linker.
@@ -59,6 +58,9 @@
   <tag><htmlurl url="coding.html" name="coding.html"></tag>
   Contains hints on creating the most effective code with cc65.
 
+  <tag><htmlurl url="cc65-intern.html" name="cc65-intern.html"></tag>
+  Describes internal details of cc65, such as calling conventions.
+
   <tag><htmlurl url="using-make.html" name="using-make.html"></tag>
   Build programs, using the GNU Make utility.
 
@@ -81,6 +83,9 @@
 
   <tag><htmlurl url="dio.html" name="dio.html"></tag>
   Low-level disk I/O API.
+
+  <tag><htmlurl url="tgi.html" name="tgi.html"></tag>
+  Tiny Graphics Interface.
 
   <tag><htmlurl url="geos.html" name="geos.html"></tag>
   The GEOSLib manual.
@@ -113,6 +118,9 @@
   <tag><htmlurl url="atari.html" name="atari.html"></tag>
   Topics specific to the Atari 8-bit machines.
 
+  <tag><htmlurl url="atari2600.html" name="atari2600.html"></tag>
+  Topics specific to the Atari 2600 Game Console.
+
   <tag><htmlurl url="atari5200.html" name="atari5200.html"></tag>
   Topics specific to the Atari 5200 Game Console.
 
@@ -134,6 +142,15 @@
   <tag><htmlurl url="cbm610.html" name="cbm610.html"></tag>
   Topics specific to the Commodore 610.
 
+  <tag><htmlurl url="creativision.html" name="creativision.html"></tag>
+  Topics specific to the Creativision Console.
+
+  <tag><htmlurl url="cx16.html" name="cx16.html"></tag>
+  Topics specific to the Commander X16.
+
+  <tag><htmlurl url="gamate.html" name="gamate.html"></tag>
+  Topics specific to the Bit Corporation Gamate Console.
+
   <tag><htmlurl url="lynx.html" name="lynx.html"></tag>
   Topics specific to the Atari Lynx Game Console.
 
@@ -144,10 +161,7 @@
   Topics specific to the Ohio Scientific machines.
 
   <tag><htmlurl url="pce.html" name="pce.html"></tag>
-  Topics specific to NEC PC-Engine (TurboGrafx) Console.
-
-  <tag><htmlurl url="gamate.html" name="gamate.html"></tag>
-  Topics specific to Bit Corporation Gamate Console.
+  Topics specific to the NEC PC-Engine (TurboGrafx-16) Console.
 
   <tag><htmlurl url="pet.html" name="pet.html"></tag>
   Topics specific to the Commodore PET machines.
@@ -157,6 +171,12 @@
 
   <tag><htmlurl url="supervision.html" name="supervision.html"></tag>
   Topics specific to the Watara Supervision Console.
+
+  <tag><htmlurl url="sym1.html" name="sym1.html"></tag>
+  Topics specific to the Synertek Systems Sym-1.
+
+  <tag><htmlurl url="telestrat.html" name="telestrat.html"></tag>
+  Topics specific to the Oric Telestrat.
 
   <tag><htmlurl url="vic20.html" name="vic20.html"></tag>
   Topics specific to the Commodore VIC20.

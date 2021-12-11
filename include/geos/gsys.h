@@ -31,9 +31,13 @@ char get_ostype(void);
 #define GEOS4           0x04    /* plus4 geos is not or'ed with version */
 #define GEOS128         0x80
   /* version flags */
+#define MEGAPATCH3      0x03
+#define GATEWAY         0x08
 #define GEOS_V10        0x10
 #define GEOS_V11        0x11
-#define GEOS_V12        0x12    /* ??? not sure */
+#define GEOS_V12        0x12
+#define GEOS_V13        0x13
+#define GEOS_V15        0x15
 #define GEOS_V20        0x20
 #define WHEELS          0x40    /* only Wheels? */
 

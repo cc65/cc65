@@ -524,7 +524,7 @@ static void StudySymbol (ExprNode* Expr, ExprDesc* D)
 
         if (SymHasUserMark (Sym)) {
             LIError (&Sym->DefLines,
-                     "Circular reference in definition of symbol `%m%p'",
+                     "Circular reference in definition of symbol '%m%p'",
                      GetSymName (Sym));
             ED_SetError (D);
         } else {
@@ -1277,6 +1277,26 @@ static void StudyDWord (ExprNode* Expr, ExprDesc* D)
 
 
 
+static void StudyNearAddr (ExprNode* Expr, ExprDesc* D)
+/* Study an EXPR_NEARADDR expression node */
+{
+    /* Study the expression */
+    StudyExprInternal (Expr->Left, D);
+
+    /* We can handle only const expressions */
+    if (!ED_IsConst (D)) {
+        ED_Invalidate (D);
+    }
+
+    /* Promote to absolute if smaller. */
+    if (D->AddrSize < ADDR_SIZE_ABS)
+    {
+        D->AddrSize = ADDR_SIZE_ABS;
+    }
+}
+
+
+
 static void StudyExprInternal (ExprNode* Expr, ExprDesc* D)
 /* Study an expression tree and place the contents into D */
 {
@@ -1433,6 +1453,10 @@ static void StudyExprInternal (ExprNode* Expr, ExprDesc* D)
 
         case EXPR_DWORD:
             StudyDWord (Expr, D);
+            break;
+
+        case EXPR_NEARADDR:
+            StudyNearAddr (Expr, D);
             break;
 
         default:

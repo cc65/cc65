@@ -8,7 +8,7 @@
 
         .export         _set_irq, _reset_irq
         .interruptor    clevel_irq, 1           ; Export as low priority IRQ handler
-        .import         popax, __ZP_START__
+        .import         popax, __ZP_START__, jmpvec
 
         .include        "zeropage.inc"
 
@@ -84,6 +84,12 @@ zpsave: .res    zpsavespace
         dex
         bpl     @L2
 
+        ; Save jmpvec
+        lda     jmpvec+1
+        pha
+        lda     jmpvec+2
+        pha
+
         ; Set C level interrupt stack
         lda     irqsp
         ldx     irqsp+1
@@ -93,15 +99,21 @@ zpsave: .res    zpsavespace
         ; Call C level interrupt request handler
         jsr     irqvec
 
-        ; Copy back our zero page content
+        ; Mark interrupt handled / not handled
+        lsr
+
+        ; Restore our zero page content
         ldx     #.sizeof(::zpsave)-1
-@L3:    ldy     zpsave,x
-        sty     <__ZP_START__,x
+@L3:    lda     zpsave,x
+        sta     <__ZP_START__,x
         dex
         bpl     @L3
 
-        ; Mark interrupt handled / not handled and return
-        lsr
+        ; Restore jmpvec and return
+        pla
+        sta     jmpvec+2
+        pla
+        sta     jmpvec+1
         rts
 
 .endproc

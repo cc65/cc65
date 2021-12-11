@@ -16,7 +16,7 @@
 
         .export         __sio_call
         .include        "atari.inc"
-        .import         popa,popax
+        .import         popa,popax,popptr1
         .import         sectsizetab,__oserror
         .importzp       ptr1
 
@@ -31,9 +31,7 @@
         sta     DAUX1           ; set sector #
         stx     DAUX2
 
-        jsr     popax
-        sta     ptr1
-        stx     ptr1+1
+        jsr     popptr1
 
         ldy     #sst_flag
         lda     (ptr1),y

@@ -11,6 +11,7 @@
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
 /*                                                                           */
+/* Mar-2017, Christian Krueger, added support for 65SC02                     */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
 /* warranty.  In no event will the authors be held liable for any damages    */
@@ -31,7 +32,12 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
+/* Known bugs and limitations of the 65C02 simulation:
+ * support currently only on the level of 65SC02:
+   BBRx, BBSx, RMBx, SMBx, WAI, and STP are unsupported
+ * BCD flag handling equals 6502 (unchecked if bug is simulated or wrong for
+   6502)
+*/
 
 #include "memory.h"
 #include "error.h"
@@ -67,6 +73,8 @@ static unsigned HaveNMIRequest;
 /* IRQ request active */
 static unsigned HaveIRQRequest;
 
+/* flag to print cycles at program termination */
+int PrintCycles;
 
 
 /*****************************************************************************/
@@ -75,12 +83,11 @@ static unsigned HaveIRQRequest;
 
 
 
-/* Return the flags as a boolean value (0/1) */
+/* Return the flags as boolean values (0/1) */
 #define GET_CF()        ((Regs.SR & CF) != 0)
 #define GET_ZF()        ((Regs.SR & ZF) != 0)
 #define GET_IF()        ((Regs.SR & IF) != 0)
 #define GET_DF()        ((Regs.SR & DF) != 0)
-#define GET_BF()        ((Regs.SR & BF) != 0)
 #define GET_OF()        ((Regs.SR & OF) != 0)
 #define GET_SF()        ((Regs.SR & SF) != 0)
 
@@ -91,7 +98,6 @@ static unsigned HaveIRQRequest;
 #define SET_ZF(f)       do { if (f) { Regs.SR |= ZF; } else { Regs.SR &= ~ZF; } } while (0)
 #define SET_IF(f)       do { if (f) { Regs.SR |= IF; } else { Regs.SR &= ~IF; } } while (0)
 #define SET_DF(f)       do { if (f) { Regs.SR |= DF; } else { Regs.SR &= ~DF; } } while (0)
-#define SET_BF(f)       do { if (f) { Regs.SR |= BF; } else { Regs.SR &= ~BF; } } while (0)
 #define SET_OF(f)       do { if (f) { Regs.SR |= OF; } else { Regs.SR &= ~OF; } } while (0)
 #define SET_SF(f)       do { if (f) { Regs.SR |= SF; } else { Regs.SR &= ~SF; } } while (0)
 
@@ -107,8 +113,8 @@ static unsigned HaveIRQRequest;
 #define PCH             ((Regs.PC >> 8) & 0xFF)
 
 /* Stack operations */
-#define PUSH(Val)       MemWriteByte (0x0100 + Regs.SP--, Val)
-#define POP()           MemReadByte (0x0100 + ++Regs.SP)
+#define PUSH(Val)       MemWriteByte (0x0100 | (Regs.SP-- & 0xFF), Val)
+#define POP()           MemReadByte (0x0100 | (++Regs.SP & 0xFF))
 
 /* Test for page cross */
 #define PAGE_CROSS(addr,offs)   ((((addr) & 0xFF) + offs) >= 0x100)
@@ -203,7 +209,23 @@ static unsigned HaveIRQRequest;
     unsigned Addr;                                              \
     Cycles = 5;                                                 \
     ZPAddr = MemReadByte (Regs.PC+1);                           \
-    Addr = MemReadZPWord (ZPAddr) + Regs.YR;                    \
+    Addr = MemReadZPWord (ZPAddr);                              \
+    if (PAGE_CROSS (Addr, Regs.YR)) {                           \
+        ++Cycles;                                               \
+    }                                                           \
+    Addr += Regs.YR;                                            \
+    Regs.AC = Regs.AC op MemReadByte (Addr);                    \
+    TEST_ZF (Regs.AC);                                          \
+    TEST_SF (Regs.AC);                                          \
+    Regs.PC += 2
+
+/* (zp) */
+#define AC_OP_ZPIND(op)                                         \
+    unsigned char ZPAddr;                                       \
+    unsigned Addr;                                              \
+    Cycles = 5;                                                 \
+    ZPAddr = MemReadByte (Regs.PC+1);                           \
+    Addr = MemReadZPWord (ZPAddr);                              \
     Regs.AC = Regs.AC op MemReadByte (Addr);                    \
     TEST_ZF (Regs.AC);                                          \
     TEST_SF (Regs.AC);                                          \
@@ -232,6 +254,9 @@ static unsigned HaveIRQRequest;
             }                                                   \
             TEST_CF (Regs.AC);                                  \
             SET_OF ((res < -128) || (res > 127));               \
+            if (CPU != CPU_6502) {                              \
+                ++Cycles;                                       \
+            }                                                   \
         } else {                                                \
             Regs.AC += rhs + GET_CF ();                         \
             TEST_ZF (Regs.AC);                                  \
@@ -311,6 +336,9 @@ static unsigned HaveIRQRequest;
             TEST_SF (res);                                      \
             SET_CF (res <= 0xFF);                               \
             SET_OF (((old^rhs) & (old^res) & 0x80));            \
+            if (CPU != CPU_6502) {                              \
+                ++Cycles;                                       \
+            }                                                   \
         } else {                                                \
             Regs.AC -= rhs + (!GET_CF ());                      \
             TEST_ZF (Regs.AC);                                  \
@@ -342,11 +370,14 @@ static void OPC_6502_00 (void)
 {
     Cycles = 7;
     Regs.PC += 2;
-    SET_BF (1);
     PUSH (PCH);
     PUSH (PCL);
     PUSH (Regs.SR);
     SET_IF (1);
+    if (CPU != CPU_6502)
+    {
+        SET_DF (0);
+    }
     Regs.PC = MemReadWord (0xFFFE);
 }
 
@@ -356,6 +387,21 @@ static void OPC_6502_01 (void)
 /* Opcode $01: ORA (ind,x) */
 {
     AC_OP_ZPXIND (|);
+}
+
+
+
+static void OPC_65SC02_04 (void)
+/* Opcode $04: TSB zp */
+{
+    unsigned char ZPAddr;
+    unsigned char Val;
+    Cycles = 5;
+    ZPAddr = MemReadByte (Regs.PC+1);
+    Val = MemReadByte (ZPAddr);
+    SET_ZF ((Val & Regs.AC) == 0);
+    MemWriteByte (ZPAddr, (unsigned char)(Val | Regs.AC));
+    Regs.PC += 2;
 }
 
 
@@ -375,7 +421,7 @@ static void OPC_6502_06 (void)
     unsigned Val;
     Cycles = 5;
     ZPAddr = MemReadByte (Regs.PC+1);
-    Val    = MemReadByte (ZPAddr) << 1;
+    Val = MemReadByte (ZPAddr) << 1;
     MemWriteByte (ZPAddr, (unsigned char) Val);
     TEST_ZF (Val & 0xFF);
     TEST_SF (Val);
@@ -389,7 +435,7 @@ static void OPC_6502_08 (void)
 /* Opcode $08: PHP */
 {
     Cycles = 3;
-    PUSH (Regs.SR & ~BF);
+    PUSH (Regs.SR);
     Regs.PC += 1;
 }
 
@@ -417,6 +463,21 @@ static void OPC_6502_0A (void)
 
 
 
+static void OPC_65SC02_0C (void)
+/* Opcode $0C: TSB abs */
+{
+    unsigned Addr;
+    unsigned char Val;
+    Cycles = 6;
+    Addr = MemReadWord (Regs.PC+1);
+    Val = MemReadByte (Addr);
+    SET_ZF ((Val & Regs.AC) == 0);
+    MemWriteByte (Addr, (unsigned char) (Val | Regs.AC));
+    Regs.PC += 3;
+}
+
+
+
 static void OPC_6502_0D (void)
 /* Opcode $0D: ORA abs */
 {
@@ -432,7 +493,7 @@ static void OPC_6502_0E (void)
     unsigned Val;
     Cycles = 6;
     Addr = MemReadWord (Regs.PC+1);
-    Val  = MemReadByte (Addr) << 1;
+    Val = MemReadByte (Addr) << 1;
     MemWriteByte (Addr, (unsigned char) Val);
     TEST_ZF (Val & 0xFF);
     TEST_SF (Val);
@@ -458,6 +519,29 @@ static void OPC_6502_11 (void)
 
 
 
+static void OPC_65SC02_12 (void)
+/* Opcode $12: ORA (zp) */
+{
+    AC_OP_ZPIND (|);
+}
+
+
+
+static void OPC_65SC02_14 (void)
+/* Opcode $14: TRB zp */
+{
+    unsigned char ZPAddr;
+    unsigned char Val;
+    Cycles = 5;
+    ZPAddr = MemReadByte (Regs.PC+1);
+    Val = MemReadByte (ZPAddr);
+    SET_ZF ((Val & Regs.AC) == 0);
+    MemWriteByte (ZPAddr, (unsigned char)(Val & ~Regs.AC));
+    Regs.PC += 2;
+}
+
+
+
 static void OPC_6502_15 (void)
 /* Opcode $15: ORA zp,x */
 {
@@ -473,7 +557,7 @@ static void OPC_6502_16 (void)
     unsigned Val;
     Cycles = 6;
     ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;
-    Val    = MemReadByte (ZPAddr) << 1;
+    Val = MemReadByte (ZPAddr) << 1;
     MemWriteByte (ZPAddr, (unsigned char) Val);
     TEST_ZF (Val & 0xFF);
     TEST_SF (Val);
@@ -501,6 +585,33 @@ static void OPC_6502_19 (void)
 
 
 
+static void OPC_65SC02_1A (void)
+/* Opcode $1A: INC a */
+{
+    Cycles = 2;
+    Regs.AC = (Regs.AC + 1) & 0xFF;
+    TEST_ZF (Regs.AC);
+    TEST_SF (Regs.AC);
+    Regs.PC += 1;
+}
+
+
+
+static void OPC_65SC02_1C (void)
+/* Opcode $1C: TRB abs */
+{
+    unsigned Addr;
+    unsigned char Val;
+    Cycles = 6;
+    Addr = MemReadWord (Regs.PC+1);
+    Val = MemReadByte (Addr);
+    SET_ZF ((Val & Regs.AC) == 0);
+    MemWriteByte (Addr, (unsigned char) (Val & ~Regs.AC));
+    Regs.PC += 3;
+}
+
+
+
 static void OPC_6502_1D (void)
 /* Opcode $1D: ORA abs,x */
 {
@@ -516,7 +627,9 @@ static void OPC_6502_1E (void)
     unsigned Val;
     Cycles = 7;
     Addr = MemReadWord (Regs.PC+1) + Regs.XR;
-    Val  = MemReadByte (Addr) << 1;
+    if (CPU != CPU_6502 && !PAGE_CROSS (Addr, Regs.XR))
+        --Cycles;
+    Val = MemReadByte (Addr) << 1;
     MemWriteByte (Addr, (unsigned char) Val);
     TEST_ZF (Val & 0xFF);
     TEST_SF (Val);
@@ -531,7 +644,7 @@ static void OPC_6502_20 (void)
 {
     unsigned Addr;
     Cycles = 6;
-    Addr   = MemReadWord (Regs.PC+1);
+    Addr = MemReadWord (Regs.PC+1);
     Regs.PC += 2;
     PUSH (PCH);
     PUSH (PCL);
@@ -557,7 +670,7 @@ static void OPC_6502_24 (void)
     unsigned char Val;
     Cycles = 3;
     ZPAddr = MemReadByte (Regs.PC+1);
-    Val    = MemReadByte (ZPAddr);
+    Val = MemReadByte (ZPAddr);
     SET_SF (Val & 0x80);
     SET_OF (Val & 0x40);
     SET_ZF ((Val & Regs.AC) == 0);
@@ -581,7 +694,7 @@ static void OPC_6502_26 (void)
     unsigned Val;
     Cycles = 5;
     ZPAddr = MemReadByte (Regs.PC+1);
-    Val    = MemReadByte (ZPAddr);
+    Val = MemReadByte (ZPAddr);
     ROL (Val);
     MemWriteByte (ZPAddr, Val);
     Regs.PC += 2;
@@ -593,7 +706,9 @@ static void OPC_6502_28 (void)
 /* Opcode $28: PLP */
 {
     Cycles = 4;
-    Regs.SR = (POP () & ~BF);
+
+    /* Bits 5 and 4 aren't used, and always are 1! */
+    Regs.SR = (POP () | 0x30);
     Regs.PC += 1;
 }
 
@@ -624,8 +739,8 @@ static void OPC_6502_2C (void)
     unsigned Addr;
     unsigned char Val;
     Cycles = 4;
-    Addr = MemReadByte (Regs.PC+1);
-    Val  = MemReadByte (Addr);
+    Addr = MemReadWord (Regs.PC+1);
+    Val = MemReadByte (Addr);
     SET_SF (Val & 0x80);
     SET_OF (Val & 0x40);
     SET_ZF ((Val & Regs.AC) == 0);
@@ -649,7 +764,7 @@ static void OPC_6502_2E (void)
     unsigned Val;
     Cycles = 6;
     Addr = MemReadWord (Regs.PC+1);
-    Val  = MemReadByte (Addr);
+    Val = MemReadByte (Addr);
     ROL (Val);
     MemWriteByte (Addr, Val);
     Regs.PC += 3;
@@ -673,6 +788,30 @@ static void OPC_6502_31 (void)
 
 
 
+static void OPC_65SC02_32 (void)
+/* Opcode $32: AND (zp) */
+{
+    AC_OP_ZPIND (&);
+}
+
+
+
+static void OPC_65SC02_34 (void)
+/* Opcode $34: BIT zp,x */
+{
+    unsigned char ZPAddr;
+    unsigned char Val;
+    Cycles = 4;
+    ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;
+    Val = MemReadByte (ZPAddr);
+    SET_SF (Val & 0x80);
+    SET_OF (Val & 0x40);
+    SET_ZF ((Val & Regs.AC) == 0);
+    Regs.PC += 2;
+}
+
+
+
 static void OPC_6502_35 (void)
 /* Opcode $35: AND zp,x */
 {
@@ -688,7 +827,7 @@ static void OPC_6502_36 (void)
     unsigned Val;
     Cycles = 6;
     ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;
-    Val    = MemReadByte (ZPAddr);
+    Val = MemReadByte (ZPAddr);
     ROL (Val);
     MemWriteByte (ZPAddr, Val);
     Regs.PC += 2;
@@ -714,6 +853,36 @@ static void OPC_6502_39 (void)
 
 
 
+static void OPC_65SC02_3A (void)
+/* Opcode $3A: DEC a */
+{
+    Cycles = 2;
+    Regs.AC = (Regs.AC - 1) & 0xFF;
+    TEST_ZF (Regs.AC);
+    TEST_SF (Regs.AC);
+    Regs.PC += 1;
+}
+
+
+
+static void OPC_65SC02_3C (void)
+/* Opcode $3C: BIT abs,x */
+{
+    unsigned Addr;
+    unsigned char Val;
+    Cycles = 4;
+    Addr = MemReadWord (Regs.PC+1);
+    if (PAGE_CROSS (Addr, Regs.XR))
+        ++Cycles;
+    Val  = MemReadByte (Addr + Regs.XR);
+    SET_SF (Val & 0x80);
+    SET_OF (Val & 0x40);
+    SET_ZF ((Val & Regs.AC) == 0);
+    Regs.PC += 3;
+}
+
+
+
 static void OPC_6502_3D (void)
 /* Opcode $3D: AND abs,x */
 {
@@ -729,7 +898,9 @@ static void OPC_6502_3E (void)
     unsigned Val;
     Cycles = 7;
     Addr = MemReadWord (Regs.PC+1) + Regs.XR;
-    Val  = MemReadByte (Addr);
+    if (CPU != CPU_6502 && !PAGE_CROSS (Addr, Regs.XR))
+        --Cycles;
+    Val = MemReadByte (Addr);
     ROL (Val);
     MemWriteByte (Addr, Val);
     Regs.PC += 2;
@@ -741,7 +912,9 @@ static void OPC_6502_40 (void)
 /* Opcode $40: RTI */
 {
     Cycles = 6;
-    Regs.SR = POP ();
+
+    /* Bits 5 and 4 aren't used, and always are 1! */
+    Regs.SR = POP () | 0x30;
     Regs.PC = POP ();                /* PCL */
     Regs.PC |= (POP () << 8);        /* PCH */
 }
@@ -752,6 +925,15 @@ static void OPC_6502_41 (void)
 /* Opcode $41: EOR (zp,x) */
 {
     AC_OP_ZPXIND (^);
+}
+
+
+
+static void OPC_65C02_44 (void)
+/* Opcode $44: 'zp' 3 cycle NOP */
+{
+    Cycles = 3;
+    Regs.PC += 2;
 }
 
 
@@ -771,7 +953,7 @@ static void OPC_6502_46 (void)
     unsigned char Val;
     Cycles = 5;
     ZPAddr = MemReadByte (Regs.PC+1);
-    Val    = MemReadByte (ZPAddr);
+    Val = MemReadByte (ZPAddr);
     SET_CF (Val & 0x01);
     Val >>= 1;
     MemWriteByte (ZPAddr, Val);
@@ -839,7 +1021,7 @@ static void OPC_6502_4E (void)
     unsigned char Val;
     Cycles = 6;
     Addr = MemReadWord (Regs.PC+1);
-    Val  = MemReadByte (Addr);
+    Val = MemReadByte (Addr);
     SET_CF (Val & 0x01);
     Val >>= 1;
     MemWriteByte (Addr, Val);
@@ -866,6 +1048,14 @@ static void OPC_6502_51 (void)
 
 
 
+static void OPC_65SC02_52 (void)
+/* Opcode $52: EOR (zp) */
+{
+    AC_OP_ZPIND (^);
+}
+
+
+
 static void OPC_6502_55 (void)
 /* Opcode $55: EOR zp,x */
 {
@@ -881,7 +1071,7 @@ static void OPC_6502_56 (void)
     unsigned char Val;
     Cycles = 6;
     ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;
-    Val    = MemReadByte (ZPAddr);
+    Val = MemReadByte (ZPAddr);
     SET_CF (Val & 0x01);
     Val >>= 1;
     MemWriteByte (ZPAddr, Val);
@@ -910,6 +1100,25 @@ static void OPC_6502_59 (void)
 
 
 
+static void OPC_65SC02_5A (void)
+/* Opcode $5A: PHY */
+{
+    Cycles = 3;
+    PUSH (Regs.YR);
+    Regs.PC += 1;
+}
+
+
+
+static void OPC_65C02_5C (void)
+/* Opcode $5C: 'Absolute' 8 cycle NOP */
+{
+    Cycles = 8;
+    Regs.PC += 3;
+}
+
+
+
 static void OPC_6502_5D (void)
 /* Opcode $5D: EOR abs,x */
 {
@@ -925,7 +1134,9 @@ static void OPC_6502_5E (void)
     unsigned char Val;
     Cycles = 7;
     Addr = MemReadWord (Regs.PC+1) + Regs.XR;
-    Val  = MemReadByte (Addr);
+    if (CPU != CPU_6502 && !PAGE_CROSS (Addr, Regs.XR))
+        --Cycles;
+    Val = MemReadByte (Addr);
     SET_CF (Val & 0x01);
     Val >>= 1;
     MemWriteByte (Addr, Val);
@@ -954,8 +1165,20 @@ static void OPC_6502_61 (void)
     unsigned Addr;
     Cycles = 6;
     ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;
-    Addr   = MemReadZPWord (ZPAddr);
+    Addr = MemReadZPWord (ZPAddr);
     ADC (MemReadByte (Addr));
+    Regs.PC += 2;
+}
+
+
+
+static void OPC_65SC02_64 (void)
+/* Opcode $64: STZ zp */
+{
+    unsigned char ZPAddr;
+    Cycles = 3;
+    ZPAddr = MemReadByte (Regs.PC+1);
+    MemWriteByte (ZPAddr, 0);
     Regs.PC += 2;
 }
 
@@ -980,7 +1203,7 @@ static void OPC_6502_66 (void)
     unsigned Val;
     Cycles = 5;
     ZPAddr = MemReadByte (Regs.PC+1);
-    Val    = MemReadByte (ZPAddr);
+    Val = MemReadByte (ZPAddr);
     ROR (Val);
     MemWriteByte (ZPAddr, Val);
     Regs.PC += 2;
@@ -1024,20 +1247,31 @@ static void OPC_6502_6C (void)
 /* Opcode $6C: JMP (ind) */
 {
     unsigned PC, Lo, Hi;
-    Cycles = 5;
     PC = Regs.PC;
     Lo = MemReadWord (PC+1);
 
-    /* Emulate the 6502 bug */
-    Regs.PC = MemReadByte (Lo);
-    Hi = (Lo & 0xFF00) | ((Lo + 1) & 0xFF);
-    Regs.PC |= (MemReadByte (Hi) << 8);
+    if (CPU == CPU_6502)
+    {
+         /* Emulate the 6502 bug */
+        Cycles = 5;
+        Regs.PC = MemReadByte (Lo);
+        Hi = (Lo & 0xFF00) | ((Lo + 1) & 0xFF);
+        Regs.PC |= (MemReadByte (Hi) << 8);
 
-    /* Output a warning if the bug is triggered */
-    if (Hi != Lo + 1) {
-        Warning ("6502 indirect jump bug triggered at $%04X, ind addr = $%04X",
-                 PC, Lo);
+        /* Output a warning if the bug is triggered */
+        if (Hi != Lo + 1)
+        {
+            Warning ("6502 indirect jump bug triggered at $%04X, ind addr = $%04X",
+                     PC, Lo);
+        }
     }
+    else
+    {
+        Cycles = 6;
+        Regs.PC = MemReadWord(Lo);
+    }
+    
+    ParaVirtHooks (&Regs);    
 }
 
 
@@ -1048,6 +1282,8 @@ static void OPC_65C02_6C (void)
     /* 6502 bug fixed here */
     Cycles = 5;
     Regs.PC = MemReadWord (MemReadWord (Regs.PC+1));
+
+    ParaVirtHooks (&Regs);    
 }
 
 
@@ -1104,6 +1340,32 @@ static void OPC_6502_71 (void)
 
 
 
+static void OPC_65SC02_72 (void)
+/* Opcode $72: ADC (zp) */
+{
+    unsigned char ZPAddr;
+    unsigned Addr;
+    Cycles = 5;
+    ZPAddr = MemReadByte (Regs.PC+1);
+    Addr   = MemReadZPWord (ZPAddr);
+    ADC (MemReadByte (Addr));
+    Regs.PC += 2;
+}
+
+
+
+static void OPC_65SC02_74 (void)
+/* Opcode $74: STZ zp,x */
+{
+    unsigned char ZPAddr;
+    Cycles = 4;
+    ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;
+    MemWriteByte (ZPAddr, 0);
+    Regs.PC += 2;
+}
+
+
+
 static void OPC_6502_75 (void)
 /* Opcode $75: ADC zp,x */
 {
@@ -1123,7 +1385,7 @@ static void OPC_6502_76 (void)
     unsigned Val;
     Cycles = 6;
     ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;
-    Val    = MemReadByte (ZPAddr);
+    Val = MemReadByte (ZPAddr);
     ROR (Val);
     MemWriteByte (ZPAddr, Val);
     Regs.PC += 2;
@@ -1146,7 +1408,7 @@ static void OPC_6502_79 (void)
 {
     unsigned Addr;
     Cycles = 4;
-    Addr   = MemReadWord (Regs.PC+1);
+    Addr = MemReadWord (Regs.PC+1);
     if (PAGE_CROSS (Addr, Regs.YR)) {
         ++Cycles;
     }
@@ -1156,12 +1418,38 @@ static void OPC_6502_79 (void)
 
 
 
+static void OPC_65SC02_7A (void)
+/* Opcode $7A: PLY */
+{
+    Cycles = 4;
+    Regs.YR = POP ();
+    TEST_ZF (Regs.YR);
+    TEST_SF (Regs.YR);
+    Regs.PC += 1;
+}
+
+
+
+static void OPC_65SC02_7C (void)
+/* Opcode $7C: JMP (ind,X) */
+{
+    unsigned PC, Adr;
+    Cycles = 6;
+    PC = Regs.PC;
+    Adr = MemReadWord (PC+1);
+    Regs.PC = MemReadWord(Adr+Regs.XR);
+
+    ParaVirtHooks (&Regs);    
+}
+
+
+
 static void OPC_6502_7D (void)
 /* Opcode $7D: ADC abs,x */
 {
     unsigned Addr;
     Cycles = 4;
-    Addr   = MemReadWord (Regs.PC+1);
+    Addr = MemReadWord (Regs.PC+1);
     if (PAGE_CROSS (Addr, Regs.XR)) {
         ++Cycles;
     }
@@ -1177,11 +1465,21 @@ static void OPC_6502_7E (void)
     unsigned Addr;
     unsigned Val;
     Cycles = 7;
-    Addr = MemReadByte (Regs.PC+1) + Regs.XR;
-    Val  = MemReadByte (Addr);
+    Addr = MemReadWord (Regs.PC+1) + Regs.XR;
+    if (CPU != CPU_6502 && !PAGE_CROSS (Addr, Regs.XR))
+        --Cycles;
+    Val = MemReadByte (Addr);
     ROR (Val);
     MemWriteByte (Addr, Val);
     Regs.PC += 3;
+}
+
+
+
+static void OPC_65SC02_80 (void)
+/* Opcode $80: BRA */
+{
+    BRANCH (1);
 }
 
 
@@ -1193,7 +1491,7 @@ static void OPC_6502_81 (void)
     unsigned Addr;
     Cycles = 6;
     ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;
-    Addr   = MemReadZPWord (ZPAddr);
+    Addr = MemReadZPWord (ZPAddr);
     MemWriteByte (Addr, Regs.AC);
     Regs.PC += 2;
 }
@@ -1244,6 +1542,20 @@ static void OPC_6502_88 (void)
     TEST_ZF (Regs.YR);
     TEST_SF (Regs.YR);
     Regs.PC += 1;
+}
+
+
+
+static void OPC_65SC02_89 (void)
+/* Opcode $89: BIT #imm */
+{
+    unsigned char Val;
+    Cycles = 2;
+    Val = MemReadByte (Regs.PC+1);
+    SET_SF (Val & 0x80);
+    SET_OF (Val & 0x40);
+    SET_ZF ((Val & Regs.AC) == 0);
+    Regs.PC += 2;
 }
 
 
@@ -1311,7 +1623,21 @@ static void OPC_6502_91 (void)
     unsigned Addr;
     Cycles = 6;
     ZPAddr = MemReadByte (Regs.PC+1);
-    Addr   = MemReadZPWord (ZPAddr) + Regs.YR;
+    Addr = MemReadZPWord (ZPAddr) + Regs.YR;
+    MemWriteByte (Addr, Regs.AC);
+    Regs.PC += 2;
+}
+
+
+
+static void OPC_65SC02_92 (void)
+/* Opcode $92: sta (zp) */
+{
+    unsigned char ZPAddr;
+    unsigned Addr;
+    Cycles = 5;
+    ZPAddr = MemReadByte (Regs.PC+1);
+    Addr = MemReadZPWord (ZPAddr);
     MemWriteByte (Addr, Regs.AC);
     Regs.PC += 2;
 }
@@ -1371,7 +1697,7 @@ static void OPC_6502_99 (void)
 {
     unsigned Addr;
     Cycles = 5;
-    Addr   = MemReadWord (Regs.PC+1) + Regs.YR;
+    Addr = MemReadWord (Regs.PC+1) + Regs.YR;
     MemWriteByte (Addr, Regs.AC);
     Regs.PC += 3;
 }
@@ -1388,13 +1714,37 @@ static void OPC_6502_9A (void)
 
 
 
+static void OPC_65SC02_9C (void)
+/* Opcode $9C: STZ abs */
+{
+    unsigned Addr;
+    Cycles = 4;
+    Addr = MemReadWord (Regs.PC+1);
+    MemWriteByte (Addr, 0);
+    Regs.PC += 3;
+}
+
+
+
 static void OPC_6502_9D (void)
 /* Opcode $9D: STA abs,x */
 {
     unsigned Addr;
     Cycles = 5;
-    Addr   = MemReadWord (Regs.PC+1) + Regs.XR;
+    Addr = MemReadWord (Regs.PC+1) + Regs.XR;
     MemWriteByte (Addr, Regs.AC);
+    Regs.PC += 3;
+}
+
+
+
+static void OPC_65SC02_9E (void)
+/* Opcode $9E: STZ abs,x */
+{
+    unsigned Addr;
+    Cycles = 5;
+    Addr = MemReadWord (Regs.PC+1) + Regs.XR;
+    MemWriteByte (Addr, 0);
     Regs.PC += 3;
 }
 
@@ -1523,7 +1873,7 @@ static void OPC_6502_AC (void)
 {
     unsigned Addr;
     Cycles = 4;
-    Addr   = MemReadWord (Regs.PC+1);
+    Addr = MemReadWord (Regs.PC+1);
     Regs.YR = MemReadByte (Addr);
     TEST_ZF (Regs.YR);
     TEST_SF (Regs.YR);
@@ -1537,7 +1887,7 @@ static void OPC_6502_AD (void)
 {
     unsigned Addr;
     Cycles = 4;
-    Addr   = MemReadWord (Regs.PC+1);
+    Addr = MemReadWord (Regs.PC+1);
     Regs.AC = MemReadByte (Addr);
     TEST_ZF (Regs.AC);
     TEST_SF (Regs.AC);
@@ -1551,7 +1901,7 @@ static void OPC_6502_AE (void)
 {
     unsigned Addr;
     Cycles = 4;
-    Addr   = MemReadWord (Regs.PC+1);
+    Addr = MemReadWord (Regs.PC+1);
     Regs.XR = MemReadByte (Addr);
     TEST_ZF (Regs.XR);
     TEST_SF (Regs.XR);
@@ -1575,11 +1925,27 @@ static void OPC_6502_B1 (void)
     unsigned Addr;
     Cycles = 5;
     ZPAddr = MemReadByte (Regs.PC+1);
-    Addr   = MemReadZPWord (ZPAddr);
+    Addr = MemReadZPWord (ZPAddr);
     if (PAGE_CROSS (Addr, Regs.YR)) {
         ++Cycles;
     }
     Regs.AC = MemReadByte (Addr + Regs.YR);
+    TEST_ZF (Regs.AC);
+    TEST_SF (Regs.AC);
+    Regs.PC += 2;
+}
+
+
+
+static void OPC_65SC02_B2 (void)
+/* Opcode $B2: LDA (zp) */
+{
+    unsigned char ZPAddr;
+    unsigned Addr;
+    Cycles = 5;
+    ZPAddr = MemReadByte (Regs.PC+1);
+    Addr = MemReadZPWord (ZPAddr);
+    Regs.AC = MemReadByte (Addr);
     TEST_ZF (Regs.AC);
     TEST_SF (Regs.AC);
     Regs.PC += 2;
@@ -1660,7 +2026,7 @@ static void OPC_6502_BA (void)
 /* Opcode $BA: TSX */
 {
     Cycles = 2;
-    Regs.XR = Regs.SP;
+    Regs.XR = Regs.SP & 0xFF;
     TEST_ZF (Regs.XR);
     TEST_SF (Regs.XR);
     Regs.PC += 1;
@@ -1736,7 +2102,7 @@ static void OPC_6502_C1 (void)
     unsigned Addr;
     Cycles = 6;
     ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;
-    Addr   = MemReadZPWord (ZPAddr);
+    Addr = MemReadZPWord (ZPAddr);
     CMP (Regs.AC, MemReadByte (Addr));
     Regs.PC += 2;
 }
@@ -1774,7 +2140,7 @@ static void OPC_6502_C6 (void)
     unsigned char Val;
     Cycles = 5;
     ZPAddr = MemReadByte (Regs.PC+1);
-    Val    = MemReadByte (ZPAddr) - 1;
+    Val = MemReadByte (ZPAddr) - 1;
     MemWriteByte (ZPAddr, Val);
     TEST_ZF (Val);
     TEST_SF (Val);
@@ -1822,7 +2188,7 @@ static void OPC_6502_CC (void)
 {
     unsigned Addr;
     Cycles = 4;
-    Addr   = MemReadWord (Regs.PC+1);
+    Addr = MemReadWord (Regs.PC+1);
     CMP (Regs.YR, MemReadByte (Addr));
     Regs.PC += 3;
 }
@@ -1834,7 +2200,7 @@ static void OPC_6502_CD (void)
 {
     unsigned Addr;
     Cycles = 4;
-    Addr   = MemReadWord (Regs.PC+1);
+    Addr = MemReadWord (Regs.PC+1);
     CMP (Regs.AC, MemReadByte (Addr));
     Regs.PC += 3;
 }
@@ -1872,11 +2238,25 @@ static void OPC_6502_D1 (void)
     unsigned Addr;
     Cycles = 5;
     ZPAddr = MemReadByte (Regs.PC+1);
-    Addr   = MemReadWord (ZPAddr);
+    Addr = MemReadWord (ZPAddr);
     if (PAGE_CROSS (Addr, Regs.YR)) {
         ++Cycles;
     }
     CMP (Regs.AC, MemReadByte (Addr + Regs.YR));
+    Regs.PC += 2;
+}
+
+
+
+static void OPC_65SC02_D2 (void)
+/* Opcode $D2: CMP (zp) */
+{
+    unsigned ZPAddr;
+    unsigned Addr;
+    Cycles = 5;
+    ZPAddr = MemReadByte (Regs.PC+1);
+    Addr = MemReadWord (ZPAddr);
+    CMP (Regs.AC, MemReadByte (Addr));
     Regs.PC += 2;
 }
 
@@ -1935,6 +2315,16 @@ static void OPC_6502_D9 (void)
 
 
 
+static void OPC_65SC02_DA (void)
+/* Opcode $DA: PHX */
+{
+    Cycles = 3;
+    PUSH (Regs.XR);
+    Regs.PC += 1;
+}
+
+
+
 static void OPC_6502_DD (void)
 /* Opcode $DD: CMP abs,x */
 {
@@ -1957,7 +2347,7 @@ static void OPC_6502_DE (void)
     unsigned char Val;
     Cycles = 7;
     Addr = MemReadWord (Regs.PC+1) + Regs.XR;
-    Val  = MemReadByte (Addr) - 1;
+    Val = MemReadByte (Addr) - 1;
     MemWriteByte (Addr, Val);
     TEST_ZF (Val);
     TEST_SF (Val);
@@ -1983,7 +2373,7 @@ static void OPC_6502_E1 (void)
     unsigned Addr;
     Cycles = 6;
     ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;
-    Addr   = MemReadZPWord (ZPAddr);
+    Addr = MemReadZPWord (ZPAddr);
     SBC (MemReadByte (Addr));
     Regs.PC += 2;
 }
@@ -2021,7 +2411,7 @@ static void OPC_6502_E6 (void)
     unsigned char Val;
     Cycles = 5;
     ZPAddr = MemReadByte (Regs.PC+1);
-    Val    = MemReadByte (ZPAddr) + 1;
+    Val = MemReadByte (ZPAddr) + 1;
     MemWriteByte (ZPAddr, Val);
     TEST_ZF (Val);
     TEST_SF (Val);
@@ -2062,6 +2452,42 @@ static void OPC_6502_EA (void)
 
 
 
+static void OPC_65C02_NOP11(void)
+/* Opcode 'Illegal' 1 cycle NOP */
+{
+    Cycles = 1;
+    Regs.PC += 1;
+}
+
+
+
+static void OPC_65C02_NOP22 (void)
+/* Opcode 'Illegal' 2 byte 2 cycle NOP */
+{
+    Cycles = 2;
+    Regs.PC += 2;
+}
+
+
+
+static void OPC_65C02_NOP24 (void)
+/* Opcode 'Illegal' 2 byte 4 cycle NOP */
+{
+    Cycles = 4;
+    Regs.PC += 2;
+}
+
+
+
+static void OPC_65C02_NOP34 (void)
+/* Opcode 'Illegal' 3 byte 4 cycle NOP */
+{
+    Cycles = 4;
+    Regs.PC += 3;
+}
+
+
+
 static void OPC_6502_EC (void)
 /* Opcode $EC: CPX abs */
 {
@@ -2079,7 +2505,7 @@ static void OPC_6502_ED (void)
 {
     unsigned Addr;
     Cycles = 4;
-    Addr   = MemReadWord (Regs.PC+1);
+    Addr = MemReadWord (Regs.PC+1);
     SBC (MemReadByte (Addr));
     Regs.PC += 3;
 }
@@ -2093,7 +2519,7 @@ static void OPC_6502_EE (void)
     unsigned char Val;
     Cycles = 6;
     Addr = MemReadWord (Regs.PC+1);
-    Val  = MemReadByte (Addr) + 1;
+    Val = MemReadByte (Addr) + 1;
     MemWriteByte (Addr, Val);
     TEST_ZF (Val);
     TEST_SF (Val);
@@ -2117,11 +2543,25 @@ static void OPC_6502_F1 (void)
     unsigned Addr;
     Cycles = 5;
     ZPAddr = MemReadByte (Regs.PC+1);
-    Addr   = MemReadZPWord (ZPAddr);
+    Addr = MemReadZPWord (ZPAddr);
     if (PAGE_CROSS (Addr, Regs.YR)) {
         ++Cycles;
     }
     SBC (MemReadByte (Addr + Regs.YR));
+    Regs.PC += 2;
+}
+
+
+
+static void OPC_65SC02_F2 (void)
+/* Opcode $F2: SBC (zp) */
+{
+    unsigned char ZPAddr;
+    unsigned Addr;
+    Cycles = 5;
+    ZPAddr = MemReadByte (Regs.PC+1);
+    Addr = MemReadZPWord (ZPAddr);
+    SBC (MemReadByte (Addr));
     Regs.PC += 2;
 }
 
@@ -2146,7 +2586,7 @@ static void OPC_6502_F6 (void)
     unsigned char Val;
     Cycles = 6;
     ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;
-    Val  = MemReadByte (ZPAddr) + 1;
+    Val = MemReadByte (ZPAddr) + 1;
     MemWriteByte (ZPAddr, Val);
     TEST_ZF (Val);
     TEST_SF (Val);
@@ -2158,7 +2598,9 @@ static void OPC_6502_F6 (void)
 static void OPC_6502_F8 (void)
 /* Opcode $F8: SED */
 {
+    Cycles = 2;
     SET_DF (1);
+    Regs.PC += 1;
 }
 
 
@@ -2168,7 +2610,7 @@ static void OPC_6502_F9 (void)
 {
     unsigned Addr;
     Cycles = 4;
-    Addr   = MemReadWord (Regs.PC+1);
+    Addr = MemReadWord (Regs.PC+1);
     if (PAGE_CROSS (Addr, Regs.YR)) {
         ++Cycles;
     }
@@ -2178,12 +2620,24 @@ static void OPC_6502_F9 (void)
 
 
 
+static void OPC_65SC02_FA (void)
+/* Opcode $7A: PLX */
+{
+    Cycles = 4;
+    Regs.XR = POP ();
+    TEST_ZF (Regs.XR);
+    TEST_SF (Regs.XR);
+    Regs.PC += 1;
+}
+
+
+
 static void OPC_6502_FD (void)
 /* Opcode $FD: SBC abs,x */
 {
     unsigned Addr;
     Cycles = 4;
-    Addr   = MemReadWord (Regs.PC+1);
+    Addr = MemReadWord (Regs.PC+1);
     if (PAGE_CROSS (Addr, Regs.XR)) {
         ++Cycles;
     }
@@ -2200,7 +2654,7 @@ static void OPC_6502_FE (void)
     unsigned char Val;
     Cycles = 7;
     Addr = MemReadWord (Regs.PC+1) + Regs.XR;
-    Val  = MemReadByte (Addr) + 1;
+    Val = MemReadByte (Addr) + 1;
     MemWriteByte (Addr, Val);
     TEST_ZF (Val);
     TEST_SF (Val);
@@ -2481,260 +2935,260 @@ static const OPFunc OP6502Table[256] = {
 static const OPFunc OP65C02Table[256] = {
     OPC_6502_00,
     OPC_6502_01,
-    OPC_Illegal,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_65C02_NOP22,    // $02
+    OPC_65C02_NOP11,    // $03
+    OPC_65SC02_04,
     OPC_6502_05,
     OPC_6502_06,
-    OPC_Illegal,
+    OPC_Illegal,        // $07: RMB0 currently unsupported
     OPC_6502_08,
     OPC_6502_09,
     OPC_6502_0A,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_65C02_NOP11,    // $0B
+    OPC_65SC02_0C,
     OPC_6502_0D,
     OPC_6502_0E,
-    OPC_Illegal,
+    OPC_Illegal,        // $0F: BBR0 currently unsupported
     OPC_6502_10,
     OPC_6502_11,
-    OPC_Illegal,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_65SC02_12,
+    OPC_65C02_NOP11,    // $13
+    OPC_65SC02_14,
     OPC_6502_15,
     OPC_6502_16,
-    OPC_Illegal,
+    OPC_Illegal,        // $17: RMB1 currently unsupported
     OPC_6502_18,
     OPC_6502_19,
-    OPC_Illegal,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_65SC02_1A,
+    OPC_65C02_NOP11,    // $1B
+    OPC_65SC02_1C,
     OPC_6502_1D,
     OPC_6502_1E,
-    OPC_Illegal,
+    OPC_Illegal,        // $1F: BBR1 currently unsupported
     OPC_6502_20,
     OPC_6502_21,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_65C02_NOP22,    // $22
+    OPC_65C02_NOP11,    // $23
     OPC_6502_24,
     OPC_6502_25,
     OPC_6502_26,
-    OPC_Illegal,
+    OPC_Illegal,        // $27: RMB2 currently unsupported
     OPC_6502_28,
     OPC_6502_29,
     OPC_6502_2A,
-    OPC_Illegal,
+    OPC_65C02_NOP11,    // $2B
     OPC_6502_2C,
     OPC_6502_2D,
     OPC_6502_2E,
-    OPC_Illegal,
+    OPC_Illegal,        // $2F: BBR2 currently unsupported
     OPC_6502_30,
     OPC_6502_31,
-    OPC_Illegal,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_65SC02_32,
+    OPC_65C02_NOP11,    // $33
+    OPC_65SC02_34,
     OPC_6502_35,
     OPC_6502_36,
-    OPC_Illegal,
+    OPC_Illegal,        // $37: RMB3 currently unsupported
     OPC_6502_38,
     OPC_6502_39,
-    OPC_Illegal,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_65SC02_3A,
+    OPC_65C02_NOP11,    // $3B
+    OPC_65SC02_3C,
     OPC_6502_3D,
     OPC_6502_3E,
-    OPC_Illegal,
+    OPC_Illegal,        // $3F: BBR3 currently unsupported
     OPC_6502_40,
     OPC_6502_41,
-    OPC_Illegal,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_65C02_NOP22,    // $42
+    OPC_65C02_NOP11,    // $43
+    OPC_65C02_44,       // $44
     OPC_6502_45,
     OPC_6502_46,
-    OPC_Illegal,
+    OPC_Illegal,        // $47: RMB4 currently unsupported
     OPC_6502_48,
     OPC_6502_49,
     OPC_6502_4A,
-    OPC_Illegal,
+    OPC_65C02_NOP11,    // $4B
     OPC_6502_4C,
     OPC_6502_4D,
     OPC_6502_4E,
-    OPC_Illegal,
+    OPC_Illegal,        // $4F: BBR4 currently unsupported
     OPC_6502_50,
     OPC_6502_51,
-    OPC_Illegal,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_65SC02_52,
+    OPC_65C02_NOP11,    // $53
+    OPC_65C02_NOP24,    // $54
     OPC_6502_55,
     OPC_6502_56,
-    OPC_Illegal,
+    OPC_Illegal,        // $57: RMB5 currently unsupported
     OPC_6502_58,
     OPC_6502_59,
-    OPC_Illegal,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_65SC02_5A,
+    OPC_65C02_NOP11,    // $5B
+    OPC_65C02_5C,
     OPC_6502_5D,
     OPC_6502_5E,
-    OPC_Illegal,
+    OPC_Illegal,        // $5F: BBR5 currently unsupported
     OPC_6502_60,
     OPC_6502_61,
-    OPC_Illegal,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_65C02_NOP22,    // $62
+    OPC_65C02_NOP11,    // $63
+    OPC_65SC02_64,
     OPC_6502_65,
     OPC_6502_66,
-    OPC_Illegal,
+    OPC_Illegal,        // $67: RMB6 currently unsupported
     OPC_6502_68,
     OPC_6502_69,
     OPC_6502_6A,
-    OPC_Illegal,
+    OPC_65C02_NOP11,    // $6B
     OPC_65C02_6C,
     OPC_6502_6D,
     OPC_6502_6E,
-    OPC_Illegal,
+    OPC_Illegal,        // $6F: BBR6 currently unsupported
     OPC_6502_70,
     OPC_6502_71,
-    OPC_Illegal,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_65SC02_72,
+    OPC_65C02_NOP11,    // $73
+    OPC_65SC02_74,
     OPC_6502_75,
     OPC_6502_76,
-    OPC_Illegal,
+    OPC_Illegal,        // $77: RMB7 currently unsupported
     OPC_6502_78,
     OPC_6502_79,
-    OPC_Illegal,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_65SC02_7A,
+    OPC_65C02_NOP11,    // $7B
+    OPC_65SC02_7C,
     OPC_6502_7D,
     OPC_6502_7E,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_Illegal,        // $7F: BBR7 currently unsupported
+    OPC_65SC02_80,
     OPC_6502_81,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_65C02_NOP22,    // $82
+    OPC_65C02_NOP11,    // $83
     OPC_6502_84,
     OPC_6502_85,
     OPC_6502_86,
-    OPC_Illegal,
+    OPC_Illegal,        // $87: SMB0 currently unsupported
     OPC_6502_88,
-    OPC_Illegal,
+    OPC_65SC02_89,
     OPC_6502_8A,
-    OPC_Illegal,
+    OPC_65C02_NOP11,    // $8B
     OPC_6502_8C,
     OPC_6502_8D,
     OPC_6502_8E,
-    OPC_Illegal,
+    OPC_Illegal,        // $8F: BBS0 currently unsupported
     OPC_6502_90,
     OPC_6502_91,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_65SC02_92,
+    OPC_65C02_NOP11,    // $93
     OPC_6502_94,
     OPC_6502_95,
     OPC_6502_96,
-    OPC_Illegal,
+    OPC_Illegal,        // $97: SMB1 currently unsupported
     OPC_6502_98,
     OPC_6502_99,
     OPC_6502_9A,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_65C02_NOP11,    // $9B
+    OPC_65SC02_9C,
     OPC_6502_9D,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_65SC02_9E,
+    OPC_Illegal,        // $9F: BBS1 currently unsupported
     OPC_6502_A0,
     OPC_6502_A1,
     OPC_6502_A2,
-    OPC_Illegal,
+    OPC_65C02_NOP11,    // $A3
     OPC_6502_A4,
     OPC_6502_A5,
     OPC_6502_A6,
-    OPC_Illegal,
+    OPC_Illegal,        // $A7: SMB2 currently unsupported
     OPC_6502_A8,
     OPC_6502_A9,
     OPC_6502_AA,
-    OPC_Illegal,
+    OPC_65C02_NOP11,    // $AB
     OPC_6502_AC,
     OPC_6502_AD,
     OPC_6502_AE,
-    OPC_Illegal,
+    OPC_Illegal,        // $AF: BBS2 currently unsupported
     OPC_6502_B0,
     OPC_6502_B1,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_65SC02_B2,
+    OPC_65C02_NOP11,    // $B3
     OPC_6502_B4,
     OPC_6502_B5,
     OPC_6502_B6,
-    OPC_Illegal,
+    OPC_Illegal,        // $B7: SMB3 currently unsupported
     OPC_6502_B8,
     OPC_6502_B9,
     OPC_6502_BA,
-    OPC_Illegal,
+    OPC_65C02_NOP11,    // $BB
     OPC_6502_BC,
     OPC_6502_BD,
     OPC_6502_BE,
-    OPC_Illegal,
+    OPC_Illegal,        // $BF: BBS3 currently unsupported
     OPC_6502_C0,
     OPC_6502_C1,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_65C02_NOP22,    // $C2
+    OPC_65C02_NOP11,    // $C3
     OPC_6502_C4,
     OPC_6502_C5,
     OPC_6502_C6,
-    OPC_Illegal,
+    OPC_Illegal,        // $C7: SMB4 currently unsupported
     OPC_6502_C8,
     OPC_6502_C9,
     OPC_6502_CA,
-    OPC_Illegal,
+    OPC_Illegal,        // $CB: WAI currently unsupported
     OPC_6502_CC,
     OPC_6502_CD,
     OPC_6502_CE,
-    OPC_Illegal,
+    OPC_Illegal,        // $CF: BBS4 currently unsupported
     OPC_6502_D0,
     OPC_6502_D1,
-    OPC_Illegal,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_65SC02_D2,
+    OPC_65C02_NOP11,    // $D3
+    OPC_65C02_NOP24,    // $D4
     OPC_6502_D5,
     OPC_6502_D6,
-    OPC_Illegal,
+    OPC_Illegal,        // $D7: SMB5 currently unsupported
     OPC_6502_D8,
     OPC_6502_D9,
-    OPC_Illegal,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_65SC02_DA,
+    OPC_Illegal,        // $DB: STP currently unsupported
+    OPC_65C02_NOP34,    // $DC
     OPC_6502_DD,
     OPC_6502_DE,
-    OPC_Illegal,
+    OPC_Illegal,        // $DF: BBS5 currently unsupported
     OPC_6502_E0,
     OPC_6502_E1,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_65C02_NOP22,    // $E2
+    OPC_65C02_NOP11,    // $E3
     OPC_6502_E4,
     OPC_6502_E5,
     OPC_6502_E6,
-    OPC_Illegal,
+    OPC_Illegal,        // $E7: SMB6 currently unsupported
     OPC_6502_E8,
     OPC_6502_E9,
     OPC_6502_EA,
-    OPC_Illegal,
+    OPC_65C02_NOP11,    // $EB
     OPC_6502_EC,
     OPC_6502_ED,
     OPC_6502_EE,
-    OPC_Illegal,
+    OPC_Illegal,        // $EF: BBS6 currently unsupported
     OPC_6502_F0,
     OPC_6502_F1,
-    OPC_Illegal,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_65SC02_F2,
+    OPC_65C02_NOP11,    // $F3
+    OPC_65C02_NOP24,    // $F4
     OPC_6502_F5,
     OPC_6502_F6,
-    OPC_Illegal,
+    OPC_Illegal,        // $F7: SMB7 currently unsupported
     OPC_6502_F8,
     OPC_6502_F9,
-    OPC_Illegal,
-    OPC_Illegal,
-    OPC_Illegal,
+    OPC_65SC02_FA,
+    OPC_65C02_NOP11,    // $FB
+    OPC_65C02_NOP34,    // $FC
     OPC_6502_FD,
     OPC_6502_FE,
-    OPC_Illegal,
+    OPC_Illegal,        // $FF: BBS7 currently unsupported
 };
 
 
@@ -2774,7 +3228,9 @@ void Reset (void)
     /* Reset the CPU */
     HaveIRQRequest = 0;
     HaveNMIRequest = 0;
-    Regs.SR = 0;
+
+    /* Bits 5 and 4 aren't used, and always are 1! */
+    Regs.SR = 0x30;
     Regs.PC = MemReadWord (0xFFFC);
 }
 
@@ -2789,8 +3245,12 @@ unsigned ExecuteInsn (void)
         HaveNMIRequest = 0;
         PUSH (PCH);
         PUSH (PCL);
-        PUSH (Regs.SR);
+        PUSH (Regs.SR & ~BF);
         SET_IF (1);
+        if (CPU != CPU_6502)
+        {
+            SET_DF (0);
+        }
         Regs.PC = MemReadWord (0xFFFA);
         Cycles = 7;
 
@@ -2799,8 +3259,12 @@ unsigned ExecuteInsn (void)
         HaveIRQRequest = 0;
         PUSH (PCH);
         PUSH (PCL);
-        PUSH (Regs.SR);
+        PUSH (Regs.SR & ~BF);
         SET_IF (1);
+        if (CPU != CPU_6502)
+        {
+            SET_DF (0);
+        }
         Regs.PC = MemReadWord (0xFFFE);
         Cycles = 7;
 

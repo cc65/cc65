@@ -4,7 +4,7 @@
 ; void __fastcall__ cbm_k_ciout (unsigned char C);
 ;
 
-        .import         CIOUT
+
+        .include        "cbm.inc"
+
         .export         _cbm_k_ciout := CIOUT
-
-

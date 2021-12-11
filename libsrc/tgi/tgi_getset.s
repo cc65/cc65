@@ -1,8 +1,9 @@
 ;
-; Ullrich von Bassewitz, 22.06.2002
+; 2002-06-22, Ullrich von Bassewitz
+; 2018-07-27, Greg King
 ;
-; Helper function for getpixel/setpixel. Load X/Y from stack and check if
-; the coordinates are valid. Return carry clear if so.
+; Helper function for getpixel/setpixel. Load X/Y from arguments;
+; and, check if the co-ordinates are valid. Return carry clear if so.
 ;
 
         .include        "tgi-kernel.inc"
@@ -15,13 +16,14 @@
 
         jsr     tgi_popxy       ; Pop X/Y into ptr1/ptr2
 
-; Are the coordinates out of range? First check if any coord is negative.
+; Are the co-ordinates out of range? First, check if any coord is negative.
 
-        txa
-        ora     ptr2+1
+        txa                     ; (.X = ptr2+1 from tgi_popxy)
+        ora     ptr1+1
+        sec                     ; Return carry set if number is negative
         bmi     @L9             ; Bail out if negative
 
-; Check if X is larger than the maximum x coord. If so, bail out
+; Check if X is larger than the maximum x coord. If so, bail out.
 
         lda     ptr1
         cmp     _tgi_xres
@@ -38,4 +40,3 @@
 @L9:    rts
 
 .endproc
-

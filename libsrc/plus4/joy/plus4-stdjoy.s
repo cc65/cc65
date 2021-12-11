@@ -1,17 +1,15 @@
 ;
-; Standard joystick driver for the Plus/4. May be used multiple times when linked
-; to the statically application.
+; Standard joystick driver for the Plus/4 and C16.
+; May be used multiple times when linked statically to an application.
 ;
-; Ullrich von Bassewitz, 2002-12-21
+; 2002-12-21, Ullrich von Bassewitz
+; 2016-06-18, Greg King
 ;
-
-        .include        "zeropage.inc"
 
         .include        "joy-kernel.inc"
         .include        "joy-error.inc"
         .include        "plus4.inc"
 
-        .macpack        generic
         .macpack        module
 
 
@@ -26,23 +24,12 @@
 
 ; Driver signature
 
-        .byte   $6A, $6F, $79           ; "joy"
+        .byte   $6A, $6F, $79           ; ASCII "joy"
         .byte   JOY_API_VERSION         ; Driver API version number
 
 ; Library reference
 
         .addr   $0000
-
-; Button state masks (8 values)
-
-        .byte   $01                     ; JOY_UP
-        .byte   $02                     ; JOY_DOWN
-        .byte   $04                     ; JOY_LEFT
-        .byte   $08                     ; JOY_RIGHT
-        .byte   $10                     ; JOY_FIRE
-        .byte   $00                     ; JOY_FIRE2 unavailable
-        .byte   $00                     ; Future expansion
-        .byte   $00                     ; Future expansion
 
 ; Jump table.
 
@@ -50,7 +37,6 @@
         .addr   UNINSTALL
         .addr   COUNT
         .addr   READ
-        .addr   0                       ; IRQ entry unused
 
 ; ------------------------------------------------------------------------
 ; Constants
@@ -98,16 +84,20 @@ COUNT:
 ; READ: Read a particular joystick passed in A.
 ;
 
-READ:   ldy     #$FA            ; Load index for joystick #1
+READ:   ldy     #%11111011      ; Load index for joystick #1
         tax                     ; Test joystick number
         beq     @L1
-        ldy     #$FB            ; Load index for joystick #2
+        ldy     #%11111101      ; Load index for joystick #2
+        ldx     #>$0000         ; (Return unsigned int)
 @L1:    sei
-        sty     TED_KBD
-        lda     TED_KBD
+        sty     TED_KBD         ; Read a joystick ...
+        lda     TED_KBD         ; ... and some keys -- it's unavoidable
         cli
-        ldx     #$00            ; Clear high byte
-        and     #$1F
-        eor     #$1F
-        rts
+        eor     #%11111111
 
+; The push buttons are in bits 6 and 7.  Both of them cannot be %1 together.
+; Therefore, bit 6 can be merged with bit 7.
+
+        clc
+        adc     #%01000000
+        rts

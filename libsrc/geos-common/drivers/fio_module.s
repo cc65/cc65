@@ -13,7 +13,7 @@
 FILEDES         = 3             ; first free to use file descriptor
 
             .importzp ptr1, ptr2, ptr3, tmp1
-            .import addysp, popax
+            .import addysp, popax, popptr1
             .import __oserror
             .import _FindFile, _ReadByte
             .export _open, _close, _read
@@ -37,9 +37,7 @@ _open:
 @parmok:
         jsr popax               ; Get flags
         sta tmp1
-        jsr popax               ; Get name
-        sta ptr1
-        stx ptr1+1
+        jsr popptr1             ; Get name
             
         lda filedesc            ; is there a file already open?
         bne @alreadyopen
@@ -96,11 +94,12 @@ _read:
     ; popax - fd, must be == to the above one
     ; return -1+__oserror or number of bytes read
 
-        eor #$ff
-        sta ptr1
-        txa
-        eor #$ff
-        sta ptr1+1              ; -(# of bytes to read)-1
+        inx
+        stx ptr1+1
+        tax
+        inx
+        stx ptr1                ; save count with each byte incremented separately
+
         jsr popax
         sta ptr2
         stx ptr2+1              ; buffer ptr
@@ -154,9 +153,9 @@ _read:
         beq @done               ; yes, we're done
         jmp __mappederrno       ; no, we're screwed
 
-@L3:    inc ptr1                ; decrement the count
+@L3:    dec ptr1                ; decrement the count
         bne @L0
-        inc ptr1+1
+        dec ptr1+1
         bne @L0
 
 @done:

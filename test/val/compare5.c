@@ -288,17 +288,17 @@ void c_minus1(void)
   printf("(long0 != -1)\n");
   if(long0 != -1)
   {
-	failures++;
+        failures++;
   }
   printf("(long0 > 0)\n");
   if(long0 > 0)
   {
-	failures++;
+        failures++;
   }
   printf("(long1 < 0)\n");
   if(long1 < 0)
   {
-	failures++;
+        failures++;
   }
 /*
   if(long1 < 2)

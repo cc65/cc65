@@ -6,14 +6,12 @@ endif
 
 .SUFFIXES:
 
-htmldir = $(prefix)/share/doc/cc65$(DESTPACKAGE_SUFFIX)/html
-infodir = $(prefix)/share/info
-
-all mostlyclean:
+htmldir = $(PREFIX)/share/doc/cc65$(DESTPACKAGE_SUFFIX)/html
+infodir = $(PREFIX)/share/info
 
 ifdef CMD_EXE
 
-clean install zip doc:
+doc clean install zip:
 
 else # CMD_EXE
 
@@ -25,23 +23,6 @@ TOC_LEVEL = 0
 TOC_LEVEL = 2
 
 INSTALL = install
-
-clean:
-	$(RM) -r ../html ../info
-
-install:
-	$(if $(prefix),,$(error variable `prefix' must be set))
-ifeq ($(wildcard ../html),../html)
-	$(INSTALL) -d $(DESTDIR)$(htmldir)
-	$(INSTALL) -m644 ../html/*.* $(DESTDIR)$(htmldir)
-endif
-ifeq ($(wildcard ../info),../info)
-	$(INSTALL) -d $(DESTDIR)$(infodir)
-	$(INSTALL) -m644 ../info/*.* $(DESTDIR)$(infodir)
-endif
-
-zip:
-	@cd .. && zip cc65 html/*.*
 
 doc: html info
 
@@ -61,4 +42,25 @@ info: $(addprefix ../info/,$(SGMLS:.sgml=.info))
 ../info/%.info: %.sgml | ../info
 	@cd ../info && linuxdoc -B info ../doc/$<
 
+clean:
+	$(RM) -r ../html ../info
+
+install:
+	$(if $(PREFIX),,$(error variable "PREFIX" must be set))
+ifeq ($(wildcard ../html),../html)
+	$(INSTALL) -d $(DESTDIR)$(htmldir)
+	$(INSTALL) -m0644 ../html/*.* $(DESTDIR)$(htmldir)
+endif
+ifeq ($(wildcard ../info),../info)
+	$(INSTALL) -d $(DESTDIR)$(infodir)
+	$(INSTALL) -m0644 ../info/*.* $(DESTDIR)$(infodir)
+endif
+
+zip:
+ifneq "$(wildcard ../html)" ""
+	@cd .. && zip cc65 html/*.*
+endif
+
 endif # CMD_EXE
+
+all mostlyclean:

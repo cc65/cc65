@@ -1,10 +1,8 @@
 <!doctype linuxdoc system>
 
 <article>
-
 <title>Using emulators with cc65
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2014-04-11
 
 <abstract>
 How to debug your code using the VICE and Oricutron emulators.
@@ -111,7 +109,7 @@ Load your program, then enter the monitor and use the "<tt/ll/" command to
 load your label file like this:
 
 <tscreen><verb>
-       	ll "hello.lbl"
+        ll "hello.lbl"
 </verb></tscreen>
 
 You will get lots of warnings and even a few errors. You may ignore safely all
@@ -122,7 +120,7 @@ After loading the labels, they are used by VICE in the disassembler listing,
 and you may use them whereever you need to specify an address. Try
 
 <tscreen><verb>
-	d ._main
+        d ._main
 </verb></tscreen>
 
 as an example (note that VICE needs a leading dot before all labels, and that
@@ -136,14 +134,14 @@ Load your program, then enter the monitor and use the "<tt/sl/" command to
 load your label file like this:
 
 <tscreen><verb>
-       	sl hello.sym
+        sl hello.sym
 </verb></tscreen>
 
 After loading the labels, they are used by Oricutron in the disassembler listing,
 and you may use them whereever you need to specify an address. Try
 
 <tscreen><verb>
-	d ._main
+        d ._main
 </verb></tscreen>
 
 as an example (note that VICE needs a leading dot before all labels, and that

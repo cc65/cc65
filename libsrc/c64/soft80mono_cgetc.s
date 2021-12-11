@@ -12,6 +12,7 @@
         .import         cursor
         .importzp       tmp1
 
+        .include        "cbm_kernal.inc"
         .include        "c64.inc"
         .include        "soft80.inc"
 

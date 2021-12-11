@@ -9,7 +9,7 @@
         .export         _cputcxy, _cputc, cputdirect, putchar
         .export         newline
         .constructor    initconio
-        .import         popa, _gotoxy
+        .import         gotoxy
         .import         ppuinit, paletteinit, ppubuf_put
         .import         setcursor
 
@@ -23,8 +23,7 @@
 
 _cputcxy:
         pha                     ; Save C
-        jsr     popa            ; Get Y
-        jsr     _gotoxy         ; Set cursor, drop x
+        jsr     gotoxy          ; Set cursor, drop x and y
         pla                     ; Restore C
 
 ; Plot a character - also used as internal function
@@ -75,10 +74,10 @@ putchar:
         jmp     ppubuf_put
 
 ;-----------------------------------------------------------------------------
-; Initialize the conio subsystem. Code goes into the INIT segment, which may
+; Initialize the conio subsystem. Code goes into the ONCE segment, which may
 ; be reused after startup.
 
-.segment        "INIT"
+.segment        "ONCE"
 
 initconio:
         jsr     ppuinit

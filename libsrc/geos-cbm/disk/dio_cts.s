@@ -1,6 +1,6 @@
 ;
-; Maciej 'YTM/Elysium' Witkowiak
-; 2.7.2001
+; 2001-07-02, Maciej 'YTM/Elysium' Witkowiak
+; 2015-08-26, Greg King
 ;
 ;
 ; unsigned char __fastcall__ dio_phys_to_log (dhandle_t handle,
@@ -59,7 +59,7 @@ _dio_phys_to_log:
         lda (ptr3),y
         tay
         lda driveType,y
-        and #%00000011          ; this is for RamDrive compatibility
+        and #%00001111          ; remove ramDisk flags
         cmp #DRV_1541
         beq dio_cts1541
         cmp #DRV_1571
@@ -67,7 +67,7 @@ _dio_phys_to_log:
         cmp #DRV_1581
         beq dio_cts1581
             
-        lda #DEV_NOT_FOUND      ; unknown device
+        lda #INCOMPATIBLE       ; unsupported device
         ldx #0
         beq ret
 
@@ -91,7 +91,7 @@ _inv_data:
         lda #INV_TRACK
         .byte $2c
 _inv_hand:
-        lda #INCOMPATIBLE
+        lda #DEV_NOT_FOUND
         ldx #0
         beq ret
 

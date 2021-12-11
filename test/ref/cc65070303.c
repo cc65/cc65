@@ -9,17 +9,17 @@
 
 typedef signed int TypA[3];
 typedef struct TypB {
-	TypA Data[2];
+        TypA Data[2];
 } sTypB;
 sTypB Bs[10];
 TypA * APtr;
 
 int main(int argc, char* argv[])
 {
-	Bs[7].Data[1][2]=11;
-	APtr=&(Bs[7].Data[1]);
-	printf("Hallo Welt! %i = %i \n",Bs[7].Data[1][2], (*APtr)[2] );
-	return 0;
+        Bs[7].Data[1][2]=11;
+        APtr=&(Bs[7].Data[1]);
+        printf("Hallo Welt! %i = %i \n",Bs[7].Data[1][2], (*APtr)[2] );
+        return 0;
 }
 
 /*

@@ -16,15 +16,15 @@ char i1[];
 void test1(void) {
 int a;
 
-	a=sizeof(i1[0]);
-	printf("%04x - ",a);
-	if(sizeof(i1[0])==sizeof(char)) {
-		/* gcc gives size of element */
-		printf("sizeof(i1[0]) gives size of element\n");
-	}
-	if(sizeof(i1[0])==sizeof(char*)) {
-		printf("sizeof(i1[0]) gives size of pointer to element\n");
-	}
+        a=sizeof(i1[0]);
+        printf("%04x - ",a);
+        if(sizeof(i1[0])==sizeof(char)) {
+                /* gcc gives size of element */
+                printf("sizeof(i1[0]) gives size of element\n");
+        }
+        if(sizeof(i1[0])==sizeof(char*)) {
+                printf("sizeof(i1[0]) gives size of pointer to element\n");
+        }
 }
 
 /*
@@ -40,14 +40,14 @@ char *t4={"abcde"};
 void test2(void) {
 char c1,c2,c3,c4;
 int i,e=0;
-	for(i=0;i<5;i++){
-		c1=t1[i];c2=t2[i];c3=t3[i];c4=t4[i];
-/*		printf("%02x %02x %02x %02x\n",c1,c2,c3,c4); */
-		printf("%c %c %c %c\n",c1,c2,c3,c4);
-		if(!((c1==c2)&(c1==c3)&(c1==c4))) e=1;
-	}
-	if(e) printf("test2 failed.\n");
-	else printf("test2 ok.\n");
+        for(i=0;i<5;i++){
+                c1=t1[i];c2=t2[i];c3=t3[i];c4=t4[i];
+/*              printf("%02x %02x %02x %02x\n",c1,c2,c3,c4); */
+                printf("%c %c %c %c\n",c1,c2,c3,c4);
+                if(!((c1==c2)&(c1==c3)&(c1==c4))) e=1;
+        }
+        if(e) printf("test2 failed.\n");
+        else printf("test2 ok.\n");
 }
 
 /*
@@ -74,7 +74,7 @@ A3 a3[] = {
 #endif
 
 void test3a(A3 *list, int number){
-	printf("%s %d\n",list->name,number);
+        printf("%s %d\n",list->name,number);
 }
 
 static void test31(void)
@@ -103,10 +103,10 @@ static void test30(void)
 */
 
 int main(void) {
-  	test1();
-	test2();
-	test30();
-	test31();
-/*	test32(); */
-	return 0;
+        test1();
+        test2();
+        test30();
+        test31();
+/*      test32(); */
+        return 0;
 }

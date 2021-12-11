@@ -66,6 +66,8 @@ typedef enum {
     FEAT_FORCE_RANGE,
     FEAT_UNDERLINE_IN_NUMBERS,
     FEAT_ADDRSIZE,
+    FEAT_BRACKET_AS_INDIRECT,
+    FEAT_STRING_ESCAPES,
 
     /* Special value: Number of features available */
     FEAT_COUNT

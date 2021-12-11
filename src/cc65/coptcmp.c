@@ -176,14 +176,14 @@ static int IsImmCmp16 (CodeEntry** L)
 {
     return (L[0]->OPC == OP65_CPX                              &&
             L[0]->AM == AM65_IMM                               &&
-            (L[0]->Flags & CEF_NUMARG) != 0                    &&
+            CE_HasNumArg (L[0])                                &&
             !CE_HasLabel (L[0])                                &&
             (L[1]->OPC == OP65_JNE || L[1]->OPC == OP65_BNE)   &&
             L[1]->JumpTo != 0                                  &&
             !CE_HasLabel (L[1])                                &&
             L[2]->OPC == OP65_CMP                              &&
             L[2]->AM == AM65_IMM                               &&
-            (L[2]->Flags & CEF_NUMARG) != 0                    &&
+            CE_HasNumArg (L[2])                                &&
             (L[3]->Info & OF_CBRA) != 0                        &&
             L[3]->JumpTo != 0                                  &&
             (L[1]->JumpTo->Owner == L[3] || L[1]->JumpTo == L[3]->JumpTo));
@@ -448,11 +448,7 @@ unsigned OptCmp3 (CodeSeg* S)
                         Delete = 1;
                         break;
 
-                    case CMP_UGT:
-                    case CMP_UGE:
-                    case CMP_ULT:
-                    case CMP_ULE:
-                    case CMP_INV:
+                    default:
                         /* Leave it alone */
                         break;
                 }
@@ -819,6 +815,7 @@ unsigned OptCmp8 (CodeSeg* S)
             /* We are able to evaluate the compare at compile time. Check if
             ** one or more branches are ahead.
             */
+            unsigned ProtectCompare = 0;
             unsigned JumpsChanged = 0;
             CodeEntry* N;
             while ((N = CS_GetNextEntry (S, I)) != 0 &&   /* Followed by something.. */
@@ -878,6 +875,21 @@ unsigned OptCmp8 (CodeSeg* S)
                     CodeEntry* X = NewCodeEntry (OP65_JMP, AM65_BRA, LabelName, L, N->LI);
                     CS_InsertEntry (S, X, I+2);
                     CS_DelEntry (S, I+1);
+                    /* Normally we can remove the compare as well,
+                    ** but some comparisons generate code with a
+                    ** shared branch operation. This prevents the unsafe
+                    ** removal of the compare for known problem cases.
+                    */
+                    if (
+                        /* Jump to branch that relies on the comparison. */
+                        (L->Owner->Info & (OF_CBRA | OF_ZBRA)) ||
+                        /* Jump to boolean transformer that relies on the comparison. */
+                        (L->Owner->OPC == OP65_JSR &&
+                         (FindBoolCmpCond (L->Owner->Arg)) != CMP_INV)
+                       )
+                    {
+                        ++ProtectCompare;
+                    }
                 }
 
                 /* Remember, we had changes */
@@ -885,11 +897,10 @@ unsigned OptCmp8 (CodeSeg* S)
                 ++Changes;
             }
 
-            /* If we have made changes above, we may also remove the compare */
-            if (JumpsChanged) {
+            /* Delete the original compare, if safe to do so. */
+            if (JumpsChanged && !ProtectCompare) {
                 CS_DelEntry (S, I);
             }
-
         }
 
 NextEntry:
@@ -933,7 +944,9 @@ unsigned OptCmp9 (CodeSeg* S)
         if (L[0]->OPC == OP65_SBC                       &&
             CS_GetEntries (S, L+1, I+1, 4)              &&
             (L[1]->OPC == OP65_BVC              ||
-             L[1]->OPC == OP65_BVS)                     &&
+             L[1]->OPC == OP65_BVS              ||
+             L[1]->OPC == OP65_JVC              ||
+             L[1]->OPC == OP65_JVS)                     &&
             L[1]->JumpTo != 0                           &&
             L[1]->JumpTo->Owner == L[3]                 &&
             L[2]->OPC == OP65_EOR                       &&

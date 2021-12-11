@@ -7,6 +7,7 @@
 ; Zero page, Commodore stuff
 
 TXTPTR          := $3D          ; Pointer into BASIC source code
+STATUS          := $90          ; Kernal I/O completion status
 TIME            := $A0          ; 60HZ clock
 FNAM_LEN        := $B7          ; Length of filename
 SECADR          := $B9          ; Secondary address
@@ -15,7 +16,9 @@ FNAM            := $BB          ; Address of filename
 FNAM_BANK       := $C7          ; Bank for filename
 KEY_COUNT       := $D0          ; Number of keys in input buffer
 FKEY_COUNT      := $D1          ; Characters for function key
-MODE            := $D7          ; 40/80 column mode flag
+MODE            := $D7          ; 40-/80-column mode (bit 7: 80 columns)
+GRAPHM          := $D8          ; Graphics mode flags (bits 5-7)
+CHARDIS         := $D9          ; Bit 2 shadow for location $01
 CURS_X          := $EC          ; Cursor column
 CURS_Y          := $EB          ; Cursor row
 SCREEN_PTR      := $E0          ; Pointer to current char in text screen
@@ -25,32 +28,23 @@ CHARCOLOR       := $F1
 RVS             := $F3          ; Reverse output flag
 SCROLL          := $F8          ; Disable scrolling flag
 
-BASIC_BUF       := $200         ; Location of command-line
+BASIC_BUF       := $0200        ; Location of command-line
 BASIC_BUF_LEN   = 162           ; Maximum length of command-line
 
-FETCH           := $2A2         ; Fetch subroutine in RAM
-FETVEC          := $2AA         ; Vector patch location for FETCH
-STASH           := $2AF         ; Stash routine in RAM
-STAVEC          := $2B9         ; Vector patch location for STASH
-IRQInd          := $2FD         ; JMP $0000 -- used as indirect IRQ vector
-PALFLAG         := $A03         ; $FF=PAL, $00=NTSC
-INIT_STATUS     := $A04         ; Flags: Reset/Restore initiation status
+FETCH           := $02A2        ; Fetch subroutine in RAM
+FETVEC          := $02AA        ; Vector patch location for FETCH
+STASH           := $02AF        ; Stash routine in RAM
+STAVEC          := $02B9        ; Vector patch location for STASH
+IRQInd          := $02FD        ; JMP $0000 -- used as indirect IRQ vector
+PALFLAG         := $0A03        ; $FF=PAL, $00=NTSC
+INIT_STATUS     := $0A04        ; Flags: Reset/Restore initiation status
+VM2             := $0A2D        ; VIC-IIe shadow for $D018 -- graphics mode
 FKEY_LEN        := $1000        ; Function key lengths
 FKEY_TEXT       := $100A        ; Function key texts
 
-; ---------------------------------------------------------------------------
-; Kernal routines
-
-; Direct entries
-CURS_SET        := $CD57
-CURS_ON         := $CD6F
-CURS_OFF        := $CD9F
-CLRSCR          := $C142
-KBDREAD         := $C006
-NEWLINE         := $C363
-PRINT           := $C322
-NMIEXIT         := $FF33
-INDFET          := $FF74
+KBDREPEAT       := $028a
+KBDREPEATRATE   := $028b
+KBDREPEATDELAY  := $028c
 
 ; ---------------------------------------------------------------------------
 ; Vectors
@@ -163,34 +157,46 @@ SID_Read3       := $D41C
 ; ---------------------------------------------------------------------------
 ; I/O: VDC (128 only)
 
-VDC_INDEX       := $D600
-VDC_DATA        := $D601
+VDC_INDEX       := $D600        ; register address port
+VDC_DATA        := $D601        ; data port
+
+; Registers
+VDC_DATA_HI     = 18            ; video RAM address (big endian)
+VDC_DATA_LO     = 19
+VDC_CSET        = 28
+VDC_RAM_RW      = 31            ; RAM port
 
 ; ---------------------------------------------------------------------------
-; I/O: CIAs
+; I/O: Complex Interface Adapters
 
 CIA1            := $DC00
-CIA1_PRA        := $DC00
-CIA1_PRB        := $DC01
-CIA1_DDRA       := $DC02
-CIA1_DDRB       := $DC03
-CIA1_TOD10      := $DC08
-CIA1_TODSEC     := $DC09
-CIA1_TODMIN     := $DC0A
-CIA1_TODHR      := $DC0B
-CIA1_ICR        := $DC0D
-CIA1_CRA        := $DC0E
-CIA1_CRB        := $DC0F
+CIA1_PRA        := $DC00        ; Port A
+CIA1_PRB        := $DC01        ; Port B
+CIA1_DDRA       := $DC02        ; Data direction register for port A
+CIA1_DDRB       := $DC03        ; Data direction register for port B
+CIA1_TA         := $DC04        ; 16-bit timer A
+CIA1_TB         := $DC06        ; 16-bit timer B
+CIA1_TOD10      := $DC08        ; Time-of-day tenths of a second
+CIA1_TODSEC     := $DC09        ; Time-of-day seconds
+CIA1_TODMIN     := $DC0A        ; Time-of-day minutes
+CIA1_TODHR      := $DC0B        ; Time-of-day hours
+CIA1_SDR        := $DC0C        ; Serial data register
+CIA1_ICR        := $DC0D        ; Interrupt control register
+CIA1_CRA        := $DC0E        ; Control register for timer A
+CIA1_CRB        := $DC0F        ; Control register for timer B
 
 CIA2            := $DD00
 CIA2_PRA        := $DD00
 CIA2_PRB        := $DD01
 CIA2_DDRA       := $DD02
 CIA2_DDRB       := $DD03
+CIA2_TA         := $DD04
+CIA2_TB         := $DD06
 CIA2_TOD10      := $DD08
 CIA2_TODSEC     := $DD09
 CIA2_TODMIN     := $DD0A
 CIA2_TODHR      := $DD0B
+CIA2_SDR        := $DD0C
 CIA2_ICR        := $DD0D
 CIA2_CRA        := $DD0E
 CIA2_CRB        := $DD0F

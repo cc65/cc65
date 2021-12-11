@@ -699,7 +699,7 @@ static ExprNode* FuncAddrSize (void)
         /* Cheap local symbol */
         Sym = SymFindLocal (SymLast, &CurTok.SVal, SYM_FIND_EXISTING);
         if (Sym == 0) {
-            Error ("Unknown symbol or scope: `%m%p'", &CurTok.SVal);
+            Error ("Unknown symbol or scope: '%m%p'", &CurTok.SVal);
         } else {
             AddrSize = Sym->AddrSize;
         }
@@ -739,13 +739,13 @@ static ExprNode* FuncAddrSize (void)
         if (Sym) {
             AddrSize = Sym->AddrSize;
         } else {
-            Error ("Unknown symbol or scope: `%m%p%m%p'", &ScopeName, &Name);
+            Error ("Unknown symbol or scope: '%m%p%m%p'", &ScopeName, &Name);
         }
 
     }
 
     if (AddrSize == 0) {
-        Warning (1, "Unknown address size: `%m%p%m%p'", &ScopeName, &Name);
+        Warning (1, "Unknown address size: '%m%p%m%p'", &ScopeName, &Name);
     }
 
     /* Free the string buffers */
@@ -780,7 +780,7 @@ static ExprNode* FuncSizeOf (void)
         /* Cheap local symbol */
         Sym = SymFindLocal (SymLast, &CurTok.SVal, SYM_FIND_EXISTING);
         if (Sym == 0) {
-            Error ("Unknown symbol or scope: `%m%p'", &CurTok.SVal);
+            Error ("Unknown symbol or scope: '%m%p'", &CurTok.SVal);
         } else {
             SizeSym = GetSizeOfSymbol (Sym);
         }
@@ -832,7 +832,7 @@ static ExprNode* FuncSizeOf (void)
             if (Sym) {
                 SizeSym = GetSizeOfSymbol (Sym);
             } else {
-                Error ("Unknown symbol or scope: `%m%p%m%p'",
+                Error ("Unknown symbol or scope: '%m%p%m%p'",
                        &ScopeName, &Name);
             }
         }
@@ -840,7 +840,7 @@ static ExprNode* FuncSizeOf (void)
 
     /* Check if we have a size */
     if (SizeSym == 0 || !SymIsConst (SizeSym, &Size)) {
-        Error ("Size of `%m%p%m%p' is unknown", &ScopeName, &Name);
+        Error ("Size of '%m%p%m%p' is unknown", &ScopeName, &Name);
         Size = 0;
     }
 
@@ -1861,6 +1861,28 @@ ExprNode* GenWordExpr (ExprNode* Expr)
 {
     /* Use the low byte operator to force the expression into word size */
     return LoWord (Expr);
+}
+
+
+
+ExprNode* GenNearAddrExpr (ExprNode* Expr)
+/* A word sized expression that will error if given a far expression at assemble time. */
+{
+    long      Val;
+    /* Special handling for const expressions */
+    if (IsEasyConst (Expr, &Val)) {
+        FreeExpr (Expr);
+        Expr = GenLiteralExpr (Val & 0xFFFF);
+        if (Val > 0xFFFF)
+        {
+            Error("Range error: constant too large for assumed near address.");
+        }
+    } else {
+        ExprNode* Operand = Expr;
+        Expr = NewExprNode (EXPR_NEARADDR);
+        Expr->Left = Operand;
+    }
+    return Expr;
 }
 
 

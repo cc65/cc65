@@ -54,7 +54,7 @@ const OpcDesc OpcTable_HuC6280[256] = {
     {   "tsb",  2,  flUseLabel,               OH_Direct                }, /* $04 */
     {   "ora",  2,  flUseLabel,               OH_Direct                }, /* $05 */
     {   "asl",  2,  flUseLabel,               OH_Direct                }, /* $06 */
-    {   "rmb0", 1,  flUseLabel,               OH_Direct,               }, /* $07 */
+    {   "rmb0", 2,  flUseLabel,               OH_Direct,               }, /* $07 */
     {   "php",  1,  flNone,                   OH_Implicit              }, /* $08 */
     {   "ora",  2,  flNone,                   OH_Immediate             }, /* $09 */
     {   "asl",  1,  flNone,                   OH_Accumulator           }, /* $0a */
@@ -70,7 +70,7 @@ const OpcDesc OpcTable_HuC6280[256] = {
     {   "trb",  2,  flUseLabel,               OH_Direct                }, /* $14 */
     {   "ora",  2,  flUseLabel,               OH_DirectX               }, /* $15 */
     {   "asl",  2,  flUseLabel,               OH_DirectX               }, /* $16 */
-    {   "rmb1", 1,  flUseLabel,               OH_Direct,               }, /* $17 */
+    {   "rmb1", 2,  flUseLabel,               OH_Direct,               }, /* $17 */
     {   "clc",  1,  flNone,                   OH_Implicit              }, /* $18 */
     {   "ora",  3,  flUseLabel,               OH_AbsoluteY             }, /* $19 */
     {   "inc",  1,  flNone,                   OH_Accumulator           }, /* $1a */
@@ -86,7 +86,7 @@ const OpcDesc OpcTable_HuC6280[256] = {
     {   "bit",  2,  flUseLabel,               OH_Direct                }, /* $24 */
     {   "and",  2,  flUseLabel,               OH_Direct                }, /* $25 */
     {   "rol",  2,  flUseLabel,               OH_Direct                }, /* $26 */
-    {   "rmb2", 1,  flUseLabel,               OH_Direct,               }, /* $27 */
+    {   "rmb2", 2,  flUseLabel,               OH_Direct,               }, /* $27 */
     {   "plp",  1,  flNone,                   OH_Implicit              }, /* $28 */
     {   "and",  2,  flNone,                   OH_Immediate             }, /* $29 */
     {   "rol",  1,  flNone,                   OH_Accumulator           }, /* $2a */
@@ -102,7 +102,7 @@ const OpcDesc OpcTable_HuC6280[256] = {
     {   "bit",  2,  flUseLabel,               OH_DirectX               }, /* $34 */
     {   "and",  2,  flUseLabel,               OH_DirectX               }, /* $35 */
     {   "rol",  2,  flUseLabel,               OH_DirectX               }, /* $36 */
-    {   "rmb3", 1,  flUseLabel,               OH_Direct,               }, /* $37 */
+    {   "rmb3", 2,  flUseLabel,               OH_Direct,               }, /* $37 */
     {   "sec",  1,  flNone,                   OH_Implicit              }, /* $38 */
     {   "and",  3,  flUseLabel,               OH_AbsoluteY             }, /* $39 */
     {   "dec",  1,  flNone,                   OH_Accumulator           }, /* $3a */
@@ -114,11 +114,11 @@ const OpcDesc OpcTable_HuC6280[256] = {
     {   "rti",  1,  flNone,                   OH_Rts                   }, /* $40 */
     {   "eor",  2,  flUseLabel,               OH_DirectXIndirect       }, /* $41 */
     {   "say",  1,  flNone,                   OH_Implicit,             }, /* $42 */
-    {   "tmai", 2,  flNone,                   OH_Immediate,            }, /* $43 */
+    {   "tma",  2,  flNone,                   OH_Immediate,            }, /* $43 */
     {   "bsr",  2,  flLabel,                  OH_Relative,             }, /* $44 */
     {   "eor",  2,  flUseLabel,               OH_Direct                }, /* $45 */
     {   "lsr",  2,  flUseLabel,               OH_Direct                }, /* $46 */
-    {   "rmb4", 1,  flUseLabel,               OH_Direct,               }, /* $47 */
+    {   "rmb4", 2,  flUseLabel,               OH_Direct,               }, /* $47 */
     {   "pha",  1,  flNone,                   OH_Implicit              }, /* $48 */
     {   "eor",  2,  flNone,                   OH_Immediate             }, /* $49 */
     {   "lsr",  1,  flNone,                   OH_Accumulator           }, /* $4a */
@@ -130,11 +130,11 @@ const OpcDesc OpcTable_HuC6280[256] = {
     {   "bvc",  2,  flLabel,                  OH_Relative              }, /* $50 */
     {   "eor",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $51 */
     {   "eor",  2,  flUseLabel,               OH_DirectIndirect        }, /* $52 */
-    {   "tami", 2,  flNone,                   OH_Immediate,            }, /* $53 */
+    {   "tam",  2,  flNone,                   OH_Immediate,            }, /* $53 */
     {   "csl",  1,  flNone,                   OH_Implicit,             }, /* $54 */
     {   "eor",  2,  flUseLabel,               OH_DirectX               }, /* $55 */
     {   "lsr",  2,  flUseLabel,               OH_DirectX               }, /* $56 */
-    {   "rmb5", 1,  flUseLabel,               OH_Direct,               }, /* $57 */
+    {   "rmb5", 2,  flUseLabel,               OH_Direct,               }, /* $57 */
     {   "cli",  1,  flNone,                   OH_Implicit              }, /* $58 */
     {   "eor",  3,  flUseLabel,               OH_AbsoluteY             }, /* $59 */
     {   "phy",  1,  flNone,                   OH_Implicit              }, /* $5a */
@@ -150,7 +150,7 @@ const OpcDesc OpcTable_HuC6280[256] = {
     {   "stz",  2,  flUseLabel,               OH_Direct                }, /* $64 */
     {   "adc",  2,  flUseLabel,               OH_Direct                }, /* $65 */
     {   "ror",  2,  flUseLabel,               OH_Direct                }, /* $66 */
-    {   "rmb6", 1,  flUseLabel,               OH_Direct,               }, /* $67 */
+    {   "rmb6", 2,  flUseLabel,               OH_Direct,               }, /* $67 */
     {   "pla",  1,  flNone,                   OH_Implicit              }, /* $68 */
     {   "adc",  2,  flNone,                   OH_Immediate             }, /* $69 */
     {   "ror",  1,  flNone,                   OH_Accumulator           }, /* $6a */
@@ -166,12 +166,12 @@ const OpcDesc OpcTable_HuC6280[256] = {
     {   "stz",  2,  flUseLabel,               OH_DirectX               }, /* $74 */
     {   "adc",  2,  flUseLabel,               OH_DirectX               }, /* $75 */
     {   "ror",  2,  flUseLabel,               OH_DirectX               }, /* $76 */
-    {   "rmb7", 1,  flUseLabel,               OH_Direct,               }, /* $77 */
+    {   "rmb7", 2,  flUseLabel,               OH_Direct,               }, /* $77 */
     {   "sei",  1,  flNone,                   OH_Implicit              }, /* $78 */
     {   "adc",  3,  flUseLabel,               OH_AbsoluteY             }, /* $79 */
     {   "ply",  1,  flNone,                   OH_Implicit              }, /* $7a */
     {   "",     1,  flIllegal,                OH_Illegal,              }, /* $7b */
-    {   "jmp",  3,  flLabel,                  OH_AbsoluteXIndirect     }, /* $7c */
+    {   "jmp",  3,  flLabel,                  OH_JmpAbsoluteXIndirect  }, /* $7c */
     {   "adc",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $7d */
     {   "ror",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $7e */
     {   "bbr7", 3,  flUseLabel,               OH_BitBranch             }, /* $7f */
@@ -182,7 +182,7 @@ const OpcDesc OpcTable_HuC6280[256] = {
     {   "sty",  2,  flUseLabel,               OH_Direct                }, /* $84 */
     {   "sta",  2,  flUseLabel,               OH_Direct                }, /* $85 */
     {   "stx",  2,  flUseLabel,               OH_Direct                }, /* $86 */
-    {   "smb0", 1,  flUseLabel,               OH_Direct,               }, /* $87 */
+    {   "smb0", 2,  flUseLabel,               OH_Direct,               }, /* $87 */
     {   "dey",  1,  flNone,                   OH_Implicit              }, /* $88 */
     {   "bit",  2,  flNone,                   OH_Immediate             }, /* $89 */
     {   "txa",  1,  flNone,                   OH_Implicit              }, /* $8a */
@@ -198,7 +198,7 @@ const OpcDesc OpcTable_HuC6280[256] = {
     {   "sty",  2,  flUseLabel,               OH_DirectX               }, /* $94 */
     {   "sta",  2,  flUseLabel,               OH_DirectX               }, /* $95 */
     {   "stx",  2,  flUseLabel,               OH_DirectY               }, /* $96 */
-    {   "smb1", 1,  flUseLabel,               OH_Direct,               }, /* $97 */
+    {   "smb1", 2,  flUseLabel,               OH_Direct,               }, /* $97 */
     {   "tya",  1,  flNone,                   OH_Implicit              }, /* $98 */
     {   "sta",  3,  flUseLabel,               OH_AbsoluteY             }, /* $99 */
     {   "txs",  1,  flNone,                   OH_Implicit              }, /* $9a */
@@ -214,7 +214,7 @@ const OpcDesc OpcTable_HuC6280[256] = {
     {   "ldy",  2,  flUseLabel,               OH_Direct                }, /* $a4 */
     {   "lda",  2,  flUseLabel,               OH_Direct                }, /* $a5 */
     {   "ldx",  2,  flUseLabel,               OH_Direct                }, /* $a6 */
-    {   "smb2", 1,  flUseLabel,               OH_Direct,               }, /* $a7 */
+    {   "smb2", 2,  flUseLabel,               OH_Direct,               }, /* $a7 */
     {   "tay",  1,  flNone,                   OH_Implicit              }, /* $a8 */
     {   "lda",  2,  flNone,                   OH_Immediate             }, /* $a9 */
     {   "tax",  1,  flNone,                   OH_Implicit              }, /* $aa */
@@ -230,7 +230,7 @@ const OpcDesc OpcTable_HuC6280[256] = {
     {   "ldy",  2,  flUseLabel,               OH_DirectX               }, /* $b4 */
     {   "lda",  2,  flUseLabel,               OH_DirectX               }, /* $b5 */
     {   "ldx",  2,  flUseLabel,               OH_DirectY               }, /* $b6 */
-    {   "smb3", 1,  flUseLabel,               OH_Direct,               }, /* $b7 */
+    {   "smb3", 2,  flUseLabel,               OH_Direct,               }, /* $b7 */
     {   "clv",  1,  flNone,                   OH_Implicit              }, /* $b8 */
     {   "lda",  3,  flUseLabel,               OH_AbsoluteY             }, /* $b9 */
     {   "tsx",  1,  flNone,                   OH_Implicit              }, /* $ba */
@@ -246,7 +246,7 @@ const OpcDesc OpcTable_HuC6280[256] = {
     {   "cpy",  2,  flUseLabel,               OH_Direct                }, /* $c4 */
     {   "cmp",  2,  flUseLabel,               OH_Direct                }, /* $c5 */
     {   "dec",  2,  flUseLabel,               OH_Direct                }, /* $c6 */
-    {   "smb4", 1,  flUseLabel,               OH_Direct,               }, /* $c7 */
+    {   "smb4", 2,  flUseLabel,               OH_Direct,               }, /* $c7 */
     {   "iny",  1,  flNone,                   OH_Implicit              }, /* $c8 */
     {   "cmp",  2,  flNone,                   OH_Immediate             }, /* $c9 */
     {   "dex",  1,  flNone,                   OH_Implicit              }, /* $ca */
@@ -262,7 +262,7 @@ const OpcDesc OpcTable_HuC6280[256] = {
     {   "csh",  1,  flNone,                   OH_Implicit,             }, /* $d4 */
     {   "cmp",  2,  flUseLabel,               OH_DirectX               }, /* $d5 */
     {   "dec",  2,  flUseLabel,               OH_DirectX               }, /* $d6 */
-    {   "smb5", 1,  flUseLabel,               OH_Direct,               }, /* $d7 */
+    {   "smb5", 2,  flUseLabel,               OH_Direct,               }, /* $d7 */
     {   "cld",  1,  flNone,                   OH_Implicit              }, /* $d8 */
     {   "cmp",  3,  flUseLabel,               OH_AbsoluteY             }, /* $d9 */
     {   "phx",  1,  flNone,                   OH_Implicit              }, /* $da */
@@ -278,7 +278,7 @@ const OpcDesc OpcTable_HuC6280[256] = {
     {   "cpx",  2,  flUseLabel,               OH_Direct                }, /* $e4 */
     {   "sbc",  2,  flUseLabel,               OH_Direct                }, /* $e5 */
     {   "inc",  2,  flUseLabel,               OH_Direct                }, /* $e6 */
-    {   "smb6", 1,  flUseLabel,               OH_Direct,               }, /* $e7 */
+    {   "smb6", 2,  flUseLabel,               OH_Direct,               }, /* $e7 */
     {   "inx",  1,  flNone,                   OH_Implicit              }, /* $e8 */
     {   "sbc",  2,  flNone,                   OH_Immediate             }, /* $e9 */
     {   "nop",  1,  flNone,                   OH_Implicit              }, /* $ea */
@@ -294,7 +294,7 @@ const OpcDesc OpcTable_HuC6280[256] = {
     {   "set",  1,  flNone,                   OH_Implicit,             }, /* $f4 */
     {   "sbc",  2,  flUseLabel,               OH_DirectX               }, /* $f5 */
     {   "inc",  2,  flUseLabel,               OH_DirectX               }, /* $f6 */
-    {   "smb7", 1,  flUseLabel,               OH_Direct,               }, /* $f7 */
+    {   "smb7", 2,  flUseLabel,               OH_Direct,               }, /* $f7 */
     {   "sed",  1,  flNone,                   OH_Implicit              }, /* $f8 */
     {   "sbc",  3,  flUseLabel,               OH_AbsoluteY             }, /* $f9 */
     {   "plx",  1,  flNone,                   OH_Implicit              }, /* $fa */

@@ -1,0 +1,16 @@
+// Da65 input file before preprocessed by cpp
+// Bank0 ROM map
+
+#define TARGET_BANK 0
+global {
+    inputoffs $00010;
+    inputsize $4000;
+    startaddr $8000;
+    cpu "6502";
+};
+
+#include "fixed.da"
+
+label { addr $8000; name "Bank0ProcA"; };
+label { addr $8123; name "Bank0ProcB"; };
+range { start $A000; end $BFFF; name "Bank0Data"; type ByteTable; };

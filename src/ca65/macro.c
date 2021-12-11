@@ -375,7 +375,7 @@ static void MacSkipDef (unsigned Style)
         if (CurTok.Tok != TOK_EOF) {
             SkipUntilSep ();
         } else {
-            Error ("`.ENDMACRO' expected");
+            Error ("'.ENDMACRO' expected");
         }
     } else {
         /* Skip until end of line */
@@ -409,7 +409,7 @@ void MacDef (unsigned Style)
     /* Did we already define that macro? */
     if (HT_Find (&MacroTab, &CurTok.SVal) != 0) {
         /* Macro is already defined */
-        Error ("A macro named `%m%p' is already defined", &CurTok.SVal);
+        Error ("A macro named '%m%p' is already defined", &CurTok.SVal);
         /* Skip tokens until we reach the final .endmacro */
         MacSkipDef (Style);
         return;
@@ -438,9 +438,7 @@ void MacDef (unsigned Style)
 
     /* Parse the parameter list */
     if (HaveParams) {
-
         while (CurTok.Tok == TOK_IDENT) {
-
             /* Create a struct holding the identifier */
             IdDesc* I = NewIdDesc (&CurTok.SVal);
 
@@ -449,9 +447,10 @@ void MacDef (unsigned Style)
                 M->Params = I;
             } else {
                 IdDesc* List = M->Params;
+
                 while (1) {
                     if (SB_Compare (&List->Id, &CurTok.SVal) == 0) {
-                        Error ("Duplicate symbol `%m%p'", &CurTok.SVal);
+                        Error ("Duplicate symbol '%m%p'", &CurTok.SVal);
                     }
                     if (List->Next == 0) {
                         break;
@@ -490,6 +489,22 @@ void MacDef (unsigned Style)
     ** the .LOCAL command is detected and removed, at this time.
     */
     while (1) {
+        /* Check for include */
+        if (CurTok.Tok == TOK_INCLUDE && Style == MAC_STYLE_CLASSIC) {
+            /* Include another file */
+            NextTok ();
+            /* Name must follow */
+            if (CurTok.Tok != TOK_STRCON) {
+                ErrorSkip ("String constant expected");
+            } else {
+                SB_Terminate (&CurTok.SVal);
+                if (NewInputFile (SB_GetConstBuf (&CurTok.SVal)) == 0) {
+                    /* Error opening the file, skip remainder of line */
+                    SkipUntilSep ();
+                }
+            }
+            NextTok ();
+        }
 
         /* Check for end of macro */
         if (Style == MAC_STYLE_CLASSIC) {
@@ -500,7 +515,7 @@ void MacDef (unsigned Style)
             }
             /* May not have end of file in a macro definition */
             if (CurTok.Tok == TOK_EOF) {
-                Error ("`.ENDMACRO' expected");
+                Error ("'.ENDMACRO' expected");
                 goto Done;
             }
         } else {
@@ -512,9 +527,7 @@ void MacDef (unsigned Style)
 
         /* Check for a .LOCAL declaration */
         if (CurTok.Tok == TOK_LOCAL && Style == MAC_STYLE_CLASSIC) {
-
             while (1) {
-
                 IdDesc* I;
 
                 /* Skip .local or comma */
@@ -553,6 +566,7 @@ void MacDef (unsigned Style)
         if (CurTok.Tok == TOK_IDENT) {
             unsigned Count = 0;
             IdDesc* I = M->Params;
+
             while (I) {
                 if (SB_Compare (&I->Id, &CurTok.SVal) == 0) {
                     /* Local param name, replace it */
@@ -930,7 +944,7 @@ static void StartExpDefine (MacExp* E)
             if (CurTok.Tok == TOK_COMMA) {
                 NextTok ();
             } else {
-                Error ("`,' expected");
+                Error ("',' expected");
             }
         }
     }

@@ -1,10 +1,8 @@
 <!doctype linuxdoc system>
 
 <article>
-
 <title>Using GNU Make with cc65
 <author><url url="mailto:ol.sc@web.de" name="Oliver Schmidt">
-<date>2014-04-12
 
 <abstract>
 How to build your program using the GNU Make utility.
@@ -58,7 +56,7 @@ SOURCES = foo.c bar.c
 PROGRAM = foobar
 
 ifdef CC65_TARGET
-CC      = $(CC65_HOME)/bin/cl65
+CC      = cl65
 CFLAGS  = -t $(CC65_TARGET) --create-dep $(<:.c=.d) -O
 LDFLAGS = -t $(CC65_TARGET) -m $(PROGRAM).map
 else
@@ -88,8 +86,8 @@ clean:
 </verb></tscreen>
 
 <bf/Important:/ When using the sample Makefile above via copy & paste it is
-necessary to replace the eight spaces at the beginning of command lines (lines
-26, 29 and 32) with a tab character (ASCII code 9).
+important to make sure that command lines (lines 26, 29 and 32) start
+with a tab character (ASCII code 9).
 
 
 <sect1>Invoking the sample Makefile<p>
@@ -103,12 +101,6 @@ best done on the GNU Make command line like this:
 <tscreen><verb>
 make CC65_TARGET=c64
 </verb></tscreen>
-
-The sample Makefile presumes the variable <tt/CC65_HOME/ to point to the
-directory cc65 is located in. Again there are several ways to define this
-variable but as its value typically won't change often it is best done as an
-environment variable. On Windows the cc65 .exe installer package takes care
-of creating a <tt/CC65_HOME/ environment variable.
 
 
 <sect1>Understanding the sample Makefile<p>
@@ -127,7 +119,7 @@ The recommended way to use GNU Make on Windows is to install it as part of a
 Cygwin environment. For more information see the Cygwin home page:
 
 <url url="http://www.cygwin.com/">
-  
+
 If however installing Cygwin shouldn't be an option for one or the other reason
 then the sample Makefile may be invoked from the Windows Command Prompt (cmd.exe)
 by downloading the following programs:
@@ -140,17 +132,17 @@ by downloading the following programs:
 
 
 <sect>Target-specific Variable Values<p>
-  
+
 The very limited resources of the cc65 target machines now and then require
 manual optimization of the build process by compiling individual source files
 with different compiler options. GNU Make offers
 <url url="http://www.gnu.org/software/make/manual/html_node/Target_002dspecific.html" name="Target-specific Variable Values">
-perfectly suited for doing so. For example placing the code of the two modules 
+perfectly suited for doing so. For example placing the code of the two modules
 <tt/foo/ and <tt/bar/ in the segment <tt/FOOBAR/ can be achieved with this
 target-specific variable definition:
 
 <tscreen><verb>
 foo.o bar.o: CFLAGS += --code-name FOOBAR
 </verb></tscreen>
-  
+
 </article>

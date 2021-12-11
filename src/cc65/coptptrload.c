@@ -988,7 +988,7 @@ unsigned OptPtrLoad12 (CodeSeg* S)
             L[4]->OPC == OP65_CLC                               &&
             L[5]->OPC == OP65_ADC                               &&
             CE_IsKnownImm (L[5], 1)                             &&
-            L[6]->OPC == OP65_BCC                               &&
+            (L[6]->OPC == OP65_BCC || L[6]->OPC == OP65_JCC)    &&
             L[6]->JumpTo != 0                                   &&
             L[6]->JumpTo->Owner == L[8]                         &&
             L[7]->OPC == OP65_INX                               &&
@@ -1443,6 +1443,220 @@ unsigned OptPtrLoad17 (CodeSeg* S)
 
             /* Delete original sequence */
             CS_DelEntries (S, I, 2);
+
+            /* Remember, we had changes */
+            ++Changes;
+
+        }
+
+        /* Next entry */
+        ++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptPtrLoad18 (CodeSeg* S)
+/* Search for the sequence:
+**
+**      ldx     #$xx
+**      lda     #$yy
+**      clc
+**      adc     xxx
+**      bcc     L
+**      inx
+** L:   ldy     #$00
+**      jsr     ldauidx
+**
+** and replace it by:
+**
+**      ldy     xxx
+**      ldx     #$00
+**      lda     $xxyy,y
+**
+** This is similar to OptPtrLoad3 but works on a constant address
+** instead of a label. Also, the initial X and A loads are reversed.
+** Must be run before OptPtrLoad7().
+*/
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        CodeEntry* L[8];
+
+        /* Get next entry */
+        L[0] = CS_GetEntry (S, I);
+
+        /* Check for the sequence */
+        if (L[0]->OPC == OP65_LDX                            &&
+            L[0]->AM == AM65_IMM                             &&
+            CS_GetEntries (S, L+1, I+1, 7)                   &&
+            L[1]->OPC == OP65_LDA                            &&
+            L[1]->AM == AM65_IMM                             &&
+            L[2]->OPC == OP65_CLC                            &&
+            L[3]->OPC == OP65_ADC                            &&
+            (L[3]->AM == AM65_ABS || L[3]->AM == AM65_ZP)    &&
+            (L[4]->OPC == OP65_BCC || L[4]->OPC == OP65_JCC) &&
+            L[4]->JumpTo != 0                                &&
+            L[4]->JumpTo->Owner == L[6]                      &&
+            L[5]->OPC == OP65_INX                            &&
+            L[6]->OPC == OP65_LDY                            &&
+            CE_IsKnownImm (L[6], 0)                          &&
+            CE_IsCallTo (L[7], "ldauidx")                    &&
+            !CS_RangeHasLabel (S, I+1, 5)                    &&
+            !CE_HasLabel (L[7])                              &&
+            L[0]->Arg[0] == '$'                              &&
+            L[1]->Arg[0] == '$'                              &&
+            strlen (L[0]->Arg) == 3                          &&
+            strlen (L[1]->Arg) == 3                         ) {
+
+            CodeEntry* X;
+            char* Label;
+
+            /* We will create all the new stuff behind the current one so
+            ** we keep the line references.
+            */
+            X = NewCodeEntry (OP65_LDY, L[3]->AM, L[3]->Arg, 0, L[0]->LI);
+            CS_InsertEntry (S, X, I+8);
+
+            X = NewCodeEntry (OP65_LDX, AM65_IMM, "$00", 0, L[0]->LI);
+            CS_InsertEntry (S, X, I+9);
+
+            Label = xmalloc(6);
+            sprintf(Label, "$%s%s", L[0]->Arg+1, L[1]->Arg+1);
+            X = NewCodeEntry (OP65_LDA, AM65_ABSY, Label, 0, L[0]->LI);
+            CS_InsertEntry (S, X, I+10);
+            xfree (Label);
+
+            /* Remove the old code */
+            CS_DelEntries (S, I, 8);
+
+            /* Remember, we had changes */
+            ++Changes;
+
+        }
+
+        /* Next entry */
+        ++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptPtrLoad19 (CodeSeg* S)
+/* Search for the sequence:
+**
+**      ldx     #0
+**      and     #mask          (any value < 0x80)
+**      jsr     aslax1/shlax1
+**      clc
+**      adc     #<(label+0)
+**      tay
+**      txa
+**      adc     #>(label+0)
+**      tax
+**      tya
+**      ldy     #$01
+**      jsr     ldaxidx
+**
+** and replace it by:
+**
+**      and     #mask          (remove if == 0x7F)
+**      asl
+**      tay
+**      lda     label,y
+**      ldx     label+1,y
+*/
+{
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        CodeEntry* L[12];
+
+        /* Get next entry */
+        L[0] = CS_GetEntry (S, I);
+
+        /* Check for the sequence */
+        if (L[0]->OPC == OP65_LDX                               &&
+            CE_IsKnownImm(L[0], 0)                              &&
+            CS_GetEntries (S, L+1, I+1, 11)                     &&
+            L[1]->OPC == OP65_AND                               &&
+            L[1]->AM == AM65_IMM                                &&
+            CE_HasNumArg (L[1]) && L[1]->Num <= 0x7F            &&
+            L[2]->OPC == OP65_JSR                               &&
+            L[3]->OPC == OP65_CLC                               &&
+            L[4]->OPC == OP65_ADC                               &&
+            L[5]->OPC == OP65_TAY                               &&
+            L[6]->OPC == OP65_TXA                               &&
+            L[7]->OPC == OP65_ADC                               &&
+            L[8]->OPC == OP65_TAX                               &&
+            L[9]->OPC == OP65_TYA                               &&
+            L[10]->OPC == OP65_LDY                              &&
+            CE_IsKnownImm(L[10], 1)                             &&
+            L[4]->Arg[0] == '<'                                 &&
+            L[7]->Arg[0] == '>'                                 &&
+            strlen(L[4]->Arg) > 3                               &&
+            strlen(L[7]->Arg) > 3                               &&
+            strcmp(L[4]->Arg+1, L[7]->Arg+1) == 0               &&
+            (strcmp (L[2]->Arg, "aslax1") == 0          ||
+             strcmp (L[2]->Arg, "shlax1") == 0)                 &&
+            CE_IsCallTo (L[11], "ldaxidx")                      &&
+            !CS_RangeHasLabel (S, I+1, 11)) {
+
+            CodeEntry* X;
+            char* Label;
+            int Len = strlen(L[4]->Arg);
+
+            /* Track the insertion point */
+            unsigned IP = I + 12;
+
+            /* asl a */
+            X = NewCodeEntry (OP65_ASL, AM65_ACC, "a", 0, L[2]->LI);
+            CS_InsertEntry (S, X, IP++);
+
+            /* tay */
+            X = NewCodeEntry (OP65_TAY, AM65_IMP, 0, 0, L[2]->LI);
+            CS_InsertEntry (S, X, IP++);
+
+            /* lda label,y */
+            /* allocate Label memory */
+            Label = memcpy (xmalloc (Len), L[4]->Arg+2, Len-3);
+            Label[Len-3] = '\0';
+            X = NewCodeEntry (OP65_LDA, AM65_ABSY, Label, 0, L[10]->LI);
+            CS_InsertEntry (S, X, IP++);
+
+            /* ldx label+1,y */
+            strcpy(&Label[Len-3], "+1");
+            X = NewCodeEntry (OP65_LDX, AM65_ABSY, Label, 0, L[10]->LI);
+            CS_InsertEntry (S, X, IP++);
+            /* free Label memory */
+            xfree (Label);
+
+            /* Remove the old code */
+            /* Remove the AND only if it's == 0x7F, since ASL erases high bit */
+            if (L[1]->Num == 0x7F) {
+                CS_DelEntries (S, I+1, 11);
+            } else {
+                CS_DelEntries (S, I+2, 10);
+            }
+
+            /* Remove the ldx #0 */
+            CS_DelEntry(S, I);
 
             /* Remember, we had changes */
             ++Changes;

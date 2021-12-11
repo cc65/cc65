@@ -126,6 +126,7 @@ YMin:           .res    2               ; Y1 value of bounding box
 XMax:           .res    2               ; X2 value of bounding box
 YMax:           .res    2               ; Y2 value of bounding box
 Buttons:        .res    1               ; Button mask
+OldButton:      .res    1               ; previous buttons
 
 XPosWrk:        .res    2
 YPosWrk:        .res    2
@@ -133,6 +134,7 @@ YPosWrk:        .res    2
 irq_enabled:    .res    1               ; flag indicating that the high frequency polling interrupt is enabled
 old_porta_vbi:  .res    1               ; previous PORTA value of the VBI interrupt (IRQ)
 how_long:       .res    1               ; counter for how many VBI interrupts the mouse hasn't been moved
+in_irq:         .res    1               ; flag indicating high-frequency polling interrupt is active
 
 .if .defined (AMIGA_MOUSE) .or .defined (ST_MOUSE)
 dumx:           .res    1
@@ -144,11 +146,11 @@ oldval:         .res    1
 .endif
 
 .ifndef __ATARIXL__
-OldT1:          .res    2
+OldT2:          .res    2
 .else
 
 .data
-set_VTIMR1_handler:
+set_VTIMR2_handler:
                 .byte   $4C, 0, 0
 .endif
 
@@ -225,29 +227,29 @@ INSTALL:
 
         ; Setup pointer to wrapper install/deinstall function.
         lda     libref
-        sta     set_VTIMR1_handler+1
+        sta     set_VTIMR2_handler+1
         lda     libref+1
-        sta     set_VTIMR1_handler+2
+        sta     set_VTIMR2_handler+2
 
         ; Install my handler.
         sec
-        lda     #<T1Han
-        ldx     #>T1Han
-        jsr     set_VTIMR1_handler
+        lda     #<T2Han
+        ldx     #>T2Han
+        jsr     set_VTIMR2_handler
 
 .else
 
-        lda     VTIMR1
-        sta     OldT1
-        lda     VTIMR1+1
-        sta     OldT1+1
+        lda     VTIMR2
+        sta     OldT2
+        lda     VTIMR2+1
+        sta     OldT2+1
 
         php
         sei
-        lda     #<T1Han
-        sta     VTIMR1
-        lda     #>T1Han
-        sta     VTIMR1+1
+        lda     #<T2Han
+        sta     VTIMR2
+        lda     #>T2Han
+        sta     VTIMR2+1
         plp
 
 .endif
@@ -256,19 +258,11 @@ INSTALL:
         sta     AUDCTL
 
         lda     #0
-        sta     AUDC1
+        sta     AUDC2
 
         lda     #15
-        sta     AUDF1
+        sta     AUDF2
         sta     STIMER
-
-.if 0   ; the IRQ will now be dynamically enabled when the mouse is moved
-        lda     POKMSK
-        ora     #%00000001              ; timer 1 enable
-        sta     POKMSK
-        sta     IRQEN
-        sta     irq_enabled
-.endif
 
         lda     PORTA
         and     #$0f
@@ -289,23 +283,23 @@ UNINSTALL:
 ; uninstall timer irq routine
 
         lda     POKMSK
-        and     #%11111110              ; timer 1 disable
+        and     #%11111101              ; timer 2 disable
         sta     IRQEN
         sta     POKMSK
 
 .ifdef __ATARIXL__
 
         clc
-        jsr     set_VTIMR1_handler
+        jsr     set_VTIMR2_handler
 
 .else
 
         php
         sei
-        lda     OldT1
-        sta     VTIMR1
-        lda     OldT1+1
-        sta     VTIMR1+1
+        lda     OldT2
+        sta     VTIMR2
+        lda     OldT2+1
+        sta     VTIMR2+1
         plp
 
 .endif
@@ -496,11 +490,13 @@ IRQ:    lda     PORTA                   ; mouse port contents
 
         cmp     old_porta_vbi
         beq     @L3                     ; no motion
+        lda     #0
+        sta     ATRACT                  ; disable "attract mode"
 
 ; Turn mouse polling IRQ back on
 
         lda     POKMSK
-        ora     #%00000001              ; timer 1 enable
+        ora     #%00000010              ; timer 2 enable
         sta     POKMSK
         sta     IRQEN
         sta     irq_enabled
@@ -530,7 +526,7 @@ IRQ:    lda     PORTA                   ; mouse port contents
 
         sta     irq_enabled
         lda     POKMSK
-        and     #%11111110              ; timer 1 disable
+        and     #%11111101              ; timer 2 disable
         sta     IRQEN
         sta     POKMSK
 
@@ -544,25 +540,34 @@ IRQ:    lda     PORTA                   ; mouse port contents
 
         jsr     CPREP
 
+; Disable "attract mode" if button status has changed
+
+        lda     Buttons
+        cmp     OldButton
+        beq     @L5
+        sta     OldButton
+        lda     #0
+        sta     ATRACT
+
 ; Limit the X coordinate to the bounding box
 
-        lda     XPosWrk+1
+@L5:    lda     XPosWrk+1
         ldy     XPosWrk
         tax
         cpy     XMin
         sbc     XMin+1
-        bpl     @L5
+        bpl     @L6
         ldy     XMin
         ldx     XMin+1
-        jmp     @L6
+        jmp     @L7
 
-@L5:    txa
+@L6:    txa
         cpy     XMax
         sbc     XMax+1
-        bmi     @L6
+        bmi     @L7
         ldy     XMax
         ldx     XMax+1
-@L6:    sty     XPos
+@L7:    sty     XPos
         stx     XPos+1
         tya
         jsr     CMOVEX
@@ -574,18 +579,18 @@ IRQ:    lda     PORTA                   ; mouse port contents
         tax
         cpy     YMin
         sbc     YMin+1
-        bpl     @L7
+        bpl     @L8
         ldy     YMin
         ldx     YMin+1
-        jmp     @L8
+        jmp     @L9
 
-@L7:    txa
+@L8:    txa
         cpy     YMax
         sbc     YMax+1
-        bmi     @L8
+        bmi     @L9
         ldy     YMax
         ldx     YMax+1
-@L8:    sty     YPos
+@L9:    sty     YPos
         stx     YPos+1
         tya
         jsr     CMOVEY
@@ -595,10 +600,10 @@ IRQ:    lda     PORTA                   ; mouse port contents
 .ifdef  DEBUG
         ; print on upper right corner 'E' or 'D', indicating the IRQ is enabled or disabled
         ldy     irq_enabled
-        beq     @L9
+        beq     @L10
         lda     #37                     ; screen code for 'E'
         .byte   $2c                     ; bit opcode, eats next 2 bytes
-@L9:    lda     #36                     ; screen code for 'D'
+@L10:   lda     #36                     ; screen code for 'D'
         ldy     #39
         sta     (SAVMSC),y
 .endif
@@ -608,13 +613,18 @@ IRQ:    lda     PORTA                   ; mouse port contents
 
 
 ;----------------------------------------------------------------------------
-; T1Han: Local IRQ routine to poll mouse
+; T2Han: Local IRQ routine to poll mouse
 ;
 
-T1Han:  lda     CRITIC                  ; if CRITIC flag is set, disable the
+T2Han:  lda     CRITIC                  ; if CRITIC flag is set, disable the
         bne     disable_me              ; high frequency polling IRQ, in order
                                         ; not to interfere with SIO I/O (e.g.
-                                        ; floppy access)
+                                        ; floppy access or serial I/O)
+
+        lda     in_irq                  ; handler entered again?
+        bne     skip                    ; yes, ignore this interrupt
+        inc     in_irq
+        cli                             ; enable IRQs so that we don't block them for too long
 
         tya
         pha
@@ -791,6 +801,8 @@ mmexit: sty     oldval
         tax
         pla
         tay
+        dec     in_irq
+skip:
 .ifdef  __ATARIXL__
         rts
 .else
@@ -807,7 +819,7 @@ mmexit: sty     oldval
 
 disable_me:
         lda     POKMSK
-        and     #%11111110              ; timer 1 disable
+        and     #%11111101              ; timer 2 disable
         sta     IRQEN
         sta     POKMSK
         lda     #0

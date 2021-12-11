@@ -92,6 +92,7 @@ static void Usage (void)
             "\n"
             "Long options:\n"
             "  --convert-to fmt[,attrlist]\tConvert into target format\n"
+            "  --dump-palette\t\tDump palette as table\n"
             "  --help\t\t\tHelp (this text)\n"
             "  --list-conversions\t\tList all possible conversions\n"
             "  --pop\t\t\t\tRestore the original loaded image\n"
@@ -140,7 +141,7 @@ static void SetOutputData (StrBuf* N)
 static void OptConvertTo (const char* Opt attribute ((unused)), const char* Arg)
 /* Convert the bitmap into a target format */
 {
-    static const char* NameList[] = {
+    static const char* const NameList[] = {
         "format"
     };
 
@@ -219,7 +220,7 @@ static void OptPop (const char* Opt attribute ((unused)),
 static void OptRead (const char* Opt attribute ((unused)), const char* Arg)
 /* Read an input file */
 {
-    static const char* NameList[] = {
+    static const char* const NameList[] = {
         "name", "format"
     };
 
@@ -273,7 +274,7 @@ static void OptSlice (const char* Opt attribute ((unused)), const char* Arg)
 
 static void OptVerbose (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
-/* Increase versbosity */
+/* Increase verbosity */
 {
     ++Verbosity;
 }
@@ -285,6 +286,7 @@ static void OptVersion (const char* Opt attribute ((unused)),
 /* Print the assembler version */
 {
     fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
+    exit(EXIT_SUCCESS);
 }
 
 
@@ -292,7 +294,7 @@ static void OptVersion (const char* Opt attribute ((unused)),
 static void OptWrite (const char* Opt attribute ((unused)), const char* Arg)
 /* Write an output file */
 {
-    static const char* NameList[] = {
+    static const char* const NameList[] = {
         "name", "format"
     };
 
@@ -390,11 +392,16 @@ int main (int argc, char* argv [])
             }
         } else {
             /* We don't accept anything else */
-            AbEnd ("Don't know what to do with `%s'", Arg);
+            AbEnd ("Don't know what to do with '%s'", Arg);
         }
 
         /* Next argument */
         ++I;
+    }
+
+    /* Do we have an input file? */
+    if (I == 1) {
+        Error ("No input file");
     }
 
     /* Cleanup data */

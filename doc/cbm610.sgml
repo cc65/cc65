@@ -1,12 +1,10 @@
 <!doctype linuxdoc system>
 
 <article>
-
 <title>Commodore 610-specific information for cc65
 <author>
 <url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
-<date>2014-04-25
 
 <abstract>
 An overview over the Commodore 610 runtime system as it is implemented for the
@@ -121,6 +119,8 @@ declaration and usage.
 <item>cbm_k_basin
 <item>cbm_k_bsout
 <item>cbm_k_clrch
+<item>cbm_k_tksa
+<item>cbm_k_second
 <item>cbm_load
 <item>cbm_open
 <item>cbm_opendir
@@ -212,16 +212,23 @@ No mouse drivers are currently available for the Commodore 610.
 
   <tag><tt/cbm610-std.ser (cbm610_std_ser)/</tag>
   Driver for the 6551 ACIA chip built into the Commodore 610. Supports up to
-  19200 BPS, hardware flow control (RTS/CTS), and interrupt-driven receives.
-  Note that, because of the peculiarities of the 6551 chip, transmits are not
-  interrupt driven; and, the transceiver blocks if the receiver asserts flow
-  control because of a full buffer.
+  19200 baud, requires hardware flow control (RTS/CTS) and does interrupt driven
+  receives. Note that, because of the peculiarities of the 6551 chip, transmits
+  are not interrupt driven; and, the transceiver blocks if the receiver asserts
+  flow control because of a full buffer.
 
 </descrip><p>
 
 
 
 <sect>Limitations<label id="limitations"><p>
+
+
+<sect1>Realtime clock<p>
+
+The realtime clock functions use the CIA1 TOD clock. As that clock only stores
+the time but not the date, the date set by <tt/clock_settime()/ is simply stored
+inside the C library for retrieval in the same program via <tt/clock_gettime()/.
 
 
 <sect1>Kernal and hardware access<p>
@@ -297,14 +304,14 @@ including commercial applications, and to alter it and redistribute it
 freely, subject to the following restrictions:
 
 <enum>
-<item>	The origin of this software must not be misrepresented; you must not
-	claim that you wrote the original software. If you use this software
-	in a product, an acknowledgment in the product documentation would be
-	appreciated but is not required.
-<item>	Altered source versions must be plainly marked as such, and must not
-	be misrepresented as being the original software.
-<item>	This notice may not be removed or altered from any source
-	distribution.
+<item>  The origin of this software must not be misrepresented; you must not
+        claim that you wrote the original software. If you use this software
+        in a product, an acknowledgment in the product documentation would be
+        appreciated but is not required.
+<item>  Altered source versions must be plainly marked as such, and must not
+        be misrepresented as being the original software.
+<item>  This notice may not be removed or altered from any source
+        distribution.
 </enum>
 
 </article>

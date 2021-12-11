@@ -14,7 +14,7 @@
                       
         .include "geossym.inc"
 
-.segment        "INIT"
+.segment        "ONCE"
 
 initscrsize:
 .ifdef __GEOS_CBM__
@@ -43,7 +43,7 @@ screensize:
         ldy ysize
         rts
 
-.bss
+.segment        "INIT"
 
 xsize:
         .res 1

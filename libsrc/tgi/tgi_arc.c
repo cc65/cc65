@@ -70,16 +70,16 @@ void __fastcall__ tgi_arc (int x, int y, unsigned char rx, unsigned char ry,
     }
 
     /* Calculate the start coords */
-    x1 = x + tgi_imulround (rx, cc65_cos (sa));
-    y1 = y - tgi_imulround (ry, cc65_sin (sa));
+    x1 = x + tgi_imulround (rx, _cos (sa));
+    y1 = y - tgi_imulround (ry, _sin (sa));
     do {
         sa += inc;
         if (sa >= ea) {
             sa = ea;
             done = 1;
         }
-        x2 = x + tgi_imulround (rx, cc65_cos (sa));
-        y2 = y - tgi_imulround (ry, cc65_sin (sa));
+        x2 = x + tgi_imulround (rx, _cos (sa));
+        y2 = y - tgi_imulround (ry, _sin (sa));
         tgi_line (x1, y1, x2, y2);
         x1 = x2;
         y1 = y2;

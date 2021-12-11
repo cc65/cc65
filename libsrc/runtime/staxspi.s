@@ -1,5 +1,6 @@
 ;
 ; Ullrich von Bassewitz, 26.10.2000
+; Christian Krueger, 12-Mar-2017, added 65SC02 optimization
 ;
 ; CC65 runtime: Store a/x indirect into address at top of stack with index
 ;
@@ -8,6 +9,8 @@
         .import         incsp2
         .importzp       sp, tmp1, ptr1
 
+        .macpack        cpu
+
 .proc   staxspidx
 
         sty     tmp1            ; Save Y
@@ -15,8 +18,12 @@
         ldy     #1
         lda     (sp),y
         sta     ptr1+1
+.if (.cpu .bitand ::CPU_ISET_65SC02)
+        lda     (sp)
+.else
         dey
         lda     (sp),y
+.endif
         sta     ptr1            ; Address now in ptr1
         ldy     tmp1            ; Restore Y
         iny                     ; Address high byte

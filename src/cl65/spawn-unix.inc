@@ -82,7 +82,7 @@ int spawnvp (int Mode attribute ((unused)), const char* File, char* const argv [
 
         /* The son - exec the program */
         if (execvp (File, argv) < 0) {
-            Error ("Cannot exec `%s': %s", File, strerror (errno));
+            Error ("Cannot exec '%s': %s", File, strerror (errno));
         }
 
     } else {
@@ -94,7 +94,7 @@ int spawnvp (int Mode attribute ((unused)), const char* File, char* const argv [
 
         /* Examine the child status */
         if (!WIFEXITED (Status)) {
-            Error ("Subprocess `%s' aborted by signal %d", File, WTERMSIG (Status));
+            Error ("Subprocess '%s' aborted by signal %d", File, WTERMSIG (Status));
         }
     }
 

@@ -134,53 +134,59 @@ static const unsigned char CTPET[256] = {
 /* One entry in the target map */
 typedef struct TargetEntry TargetEntry;
 struct TargetEntry {
-    char        Name[12];               /* Target name */
-    target_t    Id;                     /* Target id */
+    char        Name[13];               /* Target name */
+    target_t    Id;                     /* Target ID */
 };
 
-/* Table that maps target names to ids. Sorted alphabetically for bsearch.
-** Allows mupltiple entries for one target id (target name aliases).
+/* Table that maps target names to IDs. Sorted alphabetically for bsearch().
+** Allows multiple entries for one target ID (target name aliases).
 */
 static const TargetEntry TargetMap[] = {
-    {   "apple2",       TGT_APPLE2      },
-    {   "apple2enh",    TGT_APPLE2ENH   },
-    {   "atari",        TGT_ATARI       },
-    {   "atari5200",    TGT_ATARI5200   },
-    {   "atarixl",      TGT_ATARIXL     },
-    {   "atmos",        TGT_ATMOS       },
-    {   "bbc",          TGT_BBC         },
-    {   "c128",         TGT_C128        },
-    {   "c16",          TGT_C16         },
-    {   "c64",          TGT_C64         },
-    {   "cbm510",       TGT_CBM510      },
-    {   "cbm610",       TGT_CBM610      },
-    {   "gamate",       TGT_GAMATE      },
-    {   "geos",         TGT_GEOS_CBM    },
-    {   "geos-apple",   TGT_GEOS_APPLE  },
-    {   "geos-cbm",     TGT_GEOS_CBM    },
-    {   "lunix",        TGT_LUNIX       },
-    {   "lynx",         TGT_LYNX        },
-    {   "module",       TGT_MODULE      },
-    {   "nes",          TGT_NES         },
-    {   "none",         TGT_NONE        },
-    {   "osic1p",       TGT_OSIC1P      },
-    {   "pce",          TGT_PCENGINE    },
-    {   "pet",          TGT_PET         },
-    {   "plus4",        TGT_PLUS4       },
-    {   "sim6502",      TGT_SIM6502     },
-    {   "sim65c02",     TGT_SIM65C02    },
-    {   "supervision",  TGT_SUPERVISION },
-    {   "vc20",         TGT_VIC20       },
-    {   "vic20",        TGT_VIC20       },
+    {   "apple2",       TGT_APPLE2       },
+    {   "apple2enh",    TGT_APPLE2ENH    },
+    {   "atari",        TGT_ATARI        },
+    {   "atari2600",    TGT_ATARI2600    },
+    {   "atari5200",    TGT_ATARI5200    },
+    {   "atarixl",      TGT_ATARIXL      },
+    {   "atmos",        TGT_ATMOS        },
+    {   "bbc",          TGT_BBC          },
+    {   "c128",         TGT_C128         },
+    {   "c16",          TGT_C16          },
+    {   "c64",          TGT_C64          },
+    {   "c65",          TGT_C65          },
+    {   "cbm510",       TGT_CBM510       },
+    {   "cbm610",       TGT_CBM610       },
+    {   "creativision", TGT_CREATIVISION },
+    {   "cx16",         TGT_CX16         },
+    {   "gamate",       TGT_GAMATE       },
+    {   "geos",         TGT_GEOS_CBM     },
+    {   "geos-apple",   TGT_GEOS_APPLE   },
+    {   "geos-cbm",     TGT_GEOS_CBM     },
+    {   "lunix",        TGT_LUNIX        },
+    {   "lynx",         TGT_LYNX         },
+    {   "module",       TGT_MODULE       },
+    {   "nes",          TGT_NES          },
+    {   "none",         TGT_NONE         },
+    {   "osic1p",       TGT_OSIC1P       },
+    {   "pce",          TGT_PCENGINE     },
+    {   "pet",          TGT_PET          },
+    {   "plus4",        TGT_PLUS4        },
+    {   "sim6502",      TGT_SIM6502      },
+    {   "sim65c02",     TGT_SIM65C02     },
+    {   "supervision",  TGT_SUPERVISION  },
+    {   "sym1",         TGT_SYM1         },
+    {   "telestrat",    TGT_TELESTRAT    },
+    {   "vic20",        TGT_VIC20        },
 };
 #define MAP_ENTRY_COUNT         (sizeof (TargetMap) / sizeof (TargetMap[0]))
 
 
-/* Table with target properties by target id */
+/* Table with target properties by target ID */
 static const TargetProperties PropertyTable[TGT_COUNT] = {
     { "none",           CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "module",         CPU_6502,       BINFMT_O65,         CTNone  },
     { "atari",          CPU_6502,       BINFMT_BINARY,      CTAtari },
+    { "atari2600",      CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "atari5200",      CPU_6502,       BINFMT_BINARY,      CTAtari },
     { "atarixl",        CPU_6502,       BINFMT_BINARY,      CTAtari },
     { "vic20",          CPU_6502,       BINFMT_BINARY,      CTPET   },
@@ -196,16 +202,21 @@ static const TargetProperties PropertyTable[TGT_COUNT] = {
     { "apple2",         CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "apple2enh",      CPU_65C02,      BINFMT_BINARY,      CTNone  },
     { "geos-cbm",       CPU_6502,       BINFMT_BINARY,      CTNone  },
+    { "creativision",   CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "geos-apple",     CPU_65C02,      BINFMT_BINARY,      CTNone  },
     { "lunix",          CPU_6502,       BINFMT_O65,         CTNone  },
     { "atmos",          CPU_6502,       BINFMT_BINARY,      CTNone  },
+    { "telestrat",      CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "nes",            CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "supervision",    CPU_65SC02,     BINFMT_BINARY,      CTNone  },
-    { "lynx",           CPU_65C02,      BINFMT_BINARY,      CTNone  },
+    { "lynx",           CPU_65SC02,     BINFMT_BINARY,      CTNone  },
     { "sim6502",        CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "sim65c02",       CPU_65C02,      BINFMT_BINARY,      CTNone  },
     { "pce",            CPU_HUC6280,    BINFMT_BINARY,      CTNone  },
     { "gamate",         CPU_6502,       BINFMT_BINARY,      CTNone  },
+    { "c65",            CPU_4510,       BINFMT_BINARY,      CTPET   },
+    { "cx16",           CPU_65C02,      BINFMT_BINARY,      CTPET   },
+    { "sym1",           CPU_6502,       BINFMT_BINARY,      CTNone  },
 };
 
 /* Target system */
@@ -228,7 +239,7 @@ static int Compare (const void* Key, const void* Entry)
 
 
 target_t FindTarget (const char* Name)
-/* Find a target by name and return the target id. TGT_UNKNOWN is returned if
+/* Find a target by name and return the target ID. TGT_UNKNOWN is returned if
 ** the given name is no valid target.
 */
 {
@@ -236,7 +247,7 @@ target_t FindTarget (const char* Name)
     const TargetEntry* T;
     T = bsearch (Name, TargetMap, MAP_ENTRY_COUNT, sizeof (TargetMap[0]), Compare);
 
-    /* Return the target id */
+    /* Return the target ID */
     return (T == 0)? TGT_UNKNOWN : T->Id;
 }
 
@@ -245,7 +256,7 @@ target_t FindTarget (const char* Name)
 const TargetProperties* GetTargetProperties (target_t Target)
 /* Return the properties for a target */
 {
-    /* Must have a valid target id */
+    /* Must have a valid target ID */
     PRECONDITION (Target >= 0 && Target < TGT_COUNT);
 
     /* Return the array entry */

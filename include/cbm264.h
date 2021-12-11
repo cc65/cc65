@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -112,6 +112,17 @@
 #define COLOR_LIGHTBLUE         (BCOLOR_LIGHTBLUE | CATTR_LUMA7)
 #define COLOR_GRAY3             (BCOLOR_WHITE | CATTR_LUMA5)
 
+
+
+/* Masks for joy_read */
+#define JOY_UP_MASK             0x01
+#define JOY_DOWN_MASK           0x02
+#define JOY_LEFT_MASK           0x04
+#define JOY_RIGHT_MASK          0x08
+#define JOY_BTN_1_MASK          0x80
+
+
+
 /* Define hardware */
 #include <_ted.h>
 #define TED             (*(struct __ted*)0xFF00)
@@ -125,11 +136,16 @@
 /*                                   Code                                    */
 /*****************************************************************************/
 
+void fast (void);
+/* Switch the CPU into double-clock mode. */
+
+void slow (void);
+/* Switch the CPU into single-clock mode. */
+
+unsigned char isfast (void);
+/* Returns 1 if the CPU is in double-clock mode. */
+
 
 
 /* End of cbm264.h */
 #endif
-
-
-
-

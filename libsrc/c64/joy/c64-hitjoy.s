@@ -29,24 +29,12 @@
 
         .addr   $0000
 
-; Button state masks (8 values)
-
-        .byte   $01                     ; JOY_UP
-        .byte   $02                     ; JOY_DOWN
-        .byte   $04                     ; JOY_LEFT
-        .byte   $08                     ; JOY_RIGHT
-        .byte   $10                     ; JOY_FIRE
-        .byte   $00                     ; JOY_FIRE2 unavailable
-        .byte   $00                     ; Future expansion
-        .byte   $00                     ; Future expansion
-
 ; Jump table.
 
         .addr   INSTALL
         .addr   UNINSTALL
         .addr   COUNT
         .addr   READ
-        .addr   IRQ
 
 ; ------------------------------------------------------------------------
 ; Constants
@@ -85,13 +73,22 @@ UNINSTALL:
         rts
 
 ; ------------------------------------------------------------------------
-; IRQ entry point. Is called from the C layer as a subroutine in the
-; interrupt. The routine MUST return carry set if the interrupt has been
-; 'handled' - which means that the interrupt source is gone. Otherwise it
-; MUST return carry clear.
+; COUNT: Return the total number of available joysticks in a/x.
+;
 
-IRQ:    ; cia 2 setup
+COUNT:  lda     #<JOY_COUNT
+        ldx     #>JOY_COUNT
+        rts
 
+; ------------------------------------------------------------------------
+; READ: Read a particular joystick passed in A.
+;
+
+readadapter:
+
+        sei
+
+        ; cia 2 setup
         ldy     #$00            ; port b direction
         sty     $dd03           ; => input
 
@@ -155,32 +152,24 @@ IRQ:    ; cia 2 setup
         sta     temp4
 
 fire:
-        ; Default Value: $40/64 on PAL
-        ;                    $42/66 on NTSC
+        ; FIXME: to be really 100% correct this should restore the correct timer
+        ;        values for the respective machine (PAL: $4025, NTSC: $4295)
+        ;        however, this should hardly be a problem in a real world program
+
         lda     #$41
         sta     $dc05
-        ; Default Value: $25/37 on PAL
-        ;                    $95/149 on NTSC
         lda     #0
         sta     $dc04
 
-        ; We do never "handle" the interrupt, we use it just as a timer.
-        clc
+        cli
         rts
 
-; ------------------------------------------------------------------------
-; COUNT: Return the total number of available joysticks in a/x.
-;
+READ:
+        pha
+        jsr readadapter
+        pla
 
-COUNT:  lda     #<JOY_COUNT
-        ldx     #>JOY_COUNT
-        rts
-
-; ------------------------------------------------------------------------
-; READ: Read a particular joystick passed in A.
-;
-
-READ:   tax            ; Joystick number into X
+        tax            ; Joystick number into X
         bne joy2
 
 ; Read joystick 1
@@ -226,4 +215,3 @@ joy4:   lda     temp4
         eor     #$1F
         ldx     #0
         rts
-

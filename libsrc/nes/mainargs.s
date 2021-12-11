@@ -10,10 +10,10 @@
 
 
 ;---------------------------------------------------------------------------
-; Get possible command-line arguments. Goes into the special INIT segment,
+; Get possible command-line arguments. Goes into the special ONCE segment,
 ; which may be reused after the startup code is run
 
-.segment        "INIT"
+.segment        "ONCE"
 
 .proc   initmainargs
 

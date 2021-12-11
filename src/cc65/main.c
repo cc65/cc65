@@ -88,7 +88,7 @@ static void Usage (void)
             "  -O\t\t\t\tOptimize code\n"
             "  -Oi\t\t\t\tOptimize code, inline more code\n"
             "  -Or\t\t\t\tEnable register variables\n"
-            "  -Os\t\t\t\tInline some known functions\n"
+            "  -Os\t\t\t\tInline some standard functions\n"
             "  -T\t\t\t\tInclude source as comment\n"
             "  -V\t\t\t\tPrint the compiler version number\n"
             "  -W warning[,...]\t\tSuppress warnings\n"
@@ -116,11 +116,14 @@ static void Usage (void)
             "  --debug\t\t\tDebug mode\n"
             "  --debug-info\t\t\tAdd debug info to object file\n"
             "  --debug-opt name\t\tDebug optimization steps\n"
+            "  --debug-opt-output\t\tDebug output of each optimization step\n"
             "  --dep-target target\t\tUse this dependency target\n"
             "  --disable-opt name\t\tDisable an optimization step\n"
+            "  --eagerly-inline-funcs\tEagerly inline some known functions\n"
             "  --enable-opt name\t\tEnable an optimization step\n"
             "  --help\t\t\tHelp (this text)\n"
             "  --include-dir dir\t\tSet an include directory search path\n"
+            "  --inline-stdfuncs\t\tInline some standard functions\n"
             "  --list-opt-steps\t\tList all optimizer steps and exit\n"
             "  --list-warnings\t\tList available warning types for -W\n"
             "  --local-strings\t\tEmit string literals immediately\n"
@@ -158,7 +161,11 @@ static void SetSys (const char* Sys)
             break;
 
         case TGT_MODULE:
-            AbEnd ("Cannot use `module' as a target for the compiler");
+            AbEnd ("Cannot use 'module' as a target for the compiler");
+            break;
+
+        case TGT_ATARI2600:
+            DefineNumericMacro ("__ATARI2600__", 1);
             break;
 
         case TGT_ATARI5200:
@@ -230,6 +237,10 @@ static void SetSys (const char* Sys)
             DefineNumericMacro ("__GEOS_CBM__", 1);
             break;
 
+        case TGT_CREATIVISION:
+            DefineNumericMacro ("__CREATIVISION__", 1);
+            break;
+
         case TGT_GEOS_APPLE:
             DefineNumericMacro ("__GEOS__", 1);
             DefineNumericMacro ("__GEOS_APPLE__", 1);
@@ -241,6 +252,10 @@ static void SetSys (const char* Sys)
 
         case TGT_ATMOS:
             DefineNumericMacro ("__ATMOS__", 1);
+            break;
+
+        case TGT_TELESTRAT:
+            DefineNumericMacro ("__TELESTRAT__", 1);
             break;
 
         case TGT_NES:
@@ -271,8 +286,16 @@ static void SetSys (const char* Sys)
             DefineNumericMacro ("__PCE__", 1);
             break;
 
+        case TGT_CX16:
+            cbmsys ("__CX16__");
+            break;
+
+        case TGT_SYM1:
+            DefineNumericMacro ("__SYM1__", 1);
+            break;
+
         default:
-            AbEnd ("Unknown target system type %d", Target);
+            AbEnd ("Unknown target system '%s'", Sys);
     }
 
     /* Initialize the translation tables for the target system */
@@ -286,7 +309,11 @@ static void FileNameOption (const char* Opt, const char* Arg, StrBuf* Name)
 {
     /* Cannot have the option twice */
     if (SB_NotEmpty (Name)) {
-        AbEnd ("Cannot use option `%s' twice", Opt);
+        AbEnd ("Cannot use option '%s' twice", Opt);
+    }
+    /* A typo in OptTab[] might allow a NULL Arg */
+    if (Arg == 0) {
+        Internal ("Typo in OptTab[]; option '%s' should require an argument", Opt);
     }
     /* Remember the file name for later */
     SB_CopyStr (Name, Arg);
@@ -344,7 +371,7 @@ static void CheckSegName (const char* Seg)
 {
     /* Print an error and abort if the name is not ok */
     if (!ValidSegName (Seg)) {
-        AbEnd ("Segment name `%s' is invalid", Seg);
+        AbEnd ("Segment name '%s' is invalid", Seg);
     }
 }
 
@@ -440,8 +467,9 @@ static void OptCPU (const char* Opt, const char* Arg)
     /* Find the CPU from the given name */
     CPU = FindCPU (Arg);
     if (CPU != CPU_6502 && CPU != CPU_6502X && CPU != CPU_65SC02 &&
-        CPU != CPU_65C02 && CPU != CPU_65816 && CPU != CPU_HUC6280) {
-        AbEnd ("Invalid argument for %s: `%s'", Opt, Arg);
+        CPU != CPU_65C02 && CPU != CPU_65816 && CPU != CPU_HUC6280 &&
+        CPU != CPU_6502DTV) {
+        AbEnd ("Invalid argument for %s: '%s'", Opt, Arg);
     }
 }
 
@@ -486,7 +514,7 @@ static void OptDebugOpt (const char* Opt attribute ((unused)), const char* Arg)
     /* Open the file */
     FILE* F = fopen (Arg, "r");
     if (F == 0) {
-        AbEnd ("Cannot open `%s': %s", Arg, strerror (errno));
+        AbEnd ("Cannot open '%s': %s", Arg, strerror (errno));
     }
 
     /* Read line by line, ignore empty lines and switch optimization
@@ -544,7 +572,7 @@ static void OptDebugOpt (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
-static void OptDebugOptOutput (const char* Opt attribute ((unused)), 
+static void OptDebugOptOutput (const char* Opt attribute ((unused)),
                                const char* Arg attribute ((unused)))
 /* Output optimization steps */
 {
@@ -565,6 +593,16 @@ static void OptDisableOpt (const char* Opt attribute ((unused)), const char* Arg
 /* Disable an optimization step */
 {
     DisableOpt (Arg);
+}
+
+
+
+static void OptEagerlyInlineFuncs (const char* Opt attribute((unused)),
+                                   const char* Arg attribute((unused)))
+/* Eagerly inline some known functions */
+{
+    IS_Set (&InlineStdFuncs, 1);
+    IS_Set (&EagerlyInlineFuncs, 1);
 }
 
 
@@ -592,6 +630,15 @@ static void OptIncludeDir (const char* Opt attribute ((unused)), const char* Arg
 {
     AddSearchPath (SysIncSearchPath, Arg);
     AddSearchPath (UsrIncSearchPath, Arg);
+}
+
+
+
+static void OptInlineStdFuncs (const char* Opt attribute((unused)),
+                               const char* Arg attribute((unused)))
+/* Inline some standard functions */
+{
+    IS_Set (&InlineStdFuncs, 1);
 }
 
 
@@ -638,7 +685,7 @@ static void OptMemoryModel (const char* Opt, const char* Arg)
 
     /* Check the current memory model */
     if (MemoryModel != MMODEL_UNKNOWN) {
-        AbEnd ("Cannot use option `%s' twice", Opt);
+        AbEnd ("Cannot use option '%s' twice", Opt);
     }
 
     /* Translate the memory model name and check it */
@@ -689,7 +736,7 @@ static void OptRodataName (const char* Opt attribute ((unused)), const char* Arg
 
 static void OptSignedChars (const char* Opt attribute ((unused)),
                             const char* Arg attribute ((unused)))
-/* Make default characters signed */
+/* Use 'signed char' as the underlying type of 'char' */
 {
     IS_Set (&SignedChars, 1);
 }
@@ -702,7 +749,7 @@ static void OptStandard (const char* Opt, const char* Arg)
     /* Find the standard from the given name */
     standard_t Std = FindStandard (Arg);
     if (Std == STD_UNKNOWN) {
-        AbEnd ("Invalid argument for %s: `%s'", Opt, Arg);
+        AbEnd ("Invalid argument for %s: '%s'", Opt, Arg);
     } else if (IS_Get (&Standard) != STD_UNKNOWN) {
         AbEnd ("Option %s given more than once", Opt);
     } else {
@@ -742,7 +789,7 @@ static void OptVersion (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
 /* Print the compiler version */
 {
-    fprintf (stderr, "cc65 V%s\n", GetVersionAsString ());
+    fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
     exit (EXIT_SUCCESS);
 }
 
@@ -807,39 +854,41 @@ int main (int argc, char* argv[])
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
-        { "--add-source",       0,      OptAddSource            },
-        { "--all-cdecl",        0,      OptAllCDecl             },
-        { "--bss-name",         1,      OptBssName              },
-        { "--check-stack",      0,      OptCheckStack           },
-        { "--code-name",        1,      OptCodeName             },
-        { "--codesize",         1,      OptCodeSize             },
-        { "--cpu",              1,      OptCPU                  },
-        { "--create-dep",       1,      OptCreateDep            },
-        { "--create-full-dep",  1,      OptCreateFullDep        },
-        { "--data-name",        1,      OptDataName             },
-        { "--debug",            0,      OptDebug                },
-        { "--debug-info",       0,      OptDebugInfo            },
-        { "--debug-opt",        1,      OptDebugOpt             },
-        { "--debug-opt-output", 0,      OptDebugOptOutput       },
-        { "--dep-target",       1,      OptDepTarget            },
-        { "--disable-opt",      1,      OptDisableOpt           },
-        { "--enable-opt",       1,      OptEnableOpt            },
-        { "--help",             0,      OptHelp                 },
-        { "--include-dir",      1,      OptIncludeDir           },
-        { "--list-opt-steps",   0,      OptListOptSteps         },
-        { "--list-warnings",    0,      OptListWarnings         },
-        { "--local-strings",    0,      OptLocalStrings         },
-        { "--memory-model",     1,      OptMemoryModel          },
-        { "--register-space",   1,      OptRegisterSpace        },
-        { "--register-vars",    0,      OptRegisterVars         },
-        { "--rodata-name",      1,      OptRodataName           },
-        { "--signed-chars",     0,      OptSignedChars          },
-        { "--standard",         1,      OptStandard             },
-        { "--static-locals",    0,      OptStaticLocals         },
-        { "--target",           1,      OptTarget               },
-        { "--verbose",          0,      OptVerbose              },
-        { "--version",          0,      OptVersion              },
-        { "--writable-strings", 0,      OptWritableStrings      },
+        { "--add-source",           0,      OptAddSource            },
+        { "--all-cdecl",            0,      OptAllCDecl             },
+        { "--bss-name",             1,      OptBssName              },
+        { "--check-stack",          0,      OptCheckStack           },
+        { "--code-name",            1,      OptCodeName             },
+        { "--codesize",             1,      OptCodeSize             },
+        { "--cpu",                  1,      OptCPU                  },
+        { "--create-dep",           1,      OptCreateDep            },
+        { "--create-full-dep",      1,      OptCreateFullDep        },
+        { "--data-name",            1,      OptDataName             },
+        { "--debug",                0,      OptDebug                },
+        { "--debug-info",           0,      OptDebugInfo            },
+        { "--debug-opt",            1,      OptDebugOpt             },
+        { "--debug-opt-output",     0,      OptDebugOptOutput       },
+        { "--dep-target",           1,      OptDepTarget            },
+        { "--disable-opt",          1,      OptDisableOpt           },
+        { "--eagerly-inline-funcs", 0,      OptEagerlyInlineFuncs   },
+        { "--enable-opt",           1,      OptEnableOpt            },
+        { "--help",                 0,      OptHelp                 },
+        { "--include-dir",          1,      OptIncludeDir           },
+        { "--inline-stdfuncs",      0,      OptInlineStdFuncs       },
+        { "--list-opt-steps",       0,      OptListOptSteps         },
+        { "--list-warnings",        0,      OptListWarnings         },
+        { "--local-strings",        0,      OptLocalStrings         },
+        { "--memory-model",         1,      OptMemoryModel          },
+        { "--register-space",       1,      OptRegisterSpace        },
+        { "--register-vars",        0,      OptRegisterVars         },
+        { "--rodata-name",          1,      OptRodataName           },
+        { "--signed-chars",         0,      OptSignedChars          },
+        { "--standard",             1,      OptStandard             },
+        { "--static-locals",        0,      OptStaticLocals         },
+        { "--target",               1,      OptTarget               },
+        { "--verbose",              0,      OptVerbose              },
+        { "--version",              0,      OptVersion              },
+        { "--writable-strings",     0,      OptWritableStrings      },
     };
 
     unsigned I;
@@ -852,6 +901,9 @@ int main (int argc, char* argv[])
 
     /* Initialize the default segment names */
     InitSegNames ();
+
+    /* Initialize the segment address sizes table */
+    InitSegAddrSizes ();
 
     /* Initialize the include search paths */
     InitIncludePaths ();
@@ -951,6 +1003,9 @@ int main (int argc, char* argv[])
                             case 's':
                                 IS_Set (&InlineStdFuncs, 1);
                                 break;
+                            default:
+                                UnknownOption (Arg);
+                                break;
                         }
                     }
                     break;
@@ -1013,13 +1068,16 @@ int main (int argc, char* argv[])
         IS_Set (&Standard, STD_DEFAULT);
     }
 
+    /* Track string buffer allocation */
+    InitDiagnosticStrBufs ();
+
     /* Go! */
     Compile (InputFile);
 
     /* Create the output file if we didn't had any errors */
     if (PreprocessOnly == 0 && (ErrorCount == 0 || Debug)) {
 
-        /* Emit literals, externals, do cleanup and optimizations */
+        /* Emit literals, do cleanup and optimizations */
         FinishCompile ();
 
         /* Open the file */
@@ -1027,7 +1085,7 @@ int main (int argc, char* argv[])
 
         /* Write the output to the file */
         WriteAsmOutput ();
-        Print (stdout, 1, "Wrote output to `%s'\n", OutputFilename);
+        Print (stdout, 1, "Wrote output to '%s'\n", OutputFilename);
 
         /* Close the file, check for errors */
         CloseOutputFile ();
@@ -1035,6 +1093,12 @@ int main (int argc, char* argv[])
         /* Create dependencies if requested */
         CreateDependencies ();
     }
+
+    /* Done with tracked string buffer allocation */
+    DoneDiagnosticStrBufs ();
+
+    /* Free up the segment address sizes table */
+    DoneSegAddrSizes ();
 
     /* Return an apropriate exit code */
     return (ErrorCount > 0)? EXIT_FAILURE : EXIT_SUCCESS;

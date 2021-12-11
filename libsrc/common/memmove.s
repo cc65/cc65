@@ -1,6 +1,6 @@
 ;
 ; 2003-08-20, Ullrich von Bassewitz
-; 2009-09-13, Christian Krueger -- performance increase (about 20%)
+; 2009-09-13, Christian Krueger -- performance increase (about 20%), 2013-07-25 improved unrolling
 ; 2015-10-23, Greg King
 ;
 ; void* __fastcall__ memmove (void* dest, const void* src, size_t size);
@@ -61,13 +61,10 @@ PageSizeCopy:                   ; assert Y = 0
         dec     ptr1+1          ; adjust base...
         dec     ptr2+1
         dey                     ; in entry case: 0 -> FF
-        lda     (ptr1),y        ; need to copy this 'intro byte'
-        sta     (ptr2),y        ; to 'land' later on Y=0! (as a result of the '.repeat'-block!)
-        dey                     ; FF ->FE
 @copyBytes:
-        .repeat 2               ; Unroll this a bit to make it faster...
-        lda     (ptr1),y
-        sta     (ptr2),y
+        .repeat 3               ; unroll this a bit to make it faster...
+        lda     (ptr1),y        ; important: unrolling three times gives a nice
+        sta     (ptr2),y        ; 255/3 = 85 loop which ends at 0
         dey
         .endrepeat
 @copyEntry:                     ; in entry case: 0 -> FF

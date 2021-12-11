@@ -79,7 +79,7 @@ const OpcDesc OpcTable_65C02[256] = {
     {   "ora",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $1d */
     {   "asl",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $1e */
     {   "bbr1", 3,  flUseLabel,               OH_BitBranch             }, /* $1f */
-    {   "jsr",  3,  flLabel,                  OH_Absolute              }, /* $20 */
+    {   "jsr",  3,  flLabel,                  OH_JsrAbsolute           }, /* $20 */
     {   "and",  2,  flUseLabel,               OH_DirectXIndirect       }, /* $21 */
     {   "",     1,  flIllegal,                OH_Illegal,              }, /* $22 */
     {   "",     1,  flIllegal,                OH_Illegal,              }, /* $23 */
@@ -157,7 +157,7 @@ const OpcDesc OpcTable_65C02[256] = {
     {   "",     1,  flIllegal,                OH_Illegal,              }, /* $6b */
     {   "jmp",  3,  flLabel,                  OH_JmpAbsoluteIndirect   }, /* $6c */
     {   "adc",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $6d */
-    {   "ror",  3,  flUseLabel,               OH_Absolute              }, /* $6e */
+    {   "ror",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $6e */
     {   "bbr6", 3,  flUseLabel,               OH_BitBranch             }, /* $6f */
     {   "bvs",  2,  flLabel,                  OH_Relative              }, /* $70 */
     {   "adc",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $71 */
@@ -250,7 +250,7 @@ const OpcDesc OpcTable_65C02[256] = {
     {   "iny",  1,  flNone,                   OH_Implicit              }, /* $c8 */
     {   "cmp",  2,  flNone,                   OH_Immediate             }, /* $c9 */
     {   "dex",  1,  flNone,                   OH_Implicit              }, /* $ca */
-    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $cb */
+    {   "wai",  1,  flNone,                   OH_Implicit              }, /* $cb */
     {   "cpy",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $cc */
     {   "cmp",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $cd */
     {   "dec",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $ce */
@@ -266,7 +266,7 @@ const OpcDesc OpcTable_65C02[256] = {
     {   "cld",  1,  flNone,                   OH_Implicit              }, /* $d8 */
     {   "cmp",  3,  flUseLabel,               OH_AbsoluteY             }, /* $d9 */
     {   "phx",  1,  flNone,                   OH_Implicit              }, /* $da */
-    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $db */
+    {   "stp",  1,  flNone,                   OH_Implicit              }, /* $db */
     {   "",     1,  flIllegal,                OH_Illegal,              }, /* $dc */
     {   "cmp",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $dd */
     {   "dec",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $de */

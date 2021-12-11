@@ -5,7 +5,7 @@
 ;
         .include "lynx.inc"
         .include "extzp.inc"
-        .import         __BLOCKSIZE__
+        .import         __BANK0BLOCKSIZE__
         .export         __BOOTLDR__: absolute = 1
 
 
@@ -167,7 +167,7 @@ seclynxblock:
         lda __iodat
         sta IODAT
         stz _FileBlockByte
-        lda #<($100-(>__BLOCKSIZE__))
+        lda #<($100-(>__BANK0BLOCKSIZE__))
         sta _FileBlockByte+1
         ply
         plx

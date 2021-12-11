@@ -3,7 +3,6 @@
 <article>
 <title>co65 Users Guide
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>12.02.2003
 
 <abstract>
 co65 is an object file conversion utility. It converts o65 object files into
@@ -286,7 +285,7 @@ segment. Use the assembler to generate an object file from the assembler
 output.
 
   <tscreen><verb>
-       	co65 --code-label _c64_hi c64-hi.tgi
+        co65 --code-label _c64_hi c64-hi.tgi
         ca65 c64-hi.s
   </verb></tscreen>
 
@@ -294,7 +293,7 @@ Next, change your C code to declare a variable that is actually the address
 of the driver:
 
   <tscreen><verb>
-       	extern void c64_hi[];
+        extern void c64_hi[];
   </verb></tscreen>
 
 Instead of loading and unloading the driver, change the code to install and
@@ -330,14 +329,14 @@ including commercial applications, and to alter it and redistribute it
 freely, subject to the following restrictions:
 
 <enum>
-<item> 	The origin of this software must not be misrepresented; you must not
-       	claim that you wrote the original software. If you use this software
-       	in a product, an acknowledgment in the product documentation would be
-	appreciated but is not required.
-<item>	Altered source versions must be plainly marked as such, and must not
-	be misrepresented as being the original software.
-<item>	This notice may not be removed or altered from any source
-	distribution.
+<item>  The origin of this software must not be misrepresented; you must not
+        claim that you wrote the original software. If you use this software
+        in a product, an acknowledgment in the product documentation would be
+        appreciated but is not required.
+<item>  Altered source versions must be plainly marked as such, and must not
+        be misrepresented as being the original software.
+<item>  This notice may not be removed or altered from any source
+        distribution.
 </enum>
 
 </article>

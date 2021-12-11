@@ -5,10 +5,13 @@
 ; void __fastcall__ gotox (unsigned char x);
 ;
 
-        .export         _gotoxy, _gotox
+        .export         gotoxy, _gotoxy, _gotox
         .import         popa, VTABZ
 
         .include        "apple2.inc"
+
+gotoxy:
+        jsr     popa            ; Get Y
 
 _gotoxy:
         clc

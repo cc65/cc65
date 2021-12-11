@@ -2,7 +2,7 @@
 ; IRQ handling (PCE version)
 ;
 
-        .export         initirq, doneirq, IRQStub
+        .export         initirq, doneirq, IRQStub, __nmi
 
         .import         __INTERRUPTOR_COUNT__, callirq_y
 
@@ -10,7 +10,7 @@
         .include        "extzp.inc"
 
 ; ------------------------------------------------------------------------
-.segment        "INIT"
+.segment        "ONCE"
 
 ; a constructor
 ;
@@ -32,7 +32,7 @@ IRQStub:
 
 ; Save the display-source flags (and, release the interrupt).
 ;
-        ldy     a:VDC_CTRL
+        ldy     VDC_CTRL
         sty     vdc_flags
 
         ldy     #<(__INTERRUPTOR_COUNT__ * 2)
@@ -45,4 +45,4 @@ IRQStub:
         pla
         plx
 @L1:    ply
-        rti
+__nmi:  rti

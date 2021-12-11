@@ -99,6 +99,8 @@ unsigned ExecuteInsn (void);
 unsigned long GetCycles (void);
 /* Return the total number of clock cycles executed */
 
+extern int PrintCycles;
+/* flag to print cycles at program termination */
 
 
 /* End of 6502.h */

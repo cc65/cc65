@@ -53,6 +53,7 @@ size_t __fastcall__ strlen (const char* s);
 char* __fastcall__ strncat (char* s1, const char* s2, size_t count);
 int __fastcall__ strncmp (const char* s1, const char* s2, size_t count);
 char* __fastcall__ strncpy (char* dest, const char* src, size_t count);
+char* __fastcall__ strpbrk (const char* str, const char* set);
 char* __fastcall__ strrchr (const char* s, int c);
 size_t __fastcall__ strspn (const char* s1, const char* s2);
 char* __fastcall__ strstr (const char* str, const char* substr);

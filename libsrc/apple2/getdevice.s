@@ -18,7 +18,7 @@ _getfirstdevice:
 _getnextdevice:
         tax
 next:   inx
-        cpx     #$FF
+        cpx     #$FF            ; INVALID_DEVICE
         beq     done
 
         ; Check for ProDOS 8

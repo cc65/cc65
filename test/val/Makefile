@@ -1,70 +1,62 @@
-
-# makefile for the regression tests that return an error code on failure
+# Makefile for the regression tests that return an error code on failure
 
 ifneq ($(shell echo),)
-  CMD_EXE := 1
+  CMD_EXE = 1
 endif
 
 ifdef CMD_EXE
-  DEL = -del /f $(subst /,\,$1)
+  S = $(subst /,\,/)
+  NULLDEV = nul:
+  MKDIR = mkdir $(subst /,\,$1)
+  RMDIR = -rmdir /s /q $(subst /,\,$1)
 else
-  DEL = $(RM) $1
+  S = /
+  NULLDEV = /dev/null
+  MKDIR = mkdir -p $1
+  RMDIR = $(RM) -r $1
 endif
 
-CC65FLAGS := -t sim6502
-SIM65FLAGS := -x 200000000
+ifdef QUIET
+  .SILENT:
+  NULLOUT = >$(NULLDEV)
+  NULLERR = 2>$(NULLDEV)
+endif
 
-CL65 := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)
-SIM65 := $(if $(wildcard ../../bin/sim65*),../../bin/sim65,sim65)
+SIM65FLAGS = -x 5000000000
 
-WORKDIR := ../../testwrk
+CC65 := $(if $(wildcard ../../bin/cc65*),..$S..$Sbin$Scc65,cc65)
+CA65 := $(if $(wildcard ../../bin/ca65*),..$S..$Sbin$Sca65,ca65)
+LD65 := $(if $(wildcard ../../bin/ld65*),..$S..$Sbin$Sld65,ld65)
+SIM65 := $(if $(wildcard ../../bin/sim65*),..$S..$Sbin$Ssim65,sim65)
+
+WORKDIR = ../../testwrk/val
+
+OPTIONS = g O Os Osi Osir Osr Oi Oir Or
 
 .PHONY: all clean
 
 SOURCES := $(wildcard *.c)
-TESTS := $(foreach option,. .o. .os. .osi. .osir. .oi. .oir. .or.,$(SOURCES:%.c=$(WORKDIR)/%$(option)prg))
+TESTS  = $(foreach option,$(OPTIONS),$(SOURCES:%.c=$(WORKDIR)/%.$(option).6502.prg))
+TESTS += $(foreach option,$(OPTIONS),$(SOURCES:%.c=$(WORKDIR)/%.$(option).65c02.prg))
 
 all: $(TESTS)
 
-# Some files have "K & R"-style syntax.  Therefore, some forward
-# function-declarations don't match the later function definitions.
-# Those programs fail when fastcall is used; but, the cdecl calling convention
-# tolerates those conflicts.  Therefore, make their functions default to cdecl.
-#
-$(WORKDIR)/cq4%prg $(WORKDIR)/cq71.%rg $(WORKDIR)/cq81%prg $(WORKDIR)/cq84%prg: CC65FLAGS += -Wc --all-cdecl
+$(WORKDIR):
+	$(call MKDIR,$(WORKDIR))
 
-$(WORKDIR)/%.prg: %.c
-	$(CL65) $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@
+define PRG_template
 
-$(WORKDIR)/%.o.prg: %.c
-	$(CL65) -O $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@
+$(WORKDIR)/%.$1.$2.prg: %.c | $(WORKDIR)
+	$(if $(QUIET),echo val/$$*.$1.$2.prg)
+	$(CC65) -t sim$2 $$(CC65FLAGS) -$1 -o $$(@:.prg=.s) $$< $(NULLERR)
+	$(CA65) -t sim$2 -o $$(@:.prg=.o) $$(@:.prg=.s) $(NULLERR)
+	$(LD65) -t sim$2 -o $$@ $$(@:.prg=.o) sim$2.lib $(NULLERR)
+	$(SIM65) $(SIM65FLAGS) $$@ $(NULLOUT)
 
-$(WORKDIR)/%.os.prg: %.c
-	$(CL65) -Os $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@
+endef # PRG_template
 
-$(WORKDIR)/%.osi.prg: %.c
-	$(CL65) -Osi $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@
-
-$(WORKDIR)/%.osir.prg: %.c
-	$(CL65) -Osir $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@
-
-$(WORKDIR)/%.oi.prg: %.c
-	$(CL65) -Oi $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@
-
-$(WORKDIR)/%.oir.prg: %.c
-	$(CL65) -Oir $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@
-
-$(WORKDIR)/%.or.prg: %.c
-	$(CL65) -Or $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@
+$(foreach option,$(OPTIONS),$(eval $(call PRG_template,$(option),6502)))
+$(foreach option,$(OPTIONS),$(eval $(call PRG_template,$(option),65c02)))
 
 clean:
-	@$(call DEL,$(TESTS))
-	@$(call DEL,$(SOURCES:.c=.o))
+	@$(call RMDIR,$(WORKDIR))

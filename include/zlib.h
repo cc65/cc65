@@ -48,7 +48,8 @@
 #define Z_NULL       0
 
 
-unsigned __fastcall__ inflatemem (char* dest, const char* source);
+unsigned __fastcall__ inflatemem (unsigned char* dest,
+                                  const unsigned char* source);
 /*
      Decompresses the source buffer into the destination buffer.
    Returns the size of the uncompressed data (number of bytes written starting
@@ -83,8 +84,8 @@ unsigned __fastcall__ inflatemem (char* dest, const char* source);
 */
 
 
-int __fastcall__ uncompress (char* dest, unsigned* destLen,
-                             const char* source, unsigned sourceLen);
+int __fastcall__ uncompress (unsigned char* dest, unsigned* destLen,
+                             const unsigned char* source, unsigned sourceLen);
 /*
    Original zlib description:
 
@@ -113,7 +114,8 @@ int __fastcall__ uncompress (char* dest, unsigned* destLen,
 */
 
 
-unsigned long __fastcall__ adler32 (unsigned long adler, const char* buf,
+unsigned long __fastcall__ adler32 (unsigned long adler,
+                                    const unsigned char* buf,
                                     unsigned len);
 
 /*
@@ -139,7 +141,8 @@ unsigned long __fastcall__ adler32 (unsigned long adler, const char* buf,
 */
 
 
-unsigned long __fastcall__ crc32 (unsigned long crc, const char* buf,
+unsigned long __fastcall__ crc32 (unsigned long crc,
+                                  const unsigned char* buf,
                                   unsigned len);
 /*
    Original zlib description:

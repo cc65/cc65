@@ -1,0 +1,30 @@
+// Da65 input file before preprocessed by cpp
+// RAM and Fixed ROM map
+
+#ifndef FIXED_DA_INCLUDED
+#define FIXED_DA_INCLUDED
+
+#ifndef TARGET_BANK
+#define TARGET_BANK -1
+global {
+    inputoffs $0C010;
+    inputsize $4000;
+    startaddr $C000;
+    cpu "6502";
+};
+#endif /* !defined(TARGET_BANK) */
+
+// ---- RAM map ----
+label { addr $00; name "VariableA"; };
+label { addr $01; name "VariableB"; };
+label { addr $0100; name "Stack"; size $0100; };
+#if defined(TEST_ERROR) && TARGET_BANK == 0
+erroneous_line;
+#endif
+
+// ---- Fixed ROM map ----
+label { addr $C000; name "CommonProcA"; };
+label { addr $C123; name "CommonProcB"; };
+range { start $E123; end $FFFF; name "CommonData"; type ByteTable; };
+
+#endif /* !defined(FIXED_DA_INCLUDED) */

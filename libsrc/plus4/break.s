@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 27.09.1998
 ;
-; void set_brk (unsigned Addr);
+; void __fastcall__ set_brk (unsigned Addr);
 ; void reset_brk (void);
 ;
 
@@ -55,7 +55,7 @@ uservec:        jmp     $FFFF           ; Patched at runtime
 
 
 
-; Break handler, called if a break occurs. 
+; Break handler, called if a break occurs.
 
 .proc   brk_handler
 
@@ -90,5 +90,4 @@ uservec:        jmp     $FFFF           ; Patched at runtime
         rti                     ; Jump back...
 
 .endproc
-
 

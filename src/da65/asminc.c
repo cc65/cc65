@@ -133,7 +133,7 @@ void AsmInc (const char* Filename, char CommentStart, int IgnoreUnknown)
             SB_Terminate (&Ident);
         } else {
             if (!IgnoreUnknown) {
-                Error ("%s(%u): Syntax error", Filename, Line);
+                Error ("%s:%u: Syntax error", Filename, Line);
             }
             continue;
         }
@@ -148,7 +148,7 @@ void AsmInc (const char* Filename, char CommentStart, int IgnoreUnknown)
             ++L;
         } else {
             if (!IgnoreUnknown) {
-                Error ("%s(%u): Missing `='", Filename, Line);
+                Error ("%s:%u: Missing '='", Filename, Line);
             }
             continue;
         }
@@ -192,7 +192,7 @@ void AsmInc (const char* Filename, char CommentStart, int IgnoreUnknown)
         /* Must have at least one digit */
         if (Digits == 0) {
             if (!IgnoreUnknown) {
-                Error ("%s(%u): Error in number format", Filename, Line);
+                Error ("%s:%u: Error in number format", Filename, Line);
             }
             continue;
         }
@@ -213,7 +213,7 @@ void AsmInc (const char* Filename, char CommentStart, int IgnoreUnknown)
         /* Check for a comment character or end of line */
         if (*L != CommentStart && *L != '\0') {
             if (!IgnoreUnknown) {
-                Error ("%s(%u): Trailing garbage", Filename, Line);
+                Error ("%s:%u: Trailing garbage", Filename, Line);
             }
             continue;
         }

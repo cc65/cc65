@@ -4,21 +4,26 @@
 ; unsigned char __fastcall__ bordercolor (unsigned char color);
 ;
 
+        .export         _textcolor, _bgcolor, _bordercolor
+        .export         colors
 
-        .export     _textcolor, _bgcolor, _bordercolor
+        .import         return0
 
         .include        "pce.inc"
         .include        "extzp.inc"
 
+_bordercolor    := return0              ; always black
+
 _textcolor:
-        ldx     CHARCOLOR       ; get old value
-        sta     CHARCOLOR       ; set new value
+        ldx     CHARCOLOR               ; get old value
+        sta     CHARCOLOR               ; set new value
         txa
         rts
 
 _bgcolor:
-        ldx     BGCOLOR         ; get old value
-        sta     BGCOLOR         ; set new value
+        and     #$0F
+        ldx     BGCOLOR                 ; get old value
+        sta     BGCOLOR                 ; set new value
         asl     a
         tay
 
@@ -32,32 +37,25 @@ _bgcolor:
         txa
         rts
 
-_bordercolor:
-        lda     #0
-        tax
-        rts
+.rodata
 
-        .rodata
-        .export colors
-
-colors:
-        ;       G      R      B
-        .word ((0<<6)+(0<<3)+(0))       ; 0 black
-        .word ((7<<6)+(7<<3)+(7))       ; 1 white
-        .word ((0<<6)+(7<<3)+(0))       ; 2 red
-        .word ((7<<6)+(0<<3)+(7))       ; 3 cyan
-        .word ((0<<6)+(5<<3)+(7))       ; 4 violett
-        .word ((7<<6)+(0<<3)+(0))       ; 5 green
-        .word ((0<<6)+(0<<3)+(7))       ; 6 blue
-        .word ((7<<6)+(7<<3)+(0))       ; 7 yellow
-        .word ((5<<6)+(7<<3)+(0))       ; 8 orange
-        .word ((3<<6)+(4<<3)+(3))       ; 9 brown
-        .word ((4<<6)+(7<<3)+(4))       ; a light red
-        .word ((3<<6)+(3<<3)+(3))       ; b dark grey
-        .word ((4<<6)+(4<<3)+(4))       ; c middle grey
-        .word ((7<<6)+(4<<3)+(4))       ; d light green
-        .word ((4<<6)+(4<<3)+(7))       ; e light blue
-        .word ((6<<6)+(6<<3)+(6))       ; f light gray
+        ;         G      R      B
+colors: .word   ((0<<6)+(0<<3)+(0))     ; $0 black
+        .word   ((7<<6)+(7<<3)+(7))     ; $1 white
+        .word   ((0<<6)+(7<<3)+(0))     ; $2 red
+        .word   ((7<<6)+(0<<3)+(7))     ; $3 cyan
+        .word   ((0<<6)+(5<<3)+(7))     ; $4 violet
+        .word   ((7<<6)+(0<<3)+(0))     ; $5 green
+        .word   ((0<<6)+(0<<3)+(7))     ; $6 blue
+        .word   ((7<<6)+(7<<3)+(0))     ; $7 yellow
+        .word   ((5<<6)+(7<<3)+(0))     ; $8 orange
+        .word   ((3<<6)+(4<<3)+(3))     ; $9 brown
+        .word   ((4<<6)+(7<<3)+(4))     ; $A light red
+        .word   ((3<<6)+(3<<3)+(3))     ; $B dark grey
+        .word   ((4<<6)+(4<<3)+(4))     ; $C middle grey
+        .word   ((7<<6)+(4<<3)+(4))     ; $D light green
+        .word   ((4<<6)+(4<<3)+(7))     ; $E light blue
+        .word   ((6<<6)+(6<<3)+(6))     ; $F light gray
 
 ;-------------------------------------------------------------------------------
 ; force the init constructor to be imported

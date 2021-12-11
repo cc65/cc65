@@ -28,6 +28,7 @@
         ESPIPE                  ; Illegal seek
         ERANGE                  ; Range error
         EBADF                   ; Bad file number
+        ENOEXEC                 ; Exec format error
         EUNKNOWN                ; Unknown OS specific error - must be last!
 
         EMAX    = EUNKNOWN      ; Highest error code

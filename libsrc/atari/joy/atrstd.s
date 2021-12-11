@@ -34,24 +34,12 @@
 
         .addr   $0000
 
-; Button state masks (8 values)
-
-        .byte   $01                     ; JOY_UP
-        .byte   $02                     ; JOY_DOWN
-        .byte   $04                     ; JOY_LEFT
-        .byte   $08                     ; JOY_RIGHT
-        .byte   $10                     ; JOY_FIRE
-        .byte   $00                     ; JOY_FIRE2 not available
-        .byte   $00                     ; Future expansion
-        .byte   $00                     ; Future expansion
-
 ; Jump table.
 
         .addr   INSTALL
         .addr   UNINSTALL
         .addr   COUNT
         .addr   READJOY
-        .addr   0                       ; IRQ entry not used
 
 ; ------------------------------------------------------------------------
 ; Constants
@@ -105,8 +93,8 @@ _400800:
 ;
 
 READJOY:
-        and     #3              ; fix joystick number
-        tax                     ; Joystick number (0-3) into X
+        and     #JOY_COUNT-1    ; fix joystick number
+        tax                     ; Joystick number into X
 
 ; Read joystick
 
@@ -117,5 +105,14 @@ READJOY:
         asl     a
         ora     STICK0,x        ; add position information
         eor     #$1F
-        ldx     #0              ; fix X
+        cmp     oldval,x
+        beq     :+
+        sta     oldval,x
+        ldx     #0
+        stx     ATRACT          ; we have interaction, disable "attract mode"
+:       ldx     #0              ; fix X
         rts
+
+        .bss
+
+oldval: .res    JOY_COUNT

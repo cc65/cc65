@@ -67,22 +67,20 @@ firstinit:
 
         inc     soft80_first_init
 
+        ; soft80_lo_charset and soft80_hi_charset are page-aligned
+        ldy     #0
         lda     #<soft80_charset
         ldx     #>soft80_charset
         sta     ptr1
         stx     ptr1+1
-        lda     #<soft80_lo_charset
         ldx     #>soft80_lo_charset
-        sta     ptr2
+        sty     ptr2
         stx     ptr2+1
-        lda     #<soft80_hi_charset
         ldx     #>soft80_hi_charset
-        sta     ptr3
+        sty     ptr3
         stx     ptr3+1
 
         ldx     #4
-@l2:
-        ldy     #0
 @l1:
         lda     (ptr1),y
         sta     (ptr2),y
@@ -97,17 +95,17 @@ firstinit:
         inc     ptr2+1
         inc     ptr3+1
         dex
-        bne     @l2
+        bne     @l1
 
         ; copy the kplot tables to ram under I/O
         ;ldx     #0             ; is 0
-@l3:
+@l2:
         lda     soft80_tables_data_start,x
         sta     soft80_bitmapxlo,x
         lda     soft80_tables_data_start + (soft80_tables_data_end - soft80_tables_data_start - $0100),x
         sta     soft80_bitmapxlo + (soft80_tables_data_end - soft80_tables_data_start - $0100),x
         inx
-        bne     @l3
+        bne     @l2
 
         pla
         sta     $01

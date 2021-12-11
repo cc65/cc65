@@ -16,9 +16,12 @@ compiler.
 
 <sect>Overview<p>
 
-The Commander X16 is a modern small computer with firmware that is based on
-the ROMs in Commodore's VIC-20 and 64C.  It has a couple of I/O chips
-(WDC65C22 VIA) that are like the ones in the VIC-20.
+The Commander X16 is a modern small computer with firmware that is based partly
+on the ROMs in Commodore's VIC-20 and 64C.  It has a couple of I/O chips
+(WDC65C22 VIA) that are like the ones in the VIC-20.  It supports file storage
+on Secure Digital cards.  It allows two joysticks and a mouse.  It has three
+sound devices.  Its VGA screen has twice the range of the C64 (similar to the
+C128's 80-column screen), with 256 colors.
 
 This file contains an overview of the CX16 run-time system as it comes with the
 cc65 C compiler.  It describes the memory layout, CX16-specific header files,
@@ -108,7 +111,7 @@ cl65 -o file.prg -t cx16 -C cx16-asm.cfg source.s
 
 To generate code that loads to &dollar;A000:
 <tscreen><verb>
-cl65 -o file.prg -Wl -S,$A000 -t cX16 -C cX16-asm.cfg source.s
+cl65 -o file.prg -Wl -S,$A000 -t cx16 -C cx16-asm.cfg source.s
 </verb></tscreen>
 
 It also is possible to add a small BASIC header to the program, that uses SYS
@@ -139,12 +142,19 @@ The functions listed below are special for the CX16. See the <url
 url="funcref.html" name="function reference"> for declarations and usage.
 
 <itemize>
-<item>get_ostype
-<item>set_tv
-<item>videomode
-<item>vpeek
-<item>vpoke
+<item>get_ostype()
+<item>set_tv()
+<item>videomode()
+<item>vpeek()
+<item>vpoke()
 </itemize>
+
+<tt/cpeekcolor()/ works differently on the Commander X16 than it does on other
+platforms.  Each character has two colors: background and text (foreground).
+<tt/cpeekcolor()/ returns both colors.  The high nybble describes the
+background color, the low nybble describes the text color.  For example, if the
+function is used on the default screen, then it returns &dollar;61, which means
+white-on-blue.
 
 
 <sect1>CBM-specific functions<p>
@@ -154,32 +164,32 @@ machines. See the <url url="funcref.html" name="function reference"> for
 declarations and usage.
 
 <itemize>
-<item>cbm_close
-<item>cbm_closedir
-<item>cbm_k_basin
-<item>cbm_k_bsout
-<item>cbm_k_chkin
-<item>cbm_k_ckout
-<item>cbm_k_close
-<item>cbm_k_clrch
-<item>cbm_k_getin
-<item>cbm_k_load
-<item>cbm_k_open
-<item>cbm_k_readst
-<item>cbm_k_save
-<item>cbm_k_second
-<item>cbm_k_setlfs
-<item>cbm_k_setnam
-<item>cbm_k_tksa
-<item>cbm_load
-<item>cbm_open
-<item>cbm_opendir
-<item>cbm_read
-<item>cbm_readdir
-<item>cbm_save
-<item>cbm_write
-<item>get_tv
-<item>waitvsync
+<item>cbm_close()
+<item>cbm_closedir()
+<item>cbm_k_basin()
+<item>cbm_k_bsout()
+<item>cbm_k_chkin()
+<item>cbm_k_ckout()
+<item>cbm_k_close()
+<item>cbm_k_clrch()
+<item>cbm_k_getin()
+<item>cbm_k_load()
+<item>cbm_k_open()
+<item>cbm_k_readst()
+<item>cbm_k_save()
+<item>cbm_k_second()
+<item>cbm_k_setlfs()
+<item>cbm_k_setnam()
+<item>cbm_k_tksa()
+<item>cbm_load()
+<item>cbm_open()
+<item>cbm_opendir()
+<item>cbm_read()
+<item>cbm_readdir()
+<item>cbm_save()
+<item>cbm_write()
+<item>get_tv()
+<item>waitvsync()
 </itemize>
 
 
@@ -208,12 +218,22 @@ structures, accessing the struct fields will access the chip registers.
 
 <sect>Loadable drivers<p>
 
-The names in the parentheses denote the symbols to be used for static linking of the drivers.
+The names in the parentheses denote the symbols to be used for static linking
+of the drivers.  The names fit into the 8.3 character limit of the SD-Card's
+FAT32 file-system.
 
 
 <sect1>Graphics drivers<p>
 
-No graphics drivers are available currently for the CX16.
+The default drivers, <tt/tgi_stddrv (tgi_static_stddrv)/,
+point to <tt/cx320p1.tgi (cx320p1_tgi)/.
+
+<descrip>
+  <tag><tt/cx320p1.tgi (cx320p1_tgi)/</tag>
+  This driver features a resolution of 320 across and 200 down with 256 colors,
+  and a slightly adjustable palette (the order of the colors can be changed in
+  a way that's compatible with some of the other color drivers).
+</descrip><p>
 
 
 <sect1>Extended memory drivers<p>
@@ -224,10 +244,10 @@ No extended memory drivers are available currently for the CX16.
 <sect1>Joystick drivers<p>
 
 The default drivers, <tt/joy_stddrv (joy_static_stddrv)/,
-point to <tt/cX16-std.joy (cx16_std_joy)/.
+point to <tt/cx16-std.joy (cx16_std_joy)/.
 
 <descrip>
-  <tag><tt/cX16-std.joy (cX16_std_joy)/</tag>
+  <tag><tt/cx16-std.joy (cx16_std_joy)/</tag>
   Supports up to two NES (and SNES) controllers connected to the joystick ports
   of the CX16.  It reads the four directions, and the <bf/A/, <bf/B/,
   <bf/Select/, and <bf/Start/ buttons.  Buttons <bf/A/ and <bf/B/ are
@@ -238,15 +258,15 @@ point to <tt/cX16-std.joy (cx16_std_joy)/.
 <sect1>Mouse drivers<p>
 
 The default drivers, <tt/mouse_stddrv (mouse_static_stddrv)/,
-point to <tt/cX16-std.mou (cx16_std_mou)/.
+point to <tt/cx16-std.mou (cx16_std_mou)/.
 
 <descrip>
-  <tag><tt/cX16-std.mou (cX16_std_mou)/</tag>
+  <tag><tt/cx16-std.mou (cx16_std_mou)/</tag>
   Supports a standard 3-button mouse connected to the PS/2 mouse port of the
   Commander X16.
 
-  Currently (r35), this driver doesn't support <tt/mouse_move()/
-  and <tt/mouse_setbox()/.
+  Currently, this driver doesn't support <tt/mouse_move()/ and
+  <tt/mouse_setbox()/.
 </descrip><p>
 
 

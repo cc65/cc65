@@ -988,7 +988,7 @@ unsigned OptPtrLoad12 (CodeSeg* S)
             L[4]->OPC == OP65_CLC                               &&
             L[5]->OPC == OP65_ADC                               &&
             CE_IsKnownImm (L[5], 1)                             &&
-            L[6]->OPC == OP65_BCC                               &&
+            (L[6]->OPC == OP65_BCC || L[6]->OPC == OP65_JCC)    &&
             L[6]->JumpTo != 0                                   &&
             L[6]->JumpTo->Owner == L[8]                         &&
             L[7]->OPC == OP65_INX                               &&

@@ -15,17 +15,11 @@
 _strnicmp:
 _strncasecmp:
 
-; Convert the given counter value in a/x from a downward counter into an
-; upward counter, so we can increment the counter in the loop below instead
-; of decrementing it. This adds some overhead now, but is cheaper than
-; executing a more complex test in each iteration of the loop. We do also
-; correct the value by one, so we can do the test on top of the loop.
-
-        eor     #$FF
-        sta     ptr3
-        txa
-        eor     #$FF
-        sta     ptr3+1
+        inx
+        stx     ptr3+1
+        tax
+        inx
+        stx     ptr3        ; save count with each byte incremented separately
 
 ; Get the remaining arguments
 
@@ -40,8 +34,8 @@ _strncasecmp:
 
 ; Start of compare loop. Check the counter.
 
-Loop:   inc     ptr3
-        beq     IncHi           ; increment high byte
+Loop:   dec     ptr3            ; decrement high byte
+        beq     IncHi
 
 ; Compare a byte from the strings
 
@@ -79,7 +73,7 @@ L2:     ldx     tmp1
 
 ; Increment hi byte
 
-IncHi:  inc     ptr3+1
+IncHi:  dec     ptr3+1
         bne     Comp            ; jump if counter not zero
 
 ; Exit code if strings are equal. a/x not set

@@ -54,7 +54,7 @@ typedef enum {
 /* Structure that holds all data needed for function activation */
 struct Function {
     struct SymEntry*    FuncEntry;        /* Symbol table entry */
-    Type*               ReturnType;       /* Function return type */
+    const Type*         ReturnType;       /* Function return type */
     FuncDesc*           Desc;             /* Function descriptor */
     int                 Reserved;         /* Reserved local space */
     unsigned            RetLab;           /* Return code label */
@@ -67,6 +67,9 @@ struct Function {
 /* Structure that holds all data needed for function activation */
 typedef struct Function Function;
 
+/* Forward declaration */
+struct FuncDesc;
+
 /* Function activation data for current function (or NULL) */
 extern Function* CurrentFunc;
 
@@ -78,6 +81,12 @@ extern Function* CurrentFunc;
 
 
 
+int F_CheckParamList (FuncDesc* D, int RequireAll);
+/* Check and set the parameter sizes.
+** If RequireAll is true, emit errors on parameters of incomplete types.
+** Return true if all parameters have complete types.
+*/
+
 const char* F_GetFuncName (const Function* F);
 /* Return the name of the current function */
 
@@ -87,7 +96,7 @@ unsigned F_GetParamCount (const Function* F);
 unsigned F_GetParamSize (const Function* F);
 /* Return the parameter size for the current function */
 
-Type* F_GetReturnType (Function* F);
+const Type* F_GetReturnType (Function* F);
 /* Get the return type for the function */
 
 int F_HasVoidReturn (const Function* F);
@@ -110,6 +119,9 @@ int F_IsOldStyle (const Function* F);
 
 int F_HasOldStyleIntRet (const Function* F);
 /* Return true if this is an old style (K&R) function with an implicit int return */
+
+void F_SetRetLab (Function* F, unsigned NewRetLab);
+/* Change the return jump label */
 
 unsigned F_GetRetLab (const Function* F);
 /* Return the return jump label */
@@ -138,7 +150,7 @@ int F_AllocRegVar (Function* F, const Type* Type);
 ** bank (zero page storage). If there is no register space left, return -1.
 */
 
-void NewFunc (struct SymEntry* Func);
+void NewFunc (struct SymEntry* Func, struct FuncDesc* D);
 /* Parse argument declarations and function body. */
 
 

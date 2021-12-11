@@ -94,11 +94,12 @@ _read:
     ; popax - fd, must be == to the above one
     ; return -1+__oserror or number of bytes read
 
-        eor #$ff
-        sta ptr1
-        txa
-        eor #$ff
-        sta ptr1+1              ; -(# of bytes to read)-1
+        inx
+        stx ptr1+1
+        tax
+        inx
+        stx ptr1                ; save count with each byte incremented separately
+
         jsr popax
         sta ptr2
         stx ptr2+1              ; buffer ptr
@@ -152,9 +153,9 @@ _read:
         beq @done               ; yes, we're done
         jmp __mappederrno       ; no, we're screwed
 
-@L3:    inc ptr1                ; decrement the count
+@L3:    dec ptr1                ; decrement the count
         bne @L0
-        inc ptr1+1
+        dec ptr1+1
         bne @L0
 
 @done:

@@ -43,7 +43,7 @@ void __fastcall__ BitOtherClip(void *proc1, void *proc2, char skipl,
                                char skipr, unsigned skiptop,
                                struct iconpic *myIcon);
 
-void __fastcall__ GraphicsString(char *myGfxString);
+void __fastcall__ GraphicsString(const void *myGfxString);
 
 #ifdef __GEOS_CBM__
 void SetNewMode(void);

@@ -6,6 +6,9 @@
 
 #include <stdio.h>
 #include <limits.h>
+#include <stdint.h>
+
+/* #define SUPPORT_BIT_TYPES */
 
 unsigned char success=0;
 unsigned char failures=0;
@@ -14,22 +17,10 @@ unsigned char dummy=0;
 #ifdef SUPPORT_BIT_TYPES
 bit bit0 = 0;
 #endif
-#ifdef SIZEOF_INT_16BIT
-#if defined(__LINUX__) || defined(LINUX)
-unsigned short aint0 = 0;
-unsigned short aint1 = 0;
 
-#else
-unsigned int aint0 = 0;
-unsigned int aint1 = 0;
+uint16_t aint0 = 0;
+uint16_t aint1 = 0;
 
-#endif
-
-#else
-unsigned int aint0 = 0;
-unsigned int aint1 = 0;
-
-#endif
 unsigned char uchar0 = 0;
 unsigned char uchar1 = 0;
 unsigned char uchar2 = 0;

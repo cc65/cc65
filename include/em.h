@@ -82,7 +82,7 @@ unsigned char __fastcall__ em_load_driver (const char* driver);
 unsigned char em_unload (void);
 /* Uninstall, then unload the currently loaded driver. */
 
-unsigned char __fastcall__ em_install (void* driver);
+unsigned char __fastcall__ em_install (const void* driver);
 /* Install an already loaded driver. Return an error code. */
 
 unsigned char em_uninstall (void);

@@ -290,8 +290,12 @@ static void SetSys (const char* Sys)
             cbmsys ("__CX16__");
             break;
 
+        case TGT_SYM1:
+            DefineNumericMacro ("__SYM1__", 1);
+            break;
+
         default:
-            AbEnd ("Unknown target system type %d", Target);
+            AbEnd ("Unknown target system '%s'", Sys);
     }
 
     /* Initialize the translation tables for the target system */
@@ -463,7 +467,8 @@ static void OptCPU (const char* Opt, const char* Arg)
     /* Find the CPU from the given name */
     CPU = FindCPU (Arg);
     if (CPU != CPU_6502 && CPU != CPU_6502X && CPU != CPU_65SC02 &&
-        CPU != CPU_65C02 && CPU != CPU_65816 && CPU != CPU_HUC6280) {
+        CPU != CPU_65C02 && CPU != CPU_65816 && CPU != CPU_HUC6280 &&
+        CPU != CPU_6502DTV) {
         AbEnd ("Invalid argument for %s: '%s'", Opt, Arg);
     }
 }
@@ -731,7 +736,7 @@ static void OptRodataName (const char* Opt attribute ((unused)), const char* Arg
 
 static void OptSignedChars (const char* Opt attribute ((unused)),
                             const char* Arg attribute ((unused)))
-/* Make default characters signed */
+/* Use 'signed char' as the underlying type of 'char' */
 {
     IS_Set (&SignedChars, 1);
 }
@@ -897,6 +902,9 @@ int main (int argc, char* argv[])
     /* Initialize the default segment names */
     InitSegNames ();
 
+    /* Initialize the segment address sizes table */
+    InitSegAddrSizes ();
+
     /* Initialize the include search paths */
     InitIncludePaths ();
 
@@ -1060,13 +1068,16 @@ int main (int argc, char* argv[])
         IS_Set (&Standard, STD_DEFAULT);
     }
 
+    /* Track string buffer allocation */
+    InitDiagnosticStrBufs ();
+
     /* Go! */
     Compile (InputFile);
 
     /* Create the output file if we didn't had any errors */
     if (PreprocessOnly == 0 && (ErrorCount == 0 || Debug)) {
 
-        /* Emit literals, externals, do cleanup and optimizations */
+        /* Emit literals, do cleanup and optimizations */
         FinishCompile ();
 
         /* Open the file */
@@ -1082,6 +1093,12 @@ int main (int argc, char* argv[])
         /* Create dependencies if requested */
         CreateDependencies ();
     }
+
+    /* Done with tracked string buffer allocation */
+    DoneDiagnosticStrBufs ();
+
+    /* Free up the segment address sizes table */
+    DoneSegAddrSizes ();
 
     /* Return an apropriate exit code */
     return (ErrorCount > 0)? EXIT_FAILURE : EXIT_SUCCESS;

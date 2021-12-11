@@ -153,7 +153,7 @@ unsigned OptTest2 (CodeSeg* S)
             (L[2]->Info & OF_FBRA) != 0                         &&
             L[1]->AM == L[0]->AM                                &&
             strcmp (L[0]->Arg, L[1]->Arg) == 0                  &&
-            (GetRegInfo (S, I+2, L[1]->Chg) & L[1]->Chg) == 0) {
+            (GetRegInfo (S, I+2, L[1]->Chg & ~PSTATE_ZN) & L[1]->Chg & ~PSTATE_ZN) == 0) {
 
             /* Remove the load */
             CS_DelEntry (S, I+1);

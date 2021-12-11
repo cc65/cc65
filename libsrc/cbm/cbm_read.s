@@ -45,11 +45,11 @@
 
 
 _cbm_read:
-        eor     #$FF
-        sta     ptr1
-        txa
-        eor     #$FF
-        sta     ptr1+1          ; Save -size-1
+        inx
+        stx     ptr1+1
+        tax
+        inx
+        stx     ptr1            ; Save size with both bytes incremented separately.
 
         jsr     popax
         sta     ptr2
@@ -92,9 +92,9 @@ _cbm_read:
         bne     @L3
         inc     ptr3+1          ; ++bytesread;
 
-@L3:    inc     ptr1
+@L3:    dec     ptr1
         bne     @L1
-        inc     ptr1+1
+        dec     ptr1+1
         bne     @L1
 
 @L4:    jsr     CLRCH

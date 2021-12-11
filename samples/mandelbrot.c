@@ -31,6 +31,7 @@
 /* Workaround missing clock stuff */
 #ifdef __APPLE2__
 #  define clock()       0
+#  undef  CLK_TCK
 #  define CLK_TCK       1
 #endif
 
@@ -51,6 +52,7 @@ void mandelbrot (signed short x1, signed short y1, signed short x2,
     register signed short r, r1, i;
     register signed short xs, ys, xx, yy;
     register signed short x, y;
+    register unsigned char maxcol = MAXCOL;
 
     /* Calc stepwidth */
     xs = ((x2 - x1) / (SCREEN_X));
@@ -76,10 +78,15 @@ void mandelbrot (signed short x1, signed short y1, signed short x2,
             if (count == maxiterations) {
                 tgi_setcolor (0);
             } else {
-                if (MAXCOL == 2) {
+                switch (maxcol) {
+                  case 2:
                     tgi_setcolor (1);
-                } else {
-                    tgi_setcolor (count % MAXCOL);
+                    break;
+                  case 0:               /* 256 colors */
+                    tgi_setcolor (count);
+                    break;
+                  default:
+                    tgi_setcolor (count % maxcol);
                 }
             }
             /* Set pixel */

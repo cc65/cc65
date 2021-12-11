@@ -17,17 +17,17 @@
         sta     ptr3
         stx     ptr3+1          ; save count as result
 
-        eor     #$FF
-        sta     ptr2
-        txa
-        eor     #$FF
-        sta     ptr2+1          ; Remember -count-1
+        inx
+        stx     ptr2+1
+        tax
+        inx
+        stx     ptr2            ; save count with each byte incremented separately
 
         jsr     popptr1         ; get buf
         jsr     popax           ; get fd and discard
-L1:     inc     ptr2
+L1:     dec     ptr2
         bne     L2
-        inc     ptr2+1
+        dec     ptr2+1
         beq     L9
 L2:     ldy     #0
         lda     (ptr1),y

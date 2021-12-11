@@ -5,17 +5,17 @@
 ; char* strncat (char* dest, const char* src, size_t n);
 ;
 
-        .export         _strncat
-        .import         popax, popptr1
-        .importzp       ptr1, ptr2, ptr3, tmp1, tmp2
-        .macpack        cpu
+.export         _strncat
+.import         popax, popptr1
+.importzp       ptr1, ptr2, ptr3, tmp1, tmp2
+.macpack        cpu
         
 _strncat:
-    eor #$FF        ; one's complement to count upwards
-    sta tmp1
-    txa
-    eor #$FF
-    sta tmp2
+    inx
+    stx tmp2
+    tax
+    inx
+    stx tmp1        ; save count with each byte incremented separately
     
     jsr popptr1     ; get src
 
@@ -49,9 +49,9 @@ L2: sty ptr2
 L3: ldy #0
     ldx tmp1        ; low counter byte
 
-L4: inx
+L4: dex
     bne L5
-    inc tmp2
+    dec tmp2
     beq L6          ; jump if done
 L5: lda (ptr1),y
     sta (ptr2),y

@@ -1,10 +1,15 @@
 ;
 ; Ullrich von Bassewitz, 19.11.2002
 ;
-; C64 kernal functions
+; C64 Kernal functions
 ;
 
         .include "cbm_kernal.inc"
+
+        .export         CLRSCR
+        .export         KBDREAD
+        .export         UPDCRAMPTR
+        .export         NMIEXIT
 
         .export         CINT
         .export         IOINIT
@@ -33,7 +38,9 @@
         .export         CKOUT
         .export         CLRCH
         .export         BASIN
+        .export         CHRIN
         .export         BSOUT
+        .export         CHROUT
         .export         LOAD
         .export         SAVE
         .export         SETTIM

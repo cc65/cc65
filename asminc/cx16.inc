@@ -1,5 +1,5 @@
 ;
-; CX16 r37 definitions
+; CX16 r38 definitions
 ;
 
 ; ---------------------------------------------------------------------------
@@ -439,7 +439,7 @@ NMIVec          := $0318
   .scope        PSG             ; Programmable Sound Generator
     .struct
     PITCH       .word
-    VOL         .byte           ; Left, right channels; volume
+    VOL         .byte           ; Right, left sides; volume
     WAVEFORM    .byte           ; Wave shape, pulse width
     .endstruct
     LEFT        =       %01 << 6
@@ -544,9 +544,11 @@ NMIVec          := $0318
   VERALOG       .byte           ; Boolean: log VERA activity
   KEYBOARDLOG   .byte           ; Boolean: log keyboard data
   ECHO          .byte           ; Type of echo that's enabled
-  SAVEXIT       .byte           ; Boolean: save on exit
+  SAVEXIT       .byte           ; Boolean: save machine state on exit
   GIFREC        .byte           ; Method of recording GIF movie
-                .org    $9FBD
+                .res    2
+  CYCLECOUNT    .dword          ; Running count of CPU cycles (Read-Only)
+                .res    1
   KEYMAP        .byte           ; Current keyboard layout number (Read-Only)
   DETECT        .byte   2       ; If is "16" string, then running on emulator (RO)
 .endstruct

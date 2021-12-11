@@ -112,15 +112,17 @@ Here is a description of all the command line options:
   <itemize>
   <item>6502
   <item>6502x
+  <item>6502dtv
   <item>65sc02
   <item>65c02
   <item>huc6280
   <item>4510
   </itemize>
 
-  6502x is for the NMOS 6502 with unofficial opcodes. huc6280 is the CPU of
-  the PC engine. 4510 is the CPU of the Commodore C65. Support for the 65816
-  currently is not available.
+  6502x is for the NMOS 6502 with unofficial opcodes. 6502dtv is for the 
+  emulated CPU of the C64DTV device. huc6280 is the CPU of the PC engine. 
+  4510 is the CPU of the Commodore C65. Support for the 65816 currently 
+  is not available.
 
 
   <label id="option--formfeeds">
@@ -251,7 +253,10 @@ for this CPU. Invalid opcodes are translated into <tt/.byte/ commands.
 With the command line option <tt><ref id="option--cpu" name="--cpu"></tt>, the
 disassembler may be told to recognize either the 65SC02 or 65C02 CPUs. The
 latter understands the same opcodes as the former, plus 16 additional bit
-manipulation and bit test-and-branch commands.
+manipulation and bit test-and-branch commands. Using 6502x as CPU the illegal 
+opcodes of 6502 CPU are detected and displayed. 6502dtv setting recognizes the 
+emulated CPU instructons of the C64DTV device.
+
 
 When disassembling 4510 code, due to handling of 16-bit wide branches, da65
 can produce output that can not be re-assembled, when one or more of those

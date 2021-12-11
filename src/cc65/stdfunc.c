@@ -141,7 +141,7 @@ static long ArrayElementCount (const ArgDesc* Arg)
 
 
 
-static void ParseArg (ArgDesc* Arg, Type* Type)
+static void ParseArg (ArgDesc* Arg, const Type* Type, ExprDesc* Expr)
 /* Parse one argument but do not push it onto the stack. Make all fields in
 ** Arg valid.
 */
@@ -151,6 +151,10 @@ static void ParseArg (ArgDesc* Arg, Type* Type)
 
     /* Remember the required argument type */
     Arg->ArgType = Type;
+
+    /* Init expression */
+    ED_Init (&Arg->Expr);
+    Arg->Expr.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
 
     /* Read the expression we're going to pass to the function */
     MarkedExprWithCheck (hie1, &Arg->Expr);
@@ -208,9 +212,9 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 /* Handle the memcpy function */
 {
     /* Argument types: (void*, const void*, size_t) */
-    static Type Arg1Type[] = { TYPE(T_PTR), TYPE(T_VOID), TYPE(T_END) };
-    static Type Arg2Type[] = { TYPE(T_PTR), TYPE(T_VOID|T_QUAL_CONST), TYPE(T_END) };
-    static Type Arg3Type[] = { TYPE(T_SIZE_T), TYPE(T_END) };
+    static const Type* Arg1Type = type_void_p;
+    static const Type* Arg2Type = type_c_void_p;
+    static const Type* Arg3Type = type_size_t;
 
     ArgDesc  Arg1, Arg2, Arg3;
     unsigned ParamSize = 0;
@@ -218,14 +222,14 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     int      Offs;
 
     /* Argument #1 */
-    ParseArg (&Arg1, Arg1Type);
+    ParseArg (&Arg1, Arg1Type, Expr);
     g_push (Arg1.Flags, Arg1.Expr.IVal);
     GetCodePos (&Arg1.End);
     ParamSize += SizeOf (Arg1Type);
     ConsumeComma ();
 
     /* Argument #2 */
-    ParseArg (&Arg2, Arg2Type);
+    ParseArg (&Arg2, Arg2Type, Expr);
     g_push (Arg2.Flags, Arg2.Expr.IVal);
     GetCodePos (&Arg2.End);
     ParamSize += SizeOf (Arg2Type);
@@ -236,10 +240,13 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     ** also ignored for the calculation of the parameter size, since it is
     ** not passed via the stack.
     */
-    ParseArg (&Arg3, Arg3Type);
+    ParseArg (&Arg3, Arg3Type, Expr);
     if (Arg3.Flags & CF_CONST) {
         LoadExpr (CF_NONE, &Arg3.Expr);
     }
+
+    /* We still need to append deferred inc/dec before calling into the function */
+    DoDeferred (SQP_KEEP_EAX, &Arg3.Expr);
 
     /* Emit the actual function call. This will also cleanup the stack. */
     g_call (CF_FIXARGC, Func_memcpy, ParamSize);
@@ -343,7 +350,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             ** address calculation could overflow in the linker.
             */
             int AllowOneIndex = !ED_IsLocRegister (&Arg2.Expr) &&
-                                !(ED_IsLocAbs (&Arg2.Expr) && Arg2.Expr.IVal < 256);
+                                !(ED_IsLocNone (&Arg2.Expr) && Arg2.Expr.IVal < 256);
 
             /* Calculate the real stack offset */
             Offs = ED_GetStackOffs (&Arg1.Expr, 0);
@@ -421,7 +428,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             ** address calculation could overflow in the linker.
             */
             int AllowOneIndex = !ED_IsLocRegister (&Arg1.Expr) &&
-                                !(ED_IsLocAbs (&Arg1.Expr) && Arg1.Expr.IVal < 256);
+                                !(ED_IsLocNone (&Arg1.Expr) && Arg1.Expr.IVal < 256);
 
             /* Calculate the real stack offset */
             Offs = ED_GetStackOffs (&Arg2.Expr, 0);
@@ -520,7 +527,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             AddCodeLine ("lda ptr1");
 
             /* The function result is an rvalue in the primary register */
-            ED_MakeRValExpr (Expr);
+            ED_FinalizeRValLoad (Expr);
             Expr->Type = GetFuncReturn (Expr->Type);
 
             /* Bail out, no need for further processing */
@@ -529,7 +536,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     }
 
     /* The function result is an rvalue in the primary register */
-    ED_MakeRValExpr (Expr);
+    ED_FinalizeRValLoad (Expr);
     Expr->Type = GetFuncReturn (Expr->Type);
 
 ExitPoint:
@@ -549,9 +556,9 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 /* Handle the memset function */
 {
     /* Argument types: (void*, int, size_t) */
-    static Type Arg1Type[] = { TYPE(T_PTR), TYPE(T_VOID), TYPE(T_END) };
-    static Type Arg2Type[] = { TYPE(T_INT), TYPE(T_END) };
-    static Type Arg3Type[] = { TYPE(T_SIZE_T), TYPE(T_END) };
+    static const Type* Arg1Type = type_void_p;
+    static const Type* Arg2Type = type_int;
+    static const Type* Arg3Type = type_size_t;
 
     ArgDesc  Arg1, Arg2, Arg3;
     int      MemSet    = 1;             /* Use real memset if true */
@@ -559,7 +566,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     unsigned Label;
 
     /* Argument #1 */
-    ParseArg (&Arg1, Arg1Type);
+    ParseArg (&Arg1, Arg1Type, Expr);
     g_push (Arg1.Flags, Arg1.Expr.IVal);
     GetCodePos (&Arg1.End);
     ParamSize += SizeOf (Arg1Type);
@@ -568,7 +575,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     /* Argument #2. This argument is special in that we will call another
     ** function if it is a constant zero.
     */
-    ParseArg (&Arg2, Arg2Type);
+    ParseArg (&Arg2, Arg2Type, Expr);
     if ((Arg2.Flags & CF_CONST) != 0 && Arg2.Expr.IVal == 0) {
         /* Don't call memset, call bzero instead */
         MemSet = 0;
@@ -585,10 +592,13 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     ** also ignored for the calculation of the parameter size, since it is
     ** not passed via the stack.
     */
-    ParseArg (&Arg3, Arg3Type);
+    ParseArg (&Arg3, Arg3Type, Expr);
     if (Arg3.Flags & CF_CONST) {
         LoadExpr (CF_NONE, &Arg3.Expr);
     }
+
+    /* We still need to append deferred inc/dec before calling into the function */
+    DoDeferred (SQP_KEEP_EAX, &Arg3.Expr);
 
     /* Emit the actual function call. This will also cleanup the stack. */
     g_call (CF_FIXARGC, MemSet? Func_memset : Func__bzero, ParamSize);
@@ -743,7 +753,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             AddCodeLine ("lda ptr1");
 
             /* The function result is an rvalue in the primary register */
-            ED_MakeRValExpr (Expr);
+            ED_FinalizeRValLoad (Expr);
             Expr->Type = GetFuncReturn (Expr->Type);
 
             /* Bail out, no need for further processing */
@@ -752,7 +762,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     }
 
     /* The function result is an rvalue in the primary register */
-    ED_MakeRValExpr (Expr);
+    ED_FinalizeRValLoad (Expr);
     Expr->Type = GetFuncReturn (Expr->Type);
 
 ExitPoint:
@@ -772,8 +782,8 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 /* Handle the strcmp function */
 {
     /* Argument types: (const char*, const char*) */
-    static Type Arg1Type[] = { TYPE(T_PTR), TYPE(T_CHAR|T_QUAL_CONST), TYPE(T_END) };
-    static Type Arg2Type[] = { TYPE(T_PTR), TYPE(T_CHAR|T_QUAL_CONST), TYPE(T_END) };
+    static const Type* Arg1Type = type_c_char_p;
+    static const Type* Arg2Type = type_c_char_p;
 
     ArgDesc  Arg1, Arg2;
     unsigned ParamSize = 0;
@@ -782,18 +792,14 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     int      IsArray;
     int      Offs;
 
-    /* Setup the argument type string */
-    Arg1Type[1].C = GetDefaultChar () | T_QUAL_CONST;
-    Arg2Type[1].C = GetDefaultChar () | T_QUAL_CONST;
-
     /* Argument #1 */
-    ParseArg (&Arg1, Arg1Type);
+    ParseArg (&Arg1, Arg1Type, Expr);
     g_push (Arg1.Flags, Arg1.Expr.IVal);
     ParamSize += SizeOf (Arg1Type);
     ConsumeComma ();
 
     /* Argument #2. */
-    ParseArg (&Arg2, Arg2Type);
+    ParseArg (&Arg2, Arg2Type, Expr);
 
     /* Since strcmp is a fastcall function, we must load the
     ** arg into the primary if it is not already there. This parameter is
@@ -803,6 +809,9 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     if (Arg2.Flags & CF_CONST) {
         LoadExpr (CF_NONE, &Arg2.Expr);
     }
+
+    /* We still need to append deferred inc/dec before calling into the function */
+    DoDeferred (SQP_KEEP_EAX, &Arg2.Expr);
 
     /* Emit the actual function call. This will also cleanup the stack. */
     g_call (CF_FIXARGC, Func_strcmp, ParamSize);
@@ -823,8 +832,8 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         */
         if (ED_IsLocLiteral (&Arg2.Expr) &&
             IS_Get (&WritableStrings) == 0 &&
-            GetLiteralSize (Arg2.Expr.LVal) == 1 &&
-            GetLiteralStr (Arg2.Expr.LVal)[0] == '\0') {
+            GetLiteralSize (Arg2.Expr.V.LVal) == 1 &&
+            GetLiteralStr (Arg2.Expr.V.LVal)[0] == '\0') {
 
             /* Drop the generated code so we have the first argument in the
             ** primary
@@ -832,7 +841,7 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             RemoveCode (&Arg1.Push);
 
             /* We don't need the literal any longer */
-            ReleaseLiteral (Arg2.Expr.LVal);
+            ReleaseLiteral (Arg2.Expr.V.LVal);
 
             /* We do now have Arg1 in the primary. Load the first character from
             ** this string and cast to int. This is the function result.
@@ -955,7 +964,7 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     }
 
     /* The function result is an rvalue in the primary register */
-    ED_MakeRValExpr (Expr);
+    ED_FinalizeRValLoad (Expr);
     Expr->Type = GetFuncReturn (Expr->Type);
 
     /* We expect the closing brace */
@@ -974,20 +983,16 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 /* Handle the strcpy function */
 {
     /* Argument types: (char*, const char*) */
-    static Type Arg1Type[] = { TYPE(T_PTR), TYPE(T_CHAR), TYPE(T_END) };
-    static Type Arg2Type[] = { TYPE(T_PTR), TYPE(T_CHAR|T_QUAL_CONST), TYPE(T_END) };
+    static const Type* Arg1Type = type_char_p;
+    static const Type* Arg2Type = type_c_char_p;
 
     ArgDesc  Arg1, Arg2;
     unsigned ParamSize = 0;
     long     ECount;
     unsigned L1;
 
-    /* Setup the argument type string */
-    Arg1Type[1].C = GetDefaultChar ();
-    Arg2Type[1].C = GetDefaultChar () | T_QUAL_CONST;
-
     /* Argument #1 */
-    ParseArg (&Arg1, Arg1Type);
+    ParseArg (&Arg1, Arg1Type, Expr);
     g_push (Arg1.Flags, Arg1.Expr.IVal);
     GetCodePos (&Arg1.End);
     ParamSize += SizeOf (Arg1Type);
@@ -998,10 +1003,13 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     ** also ignored for the calculation of the parameter size, since it is
     ** not passed via the stack.
     */
-    ParseArg (&Arg2, Arg2Type);
+    ParseArg (&Arg2, Arg2Type, Expr);
     if (Arg2.Flags & CF_CONST) {
         LoadExpr (CF_NONE, &Arg2.Expr);
     }
+
+    /* We still need to append deferred inc/dec before calling into the function */
+    DoDeferred (SQP_KEEP_EAX, &Arg2.Expr);
 
     /* Emit the actual function call. This will also cleanup the stack. */
     g_call (CF_FIXARGC, Func_strcpy, ParamSize);
@@ -1069,7 +1077,7 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             ** address calculation could overflow in the linker.
             */
             int AllowOneIndex = !ED_IsLocRegister (&Arg1.Expr) &&
-                                !(ED_IsLocAbs (&Arg1.Expr) && Arg1.Expr.IVal < 256);
+                                !(ED_IsLocNone (&Arg1.Expr) && Arg1.Expr.IVal < 256);
 
             /* Calculate the real stack offset */
             int Offs = ED_GetStackOffs (&Arg2.Expr, 0);
@@ -1116,7 +1124,7 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             ** address calculation could overflow in the linker.
             */
             int AllowOneIndex = !ED_IsLocRegister (&Arg2.Expr) &&
-                                !(ED_IsLocAbs (&Arg2.Expr) && Arg2.Expr.IVal < 256);
+                                !(ED_IsLocNone (&Arg2.Expr) && Arg2.Expr.IVal < 256);
 
             /* Calculate the real stack offset */
             int Offs = ED_GetStackOffs (&Arg1.Expr, 0);
@@ -1153,7 +1161,7 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     }
 
     /* The function result is an rvalue in the primary register */
-    ED_MakeRValExpr (Expr);
+    ED_FinalizeRValLoad (Expr);
     Expr->Type = GetFuncReturn (Expr->Type);
 
 ExitPoint:
@@ -1172,7 +1180,7 @@ ExitPoint:
 static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 /* Handle the strlen function */
 {
-    static Type ArgType[] = { TYPE(T_PTR), TYPE(T_CHAR|T_QUAL_CONST), TYPE(T_END) };
+    static const Type* ArgType = type_c_char_p;
     ExprDesc    Arg;
     int         IsArray;
     int         IsPtr;
@@ -1180,11 +1188,14 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     long        ECount;
     unsigned    L;
 
-    /* Setup the argument type string */
-    ArgType[1].C = GetDefaultChar () | T_QUAL_CONST;
+    ED_Init (&Arg);
+    Arg.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
 
     /* Evaluate the parameter */
     hie1 (&Arg);
+
+    /* We still need to append deferred inc/dec before calling into the function */
+    DoDeferred (SQP_KEEP_EAX, &Arg);
 
     /* Check if the argument is an array. If so, remember the element count.
     ** Otherwise set the element count to undefined.
@@ -1221,10 +1232,10 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         if (ED_IsLocLiteral (&Arg) && IS_Get (&WritableStrings) == 0) {
 
             /* Constant string literal */
-            ED_MakeConstAbs (Expr, GetLiteralSize (Arg.LVal) - 1, type_size_t);
+            ED_MakeConstAbs (Expr, GetLiteralSize (Arg.V.LVal) - 1, type_size_t);
 
             /* We don't need the literal any longer */
-            ReleaseLiteral (Arg.LVal);
+            ReleaseLiteral (Arg.V.LVal);
 
             /* Bail out, no need for further improvements */
             goto ExitPoint;
@@ -1250,7 +1261,7 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             AddCodeLine ("tya");
 
             /* The function result is an rvalue in the primary register */
-            ED_MakeRValExpr (Expr);
+            ED_FinalizeRValLoad (Expr);
             Expr->Type = type_size_t;
 
             /* Bail out, no need for further processing */
@@ -1279,7 +1290,7 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             AddCodeLine ("ldx #$00");
 
             /* The function result is an rvalue in the primary register */
-            ED_MakeRValExpr (Expr);
+            ED_FinalizeRValLoad (Expr);
             Expr->Type = type_size_t;
 
             /* Bail out, no need for further processing */
@@ -1304,7 +1315,7 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             AddCodeLine ("tya");
 
             /* The function result is an rvalue in the primary register */
-            ED_MakeRValExpr (Expr);
+            ED_FinalizeRValLoad (Expr);
             Expr->Type = type_size_t;
 
             /* Bail out, no need for further processing */
@@ -1333,7 +1344,7 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             AddCodeLine ("tya");
 
             /* The function result is an rvalue in the primary register */
-            ED_MakeRValExpr (Expr);
+            ED_FinalizeRValLoad (Expr);
             Expr->Type = type_size_t;
 
             /* Bail out, no need for further processing */
@@ -1348,7 +1359,7 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     AddCodeLine ("jsr _%s", Func_strlen);
 
     /* The function result is an rvalue in the primary register */
-    ED_MakeRValExpr (Expr);
+    ED_FinalizeRValLoad (Expr);
     Expr->Type = type_size_t;
 
 ExitPoint:

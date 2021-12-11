@@ -4,7 +4,7 @@
 
 [Wiki](https://github.com/cc65/wiki/wiki)
 
-[![Build Status](https://api.travis-ci.org/cc65/cc65.svg?branch=master)](https://travis-ci.org/cc65/cc65/builds)
+[![Snapshot Build](https://github.com/cc65/cc65/actions/workflows/snapshot-on-push-master.yml/badge.svg?branch=master)](https://github.com/cc65/cc65/actions/workflows/snapshot-on-push-master.yml)
 
 cc65 is a complete cross development package for 65(C)02 systems, including
 a powerful macro assembler, a C compiler, linker, librarian and several
@@ -35,6 +35,8 @@ including
 - the Oric Telestrat.
 - the Lynx console.
 - the Ohio Scientific Challenger 1P.
+- the Commander X16.
+- the Synertek Systems Sym-1.
 
 The libraries are fairly portable, so creating a version for other 6502s
 shouldn't be too much work.

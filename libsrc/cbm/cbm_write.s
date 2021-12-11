@@ -39,11 +39,11 @@
 _cbm_write:
         sta     ptr3
         stx     ptr3+1          ; Save size
-        eor     #$FF
-        sta     ptr1
-        txa
-        eor     #$FF
-        sta     ptr1+1          ; Save -size-1
+        inx
+        stx     ptr1+1
+        tax
+        inx
+        stx     ptr1            ; Save size with both bytes incremented separately
 
         jsr     popax
         sta     ptr2
@@ -69,9 +69,9 @@ _cbm_write:
 
 @L2:    jsr     BSOUT           ; cbm_k_bsout (A);
 
-@L3:    inc     ptr1            ; --size;
+@L3:    dec     ptr1            ; --size;
         bne     @L1
-        inc     ptr1+1
+        dec     ptr1+1
         bne     @L1
 
         jsr     CLRCH

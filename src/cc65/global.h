@@ -67,7 +67,7 @@ extern IntStack         EnableRegVars;          /* Enable register variables */
 extern IntStack         AllowRegVarAddr;        /* Allow taking addresses of register vars */
 extern IntStack         RegVarsToCallStack;     /* Save reg variables on call stack */
 extern IntStack         StaticLocals;           /* Make local variables static */
-extern IntStack         SignedChars;            /* Make characters signed by default */
+extern IntStack         SignedChars;            /* Use 'signed char' as the underlying type of 'char' */
 extern IntStack         CheckStack;             /* Generate stack overflow checks */
 extern IntStack         Optimize;               /* Optimize flag */
 extern IntStack         CodeSizeFactor;         /* Size factor for generated code */

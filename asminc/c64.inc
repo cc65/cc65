@@ -9,6 +9,7 @@
 VARTAB          := $2D          ; Pointer to start of BASIC variables
 MEMSIZE         := $37          ; Pointer to highest BASIC RAM location (+1)
 TXTPTR          := $7A          ; Pointer into BASIC source code
+STATUS          := $90          ; Kernal I/O completion status
 TIME            := $A0          ; 60 HZ clock
 FNAM_LEN        := $B7          ; Length of filename
 SECADR          := $B9          ; Secondary address
@@ -76,6 +77,8 @@ VIC_SPR_EXP_Y   := $D017
 VIC_SPR_EXP_X   := $D01D
 VIC_SPR_MCOLOR  := $D01C
 VIC_SPR_BG_PRIO := $D01B
+VIC_SPR_COLL    := $D01E
+VIC_SPR_BG_COLL := $D01F
 
 VIC_SPR_MCOLOR0 := $D025
 VIC_SPR_MCOLOR1 := $D026

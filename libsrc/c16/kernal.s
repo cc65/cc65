@@ -1,10 +1,13 @@
 ;
 ; Ullrich von Bassewitz, 19.11.2002
 ;
-; C16 kernal functions
+; C16 Kernal functions
 ;
 
         .include "cbm_kernal.inc"
+
+        .export         CLRSCR
+        .export         KBDREAD
 
         .export         CINT
         .export         IOINIT
@@ -32,7 +35,9 @@
         .export         CKOUT
         .export         CLRCH
         .export         BASIN
+        .export         CHRIN
         .export         BSOUT
+        .export         CHROUT
         .export         LOAD
         .export         SAVE
         .export         SETTIM

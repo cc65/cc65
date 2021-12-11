@@ -332,6 +332,7 @@ See the <url url="funcref.html" name="function reference"> for declaration and u
 <item>_scroll
 <item>_setcolor
 <item>_setcolor_low
+<item>waitvsync
 </itemize>
 
 
@@ -674,9 +675,9 @@ The default callbacks definition (<tt/mouse_def_callbacks/) is an alias for the 
 
 <sect1>RS232 device drivers<p>
 
-Currently there is one RS232 driver.  It uses the R: device (therefore
-an R: driver needs to be installed) and was tested with the 850
-interface module.
+Currently there is one RS232 driver. It supports up to 9600 baud, requires hardware flow control
+(RTS/CTS) and uses the R: device (therefore an R: driver needs to be installed). It was tested
+with the 850 interface module.
 
 <table>
 <tabular ca="rr">
@@ -1169,7 +1170,7 @@ When using cl65, you can leave it out with this command line:
 cl65 -Wl -D__SYSTEM_CHECK__=1 <arguments>
 </verb></tscreen>
 
-The value you assign to <tt/__SYSTEM_CHECK_/ doesn't matter. If the
+The value you assign to <tt/__SYSTEM_CHECK__/ doesn't matter. If the
 <tt/__SYSTEM_CHECK__/ symbol is defined, the load chunk won't be included.
 
 

@@ -28,7 +28,9 @@
         .export         CKOUT
         .export         CLRCH
         .export         BASIN
+        .export         CHRIN
         .export         BSOUT
+        .export         CHROUT
         .export         LOAD
         .export         SAVE
         .export         STOP

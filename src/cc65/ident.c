@@ -35,7 +35,7 @@
 
 /* common */
 #include "chartype.h"
-                     
+
 /* cc65 */
 #include "ident.h"
 

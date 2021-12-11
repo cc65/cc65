@@ -6,10 +6,11 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2019 Mark Keates <markk@dendrite.co.uk>                          */
+/* (C) 2000-2021 Mark Keates <markk@dendrite.co.uk>                          */
 /*               Freddy Offenga <taf_offenga@yahoo.com>                      */
 /*               Christian Groessler <chris@groessler.org>                   */
 /*               Bill Kendrick <nbs@sonic.net>                               */
+/*               et al.                                                      */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -209,7 +210,7 @@
 #define KEY_CLEAR               (KEY_LESSTHAN | KEY_SHIFT)
 #define KEY_INSERT              (KEY_GREATERTHAN | KEY_SHIFT)
 
-#define KEY_UP      (KEY_UNDERLINE | KEY_CTRL)
+#define KEY_UP      (KEY_DASH | KEY_CTRL)
 #define KEY_DOWN    (KEY_EQUALS | KEY_CTRL)
 #define KEY_LEFT    (KEY_PLUS | KEY_CTRL)
 #define KEY_RIGHT   (KEY_ASTERISK | KEY_CTRL)
@@ -219,7 +220,7 @@
 /* Color register functions                                                  */
 /*****************************************************************************/
 
-extern void __fastcall__ _setcolor     (unsigned char color_reg, unsigned char hue, unsigned char luminace);
+extern void __fastcall__ _setcolor     (unsigned char color_reg, unsigned char hue, unsigned char luminance);
 extern void __fastcall__ _setcolor_low (unsigned char color_reg, unsigned char color_value);
 extern unsigned char __fastcall__ _getcolor (unsigned char color_reg);
 
@@ -227,6 +228,7 @@ extern unsigned char __fastcall__ _getcolor (unsigned char color_reg);
 /* Other screen functions                                                    */
 /*****************************************************************************/
 
+extern void waitvsync (void);                            /* wait for start of next frame */
 extern int  __fastcall__ _graphics (unsigned char mode); /* mode value same as in BASIC */
 extern void __fastcall__ _scroll (signed char numlines);
                                           /* numlines > 0  scrolls up */

@@ -8,9 +8,5 @@
 
 .proc _gotox
    sta    SCRX
-
-   lda     #$FF
-   sta     OLD_CHARCOLOR         
-   sta     OLD_BGCOLOR          
    rts
 .endproc

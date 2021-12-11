@@ -13,7 +13,6 @@
         .importzp       ST
 
         .include        "zeropage.inc"
-        .include        "plus4.inc"
 
 ; ------------------------------------------------------------------------
 ; Startup code

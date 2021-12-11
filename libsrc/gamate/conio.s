@@ -1,6 +1,7 @@
         .include        "gamate.inc"
         .include        "extzp.inc"
 
+        .import         fontdata
         .import         colors
         .importzp       ptr1, tmp1
 
@@ -24,8 +25,3 @@ initconio:
         sta     BGCOLOR
         rts
 
-        .segment        "RODATA"
-
-        .export         fontdata
-fontdata:
-        .include        "vga.inc"

@@ -34,7 +34,10 @@ TESTS = $(patsubst %.c,$(WORKDIR)/%.s,$(SOURCES))
 
 all: $(TESTS)
 
-$(WORKDIR)/%.s: %.c
+$(WORKDIR):
+	$(call MKDIR,$(WORKDIR))
+
+$(WORKDIR)/%.s: %.c | $(WORKDIR)
 	$(if $(QUIET),echo err/$*.s)
 	$(NOT) $(CC65) -o $@ $< $(NULLERR)
 

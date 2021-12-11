@@ -63,7 +63,7 @@ L0:     lsr     tmp4
         bcc     L1
         clc
         adc     ptr3
-        pha
+        tax
         lda     ptr3+1
         adc     tmp2
         sta     tmp2
@@ -73,7 +73,7 @@ L0:     lsr     tmp4
         lda     ptr4+1
         adc     tmp4
         sta     tmp4
-        pla
+        txa
 L1:     dey
         bpl     L0
         lda     ptr1            ; Load the low result word

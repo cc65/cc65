@@ -70,6 +70,19 @@ void TgtTranslateStrBuf (StrBuf* Buf);
 void TgtTranslateSet (unsigned Index, unsigned char C);
 /* Set the translation code for the given character */
 
+int TgtTranslatePush (void);
+/* Pushes the current translation table to the internal stack
+** Returns 1 on success, 0 on stack full
+*/
+
+int TgtTranslatePop (void);
+/* Pops a translation table from the internal stack into the current table
+** Returns 1 on success, 0 on stack empty
+*/
+
+int TgtTranslateStackIsEmpty (void);
+/* Returns 1 if the internal stack is empty */
+
 
 
 /* End of tgttrans.h */

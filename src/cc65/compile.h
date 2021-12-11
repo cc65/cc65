@@ -48,7 +48,7 @@ void Compile (const char* FileName);
 /* Top level compile routine. Will setup things and call the parser. */
 
 void FinishCompile (void);
-/* Emit literals, externals, do cleanup and optimizations */
+/* Emit literals, debug info, do cleanup and optimizations */
 
 
 

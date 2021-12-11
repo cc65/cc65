@@ -21,11 +21,11 @@
 
 .proc   rwcommon
 
-        eor     #$FF
-        sta     ptr2
-        txa
-        eor     #$FF
-        sta     ptr2+1          ; Remember -count-1
+        inx
+        stx     ptr2+1
+        tax
+        inx
+        stx     ptr2            ; Save count with each byte incremented separately
 
         jsr     popptr1         ; Get buf to ptr1, Y=0 by call
 

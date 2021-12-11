@@ -6,7 +6,7 @@
 ;
 
         .export         _cclearxy, _cclear
-        .import         update_adscr
+        .import         update_adscr, display_conio 
 
         .importzp       tmp1 
         .import         popax
@@ -27,7 +27,7 @@ _cclear:
 @L1:
         stx     tmp1            ; Save X
         lda     #' '            ; Erase current char
-        BRK_TELEMON     XFWR
+        jsr     display_conio
         ldx     tmp1
         dex
         bne     @L1

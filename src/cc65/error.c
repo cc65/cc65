@@ -38,7 +38,9 @@
 #include <stdarg.h>
 
 /* common */
+#include "coll.h"
 #include "print.h"
+#include "strbuf.h"
 
 /* cc65 */
 #include "global.h"
@@ -66,12 +68,17 @@ IntStack WarningsAreErrors  = INTSTACK(0);  /* Treat warnings as errors */
                                             /* Warn about: */
 IntStack WarnConstComparison= INTSTACK(1);  /* - constant comparison results */
 IntStack WarnNoEffect       = INTSTACK(1);  /* - statements without an effect */
+IntStack WarnPointerSign    = INTSTACK(1);  /* - pointer conversion to pointer differing in signedness */
+IntStack WarnPointerTypes   = INTSTACK(1);  /* - pointer conversion to incompatible pointer type */
 IntStack WarnRemapZero      = INTSTACK(1);  /* - remapping character code zero */
-IntStack WarnStructParam    = INTSTACK(1);  /* - structs passed by val */
+IntStack WarnReturnType     = INTSTACK(1);  /* - control reaches end of non-void function */
+IntStack WarnStructParam    = INTSTACK(0);  /* - structs passed by val */
 IntStack WarnUnknownPragma  = INTSTACK(1);  /* - unknown #pragmas */
+IntStack WarnUnreachableCode= INTSTACK(1);  /* - unreachable code */
 IntStack WarnUnusedLabel    = INTSTACK(1);  /* - unused labels */
 IntStack WarnUnusedParam    = INTSTACK(1);  /* - unused parameters */
 IntStack WarnUnusedVar      = INTSTACK(1);  /* - unused variables */
+IntStack WarnUnusedFunc     = INTSTACK(1);  /* - unused functions */
 
 /* Map the name of a warning to the intstack that holds its state */
 typedef struct WarnMapEntry WarnMapEntry;
@@ -84,13 +91,20 @@ static WarnMapEntry WarnMap[] = {
     { &WarnConstComparison,     "const-comparison"      },
     { &WarningsAreErrors,       "error"                 },
     { &WarnNoEffect,            "no-effect"             },
+    { &WarnPointerSign,         "pointer-sign"          },
+    { &WarnPointerTypes,        "pointer-types"         },
     { &WarnRemapZero,           "remap-zero"            },
+    { &WarnReturnType,          "return-type"           },
     { &WarnStructParam,         "struct-param"          },
     { &WarnUnknownPragma,       "unknown-pragma"        },
+    { &WarnUnreachableCode,     "unreachable-code"      },
+    { &WarnUnusedFunc,          "unused-func"           },
     { &WarnUnusedLabel,         "unused-label"          },
     { &WarnUnusedParam,         "unused-param"          },
     { &WarnUnusedVar,           "unused-var"            },
 };
+
+Collection DiagnosticStrBufs;
 
 
 
@@ -115,7 +129,7 @@ void Fatal (const char* Format, ...)
         LineNum  = GetCurrentLine ();
     }
 
-    fprintf (stderr, "%s(%u): Fatal: ", FileName, LineNum);
+    fprintf (stderr, "%s:%u: Fatal: ", FileName, LineNum);
 
     va_start (ap, Format);
     vfprintf (stderr, Format, ap);
@@ -145,7 +159,7 @@ void Internal (const char* Format, ...)
         LineNum  = GetCurrentLine ();
     }
 
-    fprintf (stderr, "%s(%u): Internal compiler error:\n",
+    fprintf (stderr, "%s:%u: Internal compiler error:\n",
              FileName, LineNum);
 
     va_start (ap, Format);
@@ -172,7 +186,7 @@ void Internal (const char* Format, ...)
 static void IntError (const char* Filename, unsigned LineNo, const char* Msg, va_list ap)
 /* Print an error message - internal function*/
 {
-    fprintf (stderr, "%s(%u): Error: ", Filename, LineNo);
+    fprintf (stderr, "%s:%u: Error: ", Filename, LineNo);
     vfprintf (stderr, Msg, ap);
     fprintf (stderr, "\n");
 
@@ -180,7 +194,7 @@ static void IntError (const char* Filename, unsigned LineNo, const char* Msg, va
         Print (stderr, 1, "Input: %.*s\n", (int) SB_GetLen (Line), SB_GetConstBuf (Line));
     }
     ++ErrorCount;
-    if (ErrorCount > 10) {
+    if (ErrorCount > 20) {
         Fatal ("Too many errors");
     }
 }
@@ -236,7 +250,7 @@ static void IntWarning (const char* Filename, unsigned LineNo, const char* Msg, 
 
     } else if (IS_Get (&WarnEnable)) {
 
-        fprintf (stderr, "%s(%u): Warning: ", Filename, LineNo);
+        fprintf (stderr, "%s:%u: Warning: ", Filename, LineNo);
         vfprintf (stderr, Msg, ap);
         fprintf (stderr, "\n");
 
@@ -321,5 +335,53 @@ void ListWarnings (FILE* F)
 void ErrorReport (void)
 /* Report errors (called at end of compile) */
 {
-    Print (stdout, 1, "%u errors, %u warnings\n", ErrorCount, WarningCount);
+    unsigned int V = (ErrorCount != 0 ? 0 : 1);
+    Print (stdout, V, "%u errors and %u warnings generated.\n", ErrorCount, WarningCount);
+}
+
+
+
+/*****************************************************************************/
+/*                              Tracked StrBufs                              */
+/*****************************************************************************/
+
+
+
+void InitDiagnosticStrBufs (void)
+/* Init tracking string buffers used for diagnostics */
+{
+    InitCollection (&DiagnosticStrBufs);
+}
+
+
+
+void DoneDiagnosticStrBufs (void)
+/* Done with tracked string buffers used for diagnostics */
+{
+    ClearDiagnosticStrBufs ();
+    DoneCollection (&DiagnosticStrBufs);
+}
+
+
+
+void ClearDiagnosticStrBufs (void)
+/* Free all tracked string buffers */
+{
+    unsigned I;
+
+    for (I = 0; I < CollCount (&DiagnosticStrBufs); ++I) {
+        SB_Done (CollAtUnchecked (&DiagnosticStrBufs, I));
+    }
+
+    CollDeleteAll (&DiagnosticStrBufs);
+}
+
+
+
+struct StrBuf* NewDiagnosticStrBuf (void)
+/* Get a new tracked string buffer */
+{
+    StrBuf *Buf = NewStrBuf ();
+    CollAppend (&DiagnosticStrBufs, Buf);
+    return Buf;
 }

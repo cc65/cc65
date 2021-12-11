@@ -48,18 +48,44 @@
 
 
 
-/* Degree of type compatibility. Must be in ascending order */
+/* Degree of type compatibility affected. Must be in ascending order */
 typedef enum {
-    TC_INCOMPATIBLE,              /* Distinct types */
-    TC_SIGN_DIFF,                 /* Signedness differs */
-    TC_COMPATIBLE = TC_SIGN_DIFF, /* Compatible types */
-    TC_QUAL_DIFF,                 /* Types differ in qualifier of pointer */
-    TC_STRICT_COMPATIBLE,         /* Strict compatibility */
-    TC_EQUAL,                     /* Types are equal */
-    TC_IDENTICAL                  /* Types are identical */
+    TC_INCOMPATIBLE,        /* Distinct types */
+    TC_SIGN_DIFF,           /* Signedness differs */
+    TC_PTR_SIGN_DIFF,       /* Pointee signedness differs */
+    TC_PTR_INCOMPATIBLE,    /* Distinct pointer types */
+    TC_VOID_PTR,            /* Non-void and void pointers */
+    TC_STRICT_COMPATIBLE,   /* Strict compatibility according to the C Standard */
+    TC_PTR_DECAY,           /* rhs is an array and lhs is a pointer */
+    TC_EQUAL,               /* Array types with unspecified lengths */
+    TC_UNSPECIFY,           /* lhs has unspecified length while rhs has specified length */
+    TC_IDENTICAL            /* Types are identical */
+} typecmpcode_t;
+
+/* Degree of type compatibility affected by qualifiers as well as some extra info */
+typedef enum {
+    TCF_NONE                = 0x00, /* None of the below */
+    TCF_VOID_PTR_ON_LEFT    = 0x01, /* lhs is a void pointer */
+    TCF_VOID_PTR_ON_RIGHT   = 0x02, /* rhs is a void pointer */
+    TCF_MASK_VOID_PTR       = TCF_VOID_PTR_ON_LEFT | TCF_VOID_PTR_ON_RIGHT,
+    TCF_QUAL_DIFF           = 0x04, /* CVR qualifiers differ in a way that doesn't matter */
+    TCF_QUAL_IMPLICIT       = 0x08, /* CVR qualifiers of lhs are stricter than those of rhs */
+    TCF_PTR_QUAL_DIFF       = 0x10, /* CVR qualifiers of pointers differ */
+    TCF_PTR_QUAL_IMPLICIT   = 0x20, /* CVR qualifiers of pointers are stricter on lhs than those on rhs */
+    TCF_MASK_C_QUAL_DIFF    = 0x3C, /* All C Standard qualifiers */
+    TCF_ADDRSIZE_QUAL_DIFF  = 0x40, /* Address size qualifiers differ */
+    TCF_CCONV_QUAL_DIFF     = 0x80, /* Function calling conventions differ. Unused now */
+    TCF_INCOMPATIBLE_QUAL   = TCF_ADDRSIZE_QUAL_DIFF | TCF_CCONV_QUAL_DIFF,
+    TCF_MASK_QUAL           = TCF_MASK_C_QUAL_DIFF | TCF_INCOMPATIBLE_QUAL,
+} typecmpflag_t;
+
+typedef struct {
+    typecmpcode_t C;
+    typecmpflag_t F;
+    int Indirections;
 } typecmp_t;
 
-
+#define TYPECMP_INITIALIZER { TC_IDENTICAL, TCF_NONE, 0 }
 
 /*****************************************************************************/
 /*                                   Code                                    */
@@ -69,6 +95,9 @@ typedef enum {
 
 typecmp_t TypeCmp (const Type* lhs, const Type* rhs);
 /* Compare two types and return the result */
+
+void TypeCompatibilityDiagnostic (const Type* NewType, const Type* OldType, int IsError, const char* Msg);
+/* Print error or warning message about type compatibility with proper type names */
 
 
 

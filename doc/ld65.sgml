@@ -760,7 +760,7 @@ There's a library subroutine called <tt/copydata/ (in a module named
 look at it's inner workings before using it!
 
 
-<sect1>Other MEMORY area attributes<p>
+<sect1>Other MEMORY area attributes<label id="MEMORY"><p>
 
 There are some other attributes not covered above. Before starting the
 reference section, I will discuss the remaining things here.
@@ -821,7 +821,6 @@ has a builtin function named <tt/.BANK/ which may be used with an argument
 that has a segment reference (for example a symbol). The result of this
 function is the value of the bank attribute for the run memory area of the
 segment.
-
 
 <sect1>Other SEGMENT attributes<p>
 
@@ -921,9 +920,8 @@ name="6502 binary relocation format specification">). It is defined like this:
         }
 </verb></tscreen>
 
-The other format available is the Atari (xex) segmented file format, this is
-the standard format used by Atari DOS 2.0 and upward file managers in the Atari
-8-bit computers, and it is defined like this:
+The other format available is the Atari segmented file format (xex), this is
+the standard format used by Atari DOS 2.0 and upwards, and it is defined like this:
 
 <tscreen><verb>
         FILES {
@@ -932,7 +930,8 @@ the standard format used by Atari DOS 2.0 and upward file managers in the Atari
 </verb></tscreen>
 
 In the Atari segmented file format, the linker will write each <tt/MEMORY/ area
-as a new segment, including a header with the start and end address.
+as including a header with the start and end address. If two memory areas are
+contiguous, the headers will be joined if possible.
 
 The necessary o65 or Atari attributes are defined in a special section labeled
 <ref id="FORMAT" name="FORMAT">.
@@ -1009,7 +1008,8 @@ The <tt/CONDES/ feature has several attributes:
   <tag><tt>segment</tt></tag>
 
   This attribute tells the linker into which segment the table should be
-  placed. If the segment does not exist, it is created.
+  placed. If the segment does not exist in any object file, it is created
+  in the final object code.
 
 
   <tag><tt>type</tt></tag>
@@ -1058,7 +1058,7 @@ The <tt/CONDES/ feature has several attributes:
 Without specifying the <tt/CONDES/ feature, the linker will not create any
 tables, even if there are <tt/condes/ entries in the object files.
 
-For more information see the <tt/.CONDES/ command in the <url
+For more information, see the <tt/.CONDES/ command in the <url
 url="ca65.html" name="ca65 manual">.
 
 
@@ -1139,17 +1139,25 @@ The builtin config files do contain segments that have a special meaning for
 the compiler and the libraries that come with it. If you replace the builtin
 config files, you will need the following information.
 
+<sect1>INIT<p>
+
+The INIT segment is some kind of 'bss' segment since it contains
+uninitialized data. Unlike <tt>.bss</tt> itself, its contents aren't
+initialized to zero at program startup . It's mostly used by
+constructors in the startup code. An example for the use of the INIT
+segment is saving/restoring the zero page area used by cc65.
+
+<sect1>LOWCODE<p>
+
+For the LOWCODE segment, it is guaranteed that it won't be banked out, so it
+is reachable at any time by interrupt handlers or similar.
+
 <sect1>ONCE<p>
 
 The ONCE segment is used for initialization code run only once before
 execution reaches main() - provided that the program runs in RAM. You
 may for example add the ONCE segment to the heap in really memory
 constrained systems.
-
-<sect1>LOWCODE<p>
-
-For the LOWCODE segment, it is guaranteed that it won't be banked out, so it
-is reachable at any time by interrupt handlers or similar.
 
 <sect1>STARTUP<p>
 

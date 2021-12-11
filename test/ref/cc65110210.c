@@ -20,27 +20,10 @@ cl65: Subprocess 'ld65' aborted by signal 11
 
 */
 
-/* #define STANDALONE */
-
 #include <stdio.h>
 #include <limits.h>
 
-#ifdef STANDALONE
-
-#define NO_IMPLICIT_FUNCPTR_CONV
-
-#define OPENTEST()
-#define CLOSETEST()
-
-#else
-
-#endif
-
-#ifdef NO_IMPLICIT_FUNCPTR_CONV
-void (*p1func)(void);
-#else
 void (*p1func)();
-#endif
 
 void func(void)
 {

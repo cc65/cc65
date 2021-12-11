@@ -8,7 +8,7 @@
 /* from ASCII to screen-code mapping, so you can write directly              */
 /* to the screen memory.                                                     */
 /*                                                                           */
-/* If this include is used, no additional macroes are needed.                */
+/* If this include is used, no additional macros are needed.                 */
 /*                                                                           */
 /*****************************************************************************/
 

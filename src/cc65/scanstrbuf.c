@@ -185,7 +185,7 @@ int SB_GetSym (StrBuf* B, StrBuf* Ident, const char* SpecialChars)
             SB_AppendChar (Ident, C);
             SB_Skip (B);
             C = SB_Peek (B);
-        } while (IsIdent (C) || IsDigit (C) || 
+        } while (IsIdent (C) || IsDigit (C) ||
                  (C != '\0' && strchr (SpecialChars, C) != 0));
         SB_Terminate (Ident);
         return 1;

@@ -99,7 +99,7 @@ static Literal* NewLiteral (const void* Buf, unsigned Len)
     Literal* L = xmalloc (sizeof (*L));
 
     /* Initialize the fields */
-    L->Label    = GetLocalLabel ();
+    L->Label    = GetPooledLiteralLabel ();
     L->RefCount = 0;
     L->Output   = 0;
     SB_Init (&L->Data);
@@ -130,7 +130,7 @@ static void OutputLiteral (Literal* L)
     TranslateLiteral (L);
 
     /* Define the label for the literal */
-    g_defdatalabel (L->Label);
+    g_defliterallabel (L->Label);
 
     /* Output the literal data */
     g_defbytes (SB_GetConstBuf (&L->Data), SB_GetLen (&L->Data));
@@ -423,12 +423,12 @@ static void OutputReadOnlyLiterals (Collection* Literals)
         if (C != 0) {
 
             /* This literal is part of a longer literal, merge them */
-            g_aliasdatalabel (L->Label, C->Label, GetLiteralSize (C) - GetLiteralSize (L));
+            g_aliasliterallabel (L->Label, C->Label, GetLiteralSize (C) - GetLiteralSize (L));
 
         } else {
 
             /* Define the label for the literal */
-            g_defdatalabel (L->Label);
+            g_defliterallabel (L->Label);
 
             /* Output the literal data */
             g_defbytes (SB_GetConstBuf (&L->Data), SB_GetLen (&L->Data));

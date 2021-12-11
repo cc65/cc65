@@ -15,6 +15,6 @@
 void __fastcall__ _afailed (char* file, unsigned line)
 {
     raise (SIGABRT);
-    fprintf (stderr, "ASSERTION FAILED IN %s(%u)\n", file, line);
+    fprintf (stderr, "ASSERTION FAILED IN %s:%u\n", file, line);
     exit (EXIT_ASSERT);
 }

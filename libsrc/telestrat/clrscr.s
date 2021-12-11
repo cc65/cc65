@@ -3,7 +3,7 @@
 ;
 
     .export    _clrscr
-    .import    OLD_CHARCOLOR, OLD_BGCOLOR
+    .import    OLD_CHARCOLOR, OLD_BGCOLOR, BGCOLOR, CHARCOLOR
     
     .include   "telestrat.inc"
 
@@ -23,22 +23,25 @@
 
 
     ; reset prompt position
-    lda     #<(SCREEN+40)
-    sta     ADSCRL
-    lda     #>(SCREEN+40)
-    sta     ADSCRH
+    lda     #<SCREEN
+    sta     ADSCR
+    lda     #>SCREEN
+    sta     ADSCR+1
+
+    lda     #$00
+    sta     SCRDY
 
     ; reset display position
-    ldx     #$01
+    ldx     #$00
     stx     SCRY
-    dex
     stx     SCRX
     
-    ; At this step X is equal to $00
-    dex
-    ; At this step X is equal to $FF
-    stx     OLD_BGCOLOR
+    stx     OLD_BGCOLOR                             ; Black
+    stx     BGCOLOR
+    
+    ldx     #$07                                    ; White
     stx     OLD_CHARCOLOR
-
+    stx     CHARCOLOR
+    
     rts
 .endproc

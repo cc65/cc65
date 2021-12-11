@@ -1,11 +1,12 @@
 ;
-; Callback routine called from the IRQ handler after the ROM IRQ handler
-; had been run.
+; Callback routine, called from the IRQ handler after the ROM IRQ handler
+; has been run.
 ;
-; Christian Groessler, 24.04.2014
+; 2014-04-24, Christian Groessler
+; 2020-07-14, Greg King
 ;
 ; Check if there was button/joystick activity before and/or after the ROM handler.
-; If there was activity, discard the key presses since they are most
+; If there was activity, discard the key presses because they are most
 ; probably "phantom" key presses.
 
 callback:
@@ -16,7 +17,7 @@ callback:
         lda     OLD_BUTTONS             ; keypress before?
         bne     @discard_key            ; yes, discard key
 
-        lda     #$7F
+        lda     #$FF
         sta     CIA1_PRA
         lda     CIA1_PRB                ; Read joystick #0
         and     #$1F

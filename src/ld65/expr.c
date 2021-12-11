@@ -321,20 +321,18 @@ long GetExprVal (ExprNode* Expr)
             return GetExprVal (Expr->Left) * GetExprVal (Expr->Right);
 
         case EXPR_DIV:
-            Left  = GetExprVal (Expr->Left);
             Right = GetExprVal (Expr->Right);
             if (Right == 0) {
                 Error ("Division by zero");
             }
-            return Left / Right;
+            return GetExprVal (Expr->Left) / Right;
 
         case EXPR_MOD:
-            Left  = GetExprVal (Expr->Left);
             Right = GetExprVal (Expr->Right);
             if (Right == 0) {
                 Error ("Modulo operation with zero");
             }
-            return Left % Right;
+            return GetExprVal (Expr->Left) % Right;
 
         case EXPR_OR:
             return GetExprVal (Expr->Left) | GetExprVal (Expr->Right);
@@ -403,17 +401,20 @@ long GetExprVal (ExprNode* Expr)
 
         case EXPR_BANK:
             GetSegExprVal (Expr->Left, &D);
-            if (D.TooComplex || D.Seg == 0) {
-                Error ("Argument for .BANK is not segment relative or too complex");
+            if (D.TooComplex) {
+                Error ("Argument of .BANK() is too complex");
+            }
+            if (D.Seg == 0) {
+                Error ("Argument of .BANK() isn't a label attached to a segment");
             }
             if (D.Seg->MemArea == 0) {
-                Error ("Segment '%s' is referenced by .BANK but "
-                       "not assigned to a memory area",
+                Error ("Segment '%s' is referenced by .BANK(),"
+                       " but not assigned to a memory area",
                        GetString (D.Seg->Name));
             }
             if (D.Seg->MemArea->BankExpr == 0) {
-                Error ("Memory area '%s' is referenced by .BANK but "
-                       "has no BANK attribute",
+                Error ("Memory area '%s' is referenced by .BANK(),"
+                       " but has no BANK attribute",
                        GetString (D.Seg->MemArea->Name));
             }
             return GetExprVal (D.Seg->MemArea->BankExpr);
@@ -457,12 +458,14 @@ long GetExprVal (ExprNode* Expr)
 
 static void GetSegExprValInternal (ExprNode* Expr, SegExprDesc* D, int Sign)
 /* Check if the given expression consists of a segment reference and only
-** constant values, additions and subtractions. If anything else is found,
+** constant values, additions, and subtractions. If anything else is found,
 ** set D->TooComplex to true.
 ** Internal, recursive routine.
 */
 {
     Export* E;
+
+    CHECK (Expr != 0);
 
     switch (Expr->Op) {
 
@@ -479,7 +482,7 @@ static void GetSegExprValInternal (ExprNode* Expr, SegExprDesc* D, int Sign)
             */
             if (ExportHasMark (E)) {
                 CircularRefError (E);
-            } else {
+            } else if (E->Expr != 0) {
                 MarkExport (E);
                 GetSegExprValInternal (E->Expr, D, Sign);
                 UnmarkExport (E);

@@ -6,10 +6,13 @@
 
 #include <stdio.h>
 #include <limits.h>
+#include <stdint.h>
 
 /*
  compare4.c
 */
+
+/*#define SUPPORT_BIT_TYPES */
 
 /*#define  COMPARE_OUT_OF_RANGE 1*/
 
@@ -20,22 +23,9 @@ unsigned char dummy = 0;
 #ifdef SUPPORT_BIT_TYPES
 bit bit0 = 0;
 #endif
-#ifdef SIZEOF_INT_16BIT
-#if defined(__LINUX__) || defined(LINUX)
-short int0 = 0;
-short int1 = 0;
 
-#else
-int int0 = 0;
-int int1 = 0;
-
-#endif
-
-#else
-int int0 = 0;
-int int1 = 0;
-
-#endif
+int16_t int0 = 0;
+int16_t int1 = 0;
 
 signed char char0 = 0;
 signed char char1 = 0;

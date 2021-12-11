@@ -106,9 +106,9 @@
 
 ; Decrement the count
 
-@L3:    inc     ptr2
+@L3:    dec     ptr2
         bne     @L0
-        inc     ptr2+1
+        dec     ptr2+1
         bne     @L0
         beq     done            ; Branch always
 

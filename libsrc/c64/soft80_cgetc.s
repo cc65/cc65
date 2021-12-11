@@ -46,39 +46,33 @@ invertcursor:
         lda     #$34
         sta     $01
 
-        ldy     #$00
-        jsr     setcolor
-
-        ldx     soft80_internal_cursorxlsb
-@lp1:
-        lda     (SCREEN_PTR),y
-        eor     nibble,x
-        sta     (SCREEN_PTR),y
-        iny
-        cpy     #8
-        bne     @lp1
-
-        pla
-        sta     $01             ; enable I/O
-        cli
-        rts
-
         ; do not use soft80_putcolor here to make sure the cursor is always
         ; shown using the current textcolor without disturbing the "color voodoo"
         ; in soft80_cputc
-setcolor:
-        ;ldy     #0              ; is 0
+        ldy     #0
         bcs     @set
         ; restore old value
         lda     tmp1
-        sta     (CRAM_PTR),y    ; vram
-        rts
+        bcc     @lp0
 @set:
         ; save old value
         lda     (CRAM_PTR),y    ; vram
         sta     tmp1
         lda     soft80_internal_cellcolor
+@lp0:
         sta     (CRAM_PTR),y    ; vram
+        ldx     soft80_internal_cursorxlsb
+        ldy     #7
+@lp1:
+        lda     (SCREEN_PTR),y
+        eor     nibble,x
+        sta     (SCREEN_PTR),y
+        dey
+        bpl     @lp1
+
+        pla
+        sta     $01             ; enable I/O
+        cli
         rts
 
         .rodata

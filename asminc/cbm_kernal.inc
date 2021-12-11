@@ -46,6 +46,7 @@
   GRAPH_SET_FONT                := $FF3B
   GRAPH_GET_CHAR_SIZE           := $FF3E
   GRAPH_PUT_CHAR                := $FF41
+  MULTI_ACPTR                   := $FF44
   RESTORE_BASIC                 := $FF47
   CLOCK_SET_DATE_TIME           := $FF4D
   CLOCK_GET_DATE_TIME           := $FF50

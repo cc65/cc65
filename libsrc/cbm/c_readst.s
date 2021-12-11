@@ -1,5 +1,6 @@
 ;
-; Ullrich von Bassewitz, 03.06.1999
+; 1999-06-03, Ullrich von Bassewitz
+; 2021-01-12, Greg King
 ;
 ; unsigned char cbm_k_readst (void);
 ;
@@ -10,6 +11,5 @@
 
 
 _cbm_k_readst:
-        jsr     READST
-        ldx     #0              ; Clear high byte
-        rts
+        ldx     #>$0000
+        jmp     READST

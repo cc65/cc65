@@ -140,12 +140,12 @@ void CheckAssertions (void)
 
                 case ASSERT_ACT_WARN:
                 case ASSERT_ACT_LDWARN:
-                    Warning ("%s(%u): %s", Module, Line, Message);
+                    Warning ("%s:%u: %s", Module, Line, Message);
                     break;
 
                 case ASSERT_ACT_ERROR:
                 case ASSERT_ACT_LDERROR:
-                    Error ("%s(%u): %s", Module, Line, Message);
+                    Error ("%s:%u: %s", Module, Line, Message);
                     break;
 
                 default:

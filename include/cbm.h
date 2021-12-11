@@ -166,7 +166,7 @@ unsigned char get_tv (void);
 unsigned char __fastcall__ kbrepeat (unsigned char mode);
 /* Changes which keys have automatic repeat. */
 
-#if !defined(__CBM610__) && !defined(__PET__)
+#if !defined(__CBM610__)
 void waitvsync (void);
 /* Wait for the start of the next video field. */
 #endif
@@ -191,6 +191,8 @@ unsigned char cbm_k_acptr (void);
 unsigned char cbm_k_basin (void);
 void __fastcall__ cbm_k_bsout (unsigned char C);
 unsigned char __fastcall__ cbm_k_chkin (unsigned char FN);
+unsigned char cbm_k_chrin (void);
+void __fastcall__ cbm_k_chrout (unsigned char C);
 void __fastcall__ cbm_k_ciout (unsigned char C);
 unsigned char __fastcall__ cbm_k_ckout (unsigned char FN);
 void cbm_k_clall (void);
@@ -295,7 +297,15 @@ unsigned char __fastcall__ cbm_readdir (unsigned char lfn,
 /* Reads one directory line into cbm_dirent structure.
 ** Returns 0 if reading directory-line was successful.
 ** Returns non-zero if reading directory failed, or no more file-names to read.
-** Returns 2 on last line.  Then, l_dirent->size = the number of "blocks free."
+** Returns 2 on last line.  Then, l_dirent->size = the number of "blocks free",
+** "blocks used", or "mb free".  Return codes:
+** 0 = read file-name
+** 1 = couldn't read directory
+** 2 = read "blocks free", "blocks used", or "mb free"
+** 3 = couldn't find start of file-name
+** 4 = couldn't find end of file-name
+** 5 = couldn't read file-type
+** 6 = premature end of file
 */
 
 void __fastcall__ cbm_closedir (unsigned char lfn);

@@ -32,10 +32,8 @@ Y2K3    STA     $0732,X
         LDA     #$60            ; Store RTS opcode @ end
         STA     $0750
         JSR     $0600           ; Show title screen
-        LDY     #$00            ; Clear RAM from $0600-$3FFF
+        LDY     #<$0600         ; Clear RAM from $0600-$3FFF
         STY     $80
-        LDA     #$06
+        LDA     #>$0600
         STA     $81
-        JSR     CLRRAM
-        RTS     
-
+        JMP     CLRRAM

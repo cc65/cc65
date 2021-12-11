@@ -25,35 +25,21 @@ int next;               /* index of next free entry in words */
 
 /*struct node *lookup();*/
 
-#if defined(NO_NEW_PROTOTYPES_FOR_OLD_FUNC_DECL) && !defined(NO_OLD_FUNC_DECL)
-
-#else
-
 int err(char *s);
 int getword(char *buf);
 void tprint(struct node *tree);
 struct node *lookup(char *word, struct node **p);
 
-#endif
-
 int isletter(char c);
 
 /* err - print error message s and die  */
-#ifndef NO_OLD_FUNC_DECL
 err(s) char *s; {
-#else
-int err(char *s) {
-#endif
         printf("? %s\n", s);
         exit(EXIT_FAILURE);
 }
 
 /* getword - get next input word into buf, return 0 on EOF */
-#ifndef NO_OLD_FUNC_DECL
 int getword(buf) char *buf;
-#else
-int getword(char *buf)
-#endif
 {
         char *s;
         int c;
@@ -77,12 +63,8 @@ int isletter(char c)
 }
 
 /* lookup - lookup word in tree; install if necessary */
-#ifndef NO_OLD_FUNC_DECL
 struct node *lookup(word, p)
 char *word; struct node **p;
-#else
-struct node *lookup(char *word, struct node **p)
-#endif
 {
         int cond;
 /*      char *malloc(); */
@@ -108,11 +90,7 @@ struct node *lookup(char *word, struct node **p)
 }
 
 /* tprint - print tree */
-#ifndef NO_OLD_FUNC_DECL
 void tprint(tree) struct node *tree; {
-#else
-void tprint(struct node *tree) {
-#endif
         if (tree) {
                 tprint(tree->left);
                 printf("%d:%s\n", tree->count, tree->word);

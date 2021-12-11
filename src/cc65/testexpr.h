@@ -44,9 +44,9 @@
 
 
 
-#define TESTEXPR_UNKNOWN        0       /* Result of expression unknown */
+#define TESTEXPR_UNKNOWN        -1      /* Result of expression unknown */
 #define TESTEXPR_TRUE           1       /* Expression yields true */
-#define TESTEXPR_FALSE          2       /* Expression yields false */
+#define TESTEXPR_FALSE          0       /* Expression yields false */
 
 
 

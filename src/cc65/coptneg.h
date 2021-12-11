@@ -155,7 +155,7 @@ unsigned OptNegAX2 (CodeSeg* S);
 **      eor     #$FF
 **      clc
 **      adc     #$01
-**      bne     L1
+**      bcc     L1
 **      inx
 ** L1:
 **

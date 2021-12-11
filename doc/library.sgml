@@ -59,6 +59,9 @@ Functions that are <em/not/ available:
 Functions not available on all supported systems:
 
 <itemize>
+  <item><tt>clock</tt>: Support depends on the capabilities of the target
+  machine.
+  <p>
   <item><tt>fopen/fread/fwrite/fclose/fputs/fgets/fscanf</tt>: The functions
   are built on open/read/write/close. Those latter functions are not available
   on all systems.

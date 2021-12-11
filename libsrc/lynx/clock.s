@@ -2,18 +2,14 @@
 ; 2003-04-13, Ullrich von Bassewitz
 ; 2012-02-06, Greg King
 ;
-; #include <time.h>
+; clock_t clock (void);
+; clock_t _clocks_per_sec (void);
 ;
-; typedef unsigned long int clock_t;
-; clock_t _clk_tck(void);
-; #define CLOCKS_PER_SEC _clk_tck()
-; clock_t clock(void);
-;
-; clk_tck()'s test-values are based on the numbers in "set_tv.s".
+; clocks_per_sec()'s test-values are based on the numbers in "set_tv.s".
 ; If you change the numbers there, then change them here, too.
 ;
 
-        .export         _clock, __clk_tck, clock_count
+        .export         _clock, __clocks_per_sec, clock_count
         .interruptor    update_clock, 2 ; (low priority)
         .constructor    init_clock
 
@@ -42,7 +38,7 @@
 ;-----------------------------------------------------------------------------
 ; Return the number of clock ticks in one second.
 ;
-__clk_tck:
+__clocks_per_sec:
         ldx     #$00            ; >50, >60, >75
         ldy     PBKUP
         lda     #<75

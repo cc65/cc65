@@ -71,7 +71,7 @@
 unsigned char Preprocessing = 0;
 
 /* Management data for #if */
-#define MAX_IFS         64
+#define MAX_IFS         256
 #define IFCOND_NONE     0x00U
 #define IFCOND_SKIP     0x01U
 #define IFCOND_ELSE     0x02U
@@ -1042,8 +1042,6 @@ static void DoError (void)
 static int DoIf (int Skip)
 /* Process #if directive */
 {
-    ExprDesc Expr;
-
     /* We're about to abuse the compiler expression parser to evaluate the
     ** #if expression. Save the current tokens to come back here later.
     ** NOTE: Yes, this is a hack, but it saves a complete separate expression
@@ -1078,7 +1076,7 @@ static int DoIf (int Skip)
     NextToken ();
 
     /* Call the expression parser */
-    ConstExpr (hie1, &Expr);
+    ExprDesc Expr = NoCodeConstExpr (hie1);
 
     /* End preprocessing mode */
     Preprocessing = 0;
@@ -1398,7 +1396,7 @@ void Preprocess (void)
 
 Done:
     if (Verbosity > 1 && SB_NotEmpty (Line)) {
-        printf ("%s(%u): %.*s\n", GetCurrentFile (), GetCurrentLine (),
+        printf ("%s:%u: %.*s\n", GetCurrentFile (), GetCurrentLine (),
                 (int) SB_GetLen (Line), SB_GetConstBuf (Line));
     }
 }

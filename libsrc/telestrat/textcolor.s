@@ -2,12 +2,13 @@
 ;
 
         .export         _textcolor
-        .import         CHARCOLOR
+        .import         CHARCOLOR, OLD_CHARCOLOR
         .include        "telestrat.inc"
 
 .proc _textcolor
     ldx     CHARCOLOR     ; Get previous color
     sta     CHARCOLOR
+    stx     OLD_CHARCOLOR
     txa                   ; Return previous color
     rts
 .endproc

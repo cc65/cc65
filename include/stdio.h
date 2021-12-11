@@ -40,6 +40,7 @@
 
 #include <stddef.h>
 #include <stdarg.h>
+#include <limits.h>
 
 
 
@@ -64,18 +65,7 @@ extern FILE* stderr;
 #define SEEK_SET        2
 #define TMP_MAX         256
 
-/* Standard defines that are platform dependent */
-#if defined(__APPLE2__)
-#  define FILENAME_MAX  (64+1)
-#elif defined(__ATARI__)
-#  define FILENAME_MAX  (12+1)
-#elif defined(__LUNIX__)
-#  define FILENAME_MAX  (80+1)
-#elif defined(__TELESTRAT__)
-#  define FILENAME_MAX  (50+1)
-#else
-#  define FILENAME_MAX  (16+1)
-#endif
+#define FILENAME_MAX    PATH_MAX
 #define L_tmpnam        FILENAME_MAX
 
 

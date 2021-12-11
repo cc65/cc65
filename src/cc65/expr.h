@@ -18,10 +18,31 @@
 
 
 /*****************************************************************************/
+/*                                   data                                    */
+/*****************************************************************************/
+
+
+
+#define SQP_KEEP_NONE   0x00
+#define SQP_KEEP_TEST   0x01U
+#define SQP_KEEP_EAX    0x02U
+#define SQP_KEEP_EXPR   0x03U   /* SQP_KEEP_TEST | SQP_KEEP_EAX */
+
+/* Generator attributes */
+#define GEN_NOPUSH      0x01        /* Don't push lhs */
+#define GEN_COMM        0x02        /* Operator is commutative */
+#define GEN_NOFUNC      0x04        /* Not allowed for function pointers */
+
+
+
+/*****************************************************************************/
 /*                                   code                                    */
 /*****************************************************************************/
 
 
+
+unsigned GlobalModeFlags (const ExprDesc* Expr);
+/* Return the addressing mode flags for the given expression */
 
 void ExprWithCheck (void (*Func) (ExprDesc*), ExprDesc* Expr);
 /* Call an expression function with checks. */
@@ -31,6 +52,9 @@ void MarkedExprWithCheck (void (*Func) (ExprDesc*), ExprDesc* Expr);
 ** generated code.
 */
 
+void LimitExprValue (ExprDesc* Expr);
+/* Limit the constant value of the expression to the range of its type */
+
 void PushAddr (const ExprDesc* Expr);
 /* If the expression contains an address that was somehow evaluated,
 ** push this address on the stack. This is a helper function for all
@@ -38,27 +62,32 @@ void PushAddr (const ExprDesc* Expr);
 ** must be saved if it's not constant, before evaluating the rhs.
 */
 
+void InitDeferredOps (void);
+/* Init the collection for storing deferred ops */
+
+void DoneDeferredOps (void);
+/* Deinit the collection for storing deferred ops */
+
+int GetDeferredOpCount (void);
+/* Return how many deferred operations are still waiting in the queque */
+
+void CheckDeferredOpAllDone (void);
+/* Check if all deferred operations are done at sequence points.
+** Die off if check fails.
+*/
+
+void DoDeferred (unsigned Flags, ExprDesc* Expr);
+/* Do deferred operations such as post-inc/dec at sequence points */
+
 void Store (ExprDesc* Expr, const Type* StoreType);
 /* Store the primary register into the location denoted by lval. If StoreType
 ** is given, use this type when storing instead of lval->Type. If StoreType
 ** is NULL, use lval->Type instead.
 */
 
-int evalexpr (unsigned flags, void (*Func) (ExprDesc*), ExprDesc* Expr);
-/* Will evaluate an expression via the given function. If the result is a
-** constant, 0 is returned and the value is put in the Expr struct. If the
-** result is not constant, LoadExpr is called to bring the value into the
-** primary register and 1 is returned.
-*/
-
 void Expression0 (ExprDesc* Expr);
-/* Evaluate an expression via hie0 and put the result into the primary register */
-
-void ConstExpr (void (*Func) (ExprDesc*), ExprDesc* Expr);
-/* Will evaluate an expression via the given function. If the result is not
-** a constant of some sort, a diagnostic will be printed, and the value is
-** replaced by a constant one to make sure there are no internal errors that
-** result from this input error.
+/* Evaluate an expression via hie0 and put the result into the primary register.
+** The expression is completely evaluated and all side effects complete.
 */
 
 void BoolExpr (void (*Func) (ExprDesc*), ExprDesc* Expr);
@@ -68,11 +97,18 @@ void BoolExpr (void (*Func) (ExprDesc*), ExprDesc* Expr);
 ** are no internal errors that result from this input error.
 */
 
-void ConstAbsIntExpr (void (*Func) (ExprDesc*), ExprDesc* Expr);
-/* Will evaluate an expression via the given function. If the result is not
-** a constant numeric integer value, a diagnostic will be printed, and the
-** value is replaced by a constant one to make sure there are no internal
-** errors that result from this input error.
+ExprDesc NoCodeConstExpr (void (*Func) (ExprDesc*));
+/* Get an expression evaluated via the given function. If the result is not a
+** constant expression without runtime code generated, a diagnostic will be
+** printed, and the value is replaced by a constant one to make sure there are
+** no internal errors that result from this input error.
+*/
+
+ExprDesc NoCodeConstAbsIntExpr (void (*Func) (ExprDesc*));
+/* Get an expression evaluated via the given function. If the result is not a
+** constant numeric integer value without runtime code generated, a diagnostic
+** will be printed, and the value is replaced by a constant one to make sure
+** there are no internal errors that result from this input error.
 */
 
 void hie10 (ExprDesc* lval);

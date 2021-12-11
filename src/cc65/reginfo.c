@@ -74,6 +74,15 @@ void RC_InvalidateZP (RegContents* C)
 
 
 
+void RC_InvalidatePS (RegContents* C)
+/* Invalidate processor status */
+{
+    C->PFlags = UNKNOWN_PFVAL_ALL;
+    C->ZNRegs = ZNREG_NONE;
+}
+
+
+
 static void RC_Dump1 (FILE* F, const char* Desc, short Val)
 /* Dump one register value */
 {
@@ -102,6 +111,44 @@ void RC_Dump (FILE* F, const RegContents* RC)
 
 
 
+#if !defined(HAVE_INLINE)
+int PStatesAreKnown (unsigned short PFlags, unsigned WhatStates)
+/* Return true if all queried processor states are known.
+** Note: WhatStates takes PSTATE_* rather than PFVAL_*.
+*/
+{
+    return ((PFlags << (PSTATE_BITS_SHIFT - 8)) & WhatStates & PSTATE_BITS_MASK) == 0;
+}
+#endif
+
+
+
+#if !defined(HAVE_INLINE)
+int PStatesAreSet (unsigned short PFlags, unsigned WhatStates)
+/* Return true if all queried processor states are known to be set.
+** Note: WhatStates takes PSTATE_* rather than PFVAL_*.
+*/
+{
+    return (PFlags & (WhatStates >> (PSTATE_BITS_SHIFT - 8))) == 0 &&
+           (PFlags & (WhatStates >> PSTATE_BITS_SHIFT)) == WhatStates >> PSTATE_BITS_SHIFT;
+}
+#endif
+
+
+
+#if !defined(HAVE_INLINE)
+int PStatesAreClear (unsigned short PFlags, unsigned WhatStates)
+/* Return true if all queried processor states are known to be cleared.
+** Note: WhatStates takes PSTATE_* rather than PFVAL_*.
+*/
+{
+    return (PFlags & (WhatStates >> (PSTATE_BITS_SHIFT - 8))) == 0 &&
+           (PFlags & (WhatStates >> PSTATE_BITS_SHIFT)) == 0;
+}
+#endif
+
+
+
 RegInfo* NewRegInfo (const RegContents* RC)
 /* Allocate a new register info, initialize and return it. If RC is not
 ** a NULL pointer, it is used to initialize both, the input and output
@@ -120,6 +167,9 @@ RegInfo* NewRegInfo (const RegContents* RC)
         RC_Invalidate (&RI->In);
         RC_Invalidate (&RI->Out);
         RC_Invalidate (&RI->Out2);
+        RC_InvalidatePS (&RI->In);
+        RC_InvalidatePS (&RI->Out);
+        RC_InvalidatePS (&RI->Out2);
     }
 
     /* Return the new struct */

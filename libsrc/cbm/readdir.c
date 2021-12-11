@@ -1,5 +1,7 @@
 /*
-** Ullrich von Bassewitz, 2012-05-30. Based on code by Groepaz.
+** Based on code by Groepaz.
+** 2012-05-30, Ullrich von Bassewitz
+** 2021-02-15, Greg King
 */
 
 
@@ -52,12 +54,14 @@ struct dirent* __fastcall__ readdir (register DIR* dir)
     /* Bump the directory offset and include the bytes for line-link and size */
     dir->off += count + 4;
 
-    /* End of directory is reached if the buffer contains "blocks free". It is
-    ** sufficient here to check for the leading 'b'. buffer will contain at
-    ** least one byte if we come here.
+    /* End of directory is reached if the buffer contains "blocks free/used" or
+    ** "mb free.". It is sufficient here to check for the leading 'b' and 'm'.
+    ** buffer will contain at least one byte if we come here.
     */
-    if (buffer[0] == 'b') {
-        goto exitpoint;
+    switch (buffer[0]) {
+        case 'b':
+        case 'm':
+            goto exitpoint;
     }
 
     /* Parse the buffer for the filename and file type */
@@ -67,7 +71,6 @@ struct dirent* __fastcall__ readdir (register DIR* dir)
     b = buffer;
     while (i < count) {
         switch (s) {
-
             case 0:
                 /* Searching for start of file name */
                 if (*b == '"') {
@@ -127,6 +130,3 @@ struct dirent* __fastcall__ readdir (register DIR* dir)
 exitpoint:
     return 0;
 }
-
-
-

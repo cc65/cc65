@@ -50,16 +50,15 @@ LINEDIST        =       $20             ; Offset in video RAM between two lines
         ldx     #>load_addr
         sta     load
         stx     load+1
-        lda     #<load_size
-        eor     #$FF
-        sta     count                   ; store (-size - 1)
-        lda     #>load_size
-        eor     #$FF
-        sta     count+1
 
-L1:     inc     count                   ; pre-count one's-complement upwards
+        ldx     #(<load_size) + 1
+        stx     count
+        ldx     #(>load_size) + 1
+        stx     count+1                 ; save size with each byte incremented separately
+
+L1:     dec     count
         bnz     L2
-        inc     count+1
+        dec     count+1
         bze     L3
 L2:     jsr     GETCHAR                 ; (doesn't change .Y)
         sta     (load),y

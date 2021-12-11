@@ -198,5 +198,3 @@ irqcount:       .byte   0
 .segment        "INIT"
 
 zpsave:         .res    zpspace
-
-

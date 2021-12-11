@@ -126,8 +126,8 @@ struct VLIR_info {              /* VLIR information             */
 };
 
 struct process {                /* process info, declare table of that type */
-        unsigned pointer;       /* (like: struct process proctab[2]=...    */
-        unsigned jiffies;       /* last entry HAVE TO BE {0,0}              */
+        unsigned pointer;       /* (like: struct process proctab[2]= ...    */
+        unsigned jiffies;       /* last entry MUST BE {0,0}                 */
 };
 
 struct iconpic {                /* icon/encoded bitmap description          */
@@ -135,7 +135,7 @@ struct iconpic {                /* icon/encoded bitmap description          */
         char x;                 /* position in cards (*8 pixels)            */
         char y;
         char width;             /* in cards                                 */
-        char heigth;            /* in lines (pixels)                        */
+        char height;            /* in lines (pixels)                        */
 };
 
 struct icondef {                /* icon definition for DoIcons              */
@@ -143,7 +143,7 @@ struct icondef {                /* icon definition for DoIcons              */
         char x;                 /* position in cards (*8 pixels)            */
         char y;
         char width;             /* of icon (in cards)                       */
-        char heigth;            /* of icon in lines (pixels)                */
+        char height;            /* of icon in lines (pixels)                */
         unsigned proc_ptr;      /* pointer to function handling that icon   */
 };
 

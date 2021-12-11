@@ -90,8 +90,12 @@ void CL_AddRef (CodeLabel* L, struct CodeEntry* E)
     /* The insn at E jumps to this label */
     E->JumpTo = L;
 
-    /* Replace the code entry argument with the name of the new label */
-    CE_SetArg (E, L->Name);
+    if (CE_HasArgBase (E)) {
+        /* Replace the code entry argument base with the name of the new label */
+        CE_SetArgBase (E, L->Name);
+    } else {
+        CE_SetArgBaseAndOff (E, L->Name, 0);
+    }
 
     /* Remember that in the label */
     CollAppend (&L->JumpFrom, E);
@@ -112,6 +116,7 @@ void CL_MoveRefs (CodeLabel* OldLabel, CodeLabel* NewLabel)
         CodeEntry* E = CL_GetRef (OldLabel, Count);
 
         /* Change the reference to the new label */
+        CHECK (E->JumpTo != NULL);
         CHECK (E->JumpTo == OldLabel);
         CL_AddRef (NewLabel, E);
 

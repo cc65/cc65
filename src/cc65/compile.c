@@ -37,6 +37,7 @@
 #include <time.h>
 
 /* common */
+#include "addrsize.h"
 #include "debugflag.h"
 #include "segnames.h"
 #include "version.h"
@@ -52,6 +53,7 @@
 #include "declare.h"
 #include "error.h"
 #include "expr.h"
+#include "funcdesc.h"
 #include "function.h"
 #include "global.h"
 #include "input.h"
@@ -61,6 +63,7 @@
 #include "pragma.h"
 #include "preproc.h"
 #include "standard.h"
+#include "staticassert.h"
 #include "symtab.h"
 
 
@@ -76,6 +79,7 @@ static void Parse (void)
 {
     int comma;
     SymEntry* Entry;
+    FuncDesc* FuncDef = 0;
 
     /* Go... */
     NextToken ();
@@ -108,11 +112,17 @@ static void Parse (void)
             continue;
         }
 
+        /* Check for a _Static_assert */
+        if (CurTok.Tok == TOK_STATIC_ASSERT) {
+            ParseStaticAssert ();
+            continue;
+        }
+
         /* Read variable defs and functions */
         ParseDeclSpec (&Spec, SC_EXTERN | SC_STATIC, T_INT);
 
         /* Don't accept illegal storage classes */
-        if ((Spec.StorageClass & SC_TYPE) == 0) {
+        if ((Spec.StorageClass & SC_TYPEMASK) == 0) {
             if ((Spec.StorageClass & SC_AUTO) != 0 ||
                 (Spec.StorageClass & SC_REGISTER) != 0) {
                 Error ("Illegal storage class");
@@ -132,14 +142,10 @@ static void Parse (void)
         comma = 0;
         while (1) {
 
-            Declaration         Decl;
+            Declaration Decl;
 
             /* Read the next declaration */
             ParseDecl (&Spec, &Decl, DM_NEED_IDENT);
-            if (Decl.Ident[0] == '\0') {
-                NextToken ();
-                break;
-            }
 
             /* Check if we must reserve storage for the variable. We do this,
             **
@@ -150,30 +156,38 @@ static void Parse (void)
             **
             ** This means that "extern int i;" will not get storage allocated.
             */
-            if ((Decl.StorageClass & SC_FUNC) != SC_FUNC          &&
-                (Decl.StorageClass & SC_TYPEMASK) != SC_TYPEDEF    &&
-                ((Spec.Flags & DS_DEF_STORAGE) != 0         ||
-                 (Decl.StorageClass & (SC_EXTERN|SC_STATIC)) == SC_STATIC ||
-                 ((Decl.StorageClass & SC_EXTERN) != 0 &&
-                  CurTok.Tok == TOK_ASSIGN))) {
-
-                /* We will allocate storage */
-                Decl.StorageClass |= SC_STORAGE;
+            if ((Decl.StorageClass & SC_FUNC) != SC_FUNC &&
+                (Decl.StorageClass & SC_TYPEMASK) != SC_TYPEDEF) {
+                if ((Spec.Flags & DS_DEF_STORAGE) != 0                       ||
+                    (Decl.StorageClass & (SC_EXTERN|SC_STATIC)) == SC_STATIC ||
+                    ((Decl.StorageClass & SC_EXTERN) != 0 &&
+                     CurTok.Tok == TOK_ASSIGN)) {
+                    /* We will allocate storage */
+                    Decl.StorageClass |= SC_STORAGE;
+                } else {
+                    /* It's a declaration */
+                    Decl.StorageClass |= SC_DECL;
+                }
             }
 
             /* If this is a function declarator that is not followed by a comma
-            ** or semicolon, it must be followed by a function body. If this is
-            ** the case, convert an empty parameter list into one accepting no
-            ** parameters (same as void) as required by the standard.
+            ** or semicolon, it must be followed by a function body.
             */
-            if ((Decl.StorageClass & SC_FUNC) != 0 &&
-                (CurTok.Tok != TOK_COMMA)          &&
-                (CurTok.Tok != TOK_SEMI)) {
+            if ((Decl.StorageClass & SC_FUNC) != 0) {
+                if (CurTok.Tok != TOK_COMMA && CurTok.Tok != TOK_SEMI) {
+                    /* A definition */
+                    Decl.StorageClass |= SC_DEF;
 
-                FuncDesc* D = GetFuncDesc (Decl.Type);
-
-                if (D->Flags & FD_EMPTY) {
-                    D->Flags = (D->Flags & ~FD_EMPTY) | FD_VOID_PARAM;
+                    /* Convert an empty parameter list into one accepting no
+                    ** parameters (same as void) as required by the standard.
+                    */
+                    FuncDef = GetFuncDesc (Decl.Type);
+                    if (FuncDef->Flags & FD_EMPTY) {
+                        FuncDef->Flags = (FuncDef->Flags & ~FD_EMPTY) | FD_VOID_PARAM;
+                    }
+                } else {
+                    /* Just a declaration */
+                    Decl.StorageClass |= SC_DECL;
                 }
             }
 
@@ -238,12 +252,11 @@ static void Parse (void)
                         /* We cannot declare variables of type void */
                         Error ("Illegal type for variable '%s'", Decl.Ident);
                         Entry->Flags &= ~(SC_STORAGE | SC_DEF);
-                    } else if (Size == 0) {
+                    } else if (Size == 0 && SymIsDef (Entry)) {
                         /* Size is unknown. Is it an array? */
                         if (!IsTypeArray (Decl.Type)) {
                             Error ("Variable '%s' has unknown size", Decl.Ident);
                         }
-                        Entry->Flags &= ~(SC_STORAGE | SC_DEF);
                     } else {
                         /* A global (including static) uninitialized variable is
                         ** only a tentative definition. For example, this is valid:
@@ -262,6 +275,26 @@ static void Parse (void)
                                    Entry->Name, Entry->V.BssName);
                         }
                         Entry->V.BssName = xstrdup (bssName);
+
+                        /* This is to make the automatical zeropage setting of the symbol
+                        ** work right.
+                        */
+                        g_usebss ();
+                    }
+                }
+
+                /* Make the symbol zeropage according to the segment address size */
+                if ((Entry->Flags & SC_EXTERN) != 0) {
+                    if (GetSegAddrSize (GetSegName (CS->CurDSeg)) == ADDR_SIZE_ZP) {
+                        Entry->Flags |= SC_ZEROPAGE;
+                        /* Check for enum forward declaration.
+                        ** Warn about it when extensions are not allowed.
+                        */
+                        if (Size == 0 && IsTypeEnum (Decl.Type)) {
+                            if (IS_Get (&Standard) != STD_CC65) {
+                                Warning ("ISO C forbids forward references to 'enum' types");
+                            }
+                        }
                     }
                 }
 
@@ -285,15 +318,11 @@ static void Parse (void)
                     /* Prototype only */
                     NextToken ();
                 } else {
-
-                    /* Function body. Check for duplicate function definitions */
-                    if (SymIsDef (Entry)) {
-                        Error ("Body for function '%s' has already been defined",
-                               Entry->Name);
-                    }
-
                     /* Parse the function body */
-                    NewFunc (Entry);
+                    NewFunc (Entry, FuncDef);
+
+                    /* Make sure we aren't omitting any work */
+                    CheckDeferredOpAllDone ();
                 }
             }
 
@@ -369,11 +398,19 @@ void Compile (const char* FileName)
     /* DefineNumericMacro ("__STDC__", 1);      <- not now */
     DefineNumericMacro ("__STDC_HOSTED__", 1);
 
+    InitDeferredOps ();
+
     /* Create the base lexical level */
     EnterGlobalLevel ();
 
     /* Create the global code and data segments */
     CreateGlobalSegments ();
+
+    /* There shouldn't be needs for local labels outside a function, but the
+    ** current code generator still tries to get some at times even though the
+    ** code were ill-formed. So just set it up with the global segment list.
+    */
+    UseLabelPoolFromSegments (GS);
 
     /* Initialize the literal pool */
     InitLiteralPool ();
@@ -401,10 +438,60 @@ void Compile (const char* FileName)
 
     } else {
 
+        /* Used for emitting externals */
+        SymEntry* Entry;
+
         /* Ok, start the ball rolling... */
         Parse ();
 
+        /* Reset the BSS segment name to its default; so that the below strcmp()
+        ** will work as expected, at the beginning of the list of variables
+        */
+        SetSegName (SEG_BSS, SEGNAME_BSS);
+
+        /* Walk over all global symbols and generate code for uninitialized
+        ** global variables.
+        */
+        for (Entry = GetGlobalSymTab ()->SymHead; Entry; Entry = Entry->NextSym) {
+            if ((Entry->Flags & (SC_STORAGE | SC_DEF | SC_STATIC)) == (SC_STORAGE | SC_STATIC)) {
+                /* Assembly definition of uninitialized global variable */
+                SymEntry* Sym = GetSymType (Entry->Type);
+                unsigned Size = SizeOf (Entry->Type);
+                if (Size == 0 && IsTypeArray (Entry->Type)) {
+                    if (GetElementCount (Entry->Type) == UNSPECIFIED) {
+                        /* Assume array size of 1 */
+                        SetElementCount (Entry->Type, 1);
+                        Size = SizeOf (Entry->Type);
+                        Warning ("Incomplete array '%s[]' assumed to have one element", Entry->Name);
+                    }
+
+                    Sym = GetSymType (GetElementType (Entry->Type));
+                }
+
+                /* For non-ESU types, Size != 0 */
+                if (Size != 0 || (Sym != 0 && SymIsDef (Sym))) {
+                    /* Set the segment name only when it changes */
+                    if (strcmp (GetSegName (SEG_BSS), Entry->V.BssName) != 0) {
+                        SetSegName (SEG_BSS, Entry->V.BssName);
+                        g_segname (SEG_BSS);
+                    }
+                    g_usebss ();
+                    g_defgloblabel (Entry->Name);
+                    g_res (Size);
+
+                    /* Mark as defined; so that it will be exported, not imported */
+                    Entry->Flags |= SC_DEF;
+                } else {
+                    /* Tentative declared variable is still of incomplete type */
+                    Error ("Definition of '%s' has type '%s' that is never completed",
+                           Entry->Name,
+                           GetFullTypeName (Entry->Type));
+                }
+            }
+        }
     }
+
+    DoneDeferredOps ();
 
     if (Debug) {
         PrintMacroStats (stdout);
@@ -417,38 +504,22 @@ void Compile (const char* FileName)
 
 
 void FinishCompile (void)
-/* Emit literals, externals, debug info, do cleanup and optimizations */
+/* Emit literals, debug info, do cleanup and optimizations */
 {
     SymEntry* Entry;
 
-    /* Reset the BSS segment name to its default; so that the below strcmp()
-    ** will work as expected, at the beginning of the list of variables
-    */
-    SetSegName (SEG_BSS, SEGNAME_BSS);
-
-    /* Walk over all global symbols:
-    ** - for functions, do clean-up and optimizations
-    ** - generate code for uninitialized global variables
+    /* Walk over all global symbols and do clean-up and optimizations for
+    ** functions.
     */
     for (Entry = GetGlobalSymTab ()->SymHead; Entry; Entry = Entry->NextSym) {
         if (SymIsOutputFunc (Entry)) {
+            /* Continue with previous label numbers */
+            UseLabelPoolFromSegments (Entry->V.F.Seg);
+
             /* Function which is defined and referenced or extern */
             MoveLiteralPool (Entry->V.F.LitPool);
             CS_MergeLabels (Entry->V.F.Seg->Code);
             RunOpt (Entry->V.F.Seg->Code);
-        } else if ((Entry->Flags & (SC_STORAGE | SC_DEF | SC_STATIC)) == (SC_STORAGE | SC_STATIC)) {
-            /* Assembly definition of uninitialized global variable */
-
-            /* Set the segment name only when it changes */
-            if (strcmp (GetSegName (SEG_BSS), Entry->V.BssName) != 0) {
-                SetSegName (SEG_BSS, Entry->V.BssName);
-                g_segname (SEG_BSS);
-            }
-            g_usebss ();
-            g_defgloblabel (Entry->Name);
-            g_res (SizeOf (Entry->Type));
-            /* Mark as defined; so that it will be exported, not imported */
-            Entry->Flags |= SC_DEF;
         }
     }
 

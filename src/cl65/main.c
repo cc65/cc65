@@ -112,6 +112,9 @@ static CmdDesc CO65 = { 0, 0, 0, 0, 0, 0, 0 };
 static CmdDesc LD65 = { 0, 0, 0, 0, 0, 0, 0 };
 static CmdDesc GRC  = { 0, 0, 0, 0, 0, 0, 0 };
 
+/* Pseudo-command to track files we want to delete */
+static CmdDesc RM   = { 0, 0, 0, 0, 0, 0, 0 };
+
 /* Variables controlling the steps we're doing */
 static int DoLink       = 1;
 static int DoAssemble   = 1;
@@ -228,12 +231,8 @@ static char* CmdAllocArg (const char* Arg, unsigned Len)
 static void CmdExpand (CmdDesc* Cmd)
 /* Expand the argument vector */
 {
-    unsigned NewMax  = Cmd->ArgMax + 10;
-    char**       NewArgs = xmalloc (NewMax * sizeof (char*));
-    memcpy (NewArgs, Cmd->Args, Cmd->ArgMax * sizeof (char*));
-    xfree (Cmd->Args);
-    Cmd->Args   = NewArgs;
-    Cmd->ArgMax = NewMax;
+    Cmd->ArgMax += 10;
+    Cmd->Args    = xrealloc (Cmd->Args, Cmd->ArgMax * sizeof (char*));
 }
 
 
@@ -321,12 +320,8 @@ static void CmdAddFile (CmdDesc* Cmd, const char* File)
 {
     /* Expand the file vector if needed */
     if (Cmd->FileCount == Cmd->FileMax) {
-        unsigned NewMax   = Cmd->FileMax + 10;
-        char**   NewFiles = xmalloc (NewMax * sizeof (char*));
-        memcpy (NewFiles, Cmd->Files, Cmd->FileMax * sizeof (char*));
-        xfree (Cmd->Files);
-        Cmd->Files   = NewFiles;
-        Cmd->FileMax = NewMax;
+        Cmd->FileMax += 10;
+        Cmd->Files    = xrealloc (Cmd->Files, Cmd->FileMax * sizeof (char*));
     }
 
     /* If the file name is not NULL (which is legal and is used to terminate
@@ -456,6 +451,20 @@ static void ExecProgram (CmdDesc* Cmd)
 
 
 
+static void RemoveTempFiles (void)
+{
+    unsigned I;
+
+    for (I = 0; I < RM.FileCount; ++I) {
+        if (remove (RM.Files[I]) < 0) {
+            Warning ("Cannot remove temporary file '%s': %s",
+                     RM.Files[I], strerror (errno));
+        }
+    }
+}
+
+
+
 static void Link (void)
 /* Link the resulting executable */
 {
@@ -534,6 +543,8 @@ static void AssembleFile (const char* File, unsigned ArgCount)
         */
         char* ObjName = MakeFilename (File, ".o");
         CmdAddFile (&LD65, ObjName);
+        /* This is just a temporary file, schedule it for removal */
+        CmdAddFile (&RM, ObjName);
         xfree (ObjName);
     } else {
         /* This is the final step. If an output name is given, set it */
@@ -1640,6 +1651,8 @@ int main (int argc, char* argv [])
     if (DoLink && LD65.FileCount > 0) {
         Link ();
     }
+
+    RemoveTempFiles ();
 
     /* Return an apropriate exit code */
     return EXIT_SUCCESS;

@@ -37,6 +37,7 @@
 #include <string.h>
 
 /* common */
+#include "addrsize.h"
 #include "chartype.h"
 #include "check.h"
 #include "coll.h"
@@ -61,6 +62,13 @@
 
 
 
+/* Table struct for address sizes of segments */
+typedef struct {
+    StrBuf Name;
+    unsigned char AddrSize;
+} SegAddrSize_t;
+
+
 /* Pointer to the current segment list. Output goes here. */
 Segments* CS = 0;
 
@@ -69,6 +77,9 @@ Segments* GS = 0;
 
 /* Actual names for the segments */
 static StrStack SegmentNames[SEG_COUNT];
+
+/* Address size for the segments */
+static Collection SegmentAddrSizes;
 
 /* We're using a collection for the stack instead of a linked list. Since
 ** functions may not be nested (at least in the current implementation), the
@@ -82,6 +93,85 @@ static Collection SegmentStack = STATIC_COLLECTION_INITIALIZER;
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
+
+
+
+void InitSegAddrSizes (void)
+/* Initialize the segment address sizes */
+{
+    InitCollection (&SegmentAddrSizes);
+}
+
+
+
+void DoneSegAddrSizes (void)
+/* Free the segment address sizes */
+{
+    SegAddrSize_t* A;
+    int I;
+    for (I = 0; I < (int)CollCount (&SegmentAddrSizes); ++I) {
+        A = CollAtUnchecked (&SegmentAddrSizes, I);
+        SB_Done (&A->Name);
+        xfree (A);
+    }
+    DoneCollection (&SegmentAddrSizes);
+}
+
+
+
+static SegAddrSize_t* FindSegAddrSize (const char* Name)
+/* Find already specified address size for a segment by name.
+** Return the found struct or 0 if not found.
+*/
+{
+    SegAddrSize_t* A;
+    int I;
+    for (I = 0; I < (int)CollCount (&SegmentAddrSizes); ++I) {
+        A = CollAtUnchecked (&SegmentAddrSizes, I);
+        if (A && strcmp (SB_GetConstBuf (&A->Name), Name) == 0) {
+            return A;
+        }
+    }
+    return 0;
+}
+
+
+
+void SetSegAddrSize (const char* Name, unsigned char AddrSize)
+/* Set the address size for a segment */
+{
+    SegAddrSize_t* A = FindSegAddrSize (Name);
+    if (!A) {
+        /* New one */
+        A = xmalloc (sizeof (SegAddrSize_t));
+        SB_Init (&A->Name);
+        SB_CopyStr (&A->Name, Name);
+        SB_Terminate (&A->Name);
+        CollAppend (&SegmentAddrSizes, A);
+    } else {
+        /* Check for mismatching address sizes */
+        if (A->AddrSize != AddrSize) {
+            Warning ("Segment address size changed from last time!");
+        }
+    }
+
+    /* Set the address size anyway */
+    A->AddrSize = AddrSize;
+}
+
+
+
+unsigned char GetSegAddrSize (const char* Name)
+/* Get the address size of the given segment.
+** Return ADDR_SIZE_INVALID if not found.
+*/
+{
+    SegAddrSize_t* A = FindSegAddrSize (Name);
+    if (A) {
+        return A->AddrSize;
+    }
+    return ADDR_SIZE_INVALID;
+}
 
 
 
@@ -143,12 +233,14 @@ static Segments* NewSegments (SymEntry* Func)
     Segments* S = xmalloc (sizeof (Segments));
 
     /* Initialize the fields */
-    S->Text     = NewTextSeg (Func);
-    S->Code     = NewCodeSeg (GetSegName (SEG_CODE), Func);
-    S->Data     = NewDataSeg (GetSegName (SEG_DATA), Func);
-    S->ROData   = NewDataSeg (GetSegName (SEG_RODATA), Func);
-    S->BSS      = NewDataSeg (GetSegName (SEG_BSS), Func);
-    S->CurDSeg  = SEG_DATA;
+    S->Text    = NewTextSeg (Func);
+    S->Code    = NewCodeSeg (GetSegName (SEG_CODE), Func);
+    S->Data    = NewDataSeg (GetSegName (SEG_DATA), Func);
+    S->ROData  = NewDataSeg (GetSegName (SEG_RODATA), Func);
+    S->BSS     = NewDataSeg (GetSegName (SEG_BSS), Func);
+    S->CurDSeg = SEG_DATA;
+    S->NextLabel     = 0;
+    S->NextDataLabel = 0;
 
     /* Return the new struct */
     return S;

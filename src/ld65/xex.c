@@ -241,9 +241,6 @@ static unsigned long XexWriteMem (XexDesc* D, MemoryArea* M)
     /* Store initial position to get total file size */
     unsigned long StartPos = ftell (D->F);
 
-    /* Always write a segment header for each memory area */
-    D->HeadPos = 0;
-
     /* Get the start address and size of this memory area */
     unsigned long Addr = M->Start;
 
@@ -400,6 +397,7 @@ void XexWriteTarget (XexDesc* D, struct File* F)
     if (D->F == 0) {
         Error ("Cannot open `%s': %s", D->Filename, strerror (errno));
     }
+    D->HeadPos = 0;
 
     /* Keep the user happy */
     Print (stdout, 1, "Opened `%s'...\n", D->Filename);
@@ -415,6 +413,8 @@ void XexWriteTarget (XexDesc* D, struct File* F)
             Write16 (D->F, 0x2E2);
             Write16 (D->F, 0x2E3);
             Write16 (D->F, GetExportVal (I->InitAd->Exp));
+            /* Always write a new segment header after an INITAD segment */
+            D->HeadPos = 0;
         }
     }
 

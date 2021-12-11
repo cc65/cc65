@@ -88,7 +88,7 @@ tgi_sig:        .byte   $74, $67, $69, TGI_API_VERSION  ; "tgi", version
 
 .code
 ;----------------------------------------------------------------------------
-; void __fastcall__ tgi_install (void* driver);
+; void __fastcall__ tgi_install (const void* driver);
 ; /* Install an already loaded driver. */
 
 

@@ -3,7 +3,7 @@
 ;
 ; 25.12.99
 
-; void GraphicsString         (char *myString);
+; void GraphicsString         (const void *myString);
 
             .export _GraphicsString
 

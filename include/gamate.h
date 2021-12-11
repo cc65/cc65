@@ -170,6 +170,8 @@
 /* No support for dynamically loadable drivers */
 #define DYN_DRV         0
 
+#define JOY_DATA        0x4400  /* hw register to read the pad bits from */
+
 /* Masks for joy_read */
 #define JOY_UP_MASK     0x01
 #define JOY_DOWN_MASK   0x02

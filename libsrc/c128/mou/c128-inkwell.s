@@ -2,7 +2,7 @@
 ; Driver for the Inkwell Systems 170-C and 184-C lightpens.
 ;
 ; 2014-04-26, Christian Groessler
-; 2014-09-10, Greg King
+; 2020-07-14, Greg King
 ;
 
         .include        "zeropage.inc"
@@ -414,8 +414,8 @@ IRQ:    jsr     CPREP
         ldy     #%00000000              ; Set ports A and B to input
         sty     CIA1_DDRB
         sty     CIA1_DDRA               ; Keyboard won't look like buttons
-        ;lda     #%01111111             ; (Keyboard scan leaves this in port A)
-        ;sta     CIA1_PRA
+        lda     #%11111111
+        sta     CIA1_PRA
         lda     CIA1_PRB                ; Read Control Port 1
         dec     CIA1_DDRA               ; Set port A back to output
         eor     #%11111111              ; Bit goes up when button goes down

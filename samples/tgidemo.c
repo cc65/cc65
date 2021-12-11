@@ -70,9 +70,10 @@ static void DoCircles (void)
 {
     static const unsigned char Palette[2] = { TGI_COLOR_WHITE, TGI_COLOR_ORANGE };
     unsigned char I;
-    unsigned char Color = COLOR_FORE;
-    unsigned X = MaxX / 2;
-    unsigned Y = MaxY / 2;
+    unsigned char Color = COLOR_BACK;
+    const unsigned X = MaxX / 2;
+    const unsigned Y = MaxY / 2;
+    const unsigned Limit = (X < Y) ? Y : X;
 
     tgi_setpalette (Palette);
     tgi_setcolor (COLOR_FORE);
@@ -82,7 +83,7 @@ static void DoCircles (void)
     while (!kbhit ()) {
         Color = (Color == COLOR_FORE) ? COLOR_BACK : COLOR_FORE;
         tgi_setcolor (Color);
-        for (I = 10; I < 240; I += 10) {
+        for (I = 10; I <= Limit; I += 10) {
             tgi_ellipse (X, Y, I, tgi_imulround (I, AspectRatio));
         }
     }
@@ -132,7 +133,7 @@ static void DoDiagram (void)
     tgi_setcolor (COLOR_FORE);
     tgi_clear ();
 
-    /* Determine zero and aplitude */
+    /* Determine zero and amplitude */
     YOrigin = MaxY / 2;
     XOrigin = 10;
     Amp     = (MaxY - 19) / 2;
@@ -168,16 +169,17 @@ static void DoLines (void)
 {
     static const unsigned char Palette[2] = { TGI_COLOR_WHITE, TGI_COLOR_BLACK };
     unsigned X;
+    const unsigned Min = (MaxX < MaxY) ? MaxX : MaxY;
 
     tgi_setpalette (Palette);
     tgi_setcolor (COLOR_FORE);
     tgi_clear ();
 
-    for (X = 0; X <= MaxY; X += 10) {
-        tgi_line (0, 0, MaxY, X);
-        tgi_line (0, 0, X, MaxY);
-        tgi_line (MaxY, MaxY, 0, MaxY-X);
-        tgi_line (MaxY, MaxY, MaxY-X, 0);
+    for (X = 0; X <= Min; X += 10) {
+        tgi_line (0, 0, Min, X);
+        tgi_line (0, 0, X, Min);
+        tgi_line (Min, Min, 0, Min-X);
+        tgi_line (Min, Min, Min-X, 0);
     }
 
     cgetc ();

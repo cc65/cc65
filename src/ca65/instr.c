@@ -92,7 +92,7 @@ static void PutSEP (const InsDesc* Ins);
 /* Emit a SEP instruction (65816), track register sizes */
 
 static void PutTAMn (const InsDesc* Ins);
-/* Emit a TAMn instruction (HuC6280). Since this is a two byte instruction with
+/* Emit a TAMn instruction (HuC6280). Because this is a two-byte instruction with
 ** implicit addressing mode, the opcode byte in the table is actually the
 ** second operand byte. The TAM instruction is the more generic form, it takes
 ** an immediate argument.
@@ -104,9 +104,9 @@ static void PutTMA (const InsDesc* Ins);
 */
 
 static void PutTMAn (const InsDesc* Ins);
-/* Emit a TMAn instruction (HuC6280). Since this is a two byte instruction with
+/* Emit a TMAn instruction (HuC6280). Because this is a two-byte instruction with
 ** implicit addressing mode, the opcode byte in the table is actually the
-** second operand byte. The TAM instruction is the more generic form, it takes
+** second operand byte. The TMA instruction is the more generic form, it takes
 ** an immediate argument.
 */
 
@@ -294,6 +294,91 @@ static const struct {
         { "STX",  0x000010c, 0x82, 1, PutAll },
         { "STY",  0x000002c, 0x80, 1, PutAll },
         { "TAS",  0x0000200, 0x9b, 0, PutAll },         /* X */
+        { "TAX",  0x0000001, 0xaa, 0, PutAll },
+        { "TAY",  0x0000001, 0xa8, 0, PutAll },
+        { "TSX",  0x0000001, 0xba, 0, PutAll },
+        { "TXA",  0x0000001, 0x8a, 0, PutAll },
+        { "TXS",  0x0000001, 0x9a, 0, PutAll },
+        { "TYA",  0x0000001, 0x98, 0, PutAll }
+    }
+};
+
+/* Instruction table for the 6502 with DTV extra opcodes (DTV) and 
+** those illegal instructions (X) which are supported by DTV.
+** Note: illegals opcodes which contain more subinstructions 
+** (ASO, DCM, LSE, LXA, SBX and SHS) are not enlisted.
+*/
+static const struct {
+    unsigned Count;
+    InsDesc  Ins[71];
+} InsTab6502DTV = {
+    sizeof (InsTab6502DTV.Ins) / sizeof (InsTab6502DTV.Ins[0]),
+    {
+        { "ADC",  0x080A26C, 0x60, 0, PutAll },
+        { "ALR",  0x0800000, 0x4B, 0, PutAll },         /* X */
+        { "ANC",  0x0800000, 0x0B, 0, PutAll },         /* X */
+        { "AND",  0x080A26C, 0x20, 0, PutAll },
+        { "ANE",  0x0800000, 0x8B, 0, PutAll },         /* X */
+        { "ARR",  0x0800000, 0x6B, 0, PutAll },         /* X */
+        { "ASL",  0x000006e, 0x02, 1, PutAll },
+        { "AXS",  0x0800000, 0xCB, 0, PutAll },         /* X */
+        { "BCC",  0x0020000, 0x90, 0, PutPCRel8 },
+        { "BCS",  0x0020000, 0xb0, 0, PutPCRel8 },
+        { "BEQ",  0x0020000, 0xf0, 0, PutPCRel8 },
+        { "BIT",  0x000000C, 0x00, 2, PutAll },
+        { "BMI",  0x0020000, 0x30, 0, PutPCRel8 },
+        { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
+        { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
+        { "BRA",  0x0020000, 0x12, 0, PutPCRel8 },      /* DTV */
+        { "BRK",  0x0000001, 0x00, 0, PutAll },
+        { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
+        { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
+        { "CLC",  0x0000001, 0x18, 0, PutAll },
+        { "CLD",  0x0000001, 0xd8, 0, PutAll },
+        { "CLI",  0x0000001, 0x58, 0, PutAll },
+        { "CLV",  0x0000001, 0xb8, 0, PutAll },
+        { "CMP",  0x080A26C, 0xc0, 0, PutAll },
+        { "CPX",  0x080000C, 0xe0, 1, PutAll },
+        { "CPY",  0x080000C, 0xc0, 1, PutAll },
+        { "DEC",  0x000006C, 0x00, 3, PutAll },
+        { "DEX",  0x0000001, 0xca, 0, PutAll },
+        { "DEY",  0x0000001, 0x88, 0, PutAll },
+        { "EOR",  0x080A26C, 0x40, 0, PutAll },
+        { "INC",  0x000006c, 0x00, 4, PutAll },
+        { "INX",  0x0000001, 0xe8, 0, PutAll },
+        { "INY",  0x0000001, 0xc8, 0, PutAll },
+        { "JMP",  0x0000808, 0x4c, 6, PutJMP },
+        { "JSR",  0x0000008, 0x20, 7, PutAll },
+        { "LAS",  0x0000200, 0xBB, 0, PutAll },         /* X */
+        { "LAX",  0x080A30C, 0xA3, 11, PutAll },        /* X */
+        { "LDA",  0x080A26C, 0xa0, 0, PutAll },
+        { "LDX",  0x080030C, 0xa2, 1, PutAll },
+        { "LDY",  0x080006C, 0xa0, 1, PutAll },
+        { "LSR",  0x000006F, 0x42, 1, PutAll },
+        { "NOP",  0x080006D, 0x00, 10, PutAll },        /* X */
+        { "ORA",  0x080A26C, 0x00, 0, PutAll },
+        { "PHA",  0x0000001, 0x48, 0, PutAll },
+        { "PHP",  0x0000001, 0x08, 0, PutAll },
+        { "PLA",  0x0000001, 0x68, 0, PutAll },
+        { "PLP",  0x0000001, 0x28, 0, PutAll },
+        { "RLA",  0x000A26C, 0x23, 0, PutAll },         /* X */
+        { "ROL",  0x000006F, 0x22, 1, PutAll },
+        { "ROR",  0x000006F, 0x62, 1, PutAll },
+        { "RRA",  0x000A26C, 0x63, 0, PutAll },         /* X */
+        { "RTI",  0x0000001, 0x40, 0, PutAll },
+        { "RTS",  0x0000001, 0x60, 0, PutAll },
+        { "SAC",  0x0800000, 0x32, 1, PutAll },         /* DTV */
+        { "SBC",  0x080A26C, 0xe0, 0, PutAll },
+        { "SEC",  0x0000001, 0x38, 0, PutAll },
+        { "SED",  0x0000001, 0xf8, 0, PutAll },
+        { "SEI",  0x0000001, 0x78, 0, PutAll },
+        { "SHA",  0x0002200, 0x93, 1, PutAll },         /* X */
+        { "SHX",  0x0000200, 0x9e, 1, PutAll },         /* X */
+        { "SHY",  0x0000040, 0x9c, 1, PutAll },         /* X */
+        { "SIR",  0x0800000, 0x42, 1, PutAll },         /* DTV */
+        { "STA",  0x000A26C, 0x80, 0, PutAll },
+        { "STX",  0x000010c, 0x82, 1, PutAll },
+        { "STY",  0x000002c, 0x80, 1, PutAll },
         { "TAX",  0x0000001, 0xaa, 0, PutAll },
         { "TAY",  0x0000001, 0xa8, 0, PutAll },
         { "TSX",  0x0000001, 0xba, 0, PutAll },
@@ -930,6 +1015,7 @@ static const InsTable* InsTabs[CPU_COUNT] = {
     (const InsTable*) &InsTabNone,
     (const InsTable*) &InsTab6502,
     (const InsTable*) &InsTab6502X,
+    (const InsTable*) &InsTab6502DTV,
     (const InsTable*) &InsTab65SC02,
     (const InsTable*) &InsTab65C02,
     (const InsTable*) &InsTab65816,
@@ -1093,7 +1179,7 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
     A->AddrModeSet &= Ins->AddrMode;
 
     /* If we have an expression, check it and remove any addressing modes that
-    ** are too small for the expression size. Since we have to study the
+    ** are too small for the expression size. Because we have to study the
     ** expression anyway, do also replace it by a simpler one if possible.
     */
     if (A->Expr) {
@@ -1414,7 +1500,7 @@ static void PutSEP (const InsDesc* Ins)
 
 
 static void PutTAMn (const InsDesc* Ins)
-/* Emit a TAMn instruction (HuC6280). Since this is a two byte instruction with
+/* Emit a TAMn instruction (HuC6280). Because this is a two-byte instruction with
 ** implicit addressing mode, the opcode byte in the table is actually the
 ** second operand byte. The TAM instruction is the more generic form, it takes
 ** an immediate argument.
@@ -1444,7 +1530,7 @@ static void PutTMA (const InsDesc* Ins)
     } else {
         /* Make sure just one bit is set */
         if ((Val & (Val - 1)) != 0) {
-            Error ("Argument to TAM must be a power of two");
+            Error ("Argument of TMA must be a power of two");
         }
     }
 }
@@ -1452,9 +1538,9 @@ static void PutTMA (const InsDesc* Ins)
 
 
 static void PutTMAn (const InsDesc* Ins)
-/* Emit a TMAn instruction (HuC6280). Since this is a two byte instruction with
+/* Emit a TMAn instruction (HuC6280). Because this is a two-byte instruction with
 ** implicit addressing mode, the opcode byte in the table is actually the
-** second operand byte. The TAM instruction is the more generic form, it takes
+** second operand byte. The TMA instruction is the more generic form, it takes
 ** an immediate argument.
 */
 {

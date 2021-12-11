@@ -76,730 +76,730 @@ static const CallDesc CallTable [] = {
     {
         "addeqysp",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "addeq0sp"
     },{
         "laddeq",
         {
-            /*     A               X               Y             SRegLo   */
-                         1,              0, UNKNOWN_REGVAL,              0,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-                         0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+                         1,              0, UNKNOWN_REGVAL,              0,              0,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "laddeq1"
     },{
         "laddeq",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL,              0,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-                         0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL,              0,              0,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "laddeqa"
     },{
         "laddeqysp",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "laddeq0sp"
     },{
         "ldaxidx",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL,              1, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL,              1, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "ldaxi"
     },{
         "ldaxysp",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL,              1, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL,              1, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "ldax0sp"
     },{
         "ldeaxidx",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL,              3, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL,              3, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "ldeaxi"
     },{
         "ldeaxysp",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL,              3, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL,              3, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "ldeax0sp"
     },{
         "leaaxsp",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "leaa0sp"
     },{
         "lsubeq",
         {
-            /*     A               X               Y             SRegLo   */
-                         1,              0, UNKNOWN_REGVAL,              0,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-                         0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+                         1,              0, UNKNOWN_REGVAL,              0,              0,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "lsubeq1"
     },{
         "lsubeq",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL,              0,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-                         0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL,              0,              0,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "lsubeqa"
     },{
         "lsubeqysp",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "lsubeq0sp"
     },{
         "pusha",
         {
-            /*     A               X               Y             SRegLo   */
-                         0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+                         0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_SLOWER,
         "pushc0"
     },{
         "pusha",
         {
-            /*     A               X               Y             SRegLo   */
-                         1, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+                         1, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_SLOWER,
         "pushc1"
     },{
         "pusha",
         {
-            /*     A               X               Y             SRegLo   */
-                         2, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+                         2, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_SLOWER,
         "pushc2"
     },{
         "pushax",
         {
-            /*     A               X               Y             SRegLo   */
-                         0,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+                         0,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "push0"
     },{
         "pushax",
         {
-            /*     A               X               Y             SRegLo   */
-                         1,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+                         1,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_SLOWER,
         "push1"
     },{
         "pushax",
         {
-            /*     A               X               Y             SRegLo   */
-                         2,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+                         2,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_SLOWER,
         "push2"
     },{
         "pushax",
         {
-            /*     A               X               Y             SRegLo   */
-                         3,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+                         3,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_SLOWER,
         "push3"
     },{
         "pushax",
         {
-            /*     A               X               Y             SRegLo   */
-                         4,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+                         4,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_SLOWER,
         "push4"
     },{
         "pushax",
         {
-            /*     A               X               Y             SRegLo   */
-                         5,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+                         5,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_SLOWER,
         "push5"
     },{
         "pushax",
         {
-            /*     A               X               Y             SRegLo   */
-                         6,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+                         6,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_SLOWER,
         "push6"
     },{
         "pushax",
         {
-            /*     A               X               Y             SRegLo   */
-                         7,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+                         7,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_SLOWER,
         "push7"
     },{
         "pushax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "pusha0"
     },{
         "pushax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL,           0xFF, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL,           0xFF, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_SLOWER,
         "pushaFF"
     },{
         "pushaysp",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "pusha0sp"
     },{
         "pusheax",
         {
-            /*     A               X               Y             SRegLo   */
-                         0,              0, UNKNOWN_REGVAL,              0,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-                         0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+                         0,              0, UNKNOWN_REGVAL,              0,              0,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "pushl0"
     },{
         "pusheax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-                         0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,              0,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "push0ax"
     },{
         "pushwidx",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL,              1, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL,              1, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "pushw"
     },{
         "pushwysp",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL,              3, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL,              3, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "pushw0sp"
     },{
         "staxysp",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "stax0sp"
     },{
         "steaxysp",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "steax0sp"
     },{
         "subeqysp",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "subeq0sp"
     },{
         "tosaddax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tosadda0"
     },{
         "tosaddeax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-                         0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,              0,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tosadd0ax"
     },{
         "tosandax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tosanda0"
     },{
         "tosandeax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-                         0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,              0,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tosand0ax"
     },{
         "tosdivax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tosdiva0"
     },{
         "tosdiveax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-                         0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,              0,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tosdiv0ax"
     },{
         "toseqax",
         {
-            /*     A               X               Y             SRegLo   */
-                         0,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+                         0,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "toseq00"
     },{
         "toseqax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "toseqa0"
     },{
         "tosgeax",
         {
-            /*     A               X               Y             SRegLo   */
-                         0,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+                         0,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tosge00"
     },{
         "tosgeax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tosgea0"
     },{
         "tosgtax",
         {
-            /*     A               X               Y             SRegLo   */
-                         0,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+                         0,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tosgt00"
     },{
         "tosgtax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tosgta0"
     },{
         "tosicmp",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tosicmp0"
     },{
         "tosleax",
         {
-            /*     A               X               Y             SRegLo   */
-                         0,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+                         0,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tosle00"
     },{
         "tosleax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "toslea0"
     },{
         "tosltax",
         {
-            /*     A               X               Y             SRegLo   */
-                         0,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+                         0,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "toslt00"
     },{
         "tosltax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "toslta0"
     },{
         "tosmodax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tosmoda0"
     },{
         "tosmodeax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-                         0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,              0,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tosmod0ax"
     },{
         "tosmulax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tosmula0"
     },{
         "tosmuleax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-                         0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,              0,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tosmul0ax"
     },{
         "tosneax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tosnea0"
     },{
         "tosorax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tosora0"
     },{
         "tosoreax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-                         0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,              0,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tosor0ax"
     },{
         "tosrsubax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tosrsuba0"
     },{
         "tosrsubeax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-                         0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,              0,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tosrsub0ax"
     },{
         "tossubax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tossuba0"
     },{
         "tossubeax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-                         0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,              0,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tossub0ax"
     },{
         "tosudivax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tosudiva0"
     },{
         "tosudiveax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-                         0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,              0,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tosudiv0ax"
     },{
         "tosugeax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tosugea0"
     },{
         "tosugtax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tosugta0"
     },{
         "tosuleax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tosulea0"
     },{
         "tosultax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tosulta0"
     },{
         "tosumodax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tosumoda0"
     },{
         "tosumodeax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-                         0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,              0,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tosumod0ax"
     },{
         "tosumulax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tosumula0"
     },{
         "tosumuleax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-                         0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,              0,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tosumul0ax"
     },{
         "tosxorax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tosxora0"
     },{
         "tosxoreax",
         {
-            /*     A               X               Y             SRegLo   */
-            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,
-            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
-                         0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+            /*     A               X               Y             SRegLo         SRegHi   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,              0,
+            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
         "tosxor0ax"

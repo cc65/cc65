@@ -3,6 +3,7 @@
         .import         vdc_init
         .import         psg_init
         .import         colors
+        .import         _pce_font
         .importzp       ptr1, tmp1
 
         .include        "pce.inc"
@@ -53,8 +54,8 @@ load_font:
 ;       rts                     ; (fall through)
 
 ; Point to the font data.
-copy:   lda     #<font
-        ldx     #>font
+copy:   lda     #<_pce_font
+        ldx     #>_pce_font
         sta     ptr1
         stx     ptr1+1
 
@@ -84,6 +85,3 @@ fillloop:
         bne     charloop        ; next character
 
         rts
-
-.rodata
-font:   .include        "vga.inc"

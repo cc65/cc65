@@ -3,7 +3,7 @@
 ; originally by Ullrich von Bassewitz and Sidney Cadot
 ;
 ; clock_t clock (void);
-; unsigned _clocks_per_sec (void);
+; clock_t _clocks_per_sec (void);
 ;
 
         .export         _clock, __clocks_per_sec
@@ -30,8 +30,10 @@
 
 .proc   __clocks_per_sec
 
-        ldx     #$00            ; Clear high byte of return value
-        lda     PAL             ; use hw register, PALNTS is only supported on XL/XE ROM
+        ldx     #$00            ; Clear byte 1 of return value
+        stx     sreg            ; Clear byte 2 of return value
+        stx     sreg+1          ; Clear byte 3 of return value
+        lda     PAL             ; Use hw register, PALNTS is only supported on XL/XE ROM
         and     #$0e
         bne     @NTSC
         lda     #50

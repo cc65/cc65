@@ -36,6 +36,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#if defined(_WIN32)
+#  include <process.h>
+#else
+#  include <sys/types.h>
+#  include <unistd.h>
+#endif
 
 /* common */
 #include "cmdline.h"
@@ -249,9 +255,8 @@ void LibOpen (const char* Name, int MustExist, int NeedTemp)
     if (NeedTemp) {
 
         /* Create the temporary library name */
-        NewLibName = xmalloc (strlen (Name) + strlen (".temp") + 1);
-        strcpy (NewLibName, Name);
-        strcat (NewLibName, ".temp");
+        NewLibName = xmalloc (strlen (Name) + (sizeof (".temp-") - 1)  + 2 * sizeof (unsigned int) + 1);
+        sprintf (NewLibName, "%s.temp-%X", Name, (unsigned int)getpid ());
 
         /* Create the temporary library */
         NewLib = fopen (NewLibName, "w+b");
@@ -399,9 +404,11 @@ void LibClose (void)
         Error ("Problem closing '%s': %s", LibName, strerror (errno));
     }
     if (NewLib && fclose (NewLib) != 0) {
-        Error ("Problem closing temporary library file: %s", strerror (errno));
+        Error ("Problem closing temporary library file '%s': %s",
+               NewLibName, strerror (errno));
     }
     if (NewLibName && remove (NewLibName) != 0) {
-        Error ("Problem deleting temporary library file: %s", strerror (errno));
+        Error ("Problem deleting temporary library file '%s': %s",
+               NewLibName, strerror (errno));
     }
 }

@@ -142,6 +142,7 @@ extern void c64_c256k_emd[];
 extern void c64_dqbb_emd[];
 extern void c64_georam_emd[];
 extern void c64_isepic_emd[];
+extern void c64_kerberos_emd[];
 extern void c64_ram_emd[];
 extern void c64_ramcart_emd[];
 extern void c64_reu_emd[];

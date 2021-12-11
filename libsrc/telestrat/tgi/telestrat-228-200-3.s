@@ -296,8 +296,20 @@ LINE:
         sta   HRS3
         lda   Y2
         sta   HRS4
+
+        lda   X1+1
+        sta   HRS1+1
+
+        lda   Y1+1 
+        sta   HRS2+1
+
+        lda   X2+1
+        sta   HRS3+1
         
-        lda   #$ff
+        lda   Y2+1        
+        sta   HRS4+1           
+
+        lda   #$FF
         sta   HRSPAT
 
         BRK_TELEMON(XDRAWA)

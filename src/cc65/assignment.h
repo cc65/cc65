@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2002-2004 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -44,13 +44,37 @@
 
 
 /*****************************************************************************/
+/*                                   Data                                    */
+/*****************************************************************************/
+
+
+
+/* Whether to save/restore the original lhs or result value */
+enum {
+    OA_NEED_NONE,
+    OA_NEED_OLD,
+    OA_NEED_NEW,
+};
+
+/* Forward */
+struct GenDesc;
+
+
+
+/*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
 
 
-void Assignment (ExprDesc* lval);
-/* Parse an assignment */
+void DoIncDecBitField (ExprDesc* Expr, long Val, unsigned KeepResult);
+/* Process inc/dec for bit-field */
+
+void OpAssign (const struct GenDesc* Gen, ExprDesc* lval, const char* Op);
+/* Parse an "=" (if 'Gen' is 0) or "op=" operation */
+
+void OpAddSubAssign (const struct GenDesc* Gen, ExprDesc *Expr, const char* Op);
+/* Parse a "+=" or "-=" operation */
 
 
 

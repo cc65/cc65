@@ -120,6 +120,9 @@
 #define JOY_RIGHT_MASK  0x02
 #define JOY_BTN_1_MASK  0x20
 
+#define JOY_FIRE_MASK   JOY_BTN_1_MASK
+#define JOY_FIRE(v)     ((v) & JOY_FIRE_MASK)
+
 
 
 /* No support for dynamically loadable drivers */

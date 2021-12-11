@@ -318,6 +318,10 @@ Note that the graphics drivers are incompatible with the
   A driver for the ISEPIC cartridge. This driver offers just 8 pages of 256
   bytes each. Written and contributed by Marco van den Heuvel.
 
+  <tag><tt/c64-kerberos.emd (c64_kerberos_emd)/</tag>
+  A driver for the Kerberos MIDI Cartridge. The cartridge has 512
+  pages of 256 bytes for a total of 128KB.
+
   <tag><tt/c64-ram.emd (c64_ram_emd)/</tag>
   A driver for the hidden RAM below the I/O area and kernal ROM. Supports 47
   256 byte pages. Please note that this driver is incompatible with any of the
@@ -406,9 +410,9 @@ The default drivers, <tt/mouse_stddrv (mouse_static_stddrv)/, point to <tt/c64-1
 <descrip>
 
   <tag><tt/c64-swlink.ser (c64_swlink_ser)/</tag>
-  Driver for the SwiftLink cartridge. Supports up to 38400 BPS, hardware flow
-  control (RTS/CTS), and interrupt-driven receives. Note that, because of the
-  peculiarities of the 6551 chip, together with the use of the NMI, transmits
+  Driver for the SwiftLink cartridge. Supports up to 38400 baud, requires hardware
+  flow control (RTS/CTS) and does interrupt driven receives. Note that, because of
+  the peculiarities of the 6551 chip, together with the use of the NMI, transmits
   are not interrupt driven; and, the transceiver blocks if the receiver asserts
   flow control because of a full buffer.
 

@@ -195,7 +195,7 @@ static void BinWriteMem (BinDesc* D, MemoryArea* M)
                 if (DoWrite || (M->Flags & MF_FILL) != 0) {
                     /* Seek in "overwrite" segments */
                     if (S->Flags & SF_OVERWRITE) {
-                        fseek (D->F, NewAddr - M->Start, SEEK_SET);
+                        fseek (D->F, NewAddr - M->Start + M->FileOffs, SEEK_SET);
                     } else {
                         WriteMult (D->F, M->FillVal, NewAddr-Addr);
                         PrintNumVal ("SF_OFFSET", NewAddr - Addr);
@@ -226,6 +226,13 @@ static void BinWriteMem (BinDesc* D, MemoryArea* M)
             unsigned long P = ftell (D->F);
             SegWrite (D->Filename, D->F, S->Seg, BinWriteExpr, D);
             PrintNumVal ("Wrote", (unsigned long) (ftell (D->F) - P));
+            /* If we have just written an OVERWRITE segement, move position to the
+            ** end of file, so that subsequent segments are written in the correct
+            ** place.
+            */
+            if (S->Flags & SF_OVERWRITE) {
+                fseek (D->F, 0, SEEK_END);
+            }
         } else if (M->Flags & MF_FILL) {
             WriteMult (D->F, S->Seg->FillVal, S->Seg->Size);
             PrintNumVal ("Filled", (unsigned long) S->Seg->Size);

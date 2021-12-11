@@ -133,8 +133,11 @@ SymEntry* FindLocalSym (const char* Name);
 SymEntry* FindTagSym (const char* Name);
 /* Find the symbol with the given name in the tag table */
 
-SymEntry* FindStructField (const Type* TypeArray, const char* Name);
-/* Find a struct field in the fields list */
+SymEntry FindStructField (const Type* TypeArray, const char* Name);
+/* Find a struct/union field in the fields list.
+** Return the info about the found field symbol filled in an entry struct by
+** value, or an empty entry struct if the field is not found.
+*/
 
 unsigned short FindSPAdjustment (const char* Name);
 /* Search for an entry in the table of SP adjustments */
@@ -146,10 +149,14 @@ unsigned short FindSPAdjustment (const char* Name);
 
 
 
-SymEntry* AddStructSym (const char* Name, unsigned Type, unsigned Size, SymTable* Tab);
+SymEntry* AddEnumSym (const char* Name, unsigned Flags, const Type* Type, SymTable* Tab, unsigned* DSFlags);
+/* Add an enum entry and return it */
+
+SymEntry* AddStructSym (const char* Name, unsigned Flags, unsigned Size, SymTable* Tab, unsigned* DSFlags);
 /* Add a struct/union entry and return it */
 
-SymEntry* AddBitField (const char* Name, unsigned Offs, unsigned BitOffs, unsigned Width);
+SymEntry* AddBitField (const char* Name, const Type* Type, unsigned Offs,
+                       unsigned BitOffs, unsigned BitWidth, int SignednessSpecified);
 /* Add a bit field to the local symbol table and return the symbol entry */
 
 SymEntry* AddConstSym (const char* Name, const Type* T, unsigned Flags, long Val);
@@ -159,7 +166,7 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags);
 /* Add a goto label to the symbol table */
 
 SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs);
-/* Add a local symbol and return the symbol entry */
+/* Add a local or struct/union field symbol and return the symbol entry */
 
 SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags);
 /* Add an external or global symbol to the symbol table and return the entry */
@@ -177,6 +184,9 @@ SymTable* GetSymTab (void);
 
 SymTable* GetGlobalSymTab (void);
 /* Return the global symbol table */
+
+SymTable* GetFieldSymTab (void);
+/* Return the current field symbol table */
 
 SymTable* GetLabelSymTab (void);
 /* Return the label symbol table */

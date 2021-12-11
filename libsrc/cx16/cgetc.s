@@ -1,5 +1,5 @@
 ;
-; 2019-10-01, Greg King
+; 2019-12-22, Greg King
 ;
 ; char cgetc (void);
 ; /* Return a character from the keyboard. */
@@ -7,13 +7,13 @@
 
         .export         _cgetc
 
-        .import         cursor, GETIN
+        .import         _kbhit, cursor, GETIN
 
         .include        "cx16.inc"
         .macpack        generic
 
 
-_cgetc: ldx     KEY_COUNT       ; Get number of characters
+_cgetc: jsr     _kbhit
         bnz     L3              ; Jump if there are already chars waiting
 
 ; Switch the cursor on if wanted.
@@ -22,7 +22,7 @@ _cgetc: ldx     KEY_COUNT       ; Get number of characters
         tay
         lda     cursor
         jsr     setcursor
-L1:     lda     KEY_COUNT
+L1:     jsr     _kbhit
         bze     L1              ; Wait for key
         tya
         eor     #%00000001      ; (Cursor flag uses negative logic)

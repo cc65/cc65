@@ -48,33 +48,33 @@ TR7             := $13
 
 DEFAFF          := $14
 
-IRQSVA          := $21           ; Used to save A when a BRK call occurs
-IRQSVX          := $22           ; Used to save X when a BRK call occurs
-IRQSVY          := $23           ; Used to save Y when a BRK call occurs
-IRQSVP          := $24           ; Used to save P when a BRK call occurs
+IRQSVA          := $21          ; Used to save A when a BRK call occurs
+IRQSVX          := $22          ; Used to save X when a BRK call occurs
+IRQSVY          := $23          ; Used to save Y when a BRK call occurs
+IRQSVP          := $24          ; Used to save P when a BRK call occurs
 
 ADSCR           := $26
-SCRNB           := $28           ; Id of the current window
+SCRNB           := $28          ; Id of the current window
 
-ADKBD           := $2A           ; Address ASCII conversion table
+ADKBD           := $2A          ; Address ASCII conversion table
 
 
-PTR_READ_DEST   := $2C           ; Used for XFREAD and XWRITE only in TELEMON 3.x
+PTR_READ_DEST   := $2C          ; Used for XFREAD and XWRITE only in TELEMON 3.x
 
-ADCLK           := $40           ; Address for clock display
+ADCLK           := $40          ; Address for clock display
 TIMEUS          := $42
-TIMEUD          := $44 
+TIMEUD          := $44          ; Counter clock (1/10 of a second)
 
 
 HRSX            := $46
 HRSY            := $47
 
-XLPRBI          := $48           ; Printer flag (b7)
+XLPRBI          := $48          ; Printer flag (b7)
 
 HRSX40          := $49
 HRSX6           := $4A
 
-ADHRS           := $4B           ; Hires screen address (word)
+ADHRS           := $4B          ; Hires screen address (word)
 
 HRS1            := $4D
 HRS2            := $4F
@@ -277,6 +277,7 @@ XRECLK           = $3C          ; Reset clock
 XCLCL            = $3D          ; Close clock
 XWRCLK           = $3E          ; Displays clock in the adress in A & Y registers
 
+; Sound primitives
 XSONPS           = $40          ; Send data to PSG register (14 values)
 XOUPS            = $42          ; Send Oups sound into PSG
 XPLAY            = $43          ; Play a sound
@@ -284,10 +285,25 @@ XSOUND           = $44
 XMUSIC           = $45 
 XZAP             = $46          ; Send Zap sound to PSG
 XSHOOT           = $47
+
+; Path Management
+XGETCWD          = $48          ; Get current CWD
+XPUTCWD          = $49          ; Chdir
+
+; File management
 XMKDIR           = $4B          ; Create a folder. Only available in TELEMON 3.x (bank 7 of Orix)
+
+XHCHRS           = $4C          ; Hard copy hires
+
+; File management
 XRM              = $4D          ; Remove a folder or a file. Only available in TELEMON 3.x (bank 7 of Orix)
+
 XFWR             = $4E          ; Put a char on the first screen. Only available in TELEMON 3.x (bank 7 of Orix)
-XGOKBD           = $52
+
+; Keyboard primitives
+XALLKB           = $50          ; Read Keyboard, and populate KBDCOL
+XKBDAS           = $51          ; Ascii conversion
+XGOKBD           = $52          ; Swap keyboard type (Qwerty, French ...) 
 
 ; Buffer management
 XECRBU           = $54          ; Write A or AY in the buffer
@@ -299,8 +315,27 @@ XDEFBU           = $59          ; Reset all value of the buffer
 XBUSY            = $5A          ; Test if the buffer is empty
 
 XMALLOC          = $5B          ; Only in TELEMON 3.x (bank 7 of Orix)
+
+; RS232 primitives
+XSDUMP           = $5C          ; RS232 input dump
+XCONSO           = $5D          ; Swap screen into RS232 terminal
+XSLOAD           = $5E          ; Read a file from RS232
+XSSAVE           = $5F          ; Write a file to RS232
+
+; Minitel primitives
+XMLOAD           = $60          ; Read a file from Minitel
+XMSAVE           = $61          ; Write a file to Minitel
+
 XFREE            = $62          ; Only in TELEMON 3.x (bank 7 of Orix)
+
+; Next Minitel primitives 
+XWCXFI           = $63          ; Wait connection
+XLIGNE           = $64          ;
+XDECON           = $65          ; Minitel disconnection
+XMOUT            = $66          ; Send a byte to minitel (from A)
+
 XSOUT            = $67          ; Send accumulator value (A) to RS232, available in TELEMON 2.4 & 3.x : if RS232 buffer is full, the Oric Telestrat freezes
+
 XHRSSE           = $8C          ; Set hires position cursor
 XDRAWA           = $8D          ; Draw a line absolute
 XDRAWR           = $8E          ; Draw a line (relative)
@@ -324,7 +359,7 @@ PWD_PTR          = $00
 
 ; ---------------------------------------------------------------------------
 ; 
-BUFTRV          := $100         
+BUFTRV           := $100         
 
 
 ; ---------------------------------------------------------------------------
@@ -337,7 +372,7 @@ FLGTEL           := $20D
 KOROM            := $20E        ; Used to compute the size of all rom bank. The result is store here. The value is in KB
 KORAM            := $20F        ; Used to compute the size of all ram bank. The result is store here. The value is in KB
 ; Time management
-TIMED            := $210
+TIMED            := $210        ; Clock (1/10 of seconds)
 TIMES            := $211
 TIMEM            := $212
 TIMEH            := $213

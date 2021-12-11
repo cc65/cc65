@@ -1,8 +1,8 @@
 ;
 ; Standard joystick driver for the CX16.
-; May be installed multiple times when statically linked to the application.
+; May be installed multiple times when statically linked to an application.
 ;
-; 2019-11-15 Greg King
+; 2019-12-24, Greg King
 ;
 
         .include        "joy-kernel.inc"
@@ -13,6 +13,8 @@
 
         .macpack        generic
         .macpack        module
+
+        .importzp       tmp1
 
 
 ; ------------------------------------------------------------------------
@@ -75,51 +77,21 @@ COUNT:  lda     #<JOY_COUNT
 ; ------------------------------------------------------------------------
 ; READ: Read a particular joystick passed in .A .
 
-READ:   php
-        bit     #JOY_COUNT - $01
-        sei
-        bnz     pad2
+READ:   and     #%00000001
+        jsr     JOYSTICK_GET
+        sta     tmp1
+        txa
+        bit     #%00001110      ; Is it NES or SNES controller?
+        bze     nes
 
-; Read game pad 1
-
-pad1:   ldy     JOY1            ; Allow JOY1 to be reread between interrupts
-        sty     JOY1 + 2
-
-        lda     JOY1 + 1
-        bit     #%00001110
-        bze     nes1
-
-        asl     JOY1 + 2        ; Get SNES's B button
+        asl     tmp1            ; Get SNES's B button
         ror     a               ; Put it next to the A button
-        asl     JOY1 + 2        ; Drop SNES's Y button
+        asl     tmp1            ; Drop SNES's Y button
         asl     a               ; Get back the B button
-        ror     JOY1 + 2
+        ror     tmp1
         asl     a               ; Get SNES's A button
-        ror     JOY1 + 2        ; Make byte look like NES pad
+        ror     tmp1            ; Make byte look like NES pad
 
-nes1:   lda     JOY1 + 2
-        plp
-        eor     #%11111111      ; (The controllers use negative logic)
-        rts
-
-; Read game pad 2
-
-pad2:   ldy     JOY2
-        sty     JOY2 + 2
-
-        lda     JOY2 + 1
-        bit     #%00001110
-        bze     nes2
-
-        asl     JOY2 + 2
-        ror     a
-        asl     JOY2 + 2
-        asl     a
-        ror     JOY2 + 2
-        asl     a
-        ror     JOY2 + 2
-
-nes2:   lda     JOY2 + 2
-        plp
-        eor     #%11111111
+nes:    lda     tmp1            ; The controllers give zeroes for "pressed"
+        eor     #%11111111      ; We want ones for "pressed"
         rts

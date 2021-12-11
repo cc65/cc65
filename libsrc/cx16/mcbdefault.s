@@ -1,55 +1,50 @@
 ;
 ; Default mouse callbacks for the CX16
 ;
-; 2019-11-09, Greg King
-;
-; All functions in this module should be interrupt safe
-; because they might be called from an interrupt handler.
+; 2020-01-10, Greg King
 ;
 
         .export         _mouse_def_callbacks
 
-        .include        "cbm_kernal.inc"
+        .import         MOUSE_GET, SPRITE_SET_POSITION
         .include        "cx16.inc"
 
-; --------------------------------------------------------------------------
-; Hide the mouse pointer. Always called with interrupts disabled.
-
-.code
-
-hide:   ldx     #$00            ; Don't change sprite's scale
-        lda     #$00            ; Disable sprite
-        jmp     MOUSE
 
 ; --------------------------------------------------------------------------
-; Show the mouse pointer. Always called with interrupts disabled.
+; Hide the mouse pointer.
 
-show:   ldx     #$00
-        lda     #<-$01          ; Enable sprite
-        jmp     MOUSE
+hide:   ldx     #%10000000
+        stx     gREG::r0H
+        bra     mse
 
 ; --------------------------------------------------------------------------
-; Prepare to move the mouse pointer. Always called with interrupts disabled.
+; Show the mouse pointer.
+
+show:   ldx     #gREG::r0
+        jsr     MOUSE_GET
+mse:    lda     #$00                    ; mouse sprite
+        jmp     SPRITE_SET_POSITION
+
+; --------------------------------------------------------------------------
+; Prepare to move the mouse pointer.
 
 prep:   ; Fall through
 
 ; --------------------------------------------------------------------------
-; Draw the mouse pointer. Always called with interrupts disabled.
+; Draw the mouse pointer.
 
 draw:   ; Fall through
 
 ; --------------------------------------------------------------------------
-; Move the mouse pointer X position to the value in .XA .  Always called with
-; interrupts disabled.
+; Move the mouse pointer X position to the value in .XA .
 
-movex:                          ; Already set by drivers
+movex:                                  ; Already done by Kernal
         ; Fall through
 
 ; --------------------------------------------------------------------------
-; Move the mouse pointer Y position to the value in .XA .  Always called with
-; interrupts disabled.
+; Move the mouse pointer Y position to the value in .XA .
 
-movey:  rts                     ; Already set by drivers
+movey:  rts                             ; Already done by Kernal
 
 ; --------------------------------------------------------------------------
 ; Callback structure

@@ -1,7 +1,7 @@
 ;
-; 2019-09-16, Greg King
+; 2019-12-21, Greg King
 ;
-; This module supplies the load addresses that are expected
+; This module supplies some load addresses that are expected
 ; by a Commander X16 in the first two bytes of banked RAM load files.
 ;
 
@@ -9,9 +9,11 @@
         ; this module to get included into the output files.
         .export         __BANKRAMADDR__: abs = 1
 
+.if 0 ; bank 0 is used by Kernal
 .segment        "BRAM00ADDR"
 
         .addr   *+2
+.endif
 
 .segment        "BRAM01ADDR"
 

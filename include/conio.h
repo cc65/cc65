@@ -201,16 +201,19 @@ void __fastcall__ cputhex16 (unsigned val);
 */
 
 #ifdef _textcolor
-#  define textcolor(x)          _textcolor(x)
+#  define textcolor(color)      _textcolor(color)
 #endif
 #ifdef _bgcolor
-#  define bgcolor(x)            _bgcolor(x)
+#  define bgcolor(color)        _bgcolor(color)
 #endif
 #ifdef _bordercolor
-#  define bordercolor(x)        _bordercolor(x)
+#  define bordercolor(color)    _bordercolor(color)
 #endif
 #ifdef _cpeekcolor
-#  define cpeekcolor(x)         _cpeekcolor(x)
+#  define cpeekcolor()          _cpeekcolor()
+#endif
+#ifdef _cpeekrevers
+#  define cpeekrevers()         _cpeekrevers()
 #endif
 
 

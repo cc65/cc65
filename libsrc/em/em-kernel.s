@@ -36,7 +36,7 @@ emd_sig:        .byte   $65, $6d, $64, EMD_API_VERSION  ; "emd", version
 
 
 ;----------------------------------------------------------------------------
-; unsigned char __fastcall__ em_install (void* driver);
+; unsigned char __fastcall__ em_install (const void* driver);
 ; /* Install the driver once it is loaded */
 
 

@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2002-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -49,10 +49,10 @@
 
 
 
-#define SIM65_ERROR         256
+#define SIM65_ERROR         0x7F
 /* Does not use EXIT_FAILURE because it may overlap with test results. */
 
-#define SIM65_ERROR_TIMEOUT 257
+#define SIM65_ERROR_TIMEOUT 0x7E
 /* An error result for max CPU instructions exceeded. */
 
 

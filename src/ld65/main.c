@@ -136,6 +136,7 @@ static void Usage (void)
             "  --end-group\t\t\tEnd a library group\n"
             "  --force-import sym\t\tForce an import of symbol 'sym'\n"
             "  --help\t\t\tHelp (this text)\n"
+            "  --large-alignment\t\tDon't warn about large alignments\n"
             "  --lib file\t\t\tLink this library\n"
             "  --lib-path path\t\tSpecify a library search path\n"
             "  --mapfile name\t\tCreate a map file\n"
@@ -406,6 +407,14 @@ static void OptHelp (const char* Opt attribute ((unused)),
 
 
 
+static void OptLargeAlignment (const char* Opt attribute ((unused)),
+                               const char* Arg attribute ((unused)))
+/* Don't warn about large alignments */
+{
+    LargeAlignment = 1;
+}
+
+
 static void OptLib (const char* Opt attribute ((unused)), const char* Arg)
 /* Link a library */
 {
@@ -617,6 +626,7 @@ static void ParseCommandLine(void)
         { "--end-group",                 0,      CmdlOptEndGroup         },
         { "--force-import",              1,      OptForceImport          },
         { "--help",                      0,      OptHelp                 },
+        { "--large-alignment",           0,      OptLargeAlignment       },
         { "--lib",                       1,      OptLib                  },
         { "--lib-path",                  1,      OptLibPath              },
         { "--mapfile",                   1,      OptMapFile              },

@@ -6,8 +6,9 @@
 <url url="mailto:gregdk@users.sf.net" name="Greg King">
 
 <abstract>
-cc65 is a C compiler for 6502 targets. It supports several 6502 based home
-computers like the Commodore and Atari machines, but it is easily retargetable.
+cc65 is a C compiler for 6502 targets. It supports several 6502-based home
+computers such as the Commodore and Atari machines, but it easily is
+retargetable.
 </abstract>
 
 <!-- Table of contents -->
@@ -249,7 +250,6 @@ Here is a description of all the command line options:
   <item><tt/strcmp()/
   <item><tt/strcpy()/
   <item><tt/strlen()/
-  <item>most of the functions declared in <tt/&lt;ctype.h&gt;/
   </itemize>
 
   Note: This has two consequences:
@@ -259,9 +259,7 @@ Here is a description of all the command line options:
         using <tt/--eagerly-inline-funcs/ actually will break things.
         <p>
   <item>The inlined string and memory functions will not handle strings or
-        memory areas larger than 255 bytes.  Similarly, the inlined <tt/is..()/
-        functions will not work with values outside the char. range (such as
-        <tt/EOF/).
+        memory areas larger than 255 bytes.
         <p>
   </itemize>
 
@@ -449,10 +447,10 @@ Here is a description of all the command line options:
 
   Use static storage for local variables instead of storage on the stack.
   Since the stack is emulated in software, this gives shorter and usually
-  faster code, but the code is no longer reentrant. The difference between
-  <tt/-Cl/ and declaring local variables as static yourself is, that
-  initializer code is executed each time, the function is entered. So when
-  using
+  faster code, but the code is no longer reentrant as required for recursion.
+  The difference between <tt/-Cl/ and declaring local variables as static
+  yourself is, that initializer code is executed each time, the function is
+  entered. So when using
 
   <tscreen><verb>
         void f (void)
@@ -548,13 +546,25 @@ Here is a description of all the command line options:
         Treat all warnings as errors.
   <tag><tt/no-effect/</tag>
         Warn about statements that don't have an effect.
+  <tag><tt/pointer-sign/</tag>
+        Warn if a pointer assignment changes the signedness of the target
+        of a pointer value, and the new signedness wasn't cast explicitly.
+  <tag><tt/pointer-types/</tag>
+        Warn if a pointer assignment changes the type of the target
+        of a pointer value, and the new type wasn't cast explicitly.
   <tag><tt/remap-zero/</tag>
         Warn about a <tt/<ref id="pragma-charmap" name="#pragma charmap()">/
         that changes a character's code number from/to 0x00.
+  <tag><tt/return-type/</tag>
+        Warn about no return statement in function returning non-void.
   <tag><tt/struct-param/</tag>
         Warn when passing structs by value.
   <tag><tt/unknown-pragma/</tag>
         Warn about #pragmas that aren't recognized by cc65.
+  <tag><tt/unreachable-code/</tag>
+        Warn about unreachable code in cases of comparing constants, etc.
+  <tag><tt/unused-func/</tag>
+        Warn about unused functions.
   <tag><tt/unused-label/</tag>
         Warn about unused labels.
   <tag><tt/unused-param/</tag>
@@ -709,12 +719,13 @@ This cc65 version has some extensions to the ISO C standard.
         places.
         <p>
 
-<item>  There are two pseudo variables named <tt/__AX__/ and <tt/__EAX__/.
-        Both refer to the primary register that is used by the compiler to
-        evaluate expressions or return function results. <tt/__AX__/ is of
-        type <tt/unsigned int/ and <tt/__EAX__/ of type <tt/long unsigned int/
-        respectively. The pseudo variables may be used as lvalue and rvalue as
-        every other variable. They are most useful together with short
+<item>  There are three pseudo variables named <tt/__A__/, <tt/__AX__/ and
+        <tt/__EAX__/. They all refer to the primary register that is used
+        by the compiler to evaluate expressions or return function results.
+        <tt/__A__/ is of type <tt/unsigned char/, <tt/__AX__/ is of type
+        <tt/unsigned int/ and <tt/__EAX__/ of type <tt/long unsigned int/
+        respectively. The pseudo variables may be used as lvalue and rvalue
+        as every other variable. They are most useful together with short
         sequences of assembler code. For example, the macro
 
         <tscreen><verb>
@@ -794,6 +805,26 @@ This cc65 version has some extensions to the ISO C standard.
         operator returns the struct size with the flexible array member having
         size zero, even if it is initialized.
         <p>
+
+<item>  cc65 supports <tt/_Static_assert/ from C11 and C2X.  This is similar
+        to <tt/#error/ but happens at a later stage of translation, so types
+        can be used.
+
+        <tscreen><verb>
+        /* C11 version with message. */
+        _Static_assert (sizeof (int) == 2, "Expected 2-bytes ints.");
+
+        /* C2X version without message. */
+        _Static_assert (sizeof (int) == 2);
+        </verb></tscreen>
+
+        <tt/_Static_assert/ is also available as the macro <tt/static_assert/ in
+        <tt/assert.h/.
+
+<item>  cc65 supports bit-fields of any integral type that is int-sized or
+        smaller, and enumerated types with those types as their underlying
+        type.  (Only <tt/int/, <tt/signed int/, and <tt/unsigned int/ are
+        required by the standard.)
 
 <item>  Computed gotos, a GCC extension, has limited support. With it you can
         use fast jump tables from C. You can take the address of a label with
@@ -991,10 +1022,14 @@ The compiler defines several macros at startup:
 
   This macro is defined if the target is the Supervision (-t supervision).
 
+  <tag><tt>__SYM1__</tt></tag>
+
+  This macro is defined if the target is the Sym-1 (-t sym1).
+
   <tag><tt>__TELESTRAT__</tt></tag>
 
   This macro is defined if the target is the Telestrat (-t telestrat).
-  
+
   <tag><tt>__TIME__</tt></tag>
 
   This macro expands to the time of translation of the preprocessing
@@ -1028,25 +1063,39 @@ parameter with the <tt/#pragma/.
   The <tt/#pragma/ understands the push and pop parameters as explained above.
 
 
-<sect1><tt>#pragma bss-name (&lsqb;push,&rsqb; &lt;name&gt;)</tt><label id="pragma-bss-name"><p>
+<sect1><tt>#pragma bss-name ([push, ]&lt;name>[ ,&lt;addrsize>])</tt><label id="pragma-bss-name"><p>
 
-  This pragma changes the name used for the BSS segment (the BSS segment
-  is used to store uninitialized data). The argument is a string enclosed
-  in double quotes.
+  This pragma changes the name used for the BSS segment (the BSS segment is
+  used to store variables with static storage duration and no explicit
+  initializers). The <tt/name/ argument is a string enclosed in quotation
+  marks.
 
-  Note: The default linker configuration file does only map the standard
-  segments. If you use other segments, you have to create a new linker
-  configuration file.
+  <tt/addrsize/ is an optional string that gives a hint about where the
+  <tt/name/ segment will be put in the CPU's address space.  It describes the
+  width of address numbers that point into that segment.  Only words that
+  are known to ca65 are allowed:
+  <enum>
+  <item>"zp", "zeropage", "direct"
+  <item>"abs", "absolute", "near", "default"
+  <item>"far"
+  <item>"long", "dword"
+  </enum>
 
-  Beware: The startup code will zero only the default BSS segment. If you
-  use another BSS segment, you have to do that yourself, otherwise
-  uninitialized variables do not have the value zero.
+  Note: The default linker configuration file maps only the standard segments.
+  If you use other segments, you must create a new linker configuration file.
 
-  The <tt/#pragma/ understands the push and pop parameters as explained above.
+  Beware: The start-up code will zero only the default BSS segment. If you use
+  another BSS segment, then you must do that yourself; otherwise, variables
+  with static storage duration and no explicit initializer will not have the
+  value zero.
 
-  Example:
+  The <tt/#pragma/ understands the push and pop parameters, as explained above.
+
+  Examples:
   <tscreen><verb>
-        #pragma bss-name ("MyBSS")
+  #pragma bss-name ("MyBSS")
+  #pragma bss-name (push, "MyBSS")
+  #pragma bss-name ("MyBSS", "zp")
   </verb></tscreen>
 
 
@@ -1102,21 +1151,33 @@ parameter with the <tt/#pragma/.
   The <tt/#pragma/ understands the push and pop parameters as explained above.
 
 
-<sect1><tt>#pragma code-name ([push,] &lt;name&gt;)</tt><label id="pragma-code-name"><p>
+<sect1><tt>#pragma code-name ([push, ]&lt;name>[ ,&lt;addrsize>])</tt><label id="pragma-code-name"><p>
 
-  This pragma changes the name used for the CODE segment (the CODE segment
-  is used to store executable code). The argument is a string enclosed in
-  double quotes.
+  This pragma changes the name used for the CODE segment (the CODE segment is
+  used to store executable code). The <tt/name/ argument is a string enclosed
+  in quotation marks.
 
-  Note: The default linker configuration file does only map the standard
-  segments. If you use other segments, you have to create a new linker
-  configuration file.
+  <tt/addrsize/ is an optional string that gives a hint about where the
+  <tt/name/ segment will be put in the CPU's address space.  It describes the
+  width of address numbers that point into that segment.  Only words that
+  are known to ca65 are allowed:
+  <enum>
+  <item>"zp", "zeropage", "direct"
+  <item>"abs", "absolute", "near", "default"
+  <item>"far"
+  <item>"long", "dword"
+  </enum>
 
-  The <tt/#pragma/ understands the push and pop parameters as explained above.
+  Note: The default linker configuration file maps only the standard segments.
+  If you use other segments, you must create a new linker configuration file.
 
-  Example:
+  The <tt/#pragma/ understands the push and pop parameters, as explained above.
+
+  Examples:
   <tscreen><verb>
-        #pragma code-name ("MyCODE")
+  #pragma code-name ("MyCODE")
+  #pragma code-name (push, "MyCODE")
+  #pragma code-name (push, "MyCODE", "far")
   </verb></tscreen>
 
 
@@ -1130,21 +1191,33 @@ parameter with the <tt/#pragma/.
   The <tt/#pragma/ understands the push and pop parameters as explained above.
 
 
-<sect1><tt>#pragma data-name ([push,] &lt;name&gt;)</tt><label id="pragma-data-name"><p>
+<sect1><tt>#pragma data-name ([push, ]&lt;name>[ ,&lt;addrsize>])</tt><label id="pragma-data-name"><p>
 
-  This pragma changes the name used for the DATA segment (the DATA segment
-  is used to store initialized data). The argument is a string enclosed in
-  double quotes.
+  This pragma changes the name used for the DATA segment (the DATA segment is
+  used to store initialized data). The <tt/name/ argument is a string enclosed
+  in quotation marks.
 
-  Note: The default linker configuration file does only map the standard
-  segments. If you use other segments, you have to create a new linker
-  configuration file.
+  <tt/addrsize/ is an optional string that gives a hint about where the
+  <tt/name/ segment will be put in the CPU's address space.  It describes the
+  width of address numbers that point into that segment.  Only words that
+  are known to ca65 are allowed:
+  <enum>
+  <item>"zp", "zeropage", "direct"
+  <item>"abs", "absolute", "near", "default"
+  <item>"far"
+  <item>"long", "dword"
+  </enum>
 
-  The <tt/#pragma/ understands the push and pop parameters as explained above.
+  Note: The default linker configuration file maps only the standard segments.
+  If you use other segments, you must create a new linker configuration file.
 
-  Example:
+  The <tt/#pragma/ understands the push and pop parameters, as explained above.
+
+  Examples:
   <tscreen><verb>
-        #pragma data-name ("MyDATA")
+  #pragma data-name ("MyDATA")
+  #pragma data-name (push, "MyDATA")
+  #pragma data-name ("MyDATA", "zeropage")
   </verb></tscreen>
 
 
@@ -1206,21 +1279,32 @@ parameter with the <tt/#pragma/.
   The <tt/#pragma/ understands the push and pop parameters as explained above.
 
 
-<sect1><tt>#pragma rodata-name ([push,] &lt;name&gt;)</tt><label id="pragma-rodata-name"><p>
+<sect1><tt>#pragma rodata-name ([push, ]&lt;name>[ ,&lt;addrsize>])</tt><label id="pragma-rodata-name"><p>
 
-  This pragma changes the name used for the RODATA segment (the RODATA
-  segment is used to store readonly data). The argument is a string
-  enclosed in double quotes.
+  This pragma changes the name used for the RODATA segment (the RODATA segment
+  is used to store read-only data). The <tt/name/ argument is a string enclosed
+  in quotation marks.
 
-  Note: The default linker configuration file does only map the standard
-  segments. If you use other segments, you have to create a new linker
-  configuration file.
+  <tt/addrsize/ is an optional string that gives a hint about where the
+  <tt/name/ segment will be put in the CPU's address space.  It describes the
+  width of address numbers that point into that segment.  Only words that
+  are known to ca65 are allowed:
+  <enum>
+  <item>"zp", "zeropage", "direct"
+  <item>"abs", "absolute", "near", "default"
+  <item>"far"
+  <item>"long", "dword"
+  </enum>
 
-  The <tt/#pragma/ understands the push and pop parameters as explained above.
+  Note: The default linker configuration file maps only the standard segments.
+  If you use other segments, you must create a new linker configuration file.
 
-  Example:
+  The <tt/#pragma/ understands the push and pop parameters, as explained above.
+
+  Examples:
   <tscreen><verb>
-        #pragma rodata-name ("MyRODATA")
+  #pragma rodata-name ("MyRODATA")
+  #pragma rodata-name (push, "MyRODATA")
   </verb></tscreen>
 
 
@@ -1310,7 +1394,12 @@ parameter with the <tt/#pragma/.
   the <tt/Y/ register if it wraps any variadic functions (they have "<tt/.../"
   in their prototypes).
 
-  The identifier is an 8-bit number that's set into <tt/tmp4/.
+  The identifier is an 8-bit number that's set into <tt/tmp4/. If the identifier
+  is "bank", then ca65's <tt><url url="ca65.html#.BANK" name=".bank"></tt> function will be used
+  to determine the number from the bank attribute defined in the linker config,
+  see <url url="ld65.html#MEMORY" name="Other MEMORY area attributes">. Note that
+  this currently implies that only the least significant 8 bits of the bank attribute
+  can be used.
 
   The address of a wrapped function is passed in <tt/ptr4/.  The wrapper can
   call that function by using "<tt/jsr callptr4/".

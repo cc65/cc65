@@ -7,25 +7,19 @@
 ;
 
         .export         _strnicmp, _strncasecmp
-        .import         popax, popptr1, __ctype
-        .importzp       ptr1, ptr2, ptr3, tmp1
-
+        .import         popax, popptr1
+        .importzp       ptr1, ptr2, ptr3, tmp1, tmp2
+        .import         ctypemaskdirect
         .include        "ctype.inc"
 
 _strnicmp:
 _strncasecmp:
 
-; Convert the given counter value in a/x from a downward counter into an
-; upward counter, so we can increment the counter in the loop below instead
-; of decrementing it. This adds some overhead now, but is cheaper than
-; executing a more complex test in each iteration of the loop. We do also
-; correct the value by one, so we can do the test on top of the loop.
-
-        eor     #$FF
-        sta     ptr3
-        txa
-        eor     #$FF
-        sta     ptr3+1
+        inx
+        stx     ptr3+1
+        tax
+        inx
+        stx     ptr3        ; save count with each byte incremented separately
 
 ; Get the remaining arguments
 
@@ -40,36 +34,34 @@ _strncasecmp:
 
 ; Start of compare loop. Check the counter.
 
-Loop:   inc     ptr3
-        beq     IncHi           ; Increment high byte
+Loop:   dec     ptr3            ; decrement high byte
+        beq     IncHi
 
 ; Compare a byte from the strings
 
 Comp:   lda     (ptr2),y
-        tax
-        lda     __ctype,x       ; get character classification
+        sta     tmp2            ; remember original char
+        jsr     ctypemaskdirect ; get character classification
         and     #CT_LOWER       ; lower case char?
         beq     L1              ; jump if no
-        txa                     ; get character back
-        sec
-        sbc     #<('a'-'A')     ; make upper case char
-        tax                     ;
-L1:     stx     tmp1            ; remember upper case equivalent
+        lda     #<('A'-'a')     ; make upper case char
+        adc     tmp2            ; ctypemaskdirect ensures carry clear!
+        sta     tmp2            ; remember upper case equivalent
 
-        lda     (ptr1),y        ; get character from first string
-        tax
-        lda     __ctype,x       ; get character classification
+L1:     lda     (ptr1),y        ; get character from first string
+        sta     tmp1            ; remember original char
+        jsr     ctypemaskdirect ; get character classification
         and     #CT_LOWER       ; lower case char?
         beq     L2              ; jump if no
-        txa                     ; get character back
-        sec
-        sbc     #<('a'-'A')     ; make upper case char
-        tax
+        lda     #<('A'-'a')     ; make upper case char
+        adc     tmp1            ; ctypemaskdirect ensures carry clear!
+        sta     tmp1            ; remember upper case equivalent
 
-L2:     cpx     tmp1            ; compare characters
-        bne     NotEqual        ; Jump if strings different
-        txa                     ; End of strings?
-        beq     Equal1          ; Jump if EOS reached, a/x == 0
+L2:     ldx     tmp1
+        cpx     tmp2            ; compare characters
+        bne     NotEqual        ; jump if strings different
+        txa                     ; end of strings?
+        beq     Equal1          ; jump if EOS reached, a/x == 0
 
 ; Increment the pointers
 
@@ -77,12 +69,12 @@ L2:     cpx     tmp1            ; compare characters
         bne     Loop
         inc     ptr1+1
         inc     ptr2+1
-        bne     Loop            ; Branch always
+        bne     Loop            ; branch always
 
 ; Increment hi byte
 
-IncHi:  inc     ptr3+1
-        bne     Comp            ; Jump if counter not zero
+IncHi:  dec     ptr3+1
+        bne     Comp            ; jump if counter not zero
 
 ; Exit code if strings are equal. a/x not set
 
@@ -94,8 +86,8 @@ Equal1: rts
 
 NotEqual:
         bcs     L3
-        ldx     #$FF            ; Make result negative
+        ldx     #$FF            ; make result negative
         rts
 
-L3:     ldx     #$01            ; Make result positive
+L3:     ldx     #$01            ; make result positive
         rts

@@ -97,7 +97,9 @@ static void AddLabel (unsigned Addr, attr_t Attr, const char* Name)
              strcmp (SymTab[Addr], Name) == 0))) {
             return;
         }
-        Error ("Duplicate label for address $%04X: %s/%s", Addr, SymTab[Addr], Name);
+        Error ("Duplicate label for address $%04X (%s): '%s'", Addr,
+               SymTab[Addr] == 0 ? "<unnamed label>" : SymTab[Addr],
+               Name == 0 ? "<unnamed label>" : Name);
     }
 
     /* Create a new label (xstrdup will return NULL if input NULL) */

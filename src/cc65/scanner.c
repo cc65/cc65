@@ -86,6 +86,7 @@ static const struct Keyword {
     unsigned char   Std;        /* Token supported in which standards? */
 } Keywords [] = {
     { "_Pragma",        TOK_PRAGMA,     TT_C89 | TT_C99 | TT_CC65  },   /* !! */
+    { "_Static_assert", TOK_STATIC_ASSERT,                TT_CC65  },   /* C11 */
     { "__AX__",         TOK_AX,         TT_C89 | TT_C99 | TT_CC65  },
     { "__A__",          TOK_A,          TT_C89 | TT_C99 | TT_CC65  },
     { "__EAX__",        TOK_EAX,        TT_C89 | TT_C99 | TT_CC65  },
@@ -530,10 +531,12 @@ static void NumericConst (void)
     if (!IsFloat) {
 
         unsigned Types;
-        int      HaveSuffix;
+        unsigned WarnTypes = 0;
 
-        /* Check for a suffix and determine the possible types */
-        HaveSuffix = 1;
+        /* Check for a suffix and determine the possible types. It is always
+        ** possible to convert the data to unsigned long even if the IT_ULONG
+        ** flag were not set, but we are not doing that.
+        */
         if (toupper (CurC) == 'U') {
             /* Unsigned type */
             NextChar ();
@@ -548,17 +551,18 @@ static void NumericConst (void)
             NextChar ();
             if (toupper (CurC) != 'U') {
                 Types = IT_LONG | IT_ULONG;
+                WarnTypes = IT_ULONG;
             } else {
                 NextChar ();
                 Types = IT_ULONG;
             }
         } else {
-            HaveSuffix = 0;
             if (Prefix == 10) {
                 /* Decimal constants are of any type but uint */
                 Types = IT_INT | IT_LONG | IT_ULONG;
+                WarnTypes = IT_LONG | IT_ULONG;
             } else {
-                /* Octal or hex constants are of any type */
+                /* Binary, octal and hex constants can be of any type */
                 Types = IT_INT | IT_UINT | IT_LONG | IT_ULONG;
             }
         }
@@ -568,11 +572,14 @@ static void NumericConst (void)
             /* Out of range for int */
             Types &= ~IT_INT;
             /* If the value is in the range 0x8000..0xFFFF, unsigned int is not
-            ** allowed, and we don't have a type specifying suffix, emit a
-            ** warning, because the constant is of type long.
+            ** allowed, and we don't have a long type specifying suffix, emit a
+            ** warning, because the constant is of type long while the user
+            ** might expect an unsigned int.
             */
-            if (IVal <= 0xFFFF && (Types & IT_UINT) == 0 && !HaveSuffix) {
-                Warning ("Constant is long");
+            if (IVal <= 0xFFFF              &&
+                (Types & IT_UINT) == 0      &&
+                (WarnTypes & IT_LONG) != 0) {
+                Warning ("Integer constant is long");
             }
         }
         if (IVal > 0xFFFF) {
@@ -582,6 +589,15 @@ static void NumericConst (void)
         if (IVal > 0x7FFFFFFF) {
             /* Out of range for long int */
             Types &= ~IT_LONG;
+            /* If the value is in the range 0x80000000..0xFFFFFFFF, decimal,
+            ** and we have no unsigned type specifying suffix, emit a warning,
+            ** because the constant is of type unsigned long while the user
+            ** might expect a signed integer constant, especially if there is
+            ** a preceding unary op or when it is used in constant calculation.
+            */
+            if (WarnTypes & IT_ULONG) {
+                Warning ("Integer constant is unsigned long");
+            }
         }
 
         /* Now set the type string to the smallest type in types */

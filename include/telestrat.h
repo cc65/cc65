@@ -55,9 +55,6 @@
 #define TGI_COLOR_RED           7
 
 
-extern void telestrat_228_200_3_tgi[];
-extern void telestrat_240_200_2_tgi[];      /* Referred to by tgi_static_stddrv[] */
-
 /* Define hardware */
 #include <_6522.h>
 #define VIA     (*(struct __6522*)0x300)
@@ -88,6 +85,8 @@ extern void telestrat_240_200_2_tgi[];      /* Referred to by tgi_static_stddrv[
 #define CH_LTEE         '+'
 #define CH_RTEE         '+'
 #define CH_CROSS        '+'
+#define CH_HLINE        '-'
+#define CH_VLINE        '|'
 #define CH_CURS_UP       11
 #define CH_CURS_DOWN     10
 #define CH_CURS_LEFT      8
@@ -98,6 +97,21 @@ extern void telestrat_240_200_2_tgi[];      /* Referred to by tgi_static_stddrv[
 #define CH_LIRA          95
 #define CH_ESC           27
 
+/* Masks for joy_read */
+#define JOY_UP_MASK     0x10
+#define JOY_DOWN_MASK   0x08
+#define JOY_LEFT_MASK   0x02
+#define JOY_RIGHT_MASK  0x01
+#define JOY_BTN_1_MASK  0x04
+
+#define JOY_FIRE_MASK   JOY_BTN_1_MASK
+#define JOY_FIRE(v)     ((v) & JOY_FIRE_MASK)
+
+
+/* The addresses of the static drivers */
+extern void telestrat_joy[];            /* Referred to by joy_static_stddrv[] */
+extern void telestrat_228_200_3_tgi[];
+extern void telestrat_240_200_2_tgi[];  /* Referred to by tgi_static_stddrv[] */
 
 
 void oups();
@@ -108,6 +122,8 @@ void explode();
 
 void kbdclick1();
 
-
-
-
+/* The following #defines will cause the matching functions calls in conio.h
+** to be overlaid by macros with the same names, saving the function call
+** overhead.
+*/
+#define _bordercolor(color)     COLOR_BLACK

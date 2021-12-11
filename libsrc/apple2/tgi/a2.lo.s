@@ -126,6 +126,10 @@ INIT:
         bit     $C082           ; Switch in ROM
         jsr     SETGR
         bit     MIXCLR
+        .ifdef  __APPLE2ENH__
+        sta     IOUDISON
+        bit     DHIRESOFF
+        .endif
         bit     $C080           ; Switch in LC bank 2 for R/O
 
         ; Done, reset the error code

@@ -189,15 +189,20 @@ port cardridge.
 
 <sect1>Joystick drivers<p>
 
-Telemon 2.4 & 3.0 manages joysticks but it had been handled yet. This means that
-joysticks driver could be written easily.
-
 Telemon 2.4 returns in keyboard buffer the direction of the joysticks. This means that
 if you get input from keyboard by conio cgetc function, you will get direction from joysticks.
 
+Anyway, if you don't want to use ROM, you can use joysticks standard drivers in your code. 
+
+The standard driver manages two joysticks. Only one button is managed for theses joysticks. 
+
+Telestrat can handle one button for the left port, and three buttons for the right port (but this port was designed for a mouse).
+
+If you find a Telestrat mouse (which is almost impossible :), these driver will work too because there is some extra hardware in the mouse to send direction.
+
 <sect1>Mouse drivers<p>
 
-Telestrat manages also mouse, but it had been no handled yet in this version.
+Telestrat manages also mouse (Joystick port)
 Telestrat mouse is really difficult to find.
 
 <sect1>RS232 device drivers<p>

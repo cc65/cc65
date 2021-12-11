@@ -251,7 +251,7 @@ Register variables may give faster and shorter code, but they do also have an
 overhead. Register variables are actually zero page locations, so using them
 saves roughly one cycle per access. The calling routine may also use register
 variables, so the old values have to be saved on function entry and restored
-on exit. Saving an d restoring has an overhead of about 70 cycles per 2 byte
+on exit. Saving and restoring has an overhead of about 70 cycles per 2 byte
 variable. It is easy to see, that - apart from the additional code that is
 needed to save and restore the values - you need to make heavy use of a
 variable to justify the overhead.

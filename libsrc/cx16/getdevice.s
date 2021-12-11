@@ -51,7 +51,7 @@ next:   inx
         jsr     closecmdchannel
         ldx     tmp2
 
-; As we had to reference ST above anyway, we can do so, as well,
+; As we had to reference STATUS above anyway, we can do so, as well,
 ; here too (instead of calling READST).
 
         lda     STATUS

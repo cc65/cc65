@@ -1,13 +1,14 @@
 ;
 ; Name of the standard TGI driver
 ;
-; 2019-11-06, Greg King
+; 2020-06-04, Greg King
 ;
 ; const char tgi_stddrv[];
 ;
 
         .export _tgi_stddrv
 
-.rodata
+; A FAT32 8+3 file-name (for SD cards)
 
-_tgi_stddrv:    .asciiz "cx16-640x4c.tgi"
+.rodata
+_tgi_stddrv:    .asciiz "cx320p1.tgi"

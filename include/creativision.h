@@ -70,9 +70,9 @@
 #define COLOR_WHITE         15
 
 /* Protos */
-void __fastcall__ psg_outb(unsigned char b);
-void __fastcall__ psg_delay(unsigned char b);
-void psg_silence(void);
-void __fastcall__ bios_playsound(void *a, unsigned char b);
+void __fastcall__ psg_outb (unsigned char b);
+void __fastcall__ psg_delay (unsigned char b);
+void psg_silence (void);
+void __fastcall__ bios_playsound (const void *a, unsigned char b);
 
 #endif  /* #ifndef _CVISION_H */

@@ -1,21 +1,28 @@
+; toupper.s
 ;
-; Ullrich von Bassewitz, 02.06.1998
+; This file is part of
+; cc65 - a freeware C compiler for 6502 based systems
+;
+; https://cc65.github.io
+;
+; See "LICENSE" file for legal information.
 ;
 ; int toupper (int c);
 ;
 
         .export         _toupper
-        .import         __ctype
+        .include        "ctype.inc"
+        .import         ctypemaskdirect
 
 _toupper:
-        cpx     #$00            ; Outside valid range?
-        bne     L9              ; If so, return the argument unchanged
-        tay                     ; Get c into Y
-        lda     __ctype,y       ; Get character classification
-        lsr     a               ; Get bit 0 (lower char) into carry
-        tya                     ; Get C back into A
-        bcc     L9              ; Jump if not lower char
-        clc
-        adc     #<('A'-'a')     ; make upper case char
-L9:     rts                     ; CC are set
-
+        cpx     #$00            ; out of range?
+        bne     @L2             ; if so, return the argument unchanged
+        tay                     ; save char
+        jsr     ctypemaskdirect ; get character classification
+        and     #CT_LOWER       ; lower case char?
+        beq     @L1             ; jump if no
+        tya                     ; restore char
+        adc     #<('A'-'a')     ; make upper case char (ctypemaskdirect ensures carry clear)
+        rts
+@L1:    tya                     ; restore char
+@L2:    rts

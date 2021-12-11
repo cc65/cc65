@@ -10,11 +10,13 @@ Please note:
     similar systems. If you're using Windows, then consider installing Cygwin
     or MSys2.
 
-  * The makefile specifies the C64 as the default target system because all
-    but three of the programs run on that platform. When compiling for another
-    system, you will have to change the line that specifies the target system
-    at the top of the makefile, specify the system with SYS=<target> on the
-    make command line, or set a SYS environment variable.
+  * The makefile specifies the C64 as the default target system because most
+    of the programs run on that platform. When compiling for another system,
+    you will have to change the line that specifies the target system at the
+    top of the makefile, specify the system with SYS=<target> on the make
+    command line, or set a SYS environment variable. For example:
+
+    make SYS=apple2
 
   * Use "make disk" to build a disk image with all sample programs.
 
@@ -32,11 +34,6 @@ Description:    Shows the ASCII (or ATASCII, PETSCII) codes of typed
 Platforms:      All platforms with conio or stdio (compile time configurable).
 
 -----------------------------------------------------------------------------
-Name:           atari2600hello
-Description:    A "Hello world" type program.
-Platforms:      Runs on only the Atari 2600 Video Console System.
-
------------------------------------------------------------------------------
 Name:           diodemo
 Description:    A disc copy program written and contributed by Oliver
                 Schmidt, <ol.sc@web.de>. Supports single or dual disc copy.
@@ -51,12 +48,6 @@ Description:    Enumerates all devices, directories, and files. Written and
 Platforms:      All systems with device enumeration and directory access
                 (currently the Commodore machines, the Commander X16,
                 and the Apple ][).
-
------------------------------------------------------------------------------
-Name:           fire
-Description:    Another graphics demo written by groepaz/hitmen.
-Platforms:      The program currently is running on only the C64, but should
-                be portable to the C128 and CBM510 (and maybe more machines).
 
 -----------------------------------------------------------------------------
 Name:           gunzip65
@@ -76,8 +67,8 @@ Platforms:      Runs on all platforms that support conio, which means:
 -----------------------------------------------------------------------------
 Name:           mandelbrot
 Description:    A mandelbrot demo using integer arithmetic. The demo was
-                written by groepaz/hitmen, and converted to cc65 using TGI
-                graphics by Stephan Haubenthal.
+                written by groepaz, and converted to cc65 using TGI graphics
+                by Stephan Haubenthal.
 Platforms:      Runs on all platforms that have TGI support:
                 Apple ][, Atari, C64, C128, Oric Atmos and Telestrat, GEOS,
                 NES, and Lynx.
@@ -98,25 +89,11 @@ Platforms:      All systems with an overlay linker config., disk directory
                 the Atari, and the Apple ][).
 
 -----------------------------------------------------------------------------
-Name:           nachtm
-Description:    Plays "Eine kleine Nachtmusik" by Wolfgang Amadeus Mozart.
-Platforms:      All systems that have the Commodore SID (Sound Interface
-                Device):
-                C64, C128, CBM510, CBM610.
-
------------------------------------------------------------------------------
 Name:           overlaydemo
 Description:    Shows how to load overlay files from disk. Written and
                 contributed by Oliver Schmidt, <ol.sc@web.de>.
 Platforms:      All systems with an overlay linker config. (currently the C64,
                 the C128, the Atari, and the Apple ][).
-
------------------------------------------------------------------------------
-Name:           plasma
-Description:    A fancy graphics demo written by groepaz/hitmen.
-Platforms:      The program needs a VIC-II or a TED, so it runs on the following
-                systems:
-                C64, C128, CBM510, Plus/4.
 
 -----------------------------------------------------------------------------
 Name:           sieve
@@ -129,14 +106,52 @@ Platforms:      All systems with conio and clock support:
                 support).
 
 -----------------------------------------------------------------------------
-Name:           supervisionhello
-Description:    A "Hello world" type program.
-Platforms:      Runs on only the Watara Supervision game console.
-
------------------------------------------------------------------------------
 Name:           tgidemo
 Description:    Shows some of the graphics capabilities of the "Tiny Graphics
                 Interface".
 Platforms:      Runs on all platforms that have TGI support:
                 Apple ][, Atari, C64, C128, Oric Atmos and Telestrat, GEOS,
                 NES, and Lynx.
+
+=============================================================================
+
+Platform specific samples follow:
+
+atari 2600:
+-----------
+
+Name:           hello
+Description:    A "Hello world" type program.
+Platforms:      Runs on only the Atari 2600 Video Console System.
+-----------------------------------------------------------------------------
+
+cbm:
+----
+
+Name:           fire
+Description:    Another graphics demo written by groepaz.
+Platforms:      C64, C128, CBM510
+
+-----------------------------------------------------------------------------
+Name:           nachtm
+Description:    Plays "Eine kleine Nachtmusik" by Wolfgang Amadeus Mozart.
+Platforms:      All systems that have the Commodore SID (Sound Interface
+                Device):
+                C64, C128, CBM510, CBM610.
+
+-----------------------------------------------------------------------------
+Name:           plasma
+Description:    A fancy graphics demo written by groepaz.
+Platforms:      The program needs a VIC-II or a TED, so it runs on the following
+                systems:
+                C64, C128, CBM510, Plus/4.
+-----------------------------------------------------------------------------
+
+
+supervision:
+------------
+
+Name:           hello
+Description:    A "Hello world" type program.
+Platforms:      Runs on only the Watara Supervision game console.
+----------------------------------------------------------------------------

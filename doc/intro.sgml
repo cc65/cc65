@@ -6,6 +6,7 @@
 <url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:cbmnut@hushmail.com" name="CbmNut">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">,<newline>
+<url url="mailto:groepaz@gmx.net" name="Groepaz">,<newline>
 <url url="mailto:stephan.muehlstrasser@web.de" name="Stephan M&uuml;hlstrasser">
 
 <abstract>
@@ -458,12 +459,8 @@ Substitute the name of a Commodore computer for that <tt/&lt;sys&gt;/:
 Start the desired version of the emulator (CBM610 programs run on
 the CBM II &lsqb;<tt/xcbm2/&rsqb; emulator).
 
-In the Windows versions of VICE, choose <bf>File&gt;Autoboot disk/tape
-image...</bf>, choose your executable, and click <bf/OK/.
-
-In the Unix versions, hold down the mouse's first button. Move the pointer to
-<bf>Smart-attach disk/tape...</bf>, and release the button. Choose your
-executable, and click <bf/Autostart/.
+Choose <bf>File&gt;Autostart disk/tape image...</bf>, choose your executable, 
+and click <bf/OK/.
 
 The file has a 14-byte header which corresponds to a PRG-format BASIC program,
 consisting of a single line, similar to this:
@@ -497,6 +494,29 @@ RUN "HELLO"
 
 The output will appear on a separate line, and you will be returned to a BASIC
 prompt.
+
+
+<sect1>Gamate<p>
+
+Before you can run the cartridge image produced by the linker, the binary has to
+be patched using the <bf/gamate-fixcart/ tool that is included in the cc65
+package in the util/gamata directory.
+
+<tscreen><verb>
+gamate-fixcart <image.bin>
+</verb></tscreen>
+
+<sect2>MESS<p>
+Available at <url
+url="https://www.mamedev.org">:
+
+MESS (Multiple Emulator Super System) is a multi system emulator that emulates
+various cc65 targets. It once started as a MAME fork, but was marged into MAME
+again at some point.
+
+<tscreen><verb>
+mess gamate -debug -window -skip_gameinfo -cart <image.bin>
+</verb></tscreen>
 
 
 <sect1>GEOS<p>
@@ -535,17 +555,8 @@ feature on.
 </quote>
 
 <quote>
-VICE even has different ways that depend on which operating system is running
-the emulator.
-<itemize>
-<item>In Windows, you must click on <bf/Options/ (in an always visible menu).
-      Then, you must click on <bf/True drive emulation/.
-<item>In Unix, you must <em/hold down/ the second button on your mouse.  Move
-      the pointer down to <bf/Drive settings/.  Then, move the pointer over to
-      <bf/Enable true drive emulation/.  (If there is a check-mark in front of
-      those words, that feature already is turned on -- then, move the pointer
-      off of that menu.) Release the mouse button.
-</itemize>
+In VICE, got to <bf/Settings/ -> <bf/Settings/, then <bf/Peripherial devices/ ->
+<bf/Drive/. Then, you must enable the <bf/True drive emulation/ checkbox.
 </quote>
 
 Find the <bf/CONVERT/ program on the boot disk &lsqb;tap the 6-key; then, you
@@ -571,6 +582,29 @@ directory notePad.  Look at the eight file-positions on each page until you see
 
 The output is shown in a GEOS dialog box; click <bf/OK/ when you have finished
 reading it.
+
+Alternatively you can use the <bf/c1541/ program that comes with VICE to write the
+file to a disk image directly in GEOS format, so it can be used in GEOS directly
+without having to use the <bf/CONVERT/ program.
+
+<tscreen><verb>
+c1541 -attach geos.d64 -geoswrite hello1
+</verb></tscreen>
+
+
+<sect1>Nintendo Entertainment System<p>
+
+<sect2>Mednafen (NES)<p>
+Available at <url
+url="https://mednafen.github.io/releases/">:
+
+Mednafen is a multi system emulator that emulates a couple of the supported
+targets of cc65: Apple II/II+, Atari Lynx, Nintendo Entertainment System and
+PC Engine/TurboGrafx 16.
+
+<tscreen><verb>
+mednafen -force_module nes <image.bin>
+</verb></tscreen>
 
 
 <sect1>Ohio Scientific Challenger 1P<p>
@@ -692,6 +726,32 @@ Press <RETURN>.
 </verb></tscreen>
 
 After hitting the RETURN key, you should see the boot prompt again.
+
+
+<sect1>PC Engine/TurboGrafx 16<p>
+
+For the cartridge image produced by the linker to work in emulators and on real
+hardware, its content must be rearranged so the first 8k block becomes the last
+8k block in the image.
+
+For example, for a 32k image this can be done using <bf/dd/ as follows:
+
+<tscreen><verb>
+dd if=infile.bin bs=8K skip=3 > outfile.pce
+dd if=infile.bin bs=8K count=3 >> outfile.pce
+</verb></tscreen>
+
+<sect2>Mednafen<p>
+Available at <url
+url="https://mednafen.github.io/releases/">:
+
+Mednafen is a multi system emulator that emulates a couple of the supported
+targets of cc65: Apple II/II+, Atari Lynx, Nintendo Entertainment System and
+PC Engine/TurboGrafx 16.
+
+<tscreen><verb>
+mednafen -force_module pce <image.pce>
+</verb></tscreen>
 
 
 <sect1>Contributions wanted<p>

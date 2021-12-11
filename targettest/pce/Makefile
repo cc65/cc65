@@ -42,14 +42,15 @@ else
 COUNT := 1
 endif
 
-all: conio.pce
+all: conio.bin
+
+%.bin: %.c
+	$(CL) -t pce $< -Wl -D__CARTSIZE__=${CARTSIZE} -m $*.map -o $@
+	@echo "use 'make conio.pce' to produce a .pce file using dd"
 
 %.pce: %.bin
 	dd if=$< bs=8K skip=${COUNT} > $@
 	dd if=$< bs=8K count=${COUNT} >> $@
-
-%.bin: %.c
-	$(CL) -t pce $< -Wl -D__CARTSIZE__=${CARTSIZE} -m $*.map -o $@
 
 clean:
 	@$(DEL) conio.o conio.??? 2>$(NULLDEV)

@@ -1,10 +1,19 @@
 ;
 ; Ullrich von Bassewitz, 19.11.2002
 ;
-; C128 kernal functions
+; C128 Kernal functions
 ;
 
         .include "cbm_kernal.inc"
+
+        .export         KBDREAD
+        .export         CLRSCR
+        .export         PRINT
+        .export         NEWLINE
+        .export         CURS_SET
+        .export         CURS_ON
+        .export         CURS_OFF
+        .export         NMIEXIT
 
         .export         C64MODE
         .export         SWAPPER
@@ -37,7 +46,9 @@
         .export         CKOUT
         .export         CLRCH
         .export         BASIN
+        .export         CHRIN
         .export         BSOUT
+        .export         CHROUT
         .export         LOAD
         .export         SAVE
         .export         SETTIM

@@ -36,6 +36,7 @@
 #include <string.h>
 
 /* cc65 */
+#include "error.h"
 #include "funcdesc.h"
 #include "global.h"
 #include "symtab.h"
@@ -46,51 +47,6 @@
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
-
-
-
-static void SetResult (typecmp_t* Result, typecmp_t Val)
-/* Set a new result value if it is less than the existing one */
-{
-    if (Val < *Result) {
-        /* printf ("SetResult = %d\n", Val); */
-        *Result = Val;
-    }
-}
-
-
-
-static int ParamsHaveDefaultPromotions (const FuncDesc* F)
-/* Check if any of the parameters of function F has a default promotion. In
-** this case, the function is not compatible with an empty parameter name list
-** declaration.
-*/
-{
-    /* Get the symbol table */
-    const SymTable* Tab = F->SymTab;
-
-    /* Get the first parameter in the list */
-    const SymEntry* Sym = Tab->SymHead;
-
-    /* Walk over all parameters */
-    while (Sym && (Sym->Flags & SC_PARAM)) {
-
-        /* If this is an integer type, check if the promoted type is equal
-        ** to the original type. If not, we have a default promotion.
-        */
-        if (IsClassInt (Sym->Type)) {
-            if (IntPromotion (Sym->Type) != Sym->Type) {
-                return 1;
-            }
-        }
-
-        /* Get the pointer to the next param */
-        Sym = Sym->NextSym;
-    }
-
-    /* No default promotions in the parameter list */
-    return 0;
-}
 
 
 
@@ -111,8 +67,8 @@ static int EqualFuncParams (const FuncDesc* F1, const FuncDesc* F2)
     while (Sym1 && (Sym1->Flags & SC_PARAM) && Sym2 && (Sym2->Flags & SC_PARAM)) {
 
         /* Get the symbol types */
-        Type* Type1 = Sym1->Type;
-        Type* Type2 = Sym2->Type;
+        const Type* Type1 = Sym1->Type;
+        const Type* Type2 = Sym2->Type;
 
         /* If either of both functions is old style, apply the default
         ** promotions to the parameter type.
@@ -129,7 +85,7 @@ static int EqualFuncParams (const FuncDesc* F1, const FuncDesc* F2)
         }
 
         /* Compare this field */
-        if (TypeCmp (Type1, Type2) < TC_EQUAL) {
+        if (TypeCmp (Type1, Type2).C < TC_EQUAL) {
             /* Field types not equal */
             return 0;
         }
@@ -148,37 +104,135 @@ static int EqualFuncParams (const FuncDesc* F1, const FuncDesc* F2)
 
 
 
-static int EqualSymTables (SymTable* Tab1, SymTable* Tab2)
-/* Compare two symbol tables. Return 1 if they are equal and 0 otherwise */
+static void SetResult (typecmp_t* Result, typecmpcode_t Val)
+/* Set a new result value if it is less than the existing one */
 {
-    /* Compare the parameter lists */
-    SymEntry* Sym1 = Tab1->SymHead;
-    SymEntry* Sym2 = Tab2->SymHead;
-
-    /* Compare the fields */
-    while (Sym1 && Sym2) {
-
-        /* Compare the names of this field */
-        if (!HasAnonName (Sym1) || !HasAnonName (Sym2)) {
-            if (strcmp (Sym1->Name, Sym2->Name) != 0) {
-                /* Names are not identical */
-                return 0;
+    if (Val < Result->C) {
+        if (Result->Indirections > 0) {
+            if (Val >= TC_STRICT_COMPATIBLE) {
+                /* Arrays etc. */
+                Result->C = Val;
+            } else if (Result->Indirections == 1) {
+                /* C Standard allows implicit conversion as long as one side is
+                ** a pointer to void type, but doesn't care which side is.
+                */
+                if ((Result->F & TCF_MASK_VOID_PTR) != 0) {
+                    Result->C = TC_VOID_PTR;
+                } else if (Val == TC_SIGN_DIFF) {
+                    /* Special treatment with pointee signedness difference */
+                    Result->C = TC_PTR_SIGN_DIFF;
+                } else {
+                    /* Incompatible */
+                    Result->C = TC_PTR_INCOMPATIBLE;
+                }
+            } else {
+                /* Pointer-to-pointer types must have compatible pointte types,
+                ** or they are just incompatible.
+                */
+                Result->C = TC_PTR_INCOMPATIBLE;
             }
+        } else {
+            Result->C = Val;
         }
+        /* printf ("SetResult = %d\n", Val); */
+    }
+}
 
-        /* Compare the types of this field */
-        if (TypeCmp (Sym1->Type, Sym2->Type) < TC_EQUAL) {
-            /* Field types not equal */
-            return 0;
+
+
+static typecmp_t* CmpQuals (const Type* lhst, const Type* rhst, typecmp_t* Result)
+/* Copare the types regarding thier qualifiers. Return the Result */
+{
+    TypeCode LeftQual, RightQual;
+
+    /* Get the left and right qualifiers */
+    LeftQual  = GetQualifier (lhst);
+    RightQual = GetQualifier (rhst);
+
+    /* If type is function without a calling convention set explicitly,
+    ** then assume the default one.
+    */
+    if (IsTypeFunc (lhst)) {
+        if ((LeftQual & T_QUAL_CCONV) == T_QUAL_NONE) {
+            LeftQual |= (AutoCDecl || IsVariadicFunc (lhst)) ? T_QUAL_CDECL : T_QUAL_FASTCALL;
         }
-
-        /* Get the pointers to the next fields */
-        Sym1 = Sym1->NextSym;
-        Sym2 = Sym2->NextSym;
+    }
+    if (IsTypeFunc (rhst)) {
+        if ((RightQual & T_QUAL_CCONV) == T_QUAL_NONE) {
+            RightQual |= (AutoCDecl || IsVariadicFunc (rhst)) ? T_QUAL_CDECL : T_QUAL_FASTCALL;
+        }
     }
 
-    /* Check both pointers against NULL to compare the field count */
-    return (Sym1 == 0 && Sym2 == 0);
+    /* Default address size qualifiers */
+    if ((LeftQual & T_QUAL_ADDRSIZE) == T_QUAL_NONE) {
+        LeftQual |= (IsTypeFunc (lhst) ? CodeAddrSizeQualifier () : DataAddrSizeQualifier ());
+    }
+    if ((RightQual & T_QUAL_ADDRSIZE) == T_QUAL_NONE) {
+        RightQual |= (IsTypeFunc (rhst) ? CodeAddrSizeQualifier () : DataAddrSizeQualifier ());
+    }
+
+    /* Just return if nothing to do */
+    if (LeftQual == RightQual) {
+        return Result;
+    }
+
+    /* On the first indirection level, different qualifiers mean that the types
+    ** are still compatible. On the second level, that is a (maybe minor) error.
+    ** We create a special return-code if a qualifier is dropped from a pointer.
+    ** But, different calling conventions are incompatible. Starting from the
+    ** next level, the types are incompatible if the qualifiers differ.
+    */
+    /* (Debugging statement) */
+    /* printf ("Ind = %d    %06X != %06X\n", Result->Indirections, LeftQual, RightQual); */
+    switch (Result->Indirections) {
+        case 0:
+            /* Compare C qualifiers */
+            if ((LeftQual & T_QUAL_CVR) > (RightQual & T_QUAL_CVR)) {
+                Result->F |= TCF_QUAL_IMPLICIT;
+            } else if ((LeftQual & T_QUAL_CVR) != (RightQual & T_QUAL_CVR)) {
+                Result->F |= TCF_QUAL_DIFF;
+            }
+
+            /* Compare address size qualifiers */
+            if ((LeftQual & T_QUAL_ADDRSIZE) != (RightQual & T_QUAL_ADDRSIZE)) {
+                Result->F |= TCF_ADDRSIZE_QUAL_DIFF;
+            }
+
+            /* Compare function calling conventions */
+            if ((LeftQual & T_QUAL_CCONV) != (RightQual & T_QUAL_CCONV)) {
+                SetResult (Result, TC_INCOMPATIBLE);
+            }
+            break;
+
+        case 1:
+            /* A non-const value on the right is compatible to a
+            ** const one to the left, same for volatile.
+            */
+            if ((LeftQual & T_QUAL_CVR) > (RightQual & T_QUAL_CVR)) {
+                Result->F |= TCF_PTR_QUAL_IMPLICIT;
+            } else if ((LeftQual & T_QUAL_CVR) != (RightQual & T_QUAL_CVR)) {
+                Result->F |= TCF_PTR_QUAL_DIFF;
+            }
+
+            /* Compare address size qualifiers */
+            if ((LeftQual & T_QUAL_ADDRSIZE) != (RightQual & T_QUAL_ADDRSIZE)) {
+                Result->F |= TCF_ADDRSIZE_QUAL_DIFF;
+            }
+
+            /* Compare function calling conventions */
+            if ((!IsTypeFunc (lhst) && !IsTypeFunc (rhst))  ||
+                (LeftQual & T_QUAL_CCONV) == (RightQual & T_QUAL_CCONV)) {
+                break;
+            }
+            /* else fall through */
+
+        default:
+            /* Pointer types mismatch */
+            SetResult (Result, TC_INCOMPATIBLE);
+            break;
+    }
+
+    return Result;
 }
 
 
@@ -186,47 +240,57 @@ static int EqualSymTables (SymTable* Tab1, SymTable* Tab2)
 static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
 /* Recursively compare two types. */
 {
-    unsigned    Indirections;
-    unsigned    ElementCount;
     SymEntry*   Sym1;
     SymEntry*   Sym2;
-    SymTable*   Tab1;
-    SymTable*   Tab2;
     FuncDesc*   F1;
     FuncDesc*   F2;
+    TypeCode    LeftType, RightType;
+    long        LeftCount, RightCount;
 
-
-    /* Initialize stuff */
-    Indirections = 0;
-    ElementCount = 0;
 
     /* Compare two types. Determine, where they differ */
     while (lhs->C != T_END) {
 
-        TypeCode LeftType, RightType;
-        TypeCode LeftSign, RightSign;
-        TypeCode LeftQual, RightQual;
-        long LeftCount, RightCount;
-
         /* Check if the end of the type string is reached */
         if (rhs->C == T_END) {
             /* End of comparison reached */
+            break;
+        }
+
+        /* Compare qualifiers */
+        if (CmpQuals (lhs, rhs, Result)->C == TC_INCOMPATIBLE) {
             return;
         }
 
-        /* Get the left and right types, signs and qualifiers */
+        /* Get the left and right types */
         LeftType  = (GetUnderlyingTypeCode (lhs) & T_MASK_TYPE);
         RightType = (GetUnderlyingTypeCode (rhs) & T_MASK_TYPE);
-        LeftSign  = GetSignedness (lhs);
-        RightSign = GetSignedness (rhs);
-        LeftQual  = GetQualifier (lhs);
-        RightQual = GetQualifier (rhs);
 
-        /* If the left type is a pointer and the right is an array, both
-        ** are compatible.
+        /* If one side is a pointer and the other side is an array, both are
+        ** compatible.
         */
         if (LeftType == T_TYPE_PTR && RightType == T_TYPE_ARRAY) {
             RightType = T_TYPE_PTR;
+            SetResult (Result, TC_PTR_DECAY);
+        }
+        if (LeftType == T_TYPE_ARRAY && RightType == T_TYPE_PTR) {
+            LeftType = T_TYPE_PTR;
+            SetResult (Result, TC_STRICT_COMPATIBLE);
+        }
+
+        /* Bit-fields are considered compatible if they have the same
+        ** signedness, bit-offset and bit-width.
+        */
+        if (IsTypeBitField (lhs) || IsTypeBitField (rhs)) {
+            if (!IsTypeBitField (lhs)           ||
+                !IsTypeBitField (rhs)           ||
+                lhs->A.B.Offs  != rhs->A.B.Offs ||
+                lhs->A.B.Width != rhs->A.B.Width) {
+                SetResult (Result, TC_INCOMPATIBLE);
+            }
+            if (LeftType != RightType) {
+                SetResult (Result, TC_STRICT_COMPATIBLE);
+            }
         }
 
         /* If the underlying types are not identical, the types are incompatible */
@@ -235,71 +299,67 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
             return;
         }
 
-        /* On indirection level zero, a qualifier or sign difference is
-        ** accepted. The types are no longer equal, but compatible.
-        */
-        if (LeftSign != RightSign) {
-            if (ElementCount == 0) {
-                SetResult (Result, TC_SIGN_DIFF);
-            } else {
-                SetResult (Result, TC_INCOMPATIBLE);
-                return;
-            }
-        }
+        /* Enums must be handled specially */
+        if ((IsTypeEnum (lhs) || IsTypeEnum (rhs))) {
 
-        if (LeftType == T_TYPE_FUNC) {
-            /* If a calling convention wasn't set explicitly,
-            ** then assume the default one.
-            */
-            if ((LeftQual & T_QUAL_CCONV) == T_QUAL_NONE) {
-                LeftQual |= (AutoCDecl || IsVariadicFunc (lhs)) ? T_QUAL_CDECL : T_QUAL_FASTCALL;
-            }
-            if ((RightQual & T_QUAL_CCONV) == T_QUAL_NONE) {
-                RightQual |= (AutoCDecl || IsVariadicFunc (rhs)) ? T_QUAL_CDECL : T_QUAL_FASTCALL;
-            }
-        }
+            /* Compare the tag types */
+            Sym1 = IsTypeEnum (lhs) ? GetESUSymEntry (lhs) : 0;
+            Sym2 = IsTypeEnum (rhs) ? GetESUSymEntry (rhs) : 0;
 
-        if (LeftQual != RightQual) {
-            /* On the first indirection level, different qualifiers mean
-            ** that the types still are compatible. On the second level,
-            ** that is a (maybe minor) error. We create a special return-code
-            ** if a qualifier is dropped from a pointer. But, different calling
-            ** conventions are incompatible. Starting from the next level,
-            ** the types are incompatible if the qualifiers differ.
-            */
-            /* (Debugging statement) */
-            /* printf ("Ind = %d    %06X != %06X\n", Indirections, LeftQual, RightQual); */
-            switch (Indirections) {
-                case 0:
+            if (Sym1 != Sym2) {
+                if (Sym1 == 0 || Sym2 == 0) {
+
+                    /* Only one is an enum. So they can't be identical */
                     SetResult (Result, TC_STRICT_COMPATIBLE);
-                    break;
 
-                case 1:
-                    /* A non-const value on the right is compatible to a
-                    ** const one to the left, same for volatile.
+                } else {
+                    /* For the two to be identical, they must be in the same
+                    ** scope and have the same name.
                     */
-                    if ((LeftQual & T_QUAL_CONST) < (RightQual & T_QUAL_CONST) ||
-                        (LeftQual & T_QUAL_VOLATILE) < (RightQual & T_QUAL_VOLATILE)) {
-                        SetResult (Result, TC_QUAL_DIFF);
-                    } else {
-                        SetResult (Result, TC_STRICT_COMPATIBLE);
-                    }
+                    if (Sym1->Owner != Sym2->Owner ||
+                        strcmp (Sym1->Name, Sym2->Name) != 0) {
 
-                    if (LeftType != T_TYPE_FUNC || (LeftQual & T_QUAL_CCONV) == (RightQual & T_QUAL_CCONV)) {
-                        break;
+                        /* If any one of the two is incomplete, we can't guess
+                        ** their underlying types and have to assume that they
+                        ** be incompatible.
+                        */
+                        if (SizeOf (lhs) == 0 || SizeOf (rhs) == 0) {
+                            SetResult (Result, TC_INCOMPATIBLE);
+                            return;
+                        }
                     }
-                    /* else fall through */
-
-                default:
-                    SetResult (Result, TC_INCOMPATIBLE);
-                    return;
+                }
             }
+
+        }
+
+        /* 'char' is neither 'signed char' nor 'unsigned char' */
+        if ((IsISOChar (lhs) && !IsISOChar (rhs)) ||
+            (!IsISOChar (lhs) && IsISOChar (rhs))) {
+            SetResult (Result, TC_SIGN_DIFF);
+        }
+
+        /* On indirection level zero, a sign difference is accepted.
+        ** The types are no longer equal, but compatible.
+        */
+        if (GetSignedness (lhs) != GetSignedness (rhs)) {
+            SetResult (Result, TC_SIGN_DIFF);
         }
 
         /* Check for special type elements */
         switch (LeftType) {
             case T_TYPE_PTR:
-                ++Indirections;
+                ++Result->Indirections;
+                if (Result->Indirections == 1) {
+                    if ((GetUnderlyingTypeCode (lhs + 1) & T_MASK_TYPE) == T_TYPE_VOID) {
+                        Result->F |= TCF_VOID_PTR_ON_LEFT;
+                    }
+                    if ((GetUnderlyingTypeCode (rhs + 1) & T_MASK_TYPE) == T_TYPE_VOID) {
+                        Result->F |= TCF_VOID_PTR_ON_RIGHT;
+                    }
+                } else {
+                    Result->F &= ~TCF_MASK_VOID_PTR;
+                }
                 break;
 
             case T_TYPE_FUNC:
@@ -307,29 +367,16 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
                 F1 = GetFuncDesc (lhs);
                 F2 = GetFuncDesc (rhs);
 
-                /* If one of both functions has an empty parameter list (which
-                ** does also mean, it is not a function definition, because the
-                ** flag is reset in this case), it is considered equal to any
-                ** other definition, provided that the other has no default
-                ** promotions in the parameter list. If none of both parameter
-                ** lists is empty, we have to check the parameter lists and
-                ** other attributes.
+                /* If one of both function declarations has an empty parameter
+                ** list (which does also mean, it is not a function definition,
+                ** because the flag is reset in this case), it is ignored for
+                ** parameter comparison and considered equal to the other one,
+                ** provided both have the same return type and other attributes.
+                ** If neither of both parameter lists is empty, we have to check
+                ** the parameter lists.
                 */
-                if (F1->Flags & FD_EMPTY) {
-                    if ((F2->Flags & FD_EMPTY) == 0) {
-                        if (ParamsHaveDefaultPromotions (F2)) {
-                            /* Flags differ */
-                            SetResult (Result, TC_INCOMPATIBLE);
-                            return;
-                        }
-                    }
-                } else if (F2->Flags & FD_EMPTY) {
-                    if (ParamsHaveDefaultPromotions (F1)) {
-                        /* Flags differ */
-                        SetResult (Result, TC_INCOMPATIBLE);
-                        return;
-                    }
-                } else {
+                if ((F1->Flags & FD_EMPTY) == 0 &&
+                    (F2->Flags & FD_EMPTY) == 0) {
 
                     /* Check the remaining flags */
                     if ((F1->Flags & ~FD_IGNORE) != (F2->Flags & ~FD_IGNORE)) {
@@ -353,64 +400,57 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
                 /* Check member count */
                 LeftCount  = GetElementCount (lhs);
                 RightCount = GetElementCount (rhs);
-                if (LeftCount  != UNSPECIFIED &&
-                    RightCount != UNSPECIFIED &&
-                    LeftCount  != RightCount) {
-                    /* Member count given but different */
-                    SetResult (Result, TC_INCOMPATIBLE);
-                    return;
+                if (LeftCount != RightCount) {
+                    if (LeftCount  != UNSPECIFIED &&
+                        RightCount != UNSPECIFIED) {
+                        /* Member count given but different */
+                        SetResult (Result, TC_INCOMPATIBLE);
+                        return;
+                    }
+
+                    /* We take into account which side is more specified */
+                    if (LeftCount == UNSPECIFIED) {
+                        SetResult (Result, TC_UNSPECIFY);
+                    } else {
+                        SetResult (Result, TC_EQUAL);
+                    }
                 }
                 break;
 
             case T_TYPE_STRUCT:
             case T_TYPE_UNION:
-                /* Compare the fields recursively. To do that, we fetch the
-                ** pointer to the struct definition from the type, and compare
-                ** the fields.
-                */
-                Sym1 = GetSymEntry (lhs);
-                Sym2 = GetSymEntry (rhs);
+                /* Compare the tag types */
+                Sym1 = GetESUSymEntry (lhs);
+                Sym2 = GetESUSymEntry (rhs);
 
-                /* If one symbol has a name, the names must be identical */
-                if (!HasAnonName (Sym1) || !HasAnonName (Sym2)) {
-                    if (strcmp (Sym1->Name, Sym2->Name) != 0) {
-                        /* Names are not identical */
+                CHECK (Sym1 != 0 || Sym2 != 0);
+
+                if (Sym1 != Sym2) {
+                    /* Both must be in the same scope and have the same name to
+                    ** be identical.
+                    */
+                    if (Sym1->Owner != Sym2->Owner ||
+                        strcmp (Sym1->Name, Sym2->Name) != 0) {
+                        /* This shouldn't happen in the current code base, but
+                        ** we still handle this case to be future-proof.
+                        */
                         SetResult (Result, TC_INCOMPATIBLE);
                         return;
                     }
                 }
 
-                /* Get the field tables from the struct entry */
-                Tab1 = Sym1->V.S.SymTab;
-                Tab2 = Sym2->V.S.SymTab;
-
-                /* One or both structs may be forward definitions. In this case,
-                ** the symbol tables are both non existant. Assume that the
-                ** structs are equal in this case.
-                */
-                if (Tab1 != 0 && Tab2 != 0) {
-
-                    if (EqualSymTables (Tab1, Tab2) == 0) {
-                        /* Field lists are not equal */
-                        SetResult (Result, TC_INCOMPATIBLE);
-                        return;
-                    }
-
-                }
-
-                /* Structs are equal */
+                /* Both are identical */
                 break;
         }
 
         /* Next type string element */
         ++lhs;
         ++rhs;
-        ++ElementCount;
     }
 
-    /* Check if end of rhs reached */
-    if (rhs->C == T_END) {
-        SetResult (Result, TC_EQUAL);
+    /* Check if lhs and rhs both reached ends */
+    if (lhs->C == T_END && rhs->C == T_END) {
+        SetResult (Result, TC_IDENTICAL);
     } else {
         SetResult (Result, TC_INCOMPATIBLE);
     }
@@ -422,7 +462,7 @@ typecmp_t TypeCmp (const Type* lhs, const Type* rhs)
 /* Compare two types and return the result */
 {
     /* Assume the types are identical */
-    typecmp_t   Result = TC_IDENTICAL;
+    typecmp_t Result = TYPECMP_INITIALIZER;
 
 #if 0
     printf ("Left : "); PrintRawType (stdout, lhs);
@@ -436,4 +476,22 @@ typecmp_t TypeCmp (const Type* lhs, const Type* rhs)
 
     /* Return the result */
     return Result;
+}
+
+
+
+void TypeCompatibilityDiagnostic (const Type* NewType, const Type* OldType, int IsError, const char* Msg)
+/* Print error or warning message about type compatibility with proper type names */
+{
+    StrBuf NewTypeName = STATIC_STRBUF_INITIALIZER;
+    StrBuf OldTypeName = STATIC_STRBUF_INITIALIZER;
+    GetFullTypeNameBuf (&NewTypeName, NewType);
+    GetFullTypeNameBuf (&OldTypeName, OldType);
+    if (IsError) {
+        Error (Msg, SB_GetConstBuf (&NewTypeName), SB_GetConstBuf (&OldTypeName));
+    } else {
+        Warning (Msg, SB_GetConstBuf (&NewTypeName), SB_GetConstBuf (&OldTypeName));
+    }
+    SB_Done (&OldTypeName);
+    SB_Done (&NewTypeName);
 }

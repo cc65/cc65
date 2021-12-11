@@ -1,6 +1,13 @@
 This directory contains test code for automatic regression testing of the CC65
-compiler.
+compiler and tools.
 
+/asm  - contains the assembler regression tests
+
+/dasm - contains the disassembler regression tests
+
+
+/val, /ref and /err generally contain the tests that are used to verify that the
+compiler is working as expected (when the tests behave as described):
 
 /val  - The bulk of tests are contained here, individual tests should exit with
         an exit code of EXIT_SUCCESS when they pass, or EXIT_FAILURE on error.
@@ -9,16 +16,16 @@ compiler.
 
 /err  - contains tests that MUST NOT compile
 
+
+/todo and /misc generally contain the tests that fail because of known bugs:
+
 /todo - These tests fail due to open compiler issues.
 
         The makefile in this directory _expects_ the tests to fail, because of
         that when an issue was fixed it will break the CI. The test should get 
-        moved to /var in the PR fixing the issue, which will make CI pass again.
+        moved to /val in the PR fixing the issue, which will make CI pass again.
         No changes to makefiles are required!
 
-/asm  - contains the assembler regression tests
-
-/dasm - contains the disassembler regression tests
 
 /misc - a few tests that need special care of some sort
 

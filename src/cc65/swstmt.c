@@ -97,7 +97,6 @@ void SwitchStatement (void)
     SwitchCtrl* OldSwitch;      /* Pointer to old switch control data */
     SwitchCtrl  SwitchData;     /* New switch data */
 
-
     /* Eat the "switch" token */
     NextToken ();
 
@@ -105,6 +104,8 @@ void SwitchStatement (void)
     ** integer type.
     */
     ConsumeLParen ();
+
+    ED_Init (&SwitchExpr);
     Expression0 (&SwitchExpr);
     if (!IsClassInt (SwitchExpr.Type))  {
         Error ("Switch quantity is not an integer");
@@ -147,7 +148,7 @@ void SwitchStatement (void)
     /* Parse the following statement, which may actually be a compound
     ** statement if there is a curly brace at the current input position
     */
-    HaveBreak = Statement (&RCurlyBrace);
+    HaveBreak = AnyStatement (&RCurlyBrace);
 
     /* Check if we had any labels */
     if (CollCount (SwitchData.Nodes) == 0 && SwitchData.DefaultLabel == 0) {
@@ -211,12 +212,11 @@ void CaseLabel (void)
     long     Val;               /* Case label value */
     unsigned CodeLabel;         /* Code label for this case */
 
-
     /* Skip the "case" token */
     NextToken ();
 
     /* Read the selector expression */
-    ConstAbsIntExpr (hie1, &CaseExpr);
+    CaseExpr = NoCodeConstAbsIntExpr (hie1);
     Val = CaseExpr.IVal;
 
     /* Now check if we're inside a switch statement */

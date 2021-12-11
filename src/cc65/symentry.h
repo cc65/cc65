@@ -106,6 +106,8 @@ struct CodeEntry;
 #define SC_GOTO_IND     0x800000U       /* Indirect goto */
 
 #define SC_ALIAS        0x01000000U     /* Alias of anonymous field */
+#define SC_FICTITIOUS   0x02000000U     /* Symbol is fictitious */
+#define SC_HAVEFAM      0x04000000U     /* Type has a Flexible Array Member */
 
 
 
@@ -181,16 +183,8 @@ struct SymEntry {
             const Type*         Type;     /* Underlying type */
         } E;
 
-        /* Data for bit fields */
-        struct {
-            unsigned            Offs;     /* Byte offset into struct */
-            unsigned            BitOffs;  /* Bit offset into storage unit */
-            unsigned            BitWidth; /* Width in bits */
-        } B;
-
         /* Data for functions */
         struct {
-            struct FuncDesc*    Func;     /* Function descriptor */
             struct Segments*    Seg;      /* Segments for this function */
             struct LiteralPool* LitPool;  /* Literal pool for this function */
         } F;
@@ -273,6 +267,16 @@ int SymIsOutputFunc (const SymEntry* Sym);
 /* Return true if this is a function that must be output */
 
 #if defined(HAVE_INLINE)
+INLINE int SymHasFlexibleArrayMember (const SymEntry* Sym)
+/* Return true if the given entry has a flexible array member */
+{
+    return ((Sym->Flags & SC_HAVEFAM) == SC_HAVEFAM);
+}
+#else
+#  define SymHasFlexibleArrayMember(Sym)    (((Sym)->Flags & SC_HAVEFAM) == SC_HAVEFAM)
+#endif
+
+#if defined(HAVE_INLINE)
 INLINE const char* SymGetAsmName (const SymEntry* Sym)
 /* Return the assembler label name for the symbol (beware: may be NULL!) */
 {
@@ -304,7 +308,17 @@ void SymSetAsmName (SymEntry* Sym);
 void CvtRegVarToAuto (SymEntry* Sym);
 /* Convert a register variable to an auto variable */
 
-void ChangeSymType (SymEntry* Entry, Type* T);
+SymEntry* GetSymType (const Type* T);
+/* Get the symbol entry of the enum/struct/union type
+** Return 0 if it is not an enum/struct/union.
+*/
+
+const char* GetSymTypeName (const Type* T);
+/* Return a name string of the type or the symbol name if it is an ESU type.
+** Note: This may use a static buffer that could be overwritten by other calls.
+*/
+
+void ChangeSymType (SymEntry* Entry, const Type* T);
 /* Change the type of the given symbol */
 
 void ChangeAsmName (SymEntry* Entry, const char* NewAsmName);

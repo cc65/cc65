@@ -49,6 +49,7 @@ void ParseStaticAssert ()
 {
     /*
     ** static_assert-declaration ::=
+    **     _Static_assert ( constant-expression ) ;
     **     _Static_assert ( constant-expression , string-literal ) ;
     */
     ExprDesc Expr;
@@ -64,30 +65,38 @@ void ParseStaticAssert ()
     }
 
     /* Parse assertion condition */
-    ConstAbsIntExpr (hie1, &Expr);
+    Expr = NoCodeConstAbsIntExpr (hie1);
     failed = !Expr.IVal;
 
-    /* We expect a comma */
-    if (!ConsumeComma ()) {
-        return;
-    }
-
-    /* String literal */
-    if (CurTok.Tok != TOK_SCONST) {
-        Error ("String literal expected for static_assert message");
-        return;
-    }
-
-    /* Issue an error including the message if the static_assert failed. */
-    if (failed) {
-        Error ("static_assert failed '%s'", GetLiteralStr (CurTok.SVal));
-    }
-
-    /* Consume the string constant, now that we don't need it anymore.
-    ** This should never fail since we checked the token type above.
+    /* If there is a comma, we also have an error message.  The message is optional because we
+    ** support the C2X syntax with only an expression.
     */
-    if (!Consume (TOK_SCONST, "String literal expected")) {
-        return;
+    if (CurTok.Tok == TOK_COMMA) {
+        /* Skip the comma. */
+        NextToken ();
+
+        /* String literal */
+        if (CurTok.Tok != TOK_SCONST) {
+            Error ("String literal expected for static_assert message");
+            return;
+        }
+
+        /* Issue an error including the message if the static_assert failed. */
+        if (failed) {
+            Error ("static_assert failed '%s'", GetLiteralStr (CurTok.SVal));
+        }
+
+        /* Consume the string constant, now that we don't need it anymore.
+        ** This should never fail since we checked the token type above.
+        */
+        if (!Consume (TOK_SCONST, "String literal expected")) {
+            return;
+        }
+    } else {
+        /* No message. */
+        if (failed) {
+            Error ("static_assert failed");
+        }
     }
 
     /* Closing paren and semi-colon needed */

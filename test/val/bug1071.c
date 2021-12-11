@@ -7,24 +7,24 @@
 
 struct ImageStruct
 {
-	uint8_t _imageData;
-	#if !defined(NO_COLOR)
-		uint8_t _color;
-	#endif
+        uint8_t _imageData;
+        #if !defined(NO_COLOR)
+                uint8_t _color;
+        #endif
 };
 
 typedef struct ImageStruct Image;
 
 struct CharacterStruct
 {
-	// character coordinates
-	uint8_t _x;
-	uint8_t _y;
+        // character coordinates
+        uint8_t _x;
+        uint8_t _y;
 
-	// _status decides whether the character is active
-	uint8_t _status;
+        // _status decides whether the character is active
+        uint8_t _status;
 
-	Image* _imagePtr;
+        Image* _imagePtr;
 };
 
 typedef struct CharacterStruct Character;
@@ -53,20 +53,20 @@ Character bombs[BOMBS_NUMBER];
 
 uint16_t test1(void)
 {
-	if((loop<MAX_GHOST_LOOP) && (ghostLevel<MAX_GHOST_LEVEL))
-	{
-		return INITIAL_GHOST_SLOWDOWN-(uint16_t)level*256-ghostLevel*8;
-	}
-	return GHOST_MIN_SLOWDOWN;
+        if((loop<MAX_GHOST_LOOP) && (ghostLevel<MAX_GHOST_LEVEL))
+        {
+                return INITIAL_GHOST_SLOWDOWN-(uint16_t)level*256-ghostLevel*8;
+        }
+        return GHOST_MIN_SLOWDOWN;
 }
 
 uint16_t test2(void)
 {
-	if((loop<MAX_GHOST_LOOP) && (ghostLevel<MAX_GHOST_LEVEL))
-	{
-		return INITIAL_GHOST_SLOWDOWN-(uint16_t)level*256-ghostLevel*16;
-	}
-	return GHOST_MIN_SLOWDOWN;
+        if((loop<MAX_GHOST_LOOP) && (ghostLevel<MAX_GHOST_LEVEL))
+        {
+                return INITIAL_GHOST_SLOWDOWN-(uint16_t)level*256-ghostLevel*16;
+        }
+        return GHOST_MIN_SLOWDOWN;
 }
 
 uint16_t res = 0;

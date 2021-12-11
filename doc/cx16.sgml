@@ -142,12 +142,19 @@ The functions listed below are special for the CX16. See the <url
 url="funcref.html" name="function reference"> for declarations and usage.
 
 <itemize>
-<item>get_ostype
-<item>set_tv
-<item>videomode
-<item>vpeek
-<item>vpoke
+<item>get_ostype()
+<item>set_tv()
+<item>videomode()
+<item>vpeek()
+<item>vpoke()
 </itemize>
+
+<tt/cpeekcolor()/ works differently on the Commander X16 than it does on other
+platforms.  Each character has two colors: background and text (foreground).
+<tt/cpeekcolor()/ returns both colors.  The high nybble describes the
+background color, the low nybble describes the text color.  For example, if the
+function is used on the default screen, then it returns &dollar;61, which means
+white-on-blue.
 
 
 <sect1>CBM-specific functions<p>
@@ -157,32 +164,32 @@ machines. See the <url url="funcref.html" name="function reference"> for
 declarations and usage.
 
 <itemize>
-<item>cbm_close
-<item>cbm_closedir
-<item>cbm_k_basin
-<item>cbm_k_bsout
-<item>cbm_k_chkin
-<item>cbm_k_ckout
-<item>cbm_k_close
-<item>cbm_k_clrch
-<item>cbm_k_getin
-<item>cbm_k_load
-<item>cbm_k_open
-<item>cbm_k_readst
-<item>cbm_k_save
-<item>cbm_k_second
-<item>cbm_k_setlfs
-<item>cbm_k_setnam
-<item>cbm_k_tksa
-<item>cbm_load
-<item>cbm_open
-<item>cbm_opendir
-<item>cbm_read
-<item>cbm_readdir
-<item>cbm_save
-<item>cbm_write
-<item>get_tv
-<item>waitvsync
+<item>cbm_close()
+<item>cbm_closedir()
+<item>cbm_k_basin()
+<item>cbm_k_bsout()
+<item>cbm_k_chkin()
+<item>cbm_k_ckout()
+<item>cbm_k_close()
+<item>cbm_k_clrch()
+<item>cbm_k_getin()
+<item>cbm_k_load()
+<item>cbm_k_open()
+<item>cbm_k_readst()
+<item>cbm_k_save()
+<item>cbm_k_second()
+<item>cbm_k_setlfs()
+<item>cbm_k_setnam()
+<item>cbm_k_tksa()
+<item>cbm_load()
+<item>cbm_open()
+<item>cbm_opendir()
+<item>cbm_read()
+<item>cbm_readdir()
+<item>cbm_save()
+<item>cbm_write()
+<item>get_tv()
+<item>waitvsync()
 </itemize>
 
 

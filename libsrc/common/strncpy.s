@@ -10,11 +10,11 @@
 
 .proc   _strncpy
 
-        eor     #$FF
-        sta     tmp1
-        txa
-        eor     #$FF
-        sta     tmp2            ; Store -size - 1
+        inx
+        stx     tmp2
+        tax
+        inx
+        stx     tmp1            ; save count with each byte incremented separately
 
         jsr     popptr1         ; get src
         jsr     popax           ; get dest
@@ -24,11 +24,11 @@
 
 ; Copy src -> dest up to size bytes
 
-        ldx     tmp1            ; Load low byte of ones complement of size
+        ldx     tmp1
         ldy     #$00
-L1:     inx
+L1:     dex
         bne     L2
-        inc     tmp2
+        dec     tmp2
         beq     L9
 
 L2:     lda     (ptr1),y        ; Copy one character
@@ -42,8 +42,8 @@ L2:     lda     (ptr1),y        ; Copy one character
 
 ; Fill the remaining bytes.
 
-L3:     inx                     ; Counter low byte
-        beq     L6              ; Branch on overflow
+L3:     dex                     ; Counter low byte
+        beq     L6
 L4:     sta     (ptr2),y        ; Clear one byte
 L5:     iny                     ; Bump pointer
         bne     L3
@@ -52,7 +52,7 @@ L5:     iny                     ; Bump pointer
 
 ; Bump the counter high byte
 
-L6:     inc     tmp2
+L6:     dec     tmp2
         bne     L4
 
 ; Done, return dest

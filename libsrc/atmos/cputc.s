@@ -7,7 +7,7 @@
 ;
 
         .export         _cputcxy, _cputc
-        .export         setscrptr, putchar
+        .export         setscrptr, cputdirect, putchar
         .constructor    initcputc
         .import         rvs
         .import         popax
@@ -32,13 +32,13 @@ _cputc: cmp     #$0D            ; CR?
         rts
 
 L1:     cmp     #$0A            ; LF?
-        bne     output
+        bne     cputdirect
         inc     CURS_Y          ; Newline
         rts
 
 ; Output the character, then advance the cursor position
 
-output:
+cputdirect:
         jsr     putchar
 
 advance:

@@ -29,30 +29,23 @@ gotoxy: jsr     popa            ; Get Y
 .endproc
 
 .proc update_adscr
-; Force to set again color if cursor moves       
-; $FF is used because we know that it's impossible to have this value with a color
-; It prevents a bug : If bgcolor or textcolor is set to black for example with no char displays,
-; next cputsxy will not set the attribute if y coordinate changes
-    lda     #$FF                  
-    sta     OLD_CHARCOLOR         
-    sta     OLD_BGCOLOR           
 
     lda     #<SCREEN
-    sta     ADSCRL
+    sta     ADSCR
 
     lda     #>SCREEN
-    sta     ADSCRH
+    sta     ADSCR+1
 
     ldy     SCRY
     beq     out
 loop:
-    lda     ADSCRL          
+    lda     ADSCR
     clc
     adc     #SCREEN_XSIZE
     bcc     skip
-    inc     ADSCRH
+    inc     ADSCR+1
 skip:
-    sta     ADSCRL        
+    sta     ADSCR
     dey
     bne     loop
 out:        

@@ -566,8 +566,8 @@ static void DoBss (void)
 
 
 
-static void DoByte (void)
-/* Define bytes */
+static void DoByteBase (int EnableTranslation)
+/* Define bytes or literals */
 {
     /* Element type for the generated array */
     static const char EType[1] = { GT_BYTE };
@@ -579,8 +579,12 @@ static void DoByte (void)
     /* Parse arguments */
     while (1) {
         if (CurTok.Tok == TOK_STRCON) {
-            /* A string, translate into target charset and emit */
-            TgtTranslateStrBuf (&CurTok.SVal);
+            /* A string, translate into target charset
+               if appropriate */
+            if (EnableTranslation) {
+                TgtTranslateStrBuf (&CurTok.SVal);
+            }
+            /* Emit */
             EmitStrBuf (&CurTok.SVal);
             NextTok ();
         } else {
@@ -609,6 +613,14 @@ static void DoByte (void)
 
     /* Free the type string */
     SB_Done (&Type);
+}
+
+
+
+static void DoByte (void)
+/* Define bytes with translation */
+{
+    DoByteBase (1);
 }
 
 
@@ -1415,6 +1427,14 @@ static void DoList (void)
 
 
 
+static void DoLiteral (void)
+/* Define bytes without translation */
+{
+    DoByteBase (0);
+}
+
+
+
 static void DoLoBytes (void)
 /* Define bytes, extracting the lo byte from each expression in the list */
 {
@@ -1552,10 +1572,31 @@ static void DoP4510 (void)
 
 
 
+static void DoPDTV (void)
+/* Switch to C64DTV CPU */
+{
+    SetCPU (CPU_6502DTV);
+}
+
+
+
 static void DoPageLength (void)
 /* Set the page length for the listing */
 {
     PageLength = IntArg (MIN_PAGE_LEN, MAX_PAGE_LEN);
+}
+
+
+
+static void DoPopCharmap (void)
+/* Restore a charmap */
+{
+    if (TgtTranslateStackIsEmpty ()) {
+        ErrorSkip ("Charmap stack is empty");
+        return;
+    }
+
+    TgtTranslatePop ();
 }
 
 
@@ -1649,6 +1690,16 @@ static void DoPSC02 (void)
 
 
 
+static void DoPushCharmap (void)
+/* Save the current charmap */
+{
+    if (!TgtTranslatePush ()) {
+        ErrorSkip ("Charmap stack overflow");
+    }
+}
+
+
+
 static void DoPushCPU (void)
 /* Push the current CPU setting onto the CPU stack */
 {
@@ -1675,6 +1726,17 @@ static void DoPushSeg (void)
 
     /* Get the current segment and push it */
     CollAppend (&SegStack, DupSegDef (GetCurrentSegDef ()));
+}
+
+
+
+static void DoReferTo (void)
+/* Mark given symbol as referenced */
+{
+    SymEntry* Sym = ParseAnySymName (SYM_ALLOC_NEW);
+    if (Sym) {
+        SymRef (Sym);
+    }
 }
 
 
@@ -2066,6 +2128,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccKeepToken,      DoConditionals  },      /* .IFP4510 */
     { ccKeepToken,      DoConditionals  },      /* .IFP816 */
     { ccKeepToken,      DoConditionals  },      /* .IFPC02 */
+    { ccKeepToken,      DoConditionals  },      /* .IFPDTV */
     { ccKeepToken,      DoConditionals  },      /* .IFPSC02 */
     { ccKeepToken,      DoConditionals  },      /* .IFREF */
     { ccNone,           DoImport        },
@@ -2079,6 +2142,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoLineCont      },
     { ccNone,           DoList          },
     { ccNone,           DoListBytes     },
+    { ccNone,           DoLiteral       },
     { ccNone,           DoUnexpected    },      /* .LOBYTE */
     { ccNone,           DoLoBytes       },
     { ccNone,           DoUnexpected    },      /* .LOCAL */
@@ -2099,13 +2163,17 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoPageLength    },
     { ccNone,           DoUnexpected    },      /* .PARAMCOUNT */
     { ccNone,           DoPC02          },
+    { ccNone,           DoPDTV          },
+    { ccNone,           DoPopCharmap    },
     { ccNone,           DoPopCPU        },
     { ccNone,           DoPopSeg        },
     { ccNone,           DoProc          },
     { ccNone,           DoPSC02         },
+    { ccNone,           DoPushCharmap   },
     { ccNone,           DoPushCPU       },
     { ccNone,           DoPushSeg       },
     { ccNone,           DoUnexpected    },      /* .REFERENCED */
+    { ccNone,           DoReferTo       },      /* .REFERTO */
     { ccNone,           DoReloc         },
     { ccNone,           DoRepeat        },
     { ccNone,           DoRes           },
@@ -2181,5 +2249,8 @@ void CheckPseudo (void)
     }
     if (!IS_IsEmpty (&CPUStack)) {
         Warning (1, "CPU stack is not empty");
+    }
+    if (!TgtTranslateStackIsEmpty ()) {
+        Warning (1, "Charmap stack is not empty");
     }
 }

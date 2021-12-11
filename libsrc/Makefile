@@ -34,6 +34,7 @@ TARGETS = apple2       \
           sim6502      \
           sim65c02     \
           supervision  \
+          sym1         \
           telestrat
 
 DRVTYPES = emd \
@@ -133,8 +134,7 @@ MKINC = $(GEOS) \
 
 TARGETUTIL = apple2    \
              apple2enh \
-             atari     \
-             geos-apple
+             atari
 
 GEOSDIRS = common      \
            conio       \

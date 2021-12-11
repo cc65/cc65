@@ -59,22 +59,172 @@
 
 
 /* Predefined type strings */
-Type type_schar[]       = { TYPE(T_SCHAR),  TYPE(T_END) };
-Type type_uchar[]       = { TYPE(T_UCHAR),  TYPE(T_END) };
-Type type_int[]         = { TYPE(T_INT),    TYPE(T_END) };
-Type type_uint[]        = { TYPE(T_UINT),   TYPE(T_END) };
-Type type_long[]        = { TYPE(T_LONG),   TYPE(T_END) };
-Type type_ulong[]       = { TYPE(T_ULONG),  TYPE(T_END) };
-Type type_void[]        = { TYPE(T_VOID),   TYPE(T_END) };
-Type type_size_t[]      = { TYPE(T_SIZE_T), TYPE(T_END) };
-Type type_float[]       = { TYPE(T_FLOAT),  TYPE(T_END) };
-Type type_double[]      = { TYPE(T_DOUBLE), TYPE(T_END) };
+const Type type_char[]      = { TYPE(T_CHAR),   TYPE(T_END) };
+const Type type_schar[]     = { TYPE(T_SCHAR),  TYPE(T_END) };
+const Type type_uchar[]     = { TYPE(T_UCHAR),  TYPE(T_END) };
+const Type type_int[]       = { TYPE(T_INT),    TYPE(T_END) };
+const Type type_uint[]      = { TYPE(T_UINT),   TYPE(T_END) };
+const Type type_long[]      = { TYPE(T_LONG),   TYPE(T_END) };
+const Type type_ulong[]     = { TYPE(T_ULONG),  TYPE(T_END) };
+const Type type_bool[]      = { TYPE(T_INT),    TYPE(T_END) };
+const Type type_void[]      = { TYPE(T_VOID),   TYPE(T_END) };
+const Type type_size_t[]    = { TYPE(T_SIZE_T), TYPE(T_END) };
+const Type type_float[]     = { TYPE(T_FLOAT),  TYPE(T_END) };
+const Type type_double[]    = { TYPE(T_DOUBLE), TYPE(T_END) };
+
+/* More predefined type strings */
+const Type type_char_p[]    = { TYPE(T_PTR),    TYPE(T_CHAR),   TYPE(T_END) };
+const Type type_c_char_p[]  = { TYPE(T_PTR),    TYPE(T_C_CHAR), TYPE(T_END) };
+const Type type_void_p[]    = { TYPE(T_PTR),    TYPE(T_VOID),   TYPE(T_END) };
+const Type type_c_void_p[]  = { TYPE(T_PTR),    TYPE(T_C_VOID), TYPE(T_END) };
 
 
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
+
+
+
+static struct StrBuf* GetFullTypeNameWestEast (struct StrBuf* West, struct StrBuf* East, const Type* T)
+/* Return the name string of the given type split into a western part and an
+** eastern part.
+*/
+{
+    struct StrBuf Buf = AUTO_STRBUF_INITIALIZER;
+
+    if (IsTypeArray (T)) {
+
+        long Count = GetElementCount (T);
+        if (!SB_IsEmpty (East)) {
+            if (Count > 0) {
+                SB_Printf (&Buf, "[%ld]", Count);
+            } else {
+                SB_Printf (&Buf, "[]");
+            }
+            SB_Append (East, &Buf);
+            SB_Terminate (East);
+
+        } else {
+            if (Count > 0) {
+                SB_Printf (East, "[%ld]", Count);
+            } else {
+                SB_Printf (East, "[]");
+            }
+
+            if (!SB_IsEmpty (West)) {
+                /* Add parentheses to West */
+                SB_Printf (&Buf, "(%s)", SB_GetConstBuf (West));
+                SB_Copy (West, &Buf);
+                SB_Terminate (West);
+            }
+        }
+
+        /* Get element type */
+        GetFullTypeNameWestEast (West, East, T + 1);
+
+    } else if (IsTypeFunc (T)) {
+
+        FuncDesc* D             = GetFuncDesc (T);
+        struct StrBuf ParamList = AUTO_STRBUF_INITIALIZER;
+
+        /* First argument */
+        SymEntry* Param = D->SymTab->SymHead;
+        unsigned I;
+        for (I = 0; I < D->ParamCount; ++I) {
+            CHECK (Param != 0 && (Param->Flags & SC_PARAM) != 0);
+            if (I > 0) {
+                SB_AppendStr (&ParamList, ", ");
+            }
+            SB_AppendStr (&ParamList, SB_GetConstBuf (GetFullTypeNameBuf (&Buf, Param->Type)));
+            SB_Clear (&Buf);
+            /* Next argument */
+            Param = Param->NextSym;
+        }
+        if ((D->Flags & FD_VARIADIC) == 0) {
+            if (D->ParamCount == 0 && (D->Flags & FD_EMPTY) == 0) {
+                SB_AppendStr (&ParamList, "void");
+            }
+        } else {
+            if (D->ParamCount > 0) {
+                SB_AppendStr (&ParamList, ", ...");
+            } else {
+                SB_AppendStr (&ParamList, "...");
+            }
+        }
+        SB_Terminate (&ParamList);
+
+        /* Join the existing West and East together */
+        if (!SB_IsEmpty (East)) {
+            SB_Append (West, East);
+            SB_Terminate (West);
+            SB_Clear (East);
+        }
+
+        if (SB_IsEmpty (West)) {
+            /* Just use the param list */
+            SB_Printf (West, "(%s)", SB_GetConstBuf (&ParamList));
+        } else {
+            /* Append the param list to the existing West */
+            SB_Printf (&Buf, "(%s)(%s)", SB_GetConstBuf (West), SB_GetConstBuf (&ParamList));
+            SB_Printf (West, "%s", SB_GetConstBuf (&Buf));
+        }
+        SB_Done (&ParamList);
+
+        /* Return type */
+        GetFullTypeNameWestEast (West, East, T + 1);
+
+    } else if (IsTypePtr (T)) {
+
+        int QualCount = 0;
+
+        SB_Printf (&Buf, "*");
+
+        /* Add qualifiers */
+        if ((GetQualifier (T) & ~T_QUAL_NEAR) != T_QUAL_NONE) {
+            QualCount = GetQualifierTypeCodeNameBuf (&Buf, T->C, T_QUAL_NEAR);
+        }
+
+        if (!SB_IsEmpty (West)) {
+            if (QualCount > 0) {
+                SB_AppendChar (&Buf, ' ');
+            }
+            SB_Append (&Buf, West);
+        }
+
+        SB_Copy (West, &Buf);
+        SB_Terminate (West);
+
+        /* Get indirection type */
+        GetFullTypeNameWestEast (West, East, T + 1);
+
+    } else {
+
+        /* Add qualifiers */
+        if ((GetQualifier (T) & ~T_QUAL_NEAR) != 0) {
+            if (GetQualifierTypeCodeNameBuf (&Buf, T->C, T_QUAL_NEAR) > 0) {
+                SB_AppendChar (&Buf, ' ');
+            }
+        }
+
+        if (!IsTypeBitField (T)) {
+            SB_AppendStr (&Buf, GetSymTypeName (T));
+        } else {
+            SB_AppendStr (&Buf, GetBasicTypeName (T + 1));
+        }
+
+        if (!SB_IsEmpty (West)) {
+            SB_AppendChar (&Buf, ' ');
+            SB_Append (&Buf, West);
+        }
+
+        SB_Copy (West, &Buf);
+        SB_Terminate (West);
+    }
+
+    SB_Done (&Buf);
+    return West;
+}
 
 
 
@@ -85,6 +235,7 @@ const char* GetBasicTypeName (const Type* T)
 {
     switch (GetRawType (T)) {
     case T_TYPE_ENUM:       return "enum";
+    case T_TYPE_BITFIELD:   return "bit-field";
     case T_TYPE_FLOAT:      return "float";
     case T_TYPE_DOUBLE:     return "double";
     case T_TYPE_VOID:       return "void";
@@ -97,7 +248,7 @@ const char* GetBasicTypeName (const Type* T)
     default:                break;
     }
     if (IsClassInt (T)) {
-        if (IsSignSigned (T)) {
+        if (IsRawSignSigned (T)) {
             switch (GetRawType (T)) {
             case T_TYPE_CHAR:       return "signed char";
             case T_TYPE_SHORT:      return "short";
@@ -107,7 +258,7 @@ const char* GetBasicTypeName (const Type* T)
             default:
                 return "signed integer";
             }
-        } else if (IsSignUnsigned (T)) {
+        } else if (IsRawSignUnsigned (T)) {
             switch (GetRawType (T)) {
             case T_TYPE_CHAR:       return "unsigned char";
             case T_TYPE_SHORT:      return "unsigned short";
@@ -130,6 +281,98 @@ const char* GetBasicTypeName (const Type* T)
         }
     }
     return "type";
+}
+
+
+
+const char* GetFullTypeName (const Type* T)
+/* Return the full name string of the given type */
+{
+    struct StrBuf* Buf = NewDiagnosticStrBuf ();
+    GetFullTypeNameBuf (Buf, T);
+
+    return SB_GetConstBuf (Buf);
+}
+
+
+
+struct StrBuf* GetFullTypeNameBuf (struct StrBuf* S, const Type* T)
+/* Return the full name string of the given type */
+{
+    struct StrBuf East = AUTO_STRBUF_INITIALIZER;
+    GetFullTypeNameWestEast (S, &East, T);
+
+    /* Join West and East */
+    SB_Append (S, &East);
+    SB_Terminate (S);
+    SB_Done (&East);
+
+    return S;
+}
+
+
+
+int GetQualifierTypeCodeNameBuf (struct StrBuf* S, TypeCode Qual, TypeCode IgnoredQual)
+/* Return the names of the qualifiers of the type.
+** Qualifiers to be ignored can be specified with the IgnoredQual flags.
+** Return the count of added qualifier names.
+*/
+{
+    int Count = 0;
+
+    Qual &= T_MASK_QUAL & ~IgnoredQual;
+    if (Qual & T_QUAL_CONST) {
+        if (!SB_IsEmpty (S)) {
+            SB_AppendChar (S, ' ');
+        }
+        SB_AppendStr (S, "const");
+        ++Count;
+    }
+    if (Qual & T_QUAL_VOLATILE) {
+        if (Count > 0) {
+            SB_AppendChar (S, ' ');
+        }
+        SB_AppendStr (S, "volatile");
+        ++Count;
+    }
+    if (Qual & T_QUAL_RESTRICT) {
+        if (Count > 0) {
+            SB_AppendChar (S, ' ');
+        }
+        SB_AppendStr (S, "restrict");
+        ++Count;
+    }
+    if (Qual & T_QUAL_NEAR) {
+        if (Count > 0) {
+            SB_AppendChar (S, ' ');
+        }
+        SB_AppendStr (S, "__near__");
+        ++Count;
+    }
+    if (Qual & T_QUAL_FAR) {
+        SB_AppendStr (S, "__far__");
+        ++Count;
+    }
+    if (Qual & T_QUAL_FASTCALL) {
+        if (Count > 0) {
+            SB_AppendChar (S, ' ');
+        }
+        SB_AppendStr (S, "__fastcall__");
+        ++Count;
+    }
+    if (Qual & T_QUAL_CDECL) {
+        if (Count > 0) {
+            SB_AppendChar (S, ' ');
+        }
+        SB_AppendStr (S, "__cdecl__");
+        ++Count;
+    }
+
+    if (Count > 0) {
+        SB_Terminate (S);
+    }
+
+    return Count;
 }
 
 
@@ -202,14 +445,6 @@ int SignExtendChar (int C)
 
 
 
-TypeCode GetDefaultChar (void)
-/* Return the default char type (signed/unsigned) depending on the settings */
-{
-    return IS_Get (&SignedChars)? T_SCHAR : T_UCHAR;
-}
-
-
-
 Type* GetCharArrayType (unsigned Len)
 /* Return the type for a char array of the given length */
 {
@@ -219,7 +454,7 @@ Type* GetCharArrayType (unsigned Len)
     /* Fill the type string */
     T[0].C   = T_ARRAY;
     T[0].A.L = Len;             /* Array length is in the L attribute */
-    T[1].C   = GetDefaultChar ();
+    T[1].C   = T_CHAR;
     T[2].C   = T_END;
 
     /* Return the new type */
@@ -238,13 +473,13 @@ Type* GetImplicitFuncType (void)
     Type* T = TypeAlloc (3);    /* func/returns int/terminator */
 
     /* Prepare the function descriptor */
-    F->Flags  = FD_EMPTY | FD_VARIADIC;
+    F->Flags  = FD_EMPTY;
     F->SymTab = &EmptySymTab;
     F->TagTab = &EmptySymTab;
 
     /* Fill the type string */
     T[0].C   = T_FUNC | CodeAddrSizeQualifier ();
-    T[0].A.P = F;
+    T[0].A.F = F;
     T[1].C   = T_INT;
     T[2].C   = T_END;
 
@@ -316,14 +551,14 @@ unsigned long GetIntegerTypeMax (const Type* Type)
 
 
 
-static unsigned TypeOfBySize (const Type* Type)
+static unsigned TypeOfBySize (unsigned Size)
 /* Get the code generator replacement type of the object by its size */
 {
     unsigned NewType;
     /* If the size is less than or equal to that of a a long, we will copy
     ** the struct using the primary register, otherwise we use memcpy.
     */
-    switch (SizeOf (Type)) {
+    switch (Size) {
         case 1:     NewType = CF_CHAR;  break;
         case 2:     NewType = CF_INT;   break;
         case 3:     /* FALLTHROUGH */
@@ -335,205 +570,34 @@ static unsigned TypeOfBySize (const Type* Type)
 }
 
 
-Type* PointerTo (const Type* T)
-/* Return a type string that is "pointer to T". The type string is allocated
-** on the heap and may be freed after use.
-*/
-{
-    /* Get the size of the type string including the terminator */
-    unsigned Size = TypeLen (T) + 1;
-
-    /* Allocate the new type string */
-    Type* P = TypeAlloc (Size + 1);
-
-    /* Create the return type... */
-    P[0].C = T_PTR | (T[0].C & T_QUAL_ADDRSIZE);
-    memcpy (P+1, T, Size * sizeof (Type));
-
-    /* ...and return it */
-    return P;
-}
-
-
-
-static TypeCode PrintTypeComp (FILE* F, TypeCode C, TypeCode Mask, const char* Name)
-/* Check for a specific component of the type. If it is there, print the
-** name and remove it. Return the type with the component removed.
-*/
-{
-    if ((C & Mask) == Mask) {
-        fprintf (F, "%s ", Name);
-        C &= ~Mask;
-    }
-    return C;
-}
-
-
-
-void PrintType (FILE* F, const Type* T)
-/* Output translation of type array. */
-{
-    /* Walk over the type string */
-    while (T->C != T_END) {
-
-        /* Get the type code */
-        TypeCode C = T->C;
-
-        /* Print any qualifiers */
-        C = PrintTypeComp (F, C, T_QUAL_CONST, "const");
-        C = PrintTypeComp (F, C, T_QUAL_VOLATILE, "volatile");
-        C = PrintTypeComp (F, C, T_QUAL_RESTRICT, "restrict");
-        C = PrintTypeComp (F, C, T_QUAL_NEAR, "__near__");
-        C = PrintTypeComp (F, C, T_QUAL_FAR, "__far__");
-        C = PrintTypeComp (F, C, T_QUAL_FASTCALL, "__fastcall__");
-        C = PrintTypeComp (F, C, T_QUAL_CDECL, "__cdecl__");
-
-        /* Signedness. Omit the signedness specifier for long and int */
-        if ((C & T_MASK_TYPE) != T_TYPE_INT && (C & T_MASK_TYPE) != T_TYPE_LONG) {
-            C = PrintTypeComp (F, C, T_SIGN_SIGNED, "signed");
-        }
-        C = PrintTypeComp (F, C, T_SIGN_UNSIGNED, "unsigned");
-
-        /* Now check the real type */
-        switch (C & T_MASK_TYPE) {
-            case T_TYPE_CHAR:
-                fprintf (F, "char");
-                break;
-            case T_TYPE_SHORT:
-                fprintf (F, "short");
-                break;
-            case T_TYPE_INT:
-                fprintf (F, "int");
-                break;
-            case T_TYPE_LONG:
-                fprintf (F, "long");
-                break;
-            case T_TYPE_LONGLONG:
-                fprintf (F, "long long");
-                break;
-            case T_TYPE_ENUM:
-                fprintf (F, "enum");
-                break;
-            case T_TYPE_FLOAT:
-                fprintf (F, "float");
-                break;
-            case T_TYPE_DOUBLE:
-                fprintf (F, "double");
-                break;
-            case T_TYPE_VOID:
-                fprintf (F, "void");
-                break;
-            case T_TYPE_STRUCT:
-                fprintf (F, "struct %s", ((SymEntry*) T->A.P)->Name);
-                break;
-            case T_TYPE_UNION:
-                fprintf (F, "union %s", ((SymEntry*) T->A.P)->Name);
-                break;
-            case T_TYPE_ARRAY:
-                /* Recursive call */
-                PrintType (F, T + 1);
-                if (T->A.L == UNSPECIFIED) {
-                    fprintf (F, " []");
-                } else {
-                    fprintf (F, " [%ld]", T->A.L);
-                }
-                return;
-            case T_TYPE_PTR:
-                /* Recursive call */
-                PrintType (F, T + 1);
-                fprintf (F, " *");
-                return;
-            case T_TYPE_FUNC:
-                fprintf (F, "function returning ");
-                break;
-            default:
-                fprintf (F, "unknown type: %04lX", T->C);
-        }
-
-        /* Next element */
-        ++T;
-    }
-}
-
-
-
-void PrintFuncSig (FILE* F, const char* Name, Type* T)
-/* Print a function signature. */
-{
-    /* Get the function descriptor */
-    const FuncDesc* D = GetFuncDesc (T);
-
-    /* Print a comment with the function signature */
-    PrintType (F, GetFuncReturn (T));
-    if (IsQualNear (T)) {
-        fprintf (F, " __near__");
-    }
-    if (IsQualFar (T)) {
-        fprintf (F, " __far__");
-    }
-    if (IsQualFastcall (T)) {
-        fprintf (F, " __fastcall__");
-    }
-    if (IsQualCDecl (T)) {
-        fprintf (F, " __cdecl__");
-    }
-    fprintf (F, " %s (", Name);
-
-    /* Parameters */
-    if (D->Flags & FD_VOID_PARAM) {
-        fprintf (F, "void");
-    } else {
-        unsigned I;
-        SymEntry* E = D->SymTab->SymHead;
-        for (I = 0; I < D->ParamCount; ++I) {
-            if (I > 0) {
-                fprintf (F, ", ");
-            }
-            if (SymIsRegVar (E)) {
-                fprintf (F, "register ");
-            }
-            PrintType (F, E->Type);
-            E = E->NextSym;
-        }
-    }
-
-    /* End of parameter list */
-    fprintf (F, ")");
-}
-
-
-
-void PrintRawType (FILE* F, const Type* T)
-/* Print a type string in raw format (for debugging) */
-{
-    while (T->C != T_END) {
-        fprintf (F, "%04lX ", T->C);
-        ++T;
-    }
-    fprintf (F, "\n");
-}
-
-
-
-int TypeHasAttr (const Type* T)
-/* Return true if the given type has attribute data */
-{
-    return IsClassStruct (T) || IsTypeArray (T) || IsClassFunc (T);
-}
-
-
 
 const Type* GetUnderlyingType (const Type* Type)
 /* Get the underlying type of an enum or other integer class type */
 {
-    if (IsTypeEnum (Type)) {
-
+    if (IsISOChar (Type)) {
+        return IS_Get (&SignedChars) ? type_schar : type_uchar;
+    } else if (IsTypeEnum (Type)) {
         /* This should not happen, but just in case */
-        if (Type->A.P == 0) {
+        if (Type->A.S == 0) {
             Internal ("Enum tag type error in GetUnderlyingTypeCode");
         }
 
-        return ((SymEntry*)Type->A.P)->V.E.Type;
+        /* If incomplete enum type is used, just return its raw type */
+        if (Type->A.S->V.E.Type != 0) {
+            return Type->A.S->V.E.Type;
+        }
+    } else if (IsTypeBitField (Type)) {
+        /* We consider the smallest type that can represent all values of the
+        ** bit-field, instead of the type used in the declaration, the truly
+        ** underlying of the bit-field.
+        */
+        unsigned Size = (int)(Type->A.B.Width - 1) / (int)CHAR_BITS + 1;
+        switch (Size) {
+            case SIZEOF_CHAR: Type = IsSignSigned (Type) ? type_schar : type_uchar; break;
+            case SIZEOF_INT:  Type = IsSignSigned (Type) ? type_int   : type_uint;  break;
+            case SIZEOF_LONG: Type = IsSignSigned (Type) ? type_long  : type_ulong; break;
+            default:          Type = IsSignSigned (Type) ? type_int   : type_uint;  break;
+        }
     }
 
     return Type;
@@ -547,22 +611,25 @@ TypeCode GetUnderlyingTypeCode (const Type* Type)
 */
 {
     TypeCode Underlying = UnqualifiedType (Type->C);
-    TypeCode TCode;
 
-    /* We could also support other T_CLASS_INT types, but just enums for now */
-    if (IsTypeEnum (Type)) {
+    if (IsISOChar (Type)) {
+
+        return IS_Get (&SignedChars) ? T_SCHAR : T_UCHAR;
+
+    } else if (IsTypeEnum (Type)) {
+        TypeCode TCode;
 
         /* This should not happen, but just in case */
-        if (Type->A.P == 0) {
+        if (Type->A.S == 0) {
             Internal ("Enum tag type error in GetUnderlyingTypeCode");
         }
 
         /* Inspect the underlying type of the enum */
-        if (((SymEntry*)Type->A.P)->V.E.Type == 0) {
+        if (Type->A.S->V.E.Type == 0) {
             /* Incomplete enum type is used */
             return Underlying;
         }
-        TCode = UnqualifiedType (((SymEntry*)Type->A.P)->V.E.Type->C);
+        TCode = UnqualifiedType (Type->A.S->V.E.Type->C);
 
         /* Replace the type code with integer */
         Underlying = (TCode & ~T_MASK_TYPE);
@@ -574,6 +641,21 @@ TypeCode GetUnderlyingTypeCode (const Type* Type)
             case T_SIZE_LONGLONG: Underlying |= T_TYPE_LONGLONG; break;
             default:              Underlying |= T_TYPE_INT;      break;
         }
+    } else if (IsTypeBitField (Type)) {
+        /* We consider the smallest type that can represent all values of the
+        ** bit-field, instead of the type used in the declaration, the truly
+        ** underlying of the bit-field.
+        */
+        unsigned Size = (int)(Type->A.B.Width - 1) / (int)CHAR_BITS + 1;
+        switch (Size) {
+            case SIZEOF_CHAR:     Underlying = T_CHAR;      break;
+            case SIZEOF_INT:      Underlying = T_INT;       break;
+            case SIZEOF_LONG:     Underlying = T_LONG;      break;
+            case SIZEOF_LONGLONG: Underlying = T_LONGLONG;  break;
+            default:              Underlying = T_INT;       break;
+        }
+        Underlying &= ~T_MASK_SIGN;
+        Underlying |= Type->C & T_MASK_SIGN;
     }
 
     return Underlying;
@@ -593,8 +675,9 @@ unsigned SizeOf (const Type* T)
             return T->A.U;
 
         /* Beware: There's a chance that this triggers problems in other parts
-           of the compiler. The solution is to fix the callers, because calling
-           SizeOf() with a function type as argument is bad. */
+        ** of the compiler. The solution is to fix the callers, because calling
+        ** SizeOf() with a function type as argument is bad.
+        */
         case T_FUNC:
             return 0;   /* Size of function is unknown */
 
@@ -629,7 +712,7 @@ unsigned SizeOf (const Type* T)
 
         case T_STRUCT:
         case T_UNION:
-            return ((SymEntry*) T->A.P)->V.S.Size;
+            return T->A.S->V.S.Size;
 
         case T_ARRAY:
             if (T->A.L == UNSPECIFIED) {
@@ -673,7 +756,7 @@ unsigned CheckedSizeOf (const Type* T)
 {
     unsigned Size = SizeOf (T);
     if (Size == 0) {
-        Error ("Size of data type is unknown");
+        Error ("Size of type '%s' is unknown", GetFullTypeName (T));
         Size = SIZEOF_CHAR;     /* Don't return zero */
     }
     return Size;
@@ -689,7 +772,7 @@ unsigned CheckedPSizeOf (const Type* T)
 {
     unsigned Size = PSizeOf (T);
     if (Size == 0) {
-        Error ("Size of data type is unknown");
+        Error ("Size of type '%s' is unknown", GetFullTypeName (T + 1));
         Size = SIZEOF_CHAR;     /* Don't return zero */
     }
     return Size;
@@ -732,16 +815,23 @@ unsigned TypeOf (const Type* T)
             return CF_FLOAT;
 
         case T_FUNC:
-            return (((FuncDesc*) T->A.P)->Flags & FD_VARIADIC)? 0 : CF_FIXARGC;
+            /* Treat this as a function pointer */
+            return CF_INT | CF_UNSIGNED;
 
         case T_STRUCT:
         case T_UNION:
-            NewType = TypeOfBySize (T);
+            NewType = TypeOfBySize (SizeOf (T));
             if (NewType != CF_NONE) {
                 return NewType;
             }
             /* Address of ... */
             return CF_INT | CF_UNSIGNED;
+
+        case T_VOID:
+        case T_ENUM:
+            /* Incomplete enum type */
+            Error ("Incomplete type '%s'", GetFullTypeName (T));
+            return CF_INT;
 
         default:
             Error ("Illegal type %04lX", T->C);
@@ -751,7 +841,20 @@ unsigned TypeOf (const Type* T)
 
 
 
-Type* Indirect (Type* T)
+unsigned FuncTypeOf (const Type* T)
+/* Get the code generator flag for calling the function */
+{
+    if (GetUnderlyingTypeCode (T) == T_FUNC) {
+        return (T->A.F->Flags & FD_VARIADIC) ? 0 : CF_FIXARGC;
+    } else {
+        Error ("Illegal function type %04lX", T->C);
+        return 0;
+    }
+}
+
+
+
+const Type* Indirect (const Type* T)
 /* Do one indirection for the given type, that is, return the type where the
 ** given type points to.
 */
@@ -765,22 +868,399 @@ Type* Indirect (Type* T)
 
 
 
-Type* ArrayToPtr (Type* T)
+Type* IndirectModifiable (Type* T)
+/* Do one indirection for the given type, that is, return the type where the
+** given type points to.
+*/
+{
+    /* We are expecting a pointer expression */
+    CHECK (IsClassPtr (T));
+
+    /* Skip the pointer or array token itself */
+    return T + 1;
+}
+
+
+
+Type* NewPointerTo (const Type* T)
+/* Return a type string that is "pointer to T". The type string is allocated
+** on the heap and may be freed after use.
+*/
+{
+    /* Get the size of the type string including the terminator */
+    unsigned Size = TypeLen (T) + 1;
+
+    /* Allocate the new type string */
+    Type* P = TypeAlloc (Size + 1);
+
+    /* Create the return type... */
+    P[0].C = T_PTR | (T[0].C & T_QUAL_ADDRSIZE);
+    memcpy (P+1, T, Size * sizeof (Type));
+
+    /* ...and return it */
+    return P;
+}
+
+
+
+const Type* AddressOf (const Type* T)
+/* Return a type string that is "address of T". The type string is allocated
+** on the heap and may be freed after use.
+*/
+{
+    /* Get the size of the type string including the terminator */
+    unsigned Size = TypeLen (T) + 1;
+
+    /* Allocate the new type string */
+    Type* P = TypeAlloc (Size + 1);
+
+    /* Create the return type... */
+    P[0].C = T_PTR | (T[0].C & T_QUAL_ADDRSIZE) | T_QUAL_CONST;
+    memcpy (P+1, T, Size * sizeof (Type));
+
+    /* ...and return it */
+    return P;
+}
+
+
+
+Type* ArrayToPtr (const Type* T)
 /* Convert an array to a pointer to it's first element */
 {
     /* Return pointer to first element */
-    return PointerTo (GetElementType (T));
+    return NewPointerTo (GetElementType (T));
+}
+
+
+
+const Type* PtrConversion (const Type* T)
+/* If the type is a function, convert it to pointer to function. If the
+** expression is an array, convert it to pointer to first element. Otherwise
+** return T.
+*/
+{
+    if (IsTypeFunc (T)) {
+        return AddressOf (T);
+    } else if (IsTypeArray (T)) {
+        return AddressOf (GetElementType (T));
+    } else {
+        return T;
+    }
+}
+
+
+
+const Type* IntPromotion (const Type* T)
+/* Apply the integer promotions to T and return the result. The returned type
+** string may be T if there is no need to change it.
+*/
+{
+    /* We must have an int to apply int promotions */
+    PRECONDITION (IsClassInt (T));
+
+    /* https://port70.net/~nsz/c/c89/c89-draft.html#3.2.1.1
+    ** A char, a short int, or an int bit-field, or their signed or unsigned varieties, or
+    ** an object that has enumeration type, may be used in an expression wherever an int or
+    ** unsigned int may be used. If an int can represent all values of the original type,
+    ** the value is converted to an int; otherwise it is converted to an unsigned int.
+    ** These are called the integral promotions.
+    */
+
+    if (IsTypeBitField (T)) {
+        /* The standard rule is OK for now as we don't support bit-fields with widths > 16.
+        */
+        return T->A.B.Width >= INT_BITS && IsSignUnsigned (T) ? type_uint : type_int;
+    } else if (IsTypeChar (T)) {
+        /* An integer can represent all values from either signed or unsigned char, so convert
+        ** chars to int.
+        */
+        return type_int;
+    } else if (IsTypeShort (T)) {
+        /* An integer cannot represent all values from unsigned short, so convert unsigned short
+        ** to unsigned int.
+        */
+        return IsSignUnsigned (T) ? type_uint : type_int;
+    } else if (!IsIncompleteESUType (T)) {
+        /* The type is a complete type not smaller than int, so leave it alone. */
+        return T;
+    } else {
+        /* Otherwise, this is an incomplete enum, and there is expceted to be an error already.
+        ** Assume int to avoid further errors.
+        */
+        return type_int;
+    }
+}
+
+
+
+const Type* ArithmeticConvert (const Type* lhst, const Type* rhst)
+/* Perform the usual arithmetic conversions for binary operators. */
+{
+    /* https://port70.net/~nsz/c/c89/c89-draft.html#3.2.1.5
+    ** Many binary operators that expect operands of arithmetic type cause conversions and yield
+    ** result types in a similar way. The purpose is to yield a common type, which is also the type
+    ** of the result. This pattern is called the usual arithmetic conversions.
+    */
+
+    /* There are additional rules for floating point types that we don't bother with, since
+    ** floating point types are not (yet) supported.
+    ** The integral promotions are performed on both operands.
+    */
+    lhst = IntPromotion (lhst);
+    rhst = IntPromotion (rhst);
+
+    /* If either operand has type unsigned long int, the other operand is converted to
+    ** unsigned long int.
+    */
+    if ((IsTypeLong (lhst) && IsSignUnsigned (lhst)) ||
+        (IsTypeLong (rhst) && IsSignUnsigned (rhst))) {
+        return type_ulong;
+    }
+
+    /* Otherwise, if one operand has type long int and the other has type unsigned int,
+    ** if a long int can represent all values of an unsigned int, the operand of type unsigned int
+    ** is converted to long int ; if a long int cannot represent all the values of an unsigned int,
+    ** both operands are converted to unsigned long int.
+    */
+    if ((IsTypeLong (lhst) && IsTypeInt (rhst) && IsSignUnsigned (rhst)) ||
+        (IsTypeLong (rhst) && IsTypeInt (lhst) && IsSignUnsigned (lhst))) {
+        /* long can represent all unsigneds, so we are in the first sub-case. */
+        return type_long;
+    }
+
+    /* Otherwise, if either operand has type long int, the other operand is converted to long int.
+    */
+    if (IsTypeLong (lhst) || IsTypeLong (rhst)) {
+        return type_long;
+    }
+
+    /* Otherwise, if either operand has type unsigned int, the other operand is converted to
+    ** unsigned int.
+    */
+    if ((IsTypeInt (lhst) && IsSignUnsigned (lhst)) ||
+        (IsTypeInt (rhst) && IsSignUnsigned (rhst))) {
+        return type_uint;
+    }
+
+    /* Otherwise, both operands have type int. */
+    CHECK (IsTypeInt (lhst));
+    CHECK (IsSignSigned (lhst));
+    CHECK (IsTypeInt (rhst));
+    CHECK (IsSignSigned (rhst));
+    return type_int;
+}
+
+
+
+const Type* SignedType (const Type* T)
+/* Get signed counterpart of the integral type */
+{
+    switch (GetUnderlyingTypeCode (T) & T_MASK_TYPE) {
+        case T_TYPE_CHAR:
+            return type_schar;
+
+        case T_TYPE_INT:
+        case T_TYPE_SHORT:
+            return type_int;
+
+        case T_TYPE_LONG:
+            return type_long;
+
+        default:
+            Internal ("Unknown type code: %lX", GetUnderlyingTypeCode (T));
+            return T;
+    }
+}
+
+
+
+const Type* UnsignedType (const Type* T)
+/* Get unsigned counterpart of the integral type */
+{
+    switch (GetUnderlyingTypeCode (T) & T_MASK_TYPE) {
+        case T_TYPE_CHAR:
+            return type_uchar;
+
+        case T_TYPE_INT:
+        case T_TYPE_SHORT:
+            return type_uint;
+
+        case T_TYPE_LONG:
+            return type_ulong;
+
+        default:
+            Internal ("Unknown type code: %lX", GetUnderlyingTypeCode (T));
+            return T;
+    }
+}
+
+
+
+Type* NewBitFieldType (const Type* T, unsigned BitOffs, unsigned BitWidth)
+/* Return a type string that is "T : BitWidth" aligned on BitOffs. The type
+** string is allocated on the heap and may be freed after use.
+*/
+{
+    Type* P;
+
+    /* The type specifier must be integeral */
+    CHECK (IsClassInt (T));
+    
+    /* Allocate the new type string */
+    P = TypeAlloc (3);
+
+    /* Create the return type... */
+    P[0].C = IsSignSigned (T) ? T_SBITFIELD : T_UBITFIELD;
+    P[0].C |= (T[0].C & T_QUAL_ADDRSIZE);
+    P[0].A.B.Offs  = BitOffs;
+    P[0].A.B.Width = BitWidth;
+
+    /* Get the declaration type */
+    memcpy (&P[1], GetUnderlyingType (T), sizeof (P[1]));
+
+    /* Get done... */
+    P[2].C = T_END;
+
+    /* ...and return it */
+    return P;
+}
+
+
+
+int IsClassObject (const Type* T)
+/* Return true if this is a fully described object type */
+{
+    return !IsTypeFunc (T) && !IsClassIncomplete (T);
+}
+
+
+
+int IsClassIncomplete (const Type* T)
+/* Return true if this is an object type lacking size info */
+{
+    if (IsTypeArray (T)) {
+        return GetElementCount (T) == UNSPECIFIED || IsClassIncomplete (T + 1);
+    }
+    return IsTypeVoid (T) || IsIncompleteESUType (T);
+}
+
+
+
+int IsClassArithmetic (const Type* T)
+/* Return true if this is an integer or real floating type */
+{
+    return IsClassInt (T) || IsClassFloat (T);
+}
+
+
+
+int IsClassBasic (const Type* T)
+/* Return true if this is a char, integer or floating type */
+{
+    return IsClassChar (T) || IsClassInt (T) || IsClassFloat (T);
+}
+
+
+
+int IsClassScalar (const Type* T)
+/* Return true if this is an arithmetic or pointer type */
+{
+    return IsClassArithmetic (T) || IsTypePtr (T);
+}
+
+
+
+int IsClassDerived (const Type* T)
+/* Return true if this is an array, struct, union, function or pointer type */
+{
+    return IsTypeArray (T) || IsClassStruct (T) || IsClassFunc (T) || IsTypePtr (T);
+}
+
+
+
+int IsClassAggregate (const Type* T)
+/* Return true if this is an array or struct type */
+{
+    return IsTypeArray (T) || IsTypeStruct (T);
+}
+
+
+
+int IsRelationType (const Type* T)
+/* Return true if this is an arithmetic, array or pointer type */
+{
+    return IsClassArithmetic (T) || IsClassPtr (T);
+}
+
+
+
+int IsCastType (const Type* T)
+/* Return true if this type can be used for casting */
+{
+    return IsClassScalar (T) || IsTypeVoid (T);
+}
+
+
+
+int IsESUType (const Type* T)
+/* Return true if this is an enum/struct/union type */
+{
+    return IsClassStruct (T) || IsTypeEnum (T);
+}
+
+
+
+int IsIncompleteESUType (const Type* T)
+/* Return true if this is an incomplete ESU type */
+{
+    SymEntry* Sym = GetSymType (T);
+
+    return Sym != 0 && !SymIsDef (Sym);
+}
+
+
+
+int IsEmptiableObjectType (const Type* T)
+/* Return true if this is a struct/union/void type that can have zero size */
+{
+    return IsClassStruct (T) || IsTypeVoid (T);
+}
+
+
+
+int HasUnknownSize (const Type* T)
+/* Return true if this is an incomplete ESU type or an array of unknown size */
+{
+    if (IsTypeArray (T)) {
+        return GetElementCount (T) == UNSPECIFIED || HasUnknownSize (T + 1);
+    }
+    return IsIncompleteESUType (T);
 }
 
 
 
 int IsVariadicFunc (const Type* T)
 /* Return true if this is a function type or pointer to function type with
-** variable parameter list
+** variable parameter list.
+** Check fails if the type is not a function or a pointer to function.
 */
 {
-    FuncDesc* F = GetFuncDesc (T);
-    return (F->Flags & FD_VARIADIC) != 0;
+    return (GetFuncDesc (T)->Flags & FD_VARIADIC) != 0;
+}
+
+
+
+int IsFastcallFunc (const Type* T)
+/* Return true if this is a function type or pointer to function type by
+** __fastcall__ calling convention.
+** Check fails if the type is not a function or a pointer to function.
+*/
+{
+    if (UnqualifiedType (T->C) == T_PTR) {
+        /* Pointer to function */
+        ++T;
+    }
+    return !IsVariadicFunc (T) && (AutoCDecl ? IsQualFastcall (T) : !IsQualCDecl (T));
 }
 
 
@@ -797,7 +1277,7 @@ FuncDesc* GetFuncDesc (const Type* T)
     CHECK (IsClassFunc (T));
 
     /* Get the function descriptor from the type attributes */
-    return T->A.P;
+    return T->A.F;
 }
 
 
@@ -814,12 +1294,12 @@ void SetFuncDesc (Type* T, FuncDesc* F)
     CHECK (IsClassFunc (T));
 
     /* Set the function descriptor */
-    T->A.P = F;
+    T->A.F = F;
 }
 
 
 
-Type* GetFuncReturn (Type* T)
+const Type* GetFuncReturn (const Type* T)
 /* Return a pointer to the return type of a function or pointer-to-function type */
 {
     if (UnqualifiedType (T->C) == T_PTR) {
@@ -832,6 +1312,37 @@ Type* GetFuncReturn (Type* T)
 
     /* Return a pointer to the return type */
     return T + 1;
+}
+
+
+
+Type* GetFuncReturnModifiable (Type* T)
+/* Return a non-const pointer to the return type of a function or pointer-to-function type */
+{
+    if (UnqualifiedType (T->C) == T_PTR) {
+        /* Pointer to function */
+        ++T;
+    }
+
+    /* Be sure it's a function type */
+    CHECK (IsClassFunc (T));
+
+    /* Return a pointer to the return type */
+    return T + 1;
+}
+
+
+
+const FuncDesc* GetFuncDefinitionDesc (const Type* T)
+/* Get the function descriptor of the function definition */
+{
+    const FuncDesc* D;
+
+    /* Be sure it's a function type */
+    CHECK (IsClassFunc (T));
+
+    D = GetFuncDesc (T);
+    return D->FuncDef != 0 ? D->FuncDef : D;
 }
 
 
@@ -858,7 +1369,7 @@ void SetElementCount (Type* T, long Count)
 
 
 
-Type* GetElementType (Type* T)
+const Type* GetElementType (const Type* T)
 /* Return the element type of the given array type. */
 {
     CHECK (IsTypeArray (T));
@@ -867,7 +1378,7 @@ Type* GetElementType (Type* T)
 
 
 
-Type* GetBaseElementType (Type* T)
+const Type* GetBaseElementType (const Type* T)
 /* Return the base element type of a given type. If T is not an array, this
 ** will return. Otherwise it will return the base element type, which means
 ** the element type that is not an array.
@@ -881,63 +1392,26 @@ Type* GetBaseElementType (Type* T)
 
 
 
-SymEntry* GetSymEntry (const Type* T)
-/* Return a SymEntry pointer from a type */
+struct SymEntry* GetESUSymEntry (const Type* T)
+/* Return a SymEntry pointer from an enum/struct/union type */
 {
     /* Only enums, structs or unions have a SymEntry attribute */
     CHECK (IsClassStruct (T) || IsTypeEnum (T));
 
     /* Return the attribute */
-    return T->A.P;
+    return T->A.S;
 }
 
 
 
-void SetSymEntry (Type* T, SymEntry* S)
-/* Set the SymEntry pointer for a type */
+void SetESUSymEntry (Type* T, struct SymEntry* S)
+/* Set the SymEntry pointer for an enum/struct/union type */
 {
     /* Only enums, structs or unions have a SymEntry attribute */
     CHECK (IsClassStruct (T) || IsTypeEnum (T));
 
     /* Set the attribute */
-    T->A.P = S;
-}
-
-
-
-Type* IntPromotion (Type* T)
-/* Apply the integer promotions to T and return the result. The returned type
-** string may be T if there is no need to change it.
-*/
-{
-    /* We must have an int to apply int promotions */
-    PRECONDITION (IsClassInt (T));
-
-    /* An integer can represent all values from either signed or unsigned char,
-    ** so convert chars to int and leave all other types alone.
-    */
-    if (IsTypeChar (T)) {
-        return type_int;
-    } else {
-        return T;
-    }
-}
-
-
-
-Type* PtrConversion (Type* T)
-/* If the type is a function, convert it to pointer to function. If the
-** expression is an array, convert it to pointer to first element. Otherwise
-** return T.
-*/
-{
-    if (IsTypeFunc (T)) {
-        return PointerTo (T);
-    } else if (IsTypeArray (T)) {
-        return ArrayToPtr (T);
-    } else {
-        return T;
-    }
+    T->A.S = S;
 }
 
 
@@ -958,4 +1432,102 @@ TypeCode AddrSizeQualifier (unsigned AddrSize)
             return T_QUAL_NEAR;
 
     }
+}
+
+
+
+int TypeHasAttr (const Type* T)
+/* Return true if the given type has attribute data */
+{
+    return IsClassStruct (T) || IsTypeArray (T) || IsClassFunc (T);
+}
+
+
+
+void PrintType (FILE* F, const Type* T)
+/* Print fulle name of the type */
+{
+    StrBuf Buf = AUTO_STRBUF_INITIALIZER;
+    fprintf (F, "%s", SB_GetConstBuf (GetFullTypeNameBuf (&Buf, T)));
+    SB_Done (&Buf);
+}
+
+
+
+void PrintFuncSig (FILE* F, const char* Name, const Type* T)
+/* Print a function signature */
+{
+    StrBuf Buf       = AUTO_STRBUF_INITIALIZER;
+    StrBuf ParamList = AUTO_STRBUF_INITIALIZER;
+    StrBuf East      = AUTO_STRBUF_INITIALIZER;
+    StrBuf West      = AUTO_STRBUF_INITIALIZER;
+
+    /* Get the function descriptor used in definition */
+    const FuncDesc* D = GetFuncDefinitionDesc (T);
+
+    /* Get the parameter list string. Start from the first parameter */
+    SymEntry* Param = D->SymTab->SymHead;
+    unsigned I;
+    for (I = 0; I < D->ParamCount; ++I) {
+        CHECK (Param != 0 && (Param->Flags & SC_PARAM) != 0);
+        if (I > 0) {
+            SB_AppendStr (&ParamList, ", ");
+        }
+        if (SymIsRegVar (Param)) {
+            SB_AppendStr (&ParamList, "register ");
+        }
+        if (!HasAnonName (Param)) {
+            SB_AppendStr (&Buf, Param->Name);
+        }
+        SB_AppendStr (&ParamList, SB_GetConstBuf (GetFullTypeNameBuf (&Buf, Param->Type)));
+        SB_Clear (&Buf);
+        /* Next argument */
+        Param = Param->NextSym;
+    }
+    if ((D->Flags & FD_VARIADIC) == 0) {
+        if (D->ParamCount == 0 && (D->Flags & FD_EMPTY) == 0) {
+            SB_AppendStr (&ParamList, "void");
+        }
+    } else {
+        if (D->ParamCount > 0) {
+            SB_AppendStr (&ParamList, ", ...");
+        } else {
+            SB_AppendStr (&ParamList, "...");
+        }
+    }
+    SB_Terminate (&ParamList);
+
+    /* Get the function qualifiers */
+    if (GetQualifierTypeCodeNameBuf (&Buf, T->C, T_QUAL_NONE) > 0) {
+        /* Append a space between the qualifiers and the name */
+        SB_AppendChar (&Buf, ' ');
+    }
+    SB_Terminate (&Buf);
+
+    /* Get the signature string without the return type */
+    SB_Printf (&West, "%s%s (%s)", SB_GetConstBuf (&Buf), Name, SB_GetConstBuf (&ParamList));
+    SB_Done (&Buf);
+    SB_Done (&ParamList);
+
+    /* Complete with the return type */
+    GetFullTypeNameWestEast (&West, &East, GetFuncReturn (T));
+    SB_Append (&West, &East);
+    SB_Terminate (&West);
+
+    /* Output */
+    fprintf (F, "%s", SB_GetConstBuf (&West));
+    SB_Done (&East);
+    SB_Done (&West);
+}
+
+
+
+void PrintRawType (FILE* F, const Type* T)
+/* Print a type string in raw hex format (for debugging) */
+{
+    while (T->C != T_END) {
+        fprintf (F, "%04lX ", T->C);
+        ++T;
+    }
+    fprintf (F, "\n");
 }

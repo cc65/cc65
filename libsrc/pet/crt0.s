@@ -12,7 +12,6 @@
 
         .include        "zeropage.inc"
         .include        "pet.inc"
-        .include        "../cbm/cbm.inc"
 
 ; ------------------------------------------------------------------------
 ; Startup code

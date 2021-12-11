@@ -148,9 +148,6 @@ void g_defcodelabel (unsigned label);
 void g_defdatalabel (unsigned label);
 /* Define a local data label */
 
-void g_aliasdatalabel (unsigned label, unsigned baselabel, long offs);
-/* Define label as a local alias for baselabel+offs */
-
 
 
 /*****************************************************************************/
@@ -161,6 +158,12 @@ void g_aliasdatalabel (unsigned label, unsigned baselabel, long offs);
 
 void g_defgloblabel (const char* Name);
 /* Define a global label with the given name */
+
+void g_defliterallabel (unsigned label);
+/* Define a literal data label */
+
+void g_aliasliterallabel (unsigned label, unsigned baselabel, long offs);
+/* Define label as an alias for baselabel+offs */
 
 void g_defexport (const char* Name, int ZP);
 /* Export the given label */
@@ -380,7 +383,7 @@ void g_restore (unsigned flags);
 /* Copy hold register to primary. */
 
 void g_cmp (unsigned flags, unsigned long val);
-/* Immidiate compare. The primary register will not be changed, Z flag
+/* Immediate compare. The primary register will not be changed, Z flag
 ** will be set.
 */
 
@@ -409,6 +412,13 @@ void g_truejump (unsigned flags, unsigned label);
 
 void g_falsejump (unsigned flags, unsigned label);
 /* Jump to label if zero flag set */
+
+void g_branch (unsigned Label);
+/* Branch unconditionally to Label if the CPU has the BRA instruction.
+** Otherwise, jump to Label.
+** Use this function, instead of g_jump(), only where it is certain that
+** the label cannot be farther away from the branch than -128/+127 bytes.
+*/
 
 void g_lateadjustSP (unsigned label);
 /* Adjust stack based on non-immediate data */
@@ -470,6 +480,17 @@ void g_initstatic (unsigned InitLabel, unsigned VarLabel, unsigned Size);
 /* Initialize a static local variable from static initialization data */
 
 
+
+/*****************************************************************************/
+/*                                Bit-fields                                 */
+/*****************************************************************************/
+
+void g_testbitfield (unsigned Flags, unsigned BitOffs, unsigned BitWidth);
+/* Test bit-field in ax. */
+
+void g_extractbitfield (unsigned Flags, unsigned FullWidthFlags, int IsSigned,
+                        unsigned BitOffs, unsigned BitWidth);
+/* Extract bits from bit-field in ax. */
 
 /*****************************************************************************/
 /*                             Switch statement                              */

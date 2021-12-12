@@ -115,7 +115,7 @@ struct CodeEntry;
 typedef struct DefOrRef DefOrRef;
 struct DefOrRef {
     unsigned            Line;
-    long                LocalsBlockId;
+    size_t              LocalsBlockId;
     unsigned            Flags;
     int                 StackPtr;
     unsigned            Depth;

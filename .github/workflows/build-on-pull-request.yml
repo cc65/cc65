@@ -20,7 +20,7 @@ jobs:
         shell: bash
         run: |
           sudo apt-get update
-          sudo apt-get install linuxdoc-tools linuxdoc-tools-info binutils-mingw-w64-i686 gcc-mingw-w64-i686 sshpass
+          sudo apt-get install linuxdoc-tools-info gcc-mingw-w64-i686
 
       - name: Build the tools.
         shell: bash

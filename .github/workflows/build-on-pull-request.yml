@@ -20,7 +20,7 @@ jobs:
         shell: bash
         run: |
           sudo apt-get update
-          sudo apt-get install linuxdoc-tools-info gcc-mingw-w64-i686
+          sudo apt-get install linuxdoc-tools-info gcc-mingw-w64-x86-64
 
       - name: Build the tools.
         shell: bash
@@ -37,10 +37,10 @@ jobs:
       - name: Build the document files.
         shell: bash
         run: make -j2 doc
-      - name: Build 32-bit Windows versions of the tools.
+      - name: Build 64-bit Windows versions of the tools.
         run: |
           make -C src clean
-          make -j2 bin USER_CFLAGS=-Werror CROSS_COMPILE=i686-w64-mingw32-
+          make -j2 bin USER_CFLAGS=-Werror CROSS_COMPILE=x86_64-w64-mingw32-
 
   build_windows:
     name: Build (Windows)

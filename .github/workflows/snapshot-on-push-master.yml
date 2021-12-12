@@ -44,7 +44,7 @@ jobs:
         shell: bash
         run: |
           sudo apt-get update
-          sudo apt-get install linuxdoc-tools-info gcc-mingw-w64-i686
+          sudo apt-get install linuxdoc-tools-info gcc-mingw-w64-x86-64 gcc-mingw-w64-i686
 
       - name: Build the tools.
         shell: bash
@@ -64,6 +64,12 @@ jobs:
       - name: Build the document files.
         shell: bash
         run: make -j2 doc
+      - name: Build and package 64-bit Windows versions of the tools.
+        run: |
+          make -C src clean
+          make -j2 bin USER_CFLAGS=-Werror CROSS_COMPILE=x86_64-w64-mingw32-
+          make zip
+          mv cc65.zip cc65-win64.zip
       - name: Build and package 32-bit Windows versions of the tools.
         run: |
           make -C src clean
@@ -71,11 +77,16 @@ jobs:
           make zip
           mv cc65.zip cc65-win32.zip
 
-      - name: Upload Snapshot Zip
+      - name: Upload a 32-bit Snapshot Zip
         uses: actions/upload-artifact@v2
         with:
           name: cc65-snapshot-win32.zip
           path: cc65-win32.zip
+      - name: Upload a 64-bit Snapshot Zip
+        uses: actions/upload-artifact@v2
+        with:
+          name: cc65-snapshot-win64.zip
+          path: cc65-win64.zip
 
       # TODO: Update docs at https://github.com/cc65/doc
       # TODO: Publish snapshot zip at https://github.com/cc65/cc65.github.io

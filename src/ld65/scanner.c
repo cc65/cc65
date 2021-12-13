@@ -196,7 +196,7 @@ static void StrVal (void)
 
                     default:
                         CfgWarning (&CfgErrorPos,
-                                    "Unkown escape sequence '%%%c'", C);
+                                    "Unknown escape sequence '%%%c'", C);
                         SB_AppendChar (&CfgSVal, '%');
                         SB_AppendChar (&CfgSVal, C);
                         NextChar ();

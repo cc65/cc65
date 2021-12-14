@@ -886,7 +886,7 @@ also for a segment. The value must be an integer between 0 and 255. It is used
 as the fill value for space reserved by the assembler's <tt/.ALIGN/ and <tt/.RES/
 commands. It is also used as the fill value for space between sections (part of a
 segment that comes from one object file) caused by alignment, but not for
-space that preceeds the first section.
+space that precedes the first section.
 
 To suppress the warning, the linker issues if it encounters a segment that is
 not found in any of the input files, use "<tt/optional=yes/" as an additional

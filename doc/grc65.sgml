@@ -7,7 +7,7 @@
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
 
 <abstract>
-This document describes a compiler that can create GEOS headers and menues for
+This document describes a compiler that can create GEOS headers and menus for
 cc65-compiled programs.
 </abstract>
 
@@ -24,7 +24,7 @@ Optional resources might be menu definitions, other headers (e.g., for data
 files of an app.), dialog definitions, etc.  Without an application's header,
 GEOS is unable to load and start it.
 
-Currently, <bf/grc65/ supports only menues and the required header definition,
+Currently, <bf/grc65/ supports only menus and the required header definition,
 along with support for building applications with VLIR-structured overlays.
 
 <bf/grc65/ generates output in two formats: C header and <bf/ca65/ source (.s).
@@ -345,7 +345,7 @@ for addresses.
 <!-- <appendix> -->
 <sect>Appendix A -- example.grc<label id="example-grc">
 <p><tscreen><verb>
-; Note that MENU can define both menues and submenues.
+; Note that MENU can define both menus and submenus.
 ; If you want to use any C operators (such as "|", "&", etc.), do it WITHOUT
 ; any spaces between the arguments (the parser is simple and weak).
 

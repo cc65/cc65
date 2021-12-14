@@ -207,7 +207,7 @@ see them together in the filling box in GeoPaint.
 <p>
 <tt/void GraphicsString (const void *myGString)/
 <p>
-One of the more powerfull routines of GEOS. This function calls other graphic functions depending
+One of the more powerful routines of GEOS. This function calls other graphic functions depending
 on the given command string. See the structures chapter for a more detailed description.
 
 <sect2>Rectangle functions
@@ -652,7 +652,7 @@ For some purposes you might consider using the <tt/dio.h/ interface to disk acce
 <p>
 All GEOS disk functions return an error code in the X register. In some cases this is returned by the
 GEOSLib function (if its type is <tt/char/), but in all cases the last error is saved in the <tt/__oserror/
-location. If it is nonzero - an error occured. See <tt/gdisk.h/ for the list of possible errorcodes.
+location. If it is nonzero - an error occurred. See <tt/gdisk.h/ for the list of possible errorcodes.
 You need to include <tt/errno.h/ to get <tt/__oserror/, together with the standard <tt/errno/. The
 latter gives less verbose, but still usable information and can be used with <tt/strerror/.
 Probably you will get more information using <tt/_stroserror/ in a similar way.

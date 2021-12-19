@@ -75,7 +75,7 @@ int __fastcall__ posix_memalign (void** memptr, size_t alignment, size_t size)
     }
 
     /* Test alignment: is it a power of two? There must be only one bit set. */
-    if (alignment == 0 || (alignment & --alignment) != 0) {
+    if (alignment == 0 || (alignment & alignment - 1) != 0) {
         *memptr = NULL;
         return EINVAL;
     }

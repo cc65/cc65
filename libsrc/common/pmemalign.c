@@ -75,7 +75,7 @@ int __fastcall__ posix_memalign (void** memptr, size_t alignment, size_t size)
     }
 
     /* Test alignment: is it a power of two? There must be only one bit set. */
-    if (alignment == 0 || (alignment & alignment - 1) != 0) {
+    if (alignment == 0 || (alignment & (alignment - 1)) != 0) {
         *memptr = NULL;
         return EINVAL;
     }
@@ -86,7 +86,7 @@ int __fastcall__ posix_memalign (void** memptr, size_t alignment, size_t size)
     ** overhead added one time; and, the worst thing that might happen is that
     ** we cannot free the upper and lower blocks.
     */
-    b = malloc (size + alignment);
+    b = malloc (--alignment + size);
 
     /* Handle out-of-memory */
     if (b == NULL) {
@@ -169,6 +169,3 @@ int __fastcall__ posix_memalign (void** memptr, size_t alignment, size_t size)
 
     return EOK;
 }
-
-
-

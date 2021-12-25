@@ -5,25 +5,25 @@
 .importzp   ptr1, tmp1, tmp2, tmp3, tmp4
 
 .proc _strnlen
+        ; Get maximum length.
+        tay
+        iny
+        sty     tmp3
+        inx
+        stx     tmp4
+
         ; Fetch string pointer.
+        jsr     popax
         sta     ptr1
         stx     ptr1+1
 
         ; Clear return value.
-        lda     #0
-        sta     tmp1
-        sta     tmp2
+        ldy     #0
+        sty     tmp1
+        sty     tmp2
 
-        ; Get maximum length.
-        jsr     popax
-        sta     tmp3
-        inc     tmp3
-        inx
-        stx     tmp4
 
         ;;; Loop over string.
-        ldy     #0
-
         ; Decrement maximum length.
 next:   dec     tmp3
         bne     l2
@@ -35,7 +35,7 @@ l2:
         beq     done
 
         ; Step to next character.
-        inc     ptr1
+        iny
         bne     l1
         inc     ptr1+1
 l1:
@@ -45,7 +45,7 @@ l1:
         bne     next
         inc     tmp2
 
-        jmp     next
+        bne     next        ; (jmp)
 
 
 done:   lda     tmp1

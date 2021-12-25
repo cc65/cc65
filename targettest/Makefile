@@ -135,7 +135,7 @@ endif
 ifeq ($(SYS),cbm510)
 	LDFLAGS+=-Ln $@.lbl
 endif
-ifeq ($(SYS),cbm510)
+ifeq ($(SYS),cbm610)
 	LDFLAGS+=-Ln $@.lbl
 endif
 ifeq ($(SYS),cx16)

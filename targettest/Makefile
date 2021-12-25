@@ -160,6 +160,7 @@ EXELIST_c64 = \
 	scanf-test \
 	ser-test \
 	strdup-test \
+	strnlen \
 	stroserror-test \
 	strqtok-test \
 	tinyshell \
@@ -190,6 +191,7 @@ EXELIST_vic20 = \
 	rename-test \
 	scanf-test \
 	strdup-test \
+	strnlen \
 	stroserror-test \
 	strqtok-test \
 	tinyshell \
@@ -222,6 +224,7 @@ EXELIST_apple2 = \
 	seek \
 	ser-test \
 	strdup-test \
+	strnlen \
 	stroserror-test \
 	strqtok-test \
 	tinyshell \
@@ -257,6 +260,7 @@ EXELIST_atari = \
 	seek \
 	ser-test \
 	strdup-test \
+	strnlen \
 	stroserror-test \
 	strqtok-test \
 	tinyshell \

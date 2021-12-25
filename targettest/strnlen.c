@@ -8,7 +8,7 @@ void
 check (size_t result, size_t expected)
 {
     if (result != expected) {
-        printf ("Expected strnlen() to return %d, got %d.\n",
+        printf ("Expected strnlen() to return %u, got %u.\n",
                 expected, result);
         exit (EXIT_FAILURE);
     }

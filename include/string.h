@@ -50,7 +50,7 @@ char* __fastcall__ strcpy (char* dest, const char* src);
 size_t __fastcall__ strcspn (const char* s1, const char* s2);
 char* __fastcall__ strerror (int errcode);
 size_t __fastcall__ strlen (const char* s);
-size_t __fastcall__ strnlen (const char* s, size_t maxlen);
+size_t __fastcall__ strnlen (const char* s, size_t maxlen);     /* POSIX.1-2008 */
 char* __fastcall__ strncat (char* s1, const char* s2, size_t count);
 int __fastcall__ strncmp (const char* s1, const char* s2, size_t count);
 char* __fastcall__ strncpy (char* dest, const char* src, size_t count);

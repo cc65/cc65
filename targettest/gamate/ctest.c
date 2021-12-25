@@ -7,11 +7,8 @@ unsigned char y = 0;
 unsigned char x = 0;
 unsigned short n;
 
-int main(int argc, char *argv[])
+void main(void)
 {
-    (void) argc;    // Suppress warnings.
-    (void) argv;
-
     clrscr();
     gotoxy(0,0);cputs("Gamate C-Test");
 

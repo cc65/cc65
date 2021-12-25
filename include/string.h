@@ -50,7 +50,6 @@ char* __fastcall__ strcpy (char* dest, const char* src);
 size_t __fastcall__ strcspn (const char* s1, const char* s2);
 char* __fastcall__ strerror (int errcode);
 size_t __fastcall__ strlen (const char* s);
-size_t __fastcall__ strnlen (const char* s, size_t maxlen);     /* POSIX.1-2008 */
 char* __fastcall__ strncat (char* s1, const char* s2, size_t count);
 int __fastcall__ strncmp (const char* s1, const char* s2, size_t count);
 char* __fastcall__ strncpy (char* dest, const char* src, size_t count);
@@ -79,6 +78,7 @@ int __fastcall__ stricmp (const char* s1, const char* s2);    /* DOS/Windows */
 int __fastcall__ strcasecmp (const char* s1, const char* s2); /* Same for Unix */
 int __fastcall__ strnicmp (const char* s1, const char* s2, size_t count);     /* DOS/Windows */
 int __fastcall__ strncasecmp (const char* s1, const char* s2, size_t count);  /* Same for Unix */
+size_t __fastcall__ strnlen (const char* s, size_t maxlen);     /* POSIX.1-2008 */
 char* __fastcall__ strlwr (char* s);
 char* __fastcall__ strlower (char* s);
 char* __fastcall__ strupr (char* s);

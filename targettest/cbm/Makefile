@@ -43,4 +43,4 @@ cbmdir-test.prg: cbmdir-test.c
 	$(CL) -t $(SYS) -Oris -o $@ $<
 
 clean:
-	@$(DEL) petscii.prg cbmdir-test.prg 2>$(NULLDEV)
+	@$(DEL) *.lst petscii.prg cbmdir-test.prg 2>$(NULLDEV)

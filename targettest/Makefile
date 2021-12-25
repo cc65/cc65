@@ -122,6 +122,44 @@ DISK_atarixl   = testcode.atr
 
 .PRECIOUS: %.o
 
+LDFLAGS=
+ifeq ($(SYS),c64)
+	LDFLAGS+=-Ln $@.lst
+endif
+ifeq ($(SYS),c128)
+	LDFLAGS+=-Ln $@.lst
+endif
+ifeq ($(SYS),c16)
+	LDFLAGS+=-Ln $@.lst
+endif
+ifeq ($(SYS),cbm510)
+	LDFLAGS+=-Ln $@.lst
+endif
+ifeq ($(SYS),cbm510)
+	LDFLAGS+=-Ln $@.lst
+endif
+ifeq ($(SYS),cx16)
+	LDFLAGS+=-Ln $@.lst
+endif
+ifeq ($(SYS),geos-cbm)
+	LDFLAGS+=-Ln $@.lst
+endif
+ifeq ($(SYS),lunix)
+	LDFLAGS+=-Ln $@.lst
+endif
+ifeq ($(SYS),pet)
+	LDFLAGS+=-Ln $@.lst
+endif
+ifeq ($(SYS),pet-overlay)
+	LDFLAGS+=-Ln $@.lst
+endif
+ifeq ($(SYS),plus4)
+	LDFLAGS+=-Ln $@.lst
+endif
+ifeq ($(SYS),vic20)
+	LDFLAGS+=-Ln $@.lst
+endif
+
 .o:
 ifeq ($(SYS),vic20)
 	$(LD) $(LDFLAGS_$(@F)_$(SYS)) $(LDFLAGS) -o $@ -C vic20-32k.cfg -m $@.map $^ $(SYS).lib
@@ -390,7 +428,7 @@ testcode.atr: testcode
 # Clean-up rules
 
 mostlyclean:
-	@$(DEL) *.lbl *.map *.o 2>$(NULLDEV)
+	@$(DEL) *.lbl *.map *.lst *.o 2>$(NULLDEV)
 # we cant use .s since we have asm files in the directory that we want to keep
 	@$(DEL) ${patsubst %.c,%.s,$(wildcard *.c)} 2>$(NULLDEV)
 

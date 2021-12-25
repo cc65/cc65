@@ -6,7 +6,7 @@
 
 
 
-static unsigned char* V[256];
+static char* V[256];
 
 
 
@@ -17,7 +17,7 @@ static char* Alloc (void)
     unsigned char Size = (((unsigned char)rand()) & 0x7F) + 1;
 
     /* Allocate memory */
-    unsigned char* P = malloc (Size);
+    char* P = malloc (Size);
 
     /* Set the string to a defined value. We use the size, since this will
     ** also allow us to retrieve it later.
@@ -33,7 +33,7 @@ static char* Alloc (void)
 
 
 
-static void Free (unsigned char* P)
+static void Free (char* P)
 /* Check a memory block and free it */
 {
     unsigned char I;

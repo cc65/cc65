@@ -9,6 +9,9 @@ unsigned short n;
 
 int main(int argc, char *argv[])
 {
+    (void) argc;    // Suppress warnings.
+    (void) argv;
+
     clrscr();
     gotoxy(0,0);cputs("Gamate C-Test");
 

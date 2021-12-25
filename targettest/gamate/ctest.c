@@ -7,7 +7,7 @@ unsigned char y = 0;
 unsigned char x = 0;
 unsigned short n;
 
-int main(void)
+void main(void)
 {
     clrscr();
     gotoxy(0,0);cputs("Gamate C-Test");
@@ -47,6 +47,4 @@ int main(void)
         (*((unsigned char*)LCD_YPOS)) = y;
 
     }
-
-    return 0;
 }

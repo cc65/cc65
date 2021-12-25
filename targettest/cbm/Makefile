@@ -41,7 +41,7 @@ endif
 
 cbmdir-test.prg: cbmdir-test.c
 ifeq ($(SYS),vic20)
-	$(CL) -C vic20-32k.cfg -Oris -o $@ $<
+	$(CL) -t $(SYS) -C vic20-32k.cfg -Oris -o $@ $<
 else
 	$(CL) -t $(SYS) -Oris -o $@ $<
 endif

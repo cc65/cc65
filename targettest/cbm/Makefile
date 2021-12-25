@@ -47,4 +47,4 @@ else
 endif
 
 clean:
-	@$(DEL) *.lst petscii.prg cbmdir-test.prg 2>$(NULLDEV)
+	@$(DEL) *.lbl petscii.prg cbmdir-test.prg 2>$(NULLDEV)

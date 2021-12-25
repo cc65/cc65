@@ -7,7 +7,7 @@ unsigned char y = 0;
 unsigned char x = 0;
 unsigned short n;
 
-void main(void)
+int main(void)
 {
     clrscr();
     gotoxy(0,0);cputs("Gamate C-Test");

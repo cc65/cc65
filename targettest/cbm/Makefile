@@ -32,8 +32,12 @@ endif
 
 all: petscii.prg cbmdir-test.prg
 
+ifeq ($(SYS),c64)
 petscii.prg: petscii.c
 	$(CL) -t $(SYS) -O -o petscii.prg petscii.c
+else
+petscii.prg:
+endif
 
 cbmdir-test.prg: cbmdir-test.c
 	$(CL) -t $(SYS) -Oris -o $@ $<

@@ -124,40 +124,40 @@ DISK_atarixl   = testcode.atr
 
 LDFLAGS=
 ifeq ($(SYS),c64)
-	LDFLAGS+=-Ln $@.lst
+	LDFLAGS+=-Ln $@.lbl
 endif
 ifeq ($(SYS),c128)
-	LDFLAGS+=-Ln $@.lst
+	LDFLAGS+=-Ln $@.lbl
 endif
 ifeq ($(SYS),c16)
-	LDFLAGS+=-Ln $@.lst
+	LDFLAGS+=-Ln $@.lbl
 endif
 ifeq ($(SYS),cbm510)
-	LDFLAGS+=-Ln $@.lst
+	LDFLAGS+=-Ln $@.lbl
 endif
 ifeq ($(SYS),cbm510)
-	LDFLAGS+=-Ln $@.lst
+	LDFLAGS+=-Ln $@.lbl
 endif
 ifeq ($(SYS),cx16)
-	LDFLAGS+=-Ln $@.lst
+	LDFLAGS+=-Ln $@.lbl
 endif
 ifeq ($(SYS),geos-cbm)
-	LDFLAGS+=-Ln $@.lst
+	LDFLAGS+=-Ln $@.lbl
 endif
 ifeq ($(SYS),lunix)
-	LDFLAGS+=-Ln $@.lst
+	LDFLAGS+=-Ln $@.lbl
 endif
 ifeq ($(SYS),pet)
-	LDFLAGS+=-Ln $@.lst
+	LDFLAGS+=-Ln $@.lbl
 endif
 ifeq ($(SYS),pet-overlay)
-	LDFLAGS+=-Ln $@.lst
+	LDFLAGS+=-Ln $@.lbl
 endif
 ifeq ($(SYS),plus4)
-	LDFLAGS+=-Ln $@.lst
+	LDFLAGS+=-Ln $@.lbl
 endif
 ifeq ($(SYS),vic20)
-	LDFLAGS+=-Ln $@.lst
+	LDFLAGS+=-Ln $@.lbl
 endif
 
 .o:
@@ -424,7 +424,7 @@ testcode.atr: testcode
 # Clean-up rules
 
 mostlyclean:
-	@$(DEL) *.lbl *.map *.lst *.o 2>$(NULLDEV)
+	@$(DEL) *.lbl *.map *.lbl *.o 2>$(NULLDEV)
 # we cant use .s since we have asm files in the directory that we want to keep
 	@$(DEL) ${patsubst %.c,%.s,$(wildcard *.c)} 2>$(NULLDEV)
 

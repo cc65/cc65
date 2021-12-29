@@ -106,7 +106,7 @@ devnotpresent2:
         pla
 devnotpresent:
         lda     #ENODEV
-        jmp     __directerrno   ; Sets _errno, clears _oserror, returns -1
+        .byte   $2C             ; Skip next opcode
 
 ; Error entry: The given file descriptor is not valid or not open
 

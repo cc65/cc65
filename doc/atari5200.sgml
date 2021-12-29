@@ -237,7 +237,7 @@ The runtime library provides a default game name which is "cc65
 compiled". To change that, one has to link a file which puts data into
 the "<tt/CARTNAME/" segment.
 
-For reference, here's the default version used by the cc65 libary:
+For reference, here's the default version used by the cc65 library:
 <tscreen><verb>
 .export         __CART_NAME__: absolute = 1
 .macpack        atari

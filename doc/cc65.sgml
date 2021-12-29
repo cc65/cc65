@@ -395,7 +395,7 @@ Here is a description of all the command line options:
 
   This option is used to set the target system. The target system determines
   the character set that is used for strings and character constants and the
-  default CPU. The CPU setting can be overriden by use of the <tt/<ref
+  default CPU. The CPU setting can be overridden by use of the <tt/<ref
   id="option--cpu" name="--cpu">/ option.
 
   The following target systems are supported:
@@ -1022,6 +1022,10 @@ The compiler defines several macros at startup:
 
   This macro is defined if the target is the Supervision (-t supervision).
 
+  <tag><tt>__SYM1__</tt></tag>
+
+  This macro is defined if the target is the Sym-1 (-t sym1).
+
   <tag><tt>__TELESTRAT__</tt></tag>
 
   This macro is defined if the target is the Telestrat (-t telestrat).
@@ -1246,7 +1250,7 @@ parameter with the <tt/#pragma/.
 
   This pragma is used to display informational messages at compile-time.
 
-  The message intented to be displayed must be a string literal.
+  The message intended to be displayed must be a string literal.
 
   Example:
   <tscreen><verb>
@@ -1365,7 +1369,7 @@ parameter with the <tt/#pragma/.
   Switch compiler warnings on or off. "name" is the name of a warning (see the
   <tt/<ref name="-W" id="option-W">/ compiler option for a list). The name is
   followed either by "pop", which restores the last pushed state, or by "on" or
-  "off", optionally preceeded by "push" to push the current state before
+  "off", optionally preceded by "push" to push the current state before
   changing it.
 
   Example:

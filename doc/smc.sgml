@@ -85,7 +85,7 @@ Please note:
 <item>  The macro '<tt>SMC_StoreValue</tt>' takes care, that the store
         operation will occur on the value-position of a SMC-instruction. As
         you will see, other macros influence other instruction part positions.
-        There is no consistency check, if the targeted SMC instruction acually
+        There is no consistency check, if the targeted SMC instruction actually
         contains a value. Storing a 'value' on an immplied SMC instruction
         would corrupt the following memory cell!
 </enum>
@@ -582,7 +582,7 @@ into a single instruction line. These can be changed of course too.
 Line 10,11: These lines construct a branch operation for line 8: The
 X-register will be used to change it from 'inc StoreAccuFirstSection+2'
 (high-byte operation) to 'beq restoreCode'. Please note: To calculate the
-relaive branch offset, we introduced a second label
+relative branch offset, we introduced a second label
 ('RestoreCodeBranchBaseAdr') for to calculate it. Some could also use the
 internal name of the SMC label, but you should abstain to do so - it may be
 changed in the future...

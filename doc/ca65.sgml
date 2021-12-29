@@ -301,7 +301,7 @@ Here is a description of all the command line options:
   compiler, see there for a list.
 
   Depending on the target, the default CPU type is also set. This can be
-  overriden by using the <tt/<ref id="option--cpu" name="--cpu">/ option.
+  overridden by using the <tt/<ref id="option--cpu" name="--cpu">/ option.
 
 
   <label id="option-v">
@@ -4786,6 +4786,7 @@ compiler, depending on the target system selected:
 <item><tt/__SIM6502__/ - Target system is <tt/sim6502/
 <item><tt/__SIM65C02__/ - Target system is <tt/sim65c02/
 <item><tt/__SUPERVISION__/ - Target system is <tt/supervision/
+<item><tt/__SYM1__/ - Target system is <tt/sym1/
 <item><tt/__VIC20__/ - Target system is <tt/vic20/
 </itemize>
 

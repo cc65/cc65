@@ -555,7 +555,7 @@ feature on.
 </quote>
 
 <quote>
-In VICE, got to <bf/Settings/ -> <bf/Settings/, then <bf/Peripherial devices/ ->
+In VICE, got to <bf/Settings/ -> <bf/Settings/, then <bf/Peripheral devices/ ->
 <bf/Drive/. Then, you must enable the <bf/True drive emulation/ checkbox.
 </quote>
 

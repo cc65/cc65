@@ -951,7 +951,7 @@ DefOrRef* AddDefOrRef (SymEntry* E, unsigned Flags)
     DOR = xmalloc (sizeof (DefOrRef));
     CollAppend (E->V.L.DefsOrRefs, DOR);
     DOR->Line = GetCurrentLine ();
-    DOR->LocalsBlockId = (long)CollLast (&CurrentFunc->LocalsBlockStack);
+    DOR->LocalsBlockId = (size_t)CollLast (&CurrentFunc->LocalsBlockStack);
     DOR->Flags = Flags;
     DOR->StackPtr = StackPtr;
     DOR->Depth = CollCount (&CurrentFunc->LocalsBlockStack);
@@ -1013,9 +1013,9 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
                 /* Are we jumping into a block with initalization of an object that
                 ** has automatic storage duration? Let's emit a warning.
                 */
-                if ((long)CollLast (AIC) != DOR->LocalsBlockId &&
+                if ((size_t)CollLast (AIC) != DOR->LocalsBlockId &&
                     (CollCount (AIC) < DOR->Depth ||
-                    (long)CollAt (AIC, DOR->Depth - 1) != DOR->LocalsBlockId)) {
+                    (size_t)CollAt (AIC, DOR->Depth - 1) != DOR->LocalsBlockId)) {
                     Warning ("Goto at line %d to label %s jumps into a block with "
                     "initialization of an object that has automatic storage duration",
                     GetCurrentLine (), Name);
@@ -1044,9 +1044,9 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
                 /* Are we jumping into a block with initalization of an object that
                 ** has automatic storage duration? Let's emit a warning.
                 */
-                if ((long)CollLast (AIC) != DOR->LocalsBlockId &&
+                if ((size_t)CollLast (AIC) != DOR->LocalsBlockId &&
                     (CollCount (AIC) >= DOR->Depth ||
-                    (long)CollLast (AIC) >= (long)DOR->Line))
+                    (size_t)CollLast (AIC) >= (size_t)DOR->Line))
                     Warning ("Goto at line %d to label %s jumps into a block with "
                     "initialization of an object that has automatic storage duration",
                     DOR->Line, Name);

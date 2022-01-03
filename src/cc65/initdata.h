@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 declare.h                                 */
+/*                                initdata.h                                 */
 /*                                                                           */
-/*                 Parse variable and function declarations                  */
+/*                    Parse and generate initializer data                    */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,60 +33,13 @@
 
 
 
-#ifndef DECLARE_H
-#define DECLARE_H
+#ifndef INITDATA_H
+#define INITDATA_H
 
 
-
-/* common */
-#include "coll.h"
 
 /* cc65 */
-#include "scanner.h"
-#include "symtab.h"
-
-
-
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
-
-
-
-/* Masks for the Flags field in DeclSpec */
-#define DS_DEF_STORAGE          0x0001U /* Default storage class used   */
-#define DS_DEF_TYPE             0x0002U /* Default type used            */
-#define DS_EXTRA_TYPE           0x0004U /* Extra type declared          */
-#define DS_NEW_TYPE_DECL        0x0010U /* New type declared            */
-#define DS_NEW_TYPE_DEF         0x0020U /* New type defined             */
-#define DS_NEW_TYPE             (DS_NEW_TYPE_DECL | DS_NEW_TYPE_DEF)
-
-/* Result of ParseDeclSpec */
-typedef struct DeclSpec DeclSpec;
-struct DeclSpec {
-    unsigned    StorageClass;           /* One of the SC_xxx flags      */
-    Type        Type[MAXTYPELEN];       /* Type of the declaration spec */
-    unsigned    Flags;                  /* Bitmapped flags              */
-};
-
-/* Result of ParseDecl */
-typedef struct Declaration Declaration;
-struct Declaration {
-    unsigned    StorageClass;           /* A set of SC_xxx flags */
-    Type        Type[MAXTYPELEN];       /* The type */
-    ident       Ident;                  /* The identifier, if any*/
-    Collection* Attributes;             /* Attributes if any */
-
-    /* Working variables */
-    unsigned    Index;              /* Used to build Type */
-};
-
-/* Modes for ParseDecl */
-typedef enum {
-    DM_NEED_IDENT,                      /* We must have an identifier */
-    DM_NO_IDENT,                        /* We won't read an identifier */
-    DM_ACCEPT_IDENT,                    /* We will accept an id if there is one */
-} declmode_t;
+#include "datatype.h"
 
 
 
@@ -96,26 +49,13 @@ typedef enum {
 
 
 
-void InitDeclSpec (DeclSpec* D);
-/* Initialize the DeclSpec struct for use */
-
-Type* ParseType (Type* Type);
-/* Parse a complete type specification */
-
-void ParseDecl (const DeclSpec* Spec, Declaration* D, declmode_t Mode);
-/* Parse a variable, type or function declaration */
-
-void ParseDeclSpec (DeclSpec* D, unsigned DefStorage, long DefType);
-/* Parse a declaration specification */
-
-void CheckEmptyDecl (const DeclSpec* D);
-/* Called after an empty type declaration (that is, a type declaration without
-** a variable). Checks if the declaration does really make sense and issues a
-** warning if not.
+unsigned ParseInit (Type* T);
+/* Parse initialization of variables. Return the number of initialized data
+** bytes.
 */
 
 
 
-/* End of declare.h */
+/* End of initdata.h */
 
 #endif

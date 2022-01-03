@@ -25,6 +25,7 @@
 #include "funcdesc.h"
 #include "function.h"
 #include "global.h"
+#include "initdata.h"
 #include "litpool.h"
 #include "loadexpr.h"
 #include "macrotab.h"

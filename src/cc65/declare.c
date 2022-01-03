@@ -1462,7 +1462,7 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
 
         case TOK_IDENT:
             /* This could be a label */
-            if (NextTok.Tok != TOK_COLON) {
+            if (NextTok.Tok != TOK_COLON || GetLexicalLevel () == LEX_LEVEL_STRUCT) {
                 Entry = FindSym (CurTok.Ident);
                 if (Entry && SymIsTypeDef (Entry)) {
                     /* It's a typedef */

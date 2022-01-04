@@ -1016,9 +1016,18 @@ const Type* IntPromotion (const Type* T)
     */
 
     if (IsTypeBitField (T)) {
-        /* The standard rule is OK for now as we don't support bit-fields with widths > 16.
+        /* As we now support long bit-fields, we need modified rules for them:
+        ** - If an int can represent all values of the bit-field, the bit-field is converted
+        **   to an int;
+        ** - Otherwise, if an unsigned int can represent all values of the bit-field, the
+        **   bit-field is converted to an unsigned int;
+        ** - Otherwise, the bit-field will have its declared integer type.
+        ** These rules are borrowed from C++ and seem to be consistent with GCC/Clang's.
         */
-        return T->A.B.Width >= INT_BITS && IsSignUnsigned (T) ? type_uint : type_int;
+        if (T->A.B.Width > INT_BITS) {
+            return IsSignUnsigned (T) ? type_ulong : type_long;
+        }
+        return T->A.B.Width == INT_BITS && IsSignUnsigned (T) ? type_uint : type_int;
     } else if (IsTypeChar (T)) {
         /* An integer can represent all values from either signed or unsigned char, so convert
         ** chars to int.

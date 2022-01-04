@@ -505,13 +505,14 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
         */
         if (SymIsBitField (Sym) && (IsAnonName (Sym->Name))) {
             /* Account for the data and output it if we have at least a full
-            ** word. We may have more if there was storage unit overlap, for
-            ** example two consecutive 10 bit fields. These will be packed
-            ** into 3 bytes.
+            ** byte. We may have more if there was storage unit overlap, for
+            ** example two consecutive 7 bit fields. Those would be packed
+            ** into 2 bytes.
             */
             SI.ValBits += Sym->Type->A.B.Width;
+            CHECK (SI.ValBits <= CHAR_BIT * sizeof(SI.BitVal));
             /* TODO: Generalize this so any type can be used. */
-            CHECK (SI.ValBits <= CHAR_BITS + INT_BITS - 2);
+            CHECK (SI.ValBits <= LONG_BITS);
             while (SI.ValBits >= CHAR_BITS) {
                 DefineBitFieldData (&SI);
             }
@@ -530,45 +531,51 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
             /* Parse initialization of one field. Bit-fields need a special
             ** handling.
             */
-            ExprDesc ED;
-            ED_Init (&ED);
-            unsigned Val;
+            ExprDesc Field;
+            ED_Init (&Field);
+            unsigned long Val;
             unsigned Shift;
 
             /* Calculate the bitmask from the bit-field data */
-            unsigned Mask = (1U << Sym->Type->A.B.Width) - 1U;
+            unsigned long Mask = shl_l (1UL, Sym->Type->A.B.Width) - 1UL;
 
             /* Safety ... */
             CHECK (Sym->V.Offs * CHAR_BITS + Sym->Type->A.B.Offs ==
                    SI.Offs     * CHAR_BITS + SI.ValBits);
 
             /* Read the data, check for a constant integer, do a range check */
-            ED = ParseScalarInitInternal (IntPromotion (Sym->Type));
-            if (!ED_IsConstAbsInt (&ED)) {
+            Field = ParseScalarInitInternal (IntPromotion (Sym->Type));
+            if (!ED_IsConstAbsInt (&Field)) {
                 Error ("Constant initializer expected");
-                ED_MakeConstAbsInt (&ED, 1);
+                ED_MakeConstAbsInt (&Field, 1);
             }
 
             /* Truncate the initializer value to the width of the bit-field and check if we lost
             ** any useful bits.
             */
-            Val = (unsigned) ED.IVal & Mask;
+            Val = (unsigned long) Field.IVal & Mask;
             if (IsSignUnsigned (Sym->Type)) {
-                if (ED.IVal < 0 || (unsigned long) ED.IVal != Val) {
-                    Warning ("Implicit truncation from '%s' to '%s : %u' in bit-field initializer"
-                             " changes value from %ld to %u",
-                             GetFullTypeName (ED.Type), GetFullTypeName (Sym->Type),
-                             Sym->Type->A.B.Width, ED.IVal, Val);
+                if (Field.IVal < 0 || (unsigned long) Field.IVal != Val) {
+                    Warning (IsSignUnsigned (Field.Type) ?
+                             "Implicit truncation from '%s' to '%s : %u' in bit-field initializer"
+                             " changes value from %lu to %lu" :
+                             "Implicit truncation from '%s' to '%s : %u' in bit-field initializer"
+                             " changes value from %ld to %lu",
+                             GetFullTypeName (Field.Type), GetFullTypeName (Sym->Type),
+                             Sym->Type->A.B.Width, Field.IVal, Val);
                 }
             } else {
                 /* Sign extend back to full width of host long. */
                 unsigned ShiftBits = sizeof (long) * CHAR_BIT - Sym->Type->A.B.Width;
-                long RestoredVal = asr_l(asl_l (Val, ShiftBits), ShiftBits);
-                if (ED.IVal != RestoredVal) {
-                    Warning ("Implicit truncation from '%s' to '%s : %u' in bit-field initializer "
-                             "changes value from %ld to %ld",
-                             GetFullTypeName (ED.Type), GetFullTypeName (Sym->Type),
-                             Sym->Type->A.B.Width, ED.IVal, RestoredVal);
+                long RestoredVal = asr_l (asl_l (Val, ShiftBits), ShiftBits);
+                if (Field.IVal != RestoredVal) {
+                    Warning (IsSignUnsigned (Field.Type) ?
+                             "Implicit truncation from '%s' to '%s : %u' in bit-field initializer"
+                             " changes value from %lu to %ld" :
+                             "Implicit truncation from '%s' to '%s : %u' in bit-field initializer"
+                             " changes value from %ld to %ld",
+                             GetFullTypeName (Field.Type), GetFullTypeName (Sym->Type),
+                             Sym->Type->A.B.Width, Field.IVal, RestoredVal);
                 }
             }
 
@@ -578,15 +585,15 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
 
             /* Account for the data and output any full bytes we have. */
             SI.ValBits += Sym->Type->A.B.Width;
-            /* Make sure unsigned is big enough to hold the value, 22 bits.
-            ** This is 22 bits because the most we can have is 7 bits left
-            ** over from the previous OutputBitField call, plus 15 bits
-            ** from this field.  A 16-bit bit-field will always be byte
-            ** aligned, so will have padding before it.
+            /* Make sure unsigned is big enough to hold the value, 32 bits.
+            ** This cannot be more than 32 bits because a 16-bit or 32-bit
+            ** bit-field will always be byte-aligned with padding before it
+            ** if there are bits from prior fields that haven't been output
+            ** yet.
             */
             CHECK (SI.ValBits <= CHAR_BIT * sizeof(SI.BitVal));
             /* TODO: Generalize this so any type can be used. */
-            CHECK (SI.ValBits <= CHAR_BITS + INT_BITS - 2);
+            CHECK (SI.ValBits <= LONG_BITS);
             while (SI.ValBits >= CHAR_BITS) {
                 DefineBitFieldData (&SI);
             }

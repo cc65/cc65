@@ -105,7 +105,7 @@ static void SetAX (CPURegs* Regs, unsigned Val)
 
 static unsigned char Pop (CPURegs* Regs)
 {
-    return MemReadByte (0x0100 + ++Regs->SP);
+    return MemReadByte (0x0100 + (++Regs->SP & 0xFF));
 }
 
 
@@ -327,5 +327,7 @@ void ParaVirtHooks (CPURegs* Regs)
     Hooks[Regs->PC - PARAVIRT_BASE] (Regs);
 
     /* Simulate RTS */
-    Regs->PC = Pop(Regs) + (Pop(Regs) << 8) + 1;
+    unsigned lo = Pop(Regs);
+    unsigned hi = Pop(Regs);
+    Regs->PC = lo + (hi << 8) + 1;
 }

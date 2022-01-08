@@ -317,6 +317,8 @@ void ParaVirtInit (unsigned aArgStart, unsigned char aSPAddr)
 void ParaVirtHooks (CPURegs* Regs)
 /* Potentially execute paravirtualization hooks */
 {
+    unsigned lo;
+
     /* Check for paravirtualization address range */
     if (Regs->PC <  PARAVIRT_BASE ||
         Regs->PC >= PARAVIRT_BASE + sizeof (Hooks) / sizeof (Hooks[0])) {
@@ -327,6 +329,6 @@ void ParaVirtHooks (CPURegs* Regs)
     Hooks[Regs->PC - PARAVIRT_BASE] (Regs);
 
     /* Simulate RTS */
-    unsigned lo = Pop(Regs);
+    lo = Pop(Regs);
     Regs->PC = lo + (Pop(Regs) << 8) + 1;
 }

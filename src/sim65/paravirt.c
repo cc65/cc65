@@ -329,6 +329,6 @@ void ParaVirtHooks (CPURegs* Regs)
     Hooks[Regs->PC - PARAVIRT_BASE] (Regs);
 
     /* Simulate RTS */
-    lo = Pop(Regs);
-    Regs->PC = lo + (Pop(Regs) << 8) + 1;
+    lo = Pop (Regs);
+    Regs->PC = lo + (Pop (Regs) << 8) + 1;
 }

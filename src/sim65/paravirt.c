@@ -328,6 +328,5 @@ void ParaVirtHooks (CPURegs* Regs)
 
     /* Simulate RTS */
     unsigned lo = Pop(Regs);
-    unsigned hi = Pop(Regs);
-    Regs->PC = lo + (hi << 8) + 1;
+    Regs->PC = lo + (Pop(Regs) << 8) + 1;
 }

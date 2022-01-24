@@ -726,6 +726,11 @@ for sectors 1 to 3, regardless of the type of diskette.
 The console I/O is speed optimized therefore support for XEP80 hardware
 or f80.com software is missing. Of course you may use stdio.h functions.
 
+<tt/cprintf/ targets a 40 character line. On a 20-column display this has
+the unexpected effect of a blank line after your text. On such displays you can either
+use for example <tt/gotoxy(20,0)/ to target the "next" line, or you can switch to <tt/write()/
+function which does not have this side effect.
+
 
 <sect>Technical details<label id="techdetail"><p>
 

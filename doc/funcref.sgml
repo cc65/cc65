@@ -7788,10 +7788,6 @@ format specifiers as <tt/vprintf/. <!-- <tt/<ref id="vprintf" name="vprintf">/. 
 between <tt/\r/ and <tt/\n/.
 <item>The function is only available as fastcall function, so it may only be
 used in presence of a prototype.
-<item>cprintf targets a 40 character line. On a 20-column display this has
-the unexpected effect of a blank line after your text. On such displays you can either
-use for example gotoxy(20,0) to target the "next" line, or you can switch to write()
-function which does not have this side effect.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/

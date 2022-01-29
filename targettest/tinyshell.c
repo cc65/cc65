@@ -60,13 +60,13 @@ extern unsigned int getsp(void);  /* comes from getsp.s */
 static unsigned char verbose;
 static unsigned char terminate;
 static unsigned char cmd;
-static unsigned char *cmd_asc, *arg1, *arg2, *arg3, *args;  /* 'args': everything after command */
-static unsigned char keyb_buf[KEYB_BUFSZ + 1];
-static unsigned char keyb_buf2[KEYB_BUFSZ + 1];
+static char *cmd_asc, *arg1, *arg2, *arg3, *args;  /* 'args': everything after command */
+static char keyb_buf[KEYB_BUFSZ + 1];
+static char keyb_buf2[KEYB_BUFSZ + 1];
 static size_t cpbuf_sz = 4096;
 
 struct cmd_table {
-    unsigned char *name;
+    char *name;
     unsigned char code;
 } cmd_table[] = {
     { "help",  CMD_HELP },
@@ -196,7 +196,7 @@ static void cmd_help(void)
 static void cmd_ls(void)
 {
     DIR *dir;
-    unsigned char *arg;
+    char *arg;
     struct dirent *dirent;
 #ifdef __ATARI__
     char need_free = 0;
@@ -356,7 +356,7 @@ static void cmd_rename(void)
 
 static void cmd_exec(void)
 {
-    unsigned char *progname, *arguments;
+    char *progname, *arguments;
 
     progname = strtok(args, " \t\n");
     if (! progname) {
@@ -373,7 +373,7 @@ static void cmd_exec(void)
 static void cmd_copy(void)
 {
     int srcfd = -1, dstfd = -1;
-    unsigned char *buf;
+    char *buf;
     int readsz, writesz;
 
     if (!arg2 || arg3) {

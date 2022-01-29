@@ -122,6 +122,44 @@ DISK_atarixl   = testcode.atr
 
 .PRECIOUS: %.o
 
+LDFLAGS=
+ifeq ($(SYS),c64)
+	LDFLAGS+=-Ln $@.lbl
+endif
+ifeq ($(SYS),c128)
+	LDFLAGS+=-Ln $@.lbl
+endif
+ifeq ($(SYS),c16)
+	LDFLAGS+=-Ln $@.lbl
+endif
+ifeq ($(SYS),cbm510)
+	LDFLAGS+=-Ln $@.lbl
+endif
+ifeq ($(SYS),cbm610)
+	LDFLAGS+=-Ln $@.lbl
+endif
+ifeq ($(SYS),cx16)
+	LDFLAGS+=-Ln $@.lbl
+endif
+ifeq ($(SYS),geos-cbm)
+	LDFLAGS+=-Ln $@.lbl
+endif
+ifeq ($(SYS),lunix)
+	LDFLAGS+=-Ln $@.lbl
+endif
+ifeq ($(SYS),pet)
+	LDFLAGS+=-Ln $@.lbl
+endif
+ifeq ($(SYS),pet-overlay)
+	LDFLAGS+=-Ln $@.lbl
+endif
+ifeq ($(SYS),plus4)
+	LDFLAGS+=-Ln $@.lbl
+endif
+ifeq ($(SYS),vic20)
+	LDFLAGS+=-Ln $@.lbl
+endif
+
 .o:
 ifeq ($(SYS),vic20)
 	$(LD) $(LDFLAGS_$(@F)_$(SYS)) $(LDFLAGS) -o $@ -C vic20-32k.cfg -m $@.map $^ $(SYS).lib

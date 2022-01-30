@@ -122,6 +122,44 @@ DISK_atarixl   = testcode.atr
 
 .PRECIOUS: %.o
 
+LDFLAGS=
+ifeq ($(SYS),c64)
+	LDFLAGS+=-Ln $@.lbl
+endif
+ifeq ($(SYS),c128)
+	LDFLAGS+=-Ln $@.lbl
+endif
+ifeq ($(SYS),c16)
+	LDFLAGS+=-Ln $@.lbl
+endif
+ifeq ($(SYS),cbm510)
+	LDFLAGS+=-Ln $@.lbl
+endif
+ifeq ($(SYS),cbm610)
+	LDFLAGS+=-Ln $@.lbl
+endif
+ifeq ($(SYS),cx16)
+	LDFLAGS+=-Ln $@.lbl
+endif
+ifeq ($(SYS),geos-cbm)
+	LDFLAGS+=-Ln $@.lbl
+endif
+ifeq ($(SYS),lunix)
+	LDFLAGS+=-Ln $@.lbl
+endif
+ifeq ($(SYS),pet)
+	LDFLAGS+=-Ln $@.lbl
+endif
+ifeq ($(SYS),pet-overlay)
+	LDFLAGS+=-Ln $@.lbl
+endif
+ifeq ($(SYS),plus4)
+	LDFLAGS+=-Ln $@.lbl
+endif
+ifeq ($(SYS),vic20)
+	LDFLAGS+=-Ln $@.lbl
+endif
+
 .o:
 ifeq ($(SYS),vic20)
 	$(LD) $(LDFLAGS_$(@F)_$(SYS)) $(LDFLAGS) -o $@ -C vic20-32k.cfg -m $@.map $^ $(SYS).lib
@@ -160,6 +198,7 @@ EXELIST_c64 = \
 	scanf-test \
 	ser-test \
 	strdup-test \
+	strnlen \
 	stroserror-test \
 	strqtok-test \
 	tinyshell \
@@ -190,6 +229,7 @@ EXELIST_vic20 = \
 	rename-test \
 	scanf-test \
 	strdup-test \
+	strnlen \
 	stroserror-test \
 	strqtok-test \
 	tinyshell \
@@ -222,6 +262,7 @@ EXELIST_apple2 = \
 	seek \
 	ser-test \
 	strdup-test \
+	strnlen \
 	stroserror-test \
 	strqtok-test \
 	tinyshell \
@@ -257,6 +298,7 @@ EXELIST_atari = \
 	seek \
 	ser-test \
 	strdup-test \
+	strnlen \
 	stroserror-test \
 	strqtok-test \
 	tinyshell \
@@ -292,6 +334,7 @@ all: testcode
 	make -C cbm SYS=$(SYS)
 	make -C gamate
 	make -C pce
+	make -C sym1
 
 # --------------------------------------------------------------------------
 # some programs link against getsp.o
@@ -399,3 +442,4 @@ clean: mostlyclean
 	make -C cbm SYS=$(SYS) clean
 	make -C gamate clean
 	make -C pce clean
+	make -C sym1 clean

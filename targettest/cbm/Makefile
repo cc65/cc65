@@ -24,19 +24,27 @@ ifdef CC65_HOME
   CL = $(CC65_HOME)/bin/cl65
   LD = $(CC65_HOME)/bin/ld65
 else
-  AS := $(if $(wildcard ../../../bin/ca65*),../../../bin/ca65,ca65)
-  CC := $(if $(wildcard ../../../bin/cc65*),../../../bin/cc65,cc65)
-  CL := $(if $(wildcard ../../../bin/cl65*),../../../bin/cl65,cl65)
-  LD := $(if $(wildcard ../../../bin/ld65*),../../../bin/ld65,ld65)
+  AS := $(if $(wildcard ../../bin/ca65*),../../bin/ca65,ca65)
+  CC := $(if $(wildcard ../../bin/cc65*),../../bin/cc65,cc65)
+  CL := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)
+  LD := $(if $(wildcard ../../bin/ld65*),../../bin/ld65,ld65)
 endif
 
 all: petscii.prg cbmdir-test.prg
 
+ifeq ($(SYS),c64)
 petscii.prg: petscii.c
 	$(CL) -t $(SYS) -O -o petscii.prg petscii.c
+else
+petscii.prg:
+endif
 
 cbmdir-test.prg: cbmdir-test.c
+ifeq ($(SYS),vic20)
+	$(CL) -t $(SYS) -C vic20-32k.cfg -Oris -o $@ $<
+else
 	$(CL) -t $(SYS) -Oris -o $@ $<
+endif
 
 clean:
-	@$(DEL) petscii.prg cbmdir-test.prg 2>$(NULLDEV)
+	@$(DEL) *.lbl petscii.prg cbmdir-test.prg 2>$(NULLDEV)

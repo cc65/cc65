@@ -33,8 +33,6 @@ jobs:
       - name: Test that the samples can be built.
         shell: bash
         run: |
-            make SYS=c64 -C samples all
-            make SYS=c64 -C samples clean
             make SYS=apple2 -C samples
             make SYS=apple2 -C samples clean
             make SYS=apple2enh -C samples
@@ -191,8 +189,6 @@ jobs:
 
       - name: Build app (release)
         run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Release
-
-# TODO: build samples cbm subdir for all cbm targets
 
 # TODO: fix targettest Makefile for all currently commented out targets
 # TODO: build targettest cbm subdir for all cbm targets

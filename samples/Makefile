@@ -188,7 +188,7 @@ EXELIST_atari =    \
 EXELIST_atarixl = $(EXELIST_atari)
 
 EXELIST_atari2600 = \
-        atari2600hello
+        notavailable
 
 EXELIST_atari5200 = \
         notavailable

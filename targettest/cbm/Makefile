@@ -30,7 +30,27 @@ else
   LD := $(if $(wildcard ../../bin/ld65*),../../bin/ld65,ld65)
 endif
 
-all: petscii.prg cbmdir-test.prg
+EXELIST_c64 = \
+        petscii.prg \
+        cbmdir-test.prg
+
+EXELIST_vic20 = \
+        cbmdir-test.prg
+
+ifneq ($(EXELIST_$(SYS)),)
+testcode: $(EXELIST_$(SYS))
+else
+testcode: notavailable
+endif
+
+# empty target used to skip systems that will not work with any program in this dir
+notavailable:
+ifeq ($(MAKELEVEL),0)
+	@echo "info: cbm tests not available for" $(SYS)
+else
+# suppress the "nothing to be done for 'testcode' message
+	@echo > $(NULLDEV)
+endif
 
 ifeq ($(SYS),c64)
 petscii.prg: petscii.c

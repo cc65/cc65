@@ -42,7 +42,23 @@ else
 COUNT := 1
 endif
 
-all: conio.bin
+EXELIST_pce = \
+        conio.bin
+
+ifneq ($(EXELIST_$(SYS)),)
+testcode: $(EXELIST_$(SYS))
+else
+testcode: notavailable
+endif
+
+# empty target used to skip systems that will not work with any program in this dir
+notavailable:
+ifeq ($(MAKELEVEL),0)
+	@echo "info: pce tests not available for" $(SYS)
+else
+# suppress the "nothing to be done for 'testcode' message
+	@echo > $(NULLDEV)
+endif
 
 %.bin: %.c
 	$(CL) -t pce $< -Wl -D__CARTSIZE__=${CARTSIZE} -m $*.map -o $@

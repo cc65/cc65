@@ -27,7 +27,23 @@ else
   LD := $(if $(wildcard ../../bin/ld65*),../../bin/ld65,ld65)
 endif
 
-all: hello
+EXELIST_atari5200 = \
+        hello
+
+ifneq ($(EXELIST_$(SYS)),)
+testcode: $(EXELIST_$(SYS))
+else
+testcode: notavailable
+endif
+
+# empty target used to skip systems that will not work with any program in this dir
+notavailable:
+ifeq ($(MAKELEVEL),0)
+	@echo "info: atari 5200 tests not available for" $(SYS)
+else
+# suppress the "nothing to be done for 'testcode' message
+	@echo > $(NULLDEV)
+endif
 
 hello: hello.c
 	$(CL) -t atari5200 -o hello hello.c

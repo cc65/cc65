@@ -334,6 +334,7 @@ all: testcode
 	make -C cbm SYS=$(SYS)
 	make -C gamate
 	make -C pce
+	make -C sym1
 
 # --------------------------------------------------------------------------
 # some programs link against getsp.o
@@ -441,3 +442,4 @@ clean: mostlyclean
 	make -C cbm SYS=$(SYS) clean
 	make -C gamate clean
 	make -C pce clean
+	make -C sym1 clean

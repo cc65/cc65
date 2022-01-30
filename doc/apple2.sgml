@@ -73,7 +73,7 @@ system takes care of actually moving the code into the Language Card.
 
 The amount of memory available in the Language Card for generated code depends
 on the <ref id="link-configs" name="linker configuration"> parameters. There are
-several usefull settings:
+several useful settings:
 
 <descrip>
 

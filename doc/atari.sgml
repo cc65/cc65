@@ -131,7 +131,7 @@ With the default load address of &dollar;2400 this gives a usable memory range o
 &lsqb;&dollar;2400-&dollar;CFFF&rsqb;.
 
 Please note that the first load chunk (which checks the system
-compatibilty and available memory) will always be loaded at
+compatibility and available memory) will always be loaded at
 &dollar;2E00, regardless of the specified start address. This address
 can only be changed by a custom linker config file.
 
@@ -305,7 +305,7 @@ The names are the usual ones you can find in system reference manuals. Example:
 ...
 </verb></tscreen>
 
-Please note that memory location 762/$2FA is called "<tt/char_/" while the orignal name "<tt/char/" conflicts with the C keyword.
+Please note that memory location 762/$2FA is called "<tt/char_/" while the original name "<tt/char/" conflicts with the C keyword.
 
 If you like to use the OS names and locations for the original Atari 800 operating system, please "<tt/#define OSA/" before including the
 <tt/atari.h/ header file.
@@ -401,7 +401,7 @@ OS.sdlst = &amp;DisplayList;
 ...
 </verb></tscreen>
 
-Please inspect the <tt/_antic.h/ header file to detemine the supported
+Please inspect the <tt/_antic.h/ header file to determine the supported
 instruction names. Modifiers on instructions can be nested without need
 for an order:
 
@@ -410,7 +410,7 @@ for an order:
 Please mind that ANTIC has memory alignment requirements for "player
 missile graphics"-data, font data, display lists and screen memory. Creation
 of a special linker configuration with appropriate aligned segments and
-switching to that segment in the c-code is usually neccessary. A more memory
+switching to that segment in the c-code is usually necessary. A more memory
 hungry solution consists in using the "<tt/posix_memalign()/" function in
 conjunction with copying your data to the allocated memory.
 
@@ -1146,8 +1146,8 @@ ld65: Error: Missing memory area assignment for segment 'MAINHDR'
 </verb></tscreen>
 
 The old "HEADER" memory description contained six bytes: &dollar;FFFF
-and the first and last memory addess of the program. For the "system
-check" load chunk this had to be split into two memory assigments. The
+and the first and last memory address of the program. For the "system
+check" load chunk this had to be split into two memory assignments The
 "HEADER" now only contains the &dollar;FFFF. The main program's first
 and last memory address were moved to a new segment, called "MAINHDR",
 which in the new linker config file goes into its own memory area (also

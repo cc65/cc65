@@ -235,12 +235,12 @@ things to be different from runtime loading:
 
 <item>  Without changing the segment names, all segments take the default
         names used by the standard linker configurations. This means that the
-        driver code is no longer contingous in memory, instead the code
+        driver code is no longer contiguous in memory, instead the code
         segment is placed somewhere in between all other code segments, the
         data segment is placed with all other data segments and so on. If the
         driver doesn't do strange things this shouldn't be a problem.
 
-<item>  With statically linked code, data and bss segments will get intialized
+<item>  With statically linked code, data and bss segments will get initialized
         once (when the application is loaded), while a loadable driver will
         get its initialization each time the driver is loaded into memory
         (which may be more than once in the lifetime of a program). It depends

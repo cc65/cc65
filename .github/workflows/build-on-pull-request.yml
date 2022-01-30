@@ -32,7 +32,71 @@ jobs:
         run: make test QUIET=1
       - name: Test that the samples can be built.
         shell: bash
-        run: make -j2 samples
+        run: |
+            make SYS=c64 -C samples all
+            make SYS=c64 -C samples clean
+            make SYS=apple2 -C samples
+            make SYS=apple2 -C samples clean
+            make SYS=apple2enh -C samples
+            make SYS=apple2enh -C samples clean
+            make SYS=atari -C samples
+            make SYS=atari -C samples clean
+            make SYS=atarixl -C samples
+            make SYS=atarixl -C samples clean
+            # make SYS=atari2600 -C samples
+            # make SYS=atari2600 -C samples clean
+            # make SYS=atari5200 -C samples
+            # make SYS=atari5200 -C samples clean
+            make SYS=atmos -C samples
+            make SYS=atmos -C samples clean
+            # make SYS=bbc -C samples
+            # make SYS=bbc -C samples clean
+            make SYS=c128 -C samples
+            make SYS=c128 -C samples clean
+            make SYS=c16 -C samples
+            make SYS=c16 -C samples clean
+            make SYS=c64 -C samples
+            make SYS=c64 -C samples clean
+            make SYS=cbm510 -C samples
+            make SYS=cbm510 -C samples clean
+            make SYS=cbm610 -C samples
+            make SYS=cbm610 -C samples clean
+            make SYS=creativision -C samples
+            make SYS=creativision -C samples clean
+            make SYS=cx16 -C samples
+            make SYS=cx16 -C samples clean
+            make SYS=gamate -C samples
+            make SYS=gamate -C samples clean
+            make SYS=geos-apple -C samples
+            make SYS=geos-apple -C samples clean
+            make SYS=geos-cbm -C samples
+            make SYS=geos-cbm -C samples clean
+            make SYS=lunix -C samples
+            make SYS=lunix -C samples clean
+            make SYS=lynx -C samples
+            make SYS=lynx -C samples clean
+            make SYS=nes -C samples
+            make SYS=nes -C samples clean
+            make SYS=osic1p -C samples
+            make SYS=osic1p -C samples clean
+            make SYS=pce -C samples
+            make SYS=pce -C samples clean
+            make SYS=pet -C samples
+            make SYS=pet -C samples clean
+            make SYS=plus4 -C samples
+            make SYS=plus4 -C samples clean
+            make SYS=sim6502 -C samples
+            make SYS=sim6502 -C samples clean
+            make SYS=sim65c02 -C samples
+            make SYS=sim65c02 -C samples clean
+            make SYS=supervision -C samples
+            make SYS=supervision -C samples clean
+            make SYS=sym1 -C samples
+            make SYS=sym1 -C samples clean
+            make SYS=telestrat -C samples
+            make SYS=telestrat -C samples clean
+            make SYS=vic20 -C samples
+            make SYS=vic20 -C samples clean
       - name: Test that the targettest programs can be built.
         shell: bash
         run: |
@@ -128,7 +192,10 @@ jobs:
       - name: Build app (release)
         run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Release
 
-# TODO: fix tergettest Makefile for all currently commented out targets
+# TODO: fix samples Makefile for all currently commented out targets
+# TODO: build samples cbm subdir for all cbm targets
+
+# TODO: fix targettest Makefile for all currently commented out targets
 # TODO: build targettest cbm subdir for all cbm targets
 # TODO: build targettest atari subdir for all atari targets
 # TODO: build targettest apple2 subdir for all apple2 targets

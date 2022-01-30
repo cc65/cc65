@@ -34,6 +34,9 @@ endif
 EXELIST_atari2600 = \
 	notavailable
 
+EXELIST_atari5200 = \
+	notavailable
+
 EXELIST_bbc = \
 	notavailable
 

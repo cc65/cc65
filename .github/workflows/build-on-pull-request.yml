@@ -127,3 +127,7 @@ jobs:
 
       - name: Build app (release)
         run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Release
+
+# TODO: build targettest cbm subdir for all cbm targets
+# TODO: build targettest atari subdir for all atari targets
+# TODO: build targettest apple2 subdir for all apple2 targets

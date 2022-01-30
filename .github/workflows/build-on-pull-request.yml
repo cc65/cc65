@@ -43,14 +43,14 @@ jobs:
             make SYS=atari -C samples clean
             make SYS=atarixl -C samples
             make SYS=atarixl -C samples clean
-            # make SYS=atari2600 -C samples
-            # make SYS=atari2600 -C samples clean
-            # make SYS=atari5200 -C samples
-            # make SYS=atari5200 -C samples clean
+            make SYS=atari2600 -C samples
+            make SYS=atari2600 -C samples clean
+            make SYS=atari5200 -C samples
+            make SYS=atari5200 -C samples clean
             make SYS=atmos -C samples
             make SYS=atmos -C samples clean
-            # make SYS=bbc -C samples
-            # make SYS=bbc -C samples clean
+            make SYS=bbc -C samples
+            make SYS=bbc -C samples clean
             make SYS=c128 -C samples
             make SYS=c128 -C samples clean
             make SYS=c16 -C samples
@@ -192,7 +192,6 @@ jobs:
       - name: Build app (release)
         run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Release
 
-# TODO: fix samples Makefile for all currently commented out targets
 # TODO: build samples cbm subdir for all cbm targets
 
 # TODO: fix targettest Makefile for all currently commented out targets

@@ -26,9 +26,32 @@ else
   LD := $(if $(wildcard ../../bin/ld65*),../../bin/ld65,ld65)
 endif
 
-all:	c64-scpu-test.prg c128-scpu-test.prg c64dtv-test.prg \
-	c64-c128-test.prg c128-test.prg chameleon-test.prg \
-	c65-test.prg turbomaster-test.prg
+EXELIST_c64 = \
+	c64-scpu-test.prg \
+	c128-scpu-test.prg \
+	c64dtv-test.prg \
+	c64-c128-test.prg \
+	chameleon-test.prg \
+	c65-test.prg \
+	turbomaster-test.prg
+	
+EXELIST_c128 = \
+	c128-test.prg
+	
+ifneq ($(EXELIST_$(SYS)),)
+testcode: $(EXELIST_$(SYS))
+else
+testcode: notavailable
+endif
+
+# empty target used to skip systems that will not work with any program in this dir
+notavailable:
+ifeq ($(MAKELEVEL),0)
+	@echo "info: accelerator tests not available for" $(SYS)
+else
+# suppress the "nothing to be done for 'testcode' message
+	@echo > $(NULLDEV)
+endif
 
 c64-scpu-test.prg: c64-c128-scpu-test.c
 	$(CL) -t c64 c64-c128-scpu-test.c -o c64-scpu-test.prg

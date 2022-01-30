@@ -26,7 +26,23 @@ else
   LD := $(if $(wildcard ../../bin/ld65*),../../bin/ld65,ld65)
 endif
 
-all: symHello.bin symTiny.bin symDisplay.bin symIO.bin symNotepad.bin
+EXELIST_sym1 = \
+        symHello.bin symTiny.bin symDisplay.bin symIO.bin symNotepad.bin
+
+ifneq ($(EXELIST_$(SYS)),)
+testcode: $(EXELIST_$(SYS))
+else
+testcode: notavailable
+endif
+
+# empty target used to skip systems that will not work with any program in this dir
+notavailable:
+ifeq ($(MAKELEVEL),0)
+	@echo "info: sym1 tests not available for" $(SYS)
+else
+# suppress the "nothing to be done for 'testcode' message
+	@echo > $(NULLDEV)
+endif
 
 symHello.bin: symHello.c
 	$(CL) -t sym1 -O -o symHello.bin symHello.c

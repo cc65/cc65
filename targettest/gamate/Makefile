@@ -27,7 +27,23 @@ else
   LD := $(if $(wildcard ../../bin/ld65*),../../bin/ld65,ld65)
 endif
 
-all: audiotest.bin lcdtest.bin ctest.bin
+EXELIST_gamate = \
+        audiotest.bin lcdtest.bin ctest.bin
+
+ifneq ($(EXELIST_$(SYS)),)
+testcode: $(EXELIST_$(SYS))
+else
+testcode: notavailable
+endif
+
+# empty target used to skip systems that will not work with any program in this dir
+notavailable:
+ifeq ($(MAKELEVEL),0)
+	@echo "info: gamate tests not available for" $(SYS)
+else
+# suppress the "nothing to be done for 'testcode' message
+	@echo > $(NULLDEV)
+endif
 
 audiotest.bin: audiotest.s
 	$(CL) -l audiotest.lst -t gamate -o audiotest.bin audiotest.s

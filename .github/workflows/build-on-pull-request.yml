@@ -36,8 +36,8 @@ jobs:
       - name: Test that the targettest programs can be built.
         shell: bash
         run: |
-            make SYS=c64 all
-            make SYS=c64 clean
+            make SYS=c64 -C targettest all
+            make SYS=c64 -C targettest clean
             make SYS=apple2 -C targettest
             make SYS=apple2 -C targettest clean
             make SYS=apple2enh -C targettest

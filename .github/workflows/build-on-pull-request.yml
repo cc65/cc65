@@ -36,6 +36,8 @@ jobs:
       - name: Test that the targettest programs can be built.
         shell: bash
         run: |
+            make SYS=c64 all
+            make SYS=c64 clean
             make SYS=apple2 -C targettest
             make SYS=apple2 -C targettest clean
             make SYS=apple2enh -C targettest
@@ -44,8 +46,8 @@ jobs:
             make SYS=atari -C targettest clean
             make SYS=atarixl -C targettest
             make SYS=atarixl -C targettest clean
-            make SYS=atari2600 -C targettest
-            make SYS=atari2600 -C targettest clean
+            # make SYS=atari2600 -C targettest
+            # make SYS=atari2600 -C targettest clean
             make SYS=atari5200 -C targettest
             make SYS=atari5200 -C targettest clean
             make SYS=atmos -C targettest
@@ -90,8 +92,8 @@ jobs:
             make SYS=sim6502 -C targettest clean
             make SYS=sim65c02 -C targettest
             make SYS=sim65c02 -C targettest clean
-            make SYS=supervision -C targettest
-            make SYS=supervision -C targettest clean
+            # make SYS=supervision -C targettest
+            # make SYS=supervision -C targettest clean
             make SYS=sym1 -C targettest
             make SYS=sym1 -C targettest clean
             make SYS=telestrat -C targettest

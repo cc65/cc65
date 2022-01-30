@@ -23,10 +23,10 @@ ifdef CC65_HOME
   CL = $(CC65_HOME)/bin/cl65
   LD = $(CC65_HOME)/bin/ld65
 else
-  AS := $(if $(wildcard ../../../bin/ca65*),../../../bin/ca65,ca65)
-  CC := $(if $(wildcard ../../../bin/cc65*),../../../bin/cc65,cc65)
-  CL := $(if $(wildcard ../../../bin/cl65*),../../../bin/cl65,cl65)
-  LD := $(if $(wildcard ../../../bin/ld65*),../../../bin/ld65,ld65)
+  AS := $(if $(wildcard ../../bin/ca65*),../../bin/ca65,ca65)
+  CC := $(if $(wildcard ../../bin/cc65*),../../bin/cc65,cc65)
+  CL := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)
+  LD := $(if $(wildcard ../../bin/ld65*),../../bin/ld65,ld65)
 endif
 
 all: hgrshow hgrtest dhgrshow

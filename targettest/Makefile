@@ -692,9 +692,8 @@ EXELIST_bbc = \
 EXELIST_lunix = \
 	notavailable
 
-# none of the testcode can work on the lynx (library support is broken!)
 EXELIST_lynx = \
-	notavailable
+	minimal
 
 # Unlisted targets will try to build everything.
 # That lets us learn what they cannot build, and what settings

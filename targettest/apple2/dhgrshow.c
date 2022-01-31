@@ -40,6 +40,7 @@ void main (void)
     }
     closedir (dir);
 
+    POKE (0xC05F, 0);
     tgi_uninstall ();
     videomode (old);
 }

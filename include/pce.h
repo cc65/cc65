@@ -57,6 +57,7 @@
 #define COLOR_RED               0x02
 #define COLOR_CYAN              0x03
 #define COLOR_VIOLET            0x04
+#define COLOR_PURPLE            COLOR_VIOLET
 #define COLOR_GREEN             0x05
 #define COLOR_BLUE              0x06
 #define COLOR_YELLOW            0x07

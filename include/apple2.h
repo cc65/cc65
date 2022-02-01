@@ -58,8 +58,7 @@
 /* TGI color defines */
 #define TGI_COLOR_BLACK         0x00
 #define TGI_COLOR_GREEN         0x01
-#define TGI_COLOR_VIOLET        0x02
-#define TGI_COLOR_PURPLE        TGI_COLOR_VIOLET
+#define TGI_COLOR_PURPLE        0x02
 #define TGI_COLOR_WHITE         0x03
 #define TGI_COLOR_BLACK2        0x04
 #define TGI_COLOR_ORANGE        0x05

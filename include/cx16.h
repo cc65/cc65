@@ -70,7 +70,6 @@
 #define CH_LIGHTBLUE            0x9A
 #define CH_GRAY3                0x9B
 #define CH_PURPLE               0x9C
-#define CH_VIOLET               CH_PURPLE
 #define CH_YELLOW               0x9E
 #define CH_CYAN                 0x9F
 #define CH_SHIFT_SPACE          0xA0
@@ -96,8 +95,7 @@
 #define COLOR_WHITE             0x01
 #define COLOR_RED               0x02
 #define COLOR_CYAN              0x03
-#define COLOR_VIOLET            0x04
-#define COLOR_PURPLE            COLOR_VIOLET
+#define COLOR_PURPLE            0x04
 #define COLOR_GREEN             0x05
 #define COLOR_BLUE              0x06
 #define COLOR_YELLOW            0x07
@@ -116,7 +114,6 @@
 #define TGI_COLOR_WHITE         COLOR_WHITE
 #define TGI_COLOR_RED           COLOR_RED
 #define TGI_COLOR_CYAN          COLOR_CYAN
-#define TGI_COLOR_VIOLET        COLOR_VIOLET
 #define TGI_COLOR_PURPLE        COLOR_PURPLE
 #define TGI_COLOR_GREEN         COLOR_GREEN
 #define TGI_COLOR_BLUE          COLOR_BLUE

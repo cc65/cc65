@@ -64,8 +64,7 @@
 #define COLOR_LIGHTGREEN        0x09
 #define COLOR_GREEN             0x0A
 #define COLOR_DARKBROWN         0x0B
-#define COLOR_VIOLET            0x0C
-#define COLOR_PURPLE            COLOR_VIOLET
+#define COLOR_PURPLE            0x0C
 #define COLOR_BLUE              0x0D
 #define COLOR_LIGHTBLUE         0x0E
 #define COLOR_WHITE             0x0F
@@ -84,8 +83,7 @@
 #define TGI_COLOR_LIGHTGREEN    COLOR_LIGHTGREEN
 #define TGI_COLOR_GREEN         COLOR_GREEN
 #define TGI_COLOR_DARKBROWN     COLOR_DARKBROWN
-#define TGI_COLOR_VIOLET        COLOR_VIOLET
-#define TGI_COLOR_PURPLE        TGI_COLOR_VIOLET
+#define TGI_COLOR_PURPLE        COLOR_PURPLE
 #define TGI_COLOR_BLUE          COLOR_BLUE
 #define TGI_COLOR_LIGHTBLUE     COLOR_LIGHTBLUE
 #define TGI_COLOR_WHITE         COLOR_WHITE

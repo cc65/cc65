@@ -53,5 +53,5 @@ _exit:    jsr     donelib              ; Run destructors
           lda     TECHO
           ora     #$80                 ; Re-enable console echo
           sta     TECHO
-          jsr     NACCES               ; Lock System RAM
-          rts                          ; Re-enter Sym-1 monitor
+          jmp     NACCES               ; Lock System RAM
+                                       ; Re-enter Sym-1 monitor

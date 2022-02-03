@@ -516,11 +516,12 @@ EXELIST_atari = \
 
 EXELIST_atarixl = $(EXELIST_atari)
 
-# omitted: clock-test clock cpeek-test deb dir-test em-test exec-test1 exec-test2
+# omitted: clock-test cpeek-test deb dir-test em-test exec-test1 exec-test2
 # joy-test mouse-test rename-test seek ser-test stroserror-test tinyshell
 EXELIST_telestrat = \
 	minimal \
 	arg-test \
+	clock \
 	conio \
 	cprintf \
 	cursor \

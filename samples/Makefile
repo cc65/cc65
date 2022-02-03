@@ -308,7 +308,10 @@ EXELIST_sym1 =     \
 EXELIST_telestrat = \
         ascii       \
         gunzip65    \
-        hello
+        hello       \
+        mandelbrot  \
+        sieve       \
+#        tgidemo
 
 EXELIST_vic20 =    \
         ascii      \

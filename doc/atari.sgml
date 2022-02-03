@@ -117,7 +117,7 @@ Special locations:
 The startup code rearranges the memory as follows:
 
 <enum>
-<item>Sceen memory and display list are moved below the program start address.
+<item>Screen memory and display list are moved below the program start address.
 <item>The ROM is disabled, making the memory in the areas &lsqb;&dollar;C000-&dollar;CFFF&rsqb;
 and &lsqb;&dollar;D800-&dollar;FFF9&rsqb; available.
 <item>Character generator data is copied from ROM to the CHARGEN location specified in the

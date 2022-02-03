@@ -3724,7 +3724,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
 
   <tt/.PUSHCHARMAP/ allows together with <tt><ref id=".POPCHARMAP"
   name=".POPCHARMAP"></tt> to switch to another character mapping and to restore the old
-  characther mapping later, without knowledge of the current mapping.
+  character mapping later, without knowledge of the current mapping.
 
   The assembler will print an error message if the character mapping stack is already full,
   when this command is issued.

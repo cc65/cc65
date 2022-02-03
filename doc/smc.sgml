@@ -257,7 +257,7 @@ SMC LoadDefault, { LDX #25 }
   <label id="Load value">
   <tag><tt>SMC_LoadValue label (, register)</tt></tag>
 
-  Retreives the value of a SMC line.
+  Retrieves the value of a SMC line.
 
   Example:
 <tscreen><verb>

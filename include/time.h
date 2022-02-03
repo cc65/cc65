@@ -102,6 +102,8 @@ extern struct _timezone {
 #  define CLOCKS_PER_SEC        135   /* FIXME */
 #elif defined(__GEOS__)
 #  define CLOCKS_PER_SEC        1
+#elif defined(__TELESTRAT__)
+#  define CLOCKS_PER_SEC        10
 #elif defined(__ATARI__) || defined (__LYNX__)
 /* Read the clock rate at runtime */
 clock_t _clocks_per_sec (void);

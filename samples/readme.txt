@@ -1,6 +1,14 @@
 
 This directory contains sample programs for the cc65 compiler.
 
+The programs contained here are
+- used as samples and referenced from within the documentation (this is their
+  main purpose)
+- installed into the filesystem
+- compiled (but NOT run) by the CI test
+
+-----------------------------------------------------------------------------
+
 Below is a short description for each of the programs, together with a list
 of the supported platforms.
 
@@ -106,6 +114,11 @@ Platforms:      All systems with conio and clock support:
                 support).
 
 -----------------------------------------------------------------------------
+Name:           tinyshell
+Description:    Simple ("tiny") shell to test filename and directory functions.
+Platforms:      Runs on all platforms that have stdio support
+
+-----------------------------------------------------------------------------
 Name:           tgidemo
 Description:    Shows some of the graphics capabilities of the "Tiny Graphics
                 Interface".
@@ -123,6 +136,37 @@ atari 2600:
 Name:           hello
 Description:    A "Hello world" type program.
 Platforms:      Runs on only the Atari 2600 Video Console System.
+-----------------------------------------------------------------------------
+
+atari 5200:
+-----------
+
+Name:           hello
+Description:    A "Hello world" type program.
+Platforms:      Runs on only the Atari 5200 Video Console System.
+-----------------------------------------------------------------------------
+
+apple2:
+-------
+
+Name:           hgrtest 
+Description:    shows how to incorporate a hires screen right into the binary,
+                thus allowing to place content both below and above the hires
+                video ram without multiple files nor copying stuff around (plus
+                having a nice splash screen as bonus). It basically demos how to
+                make use of apple2-hgr.cfg.
+
+Name:           hgrshow 
+Description:    is a (single) hires program showing how to load (single) hires
+                screens from files without support from TGI. TGI could be used
+                to "paint" on the loaded screens.
+
+Name:           dhgrshow 
+Description:    is a double hires program showing how to load double hires
+                screens from files. TGI is used for most of the I/O address
+                manipulation, but (in contrast to hgrshow) is not actually
+                functional.
+
 -----------------------------------------------------------------------------
 
 cbm:
@@ -147,6 +191,32 @@ Platforms:      The program needs a VIC-II or a TED, so it runs on the following
                 C64, C128, CBM510, Plus/4.
 -----------------------------------------------------------------------------
 
+gamate:
+-------
+
+Name:           nachtm
+Description:    Plays "Eine kleine Nachtmusik" by Wolfgang Amadeus Mozart.
+-----------------------------------------------------------------------------
+
+sym1:
+-----
+
+Name:           symHello
+Description:    Hello World for Sym-1
+
+Name:           symTiny
+Description:    Hello World for Sym-1 (tiny version without printf)
+
+Name:           symDisplay
+Description:    Sym-1 front panel display example
+
+Name:           symIO
+Description:    Sym-1 digital I/O interface example
+
+Name:           symNotepad
+Description:    Sym-1 Notepad
+
+-----------------------------------------------------------------------------
 
 supervision:
 ------------

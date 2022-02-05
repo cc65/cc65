@@ -51,7 +51,7 @@ endif
 
 nachtm.bin: nachtm.c
 	$(CL) -Os -l nachtm.lst -t gamate -o nachtm.bin nachtm.c
-	gamate-fixcart nachtm.bin
+	../../util/gamate/gamate-fixcart nachtm.bin
 
 clean:
 	@$(DEL) nachtm.bin nachtm.lst 2>$(NULLDEV)

@@ -47,7 +47,9 @@ jobs:
 
       - name: Build the tools.
         shell: bash
-        run: make -j2 bin USER_CFLAGS=-Werror
+        run: |
+            make -j2 bin USER_CFLAGS=-Werror
+            make -j2 util
       - name: Build the platform libraries.
         shell: bash
         run: make -j2 lib QUIET=1
@@ -60,6 +62,9 @@ jobs:
       - name: Remove the output from the samples tests.
         shell: bash
         run: make -C samples clean
+      - name: Remove programs in util directory
+        shell: bash
+        run: make -j2 util clean
       - name: Build the document files.
         shell: bash
         run: make -j2 doc

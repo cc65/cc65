@@ -23,7 +23,9 @@ jobs:
 
       - name: Build the tools.
         shell: bash
-        run: make -j2 bin USER_CFLAGS=-Werror
+        run: |
+            make -j2 bin USER_CFLAGS=-Werror
+            make -j2 util
       - name: Build the platform libraries.
         shell: bash
         run: make -j2 lib QUIET=1

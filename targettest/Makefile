@@ -174,7 +174,7 @@ endif
 # --------------------------------------------------------------------------
 # Lists of subdirectories
 
-DIRLIST = accelerator apple2 atari atari5200 cbm gamate pce sym1
+DIRLIST = accelerator atari cbm gamate pce
 
 # --------------------------------------------------------------------------
 # Lists of executables
@@ -211,7 +211,6 @@ EXELIST_c64 = \
 	strnlen \
 	stroserror-test \
 	strqtok-test \
-	tinyshell \
 	uname-test
 
 # omitted: seek
@@ -246,7 +245,6 @@ EXELIST_c128 = \
 	strnlen \
 	stroserror-test \
 	strqtok-test \
-	tinyshell \
 	uname-test
 
 
@@ -278,7 +276,6 @@ EXELIST_c16 = \
 	strnlen \
 	stroserror-test \
 	strqtok-test \
-	tinyshell \
 	uname-test
 
 # omitted: seek ser-test
@@ -312,7 +309,6 @@ EXELIST_cbm510 = \
 	strnlen \
 	stroserror-test \
 	strqtok-test \
-	tinyshell \
 	uname-test
 
 # omitted: joy-test mouse-test seek
@@ -345,7 +341,6 @@ EXELIST_cbm610 = \
 	strnlen \
 	stroserror-test \
 	strqtok-test \
-	tinyshell \
 	uname-test
 
 # omitted: clock-test em-test mouse-test seek ser-test
@@ -376,7 +371,6 @@ EXELIST_pet = \
 	strnlen \
 	stroserror-test \
 	strqtok-test \
-	tinyshell \
 	uname-test
 
 # omitted: clock-test em-test mouse-test seek
@@ -408,7 +402,6 @@ EXELIST_plus4 = \
 	strnlen \
 	stroserror-test \
 	strqtok-test \
-	tinyshell \
 	uname-test
 
 # omitted: seek clock-test mouse-test ser-test 
@@ -440,7 +433,6 @@ EXELIST_vic20 = \
 	strnlen \
 	stroserror-test \
 	strqtok-test \
-	tinyshell \
 	uname-test
 
 # omitted: cpeek-test, clock
@@ -474,7 +466,6 @@ EXELIST_apple2 = \
 	strnlen \
 	stroserror-test \
 	strqtok-test \
-	tinyshell \
 	uname-test
 
 EXELIST_apple2enh = $(EXELIST_apple2)
@@ -511,13 +502,12 @@ EXELIST_atari = \
 	strnlen \
 	stroserror-test \
 	strqtok-test \
-	tinyshell \
 	uname-test
 
 EXELIST_atarixl = $(EXELIST_atari)
 
 # omitted: clock-test cpeek-test deb dir-test em-test exec-test1 exec-test2
-# joy-test mouse-test rename-test seek ser-test stroserror-test tinyshell
+# joy-test mouse-test rename-test seek ser-test stroserror-test
 EXELIST_telestrat = \
 	minimal \
 	arg-test \
@@ -542,7 +532,7 @@ EXELIST_telestrat = \
 # omitted: arg-test clock-test clock cpeek-test conio cprintf cursor deb dir-test
 # em-test exec-test1 exec-test2 fileio-test ft getopt-test heaptest joy-test
 # mouse-test mul-test posixio-test rename-test scanf-test seek ser-test strdup-test
-# stroserror-test tinyshell uname-test
+# stroserror-test uname-test
 EXELIST_sym1 = \
 	minimal \
 	div-test \
@@ -551,7 +541,7 @@ EXELIST_sym1 = \
 	strqtok-test
 
 # omitted: clock-test cpeek-test conio deb dir-test em-test exec-test1 exec-test2
-# fileio-test ft mouse-test posixio-test rename-test seek ser-test tinyshell
+# fileio-test ft mouse-test posixio-test rename-test seek ser-test
 EXELIST_atmos = \
 	minimal \
 	arg-test \
@@ -574,7 +564,7 @@ EXELIST_atmos = \
 # omitted: arg-test clock-test clock cpeek-test conio cprintf deb dir-test div-test
 # em-test exec-test1 exec-test2 fileio-test ft getopt-test heaptest joy-test moddiv-test
 # mouse-test mul-test posixio-test rename-test scanf-test seek ser-test strdup-test
-# strnlen stroserror-test strqtok-test tinyshell uname-test
+# strnlen stroserror-test strqtok-test uname-test
 EXELIST_creativision = \
 	minimal \
 	cursor
@@ -609,13 +599,12 @@ EXELIST_cx16 = \
 	strnlen \
 	stroserror-test \
 	strqtok-test \
-	tinyshell \
 	uname-test
 
 # omitted: arg-test clock-test clock cpeek-test cprintf cursor deb dir-test div-test
 # em-test exec-test1 exec-test2 fileio-test ft getopt-test heaptest joy-test moddiv-test
 # mouse-test mul-test posixio-test rename-test scanf-test seek ser-test strdup-test
-# strnlen stroserror-test strqtok-test tinyshell uname-test
+# strnlen stroserror-test strqtok-test uname-test
 EXELIST_nes = \
 	minimal \
 	conio
@@ -623,7 +612,7 @@ EXELIST_nes = \
 # omitted: arg-test clock-test clock cpeek-test cprintf cursor deb dir-test div-test
 # em-test exec-test1 exec-test2 fileio-test ft getopt-test heaptest joy-test moddiv-test
 # mouse-test mul-test posixio-test rename-test scanf-test seek ser-test strdup-test
-# strnlen stroserror-test strqtok-test tinyshell uname-test
+# strnlen stroserror-test strqtok-test uname-test
 EXELIST_pce = \
 	minimal \
 	conio
@@ -631,7 +620,7 @@ EXELIST_pce = \
 # omitted: arg-test clock-test clock cpeek-test conio cprintf deb dir-test div-test
 # em-test exec-test1 exec-test2 fileio-test ft getopt-test heaptest joy-test moddiv-test
 # mouse-test posixio-test rename-test scanf-test seek ser-test strdup-test strnlen
-# stroserror-test strqtok-test tinyshell uname-test
+# stroserror-test strqtok-test uname-test
 EXELIST_osic1p = \
 	minimal \
 	cursor \
@@ -640,7 +629,7 @@ EXELIST_osic1p = \
 # omitted: arg-test clock-test clock cpeek-test conio cprintf deb dir-test div-test
 # em-test exec-test1 exec-test2 fileio-test ft getopt-test heaptest joy-test moddiv-test
 # mouse-test posixio-test rename-test scanf-test seek ser-test strdup-test strnlen
-# stroserror-test strqtok-test tinyshell uname-test
+# stroserror-test strqtok-test uname-test
 EXELIST_geos-apple = \
 	minimal \
 	cursor \
@@ -649,7 +638,7 @@ EXELIST_geos-apple = \
 # omitted: arg-test clock-test clock cpeek-test conio cprintf deb dir-test div-test
 # em-test exec-test1 exec-test2 fileio-test ft getopt-test heaptest joy-test moddiv-test
 # mouse-test posixio-test rename-test scanf-test seek ser-test strdup-test strnlen
-# stroserror-test strqtok-test tinyshell uname-test
+# stroserror-test strqtok-test uname-test
 
 EXELIST_geos-cbm = \
 	minimal \
@@ -658,7 +647,7 @@ EXELIST_geos-cbm = \
 
 # omitted: clock clock-test conio cpeek-test cprintf cursor deb dir-test em-test
 # exec-test1 exec-test2 ft heaptest joy-test mouse-test mul-test rename-test seek
-# ser-test strdup-test stroserror-test tinyshell uname-test
+# ser-test strdup-test stroserror-test uname-test
 EXELIST_sim6502 = \
 	minimal \
 	arg-test \
@@ -739,18 +728,12 @@ mouse-test: mouse-test.o getsp.o
 ifneq ($(SYS),vic20)
 ft: ft.o getsp.o
 	$(LD) $(LDFLAGS) -t $(SYS) -o $@ $^ $(SYS).lib
-
-tinyshell: tinyshell.o getsp.o
-	$(LD) $(LDFLAGS) -t $(SYS) -o $@ $^ $(SYS).lib
 endif
 
 # some programs need more memory on the vic20
 
 ifeq ($(SYS),vic20)
 ft:  ft.o getsp.o
-	$(LD) $(LDFLAGS) -o $@ -C vic20-32k.cfg -m $@.map $^ $(SYS).lib
-
-tinyshell:  tinyshell.o getsp.o
 	$(LD) $(LDFLAGS) -o $@ -C vic20-32k.cfg -m $@.map $^ $(SYS).lib
 endif
 

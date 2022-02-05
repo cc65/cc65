@@ -673,6 +673,11 @@ EXELIST_sim6502 = \
 	
 EXELIST_sim65c02 = $(EXELIST_sim6502)
 
+
+# omitted: arg-test clock clock-test conio cpeek-test cprintf cursor deb dir-test
+# div-test em-test exec-test1 exec-test2 fileio-test ft getopt-test heaptest
+# joy-test moddiv-test mouse-test mul-test posixio-test rename-test scanf-test
+# ser-test seek strdup-test strnlen stroserror-test strqtok-test tinyshell uname-test
 EXELIST_atari2600 = \
 	minimal
 
@@ -680,6 +685,9 @@ EXELIST_atari5200 = \
 	minimal
 
 EXELIST_gamate = \
+	minimal
+
+EXELIST_lynx = \
 	minimal
 
 EXELIST_supervision = \
@@ -692,9 +700,6 @@ EXELIST_bbc = \
 # none of the testcode can work on lunix (no library support)
 EXELIST_lunix = \
 	notavailable
-
-EXELIST_lynx = \
-	minimal
 
 # Unlisted targets will try to build everything.
 # That lets us learn what they cannot build, and what settings

@@ -1,4 +1,8 @@
 
+# Run 'make SYS=<target>'; or, set a SYS env.
+# var. to build for another target system.
+SYS ?= atari5200
+
 # Just the usual way to find out if we're
 # using cmd.exe to execute make rules.
 ifneq ($(shell echo),)
@@ -31,9 +35,9 @@ EXELIST_atari5200 = \
         hello
 
 ifneq ($(EXELIST_$(SYS)),)
-testcode: $(EXELIST_$(SYS))
+samples: $(EXELIST_$(SYS))
 else
-testcode: notavailable
+samples: notavailable
 endif
 
 # empty target used to skip systems that will not work with any program in this dir
@@ -41,7 +45,7 @@ notavailable:
 ifeq ($(MAKELEVEL),0)
 	@echo "info: atari 5200 tests not available for" $(SYS)
 else
-# suppress the "nothing to be done for 'testcode' message
+# suppress the "nothing to be done for 'samples' message
 	@echo > $(NULLDEV)
 endif
 

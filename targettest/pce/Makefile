@@ -1,4 +1,8 @@
 
+# Run 'make SYS=<target>'; or, set a SYS env.
+# var. to build for another target system.
+SYS ?= pce
+
 # Just the usual way to find out if we're
 # using cmd.exe to execute make rules.
 ifneq ($(shell echo),)

@@ -64,7 +64,7 @@ jobs:
         run: make -C samples clean
       - name: Remove programs in util directory
         shell: bash
-        run: make -j2 util clean
+        run: make -C util clean
       - name: Build the document files.
         shell: bash
         run: make -j2 doc

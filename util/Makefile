@@ -1,7 +1,9 @@
 
 .PHONY: atari gamate zlib
 
-all: atari gamate zlib
+util: atari gamate zlib
+
+all: util
 
 atari:
 	@$(MAKE) -C atari --no-print-directory $@

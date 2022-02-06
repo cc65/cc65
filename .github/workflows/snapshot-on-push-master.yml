@@ -92,5 +92,15 @@ jobs:
           name: cc65-snapshot-win64.zip
           path: cc65-win64.zip
 
+      - name: Upload snapshot to sourceforge
+        uses: nogsantos/scp-deploy@master
+        with:
+          src: cc65-win32.zip
+          host: ${{ secrets.SSH_HOST }}
+          remote: ${{ secrets.SSH_DIR }}
+          port: ${{ secrets.SSH_PORT }}
+          user: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          
       # TODO: Update docs at https://github.com/cc65/doc
       # TODO: Publish snapshot zip at https://github.com/cc65/cc65.github.io

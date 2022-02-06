@@ -29,9 +29,8 @@ jobs:
         run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Release
 
   build_linux:
-    name: Build, Test and Snaphot (Linux)
+    name: Build, Test, and Snapshot (Linux)
     runs-on: ubuntu-latest
-    needs: build_windows
 
     steps:
       - name: Install Dependencies

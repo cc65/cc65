@@ -53,9 +53,9 @@ jobs:
       - name: Build the platform libraries.
         shell: bash
         run: make -j2 lib QUIET=1
-      - name: Run the regression tests.
-        shell: bash
-        run: make test QUIET=1
+#      - name: Run the regression tests.
+#        shell: bash
+#        run: make test QUIET=1
       - name: Test that the samples can be built.
         shell: bash
         run: make -j2 samples
@@ -68,34 +68,34 @@ jobs:
       - name: Build the document files.
         shell: bash
         run: make -j2 doc
-      - name: Build and package 64-bit Windows versions of the tools.
-        run: |
-          make -C src clean
-          make -j2 bin USER_CFLAGS=-Werror CROSS_COMPILE=x86_64-w64-mingw32-
-          make zip
-          mv cc65.zip cc65-win64.zip
+#      - name: Build and package 64-bit Windows versions of the tools.
+#        run: |
+#          make -C src clean
+#          make -j2 bin USER_CFLAGS=-Werror CROSS_COMPILE=x86_64-w64-mingw32-
+#          make zip
+#          mv cc65.zip cc65-snapshot-win64.zip
       - name: Build and package 32-bit Windows versions of the tools.
         run: |
           make -C src clean
           make -j2 bin USER_CFLAGS=-Werror CROSS_COMPILE=i686-w64-mingw32-
           make zip
-          mv cc65.zip cc65-win32.zip
+          mv cc65.zip cc65-snapshot-win32.zip
 
       - name: Upload a 32-bit Snapshot Zip
         uses: actions/upload-artifact@v2
         with:
           name: cc65-snapshot-win32.zip
-          path: cc65-win32.zip
-      - name: Upload a 64-bit Snapshot Zip
-        uses: actions/upload-artifact@v2
-        with:
-          name: cc65-snapshot-win64.zip
-          path: cc65-win64.zip
+          path: cc65-snapshot-win32.zip
+#      - name: Upload a 64-bit Snapshot Zip
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: cc65-snapshot-win64.zip
+#          path: cc65-snapshot-win64.zip
 
       - name: Upload snapshot to sourceforge
         uses: nogsantos/scp-deploy@master
         with:
-          src: cc65-win32.zip
+          src: cc65-snapshot-win32.zip
           host: ${{ secrets.SSH_HOST }}
           remote: ${{ secrets.SSH_DIR }}
           port: ${{ secrets.SSH_PORT }}

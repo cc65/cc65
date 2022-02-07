@@ -50,7 +50,7 @@ DIRLIST = grc
 
 define SUBDIR_recipe
 
-@$(MAKE) SYS=$(SYS) -C $(dir) --no-print-directory $@
+@+$(MAKE) SYS=$(SYS) -C $(dir) --no-print-directory $@
 
 endef # SUBDIR_recipe
 

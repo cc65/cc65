@@ -1,4 +1,8 @@
 
+# Run 'make SYS=<target>'; or, set a SYS env.
+# var. to build for another target system.
+SYS ?= atari
+
 # Just the usual way to find out if we're
 # using cmd.exe to execute make rules.
 ifneq ($(shell echo),)
@@ -21,14 +25,36 @@ ifdef CC65_HOME
   CL = $(CC65_HOME)/bin/cl65
   LD = $(CC65_HOME)/bin/ld65
 else
-  AS := $(if $(wildcard ../../../bin/ca65*),../../../bin/ca65,ca65)
-  CC := $(if $(wildcard ../../../bin/cc65*),../../../bin/cc65,cc65)
-  CL := $(if $(wildcard ../../../bin/cl65*),../../../bin/cl65,cl65)
-  LD := $(if $(wildcard ../../../bin/ld65*),../../../bin/ld65,ld65)
+  AS := $(if $(wildcard ../../bin/ca65*),../../bin/ca65,ca65)
+  CC := $(if $(wildcard ../../bin/cc65*),../../bin/cc65,cc65)
+  CL := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)
+  LD := $(if $(wildcard ../../bin/ld65*),../../bin/ld65,ld65)
 endif
 
-all: charmapping.xex defdev.xex displaylist.xex mem.xex multi.xex ostype.xex \
-	scrcode.com sys.xex
+EXELIST_atari = \
+        charmapping.xex \
+        defdev.xex \
+        displaylist.xex \
+        mem.xex \
+        multi.xex \
+        ostype.xex \
+        scrcode.com \
+        sys.xex
+
+ifneq ($(EXELIST_$(SYS)),)
+testcode: $(EXELIST_$(SYS))
+else
+testcode: notavailable
+endif
+
+# empty target used to skip systems that will not work with any program in this dir
+notavailable:
+ifeq ($(MAKELEVEL),0)
+	@echo "info: atari tests not available for" $(SYS)
+else
+# suppress the "nothing to be done for 'testcode' message
+	@echo > $(NULLDEV)
+endif
 
 charmapping.xex: charmapping.c
 	$(CL) -t atari -o charmapping.xex charmapping.c

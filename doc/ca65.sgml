@@ -301,7 +301,7 @@ Here is a description of all the command line options:
   compiler, see there for a list.
 
   Depending on the target, the default CPU type is also set. This can be
-  overriden by using the <tt/<ref id="option--cpu" name="--cpu">/ option.
+  overridden by using the <tt/<ref id="option--cpu" name="--cpu">/ option.
 
 
   <label id="option-v">
@@ -3724,7 +3724,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
 
   <tt/.PUSHCHARMAP/ allows together with <tt><ref id=".POPCHARMAP"
   name=".POPCHARMAP"></tt> to switch to another character mapping and to restore the old
-  characther mapping later, without knowledge of the current mapping.
+  character mapping later, without knowledge of the current mapping.
 
   The assembler will print an error message if the character mapping stack is already full,
   when this command is issued.

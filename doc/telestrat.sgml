@@ -79,7 +79,7 @@ in Telemon, there is no way to load a binary easily.
 
 Stratsed (the Telestrat operating system) handles files management. Stratsed
 is loaded to memory from floppy disk. Stratsed vector are declared in asminc/telestrat.inc.
-But, reverse engineering is required to find how theses vectors works. Please, note that
+But, reverse engineering is required to find how these vectors works. Please, note that
 Stratsed is located in overlay memory (bank 0)
 
 There is no tool to insert a binary in a Stratsed floppy disk.
@@ -194,7 +194,7 @@ if you get input from keyboard by conio cgetc function, you will get direction f
 
 Anyway, if you don't want to use ROM, you can use joysticks standard drivers in your code. 
 
-The standard driver manages two joysticks. Only one button is managed for theses joysticks. 
+The standard driver manages two joysticks. Only one button is managed for these joysticks. 
 
 Telestrat can handle one button for the left port, and three buttons for the right port (but this port was designed for a mouse).
 

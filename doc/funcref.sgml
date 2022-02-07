@@ -3513,7 +3513,7 @@ extended memory that should be supported. There is no autodetect capability.
 <tag/Declaration/<tt/void* __fastcall__ em_map (unsigned page);/
 <tag/Description/The function maps one page of extended memory into linear
 memory and returns a pointer to the page frame. Depending on the hardware
-and driver, the data is either mapped into the address space or transfered
+and driver, the data is either mapped into the address space or transferred
 into a buffer. If you don't need the actual contents of the page (for example
 because you're going to overwrite it completely), it is better to call
 <tt/<ref id="em_use" name="em_use">/ instead. <tt/em_use/ will not transfer the
@@ -3728,7 +3728,7 @@ switching the CPU into double clock mode.
 <tag/Function/Return the end-of-file indicator of a stream.
 <tag/Header/<tt/<ref id="stdio.h" name="stdio.h">/
 <tag/Declaration/<tt/int __fastcall__ feof (FILE* f);/
-<tag/Description/<tt/feof/ tests the end-of-file indicator ofthe stream
+<tag/Description/<tt/feof/ tests the end-of-file indicator of the stream
 <tt/f/, and returns a non zero value if it is set.
 <tag/Notes/<itemize>
 <item>The indicator is set only after a read past the end of a file is
@@ -4172,7 +4172,7 @@ const char* optstring);/
 is a string that contains command line option characters. If a character in
 <tt/optstring/ is followed by a colon, the option requires an argument. An
 option on the command line is recognized if it is one of the option characters
-preceeded by a '-'.
+preceded by a '-'.
 <tt/getopt/ must be called repeatedly. It will return each option character
 found on the command line and <tt/EOF/ (-1) if there is no other option. An
 option argument is placed in <tt/optarg/, the index of the next element on the
@@ -5020,7 +5020,7 @@ always be the same.
 <tag/Header/<tt/<ref id="setjmp.h" name="setjmp.h">/
 <tag/Declaration/<tt/void __fastcall__ longjmp (jmp_buf buf, int retval);/
 <tag/Description/The <tt/longjmp/ function restores a program context from the
-data in <tt/buf/, which must have been set by a preceeding call to
+data in <tt/buf/, which must have been set by a preceding call to
 <tt/<ref id="setjmp" name="setjmp">/. Program execution continues as if the
 call to <tt/<ref id="setjmp" name="setjmp">/ has just returned the value
 <tt/retval/.
@@ -5664,7 +5664,7 @@ cc65 allows to pass this argument, it is ignored.
 <tag/Function/Open a directory.
 <tag/Header/<tt/<ref id="dirent.h" name="dirent.h">/
 <tag/Declaration/<tt/DIR* __fastcall__ opendir (const char* name);/
-<tag/Description/<tt/opendir/ opens a directory and returns the direcory
+<tag/Description/<tt/opendir/ opens a directory and returns the directory
 descriptor associated with it. On error, NULL is returned and an error code is
 stored in <tt/errno/.
 <tag/Notes/<itemize>
@@ -6863,7 +6863,7 @@ be used in presence of a prototype.
 
 <quote>
 <descrip>
-<tag/Function/Concatentate two strings.
+<tag/Function/Concatenate two strings.
 <tag/Header/<tt/<ref id="string.h" name="string.h">/
 <tag/Declaration/<tt/char* __fastcall__ strcat (char* s1, const char* s2);/
 <tag/Description/The <tt/strcat/ function appends a copy of the string
@@ -7189,7 +7189,7 @@ be used in presence of a prototype.
 
 <quote>
 <descrip>
-<tag/Function/Concatentate two strings.
+<tag/Function/Concatenate two strings.
 <tag/Header/<tt/<ref id="string.h" name="string.h">/
 <tag/Declaration/<tt/char* __fastcall__ strncat (char* s1, const char* s2, size_t n);/
 <tag/Description/The <tt/strncat/ function appends not more than n characters
@@ -7314,7 +7314,7 @@ be used in presence of a prototype.
 <tag/Header/<tt/<ref id="string.h" name="string.h">/
 <tag/Declaration/<tt/char* __fastcall__ strpbrk (const char* str, const char* set);/
 <tag/Description/<tt/strpbrk()/ searches within <tt/str/ for the first
-occurance of any character from <tt/set/.  It returns a pointer to that
+occurrence of any character from <tt/set/.  It returns a pointer to that
 character if found; otherwise, it returns <tt/NULL/.
 <tag/Notes/<itemize>
 <item>The function is available only as a fastcall function;
@@ -7418,7 +7418,7 @@ be used in presence of a prototype.
 <tag/Function/Find a substring.
 <tag/Header/<tt/<ref id="string.h" name="string.h">/
 <tag/Declaration/<tt/char* __fastcall__ strstr (const char* str, const char* substr);/
-<tag/Description/<tt/strstr/ searches for the first occurance of the string
+<tag/Description/<tt/strstr/ searches for the first occurrence of the string
 <tt/substr/ within <tt/str/. If found, it returns a pointer to the copy,
 otherwise it returns <tt/NULL/.
 <tag/Notes/<itemize>
@@ -7485,7 +7485,7 @@ the behaviour is undefined.
 <item>If <tt/n/ is zero, <tt/s1/ may be a NULL pointer.
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
-<item>Since cc65 doesn't support different charcter sets, <tt/strxfrm/ will
+<item>Since cc65 doesn't support different character sets, <tt/strxfrm/ will
 just copy s2 to s1 using <tt><ref id="strncpy" name="strncpy"></tt>.
 </itemize>
 <tag/Availability/ISO 9899

@@ -1,0 +1,107 @@
+name: Snapshot Build
+on:
+  push:
+    branches:
+      master
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build_windows:
+    name: Build (Windows)
+    runs-on: windows-latest
+
+    steps:
+      - shell: bash
+        run: git config --global core.autocrlf input
+
+      - name: Checkout Source
+        uses: actions/checkout@v2
+
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Build app (debug)
+        run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Debug
+
+      - name: Build app (release)
+        run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Release
+
+  build_linux:
+    name: Build, Test and Snaphot (Linux)
+    runs-on: ubuntu-latest
+    needs: build_windows
+
+    steps:
+      - name: Install Dependencies
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install linuxdoc-tools-info gcc-mingw-w64-x86-64 gcc-mingw-w64-i686
+
+      - shell: bash
+        run: git config --global core.autocrlf input
+      - name: Checkout Source
+        uses: actions/checkout@v2
+
+      - name: Build the tools.
+        shell: bash
+        run: |
+            make -j2 bin USER_CFLAGS=-Werror
+            make -j2 util
+      - name: Build the platform libraries.
+        shell: bash
+        run: make -j2 lib QUIET=1
+      - name: Run the regression tests.
+        shell: bash
+        run: make test QUIET=1
+      - name: Test that the samples can be built.
+        shell: bash
+        run: make -j2 samples
+      - name: Remove the output from the samples tests.
+        shell: bash
+        run: make -C samples clean
+      - name: Remove programs in util directory
+        shell: bash
+        run: make -C util clean
+      - name: Build the document files.
+        shell: bash
+        run: make -j2 doc
+      - name: Build and package 64-bit Windows versions of the tools.
+        run: |
+          make -C src clean
+          make -j2 bin USER_CFLAGS=-Werror CROSS_COMPILE=x86_64-w64-mingw32-
+          make zip
+          mv cc65.zip cc65-snapshot-win64.zip
+      - name: Build and package 32-bit Windows versions of the tools.
+        run: |
+          make -C src clean
+          make -j2 bin USER_CFLAGS=-Werror CROSS_COMPILE=i686-w64-mingw32-
+          make zip
+          mv cc65.zip cc65-snapshot-win32.zip
+
+      - name: Upload a 32-bit Snapshot Zip
+        uses: actions/upload-artifact@v2
+        with:
+          name: cc65-snapshot-win32.zip
+          path: cc65-snapshot-win32.zip
+      - name: Upload a 64-bit Snapshot Zip
+        uses: actions/upload-artifact@v2
+        with:
+          name: cc65-snapshot-win64.zip
+          path: cc65-snapshot-win64.zip
+
+    # enter secrets under "repository secrets"
+      - name: Upload snapshot to sourceforge
+        uses: nogsantos/scp-deploy@master
+        with:
+          src: cc65-snapshot-win32.zip
+          host: ${{ secrets.SSH_HOST }}
+          remote: ${{ secrets.SSH_DIR }}
+          port: ${{ secrets.SSH_PORT }}
+          user: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          
+      # TODO: Update docs at https://github.com/cc65/doc
+      # TODO: Publish snapshot zip at https://github.com/cc65/cc65.github.io

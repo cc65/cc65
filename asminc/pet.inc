@@ -50,7 +50,6 @@ PET_2000        = $CA
 PET_3000        = $FC
 PET_4000        = $FD
 
-
 ;----------------------------------------------------------------------------
 ; Vector and other locations
 
@@ -59,7 +58,25 @@ BRKVec          := $0092
 NMIVec          := $0094
 
 ; ---------------------------------------------------------------------------
-; I/O: 6522 VIA2
+; I/O: 6520 PIA1
+
+PIA1            := $E810        ; PIA1 base address
+PIA1_PORTA      := PIA1+$0      ; Port A (PA) and data direction register A (DDRA)
+PIA1_PACTL      := PIA1+$1      ; Port A control register (CRA)
+PIA1_PORTB      := PIA1+$2      ; Port B (PB) and data direction register B (DDRB)
+PIA1_PBCTL      := PIA1+$3      ; Port B control register (CRB)
+
+; ---------------------------------------------------------------------------
+; I/O: 6520 PIA2
+
+PIA2            := $E820        ; PIA2 base address
+PIA2_PORTA      := PIA2+$0      ; Port A (PA) and data direction register A (DDRA)
+PIA2_PACTL      := PIA2+$1      ; Port A control register (CRA)
+PIA2_PORTB      := PIA2+$2      ; Port B (PB) and data direction register B (DDRB)
+PIA2_PBCTL      := PIA2+$3      ; Port B control register (CRB)
+
+; ---------------------------------------------------------------------------
+; I/O: 6522 VIA
 
 VIA             := $E840        ; VIA base address
 VIA_PB          := VIA+$0       ; Port register B

@@ -1,6 +1,7 @@
+
 # Run 'make SYS=<target>'; or, set a SYS env.
 # var. to build for another target system.
-SYS ?= c64
+SYS ?= gamate
 
 # Just the usual way to find out if we're
 # using cmd.exe to execute make rules.
@@ -30,41 +31,27 @@ else
   LD := $(if $(wildcard ../../bin/ld65*),../../bin/ld65,ld65)
 endif
 
-EXELIST_c64 = \
-        petscii.prg \
-        cbmdir-test.prg
-
-EXELIST_vic20 = \
-        cbmdir-test.prg
+EXELIST_gamate = \
+        nachtm.bin
 
 ifneq ($(EXELIST_$(SYS)),)
-testcode: $(EXELIST_$(SYS))
+samples: $(EXELIST_$(SYS))
 else
-testcode: notavailable
+samples: notavailable
 endif
 
 # empty target used to skip systems that will not work with any program in this dir
 notavailable:
 ifeq ($(MAKELEVEL),0)
-	@echo "info: cbm tests not available for" $(SYS)
+	@echo "info: gamate tests not available for" $(SYS)
 else
-# suppress the "nothing to be done for 'testcode' message
+# suppress the "nothing to be done for 'samples' message
 	@echo > $(NULLDEV)
 endif
 
-ifeq ($(SYS),c64)
-petscii.prg: petscii.c
-	$(CL) -t $(SYS) -O -o petscii.prg petscii.c
-else
-petscii.prg:
-endif
-
-cbmdir-test.prg: cbmdir-test.c
-ifeq ($(SYS),vic20)
-	$(CL) -t $(SYS) -C vic20-32k.cfg -Oris -o $@ $<
-else
-	$(CL) -t $(SYS) -Oris -o $@ $<
-endif
+nachtm.bin: nachtm.c
+	$(CL) -Os -l nachtm.lst -t gamate -o nachtm.bin nachtm.c
+	../../util/gamate/gamate-fixcart nachtm.bin
 
 clean:
-	@$(DEL) *.lbl petscii.prg cbmdir-test.prg 2>$(NULLDEV)
+	@$(DEL) nachtm.bin nachtm.lst 2>$(NULLDEV)

@@ -1,6 +1,7 @@
+
 # Run 'make SYS=<target>'; or, set a SYS env.
 # var. to build for another target system.
-SYS ?= c64
+SYS ?= atari5200
 
 # Just the usual way to find out if we're
 # using cmd.exe to execute make rules.
@@ -30,41 +31,26 @@ else
   LD := $(if $(wildcard ../../bin/ld65*),../../bin/ld65,ld65)
 endif
 
-EXELIST_c64 = \
-        petscii.prg \
-        cbmdir-test.prg
-
-EXELIST_vic20 = \
-        cbmdir-test.prg
+EXELIST_atari5200 = \
+        hello
 
 ifneq ($(EXELIST_$(SYS)),)
-testcode: $(EXELIST_$(SYS))
+samples: $(EXELIST_$(SYS))
 else
-testcode: notavailable
+samples: notavailable
 endif
 
 # empty target used to skip systems that will not work with any program in this dir
 notavailable:
 ifeq ($(MAKELEVEL),0)
-	@echo "info: cbm tests not available for" $(SYS)
+	@echo "info: atari 5200 tests not available for" $(SYS)
 else
-# suppress the "nothing to be done for 'testcode' message
+# suppress the "nothing to be done for 'samples' message
 	@echo > $(NULLDEV)
 endif
 
-ifeq ($(SYS),c64)
-petscii.prg: petscii.c
-	$(CL) -t $(SYS) -O -o petscii.prg petscii.c
-else
-petscii.prg:
-endif
-
-cbmdir-test.prg: cbmdir-test.c
-ifeq ($(SYS),vic20)
-	$(CL) -t $(SYS) -C vic20-32k.cfg -Oris -o $@ $<
-else
-	$(CL) -t $(SYS) -Oris -o $@ $<
-endif
-
+hello: hello.c
+	$(CL) -t atari5200 -o hello hello.c
+	
 clean:
-	@$(DEL) *.lbl petscii.prg cbmdir-test.prg 2>$(NULLDEV)
+	@$(DEL) hello 2>$(NULLDEV)

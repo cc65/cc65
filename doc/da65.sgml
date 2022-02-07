@@ -156,7 +156,7 @@ Here is a description of all the command line options:
   <tag><tt>-i name, --info name</tt></tag>
 
   Specify an info file. The info file contains global options that may
-  override or replace command line options plus informations about the code
+  override or replace command line options plus information about the code
   that has to be disassembled. See the separate section <ref id="infofile"
   name="Info File Format">.
 

@@ -379,8 +379,6 @@ TARGETS :=     \
   creativision \
   cx16         \
   gamate       \
-  geos-apple   \
-  geos-cbm     \
   lunix        \
   lynx         \
   nes          \

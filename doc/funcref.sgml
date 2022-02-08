@@ -3410,9 +3410,9 @@ be used in presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
-<ref id="fdisp" name="beep">,
-<ref id="loadt" name="fdisp">,
-<ref id="dumpt" name="loadt">,
+<ref id="beep" name="beep">,
+<ref id="fdisp" name="fdisp">,
+<ref id="loadt" name="loadt">,
 <tag/Example/None.
 </descrip>
 </quote>
@@ -3790,7 +3790,7 @@ switching the CPU into double clock mode.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
-<ref id="fdisp" name="beep">,
+<ref id="beep" name="beep">,
 <ref id="loadt" name="loadt">,
 <ref id="dumpt" name="dumpt">,
 <tag/Example/None.
@@ -5054,8 +5054,8 @@ be used in presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
-<ref id="fdisp" name="beep">,
-<ref id="loadt" name="fdisp">,
+<ref id="beep" name="beep">,
+<ref id="fdisp" name="fdisp">,
 <ref id="dumpt" name="dumpt">,
 <tag/Example/None.
 </descrip>

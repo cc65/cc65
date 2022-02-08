@@ -754,6 +754,16 @@ communication, see also <tt>testcode/lib/ser-test.c</tt>.
 </itemize>
 
 
+<sect1><tt/sym1.h/<label id="sym1.h"><p>
+
+<itemize>
+<item><ref id="beep" name="beep">
+<item><ref id="fdisp" name="fdisp">
+<item><ref id="loadt" name="loadt">
+<item><ref id="dumpt" name="dumpt">
+</itemize>
+
+
 <sect1><tt/telestrat.h/<label id="telestrat.h"><p>
 
 <itemize>
@@ -1664,6 +1674,27 @@ used in presence of a prototype.
 <ref id="ltoa" name="ltoa">,
 <ref id="ultoa" name="ultoa">,
 <ref id="utoa" name="utoa">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>beep<label id="beep"><p>
+
+<quote>
+<descrip>
+<tag/Function/Beep sound.
+<tag/Header/<tt/<ref id="sym1.h" name="sym1.h">/
+<tag/Declaration/<tt/void beep(void);/
+<tag/Description/<tt/beep/ makes a brief tone.
+<tag/Notes/<itemize>
+<item>The function is specific to the Sym-1.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="fdisp" name="fdisp">,
+<ref id="loadt" name="loadt">,
+<ref id="dumpt" name="dumpt">,
 <tag/Example/None.
 </descrip>
 </quote>
@@ -3363,6 +3394,30 @@ int main(void)
 </quote>
 
 
+<sect1>dumpt<label id="dumpt"><p>
+
+<quote>
+<descrip>
+<tag/Function/Dump memory to tape.
+<tag/Header/<tt/<ref id="sym1.h" name="sym1.h">/
+<tag/Declaration/<tt/int __fastcall__ dumpt (unsigned char id, const void* start, const void* end);/
+<tag/Description/<tt/dumpt/ saves memory onto data tape.
+<tag/Notes/<itemize>
+<item>The function is specific to the Sym-1.
+<item>The return value is status.  Non-zero status indicates an error.
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="fdisp" name="beep">,
+<ref id="loadt" name="fdisp">,
+<ref id="dumpt" name="loadt">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>em_commit<label id="em_commit"><p>
 
 <quote>
@@ -3716,6 +3771,28 @@ switching the CPU into double clock mode.
 <tag/See also/
 <ref id="isfast" name="isfast">,
 <ref id="slow" name="slow">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>fdisp<label id="fdisp"><p>
+
+<quote>
+<descrip>
+<tag/Function/Flash front-panel display.
+<tag/Header/<tt/<ref id="sym1.h" name="sym1.h">/
+<tag/Declaration/<tt/void fdisp(void);/
+<tag/Description/<tt/fdisp/ flashes front-panel display.
+<tag/Notes/<itemize>
+<item>The function is specific to the Sym-1.
+<item>The front-panel display buffer must be loaded prior to calling fdisp.  See the DISPLAY struct definition in sym1.h.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="fdisp" name="beep">,
+<ref id="loadt" name="loadt">,
+<ref id="dumpt" name="dumpt">,
 <tag/Example/None.
 </descrip>
 </quote>
@@ -4956,6 +5033,30 @@ used in presence of a prototype.
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="abs" name="abs">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>loadt<label id="loadt"><p>
+
+<quote>
+<descrip>
+<tag/Function/Load memory from tape.
+<tag/Header/<tt/<ref id="sym1.h" name="sym1.h">/
+<tag/Declaration/<tt/int __fastcall__ loadt (unsigned char id);/
+<tag/Description/<tt/loadt/ loads memory from data tape.
+<tag/Notes/<itemize>
+<item>The function is specific to the Sym-1.
+<item>The return value is status.  Non-zero status indicates an error.
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="fdisp" name="beep">,
+<ref id="loadt" name="fdisp">,
+<ref id="dumpt" name="dumpt">,
 <tag/Example/None.
 </descrip>
 </quote>

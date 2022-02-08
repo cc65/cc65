@@ -38,7 +38,7 @@ Special locations:
   Conio support is not currently available for the Sym-1.  But stdio console functions are available.
 
   <tag/Stack/
-  The C runtime stack is located at &dollar;0FFF on 4KB Syms, or at &dollar;7FFFfor 32KB systems.  The stack always grows downwards. 
+  The C runtime stack is located at &dollar;0FFF on 4KB Syms, or at &dollar;7FFF for 32KB systems.  The stack always grows downwards. 
 
   <tag/Heap/
   The C heap is located at the end of the program and grows towards the C runtime stack.
@@ -102,7 +102,7 @@ As stated earlier, there are config files for 4KB and 32KB systems.  If you have
 
 <sect3>Sample programs<p>
 
-All the samples will run on the &quot;stock&quot; 4KB Sym-1, except for symIO and symNotepad, which require 32KB.  These sample programs can be found in the targettest/sym1 directory:
+All the samples will run on the &quot;stock&quot; 4KB Sym-1, except for symIO and symNotepad, which require 32KB.  These sample programs can be found in the samples/sym1 directory:
 
 <itemize>
 <item>symHello prints &quot;Hello World!&quot; and then inputs characters, which are echoed on the screen.  It also makes a &quot;beep&quot; sound.</item>

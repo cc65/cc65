@@ -3404,6 +3404,7 @@ int main(void)
 <tag/Description/<tt/dumpt/ saves memory onto data tape.
 <tag/Notes/<itemize>
 <item>The function is specific to the Sym-1.
+<item>The return value is status.  Non-zero status indicates an error.
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>

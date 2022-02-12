@@ -171,6 +171,25 @@ int IsFarRange (long Val)
 
 
 
+static const ExprNode* ResolveSymbolChain(const ExprNode* E)
+/* Recursive helper function for IsEasyConst */
+{
+    if (E->Op == EXPR_SYMBOL) {
+        SymEntry* Sym = E->V.Sym;
+
+        if (Sym == 0 || Sym->Expr == 0 || SymHasUserMark (Sym)) {
+            return 0;
+        } else {
+            SymMarkUser (Sym);
+            E = ResolveSymbolChain (Sym->Expr);
+            SymUnmarkUser (Sym);
+        }
+    }
+    return E;
+}
+
+
+
 int IsEasyConst (const ExprNode* E, long* Val)
 /* Do some light checking if the given node is a constant. Don't care if E is
 ** a complex expression. If E is a constant, return true and place its value
@@ -178,12 +197,10 @@ int IsEasyConst (const ExprNode* E, long* Val)
 */
 {
     /* Resolve symbols, follow symbol chains */
-    while (E->Op == EXPR_SYMBOL) {
-        E = SymResolve (E->V.Sym);
-        if (E == 0) {
-            /* Could not resolve */
-            return 0;
-        }
+    E = ResolveSymbolChain (E);
+    if (E == 0) {
+        /* Could not resolve */
+        return 0;
     }
 
     /* Symbols resolved, check for a literal */

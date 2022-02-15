@@ -16,7 +16,7 @@ How to debug your code using the VICE and Oricutron emulators.
 <sect>Overview<p>
 
 This document describes how to debug your programs using the cc65 development
-tools and the VICE CBM emulator.
+tools and the VICE or Oricutron emulator.
 
 
 
@@ -126,6 +126,12 @@ and you may use them wherever you need to specify an address. Try
 as an example (note that VICE needs a leading dot before all labels, and that
 the compiler prepends an underline under most named labels).
 
+If you start the emulator from the commandline, you can also load the labels
+directly using something like this:
+
+<tscreen><verb>
+        x64sc -moncommands hello.lbl hello.prg
+</verb></tscreen>
 
 
 <sect>How to use the label file with Oricutron<p>
@@ -144,8 +150,7 @@ and you may use them wherever you need to specify an address. Try
         d ._main
 </verb></tscreen>
 
-as an example (note that VICE needs a leading dot before all labels, and that
-the compiler prepends an underline under most named labels).
+as an example.
 
 
 

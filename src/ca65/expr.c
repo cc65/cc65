@@ -1226,11 +1226,11 @@ static ExprNode* Factor (void)
                 SB_GetLen (&CurTok.SVal) == 1) {
                 /* A character constant */
                 N = GenLiteralExpr (TgtTranslateChar (SB_At (&CurTok.SVal, 0)));
+                NextTok ();
             } else {
                 N = GenLiteral0 ();     /* Dummy */
                 Error ("Syntax error");
             }
-            NextTok ();
             break;
     }
     return N;

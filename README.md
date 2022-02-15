@@ -1,5 +1,7 @@
 [Windows Snapshot](https://sourceforge.net/projects/cc65/files/cc65-snapshot-win32.zip)
 
+[Linux Snapshot DEB and RPM](https://software.opensuse.org//download.html?project=home%3Astrik&package=cc65)
+
 [Documentation](https://cc65.github.io/doc)
 
 [Wiki](https://github.com/cc65/wiki/wiki)

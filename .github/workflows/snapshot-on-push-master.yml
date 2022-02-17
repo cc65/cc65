@@ -10,6 +10,7 @@ concurrency:
 jobs:
   build_windows:
     name: Build (Windows)
+    if: github.repository == 'cc65/cc65'
     runs-on: windows-latest
 
     steps:
@@ -30,6 +31,7 @@ jobs:
 
   build_linux:
     name: Build, Test, and Snapshot (Linux)
+    if: github.repository == 'cc65/cc65'
     runs-on: ubuntu-latest
 
     steps:

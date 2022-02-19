@@ -14,9 +14,9 @@ WORKDIR = ../testwrk/asm
 
 SUBDIRS = cpudetect opcodes listing
 
-.PHONY: test continue mostlyclean clean
+.PHONY: all continue mostlyclean clean
 
-test: mostlyclean continue
+all: mostlyclean continue
 
 define CALL_template
 

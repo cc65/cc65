@@ -1,3 +1,7 @@
+# Run 'make SYS=<target>'; or, set a SYS env.
+# var. to build for another target system.
+SYS ?= c64
+
 # Just the usual way to find out if we're
 # using cmd.exe to execute make rules.
 ifneq ($(shell echo),)
@@ -54,10 +58,18 @@ else
 endif
 
 c64-scpu-test.prg: c64-c128-scpu-test.c
-	$(CL) -t c64 c64-c128-scpu-test.c -o c64-scpu-test.prg
+# do not use cl65 to prevent tests from failing randomly because of one process
+# deleting the temp files from another
+#	$(CL) -t c64 c64-c128-scpu-test.c -o c64-scpu-test.prg
+	$(CC) -t c64 c64-c128-scpu-test.c -o c64-scpu-test.s
+	$(CL) -t c64 c64-scpu-test.s -o c64-scpu-test.prg
 
 c128-scpu-test.prg: c64-c128-scpu-test.c
-	$(CL) -t c128 c64-c128-scpu-test.c -o c128-scpu-test.prg
+# do not use cl65 to prevent tests from failing randomly because of one process
+# deleting the temp files from another
+#	$(CL) -t c128 c64-c128-scpu-test.c -o c128-scpu-test.prg
+	$(CC) -t c128 c64-c128-scpu-test.c -o c128-scpu-test.s
+	$(CL) -t c128 c128-scpu-test.s -o c128-scpu-test.prg
 
 c64dtv-test.prg: c64dtv-test.c
 	$(CL) -t c64 c64dtv-test.c -o c64dtv-test.prg
@@ -79,3 +91,4 @@ turbomaster-test.prg: turbomaster-test.c
 
 clean:
 	@$(DEL) *.prg 2>$(NULLDEV)
+	@$(DEL) *.s 2>$(NULLDEV)

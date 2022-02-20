@@ -129,7 +129,7 @@ LDFLAGS_tgidemo_atarixl    = --start-addr 0x4000
 # --------------------------------------------------------------------------
 # Generic rules
 
-.PHONY: all mostlyclean clean install zip samples disk
+.PHONY: samples all mostlyclean clean install zip disk platforms
 
 %: %.c
 %: %.s
@@ -340,7 +340,7 @@ endif
 
 define SUBDIR_recipe
 
-@$(MAKE) -C $(dir) --no-print-directory $@
+@+$(MAKE) -C $(dir) --no-print-directory $@
 
 endef # SUBDIR_recipe
 
@@ -359,6 +359,52 @@ endif
 disk: $(DISK_$(SYS))
 
 all:
+
+# --------------------------------------------------------------------------
+# List of every supported platform
+TARGETS :=     \
+  apple2       \
+  apple2enh    \
+  atari        \
+  atarixl      \
+  atari2600    \
+  atari5200    \
+  atmos        \
+  bbc          \
+  c128         \
+  c16          \
+  c64          \
+  cbm510       \
+  cbm610       \
+  creativision \
+  cx16         \
+  gamate       \
+  lunix        \
+  lynx         \
+  nes          \
+  osic1p       \
+  pce          \
+  pet          \
+  plus4        \
+  sim6502      \
+  sim65c02     \
+  supervision  \
+  sym1         \
+  telestrat    \
+  vic20
+
+# --------------------------------------------------------------------------
+# Rule to make the binaries for every platform
+
+define TARGET_recipe
+
+@$(MAKE) -j2 SYS:=$(T)
+@$(MAKE) --no-print-directory clean SYS:=$(T)
+
+endef # TARGET_recipe
+
+platforms:
+	$(foreach T,$(TARGETS),$(TARGET_recipe))
 
 # --------------------------------------------------------------------------
 # Overlay rules. Overlays need special ld65 configuration files.  Also, the

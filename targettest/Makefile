@@ -108,7 +108,7 @@ DISK_atarixl   = testcode.atr
 # --------------------------------------------------------------------------
 # Generic rules
 
-.PHONY: all mostlyclean clean zip testcode disk
+.PHONY: testcode all mostlyclean clean zip disk platforms
 
 %: %.c
 %: %.s
@@ -404,7 +404,7 @@ EXELIST_plus4 = \
 	strqtok-test \
 	uname-test
 
-# omitted: seek clock-test mouse-test ser-test 
+# omitted: seek clock-test mouse-test ser-test
 EXELIST_vic20 = \
 	minimal \
 	arg-test \
@@ -616,7 +616,7 @@ EXELIST_nes = \
 EXELIST_pce = \
 	minimal \
 	conio
-	
+
 # omitted: arg-test clock-test clock cpeek-test conio cprintf deb dir-test div-test
 # em-test exec-test1 exec-test2 fileio-test ft getopt-test heaptest joy-test moddiv-test
 # mouse-test posixio-test rename-test scanf-test seek ser-test strdup-test strnlen
@@ -659,7 +659,7 @@ EXELIST_sim6502 = \
 	scanf-test \
 	strnlen \
 	strqtok-test
-	
+
 EXELIST_sim65c02 = $(EXELIST_sim6502)
 
 
@@ -699,7 +699,7 @@ endif
 
 define SUBDIR_recipe
 
-@$(MAKE) -C $(dir) --no-print-directory $@
+@+$(MAKE) -C $(dir) --no-print-directory $@
 
 endef # SUBDIR_recipe
 
@@ -718,6 +718,52 @@ endif
 disk: $(DISK_$(SYS))
 
 all:
+
+# --------------------------------------------------------------------------
+# List of every supported platform
+TARGETS :=     \
+  apple2       \
+  apple2enh    \
+  atari        \
+  atarixl      \
+  atari2600    \
+  atari5200    \
+  atmos        \
+  bbc          \
+  c128         \
+  c16          \
+  c64          \
+  cbm510       \
+  cbm610       \
+  creativision \
+  cx16         \
+  gamate       \
+  lunix        \
+  lynx         \
+  nes          \
+  osic1p       \
+  pce          \
+  pet          \
+  plus4        \
+  sim6502      \
+  sim65c02     \
+  supervision  \
+  sym1         \
+  telestrat    \
+  vic20
+
+# --------------------------------------------------------------------------
+# Rule to make the binaries for every platform
+
+define TARGET_recipe
+
+@$(MAKE) -j2 SYS:=$(T)
+@$(MAKE) --no-print-directory clean SYS:=$(T)
+
+endef # TARGET_recipe
+
+platforms:
+	$(foreach T,$(TARGETS),$(TARGET_recipe))
 
 # --------------------------------------------------------------------------
 # some programs link against getsp.o

@@ -26,8 +26,10 @@
 
 static unsigned char failures = 0;
 
+typedef unsigned int field_type;
+
 static struct four_bits {
-    unsigned int x : 4;
+    field_type x : 4;
 } fb = {1};
 
 static void test_four_bits(void)
@@ -57,8 +59,8 @@ static void test_four_bits(void)
 */
 
 static struct four_bits_with_int {
-    unsigned int x : 4;
-    unsigned int y;
+    field_type x : 4;
+    field_type y;
 } fbi = {1, 2};
 
 static void test_four_bits_with_int(void)
@@ -95,8 +97,8 @@ static void test_four_bits_with_int(void)
 }
 
 static struct overlap {
-    unsigned int x : 10;
-    unsigned int y : 10;
+    field_type x : 10;
+    field_type y : 10;
 } o = {11, 22};
 
 /* Tests that bit-fields can share allocation units. */
@@ -133,9 +135,9 @@ static void test_overlap(void)
 }
 
 static struct overlap_with_int {
-    unsigned int x : 10;
-    unsigned int y : 10;
-    unsigned int z;
+    field_type x : 10;
+    field_type y : 10;
+    field_type z;
 } oi = {111, 222, 333};
 
 static void test_overlap_with_int(void)
@@ -183,8 +185,8 @@ static void test_overlap_with_int(void)
 }
 
 static struct full_width {
-    unsigned int x : 8;
-    unsigned int y : 16;
+    field_type x : 8;
+    field_type y : 16;
 } fw = {255, 17};
 
 static void test_full_width(void)
@@ -220,13 +222,13 @@ static void test_full_width(void)
 }
 
 static struct aligned_end {
-    unsigned int : 2;
-    unsigned int x : 6;
-    unsigned int : 3;
-    unsigned int y : 13;
+    field_type : 2;
+    field_type x : 6;
+    field_type : 3;
+    field_type y : 13;
     /* z crosses a byte boundary, but fits in a byte when shifted. */
-    unsigned int : 6;
-    unsigned int z : 7;
+    field_type : 6;
+    field_type z : 7;
 } ae = {63, 17, 100};
 
 static void test_aligned_end(void)

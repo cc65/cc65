@@ -129,7 +129,7 @@ setbuf: lda     #$00            ; Low byte
         .assert MLI::OPEN::PATHNAME = MLI::INFO::PATHNAME, error
 
         ; Lower file level to avoid program file
-        ; being closed by C libary shutdown code
+        ; being closed by C library shutdown code
         ldx     LEVEL
         stx     level
         beq     :+
@@ -185,13 +185,13 @@ setbuf: lda     #$00            ; Low byte
         lda     #$00            ; '\0'
         beq     :-              ; Branch always
 
-        ; Call loader stub after C libary shutdown
+        ; Call loader stub after C library shutdown
 :       lda     #<target
         ldx     #>target
         sta     done+1
         stx     done+2
 
-        ; Initiate C libary shutdown
+        ; Initiate C library shutdown
         jmp     _exit
 
         .bss

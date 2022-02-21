@@ -18,7 +18,7 @@
 ; Common subroutine to pop the parameters and put them into core
 ;
 
-dopop:  sta     tmp1            ; will loose high byte
+dopop:  sta     tmp1            ; will lose high byte
         jsr     popax           ; get s to ptr2
         sta     ptr2
         stx     ptr2+1

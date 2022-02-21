@@ -372,7 +372,7 @@ out:
         tya 
         tax
     
-        lda   ptr3     ; XSCHAR needs in A and Y the adress of the string        
+        lda   ptr3     ; XSCHAR needs in A and Y the address of the string
         ldy   ptr3+1    
         BRK_TELEMON(XSCHAR)
         rts

@@ -376,7 +376,7 @@ The names in the parentheses denote the symbols to be used for static linking of
   In memory constrained situations the memory from &dollar;803 to &dollar;1FFF
   can be made available to a program by calling <tt/_heapadd ((void *) 0x0803, 0x17FD);/
   at the beginning of <tt/main()/. Doing so is beneficial even if the program
-  doesn't use the the heap explicitly because loading the driver (and in fact
+  doesn't use the heap explicitly because loading the driver (and in fact
   already opening the driver file) uses the heap implicitly.
 
 </descrip><p>

@@ -6127,7 +6127,7 @@ pointer you're passing somewhere else, otherwise
 <tscreen><verb>
         ptr = realloc (ptr, size);
 </verb></tscreen>
-will loose your only copy of <tt/ptr/ if <tt/realloc/ returns <tt/NULL/.
+will lose your only copy of <tt/ptr/ if <tt/realloc/ returns <tt/NULL/.
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>

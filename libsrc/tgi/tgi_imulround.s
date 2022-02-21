@@ -33,7 +33,7 @@ _tgi_imulround:
 ; ASM callable entry point
 tgi_imulround:
 
-; Multiplicate
+; Multiply
 
         jsr     imul16x16r32
 

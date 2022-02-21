@@ -8,7 +8,7 @@
 **
 ** The program asks for a filename (if it hasn't
 ** got one from argv). I then opens the file,
-** reads the the first 16 bytes and displays them
+** reads the first 16 bytes and displays them
 ** (as hex values).
 ** The values of sp (cc65 runtime stack pointer)
 ** are displayed at some places. The displayed

@@ -24,7 +24,7 @@ gotoxy: jsr     popa            ; Get Y
     jsr     popa
     sta     SCRX
 
-; Update adress video ram position when SCRY is modified (update_adscr)
+; Update address video ram position when SCRY is modified (update_adscr)
 ; Fall through
 .endproc
 

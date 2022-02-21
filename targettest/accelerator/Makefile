@@ -1,3 +1,7 @@
+# Run 'make SYS=<target>'; or, set a SYS env.
+# var. to build for another target system.
+SYS ?= c64
+
 # Just the usual way to find out if we're
 # using cmd.exe to execute make rules.
 ifneq ($(shell echo),)
@@ -28,16 +32,16 @@ endif
 
 EXELIST_c64 = \
 	c64-scpu-test.prg \
-	c128-scpu-test.prg \
 	c64dtv-test.prg \
-	c64-c128-test.prg \
+	c64-test.prg \
 	chameleon-test.prg \
 	c65-test.prg \
 	turbomaster-test.prg
-	
+
 EXELIST_c128 = \
+	c128-scpu-test.prg \
 	c128-test.prg
-	
+
 ifneq ($(EXELIST_$(SYS)),)
 testcode: $(EXELIST_$(SYS))
 else
@@ -62,8 +66,8 @@ c128-scpu-test.prg: c64-c128-scpu-test.c
 c64dtv-test.prg: c64dtv-test.c
 	$(CL) -t c64 c64dtv-test.c -o c64dtv-test.prg
 
-c64-c128-test.prg: c64-c128-test.c
-	$(CL) -t c64 c64-c128-test.c -o c64-c128-test.prg
+c64-test.prg: c64-c128-test.c
+	$(CL) -t c64 c64-c128-test.c -o c64-test.prg
 
 c128-test.prg: c64-c128-test.c
 	$(CL) -t c128 c64-c128-test.c -o c128-test.prg

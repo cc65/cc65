@@ -1708,7 +1708,7 @@ ExprNode* GenLiteralExpr (long Val)
 
 
 ExprNode* GenLiteral0 (void)
-/* Return an expression tree that encodes the the number zero */
+/* Return an expression tree that encodes the number zero */
 {
     return GenLiteralExpr (0);
 }

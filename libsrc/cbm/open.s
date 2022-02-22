@@ -130,7 +130,7 @@ dowrite:
         beq     notrunc
         jsr     scratch
 
-; Complete the the file name. Check for append mode here.
+; Complete the file name. Check for append mode here.
 
 notrunc:
         lda     tmp3            ; Get the mode again
@@ -168,7 +168,7 @@ nofile:                         ; ... else use SA=0 (read)
         jsr     OPEN
         bcs     oserror
 
-; Open the the drive command channel and read it
+; Open the drive command channel and read it
 
         ldx     fnunit
         jsr     opencmdchannel

@@ -275,7 +275,7 @@ XFWRITE          = $3B          ; Only in TELEMON 3.x write file (bank 7 of Orix
 ; Clock primitive
 XRECLK           = $3C          ; Reset clock
 XCLCL            = $3D          ; Close clock
-XWRCLK           = $3E          ; Displays clock in the adress in A & Y registers
+XWRCLK           = $3E          ; Displays clock in the address in A & Y registers
 
 ; Sound primitives
 XSONPS           = $40          ; Send data to PSG register (14 values)

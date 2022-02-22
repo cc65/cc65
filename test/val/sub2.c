@@ -1,5 +1,5 @@
 /*
-  !!DESCRIPTION!! Substraction Test
+  !!DESCRIPTION!! Subtraction Test
   !!ORIGIN!!      SDCC regression tests
   !!LICENCE!!     GPL, read COPYING.GPL
 */

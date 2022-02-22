@@ -217,7 +217,7 @@ void g_reglong (unsigned Flags);
 unsigned g_typeadjust (unsigned lhs, unsigned rhs);
 /* Adjust the integer operands before doing a binary operation. lhs is a flags
 ** value, that corresponds to the value on TOS, rhs corresponds to the value
-**  in (e)ax. The return value is the the flags value for the resulting type.
+**  in (e)ax. The return value is the flags value for the resulting type.
 */
 
 unsigned g_typecast (unsigned lhs, unsigned rhs);

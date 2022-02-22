@@ -538,7 +538,7 @@ static void AssembleFile (const char* File, unsigned ArgCount)
     /* Check if this is the last processing step */
     if (DoLink) {
         /* We're linking later. Add the output file of the assembly
-        ** the the file list of the linker. The name of the output
+        ** to the file list of the linker. The name of the output
         ** file is that of the input file with ".s" replaced by ".o".
         */
         char* ObjName = MakeFilename (File, ".o");
@@ -1627,7 +1627,7 @@ int main (int argc, char* argv [])
                     break;
 
                 case FILETYPE_O65:
-                    /* Add the the object file converter files */
+                    /* Add the object file converter files */
                     ConvertO65 (Arg);
                     break;
 

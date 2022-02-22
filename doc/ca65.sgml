@@ -3108,7 +3108,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
 <sect1><tt>.IFDEF</tt><label id=".IFDEF"><p>
 
   Conditional assembly: Check if a symbol is defined. Must be followed by
-  a symbol name. The condition is true if the the given symbol is already
+  a symbol name. The condition is true if the given symbol is already
   defined, and false otherwise.
 
   See also: <tt><ref id=".DEFINED" name=".DEFINED"></tt>
@@ -3143,7 +3143,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
 <sect1><tt>.IFNDEF</tt><label id=".IFNDEF"><p>
 
   Conditional assembly: Check if a symbol is defined. Must be followed by
-  a symbol name. The condition is true if the the given symbol is not
+  a symbol name. The condition is true if the given symbol is not
   defined, and false otherwise.
 
   See also: <tt><ref id=".DEFINED" name=".DEFINED"></tt>
@@ -3152,7 +3152,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
 <sect1><tt>.IFNREF</tt><label id=".IFNREF"><p>
 
   Conditional assembly: Check if a symbol is referenced. Must be followed
-  by a symbol name. The condition is true if if the the given symbol was
+  by a symbol name. The condition is true if the given symbol was
   not referenced before, and false otherwise.
 
   See also: <tt><ref id=".REFERENCED" name=".REFERENCED"></tt>
@@ -3197,7 +3197,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
 <sect1><tt>.IFREF</tt><label id=".IFREF"><p>
 
   Conditional assembly: Check if a symbol is referenced. Must be followed
-  by a symbol name. The condition is true if if the the given symbol was
+  by a symbol name. The condition is true if the given symbol was
   referenced before, and false otherwise.
 
   This command may be used to build subroutine libraries in include files

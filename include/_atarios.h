@@ -105,7 +105,7 @@ struct __dos2x {
     unsigned char*  zbufp;      /* points to user filename */
     unsigned char*  zdrva;      /* points to serveral buffers (mostly VTOC) */
     unsigned char*  zsba;       /* points to sector buffer */
-    unsigned char   errno;      /* number of occured error */
+    unsigned char   errno;      /* number of occurred error */
 };
 
 typedef struct __dos2x dos2x_t;

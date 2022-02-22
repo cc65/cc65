@@ -846,7 +846,7 @@ static unsigned FunctionArgList (FuncDesc* Func, int IsFastcall, ExprDesc* ED)
     /* The function returns the size of all arguments pushed onto the stack.
     ** However, if there are parameters missed (which is an error, and was
     ** flagged by the compiler), AND a stack frame was preallocated above,
-    ** we would loose track of the stackpointer, and generate an internal error
+    ** we would lose track of the stackpointer, and generate an internal error
     ** later. So we correct the value by the parameters that should have been
     ** pushed into, to avoid an internal compiler error. Since an error was
     ** generated before, no code will be output anyway.

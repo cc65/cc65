@@ -689,7 +689,7 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes)
 
 
 
-void g_getimmed (unsigned Flags, unsigned long Val, long Offs)
+void g_getimmed (unsigned Flags, uintptr_t Val, long Offs)
 /* Load a constant into the primary register */
 {
     unsigned char B1, B2, B3, B4;
@@ -4394,7 +4394,7 @@ void g_res (unsigned n)
 
 
 
-void g_defdata (unsigned flags, unsigned long val, long offs)
+void g_defdata (unsigned flags, uintptr_t val, long offs)
 /* Define data with the size given in flags */
 {
     if (flags & CF_CONST) {

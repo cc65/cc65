@@ -216,8 +216,11 @@ void LimitExprValue (ExprDesc* Expr)
             break;
 
         case T_LONG:
+            Expr->IVal = (int32_t)Expr->IVal;
+            break;
+
         case T_ULONG:
-            /* No need to do anything */
+            Expr->IVal = (uint32_t)Expr->IVal;
             break;
 
         case T_SCHAR:

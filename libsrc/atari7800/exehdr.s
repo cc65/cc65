@@ -1,3 +1,10 @@
+;
+; Karri Kaksonen, 2022
+;
+; This header contains data for emulators
+;
+        .export         __EXEHDR__: absolute = 1
+
 ; ------------------------------------------------------------------------
 ; EXE header
 	.segment "EXEHDR"

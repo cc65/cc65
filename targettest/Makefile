@@ -673,6 +673,9 @@ EXELIST_atari2600 = \
 EXELIST_atari5200 = \
 	minimal
 
+EXELIST_atari7800 = \
+	minimal
+
 EXELIST_gamate = \
 	minimal
 
@@ -728,6 +731,7 @@ TARGETS :=     \
   atarixl      \
   atari2600    \
   atari5200    \
+  atari7800    \
   atmos        \
   bbc          \
   c128         \

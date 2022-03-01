@@ -27,6 +27,7 @@ including
 - the Atari 8-bit machines.
 - the Atari 2600 console.
 - the Atari 5200 console.
+- the Atari 7800 console.
 - GEOS for the C64, C128 and Apple //e.
 - the Bit Corporation Gamate console.
 - the NEC PC-Engine (aka TurboGrafx-16) console.

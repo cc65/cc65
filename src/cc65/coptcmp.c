@@ -309,10 +309,10 @@ unsigned OptCmp1 (CodeSeg* S)
 
             /* Insert the ora instead */
             X = NewCodeEntry (OP65_ORA, L[0]->AM, L[0]->Arg, 0, L[0]->LI);
-            CS_InsertEntry (S, X, I);
+            CS_InsertEntry (S, X, I+3);
 
             /* Remove all other instructions */
-            CS_DelEntries (S, I+1, 3);
+            CS_DelEntries (S, I, 3);
 
             /* Remember, we had changes */
             ++Changes;

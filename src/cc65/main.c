@@ -172,6 +172,10 @@ static void SetSys (const char* Sys)
             DefineNumericMacro ("__ATARI5200__", 1);
             break;
 
+        case TGT_ATARI7800:
+            DefineNumericMacro ("__ATARI7800__", 1);
+            break;
+
         case TGT_ATARI:
             DefineNumericMacro ("__ATARI__", 1);
             break;

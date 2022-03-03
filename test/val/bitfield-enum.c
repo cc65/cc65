@@ -1,5 +1,5 @@
 /*
-  Copyright 2020 The cc65 Authors
+  Copyright 2020-2022 The cc65 Authors
 
   This software is provided 'as-is', without any express or implied
   warranty. In no event will the authors be held liable for any damages
@@ -247,7 +247,7 @@ static void test_enum_bitfield_char(void)
         failures++;
     }
     if (e8scbf.y != 5) {
-        printf ("Got e8scbf.y = %d, expected 10.\n", e8scbf.y);
+        printf ("Got e8scbf.y = %d, expected 5.\n", e8scbf.y);
         failures++;
     }
     if (e8scbf.z != 100) {
@@ -273,12 +273,170 @@ static void test_enum_bitfield_char(void)
     }
 }
 
+/* Enum with underlying type unsigned long. */
+enum e20ul {
+    E20UL_10 = 10,
+    E20UL_1000 = 1000,
+    E20UL_1000000000 = 1000000000L,
+};
+
+static struct enum_bitfield_ulong {
+    enum e20ul x : 4;
+    enum e20ul y : 16;
+    enum e20ul z : CHAR_BIT * sizeof (enum e20ul);
+} e20ulbf = {E20UL_10, E20UL_1000, E20UL_1000000000};
+
+static void test_enum_bitfield_ulong(void)
+{
+    if (sizeof (struct enum_bitfield_ulong) != 7) {
+        printf ("Got sizeof(struct enum_bitfield_ulong) = %zu, expected 7.\n",
+                sizeof(struct enum_bitfield_ulong));
+        failures++;
+    }
+
+    if (e20ulbf.x != 10) {
+        printf ("Got e20ulbf.x = %u, expected 10.\n", e20ulbf.x);
+        failures++;
+    }
+    if (e20ulbf.y != 1000) {
+        printf ("Got e20ulbf.y = %u, expected 1000.\n", e20ulbf.y);
+        failures++;
+    }
+    if (e20ulbf.z != 1000000000L) {
+        printf ("Got e20ulbf.z = %ul, expected 1000000000.\n", e20ulbf.z);
+        failures++;
+    }
+
+    e20ulbf.x = 8;
+    e20ulbf.y = -1;  /* Will store 65535. */
+    e20ulbf.z = 1048575L;
+
+    if (e20ulbf.x != 8) {
+        printf ("Got e20ulbf.x = %ld, expected 8.\n", (long)e20ulbf.x);
+        failures++;
+    }
+
+    /* Check signedness, should be signed. */
+    {
+        if (e20ulbf.x - 9 >= 0) {
+            printf ("Got non-negative e20ulbf.x - 9 = %lu, expected negative.\n", (unsigned long)(e20ulbf.x - 9));
+            failures++;
+        }
+    }
+
+    if (e20ulbf.y != 65535L) {
+        printf ("Got e20ulbf.y = %ld, expected 65535.\n", (long)e20ulbf.y);
+        failures++;
+    }
+
+    /* Check signedness, should be signed. */
+    {
+        if (e20ulbf.y - 65536L >= 0) {
+            printf ("Got non-negative e20ulbf.y - 65536L = %lu, expected negative.\n", (unsigned long)(e20ulbf.y - 65536L));
+            failures++;
+        }
+    }
+
+    if (e20ulbf.z != 1048575L) {
+        printf ("Got e20ulbf.z = %lu, expected 1048575.\n", (unsigned long)e20ulbf.z);
+        failures++;
+    }
+
+    /* Check signedness, should be unsigned. */
+    {
+        if (e20ulbf.z - 1048576L < 0) {
+            printf ("Got negative e20ulbf.z - 1048576 = %ld, expected positive.\n", (long)(e20ulbf.z - 1048576L));
+            failures++;
+        }
+    }
+}
+
+/* Enum with underlying type signed long. */
+enum e20sl {
+    E20SL_M1 = -1,
+    E20SL_1000 = 1000,
+    E20SL_1000000000 = 1000000000L,
+};
+
+static struct enum_bitfield_long {
+    enum e20sl x : 2;
+    enum e20sl y : 16;
+    enum e20sl z : CHAR_BIT * sizeof (enum e20sl);
+} e20slbf = {E20SL_M1, E20SL_1000, E20SL_1000000000};
+
+static void test_enum_bitfield_long(void)
+{
+    if (sizeof (struct enum_bitfield_long) != 7) {
+        printf ("Got sizeof(struct enum_bitfield_long) = %zu, expected 8.\n",
+                sizeof(struct enum_bitfield_long));
+        failures++;
+    }
+
+    if (e20slbf.x != -1) {
+        printf ("Got e20slbf.x = %ld, expected -1.\n", (long)e20slbf.x);
+        failures++;
+    }
+    if (e20slbf.y != 1000) {
+        printf ("Got e20slbf.y = %ld, expected 1000.\n", (long)e20slbf.y);
+        failures++;
+    }
+    if (e20slbf.z != 1000000000L) {
+        printf ("Got e20slbf.z = %ld, expected 1000000000.\n", (long)e20slbf.z);
+        failures++;
+    }
+
+    e20slbf.x = 1;
+    e20slbf.y = 257;
+    e20slbf.z = 1048575L;
+
+    if (e20slbf.x != 1) {
+        printf ("Got e20slbf.x = %d, expected 1.\n", e20slbf.x);
+        failures++;
+    }
+
+    /* Check signedness, should be signed. */
+    {
+        if (e20slbf.x - 2 >= 0) {
+            printf ("Got non-negative e20slbf.x - 2 = %lu, expected negative.\n", (unsigned long)(e20slbf.x - 2));
+            failures++;
+        }
+    }
+
+    if (e20slbf.y != 257) {
+        printf ("Got e20slbf.y = %ld, expected 257.\n", (long)e20slbf.y);
+        failures++;
+    }
+
+    /* Check signedness, should be signed. */
+    {
+        if (e20slbf.y - 258 >= 0) {
+            printf ("Got non-negative e20slbf.y - 258 = %lu, expected negative.\n", (unsigned long)(e20slbf.y - 258));
+            failures++;
+        }
+    }
+
+    if (e20slbf.z != 1048575L) {
+        printf ("Got e20slbf.z = %ld, expected 1048575.\n", (long)e20slbf.z);
+        failures++;
+    }
+
+    /* Check signedness, should be signed. */
+    {
+        if (e20slbf.z - 1048576L >= 0) {
+            printf ("Got non-negative e20slbf.z - 1048576L = %ld, expected negative.\n", (long)(e20slbf.z - 1048576L));
+            failures++;
+        }
+    }
+}
+
 int main(void)
 {
     test_enum_bitfield_uint();
     test_enum_bitfield_int();
     test_enum_bitfield_uchar();
     test_enum_bitfield_char();
+    test_enum_bitfield_ulong();
+    test_enum_bitfield_long();
     printf("failures: %u\n", failures);
     return failures;
 }

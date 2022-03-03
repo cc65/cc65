@@ -29,7 +29,7 @@ Included with this distribution is a 4k configuration file and a 32k config file
 
 <sect>Memory layout<p>
 
-The ROMs and I/O areas are defined in the configuration files, as are most of the entry points for useful subroutines in the Sym-1 monitor ROM.  cc65 generated programs compiled and linked using 4k config run in the memory range of &dollar;200 - &dollar;0FFF.  The 32k config expands this range to &dollar;7FFF.  The starting memory location and entry point for running the program is &dollar;200, so when the program is transferred to the Sym-1, it is executed by typing 'g 200'.  The system returns control back to the monitor ROM when the program terminates, providing the '.' prompt. 
+The ROMs and I/O areas are defined in the configuration files, as are most of the entry points for useful subroutines in the Sym-1 monitor ROM.  cc65 generated programs compiled and linked using 4k config run in the memory range of &dollar;200 - &dollar;0FFF.  The 32k config expands this range to &dollar;7FFF.  Memory above 32K can be used to extend the heap, as described below.  The starting memory location and entry point for running the program is &dollar;200, so when the program is transferred to the Sym-1, it is executed by typing 'g 200'.  The system returns control back to the monitor ROM when the program terminates, providing the '.' prompt. 
 
 Special locations:
 
@@ -41,7 +41,7 @@ Special locations:
   The C runtime stack is located at &dollar;0FFF on 4KB Syms, or at &dollar;7FFF for 32KB systems.  The stack always grows downwards. 
 
   <tag/Heap/
-  The C heap is located at the end of the program and grows towards the C runtime stack.
+  The C heap is located at the end of the program and grows towards the C runtime stack.  Extended memory can be added to the heap, as described below.
 
 </descrip><p>
 
@@ -61,7 +61,7 @@ No graphics drivers are currently available for the Sym-1.
 
 <sect1>Extended memory drivers<p>
 
-No extended memory drivers are currently available for the Sym-1.
+See the example program, symExtendedMemory, in the samples directory.
 
 <sect1>Joystick drivers<p>
 
@@ -102,7 +102,7 @@ As stated earlier, there are config files for 4KB and 32KB systems.  If you have
 
 <sect3>Sample programs<p>
 
-All the samples will run on the &quot;stock&quot; 4KB Sym-1, except for symIO and symNotepad, which require 32KB.  These sample programs can be found in the samples/sym1 directory:
+All the samples will run on the &quot;stock&quot; 4KB Sym-1, except for symIO and symNotepad, which require 32KB.  Additionally, symExtendedMemory shows how to access memory above 32KB, so it expects more than 32KB.  These sample programs can be found in the samples/sym1 directory:
 
 <itemize>
 <item>symHello prints &quot;Hello World!&quot; and then inputs characters, which are echoed on the screen.  It also makes a &quot;beep&quot; sound.</item>
@@ -110,6 +110,7 @@ All the samples will run on the &quot;stock&quot; 4KB Sym-1, except for symIO an
 <item>symDisplay allows entry of a message, which is then displayed by scrolling it across the front panel display.</item>
 <item>symIO allows access to the Sym-1 digital I/O ports.</item>
 <item>symNotepad is a simple text entry/retrieval program that uses tape storage.</item>
+<item>symExtendedMemory demonstrates how to access upper-memory and add it to the heap.</item>
 </itemize>
 
 <sect>License<p>

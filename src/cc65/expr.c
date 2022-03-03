@@ -2587,12 +2587,9 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                     CmpSigned = 0;
                     flags |= CF_UNSIGNED;
                 }
+
             } else {
                 unsigned rtype = TypeOf (Expr2.Type) | (flags & CF_CONST);
-                if (CmpSigned) {
-                    ltype &= ~CF_UNSIGNED;
-                    rtype &= ~CF_UNSIGNED;
-                }
                 flags |= g_typeadjust (ltype, rtype);
             }
 

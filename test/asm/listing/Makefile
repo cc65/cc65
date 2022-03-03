@@ -48,7 +48,7 @@ define LISTING_template
 $(WORKDIR)/$1.bin: $1.s $(ISEQUAL)
 	$(if $(QUIET),echo asm/$1.bin)
 
-	# compile without generating listing
+#	compile without generating listing
 	$(CA65) -t none -o $$(@:.bin=.o) $$<
 	$(LD65) -t none -o $$@ $$(@:.bin=.o) none.lib
 
@@ -59,13 +59,13 @@ endif
 	$(CA65) -t none -l $$(@:.bin=.list.orig) -o $$(@:.bin=.list-o) $$<
 	$(LD65) -t none -o $$(@:.bin=.list-bin) $$(@:.bin=.list-o) none.lib
 
-	# check if the result bin is the same as without listing file
+#	check if the result bin is the same as without listing file
 	$(ISEQUAL) $$@ $$(@:.bin=.list-bin)
 
 ifneq ($(wildcard $1.list-ref),)
-	# we have a reference file, compare that, too
+#	we have a reference file, compare that, too
 
-	# remove first line which contains a version number
+#	remove first line which contains a version number
 	tail -n +2 $$(@:.bin=.lst.orig) > $$(@:.bin=.lst)
 	$(ISEQUAL) $1.list-ref $$(@:.bin=.lst)
 endif

@@ -61,7 +61,7 @@ No graphics drivers are currently available for the Sym-1.
 
 <sect1>Extended memory drivers<p>
 
-See the example program, symExtendedMemory, in the samples directory.
+There are no extended memory drivers for the Sym-1.  However, there is a way to access memory beyond the 32k boundary, if memory is physically present in the system.  See the example program, symExtendedMemory, in the samples directory.
 
 <sect1>Joystick drivers<p>
 
@@ -100,7 +100,11 @@ This header exposes Sym-specific I/O functions that are useful for reading and w
 
 As stated earlier, there are config files for 4KB and 32KB systems.  If you have 32KB RAM, then you will probably want to use the sym1-32k configuration, but if not - if you are using the sym1-4k configuration - then you may want to use functions like getchar, putchar, gets and puts rather than functions like scanf and printf.  Printf, for example, requires about 1KB because it needs to know how to process all the format specifiers.
 
-<sect3>Sample programs<p>
+<sect3>Using extended memory<p>
+
+Memory may be physically present that is addressed at locations above the monitor ROM at $8000.  This extended memory is accessible by adding to the heap, as described in the symExtendedMemory sample program.
+
+<sect4>Sample programs<p>
 
 All the samples will run on the &quot;stock&quot; 4KB Sym-1, except for symIO and symNotepad, which require 32KB.  Additionally, symExtendedMemory shows how to access memory above 32KB, so it expects more than 32KB.  These sample programs can be found in the samples/sym1 directory:
 

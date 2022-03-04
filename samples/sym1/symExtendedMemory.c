@@ -42,7 +42,7 @@ int main (void) {
 
    heap_size = _heapmemavail();
 
-   printf ( "Main memory has %d bytes available.\n", heap_size );
+   printf ( "Main memory has %u bytes available.\n", heap_size );
 
    while ( (int) segment < 0xEFFF ) {  // Iterate through 4K memory blocks
       if( (int) segment != UNAVAILABLE ) {

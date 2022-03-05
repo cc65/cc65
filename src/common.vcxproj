@@ -74,7 +74,6 @@
     <ClInclude Include="common\inline.h" />
     <ClInclude Include="common\intptrstack.h" />
     <ClInclude Include="common\intstack.h" />
-    <ClInclude Include="common\inttypes.h" />
     <ClInclude Include="common\libdefs.h" />
     <ClInclude Include="common\lidefs.h" />
     <ClInclude Include="common\matchpat.h" />

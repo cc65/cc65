@@ -4403,15 +4403,15 @@ void g_defdata (unsigned flags, uintptr_t val, long offs)
         switch (flags & CF_TYPEMASK) {
 
             case CF_CHAR:
-                AddDataLine ("\t.byte\t$%02lX", val & 0xFF);
+                AddDataLine ("\t.byte\t$%02"PRIXPTR, val & 0xFF);
                 break;
 
             case CF_INT:
-                AddDataLine ("\t.word\t$%04lX", val & 0xFFFF);
+                AddDataLine ("\t.word\t$%04"PRIXPTR, val & 0xFFFF);
                 break;
 
             case CF_LONG:
-                AddDataLine ("\t.dword\t$%08lX", val & 0xFFFFFFFF);
+                AddDataLine ("\t.dword\t$%08"PRIXPTR, val & 0xFFFFFFFF);
                 break;
 
             default:

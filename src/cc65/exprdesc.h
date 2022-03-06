@@ -38,12 +38,12 @@
 
 
 
+#include <inttypes.h>
 #include <string.h>
 
 /* common */
 #include "fp.h"
 #include "inline.h"
-#include "inttypes.h"
 
 /* cc65 */
 #include "asmcode.h"

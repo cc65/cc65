@@ -33,6 +33,7 @@
 
 
 
+#include <inttypes.h>
 #include <limits.h>
 #include <stdio.h>
 #include <string.h>
@@ -42,7 +43,6 @@
 #include "addrsize.h"
 #include "check.h"
 #include "cpu.h"
-#include "inttypes.h"
 #include "strbuf.h"
 #include "xmalloc.h"
 #include "xsprintf.h"

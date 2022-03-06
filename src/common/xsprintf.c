@@ -33,6 +33,7 @@
 
 
 
+#include <inttypes.h>
 #include <stdio.h>
 #include <stddef.h>
 #include <string.h>
@@ -41,7 +42,6 @@
 /* common */
 #include "chartype.h"
 #include "check.h"
-#include "inttypes.h"
 #include "strbuf.h"
 #include "va_copy.h"
 #include "xsprintf.h"

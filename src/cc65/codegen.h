@@ -37,10 +37,10 @@
 #define CODEGEN_H
 
 
+#include <inttypes.h>
 
 /* common */
 #include "coll.h"
-#include "inttypes.h"
 
 /* cc65 */
 #include "segments.h"

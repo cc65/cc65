@@ -38,7 +38,7 @@
 
 #ifdef NO_WCHAR
 
-#warn "this test checks C99 features, but NO_WCHAR is defined so the test will most definitely fail."
+#warning "this test checks C99 features, but NO_WCHAR is defined so the test will most definitely fail."
 
 #endif
 

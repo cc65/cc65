@@ -32,7 +32,7 @@ else
 endif
 
 EXELIST_sym1 = \
-        symHello.bin symTiny.bin symDisplay.bin symIO.bin symNotepad.bin
+        symHello.bin symTiny.bin symDisplay.bin symIO.bin symNotepad.bin symExtendedMemory.bin
 
 ifneq ($(EXELIST_$(SYS)),)
 samples: $(EXELIST_$(SYS))
@@ -64,9 +64,14 @@ symIO.bin: symIO.c
 symNotepad.bin: symNotepad.c
 	$(CL) -t sym1 -C sym1-32k.cfg -O -o symNotepad.bin symNotepad.c
 
+symExtendedMemory.bin: symExtendedMemory.c
+	$(CL) -t sym1 -C sym1-32k.cfg -O -o symExtendedMemory.bin symExtendedMemory.c
+
+
 clean:
 	@$(DEL) symHello.bin 2>$(NULLDEV)
 	@$(DEL) symTiny.bin 2>$(NULLDEV)
 	@$(DEL) symDisplay.bin 2>$(NULLDEV)
 	@$(DEL) symIO.bin 2>$(NULLDEV)
 	@$(DEL) symNotepad.bin 2>$(NULLDEV)
+	@$(DEL) symExtendedMemory.bin 2>$(NULLDEV)

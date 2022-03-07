@@ -4,7 +4,7 @@
 ; This header contains data for emulators
 ;
         .export         __EXEHDR__: absolute = 1
-
+        .import		__CARTSIZE__
 ; ------------------------------------------------------------------------
 ; EXE header
 	.segment "EXEHDR"
@@ -12,7 +12,7 @@
 	.byte	'A','T','A','R','I','7','8','0','0',' ',' ',' ',' ',' ',' ',' '
 	.byte	'G','a','m','e',' ','n','a','m','e',0,0,0,0,0,0,0
 	.byte	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-	.byte	0,0,$80,0					; Size
+	.byte	0,0,>__CARTSIZE__,0			; Set the cart size in the cfg file
     ;    bit  0 - pokey at 4000
     ;    bit  1 - supergame bank switched
     ;    bit  2 - supergame ram at $4000

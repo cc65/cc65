@@ -216,8 +216,11 @@ void LimitExprValue (ExprDesc* Expr)
             break;
 
         case T_LONG:
+            Expr->IVal = (int32_t)Expr->IVal;
+            break;
+
         case T_ULONG:
-            /* No need to do anything */
+            Expr->IVal = (uint32_t)Expr->IVal;
             break;
 
         case T_SCHAR:
@@ -2584,12 +2587,9 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                     CmpSigned = 0;
                     flags |= CF_UNSIGNED;
                 }
+
             } else {
                 unsigned rtype = TypeOf (Expr2.Type) | (flags & CF_CONST);
-                if (CmpSigned) {
-                    ltype &= ~CF_UNSIGNED;
-                    rtype &= ~CF_UNSIGNED;
-                }
                 flags |= g_typeadjust (ltype, rtype);
             }
 

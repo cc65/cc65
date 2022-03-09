@@ -33,6 +33,7 @@
 
 
 
+#include <inttypes.h>
 #include <limits.h>
 #include <stdio.h>
 #include <string.h>
@@ -42,7 +43,6 @@
 #include "addrsize.h"
 #include "check.h"
 #include "cpu.h"
-#include "inttypes.h"
 #include "strbuf.h"
 #include "xmalloc.h"
 #include "xsprintf.h"
@@ -689,7 +689,7 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes)
 
 
 
-void g_getimmed (unsigned Flags, unsigned long Val, long Offs)
+void g_getimmed (unsigned Flags, uintptr_t Val, long Offs)
 /* Load a constant into the primary register */
 {
     unsigned char B1, B2, B3, B4;
@@ -4394,7 +4394,7 @@ void g_res (unsigned n)
 
 
 
-void g_defdata (unsigned flags, unsigned long val, long offs)
+void g_defdata (unsigned flags, uintptr_t val, long offs)
 /* Define data with the size given in flags */
 {
     if (flags & CF_CONST) {
@@ -4403,15 +4403,15 @@ void g_defdata (unsigned flags, unsigned long val, long offs)
         switch (flags & CF_TYPEMASK) {
 
             case CF_CHAR:
-                AddDataLine ("\t.byte\t$%02lX", val & 0xFF);
+                AddDataLine ("\t.byte\t$%02"PRIXPTR, val & 0xFF);
                 break;
 
             case CF_INT:
-                AddDataLine ("\t.word\t$%04lX", val & 0xFFFF);
+                AddDataLine ("\t.word\t$%04"PRIXPTR, val & 0xFFFF);
                 break;
 
             case CF_LONG:
-                AddDataLine ("\t.dword\t$%08lX", val & 0xFFFFFFFF);
+                AddDataLine ("\t.dword\t$%08"PRIXPTR, val & 0xFFFFFFFF);
                 break;
 
             default:

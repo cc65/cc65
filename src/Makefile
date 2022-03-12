@@ -119,6 +119,7 @@ endif # CMD_EXE
 
 zip:
 	@cd .. && zip cc65 bin/*
+	@echo 'https://github.com/cc65/cc65/commits/'$(word 2,$(BUILD_ID))|zip -zq ../cc65
 
 define OBJS_template
 

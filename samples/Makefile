@@ -199,7 +199,8 @@ EXELIST_atmos =    \
         ascii      \
         hello      \
         mandelbrot \
-        sieve
+        sieve      \
+        tgidemo
 
 EXELIST_bbc = \
         notavailable
@@ -311,7 +312,7 @@ EXELIST_sim65c02 = $(EXELIST_sim6502)
 
 EXELIST_supervision = \
         notavailable
-        
+
 EXELIST_sym1 =     \
         notavailable
 
@@ -321,7 +322,7 @@ EXELIST_telestrat = \
         hello       \
         mandelbrot  \
         sieve       \
-#        tgidemo
+        tgidemo
 
 EXELIST_vic20 =    \
         ascii      \

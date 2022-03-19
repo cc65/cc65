@@ -154,7 +154,7 @@ endif
 # Lists of subdirectories
 
 # disasm depends on cpp
-DIRLIST = tutorial geos atari2600 atari5200 apple2 gamate supervision sym1 cbm
+DIRLIST = tutorial geos atari2600 atari5200 apple2 gamate lynx supervision sym1 cbm
 
 # --------------------------------------------------------------------------
 # Lists of executables

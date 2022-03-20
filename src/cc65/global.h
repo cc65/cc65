@@ -77,6 +77,7 @@ extern IntStack         DataAlignment;          /* Alignment for data */
 extern StrBuf           DepName;                /* Name of dependencies file */
 extern StrBuf           FullDepName;            /* Name of full dependencies file */
 extern StrBuf           DepTarget;              /* Name of dependency target */
+extern StrBuf           DebugTableName;         /* Name of debug table dump file */
 
 
 

@@ -57,6 +57,7 @@ typedef enum {
     TGT_ATARI,
     TGT_ATARI2600,
     TGT_ATARI5200,
+    TGT_ATARI7800,
     TGT_ATARIXL,
     TGT_VIC20,
     TGT_C16,

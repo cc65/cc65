@@ -1,9 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                  target.h                                 */
+/*                                _maria.h                                   */
 /*                                                                           */
-/*                        Target specific definitions                        */
-/*                                                                           */
+/* Atari 7800, Maria chip register hardware structures                       */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -25,51 +24,40 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
-#ifndef _TARGET_H
-#define _TARGET_H
-
-
-
-/* Include the correct target specific file */
-#if   defined(__APPLE2ENH__)
-#  include <apple2enh.h>
-#elif defined(__APPLE2__)
-#  include <apple2.h>
-#elif defined(__ATARI__)
-#  include <atari.h>
-#elif defined(__ATARI2600__)
-#  include <atari2600.h>
-#elif defined(__ATARI5200__)
-#  include <atari5200.h>
-#elif defined(__ATARI7800__)
-#  include <atari7800.h>
-#elif defined(__ATMOS__)
-#  include <atmos.h>
-#elif defined(__CBM__)
-#  include <cbm.h>
-#elif defined(__CREATIVISION__)
-#  include <creativision.h>
-#elif defined(__GAMATE__)
-#  include <gamate.h>
-#elif defined(__GEOS__)
-#  include <geos.h>
-#elif defined(__LYNX__)
-#  include <lynx.h>
-#elif defined(__NES__)
-#  include <nes.h>
-#elif defined(__OSIC1P__)
-#  include <osic1p.h>
-#elif defined(__PCE__)
-#  include <pce.h>
-#elif defined(__SUPERVISION__)
-#  include <supervision.h>
-#elif defined(__TELESTRAT__)
-#  include <telestrat.h>
-#endif
-
-
-
-/* End of target.h */
-#endif
+/*
+ * MARIA registers
+ */
+struct __maria {
+    unsigned char bkgrnd;
+    unsigned char p0c1;
+    unsigned char p0c2;
+    unsigned char p0c3;
+    unsigned char wsync;
+    unsigned char p1c1;
+    unsigned char p1c2;
+    unsigned char p1c3;
+    unsigned char mstat;
+    unsigned char p2c1;
+    unsigned char p2c2;
+    unsigned char p2c3;
+    unsigned char dpph;
+    unsigned char p3c1;
+    unsigned char p3c2;
+    unsigned char p3c3;
+    unsigned char dppl;
+    unsigned char p4c1;
+    unsigned char p4c2;
+    unsigned char p4c3;
+    unsigned char chbase;
+    unsigned char p5c1;
+    unsigned char p5c2;
+    unsigned char p5c3;
+    unsigned char offset;
+    unsigned char p6c1;
+    unsigned char p6c2;
+    unsigned char p6c3;
+    unsigned char ctrl;
+    unsigned char p7c1;
+    unsigned char p7c2;
+    unsigned char p7c3;
+};

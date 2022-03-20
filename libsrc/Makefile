@@ -21,6 +21,7 @@ TARGETS = apple2       \
           atarixl      \
           atari2600    \
           atari5200    \
+          atari7800    \
           atmos        \
           creativision \
           $(CBMS)      \

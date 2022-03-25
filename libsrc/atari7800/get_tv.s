@@ -6,6 +6,7 @@
 	.include	"atari7800.inc"
         .include        "get_tv.inc"
 	.export		_get_tv
+	.export		_paldetected
 
 .segment	"DATA"
 

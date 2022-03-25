@@ -1,5 +1,4 @@
         .export		_zonecounter
-        .export		_paldetected
         .export		 __STARTUP__ : absolute = 1
         .export		 _exit
         .import		 __ROM_START__
@@ -39,29 +38,6 @@ start:
         jsr     zerobss
         jsr     initlib
 
-	; Examine machine type as we need the info early
-vboff:	lda     MSTAT
-	bmi     vboff
-vbon:   lda     MSTAT
-        bpl     vbon
-vboff2: lda     MSTAT
-        bmi     vboff2
-        lda     #$00
-        sta     _paldetected
-        jmp     mtsta
-count:  sta     WSYNC
-        sta     WSYNC
-        dec     _paldetected
-mtsta:  lda     MSTAT
-        bpl     count
-        lda     _paldetected
-        cmp     #$78
-        bcc     mtntsc
-        lda     #$01
-        jmp     mtpal
-mtntsc: lda     #$00
-mtpal:  sta     _paldetected
-
         ; Call main program (pass empty command line)
         jsr     push0           ; argc
         jsr     push0           ; argv
@@ -82,9 +58,6 @@ IRQHandler:
         .segment "DATA"
 _zonecounter:
         .byte   0
-_paldetected:
-	.byte	0		; 0 = NTSC, 1 = PAL
-
 
         .segment "ENCRYPTION"
         .res    126, $ff        ; Reserved for encryption

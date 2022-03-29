@@ -5,12 +5,12 @@
         .import		 __RAM3_START__, __RAM3_SIZE__
         .import		 initlib, donelib
         .import		 zerobss, copydata
+        .import		 IRQStub
         .import		 push0, _main
+        .include        "atari7800.inc"
 	.include	"zeropage.inc"
 
 INPTCTRL        =       $01
-OFFSET          =       $38
-CTRL            =       $3c
 
         .segment "STARTUP"
 start:
@@ -50,7 +50,7 @@ _exit:
 
 NMIHandler:        
         inc     _zonecounter
-        rti
+        jmp	IRQStub
 
 IRQHandler:
         rti

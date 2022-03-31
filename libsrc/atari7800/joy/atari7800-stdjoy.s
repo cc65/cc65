@@ -3,7 +3,7 @@
 ; This version tries to use 7800 and 2600 joysticks.
 ; But assumes that both joysticks are of same type.
 ;
-; Modified by Karri Kaksonen, 2022-02-27
+; Modified by Karri Kaksonen, 2022-03-31
 ; Ullrich von Bassewitz, 2002-12-20
 ; Using code from Steve Schmidtke
 ;
@@ -107,7 +107,7 @@ L1:	bit INPT3	;Check for left button
 	bpl L2
 	iny		; ......21
 L2:	tya
-	bne L4		; Joystick worked
+	bne L4		; 7800 mode joystick worked
 	; 2600 Joystick 1
 	bit INPT5
 	bpl L4
@@ -127,7 +127,7 @@ L6:	bit INPT1	;Check for left button
 	bpl L7
 	iny		; ......21
 L7:	tya
-	bne L4		; Joystick worked
+	bne L4		; 7800 mode joystick worked
 	; 2600 Joystick 0
 	bit INPT4
 	bpl L4
@@ -136,12 +136,12 @@ L7:	tya
 READ:
 	tay			; Store joystick 0/1 in Y
 	beq	L8
-	lda	SWCHA
+	lda	SWCHA		; Read directions of joystick 1
 	rol			; ...RLDU.
 	rol			; ..RLDU..
 	rol			; .RLDU... - joystick 1
 	jmp	L9
-L8:	lda     SWCHA           ; Read joystick
+L8:	lda     SWCHA           ; Read directions of joystick 0
 	ror			; .RLDU... - joystick 0
 L9:	tax
 	jsr readbuttons		; A = ......21, X = .RLDU...

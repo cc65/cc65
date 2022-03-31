@@ -91,9 +91,9 @@ readbuttons:
 	; Y has joystick of interest 0/1
         ; return value:
 	;  $00: no button,
-	;  $80: left/B button,
-	;  $40: right/A button,
-	;  $c0: both buttons
+	;  $01: left/B button,
+	;  $02: right/A button,
+	;  $03: both buttons
         ; preserves X
 	tya
 	beq L5
@@ -114,10 +114,7 @@ L2:	tya
 L3:	iny		; .......1
 	lda #0		; Fallback to 2600 joystick mode
 	sta CTLSWB
-L4:	tya
-	ror		; .......2 1
-	ror		; 1....... 2
-	ror		; 21......
+L4:	tya		; ......21
 	rts
 
 L5:	; Joystick 0 processing
@@ -147,8 +144,8 @@ READ:
 L8:	lda     SWCHA           ; Read joystick
 	ror			; .RLDU... - joystick 0
 L9:	tax
-	jsr readbuttons		; A = 21......, X = .RLDU...
-	rol			; A = 1 .......2
+	jsr readbuttons		; A = ......21, X = .RLDU...
+	ror			; A = .......2 1
 	tay			; Y = .......2
 	txa			; A = .RLDU...
 	ror			; A = 1.RLDU..

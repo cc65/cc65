@@ -110,7 +110,7 @@ L2:	tya
 	bne L4		; 7800 mode joystick worked
 	; 2600 Joystick 1
 	bit INPT5
-	bpl L4
+	bmi L4
 L3:	iny		; .......1
 	lda #0		; Fallback to 2600 joystick mode
 	sta CTLSWB
@@ -130,8 +130,8 @@ L7:	tya
 	bne L4		; 7800 mode joystick worked
 	; 2600 Joystick 0
 	bit INPT4
-	bpl L4
-	bmi L3
+	bmi L4
+	bpl L3
 
 READ:
 	tay			; Store joystick 0/1 in Y

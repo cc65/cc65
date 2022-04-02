@@ -10,7 +10,6 @@
         .include        "atari7800.inc"
 	.import		_font160
 	.import		_get_tv
-	.import		_clrscr
 	.export		_screen
 	.export		_zones
 	.export		_dll
@@ -205,7 +204,6 @@ pal:	lda	#<PALscanlines
 	sta	DPPL
 	lda	#>PALscanlines
 	sta	DPPH
-	jsr	_clrscr
 vblankon:
 	lda	MSTAT
 	bmi	vblankon

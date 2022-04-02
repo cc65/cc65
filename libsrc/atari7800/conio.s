@@ -64,7 +64,7 @@ CURS_Y:
 	.byte	12
 	.byte	0
 	; Cursor
-	.byte	127
+	.byte	254
 	.byte	0
 	.byte	>_font160
 	.byte	0

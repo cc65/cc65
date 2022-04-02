@@ -1,8 +1,8 @@
 ;
-; Graphics driver for the 320 pixels across, 200 pixels down, 256 colors mode
+; Graphics driver for the 320 pixels across, 240 pixels down, 256 colors mode
 ; on the Commander X16
 ;
-; 2020-07-02, Greg King <gregdk@users.sf.net>
+; 2022-03-30, Greg King <gregdk@users.sf.net>
 ;
 
         .include        "zeropage.inc"
@@ -39,7 +39,7 @@
         .byte   TGI_API_VERSION         ; TGI API version number
         .addr   $0000                   ; Library reference
         .word   320                     ; X resolution
-        .word   200                     ; Y resolution
+        .word   240                     ; Y resolution
         .byte   <$0100                  ; Number of drawing colors
         .byte   1                       ; Number of screens available
         .byte   8                       ; System font X size
@@ -100,7 +100,7 @@ palette:        .res    $0100
 
 bcolor          :=      palette + 0     ; Background color
 color:          .res    1               ; Stroke and fill index
-mode:           .res    1               ; Old text mode
+text_mode:      .res    1               ; Old text mode
 
 .data
 
@@ -152,13 +152,15 @@ INIT:   stz     error           ; #TGI_ERR_OK
 
 ; Save the current text mode.
 
-        lda     SCREEN_MODE
-        sta     mode
+        sec
+        jsr     SCREEN_MODE
+        sta     text_mode
 
-; Switch into (320 x 200 x 256) graphics mode.
+; Switch into (320 x 240 x 256) graphics mode.
 
         lda     #GRAPH320
-        jmp     SCREEN_SET_MODE
+        clc
+        jmp     SCREEN_MODE
 
 ; ------------------------------------------------------------------------
 ; DONE: Will be called to switch the graphics device back into text mode.
@@ -168,16 +170,9 @@ INIT:   stz     error           ; #TGI_ERR_OK
 ; Must set an error code: NO
 
 DONE:
-; Work around a prerelease 37 Kernal bug.
-; VERA (graphics) layer 0 isn't disabled by SCREEN_SET_MODE.
-
-        stz     VERA::CTRL
-        lda     VERA::DISP::VIDEO
-        and     #<~VERA::DISP::ENABLE::LAYER0
-        sta     VERA::DISP::VIDEO
-
-        lda     mode
-        jmp     SCREEN_SET_MODE
+        lda     text_mode
+        clc
+        jmp     SCREEN_MODE
 
 ; ------------------------------------------------------------------------
 ; GETERROR: Return the error code in .A, and clear it.

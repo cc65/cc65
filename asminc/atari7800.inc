@@ -6,3 +6,8 @@
 .include "atari7800_tia.inc"
 .include "atari7800_riot.inc"
 .include "atari7800_maria.inc"
+
+; constants for the conio implementation
+charsperline	= 20
+screenrows	= 28
+

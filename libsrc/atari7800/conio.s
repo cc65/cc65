@@ -222,9 +222,7 @@ vblankoff:
 	sta	P0C1
 	lda	#$c8		; Green
 	sta	P0C2
-	lda	#$78		; Blue
+	lda	#$0f		; White
 	sta	P0C3
-	lda	#$0f		; Cursor gray
-	sta	P1C1
         rts
 

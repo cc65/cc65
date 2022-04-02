@@ -1,5 +1,5 @@
 ;
-; 2019-12-22, Greg King
+; 2022-03-29, Greg King
 ;
 ; char cgetc (void);
 ; /* Return a character from the keyboard. */
@@ -12,6 +12,8 @@
         .include        "cx16.inc"
         .macpack        generic
 
+
+screen_addr     :=      $1B000  ; VRAM address of text screen
 
 _cgetc: jsr     _kbhit
         bnz     L3              ; Jump if there are already chars waiting
@@ -57,8 +59,9 @@ setcursor:
 
         stz     VERA::CTRL      ; Use port 0
         lda     CURS_Y
+        add     #<(>screen_addr)
         sta     VERA::ADDR+1    ; Set row number
-        lda     #VERA::INC1     ; Increment address by one
+        lda     #VERA::INC1 | ^screen_addr      ; Increment address by one
         sta     VERA::ADDR+2
         lda     CURS_X          ; Get character column
         asl     a

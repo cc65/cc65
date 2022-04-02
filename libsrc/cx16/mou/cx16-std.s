@@ -1,7 +1,7 @@
 ;
 ; Driver for the Commander X16 Kernal's mouse driver.
 ;
-; 2019-12-25, Greg King
+; 2022-03-28, Greg King
 ;
 
         .include        "zeropage.inc"
@@ -118,7 +118,8 @@ INSTALL:
         dex
         bpl     @L1
 
-        ldx     #$00            ; Don't change sprite's scale
+        sec                     ; Get screen geometry
+        jsr     SCREEN_MODE
         lda     #$01            ; Create sprite
         jsr     MOUSE_CONFIG
 

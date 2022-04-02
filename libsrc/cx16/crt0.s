@@ -1,5 +1,5 @@
 ;
-; Start-up code for cc65 (CX16 r35 version)
+; Start-up code for cc65 (CX16 r39 version)
 ;
 
         .export         _exit
@@ -20,7 +20,7 @@
 .segment        "STARTUP"
 
 Start:  tsx
-        stx     spsave          ; Save the system stack ptr
+        stx     spsave          ; Save the system stack ptr.
 
 ; Save space by putting some of the start-up code in the ONCE segment
 ; which will be re-used by the BSS segment, the heap, and the C stack.
@@ -46,26 +46,14 @@ _exit:
 
         jsr     donelib
 
-.if 0   ; (We don't need to preserve zero-page space for cc65's variables.)
-; Copy back the zero-page stuff.
-
-        ldx     #zpspace-1
-L2:     lda     zpsave,x
-        sta     sp,x
-        dex
-        bpl     L2
-.endif
-
 ; Restore the system stuff.
 
         ldx     spsave
         txs                     ; Restore stack pointer
         ldx     ramsave
-        stx     VIA1::PRA       ; Restore former RAM bank
-        lda     VIA1::PRB
-        and     #<~$07
-        ora     #$04
-        sta     VIA1::PRB       ; Change back to BASIC ROM
+        stx     RAM_BANK        ; Restore former RAM bank
+        lda     #$04
+        sta     ROM_BANK        ; Change back to BASIC ROM
 
 ; Back to BASIC.
 
@@ -79,26 +67,14 @@ L2:     lda     zpsave,x
 init:
 ; Change from BASIC's ROM to Kernal's ROM.
 
-        lda     VIA1::PRB
-        and     #<~$07
-        sta     VIA1::PRB
+        stz     ROM_BANK
 
 ; Change to the second RAM bank.
 
-        lda     VIA1::PRA
+        lda     RAM_BANK
         sta     ramsave         ; Save the current RAM bank number
         lda     #$01
-        sta     VIA1::PRA
-
-.if 0   ; (We don't need to preserve zero-page space for cc65's variables.)
-; Save the zero-page locations that we need.
-
-        ldx     #zpspace-1
-L1:     lda     sp,x
-        sta     zpsave,x
-        dex
-        bpl     L1
-.endif
+        sta     RAM_BANK
 
 ; Set up the stack.
 
@@ -125,6 +101,3 @@ L1:     lda     sp,x
 ramsave:
         .res    1
 spsave: .res    1
-.if 0
-zpsave: .res    zpspace
-.endif

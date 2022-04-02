@@ -7,8 +7,13 @@
 
 .if .def(__CX16__)
   ; CX16 extended jump table
+  KBDBUF_PEEK                   := $FEBD
+  KBDBUF_GET_MODIFIERS          := $FEC0
+  KBDBUF_PUT                    := $FEC3
+  I2C_READ_BYTE                 := $FEC6
+  I2C_WRITE_BYTE                := $FEC9
+  CX_MONITOR                    := $FECC
   ENTROPY_GET                   := $FECF
-  KEYBRD_BUF_PUT                := $FED2
   CONSOLE_SET_PAGE_MSG          := $FED5
   CONSOLE_PUT_IMAGE             := $FED8
   CONSOLE_INIT                  := $FEDB
@@ -52,7 +57,7 @@
   CLOCK_GET_DATE_TIME           := $FF50
   JOYSTICK_SCAN                 := $FF53
   JOYSTICK_GET                  := $FF56
-  SCREEN_SET_MODE               := $FF5F
+  SCREEN_MODE                   := $FF5F
   SCREEN_SET_CHARSET            := $FF62
   MOUSE_CONFIG                  := $FF68
   MOUSE_GET                     := $FF6B

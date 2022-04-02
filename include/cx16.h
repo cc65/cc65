@@ -3,7 +3,7 @@
 /*                                  cx16.h                                   */
 /*                                                                           */
 /*                      CX16 system-specific definitions                     */
-/*                             For prerelease 38                             */
+/*                             For prerelease 39                             */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided "as-is", without any expressed or implied       */
@@ -172,11 +172,16 @@ enum {
 };
 
 /* Video modes for videomode() */
-#define VIDEOMODE_40x30         0x00
-#define VIDEOMODE_80x60         0x02
-#define VIDEOMODE_40COL         VIDEOMODE_40x30
+#define VIDEOMODE_80x60         0x00
+#define VIDEOMODE_80x30         0x01
+#define VIDEOMODE_40x60         0x02
+#define VIDEOMODE_40x30         0x03
+#define VIDEOMODE_40x15         0x04
+#define VIDEOMODE_20x30         0x05
+#define VIDEOMODE_20x15         0x06
 #define VIDEOMODE_80COL         VIDEOMODE_80x60
-#define VIDEOMODE_320x200       0x80
+#define VIDEOMODE_40COL         VIDEOMODE_40x30
+#define VIDEOMODE_320x240       0x80
 #define VIDEOMODE_SWAP          (-1)
 
 /* VERA's address increment/decrement numbers */
@@ -223,6 +228,13 @@ enum {
 
 
 /* Define hardware. */
+
+#define RAM_BANK        (*(unsigned char *)0x00)
+#define ROM_BANK        (*(unsigned char *)0x01)
+
+#include <_6522.h>
+#define VIA1    (*(volatile struct __6522 *)0x9F00)
+#define VIA2    (*(volatile struct __6522 *)0x9F10)
 
 /* A structure with the Video Enhanced Retro Adapter's external registers */
 struct __vera {
@@ -274,12 +286,15 @@ struct __vera {
 };
 #define VERA    (*(volatile struct __vera *)0x9F20)
 
-#include <_6522.h>
-#define VIA1    (*(volatile struct __6522 *)0x9F60)
-#define VIA2    (*(volatile struct __6522 *)0x9F70)
-
-#define RAM_BANK        (VIA1.pra)
-#define ROM_BANK        (VIA1.prb)
+/* Audio chip */
+struct __ym2151 {
+    union {
+        unsigned char   reg;            /* Register number for data */
+        unsigned char   status;         /* Busy flag */
+    };
+    unsigned char       data;
+};
+#define YM2151  (*(volatile struct __ym2151 *)0x9F40)
 
 /* A structure with the x16emu's settings registers */
 struct __emul {

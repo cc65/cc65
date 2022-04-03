@@ -94,11 +94,12 @@ putchar:
         adc     CURS_X
         sta     LCD_X
 
-        lda     CHARCOLOR
-        and     #1
-        beq     @delete1
-
         ldy     #$F8
+
+        lda     CHARCOLOR
+        lsr     
+        bcc     @delete1
+
 @copylp1:
         lda     (ptr3),y
         eor     RVS
@@ -110,9 +111,10 @@ putchar:
 
 @delete1:
         lda   #$00
+@del1:
         sta   LCD_DATA
         iny
-        bne @delete1
+        bne @del1
 
 @skip_delete1:
 
@@ -125,11 +127,11 @@ putchar:
         lda     _plotlo,x
         sta     LCD_Y
         
+        ldy     #$F8        
+        
         lda     CHARCOLOR
         and     #2
         beq     @delete2
-        
-        ldy     #$F8
 
 @copylp2:
         lda     (ptr3),y
@@ -142,9 +144,10 @@ putchar:
         
 @delete2:
         lda   #$00
+@del2:
         sta   LCD_DATA
         iny
-        bne @delete2
+        bne @del2
 
 @skip_delete2:
         pla

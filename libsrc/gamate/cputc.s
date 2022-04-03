@@ -111,9 +111,10 @@ putchar:
 
 @delete1:
         lda   #$00
+@del1:
         sta   LCD_DATA
         iny
-        bne @delete1
+        bne @del1
 
 @skip_delete1:
 
@@ -143,9 +144,10 @@ putchar:
         
 @delete2:
         lda   #$00
+@del2:
         sta   LCD_DATA
         iny
-        bne @delete2
+        bne @del2
 
 @skip_delete2:
         pla

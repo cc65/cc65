@@ -97,8 +97,8 @@ putchar:
         ldy     #$F8
 
         lda     CHARCOLOR
-        and     #1
-        beq     @delete1
+        lsr     
+        bcc     @delete1
 
 @copylp1:
         lda     (ptr3),y

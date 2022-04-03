@@ -500,7 +500,7 @@ prompt.
 
 Before you can run the cartridge image produced by the linker, the binary has to
 be patched using the <bf/gamate-fixcart/ tool that is included in the cc65
-package in the util/gamata directory.
+package in the util/gamate/ directory.
 
 <tscreen><verb>
 gamate-fixcart <image.bin>

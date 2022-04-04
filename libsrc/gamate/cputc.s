@@ -89,28 +89,34 @@ putchar:
         adc     #>(fontdata-$f8)
         sta     ptr3+1
 
-        lda     CHARCOLOR
-        and     #1
-        beq     @skip_plane1
-
         lda     #LCD_XPOS_PLANE1
         clc
         adc     CURS_X
         sta     LCD_X
 
-        ldy     #$f8
+        ldy     #$F8
+
+        lda     CHARCOLOR
+        lsr     
+        bcc     @delete1
+
 @copylp1:
         lda     (ptr3),y
         eor     RVS
         sta     LCD_DATA
         iny
         bne     @copylp1
+        
+        beq @skip_delete1
 
-@skip_plane1:
+@delete1:
+        lda   #$00
+@del1:
+        sta   LCD_DATA
+        iny
+        bne @del1
 
-        lda     CHARCOLOR
-        and     #2
-        beq     @skip_plane2
+@skip_delete1:
 
         lda     #LCD_XPOS_PLANE2
         clc
@@ -120,16 +126,30 @@ putchar:
         ldx     CURS_Y
         lda     _plotlo,x
         sta     LCD_Y
+        
+        ldy     #$F8        
+        
+        lda     CHARCOLOR
+        and     #2
+        beq     @delete2
 
-        ldy     #$f8
 @copylp2:
         lda     (ptr3),y
         eor     RVS
         sta     LCD_DATA
         iny
         bne     @copylp2
+        
+        beq    @skip_delete2
+        
+@delete2:
+        lda   #$00
+@del2:
+        sta   LCD_DATA
+        iny
+        bne @del2
 
-@skip_plane2:
+@skip_delete2:
         pla
         tax
         ldy     CURS_X

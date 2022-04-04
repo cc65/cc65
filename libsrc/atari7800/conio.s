@@ -14,17 +14,10 @@
 	.export		_zones
 	.export		_dll
 	.export		_initconio
-	.export		CURS_X, CURS_Y
 
         .bss
 _screen:
         .res    charsperline * screenrows
-
-	.data
-CURS_X:
-	.byte	0
-CURS_Y:
-	.byte	0
 
 ;----------------------------------------------------------------------------
 ; Macros used to generate lists

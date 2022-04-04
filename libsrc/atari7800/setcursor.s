@@ -23,9 +23,9 @@
 ; definitely not allow direct access to the variables.
 ;
 
-        .export         _cursor_visible
-        .export         _cursorzone
+        .export         _setcursor
         .export         _gotoxy, _gotox, _gotoy, wherex, wherey
+	.export		CURS_X, CURS_Y
         .constructor    init_cursor
 
 	.importzp	ptr1, sp
@@ -36,6 +36,10 @@
         .macpack        generic
 
 	.data
+;-----------------------------------------------------------------------------
+; The variables used by cursor functions
+;
+
 CURS_X:
 	.byte	0
 CURS_Y:
@@ -50,13 +54,26 @@ _cursorzone:
 	.code
 
 ;-----------------------------------------------------------------------------
+; Enable/disable cursor
+;
+        .proc   _setcursor
+
+	ldx	_cursor_visible
+	sta	_cursor_visible
+	txa
+	rts
+
+	.endproc
+
+;-----------------------------------------------------------------------------
 ; Calculate cursorzone address
 ; You also need to set the cursorzone to point to the correct cursor Header
 ; at the end of line CURS_Y.
 ; Offset to cursor zone 5. To next line offset 11
 ; cursorzone points to _zones + CURS_Y * 11 + 5
 ; A = CURS_Y
-calccursorzone:
+        .proc   calccursorzone
+
 	jsr	pusha0
 	lda	#11
 	jsr	tosumula0
@@ -70,6 +87,8 @@ calccursorzone:
 	sta	_cursorzone+1
 	sta	ptr1+1
 	rts
+
+        .endproc
 
 ;-----------------------------------------------------------------------------
 ; Set cursor to Y position.
@@ -86,7 +105,9 @@ calccursorzone:
 ; Enable cursor
 ; if showcursor cursorzone[1] = 30
 ;
-_gotoy:	pha
+        .proc   _gotoy
+
+	pha
 	lda	CURS_Y
 	jsr	calccursorzone
 	ldy	#1
@@ -96,18 +117,23 @@ _gotoy:	pha
 	sta	CURS_Y
 	jsr	calccursorzone
 	lda	_cursor_visible
-	beq	L2
+	beq	@L1
 	lda	#30		; enable cursor
-L2:	ldy	#1
+@L1:	ldy	#1
 	sta	(ptr1),y
 	rts
+
+        .endproc
 
 ;-----------------------------------------------------------------------------
 ; Set cursor to X position.
 ; You also need to set the hpos offset to the correct value on this line
 ; cursorzone[3] = 8 * CURS_X
 ;
-_gotox:	tay
+        .proc   _gotox
+
+	sta	CURS_X
+	tay
 	lda	_cursorzone
 	ldx	_cursorzone+1
 	sta	ptr1
@@ -120,6 +146,8 @@ _gotox:	tay
 	rol
 	sta	(ptr1),y
 	rts
+
+        .endproc
 
 ;-----------------------------------------------------------------------------
 ; Set cursor to desired position (X,Y)

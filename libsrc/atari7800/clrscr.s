@@ -3,18 +3,13 @@
 
         .export _clrscr
 
-	.import	CURS_X
-	.import	CURS_Y
 	.import	_screen
-	.import	pushax, __bzero
+	.import	pusha0,pushax, __bzero
 
 	.code
 
 	.proc _clrscr
 
-	lda	#0
-	sta	CURS_X
-	sta	CURS_Y
 	lda	#<(_screen)
 	ldx	#>(_screen)
 	jsr	pushax

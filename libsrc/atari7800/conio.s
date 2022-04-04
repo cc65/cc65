@@ -13,7 +13,6 @@
 	.export		_screen
 	.export		_zones
 	.export		_dll
-	.export		_initconio
 
         .bss
 _screen:
@@ -184,8 +183,11 @@ CTRL_CHAR2B	.set	$10
 CTRL_DMAON	.set	$40
 CTRL_CKOFF	.set	0
 
-_initconio:
-initconio:
+;-----------------------------------------------------------------------------
+; Initialize the conio display lists and zones
+;
+        .proc   initconio
+
 	jsr	_get_tv
 	bne	pal
 	lda	#<Topscanlines
@@ -216,4 +218,6 @@ vblankoff:
 	lda	#$0f		; White
 	sta	P0C3
         rts
+
+        .endproc
 

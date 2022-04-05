@@ -25,6 +25,7 @@ fname= fname + '.s'
 with open(fname, 'w') as f:
     f.write("    .export _font160\n")
     f.write('    .rodata\n')
+    f.write('    .align 256\n')
     f.write("_font160:\n")
     for i in range(0, int(len(data)/32)):
         printline(f, data[i * 32:i * 32 + 32])

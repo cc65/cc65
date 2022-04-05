@@ -10,10 +10,10 @@
         .import         _gotoxy, _gotox, _gotoy, tosaddax, tosumula0, pusha0
 	.import		pushax
 	.import		_screen
-        .importzp       ptr3
 	.import		CURS_X, CURS_Y
 
         .include        "atari7800.inc"
+        .include        "extzp.inc"
 
 	.data
 ;-----------------------------------------------------------------------------
@@ -132,12 +132,12 @@ txtcolor:
 	lda     #<(_screen)
 	ldx     #>(_screen)
 	jsr     tosaddax
-	sta	ptr3
-	stx	ptr3+1
+	sta	ptr7800
+	stx	ptr7800+1
 
 	pla
 	ldy	#0
-	sta	(ptr3),y
+	sta	(ptr7800),y
 	rts
 
         .endproc

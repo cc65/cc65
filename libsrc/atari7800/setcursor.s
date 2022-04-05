@@ -28,10 +28,11 @@
 	.export		CURS_X, CURS_Y
         .constructor    init_cursor
 
-	.importzp	ptr3, sp
+	.importzp	sp
 	.import		_zones
 	.import		pusha, incsp1, pusha0, pushax, popax, tosumula0, incax5
         .include        "atari7800.inc"
+        .include        "extzp.inc"
 
         .macpack        generic
 
@@ -81,11 +82,11 @@ _cursorzone:
 	clc
 	adc	#<_zones
 	sta	_cursorzone	; calculate new cursorzone
-	sta	ptr3
+	sta	ptr7800
 	txa
 	adc	#>_zones
 	sta	_cursorzone+1
-	sta	ptr3+1
+	sta	ptr7800+1
 	rts
 
         .endproc
@@ -112,7 +113,7 @@ _cursorzone:
 	jsr	calccursorzone
 	ldy	#1
 	lda	#0
-	sta	(ptr3),y	; disable cursor
+	sta	(ptr7800),y	; disable cursor
 	pla
 	sta	CURS_Y
 	jsr	calccursorzone
@@ -120,7 +121,7 @@ _cursorzone:
 	beq	@L1
 	lda	#30		; enable cursor
 @L1:	ldy	#1
-	sta	(ptr3),y
+	sta	(ptr7800),y
 	rts
 
         .endproc
@@ -136,15 +137,15 @@ _cursorzone:
 	tay
 	lda	_cursorzone
 	ldx	_cursorzone+1
-	sta	ptr3
-	stx	ptr3+1
+	sta	ptr7800
+	stx	ptr7800+1
 	tya
 	ldy	#3
 	clc
 	rol
 	rol
 	rol
-	sta	(ptr3),y
+	sta	(ptr7800),y
 	rts
 
         .endproc

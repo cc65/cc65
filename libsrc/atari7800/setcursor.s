@@ -30,7 +30,7 @@
 
 	.importzp	sp
 	.import		_zones
-	.import		pusha, incsp1, pusha0, pushax, popax, tosumula0, incax5
+	.import		pusha, incsp1, pusha0, pushax, popax
         .include        "atari7800.inc"
         .include        "extzp.inc"
 
@@ -48,11 +48,33 @@ CURS_Y:
 _cursor_visible:
         .byte	1
 
-	.bss
-_cursorzone:
-	.res	2
-
 	.code
+
+;---------------------------------------------------------------------------
+; 8x16 routine
+
+umula0:
+        ldy     #8                 ; Number of bits
+	lda	#0
+        lsr     ptr7800            ; Get first bit into carry
+@L0:    bcc     @L1
+
+        clc
+        adc     ptrtmp
+        tax
+        lda     ptrtmp+1           ; hi byte of left op
+        adc     ptr7800+1
+        sta     ptr7800+1
+        txa
+
+@L1:    ror     ptr7800+1
+        ror     a
+        ror     ptr7800
+        dey
+        bne     @L0
+        tax
+        lda     ptr7800            ; Load the result
+        rts
 
 ;-----------------------------------------------------------------------------
 ; Enable/disable cursor
@@ -75,18 +97,23 @@ _cursorzone:
 ; A = CURS_Y
         .proc   calccursorzone
 
-	jsr	pusha0
-	lda	#11
-	jsr	tosumula0
-	jsr	incax5
-	clc
-	adc	#<_zones
-	sta	_cursorzone	; calculate new cursorzone
 	sta	ptr7800
+	lda	#11
+	sta	ptrtmp
+	lda	#0
+	sta	ptr7800+1
+	sta	ptrtmp+1
+	jsr	umula0
+	clc
+	adc	#5
+	bcc	@L1
+	inx
+@L1:	clc
+	adc	#<_zones
+	sta	cursorzone	; calculate new cursorzone
 	txa
 	adc	#>_zones
-	sta	_cursorzone+1
-	sta	ptr7800+1
+	sta	cursorzone+1
 	rts
 
         .endproc
@@ -113,7 +140,7 @@ _cursorzone:
 	jsr	calccursorzone
 	ldy	#1
 	lda	#0
-	sta	(ptr7800),y	; disable cursor
+	sta	(cursorzone),y	; disable cursor
 	pla
 	sta	CURS_Y
 	jsr	calccursorzone
@@ -121,7 +148,7 @@ _cursorzone:
 	beq	@L1
 	lda	#30		; enable cursor
 @L1:	ldy	#1
-	sta	(ptr7800),y
+	sta	(cursorzone),y
 	rts
 
         .endproc
@@ -134,18 +161,12 @@ _cursorzone:
         .proc   _gotox
 
 	sta	CURS_X
-	tay
-	lda	_cursorzone
-	ldx	_cursorzone+1
-	sta	ptr7800
-	stx	ptr7800+1
-	tya
 	ldy	#3
 	clc
 	rol
 	rol
 	rol
-	sta	(ptr7800),y
+	sta	(cursorzone),y
 	rts
 
         .endproc
@@ -162,6 +183,7 @@ _cursorzone:
 	.endproc
 
 	.proc   gotoxy
+	jsr	popax
 	jmp	_gotoxy
 	.endproc
 ;-----------------------------------------------------------------------------

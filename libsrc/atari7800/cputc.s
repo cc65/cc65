@@ -7,7 +7,7 @@
 
         .export         _cputc
 	.export		_textcolor
-        .import         _gotoxy, _gotox, _gotoy, tosaddax, pusha0
+        .import         _gotoxy, _gotox, _gotoy, pusha0
 	.import		pushax
 	.import		_screen
 	.import		CURS_X, CURS_Y

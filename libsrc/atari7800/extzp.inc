@@ -8,4 +8,6 @@
 ;
 
         .global         ptr7800: zp
+        .global         ptrtmp: zp
+        .global         cursorzone: zp
 

@@ -9,3 +9,5 @@
         .segment "EXTZP" : zeropage
 
 ptr7800:        .res 2
+ptrtmp:         .res 2
+cursorzone:     .res 2

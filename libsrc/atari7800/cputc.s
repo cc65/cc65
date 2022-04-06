@@ -7,7 +7,7 @@
 
         .export         _cputc
 	.export		_textcolor
-        .import         _gotoxy, _gotox, _gotoy, tosaddax, tosumula0, pusha0
+        .import         _gotoxy, _gotox, _gotoy, tosaddax, pusha0
 	.import		pushax
 	.import		_screen
 	.import		CURS_X, CURS_Y
@@ -18,12 +18,38 @@
 	.data
 ;-----------------------------------------------------------------------------
 ; Holder of the text colour offset
-; 0 = red, 42 = green, 82 = white
+; 0 = red, 42 = green, 84 = white
 ;
 txtcolor:
 	.byte	0
 
 	.code
+
+;---------------------------------------------------------------------------
+; 8x16 routine
+
+umula0:
+        ldy     #8                 ; Number of bits
+	lda	#0
+        lsr     ptr7800            ; Get first bit into carry
+@L0:    bcc     @L1
+
+        clc
+        adc     ptrtmp
+        tax
+        lda     ptrtmp+1           ; hi byte of left op
+        adc     ptr7800+1
+        sta     ptr7800+1
+        txa
+
+@L1:    ror     ptr7800+1
+        ror     a
+        ror     ptr7800
+        dey
+        bne     @L0
+        tax
+        lda     ptr7800            ; Load the result
+        rts
 
 ;-----------------------------------------------------------------------------
 ; Change the text colour
@@ -41,21 +67,21 @@ txtcolor:
 	sec
 	sbc	#1
 	beq	@L1
-	lda	#82
+	lda	#84
 	jmp	@L2
 @L1:	lda	#42
 @L2:	ldy	txtcolor
-	sta	txtcolor
+	sta	txtcolor	; Store new textcolor
 	tya
 	bne	@L3
-	rts
+	rts			; Old colour was 0
 @L3:	sec
 	sbc	#42
 	bne	@L4
 	lda	#1
-	rts
+	rts			; Old colour was 1
 @L4:	lda #2
-	rts
+	rts			; Old colour was 2
         .endproc
 
 ;-----------------------------------------------------------------------------
@@ -66,79 +92,81 @@ txtcolor:
         .proc   _cputc
 
 	cmp     #$0A            ; LF
-        beq     @L3
-        cmp	#$20		; ' '
-        beq     @L1
-
-        jsr     @L5
-@L1:
-        lda	CURS_X
-	cmp	#(charsperline-1)
-        bne     @L2
-	jmp	@L3
-@L2:
-	clc
-	adc	#1
-	jmp	_gotox
-
-@L3:
-	lda	#0
+        bne     @L4
+@L1:	lda	#0		; newline
 	jsr	_gotox
         lda	CURS_Y
 	cmp	#(screenrows-1)
-        bne     @L4
+        bne     @L2
 	lda	#0
-	jmp	_gotoy
-@L4:
-        clc
+	beq	@L3
+@L2:	clc
 	adc	#1
-	jmp	_gotoy
+@L3:	jmp	_gotoy
 
+@L4:
+	cmp	#$20		; ' '
+	bne	@L5
+	lda	#$00
+	jmp	@L10
 @L5:
 	cmp	#$3F		; '?'
 	bne	@L6
-	lda	#$01
-	jmp	@L10
+	lda	#$02
+	jmp	@L9
 @L6:
 	cmp	#$7C		; '|'
 	bne	@L7
-	lda	#$05
-	jmp	@L10
+	lda	#$06
+	jmp	@L9
 @L7:
 	cmp	#$41		; >= 'A'
 	bcc	@L8
-	and	#$5F
+	and	#$5F		; make upper case
 	sec
-	sbc	#($41 - 16)
-	jmp	@L10
+	sbc	#($41 - 17)
+	jmp	@L9
 @L8:
-	sec
-	sbc	#($2A)
-@L10:
-	sec
+	sec			; >= '*'
+	sbc	#($2A - 1)
+@L9:
+	clc
 	adc	txtcolor
+@L10:
 	asl
 	pha
 
-	lda	CURS_Y
-	jsr	pusha0
+	lda	#0
+	sta	ptr7800+1
+	sta	ptrtmp+1
+	lda	CURS_Y		; Find position on screen buffer
+	sta	ptr7800
 	lda	#charsperline
-	jsr	tosumula0
+	sta	ptrtmp
+	jsr	umula0
 	clc
 	adc	CURS_X
 	bcc	@L11
 	inx
-@L11:	jsr	pushax
-	lda     #<(_screen)
-	ldx     #>(_screen)
-	jsr     tosaddax
+@L11:	adc	#<(_screen)
 	sta	ptr7800
-	stx	ptr7800+1
+	bcc	@L12
+	inx
+@L12:	clc
+	txa
+	adc	#>(_screen)
+	sta	ptr7800+1
 
-	pla
+	pla			; Print character on screen
 	ldy	#0
 	sta	(ptr7800),y
-	rts
+
+        lda	CURS_X		; Increment cursor
+	cmp	#(charsperline-1)
+        beq	@L1
+	clc
+	adc	#1
+	jmp	_gotox
 
         .endproc
 

@@ -4,7 +4,8 @@
         .export _clrscr
 
 	.import	_screen
-	.import	pusha0,pushax, __bzero
+	.import	pusha0,pushax
+	.include "extzp.inc"
 
 	.code
 
@@ -12,10 +13,22 @@
 
 	lda	#<(_screen)
 	ldx	#>(_screen)
-	jsr	pushax
-	ldx	#>(charsperline * screenrows)
-	lda	#<(charsperline * screenrows)
-	jmp	__bzero
+	sta	ptr7800
+	stx	ptr7800+1
+	ldx	#screenrows
+@L1:	ldy	#charsperline
+	lda	#0
+@L2:	sta	(ptr7800),y
+	dey
+	bne	@L2
+	lda	ptr7800
+	clc
+	adc	#charsperline
+	bcc	@L3
+	inc	ptr7800+1
+@L3:	dex
+	bne	@L1
+	rts
 
 	.endproc
 

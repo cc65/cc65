@@ -152,8 +152,8 @@ umula0:
 	sta	ptr7800
 	bcc	@L12
 	inx
-@L12:	clc
-	txa
+@L12:	txa
+	clc
 	adc	#>(_screen)
 	sta	ptr7800+1
 

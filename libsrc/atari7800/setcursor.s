@@ -24,7 +24,7 @@
 ;
 
         .export         _setcursor
-        .export         gotoxy, _gotoxy, _gotox, _gotoy, wherex, wherey
+        .export         gotoxy, _gotoxy, _gotox, _gotoy, _wherex, _wherey
 	.export		CURS_X, CURS_Y
         .constructor    init_cursor
 
@@ -189,20 +189,18 @@ umula0:
 ;-----------------------------------------------------------------------------
 ; Get cursor X position
 ;
-	.proc   wherex
+	.proc   _wherex
 
 	lda	CURS_X
-	jsr	pusha0
 	rts
 	.endproc
 
 ;-----------------------------------------------------------------------------
 ; Get cursor Y position
 ;
-	.proc   wherey
+	.proc   _wherey
 
 	lda	CURS_Y
-	jsr	pusha0
 	rts
 	.endproc
 

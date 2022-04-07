@@ -38,6 +38,7 @@ umula0:
         adc     ptrtmp
         tax
         lda     ptrtmp+1           ; hi byte of left op
+	clc
         adc     ptr7800+1
         sta     ptr7800+1
         txa
@@ -148,7 +149,8 @@ umula0:
 	adc	CURS_X
 	bcc	@L11
 	inx
-@L11:	adc	#<(_screen)
+@L11:	clc
+	adc	#<(_screen)
 	sta	ptr7800
 	bcc	@L12
 	inx

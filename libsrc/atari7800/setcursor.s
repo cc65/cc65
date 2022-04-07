@@ -27,6 +27,7 @@
         .export         gotoxy, _gotoxy, _gotox, _gotoy, _wherex, _wherey
 	.export		CURS_X, CURS_Y
         .constructor    init_cursor
+        .interruptor    blink_cursor
 
 	.importzp	sp
 	.import		_zones
@@ -47,6 +48,8 @@ CURS_Y:
 	.byte	0
 _cursor_visible:
         .byte	1
+blink_time:
+        .byte	140
 
 	.code
 
@@ -208,7 +211,26 @@ umula0:
 ; Initialize cursorzone at startup
 ; Offset to cursor zone 5.
 ;
-;        .segment        "ONCE"
+	.proc   blink_cursor
+	inc	blink_time
+	bne	@L3
+	lda	#140
+	sta	blink_time
+	ldy	#0
+	lda	(cursorzone),y
+	bne	@L1
+	lda	#254
+	bne	@L2
+@L1:	lda	#0
+@L2:	sta	(cursorzone),y
+@L3:	rts
+	.endproc
+
+;-----------------------------------------------------------------------------
+; Initialize cursorzone at startup
+; Offset to cursor zone 5.
+;
+        .segment        "ONCE"
 init_cursor:
 	lda	#0
 	jsr	calccursorzone

@@ -23,7 +23,6 @@
 ; definitely not allow direct access to the variables.
 ;
 
-        .export         _setcursor
         .export         gotoxy, _gotoxy, _gotox, _gotoy, _wherex, _wherey
 	.export		CURS_X, CURS_Y
         .constructor    init_cursor
@@ -31,6 +30,7 @@
 
 	.importzp	sp
 	.import		_zones
+	.import		cursor
 	.import		pusha, incsp1, pusha0, pushax, popax
         .include        "atari7800.inc"
         .include        "extzp.inc"
@@ -46,8 +46,6 @@ CURS_X:
 	.byte	0
 CURS_Y:
 	.byte	0
-_cursor_visible:
-        .byte	1
 blink_time:
         .byte	140
 
@@ -78,18 +76,6 @@ umula0:
         tax
         lda     ptr7800            ; Load the result
         rts
-
-;-----------------------------------------------------------------------------
-; Enable/disable cursor
-;
-        .proc   _setcursor
-
-	ldx	_cursor_visible
-	sta	_cursor_visible
-	txa
-	rts
-
-	.endproc
 
 ;-----------------------------------------------------------------------------
 ; Calculate cursorzone address
@@ -147,7 +133,7 @@ umula0:
 	pla
 	sta	CURS_Y
 	jsr	calccursorzone
-	lda	_cursor_visible
+	lda	cursor
 	beq	@L1
 	lda	#30		; enable cursor
 @L1:	ldy	#1

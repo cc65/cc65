@@ -14,19 +14,19 @@
         
 
 __syschdir:
-        ; Throw away all parameters except the name
+        ; throw away all parameters except the name
         dey
         dey
         jsr     addysp
 
-        ; Get name
+        ; get name
         jsr     popax
 
         stx     tmp1
         ldy     tmp1
         
-        ; Call telemon primitive
+        ; call telemon primitive
         
         BRK_TELEMON(XPUTCWD)
 
-        jmp     initcwd      ; Update cwd
+        jmp     initcwd      ; update cwd

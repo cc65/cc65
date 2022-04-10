@@ -1,7 +1,7 @@
 ;
 ; Oric TELEMON definition
-; TELEMON 2.4 & TELEMON 3.x
-; For TELEMON 3.x check http://orix.oric.org
+; TELEMON 2.4 & Orix
+; For Orix check http://orix.oric.org
 ;
 
 ; ---------------------------------------------------------------------------
@@ -269,13 +269,14 @@ XSCRSE           = $36
 XSCROH           = $37          ; Scroll up text screen
 XSCROB           = $38          ; Scroll down text screen
 XSCRNE           = $39          ; Load charset from rom to ram
-XCLOSE           = $3A          ; Only in TELEMON 3.x close file (bank 7 of Orix)
-XFWRITE          = $3B          ; Only in TELEMON 3.x write file (bank 7 of Orix)
+XCLOSE           = $3A          ; Only in Orix close file 
+XFWRITE          = $3B          ; Only in Orix write file
 
 ; Clock primitive
 XRECLK           = $3C          ; Reset clock
 XCLCL            = $3D          ; Close clock
 XWRCLK           = $3E          ; Displays clock in the address in A & Y registers
+XFSEEK           = $3F          ; Seek into file
 
 ; Sound primitives
 XSONPS           = $40          ; Send data to PSG register (14 values)

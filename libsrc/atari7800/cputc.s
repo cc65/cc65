@@ -94,16 +94,16 @@ umula0:
 
 	cmp     #$0A            ; LF
         bne     @L4
-@L1:	lda	#0		; newline
-	jsr	_gotox
-        lda	CURS_Y
+@L1:	lda	CURS_Y		; newline
 	cmp	#(screenrows-1)
         bne     @L2
 	lda	#0
 	beq	@L3
 @L2:	clc
 	adc	#1
-@L3:	jmp	_gotoy
+@L3:	jsr	_gotoy
+	lda	#0
+	jmp	_gotox
 
 @L4:
 	cmp	#$20		; ' '

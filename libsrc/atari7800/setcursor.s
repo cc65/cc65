@@ -31,7 +31,7 @@
 	.importzp	sp
 	.import		_zones
 	.import		cursor
-	.import		pusha, incsp1, pusha0, pushax, popax
+	.import		pusha, incsp1, pusha0, pushax, popa
         .include        "atari7800.inc"
         .include        "extzp.inc"
 
@@ -166,13 +166,13 @@ umula0:
 	.proc   _gotoxy
 
 	jsr	_gotoy
-	jsr	popax
+	jsr	popa
 	jsr	_gotox
 	rts
 	.endproc
 
 	.proc   gotoxy
-	jsr	popax
+	jsr	popa
 	jmp	_gotoxy
 	.endproc
 ;-----------------------------------------------------------------------------

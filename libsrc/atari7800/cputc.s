@@ -172,3 +172,8 @@ umula0:
 
         .endproc
 
+;-------------------------------------------------------------------------------
+; force the init constructor to be imported
+
+                .import initconio
+conio_init      = initconio

@@ -5,14 +5,15 @@
 ;
 
         .export         _wherex
-	.import		CURS_X
+        .import         CURS_X
 
 ;-----------------------------------------------------------------------------
 ; Get cursor X position
 ;
-	.proc   _wherex
+        .proc   _wherex
 
-	lda	CURS_X
-	rts
-	.endproc
+        ldx     #0
+        lda     CURS_X
+        rts
+        .endproc
 

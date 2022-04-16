@@ -11,8 +11,19 @@ This document contains all kinds of information that you should know if you want
 
 ## All Sources
 
+### TABs and spaces
+
+This is an ongoing controversial topic - everyone knows that. However, the following is how we do it :)
+
 * TAB characters must be expanded to spaces.
+* 4 spaces per indention level (rather than 8) are preferred, especially if there are many different levels.
+* No extra spaces at the end of lines.
 * All text files must end with new-line characters.  Don't leave the last line "dangling".
+
+The (bash) scipts used to check the above rules can be found in ```.github/check```
+
+### misc
+
 * 80 characters is the desired maximum width of files.  But, it isn't a "strong" rule; sometimes, you will want to type longer lines, in order to keep the parts of expressions or comments together on the same line.
 * You should avoid typing non-ASCII characters.
 * If you change "normal" source code into comments, then you must add a comment about why that code is a comment.
@@ -77,6 +88,19 @@ color  := $0787
   * Three blank lines between ```<sect>``` sections.
   * Two blank lines between ```<sect1>``` sections.
   * One blank line between other sections.
+
+# Library implementation rules
+
+* By default the toolchain must output a "standard" binary for the platform, no emulator formats, no extra headers used by tools. If the resulting binaries can not be run as is on emulators or eg flash cartridges, the process of converting them to something that can be used with these should be documented in the user manual.
+* Generally every function should live in a seperate source file - unless the functions are so closely related that splitting makes no sense.
+* Source files should not contain commented out code - if they do, there should be a comment that explains why that commented out code exists.
+
+# Makefile rules
+
+* Makefiles must generally work on both *nix (ba)sh and windows cmd.exe.
+* Makefiles must not use external tools that are not provided by the cc65 toolchain itself.
+
+The only exception to the above are actions that are exclusive to the github actions - those may rely on bash and/or linux tools.
 
 # Documentation rules
 

@@ -1,3 +1,21 @@
+; The internal font structure for Atari7800 needs a full set of 128
+; characters. Each character is 16 x 8 bits.
+; The font consists of 8 rows of data:
+: row7
+; row6
+; row5
+; row4
+; row3
+; row2
+; row1
+; row0
+; Each row is 256 bytes long
+; As we have 2 bits per pixel we need 2 bytes to represent
+; one character. So we can fit 128 characters in this font
+; When you later use the font you must address the characters as
+; 0, 2, 4, 6, ... 254
+; Odd indices cannot be used.
+
     .export _font160
     .rodata
     .align 256

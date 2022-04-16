@@ -3,7 +3,7 @@
 ;
 
         .include        "extzp.inc"
-        
+
 .linecont +
 
 ;
@@ -13,7 +13,7 @@
                                 ; Macro implementation of internal screensize
                                 ; function for given width and height in
                                 ; characters
-                                
+
         .export         screensize
 
 .proc   screensize
@@ -34,11 +34,11 @@
         lda     #<ScrBase       ; Fill whole video RAM with blanks by calling
         ldx     #>ScrBase       ; memset appropriately
         jsr     pushax
-        
+
         lda     #' '
         ldx     #$00
         jsr     pushax
-        
+
         lda     #<ScrRamSize
         ldx     #>ScrRamSize
         jsr     _memset
@@ -46,7 +46,7 @@
         lda     #$00            ; Cursor in upper left corner
         sta     CURS_X
         sta     CURS_Y
-        
+
         jmp     plot            ; Set the cursor position
 .endproc
 
@@ -112,12 +112,12 @@ newline:
         lda     #<(ScrBase + ScrFirstChar)
         ldx     #>(ScrBase + ScrFirstChar)
         jsr     pushax
-        
+
                                 ; Scroll source address
         lda     #<(ScrBase + ScrFirstChar + ScrollDist)
         ldx     #>(ScrBase + ScrFirstChar + ScrollDist)
         jsr     pushax
-        
+
                                 ; Number of characters to move
         lda     #<ScrollLength
         ldx     #>ScrollLength
@@ -129,7 +129,7 @@ newline:
         sta     ptr1
         lda     #>(ScrBase + ScrFirstChar + ScrollLength)
         sta     ptr1+1
-        
+
         ldy     #ScrWidth       ; Fill last line with blanks
         lda     #' '
 clrln:  sta     (ptr1),y
@@ -150,7 +150,7 @@ putchar:
         ldy     CURS_X
         sta     (SCREEN_PTR),y  ; Set char
         rts
-        
+
 .endmacro
 
 .macro osi_screen_funcs ScrBase, ScrRamSize, ScrFirstChar, \
@@ -167,11 +167,12 @@ ScrTabLo:
         .repeat ScrHeight, I
         .byte <(ScrBase + ScrFirstChar + I * ScrollDist)
         .endrep
-        
+
 ScrTabHi:
         .repeat ScrHeight, I
         .byte >(ScrBase + ScrFirstChar + I * ScrollDist)
         .endrep
+
 
 .code
 

@@ -39,6 +39,7 @@ txtcolor:
 @L1:    lda     #42
 @L2:    ldy     txtcolor
         sta     txtcolor        ; Store new textcolor
+        ldx     #0
         tya
         bne     @L3
         rts                     ; Old colour was 0

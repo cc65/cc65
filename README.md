@@ -4,7 +4,9 @@
 
 [Documentation](https://cc65.github.io/doc)
 
-[Wiki](https://github.com/cc65/wiki/wiki)
+[Contributing](Contributing.md) to the CC65 project.
+
+The [Wiki](https://github.com/cc65/wiki/wiki) contains extra info that does not fit into the regular documentation.
 
 [![Snapshot Build](https://github.com/cc65/cc65/actions/workflows/snapshot-on-push-master.yml/badge.svg?branch=master)](https://github.com/cc65/cc65/actions/workflows/snapshot-on-push-master.yml)
 

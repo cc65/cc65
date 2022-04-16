@@ -68,7 +68,7 @@ int main (void) {
    }
    else {
       memset ( tapio, 0, TAPIO_MAX_SIZE );
-   }	   
+   }
 
 
    while ( running ) {
@@ -138,21 +138,21 @@ int main (void) {
             }
             else
             {
-               for ( l = 0; l <= heap_size; l++ ) {
-                  buffer[l] = tapio[l];
-               }
+                for ( l = 0; l <= heap_size; l++ ) {
+                    buffer[l] = tapio[l];
+                }
 
-	       p = strlen ( buffer );
+                p = strlen ( buffer );
 
-               putchar ( '\r' );
-               for ( l = 0; l < 25; l++ ) {
-                  putchar ( '\n' );
-               }
-               puts ("===================== Sym-1 Notepad ====================\n");
+                putchar ( '\r' );
+                for ( l = 0; l < 25; l++ ) {
+                    putchar ( '\n' );
+                }
+                puts ("===================== Sym-1 Notepad ====================\n");
 
-               for ( l = 0; l <= p; l++ ) {
-                  putchar ( buffer[l] );
-               }
+                for ( l = 0; l <= p; l++ ) {
+                    putchar ( buffer[l] );
+                }
             }
          }
          else if ( c == 0x03 ) {       // Clear

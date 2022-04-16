@@ -61,7 +61,7 @@
 ; 00 00 00 00      ; spares
 ; 00               ; End of encrypted header mark
 ;
-;	.reloc
+;   .reloc
 ;**********************************
 ; After compilation, encryption and obfuscation it turns into this.
 ;**********************************

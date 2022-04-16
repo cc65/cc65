@@ -88,74 +88,74 @@ COUNT:
 ; READ: Read a particular joystick passed in A for 2 fire buttons. 
 
 readbuttons:
-	; Y has joystick of interest 0/1
-        ; return value:
-	;  $00: no button,
-	;  $01: left/B button,
-	;  $02: right/A button,
-	;  $03: both buttons
-        ; preserves X
-	tya
-	beq L5
-	; Joystick 1 processing
-	; 7800 joystick 1 buttons
-	ldy #0		; ........
-	bit INPT2	; Check for right button
-	bpl L1
-	ldy #2		; ......2.
-L1:	bit INPT3	;Check for left button
-	bpl L2
-	iny		; ......21
-L2:	tya
-	bne L4		; 7800 mode joystick worked
-	; 2600 Joystick 1
-	bit INPT5
-	bmi L4
-L3:	iny		; .......1
-	lda #0		; Fallback to 2600 joystick mode
-	sta CTLSWB
-L4:	tya		; ......21
-	rts
+    ; Y has joystick of interest 0/1
+    ; return value:
+    ;  $00: no button,
+    ;  $01: left/B button,
+    ;  $02: right/A button,
+    ;  $03: both buttons
+    ; preserves X
+    tya
+    beq L5
+    ; Joystick 1 processing
+    ; 7800 joystick 1 buttons
+    ldy #0      ; ........
+    bit INPT2   ; Check for right button
+    bpl L1
+    ldy #2      ; ......2.
+L1: bit INPT3   ;Check for left button
+    bpl L2
+    iny         ; ......21
+L2: tya
+    bne L4      ; 7800 mode joystick worked
+    ; 2600 Joystick 1
+    bit INPT5
+    bmi L4
+L3: iny         ; .......1
+    lda #0      ; Fallback to 2600 joystick mode
+    sta CTLSWB
+L4: tya         ; ......21
+    rts
 
-L5:	; Joystick 0 processing
-	; 7800 joystick 0 buttons
-	ldy #0		; ........
-	bit INPT0	; Check for right button
-	bpl L6
-	ldy #2		; ......2.
-L6:	bit INPT1	;Check for left button
-	bpl L7
-	iny		; ......21
-L7:	tya
-	bne L4		; 7800 mode joystick worked
-	; 2600 Joystick 0
-	bit INPT4
-	bmi L4
-	bpl L3
+L5: ; Joystick 0 processing
+    ; 7800 joystick 0 buttons
+    ldy #0      ; ........
+    bit INPT0   ; Check for right button
+    bpl L6
+    ldy #2      ; ......2.
+L6: bit INPT1   ;Check for left button
+    bpl L7
+    iny         ; ......21
+L7: tya
+    bne L4      ; 7800 mode joystick worked
+    ; 2600 Joystick 0
+    bit INPT4
+    bmi L4
+    bpl L3
 
 READ:
-	tay			; Store joystick 0/1 in Y
-	beq	L8
-	lda	SWCHA		; Read directions of joystick 1
-	rol			; ...RLDU.
-	rol			; ..RLDU..
-	rol			; .RLDU... - joystick 1
-	jmp	L9
-L8:	lda     SWCHA           ; Read directions of joystick 0
-	ror			; .RLDU... - joystick 0
-L9:	tax
-	jsr readbuttons		; A = ......21, X = .RLDU...
-	ror			; A = .......2 1
-	tay			; Y = .......2
-	txa			; A = .RLDU...
-	ror			; A = 1.RLDU..
-	tax			; X = 1.RLDU..
-	tya			; A = .......2
-	ror			; A = ........ 2
-	txa			; A = 1.RLDU..
-	rol			; A = .RLDU..2 1
-	rol			; A = RLDU..21
-	eor	#$F0		; The direction buttons were inversed
-	and	#$F3
-	rts
+    tay         ; Store joystick 0/1 in Y
+    beq L8
+    lda SWCHA   ; Read directions of joystick 1
+    rol         ; ...RLDU.
+    rol         ; ..RLDU..
+    rol         ; .RLDU... - joystick 1
+    jmp L9
+L8: lda SWCHA   ; Read directions of joystick 0
+    ror         ; .RLDU... - joystick 0
+L9: tax
+    jsr readbuttons ; A = ......21, X = .RLDU...
+    ror             ; A = .......2 1
+    tay             ; Y = .......2
+    txa             ; A = .RLDU...
+    ror             ; A = 1.RLDU..
+    tax             ; X = 1.RLDU..
+    tya             ; A = .......2
+    ror             ; A = ........ 2
+    txa             ; A = 1.RLDU..
+    rol             ; A = .RLDU..2 1
+    rol             ; A = RLDU..21
+    eor #$F0        ; The direction buttons were inversed
+    and #$F3
+    rts
 

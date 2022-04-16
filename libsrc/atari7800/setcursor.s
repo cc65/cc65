@@ -23,40 +23,40 @@
 ; definitely not allow direct access to the variables.
 ;
 
-        .export         gotoxy, _gotoxy, _gotox, _gotoy, _wherex, _wherey
-	.export		CURS_X, CURS_Y
+        .export         gotoxy, _gotoxy, gotox, gotoy
+        .export         CURS_X, CURS_Y
         .constructor    init_cursor
         .interruptor    blink_cursor
 
-	.importzp	sp
-	.import		_zones
-	.import		cursor
-	.import		pusha, incsp1, pusha0, pushax, popa
+        .importzp       sp
+        .import         _zones
+        .import         cursor
+        .import         pusha, incsp1, pusha0, pushax, popa
         .include        "atari7800.inc"
         .include        "extzp.inc"
 
         .macpack        generic
 
-	.data
+        .data
 ;-----------------------------------------------------------------------------
 ; The variables used by cursor functions
 ;
 
 CURS_X:
-	.byte	0
+        .byte   0
 CURS_Y:
-	.byte	0
+        .byte   0
 blink_time:
-        .byte	140
+        .byte   140
 
-	.code
+        .code
 
 ;---------------------------------------------------------------------------
 ; 8x16 routine
 
 umula0:
         ldy     #8                 ; Number of bits
-	lda	#0
+        lda     #0
         lsr     ptr7800            ; Get first bit into carry
 @L0:    bcc     @L1
 
@@ -86,24 +86,24 @@ umula0:
 ; A = CURS_Y
         .proc   calccursorzone
 
-	sta	ptr7800
-	lda	#11
-	sta	ptrtmp
-	lda	#0
-	sta	ptr7800+1
-	sta	ptrtmp+1
-	jsr	umula0
-	clc
-	adc	#5
-	bcc	@L1
-	inx
-@L1:	clc
-	adc	#<_zones
-	sta	cursorzone	; calculate new cursorzone
-	txa
-	adc	#>_zones
-	sta	cursorzone+1
-	rts
+        sta     ptr7800
+        lda     #11
+        sta     ptrtmp
+        lda     #0
+        sta     ptr7800+1
+        sta     ptrtmp+1
+        jsr     umula0
+        clc
+        adc     #5
+        bcc     @L1
+        inx
+@L1:    clc
+        adc     #<_zones
+        sta     cursorzone      ; calculate new cursorzone
+        txa
+        adc     #>_zones
+        sta     cursorzone+1
+        rts
 
         .endproc
 
@@ -122,23 +122,23 @@ umula0:
 ; Enable cursor
 ; if showcursor cursorzone[1] = 30
 ;
-        .proc   _gotoy
+        .proc   gotoy
 
-	pha
-	lda	CURS_Y
-	jsr	calccursorzone
-	ldy	#1
-	lda	#0
-	sta	(cursorzone),y	; disable cursor
-	pla
-	sta	CURS_Y
-	jsr	calccursorzone
-	lda	cursor
-	beq	@L1
-	lda	#30		; enable cursor
-@L1:	ldy	#1
-	sta	(cursorzone),y
-	rts
+        pha
+        lda     CURS_Y
+        jsr     calccursorzone
+        ldy     #1
+        lda     #0
+        sta     (cursorzone),y  ; disable cursor
+        pla
+        sta     CURS_Y
+        jsr     calccursorzone
+        lda     cursor
+        beq     @L1
+        lda     #30             ; enable cursor
+@L1:    ldy     #1
+        sta     (cursorzone),y
+        rts
 
         .endproc
 
@@ -147,70 +147,53 @@ umula0:
 ; You also need to set the hpos offset to the correct value on this line
 ; cursorzone[3] = 8 * CURS_X
 ;
-        .proc   _gotox
+        .proc   gotox
 
-	sta	CURS_X
-	ldy	#3
-	clc
-	rol
-	rol
-	rol
-	sta	(cursorzone),y
-	rts
+        sta     CURS_X
+        ldy     #3
+        clc
+        rol
+        rol
+        rol
+        sta     (cursorzone),y
+        rts
 
         .endproc
 
 ;-----------------------------------------------------------------------------
 ; Set cursor to desired position (X,Y)
 ;
-	.proc   _gotoxy
+        .proc   _gotoxy
 
-	jsr	_gotoy
-	jsr	popa
-	jsr	_gotox
-	rts
-	.endproc
+        jsr     gotoy
+        jsr     popa
+        jsr     gotox
+        rts
+        .endproc
 
-	.proc   gotoxy
-	jsr	popa
-	jmp	_gotoxy
-	.endproc
-;-----------------------------------------------------------------------------
-; Get cursor X position
-;
-	.proc   _wherex
-
-	lda	CURS_X
-	rts
-	.endproc
-
-;-----------------------------------------------------------------------------
-; Get cursor Y position
-;
-	.proc   _wherey
-
-	lda	CURS_Y
-	rts
-	.endproc
+        .proc   gotoxy
+        jsr     popa
+        jmp     _gotoxy
+        .endproc
 
 ;-----------------------------------------------------------------------------
 ; Initialize cursorzone at startup
 ; Offset to cursor zone 5.
 ;
-	.proc   blink_cursor
-	inc	blink_time
-	bne	@L3
-	lda	#140
-	sta	blink_time
-	ldy	#0
-	lda	(cursorzone),y
-	bne	@L1
-	lda	#254
-	bne	@L2
-@L1:	lda	#0
-@L2:	sta	(cursorzone),y
-@L3:	rts
-	.endproc
+        .proc   blink_cursor
+        inc     blink_time
+        bne     @L3
+        lda     #140
+        sta     blink_time
+        ldy     #0
+        lda     (cursorzone),y
+        bne     @L1
+        lda     #254
+        bne     @L2
+@L1:    lda     #0
+@L2:    sta     (cursorzone),y
+@L3:    rts
+        .endproc
 
 ;-----------------------------------------------------------------------------
 ; Initialize cursorzone at startup
@@ -218,9 +201,9 @@ umula0:
 ;
         .segment        "ONCE"
 init_cursor:
-	lda	#0
-	jsr	calccursorzone
-	rts
+        lda     #0
+        jsr     calccursorzone
+        rts
 
 ;-----------------------------------------------------------------------------
 ; force the init constructor to be imported

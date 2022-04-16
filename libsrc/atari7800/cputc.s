@@ -6,22 +6,15 @@
 ;
 
         .export         _cputc
-        .export         _textcolor
+        .export         umula0
         .import         _gotoxy, gotox, gotoy, pusha0
         .import         pushax
         .import         _screen
         .import         CURS_X, CURS_Y
+        .import         txtcolor
 
         .include        "atari7800.inc"
         .include        "extzp.inc"
-
-        .data
-;-----------------------------------------------------------------------------
-; Holder of the text colour offset
-; 0 = red, 42 = green, 84 = white
-;
-txtcolor:
-        .byte   0
 
         .code
 
@@ -51,39 +44,6 @@ umula0:
         tax
         lda     ptr7800            ; Load the result
         rts
-
-;-----------------------------------------------------------------------------
-; Change the text colour
-;
-; Logical colour names are
-; 0 = red
-; 1 = green
-; 2 = white
-;
-; The routine will also return the previous textcolor
-;
-        .proc   _textcolor
-
-        beq     @L2
-        sec
-        sbc     #1
-        beq     @L1
-        lda     #84
-        jmp     @L2
-@L1:    lda     #42
-@L2:    ldy     txtcolor
-        sta     txtcolor        ; Store new textcolor
-        tya
-        bne     @L3
-        rts                     ; Old colour was 0
-@L3:    sec
-        sbc     #42
-        bne     @L4
-        lda     #1
-        rts                     ; Old colour was 1
-@L4:    lda #2
-        rts                     ; Old colour was 2
-        .endproc
 
 ;-----------------------------------------------------------------------------
 ; Put a character on screen

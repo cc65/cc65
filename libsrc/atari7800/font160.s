@@ -1,7 +1,7 @@
 ; The internal font structure for Atari7800 needs a full set of 128
 ; characters. Each character is 16 x 8 bits.
 ; The font consists of 8 rows of data:
-: row7
+; row7
 ; row6
 ; row5
 ; row4

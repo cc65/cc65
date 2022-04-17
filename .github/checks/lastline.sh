@@ -8,8 +8,9 @@ cd $SCRIPT_PATH/../../
 nl='
 '
 nl=$'\n'
+r1="${nl}$"
 FILES=`find $CHECK_PATH -type f \( -name \*.inc -o -name Makefile -o -name \*.cfg -o -name \*.\[chs\] -o -name \*.asm -o -name \*.sgml \) -print | while read f; do
-    t=$(tail -c2 $f; printf x); r1="${nl}$";
+    t=$(tail -c2 $f; printf x)
     [[ ${t%x} =~ $r1 ]] || echo "$f"
 done`
 

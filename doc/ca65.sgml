@@ -3622,7 +3622,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
 
 <sect1><tt>.PDTV</tt><label id=".PDTV"><p>
 
-  Enable the 6502DTV instruction set. This is a superset of the 6502 
+  Enable the 6502DTV instruction set. This is a superset of the 6502
   instruction set.
 
   See: <tt><ref id=".P02" name=".P02"></tt>

@@ -106,7 +106,7 @@ int
 main()  {
         int     status = 0;             /* exit status to be returned */
 
-        
+
         /* <stdint.h> features: */
 
         printf("CHAR_BIT=%u\n", (unsigned)CHAR_BIT );
@@ -526,12 +526,12 @@ main()  {
                                 else    /* for trailing semicolon */
 
 #else
-                                                                 
+
 #define SCAN(buf,fs,var,exp)
 #define PRINT(fs,var,exp)
 
 #endif
-                                                                 
+
 #ifdef  SCNo32
 
         SCAN(in_dn, SCNo32, int32, 9);
@@ -586,7 +586,7 @@ main()  {
 #endif
 
 #if 0
-  
+
 #ifdef  INT16_MAX
          {      INT16_MAX,              INT16_MAX,  },
          {      -INT16_MAX,             INT16_MAX,  },
@@ -830,7 +830,7 @@ main()  {
                         }
 #endif
         }
-        
+
         {
         char            *endptr;
         wchar_t         *wendptr;

@@ -52,8 +52,8 @@ typedef unsigned size_t;
 
 /* Those non-standard cc65 exit constants definitions are in addition
 ** to the EXIT_SUCCESS and EXIT_FAILURE constants, which should not be
-** redefined 
-*/ 
+** redefined
+*/
 #define EXIT_ASSERT 2
 #define EXIT_ABORT 3
 

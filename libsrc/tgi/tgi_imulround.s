@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 2009-11-05
 ;
-; Helper function for graphics functions: Multiply two values, one being 
+; Helper function for graphics functions: Multiply two values, one being
 ; an 8.8 fixed point one, and return the rounded and scaled result.
 ;
 ; The module has two entry points: One is C callable and expects the
@@ -60,4 +60,4 @@ tgi_imulround:
         tya
         rts
 
-     
+

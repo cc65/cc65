@@ -111,4 +111,4 @@ errno:  jmp     __directerrno
 
         ; Set __oserror
 oserr:  jmp     __mappederrno
-                                                          
+

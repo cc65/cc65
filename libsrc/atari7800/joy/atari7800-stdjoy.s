@@ -85,7 +85,7 @@ COUNT:
         rts
 
 ; ------------------------------------------------------------------------
-; READ: Read a particular joystick passed in A for 2 fire buttons. 
+; READ: Read a particular joystick passed in A for 2 fire buttons.
 
 readbuttons:
     ; Y has joystick of interest 0/1

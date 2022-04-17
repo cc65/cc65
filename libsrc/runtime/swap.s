@@ -23,13 +23,13 @@ swapstk:
         tay
         lda     ptr4
         sta     (sp)
-        tya    
-.else        
+        tya
+.else
         dey
         lda     (sp),y
         pha
         lda     ptr4
         sta     (sp),y
         pla
-.endif        
+.endif
         rts                     ; whew!

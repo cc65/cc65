@@ -8,13 +8,13 @@
 ;
 
         .export         _mouse_def_callbacks
-        
+
         .include        "apple2.inc"
 
 ; ------------------------------------------------------------------------
 
         .bss
-        
+
 backup: .res    1
 visible:.res    1
 

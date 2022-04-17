@@ -1,4 +1,4 @@
-;                                 
+;
 ; Ullrich von Bassewitz, 07.04.2000
 ; Christian Krueger, 12-Mar-2017, added 65SC02 optimization
 ;
@@ -22,19 +22,19 @@ lsubeqa:
         stx     sreg+1
 
 lsubeq: sty     ptr1+1                  ; Store high byte of address
-    
+
         sec
         eor     #$FF
  .if (.cpu .bitand ::CPU_ISET_65SC02)
         adc     (ptr1)                  ; Subtract byte 0
         sta     (ptr1)
-        ldy     #$01                    ; Address byte 1               
+        ldy     #$01                    ; Address byte 1
  .else
         ldy     #$00                    ; Address low byte
         adc     (ptr1),y                ; Subtract byte 0
         sta     (ptr1),y
-        iny                             ; Address byte 1       
- .endif  
+        iny                             ; Address byte 1
+ .endif
         pha                             ; Save byte 0 of result for later
         txa
         eor     #$FF

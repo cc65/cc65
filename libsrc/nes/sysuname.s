@@ -35,5 +35,5 @@ utsdata:
         ; machine
         .asciiz         "NES"
 
-                            
+
 

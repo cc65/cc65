@@ -9,7 +9,7 @@
 
         .include        "telestrat.inc"
         .include        "zeropage.inc"
-        
+
 
 __sysmkdir:
         ; Throw away all parameters except the name
@@ -19,11 +19,11 @@ __sysmkdir:
 
         ; Get name
         jsr     popax
-        
+
         ; Call telemon primitive
-        
+
         BRK_TELEMON(XMKDIR)
-        
+
         rts
 
 

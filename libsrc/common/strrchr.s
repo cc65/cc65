@@ -16,8 +16,8 @@ _strrchr:
         stx ptr1+1
         ldx #0          ; default function result is NULL, X is high byte...
         stx tmp2        ; tmp2 is low-byte
-        stx ptr1        ; low-byte of source string is in Y, so clear real one... 
-   
+        stx ptr1        ; low-byte of source string is in Y, so clear real one...
+
 testChar:
         lda (ptr1),y    ; get char
         beq finished    ; jump if end of string

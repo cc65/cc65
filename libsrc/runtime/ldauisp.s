@@ -21,4 +21,4 @@ ldauiysp:
         lda     (ptr1),y
         rts
 
-                                   
+

@@ -12,7 +12,7 @@
 
             .include "jumptab.inc"
             .include "geossym.inc"
-        
+
 _FindBAMBit:
         jsr gettrse
         sta r6L

@@ -19,7 +19,7 @@ gotoxy: jsr     popa            ; Get Y
 ; In telemon, there is a position for the prompt, and another for the cursor.
 
     sta     SCRY
-    
+
 
     jsr     popa
     sta     SCRX
@@ -48,6 +48,6 @@ skip:
     sta     ADSCR
     dey
     bne     loop
-out:        
+out:
     rts
 .endproc

@@ -12,7 +12,7 @@
 .proc   _dio_query_sectsize
 
         sta     ptr1            ; handle
-        stx     ptr1+1 
+        stx     ptr1+1
 
         lda     #0
         sta     __oserror

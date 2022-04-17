@@ -18,7 +18,7 @@ typerr: lda     #$4A            ; "Incompatible file format"
 
         ; Cleanup name
 oserr:  jsr     popname         ; Preserves A
-        
+
         ; Set __oserror
         jmp     __mappederrno
 

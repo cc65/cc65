@@ -101,7 +101,7 @@
 @end:   stx     ringread
         sty     ringcount
 
-        rts     
+        rts
 
 .endproc
 

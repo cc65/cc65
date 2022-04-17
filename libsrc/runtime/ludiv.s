@@ -21,7 +21,7 @@ tosudiv0ax:
         sty     sreg+1
 .endif
 
-tosudiveax:                         
+tosudiveax:
         jsr     getlop          ; Get the paramameters
         jsr     udiv32          ; Do the division
         lda     ptr1            ; Result is in ptr1:sreg

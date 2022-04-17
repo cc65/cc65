@@ -7,7 +7,7 @@
 
         .export         mulax3
         .importzp       ptr1
-                
+
 .proc   mulax3
 
         sta     ptr1

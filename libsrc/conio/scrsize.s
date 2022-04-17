@@ -10,7 +10,7 @@
         .import         screensize
         .importzp       ptr1, ptr2
 
-        .macpack        cpu        
+        .macpack        cpu
 
 .proc   _screensize
 
@@ -29,7 +29,7 @@
         sta     (ptr2),y
         txa
         sta     (ptr1),y
-.endif        
+.endif
         rts
 
 .endproc

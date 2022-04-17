@@ -155,7 +155,7 @@ secreadbyte0:
         bne exit
 
 ;**********************************
-; Select a block 
+; Select a block
 ;**********************************
 seclynxblock:
         pha

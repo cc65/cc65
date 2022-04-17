@@ -20,21 +20,21 @@
 _dio_phys_to_log:
         sta ptr1
         stx ptr1+1              ; pointer to result
-            
+
         jsr popax
         sta ptr2
         stx ptr2+1              ; pointer to input structure
-            
+
         jsr popax
         sta ptr3
         stx ptr3+1              ; pointer to handle
-            
+
         ldy #sst_flag
         lda (ptr3),y
         and #128
         beq _inv_hand           ; handle not open or invalid
-            
-            
+
+
         ldy #diopp_head
         lda (ptr2),y
         bne _inv_data           ; there is only head 0
@@ -66,7 +66,7 @@ _dio_phys_to_log:
         beq dio_cts1571
         cmp #DRV_1581
         beq dio_cts1581
-            
+
         lda #INCOMPATIBLE       ; unsupported device
         ldx #0
         beq ret
@@ -78,10 +78,10 @@ dio_ctsend:
         dey
         lda tmp1
         sta (ptr1),y
-            
+
         ldx #0
         txa
-ret:        
+ret:
         sta __oserror
         rts                     ; return success
 

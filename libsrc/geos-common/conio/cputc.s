@@ -19,7 +19,7 @@
 ; ESC_GRAPHICS, ESC_RULER, GOTOX, GOTOY, GOTOXY, NEWCARDSET, all 1..8
 ;
 ; note that there are conflicts between control characters and keyboard:
-; HOME = KEY_ENTER, KEY_HOME = REV_ON, 
+; HOME = KEY_ENTER, KEY_HOME = REV_ON,
 ; UPLINE = ?, KEY_UPARROW = GOTOY, ...
 
             .export _cputcxy, _cputc

@@ -20,7 +20,7 @@ _strcspn:
 
         sta tmp1            ; tmp1 = strlen of test chars
         jsr popptr1         ; get and save s1 to ptr1
-        
+
         ldx #0              ; low counter byte
         stx tmp2            ; high counter byte
 

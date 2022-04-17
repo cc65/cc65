@@ -136,7 +136,7 @@ Skip:
 ;-------------------------------------------------------------------------
 
 .macro  CmpW source, dest
-.local Skip     
+.local Skip
         CmpB source+1, dest+1
         bne Skip
         CmpB source+0, dest+0
@@ -203,7 +203,7 @@ Skip:
 
 .macro  rmb bitNumber, dest
         pha
-        lda #(1 << bitNumber) ^ $ff 
+        lda #(1 << bitNumber) ^ $ff
         and dest
         sta dest
         pla

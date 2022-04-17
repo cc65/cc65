@@ -8,5 +8,5 @@
             .export _RstrFrmDialogue
 
             .include "jumptab.inc"
-        
+
 _RstrFrmDialogue = RstrFrmDialogue

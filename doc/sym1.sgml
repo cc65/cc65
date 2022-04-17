@@ -48,7 +48,7 @@ using 4k config run in the memory range of &dollar;200 - &dollar;0FFF.  The 32k 
 this range to &dollar;7FFF.  Memory above 32k can be used to extend the heap, as described below.
 The starting memory location and entry point for running the program is &dollar;200, so when the
 program is transferred to the Sym-1, it is executed by typing 'g 200'.  The system returns control
-back to the monitor ROM when the program terminates, providing the '.' prompt. 
+back to the monitor ROM when the program terminates, providing the '.' prompt.
 
 Special locations:
 
@@ -58,7 +58,7 @@ Special locations:
 
   <tag/Stack/
   The C runtime stack is located at &dollar;0FFF on 4kb Syms, or at &dollar;7FFF for 32kb systems.
-  The stack always grows downwards. 
+  The stack always grows downwards.
 
   <tag/Heap/
   The C heap is located at the end of the program and grows towards the C runtime stack.  Extended

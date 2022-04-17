@@ -1105,7 +1105,7 @@ Type* NewBitFieldType (const Type* T, unsigned BitOffs, unsigned BitWidth)
 
     /* The type specifier must be integeral */
     CHECK (IsClassInt (T));
-    
+
     /* Allocate the new type string */
     P = TypeAlloc (3);
 

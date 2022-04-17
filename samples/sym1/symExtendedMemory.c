@@ -72,7 +72,7 @@ int main (void) {
                error = 0;
             }
          }
-         segment += 0x1000;              // Increment to next segment      
+         segment += 0x1000;              // Increment to next segment
       }
 
       segment[0] = 0x00;                 // Check beginning of top memory segment

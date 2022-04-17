@@ -1,6 +1,8 @@
 #! /bin/bash
 OLDCWD=`pwd`
 SCRIPT_PATH=`dirname $0`
+CHECK_PATH=.
+
 cd $SCRIPT_PATH/../../
 
 nl='

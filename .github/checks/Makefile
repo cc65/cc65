@@ -1,5 +1,5 @@
 
-.PHONY: tabs
+.PHONY: check tabs lastline spaces
 
 check: tabs lastline spaces
 

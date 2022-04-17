@@ -52,7 +52,7 @@ int main (void) {
       ior3b = VIA3.prb;
 
       puts ("================== Digital I/O Status ==================");
-      puts ("     Port1A   Port1B   Port2A   Port2B   Port3A   Port3B" );    
+      puts ("     Port1A   Port1B   Port2A   Port2B   Port3A   Port3B" );
       printf ("DDR    %02X       %02X       %02X       %02X       %02X       %02X\n\r",ddr1a,ddr1b,ddr2a,ddr2b,ddr3a,ddr3b);
       printf ("IOR    %02X       %02X       %02X       %02X       %02X       %02X\n\r",ior1a,ior1b,ior2a,ior2b,ior3a,ior3b);
       puts ("========================================================\n");
@@ -75,7 +75,7 @@ int main (void) {
       cmd[strlen(cmd)-1] = '\0';
 
       if ( strncasecmp(cmd, "quit", 4) == 0 ) {
-         going = 0;  
+         going = 0;
       }
       else if ( strncasecmp(cmd, "help", 4) == 0 ) {
          instr = 1;

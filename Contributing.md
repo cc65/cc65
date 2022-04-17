@@ -20,7 +20,7 @@ This is an ongoing controversial topic - everyone knows that. However, the follo
 * No extra spaces at the end of lines.
 * All text files must end with new-line characters.  Don't leave the last line "dangling".
 
-The (bash) scipts used to check the above rules can be found in ```.github/check```
+The (bash) scipts used to check the above rules can be found in ```.github/check```. You can also run all checks using ```make check```.
 
 ### misc
 

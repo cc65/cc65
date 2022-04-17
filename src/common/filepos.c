@@ -60,7 +60,7 @@ int CompareFilePos (const FilePos* P1, const FilePos* P2)
 ** compare rates file index over line over column.
 */
 {
-    if (P1->Name > P2->Name) {    
+    if (P1->Name > P2->Name) {
         return 1;
     } else if (P1->Name < P2->Name) {
         return -1;

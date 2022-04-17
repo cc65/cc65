@@ -580,7 +580,7 @@ int xvsnprintf (char* Buf, size_t Size, const char* Format, va_list ap)
                     CHECK (S != 0);
                     /* Handle the length by using a precision */
                     if ((P.Flags & fPrec) != 0) {
-                        /* Precision already specified, use length of string 
+                        /* Precision already specified, use length of string
                         ** if less.
                         */
                         if ((unsigned) P.Prec > SB_GetLen (S)) {

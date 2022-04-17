@@ -3786,7 +3786,7 @@ static void hieOr (ExprDesc *Expr)
             /* Load false only if the result is not true */
             g_getimmed (CF_INT | CF_CONST, 0, 0);   /* Load FALSE */
             g_falsejump (CF_NONE, DoneLab);
- 
+
             /* Load the true value */
             g_defcodelabel (TrueLab);
             g_getimmed (CF_INT | CF_CONST, 1, 0);   /* Load TRUE */

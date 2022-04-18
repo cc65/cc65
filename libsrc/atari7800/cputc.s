@@ -6,8 +6,7 @@
 ;
 
         .export         _cputc
-        .export         umula0
-        .import         _gotoxy, gotox, gotoy, pusha0
+        .import         gotox, gotoy, pusha0
         .import         pushax
         .import         _screen
         .import         txtcolor

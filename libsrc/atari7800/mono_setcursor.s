@@ -23,7 +23,7 @@
 ; definitely not allow direct access to the variables.
 ;
 
-        .export         mono_gotoxy, _mono_gotoxy, _mono_gotox, _mono_gotoy
+        .export         mono_gotoxy, _mono_gotoxy, mono_gotox, mono_gotoy
         .constructor    mono_init_cursor
         .interruptor    mono_blink_cursor
 
@@ -96,7 +96,6 @@ umula0:
         adc     #<_mono_zones
         sta     cursorzone      ; calculate new cursorzone
         txa
-        clc
         adc     #>_mono_zones
         sta     cursorzone+1
         rts
@@ -118,7 +117,7 @@ umula0:
 ; Enable cursor
 ; if showcursor cursorzone[1] = 31
 ;
-        .proc   _mono_gotoy
+        .proc   mono_gotoy
 
         pha
         lda     CURS_Y
@@ -143,7 +142,7 @@ umula0:
 ; You also need to set the hpos offset to the correct value on this line
 ; cursorzone[3] = 4 * CURS_X?
 ;
-        .proc   _mono_gotox
+        .proc   mono_gotox
 
         sta     CURS_X
         ldy     #3
@@ -160,9 +159,9 @@ umula0:
 ;
         .proc   _mono_gotoxy
 
-        jsr     _mono_gotoy
+        jsr     mono_gotoy
         jsr     popa
-        jsr     _mono_gotox
+        jsr     mono_gotox
         rts
         .endproc
 

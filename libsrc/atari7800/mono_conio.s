@@ -50,14 +50,14 @@ _mono_screen:
 
 .macro TextZone row
         ; Text
-        .byte   <(_mono_screen + 2 * row * charsperline)
+        .byte   <(_mono_screen + row * mono_charsperline)
         .byte   $60
-        .byte   >(_mono_screen + 2 * row * charsperline)
+        .byte   >(_mono_screen + row * mono_charsperline)
         .byte   12
         .byte   0
-        .byte   <(_mono_screen + 2 * row * charsperline + charsperline)
+        .byte   <(_mono_screen + row * mono_charsperline + 20)
         .byte   $60
-        .byte   >(_mono_screen + 2 * row * charsperline + charsperline)
+        .byte   >(_mono_screen + row * mono_charsperline + 20)
         .byte   12
         .byte   80
         ; Cursor

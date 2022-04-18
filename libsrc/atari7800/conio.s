@@ -212,8 +212,8 @@ vblankoff:
         sta     CTRL
         lda     #$00            ; Black background
         sta     BKGRND
-	sta	CURS_X
-	sta	CURS_Y
+        sta     CURS_X
+        sta     CURS_Y
         lda     #$33            ; Red
         sta     P0C1
         lda     #$c8            ; Green

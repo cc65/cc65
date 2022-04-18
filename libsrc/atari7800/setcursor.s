@@ -31,7 +31,6 @@
         .import         _zones
         .import         cursor
         .import         pusha, incsp1, pusha0, pushax, popa
-        .import         umula0
         .include        "atari7800.inc"
         .include        "extzp.inc"
 
@@ -46,6 +45,33 @@ blink_time:
         .byte   140
 
         .code
+
+;---------------------------------------------------------------------------
+; 8x16 routine
+
+umula0:
+        ldy     #8                 ; Number of bits
+        lda     #0
+        lsr     ptr7800            ; Get first bit into carry
+@L0:    bcc     @L1
+
+        clc
+        adc     ptrtmp
+        tax
+        lda     ptrtmp+1           ; hi byte of left op
+        clc
+        adc     ptr7800+1
+        sta     ptr7800+1
+        txa
+
+@L1:    ror     ptr7800+1
+        ror     a
+        ror     ptr7800
+        dey
+        bne     @L0
+        tax
+        lda     ptr7800            ; Load the result
+        rts
 
 ;-----------------------------------------------------------------------------
 ; Calculate cursorzone address

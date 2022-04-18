@@ -6,7 +6,7 @@
 ;
 
         .export         _mono_cputc
-        .import         _mono_gotoxy, _mono_gotox, _mono_gotoy, pusha0
+        .import         mono_gotox, mono_gotoy, pusha0
         .import         pushax
         .import         _mono_screen
 
@@ -52,7 +52,7 @@ umula0:
         cmp     #$0A            ; LF
         bne     @L4
 @L1:    lda     #0              ; newline
-        jsr     _mono_gotox
+        jsr     mono_gotox
         lda     CURS_Y
         cmp     #(screenrows-1)
         bne     @L2
@@ -60,7 +60,7 @@ umula0:
         beq     @L3
 @L2:    clc
         adc     #1
-@L3:    jmp     _mono_gotoy
+@L3:    jmp     mono_gotoy
 
 @L4:
         pha
@@ -96,7 +96,7 @@ umula0:
         beq     @L1
         clc
         adc     #1
-        jmp     _mono_gotox
+        jmp     mono_gotox
 
         .endproc
 

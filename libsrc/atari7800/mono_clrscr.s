@@ -3,7 +3,7 @@
 
         .export _mono_clrscr
 
-        .import _screen
+        .import _momo_screen
         .import pusha0,pushax
         .include "extzp.inc"
 
@@ -11,8 +11,8 @@
 
         .proc _mono_clrscr
 
-        lda     #<_screen
-        ldx     #>_screen
+        lda     #<_momo_screen
+        ldx     #>_momo_screen
         sta     ptr7800
         stx     ptr7800+1
         ldx     #screenrows

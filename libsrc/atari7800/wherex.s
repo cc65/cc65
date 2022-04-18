@@ -5,7 +5,7 @@
 ;
 
         .export         _wherex
-        .import         CURS_X
+        .include        "extzp.inc"
 
 ;-----------------------------------------------------------------------------
 ; Get cursor X position

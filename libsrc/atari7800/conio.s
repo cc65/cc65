@@ -8,7 +8,8 @@
 
         .constructor    initconio
         .include        "atari7800.inc"
-        .import         _font160
+        .include        "extzp.inc"
+        .import         _font
         .import         _get_tv
         .export         _screen
         .export         _zones
@@ -57,7 +58,7 @@ _screen:
         ; Cursor
         .byte   254
         .byte   0
-        .byte   >_font160
+        .byte   >_font
         .byte   0
 .endmacro
 
@@ -205,12 +206,14 @@ vblankon:
 vblankoff:
         lda     MSTAT
         bpl     vblankoff
-        lda     #>_font160
+        lda     #>_font
         sta     CHBASE
         lda     #(CTRL_MODE160 | CTRL_KANGOFF | CTRL_BCBLACK | CTRL_CHAR2B | CTRL_DMAON | CTRL_CKOFF)
         sta     CTRL
         lda     #$00            ; Black background
         sta     BKGRND
+	sta	CURS_X
+	sta	CURS_Y
         lda     #$33            ; Red
         sta     P0C1
         lda     #$c8            ; Green

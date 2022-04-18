@@ -51,9 +51,3 @@ txtcolor:
 @L4:    lda #2
         rts                     ; Old colour was 2
         .endproc
-
-;-------------------------------------------------------------------------------
-; force the init constructor to be imported
-
-                .import initconio
-conio_init      = initconio

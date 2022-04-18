@@ -16,10 +16,10 @@
 ; 0, 2, 4, 6, ... 254
 ; Odd indices cannot be used.
 
-    .export _font160
+    .export _font
     .rodata
     .align 256
-_font160:
+_font:
     .byte $0, $0, $41, $41, $0, $0, $14, $0
     .byte $0, $0, $0, $0, $1, $40, $0, $0
     .byte $0, $0, $0, $0, $0, $0, $0, $0

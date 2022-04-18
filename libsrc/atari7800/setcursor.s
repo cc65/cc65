@@ -24,7 +24,6 @@
 ;
 
         .export         gotoxy, _gotoxy, gotox, gotoy
-        .export         CURS_X, CURS_Y
         .constructor    init_cursor
         .interruptor    blink_cursor
 
@@ -43,10 +42,6 @@
 ; The variables used by cursor functions
 ;
 
-CURS_X:
-        .byte   0
-CURS_Y:
-        .byte   0
 blink_time:
         .byte   140
 

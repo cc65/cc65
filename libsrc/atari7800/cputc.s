@@ -10,7 +10,6 @@
         .import         _gotoxy, gotox, gotoy, pusha0
         .import         pushax
         .import         _screen
-        .import         CURS_X, CURS_Y
         .import         txtcolor
 
         .include        "atari7800.inc"

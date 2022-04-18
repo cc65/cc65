@@ -10,9 +10,9 @@ FILES=`find $CHECK_PATH -type f \( \( -name \*.inc -a \! -name Makefile.inc \) -
 cd $OLDCWD
 
 if [ x"$FILES"x != xx ]; then
-    echo "error: found TABs in the following files:"
+    echo "error: found TABs in the following files:" >&2
     for n in $FILES; do
-        echo $n
+        echo $n >&2
     done
     exit -1
 fi

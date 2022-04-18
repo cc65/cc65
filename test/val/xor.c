@@ -31,12 +31,12 @@ void xor_chars_0_1(void)
 
 void xor_if(void)
 {
-  if(achar0 ^ achar1) 
+  if(achar0 ^ achar1)
     failures++;
 
   achar0 ^= 0xff;
 
-  if( !(achar0 ^ achar1) ) 
+  if( !(achar0 ^ achar1) )
     failures++;
 }
 

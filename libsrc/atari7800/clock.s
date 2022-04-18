@@ -9,12 +9,12 @@
         .constructor    init_clock
 
         .import         sreg: zp
-	.import		_zonecounter
+        .import         _zonecounter
         .include        "atari7800.inc"
 
         .macpack        generic
 
-	.code
+        .code
 
 ;-----------------------------------------------------------------------------
 ; Read the clock counter.
@@ -38,9 +38,9 @@
 ; _zonecounter == 1 (from 1st visible scanline to last visible scanline)
 ;
 update_clock:
-	lda	_zonecounter
-	and	#01
-	beq	@L1
+        lda     _zonecounter
+        and     #01
+        beq     @L1
         inc     clock_count
         bne     @L1
         inc     clock_count+1
@@ -54,10 +54,10 @@ update_clock:
 ;
         .segment        "ONCE"
 init_clock:
-	lda	#0
-	sta	clock_count+2
-	sta	clock_count+1
-	sta	clock_count
+        lda     #0
+        sta     clock_count+2
+        sta     clock_count+1
+        sta     clock_count
         rts
 
 ;-----------------------------------------------------------------------------

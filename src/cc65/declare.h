@@ -114,11 +114,6 @@ void CheckEmptyDecl (const DeclSpec* D);
 ** warning if not.
 */
 
-unsigned ParseInit (Type* T);
-/* Parse initialization of variables. Return the number of initialized data
-** bytes.
-*/
-
 
 
 /* End of declare.h */

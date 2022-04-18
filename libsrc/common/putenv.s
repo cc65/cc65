@@ -185,4 +185,4 @@ error:  jsr     __seterrno
 name:           .addr   0               ; Pointer to name
 newsize:        .byte   0               ; New environment size
 
-                
+

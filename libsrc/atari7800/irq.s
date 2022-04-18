@@ -8,7 +8,7 @@
 
         .include        "atari7800.inc"
 
-	.code
+        .code
 ; ------------------------------------------------------------------------
 
 initirq:
@@ -27,10 +27,10 @@ IRQStub:
         tya
         pha
         jsr     callirq                 ; Call the functions
-	pla
+        pla
         tay
         pla
         tax
-@L1:	pla
+@L1:    pla
         rti
 

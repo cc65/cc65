@@ -23,7 +23,7 @@ tosumulax:
 
 ; Do ptr4:ptr4+1 * ptr1:ptr1+1 --> AX
 
-        tya                     ; A = 0        
+        tya                     ; A = 0
         ldy     ptr1+1          ; check if lhs is 8 bit only
         beq     @L4             ; -> we can do 8x16 after swap
         sta     tmp1
@@ -36,7 +36,7 @@ tosumulax:
         clc
         adc     ptr1
         tax
-        lda     ptr1+1          ; Hi byte of left op         
+        lda     ptr1+1          ; Hi byte of left op
         adc     tmp1
         sta     tmp1
         txa

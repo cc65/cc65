@@ -17,10 +17,10 @@ tosumul0ax:
         stz     sreg
         stz     sreg+1
 .else
-        ldy     #$00    
+        ldy     #$00
         sty     sreg
         sty     sreg+1
-.endif        
+.endif
 
 tosmuleax:
 tosumuleax:
@@ -29,7 +29,7 @@ mul32:  sta     ptr1
 .if (.cpu .bitand ::CPU_ISET_65SC02)
         lda     (sp)
         ldy     #1
-.else        
+.else
         ldy     #0
         lda     (sp),y
         iny

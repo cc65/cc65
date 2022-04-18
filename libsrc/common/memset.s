@@ -87,7 +87,7 @@ L3:     dey
         sta     (ptr1),y                ; set bytes in low
         sta     (ptr2),y                ; and high section
         bne     L3              ; flags still up to date from dey!
-leave:  
+leave:
         jmp     popax           ; Pop ptr and return as result
 
-                
+

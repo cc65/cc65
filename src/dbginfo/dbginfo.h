@@ -135,7 +135,7 @@ struct cc65_csymdata {
     unsigned char       csym_kind;      /* Kind of c symbol */
     unsigned char       csym_sc;        /* Storage class of c symbol */
     int                 csym_offs;      /* Offset for auto and register */
-    unsigned            type_id;        /* Id of the data type */ 
+    unsigned            type_id;        /* Id of the data type */
     unsigned            symbol_id;      /* Attached asm symbol if any */
     unsigned            scope_id;       /* Scope of c symbol */
     const char*         csym_name;      /* Name of the symbol */

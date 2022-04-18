@@ -10,7 +10,7 @@
 ;
 
         .import         incsp2
-        .import         ptr1: zp                            
+        .import         ptr1: zp
 
         .include        "mouse-kernel.inc"
 

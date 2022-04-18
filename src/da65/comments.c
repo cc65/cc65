@@ -36,7 +36,7 @@
 /* common */
 #include "xmalloc.h"
 
-/* da65 */        
+/* da65 */
 #include "attrtab.h"
 #include "comments.h"
 #include "error.h"

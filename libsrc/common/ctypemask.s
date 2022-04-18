@@ -9,7 +9,7 @@
 ;
 ; ctypemask(int c)
 ;
-; converts a character to test via the is*-functions to the matching ctype-masks 
+; converts a character to test via the is*-functions to the matching ctype-masks
 ; If c is out of the 8-bit range, the function returns with carry set and accu cleared.
 ; Return value is in accu and x has to be always clear when returning
 ; (makes calling code shorter)!

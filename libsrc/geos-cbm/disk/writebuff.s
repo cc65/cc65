@@ -11,7 +11,7 @@
 
             .include "diskdrv.inc"
             .include "geossym.inc"
-        
+
 _WriteBuff:
         jsr gettrse
         sta r1L

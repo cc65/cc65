@@ -9,16 +9,16 @@ void main(void)
     char ch;
 
     DlgBoxOk("Now the screen will be", "cleared.");
-    
+
     clrscr();
-    
+
     DlgBoxOk("Now a character will be", "written at 20,20");
-    
+
     gotoxy(20, 20);
     cputc('A');
 
     DlgBoxOk("Now a string will be", "written at 0,1");
-    
+
     cputsxy(0, 1, CBOLDON "Just" COUTLINEON  "a " CITALICON "string." CPLAINTEXT );
 
     DlgBoxOk("Write text and finish it", "with a dot.");
@@ -31,7 +31,7 @@ void main(void)
     cursor(0);
 
     DlgBoxOk("Seems that it is all for conio.", "Let's test mouse routines.");
-    
+
     mouse_init(1);
     cputsxy(0, 2, CBOLDON "Now you can't see mouse (press any key)" CPLAINTEXT);
     mouse_hide();

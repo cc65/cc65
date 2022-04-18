@@ -210,9 +210,9 @@ int PushSearchPath (SearchPaths* P, const char* NewPath)
 ** that it's not already there. If the path is already at the first position,
 ** return zero, otherwise return a non zero value.
 */
-{                                      
+{
     /* Generate a clean copy of NewPath */
-    char* Path = CleanupPath (NewPath);   
+    char* Path = CleanupPath (NewPath);
 
     /* If we have paths, check if Path is already at position zero */
     if (CollCount (P) > 0 && strcmp (CollConstAt (P, 0), Path) == 0) {

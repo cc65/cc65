@@ -22,4 +22,4 @@ void __fastcall__ rewind (FILE* f)
     clearerr(f);
 }
 
-                  
+

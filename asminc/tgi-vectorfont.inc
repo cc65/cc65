@@ -54,7 +54,7 @@ TGI_VF_CCOUNT           = (TGI_VF_LASTCHAR - TGI_VF_FIRSTCHAR + 1)
 ; Font data loaded directly from file
 .struct TGI_VECTORFONT
         TOP             .byte                   ; Height of char
-        BOTTOM          .byte                   ; Descender          
+        BOTTOM          .byte                   ; Descender
         HEIGHT          .byte                   ; Maximum char height
         WIDTHS          .byte   ::TGI_VF_CCOUNT ; Char widths
         CHARS           .word   ::TGI_VF_CCOUNT ; Pointer to character defs

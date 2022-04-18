@@ -53,7 +53,7 @@
 
 
 
-void WriteBinFile (const StrBuf* Data, const Collection* A, 
+void WriteBinFile (const StrBuf* Data, const Collection* A,
                    const Bitmap* B attribute ((unused)))
 /* Write the contents of Data to the given file in binary format */
 {

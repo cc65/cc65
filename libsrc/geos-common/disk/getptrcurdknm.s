@@ -12,8 +12,8 @@
 
             .include "jumptab.inc"
             .include "geossym.inc"
-        
-_GetPtrCurDkNm: 
+
+_GetPtrCurDkNm:
         sta ptr3
         stx ptr3+1
         ldx #ptr4

@@ -161,8 +161,8 @@ umula0:
 
         jsr     mono_gotoy
         jsr     popa
-        jsr     mono_gotox
-        rts
+        jmp     mono_gotox
+
         .endproc
 
         .proc   mono_gotoxy
@@ -197,8 +197,8 @@ umula0:
         .segment        "ONCE"
 mono_init_cursor:
         lda     #0
-        jsr     calccursorzone
-        rts
+        jmp     calccursorzone
+
 
 ;-----------------------------------------------------------------------------
 ; force the init constructor to be imported

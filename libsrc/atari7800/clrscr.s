@@ -11,8 +11,8 @@
 
         .proc _clrscr
 
-        lda	#<_screen
-        ldx	#>_screen
+        lda     #<_screen
+        ldx     #>_screen
         sta     ptr7800
         stx     ptr7800+1
         ldx     #screenrows

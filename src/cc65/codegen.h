@@ -486,11 +486,11 @@ void g_initstatic (unsigned InitLabel, unsigned VarLabel, unsigned Size);
 /*****************************************************************************/
 
 void g_testbitfield (unsigned Flags, unsigned BitOffs, unsigned BitWidth);
-/* Test bit-field in ax. */
+/* Test bit-field in primary. */
 
 void g_extractbitfield (unsigned Flags, unsigned FullWidthFlags, int IsSigned,
                         unsigned BitOffs, unsigned BitWidth);
-/* Extract bits from bit-field in ax. */
+/* Extract bits from bit-field in primary. */
 
 /*****************************************************************************/
 /*                             Switch statement                              */

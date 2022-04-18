@@ -43,6 +43,7 @@
 #include "addrsize.h"
 #include "check.h"
 #include "cpu.h"
+#include "shift.h"
 #include "strbuf.h"
 #include "xmalloc.h"
 #include "xsprintf.h"
@@ -4560,110 +4561,268 @@ void g_initstatic (unsigned InitLabel, unsigned VarLabel, unsigned Size)
 
 
 void g_testbitfield (unsigned Flags, unsigned BitOffs, unsigned BitWidth)
-/* Test bit-field in ax. */
+/* Test bit-field in primary. */
 {
-    unsigned EndBit = BitOffs + BitWidth;
+    /* Since the end is inclusive and cannot be negative here, we subtract 1 from the sum */
+    unsigned MSBit = BitOffs + BitWidth - 1U;
+    unsigned Bytes = MSBit / CHAR_BITS + 1U - BitOffs / CHAR_BITS;
+    unsigned HeadMask = (0xFF << (BitOffs % CHAR_BITS)) & 0xFF;
+    unsigned TailMask = ((1U << (MSBit % CHAR_BITS + 1U)) - 1U) & 0xFF;
+    unsigned UntestedBytes = ((1U << Bytes) - 1U) << (BitOffs / CHAR_BITS);
+
+    /* We don't use these flags for now. Could CF_NOKEEP be potentially interesting? */
+    Flags &= ~CF_STYPEMASK;
 
     /* If we need to do a test, then we avoid shifting (ASR only shifts one bit at a time,
-    ** so is slow) and just AND with the appropriate mask, then test the result of that.
+    ** so is slow) and just AND the head and tail bytes with the appropriate mask, then
+    ** OR the results with the rest bytes.
     */
-
-    /* Avoid overly large shift on host platform. */
-    if (EndBit == sizeof (unsigned long) * CHAR_BIT) {
-        g_and (Flags | CF_CONST, (~0UL << BitOffs));
-    } else {
-        g_and (Flags | CF_CONST, ((1UL << EndBit) - 1) & (~0UL << BitOffs));
+    if (Bytes == 1) {
+        HeadMask = TailMask = HeadMask & TailMask;
     }
 
-    /* TODO: When long bit-fields are supported, an optimization to test only 3 bytes when
-    ** EndBit <= 24 is possible.
-    */
-    g_test (Flags | CF_CONST);
+    /* Get the head byte */
+    switch (BitOffs / CHAR_BITS) {
+    case 0:
+        if (HeadMask == 0xFF && Bytes == 1) {
+            AddCodeLine ("tax");
+            UntestedBytes &= ~0x1;
+        }
+        break;
+    case 1:
+        if (HeadMask != 0xFF || TailMask == 0xFF) {
+            AddCodeLine ("txa");
+            UntestedBytes &= ~0x2;
+        }
+        break;
+    case 2:
+        if (HeadMask != 0xFF || TailMask == 0xFF) {
+            AddCodeLine ("lda sreg");
+            UntestedBytes &= ~0x4;
+        }
+        break;
+    case 3:
+        /* In this case we'd have HeadMask == TailMask and only 1 byte, but anyways... */
+        if (HeadMask != 0xFF || TailMask == 0xFF) {
+            AddCodeLine ("lda sreg+1");
+            UntestedBytes &= ~0x8;
+        }
+        break;
+    default:
+        break;
+    }
+
+    /* Keep in mind that the head is NOT always "Byte 0" */
+    if (HeadMask != 0xFF) {
+        AddCodeLine ("and #$%02X", HeadMask);
+        /* Abuse the "Byte 0" flag so that this head content will be saved by the routine */
+        UntestedBytes |= 0x1;
+    }
+
+    /* If there is only 1 byte to test, we have done with it */
+    if (Bytes == 1) {
+        return;
+    }
+
+    /* Handle the tail byte */
+    if (TailMask != 0xFF) {
+        /* If we have to do any more masking operation, register A will be used for that,
+        ** and its current content in it must be saved.
+        */
+        if (UntestedBytes & 0x1) {
+            AddCodeLine ("sta tmp1");
+        }
+
+        /* Test the tail byte */
+        switch (MSBit / CHAR_BITS) {
+        case 1:
+            AddCodeLine ("txa");
+            UntestedBytes &= ~0x2;
+            break;
+        case 2:
+            AddCodeLine ("lda sreg");
+            UntestedBytes &= ~0x4;
+            break;
+        case 3:
+            AddCodeLine ("lda sreg+1");
+            UntestedBytes &= ~0x8;
+            break;
+        default:
+            break;
+        }
+        AddCodeLine ("and #$%02X", TailMask);
+
+        if (UntestedBytes & 0x1) {
+            AddCodeLine ("ora tmp1");
+        }
+    }
+
+    /* OR the rest bytes together, which could never need masking */
+    if (UntestedBytes & 0x2) {
+        AddCodeLine ("stx tmp1");
+        AddCodeLine ("ora tmp1");
+    }
+    if (UntestedBytes & 0x4) {
+        AddCodeLine ("ora sreg");
+    }
+    if (UntestedBytes & 0x8) {
+        AddCodeLine ("ora sreg+1");
+    }
 }
 
 
 
 void g_extractbitfield (unsigned Flags, unsigned FullWidthFlags, int IsSigned,
                         unsigned BitOffs, unsigned BitWidth)
-/* Extract bits from bit-field in ax. */
+/* Extract bits from bit-field in primary. */
 {
     unsigned EndBit = BitOffs + BitWidth;
+    unsigned long ZeroExtendMask = 0;  /* Zero if we don't need to zero-extend. */
 
     /* Shift right by the bit offset; no code is emitted if BitOffs is zero */
     g_asr (Flags | CF_CONST, BitOffs);
-
-    /* Since we have now shifted down, we could do char ops when the width fits in a char, but we
-    ** also need to clear (or set) the high byte since we've been using CF_FORCECHAR up to now.
-    */
-    unsigned Mask = (1U << BitWidth) - 1;
 
     /* To zero-extend, we will and by the width if the field doesn't end on a char or
     ** int boundary.  If it does end on a boundary, then zeros will have already been shifted in,
     ** but we need to clear the high byte for char.  g_and emits no code if the mask is all ones.
     ** This is here so the signed and unsigned branches can use it.
     */
-    unsigned ZeroExtendMask = 0;  /* Zero if we don't need to zero-extend. */
     if (EndBit == CHAR_BITS) {
         /* We need to clear the high byte, since CF_FORCECHAR was set. */
         ZeroExtendMask = 0xFF;
-    } else if (EndBit != INT_BITS) {
-        ZeroExtendMask = (1U << BitWidth) - 1;
+    } else if (EndBit != INT_BITS && EndBit != LONG_BITS) {
+        ZeroExtendMask = shl_l (1UL, BitWidth) - 1UL;
     }
 
     /* Handle signed bit-fields. */
     if (IsSigned) {
-        /* Save .A because the sign-bit test will destroy it. */
-        AddCodeLine ("tay");
-
-        /* Check sign bit */
         unsigned SignBitPos = BitWidth - 1U;
         unsigned SignBitByte = SignBitPos / CHAR_BITS;
         unsigned SignBitPosInByte = SignBitPos % CHAR_BITS;
-        unsigned SignBitMask = 1U << SignBitPosInByte;
 
-        /* Move the correct byte to .A.  This can be only .X for now,
-        ** but more cases will be needed to support long.
-        */
-        switch (SignBitByte) {
-          case 0:
-            break;
-          case 1:
-            AddCodeLine ("txa");
-            break;
-          default:
-            FAIL ("Invalid Byte for sign bit");
-        }
-
-        /* Test the sign bit */
-        AddCodeLine ("and #$%02X", SignBitMask);
-        unsigned ZeroExtendLabel = GetLocalLabel ();
-        AddCodeLine ("beq %s", LocalLabelName (ZeroExtendLabel));
-
-        /* Get back .A and sign-extend if required; operating on the full result needs
-        ** to sign-extend into the high byte, too.
-        */
-        AddCodeLine ("tya");
-        g_or (FullWidthFlags | CF_CONST, ~Mask);
-
-        /* We can generate a branch, instead of a jump, here because we know
-        ** that only a few instructions will be put between here and where
-        ** DoneLabel will be defined.
-        */
-        unsigned DoneLabel = GetLocalLabel ();
-        g_branch (DoneLabel);
-
-        /* Get back .A, then zero-extend. We need to duplicate the TYA, rather than move it before
-        ** the branch to share with the other label, because TYA changes some condition codes.
-        */
-        g_defcodelabel (ZeroExtendLabel);
-        AddCodeLine ("tya");
-
-        /* Zero the upper bits, the same as the unsigned path. */
         if (ZeroExtendMask != 0) {
-            g_and (FullWidthFlags | CF_CONST, ZeroExtendMask);
-        }
+            /* The universal trick is:
+            **   x = bits & bit_mask
+            **   m = 1 << (bit_width - 1)
+            **   r = (x ^ m) - m
+            ** which works for long as well.
+            */
 
-        g_defcodelabel (DoneLabel);
+            if (SignBitByte + 1U == sizeofarg (FullWidthFlags)) {
+                /* We can just sign-extend on the high byte if it is the only affected one */
+                unsigned char SignBitMask = (1UL << SignBitPosInByte) & 0xFF;
+                unsigned char Mask = ((2UL << (SignBitPos % CHAR_BITS)) - 1UL) & 0xFF;
+
+                /* Move the correct byte to .A */
+                switch (SignBitByte) {
+                  case 0:
+                    break;
+                  case 1:
+                    AddCodeLine ("tay");
+                    AddCodeLine ("txa");
+                    break;
+                  case 3:
+                    AddCodeLine ("tay");
+                    AddCodeLine ("lda sreg+1");
+                    break;
+                  default:
+                    FAIL ("Invalid Byte for sign bit");
+                }
+
+                /* Use .A to do the ops on the correct byte */
+                AddCodeLine ("and #$%02X", Mask);
+                AddCodeLine ("eor #$%02X", SignBitMask);
+                AddCodeLine ("sec");
+                AddCodeLine ("sbc #$%02X", SignBitMask);
+
+                /* Move the correct byte from .A */
+                switch (SignBitByte) {
+                  case 0:
+                    break;
+                  case 1:
+                    AddCodeLine ("tax");
+                    AddCodeLine ("tya");
+                    break;
+                  case 3:
+                    AddCodeLine ("sta sreg+1");
+                    AddCodeLine ("tya");
+                    break;
+                  default:
+                    FAIL ("Invalid Byte for sign bit");
+                }
+            } else {
+                unsigned long SignBitMask = 1UL << SignBitPos;
+                unsigned long Mask = (2UL << SignBitPos) - 1UL;
+                g_and (FullWidthFlags | CF_CONST, Mask);
+                g_xor (FullWidthFlags | CF_CONST, SignBitMask);
+                g_dec (FullWidthFlags | CF_CONST, SignBitMask);
+            }
+        } else {
+            unsigned char SignBitMask = (1UL << SignBitPosInByte) & 0xFF;
+            unsigned ZeroExtendLabel = GetLocalLabel ();
+
+            /* Save .A because the sign-bit test will destroy it. */
+            AddCodeLine ("tay");
+
+            /* Move the correct byte to .A */
+            switch (SignBitByte) {
+              case 0:
+                break;
+              case 1:
+                AddCodeLine ("txa");
+                break;
+              case 3:
+                AddCodeLine ("lda sreg+1");
+                break;
+              default:
+                FAIL ("Invalid Byte for sign bit");
+            }
+
+            /* Test the sign bit */
+            AddCodeLine ("and #$%02X", SignBitMask);
+            AddCodeLine ("beq %s", LocalLabelName (ZeroExtendLabel));
+
+            if (SignBitByte + 1U == sizeofarg (FullWidthFlags)) {
+                /* We can just sign-extend on the high byte if it is the only affected one */
+                unsigned char Mask = ~((2UL << (SignBitPos % CHAR_BITS)) - 1UL) & 0xFF;
+
+                /* Use .A to do the ops on the correct byte */
+                switch (SignBitByte) {
+                  case 0:
+                    AddCodeLine ("tya");
+                    AddCodeLine ("ora #$%02X", Mask);
+                    /* We could jump over the following tya instead, but that wouldn't be faster
+                    ** than taking this extra tay and then the tya.
+                    */
+                    AddCodeLine ("tay");
+                    break;
+                  case 1:
+                    AddCodeLine ("txa");
+                    AddCodeLine ("ora #$%02X", Mask);
+                    AddCodeLine ("tax");
+                    break;
+                  case 3:
+                    AddCodeLine ("lda sreg+1");
+                    AddCodeLine ("ora #$%02X", Mask);
+                    AddCodeLine ("sta sreg+1");
+                    break;
+                  default:
+                    FAIL ("Invalid Byte for sign bit");
+                }
+            } else {
+                /* Since we are going to get back .A later anyways, we may just do the op on the
+                ** higher bytes with whatever content currently in it.
+                */
+                unsigned long Mask = ~((2UL << SignBitPos) - 1UL);
+                g_or (FullWidthFlags | CF_CONST, Mask);
+            }
+
+            /* Get back .A. We need to duplicate the TYA, rather than move it before
+            ** the branch to share with the other label, because TYA changes some condition codes.
+            */
+            g_defcodelabel (ZeroExtendLabel);
+            AddCodeLine ("tya");
+        }
     } else {
         /* Unsigned bit-field, needs only zero-extension. */
         if (ZeroExtendMask != 0) {

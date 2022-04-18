@@ -25,6 +25,7 @@
 #include "funcdesc.h"
 #include "function.h"
 #include "global.h"
+#include "initdata.h"
 #include "litpool.h"
 #include "loadexpr.h"
 #include "macrotab.h"
@@ -398,7 +399,7 @@ static void DoInc (ExprDesc* Expr, unsigned KeepResult)
     Val = IsTypePtr (Expr->Type) ? CheckedSizeOf (Expr->Type + 1) : 1;
 
     /* Special treatment is needed for bit-fields */
-    if (IsTypeBitField (Expr->Type)) {
+    if (IsTypeFragBitField (Expr->Type)) {
         DoIncDecBitField (Expr, Val, KeepResult);
         return;
     }
@@ -485,7 +486,7 @@ static void DoDec (ExprDesc* Expr, unsigned KeepResult)
     Val = IsTypePtr (Expr->Type) ? CheckedSizeOf (Expr->Type + 1) : 1;
 
     /* Special treatment is needed for bit-fields */
-    if (IsTypeBitField (Expr->Type)) {
+    if (IsTypeFragBitField (Expr->Type)) {
         DoIncDecBitField (Expr, -Val, KeepResult);
         return;
     }

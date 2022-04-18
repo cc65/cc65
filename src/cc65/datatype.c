@@ -551,6 +551,24 @@ unsigned long GetIntegerTypeMax (const Type* Type)
 
 
 
+static unsigned GetBitFieldMinimalTypeSize (unsigned BitWidth)
+/* Return the size of the smallest integer type that may have BitWidth bits */
+{
+    /* Since all integer types supported in cc65 for bit-fields have sizes that
+    ** are powers of 2, we can just use this bit-twiddling trick.
+    */
+    unsigned V = (int)(BitWidth - 1U) / (int)CHAR_BITS;
+    V |= V >> 1;
+    V |= V >> 2;
+    V |= V >> 4;
+    V |= V >> 8;
+    V |= V >> 16;
+
+    /* Return the result size */
+    return V + 1U;
+}
+
+
 static unsigned TypeOfBySize (unsigned Size)
 /* Get the code generator replacement type of the object by its size */
 {
@@ -591,8 +609,7 @@ const Type* GetUnderlyingType (const Type* Type)
         ** bit-field, instead of the type used in the declaration, the truly
         ** underlying of the bit-field.
         */
-        unsigned Size = (int)(Type->A.B.Width - 1) / (int)CHAR_BITS + 1;
-        switch (Size) {
+        switch (GetBitFieldMinimalTypeSize (Type->A.B.Width)) {
             case SIZEOF_CHAR: Type = IsSignSigned (Type) ? type_schar : type_uchar; break;
             case SIZEOF_INT:  Type = IsSignSigned (Type) ? type_int   : type_uint;  break;
             case SIZEOF_LONG: Type = IsSignSigned (Type) ? type_long  : type_ulong; break;
@@ -646,8 +663,7 @@ TypeCode GetUnderlyingTypeCode (const Type* Type)
         ** bit-field, instead of the type used in the declaration, the truly
         ** underlying of the bit-field.
         */
-        unsigned Size = (int)(Type->A.B.Width - 1) / (int)CHAR_BITS + 1;
-        switch (Size) {
+        switch (GetBitFieldMinimalTypeSize (Type->A.B.Width)) {
             case SIZEOF_CHAR:     Underlying = T_CHAR;      break;
             case SIZEOF_INT:      Underlying = T_INT;       break;
             case SIZEOF_LONG:     Underlying = T_LONG;      break;
@@ -659,6 +675,39 @@ TypeCode GetUnderlyingTypeCode (const Type* Type)
     }
 
     return Underlying;
+}
+
+
+
+const Type* GetBitFieldChunkType (const Type* Type)
+/* Get the type needed to operate on the byte chunk containing the bit-field */
+{
+    unsigned ChunkSize;
+    if ((Type->A.B.Width - 1U) / CHAR_BITS ==
+        (Type->A.B.Offs + Type->A.B.Width - 1U) / CHAR_BITS) {
+        /* T bit-field fits within its underlying type */
+        return GetUnderlyingType (Type);
+    }
+
+    ChunkSize = GetBitFieldMinimalTypeSize (Type->A.B.Offs + Type->A.B.Width);
+    if (ChunkSize < SizeOf (Type + 1)) {
+        /* The end of the bit-field is offset by some bits so that it requires
+        ** more bytes to be accessed as a whole than its underlying type does.
+        ** Note: In cc65 the bit offset is always less than CHAR_BITS.
+        */
+        switch (ChunkSize) {
+            case SIZEOF_CHAR: return IsSignSigned (Type) ? type_schar : type_uchar;
+            case SIZEOF_INT:  return IsSignSigned (Type) ? type_int   : type_uint;
+            case SIZEOF_LONG: return IsSignSigned (Type) ? type_long  : type_ulong;
+            default:          return IsSignSigned (Type) ? type_int   : type_uint;
+        }
+    }
+
+    /* We can always use the declarartion integer type as the chunk type.
+    ** Note: A bit-field will not occupy bits located in bytes more than that
+    ** of its declaration type in cc65. So this is OK.
+    */
+    return Type + 1;
 }
 
 
@@ -967,9 +1016,18 @@ const Type* IntPromotion (const Type* T)
     */
 
     if (IsTypeBitField (T)) {
-        /* The standard rule is OK for now as we don't support bit-fields with widths > 16.
+        /* As we now support long bit-fields, we need modified rules for them:
+        ** - If an int can represent all values of the bit-field, the bit-field is converted
+        **   to an int;
+        ** - Otherwise, if an unsigned int can represent all values of the bit-field, the
+        **   bit-field is converted to an unsigned int;
+        ** - Otherwise, the bit-field will have its declared integer type.
+        ** These rules are borrowed from C++ and seem to be consistent with GCC/Clang's.
         */
-        return T->A.B.Width >= INT_BITS && IsSignUnsigned (T) ? type_uint : type_int;
+        if (T->A.B.Width > INT_BITS) {
+            return IsSignUnsigned (T) ? type_ulong : type_long;
+        }
+        return T->A.B.Width == INT_BITS && IsSignUnsigned (T) ? type_uint : type_int;
     } else if (IsTypeChar (T)) {
         /* An integer can represent all values from either signed or unsigned char, so convert
         ** chars to int.
@@ -1123,6 +1181,15 @@ Type* NewBitFieldType (const Type* T, unsigned BitOffs, unsigned BitWidth)
 
     /* ...and return it */
     return P;
+}
+
+
+
+int IsTypeFragBitField (const Type* T)
+/* Return true if this is a bit-field that shares byte space with other fields */
+{
+    return IsTypeBitField (T) &&
+           (T->A.B.Offs != 0 || T->A.B.Width != CHAR_BITS * SizeOf (T));
 }
 
 

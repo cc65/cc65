@@ -56,6 +56,7 @@
 #include "funcdesc.h"
 #include "function.h"
 #include "global.h"
+#include "initdata.h"
 #include "input.h"
 #include "litpool.h"
 #include "macrotab.h"

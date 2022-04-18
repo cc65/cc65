@@ -93,6 +93,7 @@
     <ClInclude Include="cc65\hexval.h" />
     <ClInclude Include="cc65\ident.h" />
     <ClInclude Include="cc65\incpath.h" />
+    <ClInclude Include="cc65\initdata.h" />
     <ClInclude Include="cc65\input.h" />
     <ClInclude Include="cc65\lineinfo.h" />
     <ClInclude Include="cc65\litpool.h" />
@@ -170,6 +171,7 @@
     <ClCompile Include="cc65\hexval.c" />
     <ClCompile Include="cc65\ident.c" />
     <ClCompile Include="cc65\incpath.c" />
+    <ClCompile Include="cc65\initdata.c" />
     <ClCompile Include="cc65\input.c" />
     <ClCompile Include="cc65\lineinfo.c" />
     <ClCompile Include="cc65\litpool.c" />

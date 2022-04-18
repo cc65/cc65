@@ -5,7 +5,7 @@
 ;
 
         .export         _wherey
-        .import         CURS_Y
+        .include        "extzp.inc"
 
 ;-----------------------------------------------------------------------------
 ; Get cursor Y position

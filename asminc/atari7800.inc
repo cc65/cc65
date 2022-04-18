@@ -8,6 +8,7 @@
 .include "atari7800_maria.inc"
 
 ; constants for the conio implementation
+mono_charsperline    = 40
 charsperline    = 20
 screenrows      = 28
 

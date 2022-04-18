@@ -10,4 +10,6 @@
         .global         ptr7800: zp
         .global         ptrtmp: zp
         .global         cursorzone: zp
+        .global         CURS_X: zp
+        .global         CURS_Y: zp
 

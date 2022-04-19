@@ -156,19 +156,8 @@ void DoIncDecBitField (ExprDesc* Expr, long Val, unsigned KeepResult)
     unsigned    ChunkFlags;
     const Type* ChunkType;
 
-    /* If the bit-field fits within one byte, do the following operations
-    ** with bytes.
-    */
-    if ((Expr->Type->A.B.Width - 1U) / CHAR_BITS ==
-        (Expr->Type->A.B.Offs + Expr->Type->A.B.Width - 1U) / CHAR_BITS) {
-        ChunkType = GetUnderlyingType (Expr->Type);
-    } else {
-        /* We use the declarartion integer type as the chunk type.
-        ** Note: A bit-field will not occupy bits located in bytes more than
-        ** that of its declaration type in cc65. So this is OK.
-        */
-        ChunkType = Expr->Type + 1;
-    }
+    /* Determine the type to operate on the whole byte chunk containing the bit-field */
+    ChunkType = GetBitFieldChunkType (Expr->Type);
 
     /* Determine code generator flags */
     Flags      = TypeOf (Expr->Type) | CF_FORCECHAR;
@@ -254,19 +243,8 @@ static void OpAssignBitField (const GenDesc* Gen, ExprDesc* Expr, const char* Op
     ED_Init (&Expr2);
     Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
 
-    /* If the bit-field fits within one byte, do the following operations
-    ** with bytes.
-    */
-    if ((Expr->Type->A.B.Width - 1U) / CHAR_BITS ==
-        (Expr->Type->A.B.Offs + Expr->Type->A.B.Width - 1U) / CHAR_BITS) {
-        ChunkType = GetUnderlyingType (Expr->Type);
-    } else {
-        /* We use the declarartion integer type as the chunk type.
-        ** Note: A bit-field will not occupy bits located in bytes more than
-        ** that of its declaration type in cc65. So this is OK.
-        */
-        ChunkType = Expr->Type + 1;
-    }
+    /* Determine the type to operate on the whole byte chunk containing the bit-field */
+    ChunkType = GetBitFieldChunkType (Expr->Type);
 
     /* Determine code generator flags */
     Flags      = TypeOf (Expr->Type) | CF_FORCECHAR;
@@ -620,8 +598,8 @@ void OpAssign (const GenDesc* Gen, ExprDesc* Expr, const char* Op)
     if (IsClassStruct (ltype)) {
         /* Copy the struct or union by value */
         CopyStruct (Expr, &Expr2);
-    } else if (IsTypeBitField (ltype)) {
-        /* Special care is needed for bit-field 'op=' */
+    } else if (IsTypeFragBitField (ltype)) {
+        /* Special care is needed for bit-fields if they don't fit in full bytes */
         OpAssignBitField (Gen, Expr, Op);
     } else {
         /* Normal straight 'op=' */

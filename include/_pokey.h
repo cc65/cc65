@@ -131,7 +131,7 @@ struct __pokey_write {
 #define SKCTL_KEYBOARD_SCANNING 0x02 /* Enable keyboard scanning circuit */
 
 /* Fast pot scan
-** The pot scan counter completes its sequence in two TV line times instead of 
+** The pot scan counter completes its sequence in two TV line times instead of
 ** one frame time (228 scan lines). Not as accurate as the normal pot scan
 */
 #define SKCTL_FAST_POT_SCAN     0x04
@@ -204,7 +204,7 @@ struct __pokey_read {
 #define SKSTAT_DATA_READ_INGORING_SHIFTREG 0x10 /* Data can be read directly from the serial input port, ignoring the shift register. */
 #define SKSTAT_KEYBOARD_OVERRUN            0x20 /* Keyboard over-run; Reset BITs 7, 6 and 5 (latches) to 1, using SKREST */
 #define SKSTAT_INPUT_OVERRUN               0x40 /* Serial data input over-run. Reset latches as above. */
-#define SKSTAT_INPUT_FRAMEERROR            0x80 /* Serial data input frame error caused by missing or extra bits. Reset latches as above. */          
+#define SKSTAT_INPUT_FRAMEERROR            0x80 /* Serial data input frame error caused by missing or extra bits. Reset latches as above. */
 
 
 /* KBCODE, internal keyboard codes for Atari 8-bit computers,

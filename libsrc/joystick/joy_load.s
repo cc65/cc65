@@ -87,7 +87,7 @@ ctrl:   .addr   _read
 
 ; Check the driver signature, install the driver. c is already on stack and
 ; will get removed by joy_install().
-; Res = joy_install (ctrl.module);  
+; Res = joy_install (ctrl.module);
 
         lda     ctrl + MOD_CTRL::MODULE
         ldx     ctrl + MOD_CTRL::MODULE+1

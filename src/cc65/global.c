@@ -66,6 +66,7 @@ IntStack CodeSizeFactor     = INTSTACK(100);/* Size factor for generated code */
 IntStack DataAlignment      = INTSTACK(1);  /* Alignment for data */
 
 /* File names */
-StrBuf DepName     = STATIC_STRBUF_INITIALIZER; /* Name of dependencies file */
-StrBuf FullDepName = STATIC_STRBUF_INITIALIZER; /* Name of full dependencies file */
-StrBuf DepTarget   = STATIC_STRBUF_INITIALIZER; /* Name of dependency target */
+StrBuf DepName        = STATIC_STRBUF_INITIALIZER; /* Name of dependencies file */
+StrBuf FullDepName    = STATIC_STRBUF_INITIALIZER; /* Name of full dependencies file */
+StrBuf DepTarget      = STATIC_STRBUF_INITIALIZER; /* Name of dependency target */
+StrBuf DebugTableName = STATIC_STRBUF_INITIALIZER; /* Name of debug table dump file */

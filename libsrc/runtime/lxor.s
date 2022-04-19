@@ -25,7 +25,7 @@ tosxoreax:
 .if (.cpu .bitand ::CPU_ISET_65SC02)
         eor     (sp)            ; byte 0
         ldy     #1
-.else                         
+.else
         ldy     #0
         eor     (sp),y          ; byte 0
         iny

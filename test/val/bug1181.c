@@ -1,5 +1,5 @@
 
-/* bug #1181 - Testing struct member against NULL is broken */ 
+/* bug #1181 - Testing struct member against NULL is broken */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -52,7 +52,7 @@ MENUITEM optionsitems_menu[] = {
 
 static MENU optionsmenu_menu = {
         &optionsitems_menu[0],
-}; 
+};
 
 unsigned char __fastcall__ menu_getnumitems(MENU *menu)
 {

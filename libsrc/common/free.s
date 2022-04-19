@@ -274,7 +274,7 @@ _free:  sta     ptr2
 ;     }
 ; }
 ;
-; 
+;
 ; On entry, ptr2 must contain a pointer to the block, which must be at least
 ; HEAP_MIN_BLOCKSIZE bytes in size, and ptr1 contains the total size of the
 ; block.

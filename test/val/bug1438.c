@@ -1,5 +1,5 @@
 
-/* Issue #1438 fix #1439 - crash in cc65, related to delayed post-counting 
+/* Issue #1438 fix #1439 - crash in cc65, related to delayed post-counting
 
   this is an odd issue, the compile would crash *sometimes*, perhaps in one
   of ten compilation runs.

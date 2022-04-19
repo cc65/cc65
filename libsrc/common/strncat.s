@@ -9,19 +9,19 @@
 .import         popax, popptr1
 .importzp       ptr1, ptr2, ptr3, tmp1, tmp2
 .macpack        cpu
-        
+
 _strncat:
     inx
     stx tmp2
     tax
     inx
     stx tmp1        ; save count with each byte incremented separately
-    
+
     jsr popptr1     ; get src
 
     jsr popax       ; get dest
     sta ptr3        ; remember for function return
-    stx ptr3+1          
+    stx ptr3+1
     stx ptr2+1
     tay             ; low byte as offset in Y
 .if (.cpu .bitand ::CPU_ISET_65SC02)

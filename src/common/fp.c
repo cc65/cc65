@@ -134,7 +134,7 @@ Float FP_F_Sub (Float Left, Float Right)
 
 
 Float FP_F_Mul (Float Left, Float Right)
-/* Multiplicate two floats */
+/* Multiply two floats */
 {
     Float D;
     D.V = Left.V * Right.V;
@@ -220,7 +220,7 @@ Double FP_D_Sub (Double Left, Double Right)
 
 
 Double FP_D_Mul (Double Left, Double Right)
-/* Multiplicate two floats */
+/* Multiply two floats */
 {
     Double D;
     D.V = Left.V * Right.V;

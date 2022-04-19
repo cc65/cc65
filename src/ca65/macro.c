@@ -637,7 +637,7 @@ void MacUndef (const StrBuf* Name, unsigned char Style)
 
 
 static int MacExpand (void* Data)
-/* If we're currently expanding a macro, set the the scanner token and
+/* If we're currently expanding a macro, set the scanner token and
 ** attribute to the next value and return true. If we are not expanding
 ** a macro, return false.
 */

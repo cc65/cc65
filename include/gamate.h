@@ -145,6 +145,8 @@
 
 /* constants for the conio implementation */
 #define COLOR_BLACK     0x03
+#define COLOR_GRAY2     0x02
+#define COLOR_GRAY1     0x01
 #define COLOR_WHITE     0x00
 
 #define CH_HLINE        1

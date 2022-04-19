@@ -128,7 +128,7 @@ Platforms:      Runs on all platforms that have TGI support:
 
 =============================================================================
 
-Platform specific samples follow:
+Platform-specific samples follow:
 
 atari 2600:
 -----------
@@ -196,6 +196,27 @@ gamate:
 
 Name:           nachtm
 Description:    Plays "Eine kleine Nachtmusik" by Wolfgang Amadeus Mozart.
+-----------------------------------------------------------------------------
+
+lynx:
+-----
+
+These programs are adapted for the Atari Lynx because its library has no conio
+output or stdio.
+
+Name:           hello
+Description:    A nice "Hello world" type program that uses the TGI graphics
+                library for output.
+
+Name:           mandelbrot
+Description:    A mandelbrot demo using integer arithmetic. The demo was
+                written by groepaz, and converted to cc65 using TGI graphics
+                by Stefan Haubenthal.
+
+Name:           tgidemo
+Description:    Shows some of the graphics capabilities of the "Tiny Graphics
+                Interface".
+
 -----------------------------------------------------------------------------
 
 sym1:

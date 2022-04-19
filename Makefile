@@ -1,4 +1,4 @@
-.PHONY: all mostlyclean clean install zip avail unavail bin lib doc html info samples test util
+.PHONY: all mostlyclean clean install zip avail unavail bin lib doc html info samples test util check
 
 .SUFFIXES:
 
@@ -23,6 +23,9 @@ samples:
 
 test:
 	@$(MAKE) -C test    --no-print-directory $@
+
+check:
+	@$(MAKE) -C .github/checks --no-print-directory $@
 
 util:
 	@$(MAKE) -C util    --no-print-directory $@

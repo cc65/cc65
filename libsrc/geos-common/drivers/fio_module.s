@@ -38,21 +38,21 @@ _open:
         jsr popax               ; Get flags
         sta tmp1
         jsr popptr1             ; Get name
-            
+
         lda filedesc            ; is there a file already open?
         bne @alreadyopen
-            
+
         lda tmp1                ; check open mode
         and #(O_RDWR | O_CREAT)
         cmp #O_RDONLY           ; only O_RDONLY is valid
         bne @badmode
-            
+
         lda ptr1
         ldx ptr1+1
         jsr _FindFile           ; try to find the file
         tax
         bne @oserror
-            
+
         lda dirEntryBuf + OFF_DE_TR_SC ; tr&se for ReadByte (r1)
         sta f_track
         lda dirEntryBuf + OFF_DE_TR_SC + 1

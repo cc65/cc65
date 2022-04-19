@@ -25,6 +25,7 @@
 #include "funcdesc.h"
 #include "function.h"
 #include "global.h"
+#include "initdata.h"
 #include "litpool.h"
 #include "loadexpr.h"
 #include "macrotab.h"
@@ -216,8 +217,11 @@ void LimitExprValue (ExprDesc* Expr)
             break;
 
         case T_LONG:
+            Expr->IVal = (int32_t)Expr->IVal;
+            break;
+
         case T_ULONG:
-            /* No need to do anything */
+            Expr->IVal = (uint32_t)Expr->IVal;
             break;
 
         case T_SCHAR:
@@ -395,7 +399,7 @@ static void DoInc (ExprDesc* Expr, unsigned KeepResult)
     Val = IsTypePtr (Expr->Type) ? CheckedSizeOf (Expr->Type + 1) : 1;
 
     /* Special treatment is needed for bit-fields */
-    if (IsTypeBitField (Expr->Type)) {
+    if (IsTypeFragBitField (Expr->Type)) {
         DoIncDecBitField (Expr, Val, KeepResult);
         return;
     }
@@ -482,7 +486,7 @@ static void DoDec (ExprDesc* Expr, unsigned KeepResult)
     Val = IsTypePtr (Expr->Type) ? CheckedSizeOf (Expr->Type + 1) : 1;
 
     /* Special treatment is needed for bit-fields */
-    if (IsTypeBitField (Expr->Type)) {
+    if (IsTypeFragBitField (Expr->Type)) {
         DoIncDecBitField (Expr, -Val, KeepResult);
         return;
     }
@@ -846,7 +850,7 @@ static unsigned FunctionArgList (FuncDesc* Func, int IsFastcall, ExprDesc* ED)
     /* The function returns the size of all arguments pushed onto the stack.
     ** However, if there are parameters missed (which is an error, and was
     ** flagged by the compiler), AND a stack frame was preallocated above,
-    ** we would loose track of the stackpointer, and generate an internal error
+    ** we would lose track of the stackpointer, and generate an internal error
     ** later. So we correct the value by the parameters that should have been
     ** pushed into, to avoid an internal compiler error. Since an error was
     ** generated before, no code will be output anyway.
@@ -2584,12 +2588,9 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                     CmpSigned = 0;
                     flags |= CF_UNSIGNED;
                 }
+
             } else {
                 unsigned rtype = TypeOf (Expr2.Type) | (flags & CF_CONST);
-                if (CmpSigned) {
-                    ltype &= ~CF_UNSIGNED;
-                    rtype &= ~CF_UNSIGNED;
-                }
                 flags |= g_typeadjust (ltype, rtype);
             }
 
@@ -3786,7 +3787,7 @@ static void hieOr (ExprDesc *Expr)
             /* Load false only if the result is not true */
             g_getimmed (CF_INT | CF_CONST, 0, 0);   /* Load FALSE */
             g_falsejump (CF_NONE, DoneLab);
- 
+
             /* Load the true value */
             g_defcodelabel (TrueLab);
             g_getimmed (CF_INT | CF_CONST, 1, 0);   /* Load TRUE */

@@ -1,5 +1,5 @@
 /*
-  Copyright 2020 The cc65 Authors
+  Copyright 2022 The cc65 Authors
 
   This software is provided 'as-is', without any express or implied
   warranty. In no event will the authors be held liable for any damages
@@ -19,45 +19,26 @@
 */
 
 /*
-  Tests that plain int bit-fields are unsigned.
+  Tests of unsigned short/unsigned int vs signed long comparisons;
+  see https://github.com/cc65/cc65/issues/1696
 */
 
 #include <stdio.h>
 
 static unsigned char failures = 0;
 
-static struct plain_ints {
-    int x : 4;
-    int y : 10;
-} pi = {15, 700};
-
-static void test_plain_int_bitfields (void)
+int main(void)
 {
-    if (pi.x != 15) {
-        printf ("Got pi.x = %u, expected 15.\n", pi.x);
-        failures++;
+    unsigned int x = 65535;
+    unsigned short y = 65535;
+    if (!(x > 1L)) {
+        printf("x = %ld but x > 1L failed\n", (long)x);
+        ++failures;
     }
-    if (pi.y != 700) {
-        printf ("Got pi.y = %u, expected 700.\n", pi.y);
-        failures++;
+    if (!(y == 65535L)) {
+        printf("y = %ld but y == 65535L failed\n", (long)y);
+        ++failures;
     }
-
-    pi.x = 3;
-    pi.y = 1023;
-
-    if (pi.x != 3) {
-        printf ("Got pi.x = %u, expected 3.\n", pi.x);
-        failures++;
-    }
-    if (pi.y != 1023) {
-        printf ("Got pi.y = %u, expected 1023.\n", pi.y);
-        failures++;
-    }
-}
-
-int main (void)
-{
-    test_plain_int_bitfields ();
-    printf ("failures: %u\n", failures);
+    printf("failures: %u\n", failures);
     return failures;
 }

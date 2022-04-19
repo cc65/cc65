@@ -17,7 +17,7 @@
 @L1:    lda     _tgi_curx,y
         sta     tgi_clip_x1,y
         dey
-        bpl     @L1  
+        bpl     @L1
         pla
         jsr     tgi_linepop     ; Pop x2/y2
         jmp     tgi_clippedline ; Call the line clipper

@@ -4,7 +4,9 @@
 
 [Documentation](https://cc65.github.io/doc)
 
-[Wiki](https://github.com/cc65/wiki/wiki)
+[Contributing](Contributing.md) to the CC65 project.
+
+The [Wiki](https://github.com/cc65/wiki/wiki) contains extra info that does not fit into the regular documentation.
 
 [![Snapshot Build](https://github.com/cc65/cc65/actions/workflows/snapshot-on-push-master.yml/badge.svg?branch=master)](https://github.com/cc65/cc65/actions/workflows/snapshot-on-push-master.yml)
 
@@ -27,6 +29,7 @@ including
 - the Atari 8-bit machines.
 - the Atari 2600 console.
 - the Atari 5200 console.
+- the Atari 7800 console.
 - GEOS for the C64, C128 and Apple //e.
 - the Bit Corporation Gamate console.
 - the NEC PC-Engine (aka TurboGrafx-16) console.

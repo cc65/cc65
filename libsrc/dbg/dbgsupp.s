@@ -58,7 +58,7 @@ DbgBreak:
         .res    256
 DbgStack:
 
-; Swap space for the the C temporaries
+; Swap space for the C temporaries
 
 CTemp:
 _DbgCS: .res    2               ; sp

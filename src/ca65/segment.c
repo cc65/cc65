@@ -417,7 +417,7 @@ void SegDone (void)
                     if ((F->Len == 1 && ED.AddrSize > ADDR_SIZE_ZP)  ||
                         (F->Len == 2 && ED.AddrSize > ADDR_SIZE_ABS) ||
                         (F->Len == 3 && ED.AddrSize > ADDR_SIZE_FAR)) {
-                        LIError (&F->LI, "Range error");
+                        LIError (&F->LI, "Range error (Address size %u does not match fragment size %u)", ED.AddrSize, F->Len);
                     }
                 }
 

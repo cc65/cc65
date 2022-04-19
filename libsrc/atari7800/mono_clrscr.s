@@ -4,7 +4,7 @@
         .export _mono_clrscr
 
         .import _mono_screen
-        .import pusha0,pushax
+        .import pushax, __bzero
         .include "extzp.inc"
 
         .code
@@ -13,22 +13,10 @@
 
         lda     #<_mono_screen
         ldx     #>_mono_screen
-        sta     ptr7800
-        stx     ptr7800+1
-        ldx     #screenrows
-@L1:    ldy     #mono_charsperline
-        lda     #0
-@L2:    sta     (ptr7800),y
-        dey
-        bne     @L2
-        lda     ptr7800
-        clc
-        adc     #mono_charsperline
-        bcc     @L3
-        inc     ptr7800+1
-@L3:    dex
-        bne     @L1
-        rts
+        jsr     pushax
+        ldx     #>(mono_charsperline * screenrows)
+        lda     #<(mono_charsperline * screenrows)
+        jmp     __bzero
 
         .endproc
 

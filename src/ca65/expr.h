@@ -172,7 +172,7 @@ ExprNode* FuncHiByte (void);
 /* Handle the .HIBYTE builtin function */
 
 ExprNode* MakeBoundedExpr (ExprNode* Expr, unsigned Size);
-/* Force the given expression into a specific size of ForceRange is true */
+/* Force the given expression into a specific size if ForceRange is true */
 
 ExprNode* BoundedExpr (ExprNode* (*ExprFunc) (void), unsigned Size);
 /* Parse an expression and force it within a given size if ForceRange is true */

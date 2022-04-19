@@ -31,7 +31,7 @@ else
   CL := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)
   LD := $(if $(wildcard ../../bin/ld65*),../../bin/ld65,ld65)
   SP := $(if $(wildcard ../../bin/sp65*),../../bin/sp65,sp65)
-endif 
+endif
 
 ifneq ($(filter disk samples.%,$(MAKECMDGOALS)),)
   ifdef CC65_HOME

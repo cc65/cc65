@@ -219,8 +219,12 @@ vblankoff:
         sta     BKGRND
         sta     CURS_X
         sta     CURS_Y
-        lda     #$0f            ; White
+        lda     #$33            ; Red
         sta     P0C1
+        lda     #$c8            ; Green
+        sta     P0C2
+        lda     #$0f            ; White
+        sta     P0C3
         rts
 
         .endproc

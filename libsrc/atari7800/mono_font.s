@@ -1,3 +1,16 @@
+; The internal font structure for Atari7800 needs a full set of 256
+; characters. Each character is 8 x 8 bits.
+; The font consists of 8 rows of data:
+; row7
+; row6
+; row5
+; row4
+; row3
+; row2
+; row1
+; row0
+; Each row is 256 bytes long
+
         .export _mono_font
         .segment "RODATA"
         .align  256

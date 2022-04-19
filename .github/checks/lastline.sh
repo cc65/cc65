@@ -17,9 +17,9 @@ done`
 cd $OLDCWD
 
 if [ x"$FILES"x != xx ]; then
-    echo "error: found following files that have no newline at the end:"
+    echo "error: found following files that have no newline at the end:" >&2
     for n in $FILES; do
-        echo $n
+        echo $n >&2
     done
     exit -1
 fi

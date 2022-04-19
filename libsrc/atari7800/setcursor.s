@@ -42,7 +42,7 @@
 ;
 
 blink_time:
-        .byte   255
+        .byte   140
 
         .code
 
@@ -177,9 +177,6 @@ umula0:
 ; Offset to cursor zone 5.
 ;
         .proc   blink_cursor
-        lda     blink_time
-        cmp     #255
-        beq     @L3
         inc     blink_time
         bne     @L3
         lda     #140

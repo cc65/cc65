@@ -43,6 +43,7 @@
 
 /* ca65 */
 #include "error.h"
+#include "expr.h"
 #include "segment.h"
 #include "studyexpr.h"
 #include "symtab.h"
@@ -186,6 +187,57 @@ static void ED_MergeAddrSize (ExprDesc* ED, const ExprDesc* Right)
     }
 }
 
+
+static void ED_MergeAddrSizeAND (ExprNode* Expr, ExprDesc* ED, const ExprDesc* Right)
+/* Merge the address sizes of two expressions into ED, special case for AND operator */
+{
+    int ConstL, ConstR;
+    long Val, ValR;
+
+    if (ED->AddrSize == ADDR_SIZE_DEFAULT) {
+        /* If ED is valid, ADDR_SIZE_DEFAULT gets always overridden, otherwise
+        ** it takes precedence over anything else.
+        */
+        if (ED_IsValid (ED)) {
+            ED->AddrSize = Right->AddrSize;
+        }
+    } else if (Right->AddrSize == ADDR_SIZE_DEFAULT) {
+        /* If Right is valid, ADDR_SIZE_DEFAULT gets always overridden,
+        ** otherwise it takes precedence over anything else.
+        */
+        if (!ED_IsValid (Right)) {
+            ED->AddrSize = Right->AddrSize;
+        }
+    } else {
+        /* Neither ED nor Right has a default address size, use the smaller of
+        ** the two.
+        */
+        if (Right->AddrSize < ED->AddrSize) {
+            ED->AddrSize = Right->AddrSize;
+        }
+    }
+    /* Check if either side of the expression is constant */
+    ConstL = IsConstExpr (Expr->Left, &Val);
+    ConstR = IsConstExpr (Expr->Right, &ValR);
+    if (!ConstL && !ConstR) {
+        /* If neither part of the expression is constant, the above is all we can do */
+        return;
+    }
+    /* Use the constant side of the expression */
+    if (ConstR) {
+        Val = ValR;
+    }
+    /* Figure out the size of the constant value and use that as expression size */
+    if (IsByteRange (Val)) {
+        ED->AddrSize = ADDR_SIZE_ZP;
+    } else if (IsWordRange (Val)) {
+        ED->AddrSize = ADDR_SIZE_ABS;
+    } else if (IsFarRange (Val)) {
+        ED->AddrSize = ADDR_SIZE_FAR;
+    } else {
+        ED->AddrSize = ADDR_SIZE_DEFAULT;
+    }
+}
 
 
 static ED_SymRef* ED_FindSymRef (ExprDesc* ED, SymEntry* Sym)
@@ -489,7 +541,11 @@ static void StudyBinaryExpr (ExprNode* Expr, ExprDesc* D)
 
         /* Merge references and update address size */
         ED_MergeRefs (D, &Right);
-        ED_MergeAddrSize (D, &Right);
+        if (Expr->Op == EXPR_AND) {
+            ED_MergeAddrSizeAND (Expr, D, &Right);
+        } else {
+            ED_MergeAddrSize (D, &Right);
+        }
 
     }
 

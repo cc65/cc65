@@ -68,6 +68,7 @@ color  := $0787
 ## Assembly Sources
 
 * Op-code mnemonics must have lower-case letters.  The names of instruction macroes may have upper-case letters.
+* Op-codes must use their official and commonly used mnemonics, ie bcc and bcs and not bgt and blt
 * Hexadecimal number constants should be used except where decimal or binary numbers make much more sense in that constant's context.
 * Hexadecimal letters should be upper-case.
 * When you set two registers or two memory locations to an immediate 16-bit zero, you should use the expressions ```#<$0000``` and ```#>$0000``` (they make it obvious where you are putting the lower and upper bytes).

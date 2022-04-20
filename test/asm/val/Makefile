@@ -28,7 +28,7 @@ CA65 := $(if $(wildcard ../../../bin/ca65*),..$S..$S..$Sbin$Sca65,ca65)
 LD65 := $(if $(wildcard ../../../bin/ld65*),..$S..$S..$Sbin$Sld65,ld65)
 SIM65 := $(if $(wildcard ../../../bin/sim65*),..$S..$S..$Sbin$Ssim65,sim65)
 
-WORKDIR = ../../testwrk/asm/val
+WORKDIR = ../../../testwrk/asm/val
 
 .PHONY: all clean
 

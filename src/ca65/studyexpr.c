@@ -192,6 +192,7 @@ static void ED_MergeAddrSizeAND (ExprNode* Expr, ExprDesc* ED, const ExprDesc* R
 /* Merge the address sizes of two expressions into ED, special case for AND operator */
 {
     int ConstL, ConstR;
+    int Size, ConstSize;
     long Val, ValR;
 
     if (ED->AddrSize == ADDR_SIZE_DEFAULT) {
@@ -223,19 +224,33 @@ static void ED_MergeAddrSizeAND (ExprNode* Expr, ExprDesc* ED, const ExprDesc* R
         /* If neither part of the expression is constant, the above is all we can do */
         return;
     }
-    /* Use the constant side of the expression */
+    /* We start assuming the left side is constant, left value is in Val, right
+       size in Size */
+    Size = Right->AddrSize;
+    /* Now check if the right side is constant, and if so put the right value
+       into Val and the Left size into Size. */
     if (ConstR) {
         Val = ValR;
+        Size = ED->AddrSize;
     }
-    /* Figure out the size of the constant value and use that as expression size */
+    /* Figure out the size of the constant value */
     if (IsByteRange (Val)) {
-        ED->AddrSize = ADDR_SIZE_ZP;
+        ConstSize = ADDR_SIZE_ZP;
     } else if (IsWordRange (Val)) {
-        ED->AddrSize = ADDR_SIZE_ABS;
+        ConstSize = ADDR_SIZE_ABS;
     } else if (IsFarRange (Val)) {
-        ED->AddrSize = ADDR_SIZE_FAR;
+        ConstSize = ADDR_SIZE_FAR;
     } else {
-        ED->AddrSize = ADDR_SIZE_DEFAULT;
+        ConstSize = ADDR_SIZE_DEFAULT;
+    }
+
+    if (Size == ADDR_SIZE_DEFAULT) {
+        ED->AddrSize = ConstSize;
+    } else if (ConstSize == ADDR_SIZE_DEFAULT) {
+        ED->AddrSize = Size;
+    } else {
+        /* use the smaller of the two sizes */
+        ED->AddrSize = (ConstSize < Size) ? ConstSize : Size;
     }
 }
 

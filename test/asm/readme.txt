@@ -17,3 +17,10 @@ Overall tests:
 --------------
 
 These go into listing/. Refer to listing/readme.txt
+
+Val:
+----
+
+Works very much like the /val directory used to test the compiler -  individual
+tests are run in the simulator and should exit with an exit code of 0 when they
+pass, or either -1 or a number indicating what part of the test failed on error.

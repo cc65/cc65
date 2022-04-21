@@ -28,6 +28,7 @@
         .interruptor    blink_cursor
 
         .importzp       sp
+        .import         _zonecounter
         .import         _zones
         .import         cursor
         .import         pusha, incsp1, pusha0, pushax, popa
@@ -177,6 +178,9 @@ umula0:
 ; Offset to cursor zone 5.
 ;
         .proc   blink_cursor
+        lda     _zonecounter
+        and     #01
+        beq     @L3
         inc     blink_time
         bne     @L3
         lda     #140

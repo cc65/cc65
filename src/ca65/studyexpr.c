@@ -241,13 +241,11 @@ static void ED_MergeAddrSizeAND (ExprNode* Expr, ExprDesc* ED, const ExprDesc* R
     } else if (IsFarRange (Val)) {
         ConstSize = ADDR_SIZE_FAR;
     } else {
-        ConstSize = ADDR_SIZE_DEFAULT;
+        ConstSize = ADDR_SIZE_LONG;
     }
 
     if (Size == ADDR_SIZE_DEFAULT) {
         ED->AddrSize = ConstSize;
-    } else if (ConstSize == ADDR_SIZE_DEFAULT) {
-        ED->AddrSize = Size;
     } else {
         /* use the smaller of the two sizes */
         ED->AddrSize = (ConstSize < Size) ? ConstSize : Size;

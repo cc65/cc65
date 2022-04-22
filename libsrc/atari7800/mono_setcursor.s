@@ -43,7 +43,7 @@
 ;
 
 blink_time:
-        .byte   140
+        .byte   200
 
         .code
 
@@ -181,7 +181,7 @@ umula0:
         beq     @L3
         inc     blink_time
         bne     @L3
-        lda     #140
+        lda     #200
         sta     blink_time
         ldy     #0
         lda     (cursorzone),y

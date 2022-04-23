@@ -29,8 +29,8 @@ loop:
         BRK_TELEMON XRD0     ; Waits until key is pressed
         bcs     loop
         rts
-@out:   
+@out:
         ldx     #$00
         stx     store_char
-        rts        
+        rts
 .endproc

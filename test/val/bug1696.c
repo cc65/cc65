@@ -29,16 +29,16 @@ static unsigned char failures = 0;
 
 int main(void)
 {
-	unsigned int x = 65535;
-	unsigned short y = 65535;
-	if (!(x > 1L)) {
-		printf("x = %ld but x > 1L failed\n", (long)x);
-		++failures;
-	}
-	if (!(y == 65535L)) {
-		printf("y = %ld but y == 65535L failed\n", (long)y);
-		++failures;
-	}
+    unsigned int x = 65535;
+    unsigned short y = 65535;
+    if (!(x > 1L)) {
+        printf("x = %ld but x > 1L failed\n", (long)x);
+        ++failures;
+    }
+    if (!(y == 65535L)) {
+        printf("y = %ld but y == 65535L failed\n", (long)y);
+        ++failures;
+    }
     printf("failures: %u\n", failures);
     return failures;
 }

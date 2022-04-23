@@ -1,14 +1,14 @@
-        .export		_zonecounter
-        .export		 __STARTUP__ : absolute = 1
-        .export		 _exit
-        .import		 __ROM_START__
-        .import		 __RAM3_START__, __RAM3_SIZE__
-        .import		 initlib, donelib
-        .import		 zerobss, copydata
-        .import		 IRQStub
-        .import		 push0, _main
-        .include        "atari7800.inc"
-	.include	"zeropage.inc"
+        .export     _zonecounter
+        .export     __STARTUP__ : absolute = 1
+        .export     _exit
+        .import     __ROM_START__
+        .import     __RAM3_START__, __RAM3_SIZE__
+        .import     initlib, donelib
+        .import     zerobss, copydata
+        .import     IRQStub
+        .import     push0, _main
+        .include    "atari7800.inc"
+        .include    "zeropage.inc"
 
 INPTCTRL        =       $01
 
@@ -19,7 +19,7 @@ start:
         sei                     ; Initialize 6502
         cld
         lda     #$07            ; Lock machine in 7800 mode
-        sta     INPTCTRL                
+        sta     INPTCTRL
         lda     #$7f            ; DMA off
         sta     CTRL
         ldx     #0              ; OFFSET must always be 0
@@ -28,7 +28,7 @@ start:
         dex                     ; Stack pointer = $ff
         txs
 
-        ; Set up parameter stack        
+        ; Set up parameter stack
         lda     #<(__RAM3_START__ + __RAM3_SIZE__)
         sta     sp
         lda     #>(__RAM3_START__ + __RAM3_SIZE__)
@@ -48,9 +48,9 @@ _exit:
         jsr     donelib
         jmp     start
 
-NMIHandler:        
+NMIHandler:
         inc     _zonecounter
-        jmp	IRQStub
+        jmp     IRQStub
 
 IRQHandler:
         rti

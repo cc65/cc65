@@ -41,9 +41,9 @@ pusheax:
         pla
 .if (.cpu .bitand ::CPU_ISET_65SC02)
         sta     (sp)
-.else        
+.else
         dey
         sta     (sp),y
-.endif        
+.endif
         rts
 

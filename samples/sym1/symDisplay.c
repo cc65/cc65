@@ -14,7 +14,7 @@ int main (void) {
    int  flashes     = 255;
    int  displayable = 1;
    int  e           = 0;
-   int  r           = 0;  
+   int  r           = 0;
    int  d           = 0;
    int  i           = 0;
    int  l           = 0;
@@ -40,7 +40,7 @@ int main (void) {
       puts ("\n\nHow many times (0 for forever) to repeat?");
       c = getchar();
       if ( (c >= '0') && (c <= '9') ) {// between 1 and 9 loops allowed
-         z = 1;                        // a number was pressed 
+         z = 1;                        // a number was pressed
          t = c - '0';                  // convert char to int
          puts ("\n\nLook at the front panel.\n");
       }

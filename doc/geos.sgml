@@ -1332,7 +1332,7 @@ This function returns the GEOS Kernal version combined (by logical OR) with the 
 <p>
 This function returns the PAL/NTSC flag combined (by logical OR) with the 40/80 columns flag. This is
 not the best way to check if the screen has 40 or 80 columns since a PAL/NTSC check is always
-performed and it can take as long as a full raster frame. If you just want to know if the 
+performed and it can take as long as a full raster frame. If you just want to know if the
 screen has 40 or 80 columns use the expression <tt/graphMode & 0x80/ which returns <tt/0/ for
 40 columns and <tt/0x80/ for 80 columns. Remember that this value can be changed during
 runtime. It is unclear if this will work for GEOS 64 so you probably do not want to test

@@ -8,5 +8,5 @@
             .export _SetDevice
 
             .include "jumptab.inc"
-        
+
 _SetDevice      = SetDevice

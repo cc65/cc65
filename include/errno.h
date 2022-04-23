@@ -84,7 +84,7 @@ extern int _errno;
 
 
 int __fastcall__ _osmaperrno (unsigned char oserror);
-/* Map an operating system specific error code (for example from _oserror) 
+/* Map an operating system specific error code (for example from _oserror)
 ** into one of the E... codes above. It is user callable.
 */
 

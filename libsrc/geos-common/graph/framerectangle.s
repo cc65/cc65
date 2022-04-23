@@ -8,5 +8,5 @@
             .export _FrameRectangle
 
             .include "jumptab.inc"
-            
+
 _FrameRectangle = FrameRectangle

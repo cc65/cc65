@@ -38,7 +38,7 @@ DIR* __fastcall__ opendir (register const char* name)
     d.fd = open (d.name, O_RDONLY);
     if (d.fd >= 0) {
 
-        /* Skip the load address */         
+        /* Skip the load address */
         if (_dirread (&d, buf, sizeof (buf))) {
 
             /* Allocate memory for the DIR structure returned */

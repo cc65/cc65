@@ -8,7 +8,7 @@
         .export         _cputsxy, _cputs
         .import         gotoxy, _cputc
         .importzp       ptr1, tmp1
-                 
+
 _cputsxy:
         sta     ptr1            ; Save s for later
         stx     ptr1+1

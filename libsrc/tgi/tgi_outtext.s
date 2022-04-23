@@ -125,7 +125,7 @@ VectorFont:
         jsr     MoveCursor              ; Move the graphics cursor
 
 ; Next char in string
-                                        
+
         inc     text
         bne     @L1
         inc     text+1

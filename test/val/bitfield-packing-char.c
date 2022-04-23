@@ -1,5 +1,5 @@
 /*
-  Copyright 2020 The cc65 Authors
+  Copyright 2020-2022 The cc65 Authors
 
   This software is provided 'as-is', without any express or implied
   warranty. In no event will the authors be held liable for any damages
@@ -19,14 +19,17 @@
 */
 
 /*
-  Tests of bit-field packing; see https://github.com/cc65/cc65/issues/1054
+  Tests of char bit-field packing and typedef works with them; see issues below
+  - packing issue: https://github.com/cc65/cc65/issues/1054
+  - typedef issue: https://github.com/cc65/cc65/pull/1662
+  - char bit-field support: https://github.com/cc65/cc65/issues/1047
 */
 
 #include <stdio.h>
 
 static unsigned char failures = 0;
 
-typedef unsigned int field_type;
+typedef unsigned char field_type;
 
 static struct four_bits {
     field_type x : 4;
@@ -58,17 +61,17 @@ static void test_four_bits(void)
   having additional fields.
 */
 
-static struct four_bits_with_int {
+static struct four_bits_with_char {
     field_type x : 4;
     field_type y;
 } fbi = {1, 2};
 
-static void test_four_bits_with_int(void)
+static void test_four_bits_with_char(void)
 {
-    /* The first 4-bit bit-field just takes one byte, so the size is 3.  */
-    if (sizeof(struct four_bits_with_int) != 3) {
-        printf("Got sizeof(struct four_bits_with_int) = %zu, expected 3.\n",
-               sizeof(struct four_bits_with_int));
+    /* The first 4-bit bit-field just takes one byte, so the size is 2.  */
+    if (sizeof(struct four_bits_with_char) != 2) {
+        printf("Got sizeof(struct four_bits_with_char) = %zu, expected 2.\n",
+               sizeof(struct four_bits_with_char));
         failures++;
     }
 
@@ -97,15 +100,15 @@ static void test_four_bits_with_int(void)
 }
 
 static struct overlap {
-    field_type x : 10;
-    field_type y : 10;
+    field_type x : 6;
+    field_type y : 6;
 } o = {11, 22};
 
 /* Tests that bit-fields can share allocation units. */
 static void test_overlap(void)
 {
-    if (sizeof(struct overlap) != 3) {
-        printf("Got sizeof(struct overlap) = %zu, expected 3.\n",
+    if (sizeof(struct overlap) != 2) {
+        printf("Got sizeof(struct overlap) = %zu, expected 2.\n",
                sizeof(struct overlap));
         failures++;
     }
@@ -134,65 +137,65 @@ static void test_overlap(void)
     }
 }
 
-static struct overlap_with_int {
-    field_type x : 10;
-    field_type y : 10;
+static struct overlap_with_char {
+    field_type x : 6;
+    field_type y : 6;
     field_type z;
-} oi = {111, 222, 333};
+} oi = {11, 22, 33};
 
-static void test_overlap_with_int(void)
+static void test_overlap_with_char(void)
 {
-    /* First two fields in 3 bytes, then another 2 bytes. */
-    if (sizeof(struct overlap_with_int) != 5) {
-        printf("Got sizeof(struct overlap_with_int) = %zu, expected 5.\n",
-               sizeof(struct overlap_with_int));
+    /* First two fields in 2 bytes, then another 1 byte. */
+    if (sizeof(struct overlap_with_char) != 3) {
+        printf("Got sizeof(struct overlap_with_char) = %zu, expected 3.\n",
+               sizeof(struct overlap_with_char));
         failures++;
     }
 
-    if (oi.x != 111) {
-        printf("Got oi.x = %u, expected 111.\n", oi.x);
+    if (oi.x != 11) {
+        printf("Got oi.x = %u, expected 11.\n", oi.x);
         failures++;
     }
 
-    if (oi.y != 222) {
-        printf("Got oi.y = %u, expected 222.\n", oi.y);
+    if (oi.y != 22) {
+        printf("Got oi.y = %u, expected 22.\n", oi.y);
         failures++;
     }
 
-    if (oi.z != 333) {
-        printf("Got oi.z = %u, expected 333.\n", oi.z);
+    if (oi.z != 33) {
+        printf("Got oi.z = %u, expected 33.\n", oi.z);
         failures++;
     }
 
-    oi.x = 444;
-    oi.y = 555;
-    oi.z = 666;
+    oi.x = 44;
+    oi.y = 55;
+    oi.z = 66;
 
-    if (oi.x != 444) {
-        printf("Got oi.x = %u, expected 444.\n", oi.x);
+    if (oi.x != 44) {
+        printf("Got oi.x = %u, expected 44.\n", oi.x);
         failures++;
     }
 
-    if (oi.y != 555) {
-        printf("Got oi.y = %u, expected 555.\n", oi.y);
+    if (oi.y != 55) {
+        printf("Got oi.y = %u, expected 55.\n", oi.y);
         failures++;
     }
 
-    if (oi.z != 666) {
-        printf("Got oi.z = %u, expected 666.\n", oi.z);
+    if (oi.z != 66) {
+        printf("Got oi.z = %u, expected 66.\n", oi.z);
         failures++;
     }
 }
 
 static struct full_width {
     field_type x : 8;
-    field_type y : 16;
+    field_type y : 8;
 } fw = {255, 17};
 
 static void test_full_width(void)
 {
-    if (sizeof(struct full_width) != 3) {
-        printf("Got sizeof(struct full_width) = %zu, expected 3.\n",
+    if (sizeof(struct full_width) != 2) {
+        printf("Got sizeof(struct full_width) = %zu, expected 2.\n",
                sizeof(struct full_width));
         failures++;
     }
@@ -208,15 +211,15 @@ static void test_full_width(void)
     }
 
     fw.x = 42;
-    fw.y = 1023;
+    fw.y = 255;
 
     if (fw.x != 42) {
         printf("Got fw.x = %u, expected 42.\n", fw.x);
         failures++;
     }
 
-    if (fw.y != 1023) {
-        printf("Got fw.y = %u, expected 1023.\n", fw.y);
+    if (fw.y != 255) {
+        printf("Got fw.y = %u, expected 255.\n", fw.y);
         failures++;
     }
 }
@@ -224,17 +227,15 @@ static void test_full_width(void)
 static struct aligned_end {
     field_type : 2;
     field_type x : 6;
-    field_type : 3;
-    field_type y : 13;
-    /* z crosses a byte boundary, but fits in a byte when shifted. */
+    /* y crosses a byte boundary, but fits in a byte when shifted. */
     field_type : 6;
-    field_type z : 7;
-} ae = {63, 17, 100};
+    field_type y : 7;
+} ae = {63, 17};
 
 static void test_aligned_end(void)
 {
-    if (sizeof(struct aligned_end) != 5) {
-        printf("Got sizeof(struct aligned_end) = %zu, expected 5.\n",
+    if (sizeof(struct aligned_end) != 3) {
+        printf("Got sizeof(struct aligned_end) = %zu, expected 3.\n",
                sizeof(struct aligned_end));
         failures++;
     }
@@ -249,37 +250,27 @@ static void test_aligned_end(void)
         failures++;
     }
 
-    if (ae.z != 100) {
-        printf("Got ae.z = %u, expected 100.\n", ae.z);
-        failures++;
-    }
-
     ae.x = 42;
-    ae.y = 1023;
-    ae.z = 66;
+    ae.y = 127;
 
     if (ae.x != 42) {
         printf("Got ae.x = %u, expected 42.\n", ae.x);
         failures++;
     }
 
-    if (ae.y != 1023) {
-        printf("Got ae.y = %u, expected 1023.\n", ae.y);
+    if (ae.y != 127) {
+        printf("Got ae.y = %u, expected 127.\n", ae.y);
         failures++;
     }
 
-    if (ae.z != 66) {
-        printf("Got ae.z = %u, expected 66.\n", ae.z);
-        failures++;
-    }
 }
 
 int main(void)
 {
     test_four_bits();
-    test_four_bits_with_int();
+    test_four_bits_with_char();
     test_overlap();
-    test_overlap_with_int();
+    test_overlap_with_char();
     test_full_width();
     test_aligned_end();
     printf("failures: %u\n", failures);

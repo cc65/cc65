@@ -303,9 +303,9 @@ static const struct {
     }
 };
 
-/* Instruction table for the 6502 with DTV extra opcodes (DTV) and 
+/* Instruction table for the 6502 with DTV extra opcodes (DTV) and
 ** those illegal instructions (X) which are supported by DTV.
-** Note: illegals opcodes which contain more subinstructions 
+** Note: illegals opcodes which contain more subinstructions
 ** (ASO, DCM, LSE, LXA, SBX and SHS) are not enlisted.
 */
 static const struct {
@@ -1207,9 +1207,9 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
             } else {
                 ED.AddrSize = DataAddrSize;
                 /* If the default address size of the data segment is unequal
-                ** to zero page addressing, but zero page addressing is 
-                ** allowed by the instruction, mark all symbols in the 
-                ** expression tree. This mark will be checked at end of 
+                ** to zero page addressing, but zero page addressing is
+                ** allowed by the instruction, mark all symbols in the
+                ** expression tree. This mark will be checked at end of
                 ** assembly, and a warning is issued, if a zero page symbol
                 ** was guessed wrong here.
                 */

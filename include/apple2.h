@@ -159,11 +159,11 @@ extern struct {
         unsigned day  :5;
         unsigned mon  :4;
         unsigned year :7;
-    }             createdate;    /* Current date: 0 */ 
+    }             createdate;    /* Current date: 0 */
     struct {
         unsigned char min;
         unsigned char hour;
-    }             createtime;    /* Current time: 0 */ 
+    }             createtime;    /* Current time: 0 */
 } _datetime;
 
 /* The addresses of the static drivers */

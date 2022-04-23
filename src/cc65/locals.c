@@ -46,6 +46,7 @@
 #include "expr.h"
 #include "function.h"
 #include "global.h"
+#include "initdata.h"
 #include "loadexpr.h"
 #include "locals.h"
 #include "stackptr.h"

@@ -198,6 +198,189 @@ Here is a description of all the command line options:
   Enables debug mode, for debugging the behavior of cc65.
 
 
+  <tag><tt>--debug-tables name</tt></tag>
+
+  Writes symbol table information to a file, which includes details on structs, unions
+  functions, and global variables. For example, given the following code:
+
+  <tscreen><verb>
+  struct l {
+      unsigned char m;
+      unsigned char n;
+  };
+
+  struct hello {
+      unsigned char j;
+      unsigned char k;
+      struct l l;
+  };
+
+  struct sub {
+      unsigned char x;
+      unsigned char y;
+  };
+
+  union xy {
+      struct sub xy;
+      unsigned int mem;
+  };
+
+  typedef struct hello thingy;
+
+  unsigned char single;
+
+  unsigned char test_local_vars_main(void) {
+      static unsigned char wahoo;
+      static unsigned char bonanza = 0x42;
+      unsigned char i;
+      unsigned int j;
+      unsigned int *random;
+      unsigned char *lol;
+      signed char whoa;
+      struct hello wow;
+      thingy *cool;
+      union xy xy;
+
+      return 0;
+  }
+  </verb></tscreen>
+
+  The following output would be produced:
+
+  <tscreen><verb>
+  SC_FUNC: _test_local_vars_main: Symbol table
+  ============================================
+  __fixargs__:
+      Flags: SC_CONST SC_DEF
+      Type:  unsigned int
+  __argsize__:
+      Flags: SC_CONST SC_DEF
+      Type:  unsigned char
+  wahoo:
+      AsmName: M0001
+      Flags: SC_STATIC SC_DEF SC_REF
+      Type:  unsigned char
+  bonanza:
+      AsmName: M0002
+      Flags: SC_STATIC SC_DEF SC_REF
+      Type:  unsigned char
+  i:
+      Flags: SC_AUTO SC_DEF SC_REF
+      Type:  unsigned char
+  j:
+      Flags: SC_AUTO SC_DEF SC_REF
+      Type:  unsigned int
+  random:
+      Flags: SC_AUTO SC_DEF SC_REF
+      Type:  unsigned int *
+  lol:
+      Flags: SC_AUTO SC_DEF SC_REF
+      Type:  unsigned char *
+  whoa:
+      Flags: SC_AUTO SC_DEF SC_REF
+      Type:  signed char
+  wow:
+      Flags: SC_AUTO SC_DEF SC_REF
+      Type:  struct hello
+  cool:
+      Flags: SC_AUTO SC_DEF SC_REF
+      Type:  struct hello *
+  xy:
+      Flags: SC_AUTO SC_DEF SC_REF
+      Type:  union xy
+
+
+
+
+  Global symbol table
+  ===================
+  thingy:
+      AsmName: _thingy
+      Flags: SC_TYPEDEF 0x100000
+      Type:  struct hello
+  single:
+      AsmName: _single
+      Flags: SC_STATIC SC_EXTERN SC_STORAGE SC_DEF SC_REF 0x100000
+      Type:  unsigned char
+  test_local_vars_main:
+      AsmName: _test_local_vars_main
+      Flags: SC_FUNC SC_STATIC SC_EXTERN SC_DEF 0x100000
+      Type:  unsigned char (void)
+
+
+
+
+  Global tag table
+  ================
+  l:
+      Flags: SC_STRUCT SC_DEF
+      Type:  (none)
+  hello:
+      Flags: SC_STRUCT SC_DEF
+      Type:  (none)
+  sub:
+      Flags: SC_STRUCT SC_DEF
+      Type:  (none)
+  xy:
+      Flags: SC_UNION SC_DEF
+      Type:  (none)
+
+
+
+
+  Global struct and union definitions
+  =========================
+
+  SC_STRUCT: l
+  ============
+  m:
+      Flags: SC_STRUCTFIELD
+      Type:  unsigned char
+  n:
+      Flags: SC_STRUCTFIELD
+      Type:  unsigned char
+
+
+
+
+  SC_STRUCT: hello
+  ================
+  j:
+      Flags: SC_STRUCTFIELD
+      Type:  unsigned char
+  k:
+      Flags: SC_STRUCTFIELD
+      Type:  unsigned char
+  l:
+      Flags: SC_STRUCTFIELD
+      Type:  struct l
+
+
+
+
+  SC_STRUCT: sub
+  ==============
+  x:
+      Flags: SC_STRUCTFIELD
+      Type:  unsigned char
+  y:
+      Flags: SC_STRUCTFIELD
+      Type:  unsigned char
+
+
+
+
+  SC_UNION: xy
+  ============
+  xy:
+      Flags: SC_STRUCTFIELD
+      Type:  struct sub
+  mem:
+      Flags: SC_STRUCTFIELD
+      Type:  unsigned int
+  </verb></tscreen>
+
+
   <tag><tt>--debug-opt name</tt></tag>
 
   The named file contains a list of specific optimization steps to enable or disable.
@@ -395,7 +578,7 @@ Here is a description of all the command line options:
 
   This option is used to set the target system. The target system determines
   the character set that is used for strings and character constants and the
-  default CPU. The CPU setting can be overriden by use of the <tt/<ref
+  default CPU. The CPU setting can be overridden by use of the <tt/<ref
   id="option--cpu" name="--cpu">/ option.
 
   The following target systems are supported:
@@ -546,6 +729,12 @@ Here is a description of all the command line options:
         Treat all warnings as errors.
   <tag><tt/no-effect/</tag>
         Warn about statements that don't have an effect.
+  <tag><tt/pointer-sign/</tag>
+        Warn if a pointer assignment changes the signedness of the target
+        of a pointer value, and the new signedness wasn't cast explicitly.
+  <tag><tt/pointer-types/</tag>
+        Warn if a pointer assignment changes the type of the target
+        of a pointer value, and the new type wasn't cast explicitly.
   <tag><tt/remap-zero/</tag>
         Warn about a <tt/<ref id="pragma-charmap" name="#pragma charmap()">/
         that changes a character's code number from/to 0x00.
@@ -555,6 +744,10 @@ Here is a description of all the command line options:
         Warn when passing structs by value.
   <tag><tt/unknown-pragma/</tag>
         Warn about #pragmas that aren't recognized by cc65.
+  <tag><tt/unreachable-code/</tag>
+        Warn about unreachable code in cases of comparing constants, etc.
+  <tag><tt/unused-func/</tag>
+        Warn about unused functions.
   <tag><tt/unused-label/</tag>
         Warn about unused labels.
   <tag><tt/unused-param/</tag>
@@ -1012,6 +1205,10 @@ The compiler defines several macros at startup:
 
   This macro is defined if the target is the Supervision (-t supervision).
 
+  <tag><tt>__SYM1__</tt></tag>
+
+  This macro is defined if the target is the Sym-1 (-t sym1).
+
   <tag><tt>__TELESTRAT__</tt></tag>
 
   This macro is defined if the target is the Telestrat (-t telestrat).
@@ -1236,7 +1433,7 @@ parameter with the <tt/#pragma/.
 
   This pragma is used to display informational messages at compile-time.
 
-  The message intented to be displayed must be a string literal.
+  The message intended to be displayed must be a string literal.
 
   Example:
   <tscreen><verb>
@@ -1355,7 +1552,7 @@ parameter with the <tt/#pragma/.
   Switch compiler warnings on or off. "name" is the name of a warning (see the
   <tt/<ref name="-W" id="option-W">/ compiler option for a list). The name is
   followed either by "pop", which restores the last pushed state, or by "on" or
-  "off", optionally preceeded by "push" to push the current state before
+  "off", optionally preceded by "push" to push the current state before
   changing it.
 
   Example:
@@ -1380,7 +1577,12 @@ parameter with the <tt/#pragma/.
   the <tt/Y/ register if it wraps any variadic functions (they have "<tt/.../"
   in their prototypes).
 
-  The identifier is an 8-bit number that's set into <tt/tmp4/.
+  The identifier is an 8-bit number that's set into <tt/tmp4/. If the identifier
+  is "bank", then ca65's <tt><url url="ca65.html#.BANK" name=".bank"></tt> function will be used
+  to determine the number from the bank attribute defined in the linker config,
+  see <url url="ld65.html#MEMORY" name="Other MEMORY area attributes">. Note that
+  this currently implies that only the least significant 8 bits of the bank attribute
+  can be used.
 
   The address of a wrapped function is passed in <tt/ptr4/.  The wrapper can
   call that function by using "<tt/jsr callptr4/".
@@ -1654,7 +1856,7 @@ This is the original compiler copyright:
 
       Anyone may copy or redistribute these programs, provided that:
 
-  1:  You don't charge anything for the copy.  It is permissable to
+  1:  You don't charge anything for the copy.  It is permissible to
       charge a nominal fee for media, etc.
 
   2:  All source code and documentation for the programs is made

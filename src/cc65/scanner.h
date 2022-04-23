@@ -205,7 +205,7 @@ struct Token {
     struct Literal* SVal;       /* String literal is any */
     ident           Ident;      /* Identifier if IDENT */
     LineInfo*       LI;         /* Source line where the token comes from */
-    Type*           Type;       /* Type if integer or float constant */
+    const Type*     Type;       /* Type if integer or float constant */
 };
 
 extern Token CurTok;            /* The current token */

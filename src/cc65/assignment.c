@@ -42,9 +42,25 @@
 #include "expr.h"
 #include "loadexpr.h"
 #include "scanner.h"
+#include "stackptr.h"
 #include "stdnames.h"
 #include "typecmp.h"
 #include "typeconv.h"
+
+
+
+/*****************************************************************************/
+/*                                   Data                                    */
+/*****************************************************************************/
+
+
+
+/* Map a generator function and its attributes to a token */
+typedef struct GenDesc {
+    token_t       Tok;                  /* Token to map to */
+    unsigned      Flags;                /* Flags for generator function */
+    void          (*Func) (unsigned, unsigned long);    /* Generator func */
+} GenDesc;
 
 
 
@@ -54,7 +70,7 @@
 
 
 
-static int CopyStruct (ExprDesc* LExpr, ExprDesc* RExpr)
+static void CopyStruct (ExprDesc* LExpr, ExprDesc* RExpr)
 /* Copy the struct/union represented by RExpr to the one represented by LExpr */
 {
     /* If the size is that of a basic type (char, int, long), we will copy
@@ -78,7 +94,7 @@ static int CopyStruct (ExprDesc* LExpr, ExprDesc* RExpr)
     hie1 (RExpr);
 
     /* Check for equality of the structs/unions */
-    if (TypeCmp (ltype, RExpr->Type) < TC_STRICT_COMPATIBLE) {
+    if (TypeCmp (ltype, RExpr->Type).C < TC_STRICT_COMPATIBLE) {
         TypeCompatibilityDiagnostic (ltype, RExpr->Type, 1,
             "Incompatible types in assignment to '%s' from '%s'");
     }
@@ -127,87 +143,311 @@ static int CopyStruct (ExprDesc* LExpr, ExprDesc* RExpr)
     ** to a boolean in C, but there is no harm to be future-proof.
     */
     ED_MarkAsUntested (LExpr);
-
-    return 1;
 }
 
 
 
-void Assignment (ExprDesc* Expr)
-/* Parse an assignment */
+void DoIncDecBitField (ExprDesc* Expr, long Val, unsigned KeepResult)
+/* Process inc/dec for bit-field */
 {
-    Type* ltype = Expr->Type;
+    int         AddrSP;
+    unsigned    Flags;                  /* Internal codegen flags */
+    unsigned    Mask;
+    unsigned    ChunkFlags;
+    const Type* ChunkType;
 
+    /* Determine the type to operate on the whole byte chunk containing the bit-field */
+    ChunkType = GetBitFieldChunkType (Expr->Type);
+
+    /* Determine code generator flags */
+    Flags      = TypeOf (Expr->Type) | CF_FORCECHAR;
+    ChunkFlags = TypeOf (ChunkType);
+    if ((ChunkFlags & CF_TYPEMASK) == CF_CHAR) {
+        ChunkFlags |= CF_FORCECHAR;
+    }
+
+    /* Get the address on stack for the store */
+    PushAddr (Expr);
+
+    /* We may need the pushed address later */
+    AddrSP = StackPtr;
+
+    /* Get bit mask to limit the range of the value */
+    Mask = (0x0001U << Expr->Type->A.B.Width) - 1U;
+
+    /* Fetch the lhs into the primary register if needed */
+    LoadExpr (CF_NONE, Expr);
+
+    /* Handle for add and sub */
+    if (Val > 0) {
+        g_inc (Flags | CF_CONST, Val);
+    } else if (Val < 0) {
+        g_dec (Flags | CF_CONST, -Val);
+    }
+
+    /* Apply the mask */
+    g_and (Flags | CF_CONST, Mask);
+
+    /* Do integral promotion without sign-extension if needed */
+    g_typecast (ChunkFlags | CF_UNSIGNED, Flags);
+
+    /* Shift it into the right position */
+    g_asl (ChunkFlags | CF_CONST, Expr->Type->A.B.Offs);
+
+    /* Push the interim result on stack */
+    g_push (ChunkFlags & ~CF_FORCECHAR, 0);
+
+    /* If the original lhs was using the primary, it is now accessible only via
+    ** the pushed address. Reload that address.
+    */
+    if (ED_IsLocPrimaryOrExpr (Expr)) {
+        g_getlocal (CF_PTR, AddrSP);
+    }
+
+    /* Load the whole data chunk containing the bits to be changed */
+    LoadExpr (ChunkFlags, Expr);
+
+    if (KeepResult == OA_NEED_OLD) {
+        /* Save the original expression value */
+        g_save (ChunkFlags | CF_FORCECHAR);
+    }
+
+    /* Get the bits that are not to be affected */
+    g_and (ChunkFlags | CF_CONST, ~(Mask << Expr->Type->A.B.Offs));
+
+    /* Restore the bits that are not to be affected */
+    g_or (ChunkFlags & ~CF_FORCECHAR, 0);
+
+    /* Store the whole data chunk containing the changed bits back */
+    Store (Expr, ChunkType);
+
+    if (KeepResult == OA_NEED_OLD) {
+        /* Restore the original expression value */
+        g_restore (ChunkFlags | CF_FORCECHAR);
+    }
+}
+
+
+
+static void OpAssignBitField (const GenDesc* Gen, ExprDesc* Expr, const char* Op)
+/* Parse an "=" (if 'Gen' is 0) or "op=" operation for bit-field lhs */
+{
     ExprDesc Expr2;
+    CodeMark PushPos;
+    int      AddrSP;
+    unsigned Mask;
+    unsigned Flags;
+    unsigned ChunkFlags;
+    const Type* ChunkType;
+
     ED_Init (&Expr2);
     Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
 
-    /* We must have an lvalue for an assignment */
-    if (ED_IsRVal (Expr)) {
-        if (IsTypeArray (Expr->Type)) {
-            Error ("Array type '%s' is not assignable", GetFullTypeName (Expr->Type));
-        } else if (IsTypeFunc (Expr->Type)) {
-            Error ("Function type '%s' is not assignable", GetFullTypeName (Expr->Type));
-        } else {
-            Error ("Assignment to rvalue");
-        }
+    /* Determine the type to operate on the whole byte chunk containing the bit-field */
+    ChunkType = GetBitFieldChunkType (Expr->Type);
+
+    /* Determine code generator flags */
+    Flags      = TypeOf (Expr->Type) | CF_FORCECHAR;
+    ChunkFlags = TypeOf (ChunkType);
+    if ((ChunkFlags & CF_TYPEMASK) == CF_CHAR) {
+        ChunkFlags |= CF_FORCECHAR;
     }
 
-    /* Check for assignment to const */
-    if (IsQualConst (ltype)) {
-        Error ("Assignment to const");
-    }
+    /* Get the address on stack for the store */
+    PushAddr (Expr);
 
-    /* Check for assignment to incomplete type */
-    if (IsIncompleteESUType (ltype)) {
-        Error ("Assignment to incomplete type '%s'", GetFullTypeName (ltype));
-    }
+    /* We may need the pushed address later */
+    AddrSP = StackPtr;
 
-    /* Skip the '=' token */
-    NextToken ();
+    /* Get bit mask to limit the range of the value */
+    Mask = (0x0001U << Expr->Type->A.B.Width) - 1U;
 
-    /* cc65 does not have full support for handling structs or unions. Since
-    ** assigning structs is one of the more useful operations from this family,
-    ** allow it here.
-    ** Note: IsClassStruct() is also true for union types. 
-    */
-    if (IsClassStruct (ltype)) {
-        /* Copy the struct or union by value */
-        CopyStruct (Expr, &Expr2);
+    if (Gen != 0) {
 
-    } else if (ED_IsBitField (Expr)) {
-
-        CodeMark AndPos;
-        CodeMark PushPos;
-
-        unsigned Mask;
-        unsigned Flags;
-
-        /* If the bit-field fits within one byte, do the following operations
-        ** with bytes.
-        */
-        if (Expr->BitOffs / CHAR_BITS == (Expr->BitOffs + Expr->BitWidth - 1) / CHAR_BITS) {
-            Expr->Type = type_uchar;
-        }
-
-        /* Determine code generator flags */
-        Flags = TypeOf (Expr->Type);
-
-        /* Assignment to a bit field. Get the address on stack for the store. */
-        PushAddr (Expr);
-
-        /* Load the value from the location */
-        Expr->Flags &= ~E_BITFIELD;
+        /* Fetch the lhs into the primary register if needed */
         LoadExpr (CF_NONE, Expr);
 
-        /* Mask unwanted bits */
-        Mask = (0x0001U << Expr->BitWidth) - 1U;
-        GetCodePos (&AndPos);
-        g_and (Flags | CF_CONST, ~(Mask << Expr->BitOffs));
-
-        /* Push it on stack */
+        /* Backup them on stack */
         GetCodePos (&PushPos);
-        g_push (Flags, 0);
+        g_push (Flags & ~CF_FORCECHAR, 0);
+
+    }
+
+    /* Read the expression on the right side of the '=' or 'op=' */
+    MarkedExprWithCheck (hie1, &Expr2);
+
+    /* The rhs must be an integer (or a float, but we don't support that yet */
+    if (!IsClassInt (Expr2.Type)) {
+        Error ("Invalid right operand for binary operator '%s'", Op);
+        /* Continue. Wrong code will be generated, but the compiler won't
+        ** break, so this is the best error recovery.
+        */
+    }
+
+    /* Special treatment if the value is constant.
+    ** Beware: Expr2 may contain side effects, so there must not be
+    ** code generated for Expr2.
+    */
+    if (ED_IsConstAbsInt (&Expr2) && ED_CodeRangeIsEmpty (&Expr2)) {
+
+        if (Gen == 0) {
+
+            /* Get the value and apply the mask */
+            unsigned Val = (unsigned)(Expr2.IVal & Mask);
+
+            /* Load the whole data chunk containing the bits to be changed */
+            LoadExpr (ChunkFlags, Expr);
+
+            /* If the value is equal to the mask now, all bits are one, and we
+            ** can skip the mask operation.
+            */
+            if (Val != Mask) {
+                /* Get the bits that are not to be affected */
+                g_and (ChunkFlags | CF_CONST, ~(Mask << Expr->Type->A.B.Offs));
+            }
+
+            /* Restore the bits that are not to be affected */
+            g_or (ChunkFlags | CF_CONST, Val << Expr->Type->A.B.Offs);
+
+            /* Store the whole data chunk containing the changed bits back */
+            Store (Expr, ChunkType);
+
+            /* Done */
+            goto Done;
+
+        } else {
+
+            /* Since we will operate with a constant, we can remove the push if
+            ** the generator has the NOPUSH flag set.
+            */
+            if (Gen->Flags & GEN_NOPUSH) {
+                RemoveCode (&PushPos);
+            }
+
+            /* Special handling for add and sub - some sort of a hack, but short code */
+            if (Gen->Func == g_add) {
+                g_inc (Flags | CF_CONST, Expr2.IVal);
+            } else if (Gen->Func == g_sub) {
+                g_dec (Flags | CF_CONST, Expr2.IVal);
+            } else {
+                if (Expr2.IVal == 0) {
+                    /* Check for div by zero/mod by zero */
+                    if (Gen->Func == g_div) {
+                        Error ("Division by zero");
+                    } else if (Gen->Func == g_mod) {
+                        Error ("Modulo operation with zero");
+                    }
+                }
+
+                /* Adjust the types of the operands if needed */
+                if (Gen->Func == g_div || Gen->Func == g_mod) {
+                    unsigned AdjustedFlags = Flags;
+                    if (Expr->Type->A.B.Width < INT_BITS || IsSignSigned (Expr->Type)) {
+                        AdjustedFlags = (Flags & ~CF_UNSIGNED) | CF_CONST;
+                        AdjustedFlags = g_typeadjust (AdjustedFlags, TypeOf (Expr2.Type) | CF_CONST);
+                    }
+                    Gen->Func (g_typeadjust (Flags, AdjustedFlags) | CF_CONST, Expr2.IVal);
+                } else {
+                    Gen->Func ((Flags & ~CF_FORCECHAR) | CF_CONST, Expr2.IVal);
+                }
+            }
+
+        }
+
+    } else {
+
+        /* Do 'op' if provided */
+        if (Gen != 0) {
+
+            /* Load rhs into the primary */
+            LoadExpr (CF_NONE, &Expr2);
+
+            /* Adjust the types of the operands if needed */
+            if (Gen->Func == g_div || Gen->Func == g_mod) {
+                unsigned AdjustedFlags = Flags;
+                if (Expr->Type->A.B.Width < INT_BITS || IsSignSigned (Expr->Type)) {
+                    AdjustedFlags = (Flags & ~CF_UNSIGNED) | CF_CONST;
+                    AdjustedFlags = g_typeadjust (AdjustedFlags, TypeOf (Expr2.Type) | CF_CONST);
+                }
+                Gen->Func (g_typeadjust (Flags, AdjustedFlags), 0);
+            } else {
+                Gen->Func (g_typeadjust (Flags, TypeOf (Expr2.Type)), 0);
+            }
+
+        } else {
+
+            /* Do type conversion if necessary */
+            TypeConversion (&Expr2, Expr->Type);
+
+            /* If necessary, load rhs into the primary register */
+            LoadExpr (CF_NONE, &Expr2);
+
+        }
+
+    }
+
+    /* Apply the mask */
+    g_and (Flags | CF_CONST, Mask);
+
+    /* Do integral promotion without sign-extension if needed */
+    g_typecast (ChunkFlags | CF_UNSIGNED, Flags);
+
+    /* Shift it into the right position */
+    g_asl (ChunkFlags | CF_CONST, Expr->Type->A.B.Offs);
+
+    /* Push the interim result on stack */
+    g_push (ChunkFlags & ~CF_FORCECHAR, 0);
+
+    /* If the original lhs was using the primary, it is now accessible only via
+    ** the pushed address. Reload that address.
+    */
+    if (ED_IsLocPrimaryOrExpr (Expr)) {
+        g_getlocal (CF_PTR, AddrSP);
+    }
+
+    /* Load the whole data chunk containing the bits to be changed */
+    LoadExpr (ChunkFlags, Expr);
+
+    /* Get the bits that are not to be affected */
+    g_and (ChunkFlags | CF_CONST, ~(Mask << Expr->Type->A.B.Offs));
+
+    /* Restore the bits that are not to be affected */
+    g_or (ChunkFlags & ~CF_FORCECHAR, 0);
+
+    /* Store the whole data chunk containing the changed bits back */
+    Store (Expr, ChunkType);
+
+Done:
+
+    /* Value is in primary as an rvalue */
+    ED_FinalizeRValLoad (Expr);
+}
+
+
+
+static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* Op)
+/* Parse an "=" (if 'Gen' is 0) or "op=" operation for arithmetic lhs */
+{
+    ExprDesc Expr2;
+    CodeMark PushPos;
+
+    unsigned Flags;
+    int MustScale;
+
+    ED_Init (&Expr2);
+    Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
+
+    /* Determine code generator flags */
+    Flags = TypeOf (Expr->Type);
+
+    /* Determine the type of the lhs */
+    MustScale = Gen != 0 && (Gen->Func == g_add || Gen->Func == g_sub) &&
+                IsTypePtr (Expr->Type);
+
+    /* Get the address on stack for the store */
+    PushAddr (Expr);
+
+    if (Gen == 0) {
 
         /* Read the expression on the right side of the '=' */
         MarkedExprWithCheck (hie1, &Expr2);
@@ -215,73 +455,274 @@ void Assignment (ExprDesc* Expr)
         /* Do type conversion if necessary. Beware: Do not use char type
         ** here!
         */
-        TypeConversion (&Expr2, ltype);
+        TypeConversion (&Expr2, Expr->Type);
 
-        /* Special treatment if the value is constant. */
-        /* Beware: Expr2 may contain side effects, so there must not be
+        /* If necessary, load the value into the primary register */
+        LoadExpr (CF_NONE, &Expr2);
+
+    } else {
+
+        /* Load the original value if necessary */
+        LoadExpr (CF_NONE, Expr);
+
+        /* Push lhs on stack */
+        GetCodePos (&PushPos);
+        g_push (Flags, 0);
+
+        /* Read the expression on the right side of the '=' or 'op=' */
+        MarkedExprWithCheck (hie1, &Expr2);
+
+        /* The rhs must be an integer (or a float, but we don't support that yet */
+        if (!IsClassInt (Expr2.Type)) {
+            Error ("Invalid right operand for binary operator '%s'", Op);
+            /* Continue. Wrong code will be generated, but the compiler won't
+            ** break, so this is the best error recovery.
+            */
+        }
+
+        /* Special treatment if the value is constant.
+        ** Beware: Expr2 may contain side effects, so there must not be
         ** code generated for Expr2.
         */
         if (ED_IsConstAbsInt (&Expr2) && ED_CodeRangeIsEmpty (&Expr2)) {
 
-            /* Get the value and apply the mask */
-            unsigned Val = (unsigned) (Expr2.IVal & Mask);
-
-            /* Since we will do the OR with a constant, we can remove the push */
-            RemoveCode (&PushPos);
-
-            /* If the value is equal to the mask now, all bits are one, and we
-            ** can remove the mask operation from above.
+            /* Since we will operate with a constant, we can remove the push if
+            ** the generator has the NOPUSH flag set.
             */
-            if (Val == Mask) {
-                RemoveCode (&AndPos);
+            if (Gen->Flags & GEN_NOPUSH) {
+                RemoveCode (&PushPos);
+            }
+            if (MustScale) {
+                /* lhs is a pointer, scale rhs */
+                Expr2.IVal *= CheckedSizeOf (Expr->Type+1);
             }
 
-            /* Generate the or operation */
-            g_or (Flags | CF_CONST, Val << Expr->BitOffs);
+            /* If the lhs is character sized, the operation may be later done
+            ** with characters.
+            */
+            if (CheckedSizeOf (Expr->Type) == SIZEOF_CHAR) {
+                Flags |= CF_FORCECHAR;
+            }
+
+            /* Special handling for add and sub - some sort of a hack, but short code */
+            if (Gen->Func == g_add) {
+                g_inc (Flags | CF_CONST, Expr2.IVal);
+            } else if (Gen->Func == g_sub) {
+                g_dec (Flags | CF_CONST, Expr2.IVal);
+            } else {
+                if (Expr2.IVal == 0) {
+                    /* Check for div by zero/mod by zero */
+                    if (Gen->Func == g_div) {
+                        Error ("Division by zero");
+                    } else if (Gen->Func == g_mod) {
+                        Error ("Modulo operation with zero");
+                    }
+                }
+                Gen->Func (Flags | CF_CONST, Expr2.IVal);
+            }
 
         } else {
 
             /* If necessary, load the value into the primary register */
             LoadExpr (CF_NONE, &Expr2);
 
-            /* Apply the mask */
-            g_and (Flags | CF_CONST, Mask);
+            if (MustScale) {
+                /* lhs is a pointer, scale rhs */
+                g_scale (TypeOf (Expr2.Type), CheckedSizeOf (Expr->Type+1));
+            }
 
-            /* Shift it into the right position */
-            g_asl (Flags | CF_CONST, Expr->BitOffs);
+            /* If the lhs is character sized, the operation may be later done
+            ** with characters.
+            */
+            if (CheckedSizeOf (Expr->Type) == SIZEOF_CHAR) {
+                Flags |= CF_FORCECHAR;
+            }
 
-            /* Or both values */
-            g_or (Flags, 0);
+            /* Adjust the types of the operands if needed */
+            Gen->Func (g_typeadjust (Flags, TypeOf (Expr2.Type)), 0);
+
         }
+    }
 
-        /* Generate a store instruction */
-        Store (Expr, 0);
+    /* Generate a store instruction */
+    Store (Expr, 0);
 
-        /* Restore the expression type */
-        Expr->Type = ltype;
+    /* Value is in primary as an rvalue */
+    ED_FinalizeRValLoad (Expr);
+}
 
-        /* Value is in primary as an rvalue */
-        ED_FinalizeRValLoad (Expr);
 
+
+void OpAssign (const GenDesc* Gen, ExprDesc* Expr, const char* Op)
+/* Parse an "=" (if 'Gen' is 0) or "op=" operation */
+{
+    const Type* ltype = Expr->Type;
+
+    ExprDesc Expr2;
+    ED_Init (&Expr2);
+    Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
+
+    /* Only "=" accept struct/union */
+    if (IsClassStruct (ltype) ? Gen != 0 : !IsClassScalar (ltype)) {
+        Error ("Invalid left operand for binary operator '%s'", Op);
+        /* Continue. Wrong code will be generated, but the compiler won't
+        ** break, so this is the best error recovery.
+        */
     } else {
+        /* Check for assignment to incomplete type */
+        if (IsIncompleteESUType (ltype)) {
+            Error ("Assignment to incomplete type '%s'", GetFullTypeName (ltype));
+        } else if (ED_IsRVal (Expr)) {
+            /* Assignment can only be used with lvalues */
+            if (IsTypeArray (ltype)) {
+                Error ("Array type '%s' is not assignable", GetFullTypeName (ltype));
+            } else if (IsTypeFunc (ltype)) {
+                Error ("Function type '%s' is not assignable", GetFullTypeName (ltype));
+            } else {
+                Error ("Assignment to rvalue");
+            }
+        } else if (IsQualConst (ltype)) {
+            /* Check for assignment to const */
+            Error ("Assignment to const");
+        }
+    }
 
-        /* Get the address on stack if needed */
-        PushAddr (Expr);
+    /* Skip the '=' or 'op=' token */
+    NextToken ();
 
-        /* Read the expression on the right side of the '=' */
-        hie1 (&Expr2);
+    /* cc65 does not have full support for handling structs or unions. Since
+    ** assigning structs is one of the more useful operations from this family,
+    ** allow it here.
+    ** Note: IsClassStruct() is also true for union types.
+    */
+    if (IsClassStruct (ltype)) {
+        /* Copy the struct or union by value */
+        CopyStruct (Expr, &Expr2);
+    } else if (IsTypeFragBitField (ltype)) {
+        /* Special care is needed for bit-fields if they don't fit in full bytes */
+        OpAssignBitField (Gen, Expr, Op);
+    } else {
+        /* Normal straight 'op=' */
+        OpAssignArithmetic (Gen, Expr, Op);
+    }
+}
 
-        /* Do type conversion if necessary */
-        TypeConversion (&Expr2, ltype);
 
-        /* If necessary, load the value into the primary register */
+
+void OpAddSubAssign (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
+/* Parse a "+=" or "-=" operation */
+{
+    ExprDesc Expr2;
+    unsigned lflags;
+    unsigned rflags;
+    int      MustScale;
+
+    /* We currently only handle non-bit-fields in some addressing modes here */
+    if (IsTypeBitField (Expr->Type) || ED_IsLocPrimaryOrExpr (Expr)) {
+        /* Use generic routine instead */
+        OpAssign (Gen, Expr, Op);
+        return;
+    }
+
+    /* There must be an integer or pointer on the left side */
+    if (!IsClassInt (Expr->Type) && !IsTypePtr (Expr->Type)) {
+        Error ("Invalid left operand for binary operator '%s'", Op);
+        /* Continue. Wrong code will be generated, but the compiler won't
+        ** break, so this is the best error recovery.
+        */
+    } else {
+        /* We must have an lvalue */
+        if (ED_IsRVal (Expr)) {
+            Error ("Invalid lvalue in assignment");
+        } else if (IsQualConst (Expr->Type)) {
+            /* The left side must not be const qualified */
+            Error ("Assignment to const");
+        }
+    }
+
+    /* Skip the operator */
+    NextToken ();
+
+    /* Check if we have a pointer expression and must scale rhs */
+    MustScale = IsTypePtr (Expr->Type);
+
+    /* Initialize the code generator flags */
+    lflags = 0;
+    rflags = 0;
+
+    ED_Init (&Expr2);
+    Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
+
+    /* Evaluate the rhs. We expect an integer here, since float is not
+    ** supported
+    */
+    hie1 (&Expr2);
+    if (!IsClassInt (Expr2.Type)) {
+        Error ("Invalid right operand for binary operator '%s'", Op);
+        /* Continue. Wrong code will be generated, but the compiler won't
+        ** break, so this is the best error recovery.
+        */
+    }
+
+    /* Setup the code generator flags */
+    lflags |= TypeOf (Expr->Type) | GlobalModeFlags (Expr) | CF_FORCECHAR;
+    rflags |= TypeOf (Expr2.Type) | CF_FORCECHAR;
+
+    if (ED_IsConstAbs (&Expr2)) {
+        /* The resulting value is a constant */
+        rflags |= CF_CONST;
+        lflags |= CF_CONST;
+
+        /* Scale it */
+        if (MustScale) {
+            Expr2.IVal *= CheckedSizeOf (Indirect (Expr->Type));
+        }
+    } else {
+        /* Not constant, load into the primary */
         LoadExpr (CF_NONE, &Expr2);
 
-        /* Generate a store instruction */
-        Store (Expr, 0);
+        /* Convert the type of the rhs to that of the lhs */
+        g_typecast (lflags, rflags & ~CF_FORCECHAR);
 
-        /* Value is in primary as an rvalue */
-        ED_FinalizeRValLoad (Expr);
-
+        if (MustScale) {
+            /* lhs is a pointer, scale rhs */
+            g_scale (TypeOf (Expr2.Type), CheckedSizeOf (Indirect (Expr->Type)));
+        }
     }
+
+    /* Output apropriate code depending on the location */
+    switch (ED_GetLoc (Expr)) {
+
+        case E_LOC_ABS:
+        case E_LOC_GLOBAL:
+        case E_LOC_STATIC:
+        case E_LOC_REGISTER:
+        case E_LOC_LITERAL:
+        case E_LOC_CODE:
+            /* Absolute numeric addressed variable, global variable, local
+            ** static variable, register variable, pooled literal or code
+            ** label location.
+            */
+            if (Gen->Tok == TOK_PLUS_ASSIGN) {
+                g_addeqstatic (lflags, Expr->Name, Expr->IVal, Expr2.IVal);
+            } else {
+                g_subeqstatic (lflags, Expr->Name, Expr->IVal, Expr2.IVal);
+            }
+            break;
+
+        case E_LOC_STACK:
+            /* Value on the stack */
+            if (Gen->Tok == TOK_PLUS_ASSIGN) {
+                g_addeqlocal (lflags, Expr->IVal, Expr2.IVal);
+            } else {
+                g_subeqlocal (lflags, Expr->IVal, Expr2.IVal);
+            }
+            break;
+
+        default:
+            Internal ("Invalid location in Store(): 0x%04X", ED_GetLoc (Expr));
+    }
+
+    /* Expression is an rvalue in the primary now */
+    ED_FinalizeRValLoad (Expr);
 }

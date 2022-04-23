@@ -21,7 +21,7 @@ tossub0ax:
         ldy     #$00
         sty     sreg
         sty     sreg+1
-.endif  
+.endif
 
 tossubeax:
         sec

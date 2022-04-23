@@ -269,7 +269,7 @@ abs:
         ; A/Y := abs (A/Y)
         cpy     #$00
         bpl     :+
-        
+
         ; A/Y := neg (A/Y)
 neg:    clc
         eor     #$FF

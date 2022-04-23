@@ -453,6 +453,7 @@ static unsigned Opt_staxspidx (StackOpData* D)
 /* Optimize the staxspidx sequence */
 {
     CodeEntry* X;
+    const char* Arg = 0;
 
     /* Check if we're using a register variable */
     if (!IsRegVar (D)) {
@@ -469,7 +470,7 @@ static unsigned Opt_staxspidx (StackOpData* D)
 
     if (RegValIsKnown (D->OpEntry->RI->In.RegY)) {
         /* Value of Y is known */
-        const char* Arg = MakeHexArg (D->OpEntry->RI->In.RegY + 1);
+        Arg = MakeHexArg (D->OpEntry->RI->In.RegY + 1);
         X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
     } else {
         X = NewCodeEntry (OP65_INY, AM65_IMP, 0, 0, D->OpEntry->LI);
@@ -478,7 +479,7 @@ static unsigned Opt_staxspidx (StackOpData* D)
 
     if (RegValIsKnown (D->OpEntry->RI->In.RegX)) {
         /* Value of X is known */
-        const char* Arg = MakeHexArg (D->OpEntry->RI->In.RegX);
+        Arg = MakeHexArg (D->OpEntry->RI->In.RegX);
         X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, D->OpEntry->LI);
     } else {
         /* Value unknown */
@@ -493,7 +494,12 @@ static unsigned Opt_staxspidx (StackOpData* D)
     /* If we remove staxspidx, we must restore the Y register to what the
     ** function would return.
     */
-    X = NewCodeEntry (OP65_LDY, AM65_IMM, "$00", 0, D->OpEntry->LI);
+    if (RegValIsKnown (D->OpEntry->RI->In.RegY)) {
+        Arg = MakeHexArg (D->OpEntry->RI->In.RegY);
+        X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
+    } else {
+        X = NewCodeEntry (OP65_DEY, AM65_IMP, 0, 0, D->OpEntry->LI);
+    }
     InsertEntry (D, X, D->OpIndex+5);
 
     /* Remove the push and the call to the staxspidx function */
@@ -1107,9 +1113,9 @@ static unsigned Opt_a_toscmpbool (StackOpData* D, const char* BoolTransformer)
 
     D->IP = D->OpIndex + 1;
 
-    if (!D->RhsMultiChg &&
-        (D->Rhs.A.LoadEntry->Flags & CEF_DONT_REMOVE) == 0 &&
-        (D->Rhs.A.Flags & LI_DIRECT) != 0) {
+    if (!D->RhsMultiChg                     &&
+        (D->Rhs.A.Flags & LI_DIRECT) != 0   &&
+        (D->Rhs.A.LoadEntry->Flags & CEF_DONT_REMOVE) == 0) {
 
         /* cmp */
         AddOpLow (D, OP65_CMP, &D->Rhs);
@@ -1814,20 +1820,18 @@ unsigned OptStackOps (CodeSeg* S)
                         Data.OpEntry = E;
                         State = FoundOp;
                         break;
-                    } else if (!HarmlessCall (E->Arg)) {
-                        /* A call to an unkown subroutine: We need to start
-                        ** over after the last pushax. Note: This will also
-                        ** happen if we encounter a call to pushax!
+                    } else if (!HarmlessCall (E, 2)) {
+                        /* The call might use or change the content that we are
+                        ** going to access later via the stack pointer. In any
+                        ** case, we need to start over after the last pushax.
+                        ** Note: This will also happen if we encounter a call
+                        ** to pushax!
                         */
                         I = Data.PushIndex;
                         State = Initialize;
                         break;
                     }
-
-                } else if ((E->Use & REG_SP) != 0               &&
-                           (E->AM != AM65_ZP_INDY               ||
-                            RegValIsUnknown (E->RI->In.RegY)    ||
-                            E->RI->In.RegY < 2)) {
+                } else if (((E->Chg | E->Use) & REG_SP) != 0) {
 
                     /* If we are using the stack, and we don't have "indirect Y"
                     ** addressing mode, or the value of Y is unknown, or less
@@ -1837,9 +1841,14 @@ unsigned OptStackOps (CodeSeg* S)
                     ** that the code works with the value on stack which is to
                     ** be removed.
                     */
-                    I = Data.PushIndex;
-                    State = Initialize;
-                    break;
+                    if (E->AM == AM65_ZPX_IND               ||
+                        ((E->Chg | E->Use) & SLV_IND) == 0  ||
+                        (RegValIsUnknown (E->RI->In.RegY)   ||
+                         E->RI->In.RegY < 2)) {
+                        I = Data.PushIndex;
+                        State = Initialize;
+                        break;
+                    }
 
                 }
 

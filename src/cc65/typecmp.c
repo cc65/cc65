@@ -36,6 +36,7 @@
 #include <string.h>
 
 /* cc65 */
+#include "error.h"
 #include "funcdesc.h"
 #include "global.h"
 #include "symtab.h"
@@ -46,51 +47,6 @@
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
-
-
-
-static void SetResult (typecmp_t* Result, typecmp_t Val)
-/* Set a new result value if it is less than the existing one */
-{
-    if (Val < *Result) {
-        /* printf ("SetResult = %d\n", Val); */
-        *Result = Val;
-    }
-}
-
-
-
-static int ParamsHaveDefaultPromotions (const FuncDesc* F)
-/* Check if any of the parameters of function F has a default promotion. In
-** this case, the function is not compatible with an empty parameter name list
-** declaration.
-*/
-{
-    /* Get the symbol table */
-    const SymTable* Tab = F->SymTab;
-
-    /* Get the first parameter in the list */
-    const SymEntry* Sym = Tab->SymHead;
-
-    /* Walk over all parameters */
-    while (Sym && (Sym->Flags & SC_PARAM)) {
-
-        /* If this is an integer type, check if the promoted type is equal
-        ** to the original type. If not, we have a default promotion.
-        */
-        if (IsClassInt (Sym->Type)) {
-            if (IntPromotion (Sym->Type) != Sym->Type) {
-                return 1;
-            }
-        }
-
-        /* Get the pointer to the next param */
-        Sym = Sym->NextSym;
-    }
-
-    /* No default promotions in the parameter list */
-    return 0;
-}
 
 
 
@@ -111,8 +67,8 @@ static int EqualFuncParams (const FuncDesc* F1, const FuncDesc* F2)
     while (Sym1 && (Sym1->Flags & SC_PARAM) && Sym2 && (Sym2->Flags & SC_PARAM)) {
 
         /* Get the symbol types */
-        Type* Type1 = Sym1->Type;
-        Type* Type2 = Sym2->Type;
+        const Type* Type1 = Sym1->Type;
+        const Type* Type2 = Sym2->Type;
 
         /* If either of both functions is old style, apply the default
         ** promotions to the parameter type.
@@ -129,7 +85,7 @@ static int EqualFuncParams (const FuncDesc* F1, const FuncDesc* F2)
         }
 
         /* Compare this field */
-        if (TypeCmp (Type1, Type2) < TC_EQUAL) {
+        if (TypeCmp (Type1, Type2).C < TC_EQUAL) {
             /* Field types not equal */
             return 0;
         }
@@ -148,49 +104,193 @@ static int EqualFuncParams (const FuncDesc* F1, const FuncDesc* F2)
 
 
 
+static void SetResult (typecmp_t* Result, typecmpcode_t Val)
+/* Set a new result value if it is less than the existing one */
+{
+    if (Val < Result->C) {
+        if (Result->Indirections > 0) {
+            if (Val >= TC_STRICT_COMPATIBLE) {
+                /* Arrays etc. */
+                Result->C = Val;
+            } else if (Result->Indirections == 1) {
+                /* C Standard allows implicit conversion as long as one side is
+                ** a pointer to void type, but doesn't care which side is.
+                */
+                if ((Result->F & TCF_MASK_VOID_PTR) != 0) {
+                    Result->C = TC_VOID_PTR;
+                } else if (Val == TC_SIGN_DIFF) {
+                    /* Special treatment with pointee signedness difference */
+                    Result->C = TC_PTR_SIGN_DIFF;
+                } else {
+                    /* Incompatible */
+                    Result->C = TC_PTR_INCOMPATIBLE;
+                }
+            } else {
+                /* Pointer-to-pointer types must have compatible pointte types,
+                ** or they are just incompatible.
+                */
+                Result->C = TC_PTR_INCOMPATIBLE;
+            }
+        } else {
+            Result->C = Val;
+        }
+        /* printf ("SetResult = %d\n", Val); */
+    }
+}
+
+
+
+static typecmp_t* CmpQuals (const Type* lhst, const Type* rhst, typecmp_t* Result)
+/* Copare the types regarding thier qualifiers. Return the Result */
+{
+    TypeCode LeftQual, RightQual;
+
+    /* Get the left and right qualifiers */
+    LeftQual  = GetQualifier (lhst);
+    RightQual = GetQualifier (rhst);
+
+    /* If type is function without a calling convention set explicitly,
+    ** then assume the default one.
+    */
+    if (IsTypeFunc (lhst)) {
+        if ((LeftQual & T_QUAL_CCONV) == T_QUAL_NONE) {
+            LeftQual |= (AutoCDecl || IsVariadicFunc (lhst)) ? T_QUAL_CDECL : T_QUAL_FASTCALL;
+        }
+    }
+    if (IsTypeFunc (rhst)) {
+        if ((RightQual & T_QUAL_CCONV) == T_QUAL_NONE) {
+            RightQual |= (AutoCDecl || IsVariadicFunc (rhst)) ? T_QUAL_CDECL : T_QUAL_FASTCALL;
+        }
+    }
+
+    /* Default address size qualifiers */
+    if ((LeftQual & T_QUAL_ADDRSIZE) == T_QUAL_NONE) {
+        LeftQual |= (IsTypeFunc (lhst) ? CodeAddrSizeQualifier () : DataAddrSizeQualifier ());
+    }
+    if ((RightQual & T_QUAL_ADDRSIZE) == T_QUAL_NONE) {
+        RightQual |= (IsTypeFunc (rhst) ? CodeAddrSizeQualifier () : DataAddrSizeQualifier ());
+    }
+
+    /* Just return if nothing to do */
+    if (LeftQual == RightQual) {
+        return Result;
+    }
+
+    /* On the first indirection level, different qualifiers mean that the types
+    ** are still compatible. On the second level, that is a (maybe minor) error.
+    ** We create a special return-code if a qualifier is dropped from a pointer.
+    ** But, different calling conventions are incompatible. Starting from the
+    ** next level, the types are incompatible if the qualifiers differ.
+    */
+    /* (Debugging statement) */
+    /* printf ("Ind = %d    %06X != %06X\n", Result->Indirections, LeftQual, RightQual); */
+    switch (Result->Indirections) {
+        case 0:
+            /* Compare C qualifiers */
+            if ((LeftQual & T_QUAL_CVR) > (RightQual & T_QUAL_CVR)) {
+                Result->F |= TCF_QUAL_IMPLICIT;
+            } else if ((LeftQual & T_QUAL_CVR) != (RightQual & T_QUAL_CVR)) {
+                Result->F |= TCF_QUAL_DIFF;
+            }
+
+            /* Compare address size qualifiers */
+            if ((LeftQual & T_QUAL_ADDRSIZE) != (RightQual & T_QUAL_ADDRSIZE)) {
+                Result->F |= TCF_ADDRSIZE_QUAL_DIFF;
+            }
+
+            /* Compare function calling conventions */
+            if ((LeftQual & T_QUAL_CCONV) != (RightQual & T_QUAL_CCONV)) {
+                SetResult (Result, TC_INCOMPATIBLE);
+            }
+            break;
+
+        case 1:
+            /* A non-const value on the right is compatible to a
+            ** const one to the left, same for volatile.
+            */
+            if ((LeftQual & T_QUAL_CVR) > (RightQual & T_QUAL_CVR)) {
+                Result->F |= TCF_PTR_QUAL_IMPLICIT;
+            } else if ((LeftQual & T_QUAL_CVR) != (RightQual & T_QUAL_CVR)) {
+                Result->F |= TCF_PTR_QUAL_DIFF;
+            }
+
+            /* Compare address size qualifiers */
+            if ((LeftQual & T_QUAL_ADDRSIZE) != (RightQual & T_QUAL_ADDRSIZE)) {
+                Result->F |= TCF_ADDRSIZE_QUAL_DIFF;
+            }
+
+            /* Compare function calling conventions */
+            if ((!IsTypeFunc (lhst) && !IsTypeFunc (rhst))  ||
+                (LeftQual & T_QUAL_CCONV) == (RightQual & T_QUAL_CCONV)) {
+                break;
+            }
+            /* else fall through */
+
+        default:
+            /* Pointer types mismatch */
+            SetResult (Result, TC_INCOMPATIBLE);
+            break;
+    }
+
+    return Result;
+}
+
+
+
 static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
 /* Recursively compare two types. */
 {
-    unsigned    Indirections;
-    unsigned    ElementCount;
     SymEntry*   Sym1;
     SymEntry*   Sym2;
     FuncDesc*   F1;
     FuncDesc*   F2;
+    TypeCode    LeftType, RightType;
+    long        LeftCount, RightCount;
 
-
-    /* Initialize stuff */
-    Indirections = 0;
-    ElementCount = 0;
 
     /* Compare two types. Determine, where they differ */
     while (lhs->C != T_END) {
 
-        TypeCode LeftType, RightType;
-        TypeCode LeftSign, RightSign;
-        TypeCode LeftQual, RightQual;
-        long LeftCount, RightCount;
-
         /* Check if the end of the type string is reached */
         if (rhs->C == T_END) {
             /* End of comparison reached */
+            break;
+        }
+
+        /* Compare qualifiers */
+        if (CmpQuals (lhs, rhs, Result)->C == TC_INCOMPATIBLE) {
             return;
         }
 
-        /* Get the left and right types, signs and qualifiers */
+        /* Get the left and right types */
         LeftType  = (GetUnderlyingTypeCode (lhs) & T_MASK_TYPE);
         RightType = (GetUnderlyingTypeCode (rhs) & T_MASK_TYPE);
-        LeftSign  = GetSignedness (lhs);
-        RightSign = GetSignedness (rhs);
-        LeftQual  = GetQualifier (lhs);
-        RightQual = GetQualifier (rhs);
 
-        /* If the left type is a pointer and the right is an array, both
-        ** are compatible.
+        /* If one side is a pointer and the other side is an array, both are
+        ** compatible.
         */
         if (LeftType == T_TYPE_PTR && RightType == T_TYPE_ARRAY) {
             RightType = T_TYPE_PTR;
+            SetResult (Result, TC_PTR_DECAY);
+        }
+        if (LeftType == T_TYPE_ARRAY && RightType == T_TYPE_PTR) {
+            LeftType = T_TYPE_PTR;
             SetResult (Result, TC_STRICT_COMPATIBLE);
+        }
+
+        /* Bit-fields are considered compatible if they have the same
+        ** signedness, bit-offset and bit-width.
+        */
+        if (IsTypeBitField (lhs) || IsTypeBitField (rhs)) {
+            if (!IsTypeBitField (lhs)           ||
+                !IsTypeBitField (rhs)           ||
+                lhs->A.B.Offs  != rhs->A.B.Offs ||
+                lhs->A.B.Width != rhs->A.B.Width) {
+                SetResult (Result, TC_INCOMPATIBLE);
+            }
+            if (LeftType != RightType) {
+                SetResult (Result, TC_STRICT_COMPATIBLE);
+            }
         }
 
         /* If the underlying types are not identical, the types are incompatible */
@@ -228,7 +328,7 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
                             return;
                         }
                     }
-                }                
+                }
             }
 
         }
@@ -236,74 +336,30 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
         /* 'char' is neither 'signed char' nor 'unsigned char' */
         if ((IsISOChar (lhs) && !IsISOChar (rhs)) ||
             (!IsISOChar (lhs) && IsISOChar (rhs))) {
-            SetResult (Result, TC_COMPATIBLE);
+            SetResult (Result, TC_SIGN_DIFF);
         }
 
-        /* On indirection level zero, a qualifier or sign difference is
-        ** accepted. The types are no longer equal, but compatible.
+        /* On indirection level zero, a sign difference is accepted.
+        ** The types are no longer equal, but compatible.
         */
-        if (LeftSign != RightSign) {
-            if (ElementCount == 0) {
-                SetResult (Result, TC_SIGN_DIFF);
-            } else {
-                SetResult (Result, TC_INCOMPATIBLE);
-                return;
-            }
-        }
-
-        if (LeftType == T_TYPE_FUNC) {
-            /* If a calling convention wasn't set explicitly,
-            ** then assume the default one.
-            */
-            if ((LeftQual & T_QUAL_CCONV) == T_QUAL_NONE) {
-                LeftQual |= (AutoCDecl || IsVariadicFunc (lhs)) ? T_QUAL_CDECL : T_QUAL_FASTCALL;
-            }
-            if ((RightQual & T_QUAL_CCONV) == T_QUAL_NONE) {
-                RightQual |= (AutoCDecl || IsVariadicFunc (rhs)) ? T_QUAL_CDECL : T_QUAL_FASTCALL;
-            }
-        }
-
-        if (LeftQual != RightQual) {
-            /* On the first indirection level, different qualifiers mean
-            ** that the types still are compatible. On the second level,
-            ** that is a (maybe minor) error. We create a special return-code
-            ** if a qualifier is dropped from a pointer. But, different calling
-            ** conventions are incompatible. Starting from the next level,
-            ** the types are incompatible if the qualifiers differ.
-            */
-            /* (Debugging statement) */
-            /* printf ("Ind = %d    %06X != %06X\n", Indirections, LeftQual, RightQual); */
-            switch (Indirections) {
-                case 0:
-                    SetResult (Result, TC_STRICT_COMPATIBLE);
-                    break;
-
-                case 1:
-                    /* A non-const value on the right is compatible to a
-                    ** const one to the left, same for volatile.
-                    */
-                    if ((LeftQual & T_QUAL_CONST) < (RightQual & T_QUAL_CONST) ||
-                        (LeftQual & T_QUAL_VOLATILE) < (RightQual & T_QUAL_VOLATILE)) {
-                        SetResult (Result, TC_QUAL_DIFF);
-                    } else {
-                        SetResult (Result, TC_STRICT_COMPATIBLE);
-                    }
-
-                    if (LeftType != T_TYPE_FUNC || (LeftQual & T_QUAL_CCONV) == (RightQual & T_QUAL_CCONV)) {
-                        break;
-                    }
-                    /* else fall through */
-
-                default:
-                    SetResult (Result, TC_INCOMPATIBLE);
-                    return;
-            }
+        if (GetSignedness (lhs) != GetSignedness (rhs)) {
+            SetResult (Result, TC_SIGN_DIFF);
         }
 
         /* Check for special type elements */
         switch (LeftType) {
             case T_TYPE_PTR:
-                ++Indirections;
+                ++Result->Indirections;
+                if (Result->Indirections == 1) {
+                    if ((GetUnderlyingTypeCode (lhs + 1) & T_MASK_TYPE) == T_TYPE_VOID) {
+                        Result->F |= TCF_VOID_PTR_ON_LEFT;
+                    }
+                    if ((GetUnderlyingTypeCode (rhs + 1) & T_MASK_TYPE) == T_TYPE_VOID) {
+                        Result->F |= TCF_VOID_PTR_ON_RIGHT;
+                    }
+                } else {
+                    Result->F &= ~TCF_MASK_VOID_PTR;
+                }
                 break;
 
             case T_TYPE_FUNC:
@@ -311,29 +367,16 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
                 F1 = GetFuncDesc (lhs);
                 F2 = GetFuncDesc (rhs);
 
-                /* If one of both functions has an empty parameter list (which
-                ** does also mean, it is not a function definition, because the
-                ** flag is reset in this case), it is considered equal to any
-                ** other definition, provided that the other has no default
-                ** promotions in the parameter list. If none of both parameter
-                ** lists is empty, we have to check the parameter lists and
-                ** other attributes.
+                /* If one of both function declarations has an empty parameter
+                ** list (which does also mean, it is not a function definition,
+                ** because the flag is reset in this case), it is ignored for
+                ** parameter comparison and considered equal to the other one,
+                ** provided both have the same return type and other attributes.
+                ** If neither of both parameter lists is empty, we have to check
+                ** the parameter lists.
                 */
-                if (F1->Flags & FD_EMPTY) {
-                    if ((F2->Flags & FD_EMPTY) == 0) {
-                        if (ParamsHaveDefaultPromotions (F2)) {
-                            /* Flags differ */
-                            SetResult (Result, TC_INCOMPATIBLE);
-                            return;
-                        }
-                    }
-                } else if (F2->Flags & FD_EMPTY) {
-                    if (ParamsHaveDefaultPromotions (F1)) {
-                        /* Flags differ */
-                        SetResult (Result, TC_INCOMPATIBLE);
-                        return;
-                    }
-                } else {
+                if ((F1->Flags & FD_EMPTY) == 0 &&
+                    (F2->Flags & FD_EMPTY) == 0) {
 
                     /* Check the remaining flags */
                     if ((F1->Flags & ~FD_IGNORE) != (F2->Flags & ~FD_IGNORE)) {
@@ -364,7 +407,13 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
                         SetResult (Result, TC_INCOMPATIBLE);
                         return;
                     }
-                    SetResult (Result, TC_EQUAL);
+
+                    /* We take into account which side is more specified */
+                    if (LeftCount == UNSPECIFIED) {
+                        SetResult (Result, TC_UNSPECIFY);
+                    } else {
+                        SetResult (Result, TC_EQUAL);
+                    }
                 }
                 break;
 
@@ -397,11 +446,10 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
         /* Next type string element */
         ++lhs;
         ++rhs;
-        ++ElementCount;
     }
 
-    /* Check if end of rhs reached */
-    if (rhs->C == T_END) {
+    /* Check if lhs and rhs both reached ends */
+    if (lhs->C == T_END && rhs->C == T_END) {
         SetResult (Result, TC_IDENTICAL);
     } else {
         SetResult (Result, TC_INCOMPATIBLE);
@@ -414,7 +462,7 @@ typecmp_t TypeCmp (const Type* lhs, const Type* rhs)
 /* Compare two types and return the result */
 {
     /* Assume the types are identical */
-    typecmp_t   Result = TC_IDENTICAL;
+    typecmp_t Result = TYPECMP_INITIALIZER;
 
 #if 0
     printf ("Left : "); PrintRawType (stdout, lhs);
@@ -432,134 +480,18 @@ typecmp_t TypeCmp (const Type* lhs, const Type* rhs)
 
 
 
-static Type* DoComposite (Type* lhs, const Type* rhs);
-
-static void CompositeFuncParams (const FuncDesc* F1, const FuncDesc* F2)
-/* Composite two function symbol tables regarding function parameters */
+void TypeCompatibilityDiagnostic (const Type* NewType, const Type* OldType, int IsError, const char* Msg)
+/* Print error or warning message about type compatibility with proper type names */
 {
-    /* Get the symbol tables */
-    const SymTable* Tab1 = F1->SymTab;
-    const SymTable* Tab2 = F2->SymTab;
-
-    /* Composite the parameter lists */
-    const SymEntry* Sym1 = Tab1->SymHead;
-    const SymEntry* Sym2 = Tab2->SymHead;
-
-    /* Composite the fields */
-    while (Sym1 && (Sym1->Flags & SC_PARAM) && Sym2 && (Sym2->Flags & SC_PARAM)) {
-
-        /* Get the symbol types */
-        Type* Type1 = Sym1->Type;
-        Type* Type2 = Sym2->Type;
-
-        /* If either of both functions is old style, apply the default
-        ** promotions to the parameter type.
-        */
-        if (F1->Flags & FD_OLDSTYLE) {
-            if (IsClassInt (Type1)) {
-                Type1 = IntPromotion (Type1);
-            }
-        }
-        if (F2->Flags & FD_OLDSTYLE) {
-            if (IsClassInt (Type2)) {
-                Type2 = IntPromotion (Type2);
-            }
-        }
-
-        /* Composite this field */
-        DoComposite (Type1, Type2);
-
-        /* Get the pointers to the next fields */
-        Sym1 = Sym1->NextSym;
-        Sym2 = Sym2->NextSym;
+    StrBuf NewTypeName = STATIC_STRBUF_INITIALIZER;
+    StrBuf OldTypeName = STATIC_STRBUF_INITIALIZER;
+    GetFullTypeNameBuf (&NewTypeName, NewType);
+    GetFullTypeNameBuf (&OldTypeName, OldType);
+    if (IsError) {
+        Error (Msg, SB_GetConstBuf (&NewTypeName), SB_GetConstBuf (&OldTypeName));
+    } else {
+        Warning (Msg, SB_GetConstBuf (&NewTypeName), SB_GetConstBuf (&OldTypeName));
     }
-}
-
-
-
-static Type* DoComposite (Type* lhs, const Type* rhs)
-/* Recursively composite two types into lhs */
-{
-    FuncDesc*   F1;
-    FuncDesc*   F2;
-    long LeftCount, RightCount;
-
-    /* Composite two types */
-    while (lhs->C != T_END) {
-
-        /* Check if the end of the type string is reached */
-        if (rhs->C == T_END) {
-            return lhs;
-        }
-
-        /* Check for sanity */
-        CHECK (GetUnderlyingTypeCode (lhs) == GetUnderlyingTypeCode (rhs));
-
-        /* Check for special type elements */
-
-        if (IsTypeFunc (lhs)) {
-            /* Composite the function descriptors */
-            F1 = GetFuncDesc (lhs);
-            F2 = GetFuncDesc (rhs);
-
-            /* If one of both functions has an empty parameter list (which
-            ** does also mean, it is not a function definition, because the
-            ** flag is reset in this case), it is replaced by the other
-            ** definition, provided that the other has no default
-            ** promotions in the parameter list. If none of both parameter
-            ** lists is empty, we have to composite the parameter lists and
-            ** other attributes.
-            */
-            if ((F1->Flags & FD_EMPTY) == FD_EMPTY) {
-                if ((F2->Flags & FD_EMPTY) == 0) {
-                    /* Copy the parameters and flags */
-                    TypeCopy (lhs, rhs);
-                    F1->Flags = F2->Flags;
-                }
-            } else if ((F2->Flags & FD_EMPTY) == 0) {
-                /* Composite the parameter lists */
-                CompositeFuncParams (F1, F2);
-            }
-
-        } else if (IsTypeArray (lhs)) {
-            /* Check member count */
-            LeftCount  = GetElementCount (lhs);
-            RightCount = GetElementCount (rhs);
-
-            /* Set composite type if it is requested */
-            if (LeftCount != UNSPECIFIED) {
-                SetElementCount (lhs, LeftCount);
-            } else if (RightCount != UNSPECIFIED) {
-                SetElementCount (lhs, RightCount);
-            }
-        }
-
-        /* Next type string element */
-        ++lhs;
-        ++rhs;
-    }
-
-    return lhs;
-}
-
-
-
-FuncDesc* RefineFuncDesc (Type* OldType, const Type* NewType)
-/* Refine the existing function descriptor with a new one */
-{
-    FuncDesc* Old = GetFuncDesc (OldType);
-    FuncDesc* New = GetFuncDesc (NewType);
-
-    CHECK (Old != 0 && New != 0);
-
-    if ((New->Flags & FD_EMPTY) == 0) {
-        if ((Old->Flags & FD_EMPTY) == 0) {
-            DoComposite (OldType, NewType);
-        } else {
-            TypeCopy (OldType, NewType);
-            Old->Flags &= ~FD_EMPTY;
-        }
-    }
-
-    return Old;
+    SB_Done (&OldTypeName);
+    SB_Done (&NewTypeName);
 }

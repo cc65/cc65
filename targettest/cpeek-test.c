@@ -294,8 +294,8 @@ int main (void)
     revers(0); cputc('x'); chBack (); c1 = cpeekrevers(); chForth();
     revers(1); cputc('X'); chBack (); c2 = cpeekrevers(); chForth();
     cputc('\n'); cputc('\r');
-    revers(c1); cputc('o'); 
-    revers(c2); cputc('O'); 
+    revers(c1); cputc('o');
+    revers(c2); cputc('O');
 
     /* test cpeeks() */
     revers(0);

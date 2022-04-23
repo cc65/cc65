@@ -148,7 +148,7 @@ void SwitchStatement (void)
     /* Parse the following statement, which may actually be a compound
     ** statement if there is a curly brace at the current input position
     */
-    HaveBreak = Statement (&RCurlyBrace);
+    HaveBreak = AnyStatement (&RCurlyBrace);
 
     /* Check if we had any labels */
     if (CollCount (SwitchData.Nodes) == 0 && SwitchData.DefaultLabel == 0) {

@@ -212,6 +212,10 @@ static void SetSys (const char* Sys)
             NewSymbol ("__ATARI5200__", 1);
             break;
 
+        case TGT_ATARI7800:
+            NewSymbol ("__ATARI7800__", 1);
+            break;
+
         case TGT_ATARI:
             NewSymbol ("__ATARI__", 1);
             break;
@@ -332,6 +336,10 @@ static void SetSys (const char* Sys)
 
         case TGT_CX16:
             CBMSystem ("__CX16__");
+            break;
+
+        case TGT_SYM1:
+            NewSymbol ("__SYM1__", 1);
             break;
 
         default:

@@ -115,7 +115,7 @@ struct CodeEntry;
 typedef struct DefOrRef DefOrRef;
 struct DefOrRef {
     unsigned            Line;
-    long                LocalsBlockId;
+    size_t              LocalsBlockId;
     unsigned            Flags;
     int                 StackPtr;
     unsigned            Depth;
@@ -182,13 +182,6 @@ struct SymEntry {
             struct SymTable*    SymTab;   /* Member symbol table */
             const Type*         Type;     /* Underlying type */
         } E;
-
-        /* Data for bit fields */
-        struct {
-            unsigned            Offs;     /* Byte offset into struct */
-            unsigned            BitOffs;  /* Bit offset into storage unit */
-            unsigned            BitWidth; /* Width in bits */
-        } B;
 
         /* Data for functions */
         struct {
@@ -325,7 +318,7 @@ const char* GetSymTypeName (const Type* T);
 ** Note: This may use a static buffer that could be overwritten by other calls.
 */
 
-void ChangeSymType (SymEntry* Entry, Type* T);
+void ChangeSymType (SymEntry* Entry, const Type* T);
 /* Change the type of the given symbol */
 
 void ChangeAsmName (SymEntry* Entry, const char* NewAsmName);

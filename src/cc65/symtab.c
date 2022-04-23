@@ -37,6 +37,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#include <errno.h>
 
 /* common */
 #include "check.h"
@@ -59,6 +60,7 @@
 #include "stackptr.h"
 #include "symentry.h"
 #include "typecmp.h"
+#include "typeconv.h"
 #include "symtab.h"
 
 
@@ -66,8 +68,6 @@
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
-
-
 
 /* An empty symbol table */
 SymTable        EmptySymTab = {
@@ -87,15 +87,18 @@ SymTable        EmptySymTab = {
 #define SYMTAB_SIZE_LABEL         7U
 
 /* The current and root symbol tables */
-static unsigned         LexicalLevel    = 0;    /* For safety checks */
+static unsigned         LexLevelDepth   = 0;    /* For safety checks */
+static LexicalLevel*    CurrentLex        = 0;
 static SymTable*        SymTab0         = 0;
 static SymTable*        SymTab          = 0;
 static SymTable*        TagTab0         = 0;
 static SymTable*        TagTab          = 0;
+static SymTable*        FieldTab        = 0;
 static SymTable*        LabelTab        = 0;
 static SymTable*        SPAdjustTab     = 0;
 static SymTable*        FailSafeTab     = 0;    /* For errors */
 
+static FILE* DebugTableFile = 0;
 
 /*****************************************************************************/
 /*                              struct SymTable                              */
@@ -171,6 +174,10 @@ static void CheckSymTable (SymTable* Tab)
                         if (IS_Get (&WarnUnusedParam)) {
                             Warning ("Parameter '%s' is never used", Entry->Name);
                         }
+                    } else if (Flags & SC_FUNC) {
+                        if (IS_Get (&WarnUnusedFunc)) {
+                            Warning ("Function '%s' is defined but never used", Entry->Name);
+                        }
                     } else {
                         if (IS_Get (&WarnUnusedVar)) {
                             Warning ("Variable '%s' is defined but never used", Entry->Name);
@@ -207,19 +214,72 @@ static void CheckSymTable (SymTable* Tab)
 
 
 
-unsigned GetLexicalLevel (void)
-/* Return the current lexical level */
+unsigned GetLexicalLevelDepth (void)
+/* Return the current lexical level depth */
 {
-    return LexicalLevel;
+    return LexLevelDepth;
 }
 
 
 
+unsigned GetLexicalLevel (void)
+/* Return the current lexical level */
+{
+    if (CurrentLex != 0) {
+        return CurrentLex->CurrentLevel;
+    }
+    return LEX_LEVEL_NONE;
+}
+
+
+
+void PushLexicalLevel (unsigned NewLevel)
+/* Enter the specified lexical level */
+{
+    LexicalLevel* L = xmalloc (sizeof (LexicalLevel));
+    L->PrevLex = CurrentLex;
+    CurrentLex = L;
+    CurrentLex->CurrentLevel = NewLevel;
+    ++LexLevelDepth;
+}
+
+
+
+void PopLexicalLevel (void)
+/* Exit the current lexical level */
+{
+    LexicalLevel* L;
+    PRECONDITION (CurrentLex != 0 && LexLevelDepth > 0);
+    L = CurrentLex;
+    CurrentLex = L->PrevLex;
+    xfree (L);
+    --LexLevelDepth;
+}
+
 void EnterGlobalLevel (void)
 /* Enter the program global lexical level */
 {
+    const char* OutName = NULL;
+    if (!SB_IsEmpty (&DebugTableName)) {
+        OutName = SB_GetConstBuf (&DebugTableName);
+    }
+
+    if (OutName) {
+        /* Open the table file */
+        DebugTableFile = fopen (OutName, "w");
+        if (DebugTableFile == 0) {
+            Error ("Cannot create table dump file '%s': %s", OutName, strerror (errno));
+        }
+    }
+    else if (Debug) {
+        DebugTableFile = stdout;
+    }
+
     /* Safety */
-    PRECONDITION (++LexicalLevel == LEX_LEVEL_GLOBAL);
+    PRECONDITION (GetLexicalLevel () == LEX_LEVEL_NONE);
+
+    /* Enter global lexical level */
+    PushLexicalLevel (LEX_LEVEL_GLOBAL);
 
     /* Create and assign the symbol table */
     SymTab0 = SymTab = NewSymTable (SYMTAB_SIZE_GLOBAL);
@@ -234,26 +294,59 @@ void EnterGlobalLevel (void)
     FailSafeTab = NewSymTable (SYMTAB_SIZE_GLOBAL);
 }
 
-
-
 void LeaveGlobalLevel (void)
 /* Leave the program global lexical level */
 {
     /* Safety */
-    PRECONDITION (LexicalLevel-- == LEX_LEVEL_GLOBAL);
+    PRECONDITION (GetLexicalLevel () == LEX_LEVEL_GLOBAL);
 
     /* Check the tables */
     CheckSymTable (SymTab0);
 
     /* Dump the tables if requested */
-    if (Debug) {
-        PrintSymTable (SymTab0, stdout, "Global symbol table");
-        PrintSymTable (TagTab0, stdout, "Global tag table");
+    if (DebugTableFile) {
+        SymEntry* Entry;
+        StrBuf* Header;
+
+        PrintSymTable (SymTab0, DebugTableFile, "Global symbol table");
+        PrintSymTable (TagTab0, DebugTableFile, "Global tag table");
+
+        Entry = TagTab0->SymHead;
+        if (Entry) {
+            fputs ("\nGlobal struct and union definitions", DebugTableFile);
+            fputs ("\n=========================\n", DebugTableFile);
+
+            do {
+                if (!((Entry->Flags & SC_STRUCT) || (Entry->Flags & SC_UNION)) || !Entry->V.S.SymTab) {
+                    continue;
+                }
+
+                Header = NewStrBuf();
+                if(Entry->Flags & SC_STRUCT) {
+                    SB_AppendStr (Header, "SC_STRUCT: ");
+                }
+                else {
+                    SB_AppendStr (Header, "SC_UNION: ");
+                }
+                SB_AppendStr (Header, Entry->Name);
+                SB_Terminate (Header);
+
+                PrintSymTable (Entry->V.S.SymTab, DebugTableFile, SB_GetConstBuf (Header));
+            } while ((Entry = Entry->NextSym));
+        }
+
+        /* Close the file */
+        if (DebugTableFile != stdout && fclose (DebugTableFile) != 0) {
+            Error ("Error closing table dump file '%s': %s", SB_GetConstBuf(&DebugTableName), strerror (errno));
+        }
     }
 
     /* Don't delete the symbol and struct tables! */
     SymTab = 0;
     TagTab = 0;
+
+    /* Exit global lexical level */
+    PopLexicalLevel ();
 }
 
 
@@ -263,8 +356,8 @@ void EnterFunctionLevel (void)
 {
     SymTable* S;
 
-    /* New lexical level */
-    ++LexicalLevel;
+    /* Enter function lexical level */
+    PushLexicalLevel (LEX_LEVEL_FUNCTION);
 
     /* Get a new symbol table and make it current */
     S = NewSymTable (SYMTAB_SIZE_FUNCTION);
@@ -287,8 +380,11 @@ void EnterFunctionLevel (void)
 void RememberFunctionLevel (struct FuncDesc* F)
 /* Remember the symbol tables for the level and leave the level without checks */
 {
-    /* Leave the lexical level */
-    --LexicalLevel;
+    /* Safety */
+    PRECONDITION (GetLexicalLevel () == LEX_LEVEL_FUNCTION);
+
+    /* Leave function lexical level */
+    PopLexicalLevel ();
 
     /* Remember the tables */
     F->SymTab = SymTab;
@@ -305,8 +401,8 @@ void RememberFunctionLevel (struct FuncDesc* F)
 void ReenterFunctionLevel (struct FuncDesc* F)
 /* Reenter the function lexical level using the existing tables from F */
 {
-    /* New lexical level */
-    ++LexicalLevel;
+    /* Enter function lexical level */
+    PushLexicalLevel (LEX_LEVEL_FUNCTION);
 
     /* Make the tables current again */
     F->SymTab->PrevTab = SymTab;
@@ -324,12 +420,27 @@ void ReenterFunctionLevel (struct FuncDesc* F)
 void LeaveFunctionLevel (void)
 /* Leave function lexical level */
 {
-    /* Leave the lexical level */
-    --LexicalLevel;
+    /* Safety */
+    PRECONDITION (GetLexicalLevel () == LEX_LEVEL_FUNCTION);
+
+    /* Leave function lexical level */
+    PopLexicalLevel ();
 
     /* Check the tables */
     CheckSymTable (SymTab);
     CheckSymTable (LabelTab);
+
+    /* Dump the tables if requested */
+    if (DebugTableFile) {
+        StrBuf* SymbolHeader = NewStrBuf();
+
+        SB_AppendStr (SymbolHeader, "SC_FUNC: ");
+        SB_AppendStr (SymbolHeader, CurrentFunc->FuncEntry->AsmName);
+        SB_AppendStr (SymbolHeader, ": Symbol table");
+        SB_Terminate (SymbolHeader);
+
+        PrintSymTable (SymTab, DebugTableFile, SB_GetConstBuf(SymbolHeader));
+    }
 
     /* Drop the label table if it is empty */
     if (LabelTab->SymCount == 0) {
@@ -349,8 +460,8 @@ void EnterBlockLevel (void)
 {
     SymTable* S;
 
-    /* New lexical level */
-    ++LexicalLevel;
+    /* Enter block lexical level */
+    PushLexicalLevel (LEX_LEVEL_BLOCK);
 
     /* Get a new symbol table and make it current */
     S = NewSymTable (SYMTAB_SIZE_BLOCK);
@@ -368,8 +479,11 @@ void EnterBlockLevel (void)
 void LeaveBlockLevel (void)
 /* Leave a nested block in a function */
 {
-    /* Leave the lexical level */
-    --LexicalLevel;
+    /* Safety */
+    PRECONDITION (GetLexicalLevel () == LEX_LEVEL_BLOCK);
+
+    /* Leave block lexical level */
+    PopLexicalLevel ();
 
     /* Check the tables */
     CheckSymTable (SymTab);
@@ -386,13 +500,16 @@ void EnterStructLevel (void)
 {
     SymTable* S;
 
+    /* Enter struct lexical level */
+    PushLexicalLevel (LEX_LEVEL_STRUCT);
+
     /* Get a new symbol table and make it current. Note: Structs and enums
     ** nested in struct scope are NOT local to the struct but visible in the
     ** outside scope. So we will NOT create a new struct or enum table.
     */
-    S = NewSymTable (SYMTAB_SIZE_BLOCK);
-    S->PrevTab  = SymTab;
-    SymTab      = S;
+    S = NewSymTable (SYMTAB_SIZE_STRUCT);
+    S->PrevTab  = FieldTab;
+    FieldTab    = S;
 }
 
 
@@ -400,8 +517,14 @@ void EnterStructLevel (void)
 void LeaveStructLevel (void)
 /* Leave a nested block for a struct definition */
 {
+    /* Safety */
+    PRECONDITION (GetLexicalLevel () == LEX_LEVEL_STRUCT);
+
+    /* Leave struct lexical level */
+    PopLexicalLevel ();
+
     /* Don't delete the table */
-    SymTab = SymTab->PrevTab;
+    FieldTab = FieldTab->PrevTab;
 }
 
 
@@ -518,7 +641,7 @@ SymEntry FindStructField (const Type* T, const char* Name)
         */
         if (Struct->V.S.SymTab) {
             Entry = FindSymInTable (Struct->V.S.SymTab, Name, HashStr (Name));
-            
+
             if (Entry != 0) {
                 Offs = Entry->V.Offs;
             }
@@ -548,6 +671,19 @@ SymEntry FindStructField (const Type* T, const char* Name)
 
 
 
+static int IsDistinctRedef (const Type* lhst, const Type* rhst, typecmpcode_t Code, typecmpflag_t Flags)
+/* Return if type compatibility result is "worse" than Code or if any bit of
+** qualifier Flags is set.
+*/
+{
+    typecmp_t Result = TypeCmp (lhst, rhst);
+    if (Result.C < Code || (Result.F & TCF_MASK_QUAL & Flags) != 0) {
+        return 1;
+    }
+    return 0;
+}
+
+
 static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags)
 /* Check and handle redefinition of existing symbols.
 ** Complete array sizes and function descriptors as well.
@@ -564,7 +700,7 @@ static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags
 
         /* Existing typedefs cannot be redeclared as anything different */
         if (SCType == SC_TYPEDEF) {
-            if (TypeCmp (E_Type, T) < TC_IDENTICAL) {
+            if (IsDistinctRedef (E_Type, T, TC_IDENTICAL, TCF_MASK_QUAL)) {
                 Error ("Conflicting types for typedef '%s'", Entry->Name);
                 Entry = 0;
             }
@@ -590,7 +726,7 @@ static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags
                 Entry = 0;
             } else {
                 /* New type must be compatible with the composite prototype */
-                if (TypeCmp (Entry->Type, T) < TC_EQUAL) {
+                if (IsDistinctRedef (E_Type, T, TC_EQUAL, TCF_MASK_QUAL)) {
                     Error ("Conflicting function types for '%s'", Entry->Name);
                     Entry = 0;
                 } else {
@@ -620,7 +756,7 @@ static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags
             ** is incomplete, complete it.
             */
             if ((Size != UNSPECIFIED && ESize != UNSPECIFIED && Size != ESize) ||
-                TypeCmp (T + 1, E_Type + 1) < TC_EQUAL) {
+                IsDistinctRedef (E_Type + 1, T + 1, TC_IDENTICAL, TCF_MASK_QUAL)) {
                 /* Conflicting element types */
                 Error ("Conflicting array types for '%s[]'", Entry->Name);
                 Entry = 0;
@@ -638,7 +774,7 @@ static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags
             if (SCType != E_SCType) {
                 Error ("Redefinition of '%s' as different kind of symbol", Entry->Name);
                 Entry = 0;
-            } else if (TypeCmp (E_Type, T) < TC_EQUAL) {
+            } else if (IsDistinctRedef (E_Type, T, TC_EQUAL, TCF_MASK_QUAL)) {
                 Error ("Conflicting types for '%s'", Entry->Name);
                 Entry = 0;
             } else if (E_SCType == SC_ENUMERATOR) {
@@ -732,7 +868,7 @@ SymEntry* AddEnumSym (const char* Name, unsigned Flags, const Type* Type, SymTab
             CurTagTab = FailSafeTab;
         }
     }
-    
+
     if (Entry == 0) {
 
         /* Create a new entry */
@@ -817,7 +953,7 @@ SymEntry* AddStructSym (const char* Name, unsigned Flags, unsigned Size, SymTabl
             CurTagTab = FailSafeTab;
         }
     }
-    
+
     if (Entry == 0) {
 
         /* Create a new entry */
@@ -850,7 +986,7 @@ SymEntry* AddBitField (const char* Name, const Type* T, unsigned Offs,
 /* Add a bit field to the local symbol table and return the symbol entry */
 {
     /* Do we have an entry with this name already? */
-    SymEntry* Entry = FindSymInTable (SymTab, Name, HashStr (Name));
+    SymEntry* Entry = FindSymInTable (FieldTab, Name, HashStr (Name));
     if (Entry) {
 
         /* We have a symbol with this name already */
@@ -862,10 +998,8 @@ SymEntry* AddBitField (const char* Name, const Type* T, unsigned Offs,
         Entry = NewSymEntry (Name, SC_BITFIELD);
 
         /* Set the symbol attributes. Bit-fields are always integral types. */
-        Entry->Type         = TypeDup (T);
-        Entry->V.B.Offs     = Offs;
-        Entry->V.B.BitOffs  = BitOffs;
-        Entry->V.B.BitWidth = BitWidth;
+        Entry->Type   = NewBitFieldType (T, BitOffs, BitWidth);
+        Entry->V.Offs = Offs;
 
         if (!SignednessSpecified) {
             /* int is treated as signed int everywhere except bit-fields; switch it to unsigned,
@@ -877,12 +1011,14 @@ SymEntry* AddBitField (const char* Name, const Type* T, unsigned Offs,
             */
             CHECK ((Entry->Type->C & T_MASK_SIGN) == T_SIGN_SIGNED ||
                    IsTypeChar (Entry->Type));
-            Entry->Type->C &= ~T_MASK_SIGN;
-            Entry->Type->C |= T_SIGN_UNSIGNED;
+            Entry->Type[0].C &= ~T_MASK_SIGN;
+            Entry->Type[0].C |= T_SIGN_UNSIGNED;
+            Entry->Type[1].C &= ~T_MASK_SIGN;
+            Entry->Type[1].C |= T_SIGN_UNSIGNED;
         }
 
         /* Add the entry to the symbol table */
-        AddSymEntry (SymTab, Entry);
+        AddSymEntry (FieldTab, Entry);
 
     }
 
@@ -932,7 +1068,7 @@ DefOrRef* AddDefOrRef (SymEntry* E, unsigned Flags)
     DOR = xmalloc (sizeof (DefOrRef));
     CollAppend (E->V.L.DefsOrRefs, DOR);
     DOR->Line = GetCurrentLine ();
-    DOR->LocalsBlockId = (long)CollLast (&CurrentFunc->LocalsBlockStack);
+    DOR->LocalsBlockId = (size_t)CollLast (&CurrentFunc->LocalsBlockStack);
     DOR->Flags = Flags;
     DOR->StackPtr = StackPtr;
     DOR->Depth = CollCount (&CurrentFunc->LocalsBlockStack);
@@ -994,9 +1130,9 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
                 /* Are we jumping into a block with initalization of an object that
                 ** has automatic storage duration? Let's emit a warning.
                 */
-                if ((long)CollLast (AIC) != DOR->LocalsBlockId &&
+                if ((size_t)CollLast (AIC) != DOR->LocalsBlockId &&
                     (CollCount (AIC) < DOR->Depth ||
-                    (long)CollAt (AIC, DOR->Depth - 1) != DOR->LocalsBlockId)) {
+                    (size_t)CollAt (AIC, DOR->Depth - 1) != DOR->LocalsBlockId)) {
                     Warning ("Goto at line %d to label %s jumps into a block with "
                     "initialization of an object that has automatic storage duration",
                     GetCurrentLine (), Name);
@@ -1025,9 +1161,9 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
                 /* Are we jumping into a block with initalization of an object that
                 ** has automatic storage duration? Let's emit a warning.
                 */
-                if ((long)CollLast (AIC) != DOR->LocalsBlockId &&
+                if ((size_t)CollLast (AIC) != DOR->LocalsBlockId &&
                     (CollCount (AIC) >= DOR->Depth ||
-                    (long)CollLast (AIC) >= (long)DOR->Line))
+                    (size_t)CollLast (AIC) >= (size_t)DOR->Line))
                     Warning ("Goto at line %d to label %s jumps into a block with "
                     "initialization of an object that has automatic storage duration",
                     DOR->Line, Name);
@@ -1070,9 +1206,9 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
 
 
 SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs)
-/* Add a local symbol and return the symbol entry */
+/* Add a local or struct/union field symbol and return the symbol entry */
 {
-    SymTable* Tab = SymTab;
+    SymTable* Tab = (Flags & SC_STRUCTFIELD) == 0 ? SymTab : FieldTab;
     ident Ident;
 
     /* Do we have an entry with this name already? */
@@ -1116,7 +1252,7 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
             }
         }
     }
-    
+
     if (Entry == 0) {
         /* Create a new entry */
         Entry = NewSymEntry (Name, Flags);
@@ -1221,7 +1357,6 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
         /* Add the new declaration to the global symbol table instead */
         Tab = SymTab0;
     }
-    
     if (Entry == 0 || Entry->Owner != Tab) {
 
         /* Create a new entry */
@@ -1267,6 +1402,16 @@ SymTable* GetGlobalSymTab (void)
 {
     return SymTab0;
 }
+
+
+
+SymTable* GetFieldSymTab (void)
+/* Return the current field symbol table */
+{
+    return FieldTab;
+}
+
+
 
 SymTable* GetLabelSymTab (void)
 /* Return the global symbol table */
@@ -1370,7 +1515,7 @@ void EmitDebugInfo (void)
         /* For cosmetic reasons in the output file, we will insert two tabs
         ** on global level and just one on local level.
         */
-        if (LexicalLevel == LEX_LEVEL_GLOBAL) {
+        if (GetLexicalLevel () == LEX_LEVEL_GLOBAL) {
             Head = "\t.dbg\t\tsym";
         } else {
             Head = "\t.dbg\tsym";

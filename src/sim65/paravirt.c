@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2013-2013 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -105,7 +105,7 @@ static void SetAX (CPURegs* Regs, unsigned Val)
 
 static unsigned char Pop (CPURegs* Regs)
 {
-    return MemReadByte (0x0100 + ++Regs->SP);
+    return MemReadByte (0x0100 + (++Regs->SP & 0xFF));
 }
 
 
@@ -317,6 +317,8 @@ void ParaVirtInit (unsigned aArgStart, unsigned char aSPAddr)
 void ParaVirtHooks (CPURegs* Regs)
 /* Potentially execute paravirtualization hooks */
 {
+    unsigned lo;
+
     /* Check for paravirtualization address range */
     if (Regs->PC <  PARAVIRT_BASE ||
         Regs->PC >= PARAVIRT_BASE + sizeof (Hooks) / sizeof (Hooks[0])) {
@@ -327,5 +329,6 @@ void ParaVirtHooks (CPURegs* Regs)
     Hooks[Regs->PC - PARAVIRT_BASE] (Regs);
 
     /* Simulate RTS */
-    Regs->PC = Pop(Regs) + (Pop(Regs) << 8) + 1;
+    lo = Pop (Regs);
+    Regs->PC = lo + (Pop (Regs) << 8) + 1;
 }

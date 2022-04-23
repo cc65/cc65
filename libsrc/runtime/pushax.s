@@ -30,6 +30,6 @@ pusha0: ldx     #0
         pla                     ; (31)
         dey                     ; (33)
         sta     (sp),y          ; (38)
-        rts                     ; (44)     
+        rts                     ; (44)
 
 .endproc

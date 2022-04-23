@@ -56,26 +56,13 @@
 ExprDesc* ED_Init (ExprDesc* Expr)
 /* Initialize an ExprDesc */
 {
-    Expr->Sym       = 0;
     Expr->Type      = 0;
     Expr->Flags     = E_NEED_EAX;
     Expr->Name      = 0;
+    Expr->Sym       = 0;
     Expr->IVal      = 0;
-    Expr->FVal      = FP_D_Make (0.0);
-    Expr->LVal      = 0;
-    Expr->BitOffs   = 0;
-    Expr->BitWidth  = 0;
+    memset (&Expr->V, 0, sizeof (Expr->V));
     return Expr;
-}
-
-
-
-void ED_MakeBitField (ExprDesc* Expr, unsigned BitOffs, unsigned BitWidth)
-/* Make this expression a bit field expression */
-{
-    Expr->Flags   |= E_BITFIELD;
-    Expr->BitOffs  = BitOffs;
-    Expr->BitWidth = BitWidth;
 }
 
 
@@ -228,15 +215,15 @@ int ED_GetStackOffs (const ExprDesc* Expr, int Offs)
 
 
 
-ExprDesc* ED_MakeConstAbs (ExprDesc* Expr, long Value, Type* Type)
+ExprDesc* ED_MakeConstAbs (ExprDesc* Expr, long Value, const Type* Type)
 /* Replace Expr with an absolute const with the given value and type */
 {
-    Expr->Sym   = 0;
     Expr->Type  = Type;
     Expr->Flags = E_LOC_NONE | E_RTYPE_RVAL | (Expr->Flags & E_MASK_KEEP_MAKE);
     Expr->Name  = 0;
+    Expr->Sym   = 0;
     Expr->IVal  = Value;
-    Expr->FVal  = FP_D_Make (0.0);
+    memset (&Expr->V, 0, sizeof (Expr->V));
     return Expr;
 }
 
@@ -245,12 +232,12 @@ ExprDesc* ED_MakeConstAbs (ExprDesc* Expr, long Value, Type* Type)
 ExprDesc* ED_MakeConstAbsInt (ExprDesc* Expr, long Value)
 /* Replace Expr with a constant integer expression with the given value */
 {
-    Expr->Sym   = 0;
     Expr->Type  = type_int;
     Expr->Flags = E_LOC_NONE | E_RTYPE_RVAL | (Expr->Flags & E_MASK_KEEP_MAKE);
     Expr->Name  = 0;
+    Expr->Sym   = 0;
     Expr->IVal  = Value;
-    Expr->FVal  = FP_D_Make (0.0);
+    memset (&Expr->V, 0, sizeof (Expr->V));
     return Expr;
 }
 
@@ -261,10 +248,10 @@ ExprDesc* ED_MakeConstBool (ExprDesc* Expr, long Value)
 {
     Expr->Sym   = 0;
     Expr->Type  = type_bool;
-    Expr->Flags = E_LOC_NONE | E_RTYPE_RVAL | (Expr->Flags & E_HAVE_MARKS);
+    Expr->Flags = E_LOC_NONE | E_RTYPE_RVAL | (Expr->Flags & E_MASK_KEEP_MAKE);
     Expr->Name  = 0;
     Expr->IVal  = Value;
-    Expr->FVal  = FP_D_Make (0.0);
+    memset (&Expr->V, 0, sizeof (Expr->V));
     return Expr;
 }
 
@@ -273,13 +260,13 @@ ExprDesc* ED_MakeConstBool (ExprDesc* Expr, long Value)
 ExprDesc* ED_FinalizeRValLoad (ExprDesc* Expr)
 /* Finalize the result of LoadExpr to be an rvalue in the primary register */
 {
-    Expr->Sym   = 0;
-    Expr->Flags &= ~(E_MASK_LOC | E_MASK_RTYPE | E_BITFIELD | E_ADDRESS_OF);
+    Expr->Flags &= ~(E_MASK_LOC | E_MASK_RTYPE | E_ADDRESS_OF);
     Expr->Flags &= ~E_CC_SET;
     Expr->Flags |= (E_LOC_PRIMARY | E_RTYPE_RVAL);
+    Expr->Sym   = 0;
     Expr->Name  = 0;
     Expr->IVal  = 0;    /* No offset */
-    Expr->FVal  = FP_D_Make (0.0);
+    memset (&Expr->V, 0, sizeof (Expr->V));
     return Expr;
 }
 
@@ -397,6 +384,30 @@ int ED_IsConstBool (const ExprDesc* Expr)
 
 
 
+int ED_IsConstTrue (const ExprDesc* Expr)
+/* Return true if the constant expression can be evaluated as boolean true at
+** compile time.
+*/
+{
+    /* Non-zero arithmetics and objects addresses are boolean true */
+    return (ED_IsConstAbsInt (Expr) && Expr->IVal != 0) ||
+           (ED_IsAddrExpr (Expr));
+}
+
+
+
+int ED_IsConstFalse (const ExprDesc* Expr)
+/* Return true if the constant expression can be evaluated as boolean false at
+** compile time.
+*/
+{
+    /* Zero arithmetics and null pointers are boolean false */
+    return (ED_IsConstAbsInt (Expr) && Expr->IVal == 0) ||
+           ED_IsNullPtr (Expr);
+}
+
+
+
 int ED_IsConst (const ExprDesc* Expr)
 /* Return true if the expression denotes a constant of some sort. This can be a
 ** numeric constant, the address of a global variable (maybe with offset) or
@@ -406,6 +417,15 @@ int ED_IsConst (const ExprDesc* Expr)
     return (Expr->Flags & E_MASK_LOC) == E_LOC_NONE || ED_IsConstAddr (Expr);
 }
 
+
+
+int ED_IsQuasiConst (const ExprDesc* Expr)
+/* Return true if the expression denotes a quasi-constant of some sort. This
+** can be a numeric constant, a constant address or a stack variable address.
+*/
+{
+    return (Expr->Flags & E_MASK_LOC) == E_LOC_NONE || ED_IsQuasiConstAddr (Expr);
+}
 
 
 int ED_IsConstAddr (const ExprDesc* Expr)
@@ -431,8 +451,8 @@ int ED_IsQuasiConstAddr (const ExprDesc* Expr)
 int ED_IsNullPtr (const ExprDesc* Expr)
 /* Return true if the given expression is a NULL pointer constant */
 {
-    return (Expr->Flags & (E_MASK_LOC|E_MASK_RTYPE|E_BITFIELD)) ==
-                                (E_LOC_NONE|E_RTYPE_RVAL) &&
+    return (Expr->Flags & (E_MASK_LOC|E_MASK_RTYPE)) ==
+                               (E_LOC_NONE|E_RTYPE_RVAL) &&
            Expr->IVal == 0                               &&
            IsClassInt (Expr->Type);
 }
@@ -440,7 +460,7 @@ int ED_IsNullPtr (const ExprDesc* Expr)
 
 
 int ED_IsBool (const ExprDesc* Expr)
-/* Return true of the expression can be treated as a boolean, that is, it can
+/* Return true if the expression can be treated as a boolean, that is, it can
 ** be an operand to a compare operation.
 */
 {
@@ -470,7 +490,7 @@ void PrintExprDesc (FILE* F, ExprDesc* E)
                     "Raw type: (unknown)\n");
     }
     fprintf (F, "IVal:     0x%08lX\n", E->IVal);
-    fprintf (F, "FVal:     %f\n", FP_D_ToFloat (E->FVal));
+    fprintf (F, "FVal:     %f\n", FP_D_ToFloat (E->V.FVal));
 
     Flags = E->Flags;
     Sep   = '(';
@@ -525,11 +545,6 @@ void PrintExprDesc (FILE* F, ExprDesc* E)
         Flags &= ~E_LOC_CODE;
         Sep = ',';
     }
-    if (Flags & E_BITFIELD) {
-        fprintf (F, "%cE_BITFIELD", Sep);
-        Flags &= ~E_BITFIELD;
-        Sep = ',';
-    }
     if (Flags & E_NEED_TEST) {
         fprintf (F, "%cE_NEED_TEST", Sep);
         Flags &= ~E_NEED_TEST;
@@ -562,10 +577,10 @@ void PrintExprDesc (FILE* F, ExprDesc* E)
 
 
 
-Type* ReplaceType (ExprDesc* Expr, const Type* NewType)
+const Type* ReplaceType (ExprDesc* Expr, const Type* NewType)
 /* Replace the type of Expr by a copy of Newtype and return the old type string */
 {
-    Type* OldType = Expr->Type;
+    const Type* OldType = Expr->Type;
     Expr->Type = TypeDup (NewType);
     return OldType;
 }

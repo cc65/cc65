@@ -187,7 +187,7 @@ SymEntry* ParseScopedSymName (SymFindAction Action)
         ** may not expect NULL to be returned if Action contains SYM_ALLOC_NEW,
         ** create a new symbol.
         */
-        if (Action & SYM_ALLOC_NEW) { 
+        if (Action & SYM_ALLOC_NEW) {
             Sym = NewSymEntry (&Ident, SF_NONE);
         } else {
             Sym = 0;

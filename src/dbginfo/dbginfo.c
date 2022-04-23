@@ -183,7 +183,7 @@ typedef struct DbgInfo DbgInfo;
 struct DbgInfo {
 
     /* First we have all items in collections sorted by id. The ids are
-    ** continous, so an access by id is almost as cheap as an array access.
+    ** continuous, so an access by id is almost as cheap as an array access.
     ** The collections are also used when the objects are deleted, so they're
     ** actually the ones that "own" the items.
     */
@@ -680,7 +680,7 @@ static char* SB_StrDup (const StrBuf* B)
 static Collection* CollInit (Collection* C)
 /* Initialize a collection and return it. */
 {
-    /* Intialize the fields. */
+    /* Initialize the fields. */
     C->Count = 0;
     C->Size  = 0;
     C->Items = 0;
@@ -1349,7 +1349,7 @@ static int CompareFileInfoByName (const void* L, const void* R)
 
 
 static LibInfo* NewLibInfo (const StrBuf* Name)
-/* Create a new LibInfo struct, intialize and return it */
+/* Create a new LibInfo struct, initialize and return it */
 {
     /* Allocate memory */
     LibInfo* L = xmalloc (sizeof (LibInfo) + SB_GetLen (Name));
@@ -1463,7 +1463,7 @@ static int CompareLineInfoByLine (const void* L, const void* R)
 
 
 static ModInfo* NewModInfo (const StrBuf* Name)
-/* Create a new ModInfo struct, intialize and return it */
+/* Create a new ModInfo struct, initialize and return it */
 {
     /* Allocate memory */
     ModInfo* M = xmalloc (sizeof (ModInfo) + SB_GetLen (Name));
@@ -1536,7 +1536,7 @@ static int CompareModInfoByName (const void* L, const void* R)
 
 
 static ScopeInfo* NewScopeInfo (const StrBuf* Name)
-/* Create a new ScopeInfo struct, intialize and return it */
+/* Create a new ScopeInfo struct, initialize and return it */
 {
     /* Allocate memory */
     ScopeInfo* S = xmalloc (sizeof (ScopeInfo) + SB_GetLen (Name));
@@ -1697,7 +1697,7 @@ static int CompareSegInfoByName (const void* L, const void* R)
 
 
 static SpanInfo* NewSpanInfo (void)
-/* Create a new SpanInfo struct, intialize and return it */
+/* Create a new SpanInfo struct, initialize and return it */
 {
     /* Allocate memory */
     SpanInfo* S = xmalloc (sizeof (SpanInfo));
@@ -1779,7 +1779,7 @@ static int CompareSpanInfoByAddr (const void* L, const void* R)
 
 
 static SymInfo* NewSymInfo (const StrBuf* Name)
-/* Create a new SymInfo struct, intialize and return it */
+/* Create a new SymInfo struct, initialize and return it */
 {
     /* Allocate memory */
     SymInfo* S = xmalloc (sizeof (SymInfo) + SB_GetLen (Name));
@@ -2147,7 +2147,7 @@ static TypeInfo* ParseTypeString (InputData* D, StrBuf* Type)
                     I += GT_GET_SIZE (A[I]) + 1;
                 } else {
                     /* Unknown type in type string */
-                    ParseError (D, CC65_ERROR, "Unkown type in type value");
+                    ParseError (D, CC65_ERROR, "Unknown type in type value");
                     return 0;
                 }
                 break;
@@ -2733,7 +2733,7 @@ static int StrConstFollows (InputData* D)
 
 
 static int Consume (InputData* D, Token Tok, const char* Name)
-/* Check for a token and consume it. Return true if the token was comsumed,
+/* Check for a token and consume it. Return true if the token was consumed,
 ** return false otherwise.
 */
 {
@@ -6936,7 +6936,7 @@ const cc65_scopeinfo* cc65_scope_byspan (cc65_dbginfo Handle, unsigned SpanId)
 const cc65_scopeinfo* cc65_childscopes_byid (cc65_dbginfo Handle, unsigned Id)
 /* Return the direct child scopes of a scope with a given id. The function
 ** returns NULL if no scope with this id was found, otherwise a list of the
-** direct childs.
+** direct children.
 */
 {
     const DbgInfo*      Info;

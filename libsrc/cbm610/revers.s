@@ -9,7 +9,7 @@
         .import         RVS: zp
 
         .include        "cbm610.inc"
-                               
+
 
 .proc   _revers
 

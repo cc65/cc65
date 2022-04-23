@@ -65,12 +65,22 @@ struct SymTable {
 /* An empty symbol table */
 extern SymTable         EmptySymTab;
 
-/* Forwards */
-struct FuncDesc;
+/* Lexical level linked list node type */
+typedef struct LexicalLevel LexicalLevel;
+struct LexicalLevel {
+    LexicalLevel*       PrevLex;
+    unsigned            CurrentLevel;
+};
 
 /* Predefined lexical levels */
+#define LEX_LEVEL_NONE          0U
 #define LEX_LEVEL_GLOBAL        1U
 #define LEX_LEVEL_FUNCTION      2U
+#define LEX_LEVEL_BLOCK         3U
+#define LEX_LEVEL_STRUCT        4U
+
+/* Forwards */
+struct FuncDesc;
 
 
 
@@ -80,8 +90,17 @@ struct FuncDesc;
 
 
 
+unsigned GetLexicalLevelDepth (void);
+/* Return the current lexical level depth */
+
 unsigned GetLexicalLevel (void);
 /* Return the current lexical level */
+
+void PushLexicalLevel (unsigned NewLevel);
+/* Enter the specified lexical level */
+
+void PopLexicalLevel (void);
+/* Exit the current lexical level */
 
 void EnterGlobalLevel (void);
 /* Enter the program global lexical level */
@@ -166,7 +185,7 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags);
 /* Add a goto label to the symbol table */
 
 SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs);
-/* Add a local symbol and return the symbol entry */
+/* Add a local or struct/union field symbol and return the symbol entry */
 
 SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags);
 /* Add an external or global symbol to the symbol table and return the entry */
@@ -184,6 +203,9 @@ SymTable* GetSymTab (void);
 
 SymTable* GetGlobalSymTab (void);
 /* Return the global symbol table */
+
+SymTable* GetFieldSymTab (void);
+/* Return the current field symbol table */
 
 SymTable* GetLabelSymTab (void);
 /* Return the label symbol table */

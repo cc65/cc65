@@ -15,7 +15,7 @@ typedef struct _DIRMENU
 {
     const char *name;
     struct _DIRMENU *dest;
-} DIRMENU; 
+} DIRMENU;
 
 static DIRMENU rmenu;
 

@@ -301,7 +301,7 @@ Here is a description of all the command line options:
   compiler, see there for a list.
 
   Depending on the target, the default CPU type is also set. This can be
-  overriden by using the <tt/<ref id="option--cpu" name="--cpu">/ option.
+  overridden by using the <tt/<ref id="option--cpu" name="--cpu">/ option.
 
 
   <label id="option-v">
@@ -1353,15 +1353,15 @@ writable.
 
 <sect>Pseudo functions<label id="pseudo-functions"><p>
 
-Pseudo functions expect their arguments in parenthesis, and they have a result,
-either a string or an expression.
+Pseudo functions expect their arguments in parentheses, and they have a result,
+either a string or an expression value.
 
 
 <sect1><tt>.ADDRSIZE</tt><label id=".ADDRSIZE"><p>
 
-  The <tt/.ADDRSIZE/ function is used to return the interal address size
+  The <tt/.ADDRSIZE/ function is used to return the internal address size
   associated with a symbol. This can be helpful in macros when knowing the address
-  size of symbol can help with custom instructions.
+  size of a symbol can help with custom instructions.
 
   Example:
 
@@ -1389,7 +1389,7 @@ either a string or an expression.
 <sect1><tt>.BANK</tt><label id=".BANK"><p>
 
   The <tt/.BANK/ function is used to support systems with banked memory. The
-  argument is an expression with exactly one segment reference - usually a
+  argument is an expression with exactly one segment reference -- usually a
   label. The function result is the value of the <tt/bank/ attribute assigned
   to the run memory area of the segment. Please see the linker documentation
   for more information about memory areas and their attributes.
@@ -1397,13 +1397,13 @@ either a string or an expression.
   The value of <tt/.BANK/ can be used to switch memory so that a memory bank
   containing specific data is available.
 
-  The <tt/bank/ attribute is a 32 bit integer and so is the result of the
+  The <tt/bank/ attribute is a 32-bit integer, and so is the result of the
   <tt/.BANK/ function. You will have to use <tt><ref id=".LOBYTE"
   name=".LOBYTE"></tt> or similar functions to address just part of it.
 
-  Please note that <tt/.BANK/ will always get evaluated in the link stage, so
-  an expression containing <tt/.BANK/ can never be used where a constant known
-  result is expected (for example with <tt/.RES/).
+  Please note that <tt/.BANK/ always will get evaluated in the link stage, so
+  an expression containing <tt/.BANK/ never can be used where a constant, known
+  result is expected (for example, with <tt/.RES/).
 
   Example:
 
@@ -1440,7 +1440,7 @@ either a string or an expression.
 
 <sect1><tt>.BLANK</tt><label id=".BLANK"><p>
 
-  Builtin function. The function evaluates its argument in braces and yields
+  Builtin function. The function evaluates its argument in parentheses and yields
   "false" if the argument is non blank (there is an argument), and "true" if
   there is no argument.  The token list that makes up the function argument
   may optionally be enclosed in curly braces. This allows the inclusion of
@@ -1479,13 +1479,48 @@ either a string or an expression.
 
 <sect1><tt>.CONST</tt><label id=".CONST"><p>
 
-  Builtin function. The function evaluates its argument in braces and
+  Builtin function. The function evaluates its argument in parentheses and
   yields "true" if the argument is a constant expression (that is, an
   expression that yields a constant value at assembly time) and "false"
   otherwise. As an example, the .IFCONST statement may be replaced by
 
   <tscreen><verb>
         .if     .const(a + 3)
+  </verb></tscreen>
+
+
+<sect1><tt>.DEF, .DEFINED</tt><label id=".DEFINED"><p>
+
+  Builtin function. The function expects an identifier as argument in parentheses.
+  The argument is evaluated, and the function yields "true" if the identifier
+  is a symbol that already is defined somewhere in the source file up to the
+  current position. Otherwise, the function yields false. As an example, the
+  <tt><ref id=".IFDEF" name=".IFDEF"></tt> statement may be replaced by
+
+  <tscreen><verb>
+        .if     .defined(a)
+  </verb></tscreen>
+
+
+<sect1><tt>.DEFINEDMACRO</tt><label id=".DEFINEDMACRO"><p>
+
+  Builtin function. The function expects an identifier as argument in parentheses.
+  The argument is evaluated, and the function yields "true" if the identifier
+  already has been defined as the name of a macro. Otherwise, the function yields
+  false. Example:
+
+  <tscreen><verb>
+        .macro add foo
+                clc
+                adc foo
+        .endmacro
+
+        .if     .definedmacro(add)
+                add #$01
+        .else
+                clc
+                adc #$01
+        .endif
   </verb></tscreen>
 
 
@@ -1522,6 +1557,23 @@ either a string or an expression.
                 makelabel       "foo", "bar"
 
                 .word           foobar          ; Valid label
+  </verb></tscreen>
+
+
+<sect1><tt>.ISMNEM, .ISMNEMONIC</tt><label id=".ISMNEMONIC"><p>
+
+  Builtin function. The function expects an identifier as argument in parentheses.
+  The argument is evaluated, and the function yields "true" if the identifier
+  is defined as an instruction mnemonic that is recognized by the assembler.
+  Example:
+
+  <tscreen><verb>
+        .if     .not .ismnemonic(ina)
+                .macro ina
+                        clc
+                        adc #$01
+                .endmacro
+        .endif
   </verb></tscreen>
 
 
@@ -1719,7 +1771,7 @@ either a string or an expression.
 
 <sect1><tt>.REF, .REFERENCED</tt><label id=".REFERENCED"><p>
 
-  Builtin function. The function expects an identifier as argument in braces.
+  Builtin function. The function expects an identifier as argument in parentheses.
   The argument is evaluated, and the function yields "true" if the identifier
   is a symbol that has already been referenced somewhere in the source file up
   to the current position. Otherwise the function yields false. As an example,
@@ -1826,24 +1878,6 @@ either a string or an expression.
   </descrip>
 
 
-<sect1><tt>.STRAT</tt><label id=".STRAT"><p>
-
-  Builtin function. The function accepts a string and an index as
-  arguments and returns the value of the character at the given position
-  as an integer value. The index is zero based.
-
-  Example:
-
-  <tscreen><verb>
-        .macro  M       Arg
-                ; Check if the argument string starts with '#'
-                .if (.strat (Arg, 0) = '#')
-                ...
-                .endif
-        .endmacro
-  </verb></tscreen>
-
-
 <sect1><tt>.SPRINTF</tt><label id=".SPRINTF"><p>
 
   Builtin function. It expects a format string as first argument. The number
@@ -1863,9 +1897,27 @@ either a string or an expression.
   </verb></tscreen>
 
 
+<sect1><tt>.STRAT</tt><label id=".STRAT"><p>
+
+  Builtin function. The function accepts a string and an index as
+  arguments and returns the value of the character at the given position
+  as an integer value. The index is zero based.
+
+  Example:
+
+  <tscreen><verb>
+        .macro  M       Arg
+                ; Check if the argument string starts with '#'
+                .if (.strat (Arg, 0) = '#')
+                ...
+                .endif
+        .endmacro
+  </verb></tscreen>
+
+
 <sect1><tt>.STRING</tt><label id=".STRING"><p>
 
-  Builtin function. The function accepts an argument in braces and converts
+  Builtin function. The function accepts an argument in parentheses and converts
   this argument into a string constant. The argument may be an identifier, or
   a constant numeric value.
 
@@ -1884,7 +1936,7 @@ either a string or an expression.
 
 <sect1><tt>.STRLEN</tt><label id=".STRLEN"><p>
 
-  Builtin function. The function accepts a string argument in braces and
+  Builtin function. The function accepts a string argument in parentheses and
   evaluates to the length of the string.
 
   Example:
@@ -1901,7 +1953,7 @@ either a string or an expression.
 
 <sect1><tt>.TCOUNT</tt><label id=".TCOUNT"><p>
 
-  Builtin function. The function accepts a token list in braces. The function
+  Builtin function. The function accepts a token list in parentheses. The function
   result is the number of tokens given as argument. The token list may
   optionally be enclosed into curly braces which are not considered part of
   the list and not counted. Enclosement in curly braces allows the inclusion
@@ -2084,7 +2136,11 @@ Here's a list of all control commands and a description, what they do:
 
   This will put the string "Hello world" followed by a binary zero into
   the current segment. There may be more strings separated by commas, but
-  the binary zero is only appended once (after the last one).
+  the binary zero is only appended once (after the last one). Strings will
+  be translated using the current character mapping definition.
+
+See: <tt><ref id=".BYTE" name=".BYTE"></tt>,<tt><ref id=".CHARMAP" name=".CHARMAP"></tt>,
+     <tt><ref id=".LITERAL" name=".LITERAL"></tt>
 
 
 <sect1><tt>.ASSERT</tt><label id=".ASSERT"><p>
@@ -2180,7 +2236,8 @@ Here's a list of all control commands and a description, what they do:
 <sect1><tt>.BYT, .BYTE</tt><label id=".BYTE"><p>
 
   Define byte sized data. Must be followed by a sequence of (byte ranged)
-  expressions or strings.
+  expressions or strings. Strings will be translated using the current
+  character mapping definition.
 
   Example:
 
@@ -2188,6 +2245,9 @@ Here's a list of all control commands and a description, what they do:
         .byte   "Hello "
         .byt    "world", $0D, $00
   </verb></tscreen>
+
+See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CHARMAP"></tt>
+     <tt><ref id=".LITERAL" name=".LITERAL"></tt>
 
 
 <sect1><tt>.CASE</tt><label id=".CASE"><p>
@@ -2207,8 +2267,10 @@ Here's a list of all control commands and a description, what they do:
 
 <sect1><tt>.CHARMAP</tt><label id=".CHARMAP"><p>
 
-  Apply a custom mapping for characters. The command is followed by two
-  numbers. The first one is the index of the source character (range 0..255);
+  Apply a custom mapping for characters for the commands <tt><ref id=".ASCIIZ"
+  name=".ASCIIZ"></tt> and <tt><ref id=".BYTE" name=".BYTE"></tt>. The command
+  is followed by two numbers. The first one is the index of the source character
+  (range 0..255);
   the second one is the mapping (range 0..255). The mapping applies to all
   character and string constants <em/when/ they generate output; and, overrides
   a mapping table specified with the <tt><ref id="option-t" name="-t"></tt>
@@ -2356,7 +2418,7 @@ Here's a list of all control commands and a description, what they do:
 
   Start a define style macro definition. The command is followed by an
   identifier (the macro name) and optionally by a list of formal arguments
-  in braces.
+  in parentheses.
 
   Please note that <tt/.DEFINE/ shares most disadvantages with its C
   counterpart, so the general advice is, <bf/NOT/ do use <tt/.DEFINE/ if you
@@ -2378,41 +2440,6 @@ Here's a list of all control commands and a description, what they do:
        <tt><ref id=".MACRO" name=".MACRO"></tt>
 
   See also section <ref id="macros" name="Macros">.
-
-
-<sect1><tt>.DEF, .DEFINED</tt><label id=".DEFINED"><p>
-
-  Builtin function. The function expects an identifier as argument in braces.
-  The argument is evaluated, and the function yields "true" if the identifier
-  is a symbol that is already defined somewhere in the source file up to the
-  current position. Otherwise the function yields false. As an example, the
-  <tt><ref id=".IFDEF" name=".IFDEF"></tt> statement may be replaced by
-
-  <tscreen><verb>
-        .if     .defined(a)
-  </verb></tscreen>
-
-
-<sect1><tt>.DEFINEDMACRO</tt><label id=".DEFINEDMACRO"><p>
-
-  Builtin function. The function expects an identifier as argument in braces.
-  The argument is evaluated, and the function yields "true" if the identifier
-  has already been defined as the name of a macro. Otherwise the function yields
-  false. Example:
-
-  <tscreen><verb>
-        .macro add foo
-                clc
-                adc foo
-        .endmacro
-
-        .if     .definedmacro(add)
-                add #$01
-        .else
-                clc
-                adc #$01
-        .endif
-  </verb></tscreen>
 
 
 <sect1><tt>.DESTRUCTOR</tt><label id=".DESTRUCTOR"><p>
@@ -3081,7 +3108,7 @@ Here's a list of all control commands and a description, what they do:
 <sect1><tt>.IFDEF</tt><label id=".IFDEF"><p>
 
   Conditional assembly: Check if a symbol is defined. Must be followed by
-  a symbol name. The condition is true if the the given symbol is already
+  a symbol name. The condition is true if the given symbol is already
   defined, and false otherwise.
 
   See also: <tt><ref id=".DEFINED" name=".DEFINED"></tt>
@@ -3116,7 +3143,7 @@ Here's a list of all control commands and a description, what they do:
 <sect1><tt>.IFNDEF</tt><label id=".IFNDEF"><p>
 
   Conditional assembly: Check if a symbol is defined. Must be followed by
-  a symbol name. The condition is true if the the given symbol is not
+  a symbol name. The condition is true if the given symbol is not
   defined, and false otherwise.
 
   See also: <tt><ref id=".DEFINED" name=".DEFINED"></tt>
@@ -3125,7 +3152,7 @@ Here's a list of all control commands and a description, what they do:
 <sect1><tt>.IFNREF</tt><label id=".IFNREF"><p>
 
   Conditional assembly: Check if a symbol is referenced. Must be followed
-  by a symbol name. The condition is true if if the the given symbol was
+  by a symbol name. The condition is true if the given symbol was
   not referenced before, and false otherwise.
 
   See also: <tt><ref id=".REFERENCED" name=".REFERENCED"></tt>
@@ -3170,7 +3197,7 @@ Here's a list of all control commands and a description, what they do:
 <sect1><tt>.IFREF</tt><label id=".IFREF"><p>
 
   Conditional assembly: Check if a symbol is referenced. Must be followed
-  by a symbol name. The condition is true if if the the given symbol was
+  by a symbol name. The condition is true if the given symbol was
   referenced before, and false otherwise.
 
   This command may be used to build subroutine libraries in include files
@@ -3186,7 +3213,8 @@ Here's a list of all control commands and a description, what they do:
         .endif
   </verb></tscreen>
 
-  See also: <tt><ref id=".REFERENCED" name=".REFERENCED"></tt>
+  See also: <tt><ref id=".REFERENCED" name=".REFERENCED"></tt>, and
+  <tt><ref id=".REFERTO" name=".REFERTO"></tt>
 
 
 <sect1><tt>.IMPORT</tt><label id=".IMPORT"><p>
@@ -3284,23 +3312,6 @@ Here's a list of all control commands and a description, what they do:
   the feature in more detail.
 
 
-<sect1><tt>.ISMNEM, .ISMNEMONIC</tt><label id=".ISMNEMONIC"><p>
-
-  Builtin function. The function expects an identifier as argument in braces.
-  The argument is evaluated, and the function yields "true" if the identifier
-  is defined as an instruction mnemonic that is recognized by the assembler.
-  Example:
-
-  <tscreen><verb>
-        .if     .not .ismnemonic(ina)
-                .macro ina
-                        clc
-                        adc #$01
-                .endmacro
-        .endif
-  </verb></tscreen>
-
-
 <sect1><tt>.LINECONT</tt><label id=".LINECONT"><p>
 
   Switch on or off line continuations using the backslash character
@@ -3354,6 +3365,22 @@ Here's a list of all control commands and a description, what they do:
         .listbytes      12              ; List the first 12 bytes
         .incbin         "data.bin"      ; Include large binary file
   </verb></tscreen>
+
+
+<sect1><tt>.LITERAL</tt><label id=".LITERAL"><p>
+
+  Define byte sized data. Must be followed by a sequence of (byte ranged)
+  expressions or strings. Strings will disregard the current character
+  mapping definition and will be interpreted literally.
+
+  Example:
+
+  <tscreen><verb>
+        .literal    "Hello "
+        .literal    "world", $0D, $00
+  </verb></tscreen>
+
+See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"></tt>
 
 
 <sect1><tt>.LOBYTES</tt><label id=".LOBYTES"><p>
@@ -3595,10 +3622,25 @@ Here's a list of all control commands and a description, what they do:
 
 <sect1><tt>.PDTV</tt><label id=".PDTV"><p>
 
-  Enable the 6502DTV instruction set. This is a superset of the 6502 
+  Enable the 6502DTV instruction set. This is a superset of the 6502
   instruction set.
 
   See: <tt><ref id=".P02" name=".P02"></tt>
+
+
+<sect1><tt>.POPCHARMAP</tt><label id=".POPCHARMAP"><p>
+
+  Pop the last character mapping from the stack, and activate it.
+
+  This command will switch back to the character mapping that was last pushed onto the
+  character mapping stack using the <tt><ref id=".PUSHCHARMAP" name=".PUSHCHARMAP"></tt>
+  command, and remove this entry from the stack.
+
+  The assembler will print an error message if the mappting stack is empty when
+  this command is issued.
+
+  See: <tt><ref id=".CHARMAP" name=".CHARMAP"></tt>, <tt><ref id=".PUSHCHARMAP"
+  name=".PUSHCHARMAP"></tt>
 
 
 <sect1><tt>.POPCPU</tt><label id=".POPCPU"><p>
@@ -3675,6 +3717,22 @@ Here's a list of all control commands and a description, what they do:
   <tt><ref id=".P4510" name=".P4510"></tt>
 
 
+<sect1><tt>.PUSHCHARMAP</tt><label id=".PUSHCHARMAP"><p>
+
+  Push the currently active character mapping onto a stack. The stack has a size of 16
+  entries.
+
+  <tt/.PUSHCHARMAP/ allows together with <tt><ref id=".POPCHARMAP"
+  name=".POPCHARMAP"></tt> to switch to another character mapping and to restore the old
+  character mapping later, without knowledge of the current mapping.
+
+  The assembler will print an error message if the character mapping stack is already full,
+  when this command is issued.
+
+  See: <tt><ref id=".CHARMAP" name=".CHARMAP"></tt>, <tt><ref id=".POPCHARMAP"
+  name=".POPCHARMAP"></tt>
+
+
 <sect1><tt>.PUSHCPU</tt><label id=".PUSHCPU"><p>
 
   Push the currently active CPU onto a stack. The stack has a size of 8
@@ -3705,6 +3763,46 @@ Here's a list of all control commands and a description, what they do:
   full, when this command is issued.
 
   See: <tt><ref id=".POPSEG" name=".POPSEG"></tt>
+
+
+<sect1><tt>.REFERTO, .REFTO</tt><label id=".REFERTO"><p>
+
+  Mark a symbol as referenced.
+
+  It is useful in combination with the <tt><ref id=".IFREF" name=".IFREF"></tt>
+  command. A subroutine with two entry points can be created. When the first
+  entry point is called, it sets some default value as an argument, and falls
+  through into the second entry point. <tt>.REFERTO</tt> helps to ensure that
+  the second part is included into binary when only the first entry point is
+  actually used from the code.
+
+  Example:
+
+  <tscreen><verb>
+        .ifref NegateValue              ; If this subroutine is used
+        NegateValue:                    ; Define it
+                lda     #0
+                sec
+                sbc     Value
+            .ifref ResetValue           ; If the ResetValue is also used
+                jmp     SetValue        ; Jump over it
+            .else
+                .refto  SetValue        ; Ensure that SetValue will be included
+            .endif
+        .endif
+
+        .ifref ResetValue               ; If this subroutine is used
+        ResetValue:                     ; Define it
+                lda     #0              ; Set a default value
+                .refto  SetValue        ; Ensure that SetValue will be included
+        .endif
+
+        .ifref SetValue                 ; If this or previous subroutine is used
+        SetValue:
+                sta     Value
+                rts
+        .endif
+  </verb></tscreen>
 
 
 <sect1><tt>.RELOC</tt><label id=".RELOC"><p>
@@ -4342,8 +4440,8 @@ different:
         For this macro type, the number of actual parameters must match
         exactly the number of formal parameters.
 
-        To make this possible, formal parameters are enclosed in braces when
-        defining the macro. If there are no parameters, the empty braces may
+        To make this possible, formal parameters are enclosed in parentheses when
+        defining the macro. If there are no parameters, the empty parentheses may
         be omitted.
 
 <item>  Since <tt><ref id=".DEFINE" name=".DEFINE"></tt> style macros may not
@@ -4393,8 +4491,8 @@ Macros with parameters may also be useful:
 
 Note that, while formal parameters have to be placed in parentheses,
 the actual argument used when invoking the macro should not be.
-The invoked arguments are separated by commas only, if parentheses are
-used by accident they will become part of the replaced token.
+The invoked arguments are separated by commas only; if parentheses are
+used by accident, they will become part of the replaced token.
 
 If you wish to have an expression follow the macro invocation, the
 last parameter can be enclosed in curly braces {} to indicate the end of that
@@ -4665,6 +4763,7 @@ compiler, depending on the target system selected:
 <item><tt/__APPLE2ENH__/ - Target system is <tt/apple2enh/
 <item><tt/__ATARI2600__/ - Target system is <tt/atari2600/
 <item><tt/__ATARI5200__/ - Target system is <tt/atari5200/
+<item><tt/__ATARI7800__/ - Target system is <tt/atari7800/
 <item><tt/__ATARI__/ - Target system is <tt/atari/ or <tt/atarixl/
 <item><tt/__ATARIXL__/ - Target system is <tt/atarixl/
 <item><tt/__ATMOS__/ - Target system is <tt/atmos/
@@ -4688,6 +4787,7 @@ compiler, depending on the target system selected:
 <item><tt/__SIM6502__/ - Target system is <tt/sim6502/
 <item><tt/__SIM65C02__/ - Target system is <tt/sim65c02/
 <item><tt/__SUPERVISION__/ - Target system is <tt/supervision/
+<item><tt/__SYM1__/ - Target system is <tt/sym1/
 <item><tt/__VIC20__/ - Target system is <tt/vic20/
 </itemize>
 

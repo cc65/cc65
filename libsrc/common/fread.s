@@ -161,7 +161,7 @@
         bne     @L8
 
 ; Error in read. Set the stream error flag and bail out. errno has already
-; been set by read(). On entry to label @L7, X must be zero. 
+; been set by read(). On entry to label @L7, X must be zero.
 
         inx                             ; X = 0
         lda     #_FERROR

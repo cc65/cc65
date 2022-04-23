@@ -6,7 +6,7 @@
 ; size_t _heapmaxavail (void);
 ;
 ;
-                            
+
         .importzp       ptr1, ptr2
         .export         __heapmaxavail
 

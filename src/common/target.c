@@ -147,6 +147,7 @@ static const TargetEntry TargetMap[] = {
     {   "atari",        TGT_ATARI        },
     {   "atari2600",    TGT_ATARI2600    },
     {   "atari5200",    TGT_ATARI5200    },
+    {   "atari7800",    TGT_ATARI7800    },
     {   "atarixl",      TGT_ATARIXL      },
     {   "atmos",        TGT_ATMOS        },
     {   "bbc",          TGT_BBC          },
@@ -174,6 +175,7 @@ static const TargetEntry TargetMap[] = {
     {   "sim6502",      TGT_SIM6502      },
     {   "sim65c02",     TGT_SIM65C02     },
     {   "supervision",  TGT_SUPERVISION  },
+    {   "sym1",         TGT_SYM1         },
     {   "telestrat",    TGT_TELESTRAT    },
     {   "vic20",        TGT_VIC20        },
 };
@@ -187,6 +189,7 @@ static const TargetProperties PropertyTable[TGT_COUNT] = {
     { "atari",          CPU_6502,       BINFMT_BINARY,      CTAtari },
     { "atari2600",      CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "atari5200",      CPU_6502,       BINFMT_BINARY,      CTAtari },
+    { "atari7800",      CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "atarixl",        CPU_6502,       BINFMT_BINARY,      CTAtari },
     { "vic20",          CPU_6502,       BINFMT_BINARY,      CTPET   },
     { "c16",            CPU_6502,       BINFMT_BINARY,      CTPET   },
@@ -215,6 +218,7 @@ static const TargetProperties PropertyTable[TGT_COUNT] = {
     { "gamate",         CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "c65",            CPU_4510,       BINFMT_BINARY,      CTPET   },
     { "cx16",           CPU_65C02,      BINFMT_BINARY,      CTPET   },
+    { "sym1",           CPU_6502,       BINFMT_BINARY,      CTNone  },
 };
 
 /* Target system */

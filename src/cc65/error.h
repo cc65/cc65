@@ -64,14 +64,18 @@ extern IntStack WarnEnable;             /* Enable warnings */
 extern IntStack WarningsAreErrors;      /* Treat warnings as errors */
                                         /* Warn about: */
 extern IntStack WarnConstComparison;    /* - constant comparison results */
+extern IntStack WarnPointerSign;        /* - pointer conversion to pointer differing in signedness */
+extern IntStack WarnPointerTypes;       /* - pointer conversion to incompatible pointer type */
 extern IntStack WarnNoEffect;           /* - statements without an effect */
 extern IntStack WarnRemapZero;          /* - remapping character code zero */
+extern IntStack WarnReturnType;         /* - control reaches end of non-void function */
 extern IntStack WarnStructParam;        /* - structs passed by val */
 extern IntStack WarnUnknownPragma;      /* - unknown #pragmas */
+extern IntStack WarnUnreachableCode;    /* - unreachable code */
 extern IntStack WarnUnusedLabel;        /* - unused labels */
 extern IntStack WarnUnusedParam;        /* - unused parameters */
 extern IntStack WarnUnusedVar;          /* - unused variables */
-extern IntStack WarnReturnType;         /* - control reaches end of non-void function */
+extern IntStack WarnUnusedFunc;         /* - unused functions */
 
 /* Forward */
 struct StrBuf;

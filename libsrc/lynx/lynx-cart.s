@@ -6,7 +6,7 @@
 ;
 ; Ported to cc65 (http://www.cc65.org) by
 ; Shawn Jefferson, June 2004
-; 
+;
 ; This version by Karri Kaksonen, December 2010
 ;
 ; Helper stuff for the cartridge file functions. This version can deal
@@ -16,7 +16,7 @@
         .include "lynx.inc"
         .include "extzp.inc"
         .export  lynxskip0, lynxread0
-        .export  lynxblock 
+        .export  lynxblock
         .import  __BLOCKSIZE__
 
         .code
@@ -60,7 +60,7 @@ readbyte0:
         bne exit
 
 ;**********************************
-; Select a block 
+; Select a block
 ;**********************************
 lynxblock:
         pha

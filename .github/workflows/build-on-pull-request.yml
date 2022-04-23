@@ -1,0 +1,69 @@
+name: Build Pull Request
+on: [pull_request]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build_linux:
+    name: Build and Test (Linux)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install Dependencies
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install linuxdoc-tools-info gcc-mingw-w64-x86-64
+
+      - shell: bash
+        run: git config --global core.autocrlf input
+      - name: Checkout Source
+        uses: actions/checkout@v2
+
+      - name: Do some simple style checks
+        shell: bash
+        run: make -j2 check
+      - name: Build the tools.
+        shell: bash
+        run: make -j2 bin USER_CFLAGS=-Werror
+      - name: Build the utilities.
+        shell: bash
+        run: make -j2 util
+      - name: Build the platform libraries.
+        shell: bash
+        run: make -j2 lib QUIET=1
+      - name: Run the regression tests.
+        shell: bash
+        run: make test QUIET=1
+      - name: Test that the samples can be built.
+        run: make -C samples platforms
+      - name: Test that the targettest programs can be built.
+        run: make -C targettest platforms
+      - name: Build the document files.
+        shell: bash
+        run: make -j2 doc
+      - name: Build 64-bit Windows versions of the tools.
+        run: |
+          make -C src clean
+          make -j2 bin USER_CFLAGS=-Werror CROSS_COMPILE=x86_64-w64-mingw32-
+
+  build_windows:
+    name: Build (Windows)
+    runs-on: windows-latest
+
+    steps:
+      - shell: bash
+        run: git config --global core.autocrlf input
+
+      - name: Checkout Source
+        uses: actions/checkout@v2
+
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Build app (debug)
+        run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Debug
+
+      - name: Build app (release)
+        run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Release

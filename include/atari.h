@@ -6,10 +6,11 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2019 Mark Keates <markk@dendrite.co.uk>                          */
+/* (C) 2000-2021 Mark Keates <markk@dendrite.co.uk>                          */
 /*               Freddy Offenga <taf_offenga@yahoo.com>                      */
 /*               Christian Groessler <chris@groessler.org>                   */
 /*               Bill Kendrick <nbs@sonic.net>                               */
+/*               et al.                                                      */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -219,7 +220,7 @@
 /* Color register functions                                                  */
 /*****************************************************************************/
 
-extern void __fastcall__ _setcolor     (unsigned char color_reg, unsigned char hue, unsigned char luminace);
+extern void __fastcall__ _setcolor     (unsigned char color_reg, unsigned char hue, unsigned char luminance);
 extern void __fastcall__ _setcolor_low (unsigned char color_reg, unsigned char color_value);
 extern unsigned char __fastcall__ _getcolor (unsigned char color_reg);
 

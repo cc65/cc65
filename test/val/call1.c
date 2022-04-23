@@ -70,7 +70,7 @@ call5 (unsigned int k)
   return (k);
 }
 
-unsigned char 
+unsigned char
 call6a(unsigned char uc)
 {
   if(uc>uchar1)
@@ -85,7 +85,7 @@ call6(unsigned char uc)
   return(call6a(uc));
 }
 
-unsigned int 
+unsigned int
 call7a(unsigned int ui)
 {
   if(ui)

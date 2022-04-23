@@ -12,14 +12,15 @@
 
 _kbhit:
         BRK_TELEMON XRD0
-        ldx     #$00 
+
+        ldx     #$00
         bcs     @no_char_action
         sta     store_char
         lda     #$01
         rts
 @no_char_action:
-        tax        
+        tax
         rts
-.data        
+.data
 store_char:
         .byte 0

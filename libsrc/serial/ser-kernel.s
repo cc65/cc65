@@ -39,7 +39,7 @@ ser_sig:        .byte   $73, $65, $72, SER_API_VERSION  ; "ser", version
 
 .code
 ;----------------------------------------------------------------------------
-; unsigned char __fastcall__ ser_install (void* driver);
+; unsigned char __fastcall__ ser_install (const void* driver);
 ; /* Install the driver once it is loaded */
 
 

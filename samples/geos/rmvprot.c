@@ -1,12 +1,12 @@
 /*
     GEOSLib example
-    
+
     This small application removes GEOS disk write protection tag.
     e.g. boot disk is always protected after boot-up
-    
+
     Maciej 'YTM/Elysium' Witkowiak
     <ytm@elysium.pl>
-    
+
     21.03.2000
 */
 
@@ -60,7 +60,7 @@ void main(void)
 {
     // Here we clear the screen. Not really needed anyway...
     GraphicsString(&clearScreen);
-        
+
     // Get the name of current disk to show it in dialog box
     GetPtrCurDkNm(diskName);
 

@@ -46,6 +46,7 @@
 #include "expr.h"
 #include "function.h"
 #include "global.h"
+#include "initdata.h"
 #include "loadexpr.h"
 #include "locals.h"
 #include "stackptr.h"
@@ -286,7 +287,7 @@ static void ParseAutoDecl (Declaration* Decl)
             ** We abuse the Collection somewhat by using it to store line
             ** numbers.
             */
-            CollReplace (&CurrentFunc->LocalsBlockStack, (void *)(long)GetCurrentLine (),
+            CollReplace (&CurrentFunc->LocalsBlockStack, (void *)(size_t)GetCurrentLine (),
                 CollCount (&CurrentFunc->LocalsBlockStack) - 1);
 
         } else {
@@ -476,8 +477,7 @@ static void ParseOneDecl (const DeclSpec* Spec)
     }
 
     /* If the symbol is not marked as external, it will be defined now */
-    if ((Decl.StorageClass & SC_FICTITIOUS) == 0 &&
-        (Decl.StorageClass & SC_DECL) == 0  &&
+    if ((Decl.StorageClass & SC_DECL) == 0 &&
         (Decl.StorageClass & SC_EXTERN) == 0) {
         Decl.StorageClass |= SC_DEF;
     }

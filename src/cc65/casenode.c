@@ -95,7 +95,7 @@ void FreeCaseNodeColl (Collection* Nodes)
 int SearchCaseNode (const Collection* Nodes, unsigned char Key, int* Index)
 /* Search for a node in the given collection. If the node has been found,
 ** set Index to the index of the node and return true. If the node was not
-** found, set Index the the insertion position of the node and return
+** found, set Index the insertion position of the node and return
 ** false.
 */
 {

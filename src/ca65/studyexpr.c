@@ -711,7 +711,7 @@ static void StudyMul (ExprNode* Expr, ExprDesc* D)
     */
     if (ED_IsConst (D) && ED_IsValid (&Right)) {
 
-        /* Multiplicate both, result goes into Right */
+        /* Multiply both, result goes into Right */
         ED_Mul (&Right, D);
 
         /* Move result into D */
@@ -719,7 +719,7 @@ static void StudyMul (ExprNode* Expr, ExprDesc* D)
 
     } else if (ED_IsConst (&Right) && ED_IsValid (D)) {
 
-        /* Multiplicate both */
+        /* Multiply both */
         ED_Mul (D, &Right);
 
     } else {

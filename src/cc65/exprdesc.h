@@ -38,12 +38,12 @@
 
 
 
+#include <inttypes.h>
 #include <string.h>
 
 /* common */
 #include "fp.h"
 #include "inline.h"
-#include "inttypes.h"
 
 /* cc65 */
 #include "asmcode.h"
@@ -73,7 +73,7 @@ enum {
     ** - ref-load doesn't change the rval/lval category of the expression,
     **    while rval-load converts it to an rvalue if it wasn't.
     ** - In practice, ref-load is unimplemented, and can be simulated with
-    **    adding E_ADDRESS_OF temporaily through LoadExpr + FinalizeLoad, 
+    **    adding E_ADDRESS_OF temporaily through LoadExpr + FinalizeLoad,
     **    whilst val-load is done with LoadExpr + FinalizeRValLoad.
     **
     ** E_LOC_NONE     -- ref-load     -> + E_LOADED (int rvalue)
@@ -114,7 +114,6 @@ enum {
     E_LOC_QUASICONST    = E_LOC_CONST | E_LOC_STACK,
 
     /* Expression type modifiers */
-    E_BITFIELD          = 0x0200,       /* Expression is a bit-field */
     E_ADDRESS_OF        = 0x0400,       /* Expression is the address of the lvalue */
 
     /* lvalue/rvalue in C language's sense */
@@ -142,7 +141,7 @@ enum {
     **    than it are usually consided "side-effects" in this regard.
     ** - The compiler front end cannot know things determined by the linker,
     **    such as the actual address of an object with static storage. What it
-    **    can know is categorized as "compiler-known" here. 
+    **    can know is categorized as "compiler-known" here.
     ** - The concept "immutable" here means that once something is determined
     **    (not necessarily by the compiler), it will never change. This is not
     **    the same meaning as the "constant" word in the C standard.
@@ -198,17 +197,15 @@ struct Literal;
 /* Describe the result of an expression */
 typedef struct ExprDesc ExprDesc;
 struct ExprDesc {
-    struct SymEntry*    Sym;            /* Symbol table entry if known */
-    Type*               Type;           /* Type array of expression */
-    unsigned            Flags;
+    const Type*         Type;           /* C type of the expression */
+    unsigned            Flags;          /* Properties of the expression */
     uintptr_t           Name;           /* Name pointer or label number */
+    struct SymEntry*    Sym;            /* Symbol table entry if any */
     long                IVal;           /* Integer value if expression constant */
-    Double              FVal;           /* Floating point value */
-    struct Literal*     LVal;           /* Literal value */
-
-    /* Bit field stuff */
-    unsigned            BitOffs;        /* Bit offset for bit fields */
-    unsigned            BitWidth;       /* Bit width for bit fields */
+    union {
+        Double          FVal;           /* Floating point value */
+        struct Literal* LVal;           /* Literal value */
+    } V;
 
     /* Start and end of generated code */
     CodeMark            Start;
@@ -299,7 +296,7 @@ INLINE int ED_IsLocExpr (const ExprDesc* Expr)
 #if defined(HAVE_INLINE)
 INLINE int ED_IsLocLiteral (const ExprDesc* Expr)
 /* Return true if the expression is a string from the literal pool */
-{               
+{
     return (Expr->Flags & E_MASK_LOC) == E_LOC_LITERAL;
 }
 #else
@@ -330,29 +327,6 @@ int ED_IsLocQuasiConst (const ExprDesc* Expr);
 ** can be the address of a global variable (maybe with offset) or similar.
 */
 #endif
-
-#if defined(HAVE_INLINE)
-INLINE int ED_IsBitField (const ExprDesc* Expr)
-/* Return true if the expression is a bit field */
-{
-    return (Expr->Flags & E_BITFIELD) != 0;
-}
-#else
-#  define ED_IsBitField(Expr)   (((Expr)->Flags & E_BITFIELD) != 0)
-#endif
-
-#if defined(HAVE_INLINE)
-INLINE void ED_DisBitField (ExprDesc* Expr)
-/* Make the expression no longer a bit field */
-{
-    Expr->Flags &= ~E_BITFIELD;
-}
-#else
-#  define ED_DisBitField(Expr)  ((Expr)->Flags &= ~E_BITFIELD)
-#endif
-
-void ED_MakeBitField (ExprDesc* Expr, unsigned BitOffs, unsigned BitWidth);
-/* Make this expression a bit field expression */
 
 #if defined(HAVE_INLINE)
 INLINE void ED_RequireTest (ExprDesc* Expr)
@@ -544,7 +518,7 @@ int ED_GetStackOffs (const ExprDesc* Expr, int Offs);
 ** an additional offset in Offs.
 */
 
-ExprDesc* ED_MakeConstAbs (ExprDesc* Expr, long Value, Type* Type);
+ExprDesc* ED_MakeConstAbs (ExprDesc* Expr, long Value, const Type* Type);
 /* Replace Expr with an absolute const with the given value and type */
 
 ExprDesc* ED_MakeConstAbsInt (ExprDesc* Expr, long Value);
@@ -643,10 +617,25 @@ int ED_IsConstAbsInt (const ExprDesc* Expr);
 int ED_IsConstBool (const ExprDesc* Expr);
 /* Return true if the expression can be constantly evaluated as a boolean. */
 
+int ED_IsConstTrue (const ExprDesc* Expr);
+/* Return true if the constant expression can be evaluated as boolean true at
+** compile time.
+*/
+
+int ED_IsConstFalse (const ExprDesc* Expr);
+/* Return true if the constant expression can be evaluated as boolean false at
+** compile time.
+*/
+
 int ED_IsConst (const ExprDesc* Expr);
 /* Return true if the expression denotes a constant of some sort. This can be a
 ** numeric constant, the address of a global variable (maybe with offset) or
 ** similar.
+*/
+
+int ED_IsQuasiConst (const ExprDesc* Expr);
+/* Return true if the expression denotes a quasi-constant of some sort. This
+** can be a numeric constant, a constant address or a stack variable address.
 */
 
 int ED_IsConstAddr (const ExprDesc* Expr);
@@ -663,14 +652,14 @@ int ED_IsNullPtr (const ExprDesc* Expr);
 /* Return true if the given expression is a NULL pointer constant */
 
 int ED_IsBool (const ExprDesc* Expr);
-/* Return true of the expression can be treated as a boolean, that is, it can
+/* Return true if the expression can be treated as a boolean, that is, it can
 ** be an operand to a compare operation with 0/NULL.
 */
 
 void PrintExprDesc (FILE* F, ExprDesc* Expr);
 /* Print an ExprDesc */
 
-Type* ReplaceType (ExprDesc* Expr, const Type* NewType);
+const Type* ReplaceType (ExprDesc* Expr, const Type* NewType);
 /* Replace the type of Expr by a copy of Newtype and return the old type string */
 
 

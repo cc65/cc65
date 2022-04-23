@@ -33,13 +33,13 @@ hiadd:  txa                     ; (19)
         inc     sp+1            ; (-1+5)
 done:   tya                     ; (36)
 
-.else        
+.else
 
         ldy     #0              ; (4)
         adc     (sp),y          ; (9) lo byte
         iny                     ; (11)
         sta     tmp1            ; (14) save it
-        txa                     ; (16) 
+        txa                     ; (16)
         adc     (sp),y          ; (21) hi byte
         tax                     ; (23)
         clc                     ; (25)

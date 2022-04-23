@@ -66,7 +66,7 @@ struct __dcb {
     unsigned char dtimlo;           /* device timeout in seconds */
     unsigned char dunuse;           /* - unused - */
     unsigned int  dbyt;             /* # of bytes to transfer */
-    union {    
+    union {
         struct {
             unsigned char daux1;    /* 1st command auxiliary byte */
             unsigned char daux2;    /* 2nd command auxiliary byte */
@@ -105,7 +105,7 @@ struct __dos2x {
     unsigned char*  zbufp;      /* points to user filename */
     unsigned char*  zdrva;      /* points to serveral buffers (mostly VTOC) */
     unsigned char*  zsba;       /* points to sector buffer */
-    unsigned char   errno;      /* number of occured error */
+    unsigned char   errno;      /* number of occurred error */
 };
 
 typedef struct __dos2x dos2x_t;
@@ -167,28 +167,28 @@ struct __os {
 
 #ifdef OSA
     unsigned char*  linzbs;                 // = $00/$01        LINBUG RAM (WILL BE REPLACED BY MONITOR RAM)
-#else           
+#else
     unsigned char   linflg;                 // = $00            LNBUG FLAG (0 = NOT LNBUG)
     unsigned char   ngflag;                 // = $01            MEMORY STATUS (0 = FAILURE)
-#endif          
+#endif
     unsigned char*  casini;                 // = $02/$03        CASSETTE INIT LOCATION
     unsigned char*  ramlo;                  // = $04/$05        RAM POINTER FOR MEMORY TEST
-                
-#ifdef OSA           
+
+#ifdef OSA
     unsigned char   tramsz;                 // = $06            FLAG FOR LEFT CARTRIDGE
     unsigned char   tstdat;                 // = $07            FLAG FOR RIGHT CARTRIDGE
-#else           
+#else
     unsigned char   trnsmz;                 // = $06            TEMPORARY REGISTER FOR RAM SIZE
     unsigned char   tstdat;                 // = $07            UNUSED (NOT TOUCHED DURING RESET/COLD START)
 #endif
-            
-    // Cleared upon Coldstart only                
-                    
+
+    // Cleared upon Coldstart only
+
     unsigned char   warmst;                 // = $08            WARM START FLAG
-    unsigned char   bootq;                  // = $09            SUCCESSFUL BOOT FLAG   
+    unsigned char   bootq;                  // = $09            SUCCESSFUL BOOT FLAG
     void (*dosvec)(void);                   // = $0A/$0B        DISK SOFTWARE START VECTOR
     void (*dosini)(void);                   // = $0C/$0D        DISK SOFTWARE INIT ADDRESS
-    unsigned char*  appmhi;                 // = $0E/$0F        APPLICATIONS MEMORY HI LIMIT    
+    unsigned char*  appmhi;                 // = $0E/$0F        APPLICATIONS MEMORY HI LIMIT
 
     // Cleared upon Coldstart or Warmstart
 
@@ -199,26 +199,26 @@ struct __os {
     unsigned char   iccomt;                 // = $17            COMMAND FOR VECTOR
     unsigned char*  dskfms;                 // = $18/$19        DISK FILE MANAGER POINTER
     unsigned char*  dskutl;                 // = $1A/$1B        DISK UTILITIES POINTER
-#ifdef OSA   
+#ifdef OSA
     unsigned char   ptimot;                 // = $1C            PRINTER TIME OUT REGISTER
     unsigned char   pbpnt;                  // = $1D            PRINT BUFFER POINTER
     unsigned char   pbufsz;                 // = $1E            PRINT BUFFER SIZE
     unsigned char   ptemp;                  // = $1F            TEMPORARY REGISTER
-#else               
+#else
     unsigned char   abufpt[4];              // = $1C-$1F        ACMI BUFFER POINTER AREA
-#endif              
+#endif
     iocb_t          ziocb;                  // = $20-$2F        ZERO PAGE I/O CONTROL BLOCK
-                    
+
     unsigned char   status;                 // = $30            INTERNAL STATUS STORAGE
     unsigned char   chksum;                 // = $31            CHECKSUM (SINGLE BYTE SUM WITH CARRY)
     unsigned char*  bufr;                   // = $32/$33        POINTER TO DATA BUFFER
     unsigned char*  bfen;                   // = $34/$35        NEXT BYTE PAST END OF THE DATA BUFFER LO
-#ifdef OSA                   
+#ifdef OSA
     unsigned char   cretry;                 // = $36            NUMBER OF COMMAND FRAME RETRIES
     unsigned char   dretry;                 // = $37            NUMBER OF DEVICE RETRIES
-#else               
+#else
     unsigned int    ltemp;                  // = $36/$37        LOADER TEMPORARY
-#endif              
+#endif
     unsigned char   bufrfl;                 // = $38            DATA BUFFER FULL FLAG
     unsigned char   recvdn;                 // = $39            RECEIVE DONE FLAG
     unsigned char   xmtdon;                 // = $3A            TRANSMISSION DONE FLAG
@@ -227,22 +227,22 @@ struct __os {
     unsigned char   bptr;                   // = $3D            CASSETTE BUFFER POINTER
     unsigned char   ftype;                  // = $3E            CASSETTE IRG TYPE
     unsigned char   feof;                   // = $3F            CASSETTE EOF FLAG (0 // = QUIET)
-                    
+
     unsigned char   freq;                   // = $40            CASSETTE BEEP COUNTER
     unsigned char   soundr;                 // = $41            NOISY I/0 FLAG. (ZERO IS QUIET)
     unsigned char   critic;                 // = $42            DEFINES CRITICAL SECTION (CRITICAL IF NON-Z)
     dos2x_t         fmszpg;                 // = $43-$49        DISK FILE MANAGER SYSTEM ZERO PAGE
-#ifdef OSA                   
+#ifdef OSA
     unsigned char   ckey;                   // = $4A            FLAG SET WHEN GAME START PRESSED
     unsigned char   cassbt;                 // = $4B            CASSETTE BOOT FLAG
-#else               
+#else
     void*           zchain;                 // = $4A/$4B        HANDLER LINKAGE CHAIN POINTER
-#endif              
+#endif
     unsigned char   dstat;                  // = $4C            DISPLAY STATUS
     unsigned char   atract;                 // = $4D            ATRACT FLAG
     unsigned char   drkmsk;                 // = $4E            DARK ATRACT MASK
     unsigned char   colrsh;                 // = $4F            ATRACT COLOR SHIFTER (EOR'ED WITH PLAYFIELD
-                
+
     unsigned char   tmpchr;                 // = $50            TEMPORARY CHARACTER
     unsigned char   hold1;                  // = $51            TEMPORARY
     unsigned char   lmargn;                 // = $52            LEFT MARGIN (NORMALLY 2, CC65 C STARTUP CODE SETS IT TO 0)
@@ -255,68 +255,68 @@ struct __os {
     unsigned int    oldcol;                 // = $5B/$5C        PRIOR COLUMN
     unsigned char   oldchr;                 // = $5D            DATA UNDER CURSOR
     unsigned char*  oldadr;                 // = $5E/$5F        SAVED CURSOR MEMORY ADDRESS
-    
-#ifdef OSA 
+
+#ifdef OSA
     unsigned char   newrow;                 // = $60            POINT DRAW GOES TO
     unsigned int    newcol;                 // = $61/$62        COLUMN DRAW GOES TO
-#else               
+#else
     unsigned char*  fkdef;                  // = $60/$61        FUNCTION KEY DEFINITION TABLE
     unsigned char   palnts;                 // = $62            PAL/NTSC INDICATOR (0 // = NTSC)
-#endif          
+#endif
     unsigned char   logcol;                 // = $63            POINTS AT COLUMN IN LOGICAL LINE
     unsigned char*  adress;                 // = $64/$65        TEMPORARY ADDRESS
-    unsigned int    mlttmp;                 // = $66/$67        TEMPORARY / FIRST BYTE IS USED IN OPEN AS TEMP          
-    unsigned int    savadr;                 // = $68/$69        SAVED ADDRESS        
+    unsigned int    mlttmp;                 // = $66/$67        TEMPORARY / FIRST BYTE IS USED IN OPEN AS TEMP
+    unsigned int    savadr;                 // = $68/$69        SAVED ADDRESS
     unsigned char   ramtop;                 // = $6A            RAM SIZE DEFINED BY POWER ON LOGIC
     unsigned char   bufcnt;                 // = $6B            BUFFER COUNT
     unsigned char*  bufstr;                 // = $6C/$6D        EDITOR GETCH POINTER
     unsigned char   bitmsk;                 // = $6E            BIT MASK
     unsigned char   shfamt;                 // = $6F            SHIFT AMOUNT FOR PIXEL JUSTIFUCATION
-                
+
     unsigned int    rowac;                  // = $70/$71        DRAW WORKING ROW
     unsigned int    colac;                  // = $72/$73        DRAW WORKING COLUMN
     unsigned char*  endpt;                  // = $74/$75        END POINT
     unsigned char   deltar;                 // = $76            ROW DIFFERENCE
     unsigned int    deltac;                 // = $77/$78        COLUMN DIFFERENCE
-#ifdef OSA               
-    unsigned char   rowinc;                 // = $79            ROWINC 
+#ifdef OSA
+    unsigned char   rowinc;                 // = $79            ROWINC
     unsigned char   colinc;                 // = $7A            COLINC
-#else           
+#else
     unsigned char*  keydef;                 // = $79/$7A        2-BYTE KEY DEFINITION TABLE ADDRESS
-#endif          
+#endif
     unsigned char   swpflg;                 // = $7B            NON-0 1F TXT AND REGULAR RAM IS SWAPPED
     unsigned char   holdch;                 // = $7C            CH IS MOVED HERE IN KGETCH BEFORE CNTL & SH
     unsigned char   insdat;                 // = $7D            1-BYTE TEMPORARY
     unsigned int    countr;                 // = $7E/$7F        2-BYTE DRAW ITERATION COUNT
-    
+
     unsigned char   _free_1[0xD4-0x7F-1];   // USER SPACE
-    
+
                                             // Floating Point Package Page Zero Address Equates
-    fpreg_t         fpreg[4];               // = $D4-$EB        4 REGSITERS, ACCCESS LIKE "fpreg[FPIDX_R0].fr"        
-    unsigned char   frx;                    // = $EC            1-BYTE TEMPORARY   
+    fpreg_t         fpreg[4];               // = $D4-$EB        4 REGSITERS, ACCCESS LIKE "fpreg[FPIDX_R0].fr"
+    unsigned char   frx;                    // = $EC            1-BYTE TEMPORARY
     unsigned char   eexp;                   // = $ED            VALUE OF EXP
-#ifdef OS_REV2          
+#ifdef OS_REV2
     unsigned char   frsign;                 // = $EE            ##REV2## 1-BYTE FLOATING POINT SIGN
     unsigned char   plycnt;                 // = $EF            ##REV2## 1-BYTE POLYNOMIAL DEGREE
     unsigned char   sgnflg;                 // = $F0            ##REV2## 1-BYTE SIGN FLAG
     unsigned char   xfmflg;                 // = $F1            ##REV2## 1-BYTE TRANSFORM FLAG
-#else           
+#else
     unsigned char   nsign;                  // = $EE            SIGN OF #
     unsigned char   esign;                  // = $EF            SIGN OF EXPONENT
     unsigned char   fchrflg;                // = $F0            1ST CHAR FLAG
     unsigned char   digrt;                  // = $F1            # OF DIGITS RIGHT OF DECIMAL
-#endif          
+#endif
     unsigned char   cix;                    // = $F2            CURRENT INPUT INDEX
-    unsigned char*  inbuff;                 // = $F3/$F4        POINTS TO USER'S LINE INPUT BUFFER                           
+    unsigned char*  inbuff;                 // = $F3/$F4        POINTS TO USER'S LINE INPUT BUFFER
     unsigned int    ztemp1;                 // = $F5/$F6        2-BYTE TEMPORARY
     unsigned int    ztemp4;                 // = $F7/$F8        2-BYTE TEMPORARY
     unsigned int    ztemp3;                 // = $F9/$FA        2-BYTE TEMPORARY
-                
-    union {         
+
+    union {
         unsigned char   degflg;             // = $FB            ##OLD## SAME AS RADFLG
         unsigned char   radflg;             // = $FB            ##OLD## 0=RADIANS, 6=DEGREES
     };
-            
+
     fpreg_t*        flptr;                  // = $FC/$FD        2-BYTE FLOATING POINT NUMBER POINTER
     fpreg_t*        fptr2;                  // = $FE/$FF        2-BYTE FLOATING POINT NUMBER POINTER
 
@@ -356,28 +356,28 @@ struct __os {
     union {
         struct {
             unsigned char sdlstl;           // = $0230          SAVE DISPLAY LIST LOW BYTE
-            unsigned char sdlsth;           // = $0231          SAVE DISPLAY LIST HI BYTE     
+            unsigned char sdlsth;           // = $0231          SAVE DISPLAY LIST HI BYTE
         };
         void*   sdlst;                      // = $0230/$0231    (same as above as pointer)
     };
     unsigned char sskctl;                   // = $0232          SKCTL REGISTER RAM
-#ifdef OSA 
+#ifdef OSA
     unsigned char _spare_1;                 // = $0233          No OS use.
 #else
     unsigned char lcount;                   // = $0233          ##1200xl## 1-byte relocating loader record
-#endif          
+#endif
     unsigned char lpenh;                    // = $0234          LIGHT PEN HORIZONTAL VALUE
     unsigned char lpenv;                    // = $0235          LIGHT PEN VERTICAL VALUE
     void (*brkky)(void);                    // = $0236/$0237    BREAK KEY VECTOR
-#ifdef OSA           
+#ifdef OSA
     unsigned char spare2[2];                // = $0238/$0239    No OS use.
-#else           
+#else
     void (*vpirq)(void);                    // = $0238/$0239    ##rev2## 2-byte parallel device IRQ vector
-#endif          
+#endif
     unsigned char cdevic;                   // = $023A          COMMAND FRAME BUFFER - DEVICE
     unsigned char ccomnd;                   // = $023B          COMMAND
     union {
-        struct {    
+        struct {
             unsigned char caux1;            // = $023C          COMMAND AUX BYTE 1
             unsigned char caux2;            // = $023D          COMMAND AUX BYTE 2
         };
@@ -389,15 +389,15 @@ struct __os {
     unsigned char dbsect;                   // = $0241          NUMBER OF DISK BOOT SECTORS
     unsigned char* bootad;                  // = $0242/$0243    ADDRESS WHERE DISK BOOT LOADER WILL BE PUT
     unsigned char coldst;                   // = $0244          COLDSTART FLAG (1=IN MIDDLE OF COLDSTART>
-#ifdef OSA           
+#ifdef OSA
     unsigned char spare3;                   // = $0245          No OS use.
-#else           
+#else
     unsigned char reclen;                   // = $0245          ##1200xl## 1-byte relocating loader record length
-#endif              
+#endif
     unsigned char dsktim;                   // = $0246          DISK TIME OUT REGISTER
-#ifdef OSA               
+#ifdef OSA
     unsigned char linbuf[40];               // = $0247-$026E    ##old## CHAR LINE BUFFER
-#else           
+#else
     unsigned char pdvmsk;                   // = $0247          ##rev2## 1-byte parallel device selection mask
     unsigned char shpdvs;                   // = $0248          ##rev2## 1-byte PDVS (parallel device select)
     unsigned char pdimsk;                   // = $0249          ##rev2## 1-byte parallel device IRQ selection
@@ -409,7 +409,7 @@ struct __os {
     unsigned char vsflag;                   // = $026C          ##1200xl## 1-byte fine vertical scroll count
     unsigned char keydis;                   // = $026D          ##1200xl## 1-byte keyboard disable
     unsigned char fine;                     // = $026E          ##1200xl## 1-byte fine scrolling mode
-#endif              
+#endif
     unsigned char gprior;                   // = $026F          GLOBAL PRIORITY CELL
     unsigned char paddl0;                   // = $0270          1-BYTE POTENTIOMETER 0
     unsigned char paddl1;                   // = $0271          1-BYTE POTENTIOMETER 1
@@ -435,30 +435,30 @@ struct __os {
     unsigned char strig1;                   // = $0285          1-BYTE JOYSTICK TRIGGER 1
     unsigned char strig2;                   // = $0286          1-BYTE JOYSTICK TRIGGER 2
     unsigned char strig3;                   // = $0287          1-BYTE JOYSTICK TRIGGER 3
-#ifdef OSA           
+#ifdef OSA
     unsigned char cstat;                    // = $0288          ##old## cassette status register
-#else           
+#else
     unsigned char hibyte;                   // = $0288          ##1200xl## 1-byte relocating loader high byte
-#endif          
+#endif
     unsigned char wmode;                    // = $0289          1-byte cassette WRITE mode
     unsigned char blim;                     // = $028A          1-byte cassette buffer limit
 #ifdef OSA
     unsigned char _reserved_2[5];           // = $028B-$028F    RESERVED
-#else    
+#else
     unsigned char imask;                    // = $028B          ##rev2## (not used)
     void (*jveck)(void);                    // = $028C/$028D    2-byte jump vector
     unsigned newadr;                        // = $028E/028F     ##1200xl## 2-byte relocating address
-#endif              
+#endif
     unsigned char txtrow;                   // = $0290          TEXT ROWCRS
     unsigned txtcol;                        // = $0291/$0292    TEXT COLCRS
     unsigned char tindex;                   // = $0293          TEXT INDEX
     unsigned char* txtmsc;                  // = $0294/$0295    FOOLS CONVRT INTO NEW MSC
     unsigned char txtold[6];                // = $0296-$029B    OLDROW & OLDCOL FOR TEXT (AND THEN SOME)
-#ifdef OSA               
+#ifdef OSA
     unsigned char tmpx1;                    // = $029C          ##old## 1--byte temporary register
-#else           
+#else
     unsigned char cretry;                   // = $029C          ##1200xl## 1-byte number of command frame retries
-#endif              
+#endif
     unsigned char hold3;                    // = $029D          1-byte temporary
     unsigned char subtmp;                   // = $029E          1-byte temporary
     unsigned char hold2;                    // = $029F          1-byte (not used)
@@ -473,41 +473,41 @@ struct __os {
     unsigned tmpcol;                        // = $02B9/$02BA    2-byte temporary column
     unsigned char scrflg;                   // = $02BB          SET IF SCROLL OCCURS
     unsigned char hold4;                    // = $02BC          TEMP CELL USED IN DRAW ONLY
-#ifdef OSA           
+#ifdef OSA
     unsigned char hold5;                    // = $02BD          ##old## DITTO
-#else           
+#else
     unsigned char dretry;                   // = $02BD          ##1200xl## 1-byte number of device retries
-#endif              
+#endif
     unsigned char shflok;                   // = $02BE          1-byte shift/control lock flags
     unsigned char botscr;                   // = $02BF          BOTTOM OF SCREEN   24 NORM 4 SPLIT
     unsigned char pcolr0;                   // = $02C0          1-byte player-missile 0 color/luminance
     unsigned char pcolr1;                   // = $02C1          1-byte player-missile 1 color/luminance
     unsigned char pcolr2;                   // = $02C2          1-byte player-missile 2 color/luminance
-    unsigned char pcolr3;                   // = $02C3          1-byte player-missile 3 color/luminance 
+    unsigned char pcolr3;                   // = $02C3          1-byte player-missile 3 color/luminance
     unsigned char color0;                   // = $02C4          1-byte playfield 0 color/luminance
     unsigned char color1;                   // = $02C5          1-byte playfield 1 color/luminance
     unsigned char color2;                   // = $02C6          1-byte playfield 2 color/luminance
     unsigned char color3;                   // = $02C7          1-byte playfield 3 color/luminance
     unsigned char color4;                   // = $02C8          1-byte background color/luminance
-#ifdef OSA 
+#ifdef OSA
     unsigned char _spare_2[23];             // = $02C9-$02DF    No OS use.
 #else
     union {
         unsigned char parmbl[6];            // = $02C9          ##rev2## 6-byte relocating loader parameter
-        struct {        
+        struct {
             void (*runadr)(void);           // = $02C9          ##1200xl## 2-byte run address
             unsigned int hiused;            // = $02CB          ##1200xl## 2-byte highest non-zero page address
             unsigned int zhiuse;            // = $02CD          ##1200xl## 2-byte highest zero page address
-        };       
-    };       
-    union {     
+        };
+    };
+    union {
         unsigned char oldpar[6];            // = $02CF          ##rev2## 6-byte relocating loader parameter
-        struct {        
+        struct {
             void (*gbytea)(void);           // = $02CF          ##1200xl## 2-byte GET-BYTE routine address
             unsigned int loadad;            // = $02D1          ##1200xl## 2-byte non-zero page load address
             unsigned int zloada;            // = $02D3          ##1200xl## 2-byte zero page load address
-        };       
-    };       
+        };
+    };
     unsigned int dsctln;                    // = $02D5          ##1200xl## 2-byte disk sector length
     unsigned int acmisr;                    // = $02D7          ##1200xl## 2-byte ACMI interrupt service routine
     unsigned char krpdel;                   // = $02D9          ##1200xl## 1-byte auto-repeat delay
@@ -517,78 +517,78 @@ struct __os {
     unsigned char dmasav;                   // = $02DD          ##1200xl## 1-byte SDMCTL save/restore
     unsigned char pbpnt;                    // = $02DE          ##1200xl## 1-byte printer buffer pointer
     unsigned char pbufsz;                   // = $02DF          ##1200xl## 1-byte printer buffer size
-#endif      
-    union {         
+#endif
+    union {
         unsigned char glbabs[4];            // = $02E0-$02E3    byte global variables for non-DOS users
-        struct {        
+        struct {
             void (*runad)(void);            // = $02E0          ##map## 2-byte binary file run address
             void (*initad)(void);           // = $02E2          ##map## 2-byte binary file initialization address
-        };      
-    };    
+        };
+    };
     unsigned char ramsiz;                   // = $02E4          RAM SIZE (HI BYTE ONLY)
     void* memtop;                           // = $02E5          TOP OF AVAILABLE USER MEMORY
     void* memlo;                            // = $02E7          BOTTOM OF AVAILABLE USER MEMORY
-#ifdef OSA       
+#ifdef OSA
     unsigned char _spare_3;                 // = $02E9          No OS use.
-#else       
+#else
     unsigned char hndlod;                   // = $02E9          ##1200xl## 1-byte user load flag
-#endif      
+#endif
     unsigned char dvstat[4];                // = $02EA-$02ED    STATUS BUFFER
-    union {     
+    union {
         unsigned int cbaud;                 // = $02EE/$02EF    2-byte cassette baud rate
-        struct {        
+        struct {
             unsigned char cbaudl;           // = $02EE          1-byte low cassette baud rate
             unsigned char cbaudh;           // = $02EF          1-byte high cassette baud rate
-        };    
-    };  
+        };
+    };
     unsigned char crsinh;                   // = $02F0          CURSOR INHIBIT (00 = CURSOR ON)
     unsigned char keydel;                   // = $02F1          KEY DELAY
     unsigned char ch1;                      // = $02F2          1-byte prior keyboard character
     unsigned char chact;                    // = $02F3          CHACTL REGISTER RAM
     unsigned char chbas;                    // = $02F4          CHBAS REGISTER RAM
-#ifdef OSA       
+#ifdef OSA
     unsigned char _spare_4[5];              // = $02F5-$02F9    No OS use.
-#else           
+#else
     unsigned char newrow;                   // = $02F5          ##1200xl## 1-byte draw destination row
     unsigned int  newcol;                   // = $02F6/$02F7    ##1200xl## 2-byte draw destination column
     unsigned char rowinc;                   // = $02F8          ##1200xl## 1-byte draw row increment
     unsigned char colinc;                   // = $02F9          ##1200xl## 1-byte draw column increment
-#endif      
+#endif
     unsigned char char_;                    // = $02FA          1-byte internal character (naming changed due to do keyword conflict)
     unsigned char atachr;                   // = $02FB          ATASCII CHARACTER
     unsigned char ch;                       // = $02FC          GLOBAL VARIABLE FOR KEYBOARD
     unsigned char fildat;                   // = $02FD          RIGHT FILL DATA <DRAW>
     unsigned char dspflg;                   // = $02FE          DISPLAY FLAG   DISPLAY CNTLS IF NON-ZERO
     unsigned char ssflag;                   // = $02FF          START/STOP FLAG FOR PAGING (CNTL 1). CLEARE
-        
+
     // --- Page 3 ---
 
     dcb_t dcb;                              // = $0300-$030B    DEVICE CONTROL BLOCK
     unsigned int timer1;                    // = $030C/$030D    INITIAL TIMER VALUE
-#ifdef OSA                      
+#ifdef OSA
     unsigned char addcor;                   // = $030E          ##old## ADDITION CORRECTION
-#else                       
+#else
     unsigned char jmpers;                   // = $030E          ##1200xl## 1-byte jumper options
-#endif          
+#endif
     unsigned char casflg;                   // = $030F          CASSETTE MODE WHEN SET
     unsigned int  timer2;                   // = $0310/$0311    2-byte final baud rate timer value
     unsigned char temp1;                    // = $0312          TEMPORARY STORAGE REGISTER
-#ifdef OSA                  
+#ifdef OSA
     unsigned char _spare_5;                 // = $0313          unused
     unsigned char temp2;                    // = $0314          ##old## TEMPORARY STORAGE REGISTER
-#else                               
+#else
     unsigned char temp2;                    // = $0313          ##1200xl## 1-byte temporary
     unsigned char ptimot;                   // = $0314          ##1200xl## 1-byte printer timeout
-#endif                  
+#endif
     unsigned char temp3;                    // = $0315          TEMPORARY STORAGE REGISTER
     unsigned char savio;                    // = $0316          SAVE SERIAL IN DATA PORT
     unsigned char timflg;                   // = $0317          TIME OUT FLAG FOR BAUD RATE CORRECTION
     unsigned char stackp;                   // = $0318          SIO STACK POINTER SAVE CELL
     unsigned char tstat;                    // = $0319          TEMPORARY STATUS HOLDER
-#ifdef OSA              
+#ifdef OSA
     hatabs_t      hatabs[12];               // = $031A-$033D    handler address table
     unsigned int  zeropad;                  // = $033E/$033F    zero padding
-#else           
+#else
     hatabs_t      hatabs[11];               // = $031A-$033A    handler address table
     unsigned int  zeropad;                  // = $033B/$033C    zero padding
     unsigned char pupbt1;                   // = $033D          ##1200xl## 1-byte power-up validation byte 1
@@ -598,9 +598,9 @@ struct __os {
 
     iocb_t        iocb[8];                  // = $0340-$03BF    8 I/O Control Blocks
     unsigned char prnbuf[40];               // = $03C0-$3E7     PRINTER BUFFER
-#ifdef OSA           
+#ifdef OSA
     unsigned char _spare_6[151];            // = $03E8-$047F    unused
-#else               
+#else
     unsigned char superf;                   // = $03E8          ##1200xl## 1-byte editor super function flag
     unsigned char ckey;                     // = $03E9          ##1200xl## 1-byte cassette boot request flag
     unsigned char cassbt;                   // = $03EA          ##1200xl## 1-byte cassette boot flag
@@ -639,7 +639,7 @@ struct __basic {
     void*         starp;                    // = $8C/$8D        ADDRESS FOR THE STRING AND ARRAY TABLE
     void*         runstk;                   // = $8E/$8F        ADDRESS OF THE RUNTIME STACK
     void*         memtop;                   // = $90/$91        POINTER TO THE TOP OF BASIC MEMORY
-    
+
     unsigned char   _internal_1[0xBA-0x91-1];  // INTERNAL DATA
 
     unsigned int  stopln;                   // = $BA/$BB        LINE WHERE A PROGRAM WAS STOPPED

@@ -67,13 +67,13 @@ not_dma:
 ; Removing this segment gives only a warning.
         .segment "FFF0"
 .proc reset32kcode
-        lda     #(6<<5) | SV_LCD_ON | SV_NMI_ENABLE_ON 
+        lda     #(6<<5) | SV_LCD_ON | SV_NMI_ENABLE_ON
         sta     sv_bank
 ; Now, the 32Kbyte image can reside in the top of 64Kbyte and 128Kbyte ROMs.
         jmp     reset
 .endproc
 
-        .segment "VECTOR"
+        .segment "VECTORS"
 
 .word   nmi
 .word   reset32kcode

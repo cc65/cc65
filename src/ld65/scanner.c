@@ -92,7 +92,7 @@ void CfgWarning (const FilePos* Pos, const char* Format, ...)
     SB_VPrintf (&Buf, Format, ap);
     va_end (ap);
 
-    Warning ("%s(%u): %s",
+    Warning ("%s:%u: %s",
              GetString (Pos->Name), Pos->Line, SB_GetConstBuf (&Buf));
     SB_Done (&Buf);
 }
@@ -109,7 +109,7 @@ void CfgError (const FilePos* Pos, const char* Format, ...)
     SB_VPrintf (&Buf, Format, ap);
     va_end (ap);
 
-    Error ("%s(%u): %s",
+    Error ("%s:%u: %s",
            GetString (Pos->Name), Pos->Line, SB_GetConstBuf (&Buf));
     SB_Done (&Buf);
 }
@@ -196,7 +196,7 @@ static void StrVal (void)
 
                     default:
                         CfgWarning (&CfgErrorPos,
-                                    "Unkown escape sequence '%%%c'", C);
+                                    "Unknown escape sequence '%%%c'", C);
                         SB_AppendChar (&CfgSVal, '%');
                         SB_AppendChar (&CfgSVal, C);
                         NextChar ();

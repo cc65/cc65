@@ -89,7 +89,7 @@ unsigned char __fastcall__ joy_load_driver (const char* driver);
 unsigned char joy_unload (void);
 /* Uninstall, then unload the currently loaded driver. */
 
-unsigned char __fastcall__ joy_install (void* driver);
+unsigned char __fastcall__ joy_install (const void* driver);
 /* Install an already loaded driver. Return an error code. */
 
 unsigned char joy_uninstall (void);

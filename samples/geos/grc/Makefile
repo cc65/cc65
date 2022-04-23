@@ -1,4 +1,8 @@
 
+# Run 'make SYS=<target>'; or, set a SYS env.
+# var. to build for another target system.
+SYS ?= geos-cbm
+
 # Just the usual way to find out if we're
 # using cmd.exe to execute make rules.
 ifneq ($(shell echo),)
@@ -29,23 +33,37 @@ else
   GRC := $(if $(wildcard ../../../bin/grc65*),../../../bin/grc65,grc65)
 endif
 
-samples: test.s vlir.cvt
+EXELIST_geos-cbm = \
+	test.s \
+	vlir.cvt
+
+ifneq ($(EXELIST_$(SYS)),)
+samples: $(EXELIST_$(SYS))
+else
+samples:
+  ifeq ($(MAKELEVEL),0)
+	@echo "info: grc sample not available for" $(SYS)
+  else
+# suppress the "nothing to be done for 'samples' message
+	@echo > $(NULLDEV)
+  endif
+endif
 
 test.s: test.grc
 	$(GRC) -s test.s test.grc
 
 vlir.cvt: vlir.grc vlir0.s vlir1.s vlir2.s
-# using seperate calls here for demonstration purposes:
-	$(GRC) -t geos-cbm -s vlir.s vlir.grc
-	$(AS) -t geos-cbm vlir.s
-	$(AS) -t geos-cbm vlir0.s
-	$(AS) -t geos-cbm vlir1.s
-	$(AS) -t geos-cbm vlir2.s
-	$(LD) -t geos-cbm -o vlir.cvt vlir.o vlir0.o vlir1.o vlir2.o geos-cbm.lib
+# using separate calls here for demonstration purposes:
+	$(GRC) -t $(SYS) -s vlir.s vlir.grc
+	$(AS) -t $(SYS) vlir.s
+	$(AS) -t $(SYS) vlir0.s
+	$(AS) -t $(SYS) vlir1.s
+	$(AS) -t $(SYS) vlir2.s
+	$(LD) -t $(SYS) -o vlir.cvt vlir.o vlir0.o vlir1.o vlir2.o $(SYS).lib
 
 # you can also do the above in one command:
-#	$(CL) -t geos-cbm -o vlir.cvt vlir.grc vlir0.s vlir1.s vlir2.s
-	
+#	$(CL) -t $(SYS) -o vlir.cvt vlir.grc vlir0.s vlir1.s vlir2.s
+
 clean:
 	@$(DEL) test.s test.h 2>$(NULLDEV)
 	@$(DEL) vlir.s vlir.cvt vlir.c vlir.h 2>$(NULLDEV)

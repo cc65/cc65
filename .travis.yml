@@ -9,14 +9,14 @@ jobs:
       - sudo apt-get update
       - sudo apt-get install linuxdoc-tools linuxdoc-tools-info binutils-mingw-w64-i686 gcc-mingw-w64-i686 sshpass
     script:
-      - make bin USER_CFLAGS=-Werror
-      - make lib QUIET=1
+      - make -j2 bin USER_CFLAGS=-Werror
+      - make -j2 lib QUIET=1
       - make test QUIET=1
-      - make samples
+      - make -j2 samples
       - make -C src clean
-      - make bin USER_CFLAGS=-Werror CROSS_COMPILE=i686-w64-mingw32-
+      - make -j2 bin USER_CFLAGS=-Werror CROSS_COMPILE=i686-w64-mingw32-
       - make -C samples clean
-      - make doc zip
+      - make -j2 doc zip
     after_success:
       - make -f Makefile.travis
 

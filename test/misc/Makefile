@@ -65,6 +65,12 @@ $(WORKDIR)/bug760.$1.$2.prg: bug760.c | $(WORKDIR)
 	$(NOT) $(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
 
 # should compile, but gives an error
+$(WORKDIR)/bug1437.$1.$2.prg: bug1437.c | $(WORKDIR)
+	@echo "FIXME: " $$@ "currently does not compile."
+	$(if $(QUIET),echo misc/bug1437.$1.$2.prg)
+	$(NOT) $(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
+
+# should compile, but gives an error
 $(WORKDIR)/bug1209-ind-goto-rev.$1.$2.prg: bug1209-ind-goto-rev.c | $(WORKDIR)
 	@echo "FIXME: " $$@ "currently does not compile."
 	$(if $(QUIET),echo misc/bug1209-ind-goto-rev.$1.$2.prg)
@@ -98,6 +104,18 @@ $(WORKDIR)/pptest2.$1.$2.prg: pptest2.c | $(WORKDIR)
 $(WORKDIR)/bug1263.$1.$2.prg: bug1263.c | $(WORKDIR)
 	@echo "FIXME: " $$@ "currently does not compile."
 	$(if $(QUIET),echo misc/bug1263.$1.$2.prg)
+	$(NOT) $(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
+
+# should compile, but gives an error
+$(WORKDIR)/bug1357.$1.$2.prg: bug1357.c | $(WORKDIR)
+	@echo "FIXME: " $$@ "currently does not compile."
+	$(if $(QUIET),echo misc/bug1357.$1.$2.prg)
+	$(NOT) $(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
+
+# should compile, but compiler exits with internal error
+$(WORKDIR)/bug1211-ice-move-refs-2.$1.$2.prg: bug1211-ice-move-refs-2.c | $(WORKDIR)
+	@echo "FIXME: " $$@ "currently does not compile."
+	$(if $(QUIET),echo misc/bug1211-ice-move-refs-2.$1.$2.prg)
 	$(NOT) $(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
 
 # this one requires --std=c89, it fails with --std=c99

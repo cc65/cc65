@@ -46,6 +46,7 @@
 #include "codegen.h"
 #include "error.h"
 #include "expr.h"
+#include "funcdesc.h"
 #include "global.h"
 #include "litpool.h"
 #include "scanner.h"
@@ -460,7 +461,7 @@ static void SegNamePragma (StrBuf* B, segment_t Seg)
                 Warning ("Invalid address size for segment!");
             }
         }
-    
+
         /* Set the new name and optionally address size */
         if (Push) {
             PushSegName (Seg, Name);
@@ -530,16 +531,19 @@ static void WrappedCallPragma (StrBuf* B)
     /* Skip the following comma */
     if (!GetComma (B)) {
         /* Error already flagged by GetComma */
+        Error ("Value or the word 'bank' required for wrapped-call identifier");
+        goto ExitPoint;
+    }
+
+    /* Next must be either a numeric value, or "bank" */
+    if (HasStr (B, "bank")) {
+        Val = WRAPPED_CALL_USE_BANK;
+    } else if (!GetNumber (B, &Val)) {
         Error ("Value required for wrapped-call identifier");
         goto ExitPoint;
     }
 
-    if (!GetNumber (B, &Val)) {
-        Error ("Value required for wrapped-call identifier");
-        goto ExitPoint;
-    }
-
-    if (Val < 0 || Val > 255) {
+    if (!(Val == WRAPPED_CALL_USE_BANK) && (Val < 0 || Val > 255)) {
         Error ("Identifier must be between 0-255");
         goto ExitPoint;
     }
@@ -551,7 +555,7 @@ static void WrappedCallPragma (StrBuf* B)
     /* Check if the name is valid */
     if (Entry && (Entry->Flags & SC_FUNC) == SC_FUNC) {
 
-        PushWrappedCall(Entry, (unsigned char) Val);
+        PushWrappedCall(Entry, (unsigned int) Val);
         Entry->Flags |= SC_REF;
         GetFuncDesc (Entry->Type)->Flags |= FD_CALL_WRAPPER;
 
@@ -780,7 +784,7 @@ static void IntPragma (StrBuf* B, IntStack* Stack, long Low, long High)
 
 static void MakeMessage (const char* Message)
 {
-    fprintf (stderr, "%s(%u): Note: %s\n", GetInputName (CurTok.LI), GetInputLine (CurTok.LI), Message);
+    fprintf (stderr, "%s:%u: Note: %s\n", GetInputName (CurTok.LI), GetInputLine (CurTok.LI), Message);
 }
 
 

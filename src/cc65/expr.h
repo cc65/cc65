@@ -28,6 +28,11 @@
 #define SQP_KEEP_EAX    0x02U
 #define SQP_KEEP_EXPR   0x03U   /* SQP_KEEP_TEST | SQP_KEEP_EAX */
 
+/* Generator attributes */
+#define GEN_NOPUSH      0x01        /* Don't push lhs */
+#define GEN_COMM        0x02        /* Operator is commutative */
+#define GEN_NOFUNC      0x04        /* Not allowed for function pointers */
+
 
 
 /*****************************************************************************/
@@ -36,6 +41,9 @@
 
 
 
+unsigned GlobalModeFlags (const ExprDesc* Expr);
+/* Return the addressing mode flags for the given expression */
+
 void ExprWithCheck (void (*Func) (ExprDesc*), ExprDesc* Expr);
 /* Call an expression function with checks. */
 
@@ -43,6 +51,9 @@ void MarkedExprWithCheck (void (*Func) (ExprDesc*), ExprDesc* Expr);
 /* Call an expression function with checks and record start and end of the
 ** generated code.
 */
+
+void LimitExprValue (ExprDesc* Expr);
+/* Limit the constant value of the expression to the range of its type */
 
 void PushAddr (const ExprDesc* Expr);
 /* If the expression contains an address that was somehow evaluated,
@@ -72,13 +83,6 @@ void Store (ExprDesc* Expr, const Type* StoreType);
 /* Store the primary register into the location denoted by lval. If StoreType
 ** is given, use this type when storing instead of lval->Type. If StoreType
 ** is NULL, use lval->Type instead.
-*/
-
-int evalexpr (unsigned flags, void (*Func) (ExprDesc*), ExprDesc* Expr);
-/* Will evaluate an expression via the given function. If the result is a
-** constant, 0 is returned and the value is put in the Expr struct. If the
-** result is not constant, LoadExpr is called to bring the value into the
-** primary register and 1 is returned.
 */
 
 void Expression0 (ExprDesc* Expr);

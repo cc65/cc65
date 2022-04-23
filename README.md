@@ -1,10 +1,14 @@
 [Windows Snapshot](https://sourceforge.net/projects/cc65/files/cc65-snapshot-win32.zip)
 
+[Linux Snapshot DEB and RPM](https://software.opensuse.org//download.html?project=home%3Astrik&package=cc65)
+
 [Documentation](https://cc65.github.io/doc)
 
-[Wiki](https://github.com/cc65/wiki/wiki)
+[Contributing](Contributing.md) to the CC65 project.
 
-[![Build Status](https://api.travis-ci.org/cc65/cc65.svg?branch=master)](https://travis-ci.org/cc65/cc65/builds)
+The [Wiki](https://github.com/cc65/wiki/wiki) contains extra info that does not fit into the regular documentation.
+
+[![Snapshot Build](https://github.com/cc65/cc65/actions/workflows/snapshot-on-push-master.yml/badge.svg?branch=master)](https://github.com/cc65/cc65/actions/workflows/snapshot-on-push-master.yml)
 
 cc65 is a complete cross development package for 65(C)02 systems, including
 a powerful macro assembler, a C compiler, linker, librarian and several
@@ -25,6 +29,7 @@ including
 - the Atari 8-bit machines.
 - the Atari 2600 console.
 - the Atari 5200 console.
+- the Atari 7800 console.
 - GEOS for the C64, C128 and Apple //e.
 - the Bit Corporation Gamate console.
 - the NEC PC-Engine (aka TurboGrafx-16) console.
@@ -35,6 +40,8 @@ including
 - the Oric Telestrat.
 - the Lynx console.
 - the Ohio Scientific Challenger 1P.
+- the Commander X16.
+- the Synertek Systems Sym-1.
 
 The libraries are fairly portable, so creating a version for other 6502s
 shouldn't be too much work.

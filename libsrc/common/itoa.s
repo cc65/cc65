@@ -19,7 +19,7 @@ specval:
 ; Common subroutine to pop the parameters and put them into core
 ;
 
-dopop:  sta     tmp1            ; will loose high byte
+dopop:  sta     tmp1            ; will lose high byte
         ldy     #0
         lda     (sp),y
         sta     ptr2

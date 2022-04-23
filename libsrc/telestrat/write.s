@@ -3,7 +3,7 @@
 
         .export         _write
         .import         popax, popptr1
-        
+
         .include        "zeropage.inc"
         .include        "telestrat.inc"
 
@@ -20,7 +20,7 @@
         stx     ptr2            ; save count with each byte incremented separately
 
         jsr     popptr1         ; get buf
-        
+
         jsr     popax           ; get fd
 
         sta     tmp1            ; save fd

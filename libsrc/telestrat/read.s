@@ -23,7 +23,7 @@
         stx     ptr2+1 
 
         jsr     popax          ; get FD
-    
+
         tax                    ; send FD to X
 
         lda     ptr1

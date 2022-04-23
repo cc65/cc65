@@ -1,7 +1,7 @@
 ;
 ; Oric TELEMON definition
 ; TELEMON 2.4 & Orix
-; For TOrix check http://orix.oric.org
+; For Orix check http://orix.oric.org
 ;
 
 ; ---------------------------------------------------------------------------

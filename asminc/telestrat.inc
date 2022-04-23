@@ -1,7 +1,7 @@
 ;
 ; Oric TELEMON definition
-; TELEMON 2.4 & TELEMON 3.x
-; For TELEMON 3.x check http://orix.oric.org
+; TELEMON 2.4 & Orix
+; For TOrix check http://orix.oric.org
 ;
 
 ; ---------------------------------------------------------------------------
@@ -59,7 +59,7 @@ SCRNB           := $28          ; Id of the current window
 ADKBD           := $2A          ; Address ASCII conversion table
 
 
-PTR_READ_DEST   := $2C          ; Used for XFREAD and XWRITE only in TELEMON 3.x
+PTR_READ_DEST   := $2C          ; Used for XFREAD and XWRITE only in Orix
 
 ADCLK           := $40          ; Address for clock display
 TIMEUS          := $42
@@ -249,10 +249,10 @@ XHIRES           = $1A
 XEFFHI           = $1B          ; Clear hires screen
 XFILLM           = $1C
 XMINMA           = $1F
-XVARS            = $24          ; Only in TELEMON 3.x, in TELEMON 2.4, it's XNOMFI ($24)
+XVARS            = $24          ; Only in Orix, in TELEMON 2.4, it's XNOMFI ($24)
 XCRLF            = $25          ; Jump a line and return to the beginning of the line
 XDECAY           = $26
-XFREAD           = $27          ; Only in TELEMON 3.x (bank 7 of Orix)
+XFREAD           = $27          ; Only in Orix
 XBINDX           = $28          ; Convert a number into hex and displays on channel 0
 XDECIM           = $29
 XHEXA            = $2A          ; Convert a number into hex
@@ -261,7 +261,7 @@ XEDT             = $2D          ; Launch editor
 XINSER           = $2E
 
 XSCELG           = $2F          ; Search a line in editor mode
-XOPEN            = $30          ; Only in TELEMON 3.x (bank 7 of Orix)
+XOPEN            = $30          ; Only in Orix
 XECRPR           = $33          ; Displays prompt
 XCOSCR           = $34          ; Switch off cursor
 XCSSCR           = $35          ; Switch on cursor
@@ -269,8 +269,8 @@ XSCRSE           = $36
 XSCROH           = $37          ; Scroll up text screen
 XSCROB           = $38          ; Scroll down text screen
 XSCRNE           = $39          ; Load charset from rom to ram
-XCLOSE           = $3A          ; Only in TELEMON 3.x close file (bank 7 of Orix)
-XFWRITE          = $3B          ; Only in TELEMON 3.x write file (bank 7 of Orix)
+XCLOSE           = $3A          ; Only in Orix close file
+XFWRITE          = $3B          ; Only in Orix write file
 
 ; Clock primitive
 XRECLK           = $3C          ; Reset clock
@@ -291,14 +291,14 @@ XGETCWD          = $48          ; Get current CWD
 XPUTCWD          = $49          ; Chdir
 
 ; File management
-XMKDIR           = $4B          ; Create a folder. Only available in TELEMON 3.x (bank 7 of Orix)
+XMKDIR           = $4B          ; Create a folder. Only available in Orix
 
 XHCHRS           = $4C          ; Hard copy hires
 
 ; File management
-XRM              = $4D          ; Remove a folder or a file. Only available in TELEMON 3.x (bank 7 of Orix)
+XRM              = $4D          ; Remove a folder or a file. Only available in Orix
 
-XFWR             = $4E          ; Put a char on the first screen. Only available in TELEMON 3.x (bank 7 of Orix)
+XFWR             = $4E          ; Put a char on the first screen. Only available in Orix
 
 ; Keyboard primitives
 XALLKB           = $50          ; Read Keyboard, and populate KBDCOL
@@ -314,7 +314,7 @@ XINIBU           = $58          ; Initialize the buffer X
 XDEFBU           = $59          ; Reset all value of the buffer
 XBUSY            = $5A          ; Test if the buffer is empty
 
-XMALLOC          = $5B          ; Only in TELEMON 3.x (bank 7 of Orix)
+XMALLOC          = $5B          ; Only in Orix
 
 ; RS232 primitives
 XSDUMP           = $5C          ; RS232 input dump
@@ -326,7 +326,9 @@ XSSAVE           = $5F          ; Write a file to RS232
 XMLOAD           = $60          ; Read a file from Minitel
 XMSAVE           = $61          ; Write a file to Minitel
 
-XFREE            = $62          ; Only in TELEMON 3.x (bank 7 of Orix)
+XFREE            = $62          ; Only in Orix
+
+XEXEC            = $63          ; Only in Orix
 
 ; Next Minitel primitives
 XWCXFI           = $63          ; Wait connection
@@ -334,7 +336,7 @@ XLIGNE           = $64          ;
 XDECON           = $65          ; Minitel disconnection
 XMOUT            = $66          ; Send a byte to minitel (from A)
 
-XSOUT            = $67          ; Send accumulator value (A) to RS232, available in TELEMON 2.4 & 3.x : if RS232 buffer is full, the Oric Telestrat freezes
+XSOUT            = $67          ; Send accumulator value (A) to RS232, available in TELEMON 2.4 : if RS232 buffer is full, the Oric Telestrat freezes
 
 XHRSSE           = $8C          ; Set hires position cursor
 XDRAWA           = $8D          ; Draw a line absolute

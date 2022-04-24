@@ -52,6 +52,8 @@
 /* No support for dynamically loadable drivers */
 #define DYN_DRV 0
 
+extern unsigned char get_tv(void);           /* get TV system */
+
 #include <_tia.h>
 #define TIA (*(struct __tia*)0x0000)
 

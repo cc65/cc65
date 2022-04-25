@@ -2,6 +2,12 @@ ifneq ($(shell echo),)
   CMD_EXE = 1
 endif
 
+ifneq ($(V),1)
+  Q=@
+else
+  Q=
+endif
+
 PROGS = ar65     \
         ca65     \
         cc65     \
@@ -147,7 +153,7 @@ endef # PROG_template
 
 ../wrk/%.o: %.c
 	@echo $<
-	@$(CC) -c $(CFLAGS) -o $@ $<
+	$(Q)$(CC) -c $(CFLAGS) -o $@ $<
 
 ../bin:
 	@$(call MKDIR,$@)

@@ -17,20 +17,23 @@
 
         ldx     #$00         ; x is the first screen
         BRK_TELEMON(XCSSCR)  ; Display cursor
-        jmp     loop         ; Could be replaced by a bne/beq but 'jmp' is cleaner than a bne/beq which could expect some matters
+        jmp     start        ; Could be replaced by a bne/beq but 'jmp' is cleaner than a bne/beq which could expect some matters
 
 switchoff_cursor:
         ; At this step X is equal to $00, X must be set, because it's the id of the screen (telestrat can handle 4 virtuals screen)
         BRK_TELEMON(XCOSCR)  ; Switch off cursor
 
-loop:
+
+start:
         lda     store_char   ; Does kbhit store a value in store_char ?
         bne     @out         ; Yes, we returns A and we reset store_char
+@wait_key:
         BRK_TELEMON XRD0     ; Waits until key is pressed
-        bcs     loop
+        bcs     @wait_key
+        ldx     #$00
         rts
 @out:   
         ldx     #$00
         stx     store_char
-        rts        
+        rts
 .endproc

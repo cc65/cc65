@@ -32,10 +32,11 @@ start:
         bcs     @wait_key
         ldx     #$00
         rts
-@out:   
+@out:
         ldx     #$00
         stx     store_char
         rts
 .endproc
+.data
 store_char:
         .byte 0

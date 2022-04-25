@@ -18,12 +18,12 @@ _kbhit:
         rts
 @call_telemon:        
         BRK_TELEMON XRD0
-        ldx     #$00 
+
+        ldx     #$00
         bcs     @no_char_action
         sta     store_char
         lda     #$01
         rts
 @no_char_action:
-        tax        
+        tax
         rts
-.data        

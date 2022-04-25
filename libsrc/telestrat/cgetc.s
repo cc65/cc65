@@ -5,7 +5,7 @@
 
     .import    cursor
 
-    .import    store_char
+    .export    store_char
 
     .include   "telestrat.inc"
 
@@ -37,3 +37,5 @@ start:
         stx     store_char
         rts
 .endproc
+store_char:
+        .byte 0

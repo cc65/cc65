@@ -6,7 +6,7 @@
 
         .export         _kbhit
 
-        .export         store_char
+        .import    store_char
 
         .include        "telestrat.inc"
 
@@ -27,5 +27,3 @@ _kbhit:
         tax        
         rts
 .data        
-store_char:
-        .byte 0

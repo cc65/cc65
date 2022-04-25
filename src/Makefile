@@ -68,9 +68,9 @@ $(info BUILD_ID: $(BUILD_ID))
 
 CFLAGS += -MMD -MP -O3 -I common \
           -Wall -Wextra -Wno-char-subscripts $(USER_CFLAGS) \
-          -DCA65_INC="$(CA65_INC)" -DCC65_INC="$(CC65_INC)" -DCL65_TGT="$(CL65_TGT)" \
-          -DLD65_LIB="$(LD65_LIB)" -DLD65_OBJ="$(LD65_OBJ)" -DLD65_CFG="$(LD65_CFG)" \
-          -DBUILD_ID="$(BUILD_ID)"
+          -DCA65_INC="\"$(CA65_INC)\"" -DCC65_INC="\"$(CC65_INC)\"" -DCL65_TGT="\"$(CL65_TGT)\"" \
+          -DLD65_LIB="\"$(LD65_LIB)\"" -DLD65_OBJ="\"$(LD65_OBJ)\"" -DLD65_CFG="\"$(LD65_CFG)\"" \
+          -DBUILD_ID="\"$(BUILD_ID)\""
 
 LDLIBS += -lm
 

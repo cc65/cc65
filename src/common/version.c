@@ -62,7 +62,7 @@ const char* GetVersionAsString (void)
 {
     static char Buf[60];
 #if defined(BUILD_ID)
-    xsnprintf (Buf, sizeof (Buf), "%u.%u - %s", VER_MAJOR, VER_MINOR, STRINGIZE (BUILD_ID));
+    xsnprintf (Buf, sizeof (Buf), "%u.%u - %s", VER_MAJOR, VER_MINOR, BUILD_ID);
 #else
     xsnprintf (Buf, sizeof (Buf), "%u.%u", VER_MAJOR, VER_MINOR);
 #endif

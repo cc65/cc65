@@ -89,13 +89,13 @@ void InitSearchPaths (void)
 
     /* Add some compiled-in search paths if defined at compile time. */
 #if defined(LD65_LIB) && !defined(_WIN32)
-    AddSearchPath (LibDefaultPath, STRINGIZE (LD65_LIB));
+    AddSearchPath (LibDefaultPath, LD65_LIB);
 #endif
 #if defined(LD65_OBJ) && !defined(_WIN32)
-    AddSearchPath (ObjDefaultPath, STRINGIZE (LD65_OBJ));
+    AddSearchPath (ObjDefaultPath, LD65_OBJ);
 #endif
 #if defined(LD65_CFG) && !defined(_WIN32)
-    AddSearchPath (CfgDefaultPath, STRINGIZE (LD65_CFG));
+    AddSearchPath (CfgDefaultPath, LD65_CFG);
 #endif
 
     /* Add paths relative to the parent directory of the Windows binary. */

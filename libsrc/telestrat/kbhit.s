@@ -11,7 +11,7 @@
         .include        "telestrat.inc"
 
 _kbhit:
-        lda     store_char       ; Check if a key has been detected previously   
+        lda     store_char       ; Check if a key has been detected previously
         beq     @call_telemon    ; No, calls Telemon routine
         lda     #$01             ; There is a key pressed previously, return 1
         ldx     #$00

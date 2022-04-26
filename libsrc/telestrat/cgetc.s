@@ -37,6 +37,6 @@ start:
         stx     store_char
         rts
 .endproc
-.data
+.bss
 store_char:
         .byte 0

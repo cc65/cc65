@@ -16,7 +16,7 @@ _kbhit:
         lda     #$01             ; There is a key pressed previously, return 1
         ldx     #$00
         rts
-@call_telemon:        
+@call_telemon:
         BRK_TELEMON XRD0
 
         ldx     #$00

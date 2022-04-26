@@ -62,7 +62,10 @@ test3:
 test3a: .byte tmp1              ; verify its 8bit
 test3b: .byte tmp1 & $ff        ; AND with $ff should work of course
 test3c: .byte tmp1 & $ffff      ; AND with $ffff should not change size
-test3d: .word tmp1 & $ffffff    ; AND with $ffffff should not change size
+test3d: .byte tmp1 & $ffffff    ; AND with $ffffff should not change size
+test3e: .byte tmp1 & $ffffffff  ; AND with $ffffffff should not change size
+test3f: .word tmp1 & $ffffff    ; AND with $ffffff should not change size
+test3g: .word tmp1 & $ffffffff  ; AND with $ffffffff should not change size
 test3chk:
         inx
         lda test3a
@@ -85,7 +88,27 @@ test3chk:
         jne exiterror
 
         inx
-        lda test3d+1
+        lda test3e
+        cmp #tmp1
+        jne exiterror
+
+        inx
+        lda test3f
+        cmp #tmp1
+        jne exiterror
+
+        inx
+        lda test3f+1
+        cmp #$00
+        jne exiterror
+
+        inx
+        lda test3g
+        cmp #tmp1
+        jne exiterror
+
+        inx
+        lda test3g+1
         cmp #$00
         jne exiterror
 

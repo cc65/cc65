@@ -274,7 +274,7 @@ static char* GetProgPath(char* pathbuf, char* a0)
 
 #endif
 
-void AddSubSearchPathFromWinBin (SearchPaths* P, const char* SubDir)
+void AddSubSearchPathFromBin (SearchPaths* P, const char* SubDir)
 {
 /* Windows only:
 ** Add a search path from the running binary, adding a subdirectory to

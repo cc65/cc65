@@ -48,16 +48,36 @@ color  := $0787
 
 ## C Sources
 
+The following is still very incomplete - if in doubt please look at existing sourcefiles and adapt to the existing style
+
 * Your files should obey the C89 standard.
+* The normal indentation width should be four spaces.
+* You must use ANSI C comments (```/* */```); you must not use C++ comments (```//```).
+* When you add functions to an existing file, you should separate them by the same number of blank lines that separate the functions that already are in that file.
+* All function declarations must be followed by a comment block that tells at least briefly what the function does, what the parameters are, and what is returned. This comment must sit between the declaration and the function body, like this:
+<pre>
+int foo(int bar)
+/* Add 1 to bar, takes bar and returns the result */
+{
+    return bar + 1;
+}
+</pre>
+* When a function's argument list wraps around to a next line, you should indent that next line by either the normal width or enough spaces to align it with the arguments on the previous line.
 * All declarations in a block must be at the beginning of that block.
 * You should put a blank line between a list of local variable declarations and the first line of code.
-* You must use ANSI C comments (```/* */```); you must not use C++ comments (```//```).
-* The normal indentation width should be four spaces.
-* When a function's argument list wraps around to a next line, you should indent that next line by either the normal width or enough spaces to align it with the arguments on the previous line.
-* When you add functions to an existing file, you should separate them by the same number of blank lines that separate the functions that already are in that file.
-
-(The next two rules will be changed at some time in the future; but, for now:)
-
+* Always use curly braces even for single statements after ```if```, and the single statement should go into a new line.
+* Use "cuddling" braces, ie the opening brace goes in the same line as the ```if```:
+<pre>
+if (foo > 42) {
+    bar = 23;
+}
+</pre>
+* Should the ```if``` statement be followed by an empty conditional block, there should be a comment telling why this is the case
+<pre>
+if (check()) {
+    /* nothing happened, do nothing */
+}
+</pre>
 * You must separate function names and parameter/argument lists by one space.
 * When declaring/defining pointers, you must put the asterisk (```*```) next to the data type, with a space between it and the variable's name.  Examples:
 <pre>

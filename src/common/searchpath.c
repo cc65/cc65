@@ -296,10 +296,23 @@ void AddSubSearchPathFromBin (SearchPaths* P, const char* SubDir)
     }
     *Ptr = '\0';
 
+#elif defined(__linux__)
+
+    /* reading from proc will return the real location, excluding symlinked
+       pathes - which is needed for certain edgy cases */
+    if (readlink("/proc/self/exe", Dir, sizeof(Dir) - 1) < 0) {
+        GetProgPath(Dir, ArgVec[0]);
+    } else {
+        /* Remove binary name */
+        Ptr = strrchr (Dir, PATHSEP[0]);
+        if (Ptr == 0) {
+            return;
+        }
+        *Ptr = '\0';
+    }
+
 #else
-
     GetProgPath(Dir, ArgVec[0]);
-
 #endif
 
     /* Check for 'bin' directory */

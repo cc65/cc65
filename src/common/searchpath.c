@@ -232,44 +232,32 @@ static int SearchPathBin(const char* bin, char* buf, size_t buflen)
 
 
 
-static char* MyDirname(char* in)
-/* returns the dirname() part of a filename.
-** the passed string is modified in place, then returned.
-*/
-{
-    char* p = strrchr (in, '/');
-
-    if (p) {
-        *p = 0;
-    }
-    return in;
-}
-
-
-
 static char* GetProgPath(char* pathbuf, char* a0)
 /* search for the full path of the binary using the argv[0] parameter
 ** passed to int main(), according to the description above.
-** if the binary was started using a relative path, realpath(3p) will
-** turn the relative path into an absolute path with pwd resolved, and
-** gratuitous path components such as "./" or ".." removed.
+**
+** the binary name will be passed to realpath(3p) to have all symlinks
+** resolved and gratuitous path components like "../" removed.
 **
 ** argument "pathbuf" is a work buffer of size PATH_MAX,
 ** "a0" the original argv[0].
-** returns pathbuf with the full path of the binary, minus the binary
-** name itself.
+** returns pathbuf with the full path of the binary.
 */
 {
-    if (a0[0] == '/') {
-        strcpy (pathbuf, a0);
-    } else if (a0[0] == '.' || strrchr (a0, '/')) {
-        /* realpath returns the work buffer passed to it, so checking the
-           return value is superfluous. gcc11 warns anyway. */
-        if (realpath (a0, pathbuf)) {}
-    } else {
-        SearchPathBin (a0, pathbuf, PATH_MAX);
+    char tmp[PATH_MAX];
+
+    if (!strchr(a0, '/')) {
+        /* path doesn't contain directory separator, so it was looked up
+           via PATH environment variable */
+        SearchPathBin (a0, tmp, PATH_MAX);
+        a0 = tmp;
     }
-    return MyDirname(pathbuf);
+
+    /* realpath returns the work buffer passed to it, so checking the
+       return value is superfluous. gcc11 warns anyway. */
+    if (realpath (a0, pathbuf)) {}
+
+    return pathbuf;
 }
 
 #endif
@@ -289,31 +277,18 @@ void AddSubSearchPathFromBin (SearchPaths* P, const char* SubDir)
         return;
     }
 
+#else
+
+    GetProgPath(Dir, ArgVec[0]);
+
+#endif
+
     /* Remove binary name */
-    Ptr = strrchr (Dir, '\\');
+    Ptr = strrchr (Dir, PATHSEP[0]);
     if (Ptr == 0) {
         return;
     }
     *Ptr = '\0';
-
-#elif defined(__linux__)
-
-    /* reading from proc will return the real location, excluding symlinked
-       pathes - which is needed for certain edgy cases */
-    if (readlink("/proc/self/exe", Dir, sizeof(Dir) - 1) < 0) {
-        GetProgPath(Dir, ArgVec[0]);
-    } else {
-        /* Remove binary name */
-        Ptr = strrchr (Dir, PATHSEP[0]);
-        if (Ptr == 0) {
-            return;
-        }
-        *Ptr = '\0';
-    }
-
-#else
-    GetProgPath(Dir, ArgVec[0]);
-#endif
 
     /* Check for 'bin' directory */
     Ptr = strrchr (Dir, PATHSEP[0]);

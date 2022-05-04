@@ -3,8 +3,8 @@
 
         .export         _write
         .import         popax, popptr1
-        .importzp       ptr1, ptr2, ptr3, tmp1
 
+        .include        "zeropage.inc"
         .include        "telestrat.inc"
 
 ; int write (int fd, const void* buf, int count);
@@ -20,7 +20,10 @@
         stx     ptr2            ; save count with each byte incremented separately
 
         jsr     popptr1         ; get buf
-        jsr     popax           ; get fd and discard
+
+        jsr     popax           ; get fd
+
+        sta     tmp1            ; save fd
 
         ; if fd=0001 then it stdout
         cpx     #0
@@ -37,6 +40,7 @@ next:
         sta     PTR_READ_DEST+1
         lda     ptr3
         ldy     ptr3+1
+        ldx     tmp1            ; send fd in X
         BRK_TELEMON  XFWRITE
         ;  compute nb of bytes written
 
@@ -74,7 +78,7 @@ L3:
         inc     ptr1+1
         jmp     L1
 
-        ; No error, return count
+        ; no error, return count
 
 L9:     lda     ptr3
         ldx     ptr3+1

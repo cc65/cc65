@@ -27,7 +27,7 @@ __sysmkdir:
         ldx     #$00         ; X register is used to set if all folders must be created
 
         ; Call telemon primitive
-        
+
         BRK_TELEMON(XMKDIR)
 
         rts

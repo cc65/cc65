@@ -263,11 +263,14 @@ static char* GetProgPath(char* pathbuf, char* a0)
 #endif
 
 void AddSubSearchPathFromBin (SearchPaths* P, const char* SubDir)
-{
-/* Windows only:
-** Add a search path from the running binary, adding a subdirectory to
+/* Add a search path from the running binary, adding a subdirectory to
 ** the parent directory of the directory containing the binary.
+**
+** currently this will work on POSIX systems and on Windows. Should
+** we run into build errors on systems that are neither, we must add
+** another exception below.
 */
+{
     char* Ptr;
     char Dir[PATH_MAX];
 
@@ -277,7 +280,7 @@ void AddSubSearchPathFromBin (SearchPaths* P, const char* SubDir)
         return;
     }
 
-#else
+#else /* POSIX */
 
     GetProgPath(Dir, ArgVec[0]);
 

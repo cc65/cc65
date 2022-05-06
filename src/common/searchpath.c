@@ -44,6 +44,12 @@
 #else
 /* Anyone else */
 #  include <unistd.h>
+#  include <stdio.h>
+#  include <limits.h>
+#  ifndef PATH_MAX
+#  define PATH_MAX 4096
+#  endif
+#  include "cmdline.h"
 #endif
 
 /* common */
@@ -157,36 +163,142 @@ void AddSubSearchPathFromEnv (SearchPaths* P, const char* EnvVar, const char* Su
     SB_Done (&Dir);
 }
 
+#ifdef _WIN32
+#define PATHSEP "\\"
+#undef PATH_MAX
+#define PATH_MAX _MAX_PATH
+#else
+#define PATHSEP "/"
 
 
-void AddSubSearchPathFromWinBin (SearchPaths* P, const char* SubDir)
-{
-/* Windows only:
-** Add a search path from the running binary, adding a subdirectory to
-** the parent directory of the directory containing the binary.
+
+/*
+   on POSIX-compatible operating system, a binary can be started in
+   3 distinct ways:
+
+   1) using absolute path; in which case argv[0] starts with '/'
+   2) using relative path; in which case argv[0] contains '/', but
+      does not start with it. e.g.: ./ca65 ; bin/cc65
+   3) using PATH environment variable, which is a colon-separated
+      list of directories which will be searched for a command
+      name used unprefixed. see execlp() and execvp() in man 3p exec:
+
+>  The argument file is used to construct a pathname that identifies the new
+>  process  image  file.  If the file argument contains a <slash> character,
+>  the  file  argument  shall  be  used  as  the  pathname  for  this  file.
+>  Otherwise,  the  path prefix for this file is obtained by a search of the
+>  directories passed  as  the  environment  variable  PATH  (see  the  Base
+>  Definitions  volume  of  POSIX.1*2008, Chapter 8, Environment Variables).
+>  If this environment variable is not present, the results  of  the  search
+>  are implementation-defined.
+
 */
-#if defined(_WIN32)
 
-    char Dir[_MAX_PATH];
+
+
+static int SearchPathBin(const char* bin, char* buf, size_t buflen)
+/* search colon-separated list of paths in PATH environment variable
+** for the full path of argv[0].
+** returns 1 if successfull, in which case buf will contain the full path.
+** bin = binary name (from argv[0]), buf = work buffer, buflen = sizeof buf
+*/
+{
+    char* p = getenv ("PATH");
+    char* o;
+    size_t l;
+
+    if (!p) {
+        return 0;
+    }
+    for (;;) {
+        o = buf;
+        l = buflen;
+        while (l && *p && *p != ':') {
+            *(o++) = *(p++);
+            l--;
+        }
+        snprintf (o, l, "/%s", bin);
+        if (access (buf, X_OK) == 0) {
+            return 1;
+        }
+        if (*p == ':') {
+            p++;
+        } else if (!p) {
+            break;
+        }
+    }
+    return 0;
+}
+
+
+
+static char* GetProgPath(char* pathbuf, char* a0)
+/* search for the full path of the binary using the argv[0] parameter
+** passed to int main(), according to the description above.
+**
+** the binary name will be passed to realpath(3p) to have all symlinks
+** resolved and gratuitous path components like "../" removed.
+**
+** argument "pathbuf" is a work buffer of size PATH_MAX,
+** "a0" the original argv[0].
+** returns pathbuf with the full path of the binary.
+*/
+{
+    char tmp[PATH_MAX];
+
+    if (!strchr(a0, '/')) {
+        /* path doesn't contain directory separator, so it was looked up
+           via PATH environment variable */
+        SearchPathBin (a0, tmp, PATH_MAX);
+        a0 = tmp;
+    }
+
+    /* realpath returns the work buffer passed to it, so checking the
+       return value is superfluous. gcc11 warns anyway. */
+    if (realpath (a0, pathbuf)) {}
+
+    return pathbuf;
+}
+
+#endif
+
+void AddSubSearchPathFromBin (SearchPaths* P, const char* SubDir)
+/* Add a search path from the running binary, adding a subdirectory to
+** the parent directory of the directory containing the binary.
+**
+** currently this will work on POSIX systems and on Windows. Should
+** we run into build errors on systems that are neither, we must add
+** another exception below.
+*/
+{
     char* Ptr;
+    char Dir[PATH_MAX];
+
+#if defined(_WIN32)
 
     if (GetModuleFileName (NULL, Dir, _MAX_PATH) == 0) {
         return;
     }
 
+#else /* POSIX */
+
+    GetProgPath(Dir, ArgVec[0]);
+
+#endif
+
     /* Remove binary name */
-    Ptr = strrchr (Dir, '\\');
+    Ptr = strrchr (Dir, PATHSEP[0]);
     if (Ptr == 0) {
         return;
     }
     *Ptr = '\0';
 
     /* Check for 'bin' directory */
-    Ptr = strrchr (Dir, '\\');
+    Ptr = strrchr (Dir, PATHSEP[0]);
     if (Ptr == 0) {
         return;
     }
-    if (strcmp (Ptr++, "\\bin") != 0) {
+    if (strcmp (Ptr++, PATHSEP "bin") != 0) {
         return;
     }
 
@@ -195,13 +307,6 @@ void AddSubSearchPathFromWinBin (SearchPaths* P, const char* SubDir)
 
     /* Add the search path */
     AddSearchPath (P, Dir);
-
-#else
-
-    (void) P;
-    (void) SubDir;
-
-#endif
 }
 
 

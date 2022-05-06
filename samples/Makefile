@@ -525,7 +525,6 @@ INSTALL = install
 samplesdir = $(PREFIX)/share/cc65/samples
 
 install:
-	$(if $(PREFIX),,$(error variable "PREFIX" must be set))
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)/geos
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)/tutorial

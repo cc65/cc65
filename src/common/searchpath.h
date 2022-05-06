@@ -75,9 +75,8 @@ void AddSubSearchPathFromEnv (SearchPaths* P, const char* EnvVar, const char* Su
 ** the environment variable value.
 */
 
-void AddSubSearchPathFromWinBin (SearchPaths* P, const char* SubDir);
-/* Windows only:
-** Add a search path from the running binary, adding a subdirectory to
+void AddSubSearchPathFromBin (SearchPaths* P, const char* SubDir);
+/* Add a search path from the running binary, adding a subdirectory to
 ** the parent directory of the directory containing the binary.
 */
 

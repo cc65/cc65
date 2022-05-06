@@ -99,7 +99,7 @@ void InitSearchPaths (void)
 #endif
 
     /* Add paths relative to the parent directory of the Windows binary. */
-    AddSubSearchPathFromWinBin (LibDefaultPath, "lib");
-    AddSubSearchPathFromWinBin (ObjDefaultPath, "lib");
-    AddSubSearchPathFromWinBin (CfgDefaultPath, "cfg");
+    AddSubSearchPathFromBin (LibDefaultPath, "lib");
+    AddSubSearchPathFromBin (ObjDefaultPath, "lib");
+    AddSubSearchPathFromBin (CfgDefaultPath, "cfg");
 }

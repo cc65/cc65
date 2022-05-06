@@ -81,5 +81,5 @@ void FinishIncludePaths (void)
 #endif
 
     /* Add paths relative to the parent directory of the Windows binary. */
-    AddSubSearchPathFromWinBin (SysIncSearchPath, "include");
+    AddSubSearchPathFromBin (SysIncSearchPath, "include");
 }

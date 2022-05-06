@@ -51,6 +51,9 @@ color  := $0787
 The following is still very incomplete - if in doubt please look at existing sourcefiles and adapt to the existing style
 
 * Your files should obey the C89 standard.
+* We generally have a "no warnings" policy
+* Warnings must not be hidden by using typecasts - fix the code instead
+   * In printf-style functions use the PRIX64 (and similar) macros to deal with 64bit values
 * The normal indentation width should be four spaces.
 * You must use ANSI C comments (```/* */```); you must not use C++ comments (```//```).
 * When you add functions to an existing file, you should separate them by the same number of blank lines that separate the functions that already are in that file.

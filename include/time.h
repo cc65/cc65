@@ -52,7 +52,6 @@ typedef unsigned size_t;
 
 typedef unsigned long time_t;
 typedef unsigned long clock_t;
-typedef unsigned char clockid_t;
 
 /* Structure for broken down time */
 struct tm {
@@ -66,22 +65,6 @@ struct tm {
     int     tm_yday;
     int     tm_isdst;
 };
-
-/* Structure for seconds and nanoseconds */
-struct timespec {
-    time_t  tv_sec;
-    long    tv_nsec;
-};
-
-/* Timezone representation, default is UTC */
-extern struct _timezone {
-    char    daylight;   /* True if daylight savings time active */
-    long    timezone;   /* Number of seconds behind UTC */
-    char    tzname[5];  /* Name of timezone, e.g. CET */
-    char    dstname[5]; /* Name when daylight true, e.g. CEST */
-} _tz;
-
-
 
 #if defined(__ATARI5200__)
 #  define CLOCKS_PER_SEC        60
@@ -109,7 +92,6 @@ extern struct _timezone {
 clock_t _clocks_per_sec (void);
 #  define CLOCKS_PER_SEC        _clocks_per_sec()
 #endif
-#define CLK_TCK                 CLOCKS_PER_SEC
 #define CLOCK_REALTIME          0
 
 
@@ -125,12 +107,32 @@ size_t __fastcall__ strftime (char* buf, size_t bufsize, const char* format, con
 time_t __fastcall__ time (time_t* t);
 
 
+#if __CC65_STD__ >= __CC65_STD_CC65__
+
+typedef unsigned char clockid_t;
+
+/* Structure for seconds and nanoseconds */
+struct timespec {
+    time_t  tv_sec;
+    long    tv_nsec;
+};
+
+/* Timezone representation, default is UTC */
+extern struct _timezone {
+    char    daylight;   /* True if daylight savings time active */
+    long    timezone;   /* Number of seconds behind UTC */
+    char    tzname[5];  /* Name of timezone, e.g. CET */
+    char    dstname[5]; /* Name when daylight true, e.g. CEST */
+} _tz;
+
+#define CLK_TCK                 CLOCKS_PER_SEC
 
 /* POSIX function prototypes */
 int __fastcall__ clock_getres (clockid_t clock_id, struct timespec *res);
 int __fastcall__ clock_gettime (clockid_t clock_id, struct timespec *tp);
 int __fastcall__ clock_settime (clockid_t clock_id, const struct timespec *tp);
 
+#endif
 
 
 /* End of time.h */

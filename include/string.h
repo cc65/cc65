@@ -36,11 +36,17 @@
 #ifndef _STRING_H
 #define _STRING_H
 
+/* NULL pointer */
+#ifndef _HAVE_NULL
+#define NULL    0
+#define _HAVE_NULL
+#endif
 
-
-#include <stddef.h>
-
-
+/* size_t is needed */
+#ifndef _HAVE_size_t
+#define _HAVE_size_t
+typedef unsigned size_t;
+#endif
 
 char* __fastcall__ strcat (char* dest, const char* src);
 char* __fastcall__ strchr (const char* s, int c);
@@ -88,7 +94,6 @@ char* __fastcall__ strqtok (char* s1, const char* s2);
 
 const char* __fastcall__ _stroserror (unsigned char errcode);
 /* Map an operating system error number to an error message. */
-
 
 
 /* End of string.h */

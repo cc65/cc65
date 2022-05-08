@@ -52,6 +52,9 @@
 unsigned OptBranchDist (CodeSeg* S);
 /* Change branches for the distance needed. */
 
+unsigned OptBranchDist2 (CodeSeg* S);
+/* If BRA points to an external symbol, change it to JMP */
+
 unsigned OptRTSJumps1 (CodeSeg* S);
 /* Replace jumps to RTS by RTS */
 

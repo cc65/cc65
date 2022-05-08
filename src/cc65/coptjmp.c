@@ -194,6 +194,37 @@ unsigned OptBranchDist (CodeSeg* S)
 
 
 
+unsigned OptBranchDist2 (CodeSeg* S)
+/* Change BRA to JMP if target is an external symbol */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        /* Get next entry */
+        CodeEntry* E = CS_GetEntry (S, I);
+
+       if ((CPUIsets[CPU] & (CPU_ISET_65SC02 |CPU_ISET_6502DTV)) != 0 && /* CPU has BRA */
+           (E->Info & OF_UBRA) != 0                                   && /* is a unconditional branch */
+           E->JumpTo == NULL) {                                          /* target is extern */
+            /* BRA jumps to external symbol and must be replaced by a JMP on the 65C02 CPU */
+            CE_ReplaceOPC (E, OP65_JMP);
+            ++Changes;
+        }
+
+        /* Next entry */
+        ++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
 /*****************************************************************************/
 /*                        Replace jumps to RTS by RTS                        */
 /*****************************************************************************/

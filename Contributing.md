@@ -155,6 +155,10 @@ The only exception to the above are actions that are exclusive to the github act
 
 # Roadmap / TODOs / open Ends
 
+## Documentation
+
+* the printf family of function does not completely implement all printf modifiers and does not behave as expected in some cases - all this should be documented in detail
+
 ## Test suite
 
 * specific tests to check the optimizer (rather than the codegenerator) are needed.

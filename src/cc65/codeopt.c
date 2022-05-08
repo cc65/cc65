@@ -117,6 +117,7 @@ static OptFunc DOptBNegAX3      = { OptBNegAX3,      "OptBNegAX3",      100, 0, 
 static OptFunc DOptBNegAX4      = { OptBNegAX4,      "OptBNegAX4",      100, 0, 0, 0, 0, 0 };
 static OptFunc DOptBoolTrans    = { OptBoolTrans,    "OptBoolTrans",    100, 0, 0, 0, 0, 0 };
 static OptFunc DOptBranchDist   = { OptBranchDist,   "OptBranchDist",     0, 0, 0, 0, 0, 0 };
+static OptFunc DOptBranchDist2  = { OptBranchDist2,  "OptBranchDist2",    0, 0, 0, 0, 0, 0 };
 static OptFunc DOptCmp1         = { OptCmp1,         "OptCmp1",          42, 0, 0, 0, 0, 0 };
 static OptFunc DOptCmp2         = { OptCmp2,         "OptCmp2",          85, 0, 0, 0, 0, 0 };
 static OptFunc DOptCmp3         = { OptCmp3,         "OptCmp3",          75, 0, 0, 0, 0, 0 };
@@ -222,6 +223,7 @@ static OptFunc* OptFuncs[] = {
     &DOptBNegAX4,
     &DOptBoolTrans,
     &DOptBranchDist,
+    &DOptBranchDist2,
     &DOptCmp1,
     &DOptCmp2,
     &DOptCmp3,
@@ -848,6 +850,10 @@ static unsigned RunOptGroup7 (CodeSeg* S)
 
     /* Replace JSR followed by RTS to JMP */
     C += RunOptFunc (S, &DOptRTS, 1);
+
+    /* Replace JMP/BRA to JMP by direct JMP */
+    C += RunOptFunc (S, &DOptJumpCascades, 1);
+    C += RunOptFunc (S, &DOptBranchDist2, 1);
 
     Changes += C;
     /* If we had changes, we must run dead code elimination again,

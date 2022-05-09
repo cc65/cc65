@@ -161,6 +161,7 @@ DIRLIST = tutorial geos atari2600 atari5200 apple2 gamate lynx supervision sym1 
 
 EXELIST_apple2 =   \
         ascii      \
+        checkversion \
         diodemo    \
         enumdevdir \
         gunzip65   \
@@ -177,6 +178,7 @@ EXELIST_apple2enh = $(EXELIST_apple2)
 
 EXELIST_atari =    \
         ascii      \
+        checkversion \
         gunzip65   \
         hello      \
         mandelbrot \
@@ -197,6 +199,7 @@ EXELIST_atari5200 = \
 
 EXELIST_atmos =    \
         ascii      \
+        checkversion \
         hello      \
         mandelbrot \
         sieve      \
@@ -207,6 +210,7 @@ EXELIST_bbc = \
 
 EXELIST_c64 =      \
         ascii      \
+        checkversion \
         enumdevdir \
         gunzip65   \
         hello      \
@@ -220,6 +224,7 @@ EXELIST_c64 =      \
 
 EXELIST_c128 =     \
         ascii      \
+        checkversion \
         enumdevdir \
         gunzip65   \
         hello      \
@@ -231,12 +236,14 @@ EXELIST_c128 =     \
 
 EXELIST_c16 =      \
         ascii      \
+        checkversion \
         enumdevdir \
         tinyshell  \
         hello
 
 EXELIST_cbm510 =   \
         ascii      \
+        checkversion \
         gunzip65   \
         hello      \
         mousedemo  \
@@ -245,6 +252,7 @@ EXELIST_cbm510 =   \
 
 EXELIST_cbm610 =   \
         ascii      \
+        checkversion \
         gunzip65   \
         hello      \
         tinyshell  \
@@ -252,10 +260,12 @@ EXELIST_cbm610 =   \
 
 EXELIST_creativision = \
         ascii          \
+        checkversion \
         hello
 
 EXELIST_cx16 =     \
         ascii      \
+        checkversion \
         enumdevdir \
         gunzip65   \
         hello      \
@@ -266,10 +276,12 @@ EXELIST_cx16 =     \
         tgidemo
 
 EXELIST_gamate =   \
+        checkversion \
         hello
 
 EXELIST_geos-cbm = \
         ascii      \
+        checkversion \
         diodemo
 
 EXELIST_geos-apple = \
@@ -282,16 +294,19 @@ EXELIST_lynx = \
         notavailable
 
 EXELIST_nes = \
+        checkversion \
         hello
 
 EXELIST_osic1p = \
         notavailable
 
 EXELIST_pce = \
+        checkversion \
         hello
 
 EXELIST_pet =      \
         ascii      \
+        checkversion \
         enumdevdir \
         hello      \
         tinyshell  \
@@ -299,6 +314,7 @@ EXELIST_pet =      \
 
 EXELIST_plus4 =    \
         ascii      \
+        checkversion \
         enumdevdir \
         gunzip65   \
         hello      \
@@ -306,6 +322,7 @@ EXELIST_plus4 =    \
         sieve
 
 EXELIST_sim6502 =  \
+        checkversion \
         gunzip65
 
 EXELIST_sim65c02 = $(EXELIST_sim6502)
@@ -318,6 +335,7 @@ EXELIST_sym1 =     \
 
 EXELIST_telestrat = \
         ascii       \
+        checkversion \
         gunzip65    \
         hello       \
         mandelbrot  \
@@ -326,6 +344,7 @@ EXELIST_telestrat = \
 
 EXELIST_vic20 =    \
         ascii      \
+        checkversion \
         enumdevdir \
         hello      \
         mandelbrot \

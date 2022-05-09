@@ -32,6 +32,8 @@ For a complete list look at the [full team list](https://github.com/orgs/cc65/te
 
 For general discussion, questions, etc subscribe to the [mailing list](https://cc65.github.io/mailing-lists.html) or use the [github discussions](https://github.com/cc65/cc65/discussions).
 
+Some of us may also be around on IRC [#cc65](https://web.libera.chat/#cc65) on libera.chat
+
 # Documentation
 
 * The main [Documentation](https://cc65.github.io/doc) for users and developers

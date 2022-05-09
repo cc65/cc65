@@ -801,9 +801,6 @@ static void StartExpClassic (MacExp* E)
 {
     token_t Term;
 
-    /* Skip the macro name */
-    NextTok ();
-
     /* Does this invocation have any arguments? */
     if (!TokIsSep (CurTok.Tok)) {
 
@@ -887,9 +884,6 @@ static void StartExpDefine (MacExp* E)
     */
     unsigned Count = E->M->ParamCount;
 
-    /* Skip the current token */
-    NextTok ();
-
     /* Read the actual parameters */
     while (Count--) {
         TokNode* Last;
@@ -965,14 +959,19 @@ static void StartExpDefine (MacExp* E)
 void MacExpandStart (Macro* M)
 /* Start expanding a macro */
 {
+    FilePos Pos;
     MacExp* E;
 
     /* Check the argument */
     PRECONDITION (M && (M->Style != MAC_STYLE_DEFINE || DisableDefines == 0));
 
+    /* Remember the current file position, then skip the macro name token */
+    Pos = CurTok.Pos;
+    NextTok ();
+
     /* We cannot expand an incomplete macro */
     if (M->Incomplete) {
-        Error ("Cannot expand an incomplete macro");
+        PError (&Pos, "Cannot expand an incomplete macro");
         return;
     }
 
@@ -980,7 +979,7 @@ void MacExpandStart (Macro* M)
     ** to force an endless loop and assembler crash.
     */
     if (MacExpansions >= MAX_MACEXPANSIONS) {
-        Error ("Too many nested macro expansions");
+        PError (&Pos, "Too many nested macro expansions");
         return;
     }
 

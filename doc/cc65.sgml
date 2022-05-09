@@ -1102,8 +1102,20 @@ The compiler defines several macros at startup:
   <tag><tt>__CC65__</tt></tag>
 
   This macro is always defined. Its value is the version number of the
-  compiler in hex.  For example, version 2.14 of the compiler has this macro
-  defined as <tt/0x02E0/.
+  compiler in hex: <tt>(VER_MAJOR * 0x100) + VER_MINOR</tt>. The upper 8 bits
+  are the major-, the lower 8 bits are the  minor version. For example, version
+  47.11 of the compiler would have this macro defined as <tt/0x2f0b/.
+
+  Note: until 2.19 this macro was defined as <tt>(VER_MAJOR * 0x100) + VER_MINOR * 0x10</tt> -
+  which resulted in broken values starting at version 2.16 of the compiler. For
+  this reason the value of this macro is considered purely informal - you should
+  not use it to check for a specific compiler version and use different code
+  according to the detected version - please update your code to work with the
+  recent version of the compiler instead (There is very little reason to not use
+  the most recent version - and even less to support older versions in your code).
+
+  Should you still insist on doing this for some reason - look at <tt>checkversion.c</tt>
+  in the samples directory for some preprocessor kludges that might help.
 
   <tag><tt>__CC65_STD__</tt></tag>
 

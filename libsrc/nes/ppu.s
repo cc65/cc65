@@ -137,7 +137,7 @@
 paldata:
         .repeat 2
         .byte   $0f     ; 0 black
-        .byte   $14     ; 4 violett
+        .byte   $14     ; 4 violet
         .byte   $3b     ; 3 cyan
         .byte   $3d     ; 1 white
 

@@ -22,7 +22,7 @@ popeax: ldy     #3
         tax
 .if (.cpu .bitand ::CPU_ISET_65SC02)
         lda     (sp)
-.else        
+.else
         dey
         lda     (sp),y
 .endif

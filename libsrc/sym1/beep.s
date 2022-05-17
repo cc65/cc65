@@ -12,7 +12,6 @@
 
 .proc _beep:    near
 
-        jsr     BEEP             ;  Beep
-        rts
+        jmp     BEEP             ;  Beep
 
 .endproc

@@ -68,7 +68,7 @@ static void DoWarning (void)
 
 static void DoCircles (void)
 {
-    static const unsigned char Palette[2] = { TGI_COLOR_WHITE, TGI_COLOR_ORANGE };
+    static const unsigned char Palette[2] = { TGI_COLOR_WHITE, TGI_COLOR_BLUE };
     unsigned char I;
     unsigned char Color = COLOR_BACK;
     const unsigned X = MaxX / 2;

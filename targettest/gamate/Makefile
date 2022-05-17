@@ -1,4 +1,8 @@
 
+# Run 'make SYS=<target>'; or, set a SYS env.
+# var. to build for another target system.
+SYS ?= gamate
+
 # Just the usual way to find out if we're
 # using cmd.exe to execute make rules.
 ifneq ($(shell echo),)
@@ -27,7 +31,23 @@ else
   LD := $(if $(wildcard ../../bin/ld65*),../../bin/ld65,ld65)
 endif
 
-all: audiotest.bin lcdtest.bin ctest.bin
+EXELIST_gamate = \
+        audiotest.bin lcdtest.bin ctest.bin
+
+ifneq ($(EXELIST_$(SYS)),)
+testcode: $(EXELIST_$(SYS))
+else
+testcode: notavailable
+endif
+
+# empty target used to skip systems that will not work with any program in this dir
+notavailable:
+ifeq ($(MAKELEVEL),0)
+	@echo "info: gamate tests not available for" $(SYS)
+else
+# suppress the "nothing to be done for 'testcode' message
+	@echo > $(NULLDEV)
+endif
 
 audiotest.bin: audiotest.s
 	$(CL) -l audiotest.lst -t gamate -o audiotest.bin audiotest.s
@@ -35,9 +55,6 @@ lcdtest.bin: lcdtest.s
 	$(CL) -l lcdtest.lst -t gamate -o lcdtest.bin lcdtest.s
 ctest.bin: ctest.c
 	$(CL) -l ctest.lst -t gamate -o ctest.bin ctest.c
-nachtm.bin: nachtm.c
-	$(CL) -Os -l nachtm.lst -t gamate -o nachtm.bin nachtm.c
-	gamate-fixcart nachtm.bin
 
 clean:
 	@$(DEL) lcdtest.o audiotest.o ctest.o 2>$(NULLDEV)

@@ -10,6 +10,7 @@ concurrency:
 jobs:
   build_windows:
     name: Build (Windows)
+    if: github.repository == 'cc65/cc65'
     runs-on: windows-latest
 
     steps:
@@ -29,9 +30,9 @@ jobs:
         run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Release
 
   build_linux:
-    name: Build, Test and Snaphot (Linux)
+    name: Build, Test, and Snapshot (Linux)
+    if: github.repository == 'cc65/cc65'
     runs-on: ubuntu-latest
-    needs: build_windows
 
     steps:
       - name: Install Dependencies
@@ -45,9 +46,14 @@ jobs:
       - name: Checkout Source
         uses: actions/checkout@v2
 
+      - name: Do some simple style checks
+        shell: bash
+        run: make -j2 checkstyle
       - name: Build the tools.
         shell: bash
-        run: make -j2 bin USER_CFLAGS=-Werror
+        run: |
+            make -j2 bin USER_CFLAGS=-Werror
+            make -j2 util
       - name: Build the platform libraries.
         shell: bash
         run: make -j2 lib QUIET=1
@@ -60,6 +66,9 @@ jobs:
       - name: Remove the output from the samples tests.
         shell: bash
         run: make -C samples clean
+      - name: Remove programs in util directory
+        shell: bash
+        run: make -C util clean
       - name: Build the document files.
         shell: bash
         run: make -j2 doc
@@ -68,24 +77,35 @@ jobs:
           make -C src clean
           make -j2 bin USER_CFLAGS=-Werror CROSS_COMPILE=x86_64-w64-mingw32-
           make zip
-          mv cc65.zip cc65-win64.zip
+          mv cc65.zip cc65-snapshot-win64.zip
       - name: Build and package 32-bit Windows versions of the tools.
         run: |
           make -C src clean
           make -j2 bin USER_CFLAGS=-Werror CROSS_COMPILE=i686-w64-mingw32-
           make zip
-          mv cc65.zip cc65-win32.zip
+          mv cc65.zip cc65-snapshot-win32.zip
 
       - name: Upload a 32-bit Snapshot Zip
         uses: actions/upload-artifact@v2
         with:
           name: cc65-snapshot-win32.zip
-          path: cc65-win32.zip
+          path: cc65-snapshot-win32.zip
       - name: Upload a 64-bit Snapshot Zip
         uses: actions/upload-artifact@v2
         with:
           name: cc65-snapshot-win64.zip
-          path: cc65-win64.zip
+          path: cc65-snapshot-win64.zip
 
+    # enter secrets under "repository secrets"
+      - name: Upload snapshot to sourceforge
+        uses: nogsantos/scp-deploy@master
+        with:
+          src: cc65-snapshot-win32.zip
+          host: ${{ secrets.SSH_HOST }}
+          remote: ${{ secrets.SSH_DIR }}
+          port: ${{ secrets.SSH_PORT }}
+          user: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          
       # TODO: Update docs at https://github.com/cc65/doc
       # TODO: Publish snapshot zip at https://github.com/cc65/cc65.github.io

@@ -11,7 +11,7 @@
 
         .include        "telestrat.inc"
         .include        "zeropage.inc"
-        
+
 
 __syschdir:
         ; Throw away all parameters except the name
@@ -24,9 +24,9 @@ __syschdir:
 
         stx     tmp1
         ldy     tmp1
-        
+
         ; Call telemon primitive
-        
+
         BRK_TELEMON(XPUTCWD)
 
         jmp     initcwd      ; Update cwd

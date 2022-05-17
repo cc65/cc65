@@ -52,7 +52,7 @@ INSTALL:
         lda     #%11000000
         sta     VIA2::DDRB
         sta     VIA2::PRB
-        ; We could detect joysticks because with previous command bit0,1,2,3,4 should be set to 1 after 
+        ; We could detect joysticks because with previous command bit0,1,2,3,4 should be set to 1 after
         ; But if some one press fire or press direction, we could reach others values which could break joystick detection.
         lda     #<JOY_ERR_OK
         ldx     #>JOY_ERR_OK
@@ -83,7 +83,7 @@ COUNT:
 ; PB7 and PB6 select right or left port
 ; When PB7 and PB6 are high, it controls two CA3083 (2 NPN transistors array) bases.
 ; In that case, PB0 to PB4 are set to high (it means no action are pressed)
-; When the user press something then bit will be set to 0. 
+; When the user press something then bit will be set to 0.
 ; Bit 0 is right
 ; Bit 1 is left
 ; Bit 2 is fire
@@ -94,18 +94,18 @@ READ:
 
         lda     VIA2::PRB
         and     #%01111111
-        ora     #%01000000        
+        ora     #%01000000
         sta     VIA2::PRB
         ; then read
         lda     VIA2::PRB
         eor     #%01011111
- 
+
         rts
-right:  
+right:
         lda     VIA2::PRB
         and     #%10111111
         ora     #%10000000
-        sta     VIA2::PRB      
+        sta     VIA2::PRB
 
         ; then read
         lda     VIA2::PRB

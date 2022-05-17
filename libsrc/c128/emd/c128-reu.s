@@ -72,7 +72,7 @@ reu_params:     .word   $0000           ; Host address, lo, hi
                 .byte   $00             ; Expansion  bank no.
                 .word   $0000           ; # bytes to move, lo, hi
                 .byte   $00             ; Interrupt mask reg.
-                .byte   $00             ; Adress control reg.
+                .byte   $00             ; Address control reg.
 
 .code
 

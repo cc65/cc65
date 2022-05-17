@@ -112,7 +112,7 @@ For a C test compiled and linked with <tt/--target sim6502/ the
 command line arguments to <tt/sim65/ will be passed to <tt/main/,
 and the return value from <tt/main/ will become sim65's exit code.
 The <tt/exit/ function may also be used to terminate with an exit code.
- 
+
 Exit codes are limited to 8 bits.
 
 The standard C library high level file input and output is functional.

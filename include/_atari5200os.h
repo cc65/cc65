@@ -31,19 +31,19 @@
 struct __os {
 
     /*Page zero*/
-    unsigned char pokmsk;            // = $00       System mask for POKEY IRQ enable 
+    unsigned char pokmsk;            // = $00       System mask for POKEY IRQ enable
     unsigned char rtclok[2];         // = $01,$02   Real time clock
-    unsigned char critic;            // = $03       Critical section flag 
+    unsigned char critic;            // = $03       Critical section flag
     unsigned char atract;            // = $04       Attract mode counter
-    
+
     union {
         struct {
             unsigned char sdlstl;    // = $05       Save display list LO
             unsigned char sdlsth;    // = $06       Save display list HI
         };
         void*   sdlst;               // = $05,$06   Display list shadow
-    };  
-    
+    };
+
     unsigned char sdmctl;            // = $07       DMACTL shadow
     unsigned char pcolr0;            // = $08       PM color 0
     unsigned char pcolr1;            // = $09       PM color 1
@@ -55,10 +55,10 @@ struct __os {
     unsigned char color3;            // = $0F       PF color 3
     unsigned char color4;            // = $10       PF color 4
     unsigned char _free_1[0xEF];     // = $11-$FF   User space
-    
+
     /*Stack*/
     unsigned char stack[0x100];      // = $100-$1FF Stack
-    
+
     /*Page 2 OS variables*/
     void (*vinter)(void);            // = $200      Immediate IRQ vector
     void (*vvblki)(void);            // = $202      Immediate VBI vector
@@ -74,7 +74,7 @@ struct __os {
     void (*vtimr1)(void);            // = $216      POKEY timer 1 IRQ vector
     void (*vtimr2)(void);            // = $218      POKEY timer 2 IRQ vector
     void (*vtimr4)(void);            // = $21A      POKEY timer 4 IRQ vector
-    
+
 };
 
 #endif

@@ -117,6 +117,7 @@ static OptFunc DOptBNegAX3      = { OptBNegAX3,      "OptBNegAX3",      100, 0, 
 static OptFunc DOptBNegAX4      = { OptBNegAX4,      "OptBNegAX4",      100, 0, 0, 0, 0, 0 };
 static OptFunc DOptBoolTrans    = { OptBoolTrans,    "OptBoolTrans",    100, 0, 0, 0, 0, 0 };
 static OptFunc DOptBranchDist   = { OptBranchDist,   "OptBranchDist",     0, 0, 0, 0, 0, 0 };
+static OptFunc DOptBranchDist2  = { OptBranchDist2,  "OptBranchDist2",    0, 0, 0, 0, 0, 0 };
 static OptFunc DOptCmp1         = { OptCmp1,         "OptCmp1",          42, 0, 0, 0, 0, 0 };
 static OptFunc DOptCmp2         = { OptCmp2,         "OptCmp2",          85, 0, 0, 0, 0, 0 };
 static OptFunc DOptCmp3         = { OptCmp3,         "OptCmp3",          75, 0, 0, 0, 0, 0 };
@@ -222,6 +223,7 @@ static OptFunc* OptFuncs[] = {
     &DOptBNegAX4,
     &DOptBoolTrans,
     &DOptBranchDist,
+    &DOptBranchDist2,
     &DOptCmp1,
     &DOptCmp2,
     &DOptCmp3,
@@ -395,7 +397,6 @@ static void ReadOptStats (const char* Name)
 /* Read the optimizer statistics file */
 {
     char Buf [256];
-    unsigned Lines;
 
     /* Try to open the file */
     FILE* F = fopen (Name, "r");
@@ -405,7 +406,6 @@ static void ReadOptStats (const char* Name)
     }
 
     /* Read and parse the lines */
-    Lines = 0;
     while (fgets (Buf, sizeof (Buf), F) != 0) {
 
         char* B;
@@ -416,9 +416,6 @@ static void ReadOptStats (const char* Name)
         char Name[32];
         unsigned long  TotalRuns;
         unsigned long  TotalChanges;
-
-        /* Count lines */
-        ++Lines;
 
         /* Remove trailing white space including the line terminator */
         B = Buf;
@@ -848,6 +845,10 @@ static unsigned RunOptGroup7 (CodeSeg* S)
 
     /* Replace JSR followed by RTS to JMP */
     C += RunOptFunc (S, &DOptRTS, 1);
+
+    /* Replace JMP/BRA to JMP by direct JMP */
+    C += RunOptFunc (S, &DOptJumpCascades, 1);
+    C += RunOptFunc (S, &DOptBranchDist2, 1);
 
     Changes += C;
     /* If we had changes, we must run dead code elimination again,

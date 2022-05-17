@@ -31,7 +31,7 @@ FILE* __fastcall__ freopen (const char* name, const char* mode, FILE* f)
     ** overwritten by _fopen.
     */
     if (close (f->f_fd) < 0) {
-        /* An error occured, errno is already set */
+        /* An error occurred, errno is already set */
         return 0;
     }
 

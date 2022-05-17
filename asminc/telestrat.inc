@@ -1,7 +1,7 @@
 ;
 ; Oric TELEMON definition
-; TELEMON 2.4 & TELEMON 3.x
-; For TELEMON 3.x check http://orix.oric.org
+; TELEMON 2.4 & Orix
+; For Orix check http://orix.oric.org
 ;
 
 ; ---------------------------------------------------------------------------
@@ -17,7 +17,7 @@ FNAME_LEN       = 11            ; Maximum length of file-name
 ; ---------------------------------------------------------------------------
 ; I/O Identifier
 ; Theses identifers are used for channel management
-; 
+;
 
 XKBD            = $80           ; Keyboard
 XRSE            = $83           ; RS232 in
@@ -59,7 +59,7 @@ SCRNB           := $28          ; Id of the current window
 ADKBD           := $2A          ; Address ASCII conversion table
 
 
-PTR_READ_DEST   := $2C          ; Used for XFREAD and XWRITE only in TELEMON 3.x
+PTR_READ_DEST   := $2C          ; Used for XFREAD and XWRITE only in Orix
 
 ADCLK           := $40          ; Address for clock display
 TIMEUS          := $42
@@ -87,27 +87,27 @@ HRSFB           := $57
 VABKP1          := $58
 
 ; RS232T
-; b0-b3 : speed 
+; b0-b3 : speed
 ;         1111 => 19200 bps  (please note that telestrat can't handle this speed without stopping all IRQ except ACIA's one)
 ;         1100 =>  9600 bps  (default from TELEMON)
-;         1110 =>  4800 bps 
-;         1010 =>  2400 bps 
-;         1000 =>  1200 bps 
-;         0111 =>   600 bps 
-;         0110 =>   300 bps 
-;         0101 =>   150 bps 
-;         0010 =>    75 bps 
+;         1110 =>  4800 bps
+;         1010 =>  2400 bps
+;         1000 =>  1200 bps
+;         0111 =>   600 bps
+;         0110 =>   300 bps
+;         0101 =>   150 bps
+;         0010 =>    75 bps
 
 ; b4    : 0 external clock, 1 internal clock
 ; b6-b5 : 00 8 bits
 ;         01 7 bits
 ;         10 6 bits
 ;         11 5 bits
-; b7    : 0  a stop  
+; b7    : 0  a stop
 
 RS232T          := $59
 
-; RS232C 
+; RS232C
 ; b0-b3 : 0
 ; b4    : 1 if echo
 ; b5    : 1 if parity
@@ -218,7 +218,7 @@ SCREEN          := $BB80
 
 ; TELEMON primitives (2.4 & 3.x)
 
-; all values are used to call bank 7 of telestrat cardridge. It works with 'brk value' 
+; all values are used to call bank 7 of telestrat cardridge. It works with 'brk value'
 XOP0             = $00          ; Open device on channel 0
 XOP1             = $01          ; Open device on channel 1
 XOP2             = $02          ; Open device on channel 2
@@ -249,10 +249,10 @@ XHIRES           = $1A
 XEFFHI           = $1B          ; Clear hires screen
 XFILLM           = $1C
 XMINMA           = $1F
-XVARS            = $24          ; Only in TELEMON 3.x, in TELEMON 2.4, it's XNOMFI ($24)
+XVARS            = $24          ; Only in Orix, in TELEMON 2.4, it's XNOMFI ($24)
 XCRLF            = $25          ; Jump a line and return to the beginning of the line
 XDECAY           = $26
-XFREAD           = $27          ; Only in TELEMON 3.x (bank 7 of Orix)
+XFREAD           = $27          ; Only in Orix
 XBINDX           = $28          ; Convert a number into hex and displays on channel 0
 XDECIM           = $29
 XHEXA            = $2A          ; Convert a number into hex
@@ -261,7 +261,7 @@ XEDT             = $2D          ; Launch editor
 XINSER           = $2E
 
 XSCELG           = $2F          ; Search a line in editor mode
-XOPEN            = $30          ; Only in TELEMON 3.x (bank 7 of Orix)
+XOPEN            = $30          ; Only in Orix
 XECRPR           = $33          ; Displays prompt
 XCOSCR           = $34          ; Switch off cursor
 XCSSCR           = $35          ; Switch on cursor
@@ -269,20 +269,20 @@ XSCRSE           = $36
 XSCROH           = $37          ; Scroll up text screen
 XSCROB           = $38          ; Scroll down text screen
 XSCRNE           = $39          ; Load charset from rom to ram
-XCLOSE           = $3A          ; Only in TELEMON 3.x close file (bank 7 of Orix)
-XFWRITE          = $3B          ; Only in TELEMON 3.x write file (bank 7 of Orix)
+XCLOSE           = $3A          ; Only in Orix close file
+XFWRITE          = $3B          ; Only in Orix write file
 
 ; Clock primitive
 XRECLK           = $3C          ; Reset clock
 XCLCL            = $3D          ; Close clock
-XWRCLK           = $3E          ; Displays clock in the adress in A & Y registers
+XWRCLK           = $3E          ; Displays clock in the address in A & Y registers
 
 ; Sound primitives
 XSONPS           = $40          ; Send data to PSG register (14 values)
 XOUPS            = $42          ; Send Oups sound into PSG
 XPLAY            = $43          ; Play a sound
-XSOUND           = $44 
-XMUSIC           = $45 
+XSOUND           = $44
+XMUSIC           = $45
 XZAP             = $46          ; Send Zap sound to PSG
 XSHOOT           = $47
 
@@ -291,30 +291,30 @@ XGETCWD          = $48          ; Get current CWD
 XPUTCWD          = $49          ; Chdir
 
 ; File management
-XMKDIR           = $4B          ; Create a folder. Only available in TELEMON 3.x (bank 7 of Orix)
+XMKDIR           = $4B          ; Create a folder. Only available in Orix
 
 XHCHRS           = $4C          ; Hard copy hires
 
 ; File management
-XRM              = $4D          ; Remove a folder or a file. Only available in TELEMON 3.x (bank 7 of Orix)
+XRM              = $4D          ; Remove a folder or a file. Only available in Orix
 
-XFWR             = $4E          ; Put a char on the first screen. Only available in TELEMON 3.x (bank 7 of Orix)
+XFWR             = $4E          ; Put a char on the first screen. Only available in Orix
 
 ; Keyboard primitives
 XALLKB           = $50          ; Read Keyboard, and populate KBDCOL
 XKBDAS           = $51          ; Ascii conversion
-XGOKBD           = $52          ; Swap keyboard type (Qwerty, French ...) 
+XGOKBD           = $52          ; Swap keyboard type (Qwerty, French ...)
 
 ; Buffer management
 XECRBU           = $54          ; Write A or AY in the buffer
 XLISBU           = $55          ; Read A or AY in the buffer
 XTSTBU           = $56
-XVIDBU           = $57          ; Flush the buffer 
+XVIDBU           = $57          ; Flush the buffer
 XINIBU           = $58          ; Initialize the buffer X
 XDEFBU           = $59          ; Reset all value of the buffer
 XBUSY            = $5A          ; Test if the buffer is empty
 
-XMALLOC          = $5B          ; Only in TELEMON 3.x (bank 7 of Orix)
+XMALLOC          = $5B          ; Only in Orix
 
 ; RS232 primitives
 XSDUMP           = $5C          ; RS232 input dump
@@ -326,21 +326,23 @@ XSSAVE           = $5F          ; Write a file to RS232
 XMLOAD           = $60          ; Read a file from Minitel
 XMSAVE           = $61          ; Write a file to Minitel
 
-XFREE            = $62          ; Only in TELEMON 3.x (bank 7 of Orix)
+XFREE            = $62          ; Only in Orix
 
-; Next Minitel primitives 
+XEXEC            = $63          ; Only in Orix
+
+; Next Minitel primitives
 XWCXFI           = $63          ; Wait connection
 XLIGNE           = $64          ;
 XDECON           = $65          ; Minitel disconnection
 XMOUT            = $66          ; Send a byte to minitel (from A)
 
-XSOUT            = $67          ; Send accumulator value (A) to RS232, available in TELEMON 2.4 & 3.x : if RS232 buffer is full, the Oric Telestrat freezes
+XSOUT            = $67          ; Send accumulator value (A) to RS232, available in TELEMON 2.4 : if RS232 buffer is full, the Oric Telestrat freezes
 
 XHRSSE           = $8C          ; Set hires position cursor
 XDRAWA           = $8D          ; Draw a line absolute
 XDRAWR           = $8E          ; Draw a line (relative)
 XCIRCL           = $8F          ; Draw a circle
-XCURSE           = $90          ; Plot a pixel 
+XCURSE           = $90          ; Plot a pixel
 XCURMO           = $91          ; Move to x,y pos in Hires
 XPAPER           = $92
 XINK             = $93
@@ -358,8 +360,8 @@ XPING            = $9D          ; Send Ping sound to PSG
 PWD_PTR          = $00
 
 ; ---------------------------------------------------------------------------
-; 
-BUFTRV           := $100         
+;
+BUFTRV           := $100
 
 
 ; ---------------------------------------------------------------------------
@@ -377,7 +379,7 @@ TIMES            := $211
 TIMEM            := $212
 TIMEH            := $213
 FLGCLK           := $214
-FLGCLK_FLAG      := $215 
+FLGCLK_FLAG      := $215
 FLGCUR           := $216        ; Cursor management flag
 ; screens position managements
 
@@ -466,7 +468,7 @@ DESALO           := $52D
 FISALO           := $52F
 EXSALO           := $531
 EXTDEF           := $55D        ; Default extension. At the start of telemon, it's set to ".COM"
-BUFEDT           := $590        ; Buffer edition 
+BUFEDT           := $590        ; Buffer edition
 
 MAX_BUFEDT_LENGTH=110
 
@@ -480,7 +482,7 @@ BUFBUF           := $c080
 
 ; ---------------------------------------------------------------------------
 ; Stratsed vectors
-; Stratsed is the main OS for Telestrat 
+; Stratsed is the main OS for Telestrat
 XMERGE           := $FF0E
 XFST             := $FF11
 XSPUT            := $FF14
@@ -532,7 +534,7 @@ XPMAP            := $FFA7
 XRWTS            := $FFAA
 
 ; ---------------------------------------------------------------------------
-; MACRO 
+; MACRO
 
 .macro  BRK_TELEMON   value
         .byte $00,value

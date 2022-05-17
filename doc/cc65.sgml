@@ -198,6 +198,189 @@ Here is a description of all the command line options:
   Enables debug mode, for debugging the behavior of cc65.
 
 
+  <tag><tt>--debug-tables name</tt></tag>
+
+  Writes symbol table information to a file, which includes details on structs, unions
+  functions, and global variables. For example, given the following code:
+
+  <tscreen><verb>
+  struct l {
+      unsigned char m;
+      unsigned char n;
+  };
+
+  struct hello {
+      unsigned char j;
+      unsigned char k;
+      struct l l;
+  };
+
+  struct sub {
+      unsigned char x;
+      unsigned char y;
+  };
+
+  union xy {
+      struct sub xy;
+      unsigned int mem;
+  };
+
+  typedef struct hello thingy;
+
+  unsigned char single;
+
+  unsigned char test_local_vars_main(void) {
+      static unsigned char wahoo;
+      static unsigned char bonanza = 0x42;
+      unsigned char i;
+      unsigned int j;
+      unsigned int *random;
+      unsigned char *lol;
+      signed char whoa;
+      struct hello wow;
+      thingy *cool;
+      union xy xy;
+
+      return 0;
+  }
+  </verb></tscreen>
+
+  The following output would be produced:
+
+  <tscreen><verb>
+  SC_FUNC: _test_local_vars_main: Symbol table
+  ============================================
+  __fixargs__:
+      Flags: SC_CONST SC_DEF
+      Type:  unsigned int
+  __argsize__:
+      Flags: SC_CONST SC_DEF
+      Type:  unsigned char
+  wahoo:
+      AsmName: M0001
+      Flags: SC_STATIC SC_DEF SC_REF
+      Type:  unsigned char
+  bonanza:
+      AsmName: M0002
+      Flags: SC_STATIC SC_DEF SC_REF
+      Type:  unsigned char
+  i:
+      Flags: SC_AUTO SC_DEF SC_REF
+      Type:  unsigned char
+  j:
+      Flags: SC_AUTO SC_DEF SC_REF
+      Type:  unsigned int
+  random:
+      Flags: SC_AUTO SC_DEF SC_REF
+      Type:  unsigned int *
+  lol:
+      Flags: SC_AUTO SC_DEF SC_REF
+      Type:  unsigned char *
+  whoa:
+      Flags: SC_AUTO SC_DEF SC_REF
+      Type:  signed char
+  wow:
+      Flags: SC_AUTO SC_DEF SC_REF
+      Type:  struct hello
+  cool:
+      Flags: SC_AUTO SC_DEF SC_REF
+      Type:  struct hello *
+  xy:
+      Flags: SC_AUTO SC_DEF SC_REF
+      Type:  union xy
+
+
+
+
+  Global symbol table
+  ===================
+  thingy:
+      AsmName: _thingy
+      Flags: SC_TYPEDEF 0x100000
+      Type:  struct hello
+  single:
+      AsmName: _single
+      Flags: SC_STATIC SC_EXTERN SC_STORAGE SC_DEF SC_REF 0x100000
+      Type:  unsigned char
+  test_local_vars_main:
+      AsmName: _test_local_vars_main
+      Flags: SC_FUNC SC_STATIC SC_EXTERN SC_DEF 0x100000
+      Type:  unsigned char (void)
+
+
+
+
+  Global tag table
+  ================
+  l:
+      Flags: SC_STRUCT SC_DEF
+      Type:  (none)
+  hello:
+      Flags: SC_STRUCT SC_DEF
+      Type:  (none)
+  sub:
+      Flags: SC_STRUCT SC_DEF
+      Type:  (none)
+  xy:
+      Flags: SC_UNION SC_DEF
+      Type:  (none)
+
+
+
+
+  Global struct and union definitions
+  =========================
+
+  SC_STRUCT: l
+  ============
+  m:
+      Flags: SC_STRUCTFIELD
+      Type:  unsigned char
+  n:
+      Flags: SC_STRUCTFIELD
+      Type:  unsigned char
+
+
+
+
+  SC_STRUCT: hello
+  ================
+  j:
+      Flags: SC_STRUCTFIELD
+      Type:  unsigned char
+  k:
+      Flags: SC_STRUCTFIELD
+      Type:  unsigned char
+  l:
+      Flags: SC_STRUCTFIELD
+      Type:  struct l
+
+
+
+
+  SC_STRUCT: sub
+  ==============
+  x:
+      Flags: SC_STRUCTFIELD
+      Type:  unsigned char
+  y:
+      Flags: SC_STRUCTFIELD
+      Type:  unsigned char
+
+
+
+
+  SC_UNION: xy
+  ============
+  xy:
+      Flags: SC_STRUCTFIELD
+      Type:  struct sub
+  mem:
+      Flags: SC_STRUCTFIELD
+      Type:  unsigned int
+  </verb></tscreen>
+
+
   <tag><tt>--debug-opt name</tt></tag>
 
   The named file contains a list of specific optimization steps to enable or disable.
@@ -919,8 +1102,20 @@ The compiler defines several macros at startup:
   <tag><tt>__CC65__</tt></tag>
 
   This macro is always defined. Its value is the version number of the
-  compiler in hex.  For example, version 2.14 of the compiler has this macro
-  defined as <tt/0x02E0/.
+  compiler in hex: <tt>(VER_MAJOR * 0x100) + VER_MINOR</tt>. The upper 8 bits
+  are the major-, the lower 8 bits are the  minor version. For example, version
+  47.11 of the compiler would have this macro defined as <tt/0x2f0b/.
+
+  Note: until 2.19 this macro was defined as <tt>(VER_MAJOR * 0x100) + VER_MINOR * 0x10</tt> -
+  which resulted in broken values starting at version 2.16 of the compiler. For
+  this reason the value of this macro is considered purely informal - you should
+  not use it to check for a specific compiler version and use different code
+  according to the detected version - please update your code to work with the
+  recent version of the compiler instead (There is very little reason to not use
+  the most recent version - and even less to support older versions in your code).
+
+  Should you still insist on doing this for some reason - look at <tt>checkversion.c</tt>
+  in the samples directory for some preprocessor kludges that might help.
 
   <tag><tt>__CC65_STD__</tt></tag>
 
@@ -1673,7 +1868,7 @@ This is the original compiler copyright:
 
       Anyone may copy or redistribute these programs, provided that:
 
-  1:  You don't charge anything for the copy.  It is permissable to
+  1:  You don't charge anything for the copy.  It is permissible to
       charge a nominal fee for media, etc.
 
   2:  All source code and documentation for the programs is made

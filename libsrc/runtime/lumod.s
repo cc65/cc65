@@ -11,7 +11,7 @@
 
         .macpack        cpu
 
-tosumod0ax:                          
+tosumod0ax:
 .if (.cpu .bitand ::CPU_ISET_65SC02)
         stz     sreg
         stz     sreg+1

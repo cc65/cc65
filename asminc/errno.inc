@@ -1,4 +1,4 @@
-;                                                   
+;
 ; Ullrich von Bassewitz, 16.05.2000
 ;
 

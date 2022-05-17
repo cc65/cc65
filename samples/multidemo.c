@@ -237,7 +237,7 @@ void main (void)
 
         /* The linker makes sure that the call to foo() ends up at the right mem
         ** addr. However it's up to user to make sure that the - right - overlay
-        ** is actually loaded before making the the call.
+        ** is actually loaded before making the call.
         */
         foo ();
     }

@@ -45,7 +45,7 @@ _dio_open:
         asl a                   ; make index from drive id
         asl a
         tax
-            
+
         lda #0
         sta sectsizetab+sst_sectsize,x
         lda #128
@@ -54,7 +54,7 @@ _dio_open:
         sta sectsizetab+sst_sectsize+1,x
         tya
         sta sectsizetab+sst_driveno,x
-            
+
         stx tmp1
         lda #<sectsizetab
         clc

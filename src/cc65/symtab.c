@@ -37,6 +37,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#include <errno.h>
 
 /* common */
 #include "check.h"
@@ -68,8 +69,6 @@
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 /* An empty symbol table */
 SymTable        EmptySymTab = {
     0,          /* PrevTab */
@@ -88,7 +87,8 @@ SymTable        EmptySymTab = {
 #define SYMTAB_SIZE_LABEL         7U
 
 /* The current and root symbol tables */
-static unsigned         LexicalLevel    = 0;    /* For safety checks */
+static unsigned         LexLevelDepth   = 0;    /* For safety checks */
+static LexicalLevel*    CurrentLex        = 0;
 static SymTable*        SymTab0         = 0;
 static SymTable*        SymTab          = 0;
 static SymTable*        TagTab0         = 0;
@@ -98,6 +98,7 @@ static SymTable*        LabelTab        = 0;
 static SymTable*        SPAdjustTab     = 0;
 static SymTable*        FailSafeTab     = 0;    /* For errors */
 
+static FILE* DebugTableFile = 0;
 
 /*****************************************************************************/
 /*                              struct SymTable                              */
@@ -213,19 +214,72 @@ static void CheckSymTable (SymTable* Tab)
 
 
 
-unsigned GetLexicalLevel (void)
-/* Return the current lexical level */
+unsigned GetLexicalLevelDepth (void)
+/* Return the current lexical level depth */
 {
-    return LexicalLevel;
+    return LexLevelDepth;
 }
 
 
 
+unsigned GetLexicalLevel (void)
+/* Return the current lexical level */
+{
+    if (CurrentLex != 0) {
+        return CurrentLex->CurrentLevel;
+    }
+    return LEX_LEVEL_NONE;
+}
+
+
+
+void PushLexicalLevel (unsigned NewLevel)
+/* Enter the specified lexical level */
+{
+    LexicalLevel* L = xmalloc (sizeof (LexicalLevel));
+    L->PrevLex = CurrentLex;
+    CurrentLex = L;
+    CurrentLex->CurrentLevel = NewLevel;
+    ++LexLevelDepth;
+}
+
+
+
+void PopLexicalLevel (void)
+/* Exit the current lexical level */
+{
+    LexicalLevel* L;
+    PRECONDITION (CurrentLex != 0 && LexLevelDepth > 0);
+    L = CurrentLex;
+    CurrentLex = L->PrevLex;
+    xfree (L);
+    --LexLevelDepth;
+}
+
 void EnterGlobalLevel (void)
 /* Enter the program global lexical level */
 {
+    const char* OutName = NULL;
+    if (!SB_IsEmpty (&DebugTableName)) {
+        OutName = SB_GetConstBuf (&DebugTableName);
+    }
+
+    if (OutName) {
+        /* Open the table file */
+        DebugTableFile = fopen (OutName, "w");
+        if (DebugTableFile == 0) {
+            Error ("Cannot create table dump file '%s': %s", OutName, strerror (errno));
+        }
+    }
+    else if (Debug) {
+        DebugTableFile = stdout;
+    }
+
     /* Safety */
-    PRECONDITION (++LexicalLevel == LEX_LEVEL_GLOBAL);
+    PRECONDITION (GetLexicalLevel () == LEX_LEVEL_NONE);
+
+    /* Enter global lexical level */
+    PushLexicalLevel (LEX_LEVEL_GLOBAL);
 
     /* Create and assign the symbol table */
     SymTab0 = SymTab = NewSymTable (SYMTAB_SIZE_GLOBAL);
@@ -240,26 +294,59 @@ void EnterGlobalLevel (void)
     FailSafeTab = NewSymTable (SYMTAB_SIZE_GLOBAL);
 }
 
-
-
 void LeaveGlobalLevel (void)
 /* Leave the program global lexical level */
 {
     /* Safety */
-    PRECONDITION (LexicalLevel-- == LEX_LEVEL_GLOBAL);
+    PRECONDITION (GetLexicalLevel () == LEX_LEVEL_GLOBAL);
 
     /* Check the tables */
     CheckSymTable (SymTab0);
 
     /* Dump the tables if requested */
-    if (Debug) {
-        PrintSymTable (SymTab0, stdout, "Global symbol table");
-        PrintSymTable (TagTab0, stdout, "Global tag table");
+    if (DebugTableFile) {
+        SymEntry* Entry;
+        StrBuf* Header;
+
+        PrintSymTable (SymTab0, DebugTableFile, "Global symbol table");
+        PrintSymTable (TagTab0, DebugTableFile, "Global tag table");
+
+        Entry = TagTab0->SymHead;
+        if (Entry) {
+            fputs ("\nGlobal struct and union definitions", DebugTableFile);
+            fputs ("\n=========================\n", DebugTableFile);
+
+            do {
+                if (!((Entry->Flags & SC_STRUCT) || (Entry->Flags & SC_UNION)) || !Entry->V.S.SymTab) {
+                    continue;
+                }
+
+                Header = NewStrBuf();
+                if(Entry->Flags & SC_STRUCT) {
+                    SB_AppendStr (Header, "SC_STRUCT: ");
+                }
+                else {
+                    SB_AppendStr (Header, "SC_UNION: ");
+                }
+                SB_AppendStr (Header, Entry->Name);
+                SB_Terminate (Header);
+
+                PrintSymTable (Entry->V.S.SymTab, DebugTableFile, SB_GetConstBuf (Header));
+            } while ((Entry = Entry->NextSym));
+        }
+
+        /* Close the file */
+        if (DebugTableFile != stdout && fclose (DebugTableFile) != 0) {
+            Error ("Error closing table dump file '%s': %s", SB_GetConstBuf(&DebugTableName), strerror (errno));
+        }
     }
 
     /* Don't delete the symbol and struct tables! */
     SymTab = 0;
     TagTab = 0;
+
+    /* Exit global lexical level */
+    PopLexicalLevel ();
 }
 
 
@@ -269,8 +356,8 @@ void EnterFunctionLevel (void)
 {
     SymTable* S;
 
-    /* New lexical level */
-    ++LexicalLevel;
+    /* Enter function lexical level */
+    PushLexicalLevel (LEX_LEVEL_FUNCTION);
 
     /* Get a new symbol table and make it current */
     S = NewSymTable (SYMTAB_SIZE_FUNCTION);
@@ -293,8 +380,11 @@ void EnterFunctionLevel (void)
 void RememberFunctionLevel (struct FuncDesc* F)
 /* Remember the symbol tables for the level and leave the level without checks */
 {
-    /* Leave the lexical level */
-    --LexicalLevel;
+    /* Safety */
+    PRECONDITION (GetLexicalLevel () == LEX_LEVEL_FUNCTION);
+
+    /* Leave function lexical level */
+    PopLexicalLevel ();
 
     /* Remember the tables */
     F->SymTab = SymTab;
@@ -311,8 +401,8 @@ void RememberFunctionLevel (struct FuncDesc* F)
 void ReenterFunctionLevel (struct FuncDesc* F)
 /* Reenter the function lexical level using the existing tables from F */
 {
-    /* New lexical level */
-    ++LexicalLevel;
+    /* Enter function lexical level */
+    PushLexicalLevel (LEX_LEVEL_FUNCTION);
 
     /* Make the tables current again */
     F->SymTab->PrevTab = SymTab;
@@ -330,12 +420,27 @@ void ReenterFunctionLevel (struct FuncDesc* F)
 void LeaveFunctionLevel (void)
 /* Leave function lexical level */
 {
-    /* Leave the lexical level */
-    --LexicalLevel;
+    /* Safety */
+    PRECONDITION (GetLexicalLevel () == LEX_LEVEL_FUNCTION);
+
+    /* Leave function lexical level */
+    PopLexicalLevel ();
 
     /* Check the tables */
     CheckSymTable (SymTab);
     CheckSymTable (LabelTab);
+
+    /* Dump the tables if requested */
+    if (DebugTableFile) {
+        StrBuf* SymbolHeader = NewStrBuf();
+
+        SB_AppendStr (SymbolHeader, "SC_FUNC: ");
+        SB_AppendStr (SymbolHeader, CurrentFunc->FuncEntry->AsmName);
+        SB_AppendStr (SymbolHeader, ": Symbol table");
+        SB_Terminate (SymbolHeader);
+
+        PrintSymTable (SymTab, DebugTableFile, SB_GetConstBuf(SymbolHeader));
+    }
 
     /* Drop the label table if it is empty */
     if (LabelTab->SymCount == 0) {
@@ -355,8 +460,8 @@ void EnterBlockLevel (void)
 {
     SymTable* S;
 
-    /* New lexical level */
-    ++LexicalLevel;
+    /* Enter block lexical level */
+    PushLexicalLevel (LEX_LEVEL_BLOCK);
 
     /* Get a new symbol table and make it current */
     S = NewSymTable (SYMTAB_SIZE_BLOCK);
@@ -374,8 +479,11 @@ void EnterBlockLevel (void)
 void LeaveBlockLevel (void)
 /* Leave a nested block in a function */
 {
-    /* Leave the lexical level */
-    --LexicalLevel;
+    /* Safety */
+    PRECONDITION (GetLexicalLevel () == LEX_LEVEL_BLOCK);
+
+    /* Leave block lexical level */
+    PopLexicalLevel ();
 
     /* Check the tables */
     CheckSymTable (SymTab);
@@ -392,6 +500,9 @@ void EnterStructLevel (void)
 {
     SymTable* S;
 
+    /* Enter struct lexical level */
+    PushLexicalLevel (LEX_LEVEL_STRUCT);
+
     /* Get a new symbol table and make it current. Note: Structs and enums
     ** nested in struct scope are NOT local to the struct but visible in the
     ** outside scope. So we will NOT create a new struct or enum table.
@@ -406,6 +517,12 @@ void EnterStructLevel (void)
 void LeaveStructLevel (void)
 /* Leave a nested block for a struct definition */
 {
+    /* Safety */
+    PRECONDITION (GetLexicalLevel () == LEX_LEVEL_STRUCT);
+
+    /* Leave struct lexical level */
+    PopLexicalLevel ();
+
     /* Don't delete the table */
     FieldTab = FieldTab->PrevTab;
 }
@@ -1398,7 +1515,7 @@ void EmitDebugInfo (void)
         /* For cosmetic reasons in the output file, we will insert two tabs
         ** on global level and just one on local level.
         */
-        if (LexicalLevel == LEX_LEVEL_GLOBAL) {
+        if (GetLexicalLevel () == LEX_LEVEL_GLOBAL) {
             Head = "\t.dbg\t\tsym";
         } else {
             Head = "\t.dbg\tsym";

@@ -57,7 +57,9 @@
 /* Character classification functions */
 int __fastcall__ isalnum (int c);
 int __fastcall__ isalpha (int c);
-int __fastcall__ isascii (int c);
+#if __CC65_STD__ >= __CC65_STD_CC65__
+int __fastcall__ isascii (int c);       /* non standard */
+#endif
 int __fastcall__ iscntrl (int c);
 int __fastcall__ isdigit (int c);
 int __fastcall__ isgraph (int c);
@@ -75,7 +77,7 @@ int __fastcall__ toupper (int c);       /* Always external */
 int __fastcall__ tolower (int c);       /* Always external */
 
 #if __CC65_STD__ >= __CC65_STD_CC65__
-unsigned char __fastcall__ toascii (unsigned char c);
+unsigned char __fastcall__ toascii (unsigned char c);       /* non standard */
 /* Convert a target-specific character to ASCII. */
 #endif
 

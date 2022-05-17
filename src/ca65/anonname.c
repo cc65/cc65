@@ -72,7 +72,7 @@ StrBuf* AnonName (StrBuf* Buf, const char* Spec)
 
 int IsAnonName (const StrBuf* Name)
 /* Check if the given symbol name is that of an anonymous symbol */
-{           
+{
     if (SB_GetLen (Name) < sizeof (AnonTag) - 1) {
         /* Too short */
         return 0;

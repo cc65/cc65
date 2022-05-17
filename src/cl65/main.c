@@ -538,7 +538,7 @@ static void AssembleFile (const char* File, unsigned ArgCount)
     /* Check if this is the last processing step */
     if (DoLink) {
         /* We're linking later. Add the output file of the assembly
-        ** the the file list of the linker. The name of the output
+        ** to the file list of the linker. The name of the output
         ** file is that of the input file with ".s" replaced by ".o".
         */
         char* ObjName = MakeFilename (File, ".o");
@@ -1216,9 +1216,9 @@ static void OptPrintTargetPath (const char* Opt attribute ((unused)),
     SearchPaths* TargetPaths = NewSearchPath ();
     AddSubSearchPathFromEnv (TargetPaths, "CC65_HOME", "target");
 #if defined(CL65_TGT) && !defined(_WIN32)
-    AddSearchPath (TargetPaths, STRINGIZE (CL65_TGT));
+    AddSearchPath (TargetPaths, CL65_TGT);
 #endif
-    AddSubSearchPathFromWinBin (TargetPaths, "target");
+    AddSubSearchPathFromBin (TargetPaths, "target");
 
     TargetPath = GetSearchPath (TargetPaths, 0);
     while (*TargetPath) {
@@ -1503,7 +1503,7 @@ int main (int argc, char* argv [])
 
                 case 'E':
                     /* Forward -E to compiler */
-                    CmdAddArg (&CC65, Arg);  
+                    CmdAddArg (&CC65, Arg);
                     DisableAssemblingAndLinking ();
                     break;
 
@@ -1513,7 +1513,7 @@ int main (int argc, char* argv [])
                         OptAsmArgs (Arg, GetArg (&I, 3));
                     } else if (Arg[2] == 'c' && Arg[3] == '\0') {
                         /* -Wc: Pass options to compiler */
-                        /* Remember -Wc sub arguments in cc65 arg struct */ 
+                        /* Remember -Wc sub arguments in cc65 arg struct */
                         OptCCArgs (Arg, GetArg (&I, 3));
                     } else if (Arg[2] == 'l' && Arg[3] == '\0') {
                         /* -Wl: Pass options to linker */
@@ -1627,7 +1627,7 @@ int main (int argc, char* argv [])
                     break;
 
                 case FILETYPE_O65:
-                    /* Add the the object file converter files */
+                    /* Add the object file converter files */
                     ConvertO65 (Arg);
                     break;
 

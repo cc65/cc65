@@ -410,7 +410,7 @@ Available at <url
 url="https://github.com/commanderx16/x16-emulator/releases">:
 
 Emulates the Commander X16 Single Board Computer, with sound, SD card images,
-VGA and NTSC video, and a NES game controller emulation.  Includes a monitor. 
+VGA and NTSC video, and a NES game controller emulation.  Includes a monitor.
 It runs on all SDL2 platforms.
 
 Compile the tutorial with
@@ -459,7 +459,7 @@ Substitute the name of a Commodore computer for that <tt/&lt;sys&gt;/:
 Start the desired version of the emulator (CBM610 programs run on
 the CBM II &lsqb;<tt/xcbm2/&rsqb; emulator).
 
-Choose <bf>File&gt;Autostart disk/tape image...</bf>, choose your executable, 
+Choose <bf>File&gt;Autostart disk/tape image...</bf>, choose your executable,
 and click <bf/OK/.
 
 The file has a 14-byte header which corresponds to a PRG-format BASIC program,
@@ -500,7 +500,7 @@ prompt.
 
 Before you can run the cartridge image produced by the linker, the binary has to
 be patched using the <bf/gamate-fixcart/ tool that is included in the cc65
-package in the util/gamata directory.
+package in the util/gamate/ directory.
 
 <tscreen><verb>
 gamate-fixcart <image.bin>

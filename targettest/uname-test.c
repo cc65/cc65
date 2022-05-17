@@ -4,7 +4,7 @@
 
 
 int main (void)
-{                  
+{
     /* Get the uname data */
     struct utsname buf;
     if (uname (&buf) != 0) {
@@ -12,7 +12,7 @@ int main (void)
         return EXIT_FAILURE;
     }
 
-    /* Print it */      
+    /* Print it */
     printf ("sysname:  \"%s\"\n", buf.sysname);
     printf ("nodename: \"%s\"\n", buf.nodename);
     printf ("release:  \"%s\"\n", buf.release);

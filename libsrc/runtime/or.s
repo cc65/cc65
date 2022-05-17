@@ -21,7 +21,7 @@ tosorax:
         ldy     #0
         ora     (sp),y
         iny
-.endif        
+.endif
         sta     tmp1
         txa
         ora     (sp),y

@@ -52,24 +52,25 @@
 
 
 /* Color defines */
-#define COLOR_BLACK             0x00
-#define COLOR_RED               0x01
-#define COLOR_PINK              0x02
-#define COLOR_LIGHTGREY         0x03
-#define COLOR_GREY              0x04
-#define COLOR_DARKGREY          0x05
-#define COLOR_BROWN             0x06
-#define COLOR_PEACH             0x07
-#define COLOR_YELLOW            0x08
-#define COLOR_LIGHTGREEN        0x09
-#define COLOR_GREEN             0x0A
-#define COLOR_DARKBROWN         0x0B
+#define COLOR_TRANSPARENT       0x00
+#define COLOR_BLACK             0x01
+#define COLOR_RED               0x02
+#define COLOR_PINK              0x03
+#define COLOR_LIGHTGREY         0x04
+#define COLOR_GREY              0x05
+#define COLOR_DARKGREY          0x06
+#define COLOR_BROWN             0x07
+#define COLOR_PEACH             0x08
+#define COLOR_YELLOW            0x09
+#define COLOR_LIGHTGREEN        0x0A
+#define COLOR_GREEN             0x0B
 #define COLOR_PURPLE            0x0C
 #define COLOR_BLUE              0x0D
 #define COLOR_LIGHTBLUE         0x0E
 #define COLOR_WHITE             0x0F
 
 /* TGI color defines (default palette) */
+#define TGI_COLOR_TRANSPARENT   COLOR_TRANSPARENT
 #define TGI_COLOR_BLACK         COLOR_BLACK
 #define TGI_COLOR_RED           COLOR_RED
 #define TGI_COLOR_PINK          COLOR_PINK

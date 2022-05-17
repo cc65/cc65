@@ -3108,7 +3108,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
 <sect1><tt>.IFDEF</tt><label id=".IFDEF"><p>
 
   Conditional assembly: Check if a symbol is defined. Must be followed by
-  a symbol name. The condition is true if the the given symbol is already
+  a symbol name. The condition is true if the given symbol is already
   defined, and false otherwise.
 
   See also: <tt><ref id=".DEFINED" name=".DEFINED"></tt>
@@ -3143,7 +3143,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
 <sect1><tt>.IFNDEF</tt><label id=".IFNDEF"><p>
 
   Conditional assembly: Check if a symbol is defined. Must be followed by
-  a symbol name. The condition is true if the the given symbol is not
+  a symbol name. The condition is true if the given symbol is not
   defined, and false otherwise.
 
   See also: <tt><ref id=".DEFINED" name=".DEFINED"></tt>
@@ -3152,7 +3152,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
 <sect1><tt>.IFNREF</tt><label id=".IFNREF"><p>
 
   Conditional assembly: Check if a symbol is referenced. Must be followed
-  by a symbol name. The condition is true if if the the given symbol was
+  by a symbol name. The condition is true if the given symbol was
   not referenced before, and false otherwise.
 
   See also: <tt><ref id=".REFERENCED" name=".REFERENCED"></tt>
@@ -3197,7 +3197,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
 <sect1><tt>.IFREF</tt><label id=".IFREF"><p>
 
   Conditional assembly: Check if a symbol is referenced. Must be followed
-  by a symbol name. The condition is true if if the the given symbol was
+  by a symbol name. The condition is true if the given symbol was
   referenced before, and false otherwise.
 
   This command may be used to build subroutine libraries in include files
@@ -3622,7 +3622,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
 
 <sect1><tt>.PDTV</tt><label id=".PDTV"><p>
 
-  Enable the 6502DTV instruction set. This is a superset of the 6502 
+  Enable the 6502DTV instruction set. This is a superset of the 6502
   instruction set.
 
   See: <tt><ref id=".P02" name=".P02"></tt>
@@ -3724,7 +3724,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
 
   <tt/.PUSHCHARMAP/ allows together with <tt><ref id=".POPCHARMAP"
   name=".POPCHARMAP"></tt> to switch to another character mapping and to restore the old
-  characther mapping later, without knowledge of the current mapping.
+  character mapping later, without knowledge of the current mapping.
 
   The assembler will print an error message if the character mapping stack is already full,
   when this command is issued.
@@ -4763,6 +4763,7 @@ compiler, depending on the target system selected:
 <item><tt/__APPLE2ENH__/ - Target system is <tt/apple2enh/
 <item><tt/__ATARI2600__/ - Target system is <tt/atari2600/
 <item><tt/__ATARI5200__/ - Target system is <tt/atari5200/
+<item><tt/__ATARI7800__/ - Target system is <tt/atari7800/
 <item><tt/__ATARI__/ - Target system is <tt/atari/ or <tt/atarixl/
 <item><tt/__ATARIXL__/ - Target system is <tt/atarixl/
 <item><tt/__ATMOS__/ - Target system is <tt/atmos/

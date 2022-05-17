@@ -1,4 +1,4 @@
-.PHONY: all mostlyclean clean install zip avail unavail bin lib doc html info samples test util check
+.PHONY: all mostlyclean clean install zip avail unavail bin lib doc html info samples test util checkstyle check
 
 .SUFFIXES:
 
@@ -30,12 +30,6 @@ doc html info:
 samples:
 	@$(MAKE) -C samples --no-print-directory $@
 
-test:
-	@$(MAKE) -C test    --no-print-directory $@
-
-check:
-	@$(MAKE) -C .github/checks --no-print-directory $@
-
 util:
 	@$(MAKE) -C util    --no-print-directory $@
 
@@ -44,3 +38,18 @@ util:
 
 %:
 	@$(MAKE) -C libsrc  --no-print-directory $@
+
+# check the code style
+checkstyle:
+	@$(MAKE) -C .github/checks       --no-print-directory $@
+
+# simple "test" target, only run regression tests for c64 target
+test:
+	@$(MAKE) -C test                 --no-print-directory $@
+
+# GNU "check" target, which runs all tests
+check:
+	@$(MAKE) -C .github/checks       --no-print-directory $@
+	@$(MAKE) test
+	@$(MAKE) -C targettest platforms --no-print-directory
+	@$(MAKE) -C samples platforms    --no-print-directory

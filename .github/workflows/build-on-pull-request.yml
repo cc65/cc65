@@ -23,7 +23,7 @@ jobs:
 
       - name: Do some simple style checks
         shell: bash
-        run: make -j2 check
+        run: make -j2 checkstyle
       - name: Build the tools.
         shell: bash
         run: make -j2 bin USER_CFLAGS=-Werror

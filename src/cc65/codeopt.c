@@ -397,7 +397,6 @@ static void ReadOptStats (const char* Name)
 /* Read the optimizer statistics file */
 {
     char Buf [256];
-    unsigned Lines;
 
     /* Try to open the file */
     FILE* F = fopen (Name, "r");
@@ -407,7 +406,6 @@ static void ReadOptStats (const char* Name)
     }
 
     /* Read and parse the lines */
-    Lines = 0;
     while (fgets (Buf, sizeof (Buf), F) != 0) {
 
         char* B;
@@ -418,9 +416,6 @@ static void ReadOptStats (const char* Name)
         char Name[32];
         unsigned long  TotalRuns;
         unsigned long  TotalChanges;
-
-        /* Count lines */
-        ++Lines;
 
         /* Remove trailing white space including the line terminator */
         B = Buf;

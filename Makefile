@@ -2,12 +2,21 @@
 
 .SUFFIXES:
 
-all mostlyclean clean install zip:
+all install zip:
 	@$(MAKE) -C src     --no-print-directory $@
 	@$(MAKE) -C libsrc  --no-print-directory $@
 	@$(MAKE) -C doc     --no-print-directory $@
 	@$(MAKE) -C util    --no-print-directory $@
 	@$(MAKE) -C samples --no-print-directory $@
+
+mostlyclean clean:
+	@$(MAKE) -C src        --no-print-directory $@
+	@$(MAKE) -C libsrc     --no-print-directory $@
+	@$(MAKE) -C doc        --no-print-directory $@
+	@$(MAKE) -C util       --no-print-directory $@
+	@$(MAKE) -C samples    --no-print-directory $@
+	@$(MAKE) -C test       --no-print-directory $@
+	@$(MAKE) -C targettest --no-print-directory $@
 
 avail unavail bin:
 	@$(MAKE) -C src     --no-print-directory $@

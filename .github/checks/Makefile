@@ -1,7 +1,7 @@
 
 .PHONY: check tabs lastline spaces
 
-check: tabs lastline spaces
+checkstyle: tabs lastline spaces
 
 tabs: tabs.sh
 	@./tabs.sh

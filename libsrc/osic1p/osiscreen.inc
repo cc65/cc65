@@ -78,13 +78,13 @@ _cputcxy:
 
 ; Plot a character - also used as internal function
 
-_cputc: cmp     #$0A            ; CR?
+_cputc: cmp     #$0D            ; CR?
         bne     L1
         lda     #0
         sta     CURS_X
         beq     plot            ; Recalculate pointers
 
-L1:     cmp     #$0D            ; LF?
+L1:     cmp     #$0A            ; LF?
         beq     newline         ; Recalculate pointers
 
 cputdirect:

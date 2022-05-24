@@ -165,6 +165,7 @@ static const TargetEntry TargetMap[] = {
     {   "geos-cbm",     TGT_GEOS_CBM     },
     {   "lunix",        TGT_LUNIX        },
     {   "lynx",         TGT_LYNX         },
+    {   "mega65",       TGT_MEGA65,      },
     {   "module",       TGT_MODULE       },
     {   "nes",          TGT_NES          },
     {   "none",         TGT_NONE         },
@@ -219,6 +220,7 @@ static const TargetProperties PropertyTable[TGT_COUNT] = {
     { "c65",            CPU_4510,       BINFMT_BINARY,      CTPET   },
     { "cx16",           CPU_65C02,      BINFMT_BINARY,      CTPET   },
     { "sym1",           CPU_6502,       BINFMT_BINARY,      CTNone  },
+    { "mega65",         CPU_4510,       BINFMT_BINARY,      CTPET   }
 };
 
 /* Target system */

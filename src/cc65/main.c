@@ -299,6 +299,10 @@ static void SetSys (const char* Sys)
             DefineNumericMacro ("__SYM1__", 1);
             break;
 
+        case TGT_MEGA65:
+            cbmsys ("__CBM610__");
+            break;
+
         default:
             AbEnd ("Unknown target system '%s'", Sys);
     }

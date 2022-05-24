@@ -1,3 +1,7 @@
+# Note about This Fork
+
+This fork adds support for the MEGA65 to `ca65`. It does not add a working C library, so `cc65` won't work. Also, this fork is not fully maintained, use at your own risk.
+
 # About cc65
 
 cc65 is a complete cross development package for 65(C)02 systems, including

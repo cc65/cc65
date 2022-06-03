@@ -1,7 +1,7 @@
 # About cc65
 
 cc65 is a complete cross development package for 65(C)02 systems, including
-a powerful macro assembler, a C compiler, linker, librarian and several
+a powerful macro assembler, a C compiler, linker, archiver and several
 other tools. cc65 has C and runtime library support for many of the old 6502 machines.
 For details look at the [Website](https://cc65.github.io).
 

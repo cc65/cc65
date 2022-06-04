@@ -154,7 +154,7 @@ endif
 # Lists of subdirectories
 
 # disasm depends on cpp
-DIRLIST = tutorial geos atari2600 atari5200 apple2 gamate lynx supervision sym1 cbm
+DIRLIST = tutorial geos atari2600 atari5200 apple2 gamate lynx supervision sym1 kim1 cbm
 
 # --------------------------------------------------------------------------
 # Lists of executables
@@ -329,6 +329,9 @@ EXELIST_supervision = \
 EXELIST_sym1 =     \
         notavailable
 
+EXELIST_kim1 =     \
+        notavailable
+
 EXELIST_telestrat = \
         ascii       \
         checkversion \
@@ -395,6 +398,7 @@ TARGETS :=     \
   creativision \
   cx16         \
   gamate       \
+  kim1         \
   lunix        \
   lynx         \
   nes          \

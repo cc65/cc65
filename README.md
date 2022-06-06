@@ -23,7 +23,7 @@ External contributors:
 * [karrika](https://github.com/karrika): Atari 7800 target
 * [Stephan Mühlstrasser](https://github.com/smuehlst): osic1p target
 * [Wayne Parham](https://github.com/WayneParham): Sym-1 target
-* [Dave Plummeer](https://github.com/davepl): KIM-1 target
+* [Dave Plummer](https://github.com/davepl): KIM-1 target
 
 *(The above list is incomplete, if you feel left out - please speak up or add yourself in a PR)*
 

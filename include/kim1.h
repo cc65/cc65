@@ -2,7 +2,7 @@
 /*                                                                           */
 /*                                  kim1.h                                   */
 /*                                                                           */
-/*                     Kim-1 system-specific definitions                     */
+/*                     KIM-1 system-specific definitions                     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,7 +33,7 @@
 
 /* Check for errors */
 #if !defined(__KIM1__)
-#  error This module may only be used when compiling for the Kim-1!
+#  error This module may only be used when compiling for the KIM-1!
 #endif
 
 

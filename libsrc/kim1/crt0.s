@@ -1,5 +1,5 @@
 ;
-; Startup code for cc65 (kim-1 version)
+; Startup code for cc65 (KIM-1 version)
 ;
 
         .export         _init, _exit

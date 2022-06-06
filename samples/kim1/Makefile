@@ -32,7 +32,8 @@ else
 endif
 
 EXELIST_kim1 = \
-        kimHello.bin
+        kimHello.bin \
+        kimSieve.bin
 
 ifneq ($(EXELIST_$(SYS)),)
 samples: $(EXELIST_$(SYS))
@@ -49,8 +50,13 @@ else
 	@echo > $(NULLDEV)
 endif
 
+kimSieve.bin: kimSieve.c
+	$(CL) -t kim1 -C kim1-60k.cfg -O -o kimSieve.bin kimSieve.c
+
 kimHello.bin: kimHello.c
 	$(CL) -t kim1 -O -o kimHello.bin kimHello.c
 
 clean:
+	@$(DEL) kimSieve.bin 2>$(NULLDEV)
 	@$(DEL) kimHello.bin 2>$(NULLDEV)
+

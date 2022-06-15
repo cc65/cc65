@@ -629,14 +629,17 @@ static void NumericConst (void)
             NextChar ();
 
             /* Read fractional digits */
-            Scale  = FP_D_Make (1.0);
+            Scale  = FP_D_Make (10.0);
             while (IsXDigit (CurC) && (DigitVal = HexVal (CurC)) < Base) {
                 /* Get the value of this digit */
-                Double FracVal = FP_D_Div (FP_D_FromInt (DigitVal * Base), Scale);
+                Double FracVal = FP_D_FromInt(0);
+                if (DigitVal != 0) {
+                    FracVal = FP_D_Div (FP_D_FromInt (DigitVal), Scale);
+                }
                 /* Add it to the float value */
                 FVal = FP_D_Add (FVal, FracVal);
                 /* Scale base */
-                Scale = FP_D_Mul (Scale, FP_D_FromInt (DigitVal));
+                Scale = FP_D_Mul (Scale, FP_D_FromInt (Base));
                 /* Skip the digit */
                 NextChar ();
             }

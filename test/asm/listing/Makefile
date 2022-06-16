@@ -49,15 +49,23 @@ $(WORKDIR)/$1.bin: $1.s $(ISEQUAL)
 	$(if $(QUIET),echo asm/$1.bin)
 
 #	compile without generating listing
-	$(CA65) -t none -o $$(@:.bin=.o) $$<
+	$(CA65) -t none -o $$(@:.bin=.o) $$< > $$(@:.bin=.err) 2>&1
 	$(LD65) -t none -o $$@ $$(@:.bin=.o) none.lib
+
+ifneq ($(wildcard $1.err-ref),)
+	$(ISEQUAL) $1.err-ref $$(@:.bin=.err)
+endif
 
 ifneq ($(wildcard $1.bin-ref),)
 	$(ISEQUAL) $1.bin-ref $$@
 endif
 
-	$(CA65) -t none -l $$(@:.bin=.list.orig) -o $$(@:.bin=.list-o) $$<
+	$(CA65) -t none -l $$(@:.bin=.list.orig) -o $$(@:.bin=.list-o) $$< > $$(@:.bin=.list-err) 2>&1
 	$(LD65) -t none -o $$(@:.bin=.list-bin) $$(@:.bin=.list-o) none.lib
+
+ifneq ($(wildcard $1.err-ref),)
+	$(ISEQUAL) $1.err-ref $$(@:.bin=.list-err)
+endif
 
 #	check if the result bin is the same as without listing file
 	$(ISEQUAL) $$@ $$(@:.bin=.list-bin)
@@ -66,7 +74,7 @@ ifneq ($(wildcard $1.list-ref),)
 #	we have a reference file, compare that, too
 
 #	remove first line which contains a version number
-	tail -n +2 $$(@:.bin=.lst.orig) > $$(@:.bin=.lst)
+	tail -n +2 $$(@:.bin=.list.orig) > $$(@:.bin=.lst)
 	$(ISEQUAL) $1.list-ref $$(@:.bin=.lst)
 endif
 

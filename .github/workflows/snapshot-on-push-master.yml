@@ -97,8 +97,10 @@ jobs:
           path: cc65-snapshot-win64.zip
 
       - name: Update the online documents.
+        env:
+            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git clone --depth 1 https://${{ secrets.GITHUB_TOKEN }}@github.com/cc65/doc.git doc.git
+          git clone --depth 1 https://${GH_TOKEN}@github.com/cc65/doc.git doc.git
           cd doc.git
           rm *.*
           cp ../html/*.* .

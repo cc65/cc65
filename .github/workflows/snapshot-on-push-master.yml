@@ -43,14 +43,6 @@ jobs:
 
       - shell: bash
         run: git config --global core.autocrlf input
-
-      - name: Get the online documents repo.
-        uses: actions/checkout@v2
-        with:
-          repository: cc65/doc
-          token: ${{ github.token }}
-          path: ../doc.git
-
       - name: Checkout Source
         uses: actions/checkout@v2
 
@@ -106,10 +98,10 @@ jobs:
 
       - name: Update the online documents.
         run: |
-          pwd
-          cd ../doc.git
+          git clone --depth 1 https://${{ secrets.GITHUB_TOKEN }}@github.com/cc65/doc.git doc.git
+          cd doc.git
           rm *.*
-          cp ../cc65/html/*.* .
+          cp ../html/*.* .
           git config user.name "cc65-github"
           git config user.email "cc65.nomail@github.com"
           git config push.default simple

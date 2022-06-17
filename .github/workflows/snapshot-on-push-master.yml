@@ -96,12 +96,13 @@ jobs:
           name: cc65-snapshot-win64.zip
           path: cc65-snapshot-win64.zip
 
-      - name: Update the online documents.
+      - name: Get the online documents repo.
         uses: actions/checkout@v2
         with:
           repository: cc65/doc
           path: doc.git
-      - run: |
+      - name: Update the online documents.
+        run: |
           cd doc.git
           rm *.*
           cp ../html/*.* .
@@ -109,7 +110,7 @@ jobs:
           git config user.email "cc65.nomail@github.com"
           git config push.default simple
           git add -A
-          git commit -m "Updated from cc65 commit $(GITHUB_SHA)." && git push -q || true
+          git commit -m "Updated from cc65 commit ${GITHUB_SHA}." && git push
 
     # enter secrets under "repository secrets"
       - name: Upload snapshot to sourceforge

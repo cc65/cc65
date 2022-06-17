@@ -43,8 +43,18 @@ jobs:
 
       - shell: bash
         run: git config --global core.autocrlf input
+
+      - name: Get the online documents repo.
+        uses: actions/checkout@v2
+        with:
+          repository: cc65/doc
+          token: ${{ github.token }}
+          path: doc.git
+
       - name: Checkout Source
         uses: actions/checkout@v2
+        with:
+          path: cc65
 
       - name: Do some simple style checks
         shell: bash
@@ -96,17 +106,11 @@ jobs:
           name: cc65-snapshot-win64.zip
           path: cc65-snapshot-win64.zip
 
-      - name: Get the online documents repo.
-        uses: actions/checkout@v2
-        with:
-          repository: cc65/doc
-          token: ${{ github.token }}
-          path: doc.git
       - name: Update the online documents.
         run: |
-          cd doc.git
+          cd ../doc.git
           rm *.*
-          cp ../html/*.* .
+          cp ../cc65/html/*.* .
           git config user.name "cc65-github"
           git config user.email "cc65.nomail@github.com"
           git config push.default simple

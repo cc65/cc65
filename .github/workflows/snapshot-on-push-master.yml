@@ -96,6 +96,21 @@ jobs:
           name: cc65-snapshot-win64.zip
           path: cc65-snapshot-win64.zip
 
+      - name: Update the online documents.
+        uses: actions/checkout@v2
+        with:
+          repository: cc65/doc
+          path: doc.git
+      - run: |
+          cd doc.git
+          rm *.*
+          cp ../html/*.* .
+          git config user.name "cc65-github"
+          git config user.email "cc65.nomail@github.com"
+          git config push.default simple
+          git add -A
+          git commit -m "Updated from cc65 commit $(GITHUB_SHA)." && git push -q || true
+
     # enter secrets under "repository secrets"
       - name: Upload snapshot to sourceforge
         uses: nogsantos/scp-deploy@master
@@ -106,6 +121,5 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           user: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          
-      # TODO: Update docs at https://github.com/cc65/doc
+
       # TODO: Publish snapshot zip at https://github.com/cc65/cc65.github.io

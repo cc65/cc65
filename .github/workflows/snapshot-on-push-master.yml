@@ -53,8 +53,6 @@ jobs:
 
       - name: Checkout Source
         uses: actions/checkout@v2
-        with:
-          path: cc65
 
       - name: Do some simple style checks
         shell: bash
@@ -108,9 +106,9 @@ jobs:
 
       - name: Update the online documents.
         run: |
-          cd ../doc.git
+          cd doc.git
           rm *.*
-          cp ../cc65/html/*.* .
+          cp ../html/*.* .
           git config user.name "cc65-github"
           git config user.email "cc65.nomail@github.com"
           git config push.default simple

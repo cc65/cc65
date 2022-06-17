@@ -96,11 +96,16 @@ jobs:
           name: cc65-snapshot-win64.zip
           path: cc65-snapshot-win64.zip
 
+      - name: Get the online documents repo.
+        uses: actions/checkout@v2
+	with:
+	  repository: cc65/doc
+	  path: doc.git
       - name: Update the online documents.
         env:
             GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git clone --depth 1 https://${GH_TOKEN}@github.com/cc65/doc.git doc.git
+	  env
           cd doc.git
           rm *.*
           cp ../html/*.* .
@@ -109,7 +114,7 @@ jobs:
           git config push.default simple
           git add -A
           git commit -m "Updated from cc65 commit ${GITHUB_SHA}."
-          git push -v
+          git push -n
 
     # enter secrets under "repository secrets"
       - name: Upload snapshot to sourceforge

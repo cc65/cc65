@@ -114,7 +114,7 @@ jobs:
           git config push.default simple
           git add -A
           git commit -m "Updated from cc65 commit ${GITHUB_SHA}."
-          git push -n
+          #git push -v
 
     # enter secrets under "repository secrets"
       - name: Upload snapshot to sourceforge

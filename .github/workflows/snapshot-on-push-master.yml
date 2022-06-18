@@ -98,14 +98,14 @@ jobs:
 
       - name: Get the online documents repo.
         uses: actions/checkout@v2
-	with:
-	  repository: cc65/doc
-	  path: doc.git
+        with:
+          repository: cc65/doc
+          path: doc.git
       - name: Update the online documents.
         env:
             GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-	  env
+          env
           cd doc.git
           rm *.*
           cp ../html/*.* .

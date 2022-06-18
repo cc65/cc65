@@ -43,9 +43,12 @@ $(ISEQUAL): ../../isequal.c | $(WORKDIR)
 	$(CC) $(CFLAGS) -o $@ $<
 
 
+$(WORKDIR)/_empty:
+	touch $@
+
 define LISTING_template
 
-$(WORKDIR)/$1.bin: $1.s $(ISEQUAL)
+$(WORKDIR)/$1.bin: $1.s $(ISEQUAL) $(WORKDIR)/_empty
 	$(if $(QUIET),echo asm/$1.bin)
 
 #	compile without generating listing
@@ -54,6 +57,8 @@ $(WORKDIR)/$1.bin: $1.s $(ISEQUAL)
 
 ifneq ($(wildcard $1.err-ref),)
 	$(ISEQUAL) $1.err-ref $$(@:.bin=.err)
+else
+	$(ISEQUAL) $(WORKDIR)/_empty $$(@:.bin=.err)
 endif
 
 ifneq ($(wildcard $1.bin-ref),)
@@ -61,10 +66,18 @@ ifneq ($(wildcard $1.bin-ref),)
 endif
 
 	$(CA65) -t none -l $$(@:.bin=.list.orig) -o $$(@:.bin=.list-o) $$< > $$(@:.bin=.list-err) 2>&1
-	$(LD65) -t none -o $$(@:.bin=.list-bin) $$(@:.bin=.list-o) none.lib
+	$(LD65) -t none -o $$(@:.bin=.list-bin) $$(@:.bin=.list-o) none.lib > $$(@:.bin=.ld65-err) 2>&1
 
 ifneq ($(wildcard $1.err-ref),)
 	$(ISEQUAL) $1.err-ref $$(@:.bin=.list-err)
+else
+	$(ISEQUAL) $(WORKDIR)/_empty $$(@:.bin=.list-err)
+endif
+
+ifneq ($(wildcard $1.ld65err-ref),)
+	$(ISEQUAL) $1.ld65err-ref $$(@:.bin=.ld65-err)
+else
+	$(ISEQUAL) $(WORKDIR)/_empty $$(@:.bin=.ld65-err)
 endif
 
 #	check if the result bin is the same as without listing file

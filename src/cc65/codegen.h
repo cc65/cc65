@@ -271,8 +271,12 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes);
 
 
 
-void g_getimmed (unsigned Flags, uintptr_t Val, long Offs);
+//void g_getimmed (unsigned Flags, uintptr_t Val, long Offs);
 /* Load a constant into the primary register */
+
+#define g_getimmed(a,b,c) _g_getimmed((a),(b),(c),(__FILE__),(__FUNCTION__),(__LINE__))
+void _g_getimmed(unsigned Flags, uintptr_t Val, long Offs, char *file, char *func, int line);
+
 
 void g_getstatic (unsigned Flags, uintptr_t Label, long Offs);
 /* Fetch an static memory cell into the primary register */
@@ -392,6 +396,8 @@ void g_test (unsigned flags);
 
 void g_push (unsigned flags, unsigned long val);
 /* Push the primary register or a constant value onto the stack */
+void g_push_float (unsigned flags, float val);
+/* Push the primary register or a constant value onto the stack */
 
 void g_swap (unsigned flags);
 /* Swap the primary register and the top of the stack. flags give the type
@@ -462,6 +468,8 @@ void g_res (unsigned n);
 /* Reserve static storage, n bytes */
 
 void g_defdata (unsigned flags, uintptr_t val, long offs);
+/* Define data with the size given in flags */
+void g_defdata_float (unsigned flags, uintptr_t val, long offs);
 /* Define data with the size given in flags */
 
 void g_defbytes (const void* bytes, unsigned count);

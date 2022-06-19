@@ -198,6 +198,8 @@ static void ParseAutoDecl (Declaration* Decl)
     /* Get the size of the variable */
     unsigned Size = SizeOf (Decl->Type);
 
+    printf("ParseAutoDecl SIze:%d IsCompound:%d\n", Size, IsCompound);
+
     /* Check if this is a variable on the stack or in static memory */
     if (IS_Get (&StaticLocals) == 0) {
 
@@ -274,7 +276,13 @@ static void ParseAutoDecl (Declaration* Decl)
                 }
 
                 /* Push the value */
-                g_push (Flags | TypeOf (Sym->Type), Expr.IVal);
+                if (TypeOf (Sym->Type) == CF_FLOAT) {
+                    /* FIXME: float */
+                    printf("Expr.V.FVal.V: %f\n", Expr.V.FVal.V);
+                    g_push_float (Flags | TypeOf (Sym->Type), Expr.V.FVal.V);
+                } else {
+                    g_push (Flags | TypeOf (Sym->Type), Expr.IVal);
+                }
 
                 /* This has to be done at sequence point */
                 DoDeferred (SQP_KEEP_NONE, &Expr);

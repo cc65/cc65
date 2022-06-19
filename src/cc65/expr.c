@@ -232,8 +232,14 @@ void LimitExprValue (ExprDesc* Expr)
             Expr->IVal = (uint8_t)Expr->IVal;
             break;
 
+        /* FIXME: float */
+        case T_FLOAT:
+        case T_DOUBLE:
+            Expr->V.FVal.V = (double)Expr->V.FVal.V;
+            break;
+
         default:
-            Internal ("hie_internal: constant result type %s\n", GetFullTypeName (Expr->Type));
+            Internal ("hie_internal: constant result type '%s' not implemented.\n", GetFullTypeName (Expr->Type));
     }
 }
 
@@ -1805,7 +1811,9 @@ static void UnaryOp (ExprDesc* Expr)
     hie10 (Expr);
 
     /* We can only handle integer types */
-    if (!IsClassInt (Expr->Type)) {
+    if (!IsClassInt (Expr->Type) 
+        && !IsClassFloat (Expr->Type)  /* FIXME: float */
+    ) {
         Error ("Argument must have integer type");
         ED_MakeConstAbsInt (Expr, 1);
     }
@@ -1813,15 +1821,27 @@ static void UnaryOp (ExprDesc* Expr)
     /* Check for a constant numeric expression */
     if (ED_IsConstAbs (Expr)) {
         /* Value is numeric */
-        switch (Tok) {
-            case TOK_MINUS: Expr->IVal = -Expr->IVal;   break;
-            case TOK_PLUS:                              break;
-            case TOK_COMP:  Expr->IVal = ~Expr->IVal;   break;
-            default:        Internal ("Unexpected token: %d", Tok);
-        }
 
-        /* Adjust the type of the expression */
-        Expr->Type = IntPromotion (Expr->Type);
+        /* FIXME: float ---- start new code */
+        if (IsClassFloat (Expr->Type)) {
+            switch (Tok) {
+                case TOK_MINUS: Expr->V.FVal = FP_D_Mul(Expr->V.FVal, FP_D_FromInt(-1));   break;
+                case TOK_PLUS:                                                         break;
+                default:        Internal ("Unexpected token: %d", Tok);
+            }
+        }
+        else {
+        /* FIXME: float ---- end new code */
+            switch (Tok) {
+                case TOK_MINUS: Expr->IVal = -Expr->IVal;   break;
+                case TOK_PLUS:                              break;
+                case TOK_COMP:  Expr->IVal = ~Expr->IVal;   break;
+                default:        Internal ("Unexpected token: %d", Tok);
+            }
+
+            /* Adjust the type of the expression */
+            Expr->Type = IntPromotion (Expr->Type);
+        }
 
         /* Limit the calculated value to the range of its type */
         LimitExprValue (Expr);
@@ -1833,7 +1853,11 @@ static void UnaryOp (ExprDesc* Expr)
         LoadExpr (CF_NONE, Expr);
 
         /* Adjust the type of the expression */
-        Expr->Type = IntPromotion (Expr->Type);
+        /* FIXME: float */
+        if (!IsClassFloat (Expr->Type)) {
+            Expr->Type = IntPromotion (Expr->Type);
+        }
+//        Expr->Type = IntPromotion (Expr->Type);
         TypeConversion (Expr, Expr->Type);
 
         /* Get code generation flags */
@@ -1872,6 +1896,7 @@ void hie10 (ExprDesc* Expr)
         case TOK_PLUS:
         case TOK_MINUS:
         case TOK_COMP:
+            /* FIXME: whats with floats? */
             UnaryOp (Expr);
             break;
 
@@ -2017,8 +2042,9 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
     unsigned ltype, type;
     int lconst;                         /* Left operand is a constant */
     int rconst;                         /* Right operand is a constant */
+    int floatop = 0;
 
-
+//printf("hie_internal\n");
     ExprWithCheck (hienext, Expr);
 
     *UsedGen = 0;
@@ -2031,16 +2057,33 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
         /* Tell the caller that we handled it's ops */
         *UsedGen = 1;
 
+        /* FIXME: float ---start new code*/
+        /* Remember the operator token, then skip it */
+        Tok = CurTok.Tok;
+        NextToken ();
+
+        switch (Tok) {
+            case TOK_STAR:
+            case TOK_DIV:
+                floatop = 1;
+                break;
+        }
+
+        /* FIXME: float ---start end code*/
+
         /* All operators that call this function expect an int on the lhs */
-        if (!IsClassInt (Expr->Type)) {
-            Error ("Integer expression expected");
+        if (!IsClassInt (Expr->Type) &&
+            /* FIXME: float */
+            !(floatop && IsClassFloat (Expr->Type))
+        ) {
+            Error ("LHS Integer expression expected (hie_internal)");
             /* To avoid further errors, make Expr a valid int expression */
             ED_MakeConstAbsInt (Expr, 1);
         }
 
-        /* Remember the operator token, then skip it */
-        Tok = CurTok.Tok;
-        NextToken ();
+//         /* Remember the operator token, then skip it */
+//         Tok = CurTok.Tok;
+//         NextToken ();
 
         /* Get the lhs on stack */
         GetCodePos (&Mark1);
@@ -2073,10 +2116,13 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
         }
 
         /* Check the type of the rhs */
-        if (!IsClassInt (Expr2.Type)) {
-            Error ("Integer expression expected");
+        if (!IsClassInt (Expr2.Type) &&
+            /* FIXME: float */
+            !(floatop && IsClassFloat (Expr2.Type))
+            ) {
+            Error ("RHS Integer expression expected (hie_internal)");
         }
-
+printf("hie_internal lconst:%d rconst:%d\n", lconst, rconst);
         /* Check for const operands */
         if (lconst && rconst) {
 
@@ -2086,80 +2132,124 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
             /* Get the type of the result */
             Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
 
-            /* Handle the op differently for signed and unsigned types */
-            if (IsSignSigned (Expr->Type)) {
+            /* FIXME: float --- newcode start */
+printf("hie_internal Expr->Type:%s Expr2->Type:%s\n",
+       (IsClassFloat (Expr->Type) == CF_FLOAT) ? "float" : "int",
+       (IsClassFloat (Expr2.Type) == CF_FLOAT) ? "float" : "int"
+       );
+printf("hie_internal Expr->Type:%s Expr2->Type:%s\n",
+       (Expr->Type == type_float) ? "float" : "int",
+       (Expr2.Type == type_float) ? "float" : "int"
+       );
 
-                /* Evaluate the result for signed operands */
-                signed long Val1 = Expr->IVal;
-                signed long Val2 = Expr2.IVal;
+            /* FIXME: float */
+            /* FIXME: right now this works only when both rhs and lhs are float,
+                      this must be extended to handle mixed operations */
+//             if ((IsClassFloat (Expr->Type) == CF_FLOAT) &&
+//                 (IsClassFloat (Expr2.Type) == CF_FLOAT)) {
+            if ((Expr->Type == type_float) &&
+                (Expr2.Type == type_float)) {
+                /* Evaluate the result for float operands */
+                Double Val1 = Expr->V.FVal;
+                Double Val2 = Expr2.V.FVal;
+                printf("hie_internal float X float\n");
                 switch (Tok) {
-                    case TOK_OR:
-                        Expr->IVal = (Val1 | Val2);
-                        break;
-                    case TOK_XOR:
-                        Expr->IVal = (Val1 ^ Val2);
-                        break;
-                    case TOK_AND:
-                        Expr->IVal = (Val1 & Val2);
+                    case TOK_DIV:
+#if 0 // TODO
+                        if (Val2 == 0.0f) {
+                            Error ("Division by zero");
+                            Expr->V.FVal = FP_D_FromInt(0);
+                        } else 
+#endif
+                        {
+                            Expr->V.FVal = FP_D_Div(Val1, Val2);
+                        }
                         break;
                     case TOK_STAR:
-                        Expr->IVal = (Val1 * Val2);
-                        break;
-                    case TOK_DIV:
-                        if (Val2 == 0) {
-                            Error ("Division by zero");
-                            Expr->IVal = 0x7FFFFFFF;
-                        } else {
-                            Expr->IVal = (Val1 / Val2);
-                        }
-                        break;
-                    case TOK_MOD:
-                        if (Val2 == 0) {
-                            Error ("Modulo operation with zero");
-                            Expr->IVal = 0;
-                        } else {
-                            Expr->IVal = (Val1 % Val2);
-                        }
+                        Expr->V.FVal = FP_D_Mul(Val1, Val2);
                         break;
                     default:
                         Internal ("hie_internal: got token 0x%X\n", Tok);
                 }
+            /* FIXME: float --- newcode end */
             } else {
+                printf("hie_internal signed int X signed int\n");
+                /* Handle the op differently for signed and unsigned types */
+                if (IsSignSigned (Expr->Type)) {
 
-                /* Evaluate the result for unsigned operands */
-                unsigned long Val1 = Expr->IVal;
-                unsigned long Val2 = Expr2.IVal;
-                switch (Tok) {
-                    case TOK_OR:
-                        Expr->IVal = (Val1 | Val2);
-                        break;
-                    case TOK_XOR:
-                        Expr->IVal = (Val1 ^ Val2);
-                        break;
-                    case TOK_AND:
-                        Expr->IVal = (Val1 & Val2);
-                        break;
-                    case TOK_STAR:
-                        Expr->IVal = (Val1 * Val2);
-                        break;
-                    case TOK_DIV:
-                        if (Val2 == 0) {
-                            Error ("Division by zero");
-                            Expr->IVal = 0xFFFFFFFF;
-                        } else {
-                            Expr->IVal = (Val1 / Val2);
-                        }
-                        break;
-                    case TOK_MOD:
-                        if (Val2 == 0) {
-                            Error ("Modulo operation with zero");
-                            Expr->IVal = 0;
-                        } else {
-                            Expr->IVal = (Val1 % Val2);
-                        }
-                        break;
-                    default:
-                        Internal ("hie_internal: got token 0x%X\n", Tok);
+                    /* Evaluate the result for signed operands */
+                    signed long Val1 = Expr->IVal;
+                    signed long Val2 = Expr2.IVal;
+                    switch (Tok) {
+                        case TOK_OR:
+                            Expr->IVal = (Val1 | Val2);
+                            break;
+                        case TOK_XOR:
+                            Expr->IVal = (Val1 ^ Val2);
+                            break;
+                        case TOK_AND:
+                            Expr->IVal = (Val1 & Val2);
+                            break;
+                        case TOK_STAR:
+                            Expr->IVal = (Val1 * Val2);
+                            break;
+                        case TOK_DIV:
+                            if (Val2 == 0) {
+                                Error ("Division by zero");
+                                Expr->IVal = 0x7FFFFFFF;
+                            } else {
+                                Expr->IVal = (Val1 / Val2);
+                            }
+                            break;
+                        case TOK_MOD:
+                            if (Val2 == 0) {
+                                Error ("Modulo operation with zero");
+                                Expr->IVal = 0;
+                            } else {
+                                Expr->IVal = (Val1 % Val2);
+                            }
+                            break;
+                        default:
+                            Internal ("hie_internal: got token 0x%X\n", Tok);
+                    }
+                } else {
+                printf("hie_internal unsigned int X unsigned int\n");
+
+                    /* Evaluate the result for unsigned operands */
+                    unsigned long Val1 = Expr->IVal;
+                    unsigned long Val2 = Expr2.IVal;
+                    switch (Tok) {
+                        case TOK_OR:
+                            Expr->IVal = (Val1 | Val2);
+                            break;
+                        case TOK_XOR:
+                            Expr->IVal = (Val1 ^ Val2);
+                            break;
+                        case TOK_AND:
+                            Expr->IVal = (Val1 & Val2);
+                            break;
+                        case TOK_STAR:
+                            Expr->IVal = (Val1 * Val2);
+                            break;
+                        case TOK_DIV:
+                            if (Val2 == 0) {
+                                Error ("Division by zero");
+                                Expr->IVal = 0xFFFFFFFF;
+                            } else {
+                                Expr->IVal = (Val1 / Val2);
+                            }
+                            break;
+                        case TOK_MOD:
+                            if (Val2 == 0) {
+                                Error ("Modulo operation with zero");
+                                Expr->IVal = 0;
+                            } else {
+                                Expr->IVal = (Val1 % Val2);
+                            }
+                            break;
+                        default:
+                            Internal ("hie_internal: got token 0x%X\n", Tok);
+                    }
                 }
             }
 
@@ -2255,7 +2345,6 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
     unsigned ltype;
     int rconst;                         /* Operand is a constant */
 
-
     ExprWithCheck (hienext, Expr);
 
     while ((Gen = FindGen (CurTok.Tok, Ops)) != 0) {
@@ -2282,6 +2371,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
         if (ED_IsConstAbs (Expr)) {
             /* Numeric constant value */
             GetCodePos (&Mark2);
+//            printf("iVal:%08x FVal:%f\n", Expr->IVal, Expr->V.FVal.V);
             g_push (ltype | CF_CONST, Expr->IVal);
         } else {
             /* Value not numeric constant */
@@ -2744,7 +2834,13 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
             } else if (!DoArrayRef && IsClassInt (lhst) && IsClassInt (rhst)) {
                 /* Integer addition */
                 flags = CF_INT;
+            } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassFloat (rhst)) {
+                /* FIXME: float addition (const + const) */
+                printf("%s:%d float addition (const + const)\n", __FILE__, __LINE__);
+                /* Integer addition */
+                flags = CF_FLOAT;
             } else {
+                printf("%s:%d OOPS\n", __FILE__, __LINE__);
                 /* OOPS */
                 AddDone = -1;
                 /* Avoid further errors */
@@ -2753,24 +2849,35 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
 
             if (!AddDone) {
                 /* Do constant calculation if we can */
-                if (ED_IsAbs (&Expr2) &&
-                    (ED_IsAbs (Expr) || lscale == 1)) {
-                    if (IsClassInt (lhst) && IsClassInt (rhst)) {
-                        Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
-                    }
-                    Expr->IVal = Expr->IVal * lscale + Expr2.IVal * rscale;
+                if (!DoArrayRef && IsClassFloat (lhst) && IsClassFloat (rhst)) {
+                    /* float + float */
+                    /* FIXME: float - this is probably completely wrong */
+                    Expr->V.FVal.V = Expr->V.FVal.V + Expr2.V.FVal.V;
+                    Expr->Type = type_float;
+                    //Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
                     AddDone = 1;
-                } else if (ED_IsAbs (Expr) &&
-                    (ED_IsAbs (&Expr2) || rscale == 1)) {
-                    if (IsClassInt (lhst) && IsClassInt (rhst)) {
-                        Expr2.Type = ArithmeticConvert (Expr2.Type, Expr->Type);
+                    printf("%s:%d float addition (const + const) res:%f\n", __FILE__, __LINE__,  Expr->V.FVal.V);
+                } else {
+                    /* integer + integer */
+                    if (ED_IsAbs (&Expr2) &&
+                        (ED_IsAbs (Expr) || lscale == 1)) {
+                        if (IsClassInt (lhst) && IsClassInt (rhst)) {
+                            Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
+                        }
+                        Expr->IVal = Expr->IVal * lscale + Expr2.IVal * rscale;
+                        AddDone = 1;
+                    } else if (ED_IsAbs (Expr) &&
+                        (ED_IsAbs (&Expr2) || rscale == 1)) {
+                        if (IsClassInt (lhst) && IsClassInt (rhst)) {
+                            Expr2.Type = ArithmeticConvert (Expr2.Type, Expr->Type);
+                        }
+                        Expr2.IVal = Expr->IVal * lscale + Expr2.IVal * rscale;
+                        /* Adjust the flags */
+                        Expr2.Flags |= Expr->Flags & ~E_MASK_KEEP_SUBEXPR;
+                        /* Get the symbol and the name */
+                        *Expr = Expr2;
+                        AddDone = 1;
                     }
-                    Expr2.IVal = Expr->IVal * lscale + Expr2.IVal * rscale;
-                    /* Adjust the flags */
-                    Expr2.Flags |= Expr->Flags & ~E_MASK_KEEP_SUBEXPR;
-                    /* Get the symbol and the name */
-                    *Expr = Expr2;
-                    AddDone = 1;
                 }
             }
 
@@ -2871,8 +2978,13 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
             } else if (!DoArrayRef && IsClassInt (lhst) && IsClassInt (rhst)) {
                 /* Integer addition */
                 flags |= typeadjust (Expr, &Expr2, 1);
+            } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassFloat (rhst)) {
+                /* Float addition */
+                /*flags |= typeadjust (Expr, &Expr2, 1);*/
+                printf("%s:%d float addition (const + var)\n", __FILE__, __LINE__);
             } else {
                 /* OOPS */
+                printf("%s:%d OOPS\n", __FILE__, __LINE__);
                 AddDone = -1;
             }
 
@@ -2964,13 +3076,26 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
             } else if (!DoArrayRef && IsClassInt (lhst) && IsClassInt (rhst)) {
                 /* Integer addition */
                 flags = typeadjust (Expr, &Expr2, 1);
+            } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassFloat (rhst)) {
+                /* FIXME: float - what to do here exactly? */
+                printf("%s:%d float addition (Expr2.V.FVal.V:%f)\n", __FILE__, __LINE__, Expr2.V.FVal.V);
+                /* Float addition (variable+constant) */
+                /*flags = typeadjust (Expr, &Expr2, 1);*/
+                flags |= CF_FLOAT;
+                Expr->Type = Expr2.Type;
             } else {
                 /* OOPS */
+                printf("%s:%d OOPS\n", __FILE__, __LINE__);
                 AddDone = -1;
             }
 
-            /* Generate code for the add */
-            g_inc (flags | CF_CONST, Expr2.IVal);
+            if (flags & CF_FLOAT) {
+                /* FIXME: float - what to do here exactly? */
+                g_inc (flags | CF_CONST, FP_D_As32bitRaw(Expr2.V.FVal));
+            } else {
+                /* Generate code for the add */
+                g_inc (flags | CF_CONST, Expr2.IVal);
+            }
 
         } else {
 
@@ -3013,8 +3138,17 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                 flags = typeadjust (Expr, &Expr2, 0);
                 /* Load rhs into the primary */
                 LoadExpr (CF_NONE, &Expr2);
+            } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassFloat (rhst)) {
+                /* FIXME: float - what to do here exactly? */
+                printf("%s:%d float addition (Expr2.V.FVal.V:%f)\n", __FILE__, __LINE__, Expr2.V.FVal.V);
+                /* Float addition */
+                /* flags = typeadjust (Expr, &Expr2, 0); */
+                flags |= CF_FLOAT;
+                /* Load rhs into the primary */
+                LoadExpr (CF_NONE, &Expr2);
             } else {
                 /* OOPS */
+                printf("%s:%d OOPS\n", __FILE__, __LINE__);
                 AddDone = -1;
                 /* We can't just goto End as that would leave the stack unbalanced */
             }
@@ -3289,6 +3423,11 @@ static void parsesub (ExprDesc* Expr)
                 /* Pointer subtraction. We've got the scale factor and flags above */
             } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
                 /* Integer subtraction. We'll adjust the types later */
+#if 0
+            } else if (IsClassFloat (lhst) && IsClassFloat (rhst)) {
+                /* Float subtraction. We'll adjust the types later */
+                /* FIXME: float */
+#endif
             } else {
                 /* OOPS */
                 Error ("Invalid operands for binary operator '-'");
@@ -3335,6 +3474,13 @@ static void parsesub (ExprDesc* Expr)
         } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
             /* Adjust operand types */
             flags = typeadjust (Expr, &Expr2, 0);
+        } else if (IsClassFloat (lhst) && IsClassFloat (rhst)) {
+            /* Float substraction */
+            /* FIXME: float - what to do here exactly? */
+            printf("%s:%d float substraction\n", __FILE__, __LINE__);
+            /* Adjust operand types */
+            /*flags = typeadjust (Expr, &Expr2, 0);*/
+            flags = CF_FLOAT;
         } else {
             /* OOPS */
             Error ("Invalid operands for binary operator '-'");

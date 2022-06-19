@@ -45,6 +45,7 @@
 
 
 #include <string.h>
+#include <stdint.h>
 
 /* common */
 #include "fp.h"
@@ -189,7 +190,11 @@ Double FP_D_FromInt (long Val)
     return D;
 }
 
-
+long FP_D_ToLong (Double Val)
+/* Convert a floating point variable into a long */
+{
+    return (long)Val.V;
+}
 
 double FP_D_ToFloat (Double Val)
 /* Convert a Double into a native double */
@@ -235,4 +240,17 @@ Double FP_D_Div (Double Left, Double Right)
     Double D;
     D.V = Left.V / Right.V;
     return D;
+}
+
+
+uint32_t FP_D_As32bitRaw(Double Val)
+/* converts double into 32bit (float) and then returns its raw content as a 32bit int */
+{
+    float f;
+    uint32_t *lptr;
+    uint32_t lval;
+    f = Val.V;
+    lptr = (uint32_t *)&f;
+    lval = *lptr;
+    return lval;
 }

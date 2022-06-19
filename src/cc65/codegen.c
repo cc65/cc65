@@ -72,17 +72,18 @@
 
 
 
-static void typeerror (unsigned type)
+static void _typeerror (char *func, int line, unsigned type)
 /* Print an error message about an invalid operand type */
 {
     /* Special handling for floats here: */
     if ((type & CF_TYPEMASK) == CF_FLOAT) {
-        Fatal ("Floating point type is currently unsupported");
+        Fatal ("%s:%d Floating point type is currently unsupported", func, line);
     } else {
         Internal ("Invalid type in CF flags: %04X, type = %u", type, type & CF_TYPEMASK);
     }
 }
 
+#define typeerror(t)    _typeerror(__FILE__, __LINE__, t)
 
 
 static void CheckLocalOffs (unsigned Offs)
@@ -688,14 +689,15 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes)
 /*                           Fetching memory cells                           */
 /*****************************************************************************/
 
+//void _g_getimmed (unsigned Flags, uintptr_t Val, long Offs, char *file, int line);
+#define g_getimmed(a,b,c) _g_getimmed((a),(b),(c),(__FILE__),(__FUNCTION__),(__LINE__))
 
-
-void g_getimmed (unsigned Flags, uintptr_t Val, long Offs)
+void _g_getimmed(unsigned Flags, uintptr_t Val, long Offs, char *file, char *func, int line)
 /* Load a constant into the primary register */
 {
     unsigned char B1, B2, B3, B4;
     unsigned      Done;
-
+printf("g_getimmed %s:%d:%s Flags:%04x Val: %08x Offs:%04x\n", file, line, func, Flags, Val, Offs);
 
     if ((Flags & CF_CONST) != 0) {
 
@@ -713,6 +715,8 @@ void g_getimmed (unsigned Flags, uintptr_t Val, long Offs)
                 AddCodeLine ("lda #$%02X", (unsigned char) Val);
                 break;
 
+            case CF_FLOAT:  /* FIXME float - handle like long here */
+printf("g_getimmed CF_FLOAT Val: %08lx\n", Val);
             case CF_LONG:
                 /* Split the value into 4 bytes */
                 B1 = (unsigned char) (Val >>  0);
@@ -724,7 +728,7 @@ void g_getimmed (unsigned Flags, uintptr_t Val, long Offs)
                 Done = 0;
 
                 /* Load the value */
-                AddCodeLine ("ldx #$%02X", B2);
+                AddCodeLine ("ldx #$%02X\t; g_getimmed LONG", B2);
                 Done |= 0x02;
                 if (B2 == B3) {
                     AddCodeLine ("stx sreg");
@@ -810,6 +814,8 @@ void g_getstatic (unsigned flags, uintptr_t label, long offs)
             }
             break;
 
+        case CF_FLOAT:  /* FIXME: float - can we really use the same as LONG? */
+            /* FIXME: float - what is the CF_TEST about? */
         case CF_LONG:
             if (flags & CF_TEST) {
                 AddCodeLine ("lda %s+3", lbuf);
@@ -835,7 +841,7 @@ void g_getstatic (unsigned flags, uintptr_t label, long offs)
 
 
 void g_getlocal (unsigned Flags, int Offs)
-/* Fetch specified local object (local var). */
+/* Fetch specified local object (local var) into the primary register */
 {
     Offs -= StackPtr;
     switch (Flags & CF_TYPEMASK) {
@@ -870,6 +876,8 @@ void g_getlocal (unsigned Flags, int Offs)
             }
             break;
 
+        case CF_FLOAT: /* FIXME: float - can we really use the same as LONG? */
+
         case CF_LONG:
             CheckLocalOffs (Offs + 3);
             AddCodeLine ("ldy #$%02X", (unsigned char) (Offs+3));
@@ -891,6 +899,7 @@ void g_getind (unsigned Flags, unsigned Offs)
 ** into the primary register
 */
 {
+    printf("g_getind flags:%04x offs:%04x\n", Flags, Offs);
     /* If the offset is greater than 255, add the part that is > 255 to
     ** the primary. This way we get an easy addition and use the low byte
     ** as the offset
@@ -923,6 +932,8 @@ void g_getind (unsigned Flags, unsigned Offs)
                 AddCodeLine ("jsr ldaxidx");
             }
             break;
+
+        case CF_FLOAT:  /* FIXME: float - can we really use the same as LONG here? */
 
         case CF_LONG:
             AddCodeLine ("ldy #$%02X", Offs+3);
@@ -1073,6 +1084,8 @@ void g_putstatic (unsigned flags, uintptr_t label, long offs)
             AddCodeLine ("stx %s+1", lbuf);
             break;
 
+        case CF_FLOAT:  /* FIXME: float - can we really use the same as LONG? */
+
         case CF_LONG:
             AddCodeLine ("sta %s", lbuf);
             AddCodeLine ("stx %s+1", lbuf);
@@ -1093,6 +1106,7 @@ void g_putstatic (unsigned flags, uintptr_t label, long offs)
 void g_putlocal (unsigned Flags, int Offs, long Val)
 /* Put data into local object. */
 {
+    printf("g_putlocal Flags:%04x Offs:%d val: %ld\n", Flags, Offs, Val);
     Offs -= StackPtr;
     CheckLocalOffs (Offs);
     switch (Flags & CF_TYPEMASK) {
@@ -1135,6 +1149,8 @@ void g_putlocal (unsigned Flags, int Offs, long Val)
                 }
             }
             break;
+
+        case CF_FLOAT: /* FIXME: float - can we use the same as LONG here? */
 
         case CF_LONG:
             if (Flags & CF_CONST) {
@@ -1286,6 +1302,11 @@ static void g_regchar (unsigned Flags)
 {
     unsigned L;
 
+    /* FIXME: float */
+    if ((Flags & CF_TYPEMASK) == CF_FLOAT) {
+        typeerror (Flags);
+    }
+
     AddCodeLine ("ldx #$00");
 
     if ((Flags & CF_UNSIGNED) == 0) {
@@ -1301,8 +1322,9 @@ static void g_regchar (unsigned Flags)
 
 
 void g_regint (unsigned Flags)
-/* Make sure, the value in the primary register an int. Convert if necessary */
+/* Make sure, the value in the primary register is an int. Convert if necessary */
 {
+    printf("g_regint flags: %04x\n", Flags);
     switch (Flags & CF_TYPEMASK) {
 
         case CF_CHAR:
@@ -1314,6 +1336,11 @@ void g_regint (unsigned Flags)
 
         case CF_INT:
         case CF_LONG:
+            break;
+
+        /* FIXME: float */
+        case CF_FLOAT:
+            AddCodeLine ("jsr feaxint");
             break;
 
         default:
@@ -1368,11 +1395,57 @@ void g_reglong (unsigned Flags)
         case CF_LONG:
             break;
 
+        /* FIXME: float */
+        case CF_FLOAT:
+            AddCodeLine ("jsr feaxlong");
+            break;
+
         default:
             typeerror (Flags);
     }
 }
 
+void g_regfloat (unsigned Flags)
+/* Make sure, the value in the primary register is a float. Convert if necessary */
+{
+    printf("g_regfloat flags: %04x\n", Flags);
+    switch (Flags & CF_TYPEMASK) {
+
+        case CF_CHAR:
+            if (Flags & CF_FORCECHAR) {
+                /* Conversion is from char */
+                if (Flags & CF_UNSIGNED) {
+                    AddCodeLine ("jsr aufloat");
+                } else {
+                    AddCodeLine ("jsr afloat");
+                }
+            }
+            /* FALLTHROUGH */
+
+        case CF_INT:
+            if (Flags & CF_UNSIGNED) {
+                AddCodeLine ("jsr axufloat");
+            } else {
+                AddCodeLine ("jsr axfloat");
+            }
+            break;
+
+        case CF_LONG:
+            if (Flags & CF_UNSIGNED) {
+                AddCodeLine ("jsr eaxufloat");
+            } else {
+                AddCodeLine ("jsr eaxfloat");
+            }
+            break;
+
+        case CF_FLOAT:
+            /* do nothing */
+            break;
+
+        default:
+            typeerror (Flags);
+    }
+}
 
 
 static unsigned g_intpromotion (unsigned flags)
@@ -1417,6 +1490,22 @@ unsigned g_typeadjust (unsigned lhs, unsigned rhs)
     unsigned ltype = lhs & CF_TYPEMASK;
     unsigned rtype = rhs & CF_TYPEMASK;
 
+    /* Result is const if both operands are const. */
+    unsigned const_flag = (lhs & CF_CONST) & (rhs & CF_CONST);
+
+    /* FIXME: float - this is is much more complicated */
+    if (ltype == CF_FLOAT && rtype == CF_FLOAT) {
+        return const_flag | CF_FLOAT;
+    }
+    if (ltype == CF_FLOAT) {
+        printf("FIXME: conversion to float format missing\n");
+        return (lhs & CF_CONST) | CF_FLOAT;
+    }
+    if (rtype == CF_FLOAT) {
+        printf("FIXME: conversion to float format missing\n");
+        return (rhs & CF_CONST) | CF_FLOAT;
+    }
+
     /* Check if a conversion is needed */
     if (ltype == CF_LONG && rtype != CF_LONG && (rhs & CF_CONST) == 0) {
         /* We must promote the primary register to long */
@@ -1429,9 +1518,6 @@ unsigned g_typeadjust (unsigned lhs, unsigned rhs)
             g_toslong (lhs);
         }
     }
-
-    /* Result is const if both operands are const. */
-    unsigned const_flag = (lhs & CF_CONST) & (rhs & CF_CONST);
 
     /* https://port70.net/~nsz/c/c89/c89-draft.html#3.2.1.5
     ** Many binary operators that expect operands of arithmetic type cause conversions and yield
@@ -1511,9 +1597,20 @@ unsigned g_typecast (unsigned lhs, unsigned rhs)
 ** by the lhs value. Return the result value.
 */
 {
+printf("g_typecast 2 rhs: %s lhs: %s (rhs is %s)\n",
+       ((rhs & CF_TYPEMASK) == CF_FLOAT) ? "float" : "int",
+       ((lhs & CF_TYPEMASK) == CF_FLOAT) ? "float" : "int",
+       ((rhs & CF_CONST) == 0) ? "not const" : "const"
+       );
     /* Check if a conversion is needed */
     if ((rhs & CF_CONST) == 0) {
         switch (lhs & CF_TYPEMASK) {
+
+            /* FIXME: float */
+            case CF_FLOAT:
+                /* We must promote the primary register to float */
+                g_regfloat (rhs);
+                break;
 
             case CF_LONG:
                 /* We must promote the primary register to long */
@@ -2292,7 +2389,12 @@ void g_cmp (unsigned flags, unsigned long val)
     }
 }
 
-
+#define OPER_IDX_SINT16     0
+#define OPER_IDX_UINT16     1
+#define OPER_IDX_SINT32     2
+#define OPER_IDX_UINT32     3
+#define OPER_IDX_FLOAT      4
+#define OPER_IDX_NUM        5
 
 static void oper (unsigned Flags, unsigned long Val, const char* const* Subs)
 /* Encode a binary operation. subs is a pointer to four strings:
@@ -2300,14 +2402,20 @@ static void oper (unsigned Flags, unsigned long Val, const char* const* Subs)
 **      1       --> Operate on unsigneds
 **      2       --> Operate on longs
 **      3       --> Operate on unsigned longs
+**      4       --> Operate on floats
 */
 {
+    int n = 0;
     /* Determine the offset into the array */
-    if (Flags & CF_UNSIGNED) {
-        ++Subs;
-    }
-    if ((Flags & CF_TYPEMASK) == CF_LONG) {
-        Subs += 2;
+    if (Flags & CF_FLOAT) {
+        n = OPER_IDX_FLOAT;
+    } else {
+        if (Flags & CF_UNSIGNED) {
+            n = 1; /* odd means unsigned */
+        }
+        if ((Flags & CF_TYPEMASK) == CF_LONG) {
+            n += 2;
+        }
     }
 
     /* Load the value if it is not already in the primary */
@@ -2316,9 +2424,12 @@ static void oper (unsigned Flags, unsigned long Val, const char* const* Subs)
         g_getimmed (Flags, Val, 0);
     }
 
-    /* Output the operation */
-    AddCodeLine ("jsr %s", *Subs);
-
+    if (Subs[n] == NULL) {
+        Internal("oper Subs NULL (%d)", n);
+    } else {
+        /* Output the operation */
+        AddCodeLine ("jsr %s", Subs[n]);
+    }
     /* The operation will pop it's argument */
     pop (Flags);
 }
@@ -2399,6 +2510,8 @@ void g_push (unsigned flags, unsigned long val)
                 AddCodeLine ("jsr pushax");
                 break;
 
+            case CF_FLOAT:  /* FIXME: float - handle like long here */
+
             case CF_LONG:
                 AddCodeLine ("jsr pusheax");
                 break;
@@ -2414,6 +2527,36 @@ void g_push (unsigned flags, unsigned long val)
     push (flags);
 }
 
+/* FIXME: float */
+void g_push_float (unsigned flags, float val)
+/* Push the primary register or a constant value onto the stack */
+{
+//    printf("g_push_float flags:%04x val:%f\n", flags, val);
+    /* Push the primary register */
+    switch (flags & CF_TYPEMASK) {
+
+        case CF_FLOAT:  /* FIXME: float - handle like long here */
+            /* Value is not 16 bit or not constant */
+//            if (flags & CF_CONST)
+            {
+                float f = val;
+                uintptr_t *p = &val; /* FIXME: float - we shouldnt do this :) */
+                /* Constant 32 bit value, load into eax */
+                printf("g_push_float flags:%04x f:%p\n", flags, *p);
+                g_getimmed (flags | CF_CONST, *p, 0); // ?? FIXME
+//                 g_getimmed (0x41,*p,0);
+            }
+            AddCodeLine ("jsr pusheax");
+            break;
+
+        default:
+            typeerror (flags);
+
+    }
+
+    /* Adjust the stack offset */
+    push (flags);
+}
 
 
 void g_swap (unsigned flags)
@@ -2612,8 +2755,12 @@ void g_stackcheck (void)
 void g_add (unsigned flags, unsigned long val)
 /* Primary = TOS + Primary */
 {
-    static const char* const ops[4] = {
-        "tosaddax", "tosaddax", "tosaddeax", "tosaddeax"
+    static const char* const ops[OPER_IDX_NUM] = {
+        "tosaddax",
+        "tosaddax",  /* unsigned */
+        "tosaddeax",
+        "tosaddeax", /* unsigned, 32bit */
+        "ftosaddeax" /* float, 32bit */
     };
 
     if (flags & CF_CONST) {
@@ -2628,8 +2775,12 @@ void g_add (unsigned flags, unsigned long val)
 void g_sub (unsigned flags, unsigned long val)
 /* Primary = TOS - Primary */
 {
-    static const char* const ops[4] = {
-        "tossubax", "tossubax", "tossubeax", "tossubeax"
+    static const char* const ops[OPER_IDX_NUM] = {
+        "tossubax",
+        "tossubax",  /* unsigned */
+        "tossubeax",
+        "tossubeax", /* unsigned, 32bit */
+        "ftossubeax" /* float, 32bit */
     };
 
     if (flags & CF_CONST) {
@@ -2644,8 +2795,12 @@ void g_sub (unsigned flags, unsigned long val)
 void g_rsub (unsigned flags, unsigned long val)
 /* Primary = Primary - TOS */
 {
-    static const char* const ops[4] = {
-        "tosrsubax", "tosrsubax", "tosrsubeax", "tosrsubeax"
+    static const char* const ops[OPER_IDX_NUM] = {
+        "tosrsubax",
+        "tosrsubax",
+        "tosrsubeax",
+        "tosrsubeax",
+        "ftosrsubeax"
     };
     oper (flags, val, ops);
 }
@@ -2655,9 +2810,15 @@ void g_rsub (unsigned flags, unsigned long val)
 void g_mul (unsigned flags, unsigned long val)
 /* Primary = TOS * Primary */
 {
-    static const char* const ops[4] = {
-        "tosmulax", "tosumulax", "tosmuleax", "tosumuleax"
+    static const char* const ops[OPER_IDX_NUM] = {
+        "tosmulax",
+        "tosumulax",
+        "tosmuleax",
+        "tosumuleax",
+        "ftosmuleax"
     };
+
+    printf("g_mul flags:%04x val:%d\n", flags, val);
 
     /* Do strength reduction if the value is constant and a power of two */
     if (flags & CF_CONST) {
@@ -2751,6 +2912,8 @@ void g_mul (unsigned flags, unsigned long val)
                 }
                 break;
 
+            case CF_FLOAT:  /* FIXME: float: is it the right thing here to do the same as LONG? */
+
             case CF_LONG:
                 break;
 
@@ -2775,9 +2938,15 @@ void g_mul (unsigned flags, unsigned long val)
 void g_div (unsigned flags, unsigned long val)
 /* Primary = TOS / Primary */
 {
-    static const char* const ops[4] = {
-        "tosdivax", "tosudivax", "tosdiveax", "tosudiveax"
+    static const char* const ops[OPER_IDX_NUM] = {
+        "tosdivax",
+        "tosudivax",
+        "tosdiveax",
+        "tosudiveax",
+        "ftosdiveax"
     };
+
+    printf("g_div flags:%04x val:%d\n", flags, val);
 
     /* Do strength reduction if the value is constant and a power of two */
     if (flags & CF_CONST) {
@@ -2886,8 +3055,12 @@ void g_div (unsigned flags, unsigned long val)
 void g_mod (unsigned flags, unsigned long val)
 /* Primary = TOS % Primary */
 {
-    static const char* const ops[4] = {
-        "tosmodax", "tosumodax", "tosmodeax", "tosumodeax"
+    static const char* const ops[OPER_IDX_NUM] = {
+        "tosmodax",
+        "tosumodax",
+        "tosmodeax",
+        "tosumodeax",
+        NULL            /* modulo is invalid for float */
     };
     int p2;
 
@@ -2911,8 +3084,8 @@ void g_mod (unsigned flags, unsigned long val)
 void g_or (unsigned flags, unsigned long val)
 /* Primary = TOS | Primary */
 {
-    static const char* const ops[4] = {
-        "tosorax", "tosorax", "tosoreax", "tosoreax"
+    static const char* const ops[OPER_IDX_NUM] = {
+        "tosorax", "tosorax", "tosoreax", "tosoreax", NULL
     };
 
     /* If the right hand side is const, the lhs is not on stack but still
@@ -2981,8 +3154,8 @@ void g_or (unsigned flags, unsigned long val)
 void g_xor (unsigned flags, unsigned long val)
 /* Primary = TOS ^ Primary */
 {
-    static const char* const ops[4] = {
-        "tosxorax", "tosxorax", "tosxoreax", "tosxoreax"
+    static const char* const ops[OPER_IDX_NUM] = {
+        "tosxorax", "tosxorax", "tosxoreax", "tosxoreax", NULL
     };
 
 
@@ -3049,8 +3222,8 @@ void g_xor (unsigned flags, unsigned long val)
 void g_and (unsigned Flags, unsigned long Val)
 /* Primary = TOS & Primary */
 {
-    static const char* const ops[4] = {
-        "tosandax", "tosandax", "tosandeax", "tosandeax"
+    static const char* const ops[OPER_IDX_NUM] = {
+        "tosandax", "tosandax", "tosandeax", "tosandeax", NULL
     };
 
     /* If the right hand side is const, the lhs is not on stack but still
@@ -3141,8 +3314,8 @@ void g_and (unsigned Flags, unsigned long Val)
 void g_asr (unsigned flags, unsigned long val)
 /* Primary = TOS >> Primary */
 {
-    static const char* const ops[4] = {
-        "tosasrax", "tosshrax", "tosasreax", "tosshreax"
+    static const char* const ops[OPER_IDX_NUM] = {
+        "tosasrax", "tosshrax", "tosasreax", "tosshreax", NULL
     };
 
     /* If the right hand side is const, the lhs is not on stack, but still
@@ -3315,8 +3488,8 @@ void g_asr (unsigned flags, unsigned long val)
 void g_asl (unsigned flags, unsigned long val)
 /* Primary = TOS << Primary */
 {
-    static const char* const ops[4] = {
-        "tosaslax", "tosshlax", "tosasleax", "tosshleax"
+    static const char* const ops[OPER_IDX_NUM] = {
+        "tosaslax", "tosshlax", "tosasleax", "tosshleax", NULL
     };
 
     /* If the right hand side is const, the lhs is not on stack, but still
@@ -3450,6 +3623,11 @@ void g_neg (unsigned Flags)
             AddCodeLine ("jsr negeax");
             break;
 
+        /* FIXME: float */
+        case CF_FLOAT:
+            AddCodeLine ("jsr fnegeax");
+            break;
+
         default:
             typeerror (Flags);
     }
@@ -3472,6 +3650,11 @@ void g_bneg (unsigned flags)
 
         case CF_LONG:
             AddCodeLine ("jsr bnegeax");
+            break;
+
+        /* FIXME: float */
+        case CF_FLOAT:
+            AddCodeLine ("jsr fbnegeax");
             break;
 
         default:
@@ -3509,8 +3692,11 @@ void g_com (unsigned Flags)
 
 
 void g_inc (unsigned flags, unsigned long val)
-/* Increment the primary register by a given number */
+/* Increment the primary register by a given number
+   if flags contain CF_FLOAT, then val can be a raw binary float.
+*/
 {
+    printf("g_inc flags:%04x val:%08lx\n", flags, val);
     /* Don't inc by zero */
     if (val == 0) {
         return;
@@ -3599,6 +3785,11 @@ void g_inc (unsigned flags, unsigned long val)
             }
             break;
 
+        /* FIXME: float */
+        case CF_FLOAT:
+            g_add (flags | CF_CONST, val);
+            break;
+
         default:
             typeerror (flags);
 
@@ -3608,7 +3799,9 @@ void g_inc (unsigned flags, unsigned long val)
 
 
 void g_dec (unsigned flags, unsigned long val)
-/* Decrement the primary register by a given number */
+/* Decrement the primary register by a given number
+   if flags contain CF_FLOAT, then val can be a raw binary float.
+*/
 {
     /* Don't dec by zero */
     if (val == 0) {
@@ -3691,6 +3884,11 @@ void g_dec (unsigned flags, unsigned long val)
             }
             break;
 
+        /* FIXME: float */
+        case CF_FLOAT:
+            g_sub (flags | CF_CONST, val);
+            break;
+
         default:
             typeerror (flags);
 
@@ -3710,12 +3908,16 @@ void g_dec (unsigned flags, unsigned long val)
 void g_eq (unsigned flags, unsigned long val)
 /* Test for equal */
 {
-    static const char* const ops[4] = {
-        "toseqax", "toseqax", "toseqeax", "toseqeax"
+    static const char* const ops[OPER_IDX_NUM] = {
+        "toseqax",
+        "toseqax",
+        "toseqeax",
+        "toseqeax",
+        "ftoseqeax"
     };
 
     unsigned L;
-
+    printf("g_eq flags:%04x val:%ld\n", flags, val);
     /* If the right hand side is const, the lhs is not on stack but still
     ** in the primary register.
     */
@@ -3743,6 +3945,10 @@ void g_eq (unsigned flags, unsigned long val)
             case CF_LONG:
                 break;
 
+            /* FIXME: float */
+            case CF_FLOAT:
+                break;
+
             default:
                 typeerror (flags);
         }
@@ -3764,8 +3970,12 @@ void g_eq (unsigned flags, unsigned long val)
 void g_ne (unsigned flags, unsigned long val)
 /* Test for not equal */
 {
-    static const char* const ops[4] = {
-        "tosneax", "tosneax", "tosneeax", "tosneeax"
+    static const char* const ops[OPER_IDX_NUM] = {
+        "tosneax",
+        "tosneax",
+        "tosneeax",
+        "tosneeax",
+        "ftosneeax"
     };
 
     unsigned L;
@@ -3797,6 +4007,10 @@ void g_ne (unsigned flags, unsigned long val)
             case CF_LONG:
                 break;
 
+            /* FIXME: float */
+            case CF_FLOAT:
+                break;
+
             default:
                 typeerror (flags);
         }
@@ -3818,8 +4032,12 @@ void g_ne (unsigned flags, unsigned long val)
 void g_lt (unsigned flags, unsigned long val)
 /* Test for less than */
 {
-    static const char* const ops[4] = {
-        "tosltax", "tosultax", "toslteax", "tosulteax"
+    static const char* const ops[OPER_IDX_NUM] = {
+        "tosltax",
+        "tosultax",
+        "toslteax",
+        "tosulteax",
+        "ftoslteax"
     };
 
     unsigned Label;
@@ -3913,6 +4131,10 @@ void g_lt (unsigned flags, unsigned long val)
                     AddCodeLine ("rol a");
                     return;
 
+                /* FIXME: float */
+                case CF_FLOAT:
+                    break;
+
                 default:
                     typeerror (flags);
             }
@@ -3957,6 +4179,10 @@ void g_lt (unsigned flags, unsigned long val)
                     /* This one is too costly */
                     break;
 
+                /* FIXME: float */
+                case CF_FLOAT:
+                    break;
+
                 default:
                     typeerror (flags);
             }
@@ -3980,8 +4206,12 @@ void g_lt (unsigned flags, unsigned long val)
 void g_le (unsigned flags, unsigned long val)
 /* Test for less than or equal to */
 {
-    static const char* const ops[4] = {
-        "tosleax", "tosuleax", "tosleeax", "tosuleeax"
+    static const char* const ops[OPER_IDX_NUM] = {
+        "tosleax",
+        "tosuleax",
+        "tosleeax",
+        "tosuleeax",
+        "ftosleeax"
     };
 
 
@@ -4074,6 +4304,10 @@ void g_le (unsigned flags, unsigned long val)
                 }
                 return;
 
+            /* FIXME: float */
+            case CF_FLOAT:
+                break;
+
             default:
                 typeerror (flags);
         }
@@ -4095,8 +4329,12 @@ void g_le (unsigned flags, unsigned long val)
 void g_gt (unsigned flags, unsigned long val)
 /* Test for greater than */
 {
-    static const char* const ops[4] = {
-        "tosgtax", "tosugtax", "tosgteax", "tosugteax"
+    static const char* const ops[OPER_IDX_NUM] = {
+        "tosgtax",
+        "tosugtax",
+        "tosgteax",
+        "tosugteax",
+        "ftosgteax"
     };
 
 
@@ -4205,6 +4443,10 @@ void g_gt (unsigned flags, unsigned long val)
                 }
                 return;
 
+            /* FIXME: float */
+            case CF_FLOAT:
+                break;
+
             default:
                 typeerror (flags);
         }
@@ -4226,8 +4468,12 @@ void g_gt (unsigned flags, unsigned long val)
 void g_ge (unsigned flags, unsigned long val)
 /* Test for greater than or equal to */
 {
-    static const char* const ops[4] = {
-        "tosgeax", "tosugeax", "tosgeeax", "tosugeeax"
+    static const char* const ops[OPER_IDX_NUM] = {
+        "tosgeax",
+        "tosugeax",
+        "tosgeeax",
+        "tosugeeax",
+        "ftosgeeax"
     };
 
     unsigned Label;
@@ -4289,6 +4535,10 @@ void g_ge (unsigned flags, unsigned long val)
                     AddCodeLine ("rol a");
                     return;
 
+                /* FIXME: float */
+                case CF_FLOAT:
+                    break;
+
                 default:
                     typeerror (flags);
             }
@@ -4317,6 +4567,10 @@ void g_ge (unsigned flags, unsigned long val)
                     AddCodeLine ("lda sreg+1");
                     AddCodeLine ("jsr boolge");
                     return;
+
+                /* FIXME: float */
+                case CF_FLOAT:
+                    break;
 
                 default:
                     typeerror (flags);
@@ -4360,6 +4614,10 @@ void g_ge (unsigned flags, unsigned long val)
 
                 case CF_LONG:
                     /* This one is too costly */
+                    break;
+
+                /* FIXME: float */
+                case CF_FLOAT:
                     break;
 
                 default:
@@ -4414,7 +4672,12 @@ void g_defdata (unsigned flags, uintptr_t val, long offs)
             case CF_LONG:
                 AddDataLine ("\t.dword\t$%08"PRIXPTR, val & 0xFFFFFFFF);
                 break;
-
+#if 0
+            case CF_FLOAT:
+                /* FIXME: float */
+                AddDataLine ("\t.dword\t$%08"PRIXPTR"\t; float", val & 0xFFFFFFFF);
+                break;
+#endif
             default:
                 typeerror (flags);
                 break;
@@ -4432,7 +4695,56 @@ void g_defdata (unsigned flags, uintptr_t val, long offs)
     }
 }
 
+void g_defdata_float (unsigned flags, uintptr_t val, long offs)
+/* Define data with the size given in flags */
+{
+    printf("g_defdata_float flags:%04x val:%f offs:%04lx\n", flags, (float)val, offs);
+    if (flags & CF_CONST) {
 
+        /* Numeric constant */
+        switch (flags & CF_TYPEMASK) {
+
+            case CF_CHAR:
+                typeerror (flags);
+                break;
+
+            case CF_INT:
+                typeerror (flags);
+                break;
+
+            case CF_LONG:
+                typeerror (flags);
+                break;
+
+            case CF_FLOAT:
+                /* FIXME: float */
+//                AddDataLine ("\t.float\t%f", (float)(val & 0xFFFFFFFF));
+//                AddDataLine ("\t.dword\t$%08"PRIXPTR"\t; float", val & 0xFFFFFFFF);
+                {
+                    /* FIXME: float - convert to binary format, this is super NOGO :) */
+//                    float f = (float)(val);
+                    unsigned char *p = (unsigned char*)&val;
+                    AddDataLine ("\t.dword\t$%02x%02x%02x%02x\t; float",
+                                 p[3],p[2],p[1],p[0]);
+                }
+                break;
+
+            default:
+                typeerror (flags);
+                break;
+
+        }
+
+    } else {
+
+        /* Create the correct label name */
+        const char* Label = GetLabelName (flags, val, offs);
+
+        /* Labels are always 16 bit */
+        AddDataLine ("\t.addr\t%s\t; float", Label);
+
+    }
+}
 
 void g_defbytes (const void* Bytes, unsigned Count)
 /* Output a row of bytes as a constant */

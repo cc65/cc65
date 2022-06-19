@@ -620,6 +620,8 @@ static void NumericConst (void)
         /* Float constant */
         Double FVal = FP_D_FromInt (IVal);      /* Convert to double */
 
+        printf("NumericConst start IVal:%ld FVal: %f\n", IVal, FVal.V);
+
         /* Check for a fractional part and read it */
         if (CurC == '.') {
 
@@ -692,6 +694,8 @@ static void NumericConst (void)
             }
         }
 
+        printf("NumericConst end FVal: %f\n", FVal.V);
+
         /* Check for a suffix and determine the type of the constant */
         if (toupper (CurC) == 'F') {
             NextChar ();
@@ -705,6 +709,7 @@ static void NumericConst (void)
         NextTok.Tok  = TOK_FCONST;
 
     }
+    printf("NumericConst exit IsFloat:%d IVal: %ld FVal: %f\n", IsFloat, NextTok.IVal, NextTok.FVal.V);
 }
 
 

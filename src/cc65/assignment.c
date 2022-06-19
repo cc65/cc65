@@ -434,6 +434,8 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
     unsigned Flags;
     int MustScale;
 
+    printf("OpAssignArithmetic (Gen=%d)\n", (int)Gen);
+
     ED_Init (&Expr2);
     Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
 
@@ -448,7 +450,9 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
     PushAddr (Expr);
 
     if (Gen == 0) {
-
+// printf("OpAssignArithmetic (gen=0) 1 lhs: %s rhs: %s\n",
+//        (TypeOf (Expr->Type) == CF_FLOAT) ? "float" : "int",
+//        (TypeOf (Expr2.Type) == CF_FLOAT) ? "float" : "int");
         /* Read the expression on the right side of the '=' */
         MarkedExprWithCheck (hie1, &Expr2);
 
@@ -460,6 +464,9 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
         /* If necessary, load the value into the primary register */
         LoadExpr (CF_NONE, &Expr2);
 
+printf("OpAssignArithmetic (0) 2 lhs: %s rhs: %s\n",
+       (TypeOf (Expr->Type) == CF_FLOAT) ? "float" : "int",
+       (TypeOf (Expr2.Type) == CF_FLOAT) ? "float" : "int");
     } else {
 
         /* Load the original value if necessary */
@@ -473,7 +480,9 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
         MarkedExprWithCheck (hie1, &Expr2);
 
         /* The rhs must be an integer (or a float, but we don't support that yet */
-        if (!IsClassInt (Expr2.Type)) {
+        if (!IsClassInt (Expr2.Type)
+//            && !IsClassFloat (Expr2.Type)   /* FIXME: float */
+        ) {
             Error ("Invalid right operand for binary operator '%s'", Op);
             /* Continue. Wrong code will be generated, but the compiler won't
             ** break, so this is the best error recovery.
@@ -557,6 +566,8 @@ void OpAssign (const GenDesc* Gen, ExprDesc* Expr, const char* Op)
 /* Parse an "=" (if 'Gen' is 0) or "op=" operation */
 {
     const Type* ltype = Expr->Type;
+
+    printf("OpAssign\n");
 
     ExprDesc Expr2;
     ED_Init (&Expr2);

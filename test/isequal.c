@@ -36,9 +36,11 @@ int handleparameter(int argc, char *argv[])
     static const char opt_empty[]     = "--empty";
     static const char opt_skipleft[]  = "--skipleft";
     static const char opt_skipright[] = "--skipright";
+    static const char opt_skip[]      = "--skip";
 
     static const char len_skipleft    = sizeof opt_skipleft - 1;
     static const char len_skipright   = sizeof opt_skipright - 1;
+    static const char len_skip        = sizeof opt_skip - 1;
 
     int argindex = 1;
 
@@ -79,6 +81,16 @@ int handleparameter(int argc, char *argv[])
             skiplines_right = handleargparameter(len_skipright, argv[argindex]);
             if (skiplines_right < 0) {
                 fprintf(stderr, "%s: you must specify the number of lines\n", opt_skipright);
+            }
+        }
+        else if (strncmp(argv[argindex], opt_skip, len_skip) == 0) {
+            if (binary || empty) {
+                fprintf(stderr, "%s cannot go with other options.\n", opt_skipright);
+                exit(1);
+            }
+            skiplines_left = skiplines_right = handleargparameter(len_skip, argv[argindex]);
+            if (skiplines_left < 0) {
+                fprintf(stderr, "%s: you must specify the number of lines\n", opt_skip);
             }
         }
         ++argindex;

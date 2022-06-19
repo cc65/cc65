@@ -106,7 +106,7 @@ ifneq ($(wildcard $1.list-ref),)
 #	we have a reference file, compare that, too
 
 #	remove first line which contains a version number
-	$(ISEQUAL) --skipright=1 $1.list-ref $$(@:.bin=.lst)
+	$(ISEQUAL) --skip=1 $1.list-ref $$(@:.bin=.lst)
 endif
 
 endef # LISTING_template

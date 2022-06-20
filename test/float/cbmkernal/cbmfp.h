@@ -16,6 +16,8 @@
     33333333 3 3222222222111111111110000000000
     98765432 1 0987654321098765432109876543210
 
+    (the above seems to match wozniacs format)
+
  * The exponent can be computed from bits 39-32 by subtracting 129 (!)
  */
 typedef struct {
@@ -50,15 +52,15 @@ typedef struct {
 } FLOATFAC;
 
 /* integer conversion functions */
-float __fastcall__ _ctof(char v);
-float __fastcall__ _utof(unsigned char v);
-float __fastcall__ _itof(int v);
-float __fastcall__ _stof(unsigned short v);
+float __fastcall__ _ctof(char v);               /* afloat */
+float __fastcall__ _utof(unsigned char v);      /* aufloat */
+float __fastcall__ _itof(int v);                /* axfloat */
+float __fastcall__ _stof(unsigned short v);     /* axufloat */
 
-int __fastcall__ _ftoi(float f);
+int __fastcall__ _ftoi(float f);                /* feaxint */
 
 /* compare two floats, returns 0 if f = a, 1 if f < a, 255 if f > a */
-unsigned char __fastcall__ _fcmp(float f, float a);
+unsigned char __fastcall__ _fcmp(float f, float a); /* ftos..eax */
 
 /* arithmetic functions */
 float __fastcall__ _fadd(float f, float a);     /* ftosaddeax */
@@ -80,22 +82,23 @@ float __fastcall__ _fatn(float s);           /* math.h atanf */
 
 float __fastcall__ _fabs(float s);           /* math.h fabsf */
 
+float __fastcall__ _fint(float s);           /* math.h truncf */ /* truncate decimal fraction */
+float __fastcall__ _fround(float s);         /* math.h roundf */ /* rounding */
+
 /* logical functions */
 float __fastcall__ _fand(float f, float a);
 float __fastcall__ _for(float f, float a);
 float __fastcall__ _fnot(float f);
 
 /* misc */
-float __fastcall__ _frnd(float s);
+float __fastcall__ _frnd(float s);  /* random number */
+float __fastcall__ _fsgn(float s);  /* "signum" returns 1 if positive, 0 if 0, -1 if negative */
 
-float __fastcall__ _fneg(float f);              /* negate (flip sign) */
+float __fastcall__ _fneg(float f);  /* negate (flip sign) FIXME: fnegeax */
+
 unsigned char __fastcall__ _ftestsgn(float f); /* FIXME */
 
-float __fastcall__ _fsgn(float s);
-float __fastcall__ _fint(float s);
-
 #if 0
-
 typedef struct {
     unsigned char exponent;
     FLOATBAS coffs[8];       /* ? */

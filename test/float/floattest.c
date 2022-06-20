@@ -14,8 +14,6 @@ char strbuf[0x20];
 char strbuf2[0x20];
 char strbuf3[0x20];
 
-
-
 typedef union {
     float    f;
     unsigned char b[sizeof (float)];
@@ -92,11 +90,11 @@ void testatan2(void)
 {
     for(i = 0; i < YNUM; i++) {
         fx = CXNUM2+((int)((sinf(deg2rad((float)(i),(float)(CYNUM)))*(float)(CYNUM2)))/(CYNUM/CXNUM));
-        
+
         fs = deg2rad((float)(i), (float)(CYNUM));
         fd = cosf(fs) * (float)(CYNUM2);
         fy = CXNUM2 + ((int)(fd) / (CYNUM/CXNUM));
-        
+
         cplot(fx, fy);
         fd = fatan2((float)(fx-CXNUM2), (float)(fy-CYNUM2));
         _ftostr(strbuf, fd);    
@@ -210,7 +208,7 @@ void testbasicmath(void)
     printf("123:%s\n",strbuf);
     _ftostr(strbuf,fs);    
     printf("-123:%s\n",strbuf);
-    
+
     a = (float)(4321);
     b = (float)(1234);
     printf("4321:0x%08lx\n", ftobin(a));
@@ -219,7 +217,7 @@ void testbasicmath(void)
     printf("4321+1234:0x%08lx\n", ftobin(c1));
     _ftoa(strbuf, c1);
     printf("4321+1234:%s\n", strbuf);
-    
+
     a = (float)(1111);
     b = (float)(2222);
     printf("1111:0x%08lx\n", ftobin(a));
@@ -234,7 +232,7 @@ void testbasicmath(void)
     fd=fd / fs;
     _ftostr(strbuf,fd);    
     printf("t:%s\n",strbuf);
-    
+
     // 1234 / 60 = 20,5666...
     t=1234;
     fd=(float)((int)t); 
@@ -261,7 +259,7 @@ void testbasicmath(void)
     fd=!fd;
     _ftostr(strbuf,!fd);    
     printf("!!0:%s\n",strbuf);
-    
+
     a = 10.0f;
     b = powf(a,(float)(1)); printf("0x%08lx %s\n", ftobin(b), _ftoa(strbuf,b));
     b = powf(a,(float)(2)); printf("0x%08lx %s\n", ftobin(b), _ftoa(strbuf,b));
@@ -336,9 +334,9 @@ int main(void)
     testbinary();
     testcompare();
     testprinting();
-#if 0    
+#if 0
     f1();
-    
+
     calcsin();
     calccos();
     testatan2();        // FIXME

@@ -586,16 +586,16 @@ __fatn:    __ffunc1 BASIC_FAC_Atn
 __fcos:    __ffunc1 BASIC_FAC_Cos
 __fexp:    __ffunc1 BASIC_FAC_Exp
 ;__ffre:    __ffunc1 BASIC_FAC_Fre
-__fint:    __ffunc1 BASIC_FAC_Int
+__fint:    __ffunc1 BASIC_FAC_Int       ; truncate fractions
 __flog:    __ffunc1 BASIC_FAC_Log
 ;__fpos:    __ffunc1 BASIC_FAC_Pos
-__frnd:    __ffunc1 BASIC_FAC_Rnd
-__fsgn:    __ffunc1 BASIC_FAC_Sgn
+__frnd:    __ffunc1 BASIC_FAC_Rnd       ; random numbers
+__fsgn:    __ffunc1 BASIC_FAC_Sgn       ;"signum" returns 1 if positive, 0 if 0, -1 if negative
 __fsin:    __ffunc1 BASIC_FAC_Sin
 __fsqr:    __ffunc1 BASIC_FAC_Sqr
 __ftan:    __ffunc1 BASIC_FAC_Tan
 __fnot:    __ffunc1 BASIC_FAC_Not
-__fround:  __ffunc1 BASIC_FAC_Round
+__fround:  __ffunc1 BASIC_FAC_Round     ; rounding
         
 ;---------------------------------------------------------------------------------------------
 ; these functions take two args (in FAC and ARG) and return result (in FAC)

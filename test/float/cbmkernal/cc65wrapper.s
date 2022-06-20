@@ -189,8 +189,15 @@ feaxlong:
     .export fbnegeax
     .import bnegax
 fbnegeax:
+; FIXME: why does this not work with __fnot?
     jsr __ftoi
     jmp bnegax
+
+.if 0 = 1
+   .export fnegeax
+ fnegeax:
+    jmp __fneg
+.endif
 
 ;--------------------------------------------------------------
 ; math ops
@@ -340,6 +347,8 @@ ftosleeax:
     .import __ftan
     .import __fatn
     .import __fabs
+    .import __fround
+    .import __fint
 
     .export _powf
 _powf:
@@ -386,3 +395,13 @@ _atanf:
 _fabsf:
     ; arg0:     a/x/sreg/sreg+1
     jmp     __fabs
+
+    .export _roundf
+_roundf:
+    ; arg0:     a/x/sreg/sreg+1
+    jmp     __fround
+
+    .export _truncf
+_truncf:
+    ; arg0:     a/x/sreg/sreg+1
+    jmp     __fint

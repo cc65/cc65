@@ -32,7 +32,7 @@ BASIC_FAC_Sqr       = $bf71     ; in/out: FAC
 BASIC_FAC_Exp       = $bfed     ; in/out: FAC
 BASIC_FAC_Log       = $b9ea     ; in/out: FAC
 BASIC_FAC_Round     = $bc1b     ; in/out: FAC
-BASIC_FAC_Sgn       = $bc39     ; in/out: FAC
+BASIC_FAC_Sgn       = $bc39     ; in/out: FAC  "signum" returns 1 if positive, 0 if 0, -1 if negative
 BASIC_FAC_Abs       = $bc58     ; in/out: FAC
 
 BASIC_ARG_FAC_Or    = $afe6     ; in: ARG,FAC out:FAC

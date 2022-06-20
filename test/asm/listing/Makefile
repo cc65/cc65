@@ -89,10 +89,10 @@ else
 	$(ISEQUAL) --empty $$(@:.bin=.list-err)
 endif
 
-ifneq ($(wildcard $(WORKDIR)/$1.ld65-err),)
 ifneq ($(wildcard ref/$1.ld65err-ref),)
 	$(ISEQUAL) ref/$1.ld65err-ref $$(@:.bin=.ld65-err)
 else
+ifneq ($(wildcard $(WORKDIR)/$1.ld65-err),)
 	$(ISEQUAL) --empty $$(@:.bin=.ld65-err)
 endif
 endif

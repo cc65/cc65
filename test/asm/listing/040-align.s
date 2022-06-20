@@ -4,8 +4,8 @@
 
         .align 4
         .byte 4
-	.word 12
-	.word 18
+        .word 12
+        .word 18
 
         .align 1
         .byte 1
@@ -16,5 +16,5 @@
         .align 8
         .byte 8
 
-	.align 128
-	.byte 128
+        .align 128
+        .byte 128

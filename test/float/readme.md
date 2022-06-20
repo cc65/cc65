@@ -47,7 +47,7 @@ TODO (much later):
 ### Files & Functions
 
 #### codegen.c
-
+```
 g_getimmed          Load a constant into the primary register
 g_getstatic         Fetch an static memory cell into the primary register
 g_getlocal          Fetch specified local object (local var) into the primary register
@@ -67,7 +67,7 @@ g_defdata_float
 (see below) g_add, g_sub, g_mul, g_div, g_neg, g_bneg
 (see below) g_eq, g_ne, g_lt, g_gt, g_le, g_ge
 (invalid) g_mod, g_or, g_xor, g_and, g_asr
-
+```
 #### datatype.c
 
 ArithmeticConvert
@@ -135,7 +135,7 @@ historical float routines by woz :) unfortunately not ieee754
 ### runtime functions
 
 these must be available in the runtime library
-
+```
 func        description                         cbmfp   wozfp   754     codegen.c
 
 aufloat     Primary 8bit unsigned -> float      *       -       -       g_regfloat
@@ -163,20 +163,20 @@ ftosleeax   Test for less than or equal to      *       -       -       g_le
 ftoslteax   Test for less than                  *       -       -       g_lt
 ftosneeax   Test for not equal                  *       -       -       g_ne
 ftoseqeax   Test for equal                      *       -       -       g_eq
-
+```
 ### extra functions
 
 optional utility functions.
-
+```
 func        description                         cbmfp   wozfp   754
 
 char *_ftostr(char *d, float s)                 *       ?       ?       for printf family
 float _strtof(char *d)                          *       -       -       for scanf family
-
+```
 ### math.h functions
 
 these are optional, required for standard libm
-
+```
 func        description                         cbmfp   wozfp   754
 
 /* C99 */
@@ -189,8 +189,8 @@ float sqrtf(float x);                           *       -       -
 float tanf(float x);                            *       -       -
 float atanf(float x);                           *       -       -
 float fabsf(float x);                           *       -       -
-
+```
 --------------------------------------------------------------------------------
 
-https://www.geeksforgeeks.org/ieee-standard-754-floating-point-numbers/
-https://www.h-schmidt.net/FloatConverter/IEEE754.html
+- https://www.geeksforgeeks.org/ieee-standard-754-floating-point-numbers/
+- https://www.h-schmidt.net/FloatConverter/IEEE754.html

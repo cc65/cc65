@@ -15,7 +15,7 @@ else
 endif
 
 ifdef QUIET
-  .SILENT:
+#  .SILENT:
 endif
 
 CA65 := $(if $(wildcard ../../../bin/ca65*),../../../bin/ca65,ca65)

@@ -102,10 +102,7 @@ jobs:
           repository: cc65/doc
           path: doc.git
       - name: Update the online documents.
-        env:
-            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          env
           cd doc.git
           rm *.*
           cp ../html/*.* .

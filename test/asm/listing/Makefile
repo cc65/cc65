@@ -99,6 +99,13 @@ else
 endif
 
 ifneq ($(wildcard ref/$1.ld65err-ref),)
+	@echo cat $$(@:.bin=.list-ld65-err)
+	cat $$(@:.bin=.list-ld65-err)
+	@echo
+	@echo
+	-diff -u ref/$1.ld65err-ref $$(@:.bin=.list-ld65-err)
+	@echo
+	@echo
 	$(ISEQUAL) ref/$1.ld65err-ref $$(@:.bin=.list-ld65-err)
 else
 ifneq ($(wildcard $(WORKDIR)/$1.list-ld65-err),)

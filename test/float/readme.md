@@ -70,35 +70,49 @@ g_defdata_float
 ```
 #### datatype.c
 
+```
 ArithmeticConvert
+```
 
 #### expr.c
 
+```
 LimitExprValue
 parseadd
 parsesub
+```
 
 #### initdata.c
 
+```
 DefineData          Output a data definition for the given expression
+```
 
 #### loadexpr.c
 
+```
 LoadExpr
+```
 
 #### locals.c
 
+```
 ParseAutoDecl
+```
 
 #### assignment.c
 
+```
 OpAssignArithmetic  Parse an "=" (if 'Gen' is 0) or "op=" operation for arithmetic lhs
+```
 
 #### fp.c
 
 wrapper for doing floating point operations on target floats
 
+```
 FP_D_As32bitRaw     converts double into 32bit (float) and then returns its raw content as a 32bit int
+```
 
 --------------------------------------------------------------------------------
 
@@ -180,15 +194,17 @@ these are optional, required for standard libm
 func        description                         cbmfp   wozfp   754
 
 /* C99 */
-float powf(float f, float a);                   *       -       -
-float sinf(float s);                            *       -       -
-float cosf(float s);                            *       -       -
-float logf(float x);                            *       *       -
-float expf(float x);                            *       -       -
-float sqrtf(float x);                           *       -       -
-float tanf(float x);                            *       -       -
-float atanf(float x);                           *       -       -
-float fabsf(float x);                           *       -       -
+float powf(float f, float a)                    *       -       -
+float sinf(float s)                             *       -       -
+float cosf(float s)                             *       -       -
+float logf(float x)                             *       *       -
+float expf(float x)                             *       -       -
+float sqrtf(float x)                            *       -       -
+float tanf(float x)                             *       -       -
+float atanf(float x)                            *       -       -
+float fabsf(float x)                            *       -       -
+float roundf(float x)                           *       -       -
+float truncf(float x)                           *       -       -
 ```
 --------------------------------------------------------------------------------
 

@@ -1,0 +1,1 @@
+ld65: Warning: /home/spiro/Work/tmp/cc65.spiro.testcases-ca65/cfg/none.cfg:18: Segment 'CODE' isn't aligned properly; the resulting executable might not be functional.

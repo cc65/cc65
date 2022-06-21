@@ -79,7 +79,7 @@ ifneq ($(wildcard ref/$1.ld65err-ref),)
 	-diff -u ref/$1.ld65err-ref $$(@:.bin=.ld65-err)
 	@echo
 	@echo
-	$(ISEQUAL) ref/$1.ld65err-ref $$(@:.bin=.ld65-err)
+	$(ISEQUAL) --wildcards ref/$1.ld65err-ref $$(@:.bin=.ld65-err)
 else
 ifneq ($(wildcard $(WORKDIR)/$1.ld65-err),)
 	$(ISEQUAL) --empty $$(@:.bin=.ld65-err)
@@ -106,7 +106,7 @@ else
 endif
 
 ifneq ($(wildcard ref/$1.ld65err-ref),)
-	$(ISEQUAL) ref/$1.ld65err-ref $$(@:.bin=.list-ld65-err)
+	$(ISEQUAL) --wildcards ref/$1.ld65err-ref $$(@:.bin=.list-ld65-err)
 else
 ifneq ($(wildcard $(WORKDIR)/$1.list-ld65-err),)
 	$(ISEQUAL) --empty $$(@:.bin=.list-ld65-err)

@@ -349,17 +349,36 @@ static int processwildcardchar(FILE *f1)
 static int wildcard_path(FILE * f2)
 {
     int isstillwildcard = 1;
+    static int allowedcolonin = 2;
 
     int ch = getnext(f2);
 
+    if (allowedcolonin >= 0) {
+        --allowedcolonin;
+    }
+
     if ((ch == wildcardendchar) || ch < ' ' || ch > 126) {
         /* this is not a path char anymore, abort the wildcard processing */
-        isstillwildcard = 0;
 
-        if (ch != wildcardendchar) {
-            exit(EXIT_FAILURE);
+        /* first of all, ignore a colon at position 2 if it is the wildcardendchar.
+         * This is needed for windows path specifications, which can begin with
+         * a drive specifier and a colon.
+         */
+
+        if ( (allowedcolonin >= 0) && (ch == ':') ) {
+            fprintf(stderr, "Ignoring ':' at drive specifier, do not end the path here!\n");
+        }
+        else {
+            isstillwildcard = 0;
+
+            allowedcolonin = 2;
+
+            if (ch != wildcardendchar) {
+                exit(EXIT_FAILURE);
+            }
         }
     }
+
 
     return isstillwildcard;
 }

@@ -1212,6 +1212,7 @@ static void OptPrintTargetPath (const char* Opt attribute ((unused)),
 /* Print the target file path */
 {
     char* TargetPath;
+    char* tmp;
 
     SearchPaths* TargetPaths = NewSearchPath ();
     AddSubSearchPathFromEnv (TargetPaths, "CC65_HOME", "target");
@@ -1220,7 +1221,15 @@ static void OptPrintTargetPath (const char* Opt attribute ((unused)),
 #endif
     AddSubSearchPathFromBin (TargetPaths, "target");
 
-    TargetPath = GetSearchPath (TargetPaths, 0);
+    TargetPath = SearchFile (TargetPaths, ".");
+    if (!TargetPath) {
+        fprintf (stderr, "%s: error - could not determine target path\n", ProgName);
+        exit (EXIT_FAILURE);
+    }
+    tmp = strrchr(TargetPath, '.');
+    if (tmp) {
+        *(--tmp) = 0;
+    }
     while (*TargetPath) {
         if (*TargetPath == ' ') {
             /* Escape spaces */

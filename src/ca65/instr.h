@@ -86,6 +86,7 @@
 #define AM65_BLOCKXFER          0x02000000UL
 #define AM65_ABS_IND_LONG       0x04000000UL
 #define AM65_IMM_IMPLICIT_WORD  0x08000000UL /* PHW #$1234 (4510 only) */
+#define AM65_32BIT_BASE_IND_Z   0x10000000UL /* lda [zp],z */
 
 /* Bitmask for all ZP operations that have correspondent ABS ops */
 #define AM65_SET_ZP     (AM65_DIR | AM65_DIR_X | AM65_DIR_Y | AM65_DIR_IND | AM65_DIR_X_IND)
@@ -110,7 +111,7 @@
 #define AM65I_IMM_INDEX         22
 #define AM65I_IMM_IMPLICIT      23
 #define AM65I_IMM_IMPLICIT_WORD 27
-#define AM65I_COUNT             28
+#define AM65I_COUNT             29
 
 
 

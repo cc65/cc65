@@ -1197,7 +1197,7 @@ Again:
                             CurTok.Tok = TOK_OVERRIDE_ZP;
                            return;
                         } else {
-                            if (CPU == CPU_4510) {
+                            if (CPU == CPU_4510 || CPU == CPU_45GS02) {
                                 CurTok.Tok = TOK_Z;
                                 return;
                             }
@@ -1209,7 +1209,7 @@ Again:
                 }
                 break;
             case 2:
-                if ((CPU == CPU_4510) &&
+                if ((CPU == CPU_4510 || CPU == CPU_45GS02) &&
                     (toupper (SB_AtUnchecked (&CurTok.SVal, 0)) == 'S') &&
                     (toupper (SB_AtUnchecked (&CurTok.SVal, 1)) == 'P')) {
 

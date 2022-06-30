@@ -728,8 +728,8 @@ static const struct {
 } InsTab45GS02 = {
         sizeof (InsTab45GS02.Ins) / sizeof (InsTab45GS02.Ins[0]),
         {
-                { "ADC",  0x080A66C, 0x60, 0, PutAll },
-                { "AND",  0x080A66C, 0x20, 0, PutAll },
+                { "ADC",  0x1080A66C, 0x60, 0, Put45GS02 },
+                { "AND",  0x1080A66C, 0x20, 0, Put45GS02 },
                 { "ASL",  0x000006e, 0x02, 1, PutAll },
                 { "ASR",  0x0000026, 0x43, 0, Put4510 },
                 { "ASW",  0x0000008, 0xcb, 6, PutAll },
@@ -766,7 +766,7 @@ static const struct {
                 { "CLE",  0x0000001, 0x02, 0, PutAll },
                 { "CLI",  0x0000001, 0x58, 0, PutAll },
                 { "CLV",  0x0000001, 0xb8, 0, PutAll },
-                { "CMP",  0x080A66C, 0xc0, 0, PutAll },
+                { "CMP",  0x1080A66C, 0xc0, 0, Put45GS02 },
                 { "CPX",  0x080000C, 0xe0, 1, PutAll },
                 { "CPY",  0x080000C, 0xc0, 1, PutAll },
                 { "CPZ",  0x080000C, 0xd0, 1, Put4510 },
@@ -777,7 +777,7 @@ static const struct {
                 { "DEY",  0x0000001, 0x88, 0, PutAll },
                 { "DEZ",  0x0000001, 0x3B, 0, PutAll },
                 { "EOM",  0x0000001, 0xea, 0, PutAll },
-                { "EOR",  0x080A66C, 0x40, 0, PutAll },
+                { "EOR",  0x1080A66C, 0x40, 0, Put45GS02 },
                 { "INA",  0x0000001, 0x00, 4, PutAll },   /* == INC */
                 { "INC",  0x000006f, 0x00, 4, PutAll },
                 { "INW",  0x0000004, 0xe3, 9, PutAll },
@@ -803,7 +803,7 @@ static const struct {
                 { "MAP",  0x0000001, 0x5C, 0, PutAll },
                 { "NEG",  0x0000001, 0x42, 0, PutAll },
                 { "NOP",  0x0000001, 0xea, 0, PutAll }, /* == EOM */
-                { "ORA",  0x080A66C, 0x00, 0, PutAll },
+                { "ORA",  0x1080A66C, 0x00, 0, Put45GS02 },
                 { "PHA",  0x0000001, 0x48, 0, PutAll },
                 { "PHD",  0x8000008, 0xf4, 1, PutAll }, /* == PHW */
                 { "PHP",  0x0000001, 0x08, 0, PutAll },
@@ -830,7 +830,7 @@ static const struct {
                 { "RTI",  0x0000001, 0x40, 0, PutAll },
                 { "RTN",  0x0800000, 0x62, 1, PutAll },
                 { "RTS",  0x0000001, 0x60, 0, PutAll },
-                { "SBC",  0x080A66C, 0xe0, 0, PutAll },
+                { "SBC",  0x1080A66C, 0xe0, 0, Put45GS02 },
                 { "SEC",  0x0000001, 0x38, 0, PutAll },
                 { "SED",  0x0000001, 0xf8, 0, PutAll },
                 { "SEE",  0x0000001, 0x03, 0, PutAll },

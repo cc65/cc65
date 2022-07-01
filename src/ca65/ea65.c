@@ -99,6 +99,9 @@ void GetEA (EffAddr* A)
     if (TokIsSep (CurTok.Tok)) {
 
         A->AddrModeSet = AM65_IMPLICIT;
+        if (GetCPU() == CPU_45GS02) {
+            A->AddrModeSet |= AM65_Q;
+        }
 
     } else if (CurTok.Tok == TOK_HASH) {
 
@@ -111,6 +114,11 @@ void GetEA (EffAddr* A)
 
         NextTok ();
         A->AddrModeSet = AM65_ACCU;
+
+    } else if (CurTok.Tok == TOK_Q) {
+
+        NextTok ();
+        A->AddrModeSet = AM65_Q;
 
     } else if (CurTok.Tok == IndirectEnter) {
 

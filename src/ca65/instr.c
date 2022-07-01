@@ -727,7 +727,7 @@ static const struct {
 /* Instruction table for the 4510 */
 static const struct {
     unsigned Count;
-    InsDesc  Ins[141];
+    InsDesc  Ins[149];
 } InsTab45GS02 = {
         sizeof (InsTab45GS02.Ins) / sizeof (InsTab45GS02.Ins[0]),
         {
@@ -736,9 +736,9 @@ static const struct {
                 { "AND",  0x1080A66C, 0x20, 0, Put45GS02 },
                 { "ANDQ", 0x0000140C, 0x20, 12, Put45GS02_Q },
                 { "ASL",  0x0000006e, 0x02, 1, PutAll },
-                /* TODO: ASLQ */
+                { "ASLQ", 0x200000ec, 0x00, 13, Put45GS02_Q },
                 { "ASR",  0x00000026, 0x43, 0, Put4510 },
-                /* TODO: ASRQ */
+                { "ASRQ", 0x20000024, 0x40, 14, Put45GS02_Q },
                 { "ASW",  0x00000008, 0xcb, 6, PutAll },
                 { "BBR0", 0x00000000, 0x0F, 0, PutBitBranch },
                 { "BBR1", 0x00000000, 0x1F, 0, PutBitBranch },
@@ -760,7 +760,7 @@ static const struct {
                 { "BCS",  0x00020000, 0xb0, 0, PutPCRel8 },
                 { "BEQ",  0x00020000, 0xf0, 0, PutPCRel8 },
                 { "BIT",  0x00A0006C, 0x00, 2, PutAll },
-                /* TODO: BITQ */
+                { "BITQ", 0x0000000c, 0x20, 14, Put45GS02_Q },
                 { "BMI",  0x00020000, 0x30, 0, PutPCRel8 },
                 { "BNE",  0x00020000, 0xd0, 0, PutPCRel8 },
                 { "BPL",  0x00020000, 0x10, 0, PutPCRel8 },
@@ -781,7 +781,7 @@ static const struct {
                 { "CPZ",  0x0080000C, 0xd0, 1, Put4510 },
                 { "DEA",  0x00000001, 0x00, 3, PutAll },   /* == DEC */
                 { "DEC",  0x000006F, 0x00, 3, PutAll },
-                /* TODO: DEQ */
+                { "DEQ", 0x200000ec, 0xc0, 13, Put45GS02_Q },
                 { "DEW",  0x0000004, 0xc3, 9, PutAll },
                 { "DEX",  0x0000001, 0xca, 0, PutAll },
                 { "DEY",  0x0000001, 0x88, 0, PutAll },
@@ -791,7 +791,7 @@ static const struct {
                 { "EORQ", 0x0000140C, 0x40, 12, Put45GS02_Q },
                 { "INA",  0x0000001, 0x00, 4, PutAll },   /* == INC */
                 { "INC",  0x000006f, 0x00, 4, PutAll },
-                /* TODO: INQ */
+                { "INQ", 0x200000ec, 0xe0, 13, Put45GS02_Q },
                 { "INW",  0x0000004, 0xe3, 9, PutAll },
                 { "INX",  0x0000001, 0xe8, 0, PutAll },
                 { "INY",  0x0000001, 0xc8, 0, PutAll },
@@ -813,7 +813,7 @@ static const struct {
                 { "LDY",  0x080006C, 0xa0, 1, PutAll },
                 { "LDZ",  0x0800048, 0xa3, 1, Put4510 },
                 { "LSR",  0x000006F, 0x42, 1, PutAll },
-                /* TODO: LSRQ */
+                { "LSLQ", 0x200000ec, 0x40, 13, Put45GS02_Q },
                 { "MAP",  0x0000001, 0x5C, 0, PutAll },
                 { "NEG",  0x0000001, 0x42, 0, PutAll },
                 { "NOP",  0x0000001, 0xea, 0, PutAll }, /* == EOM */
@@ -840,9 +840,9 @@ static const struct {
                 { "RMB6", 0x0000004, 0x67, 1, PutAll },
                 { "RMB7", 0x0000004, 0x77, 1, PutAll },
                 { "ROL",  0x000006F, 0x22, 1, PutAll },
-                /* TODO: ROLQ */
+                { "ROLQ", 0x200000ec, 0x20, 13, Put45GS02_Q },
                 { "ROR",  0x000006F, 0x62, 1, PutAll },
-                /* TODO: RORQ */
+                { "RORQ", 0x200000ec, 0x60, 13, Put45GS02_Q },
                 { "ROW",  0x0000008, 0xeb, 6, PutAll },
                 { "RTI",  0x0000001, 0x40, 0, PutAll },
                 { "RTN",  0x0800000, 0x62, 1, PutAll },
@@ -1197,7 +1197,7 @@ const InsTable* InsTab = (const InsTable*) &InsTab6502;
 /* Table to build the effective 65xx opcode from a base opcode and an
 ** addressing mode. (The value in the table is ORed with the base opcode)
 */
-static unsigned char EATab[13][AM65I_COUNT] = {
+static unsigned char EATab[15][AM65I_COUNT] = {
     {   /* Table 0 */
         0x00, 0x00, 0x05, 0x0D, 0x0F, 0x15, 0x1D, 0x1F,
         0x00, 0x19, 0x12, 0x00, 0x07, 0x11, 0x17, 0x01,
@@ -1275,6 +1275,18 @@ static unsigned char EATab[13][AM65I_COUNT] = {
             0x00, 0x00, 0x12, 0x00, 0x12, 0x00, 0x00, 0x00,
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+    },
+    {   /* Table 13 (Q) */
+            0x00, 0x00, 0x06, 0x0e, 0x00, 0x16, 0x1e, 0x00,
+            0x00, 0x00, 0x12, 0x00, 0x12, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x0a
+    },
+    {
+        0x00, 0x00, 0x04, 0x0c, 0x00, 0x14, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x03
     }
 };
 
@@ -1350,6 +1362,7 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
     GetEA (A);
 
     /* printf("%x, %lx; %lx", Ins->BaseCode, Ins->AddrMode, A->AddrModeSet); */
+
     /* From the possible addressing modes, remove the ones that are invalid
     ** for this instruction or CPU.
     */
@@ -1933,6 +1946,12 @@ static void Put45GS02_Q (const InsDesc* Ins) {
         if (A.AddrModeBit == AM65_DIR_IND_LONG) {
             Emit0(0xEA); /* NOP prefix */
             /* printf("EA "); */
+        }
+        if (A.Opcode == 0xea) {
+            A.Opcode = 0x1a;
+        }
+        else if (A.Opcode == 0xca) {
+            A.Opcode = 0x3a;
         }
         /* printf("%02x\n", A.Opcode); */
         EmitCode(&A);

@@ -132,7 +132,10 @@ static void Put4510 (const InsDesc* Ins);
 /* Handle instructions of 4510 not matching any EATab */
 
 static void Put45GS02 (const InsDesc* Ins);
-/* Handle instructions of 45GS02 */
+/* Handle [adr],z instructions of 45GS02 */
+
+static void Put45GS02_Q (const InsDesc* Ins);
+/* Handle Q instructions of 45GS02 */
 
 static void PutSweet16 (const InsDesc* Ins);
 /* Handle a generic sweet16 instruction */
@@ -724,62 +727,71 @@ static const struct {
 /* Instruction table for the 4510 */
 static const struct {
     unsigned Count;
-    InsDesc  Ins[133];
+    InsDesc  Ins[141];
 } InsTab45GS02 = {
         sizeof (InsTab45GS02.Ins) / sizeof (InsTab45GS02.Ins[0]),
         {
                 { "ADC",  0x1080A66C, 0x60, 0, Put45GS02 },
+                { "ADCQ", 0x0000140C, 0x60, 12, Put45GS02_Q },
                 { "AND",  0x1080A66C, 0x20, 0, Put45GS02 },
-                { "ASL",  0x000006e, 0x02, 1, PutAll },
-                { "ASR",  0x0000026, 0x43, 0, Put4510 },
-                { "ASW",  0x0000008, 0xcb, 6, PutAll },
-                { "BBR0", 0x0000000, 0x0F, 0, PutBitBranch },
-                { "BBR1", 0x0000000, 0x1F, 0, PutBitBranch },
-                { "BBR2", 0x0000000, 0x2F, 0, PutBitBranch },
-                { "BBR3", 0x0000000, 0x3F, 0, PutBitBranch },
-                { "BBR4", 0x0000000, 0x4F, 0, PutBitBranch },
-                { "BBR5", 0x0000000, 0x5F, 0, PutBitBranch },
-                { "BBR6", 0x0000000, 0x6F, 0, PutBitBranch },
-                { "BBR7", 0x0000000, 0x7F, 0, PutBitBranch },
-                { "BBS0", 0x0000000, 0x8F, 0, PutBitBranch },
-                { "BBS1", 0x0000000, 0x9F, 0, PutBitBranch },
-                { "BBS2", 0x0000000, 0xAF, 0, PutBitBranch },
-                { "BBS3", 0x0000000, 0xBF, 0, PutBitBranch },
-                { "BBS4", 0x0000000, 0xCF, 0, PutBitBranch },
-                { "BBS5", 0x0000000, 0xDF, 0, PutBitBranch },
-                { "BBS6", 0x0000000, 0xEF, 0, PutBitBranch },
-                { "BBS7", 0x0000000, 0xFF, 0, PutBitBranch },
-                { "BCC",  0x0020000, 0x90, 0, PutPCRel8 },
-                { "BCS",  0x0020000, 0xb0, 0, PutPCRel8 },
-                { "BEQ",  0x0020000, 0xf0, 0, PutPCRel8 },
-                { "BIT",  0x0A0006C, 0x00, 2, PutAll },
-                { "BMI",  0x0020000, 0x30, 0, PutPCRel8 },
-                { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
-                { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
-                { "BRA",  0x0020000, 0x80, 0, PutPCRel8 },
-                { "BRK",  0x0000001, 0x00, 0, PutAll },
-                { "BSR",  0x0040000, 0x63, 0, PutPCRel4510 },
-                { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
-                { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
-                { "CLC",  0x0000001, 0x18, 0, PutAll },
-                { "CLD",  0x0000001, 0xd8, 0, PutAll },
-                { "CLE",  0x0000001, 0x02, 0, PutAll },
-                { "CLI",  0x0000001, 0x58, 0, PutAll },
-                { "CLV",  0x0000001, 0xb8, 0, PutAll },
+                { "ANDQ", 0x0000140C, 0x20, 12, Put45GS02_Q },
+                { "ASL",  0x0000006e, 0x02, 1, PutAll },
+                /* TODO: ASLQ */
+                { "ASR",  0x00000026, 0x43, 0, Put4510 },
+                /* TODO: ASRQ */
+                { "ASW",  0x00000008, 0xcb, 6, PutAll },
+                { "BBR0", 0x00000000, 0x0F, 0, PutBitBranch },
+                { "BBR1", 0x00000000, 0x1F, 0, PutBitBranch },
+                { "BBR2", 0x00000000, 0x2F, 0, PutBitBranch },
+                { "BBR3", 0x00000000, 0x3F, 0, PutBitBranch },
+                { "BBR4", 0x00000000, 0x4F, 0, PutBitBranch },
+                { "BBR5", 0x00000000, 0x5F, 0, PutBitBranch },
+                { "BBR6", 0x00000000, 0x6F, 0, PutBitBranch },
+                { "BBR7", 0x00000000, 0x7F, 0, PutBitBranch },
+                { "BBS0", 0x00000000, 0x8F, 0, PutBitBranch },
+                { "BBS1", 0x00000000, 0x9F, 0, PutBitBranch },
+                { "BBS2", 0x00000000, 0xAF, 0, PutBitBranch },
+                { "BBS3", 0x00000000, 0xBF, 0, PutBitBranch },
+                { "BBS4", 0x00000000, 0xCF, 0, PutBitBranch },
+                { "BBS5", 0x00000000, 0xDF, 0, PutBitBranch },
+                { "BBS6", 0x00000000, 0xEF, 0, PutBitBranch },
+                { "BBS7", 0x00000000, 0xFF, 0, PutBitBranch },
+                { "BCC",  0x00020000, 0x90, 0, PutPCRel8 },
+                { "BCS",  0x00020000, 0xb0, 0, PutPCRel8 },
+                { "BEQ",  0x00020000, 0xf0, 0, PutPCRel8 },
+                { "BIT",  0x00A0006C, 0x00, 2, PutAll },
+                /* TODO: BITQ */
+                { "BMI",  0x00020000, 0x30, 0, PutPCRel8 },
+                { "BNE",  0x00020000, 0xd0, 0, PutPCRel8 },
+                { "BPL",  0x00020000, 0x10, 0, PutPCRel8 },
+                { "BRA",  0x00020000, 0x80, 0, PutPCRel8 },
+                { "BRK",  0x00000001, 0x00, 0, PutAll },
+                { "BSR",  0x00040000, 0x63, 0, PutPCRel4510 },
+                { "BVC",  0x00020000, 0x50, 0, PutPCRel8 },
+                { "BVS",  0x00020000, 0x70, 0, PutPCRel8 },
+                { "CLC",  0x00000001, 0x18, 0, PutAll },
+                { "CLD",  0x00000001, 0xd8, 0, PutAll },
+                { "CLE",  0x00000001, 0x02, 0, PutAll },
+                { "CLI",  0x00000001, 0x58, 0, PutAll },
+                { "CLV",  0x00000001, 0xb8, 0, PutAll },
                 { "CMP",  0x1080A66C, 0xc0, 0, Put45GS02 },
-                { "CPX",  0x080000C, 0xe0, 1, PutAll },
-                { "CPY",  0x080000C, 0xc0, 1, PutAll },
-                { "CPZ",  0x080000C, 0xd0, 1, Put4510 },
-                { "DEA",  0x0000001, 0x00, 3, PutAll },   /* == DEC */
+                { "CMPQ", 0x0000140C, 0xC0, 12, Put45GS02_Q },
+                { "CPX",  0x0080000C, 0xe0, 1, PutAll },
+                { "CPY",  0x0080000C, 0xc0, 1, PutAll },
+                { "CPZ",  0x0080000C, 0xd0, 1, Put4510 },
+                { "DEA",  0x00000001, 0x00, 3, PutAll },   /* == DEC */
                 { "DEC",  0x000006F, 0x00, 3, PutAll },
+                /* TODO: DEQ */
                 { "DEW",  0x0000004, 0xc3, 9, PutAll },
                 { "DEX",  0x0000001, 0xca, 0, PutAll },
                 { "DEY",  0x0000001, 0x88, 0, PutAll },
                 { "DEZ",  0x0000001, 0x3B, 0, PutAll },
                 { "EOM",  0x0000001, 0xea, 0, PutAll },
                 { "EOR",  0x1080A66C, 0x40, 0, Put45GS02 },
+                { "EORQ", 0x0000140C, 0x40, 12, Put45GS02_Q },
                 { "INA",  0x0000001, 0x00, 4, PutAll },   /* == INC */
                 { "INC",  0x000006f, 0x00, 4, PutAll },
+                /* TODO: INQ */
                 { "INW",  0x0000004, 0xe3, 9, PutAll },
                 { "INX",  0x0000001, 0xe8, 0, PutAll },
                 { "INY",  0x0000001, 0xc8, 0, PutAll },
@@ -796,14 +808,17 @@ static const struct {
                 { "LBVC", 0x0040000, 0x53, 0, PutPCRel4510 },
                 { "LBVS", 0x0040000, 0x73, 0, PutPCRel4510 },
                 { "LDA",  0x1090A66C, 0xa0, 0, Put45GS02 },
+                { "LDQ",  0x0000140C, 0xa0, 12, Put45GS02_Q },
                 { "LDX",  0x080030C, 0xa2, 1, PutAll },
                 { "LDY",  0x080006C, 0xa0, 1, PutAll },
                 { "LDZ",  0x0800048, 0xa3, 1, Put4510 },
                 { "LSR",  0x000006F, 0x42, 1, PutAll },
+                /* TODO: LSRQ */
                 { "MAP",  0x0000001, 0x5C, 0, PutAll },
                 { "NEG",  0x0000001, 0x42, 0, PutAll },
                 { "NOP",  0x0000001, 0xea, 0, PutAll }, /* == EOM */
                 { "ORA",  0x1080A66C, 0x00, 0, Put45GS02 },
+                { "ORQ",  0x0000140C, 0x00, 12, Put45GS02_Q },
                 { "PHA",  0x0000001, 0x48, 0, PutAll },
                 { "PHD",  0x8000008, 0xf4, 1, PutAll }, /* == PHW */
                 { "PHP",  0x0000001, 0x08, 0, PutAll },
@@ -825,12 +840,15 @@ static const struct {
                 { "RMB6", 0x0000004, 0x67, 1, PutAll },
                 { "RMB7", 0x0000004, 0x77, 1, PutAll },
                 { "ROL",  0x000006F, 0x22, 1, PutAll },
+                /* TODO: ROLQ */
                 { "ROR",  0x000006F, 0x62, 1, PutAll },
+                /* TODO: RORQ */
                 { "ROW",  0x0000008, 0xeb, 6, PutAll },
                 { "RTI",  0x0000001, 0x40, 0, PutAll },
                 { "RTN",  0x0800000, 0x62, 1, PutAll },
                 { "RTS",  0x0000001, 0x60, 0, PutAll },
                 { "SBC",  0x1080A66C, 0xe0, 0, Put45GS02 },
+                { "SBCQ", 0x0000140C, 0xe0, 12, Put45GS02_Q },
                 { "SEC",  0x0000001, 0x38, 0, PutAll },
                 { "SED",  0x0000001, 0xf8, 0, PutAll },
                 { "SEE",  0x0000001, 0x03, 0, PutAll },
@@ -844,6 +862,7 @@ static const struct {
                 { "SMB6", 0x0000004, 0xE7, 1, PutAll },
                 { "SMB7", 0x0000004, 0xF7, 1, PutAll },
                 { "STA",  0x1010A66C, 0x80, 0, Put45GS02 },
+                { "STQ",  0x0000140C, 0x80, 12, Put45GS02_Q },
                 { "STX",  0x000030c, 0x82, 1, Put4510 },
                 { "STY",  0x000006c, 0x80, 1, Put4510 },
                 { "STZ",  0x000006c, 0x04, 5, PutAll },
@@ -1178,79 +1197,85 @@ const InsTable* InsTab = (const InsTable*) &InsTab6502;
 /* Table to build the effective 65xx opcode from a base opcode and an
 ** addressing mode. (The value in the table is ORed with the base opcode)
 */
-static unsigned char EATab[12][AM65I_COUNT] = {
+static unsigned char EATab[13][AM65I_COUNT] = {
     {   /* Table 0 */
         0x00, 0x00, 0x05, 0x0D, 0x0F, 0x15, 0x1D, 0x1F,
         0x00, 0x19, 0x12, 0x00, 0x07, 0x11, 0x17, 0x01,
         0x00, 0x00, 0x00, 0x03, 0x13, 0x09, 0x00, 0x09,
-        0x00, 0x00, 0x00, 0x00, 0x12
+        0x00, 0x00, 0x00, 0x00, 0x12, 0x00
     },
     {   /* Table 1 */
         0x08, 0x08, 0x04, 0x0C, 0x00, 0x14, 0x1C, 0x00,
         0x14, 0x1C, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x80, 0x00
+        0x00, 0x00, 0x80, 0x00, 0x00, 0x00
     },
     {   /* Table 2 */
         0x00, 0x00, 0x24, 0x2C, 0x0F, 0x34, 0x3C, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x89, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     },
     {   /* Table 3 */
         0x3A, 0x3A, 0xC6, 0xCE, 0x00, 0xD6, 0xDE, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     },
     {   /* Table 4 */
         0x1A, 0x1A, 0xE6, 0xEE, 0x00, 0xF6, 0xFE, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     },
     {   /* Table 5 */
         0x00, 0x00, 0x60, 0x98, 0x00, 0x70, 0x9E, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     },
     {   /* Table 6 */
         0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00,
         0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x90, 0x00
+        0x00, 0x00, 0x90, 0x00, 0x00, 0x00
     },
     {   /* Table 7 (Subroutine opcodes) */
         0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00,
         0xDC, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     },
     {   /* Table 8 */
         0x00, 0x40, 0x01, 0x41, 0x00, 0x09, 0x49, 0x00,
         0x00, 0x00, 0x00, 0x51, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     },
     {   /* Table 9 */
         0x00, 0x00, 0x00, 0x10, 0x00, 0x20, 0x30, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     },
     {   /* Table 10 (NOPs) */
         0xea, 0x00, 0x04, 0x0c, 0x00, 0x14, 0x1c, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80,
-        0x00, 0x00, 0x00, 0x00
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     },
     {   /* Table 11 (LAX) */
         0x08, 0x08, 0x04, 0x0C, 0x00, 0x14, 0x1C, 0x00,
         0x14, 0x1C, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08,
-        0x00, 0x00, 0x80, 0x00
+        0x00, 0x00, 0x80, 0x00, 0x00, 0x00
     },
+    {   /* Table 12 (Q) */
+        0x00, 0x00, 0x05, 0x0D, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x12, 0x00, 0x12, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+    }
 };
 
 /* Table to build the effective SWEET16 opcode from a base opcode and an
@@ -1296,6 +1321,7 @@ unsigned char ExtBytes[AM65I_COUNT] = {
     2,          /* Absolute Indirect long */
     2,          /* Immidiate word */
     1,          /* [Direct],z */
+    0,          /* Q */
 };
 
 /* Table that encodes the additional bytes for each SWEET16 instruction */
@@ -1323,6 +1349,7 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
     /* Get the set of possible addressing modes */
     GetEA (A);
 
+    printf("%x, %lx; %lx", Ins->BaseCode, Ins->AddrMode, A->AddrModeSet);
     /* From the possible addressing modes, remove the ones that are invalid
     ** for this instruction or CPU.
     */
@@ -1387,11 +1414,14 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
 
     /* Check if we have any adressing modes left */
     if (A->AddrModeSet == 0) {
+        printf("\n");
         Error ("Illegal addressing mode");
         return 0;
     }
     A->AddrMode    = BitFind (A->AddrModeSet);
     A->AddrModeBit = (0x01UL << A->AddrMode);
+
+    printf(" -> %lx, %d\n", A->AddrModeBit, A->AddrMode);
 
     /* If the instruction has a one byte operand and immediate addressing is
     ** allowed but not used, check for an operand expression in the form
@@ -1890,6 +1920,26 @@ static void Put45GS02 (const InsDesc* Ins)
         Emit4510(&A);
     }
 }
+
+
+
+static void Put45GS02_Q (const InsDesc* Ins) {
+    EffAddr A;
+
+    if (EvalEA(Ins, &A)) {
+        Emit0(0x42);
+        Emit0(0x42);
+        printf("  42 42 ");
+        if (A.AddrModeBit == AM65_DIR_IND_LONG) {
+            Emit0(0xEA); /* NOP prefix */
+            printf("EA ");
+        }
+        printf("%02x\n", A.Opcode);
+        EmitCode(&A);
+    }
+}
+
+
 
 /*****************************************************************************/
 /*                       Handler functions for SWEET16                       */

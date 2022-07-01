@@ -1177,8 +1177,15 @@ Again:
                         break;
 
                     case 'S':
-                        if ((CPU == CPU_4510) || (CPU == CPU_65816)) {
+                        if ((CPU == CPU_4510) || (CPU == CPU_45GS02) || (CPU == CPU_65816)) {
                             CurTok.Tok = TOK_S;
+                            return;
+                        }
+                        break;
+
+                    case 'Q':
+                        if (CPU == CPU_45GS02) {
+                            CurTok.Tok = TOK_Q;
                             return;
                         }
                         break;
@@ -1197,7 +1204,7 @@ Again:
                             CurTok.Tok = TOK_OVERRIDE_ZP;
                            return;
                         } else {
-                            if (CPU == CPU_4510 || CPU == CPU_45GS02) {
+                            if ((CPU == CPU_4510) || (CPU == CPU_45GS02)) {
                                 CurTok.Tok = TOK_Z;
                                 return;
                             }

@@ -158,8 +158,19 @@ void GetEA (EffAddr* A)
                 }
             } else {
                 /* (adr) */
-                A->AddrModeSet = (CPU == CPU_4510 || CPU == CPU_45GS02) ? AM65_ABS_IND
-                                                   : AM65_ABS_IND | AM65_ABS_IND_LONG | AM65_DIR_IND;
+                switch (CPU) {
+                    case CPU_4510:
+                        A->AddrModeSet = AM65_ABS_IND;
+                        break;
+
+                    case CPU_45GS02:
+                        A->AddrModeSet = AM65_ABS_IND | AM65_DIR_IND;
+                        break;
+
+                    default:
+                        A->AddrModeSet = AM65_ABS_IND | AM65_ABS_IND_LONG | AM65_DIR_IND;
+                        break;
+                }
             }
         }
 

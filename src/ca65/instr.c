@@ -1349,7 +1349,7 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
     /* Get the set of possible addressing modes */
     GetEA (A);
 
-    printf("%x, %lx; %lx", Ins->BaseCode, Ins->AddrMode, A->AddrModeSet);
+    /* printf("%x, %lx; %lx", Ins->BaseCode, Ins->AddrMode, A->AddrModeSet); */
     /* From the possible addressing modes, remove the ones that are invalid
     ** for this instruction or CPU.
     */
@@ -1414,14 +1414,14 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
 
     /* Check if we have any adressing modes left */
     if (A->AddrModeSet == 0) {
-        printf("\n");
+        /* printf("\n"); */
         Error ("Illegal addressing mode");
         return 0;
     }
     A->AddrMode    = BitFind (A->AddrModeSet);
     A->AddrModeBit = (0x01UL << A->AddrMode);
 
-    printf(" -> %lx, %d\n", A->AddrModeBit, A->AddrMode);
+    /* printf(" -> %lx, %d\n", A->AddrModeBit, A->AddrMode); */
 
     /* If the instruction has a one byte operand and immediate addressing is
     ** allowed but not used, check for an operand expression in the form
@@ -1929,12 +1929,12 @@ static void Put45GS02_Q (const InsDesc* Ins) {
     if (EvalEA(Ins, &A)) {
         Emit0(0x42);
         Emit0(0x42);
-        printf("  42 42 ");
+        /* printf("  42 42 "); */
         if (A.AddrModeBit == AM65_DIR_IND_LONG) {
             Emit0(0xEA); /* NOP prefix */
-            printf("EA ");
+            /* printf("EA "); */
         }
-        printf("%02x\n", A.Opcode);
+        /* printf("%02x\n", A.Opcode); */
         EmitCode(&A);
     }
 }

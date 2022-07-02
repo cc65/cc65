@@ -813,7 +813,7 @@ static const struct {
                 { "LDY",  0x080006C, 0xa0, 1, PutAll },
                 { "LDZ",  0x0800048, 0xa3, 1, Put4510 },
                 { "LSR",  0x000006F, 0x42, 1, PutAll },
-                { "LSLQ", 0x200000ec, 0x40, 13, Put45GS02_Q },
+                { "LSRQ", 0x200000ec, 0x40, 13, Put45GS02_Q },
                 { "MAP",  0x0000001, 0x5C, 0, PutAll },
                 { "NEG",  0x0000001, 0x42, 0, PutAll },
                 { "NOP",  0x0000001, 0xea, 0, PutAll }, /* == EOM */

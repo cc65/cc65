@@ -334,8 +334,8 @@
 
    ldq $12
    ldq $3456
-   ldq ($78);,z ; TODO: Is the documentation correct? this is different to all other similar instructions
-   ldq [$9a];,z
+   ldq ($78),z
+   ldq [$9a],z
 
    lsrq $12
    lsrq

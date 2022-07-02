@@ -808,7 +808,7 @@ static const struct {
                 { "LBVC", 0x0040000, 0x53, 0, PutPCRel4510 },
                 { "LBVS", 0x0040000, 0x73, 0, PutPCRel4510 },
                 { "LDA",  0x1090A66C, 0xa0, 0, Put45GS02 },
-                { "LDQ",  0x0000140C, 0xa0, 12, Put45GS02_Q },
+                { "LDQ",  0x1000140C, 0xa0, 12, Put45GS02_Q },
                 { "LDX",  0x080030C, 0xa2, 1, PutAll },
                 { "LDY",  0x080006C, 0xa0, 1, PutAll },
                 { "LDZ",  0x0800048, 0xa3, 1, Put4510 },
@@ -1274,7 +1274,7 @@ static unsigned char EATab[15][AM65I_COUNT] = {
         0x00, 0x00, 0x05, 0x0D, 0x00, 0x00, 0x00, 0x00,
             0x00, 0x00, 0x12, 0x00, 0x12, 0x00, 0x00, 0x00,
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+            0x00, 0x00, 0x00, 0x00, 0x12, 0x00
     },
     {   /* Table 13 (Q) */
             0x00, 0x00, 0x06, 0x0e, 0x00, 0x16, 0x1e, 0x00,
@@ -1943,7 +1943,7 @@ static void Put45GS02_Q (const InsDesc* Ins) {
         Emit0(0x42);
         Emit0(0x42);
         /* printf("  42 42 "); */
-        if (A.AddrModeBit == AM65_DIR_IND_LONG) {
+        if ((A.AddrModeBit == AM65_DIR_IND_LONG) || (A.AddrModeBit == AM65_32BIT_BASE_IND_Z)) {
             Emit0(0xEA); /* NOP prefix */
             /* printf("EA "); */
         }

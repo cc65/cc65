@@ -245,7 +245,7 @@ void AddMacroArg (Macro* M, const char* Arg)
     for (I = 0; I < CollCount (&M->FormalArgs); ++I) {
         if (strcmp (CollAtUnchecked (&M->FormalArgs, I), Arg) == 0) {
             /* Found */
-            Error ("Duplicate macro parameter: '%s'", Arg);
+            PPError ("Duplicate macro parameter: '%s'", Arg);
             break;
         }
     }

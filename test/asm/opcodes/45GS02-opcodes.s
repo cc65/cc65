@@ -296,7 +296,7 @@
    aslq $3456
    aslq $78,x
    aslq $9abc,x
-   
+
    asrq
    asrq $12
    asrq $34,x

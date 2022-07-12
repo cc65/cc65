@@ -300,7 +300,7 @@ static void SetSys (const char* Sys)
             break;
 
         case TGT_MEGA65:
-            cbmsys ("__CBM610__");
+            cbmsys ("__MEGA65__");
             break;
 
         default:

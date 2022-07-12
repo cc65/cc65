@@ -1,9 +1,3 @@
-# Note about This Fork
-
-This fork adds a target for the MEGA65 and support for the 45GS02 CPU to `ca65`. It also adds startup code to allow `cl65` to create MEGA65 `PRG` files. It does not add a full C library, so `cc65` won't work.
-
-45GS02 support is still in progress, not all instructions are implemented yet.
-
 # About cc65
 
 cc65 is a complete cross development package for 65(C)02 systems, including

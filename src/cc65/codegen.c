@@ -461,7 +461,8 @@ void g_importstartup (void)
 
 
 void g_importmainargs (void)
-/* Forced import of a special symbol that handles arguments to main */
+/* Forced import of a special symbol that handles arguments to main. This will
+   happen only when the compiler sees a main function that takes arguments. */
 {
     AddTextLine ("\t.forceimport\tinitmainargs");
 }

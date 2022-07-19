@@ -93,8 +93,7 @@ int ED_IsLocPrimaryOrExpr (const ExprDesc* Expr)
 int ED_IsIndExpr (const ExprDesc* Expr)
 /* Check if the expression is a reference to its value */
 {
-    return (Expr->Flags & E_ADDRESS_OF) == 0 &&
-           !ED_IsLocNone (Expr) && !ED_IsLocPrimary (Expr);
+    return (Expr->Flags & E_ADDRESS_OF) == 0 && !ED_IsLocNone (Expr);
 }
 #endif
 
@@ -282,7 +281,7 @@ ExprDesc* ED_AddrExpr (ExprDesc* Expr)
 
         case E_LOC_EXPR:
             Expr->Flags &= ~(E_MASK_LOC | E_MASK_RTYPE);
-            Expr->Flags |= E_LOC_PRIMARY | E_RTYPE_RVAL;
+            Expr->Flags |= E_ADDRESS_OF | E_LOC_PRIMARY | E_RTYPE_RVAL;
             break;
 
         default:

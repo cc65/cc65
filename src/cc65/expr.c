@@ -48,13 +48,6 @@
 
 
 
-/* Map a generator function and its attributes to a token */
-typedef struct GenDesc {
-    token_t       Tok;                  /* Token to map to */
-    unsigned      Flags;                /* Flags for generator function */
-    void          (*Func) (unsigned, unsigned long);    /* Generator func */
-} GenDesc;
-
 /* Descriptors for the operations */
 static GenDesc GenPASGN  = { TOK_PLUS_ASSIGN,   GEN_NOPUSH,     g_add };
 static GenDesc GenSASGN  = { TOK_MINUS_ASSIGN,  GEN_NOPUSH,     g_sub };
@@ -243,7 +236,7 @@ static const GenDesc* FindGen (token_t Tok, const GenDesc* Table)
 /* Find a token in a generator table */
 {
     while (Table->Tok != TOK_INVALID) {
-        if (Table->Tok == Tok) {
+        if ((token_t)Table->Tok == Tok) {
             return Table;
         }
         ++Table;
@@ -772,9 +765,10 @@ static unsigned FunctionArgList (FuncDesc* Func, int IsFastcall, ExprDesc* ED)
             } else {
 
                 /* No prototype available. Convert array to "pointer to first
-                ** element", and function to "pointer to function".
+                ** element", function to "pointer to function" and do integral
+                ** promotion if necessary.
                 */
-                Expr.Type = PtrConversion (Expr.Type);
+                TypeConversion (&Expr, StdConversion (Expr.Type));
 
             }
 
@@ -1133,7 +1127,7 @@ static void Primary (ExprDesc* E)
                 /* output its label */
                 E->Flags = E_RTYPE_RVAL | E_LOC_CODE | E_ADDRESS_OF;
                 E->Name = Entry->V.L.Label;
-                E->Type = NewPointerTo (type_void);
+                E->Type = type_void_p;
                 NextToken ();
             } else {
                 Error ("Computed gotos are a C extension, not supported with this --standard");
@@ -1952,7 +1946,7 @@ void hie10 (ExprDesc* Expr)
                 /* The & operator yields an rvalue address */
                 ED_AddrExpr (Expr);
             }
-            Expr->Type = NewPointerTo (Expr->Type);
+            Expr->Type = AddressOf (Expr->Type);
             break;
 
         case TOK_SIZEOF:
@@ -2271,9 +2265,9 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
         Tok = CurTok.Tok;
         NextToken ();
 
-        /* If lhs is a function, convert it to pointer to function */
+        /* If lhs is a function, convert it to the address of the function */
         if (IsTypeFunc (Expr->Type)) {
-            Expr->Type = NewPointerTo (Expr->Type);
+            Expr->Type = AddressOf (Expr->Type);
         }
 
         /* Get the lhs on stack */
@@ -2293,9 +2287,9 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
         /* Get the right hand side */
         MarkedExprWithCheck (hienext, &Expr2);
 
-        /* If rhs is a function, convert it to pointer to function */
+        /* If rhs is a function, convert it to the address of the function */
         if (IsTypeFunc (Expr2.Type)) {
-            Expr2.Type = NewPointerTo (Expr2.Type);
+            Expr2.Type = AddressOf (Expr2.Type);
         }
 
         /* Check for a numeric constant expression */
@@ -3069,7 +3063,7 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
             Error ("Invalid operands for binary operator '+'");
         } else {
             /* Array and function types must be converted to pointer types */
-            Expr->Type = PtrConversion (Expr->Type);
+            Expr->Type = StdConversion (Expr->Type);
         }
     }
 
@@ -3348,7 +3342,7 @@ static void parsesub (ExprDesc* Expr)
     }
 
     /* Result type is either a pointer or an integer */
-    Expr->Type = PtrConversion (Expr->Type);
+    Expr->Type = StdConversion (Expr->Type);
 
     /* Condition code not set */
     ED_MarkAsUntested (Expr);

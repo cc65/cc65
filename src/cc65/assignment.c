@@ -590,6 +590,12 @@ void OpAssign (const GenDesc* Gen, ExprDesc* Expr, const char* Op)
         /* Normal straight 'op=' */
         OpAssignArithmetic (Gen, Expr, Op);
     }
+
+    /* Expression has had side effects */
+    Expr->Flags |= E_SIDE_EFFECTS;
+
+    /* Propagate viral flags */
+    ED_PropagateFrom (Expr, &Expr2);
 }
 
 
@@ -710,4 +716,10 @@ void OpAddSubAssign (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
 
     /* Expression is an rvalue in the primary now */
     ED_FinalizeRValLoad (Expr);
+
+    /* Expression has had side effects */
+    Expr->Flags |= E_SIDE_EFFECTS;
+
+    /* Propagate viral flags */
+    ED_PropagateFrom (Expr, &Expr2);
 }

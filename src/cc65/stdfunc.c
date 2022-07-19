@@ -185,6 +185,9 @@ static void ParseArg (ArgDesc* Arg, const Type* Type, ExprDesc* Expr)
 
     /* Use the type of the argument for the push */
     Arg->Flags |= TypeOf (Arg->Expr.Type);
+
+    /* Propagate from subexpressions */
+    Expr->Flags |= Arg->Expr.Flags & E_MASK_VIRAL;
 }
 
 
@@ -1365,6 +1368,9 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 ExitPoint:
     /* We expect the closing brace */
     ConsumeRParen ();
+
+    /* Propagate from subexpressions */
+    Expr->Flags |= Arg.Flags & E_MASK_VIRAL;
 }
 
 
@@ -1405,4 +1411,7 @@ void HandleStdFunc (int Index, FuncDesc* F, ExprDesc* lval)
 
     /* Call the handler function */
     D->Handler (F, lval);
+
+    /* We assume all function calls had side effects */
+    lval->Flags |= E_SIDE_EFFECTS;
 }

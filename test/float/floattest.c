@@ -97,7 +97,7 @@ void testatan2(void)
 
         cplot(fx, fy);
         fd = fatan2((float)(fx-CXNUM2), (float)(fy-CYNUM2));
-        _ftostr(strbuf, fd);    
+        _ftostr(strbuf, fd);
         cputs(strbuf);
    }
 }

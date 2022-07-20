@@ -3,12 +3,12 @@
 #define _FLOAT_H_
 
 /* ieee754 32bit format:
- * 
+ *
  *  sign
  * / /exponent/mantissa
  * 3 32222222 22211111111110000000000
  * 1 09876543 21098765432109876543210
- * 
+ *
  * The sign is stored in bit 31.
  * The exponent can be computed from bits 23-30 by subtracting 127. (128 = 2^1)
  * The mantissa is stored in bits 0-22.
@@ -51,4 +51,4 @@ float __fastcall__ _strtof(char *d);
 #define _fpreset()
 
 #endif /* _FLOAT_H_ */
- 
+

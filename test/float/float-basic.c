@@ -178,6 +178,6 @@ int main(void)
     printf("fp2 0x%08lx [] %s ()\n", *((uint32_t*)&fp2), _ftostr(buf, fp2));
     printf("fp3 0x%08lx [] %s ()\n", *((uint32_t*)&fp3), _ftostr(buf, fp3));
 
-    
+
     return 0;
 }

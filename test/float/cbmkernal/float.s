@@ -56,7 +56,7 @@ __basicoff:
 .else
         .include "float.inc"
 .endif
-        
+
         .importzp sreg, ptr1
 
 ;---------------------------------------------------------------------------------------------
@@ -78,27 +78,27 @@ __float_u8_to_fac:
         __enable_basic_if_needed
         jsr BASIC_u8_to_FAC
         __return_with_cleanup
-        
+
 ; get C-parameter (signed int), convert to FAC
 ___float_s16_to_fac:
         ;a: low x: high
         tay
         txa
         ;y: low a: high
-        
+
 ; convert signed int (YA) to FAC
 __float_s16_to_fac:
         __enable_basic_if_needed           ; enable BASIC (trashes X)
         jsr BASIC_s16_to_FAC
         __return_with_cleanup
-       
-; get C-parameter (unsigned short), convert to FAC          
+
+; get C-parameter (unsigned short), convert to FAC
 ___float_u16_to_fac:
         ;a: low x: high
         tay
         txa
         ;y: low a: high
-        
+
 __float_u16_to_fac:
         sta FAC_MANTISSA0
         sty FAC_MANTISSA1
@@ -116,7 +116,7 @@ __float_fac_to_u16:
         ldx FAC_MANTISSA2
         lda FAC_MANTISSA3
         rts
-        
+
 ;---------------------------------------------------------------------------------------------
 ; converter float to string and back
 ;---------------------------------------------------------------------------------------------
@@ -150,9 +150,9 @@ ___float_float_to_fac:
         sta FAC_MANTISSA1   ; 3
         stx FAC_MANTISSA0   ; 2
         ldy sreg            ; 1
-        sty FAC_EXPONENT    
+        sty FAC_EXPONENT
         ldy sreg+1          ; 0
-        sty FAC_SIGN        
+        sty FAC_SIGN
 
         ldx #$00
         stx FAC_MANTISSA2
@@ -164,7 +164,7 @@ ___float_float_to_fac:
         stx FAC_MANTISSA1   ; 2
         lda sreg            ; 1
         ora #$80
-        sta FAC_MANTISSA0   
+        sta FAC_MANTISSA0
 
         ; bit7=0 sign=0
         ; bit7=1 sign=$ff
@@ -176,7 +176,7 @@ ___float_float_to_fac:
         stx FAC_SIGN
 
         ldy sreg+1          ; 0
-        sty FAC_EXPONENT    
+        sty FAC_EXPONENT
 
         ldx #$00
         stx FAC_MANTISSA3
@@ -213,9 +213,9 @@ ___float_float_to_fac:
         stx FAC_ROUNDING
 .endif
         rts
-        
-; load BASIC float into FAC        
-; in: pointer (a/x) to BASIC float (not packed)        
+
+; load BASIC float into FAC
+; in: pointer (a/x) to BASIC float (not packed)
 __float_float_to_fac:   ; only used in ATAN2?
         sta ptr1
         stx ptr1+1
@@ -251,7 +251,7 @@ ___float_float_to_fac_arg:
 ___float_float_to_arg:
         ldy #$03
         jsr ldeaxysp
-        
+
 .if BINARYFORMAT = BINARYFORMAT_CBM_UNPACKED
         sta ARG_MANTISSA1   ; 3
         stx ARG_MANTISSA0   ; 2
@@ -273,8 +273,8 @@ ___float_float_to_arg:
         stx ARG_MANTISSA1   ; 2
         lda sreg            ; 1
         ora #$80
-        sta ARG_MANTISSA0   
-        
+        sta ARG_MANTISSA0
+
         ; bit7=0 sign=0
         ; bit7=1 sign=$ff
         ldx #0
@@ -283,13 +283,13 @@ ___float_float_to_arg:
         dex
 @pos:
         stx ARG_SIGN
-        
+
         ldy sreg+1          ; 0
-        sty ARG_EXPONENT    
+        sty ARG_EXPONENT
 
         ldx #$00
         stx ARG_MANTISSA3
-        
+
         lda ARG_SIGN
         eor FAC_SIGN
         sta FAC_SIGN_COMPARE ; sign compare
@@ -332,7 +332,7 @@ ___float_float_to_arg:
         jmp incsp4
 
 ; load BASIC float into ARG
-; in: pointer (a/x) to BASIC float (not packed)        
+; in: pointer (a/x) to BASIC float (not packed)
 __float_float_to_arg:   ; only used in ATAN2?
         sta ptr1
         stx ptr1+1
@@ -358,7 +358,7 @@ __float_float_to_arg:   ; only used in ATAN2?
         eor FAC_SIGN
         sta FAC_SIGN_COMPARE
         rts
-        
+
 ; return to C, float as unsigned long
 ___float_fac_to_float:
 .if BINARYFORMAT = BINARYFORMAT_CBM_UNPACKED
@@ -368,11 +368,11 @@ ___float_fac_to_float:
         sta sreg            ; 1
         ldx FAC_MANTISSA0   ; 2
         lda FAC_MANTISSA1   ; 3
-.endif        
+.endif
 .if BINARYFORMAT = BINARYFORMAT_CBM_PACKED
         lda FAC_EXPONENT
         sta sreg+1          ; 0
-        
+
         ; use the MSB of the mantissa for the sign
         lda FAC_SIGN        ; either $ff or $00
         ora #$7f            ; ->     $ff or $7f
@@ -381,7 +381,7 @@ ___float_fac_to_float:
 
         ldx FAC_MANTISSA1   ; 2
         lda FAC_MANTISSA2   ; 3
-.endif        
+.endif
 .if BINARYFORMAT = BINARYFORMAT_IEEE754
         ; return float in a/x/sreg/sreg+1
         lda FAC_EXPONENT
@@ -402,10 +402,10 @@ ___float_fac_to_float:
         ldx FAC_MANTISSA1   ; 2
         lda FAC_MANTISSA2   ; 3 lsb
 
-.endif        
-        rts        
+.endif
+        rts
 
-;; store float in memory        
+;; store float in memory
 ;; in: dest. pointer (a/x), float in FAC
 ;__float_fac_to_float:   ; UNUSED
 ;        sta ptr1
@@ -430,8 +430,8 @@ ___float_fac_to_float:
 ;        sta (ptr1),y
 ;        rts
 
-;; store packed float in memory        
-;; in: dest. pointer (a/x), float in FAC        
+;; store packed float in memory
+;; in: dest. pointer (a/x), float in FAC
 ;__float_fac_to_float_packed:    ; UNUSED
 ;        sta ptr1
 ;        stx ptr1+1
@@ -454,8 +454,8 @@ ___float_fac_to_float:
 ;        lda FAC_EXPONENT
 ;        sta (ptr1),y
 ;        rts
-        
-;; store packed float in memory        
+
+;; store packed float in memory
 ;; in: dest. pointer (a/x), float in ARG
 __float_arg_to_float_packed:
         sta ptr1
@@ -479,7 +479,7 @@ __float_arg_to_float_packed:
         lda ARG_EXPONENT
         sta (ptr1),y
         rts
-        
+
 ;---------------------------------------------------------------------------------------------
 
         .export __ftostr
@@ -512,10 +512,10 @@ __float_strbuf_to_string:
         rts
 
         .export __strtof
-        
-; convert a string to a float        
-; float __fastcall__ _strtof(char *d);        
-;-> unsigned long __fastcall__ _strtof(char *d);        
+
+; convert a string to a float
+; float __fastcall__ _strtof(char *d);
+;-> unsigned long __fastcall__ _strtof(char *d);
 __strtof:
         jsr ___float_str_to_fac
         jmp ___float_fac_to_float
@@ -530,7 +530,7 @@ __strtof:
         jmp ___float_fac_to_float
 
         .export __utof
-        
+
 ; convert unsigned char to float
 ; float __fastcall__ _utof(unsigned char v);
 ;-> unsigned long __fastcall__ _utof(unsigned char v);
@@ -539,7 +539,7 @@ __strtof:
         jmp ___float_fac_to_float
 
         .export __stof
-        
+
 ; convert short to float
 ; float __fastcall__ _stof(unsigned short v);
 ;-> unsigned long __fastcall__ _stof(unsigned short v);
@@ -558,7 +558,7 @@ __strtof:
         jmp ___float_fac_to_float
 
         .export __ftoi
-        
+
 ; convert float to integer
 ; int __fastcall__ _ftoi(float f);
 ;-> int __fastcall__ _ftoi(unsigned long f);
@@ -596,11 +596,11 @@ __fsqr:    __ffunc1 BASIC_FAC_Sqr
 __ftan:    __ffunc1 BASIC_FAC_Tan
 __fnot:    __ffunc1 BASIC_FAC_Not
 __fround:  __ffunc1 BASIC_FAC_Round     ; rounding
-        
+
 ;---------------------------------------------------------------------------------------------
 ; these functions take two args (in FAC and ARG) and return result (in FAC)
 ;---------------------------------------------------------------------------------------------
-        
+
 __float_ret2:
 
         ;jsr __basicoff
@@ -625,11 +625,11 @@ __float_ret2:
         jsr addr
         jmp __float_ret2
 .endmacro
-        
+
         .export __fadd, __fsub, __fmul, __fdiv, __fpow
 
-; float __fastcall__ _fadd(float f, float a);        
-;-> unsigned long __fastcall__ _fadd(unsigned long f, unsigned long a);        
+; float __fastcall__ _fadd(float f, float a);
+;-> unsigned long __fastcall__ _fadd(unsigned long f, unsigned long a);
 __fadd:   __ffunc2a BASIC_ARG_FAC_Add
 __fsub:   __ffunc2a BASIC_ARG_FAC_Sub
 __fmul:   __ffunc2a BASIC_ARG_FAC_Mul
@@ -640,7 +640,7 @@ __fpow:   __ffunc2a BASIC_ARG_FAC_Pow
 
 __fand:   __ffunc2b BASIC_ARG_FAC_And
 __for:    __ffunc2b BASIC_ARG_FAC_Or
-        
+
 __float_ret3:
         ;jsr __basicoff
 .if .defined(__C64__)
@@ -649,17 +649,17 @@ __float_ret3:
         cli
 .endif
         ldx #0
-        rts  
-        
+        rts
+
         .bss
-        
+
 tempfloat:
         .res 5
 
         .SEGMENT "LOWCODE"
-        
+
         .export __fcmp
-        
+
 __fcmp:
         jsr ___float_float_to_fac_arg
         lda #<tempfloat
@@ -675,7 +675,7 @@ ___float_cmp_fac_arg:
         jmp __float_ret3
 
         .export __ftestsgn
-        
+
 __ftestsgn:
         jsr ___float_float_to_fac
 ;___float_testsgn_fac:
@@ -683,7 +683,7 @@ __ftestsgn:
         ; in: FAC(x1)
         jsr BASIC_FAC_testsgn
         jmp __float_ret3
-        
+
 ___float_testsgn_fac:
         lda FAC_EXPONENT
         beq @s
@@ -733,9 +733,9 @@ __fpoly2:
         __enable_basic_if_needed
         jsr BASIC_FAC_Poly1
         jmp __float_ret2
-        
+
 ;---------------------------------------------------------------------------------------------
-        
+
 __float_atn_fac:
         __enable_basic_if_needed
         jsr BASIC_FAC_Atn
@@ -750,7 +750,7 @@ __float_add_fac_arg:
         lda FAC_EXPONENT
         jsr BASIC_ARG_FAC_Add
         __return_with_cleanup
-        
+
 __float_swap_fac_arg:           ; only used in ATAN2
         lda   FAC_EXPONENT
         ldx   ARG_EXPONENT
@@ -777,7 +777,7 @@ __float_swap_fac_arg:           ; only used in ATAN2
         stx   FAC_SIGN
         sta   ARG_SIGN
         rts
-        
+
         .export __fneg
 __fneg:
         jsr ___float_float_to_fac
@@ -789,8 +789,8 @@ __fneg:
         sta FAC_SIGN
 @sk:
         jmp ___float_fac_to_float
-        
-        
+
+
 __f_pi2:  .byte $81,$80+$49,$0f,$da,$a1,$00
 __f_pi:   .byte $82,$80+$49,$0f,$da,$a1,$00
 __f_1pi2: .byte $83,$80+$16,$cb,$e3,$f9,$00
@@ -846,4 +846,4 @@ __fatan2:
                         ldx #>__f_1pi2
                         jsr __float_float_to_fac
                         jmp __float_ret2
-        
+

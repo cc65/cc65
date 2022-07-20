@@ -5,4 +5,4 @@ ftossubeax:
     ; FIXME
     lda #0
     tax
-    rts 
+    rts

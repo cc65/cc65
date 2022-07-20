@@ -1,5 +1,5 @@
     .include "wozfp.inc"
-    
+
     .export ftoseqeax
 ftoseqeax:
     ; FIXME

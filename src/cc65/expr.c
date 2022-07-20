@@ -1811,7 +1811,7 @@ static void UnaryOp (ExprDesc* Expr)
     hie10 (Expr);
 
     /* We can only handle integer types */
-    if (!IsClassInt (Expr->Type) 
+    if (!IsClassInt (Expr->Type)
         && !IsClassFloat (Expr->Type)  /* FIXME: float */
     ) {
         Error ("Argument must have integer type");
@@ -2159,7 +2159,7 @@ printf("hie_internal Expr->Type:%s Expr2->Type:%s\n",
                         if (Val2 == 0.0f) {
                             Error ("Division by zero");
                             Expr->V.FVal = FP_D_FromInt(0);
-                        } else 
+                        } else
 #endif
                         {
                             Expr->V.FVal = FP_D_Div(Val1, Val2);

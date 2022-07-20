@@ -169,11 +169,11 @@ void f1(void)
 #if 0
         if(FCMPGT(0x00028000,U16TOF(0)))
         {
-        	if (FCMPGTEQ(var_i,(U16TOF(var_bs+1000)))) break;
+            if (FCMPGTEQ(var_i,(U16TOF(var_bs+1000)))) break;
         }
         else if(FCMPLT(0x00028000,U16TOF(0)))
         {
-        	if (FCMPLTEQ(var_i,(U16TOF(var_bs+1000)))) break;
+            if (FCMPLTEQ(var_i,(U16TOF(var_bs+1000)))) break;
         }
 #endif
 //        var_i=var_i + 0x00028000;
@@ -202,11 +202,11 @@ void testbasicmath(void)
 {
     printf("\ntestbasicmath:\n\n");
     t=123;
-    fd=(float)((int)t); 
+    fd=(float)((int)t);
     fs=_fneg(fd);
-    _ftostr(strbuf,fd);    
+    _ftostr(strbuf,fd);
     printf("123:%s\n",strbuf);
-    _ftostr(strbuf,fs);    
+    _ftostr(strbuf,fs);
     printf("-123:%s\n",strbuf);
 
     a = (float)(4321);
@@ -227,37 +227,37 @@ void testbasicmath(void)
     _ftoa(strbuf, c1);
     printf("1111-2222:%s\n", strbuf);
 
-    fd=(float)((int)t); 
-    fs=(float)((int)2); 
+    fd=(float)((int)t);
+    fs=(float)((int)2);
     fd=fd / fs;
-    _ftostr(strbuf,fd);    
+    _ftostr(strbuf,fd);
     printf("t:%s\n",strbuf);
 
     // 1234 / 60 = 20,5666...
     t=1234;
-    fd=(float)((int)t); 
-    fs=(float)((int)60); 
+    fd=(float)((int)t);
+    fs=(float)((int)60);
     fd=fd / fs;
-    _ftostr(strbuf,fd);    
+    _ftostr(strbuf,fd);
     printf("t:%s\n",strbuf);
 
     // 5678 / 60 = 94,6333...
     t=5678;
-    fd=(float)((int)t); 
-    fs=(float)((int)60); 
+    fd=(float)((int)t);
+    fs=(float)((int)60);
     fd=fd / fs;
-    _ftostr(strbuf,fd);    
+    _ftostr(strbuf,fd);
     printf("t:%s\n",strbuf);
 
     // ! operator DOES work on floats!
-    fd=(float)((int)4); 
+    fd=(float)((int)4);
     fd=!fd;
-    _ftostr(strbuf,!fd);    
+    _ftostr(strbuf,!fd);
     printf("!!4:%s\n",strbuf);
 
-    fd=(float)((int)0); 
+    fd=(float)((int)0);
     fd=!fd;
-    _ftostr(strbuf,!fd);    
+    _ftostr(strbuf,!fd);
     printf("!!0:%s\n",strbuf);
 
     a = 10.0f;

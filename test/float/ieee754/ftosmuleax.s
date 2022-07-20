@@ -7,6 +7,6 @@
          .import         popax
 
     .export ftosmuleax
-ftosmuleax: 
+ftosmuleax:
     ; FIXME
-    rts 
+    rts

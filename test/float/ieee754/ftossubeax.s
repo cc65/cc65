@@ -7,11 +7,11 @@
     .include "ieee754.inc"
 
     .import ftosaddeax
-    
+
     .export ftossubeax
 ftossubeax:
     ; FIXME
-    rts 
+    rts
 
 ; found at https://github.com/CrashAndSideburns/6502ieee754/blob/main/arithmetic/addition.s
 ; subtraction:

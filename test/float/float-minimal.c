@@ -55,7 +55,7 @@ int main(void)
 #if 1
     printf("(local) get address, read via ptr\n");
     fp2 = 23.1234f;
-    
+
     // get address of local
     p = (uintptr_t)&fp2;
     fp_p = (float*)p;

@@ -49,4 +49,4 @@ float __fastcall__ _fatan2(float x, float y);
 float ffloor(float x);
 
 #endif /* _MATH_H_ */
- 
+

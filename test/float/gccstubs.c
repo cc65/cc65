@@ -24,7 +24,7 @@ char *_ftostr(char *d, float s)
     return d;
 }
 
-char *_ftoa(char *d, float s) 
+char *_ftoa(char *d, float s)
 {
     if (d == NULL) {
         d = &buffer[0];

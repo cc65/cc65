@@ -7,6 +7,6 @@
          .import         popax
 
     .export ftosdiveax
-ftosdiveax: 
+ftosdiveax:
     ; FIXME
-    rts 
+    rts

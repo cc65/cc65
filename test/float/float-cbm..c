@@ -73,7 +73,7 @@ void testconversions(void)
     printf("b:0x%08lx  ", ftobin(b));
     n=(int)(b);
     printf("n:%d\n", n);
-    
+
     b=atof("1234");
     printf("b:0x%08lx  ", ftobin(b));
     n=(int)(b);
@@ -83,7 +83,7 @@ void testconversions(void)
     printf("s:%s\n", strbuf);
 
     printf("a:%s\n", _ftostr(strbuf, (float)(1234)));
-    
+
     printf("a:%s b:%s c:%s\n",
            _ftostr(strbuf, (float)(1234)),
            _ftostr(strbuf2, (float)(5678)),
@@ -127,7 +127,7 @@ void testcompare(void)
     cgetc();
 #endif
 }
- 
+
 int main(void)
 {
     printf("sizeof (float): %d\n", (int)sizeof(float));

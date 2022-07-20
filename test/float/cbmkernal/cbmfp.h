@@ -41,7 +41,7 @@ typedef struct {
  *
  * The exponent can be computed from bits 47-40 by subtracting 129 (!) (130 = 2^1)
  * MSB of the Mantissa must always be 1, if it is 0 the value is 0
- * 
+ *
  * 1.0 = exp=129, mantissa=$80
  *
  */

@@ -8,42 +8,42 @@
 
 ; Primary = TOS + Primary (like tosaddeax)
     .export ftosaddeax
-;ftosaddeax: 
+;ftosaddeax:
     ; FIXME
-;    rts 
+;    rts
 
 ; CC65 runtime: long add
 
 ; ; EAX = TOS + EAX
-; 
+;
 ; ;tosadd0ax:
 ;         ldy     #$00
 ;         sty     sreg
 ;         sty     sreg+1
-; 
+;
 ; ;tosaddeax:
 ;         clc
 ;         ldy     #0
 ;         adc     (sp),y          ; lo byte
 ;         iny
-; 
+;
 ;         sta     tmp1            ; use as temp storage
 ;         txa
 ;         adc     (sp),y          ; byte 1
 ;         tax
 ;         iny
-; 
+;
 ;         lda     sreg
 ;         adc     (sp),y          ; byte 2
 ;         sta     sreg
 ;         iny
-; 
+;
 ;         lda     sreg+1
 ;         adc     (sp),y          ; byte 3
 ;         sta     sreg+1
 ;         lda     tmp1            ; load byte 0
 ;         jmp     addysp1         ; drop TOS
-    
+
 
 ; found at https://github.com/CrashAndSideburns/6502ieee754/blob/main/arithmetic/addition.s
 
@@ -51,7 +51,7 @@
 ftosaddeax:
     ; arg0:     a/x/sreg/sreg+1
     ; arg1:     (sp),y (y=0..3)
-    
+
     lda #0
     sta SIGN_ONE
     sta SIGN_TWO
@@ -64,7 +64,7 @@ ftosaddeax:
     lda sreg+0
     ROL
     STA MANTISSA_TWO + 2
-    
+
     ; Pull MSB of mantissa off of stack and shift exponent LSB into carry.
     tax
     ROL
@@ -111,7 +111,7 @@ ftosaddeax:
   ROR MANTISSA_TWO + 1
   ROR MANTISSA_TWO + 2
   ROR MANTISSA_TWO + 3
-  
+
 @add_first_implicit_bit:
   LDA EXPONENT_ONE
   CMP #$00
@@ -216,7 +216,7 @@ ftosaddeax:
 ;   PHA
 ;   PHA
 ;   PHA
-  
+
   LDA #$ff
   sta sreg+1
   sta sreg
@@ -633,5 +633,5 @@ ftosaddeax:
   LDA MANTISSA_ONE + 3
   jmp     addysp1         ; drop TOS
 
-  RTS    
-    
+  RTS
+

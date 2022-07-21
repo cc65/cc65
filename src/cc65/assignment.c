@@ -31,7 +31,7 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
+//#define DEBUG
 
 /* cc65 */
 #include "asmcode.h"
@@ -47,7 +47,13 @@
 #include "typecmp.h"
 #include "typeconv.h"
 
-
+#ifdef DEBUG
+#define LOG(x)  printf  x
+#define FIXME(x)  printf  x
+#else
+#define LOG(x)
+#define FIXME(x)
+#endif
 
 /*****************************************************************************/
 /*                                   Data                                    */
@@ -434,7 +440,7 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
     unsigned Flags;
     int MustScale;
 
-    printf("OpAssignArithmetic (Gen=%d)\n", (int)Gen);
+    LOG(("OpAssignArithmetic (Gen=%d)\n", (int)Gen));
 
     ED_Init (&Expr2);
     Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
@@ -464,9 +470,9 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
         /* If necessary, load the value into the primary register */
         LoadExpr (CF_NONE, &Expr2);
 
-printf("OpAssignArithmetic (0) 2 lhs: %s rhs: %s\n",
-       (TypeOf (Expr->Type) == CF_FLOAT) ? "float" : "int",
-       (TypeOf (Expr2.Type) == CF_FLOAT) ? "float" : "int");
+        LOG(("OpAssignArithmetic (0) 2 lhs: %s rhs: %s\n",
+            (TypeOf (Expr->Type) == CF_FLOAT) ? "float" : "int",
+            (TypeOf (Expr2.Type) == CF_FLOAT) ? "float" : "int"));
     } else {
 
         /* Load the original value if necessary */
@@ -567,7 +573,7 @@ void OpAssign (const GenDesc* Gen, ExprDesc* Expr, const char* Op)
 {
     const Type* ltype = Expr->Type;
 
-    printf("OpAssign\n");
+    LOG(("OpAssign\n"));
 
     ExprDesc Expr2;
     ED_Init (&Expr2);

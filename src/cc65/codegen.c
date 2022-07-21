@@ -39,6 +39,8 @@
 #include <string.h>
 #include <stdarg.h>
 
+//#define DEBUG
+
 /* common */
 #include "addrsize.h"
 #include "check.h"
@@ -64,7 +66,13 @@
 #include "util.h"
 #include "codegen.h"
 
-
+#ifdef DEBUG
+#define LOG(x)  printf  x
+#define FIXME(x)  printf  x
+#else
+#define LOG(x)
+#define FIXME(x)
+#endif
 
 /*****************************************************************************/
 /*                                  Helpers                                  */
@@ -689,15 +697,19 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes)
 /*                           Fetching memory cells                           */
 /*****************************************************************************/
 
-//void _g_getimmed (unsigned Flags, uintptr_t Val, long Offs, char *file, int line);
+#ifdef DEBUG
 #define g_getimmed(a,b,c) _g_getimmed((a),(b),(c),(__FILE__),(__FUNCTION__),(__LINE__))
-
 void _g_getimmed(unsigned Flags, uintptr_t Val, long Offs, char *file, char *func, int line)
+#else
+#define g_getimmed(a,b,c) _g_getimmed((a),(b),(c))
+void _g_getimmed(unsigned Flags, uintptr_t Val, long Offs)
+#endif
 /* Load a constant into the primary register */
 {
     unsigned char B1, B2, B3, B4;
     unsigned      Done;
-printf("g_getimmed %s:%d:%s Flags:%04x Val: %08x Offs:%04x\n", file, line, func, Flags, Val, Offs);
+
+    LOG(("g_getimmed %s:%d:%s Flags:%04x Val: %08x Offs:%04x\n", file, line, func, Flags, Val, Offs));
 
     if ((Flags & CF_CONST) != 0) {
 
@@ -716,7 +728,8 @@ printf("g_getimmed %s:%d:%s Flags:%04x Val: %08x Offs:%04x\n", file, line, func,
                 break;
 
             case CF_FLOAT:  /* FIXME float - handle like long here */
-printf("g_getimmed CF_FLOAT Val: %08lx\n", Val);
+
+            LOG(("g_getimmed CF_FLOAT Val: %08lx\n", Val));
             case CF_LONG:
                 /* Split the value into 4 bytes */
                 B1 = (unsigned char) (Val >>  0);
@@ -899,7 +912,7 @@ void g_getind (unsigned Flags, unsigned Offs)
 ** into the primary register
 */
 {
-    printf("g_getind flags:%04x offs:%04x\n", Flags, Offs);
+    LOG(("g_getind flags:%04x offs:%04x\n", Flags, Offs));
     /* If the offset is greater than 255, add the part that is > 255 to
     ** the primary. This way we get an easy addition and use the low byte
     ** as the offset
@@ -1106,7 +1119,7 @@ void g_putstatic (unsigned flags, uintptr_t label, long offs)
 void g_putlocal (unsigned Flags, int Offs, long Val)
 /* Put data into local object. */
 {
-    printf("g_putlocal Flags:%04x Offs:%d val: %ld\n", Flags, Offs, Val);
+    LOG(("g_putlocal Flags:%04x Offs:%d val: %ld\n", Flags, Offs, Val));
     Offs -= StackPtr;
     CheckLocalOffs (Offs);
     switch (Flags & CF_TYPEMASK) {
@@ -1324,7 +1337,7 @@ static void g_regchar (unsigned Flags)
 void g_regint (unsigned Flags)
 /* Make sure, the value in the primary register is an int. Convert if necessary */
 {
-    printf("g_regint flags: %04x\n", Flags);
+    LOG(("g_regint flags: %04x\n", Flags));
     switch (Flags & CF_TYPEMASK) {
 
         case CF_CHAR:
@@ -1408,7 +1421,7 @@ void g_reglong (unsigned Flags)
 void g_regfloat (unsigned Flags)
 /* Make sure, the value in the primary register is a float. Convert if necessary */
 {
-    printf("g_regfloat flags: %04x\n", Flags);
+    LOG(("g_regfloat flags: %04x\n", Flags));
     switch (Flags & CF_TYPEMASK) {
 
         case CF_CHAR:
@@ -1498,11 +1511,11 @@ unsigned g_typeadjust (unsigned lhs, unsigned rhs)
         return const_flag | CF_FLOAT;
     }
     if (ltype == CF_FLOAT) {
-        printf("FIXME: conversion to float format missing\n");
+        FIXME(("FIXME: conversion to float format missing\n"));
         return (lhs & CF_CONST) | CF_FLOAT;
     }
     if (rtype == CF_FLOAT) {
-        printf("FIXME: conversion to float format missing\n");
+        FIXME("FIXME: conversion to float format missing\n");
         return (rhs & CF_CONST) | CF_FLOAT;
     }
 
@@ -1597,11 +1610,11 @@ unsigned g_typecast (unsigned lhs, unsigned rhs)
 ** by the lhs value. Return the result value.
 */
 {
-printf("g_typecast 2 rhs: %s lhs: %s (rhs is %s)\n",
-       ((rhs & CF_TYPEMASK) == CF_FLOAT) ? "float" : "int",
-       ((lhs & CF_TYPEMASK) == CF_FLOAT) ? "float" : "int",
-       ((rhs & CF_CONST) == 0) ? "not const" : "const"
-       );
+    LOG(("g_typecast 2 rhs: %s lhs: %s (rhs is %s)\n",
+        ((rhs & CF_TYPEMASK) == CF_FLOAT) ? "float" : "int",
+        ((lhs & CF_TYPEMASK) == CF_FLOAT) ? "float" : "int",
+        ((rhs & CF_CONST) == 0) ? "not const" : "const"
+    ));
     /* Check if a conversion is needed */
     if ((rhs & CF_CONST) == 0) {
         switch (lhs & CF_TYPEMASK) {
@@ -2531,7 +2544,7 @@ void g_push (unsigned flags, unsigned long val)
 void g_push_float (unsigned flags, float val)
 /* Push the primary register or a constant value onto the stack */
 {
-//    printf("g_push_float flags:%04x val:%f\n", flags, val);
+//    LOG(("g_push_float flags:%04x val:%f\n", flags, val));
     /* Push the primary register */
     switch (flags & CF_TYPEMASK) {
 
@@ -2539,11 +2552,18 @@ void g_push_float (unsigned flags, float val)
             /* Value is not 16 bit or not constant */
 //            if (flags & CF_CONST)
             {
-                float f = val;
+//                float f = val;
+#if 0
                 uintptr_t *p = &val; /* FIXME: float - we shouldnt do this :) */
                 /* Constant 32 bit value, load into eax */
-                printf("g_push_float flags:%04x f:%p\n", flags, *p);
+                LOG(("g_push_float flags:%04x f:%p\n", flags, *p));
                 g_getimmed (flags | CF_CONST, *p, 0); // ?? FIXME
+#else
+                uint32_t *p = ((uint32_t*)&val); /* FIXME: float - we shouldnt do this :) */
+                /* Constant 32 bit value, load into eax */
+                LOG(("g_push_float flags:%04x f:%p\n", flags, *p));
+                g_getimmed (flags | CF_CONST, *p, 0); // ?? FIXME
+#endif
 //                 g_getimmed (0x41,*p,0);
             }
             AddCodeLine ("jsr pusheax");
@@ -2818,7 +2838,7 @@ void g_mul (unsigned flags, unsigned long val)
         "ftosmuleax"
     };
 
-    printf("g_mul flags:%04x val:%d\n", flags, val);
+    LOG(("g_mul flags:%04x val:%d\n", flags, val));
 
     /* Do strength reduction if the value is constant and a power of two */
     if (flags & CF_CONST) {
@@ -2946,7 +2966,7 @@ void g_div (unsigned flags, unsigned long val)
         "ftosdiveax"
     };
 
-    printf("g_div flags:%04x val:%d\n", flags, val);
+    LOG(("g_div flags:%04x val:%d\n", flags, val));
 
     /* Do strength reduction if the value is constant and a power of two */
     if (flags & CF_CONST) {
@@ -3696,7 +3716,7 @@ void g_inc (unsigned flags, unsigned long val)
    if flags contain CF_FLOAT, then val can be a raw binary float.
 */
 {
-    printf("g_inc flags:%04x val:%08lx\n", flags, val);
+    LOG(("g_inc flags:%04x val:%08lx\n", flags, val));
     /* Don't inc by zero */
     if (val == 0) {
         return;
@@ -3917,7 +3937,7 @@ void g_eq (unsigned flags, unsigned long val)
     };
 
     unsigned L;
-    printf("g_eq flags:%04x val:%ld\n", flags, val);
+    LOG(("g_eq flags:%04x val:%ld\n", flags, val));
     /* If the right hand side is const, the lhs is not on stack but still
     ** in the primary register.
     */
@@ -4698,7 +4718,7 @@ void g_defdata (unsigned flags, uintptr_t val, long offs)
 void g_defdata_float (unsigned flags, uintptr_t val, long offs)
 /* Define data with the size given in flags */
 {
-    printf("g_defdata_float flags:%04x val:%f offs:%04lx\n", flags, (float)val, offs);
+    LOG(("g_defdata_float flags:%04x val:%f offs:%04lx\n", flags, (float)val, offs));
     if (flags & CF_CONST) {
 
         /* Numeric constant */

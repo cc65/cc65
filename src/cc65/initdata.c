@@ -31,10 +31,11 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
+//#define DEBUG
 
 #include <limits.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 
@@ -65,7 +66,13 @@
 #include "typeconv.h"
 #include "initdata.h"
 
-
+#ifdef DEBUG
+#define LOG(x)  printf  x
+#define FIXME(x)  printf  x
+#else
+#define LOG(x)
+#define FIXME(x)
+#endif
 
 /*****************************************************************************/
 /*                                   Data                                    */
@@ -166,8 +173,8 @@ static void DefineData (ExprDesc* Expr)
 {
     int isfloat = (TypeOf (Expr->Type) == CF_FLOAT);
 
-    printf("%s:%d DefineData IVal: %ld V.FVal: %f isfloat:%d %d\n", __FILE__, __LINE__,
-           Expr->IVal, (double)(Expr->V.FVal.V), isfloat, ED_GetLoc (Expr));
+    LOG(("%s:%d DefineData IVal: %ld V.FVal: %f isfloat:%d %d\n", __FILE__, __LINE__,
+           Expr->IVal, (double)(Expr->V.FVal.V), isfloat, ED_GetLoc (Expr)));
     switch (ED_GetLoc (Expr)) {
 
         case E_LOC_NONE:

@@ -2067,6 +2067,8 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
             case TOK_DIV:
                 floatop = 1;
                 break;
+            default:
+                break;
         }
 
         /* FIXME: float ---start end code*/

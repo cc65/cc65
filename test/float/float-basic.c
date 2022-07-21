@@ -63,7 +63,7 @@ int main(void)
 #endif
     /* addition, constant + constant (already tested by minimal) (omitted) */
 #ifdef CONIO
-    cgetc();
+    printf("<key>\n");cgetc();
 #endif
 
 #if 0

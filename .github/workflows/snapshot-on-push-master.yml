@@ -124,5 +124,4 @@ jobs:
           user: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
 
-      # TODO: Update docs at https://github.com/cc65/doc
       # TODO: Publish snapshot zip at https://github.com/cc65/cc65.github.io

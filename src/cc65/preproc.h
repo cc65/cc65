@@ -55,6 +55,11 @@ extern unsigned char Preprocessing;
 
 
 
+void TranslationPhase3 (StrBuf* Source, StrBuf* Target);
+/* Mimic Translation Phase 3. Handle old and new style comments. Collapse
+** non-newline whitespace sequences.
+*/
+
 void Preprocess (void);
 /* Preprocess a line */
 

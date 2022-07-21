@@ -103,6 +103,7 @@
     <ClInclude Include="cc65\macrotab.h" />
     <ClInclude Include="cc65\opcodes.h" />
     <ClInclude Include="cc65\output.h" />
+    <ClInclude Include="cc65\ppexpr.h" />
     <ClInclude Include="cc65\pragma.h" />
     <ClInclude Include="cc65\preproc.h" />
     <ClInclude Include="cc65\reginfo.h" />
@@ -182,6 +183,7 @@
     <ClCompile Include="cc65\main.c" />
     <ClCompile Include="cc65\opcodes.c" />
     <ClCompile Include="cc65\output.c" />
+    <ClCompile Include="cc65\ppexpr.c" />
     <ClCompile Include="cc65\pragma.c" />
     <ClCompile Include="cc65\preproc.c" />
     <ClCompile Include="cc65\reginfo.c" />

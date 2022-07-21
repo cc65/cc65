@@ -48,13 +48,13 @@
 /* cc65 */
 #include "codegen.h"
 #include "error.h"
-#include "expr.h"
 #include "global.h"
 #include "ident.h"
 #include "incpath.h"
 #include "input.h"
 #include "lineinfo.h"
 #include "macrotab.h"
+#include "ppexpr.h"
 #include "preproc.h"
 #include "scanner.h"
 #include "standard.h"
@@ -68,7 +68,7 @@
 
 
 /* Set when the preprocessor calls expr() recursively */
-unsigned char Preprocessing = 0;
+static unsigned char Preprocessing = 0;
 
 /* Management data for #if */
 #define MAX_IFS         256
@@ -97,6 +97,11 @@ struct MacroExp {
 /*****************************************************************************/
 
 
+
+static void TranslationPhase3 (StrBuf* Source, StrBuf* Target);
+/* Mimic Translation Phase 3. Handle old and new style comments. Collapse
+** non-newline whitespace sequences.
+*/
 
 static unsigned Pass1 (StrBuf* Source, StrBuf* Target);
 /* Preprocessor pass 1. Remove whitespace. Handle old and new style comments
@@ -861,7 +866,7 @@ static void DefineMacro (void)
 
 
 
-void TranslationPhase3 (StrBuf* Source, StrBuf* Target)
+static void TranslationPhase3 (StrBuf* Source, StrBuf* Target)
 /* Mimic Translation Phase 3. Handle old and new style comments. Collapse
 ** non-newline whitespace sequences.
 */
@@ -1077,48 +1082,50 @@ static void DoError (void)
 static int DoIf (int Skip)
 /* Process #if directive */
 {
-    /* We're about to abuse the compiler expression parser to evaluate the
-    ** #if expression. Save the current tokens to come back here later.
-    ** NOTE: Yes, this is a hack, but it saves a complete separate expression
-    ** evaluation for the preprocessor.
-    */
-    Token SavedCurTok  = CurTok;
-    Token SavedNextTok = NextTok;
+    PPExpr Expr = AUTO_PPEXPR_INITIALIZER;
 
-    /* Make sure the line infos for the tokens won't get removed */
-    if (SavedCurTok.LI) {
-        UseLineInfo (SavedCurTok.LI);
+    if (!Skip) {
+        /* We're about to use a dedicated expression parser to evaluate the #if
+        ** expression. Save the current tokens to come back here later.
+        */
+        Token SavedCurTok  = CurTok;
+        Token SavedNextTok = NextTok;
+
+        /* Make sure the line infos for the tokens won't get removed */
+        if (SavedCurTok.LI) {
+            UseLineInfo (SavedCurTok.LI);
+        }
+        if (SavedNextTok.LI) {
+            UseLineInfo (SavedNextTok.LI);
+        }
+
+        /* Switch into special preprocessing mode */
+        Preprocessing = 1;
+
+        /* Expand macros in this line */
+        PreprocessLine ();
+
+        /* Add two semicolons as sentinels to the line, so the following
+        ** expression evaluation will eat these two tokens but nothing from
+        ** the following line.
+        */
+        SB_AppendStr (Line, ";;");
+        SB_Terminate (Line);
+
+        /* Load CurTok and NextTok with tokens from the new input */
+        NextToken ();
+        NextToken ();
+
+        /* Call the expression parser */
+        ParsePPExpr (&Expr);
+
+        /* End preprocessing mode */
+        Preprocessing = 0;
+
+        /* Reset the old tokens */
+        CurTok  = SavedCurTok;
+        NextTok = SavedNextTok;
     }
-    if (SavedNextTok.LI) {
-        UseLineInfo (SavedNextTok.LI);
-    }
-
-    /* Switch into special preprocessing mode */
-    Preprocessing = 1;
-
-    /* Expand macros in this line */
-    PreprocessLine ();
-
-    /* Add two semicolons as sentinels to the line, so the following
-    ** expression evaluation will eat these two tokens but nothing from
-    ** the following line.
-    */
-    SB_AppendStr (Line, ";;");
-    SB_Terminate (Line);
-
-    /* Load CurTok and NextTok with tokens from the new input */
-    NextToken ();
-    NextToken ();
-
-    /* Call the expression parser */
-    ExprDesc Expr = NoCodeConstExpr (hie1);
-
-    /* End preprocessing mode */
-    Preprocessing = 0;
-
-    /* Reset the old tokens */
-    CurTok  = SavedCurTok;
-    NextTok = SavedNextTok;
 
     /* Set the #if condition according to the expression result */
     return PushIf (Skip, 1, Expr.IVal != 0);

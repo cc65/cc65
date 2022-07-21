@@ -283,9 +283,12 @@ static void ParseAutoDecl (Declaration* Decl)
 
                 /* Push the value */
                 if (TypeOf (Sym->Type) == CF_FLOAT) {
+#pragma warning( push )
+#pragma warning( disable : 4244 )   // conversion from double to float
                     /* FIXME: float */
                     LOG(("ParseAutoDecl Expr.V.FVal.V: %f\n", Expr.V.FVal.V));
                     g_push_float (Flags | TypeOf (Sym->Type), Expr.V.FVal.V);
+#pragma warning( pop )
                 } else {
                     g_push (Flags | TypeOf (Sym->Type), Expr.IVal);
                 }

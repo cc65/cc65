@@ -31,7 +31,7 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
+//#define DEBUG
 
 /* common */
 #include "shift.h"
@@ -47,7 +47,13 @@
 #include "typecmp.h"
 #include "typeconv.h"
 
-
+#ifdef DEBUG
+#define LOG(x)  printf  x
+#define FIXME(x)  printf  x
+#else
+#define LOG(x)
+#define FIXME(x)
+#endif
 
 /*****************************************************************************/
 /*                                   Code                                    */
@@ -97,10 +103,10 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
 
     /* lvalue? */
     if (ED_IsLVal (Expr)) {
-printf("DoConversion 1 Old: %s New: %s\n",
-       (IsTypeFloat (OldType)) ? "float" : "int",
-       (IsTypeFloat (NewType)) ? "float" : "int"
-       );
+        LOG(("DoConversion 1 Old: %s New: %s\n",
+            (IsTypeFloat (OldType)) ? "float" : "int",
+            (IsTypeFloat (NewType)) ? "float" : "int"
+            ));
         /* We have an lvalue. If the new size is smaller than the old one,
         ** we don't need to do anything. The compiler will generate code
         ** to load only the portion of the value that is actually needed.
@@ -124,10 +130,10 @@ printf("DoConversion 1 Old: %s New: %s\n",
         }
 
     } else if (ED_IsConstAbs (Expr)) {
-printf("DoConversion 2 Old: %s New: %s\n",
-       (IsTypeFloat (OldType)) ? "float" : "int",
-       (IsTypeFloat (NewType)) ? "float" : "int"
-       );
+        LOG(("DoConversion 2 Old: %s New: %s\n",
+            (IsTypeFloat (OldType)) ? "float" : "int",
+            (IsTypeFloat (NewType)) ? "float" : "int"
+            ));
 
         /* A cast of a constant numeric value to another type. Be sure
         ** to handle sign extension correctly.
@@ -137,11 +143,11 @@ printf("DoConversion 2 Old: %s New: %s\n",
         if (IsTypeFloat (OldType) && !IsTypeFloat (NewType)) {
             OldBits = 32;
             Expr->IVal = FP_D_ToLong(Expr->V.FVal);
-            printf("DoConversion 2 new ival: %ld\n", Expr->IVal);
+            LOG(("DoConversion 2 new ival: %ld\n", Expr->IVal));
         } else if (!IsTypeFloat (OldType) && IsTypeFloat (NewType)) {
             OldBits = 0;
             Expr->V.FVal = FP_D_FromInt(Expr->IVal);
-            printf("DoConversion 2 new fval: %f\n", Expr->V.FVal.V);
+            LOG(("DoConversion 2 new fval: %f\n", Expr->V.FVal.V));
         }
         /* FIXME: float --- end of new code */
 
@@ -149,7 +155,7 @@ printf("DoConversion 2 Old: %s New: %s\n",
         ** has a larger range, things are OK, since the value is
         ** internally already represented by a long.
         */
-        printf("DoConversion 2 NewBits: %d OldBits: %d\n", NewBits, OldBits);
+        LOG(("DoConversion 2 NewBits: %d OldBits: %d\n", NewBits, OldBits));
         if (NewBits <= OldBits) {
 
             /* Cut the value to the new size */
@@ -165,9 +171,9 @@ printf("DoConversion 2 Old: %s New: %s\n",
         }
 
         if (IsTypeFloat (NewType)) {
-            printf("DoConversion 2 new fval: %f\n", Expr->V.FVal.V);
+            LOG(("DoConversion 2 new fval: %f\n", Expr->V.FVal.V));
         } else {
-            printf("DoConversion 2 new ival: %ld\n", Expr->IVal);
+            LOG(("DoConversion 2 new ival: %ld\n", Expr->IVal));
         }
 
         /* Do the integer constant <-> absolute address conversion if necessary */
@@ -180,10 +186,10 @@ printf("DoConversion 2 Old: %s New: %s\n",
         }
 
     } else {
-printf("DoConversion 3 Old: %s New: %s\n",
-       (IsTypeFloat (OldType)) ? "float" : "int",
-       (IsTypeFloat (NewType)) ? "float" : "int"
-       );
+        LOG(("DoConversion 3 Old: %s New: %s\n",
+            (IsTypeFloat (OldType)) ? "float" : "int",
+            (IsTypeFloat (NewType)) ? "float" : "int"
+            ));
 
         /* The value is not a constant. If the sizes of the types are
         ** not equal, add conversion code. Be sure to convert chars

@@ -4,7 +4,7 @@
 ** 2020-11-20, Greg King
 */
 
-
+//#define DEBUG
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,7 +40,13 @@
 #include "typeconv.h"
 #include "expr.h"
 
-
+#ifdef DEBUG
+#define LOG(x)  printf  x
+#define FIXME(x)  printf  x
+#else
+#define LOG(x)
+#define FIXME(x)
+#endif
 
 /*****************************************************************************/
 /*                                   Data                                    */
@@ -2044,7 +2050,7 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
     int rconst;                         /* Right operand is a constant */
     int floatop = 0;
 
-//printf("hie_internal\n");
+//LOG(("hie_internal\n"));
     ExprWithCheck (hienext, Expr);
 
     *UsedGen = 0;
@@ -2124,7 +2130,7 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
             ) {
             Error ("RHS Integer expression expected (hie_internal)");
         }
-printf("hie_internal lconst:%d rconst:%d\n", lconst, rconst);
+        LOG(("hie_internal lconst:%d rconst:%d\n", lconst, rconst));
         /* Check for const operands */
         if (lconst && rconst) {
 
@@ -2135,14 +2141,14 @@ printf("hie_internal lconst:%d rconst:%d\n", lconst, rconst);
             Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
 
             /* FIXME: float --- newcode start */
-printf("hie_internal Expr->Type:%s Expr2->Type:%s\n",
+LOG(("hie_internal Expr->Type:%s Expr2->Type:%s\n",
        (IsClassFloat (Expr->Type) == CF_FLOAT) ? "float" : "int",
        (IsClassFloat (Expr2.Type) == CF_FLOAT) ? "float" : "int"
-       );
-printf("hie_internal Expr->Type:%s Expr2->Type:%s\n",
+       ));
+LOG(("hie_internal Expr->Type:%s Expr2->Type:%s\n",
        (Expr->Type == type_float) ? "float" : "int",
        (Expr2.Type == type_float) ? "float" : "int"
-       );
+       ));
 
             /* FIXME: float */
             /* FIXME: right now this works only when both rhs and lhs are float,
@@ -2154,7 +2160,7 @@ printf("hie_internal Expr->Type:%s Expr2->Type:%s\n",
                 /* Evaluate the result for float operands */
                 Double Val1 = Expr->V.FVal;
                 Double Val2 = Expr2.V.FVal;
-                printf("hie_internal float X float\n");
+                LOG(("hie_internal float X float\n"));
                 switch (Tok) {
                     case TOK_DIV:
 #if 0 // TODO
@@ -2175,7 +2181,7 @@ printf("hie_internal Expr->Type:%s Expr2->Type:%s\n",
                 }
             /* FIXME: float --- newcode end */
             } else {
-                printf("hie_internal signed int X signed int\n");
+                LOG(("hie_internal signed int X signed int\n"));
                 /* Handle the op differently for signed and unsigned types */
                 if (IsSignSigned (Expr->Type)) {
 
@@ -2215,7 +2221,7 @@ printf("hie_internal Expr->Type:%s Expr2->Type:%s\n",
                             Internal ("hie_internal: got token 0x%X\n", Tok);
                     }
                 } else {
-                printf("hie_internal unsigned int X unsigned int\n");
+                LOG(("hie_internal unsigned int X unsigned int\n"));
 
                     /* Evaluate the result for unsigned operands */
                     unsigned long Val1 = Expr->IVal;
@@ -2373,7 +2379,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
         if (ED_IsConstAbs (Expr)) {
             /* Numeric constant value */
             GetCodePos (&Mark2);
-//            printf("iVal:%08x FVal:%f\n", Expr->IVal, Expr->V.FVal.V);
+//            LOG(("iVal:%08x FVal:%f\n", Expr->IVal, Expr->V.FVal.V));
             g_push (ltype | CF_CONST, Expr->IVal);
         } else {
             /* Value not numeric constant */
@@ -2838,11 +2844,11 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                 flags = CF_INT;
             } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassFloat (rhst)) {
                 /* FIXME: float addition (const + const) */
-                printf("%s:%d float addition (const + const)\n", __FILE__, __LINE__);
+                LOG(("%s:%d float addition (const + const)\n", __FILE__, __LINE__));
                 /* Integer addition */
                 flags = CF_FLOAT;
             } else {
-                printf("%s:%d OOPS\n", __FILE__, __LINE__);
+                LOG(("%s:%d OOPS\n", __FILE__, __LINE__));
                 /* OOPS */
                 AddDone = -1;
                 /* Avoid further errors */
@@ -2858,7 +2864,7 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                     Expr->Type = type_float;
                     //Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
                     AddDone = 1;
-                    printf("%s:%d float addition (const + const) res:%f\n", __FILE__, __LINE__,  Expr->V.FVal.V);
+                    LOG(("%s:%d float addition (const + const) res:%f\n", __FILE__, __LINE__,  Expr->V.FVal.V));
                 } else {
                     /* integer + integer */
                     if (ED_IsAbs (&Expr2) &&
@@ -2983,10 +2989,10 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
             } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassFloat (rhst)) {
                 /* Float addition */
                 /*flags |= typeadjust (Expr, &Expr2, 1);*/
-                printf("%s:%d float addition (const + var)\n", __FILE__, __LINE__);
+                LOG(("%s:%d float addition (const + var)\n", __FILE__, __LINE__));
             } else {
                 /* OOPS */
-                printf("%s:%d OOPS\n", __FILE__, __LINE__);
+                LOG(("%s:%d OOPS\n", __FILE__, __LINE__));
                 AddDone = -1;
             }
 
@@ -3080,14 +3086,14 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                 flags = typeadjust (Expr, &Expr2, 1);
             } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassFloat (rhst)) {
                 /* FIXME: float - what to do here exactly? */
-                printf("%s:%d float addition (Expr2.V.FVal.V:%f)\n", __FILE__, __LINE__, Expr2.V.FVal.V);
+                LOG(("%s:%d float addition (Expr2.V.FVal.V:%f)\n", __FILE__, __LINE__, Expr2.V.FVal.V));
                 /* Float addition (variable+constant) */
                 /*flags = typeadjust (Expr, &Expr2, 1);*/
                 flags |= CF_FLOAT;
                 Expr->Type = Expr2.Type;
             } else {
                 /* OOPS */
-                printf("%s:%d OOPS\n", __FILE__, __LINE__);
+                LOG(("%s:%d OOPS\n", __FILE__, __LINE__));
                 AddDone = -1;
             }
 
@@ -3142,7 +3148,7 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                 LoadExpr (CF_NONE, &Expr2);
             } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassFloat (rhst)) {
                 /* FIXME: float - what to do here exactly? */
-                printf("%s:%d float addition (Expr2.V.FVal.V:%f)\n", __FILE__, __LINE__, Expr2.V.FVal.V);
+                LOG(("%s:%d float addition (Expr2.V.FVal.V:%f)\n", __FILE__, __LINE__, Expr2.V.FVal.V));
                 /* Float addition */
                 /* flags = typeadjust (Expr, &Expr2, 0); */
                 flags |= CF_FLOAT;
@@ -3150,7 +3156,7 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                 LoadExpr (CF_NONE, &Expr2);
             } else {
                 /* OOPS */
-                printf("%s:%d OOPS\n", __FILE__, __LINE__);
+                LOG(("%s:%d OOPS\n", __FILE__, __LINE__));
                 AddDone = -1;
                 /* We can't just goto End as that would leave the stack unbalanced */
             }
@@ -3479,7 +3485,7 @@ static void parsesub (ExprDesc* Expr)
         } else if (IsClassFloat (lhst) && IsClassFloat (rhst)) {
             /* Float substraction */
             /* FIXME: float - what to do here exactly? */
-            printf("%s:%d float substraction\n", __FILE__, __LINE__);
+            LOG(("%s:%d float substraction\n", __FILE__, __LINE__));
             /* Adjust operand types */
             /*flags = typeadjust (Expr, &Expr2, 0);*/
             flags = CF_FLOAT;

@@ -31,7 +31,7 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
+//#define DEBUG
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -59,7 +59,13 @@
 #include "standard.h"
 #include "symtab.h"
 
-
+#ifdef DEBUG
+#define LOG(x)  printf  x
+#define FIXME(x)  printf  x
+#else
+#define LOG(x)
+#define FIXME(x)
+#endif
 
 /*****************************************************************************/
 /*                                   data                                    */
@@ -620,7 +626,7 @@ static void NumericConst (void)
         /* Float constant */
         Double FVal = FP_D_FromInt (IVal);      /* Convert to double */
 
-        printf("NumericConst start IVal:%ld FVal: %f\n", IVal, FVal.V);
+        LOG(("NumericConst start IVal:%ld FVal: %f\n", IVal, FVal.V));
 
         /* Check for a fractional part and read it */
         if (CurC == '.') {
@@ -694,7 +700,7 @@ static void NumericConst (void)
             }
         }
 
-        printf("NumericConst end FVal: %f\n", FVal.V);
+        LOG(("NumericConst end FVal: %f\n", FVal.V));
 
         /* Check for a suffix and determine the type of the constant */
         if (toupper (CurC) == 'F') {
@@ -709,7 +715,7 @@ static void NumericConst (void)
         NextTok.Tok  = TOK_FCONST;
 
     }
-    printf("NumericConst exit IsFloat:%d IVal: %ld FVal: %f\n", IsFloat, NextTok.IVal, NextTok.FVal.V);
+    LOG(("NumericConst exit IsFloat:%d IVal: %ld FVal: %f\n", IsFloat, NextTok.IVal, NextTok.FVal.V));
 }
 
 

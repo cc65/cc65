@@ -125,6 +125,7 @@ enum {
     E_LOADED            = 0x1000,       /* Expression is loaded in primary */
     E_CC_SET            = 0x2000,       /* Condition codes are set */
     E_HAVE_MARKS        = 0x4000,       /* Code marks are valid */
+    E_SIDE_EFFECTS      = 0x8000,       /* Expression has had side effects */
 
     /* Optimization hints */
     E_MASK_NEED         = 0x030000,
@@ -180,6 +181,9 @@ enum {
 
     /* Expression result must be known to the compiler and generate no code to load */
     E_EVAL_C_CONST          = E_EVAL_COMPILER_KNOWN | E_EVAL_NO_CODE,
+
+    /* Flags to combine from subexpressions */
+    E_MASK_VIRAL            = E_SIDE_EFFECTS,
 
     /* Flags to keep in subexpressions of most operations other than ternary */
     E_MASK_KEEP_SUBEXPR     = E_MASK_EVAL,
@@ -468,6 +472,16 @@ INLINE int ED_MayHaveNoEffect (const ExprDesc* Expr)
 #endif
 
 #if defined(HAVE_INLINE)
+INLINE void ED_PropagateFrom (ExprDesc* Expr, const ExprDesc* SubExpr)
+/* Propagate viral flags from subexpression */
+{
+    Expr->Flags |= SubExpr->Flags & E_MASK_VIRAL;
+}
+#else
+#  define ED_PropagateFrom(Expr, SubExpr)   (void)((Expr)->Flags |= (SubExpr)->Flags & E_MASK_VIRAL)
+#endif
+
+#if defined(HAVE_INLINE)
 INLINE int ED_IsLocPrimaryOrExpr (const ExprDesc* Expr)
 /* Return true if the expression is E_LOC_PRIMARY or E_LOC_EXPR */
 {
@@ -493,8 +507,7 @@ INLINE int ED_IsAddrExpr (const ExprDesc* Expr)
 INLINE int ED_IsIndExpr (const ExprDesc* Expr)
 /* Check if the expression is a reference to its value */
 {
-    return (Expr->Flags & E_ADDRESS_OF) == 0 &&
-           !ED_IsLocNone (Expr) && !ED_IsLocPrimary (Expr);
+    return (Expr->Flags & E_ADDRESS_OF) == 0 && !ED_IsLocNone (Expr);
 }
 #else
 int ED_IsIndExpr (const ExprDesc* Expr);

@@ -101,6 +101,7 @@ static void LoadAddress (unsigned Flags, ExprDesc* Expr)
             g_leasp (Expr->IVal);
             break;
 
+        case E_LOC_PRIMARY:
         case E_LOC_EXPR:
             if (Expr->IVal != 0) {
                 /* We have an expression in the primary plus a constant
@@ -320,4 +321,8 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
         }
     }
 
+    if (ED_IsLVal (Expr) && IsQualVolatile (Expr->Type)) {
+        /* Expression has had side effects */
+        Expr->Flags |= E_SIDE_EFFECTS;
+    }
 }

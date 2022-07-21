@@ -728,6 +728,7 @@ static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags
                 /* New type must be compatible with the composite prototype */
                 if (IsDistinctRedef (E_Type, T, TC_EQUAL, TCF_MASK_QUAL)) {
                     Error ("Conflicting function types for '%s'", Entry->Name);
+                    TypeCompatibilityDiagnostic (T, E_Type, 0, "'%s' vs '%s'");
                     Entry = 0;
                 } else {
                     /* Refine the existing composite prototype with this new

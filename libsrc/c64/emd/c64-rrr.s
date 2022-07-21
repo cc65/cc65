@@ -53,7 +53,7 @@ Lo_Mem  = $0100 ; location of Lo_Code (must be below $1000 or above $e000)
         .addr   COPYFROM
         .addr   COPYTO
 
-; ------------------------------------------------------------------------        
+; ------------------------------------------------------------------------
 
 .bss
 window: .res 256        ; the memory window (256 bytes)

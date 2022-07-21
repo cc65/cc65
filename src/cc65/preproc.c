@@ -1028,7 +1028,7 @@ static void DoError (void)
 {
     SkipWhitespace (0);
     if (CurC == '\0') {
-        PPError ("Invalid #error directive");
+        PPError ("#error");
     } else {
         PPError ("#error: %s", SB_GetConstBuf (Line) + SB_GetIndex (Line));
     }
@@ -1212,7 +1212,7 @@ static void DoWarning (void)
 {
     SkipWhitespace (0);
     if (CurC == '\0') {
-        PPError ("Invalid #warning directive");
+        PPWarning ("#warning");
     } else {
         PPWarning ("#warning: %s", SB_GetConstBuf (Line) + SB_GetIndex (Line));
     }

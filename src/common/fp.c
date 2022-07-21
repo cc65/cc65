@@ -242,7 +242,8 @@ Double FP_D_Div (Double Left, Double Right)
     return D;
 }
 
-
+#pragma warning( push )
+#pragma warning( disable : 4244 )   // conversion from double to float
 uint32_t FP_D_As32bitRaw(Double Val)
 /* converts double into 32bit (float) and then returns its raw content as a 32bit int */
 {
@@ -254,3 +255,4 @@ uint32_t FP_D_As32bitRaw(Double Val)
     lval = *lptr;
     return lval;
 }
+#pragma warning( pop )

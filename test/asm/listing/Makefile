@@ -15,7 +15,7 @@ else
 endif
 
 ifdef QUIET
-  .SILENT:
+#  .SILENT:
 endif
 
 CA65 := $(if $(wildcard ../../../bin/ca65*),../../../bin/ca65,ca65)
@@ -49,32 +49,81 @@ $(WORKDIR)/$1.bin: $1.s $(ISEQUAL)
 	$(if $(QUIET),echo asm/$1.bin)
 
 #	compile without generating listing
-	$(CA65) -t none -o $$(@:.bin=.o) $$<
-	$(LD65) -t none -o $$@ $$(@:.bin=.o) none.lib
-
-ifneq ($(wildcard $1.bin-ref),)
-	$(ISEQUAL) $1.bin-ref $$@
+ifeq ($(wildcard control/$1.err),)
+	$(CA65) -t none -o $$(@:.bin=.o) $$< > $$(@:.bin=.err) 2>&1
+ifeq ($(wildcard control/$1.no-ld65),)
+	$(LD65) -t none -o $$@ $$(@:.bin=.o) none.lib > $$(@:.bin=.ld65-err) 2>&1
+endif
+else
+	$(CA65) -t none -o $$(@:.bin=.o) $$< > $$(@:.bin=.err) 2>&1 || true
+ifeq ($(wildcard control/$1.no-ld65),)
+	$(LD65) -t none -o $$@ $$(@:.bin=.o) none.lib > $$(@:.bin=.ld65-err) 2>&1  || true
+endif
 endif
 
-	$(CA65) -t none -l $$(@:.bin=.list.orig) -o $$(@:.bin=.list-o) $$<
-	$(LD65) -t none -o $$(@:.bin=.list-bin) $$(@:.bin=.list-o) none.lib
+ifneq ($(wildcard ref/$1.err-ref),)
+	$(ISEQUAL) ref/$1.err-ref $$(@:.bin=.err)
+else
+	$(ISEQUAL) --empty $$(@:.bin=.err)
+endif
+
+ifneq ($(wildcard ref/$1.bin-ref),)
+	$(ISEQUAL) --binary ref/$1.bin-ref $$@
+endif
+
+ifneq ($(wildcard ref/$1.ld65err-ref),)
+	@echo cat $$(@:.bin=.ld65-err)
+	cat $$(@:.bin=.ld65-err)
+	@echo
+	@echo
+	-diff -u ref/$1.ld65err-ref $$(@:.bin=.ld65-err)
+	@echo
+	@echo
+	$(ISEQUAL) --wildcards ref/$1.ld65err-ref $$(@:.bin=.ld65-err)
+else
+ifneq ($(wildcard $(WORKDIR)/$1.ld65-err),)
+	$(ISEQUAL) --empty $$(@:.bin=.ld65-err)
+endif
+endif
+
+#	compile with listing file
+ifeq ($(wildcard control/$1.err),)
+	$(CA65) -t none -l $$(@:.bin=.list-lst) -o $$(@:.bin=.list-o) $$< > $$(@:.bin=.list-err) 2>&1
+ifeq ($(wildcard control/$1.no-ld65),)
+	$(LD65) -t none -o $$(@:.bin=.list-bin) $$(@:.bin=.list-o) none.lib > $$(@:.bin=.list-ld65-err) 2>&1
+endif
+else
+	$(CA65) -t none -l $$(@:.bin=.list-lst) -o $$(@:.bin=.list-o) $$< > $$(@:.bin=.list-err) 2>&1 || true
+ifeq ($(wildcard control/$1.no-ld65),)
+	$(LD65) -t none -o $$(@:.bin=.list-bin) $$(@:.bin=.list-o) none.lib > $$(@:.bin=.list-ld65-err) 2>&1 || true
+endif
+endif
+
+ifneq ($(wildcard ref/$1.err-ref),)
+	$(ISEQUAL) ref/$1.err-ref $$(@:.bin=.list-err)
+else
+	$(ISEQUAL) --empty $$(@:.bin=.list-err)
+endif
+
+ifneq ($(wildcard ref/$1.ld65err-ref),)
+	$(ISEQUAL) --wildcards ref/$1.ld65err-ref $$(@:.bin=.list-ld65-err)
+else
+ifneq ($(wildcard $(WORKDIR)/$1.list-ld65-err),)
+	$(ISEQUAL) --empty $$(@:.bin=.list-ld65-err)
+endif
+endif
 
 #	check if the result bin is the same as without listing file
+ifeq ($(wildcard control/$1.err),)
 	$(ISEQUAL) $$@ $$(@:.bin=.list-bin)
+endif
 
-ifneq ($(wildcard $1.list-ref),)
+ifneq ($(wildcard ref/$1.list-ref),)
 #	we have a reference file, compare that, too
 
 #	remove first line which contains a version number
-	tail -n +2 $$(@:.bin=.lst.orig) > $$(@:.bin=.lst)
-	$(ISEQUAL) $1.list-ref $$(@:.bin=.lst)
+	$(ISEQUAL) --skip=1 ref/$1.list-ref $$(@:.bin=.list-lst)
 endif
-
-#	$(CA65) -t none -f -l $$(@:.bin=.flist.orig) -o $$(@:.bin=.flist-o) $$<
-#	$(LD65) -t none -o $$(@:.bin=.flist-bin) $$(@:.bin=.flist-o) none.lib
-
-#	# check if the result bin is the same as without listing file
-#	$(ISEQUAL) $$@ $$(@:.bin=.flist-bin)
 
 endef # LISTING_template
 

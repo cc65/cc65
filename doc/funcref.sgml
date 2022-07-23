@@ -627,7 +627,7 @@ communication, see also <tt>testcode/lib/ser-test.c</tt>.
 <sect1><tt/stdio.h/<label id="stdio.h"><p>
 
 <itemize>
-<item><ref id="_poserror" name="_poserror">
+<item><ref id="__poserror" name="__poserror">
 <item><ref id="clearerr" name="clearerr">
 <!-- <item><ref id="fclose" name="fclose"> -->
 <!-- <item><ref id="fdopen" name="fdopen"> -->
@@ -1058,14 +1058,14 @@ It returns 1 if it does.
 </descrip>
 </quote>
 
-<sect1>_poserror<label id="_poserror"><p>
+<sect1>__poserror<label id="__poserror"><p>
 
 <quote>
 <descrip>
 <tag/Function/Print an error message for the error in <tt/_oserror/.
 <tag/Header/<tt/<ref id="stdio.h" name="stdio.h">/
-<tag/Declaration/<tt/void __fastcall__ _poserror (const char* msg);/
-<tag/Description/<tt/_poserror/ prints an error message to <tt/stderr/. If
+<tag/Declaration/<tt/void __fastcall__ __poserror (const char* msg);/
+<tag/Description/<tt/__poserror/ prints an error message to <tt/stderr/. If
 <tt/msg/ is not <tt/NULL/ and not an empty string, it is printed followed by
 a colon and a blank. Then the error message for the current contents of
 <tt/_oserror/ are printed followed by a newline. The message output is the
@@ -5856,7 +5856,7 @@ be used in presence of a prototype.
 </itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
-<ref id="_poserror" name="_poserror">,
+<ref id="__poserror" name="__poserror">,
 <ref id="strerror" name="strerror">
 <tag/Example/None.
 </descrip>

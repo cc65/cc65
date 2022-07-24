@@ -42,6 +42,7 @@
 
 /* cc65 */
 #include "error.h"
+#include "preproc.h"
 #include "macrotab.h"
 
 
@@ -246,6 +247,10 @@ Macro* FindMacro (const char* Name)
     Macro* M = MacroTab[Hash];
     while (M) {
         if (strcmp (M->Name, Name) == 0) {
+            /* Check for some special macro names */
+            if (Name[0] == '_') {
+                HandleSpecialMacro (M, Name);
+            }
             /* Found it */
             return M;
         }

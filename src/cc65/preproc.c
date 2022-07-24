@@ -1533,6 +1533,24 @@ static int ParseDirectives (unsigned ModeFlags)
 
 
 
+void HandleSpecialMacro (Macro* M, const char* Name)
+/* Handle special mandatory macros */
+{
+    if (strcmp (Name, "__LINE__") == 0) {
+        /* Replace __LINE__ with the current line number */
+        SB_Printf (&M->Replacement, "%u", GetCurrentLine ());
+    } else if (strcmp (Name, "__FILE__") == 0) {
+        /* Replace __FILE__ with the current filename */
+        StrBuf B = AUTO_STRBUF_INITIALIZER;
+        SB_InitFromString (&B, GetCurrentFile ());
+        SB_Clear (&M->Replacement);
+        Stringize (&B, &M->Replacement);
+        SB_Done (&B);
+    }
+}
+
+
+
 /*****************************************************************************/
 /*                               Preprocessing                               */
 /*****************************************************************************/

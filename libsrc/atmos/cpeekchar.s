@@ -1,9 +1,9 @@
 
     .include	"atmos.inc"
 
-    .export _cpeekchar
+    .export _cpeekc
 
-_cpeekchar:
+_cpeekc:
 
     ldy CURS_Y
     ldx ScrTabLo,y

@@ -1,5 +1,5 @@
 
-    .export _cpeekchar
+    .export _cpeekc
 
     .import mul40
     .importzp ptr4
@@ -8,7 +8,7 @@
 
     .segment "CODE"
 
-_cpeekchar:
+_cpeekc:
 
     lda ROWCRS
     jsr mul40       ; destroys tmp4

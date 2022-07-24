@@ -1,5 +1,5 @@
 
-        .export _cpeekchar
+        .export _cpeekc
 
         .import ppubuf_waitempty
 
@@ -7,7 +7,7 @@
 
         .segment "CODE"
 
-_cpeekchar:
+_cpeekc:
 
         ; wait until all console data has been written
         jsr ppubuf_waitempty

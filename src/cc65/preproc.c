@@ -1136,14 +1136,18 @@ static int DoIf (int Skip)
 static int DoIfDef (int skip, int flag)
 /* Process #ifdef if flag == 1, or #ifndef if flag == 0. */
 {
-    ident Ident;
+    int Value = 0;
 
-    SkipWhitespace (0);
-    if (MacName (Ident) == 0) {
-        return 0;
-    } else {
-        return PushIf (skip, flag, IsMacro(Ident));
+    if (!skip) {
+        ident Ident;
+
+        SkipWhitespace (0);
+        if (MacName (Ident)) {
+            Value = IsMacro (Ident);
+        }
     }
+
+    return PushIf (skip, flag, Value);
 }
 
 

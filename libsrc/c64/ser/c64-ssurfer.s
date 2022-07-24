@@ -5,8 +5,6 @@
 ; gpz fixed 20020828: fatal bug fixed in _ss232_params
 ;----------------------------------------------------------------------------------------------
 
-                .include "silversurfer.inc"
-
                 .export _rs232_init
                 .export _rs232_done
                 .export _rs232_params

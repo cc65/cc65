@@ -1263,6 +1263,8 @@ static void Primary (ExprDesc* E)
             /* String literal */
             if ((Flags & E_EVAL_UNEVAL) != E_EVAL_UNEVAL) {
                 E->V.LVal = UseLiteral (CurTok.SVal);
+                /* Translate into target charset */
+                TranslateLiteral (E->V.LVal);
             } else {
                 E->V.LVal = CurTok.SVal;
             }

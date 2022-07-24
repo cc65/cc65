@@ -3,7 +3,7 @@
 
         .import ppubuf_waitempty
 
-        .include	"nes.inc"
+        .include    "nes.inc"
 
         .segment "CODE"
 

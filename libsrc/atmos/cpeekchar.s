@@ -1,5 +1,5 @@
 
-    .include	"atmos.inc"
+    .include    "atmos.inc"
 
     .export _cpeekc
 
@@ -28,4 +28,3 @@ ScrTabHi:
     .repeat 28, Line
         .byte   >(SCREEN + Line * 40)
     .endrep
-

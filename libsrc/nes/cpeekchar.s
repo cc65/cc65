@@ -1,40 +1,34 @@
 
-		.export _cpeekchar
-		.export _cpeekcharxy
+        .export _cpeekchar
 
-		.import _gotoxy 
-		.import ppubuf_waitempty
+        .import ppubuf_waitempty
 
-		.include	"nes.inc"
+        .include	"nes.inc"
 
-	.segment "CODE"
-
-_cpeekcharxy:
-
-		jsr	_gotoxy		; Set cursor
+        .segment "CODE"
 
 _cpeekchar:
 
-		; wait until all console data has been written
-		jsr ppubuf_waitempty
+        ; wait until all console data has been written
+        jsr ppubuf_waitempty
 
-		ldy SCREEN_PTR+1
-		ldx SCREEN_PTR
-       
+        ldy SCREEN_PTR+1
+        ldx SCREEN_PTR
+
 ; waiting for vblank is incredibly slow ://
 vwait:
-;		lda $2002    ;wait
-;		bpl vwait
+;       lda $2002    ;wait
+;       bpl vwait
 
-		lda #0
-		sty $2006
+        lda #0
+        sty $2006
         stx $2006
-		ldy $2007    ; first read is invalid
-		ldy $2007    ; get data
+        ldy $2007    ; first read is invalid
+        ldy $2007    ; get data
         sta $2006
         sta $2006
 
         tya
-		and #$7f ; ?!?!
-		rts
+        and #$7f ; ?!?!
+        rts
 

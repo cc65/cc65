@@ -121,67 +121,67 @@ static void MacroReplacement (StrBuf* Source, StrBuf* Target, int MultiLine);
 
 
 
-/* Types of preprocessor tokens */
+/* Types of preprocessor directives */
 typedef enum {
-    PP_ILLEGAL  = -1,
-    PP_DEFINE,
-    PP_ELIF,
-    PP_ELSE,
-    PP_ENDIF,
-    PP_ERROR,
-    PP_IF,
-    PP_IFDEF,
-    PP_IFNDEF,
-    PP_INCLUDE,
-    PP_LINE,
-    PP_PRAGMA,
-    PP_UNDEF,
-    PP_WARNING,
-} pptoken_t;
+    PPD_ILLEGAL = -1,
+    PPD_DEFINE,
+    PPD_ELIF,
+    PPD_ELSE,
+    PPD_ENDIF,
+    PPD_ERROR,
+    PPD_IF,
+    PPD_IFDEF,
+    PPD_IFNDEF,
+    PPD_INCLUDE,
+    PPD_LINE,
+    PPD_PRAGMA,
+    PPD_UNDEF,
+    PPD_WARNING,
+} ppdirective_t;
 
 
 
-/* Preprocessor keyword to token mapping table */
-static const struct PPToken {
-    const char* Key;            /* Keyword */
-    pptoken_t   Tok;            /* Token */
-} PPTokens[] = {
-    {   "define",       PP_DEFINE       },
-    {   "elif",         PP_ELIF         },
-    {   "else",         PP_ELSE         },
-    {   "endif",        PP_ENDIF        },
-    {   "error",        PP_ERROR        },
-    {   "if",           PP_IF           },
-    {   "ifdef",        PP_IFDEF        },
-    {   "ifndef",       PP_IFNDEF       },
-    {   "include",      PP_INCLUDE      },
-    {   "line",         PP_LINE         },
-    {   "pragma",       PP_PRAGMA       },
-    {   "undef",        PP_UNDEF        },
-    {   "warning",      PP_WARNING      },
+/* Preprocessor directive tokens mapping table */
+static const struct PPDType {
+    const char*     Tok;        /* Token */
+    ppdirective_t   Type;       /* Type */
+} PPDTypes[] = {
+    {   "define",       PPD_DEFINE      },
+    {   "elif",         PPD_ELIF        },
+    {   "else",         PPD_ELSE        },
+    {   "endif",        PPD_ENDIF       },
+    {   "error",        PPD_ERROR       },
+    {   "if",           PPD_IF          },
+    {   "ifdef",        PPD_IFDEF       },
+    {   "ifndef",       PPD_IFNDEF      },
+    {   "include",      PPD_INCLUDE     },
+    {   "line",         PPD_LINE        },
+    {   "pragma",       PPD_PRAGMA      },
+    {   "undef",        PPD_UNDEF       },
+    {   "warning",      PPD_WARNING     },
 };
 
-/* Number of preprocessor tokens */
-#define PPTOKEN_COUNT   (sizeof(PPTokens) / sizeof(PPTokens[0]))
+/* Number of preprocessor directive types */
+#define PPDTOKEN_COUNT  (sizeof(PPDTypes) / sizeof(PPDTypes[0]))
 
 
 
 static int CmpToken (const void* Key, const void* Elem)
 /* Compare function for bsearch */
 {
-    return strcmp ((const char*) Key, ((const struct PPToken*) Elem)->Key);
+    return strcmp ((const char*) Key, ((const struct PPDType*) Elem)->Tok);
 }
 
 
 
-static pptoken_t FindPPToken (const char* Ident)
-/* Find a preprocessor token and return it. Return PP_ILLEGAL if the identifier
-** is not a valid preprocessor token.
+static ppdirective_t FindPPDirectiveType (const char* Ident)
+/* Find a preprocessor directive type and return it. Return PPD_ILLEGAL if the
+** identifier is not a valid preprocessor directive token.
 */
 {
-    struct PPToken* P;
-    P = bsearch (Ident, PPTokens, PPTOKEN_COUNT, sizeof (PPTokens[0]), CmpToken);
-    return P? P->Tok : PP_ILLEGAL;
+    struct PPDType* P;
+    P = bsearch (Ident, PPDTypes, PPDTOKEN_COUNT, sizeof (PPDTypes[0]), CmpToken);
+    return P? P->Type : PPD_ILLEGAL;
 }
 
 
@@ -254,6 +254,26 @@ static int ME_ArgIsVariadic (const MacroExp* E, const Macro* M)
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
+
+
+
+static int MacName (char* Ident)
+/* Get a macro symbol name into Ident.  If we have an error, print a
+** diagnostic message and clear the line.
+*/
+{
+    if (IsSym (Ident) == 0) {
+        if (CurC != '\0') {
+            PPError ("Macro name must be an identifier");
+        } else {
+            PPError ("Missing macro name");
+        }
+        ClearLine ();
+        return 0;
+    } else {
+        return 1;
+    }
+}
 
 
 
@@ -502,26 +522,6 @@ static int CheckExtraTokens (const char* Name)
 
 
 
-static int MacName (char* Ident)
-/* Get a macro symbol name into Ident.  If we have an error, print a
-** diagnostic message and clear the line.
-*/
-{
-    if (IsSym (Ident) == 0) {
-        if (CurC != '\0') {
-            PPError ("Macro name must be an identifier");
-        } else {
-            PPError ("Missing macro name");
-        }
-        ClearLine ();
-        return 0;
-    } else {
-        return 1;
-    }
-}
-
-
-
 static void ReadMacroArgs (MacroExp* E, const Macro* M, int MultiLine)
 /* Identify the arguments to a macro call as-is */
 {
@@ -637,7 +637,7 @@ static void ReadMacroArgs (MacroExp* E, const Macro* M, int MultiLine)
 
 
 
-static void MacroArgSubst (MacroExp* E, Macro* M)
+static void SubstMacroArgs (MacroExp* E, Macro* M)
 /* Argument substitution according to ISO/IEC 9899:1999 (E), 6.10.3.1ff */
 {
     ident       Ident;
@@ -792,7 +792,7 @@ static void ExpandMacro (StrBuf* Target, Macro* M, int MultiLine)
     }
 
     /* Replace macro arguments handling the # and ## operators */
-    MacroArgSubst (&E, M);
+    SubstMacroArgs (&E, M);
 
     /* Forbide repeated expansion of the same macro in use */
     M->Expanding = 1;
@@ -1033,6 +1033,12 @@ static void MacroReplacement (StrBuf* Source, StrBuf* Target, int MultiLine)
     /* Switch back the input */
     InitLine (OldSource);
 }
+
+
+
+/*****************************************************************************/
+/*                                Directives                                 */
+/*****************************************************************************/
 
 
 
@@ -1468,15 +1474,15 @@ static int ParseDirectives (int InArgList)
                 }
                 ClearLine ();
             } else {
-                switch (FindPPToken (Directive)) {
+                switch (FindPPDirectiveType (Directive)) {
 
-                    case PP_DEFINE:
+                    case PPD_DEFINE:
                         if (!PPSkip) {
                             DoDefine ();
                         }
                         break;
 
-                    case PP_ELIF:
+                    case PPD_ELIF:
                         if (PPStack->Index >= 0) {
                             if ((PPStack->Stack[PPStack->Index] & IFCOND_ELSE) == 0) {
                                 /* Handle as #else/#if combination */
@@ -1496,7 +1502,7 @@ static int ParseDirectives (int InArgList)
                         }
                         break;
 
-                    case PP_ELSE:
+                    case PPD_ELSE:
                         if (PPStack->Index >= 0) {
                             if ((PPStack->Stack[PPStack->Index] & IFCOND_ELSE) == 0) {
                                 if ((PPStack->Stack[PPStack->Index] & IFCOND_SKIP) == 0) {
@@ -1514,7 +1520,7 @@ static int ParseDirectives (int InArgList)
                         }
                         break;
 
-                    case PP_ENDIF:
+                    case PPD_ENDIF:
                         if (PPStack->Index >= 0) {
                             /* Remove any clauses on top of stack that do not
                             ** need a terminating #endif.
@@ -1537,38 +1543,38 @@ static int ParseDirectives (int InArgList)
                         }
                         break;
 
-                    case PP_ERROR:
+                    case PPD_ERROR:
                         if (!PPSkip) {
                             DoError ();
                         }
                         break;
 
-                    case PP_IF:
+                    case PPD_IF:
                         PPSkip = DoIf (PPSkip);
                         break;
 
-                    case PP_IFDEF:
+                    case PPD_IFDEF:
                         PPSkip = DoIfDef (PPSkip, 1);
                         break;
 
-                    case PP_IFNDEF:
+                    case PPD_IFNDEF:
                         PPSkip = DoIfDef (PPSkip, 0);
                         break;
 
-                    case PP_INCLUDE:
+                    case PPD_INCLUDE:
                         if (!PPSkip) {
                             DoInclude ();
                         }
                         break;
 
-                    case PP_LINE:
+                    case PPD_LINE:
                         /* Should do something in C99 at least, but we ignore it */
                         if (!PPSkip) {
                             ClearLine ();
                         }
                         break;
 
-                    case PP_PRAGMA:
+                    case PPD_PRAGMA:
                         if (!PPSkip) {
                             if (!InArgList) {
                                 DoPragma ();
@@ -1578,13 +1584,13 @@ static int ParseDirectives (int InArgList)
                         }
                         break;
 
-                    case PP_UNDEF:
+                    case PPD_UNDEF:
                         if (!PPSkip) {
                             DoUndef ();
                         }
                         break;
 
-                    case PP_WARNING:
+                    case PPD_WARNING:
                         /* #warning is a non standard extension */
                         if (IS_Get (&Standard) > STD_C99) {
                             if (!PPSkip) {
@@ -1616,6 +1622,12 @@ static int ParseDirectives (int InArgList)
 
     return Whitespace != 0;
 }
+
+
+
+/*****************************************************************************/
+/*                               Preprocessor                                */
+/*****************************************************************************/
 
 
 

@@ -58,7 +58,7 @@ int main(void)
     printf("Creating file: %s\n", name1);
     file = fopen(name1, "w");
     if (file == NULL) {
-        __poserror("Disk error making first file");
+        _poserror("Disk error making first file");
         return EXIT_FAILURE;
     }
     fclose(file);
@@ -66,7 +66,7 @@ int main(void)
     /* Verify that the file-name exists now. */
     file = fopen(name1, "r");
     if (file == NULL) {
-        __poserror("Cannot find first name");
+        _poserror("Cannot find first name");
         return EXIT_FAILURE;
     }
     fclose(file);
@@ -78,7 +78,7 @@ int main(void)
     printf("Renaming %s to %s\n", name1, name2);
     r = rename(name1, name2);
     if (r < 0) {
-        __poserror("rename() failed");
+        _poserror("rename() failed");
         return EXIT_FAILURE;
     }
 
@@ -86,14 +86,14 @@ int main(void)
     file = fopen(name1, "r");
     if (file != NULL) {
         fclose(file);
-        __poserror("First name still exists");
+        _poserror("First name still exists");
         return EXIT_FAILURE;
     }
 
     /* Verify that the second file-name exists now. */
     file = fopen(name2, "r");
     if (file == NULL) {
-        __poserror("Cannot find second name");
+        _poserror("Cannot find second name");
         return EXIT_FAILURE;
     }
     fclose(file);
@@ -104,7 +104,7 @@ int main(void)
     printf("Removing %s\n", name2);
     r = remove(name2);
     if (r < 0) {
-        __poserror("remove() failed");
+        _poserror("remove() failed");
         return EXIT_FAILURE;
     }
 

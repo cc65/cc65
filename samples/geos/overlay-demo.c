@@ -65,7 +65,7 @@ void foobar (void)
 void main(int /*argc*/, char *argv[])
 {
     if (OpenRecordFile(argv[0])) {
-        __poserror("OpenRecordFile");
+        _poserror("OpenRecordFile");
         return;
     }
 
@@ -73,7 +73,7 @@ void main(int /*argc*/, char *argv[])
              "Click OK to call Overlay One.");
 
     if (PointRecord(1)) {
-        __poserror("PointRecord.1");
+        _poserror("PointRecord.1");
         return;
     }
 
@@ -82,7 +82,7 @@ void main(int /*argc*/, char *argv[])
     ** size specific to a certain program.
     */
     if (ReadRecord(OVERLAY_ADDR, OVERLAY_SIZE)) {
-        __poserror("ReadRecord.1");
+        _poserror("ReadRecord.1");
         return;
     }
 
@@ -96,7 +96,7 @@ void main(int /*argc*/, char *argv[])
              "Click OK to call Overlay Two.");
 
     if (PointRecord(2)) {
-        __poserror("PointRecord.2");
+        _poserror("PointRecord.2");
         return;
     }
 
@@ -104,7 +104,7 @@ void main(int /*argc*/, char *argv[])
     ** program. This implies that an overlay can never load another overlay.
     */
     if (ReadRecord(OVERLAY_ADDR, OVERLAY_SIZE)) {
-        __poserror("ReadRecord.2");
+        _poserror("ReadRecord.2");
         return;
     }
 
@@ -114,19 +114,19 @@ void main(int /*argc*/, char *argv[])
              "Click OK to call Overlay Three.");
 
     if (PointRecord(3)) {
-        __poserror("PointRecord.3");
+        _poserror("PointRecord.3");
         return;
     }
 
     if (ReadRecord(OVERLAY_ADDR, OVERLAY_SIZE)) {
-        __poserror("ReadRecord.3");
+        _poserror("ReadRecord.3");
         return;
     }
 
     foobar();
 
     if (CloseRecordFile()) {
-        __poserror("CloseRecordFile");
+        _poserror("CloseRecordFile");
         return;
     }
 }

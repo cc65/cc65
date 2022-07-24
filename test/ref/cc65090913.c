@@ -25,7 +25,7 @@ int foo=0,bar=2;
 int main(void)
 {
     while(foo<bar)
-	    label: ++foo;
+            label: ++foo;
 
     printf("foo: %d bar: %d\n",foo,bar);
 

@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2000-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -38,7 +38,7 @@
 
 
 
-/* common */    
+/* common */
 #include "cpu.h"
 
 /* da65 */

@@ -1,22 +1,30 @@
 ;
-; Ullrich von Bassewitz, 21.09.1998
+; 1998-09-21, Ullrich von Bassewitz
+; 2019-12-25, Greg King
 ;
 ; clock_t clock (void);
 ;
 
         .export         _clock
-        .import         RDTIM
         .importzp       sreg
 
+        .include        "cbm.inc"
+        .macpack        cpu
 
 
 .proc   _clock
 
-        lda     #0              ; Byte 3 is always zero
-        sta     sreg+1
+; Some accelerator adaptors have CMOS ICs.
+
+.if (.cpu & ::CPU_ISET_65SC02)
+        stz     sreg + 1
+.else
+        lda     #$00            ; Byte 3 always is zero
+        sta     sreg + 1
+.endif
+
         jsr     RDTIM
         sty     sreg
         rts
 
 .endproc
-

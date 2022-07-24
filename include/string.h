@@ -36,11 +36,17 @@
 #ifndef _STRING_H
 #define _STRING_H
 
+/* NULL pointer */
+#ifndef _HAVE_NULL
+#define NULL    0
+#define _HAVE_NULL
+#endif
 
-
-#include <stddef.h>
-
-
+/* size_t is needed */
+#ifndef _HAVE_size_t
+#define _HAVE_size_t
+typedef unsigned size_t;
+#endif
 
 char* __fastcall__ strcat (char* dest, const char* src);
 char* __fastcall__ strchr (const char* s, int c);
@@ -53,6 +59,7 @@ size_t __fastcall__ strlen (const char* s);
 char* __fastcall__ strncat (char* s1, const char* s2, size_t count);
 int __fastcall__ strncmp (const char* s1, const char* s2, size_t count);
 char* __fastcall__ strncpy (char* dest, const char* src, size_t count);
+char* __fastcall__ strpbrk (const char* str, const char* set);
 char* __fastcall__ strrchr (const char* s, int c);
 size_t __fastcall__ strspn (const char* s1, const char* s2);
 char* __fastcall__ strstr (const char* str, const char* substr);
@@ -77,6 +84,7 @@ int __fastcall__ stricmp (const char* s1, const char* s2);    /* DOS/Windows */
 int __fastcall__ strcasecmp (const char* s1, const char* s2); /* Same for Unix */
 int __fastcall__ strnicmp (const char* s1, const char* s2, size_t count);     /* DOS/Windows */
 int __fastcall__ strncasecmp (const char* s1, const char* s2, size_t count);  /* Same for Unix */
+size_t __fastcall__ strnlen (const char* s, size_t maxlen);     /* POSIX.1-2008 */
 char* __fastcall__ strlwr (char* s);
 char* __fastcall__ strlower (char* s);
 char* __fastcall__ strupr (char* s);
@@ -86,7 +94,6 @@ char* __fastcall__ strqtok (char* s1, const char* s2);
 
 const char* __fastcall__ _stroserror (unsigned char errcode);
 /* Map an operating system error number to an error message. */
-
 
 
 /* End of string.h */

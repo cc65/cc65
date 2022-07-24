@@ -146,7 +146,7 @@ void DoEnum (void)
     }
 
     /* End of enum definition */
-    Consume (TOK_ENDENUM, "`.ENDENUM' expected");
+    Consume (TOK_ENDENUM, "'.ENDENUM' expected");
 
     /* Free the base expression */
     FreeExpr (BaseExpr);

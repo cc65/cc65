@@ -11,7 +11,7 @@
 
             .include "jumptab.inc"
             .include "geossym.inc"
-        
+
 _FollowChain:
         sta r3L
         stx r3H

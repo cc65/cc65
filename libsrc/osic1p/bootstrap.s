@@ -6,16 +6,16 @@
 ; add "-u __BOOT__" to the cl65/ld65 command line.  Then, the linker
 ; will import this symbol name; and, link this module at the front
 ; of your program file.
-;
-        .export         __BOOT__:abs = 1
 
-        .import         __RAM_START__, __RAM_SIZE__, __BSS_RUN__
+        .export         __BOOT__ : abs = 1
+
+        .import         __MAIN_START__, __MAIN_SIZE__, __BSS_RUN__
 
 ; ------------------------------------------------------------------------
 
-load_addr       :=      __RAM_START__
-load_size       =       __BSS_RUN__ - __RAM_START__
-ram_top         :=      __RAM_START__ + __RAM_SIZE__
+load_addr       :=      __MAIN_START__
+load_size       =       __BSS_RUN__ - __MAIN_START__
+ram_top         :=      __MAIN_START__ + __MAIN_SIZE__
 
         .segment        "BOOT"
 
@@ -50,16 +50,15 @@ LINEDIST        =       $20             ; Offset in video RAM between two lines
         ldx     #>load_addr
         sta     load
         stx     load+1
-        lda     #<load_size
-        eor     #$FF
-        sta     count                   ; store (-size - 1)
-        lda     #>load_size
-        eor     #$FF
-        sta     count+1
 
-L1:     inc     count                   ; pre-count one's-complement upwards
+        ldx     #(<load_size) + 1
+        stx     count
+        ldx     #(>load_size) + 1
+        stx     count+1                 ; save size with each byte incremented separately
+
+L1:     dec     count
         bnz     L2
-        inc     count+1
+        dec     count+1
         bze     L3
 L2:     jsr     GETCHAR                 ; (doesn't change .Y)
         sta     (load),y

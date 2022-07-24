@@ -6,32 +6,30 @@
 ;
 
         .export         _chlinexy, _chline, chlinedirect
-        .import         popa, _gotoxy, cputdirect
+        .import         gotoxy, cputdirect
 
         .include        "zeropage.inc"
         .include        "apple2.inc"
 
 _chlinexy:
         pha                     ; Save the length
-        jsr     popa            ; Get y
-        jsr     _gotoxy         ; Call this one, will pop params
+        jsr     gotoxy          ; Call this one, will pop params
         pla                     ; Restore the length and run into _chline
 
 _chline:
         .ifdef  __APPLE2ENH__
-        ldx     #'S'            ; MouseText character
-        ldy     INVFLG
-        cpy     #$FF            ; Normal character display mode?
-        beq     chlinedirect
+        ldx     #'_' | $80      ; Underscore, screen code
+        .else
+        ldx     #'-' | $80      ; Minus, screen code
         .endif
-        ldx     #'-' | $80      ; Horizontal line, screen code
 
 chlinedirect:
+        stx     tmp1
         cmp     #$00            ; Is the length zero?
         beq     done            ; Jump if done
-        sta     tmp1
-:       txa                     ; Screen code
+        sta     tmp2
+:       lda     tmp1            ; Screen code
         jsr     cputdirect      ; Direct output
-        dec     tmp1
+        dec     tmp2
         bne     :-
 done:   rts

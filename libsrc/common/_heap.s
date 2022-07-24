@@ -27,7 +27,7 @@ __heaplast:
 
 ; Initialization. Will be called from startup!
 
-.segment        "INIT"
+.segment        "ONCE"
 
 initheap:
         sec
@@ -39,4 +39,4 @@ initheap:
         sta     __heapend+1
         rts
 
-                      
+

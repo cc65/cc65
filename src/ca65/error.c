@@ -84,7 +84,7 @@ static void VPrintMsg (const FilePos* Pos, const char* Desc,
     SB_Terminate (&Msg);
 
     /* Format the message header */
-    SB_Printf (&S, "%s(%u): %s: ",
+    SB_Printf (&S, "%s:%u: %s: ",
                SB_GetConstBuf (GetFileName (Pos->Name)),
                Pos->Line,
                Desc);
@@ -144,7 +144,7 @@ static void AddNotifications (const Collection* LineInfos)
                 break;
 
             case LI_TYPE_EXT:
-                Msg = "Assembler code generated from this line";
+                Msg = "Assembly code generated from this line";
                 break;
 
             case LI_TYPE_MACRO:

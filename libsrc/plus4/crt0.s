@@ -9,7 +9,7 @@
         .import         callirq_y, initlib, donelib
         .import         callmain, zerobss
         .import         __INTERRUPTOR_COUNT__
-        .import         __RAM_START__, __RAM_SIZE__     ; Linker generated
+        .import         __MAIN_START__, __MAIN_SIZE__   ; Linker generated
         .import         __STACKSIZE__                   ; Linker generated
         .importzp       ST
 
@@ -50,12 +50,12 @@ L1:     lda     sp,x
 ; of the usable RAM.
 
         tsx
-        stx     spsave          ; save system stk ptr
+        stx     spsave          ; Save system stk ptr
 
-        lda     #<(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
+        lda     #<(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
+        ldx     #>(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
         sta     sp
-        lda     #>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
-        sta     sp+1
+        stx     sp+1
 
 ; Set up the IRQ vector in the banked RAM; and, switch off the ROM.
 
@@ -195,8 +195,6 @@ spsave:         .res    1
 
 irqcount:       .byte   0
 
-.segment        "INITBSS"
+.segment        "INIT"
 
 zpsave:         .res    zpspace
-
-

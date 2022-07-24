@@ -1,13 +1,17 @@
 ;
-; Ullrich von Bassewitz, 2003-04-13
+; 2003-04-13, Ullrich von Bassewitz
+; 2017-06-15, Greg King
 ;
 ; void gotoxy (unsigned char x, unsigned char y);
 ;
 
-        .export         _gotoxy
+        .export         gotoxy, _gotoxy
+
         .import         popa
 
         .include        "atmos.inc"
+
+gotoxy: jsr     popa            ; Get Y
 
 .proc   _gotoxy
 
@@ -17,5 +21,3 @@
         rts
 
 .endproc
-
-

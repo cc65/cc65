@@ -23,7 +23,7 @@
 ; --------------------------------------------------------------------------
 ; Initialize library modules
 
-.segment        "INIT"
+.segment        "ONCE"
 
 .proc   initlib
 

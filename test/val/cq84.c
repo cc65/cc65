@@ -101,13 +101,13 @@ int s84(struct defs *pd0){
      if(pd0->flgd != 0) printf(s84er,2);
      rc = rc+2;
    }
-	#else
+        #else
    pfi = glork;
    if((*pfi)(4) != 4){
      if(pd0->flgd != 0) printf(s84er,2);
      rc = rc+2;
    }
-	#endif
+        #endif
 
         /* Float fa[17] declares an array of floating point
         numbers, and *afp[17] declares an array of pointers
@@ -223,9 +223,9 @@ return x;}
 *********************************************************************************************/
 
 #ifndef NO_TYPELESS_STRUCT_PTR
-	int section(int j,struct* pd0){
+        int section(int j,struct* pd0){
 #else
-	int section(int j,void* pd0){
+        int section(int j,void* pd0){
 #endif
         switch(j){
                 case 0: return s84(pd0);
@@ -249,7 +249,7 @@ int main(int n,char **args) {
 
 int j;
 static struct defs d0, *pd0;
-	
+
    d0.flgs = 1;          /* These flags dictate            */
    d0.flgm = 1;          /*     the verbosity of           */
    d0.flgd = 1;          /*         the program.           */

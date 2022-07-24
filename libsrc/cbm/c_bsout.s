@@ -2,9 +2,12 @@
 ; Ullrich von Bassewitz, 03.06.1999
 ;
 ; void __fastcall__ cbm_k_bsout (unsigned char C);
+; void __fastcall__ cbm_k_chrout (unsigned char C);
 ;
 
-        .export         _cbm_k_bsout
-        .import         BSOUT
+        .include        "cbm.inc"
 
-_cbm_k_bsout = BSOUT
+        .export         _cbm_k_bsout, _cbm_k_chrout
+
+_cbm_k_bsout  := BSOUT
+_cbm_k_chrout := CHROUT

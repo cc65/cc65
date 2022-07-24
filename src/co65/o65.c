@@ -361,7 +361,7 @@ O65Data* ReadO65File (const char* Name)
     /* Open the o65 input file */
     FILE* F = fopen (Name, "rb");
     if (F == 0) {
-        Error ("Cannot open `%s': %s", Name, strerror (errno));
+        Error ("Cannot open '%s': %s", Name, strerror (errno));
     }
 
     /* Read the file data */

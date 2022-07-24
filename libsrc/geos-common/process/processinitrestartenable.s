@@ -20,11 +20,11 @@ _InitProcesses:
         stx r0H
         jsr popa
         jmp InitProcesses
-            
+
 _RestartProcess:
         tax
         jmp RestartProcess
-            
+
 _EnableProcess:
         tax
         jmp EnableProcess

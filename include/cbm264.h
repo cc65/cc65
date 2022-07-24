@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -79,8 +79,7 @@
 #define BCOLOR_WHITE            0x01
 #define BCOLOR_RED              0x02
 #define BCOLOR_CYAN             0x03
-#define BCOLOR_VIOLET           0x04
-#define BCOLOR_PURPLE           BCOLOR_VIOLET
+#define BCOLOR_PURPLE           0x04
 #define BCOLOR_GREEN            0x05
 #define BCOLOR_BLUE             0x06
 #define BCOLOR_YELLOW           0x07
@@ -98,8 +97,7 @@
 #define COLOR_WHITE             (BCOLOR_WHITE | CATTR_LUMA7)
 #define COLOR_RED               (BCOLOR_RED | CATTR_LUMA4)
 #define COLOR_CYAN              (BCOLOR_CYAN | CATTR_LUMA7)
-#define COLOR_VIOLET            (BCOLOR_VIOLET | CATTR_LUMA7)
-#define COLOR_PURPLE            COLOR_VIOLET
+#define COLOR_PURPLE            (BCOLOR_VIOLET | CATTR_LUMA7)
 #define COLOR_GREEN             (BCOLOR_GREEN | CATTR_LUMA7)
 #define COLOR_BLUE              (BCOLOR_BLUE | CATTR_LUMA7)
 #define COLOR_YELLOW            (BCOLOR_YELLOW | CATTR_LUMA7)
@@ -111,6 +109,17 @@
 #define COLOR_LIGHTGREEN        (BCOLOR_LIGHTGREEN | CATTR_LUMA7)
 #define COLOR_LIGHTBLUE         (BCOLOR_LIGHTBLUE | CATTR_LUMA7)
 #define COLOR_GRAY3             (BCOLOR_WHITE | CATTR_LUMA5)
+
+
+
+/* Masks for joy_read */
+#define JOY_UP_MASK             0x01
+#define JOY_DOWN_MASK           0x02
+#define JOY_LEFT_MASK           0x04
+#define JOY_RIGHT_MASK          0x08
+#define JOY_BTN_1_MASK          0x80
+
+
 
 /* Define hardware */
 #include <_ted.h>
@@ -125,11 +134,16 @@
 /*                                   Code                                    */
 /*****************************************************************************/
 
+void fast (void);
+/* Switch the CPU into double-clock mode. */
+
+void slow (void);
+/* Switch the CPU into single-clock mode. */
+
+unsigned char isfast (void);
+/* Returns 1 if the CPU is in double-clock mode. */
+
 
 
 /* End of cbm264.h */
 #endif
-
-
-
-

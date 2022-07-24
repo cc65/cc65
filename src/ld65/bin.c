@@ -154,7 +154,7 @@ static void BinWriteMem (BinDesc* D, MemoryArea* M)
         SegDesc* S = CollAtUnchecked (&M->SegList, I);
 
         /* Keep the user happy */
-        Print (stdout, 1, "    Writing `%s'\n", GetString (S->Name));
+        Print (stdout, 1, "    Writing '%s'\n", GetString (S->Name));
 
         /* Writes do only occur in the load area and not for BSS segments */
         DoWrite = (S->Flags & SF_BSS) == 0      &&      /* No BSS segment */
@@ -168,18 +168,6 @@ static void BinWriteMem (BinDesc* D, MemoryArea* M)
         PrintBoolVal ("DoWrite", DoWrite);
         PrintNumVal  ("Address", Addr);
         PrintNumVal  ("FileOffs", (unsigned long) ftell (D->F));
-
-        /* Check if the alignment for the segment from the linker config is
-        ** a multiple for that of the segment.
-        */
-        if ((S->RunAlignment % S->Seg->Alignment) != 0) {
-            /* Segment requires another alignment than configured
-            ** in the linker.
-            */
-            Warning ("Segment `%s' is not aligned properly. Resulting "
-                     "executable may not be functional.",
-                     GetString (S->Name));
-        }
 
         /* If this is the run memory area, we must apply run alignment. If
         ** this is not the run memory area but the load memory area (which
@@ -205,8 +193,13 @@ static void BinWriteMem (BinDesc* D, MemoryArea* M)
                     NewAddr += M->Start;
                 }
                 if (DoWrite || (M->Flags & MF_FILL) != 0) {
-                    WriteMult (D->F, M->FillVal, NewAddr-Addr);
-                    PrintNumVal ("SF_OFFSET", NewAddr - Addr);
+                    /* Seek in "overwrite" segments */
+                    if (S->Flags & SF_OVERWRITE) {
+                        fseek (D->F, NewAddr - M->Start + M->FileOffs, SEEK_SET);
+                    } else {
+                        WriteMult (D->F, M->FillVal, NewAddr-Addr);
+                        PrintNumVal ("SF_OFFSET", NewAddr - Addr);
+                    }
                 }
                 Addr = NewAddr;
             }
@@ -233,6 +226,13 @@ static void BinWriteMem (BinDesc* D, MemoryArea* M)
             unsigned long P = ftell (D->F);
             SegWrite (D->Filename, D->F, S->Seg, BinWriteExpr, D);
             PrintNumVal ("Wrote", (unsigned long) (ftell (D->F) - P));
+            /* If we have just written an OVERWRITE segement, move position to the
+            ** end of file, so that subsequent segments are written in the correct
+            ** place.
+            */
+            if (S->Flags & SF_OVERWRITE) {
+                fseek (D->F, 0, SEEK_END);
+            }
         } else if (M->Flags & MF_FILL) {
             WriteMult (D->F, S->Seg->FillVal, S->Seg->Size);
             PrintNumVal ("Filled", (unsigned long) S->Seg->Size);
@@ -293,23 +293,23 @@ void BinWriteTarget (BinDesc* D, struct File* F)
     /* Open the file */
     D->F = fopen (D->Filename, "wb");
     if (D->F == 0) {
-        Error ("Cannot open `%s': %s", D->Filename, strerror (errno));
+        Error ("Cannot open '%s': %s", D->Filename, strerror (errno));
     }
 
     /* Keep the user happy */
-    Print (stdout, 1, "Opened `%s'...\n", D->Filename);
+    Print (stdout, 1, "Opened '%s'...\n", D->Filename);
 
     /* Dump all memory areas */
     for (I = 0; I < CollCount (&F->MemoryAreas); ++I) {
         /* Get this entry */
         MemoryArea* M = CollAtUnchecked (&F->MemoryAreas, I);
-        Print (stdout, 1, "  Dumping `%s'\n", GetString (M->Name));
+        Print (stdout, 1, "  Dumping '%s'\n", GetString (M->Name));
         BinWriteMem (D, M);
     }
 
     /* Close the file */
     if (fclose (D->F) != 0) {
-        Error ("Cannot write to `%s': %s", D->Filename, strerror (errno));
+        Error ("Cannot write to '%s': %s", D->Filename, strerror (errno));
     }
 
     /* Reset the file and filename */

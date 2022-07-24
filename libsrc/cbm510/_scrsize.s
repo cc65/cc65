@@ -6,7 +6,6 @@
 
         .export         screensize
         .import         SCREEN
-                              
-        screensize      = SCREEN
 
+        screensize      = SCREEN
 

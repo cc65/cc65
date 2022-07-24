@@ -41,6 +41,8 @@
 #  error This module may only be used when compiling for the Apple ][!
 #endif
 
+#include <apple2_filetype.h>
+
 
 
 /*****************************************************************************/
@@ -50,62 +52,74 @@
 
 
 /* Color defines */
-#define COLOR_BLACK  0x00
-#define COLOR_WHITE  0x01
+#define COLOR_BLACK     0x00
+#define COLOR_WHITE     0x01
 
 /* TGI color defines */
-#define TGI_COLOR_BLACK      0x00
-#define TGI_COLOR_GREEN      0x01
-#define TGI_COLOR_VIOLET     0x02
-#define TGI_COLOR_WHITE      0x03
-#define TGI_COLOR_BLACK2     0x04
-#define TGI_COLOR_ORANGE     0x05
-#define TGI_COLOR_BLUE       0x06
-#define TGI_COLOR_WHITE2     0x07
+#define TGI_COLOR_BLACK         0x00
+#define TGI_COLOR_GREEN         0x01
+#define TGI_COLOR_PURPLE        0x02
+#define TGI_COLOR_WHITE         0x03
+#define TGI_COLOR_BLACK2        0x04
+#define TGI_COLOR_ORANGE        0x05
+#define TGI_COLOR_BLUE          0x06
+#define TGI_COLOR_WHITE2        0x07
 
-#define TGI_COLOR_MAGENTA    TGI_COLOR_BLACK2
-#define TGI_COLOR_DARKBLUE   TGI_COLOR_WHITE2
-#define TGI_COLOR_DARKGREEN  0x08
-#define TGI_COLOR_GRAY       0x09
-#define TGI_COLOR_CYAN       0x0A
-#define TGI_COLOR_BROWN      0x0B
-#define TGI_COLOR_GRAY2      0x0C
-#define TGI_COLOR_PINK       0x0D
-#define TGI_COLOR_YELLOW     0x0E
-#define TGI_COLOR_AQUA       0x0F
+#define TGI_COLOR_MAGENTA       TGI_COLOR_BLACK2
+#define TGI_COLOR_DARKBLUE      TGI_COLOR_WHITE2
+#define TGI_COLOR_DARKGREEN     0x08
+#define TGI_COLOR_GRAY          0x09
+#define TGI_COLOR_CYAN          0x0A
+#define TGI_COLOR_BROWN         0x0B
+#define TGI_COLOR_GRAY2         0x0C
+#define TGI_COLOR_PINK          0x0D
+#define TGI_COLOR_YELLOW        0x0E
+#define TGI_COLOR_AQUA          0x0F
 
 /* Characters codes */
-#define CH_ENTER       0x0D
-#define CH_ESC         0x1B
-#define CH_CURS_LEFT   0x08
-#define CH_CURS_RIGHT  0x15
+#define CH_ENTER        0x0D
+#define CH_ESC          0x1B
+#define CH_CURS_LEFT    0x08
+#define CH_CURS_RIGHT   0x15
 
-#define CH_ULCORNER  '+'
-#define CH_URCORNER  '+'
-#define CH_LLCORNER  '+'
-#define CH_LRCORNER  '+'
-#define CH_TTEE      '+'
-#define CH_BTEE      '+'
-#define CH_LTEE      '+'
-#define CH_RTEE      '+'
-#define CH_CROSS     '+'
+#if !defined(__APPLE2ENH__)
+#define CH_HLINE        '-'
+#define CH_VLINE        '!'
+#define CH_ULCORNER     '+'
+#define CH_URCORNER     '+'
+#define CH_LLCORNER     '+'
+#define CH_LRCORNER     '+'
+#define CH_TTEE         '+'
+#define CH_BTEE         '+'
+#define CH_LTEE         '+'
+#define CH_RTEE         '+'
+#define CH_CROSS        '+'
+#endif
+
+/* Masks for joy_read */
+#define JOY_UP_MASK     0x10
+#define JOY_DOWN_MASK   0x20
+#define JOY_LEFT_MASK   0x04
+#define JOY_RIGHT_MASK  0x08
+#define JOY_BTN_1_MASK  0x40
+#define JOY_BTN_2_MASK  0x80
 
 /* Return codes for get_ostype */
-#define APPLE_UNKNOWN  0x00
-#define APPLE_II       0x10  /* Apple ][                    */
-#define APPLE_IIPLUS   0x11  /* Apple ][+                   */
-#define APPLE_IIIEM    0x20  /* Apple /// (emulation)       */
-#define APPLE_IIE      0x30  /* Apple //e                   */
-#define APPLE_IIEENH   0x31  /* Apple //e (enhanced)        */
-#define APPLE_IIECARD  0x40  /* Apple //e Option Card       */
-#define APPLE_IIC      0x50  /* Apple //c                   */
-#define APPLE_IIC35    0x51  /* Apple //c (3.5 ROM)         */
-#define APPLE_IICEXP   0x53  /* Apple //c (Mem. Exp.)       */
-#define APPLE_IICREV   0x54  /* Apple //c (Rev. Mem. Exp.)  */
-#define APPLE_IICPLUS  0x55  /* Apple //c Plus              */
-#define APPLE_IIGS     0x80  /* Apple IIgs                  */
-#define APPLE_IIGS1    0x81  /* Apple IIgs (ROM 1)          */
-#define APPLE_IIGS3    0x83  /* Apple IIgs (ROM 3)          */
+#define APPLE_UNKNOWN   0x00
+#define APPLE_II        0x10  /* Apple ][                    */
+#define APPLE_IIPLUS    0x11  /* Apple ][+                   */
+#define APPLE_IIIEM     0x20  /* Apple /// (emulation)       */
+#define APPLE_IIE       0x30  /* Apple //e                   */
+#define APPLE_IIEENH    0x31  /* Apple //e (enhanced)        */
+#define APPLE_IIECARD   0x32  /* Apple //e Option Card       */
+#define APPLE_IIC       0x40  /* Apple //c                   */
+#define APPLE_IIC35     0x41  /* Apple //c (3.5 ROM)         */
+#define APPLE_IICEXP    0x43  /* Apple //c (Mem. Exp.)       */
+#define APPLE_IICREV    0x44  /* Apple //c (Rev. Mem. Exp.)  */
+#define APPLE_IICPLUS   0x45  /* Apple //c Plus              */
+#define APPLE_IIGS      0x80  /* Apple IIgs                  */
+#define APPLE_IIGS1     0x81  /* Apple IIgs (ROM 1)          */
+#define APPLE_IIGS3     0x83  /* Apple IIgs (ROM 3)          */
 
 extern unsigned char _dos_type;
 /* Valid _dos_type values:
@@ -125,6 +139,7 @@ extern unsigned char _dos_type;
 ** ProDOS 8 2.0.1 - 0x21
 ** ProDOS 8 2.0.2 - 0x22
 ** ProDOS 8 2.0.3 - 0x23
+** ProDOS 8 2.4.x - 0x24
 */
 
 
@@ -136,21 +151,19 @@ extern unsigned char _dos_type;
 
 
 /* The file stream implementation and the POSIX I/O functions will use the
-** following variables to determine the file type, aux type and creation time
-** stamp to use.
+** following struct to set the date and time stamp on files. This specificially
+** applies to the open and fopen functions.
 */
-extern unsigned char _filetype;  /* Default: 6 */
-extern unsigned int _auxtype;    /* Default: 0 */
 extern struct {
     struct {
         unsigned day  :5;
         unsigned mon  :4;
         unsigned year :7;
-    }             createdate;    /* Current date: 0 */ 
+    }             createdate;    /* Current date: 0 */
     struct {
         unsigned char min;
         unsigned char hour;
-    }             createtime;    /* Current time: 0 */ 
+    }             createtime;    /* Current time: 0 */
 } _datetime;
 
 /* The addresses of the static drivers */
@@ -191,9 +204,11 @@ void rebootafterexit (void);
 ** to be overlaid by macros with the same names, saving the function call
 ** overhead.
 */
-#define _textcolor(color)    COLOR_WHITE
-#define _bgcolor(color)      COLOR_BLACK
-#define _bordercolor(color)  COLOR_BLACK
+#define _textcolor(color)       COLOR_WHITE
+#define _bgcolor(color)         COLOR_BLACK
+#define _bordercolor(color)     COLOR_BLACK
+#define _cpeekcolor()           COLOR_WHITE
+#define _cpeekrevers()          0
 
 
 

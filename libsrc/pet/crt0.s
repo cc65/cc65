@@ -12,7 +12,6 @@
 
         .include        "zeropage.inc"
         .include        "pet.inc"
-        .include        "../cbm/cbm.inc"
 
 ; ------------------------------------------------------------------------
 ; Startup code
@@ -94,7 +93,7 @@ L2:     lda     zpsave,x
 
 ; ------------------------------------------------------------------------
 
-.segment        "INITBSS"
+.segment        "INIT"
 
 zpsave: .res    zpspace
 

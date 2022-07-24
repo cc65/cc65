@@ -1,6 +1,6 @@
 ;
 ; Ullrich von Bassewitz, 05.08.1998
-;
+; Christian Krueger, 11-Mar-2017, ímproved  65SC02 optimization
 ; CC65 runtime: long sub
 ;
 
@@ -14,14 +14,19 @@
         .macpack        cpu
 
 tossub0ax:
+.if (.cpu .bitand ::CPU_ISET_65SC02)
+        stz     sreg
+        stz     sreg+1
+.else
         ldy     #$00
         sty     sreg
         sty     sreg+1
+.endif
 
 tossubeax:
         sec
         eor     #$FF
-.if (.cpu .bitand CPU_ISET_65SC02)
+.if (.cpu .bitand ::CPU_ISET_65SC02)
         adc     (sp)            ; 65SC02 version - saves 2 cycles
         ldy     #1
 .else

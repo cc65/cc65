@@ -7,46 +7,51 @@
 ; Subroutines available in the CBM jump table
 ;
 
-;CINT           = $FF81
-;IOINIT         = $FF84
-;RAMTAS         = $FF87
-;RESTOR         = $FF8A
-;VECTOR         = $FF8D
-;SETMSG         = $FF90
-;SECOND         = $FF93
-;TKSA           = $FF96
-;MEMTOP         = $FF99
-;MEMBOT         = $FF9C
-;SCNKEY         = $FF9F
-;SETTMO         = $FFA2
-;ACPTR          = $FFA5
-;CIOUT          = $FFA8
-;UNTLK          = $FFAB
-;UNLSN          = $FFAE
-;LISTEN         = $FFB1
-;TALK           = $FFB4
-;READST         = $FFB7
-;SETLFS         = $FFBA
-;SETNAM         = $FFBD
-;OPEN           = $FFC0
-;CLOSE          = $FFC3
-;CHKIN          = $FFC6
-;CKOUT          = $FFC9
-;CLRCH          = $FFCC
-;BASIN          = $FFCF
-;BSOUT          = $FFD2
-;LOAD           = $FFD5
-;SAVE           = $FFD8
-;SETTIM         = $FFDB
-;RDTIM          = $FFDE
-;STOP           = $FFE1
-;GETIN          = $FFE4
-;CLALL          = $FFE7
-;UDTIM          = $FFEA
-;SCREEN         = $FFED
-;PLOT           = $FFF0
-;IOBASE         = $FFF3
+.import C64MODE
+.import SWAPPER
+.import SETBNK
 
+.import CINT
+.import IOINIT
+.import RAMTAS
+.import VECTOR
+.import RESTOR
+.import SETMSG
+.import SECOND
+.import TKSA
+.import MEMTOP
+.import MEMBOT
+.import SCNKEY
+.import SETTMO
+.import ACPTR
+.import CIOUT
+.import UNTLK
+.import UNLSN
+.import LISTEN
+.import TALK
+.import READST
+.import SETLFS
+.import SETNAM
+.import OPEN
+.import CLOSE
+.import LOAD
+.import SAVE
+.import SETTIM
+.import RDTIM
+.import SCREEN
+.import PLOT
+.import IOBASE
+.import CHKIN
+.import CKOUT
+.import CLRCH
+.import BASIN
+.import CHRIN
+.import BSOUT
+.import CHROUT
+.import STOP
+.import GETIN
+.import CLALL
+.import UDTIM
 
 ;-----------------------------------------------------------------------------
 ; Device numbers
@@ -63,5 +68,3 @@ CBMDEV_SCREEN   = 3
 
 MAX_DRIVES      = 23
 FIRST_DRIVE     = 8
-
-

@@ -6,6 +6,7 @@
 
         .import         __dos_type
 
+        .include        "apple2.inc"
         .include        "mli.inc"
 
         .bss
@@ -23,10 +24,24 @@ callmli:
         lda     __dos_type
         beq     oserr
 
-        ; Call MLI and return
+        ; Save random counter
+        lda     RNDL
+        pha
+        lda     RNDH
+        pha
+
+        ; Call MLI
         jsr     $BF00           ; MLI call entry point
 call:   .byte   $00
         .addr   mliparam
+
+        ; Restore random counter and return
+        tax
+        pla
+        sta     RNDH
+        pla
+        sta     RNDL
+        txa
         rts
 
         ; Load oserror code and return

@@ -18,6 +18,22 @@
         .export _textcolor := soft80mono_textcolor      ; color.s
         .export _bgcolor := soft80mono_bgcolor          ; color.s
 
+        ; soft80mono_cpeekc.s
+        .import soft80_cpeekc
+        .export _cpeekc := soft80_cpeekc                ; cpeekc.s
+
+        ; soft80mono_cpeekcolor.s
+        .import soft80mono_cpeekcolor
+        .export _cpeekcolor := soft80mono_cpeekcolor    ; cpeekcolor.s
+
+        ; soft80mono_cpeekrevers.s
+        .import soft80_cpeekrevers
+        .export _cpeekrevers := soft80_cpeekrevers      ; cpeekrevers.s
+
+        ; soft80mono_cpeeks.s
+        .import soft80_cpeeks
+        .export _cpeeks := soft80_cpeeks                ; cpeeks.s
+
         ; soft80mono_cputc.s
         .import soft80mono_cputc
         .import soft80mono_cputcxy
@@ -53,3 +69,6 @@
         ; Chars used by chline () and cvline ()
         .exportzp       chlinechar = CH_HLINE
         .exportzp       cvlinechar = CH_VLINE
+
+        .import         return1
+        .export         _doesclrscrafterexit := return1

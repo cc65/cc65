@@ -104,8 +104,14 @@ PRINT           := $F77C
 
 ; Sound Effects
 PING            := $FA9F
+PING1           := $FA85
 SHOOT           := $FAB5
+SHOOT1          := $FA9B
 EXPLODE         := $FACB
+EXPLODE1        := $FAB1
 ZAP             := $FAE1
+ZAP1            := $FAC7
 TICK            := $FB14
+TICK1           := $FAFA
 TOCK            := $FB2A
+TOCK1           := $FB10

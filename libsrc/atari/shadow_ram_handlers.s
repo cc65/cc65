@@ -22,11 +22,12 @@ SHRAM_HANDLERS  =       1
         .export         CIO_handler
         .export         SIO_handler
         .export         SETVBV_handler
+        .export         XMOVE_handler
 
 BUFSZ           =       128     ; bounce buffer size
 BUFSZ_SIO       =       256
 
-.segment "INIT"
+.segment "ONCE"
 
 ; Turn off ROMs, install system and interrupt wrappers, set new chargen pointer
 
@@ -736,9 +737,9 @@ fn_cont:jsr     get_fn_len
         lda     #0
         sta     ICBLH,x
         jsr     chk_CIO_buf
-        pla     
+        pla
         sta     ICBLH,x
-        pla     
+        pla
         sta     ICBLL,x
         pla
         tay
@@ -755,7 +756,7 @@ chk_CIO_buf:
         lda     ICBAH,x
         cmp     #$c0
         bcc     @cont
-@ret:   
+@ret:
 .ifdef DEBUG
         jsr     CIO_buf_noti
 .endif
@@ -1085,6 +1086,24 @@ SETVBV_handler:
         plp
         rts
 
+;---------------------------------------------------------
+
+XMOVE_handler:
+
+        pha
+        lda     PORTB
+        sta     cur_XMOVE_PORTB
+        enable_rom
+        pla
+        jsr     XMOVE_org
+        php
+        pha
+        disable_rom_val cur_XMOVE_PORTB
+        pla
+        plp
+        rts
+
+
 CIO_a:                  .res    1
 CIO_x:                  .res    1
 CIO_y:                  .res    1
@@ -1093,6 +1112,7 @@ cur_CIOV_PORTB:         .res    1
 cur_SIOV_PORTB:         .res    1
 cur_KEYBDV_PORTB:       .res    1
 cur_SETVBV_PORTB:       .res    1
+cur_XMOVE_PORTB:        .res    1
 orig_ptr:               .res    2
 orig_len:               .res    2
 req_len:                .res    2

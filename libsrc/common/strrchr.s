@@ -1,47 +1,41 @@
 ;
 ; Ullrich von Bassewitz, 31.05.1998
+; Christian Krueger: 2013-Aug-01, optimization
 ;
 ; char* strrchr (const char* s, int c);
 ;
 
         .export         _strrchr
         .import         popax
-        .importzp       ptr1, ptr2, tmp1
+        .importzp       ptr1, tmp1, tmp2
 
 _strrchr:
-        sta     tmp1            ; Save c
-        jsr     popax           ; get s
-        sta     ptr1
-        stx     ptr1+1
-        lda     #0              ; function result = NULL
-        sta     ptr2
-        sta     ptr2+1
-        tay
+        sta tmp1        ; Save c
+        jsr popax       ; get s
+        tay             ; low byte to y
+        stx ptr1+1
+        ldx #0          ; default function result is NULL, X is high byte...
+        stx tmp2        ; tmp2 is low-byte
+        stx ptr1        ; low-byte of source string is in Y, so clear real one...
 
-L1:     lda     (ptr1),y        ; get next char
-        beq     L3              ; jump if end of string
-        cmp     tmp1            ; found?
-        bne     L2              ; jump if no
+testChar:
+        lda (ptr1),y    ; get char
+        beq finished    ; jump if end of string
+        cmp tmp1        ; found?
+        bne nextChar    ; jump if no
 
-; Remember a pointer to the character
+charFound:
+        sty tmp2        ; y has low byte of location, save it
+        ldx ptr1+1      ; x holds high-byte of result
 
-        tya
-        clc
-        adc     ptr1
-        sta     ptr2
-        lda     ptr1+1
-        adc     #$00
-        sta     ptr2+1
+nextChar:
+        iny
+        bne testChar
+        inc ptr1+1
+        bne testChar    ; here like bra...
 
-; Next char
+; return the pointer to the last occurrence
 
-L2:     iny
-        bne     L1
-        inc     ptr1+1
-        bne     L1              ; jump always
-
-; Return the pointer to the last occurrence
-
-L3:     lda     ptr2
-        ldx     ptr2+1
+finished:
+        lda tmp2        ; high byte in X is already correct...
         rts

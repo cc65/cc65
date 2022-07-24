@@ -9,7 +9,7 @@
 
 ; ------------------------------------------------------------------------
 
-.segment        "INIT"
+.segment        "ONCE"
 
 initirq:
         lda     #<IRQStub
@@ -36,7 +36,6 @@ IRQStub:
         phy
         phx
         pha
-        cld
         jsr     callirq
         lda     INTSET
         sta     INTRST

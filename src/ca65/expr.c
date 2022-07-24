@@ -171,6 +171,25 @@ int IsFarRange (long Val)
 
 
 
+static const ExprNode* ResolveSymbolChain(const ExprNode* E)
+/* Recursive helper function for IsEasyConst */
+{
+    if (E->Op == EXPR_SYMBOL) {
+        SymEntry* Sym = E->V.Sym;
+
+        if (Sym == 0 || Sym->Expr == 0 || SymHasUserMark (Sym)) {
+            return 0;
+        } else {
+            SymMarkUser (Sym);
+            E = ResolveSymbolChain (Sym->Expr);
+            SymUnmarkUser (Sym);
+        }
+    }
+    return E;
+}
+
+
+
 int IsEasyConst (const ExprNode* E, long* Val)
 /* Do some light checking if the given node is a constant. Don't care if E is
 ** a complex expression. If E is a constant, return true and place its value
@@ -178,12 +197,10 @@ int IsEasyConst (const ExprNode* E, long* Val)
 */
 {
     /* Resolve symbols, follow symbol chains */
-    while (E->Op == EXPR_SYMBOL) {
-        E = SymResolve (E->V.Sym);
-        if (E == 0) {
-            /* Could not resolve */
-            return 0;
-        }
+    E = ResolveSymbolChain (E);
+    if (E == 0) {
+        /* Could not resolve */
+        return 0;
     }
 
     /* Symbols resolved, check for a literal */
@@ -699,7 +716,7 @@ static ExprNode* FuncAddrSize (void)
         /* Cheap local symbol */
         Sym = SymFindLocal (SymLast, &CurTok.SVal, SYM_FIND_EXISTING);
         if (Sym == 0) {
-            Error ("Unknown symbol or scope: `%m%p'", &CurTok.SVal);
+            Error ("Unknown symbol or scope: '%m%p'", &CurTok.SVal);
         } else {
             AddrSize = Sym->AddrSize;
         }
@@ -739,13 +756,13 @@ static ExprNode* FuncAddrSize (void)
         if (Sym) {
             AddrSize = Sym->AddrSize;
         } else {
-            Error ("Unknown symbol or scope: `%m%p%m%p'", &ScopeName, &Name);
+            Error ("Unknown symbol or scope: '%m%p%m%p'", &ScopeName, &Name);
         }
 
     }
 
     if (AddrSize == 0) {
-        Warning (1, "Unknown address size: `%m%p%m%p'", &ScopeName, &Name);
+        Warning (1, "Unknown address size: '%m%p%m%p'", &ScopeName, &Name);
     }
 
     /* Free the string buffers */
@@ -780,7 +797,7 @@ static ExprNode* FuncSizeOf (void)
         /* Cheap local symbol */
         Sym = SymFindLocal (SymLast, &CurTok.SVal, SYM_FIND_EXISTING);
         if (Sym == 0) {
-            Error ("Unknown symbol or scope: `%m%p'", &CurTok.SVal);
+            Error ("Unknown symbol or scope: '%m%p'", &CurTok.SVal);
         } else {
             SizeSym = GetSizeOfSymbol (Sym);
         }
@@ -832,7 +849,7 @@ static ExprNode* FuncSizeOf (void)
             if (Sym) {
                 SizeSym = GetSizeOfSymbol (Sym);
             } else {
-                Error ("Unknown symbol or scope: `%m%p%m%p'",
+                Error ("Unknown symbol or scope: '%m%p%m%p'",
                        &ScopeName, &Name);
             }
         }
@@ -840,7 +857,7 @@ static ExprNode* FuncSizeOf (void)
 
     /* Check if we have a size */
     if (SizeSym == 0 || !SymIsConst (SizeSym, &Size)) {
-        Error ("Size of `%m%p%m%p' is unknown", &ScopeName, &Name);
+        Error ("Size of '%m%p%m%p' is unknown", &ScopeName, &Name);
         Size = 0;
     }
 
@@ -1209,11 +1226,11 @@ static ExprNode* Factor (void)
                 SB_GetLen (&CurTok.SVal) == 1) {
                 /* A character constant */
                 N = GenLiteralExpr (TgtTranslateChar (SB_At (&CurTok.SVal, 0)));
+                NextTok ();
             } else {
                 N = GenLiteral0 ();     /* Dummy */
                 Error ("Syntax error");
             }
-            NextTok ();
             break;
     }
     return N;
@@ -1691,7 +1708,7 @@ ExprNode* GenLiteralExpr (long Val)
 
 
 ExprNode* GenLiteral0 (void)
-/* Return an expression tree that encodes the the number zero */
+/* Return an expression tree that encodes the number zero */
 {
     return GenLiteralExpr (0);
 }
@@ -1861,6 +1878,28 @@ ExprNode* GenWordExpr (ExprNode* Expr)
 {
     /* Use the low byte operator to force the expression into word size */
     return LoWord (Expr);
+}
+
+
+
+ExprNode* GenNearAddrExpr (ExprNode* Expr)
+/* A word sized expression that will error if given a far expression at assemble time. */
+{
+    long      Val;
+    /* Special handling for const expressions */
+    if (IsEasyConst (Expr, &Val)) {
+        FreeExpr (Expr);
+        Expr = GenLiteralExpr (Val & 0xFFFF);
+        if (Val > 0xFFFF)
+        {
+            Error("Range error: constant too large for assumed near address.");
+        }
+    } else {
+        ExprNode* Operand = Expr;
+        Expr = NewExprNode (EXPR_NEARADDR);
+        Expr->Left = Operand;
+    }
+    return Expr;
 }
 
 

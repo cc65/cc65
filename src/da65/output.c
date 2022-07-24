@@ -96,7 +96,7 @@ void OpenOutput (const char* Name)
     if (Name != 0) {
         F = fopen (Name, "w");
         if (F == 0) {
-            Error ("Cannot open `%s': %s", Name, strerror (errno));
+            Error ("Cannot open '%s': %s", Name, strerror (errno));
         }
     } else {
         F = stdout;

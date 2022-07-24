@@ -1,12 +1,9 @@
 <!doctype linuxdoc system>
 
 <article>
-
-<!-- Title information -->
-
 <title>GEOSLib docs
 <author><url url="mailto:ytm@elysium.pl" name="Maciej Witkowiak">
-<date>2014-04-11
+
 <abstract>
 This is the documentation of cc65's GEOSLib, but information contained here may be also
 useful for writing GEOS applications in general.
@@ -51,7 +48,7 @@ changed between <tt/tgi_init/ and <tt/tgi_done/.
 It is safe to use these standard includes and their contents:
 <tt/assert.h, conio.h, dio.h, errno.h, em.h, geos.h, joystick.h, modload.h, mouse.h, stdlib.h, string.h, tgi.h, time.h/
 <p>
-For <tt/time.h/ functions <tt/systime()/ and <tt/clock()/ note that the resolution is one second.
+For <tt/time.h/ functions <tt/clock()/ and <tt/clock_gettime()/ note that the resolution is one second.
 <p>
 Functions from the headers above are either standard C library functions or cc65-specific, in
 either case they are not GEOS specific and so they are not described here.
@@ -71,19 +68,19 @@ programs.
 The software needed:
 <itemize>
     <item><em/cc65/ Excellent package containing a C crosscompiler, a crossassembler and a linker, you
-		can get it from: <url url="http://cc65.github.io/cc65/">.
+                can get it from: <url url="https://cc65.github.io/">.
     <item><em/VICE/ This is a portable C64, C128 and few other Commodore computers emulator, you
-		can obtain it from: <url url="http://vice-emu.sourceforge.net/">.
-		The VICE package contains the <em/c1541/ program that is able
-		to convert/unconvert GEOS files to disk images.
+                can obtain it from: <url url="http://vice-emu.sourceforge.net/">.
+                The VICE package contains the <em/c1541/ program that is able
+                to convert/unconvert GEOS files to disk images.
     <item><em/The Star Commander/ This tool is only for DOS. You will need it for transferring
-		object files from a PC to a 1541. There's also one important ability of this
-		tool - it automatically un-converts .cvt files into GEOS native format on
-		disk image files. Check out: <url url="http://sta.c64.org/sc.html">.
+                object files from a PC to a 1541. There's also one important ability of this
+                tool - it automatically un-converts .cvt files into GEOS native format on
+                disk image files. Check out: <url url="http://sta.c64.org/sc.html">.
     <item><em/opencbm/ A package that allows for communication directly with a 1541 and
-		other Commodore IEC bus drives. It can be a replacement for Star Commander if
-		you only want to transfer files to a disk and unconvert using GEOS program for
-		this purpose. Check out: <url url="http://opencbm.sourceforge.net/">.
+                other Commodore IEC bus drives. It can be a replacement for Star Commander if
+                you only want to transfer files to a disk and unconvert using GEOS program for
+                this purpose. Check out: <url url="https://spiro.trikaliotis.net/opencbm">.
 </itemize>
 <p>
 VICE and cc65 are portable - they run on variety of platforms - DOS, Win32 and UNIX. GEOSLib only
@@ -191,6 +188,14 @@ are covered by new names, but I tried to keep them in the naming convention.
 <p>
 This section covers the drawing package of GEOS along with text output routines.
 
+<sect2>SetNewMode
+<p>
+<tt/void SetNewMode (void)/
+<p>
+This function is intended for use by GEOS 128 only, and will exhibit undefined behavior on the
+C64.  It will toggle between the 40 column screen mode and the 80 column screen mode.  Many C128 GEOS
+programs implement a "Switch 40/80" submenu option under the <tt/geos/ menu.
+
 <sect2>SetPattern
 <p>
 <tt/void SetPattern (char pattern)/
@@ -200,9 +205,9 @@ see them together in the filling box in GeoPaint.
 
 <sect2>GraphicsString
 <p>
-<tt/void GraphicsString (char *myGString)/
+<tt/void GraphicsString (const void *myGString)/
 <p>
-One of the more powerfull routines of GEOS. This function calls other graphic functions depending
+One of the more powerful routines of GEOS. This function calls other graphic functions depending
 on the given command string. See the structures chapter for a more detailed description.
 
 <sect2>Rectangle functions
@@ -382,7 +387,7 @@ and the number of rows to skip from the top if it.
 <sect3>BitOtherClip
 <p>
 <tt/void BitOtherClip (void *proc1, void *proc2, char skipLeft, char skip Right, unsigned skipTop,
-	struct iconpic *myPic)/
+        struct iconpic *myPic)/
 <p>
 Similar to the previous one with some extension. <tt/proc1/ is called before reading a byte (it
 returns in .A the next value), and <tt/proc2/ is called every time the parser reads a byte which is
@@ -647,7 +652,7 @@ For some purposes you might consider using the <tt/dio.h/ interface to disk acce
 <p>
 All GEOS disk functions return an error code in the X register. In some cases this is returned by the
 GEOSLib function (if its type is <tt/char/), but in all cases the last error is saved in the <tt/__oserror/
-location. If it is nonzero - an error occured. See <tt/gdisk.h/ for the list of possible errorcodes.
+location. If it is nonzero - an error occurred. See <tt/gdisk.h/ for the list of possible errorcodes.
 You need to include <tt/errno.h/ to get <tt/__oserror/, together with the standard <tt/errno/. The
 latter gives less verbose, but still usable information and can be used with <tt/strerror/.
 Probably you will get more information using <tt/_stroserror/ in a similar way.
@@ -717,9 +722,9 @@ disk. Otherwise they will be lost. Operating area is the <tt/curDirHead/.
 This function returns the number of free blocks on the current disk. It is counted using data in
 <tt/curDirHead/ so you must initialize the disk before calling it.
 
-<sect3>ChkDskGEOS
+<sect3>ChkDkGEOS
 <p>
-<tt/char ChkDskGEOS (void)/
+<tt/char ChkDkGEOS (void)/
 <p>
 This functions checks <tt/curDirHead/ for the GEOS Format identifier. It returns either true or false,
 and also sets <tt/isGEOS/ properly. You must initialize the disk before using this.
@@ -853,20 +858,21 @@ The functions described here are common for SEQ and VLIR structures.
 <p>
 <tt/struct filehandle *GetNxtDirEntry (void)/
 <p>
-These two functions are best suited for scanning the whole directory for particular files. Note that
-the returned filehandles describe all file slots in the directory - even those with deleted files.
-The return value can be obtained by casting both sides to <tt/unsigned/ - as in the <tt/SetNextFree/
-function or read directly after a call to those two functions from <tt/r5/. The current sector number
-is in <tt/r1/ and the sector data itself is in <tt/diskBlkBuf/.
+Those two functions are best suited for scanning the whole directory for particular files. Note that
+the returned filehandles describe all file slots in the directory -- even those with deleted files.
+The return value is <tt/NULL/ if there are no more slots, or if there was a disk error.  The
+<tt/_oserror/ variable is non-zero if it was a disk error (see <tt>geos/gdisk.h</tt>).  The current
+directory track and sector numbers are in <tt/r1L/ and <tt/r1H/.  The sector data itself is in
+<tt/diskBlkBuf/.
 
 <sect3>FindFile
 <p>
 <tt/char FindFile (char *fName)/
 <p>
-This function scans the whole directory for the given filename. It returns either 0 (success) or 5
-(FILE_NOT_FOUND, defined in <tt/gdisk.h/) or any other fatal disk read error. After a successful
-<tt/FindFile/ you will have <tt/struct filehandle/ at <tt/dirEntryBuf/ filled with the file's data and
-other registers set as described in <tt/GetNxtDirEntry/.
+This function scans the whole directory for the given filename. It returns either 0 (success), 5
+(FILE_NOT_FOUND, defined in <tt>geos/gdisk.h</tt>), or any other fatal disk read error. After a successful
+<tt/FindFile()/, you will have <tt/struct filehandle/ at <tt/dirEntryBuf/ filled with the file's data, and
+other registers set as described in <tt/GetNxtDirEntry()/.
 
 <sect3>FindFTypes
 <p>
@@ -982,7 +988,7 @@ a particular file.
 <p>
 In GEOS there can be only one file opened at a time. Upon opening a VLIR file some information
 about it is copied into memory. You can retrieve the records table at <tt/fileTrScTab/ (table of
-128 <tt/struct tr_se/) and from <tt/VLIRInfo/ (<tt/struct VLIR_info/.
+128 <tt/struct tr_se/) and from <tt/VLIRInfo/ (<tt/struct VLIR_info/).
 E.g. the size of whole VLIR file can be retrieved by reading <tt/VLIRInfo.fileSize/.
 
 <sect3>OpenRecordFile
@@ -1326,7 +1332,7 @@ This function returns the GEOS Kernal version combined (by logical OR) with the 
 <p>
 This function returns the PAL/NTSC flag combined (by logical OR) with the 40/80 columns flag. This is
 not the best way to check if the screen has 40 or 80 columns since a PAL/NTSC check is always
-performed and it can take as long as a full raster frame. If you just want to know if the 
+performed and it can take as long as a full raster frame. If you just want to know if the
 screen has 40 or 80 columns use the expression <tt/graphMode & 0x80/ which returns <tt/0/ for
 40 columns and <tt/0x80/ for 80 columns. Remember that this value can be changed during
 runtime. It is unclear if this will work for GEOS 64 so you probably do not want to test
@@ -1385,9 +1391,9 @@ has the following fields:
 <itemize>
     <item><tt/char number/ - total number of icons declared here
     <item><tt/struct pixel mousepos/ - after finishing <tt/DoIcons/ the mouse pointer will be placed in
-	this point allowing you to have a hint for the user what the default action is
+        this point allowing you to have a hint for the user what the default action is
     <item><tt/struct icondef tab&lsqb;&rsqb/ - this table of size equal to <tt/icontab.number/ contains
-	descriptions for all icons
+        descriptions for all icons
 </itemize>
 
 <sect1>File and Disk
@@ -1447,9 +1453,9 @@ void example = &lcub;
 Which will be compiled to following string of bytes:
 <tscreen><verb>
 _example:
-	.byte 3
-	.word 3
-	.byte 0
+        .byte 3
+        .word 3
+        .byte 0
 </verb></tscreen>
 As you see this way it is possible to define data of any type in any order. You must remember to
 cast each member to proper type.
@@ -1469,21 +1475,21 @@ just in the content.
 Here is how a single descriptor looks like:
 <tscreen><verb>
 void myMenu = &lcub;
-	(char)top, (char)bottom,                // this is the size of the menubox
-	(unsigned)left, (unsigned)right,        // counting all items in the current descriptor
-	(char)number_of_items | type_of_menu,   // number of following items ORed with
-	                                        // type of this menu, it can be either
-	// HORIZONTAL or VERTICAL if you will have also bit 6 set then menu won't be closed
-	// after moving mouse pointer outside the menubox. You can have at most 31 items.
+        (char)top, (char)bottom,                // this is the size of the menubox
+        (unsigned)left, (unsigned)right,        // counting all items in the current descriptor
+        (char)number_of_items | type_of_menu,   // number of following items ORed with
+                                                // type of this menu, it can be either
+        // HORIZONTAL or VERTICAL if you will have also bit 6 set then menu won't be closed
+        // after moving mouse pointer outside the menubox. You can have at most 31 items.
 </verb></tscreen>
 This is followed by <tt/number_of_items/ of following item description.
 <tscreen><verb>
-	...
-	"menuitemname", (char)item_type, (unsigned)pointer,
-	"nextitemname", (char)item_type, (unsigned)pointer,
-	...
-	"lastitemname", (char)item_type, (unsigned)pointer &rcub;;
-	// Note that there isn't ending <tt/NULL/ or something like that.
+        ...
+        "menuitemname", (char)item_type, (unsigned)pointer,
+        "nextitemname", (char)item_type, (unsigned)pointer,
+        ...
+        "lastitemname", (char)item_type, (unsigned)pointer &rcub;;
+        // Note that there isn't ending <tt/NULL/ or something like that.
 </verb></tscreen>
 <tt/pointer/ is a pointer to something, what it points for depends from <tt/item_type/. This one
 can have following values:
@@ -1516,16 +1522,16 @@ The first element can be specified in two ways - by using the default size and p
 your own. The first case results in
 <tscreen><verb>
 const dlgBoxStr example = &lcub;
-	DB_DEFPOS (pattern_of_shadow),
-	...		// commands
-	DB_END &rcub;;
+        DB_DEFPOS (pattern_of_shadow),
+        ...             // commands
+        DB_END &rcub;;
 </verb></tscreen>
 And the own size and position would be:
 <tscreen><verb>
 const dlgBoxStr example = &lcub;
-	DB_SETPOS (pattern, top, bottom, left, right)
-	...		// commands
-	DB_END &rcub;;
+        DB_SETPOS (pattern, top, bottom, left, right)
+        ...             // commands
+        DB_END &rcub;;
 </verb></tscreen>
 
 <sect3>Commands
@@ -1534,9 +1540,9 @@ The next element of the <tt/DoDlgBox/ command string are the commands themselves
 default icons and the number of the selected icon will be returned from window processor. The icons are
 <tt/OK, CANCEL, YES, NO, OPEN/, and <tt/DISK/. You can use predefined macros for using them, e.g.:
 <tscreen><verb>
-	...
-	DB_ICON(OK, DBI_X_0, DBI_Y_0),
-	...
+        ...
+        DB_ICON(OK, DBI_X_0, DBI_Y_0),
+        ...
 </verb></tscreen>
 Note that the position is counted from top left corner of window, not entire screen and that the 'x'
 position is counted in cards (8-pixel) and not in pixels. This is also true for all following commands.
@@ -1550,13 +1556,13 @@ where the address of the text is stored. This is useful for information windows 
 is variable. Consider following:
 <tscreen><verb>
 char text = "foo";
-	...
-	r15=(unsigned)text;		// in code just before call to DoDlgBox
-	...
-	DB_VARSTR (TXT_LN_X, TXT_LN_1_Y, &amp;r15),
-	...
+        ...
+        r15=(unsigned)text;             // in code just before call to DoDlgBox
+        ...
+        DB_VARSTR (TXT_LN_X, TXT_LN_1_Y, &amp;r15),
+        ...
 </verb></tscreen>
-will cause the word ``foo'' to appear in the window, but you may store the pointer to any text in
+will cause the word ''foo'' to appear in the window, but you may store the pointer to any text in
 <tt/r15/ (in this case) before the call to DoDlgBox.
 <p>
 <tt/DB_GETSTR(x, y, ptr, length)/ - will add a input-from-keyboard feature. <tt/ptr/ works as in the
@@ -1591,10 +1597,10 @@ command has to be <tt/GSTR_END/. There is a custom type defined for the command 
 Here is an example for clearing the screen:
 <tscreen><verb>
 const graphicStr example = &lcub;
-	MOVEPENTO(0,0),
-	NEWPATTERN(0),
-	RECTANGLETO(319,199)
-	GSTR_END &rcub;;
+        MOVEPENTO(0,0),
+        NEWPATTERN(0),
+        RECTANGLETO(319,199)
+        GSTR_END &rcub;;
 </verb></tscreen>
 
 <sect2>InitRam table
@@ -1618,17 +1624,17 @@ It is possible to intercept events and hook into the GEOS Kernal using vectors. 
 void_func oldVector;
 
 void NewVectorHandler(void) &lcub;
-	// do something and at the end call the old vector routine
-	oldVector();
+        // do something and at the end call the old vector routine
+        oldVector();
 &rcub;
 
 void hook_into_system(void) &lcub;
-	oldVector = mouseVector;
-	mouseVector = NewVectorHandler;
+        oldVector = mouseVector;
+        mouseVector = NewVectorHandler;
 &rcub;
 
 void remove_hook(void) &lcub;
-	mouseVector = oldVector;
+        mouseVector = oldVector;
 &rcub;
 </verb></tscreen>
 <p>
@@ -1650,10 +1656,10 @@ That little example above intercepts <tt/mouseVector/. The <tt/NewVectorHandler/
 called every time the mouse button changes status. Other important vectors you should know about
 are:
 <itemize>
-	<item><tt/appMain/ - this is called from within the <tt/MainLoop/ system loop
-	<item><tt/keyVector/ - called whenever a keypress occurs
-	<item><tt/intTopVector/ - called at the start of the IRQ routine
-	<item><tt/intBotVector/ - called at the end of the IRQ routine
+        <item><tt/appMain/ - this is called from within the <tt/MainLoop/ system loop
+        <item><tt/keyVector/ - called whenever a keypress occurs
+        <item><tt/intTopVector/ - called at the start of the IRQ routine
+        <item><tt/intBotVector/ - called at the end of the IRQ routine
 </itemize>
 
 </article>

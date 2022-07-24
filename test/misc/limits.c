@@ -7,9 +7,9 @@
 #include <stdio.h>
 #include <limits.h>
 
-#define SSHRT_MAX 	SHRT_MAX
-#define SINT_MAX 	INT_MAX
-#define SLONG_MAX 	LONG_MAX
+#define SSHRT_MAX       SHRT_MAX
+#define SINT_MAX        INT_MAX
+#define SLONG_MAX       LONG_MAX
 
 #define UCHAR_MIN   0
 #define USHRT_MIN   0

@@ -1,5 +1,5 @@
 /*
-  !!DESCRIPTION!! 
+  !!DESCRIPTION!!
   !!ORIGIN!!      testsuite
   !!LICENCE!!     Public Domain
   !!AUTHOR!!      Groepaz/Hitmen
@@ -24,7 +24,7 @@ FILE *outfile=NULL;
 #else
 
 #endif
-			 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -34,18 +34,18 @@ FILE *outfile=NULL;
 
 struct Xdirent
 {
-	char d_name[XNAME_MAX+1];
-	unsigned short d_off;
-	unsigned short d_reclen;
-	unsigned char  d_type;
-	unsigned char  d_namlen;
+        char d_name[XNAME_MAX+1];
+        unsigned short d_off;
+        unsigned short d_reclen;
+        unsigned char  d_type;
+        unsigned char  d_namlen;
 };
 
 typedef struct
 {
-	unsigned char fd;
-	unsigned short off;
-	char name[XNAME_MAX+1];
+        unsigned char fd;
+        unsigned short off;
+        char name[XNAME_MAX+1];
 } XDIR;
 
 unsigned char b1[4];
@@ -61,51 +61,51 @@ static struct Xdirent entry;
 unsigned char fd;
 static unsigned char ch;
 
-		entry.d_off=dir->off;
+                entry.d_off=dir->off;
 
-		/* basic line-link / file-length */
-		memcpy(buffer,b1,4);
-		
-		dir->off=dir->off+4;    
-		entry.d_reclen=254*(buffer[2]+(buffer[3]<<8));
+                /* basic line-link / file-length */
+                memcpy(buffer,b1,4);
 
-		/* read file entry */
-		memcpy(buffer,b2,0x10);
-			
-		dir->off=dir->off+i;    
+                dir->off=dir->off+4;
+                entry.d_reclen=254*(buffer[2]+(buffer[3]<<8));
 
-		printf("Xreaddir: '%s'\n",buffer);
-		
-		/* skip until either quote (file) or b (blocks free => end) */
-		i=0;ii=0;
-		while(i==0){
-			temp=buffer[ii];ii++;
-			if(ii>16){
-				/* something went wrong...this shouldnt happen! */
-				return(NULL);
-			}
-			else if(temp=='\"') i++;
-			else if(temp=='b') {
-				/* "blocks free" */
-				return(NULL);
-			}
-		}
-		printf("Xreaddir: '%s'\n",buffer);
+                /* read file entry */
+                memcpy(buffer,b2,0x10);
 
-		/* process file entry */
+                dir->off=dir->off+i;
 
-		i=0;  temp=buffer[ii];ii++;
-		while(temp!='\"'){
-			entry.d_name[i]=temp;
-			i++;
-			temp=buffer[ii];ii++;
-		}
-		entry.d_name[i]=0;
-		entry.d_namlen=i;
+                printf("Xreaddir: '%s'\n",buffer);
 
-		/* set type flag */
+                /* skip until either quote (file) or b (blocks free => end) */
+                i=0;ii=0;
+                while(i==0){
+                        temp=buffer[ii];ii++;
+                        if(ii>16){
+                                /* something went wrong...this shouldnt happen! */
+                                return(NULL);
+                        }
+                        else if(temp=='\"') i++;
+                        else if(temp=='b') {
+                                /* "blocks free" */
+                                return(NULL);
+                        }
+                }
+                printf("Xreaddir: '%s'\n",buffer);
 
-		return(&entry);
+                /* process file entry */
+
+                i=0;  temp=buffer[ii];ii++;
+                while(temp!='\"'){
+                        entry.d_name[i]=temp;
+                        i++;
+                        temp=buffer[ii];ii++;
+                }
+                entry.d_name[i]=0;
+                entry.d_namlen=i;
+
+                /* set type flag */
+
+                return(&entry);
 }
 
 int main(void)
@@ -113,16 +113,16 @@ int main(void)
 char mydirname[XNAME_MAX+1]=".";
 XDIR mydir;
 struct Xdirent *mydirent;
-	
+
     printf("start\n");
-    
+
     if((mydirent=Xreaddir(&mydir))==NULL)
     {
-	    printf("NULL\n");
+            printf("NULL\n");
     }
     else
     {
-	    printf("=%s\n",mydirent->d_name);
+            printf("=%s\n",mydirent->d_name);
     }
     printf("done\n");
 

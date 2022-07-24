@@ -6,6 +6,7 @@
 /* 2009-10-10 -- Version 0.3 */
 /* 2011-04-07 -- Version 0.4, groepaz */
 /* 2011-04-14 -- Version 0.5, Greg King */
+/* 2021-02-15 -- Version 0.6, Greg King */
 
 /* Tested with floppy-drive and IDE64 devices.        */
 /* Not tested with messed (buggy) directory listings. */
@@ -29,7 +30,7 @@ unsigned char cbm_opendir (unsigned char lfn, unsigned char device, ...)
     va_list ap;
     const char* name = "$";
 
-    /* The name used in cbm_open may optionally be passed */
+    /* The name used in cbm_open() optionally may be passed */
     if (__argsize__ == 4) {
         va_start (ap, device);
         name = va_arg (ap, const char*);
@@ -76,9 +77,10 @@ unsigned char __fastcall__ cbm_readdir (unsigned char lfn, register struct cbm_d
 
             byte = cbm_k_basin();
             switch (byte) {
-
-                /* "B" BLOCKS FREE. */
+                /* "B" BLOCKS FREE/USED. */
+                /* "M" MB FREE. */
               case 'b':
+              case 'm':
                 /* Read until end; careless callers might call us again. */
                 while (!cbm_k_readst()) {
                     cbm_k_basin();
@@ -168,7 +170,6 @@ unsigned char __fastcall__ cbm_readdir (unsigned char lfn, register struct cbm_d
             }
 
             rv = 0;
-            goto ret_val;
         }
     }
 

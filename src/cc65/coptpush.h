@@ -52,16 +52,16 @@
 unsigned OptPush1 (CodeSeg* S);
 /* Given a sequence
 **
-**     ldy     #xx
 **     jsr     ldaxysp
 **     jsr     pushax
 **
-** If a/x are not used later, replace that by
+** If a/x are not used later, and Y is known, replace that by
 **
 **     ldy     #xx+2
 **     jsr     pushwysp
+**     ldy     #$00     ; present if later code expects Y = 0
 **
-** saving 3 bytes and several cycles.
+** saving several cycles.
 */
 
 unsigned OptPush2 (CodeSeg* S);

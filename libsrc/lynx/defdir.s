@@ -5,10 +5,9 @@
 ;
         .include "lynx.inc"
         .import         __STARTOFDIRECTORY__
-        .import         __RAM_START__
-        .import         __CODE_SIZE__,__DATA_SIZE__,__RODATA_SIZE__
-        .import         __STARTUP_SIZE__,__INIT_SIZE__,__LOWCODE_SIZE__
-        .import         __BLOCKSIZE__
+        .import         __MAIN_START__
+        .import         __STARTUP_LOAD__, __BSS_LOAD__
+        .import         __BANK0BLOCKSIZE__
         .export         __DEFDIR__: absolute = 1
 
 
@@ -17,15 +16,14 @@
         .segment "DIRECTORY"
 
 __DIRECTORY_START__:
-off0=__STARTOFDIRECTORY__+(__DIRECTORY_END__-__DIRECTORY_START__)
-blocka=off0/__BLOCKSIZE__
+off0 = __STARTOFDIRECTORY__ + (__DIRECTORY_END__ - __DIRECTORY_START__)
+blocka = off0 / __BANK0BLOCKSIZE__
 ; Entry 0 - first executable
-block0=off0/__BLOCKSIZE__
-len0=__STARTUP_SIZE__+__INIT_SIZE__+__CODE_SIZE__+__DATA_SIZE__+__RODATA_SIZE__+__LOWCODE_SIZE__
+block0 = off0 / __BANK0BLOCKSIZE__
+len0 = __BSS_LOAD__ - __STARTUP_LOAD__
         .byte   <block0
-        .word   off0 & (__BLOCKSIZE__ - 1)
+        .word   off0 & (__BANK0BLOCKSIZE__ - 1)
         .byte   $88
-        .word   __RAM_START__
+        .word   __MAIN_START__
         .word   len0
 __DIRECTORY_END__:
-

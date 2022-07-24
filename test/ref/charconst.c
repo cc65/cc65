@@ -14,23 +14,23 @@ void backslash(unsigned char c)
 
     switch (c)
     {
-	case 'b':
-		c = '\b';
-	case 'f':
-		c = '\f';
-	case 'n':
-		c = '\n';
-	case 'r':
-		c = '\r';
-	case 't':
-		c = '\t';
-	case 'v':
+        case 'b':
+                c = '\b';
+        case 'f':
+                c = '\f';
+        case 'n':
+                c = '\n';
+        case 'r':
+                c = '\r';
+        case 't':
+                c = '\t';
+        case 'v':
     #ifndef NO_BACKSLASH_V
         c = '\v';
     #else
         c = 0x0b;
     #endif
-	}
+        }
 
     if(!isprint(c))
     {
@@ -54,7 +54,7 @@ void testbackslash(void)
 
 int main(void)
 {
-	testbackslash();
+        testbackslash();
 
-	return 0;
+        return 0;
 }

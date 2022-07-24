@@ -12,7 +12,7 @@
 
         .export         _mouse_txt_callbacks
         .importzp       tmp4
-        .import         mul40,loc_tmp
+        .import         _mul40
         .importzp       mouse_txt_char          ; screen code of mouse cursor
 
         .include        "atari.inc"
@@ -74,7 +74,7 @@ prep:
         jsr     getcursor       ; Get character at cursor position
         cmp     #mouse_txt_char ; "mouse" character
         bne     overwr          ; no, probably program has overwritten it
-        lda     backup          ; 
+        lda     backup          ;
         jmp     setcursor       ; Draw character
 overwr: sta     backup
         rts
@@ -104,22 +104,15 @@ movex:
 
 ; Move the mouse cursor y position to the value in A/X.
 movey:
-        tax
-        ldy     tmp4            ; mul40 uses tmp4
-        lda     loc_tmp         ; and this local variable
-        pha
-        txa                     ; get parameter back
+        ldy     tmp4            ; mul40 uses tmp4, save in Y
         lsr     a               ; convert y position to character line
         lsr     a
         lsr     a
-        jsr     mul40
-        clc
+        jsr     _mul40          ; carry is cleared by _mul40
         adc     SAVMSC
         sta     scrptr
         txa
         adc     SAVMSC+1
         sta     scrptr+1
-        pla
-        sta     loc_tmp
-        sty     tmp4
+        sty     tmp4            ; restore tmp4
         rts

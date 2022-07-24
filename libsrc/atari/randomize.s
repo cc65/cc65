@@ -10,7 +10,7 @@
 
         .include        "atari.inc"
 
-__randomize:              
+__randomize:
         ldx     VCOUNT          ; Use vertical line counter as high byte
         lda     RTCLOK+2        ; Use clock as low byte
         jmp     _srand          ; Initialize generator

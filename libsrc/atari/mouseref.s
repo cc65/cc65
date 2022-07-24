@@ -5,8 +5,8 @@
         .export         mouse_libref
 
 .ifdef __ATARIXL__
-        .import set_VTIMR1_handler
-mouse_libref    := set_VTIMR1_handler
+        .import set_VTIMR2_handler
+mouse_libref    := set_VTIMR2_handler
 .else
         .import _exit
 mouse_libref    := _exit

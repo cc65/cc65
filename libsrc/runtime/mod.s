@@ -5,19 +5,19 @@
 ;
 
 ; When negating values, we will ignore the possibility here, that one of the
-; values if $8000, in which case the negate will fail.
+; values is $8000, in which case the negate will fail.
 
         .export         tosmoda0, tosmodax
-        .import         popsargs, udiv16, negax
-        .importzp       ptr1, tmp1
+        .import         popsargsudiv16, negax
+        .importzp       sreg, tmp1
 
 tosmoda0:
         ldx     #0
 tosmodax:
-        jsr     popsargs        ; Get arguments from stack, adjust sign
-        jsr     udiv16          ; Do the division
-        lda     ptr1            ; Load low byte of result
-        ldx     ptr1+1          ; Load high byte of result
+        jsr     popsargsudiv16  ; Get arguments from stack, adjust sign
+                                ; and do the division
+        lda     sreg            ; Load low byte of result
+        ldx     sreg+1          ; Load high byte of result
 
 ; Adjust the sign of the result. tmp1 contains the high byte of the left
 ; operand, tmp2 contains the high byte of the right operand. The sign of

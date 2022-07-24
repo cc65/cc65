@@ -4,7 +4,8 @@
 ; void cbm_k_clrch (void);
 ;
 
+        .include        "cbm.inc"
+
         .export         _cbm_k_clrch
-        .import         CLRCH
 
 _cbm_k_clrch = CLRCH

@@ -144,7 +144,7 @@ Segment* GetSegment (unsigned Name, unsigned char AddrSize, const char* ObjName)
             if (ObjName == 0) {
                 ObjName = "[linker generated]";
             }
-            Error ("Module `%s': Type mismatch for segment `%s'", ObjName,
+            Error ("Module '%s': Type mismatch for segment '%s'", ObjName,
                    GetString (Name));
         }
     }
@@ -210,7 +210,7 @@ Section* ReadSection (FILE* F, ObjData* O)
 
     /* Print some data */
     Print (stdout, 2,
-           "Module `%s': Found segment `%s', size = %u, alignment = %lu, type = %u\n",
+           "Module '%s': Found segment '%s', size = %u, alignment = %lu, type = %u\n",
            GetObjFileName (O), GetString (Name), Size, Alignment, Type);
 
     /* Get the segment for this section */
@@ -226,13 +226,13 @@ Section* ReadSection (FILE* F, ObjData* O)
     if (Sec->Alignment > 1) {
         Alignment = LeastCommonMultiple (S->Alignment, Sec->Alignment);
         if (Alignment > MAX_ALIGNMENT) {
-            Error ("Combined alignment for segment `%s' is %lu which exceeds "
-                   "%lu. Last module requiring alignment was `%s'.",
+            Error ("Combined alignment for segment '%s' is %lu which exceeds "
+                   "%lu. Last module requiring alignment was '%s'.",
                    GetString (Name), Alignment, MAX_ALIGNMENT,
                    GetObjFileName (O));
-        } else if (Alignment >= LARGE_ALIGNMENT) {
-            Warning ("Combined alignment for segment `%s' is suspiciously "
-                     "large (%lu). Last module requiring alignment was `%s'.",
+        } else if (Alignment >= LARGE_ALIGNMENT && !LargeAlignment) {
+            Warning ("Combined alignment for segment '%s' is suspiciously "
+                     "large (%lu). Last module requiring alignment was '%s'.",
                      GetString (Name), Alignment, GetObjFileName (O));
         }
         S->Alignment = Alignment;
@@ -270,7 +270,7 @@ Section* ReadSection (FILE* F, ObjData* O)
                 break;
 
             default:
-                Error ("Unknown fragment type in module `%s', segment `%s': %02X",
+                Error ("Unknown fragment type in module '%s', segment '%s': %02X",
                        GetObjFileName (O), GetString (S->Name), Type);
                 /* NOTREACHED */
                 return 0;
@@ -502,19 +502,19 @@ void SegWrite (const char* TgtName, FILE* Tgt, Segment* S, SegWriteFunc F, void*
                             break;
 
                         case SEG_EXPR_RANGE_ERROR:
-                            Error ("Range error in module `%s', line %u",
+                            Error ("Range error in module '%s', line %u",
                                    GetFragmentSourceName (Frag),
                                    GetFragmentSourceLine (Frag));
                             break;
 
                         case SEG_EXPR_TOO_COMPLEX:
-                            Error ("Expression too complex in module `%s', line %u",
+                            Error ("Expression too complex in module '%s', line %u",
                                    GetFragmentSourceName (Frag),
                                    GetFragmentSourceLine (Frag));
                             break;
 
                         case SEG_EXPR_INVALID:
-                            Error ("Invalid expression in module `%s', line %u",
+                            Error ("Invalid expression in module '%s', line %u",
                                    GetFragmentSourceName (Frag),
                                    GetFragmentSourceLine (Frag));
                             break;
@@ -657,7 +657,7 @@ void CheckSegments (void)
 
         /* Check it */
         if (S->Size > 0 && S->Dumped == 0) {
-            Error ("Missing memory area assignment for segment `%s'",
+            Error ("Missing memory area assignment for segment '%s'",
                    GetString (S->Name));
         }
     }

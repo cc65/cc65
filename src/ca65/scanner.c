@@ -216,8 +216,10 @@ struct DotKeyword {
     { ".IFNDEF",        TOK_IFNDEF              },
     { ".IFNREF",        TOK_IFNREF              },
     { ".IFP02",         TOK_IFP02               },
+    { ".IFP4510",       TOK_IFP4510             },
     { ".IFP816",        TOK_IFP816              },
     { ".IFPC02",        TOK_IFPC02              },
+    { ".IFPDTV",        TOK_IFPDTV              },
     { ".IFPSC02",       TOK_IFPSC02             },
     { ".IFREF",         TOK_IFREF               },
     { ".IMPORT",        TOK_IMPORT              },
@@ -232,6 +234,7 @@ struct DotKeyword {
     { ".LINECONT",      TOK_LINECONT            },
     { ".LIST",          TOK_LIST                },
     { ".LISTBYTES",     TOK_LISTBYTES           },
+    { ".LITERAL",       TOK_LITERAL             },
     { ".LOBYTE",        TOK_LOBYTE              },
     { ".LOBYTES",       TOK_LOBYTES             },
     { ".LOCAL",         TOK_LOCAL               },
@@ -251,19 +254,25 @@ struct DotKeyword {
     { ".ORG",           TOK_ORG                 },
     { ".OUT",           TOK_OUT                 },
     { ".P02",           TOK_P02                 },
+    { ".P4510",         TOK_P4510               },
     { ".P816",          TOK_P816                },
     { ".PAGELEN",       TOK_PAGELENGTH          },
     { ".PAGELENGTH",    TOK_PAGELENGTH          },
     { ".PARAMCOUNT",    TOK_PARAMCOUNT          },
     { ".PC02",          TOK_PC02                },
+    { ".PDTV",          TOK_PDTV                },
+    { ".POPCHARMAP",    TOK_POPCHARMAP          },
     { ".POPCPU",        TOK_POPCPU              },
     { ".POPSEG",        TOK_POPSEG              },
     { ".PROC",          TOK_PROC                },
     { ".PSC02",         TOK_PSC02               },
+    { ".PUSHCHARMAP",   TOK_PUSHCHARMAP         },
     { ".PUSHCPU",       TOK_PUSHCPU             },
     { ".PUSHSEG",       TOK_PUSHSEG             },
     { ".REF",           TOK_REFERENCED          },
     { ".REFERENCED",    TOK_REFERENCED          },
+    { ".REFERTO",       TOK_REFERTO             },
+    { ".REFTO",         TOK_REFERTO             },
     { ".RELOC",         TOK_RELOC               },
     { ".REPEAT",        TOK_REPEAT              },
     { ".RES",           TOK_RES                 },
@@ -408,7 +417,7 @@ static void IFNextChar (CharSource* S)
 
         /* If we come here, we have a new input line. To avoid problems
         ** with strange line terminators, remove all whitespace from the
-        ** end of the line, the add a single newline.
+        ** end of the line, then add a single newline.
         */
         Len = SB_GetLen (&S->V.File.Line);
         while (Len > 0 && IsSpace (SB_AtUnchecked (&S->V.File.Line, Len-1))) {
@@ -499,7 +508,7 @@ int NewInputFile (const char* Name)
         /* Main file */
         F = fopen (Name, "r");
         if (F == 0) {
-            Fatal ("Cannot open input file `%s': %s", Name, strerror (errno));
+            Fatal ("Cannot open input file '%s': %s", Name, strerror (errno));
         }
     } else {
         /* We are on include level. Search for the file in the include
@@ -508,7 +517,7 @@ int NewInputFile (const char* Name)
         PathName = SearchFile (IncSearchPath, Name);
         if (PathName == 0 || (F = fopen (PathName, "r")) == 0) {
             /* Not found or cannot open, print an error and bail out */
-            Error ("Cannot open include file `%s': %s", Name, strerror (errno));
+            Error ("Cannot open include file '%s': %s", Name, strerror (errno));
             goto ExitPoint;
         }
 
@@ -525,7 +534,7 @@ int NewInputFile (const char* Name)
     ** here.
     */
     if (FileStat (Name, &Buf) != 0) {
-        Fatal ("Cannot stat input file `%s': %s", Name, strerror (errno));
+        Fatal ("Cannot stat input file '%s': %s", Name, strerror (errno));
     }
 
     /* Add the file to the input file table and remember the index */
@@ -792,6 +801,43 @@ static void ReadStringConst (int StringTerm)
             break;
         }
 
+        if (C == '\\' && StringEscapes) {
+            NextChar ();
+
+            switch (C) {
+                case EOF:
+                    Error ("Unterminated escape sequence in string constant");
+                    break;
+                case '\\':
+                case '\'':
+                case '"':
+                    break;
+                case 't':
+                    C = '\x09';
+                    break;
+                case 'r':
+                    C = '\x0D';
+                    break;
+                case 'n':
+                    C = '\x0A';
+                    break;
+                case 'x':
+                    NextChar ();
+                    if (IsXDigit (C)) {
+                        char high_nibble = DigitVal (C) << 4;
+                        NextChar ();
+                        if (IsXDigit (C)) {
+                            C = high_nibble | DigitVal (C);
+                            break;
+                        }
+                    }
+                    /* FALLTHROUGH */
+                default:
+                    Error ("Unsupported escape sequence in string constant");
+                    break;
+            }
+        }
+
         /* Append the char to the string */
         SB_AppendChar (&CurTok.SVal, C);
 
@@ -1052,7 +1098,7 @@ Again:
                 /* Not found */
                 if (!LeadingDotInIdents) {
                     /* Invalid pseudo instruction */
-                    Error ("`%m%p' is not a recognized control command", &CurTok.SVal);
+                    Error ("'%m%p' is not a recognized control command", &CurTok.SVal);
                     goto Again;
                 }
 
@@ -1109,60 +1155,76 @@ Again:
         /* Check for special names. Bail out if we have identified the type of
         ** the token. Go on if the token is an identifier.
         */
-        if (SB_GetLen (&CurTok.SVal) == 1) {
-            switch (toupper (SB_AtUnchecked (&CurTok.SVal, 0))) {
+        switch (SB_GetLen (&CurTok.SVal)) {
+            case 1:
+                switch (toupper (SB_AtUnchecked (&CurTok.SVal, 0))) {
 
-                case 'A':
-                    if (C == ':') {
-                        NextChar ();
-                        CurTok.Tok = TOK_OVERRIDE_ABS;
-                    } else {
-                        CurTok.Tok = TOK_A;
-                    }
-                    return;
-
-                case 'F':
-                    if (C == ':') {
-                        NextChar ();
-                        CurTok.Tok = TOK_OVERRIDE_FAR;
+                    case 'A':
+                        if (C == ':') {
+                            NextChar ();
+                            CurTok.Tok = TOK_OVERRIDE_ABS;
+                        } else {
+                            CurTok.Tok = TOK_A;
+                        }
                         return;
-                    }
-                    break;
 
-                case 'S':
-                    if (CPU == CPU_65816) {
-                        CurTok.Tok = TOK_S;
+                    case 'F':
+                        if (C == ':') {
+                            NextChar ();
+                            CurTok.Tok = TOK_OVERRIDE_FAR;
+                            return;
+                        }
+                        break;
+
+                    case 'S':
+                        if ((CPU == CPU_4510) || (CPU == CPU_65816)) {
+                            CurTok.Tok = TOK_S;
+                            return;
+                        }
+                        break;
+
+                    case 'X':
+                        CurTok.Tok = TOK_X;
                         return;
-                    }
-                    break;
 
-                case 'X':
-                    CurTok.Tok = TOK_X;
-                    return;
-
-                case 'Y':
-                    CurTok.Tok = TOK_Y;
-                    return;
-
-                case 'Z':
-                    if (C == ':') {
-                        NextChar ();
-                        CurTok.Tok = TOK_OVERRIDE_ZP;
+                    case 'Y':
+                        CurTok.Tok = TOK_Y;
                         return;
-                    }
-                    break;
 
-                default:
-                    break;
-            }
+                    case 'Z':
+                        if (C == ':') {
+                            NextChar ();
+                            CurTok.Tok = TOK_OVERRIDE_ZP;
+                           return;
+                        } else {
+                            if (CPU == CPU_4510) {
+                                CurTok.Tok = TOK_Z;
+                                return;
+                            }
+                        }
+                        break;
 
-        } else if (CPU == CPU_SWEET16 &&
-                  (CurTok.IVal = Sweet16Reg (&CurTok.SVal)) >= 0) {
+                    default:
+                        break;
+                }
+                break;
+            case 2:
+                if ((CPU == CPU_4510) &&
+                    (toupper (SB_AtUnchecked (&CurTok.SVal, 0)) == 'S') &&
+                    (toupper (SB_AtUnchecked (&CurTok.SVal, 1)) == 'P')) {
 
-            /* A sweet16 register number in sweet16 mode */
-            CurTok.Tok = TOK_REG;
-            return;
+                    CurTok.Tok = TOK_S;
+                    return;
+                }
+                /* FALL THROUGH */
+            default:
+                if (CPU == CPU_SWEET16 &&
+                   (CurTok.IVal = Sweet16Reg (&CurTok.SVal)) >= 0) {
 
+                    /* A sweet16 register number in sweet16 mode */
+                    CurTok.Tok = TOK_REG;
+                    return;
+                }
         }
 
         /* Check for define style macro */
@@ -1459,7 +1521,7 @@ CharAgain:
 
 
 
-int GetSubKey (const char** Keys, unsigned Count)
+int GetSubKey (const char* const* Keys, unsigned Count)
 /* Search for a subkey in a table of keywords. The current token must be an
 ** identifier and all keys must be in upper case. The identifier will be
 ** uppercased in the process. The function returns the index of the keyword,

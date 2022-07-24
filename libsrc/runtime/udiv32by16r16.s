@@ -34,19 +34,19 @@ L0:     asl     ptr1
         rol     a
         rol     sreg+1
 
-        pha
+        tax
         cmp     ptr3
         lda     sreg+1
         sbc     ptr3+1
         bcc     L1
 
         sta     sreg+1
-        pla
+        txa
         sbc     ptr3
-        pha
+        tax
         inc     ptr1
 
-L1:     pla
+L1:     txa
         dey
         bne     L0
         sta     sreg

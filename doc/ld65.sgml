@@ -3,7 +3,6 @@
 <article>
 <title>ld65 Users Guide
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2014-04-20
 
 <abstract>
 The ld65 linker combines object files into an executable file. ld65 is highly
@@ -25,21 +24,21 @@ It complements the features that are built into the ca65 macroassembler:
 
 <itemize>
 
-<item>	Accept any number of segments to form an executable module.
+<item>  Accept any number of segments to form an executable module.
 
-<item>	Resolve arbitrary expressions stored in the object files.
+<item>  Resolve arbitrary expressions stored in the object files.
 
-<item>	In case of errors, use the meta information stored in the object files
-	to produce helpful error messages. In case of undefined symbols,
-	expression range errors, or symbol type mismatches, ld65 is able to
-	tell you the exact location in the original assembler source, where
-	the symbol was referenced.
+<item>  In case of errors, use the meta information stored in the object files
+        to produce helpful error messages. In case of undefined symbols,
+        expression range errors, or symbol type mismatches, ld65 is able to
+        tell you the exact location in the original assembler source, where
+        the symbol was referenced.
 
-<item>	Flexible output. The output of ld65 is highly configurable by a config
-	file. Some more-common platforms are supported by default configurations
-	that may be activated by naming the target system. The output
-	generation was designed with different output formats in mind, so
-	adding other formats shouldn't be a great problem.
+<item>  Flexible output. The output of ld65 is highly configurable by a config
+        file. Some more-common platforms are supported by default configurations
+        that may be activated by naming the target system. The output
+        generation was designed with different output formats in mind, so
+        adding other formats shouldn't be a great problem.
 
 </itemize>
 
@@ -67,28 +66,30 @@ Short options:
   -m name               Create a map file
   -o name               Name the default output file
   -t sys                Set the target system
-  -u sym                Force an import of symbol `sym'
+  -u sym                Force an import of symbol 'sym'
   -v                    Verbose mode
   -vm                   Verbose map file
 
 Long options:
-  --cfg-path path       Specify a config file search path
-  --config name         Use linker config file
-  --dbgfile name        Generate debug information
-  --define sym=val      Define a symbol
-  --end-group           End a library group
-  --force-import sym    Force an import of symbol `sym'
-  --help                Help (this text)
-  --lib file            Link this library
-  --lib-path path       Specify a library search path
-  --mapfile name        Create a map file
-  --module-id id        Specify a module id
-  --obj file            Link this object file
-  --obj-path path       Specify an object file search path
-  --start-addr addr     Set the default start address
-  --start-group         Start a library group
-  --target sys          Set the target system
-  --version             Print the linker version
+  --allow-multiple-definition   Allow multiple definitions
+  --cfg-path path               Specify a config file search path
+  --config name                 Use linker config file
+  --dbgfile name                Generate debug information
+  --define sym=val              Define a symbol
+  --end-group                   End a library group
+  --force-import sym            Force an import of symbol 'sym'
+  --help                        Help (this text)
+  --large-alignment             Don't warn about large alignments
+  --lib file                    Link this library
+  --lib-path path               Specify a library search path
+  --mapfile name                Create a map file
+  --module-id id                Specify a module id
+  --obj file                    Link this object file
+  --obj-path path               Specify an object file search path
+  --start-addr addr             Set the default start address
+  --start-group                 Start a library group
+  --target sys                  Set the target system
+  --version                     Print the linker version
 ---------------------------------------------------------------------------
 </verb></tscreen>
 
@@ -98,6 +99,14 @@ Long options:
 Here is a description of all of the command-line options:
 
 <descrip>
+
+  <tag><tt>--allow-multiple-definition</tt></tag>
+
+  Normally when a global symbol is defined multiple times, ld65 will
+  issue an error and not create the output file. This option lets it
+  silently ignore this fact and continue. The first definition of a
+  symbol will be used.
+
 
   <label id="option--start-group">
   <tag><tt>-(, --start-group</tt></tag>
@@ -156,6 +165,8 @@ Here is a description of all of the command-line options:
   <item>module
   <item>apple2
   <item>apple2enh
+  <item>atari2600
+  <item>atari7800
   <item>atari
   <item>atarixl
   <item>atmos
@@ -174,6 +185,7 @@ Here is a description of all of the command-line options:
   <item>sim6502
   <item>sim65c02
   <item>supervision
+  <item>telestrat
   <item>vic20
   </itemize>
 
@@ -246,10 +258,11 @@ Here is a description of all of the command-line options:
   <tag><tt>-Ln</tt></tag>
 
   This option allows you to create a file that contains all global labels and
-  may be loaded into the VICE emulator using the <tt/ll/ (load label) command. You
+  may be loaded into the VICE emulator using the <tt/ll/ (load label) command
+  or into the Oricutron emulator using the <tt/sl/ (symbols load) command. You
   may use this to debug your code with VICE. Note: Older versions had some
   bugs in the label code. If you have problems, please get the latest <url
-  url="http://vice-emu.sourceforge.net/" name="VICE"> version.
+  url="http://vice-emu.sourceforge.net" name="VICE"> version.
 
 
   <label id="option-S">
@@ -286,6 +299,12 @@ Here is a description of all of the command-line options:
   will increase the amount of information available. Please note that debug
   information generation is currently being developed, so the format of the
   file and its contents are subject to change without further notice.
+
+  <label id="option--large-alignment">
+  <tag><tt>--large-alignment</tt></tag>
+
+  Disable warnings about a large combined alignment. See the discussion of the
+  <tt/.ALIGN/ directive in the ca65 Users Guide for further information.
 
 
   <tag><tt>--lib file</tt></tag>
@@ -485,7 +504,7 @@ There are of course more attributes for a memory section than just start and
 size. Start and size are mandatory attributes, that means, each memory area
 defined <em/must/ have these attributes given (the linker will check that). I
 will cover other attributes later. As you may have noticed, I've used a
-comment in the example above. Comments start with a hash mark (`#'), the
+comment in the example above. Comments start with a hash mark ('#'), the
 remainder of the line is ignored if this character is found.
 
 
@@ -510,13 +529,15 @@ What we are doing here is telling the linker, that all segments go into the
 the linker will first write the <tt/CODE/ segment, then the <tt/RODATA/
 segment, then the <tt/DATA/ segment - but it will not write the <tt/BSS/
 segment. Why? Here enters the segment type: For each segment specified, you may also
-specify a segment attribute. There are four possible segment attributes:
+specify a segment attribute. There are five possible segment attributes:
 
 <tscreen><verb>
-        ro      means readonly
-        rw      means read/write
-        bss     means that this is an uninitialized segment
-        zp      a zeropage segment
+        ro          means readonly
+        rw          means read/write
+        bss         means that this is an uninitialized segment
+        zp          a zeropage segment
+        overwrite   a segment that overwrites (parts of) another one
+
 </verb></tscreen>
 
 So, because we specified that the segment with the name BSS is of type bss,
@@ -549,7 +570,8 @@ segment, where this attribute is true, the linker will export three symbols.
 </verb></tscreen>
 
 Replace <tt/NAME/ by the name of the segment, in the example above, this would
-be <tt/BSS/. These symbols may be accessed by your code.
+be <tt/BSS/. These symbols may be accessed by your code when imported using
+the <tt>.IMPORT</tt> directive.
 
 Now, as we've configured the linker to write the first three segments and
 create symbols for the last one, there's only one question left: Where does
@@ -568,7 +590,7 @@ default behaviour is OK for our purposes, I did not use the attribute in the
 example above. Let's have a look at it now.
 
 The "file" attribute (the keyword may also be written as "FILE" if you like
-that better) takes a string enclosed in double quotes (`&dquot;') that specifies the
+that better) takes a string enclosed in double quotes ('&dquot;') that specifies the
 file, where the data is written. You may specify the same file several times,
 in that case the data for all memory areas having this file name is written
 into this file, in the order of the memory areas defined in the <tt/MEMORY/
@@ -615,6 +637,55 @@ would write two files that start with the name of the output file specified on
 the command line, with "-1.bin" and "-2.bin" appended respectively. Because
 '%' is used as an escape char, the sequence "%%" has to be used if a single
 percent sign is required.
+
+<sect1>OVERWRITE segments<p>
+
+There are situations when you may wish to overwrite some part (or parts) of a
+segment with another one. Perhaps you are modifying an OS ROM that has its
+public subroutines at fixed, well-known addresses, and you want to prevent them
+from shifting to other locations in memory if your changed code takes less
+space. Or you are updating a block of code available in binary-only form with
+fixes that are scattered in various places. Generally, whenever you want to
+minimize disturbance to an existing code brought on by your updates, OVERWRITE
+segments are worth considering.
+
+Here is an example:
+
+<tscreen><verb>
+MEMORY {
+    RAM: file = "", start = $6000, size = $2000, type=rw;
+    ROM: file = %O, start = $8000, size = $8000, type=ro;
+}
+</verb></tscreen>
+
+Nothing unusual so far, just two memory blocks - one RAM, one ROM. Now let's
+look at the segment configuration:
+
+<tscreen><verb>
+SEGMENTS {
+    RAM:       load = RAM, type = bss;
+    ORIGINAL:  load = ROM, type = ro;
+    FASTCOPY:  load = ROM, start=$9000, type = overwrite;
+    JMPPATCH1: load = ROM, start=$f7e8, type = overwrite;
+    DEBUG:     load = ROM, start=$8000, type = overwrite;
+    VERSION:   load = ROM, start=$e5b7, type = overwrite;
+}
+</verb></tscreen>
+
+Segment named ORIGINAL contains the original code, disassembled or provided in
+a binary form (i.e. using <tt/.INCBIN/ directive; see the <tt/ca65/ assembler
+document).  Subsequent four segments will be relocated to addresses specified
+by their "start" attributes ("offset" can also be used) and then will overwrite
+whatever was at these locations in the ORIGINAL segment. In the end, resulting
+binary output file will thus contain original data with the exception of four
+sequences starting at $9000, $f7e8, $8000 and $e5b7, which will sport code from
+their respective segments. How long these sequences will be depends on the
+lengths of corresponding segments - they can even overlap, so think what you're
+doing.
+
+Finally, note that OVERWRITE segments should be the final segments loaded to a
+particular memory area, and that they need at least one of "start" or "offset"
+attributes specified.
 
 <sect1>LOAD and RUN addresses (ROMable code)<p>
 
@@ -690,7 +761,7 @@ There's a library subroutine called <tt/copydata/ (in a module named
 look at it's inner workings before using it!
 
 
-<sect1>Other MEMORY area attributes<p>
+<sect1>Other MEMORY area attributes<label id="MEMORY"><p>
 
 There are some other attributes not covered above. Before starting the
 reference section, I will discuss the remaining things here.
@@ -704,7 +775,8 @@ useful for things like a software stack, or an I/O area.
         }
 </verb></tscreen>
 
-This will define some external symbols that may be used in your code:
+This will define some external symbols that may be used in your code when
+imported using the <tt>.IMPORT</tt> directive:
 
 <tscreen><verb>
         __STACK_START__         This is set to the start of the memory
@@ -751,12 +823,10 @@ that has a segment reference (for example a symbol). The result of this
 function is the value of the bank attribute for the run memory area of the
 segment.
 
-
 <sect1>Other SEGMENT attributes<p>
 
 Segments may be aligned to some memory boundary. Specify "<tt/align = num/" to
-request this feature. Num must be a power of two. To align all segments on a
-page boundary, use
+request this feature. To align all segments on a page boundary, use
 
 <tscreen><verb>
         SEGMENTS {
@@ -817,7 +887,7 @@ also for a segment. The value must be an integer between 0 and 255. It is used
 as the fill value for space reserved by the assembler's <tt/.ALIGN/ and <tt/.RES/
 commands. It is also used as the fill value for space between sections (part of a
 segment that comes from one object file) caused by alignment, but not for
-space that preceeds the first section.
+space that precedes the first section.
 
 To suppress the warning, the linker issues if it encounters a segment that is
 not found in any of the input files, use "<tt/optional=yes/" as an additional
@@ -841,7 +911,7 @@ look like this:
         }
 </verb></tscreen>
 
-The only other available output format is the o65 format specified by Andre
+There are two other available formats, one is the o65 format specified by Andre
 Fachat (see the <url url="http://www.6502.org/users/andre/o65/fileformat.html"
 name="6502 binary relocation format specification">). It is defined like this:
 
@@ -851,7 +921,20 @@ name="6502 binary relocation format specification">). It is defined like this:
         }
 </verb></tscreen>
 
-The necessary o65 attributes are defined in a special section labeled
+The other format available is the Atari segmented file format (xex), this is
+the standard format used by Atari DOS 2.0 and upwards, and it is defined like this:
+
+<tscreen><verb>
+        FILES {
+            %O: format = atari;
+        }
+</verb></tscreen>
+
+In the Atari segmented file format, the linker will write each <tt/MEMORY/ area
+as including a header with the start and end address. If two memory areas are
+contiguous, the headers will be joined if possible.
+
+The necessary o65 or Atari attributes are defined in a special section labeled
 <ref id="FORMAT" name="FORMAT">.
 
 
@@ -872,6 +955,30 @@ has several attributes that may be defined here.
     }
 </verb></tscreen>
 
+The Atari file format has two attributes:
+
+<descrip>
+
+  <tag><tt>RUNAD = symbol</tt></tag>
+
+  Specify a symbol as the run address of the binary, the loader will call this
+  address after all the file is loaded in memory. If the attribute is omitted,
+  no run address is included in the file.
+
+  <tag><tt>INITAD = memory_area : symbol</tt></tag>
+
+  Specify a symbol as the initialization address for the given memory area.
+  The binary loader will call this address just after the memory area is loaded
+  into memory, before continuing loading the rest of the file.
+
+</descrip>
+
+
+<tscreen><verb>
+    FORMATS {
+        atari: runad = _start;
+    }
+</verb></tscreen>
 
 
 <sect1>The FEATURES section<label id="FEATURES"><p>
@@ -902,7 +1009,8 @@ The <tt/CONDES/ feature has several attributes:
   <tag><tt>segment</tt></tag>
 
   This attribute tells the linker into which segment the table should be
-  placed. If the segment does not exist, it is created.
+  placed. If the segment does not exist in any object file, it is created
+  in the final object code.
 
 
   <tag><tt>type</tt></tag>
@@ -951,7 +1059,7 @@ The <tt/CONDES/ feature has several attributes:
 Without specifying the <tt/CONDES/ feature, the linker will not create any
 tables, even if there are <tt/condes/ entries in the object files.
 
-For more information see the <tt/.CONDES/ command in the <url
+For more information, see the <tt/.CONDES/ command in the <url
 url="ca65.html" name="ca65 manual">.
 
 
@@ -1034,15 +1142,23 @@ config files, you will need the following information.
 
 <sect1>INIT<p>
 
-The INIT segment is used for initialization code that may be reused once
-execution reaches main() - provided that the program runs in RAM. You
-may for example add the INIT segment to the heap in really memory
-constrained systems.
+The INIT segment is some kind of 'bss' segment since it contains
+uninitialized data. Unlike <tt>.bss</tt> itself, its contents aren't
+initialized to zero at program startup . It's mostly used by
+constructors in the startup code. An example for the use of the INIT
+segment is saving/restoring the zero page area used by cc65.
 
 <sect1>LOWCODE<p>
 
 For the LOWCODE segment, it is guaranteed that it won't be banked out, so it
 is reachable at any time by interrupt handlers or similar.
+
+<sect1>ONCE<p>
+
+The ONCE segment is used for initialization code run only once before
+execution reaches main() - provided that the program runs in RAM. You
+may for example add the ONCE segment to the heap in really memory
+constrained systems.
 
 <sect1>STARTUP<p>
 
@@ -1073,14 +1189,14 @@ including commercial applications, and to alter it and redistribute it
 freely, subject to the following restrictions:
 
 <enum>
-<item> 	The origin of this software must not be misrepresented; you must not
-       	claim that you wrote the original software. If you use this software
-       	in a product, an acknowledgment in the product documentation would be
-	appreciated but is not required.
-<item>	Altered source versions must be plainly marked as such, and must not
-	be misrepresented as being the original software.
-<item>	This notice may not be removed or altered from any source
-	distribution.
+<item>  The origin of this software must not be misrepresented; you must not
+        claim that you wrote the original software. If you use this software
+        in a product, an acknowledgment in the product documentation would be
+        appreciated but is not required.
+<item>  Altered source versions must be plainly marked as such, and must not
+        be misrepresented as being the original software.
+<item>  This notice may not be removed or altered from any source
+        distribution.
 </enum>
 
 

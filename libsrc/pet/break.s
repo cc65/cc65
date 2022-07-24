@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 26.11.1998
 ;
-; void set_brk (unsigned Addr);
+; void __fastcall__ set_brk (unsigned Addr);
 ; void reset_brk (void);
 ;
 

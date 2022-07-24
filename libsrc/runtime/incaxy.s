@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 05.08.1998
 ;
-; CC65 runtime: Increment ax by valie in y
+; CC65 runtime: Increment ax by value in y
 ;
 
         .export         incaxy, incax4

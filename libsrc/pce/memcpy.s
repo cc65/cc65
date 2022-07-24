@@ -17,7 +17,7 @@
         .export         _memcpy
         .export         memcpy_increment, memcpy_transfer, memcpy_getparams
 
-        .import         incsp2, popax
+        .import         incsp2, popax, popptr1
         .importzp       sp, ptr1, ptr2, ptr3
 
 
@@ -81,13 +81,11 @@ memcpy_getparams:
         jsr     incsp2                  ; drop src address
         jmp     popax                   ; get pointer; return it as result
 
-@L1:    jsr     popax
-        sta     ptr1
-        stx     ptr1+1                  ; save src
+@L1:    jsr     popptr1                 ; save src
 
 ; (Direct stack access is six cycles faster [total cycle count].)
 
-        ldy     #1                      ; save dest
+        iny                             ; (Y=0 by popptr1, need '1' here) save dest
         lda     (sp),y                  ; get high byte
         tax
         lda     (sp)                    ; get low byte
@@ -97,7 +95,7 @@ memcpy_getparams:
 
 ; ----------------------------------------------------------------------
 ; The transfer instructions use inline arguments.
-; Therefore, we must build the instruction, in the DATA segment.
+; Therefore, we must build the instruction in the DATA segment.
 
 .data
 

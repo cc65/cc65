@@ -6,8 +6,7 @@
 
         .include        "atari5200.inc"
         .export         _gotox
-        .import         setcursor
 
 _gotox:
         sta     COLCRS_5200     ; Set X
-        jmp     setcursor
+        rts

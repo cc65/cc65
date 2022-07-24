@@ -10,11 +10,12 @@
 
 
 #include <stdio.h>
-#include <conio.h>
+#include <cc65.h>
 #ifndef __CBM__
 #include <fcntl.h>
 #include <unistd.h>
 #else
+#include <cbm.h>
 #include <device.h>
 #endif
 
@@ -111,7 +112,7 @@ void main (void)
 
         /* The linker makes sure that the call to foo() ends up at the right mem
         ** addr. However it's up to user to make sure that the - right - overlay
-        ** is actually loaded before making the the call.
+        ** is actually loaded before making the call.
         */
         foo ();
     }
@@ -130,5 +131,7 @@ void main (void)
         foobar ();
     }
 
-    cgetc ();
+    if (doesclrscrafterexit ()) {
+        getchar ();
+    }
 }

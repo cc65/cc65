@@ -42,10 +42,7 @@
 
 
 
-/* If not already done, include the apple2.h header file */
-#if !defined(_APPLE2_H)
-#  include <apple2.h>
-#endif
+#include <apple2.h>
 
 
 
@@ -56,9 +53,21 @@
 
 
 /* Characters codes */
-#define CH_DEL        0x7F
-#define CH_CURS_UP    0x0B
-#define CH_CURS_DOWN  0x0A
+#define CH_DEL          0x7F
+#define CH_CURS_UP      0x0B
+#define CH_CURS_DOWN    0x0A
+
+#define CH_HLINE        0x5F
+#define CH_VLINE        0xDF
+#define CH_ULCORNER     0x5F
+#define CH_URCORNER     0x20
+#define CH_LLCORNER     0xD4
+#define CH_LRCORNER     0xDF
+#define CH_TTEE         0x5F
+#define CH_BTEE         0xD4
+#define CH_LTEE         0xD4
+#define CH_RTEE         0xDF
+#define CH_CROSS        0xD4
 
 /* These are defined to be OpenApple + NumberKey */
 #define CH_F1   0xB1
@@ -72,15 +81,11 @@
 #define CH_F9   0xB9
 #define CH_F10  0xB0
 
-/* Styles for textframe */
-#define TEXTFRAME_WIDE  0x00
-#define TEXTFRAME_TALL  0x04
-
 /* Video modes */
-#define VIDEOMODE_40x24  0x0011
-#define VIDEOMODE_80x24  0x0012
-#define VIDEOMODE_40COL  VIDEOMODE_40x24
-#define VIDEOMODE_80COL  VIDEOMODE_80x24
+#define VIDEOMODE_40x24     0x0011
+#define VIDEOMODE_80x24     0x0012
+#define VIDEOMODE_40COL     VIDEOMODE_40x24
+#define VIDEOMODE_80COL     VIDEOMODE_80x24
 
 
 
@@ -106,21 +111,13 @@ extern void a2e_lo_tgi[];
 
 
 
-void __fastcall__ textframe (unsigned char width, unsigned char height,
-                             unsigned char style);
-/* Output a frame on the text screen with the given width and height
-** starting at the current cursor position and using the given style.
-*/
-
-void __fastcall__ textframexy (unsigned char x, unsigned char y,
-                               unsigned char width, unsigned char height,
-                               unsigned char style);
-/* Same as "gotoxy (x, y); textframe (width, height, style);" */
-
 unsigned __fastcall__ videomode (unsigned mode);
 /* Set the video mode, return the old mode. Call with one of the VIDEOMODE_xx
 ** constants.
 */
+
+void waitvsync (void);
+/* Wait for start of next frame */
 
 
 

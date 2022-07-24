@@ -26,10 +26,21 @@ SCR_LINELEN     := $D5          ; Screen line length
 CURS_Y          := $D8          ; Cursor row
 FNADR           := $DA          ; Pointer to file name
 
+; 80-Column CBMs
+KBDREPEAT80     := $E4
+KBDRPTRATE80    := $E5
+KBDRPTDELAY80   := $E6
+
 BASIC_BUF       := $200         ; Location of command-line
 BASIC_BUF_LEN   = 81            ; Maximum length of command-line
 
 KEY_BUF         := $26F         ; Keyboard buffer
+
+; 40-Column PETs/CBMs
+KBDRPTDELAY40   := $3E9
+KBDRPTRATE40    := $3EA
+KBDREPEAT40     := $3EE
+KBDREPEAT40B    := $3F8
 
 ;----------------------------------------------------------------------------
 ; PET ROM type detection
@@ -39,7 +50,6 @@ PET_2000        = $CA
 PET_3000        = $FC
 PET_4000        = $FD
 
-
 ;----------------------------------------------------------------------------
 ; Vector and other locations
 
@@ -48,12 +58,42 @@ BRKVec          := $0092
 NMIVec          := $0094
 
 ; ---------------------------------------------------------------------------
-; I/O: 6522 VIA2
+; I/O: 6520 PIA1
 
-VIA             := $E840
-VIA_PRB         := $E840
-VIA_PRA         := $E841
-VIA_DDRB        := $E842
-VIA_DDRA        := $E843
+PIA1            := $E810        ; PIA1 base address
+PIA1_PORTA      := PIA1+$0      ; Port A (PA) and data direction register A (DDRA)
+PIA1_PACTL      := PIA1+$1      ; Port A control register (CRA)
+PIA1_PORTB      := PIA1+$2      ; Port B (PB) and data direction register B (DDRB)
+PIA1_PBCTL      := PIA1+$3      ; Port B control register (CRB)
 
+; ---------------------------------------------------------------------------
+; I/O: 6520 PIA2
 
+PIA2            := $E820        ; PIA2 base address
+PIA2_PORTA      := PIA2+$0      ; Port A (PA) and data direction register A (DDRA)
+PIA2_PACTL      := PIA2+$1      ; Port A control register (CRA)
+PIA2_PORTB      := PIA2+$2      ; Port B (PB) and data direction register B (DDRB)
+PIA2_PBCTL      := PIA2+$3      ; Port B control register (CRB)
+
+; ---------------------------------------------------------------------------
+; I/O: 6522 VIA
+
+VIA             := $E840        ; VIA base address
+VIA_PB          := VIA+$0       ; Port register B
+VIA_PA1         := VIA+$1       ; Port register A
+VIA_PRB         := VIA+$0       ; *** Deprecated ***
+VIA_PRA         := VIA+$1       ; *** Deprecated ***
+VIA_DDRB        := VIA+$2       ; Data direction register B
+VIA_DDRA        := VIA+$3       ; Data direction register A
+VIA_T1CL        := VIA+$4       ; Timer 1, low byte
+VIA_T1CH        := VIA+$5       ; Timer 1, high byte
+VIA_T1LL        := VIA+$6       ; Timer 1 latch, low byte
+VIA_T1LH        := VIA+$7       ; Timer 1 latch, high byte
+VIA_T2CL        := VIA+$8       ; Timer 2, low byte
+VIA_T2CH        := VIA+$9       ; Timer 2, high byte
+VIA_SR          := VIA+$A       ; Shift register
+VIA_CR          := VIA+$B       ; Auxiliary control register
+VIA_PCR         := VIA+$C       ; Peripheral control register
+VIA_IFR         := VIA+$D       ; Interrupt flag register
+VIA_IER         := VIA+$E       ; Interrupt enable register
+VIA_PA2         := VIA+$F       ; Port register A w/o handshake

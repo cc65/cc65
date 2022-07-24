@@ -10,19 +10,18 @@
 
         .export         _cputcxy, _cputc
         .export         plot, cputdirect, putchar
-        .import         popa, _gotoxy, mul20
+        .import         gotoxy, _mul20
+        .import         conio_color
+        .importzp       screen_width, screen_height
         .importzp       ptr4
-        .import         setcursor
 
-        .constructor    screen_setup, 26
-        .import         screen_setup_20x24
-screen_setup    = screen_setup_20x24
-
+        .import         screen_setup
+        .constructor    initconio
+initconio               =       screen_setup
 
 _cputcxy:
         pha                     ; Save C
-        jsr     popa            ; Get Y
-        jsr     _gotoxy         ; Set cursor, drop x
+        jsr      gotoxy         ; Set cursor, drop x and y
         pla                     ; Restore C
 
 _cputc:
@@ -45,7 +44,7 @@ L4:     cmp     #$0A            ; LF
         and     #3
         tax
         tya
-        and     #$9f
+        and     #$9F
         ora     ataint,x
 
 cputdirect:                     ; accepts screen code
@@ -54,7 +53,7 @@ cputdirect:                     ; accepts screen code
 ; advance cursor
         inc     COLCRS_5200
         lda     COLCRS_5200
-        cmp     #20
+        cmp     #screen_width
         bcc     plot
         lda     #0
         sta     COLCRS_5200
@@ -63,12 +62,11 @@ cputdirect:                     ; accepts screen code
 newline:
         inc     ROWCRS_5200
         lda     ROWCRS_5200
-        cmp     #24
+        cmp     #screen_height
         bne     plot
         lda     #0
         sta     ROWCRS_5200
-plot:   jsr     setcursor
-        ldy     COLCRS_5200
+plot:   ldy     COLCRS_5200
         ldx     ROWCRS_5200
         rts
 
@@ -76,8 +74,7 @@ putchar:
         pha                     ; save char
 
         lda     ROWCRS_5200
-        jsr     mul20           ; destroys tmp4
-        clc
+        jsr     _mul20          ; destroys tmp4, carry is cleared
         adc     SAVMSC          ; add start of screen memory
         sta     ptr4
         txa
@@ -85,10 +82,12 @@ putchar:
         sta     ptr4+1
         pla                     ; get char again
 
+        and     #$3F            ; clear palette index bits
+        ora     conio_color     ; use currently selected palette
+
         ldy     COLCRS_5200
         sta     (ptr4),y
-        jmp     setcursor
+        rts
 
         .rodata
 ataint: .byte   64,0,32,96
-

@@ -54,12 +54,15 @@ FuncDesc* NewFuncDesc (void)
     FuncDesc* F = (FuncDesc*) xmalloc (sizeof (FuncDesc));
 
     /* Nullify the fields */
-    F->Flags      = 0;
-    F->SymTab     = 0;
-    F->TagTab     = 0;
-    F->ParamCount = 0;
-    F->ParamSize  = 0;
-    F->LastParam  = 0;
+    F->Flags           = 0;
+    F->SymTab          = 0;
+    F->TagTab          = 0;
+    F->ParamCount      = 0;
+    F->ParamSize       = 0;
+    F->LastParam       = 0;
+    F->FuncDef         = 0;
+    F->WrappedCall     = 0;
+    F->WrappedCallData = 0;
 
     /* Return the new struct */
     return F;

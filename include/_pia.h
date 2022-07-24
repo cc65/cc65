@@ -4,6 +4,10 @@
 /*                                                                           */
 /*                Internal include file, do not use directly                 */
 /*                                                                           */
+/* The Peripheral Interface Adapter (PIA) chip (a 6520 or 6820) provides     */
+/* parallel I/O interfacing; it was used in Atari 400/800 and Commodore PET  */
+/* family of computers, for joystick and some interrupts.                    */
+/* Sources; various + Wikpedia article on "Peripheral Interface Adapter".    */
 /*                                                                           */
 /*                                                                           */
 /* (C) 2000 Freddy Offenga <taf_offenga@yahoo.com>                           */
@@ -34,7 +38,7 @@
 #define __PIA_H
 
 
-/* Define a structure with the pia register offsets */
+/* Define a structure with the PIA register offsets */
 struct __pia {
     unsigned char   porta;  /* port A data r/w */
     unsigned char   portb;  /* port B data r/w */
@@ -42,10 +46,7 @@ struct __pia {
     unsigned char   pbctl;  /* port B control */
 };
 
-
+/* (Some specific register values for Atari defined in atari.h) */
 
 /* End of _pia.h */
 #endif
-
-
-

@@ -5,7 +5,7 @@
 ;
 
         .export         _strstr
-        .import         popax
+        .import         popptr1
         .importzp       ptr1, ptr2, ptr3, ptr4, tmp1
 
 _strstr:
@@ -13,13 +13,11 @@ _strstr:
         stx     ptr2+1
         sta     ptr4            ; Setup temp copy for later
 
-        jsr     popax           ; Get haystack
-        sta     ptr1
-        stx     ptr1+1          ; Save haystack
+        jsr     popptr1         ; Get haystack to ptr1
 
 ; If needle is empty, return haystack
 
-        ldy     #$00
+        ; ldy     #$00            Y=0 guaranteed by popptr1
         lda     (ptr2),y        ; Get first byte of needle
         beq     @Found          ; Needle is empty --> we're done
 

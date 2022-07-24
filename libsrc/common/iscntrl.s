@@ -1,21 +1,21 @@
+; iscntrl.s
 ;
-; Ullrich von Bassewitz, 02.06.1998
+; This file is part of
+; cc65 - a freeware C compiler for 6502 based systems
+;
+; https://cc65.github.io
+;
+; See "LICENSE" file for legal information.
 ;
 ; int iscntrl (int c);
 ;
 
         .export         _iscntrl
         .include        "ctype.inc"
+        .import         ctypemask
 
 _iscntrl:
-        cpx     #$00            ; Char range ok?
-        bne     @L1             ; Jump if no
-        tay
-        lda     __ctype,y       ; Get character classification
-        and     #CT_CTRL        ; Mask control character bit
-        rts
-
-@L1:    lda     #$00            ; Return false
-        tax
-        rts
-
+        jsr     ctypemask      ; (always clears X)
+        bcs     @L1                     ; out of range? (everything already clear -> false)
+        and     #CT_CTRL                ; mask control character bit
+@L1:    rts

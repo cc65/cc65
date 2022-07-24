@@ -31,9 +31,10 @@ reset:
         ; Initialize data.
         jsr     copydata
 
-        lda     #>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
-        sta     sp+1            ; Set argument stack ptr
-        stz     sp              ; #<(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
+        lda     #<(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
+        ldx     #>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
+        sta     sp
+        stx     sp+1            ; Set argument stack ptr
         jsr     initlib
         jsr     _main
 _exit:  jsr     donelib
@@ -66,16 +67,14 @@ not_dma:
 ; Removing this segment gives only a warning.
         .segment "FFF0"
 .proc reset32kcode
-        lda     #(6<<5)
+        lda     #(6<<5) | SV_LCD_ON | SV_NMI_ENABLE_ON
         sta     sv_bank
 ; Now, the 32Kbyte image can reside in the top of 64Kbyte and 128Kbyte ROMs.
         jmp     reset
 .endproc
 
-        .segment "VECTOR"
+        .segment "VECTORS"
 
 .word   nmi
 .word   reset32kcode
 .word   irq
-
-

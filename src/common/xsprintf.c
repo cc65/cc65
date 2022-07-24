@@ -33,6 +33,7 @@
 
 
 
+#include <inttypes.h>
 #include <stdio.h>
 #include <stddef.h>
 #include <string.h>
@@ -41,7 +42,6 @@
 /* common */
 #include "chartype.h"
 #include "check.h"
-#include "inttypes.h"
 #include "strbuf.h"
 #include "va_copy.h"
 #include "xsprintf.h"
@@ -352,14 +352,14 @@ static void StoreOffset (PrintfCtrl* P)
 /* Store the current output offset (%n format spec) */
 {
     switch (P->LengthMod) {
-        case lmChar:     *va_arg (P->ap, int*)       = P->BufFill;
-        case lmShort:    *va_arg (P->ap, int*)       = P->BufFill;
-        case lmInt:      *va_arg (P->ap, int*)       = P->BufFill;
-        case lmLong:     *va_arg (P->ap, long*)      = P->BufFill;
-        case lmIntMax:   *va_arg (P->ap, intmax_t*)  = P->BufFill;
-        case lmSizeT:    *va_arg (P->ap, size_t*)    = P->BufFill;
-        case lmPtrDiffT: *va_arg (P->ap, ptrdiff_t*) = P->BufFill;
-        default: FAIL ("Invalid size modifier for %n format spec in xvsnprintf");
+        case lmChar:     *va_arg (P->ap, int*)       = P->BufFill; break;
+        case lmShort:    *va_arg (P->ap, int*)       = P->BufFill; break;
+        case lmInt:      *va_arg (P->ap, int*)       = P->BufFill; break;
+        case lmLong:     *va_arg (P->ap, long*)      = P->BufFill; break;
+        case lmIntMax:   *va_arg (P->ap, intmax_t*)  = P->BufFill; break;
+        case lmSizeT:    *va_arg (P->ap, size_t*)    = P->BufFill; break;
+        case lmPtrDiffT: *va_arg (P->ap, ptrdiff_t*) = P->BufFill; break;
+        default: FAIL ("Invalid size modifier for %n format spec. in xvsnprintf()");
     }
 }
 
@@ -580,7 +580,7 @@ int xvsnprintf (char* Buf, size_t Size, const char* Format, va_list ap)
                     CHECK (S != 0);
                     /* Handle the length by using a precision */
                     if ((P.Flags & fPrec) != 0) {
-                        /* Precision already specified, use length of string 
+                        /* Precision already specified, use length of string
                         ** if less.
                         */
                         if ((unsigned) P.Prec > SB_GetLen (S)) {

@@ -16,14 +16,17 @@
         .include        "filedes.inc"
         .include        "apple2.inc"
 
-        .segment        "INIT"
+        .segment        "ONCE"
 
 initprompt:
-        ; Set prompt <> ']' to let DOS 3.3 know that we're
-        ; not in Applesoft immediate mode and thus keep it
-        ; from scanning our device I/O for DOS commands.
+        ; Set prompt <> ']' and currently executed Applesoft
+        ; line number hibyte <> $FF to let DOS 3.3 (at $A65E)
+        ; know that we're not in Applesoft immediate mode and
+        ; thus keep it from scanning our device I/O for DOS
+        ; commands.
         lda     #$80            ; Same value used at $D52C
         sta     PROMPT
+        sta     CURLIN+1        ; Any value <> $FF will do
         rts
 
         .code

@@ -8,6 +8,7 @@
         .include "fcntl.inc"
         .include "errno.inc"
         .include "fd.inc"
+        .include "zeropage.inc"
 
         .export _open
         .destructor     closeallfiles, 5
@@ -19,9 +20,7 @@
         .import incsp4
         .import ldaxysp,addysp
         .import __oserror
-        .importzp tmp4,tmp2
 .ifdef  UCASE_FILENAME
-        .importzp tmp3
         .import ucase_fn
 .endif
 
@@ -93,8 +92,10 @@ cont:   ldy     #3
 .ifdef  UCASE_FILENAME
 .ifdef  DEFAULT_DEVICE
         ldy     #$80
-        sty     tmp2            ; set flag for ucase_fn
+.else
+        ldy     #$00
 .endif
+        sty     tmp2            ; set flag for ucase_fn
         jsr     ucase_fn
         bcc     ucok1
 invret: lda     #<EINVAL        ; file name is too long

@@ -8,11 +8,11 @@
         .export         fnadd, fnaddmode, fncomplete, fndefunit
         .export         fnunit, fnlen, fnisfile, fncmd, fnbuf
 
-        .import         SETNAM
         .import         curunit, __filetype
         .importzp       ptr1, tmp1
 
         .include        "ctype.inc"
+        .include        "cbm.inc"
 
 
 ;------------------------------------------------------------------------------

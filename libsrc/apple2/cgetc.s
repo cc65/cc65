@@ -6,20 +6,47 @@
 ; If open_apple key is pressed then the high-bit of the key is set.
 ;
 
-        .export _cgetc
+        .export         _cgetc
+        .import         cursor, putchardirect
 
-        .include "apple2.inc"
+        .include        "apple2.inc"
 
 _cgetc:
-        lda     KBD
-        bpl     _cgetc          ; If < 128, no key pressed
+        ; Cursor on ?
+        lda     cursor
+        beq     :+
 
-        ; At this time, the high bit of the key pressed is set
-        bit     KBDSTRB         ; Clear keyboard strobe
+        ; Show caret.
+        .ifdef  __APPLE2ENH__
+        lda     #$7F | $80      ; Checkerboard, screen code
+        .else
+        lda     #' ' | $40      ; Blank, flashing
+        .endif
+        jsr     putchardirect   ; Returns old character in X
+
+        ; Wait for keyboard strobe.
+:       inc     RNDL            ; Increment random counter low
+        bne     :+
+        inc     RNDH            ; Increment random counter high
+:       lda     KBD
+        bpl     :--             ; If < 128, no key pressed
+
+        ; Cursor on ?
+        ldy     cursor
+        beq     :+
+
+        ; Restore old character.
+        pha
+        txa
+        jsr     putchardirect
+        pla
+
+        ; At this time, the high bit of the key pressed is set.
+:       bit     KBDSTRB         ; Clear keyboard strobe
         .ifdef __APPLE2ENH__
         bit     BUTN0           ; Check if OpenApple is down
         bmi     done
         .endif
         and     #$7F            ; If not down, then clear high bit
-done:   ldx     #$00
+done:   ldx     #>$0000
         rts

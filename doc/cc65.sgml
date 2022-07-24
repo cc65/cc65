@@ -2,19 +2,19 @@
 
 <article>
 <title>cc65 Users Guide
-<author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2015-05-26
+<author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
+<url url="mailto:gregdk@users.sf.net" name="Greg King">
 
 <abstract>
-cc65 is a C compiler for 6502 targets. It supports several 6502 based home
-computers like the Commodore and Atari machines, but it is easily retargetable.
+cc65 is a C compiler for 6502 targets. It supports several 6502-based home
+computers such as the Commodore and Atari machines, but it easily is
+retargetable.
 </abstract>
 
 <!-- Table of contents -->
 <toc>
 
 <!-- Begin the document -->
-
 
 <sect>Overview<p>
 
@@ -58,7 +58,7 @@ Short options:
   -O                            Optimize code
   -Oi                           Optimize code, inline more code
   -Or                           Enable register variables
-  -Os                           Inline some known functions
+  -Os                           Inline some standard functions
   -T                            Include source as comment
   -V                            Print the compiler version number
   -W warning[,...]              Suppress warnings
@@ -85,12 +85,15 @@ Long options:
   --data-name seg               Set the name of the DATA segment
   --debug                       Debug mode
   --debug-info                  Add debug info to object file
-  --debug-opt name              Debug optimization steps
+  --debug-opt name              Configure optimizations with a file
+  --debug-opt-output            Debug output of each optimization step
   --dep-target target           Use this dependency target
   --disable-opt name            Disable an optimization step
+  --eagerly-inline-funcs        Eagerly inline some known functions
   --enable-opt name             Enable an optimization step
   --help                        Help (this text)
   --include-dir dir             Set an include directory search path
+  --inline-stdfuncs             Inline some standard functions
   --list-opt-steps              List all optimizer steps and exit
   --list-warnings               List available warning types for -W
   --local-strings               Emit string literals immediately
@@ -192,8 +195,209 @@ Here is a description of all the command line options:
 
   <tag><tt>-d, --debug</tt></tag>
 
-  Enables debug mode, something that should not be needed for mere
-  mortals:-)
+  Enables debug mode, for debugging the behavior of cc65.
+
+
+  <tag><tt>--debug-tables name</tt></tag>
+
+  Writes symbol table information to a file, which includes details on structs, unions
+  functions, and global variables. For example, given the following code:
+
+  <tscreen><verb>
+  struct l {
+      unsigned char m;
+      unsigned char n;
+  };
+
+  struct hello {
+      unsigned char j;
+      unsigned char k;
+      struct l l;
+  };
+
+  struct sub {
+      unsigned char x;
+      unsigned char y;
+  };
+
+  union xy {
+      struct sub xy;
+      unsigned int mem;
+  };
+
+  typedef struct hello thingy;
+
+  unsigned char single;
+
+  unsigned char test_local_vars_main(void) {
+      static unsigned char wahoo;
+      static unsigned char bonanza = 0x42;
+      unsigned char i;
+      unsigned int j;
+      unsigned int *random;
+      unsigned char *lol;
+      signed char whoa;
+      struct hello wow;
+      thingy *cool;
+      union xy xy;
+
+      return 0;
+  }
+  </verb></tscreen>
+
+  The following output would be produced:
+
+  <tscreen><verb>
+  SC_FUNC: _test_local_vars_main: Symbol table
+  ============================================
+  __fixargs__:
+      Flags: SC_CONST SC_DEF
+      Type:  unsigned int
+  __argsize__:
+      Flags: SC_CONST SC_DEF
+      Type:  unsigned char
+  wahoo:
+      AsmName: M0001
+      Flags: SC_STATIC SC_DEF SC_REF
+      Type:  unsigned char
+  bonanza:
+      AsmName: M0002
+      Flags: SC_STATIC SC_DEF SC_REF
+      Type:  unsigned char
+  i:
+      Flags: SC_AUTO SC_DEF SC_REF
+      Type:  unsigned char
+  j:
+      Flags: SC_AUTO SC_DEF SC_REF
+      Type:  unsigned int
+  random:
+      Flags: SC_AUTO SC_DEF SC_REF
+      Type:  unsigned int *
+  lol:
+      Flags: SC_AUTO SC_DEF SC_REF
+      Type:  unsigned char *
+  whoa:
+      Flags: SC_AUTO SC_DEF SC_REF
+      Type:  signed char
+  wow:
+      Flags: SC_AUTO SC_DEF SC_REF
+      Type:  struct hello
+  cool:
+      Flags: SC_AUTO SC_DEF SC_REF
+      Type:  struct hello *
+  xy:
+      Flags: SC_AUTO SC_DEF SC_REF
+      Type:  union xy
+
+
+
+
+  Global symbol table
+  ===================
+  thingy:
+      AsmName: _thingy
+      Flags: SC_TYPEDEF 0x100000
+      Type:  struct hello
+  single:
+      AsmName: _single
+      Flags: SC_STATIC SC_EXTERN SC_STORAGE SC_DEF SC_REF 0x100000
+      Type:  unsigned char
+  test_local_vars_main:
+      AsmName: _test_local_vars_main
+      Flags: SC_FUNC SC_STATIC SC_EXTERN SC_DEF 0x100000
+      Type:  unsigned char (void)
+
+
+
+
+  Global tag table
+  ================
+  l:
+      Flags: SC_STRUCT SC_DEF
+      Type:  (none)
+  hello:
+      Flags: SC_STRUCT SC_DEF
+      Type:  (none)
+  sub:
+      Flags: SC_STRUCT SC_DEF
+      Type:  (none)
+  xy:
+      Flags: SC_UNION SC_DEF
+      Type:  (none)
+
+
+
+
+  Global struct and union definitions
+  =========================
+
+  SC_STRUCT: l
+  ============
+  m:
+      Flags: SC_STRUCTFIELD
+      Type:  unsigned char
+  n:
+      Flags: SC_STRUCTFIELD
+      Type:  unsigned char
+
+
+
+
+  SC_STRUCT: hello
+  ================
+  j:
+      Flags: SC_STRUCTFIELD
+      Type:  unsigned char
+  k:
+      Flags: SC_STRUCTFIELD
+      Type:  unsigned char
+  l:
+      Flags: SC_STRUCTFIELD
+      Type:  struct l
+
+
+
+
+  SC_STRUCT: sub
+  ==============
+  x:
+      Flags: SC_STRUCTFIELD
+      Type:  unsigned char
+  y:
+      Flags: SC_STRUCTFIELD
+      Type:  unsigned char
+
+
+
+
+  SC_UNION: xy
+  ============
+  xy:
+      Flags: SC_STRUCTFIELD
+      Type:  struct sub
+  mem:
+      Flags: SC_STRUCTFIELD
+      Type:  unsigned int
+  </verb></tscreen>
+
+
+  <tag><tt>--debug-opt name</tt></tag>
+
+  The named file contains a list of specific optimization steps to enable or disable.
+  Each line contains the name of an optimization step with either a
+  <tt>+</tt> (enable) or <tt>-</tt> (disable) prefix.
+  The name <tt>all</tt> can be used to enable or disable all optimizations.
+  Comment lines may begin with <tt>#</tt> or <tt>;</tt>.
+
+  Use <tt>--list-opt-steps</tt> to generate a complete list of available optimization steps.
+
+  Use <tt>--debug</tt> to see a list of optimizations applied during compilation.
+
+
+  <tag><tt>--debug-opt-output</tt></tag>
+
+  For debugging the output of each optimization pass, step by step.
+  Generates a <tt>name.opt</tt> output listing for each optimized function <tt>name</tt>.
 
 
   <label id="option-dep-target">
@@ -219,9 +423,48 @@ Here is a description of all the command line options:
   symbols in a special section in the object file.
 
 
+  <label id="option-eagerly-inline-funcs">
+  <tag><tt>--eagerly-inline-funcs</tt></tag>
+
+  Have the compiler eagerly inline these functions from the C library:
+  <itemize>
+  <item><tt/memcpy()/
+  <item><tt/memset()/
+  <item><tt/strcmp()/
+  <item><tt/strcpy()/
+  <item><tt/strlen()/
+  </itemize>
+
+  Note: This has two consequences:
+  <itemize>
+  <item>You may not use names of standard C functions for your own functions.
+        If you do that, your program is not standard-compliant anyway; but,
+        using <tt/--eagerly-inline-funcs/ actually will break things.
+        <p>
+  <item>The inlined string and memory functions will not handle strings or
+        memory areas larger than 255 bytes.
+        <p>
+  </itemize>
+
+  <tt/--eagerly-inline-funcs/ implies the <tt><ref id="option-inline-stdfuncs"
+  name="--inline-stdfuncs"></tt> command line option.
+
+  See also <tt><ref id="pragma-allow-eager-inline" name="#pragma&nbsp;allow-eager-inline"></tt>.
+
+
   <tag><tt>-h, --help</tt></tag>
 
   Print the short option summary shown above.
+
+
+  <label id="option-inline-stdfuncs">
+  <tag><tt>--inline-stdfuncs</tt></tag>
+
+  Allow the compiler to inline some standard functions from the C library like
+  strlen.  This will not only remove the overhead for a function call, but will
+  make the code visible for the optimizer.  See also the <tt><ref id="option-O"
+  name="-Os"></tt> command line option and <tt><ref id="pragma-inline-stdfuncs"
+  name="#pragma&nbsp;inline-stdfuncs"></tt>.
 
 
   <label id="option-list-warnings">
@@ -335,7 +578,7 @@ Here is a description of all the command line options:
 
   This option is used to set the target system. The target system determines
   the character set that is used for strings and character constants and the
-  default CPU. The CPU setting can be overriden by use of the <tt/<ref
+  default CPU. The CPU setting can be overridden by use of the <tt/<ref
   id="option--cpu" name="--cpu">/ option.
 
   The following target systems are supported:
@@ -363,6 +606,7 @@ Here is a description of all the command line options:
   <item>sim6502
   <item>sim65c02
   <item>supervision
+  <item>telestrat
   <item>vic20
   </itemize>
 
@@ -386,28 +630,28 @@ Here is a description of all the command line options:
 
   Use static storage for local variables instead of storage on the stack.
   Since the stack is emulated in software, this gives shorter and usually
-  faster code, but the code is no longer reentrant. The difference between
-  <tt/-Cl/ and declaring local variables as static yourself is, that
-  initializer code is executed each time, the function is entered. So when
-  using
+  faster code, but the code is no longer reentrant as required for recursion.
+  The difference between <tt/-Cl/ and declaring local variables as static
+  yourself is, that initializer code is executed each time, the function is
+  entered. So when using
 
   <tscreen><verb>
-   	void f (void)
-   	{
-   	    unsigned a = 1;
-   	    ...
-   	}
+        void f (void)
+        {
+            unsigned a = 1;
+            ...
+        }
   </verb></tscreen>
 
   the variable <tt/a/ will always have the value <tt/1/ when entering the
   function and using <tt/-Cl/, while in
 
   <tscreen><verb>
-   	void f (void)
-   	{
-   	    static unsigned a = 1;
-   	    ....
-   	}
+        void f (void)
+        {
+            static unsigned a = 1;
+            ....
+        }
   </verb></tscreen>
 
   the variable <tt/a/ will have the value <tt/1/ only the first time that the
@@ -444,23 +688,14 @@ Here is a description of all the command line options:
   name="--register-vars">/ command line option, and the <ref
   id="register-vars" name="discussion of register variables"> below.
 
-  Using <tt/-Os/ will force the compiler to inline some known functions from
-  the C library like strlen. Note: This has two consequences:
-  <p>
-  <itemize>
-  <item>You may not use names of standard C functions in your own code. If you
-     	do that, your program is not standard compliant anyway, but using
-     	<tt/-Os/ will actually break things.
-     	<p>
-  <item>The inlined string and memory functions will not handle strings or
-	memory areas larger than 255 bytes. Similarly, the inlined <tt/is..()/
-	functions will not work with values outside the char. range (such as
-	<tt/EOF/).
-     	<p>
-  </itemize>
-  <p>
+  Using <tt/-Os/ will allow the compiler to inline some standard functions
+  from the C library like strlen.  This will not only remove the overhead
+  for a function call, but will make the code visible for the optimizer.
+  See also the <tt/<ref id="option-inline-stdfuncs" name="--inline-stdfuncs">/
+  command line option.
+
   It is possible to concatenate the modifiers for <tt/-O/. For example, to
-  enable register variables and inlining of known functions, you may use
+  enable register variables and inlining of standard functions, you may use
   <tt/-Ors/.
 
 
@@ -478,15 +713,15 @@ Here is a description of all the command line options:
 
 
   <label id="option-W">
-  <tag><tt>-W name[,name]</tt></tag>
+  <tag><tt>-W name[,name,...]</tt></tag>
 
   This option allows to control warnings generated by the compiler. It is
-  followed by a comma separated list of warnings that should be enabled or
+  followed by a comma-separated list of warnings that should be enabled or
   disabled. To disable a warning, its name is prefixed by a minus sign. If
   no such prefix exists, or the name is prefixed by a plus sign, the warning
   is enabled.
 
-  The following warning names are currently recognized:
+  The following warning names currently are recognized:
   <descrip>
   <tag><tt/const-comparison/</tag>
         Warn if the result of a comparison is constant.
@@ -494,10 +729,25 @@ Here is a description of all the command line options:
         Treat all warnings as errors.
   <tag><tt/no-effect/</tag>
         Warn about statements that don't have an effect.
+  <tag><tt/pointer-sign/</tag>
+        Warn if a pointer assignment changes the signedness of the target
+        of a pointer value, and the new signedness wasn't cast explicitly.
+  <tag><tt/pointer-types/</tag>
+        Warn if a pointer assignment changes the type of the target
+        of a pointer value, and the new type wasn't cast explicitly.
+  <tag><tt/remap-zero/</tag>
+        Warn about a <tt/<ref id="pragma-charmap" name="#pragma charmap()">/
+        that changes a character's code number from/to 0x00.
+  <tag><tt/return-type/</tag>
+        Warn about no return statement in function returning non-void.
   <tag><tt/struct-param/</tag>
         Warn when passing structs by value.
   <tag><tt/unknown-pragma/</tag>
-        Warn about known #pragmas.
+        Warn about #pragmas that aren't recognized by cc65.
+  <tag><tt/unreachable-code/</tag>
+        Warn about unreachable code in cases of comparing constants, etc.
+  <tag><tt/unused-func/</tag>
+        Warn about unused functions.
   <tag><tt/unused-label/</tag>
         Warn about unused labels.
   <tag><tt/unused-param/</tag>
@@ -506,13 +756,14 @@ Here is a description of all the command line options:
         Warn about unused variables.
   </descrip>
 
-  The full list of available warning names may be retrieved by using the
+  The full list of available warning names can be retrieved by using the
   option <tt><ref id="option-list-warnings" name="--list-warnings"></tt>.
 
-  You may also use <tt><ref id="pragma-warn" name="#pragma&nbsp;warn"></tt> to
-  control this setting for smaller pieces of code from within your code.
+  You may use also <tt><ref id="pragma-warn" name="#pragma&nbsp;warn"></tt> to
+  control this setting, for smaller pieces of code, from within your sources.
 
 </descrip><p>
+
 
 
 <sect>Input and output<p>
@@ -553,21 +804,21 @@ and the one defined by the ISO standard:
 
 <itemize>
 
-<item>	The datatypes "float" and "double" are not available.
-      	<p>
-<item> 	C Functions may not return structs (or unions), and structs may not
+<item>  The datatypes "float" and "double" are not available.
+        <p>
+<item>  C Functions may not return structs (or unions), and structs may not
         be passed as parameters by value. However, struct assignment *is*
-      	possible.
-      	<p>
-<item>	Most of the C library is available with only the fastcall calling
-	convention (<ref id="extension-fastcall" name="see below">).  It means
-	that you must not mix pointers to those functions with pointers to
-	user-written, cdecl functions (the calling conventions are incompatible).
-	<p>
-<item>	The <tt/volatile/ keyword doesn't have an effect. This is not as bad
+        possible.
+        <p>
+<item>  Most of the C library is available with only the fastcall calling
+        convention (<ref id="extension-fastcall" name="see below">).  It means
+        that you must not mix pointers to those functions with pointers to
+        user-written, cdecl functions (the calling conventions are incompatible).
+        <p>
+<item>  The <tt/volatile/ keyword has almost no effect. That is not as bad
         as it sounds, since the 6502 has so few registers that it isn't
         possible to keep values in registers anyway.
-	<p>
+        <p>
 </itemize>
 
 There may be some more minor differences I'm currently not aware of. The
@@ -582,49 +833,48 @@ This cc65 version has some extensions to the ISO C standard.
 
 <itemize>
 
-<item>	The compiler allows to insert assembler statements into the output
-     	file. The syntax is
+<item>  The compiler allows to insert assembler statements into the output
+        file. The syntax is
 
-	<tscreen><verb>
-	asm (&lt;string literal&gt;[, optional parameters]) ;
-     	</verb></tscreen>
-     	or
-	<tscreen><verb>
-       	__asm__ (&lt;string literal&gt;[, optional parameters]) ;
-     	</verb></tscreen>
+        <tscreen><verb>
+        asm [optional volatile] (&lt;string literal&gt;[, optional parameters]) ;
+        </verb></tscreen>
+        or
+        <tscreen><verb>
+        __asm__ [optional volatile] (&lt;string literal&gt;[, optional parameters]) ;
+        </verb></tscreen>
 
-     	The first form is in the user namespace and is disabled if the <tt/-A/
-     	switch is given.
+        The first form is in the user namespace; and, is disabled if the <tt/-A/
+        switch is given.
 
-	There is a whole section covering inline assembler statements,
-	<ref id="inline-asm" name="see there">.
-	<p>
+        There is a whole section covering inline assembler statements,
+        <ref id="inline-asm" name="see there">.
+        <p>
 
 <label id="extension-fastcall">
-<item>	The normal calling convention -- for non-variadic functions -- is
-	named "fastcall". The syntax for a function declaration that
-	<em/explicitly/ uses fastcall is
+<item>  The normal calling convention -- for non-variadic functions -- is
+        named "fastcall". The syntax for a function declaration that
+        <em/explicitly/ uses fastcall is
 
-	<tscreen><verb>
-	&lt;return type&gt; fastcall &lt;function name&gt; (&lt;parameter list&gt;)
-     	</verb></tscreen>
-     	or
-	<tscreen><verb>
-	&lt;return type&gt; __fastcall__ &lt;function name&gt; (&lt;parameter list&gt;)
-     	</verb></tscreen>
-	An example is
-	<tscreen><verb>
-	void __fastcall__ f (unsigned char c)
-     	</verb></tscreen>
-	The first form of the fastcall keyword is in the user namespace and can
-	therefore be disabled with the <tt><ref id="option--standard"
+        <tscreen><verb>
+        &lt;return type&gt; fastcall &lt;function name&gt; (&lt;parameter list&gt;)
+        </verb></tscreen>
+        or
+        <tscreen><verb>
+        &lt;return type&gt; __fastcall__ &lt;function name&gt; (&lt;parameter list&gt;)
+        </verb></tscreen>
+        An example is
+        <tscreen><verb>
+        void __fastcall__ f (unsigned char c)
+        </verb></tscreen>
+        The first form of the fastcall keyword is in the user namespace and can
+        therefore be disabled with the <tt><ref id="option--standard"
         name="--standard"></tt> command line option.
 
-	For functions that are <tt/fastcall/, the rightmost parameter is not
-	pushed on the stack but left in the primary register when the function
-	is called. That significantly reduces the cost of calling those functions.
-	<newline><newline>
-	<p>
+        For functions that are <tt/fastcall/, the rightmost parameter is not
+        pushed on the stack but left in the primary register when the function
+        is called. That significantly reduces the cost of calling those functions.
+        <p>
 
 <item>  There is another calling convention named "cdecl". Variadic functions
         (their prototypes have an ellipsis &lsqb;<tt/.../&rsqb;) always use that
@@ -649,65 +899,73 @@ This cc65 version has some extensions to the ISO C standard.
         For functions that are <tt/cdecl/, the rightmost parameter is pushed
         onto the stack before the function is called. That increases the cost
         of calling those functions, especially when they are called from many
-        places.<newline><newline>
+        places.
         <p>
 
-<item>	There are two pseudo variables named <tt/__AX__/ and <tt/__EAX__/.
-	Both refer to the primary register that is used by the compiler to
-	evaluate expressions or return function results. <tt/__AX__/ is of
-	type <tt/unsigned int/ and <tt/__EAX__/ of type <tt/long unsigned int/
-	respectively. The pseudo variables may be used as lvalue and rvalue as
-	every other variable. They are most useful together with short
-	sequences of assembler code. For example, the macro
+<item>  There are three pseudo variables named <tt/__A__/, <tt/__AX__/ and
+        <tt/__EAX__/. They all refer to the primary register that is used
+        by the compiler to evaluate expressions or return function results.
+        <tt/__A__/ is of type <tt/unsigned char/, <tt/__AX__/ is of type
+        <tt/unsigned int/ and <tt/__EAX__/ of type <tt/long unsigned int/
+        respectively. The pseudo variables may be used as lvalue and rvalue
+        as every other variable. They are most useful together with short
+        sequences of assembler code. For example, the macro
 
-	<tscreen><verb>
-       	#define hi(x)           \
+        <tscreen><verb>
+        #define hi(x)           \
             (__AX__ = (x),      \
              asm ("txa"),       \
              asm ("ldx #$00"),  \
              __AX__)
-	</verb></tscreen>
+        </verb></tscreen>
 
-	will give the high byte of any unsigned value.
-	<p>
+        will give the high byte of any unsigned value.
+        <p>
 
-<item>	Inside a function, the identifier <tt/__func__/ gives the name of the
-	current function as a string. Outside of functions, <tt/__func__/ is
-	undefined.
-	Example:
+<item>  Inside a function, the identifier <tt/__func__/ gives the name of the
+        current function as a string. Outside of functions, <tt/__func__/ is
+        undefined.
+        Example:
 
-	<tscreen><verb>
-	#define PRINT_DEBUG(s)	printf ("%s: %s\n", __func__, s);
-	</verb></tscreen>
+        <tscreen><verb>
+        #define PRINT_DEBUG(s)  printf ("%s: %s\n", __func__, s);
+        </verb></tscreen>
 
-	The macro will print the name of the current function plus a given
-	string.
-	<p>
+        The macro will print the name of the current function plus a given
+        string.
+        <p>
 
-<item> 	cc65 allows the initialization of <tt/void/ variables. This may be
-	used to create variable structures that are more compatible with
-	interfaces written for assembler languages. Here is an example:
+<item>  cc65 allows the initialization of <tt/void/ variables. This may be
+        used to create arbitrary structures that are more compatible with
+        interfaces written for assembler languages. Here is an example:
 
-	<tscreen><verb>
-	void GCmd = {	(char)3, (unsigned)0x2000, (unsigned)0x3000 };
-	</verb></tscreen>
+        <tscreen><verb>
+        void GCmd = { (char)3, (unsigned)0x2000, (unsigned)0x3000 };
+        </verb></tscreen>
 
-	This will be translated as follows:
+        That will be translated as follows:
 
-	<tscreen><verb>
-	_GCmd:
-	   	.byte	3
-	   	.word	$2000
-	   	.word	$3000
-	</verb></tscreen>
+        <tscreen><verb>
+        _GCmd:
+                .byte   3
+                .word   $2000
+                .word   $3000
+        </verb></tscreen>
 
-	Since the variable is of type <tt/void/ you may not use it as is.
-	However, taking the address of the variable results in a <tt/void*/
-	which may be passed to any function expecting a pointer.
+        Since the variable is of type <tt/void/, you may not use it as-is.
+        However, taking the address of the variable results in a <tt/void*/
+        which may be passed to any function expecting a pointer.  Also, the
+        <tt/sizeof/ operator will give the length of the initializer:
 
-	See the <url url="geos.html" name="GEOS library document"> for examples
-	on how to use this feature.
-	<p>
+        <tscreen><verb>
+        GLen = sizeof GCmd;
+        </verb></tscreen>
+
+        will assign the value 5 to <tt/GLen/.
+
+        See the <url url="geos.html" name="GEOS library document"> for examples
+        on how to use that feature.
+        <p>
 
 <item>  cc65 implements flexible array struct members as defined in the C99 ISO
         standard. As an extension, these fields may be initialized. There are
@@ -731,8 +989,56 @@ This cc65 version has some extensions to the ISO C standard.
         size zero, even if it is initialized.
         <p>
 
+<item>  cc65 supports <tt/_Static_assert/ from C11 and C2X.  This is similar
+        to <tt/#error/ but happens at a later stage of translation, so types
+        can be used.
+
+        <tscreen><verb>
+        /* C11 version with message. */
+        _Static_assert (sizeof (int) == 2, "Expected 2-bytes ints.");
+
+        /* C2X version without message. */
+        _Static_assert (sizeof (int) == 2);
+        </verb></tscreen>
+
+        <tt/_Static_assert/ is also available as the macro <tt/static_assert/ in
+        <tt/assert.h/.
+
+<item>  cc65 supports bit-fields of any integral type that is int-sized or
+        smaller, and enumerated types with those types as their underlying
+        type.  (Only <tt/int/, <tt/signed int/, and <tt/unsigned int/ are
+        required by the standard.)
+
+<item>  Computed gotos, a GCC extension, has limited support. With it you can
+        use fast jump tables from C. You can take the address of a label with
+        a double ampersand, putting them in a static const array of type void *.
+        Then you can jump to one of these labels as follows:
+
+        <tscreen><verb>
+        static const void * const jumptable[] = {
+                &amp;&amp;add,
+                &amp;&amp;sub
+        };
+        goto *jumptable[somevar];
+
+        add:
+        ...code...
+        </verb></tscreen>
+
+        In the jump table, no expressions are supported. The array index
+        used in the goto must be a simple variable or a constant.
+
+<item>  Binary literals, a C++14 feature and a GCC C extension, are accepted.
+        They can be disabled with the <tt><ref id="option--standard"
+        name="--standard"></tt> option.
+
+        <tscreen><verb>
+        unsigned char foo = 0b101; // sets it to 5
+        </verb></tscreen>
+
 </itemize>
 <p>
+
 
 
 <sect>Predefined macros<p>
@@ -747,6 +1053,10 @@ The compiler defines several macros at startup:
   <tag><tt>__APPLE2ENH__</tt></tag>
 
   This macro is defined if the target is the enhanced Apple //e (-t apple2enh).
+
+  <tag><tt>__ATARI2600__</tt></tag>
+
+  This macro is defined if the target is the Atari 2600 game console.
 
   <tag><tt>__ATARI5200__</tt></tag>
 
@@ -792,8 +1102,20 @@ The compiler defines several macros at startup:
   <tag><tt>__CC65__</tt></tag>
 
   This macro is always defined. Its value is the version number of the
-  compiler in hex.  For example, version 2.14 of the compiler has this macro
-  defined as <tt/0x02E0/.
+  compiler in hex: <tt>(VER_MAJOR * 0x100) + VER_MINOR</tt>. The upper 8 bits
+  are the major-, the lower 8 bits are the  minor version. For example, version
+  47.11 of the compiler would have this macro defined as <tt/0x2f0b/.
+
+  Note: until 2.19 this macro was defined as <tt>(VER_MAJOR * 0x100) + VER_MINOR * 0x10</tt> -
+  which resulted in broken values starting at version 2.16 of the compiler. For
+  this reason the value of this macro is considered purely informal - you should
+  not use it to check for a specific compiler version and use different code
+  according to the detected version - please update your code to work with the
+  recent version of the compiler instead (There is very little reason to not use
+  the most recent version - and even less to support older versions in your code).
+
+  Should you still insist on doing this for some reason - look at <tt>checkversion.c</tt>
+  in the samples directory for some preprocessor kludges that might help.
 
   <tag><tt>__CC65_STD__</tt></tag>
 
@@ -805,10 +1127,19 @@ The compiler defines several macros at startup:
   <item><tt/__CC65_STD_CC65__/
   </itemize>
 
+  <tag><tt>__CX16__</tt></tag>
+
+  This macro is defined if the target is the Commander X16 (-t cx16).
+
   <tag><tt>__DATE__</tt></tag>
 
   This macro expands to the date of translation of the preprocessing
   translation unit in the form "Mmm dd yyyy".
+
+  <tag><tt>__EAGERLY_INLINE_FUNCS__</tt></tag>
+
+  Is defined if the compiler was called with the <tt><ref id="option-eagerly-inline-funcs"
+  name="--eagerly-inline-funcs"></tt> command line option.
 
   <tag><tt>__FILE__</tt></tag>
 
@@ -886,6 +1217,14 @@ The compiler defines several macros at startup:
 
   This macro is defined if the target is the Supervision (-t supervision).
 
+  <tag><tt>__SYM1__</tt></tag>
+
+  This macro is defined if the target is the Sym-1 (-t sym1).
+
+  <tag><tt>__TELESTRAT__</tt></tag>
+
+  This macro is defined if the target is the Telestrat (-t telestrat).
+
   <tag><tt>__TIME__</tt></tag>
 
   This macro expands to the time of translation of the preprocessing
@@ -897,6 +1236,7 @@ The compiler defines several macros at startup:
 </descrip>
 
 
+
 <sect>&num;pragmas<label id="pragmas"><p>
 
 The compiler understands some pragmas that may be used to change code
@@ -905,59 +1245,90 @@ If the first parameter is <tt/push/, the old value is saved onto a stack
 before changing it. The value may later be restored by using the <tt/pop/
 parameter with the <tt/#pragma/.
 
-<sect1><tt>#pragma bss-name (&lsqb;push,&rsqb; &lt;name&gt;)</tt><label id="pragma-bss-name"><p>
 
-  This pragma changes the name used for the BSS segment (the BSS segment
-  is used to store uninitialized data). The argument is a string enclosed
-  in double quotes.
+<sect1><tt>#pragma allow-eager-inline ([push,] on|off)</tt><label id="pragma-allow-eager-inline"><p>
 
-  Note: The default linker configuration file does only map the standard
-  segments. If you use other segments, you have to create a new linker
-  configuration file.
-
-  Beware: The startup code will zero only the default BSS segment. If you
-  use another BSS segment, you have to do that yourself, otherwise
-  uninitialized variables do not have the value zero.
+  Allow eager inlining of known functions.  If the argument is "off", eager
+  inlining is disabled, otherwise it is enabled. Please note that (in contrast
+  to the <tt><ref id="option-eagerly-inline-funcs" name="--eagerly-inline-funcs"></tt>
+  command line option) this pragma does not imply the <tt><ref id="option-inline-stdfuncs"
+  name="--inline-stdfuncs"></tt> command line option.  Rather it marks code to be safe for
+  eager inlining of known functions if inlining of standard functions is enabled.
 
   The <tt/#pragma/ understands the push and pop parameters as explained above.
 
-  Example:
+
+<sect1><tt>#pragma bss-name ([push, ]&lt;name>[ ,&lt;addrsize>])</tt><label id="pragma-bss-name"><p>
+
+  This pragma changes the name used for the BSS segment (the BSS segment is
+  used to store variables with static storage duration and no explicit
+  initializers). The <tt/name/ argument is a string enclosed in quotation
+  marks.
+
+  <tt/addrsize/ is an optional string that gives a hint about where the
+  <tt/name/ segment will be put in the CPU's address space.  It describes the
+  width of address numbers that point into that segment.  Only words that
+  are known to ca65 are allowed:
+  <enum>
+  <item>"zp", "zeropage", "direct"
+  <item>"abs", "absolute", "near", "default"
+  <item>"far"
+  <item>"long", "dword"
+  </enum>
+
+  Note: The default linker configuration file maps only the standard segments.
+  If you use other segments, you must create a new linker configuration file.
+
+  Beware: The start-up code will zero only the default BSS segment. If you use
+  another BSS segment, then you must do that yourself; otherwise, variables
+  with static storage duration and no explicit initializer will not have the
+  value zero.
+
+  The <tt/#pragma/ understands the push and pop parameters, as explained above.
+
+  Examples:
   <tscreen><verb>
-       	#pragma bss-name ("MyBSS")
+  #pragma bss-name ("MyBSS")
+  #pragma bss-name (push, "MyBSS")
+  #pragma bss-name ("MyBSS", "zp")
   </verb></tscreen>
 
 
 <sect1><tt>#pragma charmap (&lt;index&gt;, &lt;code&gt;)</tt><label id="pragma-charmap"><p>
 
   Each literal string and each literal character in the source is translated
-  by use of a translation table. This translation table is preset when the
-  compiler is started depending on the target system, for example to map
-  ISO-8859-1 characters into PETSCII if the target is a commodore machine.
+  by use of a translation table. That translation table is preset when the
+  compiler is started, depending on the target system; for example, to map
+  ISO-8859-1 characters into PETSCII if the target is a Commodore machine.
 
   This pragma allows to change entries in the translation table, so the
   translation for individual characters, or even the complete table may be
-  adjusted.
+  adjusted. Both arguments are assumed to be unsigned characters with a valid
+  range of 0-255.
 
-  Both arguments are assumed to be unsigned characters with a valid range of
-  1-255.
-
-  Beware of two pitfalls:
-
-    <itemize>
-    <item>The character index is actually the code of the character in the
-      	  C source, so character mappings do always depend on the source
-      	  character set. This means that <tt/#pragma&nbsp;charmap/ is not
-	  portable -- it depends on the build environment.
-    <item>While it is possible to use character literals as indices, the
-      	  result may be somewhat unexpected, since character literals are
-      	  itself translated. For this reason I would suggest to avoid
-      	  character literals and use numeric character codes instead.
-    </itemize>
+  Beware of some pitfalls:
+  <itemize>
+  <item>The character index is actually the code of the character in the
+        C source; so, character mappings do always depend on the source
+        character set. That means that <tt/#pragma&nbsp;charmap()/ is not
+        portable -- it depends on the build environment.
+  <item>While it is possible to use character literals as indices, the
+        result may be somewhat unexpected, since character literals are
+        themselves translated. For that reason, I would suggest to avoid
+        character literals, and use numeric character codes instead.
+  <item>It is risky to change index <tt/0x00/, because string functions depend
+        on it. If it is changed, then the <tt/'\0'/ at the end of string
+        literals will become non-zero. Functions that are used on those
+        literals won't stop at the end of them. cc65 will warn you if you do
+        change that code number. You can turn off that <tt/remap-zero/ warning
+        if you are certain that you know what you are doing (see <tt/<ref
+        id="pragma-warn" name="#pragma&nbsp;warn()">/).
+  </itemize>
 
   Example:
   <tscreen><verb>
-        /* Use a space wherever an 'a' occurs in ISO-8859-1 source */
-       	#pragma charmap (0x61, 0x20);
+  /* Use a space wherever an 'a' occurs in ISO-8859-1 source */
+  #pragma charmap (0x61, 0x20);
   </verb></tscreen>
 
 
@@ -974,21 +1345,34 @@ parameter with the <tt/#pragma/.
 
   The <tt/#pragma/ understands the push and pop parameters as explained above.
 
-<sect1><tt>#pragma code-name ([push,] &lt;name&gt;)</tt><label id="pragma-code-name"><p>
 
-  This pragma changes the name used for the CODE segment (the CODE segment
-  is used to store executable code). The argument is a string enclosed in
-  double quotes.
+<sect1><tt>#pragma code-name ([push, ]&lt;name>[ ,&lt;addrsize>])</tt><label id="pragma-code-name"><p>
 
-  Note: The default linker configuration file does only map the standard
-  segments. If you use other segments, you have to create a new linker
-  configuration file.
+  This pragma changes the name used for the CODE segment (the CODE segment is
+  used to store executable code). The <tt/name/ argument is a string enclosed
+  in quotation marks.
 
-  The <tt/#pragma/ understands the push and pop parameters as explained above.
+  <tt/addrsize/ is an optional string that gives a hint about where the
+  <tt/name/ segment will be put in the CPU's address space.  It describes the
+  width of address numbers that point into that segment.  Only words that
+  are known to ca65 are allowed:
+  <enum>
+  <item>"zp", "zeropage", "direct"
+  <item>"abs", "absolute", "near", "default"
+  <item>"far"
+  <item>"long", "dword"
+  </enum>
 
-  Example:
+  Note: The default linker configuration file maps only the standard segments.
+  If you use other segments, you must create a new linker configuration file.
+
+  The <tt/#pragma/ understands the push and pop parameters, as explained above.
+
+  Examples:
   <tscreen><verb>
-       	#pragma code-name ("MyCODE")
+  #pragma code-name ("MyCODE")
+  #pragma code-name (push, "MyCODE")
+  #pragma code-name (push, "MyCODE", "far")
   </verb></tscreen>
 
 
@@ -1002,22 +1386,45 @@ parameter with the <tt/#pragma/.
   The <tt/#pragma/ understands the push and pop parameters as explained above.
 
 
-<sect1><tt>#pragma data-name ([push,] &lt;name&gt;)</tt><label id="pragma-data-name"><p>
+<sect1><tt>#pragma data-name ([push, ]&lt;name>[ ,&lt;addrsize>])</tt><label id="pragma-data-name"><p>
 
-  This pragma changes the name used for the DATA segment (the DATA segment
-  is used to store initialized data). The argument is a string enclosed in
-  double quotes.
+  This pragma changes the name used for the DATA segment (the DATA segment is
+  used to store initialized data). The <tt/name/ argument is a string enclosed
+  in quotation marks.
 
-  Note: The default linker configuration file does only map the standard
-  segments. If you use other segments, you have to create a new linker
-  configuration file.
+  <tt/addrsize/ is an optional string that gives a hint about where the
+  <tt/name/ segment will be put in the CPU's address space.  It describes the
+  width of address numbers that point into that segment.  Only words that
+  are known to ca65 are allowed:
+  <enum>
+  <item>"zp", "zeropage", "direct"
+  <item>"abs", "absolute", "near", "default"
+  <item>"far"
+  <item>"long", "dword"
+  </enum>
+
+  Note: The default linker configuration file maps only the standard segments.
+  If you use other segments, you must create a new linker configuration file.
+
+  The <tt/#pragma/ understands the push and pop parameters, as explained above.
+
+  Examples:
+  <tscreen><verb>
+  #pragma data-name ("MyDATA")
+  #pragma data-name (push, "MyDATA")
+  #pragma data-name ("MyDATA", "zeropage")
+  </verb></tscreen>
+
+
+<sect1><tt>#pragma inline-stdfuncs ([push,] on|off)</tt><label id="pragma-inline-stdfuncs"><p>
+
+  Allow the compiler to inline some standard functions from the C library like
+  strlen.  If the argument is "off", inlining is disabled, otherwise it is enabled.
+
+  See also the <tt/<ref id="option-inline-stdfuncs" name="--inline-stdfuncs">/
+  command line option.
 
   The <tt/#pragma/ understands the push and pop parameters as explained above.
-
-  Example:
-  <tscreen><verb>
-       	#pragma data-name ("MyDATA")
-  </verb></tscreen>
 
 
 <sect1><tt>#pragma local-strings ([push,] on|off)</tt><label id="pragma-local-strings"><p>
@@ -1032,6 +1439,23 @@ parameter with the <tt/#pragma/.
   output immediately, which means that they go into the currently active data
   or rodata segment, but cannot be merged. When inactive, string literals are
   remembered and output as a whole when translation is finished.
+
+
+<sect1><tt>#pragma message (&lt;message&gt;)</tt><label id="pragma-message"><p>
+
+  This pragma is used to display informational messages at compile-time.
+
+  The message intended to be displayed must be a string literal.
+
+  Example:
+  <tscreen><verb>
+        #pragma message ("in a bottle")
+  </verb></tscreen>
+
+  Results in the compiler outputting the following to stderr:
+  <tscreen><verb>
+        example.c(42): Note: in a bottle
+  </verb></tscreen>
 
 
 <sect1><tt>#pragma optimize ([push,] on|off)</tt><label id="pragma-optimize"><p>
@@ -1050,21 +1474,32 @@ parameter with the <tt/#pragma/.
   The <tt/#pragma/ understands the push and pop parameters as explained above.
 
 
-<sect1><tt>#pragma rodata-name ([push,] &lt;name&gt;)</tt><label id="pragma-rodata-name"><p>
+<sect1><tt>#pragma rodata-name ([push, ]&lt;name>[ ,&lt;addrsize>])</tt><label id="pragma-rodata-name"><p>
 
-  This pragma changes the name used for the RODATA segment (the RODATA
-  segment is used to store readonly data). The argument is a string
-  enclosed in double quotes.
+  This pragma changes the name used for the RODATA segment (the RODATA segment
+  is used to store read-only data). The <tt/name/ argument is a string enclosed
+  in quotation marks.
 
-  Note: The default linker configuration file does only map the standard
-  segments. If you use other segments, you have to create a new linker
-  configuration file.
+  <tt/addrsize/ is an optional string that gives a hint about where the
+  <tt/name/ segment will be put in the CPU's address space.  It describes the
+  width of address numbers that point into that segment.  Only words that
+  are known to ca65 are allowed:
+  <enum>
+  <item>"zp", "zeropage", "direct"
+  <item>"abs", "absolute", "near", "default"
+  <item>"far"
+  <item>"long", "dword"
+  </enum>
 
-  The <tt/#pragma/ understands the push and pop parameters as explained above.
+  Note: The default linker configuration file maps only the standard segments.
+  If you use other segments, you must create a new linker configuration file.
 
-  Example:
+  The <tt/#pragma/ understands the push and pop parameters, as explained above.
+
+  Examples:
   <tscreen><verb>
-       	#pragma rodata-name ("MyRODATA")
+  #pragma rodata-name ("MyRODATA")
+  #pragma rodata-name (push, "MyRODATA")
   </verb></tscreen>
 
 
@@ -1086,9 +1521,9 @@ parameter with the <tt/#pragma/.
 
   Example:
   <tscreen><verb>
-       	#pragma regvaraddr(on) 	/* Allow taking the address
-       		      	       	 * of register variables
-       		      	       	 */
+        #pragma regvaraddr(on)  /* Allow taking the address
+                                 * of register variables
+                                 */
   </verb></tscreen>
 
 
@@ -1128,20 +1563,59 @@ parameter with the <tt/#pragma/.
 
   Switch compiler warnings on or off. "name" is the name of a warning (see the
   <tt/<ref name="-W" id="option-W">/ compiler option for a list). The name is
-  either followed by "pop", which restores the last pushed state, or by "on" or
-  "off", optionally preceeded by "push" to push the current state before
+  followed either by "pop", which restores the last pushed state, or by "on" or
+  "off", optionally preceded by "push" to push the current state before
   changing it.
 
   Example:
   <tscreen><verb>
         /* Don't warn about the unused parameter in function func */
-      	#pragma warn (unused-param, push, off)
+        #pragma warn (unused-param, push, off)
         static int func (int unused)
         {
             return 0;
         }
         #pragma warn (unused-param, pop)
   </verb></tscreen>
+
+
+<sect1><tt>#pragma wrapped-call (push, &lt;name&gt;, &lt;identifier&gt;)</tt><label id="pragma-wrapped-call"><p>
+
+  This pragma sets a wrapper for functions, often used for trampolines.
+
+  The name is a function returning <tt/void/, and taking no parameters.
+  It must preserve the CPU's <tt/A/ and <tt/X/ registers if it wraps any
+  <tt/__fastcall__/ functions that have parameters.  It must preserve
+  the <tt/Y/ register if it wraps any variadic functions (they have "<tt/.../"
+  in their prototypes).
+
+  The identifier is an 8-bit number that's set into <tt/tmp4/. If the identifier
+  is "bank", then ca65's <tt><url url="ca65.html#.BANK" name=".bank"></tt> function will be used
+  to determine the number from the bank attribute defined in the linker config,
+  see <url url="ld65.html#MEMORY" name="Other MEMORY area attributes">. Note that
+  this currently implies that only the least significant 8 bits of the bank attribute
+  can be used.
+
+  The address of a wrapped function is passed in <tt/ptr4/.  The wrapper can
+  call that function by using "<tt/jsr callptr4/".
+
+  This feature is useful, for example, with banked memory, to switch banks
+  automatically to where a wrapped function resides, and then to restore the
+  previous bank when it returns.
+
+  The <tt/#pragma/ requires the push or pop argument as explained above.
+
+  Example:
+  <tscreen><verb>
+/* Note that this code can be in a header. */
+void mytrampoline(void); /* Doesn't corrupt __AX__ */
+
+#pragma wrapped-call (push, mytrampoline, 5)
+void somefunc1(void);
+void somefunc2(int, char *);
+#pragma wrapped-call (pop)
+  </verb></tscreen>
+
 
 <sect1><tt>#pragma writable-strings ([push,] on|off)</tt><label id="pragma-writable-strings"><p>
 
@@ -1167,10 +1641,9 @@ parameter with the <tt/#pragma/.
 
   Example:
   <tscreen><verb>
-      	extern int foo;
-      	#pragma zpsym ("foo");	/* foo is in the zeropage */
+        extern int foo;
+        #pragma zpsym ("foo");  /* foo is in the zeropage */
   </verb></tscreen>
-
 
 
 
@@ -1224,39 +1697,44 @@ The compiler allows to insert assembler statements into the output file. The
 syntax is
 
 <tscreen><verb>
-      	asm (&lt;string literal&gt;[, optional parameters]) ;
+        asm [optional volatile] (&lt;string literal&gt;[, optional parameters]) ;
 </verb></tscreen>
 or
 <tscreen><verb>
-       	__asm__ (&lt;string literal&gt;[, optional parameters]) ;
+        __asm__ [optional volatile] (&lt;string literal&gt;[, optional parameters]) ;
 </verb></tscreen>
 <p>
 
-The first form is in the user namespace and is disabled by <tt><ref
+The first form is in the user namespace; and, is disabled by <tt><ref
 id="option--standard" name="--standard"></tt> if the argument is not <tt/cc65/.
 
-The asm statement may be used inside a function and on global file level. An
-inline assembler statement is a primary expression, so it may also be used as
-part of an expression. Please note however that the result of an expression
-containing just an inline assembler statement is always of type <tt/void/.
+The <tt/asm/ statement can be used only inside a function.  Please note that
+the result of an inline assembler expression is always of type <tt/void/.
 
-The contents of the string literal are preparsed by the compiler and inserted
-into the generated assembly output, so that the can be further processed by
-the backend and especially the optimizer. For this reason, the compiler does
-only allow regular 6502 opcodes to be used with the inline assembler. Pseudo
-instructions (like <tt/.import/, <tt/.byte/ and so on) are <em/not/ allowed,
+The contents of the string literal are preparsed by the compiler; and, inserted
+into the generated assembly output, so that it can be processed further by
+the backend -- and, especially the optimizer. For that reason, the compiler does
+allow only regular 6502 opcodes to be used with the inline assembler. Pseudo
+instructions (like <tt/.import/, <tt/.byte/, and so on) are <em/not/ allowed,
 even if the ca65 assembler (which is used to translate the generated assembler
-code) would accept them. The builtin inline assembler is not a replacement for
-the full blown macro assembler which comes with the compiler.
+code) would accept them. The built-in inline assembler is not a replacement for
+the full-blown macro assembler which comes with the compiler.
 
 Note: Inline assembler statements are subject to all optimizations done by the
-compiler. There is currently no way to protect an inline assembler statement
-from being moved or removed completely by the optimizer. If in doubt, check
-the generated assembler output, or disable optimizations.
+compiler. There currently is no way to protect an inline assembler statement
+-- alone -- from being moved or removed completely by the optimizer. If in
+doubt, check the generated assembler output; or, disable optimizations (for
+that function).
+
+As a shortcut, you can put the <tt/volatile/ qualifier in your <tt/asm/
+statements.  It will disable optimization for the functions in which those
+<tt/asm volatile/ statements sit.  The effect is the same as though you put
+<tt/#pragma optimize(push, off)/ above those functions, and <tt/#pragma
+optimize(pop)/ below those functions.
 
 The string literal may contain format specifiers from the following list. For
 each format specifier, an argument is expected which is inserted instead of
-the format specifier before passing the assembly code line to the backend.
+the format specifier, before passing the assembly code line to the backend.
 
 <itemize>
   <item><tt/%b/ - Numerical 8-bit value
@@ -1269,33 +1747,39 @@ the format specifier before passing the assembly code line to the backend.
   <item><tt/%%/ - The % sign itself
 </itemize><p>
 
-Using these format specifiers, you can access C <tt/#defines/, variables or
+Using those format specifiers, you can access C <tt/#defines/, variables, or
 similar stuff from the inline assembler. For example, to load the value of
-a C <tt/#define/ into the Y register, one would use
+a C <tt/#define/ into the Y index register, one would use
 
 <tscreen><verb>
-      	#define OFFS  23
-       	__asm__ ("ldy #%b", OFFS);
+        #define OFFS  23
+        __asm__ ("ldy #%b", OFFS);
 </verb></tscreen>
 
 Or, to access a struct member of a static variable:
 
 <tscreen><verb>
-      	typedef struct {
-      	    unsigned char x;
-      	    unsigned char y;
-      	    unsigned char color;
-      	} pixel_t;
-      	static pixel_t pixel;
-       	__asm__ ("ldy #%b", offsetof(pixel_t, color));
-      	__asm__ ("lda %v,y", pixel);
+        typedef struct {
+            unsigned char x;
+            unsigned char y;
+            unsigned char color;
+            unsigned char data[32];
+        } pixel_t;
+        static pixel_t pixel;
+        __asm__ ("ldy #%b", offsetof(pixel_t, color));
+        __asm__ ("lda %v,y", pixel);
+
+        /* or to access an array member */
+        static unsigned char i;
+        __asm__ ("ldy %v", i);
+        __asm__ ("lda %v+%b,y", pixel, offsetof(pixel_t, data));
 </verb></tscreen>
 <p>
 The next example shows how to use global variables to exchange data between C
-an assembler and how to handle assembler jumps:
+and assembler; and, how to handle assembler jumps:
 
 <tscreen><verb>
-        unsigned char globalSubA, globalSubB, globalSubResult;
+        static unsigned char globalSubA, globalSubB, globalSubResult;
 
         /* return a-b, return 255 if b>a */
         unsigned char sub (unsigned char a, unsigned char b)
@@ -1314,19 +1798,19 @@ an assembler and how to handle assembler jumps:
 </verb></tscreen>
 <p>
 
-Arrays can also be accessed:
+Arrays also can be accessed:
 
 <tscreen><verb>
-        unsigned char globalSquareTable[] = {
+        static const unsigned char globalSquareTable[] = {
             0, 1, 4, 9, 16, 25, 36, 49, 64, 81,
             100, 121, 144, 169, 196, 225
         };
-        unsigned char globalSquareA, globalSquareResult;
+        static unsigned char globalSquareA, globalSquareResult;
 
         /* return a*a for a<16, else 255 */
         unsigned char square (unsigned char a)
         {
-            if (a>15){
+            if (a > 15) {
                 return 255;
             }
             globalSquareA = a;
@@ -1339,26 +1823,28 @@ Arrays can also be accessed:
 <p>
 
 Note: Do not embed the assembler labels that are used as names of global
-variables or functions into your asm statements. Code like this
+variables or functions into your <tt/asm/ statements. Code such as this:
 
 <tscreen><verb>
         int foo;
-        int bar () { return 1; }
-       	__asm__ ("lda _foo");           /* DON'T DO THAT! */
+        int bar (void) { return 1; }
+        ...
+        __asm__ ("lda _foo");           /* DON'T DO THAT! */
         ...
         __asm__ ("jsr _bar");           /* DON'T DO THAT EITHER! */
 </verb></tscreen>
 <p>
 
-may stop working if the way, the compiler generates these names is changed in
-a future version. Instead use the format specifiers from the table above:
+might stop working if the way that the compiler generates those names is changed in
+a future version. Instead, use the format specifiers from the table above:
 
 <tscreen><verb>
-       	__asm__ ("lda %v", foo);        /* OK */
+        __asm__ ("lda %v", foo);        /* OK */
         ...
         __asm__ ("jsr %v", bar);        /* OK */
 </verb></tscreen>
 <p>
+
 
 
 <sect>Implementation-defined behavior<p>
@@ -1382,7 +1868,7 @@ This is the original compiler copyright:
 
       Anyone may copy or redistribute these programs, provided that:
 
-  1:  You don't charge anything for the copy.  It is permissable to
+  1:  You don't charge anything for the copy.  It is permissible to
       charge a nominal fee for media, etc.
 
   2:  All source code and documentation for the programs is made
@@ -1423,15 +1909,14 @@ including commercial applications, and to alter it and redistribute it
 freely, subject to the following restrictions:
 
 <enum>
-<item> 	The origin of this software must not be misrepresented; you must not
-       	claim that you wrote the original software. If you use this software
-       	in a product, an acknowledgment in the product documentation would be
-	appreciated but is not required.
-<item>	Altered source versions must be plainly marked as such, and must not
-	be misrepresented as being the original software.
-<item>	This notice may not be removed or altered from any source
-	distribution.
+<item>  The origin of this software must not be misrepresented; you must not
+        claim that you wrote the original software. If you use this software
+        in a product, an acknowledgment in the product documentation would be
+        appreciated but is not required.
+<item>  Altered source versions must be plainly marked as such, and must not
+        be misrepresented as being the original software.
+<item>  This notice may not be removed or altered from any source
+        distribution.
 </enum>
 
 </article>
-

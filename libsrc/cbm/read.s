@@ -8,7 +8,6 @@
         .export         _read
         .constructor    initstdin
 
-        .import         SETLFS, OPEN, CHKIN, BASIN, CLRCH, BSOUT, READST
         .import         rwcommon
         .import         popax
         .importzp       ptr1, ptr2, ptr3, tmp1, tmp2, tmp3
@@ -22,7 +21,7 @@
 ;--------------------------------------------------------------------------
 ; initstdin: Open the stdin file descriptors for the keyboard
 
-.segment        "INIT"
+.segment        "ONCE"
 
 .proc   initstdin
 
@@ -88,10 +87,10 @@
 
         ldy     #0
         lda     tmp1
-        sta     (ptr2),y
-        inc     ptr2
+        sta     (ptr1),y
+        inc     ptr1
         bne     @L1
-        inc     ptr2+1          ; *buf++ = A;
+        inc     ptr1+1          ; *buf++ = A;
 
 ; Increment the byte count
 
@@ -107,9 +106,9 @@
 
 ; Decrement the count
 
-@L3:    inc     ptr1
+@L3:    dec     ptr2
         bne     @L0
-        inc     ptr1+1
+        dec     ptr2+1
         bne     @L0
         beq     done            ; Branch always
 
@@ -136,7 +135,7 @@ eof:    lda     #0
 
 devnotpresent:
         lda     #ENODEV
-        jmp     __directerrno   ; Sets _errno, clears _oserror, returns -1
+        .byte   $2C             ; Skip next opcode via BIT <abs>
 
 ; Error entry: The given file descriptor is not valid or not open
 

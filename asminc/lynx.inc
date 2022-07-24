@@ -4,7 +4,7 @@
 ;
 ; Reference:
 ;  Bastian Schick's Lynx Documentation
-;  http://www.geocities.com/SiliconValley/Byte/4242/lynx/
+;  http://www.geocities.ws/SiliconValley/Byte/4242/lynx/
 ;
 
 ; ***
@@ -135,35 +135,35 @@ STIMCTLB    = $FD1F
 TIM0BKUP    = $FD00
 TIM0CTLA    = $FD01
 TIM0CNT     = $FD02
-TIM0CTLB    = $FD03 
+TIM0CTLB    = $FD03
 TIM1BKUP    = $FD04
 TIM1CTLA    = $FD05
 TIM1CNT     = $FD06
-TIM1CTLB    = $FD07 
+TIM1CTLB    = $FD07
 TIM2BKUP    = $FD08
 TIM2CTLA    = $FD09
 TIM2CNT     = $FD0A
-TIM2CTLB    = $FD0B 
+TIM2CTLB    = $FD0B
 TIM3BKUP    = $FD0C
 TIM3CTLA    = $FD0D
 TIM3CNT     = $FD0E
-TIM3CTLB    = $FD0F 
+TIM3CTLB    = $FD0F
 TIM4BKUP    = $FD10
 TIM4CTLA    = $FD11
 TIM4CNT     = $FD12
-TIM4CTLB    = $FD13 
+TIM4CTLB    = $FD13
 TIM5BKUP    = $FD14
 TIM5CTLA    = $FD15
 TIM5CNT     = $FD16
-TIM5CTLB    = $FD17 
+TIM5CTLB    = $FD17
 TIM6BKUP    = $FD18
 TIM6CTLA    = $FD19
 TIM6CNT     = $FD1A
-TIM6CTLB    = $FD1B 
+TIM6CTLB    = $FD1B
 TIM7BKUP    = $FD1C
 TIM7CTLA    = $FD1D
 TIM7CNT     = $FD1E
-TIM7CTLB    = $FD1F 
+TIM7CTLB    = $FD1F
 
 ; Mikey Audio
 

@@ -54,7 +54,7 @@ typedef unsigned long time_t;
 typedef unsigned long clock_t;
 
 /* Structure for broken down time */
-struct tm {     
+struct tm {
     int     tm_sec;
     int     tm_min;
     int     tm_hour;
@@ -66,65 +66,35 @@ struct tm {
     int     tm_isdst;
 };
 
-/* Timezone representation, default is UTC */
-extern struct _timezone {
-    char    daylight;   /* True if daylight savings time active */
-    long    timezone;   /* Number of seconds behind UTC */
-    char    tzname[5];  /* Name of timezone, e.g. CET */
-    char    dstname[5]; /* Name when daylight true, e.g. CEST */
-} _tz;
-
-
-
-#if defined(__ATARI__)
-/* The clock depends on the video standard, so read it at runtime */
-unsigned _clocks_per_sec (void);
-#  define CLK_TCK               _clocks_per_sec()
-#  define CLOCKS_PER_SEC        _clocks_per_sec()
-#elif defined(__ATARI5200__)
-#  define CLK_TCK               60      /* POSIX */
-#  define CLOCKS_PER_SEC        60      /* ANSI */
+#if defined(__ATARI5200__)
+#  define CLOCKS_PER_SEC        60
 #elif defined(__ATMOS__)
-#  define CLK_TCK               100     /* POSIX */
-#  define CLOCKS_PER_SEC        100     /* ANSI */
+#  define CLOCKS_PER_SEC        100
 #elif defined(__CBM__)
 #  if defined(__CBM510__) || defined(__CBM610__)
 /* The 510/610 gets its clock from the AC current */
-#    define CLK_TCK             50      /* POSIX */
-#    define CLOCKS_PER_SEC      50      /* ANSI */
+#    define CLOCKS_PER_SEC      50
 #  else
-#    define CLK_TCK             60      /* POSIX */
-#    define CLOCKS_PER_SEC      60      /* ANSI */
+#    define CLOCKS_PER_SEC      60
 #  endif
 #elif defined(__NES__)
-#  define CLK_TCK               50      /* POSIX */
-#  define CLOCKS_PER_SEC        50      /* ANSI */
+#  define CLOCKS_PER_SEC        50
 #elif defined(__PCE__)
-#  define CLK_TCK               60      /* POSIX */
-#  define CLOCKS_PER_SEC        60      /* ANSI */
-#elif  defined(__GAMATE__)
-#  define CLK_TCK               135     /* POSIX */     /* FIXME */
-#  define CLOCKS_PER_SEC        135     /* ANSI */      /* FIXME */
-#elif  defined(__GEOS__)
-#  define CLK_TCK               1       /* POSIX */
-#  define CLOCKS_PER_SEC        1       /* ANSI */
-#elif defined(__LYNX__)
-/* The clock-rate depends on the video scan-rate;
-** so, read it at run-time.
-*/
-extern clock_t _clk_tck (void);
-#  define CLK_TCK               _clk_tck()
-#  define CLOCKS_PER_SEC        _clk_tck()
+#  define CLOCKS_PER_SEC        60
+#elif defined(__GAMATE__)
+#  define CLOCKS_PER_SEC        135   /* FIXME */
+#elif defined(__GEOS__)
+#  define CLOCKS_PER_SEC        1
+#elif defined(__TELESTRAT__)
+#  define CLOCKS_PER_SEC        10
+#elif defined(__ATARI__) || defined (__LYNX__)
+/* Read the clock rate at runtime */
+clock_t _clocks_per_sec (void);
+#  define CLOCKS_PER_SEC        _clocks_per_sec()
 #endif
+#define CLOCK_REALTIME          0
 
 
-
-time_t _systime (void);
-/* Similar to time(), but:
-**   - Is not ISO C
-**   - Does not take the additional pointer
-**   - Does not set errno when returning -1
-*/
 
 /* ISO C function prototypes */
 char* __fastcall__ asctime (const struct tm* timep);
@@ -137,10 +107,34 @@ size_t __fastcall__ strftime (char* buf, size_t bufsize, const char* format, con
 time_t __fastcall__ time (time_t* t);
 
 
+#if __CC65_STD__ >= __CC65_STD_CC65__
 
-/* End of time.h */
+typedef unsigned char clockid_t;
+
+/* Structure for seconds and nanoseconds */
+struct timespec {
+    time_t  tv_sec;
+    long    tv_nsec;
+};
+
+/* Timezone representation, default is UTC */
+extern struct _timezone {
+    char    daylight;   /* True if daylight savings time active */
+    long    timezone;   /* Number of seconds behind UTC */
+    char    tzname[5];  /* Name of timezone, e.g. CET */
+    char    dstname[5]; /* Name when daylight true, e.g. CEST */
+} _tz;
+
+#define CLK_TCK                 CLOCKS_PER_SEC
+
+/* POSIX function prototypes */
+int __fastcall__ clock_getres (clockid_t clock_id, struct timespec *res);
+int __fastcall__ clock_gettime (clockid_t clock_id, struct timespec *tp);
+int __fastcall__ clock_settime (clockid_t clock_id, const struct timespec *tp);
 
 #endif
 
 
+/* End of time.h */
 
+#endif

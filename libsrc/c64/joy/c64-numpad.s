@@ -30,24 +30,12 @@
 
         .addr   $0000
 
-; Button state masks (8 values)
-
-        .byte   $02                     ; JOY_UP        "8"
-        .byte   $10                     ; JOY_DOWN      "2"
-        .byte   $20                     ; JOY_LEFT      "4"
-        .byte   $08                     ; JOY_RIGHT     "6"
-        .byte   $04                     ; JOY_FIRE      "5" ENTER
-        .byte   $00                     ; JOY_FIRE2 unavailable
-        .byte   $00                     ; Future expansion
-        .byte   $00                     ; Future expansion
-
 ; Jump table.
 
         .addr   INSTALL
         .addr   UNINSTALL
         .addr   COUNT
         .addr   READ
-        .addr   0                       ; IRQ entry unused
 
 ; ------------------------------------------------------------------------
 ; Constants
@@ -58,6 +46,49 @@ JOY_COUNT       = 1             ; Number of joysticks we support
 ; ------------------------------------------------------------------------
 ; Data.
 
+.rodata
+
+; <U>p      '8' key
+; <D>own    '2' key
+; <L>eft    '4' key
+; <R>ight   '6' key
+; <B>utton  '5' or ENTER key
+
+masktable:
+        ; Input:  LDRBU
+        ; Output: BRLDU
+        .byte %00000000         ; $00
+        .byte %00000001         ; $01
+        .byte %00010000         ; $02
+        .byte %00010001         ; $03
+        .byte %00001000         ; $04
+        .byte %00001001         ; $05
+        .byte %00011000         ; $06
+        .byte %00011001         ; $07
+        .byte %00000010         ; $08
+        .byte %00000011         ; $09
+        .byte %00010010         ; $0A
+        .byte %00010011         ; $0B
+        .byte %00001010         ; $0C
+        .byte %00001011         ; $0D
+        .byte %00011010         ; $0E
+        .byte %00011011         ; $0F
+        .byte %00000100         ; $10
+        .byte %00000101         ; $11
+        .byte %00010100         ; $12
+        .byte %00010101         ; $13
+        .byte %00001100         ; $14
+        .byte %00001101         ; $15
+        .byte %00011100         ; $16
+        .byte %00011101         ; $17
+        .byte %00000110         ; $18
+        .byte %00000111         ; $19
+        .byte %00010110         ; $1A
+        .byte %00010111         ; $1B
+        .byte %00001110         ; $1C
+        .byte %00001111         ; $1D
+        .byte %00011110         ; $1E
+        .byte %00011111         ; $1F
 
 .code
 
@@ -100,21 +131,23 @@ COUNT:  lda     #JOY_COUNT
 ;
 
 READ:   tax                     ; Clear high byte
-        lda     #$FD
-        ldy     #$FE
+        lda     #$FD            ; For ENTER and '6'
+        ldy     #$FE            ; For '8', '5', '2', '4'
         sei
         sta     VIC_KBD_128
         lda     CIA1_PRB
         and     #%00110000
         eor     #%00110000
-        lsr
-        lsr
+        lsr                     ; Map ENTER ...
+        lsr                     ; ... onto '5'
         sty     VIC_KBD_128
         eor     CIA1_PRB
         iny
         sty     VIC_KBD_128     ; Reset to $FF
         cli
-        and     #%11111110
-        eor     #%11111110
+        and     #%00111110
+        eor     #%00111110
+        lsr
+        tay
+        lda     masktable,y     ; Convert LDRBU to BRLDU
         rts
-

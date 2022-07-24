@@ -20,7 +20,7 @@ int main(void) {
     n = (p == &func);
     n = (p == func);
 
-/* the following are not valid C and should go into seperate tests that MUST fail */
+/* the following are not valid C and should go into separate tests that MUST fail */
 /*
     ++p;
     n = (p > &func);

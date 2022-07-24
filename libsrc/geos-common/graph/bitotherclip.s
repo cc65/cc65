@@ -3,7 +3,7 @@
 ;
 ; 21.12.99
 
-; void BitOtherClip     (void *proc1, void* proc2, char skipl, char skipr, int skipy, 
+; void BitOtherClip     (void *proc1, void* proc2, char skipl, char skipr, int skipy,
 ;                               struct iconpic *myGfx);
 
 ; both proc1, proc2 should be: char __fastcall something (void);

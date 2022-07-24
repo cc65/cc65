@@ -1,8 +1,9 @@
 ;
 ; Ullrich von Bassewitz, 04.10.2001
 ;
-; CC65 runtime: Multiply the primary register
+; CC65 runtime: Multiply the primary register by 5
 ;
+; Don't touch the Y-register here, the optimizer relies on it!
 
         .export         mulax5
         .importzp       ptr1

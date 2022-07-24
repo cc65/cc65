@@ -1,10 +1,9 @@
 <!doctype linuxdoc system>
 
 <article>
-
 <title>Commodore 128-specific information for cc65
-<author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2014-04-12
+<author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
+<url url="mailto:polluks@sdf.lonestar.org" name="Stefan A. Haubenthal">
 
 <abstract>
 An overview over the C128 runtime system as it is implemented for the cc65 C
@@ -85,8 +84,21 @@ url="funcref.html" name="function reference"> for declaration and usage.
 <itemize>
 <item>videomode
 <item>c64mode
-<item>fast
-<item>slow
+</itemize>
+
+
+<sect1>C128-specific accelerator functions<p>
+
+The functions listed below are accelerator functions for the C128. See the <url
+url="funcref.html" name="function reference"> for declaration and usage.
+
+<itemize>
+<item>detect_c128
+<item>detect_scpu
+<item>get_c128_speed
+<item>get_scpu_speed
+<item>set_c128_speed
+<item>set_scpu_speed
 </itemize>
 
 
@@ -111,6 +123,8 @@ declaration and usage.
 <item>cbm_k_basin
 <item>cbm_k_bsout
 <item>cbm_k_clrch
+<item>cbm_k_tksa
+<item>cbm_k_second
 <item>cbm_load
 <item>cbm_open
 <item>cbm_opendir
@@ -119,6 +133,20 @@ declaration and usage.
 <item>cbm_save
 <item>cbm_write
 <item>get_tv
+<item>waitvsync
+</itemize>
+
+
+<sect1>CBM specific CPU functions<p>
+
+Some CPU related functions are available for some of the Commodore
+machines. See the <url url="funcref.html" name="function reference"> for
+declaration and usage.
+
+<itemize>
+<item>fast
+<item>slow
+<item>isfast
 </itemize>
 
 
@@ -170,31 +198,49 @@ Note: The graphics drivers for the VDC are incompatible with the extended
 memory drivers using the VDC memory!
 
 <descrip>
+
+  <tag><tt/c128-hi.tgi (c128_hi_tgi)/</tag>
+  This driver features a resolution of 320&times;200 with two colors and an
+  adjustable palette (that means that the two colors can be chosen out of a
+  palette of the 16 VIC colors). Unlike BASIC 7.0, this driver puts its
+  graphics data into the RAM behind the ROMs.
+
   <tag><tt/c128-vdc.tgi (c128_vdc_tgi)/</tag>
   This driver was written by Maciej Witkowiak. It uses the 80-column display,
-  and features a resolution of 640*200 with two colors and an adjustable
+  and features a resolution of 640&times;200 with two colors and an adjustable
   palette (that means that the two colors can be chosen out of the 16 VDC
   colors).
 
   <tag><tt/c128-vdc2.tgi (c128_vdc2_tgi)/</tag>
   This driver was written by Maciej Witkowiak. This driver uses the 80-column
-  display, and features a resolution of 640*480 with two colors and an
+  display, and features a resolution of 640&times;480 with two colors and an
   adjustable palette (that means that the two colors can be chosen out of the
   16 VDC colors). The driver requires 64KB VDC RAM.
+
 </descrip><p>
 
-Note: The colors are translated from definitions in headers to correct VDC values;
-so, please use definitions or VIC color numbers only. Colors <tt/GRAY3/ and <tt/BROWN/ are
-missing on VDC, and are translated to the two colors missing from the VIC palette.
+Note: The colors are translated from the definitions in the headers to correct
+VDC values; so, please use definitions or VIC color numbers only. Colors
+<tt/GRAY3/ and <tt/BROWN/ are missing on the VDC; and, are translated to the
+two colors missing from the VIC palette.
+
 
 <sect1>Extended memory drivers<p>
 
 <descrip>
 
+  <tag><tt/c128-efnram.emd (c128_efnram_emd)/</tag>
+  Extended memory driver for the C128 External Function RAM.
+  Written and contributed by Marco van den Heuvel.
+
   <tag><tt/c128-georam.emd (c128_georam_emd)/</tag>
   A driver for the GeoRam cartridge. The driver will always assume 2048 pages
   of 256 bytes each. There are no checks, so if your program knows better,
   just go ahead.
+
+  <tag><tt/c128-ifnram.emd (c128_ifnram_emd)/</tag>
+  Extended memory driver for the C128 Internal Function RAM.
+  Written and contributed by Marco van den Heuvel.
 
   <tag><tt/c128-ram.emd (c128_ram_emd)/</tag>
   An extended memory driver for the RAM in page 1. The common memory area is
@@ -213,10 +259,8 @@ missing on VDC, and are translated to the two colors missing from the VIC palett
   Will test the hardware for the available RAM.
 
   <tag><tt/c128-reu.emd (c128_reu_emd)/</tag>
-  A driver for the CBM REUs. The driver will determine from the connected REU
-  if it supports 128KB of RAM or more. In the latter case, 256KB are assumed,
-  but since there are no range checks, the application can use more memory if
-  it has better knowledge about the hardware than the driver.
+  A driver for the CBM REUs. The driver will test the connected REU to find
+  out how much RAM is present.
 
   <tag><tt/c128-vdc.emd (c128_vdc_emd)/</tag>
   A driver for the VDC memory of the C128, written and contributed by Maciej
@@ -236,8 +280,9 @@ The default drivers, <tt/joy_stddrv (joy_static_stddrv)/, point to <tt/c128-stdj
   <tag><tt/c128-ptvjoy.joy (c128_ptvjoy_joy)/</tag>
   Driver for the Protovision 4-player adapter originally written by Groepaz
   for the C64, and converted for the C128 by Uz. See <url
-  url="http://www.protovision-online.de/hardw/hardwstart.htm"> for prices and
-  building instructions. Up to four joysticks are supported.
+  url="http://www.protovision-online.de/hardw/4_player.php?language=en"
+  name="Protovision shop"> for prices and building instructions. Up to four
+  joysticks are supported.
 
   <tag><tt/c128-stdjoy.joy (c128_stdjoy_joy)/</tag>
   Supports up to two joysticks connected to the standard joysticks ports of
@@ -279,9 +324,9 @@ The default drivers, <tt/mouse_stddrv (mouse_static_stddrv)/, point to <tt/c128-
 <descrip>
 
   <tag><tt/c128-swlink.ser (c128_swlink_ser)/</tag>
-  Driver for the SwiftLink cartridge. Supports up to 38400 BPS, hardware flow
-  control (RTS/CTS), and interrupt-driven receives. Note that, because of the
-  peculiarities of the 6551 chip, together with the use of the NMI, transmits
+  Driver for the SwiftLink cartridge. Supports up to 38400 baud, requires hardware
+  flow control (RTS/CTS) and does interrupt driven receives. Note that, because of
+  the peculiarities of the 6551 chip, together with the use of the NMI, transmits
   are not interrupt driven; and, the transceiver blocks if the receiver asserts
   flow control because of a full buffer.
 
@@ -293,6 +338,13 @@ The default drivers, <tt/mouse_stddrv (mouse_static_stddrv)/, point to <tt/c128-
 
 
 <sect>Limitations<p>
+
+
+<sect1>Realtime clock<p>
+
+The realtime clock functions use the CIA1 TOD clock. As that clock only stores
+the time but not the date, the date set by <tt/clock_settime()/ is simply stored
+inside the C library for retrieval in the same program via <tt/clock_gettime()/.
 
 
 
@@ -346,14 +398,14 @@ including commercial applications, and to alter it and redistribute it
 freely, subject to the following restrictions:
 
 <enum>
-<item>	The origin of this software must not be misrepresented; you must not
-	claim that you wrote the original software. If you use this software
-	in a product, an acknowledgment in the product documentation would be
-	appreciated but is not required.
-<item>	Altered source versions must be plainly marked as such, and must not
-	be misrepresented as being the original software.
-<item>	This notice may not be removed or altered from any source
-	distribution.
+<item>  The origin of this software must not be misrepresented; you must not
+        claim that you wrote the original software. If you use this software
+        in a product, an acknowledgment in the product documentation would be
+        appreciated but is not required.
+<item>  Altered source versions must be plainly marked as such, and must not
+        be misrepresented as being the original software.
+<item>  This notice may not be removed or altered from any source
+        distribution.
 </enum>
 
 </article>

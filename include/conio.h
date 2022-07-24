@@ -54,36 +54,8 @@
 
 
 
-#if !defined(_STDARG_H)
-#  include <stdarg.h>
-#endif
-
-/* Include the correct machine-specific file */
-#if defined(__APPLE2ENH__)
-#  include <apple2enh.h>
-#elif defined(__APPLE2__)
-#  include <apple2.h>
-#elif defined(__ATARI__)
-#  include <atari.h>
-#elif defined(__ATMOS__)
-#  include <atmos.h>
-#elif defined(__CBM__)
-#  include <cbm.h>
-#elif defined(__GAMATE__)
-#  include <gamate.h>
-#elif defined(__GEOS__)
-#  include <geos.h>
-#elif defined(__LUNIX__)
-#  include <lunix.h>
-#elif defined(__LYNX__)
-#  include <lynx.h>
-#elif defined(__NES__)
-#  include <nes.h>
-#elif defined(__OSIC1P__)
-#  include <osic1p.h>
-#elif defined(__PCE__)
-#  include <pce.h>
-#endif
+#include <stdarg.h>
+#include <target.h>
 
 
 
@@ -143,6 +115,23 @@ int cscanf (const char* format, ...);
 
 int __fastcall__ vcscanf (const char* format, va_list ap);
 /* Like vscanf(), but uses direct keyboard input */
+
+char cpeekc (void);
+/* Return the character from the current cursor position */
+
+unsigned char cpeekcolor (void);
+/* Return the color from the current cursor position */
+
+unsigned char cpeekrevers (void);
+/* Return the reverse attribute from the current cursor position.
+** If the character is reversed, then return 1; return 0 otherwise.
+*/
+
+void __fastcall__ cpeeks (char* s, unsigned int length);
+/* Return a string of the characters that start at the current cursor position.
+** Put the string into the buffer to which "s" points.  The string will have
+** "length" characters, then will be '\0'-terminated.
+*/
 
 unsigned char __fastcall__ cursor (unsigned char onoff);
 /* If onoff is 1, a cursor is displayed when waiting for keyboard input. If
@@ -211,20 +200,23 @@ void __fastcall__ cputhex16 (unsigned val);
 ** the macro will give access to the actual function.
 */
 
-#if defined(_textcolor)
-#  define textcolor(x)          _textcolor(x)
+#ifdef _textcolor
+#  define textcolor(color)      _textcolor(color)
 #endif
-#if defined(_bgcolor)
-#  define bgcolor(x)            _bgcolor(x)
+#ifdef _bgcolor
+#  define bgcolor(color)        _bgcolor(color)
 #endif
-#if defined(_bordercolor)
-#  define bordercolor(x)        _bordercolor(x)
+#ifdef _bordercolor
+#  define bordercolor(color)    _bordercolor(color)
+#endif
+#ifdef _cpeekcolor
+#  define cpeekcolor()          _cpeekcolor()
+#endif
+#ifdef _cpeekrevers
+#  define cpeekrevers()         _cpeekrevers()
 #endif
 
 
 
 /* End of conio.h */
 #endif
-
-
-

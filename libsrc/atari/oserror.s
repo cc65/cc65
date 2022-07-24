@@ -95,7 +95,7 @@ maptable:
         .byte   EUNKNOWN        ; 177 - haven't found documentation
         .byte   EUNKNOWN        ; 178 - haven't found documentation
         .byte   EUNKNOWN        ; 179 - haven't found documentation
-        .byte   EUNKNOWN        ; 180 - not a binary file
+        .byte   ENOEXEC         ; 180 - not a binary file
         .byte   EUNKNOWN        ; 181 - [MYDOS] invalid address range
         .byte   EUNKNOWN        ; 182 - [XDOS] invalid parameter
 

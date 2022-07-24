@@ -2,7 +2,6 @@
 ; from Atari computer version by Christian Groessler, 2014
 ;
 ; clock_t clock (void);
-; unsigned _clocks_per_sec (void);
 ;
 
         .export         _clock

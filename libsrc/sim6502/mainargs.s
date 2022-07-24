@@ -5,7 +5,7 @@
         .constructor    initmainargs, 24
         .import         __argc, __argv, args
 
-        .segment        "INIT"
+        .segment        "ONCE"
 
 initmainargs:
         lda     #<__argv

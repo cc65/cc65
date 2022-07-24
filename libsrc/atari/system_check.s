@@ -16,8 +16,7 @@
 
 ;DEBUG   =       1
 
-        .export         __SYSTEM_CHECK__: absolute = 1
-        .import         __SYSCHK_LOAD__
+        .export         __SYSTEM_CHECK__, __SYSCHK_END__
         .import         __STARTADDRESS__
 
         ; the following imports are only needed for the 'atari' target version
@@ -25,9 +24,11 @@
         .import         __STACKSIZE__
         .import         __RESERVED_MEMORY__
 
+        ; import our header and trailers
+        .forceimport    __SYSCHKHDR__, __SYSCHKTRL__
+
         .include        "zeropage.inc"
         .include        "atari.inc"
-
 
 .macro print_string text
         .local  start, cont
@@ -68,7 +69,40 @@ cont:   ldx     #0              ; channel 0
 
 .segment        "SYSCHK"
 
+        rts     ; for older DOSes which unconditionally run the first load chunk
+
 .ifdef __ATARIXL__
+
+; check for SpartaDOS and its usage of RAM below ROM
+; return CF 0/1 for ok/bad
+sdcheck:lda     DOS
+        cmp     #'S'
+        bne     sdcrts0         ; not SpartaDOS, assume RAM is not used
+
+; check for BW-DOS, which always reports itself as SpartaDOS, but doesn't use memory under the ROM
+        lda     DOS+3           ; 'B' in BW-DOS
+        cmp     #'B'
+        bne     sdnobw
+        lda     DOS+4           ; 'W' in BW-DOS
+        cmp     #'W'
+        beq     sdcrts0         ; BW-DOS does not use RAM below ROM
+
+sdnobw: lda     DOS+1           ; SD version
+        cmp     #$40            ; SD-X has $40 or higher
+        bcc     sdcrts1         ; older versions (except maybe 1.x) always use the RAM under the ROM
+        ldy     #31             ; offset for OSRMFLG
+        lda     (DOSVEC),y      ; get OSRMFLG
+        bne     sdcrts1
+
+sdcrts0:clc
+        rts
+sdcrts1:sec
+        rts
+
+ramrom_txt:
+        .byte   "Memory under ROM is in use.", ATEOL
+        .byte   "Cannot run this program.", ATEOL
+ramrom_txt_len = * - ramrom_txt
 
 lmemerrxl_txt:
         .byte   "Not enough memory to move screen", ATEOL
@@ -94,8 +128,13 @@ syschk: lda     $fcd8           ; from ostype.s
 
         jmp     mem_err
 
-sys_ok:
-        .include "xlmemchk.inc"         ; calculate lowest address we will use when we move the screen buffer down
+sys_ok: jsr     sdcheck         ; check for SpartaDOS-X, and if found, whether it uses the RAM under the ROM
+        bcc     sd_ok
+
+        print_string2 ramrom_txt, ramrom_txt_len
+        jmp     fail
+
+sd_ok:  .include "xlmemchk.inc" ; calculate lowest address we will use when we move the screen buffer down
 
         lda     MEMLO
         cmp     lowadr
@@ -191,25 +230,10 @@ delay1: ldx     #0
 
 .endproc
 
-end:
+__SYSTEM_CHECK__=syschk
+__SYSCHK_END__:
 
 .ifndef __ATARIXL__
 tmp:            ; outside of the load chunk, some kind of poor man's .bss
 .endif
 
-; ------------------------------------------------------------------------
-; Chunk header
-
-.segment        "SYSCHKHDR"
-
-        .word   __SYSCHK_LOAD__
-        .word   end - 1
-
-; ------------------------------------------------------------------------
-; Chunk "trailer" - sets INITAD
-
-.segment        "SYSCHKTRL"
-
-        .word   INITAD
-        .word   INITAD+1
-        .word   syschk

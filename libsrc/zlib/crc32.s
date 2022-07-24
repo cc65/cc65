@@ -1,13 +1,15 @@
 ;
-; Piotr Fusik, 14.11.2001
+; 2001-11-14, Piotr Fusik
+; 2018-05-20, Christian Kruger
 ;
-; unsigned long __fastcall__ crc32 (unsigned long crc, unsigned char* buf,
+; unsigned long __fastcall__ crc32 (unsigned long crc,
+;                                   const unsigned char* buf,
 ;                                   unsigned len);
 ;
 
         .export _crc32
 
-        .import         compleax, incsp2, incsp4, popax, popeax
+        .import         compleax, incsp2, incsp4, popptr1, popeax
         .importzp       sreg, ptr1, ptr2, tmp1, tmp2
 
 POLYNOMIAL      =       $EDB88320
@@ -67,9 +69,7 @@ _crc32:
 @L1:    sta     ptr2
         stx     ptr2+1
 ; ptr1 = buf
-        jsr     popax
-        sta     ptr1
-        stx     ptr1+1
+        jsr     popptr1
 ; if (buf == NULL) return 0;
         ora     ptr1+1
         beq     @L0
@@ -118,6 +118,7 @@ _crc32:
 ; return 0L
 @L0:    sta     sreg
         sta     sreg+1
+        tax             ; (popptr1 doesn't set .X)
 ; ignore crc
         jmp     incsp4
 
@@ -130,5 +131,3 @@ table_0:        .res    256
 table_1:        .res    256
 table_2:        .res    256
 table_3:        .res    256
-
-

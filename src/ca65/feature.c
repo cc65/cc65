@@ -48,7 +48,7 @@
 
 
 /* Names of the features */
-static const char* FeatureKeys[FEAT_COUNT] = {
+static const char* const FeatureKeys[FEAT_COUNT] = {
     "dollar_is_pc",
     "labels_without_colons",
     "loose_string_term",
@@ -64,6 +64,8 @@ static const char* FeatureKeys[FEAT_COUNT] = {
     "force_range",
     "underline_in_numbers",
     "addrsize",
+    "bracket_as_indirect",
+    "string_escapes",
 };
 
 
@@ -121,6 +123,8 @@ feature_t SetFeature (const StrBuf* Key)
         case FEAT_FORCE_RANGE:                ForceRange        = 1;    break;
         case FEAT_UNDERLINE_IN_NUMBERS:       UnderlineInNumbers= 1;    break;
         case FEAT_ADDRSIZE:                   AddrSize          = 1;    break;
+        case FEAT_BRACKET_AS_INDIRECT:        BracketAsIndirect = 1;    break;
+        case FEAT_STRING_ESCAPES:             StringEscapes     = 1;    break;
         default:                         /* Keep gcc silent */          break;
     }
 

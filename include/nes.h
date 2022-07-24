@@ -69,7 +69,7 @@
 #define COLOR_WHITE             0x01
 #define COLOR_RED               0x02
 #define COLOR_CYAN              0x03
-#define COLOR_VIOLET            0x04
+#define COLOR_PURPLE            0x04
 #define COLOR_GREEN             0x05
 #define COLOR_BLUE              0x06
 #define COLOR_YELLOW            0x07
@@ -82,6 +82,44 @@
 #define COLOR_LIGHTBLUE         0x0E
 #define COLOR_GRAY3             0x0F
 
+/* TGI color defines (default palette) */
+#define TGI_COLOR_BLACK         COLOR_BLACK
+#define TGI_COLOR_RED           COLOR_RED
+#define TGI_COLOR_PINK          COLOR_LIGHTRED
+#define TGI_COLOR_LIGHTGREY     COLOR_GRAY1
+#define TGI_COLOR_GREY          COLOR_GRAY2
+#define TGI_COLOR_DARKGREY      COLOR_GRAY3
+#define TGI_COLOR_BROWN         COLOR_BROWN
+#define TGI_COLOR_PEACH         COLOR_CYAN
+#define TGI_COLOR_YELLOW        COLOR_YELLOW
+#define TGI_COLOR_LIGHTGREEN    COLOR_LIGHTGREEN
+#define TGI_COLOR_GREEN         COLOR_GREEN
+#define TGI_COLOR_DARKBROWN     COLOR_ORANGE
+#define TGI_COLOR_PURPLE        COLOR_PURPLE
+#define TGI_COLOR_BLUE          COLOR_BLUE
+#define TGI_COLOR_LIGHTBLUE     COLOR_LIGHTBLUE
+#define TGI_COLOR_WHITE         COLOR_WHITE
+
+/* Masks for joy_read */
+#define JOY_UP_MASK     0x10
+#define JOY_DOWN_MASK   0x20
+#define JOY_LEFT_MASK   0x40
+#define JOY_RIGHT_MASK  0x80
+#define JOY_BTN_1_MASK  0x01
+#define JOY_BTN_2_MASK  0x02
+#define JOY_BTN_3_MASK  0x04
+#define JOY_BTN_4_MASK  0x08
+
+#define JOY_BTN_A_MASK  JOY_BTN_1_MASK
+#define JOY_BTN_B_MASK  JOY_BTN_2_MASK
+#define JOY_SELECT_MASK JOY_BTN_3_MASK
+#define JOY_START_MASK  JOY_BTN_4_MASK
+
+#define JOY_BTN_A(v)    ((v) & JOY_BTN_A_MASK)
+#define JOY_BTN_B(v)    ((v) & JOY_BTN_B_MASK)
+#define JOY_SELECT(v)   ((v) & JOY_SELECT_MASK)
+#define JOY_START(v)    ((v) & JOY_START_MASK)
+
 /* Return codes of get_tv */
 #define TV_NTSC         0
 #define TV_PAL          1
@@ -89,16 +127,6 @@
 
 /* No support for dynamically loadable drivers */
 #define DYN_DRV         0
-
-/* The joystick keys - all keys are supported */
-#define KEY_A           0x01
-#define KEY_B           0x02
-#define KEY_SELECT      0x04
-#define KEY_START       0x08
-#define KEY_UP          0x10
-#define KEY_DOWN        0x20
-#define KEY_LEFT        0x40
-#define KEY_RIGHT       0x80
 
 /* Define hardware */
 
@@ -163,8 +191,8 @@ extern void nes_64_56_2_tgi[];      /* Referred to by tgi_static_stddrv[] */
 
 
 
-void waitvblank (void);
-/* Wait for the vertical blanking */
+void waitvsync (void);
+/* Wait for start of the next frame */
 
 unsigned char get_tv (void);
 /* Return the video mode the machine is using. */

@@ -1,6 +1,6 @@
 ;
-; Maciej 'YTM/Elysium' Witkowiak
-; 2.7.2001
+; 2001-07-02, Maciej 'YTM/Elysium' Witkowiak
+; 2015-08-26, Greg King
 ;
 ;
 ; unsigned char __fastcall__ dio_phys_to_log (dhandle_t handle,
@@ -20,21 +20,21 @@
 _dio_phys_to_log:
         sta ptr1
         stx ptr1+1              ; pointer to result
-            
+
         jsr popax
         sta ptr2
         stx ptr2+1              ; pointer to input structure
-            
+
         jsr popax
         sta ptr3
         stx ptr3+1              ; pointer to handle
-            
+
         ldy #sst_flag
         lda (ptr3),y
         and #128
         beq _inv_hand           ; handle not open or invalid
-            
-            
+
+
         ldy #diopp_head
         lda (ptr2),y
         bne _inv_data           ; there is only head 0
@@ -59,15 +59,15 @@ _dio_phys_to_log:
         lda (ptr3),y
         tay
         lda driveType,y
-        and #%00000011          ; this is for RamDrive compatibility
+        and #%00001111          ; remove ramDisk flags
         cmp #DRV_1541
         beq dio_cts1541
         cmp #DRV_1571
         beq dio_cts1571
         cmp #DRV_1581
         beq dio_cts1581
-            
-        lda #DEV_NOT_FOUND      ; unknown device
+
+        lda #INCOMPATIBLE       ; unsupported device
         ldx #0
         beq ret
 
@@ -78,10 +78,10 @@ dio_ctsend:
         dey
         lda tmp1
         sta (ptr1),y
-            
+
         ldx #0
         txa
-ret:        
+ret:
         sta __oserror
         rts                     ; return success
 
@@ -91,7 +91,7 @@ _inv_data:
         lda #INV_TRACK
         .byte $2c
 _inv_hand:
-        lda #INCOMPATIBLE
+        lda #DEV_NOT_FOUND
         ldx #0
         beq ret
 

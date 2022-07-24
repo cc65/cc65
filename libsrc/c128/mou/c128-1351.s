@@ -4,7 +4,7 @@
 ;
 ; 2009-09-26, Ullrich von Bassewitz
 ; 2014-04-26, Christian Groessler
-; 2014-04-30, Greg King
+; 2020-07-14, Greg King
 ;
 
         .include        "zeropage.inc"
@@ -377,7 +377,7 @@ IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioctls, for now
 IRQ:    jsr     CPREP
         lda     KEY_COUNT
         sta     old_key_count
-        lda     #$7F
+        lda     #$FF
         sta     CIA1_PRA
         lda     CIA1_PRB                ; Read joystick #0
         and     #$1F

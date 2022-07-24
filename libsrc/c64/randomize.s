@@ -11,7 +11,7 @@
 
         .include        "c64.inc"
 
-__randomize:              
+__randomize:
         ldx     VIC_HLINE       ; Use VIC rasterline as high byte
         lda     TIME+2          ; Use 60HZ clock as low byte
         jmp     _srand          ; Initialize generator

@@ -81,9 +81,9 @@ static enum Mode GetMode (const Collection* A)
         } else if (strcmp (Mode, "multicolor") == 0) {
             return smMultiColor;
         } else {
-            Error ("Invalid value for attribute `mode'");
+            Error ("Invalid value for attribute 'mode'");
         }
-    } 
+    }
 
     return smAuto;
 }

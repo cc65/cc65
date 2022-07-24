@@ -161,7 +161,7 @@ void CollAppend (Collection* C, void* Item)
 {
     /* Insert the item at the end of the current list */
     CollInsert (C, Item, C->Count);
-}                      
+}
 #endif
 
 
@@ -341,22 +341,23 @@ void CollReplaceExpand (Collection* C, void* Item, unsigned Index)
 
 void CollMove (Collection* C, unsigned OldIndex, unsigned NewIndex)
 /* Move an item from one position in the collection to another. OldIndex
-** is the current position of the item, NewIndex is the new index after
+** is the current position of the item, NewIndex is the new index before
 ** the function has done it's work. Existing entries with indices NewIndex
-** and up are moved one position upwards.
+** and up might be moved one position upwards.
 */
 {
-    /* Get the item and remove it from the collection */
+    /* Get the item; and, remove it from the collection */
     void* Item = CollAt (C, OldIndex);
+
     CollDelete (C, OldIndex);
 
     /* Correct NewIndex if needed */
-    if (NewIndex >= OldIndex) {
+    if (NewIndex > OldIndex) {
         /* Position has changed with removal */
         --NewIndex;
     }
 
-    /* Now insert it at the new position */
+    /* Now, insert it at the new position */
     CollInsert (C, Item, NewIndex);
 }
 

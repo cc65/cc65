@@ -176,21 +176,21 @@ int s243(struct defs *pd0) {
     by a more failproof version
 
    if(
-   	'\0'    !=   0 ||
-   	'\01'   !=   1 ||
-	'\02'   !=   2 ||
-	'\03'   !=   3 ||
-    	'\04'   !=   4 ||
-	'\05'   !=   5 ||
-	'\06'   !=   6 ||
-    	'\07'   !=   7 ||
-	'\10'   !=   8 ||
-    	'\17'   !=  15 ||
-	'\20'   !=  16 ||
-	'\77'   !=  63 ||
-    	'\100'  !=  64 ||
-	'\177'  != 127
-	)
+        '\0'    !=   0 ||
+        '\01'   !=   1 ||
+        '\02'   !=   2 ||
+        '\03'   !=   3 ||
+        '\04'   !=   4 ||
+        '\05'   !=   5 ||
+        '\06'   !=   6 ||
+        '\07'   !=   7 ||
+        '\10'   !=   8 ||
+        '\17'   !=  15 ||
+        '\20'   !=  16 ||
+        '\77'   !=  63 ||
+        '\100'  !=  64 ||
+        '\177'  != 127
+        )
 */
     if(
      ('0' != '\60') ||
@@ -201,7 +201,7 @@ int s243(struct defs *pd0) {
      ('z' != '\172')
       )
 
-	{
+        {
      rc = rc+8;
      if(pd0->flgd != 0)
      {
@@ -221,9 +221,9 @@ int s243(struct defs *pd0) {
 #define cq_sections 1
 
 #ifndef NO_TYPELESS_STRUCT_PTR
-	int section(int j,struct* pd0){
+        int section(int j,struct* pd0){
 #else
-	int section(int j,void* pd0){
+        int section(int j,void* pd0){
 #endif
         switch(j){
                 case 0: return s243(pd0);
@@ -245,7 +245,7 @@ int main(int n,char **args) {
 
 int j;
 static struct defs d0, *pd0;
-	
+
    d0.flgs = 1;          /* These flags dictate            */
    d0.flgm = 1;          /*     the verbosity of           */
    d0.flgd = 1;          /*         the program.           */

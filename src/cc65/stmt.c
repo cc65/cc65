@@ -115,7 +115,7 @@ static void CheckSemi (int* PendingToken)
 {
     int HaveToken = (CurTok.Tok == TOK_SEMI);
     if (!HaveToken) {
-        Error ("`;' expected");
+        Error ("';' expected");
         /* Try to be smart about errors */
         if (CurTok.Tok == TOK_COLON || CurTok.Tok == TOK_COMMA) {
             HaveToken = 1;
@@ -163,7 +163,7 @@ static int IfStatement (void)
     TestResult = TestInParens (Label1, 0);
 
     /* Parse the if body */
-    GotBreak = Statement (0);
+    GotBreak = AnyStatement (0);
 
     /* Else clause present? */
     if (CurTok.Tok != TOK_ELSE) {
@@ -187,7 +187,7 @@ static int IfStatement (void)
         /* If the if expression was always true, the code in the else branch
         ** is never executed. Output a warning if this is the case.
         */
-        if (TestResult == TESTEXPR_TRUE) {
+        if (TestResult == TESTEXPR_TRUE && IS_Get (&WarnUnreachableCode)) {
             Warning ("Unreachable code");
         }
 
@@ -195,7 +195,7 @@ static int IfStatement (void)
         g_defcodelabel (Label1);
 
         /* Total break only if both branches had a break. */
-        GotBreak &= Statement (0);
+        GotBreak &= AnyStatement (0);
 
         /* Generate the label for the else clause */
         g_defcodelabel (Label2);
@@ -225,13 +225,13 @@ static void DoStatement (void)
     g_defcodelabel (LoopLabel);
 
     /* Parse the loop body */
-    Statement (0);
+    AnyStatement (0);
 
     /* Output the label for a continue */
     g_defcodelabel (ContinueLabel);
 
     /* Parse the end condition */
-    Consume (TOK_WHILE, "`while' expected");
+    Consume (TOK_WHILE, "'while' expected");
     TestInParens (LoopLabel, 1);
     ConsumeSemi ();
 
@@ -273,9 +273,6 @@ static void WhileStatement (void)
     /* Remember the current position */
     GetCodePos (&CondCodeStart);
 
-    /* Emit the code position label */
-    g_defcodelabel (CondLabel);
-
     /* Test the loop condition */
     TestInParens (LoopLabel, 1);
 
@@ -286,7 +283,10 @@ static void WhileStatement (void)
     g_defcodelabel (LoopLabel);
 
     /* Loop body */
-    Statement (&PendingToken);
+    AnyStatement (&PendingToken);
+
+    /* Emit the while condition label */
+    g_defcodelabel (CondLabel);
 
     /* Move the test code here */
     GetCodePos (&Here);
@@ -309,30 +309,56 @@ static void WhileStatement (void)
 static void ReturnStatement (void)
 /* Handle the 'return' statement */
 {
-    ExprDesc Expr;
+    ExprDesc    Expr;
+    const Type* ReturnType;
 
+    ED_Init (&Expr);
     NextToken ();
     if (CurTok.Tok != TOK_SEMI) {
 
         /* Evaluate the return expression */
         hie0 (&Expr);
 
-        /* If we return something in a void function, print an error and
-        ** ignore the value. Otherwise convert the value to the type of the
-        ** return.
+        /* If we return something in a function with void or incomplete return
+        ** type, print an error and ignore the value. Otherwise convert the
+        ** value to the type of the return.
         */
         if (F_HasVoidReturn (CurrentFunc)) {
-            Error ("Returning a value in function with return type void");
+            Error ("Returning a value in function with return type 'void'");
         } else {
-            /* Convert the return value to the type of the function result */
-            TypeConversion (&Expr, F_GetReturnType (CurrentFunc));
 
-            /* Load the value into the primary */
-            LoadExpr (CF_NONE, &Expr);
+            /* Check the return type first */
+            ReturnType = F_GetReturnType (CurrentFunc);
+            if (IsIncompleteESUType (ReturnType)) {
+                /* Avoid excess errors */
+                if (ErrorCount == 0) {
+                    Error ("Returning a value in function with incomplete return type");
+                }
+            } else {
+                /* Convert the return value to the type of the function result */
+                TypeConversion (&Expr, ReturnType);
+
+                /* Load the value into the primary */
+                if (IsClassStruct (Expr.Type)) {
+                    /* Handle struct/union specially */
+                    ReturnType = GetStructReplacementType (Expr.Type);
+                    if (ReturnType == Expr.Type) {
+                        Error ("Returning '%s' of this size by value is not supported", GetFullTypeName (Expr.Type));
+                    }
+                    LoadExpr (TypeOf (ReturnType), &Expr);
+
+                } else {
+                    /* Load the value into the primary */
+                    LoadExpr (CF_NONE, &Expr);
+                }
+            }
+
+            /* Append deferred inc/dec at sequence point */
+            DoDeferred (SQP_KEEP_EAX, &Expr);
         }
 
     } else if (!F_HasVoidReturn (CurrentFunc) && !F_HasOldStyleIntRet (CurrentFunc)) {
-        Error ("Function `%s' must return a value", F_GetFuncName (CurrentFunc));
+        Error ("Function '%s' must return a value", F_GetFuncName (CurrentFunc));
     }
 
     /* Mark the function as having a return statement */
@@ -361,7 +387,7 @@ static void BreakStatement (void)
     /* Check if we are inside a loop */
     if (L == 0) {
         /* Error: No current loop */
-        Error ("`break' statement not within loop or switch");
+        Error ("'break' statement not within loop or switch");
         return;
     }
 
@@ -396,7 +422,7 @@ static void ContinueStatement (void)
 
     /* Did we find it? */
     if (L == 0) {
-        Error ("`continue' statement not within a loop");
+        Error ("'continue' statement not within a loop");
         return;
     }
 
@@ -412,8 +438,6 @@ static void ContinueStatement (void)
 static void ForStatement (void)
 /* Handle a 'for' statement */
 {
-    ExprDesc lval1;
-    ExprDesc lval3;
     int HaveIncExpr;
     CodeMark IncExprStart;
     CodeMark IncExprEnd;
@@ -438,6 +462,10 @@ static void ForStatement (void)
 
     /* Parse the initializer expression */
     if (CurTok.Tok != TOK_SEMI) {
+        /* The value of the expression is unused */
+        ExprDesc lval1;
+        ED_Init (&lval1);
+        lval1.Flags = E_NEED_NONE;
         Expression0 (&lval1);
     }
     ConsumeSemi ();
@@ -463,6 +491,10 @@ static void ForStatement (void)
     /* Parse the increment expression */
     HaveIncExpr = (CurTok.Tok != TOK_RPAREN);
     if (HaveIncExpr) {
+        /* The value of the expression is unused */
+        ExprDesc lval3;
+        ED_Init (&lval3);
+        lval3.Flags = E_NEED_NONE;
         Expression0 (&lval3);
     }
 
@@ -477,7 +509,7 @@ static void ForStatement (void)
 
     /* Loop body */
     g_defcodelabel (BodyLabel);
-    Statement (&PendingToken);
+    AnyStatement (&PendingToken);
 
     /* If we had an increment expression, move the code to the bottom of
     ** the loop. In this case we don't need to jump there at the end of
@@ -504,15 +536,19 @@ static void ForStatement (void)
 
 
 
-static int CompoundStatement (void)
+static int CompoundStatement (int* PendingToken)
 /* Compound statement. Allow any number of statements inside braces. The
 ** function returns true if the last statement was a break or return.
 */
 {
-    int GotBreak;
+    int GotBreak = 0;
 
     /* Remember the stack at block entry */
     int OldStack = StackPtr;
+    unsigned OldBlockStackSize = CollCount (&CurrentFunc->LocalsBlockStack);
+
+    /* Skip '{' */
+    NextToken ();
 
     /* Enter a new lexical level */
     EnterBlockLevel ();
@@ -521,19 +557,26 @@ static int CompoundStatement (void)
     DeclareLocals ();
 
     /* Now process statements in this block */
-    GotBreak = 0;
     while (CurTok.Tok != TOK_RCURLY) {
         if (CurTok.Tok != TOK_CEOF) {
-            GotBreak = Statement (0);
+            GotBreak = AnyStatement (0);
         } else {
             break;
         }
     }
 
-    /* Clean up the stack. */
+    /* Clean up the stack if the codeflow may reach the end */
     if (!GotBreak) {
         g_space (StackPtr - OldStack);
     }
+
+    /* If the segment had autoinited variables, let's pop it of a stack
+    ** of such blocks.
+    */
+    if (OldBlockStackSize != CollCount (&CurrentFunc->LocalsBlockStack)) {
+        CollPop (&CurrentFunc->LocalsBlockStack);
+    }
+
     StackPtr = OldStack;
 
     /* Emit references to imports/exports for this block */
@@ -542,12 +585,86 @@ static int CompoundStatement (void)
     /* Leave the lexical level */
     LeaveBlockLevel ();
 
+    /* Skip '}' */
+    CheckTok (TOK_RCURLY, "'}' expected", PendingToken);
+
     return GotBreak;
 }
 
 
 
-int Statement (int* PendingToken)
+static void Statement (int* PendingToken)
+/* Single-line statement */
+{
+    ExprDesc Expr;
+    unsigned PrevErrorCount;
+    CodeMark Start, End;
+
+    /* Remember the current error count and code position */
+    PrevErrorCount = ErrorCount;
+    GetCodePos (&Start);
+
+    /* Actual statement */
+    ED_Init (&Expr);
+    Expr.Flags |= E_NEED_NONE;
+    Expression0 (&Expr);
+
+    /* If the statement has no observable effect and isn't cast to type
+    ** void, emit a warning and remove useless code if any.
+    */
+    GetCodePos (&End);
+    if (CodeRangeIsEmpty (&Start, &End) ||
+        (Expr.Flags & E_SIDE_EFFECTS) == 0) {
+
+        if (!ED_MayHaveNoEffect (&Expr) &&
+            IS_Get (&WarnNoEffect)      &&
+            PrevErrorCount == ErrorCount) {
+            Warning ("Statement has no effect");
+        }
+
+        /* Remove code with no effect */
+        RemoveCode (&Start);
+    }
+
+    CheckSemi (PendingToken);
+}
+
+
+
+static int ParseAnyLabels (void)
+/* Return -1 if there are any labels with a statement */
+{
+    unsigned PrevErrorCount = ErrorCount;
+    int HasLabels = 0;
+    for (;;) {
+        if (CurTok.Tok == TOK_IDENT && NextTok.Tok == TOK_COLON) {
+            /* C 'goto' label */
+            DoLabel ();
+        } else if (CurTok.Tok == TOK_CASE) {
+            /* C 'case' label */
+            CaseLabel ();
+        } else if (CurTok.Tok == TOK_DEFAULT) {
+            /* C 'default' label */
+            DefaultLabel ();
+        } else {
+            /* No labels */
+            break;
+        }
+        HasLabels = 1;
+    }
+
+    if (HasLabels) {
+        if (PrevErrorCount != ErrorCount || CheckLabelWithoutStatement ()) {
+            return -1;
+        }
+    }
+
+    return 0;
+}
+
+
+
+int AnyStatement (int* PendingToken)
 /* Statement parser. Returns 1 if the statement does a return/break, returns
 ** 0 otherwise. If the PendingToken pointer is not NULL, the function will
 ** not skip the terminating token of the statement (closing brace or
@@ -557,36 +674,26 @@ int Statement (int* PendingToken)
 ** NULL, the function will skip the token.
 */
 {
-    ExprDesc Expr;
-    int GotBreak;
-    CodeMark Start, End;
-
     /* Assume no pending token */
     if (PendingToken) {
         *PendingToken = 0;
     }
 
-    /* Check for a label. A label is always part of a statement, it does not
+    /* Handle any labels. A label is always part of a statement, it does not
     ** replace one.
     */
-    while (CurTok.Tok == TOK_IDENT && NextTok.Tok == TOK_COLON) {
-        /* Handle the label */
-        DoLabel ();
-        if (CheckLabelWithoutStatement ()) {
-            return 0;
-        }
+    if (ParseAnyLabels ()) {
+        return 0;
     }
 
     switch (CurTok.Tok) {
 
-        case TOK_LCURLY:
-            NextToken ();
-            GotBreak = CompoundStatement ();
-            CheckTok (TOK_RCURLY, "`{' expected", PendingToken);
-            return GotBreak;
-
         case TOK_IF:
             return IfStatement ();
+
+        case TOK_SWITCH:
+            SwitchStatement ();
+            break;
 
         case TOK_WHILE:
             WhileStatement ();
@@ -596,9 +703,14 @@ int Statement (int* PendingToken)
             DoStatement ();
             break;
 
-        case TOK_SWITCH:
-            SwitchStatement ();
+        case TOK_FOR:
+            ForStatement ();
             break;
+
+        case TOK_GOTO:
+            GotoStatement ();
+            CheckSemi (PendingToken);
+            return 1;
 
         case TOK_RETURN:
             ReturnStatement ();
@@ -615,55 +727,22 @@ int Statement (int* PendingToken)
             CheckSemi (PendingToken);
             return 1;
 
-        case TOK_FOR:
-            ForStatement ();
-            break;
-
-        case TOK_GOTO:
-            GotoStatement ();
-            CheckSemi (PendingToken);
-            return 1;
-
-        case TOK_SEMI:
-            /* Ignore it */
-            CheckSemi (PendingToken);
-            break;
-
         case TOK_PRAGMA:
             DoPragma ();
             break;
 
-        case TOK_CASE:
-            CaseLabel ();
-            CheckLabelWithoutStatement ();
+        case TOK_SEMI:
+            /* Empty statement. Ignore it */
+            CheckSemi (PendingToken);
             break;
 
-        case TOK_DEFAULT:
-            DefaultLabel ();
-            CheckLabelWithoutStatement ();
-            break;
+        case TOK_LCURLY:
+            return CompoundStatement (PendingToken);
 
         default:
-            /* Remember the current code position */
-            GetCodePos (&Start);
-            /* Actual statement */
-            ExprWithCheck (hie0, &Expr);
-            /* Load the result only if it is an lvalue and the type is
-            ** marked as volatile. Otherwise the load is useless.
-            */
-            if (ED_IsLVal (&Expr) && IsQualVolatile (Expr.Type)) {
-                LoadExpr (CF_NONE, &Expr);
-            }
-            /* If the statement didn't generate code, and is not of type
-            ** void, emit a warning.
-            */
-            GetCodePos (&End);
-            if (CodeRangeIsEmpty (&Start, &End) &&
-                !IsTypeVoid (Expr.Type)         &&
-                IS_Get (&WarnNoEffect)) {
-                Warning ("Statement has no effect");
-            }
-            CheckSemi (PendingToken);
+            /* Simple statement */
+            Statement (PendingToken);
+            break;
     }
     return 0;
 }

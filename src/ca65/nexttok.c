@@ -179,7 +179,7 @@ static void FuncConcat (void)
     ** by the string token just created.
     */
     if (CurTok.Tok != TOK_RPAREN) {
-        Error ("`)' expected");
+        Error ("')' expected");
     } else {
         CurTok.Tok = TOK_STRCON;
         SB_Copy (&CurTok.SVal, &Buf);
@@ -253,7 +253,7 @@ static void FuncIdent (void)
     SB_Copy (&Buf, &CurTok.SVal);
     NextTok ();
     if (CurTok.Tok != TOK_RPAREN) {
-        Error ("`)' expected");
+        Error ("')' expected");
     } else {
         CurTok.Tok = Id;
         SB_Copy (&CurTok.SVal, &Buf);
@@ -600,7 +600,7 @@ static void FuncSPrintF (void)
     ** by the string token just created.
     */
     if (CurTok.Tok != TOK_RPAREN) {
-        Error ("`)' expected");
+        Error ("')' expected");
     } else {
         CurTok.Tok = TOK_STRCON;
         SB_Copy (&CurTok.SVal, &R);
@@ -660,7 +660,7 @@ static void FuncString (void)
     ** by the string token just created.
     */
     if (CurTok.Tok != TOK_RPAREN) {
-        Error ("`)' expected");
+        Error ("')' expected");
     } else {
         CurTok.Tok = TOK_STRCON;
         SB_Copy (&CurTok.SVal, &Buf);
@@ -754,7 +754,7 @@ void ConsumeSep (void)
 void ConsumeLParen (void)
 /* Consume a left paren */
 {
-    Consume (TOK_LPAREN, "`(' expected");
+    Consume (TOK_LPAREN, "'(' expected");
 }
 
 
@@ -762,7 +762,7 @@ void ConsumeLParen (void)
 void ConsumeRParen (void)
 /* Consume a right paren */
 {
-    Consume (TOK_RPAREN, "`)' expected");
+    Consume (TOK_RPAREN, "')' expected");
 }
 
 
@@ -770,7 +770,7 @@ void ConsumeRParen (void)
 void ConsumeComma (void)
 /* Consume a comma */
 {
-    Consume (TOK_COMMA, "`,' expected");
+    Consume (TOK_COMMA, "',' expected");
 }
 
 

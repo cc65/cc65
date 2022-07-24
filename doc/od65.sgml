@@ -3,7 +3,6 @@
 <article>
 <title>od65 Users Guide
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2014-04-14
 
 <abstract>
 od65 is the object file dump utility. It is able to output most parts of
@@ -201,15 +200,14 @@ including commercial applications, and to alter it and redistribute it
 freely, subject to the following restrictions:
 
 <enum>
-<item> 	The origin of this software must not be misrepresented; you must not
-       	claim that you wrote the original software. If you use this software
-       	in a product, an acknowledgment in the product documentation would be
-	appreciated but is not required.
-<item>	Altered source versions must be plainly marked as such, and must not
-	be misrepresented as being the original software.
-<item>	This notice may not be removed or altered from any source
-	distribution.
+<item>  The origin of this software must not be misrepresented; you must not
+        claim that you wrote the original software. If you use this software
+        in a product, an acknowledgment in the product documentation would be
+        appreciated but is not required.
+<item>  Altered source versions must be plainly marked as such, and must not
+        be misrepresented as being the original software.
+<item>  This notice may not be removed or altered from any source
+        distribution.
 </enum>
 
 </article>
-

@@ -10,8 +10,8 @@ GH_PATH = ../doc
 
 gh-pages:
 ifdef GH_TOKEN
-	@echo 'git clone --branch=gh-pages https://$$(GH_TOKEN)@github.com/cc65/doc.git $(GH_PATH)'
-	@git clone --branch=gh-pages https://$(GH_TOKEN)@github.com/cc65/doc.git $(GH_PATH)
+	@echo 'git clone https://$$(GH_TOKEN)@github.com/cc65/doc.git $(GH_PATH)'
+	@git clone https://$(GH_TOKEN)@github.com/cc65/doc.git $(GH_PATH)
 	cd $(GH_PATH) && git config user.name "$(GH_NAME)"
 	cd $(GH_PATH) && git config user.email "$(GH_MAIL)"
 	cd $(GH_PATH) && git config push.default simple

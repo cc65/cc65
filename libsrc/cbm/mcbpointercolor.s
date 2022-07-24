@@ -3,7 +3,7 @@
         .export         _mouse_def_pointercolor
 
 
-.segment        "INIT"
+.segment        "ONCE"
 
 _mouse_def_pointercolor:
 

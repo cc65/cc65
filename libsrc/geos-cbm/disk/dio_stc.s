@@ -1,6 +1,6 @@
 ;
-; Maciej 'YTM/Elysium' Witkowiak
-; 2.7.2001
+; 2001-07-02, Maciej 'YTM/Elysium' Witkowiak
+; 2015-08-27, Greg King
 ;
 ; unsigned char __fastcall__ dio_log_to_phys (dhandle_t handle,
 ;                                             unsigned *sectnum,        /* input */
@@ -20,15 +20,15 @@ _dio_log_to_phys:
 ; check device type
         sta ptr1
         stx ptr1+1              ; pointer to result (struct dio_phys_pos)
-            
+
         jsr popax
         sta ptr2
         stx ptr2+1              ; pointer to input structure (pointer to int)
-            
+
         jsr popax
         sta ptr3
         stx ptr3+1              ; pointer to handle
-            
+
         ldy #sst_flag
         lda (ptr3),y
         and #128
@@ -42,28 +42,28 @@ _dio_log_to_phys:
         sta (ptr1),y            ; track <256
         ldy #diopp_sector+1
         sta (ptr1),y            ; sector <256
-            
+
         ldy #0
         lda (ptr2),y
         sta tmp1
-        iny 
+        iny
         lda (ptr2),y
         sta tmp2
 
 ; get drive info
         ldy #sst_driveno
         lda (ptr3),y
-        tay 
+        tay
         lda driveType,y
-        and #%00000011          ; this is for RamDrive compatibility
+        and #%00001111          ; remove ramDisk flags
         cmp #DRV_1541
         beq dio_stc1541
         cmp #DRV_1571
         beq dio_stc1571
         cmp #DRV_1581
         beq dio_stc1581
-            
-        lda #DEV_NOT_FOUND      ; unknown device
+
+        lda #INCOMPATIBLE       ; unsupported device
         ldx #0
         beq _ret
 
@@ -74,10 +74,10 @@ dio_stcend:
         ldy #diopp_sector
         lda tmp2
         sta (ptr1),y
-            
+
         ldx #0
-        txa 
-_ret:       
+        txa
+_ret:
         sta __oserror
         rts                     ; return success
 
@@ -86,7 +86,7 @@ _inv_data:
         lda #INV_TRACK
         .byte $2c
 _inv_hand:
-        lda #INCOMPATIBLE
+        lda #DEV_NOT_FOUND
         ldx #0
         beq _ret
 
@@ -102,19 +102,19 @@ _loop41:
         bne _nxt
         lda tmp1
         cmp sectab_1541_l+1,x
-        bcc _found
-_nxt:   inx 
+_nxt:   bcc _found
+        inx
         cpx #35
         bne _loop41
         beq _inv_data
-            
-_found:     
+
+_found:
         lda tmp1
-        sec 
+        sec
         sbc sectab_1541_l,x
         sta tmp2
-_fndend:    
-        inx 
+_fndend:
+        inx
         stx tmp1
         jmp dio_stcend
 
@@ -124,24 +124,25 @@ dio_stc1571:
 ; - fall down to 1541
         lda tmp2
         cmp #>683
-        bne _cnt71
+        bne _if71
         lda tmp1
         cmp #<683
-        bcc dio_stc1541
-            
-_cnt71:     
+_if71:  bcc dio_stc1541
+
         lda tmp1
-        sec 
+        sec
         sbc #<683
         sta tmp1
         lda tmp2
         sbc #>683
         sta tmp2
         jsr dio_stc1541         ; will fall through here
-            
+        tay
+        bne _ret                ; result beyond track 70
+
         ldy #diopp_track
         lda (ptr1),y
-        clc 
+        clc
         adc #35
         sta (ptr1),y
         lda #0
@@ -152,26 +153,26 @@ _cnt71:
 ; - the remainder is sector
 dio_stc1581:
         ldx #0                  ; index=(track-1)
-_loop81:    
+_loop81:
         lda tmp2
         bne _sub81
         lda tmp1
         cmp #40
         bcc _got81
 _sub81: lda tmp1
-        sec 
+        sec
         sbc #40
         sta tmp1
         lda tmp2
         sbc #0
         sta tmp2
-        inx 
-        cpx #81
+        inx
+        cpx #80
         bne _loop81
         beq _inv_data
-            
+
 _got81: lda tmp1
         sta tmp2
-        inx 
+        inx
         stx tmp1
         jmp dio_stcend

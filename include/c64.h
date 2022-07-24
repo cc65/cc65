@@ -66,8 +66,7 @@
 #define COLOR_WHITE             0x01
 #define COLOR_RED               0x02
 #define COLOR_CYAN              0x03
-#define COLOR_VIOLET            0x04
-#define COLOR_PURPLE            COLOR_VIOLET
+#define COLOR_PURPLE            0x04
 #define COLOR_GREEN             0x05
 #define COLOR_BLUE              0x06
 #define COLOR_YELLOW            0x07
@@ -85,7 +84,6 @@
 #define TGI_COLOR_WHITE         COLOR_WHITE
 #define TGI_COLOR_RED           COLOR_RED
 #define TGI_COLOR_CYAN          COLOR_CYAN
-#define TGI_COLOR_VIOLET        COLOR_VIOLET
 #define TGI_COLOR_PURPLE        COLOR_PURPLE
 #define TGI_COLOR_GREEN         COLOR_GREEN
 #define TGI_COLOR_BLUE          COLOR_BLUE
@@ -98,6 +96,13 @@
 #define TGI_COLOR_LIGHTGREEN    COLOR_LIGHTGREEN
 #define TGI_COLOR_LIGHTBLUE     COLOR_LIGHTBLUE
 #define TGI_COLOR_GRAY3         COLOR_GRAY3
+
+/* Masks for joy_read */
+#define JOY_UP_MASK             0x01
+#define JOY_DOWN_MASK           0x02
+#define JOY_LEFT_MASK           0x04
+#define JOY_RIGHT_MASK          0x08
+#define JOY_BTN_1_MASK          0x10
 
 /* Define hardware */
 #include <_vic2.h>
@@ -130,10 +135,12 @@
 
 
 /* The addresses of the static drivers */
+extern void c64_65816_emd[];
 extern void c64_c256k_emd[];
 extern void c64_dqbb_emd[];
 extern void c64_georam_emd[];
 extern void c64_isepic_emd[];
+extern void c64_kerberos_emd[];
 extern void c64_ram_emd[];
 extern void c64_ramcart_emd[];
 extern void c64_reu_emd[];

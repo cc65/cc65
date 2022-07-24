@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -56,7 +56,7 @@ struct O65Data;
 
 
 void Convert (const struct O65Data* D);
-/* Convert the o65 file in D */ 
+/* Convert the o65 file in D */
 
 
 

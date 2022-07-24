@@ -1,11 +1,11 @@
-        .include        "pce.inc"
-
         .export         psg_init
 
-        .segment        "INIT"
+        .include        "pce.inc"
+
+        .segment        "ONCE"
 psg_init:
-        clx
-        stz     PSG_GLOBAL_PAN          ; Clear global balance
+        stz     PSG_GLOBAL_PAN          ; Silence global balance
+        ldx     #6 - 1
 
 psg_clear_loop:
         stx     PSG_CHAN_SELECT         ; Select channel
@@ -17,14 +17,12 @@ psg_clear_loop:
         stz     PSG_LFO_FREQ            ; Clear LFO frequency
         stz     PSG_LFO_CTRL            ; Clear LFO control
 
-        cly
+        ldy     #$20
 psg_clear_waveform:
         stz     PSG_CHAN_DATA           ; Clear waveform byte
-        iny
-        cpy     #$20
+        dey
         bne     psg_clear_waveform
 
-        inx
-        cpx     #$06
-        bne     psg_clear_loop
+        dex
+        bpl     psg_clear_loop
         rts

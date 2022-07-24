@@ -33,9 +33,9 @@ int argc;
 char *argv[];
 #endif
 {
-	int i, c, nc;
+        int i, c, nc;
 #ifndef NO_FLOATS
-	float cutoff, atof();
+        float cutoff, atof();
 #else
         signed cutoff;
 #endif
@@ -45,29 +45,29 @@ char *argv[];
             return EXIT_FAILURE;
         }
 
-	if (argc <= 1)
+        if (argc <= 1)
 #ifndef NO_FLOATS
-		cutoff = 0.0;
+                cutoff = 0.0;
 #else
                 cutoff = 0;
 #endif
-	else
+        else
 #ifndef NO_FLOATS
-		cutoff = atof(argv[1])/100;
+                cutoff = atof(argv[1])/100;
 #else
                 cutoff = atoi(argv[1])/100;
 #endif
-	for (i = 0; i < 0x100; )
+        for (i = 0; i < 0x100; )
     {
 #ifndef NO_FLOATS
-		f[i++] = 0.0;
+                f[i++] = 0.0;
 #else
         f[i++] = 0;
 #endif
     }
 
     printf("input:\n\n");
-    
+
     nc = 0;
     while ((c = GETCHAR()) != -1)
     {
@@ -87,13 +87,13 @@ char *argv[];
     printf("a-z char:freq\n\n");
 
     /* first round ... lowercase characters */
-	for (i = 0; i < 0x100; ++i)
+        for (i = 0; i < 0x100; ++i)
     {
-		if ((f[i]) && ((f[i]/nc) >= cutoff))
+                if ((f[i]) && ((f[i]/nc) >= cutoff))
         {
-			if ((i >= 'a') && (i <= 'z'))
+                        if ((i >= 'a') && (i <= 'z'))
             {
-				printf("%c", i);
+                                printf("%c", i);
 #ifndef NO_FLOATS
                 printf(":%.1f\n", 100*f[i]/nc);
 #else
@@ -101,19 +101,19 @@ char *argv[];
 #endif
                 f[i]=0;
             }
-		}
+                }
     }
 
     printf("A-Z char:freq\n\n");
 
     /* second round ... uppercase characters */
-	for (i = 0; i < 0x100; ++i)
+        for (i = 0; i < 0x100; ++i)
     {
-		if ((f[i]) && ((f[i]/nc) >= cutoff))
+                if ((f[i]) && ((f[i]/nc) >= cutoff))
         {
-			if ((i >= 'A') && (i <= 'Z'))
+                        if ((i >= 'A') && (i <= 'Z'))
             {
-				printf("%c", i);
+                                printf("%c", i);
 #ifndef NO_FLOATS
                 printf(":%.1f\n", 100*f[i]/nc);
 #else
@@ -121,19 +121,19 @@ char *argv[];
 #endif
                 f[i]=0;
             }
-		}
+                }
     }
 
     printf("0-9 char:freq\n\n");
 
     /* third round ... numbers */
-	for (i = 0; i < 0x100; ++i)
+        for (i = 0; i < 0x100; ++i)
     {
-		if ((f[i]) && ((f[i]/nc) >= cutoff))
+                if ((f[i]) && ((f[i]/nc) >= cutoff))
         {
-			if ((i >= '0') && (i <= '9'))
+                        if ((i >= '0') && (i <= '9'))
             {
-				printf("%c", i);
+                                printf("%c", i);
 #ifndef NO_FLOATS
                 printf(":%.1f\n", 100*f[i]/nc);
 #else
@@ -141,19 +141,19 @@ char *argv[];
 #endif
                 f[i]=0;
             }
-		}
+                }
     }
 
     printf("isprint char:freq\n\n");
 
     /* second last round ... remaining printable characters */
-	for (i = 0; i < 0x100; ++i)
+        for (i = 0; i < 0x100; ++i)
     {
-		if ((f[i]) && ((f[i]/nc) >= cutoff))
+                if ((f[i]) && ((f[i]/nc) >= cutoff))
         {
-			if(isprint(i))
+                        if(isprint(i))
             {
-				printf("%c", i);
+                                printf("%c", i);
 #ifndef NO_FLOATS
                 printf(":%.1f\n", 100*f[i]/nc);
 #else
@@ -161,30 +161,30 @@ char *argv[];
 #endif
                 f[i]=0;
             }
-		}
+                }
     }
 
     printf("rest char:freq\n\n");
 
     /* last round ... remaining non printable characters */
-	for (i = 0; i < 0x100; ++i)
+        for (i = 0; i < 0x100; ++i)
     {
-		if ((f[i]) && ((f[i]/nc) >= cutoff))
+                if ((f[i]) && ((f[i]/nc) >= cutoff))
         {
             if(i=='\n')
             {
-				printf("newline");
+                                printf("newline");
             }
             else
             {
-				printf("%03o", i);
+                                printf("%03o", i);
             }
 #ifndef NO_FLOATS
                 printf(":%.1f\n", 100*f[i]/nc);
 #else
                 printf(":%d\n", 100*f[i]/nc);
 #endif
-		}
+                }
     }
     fclose(in);
     return 0;

@@ -1,12 +1,10 @@
 <!doctype linuxdoc system>
 
 <article>
-
 <title>Ohio Scientific-specific information for cc65
 <author>
 <url url="mailto:stephan.muehlstrasser@web.de" name="Stephan M&uuml;hlstrasser">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
-<date>2015-03-17
 
 <abstract>
 An overview over the Ohio Scientific runtime system as it is implemented for the cc65 C
@@ -219,14 +217,14 @@ including commercial applications, and to alter it and redistribute it
 freely, subject to the following restrictions:
 
 <enum>
-<item>	The origin of this software must not be misrepresented; you must not
-	claim that you wrote the original software. If you use this software
-	in a product, an acknowledgment in the product documentation would be
-	appreciated but is not required.
-<item>	Altered source versions must be plainly marked as such, and must not
-	be misrepresented as being the original software.
-<item>	This notice may not be removed or altered from any source
-	distribution.
+<item>  The origin of this software must not be misrepresented; you must not
+        claim that you wrote the original software. If you use this software
+        in a product, an acknowledgment in the product documentation would be
+        appreciated but is not required.
+<item>  Altered source versions must be plainly marked as such, and must not
+        be misrepresented as being the original software.
+<item>  This notice may not be removed or altered from any source
+        distribution.
 </enum>
 
 </article>

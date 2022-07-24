@@ -103,7 +103,7 @@ Bitmap* ReadInputFile (const Collection* A)
                      sizeof (FormatTable[0]),
                      CompareFileId);
         if (F == 0) {
-            Error ("Unknown input format `%s'", Format);
+            Error ("Unknown input format '%s'", Format);
         }
     } else {
         /* No format given, use file name extension */
@@ -112,7 +112,7 @@ Bitmap* ReadInputFile (const Collection* A)
                        sizeof (FormatTable) / sizeof (FormatTable[0]));
         /* Found? */
         if (F == 0) {
-            Error ("Cannot determine file format of input file `%s'", Name);
+            Error ("Cannot determine file format of input file '%s'", Name);
         }
     }
 

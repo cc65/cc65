@@ -3,7 +3,7 @@
 ;
 
         .export         rwprolog, rwcommon, rwepilog
-        .import         popax
+        .import         popax, popptr1
 
         .include        "zeropage.inc"
         .include        "errno.inc"
@@ -17,9 +17,7 @@ rwprolog:
         stx     ptr2+1
 
         ; Get and save buf
-        jsr     popax
-        sta     ptr1
-        stx     ptr1+1
+        jsr     popptr1
 
         ; Get and process fd
         jsr     popax

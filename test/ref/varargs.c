@@ -86,7 +86,7 @@ static char string[0x100];
     va_start(ap,format);
 
     vsprintf(string,format,ap);
-	printf("fd:%d,format:%s,string:%s\n",fd,format,string);
+        printf("fd:%d,format:%s,string:%s\n",fd,format,string);
     va_end(ap);
 }
 

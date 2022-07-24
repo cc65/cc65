@@ -44,4 +44,4 @@ int main(void)
     return err;
 }
 
-char mappedA[5] = "abAB"; 
+char mappedA[5] = "abAB";

@@ -147,7 +147,7 @@ int __fastcall__ vfscanf (FILE* f, const char* format, __va_list ap);
 FILE* __fastcall__ fdopen (int fd, const char* mode);   /* Unix */
 int __fastcall__ fileno (FILE* f);                      /* Unix */
 #endif
-void __fastcall__ _poserror (const char* msg);          /* cc65 */
+void __fastcall__ __poserror (const char* msg);         /* cc65 */
 
 /* Masking macros for some functions */
 #define getc(f)         fgetc (f)               /* ANSI */

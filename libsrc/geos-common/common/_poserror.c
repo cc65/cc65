@@ -1,5 +1,5 @@
 /*
-** _poserror.c
+** __poserror.c
 **
 ** Maciej 'YTM/Elysium' Witkowiak, 25.04.2003
 */
@@ -9,7 +9,7 @@
 #include <errno.h>
 #include <geos.h>
 
-void __fastcall__ _poserror (const char* msg)
+void __fastcall__ __poserror (const char* msg)
 {
     const char *errmsg = _stroserror(_oserror);
 

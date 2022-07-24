@@ -1,21 +1,14 @@
 
-		.export _cpeekcol
-		.export _cpeekcolxy
+    .export _cpeekcolor
 
-		.import _gotoxy
+    .include "c64.inc"
 
-		.include "c64.inc"
+    .segment "CODE"
 
-	.segment "CODE"
+_cpeekcolor:
 
-_cpeekcolxy:
-
-	jsr	_gotoxy		; Set cursor
-
-_cpeekcol:
-
-   	ldy CURS_X
-	lda	(CRAM_PTR),y	; get color
-	and #$0f
+    ldy CURS_X
+    lda (CRAM_PTR),y    ; get color
+    and #$0f
     ldx #0
-	rts
+    rts

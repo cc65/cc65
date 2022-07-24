@@ -1,18 +1,11 @@
 
-		.export _cpeekcol
-		.export _cpeekcolxy
-
-		.import _gotoxy
+		.export _cpeekcolor
 
 		.include "c16.inc"
 
 	.segment "CODE"
 
-_cpeekcolxy:
-
-	jsr	_gotoxy		; Set cursor
-
-_cpeekcol:
+_cpeekcolor:
 
    	ldy CURS_X
 	lda	(CRAM_PTR),y	; get color

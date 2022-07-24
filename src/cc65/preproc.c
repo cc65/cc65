@@ -57,6 +57,7 @@
 #include "ppexpr.h"
 #include "preproc.h"
 #include "scanner.h"
+#include "scanstrbuf.h"
 #include "standard.h"
 
 
@@ -1294,6 +1295,95 @@ Done:
 
 
 
+static unsigned GetLineDirectiveNum (void)
+/* Get a decimal digit-sequence from the input. Return 0 on errors. */
+{
+    unsigned long Num = 0;
+    StrBuf Buf = AUTO_STRBUF_INITIALIZER;
+
+    /* The only non-decimal-numeric character allowed in the digit-sequence is
+    ** the digit separator '\'' as of C23, but we haven't supported it yet.
+    */
+    SkipWhitespace (0);
+    while (IsDigit (CurC))
+    {
+        SB_AppendChar (&Buf, CurC);
+        NextChar ();
+    }
+
+    /* Ensure the buffer is terminated with a '\0' */
+    SB_Terminate (&Buf);
+    if (SkipWhitespace (0) != 0 || CurC == '\0') {
+        const char* Str = SB_GetConstBuf (&Buf);
+        if (Str[0] == '\0') {
+            PPWarning ("#line directive interprets number as decimal, not octal");
+        } else {
+            Num = strtoul (Str, 0, 10);
+            if (Num > 2147483647) {
+                PPError ("#line directive requires an integer argument not greater than 2147483647");
+                ClearLine ();
+                Num = 0;
+            } else if (Num == 0) {
+                PPError ("#line directive requires a positive integer argument");
+                ClearLine ();
+            }
+        }
+    } else {
+        PPError ("#line directive requires a simple decimal digit sequence");
+        ClearLine ();
+    }
+
+    /* Done with the buffer */
+    SB_Done (&Buf);
+
+    return (unsigned)Num;
+}
+
+
+
+static void DoLine (void)
+/* Process #line directive */
+{
+    unsigned LineNum;
+
+    /* Macro-replace a single line with support for the "defined" operator */
+    SB_Clear (MLine);
+    PreprocessDirective (Line, MLine, MSM_NONE);
+
+    /* Read from the processed line */
+    SB_Reset (MLine);
+    MLine = InitLine (MLine);
+
+    /* Parse and check the specified line number */
+    LineNum = GetLineDirectiveNum ();
+    if (LineNum != 0) {
+        /* Parse and check the optional filename argument */
+        if (SB_GetIndex (Line) < SB_GetLen (Line)) {
+            StrBuf Filename = AUTO_STRBUF_INITIALIZER;
+            if (SB_GetString (Line, &Filename)) {
+                SB_Terminate (&Filename);
+                SetCurrentFilename (SB_GetConstBuf (&Filename));
+            } else {
+                PPError ("Invalid filename for #line directive");
+                LineNum = 0;
+            }
+            SB_Done (&Filename);
+        }
+
+        /* #line actually sets the line number of the next line */
+        if (LineNum > 0) {
+            SetCurrentLine (LineNum - 1);
+            /* Check for extra tokens at the end */
+            CheckExtraTokens ("line");
+        }
+    }
+
+    /* Restore input source */
+    MLine = InitLine (MLine);
+}
+
+
+
 static void DoPragma (void)
 /* Handle a #pragma line by converting the #pragma preprocessor directive into
 ** the _Pragma() compiler operator.
@@ -1476,9 +1566,8 @@ static int ParseDirectives (unsigned ModeFlags)
                         break;
 
                     case PPD_LINE:
-                        /* Should do something in C99 at least, but we ignore it */
                         if (!PPSkip) {
-                            ClearLine ();
+                            DoLine ();
                         }
                         break;
 

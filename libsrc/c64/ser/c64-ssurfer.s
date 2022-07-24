@@ -5,25 +5,25 @@
 ; gpz fixed 20020828: fatal bug fixed in _ss232_params
 ;----------------------------------------------------------------------------------------------
 
-		.include "silversurfer.inc"
+                .include "silversurfer.inc"
 
-                        .export _rs232_init
-                        .export _rs232_done
-                        .export _rs232_params
-                        .export _rs232_put
-                        .export _rs232_get
+                .export _rs232_init
+                .export _rs232_done
+                .export _rs232_params
+                .export _rs232_put
+                .export _rs232_get
 
-                        .importzp ptr1, ptr2
-                        .import   popa, popax
+                .importzp ptr1, ptr2
+                .import   popa, popax
 
 ;----------------------------------------------------------------------------------------------
 ; Error codes. Beware: The codes must match the codes in the C header file
 
 ErrNotInitialized       = $01
-ErrBaudTooFast    	= $02
-ErrBaudNotAvail   	= $03
-ErrNoData         	= $04
-ErrOverflow       	= $05
+ErrBaudTooFast          = $02
+ErrBaudNotAvail         = $03
+ErrNoData               = $04
+ErrOverflow             = $05
 
 ;; this driver should work with minor modifications
 ;; with the UART in IDE-64
@@ -53,26 +53,26 @@ fifo_scratch = rs16550base+$07 ;f (r/w)
 ; */
 ;----------------------------------------------------------------------------------------------
 
-         .code
+        .code
 
 _rs232_init:
 
-         ; enable ssurfer-port
-         lda $de01
-         ora #$01
-         sta $de01
+        ; enable ssurfer-port
+        lda $de01
+        ora #$01
+        sta $de01
 
-         ; disable nmi's from ssurfer
-         lda #%00000000
-         sta fifo_ier
+        ; disable nmi's from ssurfer
+        lda #%00000000
+        sta fifo_ier
 
-         ; activate dtr
-         lda #%00000001
-         sta fifo_mcr
+        ; activate dtr
+        lda #%00000001
+        sta fifo_mcr
 
-         lda #$00       ; ok
-         tax
-         rts
+        lda #$00       ; ok
+        tax
+        rts
 
 ;----------------------------------------------------------------------------------------------
 ;unsigned char __fastcall__ rs232_done (void);
@@ -84,60 +84,60 @@ _rs232_init:
 ;----------------------------------------------------------------------------------------------
 
 _rs232_done:
-         ; disable nmi's from ssurfer
-         lda #%00000000
-         sta fifo_ier
+        ; disable nmi's from ssurfer
+        lda #%00000000
+        sta fifo_ier
 
-         ; deactivate dtr
-         sta fifo_mcr
+        ; deactivate dtr
+        sta fifo_mcr
 
-         ; disable ssurfer-port
-         lda $de01
-         and #$fe
-         sta $de01
+        ; disable ssurfer-port
+        lda $de01
+        and #$fe
+        sta $de01
 
-         lda #$00       ; ok
-         tax
-         rts
+        lda #$00       ; ok
+        tax
+        rts
 
 ;----------------------------------------------------------------------------------------------
 ;unsigned char __fastcall__ rs232_params (unsigned char params, unsigned char parity);
 ;/* Set the port parameters. Use a combination of the #defined values above. */
 ;----------------------------------------------------------------------------------------------
 
-         .data
+        .data
 
 _rs232_baudrates:
 
-         .word          (7372800 / (      50 * 16))
-         .word          (7372800 / (     110 * 16))
-         .word          (7372800 / (     269 *  8))
-         .word          (7372800 / (     300 * 16))
-         .word          (7372800 / (     600 * 16))
-         .word          (7372800 / (    1200 * 16))
-         .word          (7372800 / (    2400 * 16))
-         .word          (7372800 / (    4800 * 16))
-         .word          (7372800 / (    9600 * 16))
-         .word          (7372800 / (   19200 * 16))
-         .word          (7372800 / (   38400 * 16))
-         .word          (7372800 / (   57600 * 16))
-         .word          (7372800 / (  115200 * 16))
-         .word          (7372800 / (  230400 * 16))
+        .word          (7372800 / (      50 * 16))
+        .word          (7372800 / (     110 * 16))
+        .word          (7372800 / (     269 *  8))
+        .word          (7372800 / (     300 * 16))
+        .word          (7372800 / (     600 * 16))
+        .word          (7372800 / (    1200 * 16))
+        .word          (7372800 / (    2400 * 16))
+        .word          (7372800 / (    4800 * 16))
+        .word          (7372800 / (    9600 * 16))
+        .word          (7372800 / (   19200 * 16))
+        .word          (7372800 / (   38400 * 16))
+        .word          (7372800 / (   57600 * 16))
+        .word          (7372800 / (  115200 * 16))
+        .word          (7372800 / (  230400 * 16))
 
-         .bss
+        .bss
 
 _rs232_tmp1:
-         .res 1
+        .res 1
 
-         .code
+        .code
 
 _rs232_params:
 
-         sta _rs232_tmp1 ; save parity
+        sta _rs232_tmp1 ; save parity
 
-         ; reset fifo
-         lda #%10000111
-         sta fifo_fcr
+        ; reset fifo
+        lda #%10000111
+        sta fifo_fcr
 
    ; that delay thing really needed ?!
    ; (original datasheet mentions a delay here)
@@ -145,44 +145,44 @@ _rs232_params:
    ;      dey
    ;      bny *-1
 
-         ; set dlab
-         lda #%10000011 ; we assmume 8n1
-         sta fifo_lcr
+        ; set dlab
+        lda #%10000011 ; we assmume 8n1
+        sta fifo_lcr
 
-         jsr popa
-         tay             ; save param
+        jsr popa
+        tay             ; save param
 
-         ; set baudrate
-         clc
-         lsr a
-         lsr a
-         lsr a
-         lsr a
-         asl a
-         tax
-         lda _rs232_baudrates,x
-         sta fifo_dll
-         lda _rs232_baudrates+1,x
-         sta fifo_dlm
+        ; set baudrate
+        clc
+        lsr a
+        lsr a
+        lsr a
+        lsr a
+        asl a
+        tax
+        lda _rs232_baudrates,x
+        sta fifo_dll
+        lda _rs232_baudrates+1,x
+        sta fifo_dlm
 
-         tya             ; param
-         and #$0f
-         ora _rs232_tmp1 ; parity
+        tya             ; param
+        and #$0f
+        ora _rs232_tmp1 ; parity
 
-         ; reset dlab
-         sta fifo_lcr
+        ; reset dlab
+        sta fifo_lcr
 
-         lda #$00       ; ok
-         tax
-         rts
+        lda #$00       ; ok
+        tax
+        rts
 
 ;----------------------------------------------------------------------------------------------
 ; check if byte available, returns AKKU=0 if none
 
 rs_getlsr:
-         lda fifo_lsr
-         and #$01
-         rts
+        lda fifo_lsr
+        and #$01
+        rts
 
 ;----------------------------------------------------------------------------------------------
 ;unsigned char __fastcall__ rs232_get (char* b);
@@ -193,45 +193,45 @@ rs_getlsr:
 ; get byte (non blocking, returns byte in A or CARRY=1 - error)
 
 _rs232_get:
-         sta ptr1
-         stx ptr1+1
+        sta ptr1
+        stx ptr1+1
 
-         jsr rs_getlsr  ; check if byte available
+        jsr rs_getlsr  ; check if byte available
 ;         bne sk32 ; yes
-         bne sk33 ; yes
+        bne sk33 ; yes
 
-         ; activate rts
-         lda #%00000011
-         sta fifo_mcr
+        ; activate rts
+        lda #%00000011
+        sta fifo_mcr
 sk32:
 
          ; deactivate rts
 ;         lda #%00000001
 ;         sta fifo_mcr
 
-	 jsr rs_getlsr  ; check if byte available
-         bne sk33 ; yes
+        jsr rs_getlsr  ; check if byte available
+        bne sk33 ; yes
 
-         ; deactivate rts
-         lda #%00000001
-         sta fifo_mcr
+        ; deactivate rts
+        lda #%00000001
+        sta fifo_mcr
 
-         lda #ErrNoData      ; no data
-         ldx #0
-         rts
+        lda #ErrNoData      ; no data
+        ldx #0
+        rts
 sk33:
-         ; deactivate rts
-         lda #%00000001
-         sta fifo_mcr
+        ; deactivate rts
+        lda #%00000001
+        sta fifo_mcr
 
-         ; get byte
-         ldy #$00
-         lda fifo_rxd
-         sta (ptr1),y
+        ; get byte
+        ldy #$00
+        lda fifo_rxd
+        sta (ptr1),y
 
-         lda #0      ; ok
-         tax
-         rts
+        lda #0      ; ok
+        tax
+        rts
 
 ;----------------------------------------------------------------------------------------------
 ;unsigned char __fastcall__ rs232_put (char b);
@@ -242,26 +242,26 @@ sk33:
 ;----------------------------------------------------------------------------------------------
 
 _rs232_put:
-         tax
-         ; transmit buf ready?
-         lda fifo_lsr
-         and #%00100000
-         bne @sk1
+        tax
+        ; transmit buf ready?
+        lda fifo_lsr
+        and #%00100000
+        bne @sk1
 @sk2:
-         lda #ErrOverflow       ; overflow
-         ldx #$00
-         rts
+        lda #ErrOverflow       ; overflow
+        ldx #$00
+        rts
 @sk1:
-         ; reciever ready?
-         lda fifo_msr
-         and #%00010000
-         beq @sk2
+        ; reciever ready?
+        lda fifo_msr
+        and #%00010000
+        beq @sk2
 
-         stx fifo_txd
+        stx fifo_txd
 
-         lda #$00               ; ok
-         tax
-         rts
+        lda #$00               ; ok
+        tax
+        rts
 
 ;----------------------------------------------------------------------------------------------
 ;unsigned char __fastcall__ rs232_pause (void);
@@ -269,13 +269,13 @@ _rs232_put:
 ;----------------------------------------------------------------------------------------------
 
 _rs232_pause:
-         ; activate rts
-         lda #%00000011
-         sta fifo_mcr
+        ; activate rts
+        lda #%00000011
+        sta fifo_mcr
 
-         lda #$00       ; ok
-         tax
-         rts
+        lda #$00       ; ok
+        tax
+        rts
 
 ;----------------------------------------------------------------------------------------------
 ;unsigned char __fastcall__ rs232_unpause (void);
@@ -283,13 +283,13 @@ _rs232_pause:
 ;----------------------------------------------------------------------------------------------
 
 _rs232_unpause:
-         ; deactivate rts
-         lda #%00000001
-         sta fifo_mcr
+        ; deactivate rts
+        lda #%00000001
+        sta fifo_mcr
 
-         lda #$00       ; ok
-         tax
-         rts
+        lda #$00       ; ok
+        tax
+        rts
 
 ;----------------------------------------------------------------------------------------------
 ;unsigned char __fastcall__ rs232_status (unsigned char* status,
@@ -298,11 +298,11 @@ _rs232_unpause:
 ;----------------------------------------------------------------------------------------------
 
 _rs232_status:
- 	sta    	ptr2
- 	stx    	ptr2+1
- 	jsr    	popax
- 	sta    	ptr1
- 	stx    	ptr1+1
+        sta     ptr2
+        stx     ptr2+1
+        jsr     popax
+        sta     ptr1
+        stx     ptr1+1
 
         ldy     #$00
 
@@ -318,11 +318,11 @@ _rs232_status:
         lda     fifo_lsr
         and     #%00101110
         ora     _rs232_tmp1
- 	sta    	(ptr1),y
+        sta     (ptr1),y
 
         ; Get errors
         lda     #$00    ; ok
-       	sta    	(ptr2),y
+        sta     (ptr2),y
 
         lda     #$00    ; ok
         tax

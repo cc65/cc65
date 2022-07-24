@@ -404,6 +404,21 @@ static void CopyQuotedString (StrBuf* Target)
 
 
 
+static int CheckExtraTokens (const char* Name)
+/* Check for extra tokens at the end of the directive. Return 1 if there are
+** extra tokens, otherwise 0.
+*/
+{
+    SkipWhitespace (0);
+    if (SB_GetIndex (Line) != SB_GetLen (Line)) {
+        PPWarning ("Extra tokens at end of #%s directive", Name);
+        return 1;
+    }
+    return 0;
+}
+
+
+
 /*****************************************************************************/
 /*                                Macro stuff                                */
 /*****************************************************************************/
@@ -416,7 +431,11 @@ static int MacName (char* Ident)
 */
 {
     if (IsSym (Ident) == 0) {
-        PPError ("Identifier expected");
+        if (CurC != '\0') {
+            PPError ("Macro name must be an identifier");
+        } else {
+            PPError ("Missing macro name");
+        }
         ClearLine ();
         return 0;
     } else {
@@ -1144,6 +1163,8 @@ static int DoIfDef (int skip, int flag)
         SkipWhitespace (0);
         if (MacName (Ident)) {
             Value = IsMacro (Ident);
+            /* Check for extra tokens */
+            CheckExtraTokens (flag ? "ifdef" : "ifndef");
         }
     }
 
@@ -1196,6 +1217,10 @@ static void DoInclude (void)
 
     /* Check if we got a terminator */
     if (CurC == RTerm) {
+        /* Skip the terminator */
+        NextChar ();
+        /* Check for extra tokens following the filename */
+        CheckExtraTokens ("include");
         /* Open the include file */
         OpenIncludeFile (SB_GetConstBuf (&Filename), IT);
     } else if (CurC == '\0') {
@@ -1246,6 +1271,8 @@ static void DoUndef (void)
     if (MacName (Ident)) {
         UndefineMacro (Ident);
     }
+    /* Check for extra tokens */
+    CheckExtraTokens ("undef");
 }
 
 
@@ -1312,7 +1339,6 @@ void Preprocess (void)
                     case PP_ELIF:
                         if (IfIndex >= 0) {
                             if ((IfStack[IfIndex] & IFCOND_ELSE) == 0) {
-
                                 /* Handle as #else/#if combination */
                                 if ((IfStack[IfIndex] & IFCOND_SKIP) == 0) {
                                     Skip = !Skip;
@@ -1337,6 +1363,9 @@ void Preprocess (void)
                                     Skip = !Skip;
                                 }
                                 IfStack[IfIndex] |= IFCOND_ELSE;
+
+                                /* Check for extra tokens */
+                                CheckExtraTokens ("else");
                             } else {
                                 PPError ("Duplicate #else");
                             }
@@ -1359,6 +1388,9 @@ void Preprocess (void)
 
                             /* Remove the clause that needs a terminator */
                             Skip = (IfStack[IfIndex--] & IFCOND_SKIP) != 0;
+
+                            /* Check for extra tokens */
+                            CheckExtraTokens ("endif");
                         } else {
                             PPError ("Unexpected '#endif'");
                         }

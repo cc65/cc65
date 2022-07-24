@@ -808,6 +808,11 @@ testcode.d64: testcode
 	$(foreach file,$(EXELIST_$(SYS)),$(D64_WRITE_PRG_recipe))
 #	$(foreach file,$(EMD) $(MOU) $(TGI),$(D64_WRITE_SEQ_recipe))
 
+testcode.d81: testcode
+	@$(C1541) -format testcode,AA d81 $@ >$(NULLDEV)
+	$(foreach file,$(EXELIST_$(SYS)),$(D64_WRITE_PRG_recipe))
+	$(foreach file,$(EMD) $(MOU) $(TGI),$(D64_WRITE_SEQ_recipe))
+
 # --------------------------------------------------------------------------
 # Rule to make an Apple II disk with all testcode. Needs the AppleCommander
 # program, available at https://applecommander.github.io/, and a template disk

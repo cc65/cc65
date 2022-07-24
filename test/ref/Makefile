@@ -1,96 +1,85 @@
-
-# makefile for the regression tests that generate output which has to be
+# Makefile for the regression tests that generate output which has to be
 # compared with reference output
 
 ifneq ($(shell echo),)
-  CMD_EXE := 1
+  CMD_EXE = 1
 endif
 
 ifdef CMD_EXE
-  S := $(subst /,\,/)
-  DEL = -del /f $(subst /,\,$1)
+  S = $(subst /,\,/)
+  EXE = .exe
+  NULLDEV = nul:
+  MKDIR = mkdir $(subst /,\,$1)
+  RMDIR = -rmdir /s /q $(subst /,\,$1)
 else
-  S := /
-  DEL = $(RM) $1
+  S = /
+  EXE =
+  NULLDEV = /dev/null
+  MKDIR = mkdir -p $1
+  RMDIR = $(RM) -r $1
 endif
 
-CC65FLAGS := -t sim6502
-SIM65FLAGS := -x 200000000
+ifdef QUIET
+  .SILENT:
+  NULLERR = 2>$(NULLDEV)
+endif
 
-CL65 := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)
+SIM65FLAGS = -x 200000000
+
+CC65 := $(if $(wildcard ../../bin/cc65*),..$S..$Sbin$Scc65,cc65)
+CA65 := $(if $(wildcard ../../bin/ca65*),..$S..$Sbin$Sca65,ca65)
+LD65 := $(if $(wildcard ../../bin/ld65*),..$S..$Sbin$Sld65,ld65)
 SIM65 := $(if $(wildcard ../../bin/sim65*),..$S..$Sbin$Ssim65,sim65)
 
-WORKDIR := ..$S..$Stestwrk
-DIFF := $(WORKDIR)/bdiff
+WORKDIR = ..$S..$Stestwrk$Sref
 
-CC := gcc
-CFLAGS := -O2 -Wall -W -Wextra -fwrapv -fno-strict-overflow
+OPTIONS = g O Os Osi Osir Osr Oi Oir Or
+
+ISEQUAL = ..$S..$Stestwrk$Sisequal$(EXE)
+
+CC = gcc
+CFLAGS = -O2 -Wall -W -Wextra -funsigned-char -fwrapv -fno-strict-overflow
 
 .PHONY: all clean
 
 SOURCES := $(wildcard *.c)
-REFS := $(SOURCES:%.c=$(WORKDIR)/%.ref)
-TESTS := $(foreach option,. .o. .os. .osi. .osir. .oi. .oir. .or.,$(SOURCES:%.c=$(WORKDIR)/%$(option)prg))
+REFS = $(SOURCES:%.c=$(WORKDIR)/%.ref)
+TESTS  = $(foreach option,$(OPTIONS),$(SOURCES:%.c=$(WORKDIR)/%.$(option).6502.prg))
+TESTS += $(foreach option,$(OPTIONS),$(SOURCES:%.c=$(WORKDIR)/%.$(option).65c02.prg))
 
 all: $(REFS) $(TESTS)
 
-$(WORKDIR)/%.ref: %.c
-	$(CC) $(CFLAGS) $< -o $(WORKDIR)/$*.host
+$(WORKDIR):
+	$(call MKDIR,$(WORKDIR))
+
+$(WORKDIR)/%.ref: %.c | $(WORKDIR)
+	$(if $(QUIET),echo ref/$*.host)
+	$(CC) $(CFLAGS) -o $(WORKDIR)/$*.host $< $(NULLERR)
 	$(WORKDIR)$S$*.host > $@
 
-# Some files have "K & R"-style syntax.  Therefore, some forward
-# function-declarations don't match the later function definitions.
-# Those programs fail when fastcall is used; but, the cdecl calling convention
-# tolerates those conflicts.  Therefore, make their functions default to cdecl.
+$(ISEQUAL): ../isequal.c | $(WORKDIR)
+	$(CC) $(CFLAGS) -o $@ $<
+
+# "yaccdbg.c" includes "yacc.c".
+# yaccdbg's built files must depend on both of them.
 #
-$(WORKDIR)/init%prg: CC65FLAGS += -Wc --all-cdecl
-$(WORKDIR)/switch.%rg: CC65FLAGS += -Wc --all-cdecl
-$(WORKDIR)/yacc.%rg: CC65FLAGS += -Wc --all-cdecl
-$(WORKDIR)/yaccdbg%prg: CC65FLAGS += -Wc --all-cdecl
+$(WORKDIR)/yaccdbg.ref:   yacc.c
+$(WORKDIR)/yaccdbg.%.prg: yacc.c
 
-$(WORKDIR)/%.prg: %.c $(WORKDIR)/%.ref
-	$(CL65) $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@ > $(WORKDIR)/$*.out
-	$(DIFF) $(WORKDIR)/$*.out $(WORKDIR)/$*.ref
+define PRG_template
 
-$(WORKDIR)/%.o.prg: %.c $(WORKDIR)/%.ref
-	$(CL65) -O $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@ > $(WORKDIR)/$*.out
-	$(DIFF) $(WORKDIR)/$*.out $(WORKDIR)/$*.ref
+$(WORKDIR)/%.$1.$2.prg: %.c $(WORKDIR)/%.ref $(ISEQUAL)
+	$(if $(QUIET),echo ref/$$*.$1.$2.prg)
+	$(CC65) -t sim$2 $$(CC65FLAGS) -$1 -o $$(@:.prg=.s) $$< $(NULLERR)
+	$(CA65) -t sim$2 -o $$(@:.prg=.o) $$(@:.prg=.s) $(NULLERR)
+	$(LD65) -t sim$2 -o $$@ $$(@:.prg=.o) sim$2.lib $(NULLERR)
+	$(SIM65) $(SIM65FLAGS) $$@ > $(WORKDIR)/$$*.$1.$2.out
+	$(ISEQUAL) $(WORKDIR)/$$*.$1.$2.out $(WORKDIR)/$$*.ref
 
-$(WORKDIR)/%.os.prg: %.c $(WORKDIR)/%.ref
-	$(CL65) -Os $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@ > $(WORKDIR)/$*.out
-	$(DIFF) $(WORKDIR)/$*.out $(WORKDIR)/$*.ref
+endef # PRG_template
 
-$(WORKDIR)/%.osi.prg: %.c $(WORKDIR)/%.ref
-	$(CL65) -Osi $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@ > $(WORKDIR)/$*.out
-	$(DIFF) $(WORKDIR)/$*.out $(WORKDIR)/$*.ref
-
-$(WORKDIR)/%.osir.prg: %.c $(WORKDIR)/%.ref
-	$(CL65) -Osir $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@ > $(WORKDIR)/$*.out
-	$(DIFF) $(WORKDIR)/$*.out $(WORKDIR)/$*.ref
-
-$(WORKDIR)/%.oi.prg: %.c $(WORKDIR)/%.ref
-	$(CL65) -Oi $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@ > $(WORKDIR)/$*.out
-	$(DIFF) $(WORKDIR)/$*.out $(WORKDIR)/$*.ref
-
-$(WORKDIR)/%.oir.prg: %.c $(WORKDIR)/%.ref
-	$(CL65) -Oir $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@ > $(WORKDIR)/$*.out
-	$(DIFF) $(WORKDIR)/$*.out $(WORKDIR)/$*.ref
-
-$(WORKDIR)/%.or.prg: %.c $(WORKDIR)/%.ref
-	$(CL65) -Or $(CC65FLAGS) $< -o $@
-	$(SIM65) $(SIM65FLAGS) $@ > $(WORKDIR)/$*.out
-	$(DIFF) $(WORKDIR)/$*.out $(WORKDIR)/$*.ref
+$(foreach option,$(OPTIONS),$(eval $(call PRG_template,$(option),6502)))
+$(foreach option,$(OPTIONS),$(eval $(call PRG_template,$(option),65c02)))
 
 clean:
-	@$(call DEL,$(TESTS))
-	@$(call DEL,$(SOURCES:.c=.o))
-	@$(call DEL,$(SOURCES:%.c=$(WORKDIR)/%.out))
-	@$(call DEL,$(SOURCES:%.c=$(WORKDIR)/%.ref))
-	@$(call DEL,$(SOURCES:%.c=$(WORKDIR)/%.host))
+	@$(call RMDIR,$(WORKDIR))

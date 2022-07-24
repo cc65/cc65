@@ -1,10 +1,11 @@
 ;
 ; Ullrich von Bassewitz, 22.11.2002
 ;
-; BSOUT replacement function
+; BSOUT/CHROUT replacement function
 ;
 
         .export         BSOUT
+        .export         CHROUT
 
         .include        "plus4.inc"
 
@@ -17,4 +18,4 @@
         rts                             ; Return to caller
 .endproc
 
-
+CHROUT  :=      BSOUT

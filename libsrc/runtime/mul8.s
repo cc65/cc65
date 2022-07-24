@@ -6,8 +6,8 @@
 
         .export         tosumula0, tosmula0
         .export         mul8x16, mul8x16a
-        .import         popsreg
-        .importzp       sreg, ptr4
+        .import         popptr1
+        .importzp       ptr1, ptr4
 
 
 ;---------------------------------------------------------------------------
@@ -16,11 +16,11 @@
 tosmula0:
 tosumula0:
         sta     ptr4
-mul8x16:jsr     popsreg         ; Get left operand
+mul8x16:jsr     popptr1         ; Get left operand (Y=0 by popptr1)
 
-        lda     #0              ; Clear byte 1
+        tya                     ; Clear byte 1
         ldy     #8              ; Number of bits
-        ldx     sreg+1          ; Get into register for speed
+        ldx     ptr1+1          ; check if lhs is 8 bit only
         beq     mul8x8          ; Do 8x8 multiplication if high byte zero
 mul8x16a:
         sta     ptr4+1          ; Clear byte 2
@@ -29,12 +29,12 @@ mul8x16a:
 @L0:    bcc     @L1
 
         clc
-        adc     sreg
-        pha
-        txa                     ; hi byte of left op
+        adc     ptr1
+        tax
+        lda     ptr1+1          ; hi byte of left op
         adc     ptr4+1
         sta     ptr4+1
-        pla
+        txa
 
 @L1:    ror     ptr4+1
         ror     a
@@ -52,7 +52,7 @@ mul8x8:
         lsr     ptr4            ; Get first bit into carry
 @L0:    bcc     @L1
         clc
-        adc     sreg
+        adc     ptr1
 @L1:    ror
         ror     ptr4
         dey

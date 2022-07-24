@@ -5,7 +5,7 @@
 ; Setup arguments for main
 ;
 ; There is always either 1 or 3 arguments:
-; <program name>,0
+; <program name>, 0
 ; or
 ; <program name>, <data file name>, <data disk name>, 0
 ; the 2nd case is when using DeskTop user drags an icon of a file and drops it
@@ -18,7 +18,7 @@
             .include "const.inc"
             .include "geossym.inc"
 
-.segment        "INIT"
+.segment        "ONCE"
 
 ; Setup arguments for main
 
@@ -71,7 +71,7 @@ argv:
         .word dataDiskName      ; dataDiskName
         .word $0000             ; last one must be NULL
 
-.bss
+.segment        "INIT"
 
 argv0:
         .res 17                 ; Program name

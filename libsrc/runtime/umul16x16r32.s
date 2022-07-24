@@ -12,7 +12,7 @@
 
 ;---------------------------------------------------------------------------
 ; 16x16 => 32 unsigned multiplication routine. Because the overhead for a
-; 16x16 => 16 unsigned multiplication routine is small, we will tag it with 
+; 16x16 => 16 unsigned multiplication routine is small, we will tag it with
 ; the matching labels, as well.
 ;
 ;  routine         LHS         RHS        result          result also in
@@ -42,11 +42,11 @@ umul16x16r16m:
 
         clc
         adc     ptr3
-        pha
+        tax
         lda     ptr3+1
         adc     sreg+1
         sta     sreg+1
-        pla
+        txa
 
 @L1:    ror     sreg+1
         ror     a

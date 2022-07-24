@@ -211,7 +211,7 @@ void DbgInfoFile (void)
 void DbgInfoFunc (void)
 /* Parse and handle func subcommand of the .dbg pseudo instruction */
 {
-    static const char* StorageKeys[] = {
+    static const char* const StorageKeys[] = {
         "EXTERN",
         "STATIC",
     };
@@ -352,7 +352,7 @@ void DbgInfoLine (void)
 void DbgInfoSym (void)
 /* Parse and handle SYM subcommand of the .dbg pseudo instruction */
 {
-    static const char* StorageKeys[] = {
+    static const char* const StorageKeys[] = {
         "AUTO",
         "EXTERN",
         "REGISTER",
@@ -468,7 +468,7 @@ void DbgInfoCheck (void)
         /* Search for the symbol name */
         S->Sym = SymFindAny (S->Scope, GetStrBuf (S->AsmName));
         if (S->Sym == 0) {
-            PError (&S->Pos, "Assembler symbol `%s' not found",
+            PError (&S->Pos, "Assembler symbol '%s' not found",
                     GetString (S->AsmName));
         } else {
             /* Set the backlink */

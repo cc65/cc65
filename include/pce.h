@@ -2,11 +2,11 @@
 /*                                                                           */
 /*                                   pce.h                                   */
 /*                                                                           */
-/*                   PC-Engine system specific definitions                   */
+/*                   PC-Engine system-specific definitions                   */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2015 Groepaz/Hitmen                                                   */
+/* (C) 2015, Groepaz/Hitmen                                                  */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -51,12 +51,12 @@
 #define CH_ENTER                13
 #define CH_PI                   18
 
-/* Color defines (CBM compatible, for conio) */
+/* Color defines (CBM-compatible, for conio) */
 #define COLOR_BLACK             0x00
 #define COLOR_WHITE             0x01
 #define COLOR_RED               0x02
 #define COLOR_CYAN              0x03
-#define COLOR_VIOLET            0x04
+#define COLOR_PURPLE            0x04
 #define COLOR_GREEN             0x05
 #define COLOR_BLUE              0x06
 #define COLOR_YELLOW            0x07
@@ -73,20 +73,36 @@
 #define TV_PAL                  1
 #define TV_OTHER                2
 
+/* Masks for joy_read */
+#define JOY_UP_MASK             0x10
+#define JOY_DOWN_MASK           0x40
+#define JOY_LEFT_MASK           0x80
+#define JOY_RIGHT_MASK          0x20
+#define JOY_BTN_1_MASK          0x01
+#define JOY_BTN_2_MASK          0x02
+#define JOY_BTN_3_MASK          0x04
+#define JOY_BTN_4_MASK          0x08
+
+#define JOY_BTN_I_MASK          JOY_BTN_1_MASK
+#define JOY_BTN_II_MASK         JOY_BTN_2_MASK
+#define JOY_SELECT_MASK         JOY_BTN_3_MASK
+#define JOY_RUN_MASK            JOY_BTN_4_MASK
+
+#define JOY_BTN_I(v)            ((v) & JOY_BTN_I_MASK)
+#define JOY_BTN_II(v)           ((v) & JOY_BTN_II_MASK)
+#define JOY_SELECT(v)           ((v) & JOY_SELECT_MASK)
+#define JOY_RUN(v)              ((v) & JOY_RUN_MASK)
+
 /* No support for dynamically loadable drivers */
-#define DYN_DRV         0
+#define DYN_DRV                 0
 
 /* The addresses of the static drivers */
 extern void pce_stdjoy_joy[];   /* Referred to by joy_static_stddrv[] */
 
-#define JOY_FIRE_B              5
-#define JOY_SELECT              6
-#define JOY_RUN                 7
+void waitvsync (void);
+/* Wait for start of the next frame */
 
-void waitvblank (void);
-/* Wait for the vertical blanking */
-
-/* NOTE: all PCE are NTSC */
+/* NOTE: all PCEs are NTSC. */
 #define get_tv()                TV_NTSC
 /* Return the video mode the machine is using. */
 

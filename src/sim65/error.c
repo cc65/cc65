@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2002-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -69,7 +69,21 @@ void Error (const char* Format, ...)
     vfprintf (stderr, Format, ap);
     putc ('\n', stderr);
     va_end (ap);
-    exit (EXIT_FAILURE);
+    exit (SIM65_ERROR);
+}
+
+
+
+void ErrorCode (int Code, const char* Format, ...)
+/* Print an error message and die with the given exit code */
+{
+    va_list ap;
+    va_start (ap, Format);
+    fprintf (stderr, "Error: ");
+    vfprintf (stderr, Format, ap);
+    putc ('\n', stderr);
+    va_end (ap);
+    exit (Code);
 }
 
 
@@ -83,5 +97,5 @@ void Internal (const char* Format, ...)
     vfprintf (stderr, Format, ap);
     putc ('\n', stderr);
     va_end (ap);
-    exit (EXIT_FAILURE);
+    exit (SIM65_ERROR);
 }

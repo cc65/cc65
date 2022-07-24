@@ -211,7 +211,7 @@ unsigned GetFileIndex (const StrBuf* Name)
 
     /* If we don't have this index, print a diagnostic and use the main file */
     if (F == 0) {
-        Error ("File name `%m%p' not found in file table", Name);
+        Error ("File name '%m%p' not found in file table", Name);
         return 0;
     } else {
         return F->Index;
@@ -316,7 +316,7 @@ static void CreateDepFile (const char* Name, FileType Types)
     /* Open the file */
     FILE* F = fopen (Name, "w");
     if (F == 0) {
-        Fatal ("Cannot open dependency file `%s': %s", Name, strerror (errno));
+        Fatal ("Cannot open dependency file '%s': %s", Name, strerror (errno));
     }
 
     /* Print the output file followed by a tab char */

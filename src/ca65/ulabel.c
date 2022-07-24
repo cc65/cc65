@@ -160,7 +160,7 @@ void ULabDef (void)
         */
         ULabel* L = CollAtUnchecked (&ULabList, ULabDefCount);
         CHECK (L->Val == 0);
-        L->Val = GenCurrentPC ();     
+        L->Val = GenCurrentPC ();
         ReleaseFullLineInfo (&L->LineInfos);
         GetFullLineInfo (&L->LineInfos);
     } else {
@@ -200,7 +200,7 @@ ExprNode* ULabResolve (unsigned Index)
 
 
 void ULabDone (void)
-/* Run through all unnamed labels, check for anomalies and errors and do 
+/* Run through all unnamed labels, check for anomalies and errors and do
 ** necessary cleanups.
 */
 {

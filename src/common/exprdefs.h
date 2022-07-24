@@ -99,6 +99,7 @@
 #define EXPR_WORD1              (EXPR_UNARYNODE | 0x0D)
 #define EXPR_FARADDR            (EXPR_UNARYNODE | 0x0E)
 #define EXPR_DWORD              (EXPR_UNARYNODE | 0x0F)
+#define EXPR_NEARADDR           (EXPR_UNARYNODE | 0x10)
 
 
 

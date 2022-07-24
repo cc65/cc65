@@ -76,9 +76,9 @@ void FinishIncludePaths (void)
 
     /* Add some compiled-in search paths if defined at compile time. */
 #if defined(CA65_INC) && !defined(_WIN32)
-    AddSearchPath (IncSearchPath, STRINGIZE (CA65_INC));
+    AddSearchPath (IncSearchPath, CA65_INC);
 #endif
 
     /* Add paths relative to the parent directory of the Windows binary. */
-    AddSubSearchPathFromWinBin (IncSearchPath, "asminc");
+    AddSubSearchPathFromBin (IncSearchPath, "asminc");
 }

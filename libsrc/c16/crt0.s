@@ -13,7 +13,6 @@
         .importzp       ST
 
         .include        "zeropage.inc"
-        .include        "plus4.inc"
 
 ; ------------------------------------------------------------------------
 ; Startup code
@@ -90,7 +89,7 @@ L2:     lda     zpsave,x
 
 ; ------------------------------------------------------------------------
 
-.segment        "INITBSS"
+.segment        "INIT"
 
 zpsave: .res    zpspace
 

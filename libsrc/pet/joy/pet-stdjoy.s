@@ -27,24 +27,12 @@
 
         .addr   $0000
 
-; Button state masks (8 values)
-
-        .byte   $01             ; JOY_UP
-        .byte   $02             ; JOY_DOWN
-        .byte   $04             ; JOY_LEFT
-        .byte   $08             ; JOY_RIGHT
-        .byte   $10             ; JOY_FIRE
-        .byte   $00             ; JOY_FIRE2 unavailable
-        .byte   $00             ; Future expansion
-        .byte   $00             ; Future expansion
-
 ; Jump table.
 
         .addr   INSTALL
         .addr   UNINSTALL
         .addr   COUNT
         .addr   READ
-        .addr   0               ; IRQ entry unused
 
 ; ------------------------------------------------------------------------
 ; Constants
@@ -97,7 +85,7 @@ READ:
 joy1:
         lda     #0
         sta     VIA_DDRA
-        lda     VIA_PRA
+        lda     VIA_PA1
         and     #$0f
         cmp     #$0c
         bne     @notc1
@@ -114,7 +102,7 @@ joy1:
 joy2:
         lda     #0
         sta     VIA_DDRA
-        lda     VIA_PRA
+        lda     VIA_PA1
         lsr
         lsr
         lsr

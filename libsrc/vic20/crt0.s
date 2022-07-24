@@ -8,12 +8,11 @@
         .import         zerobss, push0
         .import         callmain
         .import         RESTOR, BSOUT, CLRCH
-        .import         __RAM_START__, __RAM_SIZE__     ; Linker generated
+        .import         __MAIN_START__, __MAIN_SIZE__   ; Linker generated
         .import         __STACKSIZE__                   ; Linker generated
         .importzp       ST
 
         .include        "zeropage.inc"
-        .include        "vic20.inc"
 
 ; ------------------------------------------------------------------------
 ; Startup code
@@ -44,10 +43,10 @@ L1:     lda     sp,x
         tsx
         stx     spsave          ; Save the system stack ptr
 
-        lda     #<(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
+        lda     #<(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
+        ldx     #>(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
         sta     sp
-        lda     #>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
-        sta     sp+1            ; Set argument stack ptr
+        stx     sp+1            ; Set argument stack ptr
 
 ; Call the module constructors.
 
@@ -86,7 +85,7 @@ L2:     lda     zpsave,x
 
 ; ------------------------------------------------------------------------
 
-.segment        "INITBSS"
+.segment        "INIT"
 
 zpsave: .res    zpspace
 

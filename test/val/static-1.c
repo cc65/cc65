@@ -13,6 +13,7 @@
 
 static int n = 0;
 extern int n;           /* should not give an error */
+static int n;           /* should not give an error */
 
 int main(void)
 {

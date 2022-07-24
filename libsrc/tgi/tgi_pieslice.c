@@ -57,8 +57,8 @@ void __fastcall__ tgi_pieslice (int x, int y, unsigned char rx, unsigned char ry
     tgi_arc (x, y, rx, ry, sa, ea);
 
     /* ... and close it */
-    tgi_line (x, y, x + tgi_imulround (rx, cc65_cos (sa)), y - tgi_imulround (ry, cc65_sin (sa)));
-    tgi_line (x, y, x + tgi_imulround (rx, cc65_cos (ea)), y - tgi_imulround (ry, cc65_sin (ea)));
+    tgi_line (x, y, x + tgi_imulround (rx, _cos (sa)), y - tgi_imulround (ry, _sin (sa)));
+    tgi_line (x, y, x + tgi_imulround (rx, _cos (ea)), y - tgi_imulround (ry, _sin (ea)));
 }
 
 

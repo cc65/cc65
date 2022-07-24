@@ -5,95 +5,78 @@
 
         .export         _cputcxy, _cputc, cputdirect, putchar
         .export         newline, plot
-        .import         popa, _gotoxy
+        .forceimport    initconio       ; force conio initiation
+
+        .import         gotoxy
         .import         PLOT
         .import         xsize
-
-        .importzp       tmp3,tmp4
+        .importzp       tmp3, tmp4
 
         .include        "pce.inc"
         .include        "extzp.inc"
 
 _cputcxy:
         pha                     ; Save C
-        jsr     popa            ; Get Y
-        jsr     _gotoxy         ; Set cursor, drop x
+        jsr     gotoxy          ; Set cursor, drop x and y
         pla                     ; Restore C
 
 ; Plot a character - also used as internal function
 
-_cputc: cmp     #$0d            ; CR?
+_cputc: cmp     #$0D            ; CR?
         bne     L1
-        lda     #0
-        sta     CURS_X
-        beq     plot            ; Recalculate pointers
+        stz     CURS_X
+        bra     plot            ; Recalculate pointer
 
-L1:     cmp     #$0a            ; LF?
-        beq     newline         ; Recalculate pointers
+L1:     cmp     #$0A            ; LF?
+        beq     newline         ; Recalculate pointer
 
 ; Printable char of some sort
 
 cputdirect:
         jsr     putchar         ; Write the character to the screen
 
-; Advance cursor position
+; Move the cursor (rightwards) to the next position.
 
 advance:
         ldy     CURS_X
         iny
         cpy     xsize
         bne     L3
-        jsr     newline         ; new line
-        ldy     #0              ; + cr
+        inc     CURS_Y          ; new line
+        cly                     ; + CR
 L3:     sty     CURS_X
-        jmp     plot
 
-newline:
-        inc     CURS_Y
-
-; Set cursor position, calculate RAM pointers
+; Set cursor position; calculate VRAM pointer.
 
 plot:   ldy     CURS_X
         ldx     CURS_Y
         clc
         jmp     PLOT            ; Set the new cursor
 
-; Write one character to the screen without doing anything else, return X
-; position in Y
+newline:
+        inc     CURS_Y
+        bra     plot
+
+; Write one character to the screen without doing anything else.
 
 putchar:
+        ora     RVS             ; Set reverse bit
 
-        ora     RVS             ; Set revers bit
+        st0     #VDC_MAWR       ; Memory-Address Write
+        ldy     SCREEN_PTR
+        ldx     SCREEN_PTR+1
+        sty     VDC_DATA_LO
+        stx     VDC_DATA_HI
 
-        tax
+        st0     #VDC_VWR        ; VRAM Write Register
+        sta     VDC_DATA_LO     ; character
 
-        st0     #VDC_MAWR       ; Memory Adress Write
-
-        lda     SCREEN_PTR
-        sta     a:VDC_DATA_LO
-
-        lda     SCREEN_PTR + 1
-        sta     a:VDC_DATA_HI
-
-        st0     #VDC_VWR        ; VWR
-
-        txa
-        sta     a:VDC_DATA_LO   ; character
-
-        lda     CHARCOLOR
-
+        lda     CHARCOLOR       ; palette number
         asl     a
         asl     a
         asl     a
         asl     a
-
-        ora     #$02
-        sta     a:VDC_DATA_HI
+        ora     #>$0200         ; high nybble of char. index
+        sta     VDC_DATA_HI
 
         rts
-
-;-------------------------------------------------------------------------------
-; force the init constructor to be imported
-
-        .import initconio
-conio_init      = initconio

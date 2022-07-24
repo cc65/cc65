@@ -1,0 +1,1033 @@
+<!doctype linuxdoc system>
+
+<article>
+<title>Tiny Graphics Interface
+<author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
+<url url="mailto:polluks@sdf.lonestar.org" name="Stefan A. Haubenthal">,<newline>
+<url url="mailto:greg.king5@verizon.net" name="Greg King">
+
+<abstract>
+The cc65 library provides functions for platform independent graphics.
+Include the tgi.h header file to get the necessary definitions, see also
+<tt>samples/tgidemo.c</tt> and <tt>samples/mandelbrot.c</tt>.
+</abstract>
+
+<!-- Begin the document -->
+
+<sect>tgi.h<label id="tgi.h">
+
+<sect1>tgi_arc<label id="tgi_arc"><p>
+
+<quote>
+<descrip>
+<tag/Function/Draw an elliptic arc in the current color.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/void __fastcall__ tgi_arc (int x, int y,
+unsigned char rx, unsigned char ry, unsigned sa, unsigned ea);/
+<tag/Description/The function draws an elliptic arc with center at x/y and
+radii rx/ry using the current drawing color. The arc covers the angle
+between sa and ea (startangle and endangle), which must be in the range
+0..360.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>The function behaves unexpectedly or may crash if the angles are out
+of range.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="tgi_bar" name="tgi_bar">,
+<ref id="tgi_circle" name="tgi_circle">,
+<ref id="tgi_ellipse" name="tgi_ellipse">,
+<ref id="tgi_pieslice" name="tgi_pieslice">,
+<ref id="tgi_setcolor" name="tgi_setcolor">
+<tag/Example/<tscreen><verb>
+/* Draw the upper half of an ellipse */
+tgi_setcolor(TGI_COLOR_BLUE);
+tgi_arc (50, 50, 40, 20, 0, 180);
+</verb></tscreen>
+</descrip>
+</quote>
+
+
+<sect1>tgi_bar<label id="tgi_bar"><p>
+
+<quote>
+<descrip>
+<tag/Function/The function fills a rectangle on the drawpage with the current
+color.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/void __fastcall__ tgi_bar (int x1, int y1, int x2, int y2);/
+<tag/Description/The function fills a rectangle on the drawpage with the current
+color.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/Other tgi function
+<tag/Example/<tscreen><verb>
+tgi_setcolor(TGI_COLOR_GREEN);
+tgi_bar(10, 10, 100, 60);
+</verb></tscreen>
+</descrip>
+</quote>
+
+
+<sect1>tgi_circle<label id="tgi_circle"><p>
+
+<quote>
+<descrip>
+<tag/Function/The function draws a circle in the current color.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/void __fastcall__ tgi_circle (int x, int y, unsigned char radius);/
+<tag/Description/The function draws a circle in the current color.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="tgi_arc" name="tgi_arc">,
+<ref id="tgi_bar" name="tgi_bar">,
+<ref id="tgi_ellipse" name="tgi_ellipse">,
+<ref id="tgi_pieslice" name="tgi_pieslice">,
+<ref id="tgi_setcolor" name="tgi_setcolor">
+<tag/Example/<tscreen><verb>
+tgi_setcolor(TGI_COLOR_BLACK);
+tgi_circle(50, 40, 40);
+</verb></tscreen>
+</descrip>
+</quote>
+
+
+<sect1>tgi_clear<label id="tgi_clear"><p>
+
+<quote>
+<descrip>
+<tag/Function/Clear the drawpage
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/void tgi_clear (void);/
+<tag/Description/Clear the drawpage
+<tag/Availability/cc65
+<tag/See also/Other tgi functions
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_done<label id="tgi_done"><p>
+
+<quote>
+<descrip>
+<tag/Function/End graphics mode, switch back to text mode.
+Will NOT uninstall or unload the driver!
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/void tgi_done (void);/
+<tag/Description/End graphics mode, switch back to text mode.
+Will NOT uninstall or unload the driver!
+<tag/Availability/cc65
+<tag/See also/Other tgi functions
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_ellipse<label id="tgi_ellipse"><p>
+
+<quote>
+<descrip>
+<tag/Function/The function draws an ellipse in the current color.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/void __fastcall__ tgi_ellipse (int x, int y, unsigned char rx, unsigned char ry);/
+<tag/Description/The function draws an ellipse at position x/y with radii
+rx and ry, using the current drawing color.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="tgi_arc" name="tgi_arc">,
+<ref id="tgi_bar" name="tgi_bar">,
+<ref id="tgi_circle" name="tgi_circle">,
+<ref id="tgi_pieslice" name="tgi_pieslice">,
+<ref id="tgi_setcolor" name="tgi_setcolor">
+<tag/Example/<tscreen><verb>
+tgi_setcolor(TGI_COLOR_RED);
+tgi_ellipse (50, 40, 40, 20);
+</verb></tscreen>
+</descrip>
+</quote>
+
+
+<sect1>tgi_free_vectorfont<label id="tgi_free_vectorfont"><p>
+
+<quote>
+<descrip>
+<tag/Function/Free a vector font that was previously loaded into memory.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/void __fastcall__ tgi_free_vectorfont (const tgi_vectorfont* font);/
+<tag/Description/Free a vector font that was previously loaded into memory.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="tgi_load_vectorfont" name="tgi_load_vectorfont">,
+<ref id="tgi_install_vectorfont" name="tgi_install_vectorfont">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_getaspectratio<label id="tgi_getaspectratio"><p>
+
+<quote> <descrip> <tag/Function/Return the pixel aspect ratio.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/unsigned tgi_getaspectratio (void);/
+<tag/Description/The function returns the pixel aspect ratio for the current
+driver and display as an 8.8 fixed point value. It may be used to correct
+geometric shapes so they look correct on the display. As an example, a circle
+with a radius of 100 pixels may look elliptic on some driver/display
+combinations if the aspect ratio is not 1.00.
+<tag/Notes/<itemize>
+<item>The aspect ratio is encoded in the TGI driver which assumes a "standard"
+monitor for the given platform. The aspect ratio may be wrong if another
+monitor is used.
+<item>No TGI function will use the aspect ratio. It is up to the programmer to
+make use of it.
+<item>The <ref id="tgi_setaspectratio" name="tgi_setaspectratio"> function can
+be used to change the aspect ratio for a loaded driver. The value is not reset
+by <ref id="tgi_init" name="tgi_init">, so if a driver is linked statically to
+an application, switching into and out of graphics mode will not restore the
+original aspect ratio.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="tgi_setaspectratio" name="tgi_setaspectratio">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_getcolor<label id="tgi_getcolor"><p>
+
+<quote>
+<descrip>
+<tag/Function/Return the current drawing color.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/unsigned char tgi_getcolor (void);/
+<tag/Description/The actual color is an index to a palette. During tgi_init
+you will get a default palette. The number of colors depend on the platform.
+All platforms recognize at least TGI_COLOR_BLACK and TGI_COLOR_WHITE. But some
+platforms have many more predefined colors. If you paint using TGI_COLOR_GREEN
+and then you change the green of the palette to blue using tgi_setpalette then
+after this painting in TGI_COLOR_GREEN will actually be blue.
+<tag/Availability/cc65
+<tag/See also/Other tgi functions
+<tag/Example/<tscreen><verb>
+color = tgi_getcolor();
+</verb></tscreen>
+</descrip>
+</quote>
+
+
+<sect1>tgi_getcolorcount<label id="tgi_getcolorcount"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get the number of available colors.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/unsigned char tgi_getcolorcount (void);/
+<tag/Description/TGI platforms use indexed color palettes. This function
+returns the number of entries we can use in the palette.
+
+<tt/tgi_setcolor()/ can accept numbers from <tt/0/ to <tt/255/.  That is 256
+possible colors, but an <tt/(unsigned char)/ cannot hold that number.
+Therefore, the number zero is used to indicate when a palette has 256 entries.
+A portable program should test for that number, and do appropriate actions.
+A program might assign the count to an <tt/unsigned int/ (and change a zero to
+a 256).  Or, it might rely on the fact that <tt/(unsigned char)/ will
+"wrap-around" when it is incremented beyond 255.
+<tag/Availability/cc65
+<tag/See also/<ref id="tgi_getcolor" name="tgi_getcolor()">,
+<ref id="tgi_getdefpalette" name="tgi_getdefpalette()">,
+<ref id="tgi_getmaxcolor" name="tgi_getmaxcolor()">,
+<ref id="tgi_getpalette" name="tgi_getpalette()">,
+<ref id="tgi_setcolor" name="tgi_setcolor()">,
+<ref id="tgi_setpalette" name="tgi_setpalette()">
+<tag/Examples/<tscreen><verb>
+if (tgi_getcolorcount() == 2) {
+  printf("Only monochrome graphics is supported\n");
+}
+
+static unsigned char num_colors;
+static unsigned char color;
+...
+num_colors = tgi_getcolorcount();
+...
+++color;
+if (num_colors == 0) {
+  tgi_setcolor(color);
+} else {
+  tgi_setcolor(color % num_colors);
+}
+</verb></tscreen>
+</descrip>
+</quote>
+
+
+<sect1>tgi_getdefpalette<label id="tgi_getdefpalette"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get the palette installed by default.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/const unsigned char* tgi_getdefpalette (void);/
+<tag/Description/The tgi driver has a default palette that is active at startup.
+The named colors TGI_COLOR_BLACK, TGI_COLOR_WHITE, TGI_COLOR_RED... need this
+palette to work correctly.
+<tag/Availability/cc65
+<tag/See also/Other tgi functions
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_geterror<label id="tgi_geterror"><p>
+
+<quote>
+<descrip>
+<tag/Function/Return the error code for the last operation.
+This will also clear the error.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/unsigned char tgi_geterror (void);/
+<tag/Description/Return the error code for the last operation.
+This will also clear the error.
+<tag/Availability/cc65
+<tag/See also/Other tgi functions
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_geterrormsg<label id="tgi_geterrormsg"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get an error message describing the error.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/const char* __fastcall__ tgi_geterrormsg (unsigned char code);/
+<tag/Description/Get an error message describing the error.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/Other tgi functions
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_getmaxcolor<label id="tgi_getmaxcolor"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get the highest index of the palette.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/unsigned char tgi_getmaxcolor (void);/
+<tag/Description/Get the highest index of the palette.
+<tag/Availability/cc65
+<tag/See also/<ref id="tgi_getcolor" name="tgi_getcolor()">,
+<ref id="tgi_getcolorcount" name="tgi_getcolorcount()">,
+<ref id="tgi_getdefpalette" name="tgi_getdefpalette()">,
+<ref id="tgi_getpalette" name="tgi_getpalette()">,
+<ref id="tgi_setcolor" name="tgi_setcolor()">,
+<ref id="tgi_setpalette" name="tgi_setpalette()">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_getmaxx<label id="tgi_getmaxx"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get the maximum x coordinate that can be used on this screen.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/unsigned tgi_getmaxx (void);/
+<tag/Description/Get the maximum x coordinate that can be used on this screen.
+<tag/Availability/cc65
+<tag/See also/Other tgi functions
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_getmaxy<label id="tgi_getmaxy"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get the maximum y coordinate that can be used on this screen.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/unsigned tgi_getmaxy (void);/
+<tag/Description/Get the maximum y coordinate that can be used on this screen.
+<tag/Availability/cc65
+<tag/See also/Other tgi functions
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_getpagecount<label id="tgi_getpagecount"><p>
+
+<quote>
+<descrip>
+<tag/Function/Return the number of screen pages available.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/unsigned tgi_getpagecount (void);/
+<tag/Description/Return the number of screen pages available.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="tgi_setdrawpage" name="tgi_setdrawpage">,
+<ref id="tgi_setviewpage" name="tgi_setviewpage">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_getpalette<label id="tgi_getpalette"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get the palette installed.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/const unsigned char* tgi_getpalette (void);/
+<tag/Description/Get the palette installed.
+<tag/Availability/cc65
+<tag/See also/Other tgi functions
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_getpixel<label id="tgi_getpixel"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get the color of a pixel from the viewpage.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ tgi_getpixel (int x, int y);/
+<tag/Description/Get the color of a pixel from the viewpage.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/Other tgi functions.
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_gettextheight<label id="tgi_gettextheight"><p>
+
+<quote>
+<descrip>
+<tag/Function/Calculate the height of the text in pixels according to
+the current text style.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/unsigned __fastcall__ tgi_gettextheight (const char* s);/
+<tag/Description/Calculate the height of the text in pixels according to
+the current text style.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/Other tgi functions.
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_gettextwidth<label id="tgi_gettextwidth"><p>
+
+<quote>
+<descrip>
+<tag/Function/Calculate the width of the text in pixels according to the current text style.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/unsigned __fastcall__ tgi_gettextwidth (const char* s);/
+<tag/Description/Calculate the width of the text in pixels according to the current text style.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/Other tgi functions.
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_getxres<label id="tgi_getxres"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get number of horisontal pixels on the screen.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/unsigned tgi_getxres (void);/
+<tag/Description/Get number of horisontal pixels on the screen.
+This is same as tgi_maxx()+1.
+<tag/Availability/cc65
+<tag/See also/Other tgi functions.
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_getyres<label id="tgi_getyres"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get number of vertical pixels on the screen.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/unsigned tgi_getyres (void);/
+<tag/Description/Get number of vertical pixels on the screen.
+This is same as tgi_maxy()+1.
+<tag/Availability/cc65
+<tag/See also/Other tgi functions.
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_gotoxy<label id="tgi_gotoxy"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set graphics cursor at x, y.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/void __fastcall__ tgi_gotoxy (int x, int y);/
+<tag/Description/Set graphics cursor at x, y.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/Other tgi functions.
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_init<label id="tgi_init"><p>
+
+<quote>
+<descrip>
+<tag/Function/Initialize the already loaded graphics driver.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/void tgi_init (void);/
+<tag/Description/The tgi_init function will set the default palette to the
+hardware.
+<tag/Notes/<itemize>
+<item><tt/tgi_init/ will not clear the screen. This allows switching between
+text and graphics mode on platforms that have separate memory areas for the
+screens. If you want the screen cleared, call <tt/<ref id="tgi_clear"
+name="tgi_clear">/ after <tt/tgi_init/.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/Other tgi functions.
+<tag/Example/<tscreen><verb>
+tgi_install(tgi_static_stddrv); //Include the driver statically instead of loading it.
+tgi_init(); //Set up the default palette and clear the screen.
+</verb></tscreen>
+</descrip>
+</quote>
+
+
+<sect1>tgi_install<label id="tgi_install"><p>
+
+<quote>
+<descrip>
+<tag/Function/Install an already loaded driver and return an error code.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ tgi_install (const void* driver);/
+<tag/Description/The function installs a driver that was already loaded into
+memory (or linked statically to the program). It returns an error code
+(<tt/TGI_ERR_OK/ in case of success).
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="tgi_load_driver" name="tgi_load_driver">,
+<ref id="tgi_uninstall" name="tgi_uninstall">,
+<ref id="tgi_unload" name="tgi_unload">
+<tag/Example/<tscreen><verb>
+tgi_install(tgi_static_stddrv); //Include the driver statically instead of loading it.
+tgi_init(); //Set up the default palette and clear the screen.
+</verb></tscreen>
+</descrip>
+</quote>
+
+
+<sect1>tgi_install_vectorfont<label id="tgi_install_vectorfont"><p>
+
+<quote>
+<descrip>
+<tag/Function/Install an already loaded driver and return an error code.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/void __fastcall__ tgi_install_vectorfont (const tgi_vectorfont* font);/
+<tag/Description/
+Install a vector font for use. More than one vector font can be loaded,
+but only one can be active. This function is used to tell which one. Call
+with a NULL pointer to uninstall the currently installed font.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="tgi_load_vectorfont" name="tgi_load_vectorfont">,
+<ref id="tgi_free_vectorfont" name="tgi_free_vectorfont">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_ioctl<label id="tgi_ioctl"><p>
+
+<quote>
+<descrip>
+<tag/Function/Platform dependent code extensions.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/unsigned __fastcall__ tgi_ioctl (unsigned char code, void* data);/
+<tag/Description/Some platforms have extra display hardware that is not
+supported by standard tgi functions. You can extend the driver to support
+this extra hardware using tgi_ioctl functions.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>These functions are not easily portable to other cc65 platforms.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/Other tgi functions.
+<tag/Example/<tscreen><verb>
+#define tgi_sprite(spr) tgi_ioctl(0, (void*)(spr))
+#define tgi_flip() tgi_ioctl(1, (void*)0)
+#define tgi_setbgcolor(bgcol) tgi_ioctl(2, (void*)(bgcol))
+#define tgi_setframerate(rate) tgi_ioctl(3, (void*)(rate))
+#define tgi_busy() tgi_ioctl(4, (void*)0)
+#define tgi_updatedisplay() tgi_ioctl(4, (void*)1)
+if (!tgi_busy()) {
+  tgi_sprite(&amp;background);
+  tgi_setcolor(TGI_COLOR_BLUE);
+  tgi_outttextxy(20,40,"Hello World");
+  tgi_updatedisplay();
+}
+</verb></tscreen>
+</descrip>
+</quote>
+
+
+<sect1>tgi_line<label id="tgi_line"><p>
+
+<quote>
+<descrip>
+<tag/Function/Draw a line in the current drawing color.
+The graphics cursor will be set to x2/y2 by this call.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/void __fastcall__ tgi_line (int x1, int y1, int x2, int y2);/
+<tag/Description/Draw a line in the current drawing color.
+The graphics cursor will be set to x2/y2 by this call.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/Other tgi functions.
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_lineto<label id="tgi_lineto"><p>
+
+<quote>
+<descrip>
+<tag/Function/Draw a line in the current drawing color from the graphics
+cursor to the new end point. The graphics cursor will be updated to x2/y2.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/void __fastcall__ tgi_lineto (int x2, int y2);/
+<tag/Description/Draw a line in the current drawing color from the graphics
+cursor to the new end point. The graphics cursor will be updated to x2/y2.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/Other tgi functions.
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_load_driver<label id="tgi_load_driver"><p>
+
+<quote>
+<descrip>
+<tag/Function/Load and install the given driver.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/void __fastcall__ tgi_load_driver (const char *name);/
+<tag/Description/Load and install the driver by name.
+Will just load the driver and check if loading was successful.
+Will not switch to graphics mode.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/Other tgi functions.
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_load_vectorfont<label id="tgi_load_vectorfont"><p>
+
+<quote>
+<descrip>
+<tag/Function/Load the given vector font.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/const tgi_vectorfont* __fastcall__ tgi_load_vectorfont (const char* name);/
+<tag/Description/
+Load a vector font into memory and return it. In case of errors, NULL is
+returned and an error is set, which can be retrieved using tgi_geterror.
+To use the font, it has to be installed using tgi_install_vectorfont.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="tgi_install_vectorfont" name="tgi_install_vectorfont">,
+<ref id="tgi_free_vectorfont" name="tgi_free_vectorfont">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_outtext<label id="tgi_outtext"><p>
+
+<quote>
+<descrip>
+<tag/Function/Output text at the current graphics cursor position.
+The graphics cursor is moved to the end of the text.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/void __fastcall__ tgi_outtext (const char* s);/
+<tag/Description/Output text at the current graphics cursor position.
+The graphics cursor is moved to the end of the text.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/Other tgi functions.
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_outtextxy<label id="tgi_outtextxy"><p>
+
+<quote>
+<descrip>
+<tag/Function/Output text at the given cursor position.
+The graphics cursor is moved to the end of the text.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/void __fastcall__ tgi_outtextxy (int x, int y, const char* s);/
+<tag/Description/Output text at the given cursor position.
+The graphics cursor is moved to the end of the text.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/Other tgi functions.
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_pieslice<label id="tgi_pieslice"><p>
+
+<quote>
+<descrip>
+<tag/Function/Draw an elliptic pie slice in the current color.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/void __fastcall__ tgi_pie slice (int x, int y,
+unsigned char rx, unsigned char ry, unsigned sa, unsigned ea);/
+<tag/Description/The function draws an elliptic pie slice with center at x/y
+and radii rx/ry using the current drawing color. The pie slice covers the angle
+between sa and ea (startangle and endangle), which must be in the range
+0..360.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>The function behaves unexpectedly or may crash if the angles are out
+of range.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="tgi_bar" name="tgi_arc">,
+<ref id="tgi_bar" name="tgi_bar">,
+<ref id="tgi_circle" name="tgi_circle">,
+<ref id="tgi_ellipse" name="tgi_ellipse">,
+<ref id="tgi_setcolor" name="tgi_setcolor">
+<tag/Example/<tscreen><verb>
+/* Draw the closed upper half of an ellipse */
+tgi_setcolor(TGI_COLOR_BLUE);
+tgi_pieslice (50, 50, 40, 20, 0, 180);
+</verb></tscreen>
+</descrip>
+</quote>
+
+
+<sect1>tgi_setaspectratio<label id="tgi_setaspectratio"><p>
+
+<quote> <descrip> <tag/Function/Set the pixel aspect ratio.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/void __fastcall__ tgi_setaspectratio (unsigned ratio);/
+<tag/Description/The function sets the pixel aspect ratio for the current
+driver and display. The argument is an 8.8 fixed point value. The aspect ratio
+may be used to correct geometric shapes so they look correct on a given
+display. As an example, a circle with a radius of 100 pixels may look elliptic
+on some driver/display combinations if the aspect ratio is not 1.00.
+<tag/Notes/<itemize>
+<item>The aspect ratio is encoded in the TGI driver which assumes a "standard"
+monitor for the given platform. The aspect ratio may be wrong if another
+monitor is used.
+<item>No TGI function will use the aspect ratio. It is up to the programmer to
+make use of it.
+<item>The <tt/tgi_setaspectratio/ function can be used to change the aspect
+ratio for a loaded driver. The value is not reset by <ref id="tgi_init"
+name="tgi_init">, so if a driver is linked statically to an application,
+switching into and out of graphics mode will not restore the original aspect
+ratio.
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="tgi_getaspectratio" name="tgi_getaspectratio">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_setcolor<label id="tgi_setcolor"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set color to be used in future draw operations.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/void __fastcall__ tgi_setcolor (unsigned char color);/
+<tag/Description/Set color to be used in future draw operations.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/Other tgi functions.
+<tag/Example/<tscreen><verb>
+tgi_setcolor(TGI_COLOR_BLACK);
+tgi_bar(0,0,30,30);
+tgi_setcolor(TGI_COLOR_WHITE);
+tgi_bar(10,10,20,20);
+</verb></tscreen>
+</descrip>
+</quote>
+
+
+<sect1>tgi_setdrawpage<label id="tgi_setdrawpage"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set the page for drawing.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/void __fastcall__ tgi_setdrawpage (unsigned char page);/
+<tag/Description/If the drawpage and the viewpage are the same then all drawing
+is seen immediately as it is drawn. For double buffered games you can set the
+drawpage to a different page than the viewpage. This lets you draw the next
+screen in the background and when the screen is ready you display it.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/Other tgi functions.
+<tag/Example/<tscreen><verb>
+tgi_setdrawpage(1);
+tgi_outtextxy(10, 10, "Hello World");
+tgi_setviewpage(1); // Show page 1
+tgi_setdrawpage(0);
+tgi_outtextxy(10, 10, "Creating next frame");
+...
+tgi_setviewpage(0); // Show page 0
+</verb></tscreen>
+</descrip>
+</quote>
+
+
+<sect1>tgi_setpalette<label id="tgi_setpalette"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set the palette (not available with all drivers/hardware).
+Palette is a pointer to as many entries as there are colors.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/void __fastcall__ tgi_setpalette (const unsigned char* palette);/
+<tag/Description/Set the palette (not available with all drivers/hardware).
+Palette is a pointer to as many entries as there are colors.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/Other tgi functions.
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_setpixel<label id="tgi_setpixel"><p>
+
+<quote>
+<descrip>
+<tag/Function/Plot a pixel on the drawpage with the current color.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/void __fastcall__ tgi_setpixel (int x, int y);/
+<tag/Description/Plot a pixel on the drawpage with the current color.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/Other tgi functions.
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_settextscale<label id="tgi_settextscale"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set the scaling for text output.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/void __fastcall__ tgi_settextscale (unsigned width, unsigned height);/
+<tag/Description/
+Set the scaling for text output. The scaling factors for width and height
+are 8.8 fixed point values. This means that $100 = 1 $200 = 2 etc.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="tgi_settextstyle" name="tgi_settextstyle">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_settextstyle<label id="tgi_settextstyle"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set the style for text output.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/void __fastcall__ tgi_settextstyle (unsigned char magx, unsigned char magy, unsigned char dir, unsigned char font);/
+<tag/Description/Set the style for text output.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="tgi_settextscale" name="tgi_settextscale">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_setviewpage<label id="tgi_setviewpage"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set page to be visible on screen.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/void __fastcall__ tgi_setviewpage (unsigned char page);/
+<tag/Description/If the drawpage and the viewpage are the same then all drawing
+is seen immediately as it is drawn. For double buffered games you can set the
+drawpage to a different page than the viewpage. This lets you draw the next
+screen in the background and when the screen is ready you display it.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/Other tgi functions.
+<tag/Example/<tscreen><verb>
+tgi_setdrawpage(1);
+tgi_outtextxy(10, 10, "Hello World");
+tgi_setviewpage(1); // Show page 1
+tgi_setdrawpage(0);
+tgi_outtextxy(10, 10, "Creating next frame");
+...
+tgi_setviewpage(0); // Show page 0
+</verb></tscreen>
+</descrip>
+</quote>
+
+
+<sect1>tgi_uninstall<label id="tgi_uninstall"><p>
+
+<quote>
+<descrip>
+<tag/Function/Uninstall the currently loaded driver but do not unload it.
+Will call tgi_done if necessary.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/void tgi_uninstall (void);/
+<tag/Description/Uninstall the currently loaded driver but do not unload it.
+Will call tgi_done if necessary.
+<tag/Availability/cc65
+<tag/See also/Other tgi functions.
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_unload<label id="tgi_unload"><p>
+
+<quote>
+<descrip>
+<tag/Function/Uninstall, then unload the currently loaded driver.
+Will call tgi_done if necessary.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/void tgi_unload (void);/
+<tag/Description/Uninstall, then unload the currently loaded driver.
+Will call tgi_done if necessary.
+<tag/Availability/cc65
+<tag/See also/Other tgi functions.
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+</article>

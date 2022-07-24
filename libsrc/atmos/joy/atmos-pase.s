@@ -28,24 +28,12 @@
 
         .addr   $0000
 
-; Button state masks (8 values)
-
-        .byte   $10                     ; JOY_UP
-        .byte   $08                     ; JOY_DOWN
-        .byte   $01                     ; JOY_LEFT
-        .byte   $02                     ; JOY_RIGHT
-        .byte   $20                     ; JOY_FIRE
-        .byte   $00                     ; Future expansion
-        .byte   $00                     ; Future expansion
-        .byte   $00                     ; Future expansion
-
 ; Jump table.
 
         .addr   INSTALL
         .addr   UNINSTALL
         .addr   COUNT
         .addr   READ
-        .addr   0                       ; IRQ entry unused
 
 ; ------------------------------------------------------------------------
 ; Constants

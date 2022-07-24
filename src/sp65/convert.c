@@ -106,7 +106,7 @@ StrBuf* ConvertTo (const Bitmap* B, const Collection* A)
                  sizeof (ConverterMap[0]),
                  Compare);
     if (E == 0) {
-        Error ("No such target format: `%s'", Format);
+        Error ("No such target format: '%s'", Format);
     }
 
     /* Do the conversion */

@@ -1,14 +1,14 @@
 ;
-; Serial driver for the builtin 6551 ACIA of the Plus/4.
+; Serial driver for the built-in 6551 ACIA of the Plus/4.
 ;
 ; Ullrich von Bassewitz, 2003-12-13
 ;
 ; The driver is based on the cc65 rs232 module, which in turn is based on
-; Craig Bruce device driver for the Switftlink/Turbo-232.
+; Craig Bruce's device driver for the Switftlink/Turbo-232.
 ;
 ; SwiftLink/Turbo-232 v0.90 device driver, by Craig Bruce, 14-Apr-1998.
 ;
-; This software is Public Domain.  It is in Buddy assembler format.
+; This (C. Bruce) software is Public Domain.  It is in Buddy assembler format.
 ;
 ; This device driver uses the SwiftLink RS-232 Serial Cartridge, available from
 ; Creative Micro Designs, Inc, and also supports the extensions of the Turbo232
@@ -17,7 +17,7 @@
 ;
 ; The code assumes that the kernal + I/O are in context.  On the C128, call
 ; it from Bank 15.  On the C64, don't flip out the Kernal unless a suitable
-; NMI catcher is put into the RAM under then Kernal.  For the SuperCPU, the
+; NMI catcher is put into the RAM under the Kernal.  For the SuperCPU, the
 ; interrupt handling assumes that the 65816 is in 6502-emulation mode.
 ;
 
@@ -36,7 +36,7 @@
 
 ; Driver signature
 
-        .byte   $73, $65, $72           ; "ser"
+        .byte   $73, $65, $72           ; ASCII "ser"
         .byte   SER_API_VERSION         ; Serial API version number
 
 ; Library reference
@@ -45,24 +45,24 @@
 
 ; Jump table
 
-        .word   INSTALL
-        .word   UNINSTALL
-        .word   OPEN
-        .word   CLOSE
-        .word   GET
-        .word   PUT
-        .word   STATUS
-        .word   IOCTL
-        .word   IRQ
+        .word   SER_INSTALL
+        .word   SER_UNINSTALL
+        .word   SER_OPEN
+        .word   SER_CLOSE
+        .word   SER_GET
+        .word   SER_PUT
+        .word   SER_STATUS
+        .word   SER_IOCTL
+        .word   SER_IRQ
 
 ;----------------------------------------------------------------------------
 ; I/O definitions
 
-ACIA            = $DE00
-ACIA_DATA       = ACIA+0        ; Data register
-ACIA_STATUS     = ACIA+1        ; Status register
-ACIA_CMD        = ACIA+2        ; Command register
-ACIA_CTRL       = ACIA+3        ; Control register
+ACIA            := $FD00
+ACIA_DATA       := ACIA+0       ; Data register
+ACIA_STATUS     := ACIA+1       ; Status register
+ACIA_CMD        := ACIA+2       ; Command register
+ACIA_CTRL       := ACIA+3       ; Control register
 
 ;----------------------------------------------------------------------------
 ;
@@ -130,25 +130,25 @@ ParityTable:
 .code
 
 ;----------------------------------------------------------------------------
-; INSTALL routine. Is called after the driver is loaded into memory. If
+; SER_INSTALL routine. Is called after the driver is loaded into memory. If
 ; possible, check if the hardware is present.
 ; Must return an SER_ERR_xx code in a/x.
 ;
 ; Since we don't have to manage the IRQ vector on the Plus/4, this is actually
 ; the same as:
 ;
-; UNINSTALL routine. Is called before the driver is removed from memory.
+; SER_UNINSTALL routine. Is called before the driver is removed from memory.
 ; Must return an SER_ERR_xx code in a/x.
 ;
 ; and:
 ;
-; CLOSE: Close the port, disable interrupts and flush the buffer. Called
+; SER_CLOSE: Close the port, disable interrupts and flush the buffer. Called
 ; without parameters. Must return an error code in a/x.
 ;
 
-INSTALL:
-UNINSTALL:
-CLOSE:
+SER_INSTALL:
+SER_UNINSTALL:
+SER_CLOSE:
 
 ; Deactivate DTR and disable 6551 interrupts
 
@@ -165,7 +165,7 @@ CLOSE:
 ; PARAMS routine. A pointer to a ser_params structure is passed in ptr1.
 ; Must return an SER_ERR_xx code in a/x.
 
-OPEN:
+SER_OPEN:
 
 ; Check if the handshake setting is valid
 
@@ -244,12 +244,13 @@ InvBaud:
         rts
 
 ;----------------------------------------------------------------------------
-; GET: Will fetch a character from the receive buffer and store it into the
+; SER_GET: Will fetch a character from the receive buffer and store it into the
 ; variable pointer to by ptr1. If no data is available, SER_ERR_NO_DATA is
 ; return.
 ;
 
-GET:    ldx     SendFreeCnt             ; Send data if necessary
+SER_GET:
+        ldx     SendFreeCnt             ; Send data if necessary
         inx                             ; X == $FF?
         beq     @L1
         lda     #$00
@@ -288,11 +289,11 @@ GET:    ldx     SendFreeCnt             ; Send data if necessary
         rts
 
 ;----------------------------------------------------------------------------
-; PUT: Output character in A.
+; SER_PUT: Output character in A.
 ; Must return an error code in a/x.
 ;
 
-PUT:
+SER_PUT:
 
 ; Try to send
 
@@ -322,34 +323,37 @@ PUT:
         rts
 
 ;----------------------------------------------------------------------------
-; STATUS: Return the status in the variable pointed to by ptr1.
+; SER_STATUS: Return the status in the variable pointed to by ptr1.
 ; Must return an error code in a/x.
 ;
 
-STATUS: lda     ACIA_STATUS
+SER_STATUS:
+        lda     ACIA_STATUS
         ldx     #0
         sta     (ptr1,x)
         txa                             ; SER_ERR_OK
         rts
 
 ;----------------------------------------------------------------------------
-; IOCTL: Driver defined entry point. The wrapper will pass a pointer to ioctl
+; SER_IOCTL: Driver defined entry point. The wrapper will pass a pointer to ioctl
 ; specific data in ptr1, and the ioctl code in A.
 ; Must return an error code in a/x.
 ;
 
-IOCTL:  lda     #<SER_ERR_INV_IOCTL     ; We don't support ioclts for now
+SER_IOCTL:
+        lda     #<SER_ERR_INV_IOCTL     ; We don't support ioclts for now
         ldx     #>SER_ERR_INV_IOCTL
         rts                             ; Run into IRQ instead
 
 ;----------------------------------------------------------------------------
-; IRQ: Called from the builtin runtime IRQ handler as a subroutine. All
+; SER_IRQ: Called from the builtin runtime IRQ handler as a subroutine. All
 ; registers are already save, no parameters are passed, but the carry flag
 ; is clear on entry. The routine must return with carry set if the interrupt
 ; was handled, otherwise with carry clear.
 ;
 
-IRQ:    lda     ACIA_STATUS     ; Check ACIA status for receive interrupt
+SER_IRQ:
+        lda     ACIA_STATUS     ; Check ACIA status for receive interrupt
         and     #$08
         beq     @L9             ; Jump if no ACIA interrupt (carry still clear)
         lda     ACIA_DATA       ; Get byte from ACIA
@@ -405,5 +409,3 @@ IRQ:    lda     ACIA_STATUS     ; Check ACIA status for receive interrupt
         jmp     @L0
 
 .endproc
-
-

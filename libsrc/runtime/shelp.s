@@ -1,17 +1,17 @@
 ;
 ; Ullrich von Bassewitz, 07.08.1998
 ;
-; CC65 runtime: helper stuff for mod/div/mul with signed ints
+; CC65 runtime: helper stuff for mod/div with signed ints
 ;
 
 ; When negating values, we will ignore the possibility here, that one of the
-; values if $8000, in which case the negate will fail.
+; values is $8000, in which case the negate will fail.
 
-        .export         popsargs
-        .import         negax, popax
-        .importzp       sreg, tmp1, tmp2, ptr4
+        .export         popsargsudiv16
+        .import         negax, popax, udiv16
+        .importzp       tmp1, tmp2, ptr1, ptr4
 
-popsargs:
+popsargsudiv16:
         stx     tmp2            ; Remember sign
         cpx     #0
         bpl     L1
@@ -24,7 +24,6 @@ L1:     sta     ptr4
         cpx     #0
         bpl     L2
         jsr     negax
-L2:     sta     sreg
-        stx     sreg+1
-        rts
-
+L2:     sta     ptr1
+        stx     ptr1+1
+        jmp     udiv16            ; Call the division

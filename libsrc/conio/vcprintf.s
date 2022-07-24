@@ -5,7 +5,7 @@
 ;
 
         .export         _vcprintf
-        .import         pushax, popax
+        .import         pushax, popax, popptr1
         .import         __printf, _cputc
         .importzp       sp, ptr1, ptr2, ptr3, tmp1
 
@@ -47,16 +47,14 @@ outdesc:                        ; Static outdesc structure
 
 out:    jsr     popax           ; count
         sta     ptr2
-        eor     #$FF
-        sta     outdesc+6
-        txa
-        sta     ptr2+1
-        eor     #$FF
-        sta     outdesc+7
+        stx     ptr2+1
+        inx
+        stx     outdesc+7
+        tax
+        inx
+        stx     outdesc+6
 
-        jsr     popax           ; buf
-        sta     ptr1
-        stx     ptr1+1
+        jsr     popptr1         ; buf
 
         jsr     popax           ; d
         sta     ptr3
@@ -76,7 +74,7 @@ out:    jsr     popax           ; count
 
 ; Loop outputting characters
 
-@L1:    inc     outdesc+6
+@L1:    dec     outdesc+6
         beq     @L4
 @L2:    ldy     tmp1
         lda     (ptr1),y
@@ -87,7 +85,7 @@ out:    jsr     popax           ; count
         jsr     _cputc
         jmp     @L1
 
-@L4:    inc     outdesc+7
+@L4:    dec     outdesc+7
         bne     @L2
         rts
 

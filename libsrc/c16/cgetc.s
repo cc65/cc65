@@ -7,6 +7,7 @@
         .export         _cgetc
         .import         cursor
 
+        .include        "cbm_kernal.inc"
         .include        "plus4.inc"
 
 
@@ -56,18 +57,22 @@ L2:     jsr     KBDREAD         ; Read char and return in A
         .constructor    initkbd
         .destructor     donekbd
 
-.segment        "INIT"
+.segment        "ONCE"
 
 .proc   initkbd
 
-        ldy     #15
+        ldy     #7
 @L1:    lda     fnkeys,y
+        sta     FKEY_SPACE+8,y
+        lda     #$01            ; Lower 8 places are all $01
         sta     FKEY_SPACE,y
         dey
         bpl     @L1
         rts
 
 .endproc
+
+fnkeys: .byte   133, 137, 134, 138, 135, 139, 136, 140
 
 
 .code
@@ -82,11 +87,3 @@ L2:     jsr     KBDREAD         ; Read char and return in A
         rts
 
 .endproc
-
-
-; Function key table, readonly
-
-.rodata
-fnkeys: .byte   $01, $01, $01, $01, $01, $01, $01, $01
-        .byte   133, 137, 134, 138, 135, 139, 136, 140
-

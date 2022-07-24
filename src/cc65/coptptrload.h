@@ -233,7 +233,7 @@ unsigned OptPtrLoad11 (CodeSeg* S);
 */
 
 unsigned OptPtrLoad12 (CodeSeg* S);
-/* Search for the sequence:       
+/* Search for the sequence:
 **
 **      lda     regbank+n
 **      ldx     regbank+n+1
@@ -356,6 +356,53 @@ unsigned OptPtrLoad17 (CodeSeg* S);
 ** the step with less than 200% so it gets executed when -Oi is in effect.
 */
 
+unsigned OptPtrLoad18 (CodeSeg* S);
+/* Search for the sequence:
+**
+**      ldx     #$xx
+**      lda     #$yy
+**      clc
+**      adc     xxx
+**      bcc     L
+**      inx
+** L:   ldy     #$00
+**      jsr     ldauidx
+**
+** and replace it by:
+**
+**      ldy     xxx
+**      ldx     #$00
+**      lda     $xxyy,y
+**
+** This is similar to OptPtrLoad3 but works on a constant address
+** instead of a label. Also, the initial X and A loads are reversed.
+*/
+
+
+unsigned OptPtrLoad19 (CodeSeg* S);
+/* Search for the sequence:
+**
+**      ldx     #0
+**      and     #mask          (any value < 0x80)
+**      jsr     aslax1/shlax1
+**      clc
+**      adc     #<(label+0)
+**      tay
+**      txa
+**      adc     #>(label+0)
+**      tax
+**      tya
+**      ldy     #$01
+**      jsr     ldaxidx
+**
+** and replace it by:
+**
+**      and     #mask          (remove if == 0x7F)
+**      asl
+**      tay
+**      lda     label,y
+**      ldx     label+1,y
+*/
 
 
 /* End of coptptrload.h */

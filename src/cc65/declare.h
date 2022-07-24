@@ -57,6 +57,9 @@
 #define DS_DEF_STORAGE          0x0001U /* Default storage class used   */
 #define DS_DEF_TYPE             0x0002U /* Default type used            */
 #define DS_EXTRA_TYPE           0x0004U /* Extra type declared          */
+#define DS_NEW_TYPE_DECL        0x0010U /* New type declared            */
+#define DS_NEW_TYPE_DEF         0x0020U /* New type defined             */
+#define DS_NEW_TYPE             (DS_NEW_TYPE_DECL | DS_NEW_TYPE_DEF)
 
 /* Result of ParseDeclSpec */
 typedef struct DeclSpec DeclSpec;
@@ -93,6 +96,9 @@ typedef enum {
 
 
 
+void InitDeclSpec (DeclSpec* D);
+/* Initialize the DeclSpec struct for use */
+
 Type* ParseType (Type* Type);
 /* Parse a complete type specification */
 
@@ -106,11 +112,6 @@ void CheckEmptyDecl (const DeclSpec* D);
 /* Called after an empty type declaration (that is, a type declaration without
 ** a variable). Checks if the declaration does really make sense and issues a
 ** warning if not.
-*/
-
-unsigned ParseInit (Type* T);
-/* Parse initialization of variables. Return the number of initialized data
-** bytes.
 */
 
 

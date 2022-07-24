@@ -24,6 +24,7 @@ const char* const _sys_errlist[] = {
     "Illegal seek",                 /* ESPIPE */
     "Range error",                  /* ERANGE */
     "Bad file number",              /* EBADF */
+    "Exec format error",            /* ENOEXEC */
     "Unknown OS error code",        /* EUNKNOWN */
 };
 

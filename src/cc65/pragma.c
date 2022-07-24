@@ -37,6 +37,7 @@
 #include <string.h>
 
 /* common */
+#include "addrsize.h"
 #include "chartype.h"
 #include "segnames.h"
 #include "tgttrans.h"
@@ -45,12 +46,14 @@
 #include "codegen.h"
 #include "error.h"
 #include "expr.h"
+#include "funcdesc.h"
 #include "global.h"
 #include "litpool.h"
 #include "scanner.h"
 #include "scanstrbuf.h"
 #include "symtab.h"
 #include "pragma.h"
+#include "wrappedcall.h"
 
 
 
@@ -64,6 +67,7 @@
 typedef enum {
     PRAGMA_ILLEGAL = -1,
     PRAGMA_ALIGN,
+    PRAGMA_ALLOW_EAGER_INLINE,
     PRAGMA_BSS_NAME,
     PRAGMA_BSSSEG,                                      /* obsolete */
     PRAGMA_CHARMAP,
@@ -74,10 +78,12 @@ typedef enum {
     PRAGMA_CODESIZE,
     PRAGMA_DATA_NAME,
     PRAGMA_DATASEG,                                     /* obsolete */
+    PRAGMA_INLINE_STDFUNCS,
     PRAGMA_LOCAL_STRINGS,
+    PRAGMA_MESSAGE,
     PRAGMA_OPTIMIZE,
-    PRAGMA_REGVARADDR,
     PRAGMA_REGISTER_VARS,
+    PRAGMA_REGVARADDR,
     PRAGMA_REGVARS,                                     /* obsolete */
     PRAGMA_RODATA_NAME,
     PRAGMA_RODATASEG,                                   /* obsolete */
@@ -86,6 +92,7 @@ typedef enum {
     PRAGMA_STATIC_LOCALS,
     PRAGMA_STATICLOCALS,                                /* obsolete */
     PRAGMA_WARN,
+    PRAGMA_WRAPPED_CALL,
     PRAGMA_WRITABLE_STRINGS,
     PRAGMA_ZPSYM,
     PRAGMA_COUNT
@@ -96,31 +103,35 @@ static const struct Pragma {
     const char* Key;            /* Keyword */
     pragma_t    Tok;            /* Token */
 } Pragmas[PRAGMA_COUNT] = {
-    { "align",                  PRAGMA_ALIGN            },
-    { "bss-name",               PRAGMA_BSS_NAME         },
-    { "bssseg",                 PRAGMA_BSSSEG           },      /* obsolete */
-    { "charmap",                PRAGMA_CHARMAP          },
-    { "check-stack",            PRAGMA_CHECK_STACK      },
-    { "checkstack",             PRAGMA_CHECKSTACK       },      /* obsolete */
-    { "code-name",              PRAGMA_CODE_NAME        },
-    { "codeseg",                PRAGMA_CODESEG          },      /* obsolete */
-    { "codesize",               PRAGMA_CODESIZE         },
-    { "data-name",              PRAGMA_DATA_NAME        },
-    { "dataseg",                PRAGMA_DATASEG          },      /* obsolete */
-    { "local-strings",          PRAGMA_LOCAL_STRINGS    },
-    { "optimize",               PRAGMA_OPTIMIZE         },
-    { "register-vars",          PRAGMA_REGISTER_VARS    },
-    { "regvaraddr",             PRAGMA_REGVARADDR       },
-    { "regvars",                PRAGMA_REGVARS          },      /* obsolete */
-    { "rodata-name",            PRAGMA_RODATA_NAME      },
-    { "rodataseg",              PRAGMA_RODATASEG        },      /* obsolete */
-    { "signed-chars",           PRAGMA_SIGNED_CHARS     },
-    { "signedchars",            PRAGMA_SIGNEDCHARS      },      /* obsolete */
-    { "static-locals",          PRAGMA_STATIC_LOCALS    },
-    { "staticlocals",           PRAGMA_STATICLOCALS     },      /* obsolete */
-    { "warn",                   PRAGMA_WARN             },
-    { "writable-strings",       PRAGMA_WRITABLE_STRINGS },
-    { "zpsym",                  PRAGMA_ZPSYM            },
+    { "align",                  PRAGMA_ALIGN              },
+    { "allow-eager-inline",     PRAGMA_ALLOW_EAGER_INLINE },
+    { "bss-name",               PRAGMA_BSS_NAME           },
+    { "bssseg",                 PRAGMA_BSSSEG             },      /* obsolete */
+    { "charmap",                PRAGMA_CHARMAP            },
+    { "check-stack",            PRAGMA_CHECK_STACK        },
+    { "checkstack",             PRAGMA_CHECKSTACK         },      /* obsolete */
+    { "code-name",              PRAGMA_CODE_NAME          },
+    { "codeseg",                PRAGMA_CODESEG            },      /* obsolete */
+    { "codesize",               PRAGMA_CODESIZE           },
+    { "data-name",              PRAGMA_DATA_NAME          },
+    { "dataseg",                PRAGMA_DATASEG            },      /* obsolete */
+    { "inline-stdfuncs",        PRAGMA_INLINE_STDFUNCS    },
+    { "local-strings",          PRAGMA_LOCAL_STRINGS      },
+    { "message",                PRAGMA_MESSAGE            },
+    { "optimize",               PRAGMA_OPTIMIZE           },
+    { "register-vars",          PRAGMA_REGISTER_VARS      },
+    { "regvaraddr",             PRAGMA_REGVARADDR         },
+    { "regvars",                PRAGMA_REGVARS            },      /* obsolete */
+    { "rodata-name",            PRAGMA_RODATA_NAME        },
+    { "rodataseg",              PRAGMA_RODATASEG          },      /* obsolete */
+    { "signed-chars",           PRAGMA_SIGNED_CHARS       },
+    { "signedchars",            PRAGMA_SIGNEDCHARS        },      /* obsolete */
+    { "static-locals",          PRAGMA_STATIC_LOCALS      },
+    { "staticlocals",           PRAGMA_STATICLOCALS       },      /* obsolete */
+    { "warn",                   PRAGMA_WARN               },
+    { "wrapped-call",           PRAGMA_WRAPPED_CALL       },
+    { "writable-strings",       PRAGMA_WRITABLE_STRINGS   },
+    { "zpsym",                  PRAGMA_ZPSYM              },
 };
 
 /* Result of ParsePushPop */
@@ -347,7 +358,7 @@ static int BoolKeyword (StrBuf* Ident)
     }
 
     /* Error */
-    Error ("Pragma argument must be one of `on', `off', `true' or `false'");
+    Error ("Pragma argument must be one of 'on', 'off', 'true' or 'false'");
     return 0;
 }
 
@@ -379,11 +390,13 @@ static void StringPragma (StrBuf* B, void (*Func) (const char*))
 static void SegNamePragma (StrBuf* B, segment_t Seg)
 /* Handle a pragma that expects a segment name parameter */
 {
-    StrBuf      S = AUTO_STRBUF_INITIALIZER;
     const char* Name;
+    unsigned char AddrSize = ADDR_SIZE_INVALID;
+    StrBuf S = AUTO_STRBUF_INITIALIZER;
+    StrBuf A = AUTO_STRBUF_INITIALIZER;
+    int Push = 0;
 
     /* Check for the "push" or "pop" keywords */
-    int Push = 0;
     switch (ParsePushPop (B)) {
 
         case PP_NONE:
@@ -396,7 +409,13 @@ static void SegNamePragma (StrBuf* B, segment_t Seg)
         case PP_POP:
             /* Pop the old value and output it */
             PopSegName (Seg);
-            g_segname (Seg);
+
+            /* BSS variables are output at the end of the compilation.  Don't
+            ** bother to change their segment, now.
+            */
+            if (Seg != SEG_BSS) {
+                g_segname (Seg);
+            }
 
             /* Done */
             goto ExitPoint;
@@ -415,24 +434,135 @@ static void SegNamePragma (StrBuf* B, segment_t Seg)
         goto ExitPoint;
     }
 
-    /* Get the string */
+    /* Get the name string of the segment */
     Name = SB_GetConstBuf (&S);
 
     /* Check if the name is valid */
     if (ValidSegName (Name)) {
 
-        /* Set the new name */
+        /* Skip the following comma */
+        SB_SkipWhite (B);
+        if (SB_Peek (B) == ',') {
+            SB_Skip (B);
+            SB_SkipWhite (B);
+
+            /* A string argument must follow */
+            if (!GetString (B, &A)) {
+                goto ExitPoint;
+            }
+
+            /* Get the address size for the segment */
+            AddrSize = AddrSizeFromStr (SB_GetConstBuf (&A));
+
+            /* Set the address size for the segment if valid */
+            if (AddrSize != ADDR_SIZE_INVALID) {
+                SetSegAddrSize (Name, AddrSize);
+            } else {
+                Warning ("Invalid address size for segment!");
+            }
+        }
+
+        /* Set the new name and optionally address size */
         if (Push) {
             PushSegName (Seg, Name);
         } else {
             SetSegName (Seg, Name);
         }
-        g_segname (Seg);
+
+        /* BSS variables are output at the end of the compilation.  Don't
+        ** bother to change their segment, now.
+        */
+        if (Seg != SEG_BSS) {
+            g_segname (Seg);
+        }
 
     } else {
 
         /* Segment name is invalid */
-        Error ("Illegal segment name: `%s'", Name);
+        Error ("Illegal segment name: '%s'", Name);
+
+    }
+
+ExitPoint:
+    /* Call the string buf destructor */
+    SB_Done (&S);
+    SB_Done (&A);
+}
+
+
+static void WrappedCallPragma (StrBuf* B)
+/* Handle the wrapped-call pragma */
+{
+    StrBuf      S = AUTO_STRBUF_INITIALIZER;
+    const char *Name;
+    long Val;
+    SymEntry *Entry;
+
+    /* Check for the "push" or "pop" keywords */
+    switch (ParsePushPop (B)) {
+
+        case PP_NONE:
+            Error ("Push or pop required");
+            break;
+
+        case PP_PUSH:
+            break;
+
+        case PP_POP:
+            PopWrappedCall();
+
+            /* Done */
+            goto ExitPoint;
+
+        case PP_ERROR:
+            /* Bail out */
+            goto ExitPoint;
+
+        default:
+            Internal ("Invalid result from ParsePushPop");
+
+    }
+
+    /* A symbol argument must follow */
+    if (!SB_GetSym (B, &S, NULL)) {
+        goto ExitPoint;
+    }
+
+    /* Skip the following comma */
+    if (!GetComma (B)) {
+        /* Error already flagged by GetComma */
+        Error ("Value or the word 'bank' required for wrapped-call identifier");
+        goto ExitPoint;
+    }
+
+    /* Next must be either a numeric value, or "bank" */
+    if (HasStr (B, "bank")) {
+        Val = WRAPPED_CALL_USE_BANK;
+    } else if (!GetNumber (B, &Val)) {
+        Error ("Value required for wrapped-call identifier");
+        goto ExitPoint;
+    }
+
+    if (!(Val == WRAPPED_CALL_USE_BANK) && (Val < 0 || Val > 255)) {
+        Error ("Identifier must be between 0-255");
+        goto ExitPoint;
+    }
+
+    /* Get the string */
+    Name = SB_GetConstBuf (&S);
+    Entry = FindSym(Name);
+
+    /* Check if the name is valid */
+    if (Entry && (Entry->Flags & SC_FUNC) == SC_FUNC) {
+
+        PushWrappedCall(Entry, (unsigned int) Val);
+        Entry->Flags |= SC_REF;
+        GetFuncDesc (Entry->Type)->Flags |= FD_CALL_WRAPPER;
+
+    } else {
+
+        /* Segment name is invalid */
+        Error ("Wrapped-call target does not exist or is not a function");
 
     }
 
@@ -452,13 +582,8 @@ static void CharMapPragma (StrBuf* B)
     if (!GetNumber (B, &Index)) {
         return;
     }
-    if (Index < 1 || Index > 255) {
-        if (Index == 0) {
-            /* For groepaz */
-            Error ("Remapping 0 is not allowed");
-        } else {
-            Error ("Character index out of range");
-        }
+    if (Index < 0 || Index > 255) {
+        Error ("Character index out of range");
         return;
     }
 
@@ -471,14 +596,21 @@ static void CharMapPragma (StrBuf* B)
     if (!GetNumber (B, &C)) {
         return;
     }
-    if (C < 1 || C > 255) {
-        if (C == 0) {
-            /* For groepaz */
-            Error ("Remapping 0 is not allowed");
-        } else {
-            Error ("Character code out of range");
-        }
+    if (C < 0 || C > 255) {
+        Error ("Character code out of range");
         return;
+    }
+
+    /* Warn about remapping character code 0x00
+    ** (except when remapping it back to itself).
+    */
+    if (Index + C != 0 && IS_Get (&WarnRemapZero)) {
+        if (Index == 0) {
+            Warning ("Remapping from 0 is dangerous with string functions");
+        }
+        else if (C == 0) {
+            Warning ("Remapping to 0 can make string functions stop unexpectedly");
+        }
     }
 
     /* Remap the character */
@@ -549,7 +681,7 @@ static void WarnPragma (StrBuf* B)
 
 
 static void FlagPragma (StrBuf* B, IntStack* Stack)
-/* Handle a pragma that expects a boolean paramater */
+/* Handle a pragma that expects a boolean parameter */
 {
     StrBuf Ident = AUTO_STRBUF_INITIALIZER;
     long   Val;
@@ -599,7 +731,7 @@ ExitPoint:
 
 
 static void IntPragma (StrBuf* B, IntStack* Stack, long Low, long High)
-/* Handle a pragma that expects an int paramater */
+/* Handle a pragma that expects an int parameter */
 {
     long  Val;
     int   Push;
@@ -650,6 +782,13 @@ static void IntPragma (StrBuf* B, IntStack* Stack, long Low, long High)
 
 
 
+static void MakeMessage (const char* Message)
+{
+    fprintf (stderr, "%s:%u: Note: %s\n", GetInputName (CurTok.LI), GetInputLine (CurTok.LI), Message);
+}
+
+
+
 static void ParsePragma (void)
 /* Parse the contents of the _Pragma statement */
 {
@@ -679,7 +818,7 @@ static void ParsePragma (void)
         ** for unknown pragmas, but warn about them if enabled (the default).
         */
         if (IS_Get (&WarnUnknownPragma)) {
-            Warning ("Unknown pragma `%s'", SB_GetConstBuf (&Ident));
+            Warning ("Unknown pragma '%s'", SB_GetConstBuf (&Ident));
         }
         goto ExitPoint;
     }
@@ -699,6 +838,10 @@ static void ParsePragma (void)
 
         case PRAGMA_ALIGN:
             IntPragma (&B, &DataAlignment, 1, 4096);
+            break;
+
+        case PRAGMA_ALLOW_EAGER_INLINE:
+            FlagPragma (&B, &EagerlyInlineFuncs);
             break;
 
         case PRAGMA_BSSSEG:
@@ -737,8 +880,16 @@ static void ParsePragma (void)
             SegNamePragma (&B, SEG_DATA);
             break;
 
+        case PRAGMA_INLINE_STDFUNCS:
+            FlagPragma (&B, &InlineStdFuncs);
+            break;
+
         case PRAGMA_LOCAL_STRINGS:
             FlagPragma (&B, &LocalStrings);
+            break;
+
+        case PRAGMA_MESSAGE:
+            StringPragma (&B, MakeMessage);
             break;
 
         case PRAGMA_OPTIMIZE:
@@ -775,6 +926,10 @@ static void ParsePragma (void)
             /* FALLTHROUGH */
         case PRAGMA_STATIC_LOCALS:
             FlagPragma (&B, &StaticLocals);
+            break;
+
+        case PRAGMA_WRAPPED_CALL:
+            WrappedCallPragma(&B);
             break;
 
         case PRAGMA_WARN:

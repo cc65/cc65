@@ -30,29 +30,16 @@
 
         .addr   $0000
 
-; Button state masks (8 values)
-
-        .byte   $01                     ; JOY_UP
-        .byte   $02                     ; JOY_DOWN
-        .byte   $04                     ; JOY_LEFT
-        .byte   $08                     ; JOY_RIGHT
-        .byte   $10                     ; JOY_FIRE
-        .byte   $00                     ; JOY_FIRE2 unavailable
-        .byte   $00                     ; Future expansion
-        .byte   $00                     ; Future expansion
-
 ; Jump table.
 
         .addr   INSTALL
         .addr   UNINSTALL
         .addr   COUNT
         .addr   READ
-        .addr   0                       ; IRQ entry unused
 
 ; ------------------------------------------------------------------------
 ; Constants
 
-VIA1_PRB        := VIA1         ; User port register
 JOY_COUNT       = 3             ; Number of joysticks we support
 
 
@@ -103,20 +90,31 @@ joy1:   lda     #$7F            ; mask for VIA2 JOYBIT: sw3
 
         ldy     VIA2_DDRB       ; remember the date of DDRB
         sta     VIA2_DDRB       ; set JOYBITS on this VIA for input
-        lda     VIA2_JOY        ; read JOYBIT: sw3
+        lda     VIA2_PB         ; read JOYBIT: sw3
         sty     VIA2_DDRB       ; restore the state of DDRB
         asl                     ; Shift sw3 into carry
 
         ldy     VIA1_DDRA       ; remember the state of DDRA
         stx     VIA1_DDRA       ; set JOYBITS on this VIA for input
-        lda     VIA1_JOY        ; read JOYBITS: sw0,sw1,sw2,sw4
+        lda     VIA1_PA1        ; read JOYBITS: sw0,sw1,sw2,sw4
         sty     VIA1_DDRA       ; restore the state of DDRA
 
         cli                     ; necessary?
-        ror                     ; Shift sw3 into bit 7
-        and     #$9E            ; Mask relevant bits
-        eor     #$9E            ; Active states are inverted
+        php                     ; Save sw3 in carry
+        lsr                     ; Shift sw0,sw1,sw2,sw4 into bits 1-4
+        tax                     ; Save sw0,sw1,sw2
+        and     #$10            ; Extract sw4 in bit 4
+        sta     tmp1            ; Save sw4 in bit 4
+        txa                     ; Restore sw0,sw1,sw2
+        lsr                     ; Shift sw0,sw1,sw2 into bits 0-2
+        and     #$07            ; Mask bits 0-2
+        plp                     ; Restore sw3 in carry
+        bcc     @L0             ; Is sw3 set?
+        ora     #$08            ; Yes: Add sw3 in bit 3
+@L0:    ora     tmp1            ; Add sw4 in bit 4
+        eor     #$1F            ; Active states are inverted
 
+        ldx     #0
         rts
 
 ; Read joystick 2
@@ -128,28 +126,27 @@ joy2:   lda     #%10000000      ; via port B Data-Direction
         bne     joy3
 
         lda     #$80            ; via port B read/write
-        sta     VIA1_PRB        ; (output one at PB7)
+        sta     VIA1_PB         ; (output one at PB7)
 
-        lda     VIA1_PRB        ; via port B read/write
-        and     #$1f            ; get bit 4-0 (PB4-PB0)
-        eor     #$1f
+        lda     VIA1_PB         ; via port B read/write
+        and     #$1F            ; get bit 4-0 (PB4-PB0)
+        eor     #$1F
         rts
 
 ; Read joystick 3
 
 joy3:   lda     #$00            ; via port B read/write
-        sta     VIA1_PRB        ; (output zero at PB7)
+        sta     VIA1_PB         ; (output zero at PB7)
 
-        lda     VIA1_PRB        ; via port B read/write
-        and     #$0f            ; get bit 3-0 (PB3-PB0)
+        lda     VIA1_PB         ; via port B read/write
+        and     #$0F            ; get bit 3-0 (PB3-PB0)
         sta     tmp1            ; joy 4 directions
 
-        lda     VIA1_PRB        ; via port B read/write
+        lda     VIA1_PB         ; via port B read/write
         and     #%00100000      ; get bit 5 (PB5)
         lsr
         ora     tmp1
-        eor     #$1f
+        eor     #$1F
 
         ldx     #0
         rts
-

@@ -10,7 +10,7 @@
         .import         _srand
         .importzp       time
 
-__randomize:               
+__randomize:
         ldx     time+2          ; Use 50/60HZ clock
         lda     time+1
         jmp     _srand          ; Initialize generator

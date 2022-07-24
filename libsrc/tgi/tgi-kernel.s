@@ -6,7 +6,6 @@
 
         .import         tgi_libref
         .importzp       ptr1
-        .interruptor    tgi_irq         ; Export as IRQ handler
 
         .include        "tgi-kernel.inc"
         .include        "tgi-error.inc"
@@ -81,7 +80,6 @@ tgi_line:           jmp     $0000
 tgi_bar:            jmp     $0000
 tgi_textstyle:      jmp     $0000
 tgi_outtext:        jmp     $0000
-tgi_irq:            .byte   $60, $00, $00       ; RTS plus two dummy bytes
 
 ; Driver header signature
 .rodata
@@ -90,7 +88,7 @@ tgi_sig:        .byte   $74, $67, $69, TGI_API_VERSION  ; "tgi", version
 
 .code
 ;----------------------------------------------------------------------------
-; void __fastcall__ tgi_install (void* driver);
+; void __fastcall__ tgi_install (const void* driver);
 ; /* Install an already loaded driver. */
 
 
@@ -144,20 +142,13 @@ _tgi_install:
         dex
         bpl     @L3
 
-; Install the IRQ vector if the driver needs it.
-
-        lda     tgi_irq+2               ; Check high byte of IRQ vector
-        beq     @L4                     ; Jump if vector invalid
-        lda     #$4C                    ; Jump opcode
-        sta     tgi_irq                 ; Activate IRQ routine
-
 ; Initialize some other variables
 
         lda     #$00
-@L4:    ldx     #csize-1
-@L5:    sta     cstart,x                ; Clear error/mode/curx/cury/...
+        ldx     #csize-1
+@L4:    sta     cstart,x                ; Clear error/mode/curx/cury/...
         dex
-        bpl     @L5
+        bpl     @L4
 
         rts
 
@@ -205,9 +196,6 @@ _tgi_uninstall:
         jsr     _tgi_done               ; Switch off graphics
 
         jsr     tgi_uninstall           ; Allow the driver to clean up
-
-        lda     #$60                    ; RTS opcode
-        sta     tgi_irq                 ; Disable IRQ entry point
 
 ; Clear driver pointer and error code
 

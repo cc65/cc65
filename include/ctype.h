@@ -36,10 +36,6 @@
 #ifndef _CTYPE_H
 #define _CTYPE_H
 
-
-/* The array containing character classification data */
-extern unsigned char _ctype[256];
-
 /* Bits used to specify character classes */
 #define _CT_LOWER       0x01    /* 0 - Lower case char */
 #define _CT_UPPER       0x02    /* 1 - Upper case char */
@@ -61,6 +57,9 @@ extern unsigned char _ctype[256];
 /* Character classification functions */
 int __fastcall__ isalnum (int c);
 int __fastcall__ isalpha (int c);
+#if __CC65_STD__ >= __CC65_STD_CC65__
+int __fastcall__ isascii (int c);       /* non standard */
+#endif
 int __fastcall__ iscntrl (int c);
 int __fastcall__ isdigit (int c);
 int __fastcall__ isgraph (int c);
@@ -78,105 +77,9 @@ int __fastcall__ toupper (int c);       /* Always external */
 int __fastcall__ tolower (int c);       /* Always external */
 
 #if __CC65_STD__ >= __CC65_STD_CC65__
-unsigned char __fastcall__ toascii (unsigned char c);
+unsigned char __fastcall__ toascii (unsigned char c);       /* non standard */
 /* Convert a target-specific character to ASCII. */
 #endif
-
-
-
-/* When inlining-of-known-functions is enabled, overload most of the above
-** functions by macroes. The function prototypes are available again after
-** #undef'ing the macroes.
-** Please note that the following macroes do NOT handle EOF correctly, as
-** stated in the manual. If you need correct behaviour for EOF, don't
-** use -Os, or #undefine the following macroes.
-*/
-#ifdef __OPT_s__
-
-#define isalnum(c)  (__AX__ = (c),                      \
-                    __asm__ ("tay"),                    \
-                    __asm__ ("lda %v,y", _ctype),       \
-                    __asm__ ("and #%b", _CT_ALNUM),     \
-                    __AX__)
-
-#define isalpha(c)  (__AX__ = (c),                      \
-                    __asm__ ("tay"),                    \
-                    __asm__ ("lda %v,y", _ctype),       \
-                    __asm__ ("and #%b", _CT_ALPHA),     \
-                    __AX__)
-
-#if __CC65_STD__ >= __CC65_STD_C99__
-#define isblank(c)  (__AX__ = (c),                      \
-                    __asm__ ("tay"),                    \
-                    __asm__ ("lda %v,y", _ctype),       \
-                    __asm__ ("and #%b", _CT_SPACE_TAB), \
-                    __AX__)
-#endif
-
-#define iscntrl(c)  (__AX__ = (c),                      \
-                    __asm__ ("tay"),                    \
-                    __asm__ ("lda %v,y", _ctype),       \
-                    __asm__ ("and #%b", _CT_CNTRL),     \
-                    __AX__)
-
-#define isdigit(c)  (__AX__ = (c),                      \
-                    __asm__ ("tay"),                    \
-                    __asm__ ("lda %v,y", _ctype),       \
-                    __asm__ ("and #%b", _CT_DIGIT),     \
-                    __AX__)
-
-#define isgraph(c)  (__AX__ = (c),                      \
-                    __asm__ ("tay"),                    \
-                    __asm__ ("lda %v,y", _ctype),       \
-                    __asm__ ("and #%b", _CT_NOT_GRAPH), \
-                    __asm__ ("cmp #1"),                 \
-                    __asm__ ("lda #1"),                 \
-                    __asm__ ("sbc #1"),                 \
-                    __AX__)
-
-#define islower(c)  (__AX__ = (c),                      \
-                    __asm__ ("tay"),                    \
-                    __asm__ ("lda %v,y", _ctype),       \
-                    __asm__ ("and #%b", _CT_LOWER),     \
-                    __AX__)
-
-#define isprint(c)  (__AX__ = (c),                      \
-                    __asm__ ("tay"),                    \
-                    __asm__ ("lda %v,y", _ctype),       \
-                    __asm__ ("and #%b", _CT_NOT_PRINT), \
-                    __asm__ ("eor #%b", _CT_NOT_PRINT), \
-                    __AX__)
-
-#define ispunct(c)  (__AX__ = (c),                      \
-                    __asm__ ("tay"),                    \
-                    __asm__ ("lda %v,y", _ctype),       \
-                    __asm__ ("and #%b", _CT_NOT_PUNCT), \
-                    __asm__ ("cmp #1"),                 \
-                    __asm__ ("lda #1"),                 \
-                    __asm__ ("sbc #1"),                 \
-                    __AX__)
-
-#define isspace(c)  (__AX__ = (c),                      \
-                    __asm__ ("tay"),                    \
-                    __asm__ ("lda %v,y", _ctype),       \
-                    __asm__ ("and #%b", _CT_WS),        \
-                    __AX__)
-
-#define isupper(c)  (__AX__ = (c),                      \
-                    __asm__ ("tay"),                    \
-                    __asm__ ("lda %v,y", _ctype),       \
-                    __asm__ ("and #%b", _CT_UPPER),     \
-                    __AX__)
-
-#define isxdigit(c) (__AX__ = (c),                      \
-                    __asm__ ("tay"),                    \
-                    __asm__ ("lda %v,y", _ctype),       \
-                    __asm__ ("and #%b", _CT_XDIGIT),    \
-                    __AX__)
-
-#endif
-
-
 
 /* End of ctype.h */
 #endif

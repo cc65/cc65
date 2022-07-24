@@ -8,7 +8,7 @@
 ; void gotoy (unsigned char y);
 ; void gotoxy (unsigned char x, unsigned char y);
 
-            .export _gotox, _gotoy, _gotoxy, fixcursor
+            .export _gotox, _gotoy, gotoxy, _gotoxy, fixcursor
             .import popa
             .importzp cursor_x, cursor_y, cursor_c, cursor_r
 
@@ -21,6 +21,9 @@ _gotox:
 _gotoy:
         sta cursor_r
         jmp fixcursor
+
+gotoxy:
+        jsr popa
 
 _gotoxy:
         sta cursor_r

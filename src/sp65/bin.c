@@ -53,7 +53,7 @@
 
 
 
-void WriteBinFile (const StrBuf* Data, const Collection* A, 
+void WriteBinFile (const StrBuf* Data, const Collection* A,
                    const Bitmap* B attribute ((unused)))
 /* Write the contents of Data to the given file in binary format */
 {
@@ -65,7 +65,7 @@ void WriteBinFile (const StrBuf* Data, const Collection* A,
     /* Open the output file */
     FILE* F = fopen (Name, "wb");
     if (F == 0) {
-        Error ("Cannot open output file `%s': %s", Name, strerror (errno));
+        Error ("Cannot open output file '%s': %s", Name, strerror (errno));
     }
 
     /* Write to the file. We will use fwrite here instead of the fileio
@@ -75,11 +75,11 @@ void WriteBinFile (const StrBuf* Data, const Collection* A,
     */
     Size = SB_GetLen (Data);
     if (fwrite (SB_GetConstBuf (Data), 1, Size, F) != Size) {
-        Error ("Error writing to output file `%s': %s", Name, strerror (errno));
+        Error ("Error writing to output file '%s': %s", Name, strerror (errno));
     }
 
     /* Close the file */
     if (fclose (F) != 0) {
-        Error ("Error closing output file `%s': %s", Name, strerror (errno));
+        Error ("Error closing output file '%s': %s", Name, strerror (errno));
     }
 }

@@ -123,28 +123,30 @@ static void Usage (void)
             "  -m name\t\tCreate a map file\n"
             "  -o name\t\tName the default output file\n"
             "  -t sys\t\tSet the target system\n"
-            "  -u sym\t\tForce an import of symbol `sym'\n"
+            "  -u sym\t\tForce an import of symbol 'sym'\n"
             "  -v\t\t\tVerbose mode\n"
             "  -vm\t\t\tVerbose map file\n"
             "\n"
             "Long options:\n"
-            "  --cfg-path path\tSpecify a config file search path\n"
-            "  --config name\t\tUse linker config file\n"
-            "  --dbgfile name\tGenerate debug information\n"
-            "  --define sym=val\tDefine a symbol\n"
-            "  --end-group\t\tEnd a library group\n"
-            "  --force-import sym\tForce an import of symbol `sym'\n"
-            "  --help\t\tHelp (this text)\n"
-            "  --lib file\t\tLink this library\n"
-            "  --lib-path path\tSpecify a library search path\n"
-            "  --mapfile name\tCreate a map file\n"
-            "  --module-id id\tSpecify a module id\n"
-            "  --obj file\t\tLink this object file\n"
-            "  --obj-path path\tSpecify an object file search path\n"
-            "  --start-addr addr\tSet the default start address\n"
-            "  --start-group\t\tStart a library group\n"
-            "  --target sys\t\tSet the target system\n"
-            "  --version\t\tPrint the linker version\n",
+            "  --allow-multiple-definition\tAllow multiple definitions\n"
+            "  --cfg-path path\t\tSpecify a config file search path\n"
+            "  --config name\t\t\tUse linker config file\n"
+            "  --dbgfile name\t\tGenerate debug information\n"
+            "  --define sym=val\t\tDefine a symbol\n"
+            "  --end-group\t\t\tEnd a library group\n"
+            "  --force-import sym\t\tForce an import of symbol 'sym'\n"
+            "  --help\t\t\tHelp (this text)\n"
+            "  --large-alignment\t\tDon't warn about large alignments\n"
+            "  --lib file\t\t\tLink this library\n"
+            "  --lib-path path\t\tSpecify a library search path\n"
+            "  --mapfile name\t\tCreate a map file\n"
+            "  --module-id id\t\tSpecify a module id\n"
+            "  --obj file\t\t\tLink this object file\n"
+            "  --obj-path path\t\tSpecify an object file search path\n"
+            "  --start-addr addr\t\tSet the default start address\n"
+            "  --start-group\t\t\tStart a library group\n"
+            "  --target sys\t\t\tSet the target system\n"
+            "  --version\t\t\tPrint the linker version\n",
             ProgName);
 }
 
@@ -214,13 +216,13 @@ static void LinkFile (const char* Name, FILETYPE Type)
 
     /* We must have a valid name now */
     if (PathName == 0) {
-        Error ("Input file `%s' not found", Name);
+        Error ("Input file '%s' not found", Name);
     }
 
     /* Try to open the file */
     F = fopen (PathName, "rb");
     if (F == 0) {
-        Error ("Cannot open `%s': %s", PathName, strerror (errno));
+        Error ("Cannot open '%s': %s", PathName, strerror (errno));
     }
 
     /* Read the magic word */
@@ -246,7 +248,7 @@ static void LinkFile (const char* Name, FILETYPE Type)
 
         default:
             fclose (F);
-            Error ("File `%s' has unknown type", PathName);
+            Error ("File '%s' has unknown type", PathName);
 
     }
 
@@ -322,7 +324,7 @@ static void OptConfig (const char* Opt attribute ((unused)), const char* Arg)
         PathName = SearchFile (CfgDefaultPath, Arg);
     }
     if (PathName == 0) {
-        Error ("Cannot find config file `%s'", Arg);
+        Error ("Cannot find config file '%s'", Arg);
     }
 
     /* Read the config */
@@ -376,7 +378,7 @@ static void OptForceImport (const char* Opt attribute ((unused)), const char* Ar
         /* Get the address size and check it */
         unsigned char AddrSize = AddrSizeFromStr (ColPos+1);
         if (AddrSize == ADDR_SIZE_INVALID) {
-            Error ("Invalid address size `%s'", ColPos+1);
+            Error ("Invalid address size '%s'", ColPos+1);
         }
 
         /* Create a copy of the argument */
@@ -403,6 +405,14 @@ static void OptHelp (const char* Opt attribute ((unused)),
     exit (EXIT_SUCCESS);
 }
 
+
+
+static void OptLargeAlignment (const char* Opt attribute ((unused)),
+                               const char* Arg attribute ((unused)))
+/* Don't warn about large alignments */
+{
+    LargeAlignment = 1;
+}
 
 
 static void OptLib (const char* Opt attribute ((unused)), const char* Arg)
@@ -509,7 +519,7 @@ static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
     /* Map the target name to a target id */
     Target = FindTarget (Arg);
     if (Target == TGT_UNKNOWN) {
-        Error ("Invalid target name: `%s'", Arg);
+        Error ("Invalid target name: '%s'", Arg);
     }
 
     /* Set the target binary format */
@@ -526,7 +536,7 @@ static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
         PathName = SearchFile (CfgDefaultPath, SB_GetBuf (&FileName));
     }
     if (PathName == 0) {
-        Error ("Cannot find config file `%s'", SB_GetBuf (&FileName));
+        Error ("Cannot find config file '%s'", SB_GetBuf (&FileName));
     }
 
     /* Free file name memory */
@@ -543,7 +553,17 @@ static void OptVersion (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
 /* Print the assembler version */
 {
-    fprintf (stderr, "ld65 V%s\n", GetVersionAsString ());
+    fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
+    exit(EXIT_SUCCESS);
+}
+
+
+
+static void OptMultDef (const char* Opt attribute ((unused)),
+                        const char* Arg attribute ((unused)))
+/* Set flag to allow multiple definitions of a global symbol */
+{
+    AllowMultDef = 1;
 }
 
 
@@ -598,23 +618,25 @@ static void ParseCommandLine(void)
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
-        { "--cfg-path",         1,      OptCfgPath              },
-        { "--config",           1,      CmdlOptConfig           },
-        { "--dbgfile",          1,      OptDbgFile              },
-        { "--define",           1,      OptDefine               },
-        { "--end-group",        0,      CmdlOptEndGroup         },
-        { "--force-import",     1,      OptForceImport          },
-        { "--help",             0,      OptHelp                 },
-        { "--lib",              1,      OptLib                  },
-        { "--lib-path",         1,      OptLibPath              },
-        { "--mapfile",          1,      OptMapFile              },
-        { "--module-id",        1,      OptModuleId             },
-        { "--obj",              1,      OptObj                  },
-        { "--obj-path",         1,      OptObjPath              },
-        { "--start-addr",       1,      OptStartAddr            },
-        { "--start-group",      0,      CmdlOptStartGroup       },
-        { "--target",           1,      CmdlOptTarget           },
-        { "--version",          0,      OptVersion              },
+        { "--allow-multiple-definition", 0,      OptMultDef              },
+        { "--cfg-path",                  1,      OptCfgPath              },
+        { "--config",                    1,      CmdlOptConfig           },
+        { "--dbgfile",                   1,      OptDbgFile              },
+        { "--define",                    1,      OptDefine               },
+        { "--end-group",                 0,      CmdlOptEndGroup         },
+        { "--force-import",              1,      OptForceImport          },
+        { "--help",                      0,      OptHelp                 },
+        { "--large-alignment",           0,      OptLargeAlignment       },
+        { "--lib",                       1,      OptLib                  },
+        { "--lib-path",                  1,      OptLibPath              },
+        { "--mapfile",                   1,      OptMapFile              },
+        { "--module-id",                 1,      OptModuleId             },
+        { "--obj",                       1,      OptObj                  },
+        { "--obj-path",                  1,      OptObjPath              },
+        { "--start-addr",                1,      OptStartAddr            },
+        { "--start-group",               0,      CmdlOptStartGroup       },
+        { "--target",                    1,      CmdlOptTarget           },
+        { "--version",                   0,      OptVersion              },
     };
 
     unsigned I;

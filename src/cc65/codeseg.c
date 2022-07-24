@@ -183,6 +183,37 @@ static void CS_RemoveLabelFromHash (CodeSeg* S, CodeLabel* L)
 
 
 
+static CodeLabel* PickRefLab (CodeEntry* E)
+/* Pick a reference label and move it to index 0 in E. */
+{
+    unsigned I;
+    unsigned LabelCount = CE_GetLabelCount (E);
+    CHECK (LabelCount > 0);
+    /* Use either the first one as reference label, or a label with a Ref that has no JumpTo.
+    ** This is a hack to partially work around #1211.  Refs with no JumpTo are labels used
+    ** in data segments.  (They are not tracked.)  If a data segment is the only reference,
+    ** the label will be pruned away, but the data reference will remain, causing linking to fail.
+    */
+    CodeLabel* L0 = CE_GetLabel (E, 0);
+    for (I = 1; I < LabelCount; ++I) {
+        unsigned J;
+        CodeLabel* L = CE_GetLabel (E, I);
+        unsigned RefCount = CL_GetRefCount (L);
+        for (J = 0; J < RefCount; ++J) {
+            CodeEntry* EJ = CL_GetRef (L, J);
+            if (EJ->JumpTo == NULL) {
+                /* Move it to the beginning since it's simpler to handle the removal this way. */
+                CE_ReplaceLabel (E, L, 0);
+                CE_ReplaceLabel (E, L0, I);
+                return L;
+            }
+        }
+    }
+    return L0;
+}
+
+
+
 /*****************************************************************************/
 /*                    Functions for parsing instructions                     */
 /*****************************************************************************/
@@ -251,6 +282,8 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
     char                Reg;
     CodeEntry*          E;
     CodeLabel*          Label;
+    const char*         ArgBase = Arg;
+    int                 IsLabel = 0;
 
     /* Read the first token and skip white space after it */
     L = SkipSpace (ReadToken (L, " \t:", Mnemo, sizeof (Mnemo)));
@@ -317,12 +350,12 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
                 /* Expect zp x indirect */
                 L = SkipSpace (L+1);
                 if (toupper (*L) != 'X') {
-                    Error ("ASM code error: `X' expected");
+                    Error ("ASM code error: 'X' expected");
                     return 0;
                 }
                 L = SkipSpace (L+1);
                 if (*L != ')') {
-                    Error ("ASM code error: `)' expected");
+                    Error ("ASM code error: ')' expected");
                     return 0;
                 }
                 L = SkipSpace (L+1);
@@ -337,7 +370,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
                 if (*L == ',') {
                     L = SkipSpace (L+1);
                     if (toupper (*L) != 'Y') {
-                        Error ("ASM code error: `Y' expected");
+                        Error ("ASM code error: 'Y' expected");
                         return 0;
                     }
                     L = SkipSpace (L+1);
@@ -372,13 +405,13 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
                 if ((OPC->Info & OF_BRA) != 0) {
                     /* Branch */
                     AM = AM65_BRA;
-                } else if (GetZPInfo(Arg) != 0) {
+                } else if (IsZPArg (Arg)) {
                     AM = AM65_ZP;
                 } else {
                     /* Check for subroutine call to local label */
                     if ((OPC->Info & OF_CALL) && IsLocalLabelName (Arg)) {
                         Error ("ASM code error: "
-                               "Cannot use local label `%s' in subroutine call",
+                               "Cannot use local label '%s' in subroutine call",
                                Arg);
                     }
                     AM = AM65_ABS;
@@ -393,12 +426,15 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
                     Reg = toupper (*L);
                     L = SkipSpace (L+1);
                     if (Reg == 'X') {
-                        if (GetZPInfo(Arg) != 0) {
+                        if (IsZPArg (Arg)) {
                             AM = AM65_ZPX;
                         } else {
                             AM = AM65_ABSX;
                         }
                     } else if (Reg == 'Y') {
+                        /* On 6502 only LDX and STX support AM65_ZPY.
+                        ** We just play it simple and safe for now.
+                        */
                         AM = AM65_ABSY;
                     } else {
                         Error ("ASM code error: syntax error");
@@ -414,29 +450,43 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
 
     }
 
-    /* If the instruction is a branch, check for the label and generate it
-    ** if it does not exist. This may lead to unused labels (if the label
+    /* We do now have the addressing mode in AM. Allocate a new CodeEntry
+    ** structure and half-initialize it. We'll set the argument and the label
+    ** later.
+    */
+    E = NewCodeEntry (OPC->OPC, AM, Arg, 0, LI);
+
+    /* If the instruction is a branch or accessing memory data, check if for
+    ** the argument could refer to a label. If it does but the label does not
+    ** exist yet, generate it. This may lead to unused labels (if the label
     ** is actually an external one) which are removed by the CS_MergeLabels
     ** function later.
     */
-    Label = 0;
-    if (AM == AM65_BRA) {
-
-        /* Generate the hash over the label, then search for the label */
-        unsigned Hash = HashStr (Arg) % CS_LABEL_HASH_SIZE;
-        Label = CS_FindLabel (S, Arg, Hash);
-
-        /* If we don't have the label, it's a forward ref - create it */
-        if (Label == 0) {
-            /* Generate a new label */
-            Label = CS_NewCodeLabel (S, Arg, Hash);
-        }
+    if ((E->Info & OF_CALL) == 0 &&
+        (E->ArgInfo & AIF_HAS_NAME) != 0) {
+        ArgBase = E->ArgBase;
+        IsLabel = (E->ArgInfo & AIF_LOCAL) != 0;
     }
 
-    /* We do now have the addressing mode in AM. Allocate a new CodeEntry
-    ** structure and initialize it.
-    */
-    E = NewCodeEntry (OPC->OPC, AM, Arg, Label, LI);
+    if (AM == AM65_BRA || IsLabel) {
+
+        /* Generate the hash over the label, then search for the label */
+        unsigned Hash = HashStr (ArgBase) % CS_LABEL_HASH_SIZE;
+        Label = CS_FindLabel (S, ArgBase, Hash);
+
+        /* If we don't have the label, it's a forward ref - create it unless
+        ** it's an external function.
+        */
+        if (Label == 0 && (OPC->OPC != OP65_JMP || IsLabel)) {
+            /* Generate a new label */
+            Label = CS_NewCodeLabel (S, ArgBase, Hash);
+        }
+
+        if (Label != 0) {
+            /* Assign the jump */
+            CL_AddRef (Label, E);
+        }
+    }
 
     /* Return the new code entry */
     return E;
@@ -532,7 +582,7 @@ void CS_AddVLine (CodeSeg* S, LineInfo* LI, const char* Format, va_list ap)
         case '.':
             /* Control instruction */
             ReadToken (L, " \t", Token, sizeof (Token));
-            Error ("ASM code error: Pseudo instruction `%s' not supported", Token);
+            Error ("ASM code error: Pseudo instruction '%s' not supported", Token);
             break;
 
         default:
@@ -780,7 +830,7 @@ CodeLabel* CS_AddLabel (CodeSeg* S, const char* Name)
     if (L) {
         /* We found it - be sure it does not already have an owner */
         if (L->Owner) {
-            Error ("ASM label `%s' is already defined", Name);
+            Error ("ASM label '%s' is already defined", Name);
             return L;
         }
     } else {
@@ -790,7 +840,7 @@ CodeLabel* CS_AddLabel (CodeSeg* S, const char* Name)
 
     /* Safety. This call is quite costly, but safety is better */
     if (CollIndex (&S->Labels, L) >= 0) {
-        Error ("ASM label `%s' is already defined", Name);
+        Error ("ASM label '%s' is already defined", Name);
         return L;
     }
 
@@ -906,7 +956,7 @@ void CS_MergeLabels (CodeSeg* S)
 
                 /* Print some debugging output */
                 if (Debug) {
-                    printf ("Removing unused global label `%s'", X->Name);
+                    printf ("Removing unused global label '%s'", X->Name);
                 }
 
                 /* And free the label */
@@ -933,8 +983,10 @@ void CS_MergeLabels (CodeSeg* S)
             continue;
         }
 
-        /* We have at least one label. Use the first one as reference label. */
-        RefLab = CE_GetLabel (E, 0);
+        /* Pick a label to keep, all references will be moved to this one, and the other labels
+        ** will be deleted.  PickRefLab moves this to index 0.
+        */
+        RefLab = PickRefLab (E);
 
         /* Walk through the remaining labels and change references to these
         ** labels to a reference to the one and only label. Delete the labels
@@ -1046,8 +1098,13 @@ void CS_MoveLabelRef (CodeSeg* S, struct CodeEntry* E, CodeLabel* L)
     /* Be sure that code entry references a label */
     PRECONDITION (OldLabel != 0);
 
-    /* Remove the reference to our label */
-    CS_RemoveLabelRef (S, E);
+    /* Delete the entry from the label */
+    CollDeleteItem (&OldLabel->JumpFrom, E);
+
+    /* If there are no more references, delete the label */
+    if (CollCount (&OldLabel->JumpFrom) == 0) {
+        CS_DelLabel (S, OldLabel);
+    }
 
     /* Use the new label */
     CL_AddRef (L, E);
@@ -1351,7 +1408,7 @@ void CS_OutputEpilogue (const CodeSeg* S)
 */
 {
     if (S->Func) {
-        WriteOutput ("\n.endproc\n\n");
+        WriteOutput (".endproc\n\n");
     }
 }
 
@@ -1421,6 +1478,9 @@ void CS_Output (CodeSeg* S)
         CE_Output (E);
     }
 
+    /* Prettyier formatting */
+    WriteOutput ("\n");
+
     /* If debug info is enabled, terminate the last line number information */
     if (DebugInfo) {
         WriteOutput ("\t.dbg\tline\n");
@@ -1463,6 +1523,7 @@ void CS_GenRegInfo (CodeSeg* S)
 
         /* On entry, the register contents are unknown */
         RC_Invalidate (&Regs);
+        RC_InvalidatePS (&Regs);
         CurrentRegs = &Regs;
 
         /* Walk over all insns and note just the changes from one insn to the
@@ -1497,6 +1558,7 @@ void CS_GenRegInfo (CodeSeg* S)
                         Regs = J->RI->Out2;
                     } else {
                         RC_Invalidate (&Regs);
+                        RC_InvalidatePS (&Regs);
                     }
                     Entry = 1;
                 } else {
@@ -1516,6 +1578,7 @@ void CS_GenRegInfo (CodeSeg* S)
                         */
                         Done = 0;
                         RC_Invalidate (&Regs);
+                        RC_InvalidatePS (&Regs);
                         break;
                     }
                     if (J->RI->Out2.RegA != Regs.RegA) {
@@ -1536,6 +1599,9 @@ void CS_GenRegInfo (CodeSeg* S)
                     if (J->RI->Out2.Tmp1 != Regs.Tmp1) {
                         Regs.Tmp1 = UNKNOWN_REGVAL;
                     }
+                    unsigned PF = J->RI->Out2.PFlags ^ Regs.PFlags;
+                    Regs.PFlags |= ((PF >> 8) | PF | (PF << 8)) & UNKNOWN_PFVAL_ALL;
+                    Regs.ZNRegs &= J->RI->Out2.ZNRegs;
                     ++Entry;
                 }
 
@@ -1555,9 +1621,9 @@ void CS_GenRegInfo (CodeSeg* S)
 
             /* If this insn is a branch on zero flag, we may have more info on
             ** register contents for one of both flow directions, but only if
-            ** there is a previous instruction.
+            ** we've gone through a previous instruction.
             */
-            if ((E->Info & OF_ZBRA) != 0 && (P = CS_GetPrevEntry (S, I)) != 0) {
+            if (LabelCount == 0 && (E->Info & OF_ZBRA) != 0 && (P = CS_GetPrevEntry (S, I)) != 0) {
 
                 /* Get the branch condition */
                 bc_t BC = GetBranchCond (E->OPC);

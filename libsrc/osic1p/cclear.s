@@ -9,19 +9,18 @@
 ;
 
         .export         _cclearxy, _cclear
-        .import         popa, _gotoxy, cputdirect
+        .import         gotoxy, cputdirect
         .importzp       tmp1
 
 _cclearxy:
         pha                     ; Save the length
-        jsr     popa            ; Get y
-        jsr     _gotoxy         ; Call this one, will pop params
+        jsr     gotoxy          ; Call this one, will pop params
         pla                     ; Restore the length and run into _cclear
 
 _cclear:
         cmp     #0              ; Is the length zero?
         beq     L9              ; Jump if done
-        sta     tmp1                                 
+        sta     tmp1
 L1:     lda     #' '
         jsr     cputdirect      ; Direct output
         dec     tmp1

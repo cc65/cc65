@@ -80,17 +80,6 @@
  bit 3:
 */
 
-#define JOY_DATA        0x4400
-
-#define JOY_DATA_UP     0x01
-#define JOY_DATA_DOWN   0x02
-#define JOY_DATA_LEFT   0x04
-#define JOY_DATA_RIGHT  0x08
-#define JOY_DATA_FIRE_A 0x10
-#define JOY_DATA_FIRE_B 0x20
-#define JOY_DATA_START  0x40
-#define JOY_DATA_SELECT 0x80
-
 /* LCD
 
     resolution 160x152 in 4 greys/greens
@@ -156,6 +145,8 @@
 
 /* constants for the conio implementation */
 #define COLOR_BLACK     0x03
+#define COLOR_GRAY2     0x02
+#define COLOR_GRAY1     0x01
 #define COLOR_WHITE     0x00
 
 #define CH_HLINE        1
@@ -181,15 +172,33 @@
 /* No support for dynamically loadable drivers */
 #define DYN_DRV         0
 
+#define JOY_DATA        0x4400  /* hw register to read the pad bits from */
+
+/* Masks for joy_read */
+#define JOY_UP_MASK     0x01
+#define JOY_DOWN_MASK   0x02
+#define JOY_LEFT_MASK   0x04
+#define JOY_RIGHT_MASK  0x08
+#define JOY_BTN_1_MASK  0x10
+#define JOY_BTN_2_MASK  0x20
+#define JOY_BTN_3_MASK  0x40
+#define JOY_BTN_4_MASK  0x80
+
+#define JOY_BTN_A_MASK  JOY_BTN_1_MASK
+#define JOY_BTN_B_MASk  JOY_BTN_2_MASK
+#define JOY_START_MASK  JOY_BTN_3_MASK
+#define JOY_SELECT_MASK JOY_BTN_4_MASK
+
+#define JOY_BTN_A(v)    ((v) & JOY_BTN_A_MASK)
+#define JOY_BTN_B(v)    ((v) & JOY_BTN_B_MASK)
+#define JOY_START(v)    ((v) & JOY_START_MASK)
+#define JOY_SELECT(v)   ((v) & JOY_SELECT_MASK)
+
 /* The addresses of the static drivers */
 extern void gamate_stdjoy_joy[];   /* Referred to by joy_static_stddrv[] */
 
-#define JOY_FIRE_B      5
-#define JOY_START       6
-#define JOY_SELECT      7
-
-void waitvblank (void);
-/* Wait for the vertical blanking */
+void waitvsync (void);
+/* Wait for start of next frame */
 
 /* NOTE: all Gamate are "NTSC" */
 #define get_tv()        TV_NTSC

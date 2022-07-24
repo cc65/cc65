@@ -243,9 +243,9 @@ int s241(struct defs *pd0) {
 #define cq_sections 1
 
 #ifndef NO_TYPELESS_STRUCT_PTR
-	int section(int j,struct* pd0){
+        int section(int j,struct* pd0){
 #else
-	int section(int j,void* pd0){
+        int section(int j,void* pd0){
 #endif
         switch(j){
                 case 0: return s241(pd0);
@@ -267,7 +267,7 @@ int main(int n,char **args) {
 
 int j;
 static struct defs d0, *pd0;
-	
+
    d0.flgs = 1;          /* These flags dictate            */
    d0.flgm = 1;          /*     the verbosity of           */
    d0.flgd = 1;          /*         the program.           */

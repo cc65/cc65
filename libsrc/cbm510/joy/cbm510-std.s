@@ -30,24 +30,12 @@
 
         .addr   $0000
 
-; Button state masks (8 values)
-
-        .byte   $01                     ; JOY_UP
-        .byte   $02                     ; JOY_DOWN
-        .byte   $04                     ; JOY_LEFT
-        .byte   $08                     ; JOY_RIGHT
-        .byte   $10                     ; JOY_FIRE
-        .byte   $00                     ; JOY_FIRE2 unavailable
-        .byte   $00                     ; Future expansion
-        .byte   $00                     ; Future expansion
-
 ; Jump table.
 
         .addr   INSTALL
         .addr   UNINSTALL
         .addr   COUNT
         .addr   READ
-        .addr   0                       ; IRQ entry unused
 
 ; ------------------------------------------------------------------------
 ; Constants
@@ -105,7 +93,7 @@ READ:   ldx     #$0F            ; Switch to the system bank
         lda     (cia2),y        ; Read joystick inputs
         sta     tmp1
 
-; Get the fire bits
+; Get the push button bits
 
         ldy     #CIA::PRA
         lda     (cia2),y
@@ -115,12 +103,12 @@ READ:   ldx     #$0F            ; Switch to the system bank
         cpx     #$00            ; Joystick 0?
         bne     @L1             ; Jump if no
 
-; Joystick 1, fire is in bit 6, direction in bit 0-3
+; Joystick 1, push button is in bit 6, direction in bit 0-3
 
         asl     a
         jmp     @L2
 
-; Joystick 2, fire is in bit 7, direction in bit 5-7
+; Joystick 2, push button is in bit 7, direction in bit 5-7
 
 @L1:    ldx     #$00            ; High byte of return value
         lsr     tmp1
@@ -128,9 +116,9 @@ READ:   ldx     #$0F            ; Switch to the system bank
         lsr     tmp1
         lsr     tmp1
 
-; Mask the relavant bits, get the fire bit
+; Mask the relavant bits, get the push button bit
 
-@L2:    asl     a               ; Fire bit into carry
+@L2:    asl     a               ; push button bit into carry
         lda     tmp1
         and     #$0F
         bcc     @L3

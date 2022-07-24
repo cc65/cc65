@@ -6,15 +6,14 @@
 ;
 
         .export         _chlinexy, _chline
-        .import         popa, _gotoxy, cputdirect
+        .import         gotoxy, cputdirect
         .importzp       tmp1
 
         .include        "gamate.inc"
 
 _chlinexy:
         pha                     ; Save the length
-        jsr     popa            ; Get y
-        jsr     _gotoxy         ; Call this one, will pop params
+        jsr     gotoxy          ; Call this one, will pop params
         pla                     ; Restore the length
 
 _chline:

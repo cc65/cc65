@@ -10,6 +10,7 @@
 #include <time.h>
 #include <conio.h>
 #include <tgi.h>
+#include <cc65.h>
 
 
 
@@ -30,6 +31,7 @@
 /* Workaround missing clock stuff */
 #ifdef __APPLE2__
 #  define clock()       0
+#  undef  CLK_TCK
 #  define CLK_TCK       1
 #endif
 
@@ -50,8 +52,9 @@ void mandelbrot (signed short x1, signed short y1, signed short x2,
     register signed short r, r1, i;
     register signed short xs, ys, xx, yy;
     register signed short x, y;
+    register unsigned char maxcol = MAXCOL;
 
-    /* calc stepwidth */
+    /* Calc stepwidth */
     xs = ((x2 - x1) / (SCREEN_X));
     ys = ((y2 - y1) / (SCREEN_Y));
 
@@ -61,7 +64,7 @@ void mandelbrot (signed short x1, signed short y1, signed short x2,
         xx = x1;
         for (x = 0; x < (SCREEN_X); x++) {
             xx += xs;
-            /* do iterations */
+            /* Do iterations */
             r = 0;
             i = 0;
             for (count = 0; (count < maxiterations) &&
@@ -75,12 +78,18 @@ void mandelbrot (signed short x1, signed short y1, signed short x2,
             if (count == maxiterations) {
                 tgi_setcolor (0);
             } else {
-                if (MAXCOL == 2)
+                switch (maxcol) {
+                  case 2:
                     tgi_setcolor (1);
-                else
-                    tgi_setcolor (count % MAXCOL);
+                    break;
+                  case 0:               /* 256 colors */
+                    tgi_setcolor (count);
+                    break;
+                  default:
+                    tgi_setcolor (count % maxcol);
+                }
             }
-            /* set pixel */
+            /* Set pixel */
             tgi_setpixel (x, y);
         }
     }
@@ -107,6 +116,9 @@ int main (void)
     if (err  != TGI_ERR_OK) {
         cprintf ("Error #%d initializing graphics.\r\n%s\r\n",
                  err, tgi_geterrormsg (err));
+        if (doesclrscrafterexit ()) {
+            cgetc ();
+        }
         exit (EXIT_FAILURE);
     };
     cprintf ("ok.\n\r");
@@ -117,15 +129,15 @@ int main (void)
 
     t = clock ();
 
-    /* calc mandelbrot set */
+    /* Calc mandelbrot set */
     mandelbrot (tofp (-2), tofp (-2), tofp (2), tofp (2));
 
     t = clock () - t;
 
     /* Fetch the character from the keyboard buffer and discard it */
-    (void) cgetc ();
+    cgetc ();
 
-    /* shut down gfx mode and return to textmode */
+    /* Shut down gfx mode and return to textmode */
     tgi_done ();
 
     /* Calculate stats */
@@ -136,9 +148,11 @@ int main (void)
     /* Output stats */
     cprintf ("time  : %lu.%us\n\r", sec, sec10);
 
-    /* Wait for a key, then end */
-    cputs ("Press any key when done...\n\r");
-    (void) cgetc ();
+    if (doesclrscrafterexit ()) {
+        /* Wait for a key, then end */
+        cputs ("Press any key when done...\n\r");
+        cgetc ();
+    }
 
     /* Done */
     return EXIT_SUCCESS;

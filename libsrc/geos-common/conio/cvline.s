@@ -7,7 +7,7 @@
 ; void cvline (unsigned char length);
 
             .export _cvlinexy, _cvline
-            .import popa, _gotoxy, fixcursor
+            .import gotoxy, fixcursor
             .importzp cursor_x, cursor_y, cursor_r
 
             .include "jumptab.inc"
@@ -15,11 +15,10 @@
 
 _cvlinexy:
         pha                     ; Save the length
-        jsr popa                ; Get y
-        jsr _gotoxy             ; Call this one, will pop params
+        jsr gotoxy              ; Call this one, will pop params
         pla                     ; Restore the length
 
-_cvline:    
+_cvline:
         cmp #0                  ; Is the length zero?
         beq L9                  ; Jump if done
         tax

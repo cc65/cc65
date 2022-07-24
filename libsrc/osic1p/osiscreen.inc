@@ -3,7 +3,7 @@
 ;
 
         .include        "extzp.inc"
-        
+
 .linecont +
 
 ;
@@ -13,7 +13,7 @@
                                 ; Macro implementation of internal screensize
                                 ; function for given width and height in
                                 ; characters
-                                
+
         .export         screensize
 
 .proc   screensize
@@ -34,11 +34,11 @@
         lda     #<ScrBase       ; Fill whole video RAM with blanks by calling
         ldx     #>ScrBase       ; memset appropriately
         jsr     pushax
-        
+
         lda     #' '
         ldx     #$00
         jsr     pushax
-        
+
         lda     #<ScrRamSize
         ldx     #>ScrRamSize
         jsr     _memset
@@ -46,7 +46,7 @@
         lda     #$00            ; Cursor in upper left corner
         sta     CURS_X
         sta     CURS_Y
-        
+
         jmp     plot            ; Set the cursor position
 .endproc
 
@@ -73,19 +73,18 @@ ScrollLength    = (ScrHeight - 1) * ScrollDist
 
 _cputcxy:
         pha                     ; Save C
-        jsr     popa            ; Get Y
-        jsr     _gotoxy         ; Set cursor, drop x
+        jsr     gotoxy          ; Set cursor, drop x and y
         pla                     ; Restore C
 
 ; Plot a character - also used as internal function
 
-_cputc: cmp     #$0A            ; CR?
+_cputc: cmp     #$0D            ; CR?
         bne     L1
         lda     #0
         sta     CURS_X
         beq     plot            ; Recalculate pointers
 
-L1:     cmp     #$0D            ; LF?
+L1:     cmp     #$0A            ; LF?
         beq     newline         ; Recalculate pointers
 
 cputdirect:
@@ -113,12 +112,12 @@ newline:
         lda     #<(ScrBase + ScrFirstChar)
         ldx     #>(ScrBase + ScrFirstChar)
         jsr     pushax
-        
+
                                 ; Scroll source address
         lda     #<(ScrBase + ScrFirstChar + ScrollDist)
         ldx     #>(ScrBase + ScrFirstChar + ScrollDist)
         jsr     pushax
-        
+
                                 ; Number of characters to move
         lda     #<ScrollLength
         ldx     #>ScrollLength
@@ -130,7 +129,7 @@ newline:
         sta     ptr1
         lda     #>(ScrBase + ScrFirstChar + ScrollLength)
         sta     ptr1+1
-        
+
         ldy     #ScrWidth       ; Fill last line with blanks
         lda     #' '
 clrln:  sta     (ptr1),y
@@ -151,13 +150,13 @@ putchar:
         ldy     CURS_X
         sta     (SCREEN_PTR),y  ; Set char
         rts
-        
+
 .endmacro
 
 .macro osi_screen_funcs ScrBase, ScrRamSize, ScrFirstChar, \
                         ScrWidth, ScrHeight, ScrollDist
 
-        .import         popa, _gotoxy
+        .import         gotoxy
         .import         _memmove, _memset, pushax
         .importzp       ptr1
 
@@ -168,11 +167,12 @@ ScrTabLo:
         .repeat ScrHeight, I
         .byte <(ScrBase + ScrFirstChar + I * ScrollDist)
         .endrep
-        
+
 ScrTabHi:
         .repeat ScrHeight, I
         .byte >(ScrBase + ScrFirstChar + I * ScrollDist)
         .endrep
+
 
 .code
 

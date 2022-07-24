@@ -60,7 +60,6 @@ yres:   .word   56                      ; Max Y resolution
         .addr   BAR
         .addr   TEXTSTYLE
         .addr   OUTTEXT
-        .addr   0                       ; IRQ entry is unused
 
 ; ------------------------------------------------------------------------
 ; Data.
@@ -80,12 +79,6 @@ TEMP2           = tmp4
 TEMP3           = sreg
 TEMP4           = sreg+1
 
-; Line routine stuff (must be on zpage)
-PB              = ptr3          ; (2)   LINE
-UB              = ptr4          ; (2)   LINE
-ERR             = regsave       ; (2)   LINE
-NX              = regsave+2     ; (2)   LINE
-
 ; Absolute variables used in the code
 
 .bss
@@ -95,17 +88,6 @@ MEMEND:
 ERROR:          .res    1       ; Error code
 COLOR:          .res    1       ; Current color
 PALETTE:        .res    2       ; The current palette
-
-; Line routine stuff
-
-OGora:
-COUNT:          .res    2
-OUkos:
-NY:             .res    2
-Y3:
-DX:             .res    1
-DY:             .res    1
-AY:             .res    1
 
 ; Constants and tables
 
@@ -243,6 +225,7 @@ SETCOLOR:
 ;
 
 SETVIEWPAGE:
+;       rts
 
 ; ------------------------------------------------------------------------
 ; SETDRAWPAGE: Set the drawable page. Called with the new page in A (0..n).

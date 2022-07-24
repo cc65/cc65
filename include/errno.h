@@ -72,7 +72,8 @@ extern int _errno;
 #define ESPIPE          14      /* Illegal seek */
 #define ERANGE          15      /* Range error */
 #define EBADF           16      /* Bad file number */
-#define EUNKNOWN        17      /* Unknown OS specific error */
+#define ENOEXEC         17      /* Exec format error */
+#define EUNKNOWN        18      /* Unknown OS specific error */
 
 
 
@@ -83,7 +84,7 @@ extern int _errno;
 
 
 int __fastcall__ _osmaperrno (unsigned char oserror);
-/* Map an operating system specific error code (for example from _oserror) 
+/* Map an operating system specific error code (for example from _oserror)
 ** into one of the E... codes above. It is user callable.
 */
 

@@ -151,7 +151,7 @@ static unsigned char OptionalAddrSize (void)
 static void SetBoolOption (unsigned char* Flag)
 /* Read a on/off/+/- option and set flag accordingly */
 {
-    static const char* Keys[] = {
+    static const char* const Keys[] = {
         "OFF",
         "ON",
     };
@@ -167,13 +167,13 @@ static void SetBoolOption (unsigned char* Flag)
         switch (GetSubKey (Keys, sizeof (Keys) / sizeof (Keys [0]))) {
             case 0:     *Flag = 0; NextTok ();                  break;
             case 1:     *Flag = 1; NextTok ();                  break;
-            default:    ErrorSkip ("`on' or `off' expected");   break;
+            default:    ErrorSkip ("'on' or 'off' expected");   break;
         }
     } else if (TokIsSep (CurTok.Tok)) {
         /* Without anything assume switch on */
         *Flag = 1;
     } else {
-        ErrorSkip ("`on' or `off' expected");
+        ErrorSkip ("'on' or 'off' expected");
     }
 }
 
@@ -451,7 +451,7 @@ static void DoASCIIZ (void)
 static void DoAssert (void)
 /* Add an assertion */
 {
-    static const char* ActionTab [] = {
+    static const char* const ActionTab [] = {
         "WARN", "WARNING",
         "ERROR",
         "LDWARN", "LDWARNING",
@@ -566,21 +566,25 @@ static void DoBss (void)
 
 
 
-static void DoByte (void)
-/* Define bytes */
+static void DoByteBase (int EnableTranslation)
+/* Define bytes or literals */
 {
     /* Element type for the generated array */
     static const char EType[1] = { GT_BYTE };
 
     /* Record type information */
     Span* S = OpenSpan ();
-    StrBuf Type = STATIC_STRBUF_INITIALIZER;
+    StrBuf Type = AUTO_STRBUF_INITIALIZER;
 
     /* Parse arguments */
     while (1) {
         if (CurTok.Tok == TOK_STRCON) {
-            /* A string, translate into target charset and emit */
-            TgtTranslateStrBuf (&CurTok.SVal);
+            /* A string, translate into target charset
+               if appropriate */
+            if (EnableTranslation) {
+                TgtTranslateStrBuf (&CurTok.SVal);
+            }
+            /* Emit */
             EmitStrBuf (&CurTok.SVal);
             NextTok ();
         } else {
@@ -598,12 +602,25 @@ static void DoByte (void)
         }
     }
 
-    /* Close the span, then add type information to it */
+    /* Close the span, then add type information to it.
+    ** Note: empty string operands emit nothing;
+    ** so, add a type only if there's a span.
+    */
     S = CloseSpan (S);
-    SetSpanType (S, GenArrayType (&Type, GetSpanSize (S), EType, sizeof (EType)));
+    if (S != 0) {
+        SetSpanType (S, GenArrayType (&Type, GetSpanSize (S), EType, sizeof (EType)));
+    }
 
     /* Free the type string */
     SB_Done (&Type);
+}
+
+
+
+static void DoByte (void)
+/* Define bytes with translation */
+{
+    DoByteBase (1);
 }
 
 
@@ -618,16 +635,16 @@ static void DoCase (void)
 
 
 static void DoCharMap (void)
-/* Allow custome character mappings */
+/* Allow custom character mappings */
 {
     long Index;
     long Code;
 
     /* Read the index as numerical value */
     Index = ConstExpression ();
-    if (Index <= 0 || Index > 255) {
+    if (Index < 0 || Index > 255) {
         /* Value out of range */
-        ErrorSkip ("Range error");
+        ErrorSkip ("Index range error");
         return;
     }
 
@@ -638,7 +655,7 @@ static void DoCharMap (void)
     Code = ConstExpression ();
     if (Code < 0 || Code > 255) {
         /* Value out of range */
-        ErrorSkip ("Range error");
+        ErrorSkip ("Code range error");
         return;
     }
 
@@ -659,7 +676,7 @@ static void DoCode (void)
 static void DoConDes (void)
 /* Export a symbol as constructor/destructor */
 {
-    static const char* Keys[] = {
+    static const char* const Keys[] = {
         "CONSTRUCTOR",
         "DESTRUCTOR",
         "INTERRUPTOR",
@@ -744,7 +761,7 @@ static void DoData (void)
 static void DoDbg (void)
 /* Add debug information from high level code */
 {
-    static const char* Keys[] = {
+    static const char* const Keys[] = {
         "FILE",
         "FUNC",
         "LINE",
@@ -816,8 +833,17 @@ static void DoDebugInfo (void)
 
 
 static void DoDefine (void)
-/* Define a one line macro */
+/* Define a one-line macro */
 {
+    /* The function is called with the .DEFINE token in place, because we need
+    ** to disable .define macro expansions before reading the next token.
+    ** Otherwise, the name of the macro might be expanded; therefore,
+    ** we never would see it.
+    */
+    DisableDefineStyleMacros ();
+    NextTok ();
+    EnableDefineStyleMacros ();
+
     MacDef (MAC_STYLE_DEFINE);
 }
 
@@ -1012,7 +1038,7 @@ static void DoFeature (void)
         /* Set the feature and check for errors */
         if (SetFeature (&CurTok.SVal) == FEAT_UNKNOWN) {
             /* Not found */
-            ErrorSkip ("Invalid feature: `%m%p'", &CurTok.SVal);
+            ErrorSkip ("Invalid feature: '%m%p'", &CurTok.SVal);
             return;
         } else {
             /* Skip the keyword */
@@ -1039,7 +1065,7 @@ static void DoFileOpt (void)
     if (CurTok.Tok == TOK_IDENT) {
 
         /* Option given as keyword */
-        static const char* Keys [] = {
+        static const char* const Keys [] = {
             "AUTHOR", "COMMENT", "COMPILER"
         };
 
@@ -1237,7 +1263,7 @@ static void DoIncBin (void)
         char* PathName = SearchFile (BinSearchPath, SB_GetConstBuf (&Name));
         if (PathName == 0 || (F = fopen (PathName, "rb")) == 0) {
             /* Not found or cannot open, print an error and bail out */
-            ErrorSkip ("Cannot open include file `%m%p': %s", &Name, strerror (errno));
+            ErrorSkip ("Cannot open include file '%m%p': %s", &Name, strerror (errno));
             xfree (PathName);
             goto ExitPoint;
         }
@@ -1263,7 +1289,7 @@ static void DoIncBin (void)
     */
     SB_Terminate (&Name);
     if (FileStat (SB_GetConstBuf (&Name), &StatBuf) != 0) {
-        Fatal ("Cannot stat input file `%m%p': %s", &Name, strerror (errno));
+        Fatal ("Cannot stat input file '%m%p': %s", &Name, strerror (errno));
     }
 
     /* Add the file to the input file table */
@@ -1300,7 +1326,7 @@ static void DoIncBin (void)
         size_t BytesRead = fread (Buf, 1, BytesToRead, F);
         if (BytesToRead != BytesRead) {
             /* Some sort of error */
-            ErrorSkip ("Cannot read from include file `%m%p': %s",
+            ErrorSkip ("Cannot read from include file '%m%p': %s",
                        &Name, strerror (errno));
             break;
         }
@@ -1388,7 +1414,7 @@ static void DoList (void)
 /* Enable/disable the listing */
 {
     /* Get the setting */
-    unsigned char List;
+    unsigned char List = 0;
     SetBoolOption (&List);
 
     /* Manage the counter */
@@ -1397,6 +1423,14 @@ static void DoList (void)
     } else {
         DisableListing ();
     }
+}
+
+
+
+static void DoLiteral (void)
+/* Define bytes without translation */
+{
+    DoByteBase (0);
 }
 
 
@@ -1530,10 +1564,39 @@ static void DoP816 (void)
 
 
 
+static void DoP4510 (void)
+/* Switch to 4510 CPU */
+{
+    SetCPU (CPU_4510);
+}
+
+
+
+static void DoPDTV (void)
+/* Switch to C64DTV CPU */
+{
+    SetCPU (CPU_6502DTV);
+}
+
+
+
 static void DoPageLength (void)
 /* Set the page length for the listing */
 {
     PageLength = IntArg (MIN_PAGE_LEN, MAX_PAGE_LEN);
+}
+
+
+
+static void DoPopCharmap (void)
+/* Restore a charmap */
+{
+    if (TgtTranslateStackIsEmpty ()) {
+        ErrorSkip ("Charmap stack is empty");
+        return;
+    }
+
+    TgtTranslatePop ();
 }
 
 
@@ -1627,6 +1690,16 @@ static void DoPSC02 (void)
 
 
 
+static void DoPushCharmap (void)
+/* Save the current charmap */
+{
+    if (!TgtTranslatePush ()) {
+        ErrorSkip ("Charmap stack overflow");
+    }
+}
+
+
+
 static void DoPushCPU (void)
 /* Push the current CPU setting onto the CPU stack */
 {
@@ -1653,6 +1726,17 @@ static void DoPushSeg (void)
 
     /* Get the current segment and push it */
     CollAppend (&SegStack, DupSegDef (GetCurrentSegDef ()));
+}
+
+
+
+static void DoReferTo (void)
+/* Mark given symbol as referenced */
+{
+    SymEntry* Sym = ParseAnySymName (SYM_ALLOC_NEW);
+    if (Sym) {
+        SymRef (Sym);
+    }
 }
 
 
@@ -1858,12 +1942,12 @@ static void DoTag (void)
 
 
 static void DoUnDef (void)
-/* Undefine a define style macro */
+/* Undefine a define-style macro */
 {
     /* The function is called with the .UNDEF token in place, because we need
     ** to disable .define macro expansions before reading the next token.
-    ** Otherwise the name of the macro would be expanded, so we would never
-    ** see it.
+    ** Otherwise, the name of the macro would be expanded; therefore,
+    ** we never would see it.
     */
     DisableDefineStyleMacros ();
     NextTok ();
@@ -1883,7 +1967,7 @@ static void DoUnDef (void)
 static void DoUnexpected (void)
 /* Got an unexpected keyword */
 {
-    Error ("Unexpected `%m%p'", &Keyword);
+    Error ("Unexpected '%m%p'", &Keyword);
     SkipUntilSep ();
 }
 
@@ -1949,7 +2033,7 @@ static void DoZeropage (void)
 /* Control commands flags */
 enum {
     ccNone      = 0x0000,               /* No special flags */
-    ccKeepToken = 0x0001                /* Do not skip the current token */
+    ccKeepToken = 0x0001                /* Do not skip the control token */
 };
 
 /* Control command table */
@@ -1988,7 +2072,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoDbg,          },
     { ccNone,           DoDByt          },
     { ccNone,           DoDebugInfo     },
-    { ccNone,           DoDefine        },
+    { ccKeepToken,      DoDefine        },
     { ccNone,           DoUnexpected    },      /* .DEFINED */
     { ccNone,           DoUnexpected    },      /* .DEFINEDMACRO */
     { ccNone,           DoDelMac        },
@@ -2033,8 +2117,10 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccKeepToken,      DoConditionals  },      /* .IFNDEF */
     { ccKeepToken,      DoConditionals  },      /* .IFNREF */
     { ccKeepToken,      DoConditionals  },      /* .IFP02 */
+    { ccKeepToken,      DoConditionals  },      /* .IFP4510 */
     { ccKeepToken,      DoConditionals  },      /* .IFP816 */
     { ccKeepToken,      DoConditionals  },      /* .IFPC02 */
+    { ccKeepToken,      DoConditionals  },      /* .IFPDTV */
     { ccKeepToken,      DoConditionals  },      /* .IFPSC02 */
     { ccKeepToken,      DoConditionals  },      /* .IFREF */
     { ccNone,           DoImport        },
@@ -2048,6 +2134,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoLineCont      },
     { ccNone,           DoList          },
     { ccNone,           DoListBytes     },
+    { ccNone,           DoLiteral       },
     { ccNone,           DoUnexpected    },      /* .LOBYTE */
     { ccNone,           DoLoBytes       },
     { ccNone,           DoUnexpected    },      /* .LOCAL */
@@ -2063,17 +2150,22 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoOrg           },
     { ccNone,           DoOut           },
     { ccNone,           DoP02           },
+    { ccNone,           DoP4510         },
     { ccNone,           DoP816          },
     { ccNone,           DoPageLength    },
     { ccNone,           DoUnexpected    },      /* .PARAMCOUNT */
     { ccNone,           DoPC02          },
+    { ccNone,           DoPDTV          },
+    { ccNone,           DoPopCharmap    },
     { ccNone,           DoPopCPU        },
     { ccNone,           DoPopSeg        },
     { ccNone,           DoProc          },
     { ccNone,           DoPSC02         },
+    { ccNone,           DoPushCharmap   },
     { ccNone,           DoPushCPU       },
     { ccNone,           DoPushSeg       },
     { ccNone,           DoUnexpected    },      /* .REFERENCED */
+    { ccNone,           DoReferTo       },      /* .REFERTO */
     { ccNone,           DoReloc         },
     { ccNone,           DoRepeat        },
     { ccNone,           DoRes           },
@@ -2148,5 +2240,8 @@ void CheckPseudo (void)
     }
     if (!IS_IsEmpty (&CPUStack)) {
         Warning (1, "CPU stack is not empty");
+    }
+    if (!TgtTranslateStackIsEmpty ()) {
+        Warning (1, "Charmap stack is not empty");
     }
 }

@@ -52,8 +52,8 @@
 O65Model Model = O65_MODEL_NONE;
 
 /* Name table */
-static const char* NameTable[O65_MODEL_COUNT] = {
-    "none",    
+static const char* const NameTable[O65_MODEL_COUNT] = {
+    "none",
     "os/a65",
     "lunix",
     "cc65-module"

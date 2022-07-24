@@ -124,7 +124,7 @@ void WriteOutputFile (const StrBuf* Data, const Collection* A, const Bitmap* B)
                      sizeof (FormatTable[0]),
                      CompareFileId);
         if (F == 0) {
-            Error ("Unknown output format `%s'", Format);
+            Error ("Unknown output format '%s'", Format);
         }
     } else {
         /* No format given, use file name extension */
@@ -133,7 +133,7 @@ void WriteOutputFile (const StrBuf* Data, const Collection* A, const Bitmap* B)
                        sizeof (FormatTable) / sizeof (FormatTable[0]));
         /* Found? */
         if (F == 0) {
-            Error ("Cannot determine file format of output file `%s'", Name);
+            Error ("Cannot determine file format of output file '%s'", Name);
         }
     }
 

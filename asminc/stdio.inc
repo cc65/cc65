@@ -7,7 +7,7 @@
 ;*                                                                           */
 ;*                                                                           */
 ;* (C) 2003-2005, Ullrich von Bassewitz                                      */
-;*                Römerstrasse 52                                            */
+;*                Roemerstrasse 52                                           */
 ;*                D-70794 Filderstadt                                        */
 ;* EMail:         uz@cc65.org                                                */
 ;*                                                                           */
@@ -44,9 +44,13 @@ EOF             = -1
 .if .defined(__APPLE2__)
 FILENAME_MAX    = 64+1
 .elseif .defined(__ATARI__)
-FILENAME_MAX    = 12+1
+FILENAME_MAX    = 63+1
+.elseif .defined(__CBM__)
+FILENAME_MAX    = 255
 .elseif .defined(__LUNIX__)
 FILENAME_MAX    = 80+1
+.elseif .defined(__TELESTRAT__)
+FILENAME_MAX    = 50+1
 .else
 FILENAME_MAX    = 16+1
 .endif

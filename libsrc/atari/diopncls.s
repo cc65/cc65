@@ -137,7 +137,7 @@ _dio_open:
         iny
         lda     #1
 
-finish: sta     (ptr2),y        ; set default sector size       
+finish: sta     (ptr2),y        ; set default sector size
 fini2:  lda     ptr2
         ldx     ptr2+1
         rts

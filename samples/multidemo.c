@@ -11,15 +11,16 @@
 
 
 #include <string.h>
-#include <conio.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
 #include <em.h>
+#include <cc65.h>
 #ifndef __CBM__
 #include <fcntl.h>
 #include <unistd.h>
 #else
+#include <cbm.h>
 #include <device.h>
 #endif
 
@@ -229,14 +230,14 @@ void main (void)
     }
 
     log ("Press any key...");
-    cgetc ();
+    getchar ();
 
     if (loadoverlay (1)) {
         log ("Calling overlay 1 from main");
 
         /* The linker makes sure that the call to foo() ends up at the right mem
         ** addr. However it's up to user to make sure that the - right - overlay
-        ** is actually loaded before making the the call.
+        ** is actually loaded before making the call.
         */
         foo ();
     }
@@ -254,6 +255,8 @@ void main (void)
         foobar ();
     }
 
-    log ("Press any key...");
-    cgetc ();
+    if (doesclrscrafterexit ()) {
+        log ("Press any key...");
+        getchar ();
+    }
 }

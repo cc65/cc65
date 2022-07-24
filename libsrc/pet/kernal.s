@@ -4,25 +4,12 @@
 ; PET kernal functions
 ;
 
+        .include "cbm_kernal.inc"
+
         .export         CLRCH
         .export         BASIN
+        .export         CHRIN
         .export         STOP
         .export         GETIN
         .export         CLALL
         .export         UDTIM
-
-
-
-
-
-
-;-----------------------------------------------------------------------------
-; Functions that are available in the kernal jump table
-
-CLRCH           = $FFCC
-BASIN           = $FFCF
-STOP            = $FFE1
-GETIN           = $FFE4
-CLALL           = $FFE7
-UDTIM           = $FFEA
-

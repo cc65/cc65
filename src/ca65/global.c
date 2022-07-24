@@ -66,6 +66,7 @@ unsigned char DbgSyms            = 0;   /* Add debug symbols */
 unsigned char LineCont           = 0;   /* Allow line continuation */
 unsigned char LargeAlignment     = 0;   /* Don't warn about large alignments */
 unsigned char RelaxChecks        = 0;   /* Relax a few assembler checks */
+unsigned char StringEscapes      = 0;   /* Allow C-style escapes in strings */
 
 /* Emulation features */
 unsigned char DollarIsPC         = 0;   /* Allow the $ symbol as current PC */
@@ -83,4 +84,4 @@ unsigned char CComments          = 0;   /* Allow C like comments */
 unsigned char ForceRange         = 0;   /* Force values into expected range */
 unsigned char UnderlineInNumbers = 0;   /* Allow underlines in numbers */
 unsigned char AddrSize           = 0;   /* Allow .ADDRSIZE function */
-
+unsigned char BracketAsIndirect  = 0;   /* Use '[]' not '()' for indirection */

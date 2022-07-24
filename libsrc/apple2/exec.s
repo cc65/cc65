@@ -18,7 +18,7 @@ typerr: lda     #$4A            ; "Incompatible file format"
 
         ; Cleanup name
 oserr:  jsr     popname         ; Preserves A
-        
+
         ; Set __oserror
         jmp     __mappederrno
 
@@ -129,7 +129,7 @@ setbuf: lda     #$00            ; Low byte
         .assert MLI::OPEN::PATHNAME = MLI::INFO::PATHNAME, error
 
         ; Lower file level to avoid program file
-        ; being closed by C libary shutdown code
+        ; being closed by C library shutdown code
         ldx     LEVEL
         stx     level
         beq     :+
@@ -185,13 +185,13 @@ setbuf: lda     #$00            ; Low byte
         lda     #$00            ; '\0'
         beq     :-              ; Branch always
 
-        ; Call loader stub after C libary shutdown
+        ; Call loader stub after C library shutdown
 :       lda     #<target
         ldx     #>target
         sta     done+1
         stx     done+2
 
-        ; Initiate C libary shutdown
+        ; Initiate C library shutdown
         jmp     _exit
 
         .bss
@@ -230,14 +230,13 @@ source: jsr     $BF00
         ; Check for startup filename support
         ; ProDOS TechRefMan, chapter 5.1.5.1:
         ; "$2000 is a jump instruction. $2003 and $2004 are $EE."
-system: lda     $2000
-        cmp     #$4C
+system: lda     #$4C
+        cmp     $2000
         bne     jump
-        lda     $2003
-        cmp     #$EE
+        lda     #$EE
+        cmp     $2003
         bne     jump
-        lda     $2004
-        cmp     #$EE
+        cmp     $2004
         bne     jump
 
         ; Store cmdline in startup filename buffer

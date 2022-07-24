@@ -1,11 +1,11 @@
 ;
 ; Ullrich von Bassewitz, 03.06.1999
 ;
-; void cbm_untlk (void);
+; void cbm_k_untlk (void);
 ;
 
-        .export         _cbm_untlk
-        .import         UNTLK
+        .include        "cbm.inc"
 
+        .export         _cbm_k_untlk
 
-_cbm_untlk = UNTLK
+_cbm_k_untlk = UNTLK

@@ -8,7 +8,7 @@
 #include <stdio.h>
 
 /*
-...gives "test.c(2): Error: Variable `foo' has unknown size" using -Cl.
+...gives "test.c(2): Error: Variable 'foo' has unknown size" using -Cl.
 Is it really unknown?
 
 cc65 V2.13.0, SVN version: 4384

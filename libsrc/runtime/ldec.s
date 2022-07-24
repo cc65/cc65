@@ -1,5 +1,6 @@
 ;
-; Ullrich von Bassewitz, 29.12.1999
+; Piotr Fusik, 09.03.2018
+; originally by Ullrich von Bassewitz
 ;
 ; CC65 runtime: Decrement eax by value in Y
 ;
@@ -11,16 +12,25 @@ deceaxy:
         sty     tmp1
         sec
         sbc     tmp1
-        sta     tmp1
-        txa
-        sbc     #0
-        tax
-        lda     sreg
-        sbc     #0
-        sta     sreg
-        lda     sreg+1
-        sbc     #0
-        sta     sreg+1
-        lda     tmp1
-        rts
+        bcs     @L9
+
+; Borrow from X.
+
+        dex
+        cpx     #$FF
+        bne     @L9
+
+; X wrapped from zero to $FF, borrow from sreg.
+
+        dec     sreg
+        cpx     sreg
+        bne     @L9
+
+; sreg wrapped from zero to $FF, borrow from sreg+1.
+
+        dec     sreg+1
+
+; Done.
+
+@L9:    rts
 

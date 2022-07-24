@@ -3,7 +3,6 @@
 <article>
 <title>sp65 Users Guide
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2012-03-11
 
 <abstract>
 sp65 is a sprite and bitmap utility that is part of the cc65 development suite.
@@ -49,6 +48,7 @@ Short options:
 
 Long options:
   --convert-to fmt[,attrlist]   Convert into target format
+  --dump-palette                Dump palette as table
   --help                        Help (this text)
   --list-conversions            List all possible conversions
   --pop                         Restore the original loaded image
@@ -74,6 +74,12 @@ attribute lists see <ref id="attr-lists" name="below">.
   Convert a bitmap into one of the supported target formats. The option
   argument must at least contain the "format" attribute. For more attributes,
   see section <ref id="conversions" name="Conversions">.
+
+
+  <label id="option--dump-palette">
+  <tag><tt>--dump-palette</tt></tag>
+
+  Dump palette as table.
 
 
   <label id="option--help">
@@ -397,14 +403,14 @@ including commercial applications, and to alter it and redistribute it
 freely, subject to the following restrictions:
 
 <enum>
-<item> 	The origin of this software must not be misrepresented; you must not
-       	claim that you wrote the original software. If you use this software
-       	in a product, an acknowledgment in the product documentation would be
-	appreciated but is not required.
-<item>	Altered source versions must be plainly marked as such, and must not
-	be misrepresented as being the original software.
-<item>	This notice may not be removed or altered from any source
-	distribution.
+<item>  The origin of this software must not be misrepresented; you must not
+        claim that you wrote the original software. If you use this software
+        in a product, an acknowledgment in the product documentation would be
+        appreciated but is not required.
+<item>  Altered source versions must be plainly marked as such, and must not
+        be misrepresented as being the original software.
+<item>  This notice may not be removed or altered from any source
+        distribution.
 </enum>
 
 

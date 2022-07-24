@@ -5,24 +5,24 @@
 ;
 
         .export         tosumoda0, tosumodax
-        .import         popsreg, udiv16
-        .importzp       ptr1, ptr4
+        .import         popptr1, udiv16
+        .importzp       sreg, ptr4
 
 tosumoda0:
         ldx     #0
 tosumodax:
         sta     ptr4
         stx     ptr4+1          ; Save right operand
-        jsr     popsreg         ; Get right operand
+        jsr     popptr1         ; Get right operand
 
 ; Do the division
 
         jsr     udiv16
 
-; Result is in sreg, remainder in ptr1
+; Result is in ptr1, remainder in sreg
 
-        lda     ptr1
-        ldx     ptr1+1
+        lda     sreg
+        ldx     sreg+1
         rts
 
-           
+

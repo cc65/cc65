@@ -16,7 +16,6 @@
 #include <dbg.h>
 
 
-
 /*****************************************************************************/
 /*                             Function forwards                             */
 /*****************************************************************************/
@@ -32,7 +31,7 @@ static char DumpHandler (void);
 static char HelpHandler (void);
 
 /* Forwards for other functions */
-static void DisplayPrompt (char* s);
+static void DisplayPrompt (const char* s);
 static void SingleStep (char StepInto);
 static void RedrawStatic (char  Frame);
 static void Redraw (char Frame);
@@ -166,7 +165,7 @@ extern unsigned      DbgHI;             /* High 16 bit of primary reg */
 typedef struct {
     unsigned char x;
     unsigned char y;
-    char*         text;
+    const char*   text;
 } TextDesc;
 
 /* Window descriptor */
@@ -181,13 +180,13 @@ typedef struct {
     unsigned char fd_visible;           /* Is the window currently visible? */
     char (*fd_func) (void);             /* Handler function */
     unsigned char fd_textcount;         /* Number of text lines to print */
-    TextDesc*     fd_text;              /* Static text in the window */
+    const TextDesc* fd_text;            /* Static text in the window */
 } FrameDesc;
 
 
 
 /* Texts for the windows */
-static TextDesc RegText [] = {
+static const TextDesc RegText [] = {
     { 1,  0, "PC" },
     { 1,  1, "SR" },
     { 1,  2, "A"  },
@@ -197,7 +196,7 @@ static TextDesc RegText [] = {
     { 1,  6, "CS" },
     { 1,  7, "HI" }
 };
-static TextDesc HelpText [] = {
+static const TextDesc HelpText [] = {
     { 1,  0, "F1, ?     Help"                           },
     { 1,  1, "F2, t     Toggle breakpoint"              },
     { 1,  2, "F3, u     Run until subroutine returns"   },
@@ -220,7 +219,7 @@ static TextDesc HelpText [] = {
 
 
 /* Window data */
-static FrameDesc AsmFrame = {
+static const FrameDesc AsmFrame = {
     CH_ULCORNER, CH_TTEE, CH_LTEE, CH_CROSS,
     0, 0, MAX_X - 10, 15,
     MAX_X - 11, 14,
@@ -228,7 +227,7 @@ static FrameDesc AsmFrame = {
     AsmHandler,
     0, 0
 };
-static FrameDesc RegFrame = {
+static const FrameDesc RegFrame = {
     CH_TTEE, CH_URCORNER, CH_LTEE, CH_RTEE,
     MAX_X - 10, 0, MAX_X - 1, 9,
     8, 8,
@@ -236,7 +235,7 @@ static FrameDesc RegFrame = {
     RegHandler,
     sizeof (RegText) / sizeof (RegText [0]), RegText
 };
-static FrameDesc StackFrame = {
+static const FrameDesc StackFrame = {
     CH_LTEE, CH_RTEE, CH_CROSS, CH_RTEE,
     MAX_X - 10, 9, MAX_X - 1, 15,
     8, 5,
@@ -244,7 +243,7 @@ static FrameDesc StackFrame = {
     StackHandler,
     0, 0
 };
-static FrameDesc CStackFrame = {
+static const FrameDesc CStackFrame = {
     CH_CROSS, CH_RTEE, CH_BTEE, CH_LRCORNER,
     MAX_X - 10, 15, MAX_X - 1, MAX_Y - 1,
     8, MAX_Y - 17,
@@ -252,7 +251,7 @@ static FrameDesc CStackFrame = {
     CStackHandler,
     0, 0
 };
-static FrameDesc DumpFrame = {
+static const FrameDesc DumpFrame = {
     CH_LTEE, CH_CROSS, CH_LLCORNER, CH_BTEE,
     0, 15, MAX_X - 10, MAX_Y-1,
     MAX_X - 11, MAX_Y - 17,
@@ -260,7 +259,7 @@ static FrameDesc DumpFrame = {
     DumpHandler,
     0, 0
 };
-static FrameDesc HelpFrame = {
+static const FrameDesc HelpFrame = {
     CH_ULCORNER, CH_URCORNER, CH_LLCORNER, CH_LRCORNER,
     0, 0, MAX_X - 1, MAX_Y-1,
     MAX_X - 2, MAX_Y - 2,
@@ -268,7 +267,7 @@ static FrameDesc HelpFrame = {
     HelpHandler,
     sizeof (HelpText) / sizeof (HelpText [0]), HelpText
 };
-static FrameDesc* Frames [] = {
+static const FrameDesc* const Frames [] = {
     &AsmFrame,
     &RegFrame,
     &StackFrame,
@@ -297,7 +296,7 @@ static unsigned char StackAddr; /* Start address of output */
 
 
 /* Prompt line data */
-static char* ActivePrompt = 0;  /* Last prompt line displayed */
+static const char* ActivePrompt = 0;  /* Last prompt line displayed */
 static char PromptColor;        /* Color behind prompt */
 static char PromptLength;       /* Length of current prompt string */
 
@@ -346,10 +345,10 @@ BreakPoint* DbgIsBreak (unsigned Addr);
 
 
 
-static void DrawFrame (register FrameDesc* F, char Active)
+static void DrawFrame (register const FrameDesc* F, char Active)
 /* Draw one window frame */
 {
-    TextDesc* T;
+    const TextDesc* T;
     unsigned char Count;
     unsigned char tl, tr, bl, br;
     unsigned char x1, y1, width;
@@ -410,7 +409,7 @@ static void DrawFrames (void)
 /* Draw all frames */
 {
     unsigned char I;
-    FrameDesc* F;
+    const FrameDesc* F;
 
     /* Build the frame layout of the screen */
     for (I = 0; I < sizeof (Frames) / sizeof (Frames [0]); ++I) {
@@ -427,7 +426,7 @@ static void ActivateFrame (int Num, unsigned char Clear)
 /* Activate a new frame, deactivate the old one */
 {
     unsigned char y;
-    register FrameDesc* F;
+    register const FrameDesc* F;
 
     if (ActiveFrame != Num) {
 
@@ -462,7 +461,7 @@ static void ActivateFrame (int Num, unsigned char Clear)
 
 
 
-static void DisplayPrompt (char* s)
+static void DisplayPrompt (const char* s)
 /* Display a prompt */
 {
     unsigned char OldColor;
@@ -626,11 +625,11 @@ static char InputHex (char* Prompt, unsigned* Val)
 
 
 
-static void ErrorPrompt (char* Msg)
+static void ErrorPrompt (const char* Msg)
 /* Display an error message and wait for a key */
 {
     /* Save the current prompt */
-    char* OldPrompt = ActivePrompt;
+    const char* OldPrompt = ActivePrompt;
 
     /* Display the new one */
     DisplayPrompt (Msg);
@@ -1580,7 +1579,11 @@ void DbgEntry (void)
             case 'q':
                 /* Quit program */
                 clrscr ();
-                exit (1);
+
+                /* Exit intentionally with error because one may
+                **  say that DbgEntry is always abnormal.
+                */
+                exit (EXIT_FAILURE);
 
         }
     }

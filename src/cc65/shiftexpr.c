@@ -61,15 +61,14 @@
 void ShiftExpr (struct ExprDesc* Expr)
 /* Parse the << and >> operators. */
 {
-    ExprDesc Expr2;
     CodeMark Mark1;
     CodeMark Mark2;
     token_t Tok;                        /* The operator token */
-    Type* EffType;                      /* Effective lhs type */
-    Type* ResultType;                   /* Type of the result */
+    const Type* ResultType;             /* Type of the result */
     unsigned ExprBits;                  /* Bits of the lhs operand */
     unsigned GenFlags;                  /* Generator flags */
     unsigned ltype;
+    int lconst;                         /* Operand is a constant */
     int rconst;                         /* Operand is a constant */
 
 
@@ -77,6 +76,10 @@ void ShiftExpr (struct ExprDesc* Expr)
     ExprWithCheck (hie8, Expr);
 
     while (CurTok.Tok == TOK_SHL || CurTok.Tok == TOK_SHR) {
+
+        ExprDesc Expr2;
+        ED_Init (&Expr2);
+        Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
 
         /* All operators that call this function expect an int on the lhs */
         if (!IsClassInt (Expr->Type)) {
@@ -89,7 +92,7 @@ void ShiftExpr (struct ExprDesc* Expr)
         NextToken ();
 
         /* Get the type of the result */
-        ResultType = EffType = IntPromotion (Expr->Type);
+        ResultType = IntPromotion (Expr->Type);
 
         /* Prepare the code generator flags */
         GenFlags = TypeOf (ResultType);
@@ -100,7 +103,8 @@ void ShiftExpr (struct ExprDesc* Expr)
         /* Get the lhs on stack */
         GetCodePos (&Mark1);
         ltype = TypeOf (Expr->Type);
-        if (ED_IsConstAbs (Expr)) {
+        lconst = ED_IsConstAbs (Expr);
+        if (lconst) {
             /* Constant value */
             GetCodePos (&Mark2);
             g_push (ltype | CF_CONST, Expr->IVal);
@@ -112,7 +116,7 @@ void ShiftExpr (struct ExprDesc* Expr)
         }
 
         /* Get the right hand side */
-        ExprWithCheck (hie8, &Expr2);
+        MarkedExprWithCheck (hie8, &Expr2);
 
         /* Check the type of the rhs */
         if (!IsClassInt (Expr2.Type)) {
@@ -121,7 +125,7 @@ void ShiftExpr (struct ExprDesc* Expr)
         }
 
         /* Check for a constant right side expression */
-        rconst = ED_IsConstAbs (&Expr2);
+        rconst = ED_IsConstAbs (&Expr2) && ED_CodeRangeIsEmpty (&Expr2);
         if (!rconst) {
 
             /* Not constant, load into the primary */
@@ -139,53 +143,58 @@ void ShiftExpr (struct ExprDesc* Expr)
             ** the operand, the behaviour is undefined according to the
             ** standard.
             */
-            if (Expr2.IVal < 0 || Expr2.IVal >= (long) ExprBits) {
+            if (Expr2.IVal < 0) {
 
-                Warning ("Shift count too large for operand type");
+                Warning ("Shift count '%ld' is negative", Expr2.IVal);
+                Expr2.IVal &= ExprBits - 1;
+
+            } else if (Expr2.IVal >= (long) ExprBits) {
+
+                Warning ("Shift count '%ld' >= width of type", Expr2.IVal);
                 Expr2.IVal &= ExprBits - 1;
 
             }
 
-            /* If the shift count is zero, nothing happens */
-            if (Expr2.IVal == 0) {
+            /* If the shift count is zero, nothing happens. If the left hand
+            ** side is a constant, the result is constant.
+            */
+            if (Expr2.IVal == 0 || lconst) {
 
-                /* Result is already in Expr, remove the generated code */
-                RemoveCode (&Mark1);
+                /* Set the type */
+                Expr->Type = ResultType;
 
-                /* Done */
-                goto Next;
-            }
+                if (lconst) {
 
-            /* If the left hand side is a constant, the result is constant */
-            if (ED_IsConstAbs (Expr)) {
+                    /* Evaluate the result */
+                    switch (Tok) {
+                        case TOK_SHL: Expr->IVal <<= Expr2.IVal; break;
+                        case TOK_SHR: Expr->IVal >>= Expr2.IVal; break;
+                        default: /* Shutup gcc */                break;
+                    }
 
-                /* Evaluate the result */
-                switch (Tok) {
-                    case TOK_SHL: Expr->IVal <<= Expr2.IVal; break;
-                    case TOK_SHR: Expr->IVal >>= Expr2.IVal; break;
-                    default: /* Shutup gcc */                break;
+                    /* Limit the calculated value to the range of its type */
+                    LimitExprValue (Expr);
                 }
 
-                /* Both operands are constant, remove the generated code */
+                /* Result is already got, remove the generated code */
                 RemoveCode (&Mark1);
 
                 /* Done */
-                goto Next;
+                continue;
             }
 
-            /* If we're shifting an integer or unsigned to the right, the
-            ** lhs has a const address, and the shift count is larger than 8,
+            /* If we're shifting an integer or unsigned to the right, the lhs
+            ** has a quasi-const address, and the shift count is larger than 8,
             ** we can load just the high byte as a char with the correct
             ** signedness, and reduce the shift count by 8. If the remaining
             ** shift count is zero, we're done.
             */
             if (Tok == TOK_SHR &&
-                IsTypeInt (Expr->Type) &&
+                IsClassInt (Expr->Type) &&
+                SizeOf (Expr->Type) == SIZEOF_INT &&
                 ED_IsLVal (Expr) &&
-                (ED_IsLocConst (Expr) || ED_IsLocStack (Expr)) &&
+                ED_IsLocQuasiConst (Expr) &&
                 Expr2.IVal >= 8) {
-
-                Type* OldType; 
 
                 /* Increase the address by one and decrease the shift count */
                 ++Expr->IVal;
@@ -194,7 +203,6 @@ void ShiftExpr (struct ExprDesc* Expr)
                 /* Replace the type of the expression temporarily by the
                 ** corresponding char type.
                 */
-                OldType = Expr->Type;
                 if (IsSignUnsigned (Expr->Type)) {
                     Expr->Type = type_uchar;
                 } else {
@@ -206,9 +214,6 @@ void ShiftExpr (struct ExprDesc* Expr)
 
                 /* Generate again code for the load, this time with the new type */
                 LoadExpr (CF_NONE, Expr);
-
-                /* Reset the type */
-                Expr->Type = OldType;
 
                 /* If the shift count is now zero, we're done */
                 if (Expr2.IVal == 0) {
@@ -227,11 +232,13 @@ void ShiftExpr (struct ExprDesc* Expr)
         }
 
 MakeRVal:
-        /* We have a rvalue in the primary now */
-        ED_MakeRValExpr (Expr);
+        /* We have an rvalue in the primary now */
+        ED_FinalizeRValLoad (Expr);
 
-Next:
         /* Set the type of the result */
         Expr->Type = ResultType;
+
+        /* Propagate from subexpressions */
+        Expr->Flags |= Expr2.Flags & E_MASK_VIRAL;
     }
 }

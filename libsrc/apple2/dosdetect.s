@@ -14,10 +14,11 @@
 ; ProDOS 8 1.6   - $16
 ; ProDOS 8 1.7   - $17
 ; ProDOS 8 1.8   - $18
-; ProDOS 8 1.9   - $18
+; ProDOS 8 1.9   - $18 (!)
 ; ProDOS 8 2.0.1 - $21
 ; ProDOS 8 2.0.2 - $22
 ; ProDOS 8 2.0.3 - $23
+; ProDOS 8 2.4.x - $24
 ;
 
         .constructor    initdostype, 25
@@ -30,7 +31,7 @@
 ; - Apple II ProDOS 8 TechNote #23, ProDOS 8 Changes and Minutia
 ; - ProDOS TechRefMan, chapter 5.2.4
 
-        .segment        "INIT"
+        .segment        "ONCE"
 
 initdostype:
         lda     $BF00
@@ -43,6 +44,6 @@ initdostype:
 :       sta     __dos_type
 done:   rts
 
-        .bss
+        .data
 
-__dos_type:     .res    1
+__dos_type:     .byte   $00

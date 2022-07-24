@@ -9,8 +9,7 @@
         .export         newline, plot
         .destructor     setsyscursor
 
-        .import         _gotoxy
-        .import         popa
+        .import         gotoxy
         .import         PLOT
 
         .import         ktmp: zp, crtc: zp, CURS_X: zp, CURS_Y: zp, RVS: zp
@@ -21,8 +20,7 @@
 
 _cputcxy:
         pha                     ; Save C
-        jsr     popa            ; Get Y
-        jsr     _gotoxy         ; Set cursor, drop x
+        jsr     gotoxy          ; Set cursor, drop x and y
         pla                     ; Restore C
 
 ; Plot a character - also used as internal function
@@ -75,10 +73,9 @@ L4:     inc     CURS_Y
 ; Handle character if high bit set
 
 L10:    and     #$7F
-        cmp     #$7E            ; PI?
+        cmp     #$7F            ; PI?
         bne     L11
         lda     #$5E            ; Load screen code for PI
-        bne     cputdirect
 L11:    ora     #$40
         bne     cputdirect      ; Branch always
 

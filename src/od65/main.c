@@ -209,6 +209,7 @@ static void OptVersion (const char* Opt attribute ((unused)),
 /* Print the assembler version */
 {
     fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
+    exit(EXIT_SUCCESS);
 }
 
 
@@ -221,7 +222,7 @@ static void DumpFile (const char* Name)
     /* Try to open the file */
     FILE* F = fopen (Name, "rb");
     if (F == 0) {
-        Error ("Cannot open `%s': %s", Name, strerror (errno));
+        Error ("Cannot open '%s': %s", Name, strerror (errno));
     }
 
     /* Read the magic word */

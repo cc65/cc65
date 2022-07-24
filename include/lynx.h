@@ -52,24 +52,25 @@
 
 
 /* Color defines */
-#define COLOR_BLACK             0x00
-#define COLOR_RED               0x01
-#define COLOR_PINK              0x02
-#define COLOR_LIGHTGREY         0x03
-#define COLOR_GREY              0x04
-#define COLOR_DARKGREY          0x05
-#define COLOR_BROWN             0x06
-#define COLOR_PEACH             0x07
-#define COLOR_YELLOW            0x08
-#define COLOR_LIGHTGREEN        0x09
-#define COLOR_GREEN             0x0A
-#define COLOR_DARKBROWN         0x0B
-#define COLOR_VIOLET            0x0C
+#define COLOR_TRANSPARENT       0x00
+#define COLOR_BLACK             0x01
+#define COLOR_RED               0x02
+#define COLOR_PINK              0x03
+#define COLOR_LIGHTGREY         0x04
+#define COLOR_GREY              0x05
+#define COLOR_DARKGREY          0x06
+#define COLOR_BROWN             0x07
+#define COLOR_PEACH             0x08
+#define COLOR_YELLOW            0x09
+#define COLOR_LIGHTGREEN        0x0A
+#define COLOR_GREEN             0x0B
+#define COLOR_PURPLE            0x0C
 #define COLOR_BLUE              0x0D
 #define COLOR_LIGHTBLUE         0x0E
 #define COLOR_WHITE             0x0F
 
 /* TGI color defines (default palette) */
+#define TGI_COLOR_TRANSPARENT   COLOR_TRANSPARENT
 #define TGI_COLOR_BLACK         COLOR_BLACK
 #define TGI_COLOR_RED           COLOR_RED
 #define TGI_COLOR_PINK          COLOR_PINK
@@ -77,15 +78,29 @@
 #define TGI_COLOR_GREY          COLOR_GREY
 #define TGI_COLOR_DARKGREY      COLOR_DARKGREY
 #define TGI_COLOR_BROWN         COLOR_BROWN
+#define TGI_COLOR_ORANGE        COLOR_BROWN
 #define TGI_COLOR_PEACH         COLOR_PEACH
 #define TGI_COLOR_YELLOW        COLOR_YELLOW
 #define TGI_COLOR_LIGHTGREEN    COLOR_LIGHTGREEN
 #define TGI_COLOR_GREEN         COLOR_GREEN
-#define TGI_COLOR_DARKBROWN     COLOR_DARKBROWN
-#define TGI_COLOR_VIOLET        COLOR_VIOLET
+#define TGI_COLOR_PURPLE        COLOR_PURPLE
 #define TGI_COLOR_BLUE          COLOR_BLUE
 #define TGI_COLOR_LIGHTBLUE     COLOR_LIGHTBLUE
 #define TGI_COLOR_WHITE         COLOR_WHITE
+
+/* Masks for joy_read */
+#define JOY_UP_MASK             0x80
+#define JOY_DOWN_MASK           0x40
+#define JOY_LEFT_MASK           0x20
+#define JOY_RIGHT_MASK          0x10
+#define JOY_BTN_1_MASK          0x01
+#define JOY_BTN_2_MASK          0x02
+
+#define JOY_BTN_A_MASK          JOY_BTN_1_MASK
+#define JOY_BTN_B_MASK          JOY_BTN_2_MASK
+
+#define JOY_BTN_A(v)            ((v) & JOY_BTN_A_MASK)
+#define JOY_BTN_B(v)            ((v) & JOY_BTN_B_MASK)
 
 /* No support for dynamically loadable drivers */
 #define DYN_DRV 0
@@ -109,6 +124,8 @@ extern void lynx_160_102_16_tgi[];    /* Referred to by tgi_static_stddrv[] */
 /*                           Sound support                                   */
 /*****************************************************************************/
 
+
+
 void lynx_snd_init (void);
 /* Initialize the sound driver */
 
@@ -129,6 +146,8 @@ void __fastcall__ lynx_snd_stop_channel (unsigned char channel);
 
 unsigned char lynx_snd_active(void);
 /* Show which channels are active */
+
+
 
 /*****************************************************************************/
 /*                           Accessing the cart                              */
@@ -193,6 +212,7 @@ unsigned __fastcall__ lynx_eewrite (unsigned cell, unsigned val);
 
 #include <_suzy.h>
 #define SUZY        (*(struct __suzy*)0xFC00)
+
 
 
 /* End of lynx.h */

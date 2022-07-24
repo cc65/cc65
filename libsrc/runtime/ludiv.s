@@ -1,5 +1,6 @@
 ;
 ; Ullrich von Bassewitz, 17.08.1998
+; Christian Krueger, 11-Mar-2017, added 65SC02 optimization
 ;
 ; CC65 runtime: division for long unsigned ints
 ;
@@ -8,12 +9,19 @@
         .import         addysp1
         .importzp       sp, sreg, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4
 
+        .macpack        cpu
+
 tosudiv0ax:
+.if (.cpu .bitand ::CPU_ISET_65SC02)
+        stz     sreg
+        stz     sreg+1
+.else
         ldy     #$00
         sty     sreg
         sty     sreg+1
+.endif
 
-tosudiveax:                         
+tosudiveax:
         jsr     getlop          ; Get the paramameters
         jsr     udiv32          ; Do the division
         lda     ptr1            ; Result is in ptr1:sreg
@@ -30,10 +38,15 @@ getlop: sta     ptr3            ; Put right operand in place
         lda     sreg+1
         sta     ptr4+1
 
+.if (.cpu .bitand ::CPU_ISET_65SC02)
+        lda     (sp)
+        ldy     #1
+.else
         ldy     #0              ; Put left operand in place
         lda     (sp),y
-        sta     ptr1
         iny
+.endif
+        sta     ptr1
         lda     (sp),y
         sta     ptr1+1
         iny
@@ -65,7 +78,7 @@ L0:     asl     ptr1
 ; Do a subtraction. we do not have enough space to store the intermediate
 ; result, so we may have to do the subtraction twice.
 
-        pha
+        tax
         cmp     ptr3
         lda     ptr2+1
         sbc     ptr3+1
@@ -78,9 +91,9 @@ L0:     asl     ptr1
 ; Overflow, do the subtraction again, this time store the result
 
         sta     tmp4            ; We have the high byte already
-        pla
+        txa
         sbc     ptr3            ; byte 0
-        pha
+        tax
         lda     ptr2+1
         sbc     ptr3+1
         sta     ptr2+1          ; byte 1
@@ -89,7 +102,7 @@ L0:     asl     ptr1
         sta     tmp3            ; byte 2
         inc     ptr1            ; Set result bit
 
-L1:     pla
+L1:     txa
         dey
         bne     L0
         sta     ptr2

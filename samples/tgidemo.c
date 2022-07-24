@@ -38,16 +38,21 @@ static unsigned AspectRatio;
 static void CheckError (const char* S)
 {
     unsigned char Error = tgi_geterror ();
+
     if (Error != TGI_ERR_OK) {
-        printf ("%s: %d\n", S, Error);
+        printf ("%s: %u\n", S, Error);
+        if (doesclrscrafterexit ()) {
+            cgetc ();
+        }
         exit (EXIT_FAILURE);
     }
 }
 
 
 
+#if DYN_DRV
 static void DoWarning (void)
-/* Warn the user that the TGI driver is needed for this program */
+/* Warn the user that the dynamic TGI driver is needed for this program */
 {
     printf ("Warning: This program needs the TGI\n"
             "driver on disk! Press 'y' if you have\n"
@@ -55,33 +60,35 @@ static void DoWarning (void)
     if (tolower (cgetc ()) != 'y') {
         exit (EXIT_SUCCESS);
     }
-    printf ("Ok. Please wait patiently...\n");
+    printf ("OK. Please wait patiently...\n");
 }
+#endif
 
 
 
 static void DoCircles (void)
 {
-    static const unsigned char Palette[2] = { TGI_COLOR_WHITE, TGI_COLOR_ORANGE };
+    static const unsigned char Palette[2] = { TGI_COLOR_WHITE, TGI_COLOR_BLUE };
     unsigned char I;
-    unsigned char Color = COLOR_FORE;
-    unsigned X = MaxX / 2;
-    unsigned Y = MaxY / 2;
+    unsigned char Color = COLOR_BACK;
+    const unsigned X = MaxX / 2;
+    const unsigned Y = MaxY / 2;
+    const unsigned Limit = (X < Y) ? Y : X;
 
     tgi_setpalette (Palette);
+    tgi_setcolor (COLOR_FORE);
+    tgi_clear ();
+    tgi_line (0, 0, MaxX, MaxY);
+    tgi_line (0, MaxY, MaxX, 0);
     while (!kbhit ()) {
-        tgi_setcolor (COLOR_FORE);
-        tgi_line (0, 0, MaxX, MaxY);
-        tgi_line (0, MaxY, MaxX, 0);
+        Color = (Color == COLOR_FORE) ? COLOR_BACK : COLOR_FORE;
         tgi_setcolor (Color);
-        for (I = 10; I < 240; I += 10) {
+        for (I = 10; I <= Limit; I += 10) {
             tgi_ellipse (X, Y, I, tgi_imulround (I, AspectRatio));
         }
-        Color = Color == COLOR_FORE ? COLOR_BACK : COLOR_FORE;
     }
 
     cgetc ();
-    tgi_clear ();
 }
 
 
@@ -90,19 +97,19 @@ static void DoCheckerboard (void)
 {
     static const unsigned char Palette[2] = { TGI_COLOR_WHITE, TGI_COLOR_BLACK };
     unsigned X, Y;
-    unsigned char Color;
+    unsigned char Color = COLOR_BACK;
 
     tgi_setpalette (Palette);
-    Color = COLOR_BACK;
+    tgi_clear ();
+
     while (1) {
         for (Y = 0; Y <= MaxY; Y += 10) {
             for (X = 0; X <= MaxX; X += 10) {
+                Color = (Color == COLOR_FORE) ? COLOR_BACK : COLOR_FORE;
                 tgi_setcolor (Color);
                 tgi_bar (X, Y, X+9, Y+9);
-                Color = Color == COLOR_FORE ? COLOR_BACK : COLOR_FORE;
                 if (kbhit ()) {
                     cgetc ();
-                    tgi_clear ();
                     return;
                 }
             }
@@ -124,8 +131,9 @@ static void DoDiagram (void)
 
     tgi_setpalette (Palette);
     tgi_setcolor (COLOR_FORE);
+    tgi_clear ();
 
-    /* Determine zero and aplitude */
+    /* Determine zero and amplitude */
     YOrigin = MaxY / 2;
     XOrigin = 10;
     Amp     = (MaxY - 19) / 2;
@@ -146,14 +154,13 @@ static void DoDiagram (void)
 
         /* Calculate the next points */
         X = (int) (((long) (MaxX - 19) * I) / 360);
-        Y = (int) (((long) Amp * -cc65_sin (I)) / 256);
+        Y = (int) (((long) Amp * -_sin (I)) / 256);
 
         /* Draw the line */
         tgi_lineto (XOrigin + X, YOrigin + Y);
     }
 
     cgetc ();
-    tgi_clear ();
 }
 
 
@@ -162,19 +169,20 @@ static void DoLines (void)
 {
     static const unsigned char Palette[2] = { TGI_COLOR_WHITE, TGI_COLOR_BLACK };
     unsigned X;
+    const unsigned Min = (MaxX < MaxY) ? MaxX : MaxY;
 
     tgi_setpalette (Palette);
     tgi_setcolor (COLOR_FORE);
+    tgi_clear ();
 
-    for (X = 0; X <= MaxY; X += 10) {
-        tgi_line (0, 0, MaxY, X);
-        tgi_line (0, 0, X, MaxY);
-        tgi_line (MaxY, MaxY, 0, MaxY-X);
-        tgi_line (MaxY, MaxY, MaxY-X, 0);
+    for (X = 0; X <= Min; X += 10) {
+        tgi_line (0, 0, Min, X);
+        tgi_line (0, 0, X, Min);
+        tgi_line (Min, Min, 0, Min-X);
+        tgi_line (Min, Min, Min-X, 0);
     }
 
     cgetc ();
-    tgi_clear ();
 }
 
 
@@ -198,7 +206,6 @@ int main (void)
 
     tgi_init ();
     CheckError ("tgi_init");
-    tgi_clear ();
 
     /* Get stuff from the driver */
     MaxX = tgi_getmaxx ();

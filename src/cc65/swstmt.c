@@ -97,7 +97,6 @@ void SwitchStatement (void)
     SwitchCtrl* OldSwitch;      /* Pointer to old switch control data */
     SwitchCtrl  SwitchData;     /* New switch data */
 
-
     /* Eat the "switch" token */
     NextToken ();
 
@@ -105,6 +104,8 @@ void SwitchStatement (void)
     ** integer type.
     */
     ConsumeLParen ();
+
+    ED_Init (&SwitchExpr);
     Expression0 (&SwitchExpr);
     if (!IsClassInt (SwitchExpr.Type))  {
         Error ("Switch quantity is not an integer");
@@ -132,7 +133,7 @@ void SwitchStatement (void)
 
     /* Setup the control structure, save the old and activate the new one */
     SwitchData.Nodes        = NewCollection ();
-    SwitchData.ExprType     = UnqualifiedType (SwitchExpr.Type[0].C);
+    SwitchData.ExprType     = GetUnderlyingTypeCode (&SwitchExpr.Type[0]);
     SwitchData.Depth        = SizeOf (SwitchExpr.Type);
     SwitchData.DefaultLabel = 0;
     OldSwitch = Switch;
@@ -144,15 +145,10 @@ void SwitchStatement (void)
     /* Create a loop so we may use break. */
     AddLoop (ExitLabel, 0);
 
-    /* Make sure a curly brace follows */
-    if (CurTok.Tok != TOK_LCURLY) {
-        Error ("`{' expected");
-    }
-
-    /* Parse the following statement, which will actually be a compound
-    ** statement because of the curly brace at the current input position
+    /* Parse the following statement, which may actually be a compound
+    ** statement if there is a curly brace at the current input position
     */
-    HaveBreak = Statement (&RCurlyBrace);
+    HaveBreak = AnyStatement (&RCurlyBrace);
 
     /* Check if we had any labels */
     if (CollCount (SwitchData.Nodes) == 0 && SwitchData.DefaultLabel == 0) {
@@ -199,7 +195,7 @@ void SwitchStatement (void)
     /* Free the case value tree */
     FreeCaseNodeColl (SwitchData.Nodes);
 
-    /* If the case statement was (correctly) terminated by a closing curly
+    /* If the case statement was terminated by a closing curly
     ** brace, skip it now.
     */
     if (RCurlyBrace) {
@@ -210,18 +206,17 @@ void SwitchStatement (void)
 
 
 void CaseLabel (void)
-/* Handle a case sabel */
+/* Handle a case label */
 {
     ExprDesc CaseExpr;          /* Case label expression */
     long     Val;               /* Case label value */
     unsigned CodeLabel;         /* Code label for this case */
 
-
     /* Skip the "case" token */
     NextToken ();
 
     /* Read the selector expression */
-    ConstAbsIntExpr (hie1, &CaseExpr);
+    CaseExpr = NoCodeConstAbsIntExpr (hie1);
     Val = CaseExpr.IVal;
 
     /* Now check if we're inside a switch statement */
@@ -308,7 +303,7 @@ void DefaultLabel (void)
     } else {
 
         /* case keyword outside a switch statement */
-        Error ("`default' label not within a switch statement");
+        Error ("'default' label not within a switch statement");
 
     }
 

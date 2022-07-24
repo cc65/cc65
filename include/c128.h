@@ -60,7 +60,7 @@
 #define COLOR_WHITE             0x01
 #define COLOR_RED               0x02
 #define COLOR_CYAN              0x03
-#define COLOR_VIOLET            0x04
+#define COLOR_PURPLE            0x04
 #define COLOR_GREEN             0x05
 #define COLOR_BLUE              0x06
 #define COLOR_YELLOW            0x07
@@ -78,7 +78,7 @@
 #define TGI_COLOR_WHITE         COLOR_WHITE
 #define TGI_COLOR_RED           COLOR_RED
 #define TGI_COLOR_CYAN          COLOR_CYAN
-#define TGI_COLOR_VIOLET        COLOR_VIOLET
+#define TGI_COLOR_PURPLE        COLOR_PURPLE
 #define TGI_COLOR_GREEN         COLOR_GREEN
 #define TGI_COLOR_BLUE          COLOR_BLUE
 #define TGI_COLOR_YELLOW        COLOR_YELLOW
@@ -90,6 +90,13 @@
 #define TGI_COLOR_LIGHTGREEN    COLOR_LIGHTGREEN
 #define TGI_COLOR_LIGHTBLUE     COLOR_LIGHTBLUE
 #define TGI_COLOR_GRAY3         COLOR_GRAY3
+
+/* Masks for joy_read */
+#define JOY_UP_MASK             0x01
+#define JOY_DOWN_MASK           0x02
+#define JOY_LEFT_MASK           0x04
+#define JOY_RIGHT_MASK          0x08
+#define JOY_BTN_1_MASK          0x10
 
 /* Video mode defines */
 #define VIDEOMODE_40x25         0x00
@@ -134,6 +141,7 @@ extern void c128_joy_mou[];
 extern void c128_inkwell_mou[];
 extern void c128_pot_mou[];
 extern void c128_swlink_ser[];
+extern void c128_hi_tgi[];
 extern void c128_vdc_tgi[];     /* Referred to by tgi_static_stddrv[] */
 extern void c128_vdc2_tgi[];
 
@@ -160,7 +168,8 @@ void fast (void);
 void slow (void);
 /* Switch the CPU into 1MHz mode. */
 
-
+unsigned char isfast (void);
+/* Returns 1 if the CPU is in 2MHz mode. */
 
 /* End of c128.h */
 #endif

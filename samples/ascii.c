@@ -58,7 +58,7 @@ int main(void) {
 
         /* This prompt fits on the VIC-20's narrow screen.
         */
-        PRINT("Type characters to see\r\ntheir hexadecimal code\r\nnumbers:\r\n\n");
+        PRINT("Type characters to see\r\ntheir hexadecimal code\r\nnumbers - 'Q' quits:\r\n\n");
         screensize(&width, &height);    /* get the screen's dimensions */
         width /= 6;                     /* get number of codes on a line */
         cursor(true);

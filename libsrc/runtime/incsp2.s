@@ -2,7 +2,7 @@
 ; Ullrich von Bassewitz, 25.10.2000
 ;
 ; CC65 runtime: Increment the stackpointer by 2. For performance reasons,
-;               this modules does also contain the popax function.
+;               this module also contains the popax function.
 
         .export         popax, incsp2
         .importzp       sp

@@ -1,29 +1,45 @@
-# makefile for the tests that MUST NOT compile
+# Makefile for the tests that MUST NOT compile
 
 ifneq ($(shell echo),)
-  CMD_EXE := 1
+  CMD_EXE = 1
 endif
 
 ifdef CMD_EXE
-  NOT := - # Hack
-  DEL = -del /f $(subst /,\,$1)
+  S = $(subst /,\,/)
+  NOT = - # Hack
+  NULLDEV = nul:
+  MKDIR = mkdir $(subst /,\,$1)
+  RMDIR = -rmdir /s /q $(subst /,\,$1)
 else
-  NOT := !
-  DEL = $(RM) $1
+  S = /
+  NOT = !
+  NULLDEV = /dev/null
+  MKDIR = mkdir -p $1
+  RMDIR = $(RM) -r $1
 endif
 
-CC65 := $(if $(wildcard ../../bin/cc65*),../../bin/cc65,cc65)
+ifdef QUIET
+  .SILENT:
+  NULLERR = 2>$(NULLDEV)
+endif
 
-WORKDIR := ../../testwrk
+CC65 := $(if $(wildcard ../../bin/cc65*),..$S..$Sbin$Scc65,cc65)
+
+WORKDIR = ../../testwrk/err
 
 .PHONY: all clean
 
-TESTS := $(patsubst %.c,$(WORKDIR)/%.s,$(wildcard *.c))
+SOURCES := $(wildcard *.c)
+TESTS = $(patsubst %.c,$(WORKDIR)/%.s,$(SOURCES))
 
 all: $(TESTS)
 
-$(WORKDIR)/%.s: %.c
-	$(NOT) $(CC65) -o $@ $<
+$(WORKDIR):
+	$(call MKDIR,$(WORKDIR))
+
+$(WORKDIR)/%.s: %.c | $(WORKDIR)
+	$(if $(QUIET),echo err/$*.s)
+	$(NOT) $(CC65) -o $@ $< $(NULLERR)
 
 clean:
-	@$(call DEL,$(TESTS))
+	@$(call RMDIR,$(WORKDIR))

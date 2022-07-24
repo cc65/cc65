@@ -1,10 +1,8 @@
 <!doctype linuxdoc system>
 
 <article>
-
 <title>Commodore Plus/4 specific information for cc65
 <author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
-<date>2014-04-12
 
 <abstract>
 An overview over the Plus/4 runtime system as it is implemented for the cc65 C
@@ -113,6 +111,8 @@ declaration and usage.
 <item>cbm_k_basin
 <item>cbm_k_bsout
 <item>cbm_k_clrch
+<item>cbm_k_tksa
+<item>cbm_k_second
 <item>cbm_load
 <item>cbm_open
 <item>cbm_opendir
@@ -121,6 +121,20 @@ declaration and usage.
 <item>cbm_save
 <item>cbm_write
 <item>get_tv
+<item>waitvsync
+</itemize>
+
+
+<sect1>CBM specific CPU functions<p>
+
+Some CPU related functions are available for some of the Commodore
+machines. See the <url url="funcref.html" name="function reference"> for
+declaration and usage.
+
+<itemize>
+<item>fast
+<item>slow
+<item>isfast
 </itemize>
 
 
@@ -181,10 +195,10 @@ No mouse drivers are currently available for the Plus/4.
 
   <tag><tt/plus4-stdser.ser (plus4_stdser_ser)/</tag>
   Driver for the 6551 ACIA chip built into the Plus/4. Supports up to 19200
-  baud, hardware flow control (RTS/CTS) and interrupt driven receives. Note
-  that because of the peculiarities of the 6551 chip transmits are not
-  interrupt driven, and the transceiver blocks if the receiver asserts flow
-  control because of a full buffer.
+  baud, requires hardware flow control (RTS/CTS) and does interrupt driven
+  receives. Note that because of the peculiarities of the 6551 chip transmits
+  are not interrupt driven, and the transceiver blocks if the receiver asserts
+  flow control because of a full buffer.
 
   You need an adapter to use the builtin port, since the output levels
   available at the user port don't follow the RS232 standard.
@@ -247,14 +261,14 @@ including commercial applications, and to alter it and redistribute it
 freely, subject to the following restrictions:
 
 <enum>
-<item>	The origin of this software must not be misrepresented; you must not
-	claim that you wrote the original software. If you use this software
-	in a product, an acknowledgment in the product documentation would be
-	appreciated but is not required.
-<item>	Altered source versions must be plainly marked as such, and must not
-	be misrepresented as being the original software.
-<item>	This notice may not be removed or altered from any source
-	distribution.
+<item>  The origin of this software must not be misrepresented; you must not
+        claim that you wrote the original software. If you use this software
+        in a product, an acknowledgment in the product documentation would be
+        appreciated but is not required.
+<item>  Altered source versions must be plainly marked as such, and must not
+        be misrepresented as being the original software.
+<item>  This notice may not be removed or altered from any source
+        distribution.
 </enum>
 
 </article>

@@ -7,24 +7,25 @@
 
 #include <geos.h>
 #include <stdio.h>
+#include <stdarg.h>
 
 void _mbprintout(void);
 
-static dlgBoxStr _mbdlg_EMPTY = {
+static const dlgBoxStr _mbdlg_EMPTY = {
         DB_DEFPOS(1),
         DB_OPVEC(&RstrFrmDialogue),
         DB_USRROUT(&_mbprintout),
         DB_END,
 };
 
-static dlgBoxStr _mbdlg_OK = {
+static const dlgBoxStr _mbdlg_OK = {
         DB_DEFPOS(1),
         DB_USRROUT(&_mbprintout),
         DB_ICON(OK, DBI_X_1, DBI_Y_2),
         DB_END,
 };
 
-static dlgBoxStr _mbdlg_OKCANCEL = {
+static const dlgBoxStr _mbdlg_OKCANCEL = {
         DB_DEFPOS(1),
         DB_USRROUT(&_mbprintout),
         DB_ICON(OK, DBI_X_0, DBI_Y_2),
@@ -32,7 +33,7 @@ static dlgBoxStr _mbdlg_OKCANCEL = {
         DB_END,
 };
 
-static dlgBoxStr _mbdlg_YESNO = {
+static const dlgBoxStr _mbdlg_YESNO = {
         DB_DEFPOS(1),
         DB_USRROUT(&_mbprintout),
         DB_ICON(YES, DBI_X_0, DBI_Y_2),
@@ -40,7 +41,7 @@ static dlgBoxStr _mbdlg_YESNO = {
         DB_END,
 };
 
-static dlgBoxStr *_mbboxes[] = {
+static const dlgBoxStr * const _mbboxes[] = {
         &_mbdlg_EMPTY,
         &_mbdlg_OK,
         &_mbdlg_OKCANCEL,

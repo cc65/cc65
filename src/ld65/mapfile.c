@@ -67,7 +67,7 @@ void CreateMapFile (int ShortMap)
     /* Open the map file */
     FILE* F = fopen (MapFileName, "w");
     if (F == 0) {
-        Error ("Cannot create map file `%s': %s", MapFileName, strerror (errno));
+        Error ("Cannot create map file '%s': %s", MapFileName, strerror (errno));
     }
 
     /* Write a modules list */
@@ -93,7 +93,7 @@ void CreateMapFile (int ShortMap)
             ** requested
             */
             if (VerboseMap || S->Size > 0) {
-                fprintf (F, 
+                fprintf (F,
                          "    %-17s Offs=%06lX  Size=%06lX  "
                          "Align=%05lX  Fill=%04lX\n",
                          GetString (S->Seg->Name), S->Offs, S->Size,
@@ -132,7 +132,7 @@ void CreateMapFile (int ShortMap)
 
     /* Close the file */
     if (fclose (F) != 0) {
-        Error ("Error closing map file `%s': %s", MapFileName, strerror (errno));
+        Error ("Error closing map file '%s': %s", MapFileName, strerror (errno));
     }
 }
 
@@ -144,7 +144,7 @@ void CreateLabelFile (void)
     /* Open the label file */
     FILE* F = fopen (LabelFileName, "w");
     if (F == 0) {
-        Error ("Cannot create label file `%s': %s", LabelFileName, strerror (errno));
+        Error ("Cannot create label file '%s': %s", LabelFileName, strerror (errno));
     }
 
     /* Print the labels for the export symbols */
@@ -155,6 +155,6 @@ void CreateLabelFile (void)
 
     /* Close the file */
     if (fclose (F) != 0) {
-        Error ("Error closing label file `%s': %s", LabelFileName, strerror (errno));
+        Error ("Error closing label file '%s': %s", LabelFileName, strerror (errno));
     }
 }

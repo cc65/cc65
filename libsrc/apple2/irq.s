@@ -9,7 +9,9 @@
 
         .include        "apple2.inc"
 
-        .segment        "INIT"
+        .macpack        apple2
+
+        .segment        "ONCE"
 
 initirq:
         ; Check for ProDOS
@@ -36,17 +38,9 @@ prterr: ldx     #msglen-1
         jmp     _exit
 
 errmsg: .ifdef  __APPLE2ENH__
-        .byte   $8D,     't'|$80, 'p'|$80, 'u'|$80, 'r'|$80, 'r'|$80
-        .byte   'e'|$80, 't'|$80, 'n'|$80, 'i'|$80, ' '|$80, 'c'|$80
-        .byte   'o'|$80, 'l'|$80, 'l'|$80, 'a'|$80, ' '|$80, 'o'|$80
-        .byte   't'|$80, ' '|$80, 'd'|$80, 'e'|$80, 'l'|$80, 'i'|$80
-        .byte   'a'|$80, 'F'|$80, $8D
+        scrcode $0D, "tpurretni colla ot deliaF", $0D
         .else
-        .byte   $8D,     'T'|$80, 'P'|$80, 'U'|$80, 'R'|$80, 'R'|$80
-        .byte   'E'|$80, 'T'|$80, 'N'|$80, 'I'|$80, ' '|$80, 'C'|$80
-        .byte   'O'|$80, 'L'|$80, 'L'|$80, 'A'|$80, ' '|$80, 'O'|$80
-        .byte   'T'|$80, ' '|$80, 'D'|$80, 'E'|$80, 'L'|$80, 'I'|$80
-        .byte   'A'|$80, 'F'|$80, $8D
+        scrcode $0D, "TPURRETNI COLLA OT DELIAF", $0D
         .endif
 
 msglen = * - errmsg

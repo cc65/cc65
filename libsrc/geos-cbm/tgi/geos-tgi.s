@@ -74,7 +74,6 @@ aspect: .word $00D4             ; Aspect ratio (based on 4/3 display)
         .addr BAR
         .addr TEXTSTYLE
         .addr OUTTEXT
-        .addr 0                 ; IRQ entry is unused
 
 ; ------------------------------------------------------------------------
 ; Data.
@@ -94,7 +93,7 @@ Y2      = ptr4
 SCRBASE:
         .res 1                  ; High byte of screen base (64k VDC only)
 
-ERROR:  
+ERROR:
         .res 1                  ; Error code
 PALETTE:
         .res 2                  ; The current palette
@@ -200,9 +199,9 @@ INSTALL:
 @endok:
         lda #0
         sta SCRBASE             ; draw page 0 as default
-        rts 
+        rts
 
-test64k:    
+test64k:
         sta tmp1
         sty ptr3
         lda #0

@@ -65,12 +65,22 @@ struct SymTable {
 /* An empty symbol table */
 extern SymTable         EmptySymTab;
 
-/* Forwards */
-struct FuncDesc;
+/* Lexical level linked list node type */
+typedef struct LexicalLevel LexicalLevel;
+struct LexicalLevel {
+    LexicalLevel*       PrevLex;
+    unsigned            CurrentLevel;
+};
 
 /* Predefined lexical levels */
+#define LEX_LEVEL_NONE          0U
 #define LEX_LEVEL_GLOBAL        1U
 #define LEX_LEVEL_FUNCTION      2U
+#define LEX_LEVEL_BLOCK         3U
+#define LEX_LEVEL_STRUCT        4U
+
+/* Forwards */
+struct FuncDesc;
 
 
 
@@ -80,8 +90,17 @@ struct FuncDesc;
 
 
 
+unsigned GetLexicalLevelDepth (void);
+/* Return the current lexical level depth */
+
 unsigned GetLexicalLevel (void);
 /* Return the current lexical level */
+
+void PushLexicalLevel (unsigned NewLevel);
+/* Enter the specified lexical level */
+
+void PopLexicalLevel (void);
+/* Exit the current lexical level */
 
 void EnterGlobalLevel (void);
 /* Enter the program global lexical level */
@@ -133,9 +152,14 @@ SymEntry* FindLocalSym (const char* Name);
 SymEntry* FindTagSym (const char* Name);
 /* Find the symbol with the given name in the tag table */
 
-SymEntry* FindStructField (const Type* TypeArray, const char* Name);
-/* Find a struct field in the fields list */
+SymEntry FindStructField (const Type* TypeArray, const char* Name);
+/* Find a struct/union field in the fields list.
+** Return the info about the found field symbol filled in an entry struct by
+** value, or an empty entry struct if the field is not found.
+*/
 
+unsigned short FindSPAdjustment (const char* Name);
+/* Search for an entry in the table of SP adjustments */
 
 
 /*****************************************************************************/
@@ -144,10 +168,14 @@ SymEntry* FindStructField (const Type* TypeArray, const char* Name);
 
 
 
-SymEntry* AddStructSym (const char* Name, unsigned Type, unsigned Size, SymTable* Tab);
+SymEntry* AddEnumSym (const char* Name, unsigned Flags, const Type* Type, SymTable* Tab, unsigned* DSFlags);
+/* Add an enum entry and return it */
+
+SymEntry* AddStructSym (const char* Name, unsigned Flags, unsigned Size, SymTable* Tab, unsigned* DSFlags);
 /* Add a struct/union entry and return it */
 
-SymEntry* AddBitField (const char* Name, unsigned Offs, unsigned BitOffs, unsigned Width);
+SymEntry* AddBitField (const char* Name, const Type* Type, unsigned Offs,
+                       unsigned BitOffs, unsigned BitWidth, int SignednessSpecified);
 /* Add a bit field to the local symbol table and return the symbol entry */
 
 SymEntry* AddConstSym (const char* Name, const Type* T, unsigned Flags, long Val);
@@ -157,7 +185,7 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags);
 /* Add a goto label to the symbol table */
 
 SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs);
-/* Add a local symbol and return the symbol entry */
+/* Add a local or struct/union field symbol and return the symbol entry */
 
 SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags);
 /* Add an external or global symbol to the symbol table and return the entry */
@@ -175,6 +203,12 @@ SymTable* GetSymTab (void);
 
 SymTable* GetGlobalSymTab (void);
 /* Return the global symbol table */
+
+SymTable* GetFieldSymTab (void);
+/* Return the current field symbol table */
+
+SymTable* GetLabelSymTab (void);
+/* Return the label symbol table */
 
 int SymIsLocal (SymEntry* Sym);
 /* Return true if the symbol is defined in the highest lexical level */

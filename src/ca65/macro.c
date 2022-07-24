@@ -375,7 +375,7 @@ static void MacSkipDef (unsigned Style)
         if (CurTok.Tok != TOK_EOF) {
             SkipUntilSep ();
         } else {
-            Error ("`.ENDMACRO' expected");
+            Error ("'.ENDMACRO' expected");
         }
     } else {
         /* Skip until end of line */
@@ -409,7 +409,7 @@ void MacDef (unsigned Style)
     /* Did we already define that macro? */
     if (HT_Find (&MacroTab, &CurTok.SVal) != 0) {
         /* Macro is already defined */
-        Error ("A macro named `%m%p' is already defined", &CurTok.SVal);
+        Error ("A macro named '%m%p' is already defined", &CurTok.SVal);
         /* Skip tokens until we reach the final .endmacro */
         MacSkipDef (Style);
         return;
@@ -438,9 +438,7 @@ void MacDef (unsigned Style)
 
     /* Parse the parameter list */
     if (HaveParams) {
-
         while (CurTok.Tok == TOK_IDENT) {
-
             /* Create a struct holding the identifier */
             IdDesc* I = NewIdDesc (&CurTok.SVal);
 
@@ -449,9 +447,10 @@ void MacDef (unsigned Style)
                 M->Params = I;
             } else {
                 IdDesc* List = M->Params;
+
                 while (1) {
                     if (SB_Compare (&List->Id, &CurTok.SVal) == 0) {
-                        Error ("Duplicate symbol `%m%p'", &CurTok.SVal);
+                        Error ("Duplicate symbol '%m%p'", &CurTok.SVal);
                     }
                     if (List->Next == 0) {
                         break;
@@ -490,6 +489,22 @@ void MacDef (unsigned Style)
     ** the .LOCAL command is detected and removed, at this time.
     */
     while (1) {
+        /* Check for include */
+        if (CurTok.Tok == TOK_INCLUDE && Style == MAC_STYLE_CLASSIC) {
+            /* Include another file */
+            NextTok ();
+            /* Name must follow */
+            if (CurTok.Tok != TOK_STRCON) {
+                ErrorSkip ("String constant expected");
+            } else {
+                SB_Terminate (&CurTok.SVal);
+                if (NewInputFile (SB_GetConstBuf (&CurTok.SVal)) == 0) {
+                    /* Error opening the file, skip remainder of line */
+                    SkipUntilSep ();
+                }
+            }
+            NextTok ();
+        }
 
         /* Check for end of macro */
         if (Style == MAC_STYLE_CLASSIC) {
@@ -500,7 +515,7 @@ void MacDef (unsigned Style)
             }
             /* May not have end of file in a macro definition */
             if (CurTok.Tok == TOK_EOF) {
-                Error ("`.ENDMACRO' expected");
+                Error ("'.ENDMACRO' expected");
                 goto Done;
             }
         } else {
@@ -512,9 +527,7 @@ void MacDef (unsigned Style)
 
         /* Check for a .LOCAL declaration */
         if (CurTok.Tok == TOK_LOCAL && Style == MAC_STYLE_CLASSIC) {
-
             while (1) {
-
                 IdDesc* I;
 
                 /* Skip .local or comma */
@@ -553,6 +566,7 @@ void MacDef (unsigned Style)
         if (CurTok.Tok == TOK_IDENT) {
             unsigned Count = 0;
             IdDesc* I = M->Params;
+
             while (I) {
                 if (SB_Compare (&I->Id, &CurTok.SVal) == 0) {
                     /* Local param name, replace it */
@@ -623,7 +637,7 @@ void MacUndef (const StrBuf* Name, unsigned char Style)
 
 
 static int MacExpand (void* Data)
-/* If we're currently expanding a macro, set the the scanner token and
+/* If we're currently expanding a macro, set the scanner token and
 ** attribute to the next value and return true. If we are not expanding
 ** a macro, return false.
 */
@@ -787,9 +801,6 @@ static void StartExpClassic (MacExp* E)
 {
     token_t Term;
 
-    /* Skip the macro name */
-    NextTok ();
-
     /* Does this invocation have any arguments? */
     if (!TokIsSep (CurTok.Tok)) {
 
@@ -873,9 +884,6 @@ static void StartExpDefine (MacExp* E)
     */
     unsigned Count = E->M->ParamCount;
 
-    /* Skip the current token */
-    NextTok ();
-
     /* Read the actual parameters */
     while (Count--) {
         TokNode* Last;
@@ -930,7 +938,7 @@ static void StartExpDefine (MacExp* E)
             if (CurTok.Tok == TOK_COMMA) {
                 NextTok ();
             } else {
-                Error ("`,' expected");
+                Error ("',' expected");
             }
         }
     }
@@ -951,14 +959,19 @@ static void StartExpDefine (MacExp* E)
 void MacExpandStart (Macro* M)
 /* Start expanding a macro */
 {
+    FilePos Pos;
     MacExp* E;
 
     /* Check the argument */
     PRECONDITION (M && (M->Style != MAC_STYLE_DEFINE || DisableDefines == 0));
 
+    /* Remember the current file position, then skip the macro name token */
+    Pos = CurTok.Pos;
+    NextTok ();
+
     /* We cannot expand an incomplete macro */
     if (M->Incomplete) {
-        Error ("Cannot expand an incomplete macro");
+        PError (&Pos, "Cannot expand an incomplete macro");
         return;
     }
 
@@ -966,7 +979,7 @@ void MacExpandStart (Macro* M)
     ** to force an endless loop and assembler crash.
     */
     if (MacExpansions >= MAX_MACEXPANSIONS) {
-        Error ("Too many nested macro expansions");
+        PError (&Pos, "Too many nested macro expansions");
         return;
     }
 

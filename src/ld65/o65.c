@@ -633,7 +633,8 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
     if (E->Op == EXPR_BYTE0   || E->Op == EXPR_BYTE1 ||
         E->Op == EXPR_BYTE2   || E->Op == EXPR_BYTE3 ||
         E->Op == EXPR_WORD0   || E->Op == EXPR_WORD1 ||
-        E->Op == EXPR_FARADDR || E->Op == EXPR_DWORD) {
+        E->Op == EXPR_FARADDR || E->Op == EXPR_DWORD ||
+        E->Op == EXPR_NEARADDR) {
         /* Use the real expression */
         Expr = E->Left;
     }
@@ -678,6 +679,7 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
         case EXPR_WORD1:    BinVal = (BinVal >> 16) & 0xFFFF;   break;
         case EXPR_FARADDR:  BinVal &= 0xFFFFFFUL;               break;
         case EXPR_DWORD:    BinVal &= 0xFFFFFFFFUL;             break;
+        case EXPR_NEARADDR: BinVal &= 0xFFFF;                   break;
     }
     WriteVal (D->F, BinVal, Size);
 
@@ -784,7 +786,7 @@ static void O65WriteSeg (O65Desc* D, SegDesc** Seg, unsigned Count, int DoWrite)
         S = Seg [I];
 
         /* Keep the user happy */
-        Print (stdout, 1, "    Writing `%s'\n", GetString (S->Name));
+        Print (stdout, 1, "    Writing '%s'\n", GetString (S->Name));
 
         /* Write this segment */
         if (DoWrite) {
@@ -805,7 +807,7 @@ static void O65WriteSeg (O65Desc* D, SegDesc** Seg, unsigned Count, int DoWrite)
 
     /* Check the size of the segment for overflow */
     if ((D->Header.Mode & MF_SIZE_MASK) == MF_SIZE_16BIT && D->SegSize > 0xFFFF) {
-        Error ("Segment overflow in file `%s'", D->Filename);
+        Error ("Segment overflow in file '%s'", D->Filename);
     }
 
 }
@@ -940,7 +942,7 @@ static void O65WriteExports (O65Desc* D)
         */
         Export* E = FindExport (NameIdx);
         if (E == 0 || IsUnresolvedExport (E)) {
-            Internal ("Unresolved export `%s' found in O65WriteExports", Name);
+            Internal ("Unresolved export '%s' found in O65WriteExports", Name);
         }
 
         /* Get the expression for the symbol */
@@ -958,7 +960,7 @@ static void O65WriteExports (O65Desc* D)
 
         /* Bail out if we cannot handle the expression */
         if (ED.TooComplex) {
-            Error ("Expression for symbol `%s' is too complex", Name);
+            Error ("Expression for symbol '%s' is too complex", Name);
         }
 
         /* Determine the segment id for the expression */
@@ -977,7 +979,7 @@ static void O65WriteExports (O65Desc* D)
                 /* For some reason, we didn't find this segment in the list of
                 ** segments written to the o65 file.
                 */
-                Error ("Segment for symbol `%s' is undefined", Name);
+                Error ("Segment for symbol '%s' is undefined", Name);
             }
             SegmentID = O65SegType (Seg);
 
@@ -1207,7 +1209,7 @@ void O65SetExport (O65Desc* D, unsigned Ident)
     */
     Export* E = FindExport (Ident);
     if (E == 0 || IsUnresolvedExport (E)) {
-        Error ("Unresolved export: `%s'", GetString (Ident));
+        Error ("Unresolved export: '%s'", GetString (Ident));
     }
 
     /* Insert the entry into the table */
@@ -1370,11 +1372,11 @@ void O65WriteTarget (O65Desc* D, File* F)
     /* Open the file */
     D->F = fopen (D->Filename, "wb");
     if (D->F == 0) {
-        Error ("Cannot open `%s': %s", D->Filename, strerror (errno));
+        Error ("Cannot open '%s': %s", D->Filename, strerror (errno));
     }
 
     /* Keep the user happy */
-    Print (stdout, 1, "Opened `%s'...\n", D->Filename);
+    Print (stdout, 1, "Opened '%s'...\n", D->Filename);
 
     /* Define some more options: A timestamp, the linker version and the
     ** filename
@@ -1428,7 +1430,7 @@ void O65WriteTarget (O65Desc* D, File* F)
 
     /* Close the file */
     if (fclose (D->F) != 0) {
-        Error ("Cannot write to `%s': %s", D->Filename, strerror (errno));
+        Error ("Cannot write to '%s': %s", D->Filename, strerror (errno));
     }
 
     /* Reset the file and filename */

@@ -11,8 +11,6 @@
         .export         writediskcmd
         .export         writefndiskcmd
 
-        .import         SETLFS, SETNAM, OPEN, CLOSE, BSOUT, BASIN
-        .import         CHKIN, CKOUT, CLRCH
         .import         fncmd, fnlen, fnunit
         .importzp       tmp1, ptr1
 

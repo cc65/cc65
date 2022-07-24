@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2000-2005 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -41,6 +41,8 @@
 /* common */
 #include "chartype.h"
 #include "xsprintf.h"
+#include "xmalloc.h"
+#include "strbuf.h"
 
 /* ld65 */
 #include "global.h"
@@ -72,6 +74,7 @@ static int              C               = ' ';
 static unsigned         InputLine       = 1;
 static unsigned         InputCol        = 0;
 static FILE*            InputFile       = 0;
+static char*            InputSrcName    = 0;
 
 
 
@@ -91,7 +94,8 @@ void InfoWarning (const char* Format, ...)
     xvsprintf (Buf, sizeof (Buf), Format, ap);
     va_end (ap);
 
-    Warning ("%s(%u): %s", InfoFile, InfoErrorLine, Buf);
+    fprintf (stderr, "%s:%u: Warning: %s\n",
+            InputSrcName, InfoErrorLine, Buf);
 }
 
 
@@ -106,8 +110,11 @@ void InfoError (const char* Format, ...)
     xvsprintf (Buf, sizeof (Buf), Format, ap);
     va_end (ap);
 
-    Error ("%s(%u): %s", InfoFile, InfoErrorLine, Buf);
+    fprintf (stderr, "%s:%u: Error: %s\n",
+            InputSrcName, InfoErrorLine, Buf);
+    exit (EXIT_FAILURE);
 }
+
 
 
 
@@ -149,17 +156,179 @@ static unsigned DigitVal (int C)
 
 
 
+static void SkipBlanks (int SingleLine)
+{
+    while (C != EOF && (!SingleLine || C != '\n') && IsSpace (C)) {
+        NextChar ();
+    }
+}
+
+
+
+static long GetDecimalToken (void)
+{
+    long Value = 0;
+
+    while (C != EOF && IsDigit (C)) {
+        Value = Value * 10 + DigitVal (C);
+        NextChar ();
+    }
+    return Value;
+}
+
+
+
+static int GetEncodedChar (char* Buf, unsigned* IPtr, unsigned Size)
+{
+    char Decoded = 0;
+    int Count;
+
+    if (C == EOF) {
+        return -1;
+    } else if (C != '\\') {
+        Decoded = C;
+        NextChar ();
+        goto Store;
+    }
+    NextChar (); /* consume '\\' */
+    if (C == EOF) {
+        return -1;
+    } else if (IsODigit (C)) {
+        Count = 3;
+        do {
+            Decoded = Decoded * 8 + DigitVal (C);
+            NextChar ();
+            --Count;
+        } while (Count > 0 && C != EOF && IsODigit (C));
+    } else if (C == 'x') {
+        NextChar (); /* consume 'x' */
+        Count = 2;
+        while (Count > 0 && C != EOF && IsXDigit (C)) {
+            Decoded = Decoded * 16 + DigitVal (C);
+            NextChar ();
+            --Count;
+        }
+    } else {
+        switch (C) {
+            case '"': case '\'': case '\\':
+                        Decoded = C;        break;
+            case 't':   Decoded = '\t';     break;
+            case 'r':   Decoded = '\r';     break;
+            case 'n':   Decoded = '\n';     break;
+            default:    return -1;
+        }
+        NextChar ();
+    }
+Store:
+    if (*IPtr < Size - 1) {
+        Buf [(*IPtr)++] = Decoded;
+    }
+    Buf [*IPtr] = 0;
+    return 0;
+}
+
+
+
+static void LineMarkerOrComment ()
+/* Handle a line beginning with '#'. Possible interpretations are:
+** - #line <lineno> ["<filename>"]          (C preprocessor input)
+** - # <lineno> "<filename>" [<flag>]...    (gcc preprocessor output)
+** - #<comment>
+*/
+{
+    unsigned long LineNo = 0;
+    int LineDirective = 0;
+    StrBuf SrcNameBuf = AUTO_STRBUF_INITIALIZER;
+
+    /* Skip the first "# " */
+    NextChar ();
+    SkipBlanks (1);
+
+    /* Check "line" */
+    if (C == 'l') {
+        char MaybeLine [6];
+        unsigned I;
+        for (I = 0; I < sizeof MaybeLine - 1 && C != EOF && IsAlNum (C); ++I) {
+            MaybeLine [I] = C;
+            NextChar ();
+        }
+        MaybeLine [I] = 0;
+        if (strcmp (MaybeLine, "line") != 0) {
+            goto NotMarker;
+        }
+        LineDirective = 1;
+        SkipBlanks (1);
+    }
+
+    /* Get line number */
+    if (C == EOF || !IsDigit (C)) {
+        goto NotMarker;
+    }
+    LineNo = GetDecimalToken ();
+    SkipBlanks (1);
+
+    /* Get the source file name */
+    if (C != '\"') {
+        /* The source file name is missing */
+        if (LineDirective && C == '\n') {
+            /* got #line <lineno> */
+            NextChar ();
+            InputLine = LineNo;
+            goto Last;
+        } else {
+            goto NotMarker;
+        }
+    }
+    NextChar ();
+    while (C != EOF && C != '\n' && C != '\"') {
+        char DecodeBuf [2];
+        unsigned I = 0;
+        if (GetEncodedChar (DecodeBuf, &I, sizeof DecodeBuf) < 0) {
+            goto BadMarker;
+        }
+        SB_AppendBuf (&SrcNameBuf, DecodeBuf, I);
+    }
+    if (C != '\"') {
+        goto BadMarker;
+    }
+    NextChar ();
+
+    /* Ignore until the end of line */
+    while (C != EOF && C != '\n') {
+        NextChar ();
+    }
+
+    /* Accepted a line marker */
+    SB_Terminate (&SrcNameBuf);
+    xfree (InputSrcName);
+    InputSrcName = SB_GetBuf (&SrcNameBuf);
+    SB_Init (&SrcNameBuf);
+    InputLine = (unsigned)LineNo;
+    NextChar ();
+    goto Last;
+
+BadMarker:
+    InfoWarning ("Bad line marker");
+NotMarker:
+    while (C != EOF && C != '\n') {
+        NextChar ();
+    }
+    NextChar ();
+Last:
+    SB_Done (&SrcNameBuf);
+}
+
+
+
 void InfoNextTok (void)
 /* Read the next token from the input stream */
 {
     unsigned I;
-    int      Esc;
+    char DecodeBuf [2];
 
 Again:
     /* Skip whitespace */
-    while (IsSpace (C)) {
-        NextChar ();
-    }
+    SkipBlanks (0);
 
     /* Remember the current position */
     InfoErrorLine = InputLine;
@@ -198,11 +367,7 @@ Again:
 
     /* Decimal number? */
     if (IsDigit (C)) {
-        InfoIVal = 0;
-        while (IsDigit (C)) {
-            InfoIVal = InfoIVal * 10 + DigitVal (C);
-            NextChar ();
-        }
+        InfoIVal = GetDecimalToken ();
         InfoTok = INFOTOK_INTCON;
         return;
     }
@@ -248,38 +413,32 @@ Again:
         case '\"':
             NextChar ();
             I = 0;
-            while (C != '\"') {
-                Esc = (C == '\\');
-                if (Esc) {
-                    NextChar ();
-                }
-                if (C == EOF || C == '\n') {
-                    InfoError ("Unterminated string");
-                }
-                if (Esc) {
-                    switch (C) {
-                        case '\"':      C = '\"';       break;
-                        case '\'':      C = '\'';       break;
-                        default:        InfoError ("Invalid escape char: %c", C);
+            InfoSVal[0] = '\0';
+            while (C != EOF && C != '\"') {
+                if (GetEncodedChar (InfoSVal, &I, sizeof InfoSVal) < 0) {
+                    if (C == EOF) {
+                        InfoError ("Unterminated string");
+                    } else  {
+                        InfoError ("Invalid escape char: %c", C);
                     }
                 }
-                if (I < CFG_MAX_IDENT_LEN) {
-                    InfoSVal [I++] = C;
-                }
-                NextChar ();
+            }
+            if (C != '\"') {
+                InfoError ("Unterminated string");
             }
             NextChar ();
-            InfoSVal [I] = '\0';
             InfoTok = INFOTOK_STRCON;
             break;
 
         case '\'':
             NextChar ();
-            if (C == EOF || IsControl (C)) {
+            if (C == EOF || IsControl (C) || C == '\'') {
                 InfoError ("Invalid character constant");
             }
-            InfoIVal = C;
-            NextChar ();
+            if (GetEncodedChar (DecodeBuf, &I, sizeof DecodeBuf) < 0 || I != 1) {
+                InfoError ("Invalid character constant");
+            }
+            InfoIVal = DecodeBuf [0];
             if (C != '\'') {
                 InfoError ("Unterminated character constant");
             }
@@ -288,10 +447,30 @@ Again:
             break;
 
         case '#':
-            /* Comment */
-            while (C != '\n' && C != EOF) {
+            /* # lineno "sourcefile" or # comment */
+            if (SyncLines && InputCol == 1) {
+                LineMarkerOrComment ();
+            } else {
+                do {
+                    NextChar ();
+                } while (C != EOF && C != '\n');
                 NextChar ();
             }
+            if (C != EOF) {
+                goto Again;
+            }
+            InfoTok = INFOTOK_EOF;
+            break;
+
+        case '/':
+            /* C++ style comment */
+            NextChar ();
+            if (C != '/') {
+                InfoError ("Invalid token '/'");
+            }
+            do {
+                NextChar ();
+            } while (C != '\n' && C != EOF);
             if (C != EOF) {
                 goto Again;
             }
@@ -303,7 +482,7 @@ Again:
             break;
 
         default:
-            InfoError ("Invalid character `%c'", C);
+            InfoError ("Invalid character '%c'", C);
 
     }
 }
@@ -324,7 +503,7 @@ void InfoConsume (unsigned T, const char* Msg)
 void InfoConsumeLCurly (void)
 /* Consume a left curly brace */
 {
-    InfoConsume (INFOTOK_LCURLY, "`{' expected");
+    InfoConsume (INFOTOK_LCURLY, "'{' expected");
 }
 
 
@@ -332,7 +511,7 @@ void InfoConsumeLCurly (void)
 void InfoConsumeRCurly (void)
 /* Consume a right curly brace */
 {
-    InfoConsume (INFOTOK_RCURLY, "`}' expected");
+    InfoConsume (INFOTOK_RCURLY, "'}' expected");
 }
 
 
@@ -340,7 +519,7 @@ void InfoConsumeRCurly (void)
 void InfoConsumeSemi (void)
 /* Consume a semicolon */
 {
-    InfoConsume (INFOTOK_SEMI, "`;' expected");
+    InfoConsume (INFOTOK_SEMI, "';' expected");
 }
 
 
@@ -348,7 +527,7 @@ void InfoConsumeSemi (void)
 void InfoConsumeColon (void)
 /* Consume a colon */
 {
-    InfoConsume (INFOTOK_COLON, "`:' expected");
+    InfoConsume (INFOTOK_COLON, "':' expected");
 }
 
 
@@ -484,14 +663,8 @@ void InfoSetName (const char* Name)
 /* Set a name for a config file */
 {
     InfoFile = Name;
-}
-
-
-
-const char* InfoGetName (void)
-/* Get the name of the config file */
-{
-    return InfoFile? InfoFile : "";
+    xfree(InputSrcName);
+    InputSrcName = xstrdup(Name);
 }
 
 
@@ -510,7 +683,7 @@ void InfoOpenInput (void)
     /* Open the file */
     InputFile = fopen (InfoFile, "r");
     if (InputFile == 0) {
-        Error ("Cannot open `%s': %s", InfoFile, strerror (errno));
+        Error ("Cannot open '%s': %s", InfoFile, strerror (errno));
     }
 
     /* Initialize variables */

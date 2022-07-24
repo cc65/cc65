@@ -1,25 +1,29 @@
-/*
-  !!DESCRIPTION!! A small test for atoi/strtol. Assumes twos complement
-  !!ORIGIN!!
-  !!LICENCE!!
-  !!AUTHOR!!
-*/
-
+/* A small test for strtol. Assumes twos complement */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
 #include <errno.h>
 
+
+
+#define outfile stderr
+
+
+
 #define ERROR   0
 #define OK      1
 
+
+
 static unsigned int Failures = 0;
+
+
 
 static void IncStr (char* Buf)
 /* Increment a number represented as a string by one. The string MUST not
- * start with a '9', we cannot handle overflow in this case.
- */
+** start with a '9', we cannot handle overflow in this case.
+*/
 {
     int Len = strlen (Buf);
 
@@ -36,32 +40,39 @@ static void IncStr (char* Buf)
     }
 }
 
+
+
 static void CheckStrToL (const char* Str, int Base, long Val, unsigned char Ok)
 {
     char* EndPtr;
     long Res = strtol (Str, &EndPtr, Base);
     if (Ok) {
         if (Res != Val) {
-            printf ("strtol error in \"%s\":\n"
-                    "  result = %ld, should be %ld, chars = %d\n",
-                    Str, Res, Val, EndPtr - Str);
+            fprintf (outfile,
+                     "strtol error in \"%s\":\n"
+                     "  result = %ld, should be %ld, chars = %d\n",
+                     Str, Res, Val, EndPtr - Str);
             ++Failures;
         }
     } else {
         if (errno != ERANGE) {
-            printf ("strtol error in \"%s\":\n"
-                    "  should not convert, but errno = %d\n",
-                    Str, errno);
+            fprintf (outfile,
+                     "strtol error in \"%s\":\n"
+                     "  should not convert, but errno = %d\n",
+                     Str, errno);
             ++Failures;
         }
         if (Res != Val) {
-            printf ("strtol error in \"%s\":\n"
-                    "  result = %ld, should be %ld, chars = %d\n",
-                    Str, Res, Val, EndPtr - Str);
+            fprintf (outfile,
+                     "strtol error in \"%s\":\n"
+                     "  result = %ld, should be %ld, chars = %d\n",
+                     Str, Res, Val, EndPtr - Str);
             ++Failures;
         }
     }
 }
+
+
 
 int main (void)
 {
@@ -129,7 +140,6 @@ int main (void)
     CheckStrToL ("zyaB", 35, 0L, ERROR);
     CheckStrToL ("zyaB", 36, 1677395L, ERROR);
 
-    printf ("Failures: %u\n", Failures);
-
-    return Failures;
+    fprintf (outfile, "Failures: %u\n", Failures);
+    return (Failures != 0);
 }

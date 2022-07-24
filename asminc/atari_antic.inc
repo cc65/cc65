@@ -33,16 +33,16 @@ NMIRES  = ANTIC + $0F         ;NMI interrupt reset
 ; ScreenDL:
 ; .byte DL_BLK8
 ; .byte DL_BLK8
-; .byte DL_CHR40x8x1 + DL_LMS + DL_DLI
+; .byte DL_CHR40x8x1 | DL_LMS | DL_DLI
 ; .word ScreenAlignment
-; .byte DL_BLK1 + DL_DLI
-; .byte DL_MAP320x1x1 + DL_LMS
+; .byte DL_BLK1 | DL_DLI
+; .byte DL_MAP320x1x1 | DL_LMS
 ; .word Screen
 ;
 ; .repeat 99
 ; .byte DL_MAP320x1x1
 ; .endrepeat
-; .byte DL_MAP320x1x1 + DL_LMS
+; .byte DL_MAP320x1x1 | DL_LMS
 ; .word Screen + 40 * 100       ; 100 lines a 40 byte, 'Screen' has to be aligned correctly!
 ; .repeat 92
 ; .byte DL_MAP320x1x1
@@ -54,6 +54,8 @@ NMIRES  = ANTIC + $0F         ;NMI interrupt reset
 
 DL_JMP  = 1
 DL_JVB  = 65
+
+; DL_BLKn display n empty lines (just background)
 
 DL_BLK1  = 0
 DL_BLK2  = 16
@@ -74,13 +76,13 @@ DL_CHR20x8x2  = 6               ; colour (duochrome per character), 20 character
 DL_CHR20x16x2 = 7               ; colour (duochrome per character), 20 character & 16 scanlines per mode line (GR. 2)
 
 DL_MAP40x8x4  = 8               ; colour, 40 pixel & 8 scanlines per mode line (GR. 3)
-DL_MAP80x4x2  = 9               ; 'duochrome', 80 pixel & 4 scanlines per mode line (GR.4) 
-DL_MAP80x4x4  = 10              ; colour, 80 pixel & 4 scanlines per mode line (GR.5) 
-DL_MAP160x2x2 = 11              ; 'duochrome', 160 pixel & 2 scanlines per mode line (GR.6) 
-DL_MAP160x1x2 = 12              ; 'duochrome', 160 pixel & 1 scanline per mode line (GR.14) 
-DL_MAP160x2x4 = 13              ; 4 colours, 160 pixel & 2 scanlines per mode line (GR.7) 
-DL_MAP160x1x4 = 14              ; 4 colours, 160 pixel & 1 scanline per mode line (GR.15) 
-DL_MAP320x1x1 = 15              ; monochrome, 320 pixel & 1 scanline per mode line (GR.8) 
+DL_MAP80x4x2  = 9               ; 'duochrome', 80 pixel & 4 scanlines per mode line (GR.4)
+DL_MAP80x4x4  = 10              ; colour, 80 pixel & 4 scanlines per mode line (GR.5)
+DL_MAP160x2x2 = 11              ; 'duochrome', 160 pixel & 2 scanlines per mode line (GR.6)
+DL_MAP160x1x2 = 12              ; 'duochrome', 160 pixel & 1 scanline per mode line (GR.14)
+DL_MAP160x2x4 = 13              ; 4 colours, 160 pixel & 2 scanlines per mode line (GR.7)
+DL_MAP160x1x4 = 14              ; 4 colours, 160 pixel & 1 scanline per mode line (GR.15)
+DL_MAP320x1x1 = 15              ; monochrome, 320 pixel & 1 scanline per mode line (GR.8)
 
 ; modifiers on mode lines...
 

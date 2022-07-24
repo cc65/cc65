@@ -7,7 +7,7 @@
 ;/*                                                                           */
 ;/*                                                                           */
 ;/* (C) 2003      Ullrich von Bassewitz                                       */
-;/*               Römerstrasse 52                                             */
+;/*               Roemerstrasse 52                                            */
 ;/*               D-70794 Filderstadt                                         */
 ;/* EMail:        uz@cc65.org                                                 */
 ;/*                                                                           */
@@ -33,7 +33,7 @@
 
 
 
-; Struct utsname 
+; Struct utsname
 .struct utsname
         sysname         .byte   17
         nodename        .byte   9

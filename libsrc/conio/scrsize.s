@@ -6,29 +6,30 @@
 
         .export         _screensize
 
-        .import         popsreg
+        .import         popptr1
         .import         screensize
-        .importzp       ptr1, sreg
+        .importzp       ptr1, ptr2
+
+        .macpack        cpu
 
 .proc   _screensize
 
-        sta     ptr1            ; Store the y pointer
-        stx     ptr1+1
-        jsr     popsreg         ; Get the x pointer into sreg
+        sta     ptr2            ; Store the y pointer
+        stx     ptr2+1
+        jsr     popptr1         ; Get the x pointer into ptr1
         jsr     screensize      ; Get screensize into X/Y
         tya                     ; Get Y size into A
 
-.IFP02
-        ldy     #0
-        sta     (ptr1),y
+.if (.cpu .bitand ::CPU_ISET_65SC02)
+        sta     (ptr2)
         txa
-        sta     (sreg),y
-.ELSE
         sta     (ptr1)
+.else
+        ldy     #0
+        sta     (ptr2),y
         txa
-        sta     (sreg)
-.ENDIF
-
+        sta     (ptr1),y
+.endif
         rts
 
 .endproc

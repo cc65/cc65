@@ -13,7 +13,6 @@
         .import         zerobss, copydata
 
         .include        "zeropage.inc"
-        .include        "atari5200.inc"
 
 start:
 
@@ -27,9 +26,9 @@ start:
 ; Set up the stack.
 
         lda     #<(__RAM_START__ + __RAM_SIZE__ - __RESERVED_MEMORY__)
+        ldx     #>(__RAM_START__ + __RAM_SIZE__ - __RESERVED_MEMORY__)
         sta     sp
-        lda     #>(__RAM_START__ + __RAM_SIZE__ - __RESERVED_MEMORY__)
-        sta     sp+1            ; Set argument stack ptr
+        stx     sp+1            ; Set argument stack ptr
 
 ; Call the module constructors.
 
@@ -45,4 +44,4 @@ _exit:  jsr     donelib         ; Run module destructors
 
 ; A 5200 program isn't supposed to exit.
 
-halt:   jmp halt
+halt:   jmp     halt

@@ -1,12 +1,10 @@
 <!doctype linuxdoc system>
 
 <article>
-
-<title>Commodore VIC20 (aka VC20) specific information for cc65
+<title>Commodore VIC20 (aka VC20 aka VIC1001) specific information for cc65
 <author>
 <url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
 <url url="mailto:polluks@sdf.lonestar.org" name="Stefan A. Haubenthal">
-<date>2014-04-12
 
 <abstract>
 An overview over the VIC20 runtime system as it is implemented for the cc65 C
@@ -77,7 +75,6 @@ common to all CBM platforms.
 There are currently no special VIC20 functions.
 
 
-
 <sect1>CBM-specific functions<p>
 
 Some functions are available for all (or at least most) of the Commodore
@@ -99,6 +96,8 @@ declaration and usage.
 <item>cbm_k_basin
 <item>cbm_k_bsout
 <item>cbm_k_clrch
+<item>cbm_k_tksa
+<item>cbm_k_second
 <item>cbm_load
 <item>cbm_open
 <item>cbm_opendir
@@ -107,6 +106,7 @@ declaration and usage.
 <item>cbm_save
 <item>cbm_write
 <item>get_tv
+<item>waitvsync
 </itemize>
 
 
@@ -142,12 +142,50 @@ The names in the parentheses denote the symbols to be used for static linking of
 
 <sect1>Graphics drivers<p>
 
-No graphics drivers are currently available for the VIC20.
+<descrip>
+
+  <tag><tt/vic20-hi.tgi (vic20_hi_tgi)/</tag>
+  This driver features a resolution of 160&times;192 with two colors.  The
+  background can be chosen from a sixteen-color palette.  The foreground can
+  be chosen from an eight-color palette.
+
+  The driver will use memory from addresses $1000 to $1FFF as a graphics
+  buffer.  Therefore, the VIC-20 must have, at least, 8K of expansion RAM.
+
+  Programs that use this driver must be linked by the <tt/vic20-tgi.cfg/
+  configuration file.  It will link a special header into the program.
+  That header will do the housekeeping that's needed by TGI.
+
+  An example command line:
+  <tscreen><verb>
+  cl65 -D DYN_DRV=0 -t vic20 -C vic20-tgi.cfg samples/mandelbrot.c
+  </verb></tscreen>
+
+  When the program starts, it will move itself up in RAM, to make room for the
+  buffer.  When the program finishes, it will reset the BASIC interpreter.
+  That means that graphics pictures won't be preserved between the executions
+  of programs.  Also, the graphics buffer shares RAM with the text screen.  If
+  a picture must be saved, then a program must put it somewhere else (such as
+  a disk file) before returning to the text mode.
+
+</descrip>
 
 
 <sect1>Extended memory drivers<p>
 
-No extended memory drivers are currently available for the VIC20.
+<descrip>
+
+  <tag><tt/vic20-rama.emd (vic20_rama_emd)/</tag>
+  A driver for any RAM at $A000-$BFFF. Supports 32 256 byte pages.
+  Written and contributed by Marco van den Heuvel.
+
+  <tag><tt/vic20-georam.emd (vic20_georam_emd)/</tag>
+  A driver for the Berkeley Softworks GeoRam cartridge connected by means of
+  the MasC=erade c64 cartridge adapter. The driver will determine the
+  available RAM from the connected cartridge. It supports 64KB
+  up to 2048KB of RAM.
+
+</descrip><p>
 
 
 <sect1>Joystick drivers<p>
@@ -161,8 +199,9 @@ The default drivers, <tt/joy_stddrv (joy_static_stddrv)/, point to <tt/vic20-std
 
   <tag><tt/vic20-ptvjoy.joy (vic20_ptvjoy_joy)/</tag>
   Driver for the Protovision 4-player adapter contributed by Groepaz. See
-  <url url="http://www.protovision-online.de/hardw/hardwstart.htm"> for prices and
-  building instructions. Up to three joysticks are supported.
+  <url url="https://www.protovision.games/hardw/4_player.php"
+  name="the Protovision shop"> for prices and building instructions. Up to three
+  joysticks are supported.
 
 </descrip><p>
 
@@ -181,13 +220,14 @@ No VIC1011 drivers are currently available for the VIC20.
 <sect>Limitations<p>
 
 
-
-<sect>Other hints<p>
-
-
 <sect1>Escape code<p>
 
-For an Esc, press CTRL and the <tt/[/ key.
+The CTRL key cannot be used to type most control characters,
+entering an Esc is not possible.
+
+
+
+<sect>Other hints<p>
 
 
 <sect1>Passing arguments to the program<p>
@@ -218,8 +258,7 @@ The program return code (low byte) is passed back to BASIC by use of the
 
 <sect1>Using extended memory<p>
 
-The extended memory at $A000 may be added to the heap by using the following
-code:
+BLK5 memory may be added to the heap by using the following code:
 
 <tscreen><verb>
     /* Check for the existence of RAM */
@@ -251,14 +290,14 @@ including commercial applications, and to alter it and redistribute it
 freely, subject to the following restrictions:
 
 <enum>
-<item>	The origin of this software must not be misrepresented; you must not
-	claim that you wrote the original software. If you use this software
-	in a product, an acknowledgment in the product documentation would be
-	appreciated but is not required.
-<item>	Altered source versions must be plainly marked as such, and must not
-	be misrepresented as being the original software.
-<item>	This notice may not be removed or altered from any source
-	distribution.
+<item>  The origin of this software must not be misrepresented; you must not
+        claim that you wrote the original software. If you use this software
+        in a product, an acknowledgment in the product documentation would be
+        appreciated but is not required.
+<item>  Altered source versions must be plainly marked as such, and must not
+        be misrepresented as being the original software.
+<item>  This notice may not be removed or altered from any source
+        distribution.
 </enum>
 
 </article>

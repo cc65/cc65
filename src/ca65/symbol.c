@@ -95,7 +95,7 @@ SymTable* ParseScopedIdent (StrBuf* Name, StrBuf* FullName)
         if (Scope == 0) {
             /* Scope not found */
             SB_Terminate (FullName);
-            Error ("No such scope: `%m%p'", FullName);
+            Error ("No such scope: '%m%p'", FullName);
             return 0;
         }
 
@@ -139,7 +139,7 @@ SymTable* ParseScopedIdent (StrBuf* Name, StrBuf* FullName)
         Scope = SymFindScope (Scope, Name, SYM_FIND_EXISTING);
         if (Scope == 0) {
             /* Scope not found */
-            Error ("No such scope: `%m%p'", FullName);
+            Error ("No such scope: '%m%p'", FullName);
             return 0;
         }
 
@@ -187,7 +187,7 @@ SymEntry* ParseScopedSymName (SymFindAction Action)
         ** may not expect NULL to be returned if Action contains SYM_ALLOC_NEW,
         ** create a new symbol.
         */
-        if (Action & SYM_ALLOC_NEW) { 
+        if (Action & SYM_ALLOC_NEW) {
             Sym = NewSymEntry (&Ident, SF_NONE);
         } else {
             Sym = 0;

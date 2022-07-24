@@ -70,14 +70,13 @@
             BAR             .addr       ; BAR routine
             TEXTSTYLE       .addr       ; TEXTSTYLE routine
             OUTTEXT         .addr       ; OUTTEXT routine
-            IRQ             .addr       ; IRQ routine
         .endstruct
 .endstruct
 
 ;------------------------------------------------------------------------------
 ; The TGI API version, stored at TGI_HDR_VERSION
 
-TGI_API_VERSION         = $05
+TGI_API_VERSION         = $06
 
 ;------------------------------------------------------------------------------
 ; Bitmapped tgi driver flags, stored in TGI_HDR::VARS::FLAGS.

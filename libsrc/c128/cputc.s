@@ -8,9 +8,9 @@
 
         .export         _cputcxy, _cputc, cputdirect, putchar
         .export         newline, plot
-        .import         popa, _gotoxy
-        .import         PLOT
+        .import         gotoxy
 
+        .include        "cbm_kernal.inc"
         .include        "c128.inc"
 
 newline         = NEWLINE
@@ -21,8 +21,7 @@ newline         = NEWLINE
 
 _cputcxy:
         pha                     ; Save C
-        jsr     popa            ; Get Y
-        jsr     _gotoxy         ; Set cursor, drop x
+        jsr      gotoxy         ; Set cursor, drop x and y
         pla                     ; Restore C
 
 ; Plot a character - also used as internal function
@@ -63,10 +62,9 @@ cputdirect:
 ; Handle character if high bit set
 
 L5:     and     #$7F
-        cmp     #$7E            ; PI?
+        cmp     #$7F            ; PI?
         bne     L6
         lda     #$5E            ; Load screen code for PI
-        bne     cputdirect
 L6:     ora     #$40
         bne     cputdirect      ; Branch always
 
@@ -86,4 +84,3 @@ plot:   ldy     CURS_X
 ; position in Y
 
 putchar = $CC2F
-

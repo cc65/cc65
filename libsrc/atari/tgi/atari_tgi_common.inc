@@ -68,7 +68,6 @@ libref: .addr   $0000                   ; Library reference
         .addr   BAR
         .addr   TEXTSTYLE
         .addr   OUTTEXT
-        .addr   0                       ; IRQ entry is unused
 
 ; ******************************************************************************
 
@@ -1111,11 +1110,8 @@ skipm:  ; Loop while --dy > 0
 
 ; locals
         string  := tmp1
-        cols    := tmp3
         pixels  := tmp4
         font    := regsave
-.rodata
-        ataint: .byte   64,0,32,96
 .bss
         rows:   .res    1
 
@@ -1223,32 +1219,31 @@ scvert: ldx     x1
 .endif
 
         ; Draw one character
-        ; Convert to ANTIC code
-draw:   tay
-        rol     a
-        rol     a
-        rol     a
-        rol     a
-        and     #3
-        tax
-        tya
-        and     #$9f
-        ora     ataint,x
-        ; Save and clear inverse video bit
-        sta     inv
-        and     #$7F
+draw:
+        ; Extract the inverse mask
+        ldx     #0
+        asl     a
+        bcc     noinv
+        dex
+noinv:  stx     inv
+
         ; Calculate font data address
+        ldx     CHBAS
+        cmp     #$20*2
+        bpl     lowhalf
+        ; Semigraphic or lowercase
+        inx
+        inx
+lowhalf:
+        asl     a
+        bcc     lowquarter
+        ; Letter
+        inx
+lowquarter:
+        asl     a
         sta     font
-        lda     #0
-        sta     font + 1
+        stx     font+1
 
-        .repeat 3
-        asl     font
-        rol     a
-        .endrepeat
-
-        adc     CHBAS
-        sta     font + 1
         ; Save old coords
         bit     text_dir
         bpl     hor
@@ -1274,15 +1269,12 @@ cont:   ldy     #7
         ; Put one row of the glyph
 putrow: sty     rows
         lda     (font),y
-        bit     inv
-        bpl     noinv
-        eor     #$FF
-noinv:  sta     pixels
-        lda     #7
-        sta     cols
+        eor     inv
+        sec
+        rol     a
+        sta     pixels
         ; Put one column of the row
-putcol: asl     pixels
-        bcc     next_col
+putcol: bcc     next_col
         lda     x1
         pha
         lda     x1 + 1
@@ -1318,8 +1310,8 @@ vertinc:
         sub     mag_x
         sta     y2
 L2:
-        dec     cols
-        bpl     putcol
+        asl     pixels
+        bne     putcol
 next_row:
         ; Go to next row
         bit     text_dir

@@ -68,7 +68,7 @@ static const char* GetModule (const char* Name)
 
     /* Must not end with a path separator */
     if (*Module == 0) {
-        Error ("Cannot make module name from `%s'", Name);
+        Error ("Cannot make module name from '%s'", Name);
     }
 
     /* Done */
@@ -82,11 +82,11 @@ static void ObjReadHeader (FILE* Obj, ObjHeader* H, const char* Name)
 {
     H->Magic      = Read32 (Obj);
     if (H->Magic != OBJ_MAGIC) {
-        Error ("`%s' is not an object file", Name);
+        Error ("'%s' is not an object file", Name);
     }
     H->Version    = Read16 (Obj);
     if (H->Version != OBJ_VERSION) {
-        Error ("Object file `%s' has wrong version", Name);
+        Error ("Object file '%s' has wrong version", Name);
     }
     H->Flags        = Read16 (Obj);
     H->OptionOffs   = Read32 (Obj);
@@ -236,7 +236,7 @@ void ObjAdd (const char* Name)
     /* Open the object file */
     FILE* Obj = fopen (Name, "rb");
     if (Obj == 0) {
-        Error ("Could not open `%s': %s", Name, strerror (errno));
+        Error ("Could not open '%s': %s", Name, strerror (errno));
     }
 
     /* Get the modification time of the object file. There's a race condition
@@ -248,7 +248,7 @@ void ObjAdd (const char* Name)
     ** here.
     */
     if (FileStat (Name, &StatBuf) != 0) {
-        Error ("Cannot stat object file `%s': %s", Name, strerror (errno));
+        Error ("Cannot stat object file '%s': %s", Name, strerror (errno));
     }
 
     /* Read and check the header */
@@ -267,7 +267,7 @@ void ObjAdd (const char* Name)
         ** and the external one.
         */
         if (difftime ((time_t)O->MTime, StatBuf.st_mtime) > 0.0) {
-            Warning ("Replacing module `%s' by older version in library `%s'",
+            Warning ("Replacing module '%s' by older version in library '%s'",
                      O->Name, LibName);
         }
 
@@ -313,13 +313,13 @@ void ObjExtract (const char* Name)
 
     /* Bail out if the module does not exist */
     if (O == 0) {
-        Error ("Module `%s' not found in library `%s'", Module, LibName);
+        Error ("Module '%s' not found in library '%s'", Module, LibName);
     }
 
     /* Open the output file */
     Obj = fopen (Name, "w+b");
     if (Obj == 0) {
-        Error ("Cannot open target file `%s': %s", Name, strerror (errno));
+        Error ("Cannot open target file '%s': %s", Name, strerror (errno));
     }
 
     /* Copy the complete object file data from the library to the new object
@@ -329,11 +329,11 @@ void ObjExtract (const char* Name)
 
     /* Close the file */
     if (fclose (Obj) != 0) {
-        Error ("Problem closing object file `%s': %s", Name, strerror (errno));
+        Error ("Problem closing object file '%s': %s", Name, strerror (errno));
     }
 
     /* Set access and modification time */
     if (SetFileTimes (Name, O->MTime) != 0) {
-        Error ("Cannot set mod time on `%s': %s", Name, strerror (errno));
+        Error ("Cannot set mod time on '%s': %s", Name, strerror (errno));
     }
 }

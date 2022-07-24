@@ -11,7 +11,7 @@
 
             .include "jumptab.inc"
             .include "geossym.inc"
-        
+
 _VerWriteBlock:
         sta r4L
         stx r4H

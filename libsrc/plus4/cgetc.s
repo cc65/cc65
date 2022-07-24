@@ -7,6 +7,7 @@
         .export         _cgetc
         .import         cursor
 
+        .include        "cbm_kernal.inc"
         .include        "plus4.inc"
 
 ; --------------------------------------------------------------------------
@@ -59,18 +60,22 @@ L2:     sta     ENABLE_ROM      ; Bank in the ROM
         .constructor    initkbd
         .destructor     donekbd
 
-.segment        "INIT"          ; Special init code segment may get overwritten
+.segment        "ONCE"          ; Special init code segment may get overwritten
 
 .proc   initkbd
 
-        ldy     #15
+        ldy     #7
 @L1:    lda     fnkeys,y
+        sta     FKEY_SPACE+8,y
+        lda     #$01            ; Lower 8 places are all $01
         sta     FKEY_SPACE,y
         dey
         bpl     @L1
         rts
 
 .endproc
+
+fnkeys: .byte   133, 137, 134, 138, 135, 139, 136, 140
 
 
 .segment        "LOWCODE"       ; Accesses the ROM - must go into low mem
@@ -87,11 +92,3 @@ L2:     sta     ENABLE_ROM      ; Bank in the ROM
         rts
 
 .endproc
-
-
-; Function key table, readonly
-
-.rodata
-fnkeys: .byte   $01, $01, $01, $01, $01, $01, $01, $01
-        .byte   133, 137, 134, 138, 135, 139, 136, 140
-

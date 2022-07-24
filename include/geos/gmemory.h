@@ -7,14 +7,12 @@
 #ifndef _GMEMORY_H
 #define _GMEMORY_H
 
-#ifndef _GSTRUCT_H
 #include <geos/gstruct.h>
-#endif
 
 void __fastcall__ CopyString(char *dest, const char *source);
 char __fastcall__ CmpString(const char *dest, const char *source);
 void __fastcall__ CopyFString(char len, char *dest, const char *source);
-char __fastcall__ CmpFString(char len, char *dest, const char *source); 
+char __fastcall__ CmpFString(char len, char *dest, const char *source);
 
 unsigned __fastcall__ CRC(const char *buffer, unsigned len);
 void* __fastcall__ ClearRam(char *dest, unsigned len);

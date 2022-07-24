@@ -111,7 +111,7 @@ void SplitAddAttr (Collection* C, const char* Combined, const char* Name);
 ** Name is NULL, terminate with an error.
 */
 
-Collection* ParseAttrList (const char* List, const char** NameList, unsigned NameCount);
+Collection* ParseAttrList (const char* List, const char* const* NameList, unsigned NameCount);
 /* Parse a list containing name/value pairs into a sorted collection. Some
 ** attributes may not need a name, so NameList contains these names. If there
 ** were no errors, the function returns a alphabetically sorted collection

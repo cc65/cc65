@@ -68,6 +68,7 @@ extern unsigned char    DbgSyms;            /* Add debug symbols */
 extern unsigned char    LineCont;           /* Allow line continuation */
 extern unsigned char    LargeAlignment;     /* Don't warn about large alignments */
 extern unsigned char    RelaxChecks;        /* Relax a few assembler checks */
+extern unsigned char    StringEscapes;      /* Allow C-style escapes in strings */
 
 /* Emulation features */
 extern unsigned char    DollarIsPC;         /* Allow the $ symbol as current PC */
@@ -85,6 +86,7 @@ extern unsigned char    CComments;          /* Allow C like comments */
 extern unsigned char    ForceRange;         /* Force values into expected range */
 extern unsigned char    UnderlineInNumbers; /* Allow underlines in numbers */
 extern unsigned char    AddrSize;           /* Allow .ADDRSIZE function */
+extern unsigned char    BracketAsIndirect;  /* Use '[]' not '()' for indirection */
 
 
 

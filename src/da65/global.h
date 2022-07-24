@@ -60,6 +60,7 @@ extern unsigned char    PassCount;      /* How many passed do we do? */
 extern signed char      NewlineAfterJMP;/* Add a newline after a JMP insn? */
 extern signed char      NewlineAfterRTS;/* Add a newline after a RTS insn? */
 extern long             StartAddr;      /* Start/load address of the program */
+extern unsigned char    SyncLines;      /* Accept line markers in the info file */
 extern long             InputOffs;      /* Offset into input file */
 extern long             InputSize;      /* Number of bytes to read from input */
 

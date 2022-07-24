@@ -16,8 +16,8 @@
 int main(int argc, char* argv[])
 {
         FILE* fp;
-        char* inbuf;
-        char* outbuf;
+        unsigned char* inbuf;
+        unsigned char* outbuf;
         size_t inlen;
         size_t outlen;
         z_stream stream;
@@ -84,7 +84,7 @@ int main(int argc, char* argv[])
         }
 
         /* display summary */
-        printf("Compressed %s (%d bytes) to %s (%d bytes)\n",
+        printf("Compressed %s (%zu bytes) to %s (%zu bytes)\n",
                 argv[1], inlen, argv[2], outlen);
         return 0;
 }

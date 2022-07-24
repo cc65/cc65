@@ -1,18 +1,26 @@
-language:
-  - c
-install:
-  - sudo apt-get update
-  - sudo apt-get install linuxdoc-tools linuxdoc-tools-info binutils-mingw-w64-i686 gcc-mingw-w64-i686 sshpass
-script:
-  - make bin USER_CFLAGS=-Werror
-  - make lib QUIET=1
-  - make -C test
-  - make -C src clean
-  - make bin USER_CFLAGS=-Werror CROSS_COMPILE=i686-w64-mingw32-
-  - make doc zip
-after_success:
-  - make -f Makefile.travis
-env:
-  global:
-    - secure: "h+hoQdEHGPLNwaqGKmSaM8NBRDLc2X+W05VsnNG2Feq/wPv/AiBjONNlzN7jRf6D6f3aoPXaQ2Lc3bYWdxGvFRCmwiofdxkJI9n5L8HPHLZ2lf37MQsXmGJzoTFOvjPLj73H6HlbI9Ux0El3zO6hvalxiXj6TfoZ41dbhNyvpYk="
-    - secure: "A4hMEe5RRfUtYjFGbT7QAvT1Tyo434N+/TiuQeQ4q0L46c79LnXuGQzbFLOFZshZiplLkJr7lFg466CoI1bf2L0cQOew/LesMhE75v0HQ7tZnExWhdpAk0ri6nWixbjn/dmQ0+HxjzJ48A44DMMBYcvSIsO4vflvuJ8etfSg42k="
+language: c
+
+jobs:
+  include:
+
+  - os: linux
+    name: Linux
+    install:
+      - sudo apt-get update
+      - sudo apt-get install linuxdoc-tools linuxdoc-tools-info binutils-mingw-w64-i686 gcc-mingw-w64-i686 sshpass
+    script:
+      - make -j2 bin USER_CFLAGS=-Werror
+      - make -j2 lib QUIET=1
+      - make test QUIET=1
+      - make -j2 samples
+      - make -C src clean
+      - make -j2 bin USER_CFLAGS=-Werror CROSS_COMPILE=i686-w64-mingw32-
+      - make -C samples clean
+      - make -j2 doc zip
+    after_success:
+      - make -f Makefile.travis
+
+  - os: windows
+    name: Windows
+    script:
+      - src/msbuild.cmd src\\cc65.sln

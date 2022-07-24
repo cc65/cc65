@@ -53,11 +53,11 @@
 size_t __fastcall__ strftime (char* buf, size_t bufsize, const char* format,
                               const struct tm* tm)
 {
-    static const char* days[7] = {
+    static const char* const days[7] = {
         "Sunday",   "Monday", "Tuesday", "Wednesday",
         "Thursday", "Friday", "Saturday"
     };
-    static const char* months[12] = {
+    static const char* const months[12] = {
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
     };

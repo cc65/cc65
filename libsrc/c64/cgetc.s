@@ -7,6 +7,7 @@
         .export         _cgetc
         .import         cursor
 
+        .include        "cbm_kernal.inc"
         .include        "c64.inc"
 
 _cgetc: lda     KEY_COUNT       ; Get number of characters

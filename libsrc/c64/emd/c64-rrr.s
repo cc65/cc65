@@ -1,14 +1,8 @@
 ;
-;Extended Memory Driver for the Retro Replay RAM (32k)
-;should work for ActionReplay as well...
-;
+; Extended Memory Driver for the Action Replay/Retro Replay RAM
 ;
 ; original Version 1.0 by Johannes Braun 2006-08-22 <hannenz@freenet.de>
-;
-;use the functions described in "usr/lib/cc65/include/em.h" to make use of this driver.
 ; ------------------------------------------------------------------------
-
-;NOTE: If called from ROM the Lo_Code routines must exit with LDA #$00 / STA $DE00!!! just change and recompile!
 
         .include        "zeropage.inc"
 
@@ -27,6 +21,9 @@ aux     = ptr4
 temp    = tmp1
 
 Lo_Mem  = $0100 ; location of Lo_Code (must be below $1000 or above $e000)
+
+RRMODE_OFF          = $02
+RRMODE_CART_RAM     = $23
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
@@ -54,9 +51,11 @@ Lo_Mem  = $0100 ; location of Lo_Code (must be below $1000 or above $e000)
         .addr   COPYTO
 
 ; ------------------------------------------------------------------------
+; Data.
 
 .bss
-window: .res 256        ; the memory window (256 bytes)
+window:     .res 256        ; the memory window (256 bytes)
+pagecount:  .res   1        ; Number of available pages
 
 .rodata
 dummy:
@@ -79,62 +78,118 @@ INSTALL:
         sta Lo_Mem,x
         dex
         bpl :-
-        stx curpage     ; invalidate current page ($ff)
+        ;ldx #$ff
+        stx curpage     ; invalidate current page
 
-        ldx #$23        ; $de00 value for rr-ram
-        ldy #$02        ; $de00 value for c64-ram, CHANGE TO LDA #$00 if driver is called from ROM!
-        bne COMMON
+        ldy #RRMODE_OFF
+        sei
+        jmp Lo_Mem+8  ; jump to the code below
 
-c1:     stx $de00       ; try accessing rr-ram
+        ; copied to Lo_Mem
+c1:
+
+;detectmodes:
+        .byte RRMODE_CART_RAM | $00
+        .byte RRMODE_CART_RAM | $08
+        .byte RRMODE_CART_RAM | $10
+        .byte RRMODE_CART_RAM | $18
+        .byte RRMODE_CART_RAM | $80
+        .byte RRMODE_CART_RAM | $88
+        .byte RRMODE_CART_RAM | $90
+        .byte RRMODE_CART_RAM | $98
+
+        ; first save c64 memory
         lda $8888
         pha
-        lda $9999       ; remember old content of $8888 and $9999
-        pha
 
-        lda #$55
-        sta $8888       ; write test values
+        ; tag c64 memory
+        lda #$00
+        sta $8888
+
+        ldx #$07
+:
+        ; try accessing rr-ram
+        ;lda detectmodes, x
+        lda Lo_Mem, x
+        sta $de00
+
+        ; tag (hopefully) rr memory
+        txa
+        ora #$80
+        sta $8888
+
+        dex
+        bpl :-
+
+        ;ldy #RRMODE_OFF
+        sty $de00
+
+        ; now if C64 memory is $80, there is no AR/RR
+        ; if C64 memory is $00, there is a AR/RR.
+
+        lda $8888
+        beq detectpages
+
+        lda #0
+        beq hasnopages
+
+detectpages:
+        ; we can now read the highest available bank nr from the highest bank :)
+
+        lda #RRMODE_CART_RAM | $98
+        sta $de00
+
+        ldx $8888
+        inx
+        txa
+
+        ; 8k = 32 pages
         asl
-        sta $9999
+        asl
+        asl
+        asl
+        asl
 
-        sty $de00       ; switch to c64 ram
-        stx $8888
-        stx $9999
+hasnopages:
 
-        stx $de00       ; switch to rr-ram again (if present)
-        ldx $8888       ; read the values
-        ldy $9999
-        pla
-        sta $9999       ; and write the old values back
+        ;ldy #RRMODE_OFF
+        sty $de00       ; c64 ram again
+
+        sta pagecount
+
+        ; restore c64 memory
         pla
         sta $8888
 
-        lda #2
-        sta $de00       ; c64 ram again
-
         cli
-        cpx #$55
-        bne no
-        cpy #$aa
-        bne no
+
+        ldx pagecount
+        beq no
+
+        ; no error
         lda #0
+        tax
         rts
-no:     asl             ; A still has #2, so return #4: error code for "device not present"
+
+no:
+        lda #4 ; return #4: error code for "device not present"
         rts
 c2:
+
 ;----------------------------------------------------------------------------------------
 ;void em_uninstall(void);
 ;----------------------------------------------------------------------------------------
 UNINSTALL:
 return_null:
-        lda #$00        ; always return 32kb (128 pages)
-        ; fall through, skip the LDA
-        .byte $2c
+        lda #$00
+        tax
+        rts
 
 ;----------------------------------------------------------------------------------------
 ;unsigned __fastcall__ em_pagecount(void);
 ;----------------------------------------------------------------------------------------
 PAGECOUNT:
-        lda #$80
+        lda pagecount        ; always return 32kb (128 pages)
         ldx #$00
         rts
 
@@ -154,7 +209,7 @@ return: rts
 ;void* __fastcall__ em_map(unsigned page);
 ;----------------------------------------------------------------------------------------
 MAP:
-        cmp #$80
+        cmp pagecount
         bcs return_null
         sta curpage
         lda #<dummy        ; load .A/.X with adress of data for COPYFROM-call (which expects the
@@ -167,7 +222,7 @@ MAP:
 ;----------------------------------------------------------------------------------------
 COMMIT:
         lda curpage
-        cmp #$80
+        cmp pagecount
         bcs return
         lda #<dummy        ; load .A/.X with adress of data for COPYTO-call (which expects the
         ldx #>dummy        ; adress in .A/.X)
@@ -192,6 +247,7 @@ COMMON:
         ;this part will be executed in Lo_Mem (!) by COPYFROM
 
 Lo_Code2:
+        ; copy byte rr -> c64
         stx $de00       ;map in rr-ram
         lda (rr_ram),y  ;get byte from rr-ram
         sty $de00       ;RR-ROM will be mapped to $8000-$a000 but write access will go to c64-ram anyway!!
@@ -204,6 +260,7 @@ Lo_Code2_End:
         ;this part will be executed in Lo_Mem (!) by COPYTO
 
 Lo_Code1:
+        ; copy byte c64 -> rr
         lda (c64_ram),y ;read 1 byte from c64-ram
         stx $de00       ;map in rr-ram
         sta (rr_ram),y  ;write byte to rr-ram

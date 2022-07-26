@@ -399,6 +399,8 @@ static void CopyQuotedString (StrBuf* Target)
     if (CurC != '\0') {
         SB_AppendChar (Target, CurC);
         NextChar ();
+    } else {
+        PPWarning ("Missing terminating %c character", Quote);
     }
 }
 

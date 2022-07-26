@@ -446,10 +446,14 @@ static int MacName (char* Ident)
 
 
 static void ReadMacroArgs (MacroExp* E)
-/* Identify the arguments to a macro call */
+/* Identify the arguments to a macro call as-is */
 {
+    int         MissingParen = 0;
     unsigned    Parens;         /* Number of open parenthesis */
-    StrBuf      Arg = STATIC_STRBUF_INITIALIZER;
+    StrBuf      Arg = AUTO_STRBUF_INITIALIZER;
+
+    /* Eat the left paren */
+    NextChar ();
 
     /* Read the actual macro arguments */
     Parens = 0;
@@ -512,13 +516,28 @@ static void ReadMacroArgs (MacroExp* E)
         } else if (CurC == '\0') {
             /* End of input inside macro argument list */
             PPError ("Unterminated argument list invoking macro '%s'", E->M->Name);
-
+            MissingParen = 1;
             ClearLine ();
             break;
         } else {
             /* Just copy the character */
             SB_AppendChar (&Arg, CurC);
             NextChar ();
+        }
+    }
+
+    /* Compare formal and actual argument count */
+    if (CollCount (&E->ActualArgs) != (unsigned) E->M->ArgCount) {
+
+        if (!MissingParen) {
+            /* Argument count mismatch */
+            PPError ("Macro argument count mismatch");
+        }
+
+        /* Be sure to make enough empty arguments available */
+        SB_Clear (&Arg);
+        while (CollCount (&E->ActualArgs) < (unsigned) E->M->ArgCount) {
+            ME_AppendActual (E, &Arg);
         }
     }
 
@@ -666,28 +685,11 @@ static void MacroCall (StrBuf* Target, Macro* M)
 {
     MacroExp    E;
 
-    /* Eat the left paren */
-    NextChar ();
-
     /* Initialize our MacroExp structure */
     InitMacroExp (&E, M);
 
-    /* Read the actual macro arguments */
+    /* Read the actual macro arguments (with the enclosing parentheses) */
     ReadMacroArgs (&E);
-
-    /* Compare formal and actual argument count */
-    if (CollCount (&E.ActualArgs) != (unsigned) M->ArgCount) {
-
-        StrBuf Arg = STATIC_STRBUF_INITIALIZER;
-
-        /* Argument count mismatch */
-        PPError ("Macro argument count mismatch");
-
-        /* Be sure to make enough empty arguments available */
-        while (CollCount (&E.ActualArgs) < (unsigned) M->ArgCount) {
-            ME_AppendActual (&E, &Arg);
-        }
-    }
 
     /* Replace macro arguments handling the # and ## operators */
     MacroArgSubst (&E);

@@ -407,6 +407,14 @@ void Compile (const char* FileName)
     /* DefineNumericMacro ("__STDC__", 1);      <- not now */
     DefineNumericMacro ("__STDC_HOSTED__", 1);
 
+    /* Stuff unsupported */
+    if (IS_Get (&Standard) > STD_C99) {
+        DefineNumericMacro ("__STDC_NO_ATOMICS__", 1);
+        DefineNumericMacro ("__STDC_NO_COMPLEX__", 1);
+        DefineNumericMacro ("__STDC_NO_THREADS__", 1);
+        DefineNumericMacro ("__STDC_NO_VLA__", 1);
+    }
+
     /* Create the base lexical level */
     EnterGlobalLevel ();
 

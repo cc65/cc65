@@ -188,10 +188,9 @@ static int SkipWhite (void)
 {
     while (1) {
         while (CurC == '\0') {
-            if (NextLine () == 0) {
+            if (PreprocessNextLine () == 0) {
                 return 0;
             }
-            Preprocess ();
         }
         if (IsSpace (CurC)) {
             NextChar ();

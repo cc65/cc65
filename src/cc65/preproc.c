@@ -71,13 +71,13 @@
 static unsigned char Preprocessing = 0;
 
 /* Management data for #if */
-#define MAX_IFS         256
 #define IFCOND_NONE     0x00U
 #define IFCOND_SKIP     0x01U
 #define IFCOND_ELSE     0x02U
 #define IFCOND_NEEDTERM 0x04U
-static unsigned char IfStack[MAX_IFS];
-static int           IfIndex = -1;
+
+/* Current PP if stack */
+static PPIfStack* PPStack;
 
 /* Buffer for macro expansion */
 static StrBuf* MLine;
@@ -1061,18 +1061,18 @@ static int PushIf (int Skip, int Invert, int Cond)
 /* Push a new if level onto the if stack */
 {
     /* Check for an overflow of the if stack */
-    if (IfIndex >= MAX_IFS-1) {
+    if (PPStack->Index >= MAX_PP_IFS-1) {
         PPError ("Too many nested #if clauses");
         return 1;
     }
 
     /* Push the #if condition */
-    ++IfIndex;
+    ++PPStack->Index;
     if (Skip) {
-        IfStack[IfIndex] = IFCOND_SKIP | IFCOND_NEEDTERM;
+        PPStack->Stack[PPStack->Index] = IFCOND_SKIP | IFCOND_NEEDTERM;
         return 1;
     } else {
-        IfStack[IfIndex] = IFCOND_NONE | IFCOND_NEEDTERM;
+        PPStack->Stack[PPStack->Index] = IFCOND_NONE | IFCOND_NEEDTERM;
         return (Invert ^ Cond);
     }
 }
@@ -1337,17 +1337,17 @@ void Preprocess (void)
                         break;
 
                     case PP_ELIF:
-                        if (IfIndex >= 0) {
-                            if ((IfStack[IfIndex] & IFCOND_ELSE) == 0) {
+                        if (PPStack->Index >= 0) {
+                            if ((PPStack->Stack[PPStack->Index] & IFCOND_ELSE) == 0) {
                                 /* Handle as #else/#if combination */
-                                if ((IfStack[IfIndex] & IFCOND_SKIP) == 0) {
+                                if ((PPStack->Stack[PPStack->Index] & IFCOND_SKIP) == 0) {
                                     Skip = !Skip;
                                 }
-                                IfStack[IfIndex] |= IFCOND_ELSE;
+                                PPStack->Stack[PPStack->Index] |= IFCOND_ELSE;
                                 Skip = DoIf (Skip);
 
                                 /* #elif doesn't need a terminator */
-                                IfStack[IfIndex] &= ~IFCOND_NEEDTERM;
+                                PPStack->Stack[PPStack->Index] &= ~IFCOND_NEEDTERM;
                             } else {
                                 PPError ("Duplicate #else/#elif");
                             }
@@ -1357,12 +1357,12 @@ void Preprocess (void)
                         break;
 
                     case PP_ELSE:
-                        if (IfIndex >= 0) {
-                            if ((IfStack[IfIndex] & IFCOND_ELSE) == 0) {
-                                if ((IfStack[IfIndex] & IFCOND_SKIP) == 0) {
+                        if (PPStack->Index >= 0) {
+                            if ((PPStack->Stack[PPStack->Index] & IFCOND_ELSE) == 0) {
+                                if ((PPStack->Stack[PPStack->Index] & IFCOND_SKIP) == 0) {
                                     Skip = !Skip;
                                 }
-                                IfStack[IfIndex] |= IFCOND_ELSE;
+                                PPStack->Stack[PPStack->Index] |= IFCOND_ELSE;
 
                                 /* Check for extra tokens */
                                 CheckExtraTokens ("else");
@@ -1375,19 +1375,20 @@ void Preprocess (void)
                         break;
 
                     case PP_ENDIF:
-                        if (IfIndex >= 0) {
+                        if (PPStack->Index >= 0) {
                             /* Remove any clauses on top of stack that do not
                             ** need a terminating #endif.
                             */
-                            while (IfIndex >= 0 && (IfStack[IfIndex] & IFCOND_NEEDTERM) == 0) {
-                                --IfIndex;
+                            while (PPStack->Index >= 0 &&
+                                   (PPStack->Stack[PPStack->Index] & IFCOND_NEEDTERM) == 0) {
+                                --PPStack->Index;
                             }
 
                             /* Stack may not be empty here or something is wrong */
-                            CHECK (IfIndex >= 0);
+                            CHECK (PPStack->Index >= 0);
 
                             /* Remove the clause that needs a terminator */
-                            Skip = (IfStack[IfIndex--] & IFCOND_SKIP) != 0;
+                            Skip = (PPStack->Stack[PPStack->Index--] & IFCOND_SKIP) != 0;
 
                             /* Check for extra tokens */
                             CheckExtraTokens ("endif");
@@ -1464,9 +1465,6 @@ void Preprocess (void)
 
         }
         if (NextLine () == 0) {
-            if (IfIndex >= 0) {
-                PPError ("'#endif' expected");
-            }
             return;
         }
         SkipWhitespace (0);
@@ -1478,5 +1476,36 @@ Done:
     if (Verbosity > 1 && SB_NotEmpty (Line)) {
         printf ("%s:%u: %.*s\n", GetCurrentFile (), GetCurrentLine (),
                 (int) SB_GetLen (Line), SB_GetConstBuf (Line));
+    }
+}
+
+
+
+void SetPPIfStack (PPIfStack* Stack)
+/* Specify which PP #if stack to use */
+{
+    PPStack = Stack;
+}
+
+
+
+void PreprocessBegin (void)
+/* Initialize preprocessor with current file */
+{
+    /* Reset #if depth */
+    PPStack->Index = -1;
+}
+
+
+
+void PreprocessEnd (void)
+/* Preprocessor done with current file */
+{
+    /* Check for missing #endif */
+    while (PPStack->Index >= 0) {
+        if ((PPStack->Stack[PPStack->Index] & IFCOND_NEEDTERM) != 0) {
+            PPError ("#endif expected");
+        }
+        --PPStack->Index;
     }
 }

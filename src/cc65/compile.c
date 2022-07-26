@@ -82,8 +82,11 @@ static void Parse (void)
     SymEntry* Entry;
     FuncDesc* FuncDef = 0;
 
-    /* Go... */
-    NextToken ();
+    /* Initialization for deferred operations */
+    InitDeferredOps ();
+
+    /* Fill up the next token with a bogus semicolon and start the tokenizer */
+    NextTok.Tok = TOK_SEMI;
     NextToken ();
 
     /* Parse until end of input */
@@ -336,6 +339,9 @@ static void Parse (void)
 
         }
     }
+
+    /* Done with deferred operations */
+    DoneDeferredOps ();
 }
 
 
@@ -401,8 +407,6 @@ void Compile (const char* FileName)
     /* DefineNumericMacro ("__STDC__", 1);      <- not now */
     DefineNumericMacro ("__STDC_HOSTED__", 1);
 
-    InitDeferredOps ();
-
     /* Create the base lexical level */
     EnterGlobalLevel ();
 
@@ -431,10 +435,8 @@ void Compile (const char* FileName)
         OpenOutputFile ();
 
         /* Preprocess each line and write it to the output file */
-        while (NextLine ()) {
-            Preprocess ();
-            WriteOutput ("%.*s\n", (int) SB_GetLen (Line), SB_GetConstBuf (Line));
-        }
+        while (PreprocessNextLine ())
+        { /* Nothing */ }
 
         /* Close the output file */
         CloseOutputFile ();
@@ -492,9 +494,8 @@ void Compile (const char* FileName)
                 }
             }
         }
-    }
 
-    DoneDeferredOps ();
+    }
 
     if (Debug) {
         PrintMacroStats (stdout);

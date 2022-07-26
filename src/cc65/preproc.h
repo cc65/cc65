@@ -74,6 +74,12 @@ void PreprocessBegin (void);
 void PreprocessEnd (void);
 /* Preprocessor done with current file */
 
+void InitPreprocess (void);
+/* Init preprocessor */
+
+void DonePreprocess (void);
+/* Done with preprocessor */
+
 
 
 /* End of preproc.h */

@@ -108,6 +108,29 @@ void FreeMacro (Macro* M)
 
 
 
+Macro* CloneMacro (const Macro* M)
+/* Clone a macro definition. The function is not insert the macro into the
+** macro table, thus the cloned instance cannot be freed with UndefineMacro.
+** Use FreeMacro for that.
+*/
+{
+    Macro* New = NewMacro (M->Name);
+    unsigned I;
+
+    for (I = 0; I < CollCount (&M->FormalArgs); ++I) {
+        /* Copy the argument */
+        const char* Arg = CollAtUnchecked (&M->FormalArgs, I);
+        CollAppend (&New->FormalArgs, xstrdup (Arg));
+    }
+    New->ArgCount = M->ArgCount;
+    New->Variadic = M->Variadic;
+    SB_Copy (&New->Replacement, &M->Replacement);
+
+    return New;
+}
+
+
+
 void DefineNumericMacro (const char* Name, long Val)
 /* Define a macro for a numeric constant */
 {

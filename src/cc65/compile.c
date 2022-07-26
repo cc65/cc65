@@ -425,6 +425,9 @@ void Compile (const char* FileName)
     /* Generate the code generator preamble */
     g_preamble ();
 
+    /* Init preprocessor */
+    InitPreprocess ();
+
     /* Open the input file */
     OpenMainFile (FileName);
 
@@ -496,6 +499,9 @@ void Compile (const char* FileName)
         }
 
     }
+
+    /* Done with preprocessor */
+    DonePreprocess ();
 
     if (Debug) {
         PrintMacroStats (stdout);

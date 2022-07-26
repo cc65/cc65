@@ -82,6 +82,12 @@ void FreeMacro (Macro* M);
 ** table, use UndefineMacro for that.
 */
 
+Macro* CloneMacro (const Macro* M);
+/* Clone a macro definition. The function is not insert the macro into the
+** macro table, thus the cloned instance cannot be freed with UndefineMacro.
+** Use FreeMacro for that.
+*/
+
 void DefineNumericMacro (const char* Name, long Val);
 /* Define a macro for a numeric constant */
 

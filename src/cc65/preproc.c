@@ -1296,7 +1296,9 @@ void Preprocess (void)
                 continue;
             }
             if (!IsSym (Directive)) {
-                PPError ("Preprocessor directive expected");
+                if (!Skip) {
+                    PPError ("Preprocessor directive expected");
+                }
                 ClearLine ();
             } else {
                 switch (FindPPToken (Directive)) {

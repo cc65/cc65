@@ -24,6 +24,10 @@ This is an ongoing controversial topic - everyone knows that. However, the follo
 
 The (bash) scripts used to check the above rules can be found in ```.github/check```. You can also run all checks using ```make check```.
 
+### identifiers and symbol names
+
+* any symbols that are exported from source files and/or appear in header files should not be in the "_symbol" form in C, or "__symbol" form in assembly. This way we evade the problem that "_symbol" may or may not be reserved by that standard.
+
 ### misc
 
 * 80 characters is the desired maximum width of files.  But, it isn't a "strong" rule; sometimes, you will want to type longer lines, in order to keep the parts of expressions or comments together on the same line.

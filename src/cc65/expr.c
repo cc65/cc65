@@ -304,13 +304,9 @@ void PushAddr (const ExprDesc* Expr)
 
 
 static void WarnConstCompareResult (const ExprDesc* Expr)
-/* If the result of a comparison is constant, this is suspicious when not in
-** preprocessor mode.
-*/
+/* If the result of a comparison is constant, this is suspicious */
 {
-    if (!Preprocessing          &&
-        !ED_NeedsConst (Expr)   &&
-        IS_Get (&WarnConstComparison) != 0) {
+    if (!ED_NeedsConst (Expr) && IS_Get (&WarnConstComparison) != 0) {
         Warning ("Result of comparison is always %s", Expr->IVal != 0 ? "true" : "false");
     }
 }
@@ -1075,57 +1071,18 @@ static void Primary (ExprDesc* E)
 /* This is the lowest level of the expression parser. */
 {
     SymEntry* Sym;
-
-    /* Character and integer constants. */
-    if (CurTok.Tok == TOK_ICONST || CurTok.Tok == TOK_CCONST) {
-        E->IVal   = CurTok.IVal;
-        E->Flags |= E_LOC_NONE | E_RTYPE_RVAL;
-        E->Type   = CurTok.Type;
-        NextToken ();
-        return;
-    }
-
-    /* Floating point constant */
-    if (CurTok.Tok == TOK_FCONST) {
-        E->V.FVal = CurTok.FVal;
-        E->Flags |= E_LOC_NONE | E_RTYPE_RVAL;
-        E->Type   = CurTok.Type;
-        NextToken ();
-        return;
-    }
-
-    /* Process parenthesized subexpression by calling the whole parser
-    ** recursively.
-    */
-    if (CurTok.Tok == TOK_LPAREN) {
-        NextToken ();
-        hie0 (E);
-        ConsumeRParen ();
-        return;
-    }
-
-    /* If we run into an identifier in preprocessing mode, we assume that this
-    ** is an undefined macro and replace it by a constant value of zero.
-    */
-    if (Preprocessing && CurTok.Tok == TOK_IDENT) {
-        NextToken ();
-        ED_MakeConstAbsInt (E, 0);
-        return;
-    }
-
-    /* All others may only be used if the expression evaluation is not called
-    ** recursively by the preprocessor.
-    */
-    if (Preprocessing) {
-        /* Illegal expression in PP mode */
-        Error ("Preprocessor expression expected");
-        ED_MakeConstAbsInt (E, 1);
-        return;
-    }
-
     unsigned Flags = E->Flags & E_MASK_KEEP_MAKE;
 
     switch (CurTok.Tok) {
+
+        case TOK_LPAREN:
+            /* Process parenthesized subexpression by calling the whole parser
+            ** recursively.
+            */
+            NextToken ();
+            hie0 (E);
+            ConsumeRParen ();
+            break;
 
         case TOK_BOOL_AND:
             /* A computed goto label address */
@@ -1160,9 +1117,9 @@ static void Primary (ExprDesc* E)
                     /* Cannot use type symbols */
                     Error ("Variable identifier expected");
                     /* Assume an int type to make E valid */
-                    E->Flags |= E_LOC_STACK | E_RTYPE_LVAL;
-                    E->Type   = type_int;
-                    return;
+                    E->Flags = E_LOC_STACK | E_RTYPE_LVAL;
+                    E->Type  = type_int;
+                    break;
                 }
 
                 /* Mark the symbol as referenced */
@@ -1175,11 +1132,11 @@ static void Primary (ExprDesc* E)
                 if ((Sym->Flags & SC_CONST) == SC_CONST) {
                     /* Enum or some other numeric constant */
                     E->Flags = E_LOC_NONE | E_RTYPE_RVAL;
-                    E->IVal = Sym->V.ConstVal;
+                    E->IVal  = Sym->V.ConstVal;
                 } else if ((Sym->Flags & SC_FUNC) == SC_FUNC) {
                     /* Function */
                     E->Flags = E_LOC_GLOBAL | E_RTYPE_LVAL;
-                    E->Name = (uintptr_t) Sym->Name;
+                    E->Name  = (uintptr_t) Sym->Name;
                 } else if ((Sym->Flags & SC_AUTO) == SC_AUTO) {
                     /* Local variable. If this is a parameter for a variadic
                     ** function, we have to add some address calculations, and the
@@ -1202,10 +1159,10 @@ static void Primary (ExprDesc* E)
                     /* Static variable */
                     if (Sym->Flags & (SC_EXTERN | SC_STORAGE | SC_DECL)) {
                         E->Flags = E_LOC_GLOBAL | E_RTYPE_LVAL;
-                        E->Name = (uintptr_t) Sym->Name;
+                        E->Name  = (uintptr_t) Sym->Name;
                     } else {
                         E->Flags = E_LOC_STATIC | E_RTYPE_LVAL;
-                        E->Name = Sym->V.L.Label;
+                        E->Name  = Sym->V.L.Label;
                     }
                 } else {
                     /* Local static variable */
@@ -1251,7 +1208,7 @@ static void Primary (ExprDesc* E)
                     /* Undeclared Variable */
                     Sym = AddLocalSym (Ident, type_int, SC_AUTO | SC_REF, 0);
                     E->Flags = E_LOC_STACK | E_RTYPE_LVAL;
-                    E->Type = type_int;
+                    E->Type  = type_int;
                     Error ("Undefined symbol: '%s'", Ident);
                 }
 
@@ -1272,6 +1229,23 @@ static void Primary (ExprDesc* E)
             E->Flags = E_LOC_LITERAL | E_RTYPE_RVAL | E_ADDRESS_OF;
             E->IVal  = 0;
             E->Name  = GetLiteralLabel (CurTok.SVal);
+            NextToken ();
+            break;
+
+        case TOK_ICONST:
+        case TOK_CCONST:
+            /* Character and integer constants */
+            E->IVal  = CurTok.IVal;
+            E->Flags = E_LOC_NONE | E_RTYPE_RVAL;
+            E->Type  = CurTok.Type;
+            NextToken ();
+            break;
+
+        case TOK_FCONST:
+            /* Floating point constant */
+            E->V.FVal = CurTok.FVal;
+            E->Flags  = E_LOC_NONE | E_RTYPE_RVAL;
+            E->Type   = CurTok.Type;
             NextToken ();
             break;
 
@@ -3476,48 +3450,6 @@ static void hie2 (ExprDesc* Expr)
 
 
 
-static void hieAndPP (ExprDesc* Expr)
-/* Process "exp && exp" in preprocessor mode (that is, when the parser is
-** called recursively from the preprocessor.
-*/
-{
-    *Expr = NoCodeConstAbsIntExpr (hie2);
-    while (CurTok.Tok == TOK_BOOL_AND) {
-
-        /* Skip the && */
-        NextToken ();
-
-        /* Get rhs */
-        ExprDesc Expr2 = NoCodeConstAbsIntExpr (hie2);
-
-        /* Combine the two */
-        Expr->IVal = (Expr->IVal && Expr2.IVal);
-    }
-}
-
-
-
-static void hieOrPP (ExprDesc *Expr)
-/* Process "exp || exp" in preprocessor mode (that is, when the parser is
-** called recursively from the preprocessor.
-*/
-{
-    *Expr = NoCodeConstAbsIntExpr (hieAndPP);
-    while (CurTok.Tok == TOK_BOOL_OR) {
-
-        /* Skip the && */
-        NextToken ();
-
-        /* Get rhs */
-        ExprDesc Expr2 = NoCodeConstAbsIntExpr (hieAndPP);
-
-        /* Combine the two */
-        Expr->IVal = (Expr->IVal || Expr2.IVal);
-    }
-}
-
-
-
 static int hieAnd (ExprDesc* Expr, unsigned* TrueLab, int* TrueLabAllocated)
 /* Process "exp && exp". This should only be called within hieOr.
 ** Return true if logic AND does occur.
@@ -3867,11 +3799,7 @@ static void hieQuest (ExprDesc* Expr)
     Type*       ResultType;     /* Type of result */
 
     /* Call the lower level eval routine */
-    if (Preprocessing) {
-        ExprWithCheck (hieOrPP, Expr);
-    } else {
-        ExprWithCheck (hieOr, Expr);
-    }
+    ExprWithCheck (hieOr, Expr);
 
     /* Check if it's a ternary expression */
     if (CurTok.Tok == TOK_QUEST) {

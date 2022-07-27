@@ -48,13 +48,13 @@
 /* cc65 */
 #include "codegen.h"
 #include "error.h"
-#include "expr.h"
 #include "global.h"
 #include "ident.h"
 #include "incpath.h"
 #include "input.h"
 #include "lineinfo.h"
 #include "macrotab.h"
+#include "ppexpr.h"
 #include "preproc.h"
 #include "scanner.h"
 #include "standard.h"
@@ -68,7 +68,7 @@
 
 
 /* Set when the preprocessor calls expr() recursively */
-unsigned char Preprocessing = 0;
+static unsigned char Preprocessing = 0;
 
 /* Management data for #if */
 #define MAX_IFS         256
@@ -97,6 +97,11 @@ struct MacroExp {
 /*****************************************************************************/
 
 
+
+static void TranslationPhase3 (StrBuf* Source, StrBuf* Target);
+/* Mimic Translation Phase 3. Handle old and new style comments. Collapse
+** non-newline whitespace sequences.
+*/
 
 static unsigned Pass1 (StrBuf* Source, StrBuf* Target);
 /* Preprocessor pass 1. Remove whitespace. Handle old and new style comments
@@ -288,7 +293,7 @@ static void OldStyleComment (void)
     /* Remember the current line number, so we can output better error
     ** messages if the comment is not terminated in the current file.
     */
-    unsigned StartingLine = GetCurrentLine();
+    unsigned StartingLine = GetCurrentLine ();
 
     /* Skip the start of comment chars */
     NextChar ();
@@ -336,8 +341,8 @@ static void NewStyleComment (void)
 
 
 static int SkipWhitespace (int SkipLines)
-/* Skip white space in the input stream. Do also skip newlines if SkipLines
-** is true. Return zero if nothing was skipped, otherwise return a
+/* Skip white space and comments in the input stream. Do also skip newlines if
+** SkipLines is true. Return zero if nothing was skipped, otherwise return a
 ** value != zero.
 */
 {
@@ -345,6 +350,12 @@ static int SkipWhitespace (int SkipLines)
     while (1) {
         if (IsSpace (CurC)) {
             NextChar ();
+            Skipped = 1;
+        } else if (CurC == '/' && NextC == '*') {
+            OldStyleComment ();
+            Skipped = 1;
+        } else if (IS_Get (&Standard) >= STD_C99 && CurC == '/' && NextC == '/') {
+            NewStyleComment ();
             Skipped = 1;
         } else if (CurC == '\0' && SkipLines) {
             /* End of line, read next */
@@ -479,16 +490,6 @@ static void ReadMacroArgs (MacroExp* E)
             if (SB_NotEmpty (&Arg)) {
                 SB_AppendChar (&Arg, ' ');
             }
-        } else if (CurC == '/' && NextC == '*') {
-            if (SB_NotEmpty (&Arg)) {
-                SB_AppendChar (&Arg, ' ');
-            }
-            OldStyleComment ();
-        } else if (IS_Get (&Standard) >= STD_C99 && CurC == '/' && NextC == '/') {
-            if (SB_NotEmpty (&Arg)) {
-                SB_AppendChar (&Arg, ' ');
-            }
-            NewStyleComment ();
         } else if (CurC == '\0') {
             /* End of input inside macro argument list */
             PPError ("Unterminated argument list invoking macro '%s'", E->M->Name);
@@ -839,7 +840,7 @@ static void DefineMacro (void)
     /* Remove whitespace and comments from the line, store the preprocessed
     ** line into the macro replacement buffer.
     */
-    Pass1 (Line, &M->Replacement);
+    TranslationPhase3 (Line, &M->Replacement);
 
     /* Remove whitespace from the end of the line */
     while (IsSpace (SB_LookAtLast (&M->Replacement))) {
@@ -865,9 +866,55 @@ static void DefineMacro (void)
 
 
 
+static void TranslationPhase3 (StrBuf* Source, StrBuf* Target)
+/* Mimic Translation Phase 3. Handle old and new style comments. Collapse
+** non-newline whitespace sequences.
+*/
+{
+    /* Switch to the new input source */
+    StrBuf* OldSource = InitLine (Source);
+
+    /* Loop removing ws and comments */
+    while (CurC != '\0') {
+        int HasWhiteSpace = 0;
+        while (1) {
+            /* Squeeze runs of blanks */
+            if (IsSpace (CurC)) {
+                NextChar ();
+                HasWhiteSpace = 1;
+            } else if (CurC == '/' && NextC == '*') {
+                OldStyleComment ();
+                HasWhiteSpace = 1;
+            } else if (IS_Get (&Standard) >= STD_C99 && CurC == '/' && NextC == '/') {
+                NewStyleComment ();
+                HasWhiteSpace = 1;
+            } else {
+                /* No more white space */
+                break;
+            }
+        }
+        if (HasWhiteSpace) {
+            SB_AppendChar (Target, ' ');
+        } else if (IsQuote (CurC)) {
+            CopyQuotedString (Target);
+        } else {
+            SB_AppendChar (Target, CurC);
+            NextChar ();
+        }
+    }
+
+    /* Terminate the new input line */
+    SB_Terminate (Target);
+
+    /* Switch back to the old source */
+    InitLine (OldSource);
+}
+
+
+
 static unsigned Pass1 (StrBuf* Source, StrBuf* Target)
-/* Preprocessor pass 1. Remove whitespace. Handle old and new style comments
-** and the "defined" operator.
+/* Preprocessor pass 1. Remove whitespace, old and new style comments. Handle
+** the "defined" operator.
 */
 {
     unsigned    IdentCount;
@@ -915,16 +962,6 @@ static unsigned Pass1 (StrBuf* Source, StrBuf* Target)
             }
         } else if (IsQuote (CurC)) {
             CopyQuotedString (Target);
-        } else if (CurC == '/' && NextC == '*') {
-            if (!IsSpace (SB_LookAtLast (Target))) {
-                SB_AppendChar (Target, ' ');
-            }
-            OldStyleComment ();
-        } else if (IS_Get (&Standard) >= STD_C99 && CurC == '/' && NextC == '/') {
-            if (!IsSpace (SB_LookAtLast (Target))) {
-                SB_AppendChar (Target, ' ');
-            }
-            NewStyleComment ();
         } else {
             SB_AppendChar (Target, CurC);
             NextChar ();
@@ -981,7 +1018,7 @@ static void MacroReplacement (StrBuf* Source, StrBuf* Target)
 
 
 static void PreprocessLine (void)
-/* Translate one line. */
+/* Translate one line with defined macros replaced */
 {
     /* Trim whitespace and remove comments. The function returns the number of
     ** identifiers found. If there were any, we will have to check for macros.
@@ -1028,9 +1065,12 @@ static void DoError (void)
 {
     SkipWhitespace (0);
     if (CurC == '\0') {
-        PPError ("Invalid #error directive");
+        PPError ("#error");
     } else {
-        PPError ("#error: %s", SB_GetConstBuf (Line) + SB_GetIndex (Line));
+        StrBuf MsgLine = AUTO_STRBUF_INITIALIZER;
+        TranslationPhase3 (Line, &MsgLine);
+        PPError ("#error: %s", SB_GetConstBuf (&MsgLine) + SB_GetIndex (&MsgLine));
+        SB_Done (&MsgLine);
     }
 
     /* Clear the rest of line */
@@ -1042,48 +1082,50 @@ static void DoError (void)
 static int DoIf (int Skip)
 /* Process #if directive */
 {
-    /* We're about to abuse the compiler expression parser to evaluate the
-    ** #if expression. Save the current tokens to come back here later.
-    ** NOTE: Yes, this is a hack, but it saves a complete separate expression
-    ** evaluation for the preprocessor.
-    */
-    Token SavedCurTok  = CurTok;
-    Token SavedNextTok = NextTok;
+    PPExpr Expr = AUTO_PPEXPR_INITIALIZER;
 
-    /* Make sure the line infos for the tokens won't get removed */
-    if (SavedCurTok.LI) {
-        UseLineInfo (SavedCurTok.LI);
+    if (!Skip) {
+        /* We're about to use a dedicated expression parser to evaluate the #if
+        ** expression. Save the current tokens to come back here later.
+        */
+        Token SavedCurTok  = CurTok;
+        Token SavedNextTok = NextTok;
+
+        /* Make sure the line infos for the tokens won't get removed */
+        if (SavedCurTok.LI) {
+            UseLineInfo (SavedCurTok.LI);
+        }
+        if (SavedNextTok.LI) {
+            UseLineInfo (SavedNextTok.LI);
+        }
+
+        /* Switch into special preprocessing mode */
+        Preprocessing = 1;
+
+        /* Expand macros in this line */
+        PreprocessLine ();
+
+        /* Add two semicolons as sentinels to the line, so the following
+        ** expression evaluation will eat these two tokens but nothing from
+        ** the following line.
+        */
+        SB_AppendStr (Line, ";;");
+        SB_Terminate (Line);
+
+        /* Load CurTok and NextTok with tokens from the new input */
+        NextToken ();
+        NextToken ();
+
+        /* Call the expression parser */
+        ParsePPExpr (&Expr);
+
+        /* End preprocessing mode */
+        Preprocessing = 0;
+
+        /* Reset the old tokens */
+        CurTok  = SavedCurTok;
+        NextTok = SavedNextTok;
     }
-    if (SavedNextTok.LI) {
-        UseLineInfo (SavedNextTok.LI);
-    }
-
-    /* Switch into special preprocessing mode */
-    Preprocessing = 1;
-
-    /* Expand macros in this line */
-    PreprocessLine ();
-
-    /* Add two semicolons as sentinels to the line, so the following
-    ** expression evaluation will eat these two tokens but nothing from
-    ** the following line.
-    */
-    SB_AppendStr (Line, ";;");
-    SB_Terminate (Line);
-
-    /* Load CurTok and NextTok with tokens from the new input */
-    NextToken ();
-    NextToken ();
-
-    /* Call the expression parser */
-    ExprDesc Expr = NoCodeConstExpr (hie1);
-
-    /* End preprocessing mode */
-    Preprocessing = 0;
-
-    /* Reset the old tokens */
-    CurTok  = SavedCurTok;
-    NextTok = SavedNextTok;
 
     /* Set the #if condition according to the expression result */
     return PushIf (Skip, 1, Expr.IVal != 0);
@@ -1094,14 +1136,18 @@ static int DoIf (int Skip)
 static int DoIfDef (int skip, int flag)
 /* Process #ifdef if flag == 1, or #ifndef if flag == 0. */
 {
-    ident Ident;
+    int Value = 0;
 
-    SkipWhitespace (0);
-    if (MacName (Ident) == 0) {
-        return 0;
-    } else {
-        return PushIf (skip, flag, IsMacro(Ident));
+    if (!skip) {
+        ident Ident;
+
+        SkipWhitespace (0);
+        if (MacName (Ident)) {
+            Value = IsMacro (Ident);
+        }
     }
+
+    return PushIf (skip, flag, Value);
 }
 
 
@@ -1174,9 +1220,6 @@ static void DoPragma (void)
 ** the _Pragma() compiler operator.
 */
 {
-    /* Skip blanks following the #pragma directive */
-    SkipWhitespace (0);
-
     /* Copy the remainder of the line into MLine removing comments and ws */
     SB_Clear (MLine);
     Pass1 (Line, MLine);
@@ -1212,9 +1255,12 @@ static void DoWarning (void)
 {
     SkipWhitespace (0);
     if (CurC == '\0') {
-        PPError ("Invalid #warning directive");
+        PPWarning ("#warning");
     } else {
-        PPWarning ("#warning: %s", SB_GetConstBuf (Line) + SB_GetIndex (Line));
+        StrBuf MsgLine = AUTO_STRBUF_INITIALIZER;
+        TranslationPhase3 (Line, &MsgLine);
+        PPWarning ("#warning: %s", SB_GetConstBuf (&MsgLine) + SB_GetIndex (&MsgLine));
+        SB_Done (&MsgLine);
     }
 
     /* Clear the rest of line */
@@ -1250,7 +1296,9 @@ void Preprocess (void)
                 continue;
             }
             if (!IsSym (Directive)) {
-                PPError ("Preprocessor directive expected");
+                if (!Skip) {
+                    PPError ("Preprocessor directive expected");
+                }
                 ClearLine ();
             } else {
                 switch (FindPPToken (Directive)) {

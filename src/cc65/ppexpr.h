@@ -1,15 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 preproc.h                                 */
+/*                                 ppexpr.h                                  */
 /*                                                                           */
-/*                              C preprocessor                               */
+/*                      Expressions for C preprocessor                       */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2022  The cc65 Authors                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,22 +30,47 @@
 
 
 
-#ifndef PREPROC_H
-#define PREPROC_H
+#ifndef PPEXPR_H
+#define PPEXPR_H
 
 
 
 /*****************************************************************************/
-/*                                   code                                    */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
-void Preprocess (void);
-/* Preprocess a line */
+/* PPExpr data struct */
+typedef struct PPExpr PPExpr;
+struct PPExpr
+{
+    long IVal;
+    unsigned Flags;
+};
+
+/* PPExpr initializers */
+#define AUTO_PPEXPR_INITIALIZER     { 0, 0 }
+#define STATIC_PPEXPR_INITIALIZER   { 0, 0 }
+
+/* PPExpr flags */
+#define PPEXPR_NONE         0U
+#define PPEXPR_UNSIGNED     1U
+#define PPEXPR_UNDEFINED    2U
 
 
 
-/* End of preproc.h */
+/*****************************************************************************/
+/*                                   Code                                    */
+/*****************************************************************************/
+
+
+
+void ParsePPExpr (PPExpr* Expr);
+/* Parse a line for PP expression */
+
+
+
+/* End of ppexpr.h */
 
 #endif

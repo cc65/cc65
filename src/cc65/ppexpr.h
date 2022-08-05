@@ -66,7 +66,7 @@ struct PPExpr
 
 
 
-void ParsePPExpr (PPExpr* Expr);
+void ParsePPExprInLine (PPExpr* Expr);
 /* Parse a line for PP expression */
 
 

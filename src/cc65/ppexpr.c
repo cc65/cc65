@@ -90,12 +90,14 @@ static void PPExprInit (PPExpr* Expr)
 
 
 static void PPErrorSkipLine (void)
-/* Skip the remain tokens till the end of the line and set the expression
-** parser error flag.
+/* Set the expression parser error flag, skip the remain tokens till the end
+** of the line, clear the current and the next tokens.
 */
 {
-    SkipTokens (0, 0);
     PPEvaluationFailed = 1;
+    SkipTokens (0, 0);
+    CurTok.Tok  = TOK_CEOF;
+    NextTok.Tok = TOK_CEOF;
 }
 
 
@@ -146,6 +148,10 @@ static void PPhiePrimary (PPExpr* Expr)
             NextToken ();
             Expr->Flags |= PPEXPR_UNDEFINED;
             Expr->IVal = 0;
+            break;
+
+        case TOK_CEOF:
+            /* Error recovery */
             break;
 
         default:
@@ -252,6 +258,10 @@ void PPhie10 (PPExpr* Expr)
             Expr->IVal = !Expr->IVal;
             break;
 
+        case TOK_CEOF:
+            /* Error recovery */
+            break;
+
         case TOK_STAR:
         case TOK_AND:
         case TOK_SIZEOF:
@@ -286,7 +296,7 @@ static void PPhie_internal (const token_t* Ops,   /* List of generators */
         /* Get the right hand side */
         hienext (&Rhs);
 
-        if (PPEvaluationEnabled) {
+        if (PPEvaluationEnabled && !PPEvaluationFailed) {
 
             /* If either side is unsigned, the result is unsigned */
             Expr->Flags |= Rhs.Flags & PPEXPR_UNSIGNED;
@@ -407,7 +417,7 @@ static void PPhie_compare (const token_t* Ops,    /* List of generators */
         /* Get the right hand side */
         hienext (&Rhs);
 
-        if (PPEvaluationEnabled) {
+        if (PPEvaluationEnabled && !PPEvaluationFailed) {
 
             /* If either side is unsigned, the comparison is unsigned */
             Expr->Flags |= Rhs.Flags & PPEXPR_UNSIGNED;
@@ -501,7 +511,7 @@ static void PPhie7 (PPExpr* Expr)
         PPhie8 (&Rhs);
 
         /* Evaluate */
-        if (PPEvaluationEnabled) {
+        if (PPEvaluationEnabled && !PPEvaluationFailed) {
             /* To shift by a negative value is equivalent to shift to the
             ** opposite direction.
             */
@@ -761,46 +771,57 @@ static void PPhie1 (PPExpr* Expr)
 
         case TOK_ASSIGN:
             PPError ("Token \"=\" is not valid in preprocessor expressions");
+            PPErrorSkipLine ();
             break;
 
         case TOK_PLUS_ASSIGN:
             PPError ("Token \"+=\" is not valid in preprocessor expressions");
+            PPErrorSkipLine ();
             break;
 
         case TOK_MINUS_ASSIGN:
             PPError ("Token \"-=\" is not valid in preprocessor expressions");
+            PPErrorSkipLine ();
             break;
 
         case TOK_MUL_ASSIGN:
             PPError ("Token \"*=\" is not valid in preprocessor expressions");
+            PPErrorSkipLine ();
             break;
 
         case TOK_DIV_ASSIGN:
             PPError ("Token \"/=\" is not valid in preprocessor expressions");
+            PPErrorSkipLine ();
             break;
 
         case TOK_MOD_ASSIGN:
             PPError ("Token \"%%=\" is not valid in preprocessor expressions");
+            PPErrorSkipLine ();
             break;
 
         case TOK_SHL_ASSIGN:
             PPError ("Token \"<<=\" is not valid in preprocessor expressions");
+            PPErrorSkipLine ();
             break;
 
         case TOK_SHR_ASSIGN:
             PPError ("Token \">>=\" is not valid in preprocessor expressions");
+            PPErrorSkipLine ();
             break;
 
         case TOK_AND_ASSIGN:
             PPError ("Token \"&=\" is not valid in preprocessor expressions");
+            PPErrorSkipLine ();
             break;
 
         case TOK_OR_ASSIGN:
             PPError ("Token \"|=\" is not valid in preprocessor expressions");
+            PPErrorSkipLine ();
             break;
 
         case TOK_XOR_ASSIGN:
             PPError ("Token \"^=\" is not valid in preprocessor expressions");
+            PPErrorSkipLine ();
             break;
 
         default:
@@ -827,12 +848,13 @@ static void PPhie0 (PPExpr* Expr)
 
 
 
-void ParsePPExpr (PPExpr* Expr)
+void ParsePPExprInLine (PPExpr* Expr)
 /* Parse a line for PP expression */
 {
     /* Initialize the parser status */
     PPEvaluationFailed = 0;
     PPEvaluationEnabled = 1;
+    NextLineDisabled = 1;
 
     /* Parse */
     PPExprInit (Expr);
@@ -841,5 +863,9 @@ void ParsePPExpr (PPExpr* Expr)
     /* If the evaluation fails, the result is always zero */
     if (PPEvaluationFailed) {
         Expr->IVal = 0;
+        PPEvaluationFailed = 0;
     }
+
+    /* Restore parser status */
+    NextLineDisabled = 0;
 }

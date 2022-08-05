@@ -1279,7 +1279,7 @@ static int DoIf (int Skip)
         NextToken ();
 
         /* Call the expression parser */
-        ParsePPExpr (&Expr);
+        ParsePPExprInLine (&Expr);
 
         /* Restore input source */
         MLine = InitLine (MLine);

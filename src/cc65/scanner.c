@@ -1012,6 +1012,15 @@ void NextToken (void)
             SetTok (TOK_COMP);
             break;
 
+        case '#':
+            NextChar ();
+            if (CurC == '#') {
+                SetTok (TOK_DOUBLE_HASH);
+            } else {
+                NextTok.Tok = TOK_HASH;
+            }
+            break;
+
         default:
             UnknownChar (CurC);
 

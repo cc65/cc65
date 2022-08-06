@@ -84,7 +84,6 @@ static StrBuf* OLine;   /* Buffer for #pragma output */
 /* Newlines to be added to preprocessed text */
 static int PendingNewLines;
 static int FileChanged;
-static int LeadingWhitespace;
 
 /* Structure used when expanding macros */
 typedef struct MacroExp MacroExp;
@@ -107,7 +106,7 @@ static void TranslationPhase3 (StrBuf* Source, StrBuf* Target);
 ** non-newline whitespace sequences.
 */
 
-static int ParseDirectives (void);
+static int ParseDirectives (int InArgList);
 /* Handle directives. Return 1 if there are directives parsed, -1 if new lines
 ** are read, otherwise 0.
 */
@@ -544,19 +543,13 @@ static void ReadMacroArgs (MacroExp* E, int MultiLine)
         if (MultiLine && CurC == '#') {
             int Newlines = 0;
 
-            SB_Cut (OLine, SB_GetLen (OLine) - LeadingWhitespace);
-            if (OldPendingNewLines == 0 && SB_NotEmpty (Line) && SB_LookAtLast (OLine) != '\n') {
-                OldPendingNewLines = 1;
-            }
             while (CurC == '#') {
                 Newlines += PendingNewLines - OldPendingNewLines;
                 PendingNewLines = OldPendingNewLines;
                 OldPendingNewLines = 0;
-                Skipped = ParseDirectives () || Skipped;
+                Skipped = ParseDirectives (1) || Skipped;
                 Skipped = SkipWhitespace (MultiLine) || Skipped;
             }
-            AppendIndent (OLine, LeadingWhitespace);
-            LeadingWhitespace = 0;
             PendingNewLines += Newlines;
         }
         if (Skipped && SB_NotEmpty (&Arg)) {
@@ -1152,10 +1145,10 @@ static void MacroReplacement (StrBuf* Source, StrBuf* Target, int MultiLine)
                         if (CurC == '#') {
                             if (OLine == 0) {
                                 OLine = Target;
-                                ParseDirectives ();
+                                ParseDirectives (0);
                                 OLine = 0;
                             } else {
-                                ParseDirectives ();
+                                ParseDirectives (0);
                             }
                         }
                         /* Add the source info to preprocessor output if needed */
@@ -1394,25 +1387,20 @@ static void DoPragma (void)
 {
     StrBuf* PragmaLine = OLine;
 
-    /* Macro-replace a single line */
-    SB_Clear (MLine);
-    ProcessSingleLine (Line, MLine, 0, 0);
-
-    /* Convert the directive into the operator */
-    if (OLine == 0) {
-        SB_Clear (Line);
-        PragmaLine = Line;
-    }
+    PRECONDITION (PragmaLine != 0);
 
     /* Add the source info to preprocessor output if needed */
     AddPreLine (PragmaLine);
+
+    /* Macro-replace a single line */
+    SB_Clear (MLine);
+    ProcessSingleLine (Line, MLine, 0, 0);
 
     /* Convert #pragma to _Pragma () */
     SB_AppendStr (PragmaLine, "_Pragma (");
     SB_Reset (MLine);
     Stringize (MLine, PragmaLine);
     SB_AppendChar (PragmaLine, ')');
-    SB_AppendChar (PragmaLine, '\n');
 
     /* End this line */
     SB_SetIndex (PragmaLine, SB_GetLen (PragmaLine));
@@ -1454,19 +1442,17 @@ static void DoWarning (void)
 
 
 
-static int ParseDirectives (void)
-/* Handle directives. Return howmany newlines are parsed. */
+static int ParseDirectives (int InArgList)
+/* Handle directives. Return 1 if any whitespace or newlines are parsed. */
 {
-    int         NewLines = 0;
-    int         Skip;
+    int         PPSkip = 0;
     ident       Directive;
 
-    /* Skip white space at the beginning of the line */
-    SkipWhitespace (0);
+    /* Skip white space at the beginning of the first line */
+    int Whitespace = SkipWhitespace (0);
 
     /* Check for stuff to skip */
-    Skip = 0;
-    while (CurC == '\0' || CurC == '#' || Skip) {
+    while (CurC == '\0' || CurC == '#' || PPSkip) {
 
         /* Check for preprocessor lines lines */
         if (CurC == '#') {
@@ -1477,7 +1463,7 @@ static int ParseDirectives (void)
                 continue;
             }
             if (!IsSym (Directive)) {
-                if (!Skip) {
+                if (!PPSkip) {
                     PPError ("Preprocessor directive expected");
                 }
                 ClearLine ();
@@ -1485,7 +1471,7 @@ static int ParseDirectives (void)
                 switch (FindPPToken (Directive)) {
 
                     case PP_DEFINE:
-                        if (!Skip) {
+                        if (!PPSkip) {
                             DefineMacro ();
                         }
                         break;
@@ -1495,10 +1481,10 @@ static int ParseDirectives (void)
                             if ((PPStack->Stack[PPStack->Index] & IFCOND_ELSE) == 0) {
                                 /* Handle as #else/#if combination */
                                 if ((PPStack->Stack[PPStack->Index] & IFCOND_SKIP) == 0) {
-                                    Skip = !Skip;
+                                    PPSkip = !PPSkip;
                                 }
                                 PPStack->Stack[PPStack->Index] |= IFCOND_ELSE;
-                                Skip = DoIf (Skip);
+                                PPSkip = DoIf (PPSkip);
 
                                 /* #elif doesn't need a terminator */
                                 PPStack->Stack[PPStack->Index] &= ~IFCOND_NEEDTERM;
@@ -1514,7 +1500,7 @@ static int ParseDirectives (void)
                         if (PPStack->Index >= 0) {
                             if ((PPStack->Stack[PPStack->Index] & IFCOND_ELSE) == 0) {
                                 if ((PPStack->Stack[PPStack->Index] & IFCOND_SKIP) == 0) {
-                                    Skip = !Skip;
+                                    PPSkip = !PPSkip;
                                 }
                                 PPStack->Stack[PPStack->Index] |= IFCOND_ELSE;
 
@@ -1542,7 +1528,7 @@ static int ParseDirectives (void)
                             CHECK (PPStack->Index >= 0);
 
                             /* Remove the clause that needs a terminator */
-                            Skip = (PPStack->Stack[PPStack->Index--] & IFCOND_SKIP) != 0;
+                            PPSkip = (PPStack->Stack[PPStack->Index--] & IFCOND_SKIP) != 0;
 
                             /* Check for extra tokens */
                             CheckExtraTokens ("endif");
@@ -1552,45 +1538,48 @@ static int ParseDirectives (void)
                         break;
 
                     case PP_ERROR:
-                        if (!Skip) {
+                        if (!PPSkip) {
                             DoError ();
                         }
                         break;
 
                     case PP_IF:
-                        Skip = DoIf (Skip);
+                        PPSkip = DoIf (PPSkip);
                         break;
 
                     case PP_IFDEF:
-                        Skip = DoIfDef (Skip, 1);
+                        PPSkip = DoIfDef (PPSkip, 1);
                         break;
 
                     case PP_IFNDEF:
-                        Skip = DoIfDef (Skip, 0);
+                        PPSkip = DoIfDef (PPSkip, 0);
                         break;
 
                     case PP_INCLUDE:
-                        if (!Skip) {
+                        if (!PPSkip) {
                             DoInclude ();
                         }
                         break;
 
                     case PP_LINE:
                         /* Should do something in C99 at least, but we ignore it */
-                        if (!Skip) {
+                        if (!PPSkip) {
                             ClearLine ();
                         }
                         break;
 
                     case PP_PRAGMA:
-                        if (!Skip) {
-                            DoPragma ();
-                            --NewLines;
+                        if (!PPSkip) {
+                            if (!InArgList) {
+                                DoPragma ();
+                            } else {
+                                PPError ("Embedded #pragma directive within macro arguments is unsupported");
+                            }
                         }
                         break;
 
                     case PP_UNDEF:
-                        if (!Skip) {
+                        if (!PPSkip) {
                             DoUndef ();
                         }
                         break;
@@ -1598,11 +1587,11 @@ static int ParseDirectives (void)
                     case PP_WARNING:
                         /* #warning is a non standard extension */
                         if (IS_Get (&Standard) > STD_C99) {
-                            if (!Skip) {
+                            if (!PPSkip) {
                                 DoWarning ();
                             }
                         } else {
-                            if (!Skip) {
+                            if (!PPSkip) {
                                 PPError ("Preprocessor directive expected");
                             }
                             ClearLine ();
@@ -1610,7 +1599,7 @@ static int ParseDirectives (void)
                         break;
 
                     default:
-                        if (!Skip) {
+                        if (!PPSkip) {
                             PPError ("Preprocessor directive expected");
                         }
                         ClearLine ();
@@ -1621,12 +1610,11 @@ static int ParseDirectives (void)
         if (NextLine () == 0) {
             break;
         }
-        ++NewLines;
-        SkipWhitespace (0);
+        ++PendingNewLines;
+        Whitespace = SkipWhitespace (0) || Whitespace;
     }
 
-    PendingNewLines += NewLines;
-    return NewLines;
+    return Whitespace != 0;
 }
 
 
@@ -1641,15 +1629,14 @@ void Preprocess (void)
 
     /* Parse any directives */
     OLine = PLine;
-    ParseDirectives ();
+    ParseDirectives (0);
     OLine = 0;
 
     /* Add the source info to preprocessor output if needed */
     AddPreLine (PLine);
 
     /* Add leading whitespace to prettify preprocessor output */
-    LeadingWhitespace = SB_GetIndex (Line);
-    AppendIndent (PLine, LeadingWhitespace);
+    AppendIndent (PLine, SB_GetIndex (Line));
 
     /* Expand macros if any */
     MacroReplacement (Line, PLine, 1);

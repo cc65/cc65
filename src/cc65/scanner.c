@@ -69,7 +69,7 @@
 
 Token CurTok;           /* The current token */
 Token NextTok;          /* The next token */
-int   NextLineDisabled; /* Disabled to read next line */
+int   PPParserRunning;  /* Is tokenizer used by the preprocessor */
 
 
 
@@ -189,8 +189,10 @@ static int SkipWhite (void)
 {
     while (1) {
         while (CurC == '\0') {
-            /* If reading next line fails or is forbidden, bail out */
-            if (NextLineDisabled || PreprocessNextLine () == 0) {
+            /* If reading next line fails or is disabled with directives, bail
+            ** out.
+            */
+            if (PPParserRunning || PreprocessNextLine () == 0) {
                 return 0;
             }
         }
@@ -759,11 +761,14 @@ void NextToken (void)
     /* Check for keywords and identifiers */
     if (IsSym (token)) {
 
-        /* Check for a keyword */
-        if ((NextTok.Tok = FindKey (token)) != TOK_IDENT) {
-            /* Reserved word found */
-            return;
+        if (!PPParserRunning) {
+            /* Check for a keyword */
+            if ((NextTok.Tok = FindKey (token)) != TOK_IDENT) {
+                /* Reserved word found */
+                return;
+            }
         }
+
         /* No reserved word, check for special symbols */
         if (token[0] == '_' && token[1] == '_') {
             /* Special symbols */

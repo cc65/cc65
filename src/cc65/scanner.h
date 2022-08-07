@@ -220,7 +220,7 @@ struct Token {
 
 extern Token CurTok;            /* The current token */
 extern Token NextTok;           /* The next token */
-extern int   NextLineDisabled;  /* Disabled to read next line */
+extern int   PPParserRunning;   /* Is tokenizer used by the preprocessor */
 
 
 

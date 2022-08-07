@@ -215,6 +215,12 @@ static void PPhie11 (PPExpr* Expr)
 
         }
     }
+
+    /* Check for excessive expressions */
+    if (!TokIsPunc (&CurTok)) {
+        PPError ("Missing binary operator");
+        PPErrorSkipLine ();
+    }
 }
 
 
@@ -854,7 +860,7 @@ void ParsePPExprInLine (PPExpr* Expr)
     /* Initialize the parser status */
     PPEvaluationFailed = 0;
     PPEvaluationEnabled = 1;
-    NextLineDisabled = 1;
+    PPParserRunning = 1;
 
     /* Parse */
     PPExprInit (Expr);
@@ -867,5 +873,5 @@ void ParsePPExprInLine (PPExpr* Expr)
     }
 
     /* Restore parser status */
-    NextLineDisabled = 0;
+    PPParserRunning = 0;
 }

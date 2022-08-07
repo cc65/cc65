@@ -1142,17 +1142,27 @@ static void MacroReplacement (StrBuf* Source, StrBuf* Target, int MultiLine)
                         if (Whitespace > 0) {
                             SB_AppendChar (Target, ' ');
                         }
-                        if (CurC == '#') {
-                            if (OLine == 0) {
-                                OLine = Target;
-                                ParseDirectives (0);
-                                OLine = 0;
-                            } else {
-                                ParseDirectives (0);
+
+                        /* Directives can only be found in an argument list
+                        ** that spans multiple lines.
+                        */
+                        if (MultiLine) {
+                            if (CurC == '#') {
+                                /* If we were going to support #pragma in
+                                ** macro argument list, it would be output
+                                ** to OLine.
+                                */
+                                if (OLine == 0) {
+                                    OLine = Target;
+                                    ParseDirectives (0);
+                                    OLine = 0;
+                                } else {
+                                    ParseDirectives (0);
+                                }
                             }
+                            /* Add the source info to preprocessor output if needed */
+                            AddPreLine (Target);
                         }
-                        /* Add the source info to preprocessor output if needed */
-                        AddPreLine (Target);
                     } else {
                         /* Function-like macro */
                         if (OLine == 0) {

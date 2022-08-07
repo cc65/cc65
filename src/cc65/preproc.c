@@ -1053,6 +1053,12 @@ static void DoDefine (void)
     /* Remember if we're in C89 mode */
     C89 = (IS_Get (&Standard) == STD_C89);
 
+    /* Check for forbidden macro names */
+    if (strcmp (Ident, "defined") == 0) {
+        PPError ("'%s' cannot be used as a macro name", Ident);
+        return;
+    }
+
     /* Create a new macro definition */
     M = NewMacro (Ident);
 

@@ -10,15 +10,15 @@
 ;
 
         .export         _waitvsync
+        .importzp       tmp1
 
 .proc _waitvsync: near
       RDTIM = $FFDE  ; Kernal API for reading the jiffy timer
       jsr RDTIM
-      sta lastjiffy
+      sta tmp1
 keep_waiting:
       jsr RDTIM
-      cmp #$FF       ; self-mod the value returned by RDTIM to save memory
-      lastjiffy=(*-1)
+      cmp tmp1
       beq keep_waiting
       rts
 .endproc

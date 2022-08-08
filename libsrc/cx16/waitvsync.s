@@ -11,9 +11,9 @@
 
         .export         _waitvsync
         .importzp       tmp1
+        .import         RDTIM
 
 .proc _waitvsync: near
-      RDTIM = $FFDE  ; Kernal API for reading the jiffy timer
       jsr RDTIM
       sta tmp1
 keep_waiting:

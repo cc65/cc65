@@ -538,11 +538,11 @@ NMIVec          := $0318
 ; YM2151 audio chip
 .struct YM2151
                 .org    $9F40
-  .union
-  STATUS        .byte
   ADDR          .byte
-  .endunion
+  .union
   DATA          .byte
+  STATUS        .byte
+  .endunion
 .endstruct
 
 ; X16 Emulator device

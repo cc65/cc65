@@ -2340,7 +2340,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
         } else if (IsClassPtr (Expr->Type)) {
             if (IsClassPtr (Expr2.Type)) {
                 /* Pointers are allowed in comparison */
-                if (TypeCmp (Expr->Type, Expr2.Type).C < TC_STRICT_COMPATIBLE) {
+                if (TypeCmp (Expr->Type, Expr2.Type).C < TC_VOID_PTR) {
                     /* Warn about distinct pointer types */
                     TypeCompatibilityDiagnostic (PtrConversion (Expr->Type), PtrConversion (Expr2.Type), 0,
                         "Distinct pointer types comparing '%s' with '%s'");

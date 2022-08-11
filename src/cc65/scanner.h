@@ -284,6 +284,14 @@ void SymName (char* S);
 int IsSym (char* S);
 /* If a symbol follows, read it and return 1, otherwise return 0 */
 
+int IsPPNumber (int Cur, int Next);
+/* Return 1 if the two successive characters indicate a pp-number, otherwise
+** return 0.
+*/
+
+void CopyPPNumber (StrBuf* Target);
+/* Copy a pp-number from the input to Target */
+
 void NextToken (void);
 /* Get next token from input stream */
 

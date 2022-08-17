@@ -1234,6 +1234,7 @@ static void Primary (ExprDesc* E)
 
         case TOK_ICONST:
         case TOK_CCONST:
+        case TOK_WCCONST:
             /* Character and integer constants */
             E->IVal  = CurTok.IVal;
             E->Flags = E_LOC_NONE | E_RTYPE_RVAL;

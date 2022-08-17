@@ -114,6 +114,7 @@ static void PPhiePrimary (PPExpr* Expr)
     switch (CurTok.Tok) {
         case TOK_ICONST:
         case TOK_CCONST:
+        case TOK_WCCONST:
             /* Character and integer constants */
             Expr->IVal = CurTok.IVal;
             /* According to the C standard, all signed types act as intmax_t

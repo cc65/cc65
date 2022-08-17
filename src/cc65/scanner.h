@@ -182,10 +182,11 @@ typedef enum token_t {
     TOK_LAST_PUNC       = TOK_DOUBLE_HASH,
 
     /* Primary expressions */
-    TOK_SCONST,
     TOK_ICONST,
     TOK_CCONST,
+    TOK_WCCONST,
     TOK_FCONST,
+    TOK_SCONST,
     TOK_WCSCONST,
     TOK_IDENT,
     TOK_A,

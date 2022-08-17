@@ -412,6 +412,15 @@ static void CharConst (void)
 {
     int C;
 
+    if (CurC == 'L') {
+        /* Wide character constant */
+        NextTok.Tok = TOK_WCCONST;
+        NextChar ();
+    } else {
+        /* Narrow character constant */
+        NextTok.Tok = TOK_CCONST;
+    }
+
     /* Skip the quote */
     NextChar ();
 
@@ -425,9 +434,6 @@ static void CharConst (void)
         /* Skip the quote */
         NextChar ();
     }
-
-    /* Setup values and attributes */
-    NextTok.Tok  = TOK_CCONST;
 
     /* Translate into target charset */
     NextTok.IVal = SignExtendChar (TgtTranslateChar (C));
@@ -804,10 +810,15 @@ void NextToken (void)
         return;
     }
 
-    /* Check for wide character literals */
-    if (CurC == 'L' && NextC == '\"') {
-        StringConst ();
-        return;
+    /* Check for wide character constants and literals */
+    if (CurC == 'L') {
+        if (NextC == '\"') {
+            StringConst ();
+            return;
+        } else if (NextC == '\'') {
+            CharConst ();
+            return;
+        }
     }
 
     /* Check for keywords and identifiers */

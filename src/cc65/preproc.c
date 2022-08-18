@@ -1043,6 +1043,7 @@ static void DoDefine (void)
     Macro*      M;
     Macro*      Existing;
     int         C89;
+    unsigned    Len;
 
     /* Read the macro name */
     SkipWhitespace (0);
@@ -1150,6 +1151,24 @@ static void DoDefine (void)
 #if 0
     printf ("%s: <%.*s>\n", M->Name, SB_GetLen (&M->Replacement), SB_GetConstBuf (&M->Replacement));
 #endif
+
+    /* Check for ## at start or end */
+    Len = SB_GetLen (&M->Replacement);
+    if (Len >= 2) {
+        if (SB_LookAt (&M->Replacement, 0) == '#' &&
+            SB_LookAt (&M->Replacement, 1) == '#') {
+            /* Diagnose and bail out */
+            PPError ("'##' cannot appear at start of macro expansion");
+            FreeMacro (M);
+            return;
+        } else if (SB_LookAt (&M->Replacement, Len - 1) == '#' &&
+                   SB_LookAt (&M->Replacement, Len - 2) == '#') {
+            /* Diagnose and bail out */
+            PPError ("'##' cannot appear at end of macro expansion");
+            FreeMacro (M);
+            return;
+        }
+    }
 
     /* Get an existing macro definition with this name */
     Existing = FindMacro (M->Name);

@@ -56,6 +56,9 @@
 #define MACRO_TAB_SIZE  211
 static Macro* MacroTab[MACRO_TAB_SIZE];
 
+/* The undefined macros list head */
+static Macro* UndefinedMacrosListHead;
+
 
 
 /*****************************************************************************/
@@ -173,10 +176,11 @@ void InsertMacro (Macro* M)
 
 
 
-int UndefineMacro (const char* Name)
-/* Search for the macro with the given name and remove it from the macro
-** table if it exists. Return 1 if a macro was found and deleted, return
-** 0 otherwise.
+Macro* UndefineMacro (const char* Name)
+/* Search for the macro with the given name, if it exists, remove it from
+** the defined macro table and insert it to a list for pending deletion.
+** Return the macro if it was found and removed, return 0 otherwise.
+** To safely free the removed macro, use FreeUndefinedMacros().
 */
 {
     /* Get the hash value of the macro name */
@@ -196,11 +200,12 @@ int UndefineMacro (const char* Name)
                 L->Next = M->Next;
             }
 
-            /* Delete the macro */
-            FreeMacro (M);
+            /* Add this macro to pending deletion list */
+            M->Next = UndefinedMacrosListHead;
+            UndefinedMacrosListHead = M;
 
             /* Done */
-            return 1;
+            return M;
         }
 
         /* Next macro */
@@ -210,6 +215,23 @@ int UndefineMacro (const char* Name)
 
     /* Not found */
     return 0;
+}
+
+
+
+void FreeUndefinedMacros (void)
+/* Free all undefined macros */
+{
+    Macro* Next;
+
+    while (UndefinedMacrosListHead != 0) {
+        Next = UndefinedMacrosListHead->Next;
+
+        /* Delete the macro */
+        FreeMacro (UndefinedMacrosListHead);
+
+        UndefinedMacrosListHead = Next;
+    }
 }
 
 

@@ -90,7 +90,6 @@ typedef struct MacroExp MacroExp;
 struct MacroExp {
     Collection  ActualArgs;     /* Actual arguments */
     StrBuf      Replacement;    /* Replacement with arguments substituted */
-    Macro*      M;              /* The macro we're handling */
 };
 
 
@@ -193,12 +192,11 @@ static pptoken_t FindPPToken (const char* Ident)
 
 
 
-static MacroExp* InitMacroExp (MacroExp* E, Macro* M)
+static MacroExp* InitMacroExp (MacroExp* E)
 /* Initialize a MacroExp structure */
 {
     InitCollection (&E->ActualArgs);
     SB_Init (&E->Replacement);
-    E->M = M;
     return E;
 }
 
@@ -244,11 +242,11 @@ static StrBuf* ME_GetActual (MacroExp* E, unsigned Index)
 
 
 
-static int ME_ArgIsVariadic (const MacroExp* E)
+static int ME_ArgIsVariadic (const MacroExp* E, const Macro* M)
 /* Return true if the next actual argument we will add is a variadic one */
 {
-    return (E->M->Variadic &&
-            E->M->ArgCount == (int) CollCount (&E->ActualArgs) + 1);
+    return (M->Variadic &&
+            M->ArgCount == (int) CollCount (&E->ActualArgs) + 1);
 }
 
 
@@ -524,7 +522,7 @@ static int MacName (char* Ident)
 
 
 
-static void ReadMacroArgs (MacroExp* E, int MultiLine)
+static void ReadMacroArgs (MacroExp* E, const Macro* M, int MultiLine)
 /* Identify the arguments to a macro call as-is */
 {
     int         MissingParen = 0;
@@ -576,7 +574,7 @@ static void ReadMacroArgs (MacroExp* E, int MultiLine)
                 }
                 SB_AppendChar (&Arg, CurC);
                 NextChar ();
-            } else if (CurC == ',' && ME_ArgIsVariadic (E)) {
+            } else if (CurC == ',' && ME_ArgIsVariadic (E, M)) {
                 /* It's a comma, but we're inside a variadic macro argument, so
                 ** just copy it and proceed.
                 */
@@ -591,7 +589,7 @@ static void ReadMacroArgs (MacroExp* E, int MultiLine)
                 /* If this is not the single empty argument for a macro with
                 ** an empty argument list, remember it.
                 */
-                if (CurC != ')' || SB_NotEmpty (&Arg) || E->M->ArgCount > 0) {
+                if (CurC != ')' || SB_NotEmpty (&Arg) || M->ArgCount > 0) {
                     ME_AppendActual (E, &Arg);
                 }
 
@@ -607,7 +605,7 @@ static void ReadMacroArgs (MacroExp* E, int MultiLine)
             }
         } else if (CurC == '\0') {
             /* End of input inside macro argument list */
-            PPError ("Unterminated argument list invoking macro '%s'", E->M->Name);
+            PPError ("Unterminated argument list invoking macro '%s'", M->Name);
             MissingParen = 1;
             ClearLine ();
             break;
@@ -619,7 +617,7 @@ static void ReadMacroArgs (MacroExp* E, int MultiLine)
     }
 
     /* Compare formal and actual argument count */
-    if (CollCount (&E->ActualArgs) != (unsigned) E->M->ArgCount) {
+    if (CollCount (&E->ActualArgs) != (unsigned) M->ArgCount) {
 
         if (!MissingParen) {
             /* Argument count mismatch */
@@ -628,7 +626,7 @@ static void ReadMacroArgs (MacroExp* E, int MultiLine)
 
         /* Be sure to make enough empty arguments available */
         SB_Clear (&Arg);
-        while (CollCount (&E->ActualArgs) < (unsigned) E->M->ArgCount) {
+        while (CollCount (&E->ActualArgs) < (unsigned) M->ArgCount) {
             ME_AppendActual (E, &Arg);
         }
     }
@@ -639,7 +637,7 @@ static void ReadMacroArgs (MacroExp* E, int MultiLine)
 
 
 
-static void MacroArgSubst (MacroExp* E)
+static void MacroArgSubst (MacroExp* E, Macro* M)
 /* Argument substitution according to ISO/IEC 9899:1999 (E), 6.10.3.1ff */
 {
     ident       Ident;
@@ -650,9 +648,9 @@ static void MacroArgSubst (MacroExp* E)
 
 
     /* Remember the current input and switch to the macro replacement. */
-    int OldIndex = SB_GetIndex (&E->M->Replacement);
-    SB_Reset (&E->M->Replacement);
-    OldSource = InitLine (&E->M->Replacement);
+    int OldIndex = SB_GetIndex (&M->Replacement);
+    SB_Reset (&M->Replacement);
+    OldSource = InitLine (&M->Replacement);
 
     /* Argument handling loop */
     while (CurC != '\0') {
@@ -661,7 +659,7 @@ static void MacroArgSubst (MacroExp* E)
         if (IsSym (Ident)) {
 
             /* Check if it's a macro argument */
-            if ((ArgIdx = FindMacroArg (E->M, Ident)) >= 0) {
+            if ((ArgIdx = FindMacroArg (M, Ident)) >= 0) {
 
                 /* A macro argument. Get the corresponding actual argument. */
                 Arg = ME_GetActual (E, ArgIdx);
@@ -720,7 +718,7 @@ static void MacroArgSubst (MacroExp* E)
             if (IsSym (Ident)) {
 
                 /* Check if it's a macro argument */
-                if ((ArgIdx = FindMacroArg (E->M, Ident)) >= 0) {
+                if ((ArgIdx = FindMacroArg (M, Ident)) >= 0) {
 
                     /* Get the corresponding actual argument and add it. */
                     SB_Append (&E->Replacement, ME_GetActual (E, ArgIdx));
@@ -733,7 +731,7 @@ static void MacroArgSubst (MacroExp* E)
                 }
             }
 
-        } else if (CurC == '#' && E->M->ArgCount >= 0) {
+        } else if (CurC == '#' && M->ArgCount >= 0) {
 
             /* A # operator within a macro expansion of a function like
             ** macro. Read the following identifier and check if it's a
@@ -741,7 +739,7 @@ static void MacroArgSubst (MacroExp* E)
             */
             NextChar ();
             SkipWhitespace (0);
-            if (!IsSym (Ident) || (ArgIdx = FindMacroArg (E->M, Ident)) < 0) {
+            if (!IsSym (Ident) || (ArgIdx = FindMacroArg (M, Ident)) < 0) {
                 PPError ("'#' is not followed by a macro parameter");
             } else {
                 /* Make a valid string from Replacement */
@@ -767,7 +765,7 @@ static void MacroArgSubst (MacroExp* E)
 
     /* Switch back the input */
     InitLine (OldSource);
-    SB_SetIndex (&E->M->Replacement, OldIndex);
+    SB_SetIndex (&M->Replacement, OldIndex);
 }
 
 
@@ -783,64 +781,27 @@ static void ExpandMacro (StrBuf* Target, Macro* M, int MultiLine)
 #endif
 
     /* Initialize our MacroExp structure */
-    InitMacroExp (&E, M);
+    InitMacroExp (&E);
 
     /* Check if this is a function like macro */
-    if (E.M->ArgCount >= 0) {
-
-        /* Since the macro could be undefined or redefined during its argument
-        ** parsing, we make a clone of the current one and stick to it.
-        */
-        if (MultiLine) {
-            E.M = CloneMacro (E.M);
-        }
+    if (M->ArgCount >= 0) {
 
         /* Read the actual macro arguments (with the enclosing parentheses) */
-        ReadMacroArgs (&E, MultiLine);
-
-        /* Replace macro arguments handling the # and ## operators */
-        MacroArgSubst (&E);
-
-        /* Do macro replacement on the macro that already has the parameters
-        ** substituted.
-        */
-        if (MultiLine) {
-            /* Check if the macro was undefined or redefined */
-            M = FindMacro (E.M->Name);
-            if (M == 0 || MacroCmp (E.M, M) != 0) {
-                /* Use the cloned macro */
-                M = E.M;
-            }
-        }
-
-        /* Forbide repeated expansion of the same macro in use */
-        M->Expanding = 1;
-        MacroReplacement (&E.Replacement, Target, 0);
-        M->Expanding = 0;
-
-    } else {
-
-        /* Handle # and ## operators for object like macros */
-        MacroArgSubst (&E);
-
-        /* Do macro replacement on the macro that already has the parameters
-        ** substituted.
-        */
-        M->Expanding = 1;
-        MacroReplacement (&E.Replacement, Target, 0);
-        M->Expanding = 0;
+        ReadMacroArgs (&E, M, MultiLine);
 
     }
+
+    /* Replace macro arguments handling the # and ## operators */
+    MacroArgSubst (&E, M);
+
+    /* Forbide repeated expansion of the same macro in use */
+    M->Expanding = 1;
+    MacroReplacement (&E.Replacement, Target, 0);
+    M->Expanding = 0;
 
 #if 0
     printf ("Done with %s(%u)\n", E.M->Name, V--);
 #endif
-
-    /* Free cloned macro */
-    if (MultiLine && E.M->ArgCount >= 0) {
-        FreeMacro (E.M);
-        E.M = 0;
-    }
 
     /* Free memory allocated for the macro expansion structure */
     DoneMacroExp (&E);
@@ -1662,6 +1623,9 @@ void Preprocess (void)
         printf ("%s:%u: %.*s\n", GetCurrentFile (), GetCurrentLine (),
                 (int) SB_GetLen (Line), SB_GetConstBuf (Line));
     }
+
+    /* Free all undefined macros */
+    FreeUndefinedMacros ();
 }
 
 

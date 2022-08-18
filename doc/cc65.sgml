@@ -1202,16 +1202,33 @@ The compiler defines several macros at startup:
 
   This macro is defined if the target is the Commodore Plus/4 (-t plus4).
 
-  <tag><tt>__STDC_HOSTED__</tt></tag>
-
-  This macro is expands to the integer constant 1.
-
   <tag><tt>__SIM6502__</tt></tag>
 
   This macro is defined if the target is sim65 in 6502 mode (-t sim6502).
 
   <tag><tt>__SIM65C02__</tt></tag>
+
   This macro is defined if the target is sim65 in 65C02 mode (-t sim65c02).
+
+  <tag><tt>__STDC_HOSTED__</tt></tag>
+
+  This macro expands to the integer constant 1.
+
+  <tag><tt>__STDC_NO_ATOMICS__</tt></tag>
+
+  This macro expands to the integer constant 1 if the language standard is cc65 (--standard cc65).
+
+  <tag><tt>__STDC_NO_COMPLEX__</tt></tag>
+
+  This macro expands to the integer constant 1 if the language standard is cc65 (--standard cc65).
+
+  <tag><tt>__STDC_NO_THREADS__</tt></tag>
+
+  This macro expands to the integer constant 1 if the language standard is cc65 (--standard cc65).
+
+  <tag><tt>__STDC_NO_VLA__</tt></tag>
+
+  This macro expands to the integer constant 1 if the language standard is cc65 (--standard cc65).
 
   <tag><tt>__SUPERVISION__</tt></tag>
 

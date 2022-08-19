@@ -207,7 +207,7 @@ static void Parse (void)
                 /* Allow initialization */
                 if (CurTok.Tok == TOK_ASSIGN) {
 
-                    /* This is a definition */
+                    /* This is a definition with storage */
                     if (SymIsDef (Entry)) {
                         Error ("Global variable '%s' has already been defined",
                                Entry->Name);
@@ -251,6 +251,7 @@ static void Parse (void)
                     ParseInit (Entry->Type);
                 } else {
 
+                    /* This is a declaration */
                     if (IsTypeVoid (Decl.Type)) {
                         /* We cannot declare variables of type void */
                         Error ("Illegal type for variable '%s'", Decl.Ident);
@@ -261,6 +262,15 @@ static void Parse (void)
                             Error ("Variable '%s' has unknown size", Decl.Ident);
                         }
                     } else {
+                        /* Check for enum forward declaration.
+                        ** Warn about it when extensions are not allowed.
+                        */
+                        if (Size == 0 && IsTypeEnum (Decl.Type)) {
+                            if (IS_Get (&Standard) != STD_CC65) {
+                                Warning ("ISO C forbids forward references to 'enum' types");
+                            }
+                        }
+
                         /* A global (including static) uninitialized variable is
                         ** only a tentative definition. For example, this is valid:
                         ** int i;
@@ -287,17 +297,9 @@ static void Parse (void)
                 }
 
                 /* Make the symbol zeropage according to the segment address size */
-                if ((Entry->Flags & SC_EXTERN) != 0) {
+                if ((Entry->Flags & SC_STATIC) != 0) {
                     if (GetSegAddrSize (GetSegName (CS->CurDSeg)) == ADDR_SIZE_ZP) {
                         Entry->Flags |= SC_ZEROPAGE;
-                        /* Check for enum forward declaration.
-                        ** Warn about it when extensions are not allowed.
-                        */
-                        if (Size == 0 && IsTypeEnum (Decl.Type)) {
-                            if (IS_Get (&Standard) != STD_CC65) {
-                                Warning ("ISO C forbids forward references to 'enum' types");
-                            }
-                        }
                     }
                 }
 

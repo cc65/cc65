@@ -82,6 +82,12 @@ void FreeMacro (Macro* M);
 ** table, use UndefineMacro for that.
 */
 
+Macro* CloneMacro (const Macro* M);
+/* Clone a macro definition. The function is not insert the macro into the
+** macro table, thus the cloned instance cannot be freed with UndefineMacro.
+** Use FreeMacro for that.
+*/
+
 void DefineNumericMacro (const char* Name, long Val);
 /* Define a macro for a numeric constant */
 
@@ -91,11 +97,15 @@ void DefineTextMacro (const char* Name, const char* Val);
 void InsertMacro (Macro* M);
 /* Insert the given macro into the macro table. */
 
-int UndefineMacro (const char* Name);
-/* Search for the macro with the given name and remove it from the macro
-** table if it exists. Return 1 if a macro was found and deleted, return
-** 0 otherwise.
+Macro* UndefineMacro (const char* Name);
+/* Search for the macro with the given name, if it exists, remove it from
+** the defined macro table and insert it to a list for pending deletion.
+** Return the macro if it was found and removed, return 0 otherwise.
+** To safely free the removed macro, use FreeUndefinedMacros().
 */
+
+void FreeUndefinedMacros (void);
+/* Free all undefined macros */
 
 Macro* FindMacro (const char* Name);
 /* Find a macro with the given name. Return the macro definition or NULL */

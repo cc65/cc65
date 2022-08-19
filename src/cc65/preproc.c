@@ -67,27 +67,29 @@
 
 
 
-/* Set when the preprocessor calls expr() recursively */
-static unsigned char Preprocessing = 0;
-
 /* Management data for #if */
-#define MAX_IFS         256
 #define IFCOND_NONE     0x00U
 #define IFCOND_SKIP     0x01U
 #define IFCOND_ELSE     0x02U
 #define IFCOND_NEEDTERM 0x04U
-static unsigned char IfStack[MAX_IFS];
-static int           IfIndex = -1;
 
-/* Buffer for macro expansion */
-static StrBuf* MLine;
+/* Current PP if stack */
+static PPIfStack* PPStack;
+
+/* Intermediate input buffers */
+static StrBuf* PLine;   /* Buffer for macro expansion */
+static StrBuf* MLine;   /* Buffer for macro expansion in #pragma */
+static StrBuf* OLine;   /* Buffer for #pragma output */
+
+/* Newlines to be added to preprocessed text */
+static int PendingNewLines;
+static int FileChanged;
 
 /* Structure used when expanding macros */
 typedef struct MacroExp MacroExp;
 struct MacroExp {
     Collection  ActualArgs;     /* Actual arguments */
     StrBuf      Replacement;    /* Replacement with arguments substituted */
-    Macro*      M;              /* The macro we're handling */
 };
 
 
@@ -103,12 +105,12 @@ static void TranslationPhase3 (StrBuf* Source, StrBuf* Target);
 ** non-newline whitespace sequences.
 */
 
-static unsigned Pass1 (StrBuf* Source, StrBuf* Target);
-/* Preprocessor pass 1. Remove whitespace. Handle old and new style comments
-** and the "defined" operator.
+static int ParseDirectives (int InArgList);
+/* Handle directives. Return 1 if there are directives parsed, -1 if new lines
+** are read, otherwise 0.
 */
 
-static void MacroReplacement (StrBuf* Source, StrBuf* Target);
+static void MacroReplacement (StrBuf* Source, StrBuf* Target, int MultiLine);
 /* Perform macro replacement. */
 
 
@@ -190,12 +192,11 @@ static pptoken_t FindPPToken (const char* Ident)
 
 
 
-static MacroExp* InitMacroExp (MacroExp* E, Macro* M)
+static MacroExp* InitMacroExp (MacroExp* E)
 /* Initialize a MacroExp structure */
 {
     InitCollection (&E->ActualArgs);
     SB_Init (&E->Replacement);
-    E->M = M;
     return E;
 }
 
@@ -241,11 +242,11 @@ static StrBuf* ME_GetActual (MacroExp* E, unsigned Index)
 
 
 
-static int ME_ArgIsVariadic (const MacroExp* E)
+static int ME_ArgIsVariadic (const MacroExp* E, const Macro* M)
 /* Return true if the next actual argument we will add is a variadic one */
 {
-    return (E->M->Variadic &&
-            E->M->ArgCount == (int) CollCount (&E->ActualArgs) + 1);
+    return (M->Variadic &&
+            M->ArgCount == (int) CollCount (&E->ActualArgs) + 1);
 }
 
 
@@ -253,6 +254,46 @@ static int ME_ArgIsVariadic (const MacroExp* E)
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
+
+
+
+static void AddPreLine (StrBuf* Str)
+/* Add newlines to the string buffer */
+{
+    if (!PreprocessOnly) {
+        PendingNewLines = 0;
+        return;
+    }
+
+    if (FileChanged || PendingNewLines > 4) {
+        /* Output #line directives as source info */
+        StrBuf Comment = AUTO_STRBUF_INITIALIZER;
+        if (SB_NotEmpty (Str) && SB_LookAtLast (Str) != '\n') {
+            SB_AppendChar (Str, '\n');
+        }
+        SB_Printf (&Comment, "#line %u \"%s\"\n", GetCurrentLine (), GetCurrentFile ());
+        SB_Append (Str, &Comment);
+    } else {
+        /* Output new lines */
+        while (PendingNewLines > 0) {
+            SB_AppendChar (Str, '\n');
+            --PendingNewLines;
+        }
+    }
+    FileChanged = 0;
+    PendingNewLines = 0;
+}
+
+
+
+static void AppendIndent (StrBuf* Str, int Count)
+/* Add Count of spaces ' ' to the string buffer */
+{
+    while (Count > 0) {
+        SB_AppendChar (Str, ' ');
+        --Count;
+    }
+}
 
 
 
@@ -341,12 +382,15 @@ static void NewStyleComment (void)
 
 
 static int SkipWhitespace (int SkipLines)
-/* Skip white space and comments in the input stream. Do also skip newlines if
-** SkipLines is true. Return zero if nothing was skipped, otherwise return a
-** value != zero.
+/* Skip white space and comments in the input stream. If skipLines is true,
+** also skip newlines and add that count to global PendingNewLines. Return 1
+** if the last skipped character was a white space other than a newline '\n',
+** otherwise return -1 if there were any newline characters skipped, otherwise
+** return 0 if nothing was skipped.
 */
 {
     int Skipped = 0;
+    int NewLine = 0;
     while (1) {
         if (IsSpace (CurC)) {
             NextChar ();
@@ -360,7 +404,9 @@ static int SkipWhitespace (int SkipLines)
         } else if (CurC == '\0' && SkipLines) {
             /* End of line, read next */
             if (NextLine () != 0) {
-                Skipped = 1;
+                ++PendingNewLines;
+                NewLine = 1;
+                Skipped = 0;
             } else {
                 /* End of input */
                 break;
@@ -370,7 +416,36 @@ static int SkipWhitespace (int SkipLines)
             break;
         }
     }
-    return Skipped;
+    return Skipped != 0 ? Skipped : -(NewLine != 0);
+}
+
+
+
+static void CopyHeaderNameToken (StrBuf* Target)
+/* Copy a header name from the input to Target. */
+{
+    /* Remember the quote character, copy it to the target buffer and skip it */
+    char Quote = CurC == '"' ? '"' : '>';
+    SB_AppendChar (Target, CurC);
+    NextChar ();
+
+    /* Copy the characters inside the string */
+    while (CurC != '\0' && CurC != Quote) {
+        /* Keep an escaped char */
+        if (CurC == '\\') {
+            SB_AppendChar (Target, CurC);
+            NextChar ();
+        }
+        /* Copy the character */
+        SB_AppendChar (Target, CurC);
+        NextChar ();
+    }
+
+    /* If we had a terminating quote, copy it */
+    if (CurC != '\0') {
+        SB_AppendChar (Target, CurC);
+        NextChar ();
+    }
 }
 
 
@@ -399,7 +474,24 @@ static void CopyQuotedString (StrBuf* Target)
     if (CurC != '\0') {
         SB_AppendChar (Target, CurC);
         NextChar ();
+    } else {
+        PPWarning ("Missing terminating %c character", Quote);
     }
+}
+
+
+
+static int CheckExtraTokens (const char* Name)
+/* Check for extra tokens at the end of the directive. Return 1 if there are
+** extra tokens, otherwise 0.
+*/
+{
+    SkipWhitespace (0);
+    if (SB_GetIndex (Line) != SB_GetLen (Line)) {
+        PPWarning ("Extra tokens at end of #%s directive", Name);
+        return 1;
+    }
+    return 0;
 }
 
 
@@ -416,7 +508,11 @@ static int MacName (char* Ident)
 */
 {
     if (IsSym (Ident) == 0) {
-        PPError ("Identifier expected");
+        if (CurC != '\0') {
+            PPError ("Macro name must be an identifier");
+        } else {
+            PPError ("Missing macro name");
+        }
         ClearLine ();
         return 0;
     } else {
@@ -426,15 +522,37 @@ static int MacName (char* Ident)
 
 
 
-static void ReadMacroArgs (MacroExp* E)
-/* Identify the arguments to a macro call */
+static void ReadMacroArgs (MacroExp* E, const Macro* M, int MultiLine)
+/* Identify the arguments to a macro call as-is */
 {
+    int         MissingParen = 0;
     unsigned    Parens;         /* Number of open parenthesis */
-    StrBuf      Arg = STATIC_STRBUF_INITIALIZER;
+    StrBuf      Arg = AUTO_STRBUF_INITIALIZER;
+
+    /* Eat the left paren */
+    NextChar ();
 
     /* Read the actual macro arguments */
     Parens = 0;
     while (1) {
+        /* Squeeze runs of blanks within an arg */
+        int OldPendingNewLines = PendingNewLines;
+        int Skipped = SkipWhitespace (MultiLine);
+        if (MultiLine && CurC == '#') {
+            int Newlines = 0;
+
+            while (CurC == '#') {
+                Newlines += PendingNewLines - OldPendingNewLines;
+                PendingNewLines = OldPendingNewLines;
+                OldPendingNewLines = 0;
+                Skipped = ParseDirectives (1) || Skipped;
+                Skipped = SkipWhitespace (MultiLine) || Skipped;
+            }
+            PendingNewLines += Newlines;
+        }
+        if (Skipped && SB_NotEmpty (&Arg)) {
+            SB_AppendChar (&Arg, ' ');
+        }
         if (CurC == '(') {
 
             /* Nested parenthesis */
@@ -456,7 +574,7 @@ static void ReadMacroArgs (MacroExp* E)
                 }
                 SB_AppendChar (&Arg, CurC);
                 NextChar ();
-            } else if (CurC == ',' && ME_ArgIsVariadic (E)) {
+            } else if (CurC == ',' && ME_ArgIsVariadic (E, M)) {
                 /* It's a comma, but we're inside a variadic macro argument, so
                 ** just copy it and proceed.
                 */
@@ -471,7 +589,7 @@ static void ReadMacroArgs (MacroExp* E)
                 /* If this is not the single empty argument for a macro with
                 ** an empty argument list, remember it.
                 */
-                if (CurC != ')' || SB_NotEmpty (&Arg) || E->M->ArgCount > 0) {
+                if (CurC != ')' || SB_NotEmpty (&Arg) || M->ArgCount > 0) {
                     ME_AppendActual (E, &Arg);
                 }
 
@@ -485,15 +603,10 @@ static void ReadMacroArgs (MacroExp* E)
                 NextChar ();
                 SB_Clear (&Arg);
             }
-        } else if (SkipWhitespace (1)) {
-            /* Squeeze runs of blanks within an arg */
-            if (SB_NotEmpty (&Arg)) {
-                SB_AppendChar (&Arg, ' ');
-            }
         } else if (CurC == '\0') {
             /* End of input inside macro argument list */
-            PPError ("Unterminated argument list invoking macro '%s'", E->M->Name);
-
+            PPError ("Unterminated argument list invoking macro '%s'", M->Name);
+            MissingParen = 1;
             ClearLine ();
             break;
         } else {
@@ -503,13 +616,28 @@ static void ReadMacroArgs (MacroExp* E)
         }
     }
 
+    /* Compare formal and actual argument count */
+    if (CollCount (&E->ActualArgs) != (unsigned) M->ArgCount) {
+
+        if (!MissingParen) {
+            /* Argument count mismatch */
+            PPError ("Macro argument count mismatch");
+        }
+
+        /* Be sure to make enough empty arguments available */
+        SB_Clear (&Arg);
+        while (CollCount (&E->ActualArgs) < (unsigned) M->ArgCount) {
+            ME_AppendActual (E, &Arg);
+        }
+    }
+
     /* Deallocate string buf resources */
     SB_Done (&Arg);
 }
 
 
 
-static void MacroArgSubst (MacroExp* E)
+static void MacroArgSubst (MacroExp* E, Macro* M)
 /* Argument substitution according to ISO/IEC 9899:1999 (E), 6.10.3.1ff */
 {
     ident       Ident;
@@ -520,9 +648,9 @@ static void MacroArgSubst (MacroExp* E)
 
 
     /* Remember the current input and switch to the macro replacement. */
-    int OldIndex = SB_GetIndex (&E->M->Replacement);
-    SB_Reset (&E->M->Replacement);
-    OldSource = InitLine (&E->M->Replacement);
+    int OldIndex = SB_GetIndex (&M->Replacement);
+    SB_Reset (&M->Replacement);
+    OldSource = InitLine (&M->Replacement);
 
     /* Argument handling loop */
     while (CurC != '\0') {
@@ -531,7 +659,7 @@ static void MacroArgSubst (MacroExp* E)
         if (IsSym (Ident)) {
 
             /* Check if it's a macro argument */
-            if ((ArgIdx = FindMacroArg (E->M, Ident)) >= 0) {
+            if ((ArgIdx = FindMacroArg (M, Ident)) >= 0) {
 
                 /* A macro argument. Get the corresponding actual argument. */
                 Arg = ME_GetActual (E, ArgIdx);
@@ -553,7 +681,7 @@ static void MacroArgSubst (MacroExp* E)
                     ** of the actual.
                     */
                     SB_Reset (Arg);
-                    MacroReplacement (Arg, &E->Replacement);
+                    MacroReplacement (Arg, &E->Replacement, 0);
 
                     /* If we skipped whitespace before, re-add it now */
                     if (HaveSpace) {
@@ -590,7 +718,7 @@ static void MacroArgSubst (MacroExp* E)
             if (IsSym (Ident)) {
 
                 /* Check if it's a macro argument */
-                if ((ArgIdx = FindMacroArg (E->M, Ident)) >= 0) {
+                if ((ArgIdx = FindMacroArg (M, Ident)) >= 0) {
 
                     /* Get the corresponding actual argument and add it. */
                     SB_Append (&E->Replacement, ME_GetActual (E, ArgIdx));
@@ -603,7 +731,7 @@ static void MacroArgSubst (MacroExp* E)
                 }
             }
 
-        } else if (CurC == '#' && E->M->ArgCount >= 0) {
+        } else if (CurC == '#' && M->ArgCount >= 0) {
 
             /* A # operator within a macro expansion of a function like
             ** macro. Read the following identifier and check if it's a
@@ -611,7 +739,7 @@ static void MacroArgSubst (MacroExp* E)
             */
             NextChar ();
             SkipWhitespace (0);
-            if (!IsSym (Ident) || (ArgIdx = FindMacroArg (E->M, Ident)) < 0) {
+            if (!IsSym (Ident) || (ArgIdx = FindMacroArg (M, Ident)) < 0) {
                 PPError ("'#' is not followed by a macro parameter");
             } else {
                 /* Make a valid string from Replacement */
@@ -637,100 +765,46 @@ static void MacroArgSubst (MacroExp* E)
 
     /* Switch back the input */
     InitLine (OldSource);
-    SB_SetIndex (&E->M->Replacement, OldIndex);
+    SB_SetIndex (&M->Replacement, OldIndex);
 }
 
 
 
-static void MacroCall (StrBuf* Target, Macro* M)
-/* Process a function like macro */
-{
-    MacroExp    E;
-
-    /* Eat the left paren */
-    NextChar ();
-
-    /* Initialize our MacroExp structure */
-    InitMacroExp (&E, M);
-
-    /* Read the actual macro arguments */
-    ReadMacroArgs (&E);
-
-    /* Compare formal and actual argument count */
-    if (CollCount (&E.ActualArgs) != (unsigned) M->ArgCount) {
-
-        StrBuf Arg = STATIC_STRBUF_INITIALIZER;
-
-        /* Argument count mismatch */
-        PPError ("Macro argument count mismatch");
-
-        /* Be sure to make enough empty arguments available */
-        while (CollCount (&E.ActualArgs) < (unsigned) M->ArgCount) {
-            ME_AppendActual (&E, &Arg);
-        }
-    }
-
-    /* Replace macro arguments handling the # and ## operators */
-    MacroArgSubst (&E);
-
-    /* Do macro replacement on the macro that already has the parameters
-    ** substituted.
-    */
-    M->Expanding = 1;
-    MacroReplacement (&E.Replacement, Target);
-    M->Expanding = 0;
-
-    /* Free memory allocated for the macro expansion structure */
-    DoneMacroExp (&E);
-}
-
-
-
-static void ExpandMacro (StrBuf* Target, Macro* M)
+static void ExpandMacro (StrBuf* Target, Macro* M, int MultiLine)
 /* Expand a macro into Target */
 {
+    MacroExp E;
+
 #if 0
     static unsigned V = 0;
     printf ("Expanding %s(%u)\n", M->Name, ++V);
 #endif
 
+    /* Initialize our MacroExp structure */
+    InitMacroExp (&E);
+
     /* Check if this is a function like macro */
     if (M->ArgCount >= 0) {
 
-        int Whitespace = SkipWhitespace (1);
-        if (CurC != '(') {
-            /* Function like macro but no parameter list */
-            SB_AppendStr (Target, M->Name);
-            if (Whitespace) {
-                SB_AppendChar (Target, ' ');
-            }
-        } else {
-            /* Function like macro */
-            MacroCall (Target, M);
-        }
-
-    } else {
-
-        MacroExp E;
-        InitMacroExp (&E, M);
-
-        /* Handle # and ## operators for object like macros */
-        MacroArgSubst (&E);
-
-        /* Do macro replacement on the macro that already has the parameters
-        ** substituted.
-        */
-        M->Expanding = 1;
-        MacroReplacement (&E.Replacement, Target);
-        M->Expanding = 0;
-
-        /* Free memory allocated for the macro expansion structure */
-        DoneMacroExp (&E);
+        /* Read the actual macro arguments (with the enclosing parentheses) */
+        ReadMacroArgs (&E, M, MultiLine);
 
     }
+
+    /* Replace macro arguments handling the # and ## operators */
+    MacroArgSubst (&E, M);
+
+    /* Forbide repeated expansion of the same macro in use */
+    M->Expanding = 1;
+    MacroReplacement (&E.Replacement, Target, 0);
+    M->Expanding = 0;
+
 #if 0
-    printf ("Done with %s(%u)\n", M->Name, V--);
+    printf ("Done with %s(%u)\n", E.M->Name, V--);
 #endif
+
+    /* Free memory allocated for the macro expansion structure */
+    DoneMacroExp (&E);
 }
 
 
@@ -912,20 +986,25 @@ static void TranslationPhase3 (StrBuf* Source, StrBuf* Target)
 
 
 
-static unsigned Pass1 (StrBuf* Source, StrBuf* Target)
-/* Preprocessor pass 1. Remove whitespace, old and new style comments. Handle
-** the "defined" operator.
+static void ProcessSingleLine (StrBuf* Source,
+                               StrBuf* Target,
+                               int HandleDefined,
+                               int HandleHeader)
+/* Process a single line. Remove whitespace, old and new style comments.
+** Recognize and handle the "defined" operator if HandleDefined is true.
+** Recognize and handle header name tokens if HandleHeader is true.
 */
 {
-    unsigned    IdentCount;
+    int         OldIndex = SB_GetIndex (Source);
     ident       Ident;
     int         HaveParen;
 
-    /* Switch to the new input source */
+    /* Operate on the new input source */
     StrBuf* OldSource = InitLine (Source);
 
+    SkipWhitespace (0);
+
     /* Loop removing ws and comments */
-    IdentCount = 0;
     while (CurC != '\0') {
         if (SkipWhitespace (0)) {
             /* Squeeze runs of blanks */
@@ -933,7 +1012,7 @@ static unsigned Pass1 (StrBuf* Source, StrBuf* Target)
                 SB_AppendChar (Target, ' ');
             }
         } else if (IsSym (Ident)) {
-            if (Preprocessing && strcmp (Ident, "defined") == 0) {
+            if (HandleDefined && strcmp (Ident, "defined") == 0) {
                 /* Handle the "defined" operator */
                 SkipWhitespace (0);
                 HaveParen = 0;
@@ -957,9 +1036,32 @@ static unsigned Pass1 (StrBuf* Source, StrBuf* Target)
                     SB_AppendChar (Target, '0');
                 }
             } else {
-                ++IdentCount;
-                SB_AppendStr (Target, Ident);
+                Macro* M = FindMacro (Ident);
+                if (M != 0 && !M->Expanding) {
+                    /* Check if this is a function-like macro */
+                    if (M->ArgCount >= 0) {
+                        int Whitespace = SkipWhitespace (0);
+                        if (CurC != '(') {
+                            /* Function-like macro without an argument list is not replaced */
+                            SB_AppendStr (Target, M->Name);
+                            if (Whitespace) {
+                                SB_AppendChar (Target, ' ');
+                            }
+                        } else {
+                            /* Function-like macro */
+                            ExpandMacro (Target, M, 0);
+                        }
+                    } else {
+                        /* Object-like macro */
+                        ExpandMacro (Target, M, 0);
+                    }
+                } else {
+                    /* An identifier, keep it */
+                    SB_AppendStr (Target, Ident);
+                }
             }
+        } else if (HandleHeader && (CurC == '<' || CurC == '\"')) {
+            CopyHeaderNameToken (Target);
         } else if (IsQuote (CurC)) {
             CopyQuotedString (Target);
         } else {
@@ -971,13 +1073,13 @@ static unsigned Pass1 (StrBuf* Source, StrBuf* Target)
     /* Switch back to the old source */
     InitLine (OldSource);
 
-    /* Return the number of identifiers found in the line */
-    return IdentCount;
+    /* Restore the source input index */
+    SB_SetIndex (Source, OldIndex);
 }
 
 
 
-static void MacroReplacement (StrBuf* Source, StrBuf* Target)
+static void MacroReplacement (StrBuf* Source, StrBuf* Target, int MultiLine)
 /* Perform macro replacement. */
 {
     ident       Ident;
@@ -992,22 +1094,64 @@ static void MacroReplacement (StrBuf* Source, StrBuf* Target)
         if (IsSym (Ident)) {
             /* Check if it's a macro */
             if ((M = FindMacro (Ident)) != 0 && !M->Expanding) {
-                /* It's a macro, expand it */
-                ExpandMacro (Target, M);
+                /* Check if this is a function-like macro */
+                if (M->ArgCount >= 0) {
+                    int Whitespace = SkipWhitespace (MultiLine);
+                    if (CurC != '(') {
+                        /* Function-like macro without an argument list is not replaced */
+                        SB_AppendStr (Target, M->Name);
+                        if (Whitespace > 0) {
+                            SB_AppendChar (Target, ' ');
+                        }
+
+                        /* Directives can only be found in an argument list
+                        ** that spans multiple lines.
+                        */
+                        if (MultiLine) {
+                            if (CurC == '#') {
+                                /* If we were going to support #pragma in
+                                ** macro argument list, it would be output
+                                ** to OLine.
+                                */
+                                if (OLine == 0) {
+                                    OLine = Target;
+                                    ParseDirectives (0);
+                                    OLine = 0;
+                                } else {
+                                    ParseDirectives (0);
+                                }
+                            }
+                            /* Add the source info to preprocessor output if needed */
+                            AddPreLine (Target);
+                        }
+                    } else {
+                        /* Function-like macro */
+                        if (OLine == 0) {
+                            OLine = Target;
+                            ExpandMacro (Target, M, MultiLine);
+                            OLine = 0;
+                        } else {
+                            ExpandMacro (Target, M, MultiLine);
+                        }
+                    }
+                } else {
+                    /* Object-like macro */
+                    ExpandMacro (Target, M, 0);
+                }
             } else {
                 /* An identifier, keep it */
                 SB_AppendStr (Target, Ident);
             }
         } else if (IsQuote (CurC)) {
             CopyQuotedString (Target);
-        } else if (IsSpace (CurC)) {
-            if (!IsSpace (SB_LookAtLast (Target))) {
-                SB_AppendChar (Target, CurC);
-            }
-            NextChar ();
         } else {
-            SB_AppendChar (Target, CurC);
-            NextChar ();
+            int Whitespace = SkipWhitespace (0);
+            if (Whitespace) {
+                SB_AppendChar (Target, ' ');
+            } else {
+                SB_AppendChar (Target, CurC);
+                NextChar ();
+            }
         }
     }
 
@@ -1017,43 +1161,22 @@ static void MacroReplacement (StrBuf* Source, StrBuf* Target)
 
 
 
-static void PreprocessLine (void)
-/* Translate one line with defined macros replaced */
-{
-    /* Trim whitespace and remove comments. The function returns the number of
-    ** identifiers found. If there were any, we will have to check for macros.
-    */
-    SB_Clear (MLine);
-    if (Pass1 (Line, MLine) > 0) {
-        MLine = InitLine (MLine);
-        SB_Reset (Line);
-        SB_Clear (MLine);
-        MacroReplacement (Line, MLine);
-    }
-
-    /* Read from the new line */
-    SB_Reset (MLine);
-    MLine = InitLine (MLine);
-}
-
-
-
 static int PushIf (int Skip, int Invert, int Cond)
 /* Push a new if level onto the if stack */
 {
     /* Check for an overflow of the if stack */
-    if (IfIndex >= MAX_IFS-1) {
+    if (PPStack->Index >= MAX_PP_IFS-1) {
         PPError ("Too many nested #if clauses");
         return 1;
     }
 
     /* Push the #if condition */
-    ++IfIndex;
+    ++PPStack->Index;
     if (Skip) {
-        IfStack[IfIndex] = IFCOND_SKIP | IFCOND_NEEDTERM;
+        PPStack->Stack[PPStack->Index] = IFCOND_SKIP | IFCOND_NEEDTERM;
         return 1;
     } else {
-        IfStack[IfIndex] = IFCOND_NONE | IFCOND_NEEDTERM;
+        PPStack->Stack[PPStack->Index] = IFCOND_NONE | IFCOND_NEEDTERM;
         return (Invert ^ Cond);
     }
 }
@@ -1085,10 +1208,11 @@ static int DoIf (int Skip)
     PPExpr Expr = AUTO_PPEXPR_INITIALIZER;
 
     if (!Skip) {
+
         /* We're about to use a dedicated expression parser to evaluate the #if
         ** expression. Save the current tokens to come back here later.
         */
-        Token SavedCurTok  = CurTok;
+        Token SavedCurTok = CurTok;
         Token SavedNextTok = NextTok;
 
         /* Make sure the line infos for the tokens won't get removed */
@@ -1099,11 +1223,13 @@ static int DoIf (int Skip)
             UseLineInfo (SavedNextTok.LI);
         }
 
-        /* Switch into special preprocessing mode */
-        Preprocessing = 1;
+        /* Macro-replace a single line with support for the "defined" operator */
+        SB_Clear (MLine);
+        ProcessSingleLine (Line, MLine, 1, 0);
 
-        /* Expand macros in this line */
-        PreprocessLine ();
+        /* Read from the processed line */
+        SB_Reset (MLine);
+        MLine = InitLine (MLine);
 
         /* Add two semicolons as sentinels to the line, so the following
         ** expression evaluation will eat these two tokens but nothing from
@@ -1117,10 +1243,10 @@ static int DoIf (int Skip)
         NextToken ();
 
         /* Call the expression parser */
-        ParsePPExpr (&Expr);
+        ParsePPExprInLine (&Expr);
 
-        /* End preprocessing mode */
-        Preprocessing = 0;
+        /* Restore input source */
+        MLine = InitLine (MLine);
 
         /* Reset the old tokens */
         CurTok  = SavedCurTok;
@@ -1144,6 +1270,8 @@ static int DoIfDef (int skip, int flag)
         SkipWhitespace (0);
         if (MacName (Ident)) {
             Value = IsMacro (Ident);
+            /* Check for extra tokens */
+            CheckExtraTokens (flag ? "ifdef" : "ifndef");
         }
     }
 
@@ -1157,14 +1285,15 @@ static void DoInclude (void)
 {
     char        RTerm;
     InputType   IT;
-    StrBuf      Filename = STATIC_STRBUF_INITIALIZER;
+    StrBuf      Filename = AUTO_STRBUF_INITIALIZER;
 
+    /* Macro-replace a single line with special support for <filename> */
+    SB_Clear (MLine);
+    ProcessSingleLine (Line, MLine, 0, 1);
 
-    /* Preprocess the remainder of the line */
-    PreprocessLine ();
-
-    /* Skip blanks */
-    SkipWhitespace (0);
+    /* Read from the processed line */
+    SB_Reset (MLine);
+    MLine = InitLine (MLine);
 
     /* Get the next char and check for a valid file name terminator. Setup
     ** the include directory spec (SYS/USR) by looking at the terminator.
@@ -1196,6 +1325,10 @@ static void DoInclude (void)
 
     /* Check if we got a terminator */
     if (CurC == RTerm) {
+        /* Skip the terminator */
+        NextChar ();
+        /* Check for extra tokens following the filename */
+        CheckExtraTokens ("include");
         /* Open the include file */
         OpenIncludeFile (SB_GetConstBuf (&Filename), IT);
     } else if (CurC == '\0') {
@@ -1206,6 +1339,9 @@ static void DoInclude (void)
 Done:
     /* Free the allocated filename data */
     SB_Done (&Filename);
+
+    /* Restore input source */
+    MLine = InitLine (MLine);
 
     /* Clear the remaining line so the next input will come from the new
     ** file (if open)
@@ -1220,19 +1356,25 @@ static void DoPragma (void)
 ** the _Pragma() compiler operator.
 */
 {
-    /* Copy the remainder of the line into MLine removing comments and ws */
+    StrBuf* PragmaLine = OLine;
+
+    PRECONDITION (PragmaLine != 0);
+
+    /* Add the source info to preprocessor output if needed */
+    AddPreLine (PragmaLine);
+
+    /* Macro-replace a single line */
     SB_Clear (MLine);
-    Pass1 (Line, MLine);
+    ProcessSingleLine (Line, MLine, 0, 0);
 
-    /* Convert the directive into the operator */
-    SB_CopyStr (Line, "_Pragma (");
+    /* Convert #pragma to _Pragma () */
+    SB_AppendStr (PragmaLine, "_Pragma (");
     SB_Reset (MLine);
-    Stringize (MLine, Line);
-    SB_AppendChar (Line, ')');
+    Stringize (MLine, PragmaLine);
+    SB_AppendChar (PragmaLine, ')');
 
-    /* Initialize reading from line */
-    SB_Reset (Line);
-    InitLine (Line);
+    /* End this line */
+    SB_SetIndex (PragmaLine, SB_GetLen (PragmaLine));
 }
 
 
@@ -1246,6 +1388,8 @@ static void DoUndef (void)
     if (MacName (Ident)) {
         UndefineMacro (Ident);
     }
+    /* Check for extra tokens */
+    CheckExtraTokens ("undef");
 }
 
 
@@ -1269,23 +1413,17 @@ static void DoWarning (void)
 
 
 
-void Preprocess (void)
-/* Preprocess a line */
+static int ParseDirectives (int InArgList)
+/* Handle directives. Return 1 if any whitespace or newlines are parsed. */
 {
-    int         Skip;
+    int         PPSkip = 0;
     ident       Directive;
 
-    /* Create the output buffer if we don't already have one */
-    if (MLine == 0) {
-        MLine = NewStrBuf ();
-    }
-
-    /* Skip white space at the beginning of the line */
-    SkipWhitespace (0);
+    /* Skip white space at the beginning of the first line */
+    int Whitespace = SkipWhitespace (0);
 
     /* Check for stuff to skip */
-    Skip = 0;
-    while (CurC == '\0' || CurC == '#' || Skip) {
+    while (CurC == '\0' || CurC == '#' || PPSkip) {
 
         /* Check for preprocessor lines lines */
         if (CurC == '#') {
@@ -1296,7 +1434,7 @@ void Preprocess (void)
                 continue;
             }
             if (!IsSym (Directive)) {
-                if (!Skip) {
+                if (!PPSkip) {
                     PPError ("Preprocessor directive expected");
                 }
                 ClearLine ();
@@ -1304,24 +1442,23 @@ void Preprocess (void)
                 switch (FindPPToken (Directive)) {
 
                     case PP_DEFINE:
-                        if (!Skip) {
+                        if (!PPSkip) {
                             DefineMacro ();
                         }
                         break;
 
                     case PP_ELIF:
-                        if (IfIndex >= 0) {
-                            if ((IfStack[IfIndex] & IFCOND_ELSE) == 0) {
-
+                        if (PPStack->Index >= 0) {
+                            if ((PPStack->Stack[PPStack->Index] & IFCOND_ELSE) == 0) {
                                 /* Handle as #else/#if combination */
-                                if ((IfStack[IfIndex] & IFCOND_SKIP) == 0) {
-                                    Skip = !Skip;
+                                if ((PPStack->Stack[PPStack->Index] & IFCOND_SKIP) == 0) {
+                                    PPSkip = !PPSkip;
                                 }
-                                IfStack[IfIndex] |= IFCOND_ELSE;
-                                Skip = DoIf (Skip);
+                                PPStack->Stack[PPStack->Index] |= IFCOND_ELSE;
+                                PPSkip = DoIf (PPSkip);
 
                                 /* #elif doesn't need a terminator */
-                                IfStack[IfIndex] &= ~IFCOND_NEEDTERM;
+                                PPStack->Stack[PPStack->Index] &= ~IFCOND_NEEDTERM;
                             } else {
                                 PPError ("Duplicate #else/#elif");
                             }
@@ -1331,12 +1468,15 @@ void Preprocess (void)
                         break;
 
                     case PP_ELSE:
-                        if (IfIndex >= 0) {
-                            if ((IfStack[IfIndex] & IFCOND_ELSE) == 0) {
-                                if ((IfStack[IfIndex] & IFCOND_SKIP) == 0) {
-                                    Skip = !Skip;
+                        if (PPStack->Index >= 0) {
+                            if ((PPStack->Stack[PPStack->Index] & IFCOND_ELSE) == 0) {
+                                if ((PPStack->Stack[PPStack->Index] & IFCOND_SKIP) == 0) {
+                                    PPSkip = !PPSkip;
                                 }
-                                IfStack[IfIndex] |= IFCOND_ELSE;
+                                PPStack->Stack[PPStack->Index] |= IFCOND_ELSE;
+
+                                /* Check for extra tokens */
+                                CheckExtraTokens ("else");
                             } else {
                                 PPError ("Duplicate #else");
                             }
@@ -1346,64 +1486,71 @@ void Preprocess (void)
                         break;
 
                     case PP_ENDIF:
-                        if (IfIndex >= 0) {
+                        if (PPStack->Index >= 0) {
                             /* Remove any clauses on top of stack that do not
                             ** need a terminating #endif.
                             */
-                            while (IfIndex >= 0 && (IfStack[IfIndex] & IFCOND_NEEDTERM) == 0) {
-                                --IfIndex;
+                            while (PPStack->Index >= 0 &&
+                                   (PPStack->Stack[PPStack->Index] & IFCOND_NEEDTERM) == 0) {
+                                --PPStack->Index;
                             }
 
                             /* Stack may not be empty here or something is wrong */
-                            CHECK (IfIndex >= 0);
+                            CHECK (PPStack->Index >= 0);
 
                             /* Remove the clause that needs a terminator */
-                            Skip = (IfStack[IfIndex--] & IFCOND_SKIP) != 0;
+                            PPSkip = (PPStack->Stack[PPStack->Index--] & IFCOND_SKIP) != 0;
+
+                            /* Check for extra tokens */
+                            CheckExtraTokens ("endif");
                         } else {
                             PPError ("Unexpected '#endif'");
                         }
                         break;
 
                     case PP_ERROR:
-                        if (!Skip) {
+                        if (!PPSkip) {
                             DoError ();
                         }
                         break;
 
                     case PP_IF:
-                        Skip = DoIf (Skip);
+                        PPSkip = DoIf (PPSkip);
                         break;
 
                     case PP_IFDEF:
-                        Skip = DoIfDef (Skip, 1);
+                        PPSkip = DoIfDef (PPSkip, 1);
                         break;
 
                     case PP_IFNDEF:
-                        Skip = DoIfDef (Skip, 0);
+                        PPSkip = DoIfDef (PPSkip, 0);
                         break;
 
                     case PP_INCLUDE:
-                        if (!Skip) {
+                        if (!PPSkip) {
                             DoInclude ();
                         }
                         break;
 
                     case PP_LINE:
                         /* Should do something in C99 at least, but we ignore it */
-                        if (!Skip) {
+                        if (!PPSkip) {
                             ClearLine ();
                         }
                         break;
 
                     case PP_PRAGMA:
-                        if (!Skip) {
-                            DoPragma ();
-                            goto Done;
+                        if (!PPSkip) {
+                            if (!InArgList) {
+                                DoPragma ();
+                            } else {
+                                PPError ("Embedded #pragma directive within macro arguments is unsupported");
+                            }
                         }
                         break;
 
                     case PP_UNDEF:
-                        if (!Skip) {
+                        if (!PPSkip) {
                             DoUndef ();
                         }
                         break;
@@ -1411,11 +1558,11 @@ void Preprocess (void)
                     case PP_WARNING:
                         /* #warning is a non standard extension */
                         if (IS_Get (&Standard) > STD_C99) {
-                            if (!Skip) {
+                            if (!PPSkip) {
                                 DoWarning ();
                             }
                         } else {
-                            if (!Skip) {
+                            if (!PPSkip) {
                                 PPError ("Preprocessor directive expected");
                             }
                             ClearLine ();
@@ -1423,7 +1570,7 @@ void Preprocess (void)
                         break;
 
                     default:
-                        if (!Skip) {
+                        if (!PPSkip) {
                             PPError ("Preprocessor directive expected");
                         }
                         ClearLine ();
@@ -1432,19 +1579,108 @@ void Preprocess (void)
 
         }
         if (NextLine () == 0) {
-            if (IfIndex >= 0) {
-                PPError ("'#endif' expected");
-            }
-            return;
+            break;
         }
-        SkipWhitespace (0);
+        ++PendingNewLines;
+        Whitespace = SkipWhitespace (0) || Whitespace;
     }
 
-    PreprocessLine ();
+    return Whitespace != 0;
+}
 
-Done:
+
+
+void Preprocess (void)
+/* Preprocess lines count of which is affected by directives */
+{
+    SB_Clear (PLine);
+
+    /* Add the source info to preprocessor output if needed */
+    AddPreLine (PLine);
+
+    /* Parse any directives */
+    OLine = PLine;
+    ParseDirectives (0);
+    OLine = 0;
+
+    /* Add the source info to preprocessor output if needed */
+    AddPreLine (PLine);
+
+    /* Add leading whitespace to prettify preprocessor output */
+    AppendIndent (PLine, SB_GetIndex (Line));
+
+    /* Expand macros if any */
+    MacroReplacement (Line, PLine, 1);
+
+    /* Add the source info to preprocessor output if needed */
+    AddPreLine (PLine);
+
+    /* Read from the new line */
+    SB_Reset (PLine);
+    PLine = InitLine (PLine);
+
     if (Verbosity > 1 && SB_NotEmpty (Line)) {
         printf ("%s:%u: %.*s\n", GetCurrentFile (), GetCurrentLine (),
                 (int) SB_GetLen (Line), SB_GetConstBuf (Line));
     }
+
+    /* Free all undefined macros */
+    FreeUndefinedMacros ();
+}
+
+
+
+void InitPreprocess (void)
+/* Init preprocessor */
+{
+    /* Create the output buffers */
+    MLine = NewStrBuf ();
+    PLine = NewStrBuf ();
+}
+
+
+
+void DonePreprocess (void)
+/* Done with preprocessor */
+{
+    /* Done with the output buffers */
+    SB_Done (MLine);
+    SB_Done (PLine);
+}
+
+
+
+void SetPPIfStack (PPIfStack* Stack)
+/* Specify which PP #if stack to use */
+{
+    PPStack = Stack;
+}
+
+
+
+void PreprocessBegin (void)
+/* Initialize preprocessor with current file */
+{
+    /* Reset #if depth */
+    PPStack->Index = -1;
+
+    /* Remember to update source file location in preprocess-only mode */
+    FileChanged = 1;
+}
+
+
+
+void PreprocessEnd (void)
+/* Preprocessor done with current file */
+{
+    /* Check for missing #endif */
+    while (PPStack->Index >= 0) {
+        if ((PPStack->Stack[PPStack->Index] & IFCOND_NEEDTERM) != 0) {
+            PPError ("#endif expected");
+        }
+        --PPStack->Index;
+    }
+
+    /* Remember to update source file location in preprocess-only mode */
+    FileChanged = 1;
 }

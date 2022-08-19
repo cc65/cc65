@@ -69,6 +69,7 @@
 
 Token CurTok;           /* The current token */
 Token NextTok;          /* The next token */
+int   NextLineDisabled; /* Disabled to read next line */
 
 
 
@@ -188,10 +189,10 @@ static int SkipWhite (void)
 {
     while (1) {
         while (CurC == '\0') {
-            if (NextLine () == 0) {
+            /* If reading next line fails or is forbidden, bail out */
+            if (NextLineDisabled || PreprocessNextLine () == 0) {
                 return 0;
             }
-            Preprocess ();
         }
         if (IsSpace (CurC)) {
             NextChar ();

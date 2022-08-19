@@ -1254,7 +1254,7 @@ static void DoInclude (void)
             break;
 
         default:
-            PPError ("'\"' or '<' expected");
+            PPError ("#include expects \"FILENAME\" or <FILENAME>");
             goto Done;
     }
     NextChar ();
@@ -1274,7 +1274,7 @@ static void DoInclude (void)
         CheckExtraTokens ("include");
         /* Open the include file */
         OpenIncludeFile (SB_GetConstBuf (&Filename), IT);
-    } else if (CurC == '\0') {
+    } else {
         /* No terminator found */
         PPError ("#include expects \"FILENAME\" or <FILENAME>");
     }

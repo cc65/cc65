@@ -809,131 +809,6 @@ static void ExpandMacro (StrBuf* Target, Macro* M, int MultiLine)
 
 
 
-static void DefineMacro (void)
-/* Handle a macro definition. */
-{
-    ident       Ident;
-    Macro*      M;
-    Macro*      Existing;
-    int         C89;
-
-    /* Read the macro name */
-    SkipWhitespace (0);
-    if (!MacName (Ident)) {
-        return;
-    }
-
-    /* Remember if we're in C89 mode */
-    C89 = (IS_Get (&Standard) == STD_C89);
-
-    /* Get an existing macro definition with this name */
-    Existing = FindMacro (Ident);
-
-    /* Create a new macro definition */
-    M = NewMacro (Ident);
-
-    /* Check if this is a function like macro */
-    if (CurC == '(') {
-
-        /* Skip the left paren */
-        NextChar ();
-
-        /* Set the marker that this is a function like macro */
-        M->ArgCount = 0;
-
-        /* Read the formal parameter list */
-        while (1) {
-
-            /* Skip white space and check for end of parameter list */
-            SkipWhitespace (0);
-            if (CurC == ')') {
-                break;
-            }
-
-            /* The next token must be either an identifier, or - if not in
-            ** C89 mode - the ellipsis.
-            */
-            if (!C89 && CurC == '.') {
-                /* Ellipsis */
-                NextChar ();
-                if (CurC != '.' || NextC != '.') {
-                    PPError ("'...' expected");
-                    ClearLine ();
-                    return;
-                }
-                NextChar ();
-                NextChar ();
-
-                /* Remember that the macro is variadic and use __VA_ARGS__ as
-                ** the argument name.
-                */
-                AddMacroArg (M, "__VA_ARGS__");
-                M->Variadic = 1;
-
-            } else {
-                /* Must be macro argument name */
-                if (MacName (Ident) == 0) {
-                    return;
-                }
-
-                /* __VA_ARGS__ is only allowed in C89 mode */
-                if (!C89 && strcmp (Ident, "__VA_ARGS__") == 0) {
-                    PPWarning ("'__VA_ARGS__' can only appear in the expansion "
-                               "of a C99 variadic macro");
-                }
-
-                /* Add the macro argument */
-                AddMacroArg (M, Ident);
-            }
-
-            /* If we had an ellipsis, or the next char is not a comma, we've
-            ** reached the end of the macro argument list.
-            */
-            SkipWhitespace (0);
-            if (M->Variadic || CurC != ',') {
-                break;
-            }
-            NextChar ();
-        }
-
-        /* Check for a right paren and eat it if we find one */
-        if (CurC != ')') {
-            PPError ("')' expected");
-            ClearLine ();
-            return;
-        }
-        NextChar ();
-    }
-
-    /* Skip whitespace before the macro replacement */
-    SkipWhitespace (0);
-
-    /* Insert the macro into the macro table and allocate the ActualArgs array */
-    InsertMacro (M);
-
-    /* Remove whitespace and comments from the line, store the preprocessed
-    ** line into the macro replacement buffer.
-    */
-    TranslationPhase3 (Line, &M->Replacement);
-
-    /* Remove whitespace from the end of the line */
-    while (IsSpace (SB_LookAtLast (&M->Replacement))) {
-        SB_Drop (&M->Replacement, 1);
-    }
-#if 0
-    printf ("%s: <%.*s>\n", M->Name, SB_GetLen (&M->Replacement), SB_GetConstBuf (&M->Replacement));
-#endif
-
-    /* If we have an existing macro, check if the redefinition is identical.
-    ** Print a diagnostic if not.
-    */
-    if (Existing && MacroCmp (M, Existing) != 0) {
-        PPError ("Macro redefinition is not identical");
-    }
-}
-
-
-
 /*****************************************************************************/
 /*                               Preprocessing                               */
 /*****************************************************************************/
@@ -1157,6 +1032,160 @@ static void MacroReplacement (StrBuf* Source, StrBuf* Target, int MultiLine)
 
     /* Switch back the input */
     InitLine (OldSource);
+}
+
+
+
+static void DoDefine (void)
+/* Process #define directive */
+{
+    ident       Ident;
+    Macro*      M;
+    Macro*      Existing;
+    int         C89;
+    unsigned    Len;
+
+    /* Read the macro name */
+    SkipWhitespace (0);
+    if (!MacName (Ident)) {
+        return;
+    }
+
+    /* Remember if we're in C89 mode */
+    C89 = (IS_Get (&Standard) == STD_C89);
+
+    /* Check for forbidden macro names */
+    if (strcmp (Ident, "defined") == 0) {
+        PPError ("'%s' cannot be used as a macro name", Ident);
+        return;
+    }
+
+    /* Create a new macro definition */
+    M = NewMacro (Ident);
+
+    /* Check if this is a function like macro */
+    if (CurC == '(') {
+
+        /* Skip the left paren */
+        NextChar ();
+
+        /* Set the marker that this is a function like macro */
+        M->ArgCount = 0;
+
+        /* Read the formal parameter list */
+        while (1) {
+
+            /* Skip white space and check for end of parameter list */
+            SkipWhitespace (0);
+            if (CurC == ')') {
+                break;
+            }
+
+            /* The next token must be either an identifier, or - if not in
+            ** C89 mode - the ellipsis.
+            */
+            if (!C89 && CurC == '.') {
+                /* Ellipsis */
+                NextChar ();
+                if (CurC != '.' || NextC != '.') {
+                    PPError ("'...' expected");
+                    ClearLine ();
+                    return;
+                }
+                NextChar ();
+                NextChar ();
+
+                /* Remember that the macro is variadic and use __VA_ARGS__ as
+                ** the argument name.
+                */
+                AddMacroArg (M, "__VA_ARGS__");
+                M->Variadic = 1;
+
+            } else {
+                /* Must be macro argument name */
+                if (MacName (Ident) == 0) {
+                    return;
+                }
+
+                /* __VA_ARGS__ is only allowed in post-C89 mode */
+                if (!C89 && strcmp (Ident, "__VA_ARGS__") == 0) {
+                    PPWarning ("'__VA_ARGS__' can only appear in the expansion "
+                               "of a C99 variadic macro");
+                }
+
+                /* Add the macro argument */
+                AddMacroArg (M, Ident);
+            }
+
+            /* If we had an ellipsis, or the next char is not a comma, we've
+            ** reached the end of the macro argument list.
+            */
+            SkipWhitespace (0);
+            if (M->Variadic || CurC != ',') {
+                break;
+            }
+            NextChar ();
+        }
+
+        /* Check for a right paren and eat it if we find one */
+        if (CurC != ')') {
+            PPError ("')' expected");
+            ClearLine ();
+            return;
+        }
+        NextChar ();
+    }
+
+    /* Skip whitespace before the macro replacement */
+    SkipWhitespace (0);
+
+    /* Remove whitespace and comments from the line, store the preprocessed
+    ** line into the macro replacement buffer.
+    */
+    TranslationPhase3 (Line, &M->Replacement);
+
+    /* Remove whitespace from the end of the line */
+    while (IsSpace (SB_LookAtLast (&M->Replacement))) {
+        SB_Drop (&M->Replacement, 1);
+    }
+#if 0
+    printf ("%s: <%.*s>\n", M->Name, SB_GetLen (&M->Replacement), SB_GetConstBuf (&M->Replacement));
+#endif
+
+    /* Check for ## at start or end */
+    Len = SB_GetLen (&M->Replacement);
+    if (Len >= 2) {
+        if (SB_LookAt (&M->Replacement, 0) == '#' &&
+            SB_LookAt (&M->Replacement, 1) == '#') {
+            /* Diagnose and bail out */
+            PPError ("'##' cannot appear at start of macro expansion");
+            FreeMacro (M);
+            return;
+        } else if (SB_LookAt (&M->Replacement, Len - 1) == '#' &&
+                   SB_LookAt (&M->Replacement, Len - 2) == '#') {
+            /* Diagnose and bail out */
+            PPError ("'##' cannot appear at end of macro expansion");
+            FreeMacro (M);
+            return;
+        }
+    }
+
+    /* Get an existing macro definition with this name */
+    Existing = FindMacro (M->Name);
+
+    /* If we have an existing macro, check if the redefinition is identical.
+    ** Print a diagnostic if not.
+    */
+    if (Existing != 0) {
+        if (MacroCmp (M, Existing) != 0) {
+            PPError ("Macro redefinition is not identical");
+        }
+        /* Undefine the existing macro anyways */
+        UndefineMacro (Existing->Name);
+    }
+
+    /* Insert the new macro into the macro table */
+    InsertMacro (M);
 }
 
 
@@ -1443,7 +1472,7 @@ static int ParseDirectives (int InArgList)
 
                     case PP_DEFINE:
                         if (!PPSkip) {
-                            DefineMacro ();
+                            DoDefine ();
                         }
                         break;
 

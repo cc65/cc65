@@ -114,6 +114,7 @@ static void PPhiePrimary (PPExpr* Expr)
     switch (CurTok.Tok) {
         case TOK_ICONST:
         case TOK_CCONST:
+        case TOK_WCCONST:
             /* Character and integer constants */
             Expr->IVal = CurTok.IVal;
             /* According to the C standard, all signed types act as intmax_t
@@ -214,6 +215,12 @@ static void PPhie11 (PPExpr* Expr)
                 Internal ("Invalid token in PPhie11: %d", CurTok.Tok);
 
         }
+    }
+
+    /* Check for excessive expressions */
+    if (!TokIsPunc (&CurTok)) {
+        PPError ("Missing binary operator");
+        PPErrorSkipLine ();
     }
 }
 
@@ -854,7 +861,7 @@ void ParsePPExprInLine (PPExpr* Expr)
     /* Initialize the parser status */
     PPEvaluationFailed = 0;
     PPEvaluationEnabled = 1;
-    NextLineDisabled = 1;
+    PPParserRunning = 1;
 
     /* Parse */
     PPExprInit (Expr);
@@ -867,5 +874,5 @@ void ParsePPExprInLine (PPExpr* Expr)
     }
 
     /* Restore parser status */
-    NextLineDisabled = 0;
+    PPParserRunning = 0;
 }

@@ -67,6 +67,17 @@
 
 
 
+/* Macro scanner mode flags */
+#define MSM_NONE                0x00U   /* Default */
+#define MSM_MULTILINE           0x01U   /* Read from multiple lines */
+#define MSM_IN_DIRECTIVE        0x02U   /* In PP directives scan */
+#define MSM_IN_ARG_LIST         0x04U   /* In macro argument scan */
+#define MSM_IN_ARG_EXPANSION    0x08U   /* In expansion on arguments */
+#define MSM_OP_DEFINED          0x10U   /* Handle the defined operator */
+#define MSM_OP_HAS_INCLUDE      0x20U   /* Handle the __has_include operator */
+#define MSM_OP_HAS_C_ATTRIBUTE  0x40U   /* Handle the __has_c_attribute operator */
+#define MSM_TOK_HEADER          0x80U   /* Support header tokens */
+
 /* Management data for #if */
 #define IFCOND_NONE     0x00U
 #define IFCOND_SKIP     0x01U
@@ -105,13 +116,16 @@ static void TranslationPhase3 (StrBuf* Source, StrBuf* Target);
 ** non-newline whitespace sequences.
 */
 
-static int ParseDirectives (int InArgList);
-/* Handle directives. Return 1 if there are directives parsed, -1 if new lines
-** are read, otherwise 0.
+static void PreprocessDirective (StrBuf* Source, StrBuf* Target, unsigned ModeFlags);
+/* Preprocess a single line. Handle specified tokens and operators, remove
+** whitespace and comments, then do macro replacement.
 */
 
-static void MacroReplacement (StrBuf* Source, StrBuf* Target, int MultiLine);
-/* Perform macro replacement. */
+static int ParseDirectives (unsigned ModeFlags);
+/* Handle directives. Return 1 if any whitespace or newlines are parsed. */
+
+static void MacroReplacement (StrBuf* Source, StrBuf* Target, unsigned ModeFlags);
+/* Scan for and perform macro replacement */
 
 
 
@@ -121,67 +135,67 @@ static void MacroReplacement (StrBuf* Source, StrBuf* Target, int MultiLine);
 
 
 
-/* Types of preprocessor tokens */
+/* Types of preprocessor directives */
 typedef enum {
-    PP_ILLEGAL  = -1,
-    PP_DEFINE,
-    PP_ELIF,
-    PP_ELSE,
-    PP_ENDIF,
-    PP_ERROR,
-    PP_IF,
-    PP_IFDEF,
-    PP_IFNDEF,
-    PP_INCLUDE,
-    PP_LINE,
-    PP_PRAGMA,
-    PP_UNDEF,
-    PP_WARNING,
-} pptoken_t;
+    PPD_ILLEGAL = -1,
+    PPD_DEFINE,
+    PPD_ELIF,
+    PPD_ELSE,
+    PPD_ENDIF,
+    PPD_ERROR,
+    PPD_IF,
+    PPD_IFDEF,
+    PPD_IFNDEF,
+    PPD_INCLUDE,
+    PPD_LINE,
+    PPD_PRAGMA,
+    PPD_UNDEF,
+    PPD_WARNING,
+} ppdirective_t;
 
 
 
-/* Preprocessor keyword to token mapping table */
-static const struct PPToken {
-    const char* Key;            /* Keyword */
-    pptoken_t   Tok;            /* Token */
-} PPTokens[] = {
-    {   "define",       PP_DEFINE       },
-    {   "elif",         PP_ELIF         },
-    {   "else",         PP_ELSE         },
-    {   "endif",        PP_ENDIF        },
-    {   "error",        PP_ERROR        },
-    {   "if",           PP_IF           },
-    {   "ifdef",        PP_IFDEF        },
-    {   "ifndef",       PP_IFNDEF       },
-    {   "include",      PP_INCLUDE      },
-    {   "line",         PP_LINE         },
-    {   "pragma",       PP_PRAGMA       },
-    {   "undef",        PP_UNDEF        },
-    {   "warning",      PP_WARNING      },
+/* Preprocessor directive tokens mapping table */
+static const struct PPDType {
+    const char*     Tok;        /* Token */
+    ppdirective_t   Type;       /* Type */
+} PPDTypes[] = {
+    {   "define",       PPD_DEFINE      },
+    {   "elif",         PPD_ELIF        },
+    {   "else",         PPD_ELSE        },
+    {   "endif",        PPD_ENDIF       },
+    {   "error",        PPD_ERROR       },
+    {   "if",           PPD_IF          },
+    {   "ifdef",        PPD_IFDEF       },
+    {   "ifndef",       PPD_IFNDEF      },
+    {   "include",      PPD_INCLUDE     },
+    {   "line",         PPD_LINE        },
+    {   "pragma",       PPD_PRAGMA      },
+    {   "undef",        PPD_UNDEF       },
+    {   "warning",      PPD_WARNING     },
 };
 
-/* Number of preprocessor tokens */
-#define PPTOKEN_COUNT   (sizeof(PPTokens) / sizeof(PPTokens[0]))
+/* Number of preprocessor directive types */
+#define PPDTOKEN_COUNT  (sizeof(PPDTypes) / sizeof(PPDTypes[0]))
 
 
 
 static int CmpToken (const void* Key, const void* Elem)
 /* Compare function for bsearch */
 {
-    return strcmp ((const char*) Key, ((const struct PPToken*) Elem)->Key);
+    return strcmp ((const char*) Key, ((const struct PPDType*) Elem)->Tok);
 }
 
 
 
-static pptoken_t FindPPToken (const char* Ident)
-/* Find a preprocessor token and return it. Return PP_ILLEGAL if the identifier
-** is not a valid preprocessor token.
+static ppdirective_t FindPPDirectiveType (const char* Ident)
+/* Find a preprocessor directive type and return it. Return PPD_ILLEGAL if the
+** identifier is not a valid preprocessor directive token.
 */
 {
-    struct PPToken* P;
-    P = bsearch (Ident, PPTokens, PPTOKEN_COUNT, sizeof (PPTokens[0]), CmpToken);
-    return P? P->Tok : PP_ILLEGAL;
+    struct PPDType* P;
+    P = bsearch (Ident, PPDTypes, PPDTOKEN_COUNT, sizeof (PPDTypes[0]), CmpToken);
+    return P? P->Type : PPD_ILLEGAL;
 }
 
 
@@ -257,6 +271,26 @@ static int ME_ArgIsVariadic (const MacroExp* E, const Macro* M)
 
 
 
+static int MacName (char* Ident)
+/* Get a macro symbol name into Ident.  If we have an error, print a
+** diagnostic message and clear the line.
+*/
+{
+    if (IsSym (Ident) == 0) {
+        if (CurC != '\0') {
+            PPError ("Macro name must be an identifier");
+        } else {
+            PPError ("Missing macro name");
+        }
+        ClearLine ();
+        return 0;
+    } else {
+        return 1;
+    }
+}
+
+
+
 static void AddPreLine (StrBuf* Str)
 /* Add newlines to the string buffer */
 {
@@ -265,7 +299,7 @@ static void AddPreLine (StrBuf* Str)
         return;
     }
 
-    if (FileChanged || PendingNewLines > 4) {
+    if (FileChanged || PendingNewLines > 6) {
         /* Output #line directives as source info */
         StrBuf Comment = AUTO_STRBUF_INITIALIZER;
         if (SB_NotEmpty (Str) && SB_LookAtLast (Str) != '\n') {
@@ -502,26 +536,6 @@ static int CheckExtraTokens (const char* Name)
 
 
 
-static int MacName (char* Ident)
-/* Get a macro symbol name into Ident.  If we have an error, print a
-** diagnostic message and clear the line.
-*/
-{
-    if (IsSym (Ident) == 0) {
-        if (CurC != '\0') {
-            PPError ("Macro name must be an identifier");
-        } else {
-            PPError ("Missing macro name");
-        }
-        ClearLine ();
-        return 0;
-    } else {
-        return 1;
-    }
-}
-
-
-
 static void ReadMacroArgs (MacroExp* E, const Macro* M, int MultiLine)
 /* Identify the arguments to a macro call as-is */
 {
@@ -545,7 +559,7 @@ static void ReadMacroArgs (MacroExp* E, const Macro* M, int MultiLine)
                 Newlines += PendingNewLines - OldPendingNewLines;
                 PendingNewLines = OldPendingNewLines;
                 OldPendingNewLines = 0;
-                Skipped = ParseDirectives (1) || Skipped;
+                Skipped = ParseDirectives (MSM_IN_ARG_LIST) || Skipped;
                 Skipped = SkipWhitespace (MultiLine) || Skipped;
             }
             PendingNewLines += Newlines;
@@ -637,7 +651,7 @@ static void ReadMacroArgs (MacroExp* E, const Macro* M, int MultiLine)
 
 
 
-static void MacroArgSubst (MacroExp* E, Macro* M)
+static void SubstMacroArgs (MacroExp* E, Macro* M)
 /* Argument substitution according to ISO/IEC 9899:1999 (E), 6.10.3.1ff */
 {
     ident       Ident;
@@ -792,7 +806,7 @@ static void ExpandMacro (StrBuf* Target, Macro* M, int MultiLine)
     }
 
     /* Replace macro arguments handling the # and ## operators */
-    MacroArgSubst (&E, M);
+    SubstMacroArgs (&E, M);
 
     /* Forbide repeated expansion of the same macro in use */
     M->Expanding = 1;
@@ -809,122 +823,89 @@ static void ExpandMacro (StrBuf* Target, Macro* M, int MultiLine)
 
 
 
-/*****************************************************************************/
-/*                               Preprocessing                               */
-/*****************************************************************************/
-
-
-
-static void TranslationPhase3 (StrBuf* Source, StrBuf* Target)
-/* Mimic Translation Phase 3. Handle old and new style comments. Collapse
-** non-newline whitespace sequences.
-*/
+static void MacroReplacement (StrBuf* Source, StrBuf* Target, unsigned ModeFlags)
+/* Scan for and perform macro replacement */
 {
-    /* Switch to the new input source */
-    StrBuf* OldSource = InitLine (Source);
-
-    /* Loop removing ws and comments */
-    while (CurC != '\0') {
-        int HasWhiteSpace = 0;
-        while (1) {
-            /* Squeeze runs of blanks */
-            if (IsSpace (CurC)) {
-                NextChar ();
-                HasWhiteSpace = 1;
-            } else if (CurC == '/' && NextC == '*') {
-                OldStyleComment ();
-                HasWhiteSpace = 1;
-            } else if (IS_Get (&Standard) >= STD_C99 && CurC == '/' && NextC == '/') {
-                NewStyleComment ();
-                HasWhiteSpace = 1;
-            } else {
-                /* No more white space */
-                break;
-            }
-        }
-        if (HasWhiteSpace) {
-            SB_AppendChar (Target, ' ');
-        } else if (IsQuote (CurC)) {
-            CopyQuotedString (Target);
-        } else {
-            SB_AppendChar (Target, CurC);
-            NextChar ();
-        }
-    }
-
-    /* Terminate the new input line */
-    SB_Terminate (Target);
-
-    /* Switch back to the old source */
-    InitLine (OldSource);
-}
-
-
-
-static void ProcessSingleLine (StrBuf* Source,
-                               StrBuf* Target,
-                               int HandleDefined,
-                               int HandleHeader)
-/* Process a single line. Remove whitespace, old and new style comments.
-** Recognize and handle the "defined" operator if HandleDefined is true.
-** Recognize and handle header name tokens if HandleHeader is true.
-*/
-{
-    int         OldIndex = SB_GetIndex (Source);
     ident       Ident;
-    int         HaveParen;
 
-    /* Operate on the new input source */
+    /* Remember the current input and switch to Source */
     StrBuf* OldSource = InitLine (Source);
 
-    SkipWhitespace (0);
-
-    /* Loop removing ws and comments */
+    /* Loop substituting macros */
     while (CurC != '\0') {
-        if (SkipWhitespace (0)) {
-            /* Squeeze runs of blanks */
-            if (!IsSpace (SB_LookAtLast (Target))) {
-                SB_AppendChar (Target, ' ');
-            }
-        } else if (IsSym (Ident)) {
-            if (HandleDefined && strcmp (Ident, "defined") == 0) {
+        /* If we have an identifier, check if it's a macro */
+        if (IsSym (Ident)) {
+            if ((ModeFlags & MSM_OP_DEFINED) != 0 && strcmp (Ident, "defined") == 0) {
                 /* Handle the "defined" operator */
+                int HaveParen = 0;
+
                 SkipWhitespace (0);
-                HaveParen = 0;
                 if (CurC == '(') {
                     HaveParen = 1;
                     NextChar ();
                     SkipWhitespace (0);
                 }
                 if (IsSym (Ident)) {
-                    SB_AppendChar (Target, IsMacro (Ident)? '1' : '0');
+                    /* Eat the identifier */
+                    SB_AppendChar (Target, IsMacro (Ident) ? '1' : '0');
                     if (HaveParen) {
                         SkipWhitespace (0);
                         if (CurC != ')') {
                             PPError ("')' expected");
+                            ClearLine ();
                         } else {
                             NextChar ();
                         }
                     }
                 } else {
-                    PPError ("Identifier expected");
+                    PPError ("Macro name must be an identifier");
+                    ClearLine ();
                     SB_AppendChar (Target, '0');
                 }
             } else {
+                /* Check if it's an expandable macro */
                 Macro* M = FindMacro (Ident);
                 if (M != 0 && !M->Expanding) {
                     /* Check if this is a function-like macro */
                     if (M->ArgCount >= 0) {
-                        int Whitespace = SkipWhitespace (0);
+                        int MultiLine  = (ModeFlags & MSM_MULTILINE) != 0;
+                        int Whitespace = SkipWhitespace (MultiLine);
                         if (CurC != '(') {
                             /* Function-like macro without an argument list is not replaced */
                             SB_AppendStr (Target, M->Name);
-                            if (Whitespace) {
+                            if (Whitespace > 0) {
                                 SB_AppendChar (Target, ' ');
+                            }
+
+                            /* Directives can only be found in an argument list
+                            ** that spans multiple lines.
+                            */
+                            if (MultiLine) {
+                                if (CurC == '#') {
+                                    /* If we were going to support #pragma in
+                                    ** macro argument list, it would be output
+                                    ** to OLine.
+                                    */
+                                    if (OLine == 0) {
+                                        OLine = Target;
+                                        ParseDirectives (ModeFlags);
+                                        OLine = 0;
+                                    } else {
+                                        ParseDirectives (ModeFlags);
+                                    }
+                                }
+                                /* Add the source info to preprocessor output if needed */
+                                AddPreLine (Target);
                             }
                         } else {
                             /* Function-like macro */
-                            ExpandMacro (Target, M, 0);
+                            if (OLine == 0) {
+                                OLine = Target;
+                                ExpandMacro (Target, M, MultiLine);
+                                OLine = 0;
+                            } else {
+                                ExpandMacro (Target, M, MultiLine);
+                            }
                         }
                     } else {
                         /* Object-like macro */
@@ -935,104 +916,37 @@ static void ProcessSingleLine (StrBuf* Source,
                     SB_AppendStr (Target, Ident);
                 }
             }
-        } else if (HandleHeader && (CurC == '<' || CurC == '\"')) {
-            CopyHeaderNameToken (Target);
-        } else if (IsQuote (CurC)) {
-            CopyQuotedString (Target);
         } else {
-            SB_AppendChar (Target, CurC);
-            NextChar ();
+            if ((ModeFlags & MSM_TOK_HEADER) != 0 && (CurC == '<' || CurC == '\"')) {
+                CopyHeaderNameToken (Target);
+            } else if (IsQuote (CurC)) {
+                CopyQuotedString (Target);
+            } else {
+                int Whitespace = SkipWhitespace (0);
+                if (Whitespace) {
+                    SB_AppendChar (Target, ' ');
+                } else {
+                    SB_AppendChar (Target, CurC);
+                    NextChar ();
+                }
+            }
         }
     }
 
-    /* Switch back to the old source */
-    InitLine (OldSource);
-
-    /* Restore the source input index */
-    SB_SetIndex (Source, OldIndex);
-}
-
-
-
-static void MacroReplacement (StrBuf* Source, StrBuf* Target, int MultiLine)
-/* Perform macro replacement. */
-{
-    ident       Ident;
-    Macro*      M;
-
-    /* Remember the current input and switch to Source */
-    StrBuf* OldSource = InitLine (Source);
-
-    /* Loop substituting macros */
-    while (CurC != '\0') {
-        /* If we have an identifier, check if it's a macro */
-        if (IsSym (Ident)) {
-            /* Check if it's a macro */
-            if ((M = FindMacro (Ident)) != 0 && !M->Expanding) {
-                /* Check if this is a function-like macro */
-                if (M->ArgCount >= 0) {
-                    int Whitespace = SkipWhitespace (MultiLine);
-                    if (CurC != '(') {
-                        /* Function-like macro without an argument list is not replaced */
-                        SB_AppendStr (Target, M->Name);
-                        if (Whitespace > 0) {
-                            SB_AppendChar (Target, ' ');
-                        }
-
-                        /* Directives can only be found in an argument list
-                        ** that spans multiple lines.
-                        */
-                        if (MultiLine) {
-                            if (CurC == '#') {
-                                /* If we were going to support #pragma in
-                                ** macro argument list, it would be output
-                                ** to OLine.
-                                */
-                                if (OLine == 0) {
-                                    OLine = Target;
-                                    ParseDirectives (0);
-                                    OLine = 0;
-                                } else {
-                                    ParseDirectives (0);
-                                }
-                            }
-                            /* Add the source info to preprocessor output if needed */
-                            AddPreLine (Target);
-                        }
-                    } else {
-                        /* Function-like macro */
-                        if (OLine == 0) {
-                            OLine = Target;
-                            ExpandMacro (Target, M, MultiLine);
-                            OLine = 0;
-                        } else {
-                            ExpandMacro (Target, M, MultiLine);
-                        }
-                    }
-                } else {
-                    /* Object-like macro */
-                    ExpandMacro (Target, M, 0);
-                }
-            } else {
-                /* An identifier, keep it */
-                SB_AppendStr (Target, Ident);
-            }
-        } else if (IsQuote (CurC)) {
-            CopyQuotedString (Target);
-        } else {
-            int Whitespace = SkipWhitespace (0);
-            if (Whitespace) {
-                SB_AppendChar (Target, ' ');
-            } else {
-                SB_AppendChar (Target, CurC);
-                NextChar ();
-            }
-        }
+    /* Drop whitespace at the end */
+    if (IsBlank (SB_LookAtLast (Target))) {
+        SB_Drop (Target, 1);
     }
 
     /* Switch back the input */
     InitLine (OldSource);
 }
+
+
+
+/*****************************************************************************/
+/*                                Directives                                 */
+/*****************************************************************************/
 
 
 
@@ -1254,7 +1168,7 @@ static int DoIf (int Skip)
 
         /* Macro-replace a single line with support for the "defined" operator */
         SB_Clear (MLine);
-        ProcessSingleLine (Line, MLine, 1, 0);
+        PreprocessDirective (Line, MLine, MSM_OP_DEFINED);
 
         /* Read from the processed line */
         SB_Reset (MLine);
@@ -1318,7 +1232,7 @@ static void DoInclude (void)
 
     /* Macro-replace a single line with special support for <filename> */
     SB_Clear (MLine);
-    ProcessSingleLine (Line, MLine, 0, 1);
+    PreprocessDirective (Line, MLine, MSM_TOK_HEADER);
 
     /* Read from the processed line */
     SB_Reset (MLine);
@@ -1340,7 +1254,7 @@ static void DoInclude (void)
             break;
 
         default:
-            PPError ("'\"' or '<' expected");
+            PPError ("#include expects \"FILENAME\" or <FILENAME>");
             goto Done;
     }
     NextChar ();
@@ -1360,7 +1274,7 @@ static void DoInclude (void)
         CheckExtraTokens ("include");
         /* Open the include file */
         OpenIncludeFile (SB_GetConstBuf (&Filename), IT);
-    } else if (CurC == '\0') {
+    } else {
         /* No terminator found */
         PPError ("#include expects \"FILENAME\" or <FILENAME>");
     }
@@ -1394,7 +1308,7 @@ static void DoPragma (void)
 
     /* Macro-replace a single line */
     SB_Clear (MLine);
-    ProcessSingleLine (Line, MLine, 0, 0);
+    PreprocessDirective (Line, MLine, MSM_NONE);
 
     /* Convert #pragma to _Pragma () */
     SB_AppendStr (PragmaLine, "_Pragma (");
@@ -1442,7 +1356,7 @@ static void DoWarning (void)
 
 
 
-static int ParseDirectives (int InArgList)
+static int ParseDirectives (unsigned ModeFlags)
 /* Handle directives. Return 1 if any whitespace or newlines are parsed. */
 {
     int         PPSkip = 0;
@@ -1468,15 +1382,15 @@ static int ParseDirectives (int InArgList)
                 }
                 ClearLine ();
             } else {
-                switch (FindPPToken (Directive)) {
+                switch (FindPPDirectiveType (Directive)) {
 
-                    case PP_DEFINE:
+                    case PPD_DEFINE:
                         if (!PPSkip) {
                             DoDefine ();
                         }
                         break;
 
-                    case PP_ELIF:
+                    case PPD_ELIF:
                         if (PPStack->Index >= 0) {
                             if ((PPStack->Stack[PPStack->Index] & IFCOND_ELSE) == 0) {
                                 /* Handle as #else/#if combination */
@@ -1496,7 +1410,7 @@ static int ParseDirectives (int InArgList)
                         }
                         break;
 
-                    case PP_ELSE:
+                    case PPD_ELSE:
                         if (PPStack->Index >= 0) {
                             if ((PPStack->Stack[PPStack->Index] & IFCOND_ELSE) == 0) {
                                 if ((PPStack->Stack[PPStack->Index] & IFCOND_SKIP) == 0) {
@@ -1514,7 +1428,7 @@ static int ParseDirectives (int InArgList)
                         }
                         break;
 
-                    case PP_ENDIF:
+                    case PPD_ENDIF:
                         if (PPStack->Index >= 0) {
                             /* Remove any clauses on top of stack that do not
                             ** need a terminating #endif.
@@ -1537,40 +1451,40 @@ static int ParseDirectives (int InArgList)
                         }
                         break;
 
-                    case PP_ERROR:
+                    case PPD_ERROR:
                         if (!PPSkip) {
                             DoError ();
                         }
                         break;
 
-                    case PP_IF:
+                    case PPD_IF:
                         PPSkip = DoIf (PPSkip);
                         break;
 
-                    case PP_IFDEF:
+                    case PPD_IFDEF:
                         PPSkip = DoIfDef (PPSkip, 1);
                         break;
 
-                    case PP_IFNDEF:
+                    case PPD_IFNDEF:
                         PPSkip = DoIfDef (PPSkip, 0);
                         break;
 
-                    case PP_INCLUDE:
+                    case PPD_INCLUDE:
                         if (!PPSkip) {
                             DoInclude ();
                         }
                         break;
 
-                    case PP_LINE:
+                    case PPD_LINE:
                         /* Should do something in C99 at least, but we ignore it */
                         if (!PPSkip) {
                             ClearLine ();
                         }
                         break;
 
-                    case PP_PRAGMA:
+                    case PPD_PRAGMA:
                         if (!PPSkip) {
-                            if (!InArgList) {
+                            if ((ModeFlags & MSM_IN_ARG_LIST) == 0) {
                                 DoPragma ();
                             } else {
                                 PPError ("Embedded #pragma directive within macro arguments is unsupported");
@@ -1578,13 +1492,13 @@ static int ParseDirectives (int InArgList)
                         }
                         break;
 
-                    case PP_UNDEF:
+                    case PPD_UNDEF:
                         if (!PPSkip) {
                             DoUndef ();
                         }
                         break;
 
-                    case PP_WARNING:
+                    case PPD_WARNING:
                         /* #warning is a non standard extension */
                         if (IS_Get (&Standard) > STD_C99) {
                             if (!PPSkip) {
@@ -1619,6 +1533,77 @@ static int ParseDirectives (int InArgList)
 
 
 
+/*****************************************************************************/
+/*                               Preprocessing                               */
+/*****************************************************************************/
+
+
+
+static void TranslationPhase3 (StrBuf* Source, StrBuf* Target)
+/* Mimic Translation Phase 3. Handle old and new style comments. Collapse
+** non-newline whitespace sequences.
+*/
+{
+    /* Switch to the new input source */
+    StrBuf* OldSource = InitLine (Source);
+
+    /* Loop removing ws and comments */
+    while (CurC != '\0') {
+        int HasWhiteSpace = 0;
+        while (1) {
+            /* Squeeze runs of blanks */
+            if (IsSpace (CurC)) {
+                NextChar ();
+                HasWhiteSpace = 1;
+            } else if (CurC == '/' && NextC == '*') {
+                OldStyleComment ();
+                HasWhiteSpace = 1;
+            } else if (IS_Get (&Standard) >= STD_C99 && CurC == '/' && NextC == '/') {
+                NewStyleComment ();
+                HasWhiteSpace = 1;
+            } else {
+                /* No more white space */
+                break;
+            }
+        }
+        if (HasWhiteSpace) {
+            SB_AppendChar (Target, ' ');
+        } else if (IsQuote (CurC)) {
+            CopyQuotedString (Target);
+        } else {
+            SB_AppendChar (Target, CurC);
+            NextChar ();
+        }
+    }
+
+    /* Terminate the new input line */
+    SB_Terminate (Target);
+
+    /* Switch back to the old source */
+    InitLine (OldSource);
+}
+
+
+
+static void PreprocessDirective (StrBuf* Source, StrBuf* Target, unsigned ModeFlags)
+/* Preprocess a single line. Handle specified tokens and operators, remove
+** whitespace and comments, then do macro replacement.
+*/
+{
+    int         OldIndex = SB_GetIndex (Source);
+    MacroExp    E;
+
+    SkipWhitespace (0);
+    InitMacroExp (&E);
+    MacroReplacement (Source, Target, ModeFlags | MSM_IN_DIRECTIVE);
+    DoneMacroExp (&E);
+
+    /* Restore the source input index */
+    SB_SetIndex (Source, OldIndex);
+}
+
+
+
 void Preprocess (void)
 /* Preprocess lines count of which is affected by directives */
 {
@@ -1629,7 +1614,7 @@ void Preprocess (void)
 
     /* Parse any directives */
     OLine = PLine;
-    ParseDirectives (0);
+    ParseDirectives (MSM_MULTILINE);
     OLine = 0;
 
     /* Add the source info to preprocessor output if needed */
@@ -1639,7 +1624,7 @@ void Preprocess (void)
     AppendIndent (PLine, SB_GetIndex (Line));
 
     /* Expand macros if any */
-    MacroReplacement (Line, PLine, 1);
+    MacroReplacement (Line, PLine, MSM_MULTILINE);
 
     /* Add the source info to preprocessor output if needed */
     AddPreLine (PLine);

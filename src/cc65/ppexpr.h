@@ -1,15 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                  input.h                                  */
+/*                                 ppexpr.h                                  */
 /*                                                                           */
-/*                            Input file handling                            */
+/*                      Expressions for C preprocessor                       */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2010, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
+/* (C) 2022  The cc65 Authors                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,15 +30,8 @@
 
 
 
-#ifndef INPUT_H
-#define INPUT_H
-
-
-
-#include <stdio.h>
-
-/* common */
-#include "strbuf.h"
+#ifndef PPEXPR_H
+#define PPEXPR_H
 
 
 
@@ -51,24 +41,22 @@
 
 
 
-/* An enum that describes different types of input files. The members are
-** choosen so that it is possible to combine them to bitsets
-*/
-typedef enum {
-    IT_MAIN   = 0x01,           /* Main input file */
-    IT_SYSINC = 0x02,           /* System include file (using <>) */
-    IT_USRINC = 0x04,           /* User include file (using "") */
-} InputType;
+/* PPExpr data struct */
+typedef struct PPExpr PPExpr;
+struct PPExpr
+{
+    long IVal;
+    unsigned Flags;
+};
 
-/* Forward for an IFile structure */
-struct IFile;
+/* PPExpr initializers */
+#define AUTO_PPEXPR_INITIALIZER     { 0, 0 }
+#define STATIC_PPEXPR_INITIALIZER   { 0, 0 }
 
-/* The current input line */
-extern StrBuf* Line;
-
-/* Current and next input character */
-extern char CurC;
-extern char NextC;
+/* PPExpr flags */
+#define PPEXPR_NONE         0U
+#define PPEXPR_UNSIGNED     1U
+#define PPEXPR_UNDEFINED    2U
 
 
 
@@ -78,55 +66,11 @@ extern char NextC;
 
 
 
-void OpenMainFile (const char* Name);
-/* Open the main file. Will call Fatal() in case of failures. */
-
-void OpenIncludeFile (const char* Name, InputType IT);
-/* Open an include file and insert it into the tables. */
-
-void CloseIncludeFile (void);
-/* Close an include file and switch to the higher level file. Set Input to
-** NULL if this was the main file.
-*/
-
-void NextChar (void);
-/* Read the next character from the input stream and make CurC and NextC
-** valid. If end of line is reached, both are set to NUL, no more lines
-** are read by this function.
-*/
-
-void ClearLine (void);
-/* Clear the current input line */
-
-StrBuf* InitLine (StrBuf* Buf);
-/* Initialize Line from Buf and read CurC and NextC from the new input line.
-** The function returns the old input line.
-*/
-
-int NextLine (void);
-/* Get a line from the current input. Returns 0 on end of file with no new
-** input bytes.
-*/
-
-int PreprocessNextLine (void);
-/* Get a line from opened input files and do preprocess. Returns 0 on end of
-** main file.
-*/
-
-const char* GetInputFile (const struct IFile* IF);
-/* Return a filename from an IFile struct */
-
-const char* GetCurrentFile (void);
-/* Return the name of the current input file */
-
-unsigned GetCurrentLine (void);
-/* Return the line number in the current input file */
-
-void CreateDependencies (void);
-/* Create dependency files requested by the user */
+void ParsePPExprInLine (PPExpr* Expr);
+/* Parse a line for PP expression */
 
 
 
-/* End of input.h */
+/* End of ppexpr.h */
 
 #endif

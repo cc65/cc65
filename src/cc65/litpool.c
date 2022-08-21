@@ -126,9 +126,6 @@ static void FreeLiteral (Literal* L)
 static void OutputLiteral (Literal* L)
 /* Output one literal to the currently active data segment */
 {
-    /* Translate the literal into the target charset */
-    TranslateLiteral (L);
-
     /* Define the label for the literal */
     g_defliterallabel (L->Label);
 
@@ -386,9 +383,6 @@ static void OutputReadOnlyLiterals (Collection* Literals)
         if (L->RefCount == 0 || L->Output) {
             continue;
         }
-
-        /* Translate the literal into the target charset */
-        TranslateLiteral (L);
 
         /* Check if this literal is part of another one. Since the literals
         ** are sorted by size (larger ones first), it can only be part of a

@@ -82,8 +82,11 @@ static void Parse (void)
     SymEntry* Entry;
     FuncDesc* FuncDef = 0;
 
-    /* Go... */
-    NextToken ();
+    /* Initialization for deferred operations */
+    InitDeferredOps ();
+
+    /* Fill up the next token with a bogus semicolon and start the tokenizer */
+    NextTok.Tok = TOK_SEMI;
     NextToken ();
 
     /* Parse until end of input */
@@ -207,7 +210,7 @@ static void Parse (void)
                 /* Allow initialization */
                 if (CurTok.Tok == TOK_ASSIGN) {
 
-                    /* This is a definition */
+                    /* This is a definition with storage */
                     if (SymIsDef (Entry)) {
                         Error ("Global variable '%s' has already been defined",
                                Entry->Name);
@@ -251,6 +254,7 @@ static void Parse (void)
                     ParseInit (Entry->Type);
                 } else {
 
+                    /* This is a declaration */
                     if (IsTypeVoid (Decl.Type)) {
                         /* We cannot declare variables of type void */
                         Error ("Illegal type for variable '%s'", Decl.Ident);
@@ -261,6 +265,15 @@ static void Parse (void)
                             Error ("Variable '%s' has unknown size", Decl.Ident);
                         }
                     } else {
+                        /* Check for enum forward declaration.
+                        ** Warn about it when extensions are not allowed.
+                        */
+                        if (Size == 0 && IsTypeEnum (Decl.Type)) {
+                            if (IS_Get (&Standard) != STD_CC65) {
+                                Warning ("ISO C forbids forward references to 'enum' types");
+                            }
+                        }
+
                         /* A global (including static) uninitialized variable is
                         ** only a tentative definition. For example, this is valid:
                         ** int i;
@@ -287,17 +300,9 @@ static void Parse (void)
                 }
 
                 /* Make the symbol zeropage according to the segment address size */
-                if ((Entry->Flags & SC_EXTERN) != 0) {
+                if ((Entry->Flags & SC_STATIC) != 0) {
                     if (GetSegAddrSize (GetSegName (CS->CurDSeg)) == ADDR_SIZE_ZP) {
                         Entry->Flags |= SC_ZEROPAGE;
-                        /* Check for enum forward declaration.
-                        ** Warn about it when extensions are not allowed.
-                        */
-                        if (Size == 0 && IsTypeEnum (Decl.Type)) {
-                            if (IS_Get (&Standard) != STD_CC65) {
-                                Warning ("ISO C forbids forward references to 'enum' types");
-                            }
-                        }
                     }
                 }
 
@@ -336,6 +341,9 @@ static void Parse (void)
 
         }
     }
+
+    /* Done with deferred operations */
+    DoneDeferredOps ();
 }
 
 
@@ -401,7 +409,13 @@ void Compile (const char* FileName)
     /* DefineNumericMacro ("__STDC__", 1);      <- not now */
     DefineNumericMacro ("__STDC_HOSTED__", 1);
 
-    InitDeferredOps ();
+    /* Stuff unsupported */
+    if (IS_Get (&Standard) > STD_C99) {
+        DefineNumericMacro ("__STDC_NO_ATOMICS__", 1);
+        DefineNumericMacro ("__STDC_NO_COMPLEX__", 1);
+        DefineNumericMacro ("__STDC_NO_THREADS__", 1);
+        DefineNumericMacro ("__STDC_NO_VLA__", 1);
+    }
 
     /* Create the base lexical level */
     EnterGlobalLevel ();
@@ -421,6 +435,9 @@ void Compile (const char* FileName)
     /* Generate the code generator preamble */
     g_preamble ();
 
+    /* Init preprocessor */
+    InitPreprocess ();
+
     /* Open the input file */
     OpenMainFile (FileName);
 
@@ -431,10 +448,8 @@ void Compile (const char* FileName)
         OpenOutputFile ();
 
         /* Preprocess each line and write it to the output file */
-        while (NextLine ()) {
-            Preprocess ();
-            WriteOutput ("%.*s\n", (int) SB_GetLen (Line), SB_GetConstBuf (Line));
-        }
+        while (PreprocessNextLine ())
+        { /* Nothing */ }
 
         /* Close the output file */
         CloseOutputFile ();
@@ -492,9 +507,11 @@ void Compile (const char* FileName)
                 }
             }
         }
+
     }
 
-    DoneDeferredOps ();
+    /* Done with preprocessor */
+    DonePreprocess ();
 
     if (Debug) {
         PrintMacroStats (stdout);

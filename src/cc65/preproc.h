@@ -39,24 +39,46 @@
 
 
 /*****************************************************************************/
-/*                                   data                                    */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
-/* Set when the preprocessor calls NoCodeConstExpr() recursively */
-extern unsigned char Preprocessing;
+/* Maximum #if depth per file */
+#define MAX_PP_IFS      256
+
+/* Data struct used for per-file-directive handling */
+typedef struct PPIfStack PPIfStack;
+struct PPIfStack {
+    unsigned char   Stack[MAX_PP_IFS];
+    int             Index;
+};
 
 
 
 /*****************************************************************************/
-/*                                   code                                    */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
 
 void Preprocess (void);
 /* Preprocess a line */
+
+void SetPPIfStack (PPIfStack* Stack);
+/* Specify which PP #if stack to use */
+
+void PreprocessBegin (void);
+/* Initialize preprocessor with current file */
+
+void PreprocessEnd (void);
+/* Preprocessor done with current file */
+
+void InitPreprocess (void);
+/* Init preprocessor */
+
+void DonePreprocess (void);
+/* Done with preprocessor */
 
 
 

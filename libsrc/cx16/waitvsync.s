@@ -6,16 +6,19 @@
 ;
 ; VERA's vertical sync causes IRQs which increment the jiffy timer.
 ;
+; Updated by ZeroByteOrg to use Kernal API RDTIM to retreive the TIMER variable
+;
 
         .export         _waitvsync
+        .importzp       tmp1
+        .import         RDTIM
 
-        .include        "cx16.inc"
-
-_waitvsync:
-        ldx     RAM_BANK        ; (TIMER is in RAM bank 0)
-        stz     RAM_BANK
-        lda     TIMER + 2
-:       cmp     TIMER + 2
-        beq     :-              ; Wait for next jiffy
-        stx     RAM_BANK
-        rts
+.proc _waitvsync: near
+      jsr RDTIM
+      sta tmp1
+keep_waiting:
+      jsr RDTIM
+      cmp tmp1
+      beq keep_waiting
+      rts
+.endproc

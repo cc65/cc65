@@ -489,23 +489,6 @@ void MacDef (unsigned Style)
     ** the .LOCAL command is detected and removed, at this time.
     */
     while (1) {
-        /* Check for include */
-        if (CurTok.Tok == TOK_INCLUDE && Style == MAC_STYLE_CLASSIC) {
-            /* Include another file */
-            NextTok ();
-            /* Name must follow */
-            if (CurTok.Tok != TOK_STRCON) {
-                ErrorSkip ("String constant expected");
-            } else {
-                SB_Terminate (&CurTok.SVal);
-                if (NewInputFile (SB_GetConstBuf (&CurTok.SVal)) == 0) {
-                    /* Error opening the file, skip remainder of line */
-                    SkipUntilSep ();
-                }
-            }
-            NextTok ();
-        }
-
         /* Check for end of macro */
         if (Style == MAC_STYLE_CLASSIC) {
             /* In classic macros, only .endmacro is allowed */

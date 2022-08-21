@@ -46,7 +46,7 @@
 
 
 /*****************************************************************************/
-/*                                   data                                    */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -84,6 +84,11 @@ void OpenMainFile (const char* Name);
 void OpenIncludeFile (const char* Name, InputType IT);
 /* Open an include file and insert it into the tables. */
 
+void CloseIncludeFile (void);
+/* Close an include file and switch to the higher level file. Set Input to
+** NULL if this was the main file.
+*/
+
 void NextChar (void);
 /* Read the next character from the input stream and make CurC and NextC
 ** valid. If end of line is reached, both are set to NUL, no more lines
@@ -99,7 +104,14 @@ StrBuf* InitLine (StrBuf* Buf);
 */
 
 int NextLine (void);
-/* Get a line from the current input. Returns 0 on end of file. */
+/* Get a line from the current input. Returns 0 on end of file with no new
+** input bytes.
+*/
+
+int PreprocessNextLine (void);
+/* Get a line from opened input files and do preprocess. Returns 0 on end of
+** main file.
+*/
 
 const char* GetInputFile (const struct IFile* IF);
 /* Return a filename from an IFile struct */

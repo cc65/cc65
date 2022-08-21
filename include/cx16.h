@@ -285,11 +285,11 @@ struct __vera {
 
 /* Audio chip */
 struct __ym2151 {
+    unsigned char       reg;            /* Register number for data */
     union {
-        unsigned char   reg;            /* Register number for data */
+        unsigned char   data;
         unsigned char   status;         /* Busy flag */
     };
-    unsigned char       data;
 };
 #define YM2151  (*(volatile struct __ym2151 *)0x9F40)
 

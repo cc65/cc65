@@ -1,0 +1,21 @@
+ca65 Vx.xx - Git XXXXXXXXX
+Main file   : 002-macro-param-listing.s
+Current file: 002-macro-param-listing.s
+
+000000r 1               ; 2022-01-17 Spiro Trikaliotis
+000000r 1               
+000000r 1               .macro TESTER val
+000000r 1                       lda #val
+000000r 1               .endmacro
+000000r 1               
+000000r 1               test:
+000000r 1  A2 00                ldx #0
+000002r 1  A9 01                TESTER 1
+000004r 1  A2 0F                ldx #15
+000006r 1  A9 02                TESTER 2
+000008r 1  E8                   inx
+000009r 1  A9 03                TESTER 3
+00000Br 1  A9 04                TESTER 4
+00000Dr 1  CA                   dex
+00000Er 1  60                   rts
+00000Er 1               

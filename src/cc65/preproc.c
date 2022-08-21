@@ -299,7 +299,7 @@ static void AddPreLine (StrBuf* Str)
         return;
     }
 
-    if (FileChanged || PendingNewLines > 4) {
+    if (FileChanged || PendingNewLines > 6) {
         /* Output #line directives as source info */
         StrBuf Comment = AUTO_STRBUF_INITIALIZER;
         if (SB_NotEmpty (Str) && SB_LookAtLast (Str) != '\n') {
@@ -931,6 +931,11 @@ static void MacroReplacement (StrBuf* Source, StrBuf* Target, unsigned ModeFlags
                 }
             }
         }
+    }
+
+    /* Drop whitespace at the end */
+    if (IsBlank (SB_LookAtLast (Target))) {
+        SB_Drop (Target, 1);
     }
 
     /* Switch back the input */

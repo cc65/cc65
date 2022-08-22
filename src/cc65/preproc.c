@@ -1663,7 +1663,8 @@ static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, M
             NextChar ();
             SkipWhitespace (0);
             if (!IsSym (Ident) || (ParamIdx = FindMacroParam (M, Ident)) < 0) {
-                PPError ("'#' is not followed by a macro parameter");
+                /* Should not happen, but still */
+                Internal ("'#' is not followed by a macro parameter");
             } else {
                 /* Make a valid string from Replacement */
                 MacroExp* A = ME_GetOriginalArg (E, ParamIdx);
@@ -2052,6 +2053,96 @@ Loop:
 
 
 
+static int ParseMacroReplacement (StrBuf* Source, Macro* M)
+/* Check correctness of macro definition while squeezing old and new style
+** comments and other non-newline whitespace sequences. Return 1 on success
+** or 0 on failure.
+*/
+{
+    /* Switch to the new input source */
+    StrBuf*     OldSource = InitLine (Source);
+    int         HasWhiteSpace = 0;
+    unsigned    Len;
+    ident       Ident;
+
+    /* Skip whitespace before the macro replacement */
+    SkipWhitespace (0);
+
+    /* Check for ## at start */
+    if (CurC == '#' && NextC == '#') {
+        /* Diagnose and bail out */
+        PPError ("'##' cannot appear at start of macro expansion");
+        goto Error_Handler;
+    }
+
+    /* Loop removing ws and comments */
+    while (CurC != '\0') {
+        if (HasWhiteSpace) {
+            SB_AppendChar (&M->Replacement, ' ');
+        } else if (IsQuote (CurC)) {
+            CopyQuotedString (&M->Replacement);
+        } else {
+            if (M->ParamCount >= 0 && GetPunc (Ident)) {
+                Len = strlen (Ident);
+                /* Check for # */
+                if (Len == 1 && Ident[0] == '#') {
+                    HasWhiteSpace = SkipWhitespace (0);
+
+                    /* Check next pp-token */
+                    if (!IsSym (Ident) || FindMacroParam (M, Ident) < 0) {
+                        PPError ("'#' is not followed by a macro parameter");
+                        goto Error_Handler;
+                    }
+
+                    /* Make the replacement */
+                    SB_AppendChar (&M->Replacement, '#');
+                    if (HasWhiteSpace) {
+                        SB_AppendChar (&M->Replacement, ' ');
+                    }
+                    SB_AppendStr (&M->Replacement, Ident);
+                } else {
+                    SB_AppendBuf (&M->Replacement, Ident, Len);
+                }
+            } else {
+                SB_AppendChar (&M->Replacement, CurC);
+                NextChar ();
+            }
+        }
+
+        HasWhiteSpace = SkipWhitespace (0);
+    }
+
+    /* Check for ## at end */
+    Len = SB_GetLen (&M->Replacement);
+    if (Len >= 2) {
+        if (SB_LookAt (&M->Replacement, Len - 1) == '#' &&
+            SB_LookAt (&M->Replacement, Len - 2) == '#') {
+            /* Diagnose and bail out */
+            PPError ("'##' cannot appear at end of macro expansion");
+            goto Error_Handler;
+        }
+    }
+
+    /* Terminate the new input line */
+    SB_Terminate (&M->Replacement);
+
+    /* Switch back to the old source */
+    InitLine (OldSource);
+
+    /* Success */
+    return 1;
+
+Error_Handler:
+
+    /* Switch back to the old source */
+    InitLine (OldSource);
+
+    /* Failure */
+    return 0;
+}
+
+
+
 static void DoDefine (void)
 /* Process #define directive */
 {
@@ -2059,7 +2150,6 @@ static void DoDefine (void)
     Macro*      M = 0;
     Macro*      Existing;
     int         C89;
-    unsigned    Len;
 
     /* Read the macro name */
     SkipWhitespace (0);
@@ -2150,37 +2240,16 @@ static void DoDefine (void)
         NextChar ();
     }
 
-    /* Skip whitespace before the macro replacement */
-    SkipWhitespace (0);
-
     /* Remove whitespace and comments from the line, store the preprocessed
     ** line into the macro replacement buffer.
     */
-    TranslationPhase3 (Line, &M->Replacement);
-
-    /* Remove whitespace from the end of the line */
-    while (IsSpace (SB_LookAtLast (&M->Replacement))) {
-        SB_Drop (&M->Replacement, 1);
+    if (ParseMacroReplacement (Line, M) == 0) {
+        goto Error_Handler;
     }
+
 #if 0
     printf ("%s: <%.*s>\n", M->Name, SB_GetLen (&M->Replacement), SB_GetConstBuf (&M->Replacement));
 #endif
-
-    /* Check for ## at start or end */
-    Len = SB_GetLen (&M->Replacement);
-    if (Len >= 2) {
-        if (SB_LookAt (&M->Replacement, 0) == '#' &&
-            SB_LookAt (&M->Replacement, 1) == '#') {
-            /* Diagnose and bail out */
-            PPError ("'##' cannot appear at start of macro expansion");
-            goto Error_Handler;
-        } else if (SB_LookAt (&M->Replacement, Len - 1) == '#' &&
-                   SB_LookAt (&M->Replacement, Len - 2) == '#') {
-            /* Diagnose and bail out */
-            PPError ("'##' cannot appear at end of macro expansion");
-            goto Error_Handler;
-        }
-    }
 
     /* Get an existing macro definition with this name */
     Existing = FindMacro (M->Name);

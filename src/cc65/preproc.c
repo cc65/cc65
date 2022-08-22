@@ -1004,6 +1004,7 @@ static void DoDefine (void)
                 if (CurC != '.' || NextC != '.') {
                     PPError ("'...' expected");
                     ClearLine ();
+                    FreeMacro (M);
                     return;
                 }
                 NextChar ();
@@ -1043,8 +1044,9 @@ static void DoDefine (void)
 
         /* Check for a right paren and eat it if we find one */
         if (CurC != ')') {
-            PPError ("')' expected");
+            PPError ("')' expected for macro definition");
             ClearLine ();
+            FreeMacro (M);
             return;
         }
         NextChar ();

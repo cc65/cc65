@@ -400,6 +400,11 @@ static void OldStyleComment (void)
 static void NewStyleComment (void)
 /* Remove a new style C comment from line. */
 {
+    /* Diagnose if this is unsupported */
+    if (IS_Get (&Standard) < STD_C99) {
+        PPError ("C++ style comments are not allowed in C89");
+    }
+
     /* Beware: Because line continuation chars are handled when reading
     ** lines, we may only skip until the end of the source line, which
     ** may not be the same as the end of the input line. The end of the
@@ -432,7 +437,7 @@ static int SkipWhitespace (int SkipLines)
         } else if (CurC == '/' && NextC == '*') {
             OldStyleComment ();
             Skipped = 1;
-        } else if (IS_Get (&Standard) >= STD_C99 && CurC == '/' && NextC == '/') {
+        } else if (CurC == '/' && NextC == '/') {
             NewStyleComment ();
             Skipped = 1;
         } else if (CurC == '\0' && SkipLines) {
@@ -1560,7 +1565,7 @@ static void TranslationPhase3 (StrBuf* Source, StrBuf* Target)
             } else if (CurC == '/' && NextC == '*') {
                 OldStyleComment ();
                 HasWhiteSpace = 1;
-            } else if (IS_Get (&Standard) >= STD_C99 && CurC == '/' && NextC == '/') {
+            } else if (CurC == '/' && NextC == '/') {
                 NewStyleComment ();
                 HasWhiteSpace = 1;
             } else {

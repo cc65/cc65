@@ -965,11 +965,28 @@ static void CopyHeaderNameToken (StrBuf* Target)
 
 
 
+static int IsQuotedString (void)
+/* Retrun 1 if the incoming characters indicate a string literal or character
+** constant, otherwise return 0.
+*/
+{
+    return IsQuote (CurC) || IsWideQuoted (CurC, NextC);
+}
+
+
+
 static void CopyQuotedString (StrBuf* Target)
 /* Copy a single or double quoted string from the input to Target. */
 {
     /* Remember the quote character, copy it to the target buffer and skip it */
-    char Quote = CurC;
+    char Quote;
+
+    if (CurC == 'L') {
+        SB_AppendChar (Target, CurC);
+        NextChar ();
+    }
+
+    Quote = CurC;
     SB_AppendChar (Target, CurC);
     NextChar ();
 
@@ -1165,7 +1182,7 @@ static int TryPastePPTok (StrBuf* Target,
     if (IsPPNumber (CurC, NextC)) {
         /* PP-number */
         CopyPPNumber (&Buf);
-    } else if (IsQuote (CurC)) {
+    } else if (IsQuotedString ()) {
         /* Quoted string */
         CopyQuotedString (&Buf);
     } else {
@@ -1391,7 +1408,7 @@ static unsigned ReadMacroArgs (unsigned NameIdx, MacroExp* E, const Macro* M, in
             } else if (IsPPNumber (CurC, NextC)) {
                 /* Copy a pp-number */
                 CopyPPNumber (&Arg.Tokens);
-            } else if (IsQuote (CurC)) {
+            } else if (IsQuotedString ()) {
                 /* Quoted string - just copy */
                 CopyQuotedString (&Arg.Tokens);
             } else if (GetPunc (Ident)) {
@@ -1545,6 +1562,11 @@ static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, M
                 TokLen = strlen (Ident);
             }
 
+            /* Special casing for 'L' prefixing '#' */
+            if (TokLen == 1 && SB_LookAtLast (Target) == 'L' && CurC == '#') {
+                HaveSpace = 1;
+            }
+
             /* Squeeze and add the skipped whitespace back for consistency */
             if (HaveSpace) {
                 SB_AppendChar (Target, ' ');
@@ -1658,7 +1680,7 @@ static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, M
         SB_Clear (&Buf);
         if (IsPPNumber (CurC, NextC)) {
             CopyPPNumber (&Buf);
-        } else if (IsQuote (CurC)) {
+        } else if (IsQuotedString ()) {
             CopyQuotedString (&Buf);
         } else {
             if (CurC == '#' && M->ParamCount >= 0) {
@@ -1957,7 +1979,7 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
                 CopyHeaderNameToken (Target);
             } else if (IsPPNumber (CurC, NextC)) {
                 CopyPPNumber (Target);
-            } else if (IsQuote (CurC)) {
+            } else if (IsQuotedString ()) {
                 CopyQuotedString (Target);
             } else {
                 Skipped = SkipWhitespace (0);
@@ -2070,7 +2092,7 @@ static int ParseMacroReplacement (StrBuf* Source, Macro* M)
     while (CurC != '\0') {
         if (HasWhiteSpace) {
             SB_AppendChar (&M->Replacement, ' ');
-        } else if (IsQuote (CurC)) {
+        } else if (IsQuotedString ()) {
             CopyQuotedString (&M->Replacement);
         } else {
             if (M->ParamCount >= 0 && GetPunc (Ident)) {
@@ -2850,7 +2872,7 @@ static void TranslationPhase3 (StrBuf* Source, StrBuf* Target)
         }
         if (HasWhiteSpace) {
             SB_AppendChar (Target, ' ');
-        } else if (IsQuote (CurC)) {
+        } else if (IsQuotedString ()) {
             CopyQuotedString (Target);
         } else {
             SB_AppendChar (Target, CurC);

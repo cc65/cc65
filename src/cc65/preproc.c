@@ -1652,31 +1652,6 @@ static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, M
                 NeedPaste = 1;
             }
 
-        } else if (CurC == '#' && M->ParamCount >= 0) {
-
-            /* A # operator within a macro expansion of a function-like
-            ** macro. Read the following identifier and check if it's a
-            ** macro parameter.
-            */
-            unsigned LastLen = SB_GetLen (Target);
-
-            NextChar ();
-            SkipWhitespace (0);
-            if (!IsSym (Ident) || (ParamIdx = FindMacroParam (M, Ident)) < 0) {
-                /* Should not happen, but still */
-                Internal ("'#' is not followed by a macro parameter");
-            } else {
-                /* Make a valid string from Replacement */
-                MacroExp* A = ME_GetOriginalArg (E, ParamIdx);
-                SB_Reset (&A->Tokens);
-                Stringize (&A->Tokens, Target);
-            }
-
-            TokLen = SB_GetLen (Target) - LastLen;
-
-            /* Done with this stringized argument */
-            continue;
-
         }
 
         /* Use the temporary buffer */
@@ -1686,7 +1661,23 @@ static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, M
         } else if (IsQuote (CurC)) {
             CopyQuotedString (&Buf);
         } else {
-            if (GetPunc (Ident)) {
+            if (CurC == '#' && M->ParamCount >= 0) {
+                /* A # operator within a macro expansion of a function-like
+                ** macro. Read the following identifier and check if it's a
+                ** macro parameter.
+                */
+                NextChar ();
+                SkipWhitespace (0);
+                if (!IsSym (Ident) || (ParamIdx = FindMacroParam (M, Ident)) < 0) {
+                    /* Should not happen, but still */
+                    Internal ("'#' is not followed by a macro parameter");
+                } else {
+                    /* Make a valid string from Replacement */
+                    MacroExp* A = ME_GetOriginalArg (E, ParamIdx);
+                    SB_Reset (&A->Tokens);
+                    Stringize (&A->Tokens, &Buf);
+                }
+            } else if (GetPunc (Ident)) {
                 /* Count right parens. This is OK since they cannot be pasted
                 ** to form different punctuators with others.
                 */

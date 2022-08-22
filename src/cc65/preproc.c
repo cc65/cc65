@@ -97,8 +97,16 @@
 /* Current PP if stack */
 static PPIfStack* PPStack;
 
+/* Struct for rescan */
+typedef struct RescanInputStack RescanInputStack;
+struct RescanInputStack {
+    Collection  Lines;
+    Collection  LastTokLens;
+    StrBuf*     PrevTok;
+};
+
 /* Input backup for rescan */
-static Collection* CurRescanStack;
+static RescanInputStack* CurRescanStack;
 
 /* Intermediate input buffers */
 static StrBuf* PLine;   /* Buffer for macro expansion */
@@ -167,6 +175,16 @@ static MacroExp* InitMacroExp (MacroExp* E);
 
 static void DoneMacroExp (MacroExp* E);
 /* Cleanup after use of a MacroExp structure */
+
+static int CheckPastePPTok (StrBuf* Target, unsigned TokLen, char Next);
+/* Return 1 if the last pp-tokens from Source could be concatenated with any
+** characters from Appended to form a new valid one.
+*/
+
+static void LazyCheckNextPPTok (const StrBuf* Prev, unsigned LastTokLen);
+/* Memorize the previous pp-token(s) to later check for potential pp-token
+** concatenation.
+*/
 
 
 
@@ -705,19 +723,66 @@ static void DoneMacroExp (MacroExp* E)
 
 
 /*****************************************************************************/
-/*                                   Code                                    */
+/*                            Rescan input stack                             */
 /*****************************************************************************/
+
+
+
+static void PushRescanLine (RescanInputStack* RIS, StrBuf* L, unsigned LastTokLen)
+/* Push an input line to the rescan input stack */
+{
+    CollAppend (&RIS->Lines, L);
+    /* Abuse the pointer to store an unsigned */
+    CollAppend (&RIS->LastTokLens, (void*)(uintptr_t)LastTokLen);
+}
 
 
 
 static void PopRescanLine (void)
 /* Pop and free a rescan input line if it reaches the end */
 {
-    if (CurC == '\0' && CollCount (CurRescanStack) > 1) {
-        FreeStrBuf (CollPop (CurRescanStack));
-        InitLine (CollLast (CurRescanStack));
+    if (CurC == '\0' && CollCount (&CurRescanStack->Lines) > 1) {
+        FreeStrBuf (CollPop (&CurRescanStack->Lines));
+        InitLine (CollLast (&CurRescanStack->Lines));
+        CollPop (&CurRescanStack->LastTokLens);
     }
 }
+
+
+
+static void InitRescanInputStack (RescanInputStack* RIS)
+/* Init a RescanInputStack struct */
+{
+    InitCollection (&RIS->Lines);
+    InitCollection (&RIS->LastTokLens);
+    RIS->PrevTok = 0;
+}
+
+
+
+static void DoneRescanInputStack (RescanInputStack* RIS)
+/* Free a RescanInputStack struct. RIS must be non-NULL. */
+{
+    /* Free pushed input lines */
+    while (CollCount (&RIS->Lines) > 1) {
+        FreeStrBuf (CollPop (&RIS->Lines));
+    }
+    /* Switch back to the old input stack */
+    InitLine (CollPop (&RIS->Lines));
+
+    /* Free any remaining pp-tokens used for concatenation check */
+    FreeStrBuf (RIS->PrevTok);
+
+    /* Done */
+    DoneCollection (&RIS->Lines);
+    DoneCollection (&RIS->LastTokLens);
+}
+
+
+
+/*****************************************************************************/
+/*                                   Code                                    */
+/*****************************************************************************/
 
 
 
@@ -881,31 +946,7 @@ static int SkipWhitespace (int SkipLines)
     int Skipped = 0;
     int NewLine = 0;
 
-    if (CurRescanStack != 0 &&
-        CollCount (CurRescanStack) > 1 &&
-        Line == CollConstLast (CurRescanStack)) {
-        /* Rescanning */
-        while (1) {
-            if (IsSpace (CurC)) {
-                NextChar ();
-                Skipped = 1;
-            } else if (CurC == '/' && NextC == '*') {
-                OldStyleComment ();
-                Skipped = 1;
-            } else if (IS_Get (&Standard) >= STD_C99 && CurC == '/' && NextC == '/') {
-                NewStyleComment ();
-                Skipped = 1;
-            } else if (CurC == '\0') {
-                /* End of line, switch back input */
-                PopRescanLine ();
-                break;
-            } else {
-                /* No more white space */
-                break;
-            }
-        }
-    }
-
+    /* Rescanning */
     while (1) {
         if (IsSpace (CurC)) {
             NextChar ();
@@ -916,14 +957,51 @@ static int SkipWhitespace (int SkipLines)
         } else if (CurC == '/' && NextC == '/') {
             NewStyleComment ();
             Skipped = 1;
-        } else if (CurC == '\0' && SkipLines) {
-            /* End of line, read next */
-            if (NextLine () != 0) {
-                ++PendingNewLines;
-                NewLine = 1;
-                Skipped = 0;
+        } else if (CurC == '\0') {
+            /* End of line */
+            if (CurRescanStack != 0 &&
+                CollCount (&CurRescanStack->Lines) > 1 &&
+                Line == CollLast (&CurRescanStack->Lines)) {
+
+                unsigned LastTokLen = (unsigned)(uintptr_t)CollLast (&CurRescanStack->LastTokLens);
+
+                /* Check for potentially merged tokens */
+                if (Skipped == 0 && LastTokLen != 0) {
+                    /* Get the following input */
+                    StrBuf* Next = CollAtUnchecked (&CurRescanStack->Lines,
+                                                    CollCount (&CurRescanStack->Lines) - 2);
+                    char    C    = SB_Peek (Next);
+
+                    /* We cannot check right now if the next pp-token may be a
+                    ** macro.
+                    */
+                    if (IsIdent (C)) {
+                        /* Memorize the previous pp-token and check it later */
+                        LazyCheckNextPPTok (Line, LastTokLen);
+                    } else if (C != '\0' && !IsSpace (C)) {
+                        /* If the two adjacent pp-tokens could be put together
+                        ** to form a new one, we have to separate them with an
+                        ** additional space.
+                        */
+                        Skipped = CheckPastePPTok (Line, LastTokLen, SB_Peek (Next));
+                    }
+
+                }
+
+                /* switch back to previous input */
+                PopRescanLine ();
+
+            } else if (SkipLines) {
+                /* Read next line */
+                if (NextLine () != 0) {
+                    ++PendingNewLines;
+                    NewLine = 1;
+                    Skipped = 0;
+                } else {
+                    /* End of input */
+                    break;
+                }
             } else {
-                /* End of input */
                 break;
             }
         } else {
@@ -931,6 +1009,7 @@ static int SkipWhitespace (int SkipLines)
             break;
         }
     }
+
     return Skipped != 0 ? Skipped : -(NewLine != 0);
 }
 
@@ -1131,6 +1210,68 @@ static int GetPunc (char* S)
 
 
 
+static int CheckPastePPTok (StrBuf* Source, unsigned TokLen, char Next)
+/* Return 1 if the last pp-tokens from Source could be concatenated with any
+** characters from Appended to form a new valid one.
+*/
+{
+    char        C;
+    unsigned    NewTokLen;
+    StrBuf*     OldSource;
+    StrBuf      Src = AUTO_STRBUF_INITIALIZER;
+    StrBuf      Buf = AUTO_STRBUF_INITIALIZER;
+
+    if (TokLen == 0 || IsBlank (SB_LookAtLast (Source))) {
+        return 0;
+    }
+
+    PRECONDITION (SB_GetLen (Source) >= TokLen);
+
+    /* Special casing "..", "/ /" and "/ *" that are not pp-tokens but still
+    ** need be separated.
+    */
+    C = SB_LookAt (Source, SB_GetLen (Source) - TokLen);
+    if ((C == '.' && Next == '.') || (C == '/' && (Next == '/' || Next == '*'))) {
+        return 1;
+    }
+
+    SB_CopyBuf (&Src, SB_GetConstBuf (Source) + SB_GetLen (Source) - TokLen, TokLen);
+    SB_AppendChar (&Src, Next);
+
+    SB_Reset (&Src);
+    OldSource = InitLine (&Src);
+
+    if (IsPPNumber (CurC, NextC)) {
+        /* PP-number */
+        CopyPPNumber (&Buf);
+    } else if (IsQuotedString ()) {
+        /* Quoted string */
+        CopyQuotedString (&Buf);
+    } else {
+        ident Ident;
+        if (GetPunc (Ident)) {
+            /* Punctuator */
+            SB_CopyStr (&Buf, Ident);
+        } else if (IsSym (Ident)) {
+            /* Identifier */
+            SB_CopyStr (&Buf, Ident);
+        }
+    }
+
+    NewTokLen = SB_GetLen (&Buf);
+
+    SB_Done (&Buf);
+    SB_Done (&Src);
+
+    /* Restore old source */
+    InitLine (OldSource);
+
+    /* Return if concatenation succeeded */
+    return NewTokLen != TokLen;
+}
+
+
+
 static int TryPastePPTok (StrBuf* Target,
                           StrBuf* Appended,
                           unsigned FirstTokLen,
@@ -1150,10 +1291,18 @@ static int TryPastePPTok (StrBuf* Target,
         return 1;
     }
 
+    /* Since we need to concatenate the token sequences, remove the
+    ** last whitespace that was added to target, since it must come
+    ** from the input.
+    */
+    if (IsBlank (SB_LookAtLast (Target))) {
+        SB_Drop (Target, 1);
+    }
+
     PRECONDITION (SB_GetLen (Target) >= FirstTokLen &&
                   SB_GetLen (Appended) >= SecondTokLen);
 
-    /* Special casing "..", "//" and "/*" */
+    /* Special casing "..", "/ /" and "/ *" */
     if (FirstTokLen == 1) {
         char C = SB_LookAt (Target, SB_GetLen (Target) - FirstTokLen);
         char N = SB_LookAt (Appended, 0);
@@ -1163,7 +1312,7 @@ static int TryPastePPTok (StrBuf* Target,
         if ((C == '.' && N == '.') || (C == '/' && (N == '/' || N == '*'))) {
             SB_AppendChar (Target, ' ');
             SB_Append (Target, Appended);
-            PPWarning ("Pasting formed '%c%c', an invalid preprocessing token", C, N);
+            PPWarning ("Pasting formed \"%c%c\", an invalid preprocessing token", C, N);
 
             return 0;
         }
@@ -1206,7 +1355,7 @@ static int TryPastePPTok (StrBuf* Target,
             NextChar ();
         }
         SB_Terminate (&Buf);
-        PPWarning ("Pasting formed '%s', an invalid preprocessing token",
+        PPWarning ("Pasting formed \"%s\", an invalid preprocessing token",
                    SB_GetConstBuf (&Buf));
 
         /* Add a space between the tokens to avoid problems in rescanning */
@@ -1238,6 +1387,85 @@ static int TryPastePPTok (StrBuf* Target,
 
     /* Return if concatenation succeeded */
     return TokLen != FirstTokLen;
+}
+
+
+
+static void SeparatePPTok (StrBuf* Target, char Next)
+/* Add a space to target if the previous pp-token could be concatenated with
+** the following character.
+*/
+{
+    if (CurRescanStack->PrevTok != 0) {
+        unsigned Len = SB_GetLen (CurRescanStack->PrevTok) - SB_GetIndex (CurRescanStack->PrevTok);
+
+        /* Check for pp-token pasting */
+        if (CheckPastePPTok (CurRescanStack->PrevTok, Len, Next)) {
+            SB_AppendChar (Target, ' ');
+        }
+        FreeStrBuf (CurRescanStack->PrevTok);
+        CurRescanStack->PrevTok = 0;
+    }
+}
+
+
+
+static void LazyCheckNextPPTok (const StrBuf* Prev, unsigned LastTokLen)
+/* Memorize the previous pp-token(s) to later check for potential pp-token
+** concatenation.
+*/
+{
+    char        C;
+    int         CheckEllipsis = 0;
+    unsigned    NewIndex = SB_GetLen (Prev) - LastTokLen;
+
+    PRECONDITION (SB_GetLen (Prev) >= LastTokLen);
+
+    /* Check for some special cases */
+    C = SB_AtUnchecked (Prev, NewIndex);
+
+    /* We may exclude certain punctuators for speedups. As newer C standards
+    ** could add more punctuators such as "[[", "]]", "::" and so on, this
+    ** check might need changes accordingly.
+    */
+    if (C == '[' || C == ']' || C == '(' || C == ')' ||
+        C == '{' || C == '}' || C == '~' || C == '?' ||
+        C == ':' || C == ';' || C == ',') {
+        /* These punctuators cannot be concatenated */
+        return;
+    }
+
+    /* Special check for .. */
+    if (NewIndex > 0    &&
+        C == '.'        &&
+        SB_AtUnchecked (Prev, NewIndex - 1) == '.') {
+        /* Save the preceding '.' as well */
+        CheckEllipsis = 1;
+    }
+
+    if (CurRescanStack->PrevTok != 0) {
+        unsigned OldIndex = SB_GetIndex (CurRescanStack->PrevTok);
+        unsigned OldLen = SB_GetLen (CurRescanStack->PrevTok) - OldIndex;
+        unsigned NewLen = SB_GetLen (Prev) - NewIndex;
+        if (OldLen == NewLen &&
+            strncmp (SB_GetConstBuf (CurRescanStack->PrevTok) + OldIndex - CheckEllipsis,
+                     SB_GetConstBuf (Prev) + NewIndex - CheckEllipsis,
+                     OldLen + CheckEllipsis) == 0) {
+            /* Same pp-token, keep using the old one */
+        } else {
+            /* Logic error */
+            SB_Terminate (CurRescanStack->PrevTok);
+            Internal ("Unchecked pp-token concatenation: \"%s\"",
+                      SB_GetConstBuf (CurRescanStack->PrevTok) + SB_GetIndex (CurRescanStack->PrevTok));
+        }
+    } else {
+        /* Memorize the current line */
+        CurRescanStack->PrevTok = NewStrBuf ();
+        SB_CopyBuf (CurRescanStack->PrevTok,
+                    SB_GetConstBuf (Prev) + NewIndex - CheckEllipsis,
+                    LastTokLen + CheckEllipsis);
+        SB_Reset (CurRescanStack->PrevTok);
+    }
 }
 
 
@@ -1315,7 +1543,7 @@ static unsigned ReadMacroArgs (unsigned NameIdx, MacroExp* E, const Macro* M, in
             ((CurC == ',' && !ME_IsNextArgVariadic (E, M)) || CurC == ')')) {
 
             /* End of actual argument. Remove whitespace from the end. */
-            while (IsSpace (SB_LookAtLast (&Arg.Tokens))) {
+            while (IsBlank (SB_LookAtLast (&Arg.Tokens))) {
                 SB_Drop (&Arg.Tokens, 1);
             }
 
@@ -1467,9 +1695,10 @@ static unsigned ReadMacroArgs (unsigned NameIdx, MacroExp* E, const Macro* M, in
 
 
 
-static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, Macro* M, unsigned IdentCount)
+static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, Macro* M, unsigned* IdentCount)
 /* Argument substitution according to ISO/IEC 9899:1999 (E), 6.10.3.1ff.
-** Return the count of identifiers and right parentheses in the result.
+** Return the length of the last pp-token in the result and output the count
+** of identifiers and right parentheses in the result to *IdentCount.
 */
 {
     unsigned    Idx         = NameIdx;
@@ -1495,7 +1724,7 @@ static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, M
     ** required by the standard but just to match up with other major C
     ** compilers.
     */
-    ME_HandleSemiNestedMacro (NameIdx, NameIdx + IdentCount, E);
+    ME_HandleSemiNestedMacro (NameIdx, NameIdx + *IdentCount, E);
 
     /* Substitution loop */
     while (CurC != '\0') {
@@ -1518,6 +1747,11 @@ static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, M
                     /* Get the corresponding actual argument */
                     const MacroExp* A = ME_GetOriginalArg (E, ParamIdx);
 
+                    /* Separate with a white space if necessary */
+                    if (CheckPastePPTok (Target, TokLen, SB_Peek (&A->Tokens))) {
+                        SB_AppendChar (Target, ' ');
+                    }
+
                     /* For now we need no placemarkers */
                     SB_Append (Target, &A->Tokens);
 
@@ -1532,6 +1766,11 @@ static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, M
 
                     /* Get the corresponding macro-replaced argument */
                     const MacroExp* A = ME_GetReplacedArg (E, ParamIdx);
+
+                    /* Separate with a white space if necessary */
+                    if (CheckPastePPTok (Target, TokLen, SB_Peek (&A->Tokens))) {
+                        SB_AppendChar (Target, ' ');
+                    }
 
                     /* Append the replaced string */
                     SB_Append (Target, &A->Tokens);
@@ -1568,7 +1807,7 @@ static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, M
             }
 
             /* Squeeze and add the skipped whitespace back for consistency */
-            if (HaveSpace) {
+            if (HaveSpace && !IsBlank (SB_LookAtLast (Target))) {
                 SB_AppendChar (Target, ' ');
             }
 
@@ -1577,19 +1816,10 @@ static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, M
 
         } else if (CurC == '#' && NextC == '#') {
 
-            /* ## operator. */
+            /* ## operator */
             NextChar ();
             NextChar ();
             SkipWhitespace (0);
-
-            /* Since we need to concatenate the token sequences, remove the
-            ** last whitespace that was added to target, since it must come
-            ** from the input.
-            */
-            if (IsBlank (SB_LookAtLast (Target))) {
-                SB_Drop (Target, 1);
-                HaveSpace = 0;
-            }
 
             /* If the next token is an identifier which is a macro argument,
             ** replace it, otherwise just add it.
@@ -1661,7 +1891,7 @@ static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, M
 
                 /* Keep the whitespace for consistency */
                 HaveSpace = SkipWhitespace (0);
-                if (HaveSpace) {
+                if (HaveSpace && !IsBlank (SB_LookAtLast (Target))) {
                     SB_AppendChar (Target, ' ');
                 }
 
@@ -1720,23 +1950,24 @@ static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, M
         ** '/' characters would be parsed wrongly as division operators.
         */
         HaveSpace = SkipWhitespace (0);
-        if (HaveSpace) {
-            SB_AppendChar (&Buf, ' ');
-        }
 
         if (NeedPaste) {
             unsigned Len = SB_GetLen (&Buf);
 
             /* Concatenate pp-tokens */
             if (TryPastePPTok (Target, &Buf, TokLen, Len)) {
-                TokLen += Len - HaveSpace;
+                TokLen += Len;
             } else {
-                TokLen = Len - HaveSpace;
+                TokLen = Len;
             }
         } else {
             /* Just append the token */
             SB_Append (Target, &Buf);
-            TokLen = SB_GetLen (&Buf) - HaveSpace;
+            TokLen = SB_GetLen (&Buf);
+        }
+
+        if (HaveSpace && !IsBlank (SB_LookAtLast (Target))) {
+            SB_AppendChar (Target, ' ');
         }
 
     }
@@ -1745,26 +1976,36 @@ static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, M
     SB_Done (&Buf);
 
     /* Remove the macro name itself together with the arguments (if any) */
-    ME_RemoveToken (Idx, 1 + IdentCount, E);
+    ME_RemoveToken (Idx, 1 + *IdentCount, E);
+
+    /* Hide this macro for the whole result of this expansion */
+    ME_HideMacro (NameIdx, Idx - NameIdx, E, M);
 
     /* Switch back the input */
     UseInputStack (OldInputStack);
     InitLine (OldSource);
     SB_SetIndex (&M->Replacement, OldIndex);
 
-    /* Return the count of substituted identifiers and right parentheses */
-    return Idx - NameIdx;
+    /* Set the count of identifiers and right parentheses in the result */
+    *IdentCount = Idx - NameIdx;
+
+    /* Return the length of the last pp-token */
+    return TokLen;
 }
 
 
 
 static unsigned ExpandMacro (unsigned Idx, StrBuf* Target, MacroExp* E, Macro* M, int MultiLine)
-/* Expand a macro into Target. Return the count of identifiers and right
-** parentheses in the result of the expansion.
+/* Expand a macro into Target. Return the length of the last pp-token in the
+** result of the expansion.
 */
 {
-    /* Count of identifiers and right parentheses */
-    unsigned Count = 0;
+    unsigned Count = 0;     /* Count of identifiers and right parentheses */
+    unsigned Len   = 0;     /* Length of the last pp-token in the result */
+
+    /* Disable previous pp-token spacing checking */
+    StrBuf* PrevTok = CurRescanStack->PrevTok;
+    CurRescanStack->PrevTok = 0;
 
 #if DEV_CC65_DEBUG
     static unsigned V = 0;
@@ -1779,7 +2020,7 @@ static unsigned ExpandMacro (unsigned Idx, StrBuf* Target, MacroExp* E, Macro* M
 
     if ((E->Flags & MES_ERROR) == 0) {
         /* Replace macro parameters with arguments handling the # and ## operators */
-        Count = SubstMacroArgs (Idx, Target, E, M, Count);
+        Len = SubstMacroArgs (Idx, Target, E, M, &Count);
     } else {
         SB_CopyStr (Target, M->Name);
     }
@@ -1789,15 +2030,17 @@ static unsigned ExpandMacro (unsigned Idx, StrBuf* Target, MacroExp* E, Macro* M
         ME_ClearArgs (E);
     }
 
-    /* Hide this macro for the whole result of this expansion */
-    ME_HideMacro (Idx, Count, E, M);
-
 #if DEV_CC65_DEBUG
     printf ("Expanded (%u) %s to %d ident(s) at %u: %s\n",
             V--, M->Name, Count, Idx, SB_GetConstBuf (Target));
 #endif
 
-    return Count;
+    /* Reenable previous pp-token concatenation checking */
+    FreeStrBuf (CurRescanStack->PrevTok);
+    CurRescanStack->PrevTok = PrevTok;
+
+    /* Return the length of the last pp-token in the expansion result */
+    return Len;
 }
 
 
@@ -1811,13 +2054,13 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
     StrBuf*     TmpTarget   = NewStrBuf ();
 
     /* Remember the current input and switch to Source */
-    StrBuf*     OldSource   = InitLine (Source);
-    Collection  RescanStack = AUTO_COLLECTION_INITIALIZER;
-    Collection* OldRescanStack = CurRescanStack;
+    StrBuf*             OldSource      = InitLine (Source);
+    RescanInputStack    RescanStack;
+    RescanInputStack*   OldRescanStack = CurRescanStack;
 
-
+    InitRescanInputStack (&RescanStack);
+    PushRescanLine (&RescanStack, Line, 0);
     CurRescanStack = &RescanStack;
-    CollAppend (CurRescanStack, Line);
 
     /* Loop substituting macros */
     while (CurC != '\0') {
@@ -1839,6 +2082,10 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
                     NextChar ();
                     SkipWhitespace (0);
                 }
+
+                /* Add a space to separate the result if necessary */
+                SeparatePPTok (Target, '0');
+
                 if (IsSym (Ident)) {
                     /* Eat the identifier */
                     ME_RemoveToken (Count, 1, E);
@@ -1864,7 +2111,8 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
 
                 /* Check if it's an expandable macro */
                 if (M != 0 && ME_CanExpand (Count, E, M)) {
-                    int MultiLine = (ModeFlags & MSM_MULTILINE) != 0;
+                    int      MultiLine = (ModeFlags & MSM_MULTILINE) != 0;
+                    unsigned LastTokLen;
 
                     /* Check if this is a function-like macro */
                     if (M->ParamCount >= 0) {
@@ -1878,7 +2126,8 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
                             /* No expansion */
                             ++Count;
 
-                            /* Just keep the macro name */
+                            /* Add a space to separate the macro name if necessary */
+                            SeparatePPTok (Target, M->Name[0]);
                             SB_AppendStr (Target, M->Name);
 
                             /* Keep tracking pp-token lengths */
@@ -1929,10 +2178,10 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
                     */
                     if (MultiLine && OLine == 0) {
                         OLine = TmpTarget;
-                        ExpandMacro (Count, TmpTarget, E, M, MultiLine);
+                        LastTokLen = ExpandMacro (Count, TmpTarget, E, M, MultiLine);
                         OLine = 0;
                     } else {
-                        ExpandMacro (Count, TmpTarget, E, M, MultiLine);
+                        LastTokLen = ExpandMacro (Count, TmpTarget, E, M, MultiLine);
                     }
 
                     /* Check for errors in expansion */
@@ -1947,7 +2196,7 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
                         /* Start rescanning from the temporary result */
                         SB_Reset (TmpTarget);
                         InitLine (TmpTarget);
-                        CollAppend (CurRescanStack, TmpTarget);
+                        PushRescanLine (CurRescanStack, TmpTarget, LastTokLen);
 
                         /* Switch the buffers */
                         TmpTarget = NewStrBuf ();
@@ -1961,6 +2210,9 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
 
                 /* An unexpandable identifier. Keep it. */
                 ++Count;
+
+                /* Add a space to separate the macro name if necessary */
+                SeparatePPTok (Target, Ident[0]);
                 SB_AppendStr (Target, Ident);
 
                 /* Keep tracking pp-token lengths */
@@ -1973,7 +2225,12 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
                 }
             }
         } else {
-            unsigned LastLen = SB_GetLen (Target);
+            unsigned LastLen;
+
+            /* Add a space to separate the macro name if necessary */
+            SeparatePPTok (Target, CurC);
+
+            LastLen = SB_GetLen (Target);
 
             if ((ModeFlags & MSM_TOK_HEADER) != 0 && (CurC == '<' || CurC == '\"')) {
                 CopyHeaderNameToken (Target);
@@ -1994,6 +2251,14 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
                             ++Count;
                         }
                         SB_AppendStr (Target, Ident);
+
+                        /* If an identifier follows immediately, it could be a macro
+                        ** expanded later that occasionally need a space to separate.
+                        */
+                        if (IsIdent (CurC)) {
+                            /* Memorize the previous pp-token and check it later */
+                            LazyCheckNextPPTok (Target, strlen (Ident));
+                        }
                     } else {
                         SB_AppendChar (Target, CurC);
                         NextChar ();
@@ -2014,7 +2279,7 @@ Loop:
         /* Switch back to the previous input stream if we have finished
         ** rescanning the current one.
         */
-        if (CurC == '\0' && CollCount (CurRescanStack) > 1) {
+        if (CurC == '\0' && CollCount (&CurRescanStack->Lines) > 1) {
             /* Check for rescan sequence end and pp-token pasting */
             Skipped = SkipWhitespace (0) || Skipped;
         }
@@ -2038,18 +2303,12 @@ Loop:
 
     /* Sanity check */
     if ((E->Flags & MES_ERROR) == 0) {
-        CHECK (CollCount (CurRescanStack) == 1);
+        CHECK (CollCount (&CurRescanStack->Lines) == 1);
     }
-
-    /* Switch back to the old input stack */
-    while (CollCount (CurRescanStack) > 1) {
-        FreeStrBuf (CollPop (CurRescanStack));
-    }
-    CurRescanStack = OldRescanStack;
 
     /* Done with the current input stack */
-    CHECK (CollCount (&RescanStack) == 1);
-    DoneCollection (&RescanStack);
+    DoneRescanInputStack (CurRescanStack);
+    CurRescanStack = OldRescanStack;
 
     /* Switch back the input */
     InitLine (OldSource);

@@ -158,8 +158,8 @@ static int ParseDirectives (unsigned ModeFlags);
 /* Handle directives. Return 1 if any whitespace or newlines are parsed. */
 
 static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsigned ModeFlags);
-/* Scan for and perform macro replacement. Return the count of identifiers in
-** the replacement result.
+/* Scan for and perform macro replacement. Return the count of identifiers and
+** right parentheses in the replacement result.
 */
 
 static MacroExp* InitMacroExp (MacroExp* E);
@@ -486,6 +486,40 @@ static void ME_RemoveToken (unsigned Idx, unsigned Count, MacroExp* E)
             }
 
             Prev = &This->Next;
+        }
+    }
+}
+
+
+
+static void ME_HandleSemiNestedMacro (unsigned NameIdx, unsigned LastIdx, MacroExp* E)
+/* Unhide the macro name from all hidesets if it was expanded with an unhidden
+** right parenthesis. This is unspecified but allowed behavior according to
+** ISO/IEC 9899:2018, 6.10.3.4ff.
+*/
+{
+    unsigned I;
+
+    for (I = 0; I < CollCount (&E->HideSets); ++I) {
+        HiddenMacro* MHS = CollAtUnchecked (&E->HideSets, I);
+        HideRange* This;
+        HideRange** Prev;
+
+        for (Prev = &MHS->HS, This = *Prev; This != 0; This = *Prev) {
+            if (NameIdx < This->End) {
+                if (NameIdx >= This->Start && LastIdx >= This->End) {
+                    This->End = NameIdx;
+                    if (This->End == This->Start) {
+                        /* Remove */
+                        (*Prev) = This->Next;
+                        FreeHideRange (This);
+                        continue;
+                    }
+                }
+                Prev = &This->Next;
+            } else {
+                break;
+            }
         }
     }
 }
@@ -1214,7 +1248,7 @@ static int CheckExtraTokens (const char* Name)
 
 static unsigned ReadMacroArgs (unsigned NameIdx, MacroExp* E, const Macro* M, int MultiLine)
 /* Identify the arguments to a macro call as-is. Return the total count of
-** identifiers in the read argument list.
+** identifiers and right parentheses in the read argument list.
 */
 {
     unsigned    Idx         = 0;
@@ -1316,6 +1350,8 @@ static unsigned ReadMacroArgs (unsigned NameIdx, MacroExp* E, const Macro* M, in
 
             /* Check for end of macro param list */
             if (CurC == ')') {
+                /* Count right parens */
+                ++Idx;
                 NextChar ();
                 break;
             }
@@ -1366,6 +1402,9 @@ static unsigned ReadMacroArgs (unsigned NameIdx, MacroExp* E, const Macro* M, in
                 } else if (Ident[0] == ')') {
                     /* Closing nested parenthesis */
                     --Parens;
+
+                    /* Count right parens */
+                    ++CountInArg;
                 }
                 /* Just copy the punctuator */
                 SB_AppendStr (&Arg.Tokens, Ident);
@@ -1403,7 +1442,9 @@ static unsigned ReadMacroArgs (unsigned NameIdx, MacroExp* E, const Macro* M, in
     /* Deallocate argument resources */
     DoneMacroExp (&Arg);
 
-    /* Return the total count of identifiers in the argument list */
+    /* Return the total count of identifiers and right parentheses in the
+    ** argument list.
+    */
     return Idx;
 }
 
@@ -1411,7 +1452,7 @@ static unsigned ReadMacroArgs (unsigned NameIdx, MacroExp* E, const Macro* M, in
 
 static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, Macro* M, unsigned IdentCount)
 /* Argument substitution according to ISO/IEC 9899:1999 (E), 6.10.3.1ff.
-** Return the count of identifiers found in the result.
+** Return the count of identifiers and right parentheses in the result.
 */
 {
     unsigned    Idx         = NameIdx;
@@ -1430,6 +1471,14 @@ static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, M
 
     SB_Reset (&M->Replacement);
     OldSource = InitLine (&M->Replacement);
+
+    /* If the macro expansion replaces an function-like macro with an argument
+    ** list containing a right parenthesis outside the hidesets of previously
+    ** replaced macros, stop those hidesets from this replacement. This is not
+    ** required by the standard but just to match up with other major C
+    ** compilers.
+    */
+    ME_HandleSemiNestedMacro (NameIdx, NameIdx + IdentCount, E);
 
     /* Substitution loop */
     while (CurC != '\0') {
@@ -1637,6 +1686,14 @@ static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, M
             CopyQuotedString (&Buf);
         } else {
             if (GetPunc (Ident)) {
+                /* Count right parens. This is OK since they cannot be pasted
+                ** to form different punctuators with others.
+                */
+                if (Ident[0] == ')') {
+                    /* Adjust tracking */
+                    ME_OffsetHideSets (Idx, 1, E);
+                    ++Idx;
+                }
                 SB_AppendStr (&Buf, Ident);
             } else if (CurC != '\0') {
                 SB_AppendChar (&Buf, CurC);
@@ -1681,18 +1738,18 @@ static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, M
     InitLine (OldSource);
     SB_SetIndex (&M->Replacement, OldIndex);
 
-    /* Return the count of substituted identifiers */
+    /* Return the count of substituted identifiers and right parentheses */
     return Idx - NameIdx;
 }
 
 
 
 static unsigned ExpandMacro (unsigned Idx, StrBuf* Target, MacroExp* E, Macro* M, int MultiLine)
-/* Expand a macro into Target. Return the count of identifiers in the result
-** of the expansion.
+/* Expand a macro into Target. Return the count of identifiers and right
+** parentheses in the result of the expansion.
 */
 {
-    /* Count of identifiers */
+    /* Count of identifiers and right parentheses */
     unsigned Count = 0;
 
 #if DEV_CC65_DEBUG
@@ -1732,8 +1789,8 @@ static unsigned ExpandMacro (unsigned Idx, StrBuf* Target, MacroExp* E, Macro* M
 
 
 static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsigned ModeFlags)
-/* Scan for and perform macro replacement. Return the count of identifiers in
-** the replacement result.
+/* Scan for and perform macro replacement. Return the count of identifiers and
+** right parentheses in the replacement result.
 */
 {
     unsigned    Count       = 0;
@@ -1778,6 +1835,8 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
                             PPError ("')' expected");
                             ClearLine ();
                         } else {
+                            /* Eat the right parenthesis */
+                            ME_RemoveToken (Count, 1, E);
                             NextChar ();
                         }
                     }
@@ -1916,6 +1975,10 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
                 */
                 if (!Skipped) {
                     if (GetPunc (Ident)) {
+                        if (Ident[0] == ')') {
+                            /* Count right parens */
+                            ++Count;
+                        }
                         SB_AppendStr (Target, Ident);
                     } else {
                         SB_AppendChar (Target, CurC);
@@ -1977,7 +2040,7 @@ Loop:
     /* Switch back the input */
     InitLine (OldSource);
 
-    /* Return the count of identifiers */
+    /* Return the count of identifiers and right parentheses */
     return Count;
 }
 

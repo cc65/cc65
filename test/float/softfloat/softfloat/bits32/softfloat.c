@@ -211,6 +211,7 @@ static float32
 
 }
 
+#ifdef DOUBLES
 /*----------------------------------------------------------------------------
 | Returns the least-significant 32 fraction bits of the double-precision
 | floating-point value `a'.
@@ -256,6 +257,7 @@ INLINE flag extractFloat64Sign( float64 a )
     return a.high>>31;
 
 }
+#endif
 
 /*----------------------------------------------------------------------------
 | Normalizes the subnormal double-precision floating-point value represented
@@ -267,6 +269,7 @@ INLINE flag extractFloat64Sign( float64 a )
 | by `zSig1Ptr'.
 *----------------------------------------------------------------------------*/
 
+#ifdef DOUBLES
 static void
  normalizeFloat64Subnormal(
      bits32 aSig0,
@@ -451,6 +454,7 @@ static float64
     return roundAndPackFloat64( zSign, zExp, zSig0, zSig1, zSig2 );
 
 }
+#endif
 
 /*----------------------------------------------------------------------------
 | Returns the result of converting the 32-bit two's complement integer `a'
@@ -469,6 +473,7 @@ float32 int32_to_float32( int32 a )
 
 }
 
+#ifdef DOUBLES
 /*----------------------------------------------------------------------------
 | Returns the result of converting the 32-bit two's complement integer `a'
 | to the double-precision floating-point format.  The conversion is performed
@@ -496,6 +501,7 @@ float64 int32_to_float64( int32 a )
     return packFloat64( zSign, 0x412 - shiftCount, zSig0, zSig1 );
 
 }
+#endif
 
 /*----------------------------------------------------------------------------
 | Returns the result of converting the single-precision floating-point value
@@ -607,6 +613,7 @@ int32 float32_to_int32_round_to_zero( float32 a )
 
 }
 
+#ifdef DOUBLES
 /*----------------------------------------------------------------------------
 | Returns the result of converting the single-precision floating-point value
 | `a' to the double-precision floating-point format.  The conversion is
@@ -635,6 +642,7 @@ float64 float32_to_float64( float32 a )
     return packFloat64( aSign, aExp + 0x380, zSig0, zSig1 );
 
 }
+#endif
 
 /*----------------------------------------------------------------------------
 | Rounds the single-precision floating-point value `a' to an integer,
@@ -1290,6 +1298,7 @@ flag float32_lt_quiet( float32 a, float32 b )
 
 }
 
+#ifdef DOUBLES
 /*----------------------------------------------------------------------------
 | Returns the result of converting the double-precision floating-point value
 | `a' to the 32-bit two's complement integer format.  The conversion is
@@ -2256,4 +2265,4 @@ flag float64_lt_quiet( float64 a, float64 b )
         : lt64( a.high, a.low, b.high, b.low );
 
 }
-
+#endif

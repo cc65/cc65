@@ -31,6 +31,15 @@ code that are retained.
 #include "milieu.h"
 #include "softfloat.h"
 
+#ifndef CLOCKS_PER_SEC
+#define CLOCKS_PER_SEC 50
+#warning "CLOCKS_PER_SEC not defined"
+clock_t clock(void) {
+    static clock_t cnt;
+    ++cnt;
+}
+#endif
+
 enum {
     minIterations = 1000
 };
@@ -52,12 +61,13 @@ static char *functionName, *roundingModeName, *tininessModeName;
 
 static void reportTime( int32 count, long clocks )
 {
-
+#if 0
     printf(
         "%8.1f kops/s: %s",
         ( count / ( ( (float) clocks ) / CLOCKS_PER_SEC ) ) / 1000,
         functionName
     );
+#endif
     if ( roundingModeName ) {
         fputs( ", rounding ", stdout );
         fputs( roundingModeName, stdout );
@@ -86,7 +96,8 @@ static const int32 inputs_int32[ numInputs_int32 ] = {
     0xBFFFFFF8, 0x0001BF56, 0x000017F6, 0x000A908A
 };
 
-static void time_a_int32_z_float32( float32 function( int32 ) )
+//static void time_a_int32_z_float32( float32 function( int32 ) )
+static void time_a_int32_z_float32( float32 (*function)( int32 ) )
 {
     clock_t startClock, endClock;
     int32 count, i;
@@ -113,6 +124,7 @@ static void time_a_int32_z_float32( float32 function( int32 ) )
 
 }
 
+#ifdef DOUBLES
 static void time_a_int32_z_float64( float64 function( int32 ) )
 {
     clock_t startClock, endClock;
@@ -139,6 +151,7 @@ static void time_a_int32_z_float64( float64 function( int32 ) )
     reportTime( count, endClock - startClock );
 
 }
+#endif
 
 enum {
     numInputs_float32 = 32
@@ -155,7 +168,8 @@ static const float32 inputs_float32[ numInputs_float32 ] = {
     0xDB428661, 0x33F89B1F, 0xA3BFEFFF, 0x537BFFBE
 };
 
-static void time_a_float32_z_int32( int32 function( float32 ) )
+//static void time_a_float32_z_int32( int32 function( float32 ) )
+static void time_a_float32_z_int32( int32 (*function)( float32 ) )
 {
     clock_t startClock, endClock;
     int32 count, i;
@@ -182,6 +196,7 @@ static void time_a_float32_z_int32( int32 function( float32 ) )
 
 }
 
+#ifdef DOUBLES
 static void time_a_float32_z_float64( float64 function( float32 ) )
 {
     clock_t startClock, endClock;
@@ -208,8 +223,10 @@ static void time_a_float32_z_float64( float64 function( float32 ) )
     reportTime( count, endClock - startClock );
 
 }
+#endif
 
-static void time_az_float32( float32 function( float32 ) )
+//static void time_az_float32( float32 function( float32 ) )
+static void time_az_float32( float32 (*function)( float32 ) )
 {
     clock_t startClock, endClock;
     int32 count, i;
@@ -236,7 +253,8 @@ static void time_az_float32( float32 function( float32 ) )
 
 }
 
-static void time_ab_float32_z_flag( flag function( float32, float32 ) )
+//static void time_ab_float32_z_flag( flag function( float32, float32 ) )
+static void time_ab_float32_z_flag( flag (*function)( float32, float32 ) )
 {
     clock_t startClock, endClock;
     int32 count, i;
@@ -271,7 +289,8 @@ static void time_ab_float32_z_flag( flag function( float32, float32 ) )
 
 }
 
-static void time_abz_float32( float32 function( float32, float32 ) )
+//static void time_abz_float32( float32 function( float32, float32 ) )
+static void time_abz_float32( float32 (*function)( float32, float32 ) )
 {
     clock_t startClock, endClock;
     int32 count, i;
@@ -317,7 +336,8 @@ static const float32 inputs_float32_pos[ numInputs_float32 ] = {
     0x5B428661, 0x33F89B1F, 0x23BFEFFF, 0x537BFFBE
 };
 
-static void time_az_float32_pos( float32 function( float32 ) )
+//static void time_az_float32_pos( float32 function( float32 ) )
+static void time_az_float32_pos( float32 (*function)( float32 ) )
 {
     clock_t startClock, endClock;
     int32 count, i;
@@ -344,6 +364,7 @@ static void time_az_float32_pos( float32 function( float32 ) )
 
 }
 
+#ifdef DOUBLES
 enum {
     numInputs_float64 = 32
 };
@@ -385,7 +406,8 @@ static const struct {
     { 0xC237FFFF, 0xFFFFFDFE }
 };
 
-static void time_a_float64_z_int32( int32 function( float64 ) )
+//static void time_a_float64_z_int32( int32 function( float64 ) )
+static void time_a_float64_z_int32( int32 (*function)( float64 ) )
 {
     clock_t startClock, endClock;
     int32 count, i;
@@ -633,13 +655,18 @@ static void time_az_float64_pos( float64 function( float64 ) )
     reportTime( count, endClock - startClock );
 
 }
+#endif
 
 enum {
     INT32_TO_FLOAT32 = 1,
+#ifdef DOUBLES
     INT32_TO_FLOAT64,
+#endif
     FLOAT32_TO_INT32,
     FLOAT32_TO_INT32_ROUND_TO_ZERO,
+#ifdef DOUBLES
     FLOAT32_TO_FLOAT64,
+#endif
     FLOAT32_ROUND_TO_INT,
     FLOAT32_ADD,
     FLOAT32_SUB,
@@ -653,6 +680,7 @@ enum {
     FLOAT32_EQ_SIGNALING,
     FLOAT32_LE_QUIET,
     FLOAT32_LT_QUIET,
+#ifdef DOUBLES
     FLOAT64_TO_INT32,
     FLOAT64_TO_INT32_ROUND_TO_ZERO,
     FLOAT64_TO_FLOAT32,
@@ -669,6 +697,7 @@ enum {
     FLOAT64_EQ_SIGNALING,
     FLOAT64_LE_QUIET,
     FLOAT64_LT_QUIET,
+#endif
     NUM_FUNCTIONS
 };
 
@@ -679,10 +708,14 @@ static struct {
 } functions[ NUM_FUNCTIONS ] = {
     { 0, 0, 0, 0 },
     { "int32_to_float32",                1, TRUE,  FALSE },
+#ifdef DOUBLES
     { "int32_to_float64",                1, FALSE, FALSE },
+#endif
     { "float32_to_int32",                1, TRUE,  FALSE },
     { "float32_to_int32_round_to_zero",  1, FALSE, FALSE },
+#ifdef DOUBLES
     { "float32_to_float64",              1, FALSE, FALSE },
+#endif
     { "float32_round_to_int",            1, TRUE,  FALSE },
     { "float32_add",                     2, TRUE,  FALSE },
     { "float32_sub",                     2, TRUE,  FALSE },
@@ -696,6 +729,7 @@ static struct {
     { "float32_eq_signaling",            2, FALSE, FALSE },
     { "float32_le_quiet",                2, FALSE, FALSE },
     { "float32_lt_quiet",                2, FALSE, FALSE },
+#ifdef DOUBLES
     { "float64_to_int32",                1, TRUE,  FALSE },
     { "float64_to_int32_round_to_zero",  1, FALSE, FALSE },
     { "float64_to_float32",              1, TRUE,  TRUE, },
@@ -712,6 +746,7 @@ static struct {
     { "float64_eq_signaling",            2, FALSE, FALSE },
     { "float64_le_quiet",                2, FALSE, FALSE },
     { "float64_lt_quiet",                2, FALSE, FALSE }
+#endif
 };
 
 enum {
@@ -777,18 +812,22 @@ static void
      case INT32_TO_FLOAT32:
         time_a_int32_z_float32( int32_to_float32 );
         break;
+#ifdef DOUBLES
      case INT32_TO_FLOAT64:
         time_a_int32_z_float64( int32_to_float64 );
         break;
+#endif
      case FLOAT32_TO_INT32:
         time_a_float32_z_int32( float32_to_int32 );
         break;
      case FLOAT32_TO_INT32_ROUND_TO_ZERO:
         time_a_float32_z_int32( float32_to_int32_round_to_zero );
         break;
+#ifdef DOUBLES
      case FLOAT32_TO_FLOAT64:
         time_a_float32_z_float64( float32_to_float64 );
         break;
+#endif
      case FLOAT32_ROUND_TO_INT:
         time_az_float32( float32_round_to_int );
         break;
@@ -828,6 +867,7 @@ static void
      case FLOAT32_LT_QUIET:
         time_ab_float32_z_flag( float32_lt_quiet );
         break;
+#ifdef DOUBLES
      case FLOAT64_TO_INT32:
         time_a_float64_z_int32( float64_to_int32 );
         break;
@@ -876,6 +916,7 @@ static void
      case FLOAT64_LT_QUIET:
         time_ab_float64_z_flag( float64_lt_quiet );
         break;
+#endif
     }
 
 }

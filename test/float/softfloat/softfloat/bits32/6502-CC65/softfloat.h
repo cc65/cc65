@@ -72,14 +72,14 @@ void float_raise( signed char );
 /*----------------------------------------------------------------------------
 | Software IEEE integer-to-floating-point conversion routines.
 *----------------------------------------------------------------------------*/
-float32 int32_to_float32( signed short );
-float64 int32_to_float64( signed short );
+float32 int32_to_float32( int32 );
+float64 int32_to_float64( int32 );
 
 /*----------------------------------------------------------------------------
 | Software IEEE single-precision conversion routines.
 *----------------------------------------------------------------------------*/
-signed short float32_to_int32( float32 );
-signed short float32_to_int32_round_to_zero( float32 );
+int32 float32_to_int32( float32 );
+int32 float32_to_int32_round_to_zero( float32 );
 float64 float32_to_float64( float32 );
 
 /*----------------------------------------------------------------------------

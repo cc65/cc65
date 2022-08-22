@@ -1,4 +1,6 @@
 
+#undef DOUBLES  // implement double precision floats
+
 /*----------------------------------------------------------------------------
 | One of the macros `BIGENDIAN' or `LITTLEENDIAN' must be defined.
 *----------------------------------------------------------------------------*/

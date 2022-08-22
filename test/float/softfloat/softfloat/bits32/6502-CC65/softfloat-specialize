@@ -88,16 +88,15 @@ flag float32_is_signaling_nan( float32 a )
 | exception is raised.
 *----------------------------------------------------------------------------*/
 
-static commonNaNT float32ToCommonNaN( float32 a )
+static commonNaNT *float32ToCommonNaN( float32 a )
 {
-    commonNaNT z;
+    static commonNaNT z;
 
     if ( float32_is_signaling_nan( a ) ) float_raise( float_flag_invalid );
     z.sign = a>>31;
     z.low = 0;
     z.high = a<<9;
-    return z;
-
+    return &z;
 }
 
 /*----------------------------------------------------------------------------
@@ -105,10 +104,10 @@ static commonNaNT float32ToCommonNaN( float32 a )
 | precision floating-point format.
 *----------------------------------------------------------------------------*/
 
-static float32 commonNaNToFloat32( commonNaNT a )
+static float32 commonNaNToFloat32( commonNaNT *a )
 {
 
-    return ( ( (bits32) a.sign )<<31 ) | 0x7FC00000 | ( a.high>>9 );
+    return ( ( (bits32) a->sign )<<31 ) | 0x7FC00000 | ( a->high>>9 );
 
 }
 
@@ -138,6 +137,7 @@ static float32 propagateFloat32NaN( float32 a, float32 b )
 
 }
 
+#ifdef DOUBLES
 /*----------------------------------------------------------------------------
 | The pattern for a default generated double-precision NaN.  The `high' and
 | `low' values hold the most- and least-significant bits, respectively.
@@ -232,4 +232,6 @@ static float64 propagateFloat64NaN( float64 a, float64 b )
     }
 
 }
+
+#endif
 

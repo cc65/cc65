@@ -74,10 +74,19 @@
 #define MSM_IN_DIRECTIVE        0x02U   /* In PP directives scan */
 #define MSM_IN_ARG_LIST         0x04U   /* In macro argument scan */
 #define MSM_IN_ARG_EXPANSION    0x08U   /* In expansion on arguments */
-#define MSM_OP_DEFINED          0x10U   /* Handle the defined operator */
-#define MSM_OP_HAS_INCLUDE      0x20U   /* Handle the __has_include operator */
-#define MSM_OP_HAS_C_ATTRIBUTE  0x40U   /* Handle the __has_c_attribute operator */
+#define MSM_OP_DEFINED          0x10U   /* Handle the "defined" operator */
+#define MSM_OP_HAS_INCLUDE      0x20U   /* Handle the "__has_include" operator */
+#define MSM_OP_HAS_C_ATTRIBUTE  0x40U   /* Handle the "__has_c_attribute" operator */
 #define MSM_TOK_HEADER          0x80U   /* Support header tokens */
+
+/* Macro expansion state flags */
+#define MES_NONE                0x00U   /* Nothing */
+#define MES_FIRST_TOKEN         0x01U   /* Mark for detecting pp-token count in the sequence */
+#define MES_MULTIPLE_TOKEN      0x02U   /* Multiple pp-tokens are detected in the sequence */
+#define MES_BEGIN_WITH_IDENT    0x04U   /* The first pp-token of the sequence is an identifier */
+#define MES_HAS_REPLACEMENT     0x10U   /* Macro argument has cached replacement result */
+#define MES_NO_VA_COMMA         0x20U   /* Variadic macro called w/o the ',' in front of variable argument */
+#define MES_ERROR               0x80U   /* Error has occurred in macro expansion */
 
 /* Management data for #if */
 #define IFCOND_NONE     0x00U
@@ -87,6 +96,9 @@
 
 /* Current PP if stack */
 static PPIfStack* PPStack;
+
+/* Input backup for rescan */
+static Collection* CurRescanStack;
 
 /* Intermediate input buffers */
 static StrBuf* PLine;   /* Buffer for macro expansion */
@@ -100,8 +112,28 @@ static int FileChanged;
 /* Structure used when expanding macros */
 typedef struct MacroExp MacroExp;
 struct MacroExp {
-    Collection  ActualArgs;     /* Actual arguments */
-    StrBuf      Replacement;    /* Replacement with arguments substituted */
+    Collection  Args;               /* Actual arguments (for function-like) */
+    Collection  HideSets;           /* Macros hidden from expansion */
+    StrBuf      Tokens;             /* Originally read sequence */
+    unsigned    IdentCount;         /* Count of identifiers in the pp-token sequence */
+    unsigned    Flags;              /* Macro argument flags */
+    MacroExp*   Replaced;           /* Macro-replaced version of this pp-token sequence */
+    unsigned    FirstTokLen;        /* Length of the first pp-token */
+    unsigned    LastTokLen;         /* Length of the last pp-token */
+};
+
+typedef struct HideRange HideRange;
+struct HideRange
+{
+    HideRange*  Next;
+    unsigned    Start;
+    unsigned    End;
+};
+
+typedef struct HiddenMacro HiddenMacro;
+struct HiddenMacro {
+    const Macro*    M;
+    HideRange*      HS;
 };
 
 
@@ -125,8 +157,16 @@ static void PreprocessDirective (StrBuf* Source, StrBuf* Target, unsigned ModeFl
 static int ParseDirectives (unsigned ModeFlags);
 /* Handle directives. Return 1 if any whitespace or newlines are parsed. */
 
-static void MacroReplacement (StrBuf* Source, StrBuf* Target, unsigned ModeFlags);
-/* Scan for and perform macro replacement */
+static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsigned ModeFlags);
+/* Scan for and perform macro replacement. Return the count of identifiers in
+** the replacement result.
+*/
+
+static MacroExp* InitMacroExp (MacroExp* E);
+/* Initialize a MacroExp structure */
+
+static void DoneMacroExp (MacroExp* E);
+/* Cleanup after use of a MacroExp structure */
 
 
 
@@ -202,16 +242,416 @@ static ppdirective_t FindPPDirectiveType (const char* Ident)
 
 
 /*****************************************************************************/
+/*                             MacroExp helpers                              */
+/*****************************************************************************/
+
+
+
+static HideRange* NewHideRange (unsigned Start, unsigned Len)
+/* Create a hide range */
+{
+    HideRange* HS = xmalloc (sizeof (HideRange));
+
+    HS->Next  = 0;
+    HS->Start = Start;
+    HS->End   = Start + Len;
+
+    return HS;
+}
+
+
+
+static void FreeHideRange (HideRange* HS)
+/* Free a hide range */
+{
+    xfree (HS);
+}
+
+
+
+static HiddenMacro* NewHiddenMacro (const Macro* M)
+/* Create a new struct for the hidden macro */
+{
+    HiddenMacro* MHS = xmalloc (sizeof (HiddenMacro));
+
+    MHS->M  = M;
+    MHS->HS = 0;
+
+    return MHS;
+}
+
+
+
+static void FreeHiddenMacro (HiddenMacro* MHS)
+/* Free the struct and all ranges of the hidden macro */
+{
+    HideRange* This;
+    HideRange* Next;
+
+    if (MHS == 0) {
+        return;
+    }
+
+    for (This = MHS->HS; This != 0; This = Next) {
+        Next = This->Next;
+        FreeHideRange (This);
+    }
+
+    xfree (MHS);
+}
+
+
+
+/*****************************************************************************/
 /*                              struct MacroExp                              */
 /*****************************************************************************/
+
+
+
+static HiddenMacro* ME_FindHiddenMacro (const MacroExp* E, const Macro* M)
+/* Find the macro hide set */
+{
+    unsigned I;
+
+    for (I = 0; I < CollCount (&E->HideSets); ++I) {
+        HiddenMacro* MHS = CollAtUnchecked (&E->HideSets, I);
+        if (MHS->M == M) {
+            return MHS;
+        }
+    }
+
+    return 0;
+}
+
+
+
+static void ME_HideMacro (unsigned Idx, unsigned Count, MacroExp* E, const Macro* M)
+/* Hide the macro from the Idx'th identifier */
+{
+    if (Count > 0) {
+        /* Find the macro hideset */
+        HiddenMacro*    MHS = ME_FindHiddenMacro (E, M);
+        HideRange**     This;
+
+        /* New hidden section */
+        HideRange*      NewHS = NewHideRange (Idx, Count);
+
+        /* New macro to hide */
+        if (MHS == 0) {
+            MHS = NewHiddenMacro (M);
+            CollAppend (&E->HideSets, MHS);
+        }
+        This = &MHS->HS;
+
+        if (*This == 0) {
+            *This = NewHS;
+        } else {
+            /* Insert */
+            while (1) {
+                if (*This == 0 || NewHS->Start <= (*This)->Start) {
+                    /* Insert before */
+                    NewHS->Next = *This;
+                    *This = NewHS;
+                    break;
+                } else if (NewHS->Start <= (*This)->End) {
+                    /* Insert after */
+                    NewHS->Next = (*This)->Next;
+                    (*This)->Next = NewHS;
+                    break;
+                }
+                /* Advance */
+                This = &(*This)->Next;
+            }
+
+            /* Merge */
+            while (*This != 0) {
+                HideRange* Next = (*This)->Next;
+
+                if (Next != 0 && (*This)->End >= Next->Start) {
+                    /* Expand this to the next */
+                    if ((*This)->End < Next->End) {
+                        (*This)->End = Next->End;
+                    }
+
+                    /* Remove next */
+                    (*This)->Next = Next->Next;
+                    FreeHideRange (Next);
+
+                    /* Advance */
+                    This = &(*This)->Next;
+                } else {
+                    /* No more */
+                    break;
+                }
+            }
+        }
+    }
+}
+
+
+
+static int ME_CanExpand (unsigned Idx, const MacroExp* E, const Macro* M)
+/* Return 1 if the macro can be expanded with the Idx'th identifier */
+{
+    if (E != 0) {
+        /* Find the macro hideset */
+        HiddenMacro* MHS = ME_FindHiddenMacro (E, M);
+        if (MHS != 0) {
+            /* Check if the macro is hidden from this identifier */
+            HideRange* HS = MHS->HS;
+            while (HS != 0) {
+                /* If the macro name overlaps with the range where the macro is hidden,
+                ** the macro cannot be expanded.
+                */
+                if (Idx >= HS->Start && Idx < HS->End) {
+                    return 0;
+                }
+                HS = HS->Next;
+            }
+        }
+    }
+
+    return 1;
+}
+
+
+
+static void ME_OffsetHideSets (unsigned Idx, unsigned Offs, MacroExp* E)
+/* Adjust all macro hide set ranges for the macro expansion when the identifier
+** at Idx is replaced with a count of Offs + 1 (if Offs > 0) of identifiers.
+*/
+{
+    if (Offs != 0) {
+        unsigned I;
+
+        for (I = 0; I < CollCount (&E->HideSets); ++I) {
+            HiddenMacro* MHS = CollAtUnchecked (&E->HideSets, I);
+            HideRange* This;
+
+            for (This = MHS->HS; This != 0; This = This->Next) {
+                if (Idx < This->Start) {
+                    This->Start += Offs;
+                    This->End   += Offs;
+                } else if (Idx < This->End) {
+                    This->End   += Offs;
+                }
+            }
+        }
+    }
+}
+
+
+
+static void ME_RemoveToken (unsigned Idx, unsigned Count, MacroExp* E)
+/* Remove the Idx'th identifier token from tracking and offset all hidden
+** ranges accordingly.
+*/
+{
+    unsigned I;
+
+    for (I = 0; I < CollCount (&E->HideSets); ++I) {
+        HiddenMacro* MHS = CollAtUnchecked (&E->HideSets, I);
+        HideRange* This;
+        HideRange** Prev;
+
+        for (Prev = &MHS->HS, This = *Prev; This != 0; This = *Prev) {
+            if (Idx < This->Start) {
+                if (This->Start - Idx >= Count) {
+                    This->Start -= Count;
+                    This->End   -= Count;
+                } else {
+                    if (This->End - Idx > Count) {
+                        This->Start = Idx;
+                        This->End  -= Count;
+                    } else {
+                        /* Remove */
+                        (*Prev) = This->Next;
+                        FreeHideRange (This);
+                        continue;
+                    }
+                }
+            } else if (Idx < This->End) {
+                if (This->End - Idx > Count) {
+                    This->End -= Count;
+                } else {
+                    This->End = Idx;
+                }
+
+                if (This->End == This->Start) {
+                    /* Remove */
+                    (*Prev) = This->Next;
+                    FreeHideRange (This);
+                    continue;
+                }
+            }
+
+            Prev = &This->Next;
+        }
+    }
+}
+
+
+
+static void ME_AddArgHideSets (unsigned Idx, const MacroExp* A, MacroExp* Parent)
+/* Propagate the macro hide sets of the substituted argument starting as the
+** Idx'th identifier of the result.
+*/
+{
+    unsigned I;
+
+    /* Move the hide set generated with in the argument as it will be freed later */
+    for (I = 0; I < CollCount (&A->HideSets); ++I) {
+        HiddenMacro* MHS = CollAtUnchecked (&A->HideSets, I);
+        HideRange* HS;
+
+        for (HS = MHS->HS; HS != 0; HS = HS->Next) {
+            ME_HideMacro (Idx + HS->Start, HS->End - HS->Start, Parent, MHS->M);
+        }
+    }
+}
+
+
+
+static void ME_DoneHideSets (MacroExp* E)
+/* Free all of hidden macros for the macro expansion */
+{
+    unsigned I;
+
+    for (I = 0; I < CollCount (&E->HideSets); ++I) {
+        HiddenMacro* MHS = CollAtUnchecked (&E->HideSets, I);
+        FreeHiddenMacro (MHS);
+    }
+    DoneCollection (&E->HideSets);
+}
+
+
+
+static void ME_SetTokLens (MacroExp* E, unsigned TokLen)
+/* Set token lengths and flags for macro expansion struct */
+{
+    E->LastTokLen = TokLen;
+    if ((E->Flags & MES_FIRST_TOKEN) != 0) {
+        E->Flags &= ~MES_FIRST_TOKEN;
+        E->FirstTokLen = E->LastTokLen;
+    } else {
+        E->Flags |= MES_MULTIPLE_TOKEN;
+    }
+}
+
+
+
+static MacroExp* ME_MakeReplaced (MacroExp* A)
+/* Make a replaced version of the argument */
+{
+    /* Replace the parameter with actual argument tokens */
+    if ((A->Flags & MES_HAS_REPLACEMENT) == 0) {
+        A->Replaced = xmalloc (sizeof (MacroExp));
+
+        InitMacroExp (A->Replaced);
+        SB_Reset (&A->Tokens);
+
+        /* Propagate the hide sets */
+        ME_AddArgHideSets (0, A, A->Replaced);
+
+        /* Do macro expansion on the argument */
+        A->Replaced->IdentCount = ReplaceMacros (&A->Tokens,
+                                                 &A->Replaced->Tokens,
+                                                 A->Replaced,
+                                                 MSM_IN_ARG_EXPANSION);
+
+        A->Flags |= MES_HAS_REPLACEMENT;
+    }
+
+    return A->Replaced != 0 ? A->Replaced : A;
+}
+
+
+
+static MacroExp* ME_GetOriginalArg (const MacroExp* E, unsigned Index)
+/* Return an actual macro argument with the given index */
+{
+    return CollAt (&E->Args, Index);
+}
+
+
+
+static MacroExp* ME_GetReplacedArg (const MacroExp* E, unsigned Index)
+/* Return a replaced macro argument with the given index */
+{
+    return ME_MakeReplaced (CollAt (&E->Args, Index));
+}
+
+
+
+static MacroExp* ME_AppendArg (MacroExp* E, MacroExp* Arg)
+/* Add a copy of Arg to the list of actual macro arguments.
+** NOTE: This function will clear the token sequence of Arg!
+*/
+{
+    MacroExp* A = xmalloc (sizeof (MacroExp));
+
+    /* Initialize our MacroExp structure */
+    InitMacroExp (A);
+
+    /* Copy info about the original strings */
+    A->IdentCount  = Arg->IdentCount;
+    A->Flags       = Arg->Flags;
+    A->FirstTokLen = Arg->FirstTokLen;
+    A->LastTokLen  = Arg->LastTokLen;
+
+    /* Move the contents of Arg to A */
+    SB_Move (&A->Tokens, &Arg->Tokens);
+
+    /* Add A to the list of actual arguments */
+    CollAppend (&E->Args, A);
+
+    return A;
+}
+
+
+
+static void ME_ClearArgs (MacroExp* E)
+/* Clear all read arguments for macro expansion */
+{
+    unsigned I;
+
+    /* Delete the list with actual arguments */
+    for (I = 0; I < CollCount (&E->Args); ++I) {
+        MacroExp* A = CollAtUnchecked (&E->Args, I);
+
+        /* Destroy the macro expansion structure and then free memory allocated
+        ** for it.
+        */
+        DoneMacroExp (A);
+        xfree (A);
+    }
+
+    DoneCollection (&E->Args);
+    InitCollection (&E->Args);
+}
+
+
+
+static int ME_IsNextArgVariadic (const MacroExp* E, const Macro* M)
+/* Return true if the next actual argument we will add is a variadic one */
+{
+    return (M->Variadic &&
+            M->ParamCount == (int) CollCount (&E->Args) + 1);
+}
 
 
 
 static MacroExp* InitMacroExp (MacroExp* E)
 /* Initialize a MacroExp structure */
 {
-    InitCollection (&E->ActualArgs);
-    SB_Init (&E->Replacement);
+    InitCollection (&E->Args);
+    InitCollection (&E->HideSets);
+    SB_Init (&E->Tokens);
+    E->IdentCount   = 0;
+    E->Flags        = MES_FIRST_TOKEN;
+    E->Replaced     = 0;
+    E->FirstTokLen  = 0;
+    E->LastTokLen   = 0;
     return E;
 }
 
@@ -220,48 +660,12 @@ static MacroExp* InitMacroExp (MacroExp* E)
 static void DoneMacroExp (MacroExp* E)
 /* Cleanup after use of a MacroExp structure */
 {
-    unsigned I;
-
-    /* Delete the list with actual arguments */
-    for (I = 0; I < CollCount (&E->ActualArgs); ++I) {
-        FreeStrBuf (CollAtUnchecked (&E->ActualArgs, I));
+    ME_ClearArgs (E);
+    ME_DoneHideSets (E);
+    SB_Done (&E->Tokens);
+    if (E->Replaced != 0) {
+        DoneMacroExp (E->Replaced);
     }
-    DoneCollection (&E->ActualArgs);
-    SB_Done (&E->Replacement);
-}
-
-
-
-static void ME_AppendActual (MacroExp* E, StrBuf* Arg)
-/* Add a copy of Arg to the list of actual macro arguments.
-** NOTE: This function will clear Arg!
-*/
-{
-    /* Create a new string buffer */
-    StrBuf* A = NewStrBuf ();
-
-    /* Move the contents of Arg to A */
-    SB_Move (A, Arg);
-
-    /* Add A to the actual arguments */
-    CollAppend (&E->ActualArgs, A);
-}
-
-
-
-static StrBuf* ME_GetActual (MacroExp* E, unsigned Index)
-/* Return an actual macro argument with the given index */
-{
-    return CollAt (&E->ActualArgs, Index);
-}
-
-
-
-static int ME_ArgIsVariadic (const MacroExp* E, const Macro* M)
-/* Return true if the next actual argument we will add is a variadic one */
-{
-    return (M->Variadic &&
-            M->ArgCount == (int) CollCount (&E->ActualArgs) + 1);
 }
 
 
@@ -269,6 +673,17 @@ static int ME_ArgIsVariadic (const MacroExp* E, const Macro* M)
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
+
+
+
+static void PopRescanLine (void)
+/* Pop and free a rescan input line if it reaches the end */
+{
+    if (CurC == '\0' && CollCount (CurRescanStack) > 1) {
+        FreeStrBuf (CollPop (CurRescanStack));
+        InitLine (CollLast (CurRescanStack));
+    }
+}
 
 
 
@@ -431,6 +846,32 @@ static int SkipWhitespace (int SkipLines)
 {
     int Skipped = 0;
     int NewLine = 0;
+
+    if (CurRescanStack != 0 &&
+        CollCount (CurRescanStack) > 1 &&
+        Line == CollConstLast (CurRescanStack)) {
+        /* Rescanning */
+        while (1) {
+            if (IsSpace (CurC)) {
+                NextChar ();
+                Skipped = 1;
+            } else if (CurC == '/' && NextC == '*') {
+                OldStyleComment ();
+                Skipped = 1;
+            } else if (IS_Get (&Standard) >= STD_C99 && CurC == '/' && NextC == '/') {
+                NewStyleComment ();
+                Skipped = 1;
+            } else if (CurC == '\0') {
+                /* End of line, switch back input */
+                PopRescanLine ();
+                break;
+            } else {
+                /* No more white space */
+                break;
+            }
+        }
+    }
+
     while (1) {
         if (IsSpace (CurC)) {
             NextChar ();
@@ -521,6 +962,235 @@ static void CopyQuotedString (StrBuf* Target)
 
 
 
+static int GetPunc (char* S)
+/* Parse a punctuator token. Return 1 and store the parsed token string into S
+** on success, otherwise just return 0.
+*/
+{
+    char C;
+    switch (CurC) {
+
+        case '[':
+        case ']':
+        case '(':
+        case ')':
+        case '{':
+        case '}':
+        case '~':
+        case '?':
+        case ':':
+        case ';':
+        case ',':
+            /* C */
+            *S++ = CurC;
+            NextChar ();
+            break;
+
+        case '=':
+        case '#':
+            /* C or CC */
+            C = *S++ = CurC;
+            NextChar ();
+            if (CurC == C) {
+                *S++ = C;
+                NextChar ();
+            }
+            break;
+
+        case '*':
+        case '/':
+        case '%':
+        case '^':
+        case '!':
+            /* C or C= */
+            *S++ = CurC;
+            NextChar ();
+            if (CurC == '=') {
+                *S++ = CurC;
+                NextChar ();
+            }
+            break;
+
+        case '+':
+        case '&':
+        case '|':
+            /* C, CC or C= */
+            C = *S++ = CurC;
+            NextChar ();
+            if (CurC == C || CurC == '=') {
+                *S++ = CurC;
+                NextChar ();
+            }
+            break;
+
+        case '<':
+        case '>':
+            /* C, CC, C= or CC= */
+            C = *S++ = CurC;
+            NextChar ();
+            if (CurC == C) {
+                *S++ = CurC;
+                if (NextC == '=') {
+                    *S++ = NextC;
+                    NextChar ();
+                }
+                NextChar ();
+            } else if (CurC == '=') {
+                *S++ = CurC;
+                NextChar ();
+            }
+            break;
+
+        case '-':
+            /* C, CC, C= or C> */
+            *S++ = CurC;
+            NextChar ();
+            switch (CurC) {
+                case '-':
+                case '=':
+                case '>':
+                    *S++ = CurC;
+                    NextChar ();
+                    break;
+                default:
+                    break;
+            }
+            break;
+
+        case '.':
+            /* C or CCC */
+            *S++ = CurC;
+            NextChar ();
+            if (CurC == '.' && NextC == '.') {
+                *S++ = CurC;
+                *S++ = NextC;
+                NextChar ();
+                NextChar ();
+            }
+            break;
+
+        default:
+            return 0;
+
+    }
+
+    *S = '\0';
+    return 1;
+}
+
+
+
+static int TryPastePPTok (StrBuf* Target,
+                          StrBuf* Appended,
+                          unsigned FirstTokLen,
+                          unsigned SecondTokLen)
+/* Paste the whole appened pp-token sequence onto the end of the target
+** pp-token sequence. Diagnose if it fails to form a valid pp-token with the
+** two pp-tokens pasted together. Return 1 if succeeds.
+*/
+{
+    unsigned    TokLen;
+    StrBuf*     OldSource;
+    StrBuf      Src = AUTO_STRBUF_INITIALIZER;
+    StrBuf      Buf = AUTO_STRBUF_INITIALIZER;
+
+    if (FirstTokLen == 0 || SecondTokLen == 0) {
+        SB_Append (Target, Appended);
+        return 1;
+    }
+
+    PRECONDITION (SB_GetLen (Target) >= FirstTokLen &&
+                  SB_GetLen (Appended) >= SecondTokLen);
+
+    /* Special casing "..", "//" and "/*" */
+    if (FirstTokLen == 1) {
+        char C = SB_LookAt (Target, SB_GetLen (Target) - FirstTokLen);
+        char N = SB_LookAt (Appended, 0);
+        /* Avoid forming a comment introducer or an ellipsis. Note that an
+        ** ellipsis pp-token cannot be formed with macros anyway.
+        */
+        if ((C == '.' && N == '.') || (C == '/' && (N == '/' || N == '*'))) {
+            SB_AppendChar (Target, ' ');
+            SB_Append (Target, Appended);
+            PPWarning ("Pasting formed '%c%c', an invalid preprocessing token", C, N);
+
+            return 0;
+        }
+    }
+
+    SB_CopyBuf (&Src, SB_GetConstBuf (Target) + SB_GetLen (Target) - FirstTokLen, FirstTokLen);
+    if (SecondTokLen == SB_GetLen (Appended) || IsSpace (SB_LookAt (Appended, SecondTokLen))) {
+        SB_AppendBuf (&Src, SB_GetConstBuf (Appended), SecondTokLen);
+    } else {
+        SB_AppendBuf (&Src, SB_GetConstBuf (Appended), SecondTokLen + 1);
+    }
+
+    SB_Reset (&Src);
+    OldSource = InitLine (&Src);
+
+    if (IsPPNumber (CurC, NextC)) {
+        /* PP-number */
+        CopyPPNumber (&Buf);
+    } else if (IsQuote (CurC)) {
+        /* Quoted string */
+        CopyQuotedString (&Buf);
+    } else {
+        ident Ident;
+        if (GetPunc (Ident)) {
+            /* Punctuator */
+            SB_CopyStr (&Buf, Ident);
+        } else if (IsSym (Ident)) {
+            /* Identifier */
+            SB_CopyStr (&Buf, Ident);
+        } else {
+            /* Unknown */
+         }
+    }
+
+    TokLen = SB_GetLen (&Buf);
+    if (TokLen < FirstTokLen + SecondTokLen) {
+        /* The pasting doesn't form a valid pp-token */
+        while (SB_GetLen (&Buf) < FirstTokLen + SecondTokLen) {
+            SB_AppendChar (&Buf, CurC);
+            NextChar ();
+        }
+        SB_Terminate (&Buf);
+        PPWarning ("Pasting formed '%s', an invalid preprocessing token",
+                   SB_GetConstBuf (&Buf));
+
+        /* Add a space between the tokens to avoid problems in rescanning */
+        if (TokLen > FirstTokLen) {
+            SB_AppendChar (Target, ' ');
+        }
+        /* Append all remaining tokens */
+        SB_Append (Target, Appended);
+
+        /* No concatenation */
+        TokLen = FirstTokLen;
+    } else {
+        /* Add a space after the merged token if necessary */
+        SB_AppendBuf (Target, SB_GetConstBuf (Appended), SecondTokLen);
+        if (TokLen > FirstTokLen + SecondTokLen) {
+            SB_AppendChar (Target, ' ');
+        }
+        /* Append all remaining tokens */
+        SB_AppendBuf (Target,
+                      SB_GetConstBuf (Appended) + SecondTokLen,
+                      SB_GetLen (Appended) - SecondTokLen);
+    }
+
+    SB_Done (&Buf);
+    SB_Done (&Src);
+
+    /* Restore old source */
+    InitLine (OldSource);
+
+    /* Return if concatenation succeeded */
+    return TokLen != FirstTokLen;
+}
+
+
+
 static int CheckExtraTokens (const char* Name)
 /* Check for extra tokens at the end of the directive. Return 1 if there are
 ** extra tokens, otherwise 0.
@@ -542,180 +1212,297 @@ static int CheckExtraTokens (const char* Name)
 
 
 
-static void ReadMacroArgs (MacroExp* E, const Macro* M, int MultiLine)
-/* Identify the arguments to a macro call as-is */
+static unsigned ReadMacroArgs (unsigned NameIdx, MacroExp* E, const Macro* M, int MultiLine)
+/* Identify the arguments to a macro call as-is. Return the total count of
+** identifiers in the read argument list.
+*/
 {
-    int         MissingParen = 0;
-    unsigned    Parens;         /* Number of open parenthesis */
-    StrBuf      Arg = AUTO_STRBUF_INITIALIZER;
+    unsigned    Idx         = 0;
+    unsigned    CountInArg  = 0;
+    unsigned    Parens      = 0;                        /* Number of open parenthesis */
+    ident       Ident;
+    MacroExp    Arg;
+
+    InitMacroExp (&Arg);
 
     /* Eat the left paren */
     NextChar ();
 
     /* Read the actual macro arguments */
-    Parens = 0;
     while (1) {
         /* Squeeze runs of blanks within an arg */
         int OldPendingNewLines = PendingNewLines;
         int Skipped = SkipWhitespace (MultiLine);
-        if (MultiLine && CurC == '#') {
+
+        /* Directives can only be found in an argument list that spans
+        ** multiple lines.
+        */
+        if (MultiLine && OldPendingNewLines < PendingNewLines && CurC == '#') {
             int Newlines = 0;
 
-            while (CurC == '#') {
+            while (OldPendingNewLines < PendingNewLines && CurC == '#') {
                 Newlines += PendingNewLines - OldPendingNewLines;
                 PendingNewLines = OldPendingNewLines;
                 OldPendingNewLines = 0;
                 Skipped = ParseDirectives (MSM_IN_ARG_LIST) || Skipped;
-                Skipped = SkipWhitespace (MultiLine) || Skipped;
             }
             PendingNewLines += Newlines;
         }
-        if (Skipped && SB_NotEmpty (&Arg)) {
-            SB_AppendChar (&Arg, ' ');
+
+        /* Append a space as a separator */
+        if (Skipped && SB_NotEmpty (&Arg.Tokens)) {
+            SB_AppendChar (&Arg.Tokens, ' ');
+            Skipped = 1;
+        } else {
+            Skipped = 0;
         }
-        if (CurC == '(') {
 
-            /* Nested parenthesis */
-            SB_AppendChar (&Arg, CurC);
-            NextChar ();
-            ++Parens;
+        /* Finish reading the current argument if we are not inside nested
+        ** parentheses or a variadic macro argument.
+        */
+        if (Parens == 0 &&
+            ((CurC == ',' && !ME_IsNextArgVariadic (E, M)) || CurC == ')')) {
 
-        } else if (IsQuote (CurC)) {
-
-            /* Quoted string - just copy */
-            CopyQuotedString (&Arg);
-
-        } else if (CurC == ',' || CurC == ')') {
-
-            if (Parens) {
-                /* Comma or right paren inside nested parenthesis */
-                if (CurC == ')') {
-                    --Parens;
-                }
-                SB_AppendChar (&Arg, CurC);
-                NextChar ();
-            } else if (CurC == ',' && ME_ArgIsVariadic (E, M)) {
-                /* It's a comma, but we're inside a variadic macro argument, so
-                ** just copy it and proceed.
-                */
-                SB_AppendChar (&Arg, CurC);
-                NextChar ();
-            } else {
-                /* End of actual argument. Remove whitespace from the end. */
-                while (IsSpace (SB_LookAtLast (&Arg))) {
-                    SB_Drop (&Arg, 1);
-                }
-
-                /* If this is not the single empty argument for a macro with
-                ** an empty argument list, remember it.
-                */
-                if (CurC != ')' || SB_NotEmpty (&Arg) || M->ArgCount > 0) {
-                    ME_AppendActual (E, &Arg);
-                }
-
-                /* Check for end of macro param list */
-                if (CurC == ')') {
-                    NextChar ();
-                    break;
-                }
-
-                /* Start the next param */
-                NextChar ();
-                SB_Clear (&Arg);
+            /* End of actual argument. Remove whitespace from the end. */
+            while (IsSpace (SB_LookAtLast (&Arg.Tokens))) {
+                SB_Drop (&Arg.Tokens, 1);
             }
+
+            /* If this is not the single empty argument for a macro with an
+            ** empty argument list, remember it.
+            */
+            if (CurC != ')' || SB_NotEmpty (&Arg.Tokens) || M->ParamCount > 0) {
+                MacroExp* A = ME_AppendArg (E, &Arg);
+                unsigned I;
+
+                /* Copy the hide sets from the argument list */
+                for (I = 0; I < CollCount (&E->HideSets); ++I) {
+                    HiddenMacro* MHS = CollAtUnchecked (&E->HideSets, I);
+                    HideRange* HS;
+
+                    for (HS = MHS->HS; HS != 0; HS = HS->Next) {
+                        /* Get the correct hide range */
+                        unsigned Start = NameIdx + 1 + Idx;
+                        unsigned Len;
+                        if (HS->Start < Start) {
+                            if (HS->End > Start) {
+                                Len = HS->End - Start;
+                            } else {
+                                /* Out of the range */
+                                continue;
+                            }
+                            Start = 0;
+                        } else {
+                            Len   = HS->End - HS->Start;
+                            Start = HS->Start - Start;
+                        }
+                        if (Start + Len > Idx + CountInArg) {
+                            if (Idx + CountInArg > Start) {
+                                Len = Idx + CountInArg - Start;
+                            } else {
+                                /* Out of the range */
+                                break;
+                            }
+                        }
+                        ME_HideMacro (Start, Len, A, MHS->M);
+                    }
+                }
+
+                /* More argument info */
+                A->IdentCount = CountInArg;
+            }
+
+            Idx += CountInArg;
+
+            /* Check for end of macro param list */
+            if (CurC == ')') {
+                NextChar ();
+                break;
+            }
+
+            /* Start the next param */
+            NextChar ();
+            DoneMacroExp (&Arg);
+            InitMacroExp (&Arg);
+            CountInArg = 0;
+
+            continue;
+
         } else if (CurC == '\0') {
+
             /* End of input inside macro argument list */
             PPError ("Unterminated argument list invoking macro '%s'", M->Name);
-            MissingParen = 1;
+            Parens = -1;
             ClearLine ();
+            E->Flags |= MES_ERROR;
+            Idx = 0;
             break;
+
         } else {
-            /* Just copy the character */
-            SB_AppendChar (&Arg, CurC);
-            NextChar ();
+            unsigned LastLen = SB_GetLen (&Arg.Tokens);
+
+            if (IsSym (Ident)) {
+                /* Just copy the identifier */
+                SB_AppendStr (&Arg.Tokens, Ident);
+
+                /* Count identifiers */
+                ++CountInArg;
+
+                /* Used for concatentation check */
+                if ((Arg.Flags & MES_FIRST_TOKEN) != 0) {
+                    Arg.Flags |= MES_BEGIN_WITH_IDENT;
+                }
+            } else if (IsPPNumber (CurC, NextC)) {
+                /* Copy a pp-number */
+                CopyPPNumber (&Arg.Tokens);
+            } else if (IsQuote (CurC)) {
+                /* Quoted string - just copy */
+                CopyQuotedString (&Arg.Tokens);
+            } else if (GetPunc (Ident)) {
+                /* Check nested parentheses */
+                if (Ident[0] == '(') {
+                    /* Opening nested parenthesis */
+                    ++Parens;
+                } else if (Ident[0] == ')') {
+                    /* Closing nested parenthesis */
+                    --Parens;
+                }
+                /* Just copy the punctuator */
+                SB_AppendStr (&Arg.Tokens, Ident);
+            } else {
+                /* Just copy the character */
+                SB_AppendChar (&Arg.Tokens, CurC);
+                NextChar ();
+
+                /* But don't count it */
+                ++LastLen;
+            }
+
+            /* Used for concatentation check */
+            ME_SetTokLens (&Arg, SB_GetLen (&Arg.Tokens) - LastLen - Skipped);
         }
     }
 
     /* Compare formal and actual argument count */
-    if (CollCount (&E->ActualArgs) != (unsigned) M->ArgCount) {
+    if (CollCount (&E->Args) != (unsigned) M->ParamCount) {
 
-        if (!MissingParen) {
+        if (Parens == 0) {
             /* Argument count mismatch */
             PPError ("Macro argument count mismatch");
         }
 
         /* Be sure to make enough empty arguments available */
-        SB_Clear (&Arg);
-        while (CollCount (&E->ActualArgs) < (unsigned) M->ArgCount) {
-            ME_AppendActual (E, &Arg);
+        DoneMacroExp (&Arg);
+        InitMacroExp (&Arg);
+        Arg.Flags |= MES_HAS_REPLACEMENT;
+        while (CollCount (&E->Args) < (unsigned) M->ParamCount) {
+            ME_AppendArg (E, &Arg);
         }
     }
 
-    /* Deallocate string buf resources */
-    SB_Done (&Arg);
+    /* Deallocate argument resources */
+    DoneMacroExp (&Arg);
+
+    /* Return the total count of identifiers in the argument list */
+    return Idx;
 }
 
 
 
-static void SubstMacroArgs (MacroExp* E, Macro* M)
-/* Argument substitution according to ISO/IEC 9899:1999 (E), 6.10.3.1ff */
+static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, Macro* M, unsigned IdentCount)
+/* Argument substitution according to ISO/IEC 9899:1999 (E), 6.10.3.1ff.
+** Return the count of identifiers found in the result.
+*/
 {
+    unsigned    Idx         = NameIdx;
     ident       Ident;
-    int         ArgIdx;
+    unsigned    TokLen      = 0;
+    int         ParamIdx;
     StrBuf*     OldSource;
-    StrBuf*     Arg;
-    int         HaveSpace;
+    int         HaveSpace   = 0;
+    StrBuf      Buf         = AUTO_STRBUF_INITIALIZER;  /* Temporary buffer */
 
+    /* Remember the current input stack and disable it for now */
+    Collection* OldInputStack = UseInputStack (0);
 
-    /* Remember the current input and switch to the macro replacement. */
-    int OldIndex = SB_GetIndex (&M->Replacement);
+    /* Remember the current input and switch to the macro replacement */
+    unsigned    OldIndex = SB_GetIndex (&M->Replacement);
+
     SB_Reset (&M->Replacement);
     OldSource = InitLine (&M->Replacement);
 
-    /* Argument handling loop */
+    /* Substitution loop */
     while (CurC != '\0') {
+        int NeedPaste = 0;
 
         /* If we have an identifier, check if it's a macro */
         if (IsSym (Ident)) {
 
-            /* Check if it's a macro argument */
-            if ((ArgIdx = FindMacroArg (M, Ident)) >= 0) {
+            /* Remember and skip any following whitespace */
+            HaveSpace = SkipWhitespace (0);
 
-                /* A macro argument. Get the corresponding actual argument. */
-                Arg = ME_GetActual (E, ArgIdx);
-
-                /* Copy any following whitespace */
-                HaveSpace = SkipWhitespace (0);
+            /* Check if it's a macro parameter */
+            if ((ParamIdx = FindMacroParam (M, Ident)) >= 0) {
 
                 /* If a ## operator follows, we have to insert the actual
-                ** argument as is, otherwise it must be macro replaced.
+                ** argument as-is, otherwise it must be macro-replaced.
                 */
                 if (CurC == '#' && NextC == '#') {
 
-                    /* ### Add placemarker if necessary */
-                    SB_Append (&E->Replacement, Arg);
+                    /* Get the corresponding actual argument */
+                    const MacroExp* A = ME_GetOriginalArg (E, ParamIdx);
+
+                    /* For now we need no placemarkers */
+                    SB_Append (Target, &A->Tokens);
+
+                    /* Adjust tracking */
+                    ME_OffsetHideSets (Idx, A->IdentCount, E);
+                    Idx += A->IdentCount;
+
+                    /* This will be used for concatenation */
+                    TokLen = A->LastTokLen;
 
                 } else {
 
-                    /* Replace the formal argument by a macro replaced copy
-                    ** of the actual.
-                    */
-                    SB_Reset (Arg);
-                    MacroReplacement (Arg, &E->Replacement, 0);
+                    /* Get the corresponding macro-replaced argument */
+                    const MacroExp* A = ME_GetReplacedArg (E, ParamIdx);
 
-                    /* If we skipped whitespace before, re-add it now */
-                    if (HaveSpace) {
-                        SB_AppendChar (&E->Replacement, ' ');
-                    }
+                    /* Append the replaced string */
+                    SB_Append (Target, &A->Tokens);
+
+                    /* Insert the range of identifiers to parent preceding this argument */
+                    ME_OffsetHideSets (Idx, A->IdentCount, E);
+
+                    /* Add hide range */
+                    ME_AddArgHideSets (Idx, A, E);
+
+                    /* Adjust tracking */
+                    Idx += A->IdentCount;
+
+                    /* May be used for later pp-token merge check */
+                    TokLen = A->LastTokLen;
                 }
-
 
             } else {
 
                 /* An identifier, keep it */
-                SB_AppendStr (&E->Replacement, Ident);
+                SB_AppendStr (Target, Ident);
 
+                /* Adjust tracking */
+                ME_OffsetHideSets (Idx, 1, E);
+                ++Idx;
+
+                /* May be used for later concatenation */
+                TokLen = strlen (Ident);
             }
+
+            /* Squeeze and add the skipped whitespace back for consistency */
+            if (HaveSpace) {
+                SB_AppendChar (Target, ' ');
+            }
+
+            /* Done with this substituted argument */
+            continue;
 
         } else if (CurC == '#' && NextC == '#') {
 
@@ -724,126 +1511,256 @@ static void SubstMacroArgs (MacroExp* E, Macro* M)
             NextChar ();
             SkipWhitespace (0);
 
-            /* Since we need to concatenate the token sequences, remove
-            ** any whitespace that was added to target, since it must come
+            /* Since we need to concatenate the token sequences, remove the
+            ** last whitespace that was added to target, since it must come
             ** from the input.
             */
-            while (IsSpace (SB_LookAtLast (&E->Replacement))) {
-                SB_Drop (&E->Replacement, 1);
+            if (IsBlank (SB_LookAtLast (Target))) {
+                SB_Drop (Target, 1);
+                HaveSpace = 0;
             }
 
             /* If the next token is an identifier which is a macro argument,
-            ** replace it, otherwise do nothing.
+            ** replace it, otherwise just add it.
             */
             if (IsSym (Ident)) {
+                unsigned NewCount = 1;
 
-                /* Check if it's a macro argument */
-                if ((ArgIdx = FindMacroArg (M, Ident)) >= 0) {
+                /* Check if it's a macro parameter */
+                if ((ParamIdx = FindMacroParam (M, Ident)) >= 0) {
 
-                    /* Get the corresponding actual argument and add it. */
-                    SB_Append (&E->Replacement, ME_GetActual (E, ArgIdx));
+                    /* Get the corresponding actual argument */
+                    MacroExp* A = ME_GetOriginalArg (E, ParamIdx);
+
+                    /* Insert the range of identifiers to parent preceding this argument */
+                    ME_OffsetHideSets (Idx, A->IdentCount, E);
+
+                    /* Add hide range */
+                    ME_AddArgHideSets (Idx, A, E);
+
+                    /* Adjust tracking */
+                    NewCount = A->IdentCount;
+
+                    /* If the preceding pp-token is not a placemarker and is
+                    ** concatenated to with an identifier, the count of tracked
+                    ** identifiers is then one less.
+                    */
+                    if (TryPastePPTok (Target, &A->Tokens, TokLen, A->FirstTokLen)) {
+                        if (TokLen > 0 && (A->Flags & MES_BEGIN_WITH_IDENT) != 0) {
+                            --NewCount;
+                            ME_RemoveToken (Idx, 1, E);
+                        }
+                        if ((A->Flags & MES_MULTIPLE_TOKEN) == 0) {
+                            TokLen += A->FirstTokLen;
+                        } else {
+                            TokLen = A->LastTokLen;
+                        }
+                    } else {
+                        TokLen = A->LastTokLen;
+                    }
 
                 } else {
 
-                    /* Just an ordinary identifier - add as is */
-                    SB_AppendStr (&E->Replacement, Ident);
+                    unsigned Len;
+
+                    /* Just an ordinary identifier - add as-is */
+                    SB_CopyStr (&Buf, Ident);
+
+                    /* If the preceding pp-token is not a placemarker and is
+                    ** concatenated to with an identifier, the count of tracked
+                    ** identifiers is then one less.
+                    */
+                    Len = SB_GetLen (&Buf);
+                    if (TryPastePPTok (Target, &Buf, TokLen, Len)) {
+                        if (TokLen > 0) {
+                            --NewCount;
+                        }
+                        TokLen += Len;
+                    } else {
+                        TokLen = Len;
+                    }
+
+                    /* Adjust tracking */
+                    ME_OffsetHideSets (Idx, NewCount, E);
 
                 }
+
+                /* Adjust tracking */
+                Idx += NewCount;
+
+                /* Keep the whitespace for consistency */
+                HaveSpace = SkipWhitespace (0);
+                if (HaveSpace) {
+                    SB_AppendChar (Target, ' ');
+                }
+
+                /* Done with this concatenated identifier */
+                continue;
             }
 
-        } else if (CurC == '#' && M->ArgCount >= 0) {
+            if (CurC != '\0') {
+                /* Non-identifiers may still be pasted together */
+                NeedPaste = 1;
+            }
 
-            /* A # operator within a macro expansion of a function like
+        } else if (CurC == '#' && M->ParamCount >= 0) {
+
+            /* A # operator within a macro expansion of a function-like
             ** macro. Read the following identifier and check if it's a
             ** macro parameter.
             */
+            unsigned LastLen = SB_GetLen (Target);
+
             NextChar ();
             SkipWhitespace (0);
-            if (!IsSym (Ident) || (ArgIdx = FindMacroArg (M, Ident)) < 0) {
+            if (!IsSym (Ident) || (ParamIdx = FindMacroParam (M, Ident)) < 0) {
                 PPError ("'#' is not followed by a macro parameter");
             } else {
                 /* Make a valid string from Replacement */
-                Arg = ME_GetActual (E, ArgIdx);
-                SB_Reset (Arg);
-                Stringize (Arg, &E->Replacement);
+                MacroExp* A = ME_GetOriginalArg (E, ParamIdx);
+                SB_Reset (&A->Tokens);
+                Stringize (&A->Tokens, Target);
             }
 
-        } else if (IsQuote (CurC)) {
-            CopyQuotedString (&E->Replacement);
-        } else {
-            SB_AppendChar (&E->Replacement, CurC);
-            NextChar ();
+            TokLen = SB_GetLen (Target) - LastLen;
+
+            /* Done with this stringized argument */
+            continue;
+
         }
+
+        /* Use the temporary buffer */
+        SB_Clear (&Buf);
+        if (IsPPNumber (CurC, NextC)) {
+            CopyPPNumber (&Buf);
+        } else if (IsQuote (CurC)) {
+            CopyQuotedString (&Buf);
+        } else {
+            if (GetPunc (Ident)) {
+                SB_AppendStr (&Buf, Ident);
+            } else if (CurC != '\0') {
+                SB_AppendChar (&Buf, CurC);
+                NextChar ();
+            }
+        }
+
+        /* Squeeze any whitespace for consistency. Especially, comments must
+        ** be consumed before fed to the punctuator parser, or their leading
+        ** '/' characters would be parsed wrongly as division operators.
+        */
+        HaveSpace = SkipWhitespace (0);
+        if (HaveSpace) {
+            SB_AppendChar (&Buf, ' ');
+        }
+
+        if (NeedPaste) {
+            unsigned Len = SB_GetLen (&Buf);
+
+            /* Concatenate pp-tokens */
+            if (TryPastePPTok (Target, &Buf, TokLen, Len)) {
+                TokLen += Len - HaveSpace;
+            } else {
+                TokLen = Len - HaveSpace;
+            }
+        } else {
+            /* Just append the token */
+            SB_Append (Target, &Buf);
+            TokLen = SB_GetLen (&Buf) - HaveSpace;
+        }
+
     }
 
-#if 0
-    /* Remove whitespace from the end of the line */
-    while (IsSpace (SB_LookAtLast (&E->Replacement))) {
-        SB_Drop (&E->Replacement, 1);
-    }
-#endif
+    /* Done with the temporary buffer */
+    SB_Done (&Buf);
+
+    /* Remove the macro name itself together with the arguments (if any) */
+    ME_RemoveToken (Idx, 1 + IdentCount, E);
 
     /* Switch back the input */
+    UseInputStack (OldInputStack);
     InitLine (OldSource);
     SB_SetIndex (&M->Replacement, OldIndex);
+
+    /* Return the count of substituted identifiers */
+    return Idx - NameIdx;
 }
 
 
 
-static void ExpandMacro (StrBuf* Target, Macro* M, int MultiLine)
-/* Expand a macro into Target */
+static unsigned ExpandMacro (unsigned Idx, StrBuf* Target, MacroExp* E, Macro* M, int MultiLine)
+/* Expand a macro into Target. Return the count of identifiers in the result
+** of the expansion.
+*/
 {
-    MacroExp E;
+    /* Count of identifiers */
+    unsigned Count = 0;
 
-#if 0
+#if DEV_CC65_DEBUG
     static unsigned V = 0;
-    printf ("Expanding %s(%u)\n", M->Name, ++V);
+    printf ("Expanding (%u) %s\n", ++V, M->Name);
 #endif
-
-    /* Initialize our MacroExp structure */
-    InitMacroExp (&E);
 
     /* Check if this is a function like macro */
-    if (M->ArgCount >= 0) {
-
+    if (M->ParamCount >= 0) {
         /* Read the actual macro arguments (with the enclosing parentheses) */
-        ReadMacroArgs (&E, M, MultiLine);
-
+        Count = ReadMacroArgs (Idx, E, M, MultiLine);
     }
 
-    /* Replace macro arguments handling the # and ## operators */
-    SubstMacroArgs (&E, M);
+    if ((E->Flags & MES_ERROR) == 0) {
+        /* Replace macro parameters with arguments handling the # and ## operators */
+        Count = SubstMacroArgs (Idx, Target, E, M, Count);
+    } else {
+        SB_CopyStr (Target, M->Name);
+    }
 
-    /* Forbide repeated expansion of the same macro in use */
-    M->Expanding = 1;
-    MacroReplacement (&E.Replacement, Target, 0);
-    M->Expanding = 0;
+    if (CollCount (&E->Args) > 0) {
+        /* Clear all arguments */
+        ME_ClearArgs (E);
+    }
 
-#if 0
-    printf ("Done with %s(%u)\n", E.M->Name, V--);
+    /* Hide this macro for the whole result of this expansion */
+    ME_HideMacro (Idx, Count, E, M);
+
+#if DEV_CC65_DEBUG
+    printf ("Expanded (%u) %s to %d ident(s) at %u: %s\n",
+            V--, M->Name, Count, Idx, SB_GetConstBuf (Target));
 #endif
 
-    /* Free memory allocated for the macro expansion structure */
-    DoneMacroExp (&E);
+    return Count;
 }
 
 
 
-static void MacroReplacement (StrBuf* Source, StrBuf* Target, unsigned ModeFlags)
-/* Scan for and perform macro replacement */
+static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsigned ModeFlags)
+/* Scan for and perform macro replacement. Return the count of identifiers in
+** the replacement result.
+*/
 {
-    ident       Ident;
+    unsigned    Count       = 0;
+    StrBuf*     TmpTarget   = NewStrBuf ();
 
     /* Remember the current input and switch to Source */
-    StrBuf* OldSource = InitLine (Source);
+    StrBuf*     OldSource   = InitLine (Source);
+    Collection  RescanStack = AUTO_COLLECTION_INITIALIZER;
+    Collection* OldRescanStack = CurRescanStack;
+
+
+    CurRescanStack = &RescanStack;
+    CollAppend (CurRescanStack, Line);
 
     /* Loop substituting macros */
     while (CurC != '\0') {
+        int Skipped = 0;
+        ident Ident;
+
         /* If we have an identifier, check if it's a macro */
         if (IsSym (Ident)) {
             if ((ModeFlags & MSM_OP_DEFINED) != 0 && strcmp (Ident, "defined") == 0) {
                 /* Handle the "defined" operator */
                 int HaveParen = 0;
+
+                /* Eat the "defined" operator */
+                ME_RemoveToken (Count, 1, E);
 
                 SkipWhitespace (0);
                 if (CurC == '(') {
@@ -853,6 +1770,7 @@ static void MacroReplacement (StrBuf* Source, StrBuf* Target, unsigned ModeFlags
                 }
                 if (IsSym (Ident)) {
                     /* Eat the identifier */
+                    ME_RemoveToken (Count, 1, E);
                     SB_AppendChar (Target, IsMacro (Ident) ? '1' : '0');
                     if (HaveParen) {
                         SkipWhitespace (0);
@@ -869,25 +1787,46 @@ static void MacroReplacement (StrBuf* Source, StrBuf* Target, unsigned ModeFlags
                     SB_AppendChar (Target, '0');
                 }
             } else {
-                /* Check if it's an expandable macro */
                 Macro* M = FindMacro (Ident);
-                if (M != 0 && !M->Expanding) {
+
+                /* Check if it's an expandable macro */
+                if (M != 0 && ME_CanExpand (Count, E, M)) {
+                    int MultiLine = (ModeFlags & MSM_MULTILINE) != 0;
+
                     /* Check if this is a function-like macro */
-                    if (M->ArgCount >= 0) {
-                        int MultiLine  = (ModeFlags & MSM_MULTILINE) != 0;
-                        int Whitespace = SkipWhitespace (MultiLine);
+                    if (M->ParamCount >= 0) {
+                        int OldPendingNewLines = PendingNewLines;
+                        int HaveSpace = SkipWhitespace (MultiLine) > 0;
+
+                        /* A function-like macro name without an immediately
+                        ** following argument list is not subject to expansion.
+                        */
                         if (CurC != '(') {
-                            /* Function-like macro without an argument list is not replaced */
+                            /* No expansion */
+                            ++Count;
+
+                            /* Just keep the macro name */
                             SB_AppendStr (Target, M->Name);
-                            if (Whitespace > 0) {
+
+                            /* Keep tracking pp-token lengths */
+                            if ((ModeFlags & MSM_IN_ARG_EXPANSION) != 0) {
+                                /* Used for concatentation check */
+                                if ((E->Flags & MES_FIRST_TOKEN) != 0) {
+                                    E->Flags |= MES_BEGIN_WITH_IDENT;
+                                }
+                                ME_SetTokLens (E, strlen (M->Name));
+                            }
+
+                            /* Append back the whitespace */
+                            if (HaveSpace) {
                                 SB_AppendChar (Target, ' ');
                             }
 
-                            /* Directives can only be found in an argument list
-                            ** that spans multiple lines.
+                            /* Since we have already got on hold of the next
+                            ** line, we have to go on preprocessing them.
                             */
                             if (MultiLine) {
-                                if (CurC == '#') {
+                                if (OldPendingNewLines < PendingNewLines && CurC == '#') {
                                     /* If we were going to support #pragma in
                                     ** macro argument list, it would be output
                                     ** to OLine.
@@ -903,49 +1842,143 @@ static void MacroReplacement (StrBuf* Source, StrBuf* Target, unsigned ModeFlags
                                 /* Add the source info to preprocessor output if needed */
                                 AddPreLine (Target);
                             }
-                        } else {
-                            /* Function-like macro */
-                            if (OLine == 0) {
-                                OLine = Target;
-                                ExpandMacro (Target, M, MultiLine);
-                                OLine = 0;
-                            } else {
-                                ExpandMacro (Target, M, MultiLine);
-                            }
+
+                            /* Loop */
+                            goto Loop;
                         }
-                    } else {
-                        /* Object-like macro */
-                        ExpandMacro (Target, M, 0);
                     }
-                } else {
-                    /* An identifier, keep it */
-                    SB_AppendStr (Target, Ident);
+
+                    /* Either an object-like or function-like macro */
+                    MultiLine = MultiLine && M->ParamCount >= 0;
+
+                    /* If we were going to support #pragma in macro argument
+                    ** list, it would be output to OLine.
+                    */
+                    if (MultiLine && OLine == 0) {
+                        OLine = TmpTarget;
+                        ExpandMacro (Count, TmpTarget, E, M, MultiLine);
+                        OLine = 0;
+                    } else {
+                        ExpandMacro (Count, TmpTarget, E, M, MultiLine);
+                    }
+
+                    /* Check for errors in expansion */
+                    if ((E->Flags & MES_ERROR) != 0) {
+                        break;
+                    }
+
+                    /* Pop the current line if it is at the end */
+                    PopRescanLine ();
+
+                    if (SB_GetLen (TmpTarget) > 0) {
+                        /* Start rescanning from the temporary result */
+                        SB_Reset (TmpTarget);
+                        InitLine (TmpTarget);
+                        CollAppend (CurRescanStack, TmpTarget);
+
+                        /* Switch the buffers */
+                        TmpTarget = NewStrBuf ();
+                    }
+
+                    /* Since we are rescanning, we needn't add the
+                    ** count of just replaced identifiers right now.
+                    */
+                    continue;
+                }
+
+                /* An unexpandable identifier. Keep it. */
+                ++Count;
+                SB_AppendStr (Target, Ident);
+
+                /* Keep tracking pp-token lengths */
+                if ((ModeFlags & MSM_IN_ARG_EXPANSION) != 0) {
+                    /* Used for concatentation check */
+                    if ((E->Flags & MES_FIRST_TOKEN) != 0) {
+                        E->Flags |= MES_BEGIN_WITH_IDENT;
+                    }
+                    ME_SetTokLens (E, strlen (Ident));
                 }
             }
         } else {
+            unsigned LastLen = SB_GetLen (Target);
+
             if ((ModeFlags & MSM_TOK_HEADER) != 0 && (CurC == '<' || CurC == '\"')) {
                 CopyHeaderNameToken (Target);
+            } else if (IsPPNumber (CurC, NextC)) {
+                CopyPPNumber (Target);
             } else if (IsQuote (CurC)) {
                 CopyQuotedString (Target);
             } else {
-                int Whitespace = SkipWhitespace (0);
-                if (Whitespace) {
-                    SB_AppendChar (Target, ' ');
-                } else {
-                    SB_AppendChar (Target, CurC);
-                    NextChar ();
+                Skipped = SkipWhitespace (0);
+
+                /* Punctuators must be checked after whitespace since comments
+                ** introducers may be misinterpreted as division operators.
+                */
+                if (!Skipped) {
+                    if (GetPunc (Ident)) {
+                        SB_AppendStr (Target, Ident);
+                    } else {
+                        SB_AppendChar (Target, CurC);
+                        NextChar ();
+
+                        /* Don't count this character */
+                        ++LastLen;
+                    }
                 }
             }
+
+            /* Keep tracking pp-token lengths */
+            if ((ModeFlags & MSM_IN_ARG_EXPANSION) != 0) {
+                ME_SetTokLens (E, SB_GetLen (Target) - LastLen);
+            }
+        }
+
+Loop:
+        /* Switch back to the previous input stream if we have finished
+        ** rescanning the current one.
+        */
+        if (CurC == '\0' && CollCount (CurRescanStack) > 1) {
+            /* Check for rescan sequence end and pp-token pasting */
+            Skipped = SkipWhitespace (0) || Skipped;
+        }
+
+        /* Append a space if there hasn't been one */
+        if (Skipped && !IsSpace (SB_LookAtLast (Target))) {
+            SB_AppendChar (Target, ' ');
         }
     }
+
+    /* Append the remaining result */
+    SB_Append (Target, TmpTarget);
+
+    /* Done with the temporary buffer */
+    SB_Done (TmpTarget);
 
     /* Drop whitespace at the end */
     if (IsBlank (SB_LookAtLast (Target))) {
         SB_Drop (Target, 1);
     }
 
+    /* Sanity check */
+    if ((E->Flags & MES_ERROR) == 0) {
+        CHECK (CollCount (CurRescanStack) == 1);
+    }
+
+    /* Switch back to the old input stack */
+    while (CollCount (CurRescanStack) > 1) {
+        FreeStrBuf (CollPop (CurRescanStack));
+    }
+    CurRescanStack = OldRescanStack;
+
+    /* Done with the current input stack */
+    CHECK (CollCount (&RescanStack) == 1);
+    DoneCollection (&RescanStack);
+
     /* Switch back the input */
     InitLine (OldSource);
+
+    /* Return the count of identifiers */
+    return Count;
 }
 
 
@@ -960,7 +1993,7 @@ static void DoDefine (void)
 /* Process #define directive */
 {
     ident       Ident;
-    Macro*      M;
+    Macro*      M = 0;
     Macro*      Existing;
     int         C89;
     unsigned    Len;
@@ -968,7 +2001,7 @@ static void DoDefine (void)
     /* Read the macro name */
     SkipWhitespace (0);
     if (!MacName (Ident)) {
-        return;
+        goto Error_Handler;
     }
 
     /* Remember if we're in C89 mode */
@@ -977,20 +2010,20 @@ static void DoDefine (void)
     /* Check for forbidden macro names */
     if (strcmp (Ident, "defined") == 0) {
         PPError ("'%s' cannot be used as a macro name", Ident);
-        return;
+        goto Error_Handler;
     }
 
     /* Create a new macro definition */
     M = NewMacro (Ident);
 
-    /* Check if this is a function like macro */
+    /* Check if this is a function-like macro */
     if (CurC == '(') {
 
         /* Skip the left paren */
         NextChar ();
 
-        /* Set the marker that this is a function like macro */
-        M->ArgCount = 0;
+        /* Set the marker that this is a function-like macro */
+        M->ParamCount = 0;
 
         /* Read the formal parameter list */
         while (1) {
@@ -1009,23 +2042,21 @@ static void DoDefine (void)
                 NextChar ();
                 if (CurC != '.' || NextC != '.') {
                     PPError ("'...' expected");
-                    ClearLine ();
-                    FreeMacro (M);
-                    return;
+                    goto Error_Handler;
                 }
                 NextChar ();
                 NextChar ();
 
                 /* Remember that the macro is variadic and use __VA_ARGS__ as
-                ** the argument name.
+                ** the parameter name.
                 */
-                AddMacroArg (M, "__VA_ARGS__");
+                AddMacroParam (M, "__VA_ARGS__");
                 M->Variadic = 1;
 
             } else {
-                /* Must be macro argument name */
+                /* Must be macro parameter name */
                 if (MacName (Ident) == 0) {
-                    return;
+                    goto Error_Handler;
                 }
 
                 /* __VA_ARGS__ is only allowed in post-C89 mode */
@@ -1034,12 +2065,12 @@ static void DoDefine (void)
                                "of a C99 variadic macro");
                 }
 
-                /* Add the macro argument */
-                AddMacroArg (M, Ident);
+                /* Add the macro parameter */
+                AddMacroParam (M, Ident);
             }
 
             /* If we had an ellipsis, or the next char is not a comma, we've
-            ** reached the end of the macro argument list.
+            ** reached the end of the macro parameter list.
             */
             SkipWhitespace (0);
             if (M->Variadic || CurC != ',') {
@@ -1051,9 +2082,7 @@ static void DoDefine (void)
         /* Check for a right paren and eat it if we find one */
         if (CurC != ')') {
             PPError ("')' expected for macro definition");
-            ClearLine ();
-            FreeMacro (M);
-            return;
+            goto Error_Handler;
         }
         NextChar ();
     }
@@ -1081,14 +2110,12 @@ static void DoDefine (void)
             SB_LookAt (&M->Replacement, 1) == '#') {
             /* Diagnose and bail out */
             PPError ("'##' cannot appear at start of macro expansion");
-            FreeMacro (M);
-            return;
+            goto Error_Handler;
         } else if (SB_LookAt (&M->Replacement, Len - 1) == '#' &&
                    SB_LookAt (&M->Replacement, Len - 2) == '#') {
             /* Diagnose and bail out */
             PPError ("'##' cannot appear at end of macro expansion");
-            FreeMacro (M);
-            return;
+            goto Error_Handler;
         }
     }
 
@@ -1108,6 +2135,18 @@ static void DoDefine (void)
 
     /* Insert the new macro into the macro table */
     InsertMacro (M);
+
+    /* Success */
+    return;
+
+Error_Handler:
+
+    /* Cleanup */
+    ClearLine ();
+
+    if (M != 0) {
+        FreeMacro (M);
+    }
 }
 
 
@@ -1624,7 +2663,7 @@ static int ParseDirectives (unsigned ModeFlags)
         Whitespace = SkipWhitespace (0) || Whitespace;
     }
 
-    return Whitespace != 0;
+    return Whitespace;
 }
 
 
@@ -1715,7 +2754,7 @@ static void PreprocessDirective (StrBuf* Source, StrBuf* Target, unsigned ModeFl
 
     SkipWhitespace (0);
     InitMacroExp (&E);
-    MacroReplacement (Source, Target, ModeFlags | MSM_IN_DIRECTIVE);
+    ReplaceMacros (Source, Target, &E, ModeFlags | MSM_IN_DIRECTIVE);
     DoneMacroExp (&E);
 
     /* Restore the source input index */
@@ -1727,6 +2766,8 @@ static void PreprocessDirective (StrBuf* Source, StrBuf* Target, unsigned ModeFl
 void Preprocess (void)
 /* Preprocess lines count of which is affected by directives */
 {
+    MacroExp E;
+
     SB_Clear (PLine);
 
     /* Add the source info to preprocessor output if needed */
@@ -1744,7 +2785,9 @@ void Preprocess (void)
     AppendIndent (PLine, SB_GetIndex (Line));
 
     /* Expand macros if any */
-    MacroReplacement (Line, PLine, MSM_MULTILINE);
+    InitMacroExp (&E);
+    ReplaceMacros (Line, PLine, &E, MSM_MULTILINE);
+    DoneMacroExp (&E);
 
     /* Add the source info to preprocessor output if needed */
     AddPreLine (PLine);

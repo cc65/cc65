@@ -9,11 +9,13 @@ ifdef CMD_EXE
   NULLDEV = nul:
   MKDIR = mkdir $(subst /,\,$1)
   RMDIR = -rmdir /s /q $(subst /,\,$1)
+  CATRES =
 else
   S = /
   NULLDEV = /dev/null
   MKDIR = mkdir -p $1
   RMDIR = $(RM) -r $1
+  CATRES = || (cat $(WORKDIR)/$$@.out && false)
 endif
 
 ifdef QUIET
@@ -51,7 +53,7 @@ $(WORKDIR)/%.$1.$2.prg: %.c | $(WORKDIR)
 	$(CC65) -t sim$2 $$(CC65FLAGS) --add-source -$1 -o $$(@:.prg=.s) $$< $(NULLERR)
 	$(CA65) -t sim$2 -o $$(@:.prg=.o) $$(@:.prg=.s) $(NULLERR)
 	$(LD65) -t sim$2 -o $$@ $$(@:.prg=.o) sim$2.lib $(NULLERR)
-	$(SIM65) $(SIM65FLAGS) $$@ > $(WORKDIR)/$$@.out
+	$(SIM65) $(SIM65FLAGS) $$@ > $(WORKDIR)/$$@.out $(CATRES)
 
 endef # PRG_template
 

@@ -1145,10 +1145,6 @@ static void Primary (ExprDesc* E)
                     /* Enum or some other numeric constant */
                     E->Flags = E_LOC_NONE | E_RTYPE_RVAL;
                     E->IVal  = Sym->V.ConstVal;
-                } else if ((Sym->Flags & SC_FUNC) == SC_FUNC) {
-                    /* Function */
-                    E->Flags = E_LOC_GLOBAL | E_RTYPE_LVAL;
-                    E->Name  = (uintptr_t) Sym->Name;
                 } else if ((Sym->Flags & SC_AUTO) == SC_AUTO) {
                     /* Local variable. If this is a parameter for a variadic
                     ** function, we have to add some address calculations, and the
@@ -1163,6 +1159,10 @@ static void Primary (ExprDesc* E)
                         E->Flags = E_LOC_STACK | E_RTYPE_LVAL;
                         E->IVal  = Sym->V.Offs;
                     }
+                } else if ((Sym->Flags & SC_FUNC) == SC_FUNC) {
+                    /* Function */
+                    E->Flags = E_LOC_GLOBAL | E_RTYPE_LVAL;
+                    E->Name  = (uintptr_t) Sym->Name;
                 } else if ((Sym->Flags & SC_REGISTER) == SC_REGISTER) {
                     /* Register variable, zero page based */
                     E->Flags = E_LOC_REGISTER | E_RTYPE_LVAL;

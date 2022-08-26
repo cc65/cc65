@@ -396,6 +396,10 @@ void Compile (const char* FileName)
         DefineNumericMacro ("__EAGERLY_INLINE_FUNCS__", 1);
     }
 
+    /* Placeholders for __FILE__ and __LINE__ macros */
+    DefineTextMacro ("__FILE__", "");
+    DefineTextMacro ("__LINE__", "");
+
     /* __TIME__ and __DATE__ macros */
     Time = time (0);
     TM   = localtime (&Time);

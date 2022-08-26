@@ -848,16 +848,7 @@ void NextToken (void)
         /* No reserved word, check for special symbols */
         if (token[0] == '_' && token[1] == '_') {
             /* Special symbols */
-            if (strcmp (token+2, "FILE__") == 0) {
-                NextTok.SVal = AddLiteral (GetCurrentFile());
-                NextTok.Tok  = TOK_SCONST;
-                return;
-            } else if (strcmp (token+2, "LINE__") == 0) {
-                NextTok.Tok  = TOK_ICONST;
-                NextTok.IVal = GetCurrentLine();
-                NextTok.Type = type_int;
-                return;
-            } else if (strcmp (token+2, "func__") == 0) {
+            if (strcmp (token+2, "func__") == 0) {
                 /* __func__ is only defined in functions */
                 if (CurrentFunc) {
                     NextTok.SVal = AddLiteral (F_GetFuncName (CurrentFunc));

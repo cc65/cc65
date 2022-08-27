@@ -59,6 +59,14 @@ $(ISEQUAL): ../isequal.c | $(WORKDIR)
 define PRG_template
 
 # should compile, but gives an error
+$(WORKDIR)/bug1252.$1.$2.prg: bug1252.c | $(WORKDIR)
+	@echo "FIXME: " $$@ "currently does not compile."
+	$(if $(QUIET),echo misc/bug1252.$1.$2.prg)
+	$(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
+	$(NOT) $(CA65) -t sim$2 -o $$(@:.prg=.o) $$(@:.prg=.s) $(NULLERR)
+#	$(NOT) $(LD65) -t sim$2 -o $$@ $$(@:.prg=.o) sim$2.lib $(NULLERR)
+
+# should compile, but gives an error
 $(WORKDIR)/bug1768.$1.$2.prg: bug1768.c | $(WORKDIR)
 	@echo "FIXME: " $$@ "currently does not compile."
 	$(if $(QUIET),echo misc/bug1768.$1.$2.prg)

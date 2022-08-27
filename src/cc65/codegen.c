@@ -4921,5 +4921,19 @@ void g_switch (Collection* Nodes, unsigned DefaultLabel, unsigned Depth)
 void g_asmcode (struct StrBuf* B)
 /* Output one line of assembler code. */
 {
-    AddCodeLine ("%.*s", (int) SB_GetLen (B), SB_GetConstBuf (B));
+    int len = (int) SB_GetLen(B);
+    const char *buf = SB_GetConstBuf(B);
+
+    /* remove whitespace at end of line so it does not interfere with label refs */
+    while (len) {
+       switch (buf[len - 1]) {
+       case '\n':
+       case ' ':
+       case '\t':
+           --len;
+           continue;
+       }
+       break;
+    }
+    AddCodeLine ("%.*s", len, buf);
 }

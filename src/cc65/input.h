@@ -122,6 +122,15 @@ const char* GetCurrentFile (void);
 unsigned GetCurrentLine (void);
 /* Return the line number in the current input file */
 
+void SetCurrentLine (unsigned LineNum);
+/* Set the line number in the current input file */
+
+void SetCurrentFilename (const char* Name);
+/* Set the presumed name of the current input file */
+
+unsigned GetCurrentCounter (void);
+/* Return the counter number in the current input file */
+
 void CreateDependencies (void);
 /* Create dependency files requested by the user */
 

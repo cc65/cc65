@@ -92,6 +92,7 @@ struct AFile {
     FILE*       F;              /* Input file stream */
     IFile*      Input;          /* Points to corresponding IFile */
     int         SearchPath;     /* True if we've added a path for this file */
+    char*       PName;          /* Presumed name of the file */
     PPIfStack   IfStack;        /* PP #if stack */
     int         MissingNL;      /* Last input line was missing a newline */
 };
@@ -104,6 +105,9 @@ static Collection AFiles = STATIC_COLLECTION_INITIALIZER;
 
 /* Input stack used when preprocessing. */
 static Collection InputStack = STATIC_COLLECTION_INITIALIZER;
+
+/* Counter for the __COUNTER__ macro */
+static unsigned MainFileCounter;
 
 
 
@@ -159,6 +163,7 @@ static AFile* NewAFile (IFile* IF, FILE* F)
     AF->Line  = 0;
     AF->F     = F;
     AF->Input = IF;
+    AF->PName = 0;
     AF->IfStack.Index = -1;
     AF->MissingNL = 0;
 
@@ -209,6 +214,9 @@ static AFile* NewAFile (IFile* IF, FILE* F)
 static void FreeAFile (AFile* AF)
 /* Free an AFile structure */
 {
+    if (AF->PName != 0) {
+        xfree (AF->PName);
+    }
     xfree (AF);
 }
 
@@ -275,6 +283,9 @@ void OpenMainFile (const char* Name)
     ** the main file before the first line is read.
     */
     UpdateLineInfo (MainFile->Input, MainFile->Line, Line);
+
+    /* Initialize the __COUNTER__ counter */
+    MainFileCounter = 0;
 }
 
 
@@ -599,8 +610,8 @@ const char* GetCurrentFile (void)
 {
     unsigned AFileCount = CollCount (&AFiles);
     if (AFileCount > 0) {
-        const AFile* AF = (const AFile*) CollAt (&AFiles, AFileCount-1);
-        return AF->Input->Name;
+        const AFile* AF = CollLast (&AFiles);
+        return AF->PName == 0 ? AF->Input->Name : AF->PName;
     } else {
         /* No open file */
         return "(outside file scope)";
@@ -614,12 +625,49 @@ unsigned GetCurrentLine (void)
 {
     unsigned AFileCount = CollCount (&AFiles);
     if (AFileCount > 0) {
-        const AFile* AF = (const AFile*) CollAt (&AFiles, AFileCount-1);
+        const AFile* AF = CollLast (&AFiles);
         return AF->Line;
     } else {
         /* No open file */
         return 0;
     }
+}
+
+
+
+void SetCurrentLine (unsigned LineNum)
+/* Set the line number in the current input file */
+{
+    unsigned AFileCount = CollCount (&AFiles);
+    if (AFileCount > 0) {
+        AFile* AF = CollLast (&AFiles);
+        AF->Line = LineNum;
+    }
+}
+
+
+
+void SetCurrentFilename (const char* Name)
+/* Set the presumed name of the current input file */
+{
+    unsigned AFileCount = CollCount (&AFiles);
+    if (AFileCount > 0) {
+        size_t Len = strlen (Name);
+        AFile* AF = CollLast (&AFiles);
+        if (AF->PName != 0) {
+            xfree (AF->PName);
+        }
+        AF->PName = xmalloc (Len + 1);
+        memcpy (AF->PName, Name, Len + 1);
+    }
+}
+
+
+
+unsigned GetCurrentCounter (void)
+/* Return the counter number in the current input file */
+{
+    return MainFileCounter++;
 }
 
 

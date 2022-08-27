@@ -1630,9 +1630,15 @@ static int ParseDirectives (unsigned ModeFlags)
 
 
 void HandleSpecialMacro (Macro* M, const char* Name)
-/* Handle special mandatory macros */
+/* Handle special "magic" macros that may change */
 {
-    if (strcmp (Name, "__LINE__") == 0) {
+    if (strcmp (Name, "__COUNTER__") == 0) {
+        /* Replace __COUNTER__ with the current counter number */
+        if (IS_Get (&Standard) < STD_CC65) {
+            PPWarning ("__COUNTER__ is a cc65 extension");
+        }
+        SB_Printf (&M->Replacement, "%u", GetCurrentCounter ());
+    } else if (strcmp (Name, "__LINE__") == 0) {
         /* Replace __LINE__ with the current line number */
         SB_Printf (&M->Replacement, "%u", GetCurrentLine ());
     } else if (strcmp (Name, "__FILE__") == 0) {

@@ -128,6 +128,9 @@ void SetCurrentLine (unsigned LineNum);
 void SetCurrentFilename (const char* Name);
 /* Set the presumed name of the current input file */
 
+unsigned GetCurrentCounter (void);
+/* Return the counter number in the current input file */
+
 void CreateDependencies (void);
 /* Create dependency files requested by the user */
 

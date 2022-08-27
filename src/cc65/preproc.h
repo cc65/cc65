@@ -91,7 +91,7 @@ void DonePreprocess (void);
 /* Done with preprocessor */
 
 void HandleSpecialMacro (Macro* M, const char* Name);
-/* Handle special mandatory macros */
+/* Handle special "magic" macros that may change */
 
 
 

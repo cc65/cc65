@@ -106,6 +106,9 @@ static Collection AFiles = STATIC_COLLECTION_INITIALIZER;
 /* Input stack used when preprocessing. */
 static Collection InputStack = STATIC_COLLECTION_INITIALIZER;
 
+/* Counter for the __COUNTER__ macro */
+static unsigned MainFileCounter;
+
 
 
 /*****************************************************************************/
@@ -280,6 +283,9 @@ void OpenMainFile (const char* Name)
     ** the main file before the first line is read.
     */
     UpdateLineInfo (MainFile->Input, MainFile->Line, Line);
+
+    /* Initialize the __COUNTER__ counter */
+    MainFileCounter = 0;
 }
 
 
@@ -654,6 +660,14 @@ void SetCurrentFilename (const char* Name)
         AF->PName = xmalloc (Len + 1);
         memcpy (AF->PName, Name, Len + 1);
     }
+}
+
+
+
+unsigned GetCurrentCounter (void)
+/* Return the counter number in the current input file */
+{
+    return MainFileCounter++;
 }
 
 

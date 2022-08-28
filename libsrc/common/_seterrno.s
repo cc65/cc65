@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 2004-05-13
 ;
-; ___seterrno: Will set __errno to the value in A and return zero in A. Other
+; ___seterrno: Will set ___errno to the value in A and return zero in A. Other
 ;             registers aren't changed. The function is C callable, but
 ;             currently only called from asm code.
 ;
@@ -12,9 +12,9 @@
 
 .proc   ___seterrno
 
-        sta     __errno
+        sta     ___errno
         lda     #0
-        sta     __errno+1
+        sta     ___errno+1
         rts
 
 .endproc

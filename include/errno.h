@@ -101,10 +101,20 @@ int __fastcall__ __osmaperrno (unsigned char oserror);
 unsigned char __fastcall__ __seterrno (unsigned char code);
 /* Set errno to a specific error code and return zero. Used by the library */
 
+#if __CC65_STD__ >= __CC65_STD_CC65__
+/* define the name with just one underscore for backwards compatibility */
+#define _seterrno __seterrno
+#endif
+
 int __fastcall__ __directerrno (unsigned char code);
 /* Set errno to a specific error code, clear __oserror and return -1. Used
 ** by the library.
 */
+
+#if __CC65_STD__ >= __CC65_STD_CC65__
+/* define the name with just one underscore for backwards compatibility */
+#define _directerrno __directerrno
+#endif
 
 int __fastcall__ __mappederrno (unsigned char code);
 /* Set __oserror to the given platform specific error code. If it is a real
@@ -113,7 +123,10 @@ int __fastcall__ __mappederrno (unsigned char code);
 ** Used by the library.
 */
 
-
+#if __CC65_STD__ >= __CC65_STD_CC65__
+/* define the name with just one underscore for backwards compatibility */
+#define _mappederrno __mappederrno
+#endif
 
 /* End of errno.h */
 #endif

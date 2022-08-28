@@ -399,7 +399,10 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
 
         default:
             /* Absolute, maybe indexed */
-            L = ReadToken (L, ",", Arg, sizeof (Arg));
+            L = ReadToken (L, ", ", Arg, sizeof (Arg));
+            if (*L == ' ') {
+                L = SkipSpace (L+1);
+            }
             if (*L == '\0') {
                 /* Absolute, zeropage or branch */
                 if ((OPC->Info & OF_BRA) != 0) {

@@ -73,7 +73,7 @@ oserr:  jsr     ___mappederrno
         iny
         lda     #$00
         sta     (ptr1),y
-        sta     ___oserror       ; Clear __oserror
+        sta     ___oserror      ; Clear __oserror
 
         ; Success, return buf
         lda     ptr1

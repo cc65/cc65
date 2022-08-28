@@ -69,7 +69,7 @@
 
 invmode:
         lda     #EINVAL
-        jsr     ___seterrno      ; Set __errno, returns zero in A
+        jsr     ___seterrno     ; Set __errno, returns zero in A
         tax                     ; a/x = 0
         jmp     incsp4
 

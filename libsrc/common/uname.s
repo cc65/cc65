@@ -15,7 +15,7 @@
 .proc   _uname
 
         jsr     __sysuname      ; Call the machine specific function
-        jmp     ___mappederrno   ; Store into __oserror, set errno, return 0/-1
+        jmp     ___mappederrno  ; Store into __oserror, set errno, return 0/-1
 
 .endproc
 

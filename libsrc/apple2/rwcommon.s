@@ -49,7 +49,7 @@ rwcommon:
 
 rwepilog:
         ; Return success
-        sta     ___oserror       ; A = 0
+        sta     ___oserror      ; A = 0
         lda     mliparam + MLI::RW::TRANS_COUNT
         ldx     mliparam + MLI::RW::TRANS_COUNT+1
         rts

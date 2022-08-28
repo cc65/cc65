@@ -21,7 +21,7 @@
 ; seeking not supported, return -1 and ENOSYS errno value
 no_supp:jsr     incsp6
         lda     #<ENOSYS
-        jsr     ___directerrno   ; returns with $FFFF in AX
+        jsr     ___directerrno  ; returns with $FFFF in AX
         sta     sreg
         sta     sreg+1
         rts
@@ -94,7 +94,7 @@ xxerr:  tya
         pha
         jsr     incsp6
         pla
-        jsr     ___mappederrno   ; returns with $FFFF in AX
+        jsr     ___mappederrno  ; returns with $FFFF in AX
         sta     sreg
         sta     sreg+1
         rts

@@ -148,7 +148,7 @@ copycd: lda     #ATEOL
         pha                     ; remember error code
         jsr     close           ; close the IOCB (required even if open failed)
         pla                     ; put error code back into A
-setmerr:jmp     ___mappederrno   ; update errno from OS specific error code in A
+setmerr:jmp     ___mappederrno  ; update errno from OS specific error code in A
 
 openok: lda     #>buf
         sta     ICBAH,x         ; set buffer address

@@ -140,7 +140,7 @@ L0:     ldy     #EINVAL
         pla                     ; Drop ap
         pla
         tya
-        jsr     ___directerrno   ; Return -1
+        jsr     ___directerrno  ; Return -1
         jmp     incsp6          ; Drop parameters
 
 

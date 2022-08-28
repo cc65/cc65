@@ -19,11 +19,11 @@
 ; */
 
 ___mappederrno:
-        sta     ___oserror               ; Store the error code
+        sta     ___oserror              ; Store the error code
         tax                             ; Did we have an error?
         bze     ok                      ; Branch if no
-        jsr     ___osmaperrno            ; Map OS error into errno code
-        jsr     ___seterrno              ; Save in errno (returns with .A = 0)
+        jsr     ___osmaperrno           ; Map OS error into errno code
+        jsr     ___seterrno             ; Save in errno (returns with .A = 0)
 .if (.cpu .bitand CPU_ISET_65SC02)
         dec     a
 .else

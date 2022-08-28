@@ -55,7 +55,7 @@
 
         jsr     CKOUT
         bcc     @L2
-@error: jmp     ___mappederrno   ; Store into ___oserror, map to errno, return -1
+@error: jmp     ___mappederrno  ; Store into ___oserror, map to errno, return -1
 
 ; Output the next character from the buffer
 
@@ -112,6 +112,6 @@ devnotpresent:
 
 invalidfd:
         lda     #EBADF
-        jmp     ___directerrno   ; Sets _errno, clears __oserror, returns -1
+        jmp     ___directerrno  ; Sets _errno, clears __oserror, returns -1
 
 .endproc

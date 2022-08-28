@@ -18,7 +18,7 @@
         jsr     CIOV
         bmi     closerr
 ok:     ldx     #0
-        stx     ___oserror               ; clear system specific error code
+        stx     ___oserror              ; clear system specific error code
         txa
         rts
 

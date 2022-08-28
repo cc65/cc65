@@ -189,7 +189,7 @@ nofile:                         ; ... else use SA=0 (read)
 
         txa                     ; Handle
         ldx     #0
-        stx     ___oserror       ; Clear __oserror
+        stx     ___oserror      ; Clear __oserror
         rts
 
 .endproc

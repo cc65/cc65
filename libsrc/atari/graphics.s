@@ -45,7 +45,7 @@ parmok: jsr     findfreeiocb
         beq     iocbok          ; we found one
 
         lda     #<EMFILE        ; "too many open files"
-seterr: jsr     ___mappederrno   ; @@@ probably not correct to set errno here @@@
+seterr: jsr     ___mappederrno  ; @@@ probably not correct to set errno here @@@
         rts                     ; return -1
 
 ;invmode:ldx    #>EINVAL

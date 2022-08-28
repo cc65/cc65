@@ -66,7 +66,7 @@
 
         jsr     CHKIN
         bcc     @L3             ; Branch if ok
-        jmp     ___mappederrno   ; Store into ___oserror, map to errno, return -1
+        jmp     ___mappederrno  ; Store into ___oserror, map to errno, return -1
 
 ; Read the next byte
 
@@ -141,7 +141,7 @@ devnotpresent:
 
 invalidfd:
         lda     #EBADF
-        jmp     ___directerrno   ; Sets _errno, clears __oserror, returns -1
+        jmp     ___directerrno  ; Sets _errno, clears __oserror, returns -1
 
 .endproc
 

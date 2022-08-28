@@ -49,7 +49,7 @@ _dio_open:
         sta     sectsizetab+sst_flag,x          ; set flag that drive is "open"
         lda     #0
         sta     sectsizetab+sst_sectsize+1,x
-        sta     ___oserror                       ; success
+        sta     ___oserror                      ; success
         tya
         sta     sectsizetab+sst_driveno,x
         stx     ptr2
@@ -156,7 +156,7 @@ s128:   lda     #128
         lda     #0
         ldy     #sst_flag
         sta     (ptr2),y
-        sta     ___oserror       ; success
+        sta     ___oserror      ; success
         tax
         rts                     ; return no error
 

@@ -33,7 +33,7 @@ done:   lda     ICBLL,x         ; buf len lo
         lda     ICBLH,x         ; get buf len hi
         tax                     ; to X
 okdone: lda     #0
-        sta     ___oserror       ; clear system dependend error code
+        sta     ___oserror      ; clear system dependend error code
         pla                     ; get buf len lo
         rts
 

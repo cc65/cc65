@@ -75,14 +75,14 @@ _open:
         .byte $2c               ; skip
 @alreadyopen:
         lda #EMFILE             ; too many opened files (there can be only one)
-        jmp ___directerrno       ; set errno, clear oserror, return -1
+        jmp ___directerrno      ; set errno, clear oserror, return -1
 @oserror:
-        jmp ___mappederrno       ; set platform error code, return -1
+        jmp ___mappederrno      ; set platform error code, return -1
 
 _close:
         lda #0
         sta ___oserror
-        jsr ___seterrno          ; clear errors
+        jsr ___seterrno         ; clear errors
         lda #0                  ; clear fd
         sta filedesc
         tax
@@ -111,13 +111,13 @@ _read:
 
 @filenotopen:
         lda #EBADF
-        jmp ___directerrno       ; Sets _errno, clears __oserror, returns -1
+        jmp ___directerrno      ; Sets _errno, clears __oserror, returns -1
 
 @fileok:
         lda #0
         sta ptr3
         sta ptr3+1              ; put 0 into ptr3 (number of bytes read)
-        sta ___oserror           ; clear error flags
+        sta ___oserror          ; clear error flags
         jsr ___seterrno
 
         lda f_track             ; restore stuff for ReadByte
@@ -147,11 +147,11 @@ _read:
         bne @L2
         inc ptr3+1
 
-@L2:    lda ___oserror           ; was there error ?
+@L2:    lda ___oserror          ; was there error ?
         beq @L3
         cmp #BFR_OVERFLOW       ; EOF?
         beq @done               ; yes, we're done
-        jmp ___mappederrno       ; no, we're screwed
+        jmp ___mappederrno      ; no, we're screwed
 
 @L3:    dec ptr1                ; decrement the count
         bne @L0

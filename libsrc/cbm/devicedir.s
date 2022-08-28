@@ -52,7 +52,7 @@ fail:   lda     #0              ; Return NULL
 
 okay:   lda     fnunit          ; Set by diskinit
         jsr     devicestr       ; Returns 0 in A
-        sta     ___oserror       ; Clear __oserror
+        sta     ___oserror      ; Clear __oserror
 
 ; Success, return buf
 

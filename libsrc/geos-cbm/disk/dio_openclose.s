@@ -80,6 +80,6 @@ _dio_close:
         lda #0
         ldy #sst_flag
         sta (ptr1),y
-        sta ___oserror           ; success
+        sta ___oserror          ; success
         tax
         rts                     ; return no error

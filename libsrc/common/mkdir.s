@@ -15,6 +15,6 @@
 .proc   _mkdir
 
         jsr     __sysmkdir      ; Call the machine specific function
-        jmp     ___mappederrno   ; Store into __oserror, set errno, return 0/-1
+        jmp     ___mappederrno  ; Store into __oserror, set errno, return 0/-1
 
 .endproc

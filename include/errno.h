@@ -45,12 +45,17 @@
 
 
 /* Operating system specific error code */
-extern unsigned char _oserror;
+extern unsigned char __oserror;
 
-extern int _errno;
+#if __CC65_STD__ >= __CC65_STD_CC65__
+/* define the name with just one underscore for backwards compatibility */
+#define _oserror __oserror
+#endif
+
+extern int __errno;
 /* System errors go here */
 
-#define errno   _errno
+#define errno   __errno
 /* errno must be a macro */
 
 
@@ -83,21 +88,26 @@ extern int _errno;
 
 
 
-int __fastcall__ _osmaperrno (unsigned char oserror);
-/* Map an operating system specific error code (for example from _oserror)
+int __fastcall__ __osmaperrno (unsigned char oserror);
+/* Map an operating system specific error code (for example from __oserror)
 ** into one of the E... codes above. It is user callable.
 */
 
-unsigned char __fastcall__ _seterrno (unsigned char code);
+#if __CC65_STD__ >= __CC65_STD_CC65__
+/* define the name with just one underscore for backwards compatibility */
+#define _osmaperrno __osmaperrno
+#endif
+
+unsigned char __fastcall__ __seterrno (unsigned char code);
 /* Set errno to a specific error code and return zero. Used by the library */
 
-int __fastcall__ _directerrno (unsigned char code);
-/* Set errno to a specific error code, clear _oserror and return -1. Used
+int __fastcall__ __directerrno (unsigned char code);
+/* Set errno to a specific error code, clear __oserror and return -1. Used
 ** by the library.
 */
 
-int __fastcall__ _mappederrno (unsigned char code);
-/* Set _oserror to the given platform specific error code. If it is a real
+int __fastcall__ __mappederrno (unsigned char code);
+/* Set __oserror to the given platform specific error code. If it is a real
 ** error code (not zero) set errno to the corresponding system error code
 ** and return -1. Otherwise return zero.
 ** Used by the library.

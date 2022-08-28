@@ -32,7 +32,7 @@
         jsr     popa
         jsr     diskinit
         beq     size
-        jsr     __mappederrno
+        jsr     ___mappederrno
         bne     fail            ; Branch always
 
 ; Check for sufficient buf size
@@ -43,7 +43,7 @@ size:   lda     ptr3+1
         cmp     #3
         bcs     okay            ; Buf >= 3
         lda     #<ERANGE
-        jsr     __directerrno
+        jsr     ___directerrno
 fail:   lda     #0              ; Return NULL
         tax
         rts
@@ -52,7 +52,7 @@ fail:   lda     #0              ; Return NULL
 
 okay:   lda     fnunit          ; Set by diskinit
         jsr     devicestr       ; Returns 0 in A
-        sta     __oserror       ; Clear _oserror
+        sta     ___oserror       ; Clear __oserror
 
 ; Success, return buf
 

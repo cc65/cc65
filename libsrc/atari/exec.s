@@ -34,7 +34,7 @@ notsupp:lda     #ENOSYS         ; "unsupported system call"
         .byte   $2C             ; bit opcode, eats the next 2 bytes
 noiocb: lda     #EMFILE         ; "too many open files"
         jsr     incsp2          ; clean up stack
-seterr: jmp     __directerrno
+seterr: jmp     ___directerrno
 
 
 ; entry point
@@ -148,7 +148,7 @@ copycd: lda     #ATEOL
         pha                     ; remember error code
         jsr     close           ; close the IOCB (required even if open failed)
         pla                     ; put error code back into A
-setmerr:jmp     __mappederrno   ; update errno from OS specific error code in A
+setmerr:jmp     ___mappederrno   ; update errno from OS specific error code in A
 
 openok: lda     #>buf
         sta     ICBAH,x         ; set buffer address

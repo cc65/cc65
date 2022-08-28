@@ -10,7 +10,7 @@
         .export __graphics
 
         .import findfreeiocb
-        .import __oserror
+        .import ___oserror
         .import fddecusage
         .import clriocb
         .import fdtoiocb
@@ -45,7 +45,7 @@ parmok: jsr     findfreeiocb
         beq     iocbok          ; we found one
 
         lda     #<EMFILE        ; "too many open files"
-seterr: jsr     __mappederrno   ; @@@ probably not correct to set errno here @@@
+seterr: jsr     ___mappederrno   ; @@@ probably not correct to set errno here @@@
         rts                     ; return -1
 
 ;invmode:ldx    #>EINVAL
@@ -94,7 +94,7 @@ doopen: txa
 
         lda     tmp2            ; get fd
         ldx     #0
-        stx     __oserror
+        stx     ___oserror
         rts
 
 cioerr: sty     tmp3            ; remember error code
@@ -103,6 +103,6 @@ cioerr: sty     tmp3            ; remember error code
         jsr     CIOV            ; close IOCB again since open failed
         jsr     fddecusage      ; and decrement usage counter of fd
         lda     tmp3            ; put error code into A
-        jmp     __mappederrno
+        jmp     ___mappederrno
 
 .endproc        ; __graphics

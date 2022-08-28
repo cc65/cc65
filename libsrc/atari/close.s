@@ -6,7 +6,7 @@
 
         .include "atari.inc"
         .export _close
-        .import __do_oserror,popax,__oserror
+        .import __do_oserror,popax,___oserror
         .import fdtoiocb_down,__inviocb
 
 .proc   _close
@@ -18,7 +18,7 @@
         jsr     CIOV
         bmi     closerr
 ok:     ldx     #0
-        stx     __oserror               ; clear system specific error code
+        stx     ___oserror               ; clear system specific error code
         txa
         rts
 

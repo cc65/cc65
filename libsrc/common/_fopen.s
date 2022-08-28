@@ -69,7 +69,7 @@
 
 invmode:
         lda     #EINVAL
-        jsr     __seterrno      ; Set __errno, returns zero in A
+        jsr     ___seterrno      ; Set __errno, returns zero in A
         tax                     ; a/x = 0
         jmp     incsp4
 
@@ -91,7 +91,7 @@ modeok: ldy     #$00
         bne     openok
         cmp     #$FF
         bne     openok
-        jmp     return0         ; Failure, errno/_oserror already set
+        jmp     return0         ; Failure, errno/__oserror already set
 
 ; Open call succeeded
 

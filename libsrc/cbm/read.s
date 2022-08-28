@@ -66,7 +66,7 @@
 
         jsr     CHKIN
         bcc     @L3             ; Branch if ok
-        jmp     __mappederrno   ; Store into __oserror, map to errno, return -1
+        jmp     ___mappederrno   ; Store into ___oserror, map to errno, return -1
 
 ; Read the next byte
 
@@ -123,10 +123,10 @@
 
 done:   jsr     CLRCH
 
-; Clear _oserror and return the number of chars read
+; Clear __oserror and return the number of chars read
 
 eof:    lda     #0
-        sta     __oserror
+        sta     ___oserror
         lda     ptr3
         ldx     ptr3+1
         rts
@@ -141,7 +141,7 @@ devnotpresent:
 
 invalidfd:
         lda     #EBADF
-        jmp     __directerrno   ; Sets _errno, clears _oserror, returns -1
+        jmp     ___directerrno   ; Sets _errno, clears __oserror, returns -1
 
 .endproc
 

@@ -169,7 +169,7 @@ addentry:
 ; Error entries
 
 nomem:  lda     #ENOMEM
-error:  jsr     __seterrno
+error:  jsr     ___seterrno
         lda     #$FF                    ; Return -1
         tax
         rts

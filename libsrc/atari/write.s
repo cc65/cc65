@@ -2,7 +2,7 @@
 ; int __fastcall__ write (int fd, const void* buf, unsigned count);
 ;
         .include "atari.inc"
-        .import __rwsetup,__do_oserror,__inviocb,__oserror
+        .import __rwsetup,__do_oserror,__inviocb,___oserror
         .export _write
 _write:
         jsr     __rwsetup       ; do common setup
@@ -21,7 +21,7 @@ write9:
         lda     ICBLH,x         ; buf len high
         tax
         lda     #0
-        sta     __oserror       ; clear system dependend error code
+        sta     ___oserror       ; clear system dependend error code
         pla
         rts
 

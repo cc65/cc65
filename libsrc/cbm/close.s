@@ -54,12 +54,12 @@
         ldx     unittab,y
         jsr     closecmdchannel ; Close the disk command channel
         pla                     ; Get the error code from the disk
-        jmp     __mappederrno   ; Set _oserror and _errno, return 0/-1
+        jmp     ___mappederrno   ; Set __oserror and _errno, return 0/-1
 
 ; Error entry: The given file descriptor is not valid or not open
 
 invalidfd:
         lda     #EBADF
-        jmp     __directerrno   ; Set _errno, clear _oserror, return -1
+        jmp     ___directerrno   ; Set _errno, clear __oserror, return -1
 
 .endproc

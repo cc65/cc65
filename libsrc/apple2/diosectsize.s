@@ -10,7 +10,7 @@
 
 _dio_query_sectsize:
         ; Clear error
-        stx     __oserror       ; X = 0
+        stx     ___oserror       ; X = 0
 
         ; Return ProDOS 8 block size
         txa                     ; X = 0

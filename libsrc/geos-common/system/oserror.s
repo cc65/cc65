@@ -3,16 +3,16 @@
 ; GEOS port: Maciej 'YTM/Elysium' Witkowiak
 ; 2.7.2001
 ;
-; int __fastcall__ _osmaperrno (unsigned char oserror);
+; int __fastcall__ __osmaperrno (unsigned char oserror);
 ; /* Map a system specific error into a system independent code */
 ;
 
-            .export __osmaperrno
+            .export ___osmaperrno
 
             .include "errno.inc"
             .include "const.inc"
 
-__osmaperrno:
+___osmaperrno:
         ldx #ErrTabSize
 @L1:    cmp ErrTab-2,x          ; Search for the error code
         beq @L2                 ; Jump if found

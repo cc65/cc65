@@ -15,7 +15,7 @@
 ; {
 ;     cbm_k_setlfs(lfn, device, sec_addr);
 ;     cbm_k_setnam(name);
-;     return _oserror = cbm_k_open();
+;     return __oserror = cbm_k_open();
 ; }
 ;
 
@@ -23,7 +23,7 @@
 
         .import         popa
         .import         _cbm_k_setlfs, _cbm_k_setnam, _cbm_k_open
-        .import         __oserror
+        .import         ___oserror
 
 _cbm_open:
         jsr     _cbm_k_setnam
@@ -32,5 +32,5 @@ _cbm_open:
         jsr     _cbm_k_setlfs   ; Call SETLFS, pop all args
 
         jsr     _cbm_k_open
-        sta     __oserror
+        sta     ___oserror
         rts

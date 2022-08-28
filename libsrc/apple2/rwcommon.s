@@ -49,10 +49,10 @@ rwcommon:
 
 rwepilog:
         ; Return success
-        sta     __oserror       ; A = 0
+        sta     ___oserror       ; A = 0
         lda     mliparam + MLI::RW::TRANS_COUNT
         ldx     mliparam + MLI::RW::TRANS_COUNT+1
         rts
 
-        ; Set __oserror
-oserr:  jmp     __mappederrno
+        ; Set ___oserror
+oserr:  jmp     ___mappederrno

@@ -78,7 +78,7 @@ err:    rts
 ; If the file is not valid, fileno must set errno and return -1
 
 error:  lda     #<EBADF
-        jsr     __seterrno
+        jsr     ___seterrno
         lda     #$FF
         tax
         rts

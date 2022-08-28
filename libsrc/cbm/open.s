@@ -94,10 +94,10 @@ parmok: jsr     popax           ; Get flags
 
         lda     #EINVAL
 
-; Error entry. Sets _errno, clears _oserror, returns -1
+; Error entry. Sets _errno, clears __oserror, returns -1
 
 seterrno:
-        jmp     __directerrno
+        jmp     ___directerrno
 
 ; Error entry: Close the file and exit. OS error code is in A on entry
 
@@ -113,7 +113,7 @@ closeandexit:
 
 ; Error entry: Set oserror and errno using error code in A and return -1
 
-oserror:jmp     __mappederrno
+oserror:jmp     ___mappederrno
 
 ; Read bit is set. Add an 'r' to the name
 
@@ -189,7 +189,7 @@ nofile:                         ; ... else use SA=0 (read)
 
         txa                     ; Handle
         ldx     #0
-        stx     __oserror       ; Clear _oserror
+        stx     ___oserror       ; Clear __oserror
         rts
 
 .endproc

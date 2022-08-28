@@ -11,7 +11,7 @@
 ; dio_close does nothing special
 
             .export _dio_open, _dio_close
-            .import __oserror, _OpenDisk
+            .import ___oserror, _OpenDisk
             .importzp ptr1, tmp1
 
             .include "dio.inc"
@@ -69,7 +69,7 @@ _dio_open:
 
 _inv_drive:
         lda #DEV_NOT_FOUND
-        sta __oserror
+        sta ___oserror
         lda #0
         tax
         rts
@@ -80,6 +80,6 @@ _dio_close:
         lda #0
         ldy #sst_flag
         sta (ptr1),y
-        sta __oserror           ; success
+        sta ___oserror           ; success
         tax
         rts                     ; return no error

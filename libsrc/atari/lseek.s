@@ -8,7 +8,7 @@
 
 
         .export         _lseek
-        .import         incsp6,__oserror
+        .import         incsp6,___oserror
         .import         __inviocb,ldax0sp,ldaxysp,fdtoiocb
         .import         __dos_type
         .import         fd_table
@@ -21,7 +21,7 @@
 ; seeking not supported, return -1 and ENOSYS errno value
 no_supp:jsr     incsp6
         lda     #<ENOSYS
-        jsr     __directerrno   ; returns with $FFFF in AX
+        jsr     ___directerrno   ; returns with $FFFF in AX
         sta     sreg
         sta     sreg+1
         rts
@@ -94,7 +94,7 @@ xxerr:  tya
         pha
         jsr     incsp6
         pla
-        jsr     __mappederrno   ; returns with $FFFF in AX
+        jsr     ___mappederrno   ; returns with $FFFF in AX
         sta     sreg
         sta     sreg+1
         rts

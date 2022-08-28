@@ -45,9 +45,9 @@ _getdevicedir:
 
         ; Handle errors
 erange: lda     #<ERANGE
-        jsr     __directerrno
+        jsr     ___directerrno
         bne     :+              ; Branch always
-oserr:  jsr     __mappederrno
+oserr:  jsr     ___mappederrno
 :       lda     #$00            ; Return NULL
         tax
         rts
@@ -73,7 +73,7 @@ oserr:  jsr     __mappederrno
         iny
         lda     #$00
         sta     (ptr1),y
-        sta     __oserror       ; Clear _oserror
+        sta     ___oserror       ; Clear __oserror
 
         ; Success, return buf
         lda     ptr1

@@ -604,7 +604,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     DoDeferred (SQP_KEEP_EAX, &Arg3.Expr);
 
     /* Emit the actual function call. This will also cleanup the stack. */
-    g_call (CF_FIXARGC, MemSet? Func_memset : Func__bzero, ParamSize);
+    g_call (CF_FIXARGC, MemSet? Func_memset : Func___bzero, ParamSize);
 
     if (ED_IsConstAbsInt (&Arg3.Expr) && Arg3.Expr.IVal == 0) {
 

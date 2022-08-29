@@ -74,7 +74,7 @@ void* __fastcall__ memset (void* s, int c, size_t count);
 /* The following is an internal function, the compiler will replace memset
 ** with it if the fill value is zero. Never use this one directly!
 */
-void* __fastcall__ _bzero (void* ptr, size_t n);
+void* __fastcall__ __bzero (void* ptr, size_t n);
 
 /* Non standard: */
 #if __CC65_STD__ == __CC65_STD_CC65__

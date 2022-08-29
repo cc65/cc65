@@ -43,7 +43,14 @@ extern unsigned*          __heapend;    /* Upper limit */
 extern struct freeblock*  __heapfirst;  /* First free block in list */
 extern struct freeblock*  __heaplast;   /* Last free block in list */
 
-
+#if __CC65_STD__ == __CC65_STD_CC65__
+/* define old name with one underscore for backwards compatibility */
+#define _heaporg __heaporg
+#define _heapptr __heapptr
+#define _heapend __heapend
+#define _heapfirst __heapfirst
+#define _heaplast __heaplast
+#endif
 
 /* End of _heap.h */
 

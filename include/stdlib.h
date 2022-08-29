@@ -125,7 +125,11 @@ size_t __heapmaxavail (void);
 #define RAND_MAX        0x7FFF
 int rand (void);
 void __fastcall__ srand (unsigned seed);
-void _randomize (void);         /* Non-standard */
+void __randomize (void);         /* Non-standard */
+#if __CC65_STD__ == __CC65_STD_CC65__
+/* define old name with one underscore for backwards compatibility */
+#define _randomize __randomize
+#endif
 
 /* Other standard stuff */
 void abort (void) __attribute__ ((noreturn));
@@ -146,7 +150,11 @@ unsigned long __fastcall__ strtoul (const char* nptr, char** endptr, int base);
 int __fastcall__ system (const char* s);
 
 /* Non-ANSI functions */
-void __fastcall__ _swap (void* p, void* q, size_t size);
+void __fastcall__ __swap (void* p, void* q, size_t size);
+#if __CC65_STD__ == __CC65_STD_CC65__
+/* define old name with one underscore for backwards compatibility */
+#define _swap __swap
+#endif
 #if __CC65_STD__ == __CC65_STD_CC65__
 char* __fastcall__ itoa (int val, char* buf, int radix);
 char* __fastcall__ utoa (unsigned val, char* buf, int radix);

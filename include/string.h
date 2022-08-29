@@ -92,8 +92,12 @@ char* __fastcall__ strupper (char* s);
 char* __fastcall__ strqtok (char* s1, const char* s2);
 #endif
 
-const char* __fastcall__ _stroserror (unsigned char errcode);
+const char* __fastcall__ __stroserror (unsigned char errcode);
 /* Map an operating system error number to an error message. */
+#if __CC65_STD__ == __CC65_STD_CC65__
+/* define old name with one underscore for backwards compatibility */
+#define _stroserror __stroserror
+#endif
 
 
 /* End of string.h */

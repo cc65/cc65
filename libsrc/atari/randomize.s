@@ -1,16 +1,16 @@
 ;
 ; Christian Groessler, 06.11.2002
 ;
-; void _randomize (void);
+; void __randomize (void);
 ; /* Initialize the random number generator */
 ;
 
-        .export         __randomize
+        .export         ___randomize
         .import         _srand
 
         .include        "atari.inc"
 
-__randomize:
+___randomize:
         ldx     VCOUNT          ; Use vertical line counter as high byte
         lda     RTCLOK+2        ; Use clock as low byte
         jmp     _srand          ; Initialize generator

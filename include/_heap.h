@@ -37,11 +37,11 @@ struct freeblock {
 
 
 /* Variables that describe the heap */
-extern unsigned*          _heaporg;     /* Bottom of heap */
-extern unsigned*          _heapptr;     /* Current top */
-extern unsigned*          _heapend;     /* Upper limit */
-extern struct freeblock*  _heapfirst;   /* First free block in list */
-extern struct freeblock*  _heaplast;    /* Last free block in list */
+extern unsigned*          __heaporg;    /* Bottom of heap */
+extern unsigned*          __heapptr;    /* Current top */
+extern unsigned*          __heapend;    /* Upper limit */
+extern struct freeblock*  __heapfirst;  /* First free block in list */
+extern struct freeblock*  __heaplast;   /* Last free block in list */
 
 
 

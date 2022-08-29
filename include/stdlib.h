@@ -92,17 +92,33 @@ int __fastcall__ posix_memalign (void** memptr, size_t alignment, size_t size);
 */
 #endif
 
-void __fastcall__ _heapadd (void* mem, size_t size);
+void __fastcall__ __heapadd (void* mem, size_t size);
 /* Add a block to the heap */
+#if __CC65_STD__ == __CC65_STD_CC65__
+/* define old name with one underscore for backwards compatibility */
+#define _heapadd __heapadd
+#endif
 
-size_t __fastcall__ _heapblocksize (const void* block);
+size_t __fastcall__ __heapblocksize (const void* block);
 /* Return the size of an allocated block */
+#if __CC65_STD__ == __CC65_STD_CC65__
+/* define old name with one underscore for backwards compatibility */
+#define _heapblocksize __heapblocksize
+#endif
 
-size_t _heapmemavail (void);
+size_t __heapmemavail (void);
 /* Return the total free heap space */
+#if __CC65_STD__ == __CC65_STD_CC65__
+/* define old name with one underscore for backwards compatibility */
+#define _heapmemavail __heapmemavail
+#endif
 
-size_t _heapmaxavail (void);
+size_t __heapmaxavail (void);
 /* Return the size of the largest free block on the heap */
+#if __CC65_STD__ == __CC65_STD_CC65__
+/* define old name with one underscore for backwards compatibility */
+#define _heapmaxavail __heapmaxavail
+#endif
 
 
 /* Random numbers */

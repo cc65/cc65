@@ -806,6 +806,21 @@ static int MacName (char* Ident)
 
 
 
+static void CheckForBadIdent (const char* Ident, int Std, const Macro* M)
+/* Check for and warning on problematic identifiers */
+{
+    if (Std >= STD_C99              &&
+        (M == 0 || !M->Variadic)    &&
+        strcmp (Ident, "__VA_ARGS__") == 0) {
+        /* __VA_ARGS__ cannot be used as a macro parameter name in post-C89
+        ** mode.
+        */
+        PPWarning ("__VA_ARGS__ can only appear in the expansion of a C99 variadic macro");
+    }
+}
+
+
+
 static void AddPreLine (StrBuf* Str)
 /* Add newlines to the string buffer */
 {
@@ -2089,6 +2104,12 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
 
         /* If we have an identifier, check if it's a macro */
         if (IsSym (Ident)) {
+            /* Check for bad identifier names */
+            if ((ModeFlags & (MSM_MULTILINE | MSM_IN_DIRECTIVE | MSM_IN_ARG_LIST)) != 0 &&
+                (CollCount (&CurRescanStack->Lines) == 1 || CurC == '\0')) {
+                CheckForBadIdent (Ident, IS_Get (&Standard), 0);
+            }
+
             if ((ModeFlags & MSM_OP_DEFINED) != 0 && strcmp (Ident, "defined") == 0) {
                 /* Handle the "defined" operator */
                 int HaveParen = 0;
@@ -2431,6 +2452,7 @@ static int ParseMacroReplacement (StrBuf* Source, Macro* M)
     int         HasWhiteSpace = 0;
     unsigned    Len;
     ident       Ident;
+    int         Std = IS_Get (&Standard);
 
     /* Skip whitespace before the macro replacement */
     SkipWhitespace (0);
@@ -2448,6 +2470,9 @@ static int ParseMacroReplacement (StrBuf* Source, Macro* M)
             SB_AppendChar (&M->Replacement, ' ');
         } else if (IsQuotedString ()) {
             CopyQuotedString (&M->Replacement);
+        } else if (IsSym (Ident)) {
+            CheckForBadIdent (Ident, Std, M);
+            SB_AppendStr (&M->Replacement, Ident);
         } else {
             if (M->ParamCount >= 0 && GetPunc (Ident)) {
                 Len = strlen (Ident);
@@ -2516,7 +2541,7 @@ static void DoDefine (void)
     ident       Ident;
     Macro*      M = 0;
     Macro*      Existing;
-    int         C89;
+    int         Std;
 
     /* Read the macro name */
     SkipWhitespace (0);
@@ -2524,14 +2549,17 @@ static void DoDefine (void)
         goto Error_Handler;
     }
 
-    /* Remember if we're in C89 mode */
-    C89 = (IS_Get (&Standard) == STD_C89);
+    /* Remember the language standard we are in */
+    Std = IS_Get (&Standard);
 
     /* Check for forbidden macro names */
     if (strcmp (Ident, "defined") == 0) {
         PPError ("'%s' cannot be used as a macro name", Ident);
         goto Error_Handler;
     }
+
+    /* Check for and warn on special identifiers */
+    CheckForBadIdent (Ident, Std, 0);
 
     /* Create a new macro definition */
     M = NewMacro (Ident);
@@ -2557,7 +2585,7 @@ static void DoDefine (void)
             /* The next token must be either an identifier, or - if not in
             ** C89 mode - the ellipsis.
             */
-            if (!C89 && CurC == '.') {
+            if (Std >= STD_C99 && CurC == '.') {
                 /* Ellipsis */
                 NextChar ();
                 if (CurC != '.' || NextC != '.') {
@@ -2579,11 +2607,8 @@ static void DoDefine (void)
                     goto Error_Handler;
                 }
 
-                /* __VA_ARGS__ is only allowed in post-C89 mode */
-                if (!C89 && strcmp (Ident, "__VA_ARGS__") == 0) {
-                    PPWarning ("'__VA_ARGS__' can only appear in the expansion "
-                               "of a C99 variadic macro");
-                }
+                /* Check for and warn on special identifiers */
+                CheckForBadIdent (Ident, Std, 0);
 
                 /* Add the macro parameter */
                 AddMacroParam (M, Ident);
@@ -2758,6 +2783,7 @@ static int DoIfDef (int skip, int flag)
 
         SkipWhitespace (0);
         if (MacName (Ident)) {
+            CheckForBadIdent (Ident, IS_Get (&Standard), 0);
             Value = IsMacro (Ident);
             /* Check for extra tokens */
             CheckExtraTokens (flag ? "ifdef" : "ifndef");
@@ -2964,6 +2990,7 @@ static void DoUndef (void)
 
     SkipWhitespace (0);
     if (MacName (Ident)) {
+        CheckForBadIdent (Ident, IS_Get (&Standard), 0);
         UndefineMacro (Ident);
     }
     /* Check for extra tokens */

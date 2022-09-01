@@ -2216,6 +2216,13 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
                         InitLine (TmpTarget);
                         PushRescanLine (CurRescanStack, TmpTarget, LastTokLen);
 
+                        /* Add a space before a '#' at the beginning of the line */
+                        if (CurC  == '#' &&
+                            NextC != '#' &&
+                            (SB_IsEmpty (Target) || SB_LookAtLast (Target) == '\n')) {
+                            SB_AppendChar (Target, ' ');
+                        }
+
                         /* Switch the buffers */
                         TmpTarget = NewStrBuf ();
                     } else if (PendingNewLines > 0 && MultiLine) {

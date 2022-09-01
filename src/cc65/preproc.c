@@ -1551,7 +1551,10 @@ static unsigned ReadMacroArgs (unsigned NameIdx, MacroExp* E, const Macro* M, in
             /* If this is not the single empty argument for a macro with an
             ** empty argument list, remember it.
             */
-            if (CurC != ')' || SB_NotEmpty (&Arg.Tokens) || M->ParamCount > 0) {
+            if (CurC != ')'                 ||
+                CollCount (&E->Args) > 0    ||
+                SB_NotEmpty (&Arg.Tokens)   ||
+                M->ParamCount > 0) {
                 MacroExp* A = ME_AppendArg (E, &Arg);
                 unsigned I;
 
@@ -1669,11 +1672,23 @@ static unsigned ReadMacroArgs (unsigned NameIdx, MacroExp* E, const Macro* M, in
     }
 
     /* Compare formal and actual argument count */
-    if (CollCount (&E->Args) != (unsigned) M->ParamCount) {
-
+    if (CollCount (&E->Args) < (unsigned) M->ParamCount) {
+        /* Check further only when the parentheses are paired */
         if (Parens == 0) {
-            /* Argument count mismatch */
-            PPError ("Macro argument count mismatch");
+            /* Specially casing variable argument */
+            if (M->Variadic         &&
+                M->ParamCount > 0   &&
+                CollCount (&E->Args) + 1 == (unsigned) M->ParamCount) {
+                /* The variable argument is left out entirely */
+                E->Flags |= MES_NO_VA_COMMA;
+                if (IS_Get (&Standard) < STD_CC65) {
+                    PPWarning ("ISO C does not permit leaving out the comma before the variable argument");
+                }
+            } else {
+                /* Too few argument */
+                PPError ("Macro \"%s\" passed only %u arguments, but requires %u",
+                         M->Name, CollCount (&E->Args), (unsigned) M->ParamCount);
+            }
         }
 
         /* Be sure to make enough empty arguments available */
@@ -1683,6 +1698,10 @@ static unsigned ReadMacroArgs (unsigned NameIdx, MacroExp* E, const Macro* M, in
         while (CollCount (&E->Args) < (unsigned) M->ParamCount) {
             ME_AppendArg (E, &Arg);
         }
+    } else if (Parens == 0 && CollCount (&E->Args) > (unsigned) M->ParamCount) {
+        /* Too many arguments */
+        PPError ("Macro \"%s\" passed %u arguments, but takes just %u",
+                 M->Name, CollCount (&E->Args), (unsigned) M->ParamCount);
     }
 
     /* Deallocate argument resources */

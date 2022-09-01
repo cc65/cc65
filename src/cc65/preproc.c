@@ -2116,7 +2116,6 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
 
                     /* Check if this is a function-like macro */
                     if (M->ParamCount >= 0) {
-                        int OldPendingNewLines = PendingNewLines;
                         int HaveSpace = SkipWhitespace (MultiLine) > 0;
 
                         /* A function-like macro name without an immediately
@@ -2139,30 +2138,48 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
                                 ME_SetTokLens (E, strlen (M->Name));
                             }
 
+                            /* Since we have already got on hold of the next
+                            ** line, we have to reuse it as the next line
+                            ** instead of reading a new line from the source.
+                            */
+                            if (PendingNewLines > 0 && MultiLine) {
+                                unsigned I = SB_GetIndex (Line);
+
+                                /* There is no way a function-like macro call
+                                ** detection could span multiple lines within
+                                ** the range of another just expanded macro.
+                                */
+                                CHECK (CollCount (&CurRescanStack->Lines) == 1);
+
+                                /* Revert one newline */
+                                --PendingNewLines;
+
+                                /* Align indention */
+                                while (I > 0) {
+                                    --I;
+                                    if (SB_GetBuf (Line)[I] == '\n') {
+                                        ++I;
+                                        break;
+                                    }
+                                    SB_GetBuf (Line)[I] = ' ';
+                                }
+
+                                /* Set start index */
+                                SB_SetIndex (Line, I);
+
+                                /* Add newlines */
+                                AddPreLine (Target);
+
+                                /* Reuse this line as the next line */
+                                ReuseInputLine ();
+
+                                /* Quit this loop */
+                                break;
+                            }
+
                             /* Append back the whitespace */
                             if (HaveSpace) {
                                 SB_AppendChar (Target, ' ');
-                            }
-
-                            /* Since we have already got on hold of the next
-                            ** line, we have to go on preprocessing them.
-                            */
-                            if (MultiLine) {
-                                if (OldPendingNewLines < PendingNewLines && CurC == '#') {
-                                    /* If we were going to support #pragma in
-                                    ** macro argument list, it would be output
-                                    ** to OLine.
-                                    */
-                                    if (OLine == 0) {
-                                        OLine = Target;
-                                        ParseDirectives (ModeFlags);
-                                        OLine = 0;
-                                    } else {
-                                        ParseDirectives (ModeFlags);
-                                    }
-                                }
-                                /* Add the source info to preprocessor output if needed */
-                                AddPreLine (Target);
                             }
 
                             /* Loop */
@@ -2200,6 +2217,27 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
 
                         /* Switch the buffers */
                         TmpTarget = NewStrBuf ();
+                    } else if (PendingNewLines > 0 && MultiLine) {
+                        /* Cancel remaining check for pp-tokens separation
+                        ** if there is since ther have been newlines that
+                        ** can always separate them.
+                        */
+                        if (CurRescanStack->PrevTok != 0) {
+                            FreeStrBuf (CurRescanStack->PrevTok);
+                            CurRescanStack->PrevTok = 0;
+                        }
+
+                        /* Squeeze whitespace */
+                        SkipWhitespace (0);
+
+                        /* Add indention to preprocessor output if needed */
+                        if (CurC != '\0' && CollCount (&CurRescanStack->Lines) == 1) {
+                            /* Add newlines */
+                            AddPreLine (Target);
+
+                            /* Align indention */
+                            AppendIndent (Target, SB_GetIndex (Line));
+                        }
                     }
 
                     /* Since we are rescanning, we needn't add the
@@ -2239,7 +2277,24 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
             } else if (IsQuotedString ()) {
                 CopyQuotedString (Target);
             } else {
-                Skipped = SkipWhitespace (0);
+                /* We want to squeeze whitespace until the end of the current
+                ** input line, so we have to deal with such cases specially.
+                */
+                if (CollCount (&CurRescanStack->Lines) > 1) {
+                    RescanInputStack* RIS = CurRescanStack;
+
+                    /* Temporarily disable input popping */
+                    CurRescanStack = 0;
+                    Skipped = SkipWhitespace (0);
+                    CurRescanStack = RIS;
+
+                    if (CurC == '\0') {
+                        /* Now we are at the end of the input line */
+                        goto Loop;
+                    }
+                } else {
+                    Skipped = SkipWhitespace (0);
+                }
 
                 /* Punctuators must be checked after whitespace since comments
                 ** introducers may be misinterpreted as division operators.
@@ -2282,6 +2337,19 @@ Loop:
         if (CurC == '\0' && CollCount (&CurRescanStack->Lines) > 1) {
             /* Check for rescan sequence end and pp-token pasting */
             Skipped = SkipWhitespace (0) || Skipped;
+
+            /* Add indention to preprocessor output if needed */
+            if (CurC != '\0'                        &&
+                PendingNewLines > 0                 &&
+                (ModeFlags & MSM_MULTILINE) != 0    &&
+                CollCount (&CurRescanStack->Lines) == 1) {
+                /* Add newlines */
+                AddPreLine (Target);
+
+                /* Align indention */
+                AppendIndent (Target, SB_GetIndex (Line));
+                Skipped = 0;
+            }
         }
 
         /* Append a space if there hasn't been one */

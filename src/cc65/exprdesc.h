@@ -507,7 +507,8 @@ INLINE int ED_IsAddrExpr (const ExprDesc* Expr)
 INLINE int ED_IsIndExpr (const ExprDesc* Expr)
 /* Check if the expression is a reference to its value */
 {
-    return (Expr->Flags & E_ADDRESS_OF) == 0 && !ED_IsLocNone (Expr);
+    return (Expr->Flags & E_ADDRESS_OF) == 0 &&
+           !ED_IsLocNone (Expr) && !ED_IsLocPrimary (Expr);
 }
 #else
 int ED_IsIndExpr (const ExprDesc* Expr);

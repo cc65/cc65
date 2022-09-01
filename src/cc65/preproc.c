@@ -878,7 +878,7 @@ static void Stringize (StrBuf* Source, StrBuf* Target)
 
 
 static void OldStyleComment (void)
-/* Remove an old style C comment from line. */
+/* Remove an old style C comment from line */
 {
     /* Remember the current line number, so we can output better error
     ** messages if the comment is not terminated in the current file.
@@ -897,6 +897,7 @@ static void OldStyleComment (void)
                          StartingLine);
                 return;
             }
+            ++PendingNewLines;
         } else {
             if (CurC == '/' && NextC == '*') {
                 PPWarning ("'/*' found inside a comment");
@@ -913,7 +914,7 @@ static void OldStyleComment (void)
 
 
 static void NewStyleComment (void)
-/* Remove a new style C comment from line. */
+/* Remove a new style C comment from line */
 {
     /* Diagnose if this is unsupported */
     if (IS_Get (&Standard) < STD_C99) {

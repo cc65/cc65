@@ -67,6 +67,9 @@
 /* The current input line */
 StrBuf* Line;
 
+/* The input line to reuse as the next line */
+static StrBuf* CurReusedLine;
+
 /* Current and next input character */
 char CurC  = '\0';
 char NextC = '\0';
@@ -403,24 +406,6 @@ static void GetInputChar (void)
         /* NextC is '\0' by default */
         NextC = '\0';
 
-        /* Drop all pushed fragments that don't have data left */
-        if (CurrentInputStack != 0) {
-            while (SB_GetIndex (Line) >= SB_GetLen (Line)) {
-                /* Cannot read more from this line, check next line on stack if any */
-                if (CollCount (CurrentInputStack) == 0) {
-                    /* This is THE line */
-                    break;
-                }
-                FreeStrBuf (Line);
-                Line = CollPop (CurrentInputStack);
-            }
-
-            /* NextC comes from next fragment */
-            if (CollCount (CurrentInputStack) > 0) {
-                NextC = ' ';
-            }
-        }
-
         /* Get CurC from the line */
         CurC = SB_LookAt (Line, SB_GetIndex (Line));
     }
@@ -461,13 +446,17 @@ void PushLine (StrBuf* L)
 /* Save the current input line and use a new one */
 {
     PRECONDITION (CurrentInputStack != 0);
-    if (SB_GetIndex (L) < SB_GetLen (L)) {
-        CollAppend (CurrentInputStack, Line);
-        Line = L;
-        GetInputChar ();
-    } else {
-        FreeStrBuf (L);
-    }
+    CollAppend (CurrentInputStack, Line);
+    Line = L;
+    GetInputChar ();
+}
+
+
+
+void ReuseInputLine (void)
+/* Save and reuse the current line as the next line */
+{
+    CurReusedLine = Line;
 }
 
 
@@ -475,16 +464,6 @@ void PushLine (StrBuf* L)
 void ClearLine (void)
 /* Clear the current input line */
 {
-    if (CurrentInputStack != 0) {
-        unsigned I;
-
-        /* Remove all pushed fragments from the input stack */
-        for (I = 0; I < CollCount (CurrentInputStack); ++I) {
-            FreeStrBuf (Line);
-            Line = CollPop (CurrentInputStack);
-        }
-    }
-
     /* Clear the contents of Line */
     SB_Clear (Line);
     CurC    = '\0';
@@ -515,12 +494,47 @@ int NextLine (void)
     int         C;
     AFile*      Input;
 
-    /* Clear the current line */
-    ClearLine ();
-    SB_Clear (Line);
+    /* Overwrite the next input line with the pushed line if there is one */
+    if (CurReusedLine != 0) {
+        /* Use data move to resolve the issue that Line may be impersistent */
+        if (Line != CurReusedLine) {
+            SB_Move (Line, CurReusedLine);
+        }
+        /* Continue with this Line */
+        InitLine (Line);
+        CurReusedLine = 0;
 
-    /* Must have an input file when called */
-    if (CollCount(&AFiles) == 0) {
+        return 1;
+    }
+
+    /* If there are pushed input lines, read from them */
+    if (CurrentInputStack != 0 && CollCount (CurrentInputStack) > 0) {
+        /* Drop all pushed fragments that have no data left until one can be
+        ** used as input.
+        */
+        do {
+            /* Use data move to resolve the issue that Line may be impersistent */
+            if (Line != CollLast (CurrentInputStack)) {
+                SB_Move (Line, CollPop (CurrentInputStack));
+            } else {
+                CollPop (CurrentInputStack);
+            }
+        } while (CollCount (CurrentInputStack) > 0 &&
+                 SB_GetIndex (Line) >= SB_GetLen (Line));
+
+        if (SB_GetIndex (Line) < SB_GetLen (Line)) {
+            InitLine (Line);
+
+            /* Successive */
+            return 1;
+        }
+    }
+
+    /* Otherwise, clear the current line */
+    ClearLine ();
+
+    /* Must have an input file when going on */
+    if (CollCount (&AFiles) == 0) {
         return 0;
     }
 

@@ -105,6 +105,9 @@ Collection* UseInputStack (Collection* InputStack);
 void PushLine (StrBuf* L);
 /* Save the current input line and use a new one */
 
+void ReuseInputLine (void);
+/* Save and reuse the current line as the next line */
+
 void ClearLine (void);
 /* Clear the current input line */
 

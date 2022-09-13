@@ -12,14 +12,17 @@ FILES=\
 	float-minimal.prg \
 	float-minimal.bin \
 	float-minimal.woz.bin \
+	float-minimal.soft.bin \
 	\
 	float-basic.prg \
 	float-basic.bin \
 	float-basic.woz.bin \
+	float-basic.soft.bin \
 	\
 	float-basic-cmp.prg \
 	float-basic-cmp.bin \
-	float-basic-cmp.woz.bin
+	float-basic-cmp.woz.bin \
+	float-basic-cmp.soft.bin
 	
 #	
 #	floattest.prg
@@ -34,6 +37,11 @@ CBMRUNTIME=\
 	cbmkernal/ftoa.c \
 	cbmkernal/ffloor.c \
 	cbmkernal/cc65wrapper.s
+
+SOFTFLOAT=\
+	softfloat/softfloat.c \
+	softfloat/ftostr.c \
+	softfloat/cc65wrapper.s
 
 IEEERUNTIME=\
 	ieee754/feaxint.s \
@@ -116,6 +124,22 @@ float-basic-cmp.woz.bin: float-basic-cmp.woz.s $(HEADER) $(WOZRUNTIME)
 	$(CL65) $(OPT) -t sim6502 -I ./include -o float-basic-cmp.woz.bin float-basic-cmp.woz.s $(WOZRUNTIME)
 
 ###############################################################################
+float-minimal.soft.s: float-minimal.c $(HEADER) $(SOFTFLOAT)
+	$(CC65) $(OPT) -t sim6502 -I ./include --add-source -o float-minimal.soft.s float-minimal.c
+float-minimal.soft.bin: float-minimal.soft.s $(HEADER) $(SOFTFLOAT)
+	$(CL65) $(OPT) -t sim6502 -I ./include -o float-minimal.soft.bin float-minimal.soft.s $(SOFTFLOAT)
+
+float-basic.soft.s: float-basic.c $(HEADER) $(SOFTFLOAT)
+	$(CC65) $(OPT) -t sim6502 -I ./include --add-source -o float-basic.soft.s float-basic.c
+float-basic.soft.bin: float-basic.soft.s $(HEADER) $(SOFTFLOAT)
+	$(CL65) $(OPT) -t sim6502 -I ./include -o float-basic.soft.bin float-basic.soft.s $(SOFTFLOAT)
+
+float-basic-cmp.soft.s: float-basic-cmp.c $(HEADER) $(SOFTFLOAT)
+	$(CC65) $(OPT) -t sim6502 -I ./include --add-source -o float-basic-cmp.soft.s float-basic-cmp.c
+float-basic-cmp.soft.bin: float-basic-cmp.soft.s $(HEADER) $(SOFTFLOAT)
+	$(CL65) $(OPT) -t sim6502 -I ./include -o float-basic-cmp.soft.bin float-basic-cmp.soft.s $(SOFTFLOAT)
+
+###############################################################################
 float-minimal.c64.s: float-minimal.c $(HEADER) $(CBMRUNTIME)
 	$(CC65) $(OPT) -DCONIO -t c64 -I ./include -I ./cbmkernal --add-source -o float-minimal.c64.s float-minimal.c
 float-minimal.prg: float-minimal.c64.s $(HEADER) $(CBMRUNTIME)
@@ -176,6 +200,18 @@ runwoz: float-minimal.woz.bin float-basic.woz.bin float-basic-cmp.woz.bin
 	$(SIM65) float-minimal.woz.bin
 	$(SIM65) float-basic.woz.bin
 	$(SIM65) float-basic-cmp.woz.bin
+	
+runsoft-minimal: float-minimal.soft.bin
+	$(SIM65) float-minimal.soft.bin
+runsoft-basic: float-basic.soft.bin
+	$(SIM65) float-basic.soft.bin
+runsoft-cmp: float-basic-cmp.soft.bin
+	$(SIM65) float-basic-cmp.soft.bin
+	
+runsoft: float-minimal.soft.bin float-basic.soft.bin float-basic-cmp.soft.bin
+	$(SIM65) float-minimal.soft.bin
+	$(SIM65) float-basic.soft.bin
+	$(SIM65) float-basic-cmp.soft.bin
 	
 ###############################################################################
 

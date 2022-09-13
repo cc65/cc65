@@ -57,7 +57,9 @@
 ;----------------------------------------------------------------------------
 ; I/O definitions
 
-ACIA            = $C088
+Offset          = $8F           ; Move 6502 false read out of I/O to page $BF
+
+ACIA            = $C088-Offset
 ACIA_DATA       = ACIA+0        ; Data register
 ACIA_STATUS     = ACIA+1        ; Status register
 ACIA_CMD        = ACIA+2        ; Command register
@@ -197,6 +199,7 @@ SER_OPEN:
         asl
         asl
         asl
+        adc     Offset                  ; Assume carry to be clear
         tax
 
         ; Check if the handshake setting is valid

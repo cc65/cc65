@@ -5253,5 +5253,25 @@ void g_switch (Collection* Nodes, unsigned DefaultLabel, unsigned Depth)
 void g_asmcode (struct StrBuf* B)
 /* Output one line of assembler code. */
 {
-    AddCodeLine ("%.*s", (int) SB_GetLen (B), SB_GetConstBuf (B));
+    int len = (int) SB_GetLen(B);
+    const char *buf = SB_GetConstBuf(B);
+
+    /* remove whitespace at end of line */
+    /* NOTE: This masks problems in ParseInsn(), which in some cases seems to
+             rely on no whitespace being present at the end of a line in generated
+             code (see issue #1252). However, it generally seems to be a good
+             idea to remove trailing whitespace from (inline) assembly, so we
+             do it anyway. */
+    while (len) {
+       switch (buf[len - 1]) {
+       case '\n':
+       case ' ':
+       case '\t':
+           --len;
+           continue;
+       }
+       break;
+    }
+
+    AddCodeLine ("%.*s", len, buf);
 }

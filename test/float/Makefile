@@ -96,7 +96,7 @@ WOZRUNTIME=\
 	woz/ftosleeax.s \
 	woz/_ftostr.c \
 	woz/wozfp.s
-	
+
 ##############################################################################
 # The IEEE755 assembler implementation
 
@@ -210,7 +210,7 @@ runsoft-misc: float-misc.soft.bin
 runsoft-quick: quick.soft.bin
 	$(SIM65) quick.soft.bin
 	
-runsoft: float-minimal.soft.bin float-basic.soft.bin float-cmp.soft.bin float-conv.soft.bin float-misc.soft.bin 
+runsoft: float-minimal.soft.bin float-basic.soft.bin float-cmp.soft.bin float-conv.soft.bin float-misc.soft.bin
 	$(SIM65) float-minimal.soft.bin
 	$(SIM65) float-misc.soft.bin
 	-$(SIM65) float-conv.soft.bin

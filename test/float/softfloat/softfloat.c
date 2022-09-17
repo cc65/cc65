@@ -1027,7 +1027,7 @@ float32 float32_rem( float32 a, float32 b )
 {
     flag aSign, bSign, zSign;
     int16 aExp, bExp, expDiff;
-    bits32 aSig, bSig, q, allZero, alternateASig;
+    bits32 aSig, bSig, q, /*allZero,*/ alternateASig;
     sbits32 sigMean;
 
     aSig = extractFloat32Frac( a );
@@ -1164,7 +1164,7 @@ float32 float32_sqrt( float32 a )
 | according to the IEEE Standard for Floating-Point Arithmetic.
 *----------------------------------------------------------------------------*/
 
-flag float32_eq( float32 a, float32 b )
+flag __fastcall__ float32_eq( float32 a, float32 b )
 {
 
     if (    ( ( extractFloat32Exp( a ) == 0xFF ) && extractFloat32Frac( a ) )
@@ -1185,7 +1185,7 @@ flag float32_eq( float32 a, float32 b )
 | performed according to the IEEE Standard for Floating-Point Arithmetic.
 *----------------------------------------------------------------------------*/
 
-flag float32_le( float32 a, float32 b )
+flag __fastcall__ float32_le( float32 a, float32 b )
 {
     flag aSign, bSign;
 
@@ -1208,7 +1208,7 @@ flag float32_le( float32 a, float32 b )
 | according to the IEEE Standard for Floating-Point Arithmetic.
 *----------------------------------------------------------------------------*/
 
-flag float32_lt( float32 a, float32 b )
+flag __fastcall__ float32_lt( float32 a, float32 b )
 {
     flag aSign, bSign;
 
@@ -1232,7 +1232,7 @@ flag float32_lt( float32 a, float32 b )
 | according to the IEEE Standard for Floating-Point Arithmetic.
 *----------------------------------------------------------------------------*/
 
-flag float32_eq_signaling( float32 a, float32 b )
+flag __fastcall__ float32_eq_signaling( float32 a, float32 b )
 {
 
     if (    ( ( extractFloat32Exp( a ) == 0xFF ) && extractFloat32Frac( a ) )
@@ -1252,10 +1252,10 @@ flag float32_eq_signaling( float32 a, float32 b )
 | IEEE Standard for Floating-Point Arithmetic.
 *----------------------------------------------------------------------------*/
 
-flag float32_le_quiet( float32 a, float32 b )
+flag __fastcall__ float32_le_quiet( float32 a, float32 b )
 {
     flag aSign, bSign;
-    int16 aExp, bExp;
+    /*int16 aExp, bExp;*/
 
     if (    ( ( extractFloat32Exp( a ) == 0xFF ) && extractFloat32Frac( a ) )
          || ( ( extractFloat32Exp( b ) == 0xFF ) && extractFloat32Frac( b ) )
@@ -1279,7 +1279,7 @@ flag float32_le_quiet( float32 a, float32 b )
 | Standard for Floating-Point Arithmetic.
 *----------------------------------------------------------------------------*/
 
-flag float32_lt_quiet( float32 a, float32 b )
+flag __fastcall__ float32_lt_quiet( float32 a, float32 b )
 {
     flag aSign, bSign;
 

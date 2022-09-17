@@ -1,4 +1,7 @@
 
+#ifndef SOFTFLOAT_H_
+#define SOFTFLOAT_H_
+
 /*============================================================================
 
 This C header file template is part of the Berkeley SoftFloat IEEE Floating-
@@ -92,14 +95,15 @@ float32 float32_mul( float32, float32 );
 float32 float32_div( float32, float32 );
 float32 float32_rem( float32, float32 );
 float32 float32_sqrt( float32 );
-unsigned char float32_eq( float32, float32 );
-unsigned char float32_le( float32, float32 );
-unsigned char float32_lt( float32, float32 );
-unsigned char float32_eq_signaling( float32, float32 );
-unsigned char float32_le_quiet( float32, float32 );
-unsigned char float32_lt_quiet( float32, float32 );
-unsigned char float32_is_signaling_nan( float32 );
+unsigned char __fastcall__ float32_eq( float32, float32 );
+unsigned char __fastcall__ float32_le( float32, float32 );
+unsigned char __fastcall__ float32_lt( float32, float32 );
+unsigned char __fastcall__ float32_eq_signaling( float32, float32 );
+unsigned char __fastcall__ float32_le_quiet( float32, float32 );
+unsigned char __fastcall__ float32_lt_quiet( float32, float32 );
+unsigned char __fastcall__ float32_is_signaling_nan( float32 );
 
+#ifdef DOUBLES
 /*----------------------------------------------------------------------------
 | Software IEEE double-precision conversion routines.
 *----------------------------------------------------------------------------*/
@@ -124,4 +128,6 @@ unsigned char float64_eq_signaling( float64, float64 );
 unsigned char float64_le_quiet( float64, float64 );
 unsigned char float64_lt_quiet( float64, float64 );
 unsigned char float64_is_signaling_nan( float64 );
+#endif
 
+#endif /* SOFTFLOAT_H_ */

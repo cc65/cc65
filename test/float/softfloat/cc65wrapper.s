@@ -1,17 +1,32 @@
 
+    .importzp sreg, tmp1
 
     .import _int32_to_float32
+
+;------------------------------------------------------------------------------
+; conversions: to float
 
     ; 16bit signed -> float
     .export axfloat
 axfloat:
     ; FIXME
+    ; sign extend to 32bit
+    ldy #$ff
+    cpx #$80
+    bcs @sk
+    ldy #$00
+@sk:
+    sty sreg
+    sty sreg+1
     jmp _int32_to_float32
 
     ; 16bit unsigned -> float
     .export axufloat
 axufloat:
     ; FIXME
+    ldy #0
+    sty sreg
+    sty sreg+1
     jmp _int32_to_float32
 
     ; 32bit signed -> float

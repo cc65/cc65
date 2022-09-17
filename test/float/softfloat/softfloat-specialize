@@ -82,6 +82,7 @@ flag float32_is_signaling_nan( float32 a )
 
 }
 
+#ifdef DOUBLES
 /*----------------------------------------------------------------------------
 | Returns the result of converting the single-precision floating-point NaN
 | `a' to the canonical NaN format.  If `a' is a signaling NaN, the invalid
@@ -98,7 +99,9 @@ static commonNaNT *float32ToCommonNaN( float32 a )
     z.high = a<<9;
     return &z;
 }
+#endif
 
+#ifdef DOUBLES
 /*----------------------------------------------------------------------------
 | Returns the result of converting the canonical NaN `a' to the single-
 | precision floating-point format.
@@ -110,6 +113,7 @@ static float32 commonNaNToFloat32( commonNaNT *a )
     return ( ( (bits32) a->sign )<<31 ) | 0x7FC00000 | ( a->high>>9 );
 
 }
+#endif
 
 /*----------------------------------------------------------------------------
 | Takes two single-precision floating-point values `a' and `b', one of which

@@ -45,18 +45,22 @@ eaxufloat:
 ; conversions: from float
 
     .import _float32_to_int32
+    .import _float32_to_int32_round_to_zero
 
     ; float -> 16bit int
     .export feaxint
 feaxint:
     ; FIXME
-    jmp _float32_to_int32
+    jmp _float32_to_int32_round_to_zero
+;    jmp _float32_to_int32
     ; float -> 32bit int
     .export feaxlong
 feaxlong:
-    jmp _float32_to_int32
+    jmp _float32_to_int32_round_to_zero
+;    jmp _float32_to_int32
 
-    ; the ! operator, returns a bool (int)
+;------------------------------------------------------------------------------
+; the ! operator, returns a bool (int)
     .export fbnegeax
 fbnegeax:
     stx     tmp1

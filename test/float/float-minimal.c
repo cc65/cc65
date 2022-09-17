@@ -15,12 +15,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 
 #include <_float.h>
-
-#define TEST_8
-#define TEST_16
-#define TEST_32
 
 float fp1 = 42.01002f;
 float fp2;  // non initialized
@@ -31,7 +28,7 @@ uintptr_t p;
 float fp3;
 float fp4 = 23.12f;
 
-char buf[0x10];
+char buf[0x20];
 
 signed char var_schar;
 unsigned char var_uchar;
@@ -40,11 +37,34 @@ unsigned int var_uint;
 signed long var_slong;
 unsigned long var_ulong;
 
+int result = 0;
+
+// returns 1 if value in f matches the string
+// the string is a hex value without leading "0x"
+int compare(float f, char *str)
+{
+    char temp[12];
+    sprintf(temp, "%08lx", *((uint32_t*)&f));
+    return (strcmp(temp, str) == 0) ? 1 : 0;
+}
+
+void test1(float f, char *str)
+{
+    if (compare(f, str)) {
+        printf("\n");
+    } else {
+        printf(" (failed)\n");
+        result++;
+    }
+}
+
 void references(void) {
     float fp2 = 23.1234f;
 
-    printf("fp2:0x%08lx [exp:0x41b8fcb9] %s (23.1234)\n", *((uint32_t*)&fp2), _ftostr(buf, fp2));
-    printf("fp4:0x%08lx [exp:0x41b8f5c3] %s (23.12)\n", *((uint32_t*)&fp4), _ftostr(buf, fp4));
+    printf("fp2:0x%08lx [exp:0x41b8fcb9] %s (23.1234)", *((uint32_t*)&fp2), _ftostr(buf, fp2));
+    test1(fp2, "41b8fcb9");
+    printf("fp4:0x%08lx [exp:0x41b8f5c3] %s (23.12)", *((uint32_t*)&fp4), _ftostr(buf, fp4));
+    test1(fp4, "41b8f5c3");
 #if 1
     printf("(global) get address, read via ptr\n");
     // get address of global (works)
@@ -53,8 +73,10 @@ void references(void) {
     // read fp via pointer and assign local
     fp2 = *fp_p;
 
-    printf("fp1:0x%08lx [exp:0x42280a43] %s (42.01002)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
-    printf("fp2:0x%08lx [exp:0x42280a43] %s (42.01002)\n", *((uint32_t*)&fp2), _ftostr(buf, fp2));
+    printf("fp1:0x%08lx [exp:0x42280a43] %s (42.01002)", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "42280a43");
+    printf("fp2:0x%08lx [exp:0x42280a43] %s (42.01002)", *((uint32_t*)&fp2), _ftostr(buf, fp2));
+    test1(fp2, "42280a43");
 #endif
 #if 1
     printf("(local) get address, read via ptr\n");
@@ -66,133 +88,66 @@ void references(void) {
     // read fp via pointer and assign global
     fp3 = *fp_p;
 
-    printf("fp2:0x%08lx [exp:] %s (23.1234)\n", *((uint32_t*)&fp2), _ftostr(buf, fp2));
-    printf("fp3:0x%08lx [exp:] %s (23.1234)\n", *((uint32_t*)&fp3), _ftostr(buf, fp3));
+    printf("fp2:0x%08lx [exp:0x41b8fcb9] %s (23.1234)", *((uint32_t*)&fp2), _ftostr(buf, fp2));
+    test1(fp2, "41b8fcb9");
+    printf("fp3:0x%08lx [exp:0x41b8fcb9] %s (23.1234)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
+    test1(fp3, "41b8fcb9");
 #endif
 }
 
-void conversions(void)
+void testprinting(void)
 {
-    // conversions
-    printf("conversions (integer constant to float)\n");
-#ifdef TEST_8
-    fp1 = -12;
-    fp2 = 199;
-    printf("fp1 0x%08lx [] %s (-12)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
-    printf("fp2 0x%08lx [] %s (199)\n", *((uint32_t*)&fp2), _ftostr(buf, fp2));
-#endif
-#ifdef TEST_16
-    fp1 = -4711;
-    fp2 = 42000;
-    printf("fp1 0x%08lx [] %s (-4711)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
-    printf("fp2 0x%08lx [] %s (42000)\n", *((uint32_t*)&fp2), _ftostr(buf, fp2));
-#endif
-#ifdef TEST_32
-    fp1 = -321198;
-    fp2 = 3200098;
-    printf("fp1 0x%08lx [] %s (-321198)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
-    printf("fp2 0x%08lx [] %s (3200098)\n", *((uint32_t*)&fp2), _ftostr(buf, fp2));
-#endif
+    static float a,b;
+    printf("\ntestprinting:\n\n");
 
-    printf("conversions (float constant to integer)\n");
-#ifdef TEST_8
-    var_schar = (signed char)12.3f;
-    printf("%s (12.3) schar:%d (12)\n", _ftostr(buf, 12.3f), (int)var_schar);
-    var_uchar = (unsigned char)19.9f;
-    printf("%s (19.9) uchar:%u (19)\n", _ftostr(buf, 19.9f), (int)var_uchar);
-#endif
-#ifdef TEST_16
-    var_sint = (signed short)1234.5f;
-    printf("%s (1234.5) sint:%d (1234)\n", _ftostr(buf, 1234.5f), var_sint);
-    var_uint = (unsigned short)1999.9f;
-    printf("%s (1999.9) uint:%u (1999)\n", _ftostr(buf, 1999.9f), var_uint);
-#endif
-#ifdef TEST_32
-    var_slong = (signed long)123456.5f;
-    printf("%s (123456.5f) slong:%ld (123456)\n", _ftostr(buf, 123456.5f), var_slong);
-    var_ulong = (unsigned long)199988.9f;
-    printf("%s (199988.9) ulong:%lu (199988)\n", _ftostr(buf, 199988.9f), var_ulong);
-#endif
-}
+    a = 1.0f;    printf("0x%08lx %s\n", *((uint32_t*)&a), _ftostr(buf, a) );
+    b = 0.10f;
+    a = b * a;       printf("0x%08lx %s\n", *((uint32_t*)&a), _ftostr(buf, a) );
+    a = b * a;       printf("0x%08lx %s\n", *((uint32_t*)&a), _ftostr(buf, a) );
+    a = b * a;       printf("0x%08lx %s\n", *((uint32_t*)&a), _ftostr(buf, a) );
+    a = b * a;       printf("0x%08lx %s\n", *((uint32_t*)&a), _ftostr(buf, a) );
+    a = b * a;       printf("0x%08lx %s\n", *((uint32_t*)&a), _ftostr(buf, a) );
+    printf("\n");
 
-void arithmetics(void)
-{
-    // addition
-#if 1
-    printf("constant + constant\n");
-    fp1 = 0.1f;
-    fp2 = 0.2f;
-    printf("    0x%08lx [] %s (0.1)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
-    printf("    0x%08lx [] %s (0.2)\n", *((uint32_t*)&fp2), _ftostr(buf, fp2));
+    a = 0.00012f;    printf("0x%08lx %s\n", *((uint32_t*)&a), _ftostr(buf, a) );
+    b = 10.0f;
+    a = b * a;       printf("0x%08lx %s\n", *((uint32_t*)&a), _ftostr(buf, a) );
+    a = b * a;       printf("0x%08lx %s\n", *((uint32_t*)&a), _ftostr(buf, a) );
+    a = b * a;       printf("0x%08lx %s\n", *((uint32_t*)&a), _ftostr(buf, a) );
+    a = b * a;       printf("0x%08lx %s\n", *((uint32_t*)&a), _ftostr(buf, a) );
+    a = b * a;       printf("0x%08lx %s\n", *((uint32_t*)&a), _ftostr(buf, a) );
+    printf("\n");
 
-    fp3 = 0.1f + 0.2f;
-    printf("fp3:0x%08lx [] %s (0.3)\n", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-#endif
-    // substraction
-#if 0
-    printf("constant - constant\n");
-    fp1 = 0.1f;
-    fp2 = 0.2f;
-    fp3 = 0.1f - 0.2f; //FIXME: Invalid operands for binary operator '-'
+    a = 40000.0f;    printf("0x%08lx %s\n", *((uint32_t*)&a), _ftostr(buf, a) );
+    b = 10.0f;
+    a = b * a;       printf("0x%08lx %s\n", *((uint32_t*)&a), _ftostr(buf, a) );
+    a = b * a;       printf("0x%08lx %s\n", *((uint32_t*)&a), _ftostr(buf, a) );
+    a = b * a;       printf("0x%08lx %s\n", *((uint32_t*)&a), _ftostr(buf, a) );
+    a = b * a;       printf("0x%08lx %s\n", *((uint32_t*)&a), _ftostr(buf, a) );
+    a = b * a;       printf("0x%08lx %s\n", *((uint32_t*)&a), _ftostr(buf, a) );
+    printf("\n");
 
-    printf("    0x%08lx [] %s (0.1)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
-    printf("    0x%08lx [] %s (0.2)\n", *((uint32_t*)&fp2), _ftostr(buf, fp2));
-    printf("fp3:0x%08lx [] %s (0.3)\n", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-#endif
-    // multiplication
-#if 1
-    printf("constant * constant\n");
-    fp1 = 0.1f;
-    fp2 = 0.2f;
-    fp3 = 0.1f * 0.2f; // FIXME: Precondition violated: IsClassInt (T), file 'cc65/datatype.c', line 1008
-
-    printf("    0x%08lx [] %s (0.1)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
-    printf("    0x%08lx [] %s (0.2)\n", *((uint32_t*)&fp2), _ftostr(buf, fp2));
-    printf("fp3:0x%08lx [] %s (0.3)\n", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-#endif
-
-    // division
-#if 1
-    printf("constant / constant\n");
-    fp1 = 0.1f;
-    fp2 = 0.2f;
-    fp3 = 0.1f / 0.2f; // FIXME: Precondition violated: IsClassInt (T), file 'cc65/datatype.c', line 1008
-
-    printf("    0x%08lx [] %s (0.1)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
-    printf("    0x%08lx [] %s (0.2)\n", *((uint32_t*)&fp2), _ftostr(buf, fp2));
-    printf("fp3:0x%08lx [] %s (0.3)\n", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-#endif
-}
-
-void comparisons(void) {
-    // comparisons
-#if 1
-    /* FIXME: this does not work yet */
-    printf("0.1f == 0.1f is "); if (0.1f == 0.1f) { printf("true\n"); } else { printf("false\n"); }
-    printf("0.2f == 0.1f is "); if (0.2f == 0.1f) { printf("true\n"); } else { printf("false\n"); }
-    printf("0.1f != 0.1f is "); if (0.1f != 0.1f) { printf("true\n"); } else { printf("false\n"); }
-    printf("0.2f != 0.1f is "); if (0.2f != 0.1f) { printf("true\n"); } else { printf("false\n"); }
-#endif
-
+    a = -40000.0f;    printf("0x%08lx %s\n", *((uint32_t*)&a), _ftostr(buf, a) );
+    b = 10.0f;
+    a = b * a;       printf("0x%08lx %s\n", *((uint32_t*)&a), _ftostr(buf, a) );
+    a = b * a;       printf("0x%08lx %s\n", *((uint32_t*)&a), _ftostr(buf, a) );
+    a = b * a;       printf("0x%08lx %s\n", *((uint32_t*)&a), _ftostr(buf, a) );
+    a = b * a;       printf("0x%08lx %s\n", *((uint32_t*)&a), _ftostr(buf, a) );
+    a = b * a;       printf("0x%08lx %s\n", *((uint32_t*)&a), _ftostr(buf, a) );
+    printf("\n");
 }
 
 int main(void)
 {
     printf("float-minimal\n");
 
+    printf("sizeof (float): %d\n", (int)sizeof(float));
+
     references();
     WAIT();
-
-    conversions();
+    testprinting();
     WAIT();
 
-    comparisons();
-    WAIT();
-
-    arithmetics();
-    WAIT();
-
-    printf("float-minimal done\n");
-
-    return 0;
+    printf("float-minimal (res:%d)\n", result);
+    return result;
 }

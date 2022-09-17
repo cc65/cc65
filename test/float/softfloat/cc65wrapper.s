@@ -41,6 +41,9 @@ eaxufloat:
     ; FIXME
     jmp _int32_to_float32
 
+;------------------------------------------------------------------------------
+; conversions: from float
+
     .import _float32_to_int32
 
     ; float -> 16bit int
@@ -53,8 +56,22 @@ feaxint:
 feaxlong:
     jmp _float32_to_int32
 
+    ; the ! operator, returns a bool (int)
     .export fbnegeax
 fbnegeax:
+    stx     tmp1
+    ora     tmp1
+    ora     sreg
+    ora     sreg+1
+    beq     @ret1   ; is = 0
+    ; return 0
+    lda #0
+    tax
+    rts
+@ret1:
+    lda #1
+    ldx #0
+    rts
 
     .import _float32_add
     .import _float32_sub

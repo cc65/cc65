@@ -391,6 +391,7 @@ void MacDef (unsigned Style)
     Macro* M;
     TokNode* N;
     int HaveParams;
+    int DefineActive;
 
     /* We expect a macro name here */
     if (CurTok.Tok != TOK_IDENT) {
@@ -482,6 +483,8 @@ void MacDef (unsigned Style)
     } else if (HaveParams) {
         ConsumeRParen ();
     }
+    /* No .define found yet */
+    DefineActive = 0;
 
     /* Preparse the macro body. We will read the tokens until we reach end of
     ** file, or a .endmacro (or end of line for DEFINE-style macros) and store
@@ -491,8 +494,8 @@ void MacDef (unsigned Style)
     while (1) {
         /* Check for end of macro */
         if (Style == MAC_STYLE_CLASSIC) {
-            /* In classic macros, only .endmacro is allowed */
-            if (CurTok.Tok == TOK_ENDMACRO) {
+            /* In classic macros, only .endmacro is allowed, but ignore it if it is part of a .define */
+            if (CurTok.Tok == TOK_ENDMACRO && !DefineActive) {
                 /* Done */
                 break;
             }
@@ -543,7 +546,7 @@ void MacDef (unsigned Style)
         }
 
         /* Create a token node for the current token */
-        N = NewTokNode ();
+        N = NewTokNode();
 
         /* If the token is an identifier, check if it is a local parameter */
         if (CurTok.Tok == TOK_IDENT) {
@@ -572,7 +575,14 @@ void MacDef (unsigned Style)
             M->TokLast = N;
         }
         ++M->TokCount;
-
+        
+        /* Mark if .define has been read until end of line has been reached */
+        if (CurTok.Tok == TOK_DEFINE) {
+            DefineActive = 1;
+        } else if (TokIsSep(CurTok.Tok)) {
+            DefineActive = 0;
+        }
+		
         /* Read the next token */
         NextTok ();
     }

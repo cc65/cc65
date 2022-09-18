@@ -12,7 +12,7 @@ int main(void)
     fn_t bar;
 
     foo(bar);
-    return 0;
+    return failures;
 }
 
 void foo(int func(int))

@@ -42,5 +42,5 @@ int main(void) {
         printf("Failures: %u\n", failures);
     }
     
-    return 0;
+    return failures;
 }

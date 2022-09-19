@@ -9,14 +9,14 @@
 #include <stdio.h>
 #include <kim1.h>
 
-int main (void) 
+int main (void)
 {
    char str[100];
    char c = 0x00;
 
    printf ("\nHello World!\n\n");
    printf ("Type a line and press ENTER, please.\n\n");
-   
+
    gets( str );
 
    printf ("\n\nThanks: %s\n\n", str);

@@ -8,11 +8,11 @@ typedef unsigned long int  ulong;
 #define LIMIT 100000L
 
 // BITARRAY
-// 
+//
 // My bit-access macros pre-divide by two on the presumption that you'll never
 // try try access both odd and even bits!
 
-#define GETBIT(array, bit) (array[bit >> 4]  &  (1 << ((bit >> 1) & 7)))       
+#define GETBIT(array, bit) (array[bit >> 4]  &  (1 << ((bit >> 1) & 7)))
 #define SETBIT(array, bit) (array[bit >> 4] |=  (1 << ((bit >> 1) & 7)))
 #define CLRBIT(array, bit) (array[bit >> 4] &= ~(1 << ((bit >> 1) & 7)))
 
@@ -65,7 +65,7 @@ int main(void)
    RepeatChar('*', 70);
    puts("\r\n** Prime Number Sieve - Dave Plummer 2022                           **");
    RepeatChar('*', 70);
-   
+
    printf("\r\n\r\nCalculating primes to %ld using a sqrt of %ld...\r\n", LIMIT, rootOfLimit);
 
    // Calculate how much memory should be allocated
@@ -80,7 +80,7 @@ int main(void)
    else
    {
       printf("Allocated %ld bytes for %ld slots\r\n", numBytesAllocated, LIMIT);
-      
+
       // Preset all the bits to true
 
       for (iNumber = 0; iNumber < numBytesAllocated; iNumber++)
@@ -102,7 +102,7 @@ int main(void)
             break;
          }
       }
-     
+
       for (n = (ulong) currentFactor * currentFactor; n <= LIMIT; n += currentFactor * 2)
          CLRBIT(array, n);
 

@@ -742,6 +742,7 @@ TARGETS :=     \
   creativision \
   cx16         \
   gamate       \
+  kim1		   \
   lunix        \
   lynx         \
   nes          \

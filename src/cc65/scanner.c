@@ -69,6 +69,7 @@
 
 Token CurTok;           /* The current token */
 Token NextTok;          /* The next token */
+int   PPParserRunning;  /* Is tokenizer used by the preprocessor */
 
 
 
@@ -188,10 +189,12 @@ static int SkipWhite (void)
 {
     while (1) {
         while (CurC == '\0') {
-            if (NextLine () == 0) {
+            /* If reading next line fails or is disabled with directives, bail
+            ** out.
+            */
+            if (PPParserRunning || PreprocessNextLine () == 0) {
                 return 0;
             }
-            Preprocess ();
         }
         if (IsSpace (CurC)) {
             NextChar ();
@@ -240,6 +243,45 @@ int IsSym (char* S)
         return 1;
     } else {
         return 0;
+    }
+}
+
+
+
+int IsPPNumber (int Cur, int Next)
+/* Return 1 if the two successive characters indicate a pp-number, otherwise
+** return 0.
+*/
+{
+    return Cur != '.' ? IsDigit (Cur) : IsDigit (Next);
+}
+
+
+
+void CopyPPNumber (StrBuf* Target)
+/* Copy a pp-number from the input to Target */
+{
+    int Std;
+
+    if (!IsPPNumber (CurC, NextC)) {
+        return;
+    }
+
+    /* P-exp is only valid in C99 and later */
+    Std = IS_Get (&Standard);
+    while (IsIdent (CurC) || IsDigit (CurC) || CurC == '.') {
+        SB_AppendChar (Target, CurC);
+        if (NextC == '+' || NextC == '-') {
+            if (CurC == 'e' || CurC == 'E' ||
+                (Std >= STD_C99 && (CurC == 'p' || CurC == 'P'))) {
+                SB_AppendChar (Target, NextC);
+                NextChar ();
+            } else {
+                NextChar ();
+                break;
+            }
+        }
+        NextChar ();
     }
 }
 
@@ -370,6 +412,15 @@ static void CharConst (void)
 {
     int C;
 
+    if (CurC == 'L') {
+        /* Wide character constant */
+        NextTok.Tok = TOK_WCCONST;
+        NextChar ();
+    } else {
+        /* Narrow character constant */
+        NextTok.Tok = TOK_CCONST;
+    }
+
     /* Skip the quote */
     NextChar ();
 
@@ -383,9 +434,6 @@ static void CharConst (void)
         /* Skip the quote */
         NextChar ();
     }
-
-    /* Setup values and attributes */
-    NextTok.Tok  = TOK_CCONST;
 
     /* Translate into target charset */
     NextTok.IVal = SignExtendChar (TgtTranslateChar (C));
@@ -457,75 +505,76 @@ static void StringConst (void)
 static void NumericConst (void)
 /* Parse a numeric constant */
 {
-    unsigned Base;              /* Temporary number base */
-    unsigned Prefix;            /* Base according to prefix */
-    StrBuf   S = STATIC_STRBUF_INITIALIZER;
+    unsigned Base;              /* Temporary number base according to prefix */
+    unsigned Index;
+    StrBuf   Src = AUTO_STRBUF_INITIALIZER;
     int      IsFloat;
     char     C;
     unsigned DigitVal;
     unsigned long IVal;         /* Value */
 
+    /* Get the pp-number first, then parse on it */
+    CopyPPNumber (&Src);
+    SB_Terminate (&Src);
+    SB_Reset (&Src);
+
     /* Check for a leading hex, octal or binary prefix and determine the
     ** possible integer types.
     */
-    if (CurC == '0') {
+    if (SB_Peek (&Src) == '0') {
         /* Gobble 0 and examine next char */
-        NextChar ();
-        if (toupper (CurC) == 'X') {
-            Base = Prefix = 16;
-            NextChar ();        /* gobble "x" */
-        } else if (toupper (CurC) == 'B' && IS_Get (&Standard) >= STD_CC65) {
-            Base = Prefix = 2;
-            NextChar ();        /* gobble 'b' */
+        SB_Skip (&Src);
+        if (toupper (SB_Peek (&Src)) == 'X' &&
+            IsXDigit (SB_LookAt (&Src, SB_GetIndex (&Src) + 1))) {
+            Base = 16;
+            SB_Skip (&Src);     /* gobble "x" */
+        } else if (toupper (SB_Peek (&Src)) == 'B'  &&
+                   IS_Get (&Standard) >= STD_CC65   &&
+                   IsDigit (SB_LookAt (&Src, SB_GetIndex (&Src) + 1))) {
+            Base = 2;
+            SB_Skip (&Src);     /* gobble 'b' */
         } else {
             Base = 10;          /* Assume 10 for now - see below */
-            Prefix = 8;         /* Actual prefix says octal */
         }
     } else {
-        Base  = Prefix = 10;
+        Base = 10;
     }
 
-    /* Because floating point numbers don't have octal prefixes (a number
-    ** with a leading zero is decimal), we first have to read the number
-    ** before converting it, so we can determine if it's a float or an
-    ** integer.
+    /* Because floating point numbers don't have octal prefixes (a number with
+    ** a leading zero is decimal), we first have to read the number before
+    ** converting it, so we can determine if it's a float or an integer.
     */
-    while (IsXDigit (CurC) && HexVal (CurC) < Base) {
-        SB_AppendChar (&S, CurC);
-        NextChar ();
+    Index = SB_GetIndex (&Src);
+    while ((C = SB_Peek (&Src)) != '\0' && (Base <= 10 ? IsDigit (C) : IsXDigit (C))) {
+        SB_Skip (&Src);
     }
-    SB_Terminate (&S);
 
     /* The following character tells us if we have an integer or floating
     ** point constant. Note: Hexadecimal floating point constants aren't
     ** supported in C89.
     */
-    IsFloat = (CurC == '.' ||
-               (Base == 10 && toupper (CurC) == 'E') ||
-               (Base == 16 && toupper (CurC) == 'P' && IS_Get (&Standard) >= STD_C99));
+    IsFloat = (C == '.' ||
+               (Base == 10 && toupper (C) == 'E') ||
+               (Base == 16 && toupper (C) == 'P' && IS_Get (&Standard) >= STD_C99));
 
-    /* If we don't have a floating point type, an octal prefix results in an
-    ** octal base.
-    */
-    if (!IsFloat && Prefix == 8) {
+    /* An octal prefix for an integer type results in an octal base */
+    if (!IsFloat && Base == 10 && SB_LookAt (&Src, 0) == '0') {
         Base = 8;
     }
 
-    /* Since we do now know the correct base, convert the remembered input
-    ** into a number.
-    */
-    SB_Reset (&S);
+    /* Since we now know the correct base, convert the input into a number */
+    SB_SetIndex (&Src, Index);
     IVal = 0;
-    while ((C = SB_Get (&S)) != '\0') {
+    while ((C = SB_Peek (&Src)) != '\0' && (Base <= 10 ? IsDigit (C) : IsXDigit (C))) {
         DigitVal = HexVal (C);
         if (DigitVal >= Base) {
-            Error ("Numeric constant contains digits beyond the radix");
+            Error ("Invalid digit \"%c\" beyond radix %u constant", C, Base);
+            SB_Clear (&Src);
+            break;
         }
         IVal = (IVal * Base) + DigitVal;
+        SB_Skip (&Src);
     }
-
-    /* We don't need the string buffer any longer */
-    SB_Done (&S);
 
     /* Distinguish between integer and floating point constants */
     if (!IsFloat) {
@@ -537,27 +586,32 @@ static void NumericConst (void)
         ** possible to convert the data to unsigned long even if the IT_ULONG
         ** flag were not set, but we are not doing that.
         */
-        if (toupper (CurC) == 'U') {
+        if (toupper (SB_Peek (&Src)) == 'U') {
             /* Unsigned type */
-            NextChar ();
-            if (toupper (CurC) != 'L') {
+            SB_Skip (&Src);
+            if (toupper (SB_Peek (&Src)) != 'L') {
                 Types = IT_UINT | IT_ULONG;
             } else {
-                NextChar ();
+                SB_Skip (&Src);
                 Types = IT_ULONG;
             }
-        } else if (toupper (CurC) == 'L') {
+        } else if (toupper (SB_Peek (&Src)) == 'L') {
             /* Long type */
-            NextChar ();
-            if (toupper (CurC) != 'U') {
+            SB_Skip (&Src);
+            if (toupper (SB_Peek (&Src)) != 'U') {
                 Types = IT_LONG | IT_ULONG;
                 WarnTypes = IT_ULONG;
             } else {
-                NextChar ();
+                SB_Skip (&Src);
                 Types = IT_ULONG;
             }
         } else {
-            if (Prefix == 10) {
+            if (SB_Peek (&Src) != '\0') {
+                Error ("Invalid suffix \"%s\" on integer constant",
+                       SB_GetConstBuf (&Src) + SB_GetIndex (&Src));
+            }
+
+            if (Base == 10) {
                 /* Decimal constants are of any type but uint */
                 Types = IT_INT | IT_LONG | IT_ULONG;
                 WarnTypes = IT_LONG | IT_ULONG;
@@ -621,16 +675,16 @@ static void NumericConst (void)
         Double FVal = FP_D_FromInt (IVal);      /* Convert to double */
 
         /* Check for a fractional part and read it */
-        if (CurC == '.') {
+        if (SB_Peek (&Src) == '.') {
 
             Double Scale;
 
             /* Skip the dot */
-            NextChar ();
+            SB_Skip (&Src);
 
             /* Read fractional digits */
             Scale  = FP_D_Make (1.0);
-            while (IsXDigit (CurC) && (DigitVal = HexVal (CurC)) < Base) {
+            while (IsXDigit (SB_Peek (&Src)) && (DigitVal = HexVal (SB_Peek (&Src))) < Base) {
                 /* Get the value of this digit */
                 Double FracVal = FP_D_Div (FP_D_FromInt (DigitVal * Base), Scale);
                 /* Add it to the float value */
@@ -638,25 +692,25 @@ static void NumericConst (void)
                 /* Scale base */
                 Scale = FP_D_Mul (Scale, FP_D_FromInt (DigitVal));
                 /* Skip the digit */
-                NextChar ();
+                SB_Skip (&Src);
             }
         }
 
         /* Check for an exponent and read it */
-        if ((Base == 16 && toupper (CurC) == 'F') ||
-            (Base == 10 && toupper (CurC) == 'E')) {
+        if ((Base == 16 && toupper (SB_Peek (&Src)) == 'P') ||
+            (Base == 10 && toupper (SB_Peek (&Src)) == 'E')) {
 
             unsigned Digits;
             unsigned Exp;
 
             /* Skip the exponent notifier */
-            NextChar ();
+            SB_Skip (&Src);
 
             /* Read an optional sign */
-            if (CurC == '-') {
-                NextChar ();
-            } else if (CurC == '+') {
-                NextChar ();
+            if (SB_Peek (&Src) == '-') {
+                SB_Skip (&Src);
+            } else if (SB_Peek (&Src) == '+') {
+                SB_Skip (&Src);
             }
 
             /* Read exponent digits. Since we support only 32 bit floats
@@ -667,11 +721,11 @@ static void NumericConst (void)
             */
             Digits = 0;
             Exp    = 0;
-            while (IsDigit (CurC)) {
+            while (IsDigit (SB_Peek (&Src))) {
                 if (++Digits <= 3) {
-                    Exp = Exp * 10 + HexVal (CurC);
+                    Exp = Exp * 10 + HexVal (SB_Peek (&Src));
                 }
-                NextChar ();
+                SB_Skip (&Src);
             }
 
             /* Check for errors: We must have exponent digits, and not more
@@ -690,10 +744,14 @@ static void NumericConst (void)
         }
 
         /* Check for a suffix and determine the type of the constant */
-        if (toupper (CurC) == 'F') {
-            NextChar ();
+        if (toupper (SB_Peek (&Src)) == 'F') {
+            SB_Skip (&Src);
             NextTok.Type = type_float;
         } else {
+            if (SB_Peek (&Src) != '\0') {
+                Error ("Invalid suffix \"%s\" on floating constant",
+                       SB_GetConstBuf (&Src) + SB_GetIndex (&Src));
+            }
             NextTok.Type = type_double;
         }
 
@@ -702,6 +760,9 @@ static void NumericConst (void)
         NextTok.Tok  = TOK_FCONST;
 
     }
+
+    /* We don't need the string buffer any longer */
+    SB_Done (&Src);
 }
 
 
@@ -743,39 +804,38 @@ void NextToken (void)
     }
 
     /* Determine the next token from the lookahead */
-    if (IsDigit (CurC) || (CurC == '.' && IsDigit (NextC))) {
+    if (IsPPNumber (CurC, NextC)) {
         /* A number */
         NumericConst ();
         return;
     }
 
-    /* Check for wide character literals */
-    if (CurC == 'L' && NextC == '\"') {
-        StringConst ();
-        return;
+    /* Check for wide character constants and literals */
+    if (CurC == 'L') {
+        if (NextC == '\"') {
+            StringConst ();
+            return;
+        } else if (NextC == '\'') {
+            CharConst ();
+            return;
+        }
     }
 
     /* Check for keywords and identifiers */
     if (IsSym (token)) {
 
-        /* Check for a keyword */
-        if ((NextTok.Tok = FindKey (token)) != TOK_IDENT) {
-            /* Reserved word found */
-            return;
+        if (!PPParserRunning) {
+            /* Check for a keyword */
+            if ((NextTok.Tok = FindKey (token)) != TOK_IDENT) {
+                /* Reserved word found */
+                return;
+            }
         }
+
         /* No reserved word, check for special symbols */
         if (token[0] == '_' && token[1] == '_') {
             /* Special symbols */
-            if (strcmp (token+2, "FILE__") == 0) {
-                NextTok.SVal = AddLiteral (GetCurrentFile());
-                NextTok.Tok  = TOK_SCONST;
-                return;
-            } else if (strcmp (token+2, "LINE__") == 0) {
-                NextTok.Tok  = TOK_ICONST;
-                NextTok.IVal = GetCurrentLine();
-                NextTok.Type = type_int;
-                return;
-            } else if (strcmp (token+2, "func__") == 0) {
+            if (strcmp (token+2, "func__") == 0) {
                 /* __func__ is only defined in functions */
                 if (CurrentFunc) {
                     NextTok.SVal = AddLiteral (F_GetFuncName (CurrentFunc));
@@ -1009,6 +1069,15 @@ void NextToken (void)
 
         case '~':
             SetTok (TOK_COMP);
+            break;
+
+        case '#':
+            NextChar ();
+            if (CurC == '#') {
+                SetTok (TOK_DOUBLE_HASH);
+            } else {
+                NextTok.Tok = TOK_HASH;
+            }
             break;
 
         default:

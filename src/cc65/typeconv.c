@@ -143,10 +143,10 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
 
         /* Do the integer constant <-> absolute address conversion if necessary */
         if (IsClassPtr (NewType)) {
-            Expr->Flags &= ~E_LOC_NONE;
+            Expr->Flags &= ~E_MASK_LOC;
             Expr->Flags |= E_LOC_ABS | E_ADDRESS_OF;
         } else if (IsClassInt (NewType)) {
-            Expr->Flags &= ~(E_LOC_ABS | E_ADDRESS_OF);
+            Expr->Flags &= ~(E_MASK_LOC | E_ADDRESS_OF);
             Expr->Flags |= E_LOC_NONE;
         }
 

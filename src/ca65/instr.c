@@ -1298,7 +1298,7 @@ static void EmitCode (EffAddr* A)
             break;
 
         case 2:
-            if (CPU == CPU_65816 && (A->AddrModeBit & (AM65_ABS | AM65_ABS_X | AM65_ABS_Y))) {
+            if (CPU == CPU_65816 && (A->AddrModeBit & (AM65_ABS | AM65_ABS_X | AM65_ABS_Y | AM65_ABS_X_IND))) {
                 /* This is a 16 bit mode that uses an address. If in 65816,
                 ** mode, force this address into 16 bit range to allow
                 ** addressing inside a 64K segment.

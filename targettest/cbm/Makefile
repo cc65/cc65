@@ -2,6 +2,10 @@
 # var. to build for another target system.
 SYS ?= c64
 
+# This one comes with the VICE emulator.
+# See http://vice-emu.sourceforge.net/
+C1541 ?= c1541
+
 # Just the usual way to find out if we're
 # using cmd.exe to execute make rules.
 ifneq ($(shell echo),)
@@ -32,10 +36,19 @@ endif
 
 EXELIST_c64 = \
         petscii.prg \
-        cbmdir-test.prg
+        cbmdir-test.prg \
+        cbmread.prg
+
+EXTRALIST_c64 = \
+	read-0 \
+	read-1 \
+	read-8
 
 EXELIST_vic20 = \
         cbmdir-test.prg
+
+DISK_c64       = testcode.d64
+DISK_vic20     = testcode.d64
 
 ifneq ($(EXELIST_$(SYS)),)
 testcode: $(EXELIST_$(SYS))
@@ -66,5 +79,38 @@ else
 	$(CL) -t $(SYS) -Oris -o $@ $<
 endif
 
+cbmread.prg: cbmread.c
+ifeq ($(SYS),vic20)
+	$(CL) -t $(SYS) -C vic20-32k.cfg -Oris -o $@ $<
+else
+	$(CL) -t $(SYS) -Oris -o $@ $<
+endif
+
+# --------------------------------------------------------------------------
+# Rule to make a CBM disk with all testcode. Needs the c1541 program that comes
+# with the VICE emulator.
+
+define D64_WRITE_PRG_recipe
+
+$(C1541) -attach $@ -write "$(subst ?,$(SPACE),$(file))" "$(subst ?,$(SPACE),$(subst .prg,,$(notdir $(file))))",p >$(NULLDEV)
+
+endef # D64_WRITE_PRG_recipe
+
+define D64_WRITE_SEQ_recipe
+
+$(C1541) -attach $@ -write "$(subst ?,$(SPACE),$(file))" $(notdir $(file)),s >$(NULLDEV)
+
+endef # D64_WRITE_SEQ_recipe
+
+disk: $(DISK_$(SYS))
+
+testcode.d64: testcode
+	@$(C1541) -format "testcode,00" d64 $@ >$(NULLDEV)
+	$(foreach file,$(EXELIST_$(SYS)),$(D64_WRITE_PRG_recipe))
+	$(foreach file,$(EXTRALIST_$(SYS)),$(D64_WRITE_SEQ_recipe))
+#	$(foreach file,$(EMD) $(MOU) $(TGI),$(D64_WRITE_SEQ_recipe))
+
 clean:
 	@$(DEL) *.lbl petscii.prg cbmdir-test.prg 2>$(NULLDEV)
+	@$(DEL) $(DISK_c64)
+	@$(DEL) $(DISK_vic20)

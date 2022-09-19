@@ -776,14 +776,20 @@ static void PrintUnresolved (ExpCheckFunc F, void* Data)
             Import* Imp = E->ImpList;
             const char* name = GetString (E->Name);
             while (Imp) {
-                unsigned J;
-                for (J = 0; J < CollCount (&Imp->RefLines); ++J) {
-                    const LineInfo* LI = CollConstAt (&Imp->RefLines, J);
-                    fprintf (stderr,
-                         "%s:%u: Error: Unresolved external '%s'\n",
-                         GetSourceName (LI),
-                         GetSourceLine (LI),
-                         name);
+                unsigned J, count = CollCount (&Imp->RefLines);
+                /* The count is 0 when the import was not added by an input file,
+                   but by the compiler itself. */
+                if (count == 0) {
+                    fprintf (stderr, "Error: Unresolved external '%s'\n", name);
+                } else {
+                    for (J = 0; J < count; ++J) {
+                        const LineInfo* LI = CollConstAt (&Imp->RefLines, J);
+                        fprintf (stderr,
+                            "%s:%u: Error: Unresolved external '%s'\n",
+                            GetSourceName (LI),
+                            GetSourceLine (LI),
+                            name);
+                    }
                 }
                 Imp = Imp->Next;
             }

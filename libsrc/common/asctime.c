@@ -42,15 +42,18 @@
 /*                                   Code                                    */
 /*****************************************************************************/
 
+/*
+    CAUTION: we need to reserve enough space to be able to hold the maximum
+    length string:
 
+     1234567890123456789012345678901234567
+    "Wednesday September ..1 00:00:00 1970"
+*/
 
 char* __fastcall__ asctime (const struct tm* timep)
 {
-    static char buf[26];
+    static char buf[38];
 
     /* Format into given buffer and return the result */
     return strftime (buf, sizeof (buf), "%c\n", timep)? buf : 0;
 }
-
-
-

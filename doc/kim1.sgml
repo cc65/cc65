@@ -2,10 +2,10 @@
 
 <article>
 <title>MOS Technology KIM-1 specific information for cc65
-<author><url url="mailto:dave@davepl.com" name="Dave Plummer">
+<author><url url="mailto:davepl@davepl.com" name="Dave Plummer">
 
 <abstract>
-An overview over the KIM-1 runtime system as it is implemented for the cc65 C compiler.
+An overview of the KIM-1 runtime system as it is implemented for the cc65 C compiler.
 </abstract>
 
 <!-- Table of contents -->

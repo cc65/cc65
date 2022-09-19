@@ -40,8 +40,8 @@ _init:    cld                          ; Clear decimal mode
 
           jsr     _main
 
-; Back from main (this is also the _exit entry).  There may be a more elegant way to9
-; return to the monitor on the Kim-1, but I don't know it!
+; Back from main (this is also the _exit entry).  There may be a more elegant way to
+; return to the monitor on the KIM-1, but I don't know it!
 
 _exit:    brk
 

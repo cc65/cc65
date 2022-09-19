@@ -166,8 +166,9 @@ SER_CLOSE:
         sta     ACIA_CMD,x
 
         ; Done, return an error code
-:       lda     #<SER_ERR_OK
-        tax                     ; A is zero
+:       lda     #SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
+        tax
         stx     Index           ; Mark port as closed
         rts
 
@@ -253,23 +254,24 @@ SER_OPEN:
 
         ; Done
         stx     Index                   ; Mark port as open
-        lda     #<SER_ERR_OK
-        tax                             ; A is zero
+        lda     #SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
+        tax
         rts
 
         ; Device (hardware) not found
-NoDevice:lda    #<SER_ERR_NO_DEVICE
-        ldx     #>SER_ERR_NO_DEVICE
+NoDevice:lda    #SER_ERR_NO_DEVICE
+        ldx     #>$0000
         rts
 
         ; Invalid parameter
-InvParam:lda    #<SER_ERR_INIT_FAILED
-        ldx     #>SER_ERR_INIT_FAILED
+InvParam:lda    #SER_ERR_INIT_FAILED
+        ldx     #>$0000
         rts
 
         ; Baud rate not available
-InvBaud:lda     #<SER_ERR_BAUD_UNAVAIL
-        ldx     #>SER_ERR_BAUD_UNAVAIL
+InvBaud:lda     #SER_ERR_BAUD_UNAVAIL
+        ldx     #>$0000
         rts
 
 ;----------------------------------------------------------------------------
@@ -289,8 +291,8 @@ SER_GET:
 :       lda     RecvFreeCnt     ; (25)
         cmp     #$FF
         bne     :+
-        lda     #<SER_ERR_NO_DATA
-        ldx     #>SER_ERR_NO_DATA
+        lda     #SER_ERR_NO_DATA
+        ldx     #>$0000
         rts
 
         ; Check for flow stopped & enough free: release flow control
@@ -333,8 +335,8 @@ SER_PUT:
         ; Put byte into send buffer & send
 :       ldy     SendFreeCnt
         bne     :+
-        lda     #<SER_ERR_OVERFLOW
-        ldx     #>SER_ERR_OVERFLOW
+        lda     #SER_ERR_OVERFLOW
+        ldx     #>$0000
         rts
 
 :       ldy     SendTail
@@ -343,7 +345,8 @@ SER_PUT:
         dec     SendFreeCnt
         lda     #$FF            ; TryHard = true
         jsr     TryToSend
-        lda     #<SER_ERR_OK
+        lda     #SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
         tax
         rts
 
@@ -356,7 +359,8 @@ SER_STATUS:
         lda     ACIA_STATUS,x
         ldx     #$00
         sta     (ptr1,x)
-        txa                     ; SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
+        txa
         rts
 
 ;----------------------------------------------------------------------------
@@ -376,11 +380,12 @@ SER_IOCTL:
         bcs     :+
 
         stx     Slot
-        tax                     ; SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
+        tax
         rts
 
-:       lda     #<SER_ERR_INV_IOCTL
-        ldx     #>SER_ERR_INV_IOCTL
+:       lda     #SER_ERR_INV_IOCTL
+        ldx     #>$0000
         rts
 
 ;----------------------------------------------------------------------------

@@ -24,6 +24,10 @@ This is an ongoing controversial topic - everyone knows that. However, the follo
 
 The (bash) scripts used to check the above rules can be found in ```.github/check```. You can also run all checks using ```make check```.
 
+### identifiers and symbol names
+
+* any symbols that are exported from source files and/or appear in header files should not be in the "_symbol" form in C, or "__symbol" form in assembly. This way we evade the problem that "_symbol" may or may not be reserved by that standard.
+
 ### misc
 
 * 80 characters is the desired maximum width of files.  But, it isn't a "strong" rule; sometimes, you will want to type longer lines, in order to keep the parts of expressions or comments together on the same line.
@@ -158,6 +162,13 @@ The only exception to the above are actions that are exclusive to the github act
 ## Documentation
 
 * the printf family of function does not completely implement all printf modifiers and does not behave as expected in some cases - all this should be documented in detail
+
+## Floating point support
+
+The first step is implementing the datatype "float" as IEEE488 floats. Help welcomed!
+
+* WIP compiler/library changes are here: https://github.com/cc65/cc65/pull/1777
+* free software library with testbench is here: http://www.jhauser.us/arithmetic/
 
 ## Test suite
 

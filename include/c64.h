@@ -145,6 +145,7 @@ extern void c64_ram_emd[];
 extern void c64_ramcart_emd[];
 extern void c64_reu_emd[];
 extern void c64_vdc_emd[];
+extern void c64_rrr_emd[];
 extern void dtv_himem_emd[];
 extern void c64_hitjoy_joy[];
 extern void c64_numpad_joy[];

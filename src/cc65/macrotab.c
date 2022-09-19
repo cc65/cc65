@@ -42,6 +42,7 @@
 
 /* cc65 */
 #include "error.h"
+#include "preproc.h"
 #include "macrotab.h"
 
 
@@ -55,6 +56,9 @@
 /* The macro hash table */
 #define MACRO_TAB_SIZE  211
 static Macro* MacroTab[MACRO_TAB_SIZE];
+
+/* The undefined macros list head */
+static Macro* UndefinedMacrosListHead;
 
 
 
@@ -108,6 +112,29 @@ void FreeMacro (Macro* M)
 
 
 
+Macro* CloneMacro (const Macro* M)
+/* Clone a macro definition. The function is not insert the macro into the
+** macro table, thus the cloned instance cannot be freed with UndefineMacro.
+** Use FreeMacro for that.
+*/
+{
+    Macro* New = NewMacro (M->Name);
+    unsigned I;
+
+    for (I = 0; I < CollCount (&M->FormalArgs); ++I) {
+        /* Copy the argument */
+        const char* Arg = CollAtUnchecked (&M->FormalArgs, I);
+        CollAppend (&New->FormalArgs, xstrdup (Arg));
+    }
+    New->ArgCount = M->ArgCount;
+    New->Variadic = M->Variadic;
+    SB_Copy (&New->Replacement, &M->Replacement);
+
+    return New;
+}
+
+
+
 void DefineNumericMacro (const char* Name, long Val)
 /* Define a macro for a numeric constant */
 {
@@ -150,10 +177,11 @@ void InsertMacro (Macro* M)
 
 
 
-int UndefineMacro (const char* Name)
-/* Search for the macro with the given name and remove it from the macro
-** table if it exists. Return 1 if a macro was found and deleted, return
-** 0 otherwise.
+Macro* UndefineMacro (const char* Name)
+/* Search for the macro with the given name, if it exists, remove it from
+** the defined macro table and insert it to a list for pending deletion.
+** Return the macro if it was found and removed, return 0 otherwise.
+** To safely free the removed macro, use FreeUndefinedMacros().
 */
 {
     /* Get the hash value of the macro name */
@@ -173,11 +201,12 @@ int UndefineMacro (const char* Name)
                 L->Next = M->Next;
             }
 
-            /* Delete the macro */
-            FreeMacro (M);
+            /* Add this macro to pending deletion list */
+            M->Next = UndefinedMacrosListHead;
+            UndefinedMacrosListHead = M;
 
             /* Done */
-            return 1;
+            return M;
         }
 
         /* Next macro */
@@ -187,6 +216,23 @@ int UndefineMacro (const char* Name)
 
     /* Not found */
     return 0;
+}
+
+
+
+void FreeUndefinedMacros (void)
+/* Free all undefined macros */
+{
+    Macro* Next;
+
+    while (UndefinedMacrosListHead != 0) {
+        Next = UndefinedMacrosListHead->Next;
+
+        /* Delete the macro */
+        FreeMacro (UndefinedMacrosListHead);
+
+        UndefinedMacrosListHead = Next;
+    }
 }
 
 
@@ -201,6 +247,10 @@ Macro* FindMacro (const char* Name)
     Macro* M = MacroTab[Hash];
     while (M) {
         if (strcmp (M->Name, Name) == 0) {
+            /* Check for some special macro names */
+            if (Name[0] == '_') {
+                HandleSpecialMacro (M, Name);
+            }
             /* Found it */
             return M;
         }
@@ -245,7 +295,7 @@ void AddMacroArg (Macro* M, const char* Arg)
     for (I = 0; I < CollCount (&M->FormalArgs); ++I) {
         if (strcmp (CollAtUnchecked (&M->FormalArgs, I), Arg) == 0) {
             /* Found */
-            Error ("Duplicate macro parameter: '%s'", Arg);
+            PPError ("Duplicate macro parameter: '%s'", Arg);
             break;
         }
     }

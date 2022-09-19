@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------
-// Hello World for Kim-1
+// Hello World for KIM-1
 //
 // Dave Plummer based on Sym-1 sample by Wayne Parham
 //

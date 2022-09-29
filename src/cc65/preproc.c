@@ -3025,6 +3025,7 @@ static int ParseDirectives (unsigned ModeFlags)
                         if (!PPSkip) {
                             if ((ModeFlags & MSM_IN_ARG_LIST) == 0) {
                                 DoPragma ();
+                                return Whitespace;
                             } else {
                                 PPError ("Embedded #pragma directive within macro arguments is unsupported");
                             }
@@ -3153,16 +3154,12 @@ static void PreprocessDirective (StrBuf* Source, StrBuf* Target, unsigned ModeFl
 ** whitespace and comments, then do macro replacement.
 */
 {
-    int         OldIndex = SB_GetIndex (Source);
     MacroExp    E;
 
     SkipWhitespace (0);
     InitMacroExp (&E);
     ReplaceMacros (Source, Target, &E, ModeFlags | MSM_IN_DIRECTIVE);
     DoneMacroExp (&E);
-
-    /* Restore the source input index */
-    SB_SetIndex (Source, OldIndex);
 }
 
 
@@ -3186,7 +3183,9 @@ void Preprocess (void)
     AddPreLine (PLine);
 
     /* Add leading whitespace to prettify preprocessor output */
-    AppendIndent (PLine, SB_GetIndex (Line));
+    if (CurC != '\0') {
+        AppendIndent (PLine, SB_GetIndex (Line));
+    }
 
     /* Expand macros if any */
     InitMacroExp (&E);

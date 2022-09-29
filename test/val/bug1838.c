@@ -1,11 +1,11 @@
 /* Bug 1838 - function parameters declared as function types rather than function pointers */
 
 #include <stdio.h>
- 
+
 static int failures = 0;
 
 typedef int fn_t(int);
- 
+
 int main(void)
 {
     void foo(fn_t*);

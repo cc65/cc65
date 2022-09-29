@@ -1,6 +1,6 @@
 
 /* issue #1462 - Bit-fields are still broken */
-/* More tests on "op= expression result value" that a naive fix might fail with */
+/* When (un-)signedness involves with integral promotion */
 
 #include <stdio.h>
 #include <limits.h>

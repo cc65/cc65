@@ -41,6 +41,6 @@ int main(void) {
     if (failures > 0) {
         printf("Failures: %u\n", failures);
     }
-    
+
     return failures;
 }

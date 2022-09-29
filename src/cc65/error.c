@@ -109,6 +109,36 @@ Collection DiagnosticStrBufs;
 
 
 /*****************************************************************************/
+/*                                  Helpers                                  */
+/*****************************************************************************/
+
+
+
+static const char* GetDiagnosticFileName (void)
+/* Get the source file name where the diagnostic info refers to */
+{
+    if (CurTok.LI) {
+        return GetInputName (CurTok.LI);
+    } else {
+        return GetCurrentFile ();
+    }
+}
+
+
+
+static unsigned GetDiagnosticLineNum (void)
+/* Get the source line number where the diagnostic info refers to */
+{
+    if (CurTok.LI) {
+        return GetInputLine (CurTok.LI);
+    } else {
+        return GetCurrentLine ();
+    }
+}
+
+
+
+/*****************************************************************************/
 /*                         Handling of fatal errors                          */
 /*****************************************************************************/
 
@@ -119,17 +149,7 @@ void Fatal (const char* Format, ...)
 {
     va_list ap;
 
-    const char* FileName;
-    unsigned    LineNum;
-    if (CurTok.LI) {
-        FileName = GetInputName (CurTok.LI);
-        LineNum  = GetInputLine (CurTok.LI);
-    } else {
-        FileName = GetCurrentFile ();
-        LineNum  = GetCurrentLine ();
-    }
-
-    fprintf (stderr, "%s:%u: Fatal: ", FileName, LineNum);
+    fprintf (stderr, "%s:%u: Fatal: ", GetDiagnosticFileName (), GetDiagnosticLineNum ());
 
     va_start (ap, Format);
     vfprintf (stderr, Format, ap);
@@ -145,22 +165,12 @@ void Fatal (const char* Format, ...)
 
 
 void Internal (const char* Format, ...)
-/* Print a message about an internal compiler error and die. */
+/* Print a message about an internal compiler error and die */
 {
     va_list ap;
 
-    const char* FileName;
-    unsigned    LineNum;
-    if (CurTok.LI) {
-        FileName = GetInputName (CurTok.LI);
-        LineNum  = GetInputLine (CurTok.LI);
-    } else {
-        FileName = GetCurrentFile ();
-        LineNum  = GetCurrentLine ();
-    }
-
     fprintf (stderr, "%s:%u: Internal compiler error:\n",
-             FileName, LineNum);
+             GetDiagnosticFileName (), GetDiagnosticLineNum ());
 
     va_start (ap, Format);
     vfprintf (stderr, Format, ap);
@@ -184,7 +194,7 @@ void Internal (const char* Format, ...)
 
 
 static void IntError (const char* Filename, unsigned LineNo, const char* Msg, va_list ap)
-/* Print an error message - internal function*/
+/* Print an error message - internal function */
 {
     fprintf (stderr, "%s:%u: Error: ", Filename, LineNo);
     vfprintf (stderr, Msg, ap);
@@ -206,7 +216,7 @@ void Error (const char* Format, ...)
 {
     va_list ap;
     va_start (ap, Format);
-    IntError (GetInputName (CurTok.LI), GetInputLine (CurTok.LI), Format, ap);
+    IntError (GetDiagnosticFileName (), GetDiagnosticLineNum (), Format, ap);
     va_end (ap);
 }
 
@@ -224,7 +234,7 @@ void LIError (const LineInfo* LI, const char* Format, ...)
 
 
 void PPError (const char* Format, ...)
-/* Print an error message. For use within the preprocessor.  */
+/* Print an error message. For use within the preprocessor */
 {
     va_list ap;
     va_start (ap, Format);
@@ -241,7 +251,7 @@ void PPError (const char* Format, ...)
 
 
 static void IntWarning (const char* Filename, unsigned LineNo, const char* Msg, va_list ap)
-/* Print warning message - internal function. */
+/* Print a warning message - internal function */
 {
     if (IS_Get (&WarningsAreErrors)) {
 
@@ -265,11 +275,11 @@ static void IntWarning (const char* Filename, unsigned LineNo, const char* Msg, 
 
 
 void Warning (const char* Format, ...)
-/* Print warning message. */
+/* Print a warning message */
 {
     va_list ap;
     va_start (ap, Format);
-    IntWarning (GetInputName (CurTok.LI), GetInputLine (CurTok.LI), Format, ap);
+    IntWarning (GetDiagnosticFileName (), GetDiagnosticLineNum (), Format, ap);
     va_end (ap);
 }
 
@@ -287,7 +297,7 @@ void LIWarning (const LineInfo* LI, const char* Format, ...)
 
 
 void PPWarning (const char* Format, ...)
-/* Print warning message. For use within the preprocessor. */
+/* Print a warning message. For use within the preprocessor */
 {
     va_list ap;
     va_start (ap, Format);
@@ -322,6 +332,55 @@ void ListWarnings (FILE* F)
     for (I = 0; I < sizeof(WarnMap) / sizeof (WarnMap[0]); ++I) {
         fprintf (F, "%s\n", WarnMap[I].Name);
     }
+}
+
+
+
+/*****************************************************************************/
+/*                          Handling of other infos                          */
+/*****************************************************************************/
+
+
+
+static void IntNote (const char* Filename, unsigned LineNo, const char* Msg, va_list ap)
+/* Print a note message - internal function */
+{
+    fprintf (stderr, "%s:%u: Note: ", Filename, LineNo);
+    vfprintf (stderr, Msg, ap);
+    fprintf (stderr, "\n");
+}
+
+
+
+void Note (const char* Format, ...)
+/* Print a note message */
+{
+    va_list ap;
+    va_start (ap, Format);
+    IntNote (GetDiagnosticFileName (), GetDiagnosticLineNum (), Format, ap);
+    va_end (ap);
+}
+
+
+
+void LINote (const LineInfo* LI, const char* Format, ...)
+/* Print a note message with the line info given explicitly */
+{
+    va_list ap;
+    va_start (ap, Format);
+    IntNote (GetInputName (LI), GetInputLine (LI), Format, ap);
+    va_end (ap);
+}
+
+
+
+void PPNote (const char* Format, ...)
+/* Print a note message. For use within the preprocessor */
+{
+    va_list ap;
+    va_start (ap, Format);
+    IntNote (GetCurrentFile(), GetCurrentLine(), Format, ap);
+    va_end (ap);
 }
 
 

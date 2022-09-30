@@ -567,6 +567,11 @@ static SymEntry* FindSymInTree (const SymTable* Tab, const char* Name)
         /* Try to find the symbol in this table */
         SymEntry* E = FindSymInTable (Tab, Name, Hash);
 
+        while (E != 0 && (E->Flags & SC_ALIAS) == SC_ALIAS) {
+            /* Get the aliased entry */
+            E = E->V.A.Field;
+        }
+
         /* Bail out if we found it */
         if (E != 0) {
             return E;
@@ -1279,6 +1284,11 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
             /* Generate the assembler name from the data label number */
             Entry->V.L.Label = Offs;
             Entry->AsmName = xstrdup (LocalDataLabelName (Entry->V.L.Label));
+        } else if ((Flags & SC_ALIAS) == SC_ALIAS) {
+            /* Just clear the info */
+            Entry->V.A.Field = 0;
+            Entry->V.A.ANumber = 0;
+            Entry->V.A.Offs = 0;
         } else {
             Internal ("Invalid flags in AddLocalSym: %04X", Flags);
         }
@@ -1296,13 +1306,26 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
 SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
 /* Add an external or global symbol to the symbol table and return the entry */
 {
-    /* Start from the local symbol table */
-    SymTable* Tab = SymTab;
+    /* Add the new declaration to the global symbol table if no errors */
+    SymTable* Tab = SymTab0;
 
-    /* Do we have an entry with this name already? */
-    SymEntry* Entry = FindSymInTree (Tab, Name);
+    /* Only search this name in the local and global symbol tables */
+    SymEntry* Entry = 0;
+    SymEntry* Alias = 0;
+
+    if (SymTab != SymTab0) {
+        Alias = Entry = FindLocalSym (Name);
+        while (Entry && (Entry->Flags & SC_ALIAS) == SC_ALIAS) {
+            /* Get the aliased entry */
+            Entry = Entry->V.A.Field;
+        }
+    }
+
+    if (Entry == 0) {
+        Entry = FindGlobalSym (Name);
+    }
+
     if (Entry) {
-
         /* We have a symbol with this name already */
         if (HandleSymRedefinition (Entry, T, Flags)) {
             Entry = 0;
@@ -1317,7 +1340,7 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
             ** declaration if both declarations are global, otherwise give an
             ** error.
             */
-            if (Tab == SymTab0 &&
+            if (SymTab == SymTab0           &&
                 (Flags & SC_EXTERN) == 0    &&
                 (Entry->Flags & SC_EXTERN) != 0) {
                 Warning ("Static declaration of '%s' follows non-static declaration", Name);
@@ -1353,12 +1376,9 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
             /* Use the fail-safe table for fictitious symbols */
             Tab = FailSafeTab;
         }
-
-    } else if ((Flags & (SC_EXTERN | SC_FUNC)) != 0) {
-        /* Add the new declaration to the global symbol table instead */
-        Tab = SymTab0;
     }
-    if (Entry == 0 || Entry->Owner != Tab) {
+
+    if (Entry == 0) {
 
         /* Create a new entry */
         Entry = NewSymEntry (Name, Flags);
@@ -1376,6 +1396,13 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
 
         /* Add the entry to the symbol table */
         AddSymEntry (Tab, Entry);
+
+    }
+
+    /* Add an alias of the global symbol to the local symbol table */
+    if (Tab == SymTab0 && SymTab != SymTab0 && Entry->Owner != SymTab && Alias == 0) {
+        Alias = AddLocalSym (Name, T, SC_ALIAS, 0);
+        Alias->V.A.Field = Entry;
     }
 
     /* Return the entry */

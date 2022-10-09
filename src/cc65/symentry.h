@@ -105,8 +105,8 @@ struct CodeEntry;
 #define SC_SPADJUSTMENT 0x400000U
 #define SC_GOTO_IND     0x800000U       /* Indirect goto */
 
-#define SC_ALIAS        0x01000000U     /* Alias of anonymous field */
-#define SC_FICTITIOUS   0x02000000U     /* Symbol is fictitious */
+#define SC_ALIAS        0x01000000U     /* Alias of global or anonymous field */
+#define SC_FICTITIOUS   0x02000000U     /* Symbol is fictitious (for error recovery) */
 #define SC_HAVEFAM      0x04000000U     /* Type has a Flexible Array Member */
 
 

@@ -465,8 +465,8 @@ static void ParseOneDecl (const DeclSpec* Spec)
         /* The default storage class could be wrong. Just clear them */
         Decl.StorageClass &= ~SC_STORAGEMASK;
 
-        /* This is always a declaration */
-        Decl.StorageClass |= SC_DECL;
+        /* This is always an extern declaration */
+        Decl.StorageClass |= SC_DECL | SC_EXTERN;
     }
 
     /* If we don't have a name, this was flagged as an error earlier.
@@ -524,7 +524,9 @@ static void ParseOneDecl (const DeclSpec* Spec)
 
         if ((Decl.StorageClass & SC_EXTERN) == SC_EXTERN ||
             (Decl.StorageClass & SC_FUNC) == SC_FUNC) {
-            /* Add the global symbol to the local symbol table */
+            /* Add the global symbol to both of the global and local symbol
+            ** tables.
+            */
             AddGlobalSym (Decl.Ident, Decl.Type, Decl.StorageClass);
         } else {
             /* Add the local symbol to the local symbol table */

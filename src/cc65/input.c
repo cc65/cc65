@@ -103,8 +103,8 @@ static Collection IFiles = STATIC_COLLECTION_INITIALIZER;
 /* List of all active files */
 static Collection AFiles = STATIC_COLLECTION_INITIALIZER;
 
-/* Input stack used when preprocessing. */
-static Collection InputStack = STATIC_COLLECTION_INITIALIZER;
+/* Input stack used when preprocessing */
+static Collection* CurrentInputStack;
 
 /* Counter for the __COUNTER__ macro */
 static unsigned MainFileCounter;
@@ -394,34 +394,37 @@ static void GetInputChar (void)
 ** are read by this function.
 */
 {
-    /* Drop all pushed fragments that don't have data left */
-    while (SB_GetIndex (Line) >= SB_GetLen (Line)) {
-        /* Cannot read more from this line, check next line on stack if any */
-        if (CollCount (&InputStack) == 0) {
-            /* This is THE line */
-            break;
-        }
-        FreeStrBuf (Line);
-        Line = CollPop (&InputStack);
-    }
-
-    /* Now get the next characters from the line */
-    if (SB_GetIndex (Line) >= SB_GetLen (Line)) {
-        CurC = NextC = '\0';
+    /* Get the next-next character from the line */
+    if (SB_GetIndex (Line) + 1 < SB_GetLen (Line)) {
+        /* CurC and NextC come from this fragment */
+        CurC  = SB_AtUnchecked (Line, SB_GetIndex (Line));
+        NextC = SB_AtUnchecked (Line, SB_GetIndex (Line) + 1);
     } else {
-        CurC = SB_AtUnchecked (Line, SB_GetIndex (Line));
-        if (SB_GetIndex (Line) + 1 < SB_GetLen (Line)) {
-            /* NextC comes from this fragment */
-            NextC = SB_AtUnchecked (Line, SB_GetIndex (Line) + 1);
-        } else {
+        /* NextC is '\0' by default */
+        NextC = '\0';
+
+        /* Drop all pushed fragments that don't have data left */
+        if (CurrentInputStack != 0) {
+            while (SB_GetIndex (Line) >= SB_GetLen (Line)) {
+                /* Cannot read more from this line, check next line on stack if any */
+                if (CollCount (CurrentInputStack) == 0) {
+                    /* This is THE line */
+                    break;
+                }
+                FreeStrBuf (Line);
+                Line = CollPop (CurrentInputStack);
+            }
+
             /* NextC comes from next fragment */
-            if (CollCount (&InputStack) > 0) {
+            if (CollCount (CurrentInputStack) > 0) {
                 NextC = ' ';
-            } else {
-                NextC = '\0';
             }
         }
+
+        /* Get CurC from the line */
+        CurC = SB_LookAt (Line, SB_GetIndex (Line));
     }
+
 }
 
 
@@ -441,16 +444,46 @@ void NextChar (void)
 
 
 
+Collection* UseInputStack (Collection* InputStack)
+/* Use the provided input stack for incoming input. Return the previously used
+** InputStack.
+*/
+{
+    Collection* OldInputStack = CurrentInputStack;
+
+    CurrentInputStack = InputStack;
+    return OldInputStack;
+}
+
+
+
+void PushLine (StrBuf* L)
+/* Save the current input line and use a new one */
+{
+    PRECONDITION (CurrentInputStack != 0);
+    if (SB_GetIndex (L) < SB_GetLen (L)) {
+        CollAppend (CurrentInputStack, Line);
+        Line = L;
+        GetInputChar ();
+    } else {
+        FreeStrBuf (L);
+    }
+}
+
+
+
 void ClearLine (void)
 /* Clear the current input line */
 {
-    unsigned I;
+    if (CurrentInputStack != 0) {
+        unsigned I;
 
-    /* Remove all pushed fragments from the input stack */
-    for (I = 0; I < CollCount (&InputStack); ++I) {
-        FreeStrBuf (CollAtUnchecked (&InputStack, I));
+        /* Remove all pushed fragments from the input stack */
+        for (I = 0; I < CollCount (CurrentInputStack); ++I) {
+            FreeStrBuf (Line);
+            Line = CollPop (CurrentInputStack);
+        }
     }
-    CollDeleteAll (&InputStack);
 
     /* Clear the contents of Line */
     SB_Clear (Line);

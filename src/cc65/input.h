@@ -70,6 +70,8 @@ extern StrBuf* Line;
 extern char CurC;
 extern char NextC;
 
+typedef struct Collection Collection;
+
 
 
 /*****************************************************************************/
@@ -94,6 +96,14 @@ void NextChar (void);
 ** valid. If end of line is reached, both are set to NUL, no more lines
 ** are read by this function.
 */
+
+Collection* UseInputStack (Collection* InputStack);
+/* Use the provided input stack for incoming input. Return the previously used
+** InputStack.
+*/
+
+void PushLine (StrBuf* L);
+/* Save the current input line and use a new one */
 
 void ClearLine (void);
 /* Clear the current input line */

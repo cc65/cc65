@@ -40,6 +40,7 @@
 
 /* cc65 */
 #include "anonname.h"
+#include "asmlabel.h"
 #include "declare.h"
 #include "error.h"
 #include "symentry.h"
@@ -65,13 +66,12 @@ SymEntry* NewSymEntry (const char* Name, unsigned Flags)
     E->NextHash = 0;
     E->PrevSym  = 0;
     E->NextSym  = 0;
-    E->Link     = 0;
     E->Owner    = 0;
     E->Flags    = Flags;
     E->Type     = 0;
     E->Attr     = 0;
     E->AsmName  = 0;
-    E->V.BssName = 0;
+    memset (&E->V, 0, sizeof (E->V));
     memcpy (E->Name, Name, Len+1);
 
     /* Return the new entry */
@@ -250,7 +250,9 @@ void SymUseAttr (SymEntry* Sym, struct Declaration* D)
 
 
 void SymSetAsmName (SymEntry* Sym)
-/* Set the assembler name for an external symbol from the name of the symbol */
+/* Set the assembler name for an external symbol from the name of the symbol.
+** The symbol must have no assembler name set yet.
+*/
 {
     unsigned Len;
 

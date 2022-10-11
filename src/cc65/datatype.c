@@ -1307,9 +1307,9 @@ int IsESUType (const Type* T)
 int IsIncompleteESUType (const Type* T)
 /* Return true if this is an incomplete ESU type */
 {
-    SymEntry* Sym = GetSymType (T);
+    SymEntry* TagSym = GetSymType (T);
 
-    return Sym != 0 && !SymIsDef (Sym);
+    return TagSym != 0 && !SymIsDef (TagSym);
 }
 
 

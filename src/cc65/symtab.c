@@ -625,8 +625,8 @@ SymEntry FindStructField (const Type* T, const char* Name)
 ** value, or an empty entry struct if the field is not found.
 */
 {
-    SymEntry* Entry = 0;
-    SymEntry  Field;
+    SymEntry* Field = 0;
+    SymEntry  Res;
     int       Offs  = 0;
 
     /* The given type may actually be a pointer to struct/union */
@@ -637,35 +637,35 @@ SymEntry FindStructField (const Type* T, const char* Name)
     /* Only structs/unions have struct/union fields... */
     if (IsClassStruct (T)) {
 
-        /* Get a pointer to the struct/union type */
-        const SymEntry* Struct = GetESUSymEntry (T);
-        CHECK (Struct != 0);
+        /* Get a pointer to the struct/union tag */
+        const SymEntry* TagSym = GetESUSymEntry (T);
+        CHECK (TagSym != 0);
 
         /* Now search in the struct/union symbol table. Beware: The table may
         ** not exist.
         */
-        if (Struct->V.S.SymTab) {
-            Entry = FindSymInTable (Struct->V.S.SymTab, Name, HashStr (Name));
+        if (TagSym->V.S.SymTab) {
+            Field = FindSymInTable (TagSym->V.S.SymTab, Name, HashStr (Name));
 
-            if (Entry != 0) {
-                Offs = Entry->V.Offs;
+            if (Field != 0) {
+                Offs = Field->V.Offs;
             }
 
-            while (Entry != 0 && (Entry->Flags & SC_ALIAS) == SC_ALIAS) {
+            while (Field != 0 && (Field->Flags & SC_ALIAS) == SC_ALIAS) {
                 /* Get the real field */
-                Entry = Entry->V.A.Field;
+                Field = Field->V.A.Field;
             }
         }
     }
 
-    if (Entry != 0) {
-        Field = *Entry;
-        Field.V.Offs = Offs;
+    if (Field != 0) {
+        Res = *Field;
+        Res.V.Offs = Offs;
     } else {
-        memset (&Field, 0, sizeof(SymEntry));
+        memset (&Res, 0, sizeof(SymEntry));
     }
 
-    return Field;
+    return Res;
 }
 
 
@@ -689,15 +689,15 @@ static int IsDistinctRedef (const Type* lhst, const Type* rhst, typecmpcode_t Co
 }
 
 
-static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags)
+static int HandleSymRedefinition (SymEntry* Sym, const Type* T, unsigned Flags)
 /* Check and handle redefinition of existing symbols.
 ** Complete array sizes and function descriptors as well.
 ** Return true if there *is* an error.
 */
 {
     /* Get the type info of the existing symbol */
-    Type*    E_Type   = Entry->Type;
-    unsigned E_SCType = Entry->Flags & SC_TYPEMASK;
+    Type*    E_Type   = Sym->Type;
+    unsigned E_SCType = Sym->Flags & SC_TYPEMASK;
     unsigned SCType   = Flags & SC_TYPEMASK;
 
     /* Some symbols may be redeclared if certain requirements are met */
@@ -706,16 +706,16 @@ static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags
         /* Existing typedefs cannot be redeclared as anything different */
         if (SCType == SC_TYPEDEF) {
             if (IsDistinctRedef (E_Type, T, TC_IDENTICAL, TCF_MASK_QUAL)) {
-                Error ("Conflicting types for typedef '%s'", Entry->Name);
+                Error ("Conflicting types for typedef '%s'", Sym->Name);
                 Note ("'%s' vs '%s'", GetFullTypeName (T), GetFullTypeName (E_Type));
-                Entry = 0;
+                Sym = 0;
             }
         } else {
-            Error ("Redefinition of typedef '%s' as different kind of symbol", Entry->Name);
-            Entry = 0;
+            Error ("Redefinition of typedef '%s' as different kind of symbol", Sym->Name);
+            Sym = 0;
         }
 
-    } else if ((Entry->Flags & SC_FUNC) == SC_FUNC) {
+    } else if ((Sym->Flags & SC_FUNC) == SC_FUNC) {
 
         /* In case of a function, use the new type descriptor, since it
         ** contains pointers to the new symbol tables that are needed if
@@ -726,27 +726,27 @@ static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags
         if (IsTypeFunc (T)) {
 
             /* Check for duplicate function definitions */
-            if (SymIsDef (Entry) && (Flags & SC_DEF) == SC_DEF) {
+            if (SymIsDef (Sym) && (Flags & SC_DEF) == SC_DEF) {
                 Error ("Body for function '%s' has already been defined",
-                        Entry->Name);
-                Entry = 0;
+                        Sym->Name);
+                Sym = 0;
             } else {
                 /* New type must be compatible with the composite prototype */
                 if (IsDistinctRedef (E_Type, T, TC_EQUAL, TCF_MASK_QUAL)) {
-                    Error ("Conflicting function types for '%s'", Entry->Name);
+                    Error ("Conflicting function types for '%s'", Sym->Name);
                     Note ("'%s' vs '%s'", GetFullTypeName (T), GetFullTypeName (E_Type));
-                    Entry = 0;
+                    Sym = 0;
                 } else {
                     /* Refine the existing composite prototype with this new
                     ** one.
                     */
-                    RefineFuncDesc (Entry->Type, T);
+                    RefineFuncDesc (Sym->Type, T);
                 }
             }
 
         } else {
-            Error ("Redefinition of function '%s' as different kind of symbol", Entry->Name);
-            Entry = 0;
+            Error ("Redefinition of function '%s' as different kind of symbol", Sym->Name);
+            Sym = 0;
         }
 
     } else {
@@ -765,9 +765,9 @@ static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags
             if ((Size != UNSPECIFIED && ESize != UNSPECIFIED && Size != ESize) ||
                 IsDistinctRedef (E_Type + 1, T + 1, TC_IDENTICAL, TCF_MASK_QUAL)) {
                 /* Conflicting element types */
-                Error ("Conflicting array types for '%s[]'", Entry->Name);
+                Error ("Conflicting array types for '%s[]'", Sym->Name);
                 Note ("'%s' vs '%s'", GetFullTypeName (T), GetFullTypeName (E_Type));
-                Entry = 0;
+                Sym = 0;
             } else {
                 /* Check if we have a size in the existing definition */
                 if (ESize == UNSPECIFIED) {
@@ -780,25 +780,25 @@ static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags
 
             /* New type must be equivalent */
             if (SCType != E_SCType) {
-                Error ("Redefinition of '%s' as different kind of symbol", Entry->Name);
-                Entry = 0;
+                Error ("Redefinition of '%s' as different kind of symbol", Sym->Name);
+                Sym = 0;
             } else if (IsDistinctRedef (E_Type, T, TC_EQUAL, TCF_MASK_QUAL)) {
-                Error ("Conflicting types for '%s'", Entry->Name);
+                Error ("Conflicting types for '%s'", Sym->Name);
                 Note ("'%s' vs '%s'", GetFullTypeName (T), GetFullTypeName (E_Type));
-                Entry = 0;
+                Sym = 0;
             } else if (E_SCType == SC_ENUMERATOR) {
                 /* Enumerators aren't allowed to be redeclared at all, even if
                 ** all occurences are identical. The current code logic won't
                 ** get here, but let's just do it.
                 */
-                Error ("Redeclaration of enumerator constant '%s'", Entry->Name);
-                Entry = 0;
+                Error ("Redeclaration of enumerator constant '%s'", Sym->Name);
+                Sym = 0;
             }
         }
     }
 
     /* Return if there are any errors */
-    return Entry == 0;
+    return Sym == 0;
 }
 
 

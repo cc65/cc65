@@ -81,7 +81,7 @@ static Function* NewFunction (struct SymEntry* Sym, FuncDesc* D)
 
     /* Initialize the fields */
     F->FuncEntry  = Sym;
-    F->ReturnType = GetFuncReturn (Sym->Type);
+    F->ReturnType = GetFuncReturnType (Sym->Type);
     F->Desc       = D;
     F->Reserved   = 0;
     F->RetLab     = 0;
@@ -540,7 +540,7 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
         /* Determine if this is a main function in a C99 environment that
         ** returns an int.
         */
-        if (IsRawTypeInt (F_GetReturnType (CurrentFunc)) &&
+        if (GetUnqualRawTypeCode (ReturnType) == T_INT &&
             IS_Get (&Standard) == STD_C99) {
             C99MainFunc = 1;
         }

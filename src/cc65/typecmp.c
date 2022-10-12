@@ -244,7 +244,7 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
     SymEntry*   Sym2;
     FuncDesc*   F1;
     FuncDesc*   F2;
-    TypeCode    LeftType, RightType;
+    TypeCode    LeftRank, RightRank;
     long        LeftCount, RightCount;
 
 
@@ -262,9 +262,23 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
             return;
         }
 
-        /* Get the left and right types */
-        LeftType  = (GetUnderlyingTypeCode (lhs) & T_MASK_TYPE);
-        RightType = (GetUnderlyingTypeCode (rhs) & T_MASK_TYPE);
+        /* Get the ranks of the left and right hands */
+        LeftRank  = (GetUnqualTypeCode (lhs) & T_MASK_RANK);
+        RightRank = (GetUnqualTypeCode (rhs) & T_MASK_RANK);
+
+        /* If one side is a pointer and the other side is an array, both are
+        ** compatible.
+        */
+        if (Result->Indirections == 0) {
+            if (LeftRank == T_RANK_PTR && RightRank == T_RANK_ARRAY) {
+                RightRank = T_RANK_PTR;
+                SetResult (Result, TC_PTR_DECAY);
+            }
+            if (LeftRank == T_RANK_ARRAY && RightRank == T_RANK_PTR) {
+                LeftRank = T_RANK_PTR;
+                SetResult (Result, TC_STRICT_COMPATIBLE);
+            }
+        }
 
         /* Bit-fields are considered compatible if they have the same
         ** signedness, bit-offset and bit-width.
@@ -275,29 +289,14 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
                 lhs->A.B.Offs  != rhs->A.B.Offs ||
                 lhs->A.B.Width != rhs->A.B.Width) {
                 SetResult (Result, TC_INCOMPATIBLE);
-                return;
             }
-            if (LeftType != RightType) {
+            if (LeftRank != RightRank) {
                 SetResult (Result, TC_STRICT_COMPATIBLE);
             }
         }
 
-        /* If one side is a pointer and the other side is an array, both are
-        ** compatible.
-        */
-        if (Result->Indirections == 0) {
-            if (LeftType == T_TYPE_PTR && RightType == T_TYPE_ARRAY) {
-                RightType = T_TYPE_PTR;
-                SetResult (Result, TC_PTR_DECAY);
-            }
-            if (LeftType == T_TYPE_ARRAY && RightType == T_TYPE_PTR) {
-                LeftType = T_TYPE_PTR;
-                SetResult (Result, TC_STRICT_COMPATIBLE);
-            }
-        }
-
-        /* If the underlying types are not identical, the types are incompatible */
-        if (LeftType != RightType) {
+        /* If the ranks are different, the types are incompatible */
+        if (LeftRank != RightRank) {
             SetResult (Result, TC_INCOMPATIBLE);
             return;
         }
@@ -337,8 +336,8 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
         }
 
         /* 'char' is neither 'signed char' nor 'unsigned char' */
-        if ((IsISOChar (lhs) && !IsISOChar (rhs)) ||
-            (!IsISOChar (lhs) && IsISOChar (rhs))) {
+        if ((IsDeclTypeChar (lhs) && !IsDeclTypeChar (rhs)) ||
+            (!IsDeclTypeChar (lhs) && IsDeclTypeChar (rhs))) {
             SetResult (Result, TC_SIGN_DIFF);
         }
 
@@ -350,14 +349,14 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
         }
 
         /* Check for special type elements */
-        switch (LeftType) {
-            case T_TYPE_PTR:
+        switch (LeftRank) {
+            case T_RANK_PTR:
                 ++Result->Indirections;
                 if (Result->Indirections == 1) {
-                    if ((GetUnderlyingTypeCode (lhs + 1) & T_MASK_TYPE) == T_TYPE_VOID) {
+                    if ((GetUnqualTypeCode (lhs + 1) & T_MASK_RANK) == T_RANK_VOID) {
                         Result->F |= TCF_VOID_PTR_ON_LEFT;
                     }
-                    if ((GetUnderlyingTypeCode (rhs + 1) & T_MASK_TYPE) == T_TYPE_VOID) {
+                    if ((GetUnqualTypeCode (rhs + 1) & T_MASK_RANK) == T_RANK_VOID) {
                         Result->F |= TCF_VOID_PTR_ON_RIGHT;
                     }
                 } else {
@@ -365,7 +364,7 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
                 }
                 break;
 
-            case T_TYPE_FUNC:
+            case T_RANK_FUNC:
                 /* Compare the function descriptors */
                 F1 = GetFuncDesc (lhs);
                 F2 = GetFuncDesc (rhs);
@@ -399,7 +398,7 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
                 /* Keep on and compare the return type */
                 break;
 
-            case T_TYPE_ARRAY:
+            case T_RANK_ARRAY:
                 /* Check member count */
                 LeftCount  = GetElementCount (lhs);
                 RightCount = GetElementCount (rhs);
@@ -420,8 +419,8 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
                 }
                 break;
 
-            case T_TYPE_STRUCT:
-            case T_TYPE_UNION:
+            case T_RANK_STRUCT:
+            case T_RANK_UNION:
                 /* Compare the tag types */
                 Sym1 = GetESUTagSym (lhs);
                 Sym2 = GetESUTagSym (rhs);

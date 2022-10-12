@@ -41,6 +41,7 @@
 #include <stdio.h>
 
 /* common */
+#include "coll.h"
 #include "strbuf.h"
 
 
@@ -69,8 +70,6 @@ extern StrBuf* Line;
 /* Current and next input character */
 extern char CurC;
 extern char NextC;
-
-typedef struct Collection Collection;
 
 
 

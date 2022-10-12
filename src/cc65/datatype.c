@@ -315,7 +315,7 @@ unsigned CheckedSizeOf (const Type* T)
 {
     unsigned Size = SizeOf (T);
     if (Size == 0) {
-        if (HasUnknownSize (T + 1)) {
+        if (HasUnknownSize (T)) {
             Error ("Size of type '%s' is unknown", GetFullTypeName (T));
         } else {
             Error ("Size of type '%s' is 0", GetFullTypeName (T));

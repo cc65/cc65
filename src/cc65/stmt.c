@@ -345,7 +345,7 @@ static void ReturnStatement (void)
                     if (ReturnType == Expr.Type) {
                         Error ("Returning '%s' of this size by value is not supported", GetFullTypeName (Expr.Type));
                     }
-                    LoadExpr (TypeOf (ReturnType), &Expr);
+                    LoadExpr (CG_TypeOf (ReturnType), &Expr);
 
                 } else {
                     /* Load the value into the primary */

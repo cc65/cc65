@@ -95,14 +95,14 @@ void ShiftExpr (struct ExprDesc* Expr)
         ResultType = IntPromotion (Expr->Type);
 
         /* Prepare the code generator flags */
-        GenFlags = TypeOf (ResultType);
+        GenFlags = CG_TypeOf (ResultType);
 
         /* Calculate the number of bits the lhs operand has */
         ExprBits = SizeOf (ResultType) * 8;
 
         /* Get the lhs on stack */
         GetCodePos (&Mark1);
-        ltype = TypeOf (Expr->Type);
+        ltype = CG_TypeOf (Expr->Type);
         lconst = ED_IsConstAbs (Expr);
         if (lconst) {
             /* Constant value */

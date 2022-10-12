@@ -66,8 +66,6 @@ typedef enum attr_t {
     atDepLabel     = 0x0040,    /* Dependent label */
     atUnnamedLabel = 0x0080,    /* Unnamed label */
 
-    atLabelDefined = 0x0100,    /* True if we defined the label */
-
     atStyleMask    = 0x000F,    /* Output style */
     atLabelMask    = 0x00F0,    /* Label information */
 

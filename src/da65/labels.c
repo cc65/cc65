@@ -447,6 +447,7 @@ void DefOutOfRangeLabels (void)
 /* Output any labels that are out of the loaded code range */
 {
     unsigned long Addr;
+    unsigned i;
 
     SeparatorLine ();
 
@@ -467,6 +468,11 @@ void DefOutOfRangeLabels (void)
     /* High range */
     while (Addr < 0x10000) {
         DefOutOfRangeLabel (Addr++);
+    }
+
+    /* 65816 long range */
+    for (i = 0; i < LongLabelsUsed; i++) {
+        DefOutOfRangeLabel (LongSymAddr[i]);
     }
 
     SeparatorLine ();

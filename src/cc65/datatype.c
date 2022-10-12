@@ -590,25 +590,6 @@ static unsigned GetBitFieldMinimalTypeSize (unsigned BitWidth)
 }
 
 
-static unsigned TypeOfBySize (unsigned Size)
-/* Get the code generator replacement type of the object by its size */
-{
-    unsigned NewType;
-    /* If the size is less than or equal to that of a a long, we will copy
-    ** the struct using the primary register, otherwise we use memcpy.
-    */
-    switch (Size) {
-        case 1:     NewType = CF_CHAR;  break;
-        case 2:     NewType = CF_INT;   break;
-        case 3:     /* FALLTHROUGH */
-        case 4:     NewType = CF_LONG;  break;
-        default:    NewType = CF_NONE;  break;
-    }
-
-    return NewType;
-}
-
-
 
 const Type* GetUnderlyingType (const Type* Type)
 /* Get the underlying type of an enum or other integer class type */
@@ -854,80 +835,6 @@ unsigned CheckedPSizeOf (const Type* T)
         Size = SIZEOF_CHAR;     /* Don't return zero */
     }
     return Size;
-}
-
-
-
-unsigned TypeOf (const Type* T)
-/* Get the code generator base type of the object */
-{
-    unsigned NewType;
-
-    switch (GetUnderlyingTypeCode (T)) {
-
-        case T_SCHAR:
-            return CF_CHAR;
-
-        case T_UCHAR:
-            return CF_CHAR | CF_UNSIGNED;
-
-        case T_SHORT:
-        case T_INT:
-            return CF_INT;
-
-        case T_USHORT:
-        case T_UINT:
-        case T_PTR:
-        case T_ARRAY:
-            return CF_INT | CF_UNSIGNED;
-
-        case T_LONG:
-            return CF_LONG;
-
-        case T_ULONG:
-            return CF_LONG | CF_UNSIGNED;
-
-        case T_FLOAT:
-        case T_DOUBLE:
-            /* These two are identical in the backend */
-            return CF_FLOAT;
-
-        case T_FUNC:
-            /* Treat this as a function pointer */
-            return CF_INT | CF_UNSIGNED;
-
-        case T_STRUCT:
-        case T_UNION:
-            NewType = TypeOfBySize (SizeOf (T));
-            if (NewType != CF_NONE) {
-                return NewType;
-            }
-            /* Address of ... */
-            return CF_INT | CF_UNSIGNED;
-
-        case T_VOID:
-        case T_ENUM:
-            /* Incomplete enum type */
-            Error ("Incomplete type '%s'", GetFullTypeName (T));
-            return CF_INT;
-
-        default:
-            Error ("Illegal type %04lX", T->C);
-            return CF_INT;
-    }
-}
-
-
-
-unsigned FuncTypeOf (const Type* T)
-/* Get the code generator flag for calling the function */
-{
-    if (GetUnderlyingTypeCode (T) == T_FUNC) {
-        return (T->A.F->Flags & FD_VARIADIC) ? 0 : CF_FIXARGC;
-    } else {
-        Error ("Illegal function type %04lX", T->C);
-        return 0;
-    }
 }
 
 

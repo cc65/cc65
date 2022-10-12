@@ -333,12 +333,6 @@ unsigned CheckedPSizeOf (const Type* T);
 ** rest of the compiler doesn't have to work with invalid sizes).
 */
 
-unsigned TypeOf (const Type* T);
-/* Get the code generator base type of the object */
-
-unsigned FuncTypeOf (const Type* T);
-/* Get the code generator flag for calling the function */
-
 const Type* Indirect (const Type* T);
 /* Do one indirection for the given type, that is, return the type where the
 ** given type points to.

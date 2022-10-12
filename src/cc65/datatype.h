@@ -239,23 +239,6 @@ extern const Type type_c_void_p[];
 
 
 
-const char* GetBasicTypeName (const Type* T);
-/* Return a const name string of the basic type.
-** Return "type" for unknown basic types.
-*/
-
-const char* GetFullTypeName (const Type* T);
-/* Return the full name string of the given type */
-
-struct StrBuf* GetFullTypeNameBuf (struct StrBuf* S, const Type* T);
-/* Return the full name string of the given type */
-
-int GetQualifierTypeCodeNameBuf (struct StrBuf* S, TypeCode Qual, TypeCode IgnoredQual);
-/* Return the names of the qualifiers of the type.
-** Qualifiers to be ignored can be specified with the IgnoredQual flags.
-** Return the count of added qualifier names.
-*/
-
 unsigned TypeLen (const Type* T);
 /* Return the length of the type string */
 
@@ -273,17 +256,26 @@ Type* TypeAlloc (unsigned Len);
 void TypeFree (Type* T);
 /* Free a type string */
 
+#if defined(HAVE_INLINE)
+INLINE void CopyTypeAttr (const Type* Src, Type* Dest)
+/* Copy attribute data from Src to Dest */
+{
+    Dest->A = Src->A;
+}
+#else
+#  define CopyTypeAttr(Src, Dest)       ((Dest)->A = (Src)->A)
+#endif
+
+
+
+/*****************************************************************************/
+/*                           Type info extraction                            */
+/*****************************************************************************/
+
+
+
 int SignExtendChar (int C);
-/* Do correct sign extension of a character */
-
-Type* GetCharArrayType (unsigned Len);
-/* Return the type for a char array of the given length */
-
-Type* GetImplicitFuncType (void);
-/* Return a type string for an inplicitly declared function */
-
-const Type* GetStructReplacementType (const Type* SType);
-/* Get a replacement type for passing a struct/union in the primary register */
+/* Do correct sign extension of a character to an int */
 
 long GetIntegerTypeMin (const Type* Type);
 /* Get the smallest possible value of the integer type.
@@ -295,9 +287,42 @@ unsigned long GetIntegerTypeMax (const Type* Type);
 ** The type must have a known size.
 */
 
+unsigned SizeOf (const Type* T);
+/* Compute size (in bytes) of object represented by type array */
+
+unsigned PSizeOf (const Type* T);
+/* Compute size (in bytes) of pointee object */
+
+unsigned CheckedSizeOf (const Type* T);
+/* Return the size (in bytes) of a data type. If the size is zero, emit an
+** error and return some valid size instead (so the rest of the compiler
+** doesn't have to work with invalid sizes).
+*/
+
+unsigned CheckedPSizeOf (const Type* T);
+/* Return the size (in bytes) of a data type that is pointed to by a pointer.
+** If the size is zero, emit an error and return some valid size instead (so
+** the rest of the compiler doesn't have to work with invalid sizes).
+*/
+
+#if defined(HAVE_INLINE)
+INLINE TypeCode GetQualifier (const Type* T)
+/* Get the qualifier from the given type string */
+{
+    return (T->C & T_MASK_QUAL);
+}
+#else
+#  define GetQualifier(T)       ((T)->C & T_MASK_QUAL)
+#endif
+
+TypeCode GetUnderlyingTypeCode (const Type* Type);
+/* Get the type code of the unqualified underlying type of TCode.
+** Return TCode if it is not scalar.
+*/
+
 #if defined(HAVE_INLINE)
 INLINE TypeCode UnqualifiedType (TypeCode T)
-/* Return the unqalified type code */
+/* Return the unqualified type code */
 {
     return (T & ~T_MASK_QUAL);
 }
@@ -305,32 +330,93 @@ INLINE TypeCode UnqualifiedType (TypeCode T)
 #  define UnqualifiedType(T)    ((T) & ~T_MASK_QUAL)
 #endif
 
-const Type* GetUnderlyingType (const Type* Type);
-/* Get the underlying type of an enum or other integer class type */
+#if defined(HAVE_INLINE)
+INLINE TypeCode GetClass (const Type* T)
+/* Get the class of a type string */
+{
+    return (T->C & T_MASK_CLASS);
+}
+#else
+#  define GetClass(T)           ((T)->C & T_MASK_CLASS)
+#endif
 
-TypeCode GetUnderlyingTypeCode (const Type* Type);
-/* Get the type code of the unqualified underlying type of TCode.
-** Return TCode if it is not scalar.
+#if defined(HAVE_INLINE)
+INLINE TypeCode GetSignedness (const Type* T)
+/* Get the signedness of a type */
+{
+    return (GetUnderlyingTypeCode (T) & T_MASK_SIGN);
+}
+#else
+#  define GetSignedness(T)      (GetUnderlyingTypeCode (T) & T_MASK_SIGN)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE TypeCode GetSizeModifier (const Type* T)
+/* Get the size modifier of a type */
+{
+    return (GetUnderlyingTypeCode (T) & T_MASK_SIZE);
+}
+#else
+#  define GetSizeModifier(T)    (GetUnderlyingTypeCode (T) & T_MASK_SIZE)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE TypeCode GetRawType (const Type* T)
+/* Get the raw type */
+{
+    return (T->C & T_MASK_TYPE);
+}
+#else
+#  define GetRawType(T)         ((T)->C & T_MASK_TYPE)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE TypeCode GetRawSignedness (const Type* T)
+/* Get the raw signedness of a type */
+{
+    return ((T)->C & T_MASK_SIGN);
+}
+#else
+#  define GetRawSignedness(T)   ((T)->C & T_MASK_SIGN)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE TypeCode GetRawSizeModifier (const Type* T)
+/* Get the size modifier of a raw type */
+{
+    return (T->C & T_MASK_SIZE);
+}
+#else
+#  define GetRawSizeModifier(T) ((T)->C & T_MASK_SIZE)
+#endif
+
+
+
+/*****************************************************************************/
+/*                             Type manipulation                             */
+/*****************************************************************************/
+
+
+
+Type* GetImplicitFuncType (void);
+/* Return a type string for an implicitly declared function */
+
+Type* GetCharArrayType (unsigned Len);
+/* Return the type for a char array of the given length */
+
+Type* NewPointerTo (const Type* T);
+/* Return a type string that is "pointer to T". The type string is allocated
+** on the heap and may be freed after use.
 */
 
-const Type* GetBitFieldChunkType (const Type* Type);
-/* Get the type needed to operate on the byte chunk containing the bit-field */
-
-unsigned SizeOf (const Type* T);
-/* Compute size of object represented by type array. */
-
-unsigned PSizeOf (const Type* T);
-/* Compute size of pointer object. */
-
-unsigned CheckedSizeOf (const Type* T);
-/* Return the size of a data type. If the size is zero, emit an error and
-** return some valid size instead (so the rest of the compiler doesn't have
-** to work with invalid sizes).
+Type* NewBitFieldType (const Type* T, unsigned BitOffs, unsigned BitWidth);
+/* Return a type string that is "T : BitWidth" aligned on BitOffs. The type
+** string is allocated on the heap and may be freed after use.
 */
-unsigned CheckedPSizeOf (const Type* T);
-/* Return the size of a data type that is pointed to by a pointer. If the
-** size is zero, emit an error and return some valid size instead (so the
-** rest of the compiler doesn't have to work with invalid sizes).
+
+const Type* AddressOf (const Type* T);
+/* Return a type string that is "address of T". The type string is allocated
+** on the heap and may be freed after use.
 */
 
 const Type* Indirect (const Type* T);
@@ -341,16 +427,6 @@ const Type* Indirect (const Type* T);
 Type* IndirectModifiable (Type* T);
 /* Do one indirection for the given type, that is, return the type where the
 ** given type points to.
-*/
-
-Type* NewPointerTo (const Type* T);
-/* Return a type string that is "pointer to T". The type string is allocated
-** on the heap and may be freed after use.
-*/
-
-const Type* AddressOf (const Type* T);
-/* Return a type string that is "address of T". The type string is allocated
-** on the heap and may be freed after use.
 */
 
 Type* ArrayToPtr (const Type* T);
@@ -382,20 +458,22 @@ const Type* SignedType (const Type* T);
 const Type* UnsignedType (const Type* T);
 /* Get unsigned counterpart of the integral type */
 
-Type* NewBitFieldType (const Type* T, unsigned BitOffs, unsigned BitWidth);
-/* Return a type string that is "T : BitWidth" aligned on BitOffs. The type
-** string is allocated on the heap and may be freed after use.
-*/
+const Type* GetUnderlyingType (const Type* Type);
+/* Get the underlying type of an enum or other integer class type */
 
-#if defined(HAVE_INLINE)
-INLINE TypeCode GetRawType (const Type* T)
-/* Get the raw type */
-{
-    return (T->C & T_MASK_TYPE);
-}
-#else
-#  define GetRawType(T)         ((T)->C & T_MASK_TYPE)
-#endif
+const Type* GetStructReplacementType (const Type* SType);
+/* Get a replacement type for passing a struct/union in the primary register */
+
+const Type* GetBitFieldChunkType (const Type* Type);
+/* Get the type needed to operate on the byte chunk containing the bit-field */
+
+
+
+/*****************************************************************************/
+/*                              Type Predicates                              */
+/*****************************************************************************/
+
+
 
 #if defined(HAVE_INLINE)
 INLINE int IsTypeChar (const Type* T)
@@ -414,7 +492,7 @@ INLINE int IsTypeShort (const Type* T)
     return (GetRawType (GetUnderlyingType (T)) == T_TYPE_SHORT);
 }
 #else
-#  define IsTypeShort(T)         (GetRawType (GetUnderlyingType (T)) == T_TYPE_SHORT)
+#  define IsTypeShort(T)        (GetRawType (GetUnderlyingType (T)) == T_TYPE_SHORT)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -579,7 +657,7 @@ INLINE int IsTypeUnion (const Type* T)
     return (GetRawType (T) == T_TYPE_UNION);
 }
 #else
-#  define IsTypeUnion(T)       (GetRawType (T) == T_TYPE_UNION)
+#  define IsTypeUnion(T)        (GetRawType (T) == T_TYPE_UNION)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -620,16 +698,6 @@ INLINE int IsTypeFuncPtr (const Type* T)
 }
 #else
 #  define IsTypeFuncPtr(T)      (IsTypePtr (T) && IsTypeFunc (T+1))
-#endif
-
-#if defined(HAVE_INLINE)
-INLINE TypeCode GetClass (const Type* T)
-/* Get the class of a type string */
-{
-    return (T->C & T_MASK_CLASS);
-}
-#else
-#  define GetClass(T)    ((T)->C & T_MASK_CLASS)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -721,25 +789,8 @@ int IsEmptiableObjectType (const Type* T);
 int HasUnknownSize (const Type* T);
 /* Return true if this is an incomplete ESU type or an array of unknown size */
 
-#if defined(HAVE_INLINE)
-INLINE TypeCode GetRawSignedness (const Type* T)
-/* Get the raw signedness of a type */
-{
-    return ((T)->C & T_MASK_SIGN);
-}
-#else
-#  define GetRawSignedness(T)   ((T)->C & T_MASK_SIGN)
-#endif
-
-#if defined(HAVE_INLINE)
-INLINE TypeCode GetSignedness (const Type* T)
-/* Get the signedness of a type */
-{
-    return (GetUnderlyingTypeCode (T) & T_MASK_SIGN);
-}
-#else
-#  define GetSignedness(T)      (GetUnderlyingTypeCode (T) & T_MASK_SIGN)
-#endif
+int TypeHasAttr (const Type* T);
+/* Return true if the given type has attribute data */
 
 #if defined(HAVE_INLINE)
 INLINE int IsRawSignUnsigned (const Type* T)
@@ -781,35 +832,13 @@ INLINE int IsSignSigned (const Type* T)
 #  define IsSignSigned(T)       (GetSignedness (T) == T_SIGN_SIGNED)
 #endif
 
-#if defined(HAVE_INLINE)
-INLINE TypeCode GetRawSizeModifier (const Type* T)
-/* Get the size modifier of a raw type */
-{
-    return (T->C & T_MASK_SIZE);
-}
-#else
-#  define GetRawSizeModifier(T) ((T)->C & T_MASK_SIZE)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE TypeCode GetSizeModifier (const Type* T)
-/* Get the size modifier of a type */
-{
-    return (GetUnderlyingTypeCode (T) & T_MASK_SIZE);
-}
-#else
-#  define GetSizeModifier(T)    (GetUnderlyingTypeCode (T) & T_MASK_SIZE)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE TypeCode GetQualifier (const Type* T)
-/* Get the qualifier from the given type string */
-{
-    return (T->C & T_MASK_QUAL);
-}
-#else
-#  define GetQualifier(T)      ((T)->C & T_MASK_QUAL)
-#endif
+/*****************************************************************************/
+/*                             Qualifier helpers                             */
+/*****************************************************************************/
+
+
 
 #if defined(HAVE_INLINE)
 INLINE int IsQualConst (const Type* T)
@@ -891,6 +920,37 @@ INLINE int IsQualCConv (const Type* T)
 #  define IsQualCConv(T)        (((T)->C & T_QUAL_CCONV) != 0)
 #endif
 
+TypeCode AddrSizeQualifier (unsigned AddrSize);
+/* Return T_QUAL_NEAR or T_QUAL_FAR depending on the address size */
+
+#if defined(HAVE_INLINE)
+INLINE TypeCode CodeAddrSizeQualifier (void)
+/* Return T_QUAL_NEAR or T_QUAL_FAR depending on the code address size */
+{
+    return AddrSizeQualifier (CodeAddrSize);
+}
+#else
+#  define CodeAddrSizeQualifier()      (AddrSizeQualifier (CodeAddrSize))
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE TypeCode DataAddrSizeQualifier (void)
+/* Return T_QUAL_NEAR or T_QUAL_FAR depending on the data address size */
+{
+    return AddrSizeQualifier (DataAddrSize);
+}
+#else
+#  define DataAddrSizeQualifier()      (AddrSizeQualifier (DataAddrSize))
+#endif
+
+
+
+/*****************************************************************************/
+/*                           Function type helpers                           */
+/*****************************************************************************/
+
+
+
 int IsVariadicFunc (const Type* T) attribute ((const));
 /* Return true if this is a function type or pointer to function type with
 ** variable parameter list.
@@ -918,6 +978,14 @@ Type* GetFuncReturnModifiable (Type* T) attribute ((const));
 const FuncDesc* GetFuncDefinitionDesc (const Type* T) attribute ((const));
 /* Get the function descriptor of the function definition */
 
+
+
+/*****************************************************************************/
+/*                            Array type helpers                             */
+/*****************************************************************************/
+
+
+
 long GetElementCount (const Type* T);
 /* Get the element count of the array specified in T (which must be of
 ** array type).
@@ -937,6 +1005,14 @@ const Type* GetBaseElementType (const Type* T);
 ** the element type that is not an array.
 */
 
+
+
+/*****************************************************************************/
+/*                             ESU types helpers                             */
+/*****************************************************************************/
+
+
+
 struct SymEntry* GetESUTagSym (const Type* T) attribute ((const));
 /* Get the tag symbol entry of the enum/struct/union type.
 ** Return 0 if it is not an enum/struct/union.
@@ -945,41 +1021,30 @@ struct SymEntry* GetESUTagSym (const Type* T) attribute ((const));
 void SetESUTagSym (Type* T, struct SymEntry* S);
 /* Set the tag symbol entry of the enum/struct/union type */
 
-TypeCode AddrSizeQualifier (unsigned AddrSize);
-/* Return T_QUAL_NEAR or T_QUAL_FAR depending on the address size */
 
-#if defined(HAVE_INLINE)
-INLINE TypeCode CodeAddrSizeQualifier (void)
-/* Return T_QUAL_NEAR or T_QUAL_FAR depending on the code address size */
-{
-    return AddrSizeQualifier (CodeAddrSize);
-}
-#else
-#  define CodeAddrSizeQualifier()      (AddrSizeQualifier (CodeAddrSize))
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE TypeCode DataAddrSizeQualifier (void)
-/* Return T_QUAL_NEAR or T_QUAL_FAR depending on the data address size */
-{
-    return AddrSizeQualifier (DataAddrSize);
-}
-#else
-#  define DataAddrSizeQualifier()      (AddrSizeQualifier (DataAddrSize))
-#endif
+/*****************************************************************************/
+/*                                  Helpers                                  */
+/*****************************************************************************/
 
-int TypeHasAttr (const Type* T);
-/* Return true if the given type has attribute data */
 
-#if defined(HAVE_INLINE)
-INLINE void CopyTypeAttr (const Type* Src, Type* Dest)
-/* Copy attribute data from Src to Dest */
-{
-    Dest->A = Src->A;
-}
-#else
-#  define CopyTypeAttr(Src, Dest)       ((Dest)->A = (Src)->A)
-#endif
+
+const char* GetBasicTypeName (const Type* T);
+/* Return a const name string of the basic type.
+** Return "type" for unknown basic types.
+*/
+
+const char* GetFullTypeName (const Type* T);
+/* Return the full name string of the given type */
+
+struct StrBuf* GetFullTypeNameBuf (struct StrBuf* S, const Type* T);
+/* Return the full name string of the given type */
+
+int GetQualifierTypeCodeNameBuf (struct StrBuf* S, TypeCode Qual, TypeCode IgnoredQual);
+/* Return the names of the qualifiers of the type.
+** Qualifiers to be ignored can be specified with the IgnoredQual flags.
+** Return the count of added qualifier names.
+*/
 
 void PrintType (FILE* F, const Type* T);
 /* Print fulle name of the type */

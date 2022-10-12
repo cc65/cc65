@@ -87,317 +87,6 @@ const Type type_c_void_p[]  = { TYPE(T_PTR),    TYPE(T_C_VOID), TYPE(T_END) };
 
 
 
-const char* GetBasicTypeName (const Type* T)
-/* Return a const name string of the basic type.
-** Return "type" for unknown basic types.
-*/
-{
-    switch (GetRawType (T)) {
-    case T_TYPE_ENUM:       return "enum";
-    case T_TYPE_BITFIELD:   return "bit-field";
-    case T_TYPE_FLOAT:      return "float";
-    case T_TYPE_DOUBLE:     return "double";
-    case T_TYPE_VOID:       return "void";
-    case T_TYPE_STRUCT:     return "struct";
-    case T_TYPE_UNION:      return "union";
-    case T_TYPE_ARRAY:      return "array";
-    case T_TYPE_PTR:        return "pointer";
-    case T_TYPE_FUNC:       return "function";
-    case T_TYPE_NONE:       /* FALLTHROUGH */
-    default:                break;
-    }
-    if (IsClassInt (T)) {
-        if (IsRawSignSigned (T)) {
-            switch (GetRawType (T)) {
-            case T_TYPE_CHAR:       return "signed char";
-            case T_TYPE_SHORT:      return "short";
-            case T_TYPE_INT:        return "int";
-            case T_TYPE_LONG:       return "long";
-            case T_TYPE_LONGLONG:   return "long long";
-            default:
-                return "signed integer";
-            }
-        } else if (IsRawSignUnsigned (T)) {
-            switch (GetRawType (T)) {
-            case T_TYPE_CHAR:       return "unsigned char";
-            case T_TYPE_SHORT:      return "unsigned short";
-            case T_TYPE_INT:        return "unsigned int";
-            case T_TYPE_LONG:       return "unsigned long";
-            case T_TYPE_LONGLONG:   return "unsigned long long";
-            default:
-                return "unsigned integer";
-            }
-        } else {
-            switch (GetRawType (T)) {
-            case T_TYPE_CHAR:       return "char";
-            case T_TYPE_SHORT:      return "short";
-            case T_TYPE_INT:        return "int";
-            case T_TYPE_LONG:       return "long";
-            case T_TYPE_LONGLONG:   return "long long";
-            default:
-                return "integer";
-            }
-        }
-    }
-    return "type";
-}
-
-
-
-static const char* GetTagSymName (const Type* T)
-/* Return a name string of the type or the symbol name if it is an ESU type.
-** Note: This may use a static buffer that could be overwritten by other calls.
-*/
-{
-    static char TypeName [IDENTSIZE + 16];
-    SymEntry* TagSym;
-
-    TagSym = GetESUTagSym (T);
-    if (TagSym == 0) {
-        return GetBasicTypeName (T);
-    }
-    sprintf (TypeName, "%s %s", GetBasicTypeName (T),
-             TagSym->Name[0] != '\0' ? TagSym->Name : "<unknown>");
-
-    return TypeName;
-}
-
-
-
-static struct StrBuf* GetFullTypeNameWestEast (struct StrBuf* West, struct StrBuf* East, const Type* T)
-/* Return the name string of the given type split into a western part and an
-** eastern part.
-*/
-{
-    struct StrBuf Buf = AUTO_STRBUF_INITIALIZER;
-
-    if (IsTypeArray (T)) {
-
-        long Count = GetElementCount (T);
-        if (!SB_IsEmpty (East)) {
-            if (Count > 0) {
-                SB_Printf (&Buf, "[%ld]", Count);
-            } else {
-                SB_Printf (&Buf, "[]");
-            }
-            SB_Append (East, &Buf);
-            SB_Terminate (East);
-
-        } else {
-            if (Count > 0) {
-                SB_Printf (East, "[%ld]", Count);
-            } else {
-                SB_Printf (East, "[]");
-            }
-
-            if (!SB_IsEmpty (West)) {
-                /* Add parentheses to West */
-                SB_Printf (&Buf, "(%s)", SB_GetConstBuf (West));
-                SB_Copy (West, &Buf);
-                SB_Terminate (West);
-            }
-        }
-
-        /* Get element type */
-        GetFullTypeNameWestEast (West, East, T + 1);
-
-    } else if (IsTypeFunc (T)) {
-
-        FuncDesc* D             = GetFuncDesc (T);
-        struct StrBuf ParamList = AUTO_STRBUF_INITIALIZER;
-
-        /* First argument */
-        SymEntry* Param = D->SymTab->SymHead;
-        unsigned I;
-        for (I = 0; I < D->ParamCount; ++I) {
-            CHECK (Param != 0 && (Param->Flags & SC_PARAM) != 0);
-            if (I > 0) {
-                SB_AppendStr (&ParamList, ", ");
-            }
-            SB_AppendStr (&ParamList, SB_GetConstBuf (GetFullTypeNameBuf (&Buf, Param->Type)));
-            SB_Clear (&Buf);
-            /* Next argument */
-            Param = Param->NextSym;
-        }
-        if ((D->Flags & FD_VARIADIC) == 0) {
-            if (D->ParamCount == 0 && (D->Flags & FD_EMPTY) == 0) {
-                SB_AppendStr (&ParamList, "void");
-            }
-        } else {
-            if (D->ParamCount > 0) {
-                SB_AppendStr (&ParamList, ", ...");
-            } else {
-                SB_AppendStr (&ParamList, "...");
-            }
-        }
-        SB_Terminate (&ParamList);
-
-        /* Join the existing West and East together */
-        if (!SB_IsEmpty (East)) {
-            SB_Append (West, East);
-            SB_Terminate (West);
-            SB_Clear (East);
-        }
-
-        if (SB_IsEmpty (West)) {
-            /* Just use the param list */
-            SB_Printf (West, "(%s)", SB_GetConstBuf (&ParamList));
-        } else {
-            /* Append the param list to the existing West */
-            SB_Printf (&Buf, "(%s)(%s)", SB_GetConstBuf (West), SB_GetConstBuf (&ParamList));
-            SB_Printf (West, "%s", SB_GetConstBuf (&Buf));
-        }
-        SB_Done (&ParamList);
-
-        /* Return type */
-        GetFullTypeNameWestEast (West, East, T + 1);
-
-    } else if (IsTypePtr (T)) {
-
-        int QualCount = 0;
-
-        SB_Printf (&Buf, "*");
-
-        /* Add qualifiers */
-        if ((GetQualifier (T) & ~T_QUAL_NEAR) != T_QUAL_NONE) {
-            QualCount = GetQualifierTypeCodeNameBuf (&Buf, T->C, T_QUAL_NEAR);
-        }
-
-        if (!SB_IsEmpty (West)) {
-            if (QualCount > 0) {
-                SB_AppendChar (&Buf, ' ');
-            }
-            SB_Append (&Buf, West);
-        }
-
-        SB_Copy (West, &Buf);
-        SB_Terminate (West);
-
-        /* Get indirection type */
-        GetFullTypeNameWestEast (West, East, T + 1);
-
-    } else {
-
-        /* Add qualifiers */
-        if ((GetQualifier (T) & ~T_QUAL_NEAR) != 0) {
-            if (GetQualifierTypeCodeNameBuf (&Buf, T->C, T_QUAL_NEAR) > 0) {
-                SB_AppendChar (&Buf, ' ');
-            }
-        }
-
-        if (!IsTypeBitField (T)) {
-            SB_AppendStr (&Buf, GetTagSymName (T));
-        } else {
-            SB_AppendStr (&Buf, GetBasicTypeName (T + 1));
-        }
-
-        if (!SB_IsEmpty (West)) {
-            SB_AppendChar (&Buf, ' ');
-            SB_Append (&Buf, West);
-        }
-
-        SB_Copy (West, &Buf);
-        SB_Terminate (West);
-    }
-
-    SB_Done (&Buf);
-    return West;
-}
-
-
-
-const char* GetFullTypeName (const Type* T)
-/* Return the full name string of the given type */
-{
-    struct StrBuf* Buf = NewDiagnosticStrBuf ();
-    GetFullTypeNameBuf (Buf, T);
-
-    return SB_GetConstBuf (Buf);
-}
-
-
-
-struct StrBuf* GetFullTypeNameBuf (struct StrBuf* S, const Type* T)
-/* Return the full name string of the given type */
-{
-    struct StrBuf East = AUTO_STRBUF_INITIALIZER;
-    GetFullTypeNameWestEast (S, &East, T);
-
-    /* Join West and East */
-    SB_Append (S, &East);
-    SB_Terminate (S);
-    SB_Done (&East);
-
-    return S;
-}
-
-
-
-int GetQualifierTypeCodeNameBuf (struct StrBuf* S, TypeCode Qual, TypeCode IgnoredQual)
-/* Return the names of the qualifiers of the type.
-** Qualifiers to be ignored can be specified with the IgnoredQual flags.
-** Return the count of added qualifier names.
-*/
-{
-    int Count = 0;
-
-    Qual &= T_MASK_QUAL & ~IgnoredQual;
-    if (Qual & T_QUAL_CONST) {
-        if (!SB_IsEmpty (S)) {
-            SB_AppendChar (S, ' ');
-        }
-        SB_AppendStr (S, "const");
-        ++Count;
-    }
-    if (Qual & T_QUAL_VOLATILE) {
-        if (Count > 0) {
-            SB_AppendChar (S, ' ');
-        }
-        SB_AppendStr (S, "volatile");
-        ++Count;
-    }
-    if (Qual & T_QUAL_RESTRICT) {
-        if (Count > 0) {
-            SB_AppendChar (S, ' ');
-        }
-        SB_AppendStr (S, "restrict");
-        ++Count;
-    }
-    if (Qual & T_QUAL_NEAR) {
-        if (Count > 0) {
-            SB_AppendChar (S, ' ');
-        }
-        SB_AppendStr (S, "__near__");
-        ++Count;
-    }
-    if (Qual & T_QUAL_FAR) {
-        SB_AppendStr (S, "__far__");
-        ++Count;
-    }
-    if (Qual & T_QUAL_FASTCALL) {
-        if (Count > 0) {
-            SB_AppendChar (S, ' ');
-        }
-        SB_AppendStr (S, "__fastcall__");
-        ++Count;
-    }
-    if (Qual & T_QUAL_CDECL) {
-        if (Count > 0) {
-            SB_AppendChar (S, ' ');
-        }
-        SB_AppendStr (S, "__cdecl__");
-        ++Count;
-    }
-
-    if (Count > 0) {
-        SB_Terminate (S);
-    }
-
-    return Count;
-}
-
-
-
 unsigned TypeLen (const Type* T)
 /* Return the length of the type string */
 {
@@ -454,6 +143,12 @@ void TypeFree (Type* T)
 
 
 
+/*****************************************************************************/
+/*                           Type info extraction                            */
+/*****************************************************************************/
+
+
+
 int SignExtendChar (int C)
 /* Do correct sign extension of a character */
 {
@@ -462,70 +157,6 @@ int SignExtendChar (int C)
     } else {
         return C & 0xFF;
     }
-}
-
-
-
-Type* GetCharArrayType (unsigned Len)
-/* Return the type for a char array of the given length */
-{
-    /* Allocate memory for the type string */
-    Type* T = TypeAlloc (3);    /* array/char/terminator */
-
-    /* Fill the type string */
-    T[0].C   = T_ARRAY;
-    T[0].A.L = Len;             /* Array length is in the L attribute */
-    T[1].C   = T_CHAR;
-    T[2].C   = T_END;
-
-    /* Return the new type */
-    return T;
-}
-
-
-
-Type* GetImplicitFuncType (void)
-/* Return a type string for an inplicitly declared function */
-{
-    /* Get a new function descriptor */
-    FuncDesc* F = NewFuncDesc ();
-
-    /* Allocate memory for the type string */
-    Type* T = TypeAlloc (3);    /* func/returns int/terminator */
-
-    /* Prepare the function descriptor */
-    F->Flags  = FD_EMPTY;
-    F->SymTab = &EmptySymTab;
-    F->TagTab = &EmptySymTab;
-
-    /* Fill the type string */
-    T[0].C   = T_FUNC | CodeAddrSizeQualifier ();
-    T[0].A.F = F;
-    T[1].C   = T_INT;
-    T[2].C   = T_END;
-
-    /* Return the new type */
-    return T;
-}
-
-
-
-const Type* GetStructReplacementType (const Type* SType)
-/* Get a replacement type for passing a struct/union in the primary register */
-{
-    const Type* NewType;
-    /* If the size is less than or equal to that of a long, we will copy the
-    ** struct using the primary register, otherwise we will use memcpy.
-    */
-    switch (SizeOf (SType)) {
-        case 1:     NewType = type_uchar;   break;
-        case 2:     NewType = type_uint;    break;
-        case 3:     /* FALLTHROUGH */
-        case 4:     NewType = type_ulong;   break;
-        default:    NewType = SType;        break;
-    }
-
-    return NewType;
 }
 
 
@@ -572,150 +203,8 @@ unsigned long GetIntegerTypeMax (const Type* Type)
 
 
 
-static unsigned GetBitFieldMinimalTypeSize (unsigned BitWidth)
-/* Return the size of the smallest integer type that may have BitWidth bits */
-{
-    /* Since all integer types supported in cc65 for bit-fields have sizes that
-    ** are powers of 2, we can just use this bit-twiddling trick.
-    */
-    unsigned V = (int)(BitWidth - 1U) / (int)CHAR_BITS;
-    V |= V >> 1;
-    V |= V >> 2;
-    V |= V >> 4;
-    V |= V >> 8;
-    V |= V >> 16;
-
-    /* Return the result size */
-    return V + 1U;
-}
-
-
-
-const Type* GetUnderlyingType (const Type* Type)
-/* Get the underlying type of an enum or other integer class type */
-{
-    if (IsISOChar (Type)) {
-        return IS_Get (&SignedChars) ? type_schar : type_uchar;
-    } else if (IsTypeEnum (Type)) {
-        /* This should not happen, but just in case */
-        if (Type->A.S == 0) {
-            Internal ("Enum tag type error in GetUnderlyingTypeCode");
-        }
-
-        /* If incomplete enum type is used, just return its raw type */
-        if (Type->A.S->V.E.Type != 0) {
-            return Type->A.S->V.E.Type;
-        }
-    } else if (IsTypeBitField (Type)) {
-        /* We consider the smallest type that can represent all values of the
-        ** bit-field, instead of the type used in the declaration, the truly
-        ** underlying of the bit-field.
-        */
-        switch (GetBitFieldMinimalTypeSize (Type->A.B.Width)) {
-            case SIZEOF_CHAR: Type = IsSignSigned (Type) ? type_schar : type_uchar; break;
-            case SIZEOF_INT:  Type = IsSignSigned (Type) ? type_int   : type_uint;  break;
-            case SIZEOF_LONG: Type = IsSignSigned (Type) ? type_long  : type_ulong; break;
-            default:          Type = IsSignSigned (Type) ? type_int   : type_uint;  break;
-        }
-    }
-
-    return Type;
-}
-
-
-
-TypeCode GetUnderlyingTypeCode (const Type* Type)
-/* Get the type code of the unqualified underlying type of TCode.
-** Return UnqualifiedType (TCode) if TCode is not scalar.
-*/
-{
-    TypeCode Underlying = UnqualifiedType (Type->C);
-
-    if (IsISOChar (Type)) {
-
-        return IS_Get (&SignedChars) ? T_SCHAR : T_UCHAR;
-
-    } else if (IsTypeEnum (Type)) {
-        TypeCode TCode;
-
-        /* This should not happen, but just in case */
-        if (Type->A.S == 0) {
-            Internal ("Enum tag type error in GetUnderlyingTypeCode");
-        }
-
-        /* Inspect the underlying type of the enum */
-        if (Type->A.S->V.E.Type == 0) {
-            /* Incomplete enum type is used */
-            return Underlying;
-        }
-        TCode = UnqualifiedType (Type->A.S->V.E.Type->C);
-
-        /* Replace the type code with integer */
-        Underlying = (TCode & ~T_MASK_TYPE);
-        switch (TCode & T_MASK_SIZE) {
-            case T_SIZE_INT:      Underlying |= T_TYPE_INT;      break;
-            case T_SIZE_LONG:     Underlying |= T_TYPE_LONG;     break;
-            case T_SIZE_SHORT:    Underlying |= T_TYPE_SHORT;    break;
-            case T_SIZE_CHAR:     Underlying |= T_TYPE_CHAR;     break;
-            case T_SIZE_LONGLONG: Underlying |= T_TYPE_LONGLONG; break;
-            default:              Underlying |= T_TYPE_INT;      break;
-        }
-    } else if (IsTypeBitField (Type)) {
-        /* We consider the smallest type that can represent all values of the
-        ** bit-field, instead of the type used in the declaration, the truly
-        ** underlying of the bit-field.
-        */
-        switch (GetBitFieldMinimalTypeSize (Type->A.B.Width)) {
-            case SIZEOF_CHAR:     Underlying = T_CHAR;      break;
-            case SIZEOF_INT:      Underlying = T_INT;       break;
-            case SIZEOF_LONG:     Underlying = T_LONG;      break;
-            case SIZEOF_LONGLONG: Underlying = T_LONGLONG;  break;
-            default:              Underlying = T_INT;       break;
-        }
-        Underlying &= ~T_MASK_SIGN;
-        Underlying |= Type->C & T_MASK_SIGN;
-    }
-
-    return Underlying;
-}
-
-
-
-const Type* GetBitFieldChunkType (const Type* Type)
-/* Get the type needed to operate on the byte chunk containing the bit-field */
-{
-    unsigned ChunkSize;
-    if ((Type->A.B.Width - 1U) / CHAR_BITS ==
-        (Type->A.B.Offs + Type->A.B.Width - 1U) / CHAR_BITS) {
-        /* T bit-field fits within its underlying type */
-        return GetUnderlyingType (Type);
-    }
-
-    ChunkSize = GetBitFieldMinimalTypeSize (Type->A.B.Offs + Type->A.B.Width);
-    if (ChunkSize < SizeOf (Type + 1)) {
-        /* The end of the bit-field is offset by some bits so that it requires
-        ** more bytes to be accessed as a whole than its underlying type does.
-        ** Note: In cc65 the bit offset is always less than CHAR_BITS.
-        */
-        switch (ChunkSize) {
-            case SIZEOF_CHAR: return IsSignSigned (Type) ? type_schar : type_uchar;
-            case SIZEOF_INT:  return IsSignSigned (Type) ? type_int   : type_uint;
-            case SIZEOF_LONG: return IsSignSigned (Type) ? type_long  : type_ulong;
-            default:          return IsSignSigned (Type) ? type_int   : type_uint;
-        }
-    }
-
-    /* We can always use the declarartion integer type as the chunk type.
-    ** Note: A bit-field will not occupy bits located in bytes more than that
-    ** of its declaration type in cc65. So this is OK.
-    */
-    return Type + 1;
-}
-
-
-
 unsigned SizeOf (const Type* T)
-/* Compute size of object represented by type array. */
+/* Compute size (in bytes) of object represented by type array */
 {
     switch (GetUnderlyingTypeCode (T)) {
 
@@ -788,7 +277,7 @@ unsigned SizeOf (const Type* T)
 
 
 unsigned PSizeOf (const Type* T)
-/* Compute size of pointer object. */
+/* Compute size (in bytes) of pointee object */
 {
     /* We are expecting a pointer expression */
     CHECK (IsClassPtr (T));
@@ -800,9 +289,9 @@ unsigned PSizeOf (const Type* T)
 
 
 unsigned CheckedSizeOf (const Type* T)
-/* Return the size of a data type. If the size is zero, emit an error and
-** return some valid size instead (so the rest of the compiler doesn't have
-** to work with invalid sizes).
+/* Return the size (in bytes) of a data type. If the size is zero, emit an
+** error and return some valid size instead (so the rest of the compiler
+** doesn't have to work with invalid sizes).
 */
 {
     unsigned Size = SizeOf (T);
@@ -820,9 +309,9 @@ unsigned CheckedSizeOf (const Type* T)
 
 
 unsigned CheckedPSizeOf (const Type* T)
-/* Return the size of a data type that is pointed to by a pointer. If the
-** size is zero, emit an error and return some valid size instead (so the
-** rest of the compiler doesn't have to work with invalid sizes).
+/* Return the size (in bytes) of a data type that is pointed to by a pointer.
+** If the size is zero, emit an error and return some valid size instead (so
+** the rest of the compiler doesn't have to work with invalid sizes).
 */
 {
     unsigned Size = PSizeOf (T);
@@ -835,6 +324,205 @@ unsigned CheckedPSizeOf (const Type* T)
         Size = SIZEOF_CHAR;     /* Don't return zero */
     }
     return Size;
+}
+
+
+
+static unsigned GetBitFieldMinimalTypeSize (unsigned BitWidth)
+/* Return the size of the smallest integer type that may have BitWidth bits */
+{
+    /* Since all integer types supported in cc65 for bit-fields have sizes that
+    ** are powers of 2, we can just use this bit-twiddling trick.
+    */
+    unsigned V = (int)(BitWidth - 1U) / (int)CHAR_BITS;
+    V |= V >> 1;
+    V |= V >> 2;
+    V |= V >> 4;
+    V |= V >> 8;
+    V |= V >> 16;
+
+    /* Return the result size */
+    return V + 1U;
+}
+
+
+
+TypeCode GetUnderlyingTypeCode (const Type* Type)
+/* Get the type code of the unqualified underlying type of TCode.
+** Return UnqualTypeCode (Type) if Type is not scalar.
+*/
+{
+    TypeCode Underlying = UnqualifiedType (Type->C);
+
+    if (IsISOChar (Type)) {
+
+        return IS_Get (&SignedChars) ? T_SCHAR : T_UCHAR;
+
+    } else if (IsTypeEnum (Type)) {
+        TypeCode TCode;
+
+        /* This should not happen, but just in case */
+        if (Type->A.S == 0) {
+            Internal ("Enum tag type error in GetUnderlyingTypeCode");
+        }
+
+        /* Inspect the underlying type of the enum */
+        if (Type->A.S->V.E.Type == 0) {
+            /* Incomplete enum type is used */
+            return Underlying;
+        }
+        TCode = UnqualifiedType (Type->A.S->V.E.Type->C);
+
+        /* Replace the type code with integer */
+        Underlying = (TCode & ~T_MASK_TYPE);
+        switch (TCode & T_MASK_SIZE) {
+            case T_SIZE_INT:      Underlying |= T_TYPE_INT;      break;
+            case T_SIZE_LONG:     Underlying |= T_TYPE_LONG;     break;
+            case T_SIZE_SHORT:    Underlying |= T_TYPE_SHORT;    break;
+            case T_SIZE_CHAR:     Underlying |= T_TYPE_CHAR;     break;
+            case T_SIZE_LONGLONG: Underlying |= T_TYPE_LONGLONG; break;
+            default:              Underlying |= T_TYPE_INT;      break;
+        }
+    } else if (IsTypeBitField (Type)) {
+        /* We consider the smallest type that can represent all values of the
+        ** bit-field, instead of the type used in the declaration, the truly
+        ** underlying of the bit-field.
+        */
+        switch (GetBitFieldMinimalTypeSize (Type->A.B.Width)) {
+            case SIZEOF_CHAR:     Underlying = T_CHAR;      break;
+            case SIZEOF_INT:      Underlying = T_INT;       break;
+            case SIZEOF_LONG:     Underlying = T_LONG;      break;
+            case SIZEOF_LONGLONG: Underlying = T_LONGLONG;  break;
+            default:              Underlying = T_INT;       break;
+        }
+        Underlying &= ~T_MASK_SIGN;
+        Underlying |= Type->C & T_MASK_SIGN;
+    }
+
+    return Underlying;
+}
+
+
+
+/*****************************************************************************/
+/*                             Type manipulation                             */
+/*****************************************************************************/
+
+
+
+Type* GetImplicitFuncType (void)
+/* Return a type string for an implicitly declared function */
+{
+    /* Get a new function descriptor */
+    FuncDesc* F = NewFuncDesc ();
+
+    /* Allocate memory for the type string */
+    Type* T = TypeAlloc (3);    /* func/returns int/terminator */
+
+    /* Prepare the function descriptor */
+    F->Flags  = FD_EMPTY;
+    F->SymTab = &EmptySymTab;
+    F->TagTab = &EmptySymTab;
+
+    /* Fill the type string */
+    T[0].C   = T_FUNC | CodeAddrSizeQualifier ();
+    T[0].A.F = F;
+    T[1].C   = T_INT;
+    T[2].C   = T_END;
+
+    /* Return the new type */
+    return T;
+}
+
+
+
+Type* GetCharArrayType (unsigned Len)
+/* Return the type for a char array of the given length */
+{
+    /* Allocate memory for the type string */
+    Type* T = TypeAlloc (3);    /* array/char/terminator */
+
+    /* Fill the type string */
+    T[0].C   = T_ARRAY;
+    T[0].A.L = Len;             /* Array length is in the L attribute */
+    T[1].C   = T_CHAR;
+    T[2].C   = T_END;
+
+    /* Return the new type */
+    return T;
+}
+
+
+
+Type* NewPointerTo (const Type* T)
+/* Return a type string that is "pointer to T". The type string is allocated
+** on the heap and may be freed after use.
+*/
+{
+    /* Get the size of the type string including the terminator */
+    unsigned Size = TypeLen (T) + 1;
+
+    /* Allocate the new type string */
+    Type* P = TypeAlloc (Size + 1);
+
+    /* Create the return type... */
+    P[0].C = T_PTR | (T[0].C & T_QUAL_ADDRSIZE);
+    memcpy (P+1, T, Size * sizeof (Type));
+
+    /* ...and return it */
+    return P;
+}
+
+
+
+Type* NewBitFieldType (const Type* T, unsigned BitOffs, unsigned BitWidth)
+/* Return a type string that is "T : BitWidth" aligned on BitOffs. The type
+** string is allocated on the heap and may be freed after use.
+*/
+{
+    Type* P;
+
+    /* The type specifier must be integeral */
+    CHECK (IsClassInt (T));
+
+    /* Allocate the new type string */
+    P = TypeAlloc (3);
+
+    /* Create the return type... */
+    P[0].C = IsSignSigned (T) ? T_SBITFIELD : T_UBITFIELD;
+    P[0].C |= (T[0].C & T_QUAL_ADDRSIZE);
+    P[0].A.B.Offs  = BitOffs;
+    P[0].A.B.Width = BitWidth;
+
+    /* Get the declaration type */
+    memcpy (&P[1], GetUnderlyingType (T), sizeof (P[1]));
+
+    /* Get done... */
+    P[2].C = T_END;
+
+    /* ...and return it */
+    return P;
+}
+
+
+
+const Type* AddressOf (const Type* T)
+/* Return a type string that is "address of T". The type string is allocated
+** on the heap and may be freed after use.
+*/
+{
+    /* Get the size of the type string including the terminator */
+    unsigned Size = TypeLen (T) + 1;
+
+    /* Allocate the new type string */
+    Type* P = TypeAlloc (Size + 1);
+
+    /* Create the return type... */
+    P[0].C = T_PTR | (T[0].C & T_QUAL_ADDRSIZE) | T_QUAL_CONST;
+    memcpy (P+1, T, Size * sizeof (Type));
+
+    /* ...and return it */
+    return P;
 }
 
 
@@ -863,48 +551,6 @@ Type* IndirectModifiable (Type* T)
 
     /* Skip the pointer or array token itself */
     return T + 1;
-}
-
-
-
-Type* NewPointerTo (const Type* T)
-/* Return a type string that is "pointer to T". The type string is allocated
-** on the heap and may be freed after use.
-*/
-{
-    /* Get the size of the type string including the terminator */
-    unsigned Size = TypeLen (T) + 1;
-
-    /* Allocate the new type string */
-    Type* P = TypeAlloc (Size + 1);
-
-    /* Create the return type... */
-    P[0].C = T_PTR | (T[0].C & T_QUAL_ADDRSIZE);
-    memcpy (P+1, T, Size * sizeof (Type));
-
-    /* ...and return it */
-    return P;
-}
-
-
-
-const Type* AddressOf (const Type* T)
-/* Return a type string that is "address of T". The type string is allocated
-** on the heap and may be freed after use.
-*/
-{
-    /* Get the size of the type string including the terminator */
-    unsigned Size = TypeLen (T) + 1;
-
-    /* Allocate the new type string */
-    Type* P = TypeAlloc (Size + 1);
-
-    /* Create the return type... */
-    P[0].C = T_PTR | (T[0].C & T_QUAL_ADDRSIZE) | T_QUAL_CONST;
-    memcpy (P+1, T, Size * sizeof (Type));
-
-    /* ...and return it */
-    return P;
 }
 
 
@@ -1109,34 +755,95 @@ const Type* UnsignedType (const Type* T)
 
 
 
-Type* NewBitFieldType (const Type* T, unsigned BitOffs, unsigned BitWidth)
-/* Return a type string that is "T : BitWidth" aligned on BitOffs. The type
-** string is allocated on the heap and may be freed after use.
-*/
+const Type* GetUnderlyingType (const Type* Type)
+/* Get the underlying type of an enum or other integer class type */
 {
-    Type* P;
+    if (IsISOChar (Type)) {
+        return IS_Get (&SignedChars) ? type_schar : type_uchar;
+    } else if (IsTypeEnum (Type)) {
+        /* This should not happen, but just in case */
+        if (Type->A.S == 0) {
+            Internal ("Enum tag type error in GetUnderlyingTypeCode");
+        }
 
-    /* The type specifier must be integeral */
-    CHECK (IsClassInt (T));
+        /* If incomplete enum type is used, just return its raw type */
+        if (Type->A.S->V.E.Type != 0) {
+            return Type->A.S->V.E.Type;
+        }
+    } else if (IsTypeBitField (Type)) {
+        /* We consider the smallest type that can represent all values of the
+        ** bit-field, instead of the type used in the declaration, the truly
+        ** underlying of the bit-field.
+        */
+        switch (GetBitFieldMinimalTypeSize (Type->A.B.Width)) {
+            case SIZEOF_CHAR: Type = IsSignSigned (Type) ? type_schar : type_uchar; break;
+            case SIZEOF_INT:  Type = IsSignSigned (Type) ? type_int   : type_uint;  break;
+            case SIZEOF_LONG: Type = IsSignSigned (Type) ? type_long  : type_ulong; break;
+            default:          Type = IsSignSigned (Type) ? type_int   : type_uint;  break;
+        }
+    }
 
-    /* Allocate the new type string */
-    P = TypeAlloc (3);
-
-    /* Create the return type... */
-    P[0].C = IsSignSigned (T) ? T_SBITFIELD : T_UBITFIELD;
-    P[0].C |= (T[0].C & T_QUAL_ADDRSIZE);
-    P[0].A.B.Offs  = BitOffs;
-    P[0].A.B.Width = BitWidth;
-
-    /* Get the declaration type */
-    memcpy (&P[1], GetUnderlyingType (T), sizeof (P[1]));
-
-    /* Get done... */
-    P[2].C = T_END;
-
-    /* ...and return it */
-    return P;
+    return Type;
 }
+
+
+
+const Type* GetStructReplacementType (const Type* SType)
+/* Get a replacement type for passing a struct/union in the primary register */
+{
+    const Type* NewType;
+    /* If the size is less than or equal to that of a long, we will copy the
+    ** struct using the primary register, otherwise we will use memcpy.
+    */
+    switch (SizeOf (SType)) {
+        case 1:     NewType = type_uchar;   break;
+        case 2:     NewType = type_uint;    break;
+        case 3:     /* FALLTHROUGH */
+        case 4:     NewType = type_ulong;   break;
+        default:    NewType = SType;        break;
+    }
+
+    return NewType;
+}
+
+
+
+const Type* GetBitFieldChunkType (const Type* Type)
+/* Get the type needed to operate on the byte chunk containing the bit-field */
+{
+    unsigned ChunkSize;
+    if ((Type->A.B.Width - 1U) / CHAR_BITS ==
+        (Type->A.B.Offs + Type->A.B.Width - 1U) / CHAR_BITS) {
+        /* T bit-field fits within its underlying type */
+        return GetUnderlyingType (Type);
+    }
+
+    ChunkSize = GetBitFieldMinimalTypeSize (Type->A.B.Offs + Type->A.B.Width);
+    if (ChunkSize < SizeOf (Type + 1)) {
+        /* The end of the bit-field is offset by some bits so that it requires
+        ** more bytes to be accessed as a whole than its underlying type does.
+        ** Note: In cc65 the bit offset is always less than CHAR_BITS.
+        */
+        switch (ChunkSize) {
+            case SIZEOF_CHAR: return IsSignSigned (Type) ? type_schar : type_uchar;
+            case SIZEOF_INT:  return IsSignSigned (Type) ? type_int   : type_uint;
+            case SIZEOF_LONG: return IsSignSigned (Type) ? type_long  : type_ulong;
+            default:          return IsSignSigned (Type) ? type_int   : type_uint;
+        }
+    }
+
+    /* We can always use the declarartion integer type as the chunk type.
+    ** Note: A bit-field will not occupy bits located in bytes more than that
+    ** of its declaration type in cc65. So this is OK.
+    */
+    return Type + 1;
+}
+
+
+
+/*****************************************************************************/
+/*                              Type Predicates                              */
+/*****************************************************************************/
 
 
 
@@ -1261,6 +968,46 @@ int HasUnknownSize (const Type* T)
 
 
 
+int TypeHasAttr (const Type* T)
+/* Return true if the given type has attribute data */
+{
+    return IsClassStruct (T) || IsTypeArray (T) || IsClassFunc (T);
+}
+
+
+
+/*****************************************************************************/
+/*                             Qualifier helpers                             */
+/*****************************************************************************/
+
+
+
+TypeCode AddrSizeQualifier (unsigned AddrSize)
+/* Return T_QUAL_NEAR or T_QUAL_FAR depending on the address size */
+{
+    switch (AddrSize) {
+
+        case ADDR_SIZE_ABS:
+            return T_QUAL_NEAR;
+
+        case ADDR_SIZE_FAR:
+            return T_QUAL_FAR;
+
+        default:
+            Error ("Invalid address size");
+            return T_QUAL_NEAR;
+
+    }
+}
+
+
+
+/*****************************************************************************/
+/*                           Function type helpers                           */
+/*****************************************************************************/
+
+
+
 int IsVariadicFunc (const Type* T)
 /* Return true if this is a function type or pointer to function type with
 ** variable parameter list.
@@ -1369,6 +1116,12 @@ const FuncDesc* GetFuncDefinitionDesc (const Type* T)
 
 
 
+/*****************************************************************************/
+/*                            Array type helpers                             */
+/*****************************************************************************/
+
+
+
 long GetElementCount (const Type* T)
 /* Get the element count of the array specified in T (which must be of
 ** array type).
@@ -1414,6 +1167,12 @@ const Type* GetBaseElementType (const Type* T)
 
 
 
+/*****************************************************************************/
+/*                             ESU types helpers                             */
+/*****************************************************************************/
+
+
+
 struct SymEntry* GetESUTagSym (const Type* T)
 /* Get the tag symbol entry of the enum/struct/union type.
 ** Return 0 if it is not an enum/struct/union.
@@ -1439,30 +1198,319 @@ void SetESUTagSym (Type* T, struct SymEntry* S)
 
 
 
-TypeCode AddrSizeQualifier (unsigned AddrSize)
-/* Return T_QUAL_NEAR or T_QUAL_FAR depending on the address size */
+/*****************************************************************************/
+/*                                  Helpers                                  */
+/*****************************************************************************/
+
+
+
+const char* GetBasicTypeName (const Type* T)
+/* Return a const name string of the basic type.
+** Return "type" for unknown basic types.
+*/
 {
-    switch (AddrSize) {
-
-        case ADDR_SIZE_ABS:
-            return T_QUAL_NEAR;
-
-        case ADDR_SIZE_FAR:
-            return T_QUAL_FAR;
-
-        default:
-            Error ("Invalid address size");
-            return T_QUAL_NEAR;
-
+    switch (GetRawType (T)) {
+    case T_TYPE_ENUM:       return "enum";
+    case T_TYPE_BITFIELD:   return "bit-field";
+    case T_TYPE_FLOAT:      return "float";
+    case T_TYPE_DOUBLE:     return "double";
+    case T_TYPE_VOID:       return "void";
+    case T_TYPE_STRUCT:     return "struct";
+    case T_TYPE_UNION:      return "union";
+    case T_TYPE_ARRAY:      return "array";
+    case T_TYPE_PTR:        return "pointer";
+    case T_TYPE_FUNC:       return "function";
+    case T_TYPE_NONE:       /* FALLTHROUGH */
+    default:                break;
     }
+    if (IsClassInt (T)) {
+        if (IsRawSignSigned (T)) {
+            switch (GetRawType (T)) {
+            case T_TYPE_CHAR:       return "signed char";
+            case T_TYPE_SHORT:      return "short";
+            case T_TYPE_INT:        return "int";
+            case T_TYPE_LONG:       return "long";
+            case T_TYPE_LONGLONG:   return "long long";
+            default:
+                return "signed integer";
+            }
+        } else if (IsRawSignUnsigned (T)) {
+            switch (GetRawType (T)) {
+            case T_TYPE_CHAR:       return "unsigned char";
+            case T_TYPE_SHORT:      return "unsigned short";
+            case T_TYPE_INT:        return "unsigned int";
+            case T_TYPE_LONG:       return "unsigned long";
+            case T_TYPE_LONGLONG:   return "unsigned long long";
+            default:
+                return "unsigned integer";
+            }
+        } else {
+            switch (GetRawType (T)) {
+            case T_TYPE_CHAR:       return "char";
+            case T_TYPE_SHORT:      return "short";
+            case T_TYPE_INT:        return "int";
+            case T_TYPE_LONG:       return "long";
+            case T_TYPE_LONGLONG:   return "long long";
+            default:
+                return "integer";
+            }
+        }
+    }
+    return "type";
 }
 
 
 
-int TypeHasAttr (const Type* T)
-/* Return true if the given type has attribute data */
+static const char* GetTagSymName (const Type* T)
+/* Return a name string of the type or the symbol name if it is an ESU type.
+** Note: This may use a static buffer that could be overwritten by other calls.
+*/
 {
-    return IsClassStruct (T) || IsTypeArray (T) || IsClassFunc (T);
+    static char TypeName [IDENTSIZE + 16];
+    SymEntry* Sym;
+
+    Sym = GetESUTagSym (T);
+    if (Sym == 0) {
+        return GetBasicTypeName (T);
+    }
+    sprintf (TypeName, "%s %s", GetBasicTypeName (T),
+             Sym->Name[0] != '\0' ? Sym->Name : "<unknown>");
+
+    return TypeName;
+}
+
+
+
+const char* GetFullTypeName (const Type* T)
+/* Return the full name string of the given type */
+{
+    struct StrBuf* Buf = NewDiagnosticStrBuf ();
+    GetFullTypeNameBuf (Buf, T);
+
+    return SB_GetConstBuf (Buf);
+}
+
+
+
+static struct StrBuf* GetFullTypeNameWestEast (struct StrBuf* West, struct StrBuf* East, const Type* T)
+/* Return the name string of the given type split into a western part and an
+** eastern part.
+*/
+{
+    struct StrBuf Buf = AUTO_STRBUF_INITIALIZER;
+
+    if (IsTypeArray (T)) {
+
+        long Count = GetElementCount (T);
+        if (!SB_IsEmpty (East)) {
+            if (Count > 0) {
+                SB_Printf (&Buf, "[%ld]", Count);
+            } else {
+                SB_Printf (&Buf, "[]");
+            }
+            SB_Append (East, &Buf);
+            SB_Terminate (East);
+
+        } else {
+            if (Count > 0) {
+                SB_Printf (East, "[%ld]", Count);
+            } else {
+                SB_Printf (East, "[]");
+            }
+
+            if (!SB_IsEmpty (West)) {
+                /* Add parentheses to West */
+                SB_Printf (&Buf, "(%s)", SB_GetConstBuf (West));
+                SB_Copy (West, &Buf);
+                SB_Terminate (West);
+            }
+        }
+
+        /* Get element type */
+        GetFullTypeNameWestEast (West, East, T + 1);
+
+    } else if (IsTypeFunc (T)) {
+
+        FuncDesc* D             = GetFuncDesc (T);
+        struct StrBuf ParamList = AUTO_STRBUF_INITIALIZER;
+
+        /* First argument */
+        SymEntry* Param = D->SymTab->SymHead;
+        unsigned I;
+        for (I = 0; I < D->ParamCount; ++I) {
+            CHECK (Param != 0 && (Param->Flags & SC_PARAM) != 0);
+            if (I > 0) {
+                SB_AppendStr (&ParamList, ", ");
+            }
+            SB_AppendStr (&ParamList, SB_GetConstBuf (GetFullTypeNameBuf (&Buf, Param->Type)));
+            SB_Clear (&Buf);
+            /* Next argument */
+            Param = Param->NextSym;
+        }
+        if ((D->Flags & FD_VARIADIC) == 0) {
+            if (D->ParamCount == 0 && (D->Flags & FD_EMPTY) == 0) {
+                SB_AppendStr (&ParamList, "void");
+            }
+        } else {
+            if (D->ParamCount > 0) {
+                SB_AppendStr (&ParamList, ", ...");
+            } else {
+                SB_AppendStr (&ParamList, "...");
+            }
+        }
+        SB_Terminate (&ParamList);
+
+        /* Join the existing West and East together */
+        if (!SB_IsEmpty (East)) {
+            SB_Append (West, East);
+            SB_Terminate (West);
+            SB_Clear (East);
+        }
+
+        if (SB_IsEmpty (West)) {
+            /* Just use the param list */
+            SB_Printf (West, "(%s)", SB_GetConstBuf (&ParamList));
+        } else {
+            /* Append the param list to the existing West */
+            SB_Printf (&Buf, "(%s)(%s)", SB_GetConstBuf (West), SB_GetConstBuf (&ParamList));
+            SB_Printf (West, "%s", SB_GetConstBuf (&Buf));
+        }
+        SB_Done (&ParamList);
+
+        /* Return type */
+        GetFullTypeNameWestEast (West, East, T + 1);
+
+    } else if (IsTypePtr (T)) {
+
+        int QualCount = 0;
+
+        SB_Printf (&Buf, "*");
+
+        /* Add qualifiers */
+        if ((GetQualifier (T) & ~T_QUAL_NEAR) != T_QUAL_NONE) {
+            QualCount = GetQualifierTypeCodeNameBuf (&Buf, T->C, T_QUAL_NEAR);
+        }
+
+        if (!SB_IsEmpty (West)) {
+            if (QualCount > 0) {
+                SB_AppendChar (&Buf, ' ');
+            }
+            SB_Append (&Buf, West);
+        }
+
+        SB_Copy (West, &Buf);
+        SB_Terminate (West);
+
+        /* Get indirection type */
+        GetFullTypeNameWestEast (West, East, T + 1);
+
+    } else {
+
+        /* Add qualifiers */
+        if ((GetQualifier (T) & ~T_QUAL_NEAR) != 0) {
+            if (GetQualifierTypeCodeNameBuf (&Buf, T->C, T_QUAL_NEAR) > 0) {
+                SB_AppendChar (&Buf, ' ');
+            }
+        }
+
+        if (!IsTypeBitField (T)) {
+            SB_AppendStr (&Buf, GetTagSymName (T));
+        } else {
+            SB_AppendStr (&Buf, GetBasicTypeName (T + 1));
+        }
+
+        if (!SB_IsEmpty (West)) {
+            SB_AppendChar (&Buf, ' ');
+            SB_Append (&Buf, West);
+        }
+
+        SB_Copy (West, &Buf);
+        SB_Terminate (West);
+    }
+
+    SB_Done (&Buf);
+    return West;
+}
+
+
+
+struct StrBuf* GetFullTypeNameBuf (struct StrBuf* S, const Type* T)
+/* Return the full name string of the given type */
+{
+    struct StrBuf East = AUTO_STRBUF_INITIALIZER;
+    GetFullTypeNameWestEast (S, &East, T);
+
+    /* Join West and East */
+    SB_Append (S, &East);
+    SB_Terminate (S);
+    SB_Done (&East);
+
+    return S;
+}
+
+
+
+int GetQualifierTypeCodeNameBuf (struct StrBuf* S, TypeCode Qual, TypeCode IgnoredQual)
+/* Return the names of the qualifiers of the type.
+** Qualifiers to be ignored can be specified with the IgnoredQual flags.
+** Return the count of added qualifier names.
+*/
+{
+    int Count = 0;
+
+    Qual &= T_MASK_QUAL & ~IgnoredQual;
+    if (Qual & T_QUAL_CONST) {
+        if (!SB_IsEmpty (S)) {
+            SB_AppendChar (S, ' ');
+        }
+        SB_AppendStr (S, "const");
+        ++Count;
+    }
+    if (Qual & T_QUAL_VOLATILE) {
+        if (Count > 0) {
+            SB_AppendChar (S, ' ');
+        }
+        SB_AppendStr (S, "volatile");
+        ++Count;
+    }
+    if (Qual & T_QUAL_RESTRICT) {
+        if (Count > 0) {
+            SB_AppendChar (S, ' ');
+        }
+        SB_AppendStr (S, "restrict");
+        ++Count;
+    }
+    if (Qual & T_QUAL_NEAR) {
+        if (Count > 0) {
+            SB_AppendChar (S, ' ');
+        }
+        SB_AppendStr (S, "__near__");
+        ++Count;
+    }
+    if (Qual & T_QUAL_FAR) {
+        SB_AppendStr (S, "__far__");
+        ++Count;
+    }
+    if (Qual & T_QUAL_FASTCALL) {
+        if (Count > 0) {
+            SB_AppendChar (S, ' ');
+        }
+        SB_AppendStr (S, "__fastcall__");
+        ++Count;
+    }
+    if (Qual & T_QUAL_CDECL) {
+        if (Count > 0) {
+            SB_AppendChar (S, ' ');
+        }
+        SB_AppendStr (S, "__cdecl__");
+        ++Count;
+    }
+
+    if (Count > 0) {
+        SB_Terminate (S);
+    }
+
+    return Count;
 }
 
 

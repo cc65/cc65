@@ -638,7 +638,7 @@ SymEntry FindStructField (const Type* T, const char* Name)
     if (IsClassStruct (T)) {
 
         /* Get a pointer to the struct/union tag */
-        const SymEntry* TagSym = GetESUSymEntry (T);
+        const SymEntry* TagSym = GetESUTagSym (T);
         CHECK (TagSym != 0);
 
         /* Now search in the struct/union symbol table. Beware: The table may
@@ -832,38 +832,38 @@ static void AddSymEntry (SymTable* T, SymEntry* S)
 
 
 SymEntry* AddEnumSym (const char* Name, unsigned Flags, const Type* Type, SymTable* Tab, unsigned* DSFlags)
-/* Add an enum entry and return it */
+/* Add an enum tag entry and return it */
 {
     SymTable* CurTagTab = TagTab;
-    SymEntry* Entry;
+    SymEntry* TagEntry;
 
     if ((Flags & SC_FICTITIOUS) == 0) {
         /* Do we have an entry with this name already? */
-        Entry = FindSymInTable (CurTagTab, Name, HashStr (Name));
+        TagEntry = FindSymInTable (CurTagTab, Name, HashStr (Name));
     } else {
         /* Add a fictitious symbol in the fail-safe table */
-        Entry = 0;
+        TagEntry = 0;
         CurTagTab = FailSafeTab;
     }
 
-    if (Entry) {
+    if (TagEntry) {
 
         /* We do have an entry. This may be a forward, so check it. */
-        if ((Entry->Flags & SC_TYPEMASK) != SC_ENUM) {
+        if ((TagEntry->Flags & SC_TYPEMASK) != SC_ENUM) {
             /* Existing symbol is not an enum */
             Error ("Symbol '%s' is already different kind", Name);
-            Entry = 0;
+            TagEntry = 0;
         } else if (Type != 0) {
             /* Define the struct size if the underlying type is given. */
-            if (Entry->V.E.Type != 0) {
+            if (TagEntry->V.E.Type != 0) {
                 /* Both are definitions. */
                 Error ("Multiple definition for 'enum %s'", Name);
-                Entry = 0;
+                TagEntry = 0;
             } else {
-                Entry->V.E.SymTab = Tab;
-                Entry->V.E.Type   = Type;
-                Entry->Flags     &= ~SC_DECL;
-                Entry->Flags     |= SC_DEF;
+                TagEntry->V.E.SymTab = Tab;
+                TagEntry->V.E.Type   = Type;
+                TagEntry->Flags     &= ~SC_DECL;
+                TagEntry->Flags     |= SC_DEF;
 
                 /* Remember this is the first definition of this type */
                 if (DSFlags != 0) {
@@ -872,83 +872,83 @@ SymEntry* AddEnumSym (const char* Name, unsigned Flags, const Type* Type, SymTab
             }
         }
 
-        if (Entry == 0) {
+        if (TagEntry == 0) {
             /* Use the fail-safe table for fictitious symbols */
             CurTagTab = FailSafeTab;
         }
     }
 
-    if (Entry == 0) {
+    if (TagEntry == 0) {
 
         /* Create a new entry */
-        Entry = NewSymEntry (Name, SC_ENUM);
+        TagEntry = NewSymEntry (Name, SC_ENUM);
 
         /* Set the enum type data */
-        Entry->V.E.SymTab = Tab;
-        Entry->V.E.Type   = Type;
+        TagEntry->V.E.SymTab = Tab;
+        TagEntry->V.E.Type   = Type;
 
         if (Type != 0) {
-            Entry->Flags |= SC_DEF;
+            TagEntry->Flags |= SC_DEF;
         }
 
         /* Remember this is the first definition of this type */
         if (CurTagTab != FailSafeTab && DSFlags != 0) {
-            if ((Entry->Flags & SC_DEF) != 0) {
+            if ((TagEntry->Flags & SC_DEF) != 0) {
                 *DSFlags |= DS_NEW_TYPE_DEF;
             }
             *DSFlags |= DS_NEW_TYPE_DECL;
         }
 
         /* Add it to the current table */
-        AddSymEntry (CurTagTab, Entry);
+        AddSymEntry (CurTagTab, TagEntry);
     }
 
     /* Return the entry */
-    return Entry;
+    return TagEntry;
 }
 
 
 
 SymEntry* AddStructSym (const char* Name, unsigned Flags, unsigned Size, SymTable* Tab, unsigned* DSFlags)
-/* Add a struct/union entry and return it */
+/* Add a struct/union tag entry and return it */
 {
     SymTable* CurTagTab = TagTab;
-    SymEntry* Entry;
-    unsigned Type = (Flags & SC_TYPEMASK);
+    SymEntry* TagEntry;
+    unsigned  SCType = (Flags & SC_TYPEMASK);
 
-    /* Type must be struct or union */
-    PRECONDITION (Type == SC_STRUCT || Type == SC_UNION);
+    /* SCType must be struct or union */
+    PRECONDITION (SCType == SC_STRUCT || SCType == SC_UNION);
 
     if ((Flags & SC_FICTITIOUS) == 0) {
         /* Do we have an entry with this name already? */
-        Entry = FindSymInTable (CurTagTab, Name, HashStr (Name));
+        TagEntry = FindSymInTable (CurTagTab, Name, HashStr (Name));
     } else {
         /* Add a fictitious symbol in the fail-safe table */
-        Entry = 0;
+        TagEntry = 0;
         CurTagTab = FailSafeTab;
     }
 
-    if (Entry) {
+    if (TagEntry) {
 
         /* We do have an entry. This may be a forward, so check it. */
-        if ((Entry->Flags & SC_TYPEMASK) != Type) {
+        if ((TagEntry->Flags & SC_TYPEMASK) != SCType) {
             /* Existing symbol is not a struct */
             Error ("Symbol '%s' is already different kind", Name);
-            Entry = 0;
-        } else if ((Entry->Flags & Flags & SC_DEF) == SC_DEF) {
+            TagEntry = 0;
+        } else if ((TagEntry->Flags & Flags & SC_DEF) == SC_DEF) {
             /* Both structs are definitions. */
-            if (Type == SC_STRUCT) {
+            if (SCType == SC_STRUCT) {
                 Error ("Multiple definition for 'struct %s'", Name);
             } else {
                 Error ("Multiple definition for 'union %s'", Name);
             }
-            Entry = 0;
+            TagEntry = 0;
         } else {
             /* Define the struct size if it is a definition */
             if ((Flags & SC_DEF) == SC_DEF) {
-                Entry->Flags      = Flags;
-                Entry->V.S.SymTab = Tab;
-                Entry->V.S.Size   = Size;
+                TagEntry->Flags      = Flags;
+                TagEntry->V.S.SymTab = Tab;
+                TagEntry->V.S.Size   = Size;
 
                 /* Remember this is the first definition of this type */
                 if (DSFlags != 0) {
@@ -957,35 +957,35 @@ SymEntry* AddStructSym (const char* Name, unsigned Flags, unsigned Size, SymTabl
             }
         }
 
-        if (Entry == 0) {
+        if (TagEntry == 0) {
             /* Use the fail-safe table for fictitious symbols */
             CurTagTab = FailSafeTab;
         }
     }
 
-    if (Entry == 0) {
+    if (TagEntry == 0) {
 
         /* Create a new entry */
-        Entry = NewSymEntry (Name, Flags);
+        TagEntry = NewSymEntry (Name, Flags);
 
         /* Set the struct data */
-        Entry->V.S.SymTab = Tab;
-        Entry->V.S.Size   = Size;
+        TagEntry->V.S.SymTab = Tab;
+        TagEntry->V.S.Size   = Size;
 
         /* Remember this is the first definition of this type */
         if (CurTagTab != FailSafeTab && DSFlags != 0) {
-            if ((Entry->Flags & SC_DEF) != 0) {
+            if ((TagEntry->Flags & SC_DEF) != 0) {
                 *DSFlags |= DS_NEW_TYPE_DEF;
             }
             *DSFlags |= DS_NEW_TYPE_DECL;
         }
 
         /* Add it to the current tag table */
-        AddSymEntry (CurTagTab, Entry);
+        AddSymEntry (CurTagTab, TagEntry);
     }
 
     /* Return the entry */
-    return Entry;
+    return TagEntry;
 }
 
 

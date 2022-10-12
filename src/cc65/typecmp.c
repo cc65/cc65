@@ -303,8 +303,8 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
         if ((IsTypeEnum (lhs) || IsTypeEnum (rhs))) {
 
             /* Compare the tag types */
-            Sym1 = IsTypeEnum (lhs) ? GetESUSymEntry (lhs) : 0;
-            Sym2 = IsTypeEnum (rhs) ? GetESUSymEntry (rhs) : 0;
+            Sym1 = IsTypeEnum (lhs) ? GetESUTagSym (lhs) : 0;
+            Sym2 = IsTypeEnum (rhs) ? GetESUTagSym (rhs) : 0;
 
             if (Sym1 != Sym2) {
                 if (Sym1 == 0 || Sym2 == 0) {
@@ -420,8 +420,8 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
             case T_TYPE_STRUCT:
             case T_TYPE_UNION:
                 /* Compare the tag types */
-                Sym1 = GetESUSymEntry (lhs);
-                Sym2 = GetESUSymEntry (rhs);
+                Sym1 = GetESUTagSym (lhs);
+                Sym2 = GetESUTagSym (rhs);
 
                 CHECK (Sym1 != 0 || Sym2 != 0);
 

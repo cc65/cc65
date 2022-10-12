@@ -306,26 +306,16 @@ void SymSetAsmName (SymEntry* Sym);
 ** The symbol must have no assembler name set yet.
 */
 
-void CvtRegVarToAuto (SymEntry* Sym);
+void SymCvtRegVarToAuto (SymEntry* Sym);
 /* Convert a register variable to an auto variable */
 
-SymEntry* GetSymType (const Type* T);
-/* Get the symbol entry of the enum/struct/union type
-** Return 0 if it is not an enum/struct/union.
-*/
-
-const char* GetSymTypeName (const Type* T);
-/* Return a name string of the type or the symbol name if it is an ESU type.
-** Note: This may use a static buffer that could be overwritten by other calls.
-*/
-
-void ChangeSymType (SymEntry* Entry, const Type* T);
+void SymChangeType (SymEntry* Sym, const Type* T);
 /* Change the type of the given symbol */
 
-void ChangeAsmName (SymEntry* Entry, const char* NewAsmName);
+void SymChangeAsmName (SymEntry* Sym, const char* NewAsmName);
 /* Change the assembler name of the symbol */
 
-int HasAnonName (const SymEntry* Entry);
+int SymHasAnonName (const SymEntry* Sym);
 /* Return true if the symbol entry has an anonymous name */
 
 

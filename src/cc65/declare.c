@@ -815,7 +815,7 @@ static unsigned AliasAnonStructFields (const Declaration* D, SymEntry* Anon)
     /* Get the symbol table containing the fields. If it is empty, there has
     ** been an error before, so bail out.
     */
-    SymTable* Tab = GetESUSymEntry (D->Type)->V.S.SymTab;
+    SymTable* Tab = GetESUTagSym (D->Type)->V.S.SymTab;
     if (Tab == 0) {
         /* Incomplete definition - has been flagged before */
         return 0;
@@ -951,7 +951,7 @@ static SymEntry* ParseUnionDecl (const char* Name, unsigned* DSFlags)
 
                 /* Check if the field itself has a flexible array member */
                 if (IsClassStruct (Decl.Type)) {
-                    SymEntry* TagEntry = GetSymType (Decl.Type);
+                    SymEntry* TagEntry = GetESUTagSym (Decl.Type);
                     if (TagEntry && SymHasFlexibleArrayMember (TagEntry)) {
                         Field->Flags |= SC_HAVEFAM;
                         Flags        |= SC_HAVEFAM;
@@ -1153,7 +1153,7 @@ static SymEntry* ParseStructDecl (const char* Name, unsigned* DSFlags)
 
                 /* Check if the field itself has a flexible array member */
                 if (IsClassStruct (Decl.Type)) {
-                    SymEntry* TagEntry = GetSymType (Decl.Type);
+                    SymEntry* TagEntry = GetESUTagSym (Decl.Type);
                     if (TagEntry && SymHasFlexibleArrayMember (TagEntry)) {
                         Field->Flags |= SC_HAVEFAM;
                         Flags        |= SC_HAVEFAM;
@@ -1385,7 +1385,7 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
             TagEntry = ParseUnionDecl (Ident, &D->Flags);
             /* Encode the union entry into the type */
             D->Type[0].C = T_UNION;
-            SetESUSymEntry (D->Type, TagEntry);
+            SetESUTagSym (D->Type, TagEntry);
             D->Type[1].C = T_END;
             break;
 
@@ -1404,7 +1404,7 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
             TagEntry = ParseStructDecl (Ident, &D->Flags);
             /* Encode the struct entry into the type */
             D->Type[0].C = T_STRUCT;
-            SetESUSymEntry (D->Type, TagEntry);
+            SetESUTagSym (D->Type, TagEntry);
             D->Type[1].C = T_END;
             break;
 
@@ -1427,7 +1427,7 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
             TagEntry = ParseEnumDecl (Ident, &D->Flags);
             /* Encode the enum entry into the type */
             D->Type[0].C |= T_ENUM;
-            SetESUSymEntry (D->Type, TagEntry);
+            SetESUTagSym (D->Type, TagEntry);
             D->Type[1].C = T_END;
             /* The signedness of enums is determined by the type, so say this is specified to avoid
             ** the int -> unsigned int handling for plain int bit-fields in AddBitField.
@@ -1596,7 +1596,7 @@ static void ParseOldStyleParamList (FuncDesc* F)
                     */
                     if (Param->Flags & SC_DEFTYPE) {
                         /* Found it, change the default type to the one given */
-                        ChangeSymType (Param, ParamTypeCvt (Decl.Type));
+                        SymChangeType (Param, ParamTypeCvt (Decl.Type));
                         /* Reset the "default type" flag */
                         Param->Flags &= ~SC_DEFTYPE;
                     } else {

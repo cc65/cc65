@@ -478,7 +478,7 @@ void Compile (const char* FileName)
         for (Entry = GetGlobalSymTab ()->SymHead; Entry; Entry = Entry->NextSym) {
             if ((Entry->Flags & (SC_STORAGE | SC_DEF | SC_STATIC)) == (SC_STORAGE | SC_STATIC)) {
                 /* Assembly definition of uninitialized global variable */
-                SymEntry* TagSym = GetSymType (Entry->Type);
+                SymEntry* TagSym = GetESUTagSym (Entry->Type);
                 unsigned Size = SizeOf (Entry->Type);
 
                 if (Size == 0 && IsTypeArray (Entry->Type)) {
@@ -489,7 +489,7 @@ void Compile (const char* FileName)
                         Warning ("Incomplete array '%s[]' assumed to have one element", Entry->Name);
                     }
 
-                    TagSym = GetSymType (GetElementType (Entry->Type));
+                    TagSym = GetESUTagSym (GetElementType (Entry->Type));
                 }
 
                 /* For non-ESU types, Size != 0 */

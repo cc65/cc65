@@ -282,7 +282,7 @@ static unsigned ExprCheckedSizeOf (const Type* T)
     unsigned Size = SizeOf (T);
 
     if (Size == 0) {
-        SymEntry* TagSym = GetSymType (T);
+        SymEntry* TagSym = GetESUTagSym (T);
         if (TagSym == 0 || !SymIsDef (TagSym)) {
             Error ("Cannot apply 'sizeof' to incomplete type '%s'", GetFullTypeName (T));
         }

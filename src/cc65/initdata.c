@@ -452,7 +452,7 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
     }
 
     /* Get a pointer to the struct entry from the type */
-    TagSym = GetESUSymEntry (T);
+    TagSym = GetESUTagSym (T);
 
     /* Get the size of the struct from the symbol table entry */
     SI.Size = TagSym->V.S.Size;

@@ -88,6 +88,9 @@ typedef enum attr_t {
 void AddrCheck (unsigned Addr);
 /* Check if the given address has a valid range */
 
+unsigned char IsLongAddr (unsigned Addr);
+/* Check if the given address is 24-bit */
+
 attr_t GetAttr (unsigned Addr);
 /* Return the attribute for the given address */
 

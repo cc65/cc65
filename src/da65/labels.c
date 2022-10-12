@@ -60,6 +60,12 @@
 /* Symbol table */
 static const char* SymTab[0x10000];
 
+/* 65816 symbol table */
+#define MAX_LONG_LABELS 256
+static const char* LongSymVal[MAX_LONG_LABELS];
+static unsigned LongSymAddr[MAX_LONG_LABELS];
+static unsigned LongLabelsUsed;
+
 
 
 /*****************************************************************************/
@@ -74,8 +80,23 @@ static const char* MakeLabelName (unsigned Addr)
 */
 {
     static char LabelBuf [32];
-    xsprintf (LabelBuf, sizeof (LabelBuf), "L%04X", Addr);
+    xsprintf (LabelBuf, sizeof (LabelBuf),
+              IsLongAddr (Addr) ? "L%06X" : "L%04X", Addr);
     return LabelBuf;
+}
+
+
+
+static unsigned FindLongIndex (unsigned Addr)
+{
+    unsigned i;
+    for (i = 0; i < LongLabelsUsed; i++) {
+        if (LongSymAddr[i] == Addr) {
+            return i;
+        }
+    }
+
+    return -1;
 }
 
 
@@ -91,19 +112,41 @@ static void AddLabel (unsigned Addr, attr_t Attr, const char* Name)
         /* Allow redefinition if identical. Beware: Unnamed labels don't
         ** have a name (you guessed that, didn't you?).
         */
-        if (ExistingAttr == Attr &&
-            ((Name == 0 && SymTab[Addr] == 0) ||
-             (Name != 0 && SymTab[Addr] != 0 &&
-             strcmp (SymTab[Addr], Name) == 0))) {
-            return;
+        if (IsLongAddr (Addr)) {
+            const unsigned i = FindLongIndex (Addr);
+            if (ExistingAttr == Attr &&
+                ((Name == 0 && LongSymVal[i] == 0) ||
+                 (Name != 0 && LongSymVal[i] != 0 &&
+                 strcmp (LongSymVal[i], Name) == 0))) {
+                return;
+            }
+            Error ("Duplicate label for address $%06X (%s): '%s'", Addr,
+                   LongSymVal[i] == 0 ? "<unnamed label>" : LongSymVal[i],
+                   Name == 0 ? "<unnamed label>" : Name);
+        } else {
+            if (ExistingAttr == Attr &&
+                ((Name == 0 && SymTab[Addr] == 0) ||
+                 (Name != 0 && SymTab[Addr] != 0 &&
+                 strcmp (SymTab[Addr], Name) == 0))) {
+                return;
+            }
+            Error ("Duplicate label for address $%04X (%s): '%s'", Addr,
+                   SymTab[Addr] == 0 ? "<unnamed label>" : SymTab[Addr],
+                   Name == 0 ? "<unnamed label>" : Name);
         }
-        Error ("Duplicate label for address $%04X (%s): '%s'", Addr,
-               SymTab[Addr] == 0 ? "<unnamed label>" : SymTab[Addr],
-               Name == 0 ? "<unnamed label>" : Name);
     }
 
     /* Create a new label (xstrdup will return NULL if input NULL) */
-    SymTab[Addr] = xstrdup (Name);
+    if (IsLongAddr (Addr)) {
+        if (LongLabelsUsed >= MAX_LONG_LABELS) {
+            Error ("Too many long labels");
+        }
+        LongSymAddr[LongLabelsUsed] = Addr;
+        LongSymVal[LongLabelsUsed] = xstrdup (Name);
+        LongLabelsUsed++;
+    } else {
+        SymTab[Addr] = xstrdup (Name);
+    }
 
     /* Remember the attribute */
     MarkAddr (Addr, Attr);
@@ -254,6 +297,10 @@ const char* GetLabelName (unsigned Addr)
     */
     if (A == atUnnamedLabel) {
         return "";
+    } else if (IsLongAddr (Addr)) {
+        /* Return the label if any */
+        const unsigned i = FindLongIndex (Addr);
+        return i < LongLabelsUsed ? LongSymVal[i] : NULL;
     } else {
         /* Return the label if any */
         return SymTab[Addr];
@@ -327,6 +374,10 @@ const char* GetLabel (unsigned Addr, unsigned RefFrom)
             return FwdLabels[Count-1];
         }
 
+    } else if (IsLongAddr (Addr)) {
+        /* Return the label if any */
+        const unsigned i = FindLongIndex (Addr);
+        return i < LongLabelsUsed ? LongSymVal[i] : NULL;
     } else {
         /* Return the label if any */
         return SymTab[Addr];
@@ -371,7 +422,13 @@ static void DefOutOfRangeLabel (unsigned long Addr)
 
         case atIntLabel:
         case atExtLabel:
-            DefConst (SymTab[Addr], GetComment (Addr), Addr);
+            if (IsLongAddr (Addr)) {
+                const unsigned i = FindLongIndex (Addr);
+                DefConst (i < LongLabelsUsed ? LongSymVal[i] : NULL,
+                          GetComment (Addr), Addr);
+            } else {
+                DefConst (SymTab[Addr], GetComment (Addr), Addr);
+            }
             break;
 
         case atUnnamedLabel:

@@ -55,6 +55,7 @@
 #include "data.h"
 #include "error.h"
 #include "global.h"
+#include "handler.h"
 #include "infofile.h"
 #include "labels.h"
 #include "opctable.h"
@@ -447,6 +448,14 @@ static void OneOpcode (unsigned RemainingBytes)
                 }
                 /* Output the insn */
                 D->Handler (D);
+                if (CPU == CPU_65816 && (D->Flags & flSizeChanges)) {
+                    if ((D->Handler == OH_Immediate65816M &&
+                        GetAttr (PC) & atMem16) ||
+                        (D->Handler == OH_Immediate65816X &&
+                        GetAttr (PC) & atIdx16)) {
+                        PC++;
+                    }
+                }
                 PC += D->Size;
                 break;
             }

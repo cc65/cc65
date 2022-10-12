@@ -231,6 +231,28 @@ void OH_Immediate (const OpcDesc* D)
 
 
 
+void OH_Immediate65816M (const OpcDesc* D)
+{
+    if (GetAttr (PC) & atMem16) {
+        OneLine (D, "#$%04X", GetCodeWord (PC+1));
+    } else {
+        OneLine (D, "#$%02X", GetCodeByte (PC+1));
+    }
+}
+
+
+
+void OH_Immediate65816X (const OpcDesc* D)
+{
+    if (GetAttr (PC) & atIdx16) {
+        OneLine (D, "#$%04X", GetCodeWord (PC+1));
+    } else {
+        OneLine (D, "#$%02X", GetCodeByte (PC+1));
+    }
+}
+
+
+
 void OH_ImmediateWord (const OpcDesc* D)
 {
     OneLine (D, "#$%04X", GetCodeWord (PC+1));

@@ -115,14 +115,14 @@ Here is a description of all the command line options:
   <item>6502dtv
   <item>65sc02
   <item>65c02
+  <item>65816
   <item>huc6280
   <item>4510
   </itemize>
 
   6502x is for the NMOS 6502 with unofficial opcodes. 6502dtv is for the
   emulated CPU of the C64DTV device. huc6280 is the CPU of the PC engine.
-  4510 is the CPU of the Commodore C65. Support for the 65816 currently
-  is not available.
+  4510 is the CPU of the Commodore C65. 65816 is the CPU of the SNES.
 
 
   <label id="option--formfeeds">
@@ -263,8 +263,9 @@ can produce output that can not be re-assembled, when one or more of those
 branches point outside of the disassembled memory. This can happen when text
 or binary data is processed.
 
-While there is some code for the 65816 in the sources, it is currently
-unsupported.
+The 65816 support requires annotating ranges with the M and X flag states.
+This can be recorded with an emulator that supports Code and Data Logging,
+for example. Disassemble one bank at a time.
 
 
 <sect1>Attribute map<p>
@@ -521,6 +522,11 @@ following attributes are recognized:
 
   </descrip>
 
+  <tag><tt>ADDRMODE</tt></tag>
+  When disassembling 65816 code, this specifies the M and X flag states
+  for this range. It's a string argument of the form "mx", capital letters
+  mean the flag is enabled.
+
 </descrip>
 
 
@@ -689,6 +695,20 @@ directives explained above:
         LABEL { NAME "hanmi";   ADDR  $FFFA; };
         LABEL { NAME "hares";   ADDR  $FFFC; };
         LABEL { NAME "hairq";   ADDR  $FFFE; };
+</verb></tscreen>
+
+
+
+<sect>Helper scripts<p>
+
+<tt>util/parse-bsnes-log.awk</tt> is a supplied script for 65816 disassembly,
+to parse bsnes-plus Code-Data log files and output the RANGE sections
+for your info file. For typical usage, you'd check the S-CPU log and trace
+log mask boxes in the bsnes-plus debugger, play through the game, then grep
+for the bank you're disassembling, and pass that to this script.
+
+<tscreen><verb>
+grep ^83 my-game-log | parse-bsnes-log.awk
 </verb></tscreen>
 
 

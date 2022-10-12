@@ -121,8 +121,10 @@ static const char* GetAddrArg (unsigned Flags, unsigned Addr)
         static char Buf [32];
         if (Addr < 0x100) {
             xsprintf (Buf, sizeof (Buf), "$%02X", Addr);
-        } else {
+        } else if (Addr < 0x10000) {
             xsprintf (Buf, sizeof (Buf), "$%04X", Addr);
+        } else {
+            xsprintf (Buf, sizeof (Buf), "$%06X", Addr);
         }
         return Buf;
     }
@@ -322,14 +324,28 @@ void OH_AbsoluteY (const OpcDesc* D)
 
 void OH_AbsoluteLong (const OpcDesc* D attribute ((unused)))
 {
-    Error ("Not implemented");
+    /* Get the operand */
+    unsigned Addr = GetCodeLongAddr (PC+1);
+
+    /* Generate a label in pass 1 */
+    GenerateLabel (D->Flags, Addr);
+
+    /* Output the line */
+    OneLine (D, "%s%s", GetAbsOverride (D->Flags, Addr), GetAddrArg (D->Flags, Addr));
 }
 
 
 
 void OH_AbsoluteLongX (const OpcDesc* D attribute ((unused)))
 {
-    Error ("Not implemented");
+    /* Get the operand */
+    unsigned Addr = GetCodeLongAddr (PC+1);
+
+    /* Generate a label in pass 1 */
+    GenerateLabel (D->Flags, Addr);
+
+    /* Output the line */
+    OneLine (D, "%s%s,x", GetAbsOverride (D->Flags, Addr), GetAddrArg (D->Flags, Addr));
 }
 
 
@@ -358,7 +374,17 @@ void OH_Relative (const OpcDesc* D)
 
 void OH_RelativeLong (const OpcDesc* D attribute ((unused)))
 {
-    Error ("Not implemented");
+    /* Get the operand */
+    signed short Offs = GetCodeWord (PC+1);
+
+    /* Calculate the target address */
+    unsigned Addr = (((int) PC+3) + Offs) & 0xFFFF;
+
+    /* Generate a label in pass 1 */
+    GenerateLabel (D->Flags, Addr);
+
+    /* Output the line */
+    OneLine (D, "%s", GetAddrArg (D->Flags, Addr));
 }
 
 
@@ -541,14 +567,15 @@ void OH_ImmediateAbsoluteX (const OpcDesc* D)
 
 void OH_StackRelative (const OpcDesc* D attribute ((unused)))
 {
-    Error ("Not implemented");
+    /* Output the line */
+    OneLine (D, "$%02X,s", GetCodeByte (PC+1));
 }
 
 
 
 void OH_DirectIndirectLongX (const OpcDesc* D attribute ((unused)))
 {
-    Error ("Not implemented");
+    Error ("Not implemented %s", __FUNCTION__);
 }
 
 
@@ -571,14 +598,28 @@ void OH_StackRelativeIndirectY4510 (const OpcDesc* D attribute ((unused)))
 
 void OH_DirectIndirectLong (const OpcDesc* D attribute ((unused)))
 {
-    Error ("Not implemented");
+    /* Get the operand */
+    unsigned Addr = GetCodeByte (PC+1);
+
+    /* Generate a label in pass 1 */
+    GenerateLabel (D->Flags, Addr);
+
+    /* Output the line */
+    OneLine (D, "[%s]", GetAddrArg (D->Flags, Addr));
 }
 
 
 
 void OH_DirectIndirectLongY (const OpcDesc* D attribute ((unused)))
 {
-    Error ("Not implemented");
+    /* Get the operand */
+    unsigned Addr = GetCodeByte (PC+1);
+
+    /* Generate a label in pass 1 */
+    GenerateLabel (D->Flags, Addr);
+
+    /* Output the line */
+    OneLine (D, "[%s],y", GetAddrArg (D->Flags, Addr));
 }
 
 

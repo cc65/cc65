@@ -427,8 +427,13 @@ static void OneOpcode (unsigned RemainingBytes)
     switch (Style) {
 
         case atDefault:
-            D->Handler (D);
-            PC += D->Size;
+            if (CPU == CPU_65816) {
+                DataByteLine (1);
+                ++PC;
+            } else {
+                D->Handler (D);
+                PC += D->Size;
+            }
             break;
 
         case atCode:

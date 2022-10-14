@@ -643,7 +643,7 @@ static void NumericConst (void)
             if (IVal <= 0xFFFF              &&
                 (Types & IT_UINT) == 0      &&
                 (WarnTypes & IT_LONG) != 0) {
-                Warning ("Integer constant is long");
+                Warning ("Integer constant implies signed long");
             }
         }
         if (IVal > 0xFFFF) {
@@ -660,7 +660,7 @@ static void NumericConst (void)
             ** a preceding unary op or when it is used in constant calculation.
             */
             if (WarnTypes & IT_ULONG) {
-                Warning ("Integer constant is unsigned long");
+                Warning ("Integer constant implies unsigned long");
             }
         }
 

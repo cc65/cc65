@@ -193,12 +193,15 @@ static unsigned typeadjust (ExprDesc* lhs, const ExprDesc* rhs, int NoPush)
 
 
 
-void LimitExprValue (ExprDesc* Expr)
+void LimitExprValue (ExprDesc* Expr, int WarnOverflow)
 /* Limit the constant value of the expression to the range of its type */
 {
     switch (GetUnderlyingTypeCode (Expr->Type)) {
         case T_INT:
         case T_SHORT:
+            if (WarnOverflow && ((Expr->IVal < -0x8000) || (Expr->IVal > 0x7FFF))) {
+                Warning ("Signed integer constant overflow");
+            }
             Expr->IVal = (int16_t)Expr->IVal;
             break;
 
@@ -218,6 +221,9 @@ void LimitExprValue (ExprDesc* Expr)
             break;
 
         case T_SCHAR:
+            if (WarnOverflow && ((Expr->IVal < -0x80) || (Expr->IVal > 0x7F))) {
+                Warning ("Signed character constant overflow");
+            }
             Expr->IVal = (int8_t)Expr->IVal;
             break;
 
@@ -1822,7 +1828,7 @@ static void UnaryOp (ExprDesc* Expr)
         Expr->Type = IntPromotion (Expr->Type);
 
         /* Limit the calculated value to the range of its type */
-        LimitExprValue (Expr);
+        LimitExprValue (Expr, 1);
 
     } else {
         unsigned Flags;
@@ -2162,7 +2168,7 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
             }
 
             /* Limit the calculated value to the range of its type */
-            LimitExprValue (Expr);
+            LimitExprValue (Expr, 1);
 
         } else if (lconst && (Gen->Flags & GEN_COMM) && !rconst) {
             /* If the LHS constant is an int that fits into an unsigned char, change the
@@ -2789,7 +2795,7 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                         Expr->Type = rhst;
                     } else {
                         /* Limit the calculated value to the range of its type */
-                        LimitExprValue (Expr);
+                        LimitExprValue (Expr, 1);
                     }
 
                     /* The result is always an rvalue */
@@ -3260,7 +3266,7 @@ static void parsesub (ExprDesc* Expr)
                     /* Just adjust the result type */
                     Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
                     /* And limit the calculated value to the range of it */
-                    LimitExprValue (Expr);
+                    LimitExprValue (Expr, 1);
                 }
                 /* The result is always an rvalue */
                 ED_MarkExprAsRVal (Expr);

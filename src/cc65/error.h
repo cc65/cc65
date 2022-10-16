@@ -92,7 +92,7 @@ void Fatal (const char* Format, ...) attribute ((noreturn, format (printf, 1, 2)
 /* Print a message about a fatal error and die */
 
 void Internal (const char* Format, ...) attribute ((noreturn, format (printf, 1, 2)));
-/* Print a message about an internal compiler error and die. */
+/* Print a message about an internal compiler error and die */
 
 void Error (const char* Format, ...) attribute ((format (printf, 1, 2)));
 /* Print an error message */
@@ -101,16 +101,16 @@ void LIError (const LineInfo* LI, const char* Format, ...) attribute ((format (p
 /* Print an error message with the line info given explicitly */
 
 void PPError (const char* Format, ...) attribute ((format (printf, 1, 2)));
-/* Print an error message. For use within the preprocessor.  */
+/* Print an error message. For use within the preprocessor */
 
 void Warning (const char* Format, ...) attribute ((format (printf, 1, 2)));
-/* Print warning message. */
+/* Print a warning message */
 
 void LIWarning (const LineInfo* LI, const char* Format, ...) attribute ((format (printf, 2, 3)));
 /* Print a warning message with the line info given explicitly */
 
 void PPWarning (const char* Format, ...) attribute ((format (printf, 1, 2)));
-/* Print warning message. For use within the preprocessor. */
+/* Print a warning message. For use within the preprocessor */
 
 IntStack* FindWarning (const char* Name);
 /* Search for a warning in the WarnMap table and return a pointer to the
@@ -119,6 +119,15 @@ IntStack* FindWarning (const char* Name);
 
 void ListWarnings (FILE* F);
 /* Print a list of warning types/names to the given file */
+
+void Note (const char* Format, ...) attribute ((format (printf, 1, 2)));
+/* Print a note message */
+
+void LINote (const LineInfo* LI, const char* Format, ...) attribute ((format (printf, 2, 3)));
+/* Print a note message with the line info given explicitly */
+
+void PPNote (const char* Format, ...) attribute ((format (printf, 1, 2)));
+/* Print a note message. For use within the preprocessor */
 
 void ErrorReport (void);
 /* Report errors (called at end of compile) */

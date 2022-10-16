@@ -707,6 +707,7 @@ static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags
         if (SCType == SC_TYPEDEF) {
             if (IsDistinctRedef (E_Type, T, TC_IDENTICAL, TCF_MASK_QUAL)) {
                 Error ("Conflicting types for typedef '%s'", Entry->Name);
+                Note ("'%s' vs '%s'", GetFullTypeName (T), GetFullTypeName (E_Type));
                 Entry = 0;
             }
         } else {
@@ -733,7 +734,7 @@ static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags
                 /* New type must be compatible with the composite prototype */
                 if (IsDistinctRedef (E_Type, T, TC_EQUAL, TCF_MASK_QUAL)) {
                     Error ("Conflicting function types for '%s'", Entry->Name);
-                    TypeCompatibilityDiagnostic (T, E_Type, 0, "'%s' vs '%s'");
+                    Note ("'%s' vs '%s'", GetFullTypeName (T), GetFullTypeName (E_Type));
                     Entry = 0;
                 } else {
                     /* Refine the existing composite prototype with this new
@@ -765,6 +766,7 @@ static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags
                 IsDistinctRedef (E_Type + 1, T + 1, TC_IDENTICAL, TCF_MASK_QUAL)) {
                 /* Conflicting element types */
                 Error ("Conflicting array types for '%s[]'", Entry->Name);
+                Note ("'%s' vs '%s'", GetFullTypeName (T), GetFullTypeName (E_Type));
                 Entry = 0;
             } else {
                 /* Check if we have a size in the existing definition */
@@ -782,6 +784,7 @@ static int HandleSymRedefinition (SymEntry* Entry, const Type* T, unsigned Flags
                 Entry = 0;
             } else if (IsDistinctRedef (E_Type, T, TC_EQUAL, TCF_MASK_QUAL)) {
                 Error ("Conflicting types for '%s'", Entry->Name);
+                Note ("'%s' vs '%s'", GetFullTypeName (T), GetFullTypeName (E_Type));
                 Entry = 0;
             } else if (E_SCType == SC_ENUMERATOR) {
                 /* Enumerators aren't allowed to be redeclared at all, even if

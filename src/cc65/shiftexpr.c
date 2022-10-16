@@ -173,7 +173,7 @@ void ShiftExpr (struct ExprDesc* Expr)
                     }
 
                     /* Limit the calculated value to the range of its type */
-                    LimitExprValue (Expr);
+                    LimitExprValue (Expr, 1);
                 }
 
                 /* Result is already got, remove the generated code */

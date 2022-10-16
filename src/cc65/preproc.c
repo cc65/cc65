@@ -806,6 +806,21 @@ static int MacName (char* Ident)
 
 
 
+static void CheckForBadIdent (const char* Ident, int Std, const Macro* M)
+/* Check for and warning on problematic identifiers */
+{
+    if (Std >= STD_C99              &&
+        (M == 0 || !M->Variadic)    &&
+        strcmp (Ident, "__VA_ARGS__") == 0) {
+        /* __VA_ARGS__ cannot be used as a macro parameter name in post-C89
+        ** mode.
+        */
+        PPWarning ("__VA_ARGS__ can only appear in the expansion of a C99 variadic macro");
+    }
+}
+
+
+
 static void AddPreLine (StrBuf* Str)
 /* Add newlines to the string buffer */
 {
@@ -878,7 +893,7 @@ static void Stringize (StrBuf* Source, StrBuf* Target)
 
 
 static void OldStyleComment (void)
-/* Remove an old style C comment from line. */
+/* Remove an old style C comment from line */
 {
     /* Remember the current line number, so we can output better error
     ** messages if the comment is not terminated in the current file.
@@ -897,6 +912,7 @@ static void OldStyleComment (void)
                          StartingLine);
                 return;
             }
+            ++PendingNewLines;
         } else {
             if (CurC == '/' && NextC == '*') {
                 PPWarning ("'/*' found inside a comment");
@@ -913,7 +929,7 @@ static void OldStyleComment (void)
 
 
 static void NewStyleComment (void)
-/* Remove a new style C comment from line. */
+/* Remove a new style C comment from line */
 {
     /* Diagnose if this is unsupported */
     if (IS_Get (&Standard) < STD_C99 && !AllowNewComments) {
@@ -1552,7 +1568,10 @@ static unsigned ReadMacroArgs (unsigned NameIdx, MacroExp* E, const Macro* M, in
             /* If this is not the single empty argument for a macro with an
             ** empty argument list, remember it.
             */
-            if (CurC != ')' || SB_NotEmpty (&Arg.Tokens) || M->ParamCount > 0) {
+            if (CurC != ')'                 ||
+                CollCount (&E->Args) > 0    ||
+                SB_NotEmpty (&Arg.Tokens)   ||
+                M->ParamCount > 0) {
                 MacroExp* A = ME_AppendArg (E, &Arg);
                 unsigned I;
 
@@ -1670,11 +1689,23 @@ static unsigned ReadMacroArgs (unsigned NameIdx, MacroExp* E, const Macro* M, in
     }
 
     /* Compare formal and actual argument count */
-    if (CollCount (&E->Args) != (unsigned) M->ParamCount) {
-
+    if (CollCount (&E->Args) < (unsigned) M->ParamCount) {
+        /* Check further only when the parentheses are paired */
         if (Parens == 0) {
-            /* Argument count mismatch */
-            PPError ("Macro argument count mismatch");
+            /* Specially casing variable argument */
+            if (M->Variadic         &&
+                M->ParamCount > 0   &&
+                CollCount (&E->Args) + 1 == (unsigned) M->ParamCount) {
+                /* The variable argument is left out entirely */
+                E->Flags |= MES_NO_VA_COMMA;
+                if (IS_Get (&Standard) < STD_CC65) {
+                    PPWarning ("ISO C does not permit leaving out the comma before the variable argument");
+                }
+            } else {
+                /* Too few argument */
+                PPError ("Macro \"%s\" passed only %u arguments, but requires %u",
+                         M->Name, CollCount (&E->Args), (unsigned) M->ParamCount);
+            }
         }
 
         /* Be sure to make enough empty arguments available */
@@ -1684,6 +1715,10 @@ static unsigned ReadMacroArgs (unsigned NameIdx, MacroExp* E, const Macro* M, in
         while (CollCount (&E->Args) < (unsigned) M->ParamCount) {
             ME_AppendArg (E, &Arg);
         }
+    } else if (Parens == 0 && CollCount (&E->Args) > (unsigned) M->ParamCount) {
+        /* Too many arguments */
+        PPError ("Macro \"%s\" passed %u arguments, but takes just %u",
+                 M->Name, CollCount (&E->Args), (unsigned) M->ParamCount);
     }
 
     /* Deallocate argument resources */
@@ -2071,6 +2106,12 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
 
         /* If we have an identifier, check if it's a macro */
         if (IsSym (Ident)) {
+            /* Check for bad identifier names */
+            if ((ModeFlags & (MSM_MULTILINE | MSM_IN_DIRECTIVE | MSM_IN_ARG_LIST)) != 0 &&
+                (CollCount (&CurRescanStack->Lines) == 1 || CurC == '\0')) {
+                CheckForBadIdent (Ident, IS_Get (&Standard), 0);
+            }
+
             if ((ModeFlags & MSM_OP_DEFINED) != 0 && strcmp (Ident, "defined") == 0) {
                 /* Handle the "defined" operator */
                 int HaveParen = 0;
@@ -2118,7 +2159,6 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
 
                     /* Check if this is a function-like macro */
                     if (M->ParamCount >= 0) {
-                        int OldPendingNewLines = PendingNewLines;
                         int HaveSpace = SkipWhitespace (MultiLine) > 0;
 
                         /* A function-like macro name without an immediately
@@ -2141,30 +2181,48 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
                                 ME_SetTokLens (E, strlen (M->Name));
                             }
 
+                            /* Since we have already got on hold of the next
+                            ** line, we have to reuse it as the next line
+                            ** instead of reading a new line from the source.
+                            */
+                            if (PendingNewLines > 0 && MultiLine) {
+                                unsigned I = SB_GetIndex (Line);
+
+                                /* There is no way a function-like macro call
+                                ** detection could span multiple lines within
+                                ** the range of another just expanded macro.
+                                */
+                                CHECK (CollCount (&CurRescanStack->Lines) == 1);
+
+                                /* Revert one newline */
+                                --PendingNewLines;
+
+                                /* Align indention */
+                                while (I > 0) {
+                                    --I;
+                                    if (SB_GetBuf (Line)[I] == '\n') {
+                                        ++I;
+                                        break;
+                                    }
+                                    SB_GetBuf (Line)[I] = ' ';
+                                }
+
+                                /* Set start index */
+                                SB_SetIndex (Line, I);
+
+                                /* Add newlines */
+                                AddPreLine (Target);
+
+                                /* Reuse this line as the next line */
+                                ReuseInputLine ();
+
+                                /* Quit this loop */
+                                break;
+                            }
+
                             /* Append back the whitespace */
                             if (HaveSpace) {
                                 SB_AppendChar (Target, ' ');
-                            }
-
-                            /* Since we have already got on hold of the next
-                            ** line, we have to go on preprocessing them.
-                            */
-                            if (MultiLine) {
-                                if (OldPendingNewLines < PendingNewLines && CurC == '#') {
-                                    /* If we were going to support #pragma in
-                                    ** macro argument list, it would be output
-                                    ** to OLine.
-                                    */
-                                    if (OLine == 0) {
-                                        OLine = Target;
-                                        ParseDirectives (ModeFlags);
-                                        OLine = 0;
-                                    } else {
-                                        ParseDirectives (ModeFlags);
-                                    }
-                                }
-                                /* Add the source info to preprocessor output if needed */
-                                AddPreLine (Target);
                             }
 
                             /* Loop */
@@ -2200,8 +2258,36 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
                         InitLine (TmpTarget);
                         PushRescanLine (CurRescanStack, TmpTarget, LastTokLen);
 
+                        /* Add a space before a '#' at the beginning of the line */
+                        if (CurC  == '#' &&
+                            NextC != '#' &&
+                            (SB_IsEmpty (Target) || SB_LookAtLast (Target) == '\n')) {
+                            SB_AppendChar (Target, ' ');
+                        }
+
                         /* Switch the buffers */
                         TmpTarget = NewStrBuf ();
+                    } else if (PendingNewLines > 0 && MultiLine) {
+                        /* Cancel remaining check for pp-tokens separation
+                        ** if there is since ther have been newlines that
+                        ** can always separate them.
+                        */
+                        if (CurRescanStack->PrevTok != 0) {
+                            FreeStrBuf (CurRescanStack->PrevTok);
+                            CurRescanStack->PrevTok = 0;
+                        }
+
+                        /* Squeeze whitespace */
+                        SkipWhitespace (0);
+
+                        /* Add indention to preprocessor output if needed */
+                        if (CurC != '\0' && CollCount (&CurRescanStack->Lines) == 1) {
+                            /* Add newlines */
+                            AddPreLine (Target);
+
+                            /* Align indention */
+                            AppendIndent (Target, SB_GetIndex (Line));
+                        }
                     }
 
                     /* Since we are rescanning, we needn't add the
@@ -2241,7 +2327,24 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
             } else if (IsQuotedString ()) {
                 CopyQuotedString (Target);
             } else {
-                Skipped = SkipWhitespace (0);
+                /* We want to squeeze whitespace until the end of the current
+                ** input line, so we have to deal with such cases specially.
+                */
+                if (CollCount (&CurRescanStack->Lines) > 1) {
+                    RescanInputStack* RIS = CurRescanStack;
+
+                    /* Temporarily disable input popping */
+                    CurRescanStack = 0;
+                    Skipped = SkipWhitespace (0);
+                    CurRescanStack = RIS;
+
+                    if (CurC == '\0') {
+                        /* Now we are at the end of the input line */
+                        goto Loop;
+                    }
+                } else {
+                    Skipped = SkipWhitespace (0);
+                }
 
                 /* Punctuators must be checked after whitespace since comments
                 ** introducers may be misinterpreted as division operators.
@@ -2284,6 +2387,19 @@ Loop:
         if (CurC == '\0' && CollCount (&CurRescanStack->Lines) > 1) {
             /* Check for rescan sequence end and pp-token pasting */
             Skipped = SkipWhitespace (0) || Skipped;
+
+            /* Add indention to preprocessor output if needed */
+            if (CurC != '\0'                        &&
+                PendingNewLines > 0                 &&
+                (ModeFlags & MSM_MULTILINE) != 0    &&
+                CollCount (&CurRescanStack->Lines) == 1) {
+                /* Add newlines */
+                AddPreLine (Target);
+
+                /* Align indention */
+                AppendIndent (Target, SB_GetIndex (Line));
+                Skipped = 0;
+            }
         }
 
         /* Append a space if there hasn't been one */
@@ -2338,6 +2454,7 @@ static int ParseMacroReplacement (StrBuf* Source, Macro* M)
     int         HasWhiteSpace = 0;
     unsigned    Len;
     ident       Ident;
+    int         Std = IS_Get (&Standard);
 
     /* Skip whitespace before the macro replacement */
     SkipWhitespace (0);
@@ -2355,6 +2472,9 @@ static int ParseMacroReplacement (StrBuf* Source, Macro* M)
             SB_AppendChar (&M->Replacement, ' ');
         } else if (IsQuotedString ()) {
             CopyQuotedString (&M->Replacement);
+        } else if (IsSym (Ident)) {
+            CheckForBadIdent (Ident, Std, M);
+            SB_AppendStr (&M->Replacement, Ident);
         } else {
             if (M->ParamCount >= 0 && GetPunc (Ident)) {
                 Len = strlen (Ident);
@@ -2423,7 +2543,7 @@ static void DoDefine (void)
     ident       Ident;
     Macro*      M = 0;
     Macro*      Existing;
-    int         C89;
+    int         Std;
 
     /* Read the macro name */
     SkipWhitespace (0);
@@ -2431,14 +2551,17 @@ static void DoDefine (void)
         goto Error_Handler;
     }
 
-    /* Remember if we're in C89 mode */
-    C89 = (IS_Get (&Standard) == STD_C89);
+    /* Remember the language standard we are in */
+    Std = IS_Get (&Standard);
 
     /* Check for forbidden macro names */
     if (strcmp (Ident, "defined") == 0) {
         PPError ("'%s' cannot be used as a macro name", Ident);
         goto Error_Handler;
     }
+
+    /* Check for and warn on special identifiers */
+    CheckForBadIdent (Ident, Std, 0);
 
     /* Create a new macro definition */
     M = NewMacro (Ident);
@@ -2464,7 +2587,7 @@ static void DoDefine (void)
             /* The next token must be either an identifier, or - if not in
             ** C89 mode - the ellipsis.
             */
-            if (!C89 && CurC == '.') {
+            if (Std >= STD_C99 && CurC == '.') {
                 /* Ellipsis */
                 NextChar ();
                 if (CurC != '.' || NextC != '.') {
@@ -2486,11 +2609,8 @@ static void DoDefine (void)
                     goto Error_Handler;
                 }
 
-                /* __VA_ARGS__ is only allowed in post-C89 mode */
-                if (!C89 && strcmp (Ident, "__VA_ARGS__") == 0) {
-                    PPWarning ("'__VA_ARGS__' can only appear in the expansion "
-                               "of a C99 variadic macro");
-                }
+                /* Check for and warn on special identifiers */
+                CheckForBadIdent (Ident, Std, 0);
 
                 /* Add the macro parameter */
                 AddMacroParam (M, Ident);
@@ -2665,6 +2785,7 @@ static int DoIfDef (int skip, int flag)
 
         SkipWhitespace (0);
         if (MacName (Ident)) {
+            CheckForBadIdent (Ident, IS_Get (&Standard), 0);
             Value = IsMacro (Ident);
             /* Check for extra tokens */
             CheckExtraTokens (flag ? "ifdef" : "ifndef");
@@ -2871,6 +2992,7 @@ static void DoUndef (void)
 
     SkipWhitespace (0);
     if (MacName (Ident)) {
+        CheckForBadIdent (Ident, IS_Get (&Standard), 0);
         UndefineMacro (Ident);
     }
     /* Check for extra tokens */

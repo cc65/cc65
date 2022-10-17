@@ -678,6 +678,19 @@ void OH_BlockMove (const OpcDesc* D)
 
 
 
+void OH_BlockMove65816 (const OpcDesc* D)
+{
+    /* Get source operand */
+    unsigned Src = GetCodeByte (PC+2);
+    /* Get destination operand */
+    unsigned Dst = GetCodeByte (PC+1);
+
+    /* Output the line */
+    OneLine (D, "#$%02X, #$%02X", Src, Dst);
+}
+
+
+
 void OH_AbsoluteXIndirect (const OpcDesc* D attribute ((unused)))
 {
     /* Get the operand */

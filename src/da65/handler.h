@@ -91,6 +91,7 @@ void OH_StackRelativeIndirectY4510 (const OpcDesc*);
 void OH_DirectIndirectLong (const OpcDesc*);
 void OH_DirectIndirectLongY (const OpcDesc*);
 void OH_BlockMove (const OpcDesc*);
+void OH_BlockMove65816 (const OpcDesc*);
 void OH_AbsoluteXIndirect (const OpcDesc*);
 
 /* Mitsubishi 740 */

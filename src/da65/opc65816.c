@@ -115,7 +115,7 @@ const OpcDesc OpcTable_65816[256] = {
     {   "eor",  2,  flUseLabel,               OH_DirectXIndirect       }, /* $41 */
     {   "wdm",  2,  flNone,                   OH_Implicit              }, /* $42 */
     {   "eor",  2,  flNone,                   OH_StackRelative         }, /* $43 */
-    {   "mvp",  3,  flNone,                   OH_BlockMove             }, /* $44 */
+    {   "mvp",  3,  flNone,                   OH_BlockMove65816        }, /* $44 */
     {   "eor",  2,  flUseLabel,               OH_Direct                }, /* $45 */
     {   "lsr",  2,  flUseLabel,               OH_Direct                }, /* $46 */
     {   "eor",  2,  flUseLabel,               OH_DirectIndirectLong    }, /* $47 */
@@ -131,7 +131,7 @@ const OpcDesc OpcTable_65816[256] = {
     {   "eor",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $51 */
     {   "eor",  2,  flUseLabel,               OH_DirectIndirect        }, /* $52 */
     {   "eor",  2,  flNone,                   OH_StackRelativeIndirectY}, /* $53 */
-    {   "mvn",  3,  flNone,                   OH_BlockMove             }, /* $54 */
+    {   "mvn",  3,  flNone,                   OH_BlockMove65816        }, /* $54 */
     {   "eor",  2,  flUseLabel,               OH_DirectX               }, /* $55 */
     {   "lsr",  2,  flUseLabel,               OH_DirectX               }, /* $56 */
     {   "eor",  2,  flUseLabel,               OH_DirectIndirectLongY   }, /* $57 */
@@ -259,7 +259,7 @@ const OpcDesc OpcTable_65816[256] = {
     {   "cmp",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $d1 */
     {   "cmp",  2,  flUseLabel,               OH_DirectIndirect        }, /* $d2 */
     {   "cmp",  2,  flNone,                   OH_StackRelativeIndirectY}, /* $d3 */
-    {   "pei",  2,  flUseLabel,               OH_Direct                }, /* $d4 */
+    {   "pei",  2,  flUseLabel,               OH_DirectIndirect        }, /* $d4 */
     {   "cmp",  2,  flUseLabel,               OH_DirectX               }, /* $d5 */
     {   "dec",  2,  flUseLabel,               OH_DirectX               }, /* $d6 */
     {   "cmp",  2,  flUseLabel,               OH_DirectIndirectLongY   }, /* $d7 */

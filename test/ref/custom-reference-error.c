@@ -13,9 +13,9 @@
     and then "make" again to confirm
 */
 
-int main(int argc, char* argv[])
+short main(int argc, char* argv[])
 {
-    printf("%02x", 0x42);
-    n = 0; /* produce an error */
-    /* another error */
+    printf("%02x", 0x42); /* produce an error */
+    n = 0;                /* produce an error */
+    /* produce a warning */
 }

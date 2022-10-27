@@ -372,6 +372,14 @@ Again:
         return;
     }
 
+    /* Decimal number offset? */
+    if (C == '+') {
+        NextChar ();
+        InfoIVal = GetDecimalToken ();
+        InfoTok = INFOTOK_OFFSET_INTCON;
+        return;
+    }
+
     /* Other characters */
     switch (C) {
 

@@ -461,7 +461,8 @@ following attributes are recognized:
   <tag><tt>END</tt></tag>
   This gives the end address of the range. The end address is inclusive, that
   means, it is part of the range. Of course, it may not be smaller than the
-  start address.
+  start address. Optionally, the end may be given as a decimal offset instead
+  of an absolute address, "+3", to specify it as a size.
 
   <tag><tt>NAME</tt></tag>
   This is a convenience attribute. It takes a string argument and will cause

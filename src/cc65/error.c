@@ -120,7 +120,7 @@ static const char* GetDiagnosticFileName (void)
     if (CurTok.LI) {
         return GetInputName (CurTok.LI);
     } else {
-        return GetCurrentFile ();
+        return GetCurrentFilename ();
     }
 }
 
@@ -132,7 +132,7 @@ static unsigned GetDiagnosticLineNum (void)
     if (CurTok.LI) {
         return GetInputLine (CurTok.LI);
     } else {
-        return GetCurrentLine ();
+        return GetCurrentLineNum ();
     }
 }
 
@@ -238,7 +238,7 @@ void PPError (const char* Format, ...)
 {
     va_list ap;
     va_start (ap, Format);
-    IntError (GetCurrentFile(), GetCurrentLine(), Format, ap);
+    IntError (GetCurrentFilename(), GetCurrentLineNum(), Format, ap);
     va_end (ap);
 }
 
@@ -301,7 +301,7 @@ void PPWarning (const char* Format, ...)
 {
     va_list ap;
     va_start (ap, Format);
-    IntWarning (GetCurrentFile(), GetCurrentLine(), Format, ap);
+    IntWarning (GetCurrentFilename(), GetCurrentLineNum(), Format, ap);
     va_end (ap);
 }
 
@@ -379,7 +379,7 @@ void PPNote (const char* Format, ...)
 {
     va_list ap;
     va_start (ap, Format);
-    IntNote (GetCurrentFile(), GetCurrentLine(), Format, ap);
+    IntNote (GetCurrentFilename(), GetCurrentLineNum(), Format, ap);
     va_end (ap);
 }
 

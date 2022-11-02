@@ -653,7 +653,7 @@ const char* GetInputFile (const struct IFile* IF)
 
 
 
-const char* GetCurrentFile (void)
+const char* GetCurrentFilename (void)
 /* Return the name of the current input file */
 {
     unsigned AFileCount = CollCount (&AFiles);
@@ -668,7 +668,7 @@ const char* GetCurrentFile (void)
 
 
 
-unsigned GetCurrentLine (void)
+unsigned GetCurrentLineNum (void)
 /* Return the line number in the current input file */
 {
     unsigned AFileCount = CollCount (&AFiles);
@@ -683,7 +683,7 @@ unsigned GetCurrentLine (void)
 
 
 
-void SetCurrentLine (unsigned LineNum)
+void SetCurrentLineNum (unsigned LineNum)
 /* Set the line number in the current input file */
 {
     unsigned AFileCount = CollCount (&AFiles);

@@ -1076,7 +1076,7 @@ DefOrRef* AddDefOrRef (SymEntry* E, unsigned Flags)
 
     DOR = xmalloc (sizeof (DefOrRef));
     CollAppend (E->V.L.DefsOrRefs, DOR);
-    DOR->Line = GetCurrentLine ();
+    DOR->Line = GetCurrentLineNum ();
     DOR->LocalsBlockId = (size_t)CollLast (&CurrentFunc->LocalsBlockStack);
     DOR->Flags = Flags;
     DOR->StackPtr = StackPtr;
@@ -1144,7 +1144,7 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
                     (size_t)CollAt (AIC, DOR->Depth - 1) != DOR->LocalsBlockId)) {
                     Warning ("Goto at line %d to label %s jumps into a block with "
                     "initialization of an object that has automatic storage duration",
-                    GetCurrentLine (), Name);
+                    GetCurrentLineNum (), Name);
                 }
             }
 

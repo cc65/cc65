@@ -611,20 +611,20 @@ static SymEntry* ParseEnumDecl (const char* Name, unsigned* DSFlags)
 
         } else {
 
-             /* Defaulted with the same signedness as the previous member's */
+            /* Defaulted with the same signedness as the previous member's */
             IsSigned = IsSignSigned (MemberType) &&
                        (unsigned long)EnumVal != GetIntegerTypeMax (MemberType);
 
-            /* Enumerate. Signed integer overflow is UB but unsigned integers
-            ** are guaranteed to wrap around.
-            */
-            EnumVal = (long)((unsigned long)EnumVal + 1UL);
+            /* Enumerate by adding one to the previous value */
+            EnumVal = (long)(((unsigned long)EnumVal + 1UL) & 0xFFFFFFFFUL);
 
             if (UnqualifiedType (MemberType->C) == T_ULONG && EnumVal == 0) {
-                /* Warn on 'unsigned long' overflow in enumeration */
-                Warning ("Enumerator '%s' overflows the range of '%s'",
-                         Ident,
-                         GetBasicTypeName (type_ulong));
+                /* Error since the new value cannot be represented in the
+                ** largest unsigned integer type supported by cc65 for enum.
+                */
+                Error ("Enumerator '%s' overflows the range of '%s'",
+                       Ident,
+                       GetBasicTypeName (type_ulong));
             }
 
             IsIncremented = 1;
@@ -657,11 +657,12 @@ static SymEntry* ParseEnumDecl (const char* Name, unsigned* DSFlags)
         /* Warn if the incremented value exceeds the range of the previous
         ** type.
         */
-        if (IsIncremented   &&
-            EnumVal >= 0    &&
+        if (PrevErrorCount == ErrorCount    &&
+            IsIncremented                   &&
+            (!IsSigned || EnumVal >= 0)     &&
             NewType->C != UnqualifiedType (MemberType->C)) {
             /* The possible overflow here can only be when EnumVal > 0 */
-            Warning ("Enumerator '%s' (value = %lu) is of type '%s'",
+            Warning ("Enumerator '%s' (value = %lu) implies type '%s'",
                      Ident,
                      (unsigned long)EnumVal,
                      GetBasicTypeName (NewType));

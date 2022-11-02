@@ -1831,7 +1831,13 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
             NextToken ();
         } else {
             if (Mode == DM_NEED_IDENT) {
+                /* Some fix point tokens that are used for error recovery */
+                static const token_t TokenList[] = { TOK_COMMA, TOK_SEMI };
+
                 Error ("Identifier expected");
+
+                /* Try some smart error recovery */
+                SkipTokens (TokenList, sizeof(TokenList) / sizeof(TokenList[0]));
             }
             D->Ident[0] = '\0';
         }

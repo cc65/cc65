@@ -68,6 +68,9 @@ void Preprocess (void);
 void SetPPIfStack (PPIfStack* Stack);
 /* Specify which PP #if stack to use */
 
+void ContinueLine (void);
+/* Continue the current line ended with a '\\' */
+
 void PreprocessBegin (void);
 /* Initialize preprocessor with current file */
 

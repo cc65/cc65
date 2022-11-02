@@ -578,15 +578,16 @@ int NextLine (void)
                 SB_Drop (Line, 1);
             }
 
-            /* If we don't have a line continuation character at the end,
-            ** we're done with this line. Otherwise replace the character
-            ** by a newline and continue reading.
+            /* If we don't have a line continuation character at the end, we
+            ** are done with this line. Otherwise just skip the character and
+            ** continue reading.
             */
-            if (SB_LookAtLast (Line) == '\\') {
-                Line->Buf[Line->Len-1] = '\n';
-            } else {
+            if (SB_LookAtLast (Line) != '\\') {
                 Input->MissingNL = 0;
                 break;
+            } else {
+                SB_Drop (Line, 1);
+                ContinueLine ();
             }
 
         } else if (C != '\0') {         /* Ignore embedded NULs */

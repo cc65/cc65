@@ -114,7 +114,8 @@ static StrBuf* MLine;   /* Buffer for macro expansion in #pragma */
 static StrBuf* OLine;   /* Buffer for #pragma output */
 
 /* Newlines to be added to preprocessed text */
-static int PendingNewLines;
+static unsigned PendingNewLines;
+static unsigned ContinuedLines;
 static int FileChanged;
 
 /* Structure used when expanding macros */
@@ -824,10 +825,15 @@ static void CheckForBadIdent (const char* Ident, int Std, const Macro* M)
 static void AddPreLine (StrBuf* Str)
 /* Add newlines to the string buffer */
 {
+    /* No need to prettify the non-exist output */
     if (!PreprocessOnly) {
         PendingNewLines = 0;
+        ContinuedLines = 0;
         return;
     }
+
+    /* We'll adjust the line number later if necessary */
+    PendingNewLines += ContinuedLines;
 
     if (FileChanged || PendingNewLines > 6) {
         /* Output #line directives as source info */
@@ -835,7 +841,8 @@ static void AddPreLine (StrBuf* Str)
         if (SB_NotEmpty (Str) && SB_LookAtLast (Str) != '\n') {
             SB_AppendChar (Str, '\n');
         }
-        SB_Printf (&Comment, "#line %u \"%s\"\n", GetCurrentLine (), GetCurrentFile ());
+        SB_Printf (&Comment, "#line %u \"%s\"\n",
+                   GetCurrentLine () - ContinuedLines, GetCurrentFile ());
         SB_Append (Str, &Comment);
     } else {
         /* Output new lines */
@@ -846,6 +853,7 @@ static void AddPreLine (StrBuf* Str)
     }
     FileChanged = 0;
     PendingNewLines = 0;
+    ContinuedLines = 0;
 }
 
 
@@ -1528,14 +1536,14 @@ static unsigned ReadMacroArgs (unsigned NameIdx, MacroExp* E, const Macro* M, in
     /* Read the actual macro arguments */
     while (1) {
         /* Squeeze runs of blanks within an arg */
-        int OldPendingNewLines = PendingNewLines;
+        unsigned OldPendingNewLines = PendingNewLines;
         int Skipped = SkipWhitespace (MultiLine);
 
         /* Directives can only be found in an argument list that spans
         ** multiple lines.
         */
         if (MultiLine && OldPendingNewLines < PendingNewLines && CurC == '#') {
-            int Newlines = 0;
+            unsigned Newlines = 0;
 
             while (OldPendingNewLines < PendingNewLines && CurC == '#') {
                 Newlines += PendingNewLines - OldPendingNewLines;
@@ -3358,6 +3366,14 @@ void SetPPIfStack (PPIfStack* Stack)
 /* Specify which PP #if stack to use */
 {
     PPStack = Stack;
+}
+
+
+
+void ContinueLine (void)
+/* Continue the current line ended with a '\\' */
+{
+    ++ContinuedLines;
 }
 
 

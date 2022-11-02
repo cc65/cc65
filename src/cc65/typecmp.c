@@ -266,18 +266,6 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
         LeftType  = (GetUnderlyingTypeCode (lhs) & T_MASK_TYPE);
         RightType = (GetUnderlyingTypeCode (rhs) & T_MASK_TYPE);
 
-        /* If one side is a pointer and the other side is an array, both are
-        ** compatible.
-        */
-        if (LeftType == T_TYPE_PTR && RightType == T_TYPE_ARRAY) {
-            RightType = T_TYPE_PTR;
-            SetResult (Result, TC_PTR_DECAY);
-        }
-        if (LeftType == T_TYPE_ARRAY && RightType == T_TYPE_PTR) {
-            LeftType = T_TYPE_PTR;
-            SetResult (Result, TC_STRICT_COMPATIBLE);
-        }
-
         /* Bit-fields are considered compatible if they have the same
         ** signedness, bit-offset and bit-width.
         */
@@ -287,8 +275,23 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
                 lhs->A.B.Offs  != rhs->A.B.Offs ||
                 lhs->A.B.Width != rhs->A.B.Width) {
                 SetResult (Result, TC_INCOMPATIBLE);
+                return;
             }
             if (LeftType != RightType) {
+                SetResult (Result, TC_STRICT_COMPATIBLE);
+            }
+        }
+
+        /* If one side is a pointer and the other side is an array, both are
+        ** compatible.
+        */
+        if (Result->Indirections == 0) {
+            if (LeftType == T_TYPE_PTR && RightType == T_TYPE_ARRAY) {
+                RightType = T_TYPE_PTR;
+                SetResult (Result, TC_PTR_DECAY);
+            }
+            if (LeftType == T_TYPE_ARRAY && RightType == T_TYPE_PTR) {
+                LeftType = T_TYPE_PTR;
                 SetResult (Result, TC_STRICT_COMPATIBLE);
             }
         }

@@ -1419,9 +1419,8 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
             } else {
                 if (CurTok.Tok != TOK_LCURLY) {
                     Error ("Identifier expected");
-                } else {
-                    AnonName (Ident, "enum");
                 }
+                AnonName (Ident, "enum");
             }
             /* Remember we have an extra type decl */
             D->Flags |= DS_EXTRA_TYPE;

@@ -3869,9 +3869,9 @@ static void hieQuest (ExprDesc* Expr)
 
             ED_FinalizeRValLoad (&Expr2);
         } else {
-            /* Constant boolean subexpression could still have deferred inc/
-            ** dec operations, so just flush their side-effects at this
-            ** sequence point.
+            /* Constant subexpression could still have deferred inc/dec
+            ** operations, so just flush their side-effects at this sequence
+            ** point.
             */
             DoDeferred (SQP_KEEP_NONE, &Expr2);
         }
@@ -3907,7 +3907,7 @@ static void hieQuest (ExprDesc* Expr)
         /* Parse third expression. Remember for later if it is a NULL pointer
         ** expression, then load it into the primary.
         */
-        ExprWithCheck (hie1, &Expr3);
+        ExprWithCheck (hieQuest, &Expr3);
         Expr3IsNULL = ED_IsNullPtr (&Expr3);
         if (!IsTypeVoid (Expr3.Type)    &&
             ED_YetToLoad (&Expr3)       &&
@@ -3920,9 +3920,9 @@ static void hieQuest (ExprDesc* Expr)
 
             ED_FinalizeRValLoad (&Expr3);
         } else {
-            /* Constant boolean subexpression could still have deferred inc/
-            ** dec operations, so just flush their side-effects at this
-            ** sequence point.
+            /* Constant subexpression could still have deferred inc/dec
+            ** operations, so just flush their side-effects at this sequence
+            ** point.
             */
             DoDeferred (SQP_KEEP_NONE, &Expr3);
         }
@@ -4036,6 +4036,8 @@ static void hieQuest (ExprDesc* Expr)
             } else {
                 *Expr = Expr3;
             }
+            /* The result expression is always an rvalue */
+            ED_MarkExprAsRVal (Expr);
         }
 
         /* Setup the target expression */

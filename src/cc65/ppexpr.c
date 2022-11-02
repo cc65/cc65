@@ -752,7 +752,7 @@ static void PPhieQuest (PPExpr* Expr)
 
         /* Parse third expression */
         PPExprInit (&Expr3);
-        PPhie1 (&Expr3);
+        PPhieQuest (&Expr3);
 
         /* Set the result */
         Expr->IVal = Expr->IVal ? Expr2.IVal != 0 : Expr3.IVal != 0;

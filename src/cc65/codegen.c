@@ -4572,6 +4572,7 @@ void g_testbitfield (unsigned Flags, unsigned BitOffs, unsigned BitWidth)
     unsigned UntestedBytes = ((1U << Bytes) - 1U) << (BitOffs / CHAR_BITS);
 
     /* We don't use these flags for now. Could CF_NOKEEP be potentially interesting? */
+    (void)Flags; /* This line can be safely removed once flags see some use */
     Flags &= ~CF_STYPEMASK;
 
     /* If we need to do a test, then we avoid shifting (ASR only shifts one bit at a time,

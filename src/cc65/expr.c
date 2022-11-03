@@ -1301,7 +1301,7 @@ static void Primary (ExprDesc* E)
                 /* Let's see if this is a C99-style declaration */
                 DeclSpec    Spec;
                 InitDeclSpec (&Spec);
-                ParseDeclSpec (&Spec, -1, T_QUAL_NONE);
+                ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_INT, SC_AUTO);
 
                 if (Spec.Type->C != T_END) {
 

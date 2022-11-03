@@ -882,12 +882,19 @@ static SymEntry* ParseUnionDecl (const char* Name, unsigned* DSFlags)
     EnterStructLevel ();
 
     /* Parse union fields */
-    UnionSize      = 0;
+    UnionSize = 0;
     while (CurTok.Tok != TOK_RCURLY) {
 
         /* Get the type of the entry */
         DeclSpec Spec;
         int SignednessSpecified = 0;
+
+        /* Check for a _Static_assert */
+        if (CurTok.Tok == TOK_STATIC_ASSERT) {
+            ParseStaticAssert ();
+            continue;
+        }
+
         InitDeclSpec (&Spec);
         ParseTypeSpec (&Spec, -1, T_QUAL_NONE, &SignednessSpecified);
 
@@ -1030,6 +1037,7 @@ static SymEntry* ParseStructDecl (const char* Name, unsigned* DSFlags)
 
         /* Get the type of the entry */
         DeclSpec Spec;
+        int SignednessSpecified = 0;
 
         /* Check for a _Static_assert */
         if (CurTok.Tok == TOK_STATIC_ASSERT) {
@@ -1037,7 +1045,6 @@ static SymEntry* ParseStructDecl (const char* Name, unsigned* DSFlags)
             continue;
         }
 
-        int SignednessSpecified = 0;
         InitDeclSpec (&Spec);
         ParseTypeSpec (&Spec, -1, T_QUAL_NONE, &SignednessSpecified);
 

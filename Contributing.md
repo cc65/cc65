@@ -14,6 +14,10 @@ This document contains all kinds of information that you should know if you want
 
 ## All Sources
 
+### Line endings
+
+All files must only contain Unix style 'LF' line endings. Please configure your editors accordingly.
+
 ### TABs and spaces
 
 This is an ongoing controversial topic - everyone knows that. However, the following is how we do it :)

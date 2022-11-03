@@ -1,7 +1,10 @@
 
-.PHONY: checkstyle tabs lastline spaces noexec
+.PHONY: checkstyle lineendings tabs lastline spaces noexec
 
-checkstyle: tabs lastline spaces noexec
+checkstyle: lineendings tabs lastline spaces noexec
+
+lineendings: lineendings.sh
+	@./lineendings.sh
 
 tabs: tabs.sh
 	@./tabs.sh

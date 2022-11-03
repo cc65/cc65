@@ -8,6 +8,7 @@ This document contains all kinds of information that you should know if you want
 
 * You must obey these rules when contributing new code or documentation to cc65. We are well aware that not all existing code may respect all rules outlined here - but this is no reason for you not to respect them.
 * One commit/patch/PR per issue. Do not mix several things unless they are very closely related.
+* Sometimes when you make a PR, it may break completely unrelated tests. However, any PR is expected to merge cleanly with no failures. That means in practise that you are expected to fix/update the failing tests if required - for example this might be needed if you make changes to the compiler that changes the format of error- or warning messages. In that case you might have to update some reference files in the testbench. Obviously still check if that is actually the right thing to do ;)
 
 # Codestyle rules
 

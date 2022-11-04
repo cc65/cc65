@@ -79,7 +79,7 @@ static void Parse (void)
 /* Top level parser routine. */
 {
     int comma;
-    SymEntry* Entry;
+    SymEntry* Sym;
     FuncDesc* FuncDef = 0;
 
     /* Initialization for deferred operations */
@@ -142,7 +142,7 @@ static void Parse (void)
         }
 
         /* Read declarations for this type */
-        Entry = 0;
+        Sym = 0;
         comma = 0;
         while (1) {
 
@@ -196,10 +196,10 @@ static void Parse (void)
             }
 
             /* Add an entry to the symbol table */
-            Entry = AddGlobalSym (Decl.Ident, Decl.Type, Decl.StorageClass);
+            Sym = AddGlobalSym (Decl.Ident, Decl.Type, Decl.StorageClass);
 
             /* Add declaration attributes */
-            SymUseAttr (Entry, &Decl);
+            SymUseAttr (Sym, &Decl);
 
             /* Reserve storage for the variable if we need to */
             if (Decl.StorageClass & SC_STORAGE) {
@@ -211,11 +211,11 @@ static void Parse (void)
                 if (CurTok.Tok == TOK_ASSIGN) {
 
                     /* This is a definition with storage */
-                    if (SymIsDef (Entry)) {
+                    if (SymIsDef (Sym)) {
                         Error ("Global variable '%s' has already been defined",
-                               Entry->Name);
+                               Sym->Name);
                     }
-                    Entry->Flags |= SC_DEF;
+                    Sym->Flags |= SC_DEF;
 
                     /* We cannot initialize types of unknown size, or
                     ** void types in ISO modes.
@@ -245,21 +245,21 @@ static void Parse (void)
                     }
 
                     /* Define a label */
-                    g_defgloblabel (Entry->Name);
+                    g_defgloblabel (Sym->Name);
 
                     /* Skip the '=' */
                     NextToken ();
 
                     /* Parse the initialization */
-                    ParseInit (Entry->Type);
+                    ParseInit (Sym->Type);
                 } else {
 
                     /* This is a declaration */
                     if (IsTypeVoid (Decl.Type)) {
                         /* We cannot declare variables of type void */
                         Error ("Illegal type for variable '%s'", Decl.Ident);
-                        Entry->Flags &= ~(SC_STORAGE | SC_DEF);
-                    } else if (Size == 0 && SymIsDef (Entry) && !IsEmptiableObjectType (Decl.Type)) {
+                        Sym->Flags &= ~(SC_STORAGE | SC_DEF);
+                    } else if (Size == 0 && SymIsDef (Sym) && !IsEmptiableObjectType (Decl.Type)) {
                         /* Size is unknown. Is it an array? */
                         if (!IsTypeArray (Decl.Type)) {
                             Error ("Variable '%s' has unknown size", Decl.Ident);
@@ -286,11 +286,11 @@ static void Parse (void)
                         */
                         const char* bssName = GetSegName (SEG_BSS);
 
-                        if (Entry->V.BssName && strcmp (Entry->V.BssName, bssName) != 0) {
+                        if (Sym->V.BssName && strcmp (Sym->V.BssName, bssName) != 0) {
                             Error ("Global variable '%s' already was defined in the '%s' segment.",
-                                   Entry->Name, Entry->V.BssName);
+                                   Sym->Name, Sym->V.BssName);
                         }
-                        Entry->V.BssName = xstrdup (bssName);
+                        Sym->V.BssName = xstrdup (bssName);
 
                         /* This is to make the automatical zeropage setting of the symbol
                         ** work right.
@@ -300,9 +300,9 @@ static void Parse (void)
                 }
 
                 /* Make the symbol zeropage according to the segment address size */
-                if ((Entry->Flags & SC_STATIC) != 0) {
+                if ((Sym->Flags & SC_STATIC) != 0) {
                     if (GetSegAddrSize (GetSegName (CS->CurDSeg)) == ADDR_SIZE_ZP) {
-                        Entry->Flags |= SC_ZEROPAGE;
+                        Sym->Flags |= SC_ZEROPAGE;
                     }
                 }
 
@@ -318,7 +318,7 @@ static void Parse (void)
         }
 
         /* Function declaration? */
-        if (Entry && IsTypeFunc (Entry->Type)) {
+        if (Sym && IsTypeFunc (Sym->Type)) {
 
             /* Function */
             if (!comma) {
@@ -327,7 +327,7 @@ static void Parse (void)
                     NextToken ();
                 } else {
                     /* Parse the function body */
-                    NewFunc (Entry, FuncDef);
+                    NewFunc (Sym, FuncDef);
 
                     /* Make sure we aren't omitting any work */
                     CheckDeferredOpAllDone ();
@@ -478,8 +478,9 @@ void Compile (const char* FileName)
         for (Entry = GetGlobalSymTab ()->SymHead; Entry; Entry = Entry->NextSym) {
             if ((Entry->Flags & (SC_STORAGE | SC_DEF | SC_STATIC)) == (SC_STORAGE | SC_STATIC)) {
                 /* Assembly definition of uninitialized global variable */
-                SymEntry* Sym = GetSymType (Entry->Type);
+                SymEntry* TagSym = GetESUTagSym (Entry->Type);
                 unsigned Size = SizeOf (Entry->Type);
+
                 if (Size == 0 && IsTypeArray (Entry->Type)) {
                     if (GetElementCount (Entry->Type) == UNSPECIFIED) {
                         /* Assume array size of 1 */
@@ -488,11 +489,11 @@ void Compile (const char* FileName)
                         Warning ("Incomplete array '%s[]' assumed to have one element", Entry->Name);
                     }
 
-                    Sym = GetSymType (GetElementType (Entry->Type));
+                    TagSym = GetESUTagSym (GetElementType (Entry->Type));
                 }
 
                 /* For non-ESU types, Size != 0 */
-                if (Size != 0 || (Sym != 0 && SymIsDef (Sym))) {
+                if (Size != 0 || (TagSym != 0 && SymIsDef (TagSym))) {
                     /* Set the segment name only when it changes */
                     if (strcmp (GetSegName (SEG_BSS), Entry->V.BssName) != 0) {
                         SetSegName (SEG_BSS, Entry->V.BssName);

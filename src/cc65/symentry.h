@@ -128,7 +128,6 @@ struct SymEntry {
     SymEntry*                   NextHash; /* Next entry in hash list */
     SymEntry*                   PrevSym;  /* Previous symbol in dl list */
     SymEntry*                   NextSym;  /* Next symbol double linked list */
-    SymEntry*                   Link;     /* General purpose single linked list */
     struct SymTable*            Owner;    /* Symbol table the symbol is in */
     unsigned                    Flags;    /* Symbol flags */
     Type*                       Type;     /* Symbol type */
@@ -138,26 +137,8 @@ struct SymEntry {
     /* Data that differs for the different symbol types */
     union {
 
-        /* Offset for locals or struct members */
+        /* Offset for locals */
         int                     Offs;
-
-        /* Data for anonymous struct or union members */
-        struct {
-            int                 Offs;     /* Byte offset into struct */
-            unsigned            ANumber;  /* Numeric ID */
-            SymEntry*           Field;    /* The real field aliased */
-        } A;
-
-
-        /* Label name for static symbols */
-        struct {
-            unsigned            Label;
-            Collection          *DefsOrRefs;
-            struct CodeEntry    *IndJumpFrom;
-        } L;
-
-        /* Value of SP adjustment needed after forward 'goto' */
-        unsigned short      SPAdjustment;
 
         /* Register bank offset and offset of the saved copy on stack for
         ** register variables.
@@ -167,21 +148,11 @@ struct SymEntry {
             int                 SaveOffs;
         } R;
 
-        /* Value for constants (including enums) */
+        /* Segment name for tentantive global definitions */
+        const char*             BssName;
+
+        /* Value for integer constants (including enumerators) */
         long                    ConstVal;
-
-        /* Data for structs/unions */
-        struct {
-            struct SymTable*    SymTab;   /* Member symbol table */
-            unsigned            Size;     /* Size of the union/struct */
-            unsigned            ACount;   /* Count of anonymous fields */
-        } S;
-
-        /* Data for enums */
-        struct {
-            struct SymTable*    SymTab;   /* Member symbol table */
-            const Type*         Type;     /* Underlying type */
-        } E;
 
         /* Data for functions */
         struct {
@@ -189,10 +160,38 @@ struct SymEntry {
             struct LiteralPool* LitPool;  /* Literal pool for this function */
         } F;
 
-        /* Segment name for tentantive global definitions */
-        const char*             BssName;
+        /* Label name for static symbols */
+        struct {
+            unsigned            Label;
+            Collection          *DefsOrRefs;
+            struct CodeEntry    *IndJumpFrom;
+        } L;
+
+        /* Value of SP adjustment needed after forward 'goto' */
+        unsigned short          SPAdjustment;
+
+        /* Data for anonymous struct or union members */
+        struct {
+            int                 Offs;     /* Byte offset into struct */
+            unsigned            ANumber;  /* Numeric ID */
+            SymEntry*           Field;    /* The real field aliased */
+        } A;
+
+        /* Data for structs/unions tags */
+        struct {
+            struct SymTable*    SymTab;   /* Member symbol table */
+            unsigned            Size;     /* Size of the union/struct */
+            unsigned            ACount;   /* Count of anonymous fields */
+        } S;
+
+        /* Data for enums tags */
+        struct {
+            struct SymTable*    SymTab;   /* Member symbol table */
+            const Type*         Type;     /* Underlying type */
+        } E;
+
     } V;
-    char                       Name[1]; /* Name, dynamically allocated */
+    char                        Name[1]; /* Name, dynamically allocated */
 };
 
 
@@ -303,28 +302,20 @@ void SymUseAttr (SymEntry* Sym, struct Declaration* D);
 /* Use the attributes from the declaration for this symbol */
 
 void SymSetAsmName (SymEntry* Sym);
-/* Set the assembler name for an external symbol from the name of the symbol */
+/* Set the assembler name for an external symbol from the name of the symbol.
+** The symbol must have no assembler name set yet.
+*/
 
-void CvtRegVarToAuto (SymEntry* Sym);
+void SymCvtRegVarToAuto (SymEntry* Sym);
 /* Convert a register variable to an auto variable */
 
-SymEntry* GetSymType (const Type* T);
-/* Get the symbol entry of the enum/struct/union type
-** Return 0 if it is not an enum/struct/union.
-*/
-
-const char* GetSymTypeName (const Type* T);
-/* Return a name string of the type or the symbol name if it is an ESU type.
-** Note: This may use a static buffer that could be overwritten by other calls.
-*/
-
-void ChangeSymType (SymEntry* Entry, const Type* T);
+void SymChangeType (SymEntry* Sym, const Type* T);
 /* Change the type of the given symbol */
 
-void ChangeAsmName (SymEntry* Entry, const char* NewAsmName);
+void SymChangeAsmName (SymEntry* Sym, const char* NewAsmName);
 /* Change the assembler name of the symbol */
 
-int HasAnonName (const SymEntry* Entry);
+int SymHasAnonName (const SymEntry* Sym);
 /* Return true if the symbol entry has an anonymous name */
 
 

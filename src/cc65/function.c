@@ -613,7 +613,7 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
                 /* Could we allocate a register? */
                 if (Reg < 0) {
                     /* No register available: Convert parameter to auto */
-                    CvtRegVarToAuto (Param);
+                    SymCvtRegVarToAuto (Param);
                 } else {
                     /* Remember the register offset */
                     Param->V.R.RegOffs = Reg;

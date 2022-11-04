@@ -502,18 +502,18 @@ static SymEntry* ESUForwardDecl (const char* Name, unsigned Flags, unsigned* DSF
     /* Try to find an enum/struct/union with the given name. If there is none,
     ** insert a forward declaration into the current lexical level.
     */
-    SymEntry* Entry = FindTagSym (Name);
-    if (Entry == 0) {
+    SymEntry* TagEntry = FindTagSym (Name);
+    if (TagEntry == 0) {
         if ((Flags & SC_ESUTYPEMASK) != SC_ENUM) {
-            Entry = AddStructSym (Name, Flags, 0, 0, DSFlags);
+            TagEntry = AddStructSym (Name, Flags, 0, 0, DSFlags);
         } else {
-            Entry = AddEnumSym (Name, Flags, 0, 0, DSFlags);
+            TagEntry = AddEnumSym (Name, Flags, 0, 0, DSFlags);
         }
-    } else if ((Entry->Flags & SC_TYPEMASK) != (Flags & SC_ESUTYPEMASK)) {
+    } else if ((TagEntry->Flags & SC_TYPEMASK) != (Flags & SC_ESUTYPEMASK)) {
         /* Already defined, but not the same type class */
         Error ("Symbol '%s' is already different kind", Name);
     }
-    return Entry;
+    return TagEntry;
 }
 
 
@@ -810,15 +810,13 @@ static unsigned AliasAnonStructFields (const Declaration* D, SymEntry* Anon)
 */
 {
     unsigned Count = 0;
+    SymEntry* Field;
     SymEntry* Alias;
-
-    /* Get the pointer to the symbol table entry of the anon struct */
-    SymEntry* Entry = GetESUSymEntry (D->Type);
 
     /* Get the symbol table containing the fields. If it is empty, there has
     ** been an error before, so bail out.
     */
-    SymTable* Tab = Entry->V.S.SymTab;
+    SymTable* Tab = GetESUTagSym (D->Type)->V.S.SymTab;
     if (Tab == 0) {
         /* Incomplete definition - has been flagged before */
         return 0;
@@ -827,24 +825,24 @@ static unsigned AliasAnonStructFields (const Declaration* D, SymEntry* Anon)
     /* Get a pointer to the list of symbols. Then walk the list adding copies
     ** of the embedded struct to the current level.
     */
-    Entry = Tab->SymHead;
-    while (Entry) {
+    Field = Tab->SymHead;
+    while (Field) {
 
         /* Enter an alias of this symbol */
-        if (!IsAnonName (Entry->Name)) {
-            Alias = AddLocalSym (Entry->Name, Entry->Type, SC_STRUCTFIELD|SC_ALIAS, 0);
-            Alias->V.A.Field = Entry;
-            Alias->V.A.Offs  = Anon->V.Offs + Entry->V.Offs;
+        if (!IsAnonName (Field->Name)) {
+            Alias = AddLocalSym (Field->Name, Field->Type, SC_STRUCTFIELD|SC_ALIAS, 0);
+            Alias->V.A.Field = Field;
+            Alias->V.A.Offs  = Anon->V.Offs + Field->V.Offs;
             ++Count;
         }
 
         /* Currently, there can not be any attributes, but if there will be
         ** some in the future, we want to know this.
         */
-        CHECK (Entry->Attr == 0);
+        CHECK (Field->Attr == 0);
 
         /* Next entry */
-        Entry = Entry->NextSym;
+        Field = Field->NextSym;
     }
 
     /* Return the count of created aliases */
@@ -862,7 +860,7 @@ static SymEntry* ParseUnionDecl (const char* Name, unsigned* DSFlags)
     int       FieldWidth;       /* Width in bits, -1 if not a bit-field */
     SymTable* FieldTab;
     SymEntry* UnionTagEntry;
-    SymEntry* Entry;
+    SymEntry* Field;
     unsigned  Flags = 0;
     unsigned  PrevErrorCount = ErrorCount;
 
@@ -946,17 +944,17 @@ static SymEntry* ParseUnionDecl (const char* Name, unsigned* DSFlags)
                 AddBitField (Decl.Ident, Decl.Type, 0, 0, FieldWidth,
                              SignednessSpecified);
             } else if (Decl.Ident[0] != '\0') {
-                Entry = AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, 0);
+                Field = AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, 0);
                 if (IsAnonName (Decl.Ident)) {
-                    Entry->V.A.ANumber = UnionTagEntry->V.S.ACount++;
-                    AliasAnonStructFields (&Decl, Entry);
+                    Field->V.A.ANumber = UnionTagEntry->V.S.ACount++;
+                    AliasAnonStructFields (&Decl, Field);
                 }
 
                 /* Check if the field itself has a flexible array member */
                 if (IsClassStruct (Decl.Type)) {
-                    SymEntry* Sym = GetSymType (Decl.Type);
-                    if (Sym && SymHasFlexibleArrayMember (Sym)) {
-                        Entry->Flags |= SC_HAVEFAM;
+                    SymEntry* TagEntry = GetESUTagSym (Decl.Type);
+                    if (TagEntry && SymHasFlexibleArrayMember (TagEntry)) {
+                        Field->Flags |= SC_HAVEFAM;
                         Flags        |= SC_HAVEFAM;
                     }
                 }
@@ -1003,7 +1001,7 @@ static SymEntry* ParseStructDecl (const char* Name, unsigned* DSFlags)
     int       FieldWidth;       /* Width in bits, -1 if not a bit-field */
     SymTable* FieldTab;
     SymEntry* StructTagEntry;
-    SymEntry* Entry;
+    SymEntry* Field;
     unsigned  Flags = 0;
     unsigned  PrevErrorCount = ErrorCount;
 
@@ -1148,17 +1146,17 @@ static SymEntry* ParseStructDecl (const char* Name, unsigned* DSFlags)
                 StructSize += BitOffs / CHAR_BITS;
                 BitOffs %= CHAR_BITS;
             } else if (Decl.Ident[0] != '\0') {
-                Entry = AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, StructSize);
+                Field = AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, StructSize);
                 if (IsAnonName (Decl.Ident)) {
-                    Entry->V.A.ANumber = StructTagEntry->V.S.ACount++;
-                    AliasAnonStructFields (&Decl, Entry);
+                    Field->V.A.ANumber = StructTagEntry->V.S.ACount++;
+                    AliasAnonStructFields (&Decl, Field);
                 }
 
                 /* Check if the field itself has a flexible array member */
                 if (IsClassStruct (Decl.Type)) {
-                    SymEntry* Sym = GetSymType (Decl.Type);
-                    if (Sym && SymHasFlexibleArrayMember (Sym)) {
-                        Entry->Flags |= SC_HAVEFAM;
+                    SymEntry* TagEntry = GetESUTagSym (Decl.Type);
+                    if (TagEntry && SymHasFlexibleArrayMember (TagEntry)) {
+                        Field->Flags |= SC_HAVEFAM;
                         Flags        |= SC_HAVEFAM;
                     }
                 }
@@ -1215,7 +1213,7 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
 */
 {
     ident       Ident;
-    SymEntry*   Entry;
+    SymEntry*   TagEntry;
 
     if (SignednessSpecified != NULL) {
         *SignednessSpecified = 0;
@@ -1385,10 +1383,10 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
             /* Remember we have an extra type decl */
             D->Flags |= DS_EXTRA_TYPE;
             /* Declare the union in the current scope */
-            Entry = ParseUnionDecl (Ident, &D->Flags);
+            TagEntry = ParseUnionDecl (Ident, &D->Flags);
             /* Encode the union entry into the type */
             D->Type[0].C = T_UNION;
-            SetESUSymEntry (D->Type, Entry);
+            SetESUTagSym (D->Type, TagEntry);
             D->Type[1].C = T_END;
             break;
 
@@ -1404,10 +1402,10 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
             /* Remember we have an extra type decl */
             D->Flags |= DS_EXTRA_TYPE;
             /* Declare the struct in the current scope */
-            Entry = ParseStructDecl (Ident, &D->Flags);
+            TagEntry = ParseStructDecl (Ident, &D->Flags);
             /* Encode the struct entry into the type */
             D->Type[0].C = T_STRUCT;
-            SetESUSymEntry (D->Type, Entry);
+            SetESUTagSym (D->Type, TagEntry);
             D->Type[1].C = T_END;
             break;
 
@@ -1427,10 +1425,10 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
             /* Remember we have an extra type decl */
             D->Flags |= DS_EXTRA_TYPE;
             /* Parse the enum decl */
-            Entry = ParseEnumDecl (Ident, &D->Flags);
+            TagEntry = ParseEnumDecl (Ident, &D->Flags);
             /* Encode the enum entry into the type */
             D->Type[0].C |= T_ENUM;
-            SetESUSymEntry (D->Type, Entry);
+            SetESUTagSym (D->Type, TagEntry);
             D->Type[1].C = T_END;
             /* The signedness of enums is determined by the type, so say this is specified to avoid
             ** the int -> unsigned int handling for plain int bit-fields in AddBitField.
@@ -1443,11 +1441,11 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
         case TOK_IDENT:
             /* This could be a label */
             if (NextTok.Tok != TOK_COLON || GetLexicalLevel () == LEX_LEVEL_STRUCT) {
-                Entry = FindSym (CurTok.Ident);
-                if (Entry && SymIsTypeDef (Entry)) {
+                TagEntry = FindSym (CurTok.Ident);
+                if (TagEntry && SymIsTypeDef (TagEntry)) {
                     /* It's a typedef */
                     NextToken ();
-                    TypeCopy (D->Type, Entry->Type);
+                    TypeCopy (D->Type, TagEntry->Type);
                     /* If it's a typedef, we should actually use whether the signedness was
                     ** specified on the typedef, but that information has been lost.  Treat the
                     ** signedness as being specified to work around the ICE in #1267.
@@ -1592,19 +1590,19 @@ static void ParseOldStyleParamList (FuncDesc* F)
             if (Decl.Ident[0] != '\0') {
 
                 /* We have a name given. Search for the symbol */
-                SymEntry* Sym = FindLocalSym (Decl.Ident);
-                if (Sym) {
+                SymEntry* Param = FindLocalSym (Decl.Ident);
+                if (Param) {
                     /* Check if we already changed the type for this
                     ** parameter
                     */
-                    if (Sym->Flags & SC_DEFTYPE) {
+                    if (Param->Flags & SC_DEFTYPE) {
                         /* Found it, change the default type to the one given */
-                        ChangeSymType (Sym, ParamTypeCvt (Decl.Type));
+                        SymChangeType (Param, ParamTypeCvt (Decl.Type));
                         /* Reset the "default type" flag */
-                        Sym->Flags &= ~SC_DEFTYPE;
+                        Param->Flags &= ~SC_DEFTYPE;
                     } else {
                         /* Type has already been changed */
-                        Error ("Redefinition for parameter '%s'", Sym->Name);
+                        Error ("Redefinition for parameter '%s'", Param->Name);
                     }
                 } else {
                     Error ("Unknown identifier: '%s'", Decl.Ident);
@@ -1634,7 +1632,7 @@ static void ParseAnsiParamList (FuncDesc* F)
 
         DeclSpec        Spec;
         Declaration     Decl;
-        SymEntry*       Sym;
+        SymEntry*       Param;
 
         /* Allow an ellipsis as last parameter */
         if (CurTok.Tok == TOK_ELLIPSIS) {
@@ -1682,10 +1680,10 @@ static void ParseAnsiParamList (FuncDesc* F)
         ParseAttribute (&Decl);
 
         /* Create a symbol table entry */
-        Sym = AddLocalSym (Decl.Ident, ParamTypeCvt (Decl.Type), Decl.StorageClass, 0);
+        Param = AddLocalSym (Decl.Ident, ParamTypeCvt (Decl.Type), Decl.StorageClass, 0);
 
         /* Add attributes if we have any */
-        SymUseAttr (Sym, &Decl);
+        SymUseAttr (Param, &Decl);
 
         /* If the parameter is a struct or union, emit a warning */
         if (IsClassStruct (Decl.Type)) {

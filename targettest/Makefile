@@ -114,11 +114,11 @@ DISK_atarixl   = testcode.atr
 %: %.s
 
 .c.o:
-	$(CC) $(CFLAGS) -Ors --codesize 500 -T -g -t $(SYS) $<
+	$(CC) -Ors --codesize 500 -T -g -t $(SYS) $<
 	$(AS) $(<:.c=.s)
 
 .s.o:
-	$(AS) $(ASFLAGS) -t $(SYS) $<
+	$(AS) -t $(SYS) $<
 
 .PRECIOUS: %.o
 

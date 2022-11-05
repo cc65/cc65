@@ -842,7 +842,7 @@ static void AddPreLine (StrBuf* Str)
             SB_AppendChar (Str, '\n');
         }
         SB_Printf (&Comment, "#line %u \"%s\"\n",
-                   GetCurrentLine () - ContinuedLines, GetCurrentFile ());
+                   GetCurrentLineNum () - ContinuedLines, GetCurrentFilename ());
         SB_Append (Str, &Comment);
     } else {
         /* Output new lines */
@@ -906,7 +906,7 @@ static void OldStyleComment (void)
     /* Remember the current line number, so we can output better error
     ** messages if the comment is not terminated in the current file.
     */
-    unsigned StartingLine = GetCurrentLine ();
+    unsigned StartingLine = GetCurrentLineNum ();
 
     /* Skip the start of comment chars */
     NextChar ();
@@ -2953,7 +2953,7 @@ static void DoLine (void)
 
         /* #line actually sets the line number of the next line */
         if (LineNum > 0) {
-            SetCurrentLine (LineNum - 1);
+            SetCurrentLineNum (LineNum - 1);
             /* Check for extra tokens at the end */
             CheckExtraTokens ("line");
         }
@@ -3216,11 +3216,11 @@ void HandleSpecialMacro (Macro* M, const char* Name)
         SB_Printf (&M->Replacement, "%u", GetCurrentCounter ());
     } else if (strcmp (Name, "__LINE__") == 0) {
         /* Replace __LINE__ with the current line number */
-        SB_Printf (&M->Replacement, "%u", GetCurrentLine ());
+        SB_Printf (&M->Replacement, "%u", GetCurrentLineNum ());
     } else if (strcmp (Name, "__FILE__") == 0) {
         /* Replace __FILE__ with the current filename */
         StrBuf B = AUTO_STRBUF_INITIALIZER;
-        SB_InitFromString (&B, GetCurrentFile ());
+        SB_InitFromString (&B, GetCurrentFilename ());
         SB_Clear (&M->Replacement);
         Stringize (&B, &M->Replacement);
         SB_Done (&B);
@@ -3332,7 +3332,7 @@ void Preprocess (void)
     PLine = InitLine (PLine);
 
     if (Verbosity > 1 && SB_NotEmpty (Line)) {
-        printf ("%s:%u: %.*s\n", GetCurrentFile (), GetCurrentLine (),
+        printf ("%s:%u: %.*s\n", GetCurrentFilename (), GetCurrentLineNum (),
                 (int) SB_GetLen (Line), SB_GetConstBuf (Line));
     }
 

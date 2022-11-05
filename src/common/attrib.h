@@ -46,7 +46,7 @@
 
 #ifdef __clang__
 #  define attribute(a)      __attribute__(a)
-#  define ATTR_UNUSED(x)
+#  define ATTR_UNUSED(x)    x
 #  define ATTR_NORETURN     __attribute__((analyzer_noreturn))
 #elif defined(__GNUC__)
 #  define attribute(a)      __attribute__(a)
@@ -54,7 +54,7 @@
 #  define ATTR_NORETURN     __attribute__((noreturn))
 #else
 #  define attribute(a)
-#  define ATTR_UNUSED(x)
+#  define ATTR_UNUSED(x)    x
 #  define ATTR_NORETURN
 #endif
 

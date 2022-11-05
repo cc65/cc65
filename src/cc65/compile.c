@@ -123,7 +123,7 @@ static void Parse (void)
         }
 
         /* Read variable defs and functions */
-        ParseDeclSpec (&Spec, SC_EXTERN | SC_STATIC, T_INT);
+        ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_INT, SC_EXTERN | SC_STATIC);
 
         /* Don't accept illegal storage classes */
         if ((Spec.StorageClass & SC_TYPEMASK) == 0) {

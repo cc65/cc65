@@ -568,7 +568,7 @@ void DeclareLocals (void)
             continue;
         }
 
-        ParseDeclSpec (&Spec, SC_AUTO, T_INT);
+        ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_INT, SC_AUTO);
         if ((Spec.Flags & DS_DEF_STORAGE) != 0 &&       /* No storage spec */
             (Spec.Flags & DS_DEF_TYPE) != 0    &&       /* No type given */
             GetQualifier (Spec.Type) == T_QUAL_NONE) {  /* No type qualifier */

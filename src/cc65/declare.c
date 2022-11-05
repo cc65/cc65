@@ -72,8 +72,7 @@
 
 
 
-static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
-                           int* SignednessSpecified);
+static void ParseTypeSpec (DeclSpec* D, typespec_t TSFlags, int* SignednessSpecified);
 /* Parse a type specifier */
 
 
@@ -81,6 +80,75 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
 /*****************************************************************************/
 /*                            Internal functions                             */
 /*****************************************************************************/
+
+
+
+static unsigned ParseOneStorageClass (void)
+/* Parse and return a storage class specifier */
+{
+    unsigned StorageClass = 0;
+
+    /* Check the storage class given */
+    switch (CurTok.Tok) {
+
+        case TOK_EXTERN:
+            StorageClass = SC_EXTERN | SC_STATIC;
+            NextToken ();
+            break;
+
+        case TOK_STATIC:
+            StorageClass = SC_STATIC;
+            NextToken ();
+            break;
+
+        case TOK_REGISTER:
+            StorageClass = SC_REGISTER | SC_STATIC;
+            NextToken ();
+            break;
+
+        case TOK_AUTO:
+            StorageClass = SC_AUTO;
+            NextToken ();
+            break;
+
+        case TOK_TYPEDEF:
+            StorageClass = SC_TYPEDEF;
+            NextToken ();
+            break;
+
+        default:
+            break;
+    }
+
+    return StorageClass;
+}
+
+
+
+static int ParseStorageClass (DeclSpec* D)
+/* Parse storage class specifiers. Return true if a specifier is read even if
+** it was duplicated or disallowed. */
+{
+    /* Check the storage class given */
+    unsigned StorageClass = ParseOneStorageClass ();
+
+    if (StorageClass == 0) {
+        return 0;
+    }
+
+    while (StorageClass != 0) {
+        if (D->StorageClass == 0) {
+            D->StorageClass = StorageClass;
+        } else if (D->StorageClass == StorageClass) {
+            Warning ("Duplicate storage class specifier");
+        } else {
+            Error ("Conflicting storage class specifier");
+        }
+        StorageClass = ParseOneStorageClass ();
+    }
+
+    return 1;
+}
 
 
 
@@ -92,9 +160,9 @@ static void DuplicateQualifier (const char* Name)
 
 
 
-static TypeCode OptionalQualifiers (TypeCode Allowed)
+static TypeCode OptionalQualifiers (TypeCode Qualifiers, TypeCode Allowed)
 /* Read type qualifiers if we have any. Allowed specifies the allowed
-** qualifiers.
+** qualifiers. Return any read qualifiers even if they caused errors.
 */
 {
     /* We start without any qualifiers */
@@ -107,7 +175,7 @@ static TypeCode OptionalQualifiers (TypeCode Allowed)
 
             case TOK_CONST:
                 if (Allowed & T_QUAL_CONST) {
-                    if (Q & T_QUAL_CONST) {
+                    if (Qualifiers & T_QUAL_CONST) {
                         DuplicateQualifier ("const");
                     }
                     Q |= T_QUAL_CONST;
@@ -118,7 +186,7 @@ static TypeCode OptionalQualifiers (TypeCode Allowed)
 
             case TOK_VOLATILE:
                 if (Allowed & T_QUAL_VOLATILE) {
-                    if (Q & T_QUAL_VOLATILE) {
+                    if (Qualifiers & T_QUAL_VOLATILE) {
                         DuplicateQualifier ("volatile");
                     }
                     Q |= T_QUAL_VOLATILE;
@@ -129,7 +197,7 @@ static TypeCode OptionalQualifiers (TypeCode Allowed)
 
             case TOK_RESTRICT:
                 if (Allowed & T_QUAL_RESTRICT) {
-                    if (Q & T_QUAL_RESTRICT) {
+                    if (Qualifiers & T_QUAL_RESTRICT) {
                         DuplicateQualifier ("restrict");
                     }
                     Q |= T_QUAL_RESTRICT;
@@ -140,7 +208,7 @@ static TypeCode OptionalQualifiers (TypeCode Allowed)
 
             case TOK_NEAR:
                 if (Allowed & T_QUAL_NEAR) {
-                    if (Q & T_QUAL_NEAR) {
+                    if (Qualifiers & T_QUAL_NEAR) {
                         DuplicateQualifier ("near");
                     }
                     Q |= T_QUAL_NEAR;
@@ -151,7 +219,7 @@ static TypeCode OptionalQualifiers (TypeCode Allowed)
 
             case TOK_FAR:
                 if (Allowed & T_QUAL_FAR) {
-                    if (Q & T_QUAL_FAR) {
+                    if (Qualifiers & T_QUAL_FAR) {
                         DuplicateQualifier ("far");
                     }
                     Q |= T_QUAL_FAR;
@@ -162,7 +230,7 @@ static TypeCode OptionalQualifiers (TypeCode Allowed)
 
             case TOK_FASTCALL:
                 if (Allowed & T_QUAL_FASTCALL) {
-                    if (Q & T_QUAL_FASTCALL) {
+                    if (Qualifiers & T_QUAL_FASTCALL) {
                         DuplicateQualifier ("fastcall");
                     }
                     Q |= T_QUAL_FASTCALL;
@@ -173,7 +241,7 @@ static TypeCode OptionalQualifiers (TypeCode Allowed)
 
             case TOK_CDECL:
                 if (Allowed & T_QUAL_CDECL) {
-                    if (Q & T_QUAL_CDECL) {
+                    if (Qualifiers & T_QUAL_CDECL) {
                         DuplicateQualifier ("cdecl");
                     }
                     Q |= T_QUAL_CDECL;
@@ -187,13 +255,16 @@ static TypeCode OptionalQualifiers (TypeCode Allowed)
 
         }
 
+        /* Combine with newly read qualifiers */
+        Qualifiers |= Q;
+
         /* Skip the token */
         NextToken ();
     }
 
 Done:
     /* We cannot have more than one address size far qualifier */
-    switch (Q & T_QUAL_ADDRSIZE) {
+    switch (Qualifiers & T_QUAL_ADDRSIZE) {
 
         case T_QUAL_NONE:
         case T_QUAL_NEAR:
@@ -202,11 +273,11 @@ Done:
 
         default:
             Error ("Cannot specify more than one address size qualifier");
-            Q &= ~T_QUAL_ADDRSIZE;
+            Qualifiers &= ~T_QUAL_ADDRSIZE;
     }
 
     /* We cannot have more than one calling convention specifier */
-    switch (Q & T_QUAL_CCONV) {
+    switch (Qualifiers & T_QUAL_CCONV) {
 
         case T_QUAL_NONE:
         case T_QUAL_FASTCALL:
@@ -215,11 +286,37 @@ Done:
 
         default:
             Error ("Cannot specify more than one calling convention qualifier");
-            Q &= ~T_QUAL_CCONV;
+            Qualifiers &= ~T_QUAL_CCONV;
     }
 
-    /* Return the qualifiers read */
+    /* Return any qualifiers just read */
     return Q;
+}
+
+
+
+static void OptionalSpecifiers (DeclSpec* Spec, TypeCode* Qualifiers, typespec_t TSFlags)
+/* Read storage specifiers and/or type qualifiers if we have any. Storage class
+** specifiers require the corresponding typespec_t flag set to be allowed, and
+** only const and volatile type qualifiers are allowed under any circumstance.
+** Read storage class specifiers are output in *Spec and type qualifiers are
+** output in *Qualifiers with error checking.
+*/
+{
+    TypeCode Q = T_QUAL_NONE;
+    int Continue;
+
+    do {
+        /* There may be type qualifiers *before* any storage class specifiers */
+        Q = OptionalQualifiers (*Qualifiers, T_QUAL_CONST | T_QUAL_VOLATILE);
+        *Qualifiers |= Q;
+
+        /* Parse storage class specifiers anyway then check */
+        Continue = ParseStorageClass (Spec);
+        if (Continue && (TSFlags & (TS_STORAGE_CLASS_SPEC | TS_FUNCTION_SPEC)) == 0) {
+            Error ("Unexpected storage class specified");
+        }
+    } while (Continue || Q != T_QUAL_NONE);
 }
 
 
@@ -396,48 +493,6 @@ static void FixQualifiers (Type* DataType)
 
 
 
-static unsigned ParseOneStorageClass (void)
-/* Parse and return a storage class */
-{
-    unsigned StorageClass = 0;
-
-    /* Check the storage class given */
-    switch (CurTok.Tok) {
-
-        case TOK_EXTERN:
-            StorageClass = SC_EXTERN | SC_STATIC;
-            NextToken ();
-            break;
-
-        case TOK_STATIC:
-            StorageClass = SC_STATIC;
-            NextToken ();
-            break;
-
-        case TOK_REGISTER:
-            StorageClass = SC_REGISTER | SC_STATIC;
-            NextToken ();
-            break;
-
-        case TOK_AUTO:
-            StorageClass = SC_AUTO;
-            NextToken ();
-            break;
-
-        case TOK_TYPEDEF:
-            StorageClass = SC_TYPEDEF;
-            NextToken ();
-            break;
-
-        default:
-            break;
-    }
-
-    return StorageClass;
-}
-
-
-
 static void CheckArrayElementType (Type* DataType)
 /* Check if data type consists of arrays of incomplete element types */
 {
@@ -463,33 +518,6 @@ static void CheckArrayElementType (Type* DataType)
             }
         } else {
             ++T;
-        }
-    }
-}
-
-
-
-static void ParseStorageClass (DeclSpec* D, unsigned DefStorage)
-/* Parse a storage class */
-{
-    /* Assume we're using an explicit storage class */
-    D->Flags &= ~DS_DEF_STORAGE;
-
-    /* Check the storage class given */
-    D->StorageClass = ParseOneStorageClass ();
-    if (D->StorageClass == 0) {
-        /* No storage class given, use default */
-        D->Flags |= DS_DEF_STORAGE;
-        D->StorageClass = DefStorage;
-    } else {
-        unsigned StorageClass = ParseOneStorageClass ();
-        while (StorageClass != 0) {
-            if (D->StorageClass == StorageClass) {
-                Warning ("Duplicate storage class specifier");
-            } else {
-                Error ("Conflicting storage class specifier");
-            }
-            StorageClass = ParseOneStorageClass ();
         }
     }
 }
@@ -882,14 +910,21 @@ static SymEntry* ParseUnionDecl (const char* Name, unsigned* DSFlags)
     EnterStructLevel ();
 
     /* Parse union fields */
-    UnionSize      = 0;
+    UnionSize = 0;
     while (CurTok.Tok != TOK_RCURLY) {
 
         /* Get the type of the entry */
         DeclSpec Spec;
         int SignednessSpecified = 0;
+
+        /* Check for a _Static_assert */
+        if (CurTok.Tok == TOK_STATIC_ASSERT) {
+            ParseStaticAssert ();
+            continue;
+        }
+
         InitDeclSpec (&Spec);
-        ParseTypeSpec (&Spec, -1, T_QUAL_NONE, &SignednessSpecified);
+        ParseTypeSpec (&Spec, TS_DEFAULT_TYPE_NONE, &SignednessSpecified);
 
         /* Read fields with this type */
         while (1) {
@@ -1030,6 +1065,7 @@ static SymEntry* ParseStructDecl (const char* Name, unsigned* DSFlags)
 
         /* Get the type of the entry */
         DeclSpec Spec;
+        int SignednessSpecified = 0;
 
         /* Check for a _Static_assert */
         if (CurTok.Tok == TOK_STATIC_ASSERT) {
@@ -1037,9 +1073,8 @@ static SymEntry* ParseStructDecl (const char* Name, unsigned* DSFlags)
             continue;
         }
 
-        int SignednessSpecified = 0;
         InitDeclSpec (&Spec);
-        ParseTypeSpec (&Spec, -1, T_QUAL_NONE, &SignednessSpecified);
+        ParseTypeSpec (&Spec, TS_DEFAULT_TYPE_NONE, &SignednessSpecified);
 
         /* Read fields with this type */
         while (1) {
@@ -1205,8 +1240,7 @@ NextMember: if (CurTok.Tok != TOK_COMMA) {
 
 
 
-static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
-                           int* SignednessSpecified)
+static void ParseTypeSpec (DeclSpec* D, typespec_t TSFlags, int* SignednessSpecified)
 /* Parse a type specifier.  Store whether one of "signed" or "unsigned" was
 ** specified, so bit-fields of unspecified signedness can be treated as
 ** unsigned; without special handling, it would be treated as signed.
@@ -1214,6 +1248,7 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
 {
     ident       Ident;
     SymEntry*   TagEntry;
+    TypeCode    Qualifiers = T_QUAL_NONE;
 
     if (SignednessSpecified != NULL) {
         *SignednessSpecified = 0;
@@ -1222,8 +1257,8 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
     /* Assume we have an explicit type */
     D->Flags &= ~DS_DEF_TYPE;
 
-    /* Read type qualifiers if we have any */
-    Qualifiers |= OptionalQualifiers (T_QUAL_CONST | T_QUAL_VOLATILE);
+    /* Read storage specifiers and/or type qualifiers if we have any */
+    OptionalSpecifiers (D, &Qualifiers, TSFlags);
 
     /* Look at the data type */
     switch (CurTok.Tok) {
@@ -1470,20 +1505,21 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
             /* FALL THROUGH */
 
         default:
-            if (Default < 0) {
+            if ((TSFlags & TS_MASK_DEFAULT_TYPE) != TS_DEFAULT_TYPE_INT) {
                 Error ("Type expected");
                 D->Type[0].C = T_INT;
                 D->Type[1].C = T_END;
             } else {
                 D->Flags |= DS_DEF_TYPE;
-                D->Type[0].C = (TypeCode) Default;
+                D->Type[0].C = T_INT;
                 D->Type[1].C = T_END;
             }
             break;
     }
 
-    /* There may also be qualifiers *after* the initial type */
-    D->Type[0].C |= (Qualifiers | OptionalQualifiers (T_QUAL_CONST | T_QUAL_VOLATILE));
+    /* There may also be specifiers/qualifiers *after* the initial type */
+    OptionalSpecifiers (D, &Qualifiers, TSFlags);
+    D->Type[0].C |= Qualifiers;
 }
 
 
@@ -1563,7 +1599,7 @@ static void ParseOldStyleParamList (FuncDesc* F)
         DeclSpec        Spec;
 
         /* Read the declaration specifier */
-        ParseDeclSpec (&Spec, SC_AUTO, T_INT);
+        ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_NONE, SC_AUTO);
 
         /* We accept only auto and register as storage class specifiers, but
         ** we ignore all this, since we use auto anyway.
@@ -1642,7 +1678,7 @@ static void ParseAnsiParamList (FuncDesc* F)
         }
 
         /* Read the declaration specifier */
-        ParseDeclSpec (&Spec, SC_AUTO, T_INT);
+        ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_NONE, SC_AUTO);
 
         /* We accept only auto and register as storage class specifiers */
         if ((Spec.StorageClass & SC_AUTO) == SC_AUTO) {
@@ -1790,7 +1826,7 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
     ** qualifier later will be transfered to the function itself. If it's a
     ** pointer to something else, it will be flagged as an error.
     */
-    TypeCode Qualifiers = OptionalQualifiers (T_QUAL_ADDRSIZE | T_QUAL_CCONV);
+    TypeCode Qualifiers = OptionalQualifiers (T_QUAL_NONE, T_QUAL_ADDRSIZE | T_QUAL_CCONV);
 
     /* Pointer to something */
     if (CurTok.Tok == TOK_STAR) {
@@ -1799,7 +1835,7 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
         NextToken ();
 
         /* Allow const, restrict, and volatile qualifiers */
-        Qualifiers |= OptionalQualifiers (T_QUAL_CVR);
+        Qualifiers |= OptionalQualifiers (Qualifiers, T_QUAL_CVR);
 
         /* Parse the type that the pointer points to */
         Declarator (Spec, D, Mode);
@@ -1944,7 +1980,7 @@ Type* ParseType (Type* T)
 
     /* Get a type without a default */
     InitDeclSpec (&Spec);
-    ParseTypeSpec (&Spec, -1, T_QUAL_NONE, NULL);
+    ParseTypeSpec (&Spec, TS_DEFAULT_TYPE_NONE, NULL);
 
     /* Parse additional declarators */
     ParseDecl (&Spec, &Decl, DM_NO_IDENT);
@@ -2069,22 +2105,23 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
 
 
 
-void ParseDeclSpec (DeclSpec* D, unsigned DefStorage, long DefType)
+void ParseDeclSpec (DeclSpec* D, typespec_t TSFlags, unsigned DefStorage)
 /* Parse a declaration specification */
 {
-    TypeCode Qualifiers;
-
     /* Initialize the DeclSpec struct */
     InitDeclSpec (D);
 
-    /* There may be qualifiers *before* the storage class specifier */
-    Qualifiers = OptionalQualifiers (T_QUAL_CONST | T_QUAL_VOLATILE);
+    /* Assume we're using an explicit storage class */
+    D->Flags &= ~DS_DEF_STORAGE;
 
-    /* Now get the storage class specifier for this declaration */
-    ParseStorageClass (D, DefStorage);
+    /* Parse the type specifiers */
+    ParseTypeSpec (D, TSFlags | TS_STORAGE_CLASS_SPEC | TS_FUNCTION_SPEC, NULL);
 
-    /* Parse the type specifiers passing any initial type qualifiers */
-    ParseTypeSpec (D, DefType, Qualifiers, NULL);
+    /* If no explicit storage class is given, use the default */
+    if (D->StorageClass == 0) {
+        D->Flags |= DS_DEF_STORAGE;
+        D->StorageClass = DefStorage;
+    }
 }
 
 

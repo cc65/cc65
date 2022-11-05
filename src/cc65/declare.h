@@ -53,6 +53,22 @@
 
 
 
+/* Type specifier parser flags */
+typedef enum typespec_t typespec_t;
+enum typespec_t {
+    TS_NONE                 = 0x00,
+
+    /* Default type */
+    TS_MASK_DEFAULT_TYPE    = 0x03,
+    TS_DEFAULT_TYPE_NONE    = 0x00,     /* No default type */
+    TS_DEFAULT_TYPE_INT     = 0x01,     /* Good old int */
+    TS_DEFAULT_TYPE_AUTO    = 0x02,     /* C23 type inference with auto */
+
+    /* Whether to allow certain kinds of specifiers */
+    TS_STORAGE_CLASS_SPEC   = 0x04,    /* Allow storage storage class specifiers */
+    TS_FUNCTION_SPEC        = 0x08,    /* Allow function specifiers */
+};
+
 /* Masks for the Flags field in DeclSpec */
 #define DS_DEF_STORAGE          0x0001U /* Default storage class used   */
 #define DS_DEF_TYPE             0x0002U /* Default type used            */
@@ -105,7 +121,7 @@ Type* ParseType (Type* Type);
 void ParseDecl (const DeclSpec* Spec, Declaration* D, declmode_t Mode);
 /* Parse a variable, type or function declaration */
 
-void ParseDeclSpec (DeclSpec* D, unsigned DefStorage, long DefType);
+void ParseDeclSpec (DeclSpec* D, typespec_t TSFlags, unsigned DefStorage);
 /* Parse a declaration specification */
 
 void CheckEmptyDecl (const DeclSpec* D);

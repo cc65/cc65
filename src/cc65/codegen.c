@@ -2524,7 +2524,10 @@ void g_push (unsigned flags, unsigned long val)
                 AddCodeLine ("jsr pushax");
                 break;
 
-            case CF_FLOAT:  /* FIXME: float - handle like long here */
+            case CF_FLOAT:
+                /* FIXME: float - handle like long here */
+                AddCodeLine ("jsr pusheax");
+                break;
 
             case CF_LONG:
                 AddCodeLine ("jsr pusheax");

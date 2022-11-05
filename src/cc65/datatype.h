@@ -943,11 +943,13 @@ const Type* GetBaseElementType (const Type* T);
 ** the element type that is not an array.
 */
 
-struct SymEntry* GetESUSymEntry (const Type* T) attribute ((const));
-/* Return a SymEntry pointer from an enum/struct/union type */
+struct SymEntry* GetESUTagSym (const Type* T) attribute ((const));
+/* Get the tag symbol entry of the enum/struct/union type.
+** Return 0 if it is not an enum/struct/union.
+*/
 
-void SetESUSymEntry (Type* T, struct SymEntry* S);
-/* Set the SymEntry pointer for an enum/struct/union type */
+void SetESUTagSym (Type* T, struct SymEntry* S);
+/* Set the tag symbol entry of the enum/struct/union type */
 
 TypeCode AddrSizeQualifier (unsigned AddrSize);
 /* Return T_QUAL_NEAR or T_QUAL_FAR depending on the address size */

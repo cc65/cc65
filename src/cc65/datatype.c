@@ -48,6 +48,7 @@
 #include "fp.h"
 #include "funcdesc.h"
 #include "global.h"
+#include "ident.h"
 #include "symtab.h"
 
 
@@ -83,6 +84,83 @@ const Type type_c_void_p[]  = { TYPE(T_PTR),    TYPE(T_C_VOID), TYPE(T_END) };
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
+
+
+
+const char* GetBasicTypeName (const Type* T)
+/* Return a const name string of the basic type.
+** Return "type" for unknown basic types.
+*/
+{
+    switch (GetRawType (T)) {
+    case T_TYPE_ENUM:       return "enum";
+    case T_TYPE_BITFIELD:   return "bit-field";
+    case T_TYPE_FLOAT:      return "float";
+    case T_TYPE_DOUBLE:     return "double";
+    case T_TYPE_VOID:       return "void";
+    case T_TYPE_STRUCT:     return "struct";
+    case T_TYPE_UNION:      return "union";
+    case T_TYPE_ARRAY:      return "array";
+    case T_TYPE_PTR:        return "pointer";
+    case T_TYPE_FUNC:       return "function";
+    case T_TYPE_NONE:       /* FALLTHROUGH */
+    default:                break;
+    }
+    if (IsClassInt (T)) {
+        if (IsRawSignSigned (T)) {
+            switch (GetRawType (T)) {
+            case T_TYPE_CHAR:       return "signed char";
+            case T_TYPE_SHORT:      return "short";
+            case T_TYPE_INT:        return "int";
+            case T_TYPE_LONG:       return "long";
+            case T_TYPE_LONGLONG:   return "long long";
+            default:
+                return "signed integer";
+            }
+        } else if (IsRawSignUnsigned (T)) {
+            switch (GetRawType (T)) {
+            case T_TYPE_CHAR:       return "unsigned char";
+            case T_TYPE_SHORT:      return "unsigned short";
+            case T_TYPE_INT:        return "unsigned int";
+            case T_TYPE_LONG:       return "unsigned long";
+            case T_TYPE_LONGLONG:   return "unsigned long long";
+            default:
+                return "unsigned integer";
+            }
+        } else {
+            switch (GetRawType (T)) {
+            case T_TYPE_CHAR:       return "char";
+            case T_TYPE_SHORT:      return "short";
+            case T_TYPE_INT:        return "int";
+            case T_TYPE_LONG:       return "long";
+            case T_TYPE_LONGLONG:   return "long long";
+            default:
+                return "integer";
+            }
+        }
+    }
+    return "type";
+}
+
+
+
+static const char* GetTagSymName (const Type* T)
+/* Return a name string of the type or the symbol name if it is an ESU type.
+** Note: This may use a static buffer that could be overwritten by other calls.
+*/
+{
+    static char TypeName [IDENTSIZE + 16];
+    SymEntry* TagSym;
+
+    TagSym = GetESUTagSym (T);
+    if (TagSym == 0) {
+        return GetBasicTypeName (T);
+    }
+    sprintf (TypeName, "%s %s", GetBasicTypeName (T),
+             TagSym->Name[0] != '\0' ? TagSym->Name : "<unknown>");
+
+    return TypeName;
+}
 
 
 
@@ -208,7 +286,7 @@ static struct StrBuf* GetFullTypeNameWestEast (struct StrBuf* West, struct StrBu
         }
 
         if (!IsTypeBitField (T)) {
-            SB_AppendStr (&Buf, GetSymTypeName (T));
+            SB_AppendStr (&Buf, GetTagSymName (T));
         } else {
             SB_AppendStr (&Buf, GetBasicTypeName (T + 1));
         }
@@ -224,63 +302,6 @@ static struct StrBuf* GetFullTypeNameWestEast (struct StrBuf* West, struct StrBu
 
     SB_Done (&Buf);
     return West;
-}
-
-
-
-const char* GetBasicTypeName (const Type* T)
-/* Return a const name string of the basic type.
-** Return "type" for unknown basic types.
-*/
-{
-    switch (GetRawType (T)) {
-    case T_TYPE_ENUM:       return "enum";
-    case T_TYPE_BITFIELD:   return "bit-field";
-    case T_TYPE_FLOAT:      return "float";
-    case T_TYPE_DOUBLE:     return "double";
-    case T_TYPE_VOID:       return "void";
-    case T_TYPE_STRUCT:     return "struct";
-    case T_TYPE_UNION:      return "union";
-    case T_TYPE_ARRAY:      return "array";
-    case T_TYPE_PTR:        return "pointer";
-    case T_TYPE_FUNC:       return "function";
-    case T_TYPE_NONE:       /* FALLTHROUGH */
-    default:                break;
-    }
-    if (IsClassInt (T)) {
-        if (IsRawSignSigned (T)) {
-            switch (GetRawType (T)) {
-            case T_TYPE_CHAR:       return "signed char";
-            case T_TYPE_SHORT:      return "short";
-            case T_TYPE_INT:        return "int";
-            case T_TYPE_LONG:       return "long";
-            case T_TYPE_LONGLONG:   return "long long";
-            default:
-                return "signed integer";
-            }
-        } else if (IsRawSignUnsigned (T)) {
-            switch (GetRawType (T)) {
-            case T_TYPE_CHAR:       return "unsigned char";
-            case T_TYPE_SHORT:      return "unsigned short";
-            case T_TYPE_INT:        return "unsigned int";
-            case T_TYPE_LONG:       return "unsigned long";
-            case T_TYPE_LONGLONG:   return "unsigned long long";
-            default:
-                return "unsigned integer";
-            }
-        } else {
-            switch (GetRawType (T)) {
-            case T_TYPE_CHAR:       return "char";
-            case T_TYPE_SHORT:      return "short";
-            case T_TYPE_INT:        return "int";
-            case T_TYPE_LONG:       return "long";
-            case T_TYPE_LONGLONG:   return "long long";
-            default:
-                return "integer";
-            }
-        }
-    }
-    return "type";
 }
 
 
@@ -1320,9 +1341,9 @@ int IsESUType (const Type* T)
 int IsIncompleteESUType (const Type* T)
 /* Return true if this is an incomplete ESU type */
 {
-    SymEntry* Sym = GetSymType (T);
+    SymEntry* TagSym = GetESUTagSym (T);
 
-    return Sym != 0 && !SymIsDef (Sym);
+    return TagSym != 0 && !SymIsDef (TagSym);
 }
 
 
@@ -1499,20 +1520,21 @@ const Type* GetBaseElementType (const Type* T)
 
 
 
-struct SymEntry* GetESUSymEntry (const Type* T)
-/* Return a SymEntry pointer from an enum/struct/union type */
+struct SymEntry* GetESUTagSym (const Type* T)
+/* Get the tag symbol entry of the enum/struct/union type.
+** Return 0 if it is not an enum/struct/union.
+*/
 {
-    /* Only enums, structs or unions have a SymEntry attribute */
-    CHECK (IsClassStruct (T) || IsTypeEnum (T));
-
-    /* Return the attribute */
-    return T->A.S;
+    if ((IsClassStruct (T) || IsTypeEnum (T))) {
+        return T->A.S;
+    }
+    return 0;
 }
 
 
 
-void SetESUSymEntry (Type* T, struct SymEntry* S)
-/* Set the SymEntry pointer for an enum/struct/union type */
+void SetESUTagSym (Type* T, struct SymEntry* S)
+/* Set the tag symbol entry of the enum/struct/union type */
 {
     /* Only enums, structs or unions have a SymEntry attribute */
     CHECK (IsClassStruct (T) || IsTypeEnum (T));
@@ -1583,7 +1605,7 @@ void PrintFuncSig (FILE* F, const char* Name, const Type* T)
         if (SymIsRegVar (Param)) {
             SB_AppendStr (&ParamList, "register ");
         }
-        if (!HasAnonName (Param)) {
+        if (!SymHasAnonName (Param)) {
             SB_AppendStr (&Buf, Param->Name);
         }
         SB_AppendStr (&ParamList, SB_GetConstBuf (GetFullTypeNameBuf (&Buf, Param->Type)));

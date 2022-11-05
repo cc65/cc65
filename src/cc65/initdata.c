@@ -459,7 +459,7 @@ static unsigned ParseArrayInit (Type* T, int* Braces, int AllowFlexibleMembers)
 static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
 /* Parse initialization of a struct or union. Return the number of data bytes. */
 {
-    SymEntry*       Sym;
+    SymEntry*       TagSym;
     SymTable*       Tab;
     StructInitData  SI;
     int             HasCurly  = 0;
@@ -474,15 +474,15 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
     }
 
     /* Get a pointer to the struct entry from the type */
-    Sym = GetESUSymEntry (T);
+    TagSym = GetESUTagSym (T);
 
     /* Get the size of the struct from the symbol table entry */
-    SI.Size = Sym->V.S.Size;
+    SI.Size = TagSym->V.S.Size;
 
     /* Check if this struct definition has a field table. If it doesn't, it
     ** is an incomplete definition.
     */
-    Tab = Sym->V.S.SymTab;
+    Tab = TagSym->V.S.SymTab;
     if (Tab == 0) {
         Error ("Cannot initialize variables with incomplete type");
         /* Try error recovery */
@@ -492,7 +492,7 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
     }
 
     /* Get a pointer to the list of symbols */
-    Sym = Tab->SymHead;
+    TagSym = Tab->SymHead;
 
     /* Initialize fields */
     SI.Offs    = 0;
@@ -501,7 +501,7 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
     while (CurTok.Tok != TOK_RCURLY) {
 
         /* Check for excess elements */
-        if (Sym == 0) {
+        if (TagSym == 0) {
             /* Is there just one trailing comma before a closing curly? */
             if (NextTok.Tok == TOK_RCURLY && CurTok.Tok == TOK_COMMA) {
                 /* Skip comma and exit scope */
@@ -517,7 +517,7 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
         }
 
         /* Check for special members that don't consume the initializer */
-        if ((Sym->Flags & SC_ALIAS) == SC_ALIAS) {
+        if ((TagSym->Flags & SC_ALIAS) == SC_ALIAS) {
             /* Just skip */
             goto NextMember;
         }
@@ -525,13 +525,13 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
         /* This may be an anonymous bit-field, in which case it doesn't
         ** have an initializer.
         */
-        if (SymIsBitField (Sym) && (IsAnonName (Sym->Name))) {
+        if (SymIsBitField (TagSym) && (IsAnonName (TagSym->Name))) {
             /* Account for the data and output it if we have at least a full
             ** byte. We may have more if there was storage unit overlap, for
             ** example two consecutive 7 bit fields. Those would be packed
             ** into 2 bytes.
             */
-            SI.ValBits += Sym->Type->A.B.Width;
+            SI.ValBits += TagSym->Type->A.B.Width;
             CHECK (SI.ValBits <= CHAR_BIT * sizeof(SI.BitVal));
             /* TODO: Generalize this so any type can be used. */
             CHECK (SI.ValBits <= LONG_BITS);
@@ -548,7 +548,7 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
             SkipComma = 0;
         }
 
-        if (SymIsBitField (Sym)) {
+        if (SymIsBitField (TagSym)) {
 
             /* Parse initialization of one field. Bit-fields need a special
             ** handling.
@@ -559,14 +559,14 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
             unsigned Shift;
 
             /* Calculate the bitmask from the bit-field data */
-            unsigned long Mask = shl_l (1UL, Sym->Type->A.B.Width) - 1UL;
+            unsigned long Mask = shl_l (1UL, TagSym->Type->A.B.Width) - 1UL;
 
             /* Safety ... */
-            CHECK (Sym->V.Offs * CHAR_BITS + Sym->Type->A.B.Offs ==
+            CHECK (TagSym->V.Offs * CHAR_BITS + TagSym->Type->A.B.Offs ==
                    SI.Offs     * CHAR_BITS + SI.ValBits);
 
             /* Read the data, check for a constant integer, do a range check */
-            Field = ParseScalarInitInternal (IntPromotion (Sym->Type));
+            Field = ParseScalarInitInternal (IntPromotion (TagSym->Type));
             if (!ED_IsConstAbsInt (&Field)) {
                 Error ("Constant initializer expected");
                 ED_MakeConstAbsInt (&Field, 1);
@@ -576,19 +576,19 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
             ** any useful bits.
             */
             Val = (unsigned long) Field.IVal & Mask;
-            if (IsSignUnsigned (Sym->Type)) {
+            if (IsSignUnsigned (TagSym->Type)) {
                 if (Field.IVal < 0 || (unsigned long) Field.IVal != Val) {
                     Warning (IsSignUnsigned (Field.Type) ?
                              "Implicit truncation from '%s' to '%s : %u' in bit-field initializer"
                              " changes value from %lu to %lu" :
                              "Implicit truncation from '%s' to '%s : %u' in bit-field initializer"
                              " changes value from %ld to %lu",
-                             GetFullTypeName (Field.Type), GetFullTypeName (Sym->Type),
-                             Sym->Type->A.B.Width, Field.IVal, Val);
+                             GetFullTypeName (Field.Type), GetFullTypeName (TagSym->Type),
+                             TagSym->Type->A.B.Width, Field.IVal, Val);
                 }
             } else {
                 /* Sign extend back to full width of host long. */
-                unsigned ShiftBits = sizeof (long) * CHAR_BIT - Sym->Type->A.B.Width;
+                unsigned ShiftBits = sizeof (long) * CHAR_BIT - TagSym->Type->A.B.Width;
                 long RestoredVal = asr_l (asl_l (Val, ShiftBits), ShiftBits);
                 if (Field.IVal != RestoredVal) {
                     Warning (IsSignUnsigned (Field.Type) ?
@@ -596,17 +596,17 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
                              " changes value from %lu to %ld" :
                              "Implicit truncation from '%s' to '%s : %u' in bit-field initializer"
                              " changes value from %ld to %ld",
-                             GetFullTypeName (Field.Type), GetFullTypeName (Sym->Type),
-                             Sym->Type->A.B.Width, Field.IVal, RestoredVal);
+                             GetFullTypeName (Field.Type), GetFullTypeName (TagSym->Type),
+                             TagSym->Type->A.B.Width, Field.IVal, RestoredVal);
                 }
             }
 
             /* Add the value to the currently stored bit-field value */
-            Shift = (Sym->V.Offs - SI.Offs) * CHAR_BITS + Sym->Type->A.B.Offs;
+            Shift = (TagSym->V.Offs - SI.Offs) * CHAR_BITS + TagSym->Type->A.B.Offs;
             SI.BitVal |= (Val << Shift);
 
             /* Account for the data and output any full bytes we have. */
-            SI.ValBits += Sym->Type->A.B.Width;
+            SI.ValBits += TagSym->Type->A.B.Width;
             /* Make sure unsigned is big enough to hold the value, 32 bits.
             ** This cannot be more than 32 bits because a 16-bit or 32-bit
             ** bit-field will always be byte-aligned with padding before it
@@ -631,7 +631,7 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
             /* Flexible array members may only be initialized if they are
             ** the last field (or part of the last struct field).
             */
-            SI.Offs += ParseInitInternal (Sym->Type, Braces, AllowFlexibleMembers && Sym->NextSym == 0);
+            SI.Offs += ParseInitInternal (TagSym->Type, Braces, AllowFlexibleMembers && TagSym->NextSym == 0);
         }
 
         /* More initializers? */
@@ -646,10 +646,10 @@ NextMember:
         /* Next member. For unions, only the first one can be initialized */
         if (IsTypeUnion (T)) {
             /* Union */
-            Sym = 0;
+            TagSym = 0;
         } else {
             /* Struct */
-            Sym = Sym->NextSym;
+            TagSym = TagSym->NextSym;
         }
     }
 

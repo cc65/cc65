@@ -72,8 +72,7 @@
 
 
 
-static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
-                           int* SignednessSpecified);
+static void ParseTypeSpec (DeclSpec* D, typespec_t TSFlags, int* SignednessSpecified);
 /* Parse a type specifier */
 
 
@@ -81,6 +80,75 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
 /*****************************************************************************/
 /*                            Internal functions                             */
 /*****************************************************************************/
+
+
+
+static unsigned ParseOneStorageClass (void)
+/* Parse and return a storage class specifier */
+{
+    unsigned StorageClass = 0;
+
+    /* Check the storage class given */
+    switch (CurTok.Tok) {
+
+        case TOK_EXTERN:
+            StorageClass = SC_EXTERN | SC_STATIC;
+            NextToken ();
+            break;
+
+        case TOK_STATIC:
+            StorageClass = SC_STATIC;
+            NextToken ();
+            break;
+
+        case TOK_REGISTER:
+            StorageClass = SC_REGISTER | SC_STATIC;
+            NextToken ();
+            break;
+
+        case TOK_AUTO:
+            StorageClass = SC_AUTO;
+            NextToken ();
+            break;
+
+        case TOK_TYPEDEF:
+            StorageClass = SC_TYPEDEF;
+            NextToken ();
+            break;
+
+        default:
+            break;
+    }
+
+    return StorageClass;
+}
+
+
+
+static int ParseStorageClass (DeclSpec* D)
+/* Parse storage class specifiers. Return true if a specifier is read even if
+** it was duplicated or disallowed. */
+{
+    /* Check the storage class given */
+    unsigned StorageClass = ParseOneStorageClass ();
+
+    if (StorageClass == 0) {
+        return 0;
+    }
+
+    while (StorageClass != 0) {
+        if (D->StorageClass == 0) {
+            D->StorageClass = StorageClass;
+        } else if (D->StorageClass == StorageClass) {
+            Warning ("Duplicate storage class specifier");
+        } else {
+            Error ("Conflicting storage class specifier");
+        }
+        StorageClass = ParseOneStorageClass ();
+    }
+
+    return 1;
+}
 
 
 
@@ -92,9 +160,9 @@ static void DuplicateQualifier (const char* Name)
 
 
 
-static TypeCode OptionalQualifiers (TypeCode Allowed)
+static TypeCode OptionalQualifiers (TypeCode Qualifiers, TypeCode Allowed)
 /* Read type qualifiers if we have any. Allowed specifies the allowed
-** qualifiers.
+** qualifiers. Return any read qualifiers even if they caused errors.
 */
 {
     /* We start without any qualifiers */
@@ -107,7 +175,7 @@ static TypeCode OptionalQualifiers (TypeCode Allowed)
 
             case TOK_CONST:
                 if (Allowed & T_QUAL_CONST) {
-                    if (Q & T_QUAL_CONST) {
+                    if (Qualifiers & T_QUAL_CONST) {
                         DuplicateQualifier ("const");
                     }
                     Q |= T_QUAL_CONST;
@@ -118,7 +186,7 @@ static TypeCode OptionalQualifiers (TypeCode Allowed)
 
             case TOK_VOLATILE:
                 if (Allowed & T_QUAL_VOLATILE) {
-                    if (Q & T_QUAL_VOLATILE) {
+                    if (Qualifiers & T_QUAL_VOLATILE) {
                         DuplicateQualifier ("volatile");
                     }
                     Q |= T_QUAL_VOLATILE;
@@ -129,7 +197,7 @@ static TypeCode OptionalQualifiers (TypeCode Allowed)
 
             case TOK_RESTRICT:
                 if (Allowed & T_QUAL_RESTRICT) {
-                    if (Q & T_QUAL_RESTRICT) {
+                    if (Qualifiers & T_QUAL_RESTRICT) {
                         DuplicateQualifier ("restrict");
                     }
                     Q |= T_QUAL_RESTRICT;
@@ -140,7 +208,7 @@ static TypeCode OptionalQualifiers (TypeCode Allowed)
 
             case TOK_NEAR:
                 if (Allowed & T_QUAL_NEAR) {
-                    if (Q & T_QUAL_NEAR) {
+                    if (Qualifiers & T_QUAL_NEAR) {
                         DuplicateQualifier ("near");
                     }
                     Q |= T_QUAL_NEAR;
@@ -151,7 +219,7 @@ static TypeCode OptionalQualifiers (TypeCode Allowed)
 
             case TOK_FAR:
                 if (Allowed & T_QUAL_FAR) {
-                    if (Q & T_QUAL_FAR) {
+                    if (Qualifiers & T_QUAL_FAR) {
                         DuplicateQualifier ("far");
                     }
                     Q |= T_QUAL_FAR;
@@ -162,7 +230,7 @@ static TypeCode OptionalQualifiers (TypeCode Allowed)
 
             case TOK_FASTCALL:
                 if (Allowed & T_QUAL_FASTCALL) {
-                    if (Q & T_QUAL_FASTCALL) {
+                    if (Qualifiers & T_QUAL_FASTCALL) {
                         DuplicateQualifier ("fastcall");
                     }
                     Q |= T_QUAL_FASTCALL;
@@ -173,7 +241,7 @@ static TypeCode OptionalQualifiers (TypeCode Allowed)
 
             case TOK_CDECL:
                 if (Allowed & T_QUAL_CDECL) {
-                    if (Q & T_QUAL_CDECL) {
+                    if (Qualifiers & T_QUAL_CDECL) {
                         DuplicateQualifier ("cdecl");
                     }
                     Q |= T_QUAL_CDECL;
@@ -187,13 +255,16 @@ static TypeCode OptionalQualifiers (TypeCode Allowed)
 
         }
 
+        /* Combine with newly read qualifiers */
+        Qualifiers |= Q;
+
         /* Skip the token */
         NextToken ();
     }
 
 Done:
     /* We cannot have more than one address size far qualifier */
-    switch (Q & T_QUAL_ADDRSIZE) {
+    switch (Qualifiers & T_QUAL_ADDRSIZE) {
 
         case T_QUAL_NONE:
         case T_QUAL_NEAR:
@@ -202,11 +273,11 @@ Done:
 
         default:
             Error ("Cannot specify more than one address size qualifier");
-            Q &= ~T_QUAL_ADDRSIZE;
+            Qualifiers &= ~T_QUAL_ADDRSIZE;
     }
 
     /* We cannot have more than one calling convention specifier */
-    switch (Q & T_QUAL_CCONV) {
+    switch (Qualifiers & T_QUAL_CCONV) {
 
         case T_QUAL_NONE:
         case T_QUAL_FASTCALL:
@@ -215,11 +286,37 @@ Done:
 
         default:
             Error ("Cannot specify more than one calling convention qualifier");
-            Q &= ~T_QUAL_CCONV;
+            Qualifiers &= ~T_QUAL_CCONV;
     }
 
-    /* Return the qualifiers read */
+    /* Return any qualifiers just read */
     return Q;
+}
+
+
+
+static void OptionalSpecifiers (DeclSpec* Spec, TypeCode* Qualifiers, typespec_t TSFlags)
+/* Read storage specifiers and/or type qualifiers if we have any. Storage class
+** specifiers require the corresponding typespec_t flag set to be allowed, and
+** only const and volatile type qualifiers are allowed under any circumstance.
+** Read storage class specifiers are output in *Spec and type qualifiers are
+** output in *Qualifiers with error checking.
+*/
+{
+    TypeCode Q = T_QUAL_NONE;
+    int Continue;
+
+    do {
+        /* There may be type qualifiers *before* any storage class specifiers */
+        Q = OptionalQualifiers (*Qualifiers, T_QUAL_CONST | T_QUAL_VOLATILE);
+        *Qualifiers |= Q;
+
+        /* Parse storage class specifiers anyway then check */
+        Continue = ParseStorageClass (Spec);
+        if (Continue && (TSFlags & (TS_STORAGE_CLASS_SPEC | TS_FUNCTION_SPEC)) == 0) {
+            Error ("Unexpected storage class specified");
+        }
+    } while (Continue || Q != T_QUAL_NONE);
 }
 
 
@@ -396,48 +493,6 @@ static void FixQualifiers (Type* DataType)
 
 
 
-static unsigned ParseOneStorageClass (void)
-/* Parse and return a storage class */
-{
-    unsigned StorageClass = 0;
-
-    /* Check the storage class given */
-    switch (CurTok.Tok) {
-
-        case TOK_EXTERN:
-            StorageClass = SC_EXTERN | SC_STATIC;
-            NextToken ();
-            break;
-
-        case TOK_STATIC:
-            StorageClass = SC_STATIC;
-            NextToken ();
-            break;
-
-        case TOK_REGISTER:
-            StorageClass = SC_REGISTER | SC_STATIC;
-            NextToken ();
-            break;
-
-        case TOK_AUTO:
-            StorageClass = SC_AUTO;
-            NextToken ();
-            break;
-
-        case TOK_TYPEDEF:
-            StorageClass = SC_TYPEDEF;
-            NextToken ();
-            break;
-
-        default:
-            break;
-    }
-
-    return StorageClass;
-}
-
-
-
 static void CheckArrayElementType (Type* DataType)
 /* Check if data type consists of arrays of incomplete element types */
 {
@@ -469,51 +524,24 @@ static void CheckArrayElementType (Type* DataType)
 
 
 
-static void ParseStorageClass (DeclSpec* D, unsigned DefStorage)
-/* Parse a storage class */
-{
-    /* Assume we're using an explicit storage class */
-    D->Flags &= ~DS_DEF_STORAGE;
-
-    /* Check the storage class given */
-    D->StorageClass = ParseOneStorageClass ();
-    if (D->StorageClass == 0) {
-        /* No storage class given, use default */
-        D->Flags |= DS_DEF_STORAGE;
-        D->StorageClass = DefStorage;
-    } else {
-        unsigned StorageClass = ParseOneStorageClass ();
-        while (StorageClass != 0) {
-            if (D->StorageClass == StorageClass) {
-                Warning ("Duplicate storage class specifier");
-            } else {
-                Error ("Conflicting storage class specifier");
-            }
-            StorageClass = ParseOneStorageClass ();
-        }
-    }
-}
-
-
-
 static SymEntry* ESUForwardDecl (const char* Name, unsigned Flags, unsigned* DSFlags)
 /* Handle an enum, struct or union forward decl */
 {
     /* Try to find an enum/struct/union with the given name. If there is none,
     ** insert a forward declaration into the current lexical level.
     */
-    SymEntry* Entry = FindTagSym (Name);
-    if (Entry == 0) {
+    SymEntry* TagEntry = FindTagSym (Name);
+    if (TagEntry == 0) {
         if ((Flags & SC_ESUTYPEMASK) != SC_ENUM) {
-            Entry = AddStructSym (Name, Flags, 0, 0, DSFlags);
+            TagEntry = AddStructSym (Name, Flags, 0, 0, DSFlags);
         } else {
-            Entry = AddEnumSym (Name, Flags, 0, 0, DSFlags);
+            TagEntry = AddEnumSym (Name, Flags, 0, 0, DSFlags);
         }
-    } else if ((Entry->Flags & SC_TYPEMASK) != (Flags & SC_ESUTYPEMASK)) {
+    } else if ((TagEntry->Flags & SC_TYPEMASK) != (Flags & SC_ESUTYPEMASK)) {
         /* Already defined, but not the same type class */
         Error ("Symbol '%s' is already different kind", Name);
     }
-    return Entry;
+    return TagEntry;
 }
 
 
@@ -611,20 +639,20 @@ static SymEntry* ParseEnumDecl (const char* Name, unsigned* DSFlags)
 
         } else {
 
-             /* Defaulted with the same signedness as the previous member's */
+            /* Defaulted with the same signedness as the previous member's */
             IsSigned = IsSignSigned (MemberType) &&
                        (unsigned long)EnumVal != GetIntegerTypeMax (MemberType);
 
-            /* Enumerate. Signed integer overflow is UB but unsigned integers
-            ** are guaranteed to wrap around.
-            */
-            EnumVal = (long)((unsigned long)EnumVal + 1UL);
+            /* Enumerate by adding one to the previous value */
+            EnumVal = (long)(((unsigned long)EnumVal + 1UL) & 0xFFFFFFFFUL);
 
             if (UnqualifiedType (MemberType->C) == T_ULONG && EnumVal == 0) {
-                /* Warn on 'unsigned long' overflow in enumeration */
-                Warning ("Enumerator '%s' overflows the range of '%s'",
-                         Ident,
-                         GetBasicTypeName (type_ulong));
+                /* Error since the new value cannot be represented in the
+                ** largest unsigned integer type supported by cc65 for enum.
+                */
+                Error ("Enumerator '%s' overflows the range of '%s'",
+                       Ident,
+                       GetBasicTypeName (type_ulong));
             }
 
             IsIncremented = 1;
@@ -657,11 +685,12 @@ static SymEntry* ParseEnumDecl (const char* Name, unsigned* DSFlags)
         /* Warn if the incremented value exceeds the range of the previous
         ** type.
         */
-        if (IsIncremented   &&
-            EnumVal >= 0    &&
+        if (PrevErrorCount == ErrorCount    &&
+            IsIncremented                   &&
+            (!IsSigned || EnumVal >= 0)     &&
             NewType->C != UnqualifiedType (MemberType->C)) {
             /* The possible overflow here can only be when EnumVal > 0 */
-            Warning ("Enumerator '%s' (value = %lu) is of type '%s'",
+            Warning ("Enumerator '%s' (value = %lu) implies type '%s'",
                      Ident,
                      (unsigned long)EnumVal,
                      GetBasicTypeName (NewType));
@@ -809,15 +838,13 @@ static unsigned AliasAnonStructFields (const Declaration* D, SymEntry* Anon)
 */
 {
     unsigned Count = 0;
+    SymEntry* Field;
     SymEntry* Alias;
-
-    /* Get the pointer to the symbol table entry of the anon struct */
-    SymEntry* Entry = GetESUSymEntry (D->Type);
 
     /* Get the symbol table containing the fields. If it is empty, there has
     ** been an error before, so bail out.
     */
-    SymTable* Tab = Entry->V.S.SymTab;
+    SymTable* Tab = GetESUTagSym (D->Type)->V.S.SymTab;
     if (Tab == 0) {
         /* Incomplete definition - has been flagged before */
         return 0;
@@ -826,24 +853,24 @@ static unsigned AliasAnonStructFields (const Declaration* D, SymEntry* Anon)
     /* Get a pointer to the list of symbols. Then walk the list adding copies
     ** of the embedded struct to the current level.
     */
-    Entry = Tab->SymHead;
-    while (Entry) {
+    Field = Tab->SymHead;
+    while (Field) {
 
         /* Enter an alias of this symbol */
-        if (!IsAnonName (Entry->Name)) {
-            Alias = AddLocalSym (Entry->Name, Entry->Type, SC_STRUCTFIELD|SC_ALIAS, 0);
-            Alias->V.A.Field = Entry;
-            Alias->V.A.Offs  = Anon->V.Offs + Entry->V.Offs;
+        if (!IsAnonName (Field->Name)) {
+            Alias = AddLocalSym (Field->Name, Field->Type, SC_STRUCTFIELD|SC_ALIAS, 0);
+            Alias->V.A.Field = Field;
+            Alias->V.A.Offs  = Anon->V.Offs + Field->V.Offs;
             ++Count;
         }
 
         /* Currently, there can not be any attributes, but if there will be
         ** some in the future, we want to know this.
         */
-        CHECK (Entry->Attr == 0);
+        CHECK (Field->Attr == 0);
 
         /* Next entry */
-        Entry = Entry->NextSym;
+        Field = Field->NextSym;
     }
 
     /* Return the count of created aliases */
@@ -861,7 +888,7 @@ static SymEntry* ParseUnionDecl (const char* Name, unsigned* DSFlags)
     int       FieldWidth;       /* Width in bits, -1 if not a bit-field */
     SymTable* FieldTab;
     SymEntry* UnionTagEntry;
-    SymEntry* Entry;
+    SymEntry* Field;
     unsigned  Flags = 0;
     unsigned  PrevErrorCount = ErrorCount;
 
@@ -883,14 +910,21 @@ static SymEntry* ParseUnionDecl (const char* Name, unsigned* DSFlags)
     EnterStructLevel ();
 
     /* Parse union fields */
-    UnionSize      = 0;
+    UnionSize = 0;
     while (CurTok.Tok != TOK_RCURLY) {
 
         /* Get the type of the entry */
         DeclSpec Spec;
         int SignednessSpecified = 0;
+
+        /* Check for a _Static_assert */
+        if (CurTok.Tok == TOK_STATIC_ASSERT) {
+            ParseStaticAssert ();
+            continue;
+        }
+
         InitDeclSpec (&Spec);
-        ParseTypeSpec (&Spec, -1, T_QUAL_NONE, &SignednessSpecified);
+        ParseTypeSpec (&Spec, TS_DEFAULT_TYPE_NONE, &SignednessSpecified);
 
         /* Read fields with this type */
         while (1) {
@@ -945,17 +979,17 @@ static SymEntry* ParseUnionDecl (const char* Name, unsigned* DSFlags)
                 AddBitField (Decl.Ident, Decl.Type, 0, 0, FieldWidth,
                              SignednessSpecified);
             } else if (Decl.Ident[0] != '\0') {
-                Entry = AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, 0);
+                Field = AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, 0);
                 if (IsAnonName (Decl.Ident)) {
-                    Entry->V.A.ANumber = UnionTagEntry->V.S.ACount++;
-                    AliasAnonStructFields (&Decl, Entry);
+                    Field->V.A.ANumber = UnionTagEntry->V.S.ACount++;
+                    AliasAnonStructFields (&Decl, Field);
                 }
 
                 /* Check if the field itself has a flexible array member */
                 if (IsClassStruct (Decl.Type)) {
-                    SymEntry* Sym = GetSymType (Decl.Type);
-                    if (Sym && SymHasFlexibleArrayMember (Sym)) {
-                        Entry->Flags |= SC_HAVEFAM;
+                    SymEntry* TagEntry = GetESUTagSym (Decl.Type);
+                    if (TagEntry && SymHasFlexibleArrayMember (TagEntry)) {
+                        Field->Flags |= SC_HAVEFAM;
                         Flags        |= SC_HAVEFAM;
                     }
                 }
@@ -1002,7 +1036,7 @@ static SymEntry* ParseStructDecl (const char* Name, unsigned* DSFlags)
     int       FieldWidth;       /* Width in bits, -1 if not a bit-field */
     SymTable* FieldTab;
     SymEntry* StructTagEntry;
-    SymEntry* Entry;
+    SymEntry* Field;
     unsigned  Flags = 0;
     unsigned  PrevErrorCount = ErrorCount;
 
@@ -1031,6 +1065,7 @@ static SymEntry* ParseStructDecl (const char* Name, unsigned* DSFlags)
 
         /* Get the type of the entry */
         DeclSpec Spec;
+        int SignednessSpecified = 0;
 
         /* Check for a _Static_assert */
         if (CurTok.Tok == TOK_STATIC_ASSERT) {
@@ -1038,9 +1073,8 @@ static SymEntry* ParseStructDecl (const char* Name, unsigned* DSFlags)
             continue;
         }
 
-        int SignednessSpecified = 0;
         InitDeclSpec (&Spec);
-        ParseTypeSpec (&Spec, -1, T_QUAL_NONE, &SignednessSpecified);
+        ParseTypeSpec (&Spec, TS_DEFAULT_TYPE_NONE, &SignednessSpecified);
 
         /* Read fields with this type */
         while (1) {
@@ -1147,17 +1181,17 @@ static SymEntry* ParseStructDecl (const char* Name, unsigned* DSFlags)
                 StructSize += BitOffs / CHAR_BITS;
                 BitOffs %= CHAR_BITS;
             } else if (Decl.Ident[0] != '\0') {
-                Entry = AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, StructSize);
+                Field = AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, StructSize);
                 if (IsAnonName (Decl.Ident)) {
-                    Entry->V.A.ANumber = StructTagEntry->V.S.ACount++;
-                    AliasAnonStructFields (&Decl, Entry);
+                    Field->V.A.ANumber = StructTagEntry->V.S.ACount++;
+                    AliasAnonStructFields (&Decl, Field);
                 }
 
                 /* Check if the field itself has a flexible array member */
                 if (IsClassStruct (Decl.Type)) {
-                    SymEntry* Sym = GetSymType (Decl.Type);
-                    if (Sym && SymHasFlexibleArrayMember (Sym)) {
-                        Entry->Flags |= SC_HAVEFAM;
+                    SymEntry* TagEntry = GetESUTagSym (Decl.Type);
+                    if (TagEntry && SymHasFlexibleArrayMember (TagEntry)) {
+                        Field->Flags |= SC_HAVEFAM;
                         Flags        |= SC_HAVEFAM;
                     }
                 }
@@ -1206,15 +1240,15 @@ NextMember: if (CurTok.Tok != TOK_COMMA) {
 
 
 
-static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
-                           int* SignednessSpecified)
+static void ParseTypeSpec (DeclSpec* D, typespec_t TSFlags, int* SignednessSpecified)
 /* Parse a type specifier.  Store whether one of "signed" or "unsigned" was
 ** specified, so bit-fields of unspecified signedness can be treated as
 ** unsigned; without special handling, it would be treated as signed.
 */
 {
     ident       Ident;
-    SymEntry*   Entry;
+    SymEntry*   TagEntry;
+    TypeCode    Qualifiers = T_QUAL_NONE;
 
     if (SignednessSpecified != NULL) {
         *SignednessSpecified = 0;
@@ -1223,8 +1257,8 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
     /* Assume we have an explicit type */
     D->Flags &= ~DS_DEF_TYPE;
 
-    /* Read type qualifiers if we have any */
-    Qualifiers |= OptionalQualifiers (T_QUAL_CONST | T_QUAL_VOLATILE);
+    /* Read storage specifiers and/or type qualifiers if we have any */
+    OptionalSpecifiers (D, &Qualifiers, TSFlags);
 
     /* Look at the data type */
     switch (CurTok.Tok) {
@@ -1384,10 +1418,10 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
             /* Remember we have an extra type decl */
             D->Flags |= DS_EXTRA_TYPE;
             /* Declare the union in the current scope */
-            Entry = ParseUnionDecl (Ident, &D->Flags);
+            TagEntry = ParseUnionDecl (Ident, &D->Flags);
             /* Encode the union entry into the type */
             D->Type[0].C = T_UNION;
-            SetESUSymEntry (D->Type, Entry);
+            SetESUTagSym (D->Type, TagEntry);
             D->Type[1].C = T_END;
             break;
 
@@ -1403,10 +1437,10 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
             /* Remember we have an extra type decl */
             D->Flags |= DS_EXTRA_TYPE;
             /* Declare the struct in the current scope */
-            Entry = ParseStructDecl (Ident, &D->Flags);
+            TagEntry = ParseStructDecl (Ident, &D->Flags);
             /* Encode the struct entry into the type */
             D->Type[0].C = T_STRUCT;
-            SetESUSymEntry (D->Type, Entry);
+            SetESUTagSym (D->Type, TagEntry);
             D->Type[1].C = T_END;
             break;
 
@@ -1426,10 +1460,10 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
             /* Remember we have an extra type decl */
             D->Flags |= DS_EXTRA_TYPE;
             /* Parse the enum decl */
-            Entry = ParseEnumDecl (Ident, &D->Flags);
+            TagEntry = ParseEnumDecl (Ident, &D->Flags);
             /* Encode the enum entry into the type */
             D->Type[0].C |= T_ENUM;
-            SetESUSymEntry (D->Type, Entry);
+            SetESUTagSym (D->Type, TagEntry);
             D->Type[1].C = T_END;
             /* The signedness of enums is determined by the type, so say this is specified to avoid
             ** the int -> unsigned int handling for plain int bit-fields in AddBitField.
@@ -1442,11 +1476,11 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
         case TOK_IDENT:
             /* This could be a label */
             if (NextTok.Tok != TOK_COLON || GetLexicalLevel () == LEX_LEVEL_STRUCT) {
-                Entry = FindSym (CurTok.Ident);
-                if (Entry && SymIsTypeDef (Entry)) {
+                TagEntry = FindSym (CurTok.Ident);
+                if (TagEntry && SymIsTypeDef (TagEntry)) {
                     /* It's a typedef */
                     NextToken ();
-                    TypeCopy (D->Type, Entry->Type);
+                    TypeCopy (D->Type, TagEntry->Type);
                     /* If it's a typedef, we should actually use whether the signedness was
                     ** specified on the typedef, but that information has been lost.  Treat the
                     ** signedness as being specified to work around the ICE in #1267.
@@ -1471,20 +1505,21 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers,
             /* FALL THROUGH */
 
         default:
-            if (Default < 0) {
+            if ((TSFlags & TS_MASK_DEFAULT_TYPE) != TS_DEFAULT_TYPE_INT) {
                 Error ("Type expected");
                 D->Type[0].C = T_INT;
                 D->Type[1].C = T_END;
             } else {
                 D->Flags |= DS_DEF_TYPE;
-                D->Type[0].C = (TypeCode) Default;
+                D->Type[0].C = T_INT;
                 D->Type[1].C = T_END;
             }
             break;
     }
 
-    /* There may also be qualifiers *after* the initial type */
-    D->Type[0].C |= (Qualifiers | OptionalQualifiers (T_QUAL_CONST | T_QUAL_VOLATILE));
+    /* There may also be specifiers/qualifiers *after* the initial type */
+    OptionalSpecifiers (D, &Qualifiers, TSFlags);
+    D->Type[0].C |= Qualifiers;
 }
 
 
@@ -1564,7 +1599,7 @@ static void ParseOldStyleParamList (FuncDesc* F)
         DeclSpec        Spec;
 
         /* Read the declaration specifier */
-        ParseDeclSpec (&Spec, SC_AUTO, T_INT);
+        ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_NONE, SC_AUTO);
 
         /* We accept only auto and register as storage class specifiers, but
         ** we ignore all this, since we use auto anyway.
@@ -1591,19 +1626,19 @@ static void ParseOldStyleParamList (FuncDesc* F)
             if (Decl.Ident[0] != '\0') {
 
                 /* We have a name given. Search for the symbol */
-                SymEntry* Sym = FindLocalSym (Decl.Ident);
-                if (Sym) {
+                SymEntry* Param = FindLocalSym (Decl.Ident);
+                if (Param) {
                     /* Check if we already changed the type for this
                     ** parameter
                     */
-                    if (Sym->Flags & SC_DEFTYPE) {
+                    if (Param->Flags & SC_DEFTYPE) {
                         /* Found it, change the default type to the one given */
-                        ChangeSymType (Sym, ParamTypeCvt (Decl.Type));
+                        SymChangeType (Param, ParamTypeCvt (Decl.Type));
                         /* Reset the "default type" flag */
-                        Sym->Flags &= ~SC_DEFTYPE;
+                        Param->Flags &= ~SC_DEFTYPE;
                     } else {
                         /* Type has already been changed */
-                        Error ("Redefinition for parameter '%s'", Sym->Name);
+                        Error ("Redefinition for parameter '%s'", Param->Name);
                     }
                 } else {
                     Error ("Unknown identifier: '%s'", Decl.Ident);
@@ -1633,7 +1668,7 @@ static void ParseAnsiParamList (FuncDesc* F)
 
         DeclSpec        Spec;
         Declaration     Decl;
-        SymEntry*       Sym;
+        SymEntry*       Param;
 
         /* Allow an ellipsis as last parameter */
         if (CurTok.Tok == TOK_ELLIPSIS) {
@@ -1643,7 +1678,7 @@ static void ParseAnsiParamList (FuncDesc* F)
         }
 
         /* Read the declaration specifier */
-        ParseDeclSpec (&Spec, SC_AUTO, T_INT);
+        ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_NONE, SC_AUTO);
 
         /* We accept only auto and register as storage class specifiers */
         if ((Spec.StorageClass & SC_AUTO) == SC_AUTO) {
@@ -1681,10 +1716,10 @@ static void ParseAnsiParamList (FuncDesc* F)
         ParseAttribute (&Decl);
 
         /* Create a symbol table entry */
-        Sym = AddLocalSym (Decl.Ident, ParamTypeCvt (Decl.Type), Decl.StorageClass, 0);
+        Param = AddLocalSym (Decl.Ident, ParamTypeCvt (Decl.Type), Decl.StorageClass, 0);
 
         /* Add attributes if we have any */
-        SymUseAttr (Sym, &Decl);
+        SymUseAttr (Param, &Decl);
 
         /* If the parameter is a struct or union, emit a warning */
         if (IsClassStruct (Decl.Type)) {
@@ -1791,7 +1826,7 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
     ** qualifier later will be transfered to the function itself. If it's a
     ** pointer to something else, it will be flagged as an error.
     */
-    TypeCode Qualifiers = OptionalQualifiers (T_QUAL_ADDRSIZE | T_QUAL_CCONV);
+    TypeCode Qualifiers = OptionalQualifiers (T_QUAL_NONE, T_QUAL_ADDRSIZE | T_QUAL_CCONV);
 
     /* Pointer to something */
     if (CurTok.Tok == TOK_STAR) {
@@ -1800,7 +1835,7 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
         NextToken ();
 
         /* Allow const, restrict, and volatile qualifiers */
-        Qualifiers |= OptionalQualifiers (T_QUAL_CVR);
+        Qualifiers |= OptionalQualifiers (Qualifiers, T_QUAL_CVR);
 
         /* Parse the type that the pointer points to */
         Declarator (Spec, D, Mode);
@@ -1945,7 +1980,7 @@ Type* ParseType (Type* T)
 
     /* Get a type without a default */
     InitDeclSpec (&Spec);
-    ParseTypeSpec (&Spec, -1, T_QUAL_NONE, NULL);
+    ParseTypeSpec (&Spec, TS_DEFAULT_TYPE_NONE, NULL);
 
     /* Parse additional declarators */
     ParseDecl (&Spec, &Decl, DM_NO_IDENT);
@@ -2070,22 +2105,23 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
 
 
 
-void ParseDeclSpec (DeclSpec* D, unsigned DefStorage, long DefType)
+void ParseDeclSpec (DeclSpec* D, typespec_t TSFlags, unsigned DefStorage)
 /* Parse a declaration specification */
 {
-    TypeCode Qualifiers;
-
     /* Initialize the DeclSpec struct */
     InitDeclSpec (D);
 
-    /* There may be qualifiers *before* the storage class specifier */
-    Qualifiers = OptionalQualifiers (T_QUAL_CONST | T_QUAL_VOLATILE);
+    /* Assume we're using an explicit storage class */
+    D->Flags &= ~DS_DEF_STORAGE;
 
-    /* Now get the storage class specifier for this declaration */
-    ParseStorageClass (D, DefStorage);
+    /* Parse the type specifiers */
+    ParseTypeSpec (D, TSFlags | TS_STORAGE_CLASS_SPEC | TS_FUNCTION_SPEC, NULL);
 
-    /* Parse the type specifiers passing any initial type qualifiers */
-    ParseTypeSpec (D, DefType, Qualifiers, NULL);
+    /* If no explicit storage class is given, use the default */
+    if (D->StorageClass == 0) {
+        D->Flags |= DS_DEF_STORAGE;
+        D->StorageClass = DefStorage;
+    }
 }
 
 

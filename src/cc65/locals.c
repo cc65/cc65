@@ -308,7 +308,7 @@ static void ParseAutoDecl (Declaration* Decl)
             ** We abuse the Collection somewhat by using it to store line
             ** numbers.
             */
-            CollReplace (&CurrentFunc->LocalsBlockStack, (void *)(size_t)GetCurrentLine (),
+            CollReplace (&CurrentFunc->LocalsBlockStack, (void *)(size_t)GetCurrentLineNum (),
                 CollCount (&CurrentFunc->LocalsBlockStack) - 1);
 
         } else {
@@ -486,8 +486,8 @@ static void ParseOneDecl (const DeclSpec* Spec)
         /* The default storage class could be wrong. Just clear them */
         Decl.StorageClass &= ~SC_STORAGEMASK;
 
-        /* This is always a declaration */
-        Decl.StorageClass |= SC_DECL;
+        /* This is always an extern declaration */
+        Decl.StorageClass |= SC_DECL | SC_EXTERN;
     }
 
     /* If we don't have a name, this was flagged as an error earlier.
@@ -545,7 +545,9 @@ static void ParseOneDecl (const DeclSpec* Spec)
 
         if ((Decl.StorageClass & SC_EXTERN) == SC_EXTERN ||
             (Decl.StorageClass & SC_FUNC) == SC_FUNC) {
-            /* Add the global symbol to the local symbol table */
+            /* Add the global symbol to both of the global and local symbol
+            ** tables.
+            */
             AddGlobalSym (Decl.Ident, Decl.Type, Decl.StorageClass);
         } else {
             /* Add the local symbol to the local symbol table */
@@ -587,7 +589,7 @@ void DeclareLocals (void)
             continue;
         }
 
-        ParseDeclSpec (&Spec, SC_AUTO, T_INT);
+        ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_INT, SC_AUTO);
         if ((Spec.Flags & DS_DEF_STORAGE) != 0 &&       /* No storage spec */
             (Spec.Flags & DS_DEF_TYPE) != 0    &&       /* No type given */
             GetQualifier (Spec.Type) == T_QUAL_NONE) {  /* No type qualifier */

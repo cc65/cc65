@@ -43,6 +43,7 @@
 
 /* common */
 #include "addrsize.h"
+#include "attrib.h"
 #include "check.h"
 #include "cpu.h"
 #include "shift.h"
@@ -4896,7 +4897,7 @@ void g_initstatic (unsigned InitLabel, unsigned VarLabel, unsigned Size)
 
 
 
-void g_testbitfield (unsigned Flags, unsigned BitOffs, unsigned BitWidth)
+void g_testbitfield (ATTR_UNUSED(unsigned Flags), unsigned BitOffs, unsigned BitWidth)
 /* Test bit-field in primary. */
 {
     /* Since the end is inclusive and cannot be negative here, we subtract 1 from the sum */

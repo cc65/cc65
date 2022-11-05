@@ -241,10 +241,20 @@ void SymName (char* S)
 
 
 
+int IsWideQuoted (char First, char Second)
+/* Return 1 if the two successive characters indicate a wide string literal or
+** a wide char constant, otherwise return 0.
+*/
+{
+    return First == 'L' && IsQuote(Second);
+}
+
+
+
 int IsSym (char* S)
 /* If a symbol follows, read it and return 1, otherwise return 0 */
 {
-    if (IsIdent (CurC)) {
+    if (IsIdent (CurC) && !IsWideQuoted (CurC, NextC)) {
         SymName (S);
         return 1;
     } else {
@@ -639,7 +649,7 @@ static void NumericConst (void)
             if (IVal <= 0xFFFF              &&
                 (Types & IT_UINT) == 0      &&
                 (WarnTypes & IT_LONG) != 0) {
-                Warning ("Integer constant is long");
+                Warning ("Integer constant implies signed long");
             }
         }
         if (IVal > 0xFFFF) {
@@ -656,7 +666,7 @@ static void NumericConst (void)
             ** a preceding unary op or when it is used in constant calculation.
             */
             if (WarnTypes & IT_ULONG) {
-                Warning ("Integer constant is unsigned long");
+                Warning ("Integer constant implies unsigned long");
             }
         }
 

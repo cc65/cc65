@@ -199,12 +199,15 @@ static unsigned typeadjust (ExprDesc* lhs, const ExprDesc* rhs, int NoPush)
 
 
 
-void LimitExprValue (ExprDesc* Expr)
+void LimitExprValue (ExprDesc* Expr, int WarnOverflow)
 /* Limit the constant value of the expression to the range of its type */
 {
     switch (GetUnderlyingTypeCode (Expr->Type)) {
         case T_INT:
         case T_SHORT:
+            if (WarnOverflow && ((Expr->IVal < -0x8000) || (Expr->IVal > 0x7FFF))) {
+                Warning ("Signed integer constant overflow");
+            }
             Expr->IVal = (int16_t)Expr->IVal;
             break;
 
@@ -224,6 +227,9 @@ void LimitExprValue (ExprDesc* Expr)
             break;
 
         case T_SCHAR:
+            if (WarnOverflow && ((Expr->IVal < -0x80) || (Expr->IVal > 0x7F))) {
+                Warning ("Signed character constant overflow");
+            }
             Expr->IVal = (int8_t)Expr->IVal;
             break;
 
@@ -286,11 +292,10 @@ static unsigned ExprCheckedSizeOf (const Type* T)
 /* Specially checked SizeOf() used in 'sizeof' expressions */
 {
     unsigned Size = SizeOf (T);
-    SymEntry* Sym;
 
     if (Size == 0) {
-        Sym = GetSymType (T);
-        if (Sym == 0 || !SymIsDef (Sym)) {
+        SymEntry* TagSym = GetESUTagSym (T);
+        if (TagSym == 0 || !SymIsDef (TagSym)) {
             Error ("Cannot apply 'sizeof' to incomplete type '%s'", GetFullTypeName (T));
         }
     }
@@ -1308,7 +1313,7 @@ static void Primary (ExprDesc* E)
                 /* Let's see if this is a C99-style declaration */
                 DeclSpec    Spec;
                 InitDeclSpec (&Spec);
-                ParseDeclSpec (&Spec, -1, T_QUAL_NONE);
+                ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_INT, SC_AUTO);
 
                 if (Spec.Type->C != T_END) {
 
@@ -1848,7 +1853,7 @@ static void UnaryOp (ExprDesc* Expr)
         }
 
         /* Limit the calculated value to the range of its type */
-        LimitExprValue (Expr);
+        LimitExprValue (Expr, 1);
 
     } else {
         unsigned Flags;
@@ -2260,7 +2265,7 @@ LOG(("hie_internal Expr->Type:%s Expr2->Type:%s\n",
             }
 
             /* Limit the calculated value to the range of its type */
-            LimitExprValue (Expr);
+            LimitExprValue (Expr, 1);
 
         } else if (lconst && (Gen->Flags & GEN_COMM) && !rconst) {
             /* If the LHS constant is an int that fits into an unsigned char, change the
@@ -2904,7 +2909,7 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                         Expr->Type = rhst;
                     } else {
                         /* Limit the calculated value to the range of its type */
-                        LimitExprValue (Expr);
+                        LimitExprValue (Expr, 1);
                     }
 
                     /* The result is always an rvalue */
@@ -3402,7 +3407,7 @@ static void parsesub (ExprDesc* Expr)
                     /* Just adjust the result type */
                     Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
                     /* And limit the calculated value to the range of it */
-                    LimitExprValue (Expr);
+                    LimitExprValue (Expr, 1);
                 }
                 /* The result is always an rvalue */
                 ED_MarkExprAsRVal (Expr);
@@ -4017,9 +4022,9 @@ static void hieQuest (ExprDesc* Expr)
 
             ED_FinalizeRValLoad (&Expr2);
         } else {
-            /* Constant boolean subexpression could still have deferred inc/
-            ** dec operations, so just flush their side-effects at this
-            ** sequence point.
+            /* Constant subexpression could still have deferred inc/dec
+            ** operations, so just flush their side-effects at this sequence
+            ** point.
             */
             DoDeferred (SQP_KEEP_NONE, &Expr2);
         }
@@ -4055,7 +4060,7 @@ static void hieQuest (ExprDesc* Expr)
         /* Parse third expression. Remember for later if it is a NULL pointer
         ** expression, then load it into the primary.
         */
-        ExprWithCheck (hie1, &Expr3);
+        ExprWithCheck (hieQuest, &Expr3);
         Expr3IsNULL = ED_IsNullPtr (&Expr3);
         if (!IsTypeVoid (Expr3.Type)    &&
             ED_YetToLoad (&Expr3)       &&
@@ -4068,9 +4073,9 @@ static void hieQuest (ExprDesc* Expr)
 
             ED_FinalizeRValLoad (&Expr3);
         } else {
-            /* Constant boolean subexpression could still have deferred inc/
-            ** dec operations, so just flush their side-effects at this
-            ** sequence point.
+            /* Constant subexpression could still have deferred inc/dec
+            ** operations, so just flush their side-effects at this sequence
+            ** point.
             */
             DoDeferred (SQP_KEEP_NONE, &Expr3);
         }
@@ -4184,6 +4189,8 @@ static void hieQuest (ExprDesc* Expr)
             } else {
                 *Expr = Expr3;
             }
+            /* The result expression is always an rvalue */
+            ED_MarkExprAsRVal (Expr);
         }
 
         /* Setup the target expression */

@@ -592,9 +592,19 @@ static void RangeSection (void)
             case INFOTOK_END:
                 AddAttr ("END", &Attributes, tEnd);
                 InfoNextTok ();
-                InfoAssureInt ();
-                InfoRangeCheck (0x0000, 0xFFFF);
-                End = InfoIVal;
+
+                if (InfoTok == INFOTOK_OFFSET_INTCON) {
+                    InfoRangeCheck (0x0000, 0xFFFF);
+                    if (!(Attributes & tStart))
+                        InfoError ("When using End with an offset, Start must be specified before");
+                    End = Start + InfoIVal - 1;
+                    if (End > 0xFFFF)
+                        InfoError ("Range error");
+                } else {
+                    InfoAssureInt ();
+                    InfoRangeCheck (0x0000, 0xFFFF);
+                    End = InfoIVal;
+                }
                 InfoNextTok ();
                 break;
 

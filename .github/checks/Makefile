@@ -1,4 +1,17 @@
 
+ifneq ($(shell echo),)
+  CMD_EXE = 1
+endif
+
+ifdef CMD_EXE
+
+.PHONY: checkstyle
+
+checkstyle:
+	$(info INFO: style checks require bash.)
+
+else
+
 .PHONY: checkstyle lineendings tabs lastline spaces noexec
 
 checkstyle: lineendings tabs lastline spaces noexec
@@ -17,3 +30,5 @@ spaces: spaces.sh
 
 noexec: noexec.sh
 	@./noexec.sh
+
+endif

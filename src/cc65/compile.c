@@ -146,7 +146,7 @@ static void Parse (void)
         comma = 0;
         while (1) {
 
-            Declaration Decl;
+            Declarator Decl;
 
             /* Read the next declaration */
             ParseDecl (&Spec, &Decl, DM_NEED_IDENT);

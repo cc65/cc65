@@ -1307,7 +1307,7 @@ static void Primary (ExprDesc* E)
 
                     Error ("Mixed declarations and code are not supported in cc65");
                     while (CurTok.Tok != TOK_SEMI) {
-                        Declaration Decl;
+                        Declarator Decl;
 
                         /* Parse one declaration */
                         ParseDecl (&Spec, &Decl, DM_ACCEPT_IDENT);

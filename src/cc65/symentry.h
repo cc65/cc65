@@ -298,8 +298,8 @@ INLINE int SymHasAttr (const SymEntry* Sym, DeclAttrType A)
 #  define SymHasAttr(Sym, A)       (SymGetAttr (Sym, A) != 0)
 #endif
 
-void SymUseAttr (SymEntry* Sym, struct Declaration* D);
-/* Use the attributes from the declaration for this symbol */
+void SymUseAttr (SymEntry* Sym, struct Declarator* D);
+/* Use the attributes from the declarator for this symbol */
 
 void SymSetAsmName (SymEntry* Sym);
 /* Set the assembler name for an external symbol from the name of the symbol.

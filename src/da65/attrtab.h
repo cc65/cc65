@@ -71,6 +71,9 @@ typedef enum attr_t {
     atSegmentEnd   = 0x0200,    /* Segment end */
     atSegmentStart = 0x0400,    /* Segment start */
 
+    /* Table unit separator */
+    atTableUnit    = 0x0800,
+
     /* 65816 addressing mode */
     atMem8         = 0x1000,    /* M flag enabled, 8-bit */
     atMem16        = 0x2000,    /* M flag disabled, 16-bit */
@@ -79,7 +82,7 @@ typedef enum attr_t {
 
     atStyleMask    = 0x000F,    /* Output style */
     atLabelMask    = 0x00F0,    /* Label information */
-    atSegmentMask  = 0x0F00,    /* Segment information */
+    atSegmentMask  = 0x0700,    /* Segment information */
     at65816Mask    = 0xF000,    /* 65816 information */
 
 } attr_t;

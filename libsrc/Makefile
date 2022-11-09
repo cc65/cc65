@@ -140,6 +140,7 @@ GEOSDIRS = common      \
            conio       \
            disk        \
            dlgbox      \
+           float/softfloat       \
            file        \
            graph       \
            memory      \
@@ -178,6 +179,7 @@ SRCDIRS += common   \
            conio    \
            dbg      \
            em       \
+           float/softfloat    \
            joystick \
            mouse    \
            runtime  \

@@ -15,7 +15,8 @@ LINK = ../../../bin/cl65 $(TARGET) -o $@
 # Probably okay below here.
 #------------------------------------------------------------------------------
 
-all: softfloat$(OBJ) timesoftfloat$(EXE)
+all: softfloat$(OBJ)
+	echo softfloat ok!
 
 milieu.h: $(PROCESSOR_H)
 	touch milieu.h
@@ -24,11 +25,11 @@ softfloat$(OBJ): milieu.h softfloat.h softfloat-specialize $(SOFTFLOAT_MACROS) s
 	$(COMPILE_C) softfloat.c
 
 timesoftfloat$(OBJ): milieu.h softfloat.h timesoftfloat.c
-	$(COMPILE_ONLY) timesoftfloat.c
-	$(COMPILE_C) timesoftfloat.c
+#	$(COMPILE_ONLY) timesoftfloat.c
+#	$(COMPILE_C) timesoftfloat.c
 
 timesoftfloat$(EXE): softfloat$(OBJ) timesoftfloat$(OBJ)
-	$(LINK) softfloat$(OBJ) timesoftfloat$(OBJ)
+#	$(LINK) softfloat$(OBJ) timesoftfloat$(OBJ)
 
 clean:
 	$(RM) softfloat$(OBJ) timesoftfloat$(EXE) timesoftfloat$(OBJ) timesoftfloat$(OBJ).s

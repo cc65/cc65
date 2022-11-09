@@ -212,10 +212,10 @@ runsoft-quick: quick.soft.bin
 	
 runsoft: float-minimal.soft.bin float-basic.soft.bin float-cmp.soft.bin float-conv.soft.bin float-misc.soft.bin
 	$(SIM65) float-minimal.soft.bin
-	$(SIM65) float-misc.soft.bin
-	-$(SIM65) float-conv.soft.bin
-	-$(SIM65) float-cmp.soft.bin
-	-$(SIM65) float-basic.soft.bin
+#	$(SIM65) float-misc.soft.bin
+#	-$(SIM65) float-conv.soft.bin
+#	-$(SIM65) float-cmp.soft.bin
+#	-$(SIM65) float-basic.soft.bin
 
 ###############################################################################
 # CBM kernal floats

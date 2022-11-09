@@ -155,6 +155,11 @@ $(WORKDIR)/goto.$1.$2.prg: goto.c $(ISEQUAL) | $(WORKDIR)
 	$(CC65) -t sim$2 -$1 -o $$@ $$< 2>$(WORKDIR)/goto.$1.$2.out
 	$(ISEQUAL) $(WORKDIR)/goto.$1.$2.out goto.ref
 
+$(WORKDIR)/bug1889-missing-identifier.$1.$2.prg: bug1889-missing-identifier.c $(ISEQUAL) | $(WORKDIR)
+	$(if $(QUIET),echo misc/bug1889-missing-identifier.$1.$2.error.prg)
+	-$(CC65) -t sim$2 -$1 -o $$(@:.error.prg=.s) $$< 2> $(WORKDIR)/bug1889-missing-identifier.$1.$2.out
+	$(ISEQUAL) $(WORKDIR)/bug1889-missing-identifier.$1.$2.out bug1889-missing-identifier.ref
+
 # the rest are tests that fail currently for one reason or another
 $(WORKDIR)/sitest.$1.$2.prg: sitest.c | $(WORKDIR)
 	@echo "FIXME: " $$@ "currently does not compile."

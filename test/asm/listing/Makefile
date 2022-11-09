@@ -19,7 +19,7 @@ else
   RMDIR = $(RM) -r $1
   ERRDIR = 2>&1
   TRUE = true
-  CAT = cat
+  CAT = cat $1
 endif
 
 ifdef QUIET

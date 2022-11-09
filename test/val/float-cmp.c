@@ -79,23 +79,23 @@ void constvar(void)
 //     expect("1.5f == 1.6f is", 0, (1.5f == fp1));
 //     expect("1.6f == 1.5f is", 0, (1.6f == fp2));
 //     expect("1.6f == 1.6f is", 1, (1.6f == fp1));
-// 
+//
 //     expect("1.5f != 1.6f is", 1, (1.5f != fp1));
 //     expect("1.6f != 1.5f is", 1, (1.6f != fp2));
 //     expect("1.6f != 1.6f is", 0, (1.6f != fp1));
-// 
+//
 //     expect("1.5f < 1.6f is", 1, (1.5f < fp1));
 //     expect("1.6f < 1.5f is", 0, (1.6f < fp2));
 //     expect("1.6f < 1.6f is", 0, (1.6f < fp1));
-// 
+//
 //     expect("1.5f > 1.6f is", 0, (1.5f > fp1));
 //     expect("1.6f > 1.5f is", 1, (1.6f > fp2));
 //     expect("1.6f > 1.6f is", 0, (1.6f > fp1));
-// 
+//
 //     expect("1.5f <= 1.6f is", 1, (1.5f <= fp1));
 //     expect("1.6f <= 1.5f is", 0, (1.6f <= fp2));
 //     expect("1.6f <= 1.6f is", 1, (1.6f <= fp1));
-// 
+//
 //     expect("1.5f >= 1.6f is", 0, (1.5f >= fp1));
 //     expect("1.6f >= 1.5f is", 1, (1.6f >= fp2));
 //     expect("1.6f >= 1.6f is", 1, (1.6f >= fp1));

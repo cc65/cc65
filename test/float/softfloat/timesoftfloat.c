@@ -1038,7 +1038,7 @@ main( int argc, char **argv )
         else {
             for ( functionCode = 1;
                   functionCode < NUM_FUNCTIONS;
-                  ++functionCode 
+                  ++functionCode
                 ) {
                 if ( strcmp( argPtr, functions[ functionCode ].name ) == 0 ) {
                     break;

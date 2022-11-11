@@ -602,7 +602,7 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
 
             /* Standard member. We should never have stuff from a
             ** bit-field left because an anonymous member was added
-            ** for padding by ParseStructDecl.
+            ** for padding by ParseStructSpec.
             */
             CHECK (SI.ValBits == 0);
 

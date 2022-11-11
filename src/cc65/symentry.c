@@ -230,8 +230,8 @@ const DeclAttr* SymGetAttr (const SymEntry* Sym, DeclAttrType AttrType)
 
 
 
-void SymUseAttr (SymEntry* Sym, struct Declaration* D)
-/* Use the attributes from the declaration for this symbol */
+void SymUseAttr (SymEntry* Sym, struct Declarator* D)
+/* Use the attributes from the declarator for this symbol */
 {
     /* We cannot specify attributes twice */
     if ((Sym->Flags & SC_HAVEATTR) != 0) {

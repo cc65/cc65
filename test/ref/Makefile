@@ -52,7 +52,8 @@ CUSTOMSOURCES = \
 # list of sources that produce a compiler error. a .cref files containing the
 # exact error output is required
 ERRORSOURCES = \
-	custom-reference-error.c
+	custom-reference-error.c \
+	bug1889-missing-identifier.c
 
 SOURCES := $(filter-out $(CUSTOMSOURCES) $(ERRORSOURCES),$(wildcard *.c))
 

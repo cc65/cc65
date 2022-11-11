@@ -38,6 +38,7 @@
 /* cc65 */
 #include "codegen.h"
 #include "error.h"
+#include "expr.h"
 #include "exprdesc.h"
 #include "global.h"
 #include "loadexpr.h"

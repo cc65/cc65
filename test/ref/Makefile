@@ -11,14 +11,14 @@ ifdef CMD_EXE
   NULLDEV = nul:
   MKDIR = mkdir $(subst /,\,$1)
   RMDIR = -rmdir /s /q $(subst /,\,$1)
-  CP=copy
+  COPY = copy $(subst /,\,$1) $(subst /,\,$2)
 else
   S = /
   EXE =
   NULLDEV = /dev/null
   MKDIR = mkdir -p $1
   RMDIR = $(RM) -r $1
-  CP=cp
+  COPY = cp $1 $2
 endif
 
 ifdef QUIET
@@ -78,7 +78,7 @@ $(ISEQUAL): ../isequal.c | $(WORKDIR)
 
 $(WORKDIR)/%.cref: %.cref | $(WORKDIR)
 	$(if $(QUIET),echo ref/$*.cref)
-	$(CP) $*.cref $@
+	$(call COPY,$*.cref,$@)
 
 $(WORKDIR)/%.ref: %.c | $(WORKDIR)
 	$(if $(QUIET),echo ref/$*.host)

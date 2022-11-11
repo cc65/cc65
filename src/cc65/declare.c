@@ -1453,9 +1453,8 @@ static void ParseTypeSpec (DeclSpec* D, typespec_t TSFlags, int* SignednessSpeci
             } else {
                 if (CurTok.Tok != TOK_LCURLY) {
                     Error ("Identifier expected");
-                } else {
-                    AnonName (Ident, "enum");
                 }
+                AnonName (Ident, "enum");
             }
             /* Remember we have an extra type decl */
             D->Flags |= DS_EXTRA_TYPE;
@@ -1867,7 +1866,13 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
             NextToken ();
         } else {
             if (Mode == DM_NEED_IDENT) {
+                /* Some fix point tokens that are used for error recovery */
+                static const token_t TokenList[] = { TOK_COMMA, TOK_SEMI };
+
                 Error ("Identifier expected");
+
+                /* Try some smart error recovery */
+                SkipTokens (TokenList, sizeof(TokenList) / sizeof(TokenList[0]));
             }
             D->Ident[0] = '\0';
         }

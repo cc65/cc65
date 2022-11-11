@@ -103,8 +103,8 @@ static void AllocStorage (unsigned DataLabel, void (*UseSeg) (), unsigned Size)
 
 
 
-static void ParseRegisterDecl (Declaration* Decl, int Reg)
-/* Parse the declaration of a register variable. Reg is the offset of the
+static void ParseRegisterDecl (Declarator* Decl, int Reg)
+/* Parse the declarator of a register variable. Reg is the offset of the
 ** variable in the register bank.
 */
 {
@@ -192,8 +192,8 @@ static void ParseRegisterDecl (Declaration* Decl, int Reg)
 
 
 
-static void ParseAutoDecl (Declaration* Decl)
-/* Parse the declaration of an auto variable. */
+static void ParseAutoDecl (Declarator* Decl)
+/* Parse the declarator of an auto variable. */
 {
     unsigned  Flags;
     SymEntry* Sym;
@@ -403,8 +403,8 @@ static void ParseAutoDecl (Declaration* Decl)
 
 
 
-static void ParseStaticDecl (Declaration* Decl)
-/* Parse the declaration of a static variable. */
+static void ParseStaticDecl (Declarator* Decl)
+/* Parse the declarator of a static variable. */
 {
     unsigned Size;
 
@@ -462,12 +462,12 @@ static void ParseStaticDecl (Declaration* Decl)
 
 
 static void ParseOneDecl (const DeclSpec* Spec)
-/* Parse one variable declaration */
+/* Parse one variable declarator. */
 {
-    Declaration Decl;           /* Declaration data structure */
+    Declarator Decl;            /* Declarator data structure */
 
 
-    /* Read the declaration */
+    /* Read the declarator */
     ParseDecl (Spec, &Decl, DM_NEED_IDENT);
 
     /* Check if there are any non-extern storage classes set for function

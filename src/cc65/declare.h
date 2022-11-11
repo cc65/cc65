@@ -86,8 +86,8 @@ struct DeclSpec {
 };
 
 /* Result of ParseDecl */
-typedef struct Declaration Declaration;
-struct Declaration {
+typedef struct Declarator Declarator;
+struct Declarator {
     unsigned    StorageClass;           /* A set of SC_xxx flags */
     Type        Type[MAXTYPELEN];       /* The type */
     ident       Ident;                  /* The identifier, if any*/
@@ -118,8 +118,8 @@ void InitDeclSpec (DeclSpec* D);
 Type* ParseType (Type* Type);
 /* Parse a complete type specification */
 
-void ParseDecl (const DeclSpec* Spec, Declaration* D, declmode_t Mode);
-/* Parse a variable, type or function declaration */
+void ParseDecl (const DeclSpec* Spec, Declarator* D, declmode_t Mode);
+/* Parse a variable, type or function declarator */
 
 void ParseDeclSpec (DeclSpec* D, typespec_t TSFlags, unsigned DefStorage);
 /* Parse a declaration specification */

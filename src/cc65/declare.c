@@ -356,8 +356,8 @@ void InitDeclSpec (DeclSpec* D)
 
 
 
-static void InitDeclaration (Declaration* D)
-/* Initialize the Declaration struct for use */
+static void InitDeclarator (Declarator* D)
+/* Initialize the Declarator struct for use */
 {
     D->Ident[0]   = '\0';
     D->Type[0].C  = T_END;
@@ -367,7 +367,7 @@ static void InitDeclaration (Declaration* D)
 
 
 
-static void NeedTypeSpace (Declaration* D, unsigned Count)
+static void NeedTypeSpace (Declarator* D, unsigned Count)
 /* Check if there is enough space for Count type specifiers within D */
 {
     if (D->Index + Count >= MAXTYPELEN) {
@@ -381,8 +381,8 @@ static void NeedTypeSpace (Declaration* D, unsigned Count)
 
 
 
-static void AddTypeToDeclaration (Declaration* D, TypeCode T)
-/* Add a type specifier to the type of a declaration */
+static void AddTypeCodeToDeclarator (Declarator* D, TypeCode T)
+/* Add a type specifier to the type of a declarator */
 {
     NeedTypeSpace (D, 1);
     D->Type[D->Index++].C = T;
@@ -524,8 +524,8 @@ static void CheckArrayElementType (Type* DataType)
 
 
 
-static SymEntry* ESUForwardDecl (const char* Name, unsigned Flags, unsigned* DSFlags)
-/* Handle an enum, struct or union forward decl */
+static SymEntry* ForwardESU (const char* Name, unsigned Flags, unsigned* DSFlags)
+/* Handle an enum, struct or union forward declaration */
 {
     /* Try to find an enum/struct/union with the given name. If there is none,
     ** insert a forward declaration into the current lexical level.
@@ -584,8 +584,8 @@ static const Type* GetEnumeratorType (long Min, unsigned long Max, int Signed)
 
 
 
-static SymEntry* ParseEnumDecl (const char* Name, unsigned* DSFlags)
-/* Process an enum declaration */
+static SymEntry* ParseEnumSpec (const char* Name, unsigned* DSFlags)
+/* Process an enum specifier */
 {
     SymTable*       FieldTab;
     long            EnumVal;
@@ -602,7 +602,7 @@ static SymEntry* ParseEnumDecl (const char* Name, unsigned* DSFlags)
 
     if (CurTok.Tok != TOK_LCURLY) {
         /* Just a forward definition */
-        return ESUForwardDecl (Name, SC_ENUM, DSFlags);
+        return ForwardESU (Name, SC_ENUM, DSFlags);
     }
 
     /* Add a forward declaration for the enum tag in the current lexical level */
@@ -754,7 +754,7 @@ static SymEntry* ParseEnumDecl (const char* Name, unsigned* DSFlags)
 
 
 
-static int ParseFieldWidth (Declaration* D)
+static int ParseFieldWidth (Declarator* D)
 /* Parse an optional field width. Returns -1 if no field width is specified,
 ** otherwise the width of the field.
 */
@@ -832,7 +832,7 @@ static unsigned PadWithBitField (unsigned StructSize, unsigned BitOffs)
 
 
 
-static unsigned AliasAnonStructFields (const Declaration* D, SymEntry* Anon)
+static unsigned AliasAnonStructFields (const Declarator* D, SymEntry* Anon)
 /* Create alias fields from an anon union/struct in the current lexical level.
 ** The function returns the count of created aliases.
 */
@@ -879,8 +879,8 @@ static unsigned AliasAnonStructFields (const Declaration* D, SymEntry* Anon)
 
 
 
-static SymEntry* ParseUnionDecl (const char* Name, unsigned* DSFlags)
-/* Parse a union declaration. */
+static SymEntry* ParseUnionSpec (const char* Name, unsigned* DSFlags)
+/* Parse a union specifier */
 {
 
     unsigned  UnionSize;
@@ -895,7 +895,7 @@ static SymEntry* ParseUnionDecl (const char* Name, unsigned* DSFlags)
 
     if (CurTok.Tok != TOK_LCURLY) {
         /* Just a forward declaration */
-        return ESUForwardDecl (Name, SC_UNION, DSFlags);
+        return ForwardESU (Name, SC_UNION, DSFlags);
     }
 
     /* Add a forward declaration for the union tag in the current lexical level */
@@ -929,7 +929,7 @@ static SymEntry* ParseUnionDecl (const char* Name, unsigned* DSFlags)
         /* Read fields with this type */
         while (1) {
 
-            Declaration Decl;
+            Declarator Decl;
 
             /* Get type and name of the struct field */
             ParseDecl (&Spec, &Decl, DM_ACCEPT_IDENT);
@@ -1026,8 +1026,8 @@ NextMember: if (CurTok.Tok != TOK_COMMA) {
 
 
 
-static SymEntry* ParseStructDecl (const char* Name, unsigned* DSFlags)
-/* Parse a struct declaration. */
+static SymEntry* ParseStructSpec (const char* Name, unsigned* DSFlags)
+/* Parse a struct specifier */
 {
 
     unsigned  StructSize;
@@ -1043,7 +1043,7 @@ static SymEntry* ParseStructDecl (const char* Name, unsigned* DSFlags)
 
     if (CurTok.Tok != TOK_LCURLY) {
         /* Just a forward declaration */
-        return ESUForwardDecl (Name, SC_STRUCT, DSFlags);
+        return ForwardESU (Name, SC_STRUCT, DSFlags);
     }
 
     /* Add a forward declaration for the struct tag in the current lexical level */
@@ -1079,7 +1079,7 @@ static SymEntry* ParseStructDecl (const char* Name, unsigned* DSFlags)
         /* Read fields with this type */
         while (1) {
 
-            Declaration Decl;
+            Declarator Decl;
 
             /* If we had a flexible array member before, no other fields can
             ** follow.
@@ -1418,7 +1418,7 @@ static void ParseTypeSpec (DeclSpec* D, typespec_t TSFlags, int* SignednessSpeci
             /* Remember we have an extra type decl */
             D->Flags |= DS_EXTRA_TYPE;
             /* Declare the union in the current scope */
-            TagEntry = ParseUnionDecl (Ident, &D->Flags);
+            TagEntry = ParseUnionSpec (Ident, &D->Flags);
             /* Encode the union entry into the type */
             D->Type[0].C = T_UNION;
             SetESUTagSym (D->Type, TagEntry);
@@ -1437,7 +1437,7 @@ static void ParseTypeSpec (DeclSpec* D, typespec_t TSFlags, int* SignednessSpeci
             /* Remember we have an extra type decl */
             D->Flags |= DS_EXTRA_TYPE;
             /* Declare the struct in the current scope */
-            TagEntry = ParseStructDecl (Ident, &D->Flags);
+            TagEntry = ParseStructSpec (Ident, &D->Flags);
             /* Encode the struct entry into the type */
             D->Type[0].C = T_STRUCT;
             SetESUTagSym (D->Type, TagEntry);
@@ -1453,14 +1453,13 @@ static void ParseTypeSpec (DeclSpec* D, typespec_t TSFlags, int* SignednessSpeci
             } else {
                 if (CurTok.Tok != TOK_LCURLY) {
                     Error ("Identifier expected");
-                } else {
-                    AnonName (Ident, "enum");
                 }
+                AnonName (Ident, "enum");
             }
             /* Remember we have an extra type decl */
             D->Flags |= DS_EXTRA_TYPE;
             /* Parse the enum decl */
-            TagEntry = ParseEnumDecl (Ident, &D->Flags);
+            TagEntry = ParseEnumSpec (Ident, &D->Flags);
             /* Encode the enum entry into the type */
             D->Type[0].C |= T_ENUM;
             SetESUTagSym (D->Type, TagEntry);
@@ -1612,7 +1611,7 @@ static void ParseOldStyleParamList (FuncDesc* F)
         /* Parse a comma separated variable list */
         while (1) {
 
-            Declaration         Decl;
+            Declarator         Decl;
 
             /* Read the parameter */
             ParseDecl (&Spec, &Decl, DM_NEED_IDENT);
@@ -1667,7 +1666,7 @@ static void ParseAnsiParamList (FuncDesc* F)
     while (CurTok.Tok != TOK_RPAREN) {
 
         DeclSpec        Spec;
-        Declaration     Decl;
+        Declarator     Decl;
         SymEntry*       Param;
 
         /* Allow an ellipsis as last parameter */
@@ -1748,7 +1747,7 @@ static void ParseAnsiParamList (FuncDesc* F)
 
 
 static FuncDesc* ParseFuncDecl (void)
-/* Parse the argument list of a function. */
+/* Parse the argument list of a function with the enclosing parentheses */
 {
     SymEntry* Sym;
     SymEntry* WrappedCall;
@@ -1759,6 +1758,9 @@ static FuncDesc* ParseFuncDecl (void)
 
     /* Enter a new lexical level */
     EnterFunctionLevel ();
+
+    /* Skip the opening paren */
+    NextToken ();
 
     /* Check for several special parameter lists */
     if (CurTok.Tok == TOK_RPAREN) {
@@ -1817,14 +1819,14 @@ static FuncDesc* ParseFuncDecl (void)
 
 
 
-static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
-/* Recursively process declarators. Build a type array in reverse order. */
+static void DirectDecl (const DeclSpec* Spec, Declarator* D, declmode_t Mode)
+/* Recursively process direct declarators. Build a type array in reverse order. */
 {
-    /* Read optional function or pointer qualifiers. They modify the
-    ** identifier or token to the right. For convenience, we allow a calling
-    ** convention also for pointers here. If it's a pointer-to-function, the
-    ** qualifier later will be transfered to the function itself. If it's a
-    ** pointer to something else, it will be flagged as an error.
+    /* Read optional function or pointer qualifiers that modify the identifier
+    ** or token to the right. For convenience, we allow a calling convention
+    ** also for pointers here. If it's a pointer-to-function, the qualifier
+    ** later will be transfered to the function itself. If it's a pointer to
+    ** something else, it will be flagged as an error.
     */
     TypeCode Qualifiers = OptionalQualifiers (T_QUAL_NONE, T_QUAL_ADDRSIZE | T_QUAL_CCONV);
 
@@ -1838,16 +1840,16 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
         Qualifiers |= OptionalQualifiers (Qualifiers, T_QUAL_CVR);
 
         /* Parse the type that the pointer points to */
-        Declarator (Spec, D, Mode);
+        DirectDecl (Spec, D, Mode);
 
         /* Add the type */
-        AddTypeToDeclaration (D, T_PTR | Qualifiers);
+        AddTypeCodeToDeclarator (D, T_PTR | Qualifiers);
         return;
     }
 
     if (CurTok.Tok == TOK_LPAREN) {
         NextToken ();
-        Declarator (Spec, D, Mode);
+        DirectDecl (Spec, D, Mode);
         ConsumeRParen ();
     } else {
         /* Things depend on Mode now:
@@ -1867,7 +1869,13 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
             NextToken ();
         } else {
             if (Mode == DM_NEED_IDENT) {
+                /* Some fix point tokens that are used for error recovery */
+                static const token_t TokenList[] = { TOK_COMMA, TOK_SEMI };
+
                 Error ("Identifier expected");
+
+                /* Try some smart error recovery */
+                SkipTokens (TokenList, sizeof(TokenList) / sizeof(TokenList[0]));
             }
             D->Ident[0] = '\0';
         }
@@ -1876,14 +1884,11 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
     while (CurTok.Tok == TOK_LBRACK || CurTok.Tok == TOK_LPAREN) {
         if (CurTok.Tok == TOK_LPAREN) {
 
-            /* Function declaration */
+            /* Function declarator */
             FuncDesc* F;
             SymEntry* PrevEntry;
 
-            /* Skip the opening paren */
-            NextToken ();
-
-            /* Parse the function declaration */
+            /* Parse the function declarator */
             F = ParseFuncDecl ();
 
             /* We cannot specify fastcall for variadic functions */
@@ -1912,7 +1917,7 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
             Qualifiers = T_QUAL_NONE;
 
         } else {
-            /* Array declaration. */
+            /* Array declarator */
             long Size = UNSPECIFIED;
 
             /* We cannot have any qualifiers for an array */
@@ -1976,7 +1981,7 @@ Type* ParseType (Type* T)
 /* Parse a complete type specification */
 {
     DeclSpec Spec;
-    Declaration Decl;
+    Declarator Decl;
 
     /* Get a type without a default */
     InitDeclSpec (&Spec);
@@ -1994,19 +1999,19 @@ Type* ParseType (Type* T)
 
 
 
-void ParseDecl (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
-/* Parse a variable, type or function declaration */
+void ParseDecl (const DeclSpec* Spec, Declarator* D, declmode_t Mode)
+/* Parse a variable, type or function declarator */
 {
     /* Used to check if we have any errors during parsing this */
     unsigned PrevErrorCount = ErrorCount;
 
-    /* Initialize the Declaration struct */
-    InitDeclaration (D);
+    /* Initialize the Declarator struct */
+    InitDeclarator (D);
 
-    /* Get additional declarators and the identifier */
-    Declarator (Spec, D, Mode);
+    /* Get additional derivation of the declarator and the identifier */
+    DirectDecl (Spec, D, Mode);
 
-    /* Add the base type. */
+    /* Add the base type */
     NeedTypeSpace (D, TypeLen (Spec->Type) + 1);        /* Bounds check */
     TypeCopy (D->Type + D->Index, Spec->Type);
 
@@ -2024,7 +2029,7 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
         D->StorageClass |= SC_FUNC;
     }
 
-    /* Parse attributes for this declaration */
+    /* Parse attributes for this declarator */
     ParseAttribute (D);
 
     /* Check several things for function or function pointer types */

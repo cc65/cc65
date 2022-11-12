@@ -287,11 +287,20 @@ unsigned long GetIntegerTypeMax (const Type* Type);
 ** The type must have a known size.
 */
 
+unsigned BitSizeOf (const Type* T);
+/* Return the size (in bit-width) of a data type */
+
 unsigned SizeOf (const Type* T);
 /* Compute size (in bytes) of object represented by type array */
 
 unsigned PSizeOf (const Type* T);
 /* Compute size (in bytes) of pointee object */
+
+unsigned CheckedBitSizeOf (const Type* T);
+/* Return the size (in bit-width) of a data type. If the size is zero, emit an
+** error and return some valid size instead (so the rest of the compiler
+** doesn't have to work with invalid sizes).
+*/
 
 unsigned CheckedSizeOf (const Type* T);
 /* Return the size (in bytes) of a data type. If the size is zero, emit an

@@ -139,21 +139,26 @@ void ShiftExpr (struct ExprDesc* Expr)
             /* Remove the code that pushes the rhs onto the stack. */
             RemoveCode (&Mark2);
 
-            /* If the shift count is greater or equal than the bit count of
-            ** the operand, the behaviour is undefined according to the
-            ** standard.
+            /* If the shift count is greater than or equal to the width of the
+            ** promoted left operand, the behaviour is undefined according to
+            ** the standard.
             */
-            if (Expr2.IVal < 0) {
-
-                Warning ("Shift count '%ld' is negative", Expr2.IVal);
-                Expr2.IVal &= ExprBits - 1;
-
-            } else if (Expr2.IVal >= (long) ExprBits) {
-
-                Warning ("Shift count '%ld' >= width of type", Expr2.IVal);
-                Expr2.IVal &= ExprBits - 1;
-
+            if (!ED_IsUneval (Expr)) {
+                if (Expr2.IVal < 0) {
+                    Warning ("Negative shift count %ld treated as %u for %s",
+                             Expr2.IVal,
+                             (unsigned)Expr2.IVal & (ExprBits - 1),
+                             GetBasicTypeName (ResultType));
+                } else if (Expr2.IVal >= (long) ExprBits) {
+                    Warning ("Shift count %ld >= width of %s treated as %u",
+                             Expr2.IVal,
+                             GetBasicTypeName (ResultType),
+                             (unsigned)Expr2.IVal & (ExprBits - 1));
+                }
             }
+
+            /* Here we simply "wrap" the shift count around the width */
+            Expr2.IVal &= ExprBits - 1;
 
             /* If the shift count is zero, nothing happens. If the left hand
             ** side is a constant, the result is constant.

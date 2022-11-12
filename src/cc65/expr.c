@@ -2177,6 +2177,10 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
         /* Check for const operands */
         if (lconst && rconst) {
 
+            /* Evaluate the result for operands */
+            unsigned long Val1 = Expr->IVal;
+            unsigned long Val2 = Expr2.IVal;
+
             /* Both operands are constant, remove the generated code */
             RemoveCode (&Mark1);
 
@@ -2184,80 +2188,51 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
             Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
 
             /* Handle the op differently for signed and unsigned types */
-            if (IsSignSigned (Expr->Type)) {
-
-                /* Evaluate the result for signed operands */
-                signed long Val1 = Expr->IVal;
-                signed long Val2 = Expr2.IVal;
-                switch (Tok) {
-                    case TOK_OR:
-                        Expr->IVal = (Val1 | Val2);
-                        break;
-                    case TOK_XOR:
-                        Expr->IVal = (Val1 ^ Val2);
-                        break;
-                    case TOK_AND:
-                        Expr->IVal = (Val1 & Val2);
-                        break;
-                    case TOK_STAR:
-                        Expr->IVal = (Val1 * Val2);
-                        break;
-                    case TOK_DIV:
-                        if (Val2 == 0) {
+            switch (Tok) {
+                case TOK_OR:
+                    Expr->IVal = (Val1 | Val2);
+                    break;
+                case TOK_XOR:
+                    Expr->IVal = (Val1 ^ Val2);
+                    break;
+                case TOK_AND:
+                    Expr->IVal = (Val1 & Val2);
+                    break;
+                case TOK_STAR:
+                    Expr->IVal = (Val1 * Val2);
+                    break;
+                case TOK_DIV:
+                    if (Val2 == 0) {
+                        if (!ED_IsUneval (Expr)) {
                             Error ("Division by zero");
-                            Expr->IVal = 0x7FFFFFFF;
+                        }
+                        Expr->IVal = 0xFFFFFFFF;
+                    } else {
+                        /* Handle signed and unsigned operands differently */
+                        if (IsSignSigned (Expr->Type)) {
+                            Expr->IVal = ((long)Val1 / (long)Val2);
                         } else {
                             Expr->IVal = (Val1 / Val2);
                         }
-                        break;
-                    case TOK_MOD:
-                        if (Val2 == 0) {
+                    }
+                    break;
+                case TOK_MOD:
+                    if (Val2 == 0) {
+                        if (!ED_IsUneval (Expr)) {
                             Error ("Modulo operation with zero");
-                            Expr->IVal = 0;
+                        }
+                        Expr->IVal = 0;
+                    } else {
+                        /* Handle signed and unsigned operands differently */
+                        if (IsSignSigned (Expr->Type)) {
+                            Expr->IVal = ((long)Val1 % (long)Val2);
                         } else {
                             Expr->IVal = (Val1 % Val2);
                         }
-                        break;
-                    default:
-                        Internal ("hie_internal: got token 0x%X\n", Tok);
-                }
-            } else {
-
-                /* Evaluate the result for unsigned operands */
-                unsigned long Val1 = Expr->IVal;
-                unsigned long Val2 = Expr2.IVal;
-                switch (Tok) {
-                    case TOK_OR:
-                        Expr->IVal = (Val1 | Val2);
-                        break;
-                    case TOK_XOR:
-                        Expr->IVal = (Val1 ^ Val2);
-                        break;
-                    case TOK_AND:
-                        Expr->IVal = (Val1 & Val2);
-                        break;
-                    case TOK_STAR:
-                        Expr->IVal = (Val1 * Val2);
-                        break;
-                    case TOK_DIV:
-                        if (Val2 == 0) {
-                            Error ("Division by zero");
-                            Expr->IVal = 0xFFFFFFFF;
-                        } else {
-                            Expr->IVal = (Val1 / Val2);
-                        }
-                        break;
-                    case TOK_MOD:
-                        if (Val2 == 0) {
-                            Error ("Modulo operation with zero");
-                            Expr->IVal = 0;
-                        } else {
-                            Expr->IVal = (Val1 % Val2);
-                        }
-                        break;
-                    default:
-                        Internal ("hie_internal: got token 0x%X\n", Tok);
-                }
+                    }
+                    break;
+                default:
+                    Internal ("hie_internal: got token 0x%X\n", Tok);
             }
 
             /* Limit the calculated value to the range of its type */
@@ -2314,10 +2289,12 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
                 /* Second value is constant - check for div */
                 type |= CF_CONST;
                 rtype |= CF_CONST;
-                if (Tok == TOK_DIV && Expr2.IVal == 0) {
-                    Error ("Division by zero");
-                } else if (Tok == TOK_MOD && Expr2.IVal == 0) {
-                    Error ("Modulo operation with zero");
+                if (Expr2.IVal == 0 && !ED_IsUneval (Expr)) {
+                    if (Tok == TOK_DIV) {
+                        Error ("Division by zero");
+                    } else if (Tok == TOK_MOD) {
+                        Error ("Modulo operation with zero");
+                    }
                 }
                 if ((Gen->Flags & GEN_NOPUSH) != 0) {
                     RemoveCode (&Mark2);

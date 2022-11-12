@@ -46,6 +46,7 @@
 #include "attrib.h"
 #include "check.h"
 #include "cpu.h"
+#include "fp.h"
 #include "shift.h"
 #include "strbuf.h"
 #include "xmalloc.h"
@@ -2581,7 +2582,7 @@ void g_push (unsigned flags, unsigned long val)
 }
 
 /* FIXME: float */
-void g_push_float (unsigned flags, float val)
+void g_push_float (unsigned flags, double val)
 /* Push the primary register or a constant value onto the stack */
 {
 //    LOG(("g_push_float flags:%04x val:%f\n", flags, val));
@@ -2598,7 +2599,8 @@ void g_push_float (unsigned flags, float val)
                 /* Constant 32 bit value, load into eax */
                 LOG(("g_push_float flags:%04x f:%p\n", flags, *p));
                 g_getimmed (flags | CF_CONST, *p, 0); // ?? FIXME
-#else
+#endif
+#if 0
                 uint32_t *p = ((uint32_t*)&val); /* FIXME: float - we shouldnt do this :) */
                 /* Constant 32 bit value, load into eax */
                 LOG(("g_push_float flags:%04x f:%p\n", flags, *p));
@@ -2606,6 +2608,11 @@ void g_push_float (unsigned flags, float val)
                 g_getimmed (flags | CF_CONST, *p, 0); // ?? FIXME
 #endif
 //                 g_getimmed (0x41,*p,0);
+#if 1
+                LOG(("g_push_float flags:%04x f:%p\n", flags, *p));
+                AddCodeLine ("nop ; g_push_float"); // FIXME: remove
+                g_getimmed (flags | CF_CONST, FP_D_As32bitRaw(FP_D_Make(val)), 0); // ?? FIXME
+#endif
             }
             AddCodeLine ("jsr pusheax");
             break;

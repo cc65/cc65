@@ -399,7 +399,7 @@ void g_test (unsigned flags);
 
 void g_push (unsigned flags, unsigned long val);
 /* Push the primary register or a constant value onto the stack */
-void g_push_float (unsigned flags, float val);
+void g_push_float (unsigned flags, double val);
 /* Push the primary register or a constant value onto the stack */
 
 void g_swap (unsigned flags);

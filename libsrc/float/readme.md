@@ -1,9 +1,6 @@
 
 ## cc65 floating point support
 
-WARNING: the following is just a brain dump after a long weekend of hacking. it
-sure needs cleanup etc :)
-
 The current goal is to implement ieee754 support in the compiler, using the
 "float" datatype as the common 32bit float. ANYTHING ELSE COMES LATER
 
@@ -28,14 +25,11 @@ feel free to work on "real" ieee754 functions (see below)
 NOT WORKING YET:
 
 - float values as in "12.34f" work, but "12.34" does not - should it?
-- compare, float const vs float const
+
+- addition, float constant + float variable (compiles but does not work)
 - substraction, float variable - float constant (compile error)
 - multiplication operator, float const * float const (compile error)
 - division operator, float const / float const
-
-- ternary operator (compile error)
-
-- addition, float constant + float variable (compiles but does not work)
 
 (and probably more :))
 
@@ -182,7 +176,7 @@ ftoseqeax   Test for equal                      *       *       -       -       
 
 optional utility functions.
 ```
-func        description                         cbmfp   cbmfp   wozfp   754
+func        description                       softfloat cbmfp   wozfp   754
 
 char *_ftostr(char *d, float s)                 *       *       ?       ?       for printf family
 float _strtof(char *d)                          -       *       -       -       for scanf family

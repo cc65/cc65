@@ -4332,6 +4332,9 @@ static void hieQuest (ExprDesc* Expr)
         } else if (IsTypeVoid (Expr2.Type) && IsTypeVoid (Expr3.Type)) {
             /* Result type is void */
             ResultType = TypeDup (type_void);
+        } else if (IsTypeFloat (Expr2.Type) && IsTypeFloat (Expr3.Type)) {
+            /* Result type is float */
+            ResultType = TypeDup (type_float);
         } else {
             if (IsClassStruct (Expr2.Type) && IsClassStruct (Expr3.Type) &&
                 TypeCmp (Expr2.Type, Expr3.Type).C == TC_IDENTICAL) {

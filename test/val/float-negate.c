@@ -70,17 +70,9 @@ int main(void)
 {
     float fp2 = 43.21f;
 
-    printf("float-misc\n");
+    printf("float-binary negate (not)\n");
     printf("fp1:0x%08lx [0x414570a4] %s (12.340000)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     printf("fp2:0x%08lx [0x422cd70a] %s (43.209999)\n", *((uint32_t*)&fp2), _ftostr(buf, fp2));
-
-// FIXME: does not compile
-#if 0
-    fp1 = (fp2 == 2.5f) ? 1.5f : 0.5f;
-#endif
-
-    // NOT
-    printf("binary negate (not)\n");
 
     fp1 = 0.0f;
     fp2 = !fp1;

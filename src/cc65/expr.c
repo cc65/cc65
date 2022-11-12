@@ -3913,17 +3913,6 @@ static void hieQuest (ExprDesc* Expr)
         ED_Init (&Expr3);
         Expr3.Flags = Flags;
 
-        NextToken ();
-
-        /* Convert non-integer constant to boolean constant, so that we may just
-        ** check it in the same way.
-        */
-        if (ED_IsConstTrue (Expr)) {
-            ED_MakeConstBool (Expr, 1);
-        } else if (ED_IsConstFalse (Expr)) {
-            ED_MakeConstBool (Expr, 0);
-        }
-
         if (!ConstantCond) {
             /* Condition codes not set, request a test */
             ED_RequireTest (Expr);
@@ -3935,6 +3924,15 @@ static void hieQuest (ExprDesc* Expr)
             FalseLab = GetLocalLabel ();
             g_falsejump (CF_NONE, FalseLab);
         } else {
+            /* Convert non-integer constant to boolean constant, so that we
+            ** may just check it in an easier way later.
+            */
+            if (ED_IsConstTrue (Expr)) {
+                ED_MakeConstBool (Expr, 1);
+            } else if (ED_IsConstFalse (Expr)) {
+                ED_MakeConstBool (Expr, 0);
+            }
+
             /* Constant boolean subexpression could still have deferred inc/dec
             ** operations, so just flush their side-effects at this sequence point.
             */
@@ -3943,8 +3941,17 @@ static void hieQuest (ExprDesc* Expr)
             if (Expr->IVal == 0) {
                 /* Remember the current code position */
                 GetCodePos (&SkippedBranch);
+
+                /* Expr2 is unevaluated when the condition is false */
+                Expr2.Flags |= E_EVAL_UNEVAL;
+            } else {
+                /* Expr3 is unevaluated when the condition is true */
+                Expr3.Flags |= E_EVAL_UNEVAL;
             }
         }
+
+        /* Skip the question mark */
+        NextToken ();
 
         /* Parse second expression. Remember for later if it is a NULL pointer
         ** expression, then load it into the primary.
@@ -3977,25 +3984,21 @@ static void hieQuest (ExprDesc* Expr)
             /* Jump around the evaluation of the third expression */
             TrueLab = GetLocalLabel ();
 
-            ConsumeColon ();
-
             g_jump (TrueLab);
 
             /* Jump here if the first expression was false */
             g_defcodelabel (FalseLab);
         } else {
             if (Expr->IVal == 0) {
-                /* Expr2 is unevaluated when the condition is false */
-                Expr2.Flags |= E_EVAL_UNEVAL;
-
                 /* Remove the load code of Expr2 */
                 RemoveCode (&SkippedBranch);
             } else {
                 /* Remember the current code position */
                 GetCodePos (&SkippedBranch);
             }
-            ConsumeColon();
         }
+
+        ConsumeColon ();
 
         /* Parse third expression. Remember for later if it is a NULL pointer
         ** expression, then load it into the primary.
@@ -4022,9 +4025,6 @@ static void hieQuest (ExprDesc* Expr)
         Expr3.Type = PtrConversion (Expr3.Type);
 
         if (ConstantCond && Expr->IVal != 0) {
-            /* Expr3 is unevaluated when the condition is true */
-            Expr3.Flags |= E_EVAL_UNEVAL;
-
             /* Remove the load code of Expr3 */
             RemoveCode (&SkippedBranch);
         }

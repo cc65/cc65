@@ -65,7 +65,7 @@ void references(void) {
     test1(fp2, "41b8fcb9");
     printf("fp4:0x%08lx [exp:0x41b8f5c3] %s (23.12)", *((uint32_t*)&fp4), _ftostr(buf, fp4));
     test1(fp4, "41b8f5c3");
-#if 1
+
     printf("(global) get address, read via ptr\n");
     // get address of global (works)
     p = (uintptr_t)&fp1;
@@ -77,8 +77,7 @@ void references(void) {
     test1(fp1, "42280a43");
     printf("fp2:0x%08lx [exp:0x42280a43] %s (42.01002)", *((uint32_t*)&fp2), _ftostr(buf, fp2));
     test1(fp2, "42280a43");
-#endif
-#if 1
+
     printf("(local) get address, read via ptr\n");
     fp2 = 23.1234f;
 
@@ -92,7 +91,6 @@ void references(void) {
     test1(fp2, "41b8fcb9");
     printf("fp3:0x%08lx [exp:0x41b8fcb9] %s (23.1234)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
     test1(fp3, "41b8fcb9");
-#endif
 }
 
 void testprinting(void)

@@ -1891,12 +1891,21 @@ static void DirectDecl (const DeclSpec* Spec, Declarator* D, declmode_t Mode)
         } else {
             if (Mode == DM_NEED_IDENT) {
                 /* Some fix point tokens that are used for error recovery */
-                static const token_t TokenList[] = { TOK_COMMA, TOK_SEMI };
+                static const token_t TokenList[] = { TOK_COMMA, TOK_SEMI, TOK_LCURLY, TOK_RCURLY };
 
                 Error ("Identifier expected");
 
                 /* Try some smart error recovery */
                 SkipTokens (TokenList, sizeof(TokenList) / sizeof(TokenList[0]));
+
+                /* Skip curly braces */
+                if (CurTok.Tok == TOK_LCURLY) {
+                    static const token_t CurlyToken[] = { TOK_RCURLY };
+                    SkipTokens (CurlyToken, sizeof(CurlyToken) / sizeof(CurlyToken[0]));
+                    NextToken ();
+                } else if (CurTok.Tok == TOK_RCURLY) {
+                    NextToken ();
+                }
             }
             D->Ident[0] = '\0';
         }

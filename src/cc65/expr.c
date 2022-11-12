@@ -2637,8 +2637,8 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                 /* at least one of the operands is a float */
                 if ((TypeOf (Expr->Type) == CF_FLOAT) && (TypeOf (Expr2.Type) == CF_FLOAT)) {
                     /* compare float vs float */
-                    float Val1 = Expr->V.FVal.V;
-                    float Val2 = Expr2.V.FVal.V;
+                    float Val1 = (float)FP_D_ToFloat(Expr->V.FVal);
+                    float Val2 = (float)FP_D_ToFloat(Expr2.V.FVal);
                     switch (Tok) {
                         case TOK_EQ: Expr->IVal = (Val1 == Val2);   break;
                         case TOK_NE: Expr->IVal = (Val1 != Val2);   break;
@@ -2652,7 +2652,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                     LOG(("FIXME: comparing non float constant with float constant\n"));
                     /* FIXME: compare non float vs float */
                     signed long Val1 = Expr2.IVal;
-                    float Val2 = Expr->V.FVal.V;
+                    float Val2 = (float)FP_D_ToFloat(Expr->V.FVal);
                     switch (Tok) {
                         case TOK_EQ: Expr->IVal = (Val1 == Val2);   break;
                         case TOK_NE: Expr->IVal = (Val1 != Val2);   break;
@@ -2665,7 +2665,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                 } else {
                     LOG(("FIXME: comparing float constant with non float constant\n"));
                     /* FIXME: compare float vs non float */
-                    float Val1 = Expr->V.FVal.V;
+                    float Val1 = (float)FP_D_ToFloat(Expr->V.FVal);
                     signed long Val2 = Expr2.IVal;
                     switch (Tok) {
                         case TOK_EQ: Expr->IVal = (Val1 == Val2);   break;

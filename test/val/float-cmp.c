@@ -45,27 +45,27 @@ void constconst(void)
     // float constant vs float const
     printf("const vs const\n");
 
-//     expect("1.5f == 1.6f is", 0, (1.5f == 1.6f));
-//     expect("1.6f == 1.5f is", 0, (1.6f == 1.5f));
+    expect("1.5f == 1.6f is", 0, (1.5f == 1.6f));
+    expect("1.6f == 1.5f is", 0, (1.6f == 1.5f));
     expect("1.6f == 1.6f is", 1, (1.6f == 1.6f));
 
-//     expect("1.5f != 1.6f is", 1, (1.5f != 1.6f));
-//     expect("1.6f != 1.5f is", 1, (1.6f != 1.5f));
+    expect("1.5f != 1.6f is", 1, (1.5f != 1.6f));
+    expect("1.6f != 1.5f is", 1, (1.6f != 1.5f));
     expect("1.6f != 1.6f is", 0, (1.6f != 1.6f));
 
-//     expect("1.5f < 1.6f is", 1, (1.5f < 1.6f));
+    expect("1.5f < 1.6f is", 1, (1.5f < 1.6f));
     expect("1.6f < 1.5f is", 0, (1.6f < 1.5f));
     expect("1.6f < 1.6f is", 0, (1.6f < 1.6f));
 
     expect("1.5f > 1.6f is", 0, (1.5f > 1.6f));
-//     expect("1.6f > 1.5f is", 1, (1.6f > 1.5f));
+    expect("1.6f > 1.5f is", 1, (1.6f > 1.5f));
     expect("1.6f > 1.6f is", 0, (1.6f > 1.6f));
 
     expect("1.5f <= 1.6f is", 1, (1.5f <= 1.6f));
-//     expect("1.6f <= 1.5f is", 0, (1.6f <= 1.5f));
+    expect("1.6f <= 1.5f is", 0, (1.6f <= 1.5f));
     expect("1.6f <= 1.6f is", 1, (1.6f <= 1.6f));
 
-//     expect("1.5f >= 1.6f is", 0, (1.5f >= 1.6f));
+    expect("1.5f >= 1.6f is", 0, (1.5f >= 1.6f));
     expect("1.6f >= 1.5f is", 1, (1.6f >= 1.5f));
     expect("1.6f >= 1.6f is", 1, (1.6f >= 1.6f));
 }

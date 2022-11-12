@@ -2631,37 +2631,75 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
             /* Both operands are numeric constant, remove the generated code */
             RemoveCode (&Mark1);
+            LOG(("hie_compare (Both operands are numeric constant)\n"));
 
-            /* Determine if this is a signed or unsigned compare */
-            if (IsClassInt (Expr->Type) && IsSignSigned (Expr->Type) &&
-                IsClassInt (Expr2.Type) && IsSignSigned (Expr2.Type)) {
-
-                /* Evaluate the result for signed operands */
-                signed long Val1 = Expr->IVal;
-                signed long Val2 = Expr2.IVal;
-                switch (Tok) {
-                    case TOK_EQ: Expr->IVal = (Val1 == Val2);   break;
-                    case TOK_NE: Expr->IVal = (Val1 != Val2);   break;
-                    case TOK_LT: Expr->IVal = (Val1 < Val2);    break;
-                    case TOK_LE: Expr->IVal = (Val1 <= Val2);   break;
-                    case TOK_GE: Expr->IVal = (Val1 >= Val2);   break;
-                    case TOK_GT: Expr->IVal = (Val1 > Val2);    break;
-                    default:     Internal ("hie_compare: got token 0x%X\n", Tok);
+             if ((TypeOf (Expr->Type) == CF_FLOAT) || (TypeOf (Expr2.Type) == CF_FLOAT)) {
+                /* at least one of the operands is a float */
+                if ((TypeOf (Expr->Type) == CF_FLOAT) && (TypeOf (Expr2.Type) == CF_FLOAT)) {
+                    /* compare float vs float */
+                    float Val1 = Expr->V.FVal.V;
+                    float Val2 = Expr2.V.FVal.V;
+                    switch (Tok) {
+                        case TOK_EQ: Expr->IVal = (Val1 == Val2);   break;
+                        case TOK_NE: Expr->IVal = (Val1 != Val2);   break;
+                        case TOK_LT: Expr->IVal = (Val1 < Val2);    break;
+                        case TOK_LE: Expr->IVal = (Val1 <= Val2);   break;
+                        case TOK_GE: Expr->IVal = (Val1 >= Val2);   break;
+                        case TOK_GT: Expr->IVal = (Val1 > Val2);    break;
+                        default:     Internal ("hie_compare: got token 0x%X\n", Tok);
+                    }
+                } else {
+                    LOG(("FIXME: comparing float constant with non float constant\n"));
+                    /* FIXME: compare float vs non float */
+                    float Val1 = Expr->V.FVal.V;
+                    signed long Val2 = Expr2.IVal;
+                    if (TypeOf (Expr2.Type) == CF_FLOAT) {
+                        Val1 = Expr2.V.FVal.V;
+                        Val2 = Expr->IVal;
+                    }
+                    switch (Tok) {
+                        case TOK_EQ: Expr->IVal = (Val1 == Val2);   break;
+                        case TOK_NE: Expr->IVal = (Val1 != Val2);   break;
+                        case TOK_LT: Expr->IVal = (Val1 < Val2);    break;
+                        case TOK_LE: Expr->IVal = (Val1 <= Val2);   break;
+                        case TOK_GE: Expr->IVal = (Val1 >= Val2);   break;
+                        case TOK_GT: Expr->IVal = (Val1 > Val2);    break;
+                        default:     Internal ("hie_compare: got token 0x%X\n", Tok);
+                    }
                 }
-
             } else {
 
-                /* Evaluate the result for unsigned operands */
-                unsigned long Val1 = Expr->IVal;
-                unsigned long Val2 = Expr2.IVal;
-                switch (Tok) {
-                    case TOK_EQ: Expr->IVal = (Val1 == Val2);   break;
-                    case TOK_NE: Expr->IVal = (Val1 != Val2);   break;
-                    case TOK_LT: Expr->IVal = (Val1 < Val2);    break;
-                    case TOK_LE: Expr->IVal = (Val1 <= Val2);   break;
-                    case TOK_GE: Expr->IVal = (Val1 >= Val2);   break;
-                    case TOK_GT: Expr->IVal = (Val1 > Val2);    break;
-                    default:     Internal ("hie_compare: got token 0x%X\n", Tok);
+                /* Determine if this is a signed or unsigned compare */
+                if (IsClassInt (Expr->Type) && IsSignSigned (Expr->Type) &&
+                    IsClassInt (Expr2.Type) && IsSignSigned (Expr2.Type)) {
+
+                    /* Evaluate the result for signed operands */
+                    signed long Val1 = Expr->IVal;
+                    signed long Val2 = Expr2.IVal;
+                    switch (Tok) {
+                        case TOK_EQ: Expr->IVal = (Val1 == Val2);   break;
+                        case TOK_NE: Expr->IVal = (Val1 != Val2);   break;
+                        case TOK_LT: Expr->IVal = (Val1 < Val2);    break;
+                        case TOK_LE: Expr->IVal = (Val1 <= Val2);   break;
+                        case TOK_GE: Expr->IVal = (Val1 >= Val2);   break;
+                        case TOK_GT: Expr->IVal = (Val1 > Val2);    break;
+                        default:     Internal ("hie_compare: got token 0x%X\n", Tok);
+                    }
+
+                } else {
+
+                    /* Evaluate the result for unsigned operands */
+                    unsigned long Val1 = Expr->IVal;
+                    unsigned long Val2 = Expr2.IVal;
+                    switch (Tok) {
+                        case TOK_EQ: Expr->IVal = (Val1 == Val2);   break;
+                        case TOK_NE: Expr->IVal = (Val1 != Val2);   break;
+                        case TOK_LT: Expr->IVal = (Val1 < Val2);    break;
+                        case TOK_LE: Expr->IVal = (Val1 <= Val2);   break;
+                        case TOK_GE: Expr->IVal = (Val1 >= Val2);   break;
+                        case TOK_GT: Expr->IVal = (Val1 > Val2);    break;
+                        default:     Internal ("hie_compare: got token 0x%X\n", Tok);
+                    }
                 }
             }
 

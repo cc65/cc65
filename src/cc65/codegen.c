@@ -1177,6 +1177,7 @@ void g_putlocal (unsigned Flags, int Offs, long Val)
 
         case CF_FLOAT: /* FIXME: float - can we use the same as LONG here? */
             AddCodeLine ("nop ; g_putlocal"); // FIXME: remove
+            /* fall through */
         case CF_LONG:
             if (Flags & CF_CONST) {
                 g_getimmed (Flags, Val, 0);

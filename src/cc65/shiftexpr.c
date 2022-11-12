@@ -160,6 +160,15 @@ void ShiftExpr (struct ExprDesc* Expr)
             /* Here we simply "wrap" the shift count around the width */
             Expr2.IVal &= ExprBits - 1;
 
+            /* Additional check for bit-fields */
+            if (IsTypeBitField (Expr->Type) &&
+                Tok == TOK_SHR              &&
+                Expr2.IVal >= (long) Expr->Type->A.B.Width) {
+                if (!ED_IsUneval (Expr)) {
+                    Warning ("Right-shift count %ld >= width of bit-field", Expr2.IVal);
+                }
+            }
+
             /* If the shift count is zero, nothing happens. If the left hand
             ** side is a constant, the result is constant.
             */

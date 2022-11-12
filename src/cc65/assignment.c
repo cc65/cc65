@@ -345,7 +345,12 @@ static void OpAssignBitField (const GenDesc* Gen, ExprDesc* Expr, const char* Op
 
                         /* Here we simply "wrap" the shift count around the width */
                         Expr2.IVal &= ExprBits - 1;
-                   }
+
+                        /* Additional check for bit-fields */
+                        if (Expr2.IVal >= (long)Expr->Type->A.B.Width) {
+                            Warning ("Shift count %ld >= width of bit-field", Expr2.IVal);
+                        }
+                    }
                 }
 
                 /* Adjust the types of the operands if needed */
@@ -549,6 +554,12 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
 
                         /* Here we simply "wrap" the shift count around the width */
                         Expr2.IVal &= ExprBits - 1;
+
+                        /* Additional check for bit width */
+                        if (Expr2.IVal >= (long)BitSizeOf (Expr->Type)) {
+                            Warning ("Shift count %ld >= width of %s",
+                                     Expr2.IVal, GetBasicTypeName (Expr->Type));
+                        }
                     }
                 }
                 Gen->Func (Flags | CF_CONST, Expr2.IVal);

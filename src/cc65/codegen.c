@@ -39,7 +39,7 @@
 #include <string.h>
 #include <stdarg.h>
 
-#define DEBUG
+//#define DEBUG
 
 /* common */
 #include "addrsize.h"
@@ -1326,10 +1326,15 @@ static void g_regchar (unsigned Flags)
 /* Make sure, the value in the primary register is in the range of char. Truncate if necessary */
 {
     unsigned L;
+    LOG(("g_regchar flags: %04x\n", Flags));
+    AddCodeLine ("nop ; g_regchar flags: %04x\n", Flags);    // FIXME:remove
 
     /* FIXME: float */
     if ((Flags & CF_TYPEMASK) == CF_FLOAT) {
-        typeerror (Flags);
+        // convert float to int, then fall through to char conversion
+        AddCodeLine ("jsr feaxint");
+//        typeerror (Flags);
+//        return;
     }
 
     AddCodeLine ("ldx #$00");
@@ -1350,6 +1355,7 @@ void g_regint (unsigned Flags)
 /* Make sure, the value in the primary register is an int. Convert if necessary */
 {
     LOG(("g_regint flags: %04x\n", Flags));
+    AddCodeLine ("nop ; g_regint flags: %04x\n", Flags);    // FIXME:remove
     switch (Flags & CF_TYPEMASK) {
 
         case CF_CHAR:
@@ -1378,6 +1384,7 @@ void g_regint (unsigned Flags)
 void g_reglong (unsigned Flags)
 /* Make sure, the value in the primary register a long. Convert if necessary */
 {
+    LOG(("g_reglong flags: %04x\n", Flags));
     switch (Flags & CF_TYPEMASK) {
 
         case CF_CHAR:
@@ -1627,9 +1634,9 @@ unsigned g_typecast (unsigned lhs, unsigned rhs)
 ** by the lhs value. Return the result value.
 */
 {
-    LOG(("g_typecast 2 rhs: %s lhs: %s (rhs is %s)\n",
-        ((rhs & CF_TYPEMASK) == CF_FLOAT) ? "float" : "int",
+    LOG(("g_typecast 2 lhs: %s <- rhs: %s (rhs is %s)\n",
         ((lhs & CF_TYPEMASK) == CF_FLOAT) ? "float" : "int",
+        ((rhs & CF_TYPEMASK) == CF_FLOAT) ? "float" : "int",
         ((rhs & CF_CONST) == 0) ? "not const" : "const"
     ));
     /* Check if a conversion is needed */
@@ -1654,12 +1661,16 @@ unsigned g_typecast (unsigned lhs, unsigned rhs)
 
             case CF_CHAR:
                 /* We must truncate the primary register to char */
-                g_regchar (lhs);
+                g_regchar (rhs);
+//                g_regchar (lhs);      // BUG IN HEAD?
                 break;
 
             default:
-                typeerror (lhs);
+                typeerror (rhs);
+//                typeerror (lhs);      // BUG IN HEAD
         }
+    } else {
+        LOG(("g_typecast 2 no conversion done\n"));
     }
 
     /* Do not need any other action. If the left type is int, and the primary

@@ -128,7 +128,7 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
             /* Value is now in primary and an rvalue */
             ED_FinalizeRValLoad (Expr);
         }
-
+        LOG(("DoConversion 1 done\n"));
     } else if (ED_IsConstAbs (Expr)) {
         LOG(("DoConversion 2 Old: %s New: %s\n",
             (IsTypeFloat (OldType)) ? "float" : "int",
@@ -224,14 +224,17 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
 ** impossible.
 */
 {
+    printf("TypeConversion\n");
 #if 0
     /* Debugging */
-    printf ("Expr:\n=======================================\n");
+    printf ("=======================================\n");
+    printf ("Expr:\n---------------------------------------\n");
     PrintExprDesc (stdout, Expr);
-    printf ("Type:\n=======================================\n");
+    printf ("\nType:\n---------------------------------------\n");
     PrintType (stdout, NewType);
     printf ("\n");
     PrintRawType (stdout, NewType);
+    printf ("=======================================\n");
 #endif
     /* First, do some type checking */
     typecmp_t Result    = TYPECMP_INITIALIZER;

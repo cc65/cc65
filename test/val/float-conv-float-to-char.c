@@ -39,26 +39,6 @@ unsigned long var_ulong;
 
 int result = 0;
 
-// returns 1 if value in f matches the string
-// the string is a hex value without leading "0x"
-int compare(float f, char *str)
-{
-    char temp[12];
-    sprintf(temp, "%08lx", *((uint32_t*)&f));
-    return (strcmp(temp, str) == 0) ? 1 : 0;
-}
-
-void test1(float f, char *str)
-{
-    if (compare(f, str)) {
-//        printf("(ok)");
-        printf("\n");
-    } else {
-        printf(" (failed) !!!\n");
-        result++;
-    }
-}
-
 void test2(long n, long val)
 {
     if (n == val) {
@@ -75,16 +55,17 @@ void varvar(void)
 
     printf("\nconversions (float variable to integer variable)\n");
     fp1 = -12.3f;
+    fp2 = 19.9f;
 
-    var_schar = (signed char)fp1;
-    printf("fp1 0x%08lx %s (-12.3) schar:%d (exp:-12)", *((uint32_t*)&fp1), _ftostr(buf, fp1), (int)var_schar);
-    test2(var_schar, -12);
+    var_uchar = (unsigned char)fp2;
+    printf("fp2 0x%08lx %s (19.9) uchar:%u (exp:19)", *((uint32_t*)&fp2), _ftostr(buf, fp2), (int)var_uchar);
+    test2(var_uchar, 19);
 }
 
 int main(void)
 {
 
-    printf("float-conv-float-to-schar\n");
+    printf("float-conv-float-to-char\n");
 
     varvar();
     WAIT();

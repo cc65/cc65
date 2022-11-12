@@ -4,7 +4,7 @@
 ** 2020-11-20, Greg King
 */
 
-#define DEBUG
+//#define DEBUG
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -2648,15 +2648,25 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                         case TOK_GT: Expr->IVal = (Val1 > Val2);    break;
                         default:     Internal ("hie_compare: got token 0x%X\n", Tok);
                     }
+                } else if (TypeOf (Expr2.Type) == CF_FLOAT) {
+                    LOG(("FIXME: comparing non float constant with float constant\n"));
+                    /* FIXME: compare non float vs float */
+                    signed long Val1 = Expr2.IVal;
+                    float Val2 = Expr->V.FVal.V;
+                    switch (Tok) {
+                        case TOK_EQ: Expr->IVal = (Val1 == Val2);   break;
+                        case TOK_NE: Expr->IVal = (Val1 != Val2);   break;
+                        case TOK_LT: Expr->IVal = (Val1 < Val2);    break;
+                        case TOK_LE: Expr->IVal = (Val1 <= Val2);   break;
+                        case TOK_GE: Expr->IVal = (Val1 >= Val2);   break;
+                        case TOK_GT: Expr->IVal = (Val1 > Val2);    break;
+                        default:     Internal ("hie_compare: got token 0x%X\n", Tok);
+                    }
                 } else {
                     LOG(("FIXME: comparing float constant with non float constant\n"));
                     /* FIXME: compare float vs non float */
                     float Val1 = Expr->V.FVal.V;
                     signed long Val2 = Expr2.IVal;
-                    if (TypeOf (Expr2.Type) == CF_FLOAT) {
-                        Val1 = Expr2.V.FVal.V;
-                        Val2 = Expr->IVal;
-                    }
                     switch (Tok) {
                         case TOK_EQ: Expr->IVal = (Val1 == Val2);   break;
                         case TOK_NE: Expr->IVal = (Val1 != Val2);   break;

@@ -160,17 +160,14 @@ void varvar(void)
 
     printf("\nconversions (float variable to integer variable)\n");
     fp1 = -12.3f;
-#if 0 // FIXME
     var_schar = (signed char)fp1;
     printf("fp1 0x%08lx %s (-12.3) schar:%d (exp:-12)", *((uint32_t*)&fp1), _ftostr(buf, fp1), (int)var_schar);
     test2(var_schar, -12);
-#endif
+
     fp2 = 19.9f;
-#if 0 // FIXME
     var_uchar = (unsigned char)fp2;
     printf("fp2 0x%08lx %s (19.9) uchar:%u (exp:19)", *((uint32_t*)&fp2), _ftostr(buf, fp2), (int)var_uchar);
     test2(var_uchar, 19);
-#endif
 
     fp1 = 1234.5f;
     var_sint = (signed short)fp1;

@@ -178,7 +178,7 @@ static void Parse (void)
             ** or semicolon, it must be followed by a function body.
             */
             if ((Decl.StorageClass & SC_FUNC) != 0) {
-                if (CurTok.Tok != TOK_COMMA && CurTok.Tok != TOK_SEMI) {
+                if (CurTok.Tok == TOK_LCURLY) {
                     /* A definition */
                     Decl.StorageClass |= SC_DEF;
 
@@ -190,6 +190,10 @@ static void Parse (void)
                         FuncDef->Flags = (FuncDef->Flags & ~FD_EMPTY) | FD_VOID_PARAM;
                     }
                 } else {
+                    if (CurTok.Tok != TOK_COMMA && CurTok.Tok != TOK_SEMI) {
+                        Error ("Expected ',' or ';' after top level declarator");
+                    }
+
                     /* Just a declaration */
                     Decl.StorageClass |= SC_DECL;
                 }
@@ -325,7 +329,7 @@ static void Parse (void)
                 if (CurTok.Tok == TOK_SEMI) {
                     /* Prototype only */
                     NextToken ();
-                } else {
+                } else if (CurTok.Tok == TOK_LCURLY) {
                     /* Parse the function body */
                     NewFunc (Sym, FuncDef);
 

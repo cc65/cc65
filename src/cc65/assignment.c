@@ -322,6 +322,12 @@ static void OpAssignBitField (const GenDesc* Gen, ExprDesc* Expr, const char* Op
                     } else if (Gen->Func == g_mod) {
                         Error ("Modulo operation with zero");
                     }
+                } else if (Gen->Func == g_asl || Gen->Func == g_asr) {
+                    if (Expr2.IVal < 0) {
+                        Warning ("Shift count '%ld' is negative", Expr2.IVal);
+                    } else if (Expr2.IVal >= (long)(SizeOf (Expr->Type) * 8)) {
+                        Warning ("Shift count '%ld' >= width of type", Expr2.IVal);
+                    }
                 }
 
                 /* Adjust the types of the operands if needed */
@@ -501,6 +507,12 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
                         Error ("Division by zero");
                     } else if (Gen->Func == g_mod) {
                         Error ("Modulo operation with zero");
+                    }
+                } else if (Gen->Func == g_asl || Gen->Func == g_asr) {
+                    if (Expr2.IVal < 0) {
+                        Warning ("Shift count '%ld' is negative", Expr2.IVal);
+                    } else if (Expr2.IVal >= (long)(SizeOf (Expr->Type) * 8)) {
+                        Warning ("Shift count '%ld' >= width of type", Expr2.IVal);
                     }
                 }
                 Gen->Func (Flags | CF_CONST, Expr2.IVal);

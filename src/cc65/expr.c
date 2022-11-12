@@ -1439,7 +1439,7 @@ static void StructRef (ExprDesc* Expr)
     /* Skip the token and check for an identifier */
     NextToken ();
     if (CurTok.Tok != TOK_IDENT) {
-        Error ("Identifier expected");
+        Error ("Identifier expected for %s member", GetBasicTypeName (Expr->Type));
         /* Make the expression an integer at address zero */
         ED_MakeConstAbs (Expr, 0, type_int);
         return;

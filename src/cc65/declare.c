@@ -1452,7 +1452,7 @@ static void ParseTypeSpec (DeclSpec* D, typespec_t TSFlags, int* SignednessSpeci
                 NextToken ();
             } else {
                 if (CurTok.Tok != TOK_LCURLY) {
-                    Error ("Identifier expected");
+                    Error ("Identifier expected for enum tag name");
                 }
                 AnonName (Ident, "enum");
             }
@@ -1573,7 +1573,7 @@ static void ParseOldStyleParamList (FuncDesc* F)
 
         } else {
             /* Not a parameter name */
-            Error ("Identifier expected");
+            Error ("Identifier expected for parameter name");
 
             /* Try some smart error recovery */
             SkipTokens (TokenList, sizeof(TokenList) / sizeof(TokenList[0]));

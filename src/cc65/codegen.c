@@ -71,9 +71,11 @@
 #ifdef DEBUG
 #define LOG(x)  printf  x
 #define FIXME(x)  printf  x
+#define ASMLOG(x)  AddCodeLine x
 #else
 #define LOG(x)
 #define FIXME(x)
+#define ASMLOG(x)
 #endif
 
 /*****************************************************************************/
@@ -741,7 +743,7 @@ void _g_getimmed(unsigned Flags, uintptr_t Val, long Offs)
             case CF_FLOAT:  /* FIXME float - handle like long here */
 
                 LOG(("g_getimmed CF_FLOAT Val: %08lx\n", Val));
-                AddCodeLine ("nop\t; g_getimmed FLOAT %08lx\n", Val);   // FIXME: remove
+                ASMLOG(("nop\t; g_getimmed FLOAT %08lx\n", Val));   // FIXME: remove
                 /* fall through */
             case CF_LONG:
                 /* Split the value into 4 bytes */
@@ -1177,7 +1179,7 @@ void g_putlocal (unsigned Flags, int Offs, long Val)
             break;
 
         case CF_FLOAT: /* FIXME: float - can we use the same as LONG here? */
-            AddCodeLine ("nop ; g_putlocal"); // FIXME: remove
+            ASMLOG(("nop ; g_putlocal")); // FIXME: remove
             /* fall through */
         case CF_LONG:
             if (Flags & CF_CONST) {
@@ -1329,7 +1331,7 @@ static void g_regchar (unsigned Flags)
 {
     unsigned L;
     LOG(("g_regchar flags: %04x\n", Flags));
-    AddCodeLine ("nop ; g_regchar flags: %04x\n", Flags);    // FIXME:remove
+    ASMLOG(("nop ; g_regchar flags: %04x\n", Flags));    // FIXME:remove
 
     /* FIXME: float */
     if ((Flags & CF_TYPEMASK) == CF_FLOAT) {
@@ -1357,7 +1359,7 @@ void g_regint (unsigned Flags)
 /* Make sure, the value in the primary register is an int. Convert if necessary */
 {
     LOG(("g_regint flags: %04x\n", Flags));
-    AddCodeLine ("nop ; g_regint flags: %04x\n", Flags);    // FIXME:remove
+    ASMLOG(("nop ; g_regint flags: %04x\n", Flags));    // FIXME:remove
     switch (Flags & CF_TYPEMASK) {
 
         case CF_CHAR:
@@ -1527,21 +1529,21 @@ unsigned g_typeadjust (unsigned lhs, unsigned rhs)
     /* Result is const if both operands are const. */
     unsigned const_flag = (lhs & CF_CONST) & (rhs & CF_CONST);
 
-    AddCodeLine ("nop ; g_typeadjust ltype:%x rtype:%x", ltype, rtype); // FIXME: remove
+    ASMLOG(("nop ; g_typeadjust ltype:%x rtype:%x", ltype, rtype)); // FIXME: remove
 
     /* FIXME: float - this is is much more complicated */
     if (ltype == CF_FLOAT && rtype == CF_FLOAT) {
-        AddCodeLine ("nop ; g_typeadjust return:%x float", const_flag | CF_FLOAT); // FIXME: remove
+        ASMLOG(("nop ; g_typeadjust return:%x float", const_flag | CF_FLOAT)); // FIXME: remove
         return const_flag | CF_FLOAT;
     }
     if (ltype == CF_FLOAT) {
         FIXME(("FIXME: conversion to float format missing\n"));
-        AddCodeLine ("nop ; g_typeadjust return:%x float", (lhs & CF_CONST) | CF_FLOAT); // FIXME: remove
+        ASMLOG(("nop ; g_typeadjust return:%x float", (lhs & CF_CONST) | CF_FLOAT)); // FIXME: remove
         return (lhs & CF_CONST) | CF_FLOAT;
     }
     if (rtype == CF_FLOAT) {
         FIXME(("FIXME: conversion to float format missing\n"));
-        AddCodeLine ("nop ; g_typeadjust return:%x float", (rhs & CF_CONST) | CF_FLOAT); // FIXME: remove
+        ASMLOG(("nop ; g_typeadjust return:%x float", (rhs & CF_CONST) | CF_FLOAT)); // FIXME: remove
         return (rhs & CF_CONST) | CF_FLOAT;
     }
 
@@ -2001,7 +2003,7 @@ void g_addeqlocal (unsigned flags, int Offs, unsigned long val)
                         AddCodeLine ("lda (sp),y");
                     }
                 } else {
-                    AddCodeLine ("nop ; g_addeqlocal"); // FIXME: remove
+                    ASMLOG(("nop ; g_addeqlocal")); // FIXME: remove
                     g_getimmed (flags, val, 0);
                     AddCodeLine ("jsr addeqysp");
                 }
@@ -2012,7 +2014,7 @@ void g_addeqlocal (unsigned flags, int Offs, unsigned long val)
 
         case CF_LONG:
             if (flags & CF_CONST) {
-                AddCodeLine ("nop ; g_addeqlocal"); // FIXME: remove
+                ASMLOG(("nop ; g_addeqlocal")); // FIXME: remove
                 g_getimmed (flags, val, 0);
             }
             AddCodeLine ("ldy #$%02X", Offs);
@@ -2209,7 +2211,7 @@ void g_subeqlocal (unsigned flags, int Offs, unsigned long val)
 
         case CF_INT:
             if (flags & CF_CONST) {
-                AddCodeLine ("nop ; g_subeqlocal"); // FIXME: remove
+                ASMLOG(("nop ; g_subeqlocal")); // FIXME: remove
                 g_getimmed (flags, val, 0);
             }
             AddCodeLine ("ldy #$%02X", Offs);
@@ -2218,7 +2220,7 @@ void g_subeqlocal (unsigned flags, int Offs, unsigned long val)
 
         case CF_LONG:
             if (flags & CF_CONST) {
-                AddCodeLine ("nop ; g_subeqlocal"); // FIXME: remove
+                ASMLOG(("nop ; g_subeqlocal")); // FIXME: remove
                 g_getimmed (flags, val, 0);
             }
             AddCodeLine ("ldy #$%02X", Offs);
@@ -2453,7 +2455,7 @@ static void oper (unsigned Flags, unsigned long Val, const char* const* Subs)
 */
 {
     int n = 0;
-    AddCodeLine ("nop ; oper(%2x,%lx)", Flags, Val); // FIXME: remove
+    ASMLOG(("nop ; oper(%2x,%lx)", Flags, Val)); // FIXME: remove
     /* Determine the offset into the array */
     if (Flags & CF_FLOAT) {
         n = OPER_IDX_FLOAT;
@@ -2469,7 +2471,7 @@ static void oper (unsigned Flags, unsigned long Val, const char* const* Subs)
     /* Load the value if it is not already in the primary */
     if (Flags & CF_CONST) {
         /* Load value */
-        AddCodeLine ("nop ; oper(%2x,%lx)", Flags, Val); // FIXME: remove
+        ASMLOG(("nop ; oper(%2x,%lx)", Flags, Val)); // FIXME: remove
         g_getimmed (Flags, Val, 0);
     }
 
@@ -2533,7 +2535,7 @@ void g_push (unsigned flags, unsigned long val)
         } else {
 
             /* Handle as 16 bit value */
-            AddCodeLine ("nop ; g_push"); // FIXME: remove
+            ASMLOG(("nop ; g_push")); // FIXME: remove
             g_getimmed (flags, val, 0);
             AddCodeLine ("jsr pushax");
         }
@@ -2543,7 +2545,7 @@ void g_push (unsigned flags, unsigned long val)
         /* Value is not 16 bit or not constant */
         if (flags & CF_CONST) {
             /* Constant 32 bit value, load into eax */
-            AddCodeLine ("nop ; g_push"); // FIXME: remove
+            ASMLOG(("nop ; g_push")); // FIXME: remove
             g_getimmed (flags, val, 0);
         }
 
@@ -2610,7 +2612,7 @@ void g_push_float (unsigned flags, double val)
 //                 g_getimmed (0x41,*p,0);
 #if 1
                 LOG(("g_push_float flags:%04x f:%p\n", flags, *p));
-                AddCodeLine ("nop ; g_push_float"); // FIXME: remove
+                ASMLOG(("nop ; g_push_float")); // FIXME: remove
                 g_getimmed (flags | CF_CONST, FP_D_As32bitRaw(FP_D_Make(val)), 0); // ?? FIXME
 #endif
             }
@@ -2835,7 +2837,7 @@ void g_add (unsigned flags, unsigned long val)
         flags &= ~CF_FORCECHAR; /* Handle chars as ints */
         g_push (flags & ~CF_CONST, 0);
     }
-    AddCodeLine ("nop ; g_add(flags:%2x,val:%lx)", flags, val); // FIXME: remove
+    ASMLOG(("nop ; g_add(flags:%2x,val:%lx)", flags, val)); // FIXME: remove
     oper (flags, val, ops);
 }
 
@@ -2856,7 +2858,7 @@ void g_sub (unsigned flags, unsigned long val)
         flags &= ~CF_FORCECHAR; /* Handle chars as ints */
         g_push (flags & ~CF_CONST, 0);
     }
-    AddCodeLine ("nop ; g_sub(flags:%2x,val:%lx)", flags, val); // FIXME: remove
+    ASMLOG(("nop ; g_sub(flags:%2x,val:%lx)", flags, val)); // FIXME: remove
     oper (flags, val, ops);
 }
 
@@ -2872,7 +2874,7 @@ void g_rsub (unsigned flags, unsigned long val)
         "tosrsubeax",
         "ftosrsubeax"
     };
-    AddCodeLine ("nop ; g_rsub(flags:%2x,val:%lx)", flags, val); // FIXME: remove
+    ASMLOG(("nop ; g_rsub(flags:%2x,val:%lx)", flags, val)); // FIXME: remove
     oper (flags, val, ops);
 }
 
@@ -2999,7 +3001,7 @@ void g_mul (unsigned flags, unsigned long val)
         g_push (flags & ~CF_CONST, 0);
 
     }
-    AddCodeLine ("nop ; g_mul(flags:%2x,val:%lx)", flags, val); // FIXME: remove
+    ASMLOG(("nop ; g_mul(flags:%2x,val:%lx)", flags, val)); // FIXME: remove
 
     /* Use long way over the stack */
     oper (flags, val, ops);
@@ -3085,7 +3087,7 @@ void g_div (unsigned flags, unsigned long val)
                 g_restore (flags);
                 AddCodeLine ("bcs %s", LocalLabelName (DoShiftLabel));
 
-                AddCodeLine ("nop ; g_div"); // FIXME: remove
+                ASMLOG(("nop ; g_div")); // FIXME: remove
                 /* The result is 0. We can just load 0 and skip the shifting. */
                 g_getimmed (flags | CF_ABSOLUTE, 0, 0);
 
@@ -3117,7 +3119,7 @@ void g_div (unsigned flags, unsigned long val)
         flags &= ~CF_FORCECHAR; /* Handle chars as ints */
         g_push (flags & ~CF_CONST, 0);
     }
-    AddCodeLine ("nop ; g_div(flags:%2x,val:%lx)", flags, val); // FIXME: remove
+    ASMLOG(("nop ; g_div(flags:%2x,val:%lx)", flags, val)); // FIXME: remove
 
     /* Generate a division */
     oper (flags, val, ops);
@@ -3138,7 +3140,7 @@ void g_mod (unsigned flags, unsigned long val)
     };
     int p2;
 
-    AddCodeLine ("nop ; g_mod(flags:%2x,val:%lx)", flags, val); // FIXME: remove
+    ASMLOG(("nop ; g_mod(flags:%2x,val:%lx)", flags, val)); // FIXME: remove
 
     /* Check if we can do some cost reduction */
     if ((flags & CF_CONST) && (flags & CF_UNSIGNED) && val != 0xFFFFFFFF && (p2 = PowerOf2 (val)) >= 0) {
@@ -3220,7 +3222,7 @@ void g_or (unsigned flags, unsigned long val)
         flags &= ~CF_FORCECHAR;
         g_push (flags & ~CF_CONST, 0);
     }
-    AddCodeLine ("nop ; g_or(flags:%2x,val:%lx)", flags, val); // FIXME: remove
+    ASMLOG(("nop ; g_or(flags:%2x,val:%lx)", flags, val)); // FIXME: remove
 
     /* Use long way over the stack */
     oper (flags, val, ops);
@@ -3289,7 +3291,7 @@ void g_xor (unsigned flags, unsigned long val)
         flags &= ~CF_FORCECHAR;
         g_push (flags & ~CF_CONST, 0);
     }
-    AddCodeLine ("nop ; g_xor(flags:%2x,val:%lx)", flags, val); // FIXME: remove
+    ASMLOG(("nop ; g_xor(flags:%2x,val:%lx)", flags, val)); // FIXME: remove
 
     /* Use long way over the stack */
     oper (flags, val, ops);
@@ -3382,7 +3384,7 @@ void g_and (unsigned Flags, unsigned long Val)
         Flags &= ~CF_FORCECHAR;
         g_push (Flags & ~CF_CONST, 0);
     }
-    AddCodeLine ("nop ; g_and(flags:%2x,val:%lx)", Flags, Val); // FIXME: remove
+    ASMLOG(("nop ; g_and(flags:%2x,val:%lx)", Flags, Val)); // FIXME: remove
 
     /* Use long way over the stack */
     oper (Flags, Val, ops);
@@ -3557,7 +3559,7 @@ void g_asr (unsigned flags, unsigned long val)
         flags &= ~CF_FORCECHAR;
         g_push (flags & ~CF_CONST, 0);
     }
-    AddCodeLine ("nop ; g_asr(flags:%2x,val:%lx)", flags, val); // FIXME: remove
+    ASMLOG(("nop ; g_asr(flags:%2x,val:%lx)", flags, val)); // FIXME: remove
 
     /* Use long way over the stack */
     oper (flags, val, ops);
@@ -3674,7 +3676,7 @@ void g_asl (unsigned flags, unsigned long val)
         flags &= ~CF_FORCECHAR;
         g_push (flags & ~CF_CONST, 0);
     }
-    AddCodeLine ("nop ; g_asl(flags:%2x,val:%lx)", flags, val); // FIXME: remove
+    ASMLOG(("nop ; g_asl(flags:%2x,val:%lx)", flags, val)); // FIXME: remove
 
     /* Use long way over the stack */
     oper (flags, val, ops);
@@ -4041,7 +4043,7 @@ void g_eq (unsigned flags, unsigned long val)
         flags &= ~CF_FORCECHAR;
         g_push (flags & ~CF_CONST, 0);
     }
-    AddCodeLine ("nop ; g_eq(flags:%2x,val:%lx)", flags, val); // FIXME: remove
+    ASMLOG(("nop ; g_eq(flags:%2x,val:%lx)", flags, val)); // FIXME: remove
 
     /* Use long way over the stack */
     oper (flags, val, ops);
@@ -4104,7 +4106,7 @@ void g_ne (unsigned flags, unsigned long val)
         flags &= ~CF_FORCECHAR;
         g_push (flags & ~CF_CONST, 0);
     }
-    AddCodeLine ("nop ; g_ne(flags:%2x,val:%lx)", flags, val); // FIXME: remove
+    ASMLOG(("nop ; g_ne(flags:%2x,val:%lx)", flags, val)); // FIXME: remove
 
     /* Use long way over the stack */
     oper (flags, val, ops);
@@ -4124,7 +4126,7 @@ void g_lt (unsigned flags, unsigned long val)
     };
 
     unsigned Label;
-    AddCodeLine ("nop ; g_lt(flags:%2x,val:%lx)", flags, val); // FIXME: remove
+    ASMLOG(("nop ; g_lt(flags:%2x,val:%lx)", flags, val)); // FIXME: remove
 
     /* If the right hand side is const, the lhs is not on stack but still
     ** in the primary register.
@@ -4298,7 +4300,7 @@ void g_le (unsigned flags, unsigned long val)
         "ftosleeax"
     };
 
-    AddCodeLine ("nop ; g_le(flags:%2x,val:%lx)", flags, val); // FIXME: remove
+    ASMLOG(("nop ; g_le(flags:%2x,val:%lx)", flags, val)); // FIXME: remove
 
     /* If the right hand side is const, the lhs is not on stack but still
     ** in the primary register.
@@ -4422,7 +4424,7 @@ void g_gt (unsigned flags, unsigned long val)
         "ftosgteax"
     };
 
-    AddCodeLine ("nop ; g_gt(flags:%2x,val:%lx)", flags, val); // FIXME: remove
+    ASMLOG(("nop ; g_gt(flags:%2x,val:%lx)", flags, val)); // FIXME: remove
 
     /* If the right hand side is const, the lhs is not on stack but still
     ** in the primary register.
@@ -4564,7 +4566,7 @@ void g_ge (unsigned flags, unsigned long val)
 
     unsigned Label;
 
-    AddCodeLine ("nop ; g_ge(flags:%2x,val:%lx)", flags, val); // FIXME: remove
+    ASMLOG(("nop ; g_ge(flags:%2x,val:%lx)", flags, val)); // FIXME: remove
 
     /* If the right hand side is const, the lhs is not on stack but still
     ** in the primary register.
@@ -4942,13 +4944,13 @@ void g_initstatic (unsigned InitLabel, unsigned VarLabel, unsigned Size)
         AddCodeLine ("bne %s", LocalLabelName (CodeLabel));
     } else {
         /* Use the easy way here: memcpy() */
-        AddCodeLine ("nop ; g_initstatic"); // FIXME: remove
+        ASMLOG(("nop ; g_initstatic")); // FIXME: remove
         g_getimmed (CF_STATIC, VarLabel, 0);
         AddCodeLine ("jsr pushax");
-        AddCodeLine ("nop ; g_initstatic"); // FIXME: remove
+        ASMLOG(("nop ; g_initstatic")); // FIXME: remove
         g_getimmed (CF_STATIC, InitLabel, 0);
         AddCodeLine ("jsr pushax");
-        AddCodeLine ("nop ; g_initstatic"); // FIXME: remove
+        ASMLOG(("nop ; g_initstatic")); // FIXME: remove
         g_getimmed (CF_INT | CF_UNSIGNED | CF_CONST, Size, 0);
         AddCodeLine ("jsr %s", GetLabelName (CF_EXTERNAL, (uintptr_t) "memcpy", 0));
     }

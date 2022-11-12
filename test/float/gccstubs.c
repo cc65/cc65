@@ -20,6 +20,7 @@ char *_ftostr(char *d, float s)
     if (d == NULL) {
         d = &buffer[0];
     }
+//    printf("<%f>", (double)s);
     sprintf(d, "%f", (double)s);
     return d;
 }

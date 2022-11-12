@@ -2,10 +2,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+
+//#include <_float.h>
 /*
-#include <_float.h>
 #include <math.h>
 */
+#if 0
 unsigned char buf[32];
 
 unsigned char var_uchar;
@@ -67,9 +69,27 @@ char *test(char *buffer, float f) {
     }
     return &buffer[0];
 }
-
+#endif
+int test1(void)
+{
+    float fp2 = 1.5f;
+    if (1.5f == fp2) {
+        return 1;
+    }
+    return 0;
+}
+// int test2(void)
+// {
+//     float fp2 = 1.5f;
+//     float fp1 = 1.6f;
+//     if (fp2 >= fp1) {
+//         return 0;
+//     }
+//     return 1;
+// }
 int main(void)
 {
+#if 0
     fp2 = 0.001f;    printf("fp2 0x%08lx %s\n", *((uint32_t*)&fp2), test(buf, fp2));
     fp2 = 0.001234f; printf("fp2 0x%08lx %s\n", *((uint32_t*)&fp2), test(buf, fp2));
     fp2 = 0.01f;     printf("fp2 0x%08lx %s\n", *((uint32_t*)&fp2), test(buf, fp2));
@@ -78,6 +98,8 @@ int main(void)
     fp2 = 1.234f;    printf("fp2 0x%08lx %s\n", *((uint32_t*)&fp2), test(buf, fp2));
     fp2 = 12.34f;    printf("fp2 0x%08lx %s\n", *((uint32_t*)&fp2), test(buf, fp2));
     fp2 = 123.4f;    printf("fp2 0x%08lx %s\n", *((uint32_t*)&fp2), test(buf, fp2));
-
-    return 0;
+#endif
+    printf("test:%d\n", test1());
+//     printf("test:%d\n", test2());
+//     return 0;
 }

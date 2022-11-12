@@ -71,8 +71,9 @@ enum typespec_t {
 
 /* Masks for the Flags field in DeclSpec */
 #define DS_DEF_STORAGE          0x0001U /* Default storage class used   */
-#define DS_DEF_TYPE             0x0002U /* Default type used            */
-#define DS_EXTRA_TYPE           0x0004U /* Extra type declared          */
+#define DS_NO_TYPE              0x0002U /* No type explicitly specified */
+#define DS_DEF_TYPE             0x0006U /* Default type used            */
+#define DS_EXTRA_TYPE           0x0008U /* Extra type declared          */
 #define DS_NEW_TYPE_DECL        0x0010U /* New type declared            */
 #define DS_NEW_TYPE_DEF         0x0020U /* New type defined             */
 #define DS_NEW_TYPE             (DS_NEW_TYPE_DECL | DS_NEW_TYPE_DEF)

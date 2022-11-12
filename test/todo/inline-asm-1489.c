@@ -27,7 +27,7 @@ void dotest1a(uint8_t *s, uint8_t *d)
     printf("dotest1a\n");
     while (*s != 0) {
         *d = (testasm1(*s));
-//        printf("%04x:%02x\n",d,*d);
+        printf("%04x:%02x\n",d,*d);
         d++;
         s++;
     }
@@ -38,6 +38,7 @@ void dotest1b(uint8_t *s, uint8_t *d)
     printf("dotest1b\n");
     while (*s != 0) {
         *d = (testasm2(*s));
+        printf("%04x:%02x\n",d,*d);
         d++;
         s++;
     }

@@ -4,7 +4,7 @@
 ** 2020-11-20, Greg King
 */
 
-//#define DEBUG
+#define DEBUG
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -2453,6 +2453,8 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
     unsigned ltype;
     int rconst;                         /* Operand is a constant */
 
+    LOG(("hie_compare\n"));
+
     ExprWithCheck (hienext, Expr);
 
     while ((Gen = FindGen (CurTok.Tok, Ops)) != 0) {
@@ -2480,7 +2482,11 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             /* Numeric constant value */
             GetCodePos (&Mark2);
 //            LOG(("iVal:%08x FVal:%f\n", Expr->IVal, Expr->V.FVal.V));
-            g_push (ltype | CF_CONST, Expr->IVal);
+            if (ltype == CF_FLOAT) {
+                g_push_float (ltype | CF_CONST, Expr->V.FVal.V);
+            } else {
+                g_push (ltype | CF_CONST, Expr->IVal);
+            }
         } else {
             /* Value not numeric constant */
             LoadExpr (CF_NONE, Expr);
@@ -2675,6 +2681,9 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             int CmpSigned   = IsClassInt (Expr->Type) && IsClassInt (Expr2.Type) &&
                               IsSignSigned (ArithmeticConvert (Expr->Type, Expr2.Type));
 
+            LOG(("hie_compare LeftSigned:%d RightSigned:%d CmpSigned:%d %x %x\n",
+                 LeftSigned, RightSigned, CmpSigned, Expr2.IVal, Expr->IVal));
+
             /* If the right hand side is constant, and the generator function
             ** expects the lhs in the primary, remove the push of the primary
             ** now.
@@ -2690,6 +2699,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
             /* Determine the type of the operation. */
             if (IsTypeChar (Expr->Type) && rconst && (!LeftSigned || RightSigned)) {
+                LOG(("hie_compare 1\n"));
 
                 /* Left side is unsigned char, right side is constant.
                 ** Determine the minimum and maximum values
@@ -2774,6 +2784,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
             } else if (IsTypeChar (Expr->Type) && IsTypeChar (Expr2.Type) &&
                 GetSignedness (Expr->Type) == GetSignedness (Expr2.Type)) {
+                LOG(("hie_compare 2\n"));
 
                 /* Both are chars with the same signedness. We can encode the
                 ** operation as a char operation.
@@ -2790,7 +2801,9 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             } else {
                 unsigned rtype = TypeOf (Expr2.Type) | (flags & CF_CONST);
                 flags |= g_typeadjust (ltype, rtype);
+                LOG(("hie_compare 3\n"));
             }
+            LOG(("hie_compare rconst:%d CmpSigned:%d \n", rconst, CmpSigned));
 
             /* If the comparison is made as unsigned types and the right is a
             ** constant, we may be able to change the compares to something more
@@ -2798,55 +2811,68 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             */
             if (!CmpSigned && rconst) {
 
-                switch (Tok) {
+                /* FIXME: float --- startcode end */
+                if (Expr2.Type == type_float) {
+                    LOG(("FIXME: special cases for comparison with float constant"));
+                } else {
+                /* FIXME: float --- newcode end */
 
-                    case TOK_LT:
-                        if (Expr2.IVal == 1) {
-                            /* An unsigned compare to one means that the value
-                            ** must be zero.
-                            */
-                            GenFunc = g_eq;
-                            Expr2.IVal = 0;
-                        }
-                        break;
+                    switch (Tok) {
 
-                    case TOK_LE:
-                        if (Expr2.IVal == 0) {
-                            /* An unsigned compare to zero means that the value
-                            ** must be zero.
-                            */
-                            GenFunc = g_eq;
-                        }
-                        break;
+                        case TOK_LT:
+                            if (Expr2.IVal == 1) {
+                                /* An unsigned compare to one means that the value
+                                ** must be zero.
+                                */
+                                GenFunc = g_eq;
+                                Expr2.IVal = 0;
+                            }
+                            break;
 
-                    case TOK_GE:
-                        if (Expr2.IVal == 1) {
-                            /* An unsigned compare to one means that the value
-                            ** must not be zero.
-                            */
-                            GenFunc = g_ne;
-                            Expr2.IVal = 0;
-                        }
-                        break;
+                        case TOK_LE:
+                            if (Expr2.IVal == 0) {
+                                /* An unsigned compare to zero means that the value
+                                ** must be zero.
+                                */
+                                GenFunc = g_eq;
+                            }
+                            break;
 
-                    case TOK_GT:
-                        if (Expr2.IVal == 0) {
-                            /* An unsigned compare to zero means that the value
-                            ** must not be zero.
-                            */
-                            GenFunc = g_ne;
-                        }
-                        break;
+                        case TOK_GE:
+                            if (Expr2.IVal == 1) {
+                                /* An unsigned compare to one means that the value
+                                ** must not be zero.
+                                */
+                                GenFunc = g_ne;
+                                Expr2.IVal = 0;
+                            }
+                            break;
 
-                    default:
-                        break;
+                        case TOK_GT:
+                            if (Expr2.IVal == 0) {
+                                /* An unsigned compare to zero means that the value
+                                ** must not be zero.
+                                */
+                                GenFunc = g_ne;
+                            }
+                            break;
 
+                        default:
+                            break;
+
+                    }
                 }
-
             }
 
-            /* Generate code */
-            GenFunc (flags, Expr2.IVal);
+            /* FIXME: float --- startcode end */
+            if (Expr2.Type == type_float) {
+                /* Generate code */
+                GenFunc (flags, FP_D_As32bitRaw(Expr2.V.FVal));
+            } else {
+                /* Generate code */
+                GenFunc (flags, Expr2.IVal);
+            }
+            /* FIXME: float --- newcode end */
 
             /* The result is an rvalue in the primary */
             ED_FinalizeRValLoad (Expr);
@@ -3657,6 +3683,7 @@ static void hie5 (ExprDesc* Expr)
         { TOK_NE,       GEN_NOPUSH,     g_ne    },
         { TOK_INVALID,  0,              0       }
     };
+    printf("hie5\n");
     hie_compare (hie5_ops, Expr, hie6);
 }
 

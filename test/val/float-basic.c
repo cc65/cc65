@@ -55,8 +55,17 @@ void test1(float f, char *str)
     }
 }
 
+void SKIPPEDtest1(float f, char *str)
+{
+    char temp[12];
+    sprintf(temp, "%08lx", *((uint32_t*)&f));
+    printf(" (SKIPPED:%s:%s)\n", temp, str);
+}
+
 void constconst(void)
 {
+    printf("\n*** constant vs constant\n\n");
+
     // addition
     printf("\nconstant + constant\n\n");
     fp1 = 0.1f;
@@ -105,7 +114,7 @@ void constconst(void)
 
 void varvar(void)
 {
-    printf("\nvariable vs variable\n\n");
+    printf("\n*** variable vs variable\n\n");
 
     /* addition, variable + variable */
     fp1 = 12.34f;
@@ -113,32 +122,32 @@ void varvar(void)
     fp3 = fp1 + fp2;   // = 55.55f
     printf("addition: %s+%s=%s\n", _ftostr(buf, fp1), _ftostr(buf2, fp2), _ftostr(buf3, fp3));
     printf(" fp3:0x%08lx [0x425e3333] %s (exp:55.549999)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-//  test1(fp3, "425e3333");
+SKIPPEDtest1(fp3, "425e3333");
 
     /* substraction, variable - variable */
     fp3 = fp1 - fp2;
     printf("substraction: %s-%s=%s\n", _ftostr(buf, fp1), _ftostr(buf2, fp2), _ftostr(buf3, fp3));
     printf(" fp3:0x%08lx [0xc1f6f5c2] %s (exp:-30.869999)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-//  test1(fp3, "c1f6f5c2");
+SKIPPEDtest1(fp3, "c1f6f5c2");
 
     fp1 = 25.2f;
     fp2 = 2.3f;
     fp3 = fp1 * fp2;
     printf("multiplication: %s*%s=%s\n", _ftostr(buf, fp1), _ftostr(buf2, fp2), _ftostr(buf3, fp3));
     printf(" fp3:0x%08lx [0x4267d70a] %s (exp:57.96)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-//  test1(fp3, "4267d70a");
+SKIPPEDtest1(fp3, "4267d70a");
 
     fp1 = 25.2f;
     fp2 = 2.5f;
     fp3 = fp1 / fp2;
     printf("division: %s/%s=%s\n", _ftostr(buf, fp1), _ftostr(buf2, fp2), _ftostr(buf3, fp3));
     printf(" fp3:0x%08lx [0x412147ae] %s (exp:10.08)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-//  test1(fp3, "412147ae");
+SKIPPEDtest1(fp3, "412147ae");
 }
 
 void varconst(void)
 {
-    printf("\nvariable vs constant\n\n");
+    printf("\n*** variable vs constant\n\n");
     /* addition, variable + constant */
     fp1 = 55.549999f;
     fp3 = fp1 + 0.05f;
@@ -152,60 +161,60 @@ void varconst(void)
     fp3 = fp1 - 11.5f;  // FIXME: Invalid operands for binary operator '-'
     printf("substraction: %s-%s=%s\n", _ftostr(buf, fp1), _ftostr(buf2, 11.5f), _ftostr(buf3, fp3));
     printf(" fp3:0x%08lx [0x3f570a40] %s ()", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-//  test1(fp3, "3f570a40");
+SKIPPEDtest1(fp3, "3f570a40");
 #endif
 
     fp1 = 25.2f;
     fp3 = fp1 * 2.3f;
     printf("multiplication: %s*%s=%s\n", _ftostr(buf, fp1), _ftostr(buf2, 2.3f), _ftostr(buf3, fp3));
     printf(" fp3:0x%08lx [0x4267d70a] %s ()", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-//  test1(fp3, "4267d70a");
+SKIPPEDtest1(fp3, "4267d70a");
 
 #if 0
     fp1 = 25.2f;
     fp3 = fp1 / 2.3f;   // FIXME: division by zero
     printf("division: %s/%s=%s\n", _ftostr(buf, fp1), _ftostr(buf2, 2.3f), _ftostr(buf3, fp3));
     printf(" fp3:0x%08lx [0x412f4dea] %s ()", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-//  test1(fp3, "412f4dea");
+SKIPPEDtest1(fp3, "412f4dea");
 #endif
 }
 
 void constvar(void)
 {
-    printf("\nconstant vs variable\n\n");
+    printf("\n*** constant vs variable\n\n");
 
     /* addition, constant + variable */
     fp2 = 43.21f;
     fp3 = 12.7f + fp2;  // FIXME: wrong, the add is dropped?
     printf("addition: %s+%s=%s\n", _ftostr(buf, 12.7f), _ftostr(buf2, fp2), _ftostr(buf3, fp3));
     printf(" fp3:0x%08lx [0x425fa3d7] %s", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-//    test1(fp3, "425fa3d7");
+SKIPPEDtest1(fp3, "425fa3d7");
 
     /* substraction, constant - variable */
     fp2 = 12.34;
     fp3 = 11.5f - fp2;  // FIXME: wrong, fp2 appears to become 0?
     printf("substraction: %s-%s=%s\n", _ftostr(buf, 11.5f), _ftostr(buf2, fp2), _ftostr(buf3, fp3));
     printf(" fp3:0x%08lx [0xbf570a40] %s ()", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-//    test1(fp3, "bf570a40");
+SKIPPEDtest1(fp3, "bf570a40");
 
     fp2 = 2.3f;
     fp3 = 25.2f * fp2;  // FIXME: wrong, fp3 appears to become 0?
     printf("multiplication: %s*%s=%s\n", _ftostr(buf, 25.2f), _ftostr(buf2, fp2), _ftostr(buf3, fp3));
     printf(" fp3:0x%08lx [0x4267d70a] %s ()", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-//    test1(fp3, "4267d70a");
+SKIPPEDtest1(fp3, "4267d70a");
 
     fp2 = 2.3f;
     fp3 = 25.2f / fp2;
     printf("division: %s/%s=%s\n", _ftostr(buf, 25.2f), _ftostr(buf2, fp2), _ftostr(buf3, fp3));
     printf(" fp3:0x%08lx [0x412f4dea] %s ()", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-//    test1(fp3, "412f4dea");
+SKIPPEDtest1(fp3, "412f4dea");
 }
 
 int main(void)
 {
     float fp2 = 43.21f;
 
-    printf("float-basic\n");
+    printf("*** float-basic ***\n");
     printf("fp1:0x%08lx [0x414570a4] %s (12.340000)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     printf("fp2:0x%08lx [0x422cd70a] %s (43.209999)\n", *((uint32_t*)&fp2), _ftostr(buf, fp2));
 

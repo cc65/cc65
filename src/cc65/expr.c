@@ -2204,7 +2204,7 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
                 case TOK_DIV:
                     if (Val2 == 0) {
                         if (!ED_IsUneval (Expr)) {
-                            Error ("Division by zero");
+                            Warning ("Division by zero");
                         }
                         Expr->IVal = 0xFFFFFFFF;
                     } else {
@@ -2219,7 +2219,7 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
                 case TOK_MOD:
                     if (Val2 == 0) {
                         if (!ED_IsUneval (Expr)) {
-                            Error ("Modulo operation with zero");
+                            Warning ("Modulo operation with zero");
                         }
                         Expr->IVal = 0;
                     } else {
@@ -2291,9 +2291,9 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
                 rtype |= CF_CONST;
                 if (Expr2.IVal == 0 && !ED_IsUneval (Expr)) {
                     if (Tok == TOK_DIV) {
-                        Error ("Division by zero");
+                        Warning ("Division by zero");
                     } else if (Tok == TOK_MOD) {
-                        Error ("Modulo operation with zero");
+                        Warning ("Modulo operation with zero");
                     }
                 }
                 if ((Gen->Flags & GEN_NOPUSH) != 0) {

@@ -319,9 +319,9 @@ static void OpAssignBitField (const GenDesc* Gen, ExprDesc* Expr, const char* Op
                     if (Expr2.IVal == 0) {
                         /* Check for div by zero/mod by zero */
                         if (Gen->Func == g_div) {
-                            Error ("Division by zero");
+                            Warning ("Division by zero");
                         } else if (Gen->Func == g_mod) {
-                            Error ("Modulo operation with zero");
+                            Warning ("Modulo operation with zero");
                         }
                     } else if (Gen->Func == g_asl || Gen->Func == g_asr) {
                         const Type* CalType  = IntPromotion (Expr->Type);
@@ -528,9 +528,9 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
                     if (Expr2.IVal == 0 && !ED_IsUneval (Expr)) {
                         /* Check for div by zero/mod by zero */
                         if (Gen->Func == g_div) {
-                            Error ("Division by zero");
+                            Warning ("Division by zero");
                         } else if (Gen->Func == g_mod) {
-                            Error ("Modulo operation with zero");
+                            Warning ("Modulo operation with zero");
                         }
                     } else if (Gen->Func == g_asl || Gen->Func == g_asr) {
                         const Type* CalType  = IntPromotion (Expr->Type);

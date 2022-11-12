@@ -224,17 +224,17 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
 ** impossible.
 */
 {
-    printf("TypeConversion\n");
+    LOG(("TypeConversion\n"));
 #if 0
     /* Debugging */
-    printf ("=======================================\n");
-    printf ("Expr:\n---------------------------------------\n");
+    LOG(("=======================================\n"));
+    LOG(("Expr:\n---------------------------------------\n"));
     PrintExprDesc (stdout, Expr);
-    printf ("\nType:\n---------------------------------------\n");
+    LOG(("\nType:\n---------------------------------------\n"));
     PrintType (stdout, NewType);
-    printf ("\n");
+    LOG(("\n");
     PrintRawType (stdout, NewType);
-    printf ("=======================================\n");
+    LOG(("=======================================\n"));
 #endif
     /* First, do some type checking */
     typecmp_t Result    = TYPECMP_INITIALIZER;

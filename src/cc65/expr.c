@@ -3731,7 +3731,6 @@ static void hie5 (ExprDesc* Expr)
         { TOK_NE,       GEN_NOPUSH,     g_ne    },
         { TOK_INVALID,  0,              0       }
     };
-    printf("hie5\n");
     hie_compare (hie5_ops, Expr, hie6);
 }
 

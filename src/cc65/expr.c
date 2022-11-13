@@ -2259,12 +2259,24 @@ LOG(("hie_internal Expr->Type:%s Expr2->Type:%s\n",
                       this must be extended to handle mixed operations */
 //             if ((IsClassFloat (Expr->Type) == CF_FLOAT) &&
 //                 (IsClassFloat (Expr2.Type) == CF_FLOAT)) {
-            if ((Expr->Type == type_float) &&
+            if ((ltype == CF_FLOAT) ||
                 (Expr2.Type == type_float)) {
                 /* Evaluate the result for float operands */
-                Double Val1 = Expr->V.FVal;
-                Double Val2 = Expr2.V.FVal;
-                LOG(("hie_internal float X float\n"));
+                Double Val1;
+                Double Val2;
+                LOG(("hie_internal float X float %d %d\n", Expr->IVal, Expr2.IVal));
+                if (ltype == CF_FLOAT) {
+                    Val1 = Expr->V.FVal;
+                } else {
+                    Val1 = FP_D_FromInt(Expr->IVal);
+                }
+                if (TypeOf (Expr2.Type) == CF_FLOAT) {
+                    Val2 = Expr2.V.FVal;
+                } else {
+                    Val2 = FP_D_FromInt(Expr2.IVal);
+                }
+                LOG(("hie_internal float X float %f %f\n", Expr->V.FVal.V, Expr2.V.FVal.V));
+
                 switch (Tok) {
                     case TOK_DIV:
 #if 0 // TODO
@@ -2973,7 +2985,7 @@ static void hie9 (ExprDesc *Expr)
         { TOK_INVALID,  0,                      0       }
     };
     int UsedGen;
-
+    LOG(("hie9\n"));
     hie_internal (hie9_ops, Expr, hie10, &UsedGen);
 }
 

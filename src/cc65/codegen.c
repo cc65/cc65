@@ -730,12 +730,16 @@ void _g_getimmed(unsigned Flags, uintptr_t Val, long Offs)
         switch (Flags & CF_TYPEMASK) {
 
             case CF_CHAR:
+                LOG(("g_getimmed CF_CHAR Val: %08lx\n", Val));
+                ASMLOG(("nop\t; g_getimmed CF_CHAR %08lx\n", Val));   // FIXME: remove
                 if ((Flags & CF_FORCECHAR) != 0) {
                     AddCodeLine ("lda #$%02X", (unsigned char) Val);
                     break;
                 }
                 /* FALL THROUGH */
             case CF_INT:
+                LOG(("g_getimmed CF_INT Val: %08lx\n", Val));
+                ASMLOG(("nop\t; g_getimmed CF_INT %08lx\n", Val));   // FIXME: remove
                 AddCodeLine ("ldx #$%02X", (unsigned char) (Val >> 8));
                 AddCodeLine ("lda #$%02X", (unsigned char) Val);
                 break;

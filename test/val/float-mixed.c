@@ -76,6 +76,21 @@ void test(void)
     fp1 = XMIN + ch * XSTEP;
     printf("fp1:0x%08lx [0x3f19979a] %s (0.5999)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     test1(fp1, "3f19979a");
+
+    printf("floatconst / intconst, intconst / floatconst\n");
+    fp1 = ( (20.0f / 4.5f));
+    fp2 = ( (4.5f / 20.0f));
+    printf(" fp1:0x%08lx [0x408e38e4] %s (exp:4.444445)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "408e38e4");
+    printf(" fp2:0x%08lx [0x3e666666] %s (exp:0.225000)\n", *((uint32_t*)&fp2), _ftostr(buf, fp2));
+    test1(fp2, "3e666666");
+
+    fp1 = ((20 / 4.5f));  // 4.44
+    fp2 = ((4.5f / 20));  // 0.225
+    printf(" fp1:0x%08lx [0x408e38e4] %s (exp:4.444445)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "408e38e4");
+    printf(" fp2:0x%08lx [0x3e666666] %s (exp:0.225000)\n", *((uint32_t*)&fp2), _ftostr(buf, fp2));
+    test1(fp2, "3e666666");
 }
 
 int main(void)

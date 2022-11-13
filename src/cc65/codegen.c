@@ -1326,46 +1326,53 @@ void g_tosint (unsigned flags)
 
 
 
-static void g_regchar (unsigned Flags)
-/* Make sure, the value in the primary register is in the range of char. Truncate if necessary */
+static void g_regchar (unsigned to)
+/* Treat the value in the primary register as a char with specified signedness
+** and convert it to an int (whose representation is irrelevent of signedness).
+*/
 {
-    unsigned L;
-    LOG(("g_regchar flags: %04x\n", Flags));
-    ASMLOG(("nop ; g_regchar flags: %04x\n", Flags));    // FIXME:remove
+    LOG(("g_regchar flags: %04x\n", to));
+    ASMLOG(("nop ; g_regchar flags: %04x\n", to));    // FIXME:remove
 
-    /* FIXME: float */
-    if ((Flags & CF_TYPEMASK) == CF_FLOAT) {
-        // convert float to int, then fall through to char conversion
-        AddCodeLine ("jsr feaxint");
-//        typeerror (Flags);
-//        return;
-    }
-
-    AddCodeLine ("ldx #$00");
-
-    if ((Flags & CF_UNSIGNED) == 0) {
-        /* Sign extend */
-        L = GetLocalLabel();
-        AddCodeLine ("cmp #$80");
-        AddCodeLine ("bcc %s", LocalLabelName (L));
-        AddCodeLine ("dex");
-        g_defcodelabel (L);
-    }
+    /* Since char is the smallest type supported here, we never need any info
+    ** about the original type to "promote from it". However, we have to make
+    ** sure the entire AX contains the correct char value as an int, since we
+    ** will almost always use the char value as an int in AX directly in code
+    ** generation (unless CF_FORCECHAR is specified). That is to say, we don't
+    ** need the original "from" flags for the first conversion to char, but do
+    ** need the original "to" flags as the new "from" flags for the conversion
+    ** to int.
+    */
+    g_regint (to | CF_FORCECHAR);
 }
 
 
-
-void g_regint (unsigned Flags)
-/* Make sure, the value in the primary register is an int. Convert if necessary */
+void g_regint (unsigned from)
+/* Convert the value in the primary register to an int (whose representation
+** is irrelevent of signedness).
+*/
 {
-    LOG(("g_regint flags: %04x\n", Flags));
-    ASMLOG(("nop ; g_regint flags: %04x\n", Flags));    // FIXME:remove
-    switch (Flags & CF_TYPEMASK) {
+    LOG(("g_regint flags: %04x\n", from));
+    ASMLOG(("nop ; g_regint flags: %04x\n", from));    // FIXME:remove
+    switch (from & CF_TYPEMASK) {
 
         case CF_CHAR:
-            if (Flags & CF_FORCECHAR) {
-                /* Conversion is from char */
-                g_regchar (Flags);
+            /* If the original value was forced to use only A, it must be
+            ** extended from char to fill AX. Otherwise nothing to do here
+            ** since AX would already have the correct int value.
+            */
+            if (from & CF_FORCECHAR) {
+                AddCodeLine ("ldx #$00");
+
+                if ((from & CF_UNSIGNED) == 0) {
+                    /* Sign extend */
+                    unsigned L = GetLocalLabel();
+                    AddCodeLine ("cmp #$80");
+                    AddCodeLine ("bcc %s", LocalLabelName (L));
+                    AddCodeLine ("dex");
+                    g_defcodelabel (L);
+                }
+                break;
             }
             /* FALLTHROUGH */
 
@@ -1379,22 +1386,27 @@ void g_regint (unsigned Flags)
             break;
 
         default:
-            typeerror (Flags);
+            typeerror (from);
     }
 }
 
 
-
-void g_reglong (unsigned Flags)
-/* Make sure, the value in the primary register a long. Convert if necessary */
+void g_reglong (unsigned from)
+/* Convert the value in the primary register to a long (whose representation
+** is irrelevent of signedness).
+*/
 {
-    LOG(("g_reglong flags: %04x\n", Flags));
-    switch (Flags & CF_TYPEMASK) {
+    LOG(("g_reglong flags: %04x\n", from));
+    switch (from & CF_TYPEMASK) {
 
         case CF_CHAR:
-            if (Flags & CF_FORCECHAR) {
+            /* If the original value was forced to use only A, it must be
+            ** extended from char to long. Otherwise AX would already have
+            ** the correct int value to be extened to long.
+            */
+            if (from & CF_FORCECHAR) {
                 /* Conversion is from char */
-                if (Flags & CF_UNSIGNED) {
+                if (from & CF_UNSIGNED) {
                     if (IS_Get (&CodeSizeFactor) >= 200) {
                         AddCodeLine ("ldx #$00");
                         AddCodeLine ("stx sreg");
@@ -1404,18 +1416,19 @@ void g_reglong (unsigned Flags)
                     }
                 } else {
                     if (IS_Get (&CodeSizeFactor) >= 366) {
-                        g_regchar (Flags);
+                        g_regint (from);
                         AddCodeLine ("stx sreg");
                         AddCodeLine ("stx sreg+1");
                     } else {
                         AddCodeLine ("jsr along");
                     }
                 }
+                break;
             }
             /* FALLTHROUGH */
 
         case CF_INT:
-            if (Flags & CF_UNSIGNED) {
+            if (from & CF_UNSIGNED) {
                 if (IS_Get (&CodeSizeFactor) >= 200) {
                     AddCodeLine ("ldy #$00");
                     AddCodeLine ("sty sreg");
@@ -1437,29 +1450,31 @@ void g_reglong (unsigned Flags)
             break;
 
         default:
-            typeerror (Flags);
+            typeerror (from);
     }
 }
 
-void g_regfloat (unsigned Flags)
-/* Make sure, the value in the primary register is a float. Convert if necessary */
+
+void g_regfloat (unsigned from)
+/* Convert the value in the primary register to a float */
 {
-    LOG(("g_regfloat flags: %04x\n", Flags));
-    switch (Flags & CF_TYPEMASK) {
+    LOG(("g_regfloat flags: %04x\n", from));
+    switch (from & CF_TYPEMASK) {
 
         case CF_CHAR:
-            if (Flags & CF_FORCECHAR) {
+            if (from & CF_FORCECHAR) {
                 /* Conversion is from char */
-                if (Flags & CF_UNSIGNED) {
+                if (from & CF_UNSIGNED) {
                     AddCodeLine ("jsr aufloat");
                 } else {
                     AddCodeLine ("jsr afloat");
                 }
+                break;
             }
             /* FALLTHROUGH */
 
         case CF_INT:
-            if (Flags & CF_UNSIGNED) {
+            if (from & CF_UNSIGNED) {
                 AddCodeLine ("jsr axufloat");
             } else {
                 AddCodeLine ("jsr axfloat");
@@ -1467,7 +1482,7 @@ void g_regfloat (unsigned Flags)
             break;
 
         case CF_LONG:
-            if (Flags & CF_UNSIGNED) {
+            if (from & CF_UNSIGNED) {
                 AddCodeLine ("jsr eaxufloat");
             } else {
                 AddCodeLine ("jsr eaxfloat");
@@ -1479,7 +1494,7 @@ void g_regfloat (unsigned Flags)
             break;
 
         default:
-            typeerror (Flags);
+            typeerror (from);
     }
 }
 
@@ -1633,63 +1648,66 @@ unsigned g_typeadjust (unsigned lhs, unsigned rhs)
 
 
 
-unsigned g_typecast (unsigned lhs, unsigned rhs)
-/* Cast the value in the primary register to the operand size that is flagged
-** by the lhs value. Return the result value.
+unsigned g_typecast (unsigned to, unsigned from)
+/* Cast the value in the primary register to the specified operand size and
+** signedness. Return the result flags.
 */
 {
-    LOG(("g_typecast 2 lhs: %s <- rhs: %s (rhs is %s)\n",
-        ((lhs & CF_TYPEMASK) == CF_FLOAT) ? "float" : "int",
-        ((rhs & CF_TYPEMASK) == CF_FLOAT) ? "float" : "int",
-        ((rhs & CF_CONST) == 0) ? "not const" : "const"
+    LOG(("g_typecast 2 to: %s <- from: %s (from is %s)\n",
+        ((to & CF_TYPEMASK) == CF_FLOAT) ? "float" : "int",
+        ((from & CF_TYPEMASK) == CF_FLOAT) ? "float" : "int",
+        ((from & CF_CONST) == 0) ? "not const" : "const"
     ));
     /* Check if a conversion is needed */
-    if ((rhs & CF_CONST) == 0) {
-        switch (lhs & CF_TYPEMASK) {
+    if ((from & CF_CONST) == 0) {
+        switch (to & CF_TYPEMASK) {
 
             /* FIXME: float */
             case CF_FLOAT:
                 /* We must promote the primary register to float */
-                g_regfloat (rhs);
+                g_regfloat (from);
                 break;
 
             case CF_LONG:
-                /* We must promote the primary register to long */
-                g_reglong (rhs);
+                /* We must promote the primary register to long in EAX */
+                g_reglong (from);
                 break;
 
             case CF_INT:
-                /* We must promote the primary register to int */
-                g_regint (rhs);
+                /* We must promote the primary register to int in AX */
+                g_regint (from);
                 break;
 
             case CF_CHAR:
-                /* We must truncate the primary register to char */
-                g_regchar (rhs);
-//                g_regchar (lhs);      // BUG IN HEAD?
+                if ((from & CF_TYPEMASK) == CF_FLOAT) {
+                    /* convert float to int, then fall through to char conversion */
+                    AddCodeLine ("jsr feaxint");
+                }
+                /* We must truncate the primary register to char and then
+                ** sign-extend it to signed int in AX.
+                */
+                g_regchar (to);
                 break;
 
             default:
-                typeerror (rhs);
-//                typeerror (lhs);      // BUG IN HEAD
+                /* Since we are switching on "to", report an error on it */
+                typeerror (to);
         }
     } else {
         LOG(("g_typecast 2 no conversion done\n"));
     }
 
-    /* Do not need any other action. If the left type is int, and the primary
+    /* Do not need any other action. If the "to" type is int, and the primary
     ** register is long, it will be automagically truncated. If the right hand
     ** side is const, it is not located in the primary register and handled by
     ** the expression parser code.
     */
 
     /* Result is const if the right hand side was const */
-    lhs |= (rhs & CF_CONST);
+    to |= (from & CF_CONST);
 
-    /* The resulting type is that of the left hand side (that's why you called
-    ** this function :-)
-    */
-    return lhs;
+    /* The resulting type is "to" (that's why you called this function :-) */
+    return to;
 }
 
 

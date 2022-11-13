@@ -208,11 +208,15 @@ void g_toslong (unsigned flags);
 void g_tosint (unsigned flags);
 /* Make sure, the value on TOS is an int. Convert if necessary */
 
-void g_regint (unsigned Flags);
-/* Make sure, the value in the primary register an int. Convert if necessary */
+void g_regint (unsigned from);
+/* Convert the value in the primary register to an int (whose representation
+** is irrelevent of signedness).
+*/
 
-void g_reglong (unsigned Flags);
-/* Make sure, the value in the primary register a long. Convert if necessary */
+void g_reglong (unsigned from);
+/* Convert the value in the primary register to a long (whose representation
+** is irrelevent of signedness).
+*/
 
 unsigned g_typeadjust (unsigned lhs, unsigned rhs);
 /* Adjust the integer operands before doing a binary operation. lhs is a flags
@@ -220,9 +224,9 @@ unsigned g_typeadjust (unsigned lhs, unsigned rhs);
 **  in (e)ax. The return value is the flags value for the resulting type.
 */
 
-unsigned g_typecast (unsigned lhs, unsigned rhs);
-/* Cast the value in the primary register to the operand size that is flagged
-** by the lhs value. Return the result value.
+unsigned g_typecast (unsigned to, unsigned from);
+/* Cast the value in the primary register to the specified operand size and
+** signedness. Return the result flags.
 */
 
 void g_scale (unsigned flags, long val);

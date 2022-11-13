@@ -2477,7 +2477,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
     unsigned ltype;
     int rconst;                         /* Operand is a constant */
 
-    LOG(("hie_compare\n"));
+//    LOG(("hie_compare\n"));
 
     ExprWithCheck (hienext, Expr);
 

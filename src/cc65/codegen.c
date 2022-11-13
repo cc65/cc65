@@ -1546,18 +1546,21 @@ unsigned g_typeadjust (unsigned lhs, unsigned rhs)
 
     ASMLOG(("nop ; g_typeadjust ltype:%x rtype:%x", ltype, rtype)); // FIXME: remove
 
-    /* FIXME: float - this is is much more complicated */
+    /* FIXME: float - this is much much more complicated */
     if (ltype == CF_FLOAT && rtype == CF_FLOAT) {
+//        g_regfloat (rhs);
         ASMLOG(("nop ; g_typeadjust return:%x float", const_flag | CF_FLOAT)); // FIXME: remove
         return const_flag | CF_FLOAT;
     }
     if (ltype == CF_FLOAT) {
         FIXME(("FIXME: conversion to float format missing\n"));
+        g_regfloat (rhs);
         ASMLOG(("nop ; g_typeadjust return:%x float", (lhs & CF_CONST) | CF_FLOAT)); // FIXME: remove
         return (lhs & CF_CONST) | CF_FLOAT;
     }
     if (rtype == CF_FLOAT) {
         FIXME(("FIXME: conversion to float format missing\n"));
+        g_regfloat (lhs);
         ASMLOG(("nop ; g_typeadjust return:%x float", (rhs & CF_CONST) | CF_FLOAT)); // FIXME: remove
         return (rhs & CF_CONST) | CF_FLOAT;
     }
@@ -2543,19 +2546,20 @@ void g_test (unsigned flags)
 void g_push (unsigned flags, unsigned long val)
 /* Push the primary register or a constant value onto the stack */
 {
-    if (flags & CF_CONST && (flags & CF_TYPEMASK) != CF_LONG) {
+    if (flags & CF_CONST && ((flags & CF_TYPEMASK) < CF_LONG)) {
 
         /* We have a constant 8 or 16 bit value */
         if ((flags & CF_TYPEMASK) == CF_CHAR && (flags & CF_FORCECHAR)) {
 
             /* Handle as 8 bit value */
+            ASMLOG(("nop ; g_push 8bit const")); // FIXME: remove
             AddCodeLine ("lda #$%02X", (unsigned char) val);
             AddCodeLine ("jsr pusha");
 
         } else {
 
             /* Handle as 16 bit value */
-            ASMLOG(("nop ; g_push")); // FIXME: remove
+            ASMLOG(("nop ; g_push 16bit const")); // FIXME: remove
             g_getimmed (flags, val, 0);
             AddCodeLine ("jsr pushax");
         }
@@ -2568,6 +2572,7 @@ void g_push (unsigned flags, unsigned long val)
             ASMLOG(("nop ; g_push load val into eax")); // FIXME: remove
             g_getimmed (flags, val, 0);
         }
+        ASMLOG(("nop ; g_push value")); // FIXME: remove
 
         /* Push the primary register */
         switch (flags & CF_TYPEMASK) {

@@ -3042,7 +3042,7 @@ void g_div (unsigned flags, unsigned long val)
     LOG(("g_div flags:%04x val:%d\n", flags, val));
 
     /* Do strength reduction if the value is constant and a power of two */
-    if (flags & CF_CONST) {
+    if ((flags & CF_CONST) && ((flags & CF_TYPEMASK) != CF_FLOAT)) {
 
         /* Deal with negative values as well as different sizes */
         int           Negation   = (flags & CF_UNSIGNED) == 0 && (long)val < 0;
@@ -3106,7 +3106,6 @@ void g_div (unsigned flags, unsigned long val)
                 g_restore (flags);
                 AddCodeLine ("bcs %s", LocalLabelName (DoShiftLabel));
 
-                ASMLOG(("nop ; g_div")); // FIXME: remove
                 /* The result is 0. We can just load 0 and skip the shifting. */
                 g_getimmed (flags | CF_ABSOLUTE, 0, 0);
 

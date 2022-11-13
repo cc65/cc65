@@ -3201,8 +3201,8 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                 flags |= typeadjust (Expr, &Expr2, 1);
             } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassFloat (rhst)) {
                 /* Float addition */
-                /*flags |= typeadjust (Expr, &Expr2, 1);*/
                 LOG(("%s:%d float addition (const + var)\n", __FILE__, __LINE__));
+                flags |= typeadjust (Expr, &Expr2, 1);
             } else {
                 /* OOPS */
                 LOG(("%s:%d OOPS\n", __FILE__, __LINE__));
@@ -3211,19 +3211,23 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
 
             /* Generate the code for the add */
             if (!AddDone) {
-                if (ED_IsAbs (Expr) &&
-                    Expr->IVal >= 0 &&
-                    Expr->IVal * lscale < 256) {
-                    /* Numeric constant */
-                    g_inc (flags, Expr->IVal * lscale);
-                    AddDone = 1;
+                if (!IsClassFloat (lhst) && !IsClassFloat (rhst)) {
+                    if (ED_IsAbs (Expr) &&
+                        Expr->IVal >= 0 &&
+                        Expr->IVal * lscale < 256) {
+                        LOG(("%s:%d call g_inc for integer\n", __FILE__, __LINE__));
+                        /* Numeric constant */
+                        g_inc (flags, Expr->IVal * lscale);
+                        AddDone = 1;
+                    }
                 }
             }
-
+            LOG(("%s:%d AddDone:%d\n", __FILE__, __LINE__, AddDone));
             if (!AddDone) {
                 if (ED_IsLocQuasiConst (&Expr2) &&
                     rscale == 1                 &&
                     CheckedSizeOf (rhst) == SIZEOF_CHAR) {
+                    LOG(("%s:%d char\n", __FILE__, __LINE__));
                     /* Change the order back */
                     RemoveCode (&Mark);
                     /* Load lhs */
@@ -3238,8 +3242,17 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                     }
                 } else if (ED_IsAbs (Expr)) {
                     /* Numeric constant */
-                    g_inc (flags, Expr->IVal * lscale);
+                    if (TypeOf (Expr->Type) == CF_FLOAT) {
+                        //FP_D_As32bitRaw()
+                        LOG(("%s:%d const float\n", __FILE__, __LINE__));
+                        Double res = FP_D_Mul(Expr->V.FVal, FP_D_FromInt(lscale));
+                        g_inc (flags, FP_D_As32bitRaw(res));
+                    } else {
+                        LOG(("%s:%d const ival:%d\n", __FILE__, __LINE__, Expr->IVal));
+                        g_inc (flags, Expr->IVal * lscale);
+                    }
                 } else if (lscale == 1) {
+                    LOG(("%s:%d addr\n", __FILE__, __LINE__));
                     if (ED_IsLocStack (Expr)) {
                         /* Constant address */
                         g_addaddr_local (flags, Expr->IVal);
@@ -3247,6 +3260,7 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                         g_addaddr_static (flags, Expr->Name, Expr->IVal);
                     }
                 } else {
+                    LOG(("%s:%d call long way\n", __FILE__, __LINE__));
                     /* Since we do already have rhs in the primary, if lhs is
                     ** not a numeric constant, and the scale factor is not one
                     ** (no scaling), we must take the long way over the stack.

@@ -74,8 +74,16 @@ void test(void)
 
     printf("floatconst + intvar * floatconst\n");
     fp1 = XMIN + ch * XSTEP;
-    printf("fp1:0x%08lx [0x3f19979a] %s (0.5999)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
-    test1(fp1, "3f19979a");
+    printf("fp1:0x%08lx [0x402663e6] %s (2.5997)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "402663e6");
+
+    ch = 4;
+    fp1 = ch * 2.0f + 3.0f;
+    fp2 = 3.0f + ch * 2.0f;
+    printf(" fp1:0x%08lx [0x41300000] %s (exp:11)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    printf(" fp2:0x%08lx [0x41300000] %s (exp:11)\n", *((uint32_t*)&fp2), _ftostr(buf, fp2));
+    test1(fp1, "41300000");
+    test1(fp2, "41300000");
 
     printf("floatconst / intconst, intconst / floatconst\n");
     fp1 = ( (20.0f / 4.5f));
@@ -91,6 +99,7 @@ void test(void)
     test1(fp1, "408e38e4");
     printf(" fp2:0x%08lx [0x3e666666] %s (exp:0.225000)\n", *((uint32_t*)&fp2), _ftostr(buf, fp2));
     test1(fp2, "3e666666");
+
 }
 
 int main(void)

@@ -26,7 +26,6 @@ NOT WORKING YET:
 
 - float values as in "12.34f" work, but "12.34" does not - should it?
 
-- addition, float const + float var
 - substraction, float const - float var
 - division, float const / float var
 

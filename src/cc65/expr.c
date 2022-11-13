@@ -2368,6 +2368,7 @@ LOG(("hie_internal Expr->Type:%s Expr2->Type:%s\n",
             ** returned without this modification).  This allows more efficient operations,
             ** but does not affect correctness for the same reasons explained in g_typeadjust.
             */
+            LOG(("hie_internal ?1\n"));
             if (ltype == CF_INT && Expr->IVal >= 0 && Expr->IVal < 256) {
                 ltype = CF_CHAR | CF_UNSIGNED;
             }
@@ -2391,7 +2392,11 @@ LOG(("hie_internal Expr->Type:%s Expr2->Type:%s\n",
             Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
 
             /* Generate code */
-            Gen->Func (type, Expr->IVal);
+            if (TypeOf (Expr2.Type) == CF_FLOAT) {
+                Gen->Func (type, FP_D_As32bitRaw(Expr->V.FVal));
+            } else {
+                Gen->Func (type, Expr->IVal);
+            }
 
             /* We have an rvalue in the primary now */
             ED_FinalizeRValLoad (Expr);
@@ -2404,19 +2409,26 @@ LOG(("hie_internal Expr->Type:%s Expr2->Type:%s\n",
             */
             unsigned rtype = TypeOf (Expr2.Type);
             type = 0;
+            LOG(("hie_internal ?2 rconst: %d rtype:%x\n", rconst, rtype));
             if (rconst) {
                 /* As above, but for the RHS. */
                 if (rtype == CF_INT && Expr2.IVal >= 0 && Expr2.IVal < 256) {
                     rtype = CF_CHAR | CF_UNSIGNED;
                 }
                 /* Second value is constant - check for div */
+                LOG(("rtype float is %x\n", CF_FLOAT));
+                if (rtype == CF_FLOAT) {
+                    // FIXME add respective checks for float
+                    FIXME(("add div checks for float\n"));
+                } else {
+                    if (Tok == TOK_DIV && Expr2.IVal == 0) {
+                        Error ("Division by zero");
+                    } else if (Tok == TOK_MOD && Expr2.IVal == 0) {
+                        Error ("Modulo operation with zero");
+                    }
+                }
                 type |= CF_CONST;
                 rtype |= CF_CONST;
-                if (Tok == TOK_DIV && Expr2.IVal == 0) {
-                    Error ("Division by zero");
-                } else if (Tok == TOK_MOD && Expr2.IVal == 0) {
-                    Error ("Modulo operation with zero");
-                }
                 if ((Gen->Flags & GEN_NOPUSH) != 0) {
                     RemoveCode (&Mark2);
                     ltype |= CF_PRIMARY;    /* Value is in register */
@@ -2428,7 +2440,11 @@ LOG(("hie_internal Expr->Type:%s Expr2->Type:%s\n",
             Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
 
             /* Generate code */
-            Gen->Func (type, Expr2.IVal);
+            if (TypeOf (Expr2.Type) == CF_FLOAT) {
+                Gen->Func (type, FP_D_As32bitRaw(Expr2.V.FVal));
+            } else {
+                Gen->Func (type, Expr2.IVal);
+            }
 
             /* We have an rvalue in the primary now */
             ED_FinalizeRValLoad (Expr);

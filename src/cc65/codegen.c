@@ -2611,7 +2611,7 @@ void g_push_float (unsigned flags, double val)
 #endif
 //                 g_getimmed (0x41,*p,0);
 #if 1
-                LOG(("g_push_float flags:%04x f:%p\n", flags, *p));
+                LOG(("g_push_float flags:%04x\n", flags));
                 ASMLOG(("nop ; g_push_float")); // FIXME: remove
                 g_getimmed (flags | CF_CONST, FP_D_As32bitRaw(FP_D_Make(val)), 0); // ?? FIXME
 #endif

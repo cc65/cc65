@@ -61,32 +61,34 @@ void varvar(void)
     printf("\nvariable vs variable\n\n");
 
     /* addition, variable + variable */
-    fp1 = 12.34f;
-    fp2 = 43.21f;
-    fp3 = fp1 + fp2;   // = 55.55f
+    fp1 = 16.5f;
+    fp2 = 64.25f;
+    fp3 = fp1 + fp2;   // = 80.75f
     printf("addition: %s+%s=%s\n", _ftostr(buf, fp1), _ftostr(buf2, fp2), _ftostr(buf3, fp3));
-    printf(" fp3:0x%08lx [0x425e3333] %s (exp:55.549999)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-    test1(fp3, "425e3333");
+    printf(" fp3:0x%08lx [0x42a18000] %s (exp:80.75)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
+    test1(fp3, "42a18000");
 
     /* substraction, variable - variable */
+    fp1 = 64.25f;
+    fp2 = 16.5f;
     fp3 = fp1 - fp2;
     printf("substraction: %s-%s=%s\n", _ftostr(buf, fp1), _ftostr(buf2, fp2), _ftostr(buf3, fp3));
-    printf(" fp3:0x%08lx [0xc1f6f5c2] %s (exp:-30.869999)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-    test1(fp3, "c1f6f5c2");
+    printf(" fp3:0x%08lx [0x423f0000] %s (exp:47.75)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
+    test1(fp3, "423f0000");
 
-    fp1 = 25.2f;
-    fp2 = 2.3f;
+    fp1 = 8.5f;
+    fp2 = 2.25f;
     fp3 = fp1 * fp2;
     printf("multiplication: %s*%s=%s\n", _ftostr(buf, fp1), _ftostr(buf2, fp2), _ftostr(buf3, fp3));
-    printf(" fp3:0x%08lx [0x4267d70a] %s (exp:57.96)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-    test1(fp3, "4267d70a");
+    printf(" fp3:0x%08lx [0x41990000] %s (exp:19.125)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
+    test1(fp3, "41990000");
 
-    fp1 = 25.2f;
+    fp1 = 16.25f;
     fp2 = 2.5f;
     fp3 = fp1 / fp2;
     printf("division: %s/%s=%s\n", _ftostr(buf, fp1), _ftostr(buf2, fp2), _ftostr(buf3, fp3));
-    printf(" fp3:0x%08lx [0x412147ae] %s (exp:10.08)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-    test1(fp3, "412147ae");
+    printf(" fp3:0x%08lx [0x40d00000] %s (exp:6.5)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
+    test1(fp3, "40d00000");
 }
 
 

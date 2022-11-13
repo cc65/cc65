@@ -60,31 +60,23 @@ void constvar(void)
 {
     printf("\nconstant vs variable\n\n");
 
-    /* addition, constant + variable */
-    fp2 = 43.21f;
-    fp3 = 12.7f + fp2;  // FIXME: wrong, the add is dropped?
-    printf("addition: %s+%s=%s\n", _ftostr(buf, 12.7f), _ftostr(buf2, fp2), _ftostr(buf3, fp3));
-    printf(" fp3:0x%08lx [0x425fa3d7] %s", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-    test1(fp3, "425fa3d7");
+    fp2 = 64.25f;
+    fp3 = 16.75f + fp2;
+    printf("addition: %s+%s=%s\n", _ftostr(buf, 16.75f), _ftostr(buf2, fp2), _ftostr(buf3, fp3));
+    printf(" fp3:0x%08lx [0x42a20000] %s (81.0)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
+    test1(fp3, "42a20000");
 
-    /* substraction, constant - variable */
-    fp2 = 12.34;
-    fp3 = 11.5f - fp2;  // FIXME: wrong, fp2 appears to become 0?
-    printf("substraction: %s-%s=%s\n", _ftostr(buf, 11.5f), _ftostr(buf2, fp2), _ftostr(buf3, fp3));
-    printf(" fp3:0x%08lx [0xbf570a40] %s ()", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-    test1(fp3, "bf570a40");
+    fp2 = 16.25;
+    fp3 =  8.5f - fp2;
+    printf("substraction: %s-%s=%s\n", _ftostr(buf, 8.5f), _ftostr(buf2, fp2), _ftostr(buf3, fp3));
+    printf(" fp3:0x%08lx [0xc0f80000] %s (-7.75)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
+    test1(fp3, "c0f80000");
 
-    fp2 = 2.3f;
-    fp3 = 25.2f * fp2;  // FIXME: wrong, fp3 appears to become 0?
-    printf("multiplication: %s*%s=%s\n", _ftostr(buf, 25.2f), _ftostr(buf2, fp2), _ftostr(buf3, fp3));
-    printf(" fp3:0x%08lx [0x4267d70a] %s ()", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-    test1(fp3, "4267d70a");
-
-    fp2 = 2.3f;
-    fp3 = 25.2f / fp2;
-    printf("division: %s/%s=%s\n", _ftostr(buf, 25.2f), _ftostr(buf2, fp2), _ftostr(buf3, fp3));
-    printf(" fp3:0x%08lx [0x412f4dea] %s ()", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-    test1(fp3, "412f4dea");
+    fp2 = 2.5f;
+    fp3 = 16.5f / fp2;
+    printf("division: %s/%s=%s\n", _ftostr(buf, 16.5f), _ftostr(buf2, fp2), _ftostr(buf3, fp3));
+    printf(" fp3:0x%08lx [0x40d33333] %s (6.60)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
+    test1(fp3, "40d33333");
 }
 
 int main(void)

@@ -1662,7 +1662,6 @@ unsigned g_typecast (unsigned to, unsigned from)
     if ((from & CF_CONST) == 0) {
         switch (to & CF_TYPEMASK) {
 
-            /* FIXME: float */
             case CF_FLOAT:
                 /* We must promote the primary register to float */
                 g_regfloat (from);
@@ -1679,10 +1678,12 @@ unsigned g_typecast (unsigned to, unsigned from)
                 break;
 
             case CF_CHAR:
+                /* If we are converting from float, first convert float to int,
+                   then fall through to char conversion */
                 if ((from & CF_TYPEMASK) == CF_FLOAT) {
-                    /* convert float to int, then fall through to char conversion */
                     AddCodeLine ("jsr feaxint");
                 }
+
                 /* We must truncate the primary register to char and then
                 ** sign-extend it to signed int in AX.
                 */

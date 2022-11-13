@@ -2913,7 +2913,7 @@ void g_mul (unsigned flags, unsigned long val)
     LOG(("g_mul flags:%04x val:%d\n", flags, val));
 
     /* Do strength reduction if the value is constant and a power of two */
-    if (flags & CF_CONST) {
+    if ((flags & CF_CONST) && ((flags & CF_TYPEMASK) != CF_FLOAT)) {
 
         /* Deal with negative values if it's signed multiplication */
         int Negation = (flags & CF_UNSIGNED) == 0 && (long)val < 0;

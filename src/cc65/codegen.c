@@ -1681,7 +1681,8 @@ unsigned g_typecast (unsigned to, unsigned from)
                 /* If we are converting from float, first convert float to int,
                    then fall through to char conversion */
                 if ((from & CF_TYPEMASK) == CF_FLOAT) {
-                    AddCodeLine ("jsr feaxint");
+//                    AddCodeLine ("jsr feaxint");
+                    g_regint (from);
                 }
 
                 /* We must truncate the primary register to char and then
@@ -2564,7 +2565,7 @@ void g_push (unsigned flags, unsigned long val)
         /* Value is not 16 bit or not constant */
         if (flags & CF_CONST) {
             /* Constant 32 bit value, load into eax */
-            ASMLOG(("nop ; g_push")); // FIXME: remove
+            ASMLOG(("nop ; g_push load val into eax")); // FIXME: remove
             g_getimmed (flags, val, 0);
         }
 
@@ -2921,6 +2922,7 @@ void g_mul (unsigned flags, unsigned long val)
 
         /* Check if we can use shift instead of multiplication */
         if (p2 == 0 || (p2 > 0 && IS_Get (&CodeSizeFactor) >= (Negation ? 100 : 0))) {
+            LOG(("g_mul doing strength reduction\n"));
             /* Generate a shift instead */
             g_asl (flags, p2);
 
@@ -3040,95 +3042,100 @@ void g_div (unsigned flags, unsigned long val)
     };
 
     LOG(("g_div flags:%04x val:%d\n", flags, val));
+    ASMLOG(("nop ; g_div(flags:%2x,val:%lx)", flags, val)); // FIXME: remove
 
     /* Do strength reduction if the value is constant and a power of two */
-    if ((flags & CF_CONST) && ((flags & CF_TYPEMASK) != CF_FLOAT)) {
+    if (flags & CF_CONST) {
 
-        /* Deal with negative values as well as different sizes */
-        int           Negation   = (flags & CF_UNSIGNED) == 0 && (long)val < 0;
-        unsigned long NegatedVal = 0UL - val;
-        int           p2         = PowerOf2 (Negation ? NegatedVal : val);
+        if ((flags & CF_TYPEMASK) != CF_FLOAT) {
+            /* Deal with negative values as well as different sizes */
+            int           Negation   = (flags & CF_UNSIGNED) == 0 && (long)val < 0;
+            unsigned long NegatedVal = 0UL - val;
+            int           p2         = PowerOf2 (Negation ? NegatedVal : val);
 
-        /* Generate a shift instead */
-        if ((flags & CF_UNSIGNED) != 0 && p2 > 0) {
-            g_asr (flags, p2);
-            return;
-        }
+            LOG(("g_div doing strength reduction\n"));
 
-        /* Check if we can afford using shift instead of multiplication at the
-        ** cost of code size */
-        if (p2 == 0 || (p2 > 0 && IS_Get (&CodeSizeFactor) >= (Negation ? 200 : 170))) {
-            /* Generate a conditional shift instead */
-            if (p2 > 0) {
-                unsigned int  DoShiftLabel = GetLocalLabel ();
-                unsigned int  EndLabel     = GetLocalLabel ();
-                unsigned long MaskedVal    = Negation ? val : NegatedVal;
+            /* Generate a shift instead */
+            if ((flags & CF_UNSIGNED) != 0 && p2 > 0) {
+                g_asr (flags, p2);
+                return;
+            }
 
-                /* GitHub #169 - if abs(expr) < abs(val), the result is always 0.
-                ** First, check whether expr >= 0 and skip to the shift if true.
-                */
-                switch (flags & CF_TYPEMASK) {
-                case CF_CHAR:
-                    if (flags & CF_FORCECHAR) {
-                        MaskedVal &= 0xFF;
-                        AddCodeLine ("cmp #$00");
+            /* Check if we can afford using shift instead of multiplication at the
+            ** cost of code size */
+            if (p2 == 0 || (p2 > 0 && IS_Get (&CodeSizeFactor) >= (Negation ? 200 : 170))) {
+                /* Generate a conditional shift instead */
+                if (p2 > 0) {
+                    unsigned int  DoShiftLabel = GetLocalLabel ();
+                    unsigned int  EndLabel     = GetLocalLabel ();
+                    unsigned long MaskedVal    = Negation ? val : NegatedVal;
+
+                    /* GitHub #169 - if abs(expr) < abs(val), the result is always 0.
+                    ** First, check whether expr >= 0 and skip to the shift if true.
+                    */
+                    switch (flags & CF_TYPEMASK) {
+                    case CF_CHAR:
+                        if (flags & CF_FORCECHAR) {
+                            MaskedVal &= 0xFF;
+                            AddCodeLine ("cmp #$00");
+                            AddCodeLine ("bpl %s", LocalLabelName (DoShiftLabel));
+                            break;
+                        }
+                        /* FALLTHROUGH */
+
+                    case CF_INT:
+                        MaskedVal &= 0xFFFF;
+                        AddCodeLine ("cpx #$00");
                         AddCodeLine ("bpl %s", LocalLabelName (DoShiftLabel));
                         break;
+
+                    case CF_LONG:
+                        MaskedVal &= 0xFFFFFFFF;
+                        AddCodeLine ("ldy sreg+1");
+                        AddCodeLine ("bpl %s", LocalLabelName (DoShiftLabel));
+                        break;
+
+                    default:
+                        typeerror (flags);
+                        break;
                     }
-                    /* FALLTHROUGH */
+                    /* Second, check whether expr <= -asb(val) and skip to the
+                    ** shift if true. The original content of expr has to be saved
+                    ** before the checking comparison and restored after that, as
+                    ** the content in Primary register will be destroyed.
+                    ** The result of the comparison is a boolean. We can store
+                    ** it in the Carry flag with a LSR and branch on it later.
+                    */
+                    g_save (flags);
+                    g_le (flags | CF_UNSIGNED, MaskedVal);
+                    AddCodeLine ("lsr a");
+                    g_restore (flags);
+                    AddCodeLine ("bcs %s", LocalLabelName (DoShiftLabel));
 
-                case CF_INT:
-                    MaskedVal &= 0xFFFF;
-                    AddCodeLine ("cpx #$00");
-                    AddCodeLine ("bpl %s", LocalLabelName (DoShiftLabel));
-                    break;
+                    /* The result is 0. We can just load 0 and skip the shifting. */
+                    g_getimmed (flags | CF_ABSOLUTE, 0, 0);
 
-                case CF_LONG:
-                    MaskedVal &= 0xFFFFFFFF;
-                    AddCodeLine ("ldy sreg+1");
-                    AddCodeLine ("bpl %s", LocalLabelName (DoShiftLabel));
-                    break;
+                    /* TODO: replace with BEQ? Would it be optimized? */
+                    g_jump (EndLabel);
 
-                default:
-                    typeerror (flags);
-                    break;
+                    /* Do the shift. The sign of the result may need to be corrected
+                    ** later.
+                    */
+                    g_defcodelabel (DoShiftLabel);
+                    g_asr (flags, p2);
+                    g_defcodelabel (EndLabel);
                 }
-                /* Second, check whether expr <= -asb(val) and skip to the
-                ** shift if true. The original content of expr has to be saved
-                ** before the checking comparison and restored after that, as
-                ** the content in Primary register will be destroyed.
-                ** The result of the comparison is a boolean. We can store
-                ** it in the Carry flag with a LSR and branch on it later.
+
+                /* Negate the result as long as val < 0, even if val == -1 and no
+                ** shift was generated.
                 */
-                g_save (flags);
-                g_le (flags | CF_UNSIGNED, MaskedVal);
-                AddCodeLine ("lsr a");
-                g_restore (flags);
-                AddCodeLine ("bcs %s", LocalLabelName (DoShiftLabel));
+                if (Negation) {
+                    g_neg (flags);
+                }
 
-                /* The result is 0. We can just load 0 and skip the shifting. */
-                g_getimmed (flags | CF_ABSOLUTE, 0, 0);
-
-                /* TODO: replace with BEQ? Would it be optimized? */
-                g_jump (EndLabel);
-
-                /* Do the shift. The sign of the result may need to be corrected
-                ** later.
-                */
-                g_defcodelabel (DoShiftLabel);
-                g_asr (flags, p2);
-                g_defcodelabel (EndLabel);
+                /* Done */
+                return;
             }
-
-            /* Negate the result as long as val < 0, even if val == -1 and no
-            ** shift was generated.
-            */
-            if (Negation) {
-                g_neg (flags);
-            }
-
-            /* Done */
-            return;
         }
 
         /* If we go here, we didn't emit code. Push the lhs on stack and fall
@@ -3137,7 +3144,6 @@ void g_div (unsigned flags, unsigned long val)
         flags &= ~CF_FORCECHAR; /* Handle chars as ints */
         g_push (flags & ~CF_CONST, 0);
     }
-    ASMLOG(("nop ; g_div(flags:%2x,val:%lx)", flags, val)); // FIXME: remove
 
     /* Generate a division */
     oper (flags, val, ops);

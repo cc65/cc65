@@ -2201,12 +2201,19 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
             ** it's a constant, since we will exchange both operands.
             */
             if ((Gen->Flags & GEN_COMM) == 0) {
-                g_push (ltype | CF_CONST, Expr->IVal);
+                if (ltype == CF_FLOAT) {
+                    LOG(("hie_internal push left side const (float)\n"));
+                    g_push (ltype | CF_CONST, FP_D_As32bitRaw(Expr->V.FVal));
+                } else {
+                    LOG(("hie_internal push left side const (int)\n"));
+                    g_push (ltype | CF_CONST, Expr->IVal);
+                }
             }
         } else {
             /* Value not constant */
             LoadExpr (CF_NONE, Expr);
             GetCodePos (&Mark2);
+            LOG(("hie_internal push left side var\n"));
             g_push (ltype, 0);
         }
 
@@ -2392,7 +2399,7 @@ LOG(("hie_internal Expr->Type:%s Expr2->Type:%s\n",
             Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
 
             /* Generate code */
-            if (TypeOf (Expr2.Type) == CF_FLOAT) {
+            if (TypeOf (Expr->Type) == CF_FLOAT) {
                 Gen->Func (type, FP_D_As32bitRaw(Expr->V.FVal));
             } else {
                 Gen->Func (type, Expr->IVal);
@@ -2419,7 +2426,7 @@ LOG(("hie_internal Expr->Type:%s Expr2->Type:%s\n",
                 LOG(("rtype float is %x\n", CF_FLOAT));
                 if (rtype == CF_FLOAT) {
                     // FIXME add respective checks for float
-                    FIXME(("add div checks for float\n"));
+                    FIXME(("FIXME: add div checks for float\n"));
                 } else {
                     if (Tok == TOK_DIV && Expr2.IVal == 0) {
                         Error ("Division by zero");
@@ -2430,6 +2437,7 @@ LOG(("hie_internal Expr->Type:%s Expr2->Type:%s\n",
                 type |= CF_CONST;
                 rtype |= CF_CONST;
                 if ((Gen->Flags & GEN_NOPUSH) != 0) {
+                    FIXME(("hie_internal ?2 removing code\n"));
                     RemoveCode (&Mark2);
                     ltype |= CF_PRIMARY;    /* Value is in register */
                 }
@@ -2877,7 +2885,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
                 /* FIXME: float --- startcode end */
                 if (Expr2.Type == type_float) {
-                    LOG(("FIXME: special cases for comparison with float constant"));
+                    LOG(("FIXME: special cases for comparison with float constant\n"));
                 } else {
                 /* FIXME: float --- newcode end */
 

@@ -41,6 +41,7 @@ int compare(float f, char *str)
 {
     char temp[12];
     sprintf(temp, "%08lx", *((uint32_t*)&f));
+    printf("[%s:%s]",temp,str);
     return (strcmp(temp, str) == 0) ? 1 : 0;
 }
 

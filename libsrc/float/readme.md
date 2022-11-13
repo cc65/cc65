@@ -62,7 +62,7 @@ g_defdata_float
 
 (see below) g_add, g_sub, g_mul, g_div, g_neg, g_bneg
 (see below) g_eq, g_ne, g_lt, g_gt, g_le, g_ge
-(invalid) g_mod, g_or, g_xor, g_and, g_asr
+(invalid) g_mod, g_or, g_xor, g_and, g_asr, g_asl
 ```
 #### datatype.c
 

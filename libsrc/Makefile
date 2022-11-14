@@ -167,7 +167,8 @@ endif
 SRCDIRS = $(SRCDIR)
 
 ifeq ($(TARGET),$(filter $(TARGET),$(CBMS)))
-  SRCDIRS += cbm
+  SRCDIRS += cbm \
+	float/cbmkernal
 endif
 
 ifeq ($(TARGET),$(filter $(TARGET),$(GEOS)))

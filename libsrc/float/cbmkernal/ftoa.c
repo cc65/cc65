@@ -2,7 +2,7 @@
 #include <_float.h>
 #include <math.h>
 
-#include <cbmfp.h>
+#include "cbmfp.h"
 
 // convert float into a string. this is surprisingly complex, so we just use
 // the kernal function, and then fix up the result

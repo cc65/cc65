@@ -2,8 +2,9 @@
 #include <_float.h>
 #include <math.h>
 
-#include <cbmfp.h>
+#include "cbmfp.h"
 
+#if 0
 #define _fcmplt(_d, _s)  (_fcmp((_d), (_s)) == 1)
 #define _fcmpgt(_d, _s)  (_fcmp((_d), (_s)) == 255)
 #define _fcmpeq(_d, _s)  (_fcmp((_d), (_s)) == 0)
@@ -22,3 +23,4 @@ float ffloor(float x)
     }
     return _fsub(d, 1);
 }
+#endif

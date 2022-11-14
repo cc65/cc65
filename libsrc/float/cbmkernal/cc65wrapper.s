@@ -5,23 +5,23 @@
     .import __stof
 
 ; 8bit signed -> float
-    .export afloat
-afloat:
+    .export ___cbmkernal_afloat
+___cbmkernal_afloat:
     jmp __ctof
 
 ; 8bit unsigned -> float
-    .export aufloat
-aufloat:
+    .export ___cbmkernal_aufloat
+___cbmkernal_aufloat:
     jmp __utof
 
 ; 16bit signed -> float
-    .export axfloat
-axfloat:
+    .export ___cbmkernal_axfloat
+___cbmkernal_axfloat:
     jmp __itof
 
 ; 16bit unsigned -> float
-    .export axufloat
-axufloat:
+    .export ___cbmkernal_axufloat
+___cbmkernal_axufloat:
     jmp __stof
 
 ; FIXME: this might be more accurate when done directly in one step (but the
@@ -30,8 +30,8 @@ axufloat:
     .importzp sreg, tmp1
     .import pusheax
 
-    .export eaxfloat
-eaxfloat:
+    .export ___cbmkernal_eaxfloat
+___cbmkernal_eaxfloat:
 
     sta tmp1
 
@@ -83,8 +83,8 @@ eaxfloat:
     .importzp sreg, tmp1
     .import pusheax
 
-    .export eaxufloat
-eaxufloat:
+    .export ___cbmkernal_eaxufloat
+___cbmkernal_eaxufloat:
 
     sta tmp1
 
@@ -135,16 +135,16 @@ eaxufloat:
     .import __ftoi
 
 ; float -> 16bit int
-    .export feaxint
-feaxint:
+    .export ___cbmkernal_feaxint
+___cbmkernal_feaxint:
     jmp __ftoi
 
 ; FIXME: this might be more accurate when done directly in one step (but the
 ;        kernal can not do this for 32bit)
 ; float -> 32bit int
     .importzp tmp1, tmp2
-    .export feaxlong
-feaxlong:
+    .export ___cbmkernal_feaxlong
+___cbmkernal_feaxlong:
 
     jsr pusheax
 
@@ -186,16 +186,16 @@ feaxlong:
     .import __fneg
 
 ; binary negate (not) for the ! operator. returns a bool!
-    .export fbnegeax
+    .export ___cbmkernal_fbnegeax
     .import bnegax
-fbnegeax:
+___cbmkernal_fbnegeax:
 ; FIXME: why does this not work with __fnot?
     jsr __ftoi
     jmp bnegax
 
 .if 0 = 1
-   .export fnegeax
- fnegeax:
+   .export ___cbmkernal_fnegeax
+ ___cbmkernal_fnegeax:
     jmp __fneg
 .endif
 
@@ -208,22 +208,22 @@ fbnegeax:
     .import __fmul
 
 ; Primary = TOS + Primary (like tosaddeax)
-    .export ftosaddeax
-ftosaddeax:
+    .export ___cbmkernal_ftosaddeax
+___cbmkernal_ftosaddeax:
     ; arg0:     a/x/sreg/sreg+1
     ; arg1:     (sp),y (y=0..3)
 
     ; FAC: ieee float is in A/X/sreg/sreg+1
     jmp     __fadd
 
-    .export ftossubeax
-ftossubeax:
+    .export ___cbmkernal_ftossubeax
+___cbmkernal_ftossubeax:
     jmp     __fsub
-    .export ftosdiveax
-ftosdiveax:
+    .export ___cbmkernal_ftosdiveax
+___cbmkernal_ftosdiveax:
     jmp     __fdiv
-    .export ftosmuleax
-ftosmuleax:
+    .export ___cbmkernal_ftosmuleax
+___cbmkernal_ftosmuleax:
     jmp     __fmul
 
 ;--------------------------------------------------------------
@@ -231,8 +231,8 @@ ftosmuleax:
     .import __fcmp
 
     ; test for equal
-    .export ftoseqeax
-ftoseqeax:
+    .export ___cbmkernal_ftoseqeax
+___cbmkernal_ftoseqeax:
     ; arg0:     a/x/sreg/sreg+1
     ; arg1:     (sp),y (y=0..3)
     jsr     __fcmp
@@ -248,8 +248,8 @@ ftoseqeax:
     rts
 
     ; test for not equal
-    .export ftosneeax
-ftosneeax:
+    .export ___cbmkernal_ftosneeax
+___cbmkernal_ftosneeax:
     ; arg0:     a/x/sreg/sreg+1
     ; arg1:     (sp),y (y=0..3)
     jsr     __fcmp
@@ -265,8 +265,8 @@ ftosneeax:
     rts
 
     ; Test for greater than
-    .export ftosgteax
-ftosgteax:
+    .export ___cbmkernal_ftosgteax
+___cbmkernal_ftosgteax:
     ; arg0:     a/x/sreg/sreg+1
     ; arg1:     (sp),y (y=0..3)
     jsr     __fcmp
@@ -283,8 +283,8 @@ ftosgteax:
     rts
 
     ; Test for less than
-    .export ftoslteax
-ftoslteax:
+    .export ___cbmkernal_ftoslteax
+___cbmkernal_ftoslteax:
     ; arg0:     a/x/sreg/sreg+1
     ; arg1:     (sp),y (y=0..3)
     jsr     __fcmp
@@ -300,8 +300,8 @@ ftoslteax:
     rts
 
     ; Test for greater than or equal to
-    .export ftosgeeax
-ftosgeeax:
+    .export ___cbmkernal_ftosgeeax
+___cbmkernal_ftosgeeax:
     ; arg0:     a/x/sreg/sreg+1
     ; arg1:     (sp),y (y=0..3)
     jsr     __fcmp
@@ -318,8 +318,8 @@ ftosgeeax:
     rts
 
     ; Test for less than or equal to
-    .export ftosleeax
-ftosleeax:
+    .export ___cbmkernal_ftosleeax
+___cbmkernal_ftosleeax:
     ; arg0:     a/x/sreg/sreg+1
     ; arg1:     (sp),y (y=0..3)
     jsr     __fcmp

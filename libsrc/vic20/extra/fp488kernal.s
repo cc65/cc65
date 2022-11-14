@@ -1,5 +1,5 @@
 
-; import/overload stubs for the VIC20 kernal floating point implementation 
+; import/overload stubs for the VIC20 kernal floating point implementation
 
     .import ___cbmkernal_afloat
     .import ___cbmkernal_aufloat

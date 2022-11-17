@@ -83,3 +83,4 @@ clean:
 
 	$(RM) quick.prg
 	$(RM) quick.c64.s
+	$(RM) quick.s

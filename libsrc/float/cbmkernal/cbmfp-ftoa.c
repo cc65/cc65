@@ -4,6 +4,7 @@
 
 #include "cbmfp.h"
 
+#if 0
 // convert float into a string. this is surprisingly complex, so we just use
 // the kernal function, and then fix up the result
 
@@ -132,3 +133,4 @@ char *ftoa(char *buf, float n)
     return buf;
 }
 
+#endif

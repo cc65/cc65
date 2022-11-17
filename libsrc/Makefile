@@ -140,7 +140,6 @@ GEOSDIRS = common      \
            conio       \
            disk        \
            dlgbox      \
-           float/softfloat       \
            file        \
            graph       \
            memory      \
@@ -166,9 +165,11 @@ endif
 
 SRCDIRS = $(SRCDIR)
 
+SRCDIRS += float/softfloat
+
 ifeq ($(TARGET),$(filter $(TARGET),$(CBMS)))
-  SRCDIRS += cbm \
-	float/cbmkernal
+  SRCDIRS += cbm
+  SRCDIRS += float/cbmkernal
 endif
 
 ifeq ($(TARGET),$(filter $(TARGET),$(GEOS)))
@@ -180,7 +181,6 @@ SRCDIRS += common   \
            conio    \
            dbg      \
            em       \
-           float/softfloat    \
            joystick \
            mouse    \
            runtime  \

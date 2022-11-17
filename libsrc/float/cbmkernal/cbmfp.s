@@ -52,9 +52,9 @@ __basicoff:
 ;---------------------------------------------------------------------------------------------
 
 .if .defined(__VIC20__)
-        .include "float-vic20.inc"
+        .include "cbmfp-vic20.inc"
 .else
-        .include "float.inc"
+        .include "cbmfp.inc"
 .endif
 
         .importzp sreg, ptr1
@@ -245,6 +245,8 @@ __float_float_to_fac:   ; only used in ATAN2?
         sta FAC_SIGN_COMPARE
         rts
 
+        .import ldeaxysp
+
 ; get C-parameter (two floats), to FAC and ARG
 ___float_float_to_fac_arg:
         jsr ___float_float_to_fac
@@ -297,6 +299,8 @@ ___float_float_to_arg:
 
 
 .if BINARYFORMAT = BINARYFORMAT_IEEE754
+        .import incsp4
+
         ; ieee float in a/x/sreg/sreg+1
         sta ARG_MANTISSA2
         stx ARG_MANTISSA1
@@ -481,7 +485,7 @@ __float_arg_to_float_packed:
         rts
 
 ;---------------------------------------------------------------------------------------------
-
+.if 1 = 0
         .export __ftostr
         .importzp ptr1
         .import popax, ldeaxysp, incsp4
@@ -510,7 +514,7 @@ __float_strbuf_to_string:
         lda ptr1
         ldx ptr1+1
         rts
-
+.endif
         .export __strtof
 
 ; convert a string to a float
@@ -710,6 +714,7 @@ ___float_testsgn_arg:
 ; polynom1 f(x)=a1+a2*x^2+a3*x^3+...+an*x^n
 ;---------------------------------------------------------------------------------------------
         .export __fpoly1
+        .import popax
 __fpoly1:
         jsr ___float_float_to_fac
         ;jsr popya
@@ -724,6 +729,7 @@ __fpoly1:
 ; polynom2 f(x)=a1+a2*x^3+a3*x^5+...+an*x^(2n-1)
 ;---------------------------------------------------------------------------------------------
         .export __fpoly2
+        .import popax
 __fpoly2:
         jsr ___float_float_to_fac
         ;jsr popya

@@ -219,6 +219,7 @@ EXELIST_c64 =      \
         hello      \
         mandelbrot \
         mandelfloat \
+        mathtest \
         mousedemo  \
         multdemo   \
         ovrldemo   \
@@ -446,6 +447,16 @@ ovrldemo: overlaydemo.o
 	$(LD) $(LDFLAGS) -o $@ -C $(SYS)-overlay.cfg -m $@.map $^ $(SYS).lib
 
 OVERLAYLIST := $(foreach I,1 2 3,multdemo.$I ovrldemo.$I)
+
+# link float examples against the (much faster) kernal lib, if available
+ifeq ($(SYS),c64)
+mandelfloat.o: override CFLAGS += -D DYN_DRV=0
+mandelfloat: mandelfloat.o
+	$(LD) $(LDFLAGS) -o $@ -C c64.cfg -m $@.map $^ c64-fp488kernal.o $(SYS).lib
+mathtest.o: override CFLAGS += -D DYN_DRV=0
+mathtest: mathtest.o
+	$(LD) $(LDFLAGS) -o $@ -C c64.cfg -m $@.map $^ c64-fp488kernal.o $(SYS).lib
+endif
 
 # --------------------------------------------------------------------------
 # TGI programs on the VIC-20 need a special ld65 configuration file.

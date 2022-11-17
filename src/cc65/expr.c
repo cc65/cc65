@@ -2489,7 +2489,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
     unsigned ltype;
     int rconst;                         /* Operand is a constant */
 
-//    LOG(("hie_compare\n"));
+    LOG(("hie_compare\n"));
 
     ExprWithCheck (hienext, Expr);
 
@@ -2517,7 +2517,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
         if (ED_IsConstAbs (Expr)) {
             /* Numeric constant value */
             GetCodePos (&Mark2);
-//            LOG(("iVal:%08x FVal:%f\n", Expr->IVal, Expr->V.FVal.V));
+            LOG(("hie_compare iVal:%08x FVal:%f\n", Expr->IVal, Expr->V.FVal.V));
             if (ltype == CF_FLOAT) {
                 g_push_float (ltype | CF_CONST, Expr->V.FVal.V);
             } else {

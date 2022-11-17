@@ -721,7 +721,9 @@ void _g_getimmed(unsigned Flags, uintptr_t Val, long Offs)
 
 //     LOG(("g_getimmed %s:%d:%s Flags:%04x Val: %08x Offs:%04x\n",
 //          file ? file : "null", line, func ? func : "null", Flags, Val, Offs));
-     LOG(("g_getimmed Flags:%04x Val: %08x Offs:%04x\n",
+    LOG(("g_getimmed Flags:%04x Val: %08x Offs:%04x\n",
+          Flags, Val, Offs));
+    ASMLOG(("nop ;> g_getimmed Flags:%04x Val: %08x Offs:%04x\n",
           Flags, Val, Offs));
 
     if ((Flags & CF_CONST) != 0) {
@@ -745,7 +747,7 @@ void _g_getimmed(unsigned Flags, uintptr_t Val, long Offs)
                 break;
 
             case CF_FLOAT:  /* FIXME float - handle like long here */
-
+                /* CAUTION: make sure Val contains the float value in raw binary format */
                 LOG(("g_getimmed CF_FLOAT Val: %08lx\n", Val));
                 ASMLOG(("nop\t; g_getimmed FLOAT %08lx\n", Val));   // FIXME: remove
                 /* fall through */
@@ -808,6 +810,7 @@ void _g_getimmed(unsigned Flags, uintptr_t Val, long Offs)
         AddCodeLine ("ldx #>(%s)", Label);
 
     }
+    ASMLOG(("nop ;< g_getimmed\n"));
 }
 
 
@@ -1401,6 +1404,7 @@ void g_reglong (unsigned from)
 */
 {
     LOG(("g_reglong flags: %04x\n", from));
+    ASMLOG(("g_reglong flags: %04x\n", from));
     switch (from & CF_TYPEMASK) {
 
         case CF_CHAR:
@@ -1463,6 +1467,7 @@ void g_regfloat (unsigned from)
 /* Convert the value in the primary register to a float */
 {
     LOG(("g_regfloat flags: %04x\n", from));
+    ASMLOG(("nop ; g_regfloat flags: %04x\n", from));
     switch (from & CF_TYPEMASK) {
 
         case CF_CHAR:
@@ -1603,6 +1608,8 @@ unsigned g_typeadjust (unsigned lhs, unsigned rhs)
         (lhs & CF_UNSIGNED) == (rhs & CF_UNSIGNED)) {
         /* Signedness flags are the same, so just use one of them. */
         const unsigned unsigned_flag = lhs & CF_UNSIGNED;
+        LOG(("<g_typeadjust return:%02x\n",        const_flag | unsigned_flag | CF_CHAR)); // FIXME: remove
+        ASMLOG(("nop ;< g_typeadjust return:%02x", const_flag | unsigned_flag | CF_CHAR)); // FIXME: remove
         return const_flag | unsigned_flag | CF_CHAR;
     }
 
@@ -1617,6 +1624,8 @@ unsigned g_typeadjust (unsigned lhs, unsigned rhs)
     */
     if ((ltype == CF_LONG && (lhs & CF_UNSIGNED)) ||
         (rtype == CF_LONG && (rhs & CF_UNSIGNED))) {
+        LOG(("<g_typeadjust return:%02x\n",        const_flag | CF_UNSIGNED | CF_LONG)); // FIXME: remove
+        ASMLOG(("nop ;< g_typeadjust return:%02x", const_flag | CF_UNSIGNED | CF_LONG)); // FIXME: remove
         return const_flag | CF_UNSIGNED | CF_LONG;
     }
 
@@ -1628,12 +1637,16 @@ unsigned g_typeadjust (unsigned lhs, unsigned rhs)
     if ((ltype == CF_LONG && rtype == CF_INT && (rhs & CF_UNSIGNED)) ||
         (rtype == CF_LONG && ltype == CF_INT && (rhs & CF_UNSIGNED))) {
         /* long can represent all unsigneds, so we are in the first sub-case. */
+        LOG(("<g_typeadjust return:%02x\n",        const_flag | CF_LONG)); // FIXME: remove
+        ASMLOG(("nop ;< g_typeadjust return:%02x", const_flag | CF_LONG)); // FIXME: remove
         return const_flag | CF_LONG;
     }
 
     /* Otherwise, if either operand has type long int, the other operand is converted to long int.
     */
     if (ltype == CF_LONG || rtype == CF_LONG) {
+        LOG(("<g_typeadjust return:%02x\n",        const_flag | CF_LONG)); // FIXME: remove
+        ASMLOG(("nop ;< g_typeadjust return:%02x", const_flag | CF_LONG)); // FIXME: remove
         return const_flag | CF_LONG;
     }
 
@@ -1642,6 +1655,8 @@ unsigned g_typeadjust (unsigned lhs, unsigned rhs)
     */
     if ((ltype == CF_INT && (lhs & CF_UNSIGNED)) ||
         (rtype == CF_INT && (rhs & CF_UNSIGNED))) {
+        LOG(("<g_typeadjust return:%02x\n",        const_flag | CF_UNSIGNED | CF_INT)); // FIXME: remove
+        ASMLOG(("nop ;< g_typeadjust return:%02x", const_flag | CF_UNSIGNED | CF_INT)); // FIXME: remove
         return const_flag | CF_UNSIGNED | CF_INT;
     }
 
@@ -1650,6 +1665,8 @@ unsigned g_typeadjust (unsigned lhs, unsigned rhs)
     CHECK (!(lhs & CF_UNSIGNED));
     CHECK (rtype == CF_INT);
     CHECK (!(rhs & CF_UNSIGNED));
+    LOG(("<g_typeadjust return:%02x\n",        const_flag | CF_INT)); // FIXME: remove
+    ASMLOG(("nop ;< g_typeadjust return:%02x", const_flag | CF_INT)); // FIXME: remove
     return const_flag | CF_INT;
 }
 
@@ -2478,7 +2495,7 @@ static void oper (unsigned Flags, unsigned long Val, const char* const* Subs)
 **      1       --> Operate on unsigneds
 **      2       --> Operate on longs
 **      3       --> Operate on unsigned longs
-**      4       --> Operate on floats
+**      4       --> Operate on floats (CAUTION: Val must be a float in raw binary format)
 */
 {
     int n = 0;
@@ -4566,6 +4583,7 @@ void g_gt (unsigned flags, unsigned long val)
 
             /* FIXME: float */
             case CF_FLOAT:
+                ASMLOG(("nop ; g_gt CF_FLOAT")); // FIXME: remove
                 break;
 
             default:

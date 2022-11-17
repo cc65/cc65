@@ -65,12 +65,6 @@ void constvar(void)
     printf("substraction: %s-%s=%s\n", _ftostr(buf, 8.5f), _ftostr(buf2, fp2), _ftostr(buf3, fp3));
     printf(" fp3:0x%08lx [0xc0f80000] %s (-7.75)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
     test1(fp3, "c0f80000");
-
-    fp2 = 2.5f;
-    fp3 = 16.5f / fp2;
-    printf("division: %s/%s=%s\n", _ftostr(buf, 16.5f), _ftostr(buf2, fp2), _ftostr(buf3, fp3));
-    printf(" fp3:0x%08lx [0x40d33333] %s (6.60)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-    test1(fp3, "40d33333");
 }
 
 int main(void)
@@ -85,5 +79,5 @@ int main(void)
     WAIT();
 
     printf("\nfloat-basic-const-var (res:%d)\n", result);
-    return (result == 2) ? EXIT_FAILURE : EXIT_SUCCESS; // only fail while ALL sub tests fail
+    return (result == 1) ? EXIT_FAILURE : EXIT_SUCCESS; // only fail while ALL sub tests fail
 }

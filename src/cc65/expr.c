@@ -2951,9 +2951,15 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             /* FIXME: float --- startcode end */
             if (Expr2.Type == type_float) {
                 /* Generate code */
+                LOG(("hie_compare generate code for Expr2 as float\n"));
                 GenFunc (flags, FP_D_As32bitRaw(Expr2.V.FVal));
+            } else if (IsClassFloat(Expr->Type)) {
+                /* Generate code */
+                LOG(("hie_compare generate code for Expr as float\n"));
+                GenFunc (flags, FP_D_As32bitRaw(FP_D_FromInt(Expr2.IVal)));
             } else {
                 /* Generate code */
+                LOG(("hie_compare generate code for Expr2 as int (=%d)\n", Expr2.IVal));
                 GenFunc (flags, Expr2.IVal);
             }
             /* FIXME: float --- newcode end */

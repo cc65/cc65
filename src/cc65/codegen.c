@@ -1553,26 +1553,32 @@ unsigned g_typeadjust (unsigned lhs, unsigned rhs)
     /* Result is const if both operands are const. */
     unsigned const_flag = (lhs & CF_CONST) & (rhs & CF_CONST);
 
-    ASMLOG(("nop ; g_typeadjust ltype:%x rtype:%x", ltype, rtype)); // FIXME: remove
+    LOG((">g_typeadjust ltype:%02x rtype:%02x\n", ltype, rtype)); // FIXME: remove
+    ASMLOG(("nop ;>g_typeadjust ltype:%02x rtype:%02x", ltype, rtype)); // FIXME: remove
 
     /* FIXME: float - this is much much more complicated */
     if (ltype == CF_FLOAT && rtype == CF_FLOAT) {
 //        g_regfloat (rhs);
-        ASMLOG(("nop ; g_typeadjust return:%x float", const_flag | CF_FLOAT)); // FIXME: remove
+        LOG(("<g_typeadjust both float return:%02x float\n", const_flag | CF_FLOAT)); // FIXME: remove
+        ASMLOG(("nop ;< g_typeadjust both float return:%02x float", const_flag | CF_FLOAT)); // FIXME: remove
         return const_flag | CF_FLOAT;
     }
-    if (ltype == CF_FLOAT) {
-        FIXME(("FIXME: conversion to float format missing\n"));
-        g_regfloat (rhs);
-        ASMLOG(("nop ; g_typeadjust return:%x float", (lhs & CF_CONST) | CF_FLOAT)); // FIXME: remove
+    else if (ltype == CF_FLOAT) {
+//        FIXME(("FIXME: conversion to float format missing\n"));
+//        g_regfloat (rhs);
+        LOG(("<g_typeadjust left float return:%02x float\n", (lhs & CF_CONST) | CF_FLOAT)); // FIXME: remove
+        ASMLOG(("nop ;< g_typeadjust return:%02x float", (lhs & CF_CONST) | CF_FLOAT)); // FIXME: remove
         return (lhs & CF_CONST) | CF_FLOAT;
     }
-    if (rtype == CF_FLOAT) {
-        FIXME(("FIXME: conversion to float format missing\n"));
+    else if (rtype == CF_FLOAT) {
+//        FIXME(("FIXME: conversion to float format missing\n"));
         g_regfloat (lhs);
-        ASMLOG(("nop ; g_typeadjust return:%x float", (rhs & CF_CONST) | CF_FLOAT)); // FIXME: remove
+        LOG(("<g_typeadjust right float return:%02x float\n", (rhs & CF_CONST) | CF_FLOAT)); // FIXME: remove
+        ASMLOG(("nop ;< g_typeadjust return:%02x float", (rhs & CF_CONST) | CF_FLOAT)); // FIXME: remove
         return (rhs & CF_CONST) | CF_FLOAT;
     }
+    LOG(("g_typeadjust not float ltype:%02x rtype:%02x\n", ltype, rtype)); // FIXME: remove
+    ASMLOG(("nop ; g_typeadjust not float ltype:%02x rtype:%02x", ltype, rtype)); // FIXME: remove
 
     /* Check if a conversion is needed */
     if (ltype == CF_LONG && rtype != CF_LONG && (rhs & CF_CONST) == 0) {

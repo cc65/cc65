@@ -70,8 +70,8 @@ void constconst(void)
     printf("fp3:0x%08lx [0x3e99999a] %s (0.3)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
     test1(fp3, "3e99999a");
 
-    // substraction
 #if 0
+    // substraction
     printf("\nconstant - constant\n\n");
     fp1 = 0.1f;
     fp2 = 0.2f;
@@ -86,7 +86,7 @@ void constconst(void)
     printf("\nconstant * constant\n\n");
     fp1 = 0.1f;
     fp2 = 0.2f;
-    fp3 = 0.1f * 5.0f; // FIXME: Precondition violated: IsClassInt (T), file 'cc65/datatype.c', line 1008
+    fp3 = 0.1f * 5.0f;
 
     printf("    0x%08lx [0x3dcccccd] %s (0.1)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     printf("    0x%08lx [0x3e4ccccd] %s (0.2)\n", *((uint32_t*)&fp2), _ftostr(buf, fp2));
@@ -97,7 +97,7 @@ void constconst(void)
     printf("\nconstant / constant\n\n");
     fp1 = 0.1f;
     fp2 = 0.2f;
-    fp3 = 0.1f / 0.2f; // FIXME: Precondition violated: IsClassInt (T), file 'cc65/datatype.c', line 1008
+    fp3 = 0.1f / 0.2f;
 
     printf("    0x%08lx [0x3dcccccd] %s (0.1)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     printf("    0x%08lx [0x3e4ccccd] %s (0.2)\n", *((uint32_t*)&fp2), _ftostr(buf, fp2));

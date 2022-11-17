@@ -167,6 +167,7 @@ EXELIST_apple2 =   \
         gunzip65   \
         hello      \
         mandelbrot \
+        mandelfloat \
         mousedemo  \
         multdemo   \
         ovrldemo   \
@@ -182,6 +183,7 @@ EXELIST_atari =    \
         gunzip65   \
         hello      \
         mandelbrot \
+        mandelfloat \
         mousedemo  \
         multdemo   \
         ovrldemo   \
@@ -202,6 +204,7 @@ EXELIST_atmos =    \
         checkversion \
         hello      \
         mandelbrot \
+        mandelfloat \
         sieve      \
         tgidemo
 
@@ -215,6 +218,7 @@ EXELIST_c64 =      \
         gunzip65   \
         hello      \
         mandelbrot \
+        mandelfloat \
         mousedemo  \
         multdemo   \
         ovrldemo   \
@@ -229,6 +233,7 @@ EXELIST_c128 =     \
         gunzip65   \
         hello      \
         mandelbrot \
+        mandelfloat \
         mousedemo  \
         sieve      \
         tinyshell  \
@@ -246,6 +251,7 @@ EXELIST_cbm510 =   \
         checkversion \
         gunzip65   \
         hello      \
+        mandelfloat \
         mousedemo  \
         tinyshell  \
         sieve
@@ -255,6 +261,7 @@ EXELIST_cbm610 =   \
         checkversion \
         gunzip65   \
         hello      \
+        mandelfloat \
         tinyshell  \
         sieve
 
@@ -269,6 +276,7 @@ EXELIST_cx16 =     \
         gunzip65   \
         hello      \
         mandelbrot \
+        mandelfloat \
         mousedemo  \
         sieve      \
         tinyshell  \
@@ -305,6 +313,7 @@ EXELIST_pet =      \
         checkversion \
         enumdevdir \
         hello      \
+        mandelfloat \
         tinyshell  \
         sieve
 
@@ -314,6 +323,7 @@ EXELIST_plus4 =    \
         enumdevdir \
         gunzip65   \
         hello      \
+        mandelfloat \
         tinyshell  \
         sieve
 
@@ -335,6 +345,7 @@ EXELIST_telestrat = \
         gunzip65    \
         hello       \
         mandelbrot  \
+        mandelfloat \
         sieve       \
         tgidemo
 
@@ -344,6 +355,7 @@ EXELIST_vic20 =    \
         enumdevdir \
         hello      \
         mandelbrot \
+        mandelfloat \
         sieve      \
         tgidemo
 

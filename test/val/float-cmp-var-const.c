@@ -31,10 +31,12 @@ unsigned long var_ulong;
 int result = 0;
 
 #define expect(msg, exp, val) \
-    printf("%s %s%s\n", \
+    printf("%s %s%s (is:%d want:%d)\n", \
         msg, \
         val ? "true" : "false", \
-        (exp != val) ? " (failed)" : ""); \
+        (exp != val) ? " (failed)" : "", \
+        exp, val \
+        ); \
     if (exp != val) { \
         result++; \
     }
@@ -42,8 +44,6 @@ int result = 0;
 //-------------------------------------------------------------------------
 // float variable vs float constant
 
-// when making individual sub tests work, remove them here and uncomment them
-// in val/float-cmp.c
 void varconst(void)
 {
     printf("var vs const\n");
@@ -51,19 +51,62 @@ void varconst(void)
     fp1 = 1.6f;
     fp2 = 1.5f;
 
+    expect("1.5f == 1.6f is", 0, (fp2 == 1.6f));
+    expect("1.6f == 1.5f is", 0, (fp1 == 1.5f));
     expect("1.6f == 1.6f is", 1, (fp1 == 1.6f));
 
+    expect("1.5f != 1.6f is", 1, (fp2 != 1.6f));
+    expect("1.6f != 1.5f is", 1, (fp1 != 1.5f));
     expect("1.6f != 1.6f is", 0, (fp1 != 1.6f));
 
     expect("1.5f < 1.6f is", 1, (fp2 < 1.6f));
+    expect("1.6f < 1.5f is", 0, (fp1 < 1.5f));
+    expect("1.6f < 1.6f is", 0, (fp1 < 1.6f));
 
     expect("1.5f > 1.6f is", 0, (fp2 > 1.6f));
+    expect("1.6f > 1.5f is", 1, (fp1 > 1.5f));
     expect("1.6f > 1.6f is", 0, (fp1 > 1.6f));
 
     expect("1.5f <= 1.6f is", 1, (fp2 <= 1.6f));
+    expect("1.6f <= 1.5f is", 0, (fp1 <= 1.5f));
     expect("1.6f <= 1.6f is", 1, (fp1 <= 1.6f));
 
     expect("1.5f >= 1.6f is", 0, (fp2 >= 1.6f));
+    expect("1.6f >= 1.5f is", 1, (fp1 >= 1.5f));
+    expect("1.6f >= 1.6f is", 1, (fp1 >= 1.6f));
+
+}
+
+void varintconst(void)
+{
+    printf("var vs int const\n");
+
+    fp1 = 10.0f;
+    fp2 = 20.0f;
+
+    expect("20 == 10 is", 0, (fp2 == 10));
+    expect("10 == 20 is", 0, (fp1 == 20));
+    expect("10 == 10 is", 1, (fp1 == 10));
+
+    expect("20 != 10 is", 1, (fp2 != 10));
+    expect("10 != 20 is", 1, (fp1 != 20));
+    expect("10 != 10 is", 0, (fp1 != 10));
+
+//     expect("20 < 10 is", 1, (fp2 < 10));
+//     expect("10 < 20 is", 0, (fp1 < 20));
+    expect("10 < 10 is", 0, (fp1 < 10));
+
+//     expect("20 > 10 is", 0, (fp2 > 10));
+//     expect("10 > 20 is", 1, (fp1 > 20));
+    expect("10 > 10 is", 0, (fp1 > 10));
+
+//     expect("20 <= 10 is", 1, (fp2 <= 10));
+//     expect("10 <= 20 is", 0, (fp1 <= 20));
+    expect("10 <= 10 is", 1, (fp1 <= 10));
+
+//     expect("20 >= 10 is", 0, (fp2 >= 10));
+//     expect("10 >= 20 is", 1, (fp1 >= 20));
+    expect("10 >= 10 is", 1, (fp1 >= 10));
 
 }
 
@@ -72,6 +115,7 @@ int main(void)
     printf("float-cmp-var-const\n");
 
     varconst();
+    varintconst();
 
     printf("float-cmp-var-const (res: %d)\n", result);
     return result;

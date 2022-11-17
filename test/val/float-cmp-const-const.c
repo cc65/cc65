@@ -39,27 +39,94 @@ int result = 0;
         result++; \
     }
 
-// when making individual sub tests work, remove them here and uncomment them
-// in val/float-cmp.c
 void constconst(void)
 {
-    //-------------------------------------------------------------------------
-    // float constant vs float const
     printf("const vs const\n");
 
     expect("1.5f == 1.6f is", 0, (1.5f == 1.6f));
     expect("1.6f == 1.5f is", 0, (1.6f == 1.5f));
+    expect("1.6f == 1.6f is", 1, (1.6f == 1.6f));
 
     expect("1.5f != 1.6f is", 1, (1.5f != 1.6f));
     expect("1.6f != 1.5f is", 1, (1.6f != 1.5f));
+    expect("1.6f != 1.6f is", 0, (1.6f != 1.6f));
 
     expect("1.5f < 1.6f is", 1, (1.5f < 1.6f));
+    expect("1.6f < 1.5f is", 0, (1.6f < 1.5f));
+    expect("1.6f < 1.6f is", 0, (1.6f < 1.6f));
 
+    expect("1.5f > 1.6f is", 0, (1.5f > 1.6f));
     expect("1.6f > 1.5f is", 1, (1.6f > 1.5f));
+    expect("1.6f > 1.6f is", 0, (1.6f > 1.6f));
 
+    expect("1.5f <= 1.6f is", 1, (1.5f <= 1.6f));
     expect("1.6f <= 1.5f is", 0, (1.6f <= 1.5f));
+    expect("1.6f <= 1.6f is", 1, (1.6f <= 1.6f));
 
     expect("1.5f >= 1.6f is", 0, (1.5f >= 1.6f));
+    expect("1.6f >= 1.5f is", 1, (1.6f >= 1.5f));
+    expect("1.6f >= 1.6f is", 1, (1.6f >= 1.6f));
+}
+
+void intconstconst(void)
+{
+    printf("int const vs const\n");
+
+    // FIXME: Comparing types 'int' with 'float' is invalid
+#if 0
+    expect("10 == 1.6f is", 0, (10 == 1.6f));
+    expect("20 == 1.5f is", 0, (20 == 1.5f));
+    expect("20 == 1.6f is", 1, (20 == 1.6f));
+
+    expect("10 != 1.6f is", 1, (10 != 1.6f));
+    expect("20 != 1.5f is", 1, (20 != 1.5f));
+    expect("20 != 1.6f is", 0, (20 != 1.6f));
+
+    expect("10 < 1.6f is", 1, (10 < 1.6f));
+    expect("20 < 1.5f is", 0, (20 < 1.5f));
+    expect("20 < 1.6f is", 0, (20 < 1.6f));
+
+    expect("10 > 1.6f is", 0, (10 > 1.6f));
+    expect("20 > 1.5f is", 1, (20 > 1.5f));
+    expect("20 > 1.6f is", 0, (20 > 1.6f));
+
+    expect("10 <= 1.6f is", 1, (10 <= 1.6f));
+    expect("20 <= 1.5f is", 0, (20 <= 1.5f));
+    expect("20 <= 1.6f is", 1, (20 <= 1.6f));
+
+    expect("10 >= 1.6f is", 0, (10 >= 1.6f));
+    expect("20 >= 1.5f is", 1, (20 >= 1.5f));
+    expect("20 >= 1.6f is", 1, (20 >= 1.6f));
+#endif
+}
+
+void constintconst(void)
+{
+    printf("const vs int const\n");
+
+    expect("10.0f == 20 is", 0, (10.0f == 20));
+    expect("20.0f == 10 is", 0, (20.0f == 10));
+    expect("20.0f == 20 is", 1, (20.0f == 20));
+
+    expect("10.0f != 20 is", 1, (10.0f != 20));
+    expect("20.0f != 10 is", 1, (20.0f != 10));
+    expect("20.0f != 20 is", 0, (20.0f != 20));
+
+    expect("10.0f < 20 is", 1, (10.0f < 20));
+    expect("20.0f < 10 is", 0, (20.0f < 10));
+    expect("20.0f < 20 is", 0, (20.0f < 20));
+
+    expect("10.0f > 20 is", 0, (10.0f > 20));
+    expect("20.0f > 10 is", 1, (20.0f > 10));
+    expect("20.0f > 20 is", 0, (20.0f > 20));
+
+    expect("10.0f <= 20 is", 1, (10.0f <= 20));
+    expect("20.0f <= 10 is", 0, (20.0f <= 10));
+    expect("20.0f <= 20 is", 1, (20.0f <= 20));
+
+    expect("10.0f >= 20 is", 0, (10.0f >= 20));
+    expect("20.0f >= 10 is", 1, (20.0f >= 10));
+    expect("20.0f >= 20 is", 1, (20.0f >= 20));
 }
 
 //-------------------------------------------------------------------------
@@ -69,6 +136,8 @@ int main(void)
     printf("float-cmp-const-const\n");
 
     constconst();
+    intconstconst();
+    constintconst();
 
     printf("float-cmp-const-const (res: %d)\n", result);
     return result;

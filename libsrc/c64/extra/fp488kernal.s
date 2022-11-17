@@ -40,3 +40,27 @@
     .export ftoslteax   := ___cbmkernal_ftoslteax
     .export ftosgeeax   := ___cbmkernal_ftosgeeax
     .export ftosleeax   := ___cbmkernal_ftosleeax
+
+    .import ___cbmkernal_powf
+    .import ___cbmkernal_sinf
+    .import ___cbmkernal_cosf
+    .import ___cbmkernal_logf
+    .import ___cbmkernal_expf
+    .import ___cbmkernal_sqrtf
+    .import ___cbmkernal_tanf
+    .import ___cbmkernal_atanf
+    .import ___cbmkernal_fabsf
+    .import ___cbmkernal_roundf
+    .import ___cbmkernal_truncf
+
+    .export _powf       := ___cbmkernal_powf
+    .export _sinf       := ___cbmkernal_sinf
+    .export _cosf       := ___cbmkernal_cosf
+    .export _logf       := ___cbmkernal_logf
+    .export _expf       := ___cbmkernal_expf
+    .export _sqrtf      := ___cbmkernal_sqrtf
+    .export _tanf       := ___cbmkernal_tanf
+    .export _atanf      := ___cbmkernal_atanf
+    .export _fabsf      := ___cbmkernal_fabsf
+    .export _roundf     := ___cbmkernal_roundf
+    .export _truncf     := ___cbmkernal_truncf

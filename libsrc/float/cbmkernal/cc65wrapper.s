@@ -350,58 +350,58 @@ ___cbmkernal_ftosleeax:
     .import __fround
     .import __fint
 
-    .export _powf
-_powf:
+    .export ___cbmkernal_powf
+___cbmkernal_powf:
     ; arg0:     a/x/sreg/sreg+1
     ; arg1:     (sp),y (y=0..3)
     jmp     __fpow
 
-    .export _sinf
-_sinf:
+    .export ___cbmkernal_sinf
+___cbmkernal_sinf:
     ; arg0:     a/x/sreg/sreg+1
     jmp     __fsin
 
-    .export _cosf
-_cosf:
+    .export ___cbmkernal_cosf
+___cbmkernal_cosf:
     ; arg0:     a/x/sreg/sreg+1
     jmp     __fcos
 
-    .export _logf
-_logf:
+    .export ___cbmkernal_logf
+___cbmkernal_logf:
     ; arg0:     a/x/sreg/sreg+1
     jmp     __flog
 
-    .export _expf
-_expf:
+    .export ___cbmkernal_expf
+___cbmkernal_expf:
     ; arg0:     a/x/sreg/sreg+1
     jmp     __fexp
 
-    .export _sqrtf
-_sqrtf:
+    .export ___cbmkernal_sqrtf
+___cbmkernal_sqrtf:
     ; arg0:     a/x/sreg/sreg+1
     jmp     __fsqr
 
-    .export _tanf
-_tanf:
+    .export ___cbmkernal_tanf
+___cbmkernal_tanf:
     ; arg0:     a/x/sreg/sreg+1
     jmp     __ftan
 
-    .export _atanf
-_atanf:
+    .export ___cbmkernal_atanf
+___cbmkernal_atanf:
     ; arg0:     a/x/sreg/sreg+1
     jmp     __fatn
 
-    .export _fabsf
-_fabsf:
+    .export ___cbmkernal_fabsf
+___cbmkernal_fabsf:
     ; arg0:     a/x/sreg/sreg+1
     jmp     __fabs
 
-    .export _roundf
-_roundf:
+    .export ___cbmkernal_roundf
+___cbmkernal_roundf:
     ; arg0:     a/x/sreg/sreg+1
     jmp     __fround
 
-    .export _truncf
-_truncf:
+    .export ___cbmkernal_truncf
+___cbmkernal_truncf:
     ; arg0:     a/x/sreg/sreg+1
     jmp     __fint

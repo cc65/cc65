@@ -74,6 +74,15 @@ void varconst(void)
     printf(" fp3:0x%08lx [0x40f80000] %s (exp:7.75)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
     test1(fp3, "40f80000");
 
+    fp1 = 0.1f;
+    fp2 = 0.3f;
+    fp3 = fp2 - 0.1f;
+    printf("fp3:0x%08lx [0x3e4cccce] %s (0.2)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
+    test1(fp3, "3e4cccce");
+    fp3 = fp1 - 0.3f;
+    printf("fp3:0x%08lx [0xbe4cccce] %s (-0.2)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
+    test1(fp3, "be4cccce");
+
     fp1 = 16.25f;
     fp3 = fp1 * 2.5f;
     printf("multiplication: %s*%s=%s\n", _ftostr(buf, fp1), _ftostr(buf2, 2.3f), _ftostr(buf3, fp3));

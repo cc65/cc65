@@ -72,6 +72,15 @@ void constvar(void)
     printf(" fp3:0x%08lx [0xc0f80000] %s (-7.75)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
     test1(fp3, "c0f80000");
 
+    fp1 = 0.1f;
+    fp2 = 0.3f;
+    fp3 = 0.3f - fp1;
+    printf("fp3:0x%08lx [0x3e4cccce] %s (0.2)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
+    test1(fp3, "3e4cccce"); 
+    fp3 = 0.1f - fp2;
+    printf("fp3:0x%08lx [0xbe4cccce] %s (-0.2)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
+    test1(fp3, "be4cccce");
+
     fp2 = 2.25f;
     fp3 = 16.25f * fp2;
     printf("multiplication: %s*%s=%s\n", _ftostr(buf, 16.25f), _ftostr(buf2, fp2), _ftostr(buf3, fp3));
@@ -83,6 +92,8 @@ void constvar(void)
     printf("division: %s/%s=%s\n", _ftostr(buf, 16.2f), _ftostr(buf2, fp2), _ftostr(buf3, fp3));
     printf(" fp3:0x%08lx [0x40cf5c2a] %s (6.48)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
     test1(fp3, "40cf5c2a");
+
+
 }
 
 int main(void)

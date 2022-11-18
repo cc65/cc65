@@ -159,6 +159,11 @@ void varvar(void)
     WAIT();
 
     printf("\nconversions (float variable to integer variable)\n");
+    fp1 = 12.3f;
+    var_schar = (signed char)fp1;
+    printf("fp1 0x%08lx %s (12.3) schar:%d (exp:12)", *((uint32_t*)&fp1), _ftostr(buf, fp1), (int)var_schar);
+    test2(var_schar, 12);
+
     fp1 = -12.3f;
     var_schar = (signed char)fp1;
     printf("fp1 0x%08lx %s (-12.3) schar:%d (exp:-12)", *((uint32_t*)&fp1), _ftostr(buf, fp1), (int)var_schar);
@@ -173,6 +178,12 @@ void varvar(void)
     var_sint = (signed short)fp1;
     printf("fp1 0x%08lx %s (1234.5) sint:%d (exp:1234)", *((uint32_t*)&fp1), _ftostr(buf, fp1), var_sint);
     test2(var_sint, 1234);
+
+    fp1 = -1234.5f;
+    var_sint = (signed short)fp1;
+    printf("fp1 0x%08lx %s (-1234.5) sint:%d (exp:-1234)", *((uint32_t*)&fp1), _ftostr(buf, fp1), var_sint);
+    test2(var_sint, -1234);
+
     fp2 = 1999.9f;
     var_uint = (unsigned short)fp2;
     printf("fp2 0x%08lx %s (1999.9) uint:%u (exp:1999)", *((uint32_t*)&fp2), _ftostr(buf, fp2), var_uint);
@@ -182,6 +193,12 @@ void varvar(void)
     var_slong = (signed long)fp1;
     printf("fp1 0x%08lx %s (123456.5) slong:%ld (exp:123456)", *((uint32_t*)&fp1), _ftostr(buf, fp1), var_slong);
     test2(var_slong, 123456);
+
+    fp1 = -123456.5f;
+    var_slong = (signed long)fp1;
+    printf("fp1 0x%08lx %s (-123456.5) slong:%ld (exp:-123456)", *((uint32_t*)&fp1), _ftostr(buf, fp1), var_slong);
+    test2(var_slong, -123456);
+
     fp2 = 199988.9f;
     var_ulong = (unsigned long)fp2;
     printf("fp2 0x%08lx %s (199988.9) ulong:%lu (exp:199988)", *((uint32_t*)&fp2), _ftostr(buf, fp2), var_ulong);

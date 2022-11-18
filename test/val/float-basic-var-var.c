@@ -76,6 +76,16 @@ void varvar(void)
     printf(" fp3:0x%08lx [0x423f0000] %s (exp:47.75)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
     test1(fp3, "423f0000");
 
+    fp1 = 0.1f;
+    fp2 = 0.3f;
+
+    fp3 = fp2 - fp1;
+    printf("fp3:0x%08lx [0x3e4cccce] %s (0.2)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
+    test1(fp3, "3e4cccce");
+    fp3 = fp1 - fp2;
+    printf("fp3:0x%08lx [0xbe4cccce] %s (-0.2)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
+    test1(fp3, "be4cccce");
+
     fp1 = 8.5f;
     fp2 = 2.25f;
     fp3 = fp1 * fp2;

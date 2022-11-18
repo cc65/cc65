@@ -46,6 +46,13 @@ jobs:
       - name: Checkout Source
         uses: actions/checkout@v2
 
+      - name: Build and package 64-bit Windows versions of the tools.
+        run: |
+          make -C src clean
+          make -j2 bin USER_CFLAGS="-D __USE_MINGW_ANSI_STDIO 1 -Werror" CROSS_COMPILE=x86_64-w64-mingw32-
+          make zip
+          mv cc65.zip cc65-snapshot-win64.zip
+
       - name: Do some simple style checks
         shell: bash
         run: make -j2 checkstyle
@@ -75,13 +82,13 @@ jobs:
       - name: Build and package 64-bit Windows versions of the tools.
         run: |
           make -C src clean
-          make -j2 bin USER_CFLAGS="-D __STDC_FORMAT_MACROS -Werror" CROSS_COMPILE=x86_64-w64-mingw32-
+          make -j2 bin USER_CFLAGS="-D __USE_MINGW_ANSI_STDIO 1 -Werror" CROSS_COMPILE=x86_64-w64-mingw32-
           make zip
           mv cc65.zip cc65-snapshot-win64.zip
       - name: Build and package 32-bit Windows versions of the tools.
         run: |
           make -C src clean
-          make -j2 bin USER_CFLAGS="-D __STDC_FORMAT_MACROS -Werror" CROSS_COMPILE=i686-w64-mingw32-
+          make -j2 bin USER_CFLAGS="-D __USE_MINGW_ANSI_STDIO 1 -Werror" CROSS_COMPILE=i686-w64-mingw32-
           make zip
           mv cc65.zip cc65-snapshot-win32.zip
 

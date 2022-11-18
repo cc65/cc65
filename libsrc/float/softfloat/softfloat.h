@@ -88,13 +88,13 @@ float64 float32_to_float64( float32 );
 /*----------------------------------------------------------------------------
 | Software IEEE single-precision operations.
 *----------------------------------------------------------------------------*/
-float32 float32_round_to_int( float32 );
-float32 float32_add( float32, float32 );
-float32 float32_sub( float32, float32 );
-float32 float32_mul( float32, float32 );
-float32 float32_div( float32, float32 );
-float32 float32_rem( float32, float32 );
-float32 float32_sqrt( float32 );
+float32 __fastcall__ float32_round_to_int( float32 );
+float32 __fastcall__ float32_add( float32, float32 );
+float32 __fastcall__ float32_sub( float32, float32 );
+float32 __fastcall__ float32_mul( float32, float32 );
+float32 __fastcall__ float32_div( float32, float32 );
+float32 __fastcall__ float32_rem( float32, float32 );
+float32 __fastcall__ float32_sqrt( float32 );
 unsigned char __fastcall__ float32_eq( float32, float32 );
 unsigned char __fastcall__ float32_le( float32, float32 );
 unsigned char __fastcall__ float32_lt( float32, float32 );

@@ -651,7 +651,7 @@ float64 float32_to_float64( float32 a )
 | Arithmetic.
 *----------------------------------------------------------------------------*/
 
-float32 float32_round_to_int( float32 a )
+float32 __fastcall__ float32_round_to_int( float32 a )
 {
     flag aSign;
     int16 aExp;
@@ -855,7 +855,7 @@ static float32 subFloat32Sigs( float32 a, float32 b, flag zSign )
 | Floating-Point Arithmetic.
 *----------------------------------------------------------------------------*/
 
-float32 float32_add( float32 a, float32 b )
+float32 __fastcall__ float32_add( float32 a, float32 b )
 {
     flag aSign, bSign;
 
@@ -876,8 +876,13 @@ float32 float32_add( float32 a, float32 b )
 | Floating-Point Arithmetic.
 *----------------------------------------------------------------------------*/
 
-float32 float32_sub( float32 a, float32 b )
+#if 0
+float32 __fastcall__ float32_sub( float32 b, float32 a ) // swapped
+#else
+float32 __fastcall__ float32_sub( float32 a, float32 b ) // original
+#endif
 {
+#if 1
     flag aSign, bSign;
 
     aSign = extractFloat32Sign( a );
@@ -888,7 +893,10 @@ float32 float32_sub( float32 a, float32 b )
     else {
         return addFloat32Sigs( a, b, aSign );
     }
-
+#else
+    b = b;
+    return a;
+#endif
 }
 
 /*----------------------------------------------------------------------------
@@ -897,7 +905,7 @@ float32 float32_sub( float32 a, float32 b )
 | Floating-Point Arithmetic.
 *----------------------------------------------------------------------------*/
 
-float32 float32_mul( float32 a, float32 b )
+float32 __fastcall__ float32_mul( float32 a, float32 b )
 {
     flag aSign, bSign, zSign;
     int16 aExp, bExp, zExp;
@@ -1023,7 +1031,7 @@ float32 float32_div( float32 a, float32 b )
 | according to the IEEE Standard for Floating-Point Arithmetic.
 *----------------------------------------------------------------------------*/
 
-float32 float32_rem( float32 a, float32 b )
+float32 __fastcall__ float32_rem( float32 a, float32 b )
 {
     flag aSign, bSign, zSign;
     int16 aExp, bExp, expDiff;
@@ -1107,7 +1115,7 @@ float32 float32_rem( float32 a, float32 b )
 | Arithmetic.
 *----------------------------------------------------------------------------*/
 
-float32 float32_sqrt( float32 a )
+float32 __fastcall__ float32_sqrt( float32 a )
 {
     flag aSign;
     int16 aExp, zExp;

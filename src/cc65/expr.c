@@ -3617,8 +3617,10 @@ static void parsesub (ExprDesc* Expr)
                 /* OOPS */
                 Error ("Invalid operands for binary operator '-'");
             }
-
-            if (!IsClassFloat (lhst) && !IsClassFloat (rhst)) {
+#if 1
+            if (!IsClassFloat (lhst) && !IsClassFloat (rhst))
+#endif
+            {
                 /* We can't make all subtraction expressions constant */
                 if (ED_IsConstAbs (&Expr2)) {
                     Expr->IVal -= Expr2.IVal * rscale;
@@ -3664,6 +3666,10 @@ static void parsesub (ExprDesc* Expr)
                         }
                         /* Do the subtraction */
                         g_dec (flags | CF_CONST, FP_D_As32bitRaw(Expr2.V.FVal));
+                    }
+                    else {
+                        /* Do the subtraction */
+                        g_dec (flags | CF_CONST, Expr2.IVal * rscale);
                     }
                 } else {
                     if (IsClassInt (lhst)) {
@@ -3724,6 +3730,10 @@ static void parsesub (ExprDesc* Expr)
                     }
                     /* Do the subtraction */
                     g_dec (flags | CF_CONST, FP_D_As32bitRaw(Expr2.V.FVal));
+                }
+                else {
+                    /* Do the subtraction */
+                    g_dec (flags | CF_CONST, Expr2.IVal * rscale);
                 }
             } else {
                 if (IsClassInt (lhst)) {

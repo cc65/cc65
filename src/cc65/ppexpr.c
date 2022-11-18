@@ -519,12 +519,21 @@ static void PPhie7 (PPExpr* Expr)
 
         /* Evaluate */
         if (PPEvaluationEnabled && !PPEvaluationFailed) {
-            /* To shift by a negative value is equivalent to shift to the
-            ** opposite direction.
-            */
-            if ((Rhs.Flags & PPEXPR_UNSIGNED) != 0 && Rhs.IVal > (long)LONG_BITS) {
+            /* For now we use 32-bit integer types for PP integer constants */
+            if ((Rhs.Flags & PPEXPR_UNSIGNED) != 0) {
+                if ((unsigned long)Rhs.IVal > LONG_BITS) {
+                    Rhs.IVal = (long)LONG_BITS;
+                }
+            } else if (Rhs.IVal > (long)LONG_BITS) {
                 Rhs.IVal = (long)LONG_BITS;
+            } else if (Rhs.IVal < -(long)LONG_BITS) {
+                Rhs.IVal = -(long)LONG_BITS;
             }
+
+            /* Positive count for left-shift and negative for right-shift. So
+            ** to shift by a count is equivalent to shift to the opposite
+            ** direction by the negated count.
+            */
             if (Op == TOK_SHR) {
                 Rhs.IVal = -Rhs.IVal;
             }
@@ -532,27 +541,26 @@ static void PPhie7 (PPExpr* Expr)
             /* Evaluate the result */
             if ((Expr->Flags & PPEXPR_UNSIGNED) != 0) {
                 if (Rhs.IVal >= (long)LONG_BITS) {
-                    /* For now we use (unsigned) long types for integer constants */
                     PPWarning ("Integer overflow in preprocessor expression");
                     Expr->IVal = 0;
                 } else if (Rhs.IVal > 0) {
                     Expr->IVal <<= Rhs.IVal;
-                } else if (Rhs.IVal < -(long)LONG_BITS) {
+                } else if (Rhs.IVal <= -(long)LONG_BITS) {
                     Expr->IVal = 0;
                 } else if (Rhs.IVal < 0) {
                     Expr->IVal = (unsigned long)Expr->IVal >> -Rhs.IVal;
                 }
             } else {
+                /* -1 for sign bit */
                 if (Rhs.IVal >= (long)(LONG_BITS - 1)) {
-                    /* For now we use (unsigned) long types for integer constants */
                     PPWarning ("Integer overflow in preprocessor expression");
                     Expr->IVal = 0;
                 } else if (Rhs.IVal > 0) {
                     Expr->IVal <<= Rhs.IVal;
-                } else if (Rhs.IVal < -(long)LONG_BITS) {
-                    Expr->IVal = -1;
+                } else if (Rhs.IVal <= -(long)LONG_BITS) {
+                    Expr->IVal = Expr->IVal >= 0 ? 0 : -1;
                 } else if (Rhs.IVal < 0) {
-                    Expr->IVal >>= Expr->IVal >> -Rhs.IVal;
+                    Expr->IVal = (long)Expr->IVal >> -Rhs.IVal;
                 }
             }
         }

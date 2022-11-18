@@ -18,7 +18,7 @@ jobs:
         run: git config --global core.autocrlf input
 
       - name: Checkout Source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.1
@@ -97,7 +97,7 @@ jobs:
           path: cc65-snapshot-win64.zip
 
       - name: Get the online documents repo.
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: cc65/doc
           path: doc.git

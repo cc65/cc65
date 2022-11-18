@@ -76,7 +76,7 @@ void constvar(void)
     fp2 = 0.3f;
     fp3 = 0.3f - fp1;
     printf("fp3:0x%08lx [0x3e4cccce] %s (0.2)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-    test1(fp3, "3e4cccce"); 
+    test1(fp3, "3e4cccce");
     fp3 = 0.1f - fp2;
     printf("fp3:0x%08lx [0xbe4cccce] %s (-0.2)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
     test1(fp3, "be4cccce");

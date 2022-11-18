@@ -44,7 +44,7 @@ jobs:
       - shell: bash
         run: git config --global core.autocrlf input
       - name: Checkout Source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Do some simple style checks
         shell: bash

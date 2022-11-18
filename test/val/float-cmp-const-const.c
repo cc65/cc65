@@ -72,32 +72,29 @@ void intconstconst(void)
 {
     printf("int const vs const\n");
 
-    // FIXME: Comparing types 'int' with 'float' is invalid
-#if 0
-    expect("10 == 1.6f is", 0, (10 == 1.6f));
-    expect("20 == 1.5f is", 0, (20 == 1.5f));
-    expect("20 == 1.6f is", 1, (20 == 1.6f));
+    expect("10 == 20.0f is", 0, (10 == 20.0f));
+    expect("20 == 10.0f is", 0, (20 == 10.0f));
+    expect("20 == 20.0f is", 1, (20 == 20.0f));
 
-    expect("10 != 1.6f is", 1, (10 != 1.6f));
-    expect("20 != 1.5f is", 1, (20 != 1.5f));
-    expect("20 != 1.6f is", 0, (20 != 1.6f));
+    expect("10 != 20.0f is", 1, (10 != 20.0f));
+    expect("20 != 10.0f is", 1, (20 != 10.0f));
+    expect("20 != 20.0f is", 0, (20 != 20.0f));
 
-    expect("10 < 1.6f is", 1, (10 < 1.6f));
-    expect("20 < 1.5f is", 0, (20 < 1.5f));
-    expect("20 < 1.6f is", 0, (20 < 1.6f));
+    expect("10 < 20.0f is", 1, (10 < 20.0f));
+    expect("20 < 10.0f is", 0, (20 < 10.0f));
+    expect("20 < 20.0f is", 0, (20 < 20.0f));
 
-    expect("10 > 1.6f is", 0, (10 > 1.6f));
-    expect("20 > 1.5f is", 1, (20 > 1.5f));
-    expect("20 > 1.6f is", 0, (20 > 1.6f));
+    expect("10 > 20.0f is", 0, (10 > 20.0f));
+    expect("20 > 10.0f is", 1, (20 > 10.0f));
+    expect("20 > 20.0f is", 0, (20 > 20.0f));
 
-    expect("10 <= 1.6f is", 1, (10 <= 1.6f));
-    expect("20 <= 1.5f is", 0, (20 <= 1.5f));
-    expect("20 <= 1.6f is", 1, (20 <= 1.6f));
+    expect("10 <= 20.0f is", 1, (10 <= 20.0f));
+    expect("20 <= 10.0f is", 0, (20 <= 10.0f));
+    expect("20 <= 20.0f is", 1, (20 <= 20.0f));
 
-    expect("10 >= 1.6f is", 0, (10 >= 1.6f));
-    expect("20 >= 1.5f is", 1, (20 >= 1.5f));
-    expect("20 >= 1.6f is", 1, (20 >= 1.6f));
-#endif
+    expect("10 >= 20.0f is", 0, (10 >= 20.0f));
+    expect("20 >= 10.0f is", 1, (20 >= 10.0f));
+    expect("20 >= 20.0f is", 1, (20 >= 20.0f));
 }
 
 void constintconst(void)

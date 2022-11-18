@@ -4110,6 +4110,9 @@ void g_eq (unsigned flags, unsigned long val)
         flags &= ~CF_FORCECHAR;
         g_push (flags & ~CF_CONST, 0);
     }
+    else {
+        LOG(("g_ee rhs not const\n"));
+    }
     ASMLOG(("nop ; g_eq(flags:%2x,val:%lx)", flags, val)); // FIXME: remove
 
     /* Use long way over the stack */

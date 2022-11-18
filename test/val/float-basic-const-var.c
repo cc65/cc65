@@ -108,5 +108,5 @@ int main(void)
     WAIT();
 
     printf("\nfloat-basic-const-var (res:%d)\n", result);
-    return (result == 1) ? EXIT_FAILURE : EXIT_SUCCESS; // only fail while ALL sub tests fail
+    return result;
 }

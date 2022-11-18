@@ -2494,7 +2494,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
         if (ED_IsConstAbs (Expr)) {
             /* Numeric constant value */
             GetCodePos (&Mark2);
-            LOG(("hie_compare iVal:%08x FVal:%f\n", Expr->IVal, Expr->V.FVal.V));
+            LOG(("hie_compare Numeric constant value iVal:%ld FVal:%f\n", Expr->IVal, Expr->V.FVal.V));
             if (ltype == CF_FLOAT) {
                 g_push_float (ltype | CF_CONST, Expr->V.FVal.V);
             } else {
@@ -2521,12 +2521,15 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             /* Not numeric constant, load into the primary */
             LoadExpr (CF_NONE, &Expr2);
         }
+        else {
+            LOG(("hie_compare rhs is constant value iVal:%ld FVal:%f\n", Expr2.IVal, Expr2.V.FVal.V));
+        }
 
         /* Check if operands have allowed types for this operation */
         if (!IsRelationType (Expr->Type) || !IsRelationType (Expr2.Type)) {
             /* Output only one message even if both sides are wrong */
             TypeCompatibilityDiagnostic (Expr->Type, Expr2.Type, 1,
-                "Comparing types '%s' with '%s' is invalid");
+                "a Comparing types '%s' with '%s' is invalid");
             /* Avoid further errors */
             ED_MakeConstAbsInt (Expr, 0);
             ED_MakeConstAbsInt (&Expr2, 0);
@@ -2545,13 +2548,13 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
         /* Make sure, the types are compatible */
         if (IsClassInt (Expr->Type)) {
-            if (!IsClassInt (Expr2.Type) && !ED_IsNullPtr (Expr)) {
+            if (!IsClassInt (Expr2.Type) && !IsClassFloat (Expr2.Type) && !ED_IsNullPtr (Expr)) {
                 if (IsClassPtr (Expr2.Type)) {
                     TypeCompatibilityDiagnostic (Expr->Type, PtrConversion (Expr2.Type), 0,
                         "Comparing integer '%s' with pointer '%s'");
                 } else {
                     TypeCompatibilityDiagnostic (Expr->Type, Expr2.Type, 1,
-                        "Comparing types '%s' with '%s' is invalid");
+                        "b Comparing types '%s' with '%s' is invalid");
                 }
             }
         } else if (IsClassPtr (Expr->Type)) {
@@ -2568,7 +2571,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                         "Comparing pointer type '%s' with integer type '%s'");
                 } else {
                     TypeCompatibilityDiagnostic (Expr->Type, Expr2.Type, 1,
-                        "Comparing types '%s' with '%s' is invalid");
+                        "c Comparing types '%s' with '%s' is invalid");
                 }
             }
         }
@@ -2576,7 +2579,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
         /* Check for numeric constant operands */
         if ((ED_IsAddrExpr (Expr) && ED_IsNullPtr (&Expr2)) ||
             (ED_IsNullPtr (Expr) && ED_IsAddrExpr (&Expr2))) {
-
+            LOG(("hie_compare numeric constant operands\n"));
             /* Object addresses are inequal to null pointer */
             Expr->IVal = (Tok != TOK_EQ);
             if (ED_IsNullPtr (&Expr2)) {
@@ -2599,6 +2602,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
             if (ED_CodeRangeIsEmpty (&Expr2)) {
                 /* Both operands are static, remove the load code */
+                LOG(("hie_compare remove code\n"));
                 RemoveCode (&Mark1);
             } else {
                 /* Drop pushed lhs */
@@ -2609,10 +2613,11 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
         } else if (ED_IsAddrExpr (Expr)     &&
                    ED_IsAddrExpr (&Expr2)   &&
                    Expr->Sym == Expr2.Sym) {
-
             /* Evaluate the result for static addresses */
             unsigned long Val1 = Expr->IVal;
             unsigned long Val2 = Expr2.IVal;
+            LOG(("hie_compare static addresses\n"));
+
             switch (Tok) {
                 case TOK_EQ: Expr->IVal = (Val1 == Val2);   break;
                 case TOK_NE: Expr->IVal = (Val1 != Val2);   break;
@@ -2643,12 +2648,19 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
         } else if (ED_IsConstAbs (Expr) && rconst) {
 
             /* Both operands are numeric constant, remove the generated code */
+            LOG(("hie_compare remove code\n"));
             RemoveCode (&Mark1);
-            LOG(("hie_compare (Both operands are numeric constant)\n"));
+            LOG(("hie_compare (Both operands are numeric constant) (float %ld:%ld) (int %ld:%ld)\n",
+                 (signed long)FP_D_ToFloat(Expr->V.FVal),
+                 (signed long)FP_D_ToFloat(Expr2.V.FVal),
+                  Expr->IVal, Expr2.IVal
+                 ));
 
              if ((TypeOf (Expr->Type) == CF_FLOAT) || (TypeOf (Expr2.Type) == CF_FLOAT)) {
                 /* at least one of the operands is a float */
-                if ((TypeOf (Expr->Type) == CF_FLOAT) && (TypeOf (Expr2.Type) == CF_FLOAT)) {
+                if ((TypeOf (Expr->Type) == CF_FLOAT) &&
+                    (TypeOf (Expr2.Type) == CF_FLOAT)) {
+                    LOG(("FIXME: comparing float constant with float constant\n"));
                     /* compare float vs float */
                     float Val1 = (float)FP_D_ToFloat(Expr->V.FVal);
                     float Val2 = (float)FP_D_ToFloat(Expr2.V.FVal);
@@ -2661,11 +2673,12 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                         case TOK_GT: Expr->IVal = (Val1 > Val2);    break;
                         default:     Internal ("hie_compare: got token 0x%X\n", Tok);
                     }
+                    LOG(("FIXME: float:%ld float:%ld res:%d\n", (long)Val1, (long)Val2, Expr->IVal));
                 } else if (TypeOf (Expr2.Type) == CF_FLOAT) {
                     LOG(("FIXME: comparing non float constant with float constant\n"));
                     /* FIXME: compare non float vs float */
-                    signed long Val1 = Expr2.IVal;
-                    float Val2 = (float)FP_D_ToFloat(Expr->V.FVal);
+                    signed long Val1 = Expr->IVal;
+                    float Val2 = (float)FP_D_ToFloat(Expr2.V.FVal);
                     switch (Tok) {
                         case TOK_EQ: Expr->IVal = (Val1 == Val2);   break;
                         case TOK_NE: Expr->IVal = (Val1 != Val2);   break;
@@ -2675,6 +2688,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                         case TOK_GT: Expr->IVal = (Val1 > Val2);    break;
                         default:     Internal ("hie_compare: got token 0x%X\n", Tok);
                     }
+                    LOG(("FIXME: int:%ld float:%ld res:%d\n", Val1, (long)Val2, Expr->IVal));
                 } else {
                     LOG(("FIXME: comparing float constant with non float constant\n"));
                     /* FIXME: compare float vs non float */
@@ -2689,8 +2703,11 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                         case TOK_GT: Expr->IVal = (Val1 > Val2);    break;
                         default:     Internal ("hie_compare: got token 0x%X\n", Tok);
                     }
+                    LOG(("FIXME: float:%ld int:%ld res:%d\n", (long)Val1, Val2, Expr->IVal));
                 }
             } else {
+
+                LOG(("hie_compare: not float\n"));
 
                 /* Determine if this is a signed or unsigned compare */
                 if (IsClassInt (Expr->Type) && IsSignSigned (Expr->Type) &&
@@ -2741,6 +2758,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             int RightSigned = IsSignSigned (Expr2.Type);
             int CmpSigned   = IsClassInt (Expr->Type) && IsClassInt (Expr2.Type) &&
                               IsSignSigned (ArithmeticConvert (Expr->Type, Expr2.Type));
+            LOG(("hie_compare Determine the signedness of the operands\n"));
 
             LOG(("hie_compare LeftSigned:%d RightSigned:%d CmpSigned:%d %x %x\n",
                  LeftSigned, RightSigned, CmpSigned, Expr2.IVal, Expr->IVal));
@@ -2753,6 +2771,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             if (rconst) {
                 flags |= CF_CONST;
                 if ((Gen->Flags & GEN_NOPUSH) != 0) {
+                    LOG(("hie_compare remove code\n"));
                     RemoveCode (&Mark2);
                     ltype |= CF_PRIMARY;    /* Value is in register */
                 }
@@ -2926,19 +2945,21 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             }
 
             /* FIXME: float --- startcode end */
-            if (Expr2.Type == type_float) {
+            if (IsClassFloat(Expr2.Type)) {
+//            if (Expr2.Type == type_float) {
                 /* Generate code */
                 LOG(("hie_compare generate code for Expr2 as float (flags:$%02x)\n", flags));
                 GenFunc (flags, FP_D_As32bitRaw(Expr2.V.FVal));
             } else if (IsClassFloat(Expr->Type)) {
                 /* Generate code */
-                LOG(("hie_compare generate code for Expr as float\n"));
+                LOG(("hie_compare generate code for Expr as float (flags:$%02x)\n", flags));
                 GenFunc (flags, FP_D_As32bitRaw(FP_D_FromInt(Expr2.IVal)));
             } else {
                 /* Generate code */
-                LOG(("hie_compare generate code for Expr2 as int (=%d)\n", Expr2.IVal));
+                LOG(("hie_compare generate code for Expr2 as int (=%d) (flags:$%02x)\n", Expr2.IVal, flags));
                 GenFunc (flags, Expr2.IVal);
             }
+            LOG(("hie_compare generate code done\n"));
             /* FIXME: float --- newcode end */
 
             /* The result is an rvalue in the primary */
@@ -2954,6 +2975,7 @@ Done:   Expr->Type = type_bool;
         /* Propagate viral flags */
         ED_PropagateFrom (Expr, &Expr2);
     }
+    LOG(("hie_compare generate end\n"));
 }
 
 

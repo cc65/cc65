@@ -38,8 +38,14 @@ COPT=-m32 -mpc32
 
 gccminimal: $(TDIR)/float-minimal.c gccstubs.c
 	gcc $(COPT) -I ./ "-D__fastcall__= " -o float-minimal $(TDIR)/float-minimal.c gccstubs.c -lm
-gccbasic: $(TDIR)/float-basic.c gccstubs.c
-	gcc $(COPT) -I ./ "-D__fastcall__= " -o float-basic $(TDIR)/float-basic.c gccstubs.c -lm
+gccbasic-const-const: $(TDIR)/float-basic-const-const.c gccstubs.c
+	gcc $(COPT) -I ./ "-D__fastcall__= " -o float-basic-const-const $(TDIR)/float-basic-const-const.c gccstubs.c -lm
+gccbasic-var-const: $(TDIR)/float-basic-var-const.c gccstubs.c
+	gcc $(COPT) -I ./ "-D__fastcall__= " -o float-basic-var-const $(TDIR)/float-basic-var-const.c gccstubs.c -lm
+gccbasic-const-var: $(TDIR)/float-basic-const-var.c gccstubs.c
+	gcc $(COPT) -I ./ "-D__fastcall__= " -o float-basic-const-var $(TDIR)/float-basic-const-var.c gccstubs.c -lm
+gccbasic-var-var: $(TDIR)/float-basic-var-var.c gccstubs.c
+	gcc $(COPT) -I ./ "-D__fastcall__= " -o float-basic-var-var $(TDIR)/float-basic-var-var.c gccstubs.c -lm
 gccconv: $(TDIR)/float-conv.c gccstubs.c
 	gcc $(COPT) -I ./ "-D__fastcall__= " -o float-conv $(TDIR)/float-conv.c gccstubs.c -lm
 gcccmp: $(TDIR)/float-cmp.c gccstubs.c
@@ -51,8 +57,11 @@ gccquick: quick.c gccstubs.c
 
 rungcc-minimal: gccminimal
 	./float-minimal
-rungcc-basic: gccbasic
-	./float-basic
+rungcc-basic: gccbasic-const-const gccbasic-var-const gccbasic-const-var gccbasic-var-var
+	./float-basic-const-const
+	./float-basic-var-const
+	./float-basic-const-var
+	./float-basic-var-var
 rungcc-conv: gccconv
 	./float-conv
 rungcc-cmp: gcccmp

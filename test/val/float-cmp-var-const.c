@@ -77,45 +77,11 @@ void varconst(void)
 
 }
 
-void varintconst(void)
-{
-    printf("var vs int const\n");
-
-    fp1 = 10.0f;
-    fp2 = 20.0f;
-
-    expect("20 == 10 is", 0, (fp2 == 10));
-    expect("10 == 20 is", 0, (fp1 == 20));
-    expect("10 == 10 is", 1, (fp1 == 10));
-
-    expect("20 != 10 is", 1, (fp2 != 10));
-    expect("10 != 20 is", 1, (fp1 != 20));
-    expect("10 != 10 is", 0, (fp1 != 10));
-
-//     expect("20 < 10 is", 1, (fp2 < 10));
-//     expect("10 < 20 is", 0, (fp1 < 20));
-    expect("10 < 10 is", 0, (fp1 < 10));
-
-//     expect("20 > 10 is", 0, (fp2 > 10));
-//     expect("10 > 20 is", 1, (fp1 > 20));
-    expect("10 > 10 is", 0, (fp1 > 10));
-
-//     expect("20 <= 10 is", 1, (fp2 <= 10));
-//     expect("10 <= 20 is", 0, (fp1 <= 20));
-    expect("10 <= 10 is", 1, (fp1 <= 10));
-
-//     expect("20 >= 10 is", 0, (fp2 >= 10));
-//     expect("10 >= 20 is", 1, (fp1 >= 20));
-    expect("10 >= 10 is", 1, (fp1 >= 10));
-
-}
-
 int main(void)
 {
     printf("float-cmp-var-const\n");
 
     varconst();
-    varintconst();
 
     printf("float-cmp-var-const (res: %d)\n", result);
     return result;

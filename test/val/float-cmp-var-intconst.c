@@ -31,8 +31,8 @@ unsigned long var_ulong;
 int result = 0;
 
 #define expect(msg, exp, val) \
-    printf("%s %s%s (is:%d want:%d)\n", \
-        msg, \
+    printf("%s %d:%d:%s%s (is:%d want:%d)\n", \
+        msg, exp, val, \
         val ? "true" : "false", \
         (exp != val) ? " (failed)" : "", \
         exp, val \
@@ -50,17 +50,29 @@ void varintconst(void)
     fp1 = 10.0f;
     fp2 = 20.0f;
 
-    expect("20 < 10 is", 1, (fp2 < 10));
-    expect("10 < 20 is", 0, (fp1 < 20));
+    expect("10 == 20 is", 0, (fp1 == 20));
+    expect("20 == 10 is", 0, (fp2 == 10));
+    expect("20 == 20 is", 1, (fp2 == 20));
 
-    expect("20 > 10 is", 0, (fp2 > 10));
-    expect("10 > 20 is", 1, (fp1 > 20));
+    expect("10 != 20 is", 1, (fp1 != 20));
+    expect("20 != 10 is", 1, (fp2 != 10));
+    expect("20 != 20 is", 0, (fp2 != 20));
 
-    expect("20 <= 10 is", 1, (fp2 <= 10));
-    expect("10 <= 20 is", 0, (fp1 <= 20));
+    expect("10 < 20 is", 1, (fp1 < 20));
+    expect("20 < 10 is", 0, (fp2 < 10));
+    expect("20 < 20 is", 0, (fp2 < 20));
 
-    expect("20 >= 10 is", 0, (fp2 >= 10));
-    expect("10 >= 20 is", 1, (fp1 >= 20));
+    expect("10 > 20 is", 0, (fp1 > 20));
+    expect("20 > 10 is", 1, (fp2 > 10));
+    expect("20 > 20 is", 0, (fp2 > 20));
+
+    expect("10 <= 20 is", 1, (fp1 <= 20));
+    expect("20 <= 10 is", 0, (fp2 <= 10));
+    expect("20 <= 20 is", 1, (fp2 <= 20));
+
+    expect("10 >= 20 is", 0, (fp1 >= 20));
+    expect("20 >= 10 is", 1, (fp2 >= 10));
+    expect("20 >= 20 is", 1, (fp2 >= 20));
 
 }
 
@@ -71,5 +83,5 @@ int main(void)
     varintconst();
 
     printf("float-cmp-var-intconst (res: %d)\n", result);
-    return (result == 8) ? EXIT_FAILURE : EXIT_SUCCESS;
+    return result;
 }

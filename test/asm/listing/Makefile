@@ -9,7 +9,6 @@ ifdef CMD_EXE
   EXE = .exe
   MKDIR = mkdir $(subst /,\,$1)
   RMDIR = -rmdir /q /s $(subst /,\,$1)
-  ERRDIR = 2>&1
   TRUE = exit 0
   CAT = type $(subst /,\,$1)
 else
@@ -17,7 +16,6 @@ else
   EXE =
   MKDIR = mkdir -p $1
   RMDIR = $(RM) -r $1
-  ERRDIR = 2>&1
   TRUE = true
   CAT = cat $1
 endif
@@ -58,14 +56,14 @@ $(WORKDIR)/$1.bin: $1.s $(ISEQUAL)
 
 #	compile without generating listing
 ifeq ($(wildcard control/$1.err),)
-	$(CA65) -t none -o $$(@:.bin=.o) $$< > $$(@:.bin=.err) $(ERRDIR)
+	$(CA65) -t none -o $$(@:.bin=.o) $$< > $$(@:.bin=.err) 2> $$(@:.bin=.err2)
 ifeq ($(wildcard control/$1.no-ld65),)
-	$(LD65) -t none -o $$@ $$(@:.bin=.o) none.lib > $$(@:.bin=.ld65-err) $(ERRDIR)
+	$(LD65) -t none -o $$@ $$(@:.bin=.o) none.lib > $$(@:.bin=.ld65-err) 2> $$(@:.bin=.ld65-err2)
 endif
 else
-	$(CA65) -t none -o $$(@:.bin=.o) $$< > $$(@:.bin=.err) $(ERRDIR) || $(TRUE)
+	$(CA65) -t none -o $$(@:.bin=.o) $$< > $$(@:.bin=.err) 2> $$(@:.bin=.err2) || $(TRUE)
 ifeq ($(wildcard control/$1.no-ld65),)
-	$(LD65) -t none -o $$@ $$(@:.bin=.o) none.lib > $$(@:.bin=.ld65-err) $(ERRDIR)  || $(TRUE)
+	$(LD65) -t none -o $$@ $$(@:.bin=.o) none.lib > $$(@:.bin=.ld65-err) 2> $$(@:.bin=.ld65-err2) || $(TRUE)
 endif
 endif
 
@@ -73,6 +71,12 @@ ifneq ($(wildcard ref/$1.err-ref),)
 	$(ISEQUAL) ref/$1.err-ref $$(@:.bin=.err)
 else
 	$(ISEQUAL) --empty $$(@:.bin=.err)
+endif
+
+ifneq ($(wildcard ref/$1.err2-ref),)
+	$(ISEQUAL) ref/$1.err2-ref $$(@:.bin=.err2)
+else
+	$(ISEQUAL) --empty $$(@:.bin=.err2)
 endif
 
 ifneq ($(wildcard ref/$1.bin-ref),)
@@ -95,16 +99,30 @@ ifneq ($(wildcard $(WORKDIR)/$1.ld65-err),)
 endif
 endif
 
+ifneq ($(wildcard ref/$1.ld65err2-ref),)
+	@echo $(CAT) $$(@:.bin=.ld65-err2)
+# FIXME: somehow this refuses to work in cmd.exe
+ifndef CMD_EXE
+	$(call CAT,$$(@:.bin=.ld65-err2))
+	-diff -u ref/$1.ld65err2-ref $$(@:.bin=.ld65-err2)
+endif
+	$(ISEQUAL) --wildcards ref/$1.ld65err2-ref $$(@:.bin=.ld65-err2)
+else
+ifneq ($(wildcard $(WORKDIR)/$1.ld65-err2),)
+	$(ISEQUAL) --empty $$(@:.bin=.ld65-err2)
+endif
+endif
+
 #	compile with listing file
 ifeq ($(wildcard control/$1.err),)
-	$(CA65) -t none -l $$(@:.bin=.list-lst) -o $$(@:.bin=.list-o) $$< > $$(@:.bin=.list-err) $(ERRDIR)
+	$(CA65) -t none -l $$(@:.bin=.list-lst) -o $$(@:.bin=.list-o) $$< > $$(@:.bin=.list-err) 2> $$(@:.bin=.list-err2)
 ifeq ($(wildcard control/$1.no-ld65),)
-	$(LD65) -t none -o $$(@:.bin=.list-bin) $$(@:.bin=.list-o) none.lib > $$(@:.bin=.list-ld65-err) $(ERRDIR)
+	$(LD65) -t none -o $$(@:.bin=.list-bin) $$(@:.bin=.list-o) none.lib > $$(@:.bin=.list-ld65-err) 2> $$(@:.bin=.list-ld65-err2)
 endif
 else
-	$(CA65) -t none -l $$(@:.bin=.list-lst) -o $$(@:.bin=.list-o) $$< > $$(@:.bin=.list-err) $(ERRDIR) || $(TRUE)
+	$(CA65) -t none -l $$(@:.bin=.list-lst) -o $$(@:.bin=.list-o) $$< > $$(@:.bin=.list-err) 2> $$(@:.bin=.list-err2) || $(TRUE)
 ifeq ($(wildcard control/$1.no-ld65),)
-	$(LD65) -t none -o $$(@:.bin=.list-bin) $$(@:.bin=.list-o) none.lib > $$(@:.bin=.list-ld65-err) $(ERRDIR) || $(TRUE)
+	$(LD65) -t none -o $$(@:.bin=.list-bin) $$(@:.bin=.list-o) none.lib > $$(@:.bin=.list-ld65-err) 2> $$(@:.bin=.list-ld65-err2) || $(TRUE)
 endif
 endif
 
@@ -122,9 +140,25 @@ ifneq ($(wildcard $(WORKDIR)/$1.list-ld65-err),)
 endif
 endif
 
+ifneq ($(wildcard ref/$1.err2-ref),)
+	$(ISEQUAL) ref/$1.err2-ref $$(@:.bin=.list-err2)
+else
+	$(ISEQUAL) --empty $$(@:.bin=.list-err2)
+endif
+
+ifneq ($(wildcard ref/$1.ld65err2-ref),)
+	$(ISEQUAL) --wildcards ref/$1.ld65err2-ref $$(@:.bin=.list-ld65-err2)
+else
+ifneq ($(wildcard $(WORKDIR)/$1.list-ld65-err2),)
+	$(ISEQUAL) --empty $$(@:.bin=.list-ld65-err2)
+endif
+endif
+
 #	check if the result bin is the same as without listing file
 ifeq ($(wildcard control/$1.err),)
+ifeq ($(wildcard control/$1.err2),)
 	$(ISEQUAL) $$@ $$(@:.bin=.list-bin)
+endif
 endif
 
 ifneq ($(wildcard ref/$1.list-ref),)

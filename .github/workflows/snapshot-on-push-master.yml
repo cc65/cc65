@@ -49,29 +49,29 @@ jobs:
       - name: Do some simple style checks
         shell: bash
         run: make -j2 checkstyle
-#      - name: Build the tools.
-#        shell: bash
-#        run: |
-#            make -j2 bin USER_CFLAGS=-Werror
-#            make -j2 util
-#      - name: Build the platform libraries.
-#        shell: bash
-#        run: make -j2 lib QUIET=1
-#      - name: Run the regression tests.
-#        shell: bash
-#        run: make test QUIET=1
-#      - name: Test that the samples can be built.
-#        shell: bash
-#        run: make -j2 samples
-#      - name: Remove the output from the samples tests.
-#        shell: bash
-#        run: make -C samples clean
-#      - name: Remove programs in util directory
-#        shell: bash
-#        run: make -C util clean
-#      - name: Build the document files.
-#        shell: bash
-#        run: make -j2 doc
+      - name: Build the tools.
+        shell: bash
+        run: |
+            make -j2 bin USER_CFLAGS=-Werror
+            make -j2 util
+      - name: Build the platform libraries.
+        shell: bash
+        run: make -j2 lib QUIET=1
+      - name: Run the regression tests.
+        shell: bash
+        run: make test QUIET=1
+      - name: Test that the samples can be built.
+        shell: bash
+        run: make -j2 samples
+      - name: Remove the output from the samples tests.
+        shell: bash
+        run: make -C samples clean
+      - name: Remove programs in util directory
+        shell: bash
+        run: make -C util clean
+      - name: Build the document files.
+        shell: bash
+        run: make -j2 doc
       - name: Build and package 64-bit Windows versions of the tools.
         run: |
           make -C src clean

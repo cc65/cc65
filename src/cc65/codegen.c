@@ -65,8 +65,12 @@
 #include "util.h"
 #include "codegen.h"
 
-/* this is a terrible hack that tries to combat the ever reoccuring issue with
-   mingw and PRIXPTR */
+/* This is a terrible hack that tries to combat the ever reoccuring issue with
+   Mingw and PRIXPTR - the macro should have been defined like this for us in
+   the first place.
+   NOTE: "I64u" works in the github actions now, so if your local mingw64 fails,
+         you probably have to update.
+*/
 #if defined(__MINGW64__)
 #undef PRIXPTR
 #define PRIXPTR "I64u"

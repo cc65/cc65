@@ -55,16 +55,10 @@ void test1(float f, char *str)
     }
 }
 
-void SKIPPEDtest1(float f, char *str)
-{
-    char temp[12];
-    sprintf(temp, "%08lx", *((uint32_t*)&f));
-    printf(" (SKIPPED:%s:%s)\n", temp, str);
-}
-
+// when making sub tests work, remove them here and uncomment them in val/float-basic.c
 void constvar(void)
 {
-    printf("\n*** constant vs variable\n\n");
+    printf("\nconstant vs variable\n\n");
 
     fp2 = 64.25f;
     fp3 = 16.75f + fp2;
@@ -72,11 +66,11 @@ void constvar(void)
     printf(" fp3:0x%08lx [0x42a20000] %s (81.0)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
     test1(fp3, "42a20000");
 
-    fp2 = 16.25;
+    fp2 = 16.25f;
     fp3 =  8.5f - fp2;
     printf("substraction: %s-%s=%s\n", _ftostr(buf, 8.5f), _ftostr(buf2, fp2), _ftostr(buf3, fp3));
     printf(" fp3:0x%08lx [0xc0f80000] %s (-7.75)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-SKIPPEDtest1(fp3, "c0f80000");
+    test1(fp3, "c0f80000");
 
     fp2 = 2.25f;
     fp3 = 16.25f * fp2;
@@ -95,13 +89,13 @@ int main(void)
 {
     float fp2 = 43.21f;
 
-    printf("*** float-basic ***\n");
+    printf("float-basic-const-var\n");
     printf("fp1:0x%08lx [0x414570a4] %s (12.340000)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     printf("fp2:0x%08lx [0x422cd70a] %s (43.209999)\n", *((uint32_t*)&fp2), _ftostr(buf, fp2));
 
     constvar();
     WAIT();
 
-    printf("\nfloat-basic (res:%d)\n", result);
-    return result;
+    printf("\nfloat-basic-const-var (res:%d)\n", result);
+    return (result == 1) ? EXIT_FAILURE : EXIT_SUCCESS; // only fail while ALL sub tests fail
 }

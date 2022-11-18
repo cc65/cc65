@@ -70,7 +70,6 @@ void constconst(void)
     printf("fp3:0x%08lx [0x3e99999a] %s (0.3)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
     test1(fp3, "3e99999a");
 
-#if 0
     // substraction
     printf("\nconstant - constant\n\n");
     fp1 = 0.1f;
@@ -81,7 +80,7 @@ void constconst(void)
     printf("    0x%08lx [0x3e4ccccd] %s (0.2)\n", *((uint32_t*)&fp2), _ftostr(buf, fp2));
     printf("fp3:0x%08lx [0xbdcccccd] %s (-0.1)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
     test1(fp3, "bdcccccd");
-#endif
+
     // multiplication
     printf("\nconstant * constant\n\n");
     fp1 = 0.1f;

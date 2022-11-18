@@ -4,7 +4,7 @@
 ** 2020-11-20, Greg King
 */
 
-//#define DEBUG
+#define DEBUG
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -2951,7 +2951,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             /* FIXME: float --- startcode end */
             if (Expr2.Type == type_float) {
                 /* Generate code */
-                LOG(("hie_compare generate code for Expr2 as float\n"));
+                LOG(("hie_compare generate code for Expr2 as float (flags:$%02x)\n", flags));
                 GenFunc (flags, FP_D_As32bitRaw(Expr2.V.FVal));
             } else if (IsClassFloat(Expr->Type)) {
                 /* Generate code */
@@ -3605,23 +3605,33 @@ static void parsesub (ExprDesc* Expr)
                 /* Pointer subtraction. We've got the scale factor and flags above */
             } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
                 /* Integer subtraction. We'll adjust the types later */
+#if 1
+            } else if (IsClassFloat (lhst) && IsClassFloat (rhst)) {
+                /* Float subtraction. We'll adjust the types later */
+            } else if (IsClassFloat (lhst) && IsClassInt (rhst)) {
+                /* Float/Int subtraction. We'll adjust the types later */
+            } else if (IsClassInt (lhst) && IsClassFloat (rhst)) {
+                /* Int/Float subtraction. We'll adjust the types later */
+#endif
             } else {
                 /* OOPS */
                 Error ("Invalid operands for binary operator '-'");
             }
 
-            /* We can't make all subtraction expressions constant */
-            if (ED_IsConstAbs (&Expr2)) {
-                Expr->IVal -= Expr2.IVal * rscale;
-                /* No runtime code */
-                SubDone = 1;
-            } else if (rscale == 1 && Expr->Sym == Expr2.Sym) {
-                /* The result is the diff of the offsets */
-                Expr->IVal -= Expr2.IVal;
-                /* Get rid of unneeded bases and flags etc. */
-                ED_MakeConstAbs (Expr, Expr->IVal, Expr->Type);
-                /* No runtime code */
-                SubDone = 1;
+            if (!IsClassFloat (lhst) && !IsClassFloat (rhst)) {
+                /* We can't make all subtraction expressions constant */
+                if (ED_IsConstAbs (&Expr2)) {
+                    Expr->IVal -= Expr2.IVal * rscale;
+                    /* No runtime code */
+                    SubDone = 1;
+                } else if (rscale == 1 && Expr->Sym == Expr2.Sym) {
+                    /* The result is the diff of the offsets */
+                    Expr->IVal -= Expr2.IVal;
+                    /* Get rid of unneeded bases and flags etc. */
+                    ED_MakeConstAbs (Expr, Expr->IVal, Expr->Type);
+                    /* No runtime code */
+                    SubDone = 1;
+                }
             }
 
             if (SubDone) {
@@ -3636,17 +3646,31 @@ static void parsesub (ExprDesc* Expr)
                 /* The result is always an rvalue */
                 ED_MarkExprAsRVal (Expr);
             } else {
+                /* NOTE: float always uses this codepath right now */
                 if (ED_IsConstAbs (&Expr2)) {
                     /* Remove pushed value from stack */
                     RemoveCode (&Mark2);
                     if (IsClassInt (lhst)) {
                         /* Adjust the types */
                         flags = typeadjust (Expr, &Expr2, 1);
+                        /* Do the subtraction */
+                        g_dec (flags | CF_CONST, Expr2.IVal * rscale);
                     }
-                    /* Do the subtraction */
-                    g_dec (flags | CF_CONST, Expr2.IVal * rscale);
+                    else if (IsClassFloat (lhst)) {
+                        /* Adjust the types */
+                        flags = typeadjust (Expr, &Expr2, 1);
+                        if (rscale != 1) {
+                            Internal("scale != 1 for float");
+                        }
+                        /* Do the subtraction */
+                        g_dec (flags | CF_CONST, FP_D_As32bitRaw(Expr2.V.FVal));
+                    }
                 } else {
                     if (IsClassInt (lhst)) {
+                        /* Adjust the types */
+                        flags = typeadjust (Expr, &Expr2, 0);
+                    }
+                    else if (IsClassFloat (lhst)) {
                         /* Adjust the types */
                         flags = typeadjust (Expr, &Expr2, 0);
                     }
@@ -3667,10 +3691,13 @@ static void parsesub (ExprDesc* Expr)
                 /* Pointer subtraction. We've got the scale factor and flags above */
             } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
                 /* Integer subtraction. We'll adjust the types later */
-#if 0
+#if 1
             } else if (IsClassFloat (lhst) && IsClassFloat (rhst)) {
                 /* Float subtraction. We'll adjust the types later */
-                /* FIXME: float */
+            } else if (IsClassFloat (lhst) && IsClassInt (rhst)) {
+                /* Float/Int subtraction. We'll adjust the types later */
+            } else if (IsClassInt (lhst) && IsClassFloat (rhst)) {
+                /* Int/Float subtraction. We'll adjust the types later */
 #endif
             } else {
                 /* OOPS */
@@ -3682,15 +3709,32 @@ static void parsesub (ExprDesc* Expr)
                 /* Remove pushed value from stack */
                 RemoveCode (&Mark2);
                 if (IsClassInt (lhst)) {
+                    LOG(("const int sub 1\n"));
                     /* Adjust the types */
                     flags = typeadjust (Expr, &Expr2, 1);
+                    /* Do the subtraction */
+                    g_dec (flags | CF_CONST, Expr2.IVal * rscale);
                 }
-                /* Do the subtraction */
-                g_dec (flags | CF_CONST, Expr2.IVal * rscale);
+                else if (IsClassFloat (lhst)) {
+                    LOG(("const float sub 2\n"));
+                    /* Adjust the types */
+                    flags = typeadjust (Expr, &Expr2, 1);
+                    if (rscale != 1) {
+                        Internal("scale != 1 for float");
+                    }
+                    /* Do the subtraction */
+                    g_dec (flags | CF_CONST, FP_D_As32bitRaw(Expr2.V.FVal));
+                }
             } else {
                 if (IsClassInt (lhst)) {
+                    LOG(("non const int sub 1\n"));
                     /* Adjust the types */
                     flags = typeadjust (Expr, &Expr2, 0);
+                }
+                else if (IsClassFloat (lhst)) {
+                    LOG(("non const float sub 2\n"));
+                    /* Adjust the types */
+                    flags = typeadjust (Expr, &Expr2, 1);
                 }
                 /* Load rhs into the primary */
                 LoadExpr (CF_NONE, &Expr2);

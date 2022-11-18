@@ -39,7 +39,7 @@
 #include <string.h>
 #include <stdarg.h>
 
-//#define DEBUG
+#define DEBUG
 
 /* common */
 #include "addrsize.h"
@@ -1404,7 +1404,7 @@ void g_reglong (unsigned from)
 */
 {
     LOG(("g_reglong flags: %04x\n", from));
-    ASMLOG(("g_reglong flags: %04x\n", from));
+    ASMLOG(("nop ; g_reglong flags: %04x\n", from));
     switch (from & CF_TYPEMASK) {
 
         case CF_CHAR:

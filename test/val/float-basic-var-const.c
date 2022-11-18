@@ -67,14 +67,12 @@ void varconst(void)
     printf(" fp3:0x%08lx [0x42860000] %s (exp:67.0)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
     test1(fp3, "42860000");
 
-#if 0
     /* substraction, variable - constant */
-    fp1 = 16.25;
+    fp1 = 16.25f;
     fp3 = fp1 - 8.5f;  // FIXME: Invalid operands for binary operator '-'
-    printf("substraction: %s-%s=%s\n", _ftostr(buf, fp1), _ftostr(buf2, 11.5f), _ftostr(buf3, fp3));
+    printf("substraction: %s-%s=%s\n", _ftostr(buf, fp1), _ftostr(buf2, 8.5f), _ftostr(buf3, fp3));
     printf(" fp3:0x%08lx [0x40f80000] %s (exp:7.75)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
     test1(fp3, "40f80000");
-#endif
 
     fp1 = 16.25f;
     fp3 = fp1 * 2.5f;

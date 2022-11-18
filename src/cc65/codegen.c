@@ -69,7 +69,7 @@
    mingw and PRIXPTR */
 #if defined(__MINGW64__)
 #undef PRIXPTR
-#define PRIXPTR "p"
+#define PRIXPTR "ul"
 #endif
 
 /*****************************************************************************/

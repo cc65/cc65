@@ -67,7 +67,7 @@
 
 /* this is a terrible hack that tries to combat the ever reoccuring issue with
    mingw and PRIXPTR */
-#defined(__MINGW64__)
+#if defined(__MINGW64__)
 #undef PRIXPTR
 #define PRIXPTR "%p"
 #endif

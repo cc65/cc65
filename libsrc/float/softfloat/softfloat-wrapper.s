@@ -84,15 +84,23 @@ fbnegeax:
 
     .export ftosaddeax
 ftosaddeax:
+    ; arg0:     a/x/sreg/sreg+1
+    ; arg1:     (sp),y (y=0..3)
      jmp _float32_add
     .export ftossubeax
 ftossubeax:
+    ; arg0:     a/x/sreg/sreg+1
+    ; arg1:     (sp),y (y=0..3)
      jmp _float32_sub
     .export ftosmuleax
 ftosmuleax:
+    ; arg0:     a/x/sreg/sreg+1
+    ; arg1:     (sp),y (y=0..3)
      jmp _float32_mul
     .export ftosdiveax
 ftosdiveax:
+    ; arg0:     a/x/sreg/sreg+1
+    ; arg1:     (sp),y (y=0..3)
      jmp _float32_div
 
 

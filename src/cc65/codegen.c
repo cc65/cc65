@@ -69,7 +69,7 @@
    mingw and PRIXPTR */
 #if defined(__MINGW64__)
 #undef PRIXPTR
-#define PRIXPTR "zu"
+#define PRIXPTR "%I64u"
 #endif
 
 /*****************************************************************************/

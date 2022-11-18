@@ -39,7 +39,7 @@
 #include <string.h>
 #include <stdarg.h>
 
-#define DEBUG
+//#define DEBUG
 
 /* common */
 #include "addrsize.h"

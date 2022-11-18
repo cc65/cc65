@@ -249,7 +249,7 @@ Double FP_D_Div (Double Left, Double Right)
 uint32_t FP_D_As32bitRaw(Double Val)
 /* converts double into 32bit (float) and then returns its raw content as a 32bit int */
 {
-    float f;
+    static float f;
     uint32_t *lptr;
     uint32_t lval;
     f = Val.V;

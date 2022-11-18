@@ -315,12 +315,41 @@ static void OpAssignBitField (const GenDesc* Gen, ExprDesc* Expr, const char* Op
             } else if (Gen->Func == g_sub) {
                 g_dec (Flags | CF_CONST, Expr2.IVal);
             } else {
-                if (Expr2.IVal == 0) {
-                    /* Check for div by zero/mod by zero */
-                    if (Gen->Func == g_div) {
-                        Error ("Division by zero");
-                    } else if (Gen->Func == g_mod) {
-                        Error ("Modulo operation with zero");
+                if (!ED_IsUneval (Expr)) {
+                    if (Expr2.IVal == 0) {
+                        /* Check for div by zero/mod by zero */
+                        if (Gen->Func == g_div) {
+                            Warning ("Division by zero");
+                        } else if (Gen->Func == g_mod) {
+                            Warning ("Modulo operation with zero");
+                        }
+                    } else if (Gen->Func == g_asl || Gen->Func == g_asr) {
+                        const Type* CalType  = IntPromotion (Expr->Type);
+                        unsigned    ExprBits = BitSizeOf (CalType);
+
+                        /* If the shift count is greater than or equal to the width of the
+                        ** promoted left operand, the behaviour is undefined according to
+                        ** the standard.
+                        */
+                        if (Expr2.IVal < 0) {
+                            Warning ("Negative shift count %ld treated as %u for %s",
+                                     Expr2.IVal,
+                                     (unsigned)Expr2.IVal & (ExprBits - 1),
+                                     GetBasicTypeName (CalType));
+                        } else if (Expr2.IVal >= (long)ExprBits) {
+                            Warning ("Shift count %ld >= width of %s treated as %u",
+                                     Expr2.IVal,
+                                     GetBasicTypeName (CalType),
+                                     (unsigned)Expr2.IVal & (ExprBits - 1));
+                        }
+
+                        /* Here we simply "wrap" the shift count around the width */
+                        Expr2.IVal &= ExprBits - 1;
+
+                        /* Additional check for bit-fields */
+                        if (Expr2.IVal >= (long)Expr->Type->A.B.Width) {
+                            Warning ("Shift count %ld >= width of bit-field", Expr2.IVal);
+                        }
                     }
                 }
 
@@ -495,12 +524,42 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
             } else if (Gen->Func == g_sub) {
                 g_dec (Flags | CF_CONST, Expr2.IVal);
             } else {
-                if (Expr2.IVal == 0) {
-                    /* Check for div by zero/mod by zero */
-                    if (Gen->Func == g_div) {
-                        Error ("Division by zero");
-                    } else if (Gen->Func == g_mod) {
-                        Error ("Modulo operation with zero");
+                if (!ED_IsUneval (Expr)) {
+                    if (Expr2.IVal == 0 && !ED_IsUneval (Expr)) {
+                        /* Check for div by zero/mod by zero */
+                        if (Gen->Func == g_div) {
+                            Warning ("Division by zero");
+                        } else if (Gen->Func == g_mod) {
+                            Warning ("Modulo operation with zero");
+                        }
+                    } else if (Gen->Func == g_asl || Gen->Func == g_asr) {
+                        const Type* CalType  = IntPromotion (Expr->Type);
+                        unsigned    ExprBits = BitSizeOf (CalType);
+
+                        /* If the shift count is greater than or equal to the width of the
+                        ** promoted left operand, the behaviour is undefined according to
+                        ** the standard.
+                        */
+                        if (Expr2.IVal < 0) {
+                            Warning ("Negative shift count %ld treated as %u for %s",
+                                     Expr2.IVal,
+                                     (unsigned)Expr2.IVal & (ExprBits - 1),
+                                     GetBasicTypeName (CalType));
+                        } else if (Expr2.IVal >= (long)ExprBits) {
+                            Warning ("Shift count %ld >= width of %s treated as %u",
+                                     Expr2.IVal,
+                                     GetBasicTypeName (CalType),
+                                     (unsigned)Expr2.IVal & (ExprBits - 1));
+                        }
+
+                        /* Here we simply "wrap" the shift count around the width */
+                        Expr2.IVal &= ExprBits - 1;
+
+                        /* Additional check for bit width */
+                        if (Expr2.IVal >= (long)BitSizeOf (Expr->Type)) {
+                            Warning ("Shift count %ld >= width of %s",
+                                     Expr2.IVal, GetBasicTypeName (Expr->Type));
+                        }
                     }
                 }
                 Gen->Func (Flags | CF_CONST, Expr2.IVal);

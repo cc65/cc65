@@ -49,14 +49,14 @@ jobs:
       - name: Do some simple style checks
         shell: bash
         run: make -j2 checkstyle
-      - name: Build the tools.
-        shell: bash
-        run: |
-            make -j2 bin USER_CFLAGS=-Werror
-            make -j2 util
-      - name: Build the platform libraries.
-        shell: bash
-        run: make -j2 lib QUIET=1
+#      - name: Build the tools.
+#        shell: bash
+#        run: |
+#            make -j2 bin USER_CFLAGS=-Werror
+#            make -j2 util
+#      - name: Build the platform libraries.
+#        shell: bash
+#        run: make -j2 lib QUIET=1
 #      - name: Run the regression tests.
 #        shell: bash
 #        run: make test QUIET=1

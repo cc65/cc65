@@ -203,6 +203,14 @@ unsigned long GetIntegerTypeMax (const Type* Type)
 
 
 
+unsigned BitSizeOf (const Type* T)
+/* Return the size (in bit-width) of a data type */
+{
+    return IsTypeBitField (T) ? T->A.B.Width : CHAR_BITS * SizeOf (T);
+}
+
+
+
 unsigned SizeOf (const Type* T)
 /* Compute size (in bytes) of object represented by type array */
 {
@@ -284,6 +292,17 @@ unsigned PSizeOf (const Type* T)
 
     /* Skip the pointer or array token itself */
     return SizeOf (T + 1);
+}
+
+
+
+unsigned CheckedBitSizeOf (const Type* T)
+/* Return the size (in bit-width) of a data type. If the size is zero, emit an
+** error and return some valid size instead (so the rest of the compiler
+** doesn't have to work with invalid sizes).
+*/
+{
+    return IsTypeBitField (T) ? T->A.B.Width : CHAR_BITS * CheckedSizeOf (T);
 }
 
 

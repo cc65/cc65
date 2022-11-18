@@ -2238,6 +2238,10 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
         /* Check for const operands */
         if (lconst && rconst) {
 
+            /* Evaluate the result for operands */
+            unsigned long Val1 = Expr->IVal;
+            unsigned long Val2 = Expr2.IVal;
+
             /* Both operands are constant, remove the generated code */
             RemoveCode (&Mark1);
 
@@ -2297,83 +2301,53 @@ LOG(("hie_internal Expr->Type:%s Expr2->Type:%s\n",
                 }
             /* FIXME: float --- newcode end */
             } else {
-                LOG(("hie_internal signed int X signed int\n"));
+                LOG(("hie_internal (un)signed int X signed int\n"));
                 /* Handle the op differently for signed and unsigned types */
-                if (IsSignSigned (Expr->Type)) {
-
-                    /* Evaluate the result for signed operands */
-                    signed long Val1 = Expr->IVal;
-                    signed long Val2 = Expr2.IVal;
-                    switch (Tok) {
-                        case TOK_OR:
-                            Expr->IVal = (Val1 | Val2);
-                            break;
-                        case TOK_XOR:
-                            Expr->IVal = (Val1 ^ Val2);
-                            break;
-                        case TOK_AND:
-                            Expr->IVal = (Val1 & Val2);
-                            break;
-                        case TOK_STAR:
-                            Expr->IVal = (Val1 * Val2);
-                            break;
-                        case TOK_DIV:
-                            if (Val2 == 0) {
-                                Error ("Division by zero");
-                                Expr->IVal = 0x7FFFFFFF;
+                switch (Tok) {
+                    case TOK_OR:
+                        Expr->IVal = (Val1 | Val2);
+                        break;
+                    case TOK_XOR:
+                        Expr->IVal = (Val1 ^ Val2);
+                        break;
+                    case TOK_AND:
+                        Expr->IVal = (Val1 & Val2);
+                        break;
+                    case TOK_STAR:
+                        Expr->IVal = (Val1 * Val2);
+                        break;
+                    case TOK_DIV:
+                        if (Val2 == 0) {
+                            if (!ED_IsUneval (Expr)) {
+                                Warning ("Division by zero");
+                            }
+                            Expr->IVal = 0xFFFFFFFF;
+                        } else {
+                            /* Handle signed and unsigned operands differently */
+                            if (IsSignSigned (Expr->Type)) {
+                                Expr->IVal = ((long)Val1 / (long)Val2);
                             } else {
                                 Expr->IVal = (Val1 / Val2);
                             }
-                            break;
-                        case TOK_MOD:
-                            if (Val2 == 0) {
-                                Error ("Modulo operation with zero");
-                                Expr->IVal = 0;
+                        }
+                        break;
+                    case TOK_MOD:
+                        if (Val2 == 0) {
+                            if (!ED_IsUneval (Expr)) {
+                                Warning ("Modulo operation with zero");
+                            }
+                            Expr->IVal = 0;
+                        } else {
+                            /* Handle signed and unsigned operands differently */
+                            if (IsSignSigned (Expr->Type)) {
+                                Expr->IVal = ((long)Val1 % (long)Val2);
                             } else {
                                 Expr->IVal = (Val1 % Val2);
                             }
-                            break;
-                        default:
-                            Internal ("hie_internal: got token 0x%X\n", Tok);
-                    }
-                } else {
-                LOG(("hie_internal unsigned int X unsigned int\n"));
-
-                    /* Evaluate the result for unsigned operands */
-                    unsigned long Val1 = Expr->IVal;
-                    unsigned long Val2 = Expr2.IVal;
-                    switch (Tok) {
-                        case TOK_OR:
-                            Expr->IVal = (Val1 | Val2);
-                            break;
-                        case TOK_XOR:
-                            Expr->IVal = (Val1 ^ Val2);
-                            break;
-                        case TOK_AND:
-                            Expr->IVal = (Val1 & Val2);
-                            break;
-                        case TOK_STAR:
-                            Expr->IVal = (Val1 * Val2);
-                            break;
-                        case TOK_DIV:
-                            if (Val2 == 0) {
-                                Error ("Division by zero");
-                                Expr->IVal = 0xFFFFFFFF;
-                            } else {
-                                Expr->IVal = (Val1 / Val2);
-                            }
-                            break;
-                        case TOK_MOD:
-                            if (Val2 == 0) {
-                                Error ("Modulo operation with zero");
-                                Expr->IVal = 0;
-                            } else {
-                                Expr->IVal = (Val1 % Val2);
-                            }
-                            break;
-                        default:
-                            Internal ("hie_internal: got token 0x%X\n", Tok);
-                    }
+                        }
+                        break;
+                    default:
+                        Internal ("hie_internal: got token 0x%X\n", Tok);
                 }
             }
 
@@ -2440,14 +2414,17 @@ LOG(("hie_internal Expr->Type:%s Expr2->Type:%s\n",
                     // FIXME add respective checks for float
                     FIXME(("FIXME: add div checks for float\n"));
                 } else {
-                    if (Tok == TOK_DIV && Expr2.IVal == 0) {
-                        Error ("Division by zero");
-                    } else if (Tok == TOK_MOD && Expr2.IVal == 0) {
-                        Error ("Modulo operation with zero");
+                    if (Expr2.IVal == 0 && !ED_IsUneval (Expr)) {
+                        if (Tok == TOK_DIV) {
+                            Warning ("Division by zero");
+                        } else if (Tok == TOK_MOD) {
+                            Warning ("Modulo operation with zero");
+                        }
                     }
                 }
                 type |= CF_CONST;
                 rtype |= CF_CONST;
+
                 if ((Gen->Flags & GEN_NOPUSH) != 0) {
                     FIXME(("hie_internal ?2 removing code\n"));
                     RemoveCode (&Mark2);
@@ -4251,17 +4228,6 @@ static void hieQuest (ExprDesc* Expr)
         ED_Init (&Expr3);
         Expr3.Flags = Flags;
 
-        NextToken ();
-
-        /* Convert non-integer constant to boolean constant, so that we may just
-        ** check it in the same way.
-        */
-        if (ED_IsConstTrue (Expr)) {
-            ED_MakeConstBool (Expr, 1);
-        } else if (ED_IsConstFalse (Expr)) {
-            ED_MakeConstBool (Expr, 0);
-        }
-
         if (!ConstantCond) {
             /* Condition codes not set, request a test */
             ED_RequireTest (Expr);
@@ -4273,6 +4239,15 @@ static void hieQuest (ExprDesc* Expr)
             FalseLab = GetLocalLabel ();
             g_falsejump (CF_NONE, FalseLab);
         } else {
+            /* Convert non-integer constant to boolean constant, so that we
+            ** may just check it in an easier way later.
+            */
+            if (ED_IsConstTrue (Expr)) {
+                ED_MakeConstBool (Expr, 1);
+            } else if (ED_IsConstFalse (Expr)) {
+                ED_MakeConstBool (Expr, 0);
+            }
+
             /* Constant boolean subexpression could still have deferred inc/dec
             ** operations, so just flush their side-effects at this sequence point.
             */
@@ -4281,8 +4256,17 @@ static void hieQuest (ExprDesc* Expr)
             if (Expr->IVal == 0) {
                 /* Remember the current code position */
                 GetCodePos (&SkippedBranch);
+
+                /* Expr2 is unevaluated when the condition is false */
+                Expr2.Flags |= E_EVAL_UNEVAL;
+            } else {
+                /* Expr3 is unevaluated when the condition is true */
+                Expr3.Flags |= E_EVAL_UNEVAL;
             }
         }
+
+        /* Skip the question mark */
+        NextToken ();
 
         /* Parse second expression. Remember for later if it is a NULL pointer
         ** expression, then load it into the primary.
@@ -4315,25 +4299,21 @@ static void hieQuest (ExprDesc* Expr)
             /* Jump around the evaluation of the third expression */
             TrueLab = GetLocalLabel ();
 
-            ConsumeColon ();
-
             g_jump (TrueLab);
 
             /* Jump here if the first expression was false */
             g_defcodelabel (FalseLab);
         } else {
             if (Expr->IVal == 0) {
-                /* Expr2 is unevaluated when the condition is false */
-                Expr2.Flags |= E_EVAL_UNEVAL;
-
                 /* Remove the load code of Expr2 */
                 RemoveCode (&SkippedBranch);
             } else {
                 /* Remember the current code position */
                 GetCodePos (&SkippedBranch);
             }
-            ConsumeColon();
         }
+
+        ConsumeColon ();
 
         /* Parse third expression. Remember for later if it is a NULL pointer
         ** expression, then load it into the primary.
@@ -4360,9 +4340,6 @@ static void hieQuest (ExprDesc* Expr)
         Expr3.Type = PtrConversion (Expr3.Type);
 
         if (ConstantCond && Expr->IVal != 0) {
-            /* Expr3 is unevaluated when the condition is true */
-            Expr3.Flags |= E_EVAL_UNEVAL;
-
             /* Remove the load code of Expr3 */
             RemoveCode (&SkippedBranch);
         }

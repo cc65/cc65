@@ -68,6 +68,13 @@
 #include "util.h"
 #include "codegen.h"
 
+/* this is a terrible hack that tries to combat the ever reoccuring issue with
+   mingw and PRIXPTR */
+#if defined(__MINGW64__)
+#undef PRIXPTR
+#define PRIXPTR "zu"
+#endif
+
 #ifdef DEBUG
 #define LOG(x)  printf  x
 #define FIXME(x)  printf  x

@@ -1,14 +1,14 @@
 ;
 ; 2020-05-02, Greg King
 ;
-; void _randomize (void);
+; void __randomize (void);
 ; /* Initialize the random number generator */
 ;
 
-        .export         __randomize
+        .export         ___randomize
 
         .import         ENTROPY_GET, _srand
 
-__randomize:
+___randomize:
         jsr     ENTROPY_GET
         jmp     _srand          ; Initialize generator

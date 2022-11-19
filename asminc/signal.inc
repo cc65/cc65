@@ -49,8 +49,8 @@ SIGCOUNT        = 6             ; Number of signals
 .global         sigtable
 
 ; Function declarations
-.global         __sig_ign
-.global         __sig_dfl
+.global         ___sig_ign
+.global         ___sig_dfl
 .global         _signal
 .global         _raise
 

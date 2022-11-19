@@ -107,8 +107,8 @@ done:   lda     #$00
 einval: lda     #EINVAL
 
         ; Set __errno
-errno:  jmp     __directerrno
+errno:  jmp     ___directerrno
 
-        ; Set __oserror
-oserr:  jmp     __mappederrno
+        ; Set ___oserror
+oserr:  jmp     ___mappederrno
 

@@ -564,9 +564,9 @@ int main (void)
 
     /* Output the result */
     if (Failures) {
-        printf ("%u tests, %u failures\n", Tests, Failures);
+        printf ("sprintf-test: %u tests, %u failures\n", Tests, Failures);
     } else {
-        printf ("%u tests: Ok\n", Tests);
+        printf ("sprintf-test: %u tests: Ok\n", Tests);
     }
 
     /* Wait for a key so we can read the result */

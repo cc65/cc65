@@ -139,20 +139,34 @@ void ShiftExpr (struct ExprDesc* Expr)
             /* Remove the code that pushes the rhs onto the stack. */
             RemoveCode (&Mark2);
 
-            /* If the shift count is greater or equal than the bit count of
-            ** the operand, the behaviour is undefined according to the
-            ** standard.
+            /* If the shift count is greater than or equal to the width of the
+            ** promoted left operand, the behaviour is undefined according to
+            ** the standard.
             */
-            if (Expr2.IVal < 0) {
+            if (!ED_IsUneval (Expr)) {
+                if (Expr2.IVal < 0) {
+                    Warning ("Negative shift count %ld treated as %u for %s",
+                             Expr2.IVal,
+                             (unsigned)Expr2.IVal & (ExprBits - 1),
+                             GetBasicTypeName (ResultType));
+                } else if (Expr2.IVal >= (long) ExprBits) {
+                    Warning ("Shift count %ld >= width of %s treated as %u",
+                             Expr2.IVal,
+                             GetBasicTypeName (ResultType),
+                             (unsigned)Expr2.IVal & (ExprBits - 1));
+                }
+            }
 
-                Warning ("Shift count '%ld' is negative", Expr2.IVal);
-                Expr2.IVal &= ExprBits - 1;
+            /* Here we simply "wrap" the shift count around the width */
+            Expr2.IVal &= ExprBits - 1;
 
-            } else if (Expr2.IVal >= (long) ExprBits) {
-
-                Warning ("Shift count '%ld' >= width of type", Expr2.IVal);
-                Expr2.IVal &= ExprBits - 1;
-
+            /* Additional check for bit-fields */
+            if (IsTypeBitField (Expr->Type) &&
+                Tok == TOK_SHR              &&
+                Expr2.IVal >= (long) Expr->Type->A.B.Width) {
+                if (!ED_IsUneval (Expr)) {
+                    Warning ("Right-shift count %ld >= width of bit-field", Expr2.IVal);
+                }
             }
 
             /* If the shift count is zero, nothing happens. If the left hand
@@ -173,7 +187,7 @@ void ShiftExpr (struct ExprDesc* Expr)
                     }
 
                     /* Limit the calculated value to the range of its type */
-                    LimitExprValue (Expr);
+                    LimitExprValue (Expr, 1);
                 }
 
                 /* Result is already got, remove the generated code */

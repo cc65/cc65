@@ -266,18 +266,6 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
         LeftType  = (GetUnderlyingTypeCode (lhs) & T_MASK_TYPE);
         RightType = (GetUnderlyingTypeCode (rhs) & T_MASK_TYPE);
 
-        /* If one side is a pointer and the other side is an array, both are
-        ** compatible.
-        */
-        if (LeftType == T_TYPE_PTR && RightType == T_TYPE_ARRAY) {
-            RightType = T_TYPE_PTR;
-            SetResult (Result, TC_PTR_DECAY);
-        }
-        if (LeftType == T_TYPE_ARRAY && RightType == T_TYPE_PTR) {
-            LeftType = T_TYPE_PTR;
-            SetResult (Result, TC_STRICT_COMPATIBLE);
-        }
-
         /* Bit-fields are considered compatible if they have the same
         ** signedness, bit-offset and bit-width.
         */
@@ -287,8 +275,23 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
                 lhs->A.B.Offs  != rhs->A.B.Offs ||
                 lhs->A.B.Width != rhs->A.B.Width) {
                 SetResult (Result, TC_INCOMPATIBLE);
+                return;
             }
             if (LeftType != RightType) {
+                SetResult (Result, TC_STRICT_COMPATIBLE);
+            }
+        }
+
+        /* If one side is a pointer and the other side is an array, both are
+        ** compatible.
+        */
+        if (Result->Indirections == 0) {
+            if (LeftType == T_TYPE_PTR && RightType == T_TYPE_ARRAY) {
+                RightType = T_TYPE_PTR;
+                SetResult (Result, TC_PTR_DECAY);
+            }
+            if (LeftType == T_TYPE_ARRAY && RightType == T_TYPE_PTR) {
+                LeftType = T_TYPE_PTR;
                 SetResult (Result, TC_STRICT_COMPATIBLE);
             }
         }
@@ -303,8 +306,8 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
         if ((IsTypeEnum (lhs) || IsTypeEnum (rhs))) {
 
             /* Compare the tag types */
-            Sym1 = IsTypeEnum (lhs) ? GetESUSymEntry (lhs) : 0;
-            Sym2 = IsTypeEnum (rhs) ? GetESUSymEntry (rhs) : 0;
+            Sym1 = IsTypeEnum (lhs) ? GetESUTagSym (lhs) : 0;
+            Sym2 = IsTypeEnum (rhs) ? GetESUTagSym (rhs) : 0;
 
             if (Sym1 != Sym2) {
                 if (Sym1 == 0 || Sym2 == 0) {
@@ -420,8 +423,8 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
             case T_TYPE_STRUCT:
             case T_TYPE_UNION:
                 /* Compare the tag types */
-                Sym1 = GetESUSymEntry (lhs);
-                Sym2 = GetESUSymEntry (rhs);
+                Sym1 = GetESUTagSym (lhs);
+                Sym2 = GetESUTagSym (rhs);
 
                 CHECK (Sym1 != 0 || Sym2 != 0);
 

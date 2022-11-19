@@ -414,6 +414,7 @@ TARGETS :=     \
 
 define TARGET_recipe
 
+@echo making samples for: $(T)
 @$(MAKE) -j2 SYS:=$(T)
 @$(MAKE) --no-print-directory clean SYS:=$(T)
 

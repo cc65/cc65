@@ -65,6 +65,13 @@ struct S {
     int b;
 };
 
+/* _Static_assert can also appear in unions. */
+union U {
+    int a;
+    _Static_assert (1, "1 should still be true.");
+    int b;
+};
+
 
 int main (void)
 {

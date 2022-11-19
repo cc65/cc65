@@ -33,9 +33,9 @@ _raise:
 ; introduce race conditions, but it's the simplest way to satisfy the
 ; standard).
 
-        lda     #<__sig_dfl
+        lda     #<___sig_dfl
         sta     sigtable,x
-        lda     #>__sig_dfl
+        lda     #>___sig_dfl
         sta     sigtable+1,x
 
 ; Restore the signal number and call the function

@@ -3,13 +3,13 @@
 ; 2012-02-06, Greg King
 ;
 ; clock_t clock (void);
-; clock_t _clocks_per_sec (void);
+; clock_t __clocks_per_sec (void);
 ;
 ; clocks_per_sec()'s test-values are based on the numbers in "set_tv.s".
 ; If you change the numbers there, then change them here, too.
 ;
 
-        .export         _clock, __clocks_per_sec, clock_count
+        .export         _clock, ___clocks_per_sec, clock_count
         .interruptor    update_clock, 2 ; (low priority)
         .constructor    init_clock
 
@@ -38,7 +38,7 @@
 ;-----------------------------------------------------------------------------
 ; Return the number of clock ticks in one second.
 ;
-__clocks_per_sec:
+___clocks_per_sec:
         ldx     #$00            ; >50, >60, >75
         ldy     PBKUP
         lda     #<75

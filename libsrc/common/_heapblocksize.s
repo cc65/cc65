@@ -7,7 +7,7 @@
 ;
 
         .importzp       ptr1, ptr2
-        .export         __heapblocksize
+        .export         ___heapblocksize
 
         .include        "_heap.inc"
 
@@ -17,7 +17,7 @@
 ;-----------------------------------------------------------------------------
 ; Code
 
-__heapblocksize:
+___heapblocksize:
 
 ; Below the user data is a pointer that points to the start of the real
 ; (raw) memory block. The first word of this block is the size. To access

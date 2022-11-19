@@ -6,7 +6,7 @@
 ; int __fastcall__ cbm_read (unsigned char lfn, void* buffer, unsigned int size)
 ; /* Reads up to "size" bytes from a file to "buffer".
 ; ** Returns the number of actually read bytes, 0 if there are no bytes left
-; ** (EOF) or -1 in case of an error. _oserror contains an errorcode then (see
+; ** (EOF) or -1 in case of an error. __oserror contains an errorcode then (see
 ; ** table below).
 ; */
 ; {
@@ -14,7 +14,7 @@
 ;     static unsigned char tmp;
 ;
 ;     /* if we can't change to the inputchannel #lfn then return an error */
-;     if (_oserror = cbm_k_chkin(lfn)) return -1;
+;     if (__oserror = cbm_k_chkin(lfn)) return -1;
 ;
 ;     bytesread = 0;
 ;
@@ -41,7 +41,7 @@
         .export         _cbm_read
         .importzp       ptr1, ptr2, ptr3, tmp1
         .import         popax, popa
-        .import         __oserror
+        .import         ___oserror
 
 
 _cbm_read:
@@ -106,7 +106,7 @@ _cbm_read:
 
 ; CHKIN failed
 
-@E1:    sta     __oserror
+@E1:    sta     ___oserror
         lda     #$FF
         tax
         rts                     ; return -1

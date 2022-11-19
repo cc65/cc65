@@ -29,9 +29,22 @@ This is an ongoing controversial topic - everyone knows that. However, the follo
 
 The (bash) scripts used to check the above rules can be found in ```.github/check```. You can also run all checks using ```make check```.
 
-### identifiers and symbol names
+### Identifiers and Symbol names
 
-* any symbols that are exported from source files and/or appear in header files should not be in the "_symbol" form in C, or "__symbol" form in assembly. This way we evade the problem that "_symbol" may or may not be reserved by that standard.
+The C Standard defines certain identifiers and symbol names, which we can not use
+in our code. Since it is not always obvious which parts of the library code will
+actually end up in a linked program, the following applies to ALL of the library.
+
+Any non standard identifier/symbol/function that is exported from source files,
+or appears in header files:
+
+* must not be in the "_symbol" form in C, or "__symbol" form in assembly.
+* must start with (at least) two (C Code) or three (assembly code) underscores, unless the symbol appears in a non standard header file.
+
+This is likely more than the standard dictates us to do - but it is certainly
+standard compliant - and easy to remember.
+
+Also see the discussion in https://github.com/cc65/cc65/issues/1796
 
 ### misc
 
@@ -173,7 +186,88 @@ The only exception to the above are actions that are exclusive to the github act
 The first step is implementing the datatype "float" as IEEE488 floats. Help welcomed!
 
 * WIP compiler/library changes are here: https://github.com/cc65/cc65/pull/1777
-* free software library with testbench is here: http://www.jhauser.us/arithmetic/
+
+## Library
+
+### name clashes in the library
+
+see "Identifiers and Symbol names" above - not all identifiers have been checked
+and renamed yet. The following is a list of those that still might need to be
+fixed:
+
+```
+common
+
+__argc                  libsrc/runtime/callmain.s libsrc/cbm610/mainargs.s libsrc/cx16/mainargs.s libsrc/plus4/mainargs.s libsrc/lynx/mainargs.s libsrc/c16/mainargs.s libsrc/geos-common/system/mainargs.s libsrc/sim6502/mainargs.s libsrc/c128/mainargs.s libsrc/vic20/mainargs.s libsrc/nes/mainargs.s libsrc/atari/getargs.s libsrc/apple2/mainargs.s libsrc/cbm510/mainargs.s libsrc/telestrat/mainargs.s libsrc/c64/mainargs.s libsrc/pet/mainargs.s libsrc/atmos/mainargs.s 
+__argv                  libsrc/runtime/callmain.s libsrc/cbm610/mainargs.s libsrc/cx16/mainargs.s libsrc/plus4/mainargs.s libsrc/lynx/mainargs.s libsrc/c16/mainargs.s libsrc/geos-common/system/mainargs.s libsrc/sim6502/mainargs.s libsrc/c128/mainargs.s libsrc/vic20/mainargs.s libsrc/nes/mainargs.s libsrc/atari/getargs.s libsrc/apple2/mainargs.s libsrc/cbm510/mainargs.s libsrc/telestrat/mainargs.s libsrc/c64/mainargs.s libsrc/pet/mainargs.s libsrc/atmos/mainargs.s 
+__cos                   libsrc/common/sincos.s
+__ctypeidx              libsrc/common/ctype.s libsrc/common/ctypemask.s libsrc/geos-common/system/ctype.s libsrc/atari/ctype.s libsrc/cbm/ctype.s libsrc/atmos/ctype.s asminc/ctype_common.inc
+__cwd                   libsrc/common/getcwd.s libsrc/common/_cwd.s libsrc/atari/initcwd.s libsrc/apple2/initcwd.s libsrc/apple2/initcwd.s libsrc/telestrat/initcwd.s libsrc/cbm/initcwd.s
+__cwd_buf_size          libsrc/common/_cwd.s
+__envcount              libsrc/common/searchenv.s libsrc/common/_environ.s libsrc/common/putenv.s libsrc/common/getenv.s
+__environ               libsrc/common/searchenv.s libsrc/common/_environ.s libsrc/common/putenv.s libsrc/common/getenv.s
+__envsize               libsrc/common/_environ.s libsrc/common/putenv.s
+__fdesc                 libsrc/common/_fdesc.s libsrc/common/fopen.s
+__filetab               libsrc/common/_fdesc.s libsrc/common/_file.s asminc/_file.inc
+__fopen                 libsrc/common/fopen.s libsrc/common/_fopen.s
+__printf                libsrc/common/vsnprintf.s libsrc/common/_printf.s libsrc/common/vfprintf.s libsrc/conio/vcprintf.s libsrc/pce/_printf.s
+__scanf                 libsrc/common/_scanf.inc libsrc/common/vsscanf.s libsrc/conio/vcscanf.s
+__sin                   libsrc/common/sincos.s
+__sys                   libsrc/common/_sys.s libsrc/apple2/_sys.s
+__sys_oserrlist         libsrc/common/stroserr.s libsrc/geos-common/system/oserrlist.s libsrc/atari/oserrlist.s libsrc/apple2/oserrlist.s libsrc/cbm/oserrlist.s libsrc/atmos/oserrlist.s
+__syschdir              libsrc/common/chdir.s libsrc/atari/syschdir.s libsrc/apple2/syschdir.s libsrc/telestrat/syschdir.s libsrc/cbm/syschdir.s
+__sysmkdir              libsrc/common/mkdir.s libsrc/atari/sysmkdir.s libsrc/apple2/sysmkdir.s libsrc/telestrat/sysmkdir.s
+__sysremove             libsrc/common/remove.s libsrc/geos-common/file/sysremove.s libsrc/atari/sysremove.s libsrc/atari/sysrmdir.s libsrc/apple2/sysremove.s libsrc/apple2/sysrmdir.s libsrc/telestrat/sysremove.s libsrc/cbm/sysremove.s
+__sysrename             libsrc/common/rename.s libsrc/geos-common/file/sysrename.s libsrc/atari/sysrename.s libsrc/apple2/sysrename.s libsrc/cbm/sysrename.s
+__sysrmdir              libsrc/common/rmdir.s libsrc/atari/sysrmdir.s libsrc/apple2/sysrmdir.s
+__sysuname              libsrc/common/uname.s libsrc/cbm610/sysuname.s libsrc/cx16/sysuname.s libsrc/plus4/sysuname.s libsrc/lynx/sysuname.s libsrc/c16/sysuname.s libsrc/geos-common/system/sysuname.s libsrc/c128/sysuname.s libsrc/creativision/sysuname.s libsrc/vic20/sysuname.s libsrc/nes/sysuname.s libsrc/atari/sysuname.s libsrc/apple2/sysuname.s libsrc/cbm510/sysuname.s libsrc/telestrat/sysuname.s libsrc/c64/sysuname.s libsrc/pet/sysuname.s libsrc/atari5200/sysuname.s libsrc/atmos/sysuname.s
+
+apple2
+
+__auxtype               libsrc/apple2/open.s
+__datetime              libsrc/apple2/open.s
+__dos_type              libsrc/apple2/dioopen.s libsrc/apple2/curdevice.s libsrc/apple2/mainargs.s libsrc/apple2/settime.s libsrc/apple2/getdevice.s libsrc/apple2/dosdetect.s libsrc/apple2/irq.s libsrc/apple2/open.s libsrc/apple2/mli.s libsrc/apple2/getres.s
+__filetype              libsrc/apple2/open.s  libsrc/apple2/exehdr.s
+
+
+atari
+
+__defdev                libsrc/atari/posixdirent.s libsrc/atari/ucase_fn.s libsrc/atari/getdefdev.s
+__dos_type              libsrc/atari/getargs.s libsrc/atari/exec.s libsrc/atari/settime.s libsrc/atari/syschdir.s libsrc/atari/dosdetect.s libsrc/atari/is_cmdline_dos.s libsrc/atari/sysrmdir.s libsrc/atari/gettime.s libsrc/atari/lseek.s libsrc/atari/getres.s libsrc/atari/getdefdev.s
+__do_oserror            libsrc/atari/posixdirent.s libsrc/atari/do_oserr.s libsrc/atari/serref.s libsrc/atari/read.s libsrc/atari/write.s libsrc/atari/close.s
+__getcolor              libsrc/atari/setcolor.s
+__getdefdev             libsrc/atari/getdefdev.s
+__graphics              libsrc/atari/graphics.s
+__inviocb               libsrc/atari/serref.s libsrc/atari/ser/atrrdev.s libsrc/atari/inviocb.s libsrc/atari/read.s libsrc/atari/write.s libsrc/atari/lseek.s libsrc/atari/close.s
+__is_cmdline_dos        libsrc/atari/is_cmdline_dos.s libsrc/atari/doesclrscr.s
+__rest_vecs             libsrc/atari/savevec.s
+__rwsetup               libsrc/atari/rwcommon.s libsrc/atari/read.s libsrc/atari/write.s
+__save_vecs             libsrc/atari/savevec.s
+__scroll                libsrc/atari/scroll.s
+__setcolor              libsrc/atari/setcolor.s
+__setcolor_low          libsrc/atari/setcolor.s
+__sio_call              libsrc/atari/diowritev.s libsrc/atari/diopncls.s libsrc/atari/siocall.s libsrc/atari/diowrite.s libsrc/atari/dioread.s
+
+
+cbm
+
+__cbm_filetype          libsrc/cbm/cbm_filetype.s asminc/cbm_filetype.in
+__dirread               libsrc/cbm/dir.inc libsrc/cbm/dir.s
+__dirread1              libsrc/cbm/dir.inc libsrc/cbm/dir.s
+
+
+lynx
+
+__iodat                 libsrc/lynx/lynx-cart.s libsrc/lynx/bootldr.s libsrc/lynx/extzp.s libsrc/lynx/crt0.s libsrc/lynx/extzp.inc
+__iodir                 libsrc/lynx/extzp.s libsrc/lynx/crt0.s libsrc/lynx/extzp.inc
+__sprsys                libsrc/lynx/tgi/lynx-160-102-16.s libsrc/lynx/extzp.s libsrc/lynx/crt0.s libsrc/lynx/extzp.inc
+__viddma                libsrc/lynx/tgi/lynx-160-102-16.s libsrc/lynx/extzp.s libsrc/lynx/crt0.s libsrc/lynx/extzp.inc
+
+
+pce
+
+__nmi                   libsrc/pce/irq.s libsrc/pce/crt0.s
+```
 
 ## Test suite
 

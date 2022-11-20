@@ -44,4 +44,22 @@
 #define _bgcolor(color)         COLOR_BLACK
 #define _bordercolor(color)     COLOR_BLACK
 
+/* Colors are not functional, display is black and white only. */
+#define COLOR_BLACK     0x00
+#define COLOR_WHITE     0x01
+
+#define CH_ULCORNER     0xCC
+#define CH_URCORNER     0xCD
+#define CH_LLCORNER     0xCB
+#define CH_LRCORNER     0xCE
+#define CH_TTEE         0xD9
+#define CH_BTEE         0xD7
+#define CH_LTEE         0xD8
+#define CH_RTEE         0xDA
+#define CH_CROSS        0xDB
+#define CH_HLINE        0x94
+#define CH_VLINE        0x95
+
+#define CH_ENTER        0x0D
+
 #endif

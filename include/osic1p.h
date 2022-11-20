@@ -36,14 +36,6 @@
 #  error "This module may only be used when compiling for the Challenger 1P!"
 #endif
 
-/* The following #defines will cause the matching functions calls in conio.h
-** to be overlaid by macros with the same names, saving the function call
-** overhead.
-*/
-#define _textcolor(color)       COLOR_WHITE
-#define _bgcolor(color)         COLOR_BLACK
-#define _bordercolor(color)     COLOR_BLACK
-
 /* Colors are not functional, display is black and white only. */
 #define COLOR_BLACK     0x00
 #define COLOR_WHITE     0x01
@@ -61,5 +53,14 @@
 #define CH_VLINE        0x95
 
 #define CH_ENTER        0x0D
+
+/* The following #defines will cause the matching functions calls in conio.h
+** to be overlaid by macros with the same names, saving the function call
+** overhead.
+*/
+#define _textcolor(color)       COLOR_WHITE
+#define _bgcolor(color)         COLOR_BLACK
+#define _bordercolor(color)     COLOR_BLACK
+#define _cpeekcolor(color)      COLOR_WHITE
 
 #endif

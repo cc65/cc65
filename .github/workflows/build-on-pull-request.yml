@@ -67,3 +67,38 @@ jobs:
 
       - name: Build app (release)
         run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Release
+
+      - name: Install MINGW64
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            git
+            base-devel
+            mingw-w64-${{ matrix.arch.arch }}-toolchain
+            zip
+      - name: Checkout Source
+        uses: actions/checkout@v3
+      - name: Do some simple style checks
+        shell: cmd
+        run: make -j2 checkstyle
+      - name: Build the tools.
+        shell: cmd
+        run: make -j2 bin USER_CFLAGS=-Werror
+      - name: Build the utilities.
+        shell: cmd
+        run: make -j2 util
+      - name: Build the platform libraries.
+        shell: cmd
+        run: make -j2 lib QUIET=1
+      - name: Run the regression tests.
+        shell: cmd
+        run: make test QUIET=1
+      - name: Test that the samples can be built.
+        run: make -C samples platforms
+      - name: Test that the targettest programs can be built.
+        run: make -C targettest platforms
+      - name: Build the document files.
+        shell: cmd
+        run: make -j2 doc

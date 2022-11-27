@@ -68,6 +68,11 @@ jobs:
       - name: Build app (release)
         run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Release
 
+  build_cmd:
+    name: Build and test (Windows cmd.exe)
+    runs-on: windows-latest
+
+    steps:
       - name: Install MINGW64
         uses: msys2/setup-msys2@v2
         with:
@@ -76,8 +81,10 @@ jobs:
           install: >-
             git
             base-devel
-            mingw-w64-${{ matrix.arch.arch }}-toolchain
+            mingw-w64-x86_64-toolchain
             zip
+      - shell: cmd
+        run: git config --global core.autocrlf input
       - name: Checkout Source
         uses: actions/checkout@v3
       - name: Do some simple style checks
@@ -102,3 +109,6 @@ jobs:
       - name: Build the document files.
         shell: cmd
         run: make -j2 doc
+      - name: clean up
+        shell: cmd
+        run: make -j2 clean

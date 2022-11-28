@@ -613,7 +613,7 @@ int xvsnprintf (char* Buf, size_t Size, const char* Format, va_list ap)
 
             default:
                 /* Invalid format spec */
-                fprintf(stderr, "buffer: %s specifier: %c\n", Buf, F);
+                fprintf(stderr, "buffer: '%s' specifier: '%c' format: '%s'\n", Buf, F, Format);
                 FAIL ("Invalid format specifier in xvsnprintf");
         }
     }

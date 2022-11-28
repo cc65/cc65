@@ -95,7 +95,8 @@ jobs:
 #        run: msys2 -c 'make -j2 checkstyle'
         run: |
             set PATH=C:\msys64\usr\bin
-            make -j2 checkstyle
+            msys2 cmd /c "make -j2 checkstyle"
+#            make -j2 checkstyle
       - name: Build the tools.
         shell: cmd
         run: msys2 -c 'make -j2 bin USER_CFLAGS=-Werror'

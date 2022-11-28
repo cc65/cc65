@@ -72,8 +72,8 @@
          you probably have to update.
 */
 #if defined(__MINGW64__)
-#undef PRIXPTR
-#define PRIXPTR "I64u"
+//#undef PRIXPTR
+//#define PRIXPTR "I64u"
 #endif
 
 /*****************************************************************************/

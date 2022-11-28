@@ -92,14 +92,14 @@ jobs:
 #        run: set PATH=C:\msys64\mingw64\bin;%PATH%
       - name: Do some simple style checks
         shell: cmd
-#        run: msys2 -c 'make -j2 checkstyle'
-#        run: c:\msys64\mingw64 cmd /c "make -j2 checkstyle"
         run: |
             set PATH=C:\msys64\usr\bin;%PATH%
             set PATH=C:\msys64;%PATH%
-#            mingw64 cmd /c "make -j2 checkstyle"
             mingw64 cmd
             make -j2 checkstyle
+#            mingw64 cmd /c "make -j2 checkstyle"
+#        run: msys2 -c 'make -j2 checkstyle'
+#        run: c:\msys64\mingw64 cmd /c "make -j2 checkstyle"
       - name: Build the tools.
         shell: cmd
         run: c:\msys64\mingw64 cmd /c 'make -j2 bin USER_CFLAGS=-Werror'

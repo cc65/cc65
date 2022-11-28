@@ -15,6 +15,7 @@ else
 .PHONY: checkstyle lineendings tabs lastline spaces noexec
 
 checkstyle: lineendings tabs lastline spaces noexec
+	$(info INFO: style checks completed.)
 
 lineendings: lineendings.sh
 	@./lineendings.sh

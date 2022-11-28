@@ -87,31 +87,31 @@ jobs:
         run: git config --global core.autocrlf input
       - name: Checkout Source
         uses: actions/checkout@v3
-      - name: Set path
-        shell: cmd
-        run: set PATH=C:\msys64\mingw64\bin;%PATH%
+#      - name: Set path
+#        shell: cmd
+#        run: set PATH=C:\msys64\mingw64\bin;%PATH%
       - name: Do some simple style checks
         shell: cmd
-        run: make -j2 checkstyle
+        run: msys2 -c 'make -j2 checkstyle'
       - name: Build the tools.
         shell: cmd
-        run: make -j2 bin USER_CFLAGS=-Werror
+        run: msys2 -c 'make -j2 bin USER_CFLAGS=-Werror'
       - name: Build the utilities.
         shell: cmd
-        run: make -j2 util
+        run: msys2 -c 'make -j2 util'
       - name: Build the platform libraries.
         shell: cmd
-        run: make -j2 lib QUIET=1
+        run: msys2 -c 'make -j2 lib QUIET=1'
       - name: Run the regression tests.
         shell: cmd
-        run: make test QUIET=1
+        run: msys2 -c 'make test QUIET=1'
       - name: Test that the samples can be built.
-        run: make -C samples platforms
+        run: msys2 -c 'make -C samples platforms'
       - name: Test that the targettest programs can be built.
-        run: make -C targettest platforms
+        run: msys2 -c 'make -C targettest platforms'
       - name: Build the document files.
         shell: cmd
-        run: make -j2 doc
+        run: msys2 -c 'make -j2 doc'
       - name: clean up
         shell: cmd
-        run: make -j2 clean
+        run: msys2 -c 'make -j2 clean'

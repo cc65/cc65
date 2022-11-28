@@ -93,29 +93,30 @@ jobs:
       - name: Do some simple style checks
         shell: cmd
 #        run: msys2 -c 'make -j2 checkstyle'
-        run: |
-            set PATH=C:\msys64\usr\bin
-            msys2 cmd /c "make -j2 checkstyle"
+        run: mingw64 cmd /c "make -j2 checkstyle"
+#        run: |
+#            set PATH=C:\msys64\usr\bin;%PATH%
+#            mingw64 cmd /c "make -j2 checkstyle"
 #            make -j2 checkstyle
       - name: Build the tools.
         shell: cmd
-        run: msys2 -c 'make -j2 bin USER_CFLAGS=-Werror'
+        run: mingw64 cmd /c 'make -j2 bin USER_CFLAGS=-Werror'
       - name: Build the utilities.
         shell: cmd
-        run: msys2 -c 'make -j2 util'
+        run: mingw64 cmd /c 'make -j2 util'
       - name: Build the platform libraries.
         shell: cmd
-        run: msys2 -c 'make -j2 lib QUIET=1'
+        run: mingw64 cmd /c 'make -j2 lib QUIET=1'
       - name: Run the regression tests.
         shell: cmd
-        run: msys2 -c 'make test QUIET=1'
+        run: mingw64 cmd /c 'make test QUIET=1'
       - name: Test that the samples can be built.
-        run: msys2 -c 'make -C samples platforms'
+        run: mingw64 cmd /c 'make -C samples platforms'
       - name: Test that the targettest programs can be built.
-        run: msys2 -c 'make -C targettest platforms'
+        run: mingw64 cmd /c 'make -C targettest platforms'
       - name: Build the document files.
         shell: cmd
-        run: msys2 -c 'make -j2 doc'
+        run: mingw64 cmd /c 'make -j2 doc'
       - name: clean up
         shell: cmd
-        run: msys2 -c 'make -j2 clean'
+        run: mingw64 cmd /c 'make -j2 clean'

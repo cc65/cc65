@@ -187,7 +187,7 @@ The only exception to the above are actions that are exclusive to the github act
 
 ### Floating point support
 
-The first step is implementing the datatype "float" as IEEE488 floats. Help welcomed!
+The first step is implementing the datatype "float" as IEEE 754 floats. Help welcomed!
 
 * WIP compiler/library changes are here: https://github.com/cc65/cc65/pull/1777
 

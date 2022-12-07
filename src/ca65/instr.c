@@ -131,6 +131,12 @@ static void PutAll (const InsDesc* Ins);
 static void Put4510 (const InsDesc* Ins);
 /* Handle instructions of 4510 not matching any EATab */
 
+static void Put45GS02 (const InsDesc* Ins);
+/* Handle [adr],z instructions of 45GS02 */
+
+static void Put45GS02_Q (const InsDesc* Ins);
+/* Handle Q instructions of 45GS02 */
+
 static void PutSweet16 (const InsDesc* Ins);
 /* Handle a generic sweet16 instruction */
 
@@ -717,6 +723,167 @@ static const struct {
     }
 };
 
+
+/* Instruction table for the 4510 */
+static const struct {
+    unsigned Count;
+    InsDesc  Ins[149];
+} InsTab45GS02 = {
+        sizeof (InsTab45GS02.Ins) / sizeof (InsTab45GS02.Ins[0]),
+        {
+                { "ADC",  0x1080A66C, 0x60, 0, Put45GS02 },
+                { "ADCQ", 0x0000140C, 0x60, 12, Put45GS02_Q },
+                { "AND",  0x1080A66C, 0x20, 0, Put45GS02 },
+                { "ANDQ", 0x0000140C, 0x20, 12, Put45GS02_Q },
+                { "ASL",  0x0000006e, 0x02, 1, PutAll },
+                { "ASLQ", 0x200000ec, 0x00, 13, Put45GS02_Q },
+                { "ASR",  0x00000026, 0x43, 0, Put4510 },
+                { "ASRQ", 0x20000024, 0x40, 14, Put45GS02_Q },
+                { "ASW",  0x00000008, 0xcb, 6, PutAll },
+                { "BBR0", 0x00000000, 0x0F, 0, PutBitBranch },
+                { "BBR1", 0x00000000, 0x1F, 0, PutBitBranch },
+                { "BBR2", 0x00000000, 0x2F, 0, PutBitBranch },
+                { "BBR3", 0x00000000, 0x3F, 0, PutBitBranch },
+                { "BBR4", 0x00000000, 0x4F, 0, PutBitBranch },
+                { "BBR5", 0x00000000, 0x5F, 0, PutBitBranch },
+                { "BBR6", 0x00000000, 0x6F, 0, PutBitBranch },
+                { "BBR7", 0x00000000, 0x7F, 0, PutBitBranch },
+                { "BBS0", 0x00000000, 0x8F, 0, PutBitBranch },
+                { "BBS1", 0x00000000, 0x9F, 0, PutBitBranch },
+                { "BBS2", 0x00000000, 0xAF, 0, PutBitBranch },
+                { "BBS3", 0x00000000, 0xBF, 0, PutBitBranch },
+                { "BBS4", 0x00000000, 0xCF, 0, PutBitBranch },
+                { "BBS5", 0x00000000, 0xDF, 0, PutBitBranch },
+                { "BBS6", 0x00000000, 0xEF, 0, PutBitBranch },
+                { "BBS7", 0x00000000, 0xFF, 0, PutBitBranch },
+                { "BCC",  0x00020000, 0x90, 0, PutPCRel8 },
+                { "BCS",  0x00020000, 0xb0, 0, PutPCRel8 },
+                { "BEQ",  0x00020000, 0xf0, 0, PutPCRel8 },
+                { "BIT",  0x00A0006C, 0x00, 2, PutAll },
+                { "BITQ", 0x0000000c, 0x20, 14, Put45GS02_Q },
+                { "BMI",  0x00020000, 0x30, 0, PutPCRel8 },
+                { "BNE",  0x00020000, 0xd0, 0, PutPCRel8 },
+                { "BPL",  0x00020000, 0x10, 0, PutPCRel8 },
+                { "BRA",  0x00020000, 0x80, 0, PutPCRel8 },
+                { "BRK",  0x00000001, 0x00, 0, PutAll },
+                { "BSR",  0x00040000, 0x63, 0, PutPCRel4510 },
+                { "BVC",  0x00020000, 0x50, 0, PutPCRel8 },
+                { "BVS",  0x00020000, 0x70, 0, PutPCRel8 },
+                { "CLC",  0x00000001, 0x18, 0, PutAll },
+                { "CLD",  0x00000001, 0xd8, 0, PutAll },
+                { "CLE",  0x00000001, 0x02, 0, PutAll },
+                { "CLI",  0x00000001, 0x58, 0, PutAll },
+                { "CLV",  0x00000001, 0xb8, 0, PutAll },
+                { "CMP",  0x1080A66C, 0xc0, 0, Put45GS02 },
+                { "CMPQ", 0x0000140C, 0xC0, 12, Put45GS02_Q },
+                { "CPX",  0x0080000C, 0xe0, 1, PutAll },
+                { "CPY",  0x0080000C, 0xc0, 1, PutAll },
+                { "CPZ",  0x0080000C, 0xd0, 1, Put4510 },
+                { "DEA",  0x00000001, 0x00, 3, PutAll },   /* == DEC */
+                { "DEC",  0x000006F, 0x00, 3, PutAll },
+                { "DEQ", 0x200000ec, 0xc0, 13, Put45GS02_Q },
+                { "DEW",  0x0000004, 0xc3, 9, PutAll },
+                { "DEX",  0x0000001, 0xca, 0, PutAll },
+                { "DEY",  0x0000001, 0x88, 0, PutAll },
+                { "DEZ",  0x0000001, 0x3B, 0, PutAll },
+                { "EOM",  0x0000001, 0xea, 0, PutAll },
+                { "EOR",  0x1080A66C, 0x40, 0, Put45GS02 },
+                { "EORQ", 0x0000140C, 0x40, 12, Put45GS02_Q },
+                { "INA",  0x0000001, 0x00, 4, PutAll },   /* == INC */
+                { "INC",  0x000006f, 0x00, 4, PutAll },
+                { "INQ", 0x200000ec, 0xe0, 13, Put45GS02_Q },
+                { "INW",  0x0000004, 0xe3, 9, PutAll },
+                { "INX",  0x0000001, 0xe8, 0, PutAll },
+                { "INY",  0x0000001, 0xc8, 0, PutAll },
+                { "INZ",  0x0000001, 0x1B, 0, PutAll },
+                { "JMP",  0x0010808, 0x4c, 6, PutAll },
+                { "JSR",  0x0010808, 0x20, 7, Put4510 },
+                { "LBCC", 0x0040000, 0x93, 0, PutPCRel4510 },
+                { "LBCS", 0x0040000, 0xb3, 0, PutPCRel4510 },
+                { "LBEQ", 0x0040000, 0xf3, 0, PutPCRel4510 },
+                { "LBMI", 0x0040000, 0x33, 0, PutPCRel4510 },
+                { "LBNE", 0x0040000, 0xd3, 0, PutPCRel4510 },
+                { "LBPL", 0x0040000, 0x13, 0, PutPCRel4510 },
+                { "LBRA", 0x0040000, 0x83, 0, PutPCRel4510 },
+                { "LBVC", 0x0040000, 0x53, 0, PutPCRel4510 },
+                { "LBVS", 0x0040000, 0x73, 0, PutPCRel4510 },
+                { "LDA",  0x1090A66C, 0xa0, 0, Put45GS02 },
+                { "LDQ",  0x1000140C, 0xa0, 12, Put45GS02_Q },
+                { "LDX",  0x080030C, 0xa2, 1, PutAll },
+                { "LDY",  0x080006C, 0xa0, 1, PutAll },
+                { "LDZ",  0x0800048, 0xa3, 1, Put4510 },
+                { "LSR",  0x000006F, 0x42, 1, PutAll },
+                { "LSRQ", 0x200000ec, 0x40, 13, Put45GS02_Q },
+                { "MAP",  0x0000001, 0x5C, 0, PutAll },
+                { "NEG",  0x0000001, 0x42, 0, PutAll },
+                { "NOP",  0x0000001, 0xea, 0, PutAll }, /* == EOM */
+                { "ORA",  0x1080A66C, 0x00, 0, Put45GS02 },
+                { "ORQ",  0x0000140C, 0x00, 12, Put45GS02_Q },
+                { "PHA",  0x0000001, 0x48, 0, PutAll },
+                { "PHD",  0x8000008, 0xf4, 1, PutAll }, /* == PHW */
+                { "PHP",  0x0000001, 0x08, 0, PutAll },
+                { "PHW",  0x8000008, 0xf4, 1, PutAll },
+                { "PHX",  0x0000001, 0xda, 0, PutAll },
+                { "PHY",  0x0000001, 0x5a, 0, PutAll },
+                { "PHZ",  0x0000001, 0xdb, 0, PutAll },
+                { "PLA",  0x0000001, 0x68, 0, PutAll },
+                { "PLP",  0x0000001, 0x28, 0, PutAll },
+                { "PLX",  0x0000001, 0xfa, 0, PutAll },
+                { "PLY",  0x0000001, 0x7a, 0, PutAll },
+                { "PLZ",  0x0000001, 0xfb, 0, PutAll },
+                { "RMB0", 0x0000004, 0x07, 1, PutAll },
+                { "RMB1", 0x0000004, 0x17, 1, PutAll },
+                { "RMB2", 0x0000004, 0x27, 1, PutAll },
+                { "RMB3", 0x0000004, 0x37, 1, PutAll },
+                { "RMB4", 0x0000004, 0x47, 1, PutAll },
+                { "RMB5", 0x0000004, 0x57, 1, PutAll },
+                { "RMB6", 0x0000004, 0x67, 1, PutAll },
+                { "RMB7", 0x0000004, 0x77, 1, PutAll },
+                { "ROL",  0x000006F, 0x22, 1, PutAll },
+                { "ROLQ", 0x200000ec, 0x20, 13, Put45GS02_Q },
+                { "ROR",  0x000006F, 0x62, 1, PutAll },
+                { "RORQ", 0x200000ec, 0x60, 13, Put45GS02_Q },
+                { "ROW",  0x0000008, 0xeb, 6, PutAll },
+                { "RTI",  0x0000001, 0x40, 0, PutAll },
+                { "RTN",  0x0800000, 0x62, 1, PutAll },
+                { "RTS",  0x0000001, 0x60, 0, PutAll },
+                { "SBC",  0x1080A66C, 0xe0, 0, Put45GS02 },
+                { "SBCQ", 0x0000140C, 0xe0, 12, Put45GS02_Q },
+                { "SEC",  0x0000001, 0x38, 0, PutAll },
+                { "SED",  0x0000001, 0xf8, 0, PutAll },
+                { "SEE",  0x0000001, 0x03, 0, PutAll },
+                { "SEI",  0x0000001, 0x78, 0, PutAll },
+                { "SMB0", 0x0000004, 0x87, 1, PutAll },
+                { "SMB1", 0x0000004, 0x97, 1, PutAll },
+                { "SMB2", 0x0000004, 0xA7, 1, PutAll },
+                { "SMB3", 0x0000004, 0xB7, 1, PutAll },
+                { "SMB4", 0x0000004, 0xC7, 1, PutAll },
+                { "SMB5", 0x0000004, 0xD7, 1, PutAll },
+                { "SMB6", 0x0000004, 0xE7, 1, PutAll },
+                { "SMB7", 0x0000004, 0xF7, 1, PutAll },
+                { "STA",  0x1010A66C, 0x80, 0, Put45GS02 },
+                { "STQ",  0x0000140C, 0x80, 12, Put45GS02_Q },
+                { "STX",  0x000030c, 0x82, 1, Put4510 },
+                { "STY",  0x000006c, 0x80, 1, Put4510 },
+                { "STZ",  0x000006c, 0x04, 5, PutAll },
+                { "TAB",  0x0000001, 0x5b, 0, PutAll },
+                { "TAX",  0x0000001, 0xaa, 0, PutAll },
+                { "TAY",  0x0000001, 0xa8, 0, PutAll },
+                { "TAZ",  0x0000001, 0x4b, 0, PutAll },
+                { "TBA",  0x0000001, 0x7b, 0, PutAll },
+                { "TRB",  0x000000c, 0x10, 1, PutAll },
+                { "TSB",  0x000000c, 0x00, 1, PutAll },
+                { "TSX",  0x0000001, 0xba, 0, PutAll },
+                { "TSY",  0x0000001, 0x0b, 0, PutAll },
+                { "TXA",  0x0000001, 0x8a, 0, PutAll },
+                { "TXS",  0x0000001, 0x9a, 0, PutAll },
+                { "TYA",  0x0000001, 0x98, 0, PutAll },
+                { "TYS",  0x0000001, 0x2b, 0, PutAll },
+                { "TZA",  0x0000001, 0x6b, 0, PutAll },
+        }
+};
+
+
 /* Instruction table for the 65816 */
 static const struct {
     unsigned Count;
@@ -1023,85 +1190,104 @@ static const InsTable* InsTabs[CPU_COUNT] = {
     (const InsTable*) &InsTabHuC6280,
     0,                                  /* Mitsubishi 740 */
     (const InsTable*) &InsTab4510,
+    (const InsTable*) &InsTab45GS02,
 };
 const InsTable* InsTab = (const InsTable*) &InsTab6502;
 
 /* Table to build the effective 65xx opcode from a base opcode and an
 ** addressing mode. (The value in the table is ORed with the base opcode)
 */
-static unsigned char EATab[12][AM65I_COUNT] = {
+static unsigned char EATab[15][AM65I_COUNT] = {
     {   /* Table 0 */
         0x00, 0x00, 0x05, 0x0D, 0x0F, 0x15, 0x1D, 0x1F,
         0x00, 0x19, 0x12, 0x00, 0x07, 0x11, 0x17, 0x01,
         0x00, 0x00, 0x00, 0x03, 0x13, 0x09, 0x00, 0x09,
-        0x00, 0x00, 0x00, 0x00
+        0x00, 0x00, 0x00, 0x00, 0x12, 0x00
     },
     {   /* Table 1 */
         0x08, 0x08, 0x04, 0x0C, 0x00, 0x14, 0x1C, 0x00,
         0x14, 0x1C, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x80, 0x00
+        0x00, 0x00, 0x80, 0x00, 0x00, 0x00
     },
     {   /* Table 2 */
         0x00, 0x00, 0x24, 0x2C, 0x0F, 0x34, 0x3C, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x89, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     },
     {   /* Table 3 */
         0x3A, 0x3A, 0xC6, 0xCE, 0x00, 0xD6, 0xDE, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     },
     {   /* Table 4 */
         0x1A, 0x1A, 0xE6, 0xEE, 0x00, 0xF6, 0xFE, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     },
     {   /* Table 5 */
         0x00, 0x00, 0x60, 0x98, 0x00, 0x70, 0x9E, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     },
     {   /* Table 6 */
         0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00,
         0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x90, 0x00
+        0x00, 0x00, 0x90, 0x00, 0x00, 0x00
     },
     {   /* Table 7 (Subroutine opcodes) */
         0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00,
         0xDC, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     },
     {   /* Table 8 */
         0x00, 0x40, 0x01, 0x41, 0x00, 0x09, 0x49, 0x00,
         0x00, 0x00, 0x00, 0x51, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     },
     {   /* Table 9 */
         0x00, 0x00, 0x00, 0x10, 0x00, 0x20, 0x30, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     },
     {   /* Table 10 (NOPs) */
         0xea, 0x00, 0x04, 0x0c, 0x00, 0x14, 0x1c, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80,
-        0x00, 0x00, 0x00, 0x00
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     },
     {   /* Table 11 (LAX) */
         0x08, 0x08, 0x04, 0x0C, 0x00, 0x14, 0x1C, 0x00,
         0x14, 0x1C, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08,
-        0x00, 0x00, 0x80, 0x00
+        0x00, 0x00, 0x80, 0x00, 0x00, 0x00
     },
+    {   /* Table 12 (Q) */
+        0x00, 0x00, 0x05, 0x0D, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x12, 0x00, 0x12, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x12, 0x00
+    },
+    {   /* Table 13 (Q) */
+            0x00, 0x00, 0x06, 0x0e, 0x00, 0x16, 0x1e, 0x00,
+            0x00, 0x00, 0x12, 0x00, 0x12, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x0a
+    },
+    {
+        0x00, 0x00, 0x04, 0x0c, 0x00, 0x14, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x03
+    }
 };
 
 /* Table to build the effective SWEET16 opcode from a base opcode and an
@@ -1146,6 +1332,8 @@ unsigned char ExtBytes[AM65I_COUNT] = {
     7,          /* Block transfer (HuC6280) */
     2,          /* Absolute Indirect long */
     2,          /* Immidiate word */
+    1,          /* [Direct],z */
+    0,          /* Q */
 };
 
 /* Table that encodes the additional bytes for each SWEET16 instruction */
@@ -1172,6 +1360,8 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
 {
     /* Get the set of possible addressing modes */
     GetEA (A);
+
+    /* printf("%x, %lx; %lx", Ins->BaseCode, Ins->AddrMode, A->AddrModeSet); */
 
     /* From the possible addressing modes, remove the ones that are invalid
     ** for this instruction or CPU.
@@ -1237,11 +1427,14 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
 
     /* Check if we have any adressing modes left */
     if (A->AddrModeSet == 0) {
+        /* printf("\n"); */
         Error ("Illegal addressing mode");
         return 0;
     }
     A->AddrMode    = BitFind (A->AddrModeSet);
     A->AddrModeBit = (0x01UL << A->AddrMode);
+
+    /* printf(" -> %lx, %d\n", A->AddrModeBit, A->AddrMode); */
 
     /* If the instruction has a one byte operand and immediate addressing is
     ** allowed but not used, check for an operand expression in the form
@@ -1655,9 +1848,7 @@ static void PutAll (const InsDesc* Ins)
 
 
 
-static void Put4510 (const InsDesc* Ins)
-/* Handle all other instructions, with modifications for 4510 */
-{
+static void Emit4510 (EffAddr* A) {
     /* The 4510 uses all 256 possible opcodes, so the last ones were crammed
     ** in where an opcode was still undefined. As a result, some of those
     ** don't follow any rules for encoding the addressmodes. So the EATab
@@ -1677,26 +1868,93 @@ static void Put4510 (const InsDesc* Ins)
     ** $d0 -> $c2 : CPZ #$00
     ** $fc -> $23 : JSR ($1234,X)
     */
+    switch (A->Opcode) {
+        case 0x47:
+            A->Opcode = 0x44;
+            break;
+        case 0x57:
+            A->Opcode = 0x54;
+            break;
+        case 0x93:
+            A->Opcode = 0x82;
+            break;
+        case 0x9C:
+            A->Opcode = 0x8B;
+            break;
+        case 0x9E:
+            A->Opcode = 0x9B;
+            break;
+        case 0xAF:
+            A->Opcode = 0xAB;
+            break;
+        case 0xBF:
+            A->Opcode = 0xBB;
+            break;
+        case 0xB3:
+            A->Opcode = 0xE2;
+            break;
+        case 0xD0:
+            A->Opcode = 0xC2;
+            break;
+        case 0xFC:
+            A->Opcode = 0x23;
+            break;
+        default: /* Keep opcode as it is */ break;
+    }
+
+    /* No error, output code */
+    EmitCode(A);
+}
+
+
+
+static void Put4510 (const InsDesc* Ins)
+/* Handle all other instructions, with modifications for 4510 */
+{
     EffAddr A;
 
     /* Evaluate the addressing mode used */
     if (EvalEA (Ins, &A)) {
-        switch (A.Opcode) {
-            case 0x47: A.Opcode = 0x44; break;
-            case 0x57: A.Opcode = 0x54; break;
-            case 0x93: A.Opcode = 0x82; break;
-            case 0x9C: A.Opcode = 0x8B; break;
-            case 0x9E: A.Opcode = 0x9B; break;
-            case 0xAF: A.Opcode = 0xAB; break;
-            case 0xBF: A.Opcode = 0xBB; break;
-            case 0xB3: A.Opcode = 0xE2; break;
-            case 0xD0: A.Opcode = 0xC2; break;
-            case 0xFC: A.Opcode = 0x23; break;
-            default: /* Keep opcode as it is */ break;
-        }
+        Emit4510(&A);
+    }
+}
 
-        /* No error, output code */
-        EmitCode (&A);
+
+
+static void Put45GS02 (const InsDesc* Ins)
+/* Handle all other instructions, with modifications for 45GS02 */
+{
+    EffAddr A;
+
+    if (EvalEA(Ins, &A)) {
+        if (A.AddrModeSet == AM65_32BIT_BASE_IND_Z) {
+            Emit0(0xEA); /* NOP prefix */
+        }
+        Emit4510(&A);
+    }
+}
+
+
+
+static void Put45GS02_Q (const InsDesc* Ins) {
+    EffAddr A;
+
+    if (EvalEA(Ins, &A)) {
+        Emit0(0x42);
+        Emit0(0x42);
+        /* printf("  42 42 "); */
+        if ((A.AddrModeBit == AM65_DIR_IND_LONG) || (A.AddrModeBit == AM65_32BIT_BASE_IND_Z)) {
+            Emit0(0xEA); /* NOP prefix */
+            /* printf("EA "); */
+        }
+        if (A.Opcode == 0xea) {
+            A.Opcode = 0x1a;
+        }
+        else if (A.Opcode == 0xca) {
+            A.Opcode = 0x3a;
+        }
+        /* printf("%02x\n", A.Opcode); */
+        EmitCode(&A);
     }
 }
 

@@ -217,6 +217,7 @@ struct DotKeyword {
     { ".IFNREF",        TOK_IFNREF              },
     { ".IFP02",         TOK_IFP02               },
     { ".IFP4510",       TOK_IFP4510             },
+    { ".IFP45GS02",     TOK_IFP45GS02           },
     { ".IFP816",        TOK_IFP816              },
     { ".IFPC02",        TOK_IFPC02              },
     { ".IFPDTV",        TOK_IFPDTV              },
@@ -255,6 +256,7 @@ struct DotKeyword {
     { ".OUT",           TOK_OUT                 },
     { ".P02",           TOK_P02                 },
     { ".P4510",         TOK_P4510               },
+    { ".P45GS02",       TOK_P45GS02             },
     { ".P816",          TOK_P816                },
     { ".PAGELEN",       TOK_PAGELENGTH          },
     { ".PAGELENGTH",    TOK_PAGELENGTH          },
@@ -1177,8 +1179,15 @@ Again:
                         break;
 
                     case 'S':
-                        if ((CPU == CPU_4510) || (CPU == CPU_65816)) {
+                        if ((CPU == CPU_4510) || (CPU == CPU_45GS02) || (CPU == CPU_65816)) {
                             CurTok.Tok = TOK_S;
+                            return;
+                        }
+                        break;
+
+                    case 'Q':
+                        if (CPU == CPU_45GS02) {
+                            CurTok.Tok = TOK_Q;
                             return;
                         }
                         break;
@@ -1197,7 +1206,7 @@ Again:
                             CurTok.Tok = TOK_OVERRIDE_ZP;
                            return;
                         } else {
-                            if (CPU == CPU_4510) {
+                            if ((CPU == CPU_4510) || (CPU == CPU_45GS02)) {
                                 CurTok.Tok = TOK_Z;
                                 return;
                             }
@@ -1209,7 +1218,7 @@ Again:
                 }
                 break;
             case 2:
-                if ((CPU == CPU_4510) &&
+                if ((CPU == CPU_4510 || CPU == CPU_45GS02) &&
                     (toupper (SB_AtUnchecked (&CurTok.SVal, 0)) == 'S') &&
                     (toupper (SB_AtUnchecked (&CurTok.SVal, 1)) == 'P')) {
 

@@ -342,6 +342,10 @@ static void SetSys (const char* Sys)
             NewSymbol ("__SYM1__", 1);
             break;
 
+        case TGT_MEGA65:
+            NewSymbol("__MEGA65__", 1);
+            break;
+
         default:
             AbEnd ("Invalid target name: '%s'", Sys);
 

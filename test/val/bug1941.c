@@ -1,4 +1,4 @@
-/* bug #1941 - Shift by literal 0 bits are broken */
+/* bug #1941 - Shifts by literal 0 bits are broken */
 
 #include <stdlib.h>
 #include <stdint.h>

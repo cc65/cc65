@@ -174,10 +174,9 @@ void ShiftExpr (struct ExprDesc* Expr)
             */
             if (Expr2.IVal == 0 || lconst) {
 
-                /* Set the type */
-                Expr->Type = ResultType;
-
                 if (lconst) {
+                    /* Set the type */
+                    Expr->Type = ResultType;
 
                     /* Evaluate the result */
                     switch (Tok) {

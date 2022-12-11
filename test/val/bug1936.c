@@ -83,11 +83,6 @@ void handle_item_drop(void)
 
 int main(void)
 {
-
-    while(1) // Game (re-)start
-    {
-    }
-
     return 0;
 }
 

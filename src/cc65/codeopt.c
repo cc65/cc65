@@ -850,6 +850,10 @@ static unsigned RunOptGroup7 (CodeSeg* S)
     C += RunOptFunc (S, &DOptJumpCascades, 1);
     C += RunOptFunc (S, &DOptBranchDist2, 1);
 
+    /* Adjust branch distances again, since the previous step may change code
+       between branches */
+    C += RunOptFunc (S, &DOptBranchDist, 3);
+
     Changes += C;
     /* If we had changes, we must run dead code elimination again,
     ** since the changes may have introduced dead code.

@@ -171,6 +171,7 @@ EXELIST_apple2 =   \
         multdemo   \
         ovrldemo   \
         sieve      \
+        terminal   \
         tinyshell  \
         tgidemo
 
@@ -186,6 +187,7 @@ EXELIST_atari =    \
         multdemo   \
         ovrldemo   \
         sieve      \
+        terminal   \
         tinyshell  \
         tgidemo
 
@@ -203,6 +205,7 @@ EXELIST_atmos =    \
         hello      \
         mandelbrot \
         sieve      \
+        terminal   \
         tgidemo
 
 EXELIST_bbc = \
@@ -219,6 +222,7 @@ EXELIST_c64 =      \
         multdemo   \
         ovrldemo   \
         sieve      \
+        terminal   \
         tinyshell  \
         tgidemo
 
@@ -231,6 +235,7 @@ EXELIST_c128 =     \
         mandelbrot \
         mousedemo  \
         sieve      \
+        terminal   \
         tinyshell  \
         tgidemo
 
@@ -247,6 +252,7 @@ EXELIST_cbm510 =   \
         gunzip65   \
         hello      \
         mousedemo  \
+        terminal   \
         tinyshell  \
         sieve
 
@@ -255,6 +261,7 @@ EXELIST_cbm610 =   \
         checkversion \
         gunzip65   \
         hello      \
+        terminal   \
         tinyshell  \
         sieve
 
@@ -314,6 +321,7 @@ EXELIST_plus4 =    \
         enumdevdir \
         gunzip65   \
         hello      \
+        terminal   \
         tinyshell  \
         sieve
 

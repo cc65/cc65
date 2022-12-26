@@ -41,6 +41,7 @@
 #include <stdio.h>
 
 /* common */
+#include "coll.h"
 #include "strbuf.h"
 
 
@@ -95,6 +96,17 @@ void NextChar (void);
 ** are read by this function.
 */
 
+Collection* UseInputStack (Collection* InputStack);
+/* Use the provided input stack for incoming input. Return the previously used
+** InputStack.
+*/
+
+void PushLine (StrBuf* L);
+/* Save the current input line and use a new one */
+
+void ReuseInputLine (void);
+/* Save and reuse the current line as the next line */
+
 void ClearLine (void);
 /* Clear the current input line */
 
@@ -116,13 +128,13 @@ int PreprocessNextLine (void);
 const char* GetInputFile (const struct IFile* IF);
 /* Return a filename from an IFile struct */
 
-const char* GetCurrentFile (void);
+const char* GetCurrentFilename (void);
 /* Return the name of the current input file */
 
-unsigned GetCurrentLine (void);
+unsigned GetCurrentLineNum (void);
 /* Return the line number in the current input file */
 
-void SetCurrentLine (unsigned LineNum);
+void SetCurrentLineNum (unsigned LineNum);
 /* Set the line number in the current input file */
 
 void SetCurrentFilename (const char* Name);

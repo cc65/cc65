@@ -81,13 +81,13 @@ erange: lda     #ERANGE
         jsr     incsp3          ; Preserves A
 
         ; Set __errno
-        jmp     __directerrno
+        jmp     ___directerrno
 
         ; Cleanup stack
 oserr:  jsr     incsp3          ; Preserves A
 
-        ; Set __oserror
-        jmp     __mappederrno
+        ; Set ___oserror
+        jmp     ___mappederrno
 
         .bss
 

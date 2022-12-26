@@ -1329,7 +1329,7 @@ static unsigned Opt_a_tosult (StackOpData* D)
 /* The first column of these two tables must be sorted in lexical order */
 
 static const OptFuncDesc FuncTable[] = {
-    { "__bzero",    Opt___bzero,   REG_NONE, OP_X_ZERO | OP_A_KNOWN                    },
+    { "___bzero",   Opt___bzero,   REG_NONE, OP_X_ZERO | OP_A_KNOWN                    },
     { "staspidx",   Opt_staspidx,  REG_NONE, OP_NONE                                   },
     { "staxspidx",  Opt_staxspidx, REG_AX,   OP_NONE                                   },
     { "tosaddax",   Opt_tosaddax,  REG_NONE, OP_NONE                                   },

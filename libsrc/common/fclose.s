@@ -31,7 +31,7 @@
 ; File is not open
 
         lda     #EINVAL
-        jsr     __seterrno
+        jsr     ___seterrno
         lda     #$FF            ; Return -1
         tax
         rts

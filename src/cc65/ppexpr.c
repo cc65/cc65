@@ -305,97 +305,60 @@ static void PPhie_internal (const token_t* Ops,   /* List of generators */
 
         if (PPEvaluationEnabled && !PPEvaluationFailed) {
 
+            /* Evaluate the result for operands */
+            unsigned long Val1 = Expr->IVal;
+            unsigned long Val2 = Rhs.IVal;
+
             /* If either side is unsigned, the result is unsigned */
             Expr->Flags |= Rhs.Flags & PPEXPR_UNSIGNED;
 
-            /* Handle the op differently for signed and unsigned integers */
-            if ((Expr->Flags & PPEXPR_UNSIGNED) == 0) {
-
-                /* Evaluate the result for signed operands */
-                signed long Val1 = Expr->IVal;
-                signed long Val2 = Rhs.IVal;
-                switch (Tok) {
-                    case TOK_OR:
-                        Expr->IVal = (Val1 | Val2);
-                        break;
-                    case TOK_XOR:
-                        Expr->IVal = (Val1 ^ Val2);
-                        break;
-                    case TOK_AND:
-                        Expr->IVal = (Val1 & Val2);
-                        break;
-                    case TOK_PLUS:
-                        Expr->IVal = (Val1 + Val2);
-                        break;
-                    case TOK_MINUS:
-                        Expr->IVal = (Val1 - Val2);
-                        break;
-                    case TOK_MUL:
-                        Expr->IVal = (Val1 * Val2);
-                        break;
-                    case TOK_DIV:
-                        if (Val2 == 0) {
-                            PPError ("Division by zero");
-                            Expr->IVal = 0;
+            switch (Tok) {
+                case TOK_OR:
+                    Expr->IVal = (Val1 | Val2);
+                    break;
+                case TOK_XOR:
+                    Expr->IVal = (Val1 ^ Val2);
+                    break;
+                case TOK_AND:
+                    Expr->IVal = (Val1 & Val2);
+                    break;
+                case TOK_PLUS:
+                    Expr->IVal = (Val1 + Val2);
+                    break;
+                case TOK_MINUS:
+                    Expr->IVal = (Val1 - Val2);
+                    break;
+                case TOK_MUL:
+                    Expr->IVal = (Val1 * Val2);
+                    break;
+                case TOK_DIV:
+                    if (Val2 == 0) {
+                        PPError ("Division by zero");
+                        Expr->IVal = 0;
+                    } else {
+                        /* Handle signed and unsigned operands differently */
+                        if ((Expr->Flags & PPEXPR_UNSIGNED) == 0) {
+                            Expr->IVal = ((long)Val1 / (long)Val2);
                         } else {
                             Expr->IVal = (Val1 / Val2);
                         }
-                        break;
-                    case TOK_MOD:
-                        if (Val2 == 0) {
-                            PPError ("Modulo operation with zero");
-                            Expr->IVal = 0;
+                    }
+                    break;
+                case TOK_MOD:
+                    if (Val2 == 0) {
+                        PPError ("Modulo operation with zero");
+                        Expr->IVal = 0;
+                    } else {
+                        /* Handle signed and unsigned operands differently */
+                        if ((Expr->Flags & PPEXPR_UNSIGNED) == 0) {
+                            Expr->IVal = ((long)Val1 % (long)Val2);
                         } else {
                             Expr->IVal = (Val1 % Val2);
                         }
-                        break;
-                    default:
-                        Internal ("PPhie_internal: got token 0x%X\n", Tok);
-                }
-
-            } else {
-
-                /* Evaluate the result for unsigned operands */
-                unsigned long Val1 = Expr->IVal;
-                unsigned long Val2 = Rhs.IVal;
-                switch (Tok) {
-                    case TOK_OR:
-                        Expr->IVal = (Val1 | Val2);
-                        break;
-                    case TOK_XOR:
-                        Expr->IVal = (Val1 ^ Val2);
-                        break;
-                    case TOK_AND:
-                        Expr->IVal = (Val1 & Val2);
-                        break;
-                    case TOK_PLUS:
-                        Expr->IVal = (Val1 + Val2);
-                        break;
-                    case TOK_MINUS:
-                        Expr->IVal = (Val1 - Val2);
-                        break;
-                    case TOK_MUL:
-                        Expr->IVal = (Val1 * Val2);
-                        break;
-                    case TOK_DIV:
-                        if (Val2 == 0) {
-                            PPError ("Division by zero");
-                            Expr->IVal = 0;
-                        } else {
-                            Expr->IVal = (Val1 / Val2);
-                        }
-                        break;
-                    case TOK_MOD:
-                        if (Val2 == 0) {
-                            PPError ("Modulo operation with zero");
-                            Expr->IVal = 0;
-                        } else {
-                            Expr->IVal = (Val1 % Val2);
-                        }
-                        break;
-                    default:
-                        Internal ("PPhie_internal: got token 0x%X\n", Tok);
-                }
+                    }
+                    break;
+                default:
+                    Internal ("PPhie_internal: got token 0x%X\n", Tok);
             }
         }
     }
@@ -519,12 +482,21 @@ static void PPhie7 (PPExpr* Expr)
 
         /* Evaluate */
         if (PPEvaluationEnabled && !PPEvaluationFailed) {
-            /* To shift by a negative value is equivalent to shift to the
-            ** opposite direction.
-            */
-            if ((Rhs.Flags & PPEXPR_UNSIGNED) != 0 && Rhs.IVal > (long)LONG_BITS) {
+            /* For now we use 32-bit integer types for PP integer constants */
+            if ((Rhs.Flags & PPEXPR_UNSIGNED) != 0) {
+                if ((unsigned long)Rhs.IVal > LONG_BITS) {
+                    Rhs.IVal = (long)LONG_BITS;
+                }
+            } else if (Rhs.IVal > (long)LONG_BITS) {
                 Rhs.IVal = (long)LONG_BITS;
+            } else if (Rhs.IVal < -(long)LONG_BITS) {
+                Rhs.IVal = -(long)LONG_BITS;
             }
+
+            /* Positive count for left-shift and negative for right-shift. So
+            ** to shift by a count is equivalent to shift to the opposite
+            ** direction by the negated count.
+            */
             if (Op == TOK_SHR) {
                 Rhs.IVal = -Rhs.IVal;
             }
@@ -532,27 +504,26 @@ static void PPhie7 (PPExpr* Expr)
             /* Evaluate the result */
             if ((Expr->Flags & PPEXPR_UNSIGNED) != 0) {
                 if (Rhs.IVal >= (long)LONG_BITS) {
-                    /* For now we use (unsigned) long types for integer constants */
                     PPWarning ("Integer overflow in preprocessor expression");
                     Expr->IVal = 0;
                 } else if (Rhs.IVal > 0) {
                     Expr->IVal <<= Rhs.IVal;
-                } else if (Rhs.IVal < -(long)LONG_BITS) {
+                } else if (Rhs.IVal <= -(long)LONG_BITS) {
                     Expr->IVal = 0;
                 } else if (Rhs.IVal < 0) {
                     Expr->IVal = (unsigned long)Expr->IVal >> -Rhs.IVal;
                 }
             } else {
+                /* -1 for sign bit */
                 if (Rhs.IVal >= (long)(LONG_BITS - 1)) {
-                    /* For now we use (unsigned) long types for integer constants */
                     PPWarning ("Integer overflow in preprocessor expression");
                     Expr->IVal = 0;
                 } else if (Rhs.IVal > 0) {
                     Expr->IVal <<= Rhs.IVal;
-                } else if (Rhs.IVal < -(long)LONG_BITS) {
-                    Expr->IVal = -1;
+                } else if (Rhs.IVal <= -(long)LONG_BITS) {
+                    Expr->IVal = Expr->IVal >= 0 ? 0 : -1;
                 } else if (Rhs.IVal < 0) {
-                    Expr->IVal >>= Expr->IVal >> -Rhs.IVal;
+                    Expr->IVal = (long)Expr->IVal >> -Rhs.IVal;
                 }
             }
         }
@@ -752,7 +723,7 @@ static void PPhieQuest (PPExpr* Expr)
 
         /* Parse third expression */
         PPExprInit (&Expr3);
-        PPhie1 (&Expr3);
+        PPhieQuest (&Expr3);
 
         /* Set the result */
         Expr->IVal = Expr->IVal ? Expr2.IVal != 0 : Expr3.IVal != 0;

@@ -5,7 +5,7 @@
 ;
 
         .include "atari.inc"
-        .import __rwsetup,__do_oserror,__inviocb,__oserror
+        .import __rwsetup,__do_oserror,__inviocb,___oserror
         .export _read
 
 _read:  jsr     __rwsetup       ; do common setup for read and write
@@ -33,7 +33,7 @@ done:   lda     ICBLL,x         ; buf len lo
         lda     ICBLH,x         ; get buf len hi
         tax                     ; to X
 okdone: lda     #0
-        sta     __oserror       ; clear system dependend error code
+        sta     ___oserror      ; clear system dependend error code
         pla                     ; get buf len lo
         rts
 

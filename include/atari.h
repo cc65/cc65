@@ -261,7 +261,7 @@ extern void atrst_mou[];                /* referred to by mouse_static_stddrv[] 
 extern void atrami_mou[];
 extern void atrtrk_mou[];
 extern void atrtt_mou[];
-extern void atrrdev_ser[];
+extern void atrrdev_ser[];              /* referred to by ser_static_stddrv[] */
 extern void atr3_tgi[];
 extern void atr4_tgi[];
 extern void atr5_tgi[];
@@ -286,7 +286,7 @@ extern void atrxst_mou[];               /* referred to by mouse_static_stddrv[] 
 extern void atrxami_mou[];
 extern void atrxtrk_mou[];
 extern void atrxtt_mou[];
-extern void atrxrdev_ser[];
+extern void atrxrdev_ser[];             /* referred to by ser_static_stddrv[] */
 extern void atrx3_tgi[];
 extern void atrx4_tgi[];
 extern void atrx5_tgi[];

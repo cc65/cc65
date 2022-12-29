@@ -403,35 +403,18 @@ Bitmap* ReadPCXFile (const Collection* A)
 
             }
         } else {
-            if (P->BPP == 4) {
-                /* One plane with 8bpp is indexed */
-                for (Y = 0, Px = B->Data; Y < P->Height; ++Y) {
+            /* One plane with 8bpp is indexed */
+            for (Y = 0, Px = B->Data; Y < P->Height; ++Y) {
 
-                    /* Read the plane */
-                    ReadPlane (F, P, L);
+                /* Read the plane */
+                ReadPlane (F, P, L);
 
-                    /* Create pixels */
-                    for (X = 0; X < P->Width; ++X, ++Px) {
-                        if (L[X] > MaxIdx) {
-                            MaxIdx = L[X];
-                        }
-                        Px->Index = L[X];
+                /* Create pixels */
+                for (X = 0; X < P->Width; ++X, ++Px) {
+                    if (L[X] > MaxIdx) {
+                        MaxIdx = L[X];
                     }
-                }
-            } else {
-                /* One plane with 8bpp is indexed */
-                for (Y = 0, Px = B->Data; Y < P->Height; ++Y) {
-
-                    /* Read the plane */
-                    ReadPlane (F, P, L);
-
-                    /* Create pixels */
-                    for (X = 0; X < P->Width; ++X, ++Px) {
-                        if (L[X] > MaxIdx) {
-                            MaxIdx = L[X];
-                        }
-                        Px->Index = L[X];
-                    }
+                    Px->Index = L[X];
                 }
             }
         }

@@ -230,109 +230,109 @@ static void ReadPlane (FILE* F, PCXHeader* P, unsigned char* L)
             /* Write the data to the buffer */
             switch (P->BPP) {
             default:
-                        for (i = 0; i < C; i++) {
+                for (i = 0; i < C; i++) {
                     if (WidthCounter > 0) {
-                                *L = B;
+                        *L = B;
                         L += 1;
                         WidthCounter -= 1;
                     }
                     Remaining -= 1;
-                    }
+                }
                 break;
             case 4:
-                        for (i = 0; i < C; i++) {
+                for (i = 0; i < C; i++) {
                     if (WidthCounter > 0) {
-                                *L = B >> 4;
+                        *L = B >> 4;
                         L += 1;
                         WidthCounter -= 1;
                     }
                     if (WidthCounter > 0) {
-                                *L = B & 15;
+                        *L = B & 15;
                         L += 1;
                         WidthCounter -= 1;
                     }
                     Remaining -= 1;
-                    }
+                }
                 break;
             case 2:
-                        for (i = 0; i < C; i++) {
+                for (i = 0; i < C; i++) {
                     if (WidthCounter > 0) {
-                                *L = (B >> 6) & 3;
+                        *L = (B >> 6) & 3;
                         L += 1;
                         WidthCounter -= 1;
                     }
                     if (WidthCounter > 0) {
-                                *L = (B >> 4) & 3;
+                        *L = (B >> 4) & 3;
                         L += 1;
                         WidthCounter -= 1;
                     }
                     if (WidthCounter > 0) {
-                                *L = (B >> 2) & 3;
+                        *L = (B >> 2) & 3;
                         L += 1;
                         WidthCounter -= 1;
                     }
                     if (WidthCounter > 0) {
-                                *L = B & 3;
+                        *L = B & 3;
                         L += 1;
                         WidthCounter -= 1;
                     }
                     Remaining -= 1;
-                    }
+                }
                 break;
             case 1:
-                        for (i = 0; i < C; i++) {
+                for (i = 0; i < C; i++) {
                     if (WidthCounter > 0) {
-                                *L = (B >> 7) & 1;
+                        *L = (B >> 7) & 1;
                         L += 1;
                         WidthCounter -= 1;
                     }
                     if (WidthCounter > 0) {
-                                *L = (B >> 6) & 1;
+                        *L = (B >> 6) & 1;
                         L += 1;
                         WidthCounter -= 1;
                     }
                     if (WidthCounter > 0) {
-                                *L = (B >> 5) & 1;
+                        *L = (B >> 5) & 1;
                         L += 1;
                         WidthCounter -= 1;
                     }
                     if (WidthCounter > 0) {
-                                *L = (B >> 4) & 1;
+                        *L = (B >> 4) & 1;
                         L += 1;
                         WidthCounter -= 1;
                     }
                     if (WidthCounter > 0) {
-                                *L = (B >> 3) & 1;
+                        *L = (B >> 3) & 1;
                         L += 1;
                         WidthCounter -= 1;
                     }
                     if (WidthCounter > 0) {
-                                *L = (B >> 2) & 1;
+                        *L = (B >> 2) & 1;
                         L += 1;
                         WidthCounter -= 1;
                     }
                     if (WidthCounter > 0) {
-                                *L = (B >> 1) & 1;
+                        *L = (B >> 1) & 1;
                         L += 1;
                         WidthCounter -= 1;
                     }
                     if (WidthCounter > 0) {
-                                *L = B & 1;
+                        *L = B & 1;
                         L += 1;
                         WidthCounter -= 1;
                     }
                     Remaining -= 1;
-                    }
-                break;
                 }
+                break;
+            }
         }
     } else {
         /* Just read one line */
         if (P->BPP == 4) {
-                printf("Not implemented\n");
-            } else {
+            printf("Not implemented\n");
+        } else {
             ReadData (F, L, P->Width);
-            }
+        }
     }
 }
 

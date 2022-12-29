@@ -156,7 +156,7 @@ static PCXHeader* ReadPCXHeader (FILE* F, const char* Name)
     **   - one plane with either 1, 4 or 8 bits per pixel
     **   - three planes with 8 bits per pixel
     **   - four planes with 8 bits per pixel (does this exist?)
-    **/
+    */
     if (!((P->BPP == 1 && P->Planes == 1) ||
           (P->BPP == 4 && P->Planes == 1) ||
           (P->BPP == 8 && (P->Planes == 1 || P->Planes == 3 || P->Planes == 4)))) {
@@ -421,7 +421,7 @@ Bitmap* ReadPCXFile (const Collection* A)
 
         /* One plane means we have a palette which is either part of the header
         ** or follows.
-        **/
+        */
         if (P->PalInfo == 0) {
 
             /* Create the monochrome palette */

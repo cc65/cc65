@@ -55,6 +55,7 @@
 #include "data.h"
 #include "error.h"
 #include "global.h"
+#include "handler.h"
 #include "infofile.h"
 #include "labels.h"
 #include "opctable.h"
@@ -62,6 +63,8 @@
 #include "scanner.h"
 #include "segment.h"
 
+
+static unsigned PrevAddrMode;
 
 
 /*****************************************************************************/
@@ -427,8 +430,13 @@ static void OneOpcode (unsigned RemainingBytes)
     switch (Style) {
 
         case atDefault:
-            D->Handler (D);
-            PC += D->Size;
+            if (CPU == CPU_65816) {
+                DataByteLine (1);
+                ++PC;
+            } else {
+                D->Handler (D);
+                PC += D->Size;
+            }
             break;
 
         case atCode:
@@ -436,12 +444,36 @@ static void OneOpcode (unsigned RemainingBytes)
             ** following insn, fall through to byte mode.
             */
             if (D->Size <= RemainingBytes) {
+                if (CPU == CPU_65816) {
+                    const unsigned AddrMode = GetAttr (PC) & at65816Mask;
+                    if (PrevAddrMode != AddrMode) {
+                        if ((PrevAddrMode & atMem8) != (AddrMode & atMem8) ||
+                            (PrevAddrMode & atMem16) != (AddrMode & atMem16)) {
+                            OutputMFlag(!!(AddrMode & atMem8));
+                        }
+                        if ((PrevAddrMode & atIdx8) != (AddrMode & atIdx8) ||
+                            (PrevAddrMode & atIdx16) != (AddrMode & atIdx16)) {
+                            OutputXFlag(!!(AddrMode & atIdx8));
+                        }
+
+                        PrevAddrMode = AddrMode;
+                    }
+                }
+
                 /* Output labels within the next insn */
                 for (I = 1; I < D->Size; ++I) {
                     ForwardLabel (I);
                 }
                 /* Output the insn */
                 D->Handler (D);
+                if (CPU == CPU_65816 && (D->Flags & flSizeChanges)) {
+                    if ((D->Handler == OH_Immediate65816M &&
+                        GetAttr (PC) & atMem16) ||
+                        (D->Handler == OH_Immediate65816X &&
+                        GetAttr (PC) & atIdx16)) {
+                        PC++;
+                    }
+                }
                 PC += D->Size;
                 break;
             }
@@ -502,6 +534,8 @@ static void OnePass (void)
 /* Make one pass through the code */
 {
     unsigned Count;
+
+    PrevAddrMode = 0;
 
     /* Disassemble until nothing left */
     while ((Count = GetRemainingBytes()) > 0) {

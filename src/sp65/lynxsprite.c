@@ -96,10 +96,10 @@ static unsigned GetActionPointX (const Bitmap* B, const Collection* A)
     if (ActionPointX) {
         if (strcmp (ActionPointX, "mid") == 0) {
             return GetBitmapWidth (B) / 2;
-	}
+        }
         if (strcmp (ActionPointX, "max") == 0) {
             return GetBitmapWidth (B) - 1;
-	}
+        }
         return atoi(ActionPointX);
     } else {
         return 0;
@@ -115,10 +115,10 @@ static unsigned GetActionPointY (const Bitmap* B, const Collection* A)
     if (ActionPointY) {
         if (strcmp (ActionPointY, "mid") == 0) {
             return GetBitmapHeight (B) / 2;
-	}
+        }
         if (strcmp (ActionPointY, "max") == 0) {
             return GetBitmapHeight (B) - 1;
-	}
+        }
         return atoi(ActionPointY);
     } else {
         return 0;
@@ -235,10 +235,10 @@ static unsigned GetPenpal (const Bitmap* B, const Collection* A, char *PenPal)
         if (strcmp (Pen, "opt") == 0) {
             /* So we need to optimize the penpal and colour depth */
             OptimizePenpal (B, PenPal);
-	} else {
-	    strncpy(PenPal, Pen, 17);
+        } else {
+            strncpy(PenPal, Pen, 17);
         }
-	return 1;
+        return 1;
     }
     return 0;
 }
@@ -322,52 +322,52 @@ static unsigned char AnalyseNextChunks(signed *newlen, signed len, char data[32]
 
     for (i = 0; i < len; i++) {
         index = index + 1;
-	if (data[i] == prev) {
+        if (data[i] == prev) {
             count = count + 1;
-	    if (count >= longest) {
+            if (count >= longest) {
                 longest = count;
-		lindex = index - count;
-	    }
-	} else {
-	    prev = data[i];
-	    count = 1;
-	}
+                lindex = index - count;
+            }
+        } else {
+            prev = data[i];
+            count = 1;
+        }
     }
     if (longest == 1) {
-	if (len > 16) {
-	    *newlen = 16;
-	} else {
-	    *newlen = len;
-	}
-	return 'L';
+        if (len > 16) {
+            *newlen = 16;
+        } else {
+            *newlen = len;
+        }
+        return 'L';
     }
     if ((lindex > 0) && (lindex + longest > 15)) {
         /* We cannot pack the stride in this packet */
         *newlen = lindex;
-	return 'A';
+        return 'A';
     }
     /* Cost till end of area */
     literal_cost = 5 + lindex * ColorBits + longest * ColorBits;
     packed_cost = 5 + lindex * ColorBits + 5 + ColorBits;
     if (packed_cost < literal_cost) {
         if (lindex == 0) {
-	    /* Use packed data */
-	    if (longest > 16) {
-	        *newlen = 16;
-	    } else {
-	        *newlen = longest;
+            /* Use packed data */
+            if (longest > 16) {
+                *newlen = 16;
+            } else {
+                *newlen = longest;
             }
-	    return 'P';
-	}
-	/* We had a good find, but it was not at the start of the line */
-	*newlen = lindex;
-	return 'A';
+            return 'P';
+        }
+        /* We had a good find, but it was not at the start of the line */
+        *newlen = lindex;
+        return 'A';
     }
     /* There is no point in packing - use literal */
     if (len > 16) {
-	*newlen = 16;
+        *newlen = 16;
     } else {
-	*newlen = len;
+        *newlen = len;
     }
     return 'L';
 }
@@ -378,7 +378,7 @@ static unsigned char GetNextChunk(signed *newlen, signed len, char data[32], cha
 
     while (oper == 'A') {
         oper = AnalyseNextChunks(newlen, len, data, ColorBits);
-	len = *newlen;
+        len = *newlen;
     }
     return oper; /* The packet type is now P or L and the length is in newlen */
 }
@@ -439,27 +439,27 @@ static void encodeSprite(StrBuf *D, enum Mode M, char ColorBits, char ColorMask,
         break;
     case smPacked:
     case smShaped:
-	if (M == smShaped) {
+        if (M == smShaped) {
             if (LastOpaquePixel > -1) {
                 if (LastOpaquePixel < len - 1) {
                     len = LastOpaquePixel + 1;
-		        }
+                        }
             } else {
                 len = 0;
             }
    }
         i = 0;
         while (len) {
-	    signed analyselen;
-	    analyselen = len;
-	    if (analyselen > 32) {
+            signed analyselen;
+            analyselen = len;
+            if (analyselen > 32) {
                 analyselen = 32;
-	    }
+            }
             if (GetNextChunk(&count, analyselen, LineBuffer + i, ColorBits) == 'P') {
                 /* Make runlength packet */
                 V = LineBuffer[i];
-		i += count;
-		len -= count;
+                i += count;
+                len -= count;
                 AssembleByte(5, count-1);
                 AssembleByte(ColorBits, V & ColorMask);
 
@@ -468,8 +468,8 @@ static void encodeSprite(StrBuf *D, enum Mode M, char ColorBits, char ColorMask,
                 AssembleByte(5, (count-1) | 0x10);
                 do {
                     AssembleByte(ColorBits, LineBuffer[i]);
-		    i++;
-		    len--;
+                    i++;
+                    len--;
                 } while (--count > 0);
             }
         }
@@ -537,75 +537,75 @@ StrBuf* GenLynxSprite (const Bitmap* B, const Collection* A)
 
     /* Now check how to do the mapping */
     if (GetPenpal (B, A, &PenPal[0])) {
-	    signed I;
+            signed I;
 
-	    /* Modify the map by content of PenPal */
-	    PenColors = strlen(PenPal);
-	    for (I = 0; I < PenColors; I++) {
-	        switch (PenPal[I]) {
+            /* Modify the map by content of PenPal */
+            PenColors = strlen(PenPal);
+            for (I = 0; I < PenColors; I++) {
+                switch (PenPal[I]) {
             case '0':
-	            Map[0] = I;
-		        break;
+                    Map[0] = I;
+                        break;
             case '1':
-	            Map[1] = I;
-		        break;
+                    Map[1] = I;
+                        break;
             case '2':
-	            Map[2] = I;
-		        break;
+                    Map[2] = I;
+                        break;
             case '3':
-	            Map[3] = I;
-		        break;
+                    Map[3] = I;
+                        break;
             case '4':
-	            Map[4] = I;
-		        break;
+                    Map[4] = I;
+                        break;
             case '5':
-	            Map[5] = I;
-		        break;
+                    Map[5] = I;
+                        break;
             case '6':
-	            Map[6] = I;
-		        break;
+                    Map[6] = I;
+                        break;
             case '7':
-	            Map[7] = I;
-		        break;
+                    Map[7] = I;
+                        break;
             case '8':
-	            Map[8] = I;
-		        break;
+                    Map[8] = I;
+                        break;
             case '9':
-	            Map[9] = I;
-		        break;
+                    Map[9] = I;
+                        break;
             case 'a':
             case 'A':
-	            Map[10] = I;
-		        break;
+                    Map[10] = I;
+                        break;
             case 'b':
             case 'B':
-	            Map[11] = I;
-		        break;
+                    Map[11] = I;
+                        break;
             case 'c':
             case 'C':
-	            Map[12] = I;
-		        break;
+                    Map[12] = I;
+                        break;
             case 'd':
             case 'D':
-	            Map[13] = I;
-		        break;
+                    Map[13] = I;
+                        break;
             case 'e':
             case 'E':
-	            Map[14] = I;
-		        break;
+                    Map[14] = I;
+                        break;
             case 'f':
             case 'F':
-	            Map[15] = I;
-		        break;
-	        /* The X is reserved as transparency. This allows for shaped sprites */
+                    Map[15] = I;
+                        break;
+                /* The X is reserved as transparency. This allows for shaped sprites */
             case 'x':
             case 'X':
-	            Map[16] = I;
-		        break;
-	        }
-	    }
+                    Map[16] = I;
+                        break;
+                }
+            }
     } else {
-	    PenColors = GetBitmapColors (B);
+            PenColors = GetBitmapColors (B);
     }
     ColorBits = 4;
     if (PenColors < 9) {
@@ -643,183 +643,183 @@ StrBuf* GenLynxSprite (const Bitmap* B, const Collection* A)
     SB_Realloc (D, 63);
 
     for (quad = 0; quad < 4; quad++) {
-	switch ((Quadrant + quad) & 3) {
-	case 0:
-	    /* Convert the image for quadrant bottom right */
-	    for (Y = OY; Y < (signed)GetBitmapHeight (B); ++Y) {
-	        signed i = 0;
-	        signed LastOpaquePixel = -1;
-	        char LineBuffer[512]; /* The maximum size is 508 pixels */
+        switch ((Quadrant + quad) & 3) {
+        case 0:
+            /* Convert the image for quadrant bottom right */
+            for (Y = OY; Y < (signed)GetBitmapHeight (B); ++Y) {
+                signed i = 0;
+                signed LastOpaquePixel = -1;
+                char LineBuffer[512]; /* The maximum size is 508 pixels */
 
-	        /* Fill the LineBuffer for easier optimisation */
-	        for (X = OX; X < (signed)GetBitmapWidth (B); ++X) {
-		    /* Fetch next bit into byte buffer */
-		    Val = GetPixel (B, X, Y).Index;
-		    if (Val > 16) Val = 16;
-		    LineBuffer[i] = Map[Val] & ColorMask;
+                /* Fill the LineBuffer for easier optimisation */
+                for (X = OX; X < (signed)GetBitmapWidth (B); ++X) {
+                    /* Fetch next bit into byte buffer */
+                    Val = GetPixel (B, X, Y).Index;
+                    if (Val > 16) Val = 16;
+                    LineBuffer[i] = Map[Val] & ColorMask;
 
-		    if (Val != EdgeIndex) {
-		        LastOpaquePixel = i;
-		    }
-		    ++i;
-		}
+                    if (Val != EdgeIndex) {
+                        LastOpaquePixel = i;
+                    }
+                    ++i;
+                }
 
-		encodeSprite(D, M, ColorBits, ColorMask, LineBuffer, i, LastOpaquePixel);
-	    }
-	    if ((OY == 0) && (OX == 0)) {
-	        /* Trivial case only one quadrant */
+                encodeSprite(D, M, ColorBits, ColorMask, LineBuffer, i, LastOpaquePixel);
+            }
+            if ((OY == 0) && (OX == 0)) {
+                /* Trivial case only one quadrant */
 
-	        /* Mark end of sprite */
-	        SB_AppendChar (D, 0);
+                /* Mark end of sprite */
+                SB_AppendChar (D, 0);
 
-	        /* Return the converted bitmap */
-	        return D;
-	    }
-	    if ((quad == 1) && (OY == 0)) {
-		/* Special case only two quadrants */
+                /* Return the converted bitmap */
+                return D;
+            }
+            if ((quad == 1) && (OY == 0)) {
+                /* Special case only two quadrants */
 
-		/* Mark end of sprite */
-		SB_AppendChar (D, 0);
+                /* Mark end of sprite */
+                SB_AppendChar (D, 0);
 
-		/* Return the converted bitmap */
-		return D;
-	    }
-	    break;
-	case 1:
-	    /* Convert the image for quadrant top right */
-	    for (Y = OY - 1; Y >= 0; --Y) {
-		signed i = 0;
-		signed LastOpaquePixel = -1;
-		char LineBuffer[512]; /* The maximum size is 508 pixels */
+                /* Return the converted bitmap */
+                return D;
+            }
+            break;
+        case 1:
+            /* Convert the image for quadrant top right */
+            for (Y = OY - 1; Y >= 0; --Y) {
+                signed i = 0;
+                signed LastOpaquePixel = -1;
+                char LineBuffer[512]; /* The maximum size is 508 pixels */
 
-		/* Fill the LineBuffer for easier optimisation */
-		for (X = OX; X < (signed)GetBitmapWidth (B); ++X) {
-		    /* Fetch next bit into byte buffer */
-		    Val = GetPixel (B, X, Y).Index;
-		    if (Val > 16) Val = 16;
+                /* Fill the LineBuffer for easier optimisation */
+                for (X = OX; X < (signed)GetBitmapWidth (B); ++X) {
+                    /* Fetch next bit into byte buffer */
+                    Val = GetPixel (B, X, Y).Index;
+                    if (Val > 16) Val = 16;
 
-		    LineBuffer[i] = Map[Val] & ColorMask;
+                    LineBuffer[i] = Map[Val] & ColorMask;
 
-		    if (Val != EdgeIndex) {
-			LastOpaquePixel = i;
-		    }
-		    ++i;
-		}
+                    if (Val != EdgeIndex) {
+                        LastOpaquePixel = i;
+                    }
+                    ++i;
+                }
 
-		encodeSprite(D, M, ColorBits, ColorMask, LineBuffer, i, LastOpaquePixel);
-	    }
+                encodeSprite(D, M, ColorBits, ColorMask, LineBuffer, i, LastOpaquePixel);
+            }
 
-	    if ((OY == GetBitmapHeight (B) - 1) && (OX == 0)) {
-	        /* Trivial case only one quadrant */
+            if ((OY == GetBitmapHeight (B) - 1) && (OX == 0)) {
+                /* Trivial case only one quadrant */
 
-	        /* Mark end of sprite */
-	        SB_AppendChar (D, 0);
+                /* Mark end of sprite */
+                SB_AppendChar (D, 0);
 
-	        /* Return the converted bitmap */
-	        return D;
-	    }
-	    if ((quad == 1) && (OX == 0)) {
-		/* Special case only two quadrants */
+                /* Return the converted bitmap */
+                return D;
+            }
+            if ((quad == 1) && (OX == 0)) {
+                /* Special case only two quadrants */
 
-		/* Mark end of sprite */
-		SB_AppendChar (D, 0);
+                /* Mark end of sprite */
+                SB_AppendChar (D, 0);
 
-		/* Return the converted bitmap */
-		return D;
-	    }
-	    break;
-	case 2:
-	    /* Convert the image for quadrant top left */
-	    for (Y = OY - 1; Y >= 0; --Y) {
-		signed i = 0;
-		signed LastOpaquePixel = -1;
-		char LineBuffer[512]; /* The maximum size is 508 pixels */
+                /* Return the converted bitmap */
+                return D;
+            }
+            break;
+        case 2:
+            /* Convert the image for quadrant top left */
+            for (Y = OY - 1; Y >= 0; --Y) {
+                signed i = 0;
+                signed LastOpaquePixel = -1;
+                char LineBuffer[512]; /* The maximum size is 508 pixels */
 
-		/* Fill the LineBuffer for easier optimisation */
-		for (X = OX - 1; X >= 0; --X) {
-		    /* Fetch next bit into byte buffer */
-		    Val = GetPixel (B, X, Y).Index;
-		    if (Val > 16) Val = 16;
+                /* Fill the LineBuffer for easier optimisation */
+                for (X = OX - 1; X >= 0; --X) {
+                    /* Fetch next bit into byte buffer */
+                    Val = GetPixel (B, X, Y).Index;
+                    if (Val > 16) Val = 16;
 
-		    LineBuffer[i] = Map[Val] & ColorMask;
+                    LineBuffer[i] = Map[Val] & ColorMask;
 
-		    if (Val != EdgeIndex) {
-			LastOpaquePixel = i;
-		    }
-		    ++i;
-		}
+                    if (Val != EdgeIndex) {
+                        LastOpaquePixel = i;
+                    }
+                    ++i;
+                }
 
-		encodeSprite(D, M, ColorBits, ColorMask, LineBuffer, i, LastOpaquePixel);
-	    }
-	    if ((OY == GetBitmapHeight (B) - 1) && (OX == GetBitmapWidth (B) - 1)) {
-	        /* Trivial case only one quadrant */
+                encodeSprite(D, M, ColorBits, ColorMask, LineBuffer, i, LastOpaquePixel);
+            }
+            if ((OY == GetBitmapHeight (B) - 1) && (OX == GetBitmapWidth (B) - 1)) {
+                /* Trivial case only one quadrant */
 
-	        /* Mark end of sprite */
-	        SB_AppendChar (D, 0);
+                /* Mark end of sprite */
+                SB_AppendChar (D, 0);
 
-	        /* Return the converted bitmap */
-	        return D;
-	    }
-	    if ((quad == 1) && (OY == GetBitmapHeight (B) - 1)) {
-		/* Special case only two quadrants */
+                /* Return the converted bitmap */
+                return D;
+            }
+            if ((quad == 1) && (OY == GetBitmapHeight (B) - 1)) {
+                /* Special case only two quadrants */
 
-		/* Mark end of sprite */
-		SB_AppendChar (D, 0);
+                /* Mark end of sprite */
+                SB_AppendChar (D, 0);
 
-		/* Return the converted bitmap */
-		return D;
-	    }
-	    break;
-	case 3:
-	    /* Convert the image for quadrant bottom left */
-	    for (Y = OY; Y < (signed)GetBitmapHeight (B); ++Y) {
-		signed i = 0;
-		signed LastOpaquePixel = -1;
-		char LineBuffer[512]; /* The maximum size is 508 pixels */
+                /* Return the converted bitmap */
+                return D;
+            }
+            break;
+        case 3:
+            /* Convert the image for quadrant bottom left */
+            for (Y = OY; Y < (signed)GetBitmapHeight (B); ++Y) {
+                signed i = 0;
+                signed LastOpaquePixel = -1;
+                char LineBuffer[512]; /* The maximum size is 508 pixels */
 
-		/* Fill the LineBuffer for easier optimisation */
-		for (X = OX - 1; X >= 0; --X) {
-		    /* Fetch next bit into byte buffer */
-		    Val = GetPixel (B, X, Y).Index;
-		    if (Val > 16) Val = 16;
+                /* Fill the LineBuffer for easier optimisation */
+                for (X = OX - 1; X >= 0; --X) {
+                    /* Fetch next bit into byte buffer */
+                    Val = GetPixel (B, X, Y).Index;
+                    if (Val > 16) Val = 16;
 
-		    LineBuffer[i] = Map[Val] & ColorMask;
+                    LineBuffer[i] = Map[Val] & ColorMask;
 
-		    if (Val != EdgeIndex) {
-			LastOpaquePixel = i;
-		    }
-		    ++i;
-		}
+                    if (Val != EdgeIndex) {
+                        LastOpaquePixel = i;
+                    }
+                    ++i;
+                }
 
-		encodeSprite(D, M, ColorBits, ColorMask, LineBuffer, i, LastOpaquePixel);
-	    }
-	    if ((OY == 0) && (OX == GetBitmapWidth (B) - 1)) {
-	        /* Trivial case only one quadrant */
+                encodeSprite(D, M, ColorBits, ColorMask, LineBuffer, i, LastOpaquePixel);
+            }
+            if ((OY == 0) && (OX == GetBitmapWidth (B) - 1)) {
+                /* Trivial case only one quadrant */
 
-	        /* Mark end of sprite */
-	        SB_AppendChar (D, 0);
+                /* Mark end of sprite */
+                SB_AppendChar (D, 0);
 
-	        /* Return the converted bitmap */
-	        return D;
-	    }
-	    if ((quad == 1) && (OX == GetBitmapWidth (B) - 1)) {
-		/* Special case only two quadrants */
+                /* Return the converted bitmap */
+                return D;
+            }
+            if ((quad == 1) && (OX == GetBitmapWidth (B) - 1)) {
+                /* Special case only two quadrants */
 
-		/* Mark end of sprite */
-		SB_AppendChar (D, 0);
+                /* Mark end of sprite */
+                SB_AppendChar (D, 0);
 
-		/* Return the converted bitmap */
-		return D;
-	    }
-	    break;
-	}
-	if (quad < 3) {
+                /* Return the converted bitmap */
+                return D;
+            }
+            break;
+        }
+        if (quad < 3) {
             /* Next quadrant */
             SB_AppendChar (D, 1);
-	} else {
+        } else {
             /* End sprite */
             SB_AppendChar (D, 0);
-	}
+        }
     }
 
     /* Return the converted bitmap */

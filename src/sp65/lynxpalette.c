@@ -62,10 +62,13 @@ StrBuf* GenLynxPalette (const Bitmap* B, const Collection* A)
 */
 {
     StrBuf* D;
-    Palette* P;
+    const Palette* P = GetBitmapPalette (B);
+    const char* Format = GetAttrVal(A, "format");
     unsigned I;
 
-    P = GetBitmapPalette (B);
+    if (Format == 0) {
+        /* No format specified */
+    }
     D = NewStrBuf ();
     for (I = 0; I < 16; ++I) {
 

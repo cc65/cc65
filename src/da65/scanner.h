@@ -90,6 +90,7 @@ typedef enum token_t {
     INFOTOK_START,
     INFOTOK_END,
     INFOTOK_TYPE,
+    INFOTOK_ADDRMODE,
 
     INFOTOK_CODE,
     INFOTOK_BYTETAB,

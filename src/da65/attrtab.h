@@ -66,15 +66,22 @@ typedef enum attr_t {
     atDepLabel     = 0x0040,    /* Dependent label */
     atUnnamedLabel = 0x0080,    /* Unnamed label */
 
-    atLabelDefined = 0x0100,    /* True if we defined the label */
-
-    atStyleMask    = 0x000F,    /* Output style */
-    atLabelMask    = 0x00F0,    /* Label information */
-
     /* Segment */
     atSegment      = 0x0100,    /* Code is in a segment */
     atSegmentEnd   = 0x0200,    /* Segment end */
     atSegmentStart = 0x0400,    /* Segment start */
+
+    /* 65816 addressing mode */
+    atMem8         = 0x1000,    /* M flag enabled, 8-bit */
+    atMem16        = 0x2000,    /* M flag disabled, 16-bit */
+    atIdx8         = 0x4000,    /* X flag enabled, 8-bit */
+    atIdx16        = 0x8000,    /* X flag disabled, 16-bit */
+
+    atStyleMask    = 0x000F,    /* Output style */
+    atLabelMask    = 0x00F0,    /* Label information */
+    atSegmentMask  = 0x0F00,    /* Segment information */
+    at65816Mask    = 0xF000,    /* 65816 information */
+
 } attr_t;
 
 
@@ -87,6 +94,9 @@ typedef enum attr_t {
 
 void AddrCheck (unsigned Addr);
 /* Check if the given address has a valid range */
+
+unsigned char IsLongAddr (unsigned Addr);
+/* Check if the given address is 24-bit */
 
 attr_t GetAttr (unsigned Addr);
 /* Return the attribute for the given address */

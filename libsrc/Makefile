@@ -27,6 +27,7 @@ TARGETS = apple2       \
           $(CBMS)      \
           $(GEOS)      \
           gamate       \
+          kim1         \
           lynx         \
           nes          \
           none         \

@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                  main.c                                   */
+/*                              main.c                                       */
 /*                                                                           */
 /*            Main program of the sp65 sprite and bitmap utility             */
 /*                                                                           */
@@ -47,6 +47,7 @@
 /* sp65 */
 #include "attr.h"
 #include "convert.h"
+#include "palconv.h"
 #include "error.h"
 #include "input.h"
 #include "output.h"
@@ -68,10 +69,13 @@ static Bitmap* C;
 /* Output data from convertion */
 static StrBuf* D;
 
+/* Output data from palconv */
+static StrBuf* E;
+
 
 
 /*****************************************************************************/
-/*                                   Code                                    */
+/*                                                             Code                                       */
 /*****************************************************************************/
 
 
@@ -88,11 +92,11 @@ static void Usage (void)
             "  -lc\t\t\t\tList all possible conversions\n"
             "  -r file[,attrlist]\t\tRead an input file\n"
             "  -v\t\t\t\tIncrease verbosity\n"
+            "  -p tgt,file[,attrlist]\t\tWrite the palette to a file\n"
             "  -w file[,attrlist]\t\tWrite the output to a file\n"
             "\n"
             "Long options:\n"
             "  --convert-to fmt[,attrlist]\tConvert into target format\n"
-            "  --dump-palette\t\tDump palette as table\n"
             "  --help\t\t\tHelp (this text)\n"
             "  --list-conversions\t\tList all possible conversions\n"
             "  --pop\t\t\t\tRestore the original loaded image\n"
@@ -100,6 +104,7 @@ static void Usage (void)
             "  --slice x,y,w,h\t\tGenerate a slice from the loaded bitmap\n"
             "  --verbose\t\t\tIncrease verbosity\n"
             "  --version\t\t\tPrint the version number and exit\n"
+            "  --palette tgt,file[,attrlist]\tWrite the palette to a file\n"
             "  --write file[,attrlist]\tWrite the output to a file\n",
             ProgName);
 }
@@ -134,6 +139,21 @@ static void SetOutputData (StrBuf* N)
 
     /* Set the new one */
     D = N;
+}
+
+
+static void SetPalOutputData (StrBuf* N)
+/* Delete the old output data and replace it by the given one. The new one
+** may be NULL to clear it.
+*/
+{
+    /* Delete the old output data */
+    if (E != 0) {
+        FreeStrBuf (E);
+    }
+
+    /* Set the new one */
+    E = N;
 }
 
 
@@ -282,14 +302,44 @@ static void OptVerbose (const char* Opt attribute ((unused)),
 
 
 static void OptVersion (const char* Opt attribute ((unused)),
-                        const char* Arg attribute ((unused)))
+                          const char* Arg attribute ((unused)))
 /* Print the assembler version */
 {
     fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
-    exit(EXIT_SUCCESS);
 }
 
 
+
+static void OptPalette (const char* Opt attribute ((unused)), const char* Arg)
+/* Write an output file */
+{
+    static const char* const NameList[] = {
+        "target", "name", "format"
+    };
+
+
+    /* Parse the argument */
+    Collection* A = ParseAttrList (Arg, NameList, 2);
+
+    /* We must have a bitmap ... */
+    if (C == 0) {
+        Error ("No bitmap");
+    }
+
+    /* ... which must be indexed */
+    if (!BitmapIsIndexed (C)) {
+        Error ("Current bitmap is not indexed");
+    }
+
+    /* Convert the palette */
+    SetPalOutputData (PaletteTo (C, A));
+
+    /* Write the file */
+    WriteOutputFile (E, A, C);
+
+    /* Delete the attribute list */
+    FreeAttrList (A);
+}
 
 static void OptWrite (const char* Opt attribute ((unused)), const char* Arg)
 /* Write an output file */
@@ -379,6 +429,10 @@ int main (int argc, char* argv [])
 
                 case 'v':
                     OptVerbose (Arg, 0);
+                    break;
+
+                case 'p':
+                    OptPalette (Arg, GetArg (&I, 2));
                     break;
 
                 case 'w':

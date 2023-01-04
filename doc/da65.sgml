@@ -522,6 +522,11 @@ following attributes are recognized:
 
   </descrip>
 
+  <tag><tt>UNIT</tt></tag>
+  Split the table into sections of this size. For example, if you have a
+  ByteTable of size 48, but it has logical groups of size 16, specifying
+  16 for UNIT adds newlines after every 16 bytes. UNIT is always in bytes.
+
   <tag><tt>ADDRMODE</tt></tag>
   When disassembling 65816 code, this specifies the M and X flag states
   for this range. It's a string argument of the form "mx", capital letters

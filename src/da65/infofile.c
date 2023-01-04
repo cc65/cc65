@@ -528,6 +528,7 @@ static void RangeSection (void)
         {   "START",            INFOTOK_START    },
         {   "TYPE",             INFOTOK_TYPE     },
         {   "ADDRMODE",         INFOTOK_ADDRMODE },
+        {   "UNIT",             INFOTOK_UNIT     },
     };
 
     static const IdentTok TypeDefs[] = {
@@ -552,6 +553,7 @@ static void RangeSection (void)
         tName     = 0x08,
         tComment  = 0x10,
         tAddrMode = 0x20,
+        tUnit     = 0x40,
         tNeeded = (tStart | tEnd | tType)
     };
     unsigned Attributes = tNone;
@@ -564,6 +566,7 @@ static void RangeSection (void)
     char* Name          = 0;
     char* Comment       = 0;
     unsigned MemberSize = 0;
+    unsigned Unit       = 0;
 
 
     /* Skip the token */
@@ -682,6 +685,15 @@ static void RangeSection (void)
                 InfoNextTok ();
                 break;
 
+            case INFOTOK_UNIT:
+                AddAttr ("UNIT", &Attributes, tUnit);
+                InfoNextTok ();
+                InfoAssureInt ();
+                InfoRangeCheck (0x0002, 0xFFFF);
+                Unit = InfoIVal;
+                InfoNextTok ();
+                break;
+
             default:
                 Internal ("Unexpected token: %u", InfoTok);
         }
@@ -702,6 +714,26 @@ static void RangeSection (void)
         }
         if (Type != atCode && (Attributes & tAddrMode)) {
             InfoError ("AddrMode is only valid for code sections");
+        }
+    }
+
+    /* Only tables support unit sizes */
+    if ((Attributes & tUnit) &&
+        Type != atAddrTab &&
+        Type != atByteTab &&
+        Type != atDByteTab &&
+        Type != atDWordTab &&
+        Type != atRtsTab &&
+        Type != atTextTab &&
+        Type != atWordTab) {
+        InfoError ("Only table types support unit size");
+    }
+
+    /* Mark each unit separator */
+    if (Attributes & tUnit) {
+        unsigned i;
+        for (i = Start; i < End; i += Unit) {
+            MarkAddr(i, atTableUnit);
         }
     }
 

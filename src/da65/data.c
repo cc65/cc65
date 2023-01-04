@@ -70,7 +70,7 @@ static unsigned GetSpan (attr_t Style)
         if ((Attr & atStyleMask) != Style) {
             break;
         }
-        if ((Attr & (atSegmentStart | atSegmentEnd))) {
+        if ((Attr & (atSegmentStart | atSegmentEnd | atTableUnit))) {
             break;
         }
         ++Count;

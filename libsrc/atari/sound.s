@@ -16,7 +16,7 @@
         pha             ;save in stack
         jsr popa        ;get voice
         asl a           ;adjust voice *2 for offset in x
-        tax 
+        tax
         pla             ;get pitch from stack
         sta AUDF1,x     ;store pitch
         lda #0

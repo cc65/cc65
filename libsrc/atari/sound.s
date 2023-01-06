@@ -8,7 +8,7 @@
         .export         _sound
         .import         popa
 ; play sound, arguments: voice, pitch, distortion, volume. same as BASIC
-.proc  _sound
+.proc   _sound
         sta STORE2      ;save volume
         jsr popa        ;get distortion
         sta STORE1      ;save distortion 

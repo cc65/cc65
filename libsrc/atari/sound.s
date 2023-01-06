@@ -11,7 +11,7 @@
 .proc   _sound
         sta STORE2      ;save volume
         jsr popa        ;get distortion
-        sta STORE1      ;save distortion 
+        sta STORE1      ;save distortion
         jsr popa        ;get pitch
         pha             ;save in stack
         jsr popa        ;get voice

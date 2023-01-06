@@ -34,6 +34,6 @@
         rts
 .endproc
                         ;reserve 2 bytes for temp storage
-           .bss
+        .bss
 STORE1: .res    1
 STORE2: .res    1

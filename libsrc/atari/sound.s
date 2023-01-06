@@ -28,7 +28,7 @@
         asl a
         asl a
         asl a
-        clc             ;setup for adding volume 
+        clc             ;setup for adding volume
         adc STORE2      ;add volume
         sta AUDC1,x     ;volume + distortion in control channel
         rts

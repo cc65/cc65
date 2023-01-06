@@ -25,8 +25,8 @@
         stx SKCTL       ;init sound
         lda STORE1      ;get distortion
         asl a           ;ignore the high nibble
-        asl a 
-        asl a 
+        asl a
+        asl a
         asl a
         clc             ;setup for adding volume 
         adc STORE2      ;add volume

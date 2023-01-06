@@ -5,7 +5,6 @@
 ; atari lib
 ;
         .include "atari.inc"
-
         .export         _sound
         .import         popa
 ; play sound, arguments: voice, pitch, distortion, volume. same as BASIC
@@ -15,18 +14,15 @@
        sta STORE1    ;save distortion 
        jsr popa      ;get pitch
        pha           ;save in stack
-       jsr popa      ;get voice
-       
-       asl a         ;adjust voice *2 for offset in x
+       jsr popa     ;get voice
+       asl a        ;adjust voice *2 for offset in x
        tax 
-       pla           ;get pitch from stack
-       sta AUDF1,x ; store pitch
-       
+       pla          ;get pitch from stack
+       sta AUDF1,x  ; store pitch
        lda #0
        sta AUDCTL
        lda #3
-       stx SKCTL  ; init sound
-
+       stx SKCTL    ;init sound
        lda STORE1    ;get distortion
        asl a         ;ignore the high nibble
        asl a 

@@ -1,5 +1,5 @@
 /*
-** testprogram printing the default device
+** Test program for _sound for atari
 **
 **  January 6 2023 Mariano Domínguez
 */
@@ -13,8 +13,8 @@ int main(void)
 {
     int i=0;
     printf("playing sound \n");
-    sound(1,121,10,15);
+    _sound(1,121,10,15); //voice, pitch, distortion, volume
     for(i=0;i<9000;i++);
-    sound(1,0,0,0);
+    _sound(1,0,0,0); //silencing, same as Atari Basic
     return 0;
 }

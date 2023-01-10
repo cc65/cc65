@@ -5,10 +5,10 @@
 ; atari lib
 ;
         .include "atari.inc"
-        .export         _sound
+        .export         __sound
         .import         popa
 ; play sound, arguments: voice, pitch, distortion, volume. same as BASIC
-.proc   _sound
+.proc   __sound
         sta STORE2      ;save volume
         jsr popa        ;get distortion
         sta STORE1      ;save distortion

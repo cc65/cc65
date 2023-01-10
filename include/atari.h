@@ -239,7 +239,7 @@ extern void __fastcall__ _scroll (signed char numlines);
 /*    Sound function                                                         */
 /*****************************************************************************/
 
-extern void  __fastcall__ _sound (unsigned char voice, unsigned char frequency, unsigned char distortion, unsigned char volume); 
+extern void  __fastcall__ _sound (unsigned char voice, unsigned char frequency, unsigned char distortion, unsigned char volume);
 
 /*****************************************************************************/
 /* Misc. functions                                                           */

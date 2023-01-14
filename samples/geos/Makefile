@@ -80,6 +80,14 @@ EXELIST_geos-apple = \
 ifneq ($(EXELIST_$(SYS)),)
 samples: $(EXELIST_$(SYS))
 	$(foreach dir,$(DIRLIST),$(SUBDIR_recipe))
+
+define samples-geos
+c1541 -attach $(0).d64 -geoswrite $(1);
+endef
+
+samples-geos: $(EXELIST_$(SYS))
+	c1541 -format "$@,01" d64 $@.d64
+	$(foreach tool,$(EXELIST_$(SYS)),$(call samples-geos,$(tool)))
 else
 samples:
   ifeq ($(MAKELEVEL),0)

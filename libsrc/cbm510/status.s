@@ -5,7 +5,7 @@
         .export         initst
 
         .include        "extzp.inc"
-        .include        "cbm610.inc" 
+        .include        "cbm510.inc"
 
 .proc   initst
 

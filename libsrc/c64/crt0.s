@@ -10,9 +10,9 @@
         .import         BSOUT
         .import         __MAIN_START__, __MAIN_SIZE__   ; Linker generated
         .import         __STACKSIZE__                   ; from configure file
-        .importzp       ST
 
         .include        "zeropage.inc"
+        .include        "c64.inc"
 
 
 ; ------------------------------------------------------------------------
@@ -62,7 +62,7 @@ L2:     lda     zpsave,x
 ; Place the program return code into BASIC's status variable.
 
         pla
-        sta     ST
+        sta     STATUS
 
 ; Restore the system stuff.
 

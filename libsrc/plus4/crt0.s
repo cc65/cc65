@@ -11,7 +11,6 @@
         .import         __INTERRUPTOR_COUNT__
         .import         __MAIN_START__, __MAIN_SIZE__   ; Linker generated
         .import         __STACKSIZE__                   ; Linker generated
-        .importzp       ST
 
         .include        "zeropage.inc"
         .include        "plus4.inc"
@@ -106,7 +105,7 @@ L2:     lda     zpsave,x
 ; Place the program return code into BASIC's status variable.
 
         pla
-        sta     ST
+        sta     STATUS
 
 ; Restore the stack pointer.
 

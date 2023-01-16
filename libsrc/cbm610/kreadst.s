@@ -16,11 +16,9 @@
 
         jsr     sys_bank
         sty     ktmp                    ; Save Y register
-        ldy     #$9C                    ; STATUS
+        ldy     #STATUS
         lda     (sysp0),y               ; Load STATUS from system bank
         ldy     ktmp
         jmp     restore_bank            ; Will set condition codes on A
 
 .endproc
-
-

@@ -7,11 +7,13 @@
         .include "atari.inc"
         .export         __sound
         .import         popa
+        .importzp    tmp1,tmp2
+
 ; play sound, arguments: voice, pitch, distortion, volume. same as BASIC
 .proc   __sound
-        sta STORE2      ;save volume
+        sta tmp2        ;save volume
         jsr popa        ;get distortion
-        sta STORE1      ;save distortion
+        sta tmp1        ;save distortion
         jsr popa        ;get pitch
         pha             ;save in stack
         jsr popa        ;get voice
@@ -22,18 +24,14 @@
         lda #0
         sta AUDCTL
         lda #3
-        stx SKCTL       ;init sound
-        lda STORE1      ;get distortion
+        sta SKCTL       ;init sound
+        lda tmp1        ;get distortion
         asl a           ;ignore the high nibble
         asl a
         asl a
         asl a
         clc             ;setup for adding volume
-        adc STORE2      ;add volume
+        adc tmp2      ;add volume
         sta AUDC1,x     ;volume + distortion in control channel
         rts
 .endproc
-                        ;reserve 2 bytes for temp storage
-        .bss
-STORE1: .res    1
-STORE2: .res    1

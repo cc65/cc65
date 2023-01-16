@@ -39,6 +39,7 @@ EXELIST_atari = \
         multi.xex \
         ostype.xex \
         scrcode.com \
+        sound.xex \
         sys.xex
 
 ifneq ($(EXELIST_$(SYS)),)
@@ -74,7 +75,8 @@ scrcode.com: scrcode.s
 	$(CL) -t atari -C atari-asm.cfg -o scrcode.com scrcode.s
 sys.xex: sys.c
 	$(CL) -t atari -o sys.xex sys.c
-
+sound.xex: sound.c
+	$(CL) -t atari -o sound.xex sound.c
 clean:
 	@$(DEL) charmapping.xex 2>$(NULLDEV)
 	@$(DEL) defdev.xex 2>$(NULLDEV)
@@ -85,3 +87,4 @@ clean:
 	@$(DEL) scrcode.o 2>$(NULLDEV)
 	@$(DEL) scrcode.com 2>$(NULLDEV)
 	@$(DEL) sys.xex 2>$(NULLDEV)
+	@$(DEL) sound.xex 2>$(NULLDEV)

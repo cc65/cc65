@@ -31,7 +31,7 @@
         asl a
         asl a
         clc             ;setup for adding volume
-        adc tmp2      ;add volume
+        adc tmp2        ;add volume
         sta AUDC1,x     ;volume + distortion in control channel
         rts
 .endproc

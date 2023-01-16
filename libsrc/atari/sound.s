@@ -7,7 +7,7 @@
         .include "atari.inc"
         .export         __sound
         .import         popa
-        .importzp    tmp1,tmp2
+        .importzp       tmp1,tmp2
 
 ; play sound, arguments: voice, pitch, distortion, volume. same as BASIC
 .proc   __sound

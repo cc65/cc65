@@ -6135,7 +6135,8 @@ const cc65_lineinfo* cc65_line_byid (cc65_dbginfo Handle, unsigned Id)
 const cc65_lineinfo* cc65_line_bynumber (cc65_dbginfo Handle, unsigned FileId,
                                          cc65_line Line)
 /* Return line information for a source file/line number combination. The
-** function returns NULL if no line information was found.
+** function returns NULL if no line information was found, otherwise a list
+** of line infos.
 */
 {
     const DbgInfo*  Info;

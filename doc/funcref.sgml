@@ -1114,18 +1114,21 @@ considered random to a certain degree.
 <descrip>
 <tag/Function/Use the speaker to produce sound in a specified voice. (Atari only)
 <tag/Header/<tt/<ref id="atari.h" name="atari.h">/
-<tag/Declaration/<tt/void _sound (unsigned char voice, unsigned char pitch, unsigned char distortion, unsigned char volume);/
-<tag/Description/The function produces a sound with the specified parameters. using any of the 4 availble oscillators (voices) controlled by POKEY chip. Sound is non cpu-blocking and it keeps oscillating until program sends 0 in all the other parameters.
+<tag/Declaration/<tt/void __fastcall__ _sound (unsigned char voice, unsigned char pitch, unsigned char distortion, unsigned char volume);/
+<tag/Description/The function produces a sound with the specified parameters using any of the 4 available oscillators (voices) controlled by the POKEY chip. Sound is non cpu-blocking and it keeps oscillating until program sends 0 in all the other parameters.
 
 <tag/Notes/<itemize>
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
 <item>The function is specific to the Atari 8 bit.
 <item> Voice can be any of 0-3 different sound channels.
 <item> Pitch goes from 0-255 (about 125 Hz to 32 Khz).
 <item> Distortion (0-14) uses poly dividers to reshape wave in order to create a noise effect. Use 10 for a "pure" square-wave sound.
 <item>Volume (0-15) is the intensity for the wave.
 <item>Extra bits in those parameters will be ignored.
+<item>Parameters are the same as for the AtariBASIC SOUND statement.
 </itemize>
-<tag/Availability/cc65 (not all platforms)
+<tag/Availability/cc65 (<tt/atari/ and <tt/atarixl/ platforms)
 <tag/Example/
 <verb>
 
@@ -4186,7 +4189,7 @@ be used in presence of a prototype.
 <tag/Example/<verb>
 chdir (getdevicedir (device, buf, sizeof buf));
 </verb>
-cf. <tt/samples/enumdevdir.c/
+cf. <tt/samples&sol;enumdevdir.c/
 </descrip>
 </quote>
 

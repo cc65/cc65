@@ -2,14 +2,16 @@
 ; Mariano Domínguez
 ; 2022-12-4
 ;
-; atari lib
+; this file provides an equivalent to the BASIC SOUND function
+;
+; void  __fastcall__ _sound (unsigned char voice, unsigned char frequency, unsigned char distortion, unsigned char volume);
 ;
         .include "atari.inc"
         .export         __sound
         .import         popa
         .importzp       tmp1,tmp2
 
-; play sound, arguments: voice, pitch, distortion, volume. same as BASIC
+; play sound, arguments: voice, pitch, distortion, volume
 .proc   __sound
         sta tmp2        ;save volume
         jsr popa        ;get distortion

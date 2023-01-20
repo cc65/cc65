@@ -53,6 +53,7 @@
 #ifndef _WIN32
 #include <unistd.h>
 #include <termios.h>
+#include <signal.h>
 #endif
 
 /*****************************************************************************/

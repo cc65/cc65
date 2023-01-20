@@ -50,7 +50,7 @@
 #include "memory.h"
 #include "paravirt.h"
 
-#ifndef(_WIN32)
+#ifndef _WIN32
 #include <unistd.h>
 #include <termios.h>
 #endif
@@ -83,7 +83,7 @@ static const unsigned char HeaderVersion = 2;
 /*                                   Code                                    */
 /*****************************************************************************/
 
-#ifndef(_WIN32)
+#ifndef _WIN32
 void Exit() {
     tcsetattr(STDIN_FILENO, TCSANOW, &OldTermAttrs);
 }
@@ -327,7 +327,7 @@ int main (int argc, char* argv[])
 
     Reset ();
 
-#ifndef(_WIN32)
+#ifndef _WIN32
     if(SetTermAttrs) {
         tcgetattr(STDIN_FILENO, &OldTermAttrs);
         NewTermAttrs = OldTermAttrs;

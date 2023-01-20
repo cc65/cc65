@@ -296,7 +296,7 @@ static void PVWrite (CPURegs* Regs)
 
 static void PVKbhit (CPURegs* Regs)
 {
-#ifndef(_WIN32)
+#ifndef _WIN32
     struct timeval tv;
     fd_set fds;
     tv.tv_sec = 0;

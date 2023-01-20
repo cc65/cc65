@@ -35,10 +35,8 @@
 
 #include <string.h>
 #include <stdio.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <termios.h>
 
 /* common */
 #include "abend.h"
@@ -52,7 +50,10 @@
 #include "memory.h"
 #include "paravirt.h"
 
-
+#ifndef(_WIN32)
+#include <unistd.h>
+#include <termios.h>
+#endif
 
 /*****************************************************************************/
 /*                                   Data                                    */
@@ -82,9 +83,11 @@ static const unsigned char HeaderVersion = 2;
 /*                                   Code                                    */
 /*****************************************************************************/
 
+#ifndef(_WIN32)
 void Exit() {
     tcsetattr(STDIN_FILENO, TCSANOW, &OldTermAttrs);
 }
+#endif
 
 static void Usage (void)
 {
@@ -92,7 +95,7 @@ static void Usage (void)
             "Short options:\n"
             "  -h\t\t\tHelp (this text)\n"
             "  -c\t\t\tPrint amount of executed CPU cycles\n"
-            "  -t\t\t\tDisable term echo and buffering\n"
+            "  -t\t\t\tDisable term echo and buffering (*Nix only)\n"
             "  -v\t\t\tIncrease verbosity\n"
             "  -V\t\t\tPrint the simulator version number\n"
             "  -x <num>\t\tExit simulator after <num> cycles\n"
@@ -100,7 +103,7 @@ static void Usage (void)
             "Long options:\n"
             "  --help\t\tHelp (this text)\n"
             "  --cycles\t\tPrint amount of executed CPU cycles\n"
-            "  --termsetup\t\tDisable term echo and buffering\n"
+            "  --termsetup\t\tDisable term echo and buffering (*Nix only)\n"
             "  --verbose\t\tIncrease verbosity\n"
             "  --version\t\tPrint the simulator version number\n",
             ProgName);
@@ -324,6 +327,7 @@ int main (int argc, char* argv[])
 
     Reset ();
 
+#ifndef(_WIN32)
     if(SetTermAttrs) {
         tcgetattr(STDIN_FILENO, &OldTermAttrs);
         NewTermAttrs = OldTermAttrs;
@@ -331,6 +335,7 @@ int main (int argc, char* argv[])
         tcsetattr(STDIN_FILENO, TCSANOW, &NewTermAttrs);
         atexit(Exit);
     }
+#endif
 
     while (1) {
         ExecuteInsn ();

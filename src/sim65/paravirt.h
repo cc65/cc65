@@ -44,7 +44,7 @@
 
 
 
-#define PARAVIRT_BASE        0xFFF4
+#define PARAVIRT_BASE        0xFFF3
 /* Lowest address used by a paravirtualization hook */
 
 

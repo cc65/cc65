@@ -7,8 +7,9 @@
 ; int __fastcall__ write (int fd, const void* buf, unsigned count);
 ;
 
-        .export         exit, args, _open, _close, _read, _write
+        .export         exit, args, _open, _close, _read, _write, _kbhit
 
+_kbhit          := $FFF3
 _open           := $FFF4
 _close          := $FFF5
 _read           := $FFF6

@@ -37,6 +37,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <sys/time.h>
 #if defined(_WIN32)
 #  define O_INITIAL O_BINARY
 #else
@@ -292,9 +293,20 @@ static void PVWrite (CPURegs* Regs)
     SetAX (Regs, RetVal);
 }
 
-
+static void PVKbhit (CPURegs* Regs)
+{
+    struct timeval tv;
+    fd_set fds;
+    tv.tv_sec = 0;
+    tv.tv_usec = 0;
+    FD_ZERO(&fds);
+    FD_SET(STDIN_FILENO, &fds); //STDIN_FILENO is 0
+    select(STDIN_FILENO + 1, &fds, NULL, NULL, &tv);
+	SetAX (Regs, FD_ISSET(STDIN_FILENO, &fds));
+}
 
 static const PVFunc Hooks[] = {
+    PVKbhit,
     PVOpen,
     PVClose,
     PVRead,

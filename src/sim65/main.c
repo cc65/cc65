@@ -67,7 +67,9 @@ const char* ProgramFile;
 /* exit simulator after MaxCycles Cycles */
 unsigned long MaxCycles;
 unsigned char SetTermAttrs;
+#ifndef _WIN32
 static struct termios OldTermAttrs, NewTermAttrs;
+#endif
 
 /* Header signature 'sim65' */
 static const unsigned char HeaderSignature[] = {

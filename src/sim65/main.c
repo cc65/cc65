@@ -89,6 +89,9 @@ static const unsigned char HeaderVersion = 2;
 void Exit() {
     tcsetattr(STDIN_FILENO, TCSANOW, &OldTermAttrs);
 }
+void INT_Handler(int signal) {
+    exit(128 + signal);
+}
 #endif
 
 static void Usage (void)
@@ -340,6 +343,7 @@ int main (int argc, char* argv[])
         NewTermAttrs.c_lflag &= ~(ICANON) & ~(ECHO);
         tcsetattr(STDIN_FILENO, TCSANOW, &NewTermAttrs);
         atexit(Exit);
+        signal(SIGINT, INT_Handler);
     }
 #endif
 

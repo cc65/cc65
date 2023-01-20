@@ -34,8 +34,11 @@
 
 
 #include <string.h>
+#include <stdio.h>
+#include <unistd.h> 
 #include <stdlib.h>
 #include <errno.h>
+#include <termios.h>
 
 /* common */
 #include "abend.h"
@@ -62,6 +65,8 @@ const char* ProgramFile;
 
 /* exit simulator after MaxCycles Cycles */
 unsigned long MaxCycles;
+unsigned char SetTermAttrs;
+static struct termios OldTermAttrs, NewTermAttrs;
 
 /* Header signature 'sim65' */
 static const unsigned char HeaderSignature[] = {
@@ -77,7 +82,9 @@ static const unsigned char HeaderVersion = 2;
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
+void Exit() {
+    tcsetattr(STDIN_FILENO, TCSANOW, &OldTermAttrs);
+}
 
 static void Usage (void)
 {
@@ -85,6 +92,7 @@ static void Usage (void)
             "Short options:\n"
             "  -h\t\t\tHelp (this text)\n"
             "  -c\t\t\tPrint amount of executed CPU cycles\n"
+            "  -t\t\t\tDisable term echo and buffering\n"
             "  -v\t\t\tIncrease verbosity\n"
             "  -V\t\t\tPrint the simulator version number\n"
             "  -x <num>\t\tExit simulator after <num> cycles\n"
@@ -92,6 +100,7 @@ static void Usage (void)
             "Long options:\n"
             "  --help\t\tHelp (this text)\n"
             "  --cycles\t\tPrint amount of executed CPU cycles\n"
+            "  --termsetup\t\tDisable term echo and buffering\n"
             "  --verbose\t\tIncrease verbosity\n"
             "  --version\t\tPrint the simulator version number\n",
             ProgName);
@@ -133,6 +142,13 @@ static void OptVersion (const char* Opt attribute ((unused)),
 {
     fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
     exit(EXIT_SUCCESS);
+}
+
+static void OptTermSetup (const char* Opt attribute ((unused)),
+                       const char* Arg attribute ((unused)))
+/* Disable input echo and buffering */
+{
+	SetTermAttrs = 1;
 }
 
 static void OptQuitXIns (const char* Opt attribute ((unused)),
@@ -230,6 +246,7 @@ int main (int argc, char* argv[])
     static const LongOpt OptTab[] = {
         { "--help",             0,      OptHelp                 },
         { "--cycles",           0,      OptCycles               },
+        { "--termsetup",        0,      OptTermSetup            },
         { "--verbose",          0,      OptVerbose              },
         { "--version",          0,      OptVersion              },
     };
@@ -263,6 +280,10 @@ int main (int argc, char* argv[])
 
                 case 'c':
                     OptCycles (Arg, 0);
+                    break;
+
+                case 't':
+                    OptTermSetup (Arg, 0);
                     break;
 
                 case 'v':
@@ -302,6 +323,14 @@ int main (int argc, char* argv[])
     ParaVirtInit (I, SPAddr);
 
     Reset ();
+
+    if(SetTermAttrs) {
+        tcgetattr(STDIN_FILENO, &OldTermAttrs);
+        NewTermAttrs = OldTermAttrs;
+        NewTermAttrs.c_lflag &= ~(ICANON) & ~(ECHO);
+        tcsetattr(STDIN_FILENO, TCSANOW, &NewTermAttrs);
+        atexit(Exit);
+    }
 
     while (1) {
         ExecuteInsn ();

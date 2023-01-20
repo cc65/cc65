@@ -97,7 +97,9 @@ static void Usage (void)
             "Short options:\n"
             "  -h\t\t\tHelp (this text)\n"
             "  -c\t\t\tPrint amount of executed CPU cycles\n"
-            "  -t\t\t\tDisable term echo and buffering (*Nix only)\n"
+#ifndef _WIN32
+            "  -t\t\t\tDisable term echo and buffering\n"
+#endif
             "  -v\t\t\tIncrease verbosity\n"
             "  -V\t\t\tPrint the simulator version number\n"
             "  -x <num>\t\tExit simulator after <num> cycles\n"
@@ -105,7 +107,9 @@ static void Usage (void)
             "Long options:\n"
             "  --help\t\tHelp (this text)\n"
             "  --cycles\t\tPrint amount of executed CPU cycles\n"
-            "  --termsetup\t\tDisable term echo and buffering (*Nix only)\n"
+#ifndef _WIN32
+            "  --termsetup\t\tDisable term echo and buffering\n"
+#endif
             "  --verbose\t\tIncrease verbosity\n"
             "  --version\t\tPrint the simulator version number\n",
             ProgName);

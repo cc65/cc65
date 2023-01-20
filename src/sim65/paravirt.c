@@ -302,7 +302,7 @@ static void PVKbhit (CPURegs* Regs)
     FD_ZERO(&fds);
     FD_SET(STDIN_FILENO, &fds); //STDIN_FILENO is 0
     select(STDIN_FILENO + 1, &fds, NULL, NULL, &tv);
-	SetAX (Regs, FD_ISSET(STDIN_FILENO, &fds));
+    SetAX (Regs, FD_ISSET(STDIN_FILENO, &fds));
 }
 
 static const PVFunc Hooks[] = {

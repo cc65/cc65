@@ -148,7 +148,7 @@ static void OptTermSetup (const char* Opt attribute ((unused)),
                        const char* Arg attribute ((unused)))
 /* Disable input echo and buffering */
 {
-	SetTermAttrs = 1;
+    SetTermAttrs = 1;
 }
 
 static void OptQuitXIns (const char* Opt attribute ((unused)),

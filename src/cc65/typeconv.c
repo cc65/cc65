@@ -238,10 +238,10 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
             **       void pointers, just with warnings.
             */
             if (Result.C == TC_PTR_SIGN_DIFF) {
-                /* Specific warning for pointee signedness difference */
+                /* Specific warning for pointer signess difference */
                 if (IS_Get (&WarnPointerSign)) {
                     TypeCompatibilityDiagnostic (NewType, Expr->Type,
-                        0, "Pointer conversion to '%s' from '%s' changes pointee signedness");
+                        0, "Pointer conversion to '%s' from '%s' changes pointer signess");
                 }
             } else if ((Result.C <= TC_PTR_INCOMPATIBLE ||
                  (Result.F & TCF_INCOMPATIBLE_QUAL) != 0)) {

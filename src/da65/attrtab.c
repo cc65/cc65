@@ -34,6 +34,7 @@
 
 
 /* da65 */
+#include "cpu.h"
 #include "error.h"
 #include "attrtab.h"
 
@@ -48,6 +49,12 @@
 /* Attribute table */
 static unsigned short AttrTab[0x10000];
 
+/* 65816 attribute table */
+#define MAX_LONG_ATTRS 256
+static unsigned short LongAttrVal[MAX_LONG_ATTRS];
+static unsigned LongAttrAddr[MAX_LONG_ATTRS];
+static unsigned LongAttrsUsed;
+
 
 
 /*****************************************************************************/
@@ -59,9 +66,16 @@ static unsigned short AttrTab[0x10000];
 void AddrCheck (unsigned Addr)
 /* Check if the given address has a valid range */
 {
-    if (Addr >= 0x10000) {
+    if (Addr >= 0x10000 && CPU != CPU_65816) {
         Error ("Address out of range: %08X", Addr);
     }
+}
+
+
+unsigned char IsLongAddr (unsigned Addr)
+/* Is it 24-bit? */
+{
+    return Addr >= 0x10000 && CPU == CPU_65816;
 }
 
 
@@ -71,6 +85,17 @@ attr_t GetAttr (unsigned Addr)
 {
     /* Check the given address */
     AddrCheck (Addr);
+
+    if (IsLongAddr (Addr)) {
+        unsigned i;
+        for (i = 0; i < LongAttrsUsed; i++) {
+            if (LongAttrAddr[i] == Addr) {
+                return LongAttrVal[i];
+            }
+        }
+
+        return 0;
+    }
 
     /* Return the attribute */
     return AttrTab[Addr];
@@ -148,6 +173,33 @@ void MarkAddr (unsigned Addr, attr_t Attr)
     /* Check the given address */
     AddrCheck (Addr);
 
+    if (IsLongAddr (Addr)) {
+        unsigned i;
+        for (i = 0; i < LongAttrsUsed; i++) {
+            if (LongAttrAddr[i] == Addr) {
+
+                /* We must not have more than one style bit */
+                if (Attr & atStyleMask) {
+                    if (LongAttrVal[i] & atStyleMask) {
+                        Error ("Duplicate style for long address %06X", Addr);
+                    }
+                }
+                LongAttrVal[i] |= Attr;
+
+                return;
+            }
+        }
+
+        if (LongAttrsUsed >= MAX_LONG_ATTRS) {
+            Error ("Too many long addresses");
+        }
+        LongAttrVal[LongAttrsUsed] |= Attr;
+        LongAttrAddr[LongAttrsUsed] = Addr;
+        LongAttrsUsed++;
+
+        return;
+    }
+
     /* We must not have more than one style bit */
     if (Attr & atStyleMask) {
         if (AttrTab[Addr] & atStyleMask) {
@@ -168,7 +220,7 @@ attr_t GetStyleAttr (unsigned Addr)
     AddrCheck (Addr);
 
     /* Return the attribute */
-    return (AttrTab[Addr] & atStyleMask);
+    return (GetAttr (Addr) & atStyleMask);
 }
 
 
@@ -180,5 +232,5 @@ attr_t GetLabelAttr (unsigned Addr)
     AddrCheck (Addr);
 
     /* Return the attribute */
-    return (AttrTab[Addr] & atLabelMask);
+    return (GetAttr (Addr) & atLabelMask);
 }

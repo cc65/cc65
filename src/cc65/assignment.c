@@ -624,7 +624,7 @@ void OpAssign (const GenDesc* Gen, ExprDesc* Expr, const char* Op)
     Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
 
     /* Only "=" accept struct/union */
-    if (IsClassStruct (ltype) ? Gen != 0 : !IsClassScalar (ltype)) {
+    if (IsClassStruct (ltype) ? Gen != 0 : !IsScalarType (ltype)) {
         Error ("Invalid left operand for binary operator '%s'", Op);
         /* Continue. Wrong code will be generated, but the compiler won't
         ** break, so this is the best error recovery.

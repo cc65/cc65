@@ -352,12 +352,12 @@ static unsigned ParseArrayInit (Type* T, int* Braces, int AllowFlexibleMembers)
     int HasCurly = 0;
 
     /* Get the array data */
-    Type* ElementType    = IndirectModifiable (T);
+    Type* ElementType    = GetElementTypeModifiable (T);
     unsigned ElementSize = SizeOf (ElementType);
     long ElementCount    = GetElementCount (T);
 
     /* Special handling for a character array initialized by a literal */
-    if (IsClassChar (ElementType) &&
+    if (IsDeclRankChar (ElementType) &&
         (CurTok.Tok == TOK_SCONST || CurTok.Tok == TOK_WCSCONST ||
         (CurTok.Tok == TOK_LCURLY &&
          (NextTok.Tok == TOK_SCONST || NextTok.Tok == TOK_WCSCONST)))) {
@@ -691,7 +691,7 @@ static unsigned ParseVoidInit (Type* T)
     Size = 0;
     do {
         ExprDesc Expr = NoCodeConstExpr (hie1);
-        switch (GetUnderlyingTypeCode (&Expr.Type[0])) {
+        switch (GetUnqualTypeCode (&Expr.Type[0])) {
 
             case T_SCHAR:
             case T_UCHAR:
@@ -759,7 +759,7 @@ static unsigned ParseVoidInit (Type* T)
 static unsigned ParseInitInternal (Type* T, int *Braces, int AllowFlexibleMembers)
 /* Parse initialization of variables. Return the number of data bytes. */
 {
-    switch (GetUnderlyingTypeCode (T)) {
+    switch (GetUnqualTypeCode (T)) {
 
         case T_SCHAR:
         case T_UCHAR:

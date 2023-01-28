@@ -181,9 +181,13 @@ The only exception to the above are actions that are exclusive to the github act
 
 * the printf family of function does not completely implement all printf modifiers and does not behave as expected in some cases - all this should be documented in detail
 
-## Floating point support
+## Compiler
 
-The first step is implementing the datatype "float" as IEEE488 floats. Help welcomed!
+* We need a way that makes it possible to feed arbitrary assembler code into the optimzer, so we can have proper tests for it
+
+### Floating point support
+
+The first step is implementing the datatype "float" as IEEE 754 floats. Help welcomed!
 
 * WIP compiler/library changes are here: https://github.com/cc65/cc65/pull/1777
 

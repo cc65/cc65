@@ -693,6 +693,17 @@ EXELIST_bbc = \
 EXELIST_lunix = \
 	notavailable
 
+# omitted: arg-test clock-test clock cpeek-test conio cprintf cursor deb dir-test
+# em-test exec-test1 exec-test2 fileio-test ft getopt-test heaptest joy-test
+# mouse-test mul-test posixio-test rename-test scanf-test seek ser-test strdup-test
+# stroserror-test uname-test
+EXELIST_kim1 = \
+	minimal \
+	div-test \
+	moddiv-test \
+	strnlen \
+	strqtok-test
+
 # Unlisted targets will try to build everything.
 # That lets us learn what they cannot build, and what settings
 # we need to use for programs that can be built and run.
@@ -742,6 +753,7 @@ TARGETS :=     \
   creativision \
   cx16         \
   gamate       \
+  kim1		   \
   lunix        \
   lynx         \
   nes          \

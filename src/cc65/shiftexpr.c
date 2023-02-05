@@ -169,32 +169,35 @@ void ShiftExpr (struct ExprDesc* Expr)
                 }
             }
 
-            /* If the shift count is zero, nothing happens. If the left hand
-            ** side is a constant, the result is constant.
-            */
-            if (Expr2.IVal == 0 || lconst) {
-
-                /* Set the type */
+            /* If the left hand side is a constant, the result is constant */
+            if (lconst) {
+                /* Set the result type */
                 Expr->Type = ResultType;
 
-                if (lconst) {
-
-                    /* Evaluate the result */
-                    switch (Tok) {
-                        case TOK_SHL: Expr->IVal <<= Expr2.IVal; break;
-                        case TOK_SHR: Expr->IVal >>= Expr2.IVal; break;
-                        default: /* Shutup gcc */                break;
-                    }
-
-                    /* Limit the calculated value to the range of its type */
-                    LimitExprValue (Expr, 1);
+                /* Evaluate the result */
+                switch (Tok) {
+                    case TOK_SHL: Expr->IVal <<= Expr2.IVal; break;
+                    case TOK_SHR: Expr->IVal >>= Expr2.IVal; break;
+                    default: /* Shutup gcc */                break;
                 }
+
+                /* Limit the calculated value to the range of its type */
+                LimitExprValue (Expr, 1);
 
                 /* Result is already got, remove the generated code */
                 RemoveCode (&Mark1);
 
                 /* Done */
                 continue;
+            }
+
+            /* If the shift count is zero, nothing happens */
+            if (Expr2.IVal == 0) {
+                /* Result is already got, remove the pushing code */
+                RemoveCode (&Mark2);
+
+                /* Be sure to mark the value as in the primary */
+                goto MakeRVal;
             }
 
             /* If we're shifting an integer or unsigned to the right, the lhs

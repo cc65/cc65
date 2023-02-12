@@ -6,8 +6,7 @@
 
         .export         initcwd, devicestr
         .import         curunit, __cwd
-        .import         pusha0, tosudiva0
-        .importzp       sreg, ptr1, ptr2
+        .importzp       tmp1, sreg, ptr2
 
 initcwd:
         lda     #<__cwd
@@ -21,9 +20,22 @@ initcwd:
 ; Convert unit number in A into string representation pointed to by ptr2.
 
 devicestr:
-        jsr     pusha0
-        lda     #10
-        jsr     tosudiva0
+; Divide by 10 by "Omegamatrix"
+; 17 bytes, 30 cycles
+        lsr
+        sta  tmp1
+        lsr
+        adc  tmp1
+        ror
+        lsr
+        lsr
+        adc  tmp1
+        ror
+        adc  tmp1
+        ror
+        lsr
+        lsr
+
         ldy     #0
         tax                     ; result of the division (lsb)
         beq     @L0             ; < 10

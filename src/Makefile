@@ -110,11 +110,21 @@ $(RM) /usr/local/bin/$(prog)
 
 endef # UNAVAIL_recipe
 
+define AVAIL_check_prog
+
+@if [ ! -e ../bin/$(prog) ]; then \
+    echo "failed to locate $(prog), please run make first"; \
+    false; \
+fi
+
+endef # AVAIL_check_prog
+
 install:
 	$(INSTALL) -d $(DESTDIR)$(bindir)
 	$(INSTALL) ../bin/* $(DESTDIR)$(bindir)
 
 avail:
+	$(foreach prog,$(PROGS),$(AVAIL_check_prog))
 	$(foreach prog,$(PROGS),$(AVAIL_recipe))
 
 unavail:

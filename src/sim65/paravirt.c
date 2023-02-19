@@ -63,6 +63,7 @@
 
 /* sim65 */
 #include "6502.h"
+#include "error.h"
 #include "memory.h"
 #include "paravirt.h"
 
@@ -166,7 +167,7 @@ static void PVArgs (CPURegs* Regs)
 
 static void PVOpen (CPURegs* Regs)
 {
-    char Path[1024];
+    char Path[PVOPEN_PATH_SIZE];
     int OFlag = O_INITIAL;
     int OMode = 0;
     unsigned RetVal, I = 0;
@@ -183,9 +184,15 @@ static void PVOpen (CPURegs* Regs)
     }
 
     do {
-        Path[I] = MemReadByte (Name++);
+        if (!(Path[I] = MemReadByte ((Name + I) & 0xFFFF))) {
+            break;
+        }
+        ++I;
+        if (I >= PVOPEN_PATH_SIZE) {
+            Error("PVOpen path too long at address $%04X",Name);
+        }
     }
-    while (Path[I++]);
+    while (1);
 
     Print (stderr, 2, "PVOpen (\"%s\", $%04X)\n", Path, Flags);
 

@@ -1936,6 +1936,11 @@ unsigned CfgProcess (void)
                       GetString (M->Name));
         }
         M->Size = GetExprVal (M->SizeExpr);
+        if (M->Size >= 0x80000000) {
+            CfgError (GetSourcePos (M->LI),
+                      "Size of memory area '%s' is negative: %ld",
+                      GetString (M->Name), (long)M->Size);
+        }
 
         /* Walk through the segments in this memory area */
         for (J = 0; J < CollCount (&M->SegList); ++J) {

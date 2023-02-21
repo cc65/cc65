@@ -559,6 +559,15 @@ static void OptVersion (const char* Opt attribute ((unused)),
 
 
 
+static void OptWarningsAsErrors (const char* Opt attribute ((unused)),
+                                 const char* Arg attribute ((unused)))
+/* Generate an error if any warnings occur */
+{
+    WarningsAsErrors = 1;
+}
+
+
+
 static void OptMultDef (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
 /* Set flag to allow multiple definitions of a global symbol */
@@ -637,6 +646,7 @@ static void ParseCommandLine(void)
         { "--start-group",               0,      CmdlOptStartGroup       },
         { "--target",                    1,      CmdlOptTarget           },
         { "--version",                   0,      OptVersion              },
+        { "--warnings-as-errors",        0,      OptWarningsAsErrors     },
     };
 
     unsigned I;
@@ -843,6 +853,10 @@ int main (int argc, char* argv [])
         }
         Error ("Cannot generate most of the files due to memory area overflow%c",
                (MemoryAreaOverflows > 1) ? 's' : ' ');
+    }
+
+    if (WarningCount > 0 && WarningsAsErrors) {
+        Error("Warnings as errors");
     }
 
     /* Create the output file */

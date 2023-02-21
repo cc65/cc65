@@ -69,6 +69,7 @@ extern unsigned char    LineCont;           /* Allow line continuation */
 extern unsigned char    LargeAlignment;     /* Don't warn about large alignments */
 extern unsigned char    RelaxChecks;        /* Relax a few assembler checks */
 extern unsigned char    StringEscapes;      /* Allow C-style escapes in strings */
+extern unsigned char    LongJsrJmpRts;      /* Allow JSR/JMP/RTS as alias for JSL/JML/RTL */
 
 /* Emulation features */
 extern unsigned char    DollarIsPC;         /* Allow the $ symbol as current PC */

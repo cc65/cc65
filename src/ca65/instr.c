@@ -1605,11 +1605,12 @@ static void PutJMP (const InsDesc* Ins)
     if (EvalEA (Ins, &A)) {
 
         /* Check for indirect addressing */
-        if (A.AddrModeBit & AM65_ABS_IND) {
+        if (A.AddrModeBit & AM65_ABS_IND && CPU < CPU_65SC02) {
 
             /* Compare the low byte of the expression to 0xFF to check for
             ** a page cross. Be sure to use a copy of the expression otherwise
-            ** things will go weird later.
+            ** things will go weird later. This only affects the 6502 CPU,
+            ** and was corrected in 65C02 and later CPUs in this family.
             */
             ExprNode* E = GenNE (GenByteExpr (CloneExpr (A.Expr)), 0xFF);
 
@@ -1617,7 +1618,7 @@ static void PutJMP (const InsDesc* Ins)
             unsigned Msg = GetStringId ("\"jmp (abs)\" across page border");
 
             /* Generate the assertion */
-            AddAssertion (E, ASSERT_ACT_WARN, Msg);
+            AddAssertion (E, ASSERT_ACT_ERROR, Msg);
         }
 
         /* No error, output code */

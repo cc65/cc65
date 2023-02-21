@@ -2112,14 +2112,15 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
   the assembler will force a segment alignment to the least common multiple of
-  15, 18 and 251 - which is 22590. To protect the user against errors, the
-  assembler will issue a warning when the combined alignment exceeds 256. The
-  command line option <tt><ref id="option--large-alignment"
-  name="--large-alignment"></tt> will disable this warning.
+  15, 18 and 251 - which is 22590. To protect the user against errors, when the
+  combined alignment is larger than the explicitly requested alignments,
+  and also exceeds 256, the assembler will issue a warning. The  command line
+  option <tt><ref id="option--large-alignment" name="--large-alignment"></tt>
+  will disable this warning.
 
   Please note that with alignments that are a power of two (which were the
-  only alignments possible in older versions of the assembler), the problem is
-  less severe, because the least common multiple of powers to the same base is
+  only alignments possible in older versions of the assembler) will not cause
+  a warning, because the least common multiple of powers to the same base is
   always the larger one.
 
 

@@ -2019,7 +2019,7 @@ Here's a list of all control commands and a description, what they do:
 
 <sect1><tt>.A16</tt><label id=".A16"><p>
 
-  Valid only in 65816 mode. Switch the accumulator to 16 bit.
+  Valid only in 65816 mode. Assume the accumulator is 16 bit.
 
   Note: This command will not emit any code, it will tell the assembler to
   create 16 bit operands for immediate accumulator addressing mode.
@@ -2029,7 +2029,7 @@ Here's a list of all control commands and a description, what they do:
 
 <sect1><tt>.A8</tt><label id=".A8"><p>
 
-  Valid only in 65816 mode. Switch the accumulator to 8 bit.
+  Valid only in 65816 mode. Assume the accumulator is 8 bit.
 
   Note: This command will not emit any code, it will tell the assembler to
   create 8 bit operands for immediate accu addressing mode.
@@ -3036,7 +3036,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
 
 <sect1><tt>.I16</tt><label id=".I16"><p>
 
-  Valid only in 65816 mode. Switch the index registers to 16 bit.
+  Valid only in 65816 mode. Assume the index registers are 16 bit.
 
   Note: This command will not emit any code, it will tell the assembler to
   create 16 bit operands for immediate operands.
@@ -3047,7 +3047,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
 
 <sect1><tt>.I8</tt><label id=".I8"><p>
 
-  Valid only in 65816 mode. Switch the index registers to 8 bit.
+  Valid only in 65816 mode. Assume the index registers are 8 bit.
 
   Note: This command will not emit any code, it will tell the assembler to
   create 8 bit operands for immediate operands.

@@ -230,7 +230,7 @@ Section* ReadSection (FILE* F, ObjData* O)
                    "%lu. Last module requiring alignment was '%s'.",
                    GetString (Name), Alignment, MAX_ALIGNMENT,
                    GetObjFileName (O));
-        } else if (Alignment >= LARGE_ALIGNMENT && !LargeAlignment) {
+        } else if (Alignment >= LARGE_ALIGNMENT && Alignment > S->Alignment && Alignment > Sec->Alignment && !LargeAlignment) {
             Warning ("Combined alignment for segment '%s' is suspiciously "
                      "large (%lu). Last module requiring alignment was '%s'.",
                      GetString (Name), Alignment, GetObjFileName (O));

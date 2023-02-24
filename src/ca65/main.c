@@ -656,6 +656,15 @@ static void OptVersion (const char* Opt attribute ((unused)),
 
 
 
+static void OptWarningsAsErrors (const char* Opt attribute ((unused)),
+                                 const char* Arg attribute ((unused)))
+/* Generate an error if any warnings occur */
+{
+    WarningsAsErrors = 1;
+}
+
+
+
 static void DoPCAssign (void)
 /* Start absolute code */
 {
@@ -919,27 +928,28 @@ int main (int argc, char* argv [])
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
-        { "--auto-import",      0,      OptAutoImport           },
-        { "--bin-include-dir",  1,      OptBinIncludeDir        },
-        { "--cpu",              1,      OptCPU                  },
-        { "--create-dep",       1,      OptCreateDep            },
-        { "--create-full-dep",  1,      OptCreateFullDep        },
-        { "--debug",            0,      OptDebug                },
-        { "--debug-info",       0,      OptDebugInfo            },
-        { "--feature",          1,      OptFeature              },
-        { "--help",             0,      OptHelp                 },
-        { "--ignore-case",      0,      OptIgnoreCase           },
-        { "--include-dir",      1,      OptIncludeDir           },
-        { "--large-alignment",  0,      OptLargeAlignment       },
-        { "--list-bytes",       1,      OptListBytes            },
-        { "--listing",          1,      OptListing              },
-        { "--memory-model",     1,      OptMemoryModel          },
-        { "--pagelength",       1,      OptPageLength           },
-        { "--relax-checks",     0,      OptRelaxChecks          },
-        { "--smart",            0,      OptSmart                },
-        { "--target",           1,      OptTarget               },
-        { "--verbose",          0,      OptVerbose              },
-        { "--version",          0,      OptVersion              },
+        { "--auto-import",         0,      OptAutoImport           },
+        { "--bin-include-dir",     1,      OptBinIncludeDir        },
+        { "--cpu",                 1,      OptCPU                  },
+        { "--create-dep",          1,      OptCreateDep            },
+        { "--create-full-dep",     1,      OptCreateFullDep        },
+        { "--debug",               0,      OptDebug                },
+        { "--debug-info",          0,      OptDebugInfo            },
+        { "--feature",             1,      OptFeature              },
+        { "--help",                0,      OptHelp                 },
+        { "--ignore-case",         0,      OptIgnoreCase           },
+        { "--include-dir",         1,      OptIncludeDir           },
+        { "--large-alignment",     0,      OptLargeAlignment       },
+        { "--list-bytes",          1,      OptListBytes            },
+        { "--listing",             1,      OptListing              },
+        { "--memory-model",        1,      OptMemoryModel          },
+        { "--pagelength",          1,      OptPageLength           },
+        { "--relax-checks",        0,      OptRelaxChecks          },
+        { "--smart",               0,      OptSmart                },
+        { "--target",              1,      OptTarget               },
+        { "--verbose",             0,      OptVerbose              },
+        { "--version",             0,      OptVersion              },
+        { "--warnings-as-errors",  0,      OptWarningsAsErrors     },
     };
 
     /* Name of the global name space */
@@ -1142,6 +1152,10 @@ int main (int argc, char* argv [])
     if (Verbosity >= 2) {
         SymDump (stdout);
         SegDump ();
+    }
+
+    if (WarningCount > 0 && WarningsAsErrors) {
+        Error("Warnings as errors");
     }
 
     /* If we didn't have an errors, finish off the line infos */

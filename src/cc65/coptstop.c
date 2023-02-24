@@ -1153,6 +1153,8 @@ static unsigned Opt_a_toscmpbool (StackOpData* D, const char* BoolTransformer)
 
         /* Save lhs into zeropage */
         AddStoreLhsA (D);
+        /* AddStoreLhsA may have moved the OpIndex, recalculate insertion point to prevent label migration. */
+        D->IP = D->OpIndex + 1;
 
         /* cmp */
         X = NewCodeEntry (OP65_CMP, AM65_ZP, D->ZPLo, 0, D->OpEntry->LI);
@@ -1206,6 +1208,8 @@ static unsigned Opt_a_tosicmp (StackOpData* D)
             /* RHS src is not directly comparable */
             X = NewCodeEntry (OP65_STA, AM65_ZP, D->ZPHi, 0, D->OpEntry->LI);
             InsertEntry (D, X, D->Rhs.A.ChgIndex + 1);
+            /* RHS insertion may have moved the OpIndex, recalculate insertion point to prevent label migration. */
+            D->IP = D->OpIndex + 1;
 
             /* Cmp with stored RHS */
             X = NewCodeEntry (OP65_CMP, AM65_ZP, D->ZPHi, 0, D->OpEntry->LI);

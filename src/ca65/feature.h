@@ -87,10 +87,8 @@ feature_t FindFeature (const StrBuf* Key);
 ** feature is invalid, return FEAT_UNKNOWN.
 */
 
-feature_t SetFeature (const StrBuf* Key);
-/* Find the feature and set the corresponding flag if the feature is known.
-** In any case, return the feature found. An invalid Key will return
-** FEAT_UNKNOWN.
+void SetFeature (feature_t Feature, unsigned char On);
+/* Set the corresponding feature flag if Feature is valid.
 */
 
 

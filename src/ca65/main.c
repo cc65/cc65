@@ -489,12 +489,15 @@ static void OptDebugInfo (const char* Opt attribute ((unused)),
 static void OptFeature (const char* Opt attribute ((unused)), const char* Arg)
 /* Set an emulation feature */
 {
-    /* Make a string buffer from Arg */
-    StrBuf Feature;
+    /* Make a string buffer from Arg and use it to find the feature. */
+    StrBuf StrFeature;
+    feature_t Feature = FindFeature (SB_InitFromString (&StrFeature, Arg));
 
-    /* Set the feature, check for errors */
-    if (SetFeature (SB_InitFromString (&Feature, Arg)) == FEAT_UNKNOWN) {
+    /* Enable the feature, check for errors */
+    if (Feature == FEAT_UNKNOWN) {
         AbEnd ("Illegal emulation feature: '%s'", Arg);
+    } else {
+        SetFeature (Feature, 1);
     }
 }
 

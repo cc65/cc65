@@ -125,6 +125,7 @@ Long options:
   --target sys                  Set the target system
   --verbose                     Increase verbosity
   --version                     Print the assembler version
+  --warnings-as-errors          Treat warnings as errors
 ---------------------------------------------------------------------------
 </verb></tscreen>
 
@@ -358,6 +359,13 @@ Here is a description of all the command line options:
   even warn about such things like unused imported symbols. The default
   warning level is 1, and it would probably be silly to set it to
   something lower.
+
+
+  <label id="option--warnings-as-errors">
+  <tag><tt>--warnings-as-errors</tt></tag>
+
+  An error will be generated if any warnings were produced.
+
 
 </descrip>
 <p>

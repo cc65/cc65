@@ -59,9 +59,9 @@ $(ISEQUAL): ../isequal.c | $(WORKDIR)
 define PRG_template
 
 # should compile, but gives an error
-$(WORKDIR)/bug1768.$1.$2.prg: bug1768.c | $(WORKDIR)
+$(WORKDIR)/int-static-1888.$1.$2.prg: int-static-1888.c | $(WORKDIR)
 	@echo "FIXME: " $$@ "currently does not compile."
-	$(if $(QUIET),echo misc/bug1768.$1.$2.prg)
+	$(if $(QUIET),echo misc/int-static-1888.$1.$2.prg)
 	$(NOT) $(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
 
 # should compile, but gives an error
@@ -128,6 +128,14 @@ $(WORKDIR)/bug1211-ice-move-refs-2.$1.$2.prg: bug1211-ice-move-refs-2.c | $(WORK
 $(WORKDIR)/bug1265.$1.$2.prg: bug1265.c | $(WORKDIR)
 	$(if $(QUIET),echo misc/bug1265.$1.$2.prg)
 	$(CC65) --standard c89 -t sim$2 -$1 -o $$(@:.prg=.s) $$< $(NULLERR)
+	$(CA65) -t sim$2 -o $$(@:.prg=.o) $$(@:.prg=.s) $(NULLERR)
+	$(LD65) -t sim$2 -o $$@ $$(@:.prg=.o) sim$2.lib $(NULLERR)
+	$(SIM65) $(SIM65FLAGS) $$@ $(NULLOUT) $(NULLERR)
+
+# this one requires -Werror
+$(WORKDIR)/bug1768.$1.$2.prg: bug1768.c | $(WORKDIR)
+	$(if $(QUIET),echo misc/bug1768.$1.$2.prg)
+	$(CC65) -Werror -t sim$2 -$1 -o $$(@:.prg=.s) $$< $(NULLERR)
 	$(CA65) -t sim$2 -o $$(@:.prg=.o) $$(@:.prg=.s) $(NULLERR)
 	$(LD65) -t sim$2 -o $$@ $$(@:.prg=.o) sim$2.lib $(NULLERR)
 	$(SIM65) $(SIM65FLAGS) $$@ $(NULLOUT) $(NULLERR)

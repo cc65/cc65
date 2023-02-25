@@ -139,48 +139,65 @@ void ShiftExpr (struct ExprDesc* Expr)
             /* Remove the code that pushes the rhs onto the stack. */
             RemoveCode (&Mark2);
 
-            /* If the shift count is greater or equal than the bit count of
-            ** the operand, the behaviour is undefined according to the
-            ** standard.
+            /* If the shift count is greater than or equal to the width of the
+            ** promoted left operand, the behaviour is undefined according to
+            ** the standard.
             */
-            if (Expr2.IVal < 0) {
-
-                Warning ("Shift count '%ld' is negative", Expr2.IVal);
-                Expr2.IVal &= ExprBits - 1;
-
-            } else if (Expr2.IVal >= (long) ExprBits) {
-
-                Warning ("Shift count '%ld' >= width of type", Expr2.IVal);
-                Expr2.IVal &= ExprBits - 1;
-
+            if (!ED_IsUneval (Expr)) {
+                if (Expr2.IVal < 0) {
+                    Warning ("Negative shift count %ld treated as %u for %s",
+                             Expr2.IVal,
+                             (unsigned)Expr2.IVal & (ExprBits - 1),
+                             GetBasicTypeName (ResultType));
+                } else if (Expr2.IVal >= (long) ExprBits) {
+                    Warning ("Shift count %ld >= width of %s treated as %u",
+                             Expr2.IVal,
+                             GetBasicTypeName (ResultType),
+                             (unsigned)Expr2.IVal & (ExprBits - 1));
+                }
             }
 
-            /* If the shift count is zero, nothing happens. If the left hand
-            ** side is a constant, the result is constant.
-            */
-            if (Expr2.IVal == 0 || lconst) {
+            /* Here we simply "wrap" the shift count around the width */
+            Expr2.IVal &= ExprBits - 1;
 
-                /* Set the type */
+            /* Additional check for bit-fields */
+            if (IsTypeBitField (Expr->Type) &&
+                Tok == TOK_SHR              &&
+                Expr2.IVal >= (long) Expr->Type->A.B.Width) {
+                if (!ED_IsUneval (Expr)) {
+                    Warning ("Right-shift count %ld >= width of bit-field", Expr2.IVal);
+                }
+            }
+
+            /* If the left hand side is a constant, the result is constant */
+            if (lconst) {
+                /* Set the result type */
                 Expr->Type = ResultType;
 
-                if (lconst) {
-
-                    /* Evaluate the result */
-                    switch (Tok) {
-                        case TOK_SHL: Expr->IVal <<= Expr2.IVal; break;
-                        case TOK_SHR: Expr->IVal >>= Expr2.IVal; break;
-                        default: /* Shutup gcc */                break;
-                    }
-
-                    /* Limit the calculated value to the range of its type */
-                    LimitExprValue (Expr);
+                /* Evaluate the result */
+                switch (Tok) {
+                    case TOK_SHL: Expr->IVal <<= Expr2.IVal; break;
+                    case TOK_SHR: Expr->IVal >>= Expr2.IVal; break;
+                    default: /* Shutup gcc */                break;
                 }
+
+                /* Limit the calculated value to the range of its type */
+                LimitExprValue (Expr, 1);
 
                 /* Result is already got, remove the generated code */
                 RemoveCode (&Mark1);
 
                 /* Done */
                 continue;
+            }
+
+            /* If the shift count is zero, nothing happens */
+            if (Expr2.IVal == 0) {
+                /* Result is already got, remove the pushing code */
+                RemoveCode (&Mark2);
+
+                /* Be sure to mark the value as in the primary */
+                goto MakeRVal;
             }
 
             /* If we're shifting an integer or unsigned to the right, the lhs

@@ -199,7 +199,7 @@ SER_OPEN:
         asl
         asl
         asl
-        adc     Offset                  ; Assume carry to be clear
+        adc     #Offset                 ; Assume carry to be clear
         tax
 
         ; Check if the handshake setting is valid

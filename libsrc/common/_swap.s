@@ -1,15 +1,15 @@
 ;
 ; Ullrich von Bassewitz, 1998-12-09, 2004-11-30
 ;
-; void __fastcall__ _swap (void* p, void* q, size_t size);
+; void __fastcall__ __swap (void* p, void* q, size_t size);
 ;
 
-        .export         __swap
+        .export         ___swap
         .import         popax, popptr1
         .importzp       ptr1, ptr2, ptr3
 
 
-__swap: eor     #$FF
+___swap: eor     #$FF
         sta     ptr3
         txa
         eor     #$FF

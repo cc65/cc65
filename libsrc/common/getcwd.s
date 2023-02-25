@@ -51,7 +51,7 @@ loop:   dec     ptr2
 
 overflow:
         lda     #<ERANGE
-        jsr     __seterrno      ; Returns 0 in A
+        jsr     ___seterrno      ; Returns 0 in A
         tax                     ; Return zero
         rts
 

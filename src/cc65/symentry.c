@@ -40,6 +40,7 @@
 
 /* cc65 */
 #include "anonname.h"
+#include "asmlabel.h"
 #include "declare.h"
 #include "error.h"
 #include "symentry.h"
@@ -65,13 +66,12 @@ SymEntry* NewSymEntry (const char* Name, unsigned Flags)
     E->NextHash = 0;
     E->PrevSym  = 0;
     E->NextSym  = 0;
-    E->Link     = 0;
     E->Owner    = 0;
     E->Flags    = Flags;
     E->Type     = 0;
     E->Attr     = 0;
     E->AsmName  = 0;
-    E->V.BssName = 0;
+    memset (&E->V, 0, sizeof (E->V));
     memcpy (E->Name, Name, Len+1);
 
     /* Return the new entry */
@@ -230,8 +230,8 @@ const DeclAttr* SymGetAttr (const SymEntry* Sym, DeclAttrType AttrType)
 
 
 
-void SymUseAttr (SymEntry* Sym, struct Declaration* D)
-/* Use the attributes from the declaration for this symbol */
+void SymUseAttr (SymEntry* Sym, struct Declarator* D)
+/* Use the attributes from the declarator for this symbol */
 {
     /* We cannot specify attributes twice */
     if ((Sym->Flags & SC_HAVEATTR) != 0) {
@@ -250,7 +250,9 @@ void SymUseAttr (SymEntry* Sym, struct Declaration* D)
 
 
 void SymSetAsmName (SymEntry* Sym)
-/* Set the assembler name for an external symbol from the name of the symbol */
+/* Set the assembler name for an external symbol from the name of the symbol.
+** The symbol must have no assembler name set yet.
+*/
 {
     unsigned Len;
 
@@ -266,7 +268,7 @@ void SymSetAsmName (SymEntry* Sym)
 
 
 
-void CvtRegVarToAuto (SymEntry* Sym)
+void SymCvtRegVarToAuto (SymEntry* Sym)
 /* Convert a register variable to an auto variable */
 {
     /* Change the storage class */
@@ -278,59 +280,26 @@ void CvtRegVarToAuto (SymEntry* Sym)
 
 
 
-SymEntry* GetSymType (const Type* T)
-/* Get the symbol entry of the enum/struct/union type
-** Return 0 if it is not an enum/struct/union.
-*/
-{
-    if ((IsClassStruct (T) || IsTypeEnum (T))) {
-        return T->A.S;
-    }
-    return 0;
-}
-
-
-
-const char* GetSymTypeName (const Type* T)
-/* Return a name string of the type or the symbol name if it is an ESU type.
-** Note: This may use a static buffer that could be overwritten by other calls.
-*/
-{
-    static char TypeName [IDENTSIZE + 16];
-    SymEntry* Sym;
-
-    Sym = GetSymType (T);
-    if (Sym == 0) {
-        return GetBasicTypeName (T);
-    }
-    sprintf (TypeName, "%s %s", GetBasicTypeName (T),
-             Sym->Name[0] != '\0' ? Sym->Name : "<unknown>");
-
-    return TypeName;
-}
-
-
-
-void ChangeSymType (SymEntry* Entry, const Type* T)
+void SymChangeType (SymEntry* Sym, const Type* T)
 /* Change the type of the given symbol */
 {
-    TypeFree (Entry->Type);
-    Entry->Type = TypeDup (T);
+    TypeFree (Sym->Type);
+    Sym->Type = TypeDup (T);
 }
 
 
 
-void ChangeAsmName (SymEntry* Entry, const char* NewAsmName)
+void SymChangeAsmName (SymEntry* Sym, const char* NewAsmName)
 /* Change the assembler name of the symbol */
 {
-    xfree (Entry->AsmName);
-    Entry->AsmName = xstrdup (NewAsmName);
+    xfree (Sym->AsmName);
+    Sym->AsmName = xstrdup (NewAsmName);
 }
 
 
 
-int HasAnonName (const SymEntry* Entry)
+int SymHasAnonName (const SymEntry* Sym)
 /* Return true if the symbol entry has an anonymous name */
 {
-    return IsAnonName (Entry->Name);
+    return IsAnonName (Sym->Name);
 }

@@ -67,6 +67,8 @@ unsigned char LineCont           = 0;   /* Allow line continuation */
 unsigned char LargeAlignment     = 0;   /* Don't warn about large alignments */
 unsigned char RelaxChecks        = 0;   /* Relax a few assembler checks */
 unsigned char StringEscapes      = 0;   /* Allow C-style escapes in strings */
+unsigned char LongJsrJmpRts      = 0;   /* Allow JSR/JMP/RTS as alias for JSL/JML/RTL */
+unsigned char WarningsAsErrors   = 0;   /* Error if any warnings */
 
 /* Emulation features */
 unsigned char DollarIsPC         = 0;   /* Allow the $ symbol as current PC */

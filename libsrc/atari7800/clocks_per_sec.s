@@ -1,10 +1,10 @@
 ;
 ; 2022-03-15, Karri Kaksonen
 ;
-; clock_t _clocks_per_sec (void);
+; clock_t __clocks_per_sec (void);
 ;
 
-        .export         __clocks_per_sec
+        .export         ___clocks_per_sec
 
         .import         sreg: zp
         .import         _paldetected
@@ -17,7 +17,7 @@
 ;-----------------------------------------------------------------------------
 ; Return the number of clock ticks in one second.
 ;
-        .proc   __clocks_per_sec
+        .proc   ___clocks_per_sec
 
         lda     #0
         tax

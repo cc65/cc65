@@ -62,9 +62,11 @@
     <ClCompile Include="sp65\geosicon.c" />
     <ClCompile Include="sp65\input.c" />
     <ClCompile Include="sp65\koala.c" />
+    <ClCompile Include="sp65\lynxpalette.c" />
     <ClCompile Include="sp65\lynxsprite.c" />
     <ClCompile Include="sp65\main.c" />
     <ClCompile Include="sp65\output.c" />
+    <ClCompile Include="sp65\palconv.c" />
     <ClCompile Include="sp65\palette.c" />
     <ClCompile Include="sp65\pcx.c" />
     <ClCompile Include="sp65\raw.c" />
@@ -84,8 +86,10 @@
     <ClInclude Include="sp65\geosicon.h" />
     <ClInclude Include="sp65\input.h" />
     <ClInclude Include="sp65\koala.h" />
+    <ClInclude Include="sp65\lynxpalette.h" />
     <ClInclude Include="sp65\lynxsprite.h" />
     <ClInclude Include="sp65\output.h" />
+    <ClInclude Include="sp65\palconv.h" />
     <ClInclude Include="sp65\palette.h" />
     <ClInclude Include="sp65\pcx.h" />
     <ClInclude Include="sp65\pixel.h" />

@@ -306,7 +306,7 @@ void SegAlign (unsigned long Alignment, int FillVal)
         ActiveSeg->Align = CombinedAlignment;
 
         /* Output a warning for larger alignments if not suppressed */
-        if (CombinedAlignment >= LARGE_ALIGNMENT && !LargeAlignment) {
+        if (CombinedAlignment >= LARGE_ALIGNMENT && CombinedAlignment > ActiveSeg->Align && CombinedAlignment > Alignment && !LargeAlignment) {
             Warning (0, "Combined alignment is suspiciously large (%lu)",
                      CombinedAlignment);
         }

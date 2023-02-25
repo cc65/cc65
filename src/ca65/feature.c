@@ -66,6 +66,7 @@ static const char* const FeatureKeys[FEAT_COUNT] = {
     "addrsize",
     "bracket_as_indirect",
     "string_escapes",
+    "long_jsr_jmp_rts",
 };
 
 
@@ -125,6 +126,7 @@ feature_t SetFeature (const StrBuf* Key)
         case FEAT_ADDRSIZE:                   AddrSize          = 1;    break;
         case FEAT_BRACKET_AS_INDIRECT:        BracketAsIndirect = 1;    break;
         case FEAT_STRING_ESCAPES:             StringEscapes     = 1;    break;
+        case FEAT_LONG_JSR_JMP_RTS:           LongJsrJmpRts     = 1;    break;
         default:                         /* Keep gcc silent */          break;
     }
 

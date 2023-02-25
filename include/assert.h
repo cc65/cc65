@@ -42,8 +42,8 @@
 #ifdef NDEBUG
 #  define assert(expr)
 #else
-extern void __fastcall__ _afailed (const char*, unsigned);
-#  define assert(expr)  ((expr)? (void)0 : _afailed(__FILE__, __LINE__))
+extern void __fastcall__ __afailed (const char*, unsigned);
+#  define assert(expr)  ((expr)? (void)0 : __afailed(__FILE__, __LINE__))
 #endif
 
 /* TODO: Guard with #if __CC65_STD__ >= __CC65_STD_C11__ if there

@@ -39,7 +39,7 @@
 ; File not open
 
 @L1:    lda     #EBADF
-        jsr     __seterrno              ; Returns with A = 0
+        jsr     ___seterrno             ; Returns with A = 0
         tax                             ; A = X = 0
         jmp     incsp6
 

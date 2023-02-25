@@ -480,6 +480,7 @@ void MacDef (unsigned Style)
     */
     if (Style == MAC_STYLE_CLASSIC) {
         ConsumeSep ();
+        LastTokWasSep = 1;
     } else if (HaveParams) {
         ConsumeRParen ();
     }

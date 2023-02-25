@@ -590,7 +590,7 @@ void MacDef (unsigned Style)
         NextTok ();
     }
 
-/* Reset the Incomplete flag now that parsing is done */
+    /* Reset the Incomplete flag now that parsing is done */
     M->Incomplete = 0;
 
 Done:

@@ -391,7 +391,7 @@ void MacDef (unsigned Style)
     Macro* M;
     TokNode* N;
     int HaveParams;
-    int DefineActive = 0;
+    int LastTokWasSep = 0;
 
     /* We expect a macro name here */
     if (CurTok.Tok != TOK_IDENT) {
@@ -493,7 +493,7 @@ void MacDef (unsigned Style)
         /* Check for end of macro */
         if (Style == MAC_STYLE_CLASSIC) {
             /* In classic macros, only .endmacro is allowed, but ignore it if it is in a .define */
-            if (CurTok.Tok == TOK_ENDMACRO && !DefineActive) {
+            if (CurTok.Tok == TOK_ENDMACRO && LastTokWasSep) {
                 /* Done */
                 break;
             }
@@ -574,12 +574,8 @@ void MacDef (unsigned Style)
         }
         ++M->TokCount;
 
-        /* Mark if .define has been read until end of line has been reached */
-        if (CurTok.Tok == TOK_DEFINE) {
-            DefineActive = 1;
-        } else if (TokIsSep(CurTok.Tok)) {
-            DefineActive = 0;
-        }
+        /* Save if last token was a separator to know if .endmacro is valid */
+        LastTokWasSep = TokIsSep(CurTok.Tok);
 
         /* Read the next token */
         NextTok ();

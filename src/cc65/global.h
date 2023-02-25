@@ -57,6 +57,7 @@ extern unsigned char    DebugInfo;              /* Add debug info to the obj */
 extern unsigned char    PreprocessOnly;         /* Just preprocess the input */
 extern unsigned char    DebugOptOutput;         /* Output debug stuff */
 extern unsigned         RegisterSpace;          /* Space available for register vars */
+extern unsigned         AllowNewComments;       /* Allow new style comments in C89 mode */
 
 /* Stackable options */
 extern IntStack         WritableStrings;        /* Literal strings are r/w */

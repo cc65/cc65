@@ -120,9 +120,21 @@ static void PutJMP (const InsDesc* Ins);
 ** to check for this case and is otherwise identical to PutAll.
 */
 
+static void PutJMP816 (const InsDesc* Ins);
+/* Handle the JMP instruction for the 816.
+** Allowing the long_jsr_jmp_rts feature to permit a long JMP.
+** Note that JMP [abs] and JML [abs] are always both permitted for instruction $DC,
+** because the [] notation for long indirection makes the generated instruction unambiguous.
+*/
+
+static void PutJSR816 (const InsDesc* Ins);
+/* Handle the JSR instruction for the 816.
+** Allowing the long_jsr_jmp_rts feature to permit a long JSR.
+*/
+
 static void PutRTS (const InsDesc* Ins attribute ((unused)));
 /* Handle the RTS instruction for the 816. In smart mode emit a RTL opcode if
-** the enclosing scope is FAR.
+** the enclosing scope is FAR, but only if the long_jsr_jmp_rts feature applies.
 */
 
 static void PutAll (const InsDesc* Ins);
@@ -758,9 +770,9 @@ static const struct {
         { "INX",  0x0000001, 0xe8, 0, PutAll },
         { "INY",  0x0000001, 0xc8, 0, PutAll },
         { "JML",  0x4000010, 0x5c, 1, PutAll },
-        { "JMP",  0x4010818, 0x4c, 6, PutAll },
+        { "JMP",  0x4010818, 0x4c, 6, PutJMP816 },
         { "JSL",  0x0000010, 0x20, 7, PutAll },
-        { "JSR",  0x0010018, 0x20, 7, PutAll },
+        { "JSR",  0x0010018, 0x20, 7, PutJSR816 },
         { "LDA",  0x0b8f6fc, 0xa0, 0, PutAll },
         { "LDX",  0x0c0030c, 0xa2, 1, PutAll },
         { "LDY",  0x0c0006c, 0xa0, 1, PutAll },
@@ -1627,12 +1639,46 @@ static void PutJMP (const InsDesc* Ins)
 
 
 
-static void PutRTS (const InsDesc* Ins attribute ((unused)))
-/* Handle the RTS instruction for the 816. In smart mode emit a RTL opcode if
-** the enclosing scope is FAR.
+static void PutJMP816 (const InsDesc* Ins)
+/* Handle the JMP instruction for the 816.
+** Allowing the long_jsr_jmp_rts feature to permit a long JMP.
+** Note that JMP [abs] and JML [abs] are always both permitted for instruction $DC,
+** because the [] notation for long indirection makes the generated instruction unambiguous.
 */
 {
-    if (SmartMode && CurrentScope->AddrSize == ADDR_SIZE_FAR) {
+    if (LongJsrJmpRts) {
+        PutJMP (Ins);
+    } else {
+        InsDesc InsAbs = *Ins;
+        InsAbs.AddrMode &= ~(AM65_ABS_LONG);
+        PutJMP (&InsAbs);
+    }
+}
+
+
+
+static void PutJSR816 (const InsDesc* Ins)
+/* Handle the JSR instruction for the 816.
+** Allowing the long_jsr_jmp_rts feature to permit a long JSR.
+*/
+{
+    if (LongJsrJmpRts) {
+        PutAll (Ins);
+    } else {
+        InsDesc InsAbs = *Ins;
+        InsAbs.AddrMode &= ~(AM65_ABS_LONG);
+        PutJMP (&InsAbs);
+    }
+}
+
+
+
+static void PutRTS (const InsDesc* Ins attribute ((unused)))
+/* Handle the RTS instruction for the 816. In smart mode emit a RTL opcode if
+** the enclosing scope is FAR, but only if the long_jsr_jmp_rts feature applies.
+*/
+{
+    if (LongJsrJmpRts && SmartMode && CurrentScope->AddrSize == ADDR_SIZE_FAR) {
         Emit0 (0x6B);       /* RTL */
     } else {
         Emit0 (0x60);       /* RTS */

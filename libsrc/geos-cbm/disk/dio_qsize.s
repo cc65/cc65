@@ -5,10 +5,10 @@
 ;
 
             .export _dio_query_sectsize
-            .import __oserror
+            .import ___oserror
 
 _dio_query_sectsize:
         lda #<256
         ldx #>256
-        sta __oserror
+        sta ___oserror
         rts

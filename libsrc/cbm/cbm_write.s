@@ -9,7 +9,7 @@
 ;     static unsigned int byteswritten;
 ;
 ;     /* if we can't change to the outputchannel #lfn then return an error */
-;     if (_oserror = cbm_k_ckout(lfn)) return -1;
+;     if (__oserror = cbm_k_ckout(lfn)) return -1;
 ;
 ;     byteswritten = 0;
 ;
@@ -18,7 +18,7 @@
 ;     }
 ;
 ;     if (cbm_k_readst()) {
-;         _oserror = 5;       /* device not present */
+;         __oserror = 5;       /* device not present */
 ;         byteswritten = -1;
 ;     }
 ;
@@ -33,7 +33,7 @@
         .export         _cbm_write
         .importzp       ptr1, ptr2, ptr3
         .import         popax, popa
-        .import         __oserror
+        .import         ___oserror
 
 
 _cbm_write:
@@ -87,7 +87,7 @@ _cbm_write:
 
 ; Error entry, error code is in A
 
-@E2:    sta     __oserror
+@E2:    sta     ___oserror
         lda     #$FF
         tax
         rts                     ; return -1

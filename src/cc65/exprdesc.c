@@ -67,75 +67,9 @@ ExprDesc* ED_Init (ExprDesc* Expr)
 
 
 
-#if !defined(HAVE_INLINE)
-int ED_IsLocQuasiConst (const ExprDesc* Expr)
-/* Return true if the expression is a constant location of some sort or on the
-** stack.
-*/
-{
-    return ED_IsLocConst (Expr) || ED_IsLocStack (Expr);
-}
-#endif
-
-
-
-#if !defined(HAVE_INLINE)
-int ED_IsLocPrimaryOrExpr (const ExprDesc* Expr)
-/* Return true if the expression is E_LOC_PRIMARY or E_LOC_EXPR */
-{
-    return ED_IsLocPrimary (Expr) || ED_IsLocExpr (Expr);
-}
-#endif
-
-
-
-#if !defined(HAVE_INLINE)
-int ED_IsIndExpr (const ExprDesc* Expr)
-/* Check if the expression is a reference to its value */
-{
-    return (Expr->Flags & E_ADDRESS_OF) == 0 &&
-           !ED_IsLocNone (Expr) && !ED_IsLocPrimary (Expr);
-}
-#endif
-
-
-
-int ED_YetToLoad (const ExprDesc* Expr)
-/* Check if the expression needs to be loaded somehow. */
-{
-    return ED_NeedsPrimary (Expr)   ||
-           ED_YetToTest (Expr)      ||
-           (ED_IsLVal (Expr) && IsQualVolatile (Expr->Type));
-}
-
-
-
-void ED_MarkForUneval (ExprDesc* Expr)
-/* Mark the expression as not to be evaluated */
-{
-    Expr->Flags = (Expr->Flags & ~E_MASK_EVAL) | E_EVAL_UNEVAL;
-}
-
-
-
-void ED_SetCodeRange (ExprDesc* Expr, const CodeMark* Start, const CodeMark* End)
-/* Set the code range for this expression */
-{
-    Expr->Flags |= E_HAVE_MARKS;
-    Expr->Start = *Start;
-    Expr->End   = *End;
-}
-
-
-
-int ED_CodeRangeIsEmpty (const ExprDesc* Expr)
-/* Return true if no code was output for this expression */
-{
-    /* We must have code marks */
-    PRECONDITION (Expr->Flags & E_HAVE_MARKS);
-
-    return CodeRangeIsEmpty (&Expr->Start, &Expr->End);
-}
+/*****************************************************************************/
+/*                              Info Extraction                              */
+/*****************************************************************************/
 
 
 
@@ -212,6 +146,190 @@ int ED_GetStackOffs (const ExprDesc* Expr, int Offs)
     CHECK (Offs >= 0);          /* Cannot handle negative stack offsets */
     return Offs;
 }
+
+
+
+/*****************************************************************************/
+/*                                Predicates                                 */
+/*****************************************************************************/
+
+
+
+#if !defined(HAVE_INLINE)
+int ED_IsLocQuasiConst (const ExprDesc* Expr)
+/* Return true if the expression is a constant location of some sort or on the
+** stack.
+*/
+{
+    return ED_IsLocConst (Expr) || ED_IsLocStack (Expr);
+}
+#endif
+
+
+
+#if !defined(HAVE_INLINE)
+int ED_IsLocPrimaryOrExpr (const ExprDesc* Expr)
+/* Return true if the expression is E_LOC_PRIMARY or E_LOC_EXPR */
+{
+    return ED_IsLocPrimary (Expr) || ED_IsLocExpr (Expr);
+}
+#endif
+
+
+
+#if !defined(HAVE_INLINE)
+int ED_IsIndExpr (const ExprDesc* Expr)
+/* Check if the expression is a reference to its value */
+{
+    return (Expr->Flags & E_ADDRESS_OF) == 0 &&
+           !ED_IsLocNone (Expr) && !ED_IsLocPrimary (Expr);
+}
+#endif
+
+
+
+int ED_YetToLoad (const ExprDesc* Expr)
+/* Check if the expression needs to be loaded somehow. */
+{
+    return ED_NeedsPrimary (Expr)   ||
+           ED_YetToTest (Expr)      ||
+           (ED_IsLVal (Expr) && IsQualVolatile (Expr->Type));
+}
+
+
+
+#if !defined(HAVE_INLINE)
+int ED_IsAbs (const ExprDesc* Expr)
+/* Return true if the expression denotes a numeric value or address. */
+{
+    return (Expr->Flags & (E_MASK_LOC)) == (E_LOC_NONE) ||
+           (Expr->Flags & (E_MASK_LOC|E_ADDRESS_OF)) == (E_LOC_ABS|E_ADDRESS_OF);
+}
+#endif
+
+
+
+#if !defined(HAVE_INLINE)
+int ED_IsConstAbs (const ExprDesc* Expr)
+/* Return true if the expression denotes a constant absolute value. This can be
+** a numeric constant, cast to any type.
+*/
+{
+    return ED_IsRVal (Expr) && ED_IsAbs (Expr);
+}
+#endif
+
+
+
+int ED_IsConstAbsInt (const ExprDesc* Expr)
+/* Return true if the expression is a constant (numeric) integer. */
+{
+    return ED_IsConstAbs (Expr) && IsClassInt (Expr->Type);
+}
+
+
+
+int ED_IsConstBool (const ExprDesc* Expr)
+/* Return true if the expression can be constantly evaluated as a boolean. */
+{
+    return ED_IsConstAbsInt (Expr) || ED_IsAddrExpr (Expr);
+}
+
+
+
+int ED_IsConstTrue (const ExprDesc* Expr)
+/* Return true if the constant expression can be evaluated as boolean true at
+** compile time.
+*/
+{
+    /* Non-zero arithmetics and objects addresses are boolean true */
+    return (ED_IsConstAbsInt (Expr) && Expr->IVal != 0) ||
+           (ED_IsAddrExpr (Expr));
+}
+
+
+
+int ED_IsConstFalse (const ExprDesc* Expr)
+/* Return true if the constant expression can be evaluated as boolean false at
+** compile time.
+*/
+{
+    /* Zero arithmetics and null pointers are boolean false */
+    return (ED_IsConstAbsInt (Expr) && Expr->IVal == 0) ||
+           ED_IsNullPtr (Expr);
+}
+
+
+
+int ED_IsConst (const ExprDesc* Expr)
+/* Return true if the expression denotes a constant of some sort. This can be a
+** numeric constant, the address of a global variable (maybe with offset) or
+** similar.
+*/
+{
+    return (Expr->Flags & E_MASK_LOC) == E_LOC_NONE || ED_IsConstAddr (Expr);
+}
+
+
+
+int ED_IsQuasiConst (const ExprDesc* Expr)
+/* Return true if the expression denotes a quasi-constant of some sort. This
+** can be a numeric constant, a constant address or a stack variable address.
+*/
+{
+    return (Expr->Flags & E_MASK_LOC) == E_LOC_NONE || ED_IsQuasiConstAddr (Expr);
+}
+
+
+
+int ED_IsConstAddr (const ExprDesc* Expr)
+/* Return true if the expression denotes a constant address of some sort. This
+** can be the address of a global variable (maybe with offset) or similar.
+*/
+{
+    return ED_IsAddrExpr (Expr) && ED_IsLocConst (Expr);
+}
+
+
+
+int ED_IsQuasiConstAddr (const ExprDesc* Expr)
+/* Return true if the expression denotes a quasi-constant address of some sort.
+** This can be a constant address or a stack variable address.
+*/
+{
+    return ED_IsAddrExpr (Expr) && ED_IsLocQuasiConst (Expr);
+}
+
+
+
+int ED_IsNullPtr (const ExprDesc* Expr)
+/* Return true if the given expression is a NULL pointer constant */
+{
+    return (Expr->Flags & (E_MASK_LOC|E_MASK_RTYPE)) ==
+                               (E_LOC_NONE|E_RTYPE_RVAL) &&
+           Expr->IVal == 0                               &&
+           IsClassInt (Expr->Type);
+}
+
+
+
+int ED_IsBool (const ExprDesc* Expr)
+/* Return true if the expression can be treated as a boolean, that is, it can
+** be an operand to a compare operation.
+*/
+{
+    /* Either ints, floats, or pointers can be used in a boolean context */
+    return IsClassInt (Expr->Type)   ||
+           IsClassFloat (Expr->Type) ||
+           IsClassPtr (Expr->Type)   ||
+           IsClassFunc (Expr->Type);
+}
+
+
+
+/*****************************************************************************/
+/*                               Manipulation                                */
+/*****************************************************************************/
 
 
 
@@ -331,7 +449,7 @@ ExprDesc* ED_IndExpr (ExprDesc* Expr)
                 ** original address. We simply mark this as E_LOC_EXPR so that
                 ** some info about the original location can be retained.
                 ** If it's really meant to dereference a "pointer value", it
-                ** should be done in two steps where the pointervalue should
+                ** should be done in two steps where the pointer value should
                 ** be the manually loaded first before a call into this, and
                 ** the offset should be manually cleared somewhere outside.
                 */
@@ -345,131 +463,27 @@ ExprDesc* ED_IndExpr (ExprDesc* Expr)
 
 
 
-#if !defined(HAVE_INLINE)
-int ED_IsAbs (const ExprDesc* Expr)
-/* Return true if the expression denotes a numeric value or address. */
+void ED_MarkForUneval (ExprDesc* Expr)
+/* Mark the expression as not to be evaluated */
 {
-    return (Expr->Flags & (E_MASK_LOC)) == (E_LOC_NONE) ||
-           (Expr->Flags & (E_MASK_LOC|E_ADDRESS_OF)) == (E_LOC_ABS|E_ADDRESS_OF);
-}
-#endif
-
-
-
-#if !defined(HAVE_INLINE)
-int ED_IsConstAbs (const ExprDesc* Expr)
-/* Return true if the expression denotes a constant absolute value. This can be
-** a numeric constant, cast to any type.
-*/
-{
-    return ED_IsRVal (Expr) && ED_IsAbs (Expr);
-}
-#endif
-
-
-
-int ED_IsConstAbsInt (const ExprDesc* Expr)
-/* Return true if the expression is a constant (numeric) integer. */
-{
-    return ED_IsConstAbs (Expr) && IsClassInt (Expr->Type);
+    Expr->Flags = (Expr->Flags & ~E_MASK_EVAL) | E_EVAL_UNEVAL;
 }
 
 
 
-int ED_IsConstBool (const ExprDesc* Expr)
-/* Return true if the expression can be constantly evaluated as a boolean. */
+const Type* ReplaceType (ExprDesc* Expr, const Type* NewType)
+/* Replace the type of Expr by a copy of Newtype and return the old type string */
 {
-    return ED_IsConstAbsInt (Expr) || ED_IsAddrExpr (Expr);
+    const Type* OldType = Expr->Type;
+    Expr->Type = TypeDup (NewType);
+    return OldType;
 }
 
 
 
-int ED_IsConstTrue (const ExprDesc* Expr)
-/* Return true if the constant expression can be evaluated as boolean true at
-** compile time.
-*/
-{
-    /* Non-zero arithmetics and objects addresses are boolean true */
-    return (ED_IsConstAbsInt (Expr) && Expr->IVal != 0) ||
-           (ED_IsAddrExpr (Expr));
-}
-
-
-
-int ED_IsConstFalse (const ExprDesc* Expr)
-/* Return true if the constant expression can be evaluated as boolean false at
-** compile time.
-*/
-{
-    /* Zero arithmetics and null pointers are boolean false */
-    return (ED_IsConstAbsInt (Expr) && Expr->IVal == 0) ||
-           ED_IsNullPtr (Expr);
-}
-
-
-
-int ED_IsConst (const ExprDesc* Expr)
-/* Return true if the expression denotes a constant of some sort. This can be a
-** numeric constant, the address of a global variable (maybe with offset) or
-** similar.
-*/
-{
-    return (Expr->Flags & E_MASK_LOC) == E_LOC_NONE || ED_IsConstAddr (Expr);
-}
-
-
-
-int ED_IsQuasiConst (const ExprDesc* Expr)
-/* Return true if the expression denotes a quasi-constant of some sort. This
-** can be a numeric constant, a constant address or a stack variable address.
-*/
-{
-    return (Expr->Flags & E_MASK_LOC) == E_LOC_NONE || ED_IsQuasiConstAddr (Expr);
-}
-
-
-int ED_IsConstAddr (const ExprDesc* Expr)
-/* Return true if the expression denotes a constant address of some sort. This
-** can be the address of a global variable (maybe with offset) or similar.
-*/
-{
-    return ED_IsAddrExpr (Expr) && ED_IsLocConst (Expr);
-}
-
-
-
-int ED_IsQuasiConstAddr (const ExprDesc* Expr)
-/* Return true if the expression denotes a quasi-constant address of some sort.
-** This can be a constant address or a stack variable address.
-*/
-{
-    return ED_IsAddrExpr (Expr) && ED_IsLocQuasiConst (Expr);
-}
-
-
-
-int ED_IsNullPtr (const ExprDesc* Expr)
-/* Return true if the given expression is a NULL pointer constant */
-{
-    return (Expr->Flags & (E_MASK_LOC|E_MASK_RTYPE)) ==
-                               (E_LOC_NONE|E_RTYPE_RVAL) &&
-           Expr->IVal == 0                               &&
-           IsClassInt (Expr->Type);
-}
-
-
-
-int ED_IsBool (const ExprDesc* Expr)
-/* Return true if the expression can be treated as a boolean, that is, it can
-** be an operand to a compare operation.
-*/
-{
-    /* Either ints, floats, or pointers can be used in a boolean context */
-    return IsClassInt (Expr->Type)   ||
-           IsClassFloat (Expr->Type) ||
-           IsClassPtr (Expr->Type)   ||
-           IsClassFunc (Expr->Type);
-}
+/*****************************************************************************/
+/*                               Other Helpers                               */
+/*****************************************************************************/
 
 
 
@@ -577,10 +591,21 @@ void PrintExprDesc (FILE* F, ExprDesc* E)
 
 
 
-const Type* ReplaceType (ExprDesc* Expr, const Type* NewType)
-/* Replace the type of Expr by a copy of Newtype and return the old type string */
+void ED_SetCodeRange (ExprDesc* Expr, const CodeMark* Start, const CodeMark* End)
+/* Set the code range for this expression */
 {
-    const Type* OldType = Expr->Type;
-    Expr->Type = TypeDup (NewType);
-    return OldType;
+    Expr->Flags |= E_HAVE_MARKS;
+    Expr->Start = *Start;
+    Expr->End   = *End;
+}
+
+
+
+int ED_CodeRangeIsEmpty (const ExprDesc* Expr)
+/* Return true if no code was output for this expression */
+{
+    /* We must have code marks */
+    PRECONDITION (Expr->Flags & E_HAVE_MARKS);
+
+    return CodeRangeIsEmpty (&Expr->Start, &Expr->End);
 }

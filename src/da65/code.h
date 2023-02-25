@@ -72,6 +72,9 @@ unsigned GetCodeWord (unsigned Addr);
 unsigned long GetCodeDWord (unsigned Addr);
 /* Get a dword from the given address */
 
+unsigned GetCodeLongAddr (unsigned Addr);
+/* Get a 24-bit address from the given address */
+
 unsigned GetRemainingBytes (void);
 /* Return the number of remaining code bytes */
 

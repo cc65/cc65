@@ -125,6 +125,7 @@ Long options:
   --target sys                  Set the target system
   --verbose                     Increase verbosity
   --version                     Print the assembler version
+  --warnings-as-errors          Treat warnings as errors
 ---------------------------------------------------------------------------
 </verb></tscreen>
 
@@ -183,7 +184,7 @@ Here is a description of all the command line options:
 
   Enable an emulation feature. This is identical as using <tt/.FEATURE/
   in the source with two exceptions: Feature names must be lower case, and
-  each feature must be specified by using an extra <tt/--feature/ option,
+  each feature must be specified by using a separate <tt/--feature/ option,
   comma separated lists are not allowed.
 
   See the discussion of the <tt><ref id=".FEATURE" name=".FEATURE"></tt>
@@ -358,6 +359,13 @@ Here is a description of all the command line options:
   even warn about such things like unused imported symbols. The default
   warning level is 1, and it would probably be silly to set it to
   something lower.
+
+
+  <label id="option--warnings-as-errors">
+  <tag><tt>--warnings-as-errors</tt></tag>
+
+  An error will be generated if any warnings were produced.
+
 
 </descrip>
 <p>
@@ -2019,7 +2027,7 @@ Here's a list of all control commands and a description, what they do:
 
 <sect1><tt>.A16</tt><label id=".A16"><p>
 
-  Valid only in 65816 mode. Switch the accumulator to 16 bit.
+  Valid only in 65816 mode. Assume the accumulator is 16 bit.
 
   Note: This command will not emit any code, it will tell the assembler to
   create 16 bit operands for immediate accumulator addressing mode.
@@ -2029,7 +2037,7 @@ Here's a list of all control commands and a description, what they do:
 
 <sect1><tt>.A8</tt><label id=".A8"><p>
 
-  Valid only in 65816 mode. Switch the accumulator to 8 bit.
+  Valid only in 65816 mode. Assume the accumulator is 8 bit.
 
   Note: This command will not emit any code, it will tell the assembler to
   create 8 bit operands for immediate accu addressing mode.
@@ -2112,15 +2120,15 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
   the assembler will force a segment alignment to the least common multiple of
-  15, 18 and 251 - which is 22590. To protect the user against errors, the
-  assembler will issue a warning when the combined alignment exceeds 256. The
-  command line option <tt><ref id="option--large-alignment"
-  name="--large-alignment"></tt> will disable this warning.
+  15, 18 and 251 - which is 22590. To protect the user against errors, when the
+  combined alignment is larger than the explicitly requested alignments,
+  the assembler will issue a warning if it also exceeds 256. The command line
+  option <tt><ref id="option--large-alignment" name="--large-alignment"></tt>
+  will disable this warning.
 
-  Please note that with alignments that are a power of two (which were the
-  only alignments possible in older versions of the assembler), the problem is
-  less severe, because the least common multiple of powers to the same base is
-  always the larger one.
+  Please note that with only alignments that are a power of two, a warning will
+  never occur, because the least common multiple of powers to the same base is
+  always simply the larger one.
 
 
 
@@ -2825,6 +2833,23 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
     overridden. When using this feature, you may also get into trouble if
     later versions of the assembler define new keywords starting with a dot.
 
+  <tag><tt>long_jsr_jmp_rts</tt><label id="long_jsr_jmp_rts"></tag>
+
+    Affects 65816 mode only.
+
+    Allows <tt>jsr</tt> and <tt>jmp</tt> to produce long jumps if the target
+    address has been previously declared in a <tt>far</tt> segment,
+    or imported as <tt>far</tt>.
+    Otherwise <tt>jsl</tt> and <tt>jml</tt> must be used instead.
+
+    Also allows <tt><ref id=".SMART" name=".SMART"></tt> to convert <tt>rts</tt>
+    to a long return <tt>rtl</tt> when the enclosing scope or memory model
+    indicates returning from a <tt>far</tt> procedure.
+
+    This permits compatibility with the old behavior of this assembler, or other
+    assemblers which similarly allowed <tt>jsr</tt> and <tt>jmp</tt> to be used
+    this way.
+
   <tag><tt>loose_char_term</tt><label id="loose_char_term"></tag>
 
     Accept single quotes as well as double quotes as terminators for char
@@ -3036,7 +3061,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
 
 <sect1><tt>.I16</tt><label id=".I16"><p>
 
-  Valid only in 65816 mode. Switch the index registers to 16 bit.
+  Valid only in 65816 mode. Assume the index registers are 16 bit.
 
   Note: This command will not emit any code, it will tell the assembler to
   create 16 bit operands for immediate operands.
@@ -3047,7 +3072,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
 
 <sect1><tt>.I8</tt><label id=".I8"><p>
 
-  Valid only in 65816 mode. Switch the index registers to 8 bit.
+  Valid only in 65816 mode. Assume the index registers are 8 bit.
 
   Note: This command will not emit any code, it will tell the assembler to
   create 8 bit operands for immediate operands.
@@ -3994,7 +4019,9 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
         the assembler cannot trace the execution flow this may lead to false
         results in some cases. If in doubt, use the <tt/.Inn/ and <tt/.Ann/
         instructions to tell the assembler about the current settings.
-  <item>In 65816 mode, replace a <tt/RTS/ instruction by <tt/RTL/ if it is
+  <item>In 65816 mode, if the <tt><ref id="long_jsr_jmp_rts"
+        name="long_jsr_jmp_rts"></tt> feature is enabled,
+        smart mode will replace a <tt/RTS/ instruction by <tt/RTL/ if it is
         used within a procedure declared as <tt/far/, or if the procedure has
         no explicit address specification, but it is <tt/far/ because of the
         memory model used.

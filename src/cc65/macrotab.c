@@ -74,19 +74,17 @@ Macro* NewMacro (const char* Name)
 */
 {
     /* Get the length of the macro name */
-    unsigned Len = strlen(Name);
+    unsigned Len = strlen (Name);
 
     /* Allocate the structure */
     Macro* M = (Macro*) xmalloc (sizeof(Macro) + Len);
 
     /* Initialize the data */
-    M->Next        = 0;
-    M->Expanding   = 0;
-    M->ArgCount    = -1;        /* Flag: Not a function like macro */
-    M->MaxArgs     = 0;
-    InitCollection (&M->FormalArgs);
+    M->Next         = 0;
+    M->ParamCount   = -1;        /* Flag: Not a function-like macro */
+    InitCollection (&M->Params);
     SB_Init (&M->Replacement);
-    M->Variadic    = 0;
+    M->Variadic     = 0;
     memcpy (M->Name, Name, Len+1);
 
     /* Return the new macro */
@@ -102,10 +100,10 @@ void FreeMacro (Macro* M)
 {
     unsigned I;
 
-    for (I = 0; I < CollCount (&M->FormalArgs); ++I) {
-        xfree (CollAtUnchecked (&M->FormalArgs, I));
+    for (I = 0; I < CollCount (&M->Params); ++I) {
+        xfree (CollAtUnchecked (&M->Params, I));
     }
-    DoneCollection (&M->FormalArgs);
+    DoneCollection (&M->Params);
     SB_Done (&M->Replacement);
     xfree (M);
 }
@@ -121,12 +119,12 @@ Macro* CloneMacro (const Macro* M)
     Macro* New = NewMacro (M->Name);
     unsigned I;
 
-    for (I = 0; I < CollCount (&M->FormalArgs); ++I) {
-        /* Copy the argument */
-        const char* Arg = CollAtUnchecked (&M->FormalArgs, I);
-        CollAppend (&New->FormalArgs, xstrdup (Arg));
+    for (I = 0; I < CollCount (&M->Params); ++I) {
+        /* Copy the parameter */
+        const char* Param = CollAtUnchecked (&M->Params, I);
+        CollAppend (&New->Params, xstrdup (Param));
     }
-    New->ArgCount = M->ArgCount;
+    New->ParamCount = M->ParamCount;
     New->Variadic = M->Variadic;
     SB_Copy (&New->Replacement, &M->Replacement);
 
@@ -265,14 +263,14 @@ Macro* FindMacro (const char* Name)
 
 
 
-int FindMacroArg (Macro* M, const char* Arg)
-/* Search for a formal macro argument. If found, return the index of the
-** argument. If the argument was not found, return -1.
+int FindMacroParam (const Macro* M, const char* Param)
+/* Search for a macro parameter. If found, return the index of the parameter.
+** If the parameter was not found, return -1.
 */
 {
     unsigned I;
-    for (I = 0; I < CollCount (&M->FormalArgs); ++I) {
-        if (strcmp (CollAtUnchecked (&M->FormalArgs, I), Arg) == 0) {
+    for (I = 0; I < CollCount (&M->Params); ++I) {
+        if (strcmp (CollAtUnchecked (&M->Params, I), Param) == 0) {
             /* Found */
             return I;
         }
@@ -284,25 +282,25 @@ int FindMacroArg (Macro* M, const char* Arg)
 
 
 
-void AddMacroArg (Macro* M, const char* Arg)
-/* Add a formal macro argument. */
+void AddMacroParam (Macro* M, const char* Param)
+/* Add a macro parameter. */
 {
-    /* Check if we have a duplicate macro argument, but add it anyway.
-    ** Beware: Don't use FindMacroArg here, since the actual argument array
+    /* Check if we have a duplicate macro parameter, but add it anyway.
+    ** Beware: Don't use FindMacroParam here, since the actual argument array
     ** may not be initialized.
     */
     unsigned I;
-    for (I = 0; I < CollCount (&M->FormalArgs); ++I) {
-        if (strcmp (CollAtUnchecked (&M->FormalArgs, I), Arg) == 0) {
+    for (I = 0; I < CollCount (&M->Params); ++I) {
+        if (strcmp (CollAtUnchecked (&M->Params, I), Param) == 0) {
             /* Found */
-            PPError ("Duplicate macro parameter: '%s'", Arg);
+            PPError ("Duplicate macro parameter: '%s'", Param);
             break;
         }
     }
 
-    /* Add the new argument */
-    CollAppend (&M->FormalArgs, xstrdup (Arg));
-    ++M->ArgCount;
+    /* Add the new parameter */
+    CollAppend (&M->Params, xstrdup (Param));
+    ++M->ParamCount;
 }
 
 
@@ -313,14 +311,14 @@ int MacroCmp (const Macro* M1, const Macro* M2)
     int I;
 
     /* Argument count must be identical */
-    if (M1->ArgCount != M2->ArgCount) {
+    if (M1->ParamCount != M2->ParamCount) {
         return 1;
     }
 
-    /* Compare the arguments */
-    for (I = 0; I < M1->ArgCount; ++I) {
-        if (strcmp (CollConstAt (&M1->FormalArgs, I),
-                    CollConstAt (&M2->FormalArgs, I)) != 0) {
+    /* Compare the parameters */
+    for (I = 0; I < M1->ParamCount; ++I) {
+        if (strcmp (CollConstAt (&M1->Params, I),
+                    CollConstAt (&M2->Params, I)) != 0) {
             return 1;
         }
     }

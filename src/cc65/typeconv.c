@@ -238,10 +238,10 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
             **       void pointers, just with warnings.
             */
             if (Result.C == TC_PTR_SIGN_DIFF) {
-                /* Specific warning for pointee signedness difference */
+                /* Specific warning for pointer signedness difference */
                 if (IS_Get (&WarnPointerSign)) {
                     TypeCompatibilityDiagnostic (NewType, Expr->Type,
-                        0, "Pointer conversion to '%s' from '%s' changes pointee signedness");
+                        0, "Pointer conversion to '%s' from '%s' changes pointer signedness");
                 }
             } else if ((Result.C <= TC_PTR_INCOMPATIBLE ||
                  (Result.F & TCF_INCOMPATIBLE_QUAL) != 0)) {
@@ -430,7 +430,7 @@ void TypeComposition (Type* lhs, const Type* rhs)
         }
 
         /* Check for sanity */
-        CHECK (GetUnderlyingTypeCode (lhs) == GetUnderlyingTypeCode (rhs));
+        CHECK (GetUnqualTypeCode (lhs) == GetUnqualTypeCode (rhs));
 
         /* Check for special type elements */
         if (IsTypeFunc (lhs)) {

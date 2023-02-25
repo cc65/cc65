@@ -74,7 +74,7 @@ void* __fastcall__ memset (void* s, int c, size_t count);
 /* The following is an internal function, the compiler will replace memset
 ** with it if the fill value is zero. Never use this one directly!
 */
-void* __fastcall__ _bzero (void* ptr, size_t n);
+void* __fastcall__ __bzero (void* ptr, size_t n);
 
 /* Non standard: */
 #if __CC65_STD__ == __CC65_STD_CC65__
@@ -92,8 +92,12 @@ char* __fastcall__ strupper (char* s);
 char* __fastcall__ strqtok (char* s1, const char* s2);
 #endif
 
-const char* __fastcall__ _stroserror (unsigned char errcode);
+const char* __fastcall__ __stroserror (unsigned char errcode);
 /* Map an operating system error number to an error message. */
+#if __CC65_STD__ == __CC65_STD_CC65__
+/* define old name with one underscore for backwards compatibility */
+#define _stroserror __stroserror
+#endif
 
 
 /* End of string.h */

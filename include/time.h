@@ -89,8 +89,8 @@ struct tm {
 #  define CLOCKS_PER_SEC        10
 #elif defined(__ATARI__) || defined (__LYNX__)
 /* Read the clock rate at runtime */
-clock_t _clocks_per_sec (void);
-#  define CLOCKS_PER_SEC        _clocks_per_sec()
+clock_t __clocks_per_sec (void);
+#  define CLOCKS_PER_SEC        __clocks_per_sec()
 #endif
 #define CLOCK_REALTIME          0
 

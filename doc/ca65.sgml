@@ -445,6 +445,7 @@ byte. If omitted, the assembler will only produce only 1 byte.
 <tscreen><verb>
                 brk                     ; 1-byte:  $00
                 brk     $34             ; 2-bytes: $00 $34
+                brk     #$34            ; 2-bytes: $00 $34
 </verb></tscreen>
 
 

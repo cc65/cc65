@@ -493,7 +493,7 @@ void MacDef (unsigned Style)
     while (1) {
         /* Check for end of macro */
         if (Style == MAC_STYLE_CLASSIC) {
-            /* In classic macros, only .endmacro is allowed, but ignore it if it is in a .define */
+            /* In classic macros, only .endmacro is allowed, but ignore it if it is not at the start of the line */
             if (CurTok.Tok == TOK_ENDMACRO && LastTokWasSep) {
                 /* Done */
                 break;

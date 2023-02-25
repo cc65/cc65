@@ -439,6 +439,14 @@ The assembler accepts
       <tt><ref id=".P4510" name=".P4510"></tt> command was given).
 </itemize>
 
+On 6502-derived platforms the <tt/BRK/ instruction has an optional signature
+byte. If omitted, the assembler will only produce only 1 byte.
+
+<tscreen><verb>
+                brk                     ; 1-byte:  $00
+                brk     $34             ; 2-bytes: $00 $34
+</verb></tscreen>
+
 
 <sect1>65816 mode<p>
 
@@ -455,6 +463,17 @@ mnemonics:
 <item><tt>TDA</tt> is an alias for <tt>TDC</tt>
 <item><tt>TSA</tt> is an alias for <tt>TSC</tt>
 </itemize>
+
+The <tt/MVN/ and <tt/MVP/ instructions accept two different argument forms.
+Either two bank bytes may be given with a <tt/#/ prefix,
+or two far addresses whose high byte will be used.
+
+<tscreen><verb>
+                mvn     #^src, #^dst       ; bank of src to bank of dst
+                mvn     src, dst           ; bank of src to bank of dst
+                mvp     #$12, #$78         ; bank $12 to $78
+                mvp     $123456, $789ABC   ; bank $12 to $78
+</verb></tscreen>
 
 
 <sect1>6502X mode<label id="6502X-mode"><p>

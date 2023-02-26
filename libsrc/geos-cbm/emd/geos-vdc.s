@@ -125,8 +125,9 @@ INSTALL:
         pla
         sta $01
         plp
-        lda #<EM_ERR_OK
-        ldx #>EM_ERR_OK
+        lda #EM_ERR_OK
+        .assert EM_ERR_OK = 0, error
+        tax
         rts
 
 test64k:

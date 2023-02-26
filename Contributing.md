@@ -134,7 +134,22 @@ You can refer to Annex B of the ISO C99 standard ([here](https://www.open-std.or
 * Hexadecimal number constants should be used except where decimal or binary numbers make much more sense in that constant's context.
 * Hexadecimal letters should be upper-case.
 * When you set two registers or two memory locations to an immediate 16-bit zero, you should use the expressions ```#<$0000``` and ```#>$0000``` (they make it obvious where you are putting the lower and upper bytes).
-* If a function is declared to return a char-sized value, it actually must return an integer-sized value.  (When cc65 promotes a returned value, it sometimes assumes that the value already is an integer.)
+* If a function is declared to return a char-sized value, it actually must return an integer-sized value.  (When cc65 promotes a returned value, it sometimes assumes that the value already is an integer.) This must be done in one of the following ways:
+<pre>
+    lda #RETURN_VALUE
+    ldx #0 ; return value is char
+</pre>
+or, if the value is 0, you can use:
+<pre>
+    lda #RETURN_VALUE
+    .assert RETURN_VALUE = 0
+    tax
+</pre>
+sometimes jumping to return0 could save a byte:
+<pre>
+    .assert RETURN_VALUE = 0
+    jmp return 0
+</pre>
 * Functions, that are intended for a platform's system library, should be optimized as much as possible.
 * Sometimes, there must be a trade-off between size and speed.  If you think that a library function won't be used often, then you should make it small.  Otherwise, you should make it fast.
 * Comments that are put on the right side of instructions must be aligned (start in the same character columns).

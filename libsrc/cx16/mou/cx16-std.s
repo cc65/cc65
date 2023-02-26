@@ -139,7 +139,8 @@ INSTALL:
 
 ; Done, return zero
 
-        ldx     #>MOUSE_ERR_OK
+        ldx     #MOUSE_ERR_OK
+        .assert MOUSE_ERR_OK = 0, error
         txa
         rts
 
@@ -300,8 +301,8 @@ INFO:   jsr     BUTTONS                 ; Will not touch ptr1
 ; specific data in ptr1, and the ioctl code in A.
 ; Must return an error code in .XA .
 
-IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL   ; We don't support ioctls, for now
-        ldx     #>MOUSE_ERR_INV_IOCTL
+IOCTL:  lda     #MOUSE_ERR_INV_IOCTL    ; We don't support ioctls, for now
+        ldx     #0 ; return value is char
 ;       rts                             ; Fall through
 
 ;----------------------------------------------------------------------------

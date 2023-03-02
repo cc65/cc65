@@ -364,7 +364,7 @@ static void FreeMacExp (MacExp* E)
 
 
 
-static void MacSkipDef (unsigned Style, FilePos Pos)
+static void MacSkipDef (unsigned Style)
 /* Skip a macro definition */
 {
     if (Style == MAC_STYLE_CLASSIC) {
@@ -375,7 +375,7 @@ static void MacSkipDef (unsigned Style, FilePos Pos)
         if (CurTok.Tok != TOK_EOF) {
             SkipUntilSep ();
         } else {
-            PError (&Pos, "'.ENDMACRO' expected");
+            Error ("'.ENDMACRO' expected");
         }
     } else {
         /* Skip until end of line */
@@ -390,27 +390,32 @@ void MacDef (unsigned Style)
 {
     Macro* M;
     TokNode* N;
+    FilePos Pos;
     int HaveParams;
+    int LastTokWasSep;
 
-    /* Remember if we are at the beginning of the line. If the macro name 
-    ** and parameters pass then this will be set, so set it now  */
-    int LastTokWasSep = 1;
+    /* For classic macros, remember if we are at the beginning of the line. 
+    ** If the macro name and parameters pass our checks then we will be on a 
+    ** new line, so set it now  
+    */
+    LastTokWasSep = 1;
 
     /* Save the position of the start of the macro definition to allow 
-    ** using Perror to display the error if .ENDMACRO isn't found */
-    FilePos Pos = CurTok.Pos;
+    ** using Perror to display the error if .ENDMACRO isn't found 
+    */
+    Pos = CurTok.Pos;
 
     /* We expect a macro name here */
     if (CurTok.Tok != TOK_IDENT) {
         Error ("Identifier expected");
-        MacSkipDef (Style, Pos);
+        MacSkipDef (Style);
         return;
     } else if (!UbiquitousIdents && FindInstruction (&CurTok.SVal) >= 0) {
         /* The identifier is a name of a 6502 instruction, which is not
         ** allowed if not explicitly enabled.
         */
         Error ("Cannot use an instruction as macro name");
-        MacSkipDef (Style, Pos);
+        MacSkipDef (Style);
         return;
     }
 
@@ -419,7 +424,7 @@ void MacDef (unsigned Style)
         /* Macro is already defined */
         Error ("A macro named '%m%p' is already defined", &CurTok.SVal);
         /* Skip tokens until we reach the final .endmacro */
-        MacSkipDef (Style, Pos);
+        MacSkipDef (Style);
         return;
     }
 
@@ -499,14 +504,16 @@ void MacDef (unsigned Style)
     while (1) {
         /* Check for end of macro */
         if (Style == MAC_STYLE_CLASSIC) {
-            /* In classic macros, only .endmacro is allowed, but do no exit the macro definition if not at the start of a line */
+            /* In classic macros, if .endmacro is not at the start of the line 
+            ** it will be added to the macro definition instead of closing it. 
+            */
             if (CurTok.Tok == TOK_ENDMACRO && LastTokWasSep) {
                 /* Done */
                 break;
             }
             /* May not have end of file in a macro definition */
             if (CurTok.Tok == TOK_EOF) {
-                PError (&Pos, "'.ENDMACRO' expected");
+                PError (&Pos, "'.ENDMACRO' expected for macro '%m%p'", &M->Name);
                 goto Done;
             }
         } else {
@@ -581,7 +588,9 @@ void MacDef (unsigned Style)
         }
         ++M->TokCount;
 
-        /* Save if last token was a separator to know if .endmacro is valid */
+        /* Save if last token was a separator to know if .endmacro is at 
+        ** the start of a line 
+        */
         LastTokWasSep = TokIsSep(CurTok.Tok);
 
         /* Read the next token */

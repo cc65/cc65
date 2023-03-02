@@ -2522,7 +2522,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
 
 <sect1><tt>.ENDMAC, .ENDMACRO</tt><label id=".ENDMACRO"><p>
 
-  Marks the end of a macro definition. Note, <tt>.ENDMACRO</tt> should be on 
+  Marks the end of a macro definition. Note, <tt>.ENDMACRO</tt> should be on
   its own line to successfully end the macro definition. It is possible to use
   <tt><ref id=".DEFINE" name=".DEFINE"></tt> to create a symbol that references
   <tt>.ENDMACRO</tt> without ending the macro definition.

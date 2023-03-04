@@ -115,7 +115,11 @@ install:
 	$(INSTALL) ../bin/* $(DESTDIR)$(bindir)
 
 avail:
+ifneq ($(patsubst %,../bin/%,$(PROGS)),$(wildcard $(patsubst %,../bin/%,$(PROGS))))
+	$(error executables are missing, please run make first)
+else
 	$(foreach prog,$(PROGS),$(AVAIL_recipe))
+endif
 
 unavail:
 	$(foreach prog,$(PROGS),$(UNAVAIL_recipe))

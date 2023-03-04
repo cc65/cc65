@@ -30,7 +30,7 @@ ISEQUAL = ../../testwrk/isequal$(EXE)
 CC = gcc
 CFLAGS = -O2
 
-START = --start-addr 0x8000
+START = --start-addr 0x7000
 
 .PHONY: all clean
 

@@ -62,8 +62,9 @@ INSTALL:
         sty SWCHB ; enable 2-button 7800 controller 2: pull pin 6 (INPT4) high
 
 reset:
-        lda #<JOY_ERR_OK
-        ldx #>JOY_ERR_OK
+        lda #JOY_ERR_OK
+        .assert JOY_ERR_OK = 0, error
+        tax
 ;       rts                     ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------

@@ -59,7 +59,7 @@
   Contains hints on creating the most effective code with cc65.
 
   <tag><htmlurl url="cc65-intern.html" name="cc65-intern.html"></tag>
-  Describes internal details of cc65, such as calling conventions.
+  Describes internal details of cc65: linker configuration, calling conventions, etc.
 
   <tag><htmlurl url="using-make.html" name="using-make.html"></tag>
   Build programs, using the GNU Make utility.

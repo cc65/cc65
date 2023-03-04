@@ -151,10 +151,11 @@ BVC LABEL
 BVS LABEL
 BRL LABEL
 JMP $1234
-JMP $FEDCBA
+JML $FEDCBA
 JMP ($1234)
 JMP ($1234,X)
 JMP [$1234]
+JML [$1234] ; alternative to JMP []
 JSL $123456
 JSR $1234
 JSR ($1234,X)
@@ -271,3 +272,15 @@ BIT #$5432
 LDA #$5432
 LDX #$5432
 LDY #$5432
+
+; test of smart and long_jsr_jmp_rts
+.smart
+.proc short_rts : far
+RTS ; not promoted to RTL
+.endproc
+.feature long_jsr_jmp_rts
+JSR $FEDCBA ; promoted to JSL
+JMP $FEDCBA ; promoted to JML
+.proc long_rts : far
+RTS ; promoted to RTL
+.endproc

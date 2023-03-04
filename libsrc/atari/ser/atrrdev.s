@@ -135,8 +135,8 @@ my_CIOV:
         .code
 
 invbaud:
-        lda     #<SER_ERR_BAUD_UNAVAIL
-        ldx     #>SER_ERR_BAUD_UNAVAIL
+        lda     #SER_ERR_BAUD_UNAVAIL
+        ldx     #0 ; return value is char
 openerr:
         rts
 
@@ -229,8 +229,9 @@ SER_OPEN:
         jsr     my_CIOV
         bmi     cioerr
 
-        lda     #<SER_ERR_OK
-        tax                             ; A is zero
+        lda     #SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
+        tax
         rts
 
 inverr: jmp     my___inviocb
@@ -240,8 +241,8 @@ cioerr:
         jsr     my_fddecusage   ; decrement usage counter of fd as open failed
 
 init_err:
-        ldx     #0
         lda     #SER_ERR_INIT_FAILED
+        ldx     #0 ; return value is char
         rts
 
 ;---- open the device
@@ -313,8 +314,9 @@ SER_CLOSE:
         stx     rshand+1
         inx
         stx     cm_run
-@done:  lda     #<SER_ERR_OK
-        ldx     #>SER_ERR_OK
+@done:  lda     #SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
+        tax
         rts
 
 ;----------------------------------------------------------------------------
@@ -365,16 +367,16 @@ SER_GET:
         rts
 
 @nix_da:lda     #SER_ERR_NO_DATA
-        ldx     #0
+        ldx     #0 ; return value is char
         rts
 
 ser_error:
         lda     #SER_ERR_OVERFLOW       ; there is no large selection of serial error codes... :-/
-        ldx     #0
+        ldx     #0 ; return value is char
         rts
 
 ni_err: lda     #SER_ERR_NOT_OPEN
-        ldx     #0
+        ldx     #0 ; return value is char
         rts
 
 ;----------------------------------------------------------------------------
@@ -427,8 +429,8 @@ SER_STATUS:
 ;
 
 SER_IOCTL:
-        lda     #<SER_ERR_INV_IOCTL     ; We don't support ioclts for now
-        ldx     #>SER_ERR_INV_IOCTL
+        lda     #SER_ERR_INV_IOCTL      ; We don't support ioclts for now
+        ldx     #0 ; return value is char
         rts
 
 ;----------------------------------------------------------------------------
@@ -456,8 +458,8 @@ search: lda     HATABS,y                ; get device name
 
 ; R: device not found, return error
 
-        lda     #<SER_ERR_NO_DEVICE
-        ldx     #0
+        lda     #SER_ERR_NO_DEVICE
+        ldx     #0 ; return value is char
         rts
 
 ; R: device found, initialize jump table into main program
@@ -554,8 +556,9 @@ found:  lda     ptr3
         pla
         sta     ptr3
 
-        lda     #<SER_ERR_OK
-        tax                     ; A is zero
+        lda     #SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
+        tax
         rts
 
 

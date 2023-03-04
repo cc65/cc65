@@ -1023,7 +1023,10 @@ static void DoFatal (void)
 static void DoFeature (void)
 /* Switch the Feature option */
 {
-    /* Allow a list of comma separated keywords */
+    feature_t Feature;
+    unsigned char On;
+
+    /* Allow a list of comma separated feature keywords with optional +/- or ON/OFF */
     while (1) {
 
         /* We expect an identifier */
@@ -1034,18 +1037,24 @@ static void DoFeature (void)
 
         /* Make the string attribute lower case */
         LocaseSVal ();
-
-        /* Set the feature and check for errors */
-        if (SetFeature (&CurTok.SVal) == FEAT_UNKNOWN) {
+        Feature = FindFeature(&CurTok.SVal);
+        if (Feature == FEAT_UNKNOWN) {
             /* Not found */
             ErrorSkip ("Invalid feature: '%m%p'", &CurTok.SVal);
             return;
-        } else {
-            /* Skip the keyword */
-            NextTok ();
+        }
+        NextTok ();
+
+        /* Optional +/- or ON/OFF */
+        On = 1;
+        if (CurTok.Tok != TOK_COMMA && !TokIsSep (CurTok.Tok)) {
+            SetBoolOption(&On);
         }
 
-        /* Allow more than one keyword */
+        /* Apply feature setting. */
+        SetFeature (Feature, On);
+
+        /* Allow more than one feature separated by commas. */
         if (CurTok.Tok == TOK_COMMA) {
             NextTok ();
         } else {

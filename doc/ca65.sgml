@@ -2758,14 +2758,18 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
   This directive may be used to enable one or more compatibility features
   of the assembler. While the use of <tt/.FEATURE/ should be avoided when
   possible, it may be useful when porting sources written for other
-  assemblers. There is no way to switch a feature off, once you have
-  enabled it, so using
+  assemblers. After the feature name an optional '+' or '-' may specify whether
+  to enable or disable the feature (enable if omitted). Multiple features may be
+  enabled, separated by commas. Examples:
 
   <tscreen><verb>
-        .FEATURE        xxx
+        ; enable c_comments
+        .feature   c_comments
+        .feature   c_comments +
+        ; enable force_range, disable underline_in_numbers, enable labels_without_colons
+        .feature   force_range, underline_in_numbers -, labels_without_colons +
+        .feature   force_range +, underline_in_numbers off, labels_without_colons on
   </verb></tscreen>
-
-  will enable the feature until end of assembly is reached.
 
   The following features are available:
 

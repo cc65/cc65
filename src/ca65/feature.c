@@ -98,38 +98,30 @@ feature_t FindFeature (const StrBuf* Key)
 
 
 
-feature_t SetFeature (const StrBuf* Key)
-/* Find the feature and set the corresponding flag if the feature is known.
-** In any case, return the feature found. An invalid Key will return
-** FEAT_UNKNOWN.
+void SetFeature (feature_t Feature, unsigned char On)
+/* Set the corresponding feature flag if Feature is valid.
 */
 {
-    /* Map the string to an enum value */
-    feature_t Feature = FindFeature (Key);
-
     /* Set the flags */
     switch (Feature) {
-        case FEAT_DOLLAR_IS_PC:               DollarIsPC        = 1;    break;
-        case FEAT_LABELS_WITHOUT_COLONS:      NoColonLabels     = 1;    break;
-        case FEAT_LOOSE_STRING_TERM:          LooseStringTerm   = 1;    break;
-        case FEAT_LOOSE_CHAR_TERM:            LooseCharTerm     = 1;    break;
-        case FEAT_AT_IN_IDENTIFIERS:          AtInIdents        = 1;    break;
-        case FEAT_DOLLAR_IN_IDENTIFIERS:      DollarInIdents    = 1;    break;
-        case FEAT_LEADING_DOT_IN_IDENTIFIERS: LeadingDotInIdents= 1;    break;
-        case FEAT_ORG_PER_SEG:                OrgPerSeg         = 1;    break;
-        case FEAT_PC_ASSIGNMENT:              PCAssignment      = 1;    break;
-        case FEAT_MISSING_CHAR_TERM:          MissingCharTerm   = 1;    break;
-        case FEAT_UBIQUITOUS_IDENTS:          UbiquitousIdents  = 1;    break;
-        case FEAT_C_COMMENTS:                 CComments         = 1;    break;
-        case FEAT_FORCE_RANGE:                ForceRange        = 1;    break;
-        case FEAT_UNDERLINE_IN_NUMBERS:       UnderlineInNumbers= 1;    break;
-        case FEAT_ADDRSIZE:                   AddrSize          = 1;    break;
-        case FEAT_BRACKET_AS_INDIRECT:        BracketAsIndirect = 1;    break;
-        case FEAT_STRING_ESCAPES:             StringEscapes     = 1;    break;
-        case FEAT_LONG_JSR_JMP_RTS:           LongJsrJmpRts     = 1;    break;
-        default:                         /* Keep gcc silent */          break;
+        case FEAT_DOLLAR_IS_PC:               DollarIsPC        = On;    break;
+        case FEAT_LABELS_WITHOUT_COLONS:      NoColonLabels     = On;    break;
+        case FEAT_LOOSE_STRING_TERM:          LooseStringTerm   = On;    break;
+        case FEAT_LOOSE_CHAR_TERM:            LooseCharTerm     = On;    break;
+        case FEAT_AT_IN_IDENTIFIERS:          AtInIdents        = On;    break;
+        case FEAT_DOLLAR_IN_IDENTIFIERS:      DollarInIdents    = On;    break;
+        case FEAT_LEADING_DOT_IN_IDENTIFIERS: LeadingDotInIdents= On;    break;
+        case FEAT_ORG_PER_SEG:                OrgPerSeg         = On;    break;
+        case FEAT_PC_ASSIGNMENT:              PCAssignment      = On;    break;
+        case FEAT_MISSING_CHAR_TERM:          MissingCharTerm   = On;    break;
+        case FEAT_UBIQUITOUS_IDENTS:          UbiquitousIdents  = On;    break;
+        case FEAT_C_COMMENTS:                 CComments         = On;    break;
+        case FEAT_FORCE_RANGE:                ForceRange        = On;    break;
+        case FEAT_UNDERLINE_IN_NUMBERS:       UnderlineInNumbers= On;    break;
+        case FEAT_ADDRSIZE:                   AddrSize          = On;    break;
+        case FEAT_BRACKET_AS_INDIRECT:        BracketAsIndirect = On;    break;
+        case FEAT_STRING_ESCAPES:             StringEscapes     = On;    break;
+        case FEAT_LONG_JSR_JMP_RTS:           LongJsrJmpRts     = On;    break;
+        default:                                                         break;
     }
-
-    /* Return the value found */
-    return Feature;
 }

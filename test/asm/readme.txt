@@ -33,6 +33,6 @@ Refer to listing/readme.txt
 val:
 ----
 
-Runtime assembly tests using sim65 that should exit with an exit code of 0 when
-the pass, or either -1 or a number indicating what part of the test failed on
-error.
+Runtime assembly tests using sim65 that should end with an exit code of 0 if
+they pass. If they fail the exit code should be either -1, or a number
+indicating what part of the test failed.

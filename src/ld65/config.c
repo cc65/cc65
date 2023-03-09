@@ -2043,14 +2043,14 @@ unsigned CfgProcess (void)
                             ++Overflows;
                             if (S->Flags & SF_OFFSET) {
                                 CfgWarning (GetSourcePos (S->LI),
-                                            "Segment '%s' offset is too small in '%s' by %lu byte%c",
+                                            "Segment '%s' offset is too small in '%s' by %lu byte%s",
                                             GetString (S->Name), GetString (M->Name),
-                                            Addr - NewAddr, (Addr - NewAddr == 1) ? ' ' : 's');
+                                            Addr - NewAddr, (Addr - NewAddr == 1) ? "" : "s");
                             } else {
                                 CfgWarning (GetSourcePos (S->LI),
-                                            "Segment '%s' start address is too low in '%s' by %lu byte%c",
+                                            "Segment '%s' start address is too low in '%s' by %lu byte%s",
                                             GetString (S->Name), GetString (M->Name),
-                                            Addr - NewAddr, (Addr - NewAddr == 1) ? ' ' : 's');
+                                            Addr - NewAddr, (Addr - NewAddr == 1) ? "" : "s");
                             }
                         } else {
                             Addr = NewAddr;
@@ -2095,9 +2095,9 @@ unsigned CfgProcess (void)
                 ++Overflows;
                 M->Flags |= MF_OVERFLOW;
                 CfgWarning (GetSourcePos (M->LI),
-                            "Segment '%s' overflows memory area '%s' by %lu byte%c",
+                            "Segment '%s' overflows memory area '%s' by %lu byte%s",
                             GetString (S->Name), GetString (M->Name),
-                            FillLevel - M->Size, (FillLevel - M->Size == 1) ? ' ' : 's');
+                            FillLevel - M->Size, (FillLevel - M->Size == 1) ? "" : "s");
             }
             if (FillLevel > M->FillLevel) {
                 /* Regular segments increase FillLevel. Overwrite segments may increase but not decrease FillLevel. */

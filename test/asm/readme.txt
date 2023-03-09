@@ -1,32 +1,38 @@
 Assembler Testcases
 ===================
 
-Opcode Tests:
--------------
+cpudetect
+---------
 
-these go into opcodes/. Refer to opcodes/readme.txt
-
-
-CPU Detect Tests
-----------------
-
-these go into cpudetect/. Refer to cpudetect/readme.txt
+Tests the --cpu command line option of ca65/ld65.
+Refer to cpudetect/readme.txt
 
 
-Overall tests:
---------------
+opcodes
+-------
 
-These go into listing/. Refer to listing/readme.txt
+Test of assembler opcodes for each CPU.
+Refer to opcodes/readme.txt
 
-val:
-----
-
-Works very much like the /val directory used to test the compiler -  individual
-tests are run in the simulator and should exit with an exit code of 0 when they
-pass, or either -1 or a number indicating what part of the test failed on error.
 
 err:
 ----
 
-Works very much like the /err directory used to test the compiler - individual
-tests are assembled and MUST NOT assemble without error.
+Used to test assembler errors. These tests MUST NOT assemble without error.
+
+
+listing:
+--------
+
+This is the most versatile assembler test form, allowing control customizations,
+reference tests for binary output, stdout and error text ouput, error tests,
+listings, custom linker configuration, etc. as needed.
+Refer to listing/readme.txt
+
+
+val:
+----
+
+Runtime assembly tests using sim65 that should end with an exit code of 0 if
+they pass. If they fail the exit code should be either -1, or a number
+indicating what part of the test failed.

@@ -56,5 +56,18 @@ int __fastcall__ loadt (unsigned char);
 /* Write to tape */
 int __fastcall__ dumpt (unsigned char, const void*, const void*);
 
+
+/* Write to 7-segment LED display. Due to hardware limitations it only
+** displays briefly, so must be called repeatedly to update the
+** display.
+**/
+void __fastcall__ scandisplay(unsigned char left, unsigned char middle, unsigned char right);
+
+/*
+** Get a keypress from the keypad. Returns $00-$0F(0-F), $10(AD), $11(DA), $12(+),
+** $13(GO), $14(PC) or $15 for no keypress.
+**/
+int __fastcall__ getkey();
+
 /* End of sym1.h */
 #endif

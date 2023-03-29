@@ -27,15 +27,10 @@ begin:  dec     ptr2
         beq     done             ; If buffer full, return
 
 getch:  jsr     INTCHR           ; Get character using Monitor ROM call
-        ;jsr     OUTCHR           ; Echo it
         and     #$7F             ; Clear top bit
-        cmp     #$07             ; Check for '\a'
-        bne     chkcr            ; ...if BEL character
-        ;jsr     BEEP             ; Make beep sound TODO
-chkcr:  cmp     #$0D             ; Check for '\r'
+        cmp     #$0D             ; Check for '\r'
         bne     putch            ; ...if CR character
         lda     #$0A             ; Replace with '\n'
-        jsr     OUTCHR           ; and echo it
 
 putch:  ldy     #$00             ; Put char into return buffer
         sta     (ptr1),y

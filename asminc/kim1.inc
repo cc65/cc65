@@ -15,7 +15,7 @@ OUTCHR   := $1EA0     ; Output character
 INTCHR   := $1E5A     ; Input character without case conversion
 DUMPT    := $1800     ; Dump memory to tape
 LOADT    := $1873     ; Load memory from tape
-
+START    := $1C4F     ; Enter KIM-1 monitor
 
 ; ---------------------------------------------------------------------------
 ; System Memory

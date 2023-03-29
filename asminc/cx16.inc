@@ -239,12 +239,12 @@ BASIC_BUF       := $0200        ; Location of command-line
 BASIC_BUF_LEN   = 81            ; Maximum length of command-line
 
 SCREEN_PTR      := $0262        ; Pointer to current row on text screen (16 bits)
-STATUS          := $0289        ; Status from previous I/O operation
-IN_DEV          := $028D        ; Current input device number
-OUT_DEV         := $028E        ; Current output device number
-FNAM_LEN        := $0291        ; Length of filename
-SECADR          := $0293        ; Secondary address
-DEVNUM          := $0294        ; Device number
+STATUS          := $0287        ; Status from previous I/O operation
+IN_DEV          := $028B        ; Current input device number
+OUT_DEV         := $028C        ; Current output device number
+FNAM_LEN        := $028F        ; Length of filename
+SECADR          := $0291        ; Secondary address
+DEVNUM          := $0292        ; Device number
 CURS_COLOR      := $0373        ; Color under the cursor
 CHARCOLOR       := $0376        ; Cursor's color nybbles (high: background, low: foreground)
 RVS             := $0377        ; Reverse flag
@@ -258,8 +258,8 @@ LLEN            := $0386        ; Line length
 NLINES          := $0387        ; Number of screen lines
 
 ; BASIC
-VARTAB          := $03E2        ; Pointer to start of BASIC variables
-MEMSIZE         := $03EA        ; Pointer to highest BASIC RAM location (+1)
+VARTAB          := $03E1        ; Pointer to start of BASIC variables
+MEMSIZE         := $03E9        ; Pointer to highest BASIC RAM location (+1)
 
 ; ---------------------------------------------------------------------------
 ; Vector and other locations

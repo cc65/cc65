@@ -69,5 +69,5 @@ void __fastcall__ scandisplay(unsigned char left, unsigned char middle, unsigned
 **/
 int __fastcall__ getkey();
 
-/* End of sym1.h */
+/* End of kim1.h */
 #endif

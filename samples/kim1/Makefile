@@ -33,7 +33,8 @@ endif
 
 EXELIST_kim1 = \
         kimHello.bin \
-        kimSieve.bin
+        kimSieve.bin \
+        kimLife.bin
 
 ifneq ($(EXELIST_$(SYS)),)
 samples: $(EXELIST_$(SYS))
@@ -50,13 +51,30 @@ else
 	@echo > $(NULLDEV)
 endif
 
+kimLife.bin: kimLife.c
+	$(CL) -t kim1 -C kim1-60k.cfg -O -o kimLife.bin kimLife.c
+
 kimSieve.bin: kimSieve.c
 	$(CL) -t kim1 -C kim1-60k.cfg -O -o kimSieve.bin kimSieve.c
 
 kimHello.bin: kimHello.c
 	$(CL) -t kim1 -O -o kimHello.bin kimHello.c
 
+# To build an intel-format file for the CORSHAM SD card reader
+
+kimLife.hex: kimLife.bin
+	srec_cat kimLife.bin  -binary -offset 0x2000 -o kimLife.hex  -Intel -address-length=2
+
+# To build a paper tape file for uploading to the KIM-1 via terminal
+
+kimLife.ptp: kimLife.bin
+	srec_cat kimLife.bin -binary -offset 0x2000 -o kimLife.hex -MOS_Technologies
+
 clean:
 	@$(DEL) kimSieve.bin 2>$(NULLDEV)
 	@$(DEL) kimHello.bin 2>$(NULLDEV)
+	@$(DEL) kimLife.bin  2>$(NULLDEV)
+	@$(DEL) kimLife.ptp  2>$(NULLDEV)
+	@$(DEL) kimLife.hex  2>$(NULLDEV)
 
+  

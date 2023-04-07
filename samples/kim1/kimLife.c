@@ -22,19 +22,15 @@ typedef unsigned char byte;
 #define NUMBYTES  8000
 #define DENSITY     50
 
-// BITARRAY
-//
-// Access individual bits in a block of memory
-
-//#define GETBIT(array, bit) (array[bit >> 3]  &  (1 << (bit & 7)))
-//#define SETBIT(array, bit) (array[bit >> 3] |=  (1 << (bit & 7)))
-//#define CLRBIT(array, bit) (array[bit >> 3] &= ~(1 << (bit & 7)))
-
 // Screen memory is placed at 8000, our world copy at A000, and they use the same layout so 
 // that we can memcpy from one to the other without translating
 
 byte * world     = (byte *) 0x8000;
 byte * new_world = (byte *) 0xA000;
+
+// BITARRAY
+//
+// Access individual bits in a block of memory
 
 // Access to the screen bitmap
 
@@ -66,9 +62,6 @@ byte GETPIXEL(byte *p, int x, int y)
    return GETBIT(p, y * WIDTH + x);
 }
 
-//#define SETPIXEL(w, x, y, bit) (bit ? SETBIT(w, y * WIDTH + x) : CLRBIT(w, y * WIDTH + x))
-//#define GETPIXEL(w, x, y) GETBIT(w, y * WIDTH + x)
-
 // RandomFillWorld
 //
 // Populates the initial world with random cells
@@ -85,7 +78,6 @@ void RandomFillWorld()
       {
          byte b = ((rand() % 100) < DENSITY) ? 1 : 0;
          SETPIXEL(world, x, y, b);
-//         printf("Set pixel at %d,%d to %d\n", x, y, b);
       }
    }
 }
@@ -123,7 +115,6 @@ void UpdateWorld()
 
    for (y = 0; y < HEIGHT; y++) 
    {
-       printf("Working on column %d\n", y);
        for (x = 0; x < WIDTH; x++) 
        {
          int neighbors = CountNeighbors(x, y);

@@ -26,9 +26,9 @@ typedef unsigned char byte;
 //
 // Access individual bits in a block of memory
 
-#define GETBIT(array, bit) (array[bit >> 3]  &  (1 << (bit & 7)))
-#define SETBIT(array, bit) (array[bit >> 3] |=  (1 << (bit & 7)))
-#define CLRBIT(array, bit) (array[bit >> 3] &= ~(1 << (bit & 7)))
+//#define GETBIT(array, bit) (array[bit >> 3]  &  (1 << (bit & 7)))
+//#define SETBIT(array, bit) (array[bit >> 3] |=  (1 << (bit & 7)))
+//#define CLRBIT(array, bit) (array[bit >> 3] &= ~(1 << (bit & 7)))
 
 // Screen memory is placed at 8000, our world copy at A000, and they use the same layout so 
 // that we can memcpy from one to the other without translating
@@ -38,8 +38,36 @@ byte * new_world = (byte *) 0xA000;
 
 // Access to the screen bitmap
 
-#define SETPIXEL(w, x, y, bit) (bit ? SETBIT(w, y * WIDTH + x) : CLRBIT(w, y * WIDTH + x))
-#define GETPIXEL(w, x, y) GETBIT(w, y * WIDTH + x)
+byte GETBIT(byte *p, int n)
+{
+   return (p[n >> 3] & (1 << (n & 7))) ? 1 : 0;
+}
+
+void SETBIT(byte *p, int n)
+{
+   p[n >> 3] |=  (1 << (n & 7));
+}
+
+void CLRBIT(byte *p, int n)
+{
+   p[n >> 3] &= ~(1 << (n & 7));
+}
+
+void SETPIXEL(byte * p, int x, int y, byte b)
+{
+   if (b)
+      SETBIT(p, y * WIDTH + x);
+   else
+      CLRBIT(p, y * WIDTH + x);
+}
+
+byte GETPIXEL(byte *p, int x, int y)
+{
+   return GETBIT(p, y * WIDTH + x);
+}
+
+//#define SETPIXEL(w, x, y, bit) (bit ? SETBIT(w, y * WIDTH + x) : CLRBIT(w, y * WIDTH + x))
+//#define GETPIXEL(w, x, y) GETBIT(w, y * WIDTH + x)
 
 // RandomFillWorld
 //
@@ -52,8 +80,14 @@ void RandomFillWorld()
    // I need a better way to see the RNG or it'll be the same game every time!
    srand(0);
    for (x = 0; x < WIDTH; x++)
+   {
       for (y = 0; y < HEIGHT; y++)
-         SETPIXEL(world, x, y, (rand() % 100) < DENSITY);
+      {
+         byte b = ((rand() % 100) < DENSITY) ? 1 : 0;
+         SETPIXEL(world, x, y, b);
+//         printf("Set pixel at %d,%d to %d\n", x, y, b);
+      }
+   }
 }
 
 // CountNeighbors
@@ -89,6 +123,7 @@ void UpdateWorld()
 
    for (y = 0; y < HEIGHT; y++) 
    {
+       printf("Working on column %d\n", y);
        for (x = 0; x < WIDTH; x++) 
        {
          int neighbors = CountNeighbors(x, y);

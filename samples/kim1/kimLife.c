@@ -16,11 +16,11 @@ typedef unsigned char byte;
 
 // World size
 
-#define WIDTH     320
-#define HEIGHT    200
-#define NUMBITS  8000
-#define NUMBYTES 1000
-#define DENSITY    50
+#define WIDTH      320
+#define HEIGHT     200
+#define NUMBITS  64000
+#define NUMBYTES  8000
+#define DENSITY     50
 
 // BITARRAY
 //
@@ -38,8 +38,8 @@ byte * new_world = (byte *) 0xA000;
 
 // Access to the screen bitmap
 
-#define SETPIXEL(w, x, y, bit) (bit ? SETBIT(w, y * HEIGHT + x) : CLRBIT(w, y * HEIGHT + x))
-#define GETPIXEL(w, x, y) GETBIT(w, y * HEIGHT + x)
+#define SETPIXEL(w, x, y, bit) (bit ? SETBIT(w, y * WIDTH + x) : CLRBIT(w, y * WIDTH + x))
+#define GETPIXEL(w, x, y) GETBIT(w, y * WIDTH + x)
 
 // RandomFillWorld
 //
@@ -49,7 +49,8 @@ void RandomFillWorld()
 {
    int x, y;
 
-   srand(rand());
+   // I need a better way to see the RNG or it'll be the same game every time!
+   srand(0);
    for (x = 0; x < WIDTH; x++)
       for (y = 0; y < HEIGHT; y++)
          SETPIXEL(world, x, y, (rand() % 100) < DENSITY);
@@ -101,12 +102,16 @@ void UpdateWorld()
 
 int main (void)
 {
-   printf("Starting Conway's Game of Life\r\n");
-
+   printf("\r\nStarting Conway's Game of Life: Randomizing World...\r\n");
+   RandomFillWorld();
+   printf("World Ready, Running!\r\n");
+   
    for (;;)
    {
       UpdateWorld();
+      printf("[");
       memcpy(world, new_world, NUMBYTES);
+      printf("]");
    }
 
    return 0;

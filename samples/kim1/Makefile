@@ -52,7 +52,10 @@ else
 endif
 
 kimLife.bin: kimLife.c
-	$(CL) -t kim1 -C kim1-60k.cfg -O -o kimLife.bin kimLife.c
+	$(CL) -t kim1 -C kim1-60k.cfg -Oi -o kimLife.bin kimLife.c
+
+kimTest.bin: kimTest.c
+	$(CL) -t kim1 -C kim1-60k.cfg -Oi -o kimTest.bin kimTest.c
 
 kimSieve.bin: kimSieve.c
 	$(CL) -t kim1 -C kim1-60k.cfg -O -o kimSieve.bin kimSieve.c
@@ -65,10 +68,16 @@ kimHello.bin: kimHello.c
 kimLife.hex: kimLife.bin
 	srec_cat kimLife.bin  -binary -offset 0x2000 -o kimLife.hex  -Intel -address-length=2
 
+kimTest.hex: kimTest.bin
+	srec_cat kimTest.bin  -binary -offset 0x2000 -o kimTest.hex  -Intel -address-length=2
+
 # To build a paper tape file for uploading to the KIM-1 via terminal
 
 kimLife.ptp: kimLife.bin
 	srec_cat kimLife.bin -binary -offset 0x2000 -o kimLife.hex -MOS_Technologies
+
+kimTest.ptp: kimTest.bin
+	srec_cat kimTest.bin -binary -offset 0x2000 -o kimTest.hex -MOS_Technologies
 
 clean:
 	@$(DEL) kimSieve.bin 2>$(NULLDEV)
@@ -76,5 +85,8 @@ clean:
 	@$(DEL) kimLife.bin  2>$(NULLDEV)
 	@$(DEL) kimLife.ptp  2>$(NULLDEV)
 	@$(DEL) kimLife.hex  2>$(NULLDEV)
+	@$(DEL) kimTest.bin  2>$(NULLDEV)
+	@$(DEL) kimTest.ptp  2>$(NULLDEV)
+	@$(DEL) kimTest.hex  2>$(NULLDEV)
 
   

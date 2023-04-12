@@ -138,7 +138,7 @@ int main(int argc, char **argv)
 
     numlabels = 0;
     while (fgets (buf, 1024, f)) {
-        unsigned i;
+        unsigned i, len;
         struct label_t *cur;
         for (i = 0; buf[i]; i++) {
             if (buf[i] == '\n') {
@@ -154,8 +154,13 @@ int main(int argc, char **argv)
         cur = &labels[numlabels];
         cur->count = 0;
         cur->addr = strtoul(buf + 3, NULL, 16);
-        strncpy(cur->name, buf + 11, 32);
-        cur->name[31] = '\0';
+
+        len = strlen(buf + 11);
+        if (len > 31) {
+            len = 31;
+        }
+        memcpy(cur->name, buf + 11, len);
+        cur->name[len] = '\0';
 
         numlabels++;
         if (numlabels >= MAX_LABELS) {

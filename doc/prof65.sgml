@@ -3,7 +3,7 @@
 <article>
 
 <title>prof65 Users Guide
-<author><url name="Lauri Kasanen">
+<author>Lauri Kasanen
 
 <abstract>
 prof65 is a profiler for sim65. It allows finding out hot spots in 6502 and 65c02 code.

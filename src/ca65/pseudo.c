@@ -2136,6 +2136,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoImportZP      },
     { ccNone,           DoIncBin        },
     { ccNone,           DoInclude       },
+    { ccNone,           DoUnexpected    },      /* .INSERT */
     { ccNone,           DoInterruptor   },
     { ccNone,           DoUnexpected    },      /* .ISIZE */
     { ccNone,           DoUnexpected    },      /* .ISMNEMONIC */

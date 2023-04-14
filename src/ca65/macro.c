@@ -364,35 +364,22 @@ static void FreeMacExp (MacExp* E)
 
 
 
-static void MacSkipDef (unsigned Style)
-/* Skip a macro definition */
-{
-    if (Style == MAC_STYLE_CLASSIC) {
-        /* Skip tokens until we reach the final .endmacro */
-        while (CurTok.Tok != TOK_ENDMACRO && CurTok.Tok != TOK_EOF) {
-            NextTok ();
-        }
-        if (CurTok.Tok != TOK_EOF) {
-            SkipUntilSep ();
-        } else {
-            Error ("'.ENDMACRO' expected");
-        }
-    } else {
-        /* Skip until end of line */
-        SkipUntilSep ();
-    }
-}
-
-
-
 void MacDef (unsigned Style)
 /* Parse a macro definition */
 {
     Macro* M;
     TokNode* N;
     FilePos Pos;
+    int L;
     int HaveParams;
     int LastTokWasSep;
+    int NestedMacroCount;
+    unsigned int MacroErrorCount;
+
+    /* For classic macros, this indicates when in a nested macro. 
+    ** Only end the macro defintion with .endmacro when this is zero
+    */
+    NestedMacroCount = 0;
 
     /* For classic macros, remember if we are at the beginning of the line.
     ** If the macro name and parameters pass our checks then we will be on a
@@ -401,35 +388,39 @@ void MacDef (unsigned Style)
     LastTokWasSep = 1;
 
     /* Save the position of the start of the macro definition to allow
-    ** using Perror to display the error if .endmacro isn't found
+    ** using Perror to display the error if the final .endmacro isn't found
     */
     Pos = CurTok.Pos;
 
-    /* We expect a macro name here */
+    /* Remember current error count */
+    MacroErrorCount = ErrorCount;
+
+    /* We expect a macro name here. */
     if (CurTok.Tok != TOK_IDENT) {
         Error ("Identifier expected");
-        MacSkipDef (Style);
-        return;
     } else if (!UbiquitousIdents && FindInstruction (&CurTok.SVal) >= 0) {
         /* The identifier is a name of a 6502 instruction, which is not
         ** allowed if not explicitly enabled.
         */
         Error ("Cannot use an instruction as macro name");
-        MacSkipDef (Style);
-        return;
     }
 
     /* Did we already define that macro? */
     if (HT_Find (&MacroTab, &CurTok.SVal) != 0) {
         /* Macro is already defined */
         Error ("A macro named '%m%p' is already defined", &CurTok.SVal);
-        /* Skip tokens until we reach the final .endmacro */
-        MacSkipDef (Style);
-        return;
     }
 
     /* Define the macro */
     M = NewMacro (&CurTok.SVal, Style);
+
+    /* For a .define: at this point, allow user newline sequences to be read 
+    ** and stored as part of the macro definition 
+    */
+    PRECONDITION (AllowNewlineToken == 0);
+    if (Style == MAC_STYLE_DEFINE) {
+        NewlineTokenAllow ();
+    }
 
     /* Switch to raw token mode and skip the macro name */
     EnterRawTokenMode ();
@@ -497,34 +488,79 @@ void MacDef (unsigned Style)
     }
 
     /* Preparse the macro body. We will read the tokens until we reach end of
-    ** file, or a .endmacro (or end of line for DEFINE-style macros) and store
-    ** them into a token list internal to the macro. For classic macros,
+    ** file, or a final .endmacro (or end of line for DEFINE-style macros) and 
+    ** store them into a token list internal to the macro. For classic macros,
     ** the .LOCAL command is detected and removed, at this time.
     */
     while (1) {
-        /* Check for end of macro */
         if (Style == MAC_STYLE_CLASSIC) {
-            /* In classic macros, if .endmacro is not at the start of the line
-            ** it will be added to the macro definition instead of closing it.
-            */
-            if (CurTok.Tok == TOK_ENDMACRO && LastTokWasSep) {
-                /* Done */
-                break;
+            /* Only look at some tokens if they are at the start of a line */
+            if (LastTokWasSep) {
+                /* If we found .macro at the start of a line, increment the counter */
+                if (CurTok.Tok == TOK_MACRO) {
+                    ++NestedMacroCount;
+                }
+
+                /* If we found .endmacro at the start of a line, then check for
+                ** nested macros. If none, the macro defintion is complete. 
+                */
+                if (CurTok.Tok == TOK_ENDMACRO) {
+                    if (NestedMacroCount) {
+                        --NestedMacroCount;
+                    } else {
+                        /* Done: Skip the .endmacro */
+                        NextTok ();
+                        break;
+                    }
+                }
+
+                /* A .define was found at the start of a line: Allow newline
+                ** tokens to be passed from the scanner
+                */
+                if (CurTok.Tok == TOK_DEFINE) {
+                    NewlineTokenAllow ();
+                }
+
+                /* If we found an .insert token, skip it. This allows 
+                ** .endmacro and .macro to be added to the macro definition
+                ** without being part of a nested macro. It also
+                ** allows a .define definition without disabling define-style
+                ** macros for the macro name
+                */
+                if (CurTok.Tok == TOK_INSERT && NestedMacroCount == 0) {
+                    LastTokWasSep = 0;
+                    NextTok ();
+                }
+
             }
             /* May not have end of file in a macro definition */
             if (CurTok.Tok == TOK_EOF) {
                 PError (&Pos, "'.ENDMACRO' expected for macro '%m%p'", &M->Name);
-                goto Done;
+                break;
             }
         } else {
-            /* Accept a newline or end of file for new style macros */
+            /* Accept a true end of line or end of file to terminate the 
+            ** definition of .define style macros
+            */
             if (TokIsSep (CurTok.Tok)) {
                 break;
             }
         }
 
-        /* Check for a .LOCAL declaration */
-        if (CurTok.Tok == TOK_LOCAL && Style == MAC_STYLE_CLASSIC) {
+        /* For .paramcount: Set the IVal for this token if not in a nested
+        ** macro. During expansion: if set, .paramcount will be processed.
+        ** Otherwise, a .paramcount token will be returned.
+        */
+        if (CurTok.Tok == TOK_PARAMCOUNT) {
+            CurTok.IVal = (NestedMacroCount == 0);
+        }
+
+        /* For classic macros, check for a .local declaration. This should only 
+        ** be evaluated when .local is at the start of a line and not in a nested 
+        ** macro defintion
+        */
+        if (CurTok.Tok == TOK_LOCAL && Style == MAC_STYLE_CLASSIC &&
+            LastTokWasSep && NestedMacroCount == 0) {
             while (1) {
                 IdDesc* I;
 
@@ -549,19 +585,21 @@ void MacDef (unsigned Style)
                 if (CurTok.Tok != TOK_COMMA) {
                     break;
                 }
-
             }
 
             /* We need end of line after the locals */
             ConsumeSep ();
+            LastTokWasSep = 1;
             continue;
         }
 
         /* Create a token node for the current token */
         N = NewTokNode ();
 
-        /* If the token is an identifier, check if it is a local parameter */
-        if (CurTok.Tok == TOK_IDENT) {
+        /* If the token is an identifier, and in the main macro body,
+        ** check if it is a local parameter 
+        */
+        if (CurTok.Tok == TOK_IDENT && NestedMacroCount == 0) {
             unsigned Count = 0;
             IdDesc* I = M->Params;
 
@@ -588,24 +626,40 @@ void MacDef (unsigned Style)
         }
         ++M->TokCount;
 
-        /* Save if last token was a separator to know if .endmacro is at
-        ** the start of a line
+        /* Remember if current token is preceeded by a separator */
+        L = LastTokWasSep;
+
+        /* Remember if the current token was a separator to indicate if 
+        ** beginning a line for the next iteration of the loop. This 
+        ** will also end any .define lines inside a classic macro: 
+        ** Tell the scanner to return a separator for newline tokens
         */
-        LastTokWasSep = TokIsSep(CurTok.Tok);
+        if (LastTokWasSep = TokIsSep (CurTok.Tok)) {
+            NewlineTokenAsSep ();
+        }
 
-        /* Read the next token */
-        NextTok ();
+        /* Read the next token:
+        ** If the current token is a valid .define or .undefine, 
+        ** turn off define-stlye macros while reading the next token 
+        ** (which should be an indentifier for the macro name)
+        */
+        if (L && (CurTok.Tok == TOK_DEFINE || CurTok.Tok == TOK_UNDEF)) {
+            DisableDefineStyleMacros ();
+            NextTok ();
+            EnableDefineStyleMacros ();
+        } else {
+            NextTok ();
+        }
     }
 
-    /* Skip the .endmacro for a classic macro */
-    if (Style == MAC_STYLE_CLASSIC) {
-        NextTok ();
-    }
+    /* Set the Incomplete flag now that parsing is done. Any errors
+    ** generated in this routine will result in an incomplete macro
+    */
+    M->Incomplete = (MacroErrorCount != ErrorCount);
 
-    /* Reset the Incomplete flag now that parsing is done */
-    M->Incomplete = 0;
+    /* All newline tokens are separators */
+    NewlineTokenAsSep ();
 
-Done:
     /* Switch out of raw token mode */
     LeaveRawTokenMode ();
 }
@@ -707,10 +761,15 @@ ExpandParam:
         /* Set pointer to next token */
         Mac->Exp = Mac->Exp->Next;
 
-        /* Is it a request for actual parameter count? */
+        /* Is it a request for actual parameter count? If the IVal is set, 
+        ** process .paramcount. If not, it is in a nested macro, so just 
+        ** return the .paramcount token
+        */
         if (CurTok.Tok == TOK_PARAMCOUNT) {
-            CurTok.Tok  = TOK_INTCON;
-            CurTok.IVal = Mac->ParamCount;
+            if (CurTok.IVal) {
+                CurTok.Tok  = TOK_INTCON;
+                CurTok.IVal = Mac->ParamCount;
+            }
             return 1;
         }
 
@@ -722,6 +781,17 @@ ExpandParam:
 
             /* Go back and expand the parameter */
             goto ExpandParam;
+        }
+
+        /* Is it a newline sequence? (This token should only be found when 
+        ** expanding a .define)
+        */
+        if (CurTok.Tok == TOK_NL) {
+            /* Newline token will be kept when defining a .define */
+            if (!AllowNewlineToken) {
+                CurTok.Tok = TOK_SEP;
+            }
+            return 1;
         }
 
         /* If it's an identifier, it may in fact be a local symbol */

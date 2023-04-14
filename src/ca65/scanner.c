@@ -125,7 +125,10 @@ static unsigned    FCount       = 0;    /* Count of input files */
 static int         C            = 0;    /* Current input character */
 
 /* Force end of assembly */
-int               ForcedEnd     = 0;
+int                ForcedEnd    = 0;
+
+/* Leave user newline tokens alone */
+int        AllowNewlineToken    = 0;
 
 /* List of dot keywords with the corresponding tokens */
 struct DotKeyword {
@@ -226,6 +229,7 @@ struct DotKeyword {
     { ".IMPORTZP",      TOK_IMPORTZP            },
     { ".INCBIN",        TOK_INCBIN              },
     { ".INCLUDE",       TOK_INCLUDE             },
+    { ".INSERT",        TOK_INSERT              },
     { ".INTERRUPTOR",   TOK_INTERRUPTOR         },
     { ".ISIZE",         TOK_ISIZE               },
     { ".ISMNEM",        TOK_ISMNEMONIC          },
@@ -1079,12 +1083,22 @@ Again:
         /* Remember and skip the dot */
         NextChar ();
 
-        /* Check if it's just a dot */
+        /* If not an identifier, check for newline sequence or just a dot */
         if (!IsIdStart (C)) {
-
-            /* Just a dot */
-            CurTok.Tok = TOK_DOT;
-
+            /* Check for user newline sequence */
+            if (C == '\\') {
+                NextChar ();
+                /* Allow the newline token to be seen for .define ... */
+                if (AllowNewlineToken) {
+                    CurTok.Tok = TOK_NL;
+                } else {
+                    /* ... otherwise, behave as if it is a true line ending */
+                    CurTok.Tok = TOK_SEP;
+                }
+            } else {
+                /* Just a dot */
+                CurTok.Tok = TOK_DOT;
+            }
         } else {
 
             /* Read the remainder of the identifier */

@@ -56,6 +56,7 @@ typedef enum token_t {
     TOK_NONE,           /* Start value, invalid */
     TOK_EOF,            /* End of input file */
     TOK_SEP,            /* Separator (usually newline) */
+    TOK_NL,             /* Newline sequence: .\ */
     TOK_IDENT,          /* An identifier */
     TOK_LOCAL_IDENT,    /* A cheap local identifier */
 
@@ -203,6 +204,7 @@ typedef enum token_t {
     TOK_IMPORTZP,
     TOK_INCBIN,
     TOK_INCLUDE,
+    TOK_INSERT,
     TOK_INTERRUPTOR,
     TOK_ISIZE,
     TOK_ISMNEMONIC,

@@ -50,8 +50,9 @@
 
 
 /* Scanner variables */
-extern Token CurTok;            /* Current input token incl. attributes */
-extern int   ForcedEnd;         /* Force end of assembly */
+extern Token CurTok;                /* Current input token incl. attributes */
+extern int   ForcedEnd;             /* Force end of assembly */
+extern int   AllowNewlineToken;     /* Keep newline sequence */
 
 
 
@@ -102,6 +103,24 @@ void InitScanner (const char* InFile);
 
 void DoneScanner (void);
 /* Release scanner resources */
+
+#if defined(HAVE_INLINE)
+INLINE void NewlineTokenAllow (void)
+{
+    AllowNewlineToken = 1;
+}
+#else
+#define NewlineTokenAllow()     (AllowNewlineToken = 1)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE void NewlineTokenAsSep (void)
+{
+    AllowNewlineToken = 0;
+}
+#else
+#define NewlineTokenAsSep()     (AllowNewlineToken = 0)
+#endif
 
 
 

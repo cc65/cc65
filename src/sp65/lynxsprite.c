@@ -312,7 +312,7 @@ static void AssembleByte(unsigned bits, char val)
 static unsigned char AnalyseNextChunks(signed *newlen, signed len, char data[32], char ColorBits)
 {
     char longest = 1;
-    char prev = 255;
+    unsigned char prev = 255;
     char count = 0;
     char index = 0;
     char lindex = 0;

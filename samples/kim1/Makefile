@@ -34,7 +34,9 @@ endif
 EXELIST_kim1 = \
         kimHello.bin \
         kimSieve.bin \
-        kimLife.bin
+        kimLife.bin \
+		kimTest.bin \
+		kimGFX.bin
 
 ifneq ($(EXELIST_$(SYS)),)
 samples: $(EXELIST_$(SYS))
@@ -57,6 +59,9 @@ kimLife.bin: kimLife.c
 kimTest.bin: kimTest.c
 	$(CL) -t kim1 -C kim1-60k.cfg -Oi -o kimTest.bin kimTest.c
 
+kimGFX.bin: kimGFX.c
+	$(CL) -t kim1 -C kim1-60k.cfg -Oi -o kimGFX.bin kimGFX.c
+
 kimSieve.bin: kimSieve.c
 	$(CL) -t kim1 -C kim1-60k.cfg -O -o kimSieve.bin kimSieve.c
 
@@ -71,10 +76,16 @@ kimLife.hex: kimLife.bin
 kimTest.hex: kimTest.bin
 	srec_cat kimTest.bin  -binary -offset 0x2000 -o kimTest.hex  -Intel -address-length=2
 
+kimGFX.hex: kimGFX.bin
+	srec_cat kimGFX.bin  -binary -offset 0x2000 -o kimGFX.hex  -Intel -address-length=2
+
 # To build a paper tape file for uploading to the KIM-1 via terminal
 
 kimLife.ptp: kimLife.bin
 	srec_cat kimLife.bin -binary -offset 0x2000 -o kimLife.hex -MOS_Technologies
+
+kimGFX.ptp: kimGFX.bin
+	srec_cat kimGFX.bin -binary -offset 0x2000 -o kimGFX.hex -MOS_Technologies
 
 kimTest.ptp: kimTest.bin
 	srec_cat kimTest.bin -binary -offset 0x2000 -o kimTest.hex -MOS_Technologies
@@ -88,5 +99,8 @@ clean:
 	@$(DEL) kimTest.bin  2>$(NULLDEV)
 	@$(DEL) kimTest.ptp  2>$(NULLDEV)
 	@$(DEL) kimTest.hex  2>$(NULLDEV)
+	@$(DEL) kimGFX.bin   2>$(NULLDEV)
+	@$(DEL) kimGFX.ptp   2>$(NULLDEV)
+	@$(DEL) kimGFX.hex   2>$(NULLDEV)
 
   

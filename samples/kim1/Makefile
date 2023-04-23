@@ -59,7 +59,7 @@ kimLife.bin: kimLife.c
 kimTest.bin: kimTest.c
 	$(CL) -t kim1 -C kim1-60k.cfg -Oi -o kimTest.bin kimTest.c
 
-kimGFX.bin: kimGFX.c
+kimGFX.bin: kimGFX.c ramfont.c
 	$(CL) -t kim1 -C kim1-60k.cfg -Oi -o kimGFX.bin kimGFX.c
 
 kimSieve.bin: kimSieve.c

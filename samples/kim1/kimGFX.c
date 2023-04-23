@@ -10,43 +10,105 @@
 #include <stdlib.h>                 // For rand, srand
 #include <string.h>                 // For memcpy
 
+#include "ramfont.c"
+
 typedef unsigned char byte;
 
 // Screen memory is placed at A000-BFFF, 320x200 pixels, mapped right to left within each horizontal byte
 
 byte * screen    = (byte *) 0xA000;
+
 #define SCREEN_WIDTH      320
 #define SCREEN_HEIGHT     200
+#define CHARWIDTH         8
+#define CHARHEIGHT        8
+#define BYTESPERROW       (SCREEN_WIDTH / 8)
+#define BYTESPERCHARROW   (BYTESPERROW * 8)
+#define CHARSPERROW       (SCREEN_WIDTH / CHARWIDTH)
+#define ROWSPERCOLUMN     (SCREEN_HEIGHT / CHARHEIGHT)
 
-// Access to the screen bitmap
+// SETPIXEL  
+// 
+// 0 <= x < 320
+// 0 <= y < 200
+//
+// Draws a pixel on the screen in white or black at pixel pos x, y
 
-void SETBIT(byte *p, unsigned long n)
+void SETPIXEL(int x, int y, byte b)
 {
-   *(p + (n >> 3)) |=  (0b10000000 >> (n & 7));
-}
-
-void CLRBIT(byte *p, unsigned long n)
-{
-   *(p + (n >> 3)) &= ~(0b10000000 >> (n & 7));
-}
-
-byte GETBIT(byte *p, unsigned long n)
-{
-   return (*(p + (n >> 3)) & (0b10000000 >> (n & 7))) ? 1 : 0;
-}
-
-
-void SETPIXEL(byte * p, int x, int y, byte b)
-{
+   byte * pb = screen;
+   pb += x >> 3;
+   pb += y * BYTESPERROW;
+   
    if (b)
-      SETBIT(p, (long) y * SCREEN_WIDTH + x);
+      *(pb) |=  (0b10000000 >> (x & 7));
    else
-      CLRBIT(p, (long) y * SCREEN_WIDTH + x);
+      *(pb) &= ~(0b10000000 >> (x & 7));
 }
 
-byte GETPIXEL(byte *p, int x, int y)
+// DRAWPIXEL
+//
+// 0 <= x < 320
+// 0 <= y < 200
+//
+// Turns on a screen pixel at pixel pos x,y
+
+void DRAWPIXEL(int x, int y)
 {
-   return GETBIT(p, (long) y * SCREEN_WIDTH + x);
+   byte * pb = screen;
+   pb += x >> 3;
+   pb += y * BYTESPERROW;
+   *(pb) |= (0b10000000 >> (x & 7));
+}
+
+// DrawChar
+//
+// 0 <= x < 40
+// 0 <= y < 25
+//
+// Draws a character at char location x, y
+
+void DrawChar(int x, int y, char c)
+{
+   byte * pb = screen;
+   int i;
+
+   if (x < 0 || y < 0 || x >= CHARSPERROW || y >= ROWSPERCOLUMN)
+      return;
+   
+   pb += y * BYTESPERCHARROW;
+   pb += x;
+
+   for (i = 0; i < 8; i++)
+   {
+      *pb =  font8x8_basic[c][i];
+       pb += BYTESPERROW;
+   }
+}
+
+void DrawText(int x, int y, char * psz)
+{
+   while (*psz)
+   {
+      while (x >= CHARSPERROW)
+      {
+         x -= CHARSPERROW;
+         y += 1;
+      }
+      while (y >= ROWSPERCOLUMN)
+         y -= ROWSPERCOLUMN;
+
+      if (*psz == 0x0A)
+      {
+         x = 0;
+         y++;
+         psz++;
+      }
+      else
+      {
+         DrawChar(x++, y, *psz++);
+      }
+   }
 }
 
 // Something like Bresenham's algorithm for drawing a line
@@ -59,7 +121,7 @@ void DrawLine(int x0, int y0, int x1, int y1, byte val)
 
     while (1)
     {
-        SETPIXEL(screen, x0, y0, val);
+        SETPIXEL(x0, y0, val);
 
         if (x0 == x1 && y0 == y1)
             break;
@@ -79,6 +141,35 @@ void DrawLine(int x0, int y0, int x1, int y1, byte val)
     }
 }
 
+// reverse_bits
+//
+// Reverse the bits in a byte
+
+unsigned char reverse_bits(unsigned char octet)
+{
+   return  (((octet >> 0) & 1) << 7) | \
+            (((octet >> 1) & 1) << 6) | \
+            (((octet >> 2) & 1) << 5) | \
+            (((octet >> 3) & 1) << 4) | \
+            (((octet >> 4) & 1) << 3) | \
+            (((octet >> 5) & 1) << 2) | \
+            (((octet >> 6) & 1) << 1) | \
+            (((octet >> 7) & 1) << 0);
+}
+
+// InitializeFont
+// 
+// RAM font is backwards left-right relative to the way memory is laid out on the KIM-1, so we swap all the 
+// bytes in place by reversing the order of the bits in every byte
+
+void InitializeFont()
+{
+   int c;
+   byte * pb = (byte *) font8x8_basic;
+
+   for (c = 0; c < 128 * 8; c++)
+      pb[c] = reverse_bits(pb[c]);
+}
 
 // ClearScreen
 //
@@ -93,24 +184,38 @@ void ClearScreen(byte val)
       screen[i] = val;
 }
 
-int main (void)
+// InitializeScreen
+//
+// One-time call to clear the screen and initialize the font
+
+void InitializeScreen()
+{
+   ClearScreen(0x00);
+   InitializeFont();
+}
+
+// DrawScreenMoire
+// 
+// Draws a moire pattern on the screen without clearing it first
+
+void DrawScreenMoire()
 {
    int x, y;
-
-   printf("\nDrawing Lines!\r\n");
-
-   // This works, white or black, so while we know we can write to the memory, SETPIXEL must be broken somehow
-
-   ClearScreen(0x00);
-   
-   // BUG: Currently pixels drawn to the bottom half of the screen are lost somewhere...
 
    for (x = 0; x < SCREEN_WIDTH; x += 6)
       DrawLine(x, 0, SCREEN_WIDTH - x, SCREEN_HEIGHT - 1, 1);
 
    for (y = 0; y < SCREEN_HEIGHT; y += 6)
       DrawLine(0, y, SCREEN_WIDTH - 1, SCREEN_HEIGHT - y, 1);
+}
 
+int main (void)
+{
+   InitializeScreen();
+               // 0123456789012345678901234567890123456789
+   DrawText(0, 0, " *** COMMODORE KIM-1 SYSTEM ***"); 
+   DrawText(0, 2, "60K RAM SYSTEM.  49152 BYTES FREE.");
+   DrawText(0, 4, "READY.\n>");
    printf("Done, exiting...\r\n");
 
    return 0;

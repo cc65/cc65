@@ -376,7 +376,7 @@ void MacDef (unsigned Style)
     int NestedMacroCount;
     unsigned int MacroErrorCount;
 
-    /* For classic macros, this indicates when in a nested macro. 
+    /* For classic macros, this indicates when in a nested macro.
     ** Only end the macro defintion with .endmacro when this is zero
     */
     NestedMacroCount = 0;
@@ -414,8 +414,8 @@ void MacDef (unsigned Style)
     /* Define the macro */
     M = NewMacro (&CurTok.SVal, Style);
 
-    /* For a .define: at this point, allow user newline sequences to be read 
-    ** and stored as part of the macro definition 
+    /* For a .define: at this point, allow user newline sequences to be read
+    ** and stored as part of the macro definition
     */
     PRECONDITION (AllowNewlineToken == 0);
     if (Style == MAC_STYLE_DEFINE) {
@@ -488,7 +488,7 @@ void MacDef (unsigned Style)
     }
 
     /* Preparse the macro body. We will read the tokens until we reach end of
-    ** file, or a final .endmacro (or end of line for DEFINE-style macros) and 
+    ** file, or a final .endmacro (or end of line for DEFINE-style macros) and
     ** store them into a token list internal to the macro. For classic macros,
     ** the .LOCAL command is detected and removed, at this time.
     */
@@ -502,7 +502,7 @@ void MacDef (unsigned Style)
                 }
 
                 /* If we found .endmacro at the start of a line, then check for
-                ** nested macros. If none, the macro defintion is complete. 
+                ** nested macros. If none, the macro defintion is complete.
                 */
                 if (CurTok.Tok == TOK_ENDMACRO) {
                     if (NestedMacroCount) {
@@ -521,7 +521,7 @@ void MacDef (unsigned Style)
                     NewlineTokenAllow ();
                 }
 
-                /* If we found an .insert token, skip it. This allows 
+                /* If we found an .insert token, skip it. This allows
                 ** .endmacro and .macro to be added to the macro definition
                 ** without being part of a nested macro. It also
                 ** allows a .define definition without disabling define-style
@@ -539,7 +539,7 @@ void MacDef (unsigned Style)
                 break;
             }
         } else {
-            /* Accept a true end of line or end of file to terminate the 
+            /* Accept a true end of line or end of file to terminate the
             ** definition of .define style macros
             */
             if (TokIsSep (CurTok.Tok)) {
@@ -555,8 +555,8 @@ void MacDef (unsigned Style)
             CurTok.IVal = (NestedMacroCount == 0);
         }
 
-        /* For classic macros, check for a .local declaration. This should only 
-        ** be evaluated when .local is at the start of a line and not in a nested 
+        /* For classic macros, check for a .local declaration. This should only
+        ** be evaluated when .local is at the start of a line and not in a nested
         ** macro defintion
         */
         if (CurTok.Tok == TOK_LOCAL && Style == MAC_STYLE_CLASSIC &&
@@ -597,7 +597,7 @@ void MacDef (unsigned Style)
         N = NewTokNode ();
 
         /* If the token is an identifier, and in the main macro body,
-        ** check if it is a local parameter 
+        ** check if it is a local parameter
         */
         if (CurTok.Tok == TOK_IDENT && NestedMacroCount == 0) {
             unsigned Count = 0;
@@ -629,9 +629,9 @@ void MacDef (unsigned Style)
         /* Remember if current token is preceeded by a separator */
         L = LastTokWasSep;
 
-        /* Remember if the current token was a separator to indicate if 
-        ** beginning a line for the next iteration of the loop. This 
-        ** will also end any .define lines inside a classic macro: 
+        /* Remember if the current token was a separator to indicate if
+        ** beginning a line for the next iteration of the loop. This
+        ** will also end any .define lines inside a classic macro:
         ** Tell the scanner to return a separator for newline tokens
         */
         if (LastTokWasSep = TokIsSep (CurTok.Tok)) {
@@ -639,8 +639,8 @@ void MacDef (unsigned Style)
         }
 
         /* Read the next token:
-        ** If the current token is a valid .define or .undefine, 
-        ** turn off define-stlye macros while reading the next token 
+        ** If the current token is a valid .define or .undefine,
+        ** turn off define-stlye macros while reading the next token
         ** (which should be an indentifier for the macro name)
         */
         if (L && (CurTok.Tok == TOK_DEFINE || CurTok.Tok == TOK_UNDEF)) {
@@ -761,8 +761,8 @@ ExpandParam:
         /* Set pointer to next token */
         Mac->Exp = Mac->Exp->Next;
 
-        /* Is it a request for actual parameter count? If the IVal is set, 
-        ** process .paramcount. If not, it is in a nested macro, so just 
+        /* Is it a request for actual parameter count? If the IVal is set,
+        ** process .paramcount. If not, it is in a nested macro, so just
         ** return the .paramcount token
         */
         if (CurTok.Tok == TOK_PARAMCOUNT) {
@@ -783,7 +783,7 @@ ExpandParam:
             goto ExpandParam;
         }
 
-        /* Is it a newline sequence? (This token should only be found when 
+        /* Is it a newline sequence? (This token should only be found when
         ** expanding a .define)
         */
         if (CurTok.Tok == TOK_NL) {

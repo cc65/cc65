@@ -634,7 +634,7 @@ void MacDef (unsigned Style)
         ** will also end any .define lines inside a classic macro:
         ** Tell the scanner to return a separator for newline tokens
         */
-        if (LastTokWasSep = TokIsSep (CurTok.Tok)) {
+        if ((LastTokWasSep = TokIsSep (CurTok.Tok))) {
             NewlineTokenAsSep ();
         }
 

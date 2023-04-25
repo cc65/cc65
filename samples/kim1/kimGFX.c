@@ -18,6 +18,11 @@ typedef unsigned char byte;
 
 byte * screen    = (byte *) 0xA000;
 
+// Cursor position
+
+int CursorX = 0;
+int CursorY = 0;
+
 #define SCREEN_WIDTH      320
 #define SCREEN_HEIGHT     200
 #define CHARWIDTH         8
@@ -61,6 +66,35 @@ void DRAWPIXEL(int x, int y)
    *(pb) |= (0b10000000 >> (x & 7));
 }
 
+// ClearScreen
+//
+// Clear the graphics memory
+
+void ClearScreen(byte val)
+{
+   int totalBytes = SCREEN_HEIGHT * (SCREEN_WIDTH / 8);
+   int i;
+
+   for (i = 0; i < totalBytes; i++)
+      screen[i] = val;
+}
+
+// ClearScreen
+//
+// Clear the graphics memory
+
+void ScrollScreen()
+{
+   int totalBytes = SCREEN_HEIGHT * (SCREEN_WIDTH / 8);
+   int i;
+   int j = 0;
+
+   for (i = BYTESPERCHARROW; i < totalBytes; i++)
+      screen[j++] = screen[i];
+}
+
+/* kimmon9000.hex - Not used yet, but available for conversion from PETSCIi to ASCII
+
 const unsigned char petToAscTable[256] =
 {
 	0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x14,0x09,0x0d,0x11,0x93,0x0a,0x0e,0x0f,
@@ -80,6 +114,11 @@ const unsigned char petToAscTable[256] =
 	0xa0,0xa1,0xa2,0xa3,0xa4,0xa5,0xa6,0xa7,0xa8,0xa9,0xaa,0xab,0xac,0xad,0xae,0xaf,
 	0xb0,0xb1,0xb2,0xb3,0xb4,0xb5,0xb6,0xb7,0xb8,0xb9,0xba,0xbb,0xbc,0xbd,0xbe,0xbf
 };
+*/
+
+// ascToPetTable
+//
+// Translation lookup table to go from ASCII to PETSCII
 
 const unsigned char ascToPetTable[256] = 
 {
@@ -127,29 +166,44 @@ void DrawChar(int x, int y, char petscii)
    }
 }
 
-void DrawText(int x, int y, char * psz)
+void DrawText(char * psz)
 {
    while (*psz)
    {
-      while (x >= CHARSPERROW)
+      while (CursorX >= CHARSPERROW)
       {
-         x -= CHARSPERROW;
-         y += 1;
+         CursorX -= CHARSPERROW;
+         CursorY += 1;
       }
-      while (y >= ROWSPERCOLUMN)
-         y -= ROWSPERCOLUMN;
+
+      // If we've gone off the bottom of the screen, we scroll the screen and back up to the last line again
+
+      if (CursorY >= ROWSPERCOLUMN)
+      {
+         CursorY = ROWSPERCOLUMN - 1;
+         ScrollScreen();
+      }
+
+      // If we output a newline we advanced the cursor down one line and reset it to the left
 
       if (*psz == 0x0A)
       {
-         x = 0;
-         y++;
+         CursorX = 0;
+         CursorY++;
          psz++;
       }
       else
       {
-         DrawChar(x++, y, *psz++);
+         DrawChar(CursorX++, CursorY, *psz++);
       }
    }
+
+}
+void DrawTextAt(int x, int y, char * psz)
+{
+   CursorX = x;
+   CursorY = y;
+   DrawText(psz);
 }
 
 // Something like Bresenham's algorithm for drawing a line
@@ -212,19 +266,6 @@ void MirrorFont()
       pb[c] = reverse_bits(pb[c]);
 }
 
-// ClearScreen
-//
-// Clear the graphics memory
-
-void ClearScreen(byte val)
-{
-   int totalBytes = SCREEN_HEIGHT * (SCREEN_WIDTH / 8);
-   int i;
-
-   for (i = 0; i < totalBytes; i++)
-      screen[i] = val;
-}
-
 // DrawScreenMoire
 // 
 // Draws a moire pattern on the screen without clearing it first
@@ -248,14 +289,24 @@ void DrawScreenMoire(int left, int top, int right, int bottom)
 
 int main (void)
 {
+   int i;
+   
+   char buffer [sizeof(int)*8+1];
+   
    ClearScreen(0x00);
                // 0123456789012345678901234567890123456789
-   DrawText(0, 0, " *** COMMODORE KIM-1 SYSTEM ***"); 
-   DrawText(0, 2, "60K RAM SYSTEM.  49152 BYTES FREE.");
-   DrawText(0, 4, "READY.\n");
+   DrawTextAt(0, 0, " *** COMMODORE KIM-1 SYSTEM ***"); 
+   DrawTextAt(0, 2, "60K RAM SYSTEM.  49152 BYTES FREE.");
+   DrawTextAt(0, 4, "READY.\n");
    printf("Done, exiting...\r\n");
 
-   DrawScreenMoire(20, 50, SCREEN_WIDTH-20, SCREEN_HEIGHT-1);
+   // DrawScreenMoire(20, 50, SCREEN_WIDTH-20, SCREEN_HEIGHT-1);
+
+   for (i = 0; i < 10000; i++)
+   {
+      sprintf(buffer, "%i\n", i);
+      DrawText(buffer);
+   }
 
    return 0;
 }

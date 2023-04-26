@@ -14,6 +14,9 @@
 
 typedef unsigned char byte;
 
+extern void ClearScreen(void);      // In subs.asm
+extern void ScrollScreen(void);     // In subs.asm
+
 // Screen memory is placed at A000-BFFF, 320x200 pixels, mapped right to left within each horizontal byte
 
 byte * screen    = (byte *) 0xA000;
@@ -64,33 +67,6 @@ void DRAWPIXEL(int x, int y)
    pb += x >> 3;
    pb += y * BYTESPERROW;
    *(pb) |= (0b10000000 >> (x & 7));
-}
-
-// ClearScreen
-//
-// Clear the graphics memory
-
-void ClearScreen(byte val)
-{
-   int totalBytes = SCREEN_HEIGHT * (SCREEN_WIDTH / 8);
-   int i;
-
-   for (i = 0; i < totalBytes; i++)
-      screen[i] = val;
-}
-
-// ClearScreen
-//
-// Clear the graphics memory
-
-void ScrollScreen()
-{
-   int totalBytes = SCREEN_HEIGHT * (SCREEN_WIDTH / 8);
-   int i;
-   int j = 0;
-
-   for (i = BYTESPERCHARROW; i < totalBytes; i++)
-      screen[j++] = screen[i];
 }
 
 /* kimmon9000.hex - Not used yet, but available for conversion from PETSCIi to ASCII
@@ -293,7 +269,7 @@ int main (void)
    
    char buffer [sizeof(int)*8+1];
    
-   ClearScreen(0x00);
+   ClearScreen();
                // 0123456789012345678901234567890123456789
    DrawTextAt(0, 0, " *** COMMODORE KIM-1 SYSTEM ***"); 
    DrawTextAt(0, 2, "60K RAM SYSTEM.  49152 BYTES FREE.");
@@ -304,7 +280,7 @@ int main (void)
 
    for (i = 0; i < 10000; i++)
    {
-      sprintf(buffer, "%i\n", i);
+      sprintf(buffer, "%i ", i);
       DrawText(buffer);
    }
 

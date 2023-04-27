@@ -212,7 +212,9 @@ void DrawLine(int x0, int y0, int x1, int y1, byte val)
     }
 }
 
-; Draw a circle without sin, cos, or floating point!
+// DrawCircle
+// 
+// Draw a circle without sin, cos, or floating point!
 
 void DrawCircle(int x0, int y0, int radius, byte val) 
 {

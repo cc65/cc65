@@ -25,10 +25,6 @@ src    = $04
 src_lo = src
 src_hi = src+1
 
-count   = $06
-count_lo = count
-count_hi = count+1
-
 _ClearScreen:
                 lda #$00
 
@@ -50,7 +46,10 @@ _ClearScreen:
                 rts
 
 _ScrollScreen:
-                ; load the source (A140) and destination (A000) addresses 
+                ; Load the source (A140) and destination (A000) addresses.  Each row of characters
+                ; occupies 320 bytes, so we start source as being one line ahead of the destination
+                ; which will have the effect of scrolling the screen up one text line.
+
                 lda #<(SCREEN+320)
                 sta src_lo
                 lda #>(SCREEN+320)
@@ -62,15 +61,15 @@ _ScrollScreen:
 
                 ldy #$00
 :
-                lda (src_lo),y
-                sta (dest_lo),y
+                lda (src),y
+                sta (dest),y
                 iny
                 bne :-
 
-                inc dest_hi
-                inc src_hi
+                inc dest_hi                 ; When the source hits $BF00 we're done, as we've copied 
+                inc src_hi                  ;   everything up to that point so far
                 ldx src_hi
-                cpx #$BF
+                cpx #$BE
                 bne :-
 
                 lda #$00                    ; Clear the last line (320 bytes, or A0 twice)

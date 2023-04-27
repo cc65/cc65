@@ -173,8 +173,8 @@ void DrawText(char * psz)
          DrawChar(CursorX++, CursorY, *psz++);
       }
    }
-
 }
+
 void DrawTextAt(int x, int y, char * psz)
 {
    CursorX = x;
@@ -269,15 +269,16 @@ int main (void)
    
    char buffer [sizeof(int)*8+1];
    
+   // Clear the screen memory
    ClearScreen();
-               // 0123456789012345678901234567890123456789
+
+   // Draw the welcome banner at the top of the screen
    DrawTextAt(0, 0, " *** COMMODORE KIM-1 SYSTEM ***"); 
    DrawTextAt(0, 2, "60K RAM SYSTEM.  49152 BYTES FREE.");
    DrawTextAt(0, 4, "READY.\n");
    printf("Done, exiting...\r\n");
 
-   // DrawScreenMoire(20, 50, SCREEN_WIDTH-20, SCREEN_HEIGHT-1);
-
+   // Print the numbers from 0-9999, forcing the screen to scroll
    for (i = 0; i < 10000; i++)
    {
       sprintf(buffer, "%i ", i);

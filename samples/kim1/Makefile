@@ -75,8 +75,8 @@ kimHello.bin: kimHello.c
 
 ramfont.c: font.rom 
 	cat font.rom | python -c "import sys; print('unsigned char font8x8_basic[256][8] = {'); \
- 							  [print('    {' + ', '.join([f'0x{byte:02x}' for byte in row]) + f'}}, // PETSCII code {i}') for i, row in \
-							   enumerate(iter(lambda: sys.stdin.buffer.read(8), b''), 0)]; print('};')" > ramfont.c 
+ 		                  [print('    {' + ', '.join([f'0x{byte:02x}' for byte in row]) + f'}}, // PETSCII code {i}') for i, row in \
+				   enumerate(iter(lambda: sys.stdin.buffer.read(8), b''), 0)]; print('};')" > ramfont.c 
 
 # To build an intel-format file for the CORSHAM SD card reader
 
@@ -92,13 +92,13 @@ kimGFX.hex: kimGFX.bin ramfont.c
 # To build a paper tape file for uploading to the KIM-1 via terminal
 
 kimLife.ptp: kimLife.bin
-	srec_cat kimLife.bin -binary -offset 0x2000 -o kimLife.hex -MOS_Technologies
+	srec_cat kimLife.bin -binary -offset 0x2000 -o kimLife.ptp -MOS_Technologies
 
 kimGFX.ptp: kimGFX.bin
-	srec_cat kimGFX.bin -binary -offset 0x2000 -o kimGFX.hex -MOS_Technologies
+	srec_cat kimGFX.bin -binary -offset 0x2000 -o kimGFX.ptp -MOS_Technologies
 
 kimTest.ptp: kimTest.bin
-	srec_cat kimTest.bin -binary -offset 0x2000 -o kimTest.hex -MOS_Technologies
+	srec_cat kimTest.bin -binary -offset 0x2000 -o kimTest.ptp -MOS_Technologies
 
 clean:
 	@$(DEL) kimSieve.bin 2>$(NULLDEV)

@@ -212,6 +212,34 @@ void DrawLine(int x0, int y0, int x1, int y1, byte val)
     }
 }
 
+; Draw a circle without sin, cos, or floating point!
+
+void DrawCircle(int x0, int y0, int radius, byte val) 
+{
+    int x = radius;
+    int y = 0;
+    int err = 0;
+
+    while (x >= y) 
+    {
+        SETPIXEL(x0 + x, y0 + y, val);
+        SETPIXEL(x0 + y, y0 + x, val);
+        SETPIXEL(x0 - y, y0 + x, val);
+        SETPIXEL(x0 - x, y0 + y, val);
+        SETPIXEL(x0 - x, y0 - y, val);
+        SETPIXEL(x0 - y, y0 - x, val);
+        SETPIXEL(x0 + y, y0 - x, val);
+        SETPIXEL(x0 + x, y0 - y, val);
+
+        y++;
+        err += 1 + 2 * y;
+        if (2 * (err - x) + 1 > 0) {
+            x--;
+            err += 1 - 2 * x;
+        }
+    }
+}
+
 // reverse_bits
 //
 // Reverse the bits in a byte
@@ -267,23 +295,19 @@ int main (void)
 {
    int i;
    
-   char buffer [sizeof(int)*8+1];
-   
    // Clear the screen memory
    ClearScreen();
 
    // Draw the welcome banner at the top of the screen
-   DrawTextAt(0, 0, " *** COMMODORE KIM-1 SYSTEM ***"); 
-   DrawTextAt(0, 2, "60K RAM SYSTEM.  49152 BYTES FREE.");
+   DrawTextAt(0, 0, "    *** COMMODORE KIM-1 SYSTEM ***"); 
+   DrawTextAt(0, 2, "   60K RAM SYSTEM.  49152 BYTES FREE.");
    DrawTextAt(0, 4, "READY.\n");
-   printf("Done, exiting...\r\n");
+
 
    // Print the numbers from 0-9999, forcing the screen to scroll
-   for (i = 0; i < 10000; i++)
-   {
-      sprintf(buffer, "%i ", i);
-      DrawText(buffer);
-   }
+   for (i = 5; i < 75; i+=5)
+      DrawCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, i, 1);
 
+   printf("Done, exiting...\r\n");
    return 0;
 }

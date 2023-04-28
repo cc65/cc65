@@ -364,27 +364,6 @@ static void FreeMacExp (MacExp* E)
 
 
 
-static void MacSkipDef (unsigned Style)
-/* Skip a macro definition */
-{
-    if (Style == MAC_STYLE_CLASSIC) {
-        /* Skip tokens until we reach the final .endmacro */
-        while (CurTok.Tok != TOK_ENDMACRO && CurTok.Tok != TOK_EOF) {
-            NextTok ();
-        }
-        if (CurTok.Tok != TOK_EOF) {
-            SkipUntilSep ();
-        } else {
-            Error ("'.ENDMACRO' expected");
-        }
-    } else {
-        /* Skip until end of line */
-        SkipUntilSep ();
-    }
-}
-
-
-
 void MacDef (unsigned Style)
 /* Parse a macro definition */
 {
@@ -393,6 +372,7 @@ void MacDef (unsigned Style)
     FilePos Pos;
     int HaveParams;
     int LastTokWasSep;
+    unsigned MacroErrorCount;
 
     /* For classic macros, remember if we are at the beginning of the line.
     ** If the macro name and parameters pass our checks then we will be on a
@@ -405,27 +385,23 @@ void MacDef (unsigned Style)
     */
     Pos = CurTok.Pos;
 
+    /* Remember current error count */
+    MacroErrorCount = ErrorCount;
+
     /* We expect a macro name here */
     if (CurTok.Tok != TOK_IDENT) {
         Error ("Identifier expected");
-        MacSkipDef (Style);
-        return;
     } else if (!UbiquitousIdents && FindInstruction (&CurTok.SVal) >= 0) {
         /* The identifier is a name of a 6502 instruction, which is not
         ** allowed if not explicitly enabled.
         */
         Error ("Cannot use an instruction as macro name");
-        MacSkipDef (Style);
-        return;
     }
 
     /* Did we already define that macro? */
     if (HT_Find (&MacroTab, &CurTok.SVal) != 0) {
         /* Macro is already defined */
         Error ("A macro named '%m%p' is already defined", &CurTok.SVal);
-        /* Skip tokens until we reach the final .endmacro */
-        MacSkipDef (Style);
-        return;
     }
 
     /* Define the macro */
@@ -508,13 +484,14 @@ void MacDef (unsigned Style)
             ** it will be added to the macro definition instead of closing it.
             */
             if (CurTok.Tok == TOK_ENDMACRO && LastTokWasSep) {
-                /* Done */
+                /* Done: Skip the .endmacro token */
+                NextTok ();
                 break;
             }
             /* May not have end of file in a macro definition */
             if (CurTok.Tok == TOK_EOF) {
                 PError (&Pos, "'.ENDMACRO' expected for macro '%m%p'", &M->Name);
-                goto Done;
+                break;
             }
         } else {
             /* Accept a newline or end of file for new style macros */
@@ -597,15 +574,11 @@ void MacDef (unsigned Style)
         NextTok ();
     }
 
-    /* Skip the .endmacro for a classic macro */
-    if (Style == MAC_STYLE_CLASSIC) {
-        NextTok ();
-    }
+    /* Set the Incomplete flag now that parsing is done. Any errors
+    ** generated in this routine will result in an incomplete macro
+    */
+    M->Incomplete = (MacroErrorCount != ErrorCount);
 
-    /* Reset the Incomplete flag now that parsing is done */
-    M->Incomplete = 0;
-
-Done:
     /* Switch out of raw token mode */
     LeaveRawTokenMode ();
 }

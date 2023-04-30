@@ -34,7 +34,7 @@ ram_top         :=      __MAIN_START__ + __MAIN_SIZE__
 
 .ifdef ASM
 
-        .include        "osic1p.inc"
+        .include        "screen-c1p-24x24.s"
         .macpack        generic
 
 load            :=      $08             ; private variables
@@ -45,20 +45,22 @@ GETCHAR         :=      $FFBF           ; gets one character from ACIA
 FIRSTVISC       =       $85             ; Offset of first visible character in video RAM
 LINEDIST        =       $20             ; Offset in video RAM between two lines
 
-        ldy     #<$0000
+        ldy     #<$00
         lda     #<load_addr
         ldx     #>load_addr
         sta     load
         stx     load+1
 
-        ldx     #(<load_size) + 1
-        stx     count
-        ldx     #(>load_size) + 1
-        stx     count+1                 ; save size with each byte incremented separately
+        lda     #<load_size
+        eor     #$FF
+        sta     count
+        lda     #>load_size
+        eor     #$FF
+        sta     count+1
 
-L1:     dec     count
+L1:     inc     count
         bnz     L2
-        dec     count+1
+        inc     count+1
         bze     L3
 L2:     jsr     GETCHAR                 ; (doesn't change .Y)
         sta     (load),y
@@ -70,7 +72,7 @@ L2:     jsr     GETCHAR                 ; (doesn't change .Y)
         lsr     a
         and     #8 - 1
         ora     #$10                    ; eight arrow characters
-        sta     SCRNBASE + FIRSTVISC + 2 * LINEDIST + 11
+        sta     C1P_SCR_BASE + FIRSTVISC + 2 * LINEDIST + 11
 
         iny
         bnz     L1

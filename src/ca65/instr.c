@@ -1617,7 +1617,7 @@ static void PutJMP (const InsDesc* Ins)
     if (EvalEA (Ins, &A)) {
 
         /* Check for indirect addressing */
-        if (A.AddrModeBit & AM65_ABS_IND && CPU < CPU_65SC02) {
+        if ((A.AddrModeBit & AM65_ABS_IND) && (CPU < CPU_65SC02)) {
 
             /* Compare the low byte of the expression to 0xFF to check for
             ** a page cross. Be sure to use a copy of the expression otherwise

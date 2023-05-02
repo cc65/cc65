@@ -741,7 +741,7 @@ Here is a description of all the command line options:
   <tag><tt/return-type/</tag>
         Warn about no return statement in function returning non-void.
   <tag><tt/struct-param/</tag>
-        Warn when passing structs by value.
+        Warn when passing structs by value. (Disabled by default.)
   <tag><tt/unknown-pragma/</tag>
         Warn about #pragmas that aren't recognized by cc65.
   <tag><tt/unreachable-code/</tag>

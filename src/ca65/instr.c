@@ -1269,7 +1269,8 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
         ExprNode* Left = A->Expr->Left;
         if ((A->Expr->Op == EXPR_BYTE0 || A->Expr->Op == EXPR_BYTE1) &&
             Left->Op == EXPR_SYMBOL                                  &&
-            GetSymAddrSize (Left->V.Sym) != ADDR_SIZE_ZP) {
+            GetSymAddrSize (Left->V.Sym) != ADDR_SIZE_ZP             &&
+            !(A->Flags & EFFADDR_OVERRIDE_ZP)) {
 
             /* Output a warning */
             Warning (1, "Suspicious address expression");
@@ -1617,11 +1618,12 @@ static void PutJMP (const InsDesc* Ins)
     if (EvalEA (Ins, &A)) {
 
         /* Check for indirect addressing */
-        if (A.AddrModeBit & AM65_ABS_IND) {
+        if ((A.AddrModeBit & AM65_ABS_IND) && (CPU < CPU_65SC02)) {
 
             /* Compare the low byte of the expression to 0xFF to check for
             ** a page cross. Be sure to use a copy of the expression otherwise
-            ** things will go weird later.
+            ** things will go weird later. This only affects the 6502 CPU,
+            ** and was corrected in 65C02 and later CPUs in this family.
             */
             ExprNode* E = GenNE (GenByteExpr (CloneExpr (A.Expr)), 0xFF);
 

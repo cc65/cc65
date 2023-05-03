@@ -2283,7 +2283,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
   Switch on or off case sensitivity on identifiers. The default is off
   (that is, identifiers are case sensitive), but may be changed by the
   -i switch on the command line.
-  The command must be followed by a '+' or '-' character to switch the
+  The command can be followed by a '+' or '-' character to switch the
   option on or off respectively.
 
   Example:
@@ -2432,7 +2432,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
   Switch on or off debug info generation. The default is off (that is,
   the object file will not contain debug infos), but may be changed by the
   -g switch on the command line.
-  The command must be followed by a '+' or '-' character to switch the
+  The command can be followed by a '+' or '-' character to switch the
   option on or off respectively.
 
   Example:
@@ -3380,7 +3380,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
   Note: Line continuations do not work in a comment. A backslash at the
   end of a comment is treated as part of the comment and does not trigger
   line continuation.
-  The command must be followed by a '+' or '-' character to switch the
+  The command can be followed by a '+' or '-' character to switch the
   option on or off respectively.
 
   Example:
@@ -3395,7 +3395,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
 
 <sect1><tt>.LIST</tt><label id=".LIST"><p>
 
-  Enable output to the listing. The command must be followed by a boolean
+  Enable output to the listing. The command can be followed by a boolean
   switch ("on", "off", "+" or "-") and will enable or disable listing
   output.
   The option has no effect if the listing is not enabled by the command line
@@ -4040,7 +4040,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
 
 <sect1><tt>.SMART</tt><label id=".SMART"><p>
 
-  Switch on or off smart mode. The command must be followed by a '+' or '-'
+  Switch on or off smart mode. The command can be followed by a '+' or '-'
   character to switch the option on or off respectively. The default is off
   (that is, the assembler doesn't try to be smart), but this default may be
   changed by the -s switch on the command line.
@@ -4262,8 +4262,13 @@ macro actually takes in the definition. You may also leave intermediate
 parameters empty. Empty parameters are replaced by empty space (that is,
 they are removed when the macro is expanded). If you have a look at our
 macro definition above, you will see, that replacing the "addr" parameter
-by nothing will lead to wrong code in most lines. To help you, writing
-macros with a variable parameter list, there are some control commands:
+by nothing will lead to wrong code in most lines.
+
+The names "a", "x" and "y" should be avoided for macro parameters, as these
+will usually conflict with the 6502 registers.
+
+For writing macros with a variable parameter list, control commands are
+available:
 
 <tt><ref id=".IFBLANK" name=".IFBLANK"></tt> tests the rest of the line and
 returns true, if there are any tokens on the remainder of the line. Since
@@ -4274,15 +4279,15 @@ opposite.
 Look at this example:
 
 <tscreen><verb>
-.macro  ldaxy   a, x, y
-.ifnblank       a
-        lda     #a
+.macro  ldaxy   i, j, k
+.ifnblank       i
+        lda     #i
 .endif
-.ifnblank       x
-        ldx     #x
+.ifnblank       j
+        ldx     #j
 .endif
-.ifnblank       y
-        ldy     #y
+.ifnblank       k
+        ldy     #k
 .endif
 .endmacro
 </verb></tscreen>

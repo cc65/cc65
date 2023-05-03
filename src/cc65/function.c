@@ -601,7 +601,7 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
                 ** We don't currently support this case.
                 */
                 if (RType == Param->Type) {
-                    Error ("Passing '%s' of this size by value is not supported", GetFullTypeName (Param->Type));
+                    Error ("Passing '%s' of this size (%d) by value is not supported", GetFullTypeName (Param->Type), SizeOf (RType));
                 }
             }
 

@@ -803,7 +803,6 @@ const Type* GetStructReplacementType (const Type* SType)
     switch (SizeOf (SType)) {
         case 1:     NewType = type_uchar;   break;
         case 2:     NewType = type_uint;    break;
-        case 3:     /* FALLTHROUGH */
         case 4:     NewType = type_ulong;   break;
         default:    NewType = SType;        break;
     }

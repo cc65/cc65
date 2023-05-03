@@ -522,6 +522,7 @@ static void NumericConst (void)
     char     C;
     unsigned DigitVal;
     unsigned long IVal;         /* Value */
+    int      Overflow;
 
     /* Get the pp-number first, then parse on it */
     CopyPPNumber (&Src);
@@ -575,6 +576,7 @@ static void NumericConst (void)
     /* Since we now know the correct base, convert the input into a number */
     SB_SetIndex (&Src, Index);
     IVal = 0;
+    Overflow = 0;
     while ((C = SB_Peek (&Src)) != '\0' && (Base <= 10 ? IsDigit (C) : IsXDigit (C))) {
         DigitVal = HexVal (C);
         if (DigitVal >= Base) {
@@ -582,9 +584,17 @@ static void NumericConst (void)
             SB_Clear (&Src);
             break;
         }
-        IVal = (IVal * Base) + DigitVal;
+        if ((((unsigned long)(IVal * Base)) / Base) != IVal)
+            Overflow = 1;
+        IVal = IVal * Base;
+        if (((unsigned long)(IVal + DigitVal)) < IVal)
+            Overflow = 1;
+        IVal += DigitVal;
         SB_Skip (&Src);
     }
+    if (Overflow)
+        Error ("Numerical constant \"%s\" too large for internal 32-bit representation",
+               SB_GetConstBuf (&Src));
 
     /* Distinguish between integer and floating point constants */
     if (!IsFloat) {

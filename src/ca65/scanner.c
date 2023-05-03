@@ -388,8 +388,9 @@ static void IFNextChar (CharSource* S)
         while (1) {
 
             int N = fgetc (S->V.File.F);
-            if (N == '\n' && S->SkipN)
+            if (N == '\n' && S->SkipN) {
                 N = fgetc (S->V.File.F);
+            }
             S->SkipN = 0;
 
             if (N == EOF) {

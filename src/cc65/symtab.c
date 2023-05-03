@@ -793,6 +793,8 @@ static int HandleSymRedefinition (SymEntry* Sym, const Type* T, unsigned Flags)
                 */
                 Error ("Redeclaration of enumerator constant '%s'", Sym->Name);
                 Sym = 0;
+            } else if (Flags & SC_STRUCTFIELD) {
+                Error ("Duplicate member '%s'", Sym->Name);
             }
         }
     }

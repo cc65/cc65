@@ -806,8 +806,8 @@ and the one defined by the ISO standard:
 
 <item>  The datatypes "float" and "double" are not available.
         <p>
-<item>  C Functions may return structs (or unions) by value, but only of
-        1, 2 or 4 byte sizes.
+<item>  C Functions may pass and return structs (or unions) by value, but only
+        of 1, 2 or 4 byte sizes.
         <p>
 <item>  Most of the C library is available with only the fastcall calling
         convention (<ref id="extension-fastcall" name="see below">).  It means

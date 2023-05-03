@@ -129,7 +129,7 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
         if (IsClassFloat (OldType) && IsClassInt (NewType)) {
             long IVal = (long)Expr->V.FVal.V;
             if (Expr->V.FVal.V != FP_D_FromInt(IVal).V)
-                Warning ("Floating point constant (%f) converted to integer loses precision (%d)",Expr->V.FVal.V,IVal);
+                Warning ("Floating point constant (%f) converted to integer loses precision (%ld)",Expr->V.FVal.V,IVal);
             Expr->IVal = IVal;
         }
 
@@ -138,7 +138,7 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
         ** internally already represented by a long.
         */
         if (NewBits <= OldBits) {
-            unsigned long OldVal = Expr->IVal;
+            long OldVal = Expr->IVal;
 
             /* Cut the value to the new size */
             Expr->IVal &= (0xFFFFFFFFUL >> (32 - NewBits));

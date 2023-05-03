@@ -55,7 +55,7 @@
 
 
 
-static void DoConversion (ExprDesc* Expr, const Type* NewType)
+static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
 /* Emit code to convert the given expression to a new type. */
 {
     const Type* OldType;
@@ -141,7 +141,7 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
                 }
             }
 
-            if ((OldVal != Expr->IVal) && IS_Get (&WarnConstOverflow)) {
+            if ((OldVal != Expr->IVal) && IS_Get (&WarnConstOverflow) && !Explicit) {
                 Warning ("Implicit conversion of constant overflows %d-bit destination", NewBits);
             }
         }
@@ -288,7 +288,7 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
         /* Both types must be complete */
         if (!IsIncompleteESUType (NewType) && !IsIncompleteESUType (Expr->Type)) {
             /* Do the actual conversion */
-            DoConversion (Expr, NewType);
+            DoConversion (Expr, NewType, 0);
         } else {
             /* We should have already generated error elsewhere so that we
             ** could just silently fail here to avoid excess errors, but to
@@ -335,7 +335,7 @@ void TypeCast (ExprDesc* Expr)
                 ReplaceType (Expr, NewType);
             } else if (IsCastType (Expr->Type)) {
                 /* Convert the value. The result has always the new type */
-                DoConversion (Expr, NewType);
+                DoConversion (Expr, NewType, 1);
             } else {
                 TypeCompatibilityDiagnostic (NewType, Expr->Type, 1,
                     "Cast to incompatible type '%s' from '%s'");

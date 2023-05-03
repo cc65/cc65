@@ -671,8 +671,8 @@ const Type* ArithmeticConvert (const Type* lhst, const Type* rhst)
     ** The integral promotions are performed on both operands.
     */
     if (IsClassFloat(lhst) || IsClassFloat(rhst)) {
-	    Error ("Floating point arithmetic not supported.");
-		return type_long;
+        Error ("Floating point arithmetic not supported.");
+        return type_long;
     }
     lhst = IntPromotion (lhst);
     rhst = IntPromotion (rhst);

@@ -754,6 +754,8 @@ Here is a description of all the command line options:
         Warn about unused function parameters.
   <tag><tt/unused-var/</tag>
         Warn about unused variables.
+  <tag><tt/const-overflow/</tag>
+        Warn if numerical constant conversion implies overflow. (Disabled by default.)
   </descrip>
 
   The full list of available warning names can be retrieved by using the

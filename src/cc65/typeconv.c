@@ -128,6 +128,7 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
         ** internally already represented by a long.
         */
         if (NewBits <= OldBits) {
+            unsigned long OldVal = Expr->IVal;
 
             /* Cut the value to the new size */
             Expr->IVal &= (0xFFFFFFFFUL >> (32 - NewBits));
@@ -138,6 +139,10 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
                     /* Beware: Use the safe shift routine here. */
                     Expr->IVal |= shl_l (~0UL, NewBits);
                 }
+            }
+
+            if ((OldVal != Expr->IVal) && IS_Get (&WarnConstOverflow)) {
+                Warning ("Implicit conversion of constant overflows %d-bit destination", NewBits);
             }
         }
 

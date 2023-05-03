@@ -1901,30 +1901,45 @@ static void UnaryOp (ExprDesc* Expr)
     /* Get the expression */
     hie10 (Expr);
 
-    /* We can only handle integer types */
-    if (!IsClassInt (Expr->Type)) {
-        Error ("Argument must have integer type");
-        ED_MakeConstAbsInt (Expr, 1);
-    }
-
     /* Check for a constant numeric expression */
     if (ED_IsConstAbs (Expr)) {
-        /* Value is numeric */
-        switch (Tok) {
-            case TOK_MINUS: Expr->IVal = -Expr->IVal;   break;
-            case TOK_PLUS:                              break;
-            case TOK_COMP:  Expr->IVal = ~Expr->IVal;   break;
-            default:        Internal ("Unexpected token: %d", Tok);
+
+        if (IsClassFloat (Expr->Type)) {
+            switch (Tok) {
+                case TOK_MINUS: Expr->V.FVal = FP_D_Sub(FP_D_Make(0.0),Expr->V.FVal);               break;
+                case TOK_PLUS:                                                                      break;
+                case TOK_COMP:  Error ("Unary ~ operator not valid for floating point constant");   break;
+                default:        Internal ("Unexpected token: %d", Tok);
+            }
+        } else {
+            if (!IsClassInt (Expr->Type)) {
+                Error ("Constant argument must have integer or float type");
+                ED_MakeConstAbsInt (Expr, 1);
+            }
+
+            /* Value is numeric */
+            switch (Tok) {
+                case TOK_MINUS: Expr->IVal = -Expr->IVal;   break;
+                case TOK_PLUS:                              break;
+                case TOK_COMP:  Expr->IVal = ~Expr->IVal;   break;
+                default:        Internal ("Unexpected token: %d", Tok);
+            }
+
+            /* Adjust the type of the expression */
+            Expr->Type = IntPromotion (Expr->Type);
+
+            /* Limit the calculated value to the range of its type */
+            LimitExprValue (Expr, 1);
         }
-
-        /* Adjust the type of the expression */
-        Expr->Type = IntPromotion (Expr->Type);
-
-        /* Limit the calculated value to the range of its type */
-        LimitExprValue (Expr, 1);
 
     } else {
         unsigned Flags;
+
+        /* If not constant, we can only handle integer types */
+        if (!IsClassInt (Expr->Type)) {
+            Error ("Non-constant argument must have integer type");
+            ED_MakeConstAbsInt (Expr, 1);
+        }
 
         /* Value is not constant */
         LoadExpr (CF_NONE, Expr);

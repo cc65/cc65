@@ -39,6 +39,7 @@
 #include <errno.h>
 #include <ctype.h>
 #include <math.h>
+#include <inttypes.h>
 
 /* common */
 #include "chartype.h"
@@ -150,6 +151,11 @@ static const struct Keyword {
 #define IT_LONG         0x04
 #define IT_ULONG        0x08
 
+
+/* Internal type for numeric constant scanning.
+** Size must be explicit for cross-platform uniformity.
+*/
+typedef uint32_t scan_t;
 
 
 /*****************************************************************************/
@@ -521,7 +527,7 @@ static void NumericConst (void)
     int      IsFloat;
     char     C;
     unsigned DigitVal;
-    unsigned long IVal;         /* Value */
+    scan_t   IVal;              /* Scanned value. */
     int      Overflow;
 
     /* Get the pp-number first, then parse on it */
@@ -584,19 +590,19 @@ static void NumericConst (void)
             SB_Clear (&Src);
             break;
         }
-        if ((((unsigned long)(IVal * Base)) / Base) != IVal) {
+        if (((scan_t)(IVal * Base) / Base) != IVal) {
             Overflow = 1;
         }
         IVal = IVal * Base;
-        if (((unsigned long)(IVal + DigitVal)) < IVal) {
+        if (((scan_t)(IVal + DigitVal)) < IVal) {
             Overflow = 1;
         }
         IVal += DigitVal;
         SB_Skip (&Src);
     }
     if (Overflow) {
-        Error ("Numerical constant \"%s\" too large for internal 32-bit representation",
-               SB_GetConstBuf (&Src));
+        Error ("Numerical constant \"%s\" too large for internal %d-bit representation",
+               SB_GetConstBuf (&Src), (int)(sizeof(IVal)*8));
     }
 
     /* Distinguish between integer and floating point constants */

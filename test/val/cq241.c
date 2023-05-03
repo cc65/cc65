@@ -4,6 +4,14 @@
   !!LICENCE!!     own, freely distributeable for non-profit. read CPYRIGHT.LCC
 */
 
+/* INTEGER_CONSTANT_MAX_32BIT
+** This suppresses constants longer than 32-bit, which are now an error:
+**   https://github.com/cc65/cc65/pull/2084
+** Because cc65's internal representation is implicitly/explicitly
+** 32-bit in many places, values larger than this aren't representable,
+** but also can't be checked for overflow once accepted.
+*/
+
 #include "common.h"
 
 struct defs {
@@ -62,7 +70,12 @@ long pow2(long n) {
    return s;
 }
 
-   long d[39], o[39], x[39];
+#ifndef INTEGER_CONSTANT_MAX_32BIT
+#define CTCOUNT 39
+#else
+#define CTCOUNT 36
+#endif
+   long d[CTCOUNT], o[CTCOUNT], x[CTCOUNT];
 
 #ifndef NO_OLD_FUNC_DECL
 s241(pd0)
@@ -212,13 +225,15 @@ int s241(struct defs *pd0) {
    d[33] = 1073741823;      o[33] = 07777777777;     x[33] = 0x3fffffff;
    d[34] = 1073741824;      o[34] = 010000000000;    x[34] = 0x40000000;
    d[35] = 4294967295;      o[35] = 037777777777;    x[35] = 0xffffffff;
+#if CTCOUNT > 36
    d[36] = 4294967296;      o[36] = 040000000000;    x[36] = 0x100000000;
    d[37] = 68719476735;     o[37] = 0777777777777;   x[37] = 0xfffffffff;
    d[38] = 68719476736;     o[38] = 01000000000000;  x[38] = 0x1000000000;
+#endif
 
    /* WHEW! */
 
-   for (j=0; j<39; j++){
+   for (j=0; j<CTCOUNT; j++){
      if ( g[j] != d[j]
        || d[j] != o[j]
        || o[j] != x[j]) {

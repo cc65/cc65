@@ -1269,7 +1269,8 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
         ExprNode* Left = A->Expr->Left;
         if ((A->Expr->Op == EXPR_BYTE0 || A->Expr->Op == EXPR_BYTE1) &&
             Left->Op == EXPR_SYMBOL                                  &&
-            GetSymAddrSize (Left->V.Sym) != ADDR_SIZE_ZP) {
+            GetSymAddrSize (Left->V.Sym) != ADDR_SIZE_ZP             &&
+            !(A->Flags & EFFADDR_OVERRIDE_ZP)) {
 
             /* Output a warning */
             Warning (1, "Suspicious address expression");

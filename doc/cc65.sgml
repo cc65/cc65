@@ -741,7 +741,7 @@ Here is a description of all the command line options:
   <tag><tt/return-type/</tag>
         Warn about no return statement in function returning non-void.
   <tag><tt/struct-param/</tag>
-        Warn when passing structs by value.
+        Warn when passing structs by value. (Disabled by default.)
   <tag><tt/unknown-pragma/</tag>
         Warn about #pragmas that aren't recognized by cc65.
   <tag><tt/unreachable-code/</tag>
@@ -806,9 +806,8 @@ and the one defined by the ISO standard:
 
 <item>  The datatypes "float" and "double" are not available.
         <p>
-<item>  C Functions may not return structs (or unions), and structs may not
-        be passed as parameters by value. However, struct assignment *is*
-        possible.
+<item>  C Functions may pass and return structs (or unions) by value, but only
+        of 1, 2 or 4 byte sizes.
         <p>
 <item>  Most of the C library is available with only the fastcall calling
         convention (<ref id="extension-fastcall" name="see below">).  It means

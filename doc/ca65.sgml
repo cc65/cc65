@@ -2283,7 +2283,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
   Switch on or off case sensitivity on identifiers. The default is off
   (that is, identifiers are case sensitive), but may be changed by the
   -i switch on the command line.
-  The command must be followed by a '+' or '-' character to switch the
+  The command can be followed by a '+' or '-' character to switch the
   option on or off respectively.
 
   Example:
@@ -2432,7 +2432,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
   Switch on or off debug info generation. The default is off (that is,
   the object file will not contain debug infos), but may be changed by the
   -g switch on the command line.
-  The command must be followed by a '+' or '-' character to switch the
+  The command can be followed by a '+' or '-' character to switch the
   option on or off respectively.
 
   Example:
@@ -3380,7 +3380,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
   Note: Line continuations do not work in a comment. A backslash at the
   end of a comment is treated as part of the comment and does not trigger
   line continuation.
-  The command must be followed by a '+' or '-' character to switch the
+  The command can be followed by a '+' or '-' character to switch the
   option on or off respectively.
 
   Example:
@@ -3395,7 +3395,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
 
 <sect1><tt>.LIST</tt><label id=".LIST"><p>
 
-  Enable output to the listing. The command must be followed by a boolean
+  Enable output to the listing. The command can be followed by a boolean
   switch ("on", "off", "+" or "-") and will enable or disable listing
   output.
   The option has no effect if the listing is not enabled by the command line
@@ -4040,7 +4040,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
 
 <sect1><tt>.SMART</tt><label id=".SMART"><p>
 
-  Switch on or off smart mode. The command must be followed by a '+' or '-'
+  Switch on or off smart mode. The command can be followed by a '+' or '-'
   character to switch the option on or off respectively. The default is off
   (that is, the assembler doesn't try to be smart), but this default may be
   changed by the -s switch on the command line.

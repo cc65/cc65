@@ -35,7 +35,6 @@ ram_top         :=      __MAIN_START__ + __MAIN_SIZE__
 .ifdef ASM
 
         .include        "screen-c1p-24x24.s"
-        .macpack        generic
 
 load            :=      $08             ; private variables
 count           :=      $0A
@@ -51,16 +50,14 @@ LINEDIST        =       $20             ; Offset in video RAM between two lines
         sta     load
         stx     load+1
 
-        lda     #<load_size
-        eor     #$FF
-        sta     count
-        lda     #>load_size
-        eor     #$FF
-        sta     count+1
+        ldx     #(<load_size) + 1
+        stx     count
+        ldx     #(>load_size) + 1
+        stx     count+1                 ; save size with each byte incremented separately
 
-L1:     inc     count
+L1:     dec     count
         bne     L2
-        inc     count+1
+        dec     count+1
         beq     L3
 L2:     jsr     GETCHAR                 ; (doesn't change .Y)
         sta     (load),y
@@ -114,18 +111,15 @@ CR      =       $0D
         hex2    >load_addr
         .byte   CR, "85", CR, "08", CR
         .byte   "86", CR, "09", CR
-        .byte   "A9", CR
-        hex2    <load_size
-        .byte   CR, "49", CR, "FF", CR
-        .byte   "85", CR, "0A", CR
-        .byte   "A9", CR
-        hex2    >load_size
-        .byte   CR, "49", CR, "FF", CR
-        .byte   "85", CR, "0B", CR
-
-        .byte   "E6", CR, "0A", CR
+        .byte   "A2", CR
+        hex2    (<load_size) + 1
+        .byte   CR, "86", CR, "0A", CR
+        .byte   "A2", CR
+        hex2    (>load_size) + 1
+        .byte   CR, "86", CR, "0B", CR
+        .byte   "C6", CR, "0A", CR
         .byte   "D0", CR, "04", CR
-        .byte   "E6", CR, "0B", CR
+        .byte   "C6", CR, "0B", CR
         .byte   "F0", CR, "16", CR
         .byte   "20", CR, "BF", CR, "FF", CR
         .byte   "91", CR, "08", CR

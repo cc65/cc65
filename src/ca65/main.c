@@ -861,8 +861,9 @@ static void OneLine (void)
         /* Suppress .size Symbol if this Symbol already has a multiply-defined error,
         ** as it will only create its own additional unnecessary error.
         */
-        if ((Sym->Flags & SF_MULTDEF) == 0)
+        if ((Sym->Flags & SF_MULTDEF) == 0) {
             DefSizeOfSymbol (Sym, Size);
+        }
     }
 
     /* Line separator must come here */

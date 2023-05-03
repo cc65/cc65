@@ -584,17 +584,20 @@ static void NumericConst (void)
             SB_Clear (&Src);
             break;
         }
-        if ((((unsigned long)(IVal * Base)) / Base) != IVal)
+        if ((((unsigned long)(IVal * Base)) / Base) != IVal) {
             Overflow = 1;
+        }
         IVal = IVal * Base;
-        if (((unsigned long)(IVal + DigitVal)) < IVal)
+        if (((unsigned long)(IVal + DigitVal)) < IVal) {
             Overflow = 1;
+        }
         IVal += DigitVal;
         SB_Skip (&Src);
     }
-    if (Overflow)
+    if (Overflow) {
         Error ("Numerical constant \"%s\" too large for internal 32-bit representation",
                SB_GetConstBuf (&Src));
+    }
 
     /* Distinguish between integer and floating point constants */
     if (!IsFloat) {

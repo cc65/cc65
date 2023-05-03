@@ -128,7 +128,7 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
         ** internally already represented by a long.
         */
         if (NewBits <= OldBits) {
-            unsigned long OldVal = Expr->IVal;
+            long OldVal = Expr->IVal;
 
             /* Cut the value to the new size */
             Expr->IVal &= (0xFFFFFFFFUL >> (32 - NewBits));

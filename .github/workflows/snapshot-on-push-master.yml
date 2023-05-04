@@ -114,7 +114,8 @@ jobs:
           git config user.email "cc65.nomail@github.com"
           git config push.default simple
           git add -A
-          if git commit -m "Updated from cc65 commit ${GITHUB_SHA}." ; then
+          # prevent failure when there is nothing to commit
+          if git commit -m "Updated from https://github.com/cc65/cc65/commit/${GITHUB_SHA}" ; then
             git push
           fi
 

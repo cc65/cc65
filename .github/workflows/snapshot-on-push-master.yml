@@ -109,6 +109,8 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: cc65/doc
+          # this token will expire, if it does, generate a new one as decribed in https://github.com/cc65/cc65/issues/2065
+          token: ${{ secrets.DOC_PAT }} # use secret token instead of default
           path: doc.git
       - name: Update the online documents.
         run: |
@@ -120,7 +122,7 @@ jobs:
           git config push.default simple
           git add -A
           git commit -m "Updated from cc65 commit ${GITHUB_SHA}."
-          #git push -n -v
+          git push -n -v
 
     # enter secrets under "repository secrets"
       - name: Upload snapshot to sourceforge

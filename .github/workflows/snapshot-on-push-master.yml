@@ -8,8 +8,13 @@ concurrency:
   cancel-in-progress: true
 
 # suggested at https://jonathansoma.com/everything/git/github-actions-403-error/
+# https://github.com/orgs/community/discussions/26694
 permissions:
+  deployments: write
   contents: write
+  statuses: write
+  actions: write
+  checks: read
 
 jobs:
   build_windows:
@@ -106,8 +111,6 @@ jobs:
           repository: cc65/doc
           path: doc.git
       - name: Update the online documents.
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd doc.git
           rm *.*

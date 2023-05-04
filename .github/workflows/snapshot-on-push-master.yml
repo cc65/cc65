@@ -95,12 +95,12 @@ jobs:
           mv cc65.zip cc65-snapshot-win32.zip
 
       - name: Upload a 32-bit Snapshot Zip
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: cc65-snapshot-win32.zip
           path: cc65-snapshot-win32.zip
       - name: Upload a 64-bit Snapshot Zip
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: cc65-snapshot-win64.zip
           path: cc65-snapshot-win64.zip
@@ -122,7 +122,7 @@ jobs:
           git config push.default simple
           git add -A
           git commit -m "Updated from cc65 commit ${GITHUB_SHA}."
-          git push -n -v
+          git push
 
     # enter secrets under "repository secrets"
       - name: Upload snapshot to sourceforge

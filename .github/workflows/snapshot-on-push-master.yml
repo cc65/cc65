@@ -9,12 +9,12 @@ concurrency:
 
 # suggested at https://jonathansoma.com/everything/git/github-actions-403-error/
 # https://github.com/orgs/community/discussions/26694
-permissions:
-  deployments: write
-  contents: write
-  statuses: write
-  actions: write
-  checks: read
+#permissions:
+#  deployments: write
+#  contents: write
+#  statuses: write
+#  actions: write
+#  checks: read
 
 jobs:
   build_windows:

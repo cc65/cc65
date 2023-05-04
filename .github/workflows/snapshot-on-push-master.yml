@@ -7,15 +7,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-# suggested at https://jonathansoma.com/everything/git/github-actions-403-error/
-# https://github.com/orgs/community/discussions/26694
-#permissions:
-#  deployments: write
-#  contents: write
-#  statuses: write
-#  actions: write
-#  checks: read
-
 jobs:
   build_windows:
     name: Build (Windows)
@@ -66,15 +57,15 @@ jobs:
       - name: Build the platform libraries.
         shell: bash
         run: make -j2 lib QUIET=1
-#      - name: Run the regression tests.
-#        shell: bash
-#        run: make test QUIET=1
-#      - name: Test that the samples can be built.
-#        shell: bash
-#        run: make -j2 samples
-#      - name: Remove the output from the samples tests.
-#        shell: bash
-#        run: make -C samples clean
+      - name: Run the regression tests.
+        shell: bash
+        run: make test QUIET=1
+      - name: Test that the samples can be built.
+        shell: bash
+        run: make -j2 samples
+      - name: Remove the output from the samples tests.
+        shell: bash
+        run: make -C samples clean
       - name: Remove programs in util directory
         shell: bash
         run: make -C util clean
@@ -110,6 +101,8 @@ jobs:
         with:
           repository: cc65/doc
           # this token will expire, if it does, generate a new one as decribed in https://github.com/cc65/cc65/issues/2065
+          # - apparently only a "classic" token works here
+          # - the token must exist in the cc65/cc65 repo
           token: ${{ secrets.DOC_PAT }} # use secret token instead of default
           path: doc.git
       - name: Update the online documents.

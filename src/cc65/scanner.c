@@ -40,6 +40,7 @@
 #include <ctype.h>
 #include <math.h>
 #include <inttypes.h>
+#include <limits.h>
 
 /* common */
 #include "chartype.h"
@@ -590,6 +591,7 @@ static void NumericConst (void)
             SB_Clear (&Src);
             break;
         }
+        /* Test result of adding digit for overflow. */
         if (((scan_t)(IVal * Base + DigitVal) / Base) != IVal) {
             Overflow = 1;
         }

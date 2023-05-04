@@ -39,8 +39,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-# inspired by https://github.com/JuliaRegistries/TagBot/blob/master/example.yml
-      token: ${{ secrets.GITHUB_TOKEN }}
       - name: Install Dependencies
         shell: bash
         run: |
@@ -108,6 +106,8 @@ jobs:
           repository: cc65/doc
           path: doc.git
       - name: Update the online documents.
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd doc.git
           rm *.*

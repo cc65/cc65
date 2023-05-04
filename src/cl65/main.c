@@ -1216,7 +1216,7 @@ static void OptPrintTargetPath (const char* Opt attribute ((unused)),
 
     SearchPaths* TargetPaths = NewSearchPath ();
     AddSubSearchPathFromEnv (TargetPaths, "CC65_HOME", "target");
-#if defined(CL65_TGT) && !defined(_WIN32)
+#if defined(CL65_TGT) && !defined(_WIN32) && !defined(_AMIGA)
     AddSearchPath (TargetPaths, CL65_TGT);
 #endif
     AddSubSearchPathFromBin (TargetPaths, "target");

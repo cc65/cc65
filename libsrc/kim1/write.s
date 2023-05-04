@@ -28,11 +28,10 @@ begin:  dec     ptr2
 
 outch:  ldy     #0
         lda     (ptr1),y
+        pha                     ; Save A (changed by OUTCHR)
         jsr     OUTCHR          ; Send character using Monitor call
-        cmp     #$07            ; Check for '\a'
-        bne     chklf           ; ...if BEL character
-;jsr     BEEP            ; Make beep sound
-chklf:  cmp     #$0A            ; Check for 'n'
+        pla                     ; Restore A
+        cmp     #$0A            ; Check for '\n'
         bne     next            ; ...if LF character
         lda     #$0D            ; Add a carriage return
         jsr     OUTCHR

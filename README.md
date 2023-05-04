@@ -12,7 +12,7 @@ Core team members:
 * [Christian Groessler](https://github.com/groessler): Atari, Atari5200, and CreatiVision library Maintainer
 * [dqh](https://github.com/dqh-au): GHA help
 * [Greg King](https://github.com/greg-king5): all around hackery
-* [groepaz](https://github.com/mrdudz): CBM libary, Project Maintainer
+* [groepaz](https://github.com/mrdudz): CBM library, Project Maintainer
 * [Oliver Schmidt](https://github.com/oliverschmidt): Apple II library Maintainer
 
 External contributors:

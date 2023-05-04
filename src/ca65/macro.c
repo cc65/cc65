@@ -390,7 +390,20 @@ void MacDef (unsigned Style)
 {
     Macro* M;
     TokNode* N;
+    FilePos Pos;
     int HaveParams;
+    int LastTokWasSep;
+
+    /* For classic macros, remember if we are at the beginning of the line.
+    ** If the macro name and parameters pass our checks then we will be on a
+    ** new line, so set it now
+    */
+    LastTokWasSep = 1;
+
+    /* Save the position of the start of the macro definition to allow
+    ** using Perror to display the error if .endmacro isn't found
+    */
+    Pos = CurTok.Pos;
 
     /* We expect a macro name here */
     if (CurTok.Tok != TOK_IDENT) {
@@ -491,14 +504,16 @@ void MacDef (unsigned Style)
     while (1) {
         /* Check for end of macro */
         if (Style == MAC_STYLE_CLASSIC) {
-            /* In classic macros, only .endmacro is allowed */
-            if (CurTok.Tok == TOK_ENDMACRO) {
+            /* In classic macros, if .endmacro is not at the start of the line
+            ** it will be added to the macro definition instead of closing it.
+            */
+            if (CurTok.Tok == TOK_ENDMACRO && LastTokWasSep) {
                 /* Done */
                 break;
             }
             /* May not have end of file in a macro definition */
             if (CurTok.Tok == TOK_EOF) {
-                Error ("'.ENDMACRO' expected");
+                PError (&Pos, "'.ENDMACRO' expected for macro '%m%p'", &M->Name);
                 goto Done;
             }
         } else {
@@ -572,6 +587,11 @@ void MacDef (unsigned Style)
             M->TokLast = N;
         }
         ++M->TokCount;
+
+        /* Save if last token was a separator to know if .endmacro is at
+        ** the start of a line
+        */
+        LastTokWasSep = TokIsSep(CurTok.Tok);
 
         /* Read the next token */
         NextTok ();

@@ -54,8 +54,9 @@ INSTALL:
         sta     VIA2::PRB
         ; We could detect joysticks because with previous command bit0,1,2,3,4 should be set to 1 after
         ; But if some one press fire or press direction, we could reach others values which could break joystick detection.
-        lda     #<JOY_ERR_OK
-        ldx     #>JOY_ERR_OK
+        lda     #JOY_ERR_OK
+        .assert JOY_ERR_OK = 0, error
+        tax
 ;       rts                     ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------

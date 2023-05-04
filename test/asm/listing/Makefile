@@ -58,12 +58,20 @@ $(WORKDIR)/$1.bin: $1.s $(ISEQUAL)
 ifeq ($(wildcard control/$1.err),)
 	$(CA65) -t none -o $$(@:.bin=.o) $$< > $$(@:.bin=.err) 2> $$(@:.bin=.err2)
 ifeq ($(wildcard control/$1.no-ld65),)
+ifeq ($(wildcard $1.cfg),)
 	$(LD65) -t none -o $$@ $$(@:.bin=.o) none.lib > $$(@:.bin=.ld65-err) 2> $$(@:.bin=.ld65-err2)
+else
+	$(LD65) -C $$(<:.s=.cfg) -o $$@ $$(@:.bin=.o) > $$(@:.bin=.ld65-err) 2> $$(@:.bin=.ld65-err2)
+endif
 endif
 else
 	$(CA65) -t none -o $$(@:.bin=.o) $$< > $$(@:.bin=.err) 2> $$(@:.bin=.err2) || $(TRUE)
 ifeq ($(wildcard control/$1.no-ld65),)
+ifeq ($(wildcard $1.cfg),)
 	$(LD65) -t none -o $$@ $$(@:.bin=.o) none.lib > $$(@:.bin=.ld65-err) 2> $$(@:.bin=.ld65-err2) || $(TRUE)
+else
+	$(LD65) -C $$(<:.s=.cfg) -o $$@ $$(@:.bin=.o) > $$(@:.bin=.ld65-err) 2> $$(@:.bin=.ld65-err2) || $(TRUE)
+endif
 endif
 endif
 
@@ -117,12 +125,20 @@ endif
 ifeq ($(wildcard control/$1.err),)
 	$(CA65) -t none -l $$(@:.bin=.list-lst) -o $$(@:.bin=.list-o) $$< > $$(@:.bin=.list-err) 2> $$(@:.bin=.list-err2)
 ifeq ($(wildcard control/$1.no-ld65),)
+ifeq ($(wildcard $1.cfg),)
 	$(LD65) -t none -o $$(@:.bin=.list-bin) $$(@:.bin=.list-o) none.lib > $$(@:.bin=.list-ld65-err) 2> $$(@:.bin=.list-ld65-err2)
+else
+	$(LD65) -C $$(<:.s=.cfg) -o $$(@:.bin=.list-bin) $$(@:.bin=.list-o) > $$(@:.bin=.list-ld65-err) 2> $$(@:.bin=.list-ld65-err2)
+endif
 endif
 else
 	$(CA65) -t none -l $$(@:.bin=.list-lst) -o $$(@:.bin=.list-o) $$< > $$(@:.bin=.list-err) 2> $$(@:.bin=.list-err2) || $(TRUE)
 ifeq ($(wildcard control/$1.no-ld65),)
+ifeq ($(wildcard $1.cfg),)
 	$(LD65) -t none -o $$(@:.bin=.list-bin) $$(@:.bin=.list-o) none.lib > $$(@:.bin=.list-ld65-err) 2> $$(@:.bin=.list-ld65-err2) || $(TRUE)
+else
+	$(LD65) -C $$(<:.s=.cfg) -o $$(@:.bin=.list-bin) $$(@:.bin=.list-o) > $$(@:.bin=.list-ld65-err) 2> $$(@:.bin=.list-ld65-err2) || $(TRUE)
+endif
 endif
 endif
 

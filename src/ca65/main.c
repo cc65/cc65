@@ -489,12 +489,15 @@ static void OptDebugInfo (const char* Opt attribute ((unused)),
 static void OptFeature (const char* Opt attribute ((unused)), const char* Arg)
 /* Set an emulation feature */
 {
-    /* Make a string buffer from Arg */
-    StrBuf Feature;
+    /* Make a string buffer from Arg and use it to find the feature. */
+    StrBuf StrFeature;
+    feature_t Feature = FindFeature (SB_InitFromString (&StrFeature, Arg));
 
-    /* Set the feature, check for errors */
-    if (SetFeature (SB_InitFromString (&Feature, Arg)) == FEAT_UNKNOWN) {
+    /* Enable the feature, check for errors */
+    if (Feature == FEAT_UNKNOWN) {
         AbEnd ("Illegal emulation feature: '%s'", Arg);
+    } else {
+        SetFeature (Feature, 1);
     }
 }
 
@@ -855,7 +858,12 @@ static void OneLine (void)
             /* The line has switched the segment */
             Size = 0;
         }
-        DefSizeOfSymbol (Sym, Size);
+        /* Suppress .size Symbol if this Symbol already has a multiply-defined error,
+        ** as it will only create its own additional unnecessary error.
+        */
+        if ((Sym->Flags & SF_MULTDEF) == 0) {
+            DefSizeOfSymbol (Sym, Size);
+        }
     }
 
     /* Line separator must come here */

@@ -7,6 +7,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# suggested at https://jonathansoma.com/everything/git/github-actions-403-error/
+permissions:
+  contents: write
+
 jobs:
   build_windows:
     name: Build (Windows)

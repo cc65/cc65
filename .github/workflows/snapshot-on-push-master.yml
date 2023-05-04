@@ -39,6 +39,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+# inspired by https://github.com/JuliaRegistries/TagBot/blob/master/example.yml
+      token: ${{ secrets.GITHUB_TOKEN }}
       - name: Install Dependencies
         shell: bash
         run: |

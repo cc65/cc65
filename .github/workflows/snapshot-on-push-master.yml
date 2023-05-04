@@ -114,8 +114,9 @@ jobs:
           git config user.email "cc65.nomail@github.com"
           git config push.default simple
           git add -A
-          git diff-index --quiet HEAD || git commit -m "Updated from cc65 commit ${GITHUB_SHA}."
-          git diff-index --quiet HEAD || git push
+          if git commit -m "Updated from cc65 commit ${GITHUB_SHA}." ; then
+            git push
+          fi
 
     # enter secrets under "repository secrets"
       - name: Upload snapshot to sourceforge

@@ -815,7 +815,7 @@ test_Ismnemonic sub
 
     .import _exit
     .export _main
-    
+
 _main:
     .if ismnemonic_error
         ldx #$01

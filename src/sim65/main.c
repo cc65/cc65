@@ -140,6 +140,16 @@ static void OptQuitXIns (const char* Opt attribute ((unused)),
 /* quit after MaxCycles cycles */
 {
     MaxCycles = strtoul(Arg, NULL, 0);
+    /* Guard against overflow. */
+    if (MaxCycles == ULONG_MAX && errno == ERANGE) {
+        Error("'-x parameter out of range. Max: %lu",ULONG_MAX);
+    }
+    /* Platforms with 64-bit long should not be permitted to behave differently. */
+#if ULONG_MAX > 0xFFFFFFFFUL
+    if (MaxCycles > 0xFFFFFFFFUL) {
+        Error("'-x parameter out of 32-bit range. Max: %ul",0xFFFFFFFF);
+    }
+#endif
 }
 
 static unsigned char ReadProgramFile (void)

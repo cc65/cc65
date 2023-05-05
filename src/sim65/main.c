@@ -195,6 +195,7 @@ static unsigned char ReadProgramFile (void)
     }
 
     /* Get load address */
+    Val2 = 0;
     if (((Val = fgetc(F)) == EOF) ||
         ((Val2 = fgetc(F)) == EOF)) {
         Error ("'%s': Header missing load address", ProgramFile);

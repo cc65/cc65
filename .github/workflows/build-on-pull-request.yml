@@ -54,7 +54,7 @@ jobs:
           make -j2 bin USER_CFLAGS=-Werror CROSS_COMPILE=x86_64-w64-mingw32-
 
   build_windows:
-    name: Build and Test (Windows)
+    name: Build (Windows)
     runs-on: windows-latest
 
     steps:
@@ -73,7 +73,8 @@ jobs:
       - name: Build app (release)
         run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Release
 
-      - name: Build the test libraries.
-        run: make -j2 libtest QUIET=1
-      - name: Run the regression tests.
-        run: make test QUIET=1
+      # Disabled because this is 5x slower than the corresponding Linux test.
+      #- name: Build the test libraries.
+      #  run: make -j2 libtest QUIET=1
+      #- name: Run the regression tests.
+      #  run: make -j test QUIET=1

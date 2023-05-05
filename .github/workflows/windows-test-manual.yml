@@ -1,0 +1,30 @@
+name: Windows Test Manual
+# Manually dispatched because it's much slower than the Linux test.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build_windows:
+    name: Build, Test (Windows)
+    runs-on: windows-latest
+
+    steps:
+      - name: Git Setup
+        shell: bash
+        run: git config --global core.autocrlf input
+
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Build app (release)
+        run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Release
+
+      - name: Build the test libraries.
+        run: make -j2 libtest QUIET=1
+
+      - name: Run the regression tests.
+        run: make test QUIET=1

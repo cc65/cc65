@@ -67,3 +67,10 @@ jobs:
 
       - name: Build app (release)
         run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Release
+
+      # Disabled because this is 5x slower than the corresponding Linux test.
+      # windows-test-manual.yml provides a manually dispatched alternative.
+      #- name: Build the test libraries.
+      #  run: make -j2 libtest QUIET=1
+      #- name: Run the regression tests.
+      #  run: make -j test QUIET=1

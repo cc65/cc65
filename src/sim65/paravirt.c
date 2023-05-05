@@ -246,7 +246,9 @@ static void PVClose (CPURegs* Regs)
         RetVal = close (FD);
     } else {
         /* test/val/constexpr "abuses" close, expecting close(-1) to return -1.
-        ** This behaviour is not the same on all target platforms. */
+        ** This behaviour is not the same on all target platforms.
+        ** MSVC's close treats it as a fatal error instead and terminates.
+        */
         RetVal = 0xFFFF;
     }
 

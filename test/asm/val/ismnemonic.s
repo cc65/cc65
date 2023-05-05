@@ -13,18 +13,22 @@
 ;    "65816"
 ;    "sweet16"
 
+; count any errors:
+ismnemonic_error .set 0
+
+; macro to test an instruction
 .macro test_Ismnemonic instr
     .if .ismnemonic(instr)
         ; do nothing
     .else
-        .error .sprintf(".ISMNEMONIC failed for instruction: %s", .string(instr))
+        ismnemonic_error .set ismnemonic_error + 1
     .endif
 .endmacro
 
 ; there is no instruction table for "none", make sure 'adc' (common to all CPUs) and 'add' (sweet16) doesn't match
 .setcpu "none"
 .if .ismnemonic(adc) || .ismnemonic(add)
-    .error ".ISMNEMONIC with CPU set to 'none' should not match any instructions."
+    ismnemonic_error .set ismnemonic_error + 1
 .endif
 
 .setcpu "6502"
@@ -806,3 +810,17 @@ test_Ismnemonic st
 test_Ismnemonic std
 test_Ismnemonic stp
 test_Ismnemonic sub
+
+    .setcpu "6502"
+
+    .import _exit
+    .export _main
+    
+_main:
+    .if ismnemonic_error
+        ldx #$01
+    .else
+        ldx #$00
+    .endif
+    txa
+    jmp _exit

@@ -6,7 +6,7 @@ on:
 
 jobs:
   build_windows:
-    name: Build, Test (Windows)
+    name: Build, Test (Windows MSVC)
     runs-on: windows-latest
 
     steps:
@@ -20,11 +20,24 @@ jobs:
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.1
 
-      - name: Build app (release)
+      - name: Build app (MSVC debug)
+        run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Debug
+
+      - name: Build app (MSVC release)
         run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Release
 
-      - name: Build the test libraries.
-        run: make -j2 libtest QUIET=1
+      - name: Build utils (make)
+        shell: cmd
+        run: make -j2 util
 
-      - name: Run the regression tests.
+      - name: Build the platform libraries
+        shell: cmd
+        run: make -j2 lib QUIET=1
+
+      - name: Run the regression tests
+        shell: cmd
         run: make test QUIET=1
+
+      - name: Test that the samples can be built
+        shell: cmd
+        run: make -j2 samples

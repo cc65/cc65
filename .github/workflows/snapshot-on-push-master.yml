@@ -9,7 +9,7 @@ concurrency:
 
 jobs:
   build_windows:
-    name: Build (Windows)
+    name: Build, Test (Windows)
     if: github.repository == 'cc65/cc65'
     runs-on: windows-latest
 
@@ -28,6 +28,11 @@ jobs:
 
       - name: Build app (release)
         run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Release
+
+      - name: Build the platform libraries.
+        run: make -j2 lib QUIET=1
+      - name: Run the regression tests.
+        run: make test QUIET=1
 
   build_linux:
     name: Build, Test, and Snapshot (Linux)

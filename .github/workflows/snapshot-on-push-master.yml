@@ -88,12 +88,12 @@ jobs:
       - name: Upload a 32-bit Snapshot Zip
         uses: actions/upload-artifact@v3
         with:
-          name: cc65-snapshot-win32.zip
+          name: cc65-snapshot-win32
           path: cc65-snapshot-win32.zip
       - name: Upload a 64-bit Snapshot Zip
         uses: actions/upload-artifact@v3
         with:
-          name: cc65-snapshot-win64.zip
+          name: cc65-snapshot-win64
           path: cc65-snapshot-win64.zip
 
       - name: Get the online documents repo.
@@ -123,7 +123,7 @@ jobs:
       - name: Upload a Documents Snapshot Zip
         uses: actions/upload-artifact@v3
         with:
-          name: cc65-snapshot-docs.zip
+          name: cc65-snapshot-docs
           path: cc65-snapshot-docs.zip
 
     # enter secrets under "repository secrets"

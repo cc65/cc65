@@ -64,6 +64,12 @@ const char* ProgramFile;
 /* exit simulator after MaxCycles Cycles */
 unsigned long MaxCycles;
 
+/* maximum number of cycles that can be tested,
+** requires overhead for longest possible instruction,
+** which should be 7, using 16 for safety.
+*/
+#define MAXCYCLES_LIMIT (ULONG_MAX-16)
+
 /* Header signature 'sim65' */
 static const unsigned char HeaderSignature[] = {
     0x73, 0x69, 0x6D, 0x36, 0x35
@@ -71,7 +77,6 @@ static const unsigned char HeaderSignature[] = {
 #define HEADER_SIGNATURE_LENGTH (sizeof(HeaderSignature)/sizeof(HeaderSignature[0]))
 
 static const unsigned char HeaderVersion = 2;
-
 
 
 /*****************************************************************************/
@@ -142,8 +147,8 @@ static void OptQuitXIns (const char* Opt attribute ((unused)),
 {
     MaxCycles = strtoul(Arg, NULL, 0);
     /* Guard against overflow. */
-    if (MaxCycles == ULONG_MAX && errno == ERANGE) {
-        Error("'-x parameter out of range. Max: %lu",ULONG_MAX);
+    if (MaxCycles >= MAXCYCLES_LIMIT) {
+        Error("'-x parameter out of range. Max: %lu",MAXCYCLES_LIMIT);
     }
 }
 

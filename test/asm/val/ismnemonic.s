@@ -21,14 +21,34 @@ ismnemonic_error .set 0
     .if .ismnemonic(instr)
         ; do nothing
     .else
-        ismnemonic_error .set ismnemonic_error + 1
+        ismnemonic_error .set 1
     .endif
 .endmacro
+
+; test .feature ubiquitous_idents
+
+ ; allow overloading mnemonics
+.feature ubiquitous_idents
+
+.setcpu "6502"
+
+; make an adc macro
+.macro adc
+.endmacro
+
+; should not match
+.if .ismnemonic(adc)
+    ismnemonic_error .set 1
+.endif
+
+.delmac adc
+
+; test all instructions:
 
 ; there is no instruction table for "none", make sure 'adc' (common to all CPUs) and 'add' (sweet16) doesn't match
 .setcpu "none"
 .if .ismnemonic(adc) || .ismnemonic(add)
-    ismnemonic_error .set ismnemonic_error + 1
+    ismnemonic_error .set 1
 .endif
 
 .setcpu "6502"

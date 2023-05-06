@@ -39,6 +39,8 @@
 #include <errno.h>
 #include <ctype.h>
 #include <math.h>
+#include <inttypes.h>
+#include <limits.h>
 
 /* common */
 #include "chartype.h"
@@ -150,6 +152,11 @@ static const struct Keyword {
 #define IT_LONG         0x04
 #define IT_ULONG        0x08
 
+
+/* Internal type for numeric constant scanning.
+** Size must be explicit for cross-platform uniformity.
+*/
+typedef uint32_t scan_t;
 
 
 /*****************************************************************************/
@@ -521,7 +528,8 @@ static void NumericConst (void)
     int      IsFloat;
     char     C;
     unsigned DigitVal;
-    unsigned long IVal;         /* Value */
+    scan_t   IVal;              /* Scanned value. */
+    int      Overflow;
 
     /* Get the pp-number first, then parse on it */
     CopyPPNumber (&Src);
@@ -575,6 +583,7 @@ static void NumericConst (void)
     /* Since we now know the correct base, convert the input into a number */
     SB_SetIndex (&Src, Index);
     IVal = 0;
+    Overflow = 0;
     while ((C = SB_Peek (&Src)) != '\0' && (Base <= 10 ? IsDigit (C) : IsXDigit (C))) {
         DigitVal = HexVal (C);
         if (DigitVal >= Base) {
@@ -582,8 +591,16 @@ static void NumericConst (void)
             SB_Clear (&Src);
             break;
         }
-        IVal = (IVal * Base) + DigitVal;
+        /* Test result of adding digit for overflow. */
+        if (((scan_t)(IVal * Base + DigitVal) / Base) != IVal) {
+            Overflow = 1;
+        }
+        IVal = IVal * Base + DigitVal;
         SB_Skip (&Src);
+    }
+    if (Overflow) {
+        Error ("Numerical constant \"%s\" too large for internal %d-bit representation",
+               SB_GetConstBuf (&Src), (int)(sizeof(IVal)*CHAR_BIT));
     }
 
     /* Distinguish between integer and floating point constants */

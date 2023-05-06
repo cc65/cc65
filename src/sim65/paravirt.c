@@ -242,7 +242,15 @@ static void PVClose (CPURegs* Regs)
 
     Print (stderr, 2, "PVClose ($%04X)\n", FD);
 
-    RetVal = close (FD);
+    if (FD != 0xFFFF) {
+        RetVal = close (FD);
+    } else {
+        /* test/val/constexpr.c "abuses" close, expecting close(-1) to return -1.
+        ** This behaviour is not the same on all target platforms.
+        ** MSVC's close treats it as a fatal error instead and terminates.
+        */
+        RetVal = 0xFFFF;
+    }
 
     SetAX (Regs, RetVal);
 }

@@ -24,7 +24,8 @@ ifdef QUIET
   NULLERR = 2>$(NULLDEV)
 endif
 
-SIM65FLAGS = -x 5000000000 -c
+# sim65 can support 64-bit cycle counts on some platforms, but not all. This must fit in 32-bit.
+SIM65FLAGS = -x 4000000000 -c
 
 CC65 := $(if $(wildcard ../../bin/cc65*),..$S..$Sbin$Scc65,cc65)
 CA65 := $(if $(wildcard ../../bin/ca65*),..$S..$Sbin$Sca65,ca65)

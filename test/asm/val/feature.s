@@ -2,6 +2,11 @@
 
 .export _main
 
+.segment "ZEROPAGE"
+zplabel:
+
+.segment "CODE"
+
 ; exit with 0
 
 _main:

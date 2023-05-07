@@ -124,7 +124,7 @@ static unsigned PopParam (unsigned char Incr)
 static void PVExit (CPURegs* Regs)
 {
     Print (stderr, 1, "PVExit ($%02X)\n", Regs->AC);
-    SimExit (Regs->AC);
+    SimExit (Regs->AC); /* Error code in range 0-255. */
 }
 
 

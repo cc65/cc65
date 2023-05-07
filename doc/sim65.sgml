@@ -44,6 +44,13 @@ The simulator is called as follows:
           --version             Print the simulator version number
 </verb></tscreen>
 
+sim65 will exit with the error code of the simulated program,
+which is limited to an 8-bit result 0-255.
+
+An error in sim65, like bad arguments or an internal problem will exit with <tt/1/.
+
+A timeout from <tt/-x/ will exist with <tt/2/.
+
 
 <sect1>Command line options in detail<p>
 

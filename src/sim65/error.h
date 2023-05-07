@@ -55,6 +55,9 @@
 #define SIM65_ERROR_TIMEOUT 0x7E
 /* An error result for max CPU instructions exceeded. */
 
+extern int PrintCycles;
+/* flag to print cycles at program termination */
+
 
 
 /*****************************************************************************/
@@ -74,6 +77,9 @@ void ErrorCode (int Code, const char* Format, ...) attribute((noreturn, format(p
 
 void Internal (const char* Format, ...) attribute((noreturn, format(printf,1,2)));
 /* Print an internal error message and die */
+
+void SimExit (int Code);
+/* Exit the simulation with an exit code */
 
 
 

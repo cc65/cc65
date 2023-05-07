@@ -79,6 +79,7 @@ IntStack WarnUnusedLabel    = INTSTACK(1);  /* - unused labels */
 IntStack WarnUnusedParam    = INTSTACK(1);  /* - unused parameters */
 IntStack WarnUnusedVar      = INTSTACK(1);  /* - unused variables */
 IntStack WarnUnusedFunc     = INTSTACK(1);  /* - unused functions */
+IntStack WarnConstOverflow  = INTSTACK(0);  /* - overflow conversion of numerical constants */
 
 /* Map the name of a warning to the intstack that holds its state */
 typedef struct WarnMapEntry WarnMapEntry;
@@ -102,6 +103,7 @@ static WarnMapEntry WarnMap[] = {
     { &WarnUnusedLabel,         "unused-label"          },
     { &WarnUnusedParam,         "unused-param"          },
     { &WarnUnusedVar,           "unused-var"            },
+    { &WarnConstOverflow,       "const-overflow"        },
 };
 
 Collection DiagnosticStrBufs;

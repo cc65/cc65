@@ -36,6 +36,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <limits.h>
 
 /* common */
 #include "abend.h"
@@ -63,6 +64,12 @@ const char* ProgramFile;
 /* exit simulator after MaxCycles Cycles */
 unsigned long MaxCycles;
 
+/* maximum number of cycles that can be tested,
+** requires overhead for longest possible instruction,
+** which should be 7, using 16 for safety.
+*/
+#define MAXCYCLES_LIMIT (ULONG_MAX-16)
+
 /* Header signature 'sim65' */
 static const unsigned char HeaderSignature[] = {
     0x73, 0x69, 0x6D, 0x36, 0x35
@@ -70,7 +77,6 @@ static const unsigned char HeaderSignature[] = {
 #define HEADER_SIGNATURE_LENGTH (sizeof(HeaderSignature)/sizeof(HeaderSignature[0]))
 
 static const unsigned char HeaderVersion = 2;
-
 
 
 /*****************************************************************************/
@@ -140,6 +146,10 @@ static void OptQuitXIns (const char* Opt attribute ((unused)),
 /* quit after MaxCycles cycles */
 {
     MaxCycles = strtoul(Arg, NULL, 0);
+    /* Guard against overflow. */
+    if (MaxCycles >= MAXCYCLES_LIMIT) {
+        Error("'-x parameter out of range. Max: %lu",MAXCYCLES_LIMIT);
+    }
 }
 
 static unsigned char ReadProgramFile (void)
@@ -184,6 +194,7 @@ static unsigned char ReadProgramFile (void)
     }
 
     /* Get load address */
+    Val2 = 0; /* suppress uninitialized variable warning */
     if (((Val = fgetc(F)) == EOF) ||
         ((Val2 = fgetc(F)) == EOF)) {
         Error ("'%s': Header missing load address", ProgramFile);

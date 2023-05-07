@@ -163,6 +163,11 @@ $(WORKDIR)/goto.$1.$2.prg: goto.c $(ISEQUAL) | $(WORKDIR)
 	$(CC65) -t sim$2 -$1 -o $$@ $$< 2>$(WORKDIR)/goto.$1.$2.out
 	$(ISEQUAL) $(WORKDIR)/goto.$1.$2.out goto.ref
 
+# should not compile until 3-byte struct by value tests are re-enabled
+$(WORKDIR)/struct-by-value.$1.$2.prg: struct-by-value.c | $(WORKDIR)
+	$(if $(QUIET),echo misc/struct-by-value.$1.$2.prg)
+	$(NOT) $(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
+
 # the rest are tests that fail currently for one reason or another
 $(WORKDIR)/sitest.$1.$2.prg: sitest.c | $(WORKDIR)
 	@echo "FIXME: " $$@ "currently does not compile."

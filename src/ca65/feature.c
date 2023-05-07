@@ -121,8 +121,6 @@ void SetFeature (feature_t Feature, unsigned char On)
         case FEAT_BRACKET_AS_INDIRECT:        BracketAsIndirect = On;    break;
         case FEAT_STRING_ESCAPES:             StringEscapes     = On;    break;
         case FEAT_LONG_JSR_JMP_RTS:           LongJsrJmpRts     = On;    break;
-        /* Accept, but ignore addrsize */
-        case FEAT_ADDRSIZE:                                              break;
         default:                                                         break;
     }
 }

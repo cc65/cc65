@@ -315,7 +315,7 @@ int main (int argc, char* argv[])
         TotalCycles += Cycles;
         if (MaxCycles) {
             if (Cycles > RemainCycles) {
-                ErrorCode (SIM65_ERROR_TIMEOUT, "Maximum number of cycles (%llu) reached.", MaxCycles);
+                ErrorCode (SIM65_ERROR_TIMEOUT, "Maximum number of cycles reached.");
             }
             RemainCycles -= Cycles;
         }

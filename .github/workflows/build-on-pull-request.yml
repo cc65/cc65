@@ -43,6 +43,11 @@ jobs:
       - name: Build the document files.
         shell: bash
         run: make -j2 doc
+      - name: Upload a documents snapshot.
+        uses: actions/upload-artifact@v3
+        with:
+          name: docs
+          path: ./html
       - name: Build 64-bit Windows versions of the tools.
         run: |
           make -C src clean

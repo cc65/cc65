@@ -1045,8 +1045,7 @@ static void DoFeature (void)
         }
 
         if (Feature == FEAT_ADDRSIZE) {
-            /* Warn for depreciated .feature addrsize */
-            Warning (1, "Depreciated feature: '.feature addrsize'. Pseudo function .addrsize is always available.");
+            Warning (1, "Deprecated feature: '.feature addrsize'. Pseudo function .addrsize is always available.");
         }
 
         NextTok ();

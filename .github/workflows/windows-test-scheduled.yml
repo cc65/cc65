@@ -65,8 +65,7 @@ jobs:
       - name: Build the platform libraries (make lib)
         if: steps.check-sha.outputs.cache-hit != 'true'
         shell: cmd
-        run: make lib QUIET=1 SHELL=cmd
-        # make -j2 lib fails with SHELL=cmd (not sure why)
+        run: make -j2 lib QUIET=1 SHELL=cmd
 
       - name: Run the regression tests (make test)
         if: steps.check-sha.outputs.cache-hit != 'true'

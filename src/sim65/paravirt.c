@@ -127,6 +127,9 @@ static void PVExit (CPURegs* Regs)
     if (PrintCycles) {
         Print (stdout, 0, "%lu cycles\n", GetCycles ());
     }
+    if (ProfileFile) {
+        ProfileSave ();
+    }
 
     exit (Regs->AC);
 }

@@ -102,6 +102,11 @@ unsigned long GetCycles (void);
 extern int PrintCycles;
 /* flag to print cycles at program termination */
 
+extern unsigned ProfileSamples[64 * 1024];
+extern const char *ProfileFile;
+
+void ProfileInit (void);
+void ProfileSave (void);
 
 /* End of 6502.h */
 

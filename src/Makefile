@@ -18,6 +18,7 @@ PROGS = ar65     \
         grc65    \
         ld65     \
         od65     \
+        prof65   \
         sim65    \
         sp65
 

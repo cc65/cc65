@@ -39,6 +39,9 @@
    6502)
 */
 
+#include <stdio.h>
+#include <string.h>
+
 #include "memory.h"
 #include "error.h"
 #include "6502.h"
@@ -76,6 +79,8 @@ static unsigned HaveIRQRequest;
 /* flag to print cycles at program termination */
 int PrintCycles;
 
+unsigned ProfileSamples[64 * 1024];
+const char *ProfileFile = 0;
 
 /*****************************************************************************/
 /*                        Helper functions and macros                        */
@@ -3280,6 +3285,10 @@ unsigned ExecuteInsn (void)
     /* Count cycles */
     TotalCycles += Cycles;
 
+    if (ProfileFile) {
+        ProfileSamples[Regs.PC] += Cycles;
+    }
+
     /* Return the number of clock cycles needed by this insn */
     return Cycles;
 }
@@ -3291,4 +3300,31 @@ unsigned long GetCycles (void)
 {
     /* Return the total number of cycles */
     return TotalCycles;
+}
+
+
+void ProfileInit (void)
+{
+    FILE *f = fopen(ProfileFile, "rb");
+    if (!f) {
+        memset(ProfileSamples, 0, sizeof(ProfileSamples));
+    } else {
+        if (fread(ProfileSamples, 1, sizeof(ProfileSamples), f) != sizeof(ProfileSamples)) {
+            Error ("Profile file %s corrupted", ProfileFile);
+        }
+        fclose(f);
+    }
+}
+
+void ProfileSave (void)
+{
+    FILE *f = fopen(ProfileFile, "wb");
+    if (!f) {
+        Error ("Failed to open %s for writing", ProfileFile);
+    } else {
+        if (fwrite(ProfileSamples, 1, sizeof(ProfileSamples), f) != sizeof(ProfileSamples)) {
+            Error ("Error writing profile file %s", ProfileFile);
+        }
+        fclose(f);
+    }
 }

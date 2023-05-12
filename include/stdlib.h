@@ -44,6 +44,12 @@ typedef unsigned size_t;
 #define _HAVE_size_t
 #endif
 
+/* NULL pointer */
+#ifndef _HAVE_NULL
+#define NULL    0
+#define _HAVE_NULL
+#endif
+
 /* Standard exit codes */
 #define EXIT_SUCCESS    0
 #define EXIT_FAILURE    1

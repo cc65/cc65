@@ -54,7 +54,7 @@ typedef unsigned size_t;
 
 /* NULL pointer */
 #ifndef _HAVE_NULL
-#define NULL    ((void *) 0)
+#define NULL    0
 #define _HAVE_NULL
 #endif
 

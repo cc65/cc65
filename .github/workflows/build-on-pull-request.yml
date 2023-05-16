@@ -72,7 +72,3 @@ jobs:
 
       - name: Build app (release)
         run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Release
-
-      # The regression tests are currently too slow to run for this Windows build,
-      # but the "Windows Test Manual" workflow (windows-test-manual.yml) can by
-      # manually dispatched from the Actions menu to test as needed.

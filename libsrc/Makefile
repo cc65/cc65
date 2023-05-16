@@ -122,8 +122,12 @@ endef # ZIP_recipe
 zip:
 	$(foreach dir,$(OUTPUTDIRS),$(ZIP_recipe))
 
-$(TARGETS):
+$(TARGETS): | ../lib
 	@$(MAKE) --no-print-directory $@
+
+# ../lib must be created globally before doing lib targets in parallel
+../lib:
+	@$(call MKDIR,$@)
 
 else # TARGET
 
@@ -293,10 +297,12 @@ $(EXTRA_OBJPAT): $(EXTRA_SRCPAT) | ../libwrk/$(TARGET) ../lib
 	@echo $(TARGET) - $(<F)
 	@$(CA65) -t $(TARGET) $(CA65FLAGS) --create-dep $(@:../lib/%.o=../libwrk/$(TARGET)/%.d) -o $@ $<
 
+$(EXTRA_OBJS): | ../lib
+
 ../lib/$(TARGET).lib: $(OBJS) | ../lib
 	$(AR65) a $@ $?
 
-../libwrk/$(TARGET) ../lib ../target/$(TARGET)/util:
+../libwrk/$(TARGET) ../target/$(TARGET)/util:
 	@$(call MKDIR,$@)
 
 $(TARGET): $(EXTRA_OBJS) ../lib/$(TARGET).lib

@@ -42,6 +42,20 @@
 
 
 /*****************************************************************************/
+/*                                   Data                                    */
+/*****************************************************************************/
+
+
+
+/* flag to print cycles at program termination */
+int PrintCycles = 0;
+
+/* cycles are counted by main.c */
+extern unsigned long long TotalCycles;
+
+
+
+/*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
@@ -98,4 +112,15 @@ void Internal (const char* Format, ...)
     putc ('\n', stderr);
     va_end (ap);
     exit (SIM65_ERROR);
+}
+
+
+
+void SimExit (int Code)
+/* Exit the simulation with an exit code */
+{
+    if (PrintCycles) {
+        fprintf (stdout, "%llu cycles\n", TotalCycles);
+    }
+    exit (Code);
 }

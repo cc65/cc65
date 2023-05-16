@@ -36,7 +36,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <limits.h>
 
 /* common */
 #include "abend.h"
@@ -61,14 +60,14 @@
 /* Name of program file */
 const char* ProgramFile;
 
-/* exit simulator after MaxCycles Cycles */
-unsigned long MaxCycles;
+/* count of total cycles executed */
+unsigned long long TotalCycles = 0;
 
-/* maximum number of cycles that can be tested,
-** requires overhead for longest possible instruction,
-** which should be 7, using 16 for safety.
-*/
-#define MAXCYCLES_LIMIT (ULONG_MAX-16)
+/* exit simulator after MaxCycles Cccles */
+unsigned long long MaxCycles = 0;
+
+/* countdown from MaxCycles */
+unsigned long long RemainCycles;
 
 /* Header signature 'sim65' */
 static const unsigned char HeaderSignature[] = {
@@ -145,11 +144,7 @@ static void OptQuitXIns (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
 /* quit after MaxCycles cycles */
 {
-    MaxCycles = strtoul(Arg, NULL, 0);
-    /* Guard against overflow. */
-    if (MaxCycles >= MAXCYCLES_LIMIT) {
-        Error("'-x parameter out of range. Max: %lu",MAXCYCLES_LIMIT);
-    }
+    MaxCycles = strtoull(Arg, NULL, 0);
 }
 
 static unsigned char ReadProgramFile (void)
@@ -247,6 +242,7 @@ int main (int argc, char* argv[])
 
     unsigned I;
     unsigned char SPAddr;
+    unsigned int Cycles;
 
     /* Initialize the cmdline module */
     InitCmdLine (&argc, &argv, "sim65");
@@ -309,18 +305,24 @@ int main (int argc, char* argv[])
     MemInit ();
 
     SPAddr = ReadProgramFile ();
-
     ParaVirtInit (I, SPAddr);
 
     Reset ();
 
+    RemainCycles = MaxCycles;
     while (1) {
-        ExecuteInsn ();
-        if (MaxCycles && (GetCycles () >= MaxCycles)) {
-            ErrorCode (SIM65_ERROR_TIMEOUT, "Maximum number of cycles reached.");
+        Cycles = ExecuteInsn ();
+        TotalCycles += Cycles;
+        if (MaxCycles) {
+            if (Cycles > RemainCycles) {
+                ErrorCode (SIM65_ERROR_TIMEOUT, "Maximum number of cycles reached.");
+            }
+            RemainCycles -= Cycles;
         }
     }
 
-    /* Return an apropriate exit code */
-    return EXIT_SUCCESS;
+    /* Unreachable. sim65 program must exit through paravirtual PVExit
+    ** or timeout from MaxCycles producing an error.
+    */
+    return SIM65_ERROR;
 }

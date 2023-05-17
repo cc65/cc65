@@ -9,7 +9,9 @@
 #ifndef _GCONST_H
 #define _GCONST_H
 
+#ifndef NULL
 #define NULL            ((void *) 0)
+#endif
 #define TRUE            0xff
 #define FALSE           ~TRUE
 #define MOUSE_SPRNUM    0

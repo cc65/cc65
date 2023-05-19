@@ -12,8 +12,8 @@
 #ifndef NULL
 #define NULL            ((void *) 0)
 #endif
+#define FALSE           0
 #define TRUE            0xff
-#define FALSE           ~TRUE
 #define MOUSE_SPRNUM    0
 #define DISK_DRV_LGH    0x0d80
 

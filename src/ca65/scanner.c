@@ -748,24 +748,7 @@ static token_t FindDotKeyword (void)
     R = bsearch (&K, DotKeywords, sizeof (DotKeywords) / sizeof (DotKeywords [0]),
                  sizeof (DotKeywords [0]), CmpDotKeyword);
     if (R != 0) {
-
-        /* By default, disable any somewhat experiemental DotKeyword. */
-
-        switch (R->Tok) {
-
-            case TOK_ADDRSIZE:
-                /* Disallow .ADDRSIZE function by default */
-                if (AddrSize == 0) {
-                    return TOK_NONE;
-                }
-                break;
-
-            default:
-                break;
-        }
-
         return R->Tok;
-
     } else {
         return TOK_NONE;
     }

@@ -1409,10 +1409,6 @@ either a string or an expression value.
         .endmacro
   </verb></tscreen>
 
-  This command is new and must be enabled with the <tt/.FEATURE addrsize/ command.
-
-  See: <tt><ref id=".FEATURE" name=".FEATURE"></tt>
-
 
 <sect1><tt>.BANK</tt><label id=".BANK"><p>
 
@@ -2794,12 +2790,6 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
   The following features are available:
 
   <descrip>
-
-  <tag><tt>addrsize</tt><label id="addrsize"></tag>
-
-    Enables the .ADDRSIZE pseudo function. This function is experimental and not enabled by default.
-
-    See also: <tt><ref id=".ADDRSIZE" name=".ADDRSIZE"></tt>
 
   <tag><tt>at_in_identifiers</tt><label id="at_in_identifiers"></tag>
 

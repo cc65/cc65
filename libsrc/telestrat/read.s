@@ -30,13 +30,14 @@
         ldy     ptr1+1
         BRK_TELEMON     XFREAD
         ;  compute nb of bytes read
-        lda     PTR_READ_DEST+1
         sec
-        sbc     ptr2+1
-        tax
-        lda     PTR_READ_DEST
-        sec
-        sbc     ptr2
-        ; here A and X contains number of bytes read
+	lda     PTR_READ_DEST
+	sbc     ptr2
+	sta     tmp1
+	lda     PTR_READ_DEST+1
+	sbc     ptr2+1
+	tax
+        lda     tmp1
+
         rts
 .endproc

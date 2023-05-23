@@ -45,12 +45,12 @@ next:
 
         ;  compute nb of bytes written
         sec
-	lda     PTR_READ_DEST
-	sbc     ptr1
-	sta     tmp1
-	lda     PTR_READ_DEST+1
-	sbc     ptr1+1
-	tax
+        lda     PTR_READ_DEST
+        sbc     ptr1
+        sta     tmp1
+        lda     PTR_READ_DEST+1
+        sbc     ptr1+1
+        tax
         lda     tmp1
         rts
 

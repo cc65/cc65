@@ -33,11 +33,11 @@
         sec
         lda     PTR_READ_DEST
         sbc     ptr2
-        sta     tmp1
+        pha
         lda     PTR_READ_DEST+1
         sbc     ptr2+1
         tax
-        lda     tmp1
+        pla
 
         rts
 .endproc

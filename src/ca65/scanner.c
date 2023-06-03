@@ -1124,17 +1124,33 @@ Again:
     /* Local symbol? */
     if (C == LocalStart) {
 
-        /* Read the identifier. */
-        ReadIdent ();
+        NextChar ();
 
-        /* Start character alone is not enough */
-        if (SB_GetLen (&CurTok.SVal) == 1) {
-            Error ("Invalid cheap local symbol");
-            goto Again;
+        if (IsIdChar (C)) {
+            /* Read a local identifier */
+            CurTok.Tok = TOK_LOCAL_IDENT;
+            SB_AppendChar (&CurTok.SVal, LocalStart);
+            ReadIdent ();
+        } else {
+            /* Read an unnamed label */
+            CurTok.IVal = 0;
+            CurTok.Tok = TOK_ULABEL;
+
+            if (C == '-' || C == '<') {
+                int PrevC = C;
+                do {
+                    --CurTok.IVal;
+                    NextChar ();
+                } while (C == PrevC);
+            } else if (C == '+' || C == '>') {
+                int PrevC = C;
+                do {
+                    ++CurTok.IVal;
+                    NextChar ();
+                } while (C == PrevC);
+            }
         }
 
-        /* A local identifier */
-        CurTok.Tok = TOK_LOCAL_IDENT;
         return;
     }
 
@@ -1314,22 +1330,30 @@ CharAgain:
                     break;
 
                 case '-':
+                case '<':
+                {
+                    int PrevC = C;
                     CurTok.IVal = 0;
                     do {
                         --CurTok.IVal;
                         NextChar ();
-                    } while (C == '-');
+                    } while (C == PrevC);
                     CurTok.Tok = TOK_ULABEL;
                     break;
+                }
 
                 case '+':
+                case '>':
+                {
+                    int PrevC = C;
                     CurTok.IVal = 0;
                     do {
                         ++CurTok.IVal;
                         NextChar ();
-                    } while (C == '+');
+                    } while (C == PrevC);
                     CurTok.Tok = TOK_ULABEL;
                     break;
+                }
 
                 case '=':
                     NextChar ();

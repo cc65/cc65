@@ -54,7 +54,15 @@ struct __os {
     unsigned char color2;            // = $0E       PF color 2
     unsigned char color3;            // = $0F       PF color 3
     unsigned char color4;            // = $10       PF color 4
-    unsigned char _free_1[0xEF];     // = $11-$FF   User space
+    unsigned char pot0;              // = $11       POT0 shadow
+    unsigned char pot1;              // = $12       POT1 shadow
+    unsigned char pot2;              // = $13       POT2 shadow
+    unsigned char pot3;              // = $14       POT3 shadow
+    unsigned char pot4;              // = $15       POT4 shadow
+    unsigned char pot5;              // = $16       POT5 shadow
+    unsigned char pot6;              // = $17       POT6 shadow
+    unsigned char pot7;              // = $18       POT7 shadow
+    unsigned char _free_1[0xE7];     // = $19-$FF   User space
 
     /*Stack*/
     unsigned char stack[0x100];      // = $100-$1FF Stack

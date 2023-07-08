@@ -103,6 +103,100 @@ unsigned GlobalModeFlags (const ExprDesc* Expr)
 
 
 
+static unsigned TypeOfBySize (unsigned Size)
+/* Get the code generator replacement type of the object by its size */
+{
+    unsigned NewType;
+    /* If the size is less than or equal to that of a a long, we will copy
+    ** the struct using the primary register, otherwise we use memcpy.
+    */
+    switch (Size) {
+        case 1:     NewType = CF_CHAR;  break;
+        case 2:     NewType = CF_INT;   break;
+        case 3:     /* FALLTHROUGH */
+        case 4:     NewType = CF_LONG;  break;
+        default:    NewType = CF_NONE;  break;
+    }
+
+    return NewType;
+}
+
+
+
+unsigned TypeOf (const Type* T)
+/* Get the code generator base type of the object */
+{
+    unsigned NewType;
+
+    switch (GetUnqualTypeCode (T)) {
+
+        case T_SCHAR:
+            return CF_CHAR;
+
+        case T_UCHAR:
+            return CF_CHAR | CF_UNSIGNED;
+
+        case T_SHORT:
+        case T_INT:
+            return CF_INT;
+
+        case T_USHORT:
+        case T_UINT:
+        case T_PTR:
+        case T_ARRAY:
+            return CF_INT | CF_UNSIGNED;
+
+        case T_LONG:
+            return CF_LONG;
+
+        case T_ULONG:
+            return CF_LONG | CF_UNSIGNED;
+
+        case T_FLOAT:
+        case T_DOUBLE:
+            /* These two are identical in the backend */
+            return CF_FLOAT;
+
+        case T_FUNC:
+            /* Treat this as a function pointer */
+            return CF_INT | CF_UNSIGNED;
+
+        case T_STRUCT:
+        case T_UNION:
+            NewType = TypeOfBySize (SizeOf (T));
+            if (NewType != CF_NONE) {
+                return NewType;
+            }
+            /* Address of ... */
+            return CF_INT | CF_UNSIGNED;
+
+        case T_VOID:
+        case T_ENUM:
+            /* Incomplete enum type */
+            Error ("Incomplete type '%s'", GetFullTypeName (T));
+            return CF_INT;
+
+        default:
+            Error ("Illegal type %04lX", T->C);
+            return CF_INT;
+    }
+}
+
+
+
+unsigned FuncTypeOf (const Type* T)
+/* Get the code generator flag for calling the function */
+{
+    if (GetUnqualTypeCode (T) == T_FUNC) {
+        return (T->A.F->Flags & FD_VARIADIC) ? 0 : CF_FIXARGC;
+    } else {
+        Error ("Illegal function type %04lX", T->C);
+        return 0;
+    }
+}
+
+
+
 void ExprWithCheck (void (*Func) (ExprDesc*), ExprDesc* Expr)
 /* Call an expression function with checks. */
 {
@@ -193,12 +287,15 @@ static unsigned typeadjust (ExprDesc* lhs, const ExprDesc* rhs, int NoPush)
 
 
 
-void LimitExprValue (ExprDesc* Expr)
+void LimitExprValue (ExprDesc* Expr, int WarnOverflow)
 /* Limit the constant value of the expression to the range of its type */
 {
-    switch (GetUnderlyingTypeCode (Expr->Type)) {
+    switch (GetUnqualTypeCode (Expr->Type)) {
         case T_INT:
         case T_SHORT:
+            if (WarnOverflow && ((Expr->IVal < -0x8000) || (Expr->IVal > 0x7FFF))) {
+                Warning ("Signed integer constant overflow");
+            }
             Expr->IVal = (int16_t)Expr->IVal;
             break;
 
@@ -218,6 +315,9 @@ void LimitExprValue (ExprDesc* Expr)
             break;
 
         case T_SCHAR:
+            if (WarnOverflow && ((Expr->IVal < -0x80) || (Expr->IVal > 0x7F))) {
+                Warning ("Signed character constant overflow");
+            }
             Expr->IVal = (int8_t)Expr->IVal;
             break;
 
@@ -274,11 +374,10 @@ static unsigned ExprCheckedSizeOf (const Type* T)
 /* Specially checked SizeOf() used in 'sizeof' expressions */
 {
     unsigned Size = SizeOf (T);
-    SymEntry* Sym;
 
     if (Size == 0) {
-        Sym = GetSymType (T);
-        if (Sym == 0 || !SymIsDef (Sym)) {
+        SymEntry* TagSym = GetESUTagSym (T);
+        if (TagSym == 0 || !SymIsDef (TagSym)) {
             Error ("Cannot apply 'sizeof' to incomplete type '%s'", GetFullTypeName (T));
         }
     }
@@ -304,13 +403,9 @@ void PushAddr (const ExprDesc* Expr)
 
 
 static void WarnConstCompareResult (const ExprDesc* Expr)
-/* If the result of a comparison is constant, this is suspicious when not in
-** preprocessor mode.
-*/
+/* If the result of a comparison is constant, this is suspicious */
 {
-    if (!Preprocessing          &&
-        !ED_NeedsConst (Expr)   &&
-        IS_Get (&WarnConstComparison) != 0) {
+    if (!ED_NeedsConst (Expr) && IS_Get (&WarnConstComparison) != 0) {
         Warning ("Result of comparison is always %s", Expr->IVal != 0 ? "true" : "false");
     }
 }
@@ -1051,7 +1146,7 @@ static void FunctionCall (ExprDesc* Expr)
 
     /* The function result is an rvalue in the primary register */
     ED_FinalizeRValLoad (Expr);
-    ReturnType = GetFuncReturn (Expr->Type);
+    ReturnType = GetFuncReturnType (Expr->Type);
 
     /* Handle struct/union specially */
     if (IsClassStruct (ReturnType)) {
@@ -1075,57 +1170,18 @@ static void Primary (ExprDesc* E)
 /* This is the lowest level of the expression parser. */
 {
     SymEntry* Sym;
-
-    /* Character and integer constants. */
-    if (CurTok.Tok == TOK_ICONST || CurTok.Tok == TOK_CCONST) {
-        E->IVal   = CurTok.IVal;
-        E->Flags |= E_LOC_NONE | E_RTYPE_RVAL;
-        E->Type   = CurTok.Type;
-        NextToken ();
-        return;
-    }
-
-    /* Floating point constant */
-    if (CurTok.Tok == TOK_FCONST) {
-        E->V.FVal = CurTok.FVal;
-        E->Flags |= E_LOC_NONE | E_RTYPE_RVAL;
-        E->Type   = CurTok.Type;
-        NextToken ();
-        return;
-    }
-
-    /* Process parenthesized subexpression by calling the whole parser
-    ** recursively.
-    */
-    if (CurTok.Tok == TOK_LPAREN) {
-        NextToken ();
-        hie0 (E);
-        ConsumeRParen ();
-        return;
-    }
-
-    /* If we run into an identifier in preprocessing mode, we assume that this
-    ** is an undefined macro and replace it by a constant value of zero.
-    */
-    if (Preprocessing && CurTok.Tok == TOK_IDENT) {
-        NextToken ();
-        ED_MakeConstAbsInt (E, 0);
-        return;
-    }
-
-    /* All others may only be used if the expression evaluation is not called
-    ** recursively by the preprocessor.
-    */
-    if (Preprocessing) {
-        /* Illegal expression in PP mode */
-        Error ("Preprocessor expression expected");
-        ED_MakeConstAbsInt (E, 1);
-        return;
-    }
-
     unsigned Flags = E->Flags & E_MASK_KEEP_MAKE;
 
     switch (CurTok.Tok) {
+
+        case TOK_LPAREN:
+            /* Process parenthesized subexpression by calling the whole parser
+            ** recursively.
+            */
+            NextToken ();
+            hie0 (E);
+            ConsumeRParen ();
+            break;
 
         case TOK_BOOL_AND:
             /* A computed goto label address */
@@ -1160,9 +1216,9 @@ static void Primary (ExprDesc* E)
                     /* Cannot use type symbols */
                     Error ("Variable identifier expected");
                     /* Assume an int type to make E valid */
-                    E->Flags |= E_LOC_STACK | E_RTYPE_LVAL;
-                    E->Type   = type_int;
-                    return;
+                    E->Flags = E_LOC_STACK | E_RTYPE_LVAL;
+                    E->Type  = type_int;
+                    break;
                 }
 
                 /* Mark the symbol as referenced */
@@ -1175,11 +1231,7 @@ static void Primary (ExprDesc* E)
                 if ((Sym->Flags & SC_CONST) == SC_CONST) {
                     /* Enum or some other numeric constant */
                     E->Flags = E_LOC_NONE | E_RTYPE_RVAL;
-                    E->IVal = Sym->V.ConstVal;
-                } else if ((Sym->Flags & SC_FUNC) == SC_FUNC) {
-                    /* Function */
-                    E->Flags = E_LOC_GLOBAL | E_RTYPE_LVAL;
-                    E->Name = (uintptr_t) Sym->Name;
+                    E->IVal  = Sym->V.ConstVal;
                 } else if ((Sym->Flags & SC_AUTO) == SC_AUTO) {
                     /* Local variable. If this is a parameter for a variadic
                     ** function, we have to add some address calculations, and the
@@ -1194,6 +1246,10 @@ static void Primary (ExprDesc* E)
                         E->Flags = E_LOC_STACK | E_RTYPE_LVAL;
                         E->IVal  = Sym->V.Offs;
                     }
+                } else if ((Sym->Flags & SC_FUNC) == SC_FUNC) {
+                    /* Function */
+                    E->Flags = E_LOC_GLOBAL | E_RTYPE_LVAL;
+                    E->Name  = (uintptr_t) Sym->Name;
                 } else if ((Sym->Flags & SC_REGISTER) == SC_REGISTER) {
                     /* Register variable, zero page based */
                     E->Flags = E_LOC_REGISTER | E_RTYPE_LVAL;
@@ -1202,10 +1258,10 @@ static void Primary (ExprDesc* E)
                     /* Static variable */
                     if (Sym->Flags & (SC_EXTERN | SC_STORAGE | SC_DECL)) {
                         E->Flags = E_LOC_GLOBAL | E_RTYPE_LVAL;
-                        E->Name = (uintptr_t) Sym->Name;
+                        E->Name  = (uintptr_t) Sym->Name;
                     } else {
                         E->Flags = E_LOC_STATIC | E_RTYPE_LVAL;
-                        E->Name = Sym->V.L.Label;
+                        E->Name  = Sym->V.L.Label;
                     }
                 } else {
                     /* Local static variable */
@@ -1251,7 +1307,7 @@ static void Primary (ExprDesc* E)
                     /* Undeclared Variable */
                     Sym = AddLocalSym (Ident, type_int, SC_AUTO | SC_REF, 0);
                     E->Flags = E_LOC_STACK | E_RTYPE_LVAL;
-                    E->Type = type_int;
+                    E->Type  = type_int;
                     Error ("Undefined symbol: '%s'", Ident);
                 }
 
@@ -1263,6 +1319,8 @@ static void Primary (ExprDesc* E)
             /* String literal */
             if ((Flags & E_EVAL_UNEVAL) != E_EVAL_UNEVAL) {
                 E->V.LVal = UseLiteral (CurTok.SVal);
+                /* Translate into target charset */
+                TranslateLiteral (E->V.LVal);
             } else {
                 E->V.LVal = CurTok.SVal;
             }
@@ -1270,6 +1328,24 @@ static void Primary (ExprDesc* E)
             E->Flags = E_LOC_LITERAL | E_RTYPE_RVAL | E_ADDRESS_OF;
             E->IVal  = 0;
             E->Name  = GetLiteralLabel (CurTok.SVal);
+            NextToken ();
+            break;
+
+        case TOK_ICONST:
+        case TOK_CCONST:
+        case TOK_WCCONST:
+            /* Character and integer constants */
+            E->IVal  = CurTok.IVal;
+            E->Flags = E_LOC_NONE | E_RTYPE_RVAL;
+            E->Type  = CurTok.Type;
+            NextToken ();
+            break;
+
+        case TOK_FCONST:
+            /* Floating point constant */
+            E->V.FVal = CurTok.FVal;
+            E->Flags  = E_LOC_NONE | E_RTYPE_RVAL;
+            E->Type   = CurTok.Type;
             NextToken ();
             break;
 
@@ -1319,13 +1395,13 @@ static void Primary (ExprDesc* E)
                 /* Let's see if this is a C99-style declaration */
                 DeclSpec    Spec;
                 InitDeclSpec (&Spec);
-                ParseDeclSpec (&Spec, -1, T_QUAL_NONE);
+                ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_INT, SC_AUTO);
 
                 if (Spec.Type->C != T_END) {
 
                     Error ("Mixed declarations and code are not supported in cc65");
                     while (CurTok.Tok != TOK_SEMI) {
-                        Declaration Decl;
+                        Declarator Decl;
 
                         /* Parse one declaration */
                         ParseDecl (&Spec, &Decl, DM_ACCEPT_IDENT);
@@ -1845,7 +1921,7 @@ static void UnaryOp (ExprDesc* Expr)
         Expr->Type = IntPromotion (Expr->Type);
 
         /* Limit the calculated value to the range of its type */
-        LimitExprValue (Expr);
+        LimitExprValue (Expr, 1);
 
     } else {
         unsigned Flags;
@@ -2101,6 +2177,10 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
         /* Check for const operands */
         if (lconst && rconst) {
 
+            /* Evaluate the result for operands */
+            unsigned long Val1 = Expr->IVal;
+            unsigned long Val2 = Expr2.IVal;
+
             /* Both operands are constant, remove the generated code */
             RemoveCode (&Mark1);
 
@@ -2108,84 +2188,55 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
             Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
 
             /* Handle the op differently for signed and unsigned types */
-            if (IsSignSigned (Expr->Type)) {
-
-                /* Evaluate the result for signed operands */
-                signed long Val1 = Expr->IVal;
-                signed long Val2 = Expr2.IVal;
-                switch (Tok) {
-                    case TOK_OR:
-                        Expr->IVal = (Val1 | Val2);
-                        break;
-                    case TOK_XOR:
-                        Expr->IVal = (Val1 ^ Val2);
-                        break;
-                    case TOK_AND:
-                        Expr->IVal = (Val1 & Val2);
-                        break;
-                    case TOK_STAR:
-                        Expr->IVal = (Val1 * Val2);
-                        break;
-                    case TOK_DIV:
-                        if (Val2 == 0) {
-                            Error ("Division by zero");
-                            Expr->IVal = 0x7FFFFFFF;
+            switch (Tok) {
+                case TOK_OR:
+                    Expr->IVal = (Val1 | Val2);
+                    break;
+                case TOK_XOR:
+                    Expr->IVal = (Val1 ^ Val2);
+                    break;
+                case TOK_AND:
+                    Expr->IVal = (Val1 & Val2);
+                    break;
+                case TOK_STAR:
+                    Expr->IVal = (Val1 * Val2);
+                    break;
+                case TOK_DIV:
+                    if (Val2 == 0) {
+                        if (!ED_IsUneval (Expr)) {
+                            Warning ("Division by zero");
+                        }
+                        Expr->IVal = 0xFFFFFFFF;
+                    } else {
+                        /* Handle signed and unsigned operands differently */
+                        if (IsSignSigned (Expr->Type)) {
+                            Expr->IVal = ((long)Val1 / (long)Val2);
                         } else {
                             Expr->IVal = (Val1 / Val2);
                         }
-                        break;
-                    case TOK_MOD:
-                        if (Val2 == 0) {
-                            Error ("Modulo operation with zero");
-                            Expr->IVal = 0;
+                    }
+                    break;
+                case TOK_MOD:
+                    if (Val2 == 0) {
+                        if (!ED_IsUneval (Expr)) {
+                            Warning ("Modulo operation with zero");
+                        }
+                        Expr->IVal = 0;
+                    } else {
+                        /* Handle signed and unsigned operands differently */
+                        if (IsSignSigned (Expr->Type)) {
+                            Expr->IVal = ((long)Val1 % (long)Val2);
                         } else {
                             Expr->IVal = (Val1 % Val2);
                         }
-                        break;
-                    default:
-                        Internal ("hie_internal: got token 0x%X\n", Tok);
-                }
-            } else {
-
-                /* Evaluate the result for unsigned operands */
-                unsigned long Val1 = Expr->IVal;
-                unsigned long Val2 = Expr2.IVal;
-                switch (Tok) {
-                    case TOK_OR:
-                        Expr->IVal = (Val1 | Val2);
-                        break;
-                    case TOK_XOR:
-                        Expr->IVal = (Val1 ^ Val2);
-                        break;
-                    case TOK_AND:
-                        Expr->IVal = (Val1 & Val2);
-                        break;
-                    case TOK_STAR:
-                        Expr->IVal = (Val1 * Val2);
-                        break;
-                    case TOK_DIV:
-                        if (Val2 == 0) {
-                            Error ("Division by zero");
-                            Expr->IVal = 0xFFFFFFFF;
-                        } else {
-                            Expr->IVal = (Val1 / Val2);
-                        }
-                        break;
-                    case TOK_MOD:
-                        if (Val2 == 0) {
-                            Error ("Modulo operation with zero");
-                            Expr->IVal = 0;
-                        } else {
-                            Expr->IVal = (Val1 % Val2);
-                        }
-                        break;
-                    default:
-                        Internal ("hie_internal: got token 0x%X\n", Tok);
-                }
+                    }
+                    break;
+                default:
+                    Internal ("hie_internal: got token 0x%X\n", Tok);
             }
 
             /* Limit the calculated value to the range of its type */
-            LimitExprValue (Expr);
+            LimitExprValue (Expr, 1);
 
         } else if (lconst && (Gen->Flags & GEN_COMM) && !rconst) {
             /* If the LHS constant is an int that fits into an unsigned char, change the
@@ -2238,10 +2289,12 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
                 /* Second value is constant - check for div */
                 type |= CF_CONST;
                 rtype |= CF_CONST;
-                if (Tok == TOK_DIV && Expr2.IVal == 0) {
-                    Error ("Division by zero");
-                } else if (Tok == TOK_MOD && Expr2.IVal == 0) {
-                    Error ("Modulo operation with zero");
+                if (Expr2.IVal == 0 && !ED_IsUneval (Expr)) {
+                    if (Tok == TOK_DIV) {
+                        Warning ("Division by zero");
+                    } else if (Tok == TOK_MOD) {
+                        Warning ("Modulo operation with zero");
+                    }
                 }
                 if ((Gen->Flags & GEN_NOPUSH) != 0) {
                     RemoveCode (&Mark2);
@@ -2364,7 +2417,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
         } else if (IsClassPtr (Expr->Type)) {
             if (IsClassPtr (Expr2.Type)) {
                 /* Pointers are allowed in comparison */
-                if (TypeCmp (Expr->Type, Expr2.Type).C < TC_STRICT_COMPATIBLE) {
+                if (TypeCmp (Expr->Type, Expr2.Type).C < TC_VOID_PTR) {
                     /* Warn about distinct pointer types */
                     TypeCompatibilityDiagnostic (PtrConversion (Expr->Type), PtrConversion (Expr2.Type), 0,
                         "Distinct pointer types comparing '%s' with '%s'");
@@ -2515,7 +2568,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             }
 
             /* Determine the type of the operation. */
-            if (IsTypeChar (Expr->Type) && rconst && (!LeftSigned || RightSigned)) {
+            if (IsRankChar (Expr->Type) && rconst && (!LeftSigned || RightSigned)) {
 
                 /* Left side is unsigned char, right side is constant.
                 ** Determine the minimum and maximum values
@@ -2598,7 +2651,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                     flags |= CF_UNSIGNED;
                 }
 
-            } else if (IsTypeChar (Expr->Type) && IsTypeChar (Expr2.Type) &&
+            } else if (IsRankChar (Expr->Type) && IsRankChar (Expr2.Type) &&
                 GetSignedness (Expr->Type) == GetSignedness (Expr2.Type)) {
 
                 /* Both are chars with the same signedness. We can encode the
@@ -2812,7 +2865,7 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                         Expr->Type = rhst;
                     } else {
                         /* Limit the calculated value to the range of its type */
-                        LimitExprValue (Expr);
+                        LimitExprValue (Expr, 1);
                     }
 
                     /* The result is always an rvalue */
@@ -3037,9 +3090,10 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                 Expr->Type = Expr2.Type;
             } else if (!DoArrayRef && IsClassInt (lhst) && IsClassInt (rhst)) {
                 /* Integer addition */
-                flags = typeadjust (Expr, &Expr2, 0);
                 /* Load rhs into the primary */
                 LoadExpr (CF_NONE, &Expr2);
+                /* Adjust rhs primary if needed  */
+                flags = typeadjust (Expr, &Expr2, 0);
             } else {
                 /* OOPS */
                 AddDone = -1;
@@ -3283,7 +3337,7 @@ static void parsesub (ExprDesc* Expr)
                     /* Just adjust the result type */
                     Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
                     /* And limit the calculated value to the range of it */
-                    LimitExprValue (Expr);
+                    LimitExprValue (Expr, 1);
                 }
                 /* The result is always an rvalue */
                 ED_MarkExprAsRVal (Expr);
@@ -3470,48 +3524,6 @@ static void hie2 (ExprDesc* Expr)
     int UsedGen;
 
     hie_internal (hie2_ops, Expr, hie3, &UsedGen);
-}
-
-
-
-static void hieAndPP (ExprDesc* Expr)
-/* Process "exp && exp" in preprocessor mode (that is, when the parser is
-** called recursively from the preprocessor.
-*/
-{
-    *Expr = NoCodeConstAbsIntExpr (hie2);
-    while (CurTok.Tok == TOK_BOOL_AND) {
-
-        /* Skip the && */
-        NextToken ();
-
-        /* Get rhs */
-        ExprDesc Expr2 = NoCodeConstAbsIntExpr (hie2);
-
-        /* Combine the two */
-        Expr->IVal = (Expr->IVal && Expr2.IVal);
-    }
-}
-
-
-
-static void hieOrPP (ExprDesc *Expr)
-/* Process "exp || exp" in preprocessor mode (that is, when the parser is
-** called recursively from the preprocessor.
-*/
-{
-    *Expr = NoCodeConstAbsIntExpr (hieAndPP);
-    while (CurTok.Tok == TOK_BOOL_OR) {
-
-        /* Skip the && */
-        NextToken ();
-
-        /* Get rhs */
-        ExprDesc Expr2 = NoCodeConstAbsIntExpr (hieAndPP);
-
-        /* Combine the two */
-        Expr->IVal = (Expr->IVal || Expr2.IVal);
-    }
 }
 
 
@@ -3865,11 +3877,7 @@ static void hieQuest (ExprDesc* Expr)
     Type*       ResultType;     /* Type of result */
 
     /* Call the lower level eval routine */
-    if (Preprocessing) {
-        ExprWithCheck (hieOrPP, Expr);
-    } else {
-        ExprWithCheck (hieOr, Expr);
-    }
+    ExprWithCheck (hieOr, Expr);
 
     /* Check if it's a ternary expression */
     if (CurTok.Tok == TOK_QUEST) {
@@ -3883,17 +3891,6 @@ static void hieQuest (ExprDesc* Expr)
         ED_Init (&Expr3);
         Expr3.Flags = Flags;
 
-        NextToken ();
-
-        /* Convert non-integer constant to boolean constant, so that we may just
-        ** check it in the same way.
-        */
-        if (ED_IsConstTrue (Expr)) {
-            ED_MakeConstBool (Expr, 1);
-        } else if (ED_IsConstFalse (Expr)) {
-            ED_MakeConstBool (Expr, 0);
-        }
-
         if (!ConstantCond) {
             /* Condition codes not set, request a test */
             ED_RequireTest (Expr);
@@ -3905,6 +3902,15 @@ static void hieQuest (ExprDesc* Expr)
             FalseLab = GetLocalLabel ();
             g_falsejump (CF_NONE, FalseLab);
         } else {
+            /* Convert non-integer constant to boolean constant, so that we
+            ** may just check it in an easier way later.
+            */
+            if (ED_IsConstTrue (Expr)) {
+                ED_MakeConstBool (Expr, 1);
+            } else if (ED_IsConstFalse (Expr)) {
+                ED_MakeConstBool (Expr, 0);
+            }
+
             /* Constant boolean subexpression could still have deferred inc/dec
             ** operations, so just flush their side-effects at this sequence point.
             */
@@ -3913,8 +3919,17 @@ static void hieQuest (ExprDesc* Expr)
             if (Expr->IVal == 0) {
                 /* Remember the current code position */
                 GetCodePos (&SkippedBranch);
+
+                /* Expr2 is unevaluated when the condition is false */
+                Expr2.Flags |= E_EVAL_UNEVAL;
+            } else {
+                /* Expr3 is unevaluated when the condition is true */
+                Expr3.Flags |= E_EVAL_UNEVAL;
             }
         }
+
+        /* Skip the question mark */
+        NextToken ();
 
         /* Parse second expression. Remember for later if it is a NULL pointer
         ** expression, then load it into the primary.
@@ -3932,9 +3947,9 @@ static void hieQuest (ExprDesc* Expr)
 
             ED_FinalizeRValLoad (&Expr2);
         } else {
-            /* Constant boolean subexpression could still have deferred inc/
-            ** dec operations, so just flush their side-effects at this
-            ** sequence point.
+            /* Constant subexpression could still have deferred inc/dec
+            ** operations, so just flush their side-effects at this sequence
+            ** point.
             */
             DoDeferred (SQP_KEEP_NONE, &Expr2);
         }
@@ -3947,30 +3962,26 @@ static void hieQuest (ExprDesc* Expr)
             /* Jump around the evaluation of the third expression */
             TrueLab = GetLocalLabel ();
 
-            ConsumeColon ();
-
             g_jump (TrueLab);
 
             /* Jump here if the first expression was false */
             g_defcodelabel (FalseLab);
         } else {
             if (Expr->IVal == 0) {
-                /* Expr2 is unevaluated when the condition is false */
-                Expr2.Flags |= E_EVAL_UNEVAL;
-
                 /* Remove the load code of Expr2 */
                 RemoveCode (&SkippedBranch);
             } else {
                 /* Remember the current code position */
                 GetCodePos (&SkippedBranch);
             }
-            ConsumeColon();
         }
+
+        ConsumeColon ();
 
         /* Parse third expression. Remember for later if it is a NULL pointer
         ** expression, then load it into the primary.
         */
-        ExprWithCheck (hie1, &Expr3);
+        ExprWithCheck (hieQuest, &Expr3);
         Expr3IsNULL = ED_IsNullPtr (&Expr3);
         if (!IsTypeVoid (Expr3.Type)    &&
             ED_YetToLoad (&Expr3)       &&
@@ -3983,18 +3994,15 @@ static void hieQuest (ExprDesc* Expr)
 
             ED_FinalizeRValLoad (&Expr3);
         } else {
-            /* Constant boolean subexpression could still have deferred inc/
-            ** dec operations, so just flush their side-effects at this
-            ** sequence point.
+            /* Constant subexpression could still have deferred inc/dec
+            ** operations, so just flush their side-effects at this sequence
+            ** point.
             */
             DoDeferred (SQP_KEEP_NONE, &Expr3);
         }
         Expr3.Type = PtrConversion (Expr3.Type);
 
         if (ConstantCond && Expr->IVal != 0) {
-            /* Expr3 is unevaluated when the condition is true */
-            Expr3.Flags |= E_EVAL_UNEVAL;
-
             /* Remove the load code of Expr3 */
             RemoveCode (&SkippedBranch);
         }
@@ -4099,6 +4107,8 @@ static void hieQuest (ExprDesc* Expr)
             } else {
                 *Expr = Expr3;
             }
+            /* The result expression is always an rvalue */
+            ED_MarkExprAsRVal (Expr);
         }
 
         /* Setup the target expression */

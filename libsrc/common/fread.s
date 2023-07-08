@@ -59,7 +59,7 @@
 ; File not open or in error state
 
 @L1:    lda     #EINVAL
-        jsr     __seterrno              ; Set __errno, return zero in A
+        jsr     ___seterrno              ; Set __errno, return zero in A
         tax                             ; a/x = 0
         jmp     @L99                    ; Bail out
 

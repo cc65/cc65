@@ -12,7 +12,7 @@ Core team members:
 * [Christian Groessler](https://github.com/groessler): Atari, Atari5200, and CreatiVision library Maintainer
 * [dqh](https://github.com/dqh-au): GHA help
 * [Greg King](https://github.com/greg-king5): all around hackery
-* [groepaz](https://github.com/mrdudz): CBM libary, Project Maintainer
+* [groepaz](https://github.com/mrdudz): CBM library, Project Maintainer
 * [Oliver Schmidt](https://github.com/oliverschmidt): Apple II library Maintainer
 
 External contributors:
@@ -23,6 +23,7 @@ External contributors:
 * [karrika](https://github.com/karrika): Atari 7800 target
 * [Stephan Mühlstrasser](https://github.com/smuehlst): osic1p target
 * [Wayne Parham](https://github.com/WayneParham): Sym-1 target
+* [Dave Plummer](https://github.com/davepl): KIM-1 target
 
 *(The above list is incomplete, if you feel left out - please speak up or add yourself in a PR)*
 

@@ -4,10 +4,10 @@
 
 ; Variables and functions
 
-        .global         __errno, __oserror
-        .global         __osmaperrno
-        .global         __seterrno
-        .global         __directerrno, __mappederrno
+        .global         ___errno, ___oserror
+        .global         ___osmaperrno
+        .global         ___seterrno
+        .global         ___directerrno, ___mappederrno
 
 ; Error codes, must match the values in the C headers
 .enum

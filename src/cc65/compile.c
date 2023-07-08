@@ -79,11 +79,14 @@ static void Parse (void)
 /* Top level parser routine. */
 {
     int comma;
-    SymEntry* Entry;
+    SymEntry* Sym;
     FuncDesc* FuncDef = 0;
 
-    /* Go... */
-    NextToken ();
+    /* Initialization for deferred operations */
+    InitDeferredOps ();
+
+    /* Fill up the next token with a bogus semicolon and start the tokenizer */
+    NextTok.Tok = TOK_SEMI;
     NextToken ();
 
     /* Parse until end of input */
@@ -120,7 +123,7 @@ static void Parse (void)
         }
 
         /* Read variable defs and functions */
-        ParseDeclSpec (&Spec, SC_EXTERN | SC_STATIC, T_INT);
+        ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_INT, SC_EXTERN | SC_STATIC);
 
         /* Don't accept illegal storage classes */
         if ((Spec.StorageClass & SC_TYPEMASK) == 0) {
@@ -139,11 +142,11 @@ static void Parse (void)
         }
 
         /* Read declarations for this type */
-        Entry = 0;
+        Sym = 0;
         comma = 0;
         while (1) {
 
-            Declaration Decl;
+            Declarator Decl;
 
             /* Read the next declaration */
             ParseDecl (&Spec, &Decl, DM_NEED_IDENT);
@@ -193,10 +196,10 @@ static void Parse (void)
             }
 
             /* Add an entry to the symbol table */
-            Entry = AddGlobalSym (Decl.Ident, Decl.Type, Decl.StorageClass);
+            Sym = AddGlobalSym (Decl.Ident, Decl.Type, Decl.StorageClass);
 
             /* Add declaration attributes */
-            SymUseAttr (Entry, &Decl);
+            SymUseAttr (Sym, &Decl);
 
             /* Reserve storage for the variable if we need to */
             if (Decl.StorageClass & SC_STORAGE) {
@@ -207,12 +210,12 @@ static void Parse (void)
                 /* Allow initialization */
                 if (CurTok.Tok == TOK_ASSIGN) {
 
-                    /* This is a definition */
-                    if (SymIsDef (Entry)) {
+                    /* This is a definition with storage */
+                    if (SymIsDef (Sym)) {
                         Error ("Global variable '%s' has already been defined",
-                               Entry->Name);
+                               Sym->Name);
                     }
-                    Entry->Flags |= SC_DEF;
+                    Sym->Flags |= SC_DEF;
 
                     /* We cannot initialize types of unknown size, or
                     ** void types in ISO modes.
@@ -242,25 +245,35 @@ static void Parse (void)
                     }
 
                     /* Define a label */
-                    g_defgloblabel (Entry->Name);
+                    g_defgloblabel (Sym->Name);
 
                     /* Skip the '=' */
                     NextToken ();
 
                     /* Parse the initialization */
-                    ParseInit (Entry->Type);
+                    ParseInit (Sym->Type);
                 } else {
 
+                    /* This is a declaration */
                     if (IsTypeVoid (Decl.Type)) {
                         /* We cannot declare variables of type void */
                         Error ("Illegal type for variable '%s'", Decl.Ident);
-                        Entry->Flags &= ~(SC_STORAGE | SC_DEF);
-                    } else if (Size == 0 && SymIsDef (Entry) && !IsEmptiableObjectType (Decl.Type)) {
+                        Sym->Flags &= ~(SC_STORAGE | SC_DEF);
+                    } else if (Size == 0 && SymIsDef (Sym) && !IsEmptiableObjectType (Decl.Type)) {
                         /* Size is unknown. Is it an array? */
                         if (!IsTypeArray (Decl.Type)) {
                             Error ("Variable '%s' has unknown size", Decl.Ident);
                         }
                     } else {
+                        /* Check for enum forward declaration.
+                        ** Warn about it when extensions are not allowed.
+                        */
+                        if (Size == 0 && IsTypeEnum (Decl.Type)) {
+                            if (IS_Get (&Standard) != STD_CC65) {
+                                Warning ("ISO C forbids forward references to 'enum' types");
+                            }
+                        }
+
                         /* A global (including static) uninitialized variable is
                         ** only a tentative definition. For example, this is valid:
                         ** int i;
@@ -273,11 +286,11 @@ static void Parse (void)
                         */
                         const char* bssName = GetSegName (SEG_BSS);
 
-                        if (Entry->V.BssName && strcmp (Entry->V.BssName, bssName) != 0) {
+                        if (Sym->V.BssName && strcmp (Sym->V.BssName, bssName) != 0) {
                             Error ("Global variable '%s' already was defined in the '%s' segment.",
-                                   Entry->Name, Entry->V.BssName);
+                                   Sym->Name, Sym->V.BssName);
                         }
-                        Entry->V.BssName = xstrdup (bssName);
+                        Sym->V.BssName = xstrdup (bssName);
 
                         /* This is to make the automatical zeropage setting of the symbol
                         ** work right.
@@ -287,17 +300,9 @@ static void Parse (void)
                 }
 
                 /* Make the symbol zeropage according to the segment address size */
-                if ((Entry->Flags & SC_EXTERN) != 0) {
+                if ((Sym->Flags & SC_STATIC) != 0) {
                     if (GetSegAddrSize (GetSegName (CS->CurDSeg)) == ADDR_SIZE_ZP) {
-                        Entry->Flags |= SC_ZEROPAGE;
-                        /* Check for enum forward declaration.
-                        ** Warn about it when extensions are not allowed.
-                        */
-                        if (Size == 0 && IsTypeEnum (Decl.Type)) {
-                            if (IS_Get (&Standard) != STD_CC65) {
-                                Warning ("ISO C forbids forward references to 'enum' types");
-                            }
-                        }
+                        Sym->Flags |= SC_ZEROPAGE;
                     }
                 }
 
@@ -313,7 +318,7 @@ static void Parse (void)
         }
 
         /* Function declaration? */
-        if (Entry && IsTypeFunc (Entry->Type)) {
+        if (Sym && IsTypeFunc (Sym->Type)) {
 
             /* Function */
             if (!comma) {
@@ -322,7 +327,7 @@ static void Parse (void)
                     NextToken ();
                 } else {
                     /* Parse the function body */
-                    NewFunc (Entry, FuncDef);
+                    NewFunc (Sym, FuncDef);
 
                     /* Make sure we aren't omitting any work */
                     CheckDeferredOpAllDone ();
@@ -336,6 +341,9 @@ static void Parse (void)
 
         }
     }
+
+    /* Done with deferred operations */
+    DoneDeferredOps ();
 }
 
 
@@ -388,6 +396,11 @@ void Compile (const char* FileName)
         DefineNumericMacro ("__EAGERLY_INLINE_FUNCS__", 1);
     }
 
+    /* Placeholders for __FILE__, __LINE__ and __COUNTER__ macros */
+    DefineTextMacro ("__FILE__", "");
+    DefineTextMacro ("__LINE__", "");
+    DefineTextMacro ("__COUNTER__", "");
+
     /* __TIME__ and __DATE__ macros */
     Time = time (0);
     TM   = localtime (&Time);
@@ -401,7 +414,13 @@ void Compile (const char* FileName)
     /* DefineNumericMacro ("__STDC__", 1);      <- not now */
     DefineNumericMacro ("__STDC_HOSTED__", 1);
 
-    InitDeferredOps ();
+    /* Stuff unsupported */
+    if (IS_Get (&Standard) > STD_C99) {
+        DefineNumericMacro ("__STDC_NO_ATOMICS__", 1);
+        DefineNumericMacro ("__STDC_NO_COMPLEX__", 1);
+        DefineNumericMacro ("__STDC_NO_THREADS__", 1);
+        DefineNumericMacro ("__STDC_NO_VLA__", 1);
+    }
 
     /* Create the base lexical level */
     EnterGlobalLevel ();
@@ -421,6 +440,9 @@ void Compile (const char* FileName)
     /* Generate the code generator preamble */
     g_preamble ();
 
+    /* Init preprocessor */
+    InitPreprocess ();
+
     /* Open the input file */
     OpenMainFile (FileName);
 
@@ -431,10 +453,8 @@ void Compile (const char* FileName)
         OpenOutputFile ();
 
         /* Preprocess each line and write it to the output file */
-        while (NextLine ()) {
-            Preprocess ();
-            WriteOutput ("%.*s\n", (int) SB_GetLen (Line), SB_GetConstBuf (Line));
-        }
+        while (PreprocessNextLine ())
+        { /* Nothing */ }
 
         /* Close the output file */
         CloseOutputFile ();
@@ -458,8 +478,9 @@ void Compile (const char* FileName)
         for (Entry = GetGlobalSymTab ()->SymHead; Entry; Entry = Entry->NextSym) {
             if ((Entry->Flags & (SC_STORAGE | SC_DEF | SC_STATIC)) == (SC_STORAGE | SC_STATIC)) {
                 /* Assembly definition of uninitialized global variable */
-                SymEntry* Sym = GetSymType (Entry->Type);
+                SymEntry* TagSym = GetESUTagSym (Entry->Type);
                 unsigned Size = SizeOf (Entry->Type);
+
                 if (Size == 0 && IsTypeArray (Entry->Type)) {
                     if (GetElementCount (Entry->Type) == UNSPECIFIED) {
                         /* Assume array size of 1 */
@@ -468,11 +489,11 @@ void Compile (const char* FileName)
                         Warning ("Incomplete array '%s[]' assumed to have one element", Entry->Name);
                     }
 
-                    Sym = GetSymType (GetElementType (Entry->Type));
+                    TagSym = GetESUTagSym (GetElementType (Entry->Type));
                 }
 
                 /* For non-ESU types, Size != 0 */
-                if (Size != 0 || (Sym != 0 && SymIsDef (Sym))) {
+                if (Size != 0 || (TagSym != 0 && SymIsDef (TagSym))) {
                     /* Set the segment name only when it changes */
                     if (strcmp (GetSegName (SEG_BSS), Entry->V.BssName) != 0) {
                         SetSegName (SEG_BSS, Entry->V.BssName);
@@ -492,9 +513,11 @@ void Compile (const char* FileName)
                 }
             }
         }
+
     }
 
-    DoneDeferredOps ();
+    /* Done with preprocessor */
+    DonePreprocess ();
 
     if (Debug) {
         PrintMacroStats (stdout);

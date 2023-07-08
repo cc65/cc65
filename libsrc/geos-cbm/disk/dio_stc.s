@@ -9,7 +9,7 @@
 
             .export _dio_log_to_phys
             .importzp ptr1,ptr2,ptr3,tmp1,tmp2
-            .import popax,__oserror
+            .import popax,___oserror
             .import sectab_1541_l, sectab_1541_h
 
             .include "dio.inc"
@@ -78,7 +78,7 @@ dio_stcend:
         ldx #0
         txa
 _ret:
-        sta __oserror
+        sta ___oserror
         rts                     ; return success
 
 ; errors

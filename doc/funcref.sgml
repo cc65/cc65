@@ -126,6 +126,7 @@ function.
 <!-- <item><ref id="_scroll" name="_scroll"> -->
 <!-- <item><ref id="_setcolor" name="_setcolor"> -->
 <!-- <item><ref id="_setcolor_low" name="_setcolor_low"> -->
+<item><ref id="_sound" name="_sound">
 <item><ref id="get_ostype" name="get_ostype">
 <!-- <item><ref id="get_tv" name="get_tv"> -->
 </itemize>
@@ -975,7 +976,7 @@ previously been allocated by <tt/<ref id="malloc" name="malloc">/, <tt/<ref
 id="calloc" name="calloc">/ or <tt/<ref id="realloc" name="realloc">/.
 <tag/Notes/<itemize>
 <item>Passing a pointer to a block that was is not the result of one of the
-allocation functions, or that has been free'd will give unpredicable results.
+allocation functions, or that has been free'd will give unpredictable results.
 <item>The function is available only as a fastcall function; so, it may be used
 only in the presence of a prototype.
 </itemize>
@@ -1108,6 +1109,46 @@ considered random to a certain degree.
 </descrip>
 </quote>
 
+<sect1>_sound<label id="_sound"><p>
+<quote>
+<descrip>
+<tag/Function/Use the speaker to produce sound in a specified voice. (Atari only)
+<tag/Header/<tt/<ref id="atari.h" name="atari.h">/
+<tag/Declaration/<tt/void __fastcall__ _sound (unsigned char voice, unsigned char pitch, unsigned char distortion, unsigned char volume);/
+<tag/Description/The function produces a sound with the specified parameters using any of the 4 available oscillators (voices) controlled by the POKEY chip. Sound is non cpu-blocking and it keeps oscillating until program sends 0 in all the other parameters.
+
+<tag/Notes/<itemize>
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
+<item>The function is specific to the Atari 8 bit.
+<item> Voice can be any of 0-3 different sound channels.
+<item> Pitch goes from 0-255 (about 125 Hz to 32 Khz).
+<item> Distortion (0-14) uses poly dividers to reshape wave in order to create a noise effect. Use 10 for a "pure" square-wave sound.
+<item>Volume (0-15) is the intensity for the wave.
+<item>Extra bits in those parameters will be ignored.
+<item>Parameters are the same as for the AtariBASIC SOUND statement.
+</itemize>
+<tag/Availability/cc65 (<tt/atari/ and <tt/atarixl/ platforms)
+<tag/Example/
+<verb>
+
+#include <stdio.h>
+int main(void)
+{
+    int i=0;
+    unsigned char j;
+    printf("playing sound \n");
+    for (j=0; j<144; j++) {
+      _sound(1,144-j,10,8);     //change the pitch for voice 1
+      for (i=0; i<50; i++);     //pause for sound duration
+    }
+    _sound(1,0,0,0);  //use zero in other parameters to stop the sound
+    return 0;
+}
+
+</verb>
+</descrip>
+</quote>
 
 <sect1>_stroserror<label id="_stroserror"><p>
 
@@ -4148,7 +4189,7 @@ be used in presence of a prototype.
 <tag/Example/<verb>
 chdir (getdevicedir (device, buf, sizeof buf));
 </verb>
-cf. <tt/samples/enumdevdir.c/
+cf. <tt/samples&sol;enumdevdir.c/
 </descrip>
 </quote>
 
@@ -6907,7 +6948,6 @@ switching the CPU into single clock mode.
 <tag/Example/None.
 </descrip>
 </quote>
-
 
 <sect1>srand<label id="srand"><p>
 

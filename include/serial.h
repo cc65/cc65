@@ -123,6 +123,13 @@ struct ser_params {
     unsigned char       handshake;      /* Type of handshake to use */
 };
 
+/* The name of the standard serial driver for a platform */
+extern const char ser_stddrv[];
+
+/* The address of the static standard serial driver for a platform */
+extern const void ser_static_stddrv[];
+
+
 
 /*****************************************************************************/
 /*                                   Code                                    */

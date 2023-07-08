@@ -1063,7 +1063,7 @@ static char StackHandler (void)
                 break;
 
             case 'a':
-#ifdef CH_CURS_UP:
+#ifdef CH_CURS_UP
             case CH_CURS_UP:
 #endif
                 --StackAddr;

@@ -74,12 +74,12 @@ void* __fastcall__ realloc (void* block, register size_t size)
     oldsize = b->size;
 
     /* Is the block at the current heap top? */
-    if (((unsigned) b) + oldsize == ((unsigned) _heapptr)) {
+    if (((unsigned) b) + oldsize == ((unsigned) __heapptr)) {
         /* Check if we've enough memory at the heap top */
-        newhptr = ((unsigned) _heapptr) - oldsize + size;
-        if (newhptr <= ((unsigned) _heapend)) {
+        newhptr = ((unsigned) __heapptr) - oldsize + size;
+        if (newhptr <= ((unsigned) __heapend)) {
             /* Ok, there's space enough */
-            _heapptr = (unsigned*) newhptr;
+            __heapptr = (unsigned*) newhptr;
             b->size = size;
             b->start = b;
             return block;

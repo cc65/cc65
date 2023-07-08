@@ -13,15 +13,15 @@
 
 .data
 
-__heaporg:
+___heaporg:
         .word   __BSS_RUN__+__BSS_SIZE__        ; Linker calculates this symbol
-__heapptr:
+___heapptr:
         .word   __BSS_RUN__+__BSS_SIZE__        ; Dito
-__heapend:
+___heapend:
         .word   __BSS_RUN__+__BSS_SIZE__
-__heapfirst:
+___heapfirst:
         .word   0
-__heaplast:
+___heaplast:
         .word   0
 
 
@@ -33,10 +33,10 @@ initheap:
         sec
         lda     sp
         sbc     #<__STACKSIZE__
-        sta     __heapend
+        sta     ___heapend
         lda     sp+1
         sbc     #>__STACKSIZE__
-        sta     __heapend+1
+        sta     ___heapend+1
         rts
 
 

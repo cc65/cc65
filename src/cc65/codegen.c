@@ -41,6 +41,7 @@
 
 /* common */
 #include "addrsize.h"
+#include "attrib.h"
 #include "check.h"
 #include "cpu.h"
 #include "shift.h"
@@ -64,7 +65,16 @@
 #include "util.h"
 #include "codegen.h"
 
-
+/* This is a terrible hack that tries to combat the ever reoccuring issue with
+   Mingw and PRIXPTR - the macro should have been defined like this for us in
+   the first place.
+   NOTE: "I64x" works in the github actions now, so if your local mingw64 fails,
+         you probably have to update.
+*/
+#if defined(__MINGW64__)
+#undef PRIXPTR
+#define PRIXPTR "I64x"
+#endif
 
 /*****************************************************************************/
 /*                                  Helpers                                  */
@@ -1282,34 +1292,49 @@ void g_tosint (unsigned flags)
 
 
 
-static void g_regchar (unsigned Flags)
-/* Make sure, the value in the primary register is in the range of char. Truncate if necessary */
+static void g_regchar (unsigned to)
+/* Treat the value in the primary register as a char with specified signedness
+** and convert it to an int (whose representation is irrelevent of signedness).
+*/
 {
-    unsigned L;
-
-    AddCodeLine ("ldx #$00");
-
-    if ((Flags & CF_UNSIGNED) == 0) {
-        /* Sign extend */
-        L = GetLocalLabel();
-        AddCodeLine ("cmp #$80");
-        AddCodeLine ("bcc %s", LocalLabelName (L));
-        AddCodeLine ("dex");
-        g_defcodelabel (L);
-    }
+    /* Since char is the smallest type supported here, we never need any info
+    ** about the original type to "promote from it". However, we have to make
+    ** sure the entire AX contains the correct char value as an int, since we
+    ** will almost always use the char value as an int in AX directly in code
+    ** generation (unless CF_FORCECHAR is specified). That is to say, we don't
+    ** need the original "from" flags for the first conversion to char, but do
+    ** need the original "to" flags as the new "from" flags for the conversion
+    ** to int.
+    */
+    g_regint (to | CF_FORCECHAR);
 }
 
 
 
-void g_regint (unsigned Flags)
-/* Make sure, the value in the primary register an int. Convert if necessary */
+void g_regint (unsigned from)
+/* Convert the value in the primary register to an int (whose representation
+** is irrelevent of signedness).
+*/
 {
-    switch (Flags & CF_TYPEMASK) {
+    switch (from & CF_TYPEMASK) {
 
         case CF_CHAR:
-            if (Flags & CF_FORCECHAR) {
-                /* Conversion is from char */
-                g_regchar (Flags);
+            /* If the original value was forced to use only A, it must be
+            ** extended from char to fill AX. Otherwise nothing to do here
+            ** since AX would already have the correct int value.
+            */
+            if (from & CF_FORCECHAR) {
+                AddCodeLine ("ldx #$00");
+
+                if ((from & CF_UNSIGNED) == 0) {
+                    /* Sign extend */
+                    unsigned L = GetLocalLabel();
+                    AddCodeLine ("cmp #$80");
+                    AddCodeLine ("bcc %s", LocalLabelName (L));
+                    AddCodeLine ("dex");
+                    g_defcodelabel (L);
+                }
+                break;
             }
             /* FALLTHROUGH */
 
@@ -1318,21 +1343,27 @@ void g_regint (unsigned Flags)
             break;
 
         default:
-            typeerror (Flags);
+            typeerror (from);
     }
 }
 
 
 
-void g_reglong (unsigned Flags)
-/* Make sure, the value in the primary register a long. Convert if necessary */
+void g_reglong (unsigned from)
+/* Convert the value in the primary register to a long (whose representation
+** is irrelevent of signedness).
+*/
 {
-    switch (Flags & CF_TYPEMASK) {
+    switch (from & CF_TYPEMASK) {
 
         case CF_CHAR:
-            if (Flags & CF_FORCECHAR) {
+            /* If the original value was forced to use only A, it must be
+            ** extended from char to long. Otherwise AX would already have
+            ** the correct int value to be extened to long.
+            */
+            if (from & CF_FORCECHAR) {
                 /* Conversion is from char */
-                if (Flags & CF_UNSIGNED) {
+                if (from & CF_UNSIGNED) {
                     if (IS_Get (&CodeSizeFactor) >= 200) {
                         AddCodeLine ("ldx #$00");
                         AddCodeLine ("stx sreg");
@@ -1342,18 +1373,19 @@ void g_reglong (unsigned Flags)
                     }
                 } else {
                     if (IS_Get (&CodeSizeFactor) >= 366) {
-                        g_regchar (Flags);
+                        g_regint (from);
                         AddCodeLine ("stx sreg");
                         AddCodeLine ("stx sreg+1");
                     } else {
                         AddCodeLine ("jsr along");
                     }
                 }
+                break;
             }
             /* FALLTHROUGH */
 
         case CF_INT:
-            if (Flags & CF_UNSIGNED) {
+            if (from & CF_UNSIGNED) {
                 if (IS_Get (&CodeSizeFactor) >= 200) {
                     AddCodeLine ("ldy #$00");
                     AddCodeLine ("sty sreg");
@@ -1370,7 +1402,7 @@ void g_reglong (unsigned Flags)
             break;
 
         default:
-            typeerror (Flags);
+            typeerror (from);
     }
 }
 
@@ -1507,48 +1539,49 @@ unsigned g_typeadjust (unsigned lhs, unsigned rhs)
 
 
 
-unsigned g_typecast (unsigned lhs, unsigned rhs)
-/* Cast the value in the primary register to the operand size that is flagged
-** by the lhs value. Return the result value.
+unsigned g_typecast (unsigned to, unsigned from)
+/* Cast the value in the primary register to the specified operand size and
+** signedness. Return the result flags.
 */
 {
     /* Check if a conversion is needed */
-    if ((rhs & CF_CONST) == 0) {
-        switch (lhs & CF_TYPEMASK) {
+    if ((from & CF_CONST) == 0) {
+        switch (to & CF_TYPEMASK) {
 
             case CF_LONG:
-                /* We must promote the primary register to long */
-                g_reglong (rhs);
+                /* We must promote the primary register to long in EAX */
+                g_reglong (from);
                 break;
 
             case CF_INT:
-                /* We must promote the primary register to int */
-                g_regint (rhs);
+                /* We must promote the primary register to int in AX */
+                g_regint (from);
                 break;
 
             case CF_CHAR:
-                /* We must truncate the primary register to char */
-                g_regchar (lhs);
+                /* We must truncate the primary register to char and then
+                ** sign-extend it to signed int in AX.
+                */
+                g_regchar (to);
                 break;
 
             default:
-                typeerror (lhs);
+                /* Since we are switching on "to", report an error on it */
+                typeerror (to);
         }
     }
 
-    /* Do not need any other action. If the left type is int, and the primary
+    /* Do not need any other action. If the "to" type is int, and the primary
     ** register is long, it will be automagically truncated. If the right hand
     ** side is const, it is not located in the primary register and handled by
     ** the expression parser code.
     */
 
     /* Result is const if the right hand side was const */
-    lhs |= (rhs & CF_CONST);
+    to |= (from & CF_CONST);
 
-    /* The resulting type is that of the left hand side (that's why you called
-    ** this function :-)
-    */
-    return lhs;
+    /* The resulting type is "to" (that's why you called this function :-) */
+    return to;
 }
 
 
@@ -4561,7 +4594,7 @@ void g_initstatic (unsigned InitLabel, unsigned VarLabel, unsigned Size)
 
 
 
-void g_testbitfield (unsigned Flags, unsigned BitOffs, unsigned BitWidth)
+void g_testbitfield (ATTR_UNUSED(unsigned Flags), unsigned BitOffs, unsigned BitWidth)
 /* Test bit-field in primary. */
 {
     /* Since the end is inclusive and cannot be negative here, we subtract 1 from the sum */
@@ -4921,5 +4954,25 @@ void g_switch (Collection* Nodes, unsigned DefaultLabel, unsigned Depth)
 void g_asmcode (struct StrBuf* B)
 /* Output one line of assembler code. */
 {
-    AddCodeLine ("%.*s", (int) SB_GetLen (B), SB_GetConstBuf (B));
+    int len = (int) SB_GetLen(B);
+    const char *buf = SB_GetConstBuf(B);
+
+    /* remove whitespace at end of line */
+    /* NOTE: This masks problems in ParseInsn(), which in some cases seems to
+             rely on no whitespace being present at the end of a line in generated
+             code (see issue #1252). However, it generally seems to be a good
+             idea to remove trailing whitespace from (inline) assembly, so we
+             do it anyway. */
+    while (len) {
+       switch (buf[len - 1]) {
+       case '\n':
+       case ' ':
+       case '\t':
+           --len;
+           continue;
+       }
+       break;
+    }
+
+    AddCodeLine ("%.*s", len, buf);
 }

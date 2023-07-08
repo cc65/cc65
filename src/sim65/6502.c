@@ -64,17 +64,11 @@ static CPURegs Regs;
 /* Cycles for the current insn */
 static unsigned Cycles;
 
-/* Total number of CPU cycles exec'd */
-static unsigned long TotalCycles;
-
 /* NMI request active */
 static unsigned HaveNMIRequest;
 
 /* IRQ request active */
 static unsigned HaveIRQRequest;
-
-/* flag to print cycles at program termination */
-int PrintCycles;
 
 
 /*****************************************************************************/
@@ -3277,18 +3271,6 @@ unsigned ExecuteInsn (void)
         Handlers[CPU][OPC] ();
     }
 
-    /* Count cycles */
-    TotalCycles += Cycles;
-
     /* Return the number of clock cycles needed by this insn */
     return Cycles;
-}
-
-
-
-unsigned long GetCycles (void)
-/* Return the total number of cycles executed */
-{
-    /* Return the total number of cycles */
-    return TotalCycles;
 }

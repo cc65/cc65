@@ -6,13 +6,84 @@
 
 <abstract>
 Internal details of cc65 code generation,
-such as calling assembly functions from C.
+such as the expected linker configuration,
+and calling assembly functions from C.
 </abstract>
 
 <!-- Table of contents -->
 <toc>
 
 <!-- Begin the document -->
+
+
+
+<sect>Linker configuration<p>
+
+The C libraries and code generation depend directly on a suitable linker configuration.
+There are premade configuration files in the <tt/cfg&sol;/ directory, normally chosen by the
+linker's selected target. These can be used as a template for customization.
+
+The C libraries depend on several special segments to be defined in your linker configuration.
+Generated code will also use some of them by default.
+Some platform libraries have additional special segments.
+
+Memory areas are free to be defined in a way that is appropriate to each platform,
+and the segments they contain are used as a layer of semantics and abstraction,
+to allow much of the reorganization to be done with the linker config,
+rather than requiring platform-specific code source changes.
+
+<sect1><tt/ZEROPAGE/ segment<p>
+
+Used by the C library and generated code for efficient internal and temporary state storage,
+also called "pseudo-registers".
+
+<sect1><tt/STARTUP/ segment<p>
+
+Used by each platform instance of the C library in <tt/crt0.s/ to contain the entry point
+of the program.
+
+The startup module will export <tt/__STARTUP__ : absolute = 1/ to force the linker to
+always include <tt/crt0.s/ from the library.
+
+<sect1><tt/CODE/ segment<p>
+
+The default segment for generated code, and most C library code will be located here.
+
+Use <tt/#pragma code-name/ to redirect generated code to another segment.
+
+<sect1><tt/BSS/ segment<p>
+
+Used for uninitialized variables.
+Originally an acronym for "Block Started by Symbol", but the meaning of this is now obscure.
+
+Use <tt/#pragma bss-name/ to redirect uninitialized variables to another segment.
+
+<sect1><tt/DATA/ segment<p>
+
+Used for initialized variables.
+
+On some platforms, this may be initialized as part of the program loading process,
+but on others it may have a separate <tt/LOAD/ and <tt/RUN/ address,
+allowing <tt/copydata/ to copy the initialization from the loaded location
+into their run destination in RAM.
+
+Use <tt/#pragma data-name/ to redirect initialized variables to another segment.
+
+<sect1><tt/RODATA/ segment<p>
+
+Used for read-only (constant) data.
+
+Use <tt/#pragma rodata-name/ to redirect constant data to another segment.
+
+<sect1><tt/FEATURES/ table<p>
+
+This currently defines table locations for the <tt/CONDES/
+constructor, destructor, and interruptor features.
+Some platform libraries use these.
+
+The constructors will be called with <tt/initlib/ at startup,
+and the destructors with <tt/donelib/ at program exit.
+Interruptors are called with <tt/callirq/.
 
 
 

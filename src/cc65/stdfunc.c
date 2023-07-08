@@ -531,7 +531,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 
             /* The function result is an rvalue in the primary register */
             ED_FinalizeRValLoad (Expr);
-            Expr->Type = GetFuncReturn (Expr->Type);
+            Expr->Type = GetFuncReturnType (Expr->Type);
 
             /* Bail out, no need for further processing */
             goto ExitPoint;
@@ -540,7 +540,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 
     /* The function result is an rvalue in the primary register */
     ED_FinalizeRValLoad (Expr);
-    Expr->Type = GetFuncReturn (Expr->Type);
+    Expr->Type = GetFuncReturnType (Expr->Type);
 
 ExitPoint:
     /* We expect the closing brace */
@@ -604,7 +604,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     DoDeferred (SQP_KEEP_EAX, &Arg3.Expr);
 
     /* Emit the actual function call. This will also cleanup the stack. */
-    g_call (CF_FIXARGC, MemSet? Func_memset : Func__bzero, ParamSize);
+    g_call (CF_FIXARGC, MemSet? Func_memset : Func___bzero, ParamSize);
 
     if (ED_IsConstAbsInt (&Arg3.Expr) && Arg3.Expr.IVal == 0) {
 
@@ -757,7 +757,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 
             /* The function result is an rvalue in the primary register */
             ED_FinalizeRValLoad (Expr);
-            Expr->Type = GetFuncReturn (Expr->Type);
+            Expr->Type = GetFuncReturnType (Expr->Type);
 
             /* Bail out, no need for further processing */
             goto ExitPoint;
@@ -766,7 +766,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 
     /* The function result is an rvalue in the primary register */
     ED_FinalizeRValLoad (Expr);
-    Expr->Type = GetFuncReturn (Expr->Type);
+    Expr->Type = GetFuncReturnType (Expr->Type);
 
 ExitPoint:
     /* We expect the closing brace */
@@ -968,7 +968,7 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 
     /* The function result is an rvalue in the primary register */
     ED_FinalizeRValLoad (Expr);
-    Expr->Type = GetFuncReturn (Expr->Type);
+    Expr->Type = GetFuncReturnType (Expr->Type);
 
     /* We expect the closing brace */
     ConsumeRParen ();
@@ -1165,7 +1165,7 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 
     /* The function result is an rvalue in the primary register */
     ED_FinalizeRValLoad (Expr);
-    Expr->Type = GetFuncReturn (Expr->Type);
+    Expr->Type = GetFuncReturnType (Expr->Type);
 
 ExitPoint:
     /* We expect the closing brace */

@@ -228,9 +228,10 @@ INSTALL:
         jsr     MoveX
         cli
 
-; Done, return zero.
+; Done
 
         lda     #MOUSE_ERR_OK
+        .assert MOUSE_ERR_OK = 0, error
         tax
         rts
 

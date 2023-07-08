@@ -64,7 +64,7 @@ _open:
 errno:  jsr     incsp4          ; Preserves A
 
         ; Set __errno
-        jmp     __directerrno
+        jmp     ___directerrno
 
         ; Save fdtab slot
 found:  tya
@@ -147,8 +147,8 @@ oserr1: ldy     tmp2            ; Restore fdtab slot
         jsr     freebuffer
         pla                     ; Restore oserror code
 
-        ; Set __oserror
-        jmp     __mappederrno
+        ; Set ___oserror
+        jmp     ___mappederrno
 
 open:   ldy     tmp2            ; Restore fdtab slot
 
@@ -209,7 +209,7 @@ done:   lda     tmp1            ; Restore fd
 
         ; Return success
         ldx     #$00
-        stx     __oserror
+        stx     ___oserror
         rts
 
 freebuffer:

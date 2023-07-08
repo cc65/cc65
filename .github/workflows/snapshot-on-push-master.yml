@@ -18,7 +18,7 @@ jobs:
         run: git config --global core.autocrlf input
 
       - name: Checkout Source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.1
@@ -44,7 +44,7 @@ jobs:
       - shell: bash
         run: git config --global core.autocrlf input
       - name: Checkout Source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Do some simple style checks
         shell: bash
@@ -86,20 +86,24 @@ jobs:
           mv cc65.zip cc65-snapshot-win32.zip
 
       - name: Upload a 32-bit Snapshot Zip
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
-          name: cc65-snapshot-win32.zip
+          name: cc65-snapshot-win32
           path: cc65-snapshot-win32.zip
       - name: Upload a 64-bit Snapshot Zip
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
-          name: cc65-snapshot-win64.zip
+          name: cc65-snapshot-win64
           path: cc65-snapshot-win64.zip
 
       - name: Get the online documents repo.
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: cc65/doc
+          # this token will expire, if it does, generate a new one as decribed in https://github.com/cc65/cc65/issues/2065
+          # - apparently only a "classic" token works here
+          # - the token must exist in the cc65/cc65 repo
+          token: ${{ secrets.DOC_PAT }} # use secret token instead of default
           path: doc.git
       - name: Update the online documents.
         run: |
@@ -110,14 +114,31 @@ jobs:
           git config user.email "cc65.nomail@github.com"
           git config push.default simple
           git add -A
-          git commit -m "Updated from cc65 commit ${GITHUB_SHA}."
-          #git push -v
+          # prevent failure when there is nothing to commit
+          git diff-index --quiet HEAD || git commit -m "Updated from https://github.com/cc65/cc65/commit/${GITHUB_SHA}"
+          git push
+      - name: Package offline documents.
+        run: 7z a cc65-snapshot-docs.zip ./html/*.*
+      - name: Upload a Documents Snapshot Zip
+        uses: actions/upload-artifact@v3
+        with:
+          name: cc65-snapshot-docs
+          path: cc65-snapshot-docs.zip
 
     # enter secrets under "repository secrets"
-      - name: Upload snapshot to sourceforge
+      - name: Upload 32-bit Windows snapshot to sourceforge
         uses: nogsantos/scp-deploy@master
         with:
           src: cc65-snapshot-win32.zip
+          host: ${{ secrets.SSH_HOST }}
+          remote: ${{ secrets.SSH_DIR }}
+          port: ${{ secrets.SSH_PORT }}
+          user: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+      - name: Upload documents snapshot to sourceforge
+        uses: nogsantos/scp-deploy@master
+        with:
+          src: cc65-snapshot-docs.zip
           host: ${{ secrets.SSH_HOST }}
           remote: ${{ secrets.SSH_DIR }}
           port: ${{ secrets.SSH_PORT }}

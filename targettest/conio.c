@@ -130,9 +130,11 @@ void main(void)
                     case CH_ENTER:
                         clrscr();
                         return;
+#ifdef CH_CURS_LEFT
                     case CH_CURS_LEFT:
                         inpos = (inpos - 1) % 8;
                         break;
+#endif
                     case '0': case '1': case '2': case '3': case '4':
                     case '5': case '6': case '7': case '8': case '9':
                         (void)textcolor(i - '0');
@@ -164,7 +166,9 @@ void main(void)
                     default:
                         cputc(i);
                         /* fallthrough */
+#ifdef CH_CURS_RIGHT
                     case CH_CURS_RIGHT:
+#endif
                         inpos = (inpos + 1) % 8;
                 }
 #endif

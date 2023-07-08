@@ -125,6 +125,7 @@ Long options:
   --target sys                  Set the target system
   --verbose                     Increase verbosity
   --version                     Print the assembler version
+  --warnings-as-errors          Treat warnings as errors
 ---------------------------------------------------------------------------
 </verb></tscreen>
 
@@ -183,7 +184,7 @@ Here is a description of all the command line options:
 
   Enable an emulation feature. This is identical as using <tt/.FEATURE/
   in the source with two exceptions: Feature names must be lower case, and
-  each feature must be specified by using an extra <tt/--feature/ option,
+  each feature must be specified by using a separate <tt/--feature/ option,
   comma separated lists are not allowed.
 
   See the discussion of the <tt><ref id=".FEATURE" name=".FEATURE"></tt>
@@ -359,6 +360,13 @@ Here is a description of all the command line options:
   warning level is 1, and it would probably be silly to set it to
   something lower.
 
+
+  <label id="option--warnings-as-errors">
+  <tag><tt>--warnings-as-errors</tt></tag>
+
+  An error will be generated if any warnings were produced.
+
+
 </descrip>
 <p>
 
@@ -431,6 +439,15 @@ The assembler accepts
       <tt><ref id=".P4510" name=".P4510"></tt> command was given).
 </itemize>
 
+On 6502-derived platforms the <tt/BRK/ instruction has an optional signature
+byte. If omitted, the assembler will only produce only 1 byte.
+
+<tscreen><verb>
+                brk                     ; 1-byte:  $00
+                brk     $34             ; 2-bytes: $00 $34
+                brk     #$34            ; 2-bytes: $00 $34
+</verb></tscreen>
+
 
 <sect1>65816 mode<p>
 
@@ -447,6 +464,17 @@ mnemonics:
 <item><tt>TDA</tt> is an alias for <tt>TDC</tt>
 <item><tt>TSA</tt> is an alias for <tt>TSC</tt>
 </itemize>
+
+The <tt/MVN/ and <tt/MVP/ instructions accept two different argument forms.
+Either two bank bytes may be given with a <tt/#/ prefix,
+or two far addresses whose high byte will be used.
+
+<tscreen><verb>
+                mvn     #^src, #^dst       ; bank of src to bank of dst
+                mvn     src, dst           ; bank of src to bank of dst
+                mvp     #$12, #$78         ; bank $12 to $78
+                mvp     $123456, $789ABC   ; bank $12 to $78
+</verb></tscreen>
 
 
 <sect1>6502X mode<label id="6502X-mode"><p>
@@ -1381,10 +1409,6 @@ either a string or an expression value.
         .endmacro
   </verb></tscreen>
 
-  This command is new and must be enabled with the <tt/.FEATURE addrsize/ command.
-
-  See: <tt><ref id=".FEATURE" name=".FEATURE"></tt>
-
 
 <sect1><tt>.BANK</tt><label id=".BANK"><p>
 
@@ -2019,7 +2043,7 @@ Here's a list of all control commands and a description, what they do:
 
 <sect1><tt>.A16</tt><label id=".A16"><p>
 
-  Valid only in 65816 mode. Switch the accumulator to 16 bit.
+  Valid only in 65816 mode. Assume the accumulator is 16 bit.
 
   Note: This command will not emit any code, it will tell the assembler to
   create 16 bit operands for immediate accumulator addressing mode.
@@ -2029,7 +2053,7 @@ Here's a list of all control commands and a description, what they do:
 
 <sect1><tt>.A8</tt><label id=".A8"><p>
 
-  Valid only in 65816 mode. Switch the accumulator to 8 bit.
+  Valid only in 65816 mode. Assume the accumulator is 8 bit.
 
   Note: This command will not emit any code, it will tell the assembler to
   create 8 bit operands for immediate accu addressing mode.
@@ -2112,15 +2136,15 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
   the assembler will force a segment alignment to the least common multiple of
-  15, 18 and 251 - which is 22590. To protect the user against errors, the
-  assembler will issue a warning when the combined alignment exceeds 256. The
-  command line option <tt><ref id="option--large-alignment"
-  name="--large-alignment"></tt> will disable this warning.
+  15, 18 and 251 - which is 22590. To protect the user against errors, when the
+  combined alignment is larger than the explicitly requested alignments,
+  the assembler will issue a warning if it also exceeds 256. The command line
+  option <tt><ref id="option--large-alignment" name="--large-alignment"></tt>
+  will disable this warning.
 
-  Please note that with alignments that are a power of two (which were the
-  only alignments possible in older versions of the assembler), the problem is
-  less severe, because the least common multiple of powers to the same base is
-  always the larger one.
+  Please note that with only alignments that are a power of two, a warning will
+  never occur, because the least common multiple of powers to the same base is
+  always simply the larger one.
 
 
 
@@ -2255,7 +2279,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
   Switch on or off case sensitivity on identifiers. The default is off
   (that is, identifiers are case sensitive), but may be changed by the
   -i switch on the command line.
-  The command must be followed by a '+' or '-' character to switch the
+  The command can be followed by a '+' or '-' character to switch the
   option on or off respectively.
 
   Example:
@@ -2404,7 +2428,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
   Switch on or off debug info generation. The default is off (that is,
   the object file will not contain debug infos), but may be changed by the
   -g switch on the command line.
-  The command must be followed by a '+' or '-' character to switch the
+  The command can be followed by a '+' or '-' character to switch the
   option on or off respectively.
 
   Example:
@@ -2514,7 +2538,19 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
 
 <sect1><tt>.ENDMAC, .ENDMACRO</tt><label id=".ENDMACRO"><p>
 
-  Marks the end of a macro definition.
+  Marks the end of a macro definition. Note, <tt>.ENDMACRO</tt> should be on
+  its own line to successfully end the macro definition. It is possible to use
+  <tt><ref id=".DEFINE" name=".DEFINE"></tt> to create a symbol that references
+  <tt>.ENDMACRO</tt> without ending the macro definition.
+
+  Example:
+
+  <tscreen><verb>
+        .macro  new_mac
+                .define startmac .macro
+                .define endmac .endmacro
+        .endmacro
+  </verb></tscreen>
 
   See: <tt><ref id=".DELMACRO" name=".DELMACRO"></tt>,
        <tt><ref id=".EXITMACRO" name=".EXITMACRO"></tt>,
@@ -2738,24 +2774,22 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
   This directive may be used to enable one or more compatibility features
   of the assembler. While the use of <tt/.FEATURE/ should be avoided when
   possible, it may be useful when porting sources written for other
-  assemblers. There is no way to switch a feature off, once you have
-  enabled it, so using
+  assemblers. After the feature name an optional '+' or '-' may specify whether
+  to enable or disable the feature (enable if omitted). Multiple features may be
+  enabled, separated by commas. Examples:
 
   <tscreen><verb>
-        .FEATURE        xxx
+        ; enable c_comments
+        .feature   c_comments
+        .feature   c_comments +
+        ; enable force_range, disable underline_in_numbers, enable labels_without_colons
+        .feature   force_range, underline_in_numbers -, labels_without_colons +
+        .feature   force_range +, underline_in_numbers off, labels_without_colons on
   </verb></tscreen>
-
-  will enable the feature until end of assembly is reached.
 
   The following features are available:
 
   <descrip>
-
-  <tag><tt>addrsize</tt><label id="addrsize"></tag>
-
-    Enables the .ADDRSIZE pseudo function. This function is experimental and not enabled by default.
-
-    See also: <tt><ref id=".ADDRSIZE" name=".ADDRSIZE"></tt>
 
   <tag><tt>at_in_identifiers</tt><label id="at_in_identifiers"></tag>
 
@@ -2824,6 +2858,23 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
     reserved keywords built into the assembler, that starts with a dot, may be
     overridden. When using this feature, you may also get into trouble if
     later versions of the assembler define new keywords starting with a dot.
+
+  <tag><tt>long_jsr_jmp_rts</tt><label id="long_jsr_jmp_rts"></tag>
+
+    Affects 65816 mode only.
+
+    Allows <tt>jsr</tt> and <tt>jmp</tt> to produce long jumps if the target
+    address has been previously declared in a <tt>far</tt> segment,
+    or imported as <tt>far</tt>.
+    Otherwise <tt>jsl</tt> and <tt>jml</tt> must be used instead.
+
+    Also allows <tt><ref id=".SMART" name=".SMART"></tt> to convert <tt>rts</tt>
+    to a long return <tt>rtl</tt> when the enclosing scope or memory model
+    indicates returning from a <tt>far</tt> procedure.
+
+    This permits compatibility with the old behavior of this assembler, or other
+    assemblers which similarly allowed <tt>jsr</tt> and <tt>jmp</tt> to be used
+    this way.
 
   <tag><tt>loose_char_term</tt><label id="loose_char_term"></tag>
 
@@ -3036,7 +3087,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
 
 <sect1><tt>.I16</tt><label id=".I16"><p>
 
-  Valid only in 65816 mode. Switch the index registers to 16 bit.
+  Valid only in 65816 mode. Assume the index registers are 16 bit.
 
   Note: This command will not emit any code, it will tell the assembler to
   create 16 bit operands for immediate operands.
@@ -3047,7 +3098,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
 
 <sect1><tt>.I8</tt><label id=".I8"><p>
 
-  Valid only in 65816 mode. Switch the index registers to 8 bit.
+  Valid only in 65816 mode. Assume the index registers are 8 bit.
 
   Note: This command will not emit any code, it will tell the assembler to
   create 8 bit operands for immediate operands.
@@ -3319,7 +3370,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
   Note: Line continuations do not work in a comment. A backslash at the
   end of a comment is treated as part of the comment and does not trigger
   line continuation.
-  The command must be followed by a '+' or '-' character to switch the
+  The command can be followed by a '+' or '-' character to switch the
   option on or off respectively.
 
   Example:
@@ -3334,7 +3385,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
 
 <sect1><tt>.LIST</tt><label id=".LIST"><p>
 
-  Enable output to the listing. The command must be followed by a boolean
+  Enable output to the listing. The command can be followed by a boolean
   switch ("on", "off", "+" or "-") and will enable or disable listing
   output.
   The option has no effect if the listing is not enabled by the command line
@@ -3979,7 +4030,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
 
 <sect1><tt>.SMART</tt><label id=".SMART"><p>
 
-  Switch on or off smart mode. The command must be followed by a '+' or '-'
+  Switch on or off smart mode. The command can be followed by a '+' or '-'
   character to switch the option on or off respectively. The default is off
   (that is, the assembler doesn't try to be smart), but this default may be
   changed by the -s switch on the command line.
@@ -3994,7 +4045,9 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
         the assembler cannot trace the execution flow this may lead to false
         results in some cases. If in doubt, use the <tt/.Inn/ and <tt/.Ann/
         instructions to tell the assembler about the current settings.
-  <item>In 65816 mode, replace a <tt/RTS/ instruction by <tt/RTL/ if it is
+  <item>In 65816 mode, if the <tt><ref id="long_jsr_jmp_rts"
+        name="long_jsr_jmp_rts"></tt> feature is enabled,
+        smart mode will replace a <tt/RTS/ instruction by <tt/RTL/ if it is
         used within a procedure declared as <tt/far/, or if the procedure has
         no explicit address specification, but it is <tt/far/ because of the
         memory model used.
@@ -4199,8 +4252,13 @@ macro actually takes in the definition. You may also leave intermediate
 parameters empty. Empty parameters are replaced by empty space (that is,
 they are removed when the macro is expanded). If you have a look at our
 macro definition above, you will see, that replacing the "addr" parameter
-by nothing will lead to wrong code in most lines. To help you, writing
-macros with a variable parameter list, there are some control commands:
+by nothing will lead to wrong code in most lines.
+
+The names "a", "x" and "y" should be avoided for macro parameters, as these
+will usually conflict with the 6502 registers.
+
+For writing macros with a variable parameter list, control commands are
+available:
 
 <tt><ref id=".IFBLANK" name=".IFBLANK"></tt> tests the rest of the line and
 returns true, if there are any tokens on the remainder of the line. Since
@@ -4211,15 +4269,15 @@ opposite.
 Look at this example:
 
 <tscreen><verb>
-.macro  ldaxy   a, x, y
-.ifnblank       a
-        lda     #a
+.macro  ldaxy   i, j, k
+.ifnblank       i
+        lda     #i
 .endif
-.ifnblank       x
-        ldx     #x
+.ifnblank       j
+        ldx     #j
 .endif
-.ifnblank       y
-        ldy     #y
+.ifnblank       k
+        ldy     #k
 .endif
 .endmacro
 </verb></tscreen>

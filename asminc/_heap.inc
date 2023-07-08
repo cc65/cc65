@@ -28,8 +28,8 @@ HEAP_MIN_BLOCKSIZE  = .sizeof (freeblock)   ; Minimum size of an allocated block
 HEAP_ADMIN_SPACE    = .sizeof (usedblock)   ; Additional space for used bock
 
 ; Variables
-.global         __heaporg
-.global         __heapptr
-.global         __heapend
-.global         __heapfirst
-.global         __heaplast
+.global         ___heaporg
+.global         ___heapptr
+.global         ___heapend
+.global         ___heapfirst
+.global         ___heaplast

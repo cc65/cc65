@@ -79,6 +79,10 @@ typedef enum token_t {
     TOK_FASTCALL,
     TOK_CDECL,
 
+    /* Address sizes */
+    TOK_FAR,
+    TOK_NEAR,
+
     /* Tokens denoting types */
     TOK_FIRST_TYPE,
     TOK_ENUM            = TOK_FIRST_TYPE,
@@ -95,94 +99,101 @@ typedef enum token_t {
     TOK_VOID,
     TOK_LAST_TYPE       = TOK_VOID,
 
-    /* Control statements */
+    /* Selection statements */
+    TOK_IF,
+    TOK_ELSE,
+    TOK_SWITCH,
+
+    /* Iteration statements */
+    TOK_WHILE,
     TOK_DO,
     TOK_FOR,
-    TOK_GOTO,
-    TOK_IF,
-    TOK_RETURN,
-    TOK_SWITCH,
-    TOK_WHILE,
 
-    TOK_ASM,
+    /* Jump statements */
+    TOK_GOTO,
+    TOK_CONTINUE,
+    TOK_BREAK,
+    TOK_RETURN,
+
+    /* Labels */
     TOK_CASE,
     TOK_DEFAULT,
-    TOK_BREAK,
-    TOK_CONTINUE,
-    TOK_ELSE,
-    TOK_ELLIPSIS,
+
+    /* Misc. */
+    TOK_ATTRIBUTE,
+    TOK_PRAGMA,
+    TOK_STATIC_ASSERT,
+    TOK_ASM,
     TOK_SIZEOF,
 
-    TOK_IDENT,
-    TOK_SEMI,
-
-    /* Primary operators */
-    TOK_LBRACK,
+    /* Punctuators */
+    TOK_FIRST_PUNC,
+    TOK_LBRACK          = TOK_FIRST_PUNC,
+    TOK_RBRACK,
     TOK_LPAREN,
+    TOK_RPAREN,
+    TOK_LCURLY,
+    TOK_RCURLY,
     TOK_DOT,
     TOK_PTR_REF,
-
-    TOK_LCURLY,
-    TOK_RBRACK,
-    TOK_COMP,
     TOK_INC,
-    TOK_PLUS_ASSIGN,
-    TOK_PLUS,
-    TOK_COMMA,
     TOK_DEC,
-    TOK_MINUS_ASSIGN,
-    TOK_RCURLY,
-    TOK_MINUS,
-    TOK_MUL_ASSIGN,
+    TOK_ADDR,
+    TOK_AND = TOK_ADDR,         /* Alias */
     TOK_STAR,
     TOK_MUL = TOK_STAR,         /* Alias */
-    TOK_DIV_ASSIGN,
-    TOK_DIV,
-    TOK_BOOL_AND,
-    TOK_AND_ASSIGN,
-    TOK_AND,
-    TOK_NE,
+    TOK_PLUS,
+    TOK_MINUS,
+    TOK_COMP,
     TOK_BOOL_NOT,
-    TOK_BOOL_OR,
-    TOK_OR_ASSIGN,
-    TOK_OR,
-    TOK_EQ,
-    TOK_ASSIGN,
-
-    /* Inequalities */
-    TOK_LE,
-    TOK_LT,
-    TOK_GE,
-    TOK_GT,
-
-    TOK_SHL_ASSIGN,
-    TOK_SHL,
-    TOK_SHR_ASSIGN,
-    TOK_SHR,
-    TOK_XOR_ASSIGN,
-    TOK_XOR,
-    TOK_MOD_ASSIGN,
+    TOK_DIV,
     TOK_MOD,
+    TOK_SHL,
+    TOK_SHR,
+    TOK_LT,
+    TOK_GT,
+    TOK_LE,
+    TOK_GE,
+    TOK_EQ,
+    TOK_NE,
+    TOK_XOR,
+    TOK_OR,
+    TOK_BOOL_AND,
+    TOK_BOOL_OR,
     TOK_QUEST,
     TOK_COLON,
-    TOK_RPAREN,
-    TOK_SCONST,
+    TOK_SEMI,
+    TOK_ELLIPSIS,
+    TOK_ASSIGN,
+    TOK_MUL_ASSIGN,
+    TOK_DIV_ASSIGN,
+    TOK_MOD_ASSIGN,
+    TOK_PLUS_ASSIGN,
+    TOK_MINUS_ASSIGN,
+    TOK_SHL_ASSIGN,
+    TOK_SHR_ASSIGN,
+    TOK_AND_ASSIGN,
+    TOK_XOR_ASSIGN,
+    TOK_OR_ASSIGN,
+    TOK_COMMA,
+    TOK_HASH,
+    TOK_HASH_HASH,
+    TOK_DOUBLE_HASH     = TOK_HASH_HASH,    /* Alias */
+    TOK_LAST_PUNC       = TOK_DOUBLE_HASH,
+
+    /* Primary expressions */
     TOK_ICONST,
     TOK_CCONST,
+    TOK_WCCONST,
     TOK_FCONST,
+    TOK_SCONST,
     TOK_WCSCONST,
-
-    TOK_ATTRIBUTE,
-    TOK_STATIC_ASSERT,
-    TOK_FAR,
-    TOK_NEAR,
+    TOK_IDENT,
     TOK_A,
     TOK_X,
     TOK_Y,
     TOK_AX,
-    TOK_EAX,
-
-    TOK_PRAGMA
+    TOK_EAX
 } token_t;
 
 
@@ -210,6 +221,7 @@ struct Token {
 
 extern Token CurTok;            /* The current token */
 extern Token NextTok;           /* The next token */
+extern int   PPParserRunning;   /* Is tokenizer used by the preprocessor */
 
 
 
@@ -218,6 +230,17 @@ extern Token NextTok;           /* The next token */
 /*****************************************************************************/
 
 
+
+#if defined(HAVE_INLINE)
+INLINE int TokIsPunc (const Token* T)
+/* Return true if the token is a punctuator */
+{
+    return (T->Tok >= TOK_FIRST_PUNC && T->Tok <= TOK_LAST_PUNC);
+}
+#else
+#  define TokIsPunc(T)  \
+        ((T)->Tok >= TOK_FIRST_PUNC && (T)->Tok <= TOK_LAST_PUNC)
+#endif
 
 #if defined(HAVE_INLINE)
 INLINE int TokIsStorageClass (const Token* T)
@@ -259,8 +282,21 @@ void SymName (char* S);
 ** least of size MAX_IDENTLEN+1.
 */
 
+int IsWideQuoted (char First, char Second);
+/* Return 1 if the two successive characters indicate a wide string literal or
+** a wide char constant, otherwise return 0.
+*/
+
 int IsSym (char* S);
 /* If a symbol follows, read it and return 1, otherwise return 0 */
+
+int IsPPNumber (int Cur, int Next);
+/* Return 1 if the two successive characters indicate a pp-number, otherwise
+** return 0.
+*/
+
+void CopyPPNumber (StrBuf* Target);
+/* Copy a pp-number from the input to Target */
 
 void NextToken (void);
 /* Get next token from input stream */

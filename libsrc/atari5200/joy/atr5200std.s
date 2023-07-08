@@ -47,7 +47,8 @@ INSTALL:
         lda     #$04            ; enable POT input from the joystick ports, see section "GTIA" in
         sta     CONSOL          ;   http://www.atarimuseum.com/videogames/consoles/5200/conv_to_5200.html
         lda     #JOY_ERR_OK
-        ldx     #0
+        .assert JOY_ERR_OK = 0, error
+        tax
 ;       rts                     ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------

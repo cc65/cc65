@@ -7,13 +7,12 @@
 
 /*
   see: https://github.com/cc65/cc65/issues/191
+       https://github.com/cc65/cc65/issues/2111
 */
 
-#pragma warn(error, on)
-
 static int n = 0;
-extern int n;           /* should not give an error */
-static int n;           /* should not give an error */
+extern int n;           /* extern is ignored, gives a warning but keeps previous static definiton */
+static int n;           /* no error or warning, the previous static is still in effect */
 
 int main(void)
 {

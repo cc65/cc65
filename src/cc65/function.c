@@ -42,6 +42,7 @@
 #include "asmlabel.h"
 #include "codegen.h"
 #include "error.h"
+#include "expr.h"
 #include "funcdesc.h"
 #include "global.h"
 #include "litpool.h"
@@ -80,7 +81,7 @@ static Function* NewFunction (struct SymEntry* Sym, FuncDesc* D)
 
     /* Initialize the fields */
     F->FuncEntry  = Sym;
-    F->ReturnType = GetFuncReturn (Sym->Type);
+    F->ReturnType = GetFuncReturnType (Sym->Type);
     F->Desc       = D;
     F->Reserved   = 0;
     F->RetLab     = 0;
@@ -539,7 +540,7 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
         /* Determine if this is a main function in a C99 environment that
         ** returns an int.
         */
-        if (IsRawTypeInt (F_GetReturnType (CurrentFunc)) &&
+        if (GetUnqualRawTypeCode (ReturnType) == T_INT &&
             IS_Get (&Standard) == STD_C99) {
             C99MainFunc = 1;
         }
@@ -600,7 +601,7 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
                 ** We don't currently support this case.
                 */
                 if (RType == Param->Type) {
-                    Error ("Passing '%s' of this size by value is not supported", GetFullTypeName (Param->Type));
+                    Error ("Passing '%s' of this size (%d) by value is not supported", GetFullTypeName (Param->Type), SizeOf (RType));
                 }
             }
 
@@ -613,7 +614,7 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
                 /* Could we allocate a register? */
                 if (Reg < 0) {
                     /* No register available: Convert parameter to auto */
-                    CvtRegVarToAuto (Param);
+                    SymCvtRegVarToAuto (Param);
                 } else {
                     /* Remember the register offset */
                     Param->V.R.RegOffs = Reg;

@@ -194,6 +194,17 @@ unsigned long GetCodeDWord (unsigned Addr)
 
 
 
+unsigned GetCodeLongAddr (unsigned Addr)
+/* Get a word from the given address */
+{
+    unsigned Lo = GetCodeByte (Addr);
+    unsigned Mid = GetCodeByte (Addr+1);
+    unsigned Hi = GetCodeByte (Addr+2);
+    return Lo | (Mid << 8) | (Hi << 16);
+}
+
+
+
 unsigned GetRemainingBytes (void)
 /* Return the number of remaining code bytes */
 {

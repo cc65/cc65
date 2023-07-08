@@ -39,9 +39,8 @@
 
 
 /* NULL pointer */
-#ifndef _HAVE_NULL
-#define NULL    0
-#define _HAVE_NULL
+#ifndef NULL
+#define NULL ((void *) 0)
 #endif
 
 /* Locale information constants */
@@ -82,6 +81,3 @@ char* __fastcall__ setlocale (int category, const char* locale);
 
 /* End of locale.h */
 #endif
-
-
-

@@ -36,6 +36,7 @@
 /* cc65 */
 #include "codegen.h"
 #include "error.h"
+#include "expr.h"
 #include "exprdesc.h"
 #include "global.h"
 #include "loadexpr.h"
@@ -92,7 +93,6 @@ static void LoadAddress (unsigned Flags, ExprDesc* Expr)
             g_leasp (Expr->IVal);
             break;
 
-        case E_LOC_PRIMARY:
         case E_LOC_EXPR:
             if (Expr->IVal != 0) {
                 /* We have an expression in the primary plus a constant

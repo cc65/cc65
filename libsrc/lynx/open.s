@@ -66,7 +66,7 @@ parmok: jsr     popax
         beq     flagsok
         jsr     popax
         lda     #EINVAL
-        jmp     __directerrno
+        jmp     ___directerrno
 
 flagsok:
         jsr     popax
@@ -74,7 +74,7 @@ flagsok:
         jsr     _openn
         ldx     #$00
         lda     #$01
-        stx     __oserror
+        stx     ___oserror
         rts
 
 .endproc

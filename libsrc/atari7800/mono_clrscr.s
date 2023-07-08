@@ -4,7 +4,7 @@
         .export _mono_clrscr
 
         .import _mono_screen
-        .import pushax, __bzero
+        .import pushax, ___bzero
         .include "extzp.inc"
 
         .code
@@ -16,7 +16,7 @@
         jsr     pushax
         ldx     #>(mono_charsperline * screenrows)
         lda     #<(mono_charsperline * screenrows)
-        jmp     __bzero
+        jmp     ___bzero
 
         .endproc
 

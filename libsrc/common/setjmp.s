@@ -2,15 +2,15 @@
 ; 1998-06-06, Ullrich von Bassewitz
 ; 2015-09-11, Greg King
 ;
-; int __fastcall__ setjmp (jmp_buf buf);
+; int __fastcall__ __setjmp (jmp_buf buf);
 ;
 
-        .export         __setjmp
+        .export         ___setjmp
 
         .import         return0
         .importzp       sp, ptr1
 
-__setjmp:
+___setjmp:
         sta     ptr1            ; Save buf
         stx     ptr1+1
         ldy     #0

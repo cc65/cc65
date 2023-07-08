@@ -187,8 +187,9 @@ SetNMI: sta     NMIVec
 
 ; Done, return an error code
 
-        lda     #<SER_ERR_OK
-        tax                     ; A is zero
+        lda     #SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
+        tax
         rts
 
 ;----------------------------------------------------------------------------
@@ -264,22 +265,23 @@ SER_OPEN:
 
 ; Done
 
-        lda     #<SER_ERR_OK
-        tax                             ; A is zero
+        lda     #SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
+        tax
         rts
 
 ; Invalid parameter
 
 InvParam:
-        lda     #<SER_ERR_INIT_FAILED
-        ldx     #>SER_ERR_INIT_FAILED
+        lda     #SER_ERR_INIT_FAILED
+        ldx     #0 ; return value is char
         rts
 
 ; Baud rate not available
 
 InvBaud:
-        lda     #<SER_ERR_BAUD_UNAVAIL
-        ldx     #>SER_ERR_BAUD_UNAVAIL
+        lda     #SER_ERR_BAUD_UNAVAIL
+        ldx     #0 ; return value is char
         rts
 
 ;----------------------------------------------------------------------------
@@ -300,8 +302,9 @@ SER_CLOSE:
 
 ; Return OK
 
-        lda     #<SER_ERR_OK
-        tax                             ; A is zero
+        lda     #SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
+        tax
         rts
 
 ;----------------------------------------------------------------------------
@@ -322,8 +325,8 @@ SER_GET:
 @L1:    lda     RecvFreeCnt             ; (25)
         cmp     #$ff
         bne     @L2
-        lda     #<SER_ERR_NO_DATA
-        ldx     #>SER_ERR_NO_DATA
+        lda     #SER_ERR_NO_DATA
+        ldx     #0 ; return value is char
         rts
 
 ; Check for flow stopped & enough free: release flow control
@@ -370,7 +373,7 @@ SER_PUT:
 
 @L2:    ldx     SendFreeCnt
         bne     @L3
-        lda     #<SER_ERR_OVERFLOW      ; X is already zero
+        lda     #SER_ERR_OVERFLOW       ; X is already zero
         rts
 
 @L3:    ldx     SendTail
@@ -379,7 +382,8 @@ SER_PUT:
         dec     SendFreeCnt
         lda     #$ff
         jsr     TryToSend
-        lda     #<SER_ERR_OK
+        lda     #SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
         tax
         rts
 
@@ -392,7 +396,8 @@ SER_STATUS:
         lda     ACIA_STATUS
         ldx     #0
         sta     (ptr1,x)
-        txa                             ; SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
+        txa
         rts
 
 ;----------------------------------------------------------------------------
@@ -402,8 +407,8 @@ SER_STATUS:
 ;
 
 SER_IOCTL:
-        lda     #<SER_ERR_INV_IOCTL     ; We don't support ioclts for now
-        ldx     #>SER_ERR_INV_IOCTL
+        lda     #SER_ERR_INV_IOCTL      ; We don't support ioclts for now
+        ldx     #0 ; return value is char
         rts
 
 ;----------------------------------------------------------------------------

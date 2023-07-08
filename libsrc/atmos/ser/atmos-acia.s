@@ -141,8 +141,9 @@ SER_CLOSE:
         sta     ACIA::CMD,x
 
         ; Done, return an error code
-:       lda     #<SER_ERR_OK
-        tax                     ; A is zero
+:       lda     #SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
+        tax
         stx     Index           ; Mark port as closed
         rts
 
@@ -205,8 +206,9 @@ SER_OPEN:
 
         ; Done
         stx     Index                   ; Mark port as open
-        lda     #<SER_ERR_OK
-        tax                             ; A is zero
+        lda     #SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
+        tax
         rts
 
         ; Invalid parameter
@@ -235,8 +237,8 @@ SER_GET:
 :       lda     RecvFreeCnt     ; (25)
         cmp     #$FF
         bne     :+
-        lda     #<SER_ERR_NO_DATA
-        ldx     #>SER_ERR_NO_DATA
+        lda     #SER_ERR_NO_DATA
+        ldx     #0 ; return value is char
         rts
 
         ; Check for flow stopped & enough free: release flow control
@@ -277,8 +279,8 @@ SER_PUT:
         ; Put byte into send buffer & send
 :       ldy     SendFreeCnt
         bne     :+
-        lda     #<SER_ERR_OVERFLOW
-        ldx     #>SER_ERR_OVERFLOW
+        lda     #SER_ERR_OVERFLOW
+        ldx     #0 ; return value is char
         rts
 
 :       ldy     SendTail
@@ -287,7 +289,8 @@ SER_PUT:
         dec     SendFreeCnt
         lda     #$FF            ; TryHard = true
         jsr     TryToSend
-        lda     #<SER_ERR_OK
+        lda     #SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
         tax
         rts
 
@@ -299,7 +302,8 @@ SER_STATUS:
         lda     ACIA::STATUS
         ldx     #$00
         sta     (ptr1,x)
-        txa                     ; SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
+        txa
         rts
 
 ;----------------------------------------------------------------------------
@@ -308,8 +312,8 @@ SER_STATUS:
 ; Must return an SER_ERR_xx code in a/x.
 
 SER_IOCTL:
-        lda     #<SER_ERR_INV_IOCTL
-        ldx     #>SER_ERR_INV_IOCTL
+        lda     #SER_ERR_INV_IOCTL
+        ldx     #0 ; return value is char
         rts
 
 ;----------------------------------------------------------------------------

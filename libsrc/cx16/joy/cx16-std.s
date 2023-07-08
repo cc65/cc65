@@ -55,8 +55,9 @@ JOY_COUNT       = $05           ; Number of joysticks we support
 ; Must return a JOY_ERR_xx code in .XA .
 
 INSTALL:
-        lda     #<JOY_ERR_OK
-        ldx     #>JOY_ERR_OK
+        lda     #JOY_ERR_OK
+        .assert JOY_ERR_OK = 0, error
+        tax
 ;       rts                     ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------

@@ -107,13 +107,13 @@ seek_common:
 einval: lda     #EINVAL
 
         ; Set __errno
-errno:  jsr     __directerrno   ; leaves -1 in AX
+errno:  jsr     ___directerrno  ; leaves -1 in AX
         stx     sreg            ; extend return value to 32 bits
         stx     sreg+1
         rts
 
-        ; Set __oserror
-oserr:  jsr     __mappederrno   ; leaves -1 in AX
+        ; Set ___oserror
+oserr:  jsr     ___mappederrno  ; leaves -1 in AX
         stx     sreg            ; extend return value to 32 bits
         stx     sreg+1
         rts

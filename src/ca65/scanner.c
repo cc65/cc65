@@ -112,6 +112,7 @@ struct CharSource {
     CharSource*                 Next;   /* Linked list of char sources */
     token_t                     Tok;    /* Last token */
     int                         C;      /* Last character */
+    int                         SkipN;  /* For '\r\n' line endings, skip '\n\ if next */
     const CharSourceFunctions*  Func;   /* Pointer to function table */
     union {
         InputFile               File;   /* File data */
@@ -325,6 +326,7 @@ static void UseCharSource (CharSource* S)
     Source      = S;
 
     /* Read the first character from the new file */
+    S->SkipN    = 0;
     S->Func->NextChar (S);
 
     /* Setup the next token so it will be skipped on the next call to
@@ -386,6 +388,11 @@ static void IFNextChar (CharSource* S)
         while (1) {
 
             int N = fgetc (S->V.File.F);
+            if (N == '\n' && S->SkipN) {
+                N = fgetc (S->V.File.F);
+            }
+            S->SkipN = 0;
+
             if (N == EOF) {
                 /* End of file. Accept files without a newline at the end */
                 if (SB_NotEmpty (&S->V.File.Line)) {
@@ -401,8 +408,11 @@ static void IFNextChar (CharSource* S)
 
             /* Check for end of line */
             } else if (N == '\n') {
-
                 /* End of line */
+                break;
+            } else if (N == '\r') {
+                /* End of line, skip '\n' if it's the next character */
+                S->SkipN = 1;
                 break;
 
             /* Collect other stuff */
@@ -738,24 +748,7 @@ static token_t FindDotKeyword (void)
     R = bsearch (&K, DotKeywords, sizeof (DotKeywords) / sizeof (DotKeywords [0]),
                  sizeof (DotKeywords [0]), CmpDotKeyword);
     if (R != 0) {
-
-        /* By default, disable any somewhat experiemental DotKeyword. */
-
-        switch (R->Tok) {
-
-            case TOK_ADDRSIZE:
-                /* Disallow .ADDRSIZE function by default */
-                if (AddrSize == 0) {
-                    return TOK_NONE;
-                }
-                break;
-
-            default:
-                break;
-        }
-
         return R->Tok;
-
     } else {
         return TOK_NONE;
     }

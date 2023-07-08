@@ -42,16 +42,16 @@ next:
         ldy     ptr3+1
         ldx     tmp1            ; send fd in X
         BRK_TELEMON  XFWRITE
+
         ;  compute nb of bytes written
-
-
-        lda     PTR_READ_DEST+1
         sec
+        lda     PTR_READ_DEST
+        sbc     ptr1
+        pha
+        lda     PTR_READ_DEST+1
         sbc     ptr1+1
         tax
-        lda     PTR_READ_DEST
-        sec
-        sbc     ptr1
+        pla
         rts
 
 

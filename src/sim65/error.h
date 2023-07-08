@@ -49,11 +49,16 @@
 
 
 
-#define SIM65_ERROR         0x7F
-/* Does not use EXIT_FAILURE because it may overlap with test results. */
+#define SIM65_ERROR         -1
+/* An error result for errors that are not part of the simulated test.
+** Note that set simulated test can only return 8-bit errors 0-255.
+*/
 
-#define SIM65_ERROR_TIMEOUT 0x7E
+#define SIM65_ERROR_TIMEOUT -2
 /* An error result for max CPU instructions exceeded. */
+
+extern int PrintCycles;
+/* flag to print cycles at program termination */
 
 
 
@@ -74,6 +79,9 @@ void ErrorCode (int Code, const char* Format, ...) attribute((noreturn, format(p
 
 void Internal (const char* Format, ...) attribute((noreturn, format(printf,1,2)));
 /* Print an internal error message and die */
+
+void SimExit (int Code);
+/* Exit the simulation with an exit code */
 
 
 

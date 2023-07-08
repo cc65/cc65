@@ -31,7 +31,7 @@ CA65 := $(if $(wildcard ../../bin/ca65*),..$S..$Sbin$Sca65,ca65)
 LD65 := $(if $(wildcard ../../bin/ld65*),..$S..$Sbin$Sld65,ld65)
 SIM65 := $(if $(wildcard ../../bin/sim65*),..$S..$Sbin$Ssim65,sim65)
 
-WORKDIR = ../../testwrk/val
+WORKDIR = ../../testwrk/todo
 
 OPTIONS = g O Os Osi Osir Osr Oi Oir Or
 
@@ -49,7 +49,7 @@ $(WORKDIR):
 define PRG_template
 
 $(WORKDIR)/%.$1.$2.prg: %.c | $(WORKDIR)
-	$(if $(QUIET),echo val/$$*.$1.$2.prg)
+	$(if $(QUIET),echo todo/$$*.$1.$2.prg)
 	$(CC65) -t sim$2 $$(CC65FLAGS) -$1 -o $$(@:.prg=.s) $$< $(NULLERR)
 	$(CA65) -t sim$2 -o $$(@:.prg=.o) $$(@:.prg=.s) $(NULLERR)
 	$(LD65) -t sim$2 -o $$@ $$(@:.prg=.o) sim$2.lib $(NULLERR)

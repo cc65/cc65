@@ -95,6 +95,9 @@ void CfgWarning (const FilePos* Pos, const char* Format, ...)
     Warning ("%s:%u: %s",
              GetString (Pos->Name), Pos->Line, SB_GetConstBuf (&Buf));
     SB_Done (&Buf);
+
+    /* Count warnings */
+    ++WarningCount;
 }
 
 

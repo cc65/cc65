@@ -502,10 +502,10 @@ DoFormat:
 ; It is a character
 
         jsr     GetIntArg               ; Get the argument (promoted to int)
-        sta     Buf                     ; Place it as zero terminated string...
-        lda     #0
-        sta     Buf+1                   ; ...into the buffer
-        jmp     HaveArg                 ; Done
+        sta     Buf                     ; Place it into the buffer
+        ldx     #0
+        lda     #1                      ; Buffer length is 1
+        jmp     HaveArg1
 
 ; Is it an integer?
 
@@ -671,6 +671,7 @@ HaveArg:
         lda     Str
         ldx     Str+1
         jsr     _strlen                 ; Get length of argument
+HaveArg1:                               ; Jumped into here from %c handling
         sta     ArgLen
         stx     ArgLen+1
 

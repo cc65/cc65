@@ -570,7 +570,18 @@ void SymCheck (void)
 
     /* Check for open scopes */
     if (CurrentScope->Parent != 0) {
-        Error ("Local scope was not closed");
+        if (CurrentScope->Label) {
+            /* proc has a label indicating the line it was opened. */
+            LIError (&CurrentScope->Label->DefLines,
+                     "Local proc '%s' was not closed",
+                     GetString (CurrentScope->Name));
+        } else {
+            /* scope has no label to track a line number, uses end-of-document line instead.
+            ** Anonymous scopes will reveal their internal automatic name.
+            */
+            Error ("Local scope '%s' was not closed",
+                   GetString (CurrentScope->Name));
+        }
     }
 
     /* First pass: Walk through all symbols, checking for undefined's and

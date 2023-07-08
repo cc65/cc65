@@ -46,7 +46,7 @@
 
 
 /* THE memory */
-static unsigned char Mem[0x10000];
+unsigned char Mem[0x10000];
 
 
 
@@ -69,14 +69,6 @@ void MemWriteWord (unsigned Addr, unsigned Val)
 {
     MemWriteByte (Addr, Val & 0xFF);
     MemWriteByte (Addr + 1, Val >> 8);
-}
-
-
-
-unsigned char MemReadByte (unsigned Addr)
-/* Read a byte from a memory location */
-{
-    return Mem[Addr];
 }
 
 

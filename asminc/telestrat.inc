@@ -277,6 +277,8 @@ XRECLK           = $3C          ; Reset clock
 XCLCL            = $3D          ; Close clock
 XWRCLK           = $3E          ; Displays clock in the address in A & Y registers
 
+XFSEEK           = $3F          ; Only in Orix
+
 ; Sound primitives
 XSONPS           = $40          ; Send data to PSG register (14 values)
 XOUPS            = $42          ; Send Oups sound into PSG

@@ -45,8 +45,10 @@ system configuration before compiling and linking user programs.
 The ROMs and I/O areas are defined in the configuration files, as are most of the entry points
 for useful subroutines in the KIM-1 monitor ROM.  cc65 generated programs compiled and linked
 using 4k config run in the memory range of &dollar;200 - &dollar;0FFF.  The 60k config expands
-this range to &dollar;DFFF. The starting memory location and entry point for running the program is
-&dollar;200, so when the program is transferred to the KIM-1, it is executed by typing '200 G'.
+this range to &dollar;DFFF. When using the 4k config the starting memory location and entry point
+for running the program is &dollar;200, so when the program is transferred to the KIM-1, it is
+executed by typing '200 G'. With the 60k config the default starting memory location and entry
+point is &dollar;2000.
 
 Special locations:
 
@@ -65,7 +67,7 @@ Special locations:
 
 <sect>Platform specific header files<p>
 
-Programs containing KIM-1 code may use the <tt/kim.h/ header file.  See the header file for more information.
+Programs containing KIM-1 code may use the <tt/kim1.h/ header file.  See the header file for more information.
 
 <sect>Loadable drivers<p>
 

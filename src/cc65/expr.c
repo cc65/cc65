@@ -3375,9 +3375,10 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                 Expr->Type = Expr2.Type;
             } else if (!DoArrayRef && IsClassInt (lhst) && IsClassInt (rhst)) {
                 /* Integer addition */
-                flags = typeadjust (Expr, &Expr2, 0);
                 /* Load rhs into the primary */
                 LoadExpr (CF_NONE, &Expr2);
+                /* Adjust rhs primary if needed  */
+                flags = typeadjust (Expr, &Expr2, 0);
             } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassFloat (rhst)) {
                 /* FIXME: float - what to do here exactly? */
                 LOG(("%s:%d float addition (Expr2.V.FVal.V:%f)\n", __FILE__, __LINE__, Expr2.V.FVal.V));

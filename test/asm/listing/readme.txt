@@ -4,6 +4,8 @@ Overall test:
 These testcases can be used to test different aspects of the assembler.
 The name of a test is everything in the form <test>.s.
 
+If a custom linker configuration is needed, also include <test>.cfg. 
+
 The following reference files can be added:
 
 - ref/<test>.bin-ref:

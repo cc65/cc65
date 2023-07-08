@@ -976,7 +976,7 @@ previously been allocated by <tt/<ref id="malloc" name="malloc">/, <tt/<ref
 id="calloc" name="calloc">/ or <tt/<ref id="realloc" name="realloc">/.
 <tag/Notes/<itemize>
 <item>Passing a pointer to a block that was is not the result of one of the
-allocation functions, or that has been free'd will give unpredicable results.
+allocation functions, or that has been free'd will give unpredictable results.
 <item>The function is available only as a fastcall function; so, it may be used
 only in the presence of a prototype.
 </itemize>

@@ -401,3 +401,23 @@ void OutputSettings (void)
     LineFeed ();
     LineFeed ();
 }
+
+
+
+void OutputMFlag (unsigned char enabled)
+/* Output the 65816 M-flag state */
+{
+    Indent (MCol);
+    Output (enabled ? ".a8" : ".a16");
+    LineFeed ();
+}
+
+
+
+void OutputXFlag (unsigned char enabled)
+/* Output the 65816 X-flag state */
+{
+    Indent (MCol);
+    Output (enabled ? ".i8" : ".i16");
+    LineFeed ();
+}

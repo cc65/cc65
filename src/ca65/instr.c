@@ -120,9 +120,21 @@ static void PutJMP (const InsDesc* Ins);
 ** to check for this case and is otherwise identical to PutAll.
 */
 
+static void PutJMP816 (const InsDesc* Ins);
+/* Handle the JMP instruction for the 816.
+** Allowing the long_jsr_jmp_rts feature to permit a long JMP.
+** Note that JMP [abs] and JML [abs] are always both permitted for instruction $DC,
+** because the [] notation for long indirection makes the generated instruction unambiguous.
+*/
+
+static void PutJSR816 (const InsDesc* Ins);
+/* Handle the JSR instruction for the 816.
+** Allowing the long_jsr_jmp_rts feature to permit a long JSR.
+*/
+
 static void PutRTS (const InsDesc* Ins attribute ((unused)));
 /* Handle the RTS instruction for the 816. In smart mode emit a RTL opcode if
-** the enclosing scope is FAR.
+** the enclosing scope is FAR, but only if the long_jsr_jmp_rts feature applies.
 */
 
 static void PutAll (const InsDesc* Ins);
@@ -169,7 +181,7 @@ static const struct {
         { "BMI",  0x0020000, 0x30, 0, PutPCRel8 },
         { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
         { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
-        { "BRK",  0x0000001, 0x00, 0, PutAll },
+        { "BRK",  0x0800005, 0x00, 6, PutAll },
         { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
         { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
         { "CLC",  0x0000001, 0x18, 0, PutAll },
@@ -240,7 +252,7 @@ static const struct {
         { "BMI",  0x0020000, 0x30, 0, PutPCRel8 },
         { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
         { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
-        { "BRK",  0x0000001, 0x00, 0, PutAll },
+        { "BRK",  0x0800005, 0x00, 6, PutAll },
         { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
         { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
         { "CLC",  0x0000001, 0x18, 0, PutAll },
@@ -330,7 +342,7 @@ static const struct {
         { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
         { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
         { "BRA",  0x0020000, 0x12, 0, PutPCRel8 },      /* DTV */
-        { "BRK",  0x0000001, 0x00, 0, PutAll },
+        { "BRK",  0x0800005, 0x00, 6, PutAll },
         { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
         { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
         { "CLC",  0x0000001, 0x18, 0, PutAll },
@@ -406,7 +418,7 @@ static const struct {
         { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
         { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
         { "BRA",  0x0020000, 0x80, 0, PutPCRel8 },
-        { "BRK",  0x0000001, 0x00, 0, PutAll },
+        { "BRK",  0x0800005, 0x00, 6, PutAll },
         { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
         { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
         { "CLC",  0x0000001, 0x18, 0, PutAll },
@@ -498,7 +510,7 @@ static const struct {
         { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
         { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
         { "BRA",  0x0020000, 0x80, 0, PutPCRel8 },
-        { "BRK",  0x0000001, 0x00, 0, PutAll },
+        { "BRK",  0x0800005, 0x00, 6, PutAll },
         { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
         { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
         { "CLC",  0x0000001, 0x18, 0, PutAll },
@@ -610,7 +622,7 @@ static const struct {
         { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
         { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
         { "BRA",  0x0020000, 0x80, 0, PutPCRel8 },
-        { "BRK",  0x0000001, 0x00, 0, PutAll },
+        { "BRK",  0x0800005, 0x00, 6, PutAll },
         { "BSR",  0x0040000, 0x63, 0, PutPCRel4510 },
         { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
         { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
@@ -735,7 +747,7 @@ static const struct {
         { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
         { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
         { "BRA",  0x0020000, 0x80, 0, PutPCRel8 },
-        { "BRK",  0x0000005, 0x00, 6, PutAll },
+        { "BRK",  0x0800005, 0x00, 6, PutAll },
         { "BRL",  0x0040000, 0x82, 0, PutPCRel16 },
         { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
         { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
@@ -744,7 +756,7 @@ static const struct {
         { "CLI",  0x0000001, 0x58, 0, PutAll },
         { "CLV",  0x0000001, 0xb8, 0, PutAll },
         { "CMP",  0x0b8f6fc, 0xc0, 0, PutAll },
-        { "COP",  0x0000004, 0x02, 6, PutAll },
+        { "COP",  0x0800005, 0x02, 6, PutAll },
         { "CPA",  0x0b8f6fc, 0xc0, 0, PutAll },   /* == CMP */
         { "CPX",  0x0c0000c, 0xe0, 1, PutAll },
         { "CPY",  0x0c0000c, 0xc0, 1, PutAll },
@@ -758,9 +770,9 @@ static const struct {
         { "INX",  0x0000001, 0xe8, 0, PutAll },
         { "INY",  0x0000001, 0xc8, 0, PutAll },
         { "JML",  0x4000010, 0x5c, 1, PutAll },
-        { "JMP",  0x4010818, 0x4c, 6, PutAll },
+        { "JMP",  0x4010818, 0x4c, 6, PutJMP816 },
         { "JSL",  0x0000010, 0x20, 7, PutAll },
-        { "JSR",  0x0010018, 0x20, 7, PutAll },
+        { "JSR",  0x0010018, 0x20, 7, PutJSR816 },
         { "LDA",  0x0b8f6fc, 0xa0, 0, PutAll },
         { "LDX",  0x0c0030c, 0xa2, 1, PutAll },
         { "LDY",  0x0c0006c, 0xa0, 1, PutAll },
@@ -821,7 +833,7 @@ static const struct {
         { "TYA",  0x0000001, 0x98, 0, PutAll },
         { "TYX",  0x0000001, 0xbb, 0, PutAll },
         { "WAI",  0x0000001, 0xcb, 0, PutAll },
-        { "WDM",  0x0000004, 0x42, 6, PutAll },
+        { "WDM",  0x0800004, 0x42, 6, PutAll },
         { "XBA",  0x0000001, 0xeb, 0, PutAll },
         { "XCE",  0x0000001, 0xfb, 0, PutAll }
     }
@@ -897,7 +909,7 @@ static const struct {
         { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
         { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
         { "BRA",  0x0020000, 0x80, 0, PutPCRel8 },
-        { "BRK",  0x0000001, 0x00, 0, PutAll },
+        { "BRK",  0x0800005, 0x00, 6, PutAll },
         { "BSR",  0x0020000, 0x44, 0, PutPCRel8 },
         { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
         { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
@@ -1257,7 +1269,8 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
         ExprNode* Left = A->Expr->Left;
         if ((A->Expr->Op == EXPR_BYTE0 || A->Expr->Op == EXPR_BYTE1) &&
             Left->Op == EXPR_SYMBOL                                  &&
-            GetSymAddrSize (Left->V.Sym) != ADDR_SIZE_ZP) {
+            GetSymAddrSize (Left->V.Sym) != ADDR_SIZE_ZP             &&
+            !(A->Flags & EFFADDR_OVERRIDE_ZP)) {
 
             /* Output a warning */
             Warning (1, "Suspicious address expression");
@@ -1605,11 +1618,12 @@ static void PutJMP (const InsDesc* Ins)
     if (EvalEA (Ins, &A)) {
 
         /* Check for indirect addressing */
-        if (A.AddrModeBit & AM65_ABS_IND) {
+        if ((A.AddrModeBit & AM65_ABS_IND) && (CPU < CPU_65SC02)) {
 
             /* Compare the low byte of the expression to 0xFF to check for
             ** a page cross. Be sure to use a copy of the expression otherwise
-            ** things will go weird later.
+            ** things will go weird later. This only affects the 6502 CPU,
+            ** and was corrected in 65C02 and later CPUs in this family.
             */
             ExprNode* E = GenNE (GenByteExpr (CloneExpr (A.Expr)), 0xFF);
 
@@ -1627,12 +1641,46 @@ static void PutJMP (const InsDesc* Ins)
 
 
 
-static void PutRTS (const InsDesc* Ins attribute ((unused)))
-/* Handle the RTS instruction for the 816. In smart mode emit a RTL opcode if
-** the enclosing scope is FAR.
+static void PutJMP816 (const InsDesc* Ins)
+/* Handle the JMP instruction for the 816.
+** Allowing the long_jsr_jmp_rts feature to permit a long JMP.
+** Note that JMP [abs] and JML [abs] are always both permitted for instruction $DC,
+** because the [] notation for long indirection makes the generated instruction unambiguous.
 */
 {
-    if (SmartMode && CurrentScope->AddrSize == ADDR_SIZE_FAR) {
+    if (LongJsrJmpRts) {
+        PutJMP (Ins);
+    } else {
+        InsDesc InsAbs = *Ins;
+        InsAbs.AddrMode &= ~(AM65_ABS_LONG);
+        PutJMP (&InsAbs);
+    }
+}
+
+
+
+static void PutJSR816 (const InsDesc* Ins)
+/* Handle the JSR instruction for the 816.
+** Allowing the long_jsr_jmp_rts feature to permit a long JSR.
+*/
+{
+    if (LongJsrJmpRts) {
+        PutAll (Ins);
+    } else {
+        InsDesc InsAbs = *Ins;
+        InsAbs.AddrMode &= ~(AM65_ABS_LONG);
+        PutJMP (&InsAbs);
+    }
+}
+
+
+
+static void PutRTS (const InsDesc* Ins attribute ((unused)))
+/* Handle the RTS instruction for the 816. In smart mode emit a RTL opcode if
+** the enclosing scope is FAR, but only if the long_jsr_jmp_rts feature applies.
+*/
+{
+    if (LongJsrJmpRts && SmartMode && CurrentScope->AddrSize == ADDR_SIZE_FAR) {
         Emit0 (0x6B);       /* RTL */
     } else {
         Emit0 (0x60);       /* RTS */

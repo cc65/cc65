@@ -1,0 +1,78 @@
+name: Windows Test Scheduled
+# Scheduled or manually dispatched because it's slower than the Linux test.
+
+on:
+  schedule:
+    - cron: '0 0 */1 * *'
+    # every 1 days
+  workflow_dispatch:
+    # allow manual dispatch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+  # don't run more than once at a time
+
+jobs:
+  build_windows:
+    name: Build, Test (Windows MSVC)
+    runs-on: windows-latest
+
+    steps:
+
+      # This cache is used to remember the last build.
+      # If there are no changes and the last build was successful,
+      # the build and test steps will be omitted.
+      # If the last build failed, the full attempt will be repeated.
+      # Github Actions will retain the last build cache for up to 7 days.
+
+      - name: Create Cache
+        shell: bash
+        run: mkdir ~/.cache-sha
+
+      - name: Cache SHA
+        uses: actions/cache@v3
+        id: check-sha
+        with:
+          path: ~/.cache-sha
+          key: cache-sha-wintest-${{ github.sha }}
+
+      - name: Git Setup
+        if: steps.check-sha.outputs.cache-hit != 'true'
+        shell: bash
+        run: git config --global core.autocrlf input
+
+      - name: Checkout source
+        if: steps.check-sha.outputs.cache-hit != 'true'
+        uses: actions/checkout@v3
+
+      - name: Add msbuild to PATH
+        if: steps.check-sha.outputs.cache-hit != 'true'
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Build app (MSVC debug)
+        if: steps.check-sha.outputs.cache-hit != 'true'
+        run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Debug
+
+      - name: Build app (MSVC release)
+        if: steps.check-sha.outputs.cache-hit != 'true'
+        run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Release
+
+      - name: Build utils (MinGW)
+        if: steps.check-sha.outputs.cache-hit != 'true'
+        shell: cmd
+        run: make -j2 util SHELL=cmd
+
+      - name: Build the platform libraries (make lib)
+        if: steps.check-sha.outputs.cache-hit != 'true'
+        shell: cmd
+        run: make -j2 lib QUIET=1 SHELL=cmd
+
+      - name: Run the regression tests (make test)
+        if: steps.check-sha.outputs.cache-hit != 'true'
+        shell: cmd
+        run: make test QUIET=1 SHELL=cmd
+
+      - name: Test that the samples can be built (make samples)
+        if: steps.check-sha.outputs.cache-hit != 'true'
+        shell: cmd
+        run: make -j2 samples SHELL=cmd

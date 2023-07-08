@@ -93,15 +93,16 @@ INSTALL:
 
 ; DTV not found
 
-        lda     #<EM_ERR_NO_DEVICE
-        ldx     #>EM_ERR_NO_DEVICE
+        lda     #EM_ERR_NO_DEVICE
+        ldx     #0 ; return value is char
         rts
 
 @present:
         ldx     #$FF
         stx     curpage+1               ; Invalidate curpage
-        inx                             ; X = 0
-        txa                             ; A/X = EM_ERR_OK
+        .assert EM_ERR_OK = 0, error
+        inx
+        txa
 
 ;       rts                             ; Run into UNINSTALL instead
 

@@ -793,6 +793,8 @@ static int HandleSymRedefinition (SymEntry* Sym, const Type* T, unsigned Flags)
                 */
                 Error ("Redeclaration of enumerator constant '%s'", Sym->Name);
                 Sym = 0;
+            } else if (Flags & SC_STRUCTFIELD) {
+                Error ("Duplicate member '%s'", Sym->Name);
             }
         }
     }
@@ -1007,7 +1009,7 @@ SymEntry* AddBitField (const char* Name, const Type* T, unsigned Offs,
         Entry = NewSymEntry (Name, SC_BITFIELD);
 
         /* Set the symbol attributes. Bit-fields are always integral types. */
-        Entry->Type   = NewBitFieldType (T, BitOffs, BitWidth);
+        Entry->Type   = NewBitFieldOf (T, BitOffs, BitWidth);
         Entry->V.Offs = Offs;
 
         if (!SignednessSpecified) {
@@ -1019,7 +1021,7 @@ SymEntry* AddBitField (const char* Name, const Type* T, unsigned Offs,
             ** `char -> unsigned char` adjustment that is performed with other integral types.
             */
             CHECK ((Entry->Type->C & T_MASK_SIGN) == T_SIGN_SIGNED ||
-                   IsTypeChar (Entry->Type));
+                   IsRankChar (Entry->Type));
             Entry->Type[0].C &= ~T_MASK_SIGN;
             Entry->Type[0].C |= T_SIGN_UNSIGNED;
             Entry->Type[1].C &= ~T_MASK_SIGN;
@@ -1338,15 +1340,14 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
                    Name);
             Entry = 0;
         } else if ((Flags & SC_ESUTYPEMASK) != SC_TYPEDEF) {
-            /* If a static declaration follows a non-static declaration, then
-            ** diagnose the conflict. It will warn and compile an extern
-            ** declaration if both declarations are global, otherwise give an
-            ** error.
+            /* If a static declaration follows a non-static declaration, then the result is undefined.
+            ** Most compilers choose to either give an error at compile time,
+            ** or remove the extern property for a link time error if used.
             */
             if (SymTab == SymTab0           &&
                 (Flags & SC_EXTERN) == 0    &&
                 (Entry->Flags & SC_EXTERN) != 0) {
-                Warning ("Static declaration of '%s' follows non-static declaration", Name);
+                Error ("Static declaration of '%s' follows non-static declaration", Name);
             } else if ((Flags & SC_EXTERN) != 0                                     &&
                        (Entry->Owner == SymTab0 || (Entry->Flags & SC_DEF) != 0)    &&
                        (Entry->Flags & SC_EXTERN) == 0) {
@@ -1358,8 +1359,12 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
                 */
                 if (Entry->Owner == SymTab0) {
                     if ((Flags & SC_STORAGE) == 0) {
-                        /* Linkage must be unchanged */
+                        /* Linkage must be unchanged.
+                        ** The C standard specifies that a later extern declaration will be ignored,
+                        ** and will use the previous linkage instead. Giving a warning for this case.
+                        */
                         Flags &= ~SC_EXTERN;
+                        Warning ("Extern declaration of '%s' follows static declaration, extern ignored", Name);
                     } else {
                         Error ("Non-static declaration of '%s' follows static declaration", Name);
                     }

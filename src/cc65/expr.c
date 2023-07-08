@@ -128,7 +128,7 @@ unsigned TypeOf (const Type* T)
 {
     unsigned NewType;
 
-    switch (GetUnderlyingTypeCode (T)) {
+    switch (GetUnqualTypeCode (T)) {
 
         case T_SCHAR:
             return CF_CHAR;
@@ -187,7 +187,7 @@ unsigned TypeOf (const Type* T)
 unsigned FuncTypeOf (const Type* T)
 /* Get the code generator flag for calling the function */
 {
-    if (GetUnderlyingTypeCode (T) == T_FUNC) {
+    if (GetUnqualTypeCode (T) == T_FUNC) {
         return (T->A.F->Flags & FD_VARIADIC) ? 0 : CF_FIXARGC;
     } else {
         Error ("Illegal function type %04lX", T->C);
@@ -290,7 +290,7 @@ static unsigned typeadjust (ExprDesc* lhs, const ExprDesc* rhs, int NoPush)
 void LimitExprValue (ExprDesc* Expr, int WarnOverflow)
 /* Limit the constant value of the expression to the range of its type */
 {
-    switch (GetUnderlyingTypeCode (Expr->Type)) {
+    switch (GetUnqualTypeCode (Expr->Type)) {
         case T_INT:
         case T_SHORT:
             if (WarnOverflow && ((Expr->IVal < -0x8000) || (Expr->IVal > 0x7FFF))) {
@@ -1146,7 +1146,7 @@ static void FunctionCall (ExprDesc* Expr)
 
     /* The function result is an rvalue in the primary register */
     ED_FinalizeRValLoad (Expr);
-    ReturnType = GetFuncReturn (Expr->Type);
+    ReturnType = GetFuncReturnType (Expr->Type);
 
     /* Handle struct/union specially */
     if (IsClassStruct (ReturnType)) {
@@ -2568,7 +2568,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             }
 
             /* Determine the type of the operation. */
-            if (IsTypeChar (Expr->Type) && rconst && (!LeftSigned || RightSigned)) {
+            if (IsRankChar (Expr->Type) && rconst && (!LeftSigned || RightSigned)) {
 
                 /* Left side is unsigned char, right side is constant.
                 ** Determine the minimum and maximum values
@@ -2651,7 +2651,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                     flags |= CF_UNSIGNED;
                 }
 
-            } else if (IsTypeChar (Expr->Type) && IsTypeChar (Expr2.Type) &&
+            } else if (IsRankChar (Expr->Type) && IsRankChar (Expr2.Type) &&
                 GetSignedness (Expr->Type) == GetSignedness (Expr2.Type)) {
 
                 /* Both are chars with the same signedness. We can encode the
@@ -3090,9 +3090,10 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                 Expr->Type = Expr2.Type;
             } else if (!DoArrayRef && IsClassInt (lhst) && IsClassInt (rhst)) {
                 /* Integer addition */
-                flags = typeadjust (Expr, &Expr2, 0);
                 /* Load rhs into the primary */
                 LoadExpr (CF_NONE, &Expr2);
+                /* Adjust rhs primary if needed  */
+                flags = typeadjust (Expr, &Expr2, 0);
             } else {
                 /* OOPS */
                 AddDone = -1;

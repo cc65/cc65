@@ -81,8 +81,9 @@ INSTALL:
         sbc     #$00
         sta     pagecount
 
-@L1:    lda     #<EM_ERR_OK
-        ldx     #>EM_ERR_OK
+@L1:    lda     #EM_ERR_OK
+        .assert EM_ERR_OK = 0, error
+        tax
 ;       rts                             ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------

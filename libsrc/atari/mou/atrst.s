@@ -268,9 +268,10 @@ INSTALL:
         and     #$0f
         sta     old_porta_vbi
 
-; Done, return zero (= MOUSE_ERR_OK)
+; Done
 
-        ldx     #$00
+        ldx     #MOUSE_ERR_OK
+        .assert MOUSE_ERR_OK = 0, error
         txa
         rts
 

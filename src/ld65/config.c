@@ -1936,6 +1936,11 @@ unsigned CfgProcess (void)
                       GetString (M->Name));
         }
         M->Size = GetExprVal (M->SizeExpr);
+        if (M->Size >= 0x80000000) {
+            CfgError (GetSourcePos (M->LI),
+                      "Size of memory area '%s' is negative: %ld",
+                      GetString (M->Name), (long)M->Size);
+        }
 
         /* Walk through the segments in this memory area */
         for (J = 0; J < CollCount (&M->SegList); ++J) {
@@ -1944,6 +1949,10 @@ unsigned CfgProcess (void)
 
             /* Remember the start address before handling this segment */
             unsigned long StartAddr = Addr;
+
+            /* For computing FillLevel */
+            unsigned long FillLevel;
+            unsigned long FillAdded = 0;
 
             /* Take note of "overwrite" segments and make sure there are no
             ** other segment types following them in current memory region.
@@ -2034,14 +2043,14 @@ unsigned CfgProcess (void)
                             ++Overflows;
                             if (S->Flags & SF_OFFSET) {
                                 CfgWarning (GetSourcePos (S->LI),
-                                            "Segment '%s' offset is too small in '%s' by %lu byte%c",
+                                            "Segment '%s' offset is too small in '%s' by %lu byte%s",
                                             GetString (S->Name), GetString (M->Name),
-                                            Addr - NewAddr, (Addr - NewAddr == 1) ? ' ' : 's');
+                                            Addr - NewAddr, (Addr - NewAddr == 1) ? "" : "s");
                             } else {
                                 CfgWarning (GetSourcePos (S->LI),
-                                            "Segment '%s' start address is too low in '%s' by %lu byte%c",
+                                            "Segment '%s' start address is too low in '%s' by %lu byte%s",
                                             GetString (S->Name), GetString (M->Name),
-                                            Addr - NewAddr, (Addr - NewAddr == 1) ? ' ' : 's');
+                                            Addr - NewAddr, (Addr - NewAddr == 1) ? "" : "s");
                             }
                         } else {
                             Addr = NewAddr;
@@ -2081,14 +2090,19 @@ unsigned CfgProcess (void)
             /* Increment the fill level of the memory area; and, check for an
             ** overflow.
             */
-            M->FillLevel = Addr + S->Seg->Size - M->Start;
-            if (M->FillLevel > M->Size && (M->Flags & MF_OVERFLOW) == 0) {
+            FillLevel = Addr + S->Seg->Size - M->Start;
+            if (FillLevel > M->Size && (M->Flags & MF_OVERFLOW) == 0) {
                 ++Overflows;
                 M->Flags |= MF_OVERFLOW;
                 CfgWarning (GetSourcePos (M->LI),
-                            "Segment '%s' overflows memory area '%s' by %lu byte%c",
+                            "Segment '%s' overflows memory area '%s' by %lu byte%s",
                             GetString (S->Name), GetString (M->Name),
-                            M->FillLevel - M->Size, (M->FillLevel - M->Size == 1) ? ' ' : 's');
+                            FillLevel - M->Size, (FillLevel - M->Size == 1) ? "" : "s");
+            }
+            if (FillLevel > M->FillLevel) {
+                /* Regular segments increase FillLevel. Overwrite segments may increase but not decrease FillLevel. */
+                FillAdded = FillLevel - M->FillLevel;
+                M->FillLevel = FillLevel;
             }
 
             /* If requested, define symbols for the start and size of the
@@ -2107,13 +2121,14 @@ unsigned CfgProcess (void)
             Addr += S->Seg->Size;
 
             /* If this segment will go out to the file, or its place
-            ** in the file will be filled, then increase the file size,
-            ** unless it's an OVERWRITE segment.
+            ** in the file will be filled, then increase the file size.
+            ** An OVERWRITE segment will only increase the size if it overlapped some of the fill area.
             */
             if (S->Load == M &&
-                ((S->Flags & SF_BSS) == 0 || (M->Flags & MF_FILL) != 0) &&
-                    (S->Flags & SF_OVERWRITE) == 0) {
-                M->F->Size += Addr - StartAddr;
+                ((S->Flags & SF_BSS) == 0 || (M->Flags & MF_FILL) != 0)) {
+                M->F->Size += (!(S->Flags & SF_OVERWRITE)) ?
+                    (Addr - StartAddr) :
+                    FillAdded;
             }
         }
 

@@ -44,6 +44,11 @@ typedef unsigned size_t;
 #define _HAVE_size_t
 #endif
 
+/* NULL pointer */
+#ifndef NULL
+#define NULL ((void *) 0)
+#endif
+
 /* Standard exit codes */
 #define EXIT_SUCCESS    0
 #define EXIT_FAILURE    1
@@ -167,6 +172,3 @@ int __fastcall__ putenv (char* s);
 
 /* End of stdlib.h */
 #endif
-
-
-

@@ -140,7 +140,8 @@ INSTALL:
 
 ; Done, return zero.
 
-        ldx     #>MOUSE_ERR_OK
+        ldx     #MOUSE_ERR_OK
+        .assert MOUSE_ERR_OK = 0, error
         txa
         rts
 
@@ -315,8 +316,8 @@ POS:    ldy     #MOUSE_POS::XCOORD      ; Structure offset
 ; Must return an error code in .XA.
 ;
 
-IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL   ; We don't support ioctls, for now
-        ldx     #>MOUSE_ERR_INV_IOCTL
+IOCTL:  lda     #MOUSE_ERR_INV_IOCTL    ; We don't support ioctls, for now
+        ldx     #0 ; return value is char
         rts
 
 ;----------------------------------------------------------------------------

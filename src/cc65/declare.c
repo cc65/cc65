@@ -406,7 +406,7 @@ static void FixQualifiers (Type* DataType)
         if (IsTypeArray (T)) {
             /* Extract any type qualifiers */
             Q |= GetQualifier (T);
-            T->C = UnqualifiedType (T->C);
+            T->C = GetUnqualRawTypeCode (T);
         } else {
             /* Add extracted type qualifiers here */
             T->C |= Q;
@@ -646,7 +646,7 @@ static SymEntry* ParseEnumSpec (const char* Name, unsigned* DSFlags)
             /* Enumerate by adding one to the previous value */
             EnumVal = (long)(((unsigned long)EnumVal + 1UL) & 0xFFFFFFFFUL);
 
-            if (UnqualifiedType (MemberType->C) == T_ULONG && EnumVal == 0) {
+            if (GetUnqualRawTypeCode (MemberType) == T_ULONG && EnumVal == 0) {
                 /* Error since the new value cannot be represented in the
                 ** largest unsigned integer type supported by cc65 for enum.
                 */
@@ -688,7 +688,7 @@ static SymEntry* ParseEnumSpec (const char* Name, unsigned* DSFlags)
         if (PrevErrorCount == ErrorCount    &&
             IsIncremented                   &&
             (!IsSigned || EnumVal >= 0)     &&
-            NewType->C != UnqualifiedType (MemberType->C)) {
+            NewType->C != GetUnqualRawTypeCode (MemberType)) {
             /* The possible overflow here can only be when EnumVal > 0 */
             Warning ("Enumerator '%s' (value = %lu) implies type '%s'",
                      Ident,
@@ -959,7 +959,7 @@ static SymEntry* ParseUnionSpec (const char* Name, unsigned* DSFlags)
             }
 
             /* Check for incomplete types including 'void' */
-            if (IsClassIncomplete (Decl.Type)) {
+            if (IsIncompleteType (Decl.Type)) {
                 Error ("Field '%s' has incomplete type '%s'",
                        Decl.Ident,
                        GetFullTypeName (Decl.Type));
@@ -1159,7 +1159,7 @@ static SymEntry* ParseStructSpec (const char* Name, unsigned* DSFlags)
             }
 
             /* Check for incomplete types including 'void' */
-            if (IsClassIncomplete (Decl.Type)) {
+            if (IsIncompleteType (Decl.Type)) {
                 Error ("Field '%s' has incomplete type '%s'",
                        Decl.Ident,
                        GetFullTypeName (Decl.Type));
@@ -2036,7 +2036,7 @@ void ParseDecl (const DeclSpec* Spec, Declarator* D, declmode_t Mode)
     if (IsTypeFunc (D->Type) || IsTypeFuncPtr (D->Type)) {
 
         /* A function. Check the return type */
-        Type* RetType = GetFuncReturnModifiable (D->Type);
+        Type* RetType = GetFuncReturnTypeModifiable (D->Type);
 
         /* Functions may not return functions or arrays */
         if (IsTypeFunc (RetType)) {
@@ -2048,13 +2048,13 @@ void ParseDecl (const DeclSpec* Spec, Declarator* D, declmode_t Mode)
         /* The return type must not be qualified */
         if (GetQualifier (RetType) != T_QUAL_NONE && RetType[1].C == T_END) {
 
-            if (GetRawType (RetType) == T_TYPE_VOID) {
+            if (GetRawTypeRank (RetType) == T_RANK_VOID) {
                 /* A qualified void type is always an error */
                 Error ("function definition has qualified void return type");
             } else {
                 /* For others, qualifiers are ignored */
                 Warning ("type qualifiers ignored on function return type");
-                RetType[0].C = UnqualifiedType (RetType[0].C);
+                RetType[0].C = GetUnqualRawTypeCode (RetType);
             }
         }
 

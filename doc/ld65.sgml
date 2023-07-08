@@ -90,6 +90,7 @@ Long options:
   --start-group                 Start a library group
   --target sys                  Set the target system
   --version                     Print the linker version
+  --warnings-as-errors          Treat warnings as errors
 ---------------------------------------------------------------------------
 </verb></tscreen>
 
@@ -329,6 +330,13 @@ Here is a description of all of the command-line options:
   passed to the linker that has no path in its name is searched in the current
   directory, in the list of directories specified using <tt/--obj-path/, in
   directories given by environment variables, and in a built-in default directory.
+
+
+  <label id="option--warnings-as-errors">
+  <tag><tt>--warnings-as-errors</tt></tag>
+
+  An error will be generated if any warnings were produced.
+
 
 </descrip>
 

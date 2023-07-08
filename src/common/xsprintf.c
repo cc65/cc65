@@ -486,6 +486,18 @@ int xvsnprintf (char* Buf, size_t Size, const char* Format, va_list ap)
                 }
                 break;
 
+            /* support the MSVC specific I64 for long long */
+            case 'I':
+                F = *Format++;
+                if (F == '6') {
+                    F = *Format++;
+                    if (F == '4') {
+                        F = *Format++;
+                        P.LengthMod = lmLongLong;
+                    }
+                }
+                break;
+
             case 'l':
                 F = *Format++;
                 if (F == 'l') {

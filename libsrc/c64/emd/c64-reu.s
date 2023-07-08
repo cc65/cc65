@@ -127,8 +127,9 @@ size_found:
 pagecount_ok:
         stx     pagecount
         sty     pagecount+1
-        lda     #<EM_ERR_OK
-        ldx     #>EM_ERR_OK
+        lda     #EM_ERR_OK
+        .assert EM_ERR_OK = 0, error
+        tax
         rts
 
 ; common REU setup for size check
@@ -152,6 +153,7 @@ reu_size_check_common:
 
 nodevice:
         lda     #EM_ERR_NO_DEVICE
+        .assert EM_ERR_OK = 0, error
 ;       rts                             ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------

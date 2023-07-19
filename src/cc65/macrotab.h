@@ -55,10 +55,8 @@
 typedef struct Macro Macro;
 struct Macro {
     Macro*        Next;         /* Next macro with same hash value */
-    int           Expanding;    /* Are we currently expanding this macro? */
-    int           ArgCount;     /* Number of parameters, -1 = no parens */
-    unsigned      MaxArgs;      /* Size of formal argument list */
-    Collection    FormalArgs;   /* Formal argument list (char*) */
+    int           ParamCount;   /* Number of parameters, -1 = no parens */
+    Collection    Params;       /* Parameter list (char*) */
     StrBuf        Replacement;  /* Replacement text */
     unsigned char Variadic;     /* C99 variadic macro */
     char          Name[1];      /* Name, dynamically allocated */
@@ -82,6 +80,12 @@ void FreeMacro (Macro* M);
 ** table, use UndefineMacro for that.
 */
 
+Macro* CloneMacro (const Macro* M);
+/* Clone a macro definition. The function is not insert the macro into the
+** macro table, thus the cloned instance cannot be freed with UndefineMacro.
+** Use FreeMacro for that.
+*/
+
 void DefineNumericMacro (const char* Name, long Val);
 /* Define a macro for a numeric constant */
 
@@ -91,11 +95,15 @@ void DefineTextMacro (const char* Name, const char* Val);
 void InsertMacro (Macro* M);
 /* Insert the given macro into the macro table. */
 
-int UndefineMacro (const char* Name);
-/* Search for the macro with the given name and remove it from the macro
-** table if it exists. Return 1 if a macro was found and deleted, return
-** 0 otherwise.
+Macro* UndefineMacro (const char* Name);
+/* Search for the macro with the given name, if it exists, remove it from
+** the defined macro table and insert it to a list for pending deletion.
+** Return the macro if it was found and removed, return 0 otherwise.
+** To safely free the removed macro, use FreeUndefinedMacros().
 */
+
+void FreeUndefinedMacros (void);
+/* Free all undefined macros */
 
 Macro* FindMacro (const char* Name);
 /* Find a macro with the given name. Return the macro definition or NULL */
@@ -110,13 +118,13 @@ INLINE int IsMacro (const char* Name)
 #  define IsMacro(Name)         (FindMacro (Name) != 0)
 #endif
 
-int FindMacroArg (Macro* M, const char* Arg);
-/* Search for a formal macro argument. If found, return the index of the
-** argument. If the argument was not found, return -1.
+int FindMacroParam (const Macro* M, const char* Param);
+/* Search for a macro parameter. If found, return the index of the parameter.
+** If the parameter was not found, return -1.
 */
 
-void AddMacroArg (Macro* M, const char* Arg);
-/* Add a formal macro argument. */
+void AddMacroParam (Macro* M, const char* Param);
+/* Add a macro parameter. */
 
 int MacroCmp (const Macro* M1, const Macro* M2);
 /* Compare two macros and return zero if both are identical. */

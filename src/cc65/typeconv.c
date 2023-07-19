@@ -55,7 +55,7 @@
 
 
 
-static void DoConversion (ExprDesc* Expr, const Type* NewType)
+static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
 /* Emit code to convert the given expression to a new type. */
 {
     const Type* OldType;
@@ -128,6 +128,7 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
         ** internally already represented by a long.
         */
         if (NewBits <= OldBits) {
+            long OldVal = Expr->IVal;
 
             /* Cut the value to the new size */
             Expr->IVal &= (0xFFFFFFFFUL >> (32 - NewBits));
@@ -139,14 +140,18 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
                     Expr->IVal |= shl_l (~0UL, NewBits);
                 }
             }
+
+            if ((OldVal != Expr->IVal) && IS_Get (&WarnConstOverflow) && !Explicit) {
+                Warning ("Implicit conversion of constant overflows %d-bit destination", NewBits);
+            }
         }
 
         /* Do the integer constant <-> absolute address conversion if necessary */
         if (IsClassPtr (NewType)) {
-            Expr->Flags &= ~E_LOC_NONE;
+            Expr->Flags &= ~E_MASK_LOC;
             Expr->Flags |= E_LOC_ABS | E_ADDRESS_OF;
         } else if (IsClassInt (NewType)) {
-            Expr->Flags &= ~(E_LOC_ABS | E_ADDRESS_OF);
+            Expr->Flags &= ~(E_MASK_LOC | E_ADDRESS_OF);
             Expr->Flags |= E_LOC_NONE;
         }
 
@@ -238,10 +243,10 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
             **       void pointers, just with warnings.
             */
             if (Result.C == TC_PTR_SIGN_DIFF) {
-                /* Specific warning for pointee signedness difference */
+                /* Specific warning for pointer signedness difference */
                 if (IS_Get (&WarnPointerSign)) {
                     TypeCompatibilityDiagnostic (NewType, Expr->Type,
-                        0, "Pointer conversion to '%s' from '%s' changes pointee signedness");
+                        0, "Pointer conversion to '%s' from '%s' changes pointer signedness");
                 }
             } else if ((Result.C <= TC_PTR_INCOMPATIBLE ||
                  (Result.F & TCF_INCOMPATIBLE_QUAL) != 0)) {
@@ -283,7 +288,7 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
         /* Both types must be complete */
         if (!IsIncompleteESUType (NewType) && !IsIncompleteESUType (Expr->Type)) {
             /* Do the actual conversion */
-            DoConversion (Expr, NewType);
+            DoConversion (Expr, NewType, 0);
         } else {
             /* We should have already generated error elsewhere so that we
             ** could just silently fail here to avoid excess errors, but to
@@ -330,7 +335,7 @@ void TypeCast (ExprDesc* Expr)
                 ReplaceType (Expr, NewType);
             } else if (IsCastType (Expr->Type)) {
                 /* Convert the value. The result has always the new type */
-                DoConversion (Expr, NewType);
+                DoConversion (Expr, NewType, 1);
             } else {
                 TypeCompatibilityDiagnostic (NewType, Expr->Type, 1,
                     "Cast to incompatible type '%s' from '%s'");
@@ -430,7 +435,7 @@ void TypeComposition (Type* lhs, const Type* rhs)
         }
 
         /* Check for sanity */
-        CHECK (GetUnderlyingTypeCode (lhs) == GetUnderlyingTypeCode (rhs));
+        CHECK (GetUnqualTypeCode (lhs) == GetUnqualTypeCode (rhs));
 
         /* Check for special type elements */
         if (IsTypeFunc (lhs)) {

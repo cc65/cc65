@@ -2,6 +2,12 @@ ifneq ($(shell echo),)
   CMD_EXE = 1
 endif
 
+ifneq ($(V),1)
+  Q=@
+else
+  Q=
+endif
+
 PROGS = ar65     \
         ca65     \
         cc65     \
@@ -20,7 +26,7 @@ PROGS = ar65     \
 .SUFFIXES:
 
 bindir  := $(PREFIX)/bin
-datadir := $(if $(PREFIX),$(PREFIX)/share/cc65,$(abspath ..))
+datadir := $(PREFIX)/share/cc65
 
 CA65_INC = $(datadir)/asminc
 CC65_INC = $(datadir)/include
@@ -62,9 +68,9 @@ $(info BUILD_ID: $(BUILD_ID))
 
 CFLAGS += -MMD -MP -O3 -I common \
           -Wall -Wextra -Wno-char-subscripts $(USER_CFLAGS) \
-          -DCA65_INC="$(CA65_INC)" -DCC65_INC="$(CC65_INC)" -DCL65_TGT="$(CL65_TGT)" \
-          -DLD65_LIB="$(LD65_LIB)" -DLD65_OBJ="$(LD65_OBJ)" -DLD65_CFG="$(LD65_CFG)" \
-          -DBUILD_ID="$(BUILD_ID)"
+          -DCA65_INC="\"$(CA65_INC)\"" -DCC65_INC="\"$(CC65_INC)\"" -DCL65_TGT="\"$(CL65_TGT)\"" \
+          -DLD65_LIB="\"$(LD65_LIB)\"" -DLD65_OBJ="\"$(LD65_OBJ)\"" -DLD65_CFG="\"$(LD65_CFG)\"" \
+          -DBUILD_ID="\"$(BUILD_ID)\""
 
 LDLIBS += -lm
 
@@ -105,12 +111,15 @@ $(RM) /usr/local/bin/$(prog)
 endef # UNAVAIL_recipe
 
 install:
-	$(if $(PREFIX),,$(error variable "PREFIX" must be set))
 	$(INSTALL) -d $(DESTDIR)$(bindir)
 	$(INSTALL) ../bin/* $(DESTDIR)$(bindir)
 
 avail:
+ifneq ($(patsubst %,../bin/%,$(PROGS)),$(wildcard $(patsubst %,../bin/%,$(PROGS))))
+	$(error executables are missing, please run make first)
+else
 	$(foreach prog,$(PROGS),$(AVAIL_recipe))
+endif
 
 unavail:
 	$(foreach prog,$(PROGS),$(UNAVAIL_recipe))
@@ -119,6 +128,7 @@ endif # CMD_EXE
 
 zip:
 	@cd .. && zip cc65 bin/*
+	@echo 'https://github.com/cc65/cc65/commits/'$(word 2,$(BUILD_ID))|zip -zq ../cc65
 
 define OBJS_template
 
@@ -146,7 +156,7 @@ endef # PROG_template
 
 ../wrk/%.o: %.c
 	@echo $<
-	@$(CC) -c $(CFLAGS) -o $@ $<
+	$(Q)$(CC) -c $(CFLAGS) -o $@ $<
 
 ../bin:
 	@$(call MKDIR,$@)

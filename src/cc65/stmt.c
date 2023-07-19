@@ -609,17 +609,23 @@ static void Statement (int* PendingToken)
     Expr.Flags |= E_NEED_NONE;
     Expression0 (&Expr);
 
-    /* If the statement didn't generate code, and is not of type
-    ** void, emit a warning.
+    /* If the statement has no observable effect and isn't cast to type
+    ** void, emit a warning and remove useless code if any.
     */
     GetCodePos (&End);
-    if (!ED_YetToLoad (&Expr)           &&
-        !ED_MayHaveNoEffect (&Expr)     &&
-        CodeRangeIsEmpty (&Start, &End) &&
-        IS_Get (&WarnNoEffect)          &&
-        PrevErrorCount == ErrorCount) {
-        Warning ("Expression result unused");
+    if (CodeRangeIsEmpty (&Start, &End) ||
+        (Expr.Flags & E_SIDE_EFFECTS) == 0) {
+
+        if (!ED_MayHaveNoEffect (&Expr) &&
+            IS_Get (&WarnNoEffect)      &&
+            PrevErrorCount == ErrorCount) {
+            Warning ("Statement has no effect");
+        }
+
+        /* Remove code with no effect */
+        RemoveCode (&Start);
     }
+
     CheckSemi (PendingToken);
 }
 

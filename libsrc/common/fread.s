@@ -59,7 +59,7 @@
 ; File not open or in error state
 
 @L1:    lda     #EINVAL
-        jsr     __seterrno              ; Set __errno, return zero in A
+        jsr     ___seterrno              ; Set __errno, return zero in A
         tax                             ; a/x = 0
         jmp     @L99                    ; Bail out
 
@@ -161,7 +161,7 @@
         bne     @L8
 
 ; Error in read. Set the stream error flag and bail out. errno has already
-; been set by read(). On entry to label @L7, X must be zero. 
+; been set by read(). On entry to label @L7, X must be zero.
 
         inx                             ; X = 0
         lda     #_FERROR

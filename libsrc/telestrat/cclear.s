@@ -6,9 +6,9 @@
 ;
 
         .export         _cclearxy, _cclear
-        .import         update_adscr, display_conio 
+        .import         update_adscr, display_conio
 
-        .importzp       tmp1 
+        .importzp       tmp1
         .import         popax
         .include        "telestrat.inc"
 

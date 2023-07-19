@@ -57,7 +57,9 @@
 ;----------------------------------------------------------------------------
 ; I/O definitions
 
-ACIA            = $C088
+Offset          = $8F           ; Move 6502 false read out of I/O to page $BF
+
+ACIA            = $C088-Offset
 ACIA_DATA       = ACIA+0        ; Data register
 ACIA_STATUS     = ACIA+1        ; Status register
 ACIA_CMD        = ACIA+2        ; Command register
@@ -166,8 +168,9 @@ SER_CLOSE:
         sta     ACIA_CMD,x
 
         ; Done, return an error code
-:       lda     #<SER_ERR_OK
-        tax                     ; A is zero
+:       lda     #SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
+        tax
         stx     Index           ; Mark port as closed
         rts
 
@@ -197,6 +200,7 @@ SER_OPEN:
         asl
         asl
         asl
+        adc     #Offset                 ; Assume carry to be clear
         tax
 
         ; Check if the handshake setting is valid
@@ -253,23 +257,24 @@ SER_OPEN:
 
         ; Done
         stx     Index                   ; Mark port as open
-        lda     #<SER_ERR_OK
-        tax                             ; A is zero
+        lda     #SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
+        tax
         rts
 
         ; Device (hardware) not found
-NoDevice:lda    #<SER_ERR_NO_DEVICE
-        ldx     #>SER_ERR_NO_DEVICE
+NoDevice:lda    #SER_ERR_NO_DEVICE
+        ldx     #0 ; return value is char
         rts
 
         ; Invalid parameter
-InvParam:lda    #<SER_ERR_INIT_FAILED
-        ldx     #>SER_ERR_INIT_FAILED
+InvParam:lda    #SER_ERR_INIT_FAILED
+        ldx     #0 ; return value is char
         rts
 
         ; Baud rate not available
-InvBaud:lda     #<SER_ERR_BAUD_UNAVAIL
-        ldx     #>SER_ERR_BAUD_UNAVAIL
+InvBaud:lda     #SER_ERR_BAUD_UNAVAIL
+        ldx     #0 ; return value is char
         rts
 
 ;----------------------------------------------------------------------------
@@ -289,8 +294,8 @@ SER_GET:
 :       lda     RecvFreeCnt     ; (25)
         cmp     #$FF
         bne     :+
-        lda     #<SER_ERR_NO_DATA
-        ldx     #>SER_ERR_NO_DATA
+        lda     #SER_ERR_NO_DATA
+        ldx     #0 ; return value is char
         rts
 
         ; Check for flow stopped & enough free: release flow control
@@ -333,8 +338,8 @@ SER_PUT:
         ; Put byte into send buffer & send
 :       ldy     SendFreeCnt
         bne     :+
-        lda     #<SER_ERR_OVERFLOW
-        ldx     #>SER_ERR_OVERFLOW
+        lda     #SER_ERR_OVERFLOW
+        ldx     #0 ; return value is char
         rts
 
 :       ldy     SendTail
@@ -343,7 +348,8 @@ SER_PUT:
         dec     SendFreeCnt
         lda     #$FF            ; TryHard = true
         jsr     TryToSend
-        lda     #<SER_ERR_OK
+        lda     #SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
         tax
         rts
 
@@ -356,7 +362,8 @@ SER_STATUS:
         lda     ACIA_STATUS,x
         ldx     #$00
         sta     (ptr1,x)
-        txa                     ; SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
+        txa
         rts
 
 ;----------------------------------------------------------------------------
@@ -376,11 +383,12 @@ SER_IOCTL:
         bcs     :+
 
         stx     Slot
-        tax                     ; SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
+        tax
         rts
 
-:       lda     #<SER_ERR_INV_IOCTL
-        ldx     #>SER_ERR_INV_IOCTL
+:       lda     #SER_ERR_INV_IOCTL
+        ldx     #0 ; return value is char
         rts
 
 ;----------------------------------------------------------------------------

@@ -133,7 +133,7 @@ void SwitchStatement (void)
 
     /* Setup the control structure, save the old and activate the new one */
     SwitchData.Nodes        = NewCollection ();
-    SwitchData.ExprType     = GetUnderlyingTypeCode (&SwitchExpr.Type[0]);
+    SwitchData.ExprType     = GetUnqualTypeCode (&SwitchExpr.Type[0]);
     SwitchData.Depth        = SizeOf (SwitchExpr.Type);
     SwitchData.DefaultLabel = 0;
     OldSwitch = Switch;
@@ -206,7 +206,7 @@ void SwitchStatement (void)
 
 
 void CaseLabel (void)
-/* Handle a case sabel */
+/* Handle a case label */
 {
     ExprDesc CaseExpr;          /* Case label expression */
     long     Val;               /* Case label value */

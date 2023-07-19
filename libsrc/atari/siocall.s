@@ -17,7 +17,7 @@
         .export         __sio_call
         .include        "atari.inc"
         .import         popa,popax,popptr1
-        .import         sectsizetab,__oserror
+        .import         sectsizetab,___oserror
         .importzp       ptr1
 
 .proc   __sio_call
@@ -76,7 +76,7 @@ _cont:  lda     #DISKID         ; SIO bus ID of diskette drive
         bmi     _req_err        ; error occurred
         txa                     ; no error occurred
 _req_err:
-        sta     __oserror
+        sta     ___oserror
         rts
 
 _inv_hand:

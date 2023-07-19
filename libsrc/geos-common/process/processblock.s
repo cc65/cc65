@@ -12,11 +12,11 @@
             .export _UnblockProcess
 
             .include "jumptab.inc"
-            
+
 _BlockProcess:
         tax
         jmp BlockProcess
-            
+
 _UnblockProcess:
         tax
         jmp UnblockProcess

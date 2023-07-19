@@ -36,7 +36,9 @@
 #ifndef MEMORY_H
 #define MEMORY_H
 
+#include "inline.h"
 
+extern unsigned char Mem[0x10000];
 
 /*****************************************************************************/
 /*                                   Code                                    */
@@ -50,8 +52,15 @@ void MemWriteByte (unsigned Addr, unsigned char Val);
 void MemWriteWord (unsigned Addr, unsigned Val);
 /* Write a word to a memory location */
 
-unsigned char MemReadByte (unsigned Addr);
+#if defined(HAVE_INLINE)
+INLINE unsigned char MemReadByte (unsigned Addr)
 /* Read a byte from a memory location */
+{
+    return Mem[Addr];
+}
+#else
+#define MemReadByte(Addr) Mem[Addr]
+#endif
 
 unsigned MemReadWord (unsigned Addr);
 /* Read a word from a memory location */

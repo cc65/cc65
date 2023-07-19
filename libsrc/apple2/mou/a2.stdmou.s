@@ -133,8 +133,8 @@ next:   inc     ptr1+1
         bcc     :+
 
         ; Mouse firmware not found
-        lda     #<MOUSE_ERR_NO_DEVICE
-        ldx     #>MOUSE_ERR_NO_DEVICE
+        lda     #MOUSE_ERR_NO_DEVICE
+        ldx     #0 ; return value is char
         rts
 
         ; Check Pascal 1.1 Firmware Protocol ID bytes
@@ -152,7 +152,7 @@ next:   inc     ptr1+1
         sta     xparam+1
         sta     jump+2
 
-        ; Disable interrupts now because setting the slot number makes 
+        ; Disable interrupts now because setting the slot number makes
         ; the IRQ handler (maybe called due to some non-mouse IRQ) try
         ; calling the firmware which isn't correctly set up yet
         sei
@@ -167,7 +167,7 @@ next:   inc     ptr1+1
         asl
         asl
         sta     yparam+1
-        
+
         ; The AppleMouse II Card needs the ROM switched in
         ; to be able to detect an Apple //e and use RDVBL
         bit     $C082
@@ -175,7 +175,7 @@ next:   inc     ptr1+1
         ; Reset mouse hardware
         ldx     #INITMOUSE
         jsr     firmware
-        
+
         ; Switch in LC bank 2 for R/O
         bit     $C080
 
@@ -236,12 +236,12 @@ UNINSTALL:
 SETBOX:
         sta     ptr1
         stx     ptr1+1
-        
+
         ; Set x clamps
         ldx     #$00
         ldy     #MOUSE_BOX::MINX
         jsr     :+
-        
+
         ; Set y clamps
         ldx     #$01
         ldy     #MOUSE_BOX::MINY
@@ -257,7 +257,7 @@ SETBOX:
         sta     pos1_lo
         iny
         lda     (ptr1),y
-        sta     box,y   
+        sta     box,y
         sta     pos1_hi
 
         ; Skip one word
@@ -267,11 +267,11 @@ SETBOX:
         ; Set high clamp
         iny
         lda     (ptr1),y
-        sta     box,y   
+        sta     box,y
         sta     pos2_lo
         iny
         lda     (ptr1),y
-        sta     box,y   
+        sta     box,y
         sta     pos2_hi
 
         txa

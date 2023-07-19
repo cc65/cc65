@@ -37,12 +37,20 @@
 #define _STDIO_H
 
 
+/* NULL pointer */
+#ifndef NULL
+#define NULL ((void *) 0)
+#endif
 
-#include <stddef.h>
-#include <stdarg.h>
-#include <limits.h>
+/* size_t is needed */
+#ifndef _HAVE_size_t
+#define _HAVE_size_t
+typedef unsigned size_t;
+#endif
 
-
+/* stdio.h should not define va_list, so we use an equivalent type in the
+   compiler namespace instead */
+typedef unsigned char* __va_list;
 
 /* Types */
 typedef struct _FILE FILE;
@@ -65,9 +73,24 @@ extern FILE* stderr;
 #define SEEK_SET        2
 #define TMP_MAX         256
 
-#define FILENAME_MAX    PATH_MAX
-#define L_tmpnam        FILENAME_MAX
+/* These defines that are platform dependent */
+/* FILENAME_MAX is defined as the same value as PATH_MAX in limits.h, but we
+   are not allowed to include limits.h here */
+#if defined(__APPLE2__)
+#  define FILENAME_MAX      (64+1)
+#elif defined(__ATARI__)
+#  define FILENAME_MAX      (63+1)
+#elif defined(__CBM__)
+#  define FILENAME_MAX      (255)  /* should be 256+1, see libsrc/common/_cmd.s why it's not */
+#elif defined(__LUNIX__)
+#  define FILENAME_MAX      (80+1)
+#elif defined(__TELESTRAT__)
+#  define FILENAME_MAX      (50+1)
+#else
+#  define FILENAME_MAX      (16+1)
+#endif
 
+#define L_tmpnam        FILENAME_MAX
 
 
 /*****************************************************************************/
@@ -107,23 +130,27 @@ int __fastcall__ rename (const char* oldname, const char* newname);
 int snprintf (char* buf, size_t size, const char* format, ...);
 int sprintf (char* buf, const char* format, ...);
 int __fastcall__ ungetc (int c, FILE* f);
-int __fastcall__ vfprintf (FILE* f, const char* format, va_list ap);
-int __fastcall__ vprintf (const char* format, va_list ap);
-int __fastcall__ vsnprintf (char* buf, size_t size, const char* format, va_list ap);
-int __fastcall__ vsprintf (char* buf, const char* format, va_list ap);
+int __fastcall__ vfprintf (FILE* f, const char* format, __va_list ap);
+int __fastcall__ vprintf (const char* format, __va_list ap);
+int __fastcall__ vsnprintf (char* buf, size_t size, const char* format, __va_list ap);
+int __fastcall__ vsprintf (char* buf, const char* format, __va_list ap);
 
 int scanf (const char* format, ...);
 int fscanf (FILE* f, const char* format, ...);
 int sscanf (const char* s, const char* format, ...);
-int __fastcall__ vscanf (const char* format, va_list ap);
-int __fastcall__ vsscanf (const char* s, const char* format, va_list ap);
-int __fastcall__ vfscanf (FILE* f, const char* format, va_list ap);
+int __fastcall__ vscanf (const char* format, __va_list ap);
+int __fastcall__ vsscanf (const char* s, const char* format, __va_list ap);
+int __fastcall__ vfscanf (FILE* f, const char* format, __va_list ap);
 
 #if __CC65_STD__ == __CC65_STD_CC65__
 FILE* __fastcall__ fdopen (int fd, const char* mode);   /* Unix */
 int __fastcall__ fileno (FILE* f);                      /* Unix */
 #endif
-void __fastcall__ _poserror (const char* msg);          /* cc65 */
+void __fastcall__ __poserror (const char* msg);          /* cc65 */
+#if __CC65_STD__ == __CC65_STD_CC65__
+/* define old name with one underscore for backwards compatibility */
+#define _poserror __poserror
+#endif
 
 /* Masking macros for some functions */
 #define getc(f)         fgetc (f)               /* ANSI */

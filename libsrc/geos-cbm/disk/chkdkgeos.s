@@ -10,7 +10,7 @@
 
             .include "jumptab.inc"
             .include "geossym.inc"
-        
+
 _ChkDkGEOS:
         jsr ChkDkGEOS
         jsr setoserror

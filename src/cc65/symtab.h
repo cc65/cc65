@@ -65,12 +65,22 @@ struct SymTable {
 /* An empty symbol table */
 extern SymTable         EmptySymTab;
 
-/* Forwards */
-struct FuncDesc;
+/* Lexical level linked list node type */
+typedef struct LexicalLevel LexicalLevel;
+struct LexicalLevel {
+    LexicalLevel*       PrevLex;
+    unsigned            CurrentLevel;
+};
 
 /* Predefined lexical levels */
+#define LEX_LEVEL_NONE          0U
 #define LEX_LEVEL_GLOBAL        1U
 #define LEX_LEVEL_FUNCTION      2U
+#define LEX_LEVEL_BLOCK         3U
+#define LEX_LEVEL_STRUCT        4U
+
+/* Forwards */
+struct FuncDesc;
 
 
 
@@ -80,8 +90,17 @@ struct FuncDesc;
 
 
 
+unsigned GetLexicalLevelDepth (void);
+/* Return the current lexical level depth */
+
 unsigned GetLexicalLevel (void);
 /* Return the current lexical level */
+
+void PushLexicalLevel (unsigned NewLevel);
+/* Enter the specified lexical level */
+
+void PopLexicalLevel (void);
+/* Exit the current lexical level */
 
 void EnterGlobalLevel (void);
 /* Enter the program global lexical level */
@@ -150,10 +169,10 @@ unsigned short FindSPAdjustment (const char* Name);
 
 
 SymEntry* AddEnumSym (const char* Name, unsigned Flags, const Type* Type, SymTable* Tab, unsigned* DSFlags);
-/* Add an enum entry and return it */
+/* Add an enum tag entry and return it */
 
 SymEntry* AddStructSym (const char* Name, unsigned Flags, unsigned Size, SymTable* Tab, unsigned* DSFlags);
-/* Add a struct/union entry and return it */
+/* Add a struct/union tag entry and return it */
 
 SymEntry* AddBitField (const char* Name, const Type* Type, unsigned Offs,
                        unsigned BitOffs, unsigned BitWidth, int SignednessSpecified);

@@ -126,6 +126,7 @@ function.
 <!-- <item><ref id="_scroll" name="_scroll"> -->
 <!-- <item><ref id="_setcolor" name="_setcolor"> -->
 <!-- <item><ref id="_setcolor_low" name="_setcolor_low"> -->
+<item><ref id="_sound" name="_sound">
 <item><ref id="get_ostype" name="get_ostype">
 <!-- <item><ref id="get_tv" name="get_tv"> -->
 </itemize>
@@ -754,6 +755,16 @@ communication, see also <tt>testcode/lib/ser-test.c</tt>.
 </itemize>
 
 
+<sect1><tt/sym1.h/<label id="sym1.h"><p>
+
+<itemize>
+<item><ref id="beep" name="beep">
+<item><ref id="fdisp" name="fdisp">
+<item><ref id="loadt" name="loadt">
+<item><ref id="dumpt" name="dumpt">
+</itemize>
+
+
 <sect1><tt/telestrat.h/<label id="telestrat.h"><p>
 
 <itemize>
@@ -965,7 +976,7 @@ previously been allocated by <tt/<ref id="malloc" name="malloc">/, <tt/<ref
 id="calloc" name="calloc">/ or <tt/<ref id="realloc" name="realloc">/.
 <tag/Notes/<itemize>
 <item>Passing a pointer to a block that was is not the result of one of the
-allocation functions, or that has been free'd will give unpredicable results.
+allocation functions, or that has been free'd will give unpredictable results.
 <item>The function is available only as a fastcall function; so, it may be used
 only in the presence of a prototype.
 </itemize>
@@ -1098,6 +1109,46 @@ considered random to a certain degree.
 </descrip>
 </quote>
 
+<sect1>_sound<label id="_sound"><p>
+<quote>
+<descrip>
+<tag/Function/Use the speaker to produce sound in a specified voice. (Atari only)
+<tag/Header/<tt/<ref id="atari.h" name="atari.h">/
+<tag/Declaration/<tt/void __fastcall__ _sound (unsigned char voice, unsigned char pitch, unsigned char distortion, unsigned char volume);/
+<tag/Description/The function produces a sound with the specified parameters using any of the 4 available oscillators (voices) controlled by the POKEY chip. Sound is non cpu-blocking and it keeps oscillating until program sends 0 in all the other parameters.
+
+<tag/Notes/<itemize>
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
+<item>The function is specific to the Atari 8 bit.
+<item> Voice can be any of 0-3 different sound channels.
+<item> Pitch goes from 0-255 (about 125 Hz to 32 Khz).
+<item> Distortion (0-14) uses poly dividers to reshape wave in order to create a noise effect. Use 10 for a "pure" square-wave sound.
+<item>Volume (0-15) is the intensity for the wave.
+<item>Extra bits in those parameters will be ignored.
+<item>Parameters are the same as for the AtariBASIC SOUND statement.
+</itemize>
+<tag/Availability/cc65 (<tt/atari/ and <tt/atarixl/ platforms)
+<tag/Example/
+<verb>
+
+#include <stdio.h>
+int main(void)
+{
+    int i=0;
+    unsigned char j;
+    printf("playing sound \n");
+    for (j=0; j<144; j++) {
+      _sound(1,144-j,10,8);     //change the pitch for voice 1
+      for (i=0; i<50; i++);     //pause for sound duration
+    }
+    _sound(1,0,0,0);  //use zero in other parameters to stop the sound
+    return 0;
+}
+
+</verb>
+</descrip>
+</quote>
 
 <sect1>_stroserror<label id="_stroserror"><p>
 
@@ -1664,6 +1715,27 @@ used in presence of a prototype.
 <ref id="ltoa" name="ltoa">,
 <ref id="ultoa" name="ultoa">,
 <ref id="utoa" name="utoa">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>beep<label id="beep"><p>
+
+<quote>
+<descrip>
+<tag/Function/Beep sound.
+<tag/Header/<tt/<ref id="sym1.h" name="sym1.h">/
+<tag/Declaration/<tt/void beep(void);/
+<tag/Description/<tt/beep/ makes a brief tone.
+<tag/Notes/<itemize>
+<item>The function is specific to the Sym-1.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="fdisp" name="fdisp">,
+<ref id="loadt" name="loadt">,
+<ref id="dumpt" name="dumpt">,
 <tag/Example/None.
 </descrip>
 </quote>
@@ -3363,6 +3435,30 @@ int main(void)
 </quote>
 
 
+<sect1>dumpt<label id="dumpt"><p>
+
+<quote>
+<descrip>
+<tag/Function/Dump memory to tape.
+<tag/Header/<tt/<ref id="sym1.h" name="sym1.h">/
+<tag/Declaration/<tt/int __fastcall__ dumpt (unsigned char id, const void* start, const void* end);/
+<tag/Description/<tt/dumpt/ saves memory onto data tape.
+<tag/Notes/<itemize>
+<item>The function is specific to the Sym-1.
+<item>The return value is status.  Non-zero status indicates an error.
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="beep" name="beep">,
+<ref id="fdisp" name="fdisp">,
+<ref id="loadt" name="loadt">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>em_commit<label id="em_commit"><p>
 
 <quote>
@@ -3513,7 +3609,7 @@ extended memory that should be supported. There is no autodetect capability.
 <tag/Declaration/<tt/void* __fastcall__ em_map (unsigned page);/
 <tag/Description/The function maps one page of extended memory into linear
 memory and returns a pointer to the page frame. Depending on the hardware
-and driver, the data is either mapped into the address space or transfered
+and driver, the data is either mapped into the address space or transferred
 into a buffer. If you don't need the actual contents of the page (for example
 because you're going to overwrite it completely), it is better to call
 <tt/<ref id="em_use" name="em_use">/ instead. <tt/em_use/ will not transfer the
@@ -3721,6 +3817,28 @@ switching the CPU into double clock mode.
 </quote>
 
 
+<sect1>fdisp<label id="fdisp"><p>
+
+<quote>
+<descrip>
+<tag/Function/Flash front-panel display.
+<tag/Header/<tt/<ref id="sym1.h" name="sym1.h">/
+<tag/Declaration/<tt/void fdisp(void);/
+<tag/Description/<tt/fdisp/ flashes front-panel display.
+<tag/Notes/<itemize>
+<item>The function is specific to the Sym-1.
+<item>The front-panel display buffer must be loaded prior to calling fdisp.  See the DISPLAY struct definition in sym1.h.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="beep" name="beep">,
+<ref id="loadt" name="loadt">,
+<ref id="dumpt" name="dumpt">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>feof<label id="feof"><p>
 
 <quote>
@@ -3728,7 +3846,7 @@ switching the CPU into double clock mode.
 <tag/Function/Return the end-of-file indicator of a stream.
 <tag/Header/<tt/<ref id="stdio.h" name="stdio.h">/
 <tag/Declaration/<tt/int __fastcall__ feof (FILE* f);/
-<tag/Description/<tt/feof/ tests the end-of-file indicator ofthe stream
+<tag/Description/<tt/feof/ tests the end-of-file indicator of the stream
 <tt/f/, and returns a non zero value if it is set.
 <tag/Notes/<itemize>
 <item>The indicator is set only after a read past the end of a file is
@@ -4071,7 +4189,7 @@ be used in presence of a prototype.
 <tag/Example/<verb>
 chdir (getdevicedir (device, buf, sizeof buf));
 </verb>
-cf. <tt/samples/enumdevdir.c/
+cf. <tt/samples&sol;enumdevdir.c/
 </descrip>
 </quote>
 
@@ -4172,7 +4290,7 @@ const char* optstring);/
 is a string that contains command line option characters. If a character in
 <tt/optstring/ is followed by a colon, the option requires an argument. An
 option on the command line is recognized if it is one of the option characters
-preceeded by a '-'.
+preceded by a '-'.
 <tt/getopt/ must be called repeatedly. It will return each option character
 found on the command line and <tt/EOF/ (-1) if there is no other option. An
 option argument is placed in <tt/optarg/, the index of the next element on the
@@ -4961,6 +5079,30 @@ used in presence of a prototype.
 </quote>
 
 
+<sect1>loadt<label id="loadt"><p>
+
+<quote>
+<descrip>
+<tag/Function/Load memory from tape.
+<tag/Header/<tt/<ref id="sym1.h" name="sym1.h">/
+<tag/Declaration/<tt/int __fastcall__ loadt (unsigned char id);/
+<tag/Description/<tt/loadt/ loads memory from data tape.
+<tag/Notes/<itemize>
+<item>The function is specific to the Sym-1.
+<item>The return value is status.  Non-zero status indicates an error.
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="beep" name="beep">,
+<ref id="fdisp" name="fdisp">,
+<ref id="dumpt" name="dumpt">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>ltoa<label id="ltoa"><p>
 
 <quote>
@@ -5020,7 +5162,7 @@ always be the same.
 <tag/Header/<tt/<ref id="setjmp.h" name="setjmp.h">/
 <tag/Declaration/<tt/void __fastcall__ longjmp (jmp_buf buf, int retval);/
 <tag/Description/The <tt/longjmp/ function restores a program context from the
-data in <tt/buf/, which must have been set by a preceeding call to
+data in <tt/buf/, which must have been set by a preceding call to
 <tt/<ref id="setjmp" name="setjmp">/. Program execution continues as if the
 call to <tt/<ref id="setjmp" name="setjmp">/ has just returned the value
 <tt/retval/.
@@ -5664,7 +5806,7 @@ cc65 allows to pass this argument, it is ignored.
 <tag/Function/Open a directory.
 <tag/Header/<tt/<ref id="dirent.h" name="dirent.h">/
 <tag/Declaration/<tt/DIR* __fastcall__ opendir (const char* name);/
-<tag/Description/<tt/opendir/ opens a directory and returns the direcory
+<tag/Description/<tt/opendir/ opens a directory and returns the directory
 descriptor associated with it. On error, NULL is returned and an error code is
 stored in <tt/errno/.
 <tag/Notes/<itemize>
@@ -6026,7 +6168,7 @@ pointer you're passing somewhere else, otherwise
 <tscreen><verb>
         ptr = realloc (ptr, size);
 </verb></tscreen>
-will loose your only copy of <tt/ptr/ if <tt/realloc/ returns <tt/NULL/.
+will lose your only copy of <tt/ptr/ if <tt/realloc/ returns <tt/NULL/.
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
@@ -6807,7 +6949,6 @@ switching the CPU into single clock mode.
 </descrip>
 </quote>
 
-
 <sect1>srand<label id="srand"><p>
 
 <quote>
@@ -6863,7 +7004,7 @@ be used in presence of a prototype.
 
 <quote>
 <descrip>
-<tag/Function/Concatentate two strings.
+<tag/Function/Concatenate two strings.
 <tag/Header/<tt/<ref id="string.h" name="string.h">/
 <tag/Declaration/<tt/char* __fastcall__ strcat (char* s1, const char* s2);/
 <tag/Description/The <tt/strcat/ function appends a copy of the string
@@ -7189,7 +7330,7 @@ be used in presence of a prototype.
 
 <quote>
 <descrip>
-<tag/Function/Concatentate two strings.
+<tag/Function/Concatenate two strings.
 <tag/Header/<tt/<ref id="string.h" name="string.h">/
 <tag/Declaration/<tt/char* __fastcall__ strncat (char* s1, const char* s2, size_t n);/
 <tag/Description/The <tt/strncat/ function appends not more than n characters
@@ -7314,7 +7455,7 @@ be used in presence of a prototype.
 <tag/Header/<tt/<ref id="string.h" name="string.h">/
 <tag/Declaration/<tt/char* __fastcall__ strpbrk (const char* str, const char* set);/
 <tag/Description/<tt/strpbrk()/ searches within <tt/str/ for the first
-occurance of any character from <tt/set/.  It returns a pointer to that
+occurrence of any character from <tt/set/.  It returns a pointer to that
 character if found; otherwise, it returns <tt/NULL/.
 <tag/Notes/<itemize>
 <item>The function is available only as a fastcall function;
@@ -7418,7 +7559,7 @@ be used in presence of a prototype.
 <tag/Function/Find a substring.
 <tag/Header/<tt/<ref id="string.h" name="string.h">/
 <tag/Declaration/<tt/char* __fastcall__ strstr (const char* str, const char* substr);/
-<tag/Description/<tt/strstr/ searches for the first occurance of the string
+<tag/Description/<tt/strstr/ searches for the first occurrence of the string
 <tt/substr/ within <tt/str/. If found, it returns a pointer to the copy,
 otherwise it returns <tt/NULL/.
 <tag/Notes/<itemize>
@@ -7485,7 +7626,7 @@ the behaviour is undefined.
 <item>If <tt/n/ is zero, <tt/s1/ may be a NULL pointer.
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
-<item>Since cc65 doesn't support different charcter sets, <tt/strxfrm/ will
+<item>Since cc65 doesn't support different character sets, <tt/strxfrm/ will
 just copy s2 to s1 using <tt><ref id="strncpy" name="strncpy"></tt>.
 </itemize>
 <tag/Availability/ISO 9899

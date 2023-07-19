@@ -73,7 +73,7 @@ INSTALL:
         lda     #$ff
         sta     curpage
         sta     curpage+1
-        
+
         ; do test for VDC presence here???
         ldx     #VDC_CSET       ; determine size of RAM...
         jsr     vdcgetreg
@@ -97,32 +97,33 @@ INSTALL:
         jsr     vdcputbyte      ; restore original value of test byte
 
         ldx     #0              ; prepare x with hi of default pagecount
-        
+
         lda     ptr1            ; do bytes match?
         cmp     ptr1+1
         bne     @have64k
         lda     ptr2
         cmp     ptr2+1
         bne     @have64k
-   
+
         lda     #64             ; assumes x = 0, here -> p.c = 64
         bne     @setpagecnt
-@have64k:        
+@have64k:
         txa                     ; assumes x = 0, here
         inx                     ; so that a/x becomes 0/1 -> p.c. = 256
-@setpagecnt:        
+@setpagecnt:
         sta     pagecount
         stx     pagecount+1
 
         txa
-        bne     @keep64kBit        
-        
+        bne     @keep64kBit
+
         ldx     #VDC_CSET       ; restore 16/64k flag
-        lda     vdc_cset_save   
-        jsr     vdcputreg   
+        lda     vdc_cset_save
+        jsr     vdcputreg
 @keep64kBit:
-        lda     #<EM_ERR_OK
-        ldx     #>EM_ERR_OK
+        lda     #EM_ERR_OK
+        .assert EM_ERR_OK = 0, error
+        tax
         rts
 
 test64k:

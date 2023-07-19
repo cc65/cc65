@@ -43,6 +43,8 @@
 #  include <atari2600.h>
 #elif defined(__ATARI5200__)
 #  include <atari5200.h>
+#elif defined(__ATARI7800__)
+#  include <atari7800.h>
 #elif defined(__ATMOS__)
 #  include <atmos.h>
 #elif defined(__CBM__)

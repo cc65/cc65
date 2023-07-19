@@ -2,7 +2,7 @@
 ; Standard joystick driver for the CX16.
 ; May be installed multiple times when statically linked to an application.
 ;
-; 2019-12-24, Greg King
+; 2021-04-07, Greg King
 ;
 
         .include        "joy-kernel.inc"
@@ -41,7 +41,7 @@
 ; ------------------------------------------------------------------------
 ; Constant
 
-JOY_COUNT       = 2             ; Number of joysticks we support
+JOY_COUNT       = $05           ; Number of joysticks we support
 
 ; ------------------------------------------------------------------------
 ; Data.
@@ -51,13 +51,13 @@ JOY_COUNT       = 2             ; Number of joysticks we support
 
 ; ------------------------------------------------------------------------
 ; INSTALL routine -- is called after the driver is loaded into memory.
-; If possible, check if the hardware is present, and determine the amount
-; of memory available.
+; If possible, check if the hardware is present.
 ; Must return a JOY_ERR_xx code in .XA .
 
 INSTALL:
-        lda     #<JOY_ERR_OK
-        ldx     #>JOY_ERR_OK
+        lda     #JOY_ERR_OK
+        .assert JOY_ERR_OK = 0, error
+        tax
 ;       rts                     ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------
@@ -77,8 +77,10 @@ COUNT:  lda     #<JOY_COUNT
 ; ------------------------------------------------------------------------
 ; READ: Read a particular joystick passed in .A .
 
-READ:   and     #%00000001
-        jsr     JOYSTICK_GET
+READ:   cmp     #JOY_COUNT
+        blt     :+
+        lda     #$00
+:       jsr     JOYSTICK_GET
         sta     tmp1
         txa
         bit     #%00001110      ; Is it NES or SNES controller?

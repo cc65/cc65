@@ -59,7 +59,7 @@
   Contains hints on creating the most effective code with cc65.
 
   <tag><htmlurl url="cc65-intern.html" name="cc65-intern.html"></tag>
-  Describes internal details of cc65, such as calling conventions.
+  Describes internal details of cc65: linker configuration, calling conventions, etc.
 
   <tag><htmlurl url="using-make.html" name="using-make.html"></tag>
   Build programs, using the GNU Make utility.
@@ -124,6 +124,9 @@
   <tag><htmlurl url="atari5200.html" name="atari5200.html"></tag>
   Topics specific to the Atari 5200 Game Console.
 
+  <tag><htmlurl url="atari7800.html" name="atari7800.html"></tag>
+  Topics specific to the Atari 7800 Game Console.
+
   <tag><htmlurl url="atmos.html" name="atmos.html"></tag>
   Topics specific to the Oric Atmos.
 
@@ -150,6 +153,9 @@
 
   <tag><htmlurl url="gamate.html" name="gamate.html"></tag>
   Topics specific to the Bit Corporation Gamate Console.
+
+  <tag><htmlurl url="kim1.html" name="kim1.html"></tag>
+  Topics specific to the MOS Technology KIM-1.
 
   <tag><htmlurl url="lynx.html" name="lynx.html"></tag>
   Topics specific to the Atari Lynx Game Console.

@@ -236,6 +236,12 @@ extern void __fastcall__ _scroll (signed char numlines);
 
 
 /*****************************************************************************/
+/*    Sound function                                                         */
+/*****************************************************************************/
+
+extern void  __fastcall__ _sound (unsigned char voice, unsigned char frequency, unsigned char distortion, unsigned char volume);
+
+/*****************************************************************************/
 /* Misc. functions                                                           */
 /*****************************************************************************/
 
@@ -261,7 +267,7 @@ extern void atrst_mou[];                /* referred to by mouse_static_stddrv[] 
 extern void atrami_mou[];
 extern void atrtrk_mou[];
 extern void atrtt_mou[];
-extern void atrrdev_ser[];
+extern void atrrdev_ser[];              /* referred to by ser_static_stddrv[] */
 extern void atr3_tgi[];
 extern void atr4_tgi[];
 extern void atr5_tgi[];
@@ -286,7 +292,7 @@ extern void atrxst_mou[];               /* referred to by mouse_static_stddrv[] 
 extern void atrxami_mou[];
 extern void atrxtrk_mou[];
 extern void atrxtt_mou[];
-extern void atrxrdev_ser[];
+extern void atrxrdev_ser[];             /* referred to by ser_static_stddrv[] */
 extern void atrx3_tgi[];
 extern void atrx4_tgi[];
 extern void atrx5_tgi[];
@@ -392,7 +398,7 @@ extern void atrx15p2_tgi[];
 #define COLOR_WHITE      GTIA_COLOR_WHITE
 #define COLOR_RED        GTIA_COLOR_RED
 #define COLOR_CYAN       GTIA_COLOR_CYAN
-#define COLOR_VIOLET     GTIA_COLOR_VIOLET
+#define COLOR_PURPLE     GTIA_COLOR_VIOLET
 #define COLOR_GREEN      GTIA_COLOR_GREEN
 #define COLOR_BLUE       GTIA_COLOR_BLUE
 #define COLOR_YELLOW     GTIA_COLOR_YELLOW
@@ -410,7 +416,7 @@ extern void atrx15p2_tgi[];
 #define TGI_COLOR_WHITE      COLOR_WHITE
 #define TGI_COLOR_RED        COLOR_RED
 #define TGI_COLOR_CYAN       COLOR_CYAN
-#define TGI_COLOR_VIOLET     COLOR_VIOLET
+#define TGI_COLOR_PURPLE     COLOR_PURPLE
 #define TGI_COLOR_GREEN      COLOR_GREEN
 #define TGI_COLOR_BLUE       COLOR_BLUE
 #define TGI_COLOR_YELLOW     COLOR_YELLOW

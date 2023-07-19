@@ -53,6 +53,22 @@
 
 
 
+/* Type specifier parser flags */
+typedef enum typespec_t typespec_t;
+enum typespec_t {
+    TS_NONE                 = 0x00,
+
+    /* Default type */
+    TS_MASK_DEFAULT_TYPE    = 0x03,
+    TS_DEFAULT_TYPE_NONE    = 0x00,     /* No default type */
+    TS_DEFAULT_TYPE_INT     = 0x01,     /* Good old int */
+    TS_DEFAULT_TYPE_AUTO    = 0x02,     /* C23 type inference with auto */
+
+    /* Whether to allow certain kinds of specifiers */
+    TS_STORAGE_CLASS_SPEC   = 0x04,    /* Allow storage storage class specifiers */
+    TS_FUNCTION_SPEC        = 0x08,    /* Allow function specifiers */
+};
+
 /* Masks for the Flags field in DeclSpec */
 #define DS_DEF_STORAGE          0x0001U /* Default storage class used   */
 #define DS_DEF_TYPE             0x0002U /* Default type used            */
@@ -70,8 +86,8 @@ struct DeclSpec {
 };
 
 /* Result of ParseDecl */
-typedef struct Declaration Declaration;
-struct Declaration {
+typedef struct Declarator Declarator;
+struct Declarator {
     unsigned    StorageClass;           /* A set of SC_xxx flags */
     Type        Type[MAXTYPELEN];       /* The type */
     ident       Ident;                  /* The identifier, if any*/
@@ -102,21 +118,16 @@ void InitDeclSpec (DeclSpec* D);
 Type* ParseType (Type* Type);
 /* Parse a complete type specification */
 
-void ParseDecl (const DeclSpec* Spec, Declaration* D, declmode_t Mode);
-/* Parse a variable, type or function declaration */
+void ParseDecl (const DeclSpec* Spec, Declarator* D, declmode_t Mode);
+/* Parse a variable, type or function declarator */
 
-void ParseDeclSpec (DeclSpec* D, unsigned DefStorage, long DefType);
+void ParseDeclSpec (DeclSpec* D, typespec_t TSFlags, unsigned DefStorage);
 /* Parse a declaration specification */
 
 void CheckEmptyDecl (const DeclSpec* D);
 /* Called after an empty type declaration (that is, a type declaration without
 ** a variable). Checks if the declaration does really make sense and issues a
 ** warning if not.
-*/
-
-unsigned ParseInit (Type* T);
-/* Parse initialization of variables. Return the number of initialized data
-** bytes.
 */
 
 

@@ -1,21 +1,24 @@
 ;
-; 2020-01-08, Greg King
+; 2021-04-01, Greg King
 ;
 ; void waitvsync (void);
 ; /* Wait for the start of the next video field. */
 ;
 ; VERA's vertical sync causes IRQs which increment the jiffy timer.
 ;
+; Updated by ZeroByteOrg to use Kernal API RDTIM to retreive the TIMER variable
+;
 
         .export         _waitvsync
+        .importzp       tmp1
+        .import         RDTIM
 
-        .include        "cx16.inc"
-
-_waitvsync:
-        ldx     VIA1::PRA       ; (TIMER is in RAM bank 0)
-        stz     VIA1::PRA
-        lda     TIMER + 2
-:       cmp     TIMER + 2
-        beq     :-              ; Wait for next jiffy
-        stx     VIA1::PRA
-        rts
+.proc _waitvsync: near
+      jsr RDTIM
+      sta tmp1
+keep_waiting:
+      jsr RDTIM
+      cmp tmp1
+      beq keep_waiting
+      rts
+.endproc

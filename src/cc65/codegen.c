@@ -33,6 +33,7 @@
 
 
 
+#include <inttypes.h>
 #include <limits.h>
 #include <stdio.h>
 #include <string.h>
@@ -40,9 +41,10 @@
 
 /* common */
 #include "addrsize.h"
+#include "attrib.h"
 #include "check.h"
 #include "cpu.h"
-#include "inttypes.h"
+#include "shift.h"
 #include "strbuf.h"
 #include "xmalloc.h"
 #include "xsprintf.h"
@@ -63,7 +65,16 @@
 #include "util.h"
 #include "codegen.h"
 
-
+/* This is a terrible hack that tries to combat the ever reoccuring issue with
+   Mingw and PRIXPTR - the macro should have been defined like this for us in
+   the first place.
+   NOTE: "I64x" works in the github actions now, so if your local mingw64 fails,
+         you probably have to update.
+*/
+#if defined(__MINGW64__)
+#undef PRIXPTR
+#define PRIXPTR "I64x"
+#endif
 
 /*****************************************************************************/
 /*                                  Helpers                                  */
@@ -460,7 +471,8 @@ void g_importstartup (void)
 
 
 void g_importmainargs (void)
-/* Forced import of a special symbol that handles arguments to main */
+/* Forced import of a special symbol that handles arguments to main. This will
+   happen only when the compiler sees a main function that takes arguments. */
 {
     AddTextLine ("\t.forceimport\tinitmainargs");
 }
@@ -689,7 +701,7 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes)
 
 
 
-void g_getimmed (unsigned Flags, unsigned long Val, long Offs)
+void g_getimmed (unsigned Flags, uintptr_t Val, long Offs)
 /* Load a constant into the primary register */
 {
     unsigned char B1, B2, B3, B4;
@@ -1280,34 +1292,49 @@ void g_tosint (unsigned flags)
 
 
 
-static void g_regchar (unsigned Flags)
-/* Make sure, the value in the primary register is in the range of char. Truncate if necessary */
+static void g_regchar (unsigned to)
+/* Treat the value in the primary register as a char with specified signedness
+** and convert it to an int (whose representation is irrelevent of signedness).
+*/
 {
-    unsigned L;
-
-    AddCodeLine ("ldx #$00");
-
-    if ((Flags & CF_UNSIGNED) == 0) {
-        /* Sign extend */
-        L = GetLocalLabel();
-        AddCodeLine ("cmp #$80");
-        AddCodeLine ("bcc %s", LocalLabelName (L));
-        AddCodeLine ("dex");
-        g_defcodelabel (L);
-    }
+    /* Since char is the smallest type supported here, we never need any info
+    ** about the original type to "promote from it". However, we have to make
+    ** sure the entire AX contains the correct char value as an int, since we
+    ** will almost always use the char value as an int in AX directly in code
+    ** generation (unless CF_FORCECHAR is specified). That is to say, we don't
+    ** need the original "from" flags for the first conversion to char, but do
+    ** need the original "to" flags as the new "from" flags for the conversion
+    ** to int.
+    */
+    g_regint (to | CF_FORCECHAR);
 }
 
 
 
-void g_regint (unsigned Flags)
-/* Make sure, the value in the primary register an int. Convert if necessary */
+void g_regint (unsigned from)
+/* Convert the value in the primary register to an int (whose representation
+** is irrelevent of signedness).
+*/
 {
-    switch (Flags & CF_TYPEMASK) {
+    switch (from & CF_TYPEMASK) {
 
         case CF_CHAR:
-            if (Flags & CF_FORCECHAR) {
-                /* Conversion is from char */
-                g_regchar (Flags);
+            /* If the original value was forced to use only A, it must be
+            ** extended from char to fill AX. Otherwise nothing to do here
+            ** since AX would already have the correct int value.
+            */
+            if (from & CF_FORCECHAR) {
+                AddCodeLine ("ldx #$00");
+
+                if ((from & CF_UNSIGNED) == 0) {
+                    /* Sign extend */
+                    unsigned L = GetLocalLabel();
+                    AddCodeLine ("cmp #$80");
+                    AddCodeLine ("bcc %s", LocalLabelName (L));
+                    AddCodeLine ("dex");
+                    g_defcodelabel (L);
+                }
+                break;
             }
             /* FALLTHROUGH */
 
@@ -1316,21 +1343,27 @@ void g_regint (unsigned Flags)
             break;
 
         default:
-            typeerror (Flags);
+            typeerror (from);
     }
 }
 
 
 
-void g_reglong (unsigned Flags)
-/* Make sure, the value in the primary register a long. Convert if necessary */
+void g_reglong (unsigned from)
+/* Convert the value in the primary register to a long (whose representation
+** is irrelevent of signedness).
+*/
 {
-    switch (Flags & CF_TYPEMASK) {
+    switch (from & CF_TYPEMASK) {
 
         case CF_CHAR:
-            if (Flags & CF_FORCECHAR) {
+            /* If the original value was forced to use only A, it must be
+            ** extended from char to long. Otherwise AX would already have
+            ** the correct int value to be extened to long.
+            */
+            if (from & CF_FORCECHAR) {
                 /* Conversion is from char */
-                if (Flags & CF_UNSIGNED) {
+                if (from & CF_UNSIGNED) {
                     if (IS_Get (&CodeSizeFactor) >= 200) {
                         AddCodeLine ("ldx #$00");
                         AddCodeLine ("stx sreg");
@@ -1340,18 +1373,19 @@ void g_reglong (unsigned Flags)
                     }
                 } else {
                     if (IS_Get (&CodeSizeFactor) >= 366) {
-                        g_regchar (Flags);
+                        g_regint (from);
                         AddCodeLine ("stx sreg");
                         AddCodeLine ("stx sreg+1");
                     } else {
                         AddCodeLine ("jsr along");
                     }
                 }
+                break;
             }
             /* FALLTHROUGH */
 
         case CF_INT:
-            if (Flags & CF_UNSIGNED) {
+            if (from & CF_UNSIGNED) {
                 if (IS_Get (&CodeSizeFactor) >= 200) {
                     AddCodeLine ("ldy #$00");
                     AddCodeLine ("sty sreg");
@@ -1368,7 +1402,7 @@ void g_reglong (unsigned Flags)
             break;
 
         default:
-            typeerror (Flags);
+            typeerror (from);
     }
 }
 
@@ -1409,7 +1443,7 @@ static unsigned g_intpromotion (unsigned flags)
 unsigned g_typeadjust (unsigned lhs, unsigned rhs)
 /* Adjust the integer operands before doing a binary operation. lhs is a flags
 ** value, that corresponds to the value on TOS, rhs corresponds to the value
-** in (e)ax. The return value is the the flags value for the resulting type.
+** in (e)ax. The return value is the flags value for the resulting type.
 */
 {
     /* Get the type spec from the flags */
@@ -1505,48 +1539,49 @@ unsigned g_typeadjust (unsigned lhs, unsigned rhs)
 
 
 
-unsigned g_typecast (unsigned lhs, unsigned rhs)
-/* Cast the value in the primary register to the operand size that is flagged
-** by the lhs value. Return the result value.
+unsigned g_typecast (unsigned to, unsigned from)
+/* Cast the value in the primary register to the specified operand size and
+** signedness. Return the result flags.
 */
 {
     /* Check if a conversion is needed */
-    if ((rhs & CF_CONST) == 0) {
-        switch (lhs & CF_TYPEMASK) {
+    if ((from & CF_CONST) == 0) {
+        switch (to & CF_TYPEMASK) {
 
             case CF_LONG:
-                /* We must promote the primary register to long */
-                g_reglong (rhs);
+                /* We must promote the primary register to long in EAX */
+                g_reglong (from);
                 break;
 
             case CF_INT:
-                /* We must promote the primary register to int */
-                g_regint (rhs);
+                /* We must promote the primary register to int in AX */
+                g_regint (from);
                 break;
 
             case CF_CHAR:
-                /* We must truncate the primary register to char */
-                g_regchar (lhs);
+                /* We must truncate the primary register to char and then
+                ** sign-extend it to signed int in AX.
+                */
+                g_regchar (to);
                 break;
 
             default:
-                typeerror (lhs);
+                /* Since we are switching on "to", report an error on it */
+                typeerror (to);
         }
     }
 
-    /* Do not need any other action. If the left type is int, and the primary
+    /* Do not need any other action. If the "to" type is int, and the primary
     ** register is long, it will be automagically truncated. If the right hand
     ** side is const, it is not located in the primary register and handled by
     ** the expression parser code.
     */
 
     /* Result is const if the right hand side was const */
-    lhs |= (rhs & CF_CONST);
+    to |= (from & CF_CONST);
 
-    /* The resulting type is that of the left hand side (that's why you called
-    ** this function :-)
-    */
-    return lhs;
+    /* The resulting type is "to" (that's why you called this function :-) */
+    return to;
 }
 
 
@@ -4394,7 +4429,7 @@ void g_res (unsigned n)
 
 
 
-void g_defdata (unsigned flags, unsigned long val, long offs)
+void g_defdata (unsigned flags, uintptr_t val, long offs)
 /* Define data with the size given in flags */
 {
     if (flags & CF_CONST) {
@@ -4403,15 +4438,15 @@ void g_defdata (unsigned flags, unsigned long val, long offs)
         switch (flags & CF_TYPEMASK) {
 
             case CF_CHAR:
-                AddDataLine ("\t.byte\t$%02lX", val & 0xFF);
+                AddDataLine ("\t.byte\t$%02"PRIXPTR, val & 0xFF);
                 break;
 
             case CF_INT:
-                AddDataLine ("\t.word\t$%04lX", val & 0xFFFF);
+                AddDataLine ("\t.word\t$%04"PRIXPTR, val & 0xFFFF);
                 break;
 
             case CF_LONG:
-                AddDataLine ("\t.dword\t$%08lX", val & 0xFFFFFFFF);
+                AddDataLine ("\t.dword\t$%08"PRIXPTR, val & 0xFFFFFFFF);
                 break;
 
             default:
@@ -4559,111 +4594,269 @@ void g_initstatic (unsigned InitLabel, unsigned VarLabel, unsigned Size)
 
 
 
-void g_testbitfield (unsigned Flags, unsigned BitOffs, unsigned BitWidth)
-/* Test bit-field in ax. */
+void g_testbitfield (ATTR_UNUSED(unsigned Flags), unsigned BitOffs, unsigned BitWidth)
+/* Test bit-field in primary. */
 {
-    unsigned EndBit = BitOffs + BitWidth;
+    /* Since the end is inclusive and cannot be negative here, we subtract 1 from the sum */
+    unsigned MSBit = BitOffs + BitWidth - 1U;
+    unsigned Bytes = MSBit / CHAR_BITS + 1U - BitOffs / CHAR_BITS;
+    unsigned HeadMask = (0xFF << (BitOffs % CHAR_BITS)) & 0xFF;
+    unsigned TailMask = ((1U << (MSBit % CHAR_BITS + 1U)) - 1U) & 0xFF;
+    unsigned UntestedBytes = ((1U << Bytes) - 1U) << (BitOffs / CHAR_BITS);
+
+    /* We don't use these flags for now. Could CF_NOKEEP be potentially interesting? */
+    Flags &= ~CF_STYPEMASK;
 
     /* If we need to do a test, then we avoid shifting (ASR only shifts one bit at a time,
-    ** so is slow) and just AND with the appropriate mask, then test the result of that.
+    ** so is slow) and just AND the head and tail bytes with the appropriate mask, then
+    ** OR the results with the rest bytes.
     */
-
-    /* Avoid overly large shift on host platform. */
-    if (EndBit == sizeof (unsigned long) * CHAR_BIT) {
-        g_and (Flags | CF_CONST, (~0UL << BitOffs));
-    } else {
-        g_and (Flags | CF_CONST, ((1UL << EndBit) - 1) & (~0UL << BitOffs));
+    if (Bytes == 1) {
+        HeadMask = TailMask = HeadMask & TailMask;
     }
 
-    /* TODO: When long bit-fields are supported, an optimization to test only 3 bytes when
-    ** EndBit <= 24 is possible.
-    */
-    g_test (Flags | CF_CONST);
+    /* Get the head byte */
+    switch (BitOffs / CHAR_BITS) {
+    case 0:
+        if (HeadMask == 0xFF && Bytes == 1) {
+            AddCodeLine ("tax");
+            UntestedBytes &= ~0x1;
+        }
+        break;
+    case 1:
+        if (HeadMask != 0xFF || TailMask == 0xFF) {
+            AddCodeLine ("txa");
+            UntestedBytes &= ~0x2;
+        }
+        break;
+    case 2:
+        if (HeadMask != 0xFF || TailMask == 0xFF) {
+            AddCodeLine ("lda sreg");
+            UntestedBytes &= ~0x4;
+        }
+        break;
+    case 3:
+        /* In this case we'd have HeadMask == TailMask and only 1 byte, but anyways... */
+        if (HeadMask != 0xFF || TailMask == 0xFF) {
+            AddCodeLine ("lda sreg+1");
+            UntestedBytes &= ~0x8;
+        }
+        break;
+    default:
+        break;
+    }
+
+    /* Keep in mind that the head is NOT always "Byte 0" */
+    if (HeadMask != 0xFF) {
+        AddCodeLine ("and #$%02X", HeadMask);
+        /* Abuse the "Byte 0" flag so that this head content will be saved by the routine */
+        UntestedBytes |= 0x1;
+    }
+
+    /* If there is only 1 byte to test, we have done with it */
+    if (Bytes == 1) {
+        return;
+    }
+
+    /* Handle the tail byte */
+    if (TailMask != 0xFF) {
+        /* If we have to do any more masking operation, register A will be used for that,
+        ** and its current content in it must be saved.
+        */
+        if (UntestedBytes & 0x1) {
+            AddCodeLine ("sta tmp1");
+        }
+
+        /* Test the tail byte */
+        switch (MSBit / CHAR_BITS) {
+        case 1:
+            AddCodeLine ("txa");
+            UntestedBytes &= ~0x2;
+            break;
+        case 2:
+            AddCodeLine ("lda sreg");
+            UntestedBytes &= ~0x4;
+            break;
+        case 3:
+            AddCodeLine ("lda sreg+1");
+            UntestedBytes &= ~0x8;
+            break;
+        default:
+            break;
+        }
+        AddCodeLine ("and #$%02X", TailMask);
+
+        if (UntestedBytes & 0x1) {
+            AddCodeLine ("ora tmp1");
+        }
+    }
+
+    /* OR the rest bytes together, which could never need masking */
+    if (UntestedBytes & 0x2) {
+        AddCodeLine ("stx tmp1");
+        AddCodeLine ("ora tmp1");
+    }
+    if (UntestedBytes & 0x4) {
+        AddCodeLine ("ora sreg");
+    }
+    if (UntestedBytes & 0x8) {
+        AddCodeLine ("ora sreg+1");
+    }
 }
 
 
 
 void g_extractbitfield (unsigned Flags, unsigned FullWidthFlags, int IsSigned,
                         unsigned BitOffs, unsigned BitWidth)
-/* Extract bits from bit-field in ax. */
+/* Extract bits from bit-field in primary. */
 {
     unsigned EndBit = BitOffs + BitWidth;
+    unsigned long ZeroExtendMask = 0;  /* Zero if we don't need to zero-extend. */
 
     /* Shift right by the bit offset; no code is emitted if BitOffs is zero */
     g_asr (Flags | CF_CONST, BitOffs);
-
-    /* Since we have now shifted down, we could do char ops when the width fits in a char, but we
-    ** also need to clear (or set) the high byte since we've been using CF_FORCECHAR up to now.
-    */
-    unsigned Mask = (1U << BitWidth) - 1;
 
     /* To zero-extend, we will and by the width if the field doesn't end on a char or
     ** int boundary.  If it does end on a boundary, then zeros will have already been shifted in,
     ** but we need to clear the high byte for char.  g_and emits no code if the mask is all ones.
     ** This is here so the signed and unsigned branches can use it.
     */
-    unsigned ZeroExtendMask = 0;  /* Zero if we don't need to zero-extend. */
     if (EndBit == CHAR_BITS) {
         /* We need to clear the high byte, since CF_FORCECHAR was set. */
         ZeroExtendMask = 0xFF;
-    } else if (EndBit != INT_BITS) {
-        ZeroExtendMask = (1U << BitWidth) - 1;
+    } else if (EndBit != INT_BITS && EndBit != LONG_BITS) {
+        ZeroExtendMask = shl_l (1UL, BitWidth) - 1UL;
     }
 
     /* Handle signed bit-fields. */
     if (IsSigned) {
-        /* Save .A because the sign-bit test will destroy it. */
-        AddCodeLine ("tay");
-
-        /* Check sign bit */
         unsigned SignBitPos = BitWidth - 1U;
         unsigned SignBitByte = SignBitPos / CHAR_BITS;
         unsigned SignBitPosInByte = SignBitPos % CHAR_BITS;
-        unsigned SignBitMask = 1U << SignBitPosInByte;
 
-        /* Move the correct byte to .A.  This can be only .X for now,
-        ** but more cases will be needed to support long.
-        */
-        switch (SignBitByte) {
-          case 0:
-            break;
-          case 1:
-            AddCodeLine ("txa");
-            break;
-          default:
-            FAIL ("Invalid Byte for sign bit");
-        }
-
-        /* Test the sign bit */
-        AddCodeLine ("and #$%02X", SignBitMask);
-        unsigned ZeroExtendLabel = GetLocalLabel ();
-        AddCodeLine ("beq %s", LocalLabelName (ZeroExtendLabel));
-
-        /* Get back .A and sign-extend if required; operating on the full result needs
-        ** to sign-extend into the high byte, too.
-        */
-        AddCodeLine ("tya");
-        g_or (FullWidthFlags | CF_CONST, ~Mask);
-
-        /* We can generate a branch, instead of a jump, here because we know
-        ** that only a few instructions will be put between here and where
-        ** DoneLabel will be defined.
-        */
-        unsigned DoneLabel = GetLocalLabel ();
-        g_branch (DoneLabel);
-
-        /* Get back .A, then zero-extend. We need to duplicate the TYA, rather than move it before
-        ** the branch to share with the other label, because TYA changes some condition codes.
-        */
-        g_defcodelabel (ZeroExtendLabel);
-        AddCodeLine ("tya");
-
-        /* Zero the upper bits, the same as the unsigned path. */
         if (ZeroExtendMask != 0) {
-            g_and (FullWidthFlags | CF_CONST, ZeroExtendMask);
-        }
+            /* The universal trick is:
+            **   x = bits & bit_mask
+            **   m = 1 << (bit_width - 1)
+            **   r = (x ^ m) - m
+            ** which works for long as well.
+            */
 
-        g_defcodelabel (DoneLabel);
+            if (SignBitByte + 1U == sizeofarg (FullWidthFlags)) {
+                /* We can just sign-extend on the high byte if it is the only affected one */
+                unsigned char SignBitMask = (1UL << SignBitPosInByte) & 0xFF;
+                unsigned char Mask = ((2UL << (SignBitPos % CHAR_BITS)) - 1UL) & 0xFF;
+
+                /* Move the correct byte to .A */
+                switch (SignBitByte) {
+                  case 0:
+                    break;
+                  case 1:
+                    AddCodeLine ("tay");
+                    AddCodeLine ("txa");
+                    break;
+                  case 3:
+                    AddCodeLine ("tay");
+                    AddCodeLine ("lda sreg+1");
+                    break;
+                  default:
+                    FAIL ("Invalid Byte for sign bit");
+                }
+
+                /* Use .A to do the ops on the correct byte */
+                AddCodeLine ("and #$%02X", Mask);
+                AddCodeLine ("eor #$%02X", SignBitMask);
+                AddCodeLine ("sec");
+                AddCodeLine ("sbc #$%02X", SignBitMask);
+
+                /* Move the correct byte from .A */
+                switch (SignBitByte) {
+                  case 0:
+                    break;
+                  case 1:
+                    AddCodeLine ("tax");
+                    AddCodeLine ("tya");
+                    break;
+                  case 3:
+                    AddCodeLine ("sta sreg+1");
+                    AddCodeLine ("tya");
+                    break;
+                  default:
+                    FAIL ("Invalid Byte for sign bit");
+                }
+            } else {
+                unsigned long SignBitMask = 1UL << SignBitPos;
+                unsigned long Mask = (2UL << SignBitPos) - 1UL;
+                g_and (FullWidthFlags | CF_CONST, Mask);
+                g_xor (FullWidthFlags | CF_CONST, SignBitMask);
+                g_dec (FullWidthFlags | CF_CONST, SignBitMask);
+            }
+        } else {
+            unsigned char SignBitMask = (1UL << SignBitPosInByte) & 0xFF;
+            unsigned ZeroExtendLabel = GetLocalLabel ();
+
+            /* Save .A because the sign-bit test will destroy it. */
+            AddCodeLine ("tay");
+
+            /* Move the correct byte to .A */
+            switch (SignBitByte) {
+              case 0:
+                break;
+              case 1:
+                AddCodeLine ("txa");
+                break;
+              case 3:
+                AddCodeLine ("lda sreg+1");
+                break;
+              default:
+                FAIL ("Invalid Byte for sign bit");
+            }
+
+            /* Test the sign bit */
+            AddCodeLine ("and #$%02X", SignBitMask);
+            AddCodeLine ("beq %s", LocalLabelName (ZeroExtendLabel));
+
+            if (SignBitByte + 1U == sizeofarg (FullWidthFlags)) {
+                /* We can just sign-extend on the high byte if it is the only affected one */
+                unsigned char Mask = ~((2UL << (SignBitPos % CHAR_BITS)) - 1UL) & 0xFF;
+
+                /* Use .A to do the ops on the correct byte */
+                switch (SignBitByte) {
+                  case 0:
+                    AddCodeLine ("tya");
+                    AddCodeLine ("ora #$%02X", Mask);
+                    /* We could jump over the following tya instead, but that wouldn't be faster
+                    ** than taking this extra tay and then the tya.
+                    */
+                    AddCodeLine ("tay");
+                    break;
+                  case 1:
+                    AddCodeLine ("txa");
+                    AddCodeLine ("ora #$%02X", Mask);
+                    AddCodeLine ("tax");
+                    break;
+                  case 3:
+                    AddCodeLine ("lda sreg+1");
+                    AddCodeLine ("ora #$%02X", Mask);
+                    AddCodeLine ("sta sreg+1");
+                    break;
+                  default:
+                    FAIL ("Invalid Byte for sign bit");
+                }
+            } else {
+                /* Since we are going to get back .A later anyways, we may just do the op on the
+                ** higher bytes with whatever content currently in it.
+                */
+                unsigned long Mask = ~((2UL << SignBitPos) - 1UL);
+                g_or (FullWidthFlags | CF_CONST, Mask);
+            }
+
+            /* Get back .A. We need to duplicate the TYA, rather than move it before
+            ** the branch to share with the other label, because TYA changes some condition codes.
+            */
+            g_defcodelabel (ZeroExtendLabel);
+            AddCodeLine ("tya");
+        }
     } else {
         /* Unsigned bit-field, needs only zero-extension. */
         if (ZeroExtendMask != 0) {
@@ -4761,5 +4954,25 @@ void g_switch (Collection* Nodes, unsigned DefaultLabel, unsigned Depth)
 void g_asmcode (struct StrBuf* B)
 /* Output one line of assembler code. */
 {
-    AddCodeLine ("%.*s", (int) SB_GetLen (B), SB_GetConstBuf (B));
+    int len = (int) SB_GetLen(B);
+    const char *buf = SB_GetConstBuf(B);
+
+    /* remove whitespace at end of line */
+    /* NOTE: This masks problems in ParseInsn(), which in some cases seems to
+             rely on no whitespace being present at the end of a line in generated
+             code (see issue #1252). However, it generally seems to be a good
+             idea to remove trailing whitespace from (inline) assembly, so we
+             do it anyway. */
+    while (len) {
+       switch (buf[len - 1]) {
+       case '\n':
+       case ' ':
+       case '\t':
+           --len;
+           continue;
+       }
+       break;
+    }
+
+    AddCodeLine ("%.*s", len, buf);
 }

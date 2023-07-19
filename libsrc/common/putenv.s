@@ -169,7 +169,7 @@ addentry:
 ; Error entries
 
 nomem:  lda     #ENOMEM
-error:  jsr     __seterrno
+error:  jsr     ___seterrno
         lda     #$FF                    ; Return -1
         tax
         rts
@@ -185,4 +185,4 @@ error:  jsr     __seterrno
 name:           .addr   0               ; Pointer to name
 newsize:        .byte   0               ; New environment size
 
-                
+

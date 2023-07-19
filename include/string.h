@@ -36,11 +36,16 @@
 #ifndef _STRING_H
 #define _STRING_H
 
+/* NULL pointer */
+#ifndef NULL
+#define NULL ((void *) 0)
+#endif
 
-
-#include <stddef.h>
-
-
+/* size_t is needed */
+#ifndef _HAVE_size_t
+#define _HAVE_size_t
+typedef unsigned size_t;
+#endif
 
 char* __fastcall__ strcat (char* dest, const char* src);
 char* __fastcall__ strchr (const char* s, int c);
@@ -68,7 +73,7 @@ void* __fastcall__ memset (void* s, int c, size_t count);
 /* The following is an internal function, the compiler will replace memset
 ** with it if the fill value is zero. Never use this one directly!
 */
-void* __fastcall__ _bzero (void* ptr, size_t n);
+void* __fastcall__ __bzero (void* ptr, size_t n);
 
 /* Non standard: */
 #if __CC65_STD__ == __CC65_STD_CC65__
@@ -78,6 +83,7 @@ int __fastcall__ stricmp (const char* s1, const char* s2);    /* DOS/Windows */
 int __fastcall__ strcasecmp (const char* s1, const char* s2); /* Same for Unix */
 int __fastcall__ strnicmp (const char* s1, const char* s2, size_t count);     /* DOS/Windows */
 int __fastcall__ strncasecmp (const char* s1, const char* s2, size_t count);  /* Same for Unix */
+size_t __fastcall__ strnlen (const char* s, size_t maxlen);     /* POSIX.1-2008 */
 char* __fastcall__ strlwr (char* s);
 char* __fastcall__ strlower (char* s);
 char* __fastcall__ strupr (char* s);
@@ -85,9 +91,12 @@ char* __fastcall__ strupper (char* s);
 char* __fastcall__ strqtok (char* s1, const char* s2);
 #endif
 
-const char* __fastcall__ _stroserror (unsigned char errcode);
+const char* __fastcall__ __stroserror (unsigned char errcode);
 /* Map an operating system error number to an error message. */
-
+#if __CC65_STD__ == __CC65_STD_CC65__
+/* define old name with one underscore for backwards compatibility */
+#define _stroserror __stroserror
+#endif
 
 
 /* End of string.h */

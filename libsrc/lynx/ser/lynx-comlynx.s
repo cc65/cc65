@@ -75,8 +75,9 @@ SER_UNINSTALL:
 SER_CLOSE:
         ; Disable interrupts
         ; Done, return an error code
-        lda     #<SER_ERR_OK
-        ldx     #>SER_ERR_OK
+        lda     #SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
+        tax
         rts
 
 ;----------------------------------------------------------------------------
@@ -190,8 +191,8 @@ SER_OPEN:
         cmp     #SER_BAUD_134_5
         beq     setbaudrate
 
-        lda     #<SER_ERR_BAUD_UNAVAIL
-        ldx     #>SER_ERR_BAUD_UNAVAIL
+        lda     #SER_ERR_BAUD_UNAVAIL
+        ldx     #0 ; return value is char
         rts
 setprescaler:
         stx     TIM4CTLA
@@ -238,12 +239,13 @@ checkhs:
         lda     contrl
         ora     #RxIntEnable|ResetErr
         sta     SERCTL
-        lda     #<SER_ERR_OK
-        ldx     #>SER_ERR_OK
+        lda     #SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
+        tax
         rts
 invparameter:
-        lda     #<SER_ERR_INIT_FAILED
-        ldx     #>SER_ERR_INIT_FAILED
+        lda     #SER_ERR_INIT_FAILED
+        ldx     #0 ; return value is char
         rts
 
 ;----------------------------------------------------------------------------
@@ -255,8 +257,8 @@ SER_GET:
         lda     RxPtrIn
         cmp     RxPtrOut
         bne     GetByte
-        lda     #<SER_ERR_NO_DATA
-        ldx     #>SER_ERR_NO_DATA
+        lda     #SER_ERR_NO_DATA
+        ldx     #0 ; return value is char
         rts
 GetByte:
         ldy     RxPtrOut
@@ -277,8 +279,8 @@ SER_PUT:
         ina
         cmp     TxPtrOut
         bne     PutByte
-        lda     #<SER_ERR_OVERFLOW
-        ldx     #>SER_ERR_OVERFLOW
+        lda     #SER_ERR_OVERFLOW
+        ldx     #0 ; return value is char
         rts
 PutByte:
         ldy     TxPtrIn
@@ -296,7 +298,8 @@ PutByte:
         sta     TxDone
         plp
 @L1:
-        lda     #<SER_ERR_OK
+        lda     #SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
         tax
         rts
 
@@ -317,8 +320,8 @@ SER_STATUS:
 ; Must return an SER_ERR_xx code in a/x.
 
 SER_IOCTL:
-        lda     #<SER_ERR_INV_IOCTL
-        ldx     #>SER_ERR_INV_IOCTL
+        lda     #SER_ERR_INV_IOCTL
+        ldx     #0 ; return value is char
         rts
 
 ;----------------------------------------------------------------------------

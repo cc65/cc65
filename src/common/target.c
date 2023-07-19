@@ -147,6 +147,7 @@ static const TargetEntry TargetMap[] = {
     {   "atari",        TGT_ATARI        },
     {   "atari2600",    TGT_ATARI2600    },
     {   "atari5200",    TGT_ATARI5200    },
+    {   "atari7800",    TGT_ATARI7800    },
     {   "atarixl",      TGT_ATARIXL      },
     {   "atmos",        TGT_ATMOS        },
     {   "bbc",          TGT_BBC          },
@@ -162,6 +163,7 @@ static const TargetEntry TargetMap[] = {
     {   "geos",         TGT_GEOS_CBM     },
     {   "geos-apple",   TGT_GEOS_APPLE   },
     {   "geos-cbm",     TGT_GEOS_CBM     },
+    {   "kim1",         TGT_KIM1         },
     {   "lunix",        TGT_LUNIX        },
     {   "lynx",         TGT_LYNX         },
     {   "module",       TGT_MODULE       },
@@ -188,6 +190,7 @@ static const TargetProperties PropertyTable[TGT_COUNT] = {
     { "atari",          CPU_6502,       BINFMT_BINARY,      CTAtari },
     { "atari2600",      CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "atari5200",      CPU_6502,       BINFMT_BINARY,      CTAtari },
+    { "atari7800",      CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "atarixl",        CPU_6502,       BINFMT_BINARY,      CTAtari },
     { "vic20",          CPU_6502,       BINFMT_BINARY,      CTPET   },
     { "c16",            CPU_6502,       BINFMT_BINARY,      CTPET   },
@@ -217,6 +220,7 @@ static const TargetProperties PropertyTable[TGT_COUNT] = {
     { "c65",            CPU_4510,       BINFMT_BINARY,      CTPET   },
     { "cx16",           CPU_65C02,      BINFMT_BINARY,      CTPET   },
     { "sym1",           CPU_6502,       BINFMT_BINARY,      CTNone  },
+    { "kim1",           CPU_6502,       BINFMT_BINARY,      CTNone  },
 };
 
 /* Target system */

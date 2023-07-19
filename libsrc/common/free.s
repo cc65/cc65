@@ -105,27 +105,27 @@ _free:  sta     ptr2
         tay
         lda     ptr2+1
         adc     ptr1+1
-        cpy     __heapptr
+        cpy     ___heapptr
         bne     heapadd                 ; Add to free list
-        cmp     __heapptr+1
+        cmp     ___heapptr+1
         bne     heapadd
 
 ; The pointer is located at the heap top. Lower the heap top pointer to
 ; release the block.
 
 @L3:    lda     ptr2
-        sta     __heapptr
+        sta     ___heapptr
         lda     ptr2+1
-        sta     __heapptr+1
+        sta     ___heapptr+1
 
 ; Check if the last block in the freelist is now at heap top. If so, remove
 ; this block from the freelist.
 
-        lda     __heaplast
+        lda     ___heaplast
         sta     ptr1
-        ora     __heaplast+1
+        ora     ___heaplast+1
         beq     @L9                     ; Jump if free list empty
-        lda     __heaplast+1
+        lda     ___heaplast+1
         sta     ptr1+1                  ; Pointer to last block now in ptr1
 
         ldy     #freeblock::size
@@ -136,35 +136,35 @@ _free:  sta     ptr2
         lda     (ptr1),y
         adc     ptr1+1
 
-        cmp     __heapptr+1
+        cmp     ___heapptr+1
         bne     @L9                     ; Jump if last block not on top of heap
-        cpx     __heapptr
+        cpx     ___heapptr
         bne     @L9                     ; Jump if last block not on top of heap
 
 ; Remove the last block
 
         lda     ptr1
-        sta     __heapptr
+        sta     ___heapptr
         lda     ptr1+1
-        sta     __heapptr+1
+        sta     ___heapptr+1
 
 ; Correct the next pointer of the now last block
 
         ldy     #freeblock::prev+1      ; Offset of ->prev field
         lda     (ptr1),y
         sta     ptr2+1                  ; Remember f->prev in ptr2
-        sta     __heaplast+1
+        sta     ___heaplast+1
         dey
         lda     (ptr1),y
         sta     ptr2                    ; Remember f->prev in ptr2
-        sta     __heaplast
-        ora     __heaplast+1            ; -> prev == 0?
+        sta     ___heaplast
+        ora     ___heaplast+1           ; -> prev == 0?
         bne     @L8                     ; Jump if free list not empty
 
 ; Free list is now empty (A = 0)
 
-        sta     __heapfirst
-        sta     __heapfirst+1
+        sta     ___heapfirst
+        sta     ___heapfirst+1
 
 ; Done
 
@@ -274,7 +274,7 @@ _free:  sta     ptr2
 ;     }
 ; }
 ;
-; 
+;
 ; On entry, ptr2 must contain a pointer to the block, which must be at least
 ; HEAP_MIN_BLOCKSIZE bytes in size, and ptr1 contains the total size of the
 ; block.
@@ -283,9 +283,9 @@ _free:  sta     ptr2
 ; Check if the free list is empty, storing _hfirst into ptr3 for later
 
 heapadd:
-        lda     __heapfirst
+        lda     ___heapfirst
         sta     ptr3
-        lda     __heapfirst+1
+        lda     ___heapfirst+1
         sta     ptr3+1
         ora     ptr3
         bne     SearchFreeList
@@ -301,10 +301,10 @@ heapadd:
 
         lda     ptr2
         ldx     ptr2+1
-        sta     __heapfirst
-        stx     __heapfirst+1           ; _heapfirst = f;
-        sta     __heaplast
-        stx     __heaplast+1            ; _heaplast = f;
+        sta     ___heapfirst
+        stx     ___heapfirst+1          ; _heapfirst = f;
+        sta     ___heaplast
+        stx     ___heaplast+1           ; _heaplast = f;
 
         rts                             ; Done
 
@@ -351,9 +351,9 @@ SearchFreeList:
         sta     (ptr2),y                ; Clear low byte of f->next
 
         lda     ptr2                    ; _heaplast = f;
-        sta     __heaplast
+        sta     ___heaplast
         lda     ptr2+1
-        sta     __heaplast+1
+        sta     ___heaplast+1
 
 ; Since we have checked the case that the freelist is empty before, if the
 ; right pointer is NULL, the left *cannot* be NULL here. So skip the
@@ -414,9 +414,9 @@ CheckRightMerge:
 ; f->next is zero, this is now the last block
 
 @L1:    lda     ptr2                    ; _heaplast = f;
-        sta     __heaplast
+        sta     ___heaplast
         lda     ptr2+1
-        sta     __heaplast+1
+        sta     ___heaplast+1
         jmp     CheckLeftMerge
 
 ; No right merge, just set the link.
@@ -451,9 +451,9 @@ CheckLeftMerge:
         sta     (ptr2),y
 
         lda     ptr2                    ; _heapfirst = f;
-        sta     __heapfirst
+        sta     ___heapfirst
         lda     ptr2+1
-        sta     __heapfirst+1
+        sta     ___heapfirst+1
 
         rts                             ; Done
 
@@ -510,9 +510,9 @@ CheckLeftMerge2:
 ; This is now the last block, do _heaplast = left
 
 @L1:    lda     ptr4
-        sta     __heaplast
+        sta     ___heaplast
         lda     ptr4+1
-        sta     __heaplast+1
+        sta     ___heaplast+1
         rts                             ; Done
 
 ; No merge of the left block, just set the link. Y points to size+1 if

@@ -59,6 +59,12 @@ $(ISEQUAL): ../isequal.c | $(WORKDIR)
 define PRG_template
 
 # should compile, but gives an error
+$(WORKDIR)/int-static-1888.$1.$2.prg: int-static-1888.c | $(WORKDIR)
+	@echo "FIXME: " $$@ "currently does not compile."
+	$(if $(QUIET),echo misc/int-static-1888.$1.$2.prg)
+	$(NOT) $(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
+
+# should compile, but gives an error
 $(WORKDIR)/bug760.$1.$2.prg: bug760.c | $(WORKDIR)
 	@echo "FIXME: " $$@ "currently does not compile."
 	$(if $(QUIET),echo misc/bug760.$1.$2.prg)
@@ -126,6 +132,14 @@ $(WORKDIR)/bug1265.$1.$2.prg: bug1265.c | $(WORKDIR)
 	$(LD65) -t sim$2 -o $$@ $$(@:.prg=.o) sim$2.lib $(NULLERR)
 	$(SIM65) $(SIM65FLAGS) $$@ $(NULLOUT) $(NULLERR)
 
+# this one requires -Werror
+$(WORKDIR)/bug1768.$1.$2.prg: bug1768.c | $(WORKDIR)
+	$(if $(QUIET),echo misc/bug1768.$1.$2.prg)
+	$(CC65) -Werror -t sim$2 -$1 -o $$(@:.prg=.s) $$< $(NULLERR)
+	$(CA65) -t sim$2 -o $$(@:.prg=.o) $$(@:.prg=.s) $(NULLERR)
+	$(LD65) -t sim$2 -o $$@ $$(@:.prg=.o) sim$2.lib $(NULLERR)
+	$(SIM65) $(SIM65FLAGS) $$@ $(NULLOUT) $(NULLERR)
+
 # should compile, but then hangs in an endless loop
 $(WORKDIR)/endless.$1.$2.prg: endless.c | $(WORKDIR)
 	$(if $(QUIET),echo misc/endless.$1.$2.prg)
@@ -148,6 +162,11 @@ $(WORKDIR)/goto.$1.$2.prg: goto.c $(ISEQUAL) | $(WORKDIR)
 	$(if $(QUIET),echo misc/goto.$1.$2.prg)
 	$(CC65) -t sim$2 -$1 -o $$@ $$< 2>$(WORKDIR)/goto.$1.$2.out
 	$(ISEQUAL) $(WORKDIR)/goto.$1.$2.out goto.ref
+
+# should not compile until 3-byte struct by value tests are re-enabled
+$(WORKDIR)/struct-by-value.$1.$2.prg: struct-by-value.c | $(WORKDIR)
+	$(if $(QUIET),echo misc/struct-by-value.$1.$2.prg)
+	$(NOT) $(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
 
 # the rest are tests that fail currently for one reason or another
 $(WORKDIR)/sitest.$1.$2.prg: sitest.c | $(WORKDIR)

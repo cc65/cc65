@@ -50,21 +50,6 @@
 
 
 /*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
-
-
-
-/* Map a generator function and its attributes to a token */
-typedef struct GenDesc {
-    token_t       Tok;                  /* Token to map to */
-    unsigned      Flags;                /* Flags for generator function */
-    void          (*Func) (unsigned, unsigned long);    /* Generator func */
-} GenDesc;
-
-
-
-/*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
@@ -156,19 +141,8 @@ void DoIncDecBitField (ExprDesc* Expr, long Val, unsigned KeepResult)
     unsigned    ChunkFlags;
     const Type* ChunkType;
 
-    /* If the bit-field fits within one byte, do the following operations
-    ** with bytes.
-    */
-    if ((Expr->Type->A.B.Width - 1U) / CHAR_BITS ==
-        (Expr->Type->A.B.Offs + Expr->Type->A.B.Width - 1U) / CHAR_BITS) {
-        ChunkType = GetUnderlyingType (Expr->Type);
-    } else {
-        /* We use the declarartion integer type as the chunk type.
-        ** Note: A bit-field will not occupy bits located in bytes more than
-        ** that of its declaration type in cc65. So this is OK.
-        */
-        ChunkType = Expr->Type + 1;
-    }
+    /* Determine the type to operate on the whole byte chunk containing the bit-field */
+    ChunkType = GetBitFieldChunkType (Expr->Type);
 
     /* Determine code generator flags */
     Flags      = TypeOf (Expr->Type) | CF_FORCECHAR;
@@ -254,19 +228,8 @@ static void OpAssignBitField (const GenDesc* Gen, ExprDesc* Expr, const char* Op
     ED_Init (&Expr2);
     Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
 
-    /* If the bit-field fits within one byte, do the following operations
-    ** with bytes.
-    */
-    if ((Expr->Type->A.B.Width - 1U) / CHAR_BITS ==
-        (Expr->Type->A.B.Offs + Expr->Type->A.B.Width - 1U) / CHAR_BITS) {
-        ChunkType = GetUnderlyingType (Expr->Type);
-    } else {
-        /* We use the declarartion integer type as the chunk type.
-        ** Note: A bit-field will not occupy bits located in bytes more than
-        ** that of its declaration type in cc65. So this is OK.
-        */
-        ChunkType = Expr->Type + 1;
-    }
+    /* Determine the type to operate on the whole byte chunk containing the bit-field */
+    ChunkType = GetBitFieldChunkType (Expr->Type);
 
     /* Determine code generator flags */
     Flags      = TypeOf (Expr->Type) | CF_FORCECHAR;
@@ -352,12 +315,41 @@ static void OpAssignBitField (const GenDesc* Gen, ExprDesc* Expr, const char* Op
             } else if (Gen->Func == g_sub) {
                 g_dec (Flags | CF_CONST, Expr2.IVal);
             } else {
-                if (Expr2.IVal == 0) {
-                    /* Check for div by zero/mod by zero */
-                    if (Gen->Func == g_div) {
-                        Error ("Division by zero");
-                    } else if (Gen->Func == g_mod) {
-                        Error ("Modulo operation with zero");
+                if (!ED_IsUneval (Expr)) {
+                    if (Expr2.IVal == 0) {
+                        /* Check for div by zero/mod by zero */
+                        if (Gen->Func == g_div) {
+                            Warning ("Division by zero");
+                        } else if (Gen->Func == g_mod) {
+                            Warning ("Modulo operation with zero");
+                        }
+                    } else if (Gen->Func == g_asl || Gen->Func == g_asr) {
+                        const Type* CalType  = IntPromotion (Expr->Type);
+                        unsigned    ExprBits = BitSizeOf (CalType);
+
+                        /* If the shift count is greater than or equal to the width of the
+                        ** promoted left operand, the behaviour is undefined according to
+                        ** the standard.
+                        */
+                        if (Expr2.IVal < 0) {
+                            Warning ("Negative shift count %ld treated as %u for %s",
+                                     Expr2.IVal,
+                                     (unsigned)Expr2.IVal & (ExprBits - 1),
+                                     GetBasicTypeName (CalType));
+                        } else if (Expr2.IVal >= (long)ExprBits) {
+                            Warning ("Shift count %ld >= width of %s treated as %u",
+                                     Expr2.IVal,
+                                     GetBasicTypeName (CalType),
+                                     (unsigned)Expr2.IVal & (ExprBits - 1));
+                        }
+
+                        /* Here we simply "wrap" the shift count around the width */
+                        Expr2.IVal &= ExprBits - 1;
+
+                        /* Additional check for bit-fields */
+                        if (Expr2.IVal >= (long)Expr->Type->A.B.Width) {
+                            Warning ("Shift count %ld >= width of bit-field", Expr2.IVal);
+                        }
                     }
                 }
 
@@ -532,12 +524,42 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
             } else if (Gen->Func == g_sub) {
                 g_dec (Flags | CF_CONST, Expr2.IVal);
             } else {
-                if (Expr2.IVal == 0) {
-                    /* Check for div by zero/mod by zero */
-                    if (Gen->Func == g_div) {
-                        Error ("Division by zero");
-                    } else if (Gen->Func == g_mod) {
-                        Error ("Modulo operation with zero");
+                if (!ED_IsUneval (Expr)) {
+                    if (Expr2.IVal == 0 && !ED_IsUneval (Expr)) {
+                        /* Check for div by zero/mod by zero */
+                        if (Gen->Func == g_div) {
+                            Warning ("Division by zero");
+                        } else if (Gen->Func == g_mod) {
+                            Warning ("Modulo operation with zero");
+                        }
+                    } else if (Gen->Func == g_asl || Gen->Func == g_asr) {
+                        const Type* CalType  = IntPromotion (Expr->Type);
+                        unsigned    ExprBits = BitSizeOf (CalType);
+
+                        /* If the shift count is greater than or equal to the width of the
+                        ** promoted left operand, the behaviour is undefined according to
+                        ** the standard.
+                        */
+                        if (Expr2.IVal < 0) {
+                            Warning ("Negative shift count %ld treated as %u for %s",
+                                     Expr2.IVal,
+                                     (unsigned)Expr2.IVal & (ExprBits - 1),
+                                     GetBasicTypeName (CalType));
+                        } else if (Expr2.IVal >= (long)ExprBits) {
+                            Warning ("Shift count %ld >= width of %s treated as %u",
+                                     Expr2.IVal,
+                                     GetBasicTypeName (CalType),
+                                     (unsigned)Expr2.IVal & (ExprBits - 1));
+                        }
+
+                        /* Here we simply "wrap" the shift count around the width */
+                        Expr2.IVal &= ExprBits - 1;
+
+                        /* Additional check for bit width */
+                        if (Expr2.IVal >= (long)BitSizeOf (Expr->Type)) {
+                            Warning ("Shift count %ld >= width of %s",
+                                     Expr2.IVal, GetBasicTypeName (Expr->Type));
+                        }
                     }
                 }
                 Gen->Func (Flags | CF_CONST, Expr2.IVal);
@@ -585,7 +607,7 @@ void OpAssign (const GenDesc* Gen, ExprDesc* Expr, const char* Op)
     Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
 
     /* Only "=" accept struct/union */
-    if (IsClassStruct (ltype) ? Gen != 0 : !IsClassScalar (ltype)) {
+    if (IsClassStruct (ltype) ? Gen != 0 : !IsScalarType (ltype)) {
         Error ("Invalid left operand for binary operator '%s'", Op);
         /* Continue. Wrong code will be generated, but the compiler won't
         ** break, so this is the best error recovery.
@@ -620,13 +642,19 @@ void OpAssign (const GenDesc* Gen, ExprDesc* Expr, const char* Op)
     if (IsClassStruct (ltype)) {
         /* Copy the struct or union by value */
         CopyStruct (Expr, &Expr2);
-    } else if (IsTypeBitField (ltype)) {
-        /* Special care is needed for bit-field 'op=' */
+    } else if (IsTypeFragBitField (ltype)) {
+        /* Special care is needed for bit-fields if they don't fit in full bytes */
         OpAssignBitField (Gen, Expr, Op);
     } else {
         /* Normal straight 'op=' */
         OpAssignArithmetic (Gen, Expr, Op);
     }
+
+    /* Expression has had side effects */
+    Expr->Flags |= E_SIDE_EFFECTS;
+
+    /* Propagate viral flags */
+    ED_PropagateFrom (Expr, &Expr2);
 }
 
 
@@ -747,4 +775,10 @@ void OpAddSubAssign (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
 
     /* Expression is an rvalue in the primary now */
     ED_FinalizeRValLoad (Expr);
+
+    /* Expression has had side effects */
+    Expr->Flags |= E_SIDE_EFFECTS;
+
+    /* Propagate viral flags */
+    ED_PropagateFrom (Expr, &Expr2);
 }

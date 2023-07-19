@@ -9,9 +9,9 @@
 #include <errno.h>
 #include <geos.h>
 
-void __fastcall__ _poserror (const char* msg)
+void __fastcall__ __poserror (const char* msg)
 {
-    const char *errmsg = _stroserror(_oserror);
+    const char *errmsg = __stroserror(_oserror);
 
     ExitTurbo();
     if (msg && *msg) {

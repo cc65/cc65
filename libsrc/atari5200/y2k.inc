@@ -9,16 +9,16 @@ Y2K     LDY     #$00            ; Copy BIOS opening screen to RAM
         CPX     #$E8            ; Is this a 4 port?
         BNE     Y2K0            ; Jump if not
         LDA     #$42            ; Yes, 4 port system
-Y2K0    STA     TEMPL           
-Y2K1    LDA     (TEMPL),Y       
+Y2K0    STA     TEMPL
+Y2K1    LDA     (TEMPL),Y
         STA     $0600,Y
-        INY     
+        INY
         BNE     Y2K1
         LDY     #$50
         INC     TEMPH
-Y2K2    LDA     (TEMPL),Y       
+Y2K2    LDA     (TEMPL),Y
         STA     $0700,Y
-        DEY     
+        DEY
         BPL     Y2K2
         LDA     #$D4            ; Point to copyright string
         STA     $0724
@@ -26,8 +26,8 @@ Y2K2    LDA     (TEMPL),Y
         STA     $0725
         LDX     #$0B            ; Store NOP's @ end
         LDA     #$EA
-Y2K3    STA     $0732,X         
-        DEX     
+Y2K3    STA     $0732,X
+        DEX
         BPL     Y2K3
         LDA     #$60            ; Store RTS opcode @ end
         STA     $0750

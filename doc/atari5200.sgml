@@ -84,7 +84,7 @@ The names are the usual ones you can find in system reference manuals. Example:
     tics = OS.rtclok[1]                     // get ticks
 ...
 </verb></tscreen>
- 
+
 <sect1>Atari 5200 specific functions<p>
 
 <itemize>
@@ -221,7 +221,7 @@ you cannot use any of the following functions (and a few others):
 
 <sect1>CAR format<p>
 
-AtariROMMaker (<url url="https://www.wudsn.com/index.php/productions-atari800/tools/atarirommaker"> ) 
+AtariROMMaker (<url url="https://www.wudsn.com/index.php/productions-atari800/tools/atarirommaker"> )
 can be used to create a <tt/.CAR/ file from the binary ROM image cc65 generates.
 This might be more convenient when working with emulators.
 
@@ -237,7 +237,7 @@ The runtime library provides a default game name which is "cc65
 compiled". To change that, one has to link a file which puts data into
 the "<tt/CARTNAME/" segment.
 
-For reference, here's the default version used by the cc65 libary:
+For reference, here's the default version used by the cc65 library:
 <tscreen><verb>
 .export         __CART_NAME__: absolute = 1
 .macpack        atari

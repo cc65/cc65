@@ -88,14 +88,20 @@ void InitSearchPaths (void)
     AddSubSearchPathFromEnv (CfgDefaultPath, "CC65_HOME", "cfg");
 
     /* Add some compiled-in search paths if defined at compile time. */
-#if defined(LD65_LIB) && !defined(_WIN32) && !defined(_AMIGA)
+#if defined(LD65_LIB) && !defined(_AMIGA)
+#if !defined(_WIN32) || defined(__MINGW32__)
     AddSearchPath (LibDefaultPath, LD65_LIB);
 #endif
-#if defined(LD65_OBJ) && !defined(_WIN32) && !defined(_AMIGA)
+#endif
+#if defined(LD65_OBJ) && !defined(_AMIGA)
+#if !defined(_WIN32) || defined(__MINGW32__)
     AddSearchPath (ObjDefaultPath, LD65_OBJ);
 #endif
-#if defined(LD65_CFG) && !defined(_WIN32) && !defined(_AMIGA)
+#endif
+#if defined(LD65_CFG) && !defined(_AMIGA)
+#if !defined(_WIN32) || defined(__MINGW32__)
     AddSearchPath (CfgDefaultPath, LD65_CFG);
+#endif
 #endif
 
     /* Add paths relative to the parent directory of the Windows binary. */

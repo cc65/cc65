@@ -159,6 +159,7 @@ static const TargetEntry TargetMap[] = {
     {   "cbm610",       TGT_CBM610       },
     {   "creativision", TGT_CREATIVISION },
     {   "cx16",         TGT_CX16         },
+    {   "ebadger",      TGT_EBADGER      },
     {   "gamate",       TGT_GAMATE       },
     {   "geos",         TGT_GEOS_CBM     },
     {   "geos-apple",   TGT_GEOS_APPLE   },
@@ -221,6 +222,7 @@ static const TargetProperties PropertyTable[TGT_COUNT] = {
     { "cx16",           CPU_65C02,      BINFMT_BINARY,      CTPET   },
     { "sym1",           CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "kim1",           CPU_6502,       BINFMT_BINARY,      CTNone  },
+    { "ebadger",        CPU_65C02,      BINFMT_BINARY,      CTNone  },
 };
 
 /* Target system */

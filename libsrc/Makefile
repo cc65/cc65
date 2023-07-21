@@ -26,6 +26,7 @@ TARGETS = apple2       \
           creativision \
           $(CBMS)      \
           $(GEOS)      \
+          ebadger      \
           gamate       \
           kim1         \
           lynx         \
@@ -137,6 +138,7 @@ CC65FLAGS = -Or -W error
 EXTZP = cbm510 \
         cbm610 \
         lynx
+        
 
 MKINC = $(GEOS) \
         atari   \

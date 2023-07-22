@@ -12,7 +12,7 @@
         .segment        "ONCE"
 
         .include "ebadger.inc"
-        
+
         .code
 
 ; Plot a character - also used as internal function
@@ -27,10 +27,6 @@ _cputc:
         beq     left
         cmp     #$0A            ; Test for \n = line feed
         beq     newline
-        eor     #$80            ; Invert high bit
-        cmp     #$E0            ; Test for lowercase
-        bcc     cputdirect
-        and     #$DF            ; Convert to uppercase
 
 cputdirect:
         jsr     putchar
@@ -53,7 +49,7 @@ newline:
 :       jmp     VTABZ
 
 putchar:
-mask:   and     INVFLG          ; Apply normal, inverse, flash
+mask:   ;and     INVFLG          ; Apply normal, inverse, flash
 
 putchardirect:
         pha

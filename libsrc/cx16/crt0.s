@@ -83,11 +83,6 @@ init:
         sta     sp
         stx     sp+1            ; Set argument stack ptr
 
-; Switch to the lower/UPPER PetSCII charset.
-
-        lda     #$0E
-        jsr     CHROUT
-
 ; Call the module constructors.
 
         jmp     initlib

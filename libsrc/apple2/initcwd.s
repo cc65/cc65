@@ -3,22 +3,39 @@
 ;
 
         .export         initcwd
-        .import         __cwd
+        .import         __cwd, __dos_type
 
         .include        "zeropage.inc"
+        .include        "apple2.inc"
         .include        "mli.inc"
 
-initcwd:
-        ; Set static prefix buffer
-        lda     #<__cwd
-        ldx     #>__cwd
-        sta     mliparam + MLI::PREFIX::PATHNAME
-        stx     mliparam + MLI::PREFIX::PATHNAME+1
+mli_parameters:
+        .byte $01     ; number of parameters
+        .addr __cwd   ; address of parameter
 
-        ; Get current working directory
-        lda     #GET_PREFIX_CALL
-        ldx     #PREFIX_COUNT
-        jsr     callmli
+initcwd:
+        ; Check for ProDOS 8
+        lda     __dos_type
+        beq     oserr
+
+        ; Save random counter
+        lda     RNDL
+        pha
+        lda     RNDH
+        pha
+
+        ; Call MLI
+        jsr     $BF00           ; MLI call entry point
+        .byte   GET_PREFIX_CALL ; MLI command
+        .addr   mli_parameters  ; MLI parameter
+
+        ; Restore random counter
+        tax
+        pla
+        sta     RNDH
+        pla
+        sta     RNDL
+        txa
 
         ; Check for null prefix
         ldx     __cwd
@@ -39,3 +56,7 @@ initcwd:
         sta     __cwd,x
 
 done:   rts
+
+oserr:  lda     #$01            ; "Bad system call number"
+        sec
+        rts

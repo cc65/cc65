@@ -9,14 +9,10 @@
         .include        "apple2.inc"
         .include        "mli.inc"
 
-mli_parameters:
-        .byte $01     ; number of parameters
-        .addr __cwd   ; address of parameter
-
 initcwd:
         ; Check for ProDOS 8
         lda     __dos_type
-        beq     oserr
+        beq     done
 
         ; Save random counter
         lda     RNDL
@@ -25,17 +21,19 @@ initcwd:
         pha
 
         ; Call MLI
+        ; We're not using mli.s' callmli because its
+        ; mliparam is in BSS and this will be called
+        ; before LC code is moved to the Language Card.
+
         jsr     $BF00           ; MLI call entry point
         .byte   GET_PREFIX_CALL ; MLI command
         .addr   mli_parameters  ; MLI parameter
 
         ; Restore random counter
-        tax
         pla
         sta     RNDH
         pla
         sta     RNDL
-        txa
 
         ; Check for null prefix
         ldx     __cwd
@@ -57,6 +55,8 @@ initcwd:
 
 done:   rts
 
-oserr:  lda     #$01            ; "Bad system call number"
-        sec
-        rts
+        .rodata
+
+mli_parameters:
+        .byte $01               ; Number of parameters
+        .addr __cwd             ; Address of parameter

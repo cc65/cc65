@@ -13,6 +13,6 @@ jmp ($10FF)
 .import _exit
 .export _main
 _main:
-	lda #0
-	tax
-	jmp _exit
+    lda #0
+    tax
+    jmp _exit

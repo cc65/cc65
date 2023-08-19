@@ -1367,17 +1367,22 @@ writable.
   Reading this pseudo variable will give the assembler version according to
   the following formula:
 
-        VER_MAJOR*$100 + VER_MINOR*$10
+        <tt>(VER_MAJOR * 0x100) + VER_MINOR</tt>
 
-  It may be used to encode the assembler version or check the assembler for
-  special features not available with older versions.
+  The upper 8 bits are the major-, the lower 8 bits are the  minor version.
 
   Example:
 
-  Version 2.14 of the assembler will return $2E0 as numerical constant when
-  reading the pseudo variable <tt/.VERSION/.
+  For example, version 47.11 of the assembler would have this macro defined as
+  <tt/0x2f0b/.
 
-
+  Note: until 2.19 this pseudo variable was defined as <tt>(VER_MAJOR * 0x100) + VER_MINOR * 0x10</tt> -
+  which resulted in broken values starting at version 2.16 of the assembler. For
+  this reason the value of this pseudo variable is considered purely informal - you should
+  not use it to check for a specific assembler version and use different code
+  according to the detected version - please update your code to work with the
+  recent version of the assembler instead (There is very little reason to not use
+  the most recent version - and even less to support older versions in your code).
 
 <sect>Pseudo functions<label id="pseudo-functions"><p>
 

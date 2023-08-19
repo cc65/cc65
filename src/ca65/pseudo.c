@@ -1043,6 +1043,11 @@ static void DoFeature (void)
             ErrorSkip ("Invalid feature: '%m%p'", &CurTok.SVal);
             return;
         }
+
+        if (Feature == FEAT_ADDRSIZE) {
+            Warning (1, "Deprecated feature: '.feature addrsize'. Pseudo function .addrsize is always available.");
+        }
+
         NextTok ();
 
         /* Optional +/- or ON/OFF */

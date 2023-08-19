@@ -850,14 +850,25 @@ static char *filterInput (FILE *F, char *tbl)
     /* loads file into buffer filtering it out */
     int a, prevchar = -1, i = 0, bracket = 0, quote = 1;
 
-    for (;;) {
-        a = getc(F);
-        if ((a == '\n') || (a == '\015')) a = ' ';
-        if (a == ',' && quote) a = ' ';
-        if (a == '\042') quote =! quote;
+    a = getc(F);
+    while (1) {
+        if (i >= BLOODY_BIG_BUFFER) {
+            AbEnd ("File too large for internal parsing buffer (%d bytes)",BLOODY_BIG_BUFFER);
+        }
+        if (((a == '\n') || (a == '\015')) ||
+            (a == ',' && quote)) {
+            a = ' ';
+        }
+        if (a == '\042') {
+            quote =! quote;
+        }
         if (quote) {
-            if ((a == '{') || (a == '(')) bracket++;
-            if ((a == '}') || (a == ')')) bracket--;
+            if ((a == '{') || (a == '(')) {
+                bracket++;
+            }
+            if ((a == '}') || (a == ')')) {
+                bracket--;
+            }
         }
         if (a == EOF) {
             tbl[i] = '\0';
@@ -873,13 +884,18 @@ static char *filterInput (FILE *F, char *tbl)
             if (a == ';' && quote) {
                 do {
                     a = getc (F);
-                } while (a != '\n');
-                fseek (F, -1, SEEK_CUR);
+                } while (a != '\n' && a != EOF);
+                /* Don't discard this newline/EOF, continue to next loop.
+                ** A previous implementation used fseek(F,-1,SEEK_CUR),
+                ** which is invalid for text mode files, and was unreliable across platforms.
+                */
+                continue;
             } else {
                 tbl[i++] = a;
                 prevchar = a;
             }
         }
+        a = getc(F);
     }
 
     if (bracket != 0) AbEnd ("There are unclosed brackets!");

@@ -259,7 +259,7 @@ NLINES          := $0387        ; Number of screen lines
 
 ; BASIC
 VARTAB          := $03E1        ; Pointer to start of BASIC variables
-MEMSIZE         := $03E9        ; Pointer to highest BASIC RAM location (+1)
+MEMSIZE         := $0259        ; Pointer to highest BASIC RAM location (+1)
 
 ; ---------------------------------------------------------------------------
 ; Vector and other locations

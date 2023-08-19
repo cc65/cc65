@@ -12,7 +12,7 @@ endif
 
 WORKDIR = ../testwrk/asm
 
-SUBDIRS = cpudetect opcodes listing val err
+SUBDIRS = cpudetect opcodes listing val err misc
 
 .PHONY: all continue mostlyclean clean
 

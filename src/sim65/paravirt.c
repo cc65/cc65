@@ -124,11 +124,7 @@ static unsigned PopParam (unsigned char Incr)
 static void PVExit (CPURegs* Regs)
 {
     Print (stderr, 1, "PVExit ($%02X)\n", Regs->AC);
-    if (PrintCycles) {
-        Print (stdout, 0, "%lu cycles\n", GetCycles ());
-    }
-
-    exit (Regs->AC);
+    SimExit (Regs->AC); /* Error code in range 0-255. */
 }
 
 
@@ -242,7 +238,15 @@ static void PVClose (CPURegs* Regs)
 
     Print (stderr, 2, "PVClose ($%04X)\n", FD);
 
-    RetVal = close (FD);
+    if (FD != 0xFFFF) {
+        RetVal = close (FD);
+    } else {
+        /* test/val/constexpr.c "abuses" close, expecting close(-1) to return -1.
+        ** This behaviour is not the same on all target platforms.
+        ** MSVC's close treats it as a fatal error instead and terminates.
+        */
+        RetVal = 0xFFFF;
+    }
 
     SetAX (Regs, RetVal);
 }

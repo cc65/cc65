@@ -74,10 +74,12 @@ color  := $0787
 
 The following is still very incomplete - if in doubt please look at existing sourcefiles and adapt to the existing style
 
-* Your files should obey the C89 standard.
+* Your files should generally obey the C89 standard, with a few C99 things (this is a bit similar to what cc65 itself supports). The exceptions are:
+   * use stdint.h for variables that require a certain bit size
+   * In printf-style functions use the PRIX64 (and similar) macros to deal with 64bit values (from inttypes.h)
+This list is not necessarily complete - if in doubt, please ask.
 * We generally have a "no warnings" policy
-* Warnings must not be hidden by using typecasts - fix the code instead
-   * In printf-style functions use the PRIX64 (and similar) macros to deal with 64bit values
+   * Warnings must not be hidden by using typecasts - fix the code instead
 * The normal indentation width should be four spaces.
 * You must use ANSI C comments (```/* */```); you must not use C++ comments (```//```).
 * When you add functions to an existing file, you should separate them by the same number of blank lines that separate the functions that already are in that file.

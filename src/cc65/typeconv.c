@@ -55,7 +55,7 @@
 
 
 
-static void DoConversion (ExprDesc* Expr, const Type* NewType)
+static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
 /* Emit code to convert the given expression to a new type. */
 {
     const Type* OldType;
@@ -128,6 +128,7 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
         ** internally already represented by a long.
         */
         if (NewBits <= OldBits) {
+            long OldVal = Expr->IVal;
 
             /* Cut the value to the new size */
             Expr->IVal &= (0xFFFFFFFFUL >> (32 - NewBits));
@@ -138,6 +139,10 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
                     /* Beware: Use the safe shift routine here. */
                     Expr->IVal |= shl_l (~0UL, NewBits);
                 }
+            }
+
+            if ((OldVal != Expr->IVal) && IS_Get (&WarnConstOverflow) && !Explicit) {
+                Warning ("Implicit conversion of constant overflows %d-bit destination", NewBits);
             }
         }
 
@@ -283,7 +288,7 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
         /* Both types must be complete */
         if (!IsIncompleteESUType (NewType) && !IsIncompleteESUType (Expr->Type)) {
             /* Do the actual conversion */
-            DoConversion (Expr, NewType);
+            DoConversion (Expr, NewType, 0);
         } else {
             /* We should have already generated error elsewhere so that we
             ** could just silently fail here to avoid excess errors, but to
@@ -330,7 +335,7 @@ void TypeCast (ExprDesc* Expr)
                 ReplaceType (Expr, NewType);
             } else if (IsCastType (Expr->Type)) {
                 /* Convert the value. The result has always the new type */
-                DoConversion (Expr, NewType);
+                DoConversion (Expr, NewType, 1);
             } else {
                 TypeCompatibilityDiagnostic (NewType, Expr->Type, 1,
                     "Cast to incompatible type '%s' from '%s'");

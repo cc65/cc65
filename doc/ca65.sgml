@@ -120,7 +120,7 @@ Long options:
   --list-bytes n                Maximum number of bytes per listing line
   --memory-model model          Set the memory model
   --pagelength n                Set the page length for the listing
-  --relax-checks                Disables some error checks (see <ref id="option--relax-checks" name="below">)
+  --relax-checks                Disables some error checks
   --smart                       Enable smart mode
   --target sys                  Set the target system
   --verbose                     Increase verbosity

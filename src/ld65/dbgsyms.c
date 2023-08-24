@@ -404,6 +404,11 @@ void PrintDbgSyms (FILE* F)
                 /* Output the type */
                 fputs (",type=imp", F);
 
+                /* Print the corresponding export's address */
+                if (Exp->Obj) {
+                  fprintf(F, ",val=0x%lX,size=%u", GetExportVal(Exp), Exp->Size);
+                }
+
                 /* If this is not a linker generated symbol, and the module
                 ** that contains the export has debug info, output the debug
                 ** symbol id for the export

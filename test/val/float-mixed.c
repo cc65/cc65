@@ -51,11 +51,11 @@ void test1(float f, char *str)
 {
     if (compare(f, str)) {
 //        printf(" (ok)");
-        printf("\n");
     } else {
-        printf(" (failed) !!!\n");
+        printf(" (failed) !!!  ");
         result++;
     }
+    printf("result:%d\n", result);
 }
 
 void SKIPPEDtest1(float f, char *str)
@@ -67,15 +67,12 @@ void SKIPPEDtest1(float f, char *str)
 
 void test(void)
 {
-#define XMIN 2.0f
-#define XSTEP 0.2f
-
-    ch = 3;
 
     printf("floatconst + intvar * floatconst\n");
-    fp1 = XMIN + ch * XSTEP;
-    printf("fp1:0x%08lx [0x402663e6] %s (2.5997)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
-    test1(fp1, "402663e6");
+    ch = 3;
+    fp1 = 2.0f + ch * 0.2f;
+    printf("fp1:0x%08lx [0x40266666] %s (2.5997)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "40266666");
 
     ch = 4;
     fp1 = ch * 2.0f + 3.0f;

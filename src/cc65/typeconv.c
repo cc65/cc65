@@ -149,7 +149,6 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
             Expr->V.FVal = FP_D_FromInt(Expr->IVal);
             LOG(("DoConversion 2 new fval: %f\n", Expr->V.FVal.V));
         }
-        /* FIXME: float --- end of new code */
 
         /* If this is a floating point constant, convert to integer,
         ** and warn if precision is discarded.
@@ -161,6 +160,7 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
             }
             Expr->IVal = IVal;
         }
+        /* FIXME: float --- end of new code */
 
         /* Check if the new datatype will have a smaller range. If it
         ** has a larger range, things are OK, since the value is

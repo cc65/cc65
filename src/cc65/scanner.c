@@ -704,20 +704,21 @@ static void NumericConst (void)
         /* Check for a fractional part and read it */
         if (SB_Peek (&Src) == '.') {
 
-            Double Scale;
+            Double Scale, ScaleDigit;
 
             /* Skip the dot */
             SB_Skip (&Src);
 
             /* Read fractional digits */
-            Scale  = FP_D_Make (1.0);
+            ScaleDigit = FP_D_Div (FP_D_Make (1.0), FP_D_FromInt (Base));
+            Scale = ScaleDigit;
             while (IsXDigit (SB_Peek (&Src)) && (DigitVal = HexVal (SB_Peek (&Src))) < Base) {
                 /* Get the value of this digit */
-                Double FracVal = FP_D_Div (FP_D_FromInt (DigitVal * Base), Scale);
+                Double FracVal = FP_D_Mul (FP_D_FromInt (DigitVal), Scale);
                 /* Add it to the float value */
                 FVal = FP_D_Add (FVal, FracVal);
-                /* Scale base */
-                Scale = FP_D_Mul (Scale, FP_D_FromInt (DigitVal));
+                /* Adjust Scale for next digit */
+                Scale = FP_D_Mul (Scale, ScaleDigit);
                 /* Skip the digit */
                 SB_Skip (&Src);
             }
@@ -729,12 +730,15 @@ static void NumericConst (void)
 
             unsigned Digits;
             unsigned Exp;
+            int Sign;
 
             /* Skip the exponent notifier */
             SB_Skip (&Src);
 
             /* Read an optional sign */
+            Sign = 0;
             if (SB_Peek (&Src) == '-') {
+                Sign = 1;
                 SB_Skip (&Src);
             } else if (SB_Peek (&Src) == '+') {
                 SB_Skip (&Src);
@@ -764,9 +768,11 @@ static void NumericConst (void)
                 Warning ("Floating constant exponent is too large");
             }
 
-            /* Scale the exponent and adjust the value accordingly */
+            /* Scale the exponent and adjust the value accordingly.
+            ** Decimal exponents are base 10, hexadecimal exponents are base 2 (C99).
+            */
             if (Exp) {
-                FVal = FP_D_Mul (FVal, FP_D_Make (pow (10, Exp)));
+                FVal = FP_D_Mul (FVal, FP_D_Make (pow ((Base == 16) ? 2.0 : 10.0, (Sign ? -1.0 : 1.0) * Exp)));
             }
         }
 

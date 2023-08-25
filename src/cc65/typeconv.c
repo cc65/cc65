@@ -123,6 +123,17 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
         ** to handle sign extension correctly.
         */
 
+        /* If this is a floating point constant, convert to integer,
+        ** and warn if precision is discarded.
+        */
+        if (IsClassFloat (OldType) && IsClassInt (NewType)) {
+            long IVal = (long)Expr->V.FVal.V;
+            if ((Expr->V.FVal.V != FP_D_FromInt(IVal).V) && !Explicit) {
+                Warning ("Floating point constant (%f) converted to integer loses precision (%ld)",Expr->V.FVal.V,IVal);
+            }
+            Expr->IVal = IVal;
+        }
+
         /* Check if the new datatype will have a smaller range. If it
         ** has a larger range, things are OK, since the value is
         ** internally already represented by a long.

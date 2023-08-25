@@ -78,6 +78,9 @@ static void CmdShowChildScopes (Collection* Args);
 static void CmdShowCSymbol (Collection* Args);
 /* Show c symbols from the debug info file */
 
+static void CmdShowExport (Collection* Args);
+/* Show export from the debug info file */
+
 static void CmdShowFunction (Collection* Args);
 /* Show C functions from the debug info file */
 
@@ -139,6 +142,7 @@ static unsigned FileWarnings = 0;
 enum {
     InvalidId,
     CSymbolId,
+    ExportId,
     LibraryId,
     LineId,
     ModuleId,
@@ -212,6 +216,11 @@ static const CmdEntry ShowCmds[] = {
         -1,
         CmdShowCSymbol
     }, {
+        "export",
+        "Show exports.",
+        -1,
+        CmdShowExport
+    }, {
         "func",
         0,
         -2,
@@ -264,7 +273,7 @@ static const CmdEntry ShowCmds[] = {
     }, {
         "symbol",
         "Show symbols. May be followed by one or more symbol or scope ids.",
-        -2,
+        -1,
         CmdShowSymbol
     }, {
         "symdef",
@@ -444,6 +453,8 @@ static unsigned FindIdType (const char* TypeName)
         char            Name[8];
         unsigned        Type;
     } TypeTab[] = {
+        {   "e",        ExportId        },
+        {   "export",   ExportId        },
         {   "l",        LineId          },
         {   "lib",      LibraryId       },
         {   "library",  LibraryId       },
@@ -577,6 +588,33 @@ static void PrintCSymbolHeader (void)
     /* Header */
     PrintLine ("  id  name                        type  kind   sc   offs  symbol scope");
     PrintSeparator ();
+}
+
+
+
+static void PrintExportHeader (void)
+/* Output a header for a list of C symbols */
+{
+    /* Header */
+    PrintLine ("  id  name                        addr  size   symbol");
+    PrintSeparator ();
+}
+
+static void PrintExports (const cc65_exportinfo* E)
+/* Output a list of C symbols */
+{
+    unsigned I;
+    const cc65_exportdata* D;
+
+    /* Segments */
+    for (I = 0, D = E->data; I < E->count; ++I, ++D) {
+        PrintId (D->export_id, 6);
+        Print ("%-28s", D->export_name);
+        PrintId (D->export_value, 6);
+        PrintNumber (D->export_size, 4, 6);
+        PrintId (D->symbol_id, 6);
+        NewLine ();
+    }
 }
 
 
@@ -1124,6 +1162,66 @@ static void CmdShowCSymbol (Collection* Args)
 }
 
 
+static void CmdShowExport (Collection* Args)
+/* Show exports from the debug info file */
+{
+    const cc65_exportinfo* E;
+
+    /* Be sure a file is loaded */
+    if (!FileIsLoaded ()) {
+        return;
+    }
+
+    /* Output the header */
+    PrintExportHeader ();
+
+    /* No arguments means show all exports */
+    if (CollCount (Args) == 0) {
+
+        /* Fetch the list of exports */
+        E = cc65_get_exportlist (Info);
+
+        /* Output the exports */
+        PrintExports (E);
+
+        /* Free the list */
+        cc65_free_exportinfo (Info, E);
+
+    } else {
+
+        /* Output export for all arguments */
+        unsigned I;
+        for (I = 0; I < CollCount (Args); ++I) {
+
+            /* Parse the argument */
+            unsigned Id;
+            unsigned IdType = ExportId;
+            if (GetId (CollConstAt (Args, I), &Id, &IdType)) {
+                /* Fetch list depending on type */
+                switch (IdType) {
+                    case ExportId:
+                        E = cc65_export_byid (Info, Id);
+                        break;
+                    default:
+                        E = 0;
+                        PrintLine ("Invalid id type");
+                        break;
+                }
+            } else {
+                /* Invalid id */
+                E = 0;
+            }
+
+            /* Output the list */
+            if (E) {
+                PrintExports (E);
+                cc65_free_exportinfo (Info, E);
+            }
+        }
+    }
+}
+
+
 
 static void CmdShowFunction (Collection* Args)
 /* Show C functions from the debug info file */
@@ -1606,37 +1704,52 @@ static void CmdShowSymbol (Collection* Args)
     /* Output the header */
     PrintSymbolHeader ();
 
-    for (I = 0; I < CollCount (Args); ++I) {
+    /* No arguments means show all symbols */
+    if (CollCount (Args) == 0) {
 
-        /* Parse the argument */
-        unsigned Id;
-        unsigned IdType = SymbolId;
-        if (GetId (CollConstAt (Args, I), &Id, &IdType)) {
-            /* Fetch list depending on type */
-            switch (IdType) {
+        /* Fetch the list of symbols */
+        S = cc65_get_symbollist (Info);
 
-                case ScopeId:
-                    S = cc65_symbol_byscope (Info, Id);
-                    break;
+        /* Output the symbols */
+        PrintSymbols (S);
 
-                case SymbolId:
-                    S = cc65_symbol_byid (Info, Id);
-                    break;
+        /* Free the list */
+        cc65_free_symbolinfo (Info, S);
 
-                default:
-                    S = 0;
-                    PrintLine ("Invalid id type");
-                    break;
+    } else {
+
+        for (I = 0; I < CollCount (Args); ++I) {
+
+            /* Parse the argument */
+            unsigned Id;
+            unsigned IdType = SymbolId;
+            if (GetId (CollConstAt (Args, I), &Id, &IdType)) {
+                /* Fetch list depending on type */
+                switch (IdType) {
+
+                    case ScopeId:
+                        S = cc65_symbol_byscope (Info, Id);
+                        break;
+
+                    case SymbolId:
+                        S = cc65_symbol_byid (Info, Id);
+                        break;
+
+                    default:
+                        S = 0;
+                        PrintLine ("Invalid id type");
+                        break;
+                }
+            } else {
+                /* Ignore the invalid id */
+                S = 0;
             }
-        } else {
-            /* Ignore the invalid id */
-            S = 0;
-        }
 
-        /* Output the list */
-        if (S) {
-            PrintSymbols (S);
-            cc65_free_symbolinfo (Info, S);
+            /* Output the list */
+            if (S) {
+                PrintSymbols (S);
+                cc65_free_symbolinfo (Info, S);
+            }
         }
     }
 }
@@ -1909,6 +2022,3 @@ int main (int argc, char* argv[])
     DoneCollection (&Args);
     return 0;
 }
-
-
-

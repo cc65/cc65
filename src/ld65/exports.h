@@ -47,6 +47,7 @@
 
 /* ld65 */
 #include "config.h"
+#include "dbgsyms.h"
 #include "lineinfo.h"
 #include "memarea.h"
 #include "objdata.h"
@@ -77,6 +78,7 @@ struct Import {
 /* Export symbol structure */
 typedef struct Export Export;
 struct Export {
+    unsigned            Id;             /* Export id */
     unsigned            Name;           /* Name */
     Export*             Next;           /* Hash table link */
     unsigned            Flags;          /* Generic flags */
@@ -87,7 +89,7 @@ struct Export {
     unsigned            Size;           /* Size of the symbol if any */
     Collection          DefLines;       /* Line infos of definition */
     Collection          RefLines;       /* Line infos of reference */
-    unsigned            DbgSymId;       /* Id of debug symbol for this export */
+    DbgSym*             DbgSymbol;      /* debug symbol for this export */
     unsigned short      Type;           /* Type of export */
     unsigned short      AddrSize;       /* Address size of export */
     unsigned char       ConDes[CD_TYPE_COUNT];  /* Constructor/destructor decls */
@@ -209,6 +211,15 @@ int ExportHasMark (Export* E);
 
 void CircularRefError (const Export* E);
 /* Print an error about a circular reference using to define the given export */
+
+unsigned ExportInfoCount (void);
+/* Return the total number of export infos */
+
+void AssignExportInfoIds (void);
+/* Assign the ids to the export infos */
+
+void PrintExports (FILE* F);
+/* Print the exports with no debug symbol in a debug file */
 
 
 

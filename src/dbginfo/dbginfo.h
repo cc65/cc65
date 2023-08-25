@@ -181,6 +181,53 @@ void cc65_free_csyminfo (cc65_dbginfo handle, const cc65_csyminfo* info);
 
 
 /*****************************************************************************/
+/*                                 Exports                                   */
+/*****************************************************************************/
+
+
+
+/* Exports information */
+typedef struct cc65_exportdata cc65_exportdata;
+struct cc65_exportdata {
+    unsigned            export_id;      /* The internal export id */
+    const char*         export_name;    /* Name of the export */
+    cc65_size           export_size;    /* Size of export, 0 if unknown */
+    long                export_value;   /* Value of export */
+    unsigned            symbol_id;      /* Matching symbol */
+
+};
+
+typedef struct cc65_exportinfo cc65_exportinfo;
+struct cc65_exportinfo {
+    unsigned            count;          /* Number of data sets that follow */
+    cc65_exportdata    data[1];         /* Data sets, number is dynamic */
+};
+
+
+
+const cc65_exportinfo* cc65_get_exportlist (cc65_dbginfo handle);
+/* Return a list of all exports */
+
+const cc65_exportinfo* cc65_export_byid (cc65_dbginfo handle, unsigned id);
+/* Return information about a export with a specific id. The function
+** returns NULL if the id is invalid (no such export) and otherwise a
+** cc65_exportinfo structure with one entry that contains the requested
+** export information.
+*/
+
+const cc65_exportinfo* cc65_export_inrange (cc65_dbginfo handle,
+                                            cc65_addr start, cc65_addr end);
+/* Return a list of exports in the given range. end is inclusive. The function
+** return NULL if no exports within the given range are found.
+*/
+
+
+void cc65_free_exportinfo (cc65_dbginfo handle, const cc65_exportinfo* info);
+/* Free a export info record */
+
+
+
+/*****************************************************************************/
 /*                                 Libraries                                 */
 /*****************************************************************************/
 
@@ -600,6 +647,9 @@ struct cc65_symbolinfo {
 
 
 
+const cc65_symbolinfo* cc65_get_symbollist (cc65_dbginfo handle);
+/* Return a list of all symbols */
+
 const cc65_symbolinfo* cc65_symbol_byid (cc65_dbginfo handle, unsigned id);
 /* Return the symbol with a given id. The function returns NULL if no symbol
 ** with this id was found.
@@ -705,6 +755,3 @@ void cc65_free_typedata (cc65_dbginfo Handle, const cc65_typedata* data);
 
 /* End of dbginfo.h */
 #endif
-
-
-

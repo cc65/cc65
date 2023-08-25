@@ -59,8 +59,22 @@
 struct Scope;
 struct HLLDbgSym;
 
-/* Opaque debug symbol structure */
+/* Debug symbol structure */
 typedef struct DbgSym DbgSym;
+struct DbgSym {
+    unsigned            Id;             /* Id of debug symbol */
+    DbgSym*             Next;           /* Pool linear list link */
+    ObjData*            Obj;            /* Object file that exports the name */
+    Collection          DefLines;       /* Line infos for definition */
+    Collection          RefLines;       /* Line infos for references */
+    ExprNode*           Expr;           /* Expression (0 if not def'd) */
+    unsigned            Size;           /* Symbol size if any */
+    unsigned            OwnerId;        /* Id of parent/owner */
+    unsigned            ImportId;       /* Id of import if this is one */
+    unsigned            Name;           /* Name */
+    unsigned short      Type;           /* Type of symbol */
+    unsigned short      AddrSize;       /* Address size of symbol */
+};
 
 
 

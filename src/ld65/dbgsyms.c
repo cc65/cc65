@@ -63,22 +63,6 @@
 
 
 
-/* Definition of the debug symbol structure */
-struct DbgSym {
-    unsigned            Id;             /* Id of debug symbol */
-    DbgSym*             Next;           /* Pool linear list link */
-    ObjData*            Obj;            /* Object file that exports the name */
-    Collection          DefLines;       /* Line infos for definition */
-    Collection          RefLines;       /* Line infos for references */
-    ExprNode*           Expr;           /* Expression (0 if not def'd) */
-    unsigned            Size;           /* Symbol size if any */
-    unsigned            OwnerId;        /* Id of parent/owner */
-    unsigned            ImportId;       /* Id of import if this is one */
-    unsigned            Name;           /* Name */
-    unsigned short      Type;           /* Type of symbol */
-    unsigned short      AddrSize;       /* Address size of symbol */
-};
-
 /* Structure used for a high level language function or symbol */
 typedef struct HLLDbgSym HLLDbgSym;
 struct HLLDbgSym {
@@ -222,8 +206,8 @@ DbgSym* ReadDbgSym (FILE* F, ObjData* O, unsigned Id)
     ** it but use it to let the export point back to us.
     */
     if (SYM_IS_EXPORT (D->Type)) {
-        /* Get the export from the export id, then set the our id */
-        GetObjExport (O, ReadVar (F))->DbgSymId = Id;
+        /* Get the export from the export id, then set our symbol */
+        GetObjExport (O, ReadVar (F))->DbgSymbol = D;
     }
 
     /* Last is the list of line infos for this symbol */
@@ -294,22 +278,6 @@ static long GetDbgSymVal (const DbgSym* D)
 
 
 
-static void PrintLineInfo (FILE* F, const Collection* LineInfos, const char* Format)
-/* Output an attribute with line infos */
-{
-    if (CollCount (LineInfos) > 0) {
-        unsigned I;
-        const LineInfo* LI = CollConstAt (LineInfos, 0);
-        fprintf (F, Format, LI->Id);
-        for (I = 1; I < CollCount (LineInfos); ++I) {
-            LI = CollConstAt (LineInfos, I);
-            fprintf (F, "+%u", LI->Id);
-        }
-    }
-}
-
-
-
 unsigned DbgSymCount (void)
 /* Return the total number of debug symbols */
 {
@@ -345,7 +313,6 @@ unsigned HLLDbgSymCount (void)
     }
     return Count;
 }
-
 
 
 void PrintDbgSyms (FILE* F)
@@ -386,8 +353,8 @@ void PrintDbgSyms (FILE* F)
             }
 
             /* Output line infos */
-            PrintLineInfo (F, &S->DefLines, ",def=%u");
-            PrintLineInfo (F, &S->RefLines, ",ref=%u");
+            PrintLineInfoReferences (F, &S->DefLines, ",def=%u");
+            PrintLineInfoReferences (F, &S->RefLines, ",ref=%u");
 
             /* If this is an import, output the id of the matching export.
             ** If this is not an import, output its value and - if we have
@@ -401,21 +368,9 @@ void PrintDbgSyms (FILE* F)
                 /* Get the export from the import */
                 const Export* Exp = Imp->Exp;
 
-                /* Output the type */
-                fputs (",type=imp", F);
-
-                /* Print the corresponding export's address */
-                if (Exp->Obj) {
-                  fprintf(F, ",val=0x%lX,size=%u", GetExportVal(Exp), Exp->Size);
-                }
-
-                /* If this is not a linker generated symbol, and the module
-                ** that contains the export has debug info, output the debug
-                ** symbol id for the export
+                /* output the type and export id for the export
                 */
-                if (Exp->Obj && OBJ_HAS_DBGINFO (Exp->Obj->Header.Flags)) {
-                    fprintf (F, ",exp=%u", Exp->Obj->SymBaseId + Exp->DbgSymId);
-                }
+                fprintf (F, ",type=imp,exp=%u", Exp->Id);
 
             } else {
 
@@ -437,6 +392,7 @@ void PrintDbgSyms (FILE* F)
 
                 /* Output the type */
                 fprintf (F, ",type=%s", SYM_IS_LABEL (S->Type)? "lab" : "equ");
+
             }
 
             /* Terminate the output line */
@@ -444,8 +400,6 @@ void PrintDbgSyms (FILE* F)
         }
     }
 }
-
-
 
 void PrintHLLDbgSyms (FILE* F)
 /* Print the high level language debug symbols in a debug file */

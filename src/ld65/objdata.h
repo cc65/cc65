@@ -78,6 +78,7 @@ struct ObjData {
     unsigned            SymBaseId;      /* Debug info base id for symbols */
     unsigned            ScopeBaseId;    /* Debug info base id for scopes */
     unsigned            SpanBaseId;     /* Debug info base id for spans */
+    unsigned            ExpBaseId;      /* Debug info base id for exports */
 
     Collection          Files;          /* List of input files */
     Collection          Sections;       /* List of all sections */

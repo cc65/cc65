@@ -188,6 +188,7 @@ struct DbgInfo {
     ** actually the ones that "own" the items.
     */
     Collection          CSymInfoById;   /* C symbol infos sorted by id */
+    Collection          ExportInfoById; /* Export infos sorted by id */
     Collection          FileInfoById;   /* File infos sorted by id */
     Collection          LibInfoById;    /* Library infos sorted by id */
     Collection          LineInfoById;   /* Line infos sorted by id */
@@ -199,13 +200,15 @@ struct DbgInfo {
     Collection          TypeInfoById;   /* Type infos sorted by id */
 
     /* Collections with other sort criteria */
-    Collection          CSymFuncByName; /* C functions sorted by name */
-    Collection          FileInfoByName; /* File infos sorted by name */
-    Collection          ModInfoByName;  /* Module info sorted by name */
-    Collection          ScopeInfoByName;/* Scope infos sorted by name */
-    Collection          SegInfoByName;  /* Segment infos sorted by name */
-    Collection          SymInfoByName;  /* Symbol infos sorted by name */
-    Collection          SymInfoByVal;   /* Symbol infos sorted by value */
+    Collection          CSymFuncByName;   /* C functions sorted by name */
+    Collection          ExportInfoByName; /* Export infos sorted by name */
+    Collection          ExportInfoByVal;  /* Export infos sorted by value */
+    Collection          FileInfoByName;   /* File infos sorted by name */
+    Collection          ModInfoByName;    /* Module info sorted by name */
+    Collection          ScopeInfoByName;  /* Scope infos sorted by name */
+    Collection          SegInfoByName;    /* Segment infos sorted by name */
+    Collection          SymInfoByName;    /* Symbol infos sorted by name */
+    Collection          SymInfoByVal;     /* Symbol infos sorted by value */
 
     /* Other stuff */
     SpanInfoList        SpanInfoByAddr; /* Span infos sorted by unique address */
@@ -237,6 +240,7 @@ struct InputData {
 
 /* Typedefs for the item structures. Do also serve as forwards */
 typedef struct CSymInfo CSymInfo;
+typedef struct ExportInfo ExportInfo;
 typedef struct FileInfo FileInfo;
 typedef struct LibInfo LibInfo;
 typedef struct LineInfo LineInfo;
@@ -266,6 +270,19 @@ struct CSymInfo {
         ScopeInfo*      Info;           /* Pointer to scope */
     } Scope;
     char                Name[1];        /* Name of file with full path */
+};
+
+/* Internally used export info struct */
+struct ExportInfo {
+    unsigned            Id;             /* Id of export */
+    cc65_addr           Value;          /* Address of export */
+    cc65_size           Size;           /* Size of export */
+    union {
+        unsigned        Id;             /* Id of attached asm symbol */
+        SymInfo*        Info;           /* Pointer to attached asm symbol */
+    } Sym;
+    Collection*         ImportList;     /* List of imports */
+    char                Name[1];        /* Name of export */
 };
 
 /* Internally used file info struct */
@@ -375,7 +392,7 @@ struct SymInfo {
     cc65_size           Size;           /* Size of symbol */
     union {
         unsigned        Id;             /* Id of export if any */
-        SymInfo*        Info;           /* Pointer to export if any */
+        ExportInfo*     Info;           /* Pointer to export if any */
     } Exp;
     union {
         unsigned        Id;             /* Id of segment if any */
@@ -390,7 +407,6 @@ struct SymInfo {
         SymInfo*        Info;           /* Pointer to parent symbol if any */
     } Parent;
     CSymInfo*           CSym;           /* Corresponding C symbol */
-    Collection*         ImportList;     /* List of imports if this is an export */
     Collection*         CheapLocals;    /* List of cheap local symbols */
     Collection          DefLineInfoList;/* Line info of symbol definition */
     Collection          RefLineInfoList;/* Line info of symbol references */
@@ -1343,6 +1359,90 @@ static int CompareFileInfoByName (const void* L, const void* R)
 
 
 /*****************************************************************************/
+/*                               Export info                                */
+/*****************************************************************************/
+
+
+
+static ExportInfo* NewExportInfo (const StrBuf* Name)
+/* Create a new ExportInfo struct, initialize and return it */
+{
+    /* Allocate memory */
+    ExportInfo* E = xmalloc (sizeof (ExportInfo) + SB_GetLen (Name));
+
+    /* Initialize the name */
+    memcpy (E->Name, SB_GetConstBuf (Name), SB_GetLen (Name) + 1);
+
+    E->ImportList  = 0;
+
+    /* Return it */
+    return E;
+}
+
+
+
+static void FreeExportInfo (ExportInfo* E)
+/* Free a ExportInfo struct */
+{
+    CollFree (E->ImportList);
+    xfree (E);
+}
+
+
+
+static int CompareExportInfoByName (const void* L, const void* R)
+/* Helper function to sort export infos in a collection by name */
+{
+    /* Sort by export name */
+    return strcmp (((const ExportInfo*) L)->Name,
+                   ((const ExportInfo*) R)->Name);
+}
+
+
+
+static int CompareExportInfoByVal (const void* L, const void* R)
+/* Helper function to sort export infos in a collection by value */
+{
+    /* Sort by export value. If both are equal, sort by export name so it
+    ** looks nice when such a list is returned.
+    */
+    if (((const ExportInfo*) L)->Value > ((const ExportInfo*) R)->Value) {
+        return 1;
+    } else if (((const ExportInfo*) L)->Value < ((const ExportInfo*) R)->Value) {
+        return -1;
+    } else {
+        return CompareExportInfoByName (L, R);
+    }
+}
+
+
+
+static cc65_exportinfo* new_cc65_exportinfo (unsigned Count)
+/* Allocate and return a cc65_exportinfo struct that is able to hold Count
+** entries. Initialize the count field of the returned struct.
+*/
+{
+    cc65_exportinfo* E = xmalloc (sizeof (*E) - sizeof (E->data[0]) +
+                                   Count * sizeof (E->data[0]));
+    E->count = Count;
+    return E;
+}
+
+
+
+static void CopyExportInfo (cc65_exportdata* D, const ExportInfo* E)
+/* Copy data from a ExportInfo struct to a cc65_exportdata struct */
+{
+    D->export_id    = E->Id;
+    D->export_name  = E->Name;
+    D->export_value = E->Value;
+    D->export_size  = E->Size;
+    D->symbol_id    = E->Sym.Id != CC65_INV_ID ? GetId (E->Sym.Info) : CC65_INV_ID;
+}
+
+
+
+/*****************************************************************************/
 /*                               Library info                                */
 /*****************************************************************************/
 
@@ -1786,7 +1886,6 @@ static SymInfo* NewSymInfo (const StrBuf* Name)
 
     /* Initialize it as necessary */
     S->CSym        = 0;
-    S->ImportList  = 0;
     S->CheapLocals = 0;
     CollInit (&S->DefLineInfoList);
     CollInit (&S->RefLineInfoList);
@@ -1801,7 +1900,6 @@ static SymInfo* NewSymInfo (const StrBuf* Name)
 static void FreeSymInfo (SymInfo* S)
 /* Free a SymInfo struct */
 {
-    CollFree (S->ImportList);
     CollFree (S->CheapLocals);
     CollDone (&S->DefLineInfoList);
     CollDone (&S->RefLineInfoList);
@@ -1832,25 +1930,22 @@ static void CopySymInfo (cc65_symboldata* D, const SymInfo* S)
     D->symbol_name      = S->Name;
     D->symbol_type      = S->Type;
     D->symbol_size      = S->Size;
+    D->symbol_value     = S->Value;
 
-    /* If this is an import, it doesn't have a value or segment. Use the data
-    ** from the matching export instead.
-    */
     if (S->Exp.Info) {
         /* This is an import, because it has a matching export */
         D->export_id    = S->Exp.Info->Id;
-        D->symbol_value = S->Exp.Info->Value;
-        Seg             = S->Exp.Info->Seg.Info;
     } else {
         D->export_id    = CC65_INV_ID;
-        D->symbol_value = S->Value;
-        Seg             = S->Seg.Info;
     }
+
+    Seg                 = S->Seg.Info;
     if (Seg) {
         D->segment_id   = Seg->Id;
     } else {
         D->segment_id   = CC65_INV_ID;
     }
+
     D->scope_id         = S->Scope.Info->Id;
     if (S->Parent.Info) {
         D->parent_id    = S->Parent.Info->Id;
@@ -2384,6 +2479,7 @@ static DbgInfo* NewDbgInfo (const char* FileName)
 
     /* Initialize it */
     CollInit (&Info->CSymInfoById);
+    CollInit (&Info->ExportInfoById);
     CollInit (&Info->FileInfoById);
     CollInit (&Info->LibInfoById);
     CollInit (&Info->LineInfoById);
@@ -2395,6 +2491,8 @@ static DbgInfo* NewDbgInfo (const char* FileName)
     CollInit (&Info->TypeInfoById);
 
     CollInit (&Info->CSymFuncByName);
+    CollInit (&Info->ExportInfoByName);
+    CollInit (&Info->ExportInfoByVal);
     CollInit (&Info->FileInfoByName);
     CollInit (&Info->ModInfoByName);
     CollInit (&Info->ScopeInfoByName);
@@ -2423,6 +2521,9 @@ static void FreeDbgInfo (DbgInfo* Info)
     /* First, free the items in the collections */
     for (I = 0; I < CollCount (&Info->CSymInfoById); ++I) {
         FreeCSymInfo (CollAt (&Info->CSymInfoById, I));
+    }
+    for (I = 0; I < CollCount (&Info->ExportInfoById); ++I) {
+        FreeExportInfo (CollAt (&Info->ExportInfoById, I));
     }
     for (I = 0; I < CollCount (&Info->FileInfoById); ++I) {
         FreeFileInfo (CollAt (&Info->FileInfoById, I));
@@ -2454,6 +2555,7 @@ static void FreeDbgInfo (DbgInfo* Info)
 
     /* Free the memory used by the id collections */
     CollDone (&Info->CSymInfoById);
+    CollDone (&Info->ExportInfoById);
     CollDone (&Info->FileInfoById);
     CollDone (&Info->LibInfoById);
     CollDone (&Info->LineInfoById);
@@ -2466,6 +2568,8 @@ static void FreeDbgInfo (DbgInfo* Info)
 
     /* Free the memory used by the other collections */
     CollDone (&Info->CSymFuncByName);
+    CollDone (&Info->ExportInfoByName);
+    CollDone (&Info->ExportInfoByVal);
     CollDone (&Info->FileInfoByName);
     CollDone (&Info->ModInfoByName);
     CollDone (&Info->ScopeInfoByName);
@@ -3153,6 +3257,12 @@ static void ParseInfo (InputData* D)
 
             case TOK_CSYM:
                 CollGrow (&D->Info->CSymInfoById,  D->IVal);
+                break;
+
+            case TOK_EXPORT:
+                CollGrow (&D->Info->ExportInfoById,   D->IVal);
+                CollGrow (&D->Info->ExportInfoByName, D->IVal);
+                CollGrow (&D->Info->ExportInfoByVal,  D->IVal);
                 break;
 
             case TOK_FILE:
@@ -4154,7 +4264,6 @@ static void ParseSym (InputData* D)
     */
     Collection          DefLineIds = COLLECTION_INITIALIZER;
     unsigned            ExportId = CC65_INV_ID;
-    unsigned            FileId = CC65_INV_ID;
     unsigned            Id = CC65_INV_ID;
     StrBuf              Name = STRBUF_INITIALIZER;
     unsigned            ParentId = CC65_INV_ID;
@@ -4196,12 +4305,11 @@ static void ParseSym (InputData* D)
 
         /* Something we know? */
         if (D->Tok != TOK_ADDRSIZE      && D->Tok != TOK_DEF            &&
-            D->Tok != TOK_EXPORT        && D->Tok != TOK_FILE           &&
-            D->Tok != TOK_ID            && D->Tok != TOK_NAME           &&
-            D->Tok != TOK_PARENT        && D->Tok != TOK_REF            &&
-            D->Tok != TOK_SCOPE         && D->Tok != TOK_SEGMENT        &&
-            D->Tok != TOK_SIZE          && D->Tok != TOK_TYPE           &&
-            D->Tok != TOK_VALUE) {
+            D->Tok != TOK_EXPORT        && D->Tok != TOK_ID             &&
+            D->Tok != TOK_NAME          && D->Tok != TOK_PARENT         &&
+            D->Tok != TOK_REF           && D->Tok != TOK_SCOPE          &&
+            D->Tok != TOK_SEGMENT       && D->Tok != TOK_SIZE           &&
+            D->Tok != TOK_TYPE          && D->Tok != TOK_VALUE) {
 
             /* Try smart error recovery */
             if (D->Tok == TOK_IDENT || TokenIsKeyword (D->Tok)) {
@@ -4249,15 +4357,6 @@ static void ParseSym (InputData* D)
                 }
                 ExportId = D->IVal;
                 InfoBits |= ibExportId;
-                NextToken (D);
-                break;
-
-            case TOK_FILE:
-                if (!IntConstFollows (D)) {
-                    goto ErrorExit;
-                }
-                FileId = D->IVal;
-                InfoBits |= ibFileId;
                 NextToken (D);
                 break;
 
@@ -4409,6 +4508,157 @@ ErrorExit:
     /* Entry point in case of errors */
     CollDone (&DefLineIds);
     CollDone (&RefLineIds);
+    SB_Done (&Name);
+    return;
+}
+
+
+
+
+static void ParseExport (InputData* D)
+/* Parse a EXP line */
+{
+    /* Most of the following variables are initialized with a value that is
+    ** overwritten later. This is just to avoid compiler warnings.
+    */
+    unsigned            Id = CC65_INV_ID;
+    StrBuf              Name = STRBUF_INITIALIZER;
+    cc65_size           Size = 0;
+    long                Value = 0;
+    unsigned            SymId = CC65_INV_ID;
+
+    ExportInfo*            E;
+    enum {
+        ibNone          = 0x0000,
+
+        ibId            = 0x0001,
+        ibSize          = 0x0002,
+        ibName          = 0x0004,
+        ibValue         = 0x0008,
+        ibSym           = 0x0010,
+
+        ibRequired      = ibId | ibName | ibValue,
+    } InfoBits = ibNone;
+
+    /* Skip the EXP token */
+    NextToken (D);
+
+    /* More stuff follows */
+    while (1) {
+
+        Token Tok;
+
+        /* Something we know? */
+        if (D->Tok != TOK_ID            && D->Tok != TOK_NAME           &&
+            D->Tok != TOK_SIZE          && D->Tok != TOK_SYM            &&
+            D->Tok != TOK_VALUE) {
+
+            /* Try smart error recovery */
+            if (D->Tok == TOK_IDENT || TokenIsKeyword (D->Tok)) {
+                UnknownKeyword (D);
+                continue;
+            }
+
+            /* Done */
+            break;
+        }
+
+        /* Remember the token, skip it, check for equal */
+        Tok = D->Tok;
+        NextToken (D);
+        if (!ConsumeEqual (D)) {
+            goto ErrorExit;
+        }
+
+        /* Check what the token was */
+        switch (Tok) {
+
+            case TOK_ID:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                Id = D->IVal;
+                NextToken (D);
+                InfoBits |= ibId;
+                break;
+
+            case TOK_NAME:
+                if (!StrConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                SB_Copy (&Name, &D->SVal);
+                SB_Terminate (&Name);
+                InfoBits |= ibName;
+                NextToken (D);
+                break;
+
+            case TOK_SIZE:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                Size = (cc65_size) D->IVal;
+                InfoBits |= ibSize;
+                NextToken (D);
+                break;
+
+            case TOK_VALUE:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                Value = D->IVal;
+                InfoBits |= ibValue;
+                NextToken (D);
+                break;
+
+            case TOK_SYM:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                SymId = D->IVal;
+                InfoBits |= ibSym;
+                NextToken (D);
+                break;
+
+            default:
+                /* NOTREACHED */
+                UnexpectedToken (D);
+                goto ErrorExit;
+
+        }
+
+        /* Comma or done */
+        if (D->Tok != TOK_COMMA) {
+            break;
+        }
+        NextToken (D);
+    }
+
+    /* Check for end of line */
+    if (D->Tok != TOK_EOL && D->Tok != TOK_EOF) {
+        UnexpectedToken (D);
+        SkipLine (D);
+        goto ErrorExit;
+    }
+
+    /* Check for required and/or matched information */
+    if ((InfoBits & ibRequired) != ibRequired) {
+        ParseError (D, CC65_ERROR, "Required attributes missing");
+        goto ErrorExit;
+    }
+    /* Create the symbol info */
+    E = NewExportInfo (&Name);
+    E->Id         = Id;
+    E->Value      = Value;
+    E->Size       = Size;
+    E->Sym.Id     = SymId;
+
+    /* Remember it */
+    CollReplaceExpand (&D->Info->ExportInfoById, E, Id);
+    CollAppend (&D->Info->ExportInfoByName, E);
+    CollAppend (&D->Info->ExportInfoByVal, E);
+
+ErrorExit:
+    /* Entry point in case of errors */
     SB_Done (&Name);
     return;
 }
@@ -4634,50 +4884,6 @@ static int FindCSymInfoByName (const Collection* CSymInfos, const char* Name,
 
         /* Get item */
         const CSymInfo* CurItem = CollAt (CSymInfos, Cur);
-
-        /* Compare */
-        int Res = strcmp (CurItem->Name, Name);
-
-        /* Found? */
-        if (Res < 0) {
-            Lo = Cur + 1;
-        } else {
-            Hi = Cur - 1;
-            /* Since we may have duplicates, repeat the search until we've
-            ** the first item that has a match.
-            */
-            if (Res == 0) {
-                Found = 1;
-            }
-        }
-    }
-
-    /* Pass back the index. This is also the insert position */
-    *Index = Lo;
-    return Found;
-}
-
-
-
-static int FindFileInfoByName (const Collection* FileInfos, const char* Name,
-                               unsigned* Index)
-/* Find the FileInfo for a given file name. The function returns true if the
-** name was found. In this case, Index contains the index of the first item
-** that matches. If the item wasn't found, the function returns false and
-** Index contains the insert position for Name.
-*/
-{
-    /* Do a binary search */
-    int Lo = 0;
-    int Hi = (int) CollCount (FileInfos) - 1;
-    int Found = 0;
-    while (Lo <= Hi) {
-
-        /* Mid of range */
-        int Cur = (Lo + Hi) / 2;
-
-        /* Get item */
-        const FileInfo* CurItem = CollAt (FileInfos, Cur);
 
         /* Compare */
         int Res = strcmp (CurItem->Name, Name);
@@ -5042,6 +5248,75 @@ static void ProcessCSymInfo (InputData* D)
 
     /* Sort the main list of all C functions by name */
     CollSort (&D->Info->CSymFuncByName, CompareCSymInfoByName);
+}
+
+
+
+static void ProcessExportInfo (InputData* D)
+/* Postprocess export infos */
+{
+    unsigned I;
+
+    /* Walk over the exports and resolve the references */
+    for (I = 0; I < CollCount (&D->Info->ExportInfoById); ++I) {
+
+        /* Get the export info */
+        ExportInfo *E = CollAt (&D->Info->ExportInfoById, I);
+
+        /* Resolve symbol */
+        if (E->Sym.Id != CC65_INV_ID) {
+            if (E->Sym.Id >= CollCount (&D->Info->SymInfoById)) {
+                ParseError (D,
+                            CC65_ERROR,
+                            "Invalid symbol id %u for export with id %u",
+                            E->Sym.Id, E->Id);
+            } else {}
+                E->Sym.Info = CollAt (&D->Info->SymInfoById, E->Sym.Id);
+        }
+    }
+    CollSort (&D->Info->ExportInfoByVal,  CompareExportInfoByVal);
+    CollSort (&D->Info->ExportInfoByName,  CompareExportInfoByName);
+}
+
+
+
+static int FindExportInfoByValue (const Collection* ExportInfos, long Value,
+                               unsigned* Index)
+/* Find the ExportInfo for a given value. The function returns true if the
+** value was found. In this case, Index contains the index of the first item
+** that matches. If the item wasn't found, the function returns false and
+** Index contains the insert position for the given value.
+*/
+{
+    /* Do a binary search */
+    int Lo = 0;
+    int Hi = (int) CollCount (ExportInfos) - 1;
+    int Found = 0;
+    while (Lo <= Hi) {
+
+        /* Mid of range */
+        int Cur = (Lo + Hi) / 2;
+
+        /* Get item */
+        ExportInfo* CurItem = CollAt (ExportInfos, Cur);
+
+        /* Found? */
+        if (Value > CurItem->Value) {
+            Lo = Cur + 1;
+        } else {
+            Hi = Cur - 1;
+            /* Since we may have duplicates, repeat the search until we've
+            ** the first item that has a match.
+            */
+            if (Value == CurItem->Value) {
+                Found = 1;
+            }
+        }
+    }
+
+    /* Pass back the index. This is also the insert position */
+    *Index = Lo;
+    return Found;
 }
 
 
@@ -5443,14 +5718,14 @@ static void ProcessSymInfo (InputData* D)
         /* Resolve export */
         if (S->Exp.Id == CC65_INV_ID) {
             S->Exp.Info = 0;
-        } else if (S->Exp.Id >= CollCount (&D->Info->SymInfoById)) {
+        } else if (S->Exp.Id >= CollCount (&D->Info->ExportInfoById)) {
             ParseError (D,
                         CC65_ERROR,
                         "Invalid export id %u for symbol with id %u",
                         S->Exp.Id, S->Id);
             S->Exp.Info = 0;
         } else {
-            S->Exp.Info = CollAt (&D->Info->SymInfoById, S->Exp.Id);
+            S->Exp.Info = CollAt (&D->Info->ExportInfoById, S->Exp.Id);
 
             /* Add a backpointer, so the export knows its imports */
             if (S->Exp.Info->ImportList == 0) {
@@ -5693,6 +5968,10 @@ cc65_dbginfo cc65_read_dbginfo (const char* FileName, cc65_errorfunc ErrFunc)
                 ParseCSym (&D);
                 break;
 
+            case TOK_EXPORT:
+                ParseExport (&D);
+                break;
+
             case TOK_FILE:
                 ParseFile (&D);
                 break;
@@ -5781,6 +6060,7 @@ CloseAndExit:
     ProcessSegInfo (&D);
     ProcessSpanInfo (&D);
     ProcessSymInfo (&D);
+    ProcessExportInfo (&D);
 
 #if DEBUG
     /* Debug output */
@@ -6010,6 +6290,152 @@ void cc65_free_csyminfo (cc65_dbginfo Handle, const cc65_csyminfo* Info)
 
     /* Just free the memory */
     xfree ((cc65_csyminfo*) Info);
+}
+
+
+
+/*****************************************************************************/
+/*                                 Exports                                   */
+/*****************************************************************************/
+
+
+
+const cc65_exportinfo* cc65_get_exportlist (cc65_dbginfo Handle)
+/* Return a list of all libraries */
+{
+    const DbgInfo*      Info;
+    cc65_exportinfo*    D;
+    unsigned            I;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = Handle;
+
+    /* Allocate memory for the data structure returned to the caller */
+    D = new_cc65_exportinfo (CollCount (&Info->ExportInfoById));
+
+    /* Fill in the data */
+    for (I = 0; I < CollCount (&Info->ExportInfoById); ++I) {
+        /* Copy the data */
+        CopyExportInfo (D->data + I, CollAt (&Info->ExportInfoById, I));
+    }
+
+    /* Return the result */
+    return D;
+}
+
+
+
+const cc65_exportinfo* cc65_export_byid (cc65_dbginfo Handle, unsigned Id)
+/* Return information about an export with a specific id. The function
+** returns NULL if the id is invalid (no such export) and otherwise a
+** cc65_exportinfo structure with one entry that contains the requested
+** export information.
+*/
+{
+    const DbgInfo*      Info;
+    cc65_exportinfo*   D;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = Handle;
+
+    /* Check if the id is valid */
+    if (Id >= CollCount (&Info->ExportInfoById)) {
+        return 0;
+    }
+
+    /* Allocate memory for the data structure returned to the caller */
+    D = new_cc65_exportinfo (1);
+
+    /* Fill in the data */
+    CopyExportInfo (D->data, CollAt (&Info->ExportInfoById, Id));
+
+    /* Return the result */
+    return D;
+}
+
+
+
+const cc65_exportinfo* cc65_export_inrange (cc65_dbginfo Handle, cc65_addr Start,
+                                            cc65_addr End)
+/* Return a list of exports in the given range. end is inclusive. The function
+** return NULL if no exports within the given range are found.
+*/
+{
+    const DbgInfo*      Info;
+    Collection          ExportInfoList = COLLECTION_INITIALIZER;
+    cc65_exportinfo*    D;
+    unsigned            I;
+    unsigned            Index;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = Handle;
+
+    /* Search for the export. Because we're searching for a range, we cannot
+    ** make use of the function result.
+    */
+    FindExportInfoByValue (&Info->ExportInfoByVal, Start, &Index);
+
+    /* Start from the given index, check all exports until the end address is
+    ** reached. Place all exports into ExportInfoList for later.
+    */
+    for (I = Index; I < CollCount (&Info->ExportInfoByVal); ++I) {
+
+        /* Get the item */
+        ExportInfo* Item = CollAt (&Info->ExportInfoByVal, I);
+
+        /* The collection is sorted by address, so if we get a value larger
+        ** than the end address, we're done.
+        */
+        if (Item->Value > (long) End) {
+            break;
+        }
+
+        /* Remember this one */
+        CollAppend (&ExportInfoList, Item);
+    }
+
+    /* If we don't have any labels within the range, bail out. No memory has
+    ** been allocated for ExportInfoList.
+    */
+    if (CollCount (&ExportInfoList) == 0) {
+        return 0;
+    }
+
+    /* Allocate memory for the data structure returned to the caller */
+    D = new_cc65_exportinfo (CollCount (&ExportInfoList));
+
+    /* Fill in the data */
+    for (I = 0; I < CollCount (&ExportInfoList); ++I) {
+        /* Copy the data */
+        CopyExportInfo (D->data + I, CollAt (&ExportInfoList, I));
+    }
+
+    /* Free the collection */
+    CollDone (&ExportInfoList);
+
+    /* Return the result */
+    return D;
+}
+
+
+
+void cc65_free_exportinfo (cc65_dbginfo Handle, const cc65_exportinfo* Info)
+/* Free a export info record */
+{
+    /* Just for completeness, check the handle */
+    assert (Handle != 0);
+
+    /* Just free the memory */
+    xfree ((cc65_exportinfo*) Info);
 }
 
 
@@ -7128,6 +7554,31 @@ void cc65_free_segmentinfo (cc65_dbginfo Handle, const cc65_segmentinfo* Info)
 /*****************************************************************************/
 
 
+const cc65_symbolinfo* cc65_get_symbollist (cc65_dbginfo Handle)
+/* Return a list of all c symbols */
+{
+    const DbgInfo*      Info;
+    cc65_symbolinfo*    S;
+    unsigned            I;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = Handle;
+
+    /* Allocate memory for the data structure returned to the caller */
+    S = new_cc65_symbolinfo (CollCount (&Info->SymInfoById));
+
+    /* Fill in the data */
+    for (I = 0; I < CollCount (&Info->SymInfoById); ++I) {
+        /* Copy the data */
+        CopySymInfo (S->data + I, CollAt (&Info->SymInfoById, I));
+    }
+
+    /* Return the result */
+    return S;
+}
 
 const cc65_symbolinfo* cc65_symbol_byid (cc65_dbginfo Handle, unsigned Id)
 /* Return the symbol with a given id. The function returns NULL if no symbol
@@ -7379,6 +7830,3 @@ void cc65_free_typedata (cc65_dbginfo Handle, const cc65_typedata* data)
 
     /* Nothing to do */
 }
-
-
-

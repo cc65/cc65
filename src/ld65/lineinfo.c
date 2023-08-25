@@ -284,3 +284,17 @@ void PrintDbgLineInfo (FILE* F)
         }
     }
 }
+
+void PrintLineInfoReferences (FILE* F, const Collection* LineInfos, const char* Format)
+/* Output an attribute with line infos */
+{
+    if (CollCount (LineInfos) > 0) {
+        unsigned I;
+        const LineInfo* LI = CollConstAt (LineInfos, 0);
+        fprintf (F, Format, LI->Id);
+        for (I = 1; I < CollCount (LineInfos); ++I) {
+            LI = CollConstAt (LineInfos, I);
+            fprintf (F, "+%u", LI->Id);
+        }
+    }
+}

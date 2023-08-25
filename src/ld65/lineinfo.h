@@ -183,6 +183,9 @@ void AssignLineInfoIds (void);
 void PrintDbgLineInfo (FILE* F);
 /* Output the line infos to a debug info file */
 
+void PrintLineInfoReferences (FILE* F, const Collection* LineInfos, const char* Format);
+/* Print a list of line information references */
+
 
 
 /* End of lineinfo.h */

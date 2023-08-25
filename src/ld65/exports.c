@@ -47,6 +47,7 @@
 
 /* ld65 */
 #include "condes.h"
+#include "dbgsyms.h"
 #include "error.h"
 #include "exports.h"
 #include "expr.h"
@@ -296,6 +297,7 @@ static Export* NewExport (unsigned Type, unsigned char AddrSize,
     Export* E = xmalloc (sizeof (Export));
 
     /* Initialize the fields */
+    E->Id        = ~0U;
     E->Name      = Name;
     E->Next      = 0;
     E->Flags     = 0;
@@ -306,7 +308,7 @@ static Export* NewExport (unsigned Type, unsigned char AddrSize,
     E->Size      = 0;
     E->DefLines  = EmptyCollection;
     E->RefLines  = EmptyCollection;
-    E->DbgSymId  = ~0U;
+    E->DbgSymbol = NULL;
     E->Type      = Type | SYM_EXPORT;
     E->AddrSize  = AddrSize;
     for (I = 0; I < sizeof (E->ConDes) / sizeof (E->ConDes[0]); ++I) {
@@ -1067,4 +1069,90 @@ void CircularRefError (const Export* E)
            GetString (E->Name),
            GetSourceName (LI),
            GetSourceLine (LI));
+}
+
+
+
+unsigned ExportInfoCount (void)
+/* Return the total number of export infos */
+{
+    /* Walk over all object files */
+    unsigned I;
+    unsigned Count = 0;
+
+    for (I = 0; I < CollCount (&ObjDataList); ++I) {
+
+        /* Get the object file */
+        ObjData* O = CollAtUnchecked (&ObjDataList, I);
+
+        /* Count exports */
+        Count += CollCount (&O->Exports);
+    }
+
+    return Count;
+}
+
+
+
+void AssignExportInfoIds (void)
+/* Assign the ids to the export infos */
+{
+    unsigned I, J;
+
+    /* Walk over all export infos */
+    unsigned Id = 0;
+    for (I = 0; I < CollCount (&ObjDataList); ++I) {
+
+        /* Get the object file */
+        ObjData* O = CollAtUnchecked (&ObjDataList, I);
+
+        /* Output the export infos */
+        for (J = 0; J < CollCount (&O->Exports); ++J) {
+
+            /* Get this export info */
+            Export* E = CollAtUnchecked (&O->Exports, J);
+
+            /* Assign the id */
+            E->Id = Id++;
+        }
+    }
+}
+
+
+
+void PrintExports (FILE* F)
+/* Print the exports */
+{
+    unsigned I, J;
+
+    for (I = 0; I < CollCount (&ObjDataList); ++I) {
+
+        /* Get the object file */
+        ObjData* O = CollAtUnchecked (&ObjDataList, I);
+
+        /* Walk through all exports in this module */
+        for (J = 0; J < CollCount (&O->Exports); ++J) {
+
+            Export* E = CollAt (&O->Exports, J);
+
+            DbgSym *S = E->DbgSymbol;
+
+            fprintf (F,
+                     "exp\tid=%u,name=\"%s\",val=0x%lX",
+                     E->Id,
+                     GetString (E->Name),
+                     GetExportVal (E));
+
+            if (E->Size != 0) {
+                fprintf(F, ",size=%u", E->Size);
+            }
+
+            if (S) {
+                fprintf (F,
+                     ",sym=%u", O->SymBaseId + S->Id);
+            }
+
+            fputs("\n", F);
+        }
+    }
 }

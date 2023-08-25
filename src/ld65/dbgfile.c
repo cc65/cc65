@@ -41,6 +41,7 @@
 #include "dbgfile.h"
 #include "dbgsyms.h"
 #include "error.h"
+#include "exports.h"
 #include "fileinfo.h"
 #include "global.h"
 #include "library.h"
@@ -71,6 +72,8 @@ static void AssignIds (void)
     unsigned ScopeBaseId  = 0;
     unsigned SpanBaseId   = 0;
     unsigned SymBaseId    = 0;
+    unsigned ExpBaseId    = 0;
+
     for (I = 0; I < CollCount (&ObjDataList); ++I) {
 
         /* Get this module */
@@ -84,12 +87,14 @@ static void AssignIds (void)
         O->ScopeBaseId  = ScopeBaseId;
         O->SpanBaseId   = SpanBaseId;
         O->SymBaseId    = SymBaseId;
+        O->ExpBaseId    = ExpBaseId;
 
         /* Bump the base ids */
         HLLSymBaseId  += CollCount (&O->HLLDbgSyms);
         ScopeBaseId   += CollCount (&O->Scopes);
         SpanBaseId    += CollCount (&O->Spans);
         SymBaseId     += CollCount (&O->DbgSyms);
+        ExpBaseId     += CollCount (&O->Exports);
     }
 
     /* Assign the ids to the file infos */
@@ -97,6 +102,9 @@ static void AssignIds (void)
 
     /* Assign the ids to line infos */
     AssignLineInfoIds ();
+
+    /* Assign the ids to export infos */
+    AssignExportInfoIds ();
 }
 
 
@@ -160,6 +168,9 @@ void CreateDbgFile (void)
 
     /* Output symbols */
     PrintDbgSyms (F);
+
+    /* Output exports */
+    PrintExports (F);
 
     /* Output types */
     PrintDbgTypes (F);

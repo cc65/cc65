@@ -1,26 +1,84 @@
 
 ## cc65 floating point support
 
-The current goal is to implement ieee754 support in the compiler, using the
-"float" datatype as the common 32bit float. ANYTHING ELSE COMES LATER
+The current main goal is to implement IEEE754 support *in the compiler*, using
+the "float" datatype as the common 32bit float.
 
-You can not use any of this to write software yet. Dont bother. This is for
+*** ANYTHING ELSE COMES LATER ***
+
+You can not use any of this to write software yet. Don't bother. This is for
 people who want to help pushing the floating point support further.
 
-- build the compiler/toolchain/libs from this fptest branch
-- now you can build the programs in this directory
+You can however try the current state of development. You should be able to
+build small (and slow...) programs that use floats on any supported target.
 
-right now you'll have to use the cbm kernal wrapper library, as that is pretty
-much the only one that somewhat works :)
+- Build the compiler/toolchain/libs from this fptest branch.
+- Now you can build the samples and/or tests. Related to fp stuff are:
 
-feel free to work on "real" ieee754 functions (see below)
+    samples/mandelfloat.c
+    samples/mathtest.c
+
+    test/val/float-basic-const-const.c
+    test/val/float-basic-const-var.c
+    test/val/float-basic-var-const.c
+    test/val/float-basic-var-var.c
+    test/val/float-cmp-const-const.c
+    test/val/float-cmp-const-var.c
+    test/val/float-cmp-intconst-const.c
+    test/val/float-cmp-var-const.c
+    test/val/float-cmp-var-intconst.c
+    test/val/float-cmp.c
+    test/val/float-const-conv.c
+    test/val/float-conv-float-to-char.c
+    test/val/float-conv-float-to-schar.c
+    test/val/float-conv.c
+    test/val/float-minimal.c
+    test/val/float-mixed.c
+    test/val/float-negate.c
+    test/val/float-ternary.c
+
+Further info:
+
+- Right now by default all targets will use the Berkeley Softfloat Library. This
+  solves the annoying "chicken and egg" problem of having to implement the float
+  support both in the compiler and in the target library at the same time, before
+  anything can be tested properly. Fortunately that also means we can use the
+  simulator for running test programs, and test changes in the compiler using
+  our test bench, and that against a library that is known to somewhat work
+  correctly :)
+- The default library can be overridden by linking an override file, similar to
+  how you can use the soft80 implementation for conio. Right now such override
+  files are provided for the C64 and VIC20 (fp754kernal.o). The samples will
+  automatically use the overrides.
+
+Wanted:
+
+- For the time being, i will not look at writing IEEE754 functions in assembly.
+  Please see below for more info on what is needed to do this, should you be
+  interested in doing this.
+- It might be possible to produce a similar kernal- or OS- wrapper override file
+  for other targets (or port the CBM one to other CBM targets).
+  - If you create a new one, keep in mind that the compiler *right now* will
+    currently work with IEEE754 floats, which your library calls must also work
+    with (which will involve converting forth and back to whatever other format
+    at runtime)
+
+Roadmap:
+
+- Test/Fix using the Softfloat lib some more
+- When all obvious tests have been created and work OK, we can merge
+
+- implement ieee754 library
+
+- implement support for native FP formats
+  - for this the wrappers in fp.c must be used in the compiler at all places.
+  - also we must *implement* the native format on the host in fp.c
+  - add a cmdline option to the compiler to switch the float binary type (754,
+    cbm, woz, ...)
+  - last not least a wrapper library that uses the native format must be created
+  - it is not unlikely that we will need extra tests for the native format
 
 ## The Compiler
-
-- for the time being i will handle and test only expressions where left and
-  right side are both floats. that will enable me to fix and test a fair portion
-  of what has to be done, before i will have to dive into the ugly areas of type
-  conversion and casting.
 
 NOT WORKING YET:
 
@@ -32,16 +90,13 @@ NOT WORKING YET:
 - substraction, float const - float const (Invalid operands for binary operator)
 - substraction, float var - float const (Invalid operands for binary operator)
 
-(and probably more :))
-
-TODO (much later):
-
-- add a cmdline option to the compiler to switch the float binary type (754, cbm,
-  woz, ...). -> remember the code in fp.c/h
-
 ### Files & Functions
 
 #### codegen.c
+
+    src/cc65/codegen.c
+    src/cc65/codegen.h
+
 ```
 g_getimmed          Load a constant into the primary register
 g_getstatic         Fetch an static memory cell into the primary register
@@ -65,11 +120,15 @@ g_defdata_float
 ```
 #### datatype.c
 
+    src/cc65/datatype.c
+
 ```
 ArithmeticConvert
 ```
 
 #### expr.c
+
+    src/cc65/expr.c
 
 ```
 LimitExprValue
@@ -79,11 +138,15 @@ parsesub
 
 #### initdata.c
 
+    src/cc65/initdata.c
+
 ```
 DefineData          Output a data definition for the given expression
 ```
 
 #### loadexpr.c
+
+    src/cc65/loadexpr.c
 
 ```
 LoadExpr
@@ -91,11 +154,15 @@ LoadExpr
 
 #### locals.c
 
+    src/cc65/locals.c
+
 ```
 ParseAutoDecl
 ```
 
 #### assignment.c
+
+    src/cc65/assignment.c
 
 ```
 OpAssignArithmetic  Parse an "=" (if 'Gen' is 0) or "op=" operation for arithmetic lhs
@@ -103,41 +170,74 @@ OpAssignArithmetic  Parse an "=" (if 'Gen' is 0) or "op=" operation for arithmet
 
 #### fp.c
 
+    src/common/fp.c
+    src/common/fp.h
+
 wrapper for doing floating point operations on target floats
 
 ```
 FP_D_As32bitRaw     converts double into 32bit (float) and then returns its raw content as a 32bit int
 ```
 
+#### typeconv.c
+
+    src/cc65/typeconv.c
+
+```
+DoConversion        Emit code to convert the given expression to a new type
+```
+
+#### scanner.c
+
+    src/cc65/scanner.c
+
+Note: Scanner fixes should be directly promoted to upstream. Any differences in
+      this branch should be related to debugging/logging.
+
 --------------------------------------------------------------------------------
 
 ## The Library
 
-cbmkernal:
+### variants
 
-this is a wrapper to the CBM kernal functions
+The floating point support calls library functions for any operations on non
+constant values
 
-- this one is fairly complete and should be OK to use when fixing/adding basic
-  things in the compiler
-- the only missing functions are ftosrsubeax, fnegeax - which can be easily
-  added once testcode is found that actually triggers it :)
+#### softfloat
 
-ieee754:
+This is a Port of "Berkeley SoftFloat Release 2c". It is currently used by
+default for all targets.
 
-this should become a freestanding ieee754 library
+- missing are all math functions (we might port another existing lib for that)
+
+#### cbmkernal
+
+This is a wrapper to the CBM kernal functions.
+
+- this one is fairly complete, including math functions
+- the only missing functions are ftosrsubeax, fnegeax
+  - WANTED: which can be easily added once testcode is found that actually triggers it :)
+
+#### ieee754
+
+This should become a freestanding IEEE754 library, which can completely replace
+the softfloat library.
 
 - basically everything missing except addition/substraction
 - compare functions are missing
 - mul, div functions are missing
 - type conversion functions are missing
 
-woz:
+#### woz
 
 historical float routines by woz :) unfortunately not ieee754
 
 - (optionally) converting from/to ieee754 format is missing (compile time option)
 - compare functions are missing
 - type conversion functions are missing
+
+-> It probably doesn't make a lot of sense to spend time on supporting these,
+   this directory should probably be deleted before merging with master
 
 --------------------------------------------------------------------------------
 

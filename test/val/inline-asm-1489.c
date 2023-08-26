@@ -24,7 +24,7 @@ int res = 0;
 
 void dotest1a(uint8_t *s, uint8_t *d)
 {
-    printf("dotest1a\n");
+    printf("dotest1a (and 0x3f)\n");
     while (*s != 0) {
         *d = (testasm1(*s));
         printf("%04x:%02x\n",d,*d);
@@ -35,7 +35,7 @@ void dotest1a(uint8_t *s, uint8_t *d)
 
 void dotest1b(uint8_t *s, uint8_t *d)
 {
-    printf("dotest1b\n");
+    printf("dotest1b (and 0x3f)\n");
     while (*s != 0) {
         *d = (testasm2(*s));
         printf("%04x:%02x\n",d,*d);
@@ -47,7 +47,7 @@ void dotest1b(uint8_t *s, uint8_t *d)
 void dotest2a (void)
 {
   char *p = &src2[0];
-  uint16_t scaddr=&dest[0];     //output to line 11 on the screen
+  uint16_t scaddr=&dest[0];
 
     printf("dotest2a\n");
     while (*p != 0) {
@@ -59,7 +59,7 @@ void dotest2a (void)
 void dotest2b (void)
 {
   char *p = &src2[0];
-  uint16_t scaddr=&dest[0];     //output to line 11 on the screen
+  uint16_t scaddr=&dest[0];
 
     printf("dotest2b\n");
     while (*p != 0) {

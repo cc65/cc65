@@ -65,6 +65,13 @@ $(WORKDIR)/inline-asm-1489.Osr.65c02.prg: inline-asm-1489.c | $(WORKDIR)
 	$(LD65) -t sim65c02 -o $@ $(@:.prg=.o) sim65c02.lib $(NULLERR)
 	$(SIM65) $(SIM65FLAGS) $@ $(NULLOUT)
 
+$(WORKDIR)/inline-asm-1489.Os.65c02.prg: inline-asm-1489.c | $(WORKDIR)
+	$(if $(QUIET),echo todo/inline-asm-1489.Os.65c02.prg)
+	$(CC65) -t sim65c02 $$(CC65FLAGS) --add-source -Os -o $(@:.prg=.s) $< $(NULLERR)
+	$(CA65) -t sim65c02 -o $(@:.prg=.o) $(@:.prg=.s) $(NULLERR)
+	$(LD65) -t sim65c02 -o $@ $(@:.prg=.o) sim65c02.lib $(NULLERR)
+	$(SIM65) $(SIM65FLAGS) $@ $(NULLOUT)
+
 $(foreach option,$(OPTIONS),$(eval $(call PRG_template,$(option),6502)))
 $(foreach option,$(OPTIONS),$(eval $(call PRG_template,$(option),65c02)))
 

@@ -464,10 +464,10 @@ OVERLAYLIST := $(foreach I,1 2 3,multdemo.$I ovrldemo.$I)
 ifeq ($(SYS),c64)
 mandelfloat.o: override CFLAGS += -D DYN_DRV=0
 mandelfloat: mandelfloat.o
-	$(LD) $(LDFLAGS) -o $@ -C c64.cfg -m $@.map $^ c64-fp488kernal.o $(SYS).lib
+	$(LD) $(LDFLAGS) -o $@ -C c64.cfg -m $@.map $^ c64-fp754kernal.o $(SYS).lib
 mathtest.o: override CFLAGS += -D DYN_DRV=0
 mathtest: mathtest.o
-	$(LD) $(LDFLAGS) -o $@ -C c64.cfg -m $@.map $^ c64-fp488kernal.o $(SYS).lib
+	$(LD) $(LDFLAGS) -o $@ -C c64.cfg -m $@.map $^ c64-fp754kernal.o $(SYS).lib
 endif
 
 # --------------------------------------------------------------------------

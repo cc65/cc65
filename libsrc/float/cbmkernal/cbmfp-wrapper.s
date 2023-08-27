@@ -394,10 +394,45 @@ ___cbmkernal_fabsf:
     ; arg0:     a/x/sreg/sreg+1
     jmp     __fabs
 
+    ; roundf rounds to the "nearest integer", "away from zero". that means
+    ; For example, round(0.5) is 1.0, and round(-0.5) is -1.0.
     .export ___cbmkernal_roundf
 ___cbmkernal_roundf:
     ; arg0:     a/x/sreg/sreg+1
-    jmp     __fround
+;    jmp     __fround
+
+    ; primary = primary + 0.5
+    jsr pusheax     ; push eax to stack
+
+;    ldy #$00
+;    sty sreg
+;    lda #$00
+;    sta sreg
+;    ldx #0
+
+    bit sreg+1
+    bpl @plus
+
+    ; $3effffff
+    lda #$3e
+    sta sreg+1
+    ldx #$ff
+    txa
+    sta sreg
+
+    jsr __fadd
+    jmp     __fint
+@plus:
+
+    ; $3fffffff
+    lda #$3f
+    sta sreg+1
+    ldx #0
+    txa
+    sta sreg
+
+    jsr __fadd
+    jmp     __fint
 
     .export ___cbmkernal_truncf
 ___cbmkernal_truncf:

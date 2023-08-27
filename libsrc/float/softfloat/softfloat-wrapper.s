@@ -77,6 +77,29 @@ fbnegeax:
     ldx #0
     rts
 
+    .import _float32_mul
+    ; arg0:     a/x/sreg/sreg+1
+    .export fnegeax
+fnegeax:
+    pha
+;    txa
+;    pha
+    lda     sreg+1
+    eor     #$80 ; sign bit
+    sta     sreg+1
+;    lda     sreg+0
+;    eor     #$ff ; sign bit
+;    sta     sreg+0
+;    txa
+;    eor     #$ff ; sign bit
+;    tax
+;    pla
+;    tax
+    pla
+;    eor     #$ff ; sign bit
+    rts
+
+
     .import _float32_add
     .import _float32_sub
     .import _float32_mul

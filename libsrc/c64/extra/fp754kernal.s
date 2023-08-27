@@ -10,6 +10,7 @@
     .import ___cbmkernal_feaxint
     .import ___cbmkernal_feaxlong
     .import ___cbmkernal_fbnegeax
+    .import ___cbmkernal_fnegeax
     .import ___cbmkernal_ftosaddeax
     .import ___cbmkernal_ftossubeax
     .import ___cbmkernal_ftosdiveax
@@ -30,6 +31,7 @@
     .export feaxint     := ___cbmkernal_feaxint
     .export feaxlong    := ___cbmkernal_feaxlong
     .export fbnegeax    := ___cbmkernal_fbnegeax
+    .export fnegeax     := ___cbmkernal_fnegeax
     .export ftosaddeax  := ___cbmkernal_ftosaddeax
     .export ftossubeax  := ___cbmkernal_ftossubeax
     .export ftosdiveax  := ___cbmkernal_ftosdiveax

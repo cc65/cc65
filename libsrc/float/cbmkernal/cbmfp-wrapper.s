@@ -193,11 +193,9 @@ ___cbmkernal_fbnegeax:
     jsr __ftoi
     jmp bnegax
 
-.if 0 = 1
    .export ___cbmkernal_fnegeax
- ___cbmkernal_fnegeax:
+___cbmkernal_fnegeax:
     jmp __fneg
-.endif
 
 ;--------------------------------------------------------------
 ; math ops

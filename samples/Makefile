@@ -229,7 +229,8 @@ EXELIST_c64 =      \
         sieve      \
         terminal   \
         tinyshell  \
-        tgidemo
+        tgidemo \
+        tgisincos
 
 EXELIST_c128 =     \
         ascii      \
@@ -467,6 +468,9 @@ mandelfloat: mandelfloat.o
 	$(LD) $(LDFLAGS) -o $@ -C c64.cfg -m $@.map $^ c64-fp754kernal.o $(SYS).lib
 mathtest.o: override CFLAGS += -D DYN_DRV=0
 mathtest: mathtest.o
+	$(LD) $(LDFLAGS) -o $@ -C c64.cfg -m $@.map $^ c64-fp754kernal.o $(SYS).lib
+tgisincos.o: override CFLAGS += -D DYN_DRV=0
+tgisincos: tgisincos.o
 	$(LD) $(LDFLAGS) -o $@ -C c64.cfg -m $@.map $^ c64-fp754kernal.o $(SYS).lib
 endif
 

@@ -485,7 +485,7 @@ __float_arg_to_float_packed:
         rts
 
 ;---------------------------------------------------------------------------------------------
-.if 1 = 0
+.if 1 = 1
         .export __ftostr
         .importzp ptr1
         .import popax, ldeaxysp, incsp4
@@ -504,10 +504,39 @@ __float_strbuf_to_string:
         sta ptr1
         stx ptr1+1
         ldy #$00
+        ldx #$00
+
+        ; if next char is a minus, copy it
+        lda $0100,x
+        cmp #'-'
+        bne @s0
+        sta (ptr1),y
+        iny
+        inx
+@s0:
+
+        ; if next char is a space, skip it
+        lda $0100,x
+        cmp #' '
+        bne @s1
+        inx
+@s1:
+
+        ; if next char is a dot, copy a '0' to buffer
+        lda $0100,x
+        cmp #'.'
+        bne @s2
+        lda #'0'
+        sta (ptr1),y
+        iny
+@s2:
+        ; FIXME: we should handle the scientific notation somehow
+        ; FIXME: we should handle very small numbers somehow (display 0)
 @l:
-        lda $0100,y
+        lda $0100,x
         sta (ptr1),y
         beq @s
+        inx
         iny
         bne @l
 @s:

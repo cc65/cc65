@@ -55,7 +55,6 @@ void test1(float f, char *str)
     }
 }
 
-// when making sub tests work, remove them here and uncomment them in val/float-basic.c
 void varvar(void)
 {
     printf("\nvariable vs variable\n\n");
@@ -68,7 +67,7 @@ void varvar(void)
     printf(" fp3:0x%08lx [0x42a18000] %s (exp:80.75)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
     test1(fp3, "42a18000");
 
-    /* substraction, variable - variable */
+    /* subtraction, variable - variable */
     fp1 = 64.25f;
     fp2 = 16.5f;
     fp3 = fp1 - fp2;
@@ -86,6 +85,7 @@ void varvar(void)
     printf("fp3:0x%08lx [0xbe4cccce] %s (-0.2)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
     test1(fp3, "be4cccce");
 
+    /* multiplication, variable * variable */
     fp1 = 8.5f;
     fp2 = 2.25f;
     fp3 = fp1 * fp2;
@@ -93,6 +93,7 @@ void varvar(void)
     printf(" fp3:0x%08lx [0x41990000] %s (exp:19.125)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
     test1(fp3, "41990000");
 
+    /* division, variable / variable */
     fp1 = 16.25f;
     fp2 = 2.5f;
     fp3 = fp1 / fp2;

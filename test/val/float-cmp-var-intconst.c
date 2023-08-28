@@ -30,12 +30,12 @@ unsigned long var_ulong;
 
 int result = 0;
 
-#define expect(msg, exp, val) \
-    printf("%s %d:%d:%s%s (is:%d want:%d)\n", \
-        msg, exp, val, \
+#define expect(msg, exp, val, fval) \
+    printf("%s %d:%d:%s%s (is:%d want:%d fval:%s)\n", \
+        msg, val, exp, \
         val ? "true" : "false", \
         (exp != val) ? " (failed)" : "", \
-        exp, val \
+        val, exp, _ftostr(buf, fval) \
         ); \
     if (exp != val) { \
         result++; \
@@ -50,29 +50,29 @@ void varintconst(void)
     fp1 = 10.0f;
     fp2 = 20.0f;
 
-    expect("10 == 20 is", 0, (fp1 == 20));
-    expect("20 == 10 is", 0, (fp2 == 10));
-    expect("20 == 20 is", 1, (fp2 == 20));
+    expect("10 == 20 is", 0, (fp1 == 20), fp1);
+    expect("20 == 10 is", 0, (fp2 == 10), fp2);
+    expect("20 == 20 is", 1, (fp2 == 20), fp2);
 
-    expect("10 != 20 is", 1, (fp1 != 20));
-    expect("20 != 10 is", 1, (fp2 != 10));
-    expect("20 != 20 is", 0, (fp2 != 20));
+    expect("10 != 20 is", 1, (fp1 != 20), fp1);
+    expect("20 != 10 is", 1, (fp2 != 10), fp2);
+    expect("20 != 20 is", 0, (fp2 != 20), fp2);
 
-    expect("10 < 20 is", 1, (fp1 < 20));
-    expect("20 < 10 is", 0, (fp2 < 10));
-    expect("20 < 20 is", 0, (fp2 < 20));
+    expect("10 < 20 is", 1, (fp1 < 20), fp1);
+    expect("20 < 10 is", 0, (fp2 < 10), fp2);
+    expect("20 < 20 is", 0, (fp2 < 20), fp2);
 
-    expect("10 > 20 is", 0, (fp1 > 20));
-    expect("20 > 10 is", 1, (fp2 > 10));
-    expect("20 > 20 is", 0, (fp2 > 20));
+    expect("10 > 20 is", 0, (fp1 > 20), fp1);
+    expect("20 > 10 is", 1, (fp2 > 10), fp2);
+    expect("20 > 20 is", 0, (fp2 > 20), fp2);
 
-    expect("10 <= 20 is", 1, (fp1 <= 20));
-    expect("20 <= 10 is", 0, (fp2 <= 10));
-    expect("20 <= 20 is", 1, (fp2 <= 20));
+    expect("10 <= 20 is", 1, (fp1 <= 20), fp1);
+    expect("20 <= 10 is", 0, (fp2 <= 10), fp2);
+    expect("20 <= 20 is", 1, (fp2 <= 20), fp2);
 
-    expect("10 >= 20 is", 0, (fp1 >= 20));
-    expect("20 >= 10 is", 1, (fp2 >= 10));
-    expect("20 >= 20 is", 1, (fp2 >= 20));
+    expect("10 >= 20 is", 0, (fp1 >= 20), fp1);
+    expect("20 >= 10 is", 1, (fp2 >= 10), fp2);
+    expect("20 >= 20 is", 1, (fp2 >= 20), fp2);
 
 }
 

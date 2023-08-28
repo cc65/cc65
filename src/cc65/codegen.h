@@ -218,6 +218,10 @@ void g_reglong (unsigned from);
 ** is irrelevent of signedness).
 */
 
+void g_regfloat (unsigned from);
+/* Convert the value in the primary register to a float
+*/
+
 unsigned g_typeadjust (unsigned lhs, unsigned rhs);
 /* Adjust the integer operands before doing a binary operation. lhs is a flags
 ** value, that corresponds to the value on TOS, rhs corresponds to the value

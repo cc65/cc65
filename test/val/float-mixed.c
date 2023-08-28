@@ -35,7 +35,10 @@ unsigned long var_ulong;
 
 int result = 0;
 int i;
-unsigned char ch;
+
+unsigned char var_char;
+unsigned int var_int;
+float var_float;
 
 // returns 1 if value in f matches the string
 // the string is a hex value without leading "0x"
@@ -67,16 +70,31 @@ void SKIPPEDtest1(float f, char *str)
 
 void test(void)
 {
+    printf("intvar + floatvar\n");
+#if 1
+    var_int = 47;
+    var_float = 11.123f;
+    fp1 = var_int;
+    printf("fp1:0x%08lx [42687df4] %s (47)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    fp1 = var_float;
+    printf("fp1:0x%08lx [42687df4] %s (11.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    fp1 = var_int + var_float;
+    printf("fp1:0x%08lx [42687df4] %s (58.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "42687df4");
+    fp1 = var_float + var_int;
+    printf("fp1:0x%08lx [42687df4] %s (58.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "42687df4");
+#endif
 
     printf("floatconst + intvar * floatconst\n");
-    ch = 3;
-    fp1 = 2.0f + ch * 0.2f;
+    var_char = 3;
+    fp1 = 2.0f + var_char * 0.2f;
     printf("fp1:0x%08lx [0x40266666] %s (2.5997)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     test1(fp1, "40266666");
 
-    ch = 4;
-    fp1 = ch * 2.0f + 3.0f;
-    fp2 = 3.0f + ch * 2.0f;
+    var_char = 4;
+    fp1 = var_char * 2.0f + 3.0f;
+    fp2 = 3.0f + var_char * 2.0f;
     printf(" fp1:0x%08lx [0x41300000] %s (exp:11)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     printf(" fp2:0x%08lx [0x41300000] %s (exp:11)\n", *((uint32_t*)&fp2), _ftostr(buf, fp2));
     test1(fp1, "41300000");

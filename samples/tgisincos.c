@@ -126,7 +126,7 @@ void Dosincos(void) {
     float b;
     float yfSquare;
 #endif
-    
+
 #if 0
     /* add some very fake perspective */
     yoff++;

@@ -7,6 +7,9 @@
 #include <modload.h>
 #include <tgi.h>
 
+char buf[100]; // for ftostr
+char buf2[100]; // for ftostr
+char buf3[100]; // for ftostr
 
 
 #ifndef DYN_DRV
@@ -78,15 +81,15 @@ float a;
 float b;
 float yfSquare;
 
-int xoff;
-int yoff;
+int xoff = 0;
+int yoff = 0;
 
 void Dosincos(void) {
-
+#if 1
     tgi_setpalette (Palette);
     tgi_setcolor (COLOR_FORE);
     tgi_clear ();
-
+#endif
   /* Get stuff from the graph lib */
   XRes = tgi_getmaxx() + 1;
 //  XRes = 320;
@@ -99,6 +102,10 @@ void Dosincos(void) {
   /* Compute and draw a 3d function. */
   yfMin = -144.0f;
   yfMax = 144.0f;
+  yf = 0;
+// printf("yf:%s\n", _ftostr(buf, yf));
+// printf("min:%s\n", _ftostr(buf, yfMin));
+// printf("max:%s\n", _ftostr(buf, yfMax));
 
   yfDelta = 2.25f;
   zScale = -10.0f;
@@ -106,20 +113,25 @@ void Dosincos(void) {
   XResHalf = XRes * 0.5f;
   yfMinSquare = yfMin * yfMin;
 
-  yoff = -80;
-  xoff = +65;
+  yoff = 20;
+  xoff = 0;
 
 //  for( yf = yfMin; yf < yfMax; yf += yfDelta) {   // FIXME
 //  for( yf = yfMin; yf < yfMax; yf = yf + yfDelta) { // FIXME
-      for( yf = yfMin; yf < yfMax; yf = yfDelta + yf ) { // FIXME
+    for( yf = yfMin; yf < yfMax; yf = yfDelta + yf ) { // FIXME
+//        printf("yf:%s min:%s max:%s\n", _ftostr(buf, yf), _ftostr(buf2, yfMin), _ftostr(buf3, yfMax));
 #if 0
     float yfD;
     float a;
     float b;
     float yfSquare;
 #endif
+    
+#if 0
+    /* add some very fake perspective */
     yoff++;
     xoff--;
+#endif
 //    xfMax = sqrtf( yfMinSquare - yf  * yf);
     xfMax = sqrtf( yfMinSquare - (yf  * yf));
     xfMin = -xfMax; // trigger fnegeax
@@ -135,6 +147,7 @@ void Dosincos(void) {
 
 //    for( xf = xfMin; xf < xfMax; xf += xfDelta) {
     for( xf = xfMin; xf < xfMax; xf = xf + xfDelta) {
+//        printf("xf:%s xfmax:%s\n", _ftostr(buf2, xf), _ftostr(buf3, xfMax));
 
       radiusf = .0327f * sqrtf( (xf * xf) + yfSquare);
 
@@ -147,9 +160,9 @@ void Dosincos(void) {
       x = 1.0f * ( xf + a);
       x += xoff;
 
-      y = 0.6f * ( b - zf);
+      y = 0.8f * ( b - zf);
       y += yoff;
-
+//printf("x: %d y: %d\n", x, y);
       if( y > 0 && y < YRes) {
 
         tgi_setpixel( x, y);
@@ -302,6 +315,8 @@ int main (void)
 {
     unsigned char Border;
 
+#if 1
+
 #if DYN_DRV
     /* Warn the user that the tgi driver is needed */
     DoWarning ();
@@ -315,7 +330,6 @@ int main (void)
     CheckError ("tgi_install");
 #endif
 
-#if 1
     tgi_init ();
     CheckError ("tgi_init");
 

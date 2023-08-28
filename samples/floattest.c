@@ -1,12 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
-//#include <conio.h>  // for cgetc
+
+#include <_float.h>
 
 char buf[100];
-
-/*
-*/
 
 // quick check to see if printing float value works
 void constants(void)
@@ -28,7 +25,7 @@ void constants(void)
     printf("   1.0      %15s\n", _ftostr(buf, 1.0f));
     printf("  10.0      %15s\n", _ftostr(buf, 10.0f));
     printf(" 100.0      %15s\n", _ftostr(buf, 100.0f));
-    printf("<key>\n"); 
+    printf("<key>\n");
 //    cgetc();
 }
 

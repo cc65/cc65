@@ -164,6 +164,7 @@ EXELIST_apple2 =   \
         checkversion \
         diodemo    \
         enumdevdir \
+        floattest  \
         gunzip65   \
         hello      \
         mandelbrot \
@@ -181,6 +182,7 @@ EXELIST_apple2enh = $(EXELIST_apple2)
 EXELIST_atari =    \
         ascii      \
         checkversion \
+        floattest  \
         gunzip65   \
         hello      \
         mandelbrot \
@@ -204,6 +206,7 @@ EXELIST_atari5200 = \
 EXELIST_atmos =    \
         ascii      \
         checkversion \
+        floattest  \
         hello      \
         mandelbrot \
         mandelfloat \
@@ -218,6 +221,7 @@ EXELIST_c64 =      \
         ascii      \
         checkversion \
         enumdevdir \
+        floattest  \
         gunzip65   \
         hello      \
         mandelbrot \
@@ -236,6 +240,7 @@ EXELIST_c128 =     \
         ascii      \
         checkversion \
         enumdevdir \
+        floattest  \
         gunzip65   \
         hello      \
         mandelbrot \
@@ -256,6 +261,7 @@ EXELIST_c16 =      \
 EXELIST_cbm510 =   \
         ascii      \
         checkversion \
+        floattest  \
         gunzip65   \
         hello      \
         mandelfloat \
@@ -267,6 +273,7 @@ EXELIST_cbm510 =   \
 EXELIST_cbm610 =   \
         ascii      \
         checkversion \
+        floattest  \
         gunzip65   \
         hello      \
         mandelfloat \
@@ -282,6 +289,7 @@ EXELIST_cx16 =     \
         ascii      \
         checkversion \
         enumdevdir \
+        floattest  \
         gunzip65   \
         hello      \
         mandelbrot \
@@ -321,6 +329,7 @@ EXELIST_pet =      \
         ascii      \
         checkversion \
         enumdevdir \
+        floattest  \
         hello      \
         mandelfloat \
         tinyshell  \
@@ -330,6 +339,7 @@ EXELIST_plus4 =    \
         ascii      \
         checkversion \
         enumdevdir \
+        floattest  \
         gunzip65   \
         hello      \
         mandelfloat \
@@ -355,6 +365,7 @@ EXELIST_kim1 =     \
 EXELIST_telestrat = \
         ascii       \
         checkversion \
+        floattest  \
         gunzip65    \
         hello       \
         mandelbrot  \
@@ -366,6 +377,7 @@ EXELIST_vic20 =    \
         ascii      \
         checkversion \
         enumdevdir \
+        floattest  \
         hello      \
         mandelbrot \
         mandelfloat \
@@ -463,6 +475,9 @@ OVERLAYLIST := $(foreach I,1 2 3,multdemo.$I ovrldemo.$I)
 
 # link float examples against the (much faster) kernal lib, if available
 ifeq ($(SYS),c64)
+floattest: override CFLAGS += -D DYN_DRV=0
+floattest: floattest.o
+	$(LD) $(LDFLAGS) -o $@ -C c64.cfg -m $@.map $^ c64-fp754kernal.o $(SYS).lib
 mandelfloat.o: override CFLAGS += -D DYN_DRV=0
 mandelfloat: mandelfloat.o
 	$(LD) $(LDFLAGS) -o $@ -C c64.cfg -m $@.map $^ c64-fp754kernal.o $(SYS).lib

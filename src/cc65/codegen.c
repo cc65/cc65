@@ -102,7 +102,7 @@ static void _typeerror (char *func, int line, unsigned type)
     if ((type & CF_TYPEMASK) == CF_FLOAT) {
         Fatal ("%s:%d Floating point type is currently unsupported", func, line);
     } else {
-        Internal ("Invalid type in CF flags: %04X, type = %u", type, type & CF_TYPEMASK);
+        Internal ("%s:%d Invalid type in CF flags: %04X, type = %u", func, line, type, type & CF_TYPEMASK);
     }
 }
 
@@ -1576,7 +1576,7 @@ unsigned g_typeadjust (unsigned lhs, unsigned rhs)
     }
     else if (ltype == CF_FLOAT) {
 //        FIXME(("FIXME: conversion to float format missing\n"));
-//        g_regfloat (rhs);
+        g_regfloat (rhs);
         LOG(("<g_typeadjust left float return:%02x float\n", (lhs & CF_CONST) | CF_FLOAT)); // FIXME: remove
         ASMLOG(("nop ;< g_typeadjust return:%02x float", (lhs & CF_CONST) | CF_FLOAT)); // FIXME: remove
         return (lhs & CF_CONST) | CF_FLOAT;

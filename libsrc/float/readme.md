@@ -13,10 +13,16 @@ You can however try the current state of development. You should be able to
 build small (and slow...) programs that use floats on any supported target.
 
 - Build the compiler/toolchain/libs from this fptest branch.
-- Now you can build the samples and/or tests. Related to fp stuff are:
+- Now you can build the samples and/or tests.
 
+math.h is available for C64 when linking agains fp754kernal.o (see below)
+
+Related to fp stuff are:
+
+    samples/floattest.c
     samples/mandelfloat.c
-    samples/mathtest.c
+    samples/mathtest.c (requires math.h)
+    samples/tgisincos.c (requires math.h)
 
     test/val/float-basic-const-const.c
     test/val/float-basic-const-var.c
@@ -37,7 +43,7 @@ build small (and slow...) programs that use floats on any supported target.
     test/val/float-negate.c
     test/val/float-ternary.c
 
-Further info:
+### Further info
 
 - Right now by default all targets will use the Berkeley Softfloat Library. This
   solves the annoying "chicken and egg" problem of having to implement the float
@@ -51,7 +57,7 @@ Further info:
   files are provided for the C64 and VIC20 (fp754kernal.o). The samples will
   automatically use the overrides.
 
-Wanted:
+### Wanted
 
 - For the time being, i will not look at writing IEEE754 functions in assembly.
   Please see below for more info on what is needed to do this, should you be
@@ -63,16 +69,30 @@ Wanted:
     with (which will involve converting forth and back to whatever other format
     at runtime)
 
-Roadmap:
+### Roadmap
 
 - Test/Fix using the Softfloat lib some more
 - When all obvious tests have been created and work OK, we can merge
 
+After the merge, the following things can be done more or less independent from
+each other (not necessarily by me :)):
+
 - implement ieee754 library
+  - for generic support this will be the best compromise for standard compliance
+    and speed, but will take more RAM than alternatives.
+  - Once implemented, it will work for all targets.
+
+- implement support for native FP routines
+  - Some targets have FP routines in ROM (or OS) that can be used instead of
+    providing our own in the library. This may or may not save RAM, and may or
+    may not be faster than the default library.
+  - The wrapper library must implement conversion from/to 32bit IEEE754
 
 - implement support for native FP formats
   - for this the wrappers in fp.c must be used in the compiler at all places.
   - also we must *implement* the native format on the host in fp.c
+  - if the native format uses a different number of bytes than 4 for its native
+    format, we must add support for this in the compiler at various places
   - add a cmdline option to the compiler to switch the float binary type (754,
     cbm, woz, ...)
   - last not least a wrapper library that uses the native format must be created
@@ -81,6 +101,8 @@ Roadmap:
 ## The Compiler
 
 NOT WORKING YET:
+
+<TODO fix this section :)>
 
 - float values as in "12.34f" work, but "12.34" does not - should it?
 
@@ -215,7 +237,7 @@ default for all targets.
 This is a wrapper to the CBM kernal functions.
 
 - this one is fairly complete, including math functions
-- the only missing functions are ftosrsubeax, fnegeax
+- the only missing function is ftosrsubeax
   - WANTED: which can be easily added once testcode is found that actually triggers it :)
 
 #### ieee754
@@ -224,9 +246,9 @@ This should become a freestanding IEEE754 library, which can completely replace
 the softfloat library.
 
 - basically everything missing except addition/substraction
-- compare functions are missing
-- mul, div functions are missing
-- type conversion functions are missing
+  - compare functions are missing
+  - mul, div functions are missing
+  - type conversion functions are missing
 
 #### woz
 
@@ -263,7 +285,7 @@ ftosrsubeax Primary = Primary - TOS             -       -       -       -       
 ftosmuleax  Primary = TOS * Primary             *       *       ?       -       g_mul
 ftosdiveax  Primary = TOS / Primary             *       *       ?       -       g_div
 
-fnegeax     Primary = -Primary                  -       -       -       -       g_neg
+fnegeax     Primary = -Primary                  *       *       -       -       g_neg
 fbnegeax    Primary = !Primary (return bool!)   *       *       -       -       g_bneg
 
 ftosgeeax   Test for greater than or equal to   *       *       -       -       g_ge

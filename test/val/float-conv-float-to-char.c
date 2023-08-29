@@ -1,6 +1,5 @@
 
 // test basic type conversions
-// WIP WIP WIP
 
 #define TEST_8
 #define TEST_16

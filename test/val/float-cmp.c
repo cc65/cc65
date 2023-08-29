@@ -1,6 +1,5 @@
 
 // test comparison operations
-// WIP WIP WIP
 
 #include <stdlib.h>
 #include <stdio.h>

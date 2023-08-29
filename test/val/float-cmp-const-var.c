@@ -1,6 +1,5 @@
 
 // test comparison operations
-// WIP WIP WIP
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -77,7 +76,7 @@ void intconstvar(void)
     fp2 = 10.0f;
 
     // Comparing types 'int' with 'float' is invalid
-#if 0
+#if 1
     expect("10 == 20 is", 0, (10 == fp1));
     expect("20 == 10 is", 0, (20 == fp2));
     expect("20 == 20 is", 1, (20 == fp1));

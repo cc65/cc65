@@ -1,6 +1,5 @@
 
 // test basic arithmetic operations
-// WIP WIP WIP
 
 #ifdef CONIO
 #include <conio.h>

@@ -1,6 +1,5 @@
 
 // test basic arithmetic operations
-// WIP WIP WIP
 
 #ifdef CONIO
 #include <conio.h>
@@ -67,9 +66,9 @@ void varconst(void)
     printf(" fp3:0x%08lx [0x42860000] %s (exp:67.0)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
     test1(fp3, "42860000");
 
-    /* substraction, variable - constant */
+    /* subtraction, variable - constant */
     fp1 = 16.25f;
-    fp3 = fp1 - 8.5f;  // FIXME: Invalid operands for binary operator '-'
+    fp3 = fp1 - 8.5f;
     printf("substraction: %s-%s=%s\n", _ftostr(buf, fp1), _ftostr(buf2, 8.5f), _ftostr(buf3, fp3));
     printf(" fp3:0x%08lx [0x40f80000] %s (exp:7.75)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
     test1(fp3, "40f80000");
@@ -83,12 +82,14 @@ void varconst(void)
     printf("fp3:0x%08lx [0xbe4cccce] %s (-0.2)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
     test1(fp3, "be4cccce");
 
+    /* multiplication, variable * constant */
     fp1 = 16.25f;
     fp3 = fp1 * 2.5f;
     printf("multiplication: %s*%s=%s\n", _ftostr(buf, fp1), _ftostr(buf2, 2.3f), _ftostr(buf3, fp3));
     printf(" fp3:0x%08lx [0x42228000] %s (exp:40.625)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
     test1(fp3, "42228000");
 
+    /* division, variable / constant */
     fp1 = 32.5f;
     fp3 = fp1 / 2.5f;
     printf("division: %s/%s=%s\n", _ftostr(buf, fp1), _ftostr(buf2, 2.3f), _ftostr(buf3, fp3));

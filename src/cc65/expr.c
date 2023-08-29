@@ -3420,15 +3420,42 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                 /*flags = typeadjust (Expr, &Expr2, 1);*/
                 flags |= CF_FLOAT;
                 Expr->Type = Expr2.Type;
+#if 1
+            } else if (!DoArrayRef && IsClassInt (lhst) && IsClassFloat (rhst)) {
+                /* FIXME: float - what to do here exactly? */
+                LOG(("%s:%d float addition (Expr2.V.FVal.V:%f)\n", __FILE__, __LINE__, Expr2.V.FVal.V));
+                /* Float addition (int variable + float constant) */
+                /* adjust lhs */
+                flags = typeadjust (Expr, &Expr2, 1);
+//                flags |= CF_FLOAT;
+//                Expr->Type = Expr2.Type;
+#endif
+#if 1
+            } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassInt (rhst)) {
+                /* FIXME: float - what to do here exactly? */
+                LOG(("%s:%d float addition (Expr2.V.FVal.V:%f)\n", __FILE__, __LINE__, Expr2.V.FVal.V));
+                /* Float addition (float variable + int constant) */
+                /*flags = typeadjust (Expr, &Expr2, 1);*/
+                flags |= CF_FLOAT;
+                // Expr->Type = Expr2.Type;
+//                g_push(CF_FLOAT, 0);
+                /* Load lhs */
+                // flags = typeadjust (Expr, &Expr2, 0);
+#endif
             } else {
                 /* OOPS */
                 LOG(("%s:%d OOPS\n", __FILE__, __LINE__));
                 AddDone = -1;
             }
 
+            /* add rhs constant value */
             if (flags & CF_FLOAT) {
                 /* FIXME: float - what to do here exactly? */
-                g_inc (flags | CF_CONST, FP_D_As32bitRaw(Expr2.V.FVal));
+                if (IsClassInt (rhst)) {
+                    g_inc (flags | CF_CONST, FP_D_As32bitRaw(FP_D_FromInt(Expr2.IVal)));
+                } else {
+                    g_inc (flags | CF_CONST, FP_D_As32bitRaw(Expr2.V.FVal));
+                }
             } else {
                 /* Generate code for the add */
                 g_inc (flags | CF_CONST, Expr2.IVal);

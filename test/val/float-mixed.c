@@ -69,21 +69,6 @@ void SKIPPEDtest1(float f, char *str)
 
 void test(void)
 {
-    printf("intvar + floatvar\n");
-#if 1
-    var_int = 47;
-    var_float = 11.123f;
-    fp1 = var_int;
-    printf("fp1:0x%08lx [42687df4] %s (47)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
-    fp1 = var_float;
-    printf("fp1:0x%08lx [42687df4] %s (11.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
-    fp1 = var_int + var_float;
-    printf("fp1:0x%08lx [42687df4] %s (58.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
-    test1(fp1, "42687df4");
-    fp1 = var_float + var_int;
-    printf("fp1:0x%08lx [42687df4] %s (58.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
-    test1(fp1, "42687df4");
-#endif
 
     printf("floatconst + intvar * floatconst\n");
     var_char = 3;

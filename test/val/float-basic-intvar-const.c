@@ -76,6 +76,15 @@ void test(void)
     fp1 = 11.123f;
     printf("fp1:0x%08lx [42687df4] %s (11.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
 #endif
+
+    printf("intvar + floatconst\n");
+#if 0
+    var_char = 42;
+    fp1 = var_char + 23.123f;
+    printf("fp1:0x%08lx [0x40266666] %s (2.5997)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "40266666");
+#endif
+
     /* addition */
     fp1 = var_int + 11.123f;
     printf("fp1:0x%08lx [42687df4] %s (58.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));

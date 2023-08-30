@@ -395,31 +395,31 @@ SER_IRQ:
         sta     IndReg          ; Switch to the system bank
 @L0:    lda     SendFreeCnt
         cmp     #$ff
-        beq     @L3             ; Bail out
+        beq     @L2             ; Bail out
 
 ; Check for flow stopped
 
 @L1:    lda     Stopped
-        bne     @L3             ; Bail out
+        bne     @L2             ; Bail out
 
 ; Check that swiftlink is ready to send
 
-@L2:    ldy     #ACIA::STATUS
+       ldy     #ACIA::STATUS
         lda     (acia),y
         and     #$10
-        bne     @L4
+        bne     @L3
         bit     tmp1            ; Keep trying if must try hard
-        bmi     @L0
+        bmi     @L1
 
 ; Switch back the bank and return
 
-@L3:    lda     ExecReg
+@L2:    lda     ExecReg
         sta     IndReg
         rts
 
 ; Send byte and try again
 
-@L4:    ldx     SendHead
+@L3:    ldx     SendHead
         lda     SendBuf,x
         ldy     #ACIA::DATA
         sta     (acia),y

@@ -443,25 +443,25 @@ NmiHandler:
         sta     tmp1            ; Remember tryHard flag
 @L0:    lda     SendFreeCnt
         cmp     #$ff
-        beq     @L3             ; Bail out
+        beq     @L2             ; Bail out
 
 ; Check for flow stopped
 
 @L1:    lda     Stopped
-        bne     @L3             ; Bail out
+        bne     @L2             ; Bail out
 
 ; Check that swiftlink is ready to send
 
-@L2:    lda     ACIA_STATUS
+        lda     ACIA_STATUS
         and     #$10
-        bne     @L4
+        bne     @L3
         bit     tmp1            ;keep trying if must try hard
-        bmi     @L0
-@L3:    rts
+        bmi     @L1
+@L2:    rts
 
 ; Send byte and try again
 
-@L4:    ldx     SendHead
+@L3:    ldx     SendHead
         lda     SendBuf,x
         sta     ACIA_DATA
         inc     SendHead

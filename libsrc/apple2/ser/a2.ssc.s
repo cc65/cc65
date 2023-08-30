@@ -427,12 +427,13 @@ Done:   rts
 
 TryToSend:
         sta     tmp1            ; Remember tryHard flag
-Again:  lda     SendFreeCnt
+NextByte:
+        lda     SendFreeCnt
         cmp     #$FF
         beq     Quit            ; Bail out
 
         ; Check for flow stopped
-        lda     Stopped
+Again:  lda     Stopped
         bne     Quit            ; Bail out
 
         ; Check that ACIA is ready to send
@@ -449,4 +450,4 @@ Send:   ldy     SendHead
         sta     ACIA_DATA,x
         inc     SendHead
         inc     SendFreeCnt
-        jmp     Again
+        jmp     NextByte

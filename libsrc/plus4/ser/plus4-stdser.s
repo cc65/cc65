@@ -300,21 +300,23 @@ SER_PUT:
 ; Try to send
 
         ldx     SendFreeCnt
-        inx                             ; X = $ff?
+        cpx     #$ff                   ; Nothing to flush
         beq     @L2
         pha
         lda     #$00
         jsr     TryToSend
         pla
 
-; Put byte into send buffer & send
+; Reload SendFreeCnt after TryToSend
 
-@L2:    ldx     SendFreeCnt
-        bne     @L3
+        ldx     SendFreeCnt
+        bne     @L2
         lda     #SER_ERR_OVERFLOW      ; X is already zero
         rts
 
-@L3:    ldx     SendTail
+; Put byte into send buffer & send
+
+@L2:    ldx     SendTail
         sta     SendBuf,x
         inc     SendTail
         dec     SendFreeCnt

@@ -328,20 +328,21 @@ SER_PUT:
 
         ; Try to send
         ldy     SendFreeCnt
-        iny                     ; Y = $FF?
+        cpy     #$FF            ; Nothing to flush
         beq     :+
         pha
         lda     #$00            ; TryHard = false
         jsr     TryToSend
         pla
 
-        ; Put byte into send buffer & send
-:       ldy     SendFreeCnt
+        ; Reload SendFreeCnt after TryToSend
+        ldy     SendFreeCnt
         bne     :+
         lda     #SER_ERR_OVERFLOW
         ldx     #0 ; return value is char
         rts
 
+        ; Put byte into send buffer & send
 :       ldy     SendTail
         sta     SendBuf,y
         inc     SendTail

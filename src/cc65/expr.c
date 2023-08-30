@@ -3302,9 +3302,20 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                 /* Integer addition */
                 flags |= typeadjust (Expr, &Expr2, 1);
             } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassFloat (rhst)) {
-                /* Float addition */
+                /* Float const + float var addition */
                 LOG(("%s:%d float addition (const + var)\n", __FILE__, __LINE__));
                 flags |= typeadjust (Expr, &Expr2, 1);
+#if 1
+            } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassInt (rhst)) {
+//printf("const 1\n");
+                /* Float const + int var addition */
+                LOG(("%s:%d float addition (float const + int var)\n", __FILE__, __LINE__));
+                flags |= typeadjust (Expr, &Expr2, 1);
+#endif
+            } else if (!DoArrayRef && IsClassInt (lhst) && IsClassFloat (rhst)) {
+//printf("const 2\n");
+                /* FIXME: int const + Float var addition */
+                LOG(("%s:%d float addition (int const + float var)\n", __FILE__, __LINE__));
             } else {
                 /* OOPS */
                 LOG(("%s:%d OOPS\n", __FILE__, __LINE__));

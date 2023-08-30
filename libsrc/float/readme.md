@@ -25,19 +25,34 @@ Related to fp stuff are:
     samples/tgisincos.c (requires math.h)
 
     test/val/float-basic-const-const.c
+    test/val/float-basic-const-intconst.c
+    test/val/float-basic-const-intvar.c
     test/val/float-basic-const-var.c
+    test/val/float-basic-intconst-const.c
+    test/val/float-basic-intconst-var.c
+    test/val/float-basic-intvar-const.c
+    test/val/float-basic-intvar-var.c
     test/val/float-basic-var-const.c
+    test/val/float-basic-var-intconst.c
+    test/val/float-basic-var-intvar.c
     test/val/float-basic-var-var.c
+    test/val/float-bnegate.c
     test/val/float-cmp-const-const.c
+    test/val/float-cmp-const-intconst.c
+    test/val/float-cmp-const-intvar.c
     test/val/float-cmp-const-var.c
     test/val/float-cmp-intconst-const.c
+    test/val/float-cmp-intconst-var.c
+    test/val/float-cmp-intvar-const.c
+    test/val/float-cmp-intvar-var.c
     test/val/float-cmp-var-const.c
     test/val/float-cmp-var-intconst.c
-    test/val/float-cmp.c
-    test/val/float-const-conv.c
+    test/val/float-cmp-var-intvar.c
+    test/val/float-cmp-var-var.c
+    test/val/float-const-convert.c
+    test/val/float-conv.c
     test/val/float-conv-float-to-char.c
     test/val/float-conv-float-to-schar.c
-    test/val/float-conv.c
     test/val/float-minimal.c
     test/val/float-mixed.c
     test/val/float-negate.c

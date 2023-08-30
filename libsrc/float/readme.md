@@ -102,15 +102,20 @@ each other (not necessarily by me :)):
 
 NOT WORKING YET:
 
-<TODO fix this section :)>
+/test/val/float-basic-const-intvar.c (subtraction)
+/test/val/float-basic-const-intconst.c (addition, subtraction)
+/test/val/float-basic-intconst-var.c (addition, subtraction, multiplication, division)
+/test/val/float-basic-intconst-const.c (addition, subtraction)
+/test/val/float-basic-intvar-const.c (subtraction)
+/test/val/float-basic-intvar-var.c (subtraction, multiplication, division)
+/test/val/float-basic-var-intconst.c (subtraction, multiplication, division)
+/test/val/float-basic-var-intvar.c (subtraction)
 
-- float values as in "12.34f" work, but "12.34" does not - should it?
+/test/val/float-cmp-var-intvar.c
+/test/val/float-cmp-const-intvar.c
+/test/val/float-cmp-intvar-const.c
 
-- substraction, float const - float var
-- division, float const / float var
-
-- substraction, float const - float const (Invalid operands for binary operator)
-- substraction, float var - float const (Invalid operands for binary operator)
+- float values written as "12.34f" work, but "12.34" does not - should it?
 
 ### Files & Functions
 

@@ -70,47 +70,47 @@ void SKIPPEDtest1(float f, char *str)
 void test(void)
 {
 
-    var_int = 47;
     var_float = 11.123f;
-    fp1 = var_int;
+#if 0
+    fp1 = 47;
     printf("fp1:0x%08lx [42687df4] %s (47)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     fp1 = var_float;
     printf("fp1:0x%08lx [42687df4] %s (11.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
-
+#endif
+#if 0 // Invalid operands for binary operator '+'
     /* addition */
-    fp1 = var_float + var_int;
+    fp1 = 47 + var_float;
     printf("fp1:0x%08lx [42687df4] %s (58.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     test1(fp1, "42687df4");
-#if 0 // Invalid operands for binary operator '-'
-    fp1 = var_float - var_int;
-    printf("fp1:0x%08lx [42687df4] %s (-35.877)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+#endif
+#if 0
+    fp1 = 47 - var_float;
+    printf("fp1:0x%08lx [42687df4] %s (58.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     test1(fp1, "42687df4");
 #endif
-#if 1
-    fp1 = var_float * var_int;
-    printf("fp1:0x%08lx [4402b1fc] %s (522.781)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
-    test1(fp1, "4402b1fc");
+#if 0
+    fp1 = 47 * var_float;
+    printf("fp1:0x%08lx [42687df4] %s (58.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "42687df4");
 #endif
-
-#if 1
-    fp1 = var_float / var_int;
-    printf("fp1:0x%08lx [3e7256e3] %s (0.2367)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
-    test1(fp1, "3e7256e3");
+#if 0
+    fp1 = 47 / var_float;
+    printf("fp1:0x%08lx [42687df4] %s (58.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "42687df4");
 #endif
-
 }
 
 int main(void)
 {
     float fp2 = 43.21f;
 
-    printf("*** float-basic-var-intvar ***\n");
+    printf("*** float-basic-intconst-var ***\n");
     printf("fp1:0x%08lx [0x414570a4] %s (12.340000)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     printf("fp2:0x%08lx [0x422cd70a] %s (43.209999)\n", *((uint32_t*)&fp2), _ftostr(buf, fp2));
 
     test();
     WAIT();
 
-    printf("\nfloat-basic-var-intvar (res:%d)\n", result);
+    printf("\nfloat-basic-intconst-var (res:%d)\n", result);
     return result;
 }

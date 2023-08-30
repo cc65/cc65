@@ -71,18 +71,34 @@ void test(void)
 {
 
     var_float = 11.123f;
-#if 1
+
     fp1 = 47;
     printf("fp1:0x%08lx [42687df4] %s (47)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     fp1 = var_float;
     printf("fp1:0x%08lx [42687df4] %s (11.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
-#endif
-#if 1  // Invalid operands for binary operator '+'
+
     /* addition */
     fp1 = var_float + 47;
     printf("fp1:0x%08lx [42687df4] %s (58.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     test1(fp1, "42687df4");
+
+#if 0 // works but gives wrong result
+    fp1 = var_float - 47;
+    printf("fp1:0x%08lx [42687df4] %s (-35.877)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "42687df4");
 #endif
+
+#if 0 // works but gives wrong result
+    fp1 = var_float * 47;
+    printf("fp1:0x%08lx [42687df4] %s (522.781)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "42687df4");
+#endif
+#if 0 // works but gives wrong result
+    fp1 = var_float / 47;
+    printf("fp1:0x%08lx [42687df4] %s (0.2367)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "42687df4");
+#endif
+
 }
 
 int main(void)

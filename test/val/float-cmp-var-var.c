@@ -77,13 +77,13 @@ void varvar(void)
 
 int main(void)
 {
-    printf("float-cmp\n");
+    printf("float-cmp-var-var\n");
 
     fp1 = 1.6f;
     fp2 = 1.5f;
 
     varvar();
 
-    printf("float-cmp (res: %d)\n", result);
+    printf("float-cmp-var-var (res: %d)\n", result);
     return result;
 }

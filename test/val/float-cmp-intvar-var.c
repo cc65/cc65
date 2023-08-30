@@ -52,7 +52,10 @@ void seperate(void)
     printf("res:%d\n", res);
 }
 
-void intconstvar(void)
+int i1 = 10;
+int i2 = 20;
+
+void intvarvar(void)
 {
     printf("int const vs var\n");
 
@@ -60,40 +63,40 @@ void intconstvar(void)
     fp2 = 20.0f;
 
 #if 1
-    expect("10 == 20 is", 0, (10 == fp2), fp2);
-    expect("20 == 10 is", 0, (20 == fp1), fp1);
-    expect("20 == 20 is", 1, (20 == fp2), fp2);
+    expect("10 == 20 is", 0, (i1 == fp2), fp2);
+    expect("20 == 10 is", 0, (i2 == fp1), fp1);
+    expect("20 == 20 is", 1, (i2 == fp2), fp2);
 
-    expect("10 != 20 is", 1, (10 != fp2), fp2);
-    expect("20 != 10 is", 1, (20 != fp1), fp1);
-    expect("20 != 20 is", 0, (20 != fp2), fp2);
+    expect("10 != 20 is", 1, (i1 != fp2), fp2);
+    expect("20 != 10 is", 1, (i2 != fp1), fp1);
+    expect("20 != 20 is", 0, (i2 != fp2), fp2);
 
-    expect("10 < 20 is", 1, (10 < fp2), fp2);
-    expect("20 < 10 is", 0, (20 < fp1), fp1);
-    expect("20 < 20 is", 0, (20 < fp2), fp2);
+    expect("10 < 20 is", 1, (i1 < fp2), fp2);
+    expect("20 < 10 is", 0, (i2 < fp1), fp1);
+    expect("20 < 20 is", 0, (i2 < fp2), fp2);
 
-    expect("10 > 20 is", 0, (10 > fp2), fp2);
-    expect("20 > 10 is", 1, (20 > fp1), fp1);
-    expect("20 > 20 is", 0, (20 > fp2), fp2);
+    expect("10 > 20 is", 0, (i1 > fp2), fp2);
+    expect("20 > 10 is", 1, (i2 > fp1), fp1);
+    expect("20 > 20 is", 0, (i2 > fp2), fp2);
 
-    expect("10 <= 20 is", 1, (10 <= fp2), fp2);
-    expect("20 <= 10 is", 0, (20 <= fp1), fp1);
-    expect("20 <= 20 is", 1, (20 <= fp2), fp2);
+    expect("10 <= 20 is", 1, (i1 <= fp2), fp2);
+    expect("20 <= 10 is", 0, (i2 <= fp1), fp1);
+    expect("20 <= 20 is", 1, (i2 <= fp2), fp2);
 
-    expect("10 >= 20 is", 0, (10 >= fp2), fp2);
-    expect("20 >= 10 is", 1, (20 >= fp1), fp1);
-    expect("20 >= 20 is", 1, (20 >= fp2), fp2);
+    expect("10 >= 20 is", 0, (i1 >= fp2), fp2);
+    expect("20 >= 10 is", 1, (i2 >= fp1), fp1);
+    expect("20 >= 20 is", 1, (i2 >= fp2), fp2);
 #endif
 
 }
 
 int main(void)
 {
-    printf("float-cmp-intconst-var\n");
+    printf("float-cmp-intvar-var\n");
 
     seperate();
-    intconstvar();
+    intvarvar();
 
-    printf("float-cmp-intconst-var (res: %d)\n", result);
+    printf("float-cmp-intvar-var (res: %d)\n", result);
     return result;
 }

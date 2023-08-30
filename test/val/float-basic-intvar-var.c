@@ -80,6 +80,21 @@ void test(void)
     fp1 = var_int + var_float;
     printf("fp1:0x%08lx [42687df4] %s (58.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     test1(fp1, "42687df4");
+#if 0 // Invalid operands for binary operator '-'
+    fp1 = var_int - var_float;
+    printf("fp1:0x%08lx [42687df4] %s (58.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "42687df4");
+#endif
+#if 0 // Internal compiler error
+    fp1 = var_int * var_float;
+    printf("fp1:0x%08lx [42687df4] %s (58.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "42687df4");
+#endif
+#if 0 // Internal compiler error
+    fp1 = var_int / var_float;
+    printf("fp1:0x%08lx [42687df4] %s (58.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "42687df4");
+#endif
 
 }
 

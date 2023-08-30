@@ -404,19 +404,19 @@ SER_IRQ:
         and     #$08
         beq     Done            ; Jump if no ACIA interrupt
         lda     ACIA_DATA,x     ; Get byte from ACIA
-        ldy     RecvFreeCnt     ; Check if we have free space left
+        ldx     RecvFreeCnt     ; Check if we have free space left
         beq     Flow            ; Jump if no space in receive buffer
         ldy     RecvTail        ; Load buffer pointer
         sta     RecvBuf,y       ; Store received byte in buffer
         inc     RecvTail        ; Increment buffer pointer
         dec     RecvFreeCnt     ; Decrement free space counter
-        ldy     RecvFreeCnt     ; Check for buffer space low
-        cpy     #33
+        cpx     #33             ; Check for buffer space low
         bcc     Flow            ; Assert flow control if buffer space low
         rts                     ; Interrupt handled (carry already set)
 
         ; Assert flow control if buffer space too low
-Flow:   lda     RtsOff
+Flow:   ldx     Index
+lda     RtsOff
         sta     ACIA_CMD,x
         sta     Stopped
         sec                     ; Interrupt handled

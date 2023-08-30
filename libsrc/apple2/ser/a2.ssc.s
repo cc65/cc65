@@ -26,6 +26,7 @@
         .include        "ser-error.inc"
 
         .macpack        module
+        .macpack        cpu
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
@@ -57,9 +58,13 @@
 ;----------------------------------------------------------------------------
 ; I/O definitions
 
+.if (.cpu .bitand CPU_ISET_65C02)
+ACIA            = $C088
+.else
 Offset          = $8F           ; Move 6502 false read out of I/O to page $BF
-
 ACIA            = $C088-Offset
+.endif
+
 ACIA_DATA       = ACIA+0        ; Data register
 ACIA_STATUS     = ACIA+1        ; Status register
 ACIA_CMD        = ACIA+2        ; Command register
@@ -200,7 +205,9 @@ SER_OPEN:
         asl
         asl
         asl
+.if .not (.cpu .bitand CPU_ISET_65C02)
         adc     #Offset                 ; Assume carry to be clear
+.endif
         tax
 
         ; Check if the handshake setting is valid
@@ -315,7 +322,11 @@ SER_GET:
         inc     RecvHead
         inc     RecvFreeCnt
         ldx     #$00            ; (59)
+.if (.cpu .bitand CPU_ISET_65C02)
+        sta     (ptr1)
+.else
         sta     (ptr1,x)
+.endif
         txa                     ; Return code = 0
         rts
 

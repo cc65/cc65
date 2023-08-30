@@ -454,7 +454,7 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
     unsigned Flags;
     int MustScale;
 
-    LOG(("OpAssignArithmetic (Gen=%d)\n", (int)Gen));
+    LOG(("OpAssignArithmetic '%s' (Gen=%d)\n", Op, (int)Gen));
 
     ED_Init (&Expr2);
     Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
@@ -484,11 +484,11 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
         /* If necessary, load the value into the primary register */
         LoadExpr (CF_NONE, &Expr2);
 
-        LOG(("OpAssignArithmetic (0) 2 lhs: %s rhs: %s\n",
+        LOG(("OpAssignArithmetic '%s' (0) 2 lhs: %s rhs: %s\n",
+             Op,
             (TypeOf (Expr->Type) == CF_FLOAT) ? "float" : "int",
             (TypeOf (Expr2.Type) == CF_FLOAT) ? "float" : "int"));
     } else {
-
         /* Load the original value if necessary */
         LoadExpr (CF_NONE, Expr);
 
@@ -735,7 +735,10 @@ void OpAddSubAssign (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
     lflags |= TypeOf (Expr->Type) | GlobalModeFlags (Expr) | CF_FORCECHAR;
     rflags |= TypeOf (Expr2.Type) | CF_FORCECHAR;
 
+    LOG(("OpAddSubAssign '%s' lflags:%04x rflags:%04x\n", Op, lflags, rflags));
+
     if (ED_IsConstAbs (&Expr2)) {
+        LOG(("OpAddSubAssign '%s' result is constant\n", Op));
         /* The resulting value is a constant */
         rflags |= CF_CONST;
         lflags |= CF_CONST;
@@ -745,6 +748,7 @@ void OpAddSubAssign (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
             Expr2.IVal *= CheckedSizeOf (Indirect (Expr->Type));
         }
     } else {
+        LOG(("OpAddSubAssign '%s' result is not constant\n", Op));
         /* Not constant, load into the primary */
         LoadExpr (CF_NONE, &Expr2);
 

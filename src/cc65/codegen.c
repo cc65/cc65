@@ -832,6 +832,9 @@ void g_getstatic (unsigned flags, uintptr_t label, long offs)
     /* Create the correct label name */
     const char* lbuf = GetLabelName (flags, label, offs);
 
+    LOG(("g_getstatic flags:%04x offs:%04x label:%04x\n", flags, offs, label));
+    ASMLOG(("nop ; g_getstatic flags:%04x offs:%04x label:%04x\n", flags, offs, label));
+
     /* Check the size and generate the correct load operation */
     switch (flags & CF_TYPEMASK) {
 
@@ -1898,6 +1901,10 @@ void g_addeqstatic (unsigned flags, uintptr_t label, long offs,
     /* Create the correct label name */
     const char* lbuf = GetLabelName (flags, label, offs);
 
+    LOG(("g_addeqstatic flags:%04x val:%08x\n", flags, val));
+    ASMLOG(("nop ; g_addeqstatic val:%08x\n", val));
+    /* if flags contain CF_CONST, then val contains the constant value */
+
     /* Check the size and determine operation */
     switch (flags & CF_TYPEMASK) {
 
@@ -2135,6 +2142,7 @@ void g_subeqstatic (unsigned flags, uintptr_t label, long offs,
     /* Create the correct label name */
     const char* lbuf = GetLabelName (flags, label, offs);
 
+    ASMLOG(("nop ; g_subeqstatic val:%08x\n", val));
     /* Check the size and determine operation */
     switch (flags & CF_TYPEMASK) {
 
@@ -3847,6 +3855,8 @@ void g_inc (unsigned flags, unsigned long val)
 */
 {
     LOG(("g_inc flags:%04x val:%08lx\n", flags, val));
+    ASMLOG(("nop ; g_inc flags:%04x val:%08x", flags, val));
+
     /* Don't inc by zero */
     if (val == 0) {
         return;
@@ -3937,6 +3947,7 @@ void g_inc (unsigned flags, unsigned long val)
 
         /* FIXME: float */
         case CF_FLOAT:
+            ASMLOG(("nop ; g_inc float"));
             g_add (flags | CF_CONST, val);
             break;
 

@@ -498,6 +498,8 @@ static void DoInc (ExprDesc* Expr, unsigned KeepResult)
     /* Get the increment value in bytes */
     Val = IsTypePtr (Expr->Type) ? CheckedSizeOf (Expr->Type + 1) : 1;
 
+    LOG(("DoInc Val:%d KeepResult:%d\n", Val, KeepResult));
+
     /* Special treatment is needed for bit-fields */
     if (IsTypeFragBitField (Expr->Type)) {
         DoIncDecBitField (Expr, Val, KeepResult);

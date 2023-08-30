@@ -314,15 +314,10 @@ SER_CLOSE:
 ;
 
 SER_GET:
-        ldx     SendFreeCnt             ; Send data if necessary
-        inx                             ; X == $FF?
-        beq     @L1
-        lda     #$00
-        jsr     TryToSend
 
 ; Check for buffer empty
 
-@L1:    lda     RecvFreeCnt             ; (25)
+        lda     RecvFreeCnt             ; (25)
         cmp     #$ff
         bne     @L2
         lda     #SER_ERR_NO_DATA

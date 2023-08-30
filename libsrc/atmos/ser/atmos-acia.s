@@ -227,14 +227,8 @@ InvBaud:lda     #<SER_ERR_BAUD_UNAVAIL
 ; returned.
 
 SER_GET:
-        ldy     SendFreeCnt     ; Send data if necessary
-        iny                     ; Y == $FF?
-        beq     :+
-        lda     #$00            ; TryHard = false
-        jsr     TryToSend
-
         ; Check for buffer empty
-:       lda     RecvFreeCnt     ; (25)
+        lda     RecvFreeCnt     ; (25)
         cmp     #$FF
         bne     :+
         lda     #SER_ERR_NO_DATA

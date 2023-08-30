@@ -2012,6 +2012,12 @@ void g_addeqstatic (unsigned flags, uintptr_t label, long offs,
             }
             break;
 
+        case CF_FLOAT:
+                g_getstatic (flags, label, offs);
+                g_inc (flags, val);
+                g_putstatic (flags, label, offs);
+            break;
+
         default:
             typeerror (flags);
     }
@@ -2235,6 +2241,12 @@ void g_subeqstatic (unsigned flags, uintptr_t label, long offs,
                 AddCodeLine ("ldy #>(%s)", lbuf);
                 AddCodeLine ("jsr lsubeq");
             }
+            break;
+
+        case CF_FLOAT:
+            g_getstatic (flags, label, offs);
+            g_dec (flags, val);
+            g_putstatic (flags, label, offs);
             break;
 
         default:

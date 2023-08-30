@@ -60,6 +60,17 @@ void test1(float f, char *str)
     printf("result:%d\n", result);
 }
 
+void test2(unsigned int i, unsigned int exp)
+{
+    if (i == exp) {
+//        printf(" (ok)");
+    } else {
+        printf(" (failed) !!!  ");
+        result++;
+    }
+    printf("result:%d\n", result);
+}
+
 void SKIPPEDtest1(float f, char *str)
 {
     char temp[12];
@@ -67,7 +78,7 @@ void SKIPPEDtest1(float f, char *str)
     printf(" (SKIPPED:%s:%s)\n", temp, str);
 }
 
-void test(void)
+void intfloat(void)
 {
     var_int = 47;
     var_float = 11.123f;
@@ -98,6 +109,43 @@ void test(void)
 
 }
 
+unsigned int i1;
+
+void intfloat2(void)
+{
+    printf("int X= float var\n");
+    var_int = 47;
+    var_float = 11.123f;
+
+    i1 = var_int;
+    printf("i1: %d (47)\n", i1);
+
+    /* addition */
+    i1 = var_int;
+    i1 += var_float;
+    printf("i1: %d (58)\n", i1);
+    test2(i1, 58);
+#if 1
+    i1 = var_int;
+    i1 -= var_float;
+    printf("i1: %d (36)\n", i1);
+    test2(i1, 36);
+#endif
+#if 0 // internal compiler error
+    i1 = var_int;
+    i1 *= var_float;
+    printf("i1: %d (522)\n", i1);
+    test2(i1, 522);
+#endif
+#if 0 // internal compiler error
+    i1 = var_int;
+    i1 /= var_float;
+    printf("i1: %d (4)\n", i1);
+    test2(i1, 4);
+#endif
+
+}
+
 int main(void)
 {
     float fp2 = 43.21f;
@@ -106,7 +154,8 @@ int main(void)
     printf("fp1:0x%08lx [0x414570a4] %s (12.340000)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     printf("fp2:0x%08lx [0x422cd70a] %s (43.209999)\n", *((uint32_t*)&fp2), _ftostr(buf, fp2));
 
-    test();
+    intfloat();
+    intfloat2();
     WAIT();
 
     printf("\nfloat-basic-intvar-var (res:%d)\n", result);

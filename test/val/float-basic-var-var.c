@@ -34,6 +34,7 @@ unsigned long var_ulong;
 
 int result = 0;
 
+#if 1
 // returns 1 if value in f matches the string
 // the string is a hex value without leading "0x"
 int compare(float f, char *str)
@@ -101,9 +102,69 @@ void varvar(void)
     test1(fp3, "40d00000");
 }
 
+void varvar2(void)
+{
+    printf("\nvariable vs variable\n\n");
+
+#if 0 // compiles, but wrong result
+    /* addition, variable + variable */
+    fp1 = 16.5f;
+    fp2 = 64.25f;
+    fp1 += fp2;   // = 80.75f
+    printf("addition: %s+%s=%s\n", _ftostr(buf, 16.5f), _ftostr(buf2, fp2), _ftostr(buf3, fp1));
+    printf(" fp1:0x%08lx [0x42a18000] %s (exp:80.75)", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "42a18000");
+#endif
+#if 0 // compiles, but wrong result
+    /* subtraction, variable - variable */
+    fp1 = 64.25f;
+    fp2 = 16.5f;
+    fp1 -= fp2;
+    printf("substraction: %s-%s=%s\n", _ftostr(buf, 64.25f), _ftostr(buf2, fp2), _ftostr(buf3, fp1));
+    printf(" fp1:0x%08lx [0x423f0000] %s (exp:47.75)", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "423f0000");
+
+    fp1 = 0.3f;
+    fp2 = 0.1f;
+    fp1 -= fp2;
+    printf("fp1:0x%08lx [0x3e4cccce] %s (0.2)", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "3e4cccce");
+
+    fp1 = 0.1f;
+    fp2 = 0.1f;
+    fp1 -= fp2;
+    printf("fp1:0x%08lx [0xbe4cccce] %s (-0.2)", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "be4cccce");
+#endif
+    /* multiplication, variable * variable */
+    fp1 = 8.5f;
+    fp2 = 2.25f;
+    fp1 *= fp2;
+    printf("multiplication: %s*%s=%s\n", _ftostr(buf, 8.5f), _ftostr(buf2, fp2), _ftostr(buf3, fp1));
+    printf(" fp1:0x%08lx [0x41990000] %s (exp:19.125)", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "41990000");
+
+    /* division, variable / variable */
+    fp1 = 16.25f;
+    fp2 = 2.5f;
+    fp1 /= fp2;
+    printf("division: %s/%s=%s\n", _ftostr(buf, 16.25f), _ftostr(buf2, fp2), _ftostr(buf3, fp1));
+    printf(" fp1:0x%08lx [0x40d00000] %s (exp:6.5)", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "40d00000");
+}
+#else
+
+void test (void)
+{
+    fp1 = 16.5f;
+    fp2 = 64.25f;
+    fp1 += fp2;   // = 80.75f
+}
+#endif
 
 int main(void)
 {
+#if 1
     float fp2 = 43.21f;
 
     printf("float-basic-var-var\n");
@@ -111,8 +172,12 @@ int main(void)
     printf("fp2:0x%08lx [0x422cd70a] %s (43.209999)\n", *((uint32_t*)&fp2), _ftostr(buf, fp2));
 
     varvar();
+    varvar2();
     WAIT();
 
     printf("\nfloat-basic-var-var (res:%d)\n", result);
+#else
+    test();
+#endif
     return result;
 }

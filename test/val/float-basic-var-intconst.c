@@ -67,7 +67,7 @@ void SKIPPEDtest1(float f, char *str)
     printf(" (SKIPPED:%s:%s)\n", temp, str);
 }
 
-void test(void)
+void varintconst(void)
 {
 
     var_float = 11.123f;
@@ -101,6 +101,46 @@ void test(void)
 
 }
 
+void varintconst2(void)
+{
+
+    var_float = 11.123f;
+
+    printf("float *= int const\n");
+
+    fp1 = 47;
+    printf("fp1:0x%08lx [42687df4] %s (47)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    fp1 = var_float;
+    printf("fp1:0x%08lx [42687df4] %s (11.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+
+#if 0 // works but gives wrong result
+    /* addition */
+    fp1 = var_float;
+    fp1 += 47;
+    printf("fp1:0x%08lx [42687df4] %s (58.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "42687df4");
+#endif
+#if 0 // works but gives wrong result
+    fp1 = var_float;
+    fp1 -= 47;
+    printf("fp1:0x%08lx [42687df4] %s (-35.877)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "42687df4");
+#endif
+#if 0 // works but gives wrong result
+    fp1 = var_float;
+    fp1 *= 47;
+    printf("fp1:0x%08lx [42687df4] %s (522.781)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "42687df4");
+#endif
+#if 0 // works but gives wrong result
+    fp1 = var_float;
+    fp1 /= 47;
+    printf("fp1:0x%08lx [42687df4] %s (0.2367)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "42687df4");
+#endif
+
+}
+
 int main(void)
 {
     float fp2 = 43.21f;
@@ -109,7 +149,8 @@ int main(void)
     printf("fp1:0x%08lx [0x414570a4] %s (12.340000)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     printf("fp2:0x%08lx [0x422cd70a] %s (43.209999)\n", *((uint32_t*)&fp2), _ftostr(buf, fp2));
 
-    test();
+    varintconst();
+    varintconst2();
     WAIT();
 
     printf("\nfloat-basic-var-intconst (res:%d)\n", result);

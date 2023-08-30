@@ -55,7 +55,6 @@ void test1(float f, char *str)
     }
 }
 
-// when making sub tests work, remove them here and uncomment them in val/float-basic.c
 void varconst(void)
 {
     printf("\n*** variable vs constant\n\n");
@@ -97,15 +96,60 @@ void varconst(void)
     test1(fp3, "41500000");
 }
 
+void varconst2(void)
+{
+    printf("\n*** variable vs constant\n\n");
+
+    /* addition, variable + constant */
+    fp1 = 64.75f;
+    fp1 += 2.25f;
+    printf("addition: %s+%s=%s\n", _ftostr(buf, 64.75f), _ftostr(buf3, 2.25f), _ftostr(buf2, fp1));
+    printf(" fp1:0x%08lx [0x42860000] %s (exp:67.0)", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "42860000");
+
+    /* subtraction, variable - constant */
+    fp1 = 16.25f;
+    fp1 -= 8.5f;
+    printf("substraction: %s-%s=%s\n", _ftostr(buf, 16.25f), _ftostr(buf2, 8.5f), _ftostr(buf3, fp1));
+    printf(" fp1:0x%08lx [0x40f80000] %s (exp:7.75)", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "40f80000");
+
+    fp1 = 0.3f;
+    fp1 -= 0.1f;
+    printf("fp1:0x%08lx [0x3e4cccce] %s (0.2)", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "3e4cccce");
+
+    fp1 = 0.1f;
+    fp1 -= 0.3f;
+    printf("fp1:0x%08lx [0xbe4cccce] %s (-0.2)", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "be4cccce");
+
+    /* multiplication, variable * constant */
+    fp1 = 16.25f;
+    fp1 *= 2.5f;
+    printf("multiplication: %s*%s=%s\n", _ftostr(buf, 16.25f), _ftostr(buf2, 2.5f), _ftostr(buf3, fp1));
+    printf(" fp1:0x%08lx [0x42228000] %s (exp:40.625)", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "42228000");
+
+    /* division, variable / constant */
+    fp1 = 32.5f;
+    fp1 /= 2.5f;
+    printf("division: %s/%s=%s\n", _ftostr(buf, 32.5f), _ftostr(buf2, 2.5f), _ftostr(buf3, fp1));
+    printf(" fp1:0x%08lx [0x41500000] %s (exp:13.0)", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "41500000");
+}
+
 int main(void)
 {
     float fp2 = 43.21f;
 
     printf("float-basic-var-const\n");
+
     printf("fp1:0x%08lx [0x414570a4] %s (12.340000)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     printf("fp2:0x%08lx [0x422cd70a] %s (43.209999)\n", *((uint32_t*)&fp2), _ftostr(buf, fp2));
 
     varconst();
+    varconst2();
     WAIT();
 
     printf("\nfloat-basic-var-const (res:%d)\n", result);

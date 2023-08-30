@@ -67,7 +67,7 @@ void SKIPPEDtest1(float f, char *str)
     printf(" (SKIPPED:%s:%s)\n", temp, str);
 }
 
-void test(void)
+void intconstvar(void)
 {
 
     var_float = 11.123f;
@@ -108,7 +108,7 @@ int main(void)
     printf("fp1:0x%08lx [0x414570a4] %s (12.340000)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     printf("fp2:0x%08lx [0x422cd70a] %s (43.209999)\n", *((uint32_t*)&fp2), _ftostr(buf, fp2));
 
-    test();
+    intconstvar();
     WAIT();
 
     printf("\nfloat-basic-intconst-var (res:%d)\n", result);

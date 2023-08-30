@@ -117,14 +117,17 @@ each other (not necessarily by me :)):
 
 NOT WORKING YET:
 
-    /test/val/float-basic-const-intvar.c (subtraction)
-    /test/val/float-basic-const-intconst.c (addition, subtraction)
-    /test/val/float-basic-intconst-var.c (addition, subtraction, multiplication, division)
-    /test/val/float-basic-intconst-const.c (addition, subtraction)
-    /test/val/float-basic-intvar-const.c (subtraction)
-    /test/val/float-basic-intvar-var.c (subtraction, multiplication, division)
-    /test/val/float-basic-var-intconst.c (subtraction, multiplication, division)
-    /test/val/float-basic-var-intvar.c (subtraction)
+    /test/val/float-basic-var-var.c         +=, -=
+
+    /test/val/float-basic-const-intvar.c    -
+    /test/val/float-basic-const-intconst.c  +, -
+    /test/val/float-basic-var-intvar.c      -, +=, -=
+    /test/val/float-basic-var-intconst.c    -, *, /, +=, -=, *=, /=
+
+    /test/val/float-basic-intvar-const.c    -, +=, -=, *=, /=
+    /test/val/float-basic-intconst-const.c  +, -
+    /test/val/float-basic-intvar-var.c      -, *, /, /=, +=
+    /test/val/float-basic-intconst-var.c    +, -, *, /
 
     /test/val/float-cmp-const-intvar.c
     /test/val/float-cmp-intvar-const.c
@@ -133,6 +136,15 @@ NOT WORKING YET:
 - float values written as "12.34f" work, but "12.34" does not - should it?
 
 ### Files & Functions
+
+#### assignment.c
+
+    src/cc65/assignment.c
+
+```
+OpAssignArithmetic  Parse an "=" or "op=" operation for arithmetic lhs
+OpAddSubAssign      Parse a "+=" or "-=" operation
+```
 
 #### codegen.c
 
@@ -165,7 +177,7 @@ g_defdata_float
     src/cc65/datatype.c
 
 ```
-ArithmeticConvert
+ArithmeticConvert   Perform the usual arithmetic conversions for binary operators.
 ```
 
 #### expr.c
@@ -176,6 +188,17 @@ ArithmeticConvert
 LimitExprValue
 parseadd
 parsesub
+```
+
+#### fp.c
+
+    src/common/fp.c         (OK)
+    src/common/fp.h         (OK)
+
+wrapper for doing floating point operations on target floats
+
+```
+FP_D_As32bitRaw     converts double into 32bit (float) and then returns its raw content as a 32bit int
 ```
 
 #### initdata.c
@@ -191,50 +214,35 @@ DefineData          Output a data definition for the given expression
     src/cc65/loadexpr.c
 
 ```
-LoadExpr
+LoadExpr            Load an expression into the primary register if it is not already there.
 ```
 
 #### locals.c
 
-    src/cc65/locals.c
+    src/cc65/locals.c       (OK?)
 
 ```
-ParseAutoDecl
-```
-
-#### assignment.c
-
-    src/cc65/assignment.c
-
-```
-OpAssignArithmetic  Parse an "=" (if 'Gen' is 0) or "op=" operation for arithmetic lhs
-```
-
-#### fp.c
-
-    src/common/fp.c
-    src/common/fp.h
-
-wrapper for doing floating point operations on target floats
-
-```
-FP_D_As32bitRaw     converts double into 32bit (float) and then returns its raw content as a 32bit int
-```
-
-#### typeconv.c
-
-    src/cc65/typeconv.c
-
-```
-DoConversion        Emit code to convert the given expression to a new type
+ParseAutoDecl       Parse the declarator of an auto variable.
 ```
 
 #### scanner.c
 
-    src/cc65/scanner.c
+    src/cc65/scanner.c     (OK?)
+
+```
+NumericConst        Parse a numeric constant
+```
 
 Note: Scanner fixes should be directly promoted to upstream. Any differences in
       this branch should be related to debugging/logging.
+
+#### typeconv.c
+
+    src/cc65/typeconv.c     (OK?)
+
+```
+DoConversion        Emit code to convert the given expression to a new type
+```
 
 --------------------------------------------------------------------------------
 

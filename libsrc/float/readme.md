@@ -102,18 +102,18 @@ each other (not necessarily by me :)):
 
 NOT WORKING YET:
 
-/test/val/float-basic-const-intvar.c (subtraction)
-/test/val/float-basic-const-intconst.c (addition, subtraction)
-/test/val/float-basic-intconst-var.c (addition, subtraction, multiplication, division)
-/test/val/float-basic-intconst-const.c (addition, subtraction)
-/test/val/float-basic-intvar-const.c (subtraction)
-/test/val/float-basic-intvar-var.c (subtraction, multiplication, division)
-/test/val/float-basic-var-intconst.c (subtraction, multiplication, division)
-/test/val/float-basic-var-intvar.c (subtraction)
+    /test/val/float-basic-const-intvar.c (subtraction)
+    /test/val/float-basic-const-intconst.c (addition, subtraction)
+    /test/val/float-basic-intconst-var.c (addition, subtraction, multiplication, division)
+    /test/val/float-basic-intconst-const.c (addition, subtraction)
+    /test/val/float-basic-intvar-const.c (subtraction)
+    /test/val/float-basic-intvar-var.c (subtraction, multiplication, division)
+    /test/val/float-basic-var-intconst.c (subtraction, multiplication, division)
+    /test/val/float-basic-var-intvar.c (subtraction)
 
-/test/val/float-cmp-var-intvar.c
-/test/val/float-cmp-const-intvar.c
-/test/val/float-cmp-intvar-const.c
+    /test/val/float-cmp-const-intvar.c
+    /test/val/float-cmp-intvar-const.c
+    /test/val/float-cmp-var-intvar.c
 
 - float values written as "12.34f" work, but "12.34" does not - should it?
 

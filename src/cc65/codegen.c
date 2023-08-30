@@ -732,9 +732,9 @@ void _g_getimmed(unsigned Flags, uintptr_t Val, long Offs)
 
 //     LOG(("g_getimmed %s:%d:%s Flags:%04x Val: %08x Offs:%04x\n",
 //          file ? file : "null", line, func ? func : "null", Flags, Val, Offs));
-    LOG(("g_getimmed Flags:%04x Val: %08x Offs:%04x\n",
+    LOG(("g_getimmed Flags:%04x Val: %08lx Offs:%04lx\n",
           Flags, Val, Offs));
-    ASMLOG(("nop ;> g_getimmed Flags:%04x Val: %08x Offs:%04x\n",
+    ASMLOG(("nop ;> g_getimmed Flags:%04x Val: %08lx Offs:%04lx\n",
           Flags, Val, Offs));
 
     if ((Flags & CF_CONST) != 0) {
@@ -832,8 +832,8 @@ void g_getstatic (unsigned flags, uintptr_t label, long offs)
     /* Create the correct label name */
     const char* lbuf = GetLabelName (flags, label, offs);
 
-    LOG(("g_getstatic flags:%04x offs:%04x label:%04x\n", flags, offs, label));
-    ASMLOG(("nop ; g_getstatic flags:%04x offs:%04x label:%04x\n", flags, offs, label));
+    LOG(("g_getstatic flags:%04x offs:%04lx label:%04lx\n", flags, offs, label));
+    ASMLOG(("nop ; g_getstatic flags:%04x offs:%04lx label:%04lx\n", flags, offs, label));
 
     /* Check the size and generate the correct load operation */
     switch (flags & CF_TYPEMASK) {
@@ -1901,8 +1901,8 @@ void g_addeqstatic (unsigned flags, uintptr_t label, long offs,
     /* Create the correct label name */
     const char* lbuf = GetLabelName (flags, label, offs);
 
-    LOG(("g_addeqstatic flags:%04x val:%08x\n", flags, val));
-    ASMLOG(("nop ; g_addeqstatic val:%08x\n", val));
+    LOG(("g_addeqstatic flags:%04x val:%08lx\n", flags, val));
+    ASMLOG(("nop ; g_addeqstatic val:%08lx\n", val));
     /* if flags contain CF_CONST, then val contains the constant value */
 
     /* Check the size and determine operation */
@@ -2142,7 +2142,7 @@ void g_subeqstatic (unsigned flags, uintptr_t label, long offs,
     /* Create the correct label name */
     const char* lbuf = GetLabelName (flags, label, offs);
 
-    ASMLOG(("nop ; g_subeqstatic val:%08x\n", val));
+    ASMLOG(("nop ; g_subeqstatic val:%08lx\n", val));
     /* Check the size and determine operation */
     switch (flags & CF_TYPEMASK) {
 
@@ -2962,7 +2962,7 @@ void g_mul (unsigned flags, unsigned long val)
         "ftosmuleax"
     };
 
-    LOG(("g_mul flags:%04x val:%d\n", flags, val));
+    LOG(("g_mul flags:%04x val:%ld\n", flags, val));
 
     /* Do strength reduction if the value is constant and a power of two */
     if ((flags & CF_CONST) && ((flags & CF_TYPEMASK) != CF_FLOAT)) {
@@ -3092,7 +3092,7 @@ void g_div (unsigned flags, unsigned long val)
         "ftosdiveax"
     };
 
-    LOG(("g_div flags:%04x val:%d\n", flags, val));
+    LOG(("g_div flags:%04x val:%ld\n", flags, val));
     ASMLOG(("nop ; g_div(flags:%2x,val:%lx)", flags, val)); // FIXME: remove
 
     /* Do strength reduction if the value is constant and a power of two */
@@ -3855,7 +3855,7 @@ void g_inc (unsigned flags, unsigned long val)
 */
 {
     LOG(("g_inc flags:%04x val:%08lx\n", flags, val));
-    ASMLOG(("nop ; g_inc flags:%04x val:%08x", flags, val));
+    ASMLOG(("nop ; g_inc flags:%04x val:%08lx", flags, val));
 
     /* Don't inc by zero */
     if (val == 0) {

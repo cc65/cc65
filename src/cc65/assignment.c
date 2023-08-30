@@ -454,7 +454,7 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
     unsigned Flags;
     int MustScale;
 
-    LOG(("OpAssignArithmetic '%s' (Gen=%d)\n", Op, (int)Gen));
+    LOG(("OpAssignArithmetic '%s' (Gen=%p)\n", Op, Gen));
 
     ED_Init (&Expr2);
     Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;

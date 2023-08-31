@@ -91,7 +91,7 @@ Related to fp stuff are:
 ### Roadmap
 
 - Test/Fix using the Softfloat lib some more
-- Find some generic math functions that we can use
+- Find some more generic math functions that we can use in softmath
 - When all obvious tests have been created and work OK, we can merge
 
 After the merge, the following things can be done more or less independent from
@@ -139,6 +139,14 @@ NOT WORKING YET:
     /test/val/float-cmp-var-intvar.c
 
 - float values written as "12.34f" work, but "12.34" does not - should it?
+
+TODO:
+
+- more tests are needed
+    - warnings
+    - errors
+    - register variables
+    - more/all tests should check local/global/register variables
 
 ### Files & Functions
 
@@ -256,27 +264,28 @@ DoConversion        Emit code to convert the given expression to a new type
 ### variants
 
 The floating point support calls library functions for any operations on non
-constant values
+constant values.
 
 #### softfloat
 
 This is a Port of "Berkeley SoftFloat Release 2c". It is currently used by
 default for all targets.
 
-- missing are all math functions (we might port another existing lib for that)
+#### softmath
+
+Contains a collection of math functions, hopefully some day enough to completely
+implement math.h in C. This is currently used by default for all targets.
 
 #### cbmkernal
 
-This is a wrapper to the CBM kernal functions.
-
-- this one is fairly complete, including math functions
-- the only missing function is ftosrsubeax
-  - WANTED: which can be easily added once testcode is found that actually triggers it :)
+This is a wrapper to the CBM kernal functions. This is fairly complete,
+including math functions. To use this, link against c64-fp754kernal.o. The c64
+samples will do this by default.
 
 #### ieee754
 
 This should become a freestanding IEEE754 library, which can completely replace
-the softfloat library.
+the softfloat (and softmath) library.
 
 - basically everything missing except addition/substraction
   - compare functions are missing
@@ -298,7 +307,7 @@ historical float routines by woz :) unfortunately not ieee754
 
 ### runtime functions
 
-these must be available in the runtime library
+These must be available in the runtime library.
 ```
 func        description                       softfloat cbmfp   wozfp   754     codegen.c
 
@@ -330,27 +339,27 @@ ftoseqeax   Test for equal                      *       *       -       -       
 ```
 ### math.h functions
 
-these are optional, required for standard libm
+These are optional, required for standard libm.
 ```
-func        description                       softfloat cbmfp   wozfp   754
+func        description                       softmath  cbmfp   wozfp   754
 
-/* C99 */
 float powf(float f, float a)                    -       *       -       -
-float sinf(float s)                             -       *       -       -
-float cosf(float s)                             -       *       -       -
+float sinf(float s)                             *       *       -       -
+float cosf(float s)                             *       *       -       -
 float logf(float x)                             -       *       *       -
 float expf(float x)                             -       *       -       -
 float sqrtf(float x)                            -       *       -       -
 float tanf(float x)                             -       *       -       -
 float atanf(float x)                            -       *       -       -
-float fabsf(float x)                            -       *       -       -
-float roundf(float x)                           -       *       -       -
-float truncf(float x)                           -       *       -       -
+float fabsf(float x)                            *       *       -       -
+float roundf(float x)                           *       *       -       -
+float truncf(float x)                           *       *       -       -
+float ceilf(float x)                            *       -       -       -
 ```
 
 ### extra functions
 
-optional utility functions.
+Optional utility functions.
 ```
 func        description                       softfloat cbmfp   wozfp   754
 

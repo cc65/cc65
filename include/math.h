@@ -37,6 +37,9 @@ float __fastcall__ roundf(float x);              /* C99 */
 /* double trunc(double x); */              /* C99 */
 float __fastcall__ truncf(float x);              /* C99 */
 
+/* double ceil(double x) */
+float ceilf(float x);              /* C99 */
+
 /* beware, this is not standard */
 #ifndef M_PI
 #define M_PI    3.14159265358979323846f

@@ -176,7 +176,8 @@ endif
 
 SRCDIRS = $(SRCDIR)
 
-SRCDIRS += float/softfloat
+SRCDIRS += float/softfloat \
+	float/softmath
 
 ifeq ($(TARGET),$(filter $(TARGET),$(CBMS)))
   SRCDIRS += cbm

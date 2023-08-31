@@ -3,6 +3,10 @@
 #include <math.h>
 #include <conio.h>  // for cgetc
 
+#ifdef __SIM6502__
+#define cgetc()
+#endif
+
 char buf[100];
 
 /*
@@ -98,7 +102,7 @@ float roundtruncvals[22] = {
 void roundtruncabs(void)
 {
     int n;
-    printf("round/truncate:\n");
+    printf("round/trunc:\n");
     for (n = 0; n < 21; n++) {
         printf("%12s", _ftostr(buf, roundtruncvals[n]));
         printf("%12s", _ftostr(buf, roundf(roundtruncvals[n])));
@@ -106,10 +110,11 @@ void roundtruncabs(void)
         printf("\n");
     }
     printf("<key>\n"); cgetc();
-    printf("abs:\n");
+    printf("abs/ceil:\n");
     for (n = 0; n < 21; n++) {
         printf("%12s", _ftostr(buf, roundtruncvals[n]));
         printf("%12s", _ftostr(buf, fabsf(roundtruncvals[n])));
+        printf("%12s", _ftostr(buf, ceilf(roundtruncvals[n])));
         printf("\n");
     }
     printf("<key>\n"); cgetc();
@@ -202,6 +207,6 @@ int main(void)
 {
     roundtruncabs();
     sincostanatan();
-    powersqrt();
     logexp();
+    powersqrt();
 }

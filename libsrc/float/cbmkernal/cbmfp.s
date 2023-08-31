@@ -659,6 +659,15 @@ __float_ret2:
         jmp __float_ret2
 .endmacro
 
+.macro __ffunc2c addr
+        jsr ___float_float_to_fac_arg
+        jsr __float_swap_fac_arg
+        __enable_basic_if_needed
+        lda FAC_EXPONENT
+        jsr addr
+        jmp __float_ret2
+.endmacro
+
         .export __fadd, __fsub, __fmul, __fdiv, __fpow
 
 ; float __fastcall__ _fadd(float f, float a);
@@ -673,6 +682,9 @@ __fpow:   __ffunc2a BASIC_ARG_FAC_Pow
 
 __fand:   __ffunc2b BASIC_ARG_FAC_And
 __for:    __ffunc2b BASIC_ARG_FAC_Or
+
+        .export __frsub
+__frsub:  __ffunc2c BASIC_ARG_FAC_Sub
 
 __float_ret3:
         ;jsr __basicoff

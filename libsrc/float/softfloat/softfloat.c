@@ -899,6 +899,25 @@ float32 __fastcall__ float32_sub( float32 a, float32 b ) // original
 #endif
 }
 
+float32 __fastcall__ float32_rsub( float32 b, float32 a ) // swapped
+{
+#if 1
+    flag aSign, bSign;
+
+    aSign = extractFloat32Sign( a );
+    bSign = extractFloat32Sign( b );
+    if ( aSign == bSign ) {
+        return subFloat32Sigs( a, b, aSign );
+    }
+    else {
+        return addFloat32Sigs( a, b, aSign );
+    }
+#else
+    b = b;
+    return a;
+#endif
+}
+
 /*----------------------------------------------------------------------------
 | Returns the result of multiplying the single-precision floating-point values
 | `a' and `b'.  The operation is performed according to the IEEE Standard for

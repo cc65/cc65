@@ -13,6 +13,7 @@
     .import ___cbmkernal_fnegeax
     .import ___cbmkernal_ftosaddeax
     .import ___cbmkernal_ftossubeax
+    .import ___cbmkernal_ftosrsubeax
     .import ___cbmkernal_ftosdiveax
     .import ___cbmkernal_ftosmuleax
     .import ___cbmkernal_ftoseqeax
@@ -34,6 +35,7 @@
     .export fnegeax     := ___cbmkernal_fnegeax
     .export ftosaddeax  := ___cbmkernal_ftosaddeax
     .export ftossubeax  := ___cbmkernal_ftossubeax
+    .export ftosrsubeax  := ___cbmkernal_ftosrsubeax
     .export ftosdiveax  := ___cbmkernal_ftosdiveax
     .export ftosmuleax  := ___cbmkernal_ftosmuleax
     .export ftoseqeax   := ___cbmkernal_ftoseqeax

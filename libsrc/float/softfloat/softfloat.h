@@ -91,6 +91,7 @@ float64 float32_to_float64( float32 );
 float32 __fastcall__ float32_round_to_int( float32 );
 float32 __fastcall__ float32_add( float32, float32 );
 float32 __fastcall__ float32_sub( float32, float32 );
+float32 __fastcall__ float32_rsub( float32, float32 );
 float32 __fastcall__ float32_mul( float32, float32 );
 float32 __fastcall__ float32_div( float32, float32 );
 float32 __fastcall__ float32_rem( float32, float32 );

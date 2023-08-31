@@ -224,6 +224,12 @@ ___cbmkernal_ftosdiveax:
 ___cbmkernal_ftosmuleax:
     jmp     __fmul
 
+    .import __frsub
+; Primary = Primary - TOS
+    .export ___cbmkernal_ftosrsubeax
+___cbmkernal_ftosrsubeax:
+    jmp     __frsub
+
 ;--------------------------------------------------------------
 
     .import __fcmp

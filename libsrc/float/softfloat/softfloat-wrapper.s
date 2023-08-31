@@ -126,6 +126,12 @@ ftosdiveax:
     ; arg1:     (sp),y (y=0..3)
      jmp _float32_div
 
+    .import _float32_rsub
+    .export ftosrsubeax
+ftosrsubeax:
+    ; arg0:     a/x/sreg/sreg+1
+    ; arg1:     (sp),y (y=0..3)
+     jmp _float32_rsub
 
      .import _float32_eq
      .import _float32_le

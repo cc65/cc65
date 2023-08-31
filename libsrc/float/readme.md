@@ -72,27 +72,32 @@ Related to fp stuff are:
   files are provided for the C64 and VIC20 (fp754kernal.o). The samples will
   automatically use the overrides.
 
-### Wanted
+### WANTED
 
 - For the time being, i will not look at writing IEEE754 functions in assembly.
   Please see below for more info on what is needed to do this, should you be
-  interested in doing this.
+  interested in doing this. Please contact me before you are putting work into
+  this, so we can discuss some things and prevent anyone wasting time.
 - It might be possible to produce a similar kernal- or OS- wrapper override file
-  for other targets (or port the CBM one to other CBM targets).
+  as the C64 one for other targets (or port the C64 one to other CBM targets).
   - If you create a new one, keep in mind that the compiler *right now* will
     currently work with IEEE754 floats, which your library calls must also work
     with (which will involve converting forth and back to whatever other format
-    at runtime)
+    at runtime), and there is no easy way tp change that.
+- Similar to the softfloat library, it would be nice to have a reference
+  implementation for the math stuff as well.
+- Also the math stuff should be implemented in assembly at some point :)
 
 ### Roadmap
 
 - Test/Fix using the Softfloat lib some more
+- Find some generic math functions that we can use
 - When all obvious tests have been created and work OK, we can merge
 
 After the merge, the following things can be done more or less independent from
 each other (not necessarily by me :)):
 
-- implement ieee754 library
+- implement IEEE754 library
   - for generic support this will be the best compromise for standard compliance
     and speed, but will take more RAM than alternatives.
   - Once implemented, it will work for all targets.
@@ -309,7 +314,7 @@ feaxlong    Primary float -> 32bit long         -       *       -       -       
 
 ftosaddeax  Primary = TOS + Primary             *       *       ?       ?       g_add
 ftossubeax  Primary = TOS - Primary             *       *       ?       ?       g_sub
-ftosrsubeax Primary = Primary - TOS             -       -       -       -       g_rsub
+ftosrsubeax Primary = Primary - TOS             *       *       -       -       g_rsub
 ftosmuleax  Primary = TOS * Primary             *       *       ?       -       g_mul
 ftosdiveax  Primary = TOS / Primary             *       *       ?       -       g_div
 
@@ -322,15 +327,6 @@ ftosleeax   Test for less than or equal to      *       *       -       -       
 ftoslteax   Test for less than                  *       *       -       -       g_lt
 ftosneeax   Test for not equal                  *       *       -       -       g_ne
 ftoseqeax   Test for equal                      *       *       -       -       g_eq
-```
-### extra functions
-
-optional utility functions.
-```
-func        description                       softfloat cbmfp   wozfp   754
-
-char *_ftostr(char *d, float s)                 *       *       ?       ?       for printf family
-float _strtof(char *d)                          -       *       -       -       for scanf family
 ```
 ### math.h functions
 
@@ -351,6 +347,17 @@ float fabsf(float x)                            -       *       -       -
 float roundf(float x)                           -       *       -       -
 float truncf(float x)                           -       *       -       -
 ```
+
+### extra functions
+
+optional utility functions.
+```
+func        description                       softfloat cbmfp   wozfp   754
+
+char *_ftostr(char *d, float s)                 *       *       ?       ?       for printf family
+float _strtof(char *d)                          -       *       -       -       for scanf family
+```
+
 --------------------------------------------------------------------------------
 
 - https://www.geeksforgeeks.org/ieee-standard-754-floating-point-numbers/

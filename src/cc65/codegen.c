@@ -31,15 +31,13 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
+//#define DEBUG
 
 #include <inttypes.h>
 #include <limits.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
-
-//#define DEBUG
 
 /* common */
 #include "addrsize.h"
@@ -2095,6 +2093,27 @@ void g_addeqlocal (unsigned flags, int Offs, unsigned long val)
             AddCodeLine ("jsr laddeqysp");
             break;
 
+        case CF_FLOAT:
+            if (flags & CF_CONST) {
+                ASMLOG(("nop ; g_addeqlocal float const")); // FIXME: remove
+                g_getimmed (flags, val, 0);
+            }
+            ASMLOG(("nop ; g_addeqlocal float (Offs:%08x Val:%08x)", Offs, val)); // FIXME: remove
+            // value to add is in primary (a/x/sreg/sgreg+1)
+
+            AddCodeLine ("jsr pusheax");
+
+            // variable to add to is at sp+y
+            AddCodeLine ("ldy #$%02X", Offs+4+3);
+            AddCodeLine ("jsr ldeaxysp");
+
+            AddCodeLine ("jsr ftosaddeax");
+            // result is in primary
+            // store primary to stack offset
+            AddCodeLine ("ldy #$%02X", Offs);
+            AddCodeLine ("jsr steaxysp");
+            break;
+
         default:
             typeerror (flags);
     }
@@ -2306,6 +2325,28 @@ void g_subeqlocal (unsigned flags, int Offs, unsigned long val)
             }
             AddCodeLine ("ldy #$%02X", Offs);
             AddCodeLine ("jsr lsubeqysp");
+            break;
+
+        case CF_FLOAT:
+            // variable to add to is at sp+y
+
+            if (flags & CF_CONST) {
+                ASMLOG(("nop ; g_subeqlocal float const")); // FIXME: remove
+                g_getimmed (flags, val, 0);
+            }
+            ASMLOG(("nop ; g_subeqlocal float (Offs:%08x Val:%08x)", Offs, val)); // FIXME: remove
+            // value to add is in primary (a/x/sreg/sgreg+1)
+
+            AddCodeLine ("jsr pusheax");
+
+            AddCodeLine ("ldy #$%02X", Offs+4+3);
+            AddCodeLine ("jsr ldeaxysp");
+
+            AddCodeLine ("jsr ftosrsubeax");
+            // result is in primary
+            // store primary to stack offset
+            AddCodeLine ("ldy #$%02X", Offs);
+            AddCodeLine ("jsr steaxysp");
             break;
 
         default:

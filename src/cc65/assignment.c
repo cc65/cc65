@@ -809,20 +809,11 @@ void OpAddSubAssign (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
             /* Value on the stack */
             if (IsClassFloat (Expr->Type)) {
                 LOG(("OpAddSubAssign '%s' stack, float\n", Op));
-#if 0
-                /* FIXME: what triggers this? */
                 if (Gen->Tok == TOK_PLUS_ASSIGN) {
                     g_addeqlocal (lflags, Expr->IVal, FP_D_As32bitRaw(Expr2.V.FVal));
                 } else {
                     g_subeqlocal (lflags, Expr->IVal, FP_D_As32bitRaw(Expr2.V.FVal));
                 }
-#else
-                if (Gen->Tok == TOK_PLUS_ASSIGN) {
-                    g_addeqlocal (lflags, Expr->IVal, Expr2.IVal);
-                } else {
-                    g_subeqlocal (lflags, Expr->IVal, Expr2.IVal);
-                }
-#endif
             } else {
                 LOG(("OpAddSubAssign '%s' stack, int\n", Op));
                 if (Gen->Tok == TOK_PLUS_ASSIGN) {

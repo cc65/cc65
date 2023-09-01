@@ -3341,19 +3341,22 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                 flags |= typeadjust (Expr, &Expr2, 1);
             } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassFloat (rhst)) {
                 /* Float const + float var addition */
-                LOG(("%s:%d float addition (const + var)\n", __FILE__, __LINE__));
+                LOG(("%s:%d parseadd float addition (const + var)\n", __FILE__, __LINE__));
                 flags |= typeadjust (Expr, &Expr2, 1);
 #if 1
             } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassInt (rhst)) {
 //printf("const 1\n");
                 /* Float const + int var addition */
-                LOG(("%s:%d float addition (float const + int var)\n", __FILE__, __LINE__));
+                LOG(("%s:%d parseadd float addition (float const + int var)\n", __FILE__, __LINE__));
                 flags |= typeadjust (Expr, &Expr2, 1);
 #endif
             } else if (!DoArrayRef && IsClassInt (lhst) && IsClassFloat (rhst)) {
-//printf("const 2\n");
                 /* FIXME: int const + Float var addition */
-                LOG(("%s:%d float addition (int const + float var)\n", __FILE__, __LINE__));
+                LOG(("%s:%d parseadd float addition (int const + float var)\n", __FILE__, __LINE__));
+                RemoveCode (&Mark);
+                LoadExpr (CF_FLOAT, &Expr2);
+                //flags |= typeadjust (Expr, &Expr2, 0);
+                flags |= CF_FLOAT;
             } else {
                 /* OOPS */
                 LOG(("%s:%d OOPS\n", __FILE__, __LINE__));
@@ -3393,14 +3396,25 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                     }
                 } else if (ED_IsAbs (Expr)) {
                     /* Numeric constant */
+                    LOG(("%s:%d parseadd lhs is numeric constant\n", __FILE__, __LINE__));
                     if (TypeOf (Expr->Type) == CF_FLOAT) {
-                        //FP_D_As32bitRaw()
-                        LOG(("%s:%d const float\n", __FILE__, __LINE__));
+                        // lhs = float
+                        LOG(("%s:%d parseadd lhs const float\n", __FILE__, __LINE__));
                         Double res = FP_D_Mul(Expr->V.FVal, FP_D_FromInt(lscale));
                         g_inc (flags, FP_D_As32bitRaw(res));
                     } else {
-                        LOG(("%s:%d const ival:%d\n", __FILE__, __LINE__, Expr->IVal));
-                        g_inc (flags, Expr->IVal * lscale);
+                        // lhs = int
+                        LOG(("%s:%d parseadd lhs const int:%d\n", __FILE__, __LINE__, Expr->IVal));
+                        if (TypeOf (Expr2.Type) == CF_FLOAT) {
+                            // lhs = int, rhs float
+                            LOG(("%s:%d parseadd rhs float:%08x\n", __FILE__, __LINE__, FP_D_As32bitRaw(FP_D_FromInt(Expr->IVal * lscale))));
+                            g_inc (flags, FP_D_As32bitRaw(FP_D_FromInt(Expr->IVal * lscale)));
+                            Expr->Type = Expr2.Type;    // HACK!
+                        } else {
+                            // lhs = int, rhs int
+                            LOG(("%s:%d parseadd rhs int:%d\n", __FILE__, __LINE__, Expr->IVal));
+                            g_inc (flags, Expr->IVal * lscale);
+                        }
                     }
                 } else if (lscale == 1) {
                     LOG(("%s:%d addr\n", __FILE__, __LINE__));

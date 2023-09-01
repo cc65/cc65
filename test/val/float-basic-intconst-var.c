@@ -39,6 +39,7 @@ unsigned char var_char;
 unsigned int var_int;
 float var_float;
 
+#if 1
 // returns 1 if value in f matches the string
 // the string is a hex value without leading "0x"
 int compare(float f, char *str)
@@ -71,31 +72,30 @@ void intconstvar(void)
 {
 
     var_float = 11.123f;
-#if 0
+
     fp1 = 47;
-    printf("fp1:0x%08lx [42687df4] %s (47)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    printf("fp1:0x%08lx [?] %s (47)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     fp1 = var_float;
-    printf("fp1:0x%08lx [42687df4] %s (11.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
-#endif
-#if 0 // Invalid operands for binary operator '+'
+    printf("fp1:0x%08lx [?] %s (11.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+
     /* addition */
     fp1 = 47 + var_float;
-    printf("fp1:0x%08lx [42687df4] %s (58.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    printf("fp1:0x%08lx [?] %s (58.123)", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     test1(fp1, "42687df4");
-#endif
-#if 0
+
+#if 0 // Invalid operands for binary operator '-'
     fp1 = 47 - var_float;
-    printf("fp1:0x%08lx [42687df4] %s (58.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    printf("fp1:0x%08lx [?] %s (58.123)", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     test1(fp1, "42687df4");
 #endif
-#if 0
+#if 0 // compiles, but wrong result
     fp1 = 47 * var_float;
-    printf("fp1:0x%08lx [42687df4] %s (58.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    printf("fp1:0x%08lx [?] %s (522.781)", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     test1(fp1, "42687df4");
 #endif
-#if 0
+#if 0 // Internal compiler error
     fp1 = 47 / var_float;
-    printf("fp1:0x%08lx [42687df4] %s (58.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    printf("fp1:0x%08lx [?] %s (58.123)", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     test1(fp1, "42687df4");
 #endif
 }
@@ -114,3 +114,12 @@ int main(void)
     printf("\nfloat-basic-intconst-var (res:%d)\n", result);
     return result;
 }
+#else
+int main(void)
+{
+    var_float = 11.123f;
+    fp1 = 47 + var_float;
+    printf("fp1:0x%08lx [42687df4] %s (58.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    return result;
+}
+#endif

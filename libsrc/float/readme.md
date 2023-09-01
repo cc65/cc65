@@ -89,7 +89,6 @@ NOT WORKING YET:
 
     /test/val/float-basic-var-var.c                  +=, -=
 
-    /test/val/float-basic-const-intvar.c    -
     /test/val/float-basic-var-intvar.c      -,       +=, -=
     /test/val/float-basic-var-intconst.c    -, *, /, +=, -=, *=, /=
 

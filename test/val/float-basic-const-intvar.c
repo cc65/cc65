@@ -63,35 +63,34 @@ void constintvar(void)
     printf("addition: %s+%d=%s\n", _ftostr(buf, 16.75f), var_sint, _ftostr(buf3, fp3));
     printf(" fp3:0x%08lx [0x42a18000] %s (80.75)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
     test1(fp3, "42a18000");
-#if 0 // Invalid operands for binary operator '-'
+
     var_sint = 16;
     fp3 =  18.5f - var_sint;
-    printf("substraction: %s-%s=%s\n", _ftostr(buf, 8.5f), _ftostr(buf2, fp2), _ftostr(buf3, fp3));
-    printf(" fp3:0x%08lx [0xc0f80000] %s (-7.75)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-    test1(fp3, "c0f80000");
+    printf("substraction: %s-%d=%s\n", _ftostr(buf, 8.5f), var_sint, _ftostr(buf3, fp3));
+    printf(" fp3:0x%08lx [0x40200000] %s (2.5)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
+    test1(fp3, "40200000");
     var_sint = 13;
-    fp3 = 20.3f - var_sint;
-    printf("fp3:0x%08lx [0x3e4cccce] %s (0.2)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-    test1(fp3, "3e4cccce");
+    fp3 = 20.6f - var_sint;
+    printf("fp3:0x%08lx [0x40f33334] %s (7.6)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
+    test1(fp3, "40f33334");
     var_sint = 13;
-    fp3 = 10.1f - var_sint;
-    printf("fp3:0x%08lx [0xbe4cccce] %s (-0.2)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-    test1(fp3, "be4cccce");
-#endif
-#if 1
+    fp3 = 10.2f - var_sint;
+    printf("fp3:0x%08lx [0xc0333334] %s (-2.8)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
+    test1(fp3, "c0333334");
+
+
     var_sint = 2;
     fp3 = 16.25f * var_sint;
     printf("multiplication: %s*%d=%s\n", _ftostr(buf, 16.25f), var_sint, _ftostr(buf3, fp3));
     printf(" fp3:0x%08lx [0x42020000] %s (32.5)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
     test1(fp3, "42020000");
-#endif
-#if 1
+
+
     var_sint = 2;
     fp3 = 16.2f / var_sint;
     printf("division: %s/%d=%s\n", _ftostr(buf, 16.2f), var_sint, _ftostr(buf3, fp3));
     printf(" fp3:0x%08lx [0x4101999a] %s (8.1)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
     test1(fp3, "4101999a");
-#endif
 }
 
 int main(void)

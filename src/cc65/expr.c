@@ -3932,6 +3932,7 @@ static void parsesub (ExprDesc* Expr)
             }
 
         } else {
+            LOG(("parsesub: lhs not const, rhs is const\n"));
 
             /* Left hand side is not constant, right hand side is */
             if (IsClassPtr (lhst) && IsClassInt (rhst)) {
@@ -3999,6 +4000,7 @@ static void parsesub (ExprDesc* Expr)
         }
 
     } else {
+        LOG(("parsesub: rhs not const\n"));
 
         /* We'll use the pushed lhs on stack instead of the original source */
         ED_FinalizeRValLoad (Expr);
@@ -4016,10 +4018,28 @@ static void parsesub (ExprDesc* Expr)
         } else if (IsClassFloat (lhst) && IsClassFloat (rhst)) {
             /* Float substraction */
             /* FIXME: float - what to do here exactly? */
-            LOG(("%s:%d float substraction\n", __FILE__, __LINE__));
+            LOG(("%s:%d parsesub float - float\n", __FILE__, __LINE__));
             /* Adjust operand types */
             /*flags = typeadjust (Expr, &Expr2, 0);*/
             flags = CF_FLOAT;
+        } else if (IsClassFloat (lhst) && IsClassInt (rhst)) {
+            /* Float substraction */
+            /* FIXME: float - what to do here exactly? */
+            LOG(("%s:%d parsesub float - int\n", __FILE__, __LINE__));
+#if 1
+            /* Adjust operand types */
+            flags = typeadjust (Expr, &Expr2, 0);
+            //flags = CF_FLOAT;
+#endif
+        } else if (IsClassInt (lhst) && IsClassFloat (rhst)) {
+            /* Float substraction */
+            /* FIXME: float - what to do here exactly? */
+            LOG(("FIXME: %s:%d parsesub int - float\n", __FILE__, __LINE__));
+#if 0
+            /* Adjust operand types */
+            /*flags = typeadjust (Expr, &Expr2, 0);*/
+            flags = CF_FLOAT;
+#endif
         } else {
             /* OOPS */
             Error ("Invalid operands for binary operator '-'");

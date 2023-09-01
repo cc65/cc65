@@ -83,11 +83,11 @@ void intconstvar(void)
     printf("fp1:0x%08lx [?] %s (58.123)", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     test1(fp1, "42687df4");
 
-#if 0 // Invalid operands for binary operator '-'
+
     fp1 = 47 - var_float;
-    printf("fp1:0x%08lx [?] %s (58.123)", *((uint32_t*)&fp1), _ftostr(buf, fp1));
-    test1(fp1, "42687df4");
-#endif
+    printf("fp1:0x%08lx [?] %s (35.877)", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "420f820c");
+
 #if 0 // compiles, but wrong result
     fp1 = 47 * var_float;
     printf("fp1:0x%08lx [?] %s (522.781)", *((uint32_t*)&fp1), _ftostr(buf, fp1));

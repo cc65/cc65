@@ -4018,14 +4018,14 @@ static void parsesub (ExprDesc* Expr)
         } else if (IsClassFloat (lhst) && IsClassFloat (rhst)) {
             /* Float substraction */
             /* FIXME: float - what to do here exactly? */
-            LOG(("%s:%d parsesub float - float\n", __FILE__, __LINE__));
+            LOG(("%s:%d parsesub float - float var\n", __FILE__, __LINE__));
             /* Adjust operand types */
             /*flags = typeadjust (Expr, &Expr2, 0);*/
             flags = CF_FLOAT;
         } else if (IsClassFloat (lhst) && IsClassInt (rhst)) {
             /* Float substraction */
             /* FIXME: float - what to do here exactly? */
-            LOG(("%s:%d parsesub float - int\n", __FILE__, __LINE__));
+            LOG(("%s:%d parsesub float - int var\n", __FILE__, __LINE__));
 #if 1
             /* Adjust operand types */
             flags = typeadjust (Expr, &Expr2, 0);
@@ -4034,12 +4034,15 @@ static void parsesub (ExprDesc* Expr)
         } else if (IsClassInt (lhst) && IsClassFloat (rhst)) {
             /* Float substraction */
             /* FIXME: float - what to do here exactly? */
-            LOG(("FIXME: %s:%d parsesub int - float\n", __FILE__, __LINE__));
-#if 0
-            /* Adjust operand types */
-            /*flags = typeadjust (Expr, &Expr2, 0);*/
-            flags = CF_FLOAT;
+            LOG(("FIXME: %s:%d parsesub int - float var\n", __FILE__, __LINE__));
+#if 1
+            /* Remove pushed value from stack */
+            RemoveCode (&Mark2);
+            flags = typeadjust (&Expr2, Expr, 0);
+            g_push (CF_FLOAT, 0);             /* --> stack */
+            LoadExpr (CF_FLOAT, &Expr2);   /* --> primary register */
 #endif
+
         } else {
             /* OOPS */
             Error ("Invalid operands for binary operator '-'");
@@ -4052,8 +4055,12 @@ static void parsesub (ExprDesc* Expr)
         ED_FinalizeRValLoad (Expr);
     }
 
-    /* Result type is either a pointer or an integer */
-    Expr->Type = StdConversion (Expr->Type);
+    if (IsClassFloat (lhst) || IsClassFloat (rhst)) {
+        Expr->Type = type_float;
+    } else {
+        /* Result type is either a pointer or an integer */
+        Expr->Type = StdConversion (Expr->Type);
+    }
 
     /* Condition code not set */
     ED_MarkAsUntested (Expr);

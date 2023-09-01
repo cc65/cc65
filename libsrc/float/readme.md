@@ -15,48 +15,12 @@ build small (and slow...) programs that use floats on any supported target.
 - Build the compiler/toolchain/libs from this fptest branch.
 - Now you can build the samples and/or tests.
 
-math.h is available for C64 when linking agains fp754kernal.o (see below)
-
-Related to fp stuff are:
-
     samples/floattest.c
     samples/mandelfloat.c
-    samples/mathtest.c (requires math.h)
-    samples/tgisincos.c (requires math.h)
+    samples/mathtest.c (requires full math.h)
+    samples/tgisincos.c (requires sin/cos from math.h)
 
-    test/val/float-basic-const-const.c
-    test/val/float-basic-const-intconst.c
-    test/val/float-basic-const-intvar.c
-    test/val/float-basic-const-var.c
-    test/val/float-basic-intconst-const.c
-    test/val/float-basic-intconst-var.c
-    test/val/float-basic-intvar-const.c
-    test/val/float-basic-intvar-var.c
-    test/val/float-basic-var-const.c
-    test/val/float-basic-var-intconst.c
-    test/val/float-basic-var-intvar.c
-    test/val/float-basic-var-var.c
-    test/val/float-bnegate.c
-    test/val/float-cmp-const-const.c
-    test/val/float-cmp-const-intconst.c
-    test/val/float-cmp-const-intvar.c
-    test/val/float-cmp-const-var.c
-    test/val/float-cmp-intconst-const.c
-    test/val/float-cmp-intconst-var.c
-    test/val/float-cmp-intvar-const.c
-    test/val/float-cmp-intvar-var.c
-    test/val/float-cmp-var-const.c
-    test/val/float-cmp-var-intconst.c
-    test/val/float-cmp-var-intvar.c
-    test/val/float-cmp-var-var.c
-    test/val/float-const-convert.c
-    test/val/float-conv.c
-    test/val/float-conv-float-to-char.c
-    test/val/float-conv-float-to-schar.c
-    test/val/float-minimal.c
-    test/val/float-mixed.c
-    test/val/float-negate.c
-    test/val/float-ternary.c
+full math.h is available for C64 when linking agains fp754kernal.o (see below)
 
 ### Further info
 
@@ -69,30 +33,31 @@ Related to fp stuff are:
   correctly :)
 - The default library can be overridden by linking an override file, similar to
   how you can use the soft80 implementation for conio. Right now such override
-  files are provided for the C64 and VIC20 (fp754kernal.o). The samples will
-  automatically use the overrides.
+  files are provided for the C64 (c64-fp754kernal.o) and VIC20
+  (vic20-fp754kernal.o). The samples will automatically use the overrides.
 
 ### WANTED
 
 - For the time being, i will not look at writing IEEE754 functions in assembly.
   Please see below for more info on what is needed to do this, should you be
   interested in doing this. Please contact me before you are putting work into
-  this, so we can discuss some things and prevent anyone wasting time.
+  this, so we can discuss some things and prevent anyone wasting time :)
 - It might be possible to produce a similar kernal- or OS- wrapper override file
   as the C64 one for other targets (or port the C64 one to other CBM targets).
   - If you create a new one, keep in mind that the compiler *right now* will
     currently work with IEEE754 floats, which your library calls must also work
     with (which will involve converting forth and back to whatever other format
     at runtime), and there is no easy way tp change that.
-- Similar to the softfloat library, it would be nice to have a reference
-  implementation for the math stuff as well.
-- Also the math stuff should be implemented in assembly at some point :)
+- Similar to the softfloat library, it would be nice to have a complete 
+  reference implementation for the math stuff in softmath as well.
+  - Also the math stuff should be implemented in assembly at some point :)
 
 ### Roadmap
 
-- Test/Fix using the Softfloat lib some more
+- Test/Fix using the Softfloat lib some more, fix as much tests as possible
 - Find some more generic math functions that we can use in softmath
 - When all obvious tests have been created and work OK, we can merge
+  - for the failing tests, create "negative" cases
 
 After the merge, the following things can be done more or less independent from
 each other (not necessarily by me :)):
@@ -125,12 +90,10 @@ NOT WORKING YET:
     /test/val/float-basic-var-var.c         +=, -=
 
     /test/val/float-basic-const-intvar.c    -
-    /test/val/float-basic-const-intconst.c  +, -
     /test/val/float-basic-var-intvar.c      -, +=, -=
     /test/val/float-basic-var-intconst.c    -, *, /, +=, -=, *=, /=
 
     /test/val/float-basic-intvar-const.c    -, +=, -=, *=, /=
-    /test/val/float-basic-intconst-const.c  +, -
     /test/val/float-basic-intvar-var.c      -, *, /, /=, +=
     /test/val/float-basic-intconst-var.c    +, -, *, /
 

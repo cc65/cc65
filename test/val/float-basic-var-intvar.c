@@ -81,23 +81,18 @@ void intvar(void)
     fp1 = var_float + var_int;
     printf("fp1:0x%08lx [42687df4] %s (58.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     test1(fp1, "42687df4");
-#if 0 // Invalid operands for binary operator '-'
+
     fp1 = var_float - var_int;
-    printf("fp1:0x%08lx [42687df4] %s (-35.877)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
-    test1(fp1, "42687df4");
-#endif
-#if 1
+    printf("fp1:0x%08lx [c20f820c] %s (-35.877)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "c20f820c");
+
     fp1 = var_float * var_int;
     printf("fp1:0x%08lx [4402b1fc] %s (522.781)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     test1(fp1, "4402b1fc");
-#endif
 
-#if 1
     fp1 = var_float / var_int;
     printf("fp1:0x%08lx [3e7256e3] %s (0.2367)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     test1(fp1, "3e7256e3");
-#endif
-
 }
 
 void intvar2(void)

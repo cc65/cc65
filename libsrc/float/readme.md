@@ -14,12 +14,12 @@ build small (and slow...) programs that use floats on any supported target.
 
 - Build the compiler/toolchain/libs from this fptest branch.
 - Now you can build the samples and/or tests.
-
+```
     samples/floattest.c
     samples/mandelfloat.c
     samples/mathtest.c (requires full math.h)
     samples/tgisincos.c (requires sin/cos from math.h)
-
+```
 full math.h is available for C64 when linking agains fp754kernal.o (see below)
 
 ### Further info
@@ -89,10 +89,10 @@ NOT WORKING YET:
 
     /test/val/float-basic-var-var.c                  +=, -=
 
-    /test/val/float-basic-var-intvar.c      -,       +=, -=
+    /test/val/float-basic-var-intvar.c               +=, -=
     /test/val/float-basic-var-intconst.c    -, *, /, +=, -=, *=, /=
 
-    /test/val/float-basic-intvar-const.c    -,       +=, -=, *=, /=
+    /test/val/float-basic-intvar-const.c             +=, -=, *=, /=
     /test/val/float-basic-intvar-var.c      -, *, /, +=,         /=
     /test/val/float-basic-intconst-var.c       *, /
 

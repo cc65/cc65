@@ -3942,10 +3942,15 @@ static void parsesub (ExprDesc* Expr)
 #if 1
             } else if (IsClassFloat (lhst) && IsClassFloat (rhst)) {
                 /* Float subtraction. We'll adjust the types later */
+                LOG(("parsesub: float - float\n"));
             } else if (IsClassFloat (lhst) && IsClassInt (rhst)) {
                 /* Float/Int subtraction. We'll adjust the types later */
+                LOG(("parsesub: float - int\n"));
+                flags |= CF_FLOAT;
             } else if (IsClassInt (lhst) && IsClassFloat (rhst)) {
                 /* Int/Float subtraction. We'll adjust the types later */
+                LOG(("parsesub: int - float\n"));
+                flags |= CF_FLOAT;
 #endif
             } else {
                 /* OOPS */
@@ -3954,17 +3959,22 @@ static void parsesub (ExprDesc* Expr)
             }
 
             if (ED_IsConstAbs (&Expr2)) {
+                /* rhs is constant */
                 /* Remove pushed value from stack */
                 RemoveCode (&Mark2);
                 if (IsClassInt (lhst)) {
-                    LOG(("const int sub 1\n"));
+                    LOG(("parsesub: lhst int sub 1\n"));
                     /* Adjust the types */
                     flags = typeadjust (Expr, &Expr2, 1);
                     /* Do the subtraction */
-                    g_dec (flags | CF_CONST, Expr2.IVal * rscale);
+                    if (IsClassFloat(rhst)) {
+                        g_dec (flags | CF_CONST, FP_D_As32bitRaw(Expr2.V.FVal));
+                    } else {
+                        g_dec (flags | CF_CONST, Expr2.IVal * rscale);
+                    }
                 }
                 else if (IsClassFloat (lhst)) {
-                    LOG(("const float sub 2\n"));
+                    LOG(("parsesub: lhst float sub 2\n"));
                     /* Adjust the types */
                     flags = typeadjust (Expr, &Expr2, 1);
                     if (rscale != 1) {

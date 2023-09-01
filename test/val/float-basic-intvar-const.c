@@ -86,7 +86,6 @@ void intvarconst(void)
     printf("fp1:0x%08lx [42687df4] %s (47)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     fp1 = 11.123f;
     printf("fp1:0x%08lx [42687df4] %s (11.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
-#endif
 
     printf("int var + float const\n");
 
@@ -99,14 +98,14 @@ void intvarconst(void)
     fp1 = var_int + 11.123f;
     printf("fp1:0x%08lx [42687df4] %s (58.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     test1(fp1, "42687df4");
-
-    /* subtraction */
-#if 0 // gives wrong result
-    fp1 = var_int - 11.123f;
-    printf("fp1:0x%08lx [?] %s (35.877)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
-    test1(fp1, "42687df4");
 #endif
-
+    /* subtraction */
+#if 1 // gives wrong result
+    fp1 = var_int - 11.123f;
+    printf("fp1:0x%08lx [420f820c] %s (35.877)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "420f820c");
+#endif
+#if 1
     /* multiplication */
     fp1 = var_int * 11.123f;
     printf("fp1:0x%08lx [4402b1fc] %s (522.781)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
@@ -116,7 +115,7 @@ void intvarconst(void)
     fp1 = var_int / 11.123f;
     printf("fp1:0x%08lx [4087371f] %s (4.2254)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     test1(fp1, "4087371f");
-
+#endif
 }
 
 unsigned int i1;

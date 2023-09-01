@@ -57,20 +57,18 @@ void test1(float f, char *str)
 void intconstconst(void)
 {
     printf("\n*** int constant vs constant\n\n");
-#if 0
+
     // addition
     printf("\nconstant + constant\n\n");
     fp1 = 0.1f;
     fp2 = 5;
-    fp3 = 5 + 0.2f;
+    fp3 = 5 + 0.5f;
 
     printf("    0x%08lx [0x3dcccccd] %s (0.1)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     printf("    0x%08lx [0x3e4ccccd] %s (5.0)\n", *((uint32_t*)&fp2), _ftostr(buf, fp2));
-    printf("fp3:0x%08lx [0x3e99999a] %s (0.3)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-    test1(fp3, "3e99999a");
-#endif
+    printf("fp3:0x%08lx [0x40b00000] %s (5.5)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
+    test1(fp3, "40b00000");
 
-#if 0 // work but produce wrong values
     // substraction
     printf("\nconstant - constant\n\n");
     fp1 = 0.1f;
@@ -79,16 +77,15 @@ void intconstconst(void)
 
     printf("    0x%08lx [0x3dcccccd] %s (0.1)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     printf("    0x%08lx [0x3e4ccccd] %s (5.0)\n", *((uint32_t*)&fp2), _ftostr(buf, fp2));
-    printf("fp3:0x%08lx [0xbdcccccd] %s (4.8)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-    test1(fp3, "bdcccccd");
+    printf("fp3:0x%08lx [0x4099999a] %s (4.8)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
+    test1(fp3, "4099999a");
 
     fp3 = 5 - 1.1f;
-    printf("fp3:0x%08lx [0xbdcccccd] %s (3.9)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-    test1(fp3, "3e4cccce");
+    printf("fp3:0x%08lx [0x4079999a] %s (3.9)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
+    test1(fp3, "4079999a");
     fp3 = 5 - 2.3f;
-    printf("fp3:0x%08lx [0xbdcccccd] %s (2.7)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-    test1(fp3, "be4cccce");
-#endif
+    printf("fp3:0x%08lx [0x402ccccd] %s (2.7)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
+    test1(fp3, "402ccccd");
 
     // multiplication
     printf("\nconstant * constant\n\n");

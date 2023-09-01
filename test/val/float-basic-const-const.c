@@ -81,11 +81,11 @@ void constconst(void)
     test1(fp3, "bdcccccd");
 
     fp3 = 0.3f - 0.1f;
-    printf("fp3:0x%08lx [0xbdcccccd] %s (0.2)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-    test1(fp3, "3e4cccce");
+    printf("fp3:0x%08lx [0x3e4ccccd] %s (0.2)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
+    test1(fp3, "3e4ccccd");
     fp3 = 0.1f - 0.3f;
-    printf("fp3:0x%08lx [0xbdcccccd] %s (-0.2)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
-    test1(fp3, "be4cccce");
+    printf("fp3:0x%08lx [0xbe4ccccd] %s (-0.2)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
+    test1(fp3, "be4ccccd");
 
     // multiplication
     printf("\nconstant * constant\n\n");

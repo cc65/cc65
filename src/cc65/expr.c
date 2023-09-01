@@ -3137,6 +3137,7 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
     **   - (integer)(base + offset) * 1 + (pointer)numeric
     */
     if (ED_IsQuasiConst (Expr)) {
+        LOG(("parseadd lhs is const\n"));
 
         /* The left hand side is a constant of some sort. Good. Get rhs */
         ExprWithCheck (DoArrayRef ? hie0 : hie9, &Expr2);
@@ -3144,6 +3145,7 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
         /* Right hand side is constant. Get the rhs type */
         rhst = Expr2.Type;
         if (ED_IsQuasiConst (&Expr2)) {
+            LOG(("parseadd lhs and rhs are const\n"));
 
             /* Both expressions are constants. Check for pointer arithmetic */
             if (IsClassPtr (lhst) && IsClassInt (rhst)) {
@@ -3161,9 +3163,23 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                 flags = CF_INT;
             } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassFloat (rhst)) {
                 /* FIXME: float addition (const + const) */
-                LOG(("%s:%d float addition (const + const)\n", __FILE__, __LINE__));
+                LOG(("%s:%d float addition (float const + float const)\n", __FILE__, __LINE__));
                 /* Integer addition */
                 flags = CF_FLOAT;
+#if 1
+            } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassInt (rhst)) {
+                /* FIXME: float addition (const + const int) */
+                LOG(("%s:%d float addition (float const + const int)\n", __FILE__, __LINE__));
+                /* Integer addition */
+                flags = CF_FLOAT;
+#endif
+#if 1
+            } else if (!DoArrayRef && IsClassInt (lhst) && IsClassFloat (rhst)) {
+                /* FIXME: float addition (const int + const) */
+                LOG(("%s:%d float addition (const int + float const)\n", __FILE__, __LINE__));
+                /* Integer addition */
+                flags = CF_FLOAT;
+#endif
             } else {
                 LOG(("%s:%d OOPS\n", __FILE__, __LINE__));
                 /* OOPS */
@@ -3181,7 +3197,27 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                     Expr->Type = type_float;
                     //Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
                     AddDone = 1;
-                    LOG(("%s:%d float addition (const + const) res:%f\n", __FILE__, __LINE__,  Expr->V.FVal.V));
+                    LOG(("%s:%d parseadd (float const + float const) res:%f\n", __FILE__, __LINE__,  Expr->V.FVal.V));
+#if 1
+                } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassInt (rhst)) {
+                    /* float + int */
+                    /* FIXME: float - this is probably completely wrong */
+                    Expr->V.FVal.V = Expr->V.FVal.V + Expr2.IVal;
+                    Expr->Type = type_float;
+                    //Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
+                    AddDone = 1;
+                    LOG(("%s:%d parseadd (float const + int const) res:%f\n", __FILE__, __LINE__,  Expr->V.FVal.V));
+#endif
+#if 1
+                } else if (!DoArrayRef && IsClassInt (lhst) && IsClassFloat (rhst)) {
+                    /* int + float */
+                    /* FIXME: float - this is probably completely wrong */
+                    Expr->V.FVal.V = Expr->IVal + Expr2.V.FVal.V;
+                    Expr->Type = type_float;
+                    //Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
+                    AddDone = 1;
+                    LOG(("%s:%d parseadd (int const + float const) res:%f\n", __FILE__, __LINE__,  Expr->V.FVal.V));
+#endif
                 } else {
                     /* integer + integer */
                     if (ED_IsAbs (&Expr2) &&
@@ -3764,8 +3800,12 @@ static void parsesub (ExprDesc* Expr)
 
     } else if (ED_IsQuasiConst (&Expr2) && ED_CodeRangeIsEmpty (&Expr2)) {
 
+        LOG(("parsesub: rhs is const\n"));
+
         /* Right hand side is constant. Check left hand side. */
         if (ED_IsQuasiConst (Expr)) {
+
+            LOG(("parsesub: lhs and rhs are const\n"));
 
             /* Both sides are constant. Check for pointer arithmetic */
             if (IsClassPtr (lhst) && IsClassInt (rhst)) {
@@ -3784,10 +3824,9 @@ static void parsesub (ExprDesc* Expr)
                 /* OOPS */
                 Error ("Invalid operands for binary operator '-'");
             }
-#if 1
-            if (!IsClassFloat (lhst) && !IsClassFloat (rhst))
-#endif
-            {
+
+            if (!IsClassFloat (lhst) && !IsClassFloat (rhst)) {
+                LOG(("parsesub const int - const int\n"));
                 /* We can't make all subtraction expressions constant */
                 if (ED_IsConstAbs (&Expr2)) {
                     Expr->IVal -= Expr2.IVal * rscale;
@@ -3798,6 +3837,27 @@ static void parsesub (ExprDesc* Expr)
                     Expr->IVal -= Expr2.IVal;
                     /* Get rid of unneeded bases and flags etc. */
                     ED_MakeConstAbs (Expr, Expr->IVal, Expr->Type);
+                    /* No runtime code */
+                    SubDone = 1;
+                }
+            } else if (IsClassFloat (lhst) && IsClassInt (rhst)) {
+                LOG(("parsesub const float - const int\n"));
+                if (ED_IsConstAbs (&Expr2)) {
+                    Expr->V.FVal = FP_D_Sub(Expr->V.FVal, FP_D_FromInt(Expr2.IVal));
+                    /* No runtime code */
+                    SubDone = 1;
+                }
+            } else if (IsClassInt (lhst) && IsClassFloat (rhst)) {
+                LOG(("parsesub const int - const float\n"));
+                if (ED_IsConstAbs (&Expr2)) {
+                    Expr->V.FVal = FP_D_Sub(FP_D_FromInt(Expr->IVal), Expr2.V.FVal);
+                    /* No runtime code */
+                    SubDone = 1;
+                }
+            } else if (IsClassFloat (lhst) && IsClassFloat (rhst)) {
+                LOG(("FIXME: parsesub const float - const float\n"));
+                if (ED_IsConstAbs (&Expr2)) {
+                    Expr->V.FVal = FP_D_Sub(Expr->V.FVal, Expr2.V.FVal);
                     /* No runtime code */
                     SubDone = 1;
                 }

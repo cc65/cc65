@@ -25,6 +25,11 @@ BRKVec  :=      $03F0   ; Break vector
 SOFTEV  :=      $03F2   ; Vector for warm start
 PWREDUP :=      $03F4   ; This must be = EOR #$A5 of SOFTEV+1
 
+ROMIRQVEC :=      $03FE   ; IRQ handler vector, called when an IRQ is fired
+                          ; and we're banked on ROM
+
+RAMIRQVEC :=      $FFFE   ; IRQ handler vector, called when an IRQ is fired
+                          ; and we're banked on RAM
 ;-----------------------------------------------------------------------------
 ; Hardware
 

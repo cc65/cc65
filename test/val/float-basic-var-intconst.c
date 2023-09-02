@@ -82,11 +82,9 @@ void varintconst(void)
     printf("fp1:0x%08lx [42687df4] %s (58.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     test1(fp1, "42687df4");
 
-#if 0 // works but gives wrong result
     fp1 = var_float - 47;
-    printf("fp1:0x%08lx [42687df4] %s (-35.877)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
-    test1(fp1, "42687df4");
-#endif
+    printf("fp1:0x%08lx [c20f820c] %s (-35.877)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "c20f820c");
 
 #if 0 // works but gives wrong result
     fp1 = var_float * 47;

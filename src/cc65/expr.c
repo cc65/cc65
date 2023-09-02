@@ -3946,11 +3946,11 @@ static void parsesub (ExprDesc* Expr)
             } else if (IsClassFloat (lhst) && IsClassInt (rhst)) {
                 /* Float/Int subtraction. We'll adjust the types later */
                 LOG(("parsesub: float - int\n"));
-                flags |= CF_FLOAT;
+                flags = CF_FLOAT;
             } else if (IsClassInt (lhst) && IsClassFloat (rhst)) {
                 /* Int/Float subtraction. We'll adjust the types later */
                 LOG(("parsesub: int - float\n"));
-                flags |= CF_FLOAT;
+                flags = CF_FLOAT;
 #endif
             } else {
                 /* OOPS */
@@ -3963,7 +3963,7 @@ static void parsesub (ExprDesc* Expr)
                 /* Remove pushed value from stack */
                 RemoveCode (&Mark2);
                 if (IsClassInt (lhst)) {
-                    LOG(("parsesub: lhst int sub 1\n"));
+                    LOG(("parsesub: lhst int\n"));
                     /* Adjust the types */
                     flags = typeadjust (Expr, &Expr2, 1);
                     /* Do the subtraction */
@@ -3974,14 +3974,22 @@ static void parsesub (ExprDesc* Expr)
                     }
                 }
                 else if (IsClassFloat (lhst)) {
-                    LOG(("parsesub: lhst float sub 2\n"));
+                    LOG(("parsesub: lhst float\n"));
                     /* Adjust the types */
-                    flags = typeadjust (Expr, &Expr2, 1);
+//                    flags = typeadjust (&Expr2, Expr, 1);
                     if (rscale != 1) {
                         Internal("scale != 1 for float");
                     }
                     /* Do the subtraction */
-                    g_dec (flags | CF_CONST, FP_D_As32bitRaw(Expr2.V.FVal));
+                    if (IsClassFloat(rhst)) {
+                        LOG(("parsesub: rhst const float\n"));
+                        g_dec (flags | CF_CONST, FP_D_As32bitRaw(Expr2.V.FVal));
+                    } else {
+                        LOG(("parsesub: rhst const int: %d\n", Expr2.IVal * rscale));
+                        g_dec (flags | CF_CONST, FP_D_As32bitRaw(FP_D_FromInt(Expr2.IVal * rscale)));
+//                        g_dec (flags | CF_CONST, Expr2.IVal * rscale);
+                    }
+//                    g_dec (flags | CF_CONST, FP_D_As32bitRaw(Expr2.V.FVal));
                 }
                 else {
                     /* Do the subtraction */

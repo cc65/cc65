@@ -90,10 +90,10 @@ NOT WORKING YET:
     /test/val/float-basic-var-var.c                  +=, -=
 
     /test/val/float-basic-var-intvar.c               +=, -=
-    /test/val/float-basic-var-intconst.c    -, *, /, +=, -=, *=, /=
+    /test/val/float-basic-var-intconst.c       *, /, +=, -=, *=, /=
 
     /test/val/float-basic-intvar-const.c             +=, -=, *=, /=
-    /test/val/float-basic-intvar-var.c      -, *, /, +=,         /=
+    /test/val/float-basic-intvar-var.c         *, /, +=,         /=
     /test/val/float-basic-intconst-var.c       *, /
 
     /test/val/float-cmp-const-intvar.c

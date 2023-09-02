@@ -39,6 +39,7 @@ unsigned char var_char;
 unsigned int var_int;
 float var_float;
 
+#if 1
 // returns 1 if value in f matches the string
 // the string is a hex value without leading "0x"
 int compare(float f, char *str)
@@ -81,11 +82,11 @@ void varintconst(void)
     fp1 = var_float + 47;
     printf("fp1:0x%08lx [42687df4] %s (58.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     test1(fp1, "42687df4");
-
+#if 1
     fp1 = var_float - 47;
     printf("fp1:0x%08lx [c20f820c] %s (-35.877)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     test1(fp1, "c20f820c");
-
+#endif
 #if 0 // works but gives wrong result
     fp1 = var_float * 47;
     printf("fp1:0x%08lx [42687df4] %s (522.781)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
@@ -154,3 +155,13 @@ int main(void)
     printf("\nfloat-basic-var-intconst (res:%d)\n", result);
     return result;
 }
+#else
+int main(void)
+{
+    fp1 = var_float - 47;
+    printf("fp1:0x%08lx [c20f820c] %s (-35.877)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    fp1 = var_float - 47.0f;
+    printf("fp1:0x%08lx [c20f820c] %s (-35.877)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    return result;
+}
+#endif

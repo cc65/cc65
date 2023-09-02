@@ -2284,6 +2284,8 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
             unsigned long Val1 = Expr->IVal;
             unsigned long Val2 = Expr2.IVal;
 
+            LOG(("hie_internal lhs is const and rhs is const"));
+
             /* Both operands are constant, remove the generated code */
             RemoveCode (&Mark1);
 
@@ -2403,7 +2405,7 @@ LOG(("hie_internal Expr->Type:%s Expr2->Type:%s\n",
             ** returned without this modification).  This allows more efficient operations,
             ** but does not affect correctness for the same reasons explained in g_typeadjust.
             */
-            LOG(("hie_internal ?1\n"));
+            LOG(("hie_internal lhs is const, rhs is not const\n"));
             if (ltype == CF_INT && Expr->IVal >= 0 && Expr->IVal < 256) {
                 ltype = CF_CHAR | CF_UNSIGNED;
             }
@@ -2444,7 +2446,7 @@ LOG(("hie_internal Expr->Type:%s Expr2->Type:%s\n",
             */
             unsigned rtype = TypeOf (Expr2.Type);
             type = 0;
-            LOG(("hie_internal ?2 rconst: %d rtype:%x\n", rconst, rtype));
+            LOG(("hie_internal ?2  ltype:%4x rconst: %d rtype:%4x\n", ltype, rconst, rtype));
             if (rconst) {
                 /* As above, but for the RHS. */
                 if (rtype == CF_INT && Expr2.IVal >= 0 && Expr2.IVal < 256) {
@@ -3963,6 +3965,7 @@ static void parsesub (ExprDesc* Expr)
                 /* Remove pushed value from stack */
                 RemoveCode (&Mark2);
                 if (IsClassInt (lhst)) {
+                    // lhs is integer, rhs is constant
                     LOG(("parsesub: lhst int\n"));
                     /* Adjust the types */
                     flags = typeadjust (Expr, &Expr2, 1);
@@ -3974,18 +3977,21 @@ static void parsesub (ExprDesc* Expr)
                     }
                 }
                 else if (IsClassFloat (lhst)) {
+                    // lhs is float, rhs is constant
                     LOG(("parsesub: lhst float\n"));
-                    /* Adjust the types */
-//                    flags = typeadjust (&Expr2, Expr, 1);
-                    if (rscale != 1) {
-                        Internal("scale != 1 for float");
-                    }
                     /* Do the subtraction */
                     if (IsClassFloat(rhst)) {
-                        LOG(("parsesub: rhst const float\n"));
+                        LOG(("parsesub: rhst const float %f\n", Expr2.V.FVal.V));
+                        flags = typeadjust (&Expr2, Expr, 1);
+//                        flags = typeadjust (Expr, &Expr2, 1);
                         g_dec (flags | CF_CONST, FP_D_As32bitRaw(Expr2.V.FVal));
                     } else {
                         LOG(("parsesub: rhst const int: %d\n", Expr2.IVal * rscale));
+                        /* Adjust rhs type */
+                        LoadExpr(CF_FLOAT, Expr);
+                        if (rscale != 1) {
+                            Internal("scale != 1 for float");
+                        }
                         g_dec (flags | CF_CONST, FP_D_As32bitRaw(FP_D_FromInt(Expr2.IVal * rscale)));
 //                        g_dec (flags | CF_CONST, Expr2.IVal * rscale);
                     }

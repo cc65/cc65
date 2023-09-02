@@ -34,6 +34,7 @@ unsigned long var_ulong;
 
 int result = 0;
 
+#if 1
 // returns 1 if value in f matches the string
 // the string is a hex value without leading "0x"
 int compare(float f, char *str)
@@ -209,4 +210,13 @@ int main(void)
     printf("\nfloat-basic-var-const (res:%d)\n", result);
     return result;
 }
-
+#else
+int main(void)
+{
+    fp1 = 16.25f;
+    fp3 = fp1 - 8.5f;
+    printf("substraction: %s-%s=%s\n", _ftostr(buf, fp1), _ftostr(buf2, 8.5f), _ftostr(buf3, fp3));
+    printf(" fp3:0x%08lx [0x40f80000] %s (exp:7.75)", *((uint32_t*)&fp3), _ftostr(buf, fp3));
+    return result;
+}
+#endif

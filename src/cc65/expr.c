@@ -4,7 +4,7 @@
 ** 2020-11-20, Greg King
 */
 
-//#define DEBUG
+#define DEBUG
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -2475,15 +2475,48 @@ LOG(("hie_internal Expr->Type:%s Expr2->Type:%s\n",
                     ltype |= CF_PRIMARY;    /* Value is in register */
                 }
             }
+            LOG(("hie_internal ?2a ltype:%4x rconst: %d rtype:%4x\n", ltype, rconst, rtype));
 
             /* Determine the type of the operation result. */
             type |= g_typeadjust (ltype, rtype);
+            LOG(("hie_internal ?2b ltype:%4x rconst: %d rtype:%4x type:%04x .Expr.Type:%04x Expr2.Type:%04x\n", ltype, rconst, rtype, type, TypeOf (Expr->Type), TypeOf (Expr2.Type)));
             Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
+            LOG(("hie_internal ?2c Expr->Type:%4x\n", TypeOf (Expr->Type)));
 
             /* Generate code */
             if (TypeOf (Expr2.Type) == CF_FLOAT) {
+#if 0
                 Gen->Func (type, FP_D_As32bitRaw(Expr2.V.FVal));
+#else
+                // right side is float
+                LOG(("hie_internal ?2 rhs float:%x\n", FP_D_As32bitRaw(Expr2.V.FVal)));
+                if (((ltype & CF_TYPEMASK) != CF_FLOAT) && (!(rtype & CF_CONST))) {
+                    // left side is not float, right side is float
+                    LOG(("hie_internal ?2 lhs not float: %ld ltype const?:%d\n", Expr->IVal, ltype & CF_CONST));
+                    RemoveCode (&Mark2);
+                    LoadExpr(ltype, Expr);
+                    /* Adjust lhs primary if needed  */
+//                  type = typeadjust (&Expr2, Expr, 0);
+//                    type = typeadjust (Expr, &Expr2, 1);
+//                    Expr->Type = type_float;
+                    g_regfloat(ltype);
+//                    g_push_float(type & ~CF_CONST, FP_D_As32bitRaw(FP_D_FromInt(Expr->IVal)));
+//                    g_push_float(type & ~CF_CONST, 0);
+//                    RemoveCode (&Mark2);
+                    g_push(type, 0);
+                    LoadExpr(CF_FLOAT, &Expr2);
+                    // left side is not float, right side is float
+                    Gen->Func (type, FP_D_As32bitRaw(Expr2.V.FVal));
+                } else {
+                    // left side is float, right side is float
+                    LOG(("hie_internal ?2 lhs is float: %08x\n", FP_D_As32bitRaw(Expr2.V.FVal)));
+                    Gen->Func (type, FP_D_As32bitRaw(Expr2.V.FVal));
+                }
+//                Gen->Func (CF_FLOAT, FP_D_As32bitRaw(Expr2.V.FVal));
+//                Gen->Func (type, Expr2.IVal);
+#endif
             } else {
+                // right side is not float
                 Gen->Func (type, Expr2.IVal);
             }
 

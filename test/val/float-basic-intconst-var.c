@@ -72,7 +72,7 @@ void intconstvar(void)
 {
 
     var_float = 11.123f;
-
+#if 1
     fp1 = 47;
     printf("fp1:0x%08lx [?] %s (47)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     fp1 = var_float;
@@ -87,7 +87,7 @@ void intconstvar(void)
     fp1 = 47 - var_float;
     printf("fp1:0x%08lx [?] %s (35.877)", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     test1(fp1, "420f820c");
-
+#endif
 #if 0 // compiles, but wrong result
     fp1 = 47 * var_float;
     printf("fp1:0x%08lx [?] %s (522.781)", *((uint32_t*)&fp1), _ftostr(buf, fp1));

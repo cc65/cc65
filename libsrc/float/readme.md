@@ -254,79 +254,68 @@ the softfloat (and softmath) library.
   - mul, div functions are missing
   - type conversion functions are missing
 
-#### woz
-
-historical float routines by woz :) unfortunately not ieee754
-
-- (optionally) converting from/to ieee754 format is missing (compile time option)
-- compare functions are missing
-- type conversion functions are missing
-
--> It probably doesn't make a lot of sense to spend time on supporting these,
-   this directory should probably be deleted before merging with master
-
 --------------------------------------------------------------------------------
 
 ### runtime functions
 
 These must be available in the runtime library.
 ```
-func        description                       softfloat cbmfp   wozfp   754     codegen.c
+func        description                       softfloat cbmfp   754     codegen.c
 
-aufloat     Primary 8bit unsigned -> float      -       *       -       -       g_regfloat
-afloat      Primary 8bit signed -> float        -       *       -       -       g_regfloat
-axufloat    Primary 16bit unsigned -> float     *       *       -       -       g_regfloat
-axfloat     Primary 16bit signed -> float       *       *       -       -       g_regfloat
-eaxufloat   Primary 32bit unsigned -> float     *       *       -       -       g_regfloat
-eaxfloat    Primary 32bit signed -> float       *       *       -       -       g_regfloat
+aufloat     Primary 8bit unsigned -> float      -       *       -       g_regfloat
+afloat      Primary 8bit signed -> float        -       *       -       g_regfloat
+axufloat    Primary 16bit unsigned -> float     *       *       -       g_regfloat
+axfloat     Primary 16bit signed -> float       *       *       -       g_regfloat
+eaxufloat   Primary 32bit unsigned -> float     *       *       -       g_regfloat
+eaxfloat    Primary 32bit signed -> float       *       *       -       g_regfloat
 
-feaxint     Primary float -> 16bit int          -       *       -       -       g_regint
-feaxlong    Primary float -> 32bit long         -       *       -       -       g_reglong
+feaxint     Primary float -> 16bit int          -       *       -       g_regint
+feaxlong    Primary float -> 32bit long         -       *       -       g_reglong
 
-ftosaddeax  Primary = TOS + Primary             *       *       ?       ?       g_add
-ftossubeax  Primary = TOS - Primary             *       *       ?       ?       g_sub
-ftosrsubeax Primary = Primary - TOS             *       *       -       -       g_rsub
-ftosmuleax  Primary = TOS * Primary             *       *       ?       -       g_mul
-ftosdiveax  Primary = TOS / Primary             *       *       ?       -       g_div
+ftosaddeax  Primary = TOS + Primary             *       *       ?       g_add
+ftossubeax  Primary = TOS - Primary             *       *       ?       g_sub
+ftosrsubeax Primary = Primary - TOS             *       *       -       g_rsub
+ftosmuleax  Primary = TOS * Primary             *       *       -       g_mul
+ftosdiveax  Primary = TOS / Primary             *       *       -       g_div
 
-fnegeax     Primary = -Primary                  *       *       -       -       g_neg
-fbnegeax    Primary = !Primary (return bool!)   *       *       -       -       g_bneg
+fnegeax     Primary = -Primary                  *       *       -       g_neg
+fbnegeax    Primary = !Primary (return bool!)   *       *       -       g_bneg
 
-ftosgeeax   Test for greater than or equal to   *       *       -       -       g_ge
-ftosgteax   Test for greater than               *       *       -       -       g_gt
-ftosleeax   Test for less than or equal to      *       *       -       -       g_le
-ftoslteax   Test for less than                  *       *       -       -       g_lt
-ftosneeax   Test for not equal                  *       *       -       -       g_ne
-ftoseqeax   Test for equal                      *       *       -       -       g_eq
+ftosgeeax   Test for greater than or equal to   *       *       -       g_ge
+ftosgteax   Test for greater than               *       *       -       g_gt
+ftosleeax   Test for less than or equal to      *       *       -       g_le
+ftoslteax   Test for less than                  *       *       -       g_lt
+ftosneeax   Test for not equal                  *       *       -       g_ne
+ftoseqeax   Test for equal                      *       *       -       g_eq
 ```
 ### math.h functions
 
 These are optional, required for standard libm.
 ```
-func        description                       softmath  cbmfp   wozfp   754
+func        description                       softmath  cbmfp   754
 
-float powf(float f, float a)                    -       *       -       -
-float sinf(float s)                             *       *       -       -
-float cosf(float s)                             *       *       -       -
-float logf(float x)                             -       *       *       -
-float expf(float x)                             -       *       -       -
-float sqrtf(float x)                            -       *       -       -
-float tanf(float x)                             -       *       -       -
-float atanf(float x)                            -       *       -       -
-float fabsf(float x)                            *       *       -       -
-float roundf(float x)                           *       *       -       -
-float truncf(float x)                           *       *       -       -
-float ceilf(float x)                            *       -       -       -
+float powf(float f, float a)                    -       *       -
+float sinf(float s)                             *       *       -
+float cosf(float s)                             *       *       -
+float logf(float x)                             -       *       -
+float expf(float x)                             -       *       -
+float sqrtf(float x)                            -       *       -
+float tanf(float x)                             -       *       -
+float atanf(float x)                            -       *       -
+float fabsf(float x)                            *       *       -
+float roundf(float x)                           *       *       -
+float truncf(float x)                           *       *       -
+float ceilf(float x)                            *       -       -
 ```
 
 ### extra functions
 
 Optional utility functions.
 ```
-func        description                       softfloat cbmfp   wozfp   754
+func        description                       softfloat cbmfp   754
 
-char *_ftostr(char *d, float s)                 *       *       ?       ?       for printf family
-float _strtof(char *d)                          -       *       -       -       for scanf family
+char *_ftostr(char *d, float s)                 *       *       ?       for printf family
+float _strtof(char *d)                          -       *       -       for scanf family
 ```
 
 --------------------------------------------------------------------------------

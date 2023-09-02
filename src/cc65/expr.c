@@ -4,7 +4,7 @@
 ** 2020-11-20, Greg King
 */
 
-#define DEBUG
+//#define DEBUG
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -95,12 +95,6 @@ IS_UPPER:
 BAD_CHAR:
         jmp     plot
 
-;-----------------------------------------------------------------------------
-; Initialize the conio subsystem. "INIT" segment is nothing special on the
-; Creativision, it is part of the "ROM" memory.
-
-.segment        "INIT"
-
 initconio:
         lda     #$0
         sta     SCREEN_PTR

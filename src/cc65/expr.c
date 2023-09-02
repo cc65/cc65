@@ -2423,6 +2423,7 @@ LOG(("hie_internal Expr->Type:%s Expr2->Type:%s\n",
             } else {
                 ltype |= CF_PRIMARY;        /* Value is in register */
             }
+            LOG(("hie_internal swap lhs/rhs\n"));
 
             /* Determine the type of the operation result. */
             type |= g_typeadjust (ltype, rtype);
@@ -2430,8 +2431,10 @@ LOG(("hie_internal Expr->Type:%s Expr2->Type:%s\n",
 
             /* Generate code */
             if (TypeOf (Expr->Type) == CF_FLOAT) {
+                LOG(("hie_internal lhs is not const, rhs is const\n"));
                 Gen->Func (type, FP_D_As32bitRaw(Expr->V.FVal));
             } else {
+                LOG(("hie_internal lhs is not const, rhs is const\n"));
                 Gen->Func (type, Expr->IVal);
             }
 

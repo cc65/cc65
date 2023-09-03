@@ -152,19 +152,9 @@ void varvar2(void)
     printf(" fp1:0x%08lx [0x40d00000] %s (exp:6.5)", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     test1(fp1, "40d00000");
 }
-#else
-
-void test (void)
-{
-    fp1 = 16.5f;
-    fp2 = 64.25f;
-    fp1 += fp2;   // = 80.75f
-}
-#endif
 
 int main(void)
 {
-#if 1
     float fp2 = 43.21f;
 
     printf("float-basic-var-var\n");
@@ -176,8 +166,14 @@ int main(void)
     WAIT();
 
     printf("\nfloat-basic-var-var (res:%d)\n", result);
-#else
-    test();
-#endif
     return result;
 }
+#else
+int main(void)
+{
+    fp1 = 16.5f;
+    fp2 = 64.25f;
+    fp1 += fp2;   // = 80.75f
+    return result;
+}
+#endif

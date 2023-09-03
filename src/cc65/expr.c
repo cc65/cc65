@@ -4,7 +4,7 @@
 ** 2020-11-20, Greg King
 */
 
-//#define DEBUG
+#define DEBUG
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -2494,8 +2494,9 @@ LOG(("hie_internal Expr->Type:%s Expr2->Type:%s\n",
                 // right side is float
                 LOG(("hie_internal ?2 rhs float:%x\n", FP_D_As32bitRaw(Expr2.V.FVal)));
                 if (((ltype & CF_TYPEMASK) != CF_FLOAT) && (!(rtype & CF_CONST))) {
-                    // left side is not float, right side is float
+                    // left side is not float, right side is non-constant float
                     LOG(("hie_internal ?2 lhs not float: %ld ltype const?:%d\n", Expr->IVal, ltype & CF_CONST));
+#if 1
                     RemoveCode (&Mark2);
                     LoadExpr(ltype, Expr);
                     /* Adjust lhs primary if needed  */
@@ -2510,6 +2511,46 @@ LOG(("hie_internal Expr->Type:%s Expr2->Type:%s\n",
                     LoadExpr(CF_FLOAT, &Expr2);
                     // left side is not float, right side is float
                     Gen->Func (type, FP_D_As32bitRaw(Expr2.V.FVal));
+#else
+                    if (lconst) {
+                        LOG(("hie_internal lhs int const\n"));
+#if 1
+                        // lhs is constant
+                          RemoveCode (&Mark2);
+                          LoadExpr(ltype, Expr);
+    //                     /* Adjust lhs primary if needed  */
+    // //                  type = typeadjust (&Expr2, Expr, 0);
+                         type = typeadjust (Expr, &Expr2, 1);
+    // //                    Expr->Type = type_float;
+    //                     g_regfloat(type);
+    // //                    g_push_float(type & ~CF_CONST, FP_D_As32bitRaw(FP_D_FromInt(Expr->IVal)));
+    // //                    g_push_float(type & ~CF_CONST, 0);
+    // //                    RemoveCode (&Mark2);
+    //                     g_push(type, 0);
+    //                     LoadExpr(CF_FLOAT, &Expr2);
+                        // left side is not float, right side is float
+                        Gen->Func (type, FP_D_As32bitRaw(Expr2.V.FVal));
+#endif
+                    } else {
+                        LOG(("hie_internal lhs int var\n"));
+#if 1
+                        RemoveCode (&Mark2);
+                        LoadExpr(ltype, Expr);
+                        /* Adjust lhs primary if needed  */
+    //                  type = typeadjust (&Expr2, Expr, 0);
+    //                    type = typeadjust (Expr, &Expr2, 1);
+    //                    Expr->Type = type_float;
+                        g_regfloat(ltype);
+    //                    g_push_float(type & ~CF_CONST, FP_D_As32bitRaw(FP_D_FromInt(Expr->IVal)));
+    //                    g_push_float(type & ~CF_CONST, 0);
+    //                    RemoveCode (&Mark2);
+                        g_push(type, 0);
+                        LoadExpr(CF_FLOAT, &Expr2);
+                        // left side is not float, right side is float
+                        Gen->Func (type, FP_D_As32bitRaw(Expr2.V.FVal));
+#endif
+                    }
+#endif
                 } else {
                     // left side is float, right side is float
                     LOG(("hie_internal ?2 lhs is float: %08x\n", FP_D_As32bitRaw(Expr2.V.FVal)));

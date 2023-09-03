@@ -3,6 +3,32 @@
 ;
 ; Oliver Schmidt, 21.04.2005
 ;
+; A word about speed: Although the SSC is capable of very high speeds (up to
+; 115200bps), this can only be achieved in a very tight asm program, in
+; push/pull mode, with IRQs disabled, like ADTPro does. This driver uses RX
+; interrupts and buffers bytes into a 256 bytes buffer, so that its users can
+; use the comfort of C. The cc65 Apple2 IRQ handler overwrites the interrupt
+; vector at $FFFE-$FFFF in the main RAM bank to point to a fast routine, so
+; when a byte arrives and your program is in the main RAM bank, there will be
+; about 140 cycles from the start of the interrupt to the storage of the byte
+; in the buffer. This allows to use communication speeds up to 19200bps without
+; loss, as long as you empty the buffer quickly enough with ser_get().
+;
+; However, your program will very probably, at some point, switch banking to
+; ROM. For example, cputc() will switch to ROM if outputting a character
+; requires to wrap to the next line (see VTABZ). So will printf(), which uses
+; COUT. So will read(), etc.
+; If an interrupt arrives while your program is on the ROM bank, the ROM IRQ
+; vector at $FFFE-$FFFF points to the ROM IRQ handler, which handles a few
+; extra things (like banking...) before passing control to our own IRQ handler
+; at $3FE-$3FF. This extra step costs around 250 cycles and makes the serial-
+; IRQ-to-byte-stored too slow to sustain 19200bps. It will be fast enough to
+; sustain 9600bps.
+; This means you can either:
+; - Play it safe and setup serial communication at 9600bps
+; - Need speed and setup for 19200bps, but take extra care not to be receiving
+;   anything while your programs banks to ROM.
+;
 ; The driver is based on the cc65 rs232 module, which in turn is based on
 ; Craig Bruce device driver for the Switftlink/Turbo-232.
 ;

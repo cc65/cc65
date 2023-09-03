@@ -57,7 +57,7 @@ float logf(float y)
 float logf(float x)
 {
 
-  // ASSUMING: 
+  // ASSUMING:
   // - non-denormalized numbers i.e. x > 2^−126
   // - integer is 32 bit. float is IEEE 32 bit.
 
@@ -66,7 +66,7 @@ float logf(float x)
   // - http://mathonweb.com/help_ebook/html/algorithms.htm#ln
   // - https://en.wikipedia.org/wiki/Fast_inverse_square_root
 
-  // FORMULA: 
+  // FORMULA:
   // x = m * 2^p =>
   //   ln(x) = ln(m) + ln(2)p,
 
@@ -76,7 +76,7 @@ float logf(float x)
   // 0b 0    [00000000] 00000000000000000000000
   // value = (-1)^s * M * 2 ^ (exp-127)
   //
-  // exp = 127 for x = 1, 
+  // exp = 127 for x = 1,
   // so 2^(exp-127) is the multiplier
 
   // evil floating point bit level hacking
@@ -105,16 +105,16 @@ float logf(float x)
   //
   // 4th order is:
   // { -1.74178, 2.82117, -1.46994, 0.447178, -0.0565717 }
-  // 
+  //
   // 3rd order is:
   // { -1.49278, 2.11263, -0.729104, 0.10969 }
 
-  return 
+  return
 
   /* less accurate */
     -1.49278+(2.11263+(-0.729104+0.10969*x)*x)*x
 
-  /* OR more accurate */      
+  /* OR more accurate */
   // -1.7417939+(2.8212026+(-1.4699568+(0.44717955-0.056570851*x)*x)*x)*x
 
   /* compensate for the ln(2)s. ln(2)=0.6931471806 */

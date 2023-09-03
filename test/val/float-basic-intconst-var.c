@@ -119,7 +119,7 @@ int main(void)
 {
     // fp1 = 47 * var_float;
     // printf("fp1:0x%08lx [?] %s (522.781)", *((uint32_t*)&fp1), _ftostr(buf, fp1));
-    
+
     fp1 = 47 / var_float;
     printf("fp1:0x%08lx [?] %s (58.123)", *((uint32_t*)&fp1), _ftostr(buf, fp1));
 

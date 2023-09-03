@@ -38,7 +38,13 @@ float __fastcall__ roundf(float x);              /* C99 */
 float __fastcall__ truncf(float x);              /* C99 */
 
 /* double ceil(double x) */
-float ceilf(float x);              /* C99 */
+float __fastcall__ ceilf(float x);              /* C99 */
+
+/* double fmod(double x, double y); */
+float __fastcall__ fmodf(float x, float y);
+
+/* double floor(double x); */
+float __fastcall__ floorf(float x);
 
 /* beware, this is not standard */
 #ifndef M_PI
@@ -47,9 +53,6 @@ float ceilf(float x);              /* C99 */
 
 /* FIXME */
 float __fastcall__ _fatan2(float x, float y);
-
-
-float ffloor(float x);
 
 #endif /* _MATH_H_ */
 

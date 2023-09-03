@@ -13,12 +13,12 @@ You can however try the current state of development. You should be able to
 build small (and slow...) programs that use floats on any supported target.
 
 - Build the compiler/toolchain/libs from this fptest branch.
-- Now you can build the samples and/or tests.
+- Now you can build and run the samples and/or tests.
 ```
     samples/floattest.c
     samples/mandelfloat.c
-    samples/mathtest.c (requires full math.h)
-    samples/tgisincos.c (requires sin/cos from math.h)
+    samples/mathtest.c
+    samples/tgisincos.c
 ```
 full math.h is available for C64 when linking agains fp754kernal.o (see below)
 
@@ -31,6 +31,9 @@ full math.h is available for C64 when linking agains fp754kernal.o (see below)
   simulator for running test programs, and test changes in the compiler using
   our test bench, and that against a library that is known to somewhat work
   correctly :)
+- The default library also contains a collection of math functions (which i
+  dubbed "softmath"), which may fill the gap until more targets have specific
+  wrappers and/or a generic math library (in assembly) was written.
 - The default library can be overridden by linking an override file, similar to
   how you can use the soft80 implementation for conio. Right now such override
   files are provided for the C64 (c64-fp754kernal.o) and VIC20
@@ -42,20 +45,17 @@ full math.h is available for C64 when linking agains fp754kernal.o (see below)
   Please see below for more info on what is needed to do this, should you be
   interested in doing this. Please contact me before you are putting work into
   this, so we can discuss some things and prevent anyone wasting time :)
+
 - It might be possible to produce a similar kernal- or OS- wrapper override file
   as the C64 one for other targets (or port the C64 one to other CBM targets).
   - If you create a new one, keep in mind that the compiler *right now* will
     currently work with IEEE754 floats, which your library calls must also work
     with (which will involve converting forth and back to whatever other format
     at runtime), and there is no easy way tp change that.
-- Similar to the softfloat library, it would be nice to have a complete 
-  reference implementation for the math stuff in softmath as well.
-  - Also the math stuff should be implemented in assembly at some point :)
 
 ### Roadmap
 
 - Test/Fix using the Softfloat lib some more, fix as much tests as possible
-- Find some more generic math functions that we can use in softmath
 - When all obvious tests have been created and work OK, we can merge
   - for the failing tests, create "negative" cases
 
@@ -78,8 +78,6 @@ each other (not necessarily by me :)):
   - also we must *implement* the native format on the host in fp.c
   - if the native format uses a different number of bytes than 4 for its native
     format, we must add support for this in the compiler at various places
-  - add a cmdline option to the compiler to switch the float binary type (754,
-    cbm, woz, ...)
   - last not least a wrapper library that uses the native format must be created
   - it is not unlikely that we will need extra tests for the native format
 
@@ -235,7 +233,7 @@ default for all targets.
 
 #### softmath
 
-Contains a collection of math functions, hopefully some day enough to completely
+Contains a collection of math functions, (hopefully) enough to completely
 implement math.h in C. This is currently used by default for all targets.
 
 #### cbmkernal
@@ -294,18 +292,20 @@ These are optional, required for standard libm.
 ```
 func        description                       softmath  cbmfp   754
 
-float powf(float f, float a)                    -       *       -
+float powf(float f, float a)                    *       *       -
 float sinf(float s)                             *       *       -
 float cosf(float s)                             *       *       -
-float logf(float x)                             -       *       -
-float expf(float x)                             -       *       -
-float sqrtf(float x)                            -       *       -
-float tanf(float x)                             -       *       -
-float atanf(float x)                            -       *       -
+float logf(float x)                             *       *       -
+float expf(float x)                             *       *       -
+float sqrtf(float x)                            *       *       -
+float tanf(float x)                             *       *       -
+float atanf(float x)                            *       *       -
 float fabsf(float x)                            *       *       -
 float roundf(float x)                           *       *       -
 float truncf(float x)                           *       *       -
 float ceilf(float x)                            *       -       -
+float floorf(float x)                           *       -       -
+float fmodf(float x, float y)                   *       -       -
 ```
 
 ### extra functions

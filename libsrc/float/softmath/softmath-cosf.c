@@ -61,7 +61,7 @@ float cosf(float x)
 }
 
 #if 0
-float c(float x) {
+float cosf(float x) {
     return sinf(x + (M_PI / 2.0));
 }
 #endif

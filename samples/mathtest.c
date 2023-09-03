@@ -1,7 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+
+#ifdef __CC65__
 #include <conio.h>  // for cgetc
+#else
+#define cgetc()
+char *_ftostr(char *d, float s);
+#endif
 
 #ifdef __SIM6502__
 #define cgetc()

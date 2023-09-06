@@ -9,7 +9,7 @@ For details look at the [Website](https://cc65.github.io).
 
 Project founder:
 
-* Ulrich von Bassewitz
+* Ullrich von Bassewitz
 
 Core team members:
 

@@ -31,7 +31,7 @@
 #ifndef _ARPA_INET_H
 #define _ARPA_INET_H
 
-#ifndef __OPT_i__
+#if (__OPT_i__ < 200)
 int __fastcall__ ntohs (int val);
 int __fastcall__ htons (int val);
 #else

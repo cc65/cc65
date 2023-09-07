@@ -31,8 +31,22 @@
 #ifndef _ARPA_INET_H
 #define _ARPA_INET_H
 
+#ifndef __OPT_i__
 int __fastcall__ ntohs (int val);
 int __fastcall__ htons (int val);
+#else
+
+#define ntohs(x)                \
+    (                           \
+        __AX__=(x),             \
+        asm("sta tmp1"),        \
+        asm("txa"),             \
+        asm("ldx tmp1"),        \
+        __AX__                  \
+    )
+#define htons(x) ntohs(x)
+
+#endif
 
 long __fastcall__ ntohl (long val);
 long __fastcall__ htonl (long val);

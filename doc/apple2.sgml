@@ -427,8 +427,12 @@ The names in the parentheses denote the symbols to be used for static linking of
 <descrip>
 
   <tag><tt/a2.ssc.ser (a2_ssc_ser)/</tag>
-  Driver for the Apple&nbsp;II Super Serial Card. Supports up to 19200 baud,
-  requires hardware flow control (RTS/CTS) and does interrupt driven receives.
+  Driver for the Apple&nbsp;II Super Serial Card.
+  They are extension cards for the II, II+, IIe, and the Apple //c and //c+ have
+  the same hardware and firmware integrated.
+  It supports up to 9600 baud, requires hardware flow control (RTS/CTS) and
+  does interrupt driven receives. Speeds faster than 9600 baud aren't reachable
+  because the ROM and ProDOS IRQ handlers are too slow.
   Note that because of the peculiarities of the 6551 chip transmits are not
   interrupt driven, and the transceiver blocks if the receiver asserts
   flow control because of a full buffer.
@@ -437,6 +441,25 @@ The names in the parentheses denote the symbols to be used for static linking of
   <tt/ser_open()/ in order to select a different slot. <tt/ser_apple2_slot()/
   succeeds for all Apple&nbsp;II slots, but <tt/ser_open()/ fails with
   <tt/SER_ERR_NO_DEVICE/ if there's no SSC firmware found in the selected slot.
+
+  In the Apple //c and //c+, slot 1 is the printer port, and slot 2 is the modem
+  port.
+
+  Never call <tt/ser_apple2_slot()/ after <tt/ser_open()/.
+
+  <tag><tt/a2.gs.ser (a2_gs_ser)/</tag>
+  Driver for the Apple&nbsp;IIgs serial ports (printer and modem).
+  It supports up to 9600 baud, requires hardware flow control (RTS/CTS) and
+  does interrupt driven receives. Speeds faster than 9600 baud aren't reachable
+  because the ROM and ProDOS IRQ handlers are too slow.
+  Note that transmits are not interrupt driven, and the transceiver blocks if
+  the receiver asserts flow control because of a full buffer.
+
+  The driver defaults to opening the modem port. Calling <tt/ser_apple2_slot()/
+  prior to <tt/ser_open()/ allows to select the printer port (1) or the modem
+  port (0).
+
+  Never call <tt/ser_apple2_slot()/ after <tt/ser_open()/.
 
 </descrip><p>
 

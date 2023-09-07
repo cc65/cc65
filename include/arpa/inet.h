@@ -28,8 +28,18 @@
 /*                                                                           */
 /*****************************************************************************/
 
+
+
 #ifndef _ARPA_INET_H
 #define _ARPA_INET_H
+
+
+
+/*****************************************************************************/
+/*                                   Code                                    */
+/*****************************************************************************/
+
+
 
 #if (__OPT_i__ < 200)
 int __fastcall__ ntohs (int val);
@@ -51,4 +61,7 @@ int __fastcall__ htons (int val);
 long __fastcall__ ntohl (long val);
 long __fastcall__ htonl (long val);
 
+
+
+/* End of arpa/inet.h */
 #endif

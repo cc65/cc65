@@ -9,8 +9,6 @@
 
 _htons := _ntohs
 
-.code
-
 _ntohs:
         sta     tmp1
         txa

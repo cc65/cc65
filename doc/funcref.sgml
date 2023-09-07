@@ -4403,7 +4403,7 @@ to undefined behaviour.
 <quote>
 <descrip>
 <tag/Function/Swaps byte order in a 32 bit word.
-<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
+<tag/Header/<tt/<ref id="inet.h" name="arpa/inet.h">/
 <tag/Declaration/<tt/int htonl(val)/
 <tag/Description/Converts a 32 bit word from from network byte order
 (big endian) to little endian (or vice-versa).
@@ -4423,7 +4423,7 @@ be used in presence of a prototype.
 <quote>
 <descrip>
 <tag/Function/Swaps byte order in a 16 bit word.
-<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
+<tag/Header/<tt/<ref id="inet.h" name="arpa/inet.h">/
 <tag/Declaration/<tt/int htons(val)/
 <tag/Description/Converts a 16 bit word from from network byte order
 (big endian) to little endian (or vice-versa) by swapping both its bytes.
@@ -5811,7 +5811,7 @@ memory allocated for the driver.
 <quote>
 <descrip>
 <tag/Function/Swaps byte order in a 32 bit word.
-<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
+<tag/Header/<tt/<ref id="inet.h" name="arpa/inet.h">/
 <tag/Declaration/<tt/int __fastcall__ ntohl (int val);/
 <tag/Description/Converts a 32 bit word from from host byte order (little endian)
 to big endian (or vice-versa).
@@ -5830,7 +5830,7 @@ be used in presence of a prototype.
 <quote>
 <descrip>
 <tag/Function/Swaps byte order in a 16 bit word.
-<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
+<tag/Header/<tt/<ref id="inet.h" name="arpa/inet.h">/
 <tag/Declaration/<tt/int __fastcall__ ntohs (int val);/
 <tag/Description/Converts a 16 bit word from from host byte order (little endian)
 to big endian (or vice-versa) by swapping both its bytes.

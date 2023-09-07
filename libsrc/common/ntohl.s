@@ -9,12 +9,10 @@
 .importzp   tmp1, tmp2, sreg
 
 _htonl := _ntohl
-.code
 
 _ntohl:
         ; The parts of our 32 bit word
         ; are in sreg+1, sreg, X, A.
-
 
         ; Save A and X
         stx tmp1

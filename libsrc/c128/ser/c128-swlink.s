@@ -314,15 +314,10 @@ SER_CLOSE:
 ;
 
 SER_GET:
-        ldx     SendFreeCnt             ; Send data if necessary
-        inx                             ; X == $FF?
-        beq     @L1
-        lda     #$00
-        jsr     TryToSend
 
 ; Check for buffer empty
 
-@L1:    lda     RecvFreeCnt             ; (25)
+        lda     RecvFreeCnt             ; (25)
         cmp     #$ff
         bne     @L2
         lda     #SER_ERR_NO_DATA
@@ -362,21 +357,23 @@ SER_PUT:
 ; Try to send
 
         ldx     SendFreeCnt
-        inx                             ; X = $ff?
+        cpx     #$FF                   ; Nothing to flush
         beq     @L2
         pha
         lda     #$00
         jsr     TryToSend
         pla
 
-; Put byte into send buffer & send
+; Reload SendFreeCnt after TryToSend
 
-@L2:    ldx     SendFreeCnt
-        bne     @L3
+        ldx     SendFreeCnt
+        bne     @L2
         lda     #SER_ERR_OVERFLOW       ; X is already zero
         rts
 
-@L3:    ldx     SendTail
+; Put byte into send buffer & send
+
+@L2:    ldx     SendTail
         sta     SendBuf,x
         inc     SendTail
         dec     SendFreeCnt
@@ -466,25 +463,25 @@ NmiHandler:
         sta     tmp1            ; Remember tryHard flag
 @L0:    lda     SendFreeCnt
         cmp     #$ff
-        beq     @L3             ; Bail out
+        beq     @L2             ; Bail out
 
 ; Check for flow stopped
 
 @L1:    lda     Stopped
-        bne     @L3             ; Bail out
+        bne     @L2             ; Bail out
 
 ; Check that swiftlink is ready to send
 
-@L2:    lda     ACIA_STATUS
+        lda     ACIA_STATUS
         and     #$10
-        bne     @L4
+        bne     @L3
         bit     tmp1            ;keep trying if must try hard
-        bmi     @L0
-@L3:    rts
+        bmi     @L1
+@L2:    rts
 
 ; Send byte and try again
 
-@L4:    ldx     SendHead
+@L3:    ldx     SendHead
         lda     SendBuf,x
         sta     ACIA_DATA
         inc     SendHead

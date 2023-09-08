@@ -26,6 +26,7 @@
         .include        "ser-error.inc"
 
         .macpack        module
+        .macpack        cpu
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
@@ -57,9 +58,13 @@
 ;----------------------------------------------------------------------------
 ; I/O definitions
 
+.if (.cpu .bitand CPU_ISET_65C02)
+ACIA            = $C088
+.else
 Offset          = $8F           ; Move 6502 false read out of I/O to page $BF
-
 ACIA            = $C088-Offset
+.endif
+
 ACIA_DATA       = ACIA+0        ; Data register
 ACIA_STATUS     = ACIA+1        ; Status register
 ACIA_CMD        = ACIA+2        ; Command register
@@ -200,7 +205,9 @@ SER_OPEN:
         asl
         asl
         asl
+.if .not (.cpu .bitand CPU_ISET_65C02)
         adc     #Offset                 ; Assume carry to be clear
+.endif
         tax
 
         ; Check if the handshake setting is valid
@@ -284,14 +291,9 @@ InvBaud:lda     #SER_ERR_BAUD_UNAVAIL
 
 SER_GET:
         ldx     Index
-        ldy     SendFreeCnt     ; Send data if necessary
-        iny                     ; Y == $FF?
-        beq     :+
-        lda     #$00            ; TryHard = false
-        jsr     TryToSend
 
         ; Check for buffer empty
-:       lda     RecvFreeCnt     ; (25)
+        lda     RecvFreeCnt     ; (25)
         cmp     #$FF
         bne     :+
         lda     #SER_ERR_NO_DATA
@@ -315,7 +317,11 @@ SER_GET:
         inc     RecvHead
         inc     RecvFreeCnt
         ldx     #$00            ; (59)
+.if (.cpu .bitand CPU_ISET_65C02)
+        sta     (ptr1)
+.else
         sta     (ptr1,x)
+.endif
         txa                     ; Return code = 0
         rts
 
@@ -328,20 +334,21 @@ SER_PUT:
 
         ; Try to send
         ldy     SendFreeCnt
-        iny                     ; Y = $FF?
+        cpy     #$FF            ; Nothing to flush
         beq     :+
         pha
         lda     #$00            ; TryHard = false
         jsr     TryToSend
         pla
 
-        ; Put byte into send buffer & send
-:       ldy     SendFreeCnt
+        ; Reload SendFreeCnt after TryToSend
+        ldy     SendFreeCnt
         bne     :+
         lda     #SER_ERR_OVERFLOW
         ldx     #0 ; return value is char
         rts
 
+        ; Put byte into send buffer & send
 :       ldy     SendTail
         sta     SendBuf,y
         inc     SendTail
@@ -404,19 +411,19 @@ SER_IRQ:
         and     #$08
         beq     Done            ; Jump if no ACIA interrupt
         lda     ACIA_DATA,x     ; Get byte from ACIA
-        ldy     RecvFreeCnt     ; Check if we have free space left
+        ldx     RecvFreeCnt     ; Check if we have free space left
         beq     Flow            ; Jump if no space in receive buffer
         ldy     RecvTail        ; Load buffer pointer
         sta     RecvBuf,y       ; Store received byte in buffer
         inc     RecvTail        ; Increment buffer pointer
         dec     RecvFreeCnt     ; Decrement free space counter
-        ldy     RecvFreeCnt     ; Check for buffer space low
-        cpy     #33
+        cpx     #33             ; Check for buffer space low
         bcc     Flow            ; Assert flow control if buffer space low
         rts                     ; Interrupt handled (carry already set)
 
         ; Assert flow control if buffer space too low
-Flow:   lda     RtsOff
+Flow:   ldx     Index
+lda     RtsOff
         sta     ACIA_CMD,x
         sta     Stopped
         sec                     ; Interrupt handled
@@ -427,12 +434,13 @@ Done:   rts
 
 TryToSend:
         sta     tmp1            ; Remember tryHard flag
-Again:  lda     SendFreeCnt
+NextByte:
+        lda     SendFreeCnt
         cmp     #$FF
         beq     Quit            ; Bail out
 
         ; Check for flow stopped
-        lda     Stopped
+Again:  lda     Stopped
         bne     Quit            ; Bail out
 
         ; Check that ACIA is ready to send
@@ -449,4 +457,4 @@ Send:   ldy     SendHead
         sta     ACIA_DATA,x
         inc     SendHead
         inc     SendFreeCnt
-        jmp     Again
+        jmp     NextByte

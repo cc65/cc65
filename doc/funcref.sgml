@@ -435,6 +435,16 @@ see also <tt>testcode/lib/em-test.c</tt> and <tt>samples/multidemo.c</tt>.
 (incomplete)
 
 
+<sect1><tt/inet.h/<label id="inet.h"><p>
+
+<itemize>
+<item><ref id="htonl" name="htonl">
+<item><ref id="htons" name="htons">
+<item><ref id="ntohl" name="ntohl">
+<item><ref id="ntohs" name="ntohs">
+</itemize>
+
+
 <sect1><tt/geos.h/<label id="geos.h"><p>
 
 <url url="geos.html" name="GEOS API">.
@@ -4388,6 +4398,45 @@ to undefined behaviour.
 </descrip>
 </quote>
 
+<sect1>htonl<label id="htonl"><p>
+
+<quote>
+<descrip>
+<tag/Function/Swaps byte order in a 32 bit word.
+<tag/Header/<tt/<ref id="inet.h" name="arpa/inet.h">/
+<tag/Declaration/<tt/int htonl(val)/
+<tag/Description/Converts a 32 bit word from from network byte order
+(big endian) to little endian (or vice-versa).
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/See also/
+<ref id="ntohl" name="ntohl">
+<tag/Availability/cc65
+</descrip>
+</quote>
+
+
+<sect1>htons<label id="htons"><p>
+
+<quote>
+<descrip>
+<tag/Function/Swaps byte order in a 16 bit word.
+<tag/Header/<tt/<ref id="inet.h" name="arpa/inet.h">/
+<tag/Declaration/<tt/int htons(val)/
+<tag/Description/Converts a 16 bit word from from network byte order
+(big endian) to little endian (or vice-versa) by swapping both its bytes.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/See also/
+<ref id="ntohs" name="ntohs">
+<tag/Availability/cc65
+</descrip>
+</quote>
+
 
 <sect1>isalnum<label id="isalnum"><p>
 
@@ -5753,6 +5802,44 @@ memory allocated for the driver.
 <tag/Header/<tt/<ref id="cc65.h" name="cc65.h">/
 <tag/Declaration/<tt/unsigned int __fastcall__ mul40 (unsigned char value);/
 <tag/Description/Speed optimized function to multiply an 8 bit unsigned value by 40 to get a 16 bit result.
+<tag/Availability/cc65
+</descrip>
+</quote>
+
+<sect1>ntohl<label id="ntohl"><p>
+
+<quote>
+<descrip>
+<tag/Function/Swaps byte order in a 32 bit word.
+<tag/Header/<tt/<ref id="inet.h" name="arpa/inet.h">/
+<tag/Declaration/<tt/int __fastcall__ ntohl (int val);/
+<tag/Description/Converts a 32 bit word from from host byte order (little endian)
+to big endian (or vice-versa).
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/See also/
+<ref id="htonl" name="htonl">
+<tag/Availability/cc65
+</descrip>
+</quote>
+
+<sect1>ntohs<label id="ntohs"><p>
+
+<quote>
+<descrip>
+<tag/Function/Swaps byte order in a 16 bit word.
+<tag/Header/<tt/<ref id="inet.h" name="arpa/inet.h">/
+<tag/Declaration/<tt/int __fastcall__ ntohs (int val);/
+<tag/Description/Converts a 16 bit word from from host byte order (little endian)
+to big endian (or vice-versa) by swapping both its bytes.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/See also/
+<ref id="htons" name="htons">
 <tag/Availability/cc65
 </descrip>
 </quote>

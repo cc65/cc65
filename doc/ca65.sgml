@@ -120,7 +120,7 @@ Long options:
   --list-bytes n                Maximum number of bytes per listing line
   --memory-model model          Set the memory model
   --pagelength n                Set the page length for the listing
-  --relax-checks                Relax some checks (see docs)
+  --relax-checks                Disables some error checks
   --smart                       Enable smart mode
   --target sys                  Set the target system
   --verbose                     Increase verbosity
@@ -265,14 +265,17 @@ Here is a description of all the command line options:
   <label id="option--relax-checks">
   <tag><tt>--relax-checks</tt></tag>
 
-  Relax some checks done by the assembler. This will allow code that is an
+  Disables some error checks done by the assembler. This will allow code that is an
   error in most cases and flagged as such by the assembler, but can be valid
   in special situations.
 
-  Examples are:
+  Disabled checks are:
 <itemize>
-<item>Short branches between two different segments.
-<item>Byte sized address loads where the address is not a zeropage address.
+<item>Address vs. fragment size: a byte sized load from an non-zeropage
+  address is truncated instead of producing an error.
+<item>Indirect jump on page boundary: <tt>jmp (label)</tt> on a label that
+  resides on a page boundary (<tt>$xxFF</tt>) fetches the second byte from the
+  wrong address on 6502 CPUs, now allowed instead of producing an error.
 </itemize>
 
 

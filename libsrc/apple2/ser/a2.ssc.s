@@ -133,18 +133,26 @@ ParityTable:
         .byte   $A0             ; SER_PAR_MARK
         .byte   $E0             ; SER_PAR_SPACE
 
-        ; (*): The first byte we'll check at offset 0 is
-        ; expected to be a BIT instruction on any Apple2
-        ; machine with an ACIA 6551, including the //c
-        ; and //c+.
+        ; Check five bytes at known positions on the
+        ; slot's firmware to make sure this is an SSC
+        ; (or Apple //c comm port) firmware that drives
+        ; an ACIA 6551 chip.
+        ;
+        ; The SSC firmware and the Apple //c(+) comm
+        ; port firmware all begin with a BIT instruction.
         ; The IIgs, on the other hand, has a
         ; Zilog Z8530 chip and its firmware starts with
         ; a SEP instruction. We don't want to load this
-        ; driver on the IIgs' serial port.
+        ; driver on the IIgs' serial port. We'll
+        ; differentiate the firmware on this byte.
         ;
         ; The next four bytes we check are the Pascal
         ; Firmware Protocol Bytes that identify a
-        ; serial card.
+        ; serial card. Those are the same bytes for
+        ; SSC firmwares, Apple //c firmwares and IIgs
+        ; Zilog Z8530 firmwares - which is the reason
+        ; we have to check for the firmware's first
+        ; instruction too.
 
 IdOfsTable:
         .byte   $00             ; First instruction

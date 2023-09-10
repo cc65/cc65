@@ -132,16 +132,33 @@ ParityTable:
         .byte   $60             ; SER_PAR_EVEN
         .byte   $A0             ; SER_PAR_MARK
         .byte   $E0             ; SER_PAR_SPACE
+
+        ; (*): The first byte we'll check at offset 0 is
+        ; expected to be a BIT instruction on any Apple2
+        ; machine with an ACIA 6551, including the //c
+        ; and //c+.
+        ; The IIgs, on the other hand, has a
+        ; Zilog Z8530 chip and its firmware starts with
+        ; a SEP instruction. We don't want to load this
+        ; driver on the IIgs' serial port.
+        ;
+        ; The next four bytes we check are the Pascal
+        ; Firmware Protocol Bytes that identify a
+        ; serial card.
+
 IdOfsTable:
+        .byte   $00             ; First instruction
         .byte   $05             ; Pascal 1.0 ID byte
         .byte   $07             ; Pascal 1.0 ID byte
         .byte   $0B             ; Pascal 1.1 generic signature byte
         .byte   $0C             ; Device signature byte
 IdValTable:
-        .byte   $38             ; Fixed
-        .byte   $18             ; Fixed
-        .byte   $01             ; Fixed
-        .byte   $31             ; Serial or parallel I/O card type 1
+        .byte   $2C             ; BIT
+        .byte   $38             ; ID Byte 0 (from Pascal 1.0), fixed
+        .byte   $18             ; ID Byte 1 (from Pascal 1.0), fixed
+        .byte   $01             ; Generic signature for Pascal 1.1, fixed
+        .byte   $31             ; Device signature byte (serial or
+                                ; parallel I/O card type 1)
 
 IdTableLen      = * - IdValTable
 

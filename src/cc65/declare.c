@@ -756,7 +756,7 @@ static SymEntry* ParseEnumSpec (const char* Name, unsigned* DSFlags)
         Flags |= SC_FICTITIOUS;
     }
 
-    return AddEnumSym (Name, Flags, MemberType, FieldTab, DSFlags);
+    return AddEnumSym (Name, SC_DEF | Flags, MemberType, FieldTab, DSFlags);
 }
 
 

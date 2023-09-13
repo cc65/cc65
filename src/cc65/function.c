@@ -466,11 +466,15 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
 
     /* Check return type */
     ReturnType = F_GetReturnType (CurrentFunc);
-    if (IsIncompleteESUType (ReturnType)) {
+    if (!IsTypeArray (ReturnType) && !IsTypeFunc (ReturnType)) {
         /* There are already diagnostics on returning arrays or functions */
-        if (!IsTypeArray (ReturnType) && !IsTypeFunc (ReturnType)) {
+        if (IsIncompleteESUType (ReturnType)) {
             Error ("Function has incomplete return type '%s'",
                     GetFullTypeName (ReturnType));
+        } else if (IsPassByRefType (ReturnType)) {
+            /* Handle struct/union specially */
+            Error ("Function return type '%s' of size %u is unsupported",
+                   GetFullTypeName (ReturnType), SizeOf (ReturnType));
         }
     }
 

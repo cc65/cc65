@@ -330,8 +330,12 @@ SER_GET:
         beq     :+
         cmp     #63
         bcc     :+
+.if (.cpu .bitand CPU_ISET_65C02)
+        stz     Stopped
+.else
         lda     #$00
         sta     Stopped
+.endif
         lda     RtsOff
         ora     #%00001000
         sta     ACIA_CMD,x

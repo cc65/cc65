@@ -7,6 +7,10 @@ For details look at the [Website](https://cc65.github.io).
 
 ## People
 
+Project founder:
+
+* Ullrich von Bassewitz
+
 Core team members:
 
 * [Christian Groessler](https://github.com/groessler): Atari, Atari5200, and CreatiVision library Maintainer

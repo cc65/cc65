@@ -44,6 +44,13 @@ The simulator is called as follows:
           --version             Print the simulator version number
 </verb></tscreen>
 
+sim65 will exit with the error code of the simulated program,
+which is limited to an 8-bit result 0-255.
+
+An error in sim65, like bad arguments or an internal problem will exit with <tt/1/.
+
+A timeout from <tt/-x/ will exist with <tt/2/.
+
 
 <sect1>Command line options in detail<p>
 
@@ -126,9 +133,17 @@ a set of built-in paravirtualization functions (<ref id="paravirt-internal" name
 <sect>Creating a Test in Assembly<p>
 
 Assembly tests may similarly be assembled and linked with
-<tt/--target sim6502/ or <tt/--target sim65c02/,
-and the sim65 library provides an <tt/exit/ symbol that the program may <tt/JMP/
-to terminate with the current A register value as an exit code.
+<tt/--target sim6502/ or <tt/--target sim65c02/.
+Define and export <tt/_main/ as an entry point,
+and the sim65 library provides two ways to return an 8-bit exit code:
+
+<itemize>
+
+<item>Return from <tt/_main/ with the exit code in <tt/A/.
+
+<item><tt/jmp exit/ with the code in <tt/A/.
+
+</itemize>
 
 The binary file has a 12 byte header:
 

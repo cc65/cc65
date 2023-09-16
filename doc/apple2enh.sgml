@@ -21,7 +21,8 @@ as it comes with the cc65 C compiler. It describes the memory layout,
 enhanced&nbsp;Apple&nbsp;//e specific header files, available drivers, and any
 pitfalls specific to that platform.
 
-Please note that enhanced&nbsp;Apple&nbsp;//e specific functions are just mentioned
+Please note that this target requires a 65C02 or 65816 CPU,
+enhanced&nbsp;Apple&nbsp;//e specific functions are just mentioned
 here, they are described in detail in the separate <url url="funcref.html"
 name="function reference">. Even functions marked as "platform dependent" may
 be available on more than one platform. Please see the function reference for

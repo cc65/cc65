@@ -87,7 +87,6 @@ extern unsigned char    OrgPerSeg;          /* Make .org local to current seg */
 extern unsigned char    CComments;          /* Allow C like comments */
 extern unsigned char    ForceRange;         /* Force values into expected range */
 extern unsigned char    UnderlineInNumbers; /* Allow underlines in numbers */
-extern unsigned char    AddrSize;           /* Allow .ADDRSIZE function */
 extern unsigned char    BracketAsIndirect;  /* Use '[]' not '()' for indirection */
 
 

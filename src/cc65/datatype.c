@@ -670,6 +670,10 @@ const Type* ArithmeticConvert (const Type* lhst, const Type* rhst)
     ** floating point types are not (yet) supported.
     ** The integral promotions are performed on both operands.
     */
+    if (IsClassFloat(lhst) || IsClassFloat(rhst)) {
+        Error ("Floating point arithmetic not supported.");
+        return type_long;
+    }
     lhst = IntPromotion (lhst);
     rhst = IntPromotion (rhst);
 
@@ -803,7 +807,6 @@ const Type* GetStructReplacementType (const Type* SType)
     switch (SizeOf (SType)) {
         case 1:     NewType = type_uchar;   break;
         case 2:     NewType = type_uint;    break;
-        case 3:     /* FALLTHROUGH */
         case 4:     NewType = type_ulong;   break;
         default:    NewType = SType;        break;
     }

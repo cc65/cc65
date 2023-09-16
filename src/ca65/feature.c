@@ -118,7 +118,6 @@ void SetFeature (feature_t Feature, unsigned char On)
         case FEAT_C_COMMENTS:                 CComments         = On;    break;
         case FEAT_FORCE_RANGE:                ForceRange        = On;    break;
         case FEAT_UNDERLINE_IN_NUMBERS:       UnderlineInNumbers= On;    break;
-        case FEAT_ADDRSIZE:                   AddrSize          = On;    break;
         case FEAT_BRACKET_AS_INDIRECT:        BracketAsIndirect = On;    break;
         case FEAT_STRING_ESCAPES:             StringEscapes     = On;    break;
         case FEAT_LONG_JSR_JMP_RTS:           LongJsrJmpRts     = On;    break;

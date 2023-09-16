@@ -603,7 +603,7 @@ url="ca65.html" name="assembler manual">.
 
   The header file <tt/apple2_filetype.h/ also defines many values
   that can be used to set these variables. It is included in
-  <tt/apple2.h/, which is in turn included in <tt/apple2enh.h/.
+  <tt/apple2.h/.
 
   <tag>Example</tag>
 

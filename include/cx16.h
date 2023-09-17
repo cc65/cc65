@@ -291,7 +291,7 @@ struct __vera {
             unsigned char dcver1;
             unsigned char dcver2;
             unsigned char dcver3;
-        }
+        };
     } display;
     struct {
         unsigned char   config;         /* Layer map geometry */

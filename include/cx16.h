@@ -290,7 +290,7 @@ struct __vera {
             unsigned char dcver0;
             unsigned char dcver1;
             unsigned char dcver2;
-            unsigned char dcver3;     
+            unsigned char dcver3;
         }
     } display;
     struct {

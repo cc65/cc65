@@ -22,7 +22,7 @@ typedef unsigned char byte;
 #define NUMBYTES  8000
 #define DENSITY     50
 
-// Screen memory is placed at 8000, our world copy at A000, and they use the same layout so 
+// Screen memory is placed at 8000, our world copy at A000, and they use the same layout so
 // that we can memcpy from one to the other without translating
 
 byte * world     = (byte *) 0x8000;
@@ -83,7 +83,7 @@ void RandomFillWorld()
 }
 
 // CountNeighbors
-// 
+//
 // Count the number of live cells around the given spot, excluding the actual spot specified
 
 int CountNeighbors(int x, int y)
@@ -113,14 +113,14 @@ void UpdateWorld()
 {
    int x, y;
 
-   for (y = 0; y < HEIGHT; y++) 
+   for (y = 0; y < HEIGHT; y++)
    {
-       for (x = 0; x < WIDTH; x++) 
+       for (x = 0; x < WIDTH; x++)
        {
          int neighbors = CountNeighbors(x, y);
          if (GETPIXEL(world, x, y))
             SETPIXEL(new_world, x, y, (neighbors == 2 || neighbors == 3));
-         else 
+         else
             SETPIXEL(new_world, x, y, (neighbors == 3));
        }
    }
@@ -131,7 +131,7 @@ int main (void)
    printf("\r\nStarting Conway's Game of Life: Randomizing World...\r\n");
    RandomFillWorld();
    printf("World Ready, Running!\r\n");
-   
+  
    for (;;)
    {
       UpdateWorld();

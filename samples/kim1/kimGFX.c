@@ -35,8 +35,8 @@ int CursorY = 0;
 #define CHARSPERROW       (SCREEN_WIDTH / CHARWIDTH)
 #define ROWSPERCOLUMN     (SCREEN_HEIGHT / CHARHEIGHT)
 
-// SETPIXEL  
-// 
+// SETPIXEL 
+//
 // 0 <= x < 320
 // 0 <= y < 200
 //
@@ -47,7 +47,7 @@ void SETPIXEL(int x, int y, byte b)
    byte * pb = screen;
    pb += x >> 3;
    pb += y * BYTESPERROW;
-   
+  
    if (b)
       *(pb) |=  (0b10000000 >> (x & 7));
    else
@@ -96,7 +96,7 @@ const unsigned char petToAscTable[256] =
 //
 // Translation lookup table to go from ASCII to PETSCII
 
-const unsigned char ascToPetTable[256] = 
+const unsigned char ascToPetTable[256] =
 {
     0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x14,0x20,0x0d,0x11,0x93,0x0a,0x0e,0x0f,
     0x10,0x0b,0x12,0x13,0x08,0x15,0x16,0x17,0x18,0x19,0x1a,0x1b,0x1c,0x1d,0x1e,0x1f,
@@ -121,7 +121,7 @@ const unsigned char ascToPetTable[256] =
 // 0 <= x < 40
 // 0 <= y < 25
 //
-// Draws an ASCII character at char location x, y 
+// Draws an ASCII character at char location x, y
 
 void DrawChar(int x, int y, char petscii)
 {
@@ -131,7 +131,7 @@ void DrawChar(int x, int y, char petscii)
 
    if (x < 0 || y < 0 || x >= CHARSPERROW || y >= ROWSPERCOLUMN)
       return;
-   
+  
    pb += y * BYTESPERCHARROW;
    pb += x;
 
@@ -198,13 +198,13 @@ void DrawLine(int x0, int y0, int x1, int y1, byte val)
             break;
 
         e2 = err;
-        
-        if (e2 > -dx) 
+       
+        if (e2 > -dx)
         {
             err -= dy;
             x0 += sx;
         }
-        if (e2 < dy) 
+        if (e2 < dy)
         {
             err += dx;
             y0 += sy;
@@ -213,16 +213,16 @@ void DrawLine(int x0, int y0, int x1, int y1, byte val)
 }
 
 // DrawCircle
-// 
+//
 // Draw a circle without sin, cos, or floating point!
 
-void DrawCircle(int x0, int y0, int radius, byte val) 
+void DrawCircle(int x0, int y0, int radius, byte val)
 {
     int x = radius;
     int y = 0;
     int err = 0;
 
-    while (x >= y) 
+    while (x >= y)
     {
         SETPIXEL(x0 + x, y0 + y, val);
         SETPIXEL(x0 + y, y0 + x, val);
@@ -259,8 +259,8 @@ unsigned char reverse_bits(unsigned char octet)
 }
 
 // MirrorFont
-// 
-// RAM font is backwards left-right relative to the way memory is laid out on the KIM-1, so we swap all the 
+//
+// RAM font is backwards left-right relative to the way memory is laid out on the KIM-1, so we swap all the
 // bytes in place by reversing the order of the bits in every byte
 
 void MirrorFont()
@@ -273,7 +273,7 @@ void MirrorFont()
 }
 
 // DrawScreenMoire
-// 
+//
 // Draws a moire pattern on the screen without clearing it first
 
 void DrawScreenMoire(int left, int top, int right, int bottom)
@@ -296,12 +296,12 @@ void DrawScreenMoire(int left, int top, int right, int bottom)
 int main (void)
 {
    int i;
-   
+  
    // Clear the screen memory
    ClearScreen();
 
    // Draw the welcome banner at the top of the screen
-   DrawTextAt(0, 0, "    *** COMMODORE KIM-1 SYSTEM ***"); 
+   DrawTextAt(0, 0, "    *** COMMODORE KIM-1 SYSTEM ***");
    DrawTextAt(0, 2, "   60K RAM SYSTEM.  49152 BYTES FREE.");
    DrawTextAt(0, 4, "READY.\n");
 

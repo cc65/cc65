@@ -73,10 +73,10 @@ kimHello.bin: kimHello.c
 
 # Convert a C64/PET ROM font binary into a C table we can use for looking up character definitions
 
-ramfont.c: font.rom 
+ramfont.c: font.rom
 	cat font.rom | python -c "import sys; print('unsigned char font8x8_basic[256][8] = {'); \
  		                  [print('    {' + ', '.join([f'0x{byte:02x}' for byte in row]) + f'}}, // PETSCII code {i}') for i, row in \
-				   enumerate(iter(lambda: sys.stdin.buffer.read(8), b''), 0)]; print('};')" > ramfont.c 
+				   enumerate(iter(lambda: sys.stdin.buffer.read(8), b''), 0)]; print('};')" > ramfont.c
 
 # To build an intel-format file for the CORSHAM SD card reader
 
@@ -86,7 +86,7 @@ kimLife.hex: kimLife.bin
 kimTest.hex: kimTest.bin
 	srec_cat kimTest.bin  -binary -offset 0x2000 -o kimTest.hex  -Intel -address-length=2
 
-kimGFX.hex: kimGFX.bin ramfont.c 
+kimGFX.hex: kimGFX.bin ramfont.c
 	srec_cat kimGFX.bin  -binary -offset 0x2000 -o kimGFX.hex  -Intel -address-length=2
 
 # To build a paper tape file for uploading to the KIM-1 via terminal
@@ -114,4 +114,4 @@ clean:
 	@$(DEL) kimGFX.hex   2>$(NULLDEV)
 	@$(DEL) ramfont.c    2>$(NULLDEV)
 
-  
+ 

@@ -4,8 +4,8 @@
 ; (c) Plummer's Software Ltd, 04/25/2023 Created
 ;         David Plummer
 ;-----------------------------------------------------------------------------------
-; 
-; File:     subs.asm            Assembly language subroutines for KIMGFX 
+;
+; File:     subs.asm            Assembly language subroutines for KIMGFX
 ;
 ;-----------------------------------------------------------------------------------
 
@@ -28,7 +28,7 @@ src_hi = src+1
 _ClearScreen:
                 lda #$00
 
-                ldx #<SCREEN    
+                ldx #<SCREEN   
                 stx dest_lo
                 ldx #>SCREEN
                 stx dest_hi
@@ -56,7 +56,7 @@ _ScrollScreen:
                 sta src_hi
                 lda #<SCREEN
                 sta dest_lo
-                lda #>SCREEN   
+                lda #>SCREEN  
                 sta dest_hi
 
                 ldy #$00
@@ -66,7 +66,7 @@ _ScrollScreen:
                 iny
                 bne :-
 
-                inc dest_hi                 ; When the source hits $BF00 we're done, as we've copied 
+                inc dest_hi                 ; When the source hits $BF00 we're done, as we've copied
                 inc src_hi                  ;   everything up to that point so far
                 ldx src_hi
                 cpx #$BE
@@ -74,7 +74,7 @@ _ScrollScreen:
 
                 lda #$00                    ; Clear the last line (320 bytes, or A0 twice)
                 ldy #$A0
-:               sta SCREEN+$1EA0, y        
+:               sta SCREEN+$1EA0, y       
                 sta SCREEN+$1E00, y
                 dey
                 bne :-

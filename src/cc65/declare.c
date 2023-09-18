@@ -515,6 +515,13 @@ static void CheckArrayElementType (Type* DataType)
                 if (!IsTypeVoid (T) || IS_Get (&Standard) != STD_CC65) {
                     Error ("Array of 0-size element type '%s'", GetFullTypeName (T));
                 }
+            } else {
+                if (IsTypeStruct (T)) {
+                    SymEntry* TagEntry = GetESUTagSym (T);
+                    if (TagEntry && SymHasFlexibleArrayMember (TagEntry)) {
+                        Error ("Invalid use of struct with flexible array member");
+                    }
+                }
             }
         } else {
             ++T;
@@ -1193,6 +1200,9 @@ static SymEntry* ParseStructSpec (const char* Name, unsigned* DSFlags)
                     if (TagEntry && SymHasFlexibleArrayMember (TagEntry)) {
                         Field->Flags |= SC_HAVEFAM;
                         Flags        |= SC_HAVEFAM;
+                        if (IsTypeStruct (Decl.Type)) {
+                            Error ("Invalid use of struct with flexible array member");
+                        }
                     }
                 }
 

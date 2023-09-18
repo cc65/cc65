@@ -31,10 +31,10 @@ else
   LD := $(if $(wildcard ../../bin/ld65*),../../bin/ld65,ld65)
 endif
 
-EXELIST_kim1 = \
-        kimHello.bin \
-        kimSieve.bin \
-        kimLife.bin \
+EXELIST_kim1 = 	\
+		kimHello.bin \
+		kimSieve.bin \
+		kimLife.bin \
 		kimTest.bin \
 		kimGFX.bin
 

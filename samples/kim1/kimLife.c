@@ -131,7 +131,7 @@ int main (void)
    printf("\r\nStarting Conway's Game of Life: Randomizing World...\r\n");
    RandomFillWorld();
    printf("World Ready, Running!\r\n");
-  
+
    for (;;)
    {
       UpdateWorld();

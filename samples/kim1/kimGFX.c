@@ -35,7 +35,7 @@ int CursorY = 0;
 #define CHARSPERROW       (SCREEN_WIDTH / CHARWIDTH)
 #define ROWSPERCOLUMN     (SCREEN_HEIGHT / CHARHEIGHT)
 
-// SETPIXEL 
+// SETPIXEL
 //
 // 0 <= x < 320
 // 0 <= y < 200
@@ -47,7 +47,7 @@ void SETPIXEL(int x, int y, byte b)
    byte * pb = screen;
    pb += x >> 3;
    pb += y * BYTESPERROW;
-  
+
    if (b)
       *(pb) |=  (0b10000000 >> (x & 7));
    else
@@ -131,7 +131,7 @@ void DrawChar(int x, int y, char petscii)
 
    if (x < 0 || y < 0 || x >= CHARSPERROW || y >= ROWSPERCOLUMN)
       return;
-  
+
    pb += y * BYTESPERCHARROW;
    pb += x;
 
@@ -198,7 +198,7 @@ void DrawLine(int x0, int y0, int x1, int y1, byte val)
             break;
 
         e2 = err;
-       
+
         if (e2 > -dx)
         {
             err -= dy;
@@ -296,7 +296,7 @@ void DrawScreenMoire(int left, int top, int right, int bottom)
 int main (void)
 {
    int i;
-  
+
    // Clear the screen memory
    ClearScreen();
 

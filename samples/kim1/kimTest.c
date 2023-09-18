@@ -33,7 +33,7 @@ void RepeatChar(char c, size_t count)
  *              within that region.  The address (and hence the
  *              memory region) is selected by the caller.
  *
- * Returns:     0 if the test succeeds. 
+ * Returns:     0 if the test succeeds.
  *              A non-zero result is the first pattern that failed.
  *
  **********************************************************************/
@@ -43,7 +43,7 @@ byte memTestDataBus(volatile byte * address)
     byte pattern;
 
     // Perform a walking 1's test at the given address.
-    
+
     for (pattern = 1; pattern != 0; pattern <<= 1)
     {
         // Write the test pattern.
@@ -78,7 +78,7 @@ byte memTestDataBus(volatile byte * address)
  *              select the region size as a power-of-two--if at all
  *              possible.
  *
- * Returns:     NULL if the test succeeds. 
+ * Returns:     NULL if the test succeeds.
  *              A non-zero result is the first address at which an
  *              aliasing problem was uncovered.  By examining the
  *              contents of memory, it may be possible to gather
@@ -97,14 +97,14 @@ byte * memTestAddressBus(volatile byte * baseAddress, unsigned long nBytes)
 
 
     //Write the default pattern at each of the power-of-two offsets.
-    
+
     for (offset = 1; (offset & addressMask) != 0; offset <<= 1)
     {
         baseAddress[offset] = pattern;
     }
 
     // Check for address bits stuck high.
-    
+
     testOffset = 0;
     baseAddress[testOffset] = antipattern;
 
@@ -121,9 +121,9 @@ byte * memTestAddressBus(volatile byte * baseAddress, unsigned long nBytes)
 
     baseAddress[testOffset] = pattern;
 
-   
+
     // Check for address bits stuck low or shorted.
-   
+
     for (testOffset = 1; (testOffset & addressMask) != 0; testOffset <<= 1)
     {
         baseAddress[testOffset] = antipattern;
@@ -144,7 +144,7 @@ byte * memTestAddressBus(volatile byte * baseAddress, unsigned long nBytes)
         baseAddress[testOffset] = pattern;
     }
     return (NULL);
-}  
+}
 
 /**********************************************************************
  *
@@ -185,7 +185,7 @@ byte * memTestDevice(volatile byte * baseAddress, unsigned long nBytes)
     for (pattern = 1, offset = 0; offset < nWords; pattern++, offset++)
     {
         if (offset % 1024 == 0)
-         printf("%04X  ", (int) &baseAddress[offset]);       
+         printf("%04X  ", (int) &baseAddress[offset]);
 
         if (baseAddress[offset] != pattern)
         {
@@ -203,7 +203,7 @@ byte * memTestDevice(volatile byte * baseAddress, unsigned long nBytes)
     for (pattern = 1, offset = 0; offset < nWords; pattern++, offset++)
     {
         if (offset % 1024 == 0)
-         printf("%04X  ", (int) &baseAddress[offset]);       
+         printf("%04X  ", (int) &baseAddress[offset]);
 
         antipattern = ~pattern;
         if (baseAddress[offset] != antipattern)
@@ -214,7 +214,7 @@ byte * memTestDevice(volatile byte * baseAddress, unsigned long nBytes)
     }
 
     return (NULL);
-} 
+}
 
 // TestMemory
 //
@@ -231,7 +231,7 @@ byte TestMemory(byte * startAddress, unsigned long size)
     else
     {
         return (0);
-    }  
+    }
 }
 
 int main (void)

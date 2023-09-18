@@ -128,10 +128,10 @@ byte * memTestAddressBus(volatile byte * baseAddress, unsigned long nBytes)
     {
         baseAddress[testOffset] = antipattern;
 
-  		  if (baseAddress[0] != pattern)
-		  {
-			 return ((byte *) &baseAddress[testOffset]);
-		  }
+        if (baseAddress[0] != pattern)
+        {
+            return ((byte *) &baseAddress[testOffset]);
+        }
 
         for (offset = 1; (offset & addressMask) != 0; offset <<= 1)
         {
@@ -166,7 +166,7 @@ byte * memTestAddressBus(volatile byte * baseAddress, unsigned long nBytes)
  *
  **********************************************************************/
 
-byte * memTestDevice(volatile byte * baseAddress, unsigned long nBytes)	
+byte * memTestDevice(volatile byte * baseAddress, unsigned long nBytes)
 {
     unsigned long offset;
     unsigned long nWords = nBytes / sizeof(byte);

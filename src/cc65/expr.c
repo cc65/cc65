@@ -1035,6 +1035,10 @@ static void FunctionCall (ExprDesc* Expr)
     /* Parse the argument list and pass them to the called function */
     ArgSize = FunctionArgList (Func, IsFastcall, Expr);
 
+    if (ArgSize > 0xFF && (Func->Flags & FD_VARIADIC) != 0) {
+        Error ("Total size of all arguments passed to a variadic function cannot exceed 255 bytes");
+    }
+
     /* We need the closing paren here */
     ConsumeRParen ();
 

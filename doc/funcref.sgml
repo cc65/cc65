@@ -435,6 +435,11 @@ see also <tt>testcode/lib/em-test.c</tt> and <tt>samples/multidemo.c</tt>.
 (incomplete)
 
 
+<sect1><tt/geos.h/<label id="geos.h"><p>
+
+<url url="geos.html" name="GEOS API">.
+
+
 <sect1><tt/inet.h/<label id="inet.h"><p>
 
 <itemize>
@@ -443,11 +448,6 @@ see also <tt>testcode/lib/em-test.c</tt> and <tt>samples/multidemo.c</tt>.
 <item><ref id="ntohl" name="ntohl">
 <item><ref id="ntohs" name="ntohs">
 </itemize>
-
-
-<sect1><tt/geos.h/<label id="geos.h"><p>
-
-<url url="geos.html" name="GEOS API">.
 
 
 <sect1><tt/joystick.h/<label id="joystick.h"><p>
@@ -460,6 +460,18 @@ see also <tt>testcode/lib/em-test.c</tt> and <tt>samples/multidemo.c</tt>.
 <item><ref id="joy_uninstall" name="joy_uninstall">
 <item><ref id="joy_unload" name="joy_unload">
 </itemize>
+
+
+<sect1><tt/kim1.h/<label id="kim1.h"><p>
+
+<itemize>
+<!-- <item><ref id="getkey" name="getkey"> -->
+<!-- <item><ref id="scandisplay" name="scandisplay"> -->
+<item><ref id="loadt" name="loadt">
+<item><ref id="dumpt" name="dumpt">
+</itemize>
+
+(incomplete)
 
 
 <sect1><tt/locale.h/<label id="locale.h"><p>
@@ -1745,7 +1757,7 @@ used in presence of a prototype.
 <tag/See also/
 <ref id="fdisp" name="fdisp">,
 <ref id="loadt" name="loadt">,
-<ref id="dumpt" name="dumpt">,
+<ref id="dumpt" name="dumpt">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -1890,7 +1902,7 @@ be used in presence of a prototype.
 <ref id="_swap" name="_swap">,
 <ref id="memcpy" name="memcpy">,
 <ref id="memmove" name="memmove">,
-<ref id="memset" name="memset">,
+<ref id="memset" name="memset">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -1963,7 +1975,7 @@ sent a command to TALK and a secondary address if it needs one.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
-<ref id="cbm_k_talk" name="cbm_k_talk">,
+<ref id="cbm_k_talk" name="cbm_k_talk">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -2365,8 +2377,8 @@ function, in order to provide input from the keyboard.
 <tag/See also/
 <ref id="cbm_k_getin" name="cbm_k_getin">,
 <ref id="cbm_k_udtim" name="cbm_k_udtim">,
-<ref id="cgetc" name="cgetc">,
-<!-- <ref id="getc" name="getc"> -->
+<ref id="cgetc" name="cgetc">
+<!-- <ref id="getc" name="getc">, -->
 <!-- <ref id="getchar" name="getchar"> -->
 <tag/Example/None.
 </descrip>
@@ -3284,7 +3296,7 @@ used in presence of a prototype.
 <tag/Availability/cc65 (not all platforms)
 <tag/See also/
 <ref id="get_c128_speed" name="get_c128_speed">,
-<ref id="set_c128_speed" name="set_c128_speed">,
+<ref id="set_c128_speed" name="set_c128_speed">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -3324,7 +3336,7 @@ used in presence of a prototype.
 <tag/Availability/cc65 (not all platforms)
 <tag/See also/
 <ref id="get_c65_speed" name="get_c65_speed">,
-<ref id="set_c65_speed" name="set_c65_speed">,
+<ref id="set_c65_speed" name="set_c65_speed">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -3450,11 +3462,11 @@ int main(void)
 <quote>
 <descrip>
 <tag/Function/Dump memory to tape.
-<tag/Header/<tt/<ref id="sym1.h" name="sym1.h">/
+<tag/Header/<tt/<ref id="sym1.h" name="sym1.h">/, <tt/<ref id="kim1.h" name="kim1.h">/
 <tag/Declaration/<tt/int __fastcall__ dumpt (unsigned char id, const void* start, const void* end);/
 <tag/Description/<tt/dumpt/ saves memory onto data tape.
 <tag/Notes/<itemize>
-<item>The function is specific to the Sym-1.
+<item>The function is specific to the Sym-1 and KIM-1.
 <item>The return value is status.  Non-zero status indicates an error.
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
@@ -3463,7 +3475,7 @@ be used in presence of a prototype.
 <tag/See also/
 <ref id="beep" name="beep">,
 <ref id="fdisp" name="fdisp">,
-<ref id="loadt" name="loadt">,
+<ref id="loadt" name="loadt">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -3843,7 +3855,7 @@ switching the CPU into double clock mode.
 <tag/See also/
 <ref id="beep" name="beep">,
 <ref id="loadt" name="loadt">,
-<ref id="dumpt" name="dumpt">,
+<ref id="dumpt" name="dumpt">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -5133,11 +5145,11 @@ used in presence of a prototype.
 <quote>
 <descrip>
 <tag/Function/Load memory from tape.
-<tag/Header/<tt/<ref id="sym1.h" name="sym1.h">/
+<tag/Header/<tt/<ref id="sym1.h" name="sym1.h">/, <tt/<ref id="kim1.h" name="kim1.h">/
 <tag/Declaration/<tt/int __fastcall__ loadt (unsigned char id);/
 <tag/Description/<tt/loadt/ loads memory from data tape.
 <tag/Notes/<itemize>
-<item>The function is specific to the Sym-1.
+<item>The function is specific to the Sym-1 and KIM-1.
 <item>The return value is status.  Non-zero status indicates an error.
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
@@ -5146,7 +5158,7 @@ be used in presence of a prototype.
 <tag/See also/
 <ref id="beep" name="beep">,
 <ref id="fdisp" name="fdisp">,
-<ref id="dumpt" name="dumpt">,
+<ref id="dumpt" name="dumpt">
 <tag/Example/None.
 </descrip>
 </quote>

@@ -6705,7 +6705,8 @@ be used in presence of a prototype.
 <tag/Function/Uninstall the currently loaded driver but do not unload it.
 <tag/Header/<tt/<ref id="serial.h" name="serial.h">/
 <tag/Declaration/<tt/unsigned char ser_uninstall (void);/
-<tag/Description/Uninstall the currently loaded driver but do not unload it.
+<tag/Description/Uninstall the currently loaded driver but do not unload it. This
+function returns SER_ERR_NO_DRIVER if no driver was installed, 0 otherwise.
 <tag/Availability/cc65
 <tag/See also/Other serial functions.
 <tag/Example/None.

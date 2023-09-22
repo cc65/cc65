@@ -334,9 +334,11 @@ function.
 
 <itemize>
 <!-- <item><ref id="get_numbanks" name="get_numbanks"> -->
-<!-- <item><ref id="get_ostype" name="get_ostype"> -->
+<item><ref id="get_ostype" name="get_ostype">
 <!-- <item><ref id="get_tv" name="get_tv"> -->
 <!-- <item><ref id="set_tv" name="set_tv"> -->
+<!-- <item><ref id="vera_layer_enable" name="vera_layer_enable"> -->
+<!-- <item><ref id="vera_sprites_enable" name="vera_sprites_enable"> -->
 <item><ref id="videomode" name="videomode">
 <!-- <item><ref id="vpeek" name="vpeek"> -->
 <!-- <item><ref id="vpoke" name="vpoke"> -->
@@ -3971,7 +3973,8 @@ be used in presence of a prototype.
 <descrip>
 <tag/Function/The function returns the operating system, the program runs on.
 <tag/Header/<tt/<ref id="apple2.h" name="apple2.h">,
-<ref id="atari.h" name="atari.h">, <ref id="c64.h" name="c64.h">/
+<ref id="atari.h" name="atari.h">, <ref id="c64.h" name="c64.h">,
+<ref id="cx16.h" name="cx16.h">/
 <tag/Declaration/<tt/unsigned char get_ostype (void);/
 <tag/Description/<tt/get_ostype/ is machine dependent and does not exist for
 all supported targets. If it exists, it returns a number that identifies the

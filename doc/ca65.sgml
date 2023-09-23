@@ -829,47 +829,40 @@ names like "Loop". Here is an example:
                 bne    @Loop            ; ERROR: Unknown identifier!
 </verb></tscreen>
 
+
 <sect1>Unnamed labels<p>
 
-If you really want to write messy code, there are also unnamed labels. These
-labels do not have a name (you guessed that already, didn't you?). A colon is
-used to mark the absence of the name.
+If you really want to write messy code, there are also unnamed labels. To define
+an unnamed label, use either <tt>@:</tt> (<tt>.LOCALCHAR</tt> is respected if it
+is set) or sole <tt>:</tt>.
 
-Unnamed labels may be accessed by using the colon plus several minus or plus
-characters as a label designator. Using the '-' characters will create a back
-reference (use the n'th label backwards), using '+' will create a forward
-reference (use the n'th label in forward direction). An example will help to
-understand this:
+To reference an unnamed label, use <tt>@</tt> (<tt>.LOCALCHAR</tt> is respected
+if it is set) or <tt>:</tt> with several <tt>-</tt> or <tt>+</tt> characters.
+The <tt>-</tt> characters will create a back reference (n'th label backwards),
+the <tt>+</tt> will create a forward reference (n'th label in forward direction).
+As an alternative, angle brackets <tt>&lt;</tt> and <tt>&gt;</tt> may be used
+instead of <tt>-</tt> and <tt>+</tt> with the same meaning.
+
+Example:
 
 <tscreen><verb>
-        :       lda     (ptr1),y        ; #1
-                cmp     (ptr2),y
-                bne     :+              ; -> #2
-                tax
-                beq     :+++            ; -> #4
-                iny
-                bne     :-              ; -> #1
-                inc     ptr1+1
-                inc     ptr2+1
-                bne     :-              ; -> #1
-
-        :       bcs     :+              ; #2 -> #3
-                ldx     #$FF
-                rts
-
-        :       ldx     #$01            ; #3
-        :       rts                     ; #4
+        cpy #0
+        beq @++
+    @:
+        sta $2007
+        dey
+        bne @-
+    @:
+        rts
 </verb></tscreen>
 
-As you can see from the example, unnamed labels will make even short
-sections of code hard to understand, because you have to count labels
-to find branch targets (this is the reason why I for my part do
-prefer the "cheap" local labels). Nevertheless, unnamed labels are
-convenient in some situations, so it's your decision.
+Unnamed labels may make even short sections of code hard to understand, because
+you have to count labels to find branch targets. It's better to prefer the
+"cheap" local labels. Nevertheless, unnamed labels are convenient in some
+situations, so it's up to your discretion.
 
 <em/Note:/ <ref id="scopes" name="Scopes"> organize named symbols, not
 unnamed ones, so scopes don't have an effect on unnamed labels.
-
 
 
 <sect1>Using macros to define labels and constants<p>

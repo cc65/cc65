@@ -213,8 +213,6 @@ source: jsr     $BF00
         bcs     error
 
         ; Check for cmdline handling
-        lda     $0100           ; Valid cmdline?
-        beq     jump            ; No, jump to program right away
         ldx     file_type       ; SYS file?
         bne     system          ; Yes, check for startup filename
 

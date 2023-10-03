@@ -73,86 +73,90 @@ CurChanIrqFlags:.byte   INTR_PENDING_RX_EXT_B
 
 SerFlagOrig:    .byte   $00
 
-; Tables used to translate RS232 params into register values
+; Tables used to translate cc65 RS232 params into register values
 ; (Ref page 5-18 and 5-19)
 BaudLowTable:
-        .byte   $7E                     ; SER_BAUD_300
-        .byte   $5E                     ; SER_BAUD_1200
-        .byte   $2E                     ; SER_BAUD_2400
-        .byte   $16                     ; SER_BAUD_4800
-        .byte   $0A                     ; SER_BAUD_9600
-        .byte   $04                     ; SER_BAUD_19200
-        .byte   $01                     ; SER_BAUD_38400
-        .byte   $00                     ; SER_BAUD_57600
+                .byte   $7E             ; SER_BAUD_300
+                .byte   $5E             ; SER_BAUD_1200
+                .byte   $2E             ; SER_BAUD_2400
+                .byte   $16             ; SER_BAUD_4800
+                .byte   $0A             ; SER_BAUD_9600
+                .byte   $04             ; SER_BAUD_19200
+                .byte   $01             ; SER_BAUD_38400
+                .byte   $00             ; SER_BAUD_57600
 
 BaudHighTable:
-        .byte   $01                     ; SER_BAUD_300
-        .byte   $00                     ; SER_BAUD_1200
-        .byte   $00                     ; SER_BAUD_2400
-        .byte   $00                     ; SER_BAUD_4800
-        .byte   $00                     ; SER_BAUD_9600
-        .byte   $00                     ; SER_BAUD_19200
-        .byte   $00                     ; SER_BAUD_38400
-        .byte   $00                     ; SER_BAUD_57600
+                .byte   $01             ; SER_BAUD_300
+                .byte   $00             ; SER_BAUD_1200
+                .byte   $00             ; SER_BAUD_2400
+                .byte   $00             ; SER_BAUD_4800
+                .byte   $00             ; SER_BAUD_9600
+                .byte   $00             ; SER_BAUD_19200
+                .byte   $00             ; SER_BAUD_38400
+                .byte   $00             ; SER_BAUD_57600
 
 RxBitTable:
-        .byte   %00000000               ; SER_BITS_5, in WR_RX_CTRL (WR3)
-        .byte   %10000000               ; SER_BITS_6  (Ref page 5-7)
-        .byte   %01000000               ; SER_BITS_7
-        .byte   %11000000               ; SER_BITS_8
+                .byte   %00000000       ; SER_BITS_5, in WR_RX_CTRL (WR3)
+                .byte   %10000000       ; SER_BITS_6  (Ref page 5-7)
+                .byte   %01000000       ; SER_BITS_7
+                .byte   %11000000       ; SER_BITS_8
+
 TxBitTable:
-        .byte   %00000000               ; SER_BITS_5, in WR_TX_CTRL (WR5)
-        .byte   %01000000               ; SER_BITS_6  (Ref page 5-9)
-        .byte   %00100000               ; SER_BITS_7
-        .byte   %01100000               ; SER_BITS_8
+                .byte   %00000000       ; SER_BITS_5, in WR_TX_CTRL (WR5)
+                .byte   %01000000       ; SER_BITS_6  (Ref page 5-9)
+                .byte   %00100000       ; SER_BITS_7
+                .byte   %01100000       ; SER_BITS_8
 
         .rodata
 
 BaudTable:                              ; bit7 = 1 means setting is invalid
                                         ; Otherwise refers to the index in
                                         ; Baud(Low/High)Table
-        .byte   $FF                     ; SER_BAUD_45_5
-        .byte   $FF                     ; SER_BAUD_50
-        .byte   $FF                     ; SER_BAUD_75
-        .byte   $FF                     ; SER_BAUD_110
-        .byte   $FF                     ; SER_BAUD_134_5
-        .byte   $FF                     ; SER_BAUD_150
-        .byte   $00                     ; SER_BAUD_300
-        .byte   $FF                     ; SER_BAUD_600
-        .byte   $01                     ; SER_BAUD_1200
-        .byte   $FF                     ; SER_BAUD_1800
-        .byte   $02                     ; SER_BAUD_2400
-        .byte   $FF                     ; SER_BAUD_3600
-        .byte   $03                     ; SER_BAUD_4800
-        .byte   $FF                     ; SER_BAUD_7200
-        .byte   $04                     ; SER_BAUD_9600
-        .byte   $05                     ; SER_BAUD_19200
-        .byte   $06                     ; SER_BAUD_38400
-        .byte   $07                     ; SER_BAUD_57600
-        .byte   $FF                     ; SER_BAUD_115200
-        .byte   $FF                     ; SER_BAUD_230400
+                .byte   $FF             ; SER_BAUD_45_5
+                .byte   $FF             ; SER_BAUD_50
+                .byte   $FF             ; SER_BAUD_75
+                .byte   $FF             ; SER_BAUD_110
+                .byte   $FF             ; SER_BAUD_134_5
+                .byte   $FF             ; SER_BAUD_150
+                .byte   $00             ; SER_BAUD_300
+                .byte   $FF             ; SER_BAUD_600
+                .byte   $01             ; SER_BAUD_1200
+                .byte   $FF             ; SER_BAUD_1800
+                .byte   $02             ; SER_BAUD_2400
+                .byte   $FF             ; SER_BAUD_3600
+                .byte   $03             ; SER_BAUD_4800
+                .byte   $FF             ; SER_BAUD_7200
+                .byte   $04             ; SER_BAUD_9600
+                .byte   $05             ; SER_BAUD_19200
+                .byte   $06             ; SER_BAUD_38400
+                .byte   $07             ; SER_BAUD_57600
+                .byte   $FF             ; SER_BAUD_115200
+                .byte   $FF             ; SER_BAUD_230400
 
 StopTable:
-        .byte   %00000100               ; SER_STOP_1, in WR_TX_RX_CTRL (WR4)
-        .byte   %00001100               ; SER_STOP_2  (Ref page 5-8)
+                .byte   %00000100       ; SER_STOP_1, in WR_TX_RX_CTRL (WR4)
+                .byte   %00001100       ; SER_STOP_2  (Ref page 5-8)
+
 ParityTable:
-        .byte   %00000000               ; SER_PAR_NONE, in WR_TX_RX_CTRL (WR4)
-        .byte   %00000001               ; SER_PAR_ODD   (Ref page 5-8)
-        .byte   %00000011               ; SER_PAR_EVEN
-        .byte   $FF                     ; SER_PAR_MARK
-        .byte   $FF                     ; SER_PAR_SPACE
+                .byte   %00000000       ; SER_PAR_NONE, in WR_TX_RX_CTRL (WR4)
+                .byte   %00000001       ; SER_PAR_ODD   (Ref page 5-8)
+                .byte   %00000011       ; SER_PAR_EVEN
+                .byte   $FF             ; SER_PAR_MARK
+                .byte   $FF             ; SER_PAR_SPACE
+
 IdOfsTable:
-        .byte   $00                     ; First firmware instruction
-        .byte   $05                     ; Pascal 1.0 ID byte
-        .byte   $07                     ; Pascal 1.0 ID byte
-        .byte   $0B                     ; Pascal 1.1 generic signature byte
-        .byte   $0C                     ; Device signature byte
+                .byte   $00             ; First firmware instruction
+                .byte   $05             ; Pascal 1.0 ID byte
+                .byte   $07             ; Pascal 1.0 ID byte
+                .byte   $0B             ; Pascal 1.1 generic signature byte
+                .byte   $0C             ; Device signature byte
+
 IdValTable:
-        .byte   $E2                     ; SEP instruction
-        .byte   $38                     ; Fixed
-        .byte   $18                     ; Fixed
-        .byte   $01                     ; Fixed
-        .byte   $31                     ; Serial or parallel I/O card type 1
+                .byte   $E2             ; SEP instruction
+                .byte   $38             ; Fixed
+                .byte   $18             ; Fixed
+                .byte   $01             ; Fixed
+                .byte   $31             ; Serial or parallel I/O card type 1
 
 IdTableLen      = * - IdValTable
 
@@ -345,7 +349,7 @@ NoDevice:
         lda     #SER_ERR_NO_DEVICE
 SetupErrOut:
         cli
-        ldx     #$00                    ; Return value is char
+        ldx     #$00
         stx     Slot                    ; Mark port closed
         rts
 
@@ -513,8 +517,9 @@ SER_GET:
         inc     RecvHead
         inc     RecvFreeCnt
         sta     (ptr1)
-        ldx     #$00
-        txa                             ; Return code = 0
+        lda     #SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
+        tax
         rts
 NoData:
         lda     #SER_ERR_NO_DATA
@@ -539,7 +544,7 @@ SER_PUT:
 :       ldy     SendFreeCnt             ; Do we have room to store byte?
         bne     :+
         lda     #SER_ERR_OVERFLOW
-        ldx     #$00                    ; Return value is char
+        ldx     #$00
         rts
 
 :       ldy     SendTail                ; Put byte into send buffer & send
@@ -590,7 +595,7 @@ SER_IOCTL:
         rts
 
 :       lda     #SER_ERR_INV_IOCTL
-        ldx     #$00                    ; Return value is char
+        ldx     #$00
         rts
 
 ;----------------------------------------------------------------------------

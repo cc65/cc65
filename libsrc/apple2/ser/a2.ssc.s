@@ -300,17 +300,17 @@ SER_OPEN:
 
         ; Device (hardware) not found
 NoDev:  lda     #SER_ERR_NO_DEVICE
-        ldx     #$00
+        ldx     #$00            ; Promote char return value
         rts
 
         ; Invalid parameter
 InvParm:lda     #SER_ERR_INIT_FAILED
-        ldx     #$00
+        ldx     #$00            ; Promote char return value
         rts
 
         ; Baud rate not available
 InvBaud:lda     #SER_ERR_BAUD_UNAVAIL
-        ldx     #$00
+        ldx     #$00            ; Promote char return value
         rts
 
 ;----------------------------------------------------------------------------
@@ -325,7 +325,7 @@ SER_GET:
         cmp     #$FF
         bne     :+
         lda     #SER_ERR_NO_DATA
-        ldx     #$00
+        ldx     #$00            ; Promote char return value
         rts
 
 :       ldy     Stopped         ; Check for flow stopped
@@ -373,7 +373,7 @@ SER_PUT:
         ldy     SendFreeCnt     ; Reload SendFreeCnt after TryToSend
         bne     :+
         lda     #SER_ERR_OVERFLOW
-        ldx     #$00
+        ldx     #$00            ; Promote char return value
         rts
 
 :       ldy     SendTail        ; Put byte into send buffer
@@ -421,7 +421,7 @@ SER_IOCTL:
         rts
 
 :       lda     #SER_ERR_INV_IOCTL
-        ldx     #$00
+        ldx     #$00            ; Promote char return value
         rts
 
 ;----------------------------------------------------------------------------

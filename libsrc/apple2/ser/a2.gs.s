@@ -75,8 +75,7 @@ SerFlagOrig:    .byte   $00
 
 ; Tables used to translate cc65 RS232 params into register values
 ; (Ref page 5-18 and 5-19)
-BaudLowTable:
-                .byte   $7E             ; SER_BAUD_300
+BaudLowTable:   .byte   $7E             ; SER_BAUD_300
                 .byte   $5E             ; SER_BAUD_1200
                 .byte   $2E             ; SER_BAUD_2400
                 .byte   $16             ; SER_BAUD_4800
@@ -85,8 +84,7 @@ BaudLowTable:
                 .byte   $01             ; SER_BAUD_38400
                 .byte   $00             ; SER_BAUD_57600
 
-BaudHighTable:
-                .byte   $01             ; SER_BAUD_300
+BaudHighTable:  .byte   $01             ; SER_BAUD_300
                 .byte   $00             ; SER_BAUD_1200
                 .byte   $00             ; SER_BAUD_2400
                 .byte   $00             ; SER_BAUD_4800
@@ -95,14 +93,12 @@ BaudHighTable:
                 .byte   $00             ; SER_BAUD_38400
                 .byte   $00             ; SER_BAUD_57600
 
-RxBitTable:
-                .byte   %00000000       ; SER_BITS_5, in WR_RX_CTRL (WR3)
+RxBitTable:     .byte   %00000000       ; SER_BITS_5, in WR_RX_CTRL (WR3)
                 .byte   %10000000       ; SER_BITS_6  (Ref page 5-7)
                 .byte   %01000000       ; SER_BITS_7
                 .byte   %11000000       ; SER_BITS_8
 
-TxBitTable:
-                .byte   %00000000       ; SER_BITS_5, in WR_TX_CTRL (WR5)
+TxBitTable:     .byte   %00000000       ; SER_BITS_5, in WR_TX_CTRL (WR5)
                 .byte   %01000000       ; SER_BITS_6  (Ref page 5-9)
                 .byte   %00100000       ; SER_BITS_7
                 .byte   %01100000       ; SER_BITS_8
@@ -133,26 +129,22 @@ BaudTable:                              ; bit7 = 1 means setting is invalid
                 .byte   $FF             ; SER_BAUD_115200
                 .byte   $FF             ; SER_BAUD_230400
 
-StopTable:
-                .byte   %00000100       ; SER_STOP_1, in WR_TX_RX_CTRL (WR4)
+StopTable:      .byte   %00000100       ; SER_STOP_1, in WR_TX_RX_CTRL (WR4)
                 .byte   %00001100       ; SER_STOP_2  (Ref page 5-8)
 
-ParityTable:
-                .byte   %00000000       ; SER_PAR_NONE, in WR_TX_RX_CTRL (WR4)
+ParityTable:    .byte   %00000000       ; SER_PAR_NONE, in WR_TX_RX_CTRL (WR4)
                 .byte   %00000001       ; SER_PAR_ODD   (Ref page 5-8)
                 .byte   %00000011       ; SER_PAR_EVEN
                 .byte   $FF             ; SER_PAR_MARK
                 .byte   $FF             ; SER_PAR_SPACE
 
-IdOfsTable:
-                .byte   $00             ; First firmware instruction
+IdOfsTable:     .byte   $00             ; First firmware instruction
                 .byte   $05             ; Pascal 1.0 ID byte
                 .byte   $07             ; Pascal 1.0 ID byte
                 .byte   $0B             ; Pascal 1.1 generic signature byte
                 .byte   $0C             ; Device signature byte
 
-IdValTable:
-                .byte   $E2             ; SEP instruction
+IdValTable:     .byte   $E2             ; SEP instruction
                 .byte   $38             ; Fixed
                 .byte   $18             ; Fixed
                 .byte   $01             ; Fixed
@@ -349,7 +341,7 @@ NoDevice:
         lda     #SER_ERR_NO_DEVICE
 SetupErrOut:
         cli
-        ldx     #$00
+        ldx     #$00                    ; Promote char return value
         stx     Slot                    ; Mark port closed
         rts
 
@@ -523,7 +515,7 @@ SER_GET:
         rts
 NoData:
         lda     #SER_ERR_NO_DATA
-        ldx     #$00
+        ldx     #$00                    ; Promote char return value
         rts
 
 ;----------------------------------------------------------------------------
@@ -595,7 +587,7 @@ SER_IOCTL:
         rts
 
 :       lda     #SER_ERR_INV_IOCTL
-        ldx     #$00
+        ldx     #$00                    ; Promote char return value
         rts
 
 ;----------------------------------------------------------------------------

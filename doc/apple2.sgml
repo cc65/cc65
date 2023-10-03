@@ -428,7 +428,7 @@ The names in the parentheses denote the symbols to be used for static linking of
 
   <tag><tt/a2.ssc.ser (a2_ssc_ser)/</tag>
   Driver for the Apple&nbsp;II Super Serial Card.
-  They are extension cards for the II, II+, IIe, and the Apple //c and //c+ have
+  The SSC is an extension card for the II, II+, IIe; the Apple //c and //c+ have
   the same hardware and firmware integrated.
   It supports up to 9600 baud, requires hardware flow control (RTS/CTS) and
   does interrupt driven receives. Speeds faster than 9600 baud aren't reachable

@@ -56,6 +56,7 @@
 #include "ident.h"
 #include "input.h"
 #include "litpool.h"
+#include "pragma.h"
 #include "preproc.h"
 #include "scanner.h"
 #include "standard.h"
@@ -800,36 +801,30 @@ static void NumericConst (void)
 
 
 
-void NextToken (void)
+static void GetNextInputToken (void)
 /* Get next token from input stream */
 {
     ident token;
 
     /* We have to skip white space here before shifting tokens, since the
     ** tokens and the current line info is invalid at startup and will get
-    ** initialized by reading the first time from the file. Remember if
-    ** we were at end of input and handle that later.
+    ** initialized by reading the first time from the file. Remember if we
+    ** were at end of input and handle that later.
     */
-    int GotEOF = (SkipWhite() == 0);
+    int GotEOF = (SkipWhite () == 0);
 
     /* Current token is the lookahead token */
     if (CurTok.LI) {
         ReleaseLineInfo (CurTok.LI);
     }
-    CurTok = NextTok;
 
-    /* When reading the first time from the file, the line info in NextTok,
-    ** which was copied to CurTok is invalid. Since the information from
-    ** the token is used for error messages, we must make it valid.
-    */
-    if (CurTok.LI == 0) {
-        CurTok.LI = UseLineInfo (GetCurLineInfo ());
-    }
+    /* Get the current token */
+    CurTok = NextTok;
 
     /* Remember the starting position of the next token */
     NextTok.LI = UseLineInfo (GetCurLineInfo ());
 
-    /* Now handle end of input. */
+    /* Now handle end of input */
     if (GotEOF) {
         /* End of file reached */
         NextTok.Tok = TOK_CEOF;
@@ -859,7 +854,8 @@ void NextToken (void)
 
         if (!PPParserRunning) {
             /* Check for a keyword */
-            if ((NextTok.Tok = FindKey (token)) != TOK_IDENT) {
+            NextTok.Tok = FindKey (token);
+            if (NextTok.Tok != TOK_IDENT) {
                 /* Reserved word found */
                 return;
             }
@@ -1117,7 +1113,31 @@ void NextToken (void)
             UnknownChar (CurC);
 
     }
+}
 
+
+
+void NextToken (void)
+/* Get next non-pragma token from input stream consuming any pragmas
+** encountered. Adjacent string literal tokens will be concatenated.
+*/
+{
+    /* When reading the first time from the file, the line info in NextTok,
+    ** which will be copied to CurTok is invalid. Since the information from
+    ** the token is used for error messages, we must make it valid.
+    */
+    if (NextTok.LI == 0) {
+        NextTok.LI = UseLineInfo (GetCurLineInfo ());
+    }
+
+    /* Read the next token from the file */
+    GetNextInputToken ();
+
+    /* Consume all pragmas at hand, including those nested in a _Pragma() */
+    if (CurTok.Tok == TOK_PRAGMA) {
+        /* Repeated and/or nested _Pragma()'s will be handled recursively */
+        ConsumePragma ();
+    }
 }
 
 

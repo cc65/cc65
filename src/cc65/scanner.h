@@ -299,7 +299,9 @@ void CopyPPNumber (StrBuf* Target);
 /* Copy a pp-number from the input to Target */
 
 void NextToken (void);
-/* Get next token from input stream */
+/* Get next non-pragma token from input stream consuming any pragmas
+** encountered. Adjacent string literal tokens will be concatenated.
+*/
 
 void SkipTokens (const token_t* TokenList, unsigned TokenCount);
 /* Skip tokens until we reach TOK_CEOF or a token in the given token list.

@@ -1452,7 +1452,7 @@ static void ParseTypeSpec (DeclSpec* D, typespec_t TSFlags, int* SignednessSpeci
                 NextToken ();
             } else {
                 if (CurTok.Tok != TOK_LCURLY) {
-                    Error ("Identifier expected");
+                    Error ("Identifier expected for enum tag name");
                 }
                 AnonName (Ident, "enum");
             }
@@ -1504,8 +1504,8 @@ static void ParseTypeSpec (DeclSpec* D, typespec_t TSFlags, int* SignednessSpeci
             /* FALL THROUGH */
 
         default:
-            if ((TSFlags & TS_MASK_DEFAULT_TYPE) != TS_DEFAULT_TYPE_INT) {
-                Error ("Type expected");
+            if ((TSFlags & TS_MASK_DEFAULT_TYPE) == TS_DEFAULT_TYPE_NONE) {
+                D->Flags |= DS_NO_TYPE;
                 D->Type[0].C = T_INT;
                 D->Type[1].C = T_END;
             } else {
@@ -1553,8 +1553,7 @@ static const Type* ParamTypeCvt (Type* T)
 static void ParseOldStyleParamList (FuncDesc* F)
 /* Parse an old-style (K&R) parameter list */
 {
-    /* Some fix point tokens that are used for error recovery */
-    static const token_t TokenList[] = { TOK_COMMA, TOK_RPAREN, TOK_SEMI };
+    unsigned PrevErrorCount = ErrorCount;
 
     /* Parse params */
     while (CurTok.Tok != TOK_RPAREN) {
@@ -1572,8 +1571,11 @@ static void ParseOldStyleParamList (FuncDesc* F)
             NextToken ();
 
         } else {
+            /* Some fix point tokens that are used for error recovery */
+            static const token_t TokenList[] = { TOK_COMMA, TOK_RPAREN, TOK_SEMI };
+
             /* Not a parameter name */
-            Error ("Identifier expected");
+            Error ("Identifier expected for parameter name");
 
             /* Try some smart error recovery */
             SkipTokens (TokenList, sizeof(TokenList) / sizeof(TokenList[0]));
@@ -1606,6 +1608,12 @@ static void ParseOldStyleParamList (FuncDesc* F)
         if ((Spec.StorageClass & SC_AUTO) == 0 &&
             (Spec.StorageClass & SC_REGISTER) == 0) {
             Error ("Illegal storage class");
+        }
+
+        /* Type must be specified */
+        if ((Spec.Flags & DS_NO_TYPE) != 0) {
+            Error ("Expected declaration specifiers");
+            break;
         }
 
         /* Parse a comma separated variable list */
@@ -1655,6 +1663,14 @@ static void ParseOldStyleParamList (FuncDesc* F)
         /* Variable list must be semicolon terminated */
         ConsumeSemi ();
     }
+
+    if (PrevErrorCount != ErrorCount) {
+        /* Some fix point tokens that are used for error recovery */
+        static const token_t TokenList[] = { TOK_COMMA, TOK_SEMI };
+
+        /* Try some smart error recovery */
+        SkipTokens (TokenList, sizeof(TokenList) / sizeof(TokenList[0]));
+    }
 }
 
 
@@ -1687,6 +1703,11 @@ static void ParseAnsiParamList (FuncDesc* F)
         } else {
             Error ("Illegal storage class");
             Spec.StorageClass = SC_AUTO | SC_PARAM | SC_DEF;
+        }
+
+        /* Type must be specified */
+        if ((Spec.Flags & DS_NO_TYPE) != 0) {
+            Error ("Type specifier missing");
         }
 
         /* Warn about new local type declaration */
@@ -1870,12 +1891,21 @@ static void DirectDecl (const DeclSpec* Spec, Declarator* D, declmode_t Mode)
         } else {
             if (Mode == DM_NEED_IDENT) {
                 /* Some fix point tokens that are used for error recovery */
-                static const token_t TokenList[] = { TOK_COMMA, TOK_SEMI };
+                static const token_t TokenList[] = { TOK_COMMA, TOK_SEMI, TOK_LCURLY, TOK_RCURLY };
 
                 Error ("Identifier expected");
 
                 /* Try some smart error recovery */
                 SkipTokens (TokenList, sizeof(TokenList) / sizeof(TokenList[0]));
+
+                /* Skip curly braces */
+                if (CurTok.Tok == TOK_LCURLY) {
+                    static const token_t CurlyToken[] = { TOK_RCURLY };
+                    SkipTokens (CurlyToken, sizeof(CurlyToken) / sizeof(CurlyToken[0]));
+                    NextToken ();
+                } else if (CurTok.Tok == TOK_RCURLY) {
+                    NextToken ();
+                }
             }
             D->Ident[0] = '\0';
         }

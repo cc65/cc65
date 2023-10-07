@@ -141,35 +141,14 @@ ParityTable:                    ; Table used to translate RS232 parity param
         .byte   $A0             ; SER_PAR_MARK
         .byte   $E0             ; SER_PAR_SPACE
 
-IdOfsTable:                     ; Table of bytes positions, used to check five
-                                ; specific bytes on the slot's firmware to make
-                                ; sure this is an SSC (or Apple //c comm port)
-                                ; firmware that drives an ACIA 6551 chip.
-                                ;
-                                ; The SSC firmware and the Apple //c(+) comm
-                                ; port firmware all begin with a BIT instruction.
-                                ; The IIgs, on the other hand, has a
-                                ; Zilog Z8530 chip and its firmware starts with
-                                ; a SEP instruction. We don't want to load this
-                                ; driver on the IIgs' serial port. We'll
-                                ; differentiate the firmware on this byte.
-                                ;
-                                ; The next four bytes we check are the Pascal
-                                ; Firmware Protocol Bytes that identify a
-                                ; serial card. Those are the same bytes for
-                                ; SSC firmwares, Apple //c firmwares and IIgs
-                                ; Zilog Z8530 firmwares - which is the reason
-                                ; we have to check for the firmware's first
-                                ; instruction too.
-        .byte   $00             ; First instruction
+IdOfsTable:                     ; Table of offsets to check the firmware
         .byte   $05             ; Pascal 1.0 ID byte
         .byte   $07             ; Pascal 1.0 ID byte
         .byte   $0B             ; Pascal 1.1 generic signature byte
         .byte   $0C             ; Device signature byte
 
-IdValTable:                     ; Table of expected values for the five checked
+IdValTable:                     ; Table of expected values for the four checked
                                 ; bytes
-        .byte   $2C             ; BIT
         .byte   $38             ; ID Byte 0 (from Pascal 1.0), fixed
         .byte   $18             ; ID Byte 1 (from Pascal 1.0), fixed
         .byte   $01             ; Generic signature for Pascal 1.1, fixed
@@ -220,6 +199,17 @@ SER_OPEN:
         lda     #>$C000
         ora     Slot
         sta     ptr2+1
+
+        ; Make sure we're not about to check an Apple IIgs
+        ; SCC card, which has matching Pascal Firmware
+        ; bytes but is not compatible with this driver.
+        ; We check that byte 0 of the firmware is not a SEP
+        ; instruction. All Apple 2 ROMs have a BIT instruction there,
+        ; but some clones differ, hence the NOT check.
+        ldy     #$00
+        lda     (ptr2),y
+        cmp     #$E2
+        beq     NoDev
 
 :       ldy     IdOfsTable,x    ; Check Pascal 1.1 Firmware Protocol ID bytes
         lda     IdValTable,x

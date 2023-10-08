@@ -65,6 +65,7 @@
 #include "preproc.h"
 #include "standard.h"
 #include "staticassert.h"
+#include "typecmp.h"
 #include "symtab.h"
 
 
@@ -325,17 +326,24 @@ static void Parse (void)
         if (Sym && IsTypeFunc (Sym->Type)) {
 
             /* Function */
-            if (!comma) {
-                if (CurTok.Tok == TOK_SEMI) {
-                    /* Prototype only */
-                    NextToken ();
-                } else if (CurTok.Tok == TOK_LCURLY) {
-                    /* Parse the function body */
-                    NewFunc (Sym, FuncDef);
-
-                    /* Make sure we aren't omitting any work */
-                    CheckDeferredOpAllDone ();
+            if (CurTok.Tok == TOK_SEMI) {
+                /* Prototype only */
+                NextToken ();
+            } else if (CurTok.Tok == TOK_LCURLY) {
+                /* ISO C: The type category in a function definition cannot be
+                ** inherited from a typedef.
+                */
+                if (IsTypeFunc (Spec.Type) && TypeCmp (Sym->Type, Spec.Type).C >= TC_EQUAL) {
+                    Error ("Function cannot be defined with a typedef");
+                } else if (comma) {
+                    Error ("';' expected after top level declarator");
                 }
+
+                /* Parse the function body anyways */
+                NewFunc (Sym, FuncDef);
+
+                /* Make sure we aren't omitting any work */
+                CheckDeferredOpAllDone ();
             }
 
         } else {

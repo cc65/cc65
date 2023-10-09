@@ -57,13 +57,13 @@ subs.o: subs.asm
 	$(AS) subs.asm -o subs.o
 
 kimLife.bin: kimLife.c
-	$(CL) -t kim1 -C kim1-60k.cfg -Oi -o kimLife.bin kimLife.c
+	$(CL) -t kim1 -C kim1-mtu60k.cfg -Oi -o kimLife.bin kimLife.c
 
 kimTest.bin: kimTest.c
 	$(CL) -t kim1 -C kim1-60k.cfg -Oi -o kimTest.bin kimTest.c
 
 kimGFX.bin: kimGFX.c ramfont.c subs.o
-	$(CL) -t kim1 -C kim1-60k.cfg -Oi -o kimGFX.bin kimGFX.c subs.o
+	$(CL) -t kim1 -C kim1-mtu60k.cfg -Oi -o kimGFX.bin kimGFX.c subs.o 
 
 kimSieve.bin: kimSieve.c
 	$(CL) -t kim1 -C kim1-60k.cfg -O -o kimSieve.bin kimSieve.c

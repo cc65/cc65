@@ -239,33 +239,34 @@ SER_FLAG_CH_B          = %00000111
 
         .code
 
-; Read a register
-; Input: X as channel
-; Output result in A
-.macro rra      In,Reg
-       lda      Reg
-       sta      In,x
-       lda      In,x
-.endmacro
+; Read register value to A.
+; Input:  X as channel
+;         Y as register
+; Output: A
+readSSCReg:
+      cpx       #0
+      bne       ReadAreg
+      sty       SCCBREG
+      lda       SCCBREG
+      rts
+ReadAreg:
+      sty       SCCAREG
+      lda       SCCAREG
+      rts
 
 ; Write value of A to a register.
 ; Input: X as channel
-.macro wra      Out,Reg
-       pha
-       lda      Reg
-       sta      Out,x
-       pla
-       sta      Out,x
-.endmacro
-
-; Write value passed as parameter to a register.
-; Input: X as channel
-.macro wrr      Out,Reg,Val
-       lda      Reg
-       sta      Out,x
-       lda      Val
-       sta      Out,x
-.endmacro
+;        Y as register
+writeSCCReg:
+      cpx       #0
+      bne       WriteAreg
+      sty       SCCBREG
+      sta       SCCBREG
+      rts
+WriteAreg:
+      sty       SCCAREG
+      sta       SCCAREG
+      rts
 
 ;----------------------------------------------------------------------------
 ; SER_INSTALL: Is called after the driver is loaded into memory. If possible,
@@ -291,8 +292,13 @@ SER_CLOSE:
 
         ; Deactivate interrupts
         sei
-        wrr     SCCBREG, #WR_MASTER_IRQ_RST, #MASTER_IRQ_SHUTDOWN
-        wrr     SCCBREG, #WR_TX_RX_MODE_CTRL, #TX_RX_MODE_OFF
+        ldy     #WR_MASTER_IRQ_RST
+        lda     #MASTER_IRQ_SHUTDOWN
+        jsr     writeSCCReg
+
+        ldy     #WR_TX_RX_MODE_CTRL
+        lda     #TX_RX_MODE_OFF
+        jsr     writeSCCReg
 
         ; Reset SerFlag to what it was
         lda     SerFlagOrig
@@ -303,14 +309,13 @@ SER_CLOSE:
         ; Clear external interrupts (twice)
         ldy     #WR_INIT_CTRL
         lda     #INIT_CTRL_CLEAR_EIRQ
-
-        sty     SCCBREG
-        sta     SCCBREG
-        sty     SCCBREG
-        sta     SCCBREG
+        jsr     writeSCCReg
+        jsr     writeSCCReg
 
         ; Reset MIE for firmware use
-        wrr     SCCBREG, #WR_MASTER_IRQ_RST, #MASTER_IRQ_MIE_RST
+        ldy     #WR_MASTER_IRQ_RST
+        lda     #MASTER_IRQ_MIE_RST
+        jsr     writeSCCReg
 
         ldx     #$00
         stx     Slot                    ; Mark port as closed
@@ -346,6 +351,8 @@ SetupErrOut:
         rts
 
 HardwareFound:
+        sei                             ; Disable interrupts
+
         ; Check if the handshake setting is valid
         ldy     #SER_PARAMS::HANDSHAKE  ; Handshake
         lda     (ptr1),y
@@ -370,7 +377,12 @@ SetupBufs:
 
         ldx     Channel
 
-        rra     SCCBREG,#$00            ; Hit rr0 once to sync up
+        ldy     #RR_INIT_STATUS         ; Hit rr0 once to sync up
+        jsr     readSSCReg
+
+        ldy     #WR_MISC_CTRL           ; Turn everything off
+        lda     #$00
+        jsr     writeSCCReg
 
         ldy     #SER_PARAMS::STOPBITS
         lda     (ptr1),y                ; Stop bits
@@ -388,19 +400,24 @@ SetupBufs:
 
         ora     #TX_RX_CLOCK_MUL
 
-        wra     SCCBREG,#WR_TX_RX_CTRL
+        ldy     #WR_TX_RX_CTRL          ; Setup stop & parity bits
+        jsr     writeSCCReg
 
         cpx     #$00
         bne     ClockA
 ClockB:
-        wrr     SCCBREG,#WR_CLOCK_CTRL,#CLOCK_CTRL_CH_B
+        ldy     #WR_CLOCK_CTRL
+        lda     #CLOCK_CTRL_CH_B
+        jsr     writeSCCReg
 
         lda     #INTR_PENDING_RX_EXT_B  ; Store which IRQ bits we'll check
         sta     CurChanIrqFlags
 
         bra     SetBaud
 ClockA:
-        wrr     SCCBREG,#WR_CLOCK_CTRL,#CLOCK_CTRL_CH_A
+        ldy     #WR_CLOCK_CTRL
+        lda     #CLOCK_CTRL_CH_A
+        jsr     writeSCCReg
 
         lda     #INTR_PENDING_RX_EXT_A  ; Store which IRQ bits we'll check
         sta     CurChanIrqFlags
@@ -416,50 +433,58 @@ SetBaud:
         lda     BaudLowTable,y          ; Get low byte
         bmi     InvParam                ; Branch if rate not supported
 
-        wra     SCCBREG,#WR_BAUDL_CTRL
+        phy
+        ldy     #WR_BAUDL_CTRL
+        jsr     writeSCCReg
+        ply
 
         lda     BaudHighTable,y         ; Get high byte
-        wra     SCCBREG,#WR_BAUDH_CTRL
+        ldy     #WR_BAUDH_CTRL
+        jsr     writeSCCReg
 
-        lda     #$00
-        wra     SCCBREG,#WR_MISC_CTRL
+        ldy     #WR_MISC_CTRL           ; Time to turn this thing on
+        lda     #MISC_CTRL_RATE_GEN_ON
+        jsr     writeSCCReg
 
-        ora     #MISC_CTRL_RATE_GEN_ON  ; Time to turn this thing on
-        wra     SCCBREG,#WR_MISC_CTRL
-
-        ; Final write to RX_CTRL
         ldy     #SER_PARAMS::DATABITS
         lda     (ptr1),y                ; Data bits
         tay
         lda     RxBitTable,y            ; Data bits for RX
-        ora     #RX_CTRL_ON             ; Plus turn on
-        wra     SCCBREG,#WR_RX_CTRL
+        ora     #RX_CTRL_ON             ; and turn RX on
+
+        phy
+        ldy     #WR_RX_CTRL
+        jsr     writeSCCReg
+        ply
 
         lda     TxBitTable,y            ; Data bits for TX
-        ora     #TX_CTRL_ON             ; Plus turn on
+        ora     #TX_CTRL_ON             ; and turn TX on
         and     #TX_DTR_ON
 
         sta     RtsOff                  ; Save value for flow control
 
         ora     #TX_RTS_ON
-        wra     SCCBREG,#WR_TX_CTRL
 
-        wrr     SCCBREG,#WR_IRQ_CTRL,#IRQ_CLEANUP_EIRQ
+        ldy     #WR_TX_CTRL
+        jsr     writeSCCReg
 
-        lda     #WR_INIT_CTRL           ; Clear ext status (write twice)
-        sta     SCCBREG,x
+        ldy     #WR_IRQ_CTRL
+        lda     #IRQ_CLEANUP_EIRQ
+        jsr     writeSCCReg
+
+        ldy     #WR_INIT_CTRL           ; Clear ext status (write twice)
         lda     #INIT_CTRL_CLEAR_EIRQ
-        sta     SCCBREG,x
+        jsr     writeSCCReg
+        jsr     writeSCCReg
 
-        lda     #WR_INIT_CTRL
-        sta     SCCBREG,x
-        lda     #INIT_CTRL_CLEAR_EIRQ
-        sta     SCCBREG,x
+        ldy     #WR_TX_RX_MODE_CTRL      ; Activate RX IRQ
+        lda     #TX_RX_MODE_RXIRQ
+        jsr     writeSCCReg
 
-        ; Activate RX IRQ
-        wrr     SCCBREG,#WR_TX_RX_MODE_CTRL,#TX_RX_MODE_RXIRQ
-
-        wrr     SCCBREG,#WR_MASTER_IRQ_RST,#MASTER_IRQ_SET
+        lda     SCCBREG                 ; Activate master IRQ
+        ldy     #WR_MASTER_IRQ_RST
+        lda     #MASTER_IRQ_SET
+        jsr     writeSCCReg
 
         lda     SER_FLAG                ; Get SerFlag's current value
         sta     SerFlagOrig             ; and save it
@@ -502,7 +527,9 @@ SER_GET:
 
         lda     RtsOff
         ora     #TX_RTS_ON
-        wra     SCCBREG,#WR_TX_CTRL
+
+        ldy     #WR_TX_CTRL
+        jsr     writeSCCReg
 
 :       ldy     RecvHead                ; Get byte from buffer
         lda     RecvBuf,y
@@ -597,8 +624,10 @@ SER_IOCTL:
 ; was handled, otherwise with carry clear.
 
 SER_IRQ:
-        ldx     #$00                    ; IRQ status is always in A reg
-        rra     SCCAREG,#RR_INTR_PENDING_STATUS
+        ldx     #$01                    ; IRQ status is always in A reg
+        ldy     #RR_INTR_PENDING_STATUS
+        jsr     readSSCReg
+
         and     CurChanIrqFlags         ; Is this ours?
         beq     Done
 
@@ -620,7 +649,8 @@ SER_IRQ:
 CheckSpecial:
         ; Always check IRQ special flags from Channel B (Ref page 5-24)
         ; X is still 0 there.
-        rra     SCCBREG,#RR_IRQ_STATUS
+        ldy     #RR_IRQ_STATUS
+        jsr     readSSCReg
 
         and     #IRQ_MASQ
         cmp     #IRQ_SPECIAL
@@ -628,19 +658,28 @@ CheckSpecial:
 
         ; Clear exint
         ldx     Channel
-        wrr     SCCBREG,#WR_INIT_CTRL,#INIT_CTRL_CLEAR_EIRQ
+
+        ldy     #WR_INIT_CTRL
+        lda     #INIT_CTRL_CLEAR_EIRQ
+        jsr     writeSCCReg
+
         sec
         rts
 
 Flow:   ldx     Channel                 ; Assert flow control if buffer space too low
+
+        ldy     #WR_TX_CTRL
         lda     RtsOff
-        wra     SCCBREG,#WR_TX_CTRL
+        jsr     writeSCCReg
+
         sta     Stopped
         sec                             ; Interrupt handled
 Done:   rts
 
-Special:
-        rra     SCCBREG,#RR_SPEC_COND_STATUS
+Special:ldx     Channel
+        ldy     #RR_SPEC_COND_STATUS
+        jsr     readSSCReg
+
         tax
         and     #SPEC_COND_FRAMING_ERR
         bne     BadChar
@@ -648,7 +687,10 @@ Special:
         and     #SPEC_COND_OVERRUN_ERR
         beq     BadChar
 
-        wrr     SCCBREG,#WR_INIT_CTRL,#INIT_CTRL_CLEAR_ERR
+        ldy     #WR_INIT_CTRL
+        lda     #INIT_CTRL_CLEAR_ERR
+        jsr     writeSCCReg
+
         sec
         rts
 
@@ -669,14 +711,19 @@ Again:  lda     SendFreeCnt             ; Anything to send?
         lda     Stopped                 ; Check for flow stopped
         bne     Quit                    ; Bail out if it is
 
+Wait:
         lda     SCCBREG,x               ; Check that we're ready to send
         tay
         and     #INIT_STATUS_READY
-        bne     Send
+        beq     NotReady
+
         tya
         and     #INIT_STATUS_RTS        ; Ready to send
+        bne     Send
+
+NotReady:
         bit     tmp1                    ; Keep trying if must try hard
-        bmi     Again
+        bmi     Wait
 Quit:   rts
 
 Send:   ldy     SendHead                ; Send byte

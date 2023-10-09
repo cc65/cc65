@@ -16,6 +16,17 @@ typedef unsigned char byte;
 
 extern void ClearScreen(void);      // In subs.asm
 extern void ScrollScreen(void);     // In subs.asm
+extern void DrawCircle(void);       // In subs.asm
+
+extern int  x1cord;
+extern int  y1cord;
+extern int  x2cord;
+extern int  y2cord;
+
+#pragma zpsym("x1cord")
+#pragma zpsym("x2cord")
+#pragma zpsym("y1cord")
+#pragma zpsym("y2cord")
 
 // Screen memory is placed at A000-BFFF, 320x200 pixels, mapped right to left within each horizontal byte
 
@@ -216,30 +227,12 @@ void DrawLine(int x0, int y0, int x1, int y1, byte val)
 //
 // Draw a circle without sin, cos, or floating point!
 
-void DrawCircle(int x0, int y0, int radius, byte val)
+void DrawCircleC(int x0, int y0, int radius, byte)
 {
-    int x = radius;
-    int y = 0;
-    int err = 0;
-
-    while (x >= y)
-    {
-        SETPIXEL(x0 + x, y0 + y, val);
-        SETPIXEL(x0 + y, y0 + x, val);
-        SETPIXEL(x0 - y, y0 + x, val);
-        SETPIXEL(x0 - x, y0 + y, val);
-        SETPIXEL(x0 - x, y0 - y, val);
-        SETPIXEL(x0 - y, y0 - x, val);
-        SETPIXEL(x0 + y, y0 - x, val);
-        SETPIXEL(x0 + x, y0 - y, val);
-
-        y++;
-        err += 1 + 2 * y;
-        if (2 * (err - x) + 1 > 0) {
-            x--;
-            err += 1 - 2 * x;
-        }
-    }
+   x1cord = x0;
+   y1cord = y0;
+   y2cord = radius;
+   DrawCircle();
 }
 
 // reverse_bits
@@ -308,7 +301,7 @@ int main (void)
 
    // Print the numbers from 0-9999, forcing the screen to scroll
    for (i = 5; i < 75; i+=5)
-      DrawCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, i, 1);
+      DrawCircleC(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, i, 1);
 
    printf("Done, exiting...\r\n");
    return 0;

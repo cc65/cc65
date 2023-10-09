@@ -9,12 +9,4 @@
 /cc65.zip
 /util/atari/*.exe
 /util/gamate/*.exe
-/.DS_Store
-.gitignore
-samples/kim1/.DS_Store
-samples/kim1/*.bin
-samples/kim1/*.hex
-samples/kim1/*.ptp
-samples/kim1/*.o
 
-samples/.DS_Store

@@ -25,6 +25,8 @@
         .include        "ser-kernel.inc"
         .include        "ser-error.inc"
 
+        .importzp       tmp1, tmp2
+
         .macpack        module
         .macpack        cpu
 
@@ -141,35 +143,16 @@ ParityTable:                    ; Table used to translate RS232 parity param
         .byte   $A0             ; SER_PAR_MARK
         .byte   $E0             ; SER_PAR_SPACE
 
-IdOfsTable:                     ; Table of bytes positions, used to check five
+IdOfsTable:                     ; Table of bytes positions, used to check four
                                 ; specific bytes on the slot's firmware to make
-                                ; sure this is an SSC (or Apple //c comm port)
-                                ; firmware that drives an ACIA 6551 chip.
-                                ;
-                                ; The SSC firmware and the Apple //c(+) comm
-                                ; port firmware all begin with a BIT instruction.
-                                ; The IIgs, on the other hand, has a
-                                ; Zilog Z8530 chip and its firmware starts with
-                                ; a SEP instruction. We don't want to load this
-                                ; driver on the IIgs' serial port. We'll
-                                ; differentiate the firmware on this byte.
-                                ;
-                                ; The next four bytes we check are the Pascal
-                                ; Firmware Protocol Bytes that identify a
-                                ; serial card. Those are the same bytes for
-                                ; SSC firmwares, Apple //c firmwares and IIgs
-                                ; Zilog Z8530 firmwares - which is the reason
-                                ; we have to check for the firmware's first
-                                ; instruction too.
-        .byte   $00             ; First instruction
+                                ; sure this is an SSC (or Apple //c comm port).
         .byte   $05             ; Pascal 1.0 ID byte
         .byte   $07             ; Pascal 1.0 ID byte
         .byte   $0B             ; Pascal 1.1 generic signature byte
         .byte   $0C             ; Device signature byte
 
-IdValTable:                     ; Table of expected values for the five checked
+IdValTable:                     ; Table of expected values for the four checked
                                 ; bytes
-        .byte   $2C             ; BIT
         .byte   $38             ; ID Byte 0 (from Pascal 1.0), fixed
         .byte   $18             ; ID Byte 1 (from Pascal 1.0), fixed
         .byte   $01             ; Generic signature for Pascal 1.1, fixed
@@ -211,6 +194,48 @@ SER_CLOSE:
         rts
 
 ;----------------------------------------------------------------------------
+; Internal function to test whether we're really talking with a 6551,
+; or at least it really looks like it.
+; Input: X= Index
+; Output: carry set if this is very probably a 6551, clear if not
+
+Verify6551:
+        lda     ACIA_STATUS,x   ; Save current values in what we expect to be
+        pha                     ; the ACIA status register
+        lda     ACIA_CMD,x      ; and command register. So we can restore them
+        sta     tmp1            ; if this isn't a 6551.
+
+        and     #$01
+        bne     NotAcia         ; We expect command register bit 0 to be 0
+
+        lda     tmp1
+        ora     #$01            ; Enable receiver/transmitter
+        sta     ACIA_CMD,x
+        sta     tmp2            ; Store it for comparison
+
+        lda     ACIA_CMD,x      ; Is command register what we wrote?
+        cmp     tmp2
+        bne     NotAcia
+
+        sta     ACIA_STATUS,x   ; Reset Acia (value written is not important)
+
+        lda     ACIA_CMD,x      ; Is the value back to the original value?
+        cmp     tmp1
+        bne     NotAcia
+
+        pla                     ; Clear stack of leftovers
+        clc
+        rts
+
+NotAcia:
+        lda     tmp1            ; Restore saved bytes, they're probably needed
+        sta     ACIA_CMD,x
+        pla
+        sta     ACIA_STATUS,x
+        sec
+        rts
+
+;----------------------------------------------------------------------------
 ; SER_OPEN: A pointer to a ser_params structure is passed in ptr1.
 ; Must return an SER_ERR_xx code in a/x.
 
@@ -238,6 +263,9 @@ SER_OPEN:
         adc     #Offset         ; Assume carry to be clear
 .endif
         tax
+
+        jsr     Verify6551
+        bcs     NoDev
 
         ; Check if the handshake setting is valid
         ldy     #SER_PARAMS::HANDSHAKE

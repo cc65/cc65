@@ -21,43 +21,43 @@
 SCREEN  = $A000
 
 .segment "ZEROPAGE"
-btpt:        .res 1
 
-_x1cord:      .res 2
-_x2cord:      .res 2
-_y1cord:      .res 2
-_y2cord:      .res 2
+btpt:           .res 1
 
 dest:
-dest_lo:      .res 1
-dest_hi:      .res 1
+dest_lo:        .res 1
+dest_hi:        .res 1
 
 src:
-src_lo:       .res 1
-src_hi:       .res 1
+src_lo:         .res 1
+src_hi:         .res 1
 
 adp1:
-adp1_lo:      .res 1
-adp1_hi:      .res 1
+adp1_lo:        .res 1
+adp1_hi:        .res 1
 
 adp2:
-adp2_lo:      .res 1
-adp2_hi:      .res 1
-
-.exportzp _x1cord
-.exportzp _x2cord
-.exportzp _y1cord
-.exportzp _y2cord
+adp2_lo:        .res 1
+adp2_hi:        .res 1
 
 .segment "DATA"
 
-xval:           .res 2
-yval:           .res 2 
+_x1cord:        .res 2
+_x2cord:        .res 2
+_y1cord:        .res 2
+_y2cord:        .res 2
+xval:           .res 2              ; These could move to zeropage for perf, but presume we
+yval:           .res 2              ;   we want to minimize the amount we grow zero page use
 err:            .res 2  
 temp:           .res 2
 temp2:          .res 2
 x0:             .res 2
 y0:             .res 2
+
+.export _x1cord                   ; Make sure these show up on the C side as zero page
+.export _x2cord
+.export _y1cord
+.export _y2cord
 
 .segment "CODE"
 
@@ -236,9 +236,6 @@ _ScrollScreen:
 ;-----------------------------------------------------------------------------------
 ; Implements the midpoint circle algorithm without floating point or trig functions
 ;-----------------------------------------------------------------------------------
-
-; void DrawCircle(int x0, int y0, int radius, byte val) 
-; {
 ;     int x = radius;
 ;     int y = 0;
 ;     int err = 0;
@@ -261,22 +258,22 @@ _ScrollScreen:
 ;             err += 1 - 2 * x;
 ;         }
 ;     }
-; }
-       
-_DrawCircle:    lda _x1cord                      ; x0 = _x1cord
+;-----------------------------------------------------------------------------------
+
+_DrawCircle:    lda _x1cord                     ; x0 = _x1cord
                 sta x0
                 lda _x1cord+1
                 sta x0+1
-                lda _y1cord                      ; y0 = _y1cord
+                lda _y1cord                     ; y0 = _y1cord
                 sta y0
                 lda _y1cord+1
                 sta y0+1
 
-                lda _y2cord                      ; x = radius
+                lda _y2cord                     ; x = radius
                 sta xval
                 lda _y2cord+1
                 sta xval+1
-                
+                    
                 lda #$0                         ; yval = 0;
                 sta yval
                 sta yval+1
@@ -294,8 +291,7 @@ circleloop:
 
 doneCircle:     rts
 
-doCircle:                                       
-                lda x0                          ; Draw the first of 8 symmetric quadrant copies
+doCircle:       lda x0                          ; Draw the first of 8 symmetric quadrant copies
                 clc
                 adc yval
                 sta _x1cord
@@ -310,8 +306,7 @@ doCircle:
                 sbc xval+1
                 sta _y1cord+1
                 jsr _SetPixel                    ; SETPIXEL(x0 + y, y0 - x, val);
-   
-   
+      
                 lda x0
                 sec
                 sbc yval
@@ -423,7 +418,7 @@ doCircle:
                 adc xval+1
                 sta _y1cord+1
                 jsr _SetPixel                   ; SETPIXEL(x0 - y, y0 + x, val);
-     
+
                 inc yval                        ; yval++;
                 bne :+
                 inc yval+1
@@ -454,22 +449,18 @@ doCircle:
                 sbc xval+1
                 sta temp+1
                 
-                lda temp                     ; temp will now be 2*(err-xval)+1
-                asl
-                sta temp
-                lda temp+1
-                rol
-                sta temp+1
+                asl temp                        ; temp = 2*(err-xval)+1
+                rol temp+1
                 inc temp                     
                 bne :+
                 inc temp+1
 :               
-                lda temp+1                   ; if (temp > 0) we'll dec xval
-                bmi doneLoop                   ; less than zero, so no dec
+                lda temp+1                      ; if (temp > 0) we'll dec xval
+                bmi doneLoop                    ; less than zero, so no dec
                 bne decxval                     ; if not zero, go ahead and dec
 
-                lda temp                     ; MSb is zero so now check the LSB
-                beq doneLoop                   ; both bytes are zero, so no dec
+                lda temp                        ; MSB is zero so now check the LSB
+                beq doneLoop                    ; both bytes are zero, so no dec
 
 decxval:        lda xval                        ; xval--
                 bne :+
@@ -483,7 +474,7 @@ updateerr:      lda xval                        ; temp = xval * 2
                 rol
                 sta temp+1
 
-                lda #1                          ; temp2 = 1-(xval*2)
+                lda #1                          ; temp2 == 1-temp == 1-(xval*2)
                 sec
                 sbc temp
                 sta temp2

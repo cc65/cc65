@@ -804,12 +804,12 @@ Current file: kimGFX.s
 000511r 1  A2 rr        	ldx     #>(S0006)
 000513r 1  20 rr rr     	jsr     _DrawTextAt
 000516r 1  A2 00        	ldx     #$00
-000518r 1  A9 19        	lda     #$19
+000518r 1  A9 05        	lda     #$05
 00051Ar 1  A0 00        	ldy     #$00
 00051Cr 1  20 rr rr     	jsr     staxysp
 00051Fr 1  A0 01        L0002:	ldy     #$01
 000521r 1  20 rr rr     	jsr     ldaxysp
-000524r 1  C9 5F        	cmp     #$5F
+000524r 1  C9 50        	cmp     #$50
 000526r 1  8A           	txa
 000527r 1  E9 00        	sbc     #$00
 000529r 1  50 02        	bvc     L0006
@@ -825,7 +825,7 @@ Current file: kimGFX.s
 00053Dr 1  A9 A0        	lda     #$A0
 00053Fr 1  20 rr rr     	jsr     pushax
 000542r 1  A2 00        	ldx     #$00
-000544r 1  A9 64        	lda     #$64
+000544r 1  A9 78        	lda     #$78
 000546r 1  20 rr rr     	jsr     pushax
 000549r 1  A0 05        	ldy     #$05
 00054Br 1  20 rr rr     	jsr     ldaxysp

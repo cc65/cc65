@@ -227,8 +227,8 @@ int main (void)
    // DrawScreenMoire(0,30, 319, 199);
 
    // Print the numbers from 0-9999, forcing the screen to scroll
-   for (i = 25; i < 95; i+=5)
-      DrawCircleC(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, i, 1);
+   for (i = 5; i < 80; i+=5)
+      DrawCircleC(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 20, i, 1);
 
    printf("Done, exiting...\r\n");
    return 0;

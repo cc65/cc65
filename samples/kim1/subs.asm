@@ -98,32 +98,29 @@ _GetPixelAddress:
                 ror 	adp1
                 lsr 	adp1+1
                 ror 	adp1
-                lda 	#199 		      ; transfer (199-_y1cord) to adp2
-                sec 			         ; and temporary storage
-                sbc 	_y1cord
+                lda 	_y1cord
                 sta 	adp2
                 sta 	temp
 
-                lda 	#0
-                sbc 	_y1cord+1
+                lda 	_y1cord+1
                 sta 	adp2+1
                 sta 	temp+1
-                asl 	adp2 		      ; compute 40*(199-_y1cord)
-                rol 	adp2+1 		   ;  2*(199-_y1cord)
+                asl 	adp2 		      ; compute 40*(_y1cord)
+                rol 	adp2+1 		   ;  2*(_y1cord)
                 asl 	adp2
-                rol 	adp2+1 		   ;  4*(199-_y1cord)
-                lda 	adp2 		      ;  add in temporary save of (199-_y1cord)
-                clc 			         ;  to make 5*(199-_y1cord)
+                rol 	adp2+1 		   ;  4*(_y1cord)
+                lda 	adp2 		      ;  add in temporary save of (_y1cord)
+                clc 			         ;  to make 5*(_y1cord)
                 adc 	temp
                 sta 	adp2
                 lda 	adp2+1
                 adc 	temp+1
-                sta 	adp2+1 		   ; 5*(199-_y1cord)
-                asl 	adp2 		      ; 10*(199-_y1cord)
+                sta 	adp2+1 		   ; 5*(_y1cord)
+                asl 	adp2 		      ; 10*(_y1cord)
                 rol 	adp2+1
-                asl 	adp2 		      ; 20#(199-_y1cord)
+                asl 	adp2 		      ; 20#(_y1cord)
                 rol 	adp2+1
-                asl 	adp2 		      ; 40*(199-_y1cord)
+                asl 	adp2 		      ; 40*(_y1cord)
                 rol 	adp2+1
                 lda 	adp2 		      ; add in int(_x1cord/8) computed earlier
                 clc

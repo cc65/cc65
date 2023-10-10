@@ -18,8 +18,20 @@
 .export _ClearPixel
 .export _DrawCircle
 .export _AscToPet
+.export _ReverseBits
+.export _DrawChar
 
-SCREEN  = $A000
+.import _font8x8_basic
+
+SCREEN           = $A000
+SCREEN_WIDTH     = 320
+SCREEN_HEIGHT    = 200
+CHARWIDTH        = 8
+CHARHEIGHT       = 8
+BYTESPERROW      = (SCREEN_WIDTH / 8)
+BYTESPERCHARROW  = (BYTESPERROW * 8)
+CHARSPERROW      = (SCREEN_WIDTH / CHARWIDTH)
+ROWSPERCOLUMN    = (SCREEN_HEIGHT / CHARHEIGHT)
 
 .segment "ZEROPAGE"
 
@@ -69,25 +81,25 @@ y0:             .res 2
 ;-----------------------------------------------------------------------------------
 ; x             - _x1cord (16-bit)
 ; y             - _y1cord (16-bit)   
-; adp2          - address of pixel to set (16-bit)
+; adp1          - address of pixel to set (16-bit)
 ;-----------------------------------------------------------------------------------
 
 _GetPixelAddress:          
-                lda 	_x1cord 	; compute bit address first
-                sta 	adp1 		; also transfer _x1cord to adp1
-                and 	#$07		; + which is simply the low 3 bits of x
+                lda 	_x1cord 	      ; compute bit address first
+                sta 	adp1 		      ; also transfer _x1cord to adp1
+                and 	#$07		      ; + which is simply the low 3 bits of x
                 sta 	btpt
 
-                lda 	_x1cord+1 	; finish transferring _x1cord to adp1
+                lda 	_x1cord+1 	   ; finish transferring _x1cord to adp1
                 sta 	adp1+1
-                lsr 	adp1+1 		; double shift adp1 right 3 to get
-                ror 	adp1 		; int(xcord/8 )
+                lsr 	adp1+1 		   ; double shift adp1 right 3 to get
+                ror 	adp1 		      ; int(xcord/8 )
                 lsr 	adp1+1
                 ror 	adp1
                 lsr 	adp1+1
                 ror 	adp1
-                lda 	#199 		; transfer (199-_y1cord) to adp2
-                sec 			    ; and temporary storage
+                lda 	#199 		      ; transfer (199-_y1cord) to adp2
+                sec 			         ; and temporary storage
                 sbc 	_y1cord
                 sta 	adp2
                 sta 	temp
@@ -96,32 +108,32 @@ _GetPixelAddress:
                 sbc 	_y1cord+1
                 sta 	adp2+1
                 sta 	temp+1
-                asl 	adp2 		; compute 40*(199-_y1cord)
-                rol 	adp2+1 		;  2*(199-_y1cord)
+                asl 	adp2 		      ; compute 40*(199-_y1cord)
+                rol 	adp2+1 		   ;  2*(199-_y1cord)
                 asl 	adp2
-                rol 	adp2+1 		;  4*(199-_y1cord)
-                lda 	adp2 		;  add in temporary save of (199-_y1cord)
-                clc 			    ;  to make 5*(199-_y1cord)
+                rol 	adp2+1 		   ;  4*(199-_y1cord)
+                lda 	adp2 		      ;  add in temporary save of (199-_y1cord)
+                clc 			         ;  to make 5*(199-_y1cord)
                 adc 	temp
                 sta 	adp2
                 lda 	adp2+1
                 adc 	temp+1
-                sta 	adp2+1 		; 5*(199-_y1cord)
-                asl 	adp2 		; 10*(199-_y1cord)
+                sta 	adp2+1 		   ; 5*(199-_y1cord)
+                asl 	adp2 		      ; 10*(199-_y1cord)
                 rol 	adp2+1
-                asl 	adp2 		; 20#(199-_y1cord)
+                asl 	adp2 		      ; 20#(199-_y1cord)
                 rol 	adp2+1
-                asl 	adp2 		; 40*(199-_y1cord)
+                asl 	adp2 		      ; 40*(199-_y1cord)
                 rol 	adp2+1
-                lda 	adp2 		; add in int(_x1cord/8) computed earlier
+                lda 	adp2 		      ; add in int(_x1cord/8) computed earlier
                 clc
                 adc 	adp1
                 sta 	adp1
                 lda 	adp2+1
                 adc 	adp1+1
-                adc 	#>SCREEN    ; add in base vidscreen address
-                sta 	adp1+1 		; final result
-                rts 			    ; return
+                adc 	#>SCREEN       ; add in base vidscreen address
+                sta 	adp1+1 		   ; final result
+                rts 			         ; return
 
 ;-----------------------------------------------------------------------------------
 ; Mask tables for individual pixel subroutines
@@ -493,6 +505,10 @@ updateerr:      lda xval                        ; temp = xval * 2
                 
 doneLoop:       jmp circleloop
 
+;-----------------------------------------------------------------------------------
+; Character set translation tables
+;-----------------------------------------------------------------------------------
+
 ascToPetTable:  .byte $00,$01,$02,$03,$04,$05,$06,$07,$14,$20,$0d,$11,$93,$0a,$0e,$0f
                 .byte $10,$0b,$12,$13,$08,$15,$16,$17,$18,$19,$1a,$1b,$1c,$1d,$1e,$1f
                 .byte $20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$2a,$2b,$2c,$2d,$2e,$2f
@@ -539,3 +555,115 @@ ascToPetTable:  .byte $00,$01,$02,$03,$04,$05,$06,$07,$14,$20,$0d,$11,$93,$0a,$0
 _AscToPet:      tay
                 lda ascToPetTable, y
                 rts             
+
+;-----------------------------------------------------------------------------------
+; ReverseBits   - Reverse the bits in a byte
+;-----------------------------------------------------------------------------------
+; A = octet to be reversed
+;-----------------------------------------------------------------------------------
+
+_ReverseBits:
+                ldx #8           ; set counter to 8 (for 8 bits)
+                lda #0           ; initialize A to 0
+                sta temp         ; clear result byte (accumulator for the reversed octet)
+:               asl              ; shift leftmost bit of input into carry
+                lda temp         ; load the temporary result byte into A
+                ror              ; rotate carry into leftmost bit of result
+                sta temp         ; store the updated result back into memory
+                dex              ; decrement counter
+                bne :-           ; repeat until all bits are processed
+                lda temp         ; load the final reversed byte into A
+                rts              ; return with result in A
+
+;-----------------------------------------------------------------------------------
+; LoadFont      - Makes sure the font data is ready to use.  This usually requires
+;                 reversing the bits so that they match the bit order of the screen
+;-----------------------------------------------------------------------------------
+
+_LoadFont:      ldx #3
+                lda #<_font8x8_basic
+                sta adp1_lo
+                lda #>_font8x8_basic
+                sta adp1_hi
+                ldy #0
+@loop:          lda (adp1), y
+                jsr _ReverseBits
+                sta (adp1), y
+                iny
+                bne @loop
+
+                inc adp1_lo
+                bne :+
+                inc adp1_hi
+:               dex
+                bne @loop
+                rts
+
+ScreenLineAddresses:
+                .word SCREEN +  0 * BYTESPERCHARROW, SCREEN +  1 * BYTESPERCHARROW
+                .word SCREEN +  2 * BYTESPERCHARROW, SCREEN +  3 * BYTESPERCHARROW
+                .word SCREEN +  4 * BYTESPERCHARROW, SCREEN +  5 * BYTESPERCHARROW
+                .word SCREEN +  6 * BYTESPERCHARROW, SCREEN +  7 * BYTESPERCHARROW
+                .word SCREEN +  8 * BYTESPERCHARROW, SCREEN +  9 * BYTESPERCHARROW
+                .word SCREEN + 10 * BYTESPERCHARROW, SCREEN + 11 * BYTESPERCHARROW
+                .word SCREEN + 12 * BYTESPERCHARROW, SCREEN + 13 * BYTESPERCHARROW
+                .word SCREEN + 14 * BYTESPERCHARROW, SCREEN + 15 * BYTESPERCHARROW
+                .word SCREEN + 16 * BYTESPERCHARROW, SCREEN + 17 * BYTESPERCHARROW
+                .word SCREEN + 18 * BYTESPERCHARROW, SCREEN + 19 * BYTESPERCHARROW
+                .word SCREEN + 20 * BYTESPERCHARROW, SCREEN + 21 * BYTESPERCHARROW
+                .word SCREEN + 22 * BYTESPERCHARROW, SCREEN + 23 * BYTESPERCHARROW
+                .word SCREEN + 24 * BYTESPERCHARROW
+                .assert( (* - ScreenLineAddresses) = ROWSPERCOLUMN * 2), error
+
+;-----------------------------------------------------------------------------------
+; DrawChar     - Draws an ASCII character at char location x, y
+;-----------------------------------------------------------------------------------
+; 0 <= x < 40
+; 0 <= y < 25
+;-----------------------------------------------------------------------------------
+
+_DrawChar:     pha
+               tya                                 ; Get the address in screen memory where this
+               asl                                 ;  character X/Y cursor pos should be drawn
+               tay
+               txa
+               clc
+               adc ScreenLineAddresses, y
+               sta adp1_lo
+               lda ScreenLineAddresses+1, y
+               adc #0
+               sta adp1_hi
+               
+               lda #0                              ; Get the address in font memory where this
+               sta adp2_hi                         ;  Petscii chracter lives (after conversion from
+               pla                                 ;  ascii)
+               jsr _AscToPet
+               asl 
+               rol adp2_hi
+               asl 
+               rol adp2_hi
+               asl 
+               rol adp2_hi
+               clc
+               adc #<_font8x8_basic                ; Add the base address of the font table to the offset
+               sta adp2_lo
+               lda adp2_hi
+               adc #>_font8x8_basic
+               sta adp2_hi
+
+               ldy #0                              ; opy the character def to the screen, one byte at a time
+               ldx #0
+:              lda (adp2), y                       ; Copy this byte from the character def to the screen target
+               sta (adp1, x)
+               lda adp1_lo                         ; Advance to the next "scanline", or pixel row, down
+               clc
+               adc #<BYTESPERROW               
+               sta adp1_lo
+               lda adp1_hi
+               adc #>BYTESPERROW
+               sta adp1_hi
+
+               iny
+               cpy #8
+               bne :-
+               rts

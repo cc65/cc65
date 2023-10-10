@@ -66,7 +66,7 @@ kimTest.bin: kimTest.c
 	$(CL) -t kim1 -C kim1-60k.cfg -Oi -o kimTest.bin kimTest.c
 
 kimGFX.bin: kimGFX.c subs.o ramfont.o
-	$(CL) -t kim1 -C kim1-60k.cfg -Oi -o kimGFX.bin kimGFX.c subs.o ramfont.o
+	$(CL) -t kim1 --listing kimGFX.lst -C kim1-60k.cfg -o kimGFX.bin kimGFX.c subs.o ramfont.o
 
 kimSieve.bin: kimSieve.c
 	$(CL) -t kim1 -C kim1-60k.cfg -O -o kimSieve.bin kimSieve.c

@@ -19,7 +19,9 @@ extern void ScrollScreen(void);
 extern void DrawCircle(void);       
 extern void SetPixel(void);
 extern void ClearPixel(void);
+extern void DrawChar(void);
 extern byte __fastcall__ AscToPet(byte in);
+extern byte __fastcall__ ReverseBits(byte in);
 extern unsigned char font8x8_basic[256][8];
 
 extern int  x1cord;
@@ -84,31 +86,7 @@ void DRAWPIXEL(int x, int y)
    SetPixel();
 }
 
-// DrawChar
-//
-// 0 <= x < 40
-// 0 <= y < 25
-//
-// Draws an ASCII character at char location x, y
-
-void DrawChar(int x, int y, char petscii)
-{
-   byte * pb = screen;
-   int i;
-   char c = AscToPet(petscii);
-
-   if (x < 0 || y < 0 || x >= CHARSPERROW || y >= ROWSPERCOLUMN)
-      return;
-
-   pb += y * BYTESPERCHARROW;
-   pb += x;
-
-   for (i = 0; i < 8; i++)
-   {
-      *pb =  font8x8_basic[c][i];
-       pb += BYTESPERROW;
-   }
-}
+int c;
 
 void DrawText(char * psz)
 {
@@ -138,7 +116,14 @@ void DrawText(char * psz)
       }
       else
       {
-         DrawChar(CursorX++, CursorY, *psz++);
+         c = *psz;
+     
+         __asm__ ("ldx %v", CursorX);
+         __asm__ ("ldy %v", CursorY);
+         __asm__ ("lda %v", c);
+         DrawChar();
+         CursorX++;
+         psz++;
       }
    }
 }
@@ -192,22 +177,6 @@ void DrawCircleC(int x0, int y0, int radius, byte)
    DrawCircle();
 }
 
-// reverse_bits
-//
-// Reverse the bits in a byte
-
-unsigned char reverse_bits(unsigned char octet)
-{
-   return  (((octet >> 0) & 1) << 7) | \
-            (((octet >> 1) & 1) << 6) | \
-            (((octet >> 2) & 1) << 5) | \
-            (((octet >> 3) & 1) << 4) | \
-            (((octet >> 4) & 1) << 3) | \
-            (((octet >> 5) & 1) << 2) | \
-            (((octet >> 6) & 1) << 1) | \
-            (((octet >> 7) & 1) << 0);
-}
-
 // MirrorFont
 //
 // RAM font is backwards left-right relative to the way memory is laid out on the KIM-1, so we swap all the
@@ -219,7 +188,7 @@ void MirrorFont()
    byte * pb = (byte *) font8x8_basic;
 
    for (c = 0; c < 128 * 8; c++)
-      pb[c] = reverse_bits(pb[c]);
+      pb[c] = ReverseBits(pb[c]);
 }
 
 // DrawScreenMoire
@@ -243,32 +212,6 @@ void DrawScreenMoire(int left, int top, int right, int bottom)
 
 }
 
-void OldDrawCircleC(int x0, int y0, int radius, byte val) 
-{
-    int x = radius;
-    int y = 0;
-    int err = 0;
-
-    while (x >= y) 
-    {
-        SETPIXEL(x0 + x, y0 + y, val);
-        SETPIXEL(x0 + y, y0 + x, val);
-        SETPIXEL(x0 - y, y0 + x, val);
-        SETPIXEL(x0 - x, y0 + y, val);
-        SETPIXEL(x0 - x, y0 - y, val);
-        SETPIXEL(x0 - y, y0 - x, val);
-        SETPIXEL(x0 + y, y0 - x, val);
-        SETPIXEL(x0 + x, y0 - y, val);
-
-        y++;
-        err += 1 + 2 * y;
-        if (2 * (err - x) + 1 > 0) {
-            x--;
-            err += 1 - 2 * x;
-        }
-    }
-}
-
 int main (void)
 {
    int i;
@@ -284,7 +227,7 @@ int main (void)
    // DrawScreenMoire(0,30, 319, 199);
 
    // Print the numbers from 0-9999, forcing the screen to scroll
-   for (i = 5; i < 75; i+=5)
+   for (i = 25; i < 95; i+=5)
       DrawCircleC(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, i, 1);
 
    printf("Done, exiting...\r\n");

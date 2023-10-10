@@ -602,9 +602,9 @@ SER_IOCTL:
 ; was handled, otherwise with carry clear.
 
 SER_IRQ:
-        ldx     #$01                    ; IRQ status is always in A reg
-        ldy     #RR_INTR_PENDING_STATUS
-        jsr     readSSCReg
+        ldy     #RR_INTR_PENDING_STATUS ; IRQ status is always in A reg
+        sty     SCCAREG
+        lda     SCCAREG
 
         and     CurChanIrqFlags         ; Is this ours?
         beq     Done
@@ -626,9 +626,9 @@ SER_IRQ:
 
 CheckSpecial:
         ; Always check IRQ special flags from Channel B (Ref page 5-24)
-        ; X is still 0 there.
         ldy     #RR_IRQ_STATUS
-        jsr     readSSCReg
+        sty     SCCBREG
+        lda     SCCBREG
 
         and     #IRQ_MASQ
         cmp     #IRQ_SPECIAL
@@ -636,7 +636,6 @@ CheckSpecial:
 
         ; Clear exint
         ldx     Channel
-
         ldy     #WR_INIT_CTRL
         lda     #INIT_CTRL_CLEAR_EIRQ
         jsr     writeSCCReg
@@ -645,7 +644,6 @@ CheckSpecial:
         rts
 
 Flow:   ldx     Channel                 ; Assert flow control if buffer space too low
-
         ldy     #WR_TX_CTRL
         lda     RtsOff
         jsr     writeSCCReg

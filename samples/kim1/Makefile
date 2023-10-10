@@ -1,4 +1,4 @@
-
+	
 # Run 'make SYS=<target>'; or, set a SYS env.
 # var. to build for another target system.
 SYS ?= kim1
@@ -56,27 +56,23 @@ endif
 subs.o: subs.asm
 	$(AS) subs.asm -o subs.o
 
+ramfont.o: ramfont.asm
+	$(AS) ramfont.asm -o ramfont.o
+
 kimLife.bin: kimLife.c
-	$(CL) -t kim1 -C kim1-mtu60k.cfg -Oi -o kimLife.bin kimLife.c
+	$(CL) -t kim1 -C kim1-60k.cfg -Oi -o kimLife.bin kimLife.c
 
 kimTest.bin: kimTest.c
 	$(CL) -t kim1 -C kim1-60k.cfg -Oi -o kimTest.bin kimTest.c
 
-kimGFX.bin: kimGFX.c ramfont.c subs.o
-	$(CL) -t kim1 -C kim1-mtu60k.cfg -Oi -o kimGFX.bin kimGFX.c subs.o 
+kimGFX.bin: kimGFX.c subs.o ramfont.o
+	$(CL) -t kim1 -C kim1-60k.cfg -Oi -o kimGFX.bin kimGFX.c subs.o ramfont.o
 
 kimSieve.bin: kimSieve.c
 	$(CL) -t kim1 -C kim1-60k.cfg -O -o kimSieve.bin kimSieve.c
 
 kimHello.bin: kimHello.c
 	$(CL) -t kim1 -O -o kimHello.bin kimHello.c
-
-# Convert a C64/PET ROM font binary into a C table we can use for looking up character definitions
-
-ramfont.c: font.rom
-	cat font.rom | python -c "import sys; print('unsigned char font8x8_basic[256][8] = {'); \
- 		                  [print('    {' + ', '.join([f'0x{byte:02x}' for byte in row]) + f'}}, // PETSCII code {i}') for i, row in \
-				   enumerate(iter(lambda: sys.stdin.buffer.read(8), b''), 0)]; print('};')" > ramfont.c
 
 # To build an intel-format file for the CORSHAM SD card reader
 

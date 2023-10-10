@@ -67,7 +67,7 @@ SendBuf:        .res    256             ; Send buffers: 256 bytes
 
         .data
 
-Slot:           .byte   $00             ; 2 when opened
+Opened:         .byte   $00             ; 1 when opened
 Channel:        .byte   $00             ; Channel B by default
 CurChanIrqFlags:.byte   INTR_PENDING_RX_EXT_B
 
@@ -138,24 +138,8 @@ ParityTable:    .byte   %00000000       ; SER_PAR_NONE, in WR_TX_RX_CTRL (WR4)
                 .byte   $FF             ; SER_PAR_MARK
                 .byte   $FF             ; SER_PAR_SPACE
 
-IdOfsTable:     .byte   $00             ; First firmware instruction
-                .byte   $05             ; Pascal 1.0 ID byte
-                .byte   $07             ; Pascal 1.0 ID byte
-                .byte   $0B             ; Pascal 1.1 generic signature byte
-                .byte   $0C             ; Device signature byte
-
-IdValTable:     .byte   $E2             ; SEP instruction
-                .byte   $38             ; Fixed
-                .byte   $18             ; Fixed
-                .byte   $01             ; Fixed
-                .byte   $31             ; Serial or parallel I/O card type 1
-
-IdTableLen      = * - IdValTable
-
 ; ------------------------------------------------------------------------
 ; Addresses
-
-ZILOG_BASE := $C200
 
 SCCAREG    := $C039
 SCCBREG    := $C038
@@ -286,7 +270,7 @@ WriteAreg:
 SER_INSTALL:
 SER_UNINSTALL:
 SER_CLOSE:
-        ldx     Slot                    ; Check for open port
+        ldx     Opened                  ; Check for open port
         beq     :+
         ldx     Channel
 
@@ -318,7 +302,7 @@ SER_CLOSE:
         jsr     writeSCCReg
 
         ldx     #$00
-        stx     Slot                    ; Mark port as closed
+        stx     Opened                  ; Mark port as closed
 
         cli
 :       txa
@@ -329,28 +313,22 @@ SER_CLOSE:
 ; Must return an SER_ERR_xx code in a/x.
 
 SER_OPEN:
-        ; Check Pascal 1.1 Firmware Protocol ID bytes
-        ldx     #$00
-Check:  ldy     IdOfsTable,x
-        lda     IdValTable,x
-        cmp     ZILOG_BASE,y
-        bne     NoDevice
-        inx
-        cpx     #IdTableLen
-        bcc     Check
-
-        beq     HardwareFound
+        bit     $C082                   ; Check if this is a IIgs
+        lda     $FE1F                   ; https://prodos8.com/docs/technote/misc/07/
+        cmp     #$60                    ; Everything but the IIgs has an RTS there
+        bne     HardwareFound
 
         ; Device (hardware) not found
-NoDevice:
+        bit     $C080
         lda     #SER_ERR_NO_DEVICE
 SetupErrOut:
         cli
         ldx     #$00                    ; Promote char return value
-        stx     Slot                    ; Mark port closed
+        stx     Opened                  ; Mark port closed
         rts
 
 HardwareFound:
+        bit     $C080
         sei                             ; Disable interrupts
 
         ; Check if the handshake setting is valid
@@ -499,8 +477,8 @@ IntA:
 StoreFlag:
         sta     SER_FLAG
 
-        ldy     #$02                    ; Mark port opened
-        sty     Slot
+        ldy     #$01                    ; Mark port opened
+        sty     Opened
         cli
         lda     #SER_ERR_OK
         .assert SER_ERR_OK = 0, error

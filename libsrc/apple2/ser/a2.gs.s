@@ -314,20 +314,19 @@ SER_CLOSE:
 
 SER_OPEN:
         bit     $C082                   ; Check if this is a IIgs
-        lda     $FE1F                   ; https://prodos8.com/docs/technote/misc/07/
-        cmp     #$60                    ; Everything but the IIgs has an RTS there
-        bne     HardwareFound
+        sec
+        jsr     $FE1F                   ; https://prodos8.com/docs/technote/misc/07/
+        bcc     IIgs
 
-        ; Device (hardware) not found
         bit     $C080
-        lda     #SER_ERR_NO_DEVICE
+        lda     #SER_ERR_NO_DEVICE      ; Not a IIgs
 SetupErrOut:
         cli
         ldx     #$00                    ; Promote char return value
         stx     Opened                  ; Mark port closed
         rts
 
-HardwareFound:
+IIgs:
         bit     $C080
         sei                             ; Disable interrupts
 

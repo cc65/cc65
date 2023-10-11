@@ -112,14 +112,15 @@ Current file: kimGFX.s
 000000r 1               	.import		_SetPixel
 000000r 1               	.import		_ClearPixel
 000000r 1               	.import		_DrawChar
+000000r 1               	.import		_Demo
 000000r 1               	.import		_ReverseBits
 000000r 1               	.import		_font8x8_basic
 000000r 1               	.import		_x1cord
 000000r 1               	.import		_y1cord
 000000r 1               	.import		_y2cord
+000000r 1               	.import		_cursorX
+000000r 1               	.import		_cursorY
 000000r 1               	.export		_screen
-000000r 1               	.export		_CursorX
-000000r 1               	.export		_CursorY
 000000r 1               	.export		_SETPIXEL
 000000r 1               	.export		_DRAWPIXEL
 000000r 1               	.export		_c
@@ -135,41 +136,16 @@ Current file: kimGFX.s
 000000r 1               
 000000r 1               _screen:
 000000r 1  00 A0        	.word	$A000
-000002r 1               _CursorX:
-000002r 1  00 00        	.word	$0000
-000004r 1               _CursorY:
-000004r 1  00 00        	.word	$0000
-000006r 1               
-000006r 1               .segment	"RODATA"
+000002r 1               
+000002r 1               .segment	"RODATA"
 000000r 1               
-000000r 1               S0005:
-000000r 1  20 20 20 36  	.byte	$20,$20,$20,$36,$30,$4B,$20,$52,$41,$4D,$20,$53,$59,$53,$54,$45
-000004r 1  30 4B 20 52  
-000008r 1  41 4D 20 53  
-000010r 1  4D 2E 20 20  	.byte	$4D,$2E,$20,$20,$34,$39,$31,$35,$32,$20,$42,$59,$54,$45,$53,$20
-000014r 1  34 39 31 35  
-000018r 1  32 20 42 59  
-000020r 1  46 52 45 45  	.byte	$46,$52,$45,$45,$2E,$00
-000024r 1  2E 00        
-000026r 1               S0004:
-000026r 1  20 20 2A 2A  	.byte	$20,$20,$2A,$2A,$2A,$20,$43,$4F,$4D,$4D,$4F,$44,$4F,$52,$45,$20
-00002Ar 1  2A 20 43 4F  
-00002Er 1  4D 4D 4F 44  
-000036r 1  4B 49 4D 2D  	.byte	$4B,$49,$4D,$2D,$31,$20,$53,$48,$45,$4C,$4C,$20,$76,$31,$2E,$31
-00003Ar 1  31 20 53 48  
-00003Er 1  45 4C 4C 20  
-000046r 1  20 2A 2A 2A  	.byte	$20,$2A,$2A,$2A,$00
-00004Ar 1  00           
-00004Br 1               S0007:
-00004Br 1  44 6F 6E 65  	.byte	$44,$6F,$6E,$65,$2C,$20,$65,$78,$69,$74,$69,$6E,$67,$2E,$2E,$2E
-00004Fr 1  2C 20 65 78  
-000053r 1  69 74 69 6E  
-00005Br 1  0D 0A 00     	.byte	$0D,$0A,$00
-00005Er 1               S0006:
-00005Er 1  52 45 41 44  	.byte	$52,$45,$41,$44,$59,$2E,$0A,$00
-000062r 1  59 2E 0A 00  
-000066r 1               
-000066r 1               .segment	"BSS"
+000000r 1               S0004:
+000000r 1  44 6F 6E 65  	.byte	$44,$6F,$6E,$65,$2C,$20,$65,$78,$69,$74,$69,$6E,$67,$2E,$2E,$2E
+000004r 1  2C 20 65 78  
+000008r 1  69 74 69 6E  
+000010r 1  0D 0A 00     	.byte	$0D,$0A,$00
+000013r 1               
+000013r 1               .segment	"BSS"
 000000r 1               
 000000r 1               _c:
 000000r 1  00 00        	.res	2,$00
@@ -243,20 +219,20 @@ Current file: kimGFX.s
 00004Fr 1  20 rr rr     	jsr     pushax
 000052r 1  4C rr rr     	jmp     L000F
 000055r 1  4C rr rr     L0002:	jmp     L0007
-000058r 1  AD rr rr     L0005:	lda     _CursorX
+000058r 1  AD rr rr     L0005:	lda     _cursorX
 00005Br 1  38           	sec
 00005Cr 1  E9 28        	sbc     #$28
-00005Er 1  8D rr rr     	sta     _CursorX
+00005Er 1  8D rr rr     	sta     _cursorX
 000061r 1  B0 03        	bcs     L0009
-000063r 1  CE rr rr     	dec     _CursorX+1
-000066r 1  AE rr rr     L0009:	ldx     _CursorX+1
-000069r 1  EE rr rr     	inc     _CursorY
+000063r 1  CE rr rr     	dec     _cursorX+1
+000066r 1  AE rr rr     L0009:	ldx     _cursorX+1
+000069r 1  EE rr rr     	inc     _cursorY
 00006Cr 1  D0 03        	bne     L000A
-00006Er 1  EE rr rr     	inc     _CursorY+1
-000071r 1  AD rr rr     L000A:	lda     _CursorY
-000074r 1  AE rr rr     	ldx     _CursorY+1
-000077r 1  AD rr rr     L0007:	lda     _CursorX
-00007Ar 1  AE rr rr     	ldx     _CursorX+1
+00006Er 1  EE rr rr     	inc     _cursorY+1
+000071r 1  AD rr rr     L000A:	lda     _cursorY
+000074r 1  AE rr rr     	ldx     _cursorY+1
+000077r 1  AD rr rr     L0007:	lda     _cursorX
+00007Ar 1  AE rr rr     	ldx     _cursorX+1
 00007Dr 1  C9 28        	cmp     #$28
 00007Fr 1  8A           	txa
 000080r 1  E9 00        	sbc     #$00
@@ -267,8 +243,8 @@ Current file: kimGFX.s
 000089r 1  A2 00        	ldx     #$00
 00008Br 1  2A           	rol     a
 00008Cr 1  D0 CA        	jne     L0005
-00008Er 1  AD rr rr     	lda     _CursorY
-000091r 1  AE rr rr     	ldx     _CursorY+1
+00008Er 1  AD rr rr     	lda     _cursorY
+000091r 1  AE rr rr     	ldx     _cursorY+1
 000094r 1  C9 19        	cmp     #$19
 000096r 1  8A           	txa
 000097r 1  E9 00        	sbc     #$00
@@ -282,8 +258,8 @@ Current file: kimGFX.s
 0000A7r 1  rr           
 0000A8r 1  A2 00        	ldx     #$00
 0000AAr 1  A9 18        	lda     #$18
-0000ACr 1  8D rr rr     	sta     _CursorY
-0000AFr 1  8E rr rr     	stx     _CursorY+1
+0000ACr 1  8D rr rr     	sta     _cursorY
+0000AFr 1  8E rr rr     	stx     _cursorY+1
 0000B2r 1  20 rr rr     	jsr     _ScrollScreen
 0000B5r 1  A0 01        L000B:	ldy     #$01
 0000B7r 1  20 rr rr     	jsr     ldaxysp
@@ -295,11 +271,11 @@ Current file: kimGFX.s
 0000C8r 1  rr           
 0000C9r 1  A2 00        	ldx     #$00
 0000CBr 1  A9 00        	lda     #$00
-0000CDr 1  8D rr rr     	sta     _CursorX
-0000D0r 1  8E rr rr     	stx     _CursorX+1
-0000D3r 1  EE rr rr     	inc     _CursorY
+0000CDr 1  8D rr rr     	sta     _cursorX
+0000D0r 1  8E rr rr     	stx     _cursorX+1
+0000D3r 1  EE rr rr     	inc     _cursorY
 0000D6r 1  D0 03        	bne     L000E
-0000D8r 1  EE rr rr     	inc     _CursorY+1
+0000D8r 1  EE rr rr     	inc     _cursorY+1
 0000DBr 1  A0 00        L000E:	ldy     #$00
 0000DDr 1  A2 00        	ldx     #$00
 0000DFr 1  A9 01        	lda     #$01
@@ -311,13 +287,13 @@ Current file: kimGFX.s
 0000EEr 1  20 rr rr     	jsr     ldauidx
 0000F1r 1  8D rr rr     	sta     _c
 0000F4r 1  8E rr rr     	stx     _c+1
-0000F7r 1  AE rr rr     	ldx     _CursorX
-0000FAr 1  AC rr rr     	ldy     _CursorY
+0000F7r 1  AE rr rr     	ldx     _cursorX
+0000FAr 1  AC rr rr     	ldy     _cursorY
 0000FDr 1  AD rr rr     	lda     _c
 000100r 1  20 rr rr     	jsr     _DrawChar
-000103r 1  EE rr rr     	inc     _CursorX
+000103r 1  EE rr rr     	inc     _cursorX
 000106r 1  D0 03        	bne     L0010
-000108r 1  EE rr rr     	inc     _CursorX+1
+000108r 1  EE rr rr     	inc     _cursorX+1
 00010Br 1  A0 00        L0010:	ldy     #$00
 00010Dr 1  A2 00        	ldx     #$00
 00010Fr 1  A9 01        	lda     #$01
@@ -346,12 +322,12 @@ Current file: kimGFX.s
 000127r 1  20 rr rr     	jsr     pushax
 00012Ar 1  A0 05        	ldy     #$05
 00012Cr 1  20 rr rr     	jsr     ldaxysp
-00012Fr 1  8D rr rr     	sta     _CursorX
-000132r 1  8E rr rr     	stx     _CursorX+1
+00012Fr 1  8D rr rr     	sta     _cursorX
+000132r 1  8E rr rr     	stx     _cursorX+1
 000135r 1  A0 03        	ldy     #$03
 000137r 1  20 rr rr     	jsr     ldaxysp
-00013Ar 1  8D rr rr     	sta     _CursorY
-00013Dr 1  8E rr rr     	stx     _CursorY+1
+00013Ar 1  8D rr rr     	sta     _cursorY
+00013Dr 1  8E rr rr     	stx     _cursorY+1
 000140r 1  A0 01        	ldy     #$01
 000142r 1  20 rr rr     	jsr     ldaxysp
 000145r 1  20 rr rr     	jsr     _DrawText
@@ -776,79 +752,53 @@ Current file: kimGFX.s
 0004D1r 1               
 0004D1r 1  20 rr rr     	jsr     decsp2
 0004D4r 1  20 rr rr     	jsr     _ClearScreen
-0004D7r 1  A2 00        	ldx     #$00
-0004D9r 1  A9 00        	lda     #$00
-0004DBr 1  20 rr rr     	jsr     pushax
-0004DEr 1  A2 00        	ldx     #$00
-0004E0r 1  A9 00        	lda     #$00
-0004E2r 1  20 rr rr     	jsr     pushax
-0004E5r 1  A9 rr        	lda     #<(S0004)
-0004E7r 1  A2 rr        	ldx     #>(S0004)
-0004E9r 1  20 rr rr     	jsr     _DrawTextAt
-0004ECr 1  A2 00        	ldx     #$00
-0004EEr 1  A9 00        	lda     #$00
-0004F0r 1  20 rr rr     	jsr     pushax
-0004F3r 1  A2 00        	ldx     #$00
-0004F5r 1  A9 02        	lda     #$02
-0004F7r 1  20 rr rr     	jsr     pushax
-0004FAr 1  A9 rr        	lda     #<(S0005)
-0004FCr 1  A2 rr        	ldx     #>(S0005)
-0004FEr 1  20 rr rr     	jsr     _DrawTextAt
-000501r 1  A2 00        	ldx     #$00
-000503r 1  A9 00        	lda     #$00
-000505r 1  20 rr rr     	jsr     pushax
-000508r 1  A2 00        	ldx     #$00
-00050Ar 1  A9 04        	lda     #$04
-00050Cr 1  20 rr rr     	jsr     pushax
-00050Fr 1  A9 rr        	lda     #<(S0006)
-000511r 1  A2 rr        	ldx     #>(S0006)
-000513r 1  20 rr rr     	jsr     _DrawTextAt
-000516r 1  A2 00        	ldx     #$00
-000518r 1  A9 05        	lda     #$05
-00051Ar 1  A0 00        	ldy     #$00
-00051Cr 1  20 rr rr     	jsr     staxysp
-00051Fr 1  A0 01        L0002:	ldy     #$01
-000521r 1  20 rr rr     	jsr     ldaxysp
-000524r 1  C9 50        	cmp     #$50
-000526r 1  8A           	txa
-000527r 1  E9 00        	sbc     #$00
-000529r 1  50 02        	bvc     L0006
-00052Br 1  49 80        	eor     #$80
-00052Dr 1  0A           L0006:	asl     a
-00052Er 1  A9 00        	lda     #$00
-000530r 1  A2 00        	ldx     #$00
-000532r 1  2A           	rol     a
-000533r 1  F0 03 4C rr  	jne     L0005
-000537r 1  rr           
-000538r 1  4C rr rr     	jmp     L0003
-00053Br 1  A2 00        L0005:	ldx     #$00
-00053Dr 1  A9 A0        	lda     #$A0
-00053Fr 1  20 rr rr     	jsr     pushax
-000542r 1  A2 00        	ldx     #$00
-000544r 1  A9 78        	lda     #$78
-000546r 1  20 rr rr     	jsr     pushax
-000549r 1  A0 05        	ldy     #$05
-00054Br 1  20 rr rr     	jsr     ldaxysp
-00054Er 1  20 rr rr     	jsr     pushax
-000551r 1  A2 00        	ldx     #$00
-000553r 1  A9 01        	lda     #$01
-000555r 1  20 rr rr     	jsr     _DrawCircleC
-000558r 1  A0 00        	ldy     #$00
-00055Ar 1  A2 00        	ldx     #$00
-00055Cr 1  A9 05        	lda     #$05
-00055Er 1  20 rr rr     	jsr     addeqysp
-000561r 1  4C rr rr     	jmp     L0002
-000564r 1  A9 rr        L0003:	lda     #<(S0007)
-000566r 1  A2 rr        	ldx     #>(S0007)
-000568r 1  20 rr rr     	jsr     pushax
-00056Br 1  A0 02        	ldy     #$02
-00056Dr 1  20 rr rr     	jsr     _printf
-000570r 1  A2 00        	ldx     #$00
-000572r 1  A9 00        	lda     #$00
-000574r 1  4C rr rr     	jmp     L0001
-000577r 1  20 rr rr     L0001:	jsr     incsp2
-00057Ar 1  60           	rts
-00057Br 1               
-00057Br 1               .endproc
-00057Br 1               
-00057Br 1               
+0004D7r 1  20 rr rr     	jsr     _Demo
+0004DAr 1  A2 00        	ldx     #$00
+0004DCr 1  A9 05        	lda     #$05
+0004DEr 1  A0 00        	ldy     #$00
+0004E0r 1  20 rr rr     	jsr     staxysp
+0004E3r 1  A0 01        L0002:	ldy     #$01
+0004E5r 1  20 rr rr     	jsr     ldaxysp
+0004E8r 1  C9 50        	cmp     #$50
+0004EAr 1  8A           	txa
+0004EBr 1  E9 00        	sbc     #$00
+0004EDr 1  50 02        	bvc     L0006
+0004EFr 1  49 80        	eor     #$80
+0004F1r 1  0A           L0006:	asl     a
+0004F2r 1  A9 00        	lda     #$00
+0004F4r 1  A2 00        	ldx     #$00
+0004F6r 1  2A           	rol     a
+0004F7r 1  F0 03 4C rr  	jne     L0005
+0004FBr 1  rr           
+0004FCr 1  4C rr rr     	jmp     L0003
+0004FFr 1  A2 00        L0005:	ldx     #$00
+000501r 1  A9 A0        	lda     #$A0
+000503r 1  20 rr rr     	jsr     pushax
+000506r 1  A2 00        	ldx     #$00
+000508r 1  A9 78        	lda     #$78
+00050Ar 1  20 rr rr     	jsr     pushax
+00050Dr 1  A0 05        	ldy     #$05
+00050Fr 1  20 rr rr     	jsr     ldaxysp
+000512r 1  20 rr rr     	jsr     pushax
+000515r 1  A2 00        	ldx     #$00
+000517r 1  A9 01        	lda     #$01
+000519r 1  20 rr rr     	jsr     _DrawCircleC
+00051Cr 1  A0 00        	ldy     #$00
+00051Er 1  A2 00        	ldx     #$00
+000520r 1  A9 05        	lda     #$05
+000522r 1  20 rr rr     	jsr     addeqysp
+000525r 1  4C rr rr     	jmp     L0002
+000528r 1  A9 rr        L0003:	lda     #<(S0004)
+00052Ar 1  A2 rr        	ldx     #>(S0004)
+00052Cr 1  20 rr rr     	jsr     pushax
+00052Fr 1  A0 02        	ldy     #$02
+000531r 1  20 rr rr     	jsr     _printf
+000534r 1  A2 00        	ldx     #$00
+000536r 1  A9 00        	lda     #$00
+000538r 1  4C rr rr     	jmp     L0001
+00053Br 1  20 rr rr     L0001:	jsr     incsp2
+00053Er 1  60           	rts
+00053Fr 1               
+00053Fr 1               .endproc
+00053Fr 1               
+00053Fr 1               

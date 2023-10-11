@@ -20,6 +20,7 @@ extern void DrawCircle(void);
 extern void SetPixel(void);
 extern void ClearPixel(void);
 extern void DrawChar(void);
+extern void Demo(void);
 extern byte __fastcall__ AscToPet(byte in);
 extern byte __fastcall__ ReverseBits(byte in);
 extern unsigned char font8x8_basic[256][8];
@@ -28,6 +29,8 @@ extern int  x1cord;
 extern int  y1cord;
 extern int  x2cord;
 extern int  y2cord;
+extern int  cursorX;
+extern int  cursorY;
 
 // If in zeropage:
 //
@@ -41,9 +44,6 @@ extern int  y2cord;
 byte * screen    = (byte *) 0xA000;
 
 // Cursor position
-
-int CursorX = 0;
-int CursorY = 0;
 
 #define SCREEN_WIDTH      320
 #define SCREEN_HEIGHT     200
@@ -92,17 +92,17 @@ void DrawText(char * psz)
 {
    while (*psz)
    {
-      while (CursorX >= CHARSPERROW)
+      while (cursorX >= CHARSPERROW)
       {
-         CursorX -= CHARSPERROW;
-         CursorY += 1;
+         cursorX -= CHARSPERROW;
+         cursorY += 1;
       }
 
       // If we've gone off the bottom of the screen, we scroll the screen and back up to the last line again
 
-      if (CursorY >= ROWSPERCOLUMN)
+      if (cursorY >= ROWSPERCOLUMN)
       {
-         CursorY = ROWSPERCOLUMN - 1;
+         cursorY = ROWSPERCOLUMN - 1;
          ScrollScreen();
       }
 
@@ -110,19 +110,19 @@ void DrawText(char * psz)
 
       if (*psz == 0x0A)
       {
-         CursorX = 0;
-         CursorY++;
+         cursorX = 0;
+         cursorY++;
          psz++;
       }
       else
       {
          c = *psz;
      
-         __asm__ ("ldx %v", CursorX);
-         __asm__ ("ldy %v", CursorY);
+         __asm__ ("ldx %v", cursorX);
+         __asm__ ("ldy %v", cursorY);
          __asm__ ("lda %v", c);
          DrawChar();
-         CursorX++;
+         cursorX++;
          psz++;
       }
    }
@@ -130,8 +130,8 @@ void DrawText(char * psz)
 
 void DrawTextAt(int x, int y, char * psz)
 {
-   CursorX = x;
-   CursorY = y;
+   cursorX = x;
+   cursorY = y;
    DrawText(psz);
 }
 
@@ -218,11 +218,9 @@ int main (void)
 
    // Clear the screen memory
    ClearScreen();
+   Demo();
 
-   // Draw the welcome banner at the top of the screen
-   DrawTextAt(0, 0, "  *** COMMODORE KIM-1 SHELL v1.1 ***");
-   DrawTextAt(0, 2, "   60K RAM SYSTEM.  49152 BYTES FREE.");
-   DrawTextAt(0, 4, "READY.\n");
+   //DrawTextAt(184, 192, "TEST");
 
    // DrawScreenMoire(0,30, 319, 199);
 

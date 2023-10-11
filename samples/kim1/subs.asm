@@ -20,6 +20,7 @@
 .export _AscToPet
 .export _ReverseBits
 .export _DrawChar
+.export _Demo
 
 .import _font8x8_basic
 
@@ -59,6 +60,9 @@ _x1cord:        .res 2
 _x2cord:        .res 2
 _y1cord:        .res 2
 _y2cord:        .res 2
+_cursorX:       .res 1
+_cursorY:       .res 1
+tempchar:       .res 1
 xval:           .res 2              ; These could move to zeropage for perf, but presume we
 yval:           .res 2              ;   we want to minimize the amount we grow zero page use
 err:            .res 2  
@@ -71,6 +75,8 @@ y0:             .res 2
 .export _x2cord
 .export _y1cord
 .export _y2cord
+.export _cursorX
+.export _cursorY
 
 .segment "CODE"
 
@@ -202,7 +208,12 @@ _ClearScreen:
 ; ScrollScreen - Scrolls the entire video memory (and thus the screen) up one row
 ;-----------------------------------------------------------------------------------
 
-_ScrollScreen:
+_ScrollScreen:  pha
+                tya
+                pha
+                txa
+                pha
+
                 ; Load the source (A140) and destination (A000) addresses.  Each row of characters
                 ; occupies 320 bytes, so we start source as being one line ahead of the destination
                 ; which will have the effect of scrolling the screen up one text line.
@@ -235,6 +246,12 @@ _ScrollScreen:
                 sta SCREEN+$1E00, y
                 dey
                 bne :-
+
+                pla
+                txa
+                pla
+                tya
+                pla
                 rts
 
 ;-----------------------------------------------------------------------------------
@@ -617,50 +634,130 @@ ScreenLineAddresses:
 ;-----------------------------------------------------------------------------------
 ; 0 <= x < 40
 ; 0 <= y < 25
+; Preserves all registers
 ;-----------------------------------------------------------------------------------
 
 _DrawChar:     pha
+               
                tya                                 ; Get the address in screen memory where this
                asl                                 ;  character X/Y cursor pos should be drawn
                tay
                txa
                clc
                adc ScreenLineAddresses, y
-               sta adp1_lo
+               sta dest_lo
                lda ScreenLineAddresses+1, y
                adc #0
-               sta adp1_hi
+               sta dest_hi
                
                lda #0                              ; Get the address in font memory where this
-               sta adp2_hi                         ;  Petscii chracter lives (after conversion from
+               sta src_hi                          ;  Petscii chracter lives (after conversion from
+
                pla                                 ;  ascii)
+
+               sty temp2
                jsr _AscToPet
+               ldy temp2
+
                asl 
-               rol adp2_hi
+               rol src_hi
                asl 
-               rol adp2_hi
+               rol src_hi
                asl 
-               rol adp2_hi
+               rol src_hi
                clc
                adc #<_font8x8_basic                ; Add the base address of the font table to the offset
-               sta adp2_lo
-               lda adp2_hi
+               sta src_lo
+               lda src_hi
                adc #>_font8x8_basic
-               sta adp2_hi
+               sta src_hi
 
                ldy #0                              ; opy the character def to the screen, one byte at a time
                ldx #0
-:              lda (adp2), y                       ; Copy this byte from the character def to the screen target
-               sta (adp1, x)
-               lda adp1_lo                         ; Advance to the next "scanline", or pixel row, down
+:              lda (src), y                       ; Copy this byte from the character def to the screen target
+               sta (dest, x)
+               lda dest_lo                         ; Advance to the next "scanline", or pixel row, down
                clc
                adc #<BYTESPERROW               
-               sta adp1_lo
-               lda adp1_hi
+               sta dest_lo
+               lda dest_hi
                adc #>BYTESPERROW
-               sta adp1_hi
+               sta dest_hi
 
                iny
                cpy #8
                bne :-
+
                rts
+
+
+
+;-----------------------------------------------------------------------------------
+; DrawText     - Draws an ASCII string at the current cursor position
+;-----------------------------------------------------------------------------------
+; XY           - Pointer to the string to draw, stops on NUL or 255 chars later
+;-----------------------------------------------------------------------------------
+
+_DrawText:     stx adp1_lo
+               sty adp1_hi
+               ldy #0
+@char:         lda (adp1), y
+               sta tempchar
+               beq doneText
+
+               lda _cursorX                        ; if X >= CHARSPERROW, we need to advance to the next line
+               cmp #CHARSPERROW-1
+               bcc :+
+
+               lda #0                              ; Back to the left edge     
+               sta _cursorX
+               inc _cursorY                        ; Advance to the next line
+
+:              lda _cursorY 
+               cmp #ROWSPERCOLUMN - 1              ; Check to see if we've gone off the bottom of the screen
+               bcc :+
+
+               lda #ROWSPERCOLUMN - 1              ; If we have, we scroll the screen and back up to the last line again
+               sta _cursorY
+               jsr _ScrollScreen
+
+:              lda tempchar                        ; If the character is 0A, we advance to the next line
+               cmp #$0a
+               bne :+
+
+               lda #0                              ; Back to the left edge
+               sta _cursorX
+               inc _cursorY                        ; Advance to the next line
+               iny
+               bne @char
+
+:              tya
+               pha
+               lda tempchar
+               ldx _cursorX
+               ldy _cursorY
+               jsr _DrawChar
+               pla
+               tay
+               
+               inc _cursorX
+               iny
+               bne @char
+
+doneText:      rts      
+
+demoText1:     .byte "  *** COMMODORE KIM-1 SHELL V0.1 ***", $0A, $0A
+               .byte "   60K RAM SYSTEM.  49152 BYTES FREE.", $0A, $0A
+               .byte "READY.", $0A, 00
+
+_Demo:         lda #0
+               sta _cursorX
+               sta _cursorY
+               ldx #<demoText1
+               ldy #>demoText1
+               jsr _DrawText
+               rts
+
+
+
+

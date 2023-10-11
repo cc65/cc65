@@ -305,7 +305,7 @@ SER_CLOSE:
         stx     Opened                  ; Mark port as closed
 
         cli
-:       txa
+:       txa                             ; Promote char return value
         rts
 
 ;----------------------------------------------------------------------------
@@ -313,13 +313,17 @@ SER_CLOSE:
 ; Must return an SER_ERR_xx code in a/x.
 
 SER_OPEN:
-        bit     $C082                   ; Check if this is a IIgs
+        ; Check if this is a IIgs (Apple II Miscellaneous TechNote #7,
+        ; Apple II Family Identification)
         sec
-        jsr     $FE1F                   ; https://prodos8.com/docs/technote/misc/07/
+        bit     $C082
+        jsr     $FE1F
+        bit     $C080
+
         bcc     IIgs
 
-        bit     $C080
         lda     #SER_ERR_NO_DEVICE      ; Not a IIgs
+
 SetupErrOut:
         cli
         ldx     #$00                    ; Promote char return value
@@ -327,8 +331,7 @@ SetupErrOut:
         rts
 
 IIgs:
-        bit     $C080
-        sei                             ; Disable interrupts
+        sei
 
         ; Check if the handshake setting is valid
         ldy     #SER_PARAMS::HANDSHAKE  ; Handshake

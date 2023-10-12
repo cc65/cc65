@@ -334,14 +334,8 @@ SER_OPEN:
         ldy     #SER_PARAMS::HANDSHAKE  ; Handshake
         lda     (ptr1),y
         cmp     #SER_HS_HW              ; This is all we support
-        beq     SetupBufs
+        bne     InvParam
 
-InvParam:
-        lda     #SER_ERR_INIT_FAILED
-        ldy     #$00                    ; Mark port closed
-        jmp     SetupOut
-
-SetupBufs:
         ; Initialize buffers
         ldy     #$00
         sty     Stopped
@@ -371,10 +365,9 @@ SetupBufs:
         ldy     #SER_PARAMS::PARITY
         lda     (ptr1),y                ; Parity bits
         tay
-        cmp     #$FF
-        beq     InvParam
         pla
         ora     ParityTable,y           ; Get value
+        bmi     InvParam
 
         ora     #TX_RX_CLOCK_MUL
 
@@ -406,10 +399,17 @@ SetBaud:
         tay
 
         lda     BaudTable,y             ; Get chip value from Low/High tables
+        bpl     BaudOK                  ; Verify baudrate is supported
+
+InvParam:
+        lda     #SER_ERR_INIT_FAILED
+        ldy     #$00                    ; Mark port closed
+        bra     SetupOut
+
+BaudOK:
         tay
 
         lda     BaudLowTable,y          ; Get low byte
-        bmi     InvParam                ; Branch if rate not supported
 
         phy
         ldy     #WR_BAUDL_CTRL

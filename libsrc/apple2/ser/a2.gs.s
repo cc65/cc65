@@ -477,14 +477,13 @@ IntA:
 StoreFlag:
         sta     SER_FLAG
 
-        cli
-
         ldy     #$01                    ; Mark port opened
         lda     #SER_ERR_OK
 
 SetupOut:
         ldx     #$00                    ; Promote char return value
         sty     Opened
+        cli
         rts
 
 ;----------------------------------------------------------------------------

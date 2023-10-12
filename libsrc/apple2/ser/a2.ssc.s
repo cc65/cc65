@@ -25,8 +25,6 @@
         .include        "ser-kernel.inc"
         .include        "ser-error.inc"
 
-        .importzp       tmp1, tmp2
-
         .macpack        module
         .macpack        cpu
 
@@ -71,6 +69,8 @@ ACIA_DATA      := ACIA+0        ; Data register
 ACIA_STATUS    := ACIA+1        ; Status register
 ACIA_CMD       := ACIA+2        ; Command register
 ACIA_CTRL      := ACIA+3        ; Control register
+
+SLTROMSEL      := $C02D         ; For Apple IIgs slot verification
 
 ;----------------------------------------------------------------------------
 ; Global variables
@@ -194,53 +194,34 @@ SER_CLOSE:
         rts
 
 ;----------------------------------------------------------------------------
-; Internal function to test whether we're really talking with a 6551,
-; or at least it really looks like it.
-; Input: X= Index
-; Output: carry set if this is very probably a 6551, clear if not
-
-Verify6551:
-        lda     ACIA_STATUS,x   ; Save current values in what we expect to be
-        pha                     ; the ACIA status register
-        lda     ACIA_CMD,x      ; and command register. So we can restore them
-        sta     tmp1            ; if this isn't a 6551.
-
-        and     #$01
-        bne     NotAcia         ; We expect command register bit 0 to be 0
-
-        lda     tmp1
-        ora     #$01            ; Enable receiver/transmitter
-        sta     ACIA_CMD,x
-        sta     tmp2            ; Store it for comparison
-
-        lda     ACIA_CMD,x      ; Is command register what we wrote?
-        cmp     tmp2
-        bne     NotAcia
-
-        sta     ACIA_STATUS,x   ; Reset Acia (value written is not important)
-
-        lda     ACIA_CMD,x      ; Is the value back to the original value?
-        cmp     tmp1
-        bne     NotAcia
-
-        pla                     ; Clear stack of leftovers
-        clc
-        rts
-
-NotAcia:
-        lda     tmp1            ; Restore saved bytes, they're probably needed
-        sta     ACIA_CMD,x
-        pla
-        sta     ACIA_STATUS,x
-        sec
-        rts
-
-;----------------------------------------------------------------------------
 ; SER_OPEN: A pointer to a ser_params structure is passed in ptr1.
 ; Must return an SER_ERR_xx code in a/x.
+; Note: Hardware checks are done in SER_OPEN instead of SER_INSTALL,
+; because they depend on the selected slot, and we can't select the slot
+; before SER_INSTALL.
 
 SER_OPEN:
-        ldx     #<$C000
+        ; Check if this is a IIgs (Apple II Miscellaneous TechNote #7,
+        ; Apple II Family Identification)
+        sec
+        bit     $C082
+        jsr     $FE1F
+        bit     $C080
+
+        bcs     NotIIgs
+
+        ; We're on a IIgs. For every slot N, either bit N of $C02D is
+        ; 0 for the internal ROM, or 1 for "Your Card". Let's make sure
+        ; that slot N's bit is set to 1, otherwise, that can't be an SSC.
+
+        ldy     Slot
+        lda     SLTROMSEL
+:       lsr
+        dey
+        bpl     :-              ; Shift until slot's bit ends in carry
+        bcc     NoDev
+
+NotIIgs:ldx     #<$C000
         stx     ptr2
         lda     #>$C000
         ora     Slot
@@ -249,8 +230,12 @@ SER_OPEN:
 :       ldy     IdOfsTable,x    ; Check Pascal 1.1 Firmware Protocol ID bytes
         lda     IdValTable,x
         cmp     (ptr2),y
-        bne     NoDev
-        inx
+        beq     ByteOK
+
+NoDev:  lda     #SER_ERR_NO_DEVICE
+        bne     Out
+
+ByteOK: inx
         cpx     #IdTableLen
         bcc     :-
 
@@ -264,15 +249,16 @@ SER_OPEN:
 .endif
         tax
 
-        jsr     Verify6551
-        bcs     NoDev
-
         ; Check if the handshake setting is valid
         ldy     #SER_PARAMS::HANDSHAKE
         lda     (ptr1),y
         cmp     #SER_HS_HW      ; This is all we support
-        bne     InvParm
+        beq     HandshakeOK
 
+        lda     #SER_ERR_INIT_FAILED
+        bne     Out
+
+HandshakeOK:
         ldy     #$00            ; Initialize buffers
         sty     Stopped
         sty     RecvHead
@@ -289,9 +275,12 @@ SER_OPEN:
         lda     (ptr1),y        ; Baudrate index
         tay
         lda     BaudTable,y     ; Get 6551 value
-        bmi     InvBaud         ; Branch if rate not supported
-        sta     tmp1
+        bpl     BaudOK          ; Check that baudrate is supported
 
+        lda     #SER_ERR_BAUD_UNAVAIL
+        bne     Out
+
+BaudOK: sta     tmp1
         ldy     #SER_PARAMS::DATABITS
         lda     (ptr1),y        ; Databits index
         tay
@@ -322,22 +311,7 @@ SER_OPEN:
         ; Done
         stx     Index           ; Mark port as open
         lda     #SER_ERR_OK
-        .assert SER_ERR_OK = 0, error
-        tax
-        rts
-
-        ; Device (hardware) not found
-NoDev:  lda     #SER_ERR_NO_DEVICE
-        ldx     #$00            ; Promote char return value
-        rts
-
-        ; Invalid parameter
-InvParm:lda     #SER_ERR_INIT_FAILED
-        ldx     #$00            ; Promote char return value
-        rts
-
-        ; Baud rate not available
-InvBaud:lda     #SER_ERR_BAUD_UNAVAIL
+Out:
         ldx     #$00            ; Promote char return value
         rts
 

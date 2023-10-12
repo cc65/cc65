@@ -270,8 +270,23 @@ WriteAreg:
 SER_INSTALL:
 SER_UNINSTALL:
 SER_CLOSE:
+        ; Check if this is a IIgs (Apple II Miscellaneous TechNote #7,
+        ; Apple II Family Identification)
+        sec
+        bit     $C082
+        jsr     $FE1F
+        bit     $C080
+
+        bcc     IIgs
+
+        lda     #SER_ERR_NO_DEVICE      ; Not a IIgs
+        ldx     #$00                    ; Promote char return value
+        rts
+
+IIgs:
         ldx     Opened                  ; Check for open port
         beq     :+
+
         ldx     Channel
 
         ; Deactivate interrupts
@@ -313,24 +328,6 @@ SER_CLOSE:
 ; Must return an SER_ERR_xx code in a/x.
 
 SER_OPEN:
-        ; Check if this is a IIgs (Apple II Miscellaneous TechNote #7,
-        ; Apple II Family Identification)
-        sec
-        bit     $C082
-        jsr     $FE1F
-        bit     $C080
-
-        bcc     IIgs
-
-        lda     #SER_ERR_NO_DEVICE      ; Not a IIgs
-
-SetupErrOut:
-        cli
-        ldx     #$00                    ; Promote char return value
-        stx     Opened                  ; Mark port closed
-        rts
-
-IIgs:
         sei
 
         ; Check if the handshake setting is valid
@@ -341,7 +338,8 @@ IIgs:
 
 InvParam:
         lda     #SER_ERR_INIT_FAILED
-        jmp     SetupErrOut
+        ldy     #$00                    ; Mark port closed
+        jmp     SetupOut
 
 SetupBufs:
         ; Initialize buffers
@@ -479,12 +477,14 @@ IntA:
 StoreFlag:
         sta     SER_FLAG
 
-        ldy     #$01                    ; Mark port opened
-        sty     Opened
         cli
+
+        ldy     #$01                    ; Mark port opened
         lda     #SER_ERR_OK
-        .assert SER_ERR_OK = 0, error
-        tax
+
+SetupOut:
+        ldx     #$00                    ; Promote char return value
+        sty     Opened
         rts
 
 ;----------------------------------------------------------------------------

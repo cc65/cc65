@@ -70,6 +70,7 @@
 
 
 
+static Token SavedTok;  /* Saved token */
 Token CurTok;           /* The current token */
 Token NextTok;          /* The next token */
 int   PPParserRunning;  /* Is tokenizer used by the preprocessor */
@@ -324,7 +325,7 @@ static void SetTok (int tok)
 
 
 static int ParseChar (void)
-/* Parse a character. Converts escape chars into character codes. */
+/* Parse a character token. Converts escape chars into character codes. */
 {
     int C;
     int HadError;
@@ -426,7 +427,7 @@ static int ParseChar (void)
 
 
 static void CharConst (void)
-/* Parse a character constant. */
+/* Parse a character constant token */
 {
     int C;
 
@@ -463,7 +464,7 @@ static void CharConst (void)
 
 
 static void StringConst (void)
-/* Parse a quoted string */
+/* Parse a quoted string token */
 {
     /* String buffer */
     StrBuf S = AUTO_STRBUF_INITIALIZER;
@@ -471,42 +472,33 @@ static void StringConst (void)
     /* Assume next token is a string constant */
     NextTok.Tok  = TOK_SCONST;
 
-    /* Concatenate strings. If at least one of the concenated strings is a wide
-    ** character literal, the whole string is a wide char literal, otherwise
-    ** it's a normal string literal.
-    */
-    while (1) {
+    /* Check if this is a normal or a wide char string */
+    if (CurC == 'L' && NextC == '\"') {
+        /* Wide character literal */
+        NextTok.Tok = TOK_WCSCONST;
+        NextChar ();
+        NextChar ();
+    } else if (CurC == '\"') {
+        /* Skip the quote char */
+        NextChar ();
+    } else {
+        /* No string */
+        goto ExitPoint;
+    }
 
-        /* Check if this is a normal or a wide char string */
-        if (CurC == 'L' && NextC == '\"') {
-            /* Wide character literal */
-            NextTok.Tok = TOK_WCSCONST;
-            NextChar ();
-            NextChar ();
-        } else if (CurC == '\"') {
-            /* Skip the quote char */
-            NextChar ();
-        } else {
-            /* No string */
+    /* Read until end of string */
+    while (CurC != '\"') {
+        if (CurC == '\0') {
+            Error ("Unexpected newline");
             break;
         }
-
-        /* Read until end of string */
-        while (CurC != '\"') {
-            if (CurC == '\0') {
-                Error ("Unexpected newline");
-                break;
-            }
-            SB_AppendChar (&S, ParseChar ());
-        }
-
-        /* Skip closing quote char if there was one */
-        NextChar ();
-
-        /* Skip white space, read new input */
-        SkipWhite ();
-
+        SB_AppendChar (&S, ParseChar ());
     }
+
+    /* Skip closing quote char if there was one */
+    NextChar ();
+
+ExitPoint:
 
     /* Terminate the string */
     SB_AppendChar (&S, '\0');
@@ -521,7 +513,7 @@ static void StringConst (void)
 
 
 static void NumericConst (void)
-/* Parse a numeric constant */
+/* Parse a numeric constant token */
 {
     unsigned Base;              /* Temporary number base according to prefix */
     unsigned Index;
@@ -806,13 +798,6 @@ static void GetNextInputToken (void)
 {
     ident token;
 
-    /* We have to skip white space here before shifting tokens, since the
-    ** tokens and the current line info is invalid at startup and will get
-    ** initialized by reading the first time from the file. Remember if we
-    ** were at end of input and handle that later.
-    */
-    int GotEOF = (SkipWhite () == 0);
-
     /* Current token is the lookahead token */
     if (CurTok.LI) {
         ReleaseLineInfo (CurTok.LI);
@@ -821,13 +806,27 @@ static void GetNextInputToken (void)
     /* Get the current token */
     CurTok = NextTok;
 
-    /* Remember the starting position of the next token */
-    NextTok.LI = UseLineInfo (GetCurLineInfo ());
+    if (SavedTok.Tok == TOK_INVALID) {
+        /* We have to skip white space here before shifting tokens, since the
+        ** tokens and the current line info is invalid at startup and will get
+        ** initialized by reading the first time from the file. Remember if we
+        ** were at end of input and handle that later.
+        */
+        int GotEOF = (SkipWhite () == 0);
 
-    /* Now handle end of input */
-    if (GotEOF) {
-        /* End of file reached */
-        NextTok.Tok = TOK_CEOF;
+        /* Remember the starting position of the next token */
+        NextTok.LI = UseLineInfo (GetCurLineInfo ());
+
+        /* Now handle end of input */
+        if (GotEOF) {
+            /* End of file reached */
+            NextTok.Tok = TOK_CEOF;
+            return;
+        }
+    } else {
+        /* Just use the saved token */
+        NextTok = SavedTok;
+        SavedTok.Tok = TOK_INVALID;
         return;
     }
 
@@ -1122,6 +1121,9 @@ void NextToken (void)
 ** encountered. Adjacent string literal tokens will be concatenated.
 */
 {
+    /* Used for string literal concatenation */
+    Token PrevTok;
+
     /* When reading the first time from the file, the line info in NextTok,
     ** which will be copied to CurTok is invalid. Since the information from
     ** the token is used for error messages, we must make it valid.
@@ -1130,13 +1132,64 @@ void NextToken (void)
         NextTok.LI = UseLineInfo (GetCurLineInfo ());
     }
 
-    /* Read the next token from the file */
-    GetNextInputToken ();
+    PrevTok.Tok = TOK_INVALID;
+    while (1) {
+        /* Read the next token from the file */
+        GetNextInputToken ();
 
-    /* Consume all pragmas at hand, including those nested in a _Pragma() */
-    if (CurTok.Tok == TOK_PRAGMA) {
-        /* Repeated and/or nested _Pragma()'s will be handled recursively */
-        ConsumePragma ();
+        /* Consume all pragmas at hand, including those nested in a _Pragma() */
+        if (CurTok.Tok == TOK_PRAGMA) {
+            /* Repeated and/or nested _Pragma()'s will be handled recursively */
+            ConsumePragma ();
+        }
+
+        /* Check for string concatenation */
+        if (CurTok.Tok == TOK_SCONST || CurTok.Tok == TOK_WCSCONST) {
+            if (PrevTok.Tok == TOK_SCONST || PrevTok.Tok == TOK_WCSCONST) {
+                /* Concatenate strings */
+                ConcatLiteral (PrevTok.SVal, CurTok.SVal);
+
+                /* If at least one of the concatenated strings is a wide
+                ** character literal, the whole string is a wide char
+                ** literal, otherwise it is a normal string literal.
+                */
+                if (CurTok.Tok == TOK_WCSCONST) {
+                    PrevTok.Tok = TOK_WCSCONST;
+                    PrevTok.Type = CurTok.Type;
+                }
+            }
+
+            if (NextTok.Tok == TOK_SCONST ||
+                NextTok.Tok == TOK_WCSCONST ||
+                NextTok.Tok == TOK_PRAGMA) {
+                /* Remember current string literal token */
+                if (PrevTok.Tok == TOK_INVALID) {
+                    PrevTok = CurTok;
+                    PrevTok.LI = UseLineInfo (PrevTok.LI);
+                }
+
+                /* Keep looping */
+                continue;
+            }
+        }
+
+        break;
+    }
+
+    /* Use the concatenated string literal token if there is one */
+    if (PrevTok.Tok == TOK_SCONST || PrevTok.Tok == TOK_WCSCONST) {
+        if (CurTok.Tok != TOK_SCONST && CurTok.Tok != TOK_WCSCONST) {
+            /* Push back the incoming tokens */
+            SavedTok = NextTok;
+            NextTok  = CurTok;
+        } else {
+            /* The last string literal token can be just replaced */
+            if (CurTok.LI) {
+                ReleaseLineInfo (CurTok.LI);
+            }
+        }
+        /* Replace the current token with the concatenated string literal */
+        CurTok = PrevTok;
     }
 }
 

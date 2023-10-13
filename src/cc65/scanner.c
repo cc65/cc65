@@ -1157,6 +1157,11 @@ void NextToken (void)
         /* Check for string concatenation */
         if (CurTok.Tok == TOK_SCONST || CurTok.Tok == TOK_WCSCONST) {
             if (PrevTok.Tok == TOK_SCONST || PrevTok.Tok == TOK_WCSCONST) {
+                /* Warn on non-ISO behavior */
+                if (InPragmaParser) {
+                    Warning ("Concatenated string literals in _Pragma operation");
+                }
+
                 /* Concatenate strings */
                 ConcatLiteral (PrevTok.SVal, CurTok.SVal);
 

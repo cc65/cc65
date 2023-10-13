@@ -27,12 +27,14 @@
 SCREEN           = $A000
 SCREEN_WIDTH     = 320
 SCREEN_HEIGHT    = 200
+SCREEN_BYTES     = SCREEN_WIDTH * SCREEN_HEIGHT / 8
 CHARWIDTH        = 8
 CHARHEIGHT       = 8
 BYTESPERROW      = (SCREEN_WIDTH / 8)
 BYTESPERCHARROW  = (BYTESPERROW * 8)
 CHARSPERROW      = (SCREEN_WIDTH / CHARWIDTH)
 ROWSPERCOLUMN    = (SCREEN_HEIGHT / CHARHEIGHT)
+LASTROW          = SCREEN + SCREEN_BYTES - BYTESPERCHARROW
 
 .segment "ZEROPAGE"
 
@@ -54,6 +56,14 @@ adp2:
 adp2_lo:        .res 1
 adp2_hi:        .res 1
 
+scroll_src:     
+scroll_src_lo:  .res 1
+scroll_src_hi:  .res 1  
+
+scroll_dest:   
+scroll_dest_lo: .res 1
+scroll_dest_hi: .res 1
+
 .segment "DATA"
 
 _x1cord:        .res 2
@@ -67,6 +77,9 @@ xval:           .res 2              ; These could move to zeropage for perf, but
 yval:           .res 2              ;   we want to minimize the amount we grow zero page use
 err:            .res 2  
 temp:           .res 2
+tempa:          .res 1    
+tempx:          .res 1
+tempy:          .res 1
 temp2:          .res 2
 x0:             .res 2
 y0:             .res 2
@@ -208,49 +221,61 @@ _ClearScreen:
 ; ScrollScreen - Scrolls the entire video memory (and thus the screen) up one row
 ;-----------------------------------------------------------------------------------
 
-_ScrollScreen:  pha
+BYTES_TO_MOVE      = SCREEN_BYTES - BYTESPERCHARROW
+PAGES_TO_MOVE      = BYTES_TO_MOVE / 256
+
+_ScrollScreen:
+                pha
                 tya
                 pha
                 txa
                 pha
 
-                ; Load the source (A140) and destination (A000) addresses.  Each row of characters
-                ; occupies 320 bytes, so we start source as being one line ahead of the destination
-                ; which will have the effect of scrolling the screen up one text line.
-
-                lda #<(SCREEN+320)
-                sta src_lo
-                lda #>(SCREEN+320)
-                sta src_hi
+                ; Load the source (A140) and destination (A000) addresses
+                lda #<(SCREEN+BYTESPERCHARROW)
+                sta scroll_src_lo
+                lda #>(SCREEN+BYTESPERCHARROW)
+                sta scroll_src_hi
                 lda #<SCREEN
-                sta dest_lo
+                sta scroll_dest_lo
                 lda #>SCREEN
-                sta dest_hi
+                sta scroll_dest_hi
 
-                ldy #$00
-:
-                lda (src),y
-                sta (dest),y
+                ldx #PAGES_TO_MOVE
+@outerLoop:
+                ldy #0
+@innerLoop:
+                lda (scroll_src),y
+                sta (scroll_dest),y
                 iny
-                bne :-
+                bne @innerLoop                              ; If Y overflows, it will be 0, so won't branch
+                inc scroll_src_hi
+                inc scroll_dest_hi
+                dex
+                bne @outerLoop
 
-                inc dest_hi                 ; When the source hits $BF00 we're done, as we've copied
-                inc src_hi                  ;   everything up to that point so far
-                ldx src_hi
-                cpx #$BE
-                bne :-
-
-                lda #$00                    ; Clear the last line (320 bytes, or A0 twice)
-                ldy #$A0
-:               sta SCREEN+$1EA0, y
-                sta SCREEN+$1E00, y
-                dey
-                bne :-
+                ; Clear the last line
+                lda #<LASTROW
+                sta scroll_dest_lo
+                lda #>LASTROW
+                sta scroll_dest_hi
+                lda #$00
+                ldy #0
+fullPageLoop:
+                sta (scroll_dest_lo),y
+                iny
+                bne fullPageLoop
+                inc scroll_dest_hi                
+partialPageLoop:
+                sta (scroll_dest_lo),y
+                iny
+                cpy #BYTESPERCHARROW - 256         ; Only clear up to the 64th byte (256 + 64 == 320)
+                bne partialPageLoop
 
                 pla
-                txa
+                tax
                 pla
-                tya
+                tay
                 pla
                 rts
 
@@ -634,10 +659,12 @@ ScreenLineAddresses:
 ;-----------------------------------------------------------------------------------
 ; 0 <= x < 40
 ; 0 <= y < 25
-; Preserves all registers
+; Preserves all registers, but its not very threadsafe or reentrant
 ;-----------------------------------------------------------------------------------
 
-_DrawChar:     pha
+_DrawChar:     sty tempy
+               stx tempx
+               sta tempa
                
                tya                                 ; Get the address in screen memory where this
                asl                                 ;  character X/Y cursor pos should be drawn
@@ -653,7 +680,7 @@ _DrawChar:     pha
                lda #0                              ; Get the address in font memory where this
                sta src_hi                          ;  Petscii chracter lives (after conversion from
 
-               pla                                 ;  ascii)
+               lda tempa                           ;  ascii)
 
                sty temp2
                jsr _AscToPet
@@ -688,9 +715,10 @@ _DrawChar:     pha
                cpy #8
                bne :-
 
+               ldy tempy
+               ldx tempx
+               lda tempa
                rts
-
-
 
 ;-----------------------------------------------------------------------------------
 ; DrawText     - Draws an ASCII string at the current cursor position
@@ -701,27 +729,24 @@ _DrawChar:     pha
 _DrawText:     stx adp1_lo
                sty adp1_hi
                ldy #0
-@char:         lda (adp1), y
-               sta tempchar
+
+checkHWrap:    lda _cursorX
+               cmp #CHARSPERROW
+               bcc checkVWrap
+               lda #0
+               sta _cursorX
+               inc _cursorY    
+              
+checkVWrap:    lda _cursorY
+               cmp #ROWSPERCOLUMN
+               bcc loadChar
+               jsr _ScrollScreen
+               lda #ROWSPERCOLUMN-1
+               sta _cursorY
+
+loadChar:      lda (adp1), y
                beq doneText
 
-               lda _cursorX                        ; if X >= CHARSPERROW, we need to advance to the next line
-               cmp #CHARSPERROW-1
-               bcc :+
-
-               lda #0                              ; Back to the left edge     
-               sta _cursorX
-               inc _cursorY                        ; Advance to the next line
-
-:              lda _cursorY 
-               cmp #ROWSPERCOLUMN - 1              ; Check to see if we've gone off the bottom of the screen
-               bcc :+
-
-               lda #ROWSPERCOLUMN - 1              ; If we have, we scroll the screen and back up to the last line again
-               sta _cursorY
-               jsr _ScrollScreen
-
-:              lda tempchar                        ; If the character is 0A, we advance to the next line
                cmp #$0a
                bne :+
 
@@ -729,20 +754,16 @@ _DrawText:     stx adp1_lo
                sta _cursorX
                inc _cursorY                        ; Advance to the next line
                iny
-               bne @char
+               bne checkHWrap
 
-:              tya
-               pha
-               lda tempchar
+:              sty temp
                ldx _cursorX
                ldy _cursorY
                jsr _DrawChar
-               pla
-               tay
-               
+               ldy temp
                inc _cursorX
                iny
-               bne @char
+               bne checkHWrap
 
 doneText:      rts      
 
@@ -750,13 +771,20 @@ demoText1:     .byte "  *** COMMODORE KIM-1 SHELL V0.1 ***", $0A, $0A
                .byte "   60K RAM SYSTEM.  49152 BYTES FREE.", $0A, $0A
                .byte "READY.", $0A, 00
 
+alphabet:      .byte "ABCDEFGHIJKLMNOPQRSTUVWXYZ", 00, "*****", 00
+
 _Demo:         lda #0
                sta _cursorX
                sta _cursorY
                ldx #<demoText1
                ldy #>demoText1
                jsr _DrawText
-               rts
+ 
+ :             ldx #<alphabet
+               ldy #>alphabet
+               jsr _DrawText
+               jmp :-
+
 
 
 

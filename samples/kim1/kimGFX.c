@@ -10,8 +10,6 @@
 #include <stdlib.h>                 // For rand, srand
 #include <string.h>                 // For memcpy
 
-#include "ramfont.c"
-
 typedef unsigned char byte;
 
 extern void ClearScreen(void);      // In subs.asm

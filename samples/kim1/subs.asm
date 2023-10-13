@@ -206,8 +206,22 @@ _ClearScreen:
                 stx dest_hi
 
                 ldy #0
-:               sta (dest), y
-                iny
+:               sta (dest), y       ; Loop unwound by a factor of 8, which means our iny before the branchh
+                iny                 ;  will still work as it's on a page crossing boundary. 
+                sta (dest), y       ;  This will avoid most of the overhead of the branch.
+                iny                
+                sta (dest), y
+                iny                
+                sta (dest), y
+                iny                
+                sta (dest), y
+                iny                
+                sta (dest), y
+                iny                
+                sta (dest), y
+                iny                
+                sta (dest), y
+                iny                                               
                 bne :-
 
                 inc dest_hi

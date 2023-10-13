@@ -219,9 +219,11 @@ struct Token {
     const Type*     Type;       /* Type if integer or float constant */
 };
 
-extern Token CurTok;            /* The current token */
-extern Token NextTok;           /* The next token */
-extern int   PPParserRunning;   /* Is tokenizer used by the preprocessor */
+extern Token    CurTok;             /* The current token */
+extern Token    NextTok;            /* The next token */
+extern int      PPParserRunning;    /* Is tokenizer used by the preprocessor */
+extern int      NoCharMap;          /* Disable literal translation */
+extern unsigned InPragmaParser;     /* Depth of pragma parser calling */
 
 
 

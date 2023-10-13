@@ -70,10 +70,12 @@
 
 
 
-static Token SavedTok;  /* Saved token */
-Token CurTok;           /* The current token */
-Token NextTok;          /* The next token */
-int   PPParserRunning;  /* Is tokenizer used by the preprocessor */
+static Token SavedTok;          /* Saved token */
+Token       CurTok;             /* The current token */
+Token       NextTok;            /* The next token */
+int         PPParserRunning;    /* Is tokenizer used by the preprocessor */
+int         NoCharMap;          /* Disable literal translation */
+unsigned    InPragmaParser;     /* Depth of pragma parser calling */
 
 
 
@@ -455,7 +457,7 @@ static void CharConst (void)
     }
 
     /* Translate into target charset */
-    NextTok.IVal = SignExtendChar (TgtTranslateChar (C));
+    NextTok.IVal = SignExtendChar (C);
 
     /* Character constants have type int */
     NextTok.Type = type_int;
@@ -797,6 +799,15 @@ static void GetNextInputToken (void)
 /* Get next token from input stream */
 {
     ident token;
+
+    if (!NoCharMap && !InPragmaParser) {
+        /* Translate string and character literals into target charset */
+        if (NextTok.Tok == TOK_SCONST || NextTok.Tok == TOK_WCSCONST) {
+            TranslateLiteral (NextTok.SVal);
+        } else if (NextTok.Tok == TOK_CCONST || NextTok.Tok == TOK_WCCONST) {
+            NextTok.IVal = SignExtendChar (TgtTranslateChar (NextTok.IVal));
+        }
+    }
 
     /* Current token is the lookahead token */
     if (CurTok.LI) {

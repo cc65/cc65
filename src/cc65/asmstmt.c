@@ -417,6 +417,9 @@ void AsmStatement (void)
 ** a string literal in parenthesis.
 */
 {
+    /* Prevent from translating the inline code string literal in asm */
+    NoCharMap = 1;
+
     /* Skip the ASM */
     NextToken ();
 
@@ -431,8 +434,14 @@ void AsmStatement (void)
 
     /* Need left parenthesis */
     if (!ConsumeLParen ()) {
+        NoCharMap = 0;
         return;
     }
+
+    /* We have got the inline code string untranslated, now reenable string
+    ** literal translation for string arguments (if any).
+    */
+    NoCharMap = 0;
 
     /* String literal */
     if (CurTok.Tok != TOK_SCONST) {

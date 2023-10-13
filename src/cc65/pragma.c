@@ -1096,8 +1096,12 @@ void ConsumePragma (void)
     /* Skip the _Pragma token */
     NextToken ();
 
+    /* Prevent from translating string literals in _Pragma */
+    ++InPragmaParser;
+
     /* We expect an opening paren */
     if (!ConsumeLParen ()) {
+        --InPragmaParser;
         return;
     }
 
@@ -1114,6 +1118,8 @@ void ConsumePragma (void)
         /* Parse the pragma */
         ParsePragmaString ();
     }
+
+    --InPragmaParser;
 
     /* Closing paren needed */
     ConsumeRParen ();

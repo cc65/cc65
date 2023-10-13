@@ -82,7 +82,7 @@ kimLife.hex: kimLife.bin
 kimTest.hex: kimTest.bin
 	srec_cat kimTest.bin  -binary -offset 0x2000 -o kimTest.hex  -Intel -address-length=2
 
-kimGFX.hex: kimGFX.bin ramfont.c
+kimGFX.hex: kimGFX.bin ramfont.o
 	srec_cat kimGFX.bin  -binary -offset 0x2000 -o kimGFX.hex  -Intel -address-length=2
 
 # To build a paper tape file for uploading to the KIM-1 via terminal

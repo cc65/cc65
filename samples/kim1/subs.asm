@@ -244,7 +244,31 @@ _ScrollScreen:
                 ldx #PAGES_TO_MOVE
 @outerLoop:
                 ldy #0
-@innerLoop:
+@innerLoop:     ;
+                ; I could do this faster in self-modifying code (avoiding the zero page overhead) but then it
+                ; couldn't go into ROM
+
+                lda (scroll_src),y                          ; I've unwound the loop to do 8 bytes at a time.  Since we're doing full pages
+                sta (scroll_dest),y                         ;   as long as we unwind the loop to do 8 bytes at a time, we know we'll still
+                iny                                         ;   do the final increment on a page boundary.  
+                lda (scroll_src),y                          
+                sta (scroll_dest),y
+                iny
+                lda (scroll_src),y
+                sta (scroll_dest),y
+                iny
+                lda (scroll_src),y
+                sta (scroll_dest),y
+                iny
+                lda (scroll_src),y
+                sta (scroll_dest),y
+                iny
+                lda (scroll_src),y
+                sta (scroll_dest),y
+                iny
+                lda (scroll_src),y
+                sta (scroll_dest),y
+                iny
                 lda (scroll_src),y
                 sta (scroll_dest),y
                 iny

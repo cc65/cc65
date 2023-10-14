@@ -209,19 +209,19 @@ _ClearScreen:
 :               sta (dest), y       ; Loop unwound by a factor of 8, which means our iny before the branchh
                 iny                 ;  will still work as it's on a page crossing boundary. 
                 sta (dest), y       ;  This will avoid most of the overhead of the branch.
-                iny                
+                iny
                 sta (dest), y
-                iny                
+                iny
                 sta (dest), y
-                iny                
+                iny
                 sta (dest), y
-                iny                
+                iny
                 sta (dest), y
-                iny                
+                iny
                 sta (dest), y
-                iny                
+                iny
                 sta (dest), y
-                iny                                               
+                iny
                 bne :-
 
                 inc dest_hi

@@ -1225,6 +1225,15 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
     /* Do we have an entry with this name already? */
     SymEntry* Entry = FindSymInTable (Tab, Name, HashStr (Name));
     if (Entry) {
+        int CheckExtern = 0;
+        if ((Flags & SC_STRUCTFIELD) == 0) {
+            while (Entry && (Entry->Flags & SC_ALIAS) == SC_ALIAS) {
+                /* Get the aliased entry */
+                Entry = Entry->V.A.Field;
+                /* Check for conflict with local storage class */
+                CheckExtern = 1;
+            }
+        }
 
         /* We have a symbol with this name already */
         if (HandleSymRedefinition (Entry, T, Flags)) {
@@ -1234,19 +1243,14 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
             if (SymIsDef (Entry) && (Flags & SC_DEF) == SC_DEF) {
                 Error ("Multiple definition of '%s'", Entry->Name);
                 Entry = 0;
-            } else if ((Flags & (SC_AUTO | SC_REGISTER)) != 0 &&
-                       (Entry->Flags & SC_EXTERN) != 0) {
-                /* Check for local storage class conflict */
-                Error ("Declaration of '%s' with no linkage follows extern declaration",
-                       Name);
-                Entry = 0;
-            } else {
-                /* If a static declaration follows a non-static declaration,
-                ** then it is an error.
-                */
-                if ((Flags & SC_DEF)            &&
-                    (Flags & SC_EXTERN) == 0    &&
-                    (Entry->Flags & SC_EXTERN) != 0) {
+            } else if (CheckExtern) {
+                if ((Flags & (SC_AUTO | SC_REGISTER)) != 0) {
+                    Error ("Declaration of '%s' with no linkage follows extern declaration", Name);
+                    Entry = 0;
+                } else if ((Flags & SC_DEF) != 0 && (Flags & SC_EXTERN) == 0) {
+                    /* If a static declaration follows a non-static declaration,
+                    ** then it is an error.
+                    */
                     Error ("Static declaration of '%s' follows extern declaration", Name);
                     Entry = 0;
                 }
@@ -1340,7 +1344,8 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
                    Name);
             Entry = 0;
         } else if ((Flags & SC_ESUTYPEMASK) != SC_TYPEDEF) {
-            /* If a static declaration follows a non-static declaration, then the result is undefined.
+            /* If a static declaration follows a non-static declaration, then
+            ** the result is undefined.
             ** Most compilers choose to either give an error at compile time,
             ** or remove the extern property for a link time error if used.
             */
@@ -1348,6 +1353,7 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
                 (Flags & SC_EXTERN) == 0    &&
                 (Entry->Flags & SC_EXTERN) != 0) {
                 Error ("Static declaration of '%s' follows non-static declaration", Name);
+                Entry = 0;
             } else if ((Flags & SC_EXTERN) != 0                                     &&
                        (Entry->Owner == SymTab0 || (Entry->Flags & SC_DEF) != 0)    &&
                        (Entry->Flags & SC_EXTERN) == 0) {
@@ -1359,14 +1365,15 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
                 */
                 if (Entry->Owner == SymTab0) {
                     if ((Flags & SC_STORAGE) == 0) {
-                        /* Linkage must be unchanged.
-                        ** The C standard specifies that a later extern declaration will be ignored,
-                        ** and will use the previous linkage instead. Giving a warning for this case.
+                        /* The C standard specifies that a later extern declaration will keep
+                        ** the previously declared internal or external linkage unchanged.
+                        ** Though not required by the standard, we are warning on this case.
                         */
                         Flags &= ~SC_EXTERN;
-                        Warning ("Extern declaration of '%s' follows static declaration, extern ignored", Name);
+                        Warning ("Extern declaration of '%s' follows static declaration, linkage unchanged", Name);
                     } else {
                         Error ("Non-static declaration of '%s' follows static declaration", Name);
+                        Entry = 0;
                     }
                 } else {
                     Error ("Extern declaration of '%s' follows static declaration", Name);

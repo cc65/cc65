@@ -49,6 +49,7 @@
 #include "initdata.h"
 #include "loadexpr.h"
 #include "locals.h"
+#include "seqpoint.h"
 #include "stackptr.h"
 #include "standard.h"
 #include "staticassert.h"

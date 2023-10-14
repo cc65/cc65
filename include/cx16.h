@@ -256,6 +256,42 @@ struct __vera {
             unsigned char vstart;       /* Vertical start position */
             unsigned char vstop;        /* Vertical stop position */
         };
+        struct {                        /* Visible when DCSEL flag = 2 */
+            unsigned char fxctrl;
+            unsigned char fxtilebase;
+            unsigned char fxmapbase;
+            unsigned char fxmult;
+        };
+        struct {                        /* Visible when DCSEL flag = 3 */
+            unsigned char fxxincrl;
+            unsigned char fxxincrh;
+            unsigned char fxyincrl;
+            unsigned char fxyincrh;
+        };
+        struct {                        /* Visible when DCSEL flag = 4 */
+            unsigned char fxxposl;
+            unsigned char fxxposh;
+            unsigned char fxyposl;
+            unsigned char fxyposh;
+        };
+        struct {                        /* Visible when DCSEL flag = 5 */
+            unsigned char fxxposs;
+            unsigned char fxyposs;
+            unsigned char fxpolyfilll;
+            unsigned char fxpolyfillh;
+        };
+        struct {                        /* Visible when DCSEL flag = 6 */
+            unsigned char fxcachel;
+            unsigned char fxcachem;
+            unsigned char fxcacheh;
+            unsigned char fxcacheu;
+        };
+        struct {                        /* Visible when DCSEL flag = 63 */
+            unsigned char dcver0;
+            unsigned char dcver1;
+            unsigned char dcver2;
+            unsigned char dcver3;
+        };
     } display;
     struct {
         unsigned char   config;         /* Layer map geometry */

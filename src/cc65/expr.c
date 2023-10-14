@@ -31,6 +31,7 @@
 #include "macrotab.h"
 #include "preproc.h"
 #include "scanner.h"
+#include "seqpoint.h"
 #include "shiftexpr.h"
 #include "stackptr.h"
 #include "standard.h"
@@ -691,6 +692,7 @@ void DoDeferred (unsigned Flags, ExprDesc* Expr)
     int         I;
     unsigned    Size = 0;
     int         Count = GetDeferredOpCount ();
+    unsigned    StmtFlags = GetSQPFlags ();
 
     /* Nothing to be done */
     if (Count <= 0) {
@@ -698,24 +700,36 @@ void DoDeferred (unsigned Flags, ExprDesc* Expr)
     }
 
     /* Backup some regs/processor flags around the inc/dec */
-    if ((Flags & SQP_KEEP_TEST) != 0 && ED_NeedsTest (Expr)) {
+    if ((StmtFlags & SQP_KEEP_TEST) != 0 ||
+        ((Flags & SQP_KEEP_TEST) != 0 && ED_NeedsTest (Expr))) {
         /* Sufficient to add a pair of PHP/PLP for all cases */
         AddCodeLine ("php");
     }
 
-    /* Backup the content of EAX around the inc/dec */
-    if ((Flags & SQP_KEEP_EAX) != 0 && ED_NeedsPrimary (Expr)) {
-        /* Get the size */
-        Size = CheckedSizeOf (Expr->Type);
+    if ((Flags & SQP_MASK_EAX) != 0 && ED_NeedsPrimary (Expr)) {
+        Size = SizeOf (Expr->Type);
+    }
 
-        if (Size < 2) {
-            AddCodeLine ("pha");
-        } else if (Size < 3) {
-            AddCodeLine ("sta regsave");
-            AddCodeLine ("stx regsave+1");
-        } else {
-            AddCodeLine ("jsr saveeax");
+    /* Get the size of the backup */
+    if ((StmtFlags & SQP_MASK_EAX) != 0) {
+        switch (StmtFlags & SQP_MASK_EAX) {
+            case SQP_KEEP_A:    if (Size < 1) Size = 1; break;
+            case SQP_KEEP_AX:   if (Size < 2) Size = 2; break;
+            case SQP_KEEP_EAX:  if (Size < 4) Size = 4; break;
+            default:            ;
         }
+    }
+
+    /* Backup the content of EAX around the inc/dec */
+    if (Size == 1) {
+        AddCodeLine ("pha");
+    } else if (Size == 2) {
+        AddCodeLine ("sta regsave");
+        AddCodeLine ("stx regsave+1");
+    } else if (Size == 3 || Size == 4) {
+        AddCodeLine("jsr saveeax");
+    } else if (Size > 4) {
+        Error ("Unsupported deferred operand size: %u", Size);
     }
 
     for (I = 0; I < Count; ++I) {
@@ -735,19 +749,18 @@ void DoDeferred (unsigned Flags, ExprDesc* Expr)
     CollDeleteAll (&DeferredOps);
 
     /* Restore the content of EAX around the inc/dec */
-    if ((Flags & SQP_KEEP_EAX) != 0 && ED_NeedsPrimary (Expr)) {
-        if (Size < 2) {
-            AddCodeLine ("pla");
-        } else if (Size < 3) {
-            AddCodeLine ("lda regsave");
-            AddCodeLine ("ldx regsave+1");
-        } else {
-            AddCodeLine ("jsr resteax");
-        }
+    if (Size == 1) {
+        AddCodeLine ("pla");
+    } else if (Size == 2) {
+        AddCodeLine ("lda regsave");
+        AddCodeLine ("ldx regsave+1");
+    } else if (Size == 3 || Size == 4) {
+        AddCodeLine ("jsr resteax");
     }
 
     /* Restore the regs/processor flags around the inc/dec */
-    if ((Flags & SQP_KEEP_TEST) != 0 && ED_NeedsTest (Expr)) {
+    if ((StmtFlags & SQP_KEEP_TEST) != 0 ||
+        ((Flags & SQP_KEEP_TEST) != 0 && ED_NeedsTest (Expr))) {
         /* Sufficient to pop the processor flags */
         AddCodeLine ("plp");
     }
@@ -1048,6 +1061,10 @@ static void FunctionCall (ExprDesc* Expr)
 
     /* Parse the argument list and pass them to the called function */
     ArgSize = FunctionArgList (Func, IsFastcall, Expr);
+
+    if (ArgSize > 0xFF && (Func->Flags & FD_VARIADIC) != 0) {
+        Error ("Total size of all arguments passed to a variadic function cannot exceed 255 bytes");
+    }
 
     /* We need the closing paren here */
     ConsumeRParen ();
@@ -1372,6 +1389,7 @@ static void Primary (ExprDesc* E)
 
         case TOK_A:
             /* Register pseudo variable */
+            SetSQPFlags (SQP_KEEP_A);
             E->Type  = type_uchar;
             E->Flags = E_LOC_PRIMARY | E_RTYPE_LVAL;
             NextToken ();
@@ -1379,6 +1397,7 @@ static void Primary (ExprDesc* E)
 
         case TOK_AX:
             /* Register pseudo variable */
+            SetSQPFlags (SQP_KEEP_AX);
             E->Type  = type_uint;
             E->Flags = E_LOC_PRIMARY | E_RTYPE_LVAL;
             NextToken ();
@@ -1386,6 +1405,7 @@ static void Primary (ExprDesc* E)
 
         case TOK_EAX:
             /* Register pseudo variable */
+            SetSQPFlags (SQP_KEEP_EAX);
             E->Type  = type_ulong;
             E->Flags = E_LOC_PRIMARY | E_RTYPE_LVAL;
             NextToken ();
@@ -1453,7 +1473,7 @@ static void StructRef (ExprDesc* Expr)
     /* Skip the token and check for an identifier */
     NextToken ();
     if (CurTok.Tok != TOK_IDENT) {
-        Error ("Identifier expected");
+        Error ("Identifier expected for %s member", GetBasicTypeName (Expr->Type));
         /* Make the expression an integer at address zero */
         ED_MakeConstAbs (Expr, 0, type_int);
         return;

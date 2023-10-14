@@ -65,6 +65,7 @@
 #include "preproc.h"
 #include "standard.h"
 #include "staticassert.h"
+#include "typecmp.h"
 #include "symtab.h"
 
 
@@ -178,7 +179,7 @@ static void Parse (void)
             ** or semicolon, it must be followed by a function body.
             */
             if ((Decl.StorageClass & SC_FUNC) != 0) {
-                if (CurTok.Tok != TOK_COMMA && CurTok.Tok != TOK_SEMI) {
+                if (CurTok.Tok == TOK_LCURLY) {
                     /* A definition */
                     Decl.StorageClass |= SC_DEF;
 
@@ -190,6 +191,10 @@ static void Parse (void)
                         FuncDef->Flags = (FuncDef->Flags & ~FD_EMPTY) | FD_VOID_PARAM;
                     }
                 } else {
+                    if (CurTok.Tok != TOK_COMMA && CurTok.Tok != TOK_SEMI) {
+                        Error ("Expected ',' or ';' after top level declarator");
+                    }
+
                     /* Just a declaration */
                     Decl.StorageClass |= SC_DECL;
                 }
@@ -321,17 +326,24 @@ static void Parse (void)
         if (Sym && IsTypeFunc (Sym->Type)) {
 
             /* Function */
-            if (!comma) {
-                if (CurTok.Tok == TOK_SEMI) {
-                    /* Prototype only */
-                    NextToken ();
-                } else {
-                    /* Parse the function body */
-                    NewFunc (Sym, FuncDef);
-
-                    /* Make sure we aren't omitting any work */
-                    CheckDeferredOpAllDone ();
+            if (CurTok.Tok == TOK_SEMI) {
+                /* Prototype only */
+                NextToken ();
+            } else if (CurTok.Tok == TOK_LCURLY) {
+                /* ISO C: The type category in a function definition cannot be
+                ** inherited from a typedef.
+                */
+                if (IsTypeFunc (Spec.Type) && TypeCmp (Sym->Type, Spec.Type).C >= TC_EQUAL) {
+                    Error ("Function cannot be defined with a typedef");
+                } else if (comma) {
+                    Error ("';' expected after top level declarator");
                 }
+
+                /* Parse the function body anyways */
+                NewFunc (Sym, FuncDef);
+
+                /* Make sure we aren't omitting any work */
+                CheckDeferredOpAllDone ();
             }
 
         } else {

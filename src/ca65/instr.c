@@ -1618,7 +1618,7 @@ static void PutJMP (const InsDesc* Ins)
     if (EvalEA (Ins, &A)) {
 
         /* Check for indirect addressing */
-        if ((A.AddrModeBit & AM65_ABS_IND) && (CPU < CPU_65SC02)) {
+        if ((A.AddrModeBit & AM65_ABS_IND) && (CPU < CPU_65SC02) && (RelaxChecks == 0)) {
 
             /* Compare the low byte of the expression to 0xFF to check for
             ** a page cross. Be sure to use a copy of the expression otherwise
@@ -1631,7 +1631,7 @@ static void PutJMP (const InsDesc* Ins)
             unsigned Msg = GetStringId ("\"jmp (abs)\" across page border");
 
             /* Generate the assertion */
-            AddAssertion (E, ASSERT_ACT_WARN, Msg);
+            AddAssertion (E, ASSERT_ACT_ERROR, Msg);
         }
 
         /* No error, output code */

@@ -334,9 +334,11 @@ function.
 
 <itemize>
 <!-- <item><ref id="get_numbanks" name="get_numbanks"> -->
-<!-- <item><ref id="get_ostype" name="get_ostype"> -->
+<item><ref id="get_ostype" name="get_ostype">
 <!-- <item><ref id="get_tv" name="get_tv"> -->
 <!-- <item><ref id="set_tv" name="set_tv"> -->
+<!-- <item><ref id="vera_layer_enable" name="vera_layer_enable"> -->
+<!-- <item><ref id="vera_sprites_enable" name="vera_sprites_enable"> -->
 <item><ref id="videomode" name="videomode">
 <!-- <item><ref id="vpeek" name="vpeek"> -->
 <!-- <item><ref id="vpoke" name="vpoke"> -->
@@ -440,6 +442,16 @@ see also <tt>testcode/lib/em-test.c</tt> and <tt>samples/multidemo.c</tt>.
 <url url="geos.html" name="GEOS API">.
 
 
+<sect1><tt/inet.h/<label id="inet.h"><p>
+
+<itemize>
+<item><ref id="htonl" name="htonl">
+<item><ref id="htons" name="htons">
+<item><ref id="ntohl" name="ntohl">
+<item><ref id="ntohs" name="ntohs">
+</itemize>
+
+
 <sect1><tt/joystick.h/<label id="joystick.h"><p>
 
 <itemize>
@@ -450,6 +462,18 @@ see also <tt>testcode/lib/em-test.c</tt> and <tt>samples/multidemo.c</tt>.
 <item><ref id="joy_uninstall" name="joy_uninstall">
 <item><ref id="joy_unload" name="joy_unload">
 </itemize>
+
+
+<sect1><tt/kim1.h/<label id="kim1.h"><p>
+
+<itemize>
+<!-- <item><ref id="getkey" name="getkey"> -->
+<!-- <item><ref id="scandisplay" name="scandisplay"> -->
+<item><ref id="loadt" name="loadt">
+<item><ref id="dumpt" name="dumpt">
+</itemize>
+
+(incomplete)
 
 
 <sect1><tt/locale.h/<label id="locale.h"><p>
@@ -1735,7 +1759,7 @@ used in presence of a prototype.
 <tag/See also/
 <ref id="fdisp" name="fdisp">,
 <ref id="loadt" name="loadt">,
-<ref id="dumpt" name="dumpt">,
+<ref id="dumpt" name="dumpt">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -1880,7 +1904,7 @@ be used in presence of a prototype.
 <ref id="_swap" name="_swap">,
 <ref id="memcpy" name="memcpy">,
 <ref id="memmove" name="memmove">,
-<ref id="memset" name="memset">,
+<ref id="memset" name="memset">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -1953,7 +1977,7 @@ sent a command to TALK and a secondary address if it needs one.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
-<ref id="cbm_k_talk" name="cbm_k_talk">,
+<ref id="cbm_k_talk" name="cbm_k_talk">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -2355,8 +2379,8 @@ function, in order to provide input from the keyboard.
 <tag/See also/
 <ref id="cbm_k_getin" name="cbm_k_getin">,
 <ref id="cbm_k_udtim" name="cbm_k_udtim">,
-<ref id="cgetc" name="cgetc">,
-<!-- <ref id="getc" name="getc"> -->
+<ref id="cgetc" name="cgetc">
+<!-- <ref id="getc" name="getc">, -->
 <!-- <ref id="getchar" name="getchar"> -->
 <tag/Example/None.
 </descrip>
@@ -3274,7 +3298,7 @@ used in presence of a prototype.
 <tag/Availability/cc65 (not all platforms)
 <tag/See also/
 <ref id="get_c128_speed" name="get_c128_speed">,
-<ref id="set_c128_speed" name="set_c128_speed">,
+<ref id="set_c128_speed" name="set_c128_speed">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -3314,7 +3338,7 @@ used in presence of a prototype.
 <tag/Availability/cc65 (not all platforms)
 <tag/See also/
 <ref id="get_c65_speed" name="get_c65_speed">,
-<ref id="set_c65_speed" name="set_c65_speed">,
+<ref id="set_c65_speed" name="set_c65_speed">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -3440,11 +3464,11 @@ int main(void)
 <quote>
 <descrip>
 <tag/Function/Dump memory to tape.
-<tag/Header/<tt/<ref id="sym1.h" name="sym1.h">/
+<tag/Header/<tt/<ref id="sym1.h" name="sym1.h">/, <tt/<ref id="kim1.h" name="kim1.h">/
 <tag/Declaration/<tt/int __fastcall__ dumpt (unsigned char id, const void* start, const void* end);/
 <tag/Description/<tt/dumpt/ saves memory onto data tape.
 <tag/Notes/<itemize>
-<item>The function is specific to the Sym-1.
+<item>The function is specific to the Sym-1 and KIM-1.
 <item>The return value is status.  Non-zero status indicates an error.
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
@@ -3453,7 +3477,7 @@ be used in presence of a prototype.
 <tag/See also/
 <ref id="beep" name="beep">,
 <ref id="fdisp" name="fdisp">,
-<ref id="loadt" name="loadt">,
+<ref id="loadt" name="loadt">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -3833,7 +3857,7 @@ switching the CPU into double clock mode.
 <tag/See also/
 <ref id="beep" name="beep">,
 <ref id="loadt" name="loadt">,
-<ref id="dumpt" name="dumpt">,
+<ref id="dumpt" name="dumpt">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -3949,7 +3973,8 @@ be used in presence of a prototype.
 <descrip>
 <tag/Function/The function returns the operating system, the program runs on.
 <tag/Header/<tt/<ref id="apple2.h" name="apple2.h">,
-<ref id="atari.h" name="atari.h">, <ref id="c64.h" name="c64.h">/
+<ref id="atari.h" name="atari.h">, <ref id="c64.h" name="c64.h">,
+<ref id="cx16.h" name="cx16.h">/
 <tag/Declaration/<tt/unsigned char get_ostype (void);/
 <tag/Description/<tt/get_ostype/ is machine dependent and does not exist for
 all supported targets. If it exists, it returns a number that identifies the
@@ -4385,6 +4410,45 @@ to undefined behaviour.
 <ref id="wherex" name="wherex">,
 <ref id="wherey" name="wherey">
 <tag/Example/None.
+</descrip>
+</quote>
+
+<sect1>htonl<label id="htonl"><p>
+
+<quote>
+<descrip>
+<tag/Function/Swaps byte order in a 32 bit word.
+<tag/Header/<tt/<ref id="inet.h" name="arpa/inet.h">/
+<tag/Declaration/<tt/int htonl(val)/
+<tag/Description/Converts a 32 bit word from from network byte order
+(big endian) to little endian (or vice-versa).
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/See also/
+<ref id="ntohl" name="ntohl">
+<tag/Availability/cc65
+</descrip>
+</quote>
+
+
+<sect1>htons<label id="htons"><p>
+
+<quote>
+<descrip>
+<tag/Function/Swaps byte order in a 16 bit word.
+<tag/Header/<tt/<ref id="inet.h" name="arpa/inet.h">/
+<tag/Declaration/<tt/int htons(val)/
+<tag/Description/Converts a 16 bit word from from network byte order
+(big endian) to little endian (or vice-versa) by swapping both its bytes.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/See also/
+<ref id="ntohs" name="ntohs">
+<tag/Availability/cc65
 </descrip>
 </quote>
 
@@ -5084,11 +5148,11 @@ used in presence of a prototype.
 <quote>
 <descrip>
 <tag/Function/Load memory from tape.
-<tag/Header/<tt/<ref id="sym1.h" name="sym1.h">/
+<tag/Header/<tt/<ref id="sym1.h" name="sym1.h">/, <tt/<ref id="kim1.h" name="kim1.h">/
 <tag/Declaration/<tt/int __fastcall__ loadt (unsigned char id);/
 <tag/Description/<tt/loadt/ loads memory from data tape.
 <tag/Notes/<itemize>
-<item>The function is specific to the Sym-1.
+<item>The function is specific to the Sym-1 and KIM-1.
 <item>The return value is status.  Non-zero status indicates an error.
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
@@ -5097,7 +5161,7 @@ be used in presence of a prototype.
 <tag/See also/
 <ref id="beep" name="beep">,
 <ref id="fdisp" name="fdisp">,
-<ref id="dumpt" name="dumpt">,
+<ref id="dumpt" name="dumpt">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -5753,6 +5817,44 @@ memory allocated for the driver.
 <tag/Header/<tt/<ref id="cc65.h" name="cc65.h">/
 <tag/Declaration/<tt/unsigned int __fastcall__ mul40 (unsigned char value);/
 <tag/Description/Speed optimized function to multiply an 8 bit unsigned value by 40 to get a 16 bit result.
+<tag/Availability/cc65
+</descrip>
+</quote>
+
+<sect1>ntohl<label id="ntohl"><p>
+
+<quote>
+<descrip>
+<tag/Function/Swaps byte order in a 32 bit word.
+<tag/Header/<tt/<ref id="inet.h" name="arpa/inet.h">/
+<tag/Declaration/<tt/int __fastcall__ ntohl (int val);/
+<tag/Description/Converts a 32 bit word from from host byte order (little endian)
+to big endian (or vice-versa).
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/See also/
+<ref id="htonl" name="htonl">
+<tag/Availability/cc65
+</descrip>
+</quote>
+
+<sect1>ntohs<label id="ntohs"><p>
+
+<quote>
+<descrip>
+<tag/Function/Swaps byte order in a 16 bit word.
+<tag/Header/<tt/<ref id="inet.h" name="arpa/inet.h">/
+<tag/Declaration/<tt/int __fastcall__ ntohs (int val);/
+<tag/Description/Converts a 16 bit word from from host byte order (little endian)
+to big endian (or vice-versa) by swapping both its bytes.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/See also/
+<ref id="htons" name="htons">
 <tag/Availability/cc65
 </descrip>
 </quote>
@@ -6606,7 +6708,8 @@ be used in presence of a prototype.
 <tag/Function/Uninstall the currently loaded driver but do not unload it.
 <tag/Header/<tt/<ref id="serial.h" name="serial.h">/
 <tag/Declaration/<tt/unsigned char ser_uninstall (void);/
-<tag/Description/Uninstall the currently loaded driver but do not unload it.
+<tag/Description/Uninstall the currently loaded driver but do not unload it. This
+function returns SER_ERR_NO_DRIVER if no driver was installed, 0 otherwise.
 <tag/Availability/cc65
 <tag/See also/Other serial functions.
 <tag/Example/None.

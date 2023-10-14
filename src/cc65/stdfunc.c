@@ -50,6 +50,7 @@
 #include "litpool.h"
 #include "loadexpr.h"
 #include "scanner.h"
+#include "seqpoint.h"
 #include "stackptr.h"
 #include "stdfunc.h"
 #include "stdnames.h"

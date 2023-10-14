@@ -139,7 +139,7 @@ You can refer to Annex B of the ISO C99 standard ([here](https://www.open-std.or
 * If a function is declared to return a char-sized value, it actually must return an integer-sized value.  (When cc65 promotes a returned value, it sometimes assumes that the value already is an integer.) This must be done in one of the following ways:
 <pre>
     lda #RETURN_VALUE
-    ldx #0 ; return value is char
+    ldx #0 ; Promote char return value
 </pre>
 or, if the value is 0, you can use:
 <pre>

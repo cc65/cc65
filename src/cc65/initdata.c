@@ -58,6 +58,7 @@
 #include "litpool.h"
 #include "pragma.h"
 #include "scanner.h"
+#include "seqpoint.h"
 #include "shift.h"
 #include "standard.h"
 #include "symtab.h"

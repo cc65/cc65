@@ -56,6 +56,7 @@
 #include "loop.h"
 #include "pragma.h"
 #include "scanner.h"
+#include "seqpoint.h"
 #include "stackptr.h"
 #include "stmt.h"
 #include "swstmt.h"
@@ -674,6 +675,8 @@ int AnyStatement (int* PendingToken)
 ** NULL, the function will skip the token.
 */
 {
+    int GotBreak = 0;
+
     /* Assume no pending token */
     if (PendingToken) {
         *PendingToken = 0;
@@ -689,7 +692,8 @@ int AnyStatement (int* PendingToken)
     switch (CurTok.Tok) {
 
         case TOK_IF:
-            return IfStatement ();
+            GotBreak = IfStatement ();
+            break;
 
         case TOK_SWITCH:
             SwitchStatement ();
@@ -710,22 +714,26 @@ int AnyStatement (int* PendingToken)
         case TOK_GOTO:
             GotoStatement ();
             CheckSemi (PendingToken);
-            return 1;
+            GotBreak = 1;
+            break;
 
         case TOK_RETURN:
             ReturnStatement ();
             CheckSemi (PendingToken);
-            return 1;
+            GotBreak = 1;
+            break;
 
         case TOK_BREAK:
             BreakStatement ();
             CheckSemi (PendingToken);
-            return 1;
+            GotBreak = 1;
+            break;
 
         case TOK_CONTINUE:
             ContinueStatement ();
             CheckSemi (PendingToken);
-            return 1;
+            GotBreak = 1;
+            break;
 
         case TOK_PRAGMA:
             DoPragma ();
@@ -737,12 +745,17 @@ int AnyStatement (int* PendingToken)
             break;
 
         case TOK_LCURLY:
-            return CompoundStatement (PendingToken);
+            GotBreak = CompoundStatement (PendingToken);
+            break;
 
         default:
             /* Simple statement */
             Statement (PendingToken);
             break;
     }
-    return 0;
+
+    /* Reset SQP flags */
+    SetSQPFlags (SQP_KEEP_NONE);
+
+    return GotBreak;
 }

@@ -837,7 +837,7 @@ This cc65 version has some extensions to the ISO C standard.
 
 <itemize>
 
-<item>  The compiler allows to insert assembler statements into the output
+<item>  The compiler allows to insert assembler expressions into the output
         file. The syntax is
 
         <tscreen><verb>
@@ -851,7 +851,7 @@ This cc65 version has some extensions to the ISO C standard.
         The first form is in the user namespace; and, is disabled if the <tt/-A/
         switch is given.
 
-        There is a whole section covering inline assembler statements,
+        There is a whole section covering inline assembler expressions,
         <ref id="inline-asm" name="see there">.
         <p>
 
@@ -1714,7 +1714,7 @@ bloated code and a slowdown.
 
 <sect>Inline assembler<label id="inline-asm"><p>
 
-The compiler allows to insert assembler statements into the output file. The
+The compiler allows to insert assembler expressions into the output file. The
 syntax is
 
 <tscreen><verb>
@@ -1729,7 +1729,7 @@ or
 The first form is in the user namespace; and, is disabled by <tt><ref
 id="option--standard" name="--standard"></tt> if the argument is not <tt/cc65/.
 
-The <tt/asm/ statement can be used only inside a function.  Please note that
+The <tt/asm/ expression can be used only inside a function.  Please note that
 the result of an inline assembler expression is always of type <tt/void/.
 
 The contents of the string literal are preparsed by the compiler; and, inserted
@@ -1741,15 +1741,15 @@ even if the ca65 assembler (which is used to translate the generated assembler
 code) would accept them. The built-in inline assembler is not a replacement for
 the full-blown macro assembler which comes with the compiler.
 
-Note: Inline assembler statements are subject to all optimizations done by the
-compiler. There currently is no way to protect an inline assembler statement
+Note: Inline assembler expressions are subject to all optimizations done by the
+compiler. There currently is no way to protect an inline assembler expression
 -- alone -- from being moved or removed completely by the optimizer. If in
 doubt, check the generated assembler output; or, disable optimizations (for
 that function).
 
 As a shortcut, you can put the <tt/volatile/ qualifier in your <tt/asm/
-statements.  It will disable optimization for the functions in which those
-<tt/asm volatile/ statements sit.  The effect is the same as though you put
+expressions.  It will disable optimization for the functions in which those
+<tt/asm volatile/ expressions sit.  The effect is the same as though you put
 <tt/#pragma optimize(push, off)/ above those functions, and <tt/#pragma
 optimize(pop)/ below those functions.
 
@@ -1844,7 +1844,7 @@ Arrays also can be accessed:
 <p>
 
 Note: Do not embed the assembler labels that are used as names of global
-variables or functions into your <tt/asm/ statements. Code such as this:
+variables or functions into your <tt/asm/ expressions. Code such as this:
 
 <tscreen><verb>
         int foo;

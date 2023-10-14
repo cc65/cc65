@@ -56,11 +56,11 @@ adp2:
 adp2_lo:        .res 1
 adp2_hi:        .res 1
 
-scroll_src:     
+scroll_src:
 scroll_src_lo:  .res 1
 scroll_src_hi:  .res 1  
 
-scroll_dest:   
+scroll_dest:
 scroll_dest_lo: .res 1
 scroll_dest_hi: .res 1
 
@@ -75,9 +75,9 @@ _cursorY:       .res 1
 tempchar:       .res 1
 xval:           .res 2              ; These could move to zeropage for perf, but presume we
 yval:           .res 2              ;   we want to minimize the amount we grow zero page use
-err:            .res 2  
+err:            .res 2
 temp:           .res 2
-tempa:          .res 1    
+tempa:          .res 1
 tempx:          .res 1
 tempy:          .res 1
 temp2:          .res 2
@@ -103,7 +103,7 @@ y0:             .res 2
 ; adp1          - address of pixel to set (16-bit)
 ;-----------------------------------------------------------------------------------
 
-_GetPixelAddress:          
+_GetPixelAddress:
                 lda 	_x1cord 	      ; compute bit address first
                 sta 	adp1 		      ; also transfer _x1cord to adp1
                 and 	#$07		      ; + which is simply the low 3 bits of x
@@ -165,7 +165,7 @@ msktb2:	  	    .byte 	$7F,$BF,$DF,$EF,$F7,$FB,$FD,$FE
 ; SetPixel - Set a pixel in the video memory
 ;-----------------------------------------------------------------------------------
 ; x             - _x1cord (16-bit)
-; y             - _y1cord (16-bit)   
+; y             - _y1cord (16-bit)
 ;-----------------------------------------------------------------------------------
 ; Mask tables for individual pixel subroutines
 ;-----------------------------------------------------------------------------------
@@ -173,25 +173,25 @@ msktb2:	  	    .byte 	$7F,$BF,$DF,$EF,$F7,$FB,$FD,$FE
 _SetPixel:	    jsr 	_GetPixelAddress
                 ldy 	btpt 		; get bit number in y
                 lda 	msktb1,y 	; get a byte with that bit =1, others =0
-                ldy 	#0 		
+                ldy 	#0
                 ora 	(adp1),y 	; combine the bit with the addressed vm
                 sta 	(adp1),y 	; byte
-                rts 			
+                rts
 
 ;-----------------------------------------------------------------------------------
 ; ClearPixel - Clears a pixel in the video memory
 ;-----------------------------------------------------------------------------------
 ; x             - _x1cord (16-bit)
-; y             - _y1cord (16-bit)   
+; y             - _y1cord (16-bit)
 ;-----------------------------------------------------------------------------------
 
 _ClearPixel:	jsr 	_GetPixelAddress
                 ldy 	btpt 		; get bit number in y
                 lda 	msktb2,y 	; get a byte with that bit =0, others =1
-                ldy 	#0 		
+                ldy 	#0
                 and 	(adp1),y 	; remove the bit from the addressed vm
                 sta 	(adp1),y 	; byte
-                rts 			
+                rts
 
 ;-----------------------------------------------------------------------------------
 ; ClearScreen - Clears the entire video memory (and thus the screen)
@@ -265,7 +265,7 @@ _ScrollScreen:
                 lda (scroll_src),y                          ; I've unwound the loop to do 8 bytes at a time.  Since we're doing full pages
                 sta (scroll_dest),y                         ;   as long as we unwind the loop to do 8 bytes at a time, we know we'll still
                 iny                                         ;   do the final increment on a page boundary.  
-                lda (scroll_src),y                          
+                lda (scroll_src),y
                 sta (scroll_dest),y
                 iny
                 lda (scroll_src),y
@@ -303,7 +303,7 @@ fullPageLoop:
                 sta (scroll_dest_lo),y
                 iny
                 bne fullPageLoop
-                inc scroll_dest_hi                
+                inc scroll_dest_hi
 partialPageLoop:
                 sta (scroll_dest_lo),y
                 iny
@@ -368,8 +368,8 @@ _DrawCircle:    lda _x1cord                     ; x0 = _x1cord
                 sta yval
                 sta yval+1
                 sta err                         ; err = 0;
-                sta err+1                       
-circleloop:                        
+                sta err+1
+circleloop:
                 lda xval+1                      ; if (xval < yval) we're done;
                 sec
                 cmp yval+1
@@ -396,7 +396,7 @@ doCircle:       lda x0                          ; Draw the first of 8 symmetric 
                 sbc xval+1
                 sta _y1cord+1
                 jsr _SetPixel                    ; SETPIXEL(x0 + y, y0 - x, val);
-      
+
                 lda x0
                 sec
                 sbc yval
@@ -541,7 +541,7 @@ doCircle:       lda x0                          ; Draw the first of 8 symmetric 
                 
                 asl temp                        ; temp = 2*(err-xval)+1
                 rol temp+1
-                inc temp                     
+                inc temp
                 bne :+
                 inc temp+1
 :               
@@ -631,7 +631,7 @@ ascToPetTable:  .byte $00,$01,$02,$03,$04,$05,$06,$07,$14,$20,$0d,$11,$93,$0a,$0
 
 _AscToPet:      tay
                 lda ascToPetTable, y
-                rts             
+                rts
 
 ;-----------------------------------------------------------------------------------
 ; ReverseBits   - Reverse the bits in a byte
@@ -743,7 +743,7 @@ _DrawChar:     sty tempy
                sta (dest, x)
                lda dest_lo                         ; Advance to the next "scanline", or pixel row, down
                clc
-               adc #<BYTESPERROW               
+               adc #<BYTESPERROW
                sta dest_lo
                lda dest_hi
                adc #>BYTESPERROW
@@ -773,7 +773,7 @@ checkHWrap:    lda _cursorX
                bcc checkVWrap
                lda #0
                sta _cursorX
-               inc _cursorY    
+               inc _cursorY
               
 checkVWrap:    lda _cursorY
                cmp #ROWSPERCOLUMN
@@ -803,7 +803,7 @@ loadChar:      lda (adp1), y
                iny
                bne checkHWrap
 
-doneText:      rts      
+doneText:      rts
 
 demoText1:     .byte "  *** COMMODORE KIM-1 SHELL V0.1 ***", $0A, $0A
                .byte "   60K RAM SYSTEM.  49152 BYTES FREE.", $0A, $0A

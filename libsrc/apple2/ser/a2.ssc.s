@@ -145,7 +145,7 @@ ParityTable:                    ; Table used to translate RS232 parity param
 
 IdOfsTable:                     ; Table of bytes positions, used to check four
                                 ; specific bytes on the slot's firmware to make
-                                ; sure this is an SSC (or Apple //c comm port).
+                                ; sure this is a serial card.
         .byte   $05             ; Pascal 1.0 ID byte
         .byte   $07             ; Pascal 1.0 ID byte
         .byte   $0B             ; Pascal 1.1 generic signature byte
@@ -230,12 +230,8 @@ NotIIgs:ldx     #<$C000
 :       ldy     IdOfsTable,x    ; Check Pascal 1.1 Firmware Protocol ID bytes
         lda     IdValTable,x
         cmp     (ptr2),y
-        beq     ByteOK
-
-NoDev:  lda     #SER_ERR_NO_DEVICE
-        bne     Out
-
-ByteOK: inx
+        bne     NoDev
+        inx
         cpx     #IdTableLen
         bcc     :-
 
@@ -249,8 +245,45 @@ ByteOK: inx
 .endif
         tax
 
+        ; Check that this works like an ACIA 6551 is expected to work
+
+        lda     ACIA_STATUS,x   ; Save current values in what we expect to be
+        sta     tmp1            ; the ACIA status register
+        lda     ACIA_CMD,x      ; and command register. So we can restore them
+        sta     tmp2            ; if this isn't a 6551.
+
+        and     #%11111110
+        sta     ACIA_CMD,x      ; Disable receiver/transmitter
+
+        lda     ACIA_CMD,x      ; Reload register
+        and     #%00000001
+        bne     NotAcia         ; We expect command register bit 0 to be 0
+
+        lda     tmp2
+        ora     #%00000001      ; Enable receiver/transmitter
+        sta     ACIA_CMD,x
+        sta     tmp3            ; Store it for comparison
+
+        lda     ACIA_CMD,x      ; Is command register what we wrote?
+        cmp     tmp3
+        bne     NotAcia
+
+        sta     ACIA_STATUS,x   ; Reset Acia (value written is not important)
+
+        lda     ACIA_CMD,x      ; Is the Acia disabled now?
+        and     #%00000001
+        beq     AciaOK
+
+NotAcia:lda    tmp2             ; Restore original values
+        sta    ACIA_CMD,x
+        lda    tmp1
+        sta    ACIA_STATUS,x
+
+NoDev:  lda     #SER_ERR_NO_DEVICE
+        bne     Out
+
         ; Check if the handshake setting is valid
-        ldy     #SER_PARAMS::HANDSHAKE
+AciaOK: ldy     #SER_PARAMS::HANDSHAKE
         lda     (ptr1),y
         cmp     #SER_HS_HW      ; This is all we support
         beq     HandshakeOK
@@ -481,4 +514,4 @@ Send:   ldy     SendHead        ; Get first byte to send
         sta     ACIA_DATA,x     ; Send it
         inc     SendHead
         inc     SendFreeCnt
-        jmp     NextByte        ; And try next one
+        bne     NextByte        ; And try next one

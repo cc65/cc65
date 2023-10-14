@@ -1427,13 +1427,13 @@ static void Primary (ExprDesc* E)
                 break;
             } else {
                 /* Let's see if this is a C99-style declaration */
-                DeclSpec    Spec;
-                InitDeclSpec (&Spec);
+                DeclSpec Spec;
                 ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_INT, SC_AUTO);
 
                 if (Spec.Type->C != T_END) {
-
+                    /* Recognized but not supported */
                     Error ("Mixed declarations and code are not supported in cc65");
+
                     while (CurTok.Tok != TOK_SEMI) {
                         Declarator Decl;
 

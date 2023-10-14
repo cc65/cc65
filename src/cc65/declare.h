@@ -113,19 +113,16 @@ typedef enum {
 
 
 
-void InitDeclSpec (DeclSpec* D);
-/* Initialize the DeclSpec struct for use */
-
 Type* ParseType (Type* Type);
 /* Parse a complete type specification */
 
 void ParseDecl (const DeclSpec* Spec, Declarator* D, declmode_t Mode);
 /* Parse a variable, type or function declarator */
 
-void ParseDeclSpec (DeclSpec* D, typespec_t TSFlags, unsigned DefStorage);
+void ParseDeclSpec (DeclSpec* Spec, typespec_t TSFlags, unsigned DefStorage);
 /* Parse a declaration specification */
 
-void CheckEmptyDecl (const DeclSpec* D);
+void CheckEmptyDecl (const DeclSpec* Spec);
 /* Called after an empty type declaration (that is, a type declaration without
 ** a variable). Checks if the declaration does really make sense and issues a
 ** warning if not.

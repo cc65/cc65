@@ -252,32 +252,23 @@ NotIIgs:ldx     #<$C000
         lda     ACIA_CMD,x      ; and command register. So we can restore them
         sta     tmp2            ; if this isn't a 6551.
 
-        and     #%11111110
-        sta     ACIA_CMD,x      ; Disable receiver/transmitter
-
-        lda     ACIA_CMD,x      ; Reload register
-        and     #%00000001
-        bne     NotAcia         ; We expect command register bit 0 to be 0
-
-        lda     tmp2
-        ora     #%00000001      ; Enable receiver/transmitter
+        ldy     #%00000010      ; Disable TX/RX, disable IRQ
+:       tya
         sta     ACIA_CMD,x
-        sta     tmp3            ; Store it for comparison
-
-        lda     ACIA_CMD,x      ; Is command register what we wrote?
-        cmp     tmp3
+        cmp     ACIA_CMD,x      ; Verify what we stored is there
         bne     NotAcia
+        iny                     ; Enable TX/RX, disable IRQ
+        cpy     #%00000100
+        bne     :-
+        sta     ACIA_STATUS,x   ; Reset ACIA
+        lda     ACIA_CMD,x      ; Check that RX/TX is disabled
+        lsr
+        bcc     AciaOK
 
-        sta     ACIA_STATUS,x   ; Reset Acia (value written is not important)
-
-        lda     ACIA_CMD,x      ; Is the Acia disabled now?
-        and     #%00000001
-        beq     AciaOK
-
-NotAcia:lda    tmp2             ; Restore original values
-        sta    ACIA_CMD,x
-        lda    tmp1
-        sta    ACIA_STATUS,x
+NotAcia:lda     tmp2             ; Restore original values
+        sta     ACIA_CMD,x
+        lda     tmp1
+        sta     ACIA_STATUS,x
 
 NoDev:  lda     #SER_ERR_NO_DEVICE
         bne     Out

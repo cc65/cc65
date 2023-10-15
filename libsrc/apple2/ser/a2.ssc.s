@@ -265,7 +265,7 @@ NotIIgs:ldx     #<$C000
         lsr
         bcc     AciaOK
 
-NotAcia:lda     tmp2             ; Restore original values
+NotAcia:lda     tmp2            ; Restore original values
         sta     ACIA_CMD,x
         lda     tmp1
         sta     ACIA_STATUS,x

@@ -13,8 +13,8 @@
 typedef unsigned char byte;
 
 extern void ClearScreen(void);      // In subs.asm
-extern void ScrollScreen(void);     
-extern void DrawCircle(void);       
+extern void ScrollScreen(void);
+extern void DrawCircle(void);
 extern void SetPixel(void);
 extern void ClearPixel(void);
 extern void DrawChar(void);
@@ -115,7 +115,7 @@ void DrawText(char * psz)
       else
       {
          c = *psz;
-     
+
          __asm__ ("ldx %v", cursorX);
          __asm__ ("ldy %v", cursorY);
          __asm__ ("lda %v", c);

@@ -58,7 +58,7 @@ adp2_hi:        .res 1
 
 scroll_src:
 scroll_src_lo:  .res 1
-scroll_src_hi:  .res 1  
+scroll_src_hi:  .res 1
 
 scroll_dest:
 scroll_dest_lo: .res 1
@@ -99,57 +99,57 @@ y0:             .res 2
 ; Based on MTU PIXADR code
 ;-----------------------------------------------------------------------------------
 ; x             - _x1cord (16-bit)
-; y             - _y1cord (16-bit)   
+; y             - _y1cord (16-bit)
 ; adp1          - address of pixel to set (16-bit)
 ;-----------------------------------------------------------------------------------
 
 _GetPixelAddress:
-                lda 	_x1cord 	      ; compute bit address first
-                sta 	adp1 		      ; also transfer _x1cord to adp1
-                and 	#$07		      ; + which is simply the low 3 bits of x
-                sta 	btpt
+                lda     _x1cord         ; compute bit address first
+                sta     adp1            ; also transfer _x1cord to adp1
+                and     #$07            ; + which is simply the low 3 bits of x
+                sta     btpt
 
-                lda 	_x1cord+1 	   ; finish transferring _x1cord to adp1
-                sta 	adp1+1
-                lsr 	adp1+1 		   ; double shift adp1 right 3 to get
-                ror 	adp1 		      ; int(xcord/8 )
-                lsr 	adp1+1
-                ror 	adp1
-                lsr 	adp1+1
-                ror 	adp1
-                lda 	_y1cord
-                sta 	adp2
-                sta 	temp
+                lda     _x1cord+1       ; finish transferring _x1cord to adp1
+                sta     adp1+1
+                lsr     adp1+1          ; double shift adp1 right 3 to get
+                ror     adp1            ; int(xcord/8 )
+                lsr     adp1+1
+                ror     adp1
+                lsr     adp1+1
+                ror     adp1
+                lda     _y1cord
+                sta     adp2
+                sta     temp
 
-                lda 	_y1cord+1
-                sta 	adp2+1
-                sta 	temp+1
-                asl 	adp2 		      ; compute 40*(_y1cord)
-                rol 	adp2+1 		   ;  2*(_y1cord)
-                asl 	adp2
-                rol 	adp2+1 		   ;  4*(_y1cord)
-                lda 	adp2 		      ;  add in temporary save of (_y1cord)
-                clc 			         ;  to make 5*(_y1cord)
-                adc 	temp
-                sta 	adp2
-                lda 	adp2+1
-                adc 	temp+1
-                sta 	adp2+1 		   ; 5*(_y1cord)
-                asl 	adp2 		      ; 10*(_y1cord)
-                rol 	adp2+1
-                asl 	adp2 		      ; 20#(_y1cord)
-                rol 	adp2+1
-                asl 	adp2 		      ; 40*(_y1cord)
-                rol 	adp2+1
-                lda 	adp2 		      ; add in int(_x1cord/8) computed earlier
+                lda     _y1cord+1
+                sta     adp2+1
+                sta     temp+1
+                asl     adp2            ; compute 40*(_y1cord)
+                rol     adp2+1          ;  2*(_y1cord)
+                asl     adp2
+                rol     adp2+1          ;  4*(_y1cord)
+                lda     adp2            ;  add in temporary save of (_y1cord)
+                clc                     ;  to make 5*(_y1cord)
+                adc     temp
+                sta     adp2
+                lda     adp2+1
+                adc     temp+1
+                sta     adp2+1          ; 5*(_y1cord)
+                asl     adp2            ; 10*(_y1cord)
+                rol     adp2+1
+                asl     adp2            ; 20#(_y1cord)
+                rol     adp2+1
+                asl     adp2            ; 40*(_y1cord)
+                rol     adp2+1
+                lda     adp2            ; add in int(_x1cord/8) computed earlier
                 clc
-                adc 	adp1
-                sta 	adp1
-                lda 	adp2+1
-                adc 	adp1+1
-                adc 	#>SCREEN       ; add in base vidscreen address
-                sta 	adp1+1 		   ; final result
-                rts 			         ; return
+                adc     adp1
+                sta     adp1
+                lda     adp2+1
+                adc     adp1+1
+                adc     #>SCREEN        ; add in base vidscreen address
+                sta     adp1+1          ; final result
+                rts                     ; return
 
 ;-----------------------------------------------------------------------------------
 ; Mask tables for individual pixel subroutines
@@ -158,8 +158,8 @@ _GetPixelAddress:
 ; MSKTB2 is a table of 0 bits corresponding to bit numbers
 ;-----------------------------------------------------------------------------------
 
-msktb1:	 	    .byte 	$80,$40,$20,$10,$08,$04,$02,$01
-msktb2:	  	    .byte 	$7F,$BF,$DF,$EF,$F7,$FB,$FD,$FE
+msktb1:         .byte   $80,$40,$20,$10,$08,$04,$02,$01
+msktb2:         .byte   $7F,$BF,$DF,$EF,$F7,$FB,$FD,$FE
 
 ;-----------------------------------------------------------------------------------
 ; SetPixel - Set a pixel in the video memory
@@ -170,12 +170,12 @@ msktb2:	  	    .byte 	$7F,$BF,$DF,$EF,$F7,$FB,$FD,$FE
 ; Mask tables for individual pixel subroutines
 ;-----------------------------------------------------------------------------------
 
-_SetPixel:	    jsr 	_GetPixelAddress
-                ldy 	btpt 		; get bit number in y
-                lda 	msktb1,y 	; get a byte with that bit =1, others =0
-                ldy 	#0
-                ora 	(adp1),y 	; combine the bit with the addressed vm
-                sta 	(adp1),y 	; byte
+_SetPixel:      jsr     _GetPixelAddress
+                ldy     btpt        ; get bit number in y
+                lda     msktb1,y    ; get a byte with that bit =1, others =0
+                ldy     #0
+                ora     (adp1),y    ; combine the bit with the addressed vm
+                sta     (adp1),y    ; byte
                 rts
 
 ;-----------------------------------------------------------------------------------
@@ -185,12 +185,12 @@ _SetPixel:	    jsr 	_GetPixelAddress
 ; y             - _y1cord (16-bit)
 ;-----------------------------------------------------------------------------------
 
-_ClearPixel:	jsr 	_GetPixelAddress
-                ldy 	btpt 		; get bit number in y
-                lda 	msktb2,y 	; get a byte with that bit =0, others =1
-                ldy 	#0
-                and 	(adp1),y 	; remove the bit from the addressed vm
-                sta 	(adp1),y 	; byte
+_ClearPixel:    jsr     _GetPixelAddress
+                ldy     btpt        ; get bit number in y
+                lda     msktb2,y    ; get a byte with that bit =0, others =1
+                ldy     #0
+                and     (adp1),y    ; remove the bit from the addressed vm
+                sta     (adp1),y    ; byte
                 rts
 
 ;-----------------------------------------------------------------------------------
@@ -321,7 +321,7 @@ partialPageLoop:
 ; DrawCircle    - Draws a circle in video memory of a given radius at a given coord
 ;-----------------------------------------------------------------------------------
 ; x             - _x1cord (16-bit)
-; y             - _y1cord (16-bit)   
+; y             - _y1cord (16-bit)
 ; radius        - _y2cord (16-bit)
 ;-----------------------------------------------------------------------------------
 ; Implements the midpoint circle algorithm without floating point or trig functions
@@ -329,7 +329,7 @@ partialPageLoop:
 ;     int x = radius;
 ;     int y = 0;
 ;     int err = 0;
-; 
+;
 ;     while (x >= y) 
 ;     {
 ;         SETPIXEL(x0 + x, y0 + y, val);
@@ -363,7 +363,7 @@ _DrawCircle:    lda _x1cord                     ; x0 = _x1cord
                 sta xval
                 lda _y2cord+1
                 sta xval+1
-                    
+
                 lda #$0                         ; yval = 0;
                 sta yval
                 sta yval+1
@@ -376,7 +376,7 @@ circleloop:
                 bcc doneCircle                  ; if high byteof yval is greater, we can draw
                 bne doCircle                    ; it not greater and not equal, is less, so done
                 lda xval                        ; in other cases we need to compare the LSB next
-                cmp yval                            
+                cmp yval
                 bcs doCircle                    ; if it's less, but MSB was equal, we go draw
 
 doneCircle:     rts
@@ -412,7 +412,7 @@ doCircle:       lda x0                          ; Draw the first of 8 symmetric 
                 sbc xval+1
                 sta _y1cord+1
                 jsr _SetPixel                    ; SETPIXEL(x0 - y, y0 - x, val);
-             
+
                 lda x0
                 sec
                 sbc xval
@@ -428,7 +428,7 @@ doCircle:       lda x0                          ; Draw the first of 8 symmetric 
                 sbc yval+1
                 sta _y1cord+1
                 jsr _SetPixel                    ; SETPIXEL(x0 - x, y0 - y, val);
-                
+
                 lda x0
                 sec
                 sbc xval
@@ -444,7 +444,7 @@ doCircle:       lda x0                          ; Draw the first of 8 symmetric 
                 adc yval+1
                 sta _y1cord+1
                 jsr _SetPixel                    ; SETPIXEL(x0 - x, y0 + y, val);
-                
+
                 lda x0
                 clc
                 adc yval
@@ -460,7 +460,7 @@ doCircle:       lda x0                          ; Draw the first of 8 symmetric 
                 adc xval+1
                 sta _y1cord+1
                 jsr _SetPixel                    ; SETPIXEL(x0 + y, y0 + x, val);
-                
+
                 lda x0
                 clc
                 adc xval
@@ -476,7 +476,7 @@ doCircle:       lda x0                          ; Draw the first of 8 symmetric 
                 adc yval+1
                 sta _y1cord+1
                 jsr _SetPixel                    ; SETPIXEL(x0 + x, y0 + y, val);
-                
+
                 lda x0
                 clc
                 adc xval
@@ -492,7 +492,7 @@ doCircle:       lda x0                          ; Draw the first of 8 symmetric 
                 sbc yval+1
                 sta _y1cord+1
                 jsr _SetPixel                    ; SETPIXEL(x0 + x, y0 - y, val);
-                
+
                 lda x0
                 sec
                 sbc yval
@@ -522,7 +522,7 @@ doCircle:       lda x0                          ; Draw the first of 8 symmetric 
                 inc temp
                 bne :+
                 inc temp+1
-:               
+:
                 lda err                         ; err += temp
                 clc
                 adc temp
@@ -531,20 +531,20 @@ doCircle:       lda x0                          ; Draw the first of 8 symmetric 
                 adc temp+1
                 sta err+1
                                                 ; if (2 * (err - xval) + 1 > 0) then dec xval
-                lda err                         ; temp = err-xval                              
+                lda err                         ; temp = err-xval
                 sec
                 sbc xval
                 sta temp
                 lda err+1
                 sbc xval+1
                 sta temp+1
-                
+
                 asl temp                        ; temp = 2*(err-xval)+1
                 rol temp+1
                 inc temp
                 bne :+
                 inc temp+1
-:               
+:
                 lda temp+1                      ; if (temp > 0) we'll dec xval
                 bmi doneLoop                    ; less than zero, so no dec
                 bne decxval                     ; if not zero, go ahead and dec
@@ -571,7 +571,7 @@ updateerr:      lda xval                        ; temp = xval * 2
                 lda #0
                 sbc temp+1
                 sta temp2+1
-                                
+
                 lda err                         ; err += 1-(xval*2)
                 clc
                 adc temp2
@@ -579,7 +579,7 @@ updateerr:      lda xval                        ; temp = xval * 2
                 lda err+1
                 adc temp2+1
                 sta err+1
-                
+
 doneLoop:       jmp circleloop
 
 ;-----------------------------------------------------------------------------------
@@ -604,8 +604,8 @@ ascToPetTable:  .byte $00,$01,$02,$03,$04,$05,$06,$07,$14,$20,$0d,$11,$93,$0a,$0
                 .byte $f0,$f1,$f2,$f3,$f4,$f5,$f6,$f7,$f8,$f9,$fa,$fb,$fc,$fd,$fe,$ff
 
 ; PETSCI to Ascii lookup table - not current used, so commented out, but can be used to map fonts
-;               
-; 
+;
+;
 ; petToAscTable:  .byte $00,$01,$02,$03,$04,$05,$06,$07,$14,$09,$0d,$11,$93,$0a,$0e,$0f
 ;                 .byte $10,$0b,$12,$13,$08,$15,$16,$17,$18,$19,$1a,$1b,$1c,$1d,$1e,$1f
 ;                 .byte $20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$2a,$2b,$2c,$2d,$2e,$2f
@@ -703,7 +703,7 @@ ScreenLineAddresses:
 _DrawChar:     sty tempy
                stx tempx
                sta tempa
-               
+
                tya                                 ; Get the address in screen memory where this
                asl                                 ;  character X/Y cursor pos should be drawn
                tay
@@ -714,7 +714,7 @@ _DrawChar:     sty tempy
                lda ScreenLineAddresses+1, y
                adc #0
                sta dest_hi
-               
+
                lda #0                              ; Get the address in font memory where this
                sta src_hi                          ;  Petscii chracter lives (after conversion from
 
@@ -774,7 +774,7 @@ checkHWrap:    lda _cursorX
                lda #0
                sta _cursorX
                inc _cursorY
-              
+
 checkVWrap:    lda _cursorY
                cmp #ROWSPERCOLUMN
                bcc loadChar
@@ -817,13 +817,8 @@ _Demo:         lda #0
                ldx #<demoText1
                ldy #>demoText1
                jsr _DrawText
- 
+
  :             ldx #<alphabet
                ldy #>alphabet
                jsr _DrawText
                jmp :-
-
-
-
-
-

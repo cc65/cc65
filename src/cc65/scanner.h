@@ -219,9 +219,11 @@ struct Token {
     const Type*     Type;       /* Type if integer or float constant */
 };
 
-extern Token CurTok;            /* The current token */
-extern Token NextTok;           /* The next token */
-extern int   PPParserRunning;   /* Is tokenizer used by the preprocessor */
+extern Token    CurTok;             /* The current token */
+extern Token    NextTok;            /* The next token */
+extern int      PPParserRunning;    /* Is tokenizer used by the preprocessor */
+extern int      NoCharMap;          /* Disable literal translation */
+extern unsigned InPragmaParser;     /* Depth of pragma parser calling */
 
 
 
@@ -299,7 +301,9 @@ void CopyPPNumber (StrBuf* Target);
 /* Copy a pp-number from the input to Target */
 
 void NextToken (void);
-/* Get next token from input stream */
+/* Get next non-pragma token from input stream consuming any pragmas
+** encountered. Adjacent string literal tokens will be concatenated.
+*/
 
 void SkipTokens (const token_t* TokenList, unsigned TokenCount);
 /* Skip tokens until we reach TOK_CEOF or a token in the given token list.

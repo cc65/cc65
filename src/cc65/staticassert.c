@@ -72,8 +72,14 @@ void ParseStaticAssert ()
     ** support the C2X syntax with only an expression.
     */
     if (CurTok.Tok == TOK_COMMA) {
-        /* Skip the comma. */
+        /* Prevent from translating the message string literal */
+        NoCharMap = 1;
+
+        /* Skip the comma and get the next token */
         NextToken ();
+
+        /* Reenable string literal translation */
+        NoCharMap = 0;
 
         /* String literal */
         if (CurTok.Tok != TOK_SCONST) {

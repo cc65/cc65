@@ -837,21 +837,21 @@ This cc65 version has some extensions to the ISO C standard.
 
 <itemize>
 
-<item>  The compiler allows to insert assembler expressions into the output
-        file. The syntax is
+<item>  The compiler allows to insert inline assembler code in the form of the
+        <tt/asm/ expression into the output file. The syntax is
 
         <tscreen><verb>
-        asm [optional volatile] (&lt;string literal&gt;[, optional parameters]) ;
+        asm [optional volatile] (&lt;string literal&gt;[, optional parameters])
         </verb></tscreen>
         or
         <tscreen><verb>
-        __asm__ [optional volatile] (&lt;string literal&gt;[, optional parameters]) ;
+        __asm__ [optional volatile] (&lt;string literal&gt;[, optional parameters])
         </verb></tscreen>
 
         The first form is in the user namespace; and, is disabled if the <tt/-A/
         switch is given.
 
-        There is a whole section covering inline assembler expressions,
+        There is a whole section covering the inline assembler,
         <ref id="inline-asm" name="see there">.
         <p>
 
@@ -1007,6 +1007,13 @@ This cc65 version has some extensions to the ISO C standard.
 
         <tt/_Static_assert/ is also available as the macro <tt/static_assert/ in
         <tt/assert.h/.
+
+        Note: The string literal as the message in the <tt/_Static_assert/
+        declaration is not subject to string literal translation (see
+        <tt/<ref id="pragma-charmap" name="#pragma&nbsp;charmap()">/) and will
+        always be in the host encoding. On the other hand, any character or
+        string literals present in the condition expression of the
+        <tt/_Static_assert/ declaration will be translated as usual.
 
 <item>  cc65 supports bit-fields of any integral type that is int-sized or
         smaller, and enumerated types with those types as their underlying
@@ -1317,7 +1324,9 @@ parameter with the <tt/#pragma/.
 
 <sect1><tt>#pragma charmap (&lt;index&gt;, &lt;code&gt;)</tt><label id="pragma-charmap"><p>
 
-  Each literal string and each literal character in the source is translated
+  Each literal string and each literal character in the preprocessed source,
+  except when used in an <tt/asm/ expression as the inline assembler code or
+  in a <tt/_Static_assert/ declaration as the failure message, is translated
   by use of a translation table. That translation table is preset when the
   compiler is started, depending on the target system; for example, to map
   ISO-8859-1 characters into PETSCII if the target is a Commodore machine.
@@ -1714,23 +1723,23 @@ bloated code and a slowdown.
 
 <sect>Inline assembler<label id="inline-asm"><p>
 
-The compiler allows to insert assembler expressions into the output file. The
-syntax is
+The compiler allows to insert inline assembler code in the form of the <tt/asm/
+expression into the output file. The syntax is
 
 <tscreen><verb>
-        asm [optional volatile] (&lt;string literal&gt;[, optional parameters]) ;
+        asm [optional volatile] (&lt;string literal&gt;[, optional parameters])
 </verb></tscreen>
 or
 <tscreen><verb>
-        __asm__ [optional volatile] (&lt;string literal&gt;[, optional parameters]) ;
+        __asm__ [optional volatile] (&lt;string literal&gt;[, optional parameters])
 </verb></tscreen>
 <p>
 
 The first form is in the user namespace; and, is disabled by <tt><ref
 id="option--standard" name="--standard"></tt> if the argument is not <tt/cc65/.
 
-The <tt/asm/ expression can be used only inside a function.  Please note that
-the result of an inline assembler expression is always of type <tt/void/.
+The <tt/asm/ expression can be used only inside a function.  The result of an
+<tt/asm/ expression is always of type <tt/void/.
 
 The contents of the string literal are preparsed by the compiler; and, inserted
 into the generated assembly output, so that it can be processed further by
@@ -1756,6 +1765,13 @@ optimize(pop)/ below those functions.
 The string literal may contain format specifiers from the following list. For
 each format specifier, an argument is expected which is inserted instead of
 the format specifier, before passing the assembly code line to the backend.
+
+Note: The string literal as the inline assembler code itself in the <tt/asm/
+expression is not subject to string literal translation (see
+<tt/<ref id="pragma-charmap" name="#pragma&nbsp;charmap()">/) and will always
+be in the host encoding. On the other hand, all character and string literals
+as the arguments for replacing the format specifiers will be translated as
+usual.
 
 <itemize>
   <item><tt/%b/ - Numerical 8-bit value

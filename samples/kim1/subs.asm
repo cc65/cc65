@@ -207,7 +207,7 @@ _ClearScreen:
 
                 ldy #0
 :               sta (dest), y       ; Loop unwound by a factor of 8, which means our iny before the branchh
-                iny                 ;  will still work as it's on a page crossing boundary. 
+                iny                 ;  will still work as it's on a page crossing boundary.
                 sta (dest), y       ;  This will avoid most of the overhead of the branch.
                 iny
                 sta (dest), y
@@ -264,7 +264,7 @@ _ScrollScreen:
 
                 lda (scroll_src),y                          ; I've unwound the loop to do 8 bytes at a time.  Since we're doing full pages
                 sta (scroll_dest),y                         ;   as long as we unwind the loop to do 8 bytes at a time, we know we'll still
-                iny                                         ;   do the final increment on a page boundary.  
+                iny                                         ;   do the final increment on a page boundary.
                 lda (scroll_src),y
                 sta (scroll_dest),y
                 iny
@@ -330,7 +330,7 @@ partialPageLoop:
 ;     int y = 0;
 ;     int err = 0;
 ;
-;     while (x >= y) 
+;     while (x >= y)
 ;     {
 ;         SETPIXEL(x0 + x, y0 + y, val);
 ;         SETPIXEL(x0 + y, y0 + x, val);
@@ -340,7 +340,7 @@ partialPageLoop:
 ;         SETPIXEL(x0 - y, y0 - x, val);
 ;         SETPIXEL(x0 + y, y0 - x, val);
 ;         SETPIXEL(x0 + x, y0 - y, val);
-; 
+;
 ;         y++;
 ;         err += 1 + 2 * y;
 ;         if (2 * (err - x) + 1 > 0) {
@@ -517,7 +517,7 @@ doCircle:       lda x0                          ; Draw the first of 8 symmetric 
                 asl
                 sta temp
                 lda yval+1
-                rol 
+                rol
                 sta temp+1
                 inc temp
                 bne :+
@@ -724,11 +724,11 @@ _DrawChar:     sty tempy
                jsr _AscToPet
                ldy temp2
 
-               asl 
+               asl
                rol src_hi
-               asl 
+               asl
                rol src_hi
-               asl 
+               asl
                rol src_hi
                clc
                adc #<_font8x8_basic                ; Add the base address of the font table to the offset

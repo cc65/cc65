@@ -833,7 +833,7 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         */
         if (ED_IsLocLiteral (&Arg2.Expr) &&
             IS_Get (&WritableStrings) == 0 &&
-            GetLiteralSize (Arg2.Expr.V.LVal) == 1 &&
+            GetLiteralSize (Arg2.Expr.V.LVal) >= 1 &&
             GetLiteralStr (Arg2.Expr.V.LVal)[0] == '\0') {
 
             /* Drop the generated code so we have the first argument in the
@@ -1226,9 +1226,13 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         ** at runtime.
         */
         if (ED_IsLocLiteral (&Arg) && IS_Get (&WritableStrings) == 0) {
+            /* Get the length of the C string within the string literal.
+            ** Note: Keep in mind that the literal could contain '\0' in it.
+            */
+            size_t Len = strnlen (GetLiteralStr (Arg.V.LVal), GetLiteralSize (Arg.V.LVal) - 1);
 
             /* Constant string literal */
-            ED_MakeConstAbs (Expr, GetLiteralSize (Arg.V.LVal) - 1, type_size_t);
+            ED_MakeConstAbs (Expr, Len, type_size_t);
 
             /* We don't need the literal any longer */
             ReleaseLiteral (Arg.V.LVal);

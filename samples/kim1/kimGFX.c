@@ -18,6 +18,7 @@ extern void DrawCircle(void);
 extern void SetPixel(void);
 extern void ClearPixel(void);
 extern void DrawChar(void);
+extern void DrawLine();
 extern void Demo(void);
 extern byte __fastcall__ AscToPet(byte in);
 extern byte __fastcall__ ReverseBits(byte in);
@@ -134,7 +135,7 @@ void DrawTextAt(int x, int y, char * psz)
 }
 
 // Something like Bresenham's algorithm for drawing a line
-
+/*
 void DrawLine(int x0, int y0, int x1, int y1, byte val)
 {
     int dx = abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
@@ -162,6 +163,7 @@ void DrawLine(int x0, int y0, int x1, int y1, byte val)
         }
     }
 }
+*/
 
 // DrawCircle
 //
@@ -173,6 +175,15 @@ void DrawCircleC(int x0, int y0, int radius, byte)
    y1cord = y0;
    y2cord = radius;
    DrawCircle();
+}
+
+void DrawLineC(int x0, int x1, int y0, int y1)
+{
+   x1cord = x0;
+   y1cord = y0;
+   x2cord = x1;
+   y2cord = y1;
+   DrawLine();
 }
 
 // MirrorFont
@@ -197,34 +208,34 @@ void DrawScreenMoire(int left, int top, int right, int bottom)
 {
    int x, y;
 
-   DrawLine(left, top, right, top, 1);
-   DrawLine(left, bottom, right, bottom, 1);
-   DrawLine(left, top, left, bottom, 1);
-   DrawLine(right, top, right, bottom, 1);
+   DrawLineC(left, top, right, top);
+   DrawLineC(left, bottom, right, bottom);
+   DrawLineC(left, top, left, bottom);
+   DrawLineC(right, top, right, bottom);
 
    for (x = left; x < right; x += 6)
-      DrawLine(x, top, right - x + left, bottom, 1);
+      DrawLineC(x, top, right - x + left, bottom);
 
    for (y = top; y < bottom; y += 6)
-      DrawLine(left, y, right, bottom - y + top, 1);
+      DrawLineC(left, y, right, bottom - y + top);
 
 }
 
 int main (void)
 {
-   int i;
+   //int i;
 
    // Clear the screen memory
    ClearScreen();
-   Demo();
+   //Demo();
 
    //DrawTextAt(184, 192, "TEST");
 
-   // DrawScreenMoire(0,30, 319, 199);
+   DrawScreenMoire(0,30, 319, 199);
 
    // Print the numbers from 0-9999, forcing the screen to scroll
-   for (i = 5; i < 80; i+=5)
-      DrawCircleC(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 20, i, 1);
+   //for (i = 5; i < 80; i+=5)
+   //   DrawCircleC(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 20, i, 1);
 
    printf("Done, exiting...\r\n");
    return 0;

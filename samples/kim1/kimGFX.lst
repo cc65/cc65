@@ -105,18 +105,18 @@ Current file: kimGFX.s
 000000r 2               
 000000r 1               	.forceimport	__STARTUP__
 000000r 1               	.import		_printf
-000000r 1               	.import		_abs
 000000r 1               	.import		_ClearScreen
 000000r 1               	.import		_ScrollScreen
 000000r 1               	.import		_DrawCircle
 000000r 1               	.import		_SetPixel
 000000r 1               	.import		_ClearPixel
 000000r 1               	.import		_DrawChar
-000000r 1               	.import		_Demo
+000000r 1               	.import		_DrawLine
 000000r 1               	.import		_ReverseBits
 000000r 1               	.import		_font8x8_basic
 000000r 1               	.import		_x1cord
 000000r 1               	.import		_y1cord
+000000r 1               	.import		_x2cord
 000000r 1               	.import		_y2cord
 000000r 1               	.import		_cursorX
 000000r 1               	.import		_cursorY
@@ -126,8 +126,8 @@ Current file: kimGFX.s
 000000r 1               	.export		_c
 000000r 1               	.export		_DrawText
 000000r 1               	.export		_DrawTextAt
-000000r 1               	.export		_DrawLine
 000000r 1               	.export		_DrawCircleC
+000000r 1               	.export		_DrawLineC
 000000r 1               	.export		_MirrorFont
 000000r 1               	.export		_DrawScreenMoire
 000000r 1               	.export		_main
@@ -337,468 +337,302 @@ Current file: kimGFX.s
 00014Cr 1               .endproc
 00014Cr 1               
 00014Cr 1               ; ---------------------------------------------------------------
-00014Cr 1               ; void __near__ DrawLine (int x0, int y0, int x1, int y1, unsigned char val)
+00014Cr 1               ; void __near__ DrawCircleC (int x0, int y0, int radius, unsigned char)
 00014Cr 1               ; ---------------------------------------------------------------
 00014Cr 1               
 00014Cr 1               .segment	"CODE"
 00014Cr 1               
-00014Cr 1               .proc	_DrawLine: near
+00014Cr 1               .proc	_DrawCircleC: near
 00014Cr 1               
 00014Cr 1               .segment	"CODE"
 00014Cr 1               
 00014Cr 1  20 rr rr     	jsr     pusha
-00014Fr 1  A0 04        	ldy     #$04
+00014Fr 1  A0 06        	ldy     #$06
 000151r 1  20 rr rr     	jsr     ldaxysp
-000154r 1  20 rr rr     	jsr     pushax
-000157r 1  A0 0A        	ldy     #$0A
-000159r 1  20 rr rr     	jsr     ldaxysp
-00015Cr 1  20 rr rr     	jsr     tossubax
-00015Fr 1  20 rr rr     	jsr     _abs
-000162r 1  20 rr rr     	jsr     pushax
-000165r 1  A0 0A        	ldy     #$0A
+000154r 1  8D rr rr     	sta     _x1cord
+000157r 1  8E rr rr     	stx     _x1cord+1
+00015Ar 1  A0 04        	ldy     #$04
+00015Cr 1  20 rr rr     	jsr     ldaxysp
+00015Fr 1  8D rr rr     	sta     _y1cord
+000162r 1  8E rr rr     	stx     _y1cord+1
+000165r 1  A0 02        	ldy     #$02
 000167r 1  20 rr rr     	jsr     ldaxysp
-00016Ar 1  20 rr rr     	jsr     pushax
-00016Dr 1  A0 08        	ldy     #$08
-00016Fr 1  20 rr rr     	jsr     ldaxysp
-000172r 1  20 rr rr     	jsr     tosltax
-000175r 1  D0 03 4C rr  	jeq     L0002
-000179r 1  rr           
-00017Ar 1  A2 00        	ldx     #$00
-00017Cr 1  A9 01        	lda     #$01
-00017Er 1  4C rr rr     	jmp     L0003
-000181r 1  A2 FF        L0002:	ldx     #$FF
-000183r 1  A9 FF        	lda     #$FF
-000185r 1  20 rr rr     L0003:	jsr     pushax
-000188r 1  A0 06        	ldy     #$06
-00018Ar 1  20 rr rr     	jsr     ldaxysp
-00018Dr 1  20 rr rr     	jsr     pushax
-000190r 1  A0 0C        	ldy     #$0C
+00016Ar 1  8D rr rr     	sta     _y2cord
+00016Dr 1  8E rr rr     	stx     _y2cord+1
+000170r 1  20 rr rr     	jsr     _DrawCircle
+000173r 1  20 rr rr     	jsr     incsp7
+000176r 1  60           	rts
+000177r 1               
+000177r 1               .endproc
+000177r 1               
+000177r 1               ; ---------------------------------------------------------------
+000177r 1               ; void __near__ DrawLineC (int x0, int x1, int y0, int y1)
+000177r 1               ; ---------------------------------------------------------------
+000177r 1               
+000177r 1               .segment	"CODE"
+000177r 1               
+000177r 1               .proc	_DrawLineC: near
+000177r 1               
+000177r 1               .segment	"CODE"
+000177r 1               
+000177r 1  20 rr rr     	jsr     pushax
+00017Ar 1  A0 07        	ldy     #$07
+00017Cr 1  20 rr rr     	jsr     ldaxysp
+00017Fr 1  8D rr rr     	sta     _x1cord
+000182r 1  8E rr rr     	stx     _x1cord+1
+000185r 1  A0 03        	ldy     #$03
+000187r 1  20 rr rr     	jsr     ldaxysp
+00018Ar 1  8D rr rr     	sta     _y1cord
+00018Dr 1  8E rr rr     	stx     _y1cord+1
+000190r 1  A0 05        	ldy     #$05
 000192r 1  20 rr rr     	jsr     ldaxysp
-000195r 1  20 rr rr     	jsr     tossubax
-000198r 1  20 rr rr     	jsr     _abs
-00019Br 1  20 rr rr     	jsr     pushax
-00019Er 1  A0 0C        	ldy     #$0C
-0001A0r 1  20 rr rr     	jsr     ldaxysp
-0001A3r 1  20 rr rr     	jsr     pushax
-0001A6r 1  A0 0A        	ldy     #$0A
-0001A8r 1  20 rr rr     	jsr     ldaxysp
-0001ABr 1  20 rr rr     	jsr     tosltax
-0001AEr 1  D0 03 4C rr  	jeq     L0004
-0001B2r 1  rr           
-0001B3r 1  A2 00        	ldx     #$00
-0001B5r 1  A9 01        	lda     #$01
-0001B7r 1  4C rr rr     	jmp     L0005
-0001BAr 1  A2 FF        L0004:	ldx     #$FF
-0001BCr 1  A9 FF        	lda     #$FF
-0001BEr 1  20 rr rr     L0005:	jsr     pushax
-0001C1r 1  A0 07        	ldy     #$07
-0001C3r 1  20 rr rr     	jsr     ldaxysp
-0001C6r 1  20 rr rr     	jsr     pushax
-0001C9r 1  A0 05        	ldy     #$05
-0001CBr 1  20 rr rr     	jsr     ldaxysp
-0001CEr 1  20 rr rr     	jsr     tosgtax
-0001D1r 1  D0 03 4C rr  	jeq     L0006
-0001D5r 1  rr           
-0001D6r 1  A0 07        	ldy     #$07
-0001D8r 1  20 rr rr     	jsr     ldaxysp
-0001DBr 1  4C rr rr     	jmp     L0007
-0001DEr 1  A0 03        L0006:	ldy     #$03
-0001E0r 1  20 rr rr     	jsr     ldaxysp
-0001E3r 1  20 rr rr     	jsr     negax
-0001E6r 1  20 rr rr     L0007:	jsr     pushax
-0001E9r 1  A2 00        	ldx     #$00
-0001EBr 1  A9 02        	lda     #$02
-0001EDr 1  20 rr rr     	jsr     tosdivax
-0001F0r 1  20 rr rr     	jsr     pushax
-0001F3r 1  20 rr rr     	jsr     decsp2
-0001F6r 1  4C rr rr     	jmp     L0010
-0001F9r 1  A0 14        L0008:	ldy     #$14
-0001FBr 1  20 rr rr     	jsr     ldaxysp
-0001FEr 1  20 rr rr     	jsr     pushax
-000201r 1  A0 14        	ldy     #$14
-000203r 1  20 rr rr     	jsr     ldaxysp
-000206r 1  20 rr rr     	jsr     pushax
-000209r 1  A0 10        	ldy     #$10
-00020Br 1  A2 00        	ldx     #$00
-00020Dr 1  B1 rr        	lda     (sp),y
-00020Fr 1  20 rr rr     	jsr     _SETPIXEL
-000212r 1  A0 14        	ldy     #$14
-000214r 1  20 rr rr     	jsr     ldaxysp
-000217r 1  20 rr rr     	jsr     pushax
-00021Ar 1  A0 12        	ldy     #$12
-00021Cr 1  20 rr rr     	jsr     ldaxysp
-00021Fr 1  20 rr rr     	jsr     toseqax
-000222r 1  D0 03 4C rr  	jeq     L000C
-000226r 1  rr           
-000227r 1  A0 12        	ldy     #$12
-000229r 1  20 rr rr     	jsr     ldaxysp
-00022Cr 1  20 rr rr     	jsr     pushax
-00022Fr 1  A0 10        	ldy     #$10
-000231r 1  20 rr rr     	jsr     ldaxysp
-000234r 1  20 rr rr     	jsr     toseqax
-000237r 1  F0 03 4C rr  	jne     L000D
-00023Br 1  rr           
-00023Cr 1  A2 00        L000C:	ldx     #$00
-00023Er 1  A9 00        	lda     #$00
-000240r 1  D0 03 4C rr  	jeq     L000E
-000244r 1  rr           
-000245r 1  A2 00        L000D:	ldx     #$00
-000247r 1  A9 01        	lda     #$01
-000249r 1  D0 03 4C rr  L000E:	jeq     L000B
-00024Dr 1  rr           
-00024Er 1  4C rr rr     	jmp     L0009
-000251r 1  A0 03        L000B:	ldy     #$03
-000253r 1  20 rr rr     	jsr     ldaxysp
-000256r 1  A0 00        	ldy     #$00
-000258r 1  20 rr rr     	jsr     staxysp
-00025Br 1  A0 01        	ldy     #$01
-00025Dr 1  20 rr rr     	jsr     ldaxysp
-000260r 1  20 rr rr     	jsr     pushax
-000263r 1  A0 0D        	ldy     #$0D
-000265r 1  20 rr rr     	jsr     ldaxysp
-000268r 1  20 rr rr     	jsr     negax
-00026Br 1  20 rr rr     	jsr     tosgtax
-00026Er 1  D0 03 4C rr  	jeq     L000F
-000272r 1  rr           
-000273r 1  A0 07        	ldy     #$07
-000275r 1  20 rr rr     	jsr     ldaxysp
-000278r 1  A0 02        	ldy     #$02
-00027Ar 1  20 rr rr     	jsr     subeqysp
-00027Dr 1  A0 09        	ldy     #$09
-00027Fr 1  20 rr rr     	jsr     ldaxysp
-000282r 1  A0 13        	ldy     #$13
-000284r 1  20 rr rr     	jsr     addeqysp
-000287r 1  A0 01        L000F:	ldy     #$01
-000289r 1  20 rr rr     	jsr     ldaxysp
-00028Cr 1  20 rr rr     	jsr     pushax
-00028Fr 1  A0 09        	ldy     #$09
-000291r 1  20 rr rr     	jsr     ldaxysp
-000294r 1  20 rr rr     	jsr     tosltax
-000297r 1  D0 03 4C rr  	jeq     L0010
-00029Br 1  rr           
-00029Cr 1  A0 0B        	ldy     #$0B
-00029Er 1  20 rr rr     	jsr     ldaxysp
-0002A1r 1  A0 02        	ldy     #$02
-0002A3r 1  20 rr rr     	jsr     addeqysp
-0002A6r 1  A0 05        	ldy     #$05
-0002A8r 1  20 rr rr     	jsr     ldaxysp
-0002ABr 1  A0 11        	ldy     #$11
-0002ADr 1  20 rr rr     	jsr     addeqysp
-0002B0r 1  4C rr rr     L0010:	jmp     L0008
-0002B3r 1  A0 15        L0009:	ldy     #$15
-0002B5r 1  20 rr rr     	jsr     addysp
-0002B8r 1  60           	rts
-0002B9r 1               
-0002B9r 1               .endproc
-0002B9r 1               
-0002B9r 1               ; ---------------------------------------------------------------
-0002B9r 1               ; void __near__ DrawCircleC (int x0, int y0, int radius, unsigned char)
-0002B9r 1               ; ---------------------------------------------------------------
-0002B9r 1               
-0002B9r 1               .segment	"CODE"
-0002B9r 1               
-0002B9r 1               .proc	_DrawCircleC: near
-0002B9r 1               
-0002B9r 1               .segment	"CODE"
-0002B9r 1               
-0002B9r 1  20 rr rr     	jsr     pusha
-0002BCr 1  A0 06        	ldy     #$06
-0002BEr 1  20 rr rr     	jsr     ldaxysp
-0002C1r 1  8D rr rr     	sta     _x1cord
-0002C4r 1  8E rr rr     	stx     _x1cord+1
-0002C7r 1  A0 04        	ldy     #$04
-0002C9r 1  20 rr rr     	jsr     ldaxysp
-0002CCr 1  8D rr rr     	sta     _y1cord
-0002CFr 1  8E rr rr     	stx     _y1cord+1
-0002D2r 1  A0 02        	ldy     #$02
-0002D4r 1  20 rr rr     	jsr     ldaxysp
-0002D7r 1  8D rr rr     	sta     _y2cord
-0002DAr 1  8E rr rr     	stx     _y2cord+1
-0002DDr 1  20 rr rr     	jsr     _DrawCircle
-0002E0r 1  20 rr rr     	jsr     incsp7
-0002E3r 1  60           	rts
-0002E4r 1               
-0002E4r 1               .endproc
-0002E4r 1               
-0002E4r 1               ; ---------------------------------------------------------------
-0002E4r 1               ; void __near__ MirrorFont (void)
-0002E4r 1               ; ---------------------------------------------------------------
-0002E4r 1               
-0002E4r 1               .segment	"CODE"
-0002E4r 1               
-0002E4r 1               .proc	_MirrorFont: near
-0002E4r 1               
-0002E4r 1               .segment	"CODE"
-0002E4r 1               
-0002E4r 1  20 rr rr     	jsr     decsp2
-0002E7r 1  A9 rr        	lda     #<(_font8x8_basic)
-0002E9r 1  A2 rr        	ldx     #>(_font8x8_basic)
-0002EBr 1  20 rr rr     	jsr     pushax
-0002EEr 1  A2 00        	ldx     #$00
-0002F0r 1  A9 00        	lda     #$00
-0002F2r 1  A0 02        	ldy     #$02
-0002F4r 1  20 rr rr     	jsr     staxysp
-0002F7r 1  A0 03        L0002:	ldy     #$03
-0002F9r 1  20 rr rr     	jsr     ldaxysp
-0002FCr 1  C9 00        	cmp     #$00
-0002FEr 1  8A           	txa
-0002FFr 1  E9 04        	sbc     #$04
-000301r 1  50 02        	bvc     L0006
-000303r 1  49 80        	eor     #$80
-000305r 1  0A           L0006:	asl     a
-000306r 1  A9 00        	lda     #$00
-000308r 1  A2 00        	ldx     #$00
-00030Ar 1  2A           	rol     a
-00030Br 1  F0 03 4C rr  	jne     L0005
-00030Fr 1  rr           
-000310r 1  4C rr rr     	jmp     L0003
-000313r 1  A0 01        L0005:	ldy     #$01
-000315r 1  20 rr rr     	jsr     ldaxysp
-000318r 1  20 rr rr     	jsr     pushax
-00031Br 1  A0 05        	ldy     #$05
-00031Dr 1  20 rr rr     	jsr     ldaxysp
-000320r 1  20 rr rr     	jsr     tosaddax
-000323r 1  20 rr rr     	jsr     pushax
-000326r 1  A0 03        	ldy     #$03
-000328r 1  20 rr rr     	jsr     ldaxysp
-00032Br 1  20 rr rr     	jsr     pushax
-00032Er 1  A0 07        	ldy     #$07
-000330r 1  20 rr rr     	jsr     ldaxysp
-000333r 1  20 rr rr     	jsr     tosaddax
-000336r 1  A0 00        	ldy     #$00
-000338r 1  20 rr rr     	jsr     ldauidx
-00033Br 1  20 rr rr     	jsr     _ReverseBits
-00033Er 1  A0 00        	ldy     #$00
-000340r 1  20 rr rr     	jsr     staspidx
-000343r 1  A0 02        	ldy     #$02
-000345r 1  A2 00        	ldx     #$00
-000347r 1  A9 01        	lda     #$01
-000349r 1  20 rr rr     	jsr     addeqysp
-00034Cr 1  4C rr rr     	jmp     L0002
-00034Fr 1  20 rr rr     L0003:	jsr     incsp4
-000352r 1  60           	rts
-000353r 1               
-000353r 1               .endproc
-000353r 1               
-000353r 1               ; ---------------------------------------------------------------
-000353r 1               ; void __near__ DrawScreenMoire (int left, int top, int right, int bottom)
-000353r 1               ; ---------------------------------------------------------------
-000353r 1               
-000353r 1               .segment	"CODE"
-000353r 1               
-000353r 1               .proc	_DrawScreenMoire: near
-000353r 1               
-000353r 1               .segment	"CODE"
-000353r 1               
-000353r 1  20 rr rr     	jsr     pushax
-000356r 1  20 rr rr     	jsr     decsp4
-000359r 1  A0 0B        	ldy     #$0B
-00035Br 1  20 rr rr     	jsr     ldaxysp
-00035Er 1  20 rr rr     	jsr     pushax
-000361r 1  A0 0B        	ldy     #$0B
-000363r 1  20 rr rr     	jsr     ldaxysp
-000366r 1  20 rr rr     	jsr     pushax
-000369r 1  A0 0B        	ldy     #$0B
-00036Br 1  20 rr rr     	jsr     ldaxysp
-00036Er 1  20 rr rr     	jsr     pushax
-000371r 1  A0 0F        	ldy     #$0F
-000373r 1  20 rr rr     	jsr     ldaxysp
-000376r 1  20 rr rr     	jsr     pushax
-000379r 1  A2 00        	ldx     #$00
-00037Br 1  A9 01        	lda     #$01
-00037Dr 1  20 rr rr     	jsr     _DrawLine
-000380r 1  A0 0B        	ldy     #$0B
-000382r 1  20 rr rr     	jsr     ldaxysp
+000195r 1  8D rr rr     	sta     _x2cord
+000198r 1  8E rr rr     	stx     _x2cord+1
+00019Br 1  A0 01        	ldy     #$01
+00019Dr 1  20 rr rr     	jsr     ldaxysp
+0001A0r 1  8D rr rr     	sta     _y2cord
+0001A3r 1  8E rr rr     	stx     _y2cord+1
+0001A6r 1  20 rr rr     	jsr     _DrawLine
+0001A9r 1  20 rr rr     	jsr     incsp8
+0001ACr 1  60           	rts
+0001ADr 1               
+0001ADr 1               .endproc
+0001ADr 1               
+0001ADr 1               ; ---------------------------------------------------------------
+0001ADr 1               ; void __near__ MirrorFont (void)
+0001ADr 1               ; ---------------------------------------------------------------
+0001ADr 1               
+0001ADr 1               .segment	"CODE"
+0001ADr 1               
+0001ADr 1               .proc	_MirrorFont: near
+0001ADr 1               
+0001ADr 1               .segment	"CODE"
+0001ADr 1               
+0001ADr 1  20 rr rr     	jsr     decsp2
+0001B0r 1  A9 rr        	lda     #<(_font8x8_basic)
+0001B2r 1  A2 rr        	ldx     #>(_font8x8_basic)
+0001B4r 1  20 rr rr     	jsr     pushax
+0001B7r 1  A2 00        	ldx     #$00
+0001B9r 1  A9 00        	lda     #$00
+0001BBr 1  A0 02        	ldy     #$02
+0001BDr 1  20 rr rr     	jsr     staxysp
+0001C0r 1  A0 03        L0002:	ldy     #$03
+0001C2r 1  20 rr rr     	jsr     ldaxysp
+0001C5r 1  C9 00        	cmp     #$00
+0001C7r 1  8A           	txa
+0001C8r 1  E9 04        	sbc     #$04
+0001CAr 1  50 02        	bvc     L0006
+0001CCr 1  49 80        	eor     #$80
+0001CEr 1  0A           L0006:	asl     a
+0001CFr 1  A9 00        	lda     #$00
+0001D1r 1  A2 00        	ldx     #$00
+0001D3r 1  2A           	rol     a
+0001D4r 1  F0 03 4C rr  	jne     L0005
+0001D8r 1  rr           
+0001D9r 1  4C rr rr     	jmp     L0003
+0001DCr 1  A0 01        L0005:	ldy     #$01
+0001DEr 1  20 rr rr     	jsr     ldaxysp
+0001E1r 1  20 rr rr     	jsr     pushax
+0001E4r 1  A0 05        	ldy     #$05
+0001E6r 1  20 rr rr     	jsr     ldaxysp
+0001E9r 1  20 rr rr     	jsr     tosaddax
+0001ECr 1  20 rr rr     	jsr     pushax
+0001EFr 1  A0 03        	ldy     #$03
+0001F1r 1  20 rr rr     	jsr     ldaxysp
+0001F4r 1  20 rr rr     	jsr     pushax
+0001F7r 1  A0 07        	ldy     #$07
+0001F9r 1  20 rr rr     	jsr     ldaxysp
+0001FCr 1  20 rr rr     	jsr     tosaddax
+0001FFr 1  A0 00        	ldy     #$00
+000201r 1  20 rr rr     	jsr     ldauidx
+000204r 1  20 rr rr     	jsr     _ReverseBits
+000207r 1  A0 00        	ldy     #$00
+000209r 1  20 rr rr     	jsr     staspidx
+00020Cr 1  A0 02        	ldy     #$02
+00020Er 1  A2 00        	ldx     #$00
+000210r 1  A9 01        	lda     #$01
+000212r 1  20 rr rr     	jsr     addeqysp
+000215r 1  4C rr rr     	jmp     L0002
+000218r 1  20 rr rr     L0003:	jsr     incsp4
+00021Br 1  60           	rts
+00021Cr 1               
+00021Cr 1               .endproc
+00021Cr 1               
+00021Cr 1               ; ---------------------------------------------------------------
+00021Cr 1               ; void __near__ DrawScreenMoire (int left, int top, int right, int bottom)
+00021Cr 1               ; ---------------------------------------------------------------
+00021Cr 1               
+00021Cr 1               .segment	"CODE"
+00021Cr 1               
+00021Cr 1               .proc	_DrawScreenMoire: near
+00021Cr 1               
+00021Cr 1               .segment	"CODE"
+00021Cr 1               
+00021Cr 1  20 rr rr     	jsr     pushax
+00021Fr 1  20 rr rr     	jsr     decsp4
+000222r 1  A0 0B        	ldy     #$0B
+000224r 1  20 rr rr     	jsr     ldaxysp
+000227r 1  20 rr rr     	jsr     pushax
+00022Ar 1  A0 0B        	ldy     #$0B
+00022Cr 1  20 rr rr     	jsr     ldaxysp
+00022Fr 1  20 rr rr     	jsr     pushax
+000232r 1  A0 0B        	ldy     #$0B
+000234r 1  20 rr rr     	jsr     ldaxysp
+000237r 1  20 rr rr     	jsr     pushax
+00023Ar 1  A0 0F        	ldy     #$0F
+00023Cr 1  20 rr rr     	jsr     ldaxysp
+00023Fr 1  20 rr rr     	jsr     _DrawLineC
+000242r 1  A0 0B        	ldy     #$0B
+000244r 1  20 rr rr     	jsr     ldaxysp
+000247r 1  20 rr rr     	jsr     pushax
+00024Ar 1  A0 07        	ldy     #$07
+00024Cr 1  20 rr rr     	jsr     ldaxysp
+00024Fr 1  20 rr rr     	jsr     pushax
+000252r 1  A0 0B        	ldy     #$0B
+000254r 1  20 rr rr     	jsr     ldaxysp
+000257r 1  20 rr rr     	jsr     pushax
+00025Ar 1  A0 0B        	ldy     #$0B
+00025Cr 1  20 rr rr     	jsr     ldaxysp
+00025Fr 1  20 rr rr     	jsr     _DrawLineC
+000262r 1  A0 0B        	ldy     #$0B
+000264r 1  20 rr rr     	jsr     ldaxysp
+000267r 1  20 rr rr     	jsr     pushax
+00026Ar 1  A0 0B        	ldy     #$0B
+00026Cr 1  20 rr rr     	jsr     ldaxysp
+00026Fr 1  20 rr rr     	jsr     pushax
+000272r 1  A0 0F        	ldy     #$0F
+000274r 1  20 rr rr     	jsr     ldaxysp
+000277r 1  20 rr rr     	jsr     pushax
+00027Ar 1  A0 0B        	ldy     #$0B
+00027Cr 1  20 rr rr     	jsr     ldaxysp
+00027Fr 1  20 rr rr     	jsr     _DrawLineC
+000282r 1  A0 07        	ldy     #$07
+000284r 1  20 rr rr     	jsr     ldaxysp
+000287r 1  20 rr rr     	jsr     pushax
+00028Ar 1  A0 0B        	ldy     #$0B
+00028Cr 1  20 rr rr     	jsr     ldaxysp
+00028Fr 1  20 rr rr     	jsr     pushax
+000292r 1  A0 0B        	ldy     #$0B
+000294r 1  20 rr rr     	jsr     ldaxysp
+000297r 1  20 rr rr     	jsr     pushax
+00029Ar 1  A0 0B        	ldy     #$0B
+00029Cr 1  20 rr rr     	jsr     ldaxysp
+00029Fr 1  20 rr rr     	jsr     _DrawLineC
+0002A2r 1  A0 0B        	ldy     #$0B
+0002A4r 1  20 rr rr     	jsr     ldaxysp
+0002A7r 1  A0 02        	ldy     #$02
+0002A9r 1  20 rr rr     	jsr     staxysp
+0002ACr 1  A0 03        L0002:	ldy     #$03
+0002AEr 1  20 rr rr     	jsr     ldaxysp
+0002B1r 1  20 rr rr     	jsr     pushax
+0002B4r 1  A0 09        	ldy     #$09
+0002B6r 1  20 rr rr     	jsr     ldaxysp
+0002B9r 1  20 rr rr     	jsr     tosltax
+0002BCr 1  F0 03 4C rr  	jne     L0005
+0002C0r 1  rr           
+0002C1r 1  4C rr rr     	jmp     L0003
+0002C4r 1  A0 03        L0005:	ldy     #$03
+0002C6r 1  20 rr rr     	jsr     ldaxysp
+0002C9r 1  20 rr rr     	jsr     pushax
+0002CCr 1  A0 0B        	ldy     #$0B
+0002CEr 1  20 rr rr     	jsr     ldaxysp
+0002D1r 1  20 rr rr     	jsr     pushax
+0002D4r 1  A0 0B        	ldy     #$0B
+0002D6r 1  20 rr rr     	jsr     ldaxysp
+0002D9r 1  20 rr rr     	jsr     pushax
+0002DCr 1  A0 09        	ldy     #$09
+0002DEr 1  20 rr rr     	jsr     ldaxysp
+0002E1r 1  20 rr rr     	jsr     tossubax
+0002E4r 1  20 rr rr     	jsr     pushax
+0002E7r 1  A0 11        	ldy     #$11
+0002E9r 1  20 rr rr     	jsr     ldaxysp
+0002ECr 1  20 rr rr     	jsr     tosaddax
+0002EFr 1  20 rr rr     	jsr     pushax
+0002F2r 1  A0 0B        	ldy     #$0B
+0002F4r 1  20 rr rr     	jsr     ldaxysp
+0002F7r 1  20 rr rr     	jsr     _DrawLineC
+0002FAr 1  A0 02        	ldy     #$02
+0002FCr 1  A2 00        	ldx     #$00
+0002FEr 1  A9 06        	lda     #$06
+000300r 1  20 rr rr     	jsr     addeqysp
+000303r 1  4C rr rr     	jmp     L0002
+000306r 1  A0 09        L0003:	ldy     #$09
+000308r 1  20 rr rr     	jsr     ldaxysp
+00030Br 1  A0 00        	ldy     #$00
+00030Dr 1  20 rr rr     	jsr     staxysp
+000310r 1  A0 01        L0006:	ldy     #$01
+000312r 1  20 rr rr     	jsr     ldaxysp
+000315r 1  20 rr rr     	jsr     pushax
+000318r 1  A0 07        	ldy     #$07
+00031Ar 1  20 rr rr     	jsr     ldaxysp
+00031Dr 1  20 rr rr     	jsr     tosltax
+000320r 1  F0 03 4C rr  	jne     L0009
+000324r 1  rr           
+000325r 1  4C rr rr     	jmp     L0007
+000328r 1  A0 0B        L0009:	ldy     #$0B
+00032Ar 1  20 rr rr     	jsr     ldaxysp
+00032Dr 1  20 rr rr     	jsr     pushax
+000330r 1  A0 03        	ldy     #$03
+000332r 1  20 rr rr     	jsr     ldaxysp
+000335r 1  20 rr rr     	jsr     pushax
+000338r 1  A0 0B        	ldy     #$0B
+00033Ar 1  20 rr rr     	jsr     ldaxysp
+00033Dr 1  20 rr rr     	jsr     pushax
+000340r 1  A0 0B        	ldy     #$0B
+000342r 1  20 rr rr     	jsr     ldaxysp
+000345r 1  20 rr rr     	jsr     pushax
+000348r 1  A0 09        	ldy     #$09
+00034Ar 1  20 rr rr     	jsr     ldaxysp
+00034Dr 1  20 rr rr     	jsr     tossubax
+000350r 1  20 rr rr     	jsr     pushax
+000353r 1  A0 11        	ldy     #$11
+000355r 1  20 rr rr     	jsr     ldaxysp
+000358r 1  20 rr rr     	jsr     tosaddax
+00035Br 1  20 rr rr     	jsr     _DrawLineC
+00035Er 1  A0 00        	ldy     #$00
+000360r 1  A2 00        	ldx     #$00
+000362r 1  A9 06        	lda     #$06
+000364r 1  20 rr rr     	jsr     addeqysp
+000367r 1  4C rr rr     	jmp     L0006
+00036Ar 1  A0 0C        L0007:	ldy     #$0C
+00036Cr 1  20 rr rr     	jsr     addysp
+00036Fr 1  60           	rts
+000370r 1               
+000370r 1               .endproc
+000370r 1               
+000370r 1               ; ---------------------------------------------------------------
+000370r 1               ; int __near__ main (void)
+000370r 1               ; ---------------------------------------------------------------
+000370r 1               
+000370r 1               .segment	"CODE"
+000370r 1               
+000370r 1               .proc	_main: near
+000370r 1               
+000370r 1               .segment	"CODE"
+000370r 1               
+000370r 1  20 rr rr     	jsr     _ClearScreen
+000373r 1  A2 00        	ldx     #$00
+000375r 1  A9 00        	lda     #$00
+000377r 1  20 rr rr     	jsr     pushax
+00037Ar 1  A2 00        	ldx     #$00
+00037Cr 1  A9 1E        	lda     #$1E
+00037Er 1  20 rr rr     	jsr     pushax
+000381r 1  A2 01        	ldx     #$01
+000383r 1  A9 3F        	lda     #$3F
 000385r 1  20 rr rr     	jsr     pushax
-000388r 1  A0 07        	ldy     #$07
-00038Ar 1  20 rr rr     	jsr     ldaxysp
-00038Dr 1  20 rr rr     	jsr     pushax
-000390r 1  A0 0B        	ldy     #$0B
-000392r 1  20 rr rr     	jsr     ldaxysp
-000395r 1  20 rr rr     	jsr     pushax
-000398r 1  A0 0B        	ldy     #$0B
-00039Ar 1  20 rr rr     	jsr     ldaxysp
-00039Dr 1  20 rr rr     	jsr     pushax
-0003A0r 1  A2 00        	ldx     #$00
-0003A2r 1  A9 01        	lda     #$01
-0003A4r 1  20 rr rr     	jsr     _DrawLine
-0003A7r 1  A0 0B        	ldy     #$0B
-0003A9r 1  20 rr rr     	jsr     ldaxysp
-0003ACr 1  20 rr rr     	jsr     pushax
-0003AFr 1  A0 0B        	ldy     #$0B
-0003B1r 1  20 rr rr     	jsr     ldaxysp
-0003B4r 1  20 rr rr     	jsr     pushax
-0003B7r 1  A0 0F        	ldy     #$0F
-0003B9r 1  20 rr rr     	jsr     ldaxysp
-0003BCr 1  20 rr rr     	jsr     pushax
-0003BFr 1  A0 0B        	ldy     #$0B
-0003C1r 1  20 rr rr     	jsr     ldaxysp
-0003C4r 1  20 rr rr     	jsr     pushax
-0003C7r 1  A2 00        	ldx     #$00
-0003C9r 1  A9 01        	lda     #$01
-0003CBr 1  20 rr rr     	jsr     _DrawLine
-0003CEr 1  A0 07        	ldy     #$07
-0003D0r 1  20 rr rr     	jsr     ldaxysp
-0003D3r 1  20 rr rr     	jsr     pushax
-0003D6r 1  A0 0B        	ldy     #$0B
-0003D8r 1  20 rr rr     	jsr     ldaxysp
-0003DBr 1  20 rr rr     	jsr     pushax
-0003DEr 1  A0 0B        	ldy     #$0B
-0003E0r 1  20 rr rr     	jsr     ldaxysp
-0003E3r 1  20 rr rr     	jsr     pushax
-0003E6r 1  A0 0B        	ldy     #$0B
-0003E8r 1  20 rr rr     	jsr     ldaxysp
-0003EBr 1  20 rr rr     	jsr     pushax
-0003EEr 1  A2 00        	ldx     #$00
-0003F0r 1  A9 01        	lda     #$01
-0003F2r 1  20 rr rr     	jsr     _DrawLine
-0003F5r 1  A0 0B        	ldy     #$0B
-0003F7r 1  20 rr rr     	jsr     ldaxysp
-0003FAr 1  A0 02        	ldy     #$02
-0003FCr 1  20 rr rr     	jsr     staxysp
-0003FFr 1  A0 03        L0002:	ldy     #$03
-000401r 1  20 rr rr     	jsr     ldaxysp
-000404r 1  20 rr rr     	jsr     pushax
-000407r 1  A0 09        	ldy     #$09
-000409r 1  20 rr rr     	jsr     ldaxysp
-00040Cr 1  20 rr rr     	jsr     tosltax
-00040Fr 1  F0 03 4C rr  	jne     L0005
-000413r 1  rr           
-000414r 1  4C rr rr     	jmp     L0003
-000417r 1  A0 03        L0005:	ldy     #$03
-000419r 1  20 rr rr     	jsr     ldaxysp
-00041Cr 1  20 rr rr     	jsr     pushax
-00041Fr 1  A0 0B        	ldy     #$0B
-000421r 1  20 rr rr     	jsr     ldaxysp
-000424r 1  20 rr rr     	jsr     pushax
-000427r 1  A0 0B        	ldy     #$0B
-000429r 1  20 rr rr     	jsr     ldaxysp
-00042Cr 1  20 rr rr     	jsr     pushax
-00042Fr 1  A0 09        	ldy     #$09
-000431r 1  20 rr rr     	jsr     ldaxysp
-000434r 1  20 rr rr     	jsr     tossubax
-000437r 1  20 rr rr     	jsr     pushax
-00043Ar 1  A0 11        	ldy     #$11
-00043Cr 1  20 rr rr     	jsr     ldaxysp
-00043Fr 1  20 rr rr     	jsr     tosaddax
-000442r 1  20 rr rr     	jsr     pushax
-000445r 1  A0 0B        	ldy     #$0B
-000447r 1  20 rr rr     	jsr     ldaxysp
-00044Ar 1  20 rr rr     	jsr     pushax
-00044Dr 1  A2 00        	ldx     #$00
-00044Fr 1  A9 01        	lda     #$01
-000451r 1  20 rr rr     	jsr     _DrawLine
-000454r 1  A0 02        	ldy     #$02
-000456r 1  A2 00        	ldx     #$00
-000458r 1  A9 06        	lda     #$06
-00045Ar 1  20 rr rr     	jsr     addeqysp
-00045Dr 1  4C rr rr     	jmp     L0002
-000460r 1  A0 09        L0003:	ldy     #$09
-000462r 1  20 rr rr     	jsr     ldaxysp
-000465r 1  A0 00        	ldy     #$00
-000467r 1  20 rr rr     	jsr     staxysp
-00046Ar 1  A0 01        L0006:	ldy     #$01
-00046Cr 1  20 rr rr     	jsr     ldaxysp
-00046Fr 1  20 rr rr     	jsr     pushax
-000472r 1  A0 07        	ldy     #$07
-000474r 1  20 rr rr     	jsr     ldaxysp
-000477r 1  20 rr rr     	jsr     tosltax
-00047Ar 1  F0 03 4C rr  	jne     L0009
-00047Er 1  rr           
-00047Fr 1  4C rr rr     	jmp     L0007
-000482r 1  A0 0B        L0009:	ldy     #$0B
-000484r 1  20 rr rr     	jsr     ldaxysp
-000487r 1  20 rr rr     	jsr     pushax
-00048Ar 1  A0 03        	ldy     #$03
-00048Cr 1  20 rr rr     	jsr     ldaxysp
-00048Fr 1  20 rr rr     	jsr     pushax
-000492r 1  A0 0B        	ldy     #$0B
-000494r 1  20 rr rr     	jsr     ldaxysp
-000497r 1  20 rr rr     	jsr     pushax
-00049Ar 1  A0 0B        	ldy     #$0B
-00049Cr 1  20 rr rr     	jsr     ldaxysp
-00049Fr 1  20 rr rr     	jsr     pushax
-0004A2r 1  A0 09        	ldy     #$09
-0004A4r 1  20 rr rr     	jsr     ldaxysp
-0004A7r 1  20 rr rr     	jsr     tossubax
-0004AAr 1  20 rr rr     	jsr     pushax
-0004ADr 1  A0 11        	ldy     #$11
-0004AFr 1  20 rr rr     	jsr     ldaxysp
-0004B2r 1  20 rr rr     	jsr     tosaddax
-0004B5r 1  20 rr rr     	jsr     pushax
-0004B8r 1  A2 00        	ldx     #$00
-0004BAr 1  A9 01        	lda     #$01
-0004BCr 1  20 rr rr     	jsr     _DrawLine
-0004BFr 1  A0 00        	ldy     #$00
-0004C1r 1  A2 00        	ldx     #$00
-0004C3r 1  A9 06        	lda     #$06
-0004C5r 1  20 rr rr     	jsr     addeqysp
-0004C8r 1  4C rr rr     	jmp     L0006
-0004CBr 1  A0 0C        L0007:	ldy     #$0C
-0004CDr 1  20 rr rr     	jsr     addysp
-0004D0r 1  60           	rts
-0004D1r 1               
-0004D1r 1               .endproc
-0004D1r 1               
-0004D1r 1               ; ---------------------------------------------------------------
-0004D1r 1               ; int __near__ main (void)
-0004D1r 1               ; ---------------------------------------------------------------
-0004D1r 1               
-0004D1r 1               .segment	"CODE"
-0004D1r 1               
-0004D1r 1               .proc	_main: near
-0004D1r 1               
-0004D1r 1               .segment	"CODE"
-0004D1r 1               
-0004D1r 1  20 rr rr     	jsr     decsp2
-0004D4r 1  20 rr rr     	jsr     _ClearScreen
-0004D7r 1  20 rr rr     	jsr     _Demo
-0004DAr 1  A2 00        	ldx     #$00
-0004DCr 1  A9 05        	lda     #$05
-0004DEr 1  A0 00        	ldy     #$00
-0004E0r 1  20 rr rr     	jsr     staxysp
-0004E3r 1  A0 01        L0002:	ldy     #$01
-0004E5r 1  20 rr rr     	jsr     ldaxysp
-0004E8r 1  C9 50        	cmp     #$50
-0004EAr 1  8A           	txa
-0004EBr 1  E9 00        	sbc     #$00
-0004EDr 1  50 02        	bvc     L0006
-0004EFr 1  49 80        	eor     #$80
-0004F1r 1  0A           L0006:	asl     a
-0004F2r 1  A9 00        	lda     #$00
-0004F4r 1  A2 00        	ldx     #$00
-0004F6r 1  2A           	rol     a
-0004F7r 1  F0 03 4C rr  	jne     L0005
-0004FBr 1  rr           
-0004FCr 1  4C rr rr     	jmp     L0003
-0004FFr 1  A2 00        L0005:	ldx     #$00
-000501r 1  A9 A0        	lda     #$A0
-000503r 1  20 rr rr     	jsr     pushax
-000506r 1  A2 00        	ldx     #$00
-000508r 1  A9 78        	lda     #$78
-00050Ar 1  20 rr rr     	jsr     pushax
-00050Dr 1  A0 05        	ldy     #$05
-00050Fr 1  20 rr rr     	jsr     ldaxysp
-000512r 1  20 rr rr     	jsr     pushax
-000515r 1  A2 00        	ldx     #$00
-000517r 1  A9 01        	lda     #$01
-000519r 1  20 rr rr     	jsr     _DrawCircleC
-00051Cr 1  A0 00        	ldy     #$00
-00051Er 1  A2 00        	ldx     #$00
-000520r 1  A9 05        	lda     #$05
-000522r 1  20 rr rr     	jsr     addeqysp
-000525r 1  4C rr rr     	jmp     L0002
-000528r 1  A9 rr        L0003:	lda     #<(S0004)
-00052Ar 1  A2 rr        	ldx     #>(S0004)
-00052Cr 1  20 rr rr     	jsr     pushax
-00052Fr 1  A0 02        	ldy     #$02
-000531r 1  20 rr rr     	jsr     _printf
-000534r 1  A2 00        	ldx     #$00
-000536r 1  A9 00        	lda     #$00
-000538r 1  4C rr rr     	jmp     L0001
-00053Br 1  20 rr rr     L0001:	jsr     incsp2
-00053Er 1  60           	rts
-00053Fr 1               
-00053Fr 1               .endproc
-00053Fr 1               
-00053Fr 1               
+000388r 1  A2 00        	ldx     #$00
+00038Ar 1  A9 C7        	lda     #$C7
+00038Cr 1  20 rr rr     	jsr     _DrawScreenMoire
+00038Fr 1  A9 rr        	lda     #<(S0004)
+000391r 1  A2 rr        	ldx     #>(S0004)
+000393r 1  20 rr rr     	jsr     pushax
+000396r 1  A0 02        	ldy     #$02
+000398r 1  20 rr rr     	jsr     _printf
+00039Br 1  A2 00        	ldx     #$00
+00039Dr 1  A9 00        	lda     #$00
+00039Fr 1  4C rr rr     	jmp     L0001
+0003A2r 1  60           L0001:	rts
+0003A3r 1               
+0003A3r 1               .endproc
+0003A3r 1               
+0003A3r 1               

@@ -17,6 +17,7 @@
 .export _SetPixel
 .export _ClearPixel
 .export _DrawCircle
+.export _DrawLine
 .export _AscToPet
 .export _ReverseBits
 .export _DrawChar
@@ -24,7 +25,15 @@
 
 .import _font8x8_basic
 
+; This is the assumed location of the MTU visible memory board's 8K of memory.  You can adjust this
+; constant to refelct other locations as needed.
+
 SCREEN           = $A000
+
+; Note that even though these constants are defined here and respected, there are still going to be
+; logic assumptions in GetPixelAddress that assume a 320x200 screen.  If you change these, you'll
+; need to adjust GetPixelAddress to match.
+
 SCREEN_WIDTH     = 320
 SCREEN_HEIGHT    = 200
 SCREEN_BYTES     = SCREEN_WIDTH * SCREEN_HEIGHT / 8
@@ -717,7 +726,6 @@ _DrawChar:     sty tempy
                
                lda #0                              ; Get the address in font memory where this
                sta src_hi                          ;  Petscii chracter lives (after conversion from
-
                lda tempa                           ;  ascii)
 
                sty temp2
@@ -823,7 +831,220 @@ _Demo:         lda #0
                jsr _DrawText
                jmp :-
 
+;-----------------------------------------------------------------------------------
+; DrawCircle    - Draws a circle in video memory of a given radius at a given coord
+;-----------------------------------------------------------------------------------
+; _x1cord (16-bit)
+; _y1cord (8-bit)   
+; _x2cord (16-bit)
+; _y2cord (8-bit)
+;-----------------------------------------------------------------------------------
+; Implements something like Bresenham's algorithm for drawing a line
+;-----------------------------------------------------------------------------------
+; void DrawLine(int x0, int y0, int x1, int y1, byte val)
+; {
+;     int dx = abs(_x2cord - _x1cord), sx = _x1cord < _x2cord ? 1 : -1;
+;     int dy = abs(_y2cord - _y1cord), sy = _y1cord < _y2cord ? 1 : -1;
+;     int err = (dx > dy ? dx : -dy) / 2, e2;
+; 
+;     while (1)
+;     {
+;         SETPIXEL(_x1cord, _y1cord, val);
+; 
+;         if (_x1cord == _x2cord && _y1cord == _y2cord)
+;             break;
+; 
+;         e2 = err;
+; 
+;         if (e2 > -dx)
+;         {
+;             err -= dy;
+;             _x1cord += sx;
+;         }
+;         if (e2 < dy)
+;         {
+;             err += dx;
+;             _y1cord += sy;
+;         }
+;     }
+; }
+;-----------------------------------------------------------------------------------
 
+dx:         .res 2
+dy:         .res 2
+e2:         .res 2
+sx:         .res 1
+sy:         .res 1
+dltemp:     .res 2
+
+_DrawLine:  lda _x2cord             ; Calculate dx = (x2cord - X1cord)
+            sec
+            sbc _x1cord
+            sta dx
+            lda _x2cord+1
+            sbc _x1cord+1
+            sta dx+1
+            bpl positivedx          ; dx is positive, so we're good
+            
+            lda dx                  ; dx is negative, so compute absolute value
+            clc                     ;  by inverting bits and adding 1
+            eor #$ff
+            adc #1
+            sta dx
+            lda dx+1
+            eor #$ff
+            adc #0
+            sta dx+1
+positivedx: 
+            lda _y2cord             ; Calculate dy = (y2cord - y1cord)
+            sec
+            sbc _y1cord
+            sta dy
+            lda _y2cord+1
+            sbc _y1cord+1
+            sta dy+1
+            bpl positivedy          ; dy is positive, so we're good
+            
+            lda dy                  ; It's negative, so compute the absolute value
+            clc                     ;   by inverting bits and adding 1
+            eor #$ff
+            adc #1
+            sta dy
+            lda dy+1
+            eor #$ff
+            adc #0
+            sta dy+1
+positivedy:                         ; Check if dx > dy
+            lda dy+1
+            cmp dx+1
+            bcc dxgt
+            bne dygt
+            lda dy
+            cmp dx
+            bcs dygt
+
+dxgt:       lda dx                  ; We found dx>dy so err = dx
+            sta err
+            lda dx+1
+            sta err+1
+            jmp div2
+
+dygt:       lda dy                  ; else err = -dy
+            clc
+            eor #$ff
+            adc #1
+            sta err
+            lda dy+1
+            eor #$ff
+            adc #0
+            sta err+1
+div2:       clc
+            lsr err+1               ; err /= 2
+            ror err
+
+calcsx:     lda _x1cord+1           ; if (x1cord < x2cord) then sx = 1
+            cmp _x2cord+1
+            bcc x1lt
+            bne x1gt
+            lda _x1cord
+            cmp _x2cord
+            bcc x1lt
+
+x1gt:       lda #$FF
+            sta sx
+            bne calcsy              
+
+x1lt:       lda #1                  ; otherwise sx = 1
+            sta sx
+
+calcsy:     lda _y1cord+1           ; if (y1cord < y2cord) then sy = 1
+            cmp _y2cord+1
+            bcc y1lt
+            bne y1gt
+            lda _y1cord
+            cmp _y2cord
+            bcc y1lt
+y1gt:       lda _y1cord             ; if (_y1cord > _y2cord) then sy = -1
+            lda #$FF
+            sta sy
+            bne loop
+
+y1lt:       lda #1                  ; otherwise sy = 1
+            sta sy
+
+loop:       jsr _SetPixel           ; Plot the current _x1cord, _y1cord
+
+            lda _x1cord             ; if (_x1cord == _x2cord && _y1cord == _y2cord) then we rts
+            cmp _x2cord
+            bne noteq
+            lda _x1cord+1
+            cmp _x2cord+1
+            bne noteq
+            lda _y1cord
+            cmp _y2cord
+            bne noteq
+            lda _y1cord+1
+            cmp _y2cord+1
+            bne noteq
+
+            rts
+
+noteq:      lda err
+            sta e2
+            lda err+1
+            sta e2+1
+
+            lda e2                 ; if (e2 > -dx) is the same as if (e2 + dx > 0), so we test that.
+            clc                    ;    If its true then we dec err and inc _x1cord
+            adc dx
+            lda e2+1
+            adc dx+1
+            bmi noincx
+
+incx:       lda err                 ; err -= dy
+            sec
+            sbc dy
+            sta err
+            lda err+1
+            sbc dy+1
+            sta err+1
+            lda _x1cord             ; _x1cord += sx
+            clc
+            adc sx
+            sta _x1cord
+            lda _x1cord+1
+            adc #0
+            sta _x1cord+1
+
+noincx:     lda e2+1                ; if (e2 < dy) then we inc err and inc _y1cord
+            cmp dy+1
+            bcc noincy
+            bne incy
+            lda e2
+            cmp dy
+            bcc noincy
+incy:       lda err                 ; err += dx
+            clc
+            adc dx
+            sta err
+            lda err+1
+            adc dx+1
+            sta err+1
+            lda _y1cord             ; _y1cord += sy
+            clc
+            adc sy
+            sta _y1cord
+            lda _y1cord+1
+            adc #0
+            sta _y1cord+1
+noincy:
+            jmp loop            
+
+
+
+
+
+                    
 
 
 

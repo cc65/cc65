@@ -3001,8 +3001,9 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
             }
 
             if (!AddDone) {
-                if (ED_IsLocQuasiConst (&Expr2) &&
-                    rscale == 1                 &&
+                if (ED_IsLocQuasiConst (&Expr2)  &&
+                    !IsTypeBitField (Expr2.Type) &&
+                    rscale == 1                  &&
                     CheckedSizeOf (rhst) == SIZEOF_CHAR) {
                     /* Change the order back */
                     RemoveCode (&Mark);

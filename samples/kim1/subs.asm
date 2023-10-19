@@ -75,13 +75,26 @@ scroll_dest_hi: .res 1
 
 .segment "DATA"
 
+; Arguments for graphics functions
+
 _x1cord:        .res 2
 _x2cord:        .res 2
 _y1cord:        .res 2
 _y2cord:        .res 2
 _cursorX:       .res 1
 _cursorY:       .res 1
-tempchar:       .res 1
+
+; Linedraw
+
+dx:         .res 2
+dy:         .res 2
+e2:         .res 2
+sx:         .res 1
+sy:         .res 1
+dltemp:     .res 2
+
+; DrawCircle
+
 xval:           .res 2              ; These could move to zeropage for perf, but presume we
 yval:           .res 2              ;   we want to minimize the amount we grow zero page use
 err:            .res 2  
@@ -107,58 +120,58 @@ y0:             .res 2
 ;-----------------------------------------------------------------------------------
 ; Based on MTU PIXADR code
 ;-----------------------------------------------------------------------------------
-; x             - _x1cord (16-bit)
-; y             - _y1cord (16-bit)   
-; adp1          - address of pixel to set (16-bit)
+; In:       _x1cord         (16-bit)
+;           _y1cord         (16-bit)   
+; Out:      adp1            (16-bit) Address of pixel to set 
 ;-----------------------------------------------------------------------------------
 
 _GetPixelAddress:          
-                lda 	_x1cord 	      ; compute bit address first
-                sta 	adp1 		      ; also transfer _x1cord to adp1
-                and 	#$07		      ; + which is simply the low 3 bits of x
+                lda 	_x1cord 	; compute bit address first
+                sta 	adp1 		; also transfer x1cord to adp1
+                and 	#$07		; + which is simply the low 3 bits of x
                 sta 	btpt
-
-                lda 	_x1cord+1 	   ; finish transferring _x1cord to adp1
+                lda 	_x1cord+1 	; finish transferring x1cord to adp1
                 sta 	adp1+1
-                lsr 	adp1+1 		   ; double shift adp1 right 3 to get
-                ror 	adp1 		      ; int(xcord/8 )
+                lsr 	adp1+1 		; double shift adp1 right 3 to get
+                ror 	adp1 		; int(xcord/8 )
                 lsr 	adp1+1
                 ror 	adp1
                 lsr 	adp1+1
                 ror 	adp1
+                sec 				; and temporary storage
                 lda 	_y1cord
                 sta 	adp2
                 sta 	temp
-
-                lda 	_y1cord+1
+                lda 	#0
+                sbc 	_y1cord+1
                 sta 	adp2+1
                 sta 	temp+1
-                asl 	adp2 		      ; compute 40*(_y1cord)
-                rol 	adp2+1 		   ;  2*(_y1cord)
+                asl 	adp2 		; compute 40*(y1cord)
+                rol 	adp2+1 		;  2*(y1cord)
                 asl 	adp2
-                rol 	adp2+1 		   ;  4*(_y1cord)
-                lda 	adp2 		      ;  add in temporary save of (_y1cord)
-                clc 			         ;  to make 5*(_y1cord)
+                rol 	adp2+1 		;  4*(y1cord)
+                lda 	adp2 		;  add in temporary save of (y1cord)
+                clc 				;  to make 5*(y1cord)
                 adc 	temp
                 sta 	adp2
                 lda 	adp2+1
                 adc 	temp+1
-                sta 	adp2+1 		   ; 5*(_y1cord)
-                asl 	adp2 		      ; 10*(_y1cord)
+                sta 	adp2+1 		; 5*(y1cord)
+                asl 	adp2 		; 10*(1cord)
                 rol 	adp2+1
-                asl 	adp2 		      ; 20#(_y1cord)
+                asl 	adp2 		; 20#(y1cord)
                 rol 	adp2+1
-                asl 	adp2 		      ; 40*(_y1cord)
+                asl 	adp2 		; 40*(y1cord)
                 rol 	adp2+1
-                lda 	adp2 		      ; add in int(_x1cord/8) computed earlier
+                lda 	adp2 		; add in int(x1cord/8) computed earlier
                 clc
                 adc 	adp1
                 sta 	adp1
                 lda 	adp2+1
                 adc 	adp1+1
-                adc 	#>SCREEN       ; add in base vidscreen address
-                sta 	adp1+1 		   ; final result
-                rts 			         ; return
+                adc 	#>SCREEN    ; add in vmorg*256
+                sta 	adp1+1 		; final result
+                rts 				; return        
 
 ;-----------------------------------------------------------------------------------
 ; Mask tables for individual pixel subroutines
@@ -814,8 +827,8 @@ loadChar:      lda (adp1), y
 doneText:      rts      
 
 demoText1:     .byte "  *** COMMODORE KIM-1 SHELL V0.1 ***", $0A, $0A
-               .byte "   60K RAM SYSTEM.  49152 BYTES FREE.", $0A, $0A
-               .byte "READY.", $0A, 00
+               .byte "   60K RAM SYSTEM.  49152 BYTES FREE.", $0A, $0A, $00
+readyText:     .byte "READY.", $0A, 00
 
 alphabet:      .byte "ABCDEFGHIJKLMNOPQRSTUVWXYZ", 00, "*****", 00
 
@@ -825,21 +838,22 @@ _Demo:         lda #0
                ldx #<demoText1
                ldy #>demoText1
                jsr _DrawText
- 
- :             ldx #<alphabet
+               rts
+
+:              ldx #<alphabet
                ldy #>alphabet
                jsr _DrawText
                jmp :-
 
 ;-----------------------------------------------------------------------------------
-; DrawCircle    - Draws a circle in video memory of a given radius at a given coord
+; DrawLine    - Draws a line between two points
 ;-----------------------------------------------------------------------------------
 ; _x1cord (16-bit)
-; _y1cord (8-bit)   
+; _y1cord ( 8-bit)   
 ; _x2cord (16-bit)
-; _y2cord (8-bit)
+; _y2cord ( 8-bit)
 ;-----------------------------------------------------------------------------------
-; Implements something like Bresenham's algorithm for drawing a line
+; Implements something like Bresenham's algorithm for drawing a line:
 ;-----------------------------------------------------------------------------------
 ; void DrawLine(int x0, int y0, int x1, int y1, byte val)
 ; {
@@ -870,181 +884,140 @@ _Demo:         lda #0
 ; }
 ;-----------------------------------------------------------------------------------
 
-dx:         .res 2
-dy:         .res 2
-e2:         .res 2
-sx:         .res 1
-sy:         .res 1
-dltemp:     .res 2
-
-_DrawLine:  lda _x2cord             ; Calculate dx = (x2cord - X1cord)
+_DrawLine:  ldx #$01                ; positive x-step for now
+            stx sx
+            lda _x2cord             ; Calculate dx = (x2cord - X1cord)
             sec
             sbc _x1cord
             sta dx
             lda _x2cord+1
             sbc _x1cord+1
             sta dx+1
-            bpl positivedx          ; dx is positive, so we're good
+            bpl calcdy              ; dx is positive (dx >= 0), so we're good
             
-            lda dx                  ; dx is negative, so compute absolute value
-            clc                     ;  by inverting bits and adding 1
-            eor #$ff
-            adc #1
+            ldx #$FF                ; negative x-step
+            stx sx
+            lda _x1cord             ; Calculate dx = (x2cord - X1cord)
+            sec
+            sbc _x2cord
             sta dx
-            lda dx+1
-            eor #$ff
-            adc #0
+            lda _x1cord+1
+            sbc _x2cord+1
             sta dx+1
-positivedx: 
-            lda _y2cord             ; Calculate dy = (y2cord - y1cord)
+
+calcdy:     ldx #$01                ; positive y-step for now
+            stx sy
+            lda _y2cord
             sec
             sbc _y1cord
             sta dy
-            lda _y2cord+1
-            sbc _y1cord+1
-            sta dy+1
-            bpl positivedy          ; dy is positive, so we're good
-            
-            lda dy                  ; It's negative, so compute the absolute value
-            clc                     ;   by inverting bits and adding 1
-            eor #$ff
-            adc #1
+            bcs positivedy          ; If y2cord > y1cord, then dy is positive and we're good
+
+            ldx #$FF                ; negative y-step
+            stx sy
+            lda _y1cord
+            sec
+            sbc _y2cord
             sta dy
-            lda dy+1
-            eor #$ff
-            adc #0
-            sta dy+1
-positivedy:                         ; Check if dx > dy
-            lda dy+1
-            cmp dx+1
-            bcc dxgt
-            bne dygt
+
+positivedy: lda dx+1                ; Check if dx > dy (both are always positive now)
+            bne dxgt                ; If MSB of dx is greater than zero, then dx > dy since dy is 8-bits
             lda dy
             cmp dx
-            bcs dygt
+            bcs dygte
 
-dxgt:       lda dx                  ; We found dx>dy so err = dx
+dxgt:       lda dx                  ; We found dx>dy so set err = dx / 2
             sta err
             lda dx+1
-            sta err+1
-            jmp div2
-
-dygt:       lda dy                  ; else err = -dy
-            clc
-            eor #$ff
-            adc #1
-            sta err
-            lda dy+1
-            eor #$ff
-            adc #0
-            sta err+1
-div2:       clc
-            lsr err+1               ; err /= 2
+            lsr
+            sta err+1               ; err = dx/2
             ror err
+            jmp loop
 
-calcsx:     lda _x1cord+1           ; if (x1cord < x2cord) then sx = 1
-            cmp _x2cord+1
-            bcc x1lt
-            bne x1gt
-            lda _x1cord
-            cmp _x2cord
-            bcc x1lt
-
-x1gt:       lda #$FF
-            sta sx
-            bne calcsy              
-
-x1lt:       lda #1                  ; otherwise sx = 1
-            sta sx
-
-calcsy:     lda _y1cord+1           ; if (y1cord < y2cord) then sy = 1
-            cmp _y2cord+1
-            bcc y1lt
-            bne y1gt
-            lda _y1cord
-            cmp _y2cord
-            bcc y1lt
-y1gt:       lda _y1cord             ; if (_y1cord > _y2cord) then sy = -1
+dygte:      lda #0                  ; we found dx <= dy so set err = -dy / 2
+            sec
+            sbc dy                  ; else err = -dy / 2
+            ror
+            ora #$80
+            sta err
             lda #$FF
-            sta sy
-            bne loop
-
-y1lt:       lda #1                  ; otherwise sy = 1
-            sta sy
-
+            sta err+1
+      
 loop:       jsr _SetPixel           ; Plot the current _x1cord, _y1cord
 
             lda _x1cord             ; if (_x1cord == _x2cord && _y1cord == _y2cord) then we rts
             cmp _x2cord
             bne noteq
-            lda _x1cord+1
-            cmp _x2cord+1
-            bne noteq
             lda _y1cord
             cmp _y2cord
             bne noteq
-            lda _y1cord+1
-            cmp _y2cord+1
+            lda _x1cord+1
+            cmp _x2cord+1
             bne noteq
-
+           
             rts
 
-noteq:      lda err
+noteq:      lda err                 ; e2 = err
             sta e2
             lda err+1
             sta e2+1
 
-            lda e2                 ; if (e2 > -dx) is the same as if (e2 + dx > 0), so we test that.
-            clc                    ;    If its true then we dec err and inc _x1cord
+            lda e2                  ; if (e2 > -dx) is the same as if (e2 + dx > 0), so we test that because its easier
+            clc                     ;    If its true then we dec err and inc _x1cord
             adc dx
+            sta temp
             lda e2+1
             adc dx+1
-            bmi noincx
+            bmi doneupdatex         ; If result is negative, then e2 + dx < 0, so we don't dec err or inc _x1cord
+            bne stepx                ; If MSB is non-zero, then e2 + dx > 0, so we DO dec err and inc _x1cord
+            lda temp                ; If result is zero in MSB, then we check the LSB here
+            beq doneupdatex         ;    If LSB is zero, then we don't dec err or inc _x1cord
+                                    ; We already know e2 + dx > 0, so LSB can't be negative
+stepx:      lda sx
+            bmi decx
+incxval:    inc _x1cord             ; _x1cord += 1 because sx == 1
+            bne updatexerr
+            inc _x1cord+1
+            jmp updatexerr
 
-incx:       lda err                 ; err -= dy
+decx:       lda _x1cord             ; _x1cord += 1 because sx == 1
+            sec
+            sbc #1
+            sta _x1cord
+            lda _x1cord+1
+            sbc #0
+            sta _x1cord+1
+ 
+updatexerr: lda err                 ; err -= dy  
             sec
             sbc dy
             sta err
             lda err+1
-            sbc dy+1
+            sbc #0
             sta err+1
-            lda _x1cord             ; _x1cord += sx
-            clc
-            adc sx
-            sta _x1cord
-            lda _x1cord+1
-            adc #0
-            sta _x1cord+1
 
-noincx:     lda e2+1                ; if (e2 < dy) then we inc err and inc _y1cord
-            cmp dy+1
-            bcc noincy
-            bne incy
-            lda e2
-            cmp dy
-            bcc noincy
-incy:       lda err                 ; err += dx
+doneupdatex:lda e2+1                ; if (e2 < dy) then we inc err and inc _y1cord 
+            bmi updateerry          ; If MSB is negative, then e2 < dy, so we inc err and inc _y1cord
+            bne noupdatey           ; If the MSB of e2 is set and positive, then we know e2 > dy, so we don't inc err or inc _y1cord
+            lda e2                  
+            sec
+            sbc dy              
+            beq noupdatey           ; e2 - dy == 0 so we don't inc err or inc _y1cord
+            bcs noupdatey           ; if e2 was large enough that carry never cleared, then e2 > dy do no update
+
+updateerry: lda err                 ; err += dx     
             clc
             adc dx
             sta err
             lda err+1
             adc dx+1
             sta err+1
-            lda _y1cord             ; _y1cord += sy
+
+stepy:      lda _y1cord
             clc
             adc sy
             sta _y1cord
-            lda _y1cord+1
-            adc #0
-            sta _y1cord+1
-noincy:
-            jmp loop            
 
-
-
-
-
-                    
-
+noupdatey:  jmp loop
 
 

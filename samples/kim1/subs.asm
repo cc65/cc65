@@ -886,6 +886,9 @@ _Demo:         lda #0
 
 _DrawLine:  ldx #$01                ; positive x-step for now
             stx sx
+
+            ; Calculate dx = (x2cord - X1cord) and see if its positive or not
+
             lda _x2cord             ; Calculate dx = (x2cord - X1cord)
             sec
             sbc _x1cord
@@ -895,6 +898,9 @@ _DrawLine:  ldx #$01                ; positive x-step for now
             sta dx+1
             bpl calcdy              ; dx is positive (dx >= 0), so we're good
             
+            ; dx was negative (dx < 0), so we set sx to -1 and get the absolute
+            ;  value by subtracting the other direction
+
             ldx #$FF                ; negative x-step
             stx sx
             lda _x1cord             ; Calculate dx = (x2cord - X1cord)
@@ -905,6 +911,8 @@ _DrawLine:  ldx #$01                ; positive x-step for now
             sbc _x2cord+1
             sta dx+1
 
+            ; Calculate dy = (y2cord - y1cord) and see if its positive or not
+
 calcdy:     ldx #$01                ; positive y-step for now
             stx sy
             lda _y2cord
@@ -913,12 +921,17 @@ calcdy:     ldx #$01                ; positive y-step for now
             sta dy
             bcs positivedy          ; If y2cord > y1cord, then dy is positive and we're good
 
+            ; dy was negative (dy < 0), so we set sy to -1 and get the absolute value
+
             ldx #$FF                ; negative y-step
             stx sy
             lda _y1cord
             sec
             sbc _y2cord
             sta dy
+
+            ; Now we have dx and dy, so we can calculate err, but first we need
+            ;  to see if dx > dy or not
 
 positivedy: lda dx+1                ; Check if dx > dy (both are always positive now)
             bne dxgt                ; If MSB of dx is greater than zero, then dx > dy since dy is 8-bits
@@ -943,6 +956,8 @@ dygte:      lda #0                  ; we found dx <= dy so set err = -dy / 2
             lda #$FF
             sta err+1
       
+            ; Now we have dx, dy, and err, so we can start drawing pixels
+
 loop:       jsr _SetPixel           ; Plot the current _x1cord, _y1cord
 
             lda _x1cord             ; if (_x1cord == _x2cord && _y1cord == _y2cord) then we rts
@@ -962,6 +977,8 @@ noteq:      lda err                 ; e2 = err
             lda err+1
             sta e2+1
 
+            ; Check the two update conditions for x and y, and update if needed
+            
             lda e2                  ; if (e2 > -dx) is the same as if (e2 + dx > 0), so we test that because its easier
             clc                     ;    If its true then we dec err and inc _x1cord
             adc dx

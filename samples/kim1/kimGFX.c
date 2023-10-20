@@ -177,12 +177,12 @@ void DrawCircleC(int x0, int y0, int radius, byte)
    DrawCircle();
 }
 
-void DrawLineC(int x0, int x1, int y0, int y1)
+void DrawLineC(int x1, int y1, int x2, int y2)
 {
-   x1cord = x0;
-   y1cord = y0;
-   x2cord = x1;
-   y2cord = y1;
+   x1cord = x1;
+   y1cord = y1;
+   x2cord = x2;
+   y2cord = y2;
    DrawLine();
 }
 
@@ -223,19 +223,22 @@ void DrawScreenMoire(int left, int top, int right, int bottom)
 
 int main (void)
 {
-   //int i;
+   int i;
 
    // Clear the screen memory
-   ClearScreen();
-   //Demo();
+   while(1)
+   {
+      ClearScreen();
+      Demo();
+      DrawScreenMoire(0,30, 319, 199);
 
-   //DrawTextAt(184, 192, "TEST");
+      ClearScreen();
+      Demo();
+      
+      for (i = 5; i < 80; i+=5)
+         DrawCircleC(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 20, i, 1);
 
-   DrawScreenMoire(0,30, 319, 199);
-
-   // Print the numbers from 0-9999, forcing the screen to scroll
-   //for (i = 5; i < 80; i+=5)
-   //   DrawCircleC(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 20, i, 1);
+   }
 
    printf("Done, exiting...\r\n");
    return 0;

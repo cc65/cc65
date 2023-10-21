@@ -64,6 +64,36 @@ unsigned OptBoolTrans (CodeSeg* S);
 
 
 /*****************************************************************************/
+/*           Remove calls to the boolean cast/negation subroutines           */
+/*****************************************************************************/
+
+
+
+unsigned OptBoolUnary1 (CodeSeg* S);
+/* Search for and remove bcastax adjacent to bnegax */
+
+unsigned OptBoolUnary2 (CodeSeg* S);
+/* Search for and remove bcastax/bnegax following a boolean transformer.
+** Invert the boolean transformer if it is bnegax to be removed.
+*/
+
+unsigned OptBoolUnary3 (CodeSeg* S);
+/* Replace bcastax/bnegax with
+**
+**      cpx #0
+**      jsr boolne/booleq
+**
+** if A == 0, or replace bcastax/bnegax with
+**
+**      cmp #0
+**      jsr boolne/booleq
+**
+** if X == 0.
+*/
+
+
+
+/*****************************************************************************/
 /*                            bnega optimizations                            */
 /*****************************************************************************/
 

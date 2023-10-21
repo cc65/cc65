@@ -118,6 +118,9 @@ static OptFunc DOptBNegAX3      = { OptBNegAX3,      "OptBNegAX3",      100, 0, 
 static OptFunc DOptBNegAX4      = { OptBNegAX4,      "OptBNegAX4",      100, 0, 0, 0, 0, 0 };
 static OptFunc DOptBoolCmp      = { OptBoolCmp,      "OptBoolCmp",      100, 0, 0, 0, 0, 0 };
 static OptFunc DOptBoolTrans    = { OptBoolTrans,    "OptBoolTrans",    100, 0, 0, 0, 0, 0 };
+static OptFunc DOptBoolUnary1   = { OptBoolUnary1,   "OptBoolUnary1",    40, 0, 0, 0, 0, 0 };
+static OptFunc DOptBoolUnary2   = { OptBoolUnary2,   "OptBoolUnary2",    40, 0, 0, 0, 0, 0 };
+static OptFunc DOptBoolUnary3   = { OptBoolUnary3,   "OptBoolUnary3",    40, 0, 0, 0, 0, 0 };
 static OptFunc DOptBranchDist   = { OptBranchDist,   "OptBranchDist",     0, 0, 0, 0, 0, 0 };
 static OptFunc DOptBranchDist2  = { OptBranchDist2,  "OptBranchDist2",    0, 0, 0, 0, 0, 0 };
 static OptFunc DOptCmp1         = { OptCmp1,         "OptCmp1",          42, 0, 0, 0, 0, 0 };
@@ -224,6 +227,9 @@ static OptFunc* OptFuncs[] = {
     &DOptBNegAX4,
     &DOptBoolCmp,
     &DOptBoolTrans,
+    &DOptBoolUnary1,
+    &DOptBoolUnary2,
+    &DOptBoolUnary3,
     &DOptBranchDist,
     &DOptBranchDist2,
     &DOptCmp1,
@@ -613,7 +619,6 @@ static unsigned RunOptGroup1 (CodeSeg* S)
     Changes += RunOptFunc (S, &DOptPtrLoad15, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad16, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad17, 1);
-    Changes += RunOptFunc (S, &DOptBNegAX1, 1);
     Changes += RunOptFunc (S, &DOptBNegAX2, 1);
     Changes += RunOptFunc (S, &DOptBNegAX3, 1);
     Changes += RunOptFunc (S, &DOptBNegAX4, 1);
@@ -673,7 +678,12 @@ static unsigned RunOptGroup3 (CodeSeg* S)
         C += RunOptFunc (S, &DOptBNegA2, 1);
         C += RunOptFunc (S, &DOptNegAX1, 1);
         C += RunOptFunc (S, &DOptNegAX2, 1);
-        C += RunOptFunc (S, &DOptStackOps, 3);
+        C += RunOptFunc (S, &DOptStackOps, 3);      /* Before OptBoolUnary1 */
+        C += RunOptFunc (S, &DOptCmp8, 1);          /* Before OptBoolUnary1 */
+        C += RunOptFunc (S, &DOptBoolUnary1, 3);
+        C += RunOptFunc (S, &DOptBoolUnary2, 3);
+        C += RunOptFunc (S, &DOptBoolUnary3, 1);
+        C += RunOptFunc (S, &DOptBNegAX1, 1);       /* After OptBoolUnary2 */
         C += RunOptFunc (S, &DOptShift1, 1);
         C += RunOptFunc (S, &DOptShift4, 1);
         C += RunOptFunc (S, &DOptComplAX1, 1);

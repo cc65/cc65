@@ -291,6 +291,227 @@ unsigned OptBoolTrans (CodeSeg* S)
 
 
 /*****************************************************************************/
+/*           Remove calls to the boolean cast/negation subroutines           */
+/*****************************************************************************/
+
+
+
+unsigned OptBoolUnary1 (CodeSeg* S)
+/* Search for and remove cmp #0/bcastax/boolne following a bcastax/bnegax.
+** Or search for and remove cmp #1/bnegax/booleq following a bcastax/bnegax
+** and invert the bcastax/bnegax.
+*/
+{
+    unsigned Changes = 0;
+    int      Neg = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        CodeEntry* L[2];
+
+        /* Get next entry */
+        L[0] = CS_GetEntry (S, I);
+
+        /* Check for the sequence.
+        ** We allow the first entry to have labels.
+        */
+        if (L[0]->OPC == OP65_JSR                   &&
+            (L[1] = CS_GetNextEntry (S, I)) != 0    &&
+            !CE_HasLabel (L[1])) {
+            if (strcmp (L[0]->Arg, "bnegax") == 0) {
+                Neg = 1;
+            } else if (strcmp (L[0]->Arg, "bcastax") == 0) {
+                Neg = 0;
+            } else {
+                /* Next entry */
+                ++I;
+                continue;
+            }
+            if ((L[1]->OPC == OP65_CMP && CE_IsKnownImm (L[1], 0x0)) ||
+                CE_IsCallTo (L[1], "boolne") ||
+                CE_IsCallTo (L[1], "bcastax")) {
+                /* Delete the entry no longer needed. */
+                CS_DelEntry (S, I + 1);
+
+                /* Remember, we had changes */
+                ++Changes;
+
+                /* We are still at this index */
+                continue;
+
+            } else if ((L[1]->OPC == OP65_CMP && CE_IsKnownImm (L[1], 0x1)) ||
+                CE_IsCallTo (L[1], "booleq") ||
+                CE_IsCallTo (L[1], "bnegax")) {
+                /* Invert the previous bool conversion */
+                CE_SetArg (L[0], Neg ? "bcastax" : "bnegax");
+
+                /* Delete the entry no longer needed */
+                CS_DelEntry (S, I + 1);
+
+                /* Remember, we had changes */
+                ++Changes;
+
+                /* We are still at this index */
+                continue;
+            }
+        }
+
+        /* Next entry */
+        ++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptBoolUnary2 (CodeSeg* S)
+/* Search for and remove cmp #0/bcastax/boolne following a boolean transformer.
+** Or search for and remove cmp #1/bnegax/booleq following a boolean transformer
+** and invert the boolean transformer.
+*/
+{
+    unsigned Changes = 0;
+    cmp_t Cond;
+    char Buf[16];
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        CodeEntry* L[2];
+
+        /* Get next entry */
+        L[0] = CS_GetEntry (S, I);
+
+        /* Check for the sequence.
+        ** We allow the first entry to have labels.
+        */
+        if (L[0]->OPC == OP65_JSR                   &&
+            (L[1] = CS_GetNextEntry (S, I)) != 0    &&
+            !CE_HasLabel (L[1])                     &&
+            (Cond = FindBoolCmpCond (L[0]->Arg)) != CMP_INV) {
+            if ((L[1]->OPC == OP65_CMP && CE_IsKnownImm (L[1], 0x0)) ||
+                CE_IsCallTo (L[1], "boolne") ||
+                CE_IsCallTo (L[1], "bcastax")) {
+                /* Delete the entry no longer needed */
+                CS_DelEntry (S, I + 1);
+
+                /* Remember, we had changes */
+                ++Changes;
+
+                /* We are still at this index */
+                continue;
+
+            } else if ((L[1]->OPC == OP65_CMP && CE_IsKnownImm (L[1], 0x1)) ||
+                CE_IsCallTo (L[1], "booleq") ||
+                CE_IsCallTo (L[1], "bnegax")) {
+                /* Invert the bool conversion */
+                if (GetBoolCmpSuffix (Buf, GetNegatedCond (Cond)) == 0) {
+                    Internal ("No inverted boolean transformer for: %s", L[0]->Arg);
+                }
+                CE_SetArg (L[0], Buf);
+
+                /* Delete the entry no longer needed */
+                CS_DelEntry (S, I + 1);
+
+                /* Remember, we had changes */
+                ++Changes;
+
+                /* We are still at this index */
+                continue;
+            }
+        }
+
+        /* Next entry */
+        ++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptBoolUnary3 (CodeSeg* S)
+/* If A == 0, replace bcastax/bnegax with
+**
+**      cpx #0
+**      jsr boolne/booleq
+**
+** Or if X == 0, replace bcastax/bnegax with
+**
+**      cmp #0
+**      jsr boolne/booleq
+**
+*/
+{
+    unsigned    Changes = 0;
+    opc_t       Op      = OP65_COUNT;
+    const char* Sub     = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        CodeEntry* E;
+        CodeEntry* X;
+
+        /* Get next entry */
+        E = CS_GetEntry (S, I);
+
+        /* Check for the sequence */
+        if (!CE_HasLabel (E)) {
+            /* Choose the right subroutine */
+            if (CE_IsCallTo (E, "bnegax")) {
+                Sub = "booleq";
+            } else if (CE_IsCallTo (E, "bcastax")) {
+                Sub = "boolne";
+            }
+            /* Choose the right opcode */
+            if (RegValIsKnown (E->RI->In.RegA) && E->RI->In.RegA == 0) {
+                Op = OP65_CPX;
+            } else if (RegValIsKnown (E->RI->In.RegX) && E->RI->In.RegX == 0) {
+                Op = OP65_CMP;
+            }
+            /* Replace the sequence if all requirements are met*/
+            if (Op != OP65_COUNT && Sub != 0) {
+                /* Replace bcastax/bnegax with boolne/booleq */
+                CE_SetArg (E, Sub);
+
+                /* Insert the compare */
+                X = NewCodeEntry (Op, AM65_IMM, "$00", 0, E->LI);
+                CS_InsertEntry (S, X, I);
+
+                /* Remember, we had changes */
+                ++Changes;
+
+                /* Correct the index */
+                ++I;
+            }
+
+            /* Reset the choices */
+            Op  = OP65_COUNT;
+            Sub = 0;
+        }
+
+        /* Next entry */
+        ++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+/*****************************************************************************/
 /*                            bnega optimizations                            */
 /*****************************************************************************/
 

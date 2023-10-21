@@ -255,7 +255,8 @@ unsigned OptBoolTrans (CodeSeg* S)
         if (E->OPC == OP65_JSR                           &&
             (Cond = FindBoolCmpCond (E->Arg)) != CMP_INV &&
             (N = CS_GetNextEntry (S, I)) != 0            &&
-            (N->Info & OF_ZBRA) != 0) {
+            (N->Info & OF_ZBRA) != 0                     &&
+            (GetRegInfo (S, I + 2, PSTATE_Z) & PSTATE_Z) == 0) {
 
             /* Make the boolean transformer unnecessary by changing the
             ** the conditional jump to evaluate the condition flags that
@@ -606,7 +607,8 @@ unsigned OptBNegA2 (CodeSeg* S)
             CE_IsCallTo (L[0], "bnega")         &&
             !CE_HasLabel (L[0])                 &&
             (L[1]->Info & OF_ZBRA) != 0         &&
-            !CE_HasLabel (L[1])) {
+            !CE_HasLabel (L[1])                 &&
+            (GetRegInfo (S, I + 3, PSTATE_Z) & PSTATE_Z) == 0) {
 
             /* Invert the branch */
             CE_ReplaceOPC (L[1], GetInverseBranch (L[1]->OPC));
@@ -709,7 +711,8 @@ unsigned OptBNegAX2 (CodeSeg* S)
             CS_GetEntries (S, L+1, I+1, 3)      &&
             CE_IsCallTo (L[1], "ldaxysp")       &&
             CE_IsCallTo (L[2], "bnegax")        &&
-            (L[3]->Info & OF_ZBRA) != 0) {
+            (L[3]->Info & OF_ZBRA) != 0         &&
+            (GetRegInfo (S, I + 4, PSTATE_Z) & PSTATE_Z) == 0) {
 
             CodeEntry* X;
 
@@ -781,7 +784,8 @@ unsigned OptBNegAX3 (CodeSeg* S)
             CE_IsCallTo (L[1], "bnegax")        &&
             !CE_HasLabel (L[1])                 &&
             (L[2]->Info & OF_ZBRA) != 0         &&
-            !CE_HasLabel (L[2])) {
+            !CE_HasLabel (L[2])                 &&
+            (GetRegInfo (S, I + 4, PSTATE_Z) & PSTATE_Z) == 0) {
 
             /* ldx --> ora */
             CE_ReplaceOPC (L[0], OP65_ORA);
@@ -840,7 +844,8 @@ unsigned OptBNegAX4 (CodeSeg* S)
             strncmp (L[0]->Arg,"bnega",5) == 0  &&
             !CE_HasLabel (L[0])                 &&
             (L[1]->Info & OF_ZBRA) != 0         &&
-            !CE_HasLabel (L[1])) {
+            !CE_HasLabel (L[1])                 &&
+            (GetRegInfo (S, I + 3, PSTATE_Z) & PSTATE_Z) == 0) {
 
             CodeEntry* X;
 

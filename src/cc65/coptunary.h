@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 coptcmp.h                                 */
+/*                                coptunary.h                                */
 /*                                                                           */
-/*                             Optimize compares                             */
+/*                     Optimize bitwise unary sequences                      */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2009, Ullrich von Bassewitz                                      */
+/* (C) 2001-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -33,8 +33,8 @@
 
 
 
-#ifndef COPTCMP_H
-#define COPTCMP_H
+#ifndef COPTUNARY_H
+#define COPTUNARY_H
 
 
 
@@ -44,110 +44,53 @@
 
 
 /*****************************************************************************/
-/*                        Optimizations for compares                         */
+/*                            negax optimizations                            */
 /*****************************************************************************/
 
 
 
-unsigned OptCmp1 (CodeSeg* S);
-/* Search for the sequence
+unsigned OptNegAX1 (CodeSeg* S);
+/* Search for a call to negax and replace it by
 **
-**      ldx     xx
-**      stx     tmp1
-**      ora     tmp1
+**      eor     #$FF
+**      clc
+**      adc     #$01
 **
-** and replace it by
-**
-**      ora     xx
+** if X isn't used later.
 */
 
-unsigned OptCmp2 (CodeSeg* S);
-/* Search for the sequence
+unsigned OptNegAX2 (CodeSeg* S);
+/* Search for a call to negax and replace it by
 **
-**      stx     xx
-**      stx     tmp1
-**      ora     tmp1
+**      ldx     #$FF
+**      eor     #$FF
+**      clc
+**      adc     #$01
+**      bcc     L1
+**      inx
+** L1:
 **
-** and replace it by
-**
-**      stx     xx
-**      ora     xx
-*/
-
-unsigned OptCmp3 (CodeSeg* S);
-/* Search for
-**
-**      lda/and/ora/eor ...
-**      cmp #$00
-**      jeq/jne
-** or
-**      lda/and/ora/eor ...
-**      cmp #$00
-**      jsr boolxx
-**
-** and remove the cmp.
-*/
-
-unsigned OptCmp4 (CodeSeg* S);
-/* Search for
-**
-**      lda     x
-**      ldx     y
-**      cpx     #a
-**      bne     L1
-**      cmp     #b
-**      jne/jeq L2
-**
-** If a is zero, we may remove the compare. If a and b are both zero, we may
-** replace it by the sequence
-**
-**      lda     x
-**      ora     x+1
-**      jne/jeq ...
-**
-** L1 may be either the label at the branch instruction, or the target label
-** of this instruction.
-*/
-
-unsigned OptCmp5 (CodeSeg* S);
-/* Optimize compares of local variables:
-**
-**      ldy     #o
-**      lda     (sp),y
-**      tax
-**      dey
-**      lda     (sp),y
-**      cpx     #a
-**      bne     L1
-**      cmp     #b
-**      jne/jeq L2
-*/
-
-unsigned OptCmp7 (CodeSeg* S);
-/* Search for a sequence ldx/txa/branch and remove the txa if A is not
-** used later.
-*/
-
-unsigned OptCmp8 (CodeSeg* S);
-/* Check for register compares where the contents of the register and therefore
-** the result of the compare is known.
-*/
-
-unsigned OptCmp9 (CodeSeg* S);
-/* Search for the sequence
-**
-**    sbc       xx
-**    bvs/bvc   L
-**    eor       #$80
-** L: asl       a
-**    bcc/bcs   somewhere
-**
-** If A is not used later (which should be the case), we can branch on the N
-** flag instead of the carry flag and remove the asl.
+** if X is known and zero on entry.
 */
 
 
 
-/* End of coptcmp.h */
+/*****************************************************************************/
+/*                           complax optimizations                           */
+/*****************************************************************************/
+
+
+
+unsigned OptComplAX1 (CodeSeg* S);
+/* Search for a call to complax and replace it by
+**
+**      eor     #$FF
+**
+** if X isn't used later.
+*/
+
+
+
+/* End of coptunary.h */
 
 #endif

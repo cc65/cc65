@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 coptneg.c                                 */
+/*                                coptbool.c                                 */
 /*                                                                           */
-/*                        Optimize negation sequences                        */
+/*                        Optimize boolean sequences                         */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -36,7 +36,257 @@
 /* cc65 */
 #include "codeent.h"
 #include "codeinfo.h"
-#include "coptneg.h"
+#include "error.h"
+#include "coptbool.h"
+
+
+
+/*****************************************************************************/
+/*                                   Data                                    */
+/*****************************************************************************/
+
+
+
+/* Table used to invert a condition, indexed by condition */
+static const unsigned char CmpInvertTab[] = {
+    CMP_NE, CMP_EQ,
+    CMP_LE, CMP_LT, CMP_GE, CMP_GT,
+    CMP_ULE, CMP_ULT, CMP_UGE, CMP_UGT
+};
+
+
+
+/*****************************************************************************/
+/*                             Helper functions                              */
+/*****************************************************************************/
+
+
+
+static void ReplaceBranchCond (CodeSeg* S, unsigned I, cmp_t Cond)
+/* Helper function for the replacement of routines that return a boolean
+** followed by a conditional jump. Instead of the boolean value, the condition
+** codes are evaluated directly.
+** I is the index of the conditional branch, the sequence is already checked
+** to be correct.
+*/
+{
+    CodeEntry* N;
+    CodeLabel* L;
+
+    /* Get the entry */
+    CodeEntry* E = CS_GetEntry (S, I);
+
+    /* Replace the conditional branch */
+    switch (Cond) {
+
+        case CMP_EQ:
+            CE_ReplaceOPC (E, OP65_JEQ);
+            break;
+
+        case CMP_NE:
+            CE_ReplaceOPC (E, OP65_JNE);
+            break;
+
+        case CMP_GT:
+            /* Replace by
+            **     beq @L
+            **     jpl Target
+            ** @L: ...
+            */
+            if ((N = CS_GetNextEntry (S, I)) == 0) {
+                /* No such entry */
+                Internal ("Invalid program flow");
+            }
+            L = CS_GenLabel (S, N);
+            N = NewCodeEntry (OP65_BEQ, AM65_BRA, L->Name, L, E->LI);
+            CS_InsertEntry (S, N, I);
+            CE_ReplaceOPC (E, OP65_JPL);
+            break;
+
+        case CMP_GE:
+            CE_ReplaceOPC (E, OP65_JPL);
+            break;
+
+        case CMP_LT:
+            CE_ReplaceOPC (E, OP65_JMI);
+            break;
+
+        case CMP_LE:
+            /* Replace by
+            **     jmi Target
+            **     jeq Target
+            */
+            CE_ReplaceOPC (E, OP65_JMI);
+            L = E->JumpTo;
+            N = NewCodeEntry (OP65_JEQ, AM65_BRA, L->Name, L, E->LI);
+            CS_InsertEntry (S, N, I+1);
+            break;
+
+        case CMP_UGT:
+            /* Replace by
+            **     beq @L
+            **     jcs Target
+            ** @L: ...
+            */
+            if ((N = CS_GetNextEntry (S, I)) == 0) {
+                /* No such entry */
+                Internal ("Invalid program flow");
+            }
+            L = CS_GenLabel (S, N);
+            N = NewCodeEntry (OP65_BEQ, AM65_BRA, L->Name, L, E->LI);
+            CS_InsertEntry (S, N, I);
+            CE_ReplaceOPC (E, OP65_JCS);
+            break;
+
+        case CMP_UGE:
+            CE_ReplaceOPC (E, OP65_JCS);
+            break;
+
+        case CMP_ULT:
+            CE_ReplaceOPC (E, OP65_JCC);
+            break;
+
+        case CMP_ULE:
+            /* Replace by
+            **     jcc Target
+            **     jeq Target
+            */
+            CE_ReplaceOPC (E, OP65_JCC);
+            L = E->JumpTo;
+            N = NewCodeEntry (OP65_JEQ, AM65_BRA, L->Name, L, E->LI);
+            CS_InsertEntry (S, N, I+1);
+            break;
+
+        default:
+            Internal ("Unknown jump condition: %d", Cond);
+
+    }
+
+}
+
+
+
+/*****************************************************************************/
+/*           Optimize bool comparison and transformer subroutines            */
+/*****************************************************************************/
+
+
+
+unsigned OptBoolCmp (CodeSeg* S)
+/* Search for calls to compare subroutines followed by a conditional branch
+** and replace them by cheaper versions, since the branch means that the
+** boolean value returned by these routines is not needed (we may also check
+** that explicitly, but for the current code generator it is always true).
+*/
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        CodeEntry* N;
+        cmp_t Cond;
+
+        /* Get next entry */
+        CodeEntry* E = CS_GetEntry (S, I);
+
+        /* Check for the sequence */
+        if (E->OPC == OP65_JSR                          &&
+            (Cond = FindTosCmpCond (E->Arg)) != CMP_INV &&
+            (N = CS_GetNextEntry (S, I)) != 0           &&
+            (N->Info & OF_ZBRA) != 0                    &&
+            !CE_HasLabel (N)) {
+
+            /* The tos... functions will return a boolean value in a/x and
+            ** the Z flag says if this value is zero or not. We will call
+            ** a cheaper subroutine instead, one that does not return a
+            ** boolean value but only valid flags. Note: jeq jumps if
+            ** the condition is not met, jne jumps if the condition is met.
+            ** Invert the code if we jump on condition not met.
+            */
+            if (GetBranchCond (N->OPC) == BC_EQ) {
+                /* Jumps if condition false, invert condition */
+                Cond = CmpInvertTab [Cond];
+            }
+
+            /* Replace the subroutine call. */
+            E = NewCodeEntry (OP65_JSR, AM65_ABS, "tosicmp", 0, E->LI);
+            CS_InsertEntry (S, E, I+1);
+            CS_DelEntry (S, I);
+
+            /* Replace the conditional branch */
+            ReplaceBranchCond (S, I+1, Cond);
+
+            /* Remember, we had changes */
+            ++Changes;
+
+        }
+
+        /* Next entry */
+        ++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptBoolTrans (CodeSeg* S)
+/* Try to remove the call to boolean transformer routines where the call is
+** not really needed and change following branch condition accordingly.
+*/
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        CodeEntry* N;
+        cmp_t Cond;
+
+        /* Get next entry */
+        CodeEntry* E = CS_GetEntry (S, I);
+
+        /* Check for a boolean transformer */
+        if (E->OPC == OP65_JSR                           &&
+            (Cond = FindBoolCmpCond (E->Arg)) != CMP_INV &&
+            (N = CS_GetNextEntry (S, I)) != 0            &&
+            (N->Info & OF_ZBRA) != 0) {
+
+            /* Make the boolean transformer unnecessary by changing the
+            ** the conditional jump to evaluate the condition flags that
+            ** are set after the compare directly. Note: jeq jumps if
+            ** the condition is not met, jne jumps if the condition is met.
+            ** Invert the code if we jump on condition not met.
+            */
+            if (GetBranchCond (N->OPC) == BC_EQ) {
+                /* Jumps if condition false, invert condition */
+                Cond = CmpInvertTab [Cond];
+            }
+
+            /* Check if we can replace the code by something better */
+            ReplaceBranchCond (S, I+1, Cond);
+
+            /* Remove the call to the bool transformer */
+            CS_DelEntry (S, I);
+
+            /* Remember, we had changes */
+            ++Changes;
+
+        }
+
+        /* Next entry */
+        ++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
 
 
 
@@ -398,203 +648,6 @@ unsigned OptBNegAX4 (CodeSeg* S)
             /* Remember, we had changes */
             ++Changes;
 
-        }
-
-        /* Next entry */
-        ++I;
-
-    }
-
-    /* Return the number of changes made */
-    return Changes;
-}
-
-
-
-/*****************************************************************************/
-/*                            negax optimizations                            */
-/*****************************************************************************/
-
-
-
-unsigned OptNegAX1 (CodeSeg* S)
-/* Search for a call to negax and replace it by
-**
-**      eor     #$FF
-**      clc
-**      adc     #$01
-**
-** if X isn't used later.
-*/
-{
-    unsigned Changes = 0;
-    unsigned I;
-
-    /* Walk over the entries */
-    I = 0;
-    while (I < CS_GetEntryCount (S)) {
-
-        /* Get next entry */
-        CodeEntry* E = CS_GetEntry (S, I);
-
-        /* Check if this is a call to negax, and if X isn't used later */
-        if (CE_IsCallTo (E, "negax") && !RegXUsed (S, I+1)) {
-
-            CodeEntry* X;
-
-            /* Add replacement code behind */
-            X = NewCodeEntry (OP65_EOR, AM65_IMM, "$FF", 0, E->LI);
-            CS_InsertEntry (S, X, I+1);
-
-            X = NewCodeEntry (OP65_CLC, AM65_IMP, 0, 0, E->LI);
-            CS_InsertEntry (S, X, I+2);
-
-            X = NewCodeEntry (OP65_ADC, AM65_IMM, "$01", 0, E->LI);
-            CS_InsertEntry (S, X, I+3);
-
-            /* Delete the call to negax */
-            CS_DelEntry (S, I);
-
-            /* Skip the generated code */
-            I += 2;
-
-            /* We had changes */
-            ++Changes;
-        }
-
-        /* Next entry */
-        ++I;
-
-    }
-
-    /* Return the number of changes made */
-    return Changes;
-}
-
-
-
-unsigned OptNegAX2 (CodeSeg* S)
-/* Search for a call to negax and replace it by
-**
-**      ldx     #$FF
-**      eor     #$FF
-**      clc
-**      adc     #$01
-**      bcc     L1
-**      inx
-** L1:
-**
-** if X is known and zero on entry.
-*/
-{
-    unsigned Changes = 0;
-    unsigned I;
-
-    /* Walk over the entries */
-    I = 0;
-    while (I < CS_GetEntryCount (S)) {
-
-        CodeEntry* P;
-
-        /* Get next entry */
-        CodeEntry* E = CS_GetEntry (S, I);
-
-        /* Check if this is a call to negax, and if X is known and zero */
-        if (E->RI->In.RegX == 0                 &&
-            CE_IsCallTo (E, "negax")            &&
-            (P = CS_GetNextEntry (S, I)) != 0) {
-
-            CodeEntry* X;
-            CodeLabel* L;
-
-            /* Add replacement code behind */
-
-            /* ldx #$FF */
-            X = NewCodeEntry (OP65_LDX, AM65_IMM, "$FF", 0, E->LI);
-            CS_InsertEntry (S, X, I+1);
-
-            /* eor #$FF */
-            X = NewCodeEntry (OP65_EOR, AM65_IMM, "$FF", 0, E->LI);
-            CS_InsertEntry (S, X, I+2);
-
-            /* clc */
-            X = NewCodeEntry (OP65_CLC, AM65_IMP, 0, 0, E->LI);
-            CS_InsertEntry (S, X, I+3);
-
-            /* adc #$01 */
-            X = NewCodeEntry (OP65_ADC, AM65_IMM, "$01", 0, E->LI);
-            CS_InsertEntry (S, X, I+4);
-
-            /* Get the label attached to the insn following the call */
-            L = CS_GenLabel (S, P);
-
-            /* bcc L */
-            X = NewCodeEntry (OP65_BCC, AM65_BRA, L->Name, L, E->LI);
-            CS_InsertEntry (S, X, I+5);
-
-            /* inx */
-            X = NewCodeEntry (OP65_INX, AM65_IMP, 0, 0, E->LI);
-            CS_InsertEntry (S, X, I+6);
-
-            /* Delete the call to negax */
-            CS_DelEntry (S, I);
-
-            /* Skip the generated code */
-            I += 5;
-
-            /* We had changes */
-            ++Changes;
-        }
-
-        /* Next entry */
-        ++I;
-
-    }
-
-    /* Return the number of changes made */
-    return Changes;
-}
-
-
-
-/*****************************************************************************/
-/*                           complax optimizations                           */
-/*****************************************************************************/
-
-
-
-unsigned OptComplAX1 (CodeSeg* S)
-/* Search for a call to complax and replace it by
-**
-**      eor     #$FF
-**
-** if X isn't used later.
-*/
-{
-    unsigned Changes = 0;
-    unsigned I;
-
-    /* Walk over the entries */
-    I = 0;
-    while (I < CS_GetEntryCount (S)) {
-
-        /* Get next entry */
-        CodeEntry* E = CS_GetEntry (S, I);
-
-        /* Check if this is a call to negax, and if X isn't used later */
-        if (CE_IsCallTo (E, "complax") && !RegXUsed (S, I+1)) {
-
-            CodeEntry* X;
-
-            /* Add replacement code behind */
-            X = NewCodeEntry (OP65_EOR, AM65_IMM, "$FF", 0, E->LI);
-            CS_InsertEntry (S, X, I+1);
-
-            /* Delete the call to negax */
-            CS_DelEntry (S, I);
-
-            /* We had changes */
-            ++Changes;
         }
 
         /* Next entry */

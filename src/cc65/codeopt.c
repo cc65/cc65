@@ -52,12 +52,12 @@
 #include "codeinfo.h"
 #include "codeopt.h"
 #include "coptadd.h"
+#include "coptbool.h"
 #include "coptc02.h"
 #include "coptcmp.h"
 #include "coptind.h"
 #include "coptjmp.h"
 #include "coptmisc.h"
-#include "coptneg.h"
 #include "coptptrload.h"
 #include "coptptrstore.h"
 #include "coptpush.h"
@@ -67,6 +67,7 @@
 #include "coptstore.h"
 #include "coptsub.h"
 #include "copttest.h"
+#include "coptunary.h"
 #include "error.h"
 #include "global.h"
 #include "output.h"
@@ -115,6 +116,7 @@ static OptFunc DOptBNegAX1      = { OptBNegAX1,      "OptBNegAX1",      100, 0, 
 static OptFunc DOptBNegAX2      = { OptBNegAX2,      "OptBNegAX2",      100, 0, 0, 0, 0, 0 };
 static OptFunc DOptBNegAX3      = { OptBNegAX3,      "OptBNegAX3",      100, 0, 0, 0, 0, 0 };
 static OptFunc DOptBNegAX4      = { OptBNegAX4,      "OptBNegAX4",      100, 0, 0, 0, 0, 0 };
+static OptFunc DOptBoolCmp      = { OptBoolCmp,      "OptBoolCmp",      100, 0, 0, 0, 0, 0 };
 static OptFunc DOptBoolTrans    = { OptBoolTrans,    "OptBoolTrans",    100, 0, 0, 0, 0, 0 };
 static OptFunc DOptBranchDist   = { OptBranchDist,   "OptBranchDist",     0, 0, 0, 0, 0, 0 };
 static OptFunc DOptBranchDist2  = { OptBranchDist2,  "OptBranchDist2",    0, 0, 0, 0, 0, 0 };
@@ -123,7 +125,6 @@ static OptFunc DOptCmp2         = { OptCmp2,         "OptCmp2",          85, 0, 
 static OptFunc DOptCmp3         = { OptCmp3,         "OptCmp3",          75, 0, 0, 0, 0, 0 };
 static OptFunc DOptCmp4         = { OptCmp4,         "OptCmp4",          75, 0, 0, 0, 0, 0 };
 static OptFunc DOptCmp5         = { OptCmp5,         "OptCmp5",         100, 0, 0, 0, 0, 0 };
-static OptFunc DOptCmp6         = { OptCmp6,         "OptCmp6",         100, 0, 0, 0, 0, 0 };
 static OptFunc DOptCmp7         = { OptCmp7,         "OptCmp7",          85, 0, 0, 0, 0, 0 };
 static OptFunc DOptCmp8         = { OptCmp8,         "OptCmp8",          50, 0, 0, 0, 0, 0 };
 static OptFunc DOptCmp9         = { OptCmp9,         "OptCmp9",          85, 0, 0, 0, 0, 0 };
@@ -221,6 +222,7 @@ static OptFunc* OptFuncs[] = {
     &DOptBNegAX2,
     &DOptBNegAX3,
     &DOptBNegAX4,
+    &DOptBoolCmp,
     &DOptBoolTrans,
     &DOptBranchDist,
     &DOptBranchDist2,
@@ -229,7 +231,6 @@ static OptFunc* OptFuncs[] = {
     &DOptCmp3,
     &DOptCmp4,
     &DOptCmp5,
-    &DOptCmp6,
     &DOptCmp7,
     &DOptCmp8,
     &DOptCmp9,
@@ -684,6 +685,7 @@ static unsigned RunOptGroup3 (CodeSeg* S)
         C += RunOptFunc (S, &DOptJumpCascades, 1);
         C += RunOptFunc (S, &DOptDeadJumps, 1);
         C += RunOptFunc (S, &DOptDeadCode, 1);
+        C += RunOptFunc (S, &DOptBoolCmp, 1);
         C += RunOptFunc (S, &DOptBoolTrans, 1);
         C += RunOptFunc (S, &DOptJumpTarget1, 1);
         C += RunOptFunc (S, &DOptJumpTarget2, 1);
@@ -696,7 +698,6 @@ static unsigned RunOptGroup3 (CodeSeg* S)
         C += RunOptFunc (S, &DOptCmp3, 1);
         C += RunOptFunc (S, &DOptCmp4, 1);
         C += RunOptFunc (S, &DOptCmp5, 1);
-        C += RunOptFunc (S, &DOptCmp6, 1);
         C += RunOptFunc (S, &DOptCmp7, 1);
         C += RunOptFunc (S, &DOptCmp9, 1);
         C += RunOptFunc (S, &DOptTest1, 1);

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 coptneg.h                                 */
+/*                                coptbool.h                                 */
 /*                                                                           */
-/*                        Optimize negation sequences                        */
+/*                        Optimize boolean sequences                         */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,13 +33,33 @@
 
 
 
-#ifndef COPTNEG_H
-#define COPTNEG_H
+#ifndef COPTBOOL_H
+#define COPTBOOL_H
 
 
 
 /* cc65 */
 #include "codeseg.h"
+
+
+
+/*****************************************************************************/
+/*           Optimize bool comparison and transformer subroutines            */
+/*****************************************************************************/
+
+
+
+unsigned OptBoolCmp (CodeSeg* S);
+/* Search for calls to compare subroutines followed by a conditional branch
+** and replace them by cheaper versions, since the branch means that the
+** boolean value returned by these routines is not needed (we may also check
+** that explicitly, but for the current code generator it is always true).
+*/
+
+unsigned OptBoolTrans (CodeSeg* S);
+/* Try to remove the call to boolean transformer routines where the call is
+** not really needed and change following branch condition accordingly.
+*/
 
 
 
@@ -132,54 +152,6 @@ unsigned OptBNegAX4 (CodeSeg* S);
 
 
 
-/*****************************************************************************/
-/*                            negax optimizations                            */
-/*****************************************************************************/
-
-
-
-unsigned OptNegAX1 (CodeSeg* S);
-/* Search for a call to negax and replace it by
-**
-**      eor     #$FF
-**      clc
-**      adc     #$01
-**
-** if X isn't used later.
-*/
-
-unsigned OptNegAX2 (CodeSeg* S);
-/* Search for a call to negax and replace it by
-**
-**      ldx     #$FF
-**      eor     #$FF
-**      clc
-**      adc     #$01
-**      bcc     L1
-**      inx
-** L1:
-**
-** if X is known and zero on entry.
-*/
-
-
-
-/*****************************************************************************/
-/*                           complax optimizations                           */
-/*****************************************************************************/
-
-
-
-unsigned OptComplAX1 (CodeSeg* S);
-/* Search for a call to complax and replace it by
-**
-**      eor     #$FF
-**
-** if X isn't used later.
-*/
-
-
-
-/* End of coptneg.h */
+/* End of coptbool.h */
 
 #endif

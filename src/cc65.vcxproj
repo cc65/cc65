@@ -64,12 +64,12 @@
     <ClInclude Include="cc65\codeseg.h" />
     <ClInclude Include="cc65\compile.h" />
     <ClInclude Include="cc65\coptadd.h" />
+    <ClInclude Include="cc65\coptbool.h" />
     <ClInclude Include="cc65\coptc02.h" />
     <ClInclude Include="cc65\coptcmp.h" />
     <ClInclude Include="cc65\coptind.h" />
     <ClInclude Include="cc65\coptjmp.h" />
     <ClInclude Include="cc65\coptmisc.h" />
-    <ClInclude Include="cc65\coptneg.h" />
     <ClInclude Include="cc65\coptptrload.h" />
     <ClInclude Include="cc65\coptptrstore.h" />
     <ClInclude Include="cc65\coptpush.h" />
@@ -79,6 +79,7 @@
     <ClInclude Include="cc65\coptstore.h" />
     <ClInclude Include="cc65\coptsub.h" />
     <ClInclude Include="cc65\copttest.h" />
+    <ClInclude Include="cc65\coptunary.h" />
     <ClInclude Include="cc65\dataseg.h" />
     <ClInclude Include="cc65\datatype.h" />
     <ClInclude Include="cc65\declare.h" />
@@ -144,12 +145,12 @@
     <ClCompile Include="cc65\codeseg.c" />
     <ClCompile Include="cc65\compile.c" />
     <ClCompile Include="cc65\coptadd.c" />
+    <ClCompile Include="cc65\coptbool.c" />
     <ClCompile Include="cc65\coptc02.c" />
     <ClCompile Include="cc65\coptcmp.c" />
     <ClCompile Include="cc65\coptind.c" />
     <ClCompile Include="cc65\coptjmp.c" />
     <ClCompile Include="cc65\coptmisc.c" />
-    <ClCompile Include="cc65\coptneg.c" />
     <ClCompile Include="cc65\coptptrload.c" />
     <ClCompile Include="cc65\coptptrstore.c" />
     <ClCompile Include="cc65\coptpush.c" />
@@ -159,6 +160,7 @@
     <ClCompile Include="cc65\coptstore.c" />
     <ClCompile Include="cc65\coptsub.c" />
     <ClCompile Include="cc65\copttest.c" />
+    <ClCompile Include="cc65\coptunary.c" />
     <ClCompile Include="cc65\dataseg.c" />
     <ClCompile Include="cc65\datatype.c" />
     <ClCompile Include="cc65\declare.c" />

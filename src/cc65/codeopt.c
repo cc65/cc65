@@ -132,8 +132,10 @@ static OptFunc DOptCmp7         = { OptCmp7,         "OptCmp7",          85, 0, 
 static OptFunc DOptCmp8         = { OptCmp8,         "OptCmp8",          50, 0, 0, 0, 0, 0 };
 static OptFunc DOptCmp9         = { OptCmp9,         "OptCmp9",          85, 0, 0, 0, 0, 0 };
 static OptFunc DOptComplAX1     = { OptComplAX1,     "OptComplAX1",      65, 0, 0, 0, 0, 0 };
-static OptFunc DOptCondBranches1= { OptCondBranches1,"OptCondBranches1", 80, 0, 0, 0, 0, 0 };
-static OptFunc DOptCondBranches2= { OptCondBranches2,"OptCondBranches2",  0, 0, 0, 0, 0, 0 };
+static OptFunc DOptCondBranch1  = { OptCondBranch1,  "OptCondBranch1",   80, 0, 0, 0, 0, 0 };
+static OptFunc DOptCondBranch2  = { OptCondBranch2,  "OptCondBranch2",   40, 0, 0, 0, 0, 0 };
+static OptFunc DOptCondBranch3  = { OptCondBranch3,  "OptCondBranch3",   40, 0, 0, 0, 0, 0 };
+static OptFunc DOptCondBranchC  = { OptCondBranchC,  "OptCondBranchC",    0, 0, 0, 0, 0, 0 };
 static OptFunc DOptDeadCode     = { OptDeadCode,     "OptDeadCode",     100, 0, 0, 0, 0, 0 };
 static OptFunc DOptDeadJumps    = { OptDeadJumps,    "OptDeadJumps",    100, 0, 0, 0, 0, 0 };
 static OptFunc DOptDecouple     = { OptDecouple,     "OptDecouple",     100, 0, 0, 0, 0, 0 };
@@ -241,8 +243,10 @@ static OptFunc* OptFuncs[] = {
     &DOptCmp8,
     &DOptCmp9,
     &DOptComplAX1,
-    &DOptCondBranches1,
-    &DOptCondBranches2,
+    &DOptCondBranch1,
+    &DOptCondBranch2,
+    &DOptCondBranch3,
+    &DOptCondBranchC,
     &DOptDeadCode,
     &DOptDeadJumps,
     &DOptDecouple,
@@ -619,9 +623,6 @@ static unsigned RunOptGroup1 (CodeSeg* S)
     Changes += RunOptFunc (S, &DOptPtrLoad15, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad16, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad17, 1);
-    Changes += RunOptFunc (S, &DOptBNegAX2, 1);
-    Changes += RunOptFunc (S, &DOptBNegAX3, 1);
-    Changes += RunOptFunc (S, &DOptBNegAX4, 1);
     Changes += RunOptFunc (S, &DOptAdd1, 1);
     Changes += RunOptFunc (S, &DOptAdd2, 1);
     Changes += RunOptFunc (S, &DOptAdd4, 1);
@@ -674,8 +675,6 @@ static unsigned RunOptGroup3 (CodeSeg* S)
     do {
         C = 0;
 
-        C += RunOptFunc (S, &DOptBNegA1, 1);
-        C += RunOptFunc (S, &DOptBNegA2, 1);
         C += RunOptFunc (S, &DOptNegAX1, 1);
         C += RunOptFunc (S, &DOptNegAX2, 1);
         C += RunOptFunc (S, &DOptStackOps, 3);      /* Before OptBoolUnary1 */
@@ -683,6 +682,7 @@ static unsigned RunOptGroup3 (CodeSeg* S)
         C += RunOptFunc (S, &DOptBoolUnary1, 3);
         C += RunOptFunc (S, &DOptBoolUnary2, 3);
         C += RunOptFunc (S, &DOptBoolUnary3, 1);
+        C += RunOptFunc (S, &DOptBNegA1, 1);
         C += RunOptFunc (S, &DOptBNegAX1, 1);       /* After OptBoolUnary2 */
         C += RunOptFunc (S, &DOptShift1, 1);
         C += RunOptFunc (S, &DOptShift4, 1);
@@ -695,16 +695,22 @@ static unsigned RunOptGroup3 (CodeSeg* S)
         C += RunOptFunc (S, &DOptJumpCascades, 1);
         C += RunOptFunc (S, &DOptDeadJumps, 1);
         C += RunOptFunc (S, &DOptDeadCode, 1);
-        C += RunOptFunc (S, &DOptBoolCmp, 1);
-        C += RunOptFunc (S, &DOptBoolTrans, 1);
         C += RunOptFunc (S, &DOptJumpTarget1, 1);
         C += RunOptFunc (S, &DOptJumpTarget2, 1);
-        C += RunOptFunc (S, &DOptCondBranches1, 1);
-        C += RunOptFunc (S, &DOptCondBranches2, 1);
+        C += RunOptFunc (S, &DOptCondBranch1, 1);
+        C += RunOptFunc (S, &DOptCondBranch2, 1);
+        C += RunOptFunc (S, &DOptCondBranch3, 1);
+        C += RunOptFunc (S, &DOptCondBranchC, 1);
         C += RunOptFunc (S, &DOptRTSJumps1, 1);
+        C += RunOptFunc (S, &DOptBoolCmp, 1);
+        C += RunOptFunc (S, &DOptBoolTrans, 1);
+        C += RunOptFunc (S, &DOptBNegA2, 1);        /* After OptCondBranch's */
+        C += RunOptFunc (S, &DOptBNegAX2, 1);       /* After OptCondBranch's */
+        C += RunOptFunc (S, &DOptBNegAX3, 1);       /* After OptCondBranch's */
+        C += RunOptFunc (S, &DOptBNegAX4, 1);       /* After OptCondBranch's */
         C += RunOptFunc (S, &DOptCmp1, 1);
         C += RunOptFunc (S, &DOptCmp2, 1);
-        C += RunOptFunc (S, &DOptCmp8, 1);      /* Must run before OptCmp3 */
+        C += RunOptFunc (S, &DOptCmp8, 1);          /* Must run before OptCmp3 */
         C += RunOptFunc (S, &DOptCmp3, 1);
         C += RunOptFunc (S, &DOptCmp4, 1);
         C += RunOptFunc (S, &DOptCmp5, 1);
@@ -712,7 +718,7 @@ static unsigned RunOptGroup3 (CodeSeg* S)
         C += RunOptFunc (S, &DOptCmp9, 1);
         C += RunOptFunc (S, &DOptTest1, 1);
         C += RunOptFunc (S, &DOptLoad1, 1);
-        C += RunOptFunc (S, &DOptJumpTarget3, 1);       /* After OptCondBranches2 */
+        C += RunOptFunc (S, &DOptJumpTarget3, 1);   /* After OptCondBranches2 */
         C += RunOptFunc (S, &DOptUnusedLoads, 1);
         C += RunOptFunc (S, &DOptUnusedStores, 1);
         C += RunOptFunc (S, &DOptDupLoads, 1);

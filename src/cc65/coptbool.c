@@ -167,7 +167,7 @@ static void ReplaceBranchCond (CodeSeg* S, unsigned I, cmp_t Cond)
 
 
 /*****************************************************************************/
-/*           Optimize bool comparison and transformer subroutines            */
+/*    Optimize bool comparison and transformer subroutines with branches     */
 /*****************************************************************************/
 
 
@@ -257,6 +257,62 @@ unsigned OptBoolTrans (CodeSeg* S)
             (N = CS_GetNextEntry (S, I)) != 0            &&
             (N->Info & OF_ZBRA) != 0                     &&
             (GetRegInfo (S, I + 2, PSTATE_Z) & PSTATE_Z) == 0) {
+
+            /* Make the boolean transformer unnecessary by changing the
+            ** the conditional jump to evaluate the condition flags that
+            ** are set after the compare directly. Note: jeq jumps if
+            ** the condition is not met, jne jumps if the condition is met.
+            ** Invert the code if we jump on condition not met.
+            */
+            if (GetBranchCond (N->OPC) == BC_EQ) {
+                /* Jumps if condition false, invert condition */
+                Cond = CmpInvertTab [Cond];
+            }
+
+            /* Check if we can replace the code by something better */
+            ReplaceBranchCond (S, I+1, Cond);
+
+            /* Remove the call to the bool transformer */
+            CS_DelEntry (S, I);
+
+            /* Remember, we had changes */
+            ++Changes;
+
+        }
+
+        /* Next entry */
+        ++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptBoolUnary (CodeSeg* S)
+/* Try to remove the call to a bcastax/bnegax routines where the call is
+** not really needed and change following branch condition accordingly.
+*/
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        CodeEntry* N;
+        cmp_t Cond;
+
+        /* Get next entry */
+        CodeEntry* E = CS_GetEntry (S, I);
+
+        /* Check for a boolean transformer */
+        if (E->OPC == OP65_JSR                           &&
+            (Cond = FindBoolCmpCond (E->Arg)) != CMP_INV &&
+            (N = CS_GetNextEntry (S, I)) != 0            &&
+            (N->Info & OF_ZBRA) != 0) {
 
             /* Make the boolean transformer unnecessary by changing the
             ** the conditional jump to evaluate the condition flags that

@@ -56,7 +56,7 @@
 
 
 
-struct Segments;
+struct SegContext;
 struct LiteralPool;
 struct CodeEntry;
 
@@ -156,7 +156,7 @@ struct SymEntry {
 
         /* Data for functions */
         struct {
-            struct Segments*    Seg;      /* Segments for this function */
+            struct SegContext*  Seg;      /* SegContext for this function */
             struct LiteralPool* LitPool;  /* Literal pool for this function */
         } F;
 

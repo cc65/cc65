@@ -106,19 +106,19 @@ unsigned CG_AddrModeFlags (const ExprDesc* Expr)
 static unsigned CG_TypeOfBySize (unsigned Size)
 /* Get the code generator replacement type of the object by its size */
 {
-    unsigned NewType;
+    unsigned CG_Type;
     /* If the size is less than or equal to that of a a long, we will copy
     ** the struct using the primary register, otherwise we use memcpy.
     */
     switch (Size) {
-        case 1:     NewType = CF_CHAR;  break;
-        case 2:     NewType = CF_INT;   break;
+        case 1:     CG_Type = CF_CHAR;  break;
+        case 2:     CG_Type = CF_INT;   break;
         case 3:     /* FALLTHROUGH */
-        case 4:     NewType = CF_LONG;  break;
-        default:    NewType = CF_NONE;  break;
+        case 4:     CG_Type = CF_LONG;  break;
+        default:    CG_Type = CF_NONE;  break;
     }
 
-    return NewType;
+    return CG_Type;
 }
 
 
@@ -126,7 +126,7 @@ static unsigned CG_TypeOfBySize (unsigned Size)
 unsigned CG_TypeOf (const Type* T)
 /* Get the code generator base type of the object */
 {
-    unsigned NewType;
+    unsigned CG_Type;
 
     switch (GetUnderlyingTypeCode (T)) {
 
@@ -163,9 +163,9 @@ unsigned CG_TypeOf (const Type* T)
 
         case T_STRUCT:
         case T_UNION:
-            NewType = CG_TypeOfBySize (SizeOf (T));
-            if (NewType != CF_NONE) {
-                return NewType;
+            CG_Type = CG_TypeOfBySize (SizeOf (T));
+            if (CG_Type != CF_NONE) {
+                return CG_Type;
             }
             /* Address of ... */
             return CF_INT | CF_UNSIGNED;

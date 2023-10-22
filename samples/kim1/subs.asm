@@ -21,7 +21,11 @@
 .export _AscToPet
 .export _ReverseBits
 .export _DrawChar
+.export _CharOut
 .export _Demo
+.export _Delay
+.export _getch
+
 
 .import _font8x8_basic
 
@@ -73,6 +77,7 @@ scroll_dest:
 scroll_dest_lo: .res 1
 scroll_dest_hi: .res 1
 
+
 .segment "DATA"
 
 ; Arguments for graphics functions
@@ -92,6 +97,7 @@ e2:         .res 2
 sx:         .res 1
 sy:         .res 1
 dltemp:     .res 2
+pixel:      .res 1
 
 ; DrawCircle
 
@@ -105,6 +111,10 @@ tempy:          .res 1
 temp2:          .res 2
 x0:             .res 2
 y0:             .res 2
+
+; CharOut
+
+tempstr:        .res 2
 
 .export _x1cord                   ; Make sure these show up on the C side as zero page
 .export _x2cord
@@ -182,6 +192,29 @@ _GetPixelAddress:
 
 msktb1:	 	    .byte 	$80,$40,$20,$10,$08,$04,$02,$01
 msktb2:	  	    .byte 	$7F,$BF,$DF,$EF,$F7,$FB,$FD,$FE
+
+_Delay:         pha
+                sta temp
+                txa
+                pha
+                tya
+                pha
+
+@loopa:         ldx #$ff
+@loopx:         ldy #$ff
+@loopy:         dey
+                bne @loopy
+                dex
+                bne @loopx
+                dec temp
+                bne @loopa
+
+                pla
+                tay
+                pla
+                tax
+                pla
+                rts
 
 ;-----------------------------------------------------------------------------------
 ; SetPixel - Set a pixel in the video memory
@@ -628,22 +661,22 @@ ascToPetTable:  .byte $00,$01,$02,$03,$04,$05,$06,$07,$14,$20,$0d,$11,$93,$0a,$0
 ; PETSCI to Ascii lookup table - not current used, so commented out, but can be used to map fonts
 ;               
 ; 
-; petToAscTable:  .byte $00,$01,$02,$03,$04,$05,$06,$07,$14,$09,$0d,$11,$93,$0a,$0e,$0f
-;                 .byte $10,$0b,$12,$13,$08,$15,$16,$17,$18,$19,$1a,$1b,$1c,$1d,$1e,$1f
-;                 .byte $20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$2a,$2b,$2c,$2d,$2e,$2f
-;                 .byte $30,$31,$32,$33,$34,$35,$36,$37,$38,$39,$3a,$3b,$3c,$3d,$3e,$3f
-;                 .byte $40,$61,$62,$63,$64,$65,$66,$67,$68,$69,$6a,$6b,$6c,$6d,$6e,$6f
-;                 .byte $70,$71,$72,$73,$74,$75,$76,$77,$78,$79,$7a,$5b,$5c,$5d,$5e,$5f
-;                 .byte $c0,$c1,$c2,$c3,$c4,$c5,$c6,$c7,$c8,$c9,$ca,$cb,$cc,$cd,$ce,$cf
-;                 .byte $d0,$d1,$d2,$d3,$d4,$d5,$d6,$d7,$d8,$d9,$da,$db,$dc,$dd,$de,$df
-;                 .byte $80,$81,$82,$83,$84,$85,$86,$87,$88,$89,$8a,$8b,$8c,$8d,$8e,$8f
-;                 .byte $90,$91,$92,$0c,$94,$95,$96,$97,$98,$99,$9a,$9b,$9c,$9d,$9e,$9f
-;                 .byte $a0,$a1,$a2,$a3,$a4,$a5,$a6,$a7,$a8,$a9,$aa,$ab,$ac,$ad,$ae,$af
-;                 .byte $b0,$b1,$b2,$b3,$b4,$b5,$b6,$b7,$b8,$b9,$ba,$bb,$bc,$bd,$be,$bf
-;                 .byte $60,$41,$42,$43,$44,$45,$46,$47,$48,$49,$4a,$4b,$4c,$4d,$4e,$4f
-;                 .byte $50,$51,$52,$53,$54,$55,$56,$57,$58,$59,$5a,$7b,$7c,$7d,$7e,$7f
-;                 .byte $a0,$a1,$a2,$a3,$a4,$a5,$a6,$a7,$a8,$a9,$aa,$ab,$ac,$ad,$ae,$af
-;                 .byte $b0,$b1,$b2,$b3,$b4,$b5,$b6,$b7,$b8,$b9,$ba,$bb,$bc,$bd,$be,$bf
+ petToAscTable:  .byte $00,$01,$02,$03,$04,$05,$06,$07,$14,$09,$0d,$11,$93,$0a,$0e,$0f
+                 .byte $10,$0b,$12,$13,$08,$15,$16,$17,$18,$19,$1a,$1b,$1c,$1d,$1e,$1f
+                 .byte $20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$2a,$2b,$2c,$2d,$2e,$2f
+                 .byte $30,$31,$32,$33,$34,$35,$36,$37,$38,$39,$3a,$3b,$3c,$3d,$3e,$3f
+                 .byte $40,$61,$62,$63,$64,$65,$66,$67,$68,$69,$6a,$6b,$6c,$6d,$6e,$6f
+                 .byte $70,$71,$72,$73,$74,$75,$76,$77,$78,$79,$7a,$5b,$5c,$5d,$5e,$5f
+                 .byte $c0,$c1,$c2,$c3,$c4,$c5,$c6,$c7,$c8,$c9,$ca,$cb,$cc,$cd,$ce,$cf
+                 .byte $d0,$d1,$d2,$d3,$d4,$d5,$d6,$d7,$d8,$d9,$da,$db,$dc,$dd,$de,$df
+                 .byte $80,$81,$82,$83,$84,$85,$86,$87,$88,$89,$8a,$8b,$8c,$8d,$8e,$8f
+                 .byte $90,$91,$92,$0c,$94,$95,$96,$97,$98,$99,$9a,$9b,$9c,$9d,$9e,$9f
+                 .byte $a0,$a1,$a2,$a3,$a4,$a5,$a6,$a7,$a8,$a9,$aa,$ab,$ac,$ad,$ae,$af
+                 .byte $b0,$b1,$b2,$b3,$b4,$b5,$b6,$b7,$b8,$b9,$ba,$bb,$bc,$bd,$be,$bf
+                 .byte $60,$41,$42,$43,$44,$45,$46,$47,$48,$49,$4a,$4b,$4c,$4d,$4e,$4f
+                 .byte $50,$51,$52,$53,$54,$55,$56,$57,$58,$59,$5a,$7b,$7c,$7d,$7e,$7f
+                 .byte $a0,$a1,$a2,$a3,$a4,$a5,$a6,$a7,$a8,$a9,$aa,$ab,$ac,$ad,$ae,$af
+                 .byte $b0,$b1,$b2,$b3,$b4,$b5,$b6,$b7,$b8,$b9,$ba,$bb,$bc,$bd,$be,$bf
 
 ;-----------------------------------------------------------------------------------
 ; PetToAsc      - Convert a PETSCII character to ASCII
@@ -654,6 +687,10 @@ ascToPetTable:  .byte $00,$01,$02,$03,$04,$05,$06,$07,$14,$20,$0d,$11,$93,$0a,$0
 _AscToPet:      tay
                 lda ascToPetTable, y
                 rts             
+
+_PetToAsc:      tay     
+                lda petToAscTable, Y
+                rts
 
 ;-----------------------------------------------------------------------------------
 ; ReverseBits   - Reverse the bits in a byte
@@ -780,6 +817,28 @@ _DrawChar:     sty tempy
                rts
 
 ;-----------------------------------------------------------------------------------
+; DrawText     - Draws an ASCII char in A at the current cursor pos, saves all regs
+;-----------------------------------------------------------------------------------
+
+_CharOut:      sta temp
+               lda #0
+               sta temp+1
+               txa
+               pha
+               tya 
+               pha
+
+               ldx #<temp
+               ldy #>temp
+               jsr _DrawText                        
+
+               pla
+               tay
+               pla
+               tax
+               rts
+
+;-----------------------------------------------------------------------------------
 ; DrawText     - Draws an ASCII string at the current cursor position
 ;-----------------------------------------------------------------------------------
 ; XY           - Pointer to the string to draw, stops on NUL or 255 chars later
@@ -828,11 +887,10 @@ doneText:      rts
 
 demoText1:     .byte "  *** COMMODORE KIM-1 SHELL V0.1 ***", $0A, $0A
                .byte "   60K RAM SYSTEM.  49152 BYTES FREE.", $0A, $0A, $00
-readyText:     .byte "READY.", $0A, 00
+readyText:     .byte $0A,"READY.", $0A, 00
 
-alphabet:      .byte "ABCDEFGHIJKLMNOPQRSTUVWXYZ", 00, "*****", 00
-
-_Demo:         lda #0
+_Demo:         jsr _ClearScreen
+               lda #0
                sta _cursorX
                sta _cursorY
                ldx #<demoText1
@@ -840,10 +898,11 @@ _Demo:         lda #0
                jsr _DrawText
                rts
 
-:              ldx #<alphabet
-               ldy #>alphabet
+_Ready:        ldx #<readyText
+               ldy #>readyText
                jsr _DrawText
-               jmp :-
+               rts
+
 
 ;-----------------------------------------------------------------------------------
 ; DrawLine    - Draws a line between two points
@@ -884,7 +943,9 @@ _Demo:         lda #0
 ; }
 ;-----------------------------------------------------------------------------------
 
-_DrawLine:  ldx #$01                ; positive x-step for now
+_DrawLine:  sta pixel
+
+            ldx #$01                ; positive x-step for now
             stx sx
 
             ; Calculate dx = (x2cord - X1cord) and see if its positive or not
@@ -958,9 +1019,13 @@ dygte:      lda #0                  ; we found dx <= dy so set err = -dy / 2
       
             ; Now we have dx, dy, and err, so we can start drawing pixels
 
-loop:       jsr _SetPixel           ; Plot the current _x1cord, _y1cord
+loop:       lda pixel
+            beq clearpixel
+            jsr _SetPixel           ; Plot the current _x1cord, _y1cord
+            jmp next
+clearpixel: jsr _ClearPixel         ; Clear the current _x1cord, _y1cord
 
-            lda _x1cord             ; if (_x1cord == _x2cord && _y1cord == _y2cord) then we rts
+next:       lda _x1cord             ; if (_x1cord == _x2cord && _y1cord == _y2cord) then we rts
             cmp _x2cord
             bne noteq
             lda _y1cord
@@ -978,7 +1043,7 @@ noteq:      lda err                 ; e2 = err
             sta e2+1
 
             ; Check the two update conditions for x and y, and update if needed
-            
+
             lda e2                  ; if (e2 > -dx) is the same as if (e2 + dx > 0), so we test that because its easier
             clc                     ;    If its true then we dec err and inc _x1cord
             adc dx
@@ -1037,4 +1102,9 @@ stepy:      lda _y1cord
 
 noupdatey:  jmp loop
 
-
+_getch: jsr     $1E5A            ; Get character using Monitor ROM call
+        and     #$7F             ; Clear top bit
+        cmp     #$0D             ; Check for '\r'
+        bne     gotch            ; ...if CR character
+        lda     #$0A             ; Replace with '\n'
+gotch:  rts

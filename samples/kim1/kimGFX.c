@@ -9,6 +9,7 @@
 #include <stdio.h>                  // For printf
 #include <stdlib.h>                 // For rand, srand
 #include <string.h>                 // For memcpy
+#include <ctype.h>
 
 typedef unsigned char byte;
 
@@ -18,10 +19,14 @@ extern void DrawCircle(void);
 extern void SetPixel(void);
 extern void ClearPixel(void);
 extern void DrawChar(void);
-extern void DrawLine();
 extern void Demo(void);
+extern void __fastcall__ Delay(byte loops);
+extern void __fastcall__ DrawLine(byte bSet);
 extern byte __fastcall__ AscToPet(byte in);
+extern byte __fastcall__ PetToAsc(byte in);
 extern byte __fastcall__ ReverseBits(byte in);
+extern void __fastcall__ CharOut(byte asci_char);
+extern byte __fastcall__ getch();
 extern unsigned char font8x8_basic[256][8];
 
 extern int  x1cord;
@@ -177,13 +182,13 @@ void DrawCircleC(int x0, int y0, int radius, byte)
    DrawCircle();
 }
 
-void DrawLineC(int x1, int y1, int x2, int y2)
+void DrawLineC(int x1, int y1, int x2, int y2, byte bSet)
 {
    x1cord = x1;
    y1cord = y1;
    x2cord = x2;
    y2cord = y2;
-   DrawLine();
+   DrawLine(bSet);
 }
 
 // MirrorFont
@@ -204,39 +209,79 @@ void MirrorFont()
 //
 // Draws a moire pattern on the screen without clearing it first
 
+void DrawMoire(int left, int top, int right, int bottom, byte pixel)
+{
+   int x, y;
+
+   for (x = left; x < right; x += 6)
+      DrawLineC(x, top, right - x + left, bottom, pixel);
+
+   for (y = top; y < bottom; y += 6)
+      DrawLineC(left, y, right, bottom - y + top, pixel);
+}
+
 void DrawScreenMoire(int left, int top, int right, int bottom)
 {
    int x, y;
 
-   DrawLineC(left, top, right, top);
-   DrawLineC(left, bottom, right, bottom);
-   DrawLineC(left, top, left, bottom);
-   DrawLineC(right, top, right, bottom);
+   DrawLineC(left, top, right, top, 1);
+   DrawLineC(left, bottom, right, bottom, 1);
+   DrawLineC(left, top, left, bottom, 1);
+   DrawLineC(right, top, right, bottom, 1);
+
+   left++; top++; right--; bottom--;
 
    for (x = left; x < right; x += 6)
-      DrawLineC(x, top, right - x + left, bottom);
-
+      DrawLineC(x, top, right - x + left, bottom, 1);
    for (y = top; y < bottom; y += 6)
-      DrawLineC(left, y, right, bottom - y + top);
+      DrawLineC(left, y, right, bottom - y + top, 1);
+   for (x = left; x < right; x += 6)
+      DrawLineC(x, top, right - x + left, bottom, 0);
+   for (y = top; y < bottom; y += 6)
+      DrawLineC(left, y, right, bottom - y + top, 0);
 
 }
 
 int main (void)
 {
+  
    int i;
+   int c = 0; 
+
+   Demo();
+
+   CharOut('R');
+   CharOut('E');
+   CharOut('A');
+   CharOut('D');
+   CharOut('Y');
+   CharOut('.');
+   CharOut('\n');
+
+
+   while(1)
+   {
+      c = toupper(getch());
+      if (c != EOF)
+         CharOut(c);         
+   }
 
    // Clear the screen memory
    while(1)
    {
-      ClearScreen();
       Demo();
       DrawScreenMoire(0,30, 319, 199);
+      Delay(10);
 
-      ClearScreen();
       Demo();
-      
       for (i = 5; i < 80; i+=5)
+      {
          DrawCircleC(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 20, i, 1);
+         DrawCircleC(SCREEN_WIDTH/4, SCREEN_HEIGHT/2 + 20, i, 1);
+         DrawCircleC(SCREEN_WIDTH*3/4, SCREEN_HEIGHT/2 + 20, i, 1);
+      }
+
+      Delay(10);
 
    }
 

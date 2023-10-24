@@ -1774,15 +1774,17 @@ as the arguments for replacing the format specifiers will be translated as
 usual.
 
 <itemize>
-  <item><tt/%b/ - Numerical 8-bit value
-  <item><tt/%w/ - Numerical 16-bit value
-  <item><tt/%l/ - Numerical 32-bit value
+  <item><tt/%b/ - Numerical 8-bit value ($xx)
+  <item><tt/%w/ - Numerical 16-bit value ($xxxx)
+  <item><tt/%l/ - Numerical 32-bit value ($xxxxxxxx)
   <item><tt/%v/ - Assembler name of a global variable or function
   <item><tt/%o/ - Stack offset of a local variable
   <item><tt/%g/ - Assembler name of a C label
   <item><tt/%s/ - The argument is converted to a string
   <item><tt/%%/ - The % sign itself
 </itemize><p>
+
+Note: For a numerical value to be treated as an immediate value by the assembler, a # has to be added in front of the format specifier.
 
 Using those format specifiers, you can access C <tt/#defines/, variables, or
 similar stuff from the inline assembler. For example, to load the value of

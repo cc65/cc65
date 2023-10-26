@@ -111,7 +111,7 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
             LoadExpr (CF_NONE, Expr);
 
             /* Emit typecast code */
-            g_typecast (TypeOf (NewType), TypeOf (OldType));
+            g_typecast (CG_TypeOf (NewType), CG_TypeOf (OldType));
 
             /* Value is now in primary and an rvalue */
             ED_FinalizeRValLoad (Expr);
@@ -178,7 +178,7 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
             LoadExpr (CF_NONE, Expr);
 
             /* Emit typecast code. */
-            g_typecast (TypeOf (NewType), TypeOf (OldType));
+            g_typecast (CG_TypeOf (NewType), CG_TypeOf (OldType));
 
             /* Value is now an rvalue in the primary */
             ED_FinalizeRValLoad (Expr);

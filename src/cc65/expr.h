@@ -43,14 +43,14 @@ typedef struct GenDesc {
 
 
 
-unsigned GlobalModeFlags (const ExprDesc* Expr);
+unsigned CG_AddrModeFlags (const ExprDesc* Expr);
 /* Return the addressing mode flags for the given expression */
 
-unsigned TypeOf (const Type* T);
+unsigned CG_TypeOf (const Type* T);
 /* Get the code generator base type of the object */
 
-unsigned FuncTypeOf (const Type* T);
-/* Get the code generator flag for calling the function */
+unsigned CG_CallFlags (const Type* T);
+/* Get the code generator flags for calling the function */
 
 void ExprWithCheck (void (*Func) (ExprDesc*), ExprDesc* Expr);
 /* Call an expression function with checks. */

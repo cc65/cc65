@@ -169,12 +169,12 @@ static void DefineData (ExprDesc* Expr)
 
         case E_LOC_NONE:
             /* Immediate numeric value with no storage */
-            g_defdata (CF_IMM | TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
+            g_defdata (CF_IMM | CG_TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
             break;
 
         case E_LOC_ABS:
             /* Absolute numeric address */
-            g_defdata (CF_ABSOLUTE | TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
+            g_defdata (CF_ABSOLUTE | CG_TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
             break;
 
         case E_LOC_GLOBAL:

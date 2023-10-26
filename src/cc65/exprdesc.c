@@ -167,6 +167,17 @@ int ED_IsLocQuasiConst (const ExprDesc* Expr)
 
 
 
+int ED_IsLocZP (const ExprDesc* Expr)
+/* Return true if the expression is in a location on a zeropage */
+{
+    return ED_IsLocRegister (Expr) ||
+           (ED_IsLocConst (Expr) &&
+            Expr->Sym != 0       &&
+            (Expr->Sym->Flags & SC_ZEROPAGE) != 0);
+}
+
+
+
 #if !defined(HAVE_INLINE)
 int ED_IsLocPrimaryOrExpr (const ExprDesc* Expr)
 /* Return true if the expression is E_LOC_PRIMARY or E_LOC_EXPR */
@@ -298,6 +309,23 @@ int ED_IsQuasiConstAddr (const ExprDesc* Expr)
 */
 {
     return ED_IsAddrExpr (Expr) && ED_IsLocQuasiConst (Expr);
+}
+
+
+
+
+int ED_IsStackAddr (const ExprDesc* Expr)
+/* Return true if the expression denotes a fixed address on stack */
+{
+    return ED_IsAddrExpr (Expr) && ED_IsLocStack (Expr);
+}
+
+
+
+int ED_IsZPInd (const ExprDesc* Expr)
+/* Return true if the expression is located on the zeropage */
+{
+    return ED_IsIndExpr (Expr) && ED_IsLocZP (Expr);
 }
 
 

@@ -369,6 +369,9 @@ int ED_IsLocQuasiConst (const ExprDesc* Expr);
 */
 #endif
 
+int ED_IsLocZP (const ExprDesc* Expr);
+/* Return true if the expression is in a location on a zeropage */
+
 #if defined(HAVE_INLINE)
 INLINE int ED_IsLocPrimaryOrExpr (const ExprDesc* Expr)
 /* Return true if the expression is E_LOC_PRIMARY or E_LOC_EXPR */
@@ -571,6 +574,12 @@ int ED_IsQuasiConstAddr (const ExprDesc* Expr);
 /* Return true if the expression denotes a quasi-constant address of some sort.
 ** This can be a constant address or a stack variable address.
 */
+
+int ED_IsStackAddr (const ExprDesc* Expr);
+/* Return true if the expression denotes a fixed address on stack */
+
+int ED_IsZPInd (const ExprDesc* Expr);
+/* Return true if the expression is located on the zeropage */
 
 int ED_IsNullPtr (const ExprDesc* Expr);
 /* Return true if the given expression is a NULL pointer constant */

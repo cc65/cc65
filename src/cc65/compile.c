@@ -111,12 +111,6 @@ static void Parse (void)
             continue;
         }
 
-        /* Check for a #pragma */
-        if (CurTok.Tok == TOK_PRAGMA) {
-            DoPragma ();
-            continue;
-        }
-
         /* Check for a _Static_assert */
         if (CurTok.Tok == TOK_STATIC_ASSERT) {
             ParseStaticAssert ();

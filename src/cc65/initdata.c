@@ -267,9 +267,6 @@ static void DefineBitFieldData (StructInitData* SI)
 
 static void DefineStrData (Literal* Lit, unsigned Count)
 {
-    /* Translate into target charset */
-    TranslateLiteral (Lit);
-
     /* Output the data */
     g_defbytes (GetLiteralStr (Lit), Count);
 }

@@ -160,9 +160,20 @@ void ReleaseLiteral (Literal* L)
 
 
 void TranslateLiteral (Literal* L)
-/* Translate a literal into the target charset. */
+/* Translate a literal into the target charset */
 {
     TgtTranslateBuf (SB_GetBuf (&L->Data), SB_GetLen (&L->Data));
+}
+
+
+
+void ConcatLiteral (Literal* L, const Literal* Appended)
+/* Concatenate string literals */
+{
+    if (SB_GetLen (&L->Data) > 0 && SB_LookAtLast (&L->Data) == '\0') {
+        SB_Drop (&L->Data, 1);
+    }
+    SB_Append (&L->Data, &Appended->Data);
 }
 
 

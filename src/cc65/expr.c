@@ -1350,8 +1350,6 @@ static void Primary (ExprDesc* E)
             /* String literal */
             if ((Flags & E_EVAL_UNEVAL) != E_EVAL_UNEVAL) {
                 E->V.LVal = UseLiteral (CurTok.SVal);
-                /* Translate into target charset */
-                TranslateLiteral (E->V.LVal);
             } else {
                 E->V.LVal = CurTok.SVal;
             }
@@ -3477,8 +3475,9 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
             }
             LOG(("%s:%d AddDone:%d\n", __FILE__, __LINE__, AddDone));
             if (!AddDone) {
-                if (ED_IsLocQuasiConst (&Expr2) &&
-                    rscale == 1                 &&
+                if (ED_IsLocQuasiConst (&Expr2)  &&
+                    !IsTypeBitField (Expr2.Type) &&
+                    rscale == 1                  &&
                     CheckedSizeOf (rhst) == SIZEOF_CHAR) {
                     LOG(("%s:%d char\n", __FILE__, __LINE__));
                     /* Change the order back */

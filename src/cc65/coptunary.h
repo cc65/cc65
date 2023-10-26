@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 pragma.h                                  */
+/*                                coptunary.h                                */
 /*                                                                           */
-/*                  Pragma handling for the cc65 C compiler                  */
+/*                     Optimize bitwise unary sequences                      */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002, Ullrich von Bassewitz                                      */
+/* (C) 2001-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -33,24 +33,64 @@
 
 
 
-#ifndef PRAGMA_H
-#define PRAGMA_H
+#ifndef COPTUNARY_H
+#define COPTUNARY_H
+
+
+
+/* cc65 */
+#include "codeseg.h"
 
 
 
 /*****************************************************************************/
-/*                                   Code                                    */
+/*                            negax optimizations                            */
 /*****************************************************************************/
 
 
 
-void ConsumePragma (void);
-/* Parse a pragma. The pragma comes always in the form of the new C99 _Pragma()
-** operator.
+unsigned OptNegAX1 (CodeSeg* S);
+/* Search for a call to negax and replace it by
+**
+**      eor     #$FF
+**      clc
+**      adc     #$01
+**
+** if X isn't used later.
+*/
+
+unsigned OptNegAX2 (CodeSeg* S);
+/* Search for a call to negax and replace it by
+**
+**      ldx     #$FF
+**      eor     #$FF
+**      clc
+**      adc     #$01
+**      bcc     L1
+**      inx
+** L1:
+**
+** if X is known and zero on entry.
 */
 
 
 
-/* End of pragma.h */
+/*****************************************************************************/
+/*                           complax optimizations                           */
+/*****************************************************************************/
+
+
+
+unsigned OptComplAX1 (CodeSeg* S);
+/* Search for a call to complax and replace it by
+**
+**      eor     #$FF
+**
+** if X isn't used later.
+*/
+
+
+
+/* End of coptunary.h */
 
 #endif

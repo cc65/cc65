@@ -735,10 +735,6 @@ int AnyStatement (int* PendingToken)
             GotBreak = 1;
             break;
 
-        case TOK_PRAGMA:
-            DoPragma ();
-            break;
-
         case TOK_SEMI:
             /* Empty statement. Ignore it */
             CheckSemi (PendingToken);

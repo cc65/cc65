@@ -1633,9 +1633,9 @@ static void hie11 (ExprDesc *Expr)
                 break;
 
             case TOK_LPAREN:
-                /* Function call. */
-                if (!IsTypeFunc (Expr->Type) && !IsTypeFuncPtr (Expr->Type)) {
-                    /* Not a function */
+                /* Function call */
+                if (!IsTypeFuncLike (Expr->Type)) {
+                    /* Not a function or function pointer */
                     Error ("Illegal function call");
                     /* Force the type to be a implicitly defined function, one
                     ** returning an int and taking any number of arguments.
@@ -2093,7 +2093,7 @@ void hie10 (ExprDesc* Expr)
             ** of dereference operators is legal, since the result will
             ** always be converted to "pointer to function".
             */
-            if (IsTypeFuncPtr (Expr->Type) || IsTypeFunc (Expr->Type)) {
+            if (IsTypeFuncLike (Expr->Type)) {
                 /* Expression not storable */
                 ED_MarkExprAsRVal (Expr);
             } else {
@@ -3791,7 +3791,7 @@ static void parsesub (ExprDesc* Expr)
     Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
 
     /* lhs cannot be function or pointer to function */
-    if (IsTypeFunc (Expr->Type) || IsTypeFuncPtr (Expr->Type)) {
+    if (IsTypeFuncLike (Expr->Type)) {
         Error ("Invalid left operand for binary operator '-'");
         /* Make it pointer to char to avoid further errors */
         Expr->Type = type_uchar;
@@ -3816,7 +3816,7 @@ static void parsesub (ExprDesc* Expr)
     MarkedExprWithCheck (hie9, &Expr2);
 
     /* rhs cannot be function or pointer to function */
-    if (IsTypeFunc (Expr2.Type) || IsTypeFuncPtr (Expr2.Type)) {
+    if (IsTypeFuncLike (Expr2.Type)) {
         Error ("Invalid right operand for binary operator '-'");
         /* Make it pointer to char to avoid further errors */
         Expr2.Type = type_uchar;

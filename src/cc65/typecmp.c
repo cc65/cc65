@@ -141,7 +141,7 @@ static void SetResult (typecmp_t* Result, typecmpcode_t Val)
 
 
 static typecmp_t* CmpQuals (const Type* lhst, const Type* rhst, typecmp_t* Result)
-/* Copare the types regarding thier qualifiers. Return the Result */
+/* Compare the types regarding their qualifiers. Return via pointer *Result */
 {
     TypeCode LeftQual, RightQual;
 
@@ -249,22 +249,32 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
 
 
     /* Compare two types. Determine, where they differ */
-    while (lhs->C != T_END) {
-
-        /* Check if the end of the type string is reached */
-        if (rhs->C == T_END) {
-            /* End of comparison reached */
-            break;
-        }
-
+    while (lhs->C != T_END && rhs->C != T_END) {
         /* Compare qualifiers */
         if (CmpQuals (lhs, rhs, Result)->C == TC_INCOMPATIBLE) {
+            /* No need to compare further */
             return;
         }
 
         /* Get the ranks of the left and right hands */
         LeftRank  = (GetUnqualTypeCode (lhs) & T_MASK_RANK);
         RightRank = (GetUnqualTypeCode (rhs) & T_MASK_RANK);
+
+        /* Bit-fields are considered compatible if they have the same
+        ** signedness, bit-offset and bit-width.
+        */
+        if (IsTypeBitField (lhs) || IsTypeBitField (rhs)) {
+            if (!IsTypeBitField (lhs)           ||
+                !IsTypeBitField (rhs)           ||
+                lhs->A.B.Offs  != rhs->A.B.Offs ||
+                lhs->A.B.Width != rhs->A.B.Width) {
+                /* Incompatible */
+                goto Incompatible;
+            }
+            if (LeftRank != RightRank) {
+                SetResult (Result, TC_STRICT_COMPATIBLE);
+            }
+        }
 
         /* If one side is a pointer and the other side is an array, both are
         ** compatible.
@@ -280,56 +290,35 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
             }
         }
 
-        /* Bit-fields are considered compatible if they have the same
-        ** signedness, bit-offset and bit-width.
-        */
-        if (IsTypeBitField (lhs) || IsTypeBitField (rhs)) {
-            if (!IsTypeBitField (lhs)           ||
-                !IsTypeBitField (rhs)           ||
-                lhs->A.B.Offs  != rhs->A.B.Offs ||
-                lhs->A.B.Width != rhs->A.B.Width) {
-                SetResult (Result, TC_INCOMPATIBLE);
-            }
-            if (LeftRank != RightRank) {
-                SetResult (Result, TC_STRICT_COMPATIBLE);
-            }
-        }
-
         /* If the ranks are different, the types are incompatible */
         if (LeftRank != RightRank) {
-            SetResult (Result, TC_INCOMPATIBLE);
-            return;
+            goto Incompatible;
         }
 
         /* Enums must be handled specially */
         if ((IsTypeEnum (lhs) || IsTypeEnum (rhs))) {
 
             /* Compare the tag types */
-            Sym1 = IsTypeEnum (lhs) ? GetESUTagSym (lhs) : 0;
-            Sym2 = IsTypeEnum (rhs) ? GetESUTagSym (rhs) : 0;
+            Sym1 = GetESUTagSym (lhs);
+            Sym2 = GetESUTagSym (rhs);
 
+            /* For the two to be identical, they must be declared in the same
+            ** scope and have the same name.
+            */
             if (Sym1 != Sym2) {
                 if (Sym1 == 0 || Sym2 == 0) {
-
                     /* Only one is an enum. So they can't be identical */
                     SetResult (Result, TC_STRICT_COMPATIBLE);
-
-                } else {
-                    /* For the two to be identical, they must be in the same
-                    ** scope and have the same name.
+                } else if (Sym1->Owner != Sym2->Owner ||
+                           strcmp (Sym1->Name, Sym2->Name) != 0) {
+                    /* If any one of the two is incomplete, we can't guess
+                    ** their underlying types and have to assume that they
+                    ** be incompatible.
                     */
-                    if (Sym1->Owner != Sym2->Owner ||
-                        strcmp (Sym1->Name, Sym2->Name) != 0) {
-
-                        /* If any one of the two is incomplete, we can't guess
-                        ** their underlying types and have to assume that they
-                        ** be incompatible.
-                        */
-                        if (SizeOf (lhs) == 0 || SizeOf (rhs) == 0) {
-                            SetResult (Result, TC_INCOMPATIBLE);
-                            return;
-                        }
+                    if (SizeOf (lhs) == 0 || SizeOf (rhs) == 0) {
+                        goto Incompatible;
                     }
+                    SetResult (Result, TC_STRICT_COMPATIBLE);
                 }
             }
 
@@ -383,15 +372,13 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
                     /* Check the remaining flags */
                     if ((F1->Flags & ~FD_IGNORE) != (F2->Flags & ~FD_IGNORE)) {
                         /* Flags differ */
-                        SetResult (Result, TC_INCOMPATIBLE);
-                        return;
+                        goto Incompatible;
                     }
 
                     /* Compare the parameter lists */
                     if (EqualFuncParams (F1, F2) == 0) {
                         /* Parameter list is not identical */
-                        SetResult (Result, TC_INCOMPATIBLE);
-                        return;
+                        goto Incompatible;
                     }
                 }
 
@@ -406,8 +393,7 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
                     if (LeftCount  != UNSPECIFIED &&
                         RightCount != UNSPECIFIED) {
                         /* Member count given but different */
-                        SetResult (Result, TC_INCOMPATIBLE);
-                        return;
+                        goto Incompatible;
                     }
 
                     /* We take into account which side is more specified */
@@ -436,8 +422,7 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
                         /* This shouldn't happen in the current code base, but
                         ** we still handle this case to be future-proof.
                         */
-                        SetResult (Result, TC_INCOMPATIBLE);
-                        return;
+                        goto Incompatible;
                     }
                 }
 
@@ -453,9 +438,11 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
     /* Check if lhs and rhs both reached ends */
     if (lhs->C == T_END && rhs->C == T_END) {
         SetResult (Result, TC_IDENTICAL);
-    } else {
-        SetResult (Result, TC_INCOMPATIBLE);
+        return;
     }
+
+Incompatible:
+    SetResult (Result, TC_INCOMPATIBLE);
 }
 
 
@@ -483,7 +470,10 @@ typecmp_t TypeCmp (const Type* lhs, const Type* rhs)
 
 
 void TypeCompatibilityDiagnostic (const Type* NewType, const Type* OldType, int IsError, const char* Msg)
-/* Print error or warning message about type compatibility with proper type names */
+/* Print error or warning message about type compatibility with proper type
+** names. The format string shall contain two '%s' specifiers for the names of
+** the two types.
+*/
 {
     StrBuf NewTypeName = STATIC_STRBUF_INITIALIZER;
     StrBuf OldTypeName = STATIC_STRBUF_INITIALIZER;

@@ -1008,7 +1008,6 @@ SymEntry* AddBitField (const char* Name, const Type* T, unsigned Offs,
         Entry = NewSymEntry (Name, SC_BITFIELD);
 
         /* Set the symbol attributes. Bit-fields are always integral types. */
-        Entry->Type   = NewBitFieldOf (T, BitOffs, BitWidth);
         Entry->V.Offs = Offs;
 
         if (!SignednessSpecified) {
@@ -1019,12 +1018,10 @@ SymEntry* AddBitField (const char* Name, const Type* T, unsigned Offs,
             ** is controlled by `--signed-chars`.  In bit-fields, however, we perform the same
             ** `char -> unsigned char` adjustment that is performed with other integral types.
             */
-            CHECK ((Entry->Type->C & T_MASK_SIGN) == T_SIGN_SIGNED ||
-                   IsRankChar (Entry->Type));
-            Entry->Type[0].C &= ~T_MASK_SIGN;
-            Entry->Type[0].C |= T_SIGN_UNSIGNED;
-            Entry->Type[1].C &= ~T_MASK_SIGN;
-            Entry->Type[1].C |= T_SIGN_UNSIGNED;
+            CHECK (IsSignSigned (T) || IsRankChar (T));
+            Entry->Type = NewBitFieldOf (GetUnsignedType (T), BitOffs, BitWidth);
+        } else {
+            Entry->Type = NewBitFieldOf (T, BitOffs, BitWidth);
         }
 
         /* Add the entry to the symbol table */

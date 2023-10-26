@@ -547,7 +547,7 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
     }
 
     /* Allocate code and data segments for this function */
-    Func->V.F.Seg = PushSegments (Func);
+    Func->V.F.Seg = PushSegContext (Func);
 
     /* Use the info in the segments for generating new local labels */
     UseLabelPoolFromSegments (Func->V.F.Seg);
@@ -696,7 +696,7 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
     }
 
     /* Switch back to the old segments */
-    PopSegments ();
+    PopSegContext ();
 
     /* Reset the current function pointer */
     FreeFunction (CurrentFunc);

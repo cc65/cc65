@@ -816,6 +816,14 @@ const Type* GetStructReplacementType (const Type* SType)
 
 
 
+const Type* GetBitFieldDeclType (const Type* Type)
+/* Get the original integer type used to declare the bit-field */
+{
+    return Type + 1;
+}
+
+
+
 const Type* GetBitFieldChunkType (const Type* Type)
 /* Get the type needed to operate on the byte chunk containing the bit-field */
 {
@@ -861,6 +869,16 @@ int IsTypeFragBitField (const Type* T)
     return IsTypeBitField (T) &&
            (T->A.B.Offs != 0 || T->A.B.Width != CHAR_BITS * SizeOf (T));
 }
+
+
+
+#if !defined(HAVE_INLINE)
+int IsTypeFuncLike (const Type* T)
+/* Return true if this is a function or a function pointer */
+{
+    return IsTypeFunc (T) || IsTypeFuncPtr (T);
+}
+#endif
 
 
 
@@ -923,6 +941,14 @@ int IsAggregateType (const Type* T)
 
 
 
+int IsDerivedDeclaratorType (const Type* T)
+/* Return true if this is an array, function or pointer type */
+{
+    return IsTypeArray (T) || IsTypeFunc (T) || IsTypePtr (T);
+}
+
+
+
 int IsRelationType (const Type* T)
 /* Return true if this is an arithmetic, array or pointer type */
 {
@@ -953,6 +979,17 @@ int IsIncompleteESUType (const Type* T)
     SymEntry* TagSym = GetESUTagSym (T);
 
     return TagSym != 0 && !SymIsDef (TagSym);
+}
+
+
+
+int IsPassByRefType (const Type* T)
+/* Return true if this is a large struct/union type that doesn't fit in the
+** primary. This returns false for the void value extension type since it is
+** not passable at all.
+*/
+{
+    return IsClassStruct (T) && GetStructReplacementType (T) == T;
 }
 
 
@@ -1223,7 +1260,7 @@ void SetESUTagSym (Type* T, struct SymEntry* S)
 
 const char* GetBasicTypeName (const Type* T)
 /* Return a const name string of the basic type.
-** Return "type" for unknown basic types.
+** Return "<type>" for unknown basic types.
 */
 {
     switch (GetRawTypeRank (T)) {
@@ -1273,7 +1310,7 @@ const char* GetBasicTypeName (const Type* T)
             }
         }
     }
-    return "type";
+    return "<type>";
 }
 
 
@@ -1433,7 +1470,7 @@ static struct StrBuf* GetFullTypeNameWestEast (struct StrBuf* West, struct StrBu
         if (!IsTypeBitField (T)) {
             SB_AppendStr (&Buf, GetTagSymName (T));
         } else {
-            SB_AppendStr (&Buf, GetBasicTypeName (T + 1));
+            SB_AppendStr (&Buf, GetBasicTypeName (GetBitFieldDeclType (T)));
         }
 
         if (!SB_IsEmpty (West)) {

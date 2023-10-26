@@ -793,8 +793,6 @@ static int HandleSymRedefinition (SymEntry* Sym, const Type* T, unsigned Flags)
                 */
                 Error ("Redeclaration of enumerator constant '%s'", Sym->Name);
                 Sym = 0;
-            } else if (Flags & SC_STRUCTFIELD) {
-                Error ("Duplicate member '%s'", Sym->Name);
             }
         }
     }
@@ -998,6 +996,7 @@ SymEntry* AddBitField (const char* Name, const Type* T, unsigned Offs,
 {
     /* Do we have an entry with this name already? */
     SymEntry* Entry = FindSymInTable (FieldTab, Name, HashStr (Name));
+
     if (Entry) {
 
         /* We have a symbol with this name already */
@@ -1044,6 +1043,7 @@ SymEntry* AddConstSym (const char* Name, const Type* T, unsigned Flags, long Val
 {
     /* Do we have an entry with this name already? */
     SymEntry* Entry = FindSymInTable (SymTab, Name, HashStr (Name));
+
     if (Entry) {
         if ((Entry->Flags & SC_CONST) != SC_CONST) {
             Error ("Symbol '%s' is already different kind", Name);
@@ -1114,6 +1114,7 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
 
     /* Do we have an entry with this name already? */
     SymEntry* Entry = FindSymInTable (LabelTab, Name, HashStr (Name));
+
     if (Entry) {
 
         if (SymIsDef (Entry) && (Flags & SC_DEF) != 0) {
@@ -1224,6 +1225,7 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
 
     /* Do we have an entry with this name already? */
     SymEntry* Entry = FindSymInTable (Tab, Name, HashStr (Name));
+
     if (Entry) {
         int CheckExtern = 0;
         if ((Flags & SC_STRUCTFIELD) == 0) {
@@ -1254,6 +1256,9 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
                     Error ("Static declaration of '%s' follows extern declaration", Name);
                     Entry = 0;
                 }
+            } else if ((Flags & SC_STRUCTFIELD) != 0) {
+                Error ("Duplicate member '%s'", Entry->Name);
+                Entry = 0;
             }
         }
 

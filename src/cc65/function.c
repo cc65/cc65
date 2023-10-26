@@ -565,15 +565,15 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
         /* Generate the push */
         /* Handle struct/union specially */
         if (IsClassStruct (D->LastParam->Type)) {
-            Flags = TypeOf (GetStructReplacementType (D->LastParam->Type)) | CF_FORCECHAR;
+            Flags = CG_TypeOf (GetStructReplacementType (D->LastParam->Type)) | CF_FORCECHAR;
         } else {
-            Flags = TypeOf (D->LastParam->Type) | CF_FORCECHAR;
+            Flags = CG_TypeOf (D->LastParam->Type) | CF_FORCECHAR;
         }
         g_push (Flags, 0);
     }
 
     /* Generate function entry code if needed */
-    g_enter (FuncTypeOf (Func->Type), F_GetParamSize (CurrentFunc));
+    g_enter (CG_CallFlags (Func->Type), F_GetParamSize (CurrentFunc));
 
     /* If stack checking code is requested, emit a call to the helper routine */
     if (IS_Get (&CheckStack)) {

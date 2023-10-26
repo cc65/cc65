@@ -185,7 +185,7 @@ static void ParseArg (ArgDesc* Arg, const Type* Type, ExprDesc* Expr)
     GetCodePos (&Arg->End);
 
     /* Use the type of the argument for the push */
-    Arg->Flags |= TypeOf (Arg->Expr.Type);
+    Arg->Flags |= CG_TypeOf (Arg->Expr.Type);
 
     /* Propagate from subexpressions */
     Expr->Flags |= Arg->Expr.Flags & E_MASK_VIRAL;

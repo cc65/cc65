@@ -171,7 +171,7 @@ static void ParseRegisterDecl (Declarator* Decl, int Reg)
             LoadExpr (CF_NONE, &Expr);
 
             /* Store the value into the variable */
-            g_putstatic (CF_REGVAR | TypeOf (Sym->Type), Reg, 0);
+            g_putstatic (CF_REGVAR | CG_TypeOf (Sym->Type), Reg, 0);
 
             /* This has to be done at sequence point */
             DoDeferred (SQP_KEEP_NONE, &Expr);
@@ -283,19 +283,19 @@ static void ParseAutoDecl (Declarator* Decl)
                 }
 
                 /* Push the value */
-                if (TypeOf (Sym->Type) == CF_FLOAT) {
+                if (CG_TypeOf (Sym->Type) == CF_FLOAT) {
 #if defined(_MSC_VER)
 #pragma warning( push )
 #pragma warning( disable : 4244 )   // conversion from double to float
 #endif
                     /* FIXME: float */
                     LOG(("ParseAutoDecl Expr.V.FVal.V: %f\n", Expr.V.FVal.V));
-                    g_push_float (Flags | TypeOf (Sym->Type), Expr.V.FVal.V);
+                    g_push_float (Flags | CG_TypeOf (Sym->Type), Expr.V.FVal.V);
 #if defined(_MSC_VER)
 #pragma warning( pop )
 #endif
                 } else {
-                    g_push (Flags | TypeOf (Sym->Type), Expr.IVal);
+                    g_push (Flags | CG_TypeOf (Sym->Type), Expr.IVal);
                 }
 
                 /* This has to be done at sequence point */
@@ -375,7 +375,7 @@ static void ParseAutoDecl (Declarator* Decl)
                 LoadExpr (CF_NONE, &Expr);
 
                 /* Store the value into the variable */
-                g_putstatic (CF_STATIC | TypeOf (Sym->Type), DataLabel, 0);
+                g_putstatic (CF_STATIC | CG_TypeOf (Sym->Type), DataLabel, 0);
 
                 /* This has to be done at sequence point */
                 DoDeferred (SQP_KEEP_NONE, &Expr);

@@ -172,7 +172,7 @@ static void ClosingCurlyBraces (unsigned BracesExpected)
 static void DefineData (ExprDesc* Expr)
 /* Output a data definition for the given expression */
 {
-    int isfloat = (TypeOf (Expr->Type) == CF_FLOAT);
+    int isfloat = (CG_TypeOf (Expr->Type) == CF_FLOAT);
 
     LOG(("%s:%d DefineData IVal: %ld V.FVal: %f isfloat:%d %d\n", __FILE__, __LINE__,
            Expr->IVal, (double)(Expr->V.FVal.V), isfloat, ED_GetLoc (Expr)));
@@ -182,16 +182,16 @@ static void DefineData (ExprDesc* Expr)
             /* Immediate numeric value with no storage */
             /* FIXME: float */
             if (isfloat) {
-                g_defdata_float (CF_IMM | TypeOf (Expr->Type) | CF_CONST, FP_D_As32bitRaw(Expr->V.FVal), 0);
+                g_defdata_float (CF_IMM | CG_TypeOf (Expr->Type) | CF_CONST, FP_D_As32bitRaw(Expr->V.FVal), 0);
             } else {
-                g_defdata (CF_IMM | TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
+                g_defdata (CF_IMM | CG_TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
             }
             break;
 /* FIXME: float - other cases */
         case E_LOC_ABS:
             if (isfloat) { printf("%s:%d FIXME: E_LOC_ABS\n", __FILE__, __LINE__); exit(-1); }
             /* Absolute numeric address */
-            g_defdata (CF_ABSOLUTE | TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
+            g_defdata (CF_ABSOLUTE | CG_TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
             break;
 
         case E_LOC_GLOBAL:

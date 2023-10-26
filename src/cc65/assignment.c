@@ -96,7 +96,7 @@ static void CopyStruct (ExprDesc* LExpr, ExprDesc* RExpr)
         /* Check if the value of the rhs is not in the primary yet */
         if (!ED_IsLocPrimary (RExpr)) {
             /* Just load the value into the primary as the replacement type. */
-            LoadExpr (TypeOf (stype) | CF_FORCECHAR, RExpr);
+            LoadExpr (CG_TypeOf (stype) | CF_FORCECHAR, RExpr);
         }
 
         /* Store it into the location referred in the primary */
@@ -151,8 +151,8 @@ void DoIncDecBitField (ExprDesc* Expr, long Val, unsigned KeepResult)
     ChunkType = GetBitFieldChunkType (Expr->Type);
 
     /* Determine code generator flags */
-    Flags      = TypeOf (Expr->Type) | CF_FORCECHAR;
-    ChunkFlags = TypeOf (ChunkType);
+    Flags      = CG_TypeOf (Expr->Type) | CF_FORCECHAR;
+    ChunkFlags = CG_TypeOf (ChunkType);
     if ((ChunkFlags & CF_TYPEMASK) == CF_CHAR) {
         ChunkFlags |= CF_FORCECHAR;
     }
@@ -238,8 +238,8 @@ static void OpAssignBitField (const GenDesc* Gen, ExprDesc* Expr, const char* Op
     ChunkType = GetBitFieldChunkType (Expr->Type);
 
     /* Determine code generator flags */
-    Flags      = TypeOf (Expr->Type) | CF_FORCECHAR;
-    ChunkFlags = TypeOf (ChunkType);
+    Flags      = CG_TypeOf (Expr->Type) | CF_FORCECHAR;
+    ChunkFlags = CG_TypeOf (ChunkType);
     if ((ChunkFlags & CF_TYPEMASK) == CF_CHAR) {
         ChunkFlags |= CF_FORCECHAR;
     }
@@ -364,7 +364,7 @@ static void OpAssignBitField (const GenDesc* Gen, ExprDesc* Expr, const char* Op
                     unsigned AdjustedFlags = Flags;
                     if (Expr->Type->A.B.Width < INT_BITS || IsSignSigned (Expr->Type)) {
                         AdjustedFlags = (Flags & ~CF_UNSIGNED) | CF_CONST;
-                        AdjustedFlags = g_typeadjust (AdjustedFlags, TypeOf (Expr2.Type) | CF_CONST);
+                        AdjustedFlags = g_typeadjust (AdjustedFlags, CG_TypeOf (Expr2.Type) | CF_CONST);
                     }
                     Gen->Func (g_typeadjust (Flags, AdjustedFlags) | CF_CONST, Expr2.IVal);
                 } else {
@@ -387,11 +387,11 @@ static void OpAssignBitField (const GenDesc* Gen, ExprDesc* Expr, const char* Op
                 unsigned AdjustedFlags = Flags;
                 if (Expr->Type->A.B.Width < INT_BITS || IsSignSigned (Expr->Type)) {
                     AdjustedFlags = (Flags & ~CF_UNSIGNED) | CF_CONST;
-                    AdjustedFlags = g_typeadjust (AdjustedFlags, TypeOf (Expr2.Type) | CF_CONST);
+                    AdjustedFlags = g_typeadjust (AdjustedFlags, CG_TypeOf (Expr2.Type) | CF_CONST);
                 }
                 Gen->Func (g_typeadjust (Flags, AdjustedFlags), 0);
             } else {
-                Gen->Func (g_typeadjust (Flags, TypeOf (Expr2.Type)), 0);
+                Gen->Func (g_typeadjust (Flags, CG_TypeOf (Expr2.Type)), 0);
             }
 
         } else {
@@ -460,7 +460,7 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
     Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
 
     /* Determine code generator flags */
-    Flags = TypeOf (Expr->Type);
+    Flags = CG_TypeOf (Expr->Type);
 
     /* Determine the type of the lhs */
     MustScale = Gen != 0 && (Gen->Func == g_add || Gen->Func == g_sub) &&
@@ -601,7 +601,7 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
 
             if (MustScale) {
                 /* lhs is a pointer, scale rhs */
-                g_scale (TypeOf (Expr2.Type), CheckedSizeOf (Expr->Type+1));
+                g_scale (CG_TypeOf (Expr2.Type), CheckedSizeOf (Expr->Type+1));
             }
 
             /* If the lhs is character sized, the operation may be later done
@@ -612,7 +612,7 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
             }
 
             /* Adjust the types of the operands if needed */
-            Gen->Func (g_typeadjust (Flags, TypeOf (Expr2.Type)), 0);
+            Gen->Func (g_typeadjust (Flags, CG_TypeOf (Expr2.Type)), 0);
 
         }
     }
@@ -745,8 +745,8 @@ void OpAddSubAssign (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
     }
 
     /* Setup the code generator flags */
-    lflags |= TypeOf (Expr->Type) | GlobalModeFlags (Expr) | CF_FORCECHAR;
-    rflags |= TypeOf (Expr2.Type) | CF_FORCECHAR;
+    lflags |= CG_TypeOf (Expr->Type) | CG_AddrModeFlags (Expr) | CF_FORCECHAR;
+    rflags |= CG_TypeOf (Expr2.Type) | CF_FORCECHAR;
 
     LOG(("OpAddSubAssign '%s' lflags:%04x rflags:%04x\n", Op, lflags, rflags));
 
@@ -770,7 +770,7 @@ void OpAddSubAssign (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
 
         if (MustScale) {
             /* lhs is a pointer, scale rhs */
-            g_scale (TypeOf (Expr2.Type), CheckedSizeOf (Indirect (Expr->Type)));
+            g_scale (CG_TypeOf (Expr2.Type), CheckedSizeOf (Indirect (Expr->Type)));
         }
     }
 

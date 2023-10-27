@@ -511,7 +511,7 @@ void Compile (const char* FileName)
 
                     /* Mark as defined; so that it will be exported, not imported */
                     Entry->Flags |= SC_DEF;
-                } else {
+                } else if (!IsTypeArray (Entry->Type)) {
                     /* Tentative declared variable is still of incomplete type */
                     Error ("Definition of '%s' has type '%s' that is never completed",
                            Entry->Name,

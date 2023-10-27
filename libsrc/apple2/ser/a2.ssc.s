@@ -87,6 +87,7 @@ SendFreeCnt:    .res    1       ; Number of free bytes in send buffer
 Stopped:        .res    1       ; Flow-stopped flag
 RtsOff:         .res    1       ; Cached value of command register with
                                 ; flow stopped
+HSType:         .res    1       ; Flow-control type
 
 RecvBuf:        .res    256     ; Receive buffer: 256 bytes
 SendBuf:        .res    256     ; Send buffer: 256 bytes
@@ -276,13 +277,15 @@ NoDev:  lda     #SER_ERR_NO_DEVICE
         ; Check if the handshake setting is valid
 AciaOK: ldy     #SER_PARAMS::HANDSHAKE
         lda     (ptr1),y
-        cmp     #SER_HS_HW      ; This is all we support
-        beq     HandshakeOK
+        cmp     #SER_HS_SW      ; Not supported
+        bne     HandshakeOK
 
         lda     #SER_ERR_INIT_FAILED
         bne     Out
 
 HandshakeOK:
+        sta     HSType          ; Store flow control type
+
         ldy     #$00            ; Initialize buffers
         sty     Stopped
         sty     RecvHead
@@ -473,11 +476,14 @@ SER_IRQ:
         bcc     Flow            ; Assert flow control if buffer space low
         rts                     ; Interrupt handled (carry already set)
 
-Flow:   ldx     Index           ; Assert flow control if buffer space too low
-lda     RtsOff
+Flow:   lda     HSType          ; Don't touch if no flow control
+        beq     IRQDone
+
+        ldx     Index           ; Assert flow control if buffer space too low
+        lda     RtsOff
         sta     ACIA_CMD,x
         sta     Stopped
-        sec                     ; Interrupt handled
+IRQDone:sec                     ; Interrupt handled
 Done:   rts
 
 ;----------------------------------------------------------------------------

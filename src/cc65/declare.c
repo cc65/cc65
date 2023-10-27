@@ -517,7 +517,8 @@ static void CheckArrayElementType (const Type* T)
                     return;
                 }
             } else {
-                if (IsTypeStruct (T)) {
+                /* Elements cannot contain flexible array members themselves */
+                if (IsClassStruct (T)) {
                     SymEntry* TagEntry = GetESUTagSym (T);
                     if (TagEntry && SymHasFlexibleArrayMember (TagEntry)) {
                         Error ("Invalid use of struct with flexible array member");
@@ -1202,9 +1203,7 @@ static SymEntry* ParseStructSpec (const char* Name, unsigned* DSFlags)
                     if (TagEntry && SymHasFlexibleArrayMember (TagEntry)) {
                         Field->Flags |= SC_HAVEFAM;
                         Flags        |= SC_HAVEFAM;
-                        if (IsTypeStruct (Decl.Type)) {
-                            Error ("Invalid use of struct with flexible array member");
-                        }
+                        Error ("Invalid use of struct with flexible array member");
                     }
                 }
 

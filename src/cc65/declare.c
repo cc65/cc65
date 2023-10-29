@@ -493,33 +493,36 @@ static void FixQualifiers (Type* DataType)
 
 
 
-static void CheckArrayElementType (Type* DataType)
+static void CheckArrayElementType (const Type* T)
 /* Check if data type consists of arrays of incomplete element types */
 {
-    Type* T = DataType;
-
     while (T->C != T_END) {
         if (IsTypeArray (T)) {
+            /* If the array is multi-dimensional, keep going until we get the
+            ** true element type.
+            */
             ++T;
-            if (IsIncompleteESUType (T)) {
-                /* We cannot have an array of incomplete elements */
-                Error ("Array of incomplete element type '%s'", GetFullTypeName (T));
-            } else if (SizeOf (T) == 0) {
-                /* If the array is multi-dimensional, try to get the true
-                ** element type.
-                */
-                if (IsTypeArray (T)) {
-                    continue;
-                }
-                /* We could support certain 0-size element types as an extension */
-                if (!IsTypeVoid (T) || IS_Get (&Standard) != STD_CC65) {
-                    Error ("Array of 0-size element type '%s'", GetFullTypeName (T));
+            if (SizeOf (T) == 0) {
+                if (IsTypeArray (T) || IsIncompleteESUType (T)) {
+                    /* We cannot have an array of incomplete elements */
+                    if (!IsTypeArray (T) || GetElementCount (T) == UNSPECIFIED) {
+                        Error ("Array of incomplete element type '%s'",
+                               GetFullTypeName (T));
+                        return;
+                    }
+                } else if (!IsTypeVoid (T) || IS_Get (&Standard) != STD_CC65) {
+                    /* We could support certain 0-size element types as an extension */
+                    Error ("Array of 0-size element type '%s'",
+                           GetFullTypeName (T));
+                    return;
                 }
             } else {
-                if (IsTypeStruct (T)) {
+                /* Elements cannot contain flexible array members themselves */
+                if (IsClassStruct (T)) {
                     SymEntry* TagEntry = GetESUTagSym (T);
                     if (TagEntry && SymHasFlexibleArrayMember (TagEntry)) {
                         Error ("Invalid use of struct with flexible array member");
+                        return;
                     }
                 }
             }
@@ -756,7 +759,7 @@ static SymEntry* ParseEnumSpec (const char* Name, unsigned* DSFlags)
         Flags |= SC_FICTITIOUS;
     }
 
-    return AddEnumSym (Name, Flags, MemberType, FieldTab, DSFlags);
+    return AddEnumSym (Name, SC_DEF | Flags, MemberType, FieldTab, DSFlags);
 }
 
 
@@ -1200,9 +1203,7 @@ static SymEntry* ParseStructSpec (const char* Name, unsigned* DSFlags)
                     if (TagEntry && SymHasFlexibleArrayMember (TagEntry)) {
                         Field->Flags |= SC_HAVEFAM;
                         Flags        |= SC_HAVEFAM;
-                        if (IsTypeStruct (Decl.Type)) {
-                            Error ("Invalid use of struct with flexible array member");
-                        }
+                        Error ("Invalid use of struct with flexible array member");
                     }
                 }
 

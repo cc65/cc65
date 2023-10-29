@@ -215,6 +215,8 @@ struct Type {
 extern const Type type_char[];
 extern const Type type_schar[];
 extern const Type type_uchar[];
+extern const Type type_short[];
+extern const Type type_ushort[];
 extern const Type type_int[];
 extern const Type type_uint[];
 extern const Type type_long[];

@@ -63,6 +63,8 @@
 const Type type_char[]      = { TYPE(T_CHAR),   TYPE(T_END) };
 const Type type_schar[]     = { TYPE(T_SCHAR),  TYPE(T_END) };
 const Type type_uchar[]     = { TYPE(T_UCHAR),  TYPE(T_END) };
+const Type type_short[]     = { TYPE(T_SHORT),  TYPE(T_END) };
+const Type type_ushort[]    = { TYPE(T_USHORT), TYPE(T_END) };
 const Type type_int[]       = { TYPE(T_INT),    TYPE(T_END) };
 const Type type_uint[]      = { TYPE(T_UINT),   TYPE(T_END) };
 const Type type_long[]      = { TYPE(T_LONG),   TYPE(T_END) };
@@ -315,7 +317,7 @@ unsigned CheckedSizeOf (const Type* T)
 {
     unsigned Size = SizeOf (T);
     if (Size == 0) {
-        if (HasUnknownSize (T + 1)) {
+        if (HasUnknownSize (T)) {
             Error ("Size of type '%s' is unknown", GetFullTypeName (T));
         } else {
             Error ("Size of type '%s' is 0", GetFullTypeName (T));
@@ -727,8 +729,10 @@ const Type* GetSignedType (const Type* T)
         case T_RANK_CHAR:
             return type_schar;
 
-        case T_RANK_INT:
         case T_RANK_SHORT:
+            return type_short;
+
+        case T_RANK_INT:
             return type_int;
 
         case T_RANK_LONG:
@@ -749,8 +753,10 @@ const Type* GetUnsignedType (const Type* T)
         case T_RANK_CHAR:
             return type_uchar;
 
-        case T_RANK_INT:
         case T_RANK_SHORT:
+            return type_ushort;
+
+        case T_RANK_INT:
             return type_uint;
 
         case T_RANK_LONG:
@@ -1016,7 +1022,11 @@ int HasUnknownSize (const Type* T)
 int TypeHasAttrData (const Type* T)
 /* Return true if the given type has attribute data */
 {
-    return IsClassStruct (T) || IsTypeArray (T) || IsClassFunc (T);
+    return IsClassStruct (T)    ||
+           IsTypeArray (T)      ||
+           IsClassFunc (T)      ||
+           IsTypeVoid (T)       ||
+           IsTypeBitField (T);
 }
 
 

@@ -5,7 +5,12 @@ typedef struct x {
     int b[];    /* Ok: Flexible array member can be last */
 } x;
 
+typedef union u {
+    int a;
+    x   x;      /* Ok: Union member can contain flexible array member */
+} u;
+
 struct y {
-    x   x;      /* Not ok: Contains flexible array member */
+    u   u;      /* Not ok: Contains union that contains flexible array member */
     int a;
 };

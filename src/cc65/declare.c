@@ -493,8 +493,44 @@ static void FixQualifiers (Type* DataType)
 
 
 
+static void FixFunctionReturnType (Type* T)
+/* Check if the data type consists of any functions returning forbidden return
+** types and remove qualifiers from the return types if they are not void.
+*/
+{
+    while (T->C != T_END) {
+        if (IsTypeFunc (T)) {
+            ++T;
+
+            /* Functions may not return functions or arrays */
+            if (IsTypeFunc (T)) {
+                Error ("Functions are not allowed to return functions");
+            } else if (IsTypeArray (T)) {
+                Error ("Functions are not allowed to return arrays");
+            }
+
+            /* The return type must not be qualified */
+            if ((GetQualifier (T) & T_QUAL_CVR) != T_QUAL_NONE) {
+                /* We are stricter than the standard here */
+                if (GetRawTypeRank (T) == T_RANK_VOID) {
+                    /* A qualified void type is always an error */
+                    Error ("Function definition has qualified void return type");
+                } else {
+                    /* For others, qualifiers are ignored */
+                    Warning ("Type qualifiers ignored on function return type");
+                    T[0].C &= ~T_QUAL_CVR;
+                }
+            }
+        } else {
+            ++T;
+        }
+    }
+}
+
+
+
 static void CheckArrayElementType (const Type* T)
-/* Check if data type consists of arrays of incomplete element types */
+/* Check recursively if type consists of arrays of forbidden element types */
 {
     while (T->C != T_END) {
         if (IsTypeArray (T)) {
@@ -2061,46 +2097,39 @@ void ParseDecl (const DeclSpec* Spec, Declarator* D, declmode_t Mode)
     /* Do several fixes on qualifiers */
     FixQualifiers (D->Type);
 
-    /* Check if the data type consists of any arrays of forbidden types */
-    CheckArrayElementType (D->Type);
+    /* Check if the data type consists of any functions returning forbidden return
+    ** types and remove qualifiers from the return types if they are not void.
+    */
+    FixFunctionReturnType (D->Type);
 
-    /* If we have a function, add a special storage class */
-    if (IsTypeFunc (D->Type)) {
-        D->StorageClass |= SC_FUNC;
-    }
+    /* Check recursively if the data type consists of arrays of forbidden types */
+    CheckArrayElementType (D->Type);
 
     /* Parse attributes for this declarator */
     ParseAttribute (D);
 
-    /* Check several things for function or function pointer types */
-    if (IsTypeFunc (D->Type) || IsTypeFuncPtr (D->Type)) {
+    /* If we have a function, add a special storage class */
+    if (IsTypeFunc (D->Type)) {
 
-        /* A function. Check the return type */
-        Type* RetType = GetFuncReturnTypeModifiable (D->Type);
+        D->StorageClass |= SC_FUNC;
 
-        /* Functions may not return functions or arrays */
-        if (IsTypeFunc (RetType)) {
-            Error ("Functions are not allowed to return functions");
-        } else if (IsTypeArray (RetType)) {
-            Error ("Functions are not allowed to return arrays");
-        }
+    } else if (!IsTypeVoid (D->Type)) {
+        /* Check the size of the generated type */
+        unsigned Size = SizeOf (D->Type);
 
-        /* The return type must not be qualified */
-        if (GetQualifier (RetType) != T_QUAL_NONE && RetType[1].C == T_END) {
-
-            if (GetRawTypeRank (RetType) == T_RANK_VOID) {
-                /* A qualified void type is always an error */
-                Error ("function definition has qualified void return type");
+        if (Size >= 0x10000) {
+            if (D->Ident[0] != '\0') {
+                Error ("Size of '%s' is invalid (0x%06X)", D->Ident, Size);
             } else {
-                /* For others, qualifiers are ignored */
-                Warning ("type qualifiers ignored on function return type");
-                RetType[0].C = GetUnqualRawTypeCode (RetType);
+                Error ("Invalid size in declaration (0x%06X)", Size);
             }
         }
+    }
 
-        /* Warn about an implicit int return in the function */
-        if ((Spec->Flags & DS_DEF_TYPE) != 0 &&
-            RetType[0].C == T_INT && RetType[1].C == T_END) {
+    /* Check a few pre-C99 things */
+    if ((Spec->Flags & DS_DEF_TYPE) != 0) {
+        /* Check and warn about an implicit int return in the function */
+        if (IsTypeFunc (D->Type) && IsRankInt (GetFuncReturnType (D->Type))) {
             /* Function has an implicit int return. Output a warning if we don't
             ** have the C89 standard enabled explicitly.
             */
@@ -2110,29 +2139,16 @@ void ParseDecl (const DeclSpec* Spec, Declarator* D, declmode_t Mode)
             GetFuncDesc (D->Type)->Flags |= FD_OLDSTYLE_INTRET;
         }
 
-    }
-
-    /* For anthing that is not a function or typedef, check for an implicit
-    ** int declaration.
-    */
-    if ((D->StorageClass & SC_FUNC) != SC_FUNC &&
-        (D->StorageClass & SC_TYPEMASK) != SC_TYPEDEF) {
-        /* If the standard was not set explicitly to C89, print a warning
-        ** for variables with implicit int type.
+        /* For anthing that is not a function or typedef, check for an implicit
+        ** int declaration.
         */
-        if ((Spec->Flags & DS_DEF_TYPE) != 0 && IS_Get (&Standard) >= STD_C99) {
-            Warning ("Implicit 'int' is an obsolete feature");
-        }
-    }
-
-    if (!IsTypeFunc (D->Type) && !IsTypeVoid (D->Type)) {
-        /* Check the size of the generated type */
-        unsigned Size = SizeOf (D->Type);
-        if (Size >= 0x10000) {
-            if (D->Ident[0] != '\0') {
-                Error ("Size of '%s' is invalid (0x%06X)", D->Ident, Size);
-            } else {
-                Error ("Invalid size in declaration (0x%06X)", Size);
+        if ((D->StorageClass & SC_FUNC) != SC_FUNC &&
+            (D->StorageClass & SC_TYPEMASK) != SC_TYPEDEF) {
+            /* If the standard was not set explicitly to C89, print a warning
+            ** for variables with implicit int type.
+            */
+            if (IS_Get (&Standard) >= STD_C99) {
+                Warning ("Implicit 'int' is an obsolete feature");
             }
         }
     }

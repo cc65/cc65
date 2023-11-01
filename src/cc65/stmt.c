@@ -311,7 +311,6 @@ static void ReturnStatement (void)
 /* Handle the 'return' statement */
 {
     ExprDesc    Expr;
-    const Type* ReturnType;
 
     ED_Init (&Expr);
     NextToken ();
@@ -327,31 +326,19 @@ static void ReturnStatement (void)
         if (F_HasVoidReturn (CurrentFunc)) {
             Error ("Returning a value in function with return type 'void'");
         } else {
-
             /* Check the return type first */
-            ReturnType = F_GetReturnType (CurrentFunc);
-            if (IsIncompleteESUType (ReturnType)) {
-                /* Avoid excess errors */
-                if (ErrorCount == 0) {
-                    Error ("Returning a value in function with incomplete return type");
-                }
+            const Type* ReturnType = F_GetReturnType (CurrentFunc);
+
+            /* Convert the return value to the type of the function result */
+            TypeConversion (&Expr, ReturnType);
+
+            /* Load the value into the primary */
+            if (IsClassStruct (Expr.Type)) {
+                /* Handle struct/union specially */
+                LoadExpr (CG_TypeOf (GetStructReplacementType (ReturnType)), &Expr);
             } else {
-                /* Convert the return value to the type of the function result */
-                TypeConversion (&Expr, ReturnType);
-
                 /* Load the value into the primary */
-                if (IsClassStruct (Expr.Type)) {
-                    /* Handle struct/union specially */
-                    ReturnType = GetStructReplacementType (Expr.Type);
-                    if (ReturnType == Expr.Type) {
-                        Error ("Returning '%s' of this size by value is not supported", GetFullTypeName (Expr.Type));
-                    }
-                    LoadExpr (CG_TypeOf (ReturnType), &Expr);
-
-                } else {
-                    /* Load the value into the primary */
-                    LoadExpr (CF_NONE, &Expr);
-                }
+                LoadExpr (CF_NONE, &Expr);
             }
 
             /* Append deferred inc/dec at sequence point */

@@ -239,6 +239,10 @@ static TypeCode OptionalQualifiers (TypeCode Qualifiers, TypeCode Allowed)
                 }
                 break;
 
+            case TOK_INLINE:
+                Warning ("inline unsported, ignoring");
+                break;
+
             case TOK_CDECL:
                 if (Allowed & T_QUAL_CDECL) {
                     if (Qualifiers & T_QUAL_CDECL) {

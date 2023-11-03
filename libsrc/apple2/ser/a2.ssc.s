@@ -87,6 +87,7 @@ SendFreeCnt:    .res    1       ; Number of free bytes in send buffer
 Stopped:        .res    1       ; Flow-stopped flag
 RtsOff:         .res    1       ; Cached value of command register with
                                 ; flow stopped
+HSType:         .res    1       ; Flow-control type
 
 RecvBuf:        .res    256     ; Receive buffer: 256 bytes
 SendBuf:        .res    256     ; Send buffer: 256 bytes
@@ -283,7 +284,7 @@ AciaOK: ldy     #SER_PARAMS::HANDSHAKE
         bne     Out
 
 HandshakeOK:
-        sta     tmp2            ; Store flow control type
+        sta     HSType          ; Store flow control type
 
         ldy     #$00            ; Initialize buffers
         sty     Stopped
@@ -334,12 +335,8 @@ BaudOK: sta     tmp1
         ora     #%00001000      ; Enable receive interrupts (RTS low)
         sta     ACIA_CMD,x
 
-        ldy     tmp2            ; Check flow control type
-        bne     Opened
-        sta     RtsOff          ; Disable flow control if required
-
         ; Done
-Opened: stx     Index           ; Mark port as open
+        stx     Index           ; Mark port as open
         lda     #SER_ERR_OK
 Out:
         ldx     #$00            ; Promote char return value
@@ -479,11 +476,14 @@ SER_IRQ:
         bcc     Flow            ; Assert flow control if buffer space low
         rts                     ; Interrupt handled (carry already set)
 
-Flow:   ldx     Index           ; Assert flow control if buffer space too low
+Flow:   lda     HSType          ; Don't touch if no flow control
+        beq     IRQDone
+
+        ldx     Index           ; Assert flow control if buffer space too low
         lda     RtsOff
         sta     ACIA_CMD,x
         sta     Stopped
-        sec                     ; Interrupt handled
+IRQDone:sec                     ; Interrupt handled
 Done:   rts
 
 ;----------------------------------------------------------------------------

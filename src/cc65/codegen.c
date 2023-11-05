@@ -2726,7 +2726,12 @@ void g_mul (unsigned flags, unsigned long val)
                 if (flags & CF_FORCECHAR) {
                     /* Handle some special cases */
                     switch (val) {
-
+                        case 0:
+                            AddCodeLine ("lda #$00");
+                            return;
+                        case 1:
+                            /* Nothing to do */
+                            return;
                         case 3:
                             AddCodeLine ("sta tmp1");
                             AddCodeLine ("asl a");
@@ -2764,6 +2769,13 @@ void g_mul (unsigned flags, unsigned long val)
 
             case CF_INT:
                 switch (val) {
+                    case 0:
+                        AddCodeLine ("lda #$00");
+                        AddCodeLine ("tax");
+                        return;
+                    case 1:
+                        /* Nothing to do */
+                        return;
                     case 3:
                         AddCodeLine ("jsr mulax3");
                         return;

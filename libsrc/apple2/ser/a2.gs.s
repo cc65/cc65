@@ -61,6 +61,7 @@ SendFreeCnt:    .res    1               ; Number of bytes in send buffer
 
 Stopped:        .res    1               ; Flow-stopped flag
 RtsOff:         .res    1
+HSType:         .res    1               ; Flow-control type
 
 RecvBuf:        .res    256             ; Receive buffers: 256 bytes
 SendBuf:        .res    256             ; Send buffers: 256 bytes
@@ -333,8 +334,10 @@ SER_OPEN:
         ; Check if the handshake setting is valid
         ldy     #SER_PARAMS::HANDSHAKE  ; Handshake
         lda     (ptr1),y
-        cmp     #SER_HS_HW              ; This is all we support
-        bne     InvParam
+        cmp     #SER_HS_SW              ; Not supported
+        beq     InvParam
+
+        sta     HSType                  ; Store flow control type
 
         ; Initialize buffers
         ldy     #$00
@@ -644,13 +647,16 @@ CheckSpecial:
         sec
         rts
 
-Flow:   ldx     Channel                 ; Assert flow control if buffer space too low
+Flow:   lda     HSType                  ; Don't touch if no flow control
+        beq     IRQDone
+
+        ldx     Channel                 ; Assert flow control if buffer space too low
         ldy     #WR_TX_CTRL
         lda     RtsOff
         jsr     writeSCCReg
 
         sta     Stopped
-        sec                             ; Interrupt handled
+IRQDone:sec                             ; Interrupt handled
 Done:   rts
 
 Special:ldx     Channel

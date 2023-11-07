@@ -135,6 +135,15 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           user: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
+      - name: Upload 64-bit Windows snapshot to sourceforge
+        uses: nogsantos/scp-deploy@master
+        with:
+          src: cc65-snapshot-win64.zip
+          host: ${{ secrets.SSH_HOST }}
+          remote: ${{ secrets.SSH_DIR }}
+          port: ${{ secrets.SSH_PORT }}
+          user: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
       - name: Upload documents snapshot to sourceforge
         uses: nogsantos/scp-deploy@master
         with:

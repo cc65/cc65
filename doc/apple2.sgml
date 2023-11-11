@@ -430,9 +430,10 @@ The names in the parentheses denote the symbols to be used for static linking of
   Driver for the Apple&nbsp;II Super Serial Card.
   The SSC is an extension card for the II, II+, IIe; the Apple //c and //c+ have
   the same hardware and firmware integrated.
-  It supports up to 9600 baud, requires hardware flow control (RTS/CTS) and
-  does interrupt driven receives. Speeds faster than 9600 baud aren't reachable
-  because the ROM and ProDOS IRQ handlers are too slow.
+  It supports up to 9600 baud, supports no flow control and hardware flow control
+  (RTS/CTS) and does interrupt driven receives. Speeds faster than 9600 baud
+  aren't reachable because the ROM and ProDOS IRQ handlers are too slow.
+  Software flow control (XON/XOFF) is not supported.
   Note that because of the peculiarities of the 6551 chip transmits are not
   interrupt driven, and the transceiver blocks if the receiver asserts
   flow control because of a full buffer.
@@ -449,9 +450,10 @@ The names in the parentheses denote the symbols to be used for static linking of
 
   <tag><tt/a2.gs.ser (a2_gs_ser)/</tag>
   Driver for the Apple&nbsp;IIgs serial ports (printer and modem).
-  It supports up to 9600 baud, requires hardware flow control (RTS/CTS) and
-  does interrupt driven receives. Speeds faster than 9600 baud aren't reachable
-  because the ROM and ProDOS IRQ handlers are too slow.
+  It supports up to 9600 baud, supports no flow control and hardware flow control
+  (RTS/CTS) and does interrupt driven receives. Speeds faster than 9600 baud
+  aren't reachable because the ROM and ProDOS IRQ handlers are too slow.
+  Software flow control (XON/XOFF) is not supported.
   Note that transmits are not interrupt driven, and the transceiver blocks if
   the receiver asserts flow control because of a full buffer.
 

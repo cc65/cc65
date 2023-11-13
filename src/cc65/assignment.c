@@ -44,6 +44,7 @@
 #include "scanner.h"
 #include "stackptr.h"
 #include "stdnames.h"
+#include "symentry.h"
 #include "typecmp.h"
 #include "typeconv.h"
 
@@ -82,6 +83,8 @@ static void CopyStruct (ExprDesc* LExpr, ExprDesc* RExpr)
     if (TypeCmp (ltype, RExpr->Type).C < TC_STRICT_COMPATIBLE) {
         TypeCompatibilityDiagnostic (ltype, RExpr->Type, 1,
             "Incompatible types in assignment to '%s' from '%s'");
+    } else if (SymHasConstMember (ltype->A.S)) {
+        Error ("Assignment to read only variable");
     }
 
     /* Do we copy the value directly using the primary? */
@@ -627,7 +630,7 @@ void OpAssign (const GenDesc* Gen, ExprDesc* Expr, const char* Op)
             }
         } else if (IsQualConst (ltype)) {
             /* Check for assignment to const */
-            Error ("Assignment to const");
+            Error ("Assignment to const variable");
         }
     }
 
@@ -686,7 +689,7 @@ void OpAddSubAssign (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
             Error ("Invalid lvalue in assignment");
         } else if (IsQualConst (Expr->Type)) {
             /* The left side must not be const qualified */
-            Error ("Assignment to const");
+            Error ("Assignment to const variable");
         }
     }
 

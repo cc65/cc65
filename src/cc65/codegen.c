@@ -705,7 +705,6 @@ void g_getimmed (unsigned Flags, uintptr_t Val, long Offs)
 /* Load a constant into the primary register */
 {
     unsigned char B1, B2, B3, B4;
-    unsigned      Done;
 
 
     if ((Flags & CF_CONST) != 0) {
@@ -731,40 +730,15 @@ void g_getimmed (unsigned Flags, uintptr_t Val, long Offs)
                 B3 = (unsigned char) (Val >> 16);
                 B4 = (unsigned char) (Val >> 24);
 
-                /* Remember which bytes are done */
-                Done = 0;
-
-                /* Load the value */
-                AddCodeLine ("ldx #$%02X", B2);
-                Done |= 0x02;
-                if (B2 == B3) {
-                    AddCodeLine ("stx sreg");
-                    Done |= 0x04;
-                }
-                if (B2 == B4) {
-                    AddCodeLine ("stx sreg+1");
-                    Done |= 0x08;
-                }
-                if ((Done & 0x04) == 0 && B1 != B3) {
-                    AddCodeLine ("lda #$%02X", B3);
-                    AddCodeLine ("sta sreg");
-                    Done |= 0x04;
-                }
-                if ((Done & 0x08) == 0 && B1 != B4) {
-                    AddCodeLine ("lda #$%02X", B4);
-                    AddCodeLine ("sta sreg+1");
-                    Done |= 0x08;
-                }
+                /* Load the value. Don't be too smart here and let
+                 * the optimizer do its job.
+                 */
+                AddCodeLine ("lda #$%02X", B4);
+                AddCodeLine ("sta sreg+1");
+                AddCodeLine ("lda #$%02X", B3);
+                AddCodeLine ("sta sreg");
                 AddCodeLine ("lda #$%02X", B1);
-                Done |= 0x01;
-                if ((Done & 0x04) == 0) {
-                    CHECK (B1 == B3);
-                    AddCodeLine ("sta sreg");
-                }
-                if ((Done & 0x08) == 0) {
-                    CHECK (B1 == B4);
-                    AddCodeLine ("sta sreg+1");
-                }
+                AddCodeLine ("ldx #$%02X", B2);
                 break;
 
             default:

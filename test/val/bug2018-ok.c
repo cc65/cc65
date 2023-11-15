@@ -5,6 +5,11 @@
 unsigned failures;
 
 struct X {
+    const int;                  /* Useless empty declaration */
+    const void;                 /* Useless empty declaration */
+    const struct U;             /* Useless(?) declaration */
+    const struct V { int a; };  /* Useless(?) declaration */
+
     const struct {              /* Qualifier ignored in cc65 */
         int a;
     };
@@ -14,6 +19,11 @@ struct X {
 };
 
 union Y {
+    const int;                  /* Useless empty declaration */
+    const void;                 /* Useless empty declaration */
+    const union W;              /* Useless(?) declaration */
+    const union T { int a; };   /* Useless(?) declaration */
+
     const struct {              /* Qualifier ignored in cc65 */
         int a;
     };

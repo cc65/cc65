@@ -1,10 +1,7 @@
-; Copyright (c) 2023 Rumbledethumps
 ;
-; SPDX-License-Identifier: Zlib
-; SPDX-License-Identifier: BSD-3-Clause
-; SPDX-License-Identifier: Unlicense
-
-; Boilerplate crt0.s
+; 2023, Rumbledethumps
+;
+; crt0.s
 
 .export _init, _exit
 .import _main

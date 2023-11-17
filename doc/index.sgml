@@ -175,6 +175,9 @@
   <tag><htmlurl url="plus4.html" name="plus4.html"></tag>
   Topics specific to the Commodore Plus/4.
 
+  <tag><htmlurl url="rp6502.html" name="rp6502.html"></tag>
+  Topics specific to the Picocomputer 6502.
+
   <tag><htmlurl url="supervision.html" name="supervision.html"></tag>
   Topics specific to the Watara Supervision Console.
 

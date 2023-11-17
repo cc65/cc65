@@ -1,8 +1,7 @@
-; Copyright (c) 2023 Rumbledethumps
 ;
-; SPDX-License-Identifier: Zlib
-; SPDX-License-Identifier: BSD-3-Clause
-; SPDX-License-Identifier: Unlicense
+; 2023, Rumbledethumps
+;
+; Helpers for building API shims
 
 .include "rp6502.inc"
 

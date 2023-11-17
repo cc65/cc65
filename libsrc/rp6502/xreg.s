@@ -1,9 +1,6 @@
-; Copyright (c) 2023 Rumbledethumps
 ;
-; SPDX-License-Identifier: Zlib
-; SPDX-License-Identifier: BSD-3-Clause
-; SPDX-License-Identifier: Unlicense
-
+; 2023, Rumbledethumps
+;
 ; CC65 will promote variadic char arguments to int. It will not demote longs.
 ; int __cdecl__ xreg(char device, char channel, unsigned char address, ...);
 

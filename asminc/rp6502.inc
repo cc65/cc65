@@ -1,8 +1,4 @@
-; Copyright (c) 2023 Rumbledethumps
-;
-; SPDX-License-Identifier: Zlib
-; SPDX-License-Identifier: BSD-3-Clause
-; SPDX-License-Identifier: Unlicense
+; Picocomputer 6502 general defines
 
 ; RIA UART
 RIA_READY       := $FFE0 ; TX=$80 RX=$40

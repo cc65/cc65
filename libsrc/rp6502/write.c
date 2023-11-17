@@ -1,29 +1,18 @@
-/*
- * Copyright (c) 2023 Rumbledethumps
- *
- * SPDX-License-Identifier: Zlib
- * SPDX-License-Identifier: BSD-3-Clause
- * SPDX-License-Identifier: Unlicense
- */
-
 #include <rp6502.h>
 #include <unistd.h>
 
-int __fastcall__ write(int fildes, const void *buf, unsigned count)
+int __fastcall__ write (int fildes, const void* buf, unsigned count)
 {
     int ax, total = 0;
-    while (count)
-    {
+    while (count) {
         int blockcount = (count > 256) ? 256 : count;
-        ax = write_xstack(&((char *)buf)[total], blockcount, fildes);
-        if (ax < 0)
-        {
+        ax = write_xstack (&((char*)buf)[total], blockcount, fildes);
+        if (ax < 0) {
             return ax;
         }
         total += ax;
         count -= ax;
-        if (ax < blockcount)
-        {
+        if (ax < blockcount) {
             break;
         }
     }

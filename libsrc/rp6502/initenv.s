@@ -1,8 +1,6 @@
-; Copyright (c) 2023 Rumbledethumps
 ;
-; SPDX-License-Identifier: Zlib
-; SPDX-License-Identifier: BSD-3-Clause
-; SPDX-License-Identifier: Unlicense
+; 2023, Rumbledethumps
+;
 
 .constructor initenv, 24
 .import __environ, __envcount, __envsize

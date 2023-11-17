@@ -1,10 +1,28 @@
-/*
- * Copyright (c) 2023 Rumbledethumps
- *
- * SPDX-License-Identifier: Zlib
- * SPDX-License-Identifier: BSD-3-Clause
- * SPDX-License-Identifier: Unlicense
- */
+/*****************************************************************************/
+/*                                                                           */
+/*                                 rp6502.h                                  */
+/*                                                                           */
+/*                            Picocomputer 6502                              */
+/*                                                                           */
+/*                                                                           */
+/* This software is provided 'as-is', without any expressed or implied       */
+/* warranty.  In no event will the authors be held liable for any damages    */
+/* arising from the use of this software.                                    */
+/*                                                                           */
+/* Permission is granted to anyone to use this software for any purpose,     */
+/* including commercial applications, and to alter it and redistribute it    */
+/* freely, subject to the following restrictions:                            */
+/*                                                                           */
+/* 1. The origin of this software must not be misrepresented; you must not   */
+/*    claim that you wrote the original software. If you use this software   */
+/*    in a product, an acknowledgment in the product documentation would be  */
+/*    appreciated but is not required.                                       */
+/* 2. Altered source versions must be plainly marked as such, and must not   */
+/*    be misrepresented as being the original software.                      */
+/* 3. This notice may not be removed or altered from any source              */
+/*    distribution.                                                          */
+/*                                                                           */
+/*****************************************************************************/
 
 #ifndef _RP6502_H
 #define _RP6502_H
@@ -50,29 +68,29 @@ struct __RP6502
 
 /* XSTACK helpers */
 
-void __fastcall__ ria_push_long(unsigned long val);
-void __fastcall__ ria_push_int(unsigned int val);
+void __fastcall__ ria_push_long (unsigned long val);
+void __fastcall__ ria_push_int (unsigned int val);
 #define ria_push_char(v) RIA.xstack = v
 
-long __fastcall__ ria_pop_long(void);
-int __fastcall__ ria_pop_int(void);
+long __fastcall__ ria_pop_long (void);
+int __fastcall__ ria_pop_int (void);
 #define ria_pop_char() RIA.xstack
 
 /* Set the RIA fastcall register */
 
-void __fastcall__ ria_set_axsreg(unsigned long axsreg);
-void __fastcall__ ria_set_ax(unsigned int ax);
+void __fastcall__ ria_set_axsreg (unsigned long axsreg);
+void __fastcall__ ria_set_ax (unsigned int ax);
 #define ria_set_a(v) RIA.a = v
 
 /* Run an OS operation */
 
-int __fastcall__ ria_call_int(unsigned char op);
-long __fastcall__ ria_call_long(unsigned char op);
+int __fastcall__ ria_call_int (unsigned char op);
+long __fastcall__ ria_call_long (unsigned char op);
 
 /* These run _mappederrno() on error */
 
-int __fastcall__ ria_call_int_errno(unsigned char op);
-long __fastcall__ ria_call_long_errno(unsigned char op);
+int __fastcall__ ria_call_int_errno (unsigned char op);
+long __fastcall__ ria_call_long_errno (unsigned char op);
 
 /* OS operation numbers */
 
@@ -99,15 +117,15 @@ long __fastcall__ ria_call_long_errno(unsigned char op);
 
 /* C API for the operating system. */
 
-int __cdecl__ xreg(char device, char channel, unsigned char address, ...);
-int __fastcall__ phi2(void);
-int __fastcall__ codepage(void);
-long __fastcall__ lrand(void);
-int __fastcall__ stdin_opt(unsigned long ctrl_bits, unsigned char str_length);
-int __fastcall__ read_xstack(void *buf, unsigned count, int fildes);
-int __fastcall__ read_xram(unsigned buf, unsigned count, int fildes);
-int __fastcall__ write_xstack(const void *buf, unsigned count, int fildes);
-int __fastcall__ write_xram(unsigned buf, unsigned count, int fildes);
+int __cdecl__ xreg (char device, char channel, unsigned char address, ...);
+int __fastcall__ phi2 (void);
+int __fastcall__ codepage (void);
+long __fastcall__ lrand (void);
+int __fastcall__ stdin_opt (unsigned long ctrl_bits, unsigned char str_length);
+int __fastcall__ read_xstack (void* buf, unsigned count, int fildes);
+int __fastcall__ read_xram (unsigned buf, unsigned count, int fildes);
+int __fastcall__ write_xstack (const void* buf, unsigned count, int fildes);
+int __fastcall__ write_xram (unsigned buf, unsigned count, int fildes);
 
 /* XREG location helpers */
 

@@ -4199,10 +4199,14 @@ void g_gt (unsigned flags, unsigned long val)
                         */
                         g_ne (flags, val);
                     } else if (val < 0xFFFF) {
-                        /* Use >= instead of > because the former gives better
-                        ** code on the 6502 than the latter.
-                        */
-                        g_ge (flags, val+1);
+                        if (val == 0xFF) {
+                            AddCodeLine ("cpx #$00");
+                        } else {
+                            /* Use >= instead of > because the former gives better
+                            ** code on the 6502 than the latter.
+                            */
+                            g_ge (flags, val+1);
+                        }
                     } else {
                         /* Never true */
                         Warning ("Condition is never true");
@@ -4229,6 +4233,8 @@ void g_gt (unsigned flags, unsigned long val)
                         ** is easier to optimize.
                         */
                         g_ne (flags, val);
+                    } else if (val == 0xFF) {
+                        AddCodeLine ("cpx #$00");
                     } else if (val < 0xFFFFFFFF) {
                         /* Use >= instead of > because the former gives better
                         ** code on the 6502 than the latter.
@@ -4241,7 +4247,9 @@ void g_gt (unsigned flags, unsigned long val)
                     }
                 } else {
                     /* Signed compare */
-                    if ((long) val < 0x7FFFFFFF) {
+                    if (val == 0xFF) {
+                        AddCodeLine ("cpx #$00");
+                    } else if ((long) val < 0x7FFFFFFF) {
                         g_ge (flags, val+1);
                     } else {
                         /* Never true */

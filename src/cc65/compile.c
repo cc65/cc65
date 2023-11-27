@@ -94,6 +94,8 @@ static void Parse (void)
     while (CurTok.Tok != TOK_CEOF) {
 
         DeclSpec        Spec;
+        int             NeedClean = 0;
+        unsigned        PrevErrorCount = ErrorCount;
 
         /* Check for empty statements */
         if (CurTok.Tok == TOK_SEMI) {
@@ -144,7 +146,11 @@ static void Parse (void)
             Declarator Decl;
 
             /* Read the next declaration */
-            ParseDecl (&Spec, &Decl, DM_NEED_IDENT);
+            NeedClean = ParseDecl (&Spec, &Decl, DM_NEED_IDENT);
+            if (Decl.Ident[0] == '\0') {
+                Sym = 0;
+                goto NextDecl;
+            }
 
             /* Check if we must reserve storage for the variable. We do this,
             **
@@ -310,6 +316,7 @@ static void Parse (void)
 
             }
 
+NextDecl:
             /* Check for end of declaration list */
             if (CurTok.Tok == TOK_COMMA) {
                 NextToken ();
@@ -325,6 +332,7 @@ static void Parse (void)
             /* Function */
             if (CurTok.Tok == TOK_SEMI) {
                 /* Prototype only */
+                NeedClean = 0;
                 NextToken ();
             } else if (CurTok.Tok == TOK_LCURLY) {
                 /* ISO C: The type category in a function definition cannot be
@@ -337,6 +345,7 @@ static void Parse (void)
                 }
 
                 /* Parse the function body anyways */
+                NeedClean = 0;
                 NewFunc (Sym, FuncDef);
 
                 /* Make sure we aren't omitting any work */
@@ -345,9 +354,26 @@ static void Parse (void)
 
         } else {
 
-            /* Must be followed by a semicolon */
-            ConsumeSemi ();
+            if (Sym) {
+                /* Must be followed by a semicolon */
+                if (CurTok.Tok != TOK_SEMI) {
+                    NeedClean = -1;
+                }
+                ConsumeSemi ();
+            }
 
+        }
+
+        /* Try some smart error recovery */
+        if (PrevErrorCount != ErrorCount && NeedClean < 0) {
+            /* Some fix point tokens that are used for error recovery */
+            static const token_t TokenList[] = { TOK_SEMI, TOK_RCURLY };
+
+            SmartErrorSkip ();
+            SkipTokens (TokenList, sizeof (TokenList) / sizeof (TokenList[0]));
+            if (CurTok.Tok == TOK_SEMI || CurTok.Tok == TOK_RCURLY) {
+                NextToken ();
+            }
         }
     }
 

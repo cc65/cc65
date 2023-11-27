@@ -128,11 +128,19 @@ typedef enum {
 
 
 
+int SmartErrorSkip (void);
+/* Try some smart error recovery. Skip tokens until either a comma or semicolon
+** that is not enclosed in an open parenthesis/bracket/curly brace, or until an
+** unpaired right parenthesis/bracket/curly brace is reached. Return 0 if it is
+** the former case, or -1 if it is the latter case. */
+
 Type* ParseType (Type* Type);
 /* Parse a complete type specification */
 
-void ParseDecl (const DeclSpec* Spec, Declarator* D, declmode_t Mode);
-/* Parse a variable, type or function declarator */
+int ParseDecl (const DeclSpec* Spec, Declarator* D, declmode_t Mode);
+/* Parse a variable, type or function declarator. Return -1 if this stops at
+** an unpaired right parenthesis/bracket/curly brace.
+*/
 
 void ParseDeclSpec (DeclSpec* Spec, typespec_t TSFlags, unsigned DefStorage);
 /* Parse a declaration specification */

@@ -98,11 +98,26 @@ struct Declarator {
     unsigned    Index;              /* Used to build Type */
 };
 
-/* Modes for ParseDecl */
+/* Modes for ParseDecl:
+**  - DM_NEED_IDENT means:
+**      we *must* have a type and a variable identifer.
+**  - DM_NO_IDENT means:
+**      we must have a type but no variable identifer
+**      (if there is one, it's not read).
+**  - DM_ACCEPT_IDENT means:
+**      we *may* have an identifier, or none. If it is the latter case,
+**      the type must be used as an empty declaration, or it is an error.
+**      Note: this is used for struct/union members.
+**  - DM_IGNORE_IDENT means:
+**      we *may* have an identifier. If there is an identifier,
+**      it is read, but it is no error, if there is none.
+**      Note: this is used for function parameter type lists.
+*/
 typedef enum {
-    DM_NEED_IDENT,                      /* We must have an identifier */
-    DM_NO_IDENT,                        /* We won't read an identifier */
-    DM_ACCEPT_IDENT,                    /* We will accept an id if there is one */
+    DM_NEED_IDENT,
+    DM_NO_IDENT,
+    DM_ACCEPT_IDENT,
+    DM_ACCEPT_PARAM_IDENT,
 } declmode_t;
 
 

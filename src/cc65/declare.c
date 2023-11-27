@@ -1766,7 +1766,7 @@ static void ParseAnsiParamList (FuncDesc* F)
         /* Allow parameters without a name, but remember if we had some to
         ** eventually print an error message later.
         */
-        ParseDecl (&Spec, &Decl, DM_ACCEPT_IDENT);
+        ParseDecl (&Spec, &Decl, DM_ACCEPT_PARAM_IDENT);
         if (Decl.Ident[0] == '\0') {
 
             /* Unnamed symbol. Generate a name that is not user accessible,
@@ -1886,7 +1886,7 @@ static FuncDesc* ParseFuncDecl (void)
 
 
 
-static void DirectDecl (const DeclSpec* Spec, Declarator* D, declmode_t Mode)
+static declmode_t DirectDecl (const DeclSpec* Spec, Declarator* D, declmode_t Mode)
 /* Recursively process direct declarators. Build a type array in reverse order. */
 {
     /* Read optional function or pointer qualifiers that modify the identifier
@@ -1903,61 +1903,49 @@ static void DirectDecl (const DeclSpec* Spec, Declarator* D, declmode_t Mode)
         /* Skip the star */
         NextToken ();
 
+        /* A pointer type cannot be used as an empty declaration */
+        if (Mode == DM_ACCEPT_IDENT) {
+            Mode = DM_NEED_IDENT;
+        }
+
         /* Allow const, restrict, and volatile qualifiers */
         Qualifiers |= OptionalQualifiers (Qualifiers, T_QUAL_CVR);
 
         /* Parse the type that the pointer points to */
-        DirectDecl (Spec, D, Mode);
+        Mode = DirectDecl (Spec, D, Mode);
 
         /* Add the type */
         AddTypeCodeToDeclarator (D, T_PTR | Qualifiers);
-        return;
+        return Mode;
     }
 
     if (CurTok.Tok == TOK_LPAREN) {
         NextToken ();
-        DirectDecl (Spec, D, Mode);
-        ConsumeRParen ();
-    } else {
-        /* Things depend on Mode now:
-        **  - Mode == DM_NEED_IDENT means:
-        **      we *must* have a type and a variable identifer.
-        **  - Mode == DM_NO_IDENT means:
-        **      we must have a type but no variable identifer
-        **      (if there is one, it's not read).
-        **  - Mode == DM_ACCEPT_IDENT means:
-        **      we *may* have an identifier. If there is an identifier,
-        **      it is read, but it is no error, if there is none.
+        /* An empty declaration cannot contain parentheses where an identifier
+        ** would show up if it were a non-empty declaration.
         */
-        if (Mode == DM_NO_IDENT) {
-            D->Ident[0] = '\0';
-        } else if (CurTok.Tok == TOK_IDENT) {
-            strcpy (D->Ident, CurTok.Ident);
-            NextToken ();
-        } else {
-            if (Mode == DM_NEED_IDENT) {
-                /* Some fix point tokens that are used for error recovery */
-                static const token_t TokenList[] = { TOK_COMMA, TOK_SEMI, TOK_LCURLY, TOK_RCURLY };
-
-                Error ("Identifier expected");
-
-                /* Try some smart error recovery */
-                SkipTokens (TokenList, sizeof(TokenList) / sizeof(TokenList[0]));
-
-                /* Skip curly braces */
-                if (CurTok.Tok == TOK_LCURLY) {
-                    static const token_t CurlyToken[] = { TOK_RCURLY };
-                    SkipTokens (CurlyToken, sizeof(CurlyToken) / sizeof(CurlyToken[0]));
-                    NextToken ();
-                } else if (CurTok.Tok == TOK_RCURLY) {
-                    NextToken ();
-                }
-            }
-            D->Ident[0] = '\0';
+        if (Mode == DM_ACCEPT_IDENT) {
+            Mode = DM_NEED_IDENT;
+        }
+        Mode = DirectDecl (Spec, D, Mode);
+        ConsumeRParen ();
+    } else if (CurTok.Tok == TOK_IDENT) {
+        strcpy (D->Ident, CurTok.Ident);
+        NextToken ();
+    } else {
+        D->Ident[0] = '\0';
+        if (Mode == DM_NEED_IDENT) {
+            Error ("Identifier expected");
         }
     }
 
     while (CurTok.Tok == TOK_LBRACK || CurTok.Tok == TOK_LPAREN) {
+        /* An array or function type cannot be used as an empty declaration */
+        if (Mode == DM_ACCEPT_IDENT && D->Ident[0] == '\0') {
+            Mode = DM_NEED_IDENT;
+            Error ("Identifier expected");
+        }
+
         if (CurTok.Tok == TOK_LPAREN) {
 
             /* Function declarator */
@@ -2043,6 +2031,8 @@ static void DirectDecl (const DeclSpec* Spec, Declarator* D, declmode_t Mode)
     if (Qualifiers & T_QUAL_CDECL) {
         Error ("Invalid '__cdecl__' qualifier");
     }
+
+    return Mode;
 }
 
 
@@ -2154,12 +2144,44 @@ void ParseDecl (const DeclSpec* Spec, Declarator* D, declmode_t Mode)
     }
 
     if (PrevErrorCount != ErrorCount) {
-        /* Make the declaration fictitious if is is not parsed correctly */
-        D->StorageClass |= SC_FICTITIOUS;
+        /* Some fix point tokens that are used for error recovery */
+        static const token_t TokenList[] = { TOK_COMMA, TOK_SEMI, TOK_LCURLY, TOK_RCURLY };
+
+        /* Try some smart error recovery */
+        SkipTokens (TokenList, sizeof (TokenList) / sizeof (TokenList[0]));
+
+        /* Skip curly braces */
+        if (CurTok.Tok == TOK_LCURLY) {
+            static const token_t CurlyToken[] = { TOK_RCURLY };
+            SkipTokens (CurlyToken, sizeof (CurlyToken) / sizeof (CurlyToken[0]));
+            NextToken ();
+        } else if (CurTok.Tok == TOK_RCURLY) {
+            NextToken ();
+        }
 
         if (Mode == DM_NEED_IDENT && D->Ident[0] == '\0') {
+            /* Make the declaration fictitious if is is not parsed correctly */
+            D->StorageClass |= SC_FICTITIOUS;
+
             /* Use a fictitious name for the identifier if it is missing */
-            AnonName (D->Ident, "global");
+            const char* Level = "";
+
+            switch (GetLexicalLevel ()) {
+                case LEX_LEVEL_GLOBAL:
+                    Level = "global";
+                    break;
+                case LEX_LEVEL_FUNCTION:
+                case LEX_LEVEL_BLOCK:
+                    Level = "local";
+                    break;
+                case LEX_LEVEL_STRUCT:
+                    Level = "field";
+                    break;
+                default:
+                    Level = "unknown";
+                    break;
+            }
+            AnonName (D->Ident, Level);
         }
     }
 }

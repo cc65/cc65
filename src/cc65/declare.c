@@ -1850,6 +1850,7 @@ static FuncDesc* ParseFuncDecl (void)
     }
 
     /* Parse params */
+    PushLexicalLevel (LEX_LEVEL_PARAM_LIST);
     if ((F->Flags & FD_OLDSTYLE) == 0) {
         /* New-style function */
         ParseAnsiParamList (F);
@@ -1857,6 +1858,7 @@ static FuncDesc* ParseFuncDecl (void)
         /* Old-style function */
         ParseOldStyleParamList (F);
     }
+    PopLexicalLevel ();
 
     /* Remember the last function parameter. We need it later for several
     ** purposes, for example when passing stuff to fastcall functions. Since

@@ -1221,7 +1221,14 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
     ident Ident;
 
     /* Do we have an entry with this name already? */
-    SymEntry* Entry = FindSymInTable (Tab, Name, HashStr (Name));
+    SymEntry* Entry;
+
+    /* HACK: only allows to add parameter symbols in a parameter list */
+    if ((Flags & SC_PARAM) == 0 && GetLexicalLevel () == LEX_LEVEL_PARAM_LIST) {
+        return 0;
+    }
+
+    Entry = FindSymInTable (Tab, Name, HashStr (Name));
 
     if (Entry) {
         int CheckExtern = 0;
@@ -1419,7 +1426,9 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
     /* Add an alias of the global symbol to the local symbol table */
     if (Tab == SymTab0 && SymTab != SymTab0 && Entry->Owner != SymTab && Alias == 0) {
         Alias = AddLocalSym (Name, T, SC_ALIAS, 0);
-        Alias->V.A.Field = Entry;
+        if (Alias != 0) {
+            Alias->V.A.Field = Entry;
+        }
     }
 
     /* Return the entry */

@@ -78,6 +78,7 @@ struct LexicalLevel {
 #define LEX_LEVEL_FUNCTION      2U
 #define LEX_LEVEL_BLOCK         3U
 #define LEX_LEVEL_STRUCT        4U
+#define LEX_LEVEL_PARAM_LIST    5U  /* HACK for error recovery */
 
 /* Forwards */
 struct FuncDesc;

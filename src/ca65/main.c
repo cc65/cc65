@@ -346,6 +346,10 @@ static void SetSys (const char* Sys)
             NewSymbol ("__KIM1__", 1);
             break;
 
+        case TGT_RP6502:
+            NewSymbol ("__RP6502__", 1);
+            break;
+
         default:
             AbEnd ("Invalid target name: '%s'", Sys);
 

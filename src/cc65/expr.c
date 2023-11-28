@@ -1336,10 +1336,10 @@ static void Primary (ExprDesc* E)
                     E->Name  = (uintptr_t) Sym->Name;
                 } else {
                     /* Undeclared Variable */
+                    Error ("Undeclared identifier '%s'", Ident);
                     Sym = AddLocalSym (Ident, type_int, SC_AUTO | SC_REF, 0);
                     E->Flags = E_LOC_STACK | E_RTYPE_LVAL;
                     E->Type  = type_int;
-                    Error ("Undefined symbol: '%s'", Ident);
                 }
 
             }

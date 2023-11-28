@@ -61,6 +61,7 @@ SendFreeCnt:    .res    1               ; Number of bytes in send buffer
 
 Stopped:        .res    1               ; Flow-stopped flag
 RtsOff:         .res    1
+HSType:         .res    1               ; Flow-control type
 
 RecvBuf:        .res    256             ; Receive buffers: 256 bytes
 SendBuf:        .res    256             ; Send buffers: 256 bytes
@@ -152,6 +153,11 @@ SCCBDATA   := $C03A
 ; soon with a different value, let's keep it simple.
 
 SER_FLAG   := $E10104
+
+; ------------------------------------------------------------------------
+; Channels
+CHANNEL_B              = 0
+CHANNEL_A              = 1
 
 ; ------------------------------------------------------------------------
 ; Write registers, read registers, and values that interest us
@@ -333,8 +339,10 @@ SER_OPEN:
         ; Check if the handshake setting is valid
         ldy     #SER_PARAMS::HANDSHAKE  ; Handshake
         lda     (ptr1),y
-        cmp     #SER_HS_HW              ; This is all we support
-        bne     InvParam
+        cmp     #SER_HS_SW              ; Not supported
+        beq     InvParam
+
+        sta     HSType                  ; Store flow control type
 
         ; Initialize buffers
         ldy     #$00
@@ -374,7 +382,7 @@ SER_OPEN:
         ldy     #WR_TX_RX_CTRL          ; Setup stop & parity bits
         jsr     writeSCCReg
 
-        cpx     #$00
+        cpx     #CHANNEL_B
         bne     ClockA
 ClockB:
         ldy     #WR_CLOCK_CTRL
@@ -467,7 +475,7 @@ BaudOK:
         lda     SER_FLAG                ; Get SerFlag's current value
         sta     SerFlagOrig             ; and save it
 
-        cpx     #$00
+        cpx     #CHANNEL_B
         bne     IntA
 IntB:
         ora     #SER_FLAG_CH_B          ; Inform firmware we want channel B IRQs
@@ -565,7 +573,8 @@ SER_PUT:
 
 SER_STATUS:
         ldx     Channel
-        lda     SCCBREG,x
+        ldy     #RR_INIT_STATUS
+        jsr     readSSCReg
         ldx     #$00
         sta     (ptr1)
         .assert SER_ERR_OK = 0, error
@@ -614,7 +623,12 @@ SER_IRQ:
         beq     CheckSpecial
 
         ldx     Channel
-        lda     SCCBDATA,x              ; Get byte
+        beq     ReadBdata
+        lda     SCCADATA
+        bra     ReadDone
+ReadBdata:
+        lda     SCCBDATA                ; Get byte
+ReadDone:
         ldx     RecvFreeCnt             ; Check if we have free space left
         beq     Flow                    ; Jump if no space in receive buffer
         ldy     RecvTail                ; Load buffer pointer
@@ -644,13 +658,16 @@ CheckSpecial:
         sec
         rts
 
-Flow:   ldx     Channel                 ; Assert flow control if buffer space too low
+Flow:   lda     HSType                  ; Don't touch if no flow control
+        beq     IRQDone
+
+        ldx     Channel                 ; Assert flow control if buffer space too low
         ldy     #WR_TX_CTRL
         lda     RtsOff
         jsr     writeSCCReg
 
         sta     Stopped
-        sec                             ; Interrupt handled
+IRQDone:sec                             ; Interrupt handled
 Done:   rts
 
 Special:ldx     Channel
@@ -672,7 +689,13 @@ Special:ldx     Channel
         rts
 
 BadChar:
-        lda     SCCBDATA,x              ; Remove char in error
+        cpx     #CHANNEL_B
+        beq     BadCharB
+        lda     SCCADATA
+        bra     BadCharDone
+BadCharB:
+        lda     SCCBDATA                ; Remove char in error
+BadCharDone:
         sec
         rts
 
@@ -689,7 +712,8 @@ Again:  lda     SendFreeCnt             ; Anything to send?
         bne     Quit                    ; Bail out if it is
 
 Wait:
-        lda     SCCBREG,x               ; Check that we're ready to send
+        ldy     #RR_INIT_STATUS
+        jsr     readSSCReg              ; Check that we're ready to send
         tay
         and     #INIT_STATUS_READY
         beq     NotReady
@@ -706,8 +730,13 @@ Quit:   rts
 Send:   ldy     SendHead                ; Send byte
         lda     SendBuf,y
 
-        sta     SCCBDATA,x
-
+        cpx     #CHANNEL_B
+        beq     WriteBdata
+        sta     SCCADATA
+        bra     WriteDone
+WriteBdata:
+        sta     SCCBDATA
+WriteDone:
         inc     SendHead
         inc     SendFreeCnt
         jmp     Again                   ; Continue flushing TX buffer

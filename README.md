@@ -49,8 +49,10 @@ Some of us may also be around on IRC [#cc65](https://web.libera.chat/#cc65) on l
 
 # Downloads
 
-* [Windows Snapshot](https://sourceforge.net/projects/cc65/files/cc65-snapshot-win32.zip)
+* [Windows 64bit Snapshot](https://sourceforge.net/projects/cc65/files/cc65-snapshot-win64.zip)
 
-* [Linux Snapshot DEB and RPM](https://software.opensuse.org//download.html?project=home%3Astrik&package=cc65)
+* [Windows 32bit Snapshot](https://sourceforge.net/projects/cc65/files/cc65-snapshot-win32.zip)
+
+* [Linux Snapshot DEB and RPM](https://software.opensuse.org/download.html?project=home%3Astrik&package=cc65)
 
 [![Snapshot Build](https://github.com/cc65/cc65/actions/workflows/snapshot-on-push-master.yml/badge.svg?branch=master)](https://github.com/cc65/cc65/actions/workflows/snapshot-on-push-master.yml)

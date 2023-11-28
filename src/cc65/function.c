@@ -518,11 +518,21 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
             Error ("'main' cannot be declared as __fastcall__");
         }
 
-        /* If cc65 extensions aren't enabled, don't allow a main function that
-        ** doesn't return an int.
-        */
-        if (IS_Get (&Standard) != STD_CC65 && ReturnType[0].C != T_INT) {
-            Error ("'main' must always return an int");
+        /* Check return type */
+        if (GetUnqualRawTypeCode (ReturnType) == T_INT) {
+            /* Determine if this is a main function in a C99 environment that
+            ** returns an int.
+            */
+            if (IS_Get (&Standard) >= STD_C99) {
+                C99MainFunc = 1;
+            }
+        } else {
+            /* If cc65 extensions aren't enabled, don't allow a main function
+            ** that doesn't return an int.
+            */
+            if (IS_Get (&Standard) != STD_CC65) {
+                Error ("'main' must always return an int");
+            }
         }
 
         /* Add a forced import of a symbol that is contained in the startup
@@ -539,14 +549,6 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
 
             /* The start-up code doesn't fast-call main(). */
             Func->Type->C |= T_QUAL_CDECL;
-        }
-
-        /* Determine if this is a main function in a C99 environment that
-        ** returns an int.
-        */
-        if (GetUnqualRawTypeCode (ReturnType) == T_INT &&
-            IS_Get (&Standard) == STD_C99) {
-            C99MainFunc = 1;
         }
     }
 
@@ -652,21 +654,16 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
         AnyStatement (0);
     }
 
-    /* If this is not a void function, and not the main function in a C99
-    ** environment returning int, output a warning if we didn't see a return
-    ** statement.
-    */
-    if (!F_HasVoidReturn (CurrentFunc) && !F_HasReturn (CurrentFunc) && !C99MainFunc && IS_Get (&WarnReturnType)) {
-        Warning ("Control reaches end of non-void function [-Wreturn-type]");
-    }
-
-    /* If this is the main function in a C99 environment returning an int, let
-    ** it always return zero. Note: Actual return statements jump to the return
-    ** label defined below.
-    ** The code is removed by the optimizer if unused.
-    */
-    if (C99MainFunc) {
-        g_getimmed (CF_INT | CF_CONST, 0, 0);
+    /* Check if this function is missing a return value */
+    if (!F_HasVoidReturn (CurrentFunc) && !F_HasReturn (CurrentFunc)) {
+        /* If this is the main function in a C99 environment returning an int,
+        ** let it always return zero. Otherwise output a warning.
+        */
+        if (C99MainFunc) {
+            g_getimmed (CF_INT | CF_CONST, 0, 0);
+        } else if (IS_Get (&WarnReturnType)) {
+            Warning ("Control reaches end of non-void function [-Wreturn-type]");
+        }
     }
 
     /* Output the function exit code label */

@@ -519,7 +519,7 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
 
             if (HasCurly) {
                 Error ("Excess elements in %s initializer", GetBasicTypeName (T));
-                SkipInitializer (HasCurly);
+                SkipInitializer (0);
             }
             break;
         }

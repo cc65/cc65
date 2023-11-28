@@ -55,6 +55,7 @@ void m3(unsigned char uc)
   /* testing literal multiply with same source and destination */
   vuc = uc;
   uc2 = 0;
+  uc1 = vuc; uc1 = uc1*0; if( uc1 != 0 )              failures++;
   uc1 = vuc; uc1 = uc1*1; if( uc1 != (uc2+=TESTLIT) ) failures++;
   uc1 = vuc; uc1 = uc1*2; if( uc1 != (uc2+=TESTLIT) ) failures++;
   uc1 = vuc; uc1 = uc1*3; if( uc1 != (uc2+=TESTLIT) ) failures++;

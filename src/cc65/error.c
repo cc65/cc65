@@ -61,6 +61,8 @@
 /* Count of errors/warnings */
 unsigned ErrorCount     = 0;
 unsigned WarningCount   = 0;
+unsigned RecentLineNo     = 0;
+unsigned RecentErrorCount = 0;
 
 /* Warning and error options */
 IntStack WarnEnable         = INTSTACK(1);  /* Enable warnings */
@@ -205,8 +207,16 @@ static void IntError (const char* Filename, unsigned LineNo, const char* Msg, va
     if (Line) {
         Print (stderr, 1, "Input: %.*s\n", (int) SB_GetLen (Line), SB_GetConstBuf (Line));
     }
+
     ++ErrorCount;
-    if (ErrorCount > 20) {
+    if (RecentLineNo != LineNo) {
+        RecentLineNo = LineNo;
+        RecentErrorCount = 0;
+    } else {
+        ++RecentErrorCount;
+    }
+
+    if (RecentErrorCount > 20 || ErrorCount > 200) {
         Fatal ("Too many errors");
     }
 }

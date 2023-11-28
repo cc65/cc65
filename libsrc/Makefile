@@ -33,6 +33,7 @@ TARGETS = apple2       \
           none         \
           osic1p       \
           pce          \
+          rp6502       \
           sim6502      \
           sim65c02     \
           supervision  \

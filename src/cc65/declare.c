@@ -83,6 +83,104 @@ static void ParseTypeSpec (DeclSpec* Spec, typespec_t TSFlags, int* SignednessSp
 
 
 
+static void OpenBrace (Collection* C, token_t Tok)
+/* Consume an opening parenthesis/bracket/curly brace and remember that */
+{
+    switch (Tok) {
+        case TOK_LPAREN: Tok = TOK_RPAREN; break;
+        case TOK_LBRACK: Tok = TOK_RBRACK; break;
+        case TOK_LCURLY: Tok = TOK_RCURLY; break;
+        default:         Internal ("Unexpected opening token: %02X", (unsigned)Tok);
+    }
+    CollAppend (C, (void*)Tok);
+    NextToken ();
+}
+
+
+
+static int CloseBrace (Collection* C, token_t Tok)
+/* Consume a closing parenthesis/bracket/curly brace if it is matched with an
+** opening one and return 0, or bail out and return -1 if it is not matched.
+*/
+{
+    if (CollCount (C) > 0) {
+        token_t LastTok = (token_t)CollLast (C);
+        if (LastTok == Tok) {
+            CollPop (C);
+            NextToken ();
+            return 0;
+        }
+    }
+
+    return -1;
+}
+
+
+
+int SmartErrorSkip (void)
+/* Try some smart error recovery. Skip tokens until either a comma or semicolon
+** that is not enclosed in an open parenthesis/bracket/curly brace, or until an
+** unpaired right parenthesis/bracket/curly brace is reached. Return 0 if it is
+** the former case, or -1 if it is the latter case. */
+{
+    Collection C = AUTO_COLLECTION_INITIALIZER;
+    int Res = 0;
+
+    /* Some fix point tokens that are used for error recovery */
+    static const token_t TokenList[] = { TOK_COMMA, TOK_SEMI,
+        TOK_LPAREN, TOK_RPAREN, TOK_LBRACK, TOK_RBRACK, TOK_LCURLY, TOK_RCURLY };
+
+    while (CurTok.Tok != TOK_CEOF) {
+        SkipTokens (TokenList, sizeof (TokenList) / sizeof (TokenList[0]));
+
+        switch (CurTok.Tok) {
+            case TOK_LPAREN:
+            case TOK_LBRACK:
+            case TOK_LCURLY:
+                OpenBrace (&C, CurTok.Tok);
+                break;
+
+            case TOK_RPAREN:
+            case TOK_RBRACK:
+                if (CloseBrace (&C, CurTok.Tok)) {
+                    Res = -1;
+                    goto ExitPoint;
+                }
+                break;
+
+            case TOK_RCURLY:
+                if (CloseBrace (&C, CurTok.Tok)) {
+                    Res = -1;
+                    goto ExitPoint;
+                } else if (CollCount (&C) == 0) {
+                    goto ExitPoint;
+                }
+                break;
+
+            case TOK_COMMA:
+                if (CollCount (&C) == 0) {
+                    goto ExitPoint;
+                }
+                NextToken ();
+                break;
+
+            case TOK_SEMI:
+            case TOK_CEOF:
+                Res = -1;
+                goto ExitPoint;
+
+            default:
+                Internal ("Unexpected token: %02X", (unsigned)CurTok.Tok);
+        }
+    }
+
+ExitPoint:
+    DoneCollection (&C);
+    return Res;
+}
+
+
+
 static unsigned ParseOneStorageClass (void)
 /* Parse and return a storage class specifier */
 {
@@ -1589,6 +1687,12 @@ static void ParseTypeSpec (DeclSpec* Spec, typespec_t TSFlags, int* SignednessSp
                         *SignednessSpecified = 1;
                     }
                     break;
+                } else if ((TSFlags & TS_MASK_DEFAULT_TYPE) == TS_DEFAULT_TYPE_NONE) {
+                    /* Treat this identifier as an unknown type */
+                    Error ("Unknown type name '%s'", CurTok.Ident);
+                    TypeCopy (Spec->Type, type_int);
+                    NextToken ();
+                    break;
                 }
             } else {
                 /* This is a label. Use the default type flag to end the loop
@@ -1670,14 +1774,13 @@ static void ParseOldStyleParamList (FuncDesc* F)
             NextToken ();
 
         } else {
-            /* Some fix point tokens that are used for error recovery */
-            static const token_t TokenList[] = { TOK_COMMA, TOK_RPAREN, TOK_SEMI };
-
             /* Not a parameter name */
             Error ("Identifier expected for parameter name");
 
             /* Try some smart error recovery */
-            SkipTokens (TokenList, sizeof(TokenList) / sizeof(TokenList[0]));
+            if (SmartErrorSkip () < 0) {
+                break;
+            }
         }
 
         /* Check for more parameters */
@@ -1763,12 +1866,9 @@ static void ParseOldStyleParamList (FuncDesc* F)
         ConsumeSemi ();
     }
 
-    if (PrevErrorCount != ErrorCount) {
-        /* Some fix point tokens that are used for error recovery */
-        static const token_t TokenList[] = { TOK_COMMA, TOK_SEMI };
-
+    if (PrevErrorCount != ErrorCount && CurTok.Tok != TOK_LCURLY) {
         /* Try some smart error recovery */
-        SkipTokens (TokenList, sizeof(TokenList) / sizeof(TokenList[0]));
+        SmartErrorSkip ();
     }
 }
 
@@ -1783,6 +1883,7 @@ static void ParseAnsiParamList (FuncDesc* F)
         DeclSpec    Spec;
         Declarator  Decl;
         SymEntry*   Param;
+        unsigned    PrevErrorCount = ErrorCount;
 
         /* Allow an ellipsis as last parameter */
         if (CurTok.Tok == TOK_ELLIPSIS) {
@@ -1818,7 +1919,7 @@ static void ParseAnsiParamList (FuncDesc* F)
         /* Allow parameters without a name, but remember if we had some to
         ** eventually print an error message later.
         */
-        ParseDecl (&Spec, &Decl, DM_ACCEPT_IDENT);
+        ParseDecl (&Spec, &Decl, DM_ACCEPT_PARAM_IDENT);
         if (Decl.Ident[0] == '\0') {
 
             /* Unnamed symbol. Generate a name that is not user accessible,
@@ -1849,6 +1950,13 @@ static void ParseAnsiParamList (FuncDesc* F)
 
         /* Count arguments */
         ++F->ParamCount;
+
+        if (PrevErrorCount != ErrorCount) {
+            /* Try some smart error recovery */
+            if (SmartErrorSkip () < 0) {
+                break;
+            }
+        }
 
         /* Check for more parameters */
         if (CurTok.Tok == TOK_COMMA) {
@@ -1940,7 +2048,7 @@ static FuncDesc* ParseFuncDecl (void)
 
 
 
-static void DirectDecl (const DeclSpec* Spec, Declarator* D, declmode_t Mode)
+static declmode_t DirectDecl (const DeclSpec* Spec, Declarator* D, declmode_t Mode)
 /* Recursively process direct declarators. Build a type array in reverse order. */
 {
     /* Read optional function or pointer qualifiers that modify the identifier
@@ -1957,61 +2065,49 @@ static void DirectDecl (const DeclSpec* Spec, Declarator* D, declmode_t Mode)
         /* Skip the star */
         NextToken ();
 
+        /* A pointer type cannot be used as an empty declaration */
+        if (Mode == DM_ACCEPT_IDENT) {
+            Mode = DM_NEED_IDENT;
+        }
+
         /* Allow const, restrict, and volatile qualifiers */
         Qualifiers |= OptionalQualifiers (Qualifiers, T_QUAL_CVR);
 
         /* Parse the type that the pointer points to */
-        DirectDecl (Spec, D, Mode);
+        Mode = DirectDecl (Spec, D, Mode);
 
         /* Add the type */
         AddTypeCodeToDeclarator (D, T_PTR | Qualifiers);
-        return;
+        return Mode;
     }
 
     if (CurTok.Tok == TOK_LPAREN) {
         NextToken ();
-        DirectDecl (Spec, D, Mode);
-        ConsumeRParen ();
-    } else {
-        /* Things depend on Mode now:
-        **  - Mode == DM_NEED_IDENT means:
-        **      we *must* have a type and a variable identifer.
-        **  - Mode == DM_NO_IDENT means:
-        **      we must have a type but no variable identifer
-        **      (if there is one, it's not read).
-        **  - Mode == DM_ACCEPT_IDENT means:
-        **      we *may* have an identifier. If there is an identifier,
-        **      it is read, but it is no error, if there is none.
+        /* An empty declaration cannot contain parentheses where an identifier
+        ** would show up if it were a non-empty declaration.
         */
-        if (Mode == DM_NO_IDENT) {
-            D->Ident[0] = '\0';
-        } else if (CurTok.Tok == TOK_IDENT) {
-            strcpy (D->Ident, CurTok.Ident);
-            NextToken ();
-        } else {
-            if (Mode == DM_NEED_IDENT) {
-                /* Some fix point tokens that are used for error recovery */
-                static const token_t TokenList[] = { TOK_COMMA, TOK_SEMI, TOK_LCURLY, TOK_RCURLY };
-
-                Error ("Identifier expected");
-
-                /* Try some smart error recovery */
-                SkipTokens (TokenList, sizeof(TokenList) / sizeof(TokenList[0]));
-
-                /* Skip curly braces */
-                if (CurTok.Tok == TOK_LCURLY) {
-                    static const token_t CurlyToken[] = { TOK_RCURLY };
-                    SkipTokens (CurlyToken, sizeof(CurlyToken) / sizeof(CurlyToken[0]));
-                    NextToken ();
-                } else if (CurTok.Tok == TOK_RCURLY) {
-                    NextToken ();
-                }
-            }
-            D->Ident[0] = '\0';
+        if (Mode == DM_ACCEPT_IDENT) {
+            Mode = DM_NEED_IDENT;
+        }
+        Mode = DirectDecl (Spec, D, Mode);
+        ConsumeRParen ();
+    } else if (CurTok.Tok == TOK_IDENT) {
+        strcpy (D->Ident, CurTok.Ident);
+        NextToken ();
+    } else {
+        D->Ident[0] = '\0';
+        if (Mode == DM_NEED_IDENT) {
+            Error ("Identifier expected");
         }
     }
 
     while (CurTok.Tok == TOK_LBRACK || CurTok.Tok == TOK_LPAREN) {
+        /* An array or function type cannot be used as an empty declaration */
+        if (Mode == DM_ACCEPT_IDENT && D->Ident[0] == '\0') {
+            Mode = DM_NEED_IDENT;
+            Error ("Identifier expected");
+        }
+
         if (CurTok.Tok == TOK_LPAREN) {
 
             /* Function declarator */
@@ -2097,6 +2193,8 @@ static void DirectDecl (const DeclSpec* Spec, Declarator* D, declmode_t Mode)
     if (Qualifiers & T_QUAL_CDECL) {
         Error ("Invalid '__cdecl__' qualifier");
     }
+
+    return Mode;
 }
 
 
@@ -2129,8 +2227,10 @@ Type* ParseType (Type* T)
 
 
 
-void ParseDecl (const DeclSpec* Spec, Declarator* D, declmode_t Mode)
-/* Parse a variable, type or function declarator */
+int ParseDecl (const DeclSpec* Spec, Declarator* D, declmode_t Mode)
+/* Parse a variable, type or function declarator. Return -1 if this stops at
+** an unpaired right parenthesis/bracket/curly brace.
+*/
 {
     /* Used to check if we have any errors during parsing this */
     unsigned PrevErrorCount = ErrorCount;
@@ -2181,7 +2281,7 @@ void ParseDecl (const DeclSpec* Spec, Declarator* D, declmode_t Mode)
     }
 
     /* Check a few pre-C99 things */
-    if ((Spec->Flags & DS_DEF_TYPE) != 0) {
+    if (D->Ident[0] != '\0' && (Spec->Flags & DS_DEF_TYPE) != 0) {
         /* Check and warn about an implicit int return in the function */
         if (IsTypeFunc (D->Type) && IsRankInt (GetFuncReturnType (D->Type))) {
             /* Function has an implicit int return. Output a warning if we don't
@@ -2193,7 +2293,7 @@ void ParseDecl (const DeclSpec* Spec, Declarator* D, declmode_t Mode)
             GetFuncDesc (D->Type)->Flags |= FD_OLDSTYLE_INTRET;
         }
 
-        /* For anthing that is not a function or typedef, check for an implicit
+        /* For anything that is not a function or typedef, check for an implicit
         ** int declaration.
         */
         if ((D->StorageClass & SC_FUNC) != SC_FUNC &&
@@ -2208,14 +2308,38 @@ void ParseDecl (const DeclSpec* Spec, Declarator* D, declmode_t Mode)
     }
 
     if (PrevErrorCount != ErrorCount) {
-        /* Make the declaration fictitious if is is not parsed correctly */
-        D->StorageClass |= SC_FICTITIOUS;
+        if ((Spec->Flags & DS_DEF_TYPE) == 0 && Mode == DM_NEED_IDENT && D->Ident[0] == '\0') {
+            /* Make the declaration fictitious if is is not parsed correctly */
+            D->StorageClass |= SC_FICTITIOUS;
 
-        if (Mode == DM_NEED_IDENT && D->Ident[0] == '\0') {
             /* Use a fictitious name for the identifier if it is missing */
-            AnonName (D->Ident, "global");
+            const char* Level = "";
+
+            switch (GetLexicalLevel ()) {
+                case LEX_LEVEL_GLOBAL:
+                    Level = "global";
+                    break;
+                case LEX_LEVEL_FUNCTION:
+                case LEX_LEVEL_BLOCK:
+                    Level = "local";
+                    break;
+                case LEX_LEVEL_STRUCT:
+                    Level = "field";
+                    break;
+                default:
+                    Level = "unknown";
+                    break;
+            }
+            AnonName (D->Ident, Level);
+        }
+
+        /* Try some smart error recovery */
+        if (CurTok.Tok != TOK_LCURLY || !IsTypeFunc (D->Type)) {
+            return SmartErrorSkip ();
         }
     }
+
+    return 0;
 }
 
 

@@ -102,7 +102,7 @@ static SymEntry* AsmGetSym (unsigned Arg, unsigned Type)
 
     /* Did we find a symbol with this name? */
     if (Sym == 0) {
-        Error ("Undefined symbol '%s' for argument %u", CurTok.Ident, Arg);
+        Error ("Undeclared symbol '%s' for argument %u", CurTok.Ident, Arg);
         AsmErrorSkip ();
         return 0;
     }

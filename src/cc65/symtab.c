@@ -1493,7 +1493,7 @@ void MakeZPSym (const char* Name)
     if (Entry) {
         Entry->Flags |= SC_ZEROPAGE;
     } else {
-        Error ("Undefined symbol: '%s'", Name);
+        Error ("Undeclared symbol: '%s'", Name);
     }
 }
 

@@ -983,32 +983,49 @@ static SymEntry* ParseUnionSpec (const char* Name, unsigned* DSFlags)
             /* Check for a bit-field declaration */
             FieldWidth = ParseFieldWidth (&Decl);
 
-            /* Ignore zero sized bit fields in a union */
-            if (FieldWidth == 0) {
-                goto NextMember;
-            }
-
-            /* Check for fields without a name */
+            /* Check for fields without names */
             if (Decl.Ident[0] == '\0') {
-                /* In cc65 mode, we allow anonymous structs/unions within
-                ** a union.
-                */
-                if (IS_Get (&Standard) >= STD_CC65 && IsClassStruct (Decl.Type)) {
-                    /* This is an anonymous struct or union. Copy the fields
-                    ** into the current level.
+                if (FieldWidth < 0) {
+                    /* In cc65 mode, we allow anonymous structs/unions within
+                    ** a union.
                     */
-                    AnonFieldName (Decl.Ident, "field", UnionTagEntry->V.S.ACount);
-                } else {
-                    /* A non bit-field without a name is legal but useless */
-                    Warning ("Declaration does not declare anything");
-                }
-            }
+                    SymEntry* TagEntry;
+                    if (IS_Get (&Standard) >= STD_CC65          &&
+                        IsClassStruct (Decl.Type)               &&
+                        (TagEntry = GetESUTagSym (Decl.Type))   &&
+                        SymHasAnonName (TagEntry)) {
+                        /* This is an anonymous struct or union */
+                        AnonFieldName (Decl.Ident, GetBasicTypeName (Decl.Type), UnionTagEntry->V.S.ACount);
 
-            /* Check for incomplete types including 'void' */
-            if (IsIncompleteType (Decl.Type)) {
+                        /* Ignore CVR qualifiers */
+                        if (IsQualConst (Decl.Type) || IsQualVolatile (Decl.Type) || IsQualRestrict (Decl.Type)) {
+                            Warning ("Anonymous %s qualifiers are ignored", GetBasicTypeName (Decl.Type));
+                            Decl.Type[0].C &= ~T_QUAL_CVR;
+                        }
+                    } else {
+                        /* A non bit-field without a name is legal but useless */
+                        Warning ("Declaration does not declare anything");
+
+                        goto NextMember;
+                    }
+                } else if (FieldWidth > 0) {
+                    /* A bit-field without a name will get an anonymous one */
+                    AnonName (Decl.Ident, "bit-field");
+                }
+            } else if (IsIncompleteType (Decl.Type)) {
                 Error ("Field '%s' has incomplete type '%s'",
                        Decl.Ident,
                        GetFullTypeName (Decl.Type));
+            }
+
+            /* Check for const types */
+            if (IsQualConst (Decl.Type)) {
+                Flags |= SC_HAVECONST;
+            }
+
+            /* Ignore zero sized bit fields in a union */
+            if (FieldWidth == 0) {
+                goto NextMember;
             }
 
             /* Handle sizes */
@@ -1017,7 +1034,7 @@ static SymEntry* ParseUnionSpec (const char* Name, unsigned* DSFlags)
                 UnionSize = FieldSize;
             }
 
-            /* Add a field entry to the table. */
+            /* Add a field entry to the table */
             if (FieldWidth > 0) {
                 /* For a union, allocate space for the type specified by the
                 ** bit-field.
@@ -1025,18 +1042,29 @@ static SymEntry* ParseUnionSpec (const char* Name, unsigned* DSFlags)
                 AddBitField (Decl.Ident, Decl.Type, 0, 0, FieldWidth,
                              SignednessSpecified);
             } else if (Decl.Ident[0] != '\0') {
+                /* Add the new field to the table */
                 Field = AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, 0);
-                if (IsAnonName (Decl.Ident)) {
-                    Field->V.A.ANumber = UnionTagEntry->V.S.ACount++;
-                    AliasAnonStructFields (&Decl, Field);
-                }
 
-                /* Check if the field itself has a flexible array member */
+                /* Check the new field for certain kinds of members */
                 if (IsClassStruct (Decl.Type)) {
                     SymEntry* TagEntry = GetESUTagSym (Decl.Type);
+
+                    /* Alias the fields of the anonymous member on the current level */
+                    if (IsAnonName (Decl.Ident)) {
+                        Field->V.A.ANumber = UnionTagEntry->V.S.ACount++;
+                        AliasAnonStructFields (&Decl, Field);
+                    }
+
+                    /* Check if the field itself has a flexible array member */
                     if (TagEntry && SymHasFlexibleArrayMember (TagEntry)) {
                         Field->Flags |= SC_HAVEFAM;
                         Flags        |= SC_HAVEFAM;
+                    }
+
+                    /* Check if the field itself has a const member */
+                    if (TagEntry && SymHasConstMember (TagEntry)) {
+                        Field->Flags |= SC_HAVECONST;
+                        Flags        |= SC_HAVECONST;
                     }
                 }
             }
@@ -1160,55 +1188,68 @@ static SymEntry* ParseStructSpec (const char* Name, unsigned* DSFlags)
                 }
             }
 
-            /* Apart from the above, a bit field with width 0 is not processed
-            ** further.
-            */
-            if (FieldWidth == 0) {
-                goto NextMember;
-            }
-
-            /* Check if this field is a flexible array member, and
-            ** calculate the size of the field.
-            */
-            if (IsTypeArray (Decl.Type) && GetElementCount (Decl.Type) == UNSPECIFIED) {
-                /* Array with unspecified size */
-                if (StructSize == 0) {
-                    Error ("Flexible array member cannot be first struct field");
-                }
-                FlexibleMember = 1;
-                Flags |= SC_HAVEFAM;
-
-                /* Assume zero for size calculations */
-                SetElementCount (Decl.Type, FLEXIBLE);
-            }
-
             /* Check for fields without names */
             if (Decl.Ident[0] == '\0') {
                 if (FieldWidth < 0) {
                     /* In cc65 mode, we allow anonymous structs/unions within
                     ** a struct.
                     */
-                    if (IS_Get (&Standard) >= STD_CC65 && IsClassStruct (Decl.Type)) {
+                    SymEntry* TagEntry;
+                    if (IS_Get (&Standard) >= STD_CC65          &&
+                        IsClassStruct (Decl.Type)               &&
+                        (TagEntry = GetESUTagSym (Decl.Type))   &&
+                        SymHasAnonName (TagEntry)) {
+                        /* This is an anonymous struct or union */
+                        AnonFieldName (Decl.Ident, GetBasicTypeName (Decl.Type), StructTagEntry->V.S.ACount);
 
-                        /* This is an anonymous struct or union. Copy the
-                        ** fields into the current level.
-                        */
-                        AnonFieldName (Decl.Ident, "field", StructTagEntry->V.S.ACount);
+                        /* Ignore CVR qualifiers */
+                        if (IsQualConst (Decl.Type) || IsQualVolatile (Decl.Type) || IsQualRestrict (Decl.Type)) {
+                            Warning ("Anonymous %s qualifiers are ignored", GetBasicTypeName (Decl.Type));
+                            Decl.Type[0].C &= ~T_QUAL_CVR;
+                        }
                     } else {
                         /* A non bit-field without a name is legal but useless */
                         Warning ("Declaration does not declare anything");
+
+                        goto NextMember;
                     }
-                } else {
+                } else if (FieldWidth > 0) {
                     /* A bit-field without a name will get an anonymous one */
                     AnonName (Decl.Ident, "bit-field");
                 }
+            } else {
+                /* Check if this field is a flexible array member, and
+                ** calculate the size of the field.
+                */
+                if (IsTypeArray (Decl.Type) && GetElementCount (Decl.Type) == UNSPECIFIED) {
+                    /* Array with unspecified size */
+                    if (StructSize == 0) {
+                        Error ("Flexible array member cannot be first struct field");
+                    }
+                    FlexibleMember = 1;
+                    Flags |= SC_HAVEFAM;
+
+                    /* Assume zero for size calculations */
+                    SetElementCount (Decl.Type, FLEXIBLE);
+                }
+
+                if (IsIncompleteType (Decl.Type)) {
+                    Error ("Field '%s' has incomplete type '%s'",
+                           Decl.Ident,
+                           GetFullTypeName (Decl.Type));
+                }
             }
 
-            /* Check for incomplete types including 'void' */
-            if (IsIncompleteType (Decl.Type)) {
-                Error ("Field '%s' has incomplete type '%s'",
-                       Decl.Ident,
-                       GetFullTypeName (Decl.Type));
+            /* Check for const types */
+            if (IsQualConst (Decl.Type)) {
+                Flags |= SC_HAVECONST;
+            }
+
+            /* Apart from the above, a bit field with width 0 is not processed
+            ** further.
+            */
+            if (FieldWidth == 0) {
+                goto NextMember;
             }
 
             /* Add a field entry to the table */
@@ -1223,23 +1264,34 @@ static SymEntry* ParseStructSpec (const char* Name, unsigned* DSFlags)
                              FieldWidth, SignednessSpecified);
                 BitOffs += FieldWidth;
                 CHECK (BitOffs <= CHAR_BITS * SizeOf (Decl.Type));
-                /* Add any full bytes to the struct size. */
+                /* Add any full bytes to the struct size */
                 StructSize += BitOffs / CHAR_BITS;
                 BitOffs %= CHAR_BITS;
             } else if (Decl.Ident[0] != '\0') {
+                /* Add the new field to the table */
                 Field = AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, StructSize);
-                if (IsAnonName (Decl.Ident)) {
-                    Field->V.A.ANumber = StructTagEntry->V.S.ACount++;
-                    AliasAnonStructFields (&Decl, Field);
-                }
 
-                /* Check if the field itself has a flexible array member */
+                /* Check the new field for certain kinds of members */
                 if (IsClassStruct (Decl.Type)) {
                     SymEntry* TagEntry = GetESUTagSym (Decl.Type);
+
+                    /* Alias the fields of the anonymous member on the current level */
+                    if (IsAnonName (Decl.Ident)) {
+                        Field->V.A.ANumber = StructTagEntry->V.S.ACount++;
+                        AliasAnonStructFields (&Decl, Field);
+                    }
+
+                    /* Check if the field itself has a flexible array member */
                     if (TagEntry && SymHasFlexibleArrayMember (TagEntry)) {
                         Field->Flags |= SC_HAVEFAM;
                         Flags        |= SC_HAVEFAM;
                         Error ("Invalid use of struct with flexible array member");
+                    }
+
+                    /* Check if the field itself has a const member */
+                    if (TagEntry && SymHasConstMember (TagEntry)) {
+                        Field->Flags |= SC_HAVECONST;
+                        Flags        |= SC_HAVECONST;
                     }
                 }
 

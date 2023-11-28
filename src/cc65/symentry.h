@@ -108,6 +108,7 @@ struct CodeEntry;
 #define SC_ALIAS        0x01000000U     /* Alias of global or anonymous field */
 #define SC_FICTITIOUS   0x02000000U     /* Symbol is fictitious (for error recovery) */
 #define SC_HAVEFAM      0x04000000U     /* Type has a Flexible Array Member */
+#define SC_HAVECONST    0x08000000U     /* Type has a const member */
 
 
 
@@ -276,13 +277,23 @@ INLINE int SymHasFlexibleArrayMember (const SymEntry* Sym)
 #endif
 
 #if defined(HAVE_INLINE)
+INLINE int SymHasConstMember (const SymEntry* Sym)
+/* Return true if the given entry has a const member */
+{
+    return ((Sym->Flags & SC_HAVECONST) == SC_HAVECONST);
+}
+#else
+#  define SymHasConstMember(Sym)    (((Sym)->Flags & SC_HAVECONST) == SC_HAVECONST)
+#endif
+
+#if defined(HAVE_INLINE)
 INLINE const char* SymGetAsmName (const SymEntry* Sym)
 /* Return the assembler label name for the symbol (beware: may be NULL!) */
 {
     return Sym->AsmName;
 }
 #else
-#  define SymGetAsmName(Sym)      ((Sym)->AsmName)
+#  define SymGetAsmName(Sym)        ((Sym)->AsmName)
 #endif
 
 const DeclAttr* SymGetAttr (const SymEntry* Sym, DeclAttrType AttrType);

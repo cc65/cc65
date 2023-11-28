@@ -2000,25 +2000,55 @@ void g_subeqstatic (unsigned flags, uintptr_t label, long offs,
 
         case CF_INT:
             if (flags & CF_CONST) {
-                AddCodeLine ("lda %s", lbuf);
-                AddCodeLine ("sec");
-                AddCodeLine ("sbc #$%02X", (unsigned char)val);
-                AddCodeLine ("sta %s", lbuf);
-                if (val < 0x100) {
-                    unsigned L = GetLocalLabel ();
-                    AddCodeLine ("bcs %s", LocalLabelName (L));
-                    AddCodeLine ("dec %s+1", lbuf);
-                    g_defcodelabel (L);
+                if (val == 1) {
+                    unsigned L = GetLocalLabel();
                     if ((flags & CF_NOKEEP) == 0) {
-                        AddCodeLine ("ldx %s+1", lbuf);
+                        if ((CPUIsets[CPU] & CPU_ISET_65SC02) != 0) {
+                            AddCodeLine ("lda %s", lbuf);
+                            AddCodeLine ("bne %s", LocalLabelName (L));
+                            AddCodeLine ("dec %s+1", lbuf);
+                            g_defcodelabel (L);
+                            AddCodeLine ("dea");
+                            AddCodeLine ("sta %s", lbuf);
+                            AddCodeLine ("ldx %s+1", lbuf);
+                        } else {
+                            AddCodeLine ("ldx %s", lbuf);
+                            AddCodeLine ("bne %s", LocalLabelName (L));
+                            AddCodeLine ("dec %s+1", lbuf);
+                            g_defcodelabel (L);
+                            AddCodeLine ("dex");
+                            AddCodeLine ("stx %s", lbuf);
+                            AddCodeLine ("txa");
+                            AddCodeLine ("ldx %s+1", lbuf);
+                        }
+                    } else {
+                        AddCodeLine ("lda %s", lbuf);
+                        AddCodeLine ("bne %s", LocalLabelName (L));
+                        AddCodeLine ("dec %s+1", lbuf);
+                        g_defcodelabel (L);
+                        AddCodeLine ("dec %s", lbuf);
                     }
                 } else {
-                    AddCodeLine ("lda %s+1", lbuf);
-                    AddCodeLine ("sbc #$%02X", (unsigned char)(val >> 8));
-                    AddCodeLine ("sta %s+1", lbuf);
-                    if ((flags & CF_NOKEEP) == 0) {
-                        AddCodeLine ("tax");
-                        AddCodeLine ("lda %s", lbuf);
+                    AddCodeLine ("lda %s", lbuf);
+                    AddCodeLine ("sec");
+                    AddCodeLine ("sbc #$%02X", (unsigned char)val);
+                    AddCodeLine ("sta %s", lbuf);
+                    if (val < 0x100) {
+                        unsigned L = GetLocalLabel ();
+                        AddCodeLine ("bcs %s", LocalLabelName (L));
+                        AddCodeLine ("dec %s+1", lbuf);
+                        g_defcodelabel (L);
+                        if ((flags & CF_NOKEEP) == 0) {
+                            AddCodeLine ("ldx %s+1", lbuf);
+                        }
+                    } else {
+                        AddCodeLine ("lda %s+1", lbuf);
+                        AddCodeLine ("sbc #$%02X", (unsigned char)(val >> 8));
+                        AddCodeLine ("sta %s+1", lbuf);
+                        if ((flags & CF_NOKEEP) == 0) {
+                            AddCodeLine ("tax");
+                            AddCodeLine ("lda %s", lbuf);
+                        }
                     }
                 }
             } else {
@@ -3693,7 +3723,13 @@ void g_dec (unsigned flags, unsigned long val)
             } else {
                 /* Inline the code */
                 if (val < 0x300) {
-                    if ((val & 0xFF) != 0) {
+                    if ((CPUIsets[CPU] & CPU_ISET_65SC02) != 0 && val == 1) {
+                        unsigned L = GetLocalLabel();
+                        AddCodeLine ("bne %s", LocalLabelName (L));
+                        AddCodeLine ("dex");
+                        g_defcodelabel (L);
+                        AddCodeLine ("dea");
+                    } else if ((val & 0xFF) != 0) {
                         unsigned L = GetLocalLabel();
                         AddCodeLine ("sec");
                         AddCodeLine ("sbc #$%02X", (unsigned char) val);

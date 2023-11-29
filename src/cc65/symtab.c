@@ -1023,6 +1023,7 @@ SymEntry* AddBitField (const char* Name, const Type* T, unsigned Offs,
         } else {
             Entry->Type = NewBitFieldOf (T, BitOffs, BitWidth);
         }
+        Entry->Type[0].C |= GetQualifier (T) & T_MASK_QUAL;
 
         /* Add the entry to the symbol table */
         AddSymEntry (FieldTab, Entry);

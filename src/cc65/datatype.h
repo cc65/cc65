@@ -435,8 +435,8 @@ Type* NewPointerTo (const Type* T);
 */
 
 Type* NewBitFieldOf (const Type* T, unsigned BitOffs, unsigned BitWidth);
-/* Return a type string that is "T : BitWidth" aligned on BitOffs. The type
-** string is allocated on the heap and may be freed after use.
+/* Return a type string that is "unqualified T : BitWidth" aligned on BitOffs.
+** The type string is allocated on the heap and may be freed after use.
 */
 
 const Type* AddressOf (const Type* T);

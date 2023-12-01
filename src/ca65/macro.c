@@ -53,6 +53,7 @@
 #include "pseudo.h"
 #include "toklist.h"
 #include "macro.h"
+#include "listing.h"
 
 
 
@@ -74,7 +75,8 @@ static int HT_Compare (const void* Key1, const void* Key2);
 ** than zero if Key1 is greater then Key2.
 */
 
-
+static StrBuf MakeLineFromTokens (TokNode* first);
+static char* GetTokenString (Token* T);
 
 /*****************************************************************************/
 /*                                   Data                                    */
@@ -689,6 +691,8 @@ ExpandParam:
         Mac->ParamLI = 0;
 
     }
+    /* boolean to indicate that we need to start a new macro expansion line*/
+    static int new_expand_line = 1;
 
     /* We're not expanding macro parameters. Check if we have tokens left from
     ** the macro itself.
@@ -697,7 +701,16 @@ ExpandParam:
 
         /* Use next macro token */
         TokSet (Mac->Exp);
-
+        if (ExpandMacros) {
+            if (new_expand_line) {
+                StrBuf  mac_line = MakeLineFromTokens (Mac->Exp);
+                NewListingLine (&mac_line, 0, 0);
+                new_expand_line = 0;
+            }
+            if (CurTok.Tok == TOK_SEP) {
+                new_expand_line = 1;
+            }
+        }
         /* Create new line info for this token */
         if (Mac->LI) {
             EndLine (Mac->LI);
@@ -1064,4 +1077,128 @@ void EnableDefineStyleMacros (void)
 {
     PRECONDITION (DisableDefines > 0);
     --DisableDefines;
+}
+
+static StrBuf MakeLineFromTokens (TokNode* first)
+{
+    /* This code reconstitutes a Macro line from the 'compiled' tokens*/
+    unsigned I;
+    /* string to be returned */
+    StrBuf S = STATIC_STRBUF_INITIALIZER;
+
+
+    /* prepend depth indicator */
+    for (I = 0; I < GetStackDepth (); I++) {
+        SB_AppendStr (&S, ">");
+    }
+    SB_AppendStr (&S, " ");
+
+    TokNode* tn = first;
+    while (tn) {
+        /* per token string */
+        StrBuf T = STATIC_STRBUF_INITIALIZER;
+
+        Token* token = &tn->T;
+        tn = tn->Next;
+        char* token_string;
+        /* leading white space?*/
+        if (token->WS) SB_AppendChar (&T, ' ');
+        /* is it a string of some sort?*/
+        unsigned len = SB_GetLen (&token->SVal);
+        if (len > 0) {
+            token_string = xmalloc (len + 1);
+            memcpy (token_string, SB_GetBuf (&token->SVal), len);
+            token_string[len] = 0;
+            SB_AppendStr (&T, token_string);
+            xfree (token_string);
+        } else if (token->Tok == TOK_INTCON) {
+            char ival[11]; // max size a long can be
+            snprintf (ival, 11, "%d", token->IVal);
+            SB_AppendStr (&T, ival);
+        } else if ((token_string = GetTokenString (token)) != NULL)
+        {
+            SB_AppendStr (&T, token_string);
+        }
+        SB_Append (&S, &T);
+        if (token->Tok == TOK_SEP) {
+            return S;
+        }
+    }
+    return S;
+}
+
+static char* GetTokenString (Token* T)
+{
+    switch (T->Tok) {
+
+        case TOK_ASSIGN: return ":=";       /* := */
+        case TOK_ULABEL: return ":++";      /* :++ or :-- */
+
+        case TOK_EQ:return "=";             /* = */
+        case TOK_NE: return "<>";           /* <> */
+        case TOK_LT: return "<";            /* < */
+        case TOK_GT:return ">";             /* > */
+        case TOK_LE: return "<=";           /* <= */
+        case TOK_GE:return ">=";            /* >= */
+
+                //TOK_BOOLAND,        /* .and */
+                //TOK_BOOLOR,         /* .or */
+                ///TOK_BOOLXOR,        /* .xor */
+                //TOK_BOOLNOT,        /* .not */
+
+        case TOK_PLUS: return "+";          /* + */
+        case TOK_MINUS:return "-";          /* - */
+        case TOK_MUL: return "*";           /* * */
+        case TOK_DIV: return "/";           /* / */
+        case TOK_MOD:return "!";            /* ! */
+        case TOK_OR: return "|";            /* | */
+        case TOK_XOR: return "^";           /* ^ */
+        case TOK_AND:return "&";            /* & */
+        case TOK_SHL: return "<<";          /* << */
+        case TOK_SHR: return ">>";          /* >> */
+        case TOK_NOT:return "~";            /* ~ */
+
+        case TOK_PC: return "$";            /* $ if enabled */
+        case TOK_NAMESPACE:return "::";     /* :: */
+        case TOK_DOT:return ".";            /* . */
+        case TOK_COMMA:return ",";          /* , */
+        case TOK_HASH: return "#";          /* # */
+        case TOK_COLON:return ":";          /* : */
+        case TOK_LPAREN:return "(";         /* ( */
+        case TOK_RPAREN:return ")";         /* ) */
+        case TOK_LBRACK:return "[";         /* [ */
+        case TOK_RBRACK:return "]";         /* ] */
+        case TOK_LCURLY:return "{";         /* { */
+        case TOK_RCURLY:return "}";         /* } */
+        case TOK_AT:return "@";             /* @ - in Sweet16 mode */
+
+        case TOK_OVERRIDE_ZP:return "z:";    /* z: */
+        case TOK_OVERRIDE_ABS:return "a:";   /* a: */
+        case TOK_OVERRIDE_FAR:return "f:";   /* f: */
+        default: return NULL;
+    }
+}
+StrBuf xMakeLineFromTokens (TokNode* first)
+{
+    StrBuf S = STATIC_STRBUF_INITIALIZER;
+    StrBuf T = STATIC_STRBUF_INITIALIZER;
+    SB_AppendStr (&S, ">> ");
+    TokNode* tn = first;
+    while (tn) {
+        Token* t = &tn->T;
+        tn = tn->Next;
+        char str[100];
+        int len = SB_GetLen (&t->SVal);
+        if (len > 0) {
+            memcpy (str, SB_GetBuf (&t->SVal), len);
+            str[len] = 0;
+        } else str[0] = 0;
+        SB_Printf (&T, "%s ", str);
+        SB_Append (&S, &T);
+        if (t->Tok == TOK_SEP) {
+
+            return S;
+        }
+    }
+    return S;
 }

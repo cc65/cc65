@@ -107,6 +107,7 @@ static void Usage (void)
             "  -s\t\t\t\tEnable smart mode\n"
             "  -t sys\t\t\tSet the target system\n"
             "  -v\t\t\t\tIncrease verbosity\n"
+            "  -x\t\t\t\tExpand macros\n"
             "\n"
             "Long options:\n"
             "  --auto-import\t\t\tMark unresolved symbols as import\n"
@@ -129,7 +130,8 @@ static void Usage (void)
             "  --smart\t\t\tEnable smart mode\n"
             "  --target sys\t\t\tSet the target system\n"
             "  --verbose\t\t\tIncrease verbosity\n"
-            "  --version\t\t\tPrint the assembler version\n",
+            "  --version\t\t\tPrint the assembler version\n"
+            "  --expand_macros\t\tExpand macros in the listing\n",
             ProgName);
 }
 
@@ -670,7 +672,12 @@ static void OptWarningsAsErrors (const char* Opt attribute ((unused)),
     WarningsAsErrors = 1;
 }
 
-
+static void OptExpandMacros (const char* Opt attribute ((unused)),
+    const char* Arg attribute ((unused)))
+    /* Exapnd macros in listing */
+{
+    ExpandMacros = 1;
+}
 
 static void DoPCAssign (void)
 /* Start absolute code */
@@ -695,9 +702,9 @@ static void OneLine (void)
     int           Instr = -1;
 
     /* Initialize the new listing line if we are actually reading from file
-    ** and not from internally pushed input.
+    ** and not from internally pushed input, unless expanding macros
     */
-    if (!HavePushedInput ()) {
+    if (!HavePushedInput () || ExpandMacros) {
         InitListingLine ();
     }
 
@@ -962,6 +969,7 @@ int main (int argc, char* argv [])
         { "--verbose",             0,      OptVerbose              },
         { "--version",             0,      OptVersion              },
         { "--warnings-as-errors",  0,      OptWarningsAsErrors     },
+        { "--expand_macros",       0,      OptExpandMacros         },
     };
 
     /* Name of the global name space */
@@ -1069,6 +1077,10 @@ int main (int argc, char* argv [])
                 case 'W':
                     WarnLevel = atoi (GetArg (&I, 2));
                     break;
+                case 'x':
+                    ExpandMacros = 1;
+                    break;
+
 
                 default:
                     UnknownOption (Arg);

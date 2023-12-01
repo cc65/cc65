@@ -63,7 +63,7 @@ void CheckInputStack (void);
 ** stuff on the input stack.
 */
 
-
+unsigned GetStackDepth (void);
 
 /* End of istack.h */
 

@@ -705,6 +705,7 @@ ExpandParam:
             if (new_expand_line) {
                 StrBuf  mac_line = MakeLineFromTokens (Mac->Exp);
                 NewListingLine (&mac_line, 0, 0);
+                SB_Done (&mac_line);
                 new_expand_line = 0;
             }
             if (CurTok.Tok == TOK_SEP) {
@@ -1141,10 +1142,6 @@ static char* GetTokenString (Token* T)
         case TOK_LE: return "<=";           /* <= */
         case TOK_GE:return ">=";            /* >= */
 
-                //TOK_BOOLAND,        /* .and */
-                //TOK_BOOLOR,         /* .or */
-                ///TOK_BOOLXOR,        /* .xor */
-                //TOK_BOOLNOT,        /* .not */
 
         case TOK_PLUS: return "+";          /* + */
         case TOK_MINUS:return "-";          /* - */
@@ -1177,28 +1174,4 @@ static char* GetTokenString (Token* T)
         case TOK_OVERRIDE_FAR:return "f:";   /* f: */
         default: return NULL;
     }
-}
-StrBuf xMakeLineFromTokens (TokNode* first)
-{
-    StrBuf S = STATIC_STRBUF_INITIALIZER;
-    StrBuf T = STATIC_STRBUF_INITIALIZER;
-    SB_AppendStr (&S, ">> ");
-    TokNode* tn = first;
-    while (tn) {
-        Token* t = &tn->T;
-        tn = tn->Next;
-        char str[100];
-        int len = SB_GetLen (&t->SVal);
-        if (len > 0) {
-            memcpy (str, SB_GetBuf (&t->SVal), len);
-            str[len] = 0;
-        } else str[0] = 0;
-        SB_Printf (&T, "%s ", str);
-        SB_Append (&S, &T);
-        if (t->Tok == TOK_SEP) {
-
-            return S;
-        }
-    }
-    return S;
 }

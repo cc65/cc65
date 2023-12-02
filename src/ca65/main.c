@@ -702,9 +702,11 @@ static void OneLine (void)
     int           Instr = -1;
 
     /* Initialize the new listing line if we are actually reading from file
-    ** and not from internally pushed input, unless expanding macros
+    ** and not from internally pushed input
     */
-    if (!HavePushedInput () || ExpandMacros) {
+
+    
+    if (!HavePushedInput () ) {
         InitListingLine ();
     }
 

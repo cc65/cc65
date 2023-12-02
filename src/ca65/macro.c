@@ -705,6 +705,7 @@ ExpandParam:
             if (new_expand_line) {
                 StrBuf  mac_line = MakeLineFromTokens (Mac->Exp);
                 NewListingLine (&mac_line, 0, 0);
+                InitListingLine ();
                 SB_Done (&mac_line);
                 new_expand_line = 0;
             }
@@ -1107,17 +1108,12 @@ static StrBuf MakeLineFromTokens (TokNode* first)
         /* is it a string of some sort?*/
         unsigned len = SB_GetLen (&token->SVal);
         if (len > 0) {
-            token_string = xmalloc (len + 1);
-            memcpy (token_string, SB_GetBuf (&token->SVal), len);
-            token_string[len] = 0;
-            SB_AppendStr (&T, token_string);
-            xfree (token_string);
+            SB_Append (&T, &token->SVal);
         } else if (token->Tok == TOK_INTCON) {
             char ival[12]; // max size a long can be
             snprintf (ival, sizeof(ival), "%ld", token->IVal);
             SB_AppendStr (&T, ival);
-        } else if ((token_string = GetTokenString (token)) != NULL)
-        {
+        } else if ((token_string = GetTokenString (token)) != NULL)   {
             SB_AppendStr (&T, token_string);
         }
         SB_Append (&S, &T);

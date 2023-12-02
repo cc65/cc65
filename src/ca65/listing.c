@@ -73,7 +73,7 @@ static unsigned ListBytes  = 12;        /* Number of bytes to list for one line 
 
 /* Switch the listing on/off */
 static int      ListingEnabled = 1;     /* Enabled if > 0 */
-
+static int      EverReloc = 0;
 
 
 /*****************************************************************************/
@@ -105,6 +105,7 @@ void NewListingLine (const StrBuf* Line, unsigned char File, unsigned char Depth
         L->Next         = 0;
         L->FragList     = 0;
         L->FragLast     = 0;
+        L->Seg          = ActiveSeg->Num;
         L->PC           = GetPC ();
         L->Reloc        = GetRelocMode ();
         L->File         = File;
@@ -121,6 +122,7 @@ void NewListingLine (const StrBuf* Line, unsigned char File, unsigned char Depth
             LineLast->Next = L;
         }
         LineLast = L;
+        EverReloc = EverReloc || L->Reloc;
     }
 }
 
@@ -181,6 +183,7 @@ void InitListingLine (void)
                 L = L->Next;
                 /* Set the values for this line */
                 CHECK (L != 0);
+                L->Seg           = ActiveSeg->Num;
                 L->PC            = GetPC ();
                 L->Reloc         = GetRelocMode ();
                 L->Output        = (ListingEnabled > 0);
@@ -191,6 +194,7 @@ void InitListingLine (void)
 
         /* Set the values for this line */
         CHECK (LineCur != 0);
+        LineCur->Seg        = ActiveSeg->Num;
         LineCur->PC         = GetPC ();
         LineCur->Reloc      = GetRelocMode ();
         LineCur->Output     = (ListingEnabled > 0);
@@ -276,7 +280,7 @@ static char* MakeLineHeader (char* H, const ListLine* L)
 {
     char Mode;
     char Depth;
-
+    unsigned Offset = 0;
     /* Setup the PC mode */
     Mode = (L->Reloc)? 'r' : ' ';
 
@@ -284,8 +288,18 @@ static char* MakeLineHeader (char* H, const ListLine* L)
     Depth = (L->Depth < 10)? L->Depth + '0' : '+';
 
     /* Format the line */
-    sprintf (H, "%06lX%c %c", L->PC, Mode, Depth);
-    memset (H+9, ' ', LINE_HEADER_LEN-9);
+    if (!SegList) {
+        Offset = 9;
+        sprintf (H, "%06lX%c %c", L->PC, Mode, Depth);
+    }else if (L->Reloc){
+        Offset = 12;
+        sprintf (H, "%02X.%06lX%c %c",L->Seg, L->PC, Mode, Depth);
+    } else {
+        Offset = 12;
+        sprintf (H, "   %06lX%c %c", L->PC, Mode, Depth);
+
+    }
+    memset (H + Offset, ' ', LINE_HEADER_LEN - Offset - (SegList?0:3));
 
     /* Return the buffer */
     return H;
@@ -314,7 +328,8 @@ void CreateListing (void)
     PrintPageHeader (F, LineList);
 
     /* Terminate the header buffer. The last byte will never get overwritten */
-    HeaderBuf [LINE_HEADER_LEN] = '\0';
+
+    HeaderBuf [(SegList ? LINE_HEADER_LEN : LINE_HEADER_LEN -3)] = '\0';
 
     /* Walk through all listing lines */
     L = LineList;
@@ -426,7 +441,7 @@ void CreateListing (void)
             L->PC += Chunk;
 
             /* Copy the bytes into the line */
-            P = HeaderBuf + 11;
+            P = HeaderBuf + (SegList?14: 11);
             for (I = 0; I < Chunk; ++I) {
                 *P++ = *B++;
                 *P++ = *B++;

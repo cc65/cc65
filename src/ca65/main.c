@@ -661,7 +661,12 @@ static void OptVersion (const char* Opt attribute ((unused)),
     exit(EXIT_SUCCESS);
 }
 
-
+static void OptSeglist (const char* Opt attribute ((unused)),
+    const char* Arg attribute ((unused)))
+    /* Enable segment listing */
+{
+    SegList = 1;
+}
 
 static void OptWarningsAsErrors (const char* Opt attribute ((unused)),
                                  const char* Arg attribute ((unused)))
@@ -1068,6 +1073,9 @@ int main (int argc, char* argv [])
 
                 case 'W':
                     WarnLevel = atoi (GetArg (&I, 2));
+                    break;
+                case 'S':
+                    OptSeglist (Arg, 0);
                     break;
 
                 default:

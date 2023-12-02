@@ -1112,8 +1112,8 @@ static StrBuf MakeLineFromTokens (TokNode* first)
             SB_AppendStr (&T, token_string);
             xfree (token_string);
         } else if (token->Tok == TOK_INTCON) {
-            char ival[11]; // max size a long can be
-            snprintf (ival, 11, "%d", token->IVal);
+            char ival[12]; // max size a long can be
+            snprintf (ival, sizeof(ival), "%ld", token->IVal);
             SB_AppendStr (&T, ival);
         } else if ((token_string = GetTokenString (token)) != NULL)
         {

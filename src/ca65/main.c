@@ -131,7 +131,7 @@ static void Usage (void)
             "  --target sys\t\t\tSet the target system\n"
             "  --verbose\t\t\tIncrease verbosity\n"
             "  --version\t\t\tPrint the assembler version\n"
-            "  --expand_macros\t\tExpand macros in the listing\n",
+            "  --expand-macros\t\tExpand macros in the listing\n",
             ProgName);
 }
 
@@ -975,7 +975,7 @@ int main (int argc, char* argv [])
         { "--verbose",             0,      OptVerbose              },
         { "--version",             0,      OptVersion              },
         { "--warnings-as-errors",  0,      OptWarningsAsErrors     },
-        { "--expand_macros",       0,      OptExpandMacros         },
+        { "--expand-macros",       0,      OptExpandMacros         },
     };
 
     /* Name of the global name space */

@@ -61,7 +61,6 @@ struct StrBuf;
 
 /* Length of the header of a listing line */
 #define LINE_HEADER_LEN         27
-static unsigned LineHeaderLen = 24;
 
 /* One listing line as it is stored in memory */
 typedef struct ListLine ListLine;

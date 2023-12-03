@@ -73,7 +73,6 @@ static unsigned ListBytes  = 12;        /* Number of bytes to list for one line 
 
 /* Switch the listing on/off */
 static int      ListingEnabled = 1;     /* Enabled if > 0 */
-static int      EverReloc = 0;
 
 
 /*****************************************************************************/
@@ -122,7 +121,6 @@ void NewListingLine (const StrBuf* Line, unsigned char File, unsigned char Depth
             LineLast->Next = L;
         }
         LineLast = L;
-        EverReloc = EverReloc || L->Reloc;
     }
 }
 
@@ -327,9 +325,11 @@ void CreateListing (void)
     PageNumber = 0;
     PrintPageHeader (F, LineList);
 
-    /* Terminate the header buffer. The last byte will never get overwritten */
+    /* Terminate the header buffer. The last byte will never get overwritten
+    ** the - 3 adjust is for when the segnum gets prepended to the header.
+    */
 
-    HeaderBuf [(SegList ? LINE_HEADER_LEN : LINE_HEADER_LEN -3)] = '\0';
+    HeaderBuf [(SegList ? LINE_HEADER_LEN : LINE_HEADER_LEN - 3)] = '\0';
 
     /* Walk through all listing lines */
     L = LineList;
@@ -463,7 +463,8 @@ void CreateListing (void)
         L = L->Next;
 
     }
-
+    if (SegList)
+        ListSegments (F);
     /* Close the listing file */
     (void) fclose (F);
 }

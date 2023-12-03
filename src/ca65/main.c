@@ -107,6 +107,7 @@ static void Usage (void)
             "  -s\t\t\t\tEnable smart mode\n"
             "  -t sys\t\t\tSet the target system\n"
             "  -v\t\t\t\tIncrease verbosity\n"
+            "  -S\t\t\t\tEnable segment offset listing\n"
             "\n"
             "Long options:\n"
             "  --auto-import\t\t\tMark unresolved symbols as import\n"
@@ -129,7 +130,8 @@ static void Usage (void)
             "  --smart\t\t\tEnable smart mode\n"
             "  --target sys\t\t\tSet the target system\n"
             "  --verbose\t\t\tIncrease verbosity\n"
-            "  --version\t\t\tPrint the assembler version\n",
+            "  --version\t\t\tPrint the assembler version\n"
+            "  --segment-list\t\tEnable segment offset listing\n",
             ProgName);
 }
 
@@ -967,6 +969,7 @@ int main (int argc, char* argv [])
         { "--verbose",             0,      OptVerbose              },
         { "--version",             0,      OptVersion              },
         { "--warnings-as-errors",  0,      OptWarningsAsErrors     },
+        { "--segment-list",        0,      OptSeglist              },
     };
 
     /* Name of the global name space */
@@ -1074,6 +1077,7 @@ int main (int argc, char* argv [])
                 case 'W':
                     WarnLevel = atoi (GetArg (&I, 2));
                     break;
+
                 case 'S':
                     OptSeglist (Arg, 0);
                     break;

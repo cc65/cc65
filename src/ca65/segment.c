@@ -476,7 +476,17 @@ void SegDump (void)
     printf ("\n");
 }
 
-
+void ListSegments (FILE* destination)
+{
+    /* summary of segments when seglist requested */
+    unsigned I;
+    fprintf (destination, "\nSegment summary\n\n");
+    for (I = 0; I < CollCount (&SegmentList); ++I) {
+        Segment* S = CollAtUnchecked (&SegmentList, I);
+        if(S->FragCount)
+            fprintf (destination, "Segment: %02X = %s\n", S->Num, S->Def->Name);
+    }
+}
 
 void SegInit (void)
 /* Initialize segments */

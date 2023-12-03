@@ -1132,7 +1132,7 @@ StrBuf MakeLineFromTokens (TokNode* first)
             SB_AppendStr (&T, ival);
         } else if ((token_string = GetTokenString (token)) != NULL)   {
             SB_AppendStr (&T, token_string);
-        } 
+        }
         SB_Append (&S, &T);
         if (token->Tok == TOK_SEP) {
             return S;

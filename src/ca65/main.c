@@ -676,7 +676,7 @@ static void OptExpandMacros (const char* Opt attribute ((unused)),
     const char* Arg attribute ((unused)))
     /* Expand macros in listing
     ** one -m means short listing
-    ** two means full listing 
+    ** two means full listing
     */
 {
 
@@ -709,7 +709,6 @@ static void OneLine (void)
     ** and not from internally pushed input
     */
 
-    
     if (!HavePushedInput () ) {
         InitListingLine ();
     }
@@ -899,7 +898,7 @@ static void Assemble (void)
     while (CurTok.Tok != TOK_EOF) {
         OneLine ();
     }
- 
+
 }
 
 

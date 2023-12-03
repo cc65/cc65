@@ -674,9 +674,13 @@ static void OptWarningsAsErrors (const char* Opt attribute ((unused)),
 
 static void OptExpandMacros (const char* Opt attribute ((unused)),
     const char* Arg attribute ((unused)))
-    /* Exapnd macros in listing */
+    /* Expand macros in listing
+    ** one -m means short listing
+    ** two means full listing 
+    */
 {
-    ExpandMacros = 1;
+
+    ExpandMacros++;
 }
 
 static void DoPCAssign (void)
@@ -895,6 +899,7 @@ static void Assemble (void)
     while (CurTok.Tok != TOK_EOF) {
         OneLine ();
     }
+ 
 }
 
 
@@ -1080,7 +1085,7 @@ int main (int argc, char* argv [])
                     WarnLevel = atoi (GetArg (&I, 2));
                     break;
                 case 'x':
-                    ExpandMacros = 1;
+                    ExpandMacros++;
                     break;
 
 

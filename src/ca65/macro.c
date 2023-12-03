@@ -75,8 +75,8 @@ static int HT_Compare (const void* Key1, const void* Key2);
 ** than zero if Key1 is greater then Key2.
 */
 
-static StrBuf MakeLineFromTokens (TokNode* first);
 static char* GetTokenString (Token* T);
+/* decompile a token back to a string */
 
 /*****************************************************************************/
 /*                                   Data                                    */
@@ -135,6 +135,7 @@ struct MacExp {
     TokNode*    ParamExp;       /* Node for expanding parameters */
     LineInfo*   LI;             /* Line info for the expansion */
     LineInfo*   ParamLI;        /* Line info for parameter expansion */
+    unsigned    ExpandStart;    /* First pass through expansion ?*/
 };
 
 /* Maximum number of nested macro expansions */
@@ -314,6 +315,7 @@ static MacExp* NewMacExp (Macro* M)
     E->ParamExp         = 0;
     E->LI               = 0;
     E->ParamLI          = 0;
+    E->ExpandStart      = 1; /* set up detection of first call */
 
     /* Mark the macro as expanding */
     ++M->Expansions;
@@ -703,9 +705,24 @@ ExpandParam:
         TokSet (Mac->Exp);
         if (ExpandMacros) {
             if (new_expand_line) {
-                StrBuf  mac_line = MakeLineFromTokens (Mac->Exp);
+                /* Suppress unneeded lines if short expansion
+                ** the ExpandStart is used to ensure that
+                ** the invokation line itself isnt suppress
+                ** This is becuase we are always working a line behind
+                ** Lines we want to keep are upvoted so that this downvote
+                ** will not suppress them
+                */
+                if (LineLast->FragList == 0 && ExpandMacros == 1 && !Mac->ExpandStart) {
+                    LineCur->Output--;
+                }
+                Mac->ExpandStart = 0;
+                StrBuf mac_line = MakeLineFromTokens (Mac->Exp);
                 NewListingLine (&mac_line, 0, 0);
                 InitListingLine ();
+                if (CurTok.Tok == TOK_SEGMENT) {
+                    /* upvote the lines to keep*/
+                    LineCur->Output = 2;
+                }
                 SB_Done (&mac_line);
                 new_expand_line = 0;
             }
@@ -809,6 +826,7 @@ MacEnd:
     PopInput ();
 
     /* No token available */
+    new_expand_line = 1;
     return 0;
 }
 
@@ -1080,8 +1098,7 @@ void EnableDefineStyleMacros (void)
     PRECONDITION (DisableDefines > 0);
     --DisableDefines;
 }
-
-static StrBuf MakeLineFromTokens (TokNode* first)
+StrBuf MakeLineFromTokens (TokNode* first)
 {
     /* This code reconstitutes a Macro line from the 'compiled' tokens*/
     unsigned I;
@@ -1115,7 +1132,7 @@ static StrBuf MakeLineFromTokens (TokNode* first)
             SB_AppendStr (&T, ival);
         } else if ((token_string = GetTokenString (token)) != NULL)   {
             SB_AppendStr (&T, token_string);
-        }
+        } 
         SB_Append (&S, &T);
         if (token->Tok == TOK_SEP) {
             return S;

@@ -184,7 +184,7 @@ void AddDepLabel (unsigned Addr, attr_t Attr, const char* BaseName, unsigned Off
 */
 {
     /* Allocate memory for the dependent label name */
-    unsigned NameLen = strlen (BaseName);
+    unsigned NameLen = (unsigned)strlen (BaseName);
     char*    DepName = xmalloc (NameLen + 7);   /* "+$ABCD\0" */
 
     /* Create the new name in the buffer */
@@ -220,7 +220,7 @@ static void AddLabelRange (unsigned Addr, attr_t Attr,
         const char* Format = UseHexOffs? "$%02X" : "%u";
 
         /* Allocate memory for the dependent label names */
-        unsigned NameLen = strlen (Name);
+        unsigned NameLen = (unsigned)strlen (Name);
         char*    DepName = xmalloc (NameLen + 7);       /* "+$ABCD" */
         char*    DepOffs = DepName + NameLen + 1;
 

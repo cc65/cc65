@@ -57,8 +57,8 @@ Attr* NewAttr (const char* Name, const char* Value)
 /* Create a new attribute */
 {
     /* Determine the string lengths */
-    unsigned NameLen  = strlen (Name);
-    unsigned ValueLen = strlen (Value);
+    unsigned NameLen  = (unsigned)strlen (Name);
+    unsigned ValueLen = (unsigned)strlen (Value);
 
     /* Allocate memory */
     Attr* A = xmalloc (sizeof (Attr) + ValueLen + NameLen + 1);
@@ -227,7 +227,7 @@ void SplitAddAttr (Collection* C, const char* Combined, const char* Name)
     } else {
         /* Must split name and value */
         StrBuf N = AUTO_STRBUF_INITIALIZER;
-        SB_CopyBuf (&N, Combined, Pos - Combined);
+        SB_CopyBuf (&N, Combined, (unsigned)(Pos - Combined));
         SB_Terminate (&N);
 
         /* Add the attribute */

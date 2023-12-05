@@ -288,7 +288,7 @@ void ObjWriteVar (unsigned long V)
 void ObjWriteStr (const char* S)
 /* Write a string to the object file */
 {
-    unsigned Len = strlen (S);
+    unsigned Len = (unsigned)strlen (S);
 
     /* Write the string with the length preceeded (this is easier for
     ** the reading routine than the C format since the length is known in

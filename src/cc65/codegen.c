@@ -121,9 +121,9 @@ static const char* GetLabelName (unsigned Flags, uintptr_t Label, long Offs)
         case CF_STATIC:
             /* Local static memory cell */
             if (Offs) {
-                xsprintf (Buf, sizeof (Buf), "%s%+ld", LocalDataLabelName (Label), Offs);
+                xsprintf (Buf, sizeof (Buf), "%s%+ld", LocalDataLabelName ((unsigned)Label), Offs);
             } else {
-                xsprintf (Buf, sizeof (Buf), "%s", LocalDataLabelName (Label));
+                xsprintf (Buf, sizeof (Buf), "%s", LocalDataLabelName ((unsigned)Label));
             }
             break;
 
@@ -140,9 +140,9 @@ static const char* GetLabelName (unsigned Flags, uintptr_t Label, long Offs)
             /* Literal */
             /* Static memory cell */
             if (Offs) {
-                xsprintf (Buf, sizeof (Buf), "%s%+ld", PooledLiteralLabelName (Label), Offs);
+                xsprintf (Buf, sizeof (Buf), "%s%+ld", PooledLiteralLabelName ((unsigned)Label), Offs);
             } else {
-                xsprintf (Buf, sizeof (Buf), "%s", PooledLiteralLabelName (Label));
+                xsprintf (Buf, sizeof (Buf), "%s", PooledLiteralLabelName ((unsigned)Label));
             }
             break;
 
@@ -159,9 +159,9 @@ static const char* GetLabelName (unsigned Flags, uintptr_t Label, long Offs)
         case CF_CODE:
             /* Code label location */
             if (Offs) {
-                xsprintf (Buf, sizeof (Buf), "%s%+ld", LocalLabelName (Label), Offs);
+                xsprintf (Buf, sizeof (Buf), "%s%+ld", LocalLabelName ((unsigned)Label), Offs);
             } else {
-                xsprintf (Buf, sizeof (Buf), "%s", LocalLabelName (Label));
+                xsprintf (Buf, sizeof (Buf), "%s", LocalLabelName ((unsigned)Label));
             }
             break;
 

@@ -308,7 +308,7 @@ unsigned OptPtrLoad3 (CodeSeg* S)
             !CS_RangeHasLabel (S, I+1, 5)                    &&
             !CE_HasLabel (L[7])                              &&
             /* Check the label last because this is quite costly */
-            (Len = strlen (L[0]->Arg)) > 3                   &&
+            (Len = (unsigned)strlen (L[0]->Arg)) > 3                   &&
             L[0]->Arg[0] == '<'                              &&
             L[0]->Arg[1] == '('                              &&
             strlen (L[1]->Arg) == Len                        &&
@@ -412,7 +412,7 @@ unsigned OptPtrLoad4 (CodeSeg* S)
             CE_IsCallTo (L[8], "ldauidx")                    &&
             !CE_HasLabel (L[8])                              &&
             /* Check the label last because this is quite costly */
-            (Len = strlen (L[0]->Arg)) > 3                   &&
+            (Len = (unsigned)strlen (L[0]->Arg)) > 3                   &&
             L[0]->Arg[0] == '<'                              &&
             L[0]->Arg[1] == '('                              &&
             strlen (L[1]->Arg) == Len                        &&
@@ -971,7 +971,7 @@ unsigned OptPtrLoad12 (CodeSeg* S)
         if (L[0]->OPC == OP65_LDA                               &&
             L[0]->AM == AM65_ZP                                 &&
             strncmp (L[0]->Arg, "regbank+", 8) == 0             &&
-            (Len = strlen (L[0]->Arg)) > 0                      &&
+            (Len = (unsigned)strlen (L[0]->Arg)) > 0                      &&
             CS_GetEntries (S, L+1, I+1, 14)                     &&
             !CS_RangeHasLabel (S, I+1, 7)                       &&
             !CS_RangeHasLabel (S, I+9, 5)                       &&
@@ -1100,7 +1100,7 @@ unsigned OptPtrLoad13 (CodeSeg* S)
             CS_GetEntries (S, L+1, I+1, 3)                      &&
             !CS_RangeHasLabel (S, I+1, 3)                       &&
             L[1]->OPC == OP65_LDX && L[1]->AM == AM65_ZP        &&
-            (Len = strlen (L[0]->Arg)) > 0                      &&
+            (Len = (unsigned)strlen (L[0]->Arg)) > 0                      &&
             strncmp (L[0]->Arg, L[1]->Arg, Len) == 0            &&
             strcmp (L[1]->Arg + Len, "+1") == 0                 &&
             L[2]->OPC == OP65_LDY                               &&
@@ -1173,7 +1173,7 @@ unsigned OptPtrLoad14 (CodeSeg* S)
             CS_GetEntries (S, L+1, I+1, 4)                      &&
             !CS_RangeHasLabel (S, I+1, 4)                       &&
             L[1]->OPC == OP65_LDX && L[1]->AM == AM65_ZP        &&
-            (Len = strlen (L[0]->Arg)) > 0                      &&
+            (Len = (unsigned)strlen (L[0]->Arg)) > 0                      &&
             strncmp (L[0]->Arg, L[1]->Arg, Len) == 0            &&
             strcmp (L[1]->Arg + Len, "+1") == 0                 &&
             (L[2]->Chg & REG_AX) == 0                           &&
@@ -1244,7 +1244,7 @@ unsigned OptPtrLoad15 (CodeSeg* S)
             L[0]->OPC == OP65_LDA && L[0]->AM == AM65_ZP        &&
             L[1]->OPC == OP65_LDX && L[1]->AM == AM65_ZP        &&
             !CS_RangeHasLabel (S, I+1, 2)                       &&
-            (Len = strlen (L[0]->Arg)) > 0                      &&
+            (Len = (unsigned)strlen (L[0]->Arg)) > 0                      &&
             strncmp (L[0]->Arg, L[1]->Arg, Len) == 0            &&
             strcmp (L[1]->Arg + Len, "+1") == 0) {
 
@@ -1620,7 +1620,7 @@ unsigned OptPtrLoad19 (CodeSeg* S)
 
             CodeEntry* X;
             char* Label;
-            int Len = strlen(L[4]->Arg);
+            int Len = (int)strlen(L[4]->Arg);
 
             /* Track the insertion point */
             unsigned IP = I + 12;

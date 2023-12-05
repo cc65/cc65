@@ -616,7 +616,7 @@ const OPCDesc* FindOP65 (const char* M)
     ** storage, converting it to upper case.
     */
     char Mnemo[sizeof (OPCTable[0].Mnemo)];
-    Len = strlen (M);
+    Len = (unsigned)strlen (M);
     if (Len >= sizeof (OPCTable[0].Mnemo)) {
         /* Invalid length means invalid opcode */
         return 0;

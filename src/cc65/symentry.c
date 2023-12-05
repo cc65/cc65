@@ -57,7 +57,7 @@ SymEntry* NewSymEntry (const char* Name, unsigned Flags)
 /* Create a new symbol table with the given name */
 {
     /* Get the length of the name */
-    unsigned Len = strlen (Name);
+    unsigned Len = (unsigned)strlen (Name);
 
     /* Allocate memory for the symbol entry */
     SymEntry* E = xmalloc (sizeof (SymEntry) + Len);
@@ -260,7 +260,7 @@ void SymSetAsmName (SymEntry* Sym)
     PRECONDITION (Sym->AsmName == 0);
 
     /* The assembler name starts with an underline */
-    Len = strlen (Sym->Name);
+    Len = (unsigned)strlen (Sym->Name);
     Sym->AsmName = xmalloc (Len + 2);
     Sym->AsmName[0] = '_';
     memcpy (Sym->AsmName+1, Sym->Name, Len+1);

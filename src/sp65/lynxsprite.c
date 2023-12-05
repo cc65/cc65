@@ -540,7 +540,7 @@ StrBuf* GenLynxSprite (const Bitmap* B, const Collection* A)
             signed I;
 
             /* Modify the map by content of PenPal */
-            PenColors = strlen(PenPal);
+            PenColors = (int)strlen(PenPal);
             for (I = 0; I < PenColors; I++) {
                 switch (PenPal[I]) {
             case '0':

@@ -166,7 +166,7 @@ void WriteVar (FILE* F, unsigned long V)
 void WriteStr (FILE* F, const char* S)
 /* Write a string to the file */
 {
-    unsigned Len = strlen (S);
+    unsigned Len = (unsigned)strlen (S);
     WriteVar (F, Len);
     WriteData (F, S, Len);
 }

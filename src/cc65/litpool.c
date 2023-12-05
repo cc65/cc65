@@ -468,7 +468,7 @@ void OutputGlobalLiteralPool (void)
 Literal* AddLiteral (const char* S)
 /* Add a literal string to the literal pool. Return the literal. */
 {
-    return AddLiteralBuf (S, strlen (S) + 1);
+    return AddLiteralBuf (S, (unsigned)strlen (S) + 1);
 }
 
 

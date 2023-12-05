@@ -952,7 +952,7 @@ cmp_t FindBoolCmpCond (const char* Name)
     /* Check for the correct subroutine name */
     if (strncmp (Name, "bool", 4) == 0) {
         /* Name is ok, search for the code in the table */
-        return FindCmpCond (Name+4, strlen(Name)-4);
+        return FindCmpCond (Name+4, (unsigned)strlen(Name)-4);
     } else {
         /* Not found */
         return CMP_INV;
@@ -966,7 +966,7 @@ cmp_t FindTosCmpCond (const char* Name)
 ** Return the condition code or CMP_INV on failure.
 */
 {
-    unsigned Len = strlen (Name);
+    unsigned Len = (unsigned)strlen (Name);
 
     /* Check for the correct subroutine name */
     if (strncmp (Name, "tos", 3) == 0 && strcmp (Name+Len-2, "ax") == 0) {

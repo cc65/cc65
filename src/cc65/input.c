@@ -124,7 +124,7 @@ static IFile* NewIFile (const char* Name, InputType Type)
 /* Create and return a new IFile */
 {
     /* Get the length of the name */
-    unsigned Len = strlen (Name);
+    unsigned Len = (unsigned)strlen (Name);
 
     /* Allocate a IFile structure */
     IFile* IF = (IFile*) xmalloc (sizeof (IFile) + Len);
@@ -203,7 +203,7 @@ static AFile* NewAFile (IFile* IF, FILE* F)
     ** To avoid file search overhead, we will add one path only once.
     ** This is checked by the PushSearchPath function.
     */
-    SB_CopyBuf (&Path, IF->Name, FindName (IF->Name) - IF->Name);
+    SB_CopyBuf (&Path, IF->Name, (unsigned)(FindName (IF->Name) - IF->Name));
     SB_Terminate (&Path);
     AF->SearchPath = PushSearchPath (UsrIncSearchPath, SB_GetConstBuf (&Path));
     SB_Done (&Path);

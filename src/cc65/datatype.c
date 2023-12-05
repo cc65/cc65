@@ -96,7 +96,7 @@ unsigned TypeLen (const Type* T)
     while (T->C != T_END) {
         ++T;
     }
-    return T - Start;
+    return (unsigned)(T - Start);
 }
 
 
@@ -255,10 +255,10 @@ unsigned SizeOf (const Type* T)
             return SIZEOF_LONGLONG;
 
         case T_FLOAT:
-            return SIZEOF_FLOAT;
+            return (unsigned)SIZEOF_FLOAT;
 
         case T_DOUBLE:
-            return SIZEOF_DOUBLE;
+            return (unsigned)SIZEOF_DOUBLE;
 
         case T_STRUCT:
         case T_UNION:

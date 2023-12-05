@@ -141,7 +141,7 @@ static int ConDesCompare (void* Data, const void* E1, const void* E2)
     ** the void pointers to object pointers.
     */
     ConDesDesc* CD = ((ConDesDesc*) Data);
-    int Type = CD - ConDes;
+    int Type =(int)( CD - ConDes);
     const Export* Exp1 = (const Export*) E1;
     const Export* Exp2 = (const Export*) E2;
 

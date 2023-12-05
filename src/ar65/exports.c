@@ -77,7 +77,7 @@ static HashEntry* NewHashEntry (const char* Name, const ObjData* Module)
 /* Create and return a new hash entry */
 {
     /* Get the length of the name */
-    unsigned Len = strlen (Name);
+    unsigned Len = (unsigned)strlen (Name);
 
     /* Get memory for the struct */
     HashEntry* H = xmalloc (sizeof (HashEntry) + Len);

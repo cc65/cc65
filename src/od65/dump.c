@@ -110,7 +110,7 @@ static char* TimeToStr (unsigned long Time)
     char*  S = asctime (localtime (&T));
 
     /* Remove the trailing newline */
-    unsigned Len = strlen (S);
+    unsigned Len = (unsigned)strlen (S);
     if (Len > 0 && S[Len-1] == '\n') {
         S[Len-1 ] = '\0';
     }
@@ -386,7 +386,7 @@ void DumpObjOptions (FILE* F, unsigned long Offset)
 
             case OPT_ARGSTR:
                 ArgStr = GetString (&StrPool, Val);
-                ArgLen = strlen (ArgStr);
+                ArgLen = (unsigned)strlen (ArgStr);
                 printf ("      Data:%*s\"%s\"\n", (int)(24-ArgLen), "", ArgStr);
                 break;
 
@@ -447,7 +447,7 @@ void DumpObjFiles (FILE* F, unsigned long Offset)
         const char*   Name  = GetString (&StrPool, ReadVar (F));
         unsigned long MTime = Read32 (F);
         unsigned long Size  = ReadVar (F);
-        unsigned      Len   = strlen (Name);
+        unsigned      Len   = (unsigned)strlen (Name);
 
         /* Print the header */
         printf ("    Index:%27u\n", I);
@@ -497,7 +497,7 @@ void DumpObjSegments (FILE* F, unsigned long Offset)
         unsigned long DataSize  = Read32 (F);
         unsigned long NextSeg   = ftell (F) + DataSize;
         const char*   Name      = GetString (&StrPool, ReadVar (F));
-        unsigned      Len       = strlen (Name);
+        unsigned      Len       = (unsigned)strlen (Name);
         unsigned      Flags     = ReadVar (F);
         unsigned long Size      = ReadVar (F);
         unsigned long Align     = ReadVar (F);
@@ -558,7 +558,7 @@ void DumpObjImports (FILE* F, unsigned long Offset)
         /* Read the data for one import */
         unsigned char AddrSize = Read8 (F);
         const char*   Name     = GetString (&StrPool, ReadVar (F));
-        unsigned      Len      = strlen (Name);
+        unsigned      Len      = (unsigned)strlen (Name);
 
         /* Skip both line info lists */
         SkipLineInfoList (F);
@@ -620,7 +620,7 @@ void DumpObjExports (FILE* F, unsigned long Offset)
         unsigned char AddrSize = Read8 (F);
         ReadData (F, ConDes, SYM_GET_CONDES_COUNT (Type));
         Name  = GetString (&StrPool, ReadVar (F));
-        Len   = strlen (Name);
+        Len   = (unsigned)strlen (Name);
         if (SYM_IS_CONST (Type)) {
             Value = Read32 (F);
         } else {
@@ -702,7 +702,7 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset)
         unsigned char AddrSize = Read8 (F);
         unsigned long Owner    = ReadVar (F);
         const char*   Name     = GetString (&StrPool, ReadVar (F));
-        unsigned      Len      = strlen (Name);
+        unsigned      Len      = (unsigned)strlen (Name);
         if (SYM_IS_CONST (Type)) {
             Value = Read32 (F);
         } else {
@@ -872,7 +872,7 @@ void DumpObjScopes (FILE* F, unsigned long Offset)
 
         /* Resolve and print the name */
         Name = GetString (&StrPool, ReadVar (F));
-        Len  = strlen (Name);
+        Len  = (unsigned)strlen (Name);
         printf ("      Name:%*s\"%s\"\n", (int)(24-Len), "", Name);
 
         /* Size */
@@ -930,7 +930,7 @@ void DumpObjSegSize (FILE* F, unsigned long Offset)
         unsigned long DataSize = Read32 (F);
         unsigned long NextSeg  = ftell (F) + DataSize;
         const char*   Name     = GetString (&StrPool, ReadVar (F));
-        unsigned      Len      = strlen (Name);
+        unsigned      Len      = (unsigned)strlen (Name);
 
         /* Skip segment flags, read size */
         (void) ReadVar (F);

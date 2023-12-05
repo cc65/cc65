@@ -1346,10 +1346,10 @@ static void DoIncBin (void)
         }
 
         /* Insert it into the output */
-        EmitData (Buf, BytesRead);
+        EmitData (Buf, (unsigned)BytesRead);
 
         /* Keep the counters current */
-        Count -= BytesRead;
+        Count -= (long)BytesRead;
     }
 
 Done:

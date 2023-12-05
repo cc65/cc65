@@ -363,7 +363,7 @@ static void DefineSym (const char* Def)
         ** terminator.
         */
         char* Q;
-        unsigned Len = strlen (Def)+1;
+        unsigned Len = (unsigned)strlen (Def)+1;
         char* S = (char*) xmalloc (Len);
         memcpy (S, Def, Len);
         Q = S + (P - Def);
@@ -542,7 +542,7 @@ static void OptDebugOpt (const char* Opt attribute ((unused)), const char* Arg)
         /* Remove trailing control chars. This will also remove the
         ** trailing newline.
         */
-        unsigned Len = strlen (Buf);
+        unsigned Len = (unsigned)strlen (Buf);
         while (Len > 0 && IsControl (Buf[Len-1])) {
             --Len;
         }
@@ -836,7 +836,7 @@ static void OptWarning (const char* Opt attribute ((unused)), const char* Arg)
         /* Get the next suboption */
         Pos = strchr (Arg, ',');
         if (Pos) {
-            SB_CopyBuf (&W, Arg, Pos - Arg);
+            SB_CopyBuf (&W, Arg, (unsigned)(Pos - Arg));
             Arg = Pos + 1;
         } else {
             SB_CopyStr (&W, Arg);

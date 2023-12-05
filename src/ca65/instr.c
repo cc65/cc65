@@ -1889,7 +1889,7 @@ int FindInstruction (const StrBuf* Ident)
         return -1;
     } else {
         /* Found, return the entry */
-        return ID - InsTab->Ins;
+        return (int)(ID - InsTab->Ins);
     }
 }
 

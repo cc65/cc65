@@ -144,7 +144,7 @@ static void PVArgs (CPURegs* Regs)
     while (ArgStart < ArgCount) {
         unsigned I = 0;
         const char* Arg = ArgVec[ArgStart++];
-        SP -= strlen (Arg) + 1;
+        SP -= (unsigned)strlen (Arg) + 1;
         do {
             MemWriteByte (SP + I, Arg[I]);
         }

@@ -247,7 +247,7 @@ static void CmdAddArg (CmdDesc* Cmd, const char* Arg)
 
     /* Add a copy of the new argument, allow a NULL pointer */
     if (Arg) {
-        Cmd->Args[Cmd->ArgCount++] = CmdAllocArg (Arg, strlen (Arg));
+        Cmd->Args[Cmd->ArgCount++] = CmdAllocArg (Arg, (unsigned)strlen (Arg));
     } else {
         Cmd->Args[Cmd->ArgCount++] = 0;
     }
@@ -274,7 +274,7 @@ static void CmdAddArgList (CmdDesc* Cmd, const char* ArgList)
         if (*P == '\0' || *P == ',') {
 
             /* End of argument, add it */
-            unsigned Len = P - Arg;
+            unsigned Len = (unsigned)(P - Arg);
 
             /* Expand the argument vector if needed */
             if (Cmd->ArgCount >= Cmd->ArgMax) {
@@ -408,7 +408,7 @@ static void SetTargetFiles (void)
 {
     /* Get a pointer to the system name and its length */
     const char* TargetName = GetTargetName (Target);
-    unsigned    TargetNameLen = strlen (TargetName);
+    unsigned    TargetNameLen = (unsigned)strlen (TargetName);
 
     /* Set the library file */
     TargetLib = xmalloc (TargetNameLen + 4 + 1);
@@ -437,7 +437,7 @@ static void ExecProgram (CmdDesc* Cmd)
     }
 
     /* Call the program */
-    Status = spawnvp (P_WAIT, Cmd->Name, SPAWN_ARGV_CONST_CAST Cmd->Args);
+    Status = (int)spawnvp (P_WAIT, Cmd->Name, SPAWN_ARGV_CONST_CAST Cmd->Args);
 
     /* Check the result code */
     if (Status < 0) {

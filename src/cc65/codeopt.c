@@ -432,7 +432,7 @@ static void ReadOptStats (const char* Name)
 
         /* Remove trailing white space including the line terminator */
         B = Buf;
-        Len = strlen (B);
+        Len = (unsigned)strlen (B);
         while (Len > 0 && IsSpace (B[Len-1])) {
             --Len;
         }

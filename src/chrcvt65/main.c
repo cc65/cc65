@@ -401,7 +401,7 @@ static void ConvertFile (const char* Input, const char* Output)
         Offs = OffsetBuf[0] + (OffsetBuf[1] << 8);
 
         /* Calculate the remaining data in the buffer for this character */
-        Remaining = Size - (Offs + (VectorBuf - Buf));
+        Remaining = Size - (Offs + (int)(VectorBuf - Buf));
 
         /* Check if the offset is valid */
         if (Remaining <= 0) {

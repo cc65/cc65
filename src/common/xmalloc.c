@@ -105,7 +105,7 @@ char* xstrdup (const char* S)
     if (S) {
 
         /* Get the length of the string */
-        unsigned Len = strlen (S) + 1;
+        unsigned Len = (unsigned)strlen (S) + 1;
 
         /* Allocate memory and return a copy */
         return memcpy (xmalloc (Len), S, Len);

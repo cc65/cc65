@@ -79,7 +79,7 @@ StrBuf* SB_InitFromString (StrBuf* B, const char* S)
 */
 {
     B->Allocated = 0;
-    B->Len       = strlen (S);
+    B->Len       = (unsigned)strlen (S);
     B->Index     = 0;
     B->Buf       = (char*) S;
     return B;
@@ -244,7 +244,7 @@ void SB_CopyBuf (StrBuf* Target, const char* Buf, unsigned Size)
 void SB_CopyStr (StrBuf* Target, const char* S)
 /* Copy S to Target, discarding the old contents of Target */
 {
-    SB_CopyBuf (Target, S, strlen (S));
+    SB_CopyBuf (Target, S, (unsigned)strlen (S));
 }
 #endif
 
@@ -291,7 +291,7 @@ void SB_AppendBuf (StrBuf* B, const char* S, unsigned Size)
 void SB_AppendStr (StrBuf* B, const char* S)
 /* Append a string to the end of the string buffer */
 {
-    SB_AppendBuf (B, S, strlen (S));
+    SB_AppendBuf (B, S, (unsigned)strlen (S));
 }
 #endif
 
@@ -425,7 +425,7 @@ int SB_CompareStr (const StrBuf* S1, const char* S2)
 /* Do a lexical compare of S1 and S2. See strcmp for result codes. */
 {
     int Result;
-    unsigned S2Len = strlen (S2);
+    unsigned S2Len = (unsigned)strlen (S2);
     if (S1->Len < S2Len) {
         Result = memcmp (S1->Buf, S2, S1->Len);
         if (Result == 0) {

@@ -112,7 +112,7 @@ void AsmInc (const char* Filename, char CommentStart, int IgnoreUnknown)
         }
 
         /* Remove trailing whitespace */
-        Len = strlen (L);
+        Len = (unsigned)strlen (L);
         while (Len > 0 && IsSpace (L[Len-1])) {
             --Len;
         }

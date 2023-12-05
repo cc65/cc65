@@ -1843,7 +1843,7 @@ static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, M
                 ++Idx;
 
                 /* May be used for later concatenation */
-                TokLen = strlen (Ident);
+                TokLen = (unsigned)strlen (Ident);
             }
 
             /* Special casing for 'L' prefixing '#' */
@@ -2186,7 +2186,7 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
                                 if ((E->Flags & MES_FIRST_TOKEN) != 0) {
                                     E->Flags |= MES_BEGIN_WITH_IDENT;
                                 }
-                                ME_SetTokLens (E, strlen (M->Name));
+                                ME_SetTokLens (E, (unsigned)strlen (M->Name));
                             }
 
                             /* Since we have already got on hold of the next
@@ -2317,7 +2317,7 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
                     if ((E->Flags & MES_FIRST_TOKEN) != 0) {
                         E->Flags |= MES_BEGIN_WITH_IDENT;
                     }
-                    ME_SetTokLens (E, strlen (Ident));
+                    ME_SetTokLens (E, (unsigned)strlen (Ident));
                 }
             }
         } else {
@@ -2370,7 +2370,7 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
                         */
                         if (IsIdent (CurC)) {
                             /* Memorize the previous pp-token and check it later */
-                            LazyCheckNextPPTok (Target, strlen (Ident));
+                            LazyCheckNextPPTok (Target, (unsigned)strlen (Ident));
                         }
                     } else {
                         SB_AppendChar (Target, CurC);
@@ -2485,7 +2485,7 @@ static int ParseMacroReplacement (StrBuf* Source, Macro* M)
             SB_AppendStr (&M->Replacement, Ident);
         } else {
             if (M->ParamCount >= 0 && GetPunc (Ident)) {
-                Len = strlen (Ident);
+                Len = (unsigned)strlen (Ident);
                 /* Check for # */
                 if (Len == 1 && Ident[0] == '#') {
                     HasWhiteSpace = SkipWhitespace (0);

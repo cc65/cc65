@@ -1232,7 +1232,7 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             size_t Len = strnlen (GetLiteralStr (Arg.V.LVal), GetLiteralSize (Arg.V.LVal) - 1);
 
             /* Constant string literal */
-            ED_MakeConstAbs (Expr, Len, type_size_t);
+            ED_MakeConstAbs (Expr, (long)Len, type_size_t);
 
             /* We don't need the literal any longer */
             ReleaseLiteral (Arg.V.LVal);
@@ -1391,7 +1391,7 @@ int FindStdFunc (const char* Name)
     if (D == 0) {
         return -1;
     } else {
-        return D - StdFuncs;
+        return (int)(D - StdFuncs);
     }
 }
 

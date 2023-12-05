@@ -140,7 +140,7 @@ void LoadCode (void)
     }
 
     /* Read from the file and remember the number of bytes read */
-    Count = fread (CodeBuf + StartAddr, 1, MaxCount, F);
+    Count = (long)fread (CodeBuf + StartAddr, 1, MaxCount, F);
     if (ferror (F) || Count != MaxCount) {
         Error ("Error reading from '%s': %s", InFile, strerror (errno));
     }

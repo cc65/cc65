@@ -268,7 +268,7 @@ static void fillOut (char *name, int len, char *filler)
     setLen (name, len);
     fprintf (outputSFile, "\t.byte \"%s\"\n", name);
 
-    a = strlen (name);
+    a = (int)strlen (name);
     if (a < len) {
         fprintf (outputSFile, "\t.res  (%i - %i), %s\n", len, a, filler);
     }

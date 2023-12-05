@@ -55,7 +55,7 @@ static int MemAccess (CodeSeg* S, unsigned From, unsigned To, const CodeEntry* N
 /* Checks a range of code entries if there are any memory accesses to N->Arg */
 {
     /* Get the length of the argument */
-    unsigned NLen = strlen (N->Arg);
+    unsigned NLen = (unsigned)strlen (N->Arg);
 
     /* What to check for? */
     enum {
@@ -97,7 +97,7 @@ static int MemAccess (CodeSeg* S, unsigned From, unsigned To, const CodeEntry* N
                 return 1;
             }
 
-            ELen = strlen (E->Arg);
+            ELen = (unsigned)strlen (E->Arg);
             if ((What & Base) != 0) {
                 if (ELen == NLen - 2 && strncmp (E->Arg, N->Arg, NLen-2) == 0) {
                     /* Found an access */

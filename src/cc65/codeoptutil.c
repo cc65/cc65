@@ -973,7 +973,7 @@ int IsRegVar (StackOpData* D)
     }
 
     /* Must be the same zp loc with high byte in X */
-    Len = strlen (LoadA->Arg);
+    Len = (unsigned)strlen (LoadA->Arg);
     if (strncmp (LoadA->Arg, LoadX->Arg, Len) != 0      ||
         strcmp (LoadX->Arg + Len, "+1") != 0) {
         return 0;

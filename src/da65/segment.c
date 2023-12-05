@@ -80,7 +80,7 @@ void AddAbsSegment (unsigned Start, unsigned End, const char* Name)
 /* Add an absolute segment to the segment table */
 {
     /* Get the length of the name */
-    unsigned Len = strlen (Name);
+    unsigned Len = (unsigned)strlen (Name);
 
     /* Create a new segment */
     Segment* S = xmalloc (sizeof (Segment) + Len);

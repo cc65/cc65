@@ -562,7 +562,7 @@ int NewInputFile (const char* Name)
     SB_Init (&S->V.File.Line);
 
     /* Push the path for this file onto the include search lists */
-    SB_CopyBuf (&Path, Name, FindName (Name) - Name);
+    SB_CopyBuf (&Path, Name, (unsigned)(FindName (Name) - Name));
     SB_Terminate (&Path);
     S->V.File.IncSearchPath = PushSearchPath (IncSearchPath, SB_GetConstBuf (&Path));
     S->V.File.BinSearchPath = PushSearchPath (BinSearchPath, SB_GetConstBuf (&Path));

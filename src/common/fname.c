@@ -52,7 +52,7 @@ const char* FindExt (const char* Name)
     const char* S;
 
     /* Get the length of the name */
-    unsigned Len = strlen (Name);
+    unsigned Len = (unsigned)strlen (Name);
     if (Len < 2) {
         return 0;
     }
@@ -81,7 +81,7 @@ const char* FindName (const char* Path)
 */
 {
     /* Get the length of the name */
-    int Len = strlen (Path);
+    int Len = (int)strlen (Path);
 
     /* Search for the path separator */
     while (Len > 0 && Path[Len-1] != '\\' && Path[Len-1] != '/') {

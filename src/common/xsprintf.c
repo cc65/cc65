@@ -191,7 +191,7 @@ static void ToStr (PrintfCtrl* P, uintmax_t Val)
         *S++ = P->CharTable[Val % P->Base];
         Val /= P->Base;
     }
-    P->ArgLen = S - P->ArgBuf;
+    P->ArgLen = (int)(S - P->ArgBuf);
 }
 
 
@@ -316,10 +316,10 @@ static void FormatStr (PrintfCtrl* P, const char* Val)
             Len = P->Prec;
         } else {
             /* Terminating zero found */
-            Len = S - Val;
+            Len = (int)(S - Val);
         }
     } else {
-        Len = strlen (Val);
+        Len = (int)strlen (Val);
     }
 
     /* Determine the width padding needed */
@@ -352,13 +352,13 @@ static void StoreOffset (PrintfCtrl* P)
 /* Store the current output offset (%n format spec) */
 {
     switch (P->LengthMod) {
-        case lmChar:     *va_arg (P->ap, int*)       = P->BufFill; break;
-        case lmShort:    *va_arg (P->ap, int*)       = P->BufFill; break;
-        case lmInt:      *va_arg (P->ap, int*)       = P->BufFill; break;
-        case lmLong:     *va_arg (P->ap, long*)      = P->BufFill; break;
-        case lmIntMax:   *va_arg (P->ap, intmax_t*)  = P->BufFill; break;
-        case lmSizeT:    *va_arg (P->ap, size_t*)    = P->BufFill; break;
-        case lmPtrDiffT: *va_arg (P->ap, ptrdiff_t*) = P->BufFill; break;
+        case lmChar:     *va_arg (P->ap, int*)       = (int)P->BufFill; break;
+        case lmShort:    *va_arg (P->ap, int*)       = (int)P->BufFill; break;
+        case lmInt:      *va_arg (P->ap, int*)       = (int)P->BufFill; break;
+        case lmLong:     *va_arg (P->ap, long*)      = (int)P->BufFill; break;
+        case lmIntMax:   *va_arg (P->ap, intmax_t*)  = (int)P->BufFill; break;
+        case lmSizeT:    *va_arg (P->ap, size_t*)    = (int)P->BufFill; break;
+        case lmPtrDiffT: *va_arg (P->ap, ptrdiff_t*) = (int)P->BufFill; break;
         default: FAIL ("Invalid size modifier for %n format spec. in xvsnprintf()");
     }
 }
@@ -638,7 +638,7 @@ int xvsnprintf (char* Buf, size_t Size, const char* Format, va_list ap)
     ** Beware: The terminating zero is not counted for the function result!
     */
     AddChar (&P, '\0');
-    return P.BufFill - 1;
+    return (int)(P.BufFill - 1);
 }
 
 

@@ -427,7 +427,7 @@ int ParseOpcArgStr (const char* Arg, unsigned short* ArgInfo, struct StrBuf* Nam
             if (NameEnd == 0 || NameEnd > OffsetPart) {
                 NameEnd = OffsetPart;
             }
-            SB_CopyBuf (Name, Arg, NameEnd - Arg);
+            SB_CopyBuf (Name, Arg, (unsigned)(NameEnd - Arg));
             SB_Terminate (Name);
 
         } else {
@@ -435,7 +435,7 @@ int ParseOpcArgStr (const char* Arg, unsigned short* ArgInfo, struct StrBuf* Nam
             if (Parentheses == 0) {
                 SB_CopyStr (Name, Arg);
             } else {
-                SB_CopyBuf (Name, Arg, End - Arg);
+                SB_CopyBuf (Name, Arg, (unsigned)(End - Arg));
             }
             SB_Terminate (Name);
         }

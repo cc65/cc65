@@ -74,7 +74,7 @@ Macro* NewMacro (const char* Name)
 */
 {
     /* Get the length of the macro name */
-    unsigned Len = strlen (Name);
+    unsigned Len = (unsigned)strlen (Name);
 
     /* Allocate the structure */
     Macro* M = (Macro*) xmalloc (sizeof(Macro) + Len);

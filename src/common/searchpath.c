@@ -73,7 +73,7 @@ static char* CleanupPath (const char* Path)
     char*    NewPath;
 
     /* Get the length of the path */
-    Len = strlen (Path);
+    Len = (unsigned)strlen (Path);
 
     /* Check for a trailing path separator and remove it */
     if (Len > 0 && (Path[Len-1] == '\\' || Path[Len-1] == '/')) {

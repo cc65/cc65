@@ -272,7 +272,7 @@ static IntStack* GetWarning (StrBuf* B)
 static int HasStr (StrBuf* B, const char* E)
 /* Checks if E follows in B. If so, skips it and returns true */
 {
-    unsigned Len = strlen (E);
+    unsigned Len = (unsigned)strlen (E);
     if (SB_GetLen (B) - SB_GetIndex (B) >= Len) {
         if (strncmp (SB_GetConstBuf (B) + SB_GetIndex (B), E, Len) == 0) {
             /* Found */

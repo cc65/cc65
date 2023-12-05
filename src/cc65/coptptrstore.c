@@ -111,7 +111,7 @@ static const char* LoadAXZP (CodeSeg* S, unsigned I)
         L[1]->OPC == OP65_LDX                                   &&
         L[1]->AM == AM65_ZP                                     &&
         !CE_HasLabel (L[1])                                     &&
-        (Len = strlen (L[0]->Arg)) == strlen (L[1]->Arg) - 2    &&
+        (Len = (unsigned)strlen (L[0]->Arg)) == strlen (L[1]->Arg) - 2    &&
         memcmp (L[0]->Arg, L[1]->Arg, Len) == 0                 &&
         L[1]->Arg[Len] == '+'                                   &&
         L[1]->Arg[Len+1] == '1') {
@@ -196,7 +196,7 @@ static const char* LoadAXImm (CodeSeg* S, unsigned I)
     }
 
     /* Check for a load of a label address */
-    if ((Len = strlen (ALoad->Arg)) > 3                         &&
+    if ((Len = (unsigned)strlen (ALoad->Arg)) > 3                         &&
         ALoad->Arg[0] == '<'                                    &&
         ALoad->Arg[1] == '('                                    &&
         strlen (XLoad->Arg) == Len                              &&
@@ -703,7 +703,7 @@ unsigned OptPtrStore3 (CodeSeg* S)
                     !CE_HasLabel (P[1])   &&
                     strncmp (P[0]->Arg, "regbank+", 8) == 0) {
 
-                    unsigned Len = strlen (P[0]->Arg);
+                    unsigned Len = (unsigned)strlen (P[0]->Arg);
 
                     if (strncmp (P[0]->Arg, P[1]->Arg, Len) == 0 &&
                         P[1]->Arg[Len+0] == '+'                  &&

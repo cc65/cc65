@@ -126,7 +126,7 @@ static void ExpandFile (CmdLine* L, const char* Name)
         /* Skip trailing whitespace (this will also kill the newline that is
         ** appended by fgets().
         */
-        unsigned Len = strlen (Buf);
+        unsigned Len = (unsigned)strlen (Buf);
         while (Len > 0 && IsSpace (Buf [Len-1])) {
             --Len;
         }

@@ -892,7 +892,7 @@ static void O65WriteImports (O65Desc* D)
         /* Get the name */
         const char* Name = GetString (ExtSymName (S));
         /* And write it to the output file */
-        WriteData (D->F, Name, strlen (Name) + 1);
+        WriteData (D->F, Name, (unsigned)strlen (Name) + 1);
         /* Next symbol */
         S = ExtSymNext (S);
     }
@@ -991,7 +991,7 @@ static void O65WriteExports (O65Desc* D)
         }
 
         /* Write the name to the output file */
-        WriteData (D->F, Name, strlen (Name) + 1);
+        WriteData (D->F, Name, (unsigned)strlen (Name) + 1);
 
         /* Output the segment id followed by the literal value */
         Write8 (D->F, SegmentID);
@@ -1383,16 +1383,16 @@ void O65WriteTarget (O65Desc* D, File* F)
     */
     T = time (0);
     strcpy (OptBuf, ctime (&T));
-    OptLen = strlen (OptBuf);
+    OptLen = (unsigned)strlen (OptBuf);
     while (OptLen > 0 && IsControl (OptBuf[OptLen-1])) {
         --OptLen;
     }
     OptBuf[OptLen] = '\0';
     O65SetOption (D, O65OPT_TIMESTAMP, OptBuf, OptLen + 1);
     sprintf (OptBuf, "ld65 V%s", GetVersionAsString ());
-    O65SetOption (D, O65OPT_ASM, OptBuf, strlen (OptBuf) + 1);
+    O65SetOption (D, O65OPT_ASM, OptBuf, (unsigned)strlen (OptBuf) + 1);
     Name = FindName (D->Filename);
-    O65SetOption (D, O65OPT_FILENAME, Name, strlen (Name) + 1);
+    O65SetOption (D, O65OPT_FILENAME, Name, (unsigned)strlen (Name) + 1);
 
     /* Write the header */
     O65WriteHeader (D);

@@ -40,7 +40,7 @@ OPTIONS = g O Os Osi Osir Osr Oi Oir Or
 ISEQUAL = ..$S..$Stestwrk$Sisequal$(EXE)
 
 CC = gcc
-CFLAGS = -O2 -Wall -W -Wextra -funsigned-char -fwrapv -fno-strict-overflow
+CFLAGS = -std=c89 -O2 -Wall -W -Wextra -funsigned-char -fwrapv -fno-strict-overflow
 
 .PHONY: all clean
 

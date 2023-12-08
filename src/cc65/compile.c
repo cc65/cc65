@@ -257,6 +257,7 @@ static void Parse (void)
 
                     /* Parse the initialization */
                     ParseInit (Sym->Type);
+
                 } else {
 
                     /* This is a declaration */
@@ -326,21 +327,19 @@ NextDecl:
             }
         }
 
-        /* Function declaration? */
-        if (Sym && IsTypeFunc (Sym->Type)) {
-
-            /* Function */
-            if (CurTok.Tok == TOK_SEMI) {
-                /* Prototype only */
-                NeedClean = 0;
-                NextToken ();
-            } else if (CurTok.Tok == TOK_LCURLY) {
-                /* ISO C: The type category in a function definition cannot be
-                ** inherited from a typedef.
-                */
+        /* Finish the declaration */
+        if (Sym) {
+            /* Function definition? */
+            if (IsTypeFunc (Sym->Type) && CurTok.Tok == TOK_LCURLY) {
                 if (IsTypeFunc (Spec.Type) && TypeCmp (Sym->Type, Spec.Type).C >= TC_EQUAL) {
+                    /* ISO C: The type category in a function definition cannot be
+                    ** inherited from a typedef.
+                    */
                     Error ("Function cannot be defined with a typedef");
                 } else if (comma) {
+                    /* ISO C: A function definition cannot shall its return type
+                    ** specifier with other declarators.
+                    */
                     Error ("';' expected after top level declarator");
                 }
 
@@ -350,30 +349,19 @@ NextDecl:
 
                 /* Make sure we aren't omitting any work */
                 CheckDeferredOpAllDone ();
-            }
-
-        } else {
-
-            if (Sym) {
+            } else {
                 /* Must be followed by a semicolon */
-                if (CurTok.Tok != TOK_SEMI) {
+                if (ConsumeSemi ()) {
+                    NeedClean = 0;
+                } else {
                     NeedClean = -1;
                 }
-                ConsumeSemi ();
             }
-
         }
 
         /* Try some smart error recovery */
         if (PrevErrorCount != ErrorCount && NeedClean < 0) {
-            /* Some fix point tokens that are used for error recovery */
-            static const token_t TokenList[] = { TOK_SEMI, TOK_RCURLY };
-
-            SmartErrorSkip ();
-            SkipTokens (TokenList, sizeof (TokenList) / sizeof (TokenList[0]));
-            if (CurTok.Tok == TOK_SEMI || CurTok.Tok == TOK_RCURLY) {
-                NextToken ();
-            }
+            SmartErrorSkip (1);
         }
     }
 

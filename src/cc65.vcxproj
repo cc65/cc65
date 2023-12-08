@@ -69,6 +69,7 @@
     <ClInclude Include="cc65\coptcmp.h" />
     <ClInclude Include="cc65\coptind.h" />
     <ClInclude Include="cc65\coptjmp.h" />
+    <ClInclude Include="cc65\coptlong.h" />
     <ClInclude Include="cc65\coptmisc.h" />
     <ClInclude Include="cc65\coptptrload.h" />
     <ClInclude Include="cc65\coptptrstore.h" />
@@ -150,6 +151,7 @@
     <ClCompile Include="cc65\coptcmp.c" />
     <ClCompile Include="cc65\coptind.c" />
     <ClCompile Include="cc65\coptjmp.c" />
+    <ClCompile Include="cc65\coptlong.c" />
     <ClCompile Include="cc65\coptmisc.c" />
     <ClCompile Include="cc65\coptptrload.c" />
     <ClCompile Include="cc65\coptptrstore.c" />

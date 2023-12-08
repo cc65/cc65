@@ -57,6 +57,7 @@
 #include "coptcmp.h"
 #include "coptind.h"
 #include "coptjmp.h"
+#include "coptlong.h"
 #include "coptmisc.h"
 #include "coptptrload.h"
 #include "coptptrstore.h"
@@ -150,6 +151,8 @@ static OptFunc DOptJumpTarget3  = { OptJumpTarget3,  "OptJumpTarget3",  100, 0, 
 static OptFunc DOptLoad1        = { OptLoad1,        "OptLoad1",        100, 0, 0, 0, 0, 0 };
 static OptFunc DOptLoad2        = { OptLoad2,        "OptLoad2",        200, 0, 0, 0, 0, 0 };
 static OptFunc DOptLoad3        = { OptLoad3,        "OptLoad3",          0, 0, 0, 0, 0, 0 };
+static OptFunc DOptLongAssign   = { OptLongAssign,   "OptLongAssign",   100, 0, 0, 0, 0, 0 };
+static OptFunc DOptLongCopy     = { OptLongCopy,     "OptLongCopy",     100, 0, 0, 0, 0, 0 };
 static OptFunc DOptNegAX1       = { OptNegAX1,       "OptNegAX1",       165, 0, 0, 0, 0, 0 };
 static OptFunc DOptNegAX2       = { OptNegAX2,       "OptNegAX2",       200, 0, 0, 0, 0, 0 };
 static OptFunc DOptPrecalc      = { OptPrecalc,      "OptPrecalc",      100, 0, 0, 0, 0, 0 };
@@ -262,6 +265,8 @@ static OptFunc* OptFuncs[] = {
     &DOptLoad1,
     &DOptLoad2,
     &DOptLoad3,
+    &DOptLongAssign,
+    &DOptLongCopy,
     &DOptNegAX1,
     &DOptNegAX2,
     &DOptPrecalc,
@@ -632,6 +637,7 @@ static unsigned RunOptGroup1 (CodeSeg* S)
     Changes += RunOptFunc (S, &DOptAdd6, 1);
     Changes += RunOptFunc (S, &DOptSub1, 1);
     Changes += RunOptFunc (S, &DOptSub3, 1);
+    Changes += RunOptFunc (S, &DOptLongAssign, 1);
     Changes += RunOptFunc (S, &DOptStore4, 1);
     Changes += RunOptFunc (S, &DOptStore5, 1);
     Changes += RunOptFunc (S, &DOptShift1, 1);
@@ -641,6 +647,7 @@ static unsigned RunOptGroup1 (CodeSeg* S)
     Changes += RunOptFunc (S, &DOptStore1, 1);
     Changes += RunOptFunc (S, &DOptStore2, 5);
     Changes += RunOptFunc (S, &DOptStore3, 5);
+    Changes += RunOptFunc (S, &DOptLongCopy, 1);
 
     /* Return the number of changes */
     return Changes;

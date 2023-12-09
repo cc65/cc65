@@ -919,14 +919,8 @@ SymEntry* AddStructSym (const char* Name, unsigned Flags, unsigned Size, SymTabl
     /* SCType must be struct or union */
     PRECONDITION (SCType == SC_STRUCT || SCType == SC_UNION);
 
-    if ((Flags & SC_FICTITIOUS) == 0) {
-        /* Do we have an entry with this name already? */
-        TagEntry = FindSymInTable (CurTagTab, Name, HashStr (Name));
-    } else {
-        /* Add a fictitious symbol in the fail-safe table */
-        TagEntry = 0;
-        CurTagTab = FailSafeTab;
-    }
+    /* Do we have an entry with this name already? */
+    TagEntry = FindSymInTable (CurTagTab, Name, HashStr (Name));
 
     if (TagEntry) {
 
@@ -953,6 +947,15 @@ SymEntry* AddStructSym (const char* Name, unsigned Flags, unsigned Size, SymTabl
                 /* Remember this is the first definition of this type */
                 if (DSFlags != 0) {
                     *DSFlags |= DS_NEW_TYPE_DEF;
+                }
+
+                if ((Flags & SC_FICTITIOUS) == SC_FICTITIOUS) {
+                    /* Add a fictitious symbol in the fail-safe table */
+                    TagEntry = 0;
+                } else if (Size == 0) {
+                    /* Empty struct is not supported now */
+                    Error ("Empty %s type '%s' is not supported", SCType == SC_STRUCT ? "struct" : "union", Name);
+                    TagEntry = 0;
                 }
             }
         }

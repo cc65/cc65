@@ -61,6 +61,7 @@
 #include "symentry.h"
 #include "typecmp.h"
 #include "typeconv.h"
+#include "wrappedcall.h"
 #include "symtab.h"
 
 
@@ -1407,24 +1408,30 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
     }
 
     if (Entry == 0) {
-
         /* Create a new entry */
         Entry = NewSymEntry (Name, Flags);
 
         /* Set the symbol attributes */
         Entry->Type = TypeDup (T);
 
-        /* If this is a function, clear additional fields */
-        if (IsTypeFunc (T)) {
-            Entry->V.F.Seg = 0;
-        }
-
         /* Add the assembler name of the symbol */
         SymSetAsmName (Entry);
 
         /* Add the entry to the symbol table */
         AddSymEntry (Tab, Entry);
+    }
 
+    /* If this is a function, do we wrap calls to it? */
+    if (IsTypeFunc (Entry->Type)) {
+        SymEntry* WrappedCall;
+        unsigned int WrappedCallData;
+
+        /* Always use the latest wrapper data for it */
+        GetWrappedCall ((void**)&WrappedCall, &WrappedCallData);
+        if (WrappedCall) {
+            Entry->V.F.WrappedCall = WrappedCall;
+            Entry->V.F.WrappedCallData = WrappedCallData;
+        }
     }
 
     /* Add an alias of the global symbol to the local symbol table */

@@ -1613,13 +1613,13 @@ parameter with the <tt/#pragma/.
 
   This pragma sets a wrapper for functions, often used for trampolines.
 
-  The name is a function returning <tt/void/, and taking no parameters.
+  The <tt/name/ is a wrapper function returning <tt/void/, and taking no parameters.
   It must preserve the CPU's <tt/A/ and <tt/X/ registers if it wraps any
   <tt/__fastcall__/ functions that have parameters.  It must preserve
   the <tt/Y/ register if it wraps any variadic functions (they have "<tt/.../"
   in their prototypes).
 
-  The identifier is an 8-bit number that's set into <tt/tmp4/. If the identifier
+  The <tt/identifier/ is an 8-bit number that's set into <tt/tmp4/. If the <tt/identifier/
   is "bank", then ca65's <tt><url url="ca65.html#.BANK" name=".bank"></tt> function will be used
   to determine the number from the bank attribute defined in the linker config,
   see <url url="ld65.html#MEMORY" name="Other MEMORY area attributes">. Note that
@@ -1628,6 +1628,11 @@ parameter with the <tt/#pragma/.
 
   The address of a wrapped function is passed in <tt/ptr4/.  The wrapper can
   call that function by using "<tt/jsr callptr4/".
+
+  All functions ever declared or defined when this pragma is in effect will be wrapped
+  when they are called explicitly by their names later in the same translation unit.
+  Invocation of these functions in any other ways, for example, that via a function
+  pointer or in inline assembly code, will not be wrapped.
 
   This feature is useful, for example, with banked memory, to switch banks
   automatically to where a wrapped function resides, and then to restore the

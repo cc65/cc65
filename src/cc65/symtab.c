@@ -178,7 +178,7 @@ static void CheckSymTable (SymTable* Tab)
                         if (IS_Get (&WarnUnusedFunc)) {
                             Warning ("Function '%s' is defined but never used", Entry->Name);
                         }
-                    } else {
+                    } else if (!IsAnonName (Entry->Name)) {
                         if (IS_Get (&WarnUnusedVar)) {
                             Warning ("Variable '%s' is defined but never used", Entry->Name);
                         }

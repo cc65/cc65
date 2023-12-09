@@ -723,7 +723,6 @@ void _g_getimmed(unsigned Flags, uintptr_t Val, long Offs)
 /* Load a constant into the primary register */
 {
     unsigned char B1, B2, B3, B4;
-    unsigned      Done;
 
 //    LOG(("file:%s\n", file ? file : "null"));
 //    LOG(("func:%s\n", func ? func : "null"));
@@ -767,40 +766,15 @@ void _g_getimmed(unsigned Flags, uintptr_t Val, long Offs)
                 B3 = (unsigned char) (Val >> 16);
                 B4 = (unsigned char) (Val >> 24);
 
-                /* Remember which bytes are done */
-                Done = 0;
-
-                /* Load the value */
-                AddCodeLine ("ldx #$%02X\t; g_getimmed LONG", B2);
-                Done |= 0x02;
-                if (B2 == B3) {
-                    AddCodeLine ("stx sreg");
-                    Done |= 0x04;
-                }
-                if (B2 == B4) {
-                    AddCodeLine ("stx sreg+1");
-                    Done |= 0x08;
-                }
-                if ((Done & 0x04) == 0 && B1 != B3) {
-                    AddCodeLine ("lda #$%02X", B3);
-                    AddCodeLine ("sta sreg");
-                    Done |= 0x04;
-                }
-                if ((Done & 0x08) == 0 && B1 != B4) {
-                    AddCodeLine ("lda #$%02X", B4);
-                    AddCodeLine ("sta sreg+1");
-                    Done |= 0x08;
-                }
+                /* Load the value. Don't be too smart here and let
+                 * the optimizer do its job.
+                 */
+                AddCodeLine ("lda #$%02X", B4);
+                AddCodeLine ("sta sreg+1");
+                AddCodeLine ("lda #$%02X", B3);
+                AddCodeLine ("sta sreg");
                 AddCodeLine ("lda #$%02X", B1);
-                Done |= 0x01;
-                if ((Done & 0x04) == 0) {
-                    CHECK (B1 == B3);
-                    AddCodeLine ("sta sreg");
-                }
-                if ((Done & 0x08) == 0) {
-                    CHECK (B1 == B4);
-                    AddCodeLine ("sta sreg+1");
-                }
+                AddCodeLine ("ldx #$%02X", B2);
                 break;
 
             default:
@@ -4096,13 +4070,7 @@ void g_dec (unsigned flags, unsigned long val)
             } else {
                 /* Inline the code */
                 if (val < 0x300) {
-                    if ((CPUIsets[CPU] & CPU_ISET_65SC02) != 0 && val == 1) {
-                        unsigned L = GetLocalLabel();
-                        AddCodeLine ("bne %s", LocalLabelName (L));
-                        AddCodeLine ("dex");
-                        g_defcodelabel (L);
-                        AddCodeLine ("dea");
-                    } else if ((val & 0xFF) != 0) {
+                    if ((val & 0xFF) != 0) {
                         unsigned L = GetLocalLabel();
                         AddCodeLine ("sec");
                         AddCodeLine ("sbc #$%02X", (unsigned char) val);

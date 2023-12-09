@@ -168,6 +168,31 @@ void post_dec_assign_test(void)
     failures++;
 }
 
+void dex_tests(void) {
+  static unsigned int a, b;
+
+  a = 257;
+  b = a - 1;
+  if (b != 256) {
+    printf("fail 257 => 256\n");
+    failures++;
+  }
+
+  a = 256;
+  b = a - 1;
+  if (b != 255) {
+    printf("fail 256 => 255\n");
+    failures++;
+  }
+
+  a = 255;
+  b = a - 1;
+  if (b != 254) {
+    printf("fail 255 => 254\n");
+    failures++;
+  }
+}
+
 int main(void)
 {
   int0 = 5;
@@ -185,6 +210,8 @@ int main(void)
   int0 = 5;
   int1 = 5;
   post_dec_assign_test();
+
+  dex_tests();
 
   printf("failures: %d\n",failures);
 

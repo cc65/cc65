@@ -69,6 +69,7 @@ static int EqualFuncParams (const FuncDesc* F1, const FuncDesc* F2)
         /* Get the symbol types */
         const Type* Type1 = Sym1->Type;
         const Type* Type2 = Sym2->Type;
+        typecmp_t   CmpResult;
 
         /* If either of both functions is old style, apply the default
         ** promotions to the parameter type.
@@ -84,9 +85,10 @@ static int EqualFuncParams (const FuncDesc* F1, const FuncDesc* F2)
             }
         }
 
-        /* Compare this field */
-        if (TypeCmp (Type1, Type2).C < TC_EQUAL) {
-            /* Field types not equal */
+        /* Compare types of this parameter */
+        CmpResult = TypeCmp (Type1, Type2);
+        if (CmpResult.C < TC_EQUAL || (CmpResult.F & TCF_MASK_PARAM_DIFF) != 0) {
+            /* The types are not compatible */
             return 0;
         }
 

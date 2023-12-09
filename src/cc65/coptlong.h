@@ -1,15 +1,16 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 feature.h                                 */
+/*                                 coptlong.h                                */
 /*                                                                           */
-/*                  Subroutines for the emulation features                   */
+/*                       Long integers optimizations                         */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2013, Ullrich von Bassewitz                                      */
+/* (C) 2001-2009, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
+/* (C) 2023, Colin Leroy-Mira <colin@colino.net                              */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,47 +34,13 @@
 
 
 
-#ifndef FEATURE_H
-#define FEATURE_H
+#ifndef COPTLONG_H
+#define COPTLONG_H
 
 
 
-/* common */
-#include "strbuf.h"
-
-
-
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
-
-
-
-typedef enum {
-    FEAT_UNKNOWN                = -1,
-    FEAT_DOLLAR_IS_PC,
-    FEAT_LABELS_WITHOUT_COLONS,
-    FEAT_LOOSE_STRING_TERM,
-    FEAT_LOOSE_CHAR_TERM,
-    FEAT_AT_IN_IDENTIFIERS,
-    FEAT_DOLLAR_IN_IDENTIFIERS,
-    FEAT_LEADING_DOT_IN_IDENTIFIERS,
-    FEAT_ORG_PER_SEG,
-    FEAT_PC_ASSIGNMENT,
-    FEAT_MISSING_CHAR_TERM,
-    FEAT_UBIQUITOUS_IDENTS,
-    FEAT_C_COMMENTS,
-    FEAT_FORCE_RANGE,
-    FEAT_UNDERLINE_IN_NUMBERS,
-    FEAT_ADDRSIZE,
-    FEAT_BRACKET_AS_INDIRECT,
-    FEAT_STRING_ESCAPES,
-    FEAT_LONG_JSR_JMP_RTS,
-    FEAT_LINE_CONTINUATIONS,
-
-    /* Special value: Number of features available */
-    FEAT_COUNT
-} feature_t;
+/* cc65 */
+#include "codeseg.h"
 
 
 
@@ -83,17 +50,14 @@ typedef enum {
 
 
 
-feature_t FindFeature (const StrBuf* Key);
-/* Find the feature in a table and return the corresponding enum value. If the
-** feature is invalid, return FEAT_UNKNOWN.
-*/
+unsigned OptLongAssign (CodeSeg* S);
+/* Simplify long assigns. */
 
-void SetFeature (feature_t Feature, unsigned char On);
-/* Set the corresponding feature flag if Feature is valid.
-*/
+unsigned OptLongCopy (CodeSeg* S);
+/* Simplify long copy. */
 
 
 
-/* End of feature.h */
+/* End of coptind.h */
 
 #endif

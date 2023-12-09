@@ -117,11 +117,22 @@ static int CloseBrace (Collection* C, token_t Tok)
 
 
 
-int SmartErrorSkip (void)
-/* Try some smart error recovery. Skip tokens until either a comma or semicolon
-** that is not enclosed in an open parenthesis/bracket/curly brace, or until an
-** unpaired right parenthesis/bracket/curly brace is reached. Return 0 if it is
-** the former case, or -1 if it is the latter case. */
+int SmartErrorSkip (int WholeDecl)
+/* Try some smart error recovery.
+**
+** - If WholeDecl is 0:
+**   Skip tokens until a comma or closing curly brace that is not enclosed in
+**   an open parenthesis/bracket/curly brace, or until a semicolon, EOF or
+**   unpaired right parenthesis/bracket/curly brace is reached.
+**
+** - If WholeDecl is non-0:
+**   Skip tokens until a closing curly brace that is not enclosed in an open
+**   parenthesis/bracket/curly brace, or until a semicolon or EOF is reached.
+**
+** Return 0 if this exits as soon as it reaches an EOF. Return 0 as well if
+** this exits with no open parentheses/brackets/curly braces. Otherwise, return
+** -1.
+*/
 {
     Collection C = AUTO_COLLECTION_INITIALIZER;
     int Res = 0;
@@ -142,31 +153,41 @@ int SmartErrorSkip (void)
 
             case TOK_RPAREN:
             case TOK_RBRACK:
-                if (CloseBrace (&C, CurTok.Tok)) {
-                    Res = -1;
-                    goto ExitPoint;
+                if (CloseBrace (&C, CurTok.Tok) < 0) {
+                    if (!WholeDecl) {
+                        Res = -1;
+                        goto ExitPoint;
+                    }
+                    NextToken ();
                 }
                 break;
 
             case TOK_RCURLY:
-                if (CloseBrace (&C, CurTok.Tok)) {
-                    Res = -1;
-                    goto ExitPoint;
+                if (CloseBrace (&C, CurTok.Tok) < 0) {
+                    if (!WholeDecl) {
+                        Res = -1;
+                        goto ExitPoint;
+                    }
+                    NextToken ();
                 } else if (CollCount (&C) == 0) {
                     goto ExitPoint;
                 }
                 break;
 
             case TOK_COMMA:
-                if (CollCount (&C) == 0) {
+                if (CollCount (&C) == 0 && !WholeDecl) {
                     goto ExitPoint;
                 }
                 NextToken ();
                 break;
 
             case TOK_SEMI:
+                if (CollCount (&C) != 0) {
+                    Res = -1;
+                }
+                goto ExitPoint;
+
             case TOK_CEOF:
-                Res = -1;
                 goto ExitPoint;
 
             default:
@@ -1058,8 +1079,9 @@ static SymEntry* ParseUnionSpec (const char* Name, unsigned* DSFlags)
     while (CurTok.Tok != TOK_RCURLY) {
 
         /* Get the type of the entry */
-        DeclSpec Spec;
-        int SignednessSpecified = 0;
+        DeclSpec    Spec;
+        int         SignednessSpecified = 0;
+        int         NeedClean = 0;
 
         /* Check for a _Static_assert */
         if (CurTok.Tok == TOK_STATIC_ASSERT) {
@@ -1076,7 +1098,7 @@ static SymEntry* ParseUnionSpec (const char* Name, unsigned* DSFlags)
             Declarator Decl;
 
             /* Get type and name of the struct field */
-            ParseDecl (&Spec, &Decl, DM_ACCEPT_IDENT);
+            NeedClean = ParseDecl (&Spec, &Decl, DM_ACCEPT_IDENT);
 
             /* Check for a bit-field declaration */
             FieldWidth = ParseFieldWidth (&Decl);
@@ -1172,7 +1194,18 @@ NextMember: if (CurTok.Tok != TOK_COMMA) {
             }
             NextToken ();
         }
-        ConsumeSemi ();
+
+        /* Must be followed by a semicolon */
+        if (NeedClean >= 0 && ConsumeSemi ()) {
+            NeedClean = 0;
+        } else {
+            NeedClean = -1;
+        }
+
+        /* Try some smart error recovery */
+        if (NeedClean < 0) {
+            SmartErrorSkip (1);
+        }
     }
 
     /* Skip the closing brace */
@@ -1185,11 +1218,6 @@ NextMember: if (CurTok.Tok != TOK_COMMA) {
     /* Return a fictitious symbol if errors occurred during parsing */
     if (PrevErrorCount != ErrorCount) {
         Flags |= SC_FICTITIOUS;
-    }
-
-    /* Empty union is not supported now */
-    if (UnionSize == 0) {
-        Error ("Empty union type '%s' is not supported", Name);
     }
 
     /* Make a real entry from the forward decl and return it */
@@ -1236,8 +1264,9 @@ static SymEntry* ParseStructSpec (const char* Name, unsigned* DSFlags)
     while (CurTok.Tok != TOK_RCURLY) {
 
         /* Get the type of the entry */
-        DeclSpec Spec;
-        int SignednessSpecified = 0;
+        DeclSpec    Spec;
+        int         SignednessSpecified = 0;
+        int         NeedClean = 0;
 
         /* Check for a _Static_assert */
         if (CurTok.Tok == TOK_STATIC_ASSERT) {
@@ -1262,7 +1291,7 @@ static SymEntry* ParseStructSpec (const char* Name, unsigned* DSFlags)
             }
 
             /* Get type and name of the struct field */
-            ParseDecl (&Spec, &Decl, DM_ACCEPT_IDENT);
+            NeedClean = ParseDecl (&Spec, &Decl, DM_ACCEPT_IDENT);
 
             /* Check for a bit-field declaration */
             FieldWidth = ParseFieldWidth (&Decl);
@@ -1403,7 +1432,18 @@ NextMember: if (CurTok.Tok != TOK_COMMA) {
             }
             NextToken ();
         }
-        ConsumeSemi ();
+
+        /* Must be followed by a semicolon */
+        if (NeedClean >= 0 && ConsumeSemi ()) {
+            NeedClean = 0;
+        } else {
+            NeedClean = -1;
+        }
+
+        /* Try some smart error recovery */
+        if (NeedClean < 0) {
+            SmartErrorSkip (1);
+        }
     }
 
     if (BitOffs > 0) {
@@ -1424,11 +1464,6 @@ NextMember: if (CurTok.Tok != TOK_COMMA) {
     /* Return a fictitious symbol if errors occurred during parsing */
     if (PrevErrorCount != ErrorCount) {
         Flags |= SC_FICTITIOUS;
-    }
-
-    /* Empty struct is not supported now */
-    if (StructSize == 0) {
-        Error ("Empty struct type '%s' is not supported", Name);
     }
 
     /* Make a real entry from the forward decl and return it */
@@ -1778,7 +1813,7 @@ static void ParseOldStyleParamList (FuncDesc* F)
             Error ("Identifier expected for parameter name");
 
             /* Try some smart error recovery */
-            if (SmartErrorSkip () < 0) {
+            if (SmartErrorSkip (0) < 0) {
                 break;
             }
         }
@@ -1868,7 +1903,7 @@ static void ParseOldStyleParamList (FuncDesc* F)
 
     if (PrevErrorCount != ErrorCount && CurTok.Tok != TOK_LCURLY) {
         /* Try some smart error recovery */
-        SmartErrorSkip ();
+        SmartErrorSkip (0);
     }
 }
 
@@ -1953,7 +1988,7 @@ static void ParseAnsiParamList (FuncDesc* F)
 
         if (PrevErrorCount != ErrorCount) {
             /* Try some smart error recovery */
-            if (SmartErrorSkip () < 0) {
+            if (SmartErrorSkip (0) < 0) {
                 break;
             }
         }
@@ -2335,7 +2370,7 @@ int ParseDecl (const DeclSpec* Spec, Declarator* D, declmode_t Mode)
 
         /* Try some smart error recovery */
         if (CurTok.Tok != TOK_LCURLY || !IsTypeFunc (D->Type)) {
-            return SmartErrorSkip ();
+            return SmartErrorSkip (0);
         }
     }
 

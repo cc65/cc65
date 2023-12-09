@@ -533,18 +533,20 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
         /* This may be an anonymous bit-field, in which case it doesn't
         ** have an initializer.
         */
-        if (SymIsBitField (TagSym) && (IsAnonName (TagSym->Name))) {
-            /* Account for the data and output it if we have at least a full
-            ** byte. We may have more if there was storage unit overlap, for
-            ** example two consecutive 7 bit fields. Those would be packed
-            ** into 2 bytes.
-            */
-            SI.ValBits += TagSym->Type->A.B.Width;
-            CHECK (SI.ValBits <= CHAR_BIT * sizeof(SI.BitVal));
-            /* TODO: Generalize this so any type can be used. */
-            CHECK (SI.ValBits <= LONG_BITS);
-            while (SI.ValBits >= CHAR_BITS) {
-                DefineBitFieldData (&SI);
+        if (SymIsBitField (TagSym) && IsAnonName (TagSym->Name)) {
+            if (!IsTypeUnion (T)) {
+                /* Account for the data and output it if we have at least a full
+                ** byte. We may have more if there was storage unit overlap, for
+                ** example two consecutive 7 bit fields. Those would be packed
+                ** into 2 bytes.
+                */
+                SI.ValBits += TagSym->Type->A.B.Width;
+                CHECK (SI.ValBits <= CHAR_BIT * sizeof(SI.BitVal));
+                /* TODO: Generalize this so any type can be used. */
+                CHECK (SI.ValBits <= LONG_BITS);
+                while (SI.ValBits >= CHAR_BITS) {
+                    DefineBitFieldData (&SI);
+                }
             }
             /* Avoid consuming the comma if any */
             goto NextMember;
@@ -650,15 +652,15 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
         /* Skip the comma next round */
         SkipComma = 1;
 
-NextMember:
-        /* Next member. For unions, only the first one can be initialized */
+        /* For unions, only the first named member can be initialized */
         if (IsTypeUnion (T)) {
-            /* Union */
             TagSym = 0;
-        } else {
-            /* Struct */
-            TagSym = TagSym->NextSym;
+            continue;
         }
+
+NextMember:
+        /* Next member */
+        TagSym = TagSym->NextSym;
     }
 
     if (HasCurly) {

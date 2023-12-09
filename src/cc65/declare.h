@@ -128,11 +128,22 @@ typedef enum {
 
 
 
-int SmartErrorSkip (void);
-/* Try some smart error recovery. Skip tokens until either a comma or semicolon
-** that is not enclosed in an open parenthesis/bracket/curly brace, or until an
-** unpaired right parenthesis/bracket/curly brace is reached. Return 0 if it is
-** the former case, or -1 if it is the latter case. */
+int SmartErrorSkip (int WholeDecl);
+/* Try some smart error recovery.
+**
+** - If WholeDecl is 0:
+**   Skip tokens until a comma or closing curly brace that is not enclosed in
+**   an open parenthesis/bracket/curly brace, or until a semicolon, EOF or
+**   unpaired right parenthesis/bracket/curly brace is reached.
+**
+** - If WholeDecl is non-0:
+**   Skip tokens until a closing curly brace that is not enclosed in an open
+**   parenthesis/bracket/curly brace, or until a semicolon or EOF is reached.
+**
+** Return 0 if this exits as soon as it reaches an EOF. Return 0 as well if
+** this exits with no open parentheses/brackets/curly braces. Otherwise, return
+** -1.
+*/
 
 Type* ParseType (Type* Type);
 /* Parse a complete type specification */

@@ -4102,9 +4102,10 @@ static void hieQuest (ExprDesc* Expr)
                     /* Avoid further errors */
                     ResultType = NewPointerTo (type_void);
                 } else {
-                    /* Result has the composite type */
+                    /* Result has the properly qualified composite type */
                     ResultType = TypeDup (Expr2.Type);
                     TypeComposition (ResultType, Expr3.Type);
+                    ResultType[1].C |= GetQualifier (Indirect (Expr3.Type));
                 }
             }
         } else if (IsClassPtr (Expr2.Type) && Expr3IsNULL) {

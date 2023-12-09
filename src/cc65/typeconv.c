@@ -485,13 +485,6 @@ void TypeComposition (Type* lhs, const Type* rhs)
             } else if (RightCount != UNSPECIFIED) {
                 SetElementCount (lhs, RightCount);
             }
-        } else {
-            /* Combine the qualifiers */
-            if (IsClassPtr (lhs)) {
-                ++lhs;
-                ++rhs;
-                lhs->C |= GetQualifier (rhs);
-            }
         }
 
         /* Next type string element */

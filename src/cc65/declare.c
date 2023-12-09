@@ -1220,11 +1220,6 @@ NextMember: if (CurTok.Tok != TOK_COMMA) {
         Flags |= SC_FICTITIOUS;
     }
 
-    /* Empty union is not supported now */
-    if (UnionSize == 0) {
-        Error ("Empty union type '%s' is not supported", Name);
-    }
-
     /* Make a real entry from the forward decl and return it */
     return AddStructSym (Name, SC_UNION | SC_DEF | Flags, UnionSize, FieldTab, DSFlags);
 }
@@ -1469,11 +1464,6 @@ NextMember: if (CurTok.Tok != TOK_COMMA) {
     /* Return a fictitious symbol if errors occurred during parsing */
     if (PrevErrorCount != ErrorCount) {
         Flags |= SC_FICTITIOUS;
-    }
-
-    /* Empty struct is not supported now */
-    if (StructSize == 0) {
-        Error ("Empty struct type '%s' is not supported", Name);
     }
 
     /* Make a real entry from the forward decl and return it */

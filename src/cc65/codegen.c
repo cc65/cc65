@@ -3697,13 +3697,7 @@ void g_dec (unsigned flags, unsigned long val)
             } else {
                 /* Inline the code */
                 if (val < 0x300) {
-                    if ((CPUIsets[CPU] & CPU_ISET_65SC02) != 0 && val == 1) {
-                        unsigned L = GetLocalLabel();
-                        AddCodeLine ("bne %s", LocalLabelName (L));
-                        AddCodeLine ("dex");
-                        g_defcodelabel (L);
-                        AddCodeLine ("dea");
-                    } else if ((val & 0xFF) != 0) {
+                    if ((val & 0xFF) != 0) {
                         unsigned L = GetLocalLabel();
                         AddCodeLine ("sec");
                         AddCodeLine ("sbc #$%02X", (unsigned char) val);

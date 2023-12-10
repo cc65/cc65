@@ -321,14 +321,8 @@ void TypeCast (ExprDesc* Expr)
 {
     Type    NewType[MAXTYPELEN];
 
-    /* Skip the left paren */
-    NextToken ();
-
-    /* Read the type */
+    /* Read the type enclosed in parentheses */
     ParseType (NewType);
-
-    /* Closing paren */
-    ConsumeRParen ();
 
     /* Read the expression we have to cast */
     hie10 (Expr);
@@ -484,13 +478,6 @@ void TypeComposition (Type* lhs, const Type* rhs)
                 SetElementCount (lhs, LeftCount);
             } else if (RightCount != UNSPECIFIED) {
                 SetElementCount (lhs, RightCount);
-            }
-        } else {
-            /* Combine the qualifiers */
-            if (IsClassPtr (lhs)) {
-                ++lhs;
-                ++rhs;
-                lhs->C |= GetQualifier (rhs);
             }
         }
 

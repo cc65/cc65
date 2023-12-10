@@ -49,24 +49,30 @@
 /*                      Remove unused loads and stores                       */
 /*****************************************************************************/
 
-
-
 unsigned OptLongAssign (CodeSeg* S)
 /* Simplify long assignments.
 ** Recognize
-**      lda     ...       0
+**      lda     #IMM      0
 **      sta     sreg+1    1
-**      lda     ...       2
+**      lda     #IMM      2
 **      sta     sreg      3
-**      lda     ...       4
-**      ldx     ...       5
-**      sta     M0002     6
-**      stx     M0002+1   7
+**      lda     #IMM      4
+**      ldx     #IMM      5
+**      sta     YYY       6
+**      stx     YYY+1     7
 **      ldy     sreg      8
-**      sty     M0002+2   9
+**      sty     YYY+2     9
 **      ldy     sreg+1    10
-**      sty     M0002+3   11
-** and simplify if not used right after.
+**      sty     YYY+3     11
+** and simplify, if not used right after and no branching occurs, to
+**      lda    XXX+3
+**      sta    YYY+3
+**      lda    XXX+2
+**      sta    YYY+2
+**      ldx    XXX
+**      lda    XXX+1
+**      sta    YYY
+**      stx    YYY+1
 */
 {
     unsigned Changes = 0;
@@ -75,35 +81,43 @@ unsigned OptLongAssign (CodeSeg* S)
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-        CodeEntry* L[12];
+        CodeEntry* L[13];
 
         /* Get next entry */
         L[0] = CS_GetEntry (S, I);
 
-        if (CS_GetEntries (S, L+1, I+1, 11)) {
-          if (L[0]->OPC == OP65_LDA                                &&
+        if (CS_GetEntries (S, L+1, I+1, 12)) {
+          if (/* Check the opcode sequence */
+              L[0]->OPC == OP65_LDA                                &&
               L[1]->OPC == OP65_STA                                &&
-                !strcmp (L[1]->Arg, "sreg+1")                      &&
               L[2]->OPC == OP65_LDA                                &&
               L[3]->OPC == OP65_STA                                &&
-                !strcmp (L[3]->Arg, "sreg")                        &&
               L[4]->OPC == OP65_LDA                                &&
               L[5]->OPC == OP65_LDX                                &&
               L[6]->OPC == OP65_STA                                &&
               L[7]->OPC == OP65_STX                                &&
-                !strncmp(L[7]->Arg, L[6]->Arg, strlen(L[6]->Arg))  &&
-                !strcmp(L[7]->Arg + strlen(L[6]->Arg), "+1")       &&
               L[8]->OPC == OP65_LDY                                &&
-                !strcmp (L[8]->Arg, "sreg")                        &&
               L[9]->OPC == OP65_STY                                &&
-                !strncmp(L[9]->Arg, L[6]->Arg, strlen(L[6]->Arg))  &&
-                !strcmp(L[9]->Arg + strlen(L[6]->Arg), "+2")       &&
               L[10]->OPC == OP65_LDY                               &&
-                !strcmp (L[10]->Arg, "sreg+1")                     &&
               L[11]->OPC == OP65_STY                               &&
-                !strncmp(L[11]->Arg, L[6]->Arg, strlen(L[6]->Arg)) &&
+              /* Check the arguments match */
+              L[0]->AM == AM65_IMM                                 &&
+              !strcmp (L[1]->Arg, "sreg+1")                        &&
+              L[2]->AM == AM65_IMM                                 &&
+              !strcmp (L[3]->Arg, "sreg")                          &&
+              L[4]->AM == AM65_IMM                                 &&
+              L[5]->AM == AM65_IMM                                 &&
+              !strncmp(L[7]->Arg, L[6]->Arg, strlen(L[6]->Arg))    &&
+                !strcmp(L[7]->Arg + strlen(L[6]->Arg), "+1")       &&
+              !strcmp (L[8]->Arg, "sreg")                          &&
+              !strncmp(L[9]->Arg, L[6]->Arg, strlen(L[6]->Arg))    &&
+                !strcmp(L[9]->Arg + strlen(L[6]->Arg), "+2")       &&
+              !strcmp (L[10]->Arg, "sreg+1")                       &&
+              !strncmp(L[11]->Arg, L[6]->Arg, strlen(L[6]->Arg))   &&
                 !strcmp(L[11]->Arg + strlen(L[6]->Arg), "+3")      &&
-              !RegXUsed (S, I+11)) {
+              /* Check there's nothing more */
+              !RegXUsed (S, I+12)                                  &&
+              !CS_RangeHasLabel(S, I, 12)) {
 
               L[1]->AM = L[11]->AM;
               CE_SetArg(L[1], L[11]->Arg);
@@ -142,7 +156,15 @@ unsigned OptLongCopy (CodeSeg* S)
 **      sty     YYY+2       9
 **      ldy     sreg+1      10
 **      sty     YYY+3       11
-** and simplify if not used right after.
+** and simplify, if not used right after and no branching occurs, to
+**      lda    XXX+3
+**      sta    YYY+3
+**      lda    XXX+2
+**      sta    YYY+2
+**      ldx    XXX
+**      lda    XXX+1
+**      sta    YYY
+**      stx    YYY+1
 */
 {
     unsigned Changes = 0;
@@ -151,12 +173,12 @@ unsigned OptLongCopy (CodeSeg* S)
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-        CodeEntry* L[12];
+        CodeEntry* L[13];
 
         /* Get next entry */
         L[0] = CS_GetEntry (S, I);
 
-        if (CS_GetEntries (S, L+1, I+1, 11)) {
+        if (CS_GetEntries (S, L+1, I+1, 12)) {
           if (L[0]->OPC == OP65_LDA                                &&
                 !strncmp(L[0]->Arg, L[5]->Arg, strlen(L[5]->Arg))  &&
                 !strcmp(L[0]->Arg + strlen(L[5]->Arg), "+3")       &&
@@ -185,7 +207,8 @@ unsigned OptLongCopy (CodeSeg* S)
               L[11]->OPC == OP65_STY                               &&
                 !strncmp(L[11]->Arg, L[6]->Arg, strlen(L[6]->Arg)) &&
                 !strcmp(L[11]->Arg + strlen(L[6]->Arg), "+3")      &&
-              !RegXUsed (S, I+11)) {
+              !RegXUsed (S, I+11)                                  &&
+              !CS_RangeHasLabel(S, I, 12)) {
 
               L[1]->AM = L[11]->AM;
               CE_SetArg(L[1], L[11]->Arg);

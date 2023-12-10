@@ -1428,25 +1428,9 @@ static void Primary (ExprDesc* E)
                 DeclSpec Spec;
                 ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_NONE, SC_AUTO);
 
-                if ((Spec.Flags & DS_DEF_TYPE) == 0) {
-                    /* Recognized but not supported */
+                if ((Spec.Flags & DS_TYPE_MASK) != DS_NONE) {
                     Error ("Mixed declarations and code are not supported in cc65");
-
-                    while (CurTok.Tok != TOK_SEMI) {
-                        Declarator Decl;
-
-                        /* Parse one declaration */
-                        ParseDecl (&Spec, &Decl, DM_ACCEPT_IDENT);
-                        if (CurTok.Tok == TOK_ASSIGN) {
-                            NextToken ();
-                            ParseInit (Decl.Type);
-                        }
-                        if (CurTok.Tok == TOK_COMMA) {
-                            NextToken ();
-                        } else {
-                            break;
-                        }
-                    }
+                    SmartErrorSkip (0);
                 } else {
                     Error ("Expression expected");
                     E->Flags |= E_EVAL_MAYBE_UNUSED;
@@ -2147,9 +2131,7 @@ void hie10 (ExprDesc* Expr)
             NextToken ();
             if (TypeSpecAhead ()) {
                 Type T[MAXTYPELEN];
-                NextToken ();
                 Size = ExprCheckedSizeOf (ParseType (T));
-                ConsumeRParen ();
             } else {
                 /* Remember the output queue pointer */
                 CodeMark Mark;

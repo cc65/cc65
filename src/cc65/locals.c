@@ -462,14 +462,15 @@ static void ParseStaticDecl (Declarator* Decl)
 
 
 
-static void ParseOneDecl (const DeclSpec* Spec)
+static int ParseOneDecl (DeclSpec* Spec)
 /* Parse one variable declarator. */
 {
-    Declarator Decl;            /* Declarator data structure */
+    Declarator  Decl;           /* Declarator data structure */
+    int         NeedClean;
 
 
     /* Read the declarator */
-    ParseDecl (Spec, &Decl, DM_NEED_IDENT);
+    NeedClean = ParseDecl (Spec, &Decl, DM_IDENT_OR_EMPTY);
 
     /* Check if there are any non-extern storage classes set for function
     ** declarations. Function can only be declared inside functions with the
@@ -559,6 +560,8 @@ static void ParseOneDecl (const DeclSpec* Spec)
 
     /* Make sure we aren't missing some work */
     CheckDeferredOpAllDone ();
+
+    return NeedClean;
 }
 
 
@@ -574,15 +577,8 @@ void DeclareLocals (void)
 
     /* Loop until we don't find any more variables */
     while (1) {
-
-        /* Check variable declarations. We need to distinguish between a
-        ** default int type and the end of variable declarations. So we
-        ** will do the following: If there is no explicit storage class
-        ** specifier *and* no explicit type given, *and* no type qualifiers
-        ** have been read, it is assumed that we have reached the end of
-        ** declarations.
-        */
         DeclSpec Spec;
+        int      NeedClean;
 
         /* Check for a _Static_assert */
         if (CurTok.Tok == TOK_STATIC_ASSERT) {
@@ -590,10 +586,18 @@ void DeclareLocals (void)
             continue;
         }
 
+        /* Read the declaration specifier */
         ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_INT, SC_AUTO);
-        if ((Spec.Flags & DS_DEF_STORAGE) != 0 &&       /* No storage spec */
-            (Spec.Flags & DS_DEF_TYPE) != 0    &&       /* No type given */
-            GetQualifier (Spec.Type) == T_QUAL_NONE) {  /* No type qualifier */
+
+        /* Check variable declarations. We need distinguish between a default
+        ** int type and the end of variable declarations. So we will do the
+        ** following: If there is no explicit storage class specifier *and* no
+        ** explicit type given, *and* no type qualifiers have been read, it is
+        ** assumed that we have reached the end of declarations.
+        */
+        if ((Spec.Flags & DS_DEF_STORAGE) != 0          &&  /* No storage spec */
+            (Spec.Flags & DS_TYPE_MASK) == DS_DEF_TYPE  &&  /* No type given */
+            GetQualifier (Spec.Type) == T_QUAL_NONE) {      /* No type qualifier */
             break;
         }
 
@@ -605,11 +609,24 @@ void DeclareLocals (void)
             continue;
         }
 
+        /* If we haven't got a type specifier yet, something must be wrong */
+        if ((Spec.Flags & DS_TYPE_MASK) == DS_NONE) {
+            /* Avoid extra errors if it was a failed type specifier */
+            if ((Spec.Flags & DS_EXTRA_TYPE) == 0) {
+                Error ("Declaration specifier expected");
+            }
+            NeedClean = -1;
+            goto EndOfDecl;
+        }
+
         /* Parse a comma separated variable list */
         while (1) {
 
-            /* Parse one declaration */
-            ParseOneDecl (&Spec);
+            /* Parse one declarator */
+            NeedClean = ParseOneDecl (&Spec);
+            if (NeedClean <= 0) {
+                break;
+            }
 
             /* Check if there is more */
             if (CurTok.Tok == TOK_COMMA) {
@@ -621,8 +638,20 @@ void DeclareLocals (void)
             }
         }
 
-        /* A semicolon must follow */
-        ConsumeSemi ();
+        if (NeedClean > 0) {
+            /* Must be followed by a semicolon */
+            if (ConsumeSemi ()) {
+                NeedClean = 0;
+            } else {
+                NeedClean = -1;
+            }
+        }
+
+EndOfDecl:
+        /* Try some smart error recovery */
+        if (NeedClean < 0) {
+            SmartErrorSkip (1);
+        }
     }
 
     /* Be sure to allocate any reserved space for locals */

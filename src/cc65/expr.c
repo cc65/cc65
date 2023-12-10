@@ -1412,7 +1412,7 @@ static void Primary (ExprDesc* E)
             } else {
                 /* Let's see if this is a C99-style declaration */
                 DeclSpec Spec;
-                ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_NONE, SC_AUTO);
+                ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_INT, SC_AUTO);
 
                 if ((Spec.Flags & DS_TYPE_MASK) != DS_NONE) {
                     Error ("Mixed declarations and code are not supported in cc65");

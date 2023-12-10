@@ -979,6 +979,13 @@ static SymEntry* ParseUnionSpec (const char* Name, unsigned* DSFlags)
         DeclSpec    Spec;
         int         NeedClean = 0;
 
+        /* Check for extra semicolons */
+        if (CurTok.Tok == TOK_SEMI) {
+            /* TODO: warn on this if we have a pedantic mode */
+            NextToken ();
+            continue;
+        }
+
         /* Check for a _Static_assert */
         if (CurTok.Tok == TOK_STATIC_ASSERT) {
             ParseStaticAssert ();
@@ -993,6 +1000,16 @@ static SymEntry* ParseUnionSpec (const char* Name, unsigned* DSFlags)
             CheckEmptyDecl (&Spec);
             NextToken ();
             continue;
+        }
+
+        /* If we haven't got a type specifier yet, something must be wrong */
+        if ((Spec.Flags & DS_TYPE_MASK) == DS_NONE) {
+            /* Avoid extra errors if it was a failed type specifier */
+            if ((Spec.Flags & DS_EXTRA_TYPE) == 0) {
+                Error ("Declaration specifier expected");
+            }
+            NeedClean = -1;
+            goto EndOfDecl;
         }
 
         /* Allow anonymous bit-fields */
@@ -1107,6 +1124,7 @@ NextMember:
             NextToken ();
         }
 
+EndOfDecl:
         if (NeedClean > 0) {
             /* Must be followed by a semicolon */
             if (ConsumeSemi ()) {
@@ -1181,6 +1199,13 @@ static SymEntry* ParseStructSpec (const char* Name, unsigned* DSFlags)
         DeclSpec    Spec;
         int         NeedClean = 0;
 
+        /* Check for extra semicolons */
+        if (CurTok.Tok == TOK_SEMI) {
+            /* TODO: warn on this if we have a pedantic mode */
+            NextToken ();
+            continue;
+        }
+
         /* Check for a _Static_assert */
         if (CurTok.Tok == TOK_STATIC_ASSERT) {
             ParseStaticAssert ();
@@ -1195,6 +1220,16 @@ static SymEntry* ParseStructSpec (const char* Name, unsigned* DSFlags)
             CheckEmptyDecl (&Spec);
             NextToken ();
             continue;
+        }
+
+        /* If we haven't got a type specifier yet, something must be wrong */
+        if ((Spec.Flags & DS_TYPE_MASK) == DS_NONE) {
+            /* Avoid extra errors if it was a failed type specifier */
+            if ((Spec.Flags & DS_EXTRA_TYPE) == 0) {
+                Error ("Declaration specifier expected");
+            }
+            NeedClean = -1;
+            goto EndOfDecl;
         }
 
         /* Allow anonymous bit-fields */
@@ -1362,6 +1397,7 @@ NextMember:
             NextToken ();
         }
 
+EndOfDecl:
         if (NeedClean > 0) {
             /* Must be followed by a semicolon */
             if (ConsumeSemi ()) {
@@ -1559,6 +1595,8 @@ static void ParseTypeSpec (DeclSpec* Spec, typespec_t TSFlags)
 
         case TOK_UNION:
             NextToken ();
+            /* Remember we have an extra type decl */
+            Spec->Flags |= DS_EXTRA_TYPE;
             /* Check for tag name */
             if (CurTok.Tok == TOK_IDENT) {
                 strcpy (Ident, CurTok.Ident);
@@ -1570,8 +1608,6 @@ static void ParseTypeSpec (DeclSpec* Spec, typespec_t TSFlags)
                 UseDefaultType (Spec, TS_DEFAULT_TYPE_NONE);
                 break;
             }
-            /* Remember we have an extra type decl */
-            Spec->Flags |= DS_EXTRA_TYPE;
             /* Declare the union in the current scope */
             TagEntry = ParseUnionSpec (Ident, &Spec->Flags);
             /* Encode the union entry into the type */
@@ -1582,6 +1618,8 @@ static void ParseTypeSpec (DeclSpec* Spec, typespec_t TSFlags)
 
         case TOK_STRUCT:
             NextToken ();
+            /* Remember we have an extra type decl */
+            Spec->Flags |= DS_EXTRA_TYPE;
             /* Check for tag name */
             if (CurTok.Tok == TOK_IDENT) {
                 strcpy (Ident, CurTok.Ident);
@@ -1593,8 +1631,6 @@ static void ParseTypeSpec (DeclSpec* Spec, typespec_t TSFlags)
                 UseDefaultType (Spec, TS_DEFAULT_TYPE_NONE);
                 break;
             }
-            /* Remember we have an extra type decl */
-            Spec->Flags |= DS_EXTRA_TYPE;
             /* Declare the struct in the current scope */
             TagEntry = ParseStructSpec (Ident, &Spec->Flags);
             /* Encode the struct entry into the type */
@@ -1605,6 +1641,8 @@ static void ParseTypeSpec (DeclSpec* Spec, typespec_t TSFlags)
 
         case TOK_ENUM:
             NextToken ();
+            /* Remember we have an extra type decl */
+            Spec->Flags |= DS_EXTRA_TYPE;
             /* Check for tag name */
             if (CurTok.Tok == TOK_IDENT) {
                 strcpy (Ident, CurTok.Ident);
@@ -1616,8 +1654,6 @@ static void ParseTypeSpec (DeclSpec* Spec, typespec_t TSFlags)
                 UseDefaultType (Spec, TS_DEFAULT_TYPE_NONE);
                 break;
             }
-            /* Remember we have an extra type decl */
-            Spec->Flags |= DS_EXTRA_TYPE;
             /* Parse the enum decl */
             TagEntry = ParseEnumSpec (Ident, &Spec->Flags);
             /* Encode the enum entry into the type */
@@ -1658,9 +1694,7 @@ static void ParseTypeSpec (DeclSpec* Spec, typespec_t TSFlags)
                 ** in DeclareLocals. The type code used here doesn't matter as
                 ** long as it has no qualifiers.
                 */
-                Spec->Flags |= DS_DEF_TYPE;
-                Spec->Type[0].C = T_INT;
-                Spec->Type[1].C = T_END;
+                UseDefaultType (Spec, TS_DEFAULT_TYPE_INT);
                 break;
             }
             /* FALL THROUGH */
@@ -2376,7 +2410,9 @@ void CheckEmptyDecl (const DeclSpec* Spec)
 ** warning if not.
 */
 {
-    if ((Spec->Flags & DS_EXTRA_TYPE) == 0) {
+    if ((Spec->Flags & DS_TYPE_MASK) == DS_NONE) {
+        /* No declaration at all */
+    } else if ((Spec->Flags & DS_EXTRA_TYPE) == 0) {
         Warning ("Declaration does not declare anything");
     } else if (IsClassStruct (Spec->Type)           &&
                !IsIncompleteESUType (Spec->Type)    &&

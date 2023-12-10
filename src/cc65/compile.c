@@ -88,6 +88,7 @@ static void Parse (void)
     /* Fill up the next token with a bogus semicolon and start the tokenizer */
     NextTok.Tok = TOK_SEMI;
     NextToken ();
+    NextToken ();
 
     /* Parse until end of input */
     while (CurTok.Tok != TOK_CEOF) {
@@ -98,6 +99,7 @@ static void Parse (void)
 
         /* Check for empty statements */
         if (CurTok.Tok == TOK_SEMI) {
+            /* TODO: warn on this if we have a pedantic mode */
             NextToken ();
             continue;
         }
@@ -135,6 +137,16 @@ static void Parse (void)
             CheckEmptyDecl (&Spec);
             NextToken ();
             continue;
+        }
+
+        /* If we haven't got a type specifier yet, something must be wrong */
+        if ((Spec.Flags & DS_TYPE_MASK) == DS_NONE) {
+            /* Avoid extra errors if it was a failed type specifier */
+            if ((Spec.Flags & DS_EXTRA_TYPE) == 0) {
+                Error ("Declaration specifier expected");
+            }
+            NeedClean = -1;
+            goto EndOfDecl;
         }
 
         /* Read declarations for this type */
@@ -355,6 +367,7 @@ static void Parse (void)
             }
         }
 
+EndOfDecl:
         /* Try some smart error recovery */
         if (NeedClean < 0) {
             SmartErrorSkip (1);

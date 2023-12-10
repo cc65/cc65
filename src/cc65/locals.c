@@ -588,6 +588,16 @@ void DeclareLocals (void)
             continue;
         }
 
+        /* If we haven't got a type specifier yet, something must be wrong */
+        if ((Spec.Flags & DS_TYPE_MASK) == DS_NONE) {
+            /* Avoid extra errors if it was a failed type specifier */
+            if ((Spec.Flags & DS_EXTRA_TYPE) == 0) {
+                Error ("Declaration specifier expected");
+            }
+            NeedClean = -1;
+            goto EndOfDecl;
+        }
+
         /* Parse a comma separated variable list */
         while (1) {
 
@@ -616,6 +626,7 @@ void DeclareLocals (void)
             }
         }
 
+EndOfDecl:
         /* Try some smart error recovery */
         if (NeedClean < 0) {
             SmartErrorSkip (1);

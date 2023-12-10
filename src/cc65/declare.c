@@ -2080,6 +2080,9 @@ static void DirectDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
         DirectDecl (Spec, D, Mode);
         ConsumeRParen ();
     } else if (CurTok.Tok == TOK_IDENT) {
+        if (Mode == DM_NO_IDENT) {
+            Error ("Unexpected identifier in type name");
+        }
         strcpy (D->Ident, CurTok.Ident);
         NextToken ();
     } else {

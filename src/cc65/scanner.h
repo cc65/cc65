@@ -339,6 +339,11 @@ int SmartErrorSkip (int TillEnd);
 **   If this exits at a non-EOF without consuming it.
 */
 
+int SimpleErrorSkip (void);
+/* Skip tokens until an EOF or unpaired right parenthesis/bracket/curly brace
+** is reached. Return 0 If this exits at an EOF. Otherwise return -1.
+*/
+
 int Consume (token_t Token, const char* ErrorMsg);
 /* Eat token if it is the next in the input stream, otherwise print an error
 ** message. Returns true if the token was found and false otherwise.

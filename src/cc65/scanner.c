@@ -1392,6 +1392,55 @@ ExitPoint:
 
 
 
+int SimpleErrorSkip (void)
+/* Skip tokens until an EOF or unpaired right parenthesis/bracket/curly brace
+** is reached. Return 0 If this exits at an EOF. Otherwise return -1.
+*/
+{
+    Collection C = AUTO_COLLECTION_INITIALIZER;
+    int Res = 0;
+
+    /* Some fix point tokens that are used for error recovery */
+    static const token_t TokenList[] = {
+        TOK_LPAREN, TOK_RPAREN, TOK_LBRACK, TOK_RBRACK, TOK_LCURLY, TOK_RCURLY };
+
+    while (CurTok.Tok != TOK_CEOF) {
+        SkipTokens (TokenList, sizeof (TokenList) / sizeof (TokenList[0]));
+
+        switch (CurTok.Tok) {
+            case TOK_LPAREN:
+            case TOK_LBRACK:
+            case TOK_LCURLY:
+                OpenBrace (&C, CurTok.Tok);
+                break;
+
+            case TOK_RPAREN:
+            case TOK_RBRACK:
+            case TOK_RCURLY:
+                if (CloseBrace (&C, CurTok.Tok) < 0) {
+                    /* Found a terminator */
+                    Res = -1;
+                    goto ExitPoint;
+                }
+                break;
+
+            case TOK_CEOF:
+                /* We cannot go any farther */
+                Res = 0;
+                goto ExitPoint;
+
+            default:
+                Internal ("Unexpected token: %02X", (unsigned)CurTok.Tok);
+        }
+    }
+
+ExitPoint:
+    DoneCollection (&C);
+    return Res;
+}
+
+
+
 int Consume (token_t Token, const char* ErrorMsg)
 /* Eat token if it is the next in the input stream, otherwise print an error
 ** message. Returns true if the token was found and false otherwise.

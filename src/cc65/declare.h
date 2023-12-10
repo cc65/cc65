@@ -135,7 +135,7 @@ typedef enum {
 
 
 Type* ParseType (Type* Type);
-/* Parse a complete type specification */
+/* Parse a complete type specification in parentheses */
 
 int ParseDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode);
 /* Parse a variable, type or function declarator. Return -1 if this stops at

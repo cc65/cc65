@@ -2166,20 +2166,41 @@ static void DirectDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
 
 
 Type* ParseType (Type* T)
-/* Parse a complete type specification */
+/* Parse a complete type specification in parentheses */
 {
     DeclSpec Spec;
     Declarator Decl;
+    int NeedClean = -1;
+
+    /* Skip the left paren */
+    NextToken ();
 
     /* Get a type without a default */
     InitDeclSpec (&Spec);
     ParseTypeSpec (&Spec, TS_DEFAULT_TYPE_NONE);
 
-    /* Parse additional declarators */
-    ParseDecl (&Spec, &Decl, DM_NO_IDENT);
+    /* Only parse further if there is a type specifier */
+    if ((Spec.Flags & DS_TYPE_MASK) != DS_NONE) {
+        /* Parse additional declarators */
+        NeedClean = ParseDecl (&Spec, &Decl, DM_NO_IDENT);
 
-    /* Copy the type to the target buffer */
-    TypeCopy (T, Decl.Type);
+        /* Copy the type to the target buffer */
+        TypeCopy (T, Decl.Type);
+    } else {
+        /* Fail-safe */
+        TypeCopy (T, type_int);
+    }
+
+    /* Try some smart error recovery */
+    if (NeedClean < 0) {
+        SimpleErrorSkip ();
+    }
+
+    /* Closing paren */
+    if (!ConsumeRParen ()) {
+        SimpleErrorSkip ();
+        NextToken ();
+    }
 
     /* Return a pointer to the target buffer */
     return T;

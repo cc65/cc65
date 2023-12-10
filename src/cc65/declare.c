@@ -350,11 +350,11 @@ static void UseDefaultType (DeclSpec* Spec, typespec_t TSFlags)
 /* Use the default type for the type specifier */
 {
     if ((TSFlags & TS_MASK_DEFAULT_TYPE) == TS_DEFAULT_TYPE_NONE) {
-        Spec->Flags |= DS_NO_TYPE;
+        Spec->Flags = (Spec->Flags & ~DS_TYPE_MASK) | DS_NONE;
         Spec->Type[0].C = T_INT;
         Spec->Type[1].C = T_END;
     } else {
-        Spec->Flags |= DS_DEF_TYPE;
+        Spec->Flags = (Spec->Flags & ~DS_TYPE_MASK) | DS_DEF_TYPE;
         Spec->Type[0].C = T_INT;
         Spec->Type[1].C = T_END;
     }
@@ -1413,8 +1413,8 @@ static void ParseTypeSpec (DeclSpec* Spec, typespec_t TSFlags)
     SymEntry*   TagEntry;
     TypeCode    Qualifiers = T_QUAL_NONE;
 
-    /* Assume we have an explicit type */
-    Spec->Flags &= ~DS_DEF_TYPE;
+    /* Assume we have an explicitly specified type */
+    Spec->Flags = (Spec->Flags & ~DS_TYPE_MASK) | DS_EXPLICIT_TYPE;
 
     /* Read storage specifiers and/or type qualifiers if we have any */
     OptionalSpecifiers (Spec, &Qualifiers, TSFlags);
@@ -1767,7 +1767,7 @@ static void ParseOldStyleParamList (FuncDesc* F)
         }
 
         /* Type must be specified */
-        if ((Spec.Flags & DS_NO_TYPE) != 0) {
+        if ((Spec.Flags & DS_TYPE_MASK) == DS_NONE) {
             Error ("Expected declaration specifiers");
             break;
         }
@@ -1860,7 +1860,7 @@ static void ParseAnsiParamList (FuncDesc* F)
         }
 
         /* Type must be specified */
-        if ((Spec.Flags & DS_NO_TYPE) != 0) {
+        if ((Spec.Flags & DS_TYPE_MASK) == DS_NONE) {
             Error ("Type specifier missing");
         }
 
@@ -2100,7 +2100,7 @@ static void DirectDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
             if (Mode == DM_IDENT_OR_EMPTY) {
                 Spec->Flags |= DS_NO_EMPTY_DECL;
                 if (D->Ident[0] == '\0') {
-                    if ((Spec->Flags & DS_DEF_TYPE) == 0) {
+                    if ((Spec->Flags & DS_TYPE_MASK) != DS_NONE) {
                         Error ("Identifier or ';' expected after declaration specifiers");
                     } else {
                         Error ("Identifier expected");
@@ -2200,7 +2200,8 @@ int ParseDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
     /* If there is no explicit type specifier, an optional identifier becomes
     ** required.
     */
-    if (Mode == DM_IDENT_OR_EMPTY && (Spec->Flags & DS_DEF_TYPE) != 0) {
+    if (Mode == DM_IDENT_OR_EMPTY &&
+        (Spec->Flags & DS_TYPE_MASK) == DS_DEF_TYPE) {
         Spec->Flags |= DS_NO_EMPTY_DECL;
     }
 
@@ -2237,7 +2238,7 @@ int ParseDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
     ParseAttribute (D);
 
     /* Check a few pre-C99 things */
-    if (D->Ident[0] != '\0' && (Spec->Flags & DS_DEF_TYPE) != 0) {
+    if (D->Ident[0] != '\0' && (Spec->Flags & DS_TYPE_MASK) == DS_DEF_TYPE) {
         /* Check and warn about an implicit int return in the function */
         if (IsTypeFunc (D->Type) && IsRankInt (GetFuncReturnType (D->Type))) {
             /* Function has an implicit int return. Output a warning if we don't
@@ -2286,8 +2287,8 @@ int ParseDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
     }
 
     if (PrevErrorCount != ErrorCount) {
-        if ((Spec->Flags & DS_DEF_TYPE) == 0        &&
-            (Spec->Flags & DS_NO_EMPTY_DECL) != 0   &&
+        if ((Spec->Flags & DS_TYPE_MASK) != DS_DEF_TYPE &&
+            (Spec->Flags & DS_NO_EMPTY_DECL) != 0       &&
             D->Ident[0] == '\0') {
             /* Use a fictitious name for the identifier if it is missing */
             const char* Level = "";

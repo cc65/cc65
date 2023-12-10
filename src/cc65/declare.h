@@ -65,15 +65,18 @@ enum typespec_t {
     TS_DEFAULT_TYPE_AUTO    = 0x02,     /* C23 type inference with auto */
 
     /* Whether to allow certain kinds of specifiers */
-    TS_STORAGE_CLASS_SPEC   = 0x04,    /* Allow storage storage class specifiers */
-    TS_FUNCTION_SPEC        = 0x08,    /* Allow function specifiers */
+    TS_STORAGE_CLASS_SPEC   = 0x04,     /* Allow storage class specifiers */
+    TS_FUNCTION_SPEC        = 0x08,     /* Allow function specifiers */
 };
 
 /* Masks for the Flags field in DeclSpec */
+#define DS_NONE                 0x0000U /* Nothing specified or used    */
 #define DS_DEF_STORAGE          0x0001U /* Default storage class used   */
-#define DS_NO_TYPE              0x0002U /* No type explicitly specified */
-#define DS_DEF_TYPE             0x0006U /* Default type used            */
-#define DS_EXTRA_TYPE           0x0008U /* Extra type declared          */
+#define DS_EXPLICIT_TYPE        0x0002U /* Type specified               */
+#define DS_DEF_TYPE             0x0004U /* Implicit type used           */
+#define DS_AUTO_TYPE            0x0006U /* C23 auto type used           */
+#define DS_TYPE_MASK            0x0006U /* Mask for type of spec decl   */
+#define DS_EXTRA_TYPE           0x0008U /* ESU type in declaration      */
 #define DS_NEW_TYPE_DECL        0x0010U /* New type declared            */
 #define DS_NEW_TYPE_DEF         0x0020U /* New type defined             */
 #define DS_NEW_TYPE             (DS_NEW_TYPE_DECL | DS_NEW_TYPE_DEF)

@@ -1414,7 +1414,7 @@ static void Primary (ExprDesc* E)
                 DeclSpec Spec;
                 ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_NONE, SC_AUTO);
 
-                if ((Spec.Flags & DS_DEF_TYPE) == 0) {
+                if ((Spec.Flags & DS_TYPE_MASK) != DS_NONE) {
                     /* Recognized but not supported */
                     Error ("Mixed declarations and code are not supported in cc65");
 

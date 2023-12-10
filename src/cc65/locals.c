@@ -575,7 +575,7 @@ void DeclareLocals (void)
         ** assumed that we have reached the end of declarations.
         */
         if ((Spec.Flags & DS_DEF_STORAGE) != 0          &&  /* No storage spec */
-            (Spec.Flags & DS_DEF_TYPE) == DS_DEF_TYPE   &&  /* No type given */
+            (Spec.Flags & DS_TYPE_MASK) == DS_DEF_TYPE  &&  /* No type given */
             GetQualifier (Spec.Type) == T_QUAL_NONE) {      /* No type qualifier */
             break;
         }

@@ -1235,6 +1235,163 @@ void SkipTokens (const token_t* TokenList, unsigned TokenCount)
 
 
 
+static void OpenBrace (Collection* C, token_t Tok)
+/* Consume an opening parenthesis/bracket/curly brace and remember that */
+{
+    switch (Tok) {
+        case TOK_LPAREN: Tok = TOK_RPAREN; break;
+        case TOK_LBRACK: Tok = TOK_RBRACK; break;
+        case TOK_LCURLY: Tok = TOK_RCURLY; break;
+        default:         Internal ("Unexpected opening token: %02X", (unsigned)Tok);
+    }
+    CollAppend (C, (void*)Tok);
+    NextToken ();
+}
+
+
+
+static void PopBrace (Collection* C)
+/* Close the latest open parenthesis/bracket/curly brace */
+{
+    if (CollCount (C) > 0) {
+        CollPop (C);
+    }
+}
+
+
+
+static int CloseBrace (Collection* C, token_t Tok)
+/* Consume a closing parenthesis/bracket/curly brace if it is matched with an
+** opening one to close and return 0, or bail out and return -1 if it is not
+** matched.
+*/
+{
+    if (CollCount (C) > 0) {
+        token_t LastTok = (token_t)CollLast (C);
+        if (LastTok == Tok) {
+            CollPop (C);
+            NextToken ();
+            return 0;
+        }
+    }
+
+    return -1;
+}
+
+
+
+int SmartErrorSkip (int TillEnd)
+/* Try some smart error recovery.
+**
+** - If TillEnd == 0:
+**   Skip tokens until a comma or closing curly brace that is not enclosed in
+**   an open parenthesis/bracket/curly brace, or until a semicolon, EOF or
+**   unpaired right parenthesis/bracket/curly brace is reached. The closing
+**   curly brace is consumed in the former case.
+**
+** - If TillEnd != 0:
+**   Skip tokens until a right curly brace or semicolon is reached and consumed
+**   while there are no open parentheses/brackets/curly braces, or until an EOF
+**   is reached anytime. Any open parenthesis/bracket/curly brace is considered
+**   to be closed by consuming a right parenthesis/bracket/curly brace even if
+**   they didn't match.
+**
+** - Return -1:
+**   If this exits at a semicolon or unpaired right parenthesis/bracket/curly
+**   brace while there are still open parentheses/brackets/curly braces.
+**
+** - Return 0:
+**   If this exits as soon as it reaches an EOF;
+**   Or if this exits right after consuming a semicolon or right curly brace
+**   while there are no open parentheses/brackets/curly braces.
+**
+** - Return 1:
+**   If this exits at a non-EOF without consuming it.
+*/
+{
+    Collection C = AUTO_COLLECTION_INITIALIZER;
+    int Res = 0;
+
+    /* Some fix point tokens that are used for error recovery */
+    static const token_t TokenList[] = { TOK_COMMA, TOK_SEMI,
+        TOK_LPAREN, TOK_RPAREN, TOK_LBRACK, TOK_RBRACK, TOK_LCURLY, TOK_RCURLY };
+
+    while (CurTok.Tok != TOK_CEOF) {
+        SkipTokens (TokenList, sizeof (TokenList) / sizeof (TokenList[0]));
+
+        switch (CurTok.Tok) {
+            case TOK_LPAREN:
+            case TOK_LBRACK:
+            case TOK_LCURLY:
+                OpenBrace (&C, CurTok.Tok);
+                break;
+
+            case TOK_RPAREN:
+            case TOK_RBRACK:
+                if (CloseBrace (&C, CurTok.Tok) < 0) {
+                    if (!TillEnd) {
+                        Res = -1;
+                        goto ExitPoint;
+                    }
+                    PopBrace (&C);
+                    NextToken ();
+                }
+                break;
+
+            case TOK_RCURLY:
+                if (CloseBrace (&C, CurTok.Tok) < 0) {
+                    if (!TillEnd) {
+                        Res = -1;
+                        goto ExitPoint;
+                    }
+                    PopBrace (&C);
+                    NextToken ();
+                }
+                if (CollCount (&C) == 0) {
+                    /* We consider this as a terminator as well */
+                    Res = 0;
+                    goto ExitPoint;
+                }
+                break;
+
+            case TOK_COMMA:
+                if (CollCount (&C) == 0 && !TillEnd) {
+                    Res = 1;
+                    goto ExitPoint;
+                }
+                NextToken ();
+                break;
+
+            case TOK_SEMI:
+                if (CollCount (&C) == 0) {
+                    if (TillEnd) {
+                        NextToken ();
+                        Res = 0;
+                    } else {
+                        Res = 1;
+                    }
+                    goto ExitPoint;
+                }
+                NextToken ();
+                break;
+
+            case TOK_CEOF:
+                /* We cannot consume this */
+                Res = 0;
+                goto ExitPoint;
+
+            default:
+                Internal ("Unexpected token: %02X", (unsigned)CurTok.Tok);
+        }
+    }
+
+ExitPoint:
+    DoneCollection (&C);
+    return Res;
+}
+
+
+
 int Consume (token_t Token, const char* ErrorMsg)
 /* Eat token if it is the next in the input stream, otherwise print an error
 ** message. Returns true if the token was found and false otherwise.

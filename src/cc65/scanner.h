@@ -310,6 +310,35 @@ void SkipTokens (const token_t* TokenList, unsigned TokenCount);
 ** This routine is used for error recovery.
 */
 
+int SmartErrorSkip (int TillEnd);
+/* Try some smart error recovery.
+**
+** - If TillEnd == 0:
+**   Skip tokens until a comma or closing curly brace that is not enclosed in
+**   an open parenthesis/bracket/curly brace, or until a semicolon, EOF or
+**   unpaired right parenthesis/bracket/curly brace is reached. The closing
+**   curly brace is consumed in the former case.
+**
+** - If TillEnd != 0:
+**   Skip tokens until a right curly brace or semicolon is reached and consumed
+**   while there are no open parentheses/brackets/curly braces, or until an EOF
+**   is reached anytime. Any open parenthesis/bracket/curly brace is considered
+**   to be closed by consuming a right parenthesis/bracket/curly brace even if
+**   they didn't match.
+**
+** - Return -1:
+**   If this exits at a semicolon or unpaired right parenthesis/bracket/curly
+**   brace while there are still open parentheses/brackets/curly braces.
+**
+** - Return 0:
+**   If this exits as soon as it reaches an EOF;
+**   Or if this exits right after consuming a semicolon or right curly brace
+**   while there are no open parentheses/brackets/curly braces.
+**
+** - Return 1:
+**   If this exits at a non-EOF without consuming it.
+*/
+
 int Consume (token_t Token, const char* ErrorMsg);
 /* Eat token if it is the next in the input stream, otherwise print an error
 ** message. Returns true if the token was found and false otherwise.

@@ -77,6 +77,11 @@ enum typespec_t {
 #define DS_NEW_TYPE_DECL        0x0010U /* New type declared            */
 #define DS_NEW_TYPE_DEF         0x0020U /* New type defined             */
 #define DS_NEW_TYPE             (DS_NEW_TYPE_DECL | DS_NEW_TYPE_DEF)
+#define DS_EXPLICIT_SIGNEDNESS  0x0040U /* Signedness specified         */
+#define DS_NO_EMPTY_DECL        0x0100U /* Disallow empty declaration   */
+#define DS_ALLOW_BITFIELD       0x0200U /* Allow anonymous bit-fields   */
+
+
 
 /* Result of ParseDeclSpec */
 typedef struct DeclSpec DeclSpec;
@@ -99,24 +104,22 @@ struct Declarator {
 };
 
 /* Modes for ParseDecl:
-**  - DM_NEED_IDENT means:
-**      we *must* have a type and a variable identifer.
+**  - DM_IDENT_OR_EMPTY means:
+**      we *may* have an identifier, or none. If it is the latter case,
+**      the type specifier must be used for an empty declaration,
+**      or it is an error.
 **  - DM_NO_IDENT means:
 **      we must have a type but no variable identifer
 **      (if there is one, it's not read).
-**  - DM_ACCEPT_IDENT means:
-**      we *may* have an identifier, or none. If it is the latter case,
-**      the type must be used as an empty declaration, or it is an error.
-**      Note: this is used for struct/union members.
-**  - DM_IGNORE_IDENT means:
+**      Note: this is used for type names.
+**  - DM_ACCEPT_PARAM_IDENT means:
 **      we *may* have an identifier. If there is an identifier,
 **      it is read, but it is no error, if there is none.
 **      Note: this is used for function parameter type lists.
 */
 typedef enum {
-    DM_NEED_IDENT,
+    DM_IDENT_OR_EMPTY,
     DM_NO_IDENT,
-    DM_ACCEPT_IDENT,
     DM_ACCEPT_PARAM_IDENT,
 } declmode_t;
 
@@ -128,29 +131,14 @@ typedef enum {
 
 
 
-int SmartErrorSkip (int WholeDecl);
-/* Try some smart error recovery.
-**
-** - If WholeDecl is 0:
-**   Skip tokens until a comma or closing curly brace that is not enclosed in
-**   an open parenthesis/bracket/curly brace, or until a semicolon, EOF or
-**   unpaired right parenthesis/bracket/curly brace is reached.
-**
-** - If WholeDecl is non-0:
-**   Skip tokens until a closing curly brace that is not enclosed in an open
-**   parenthesis/bracket/curly brace, or until a semicolon or EOF is reached.
-**
-** Return 0 if this exits as soon as it reaches an EOF. Return 0 as well if
-** this exits with no open parentheses/brackets/curly braces. Otherwise, return
-** -1.
-*/
-
 Type* ParseType (Type* Type);
 /* Parse a complete type specification */
 
-int ParseDecl (const DeclSpec* Spec, Declarator* D, declmode_t Mode);
+int ParseDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode);
 /* Parse a variable, type or function declarator. Return -1 if this stops at
-** an unpaired right parenthesis/bracket/curly brace.
+** an unpaired right parenthesis/bracket/curly brace. Return 0 if this stops
+** after consuming a semicolon or closing curly brace, or reaching an EOF.
+** Return 1 otherwise.
 */
 
 void ParseDeclSpec (DeclSpec* Spec, typespec_t TSFlags, unsigned DefStorage);

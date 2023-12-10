@@ -79,7 +79,6 @@
 static void Parse (void)
 /* Top level parser routine. */
 {
-    int comma;
     SymEntry* Sym;
     FuncDesc* FuncDef = 0;
 
@@ -94,8 +93,8 @@ static void Parse (void)
     while (CurTok.Tok != TOK_CEOF) {
 
         DeclSpec        Spec;
+        int             Comma;
         int             NeedClean = 0;
-        unsigned        PrevErrorCount = ErrorCount;
 
         /* Check for empty statements */
         if (CurTok.Tok == TOK_SEMI) {
@@ -119,7 +118,7 @@ static void Parse (void)
             continue;
         }
 
-        /* Read variable defs and functions */
+        /* Read the declaration specifier */
         ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_INT, SC_EXTERN | SC_STATIC);
 
         /* Don't accept illegal storage classes */
@@ -139,17 +138,19 @@ static void Parse (void)
         }
 
         /* Read declarations for this type */
-        Sym = 0;
-        comma = 0;
+        Comma = 0;
         while (1) {
 
             Declarator Decl;
 
+            Sym = 0;
+
             /* Read the next declaration */
-            NeedClean = ParseDecl (&Spec, &Decl, DM_NEED_IDENT);
-            if (Decl.Ident[0] == '\0') {
-                Sym = 0;
-                goto NextDecl;
+            NeedClean = ParseDecl (&Spec, &Decl, DM_IDENT_OR_EMPTY);
+
+            /* Bail out if there are errors */
+            if (NeedClean <= 0) {
+                break;
             }
 
             /* Check if we must reserve storage for the variable. We do this,
@@ -191,10 +192,6 @@ static void Parse (void)
                         FuncDef->Flags = (FuncDef->Flags & ~FD_EMPTY) | FD_VOID_PARAM;
                     }
                 } else {
-                    if (CurTok.Tok != TOK_COMMA && CurTok.Tok != TOK_SEMI) {
-                        Error ("Expected ',' or ';' after top level declarator");
-                    }
-
                     /* Just a declaration */
                     Decl.StorageClass |= SC_DECL;
                 }
@@ -317,50 +314,49 @@ static void Parse (void)
 
             }
 
-NextDecl:
             /* Check for end of declaration list */
-            if (CurTok.Tok == TOK_COMMA) {
-                NextToken ();
-                comma = 1;
-            } else {
+            if (CurTok.Tok != TOK_COMMA) {
                 break;
             }
+            Comma = 1;
+            Spec.Flags |= DS_NO_EMPTY_DECL;
+            NextToken ();
         }
 
         /* Finish the declaration */
-        if (Sym) {
-            /* Function definition? */
-            if (IsTypeFunc (Sym->Type) && CurTok.Tok == TOK_LCURLY) {
-                if (IsTypeFunc (Spec.Type) && TypeCmp (Sym->Type, Spec.Type).C >= TC_EQUAL) {
-                    /* ISO C: The type category in a function definition cannot be
-                    ** inherited from a typedef.
-                    */
-                    Error ("Function cannot be defined with a typedef");
-                } else if (comma) {
-                    /* ISO C: A function definition cannot shall its return type
-                    ** specifier with other declarators.
-                    */
-                    Error ("';' expected after top level declarator");
-                }
+        if (Sym && IsTypeFunc (Sym->Type) && CurTok.Tok == TOK_LCURLY) {
+            /* A function definition is not terminated with a semicolon */
+            if (IsTypeFunc (Spec.Type) && TypeCmp (Sym->Type, Spec.Type).C >= TC_EQUAL) {
+                /* ISO C: The type category in a function definition cannot be
+                ** inherited from a typedef.
+                */
+                Error ("Function cannot be defined with a typedef");
+            } else if (Comma) {
+                /* ISO C: A function definition cannot shall its return type
+                ** specifier with other declarators.
+                */
+                Error ("';' expected after top level declarator");
+            }
 
-                /* Parse the function body anyways */
-                NeedClean = 0;
-                NewFunc (Sym, FuncDef);
+            /* Parse the function body anyways */
+            NeedClean = 0;
+            NewFunc (Sym, FuncDef);
 
-                /* Make sure we aren't omitting any work */
-                CheckDeferredOpAllDone ();
+            /* Make sure we aren't omitting any work */
+            CheckDeferredOpAllDone ();
+        } else if (NeedClean > 0) {
+            /* Must be followed by a semicolon */
+            if (CurTok.Tok != TOK_SEMI) {
+                Error ("',' or ';' expected after top level declarator");
+                NeedClean = -1;
             } else {
-                /* Must be followed by a semicolon */
-                if (ConsumeSemi ()) {
-                    NeedClean = 0;
-                } else {
-                    NeedClean = -1;
-                }
+                NextToken ();
+                NeedClean = 0;
             }
         }
 
         /* Try some smart error recovery */
-        if (PrevErrorCount != ErrorCount && NeedClean < 0) {
+        if (NeedClean < 0) {
             SmartErrorSkip (1);
         }
     }

@@ -1422,7 +1422,7 @@ static void Primary (ExprDesc* E)
                         Declarator Decl;
 
                         /* Parse one declaration */
-                        ParseDecl (&Spec, &Decl, DM_ACCEPT_IDENT);
+                        ParseDecl (&Spec, &Decl, DM_IDENT_OR_EMPTY);
                         if (CurTok.Tok == TOK_ASSIGN) {
                             NextToken ();
                             ParseInit (Decl.Type);

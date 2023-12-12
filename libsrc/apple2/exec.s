@@ -121,35 +121,9 @@ setbuf: lda     #$00            ; Low byte
         dex
         dex
 
-        ; Set I/O buffer
-        sta     mliparam + MLI::OPEN::IO_BUFFER
-        stx     mliparam + MLI::OPEN::IO_BUFFER+1
-
-        ; PATHNAME already set
-        .assert MLI::OPEN::PATHNAME = MLI::INFO::PATHNAME, error
-
-        ; Lower file level to avoid program file
-        ; being closed by C library shutdown code
-        ldx     LEVEL
-        stx     level
-        beq     :+
-        dec     LEVEL
-
-        ; Open file
-:       lda     #OPEN_CALL
-        ldx     #OPEN_COUNT
-        jsr     callmli
-
-        ; Restore file level
-        ldx     level
-        stx     LEVEL
-        bcc     :+
-        jmp     oserr
-
-        ; Get and save fd
-:       lda     mliparam + MLI::OPEN::REF_NUM
-        sta     read_ref
-        sta     close_ref
+        ; Set OPEN MLI call I/O buffer parameter
+        sta     io_buffer
+        stx     io_buffer+1
 
         .ifdef  __APPLE2ENH__
         ; Calling the 80 column firmware needs the ROM switched
@@ -194,14 +168,25 @@ setbuf: lda     #$00            ; Low byte
         ; Initiate C library shutdown
         jmp     _exit
 
-        .bss
-
-level : .res    1
-
         .rodata
 
+source:
+        ; Open program file
+        ; PATHNAME parameter is already set (we reuse
+        ; the copy at $0280); IO_BUFFER has been setup
+        ; before shutting down the C library
+        jsr     $BF00
+        .byte   OPEN_CALL
+        .word   open_param
+        bcs     error
+
+        ; Copy REF_NUM to MLI READ and CLOSE parameters
+        lda     open_ref
+        sta     read_ref
+        sta     close_ref
+
         ; Read whole program file
-source: jsr     $BF00
+        jsr     $BF00
         .byte   READ_CALL
         .word   read_param
         bcs     error
@@ -254,6 +239,14 @@ jump:   jmp     (data_buffer)
 file_type       = * - source + target
         .byte   $00
 
+open_param      = * - source + target
+        .byte   $03             ; PARAM_COUNT
+        .addr   $0280           ; PATHNAME
+io_buffer       = * - source + target
+        .addr   $0000           ; IO_BUFFER
+open_ref        = * - source + target
+        .byte   $00             ; REF_NUM
+
 read_param      = * - source + target
         .byte   $04             ; PARAM_COUNT
 read_ref        = * - source + target
@@ -284,5 +277,9 @@ quit_param      = * - source + target
 size            = * - source
 
 target          = DOSWARM - size
+
+        ; Make sure that the loader isn't too big, and
+        ; fits in $300-$3D0
+        .assert target >= $300, error
 
 dosvec: jmp     quit

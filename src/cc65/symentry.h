@@ -159,6 +159,8 @@ struct SymEntry {
         struct {
             struct SegContext*  Seg;      /* SegContext for this function */
             struct LiteralPool* LitPool;  /* Literal pool for this function */
+            struct SymEntry*    WrappedCall;        /* Pointer to the WrappedCall */
+            unsigned int        WrappedCallData;    /* The WrappedCall's user data */
         } F;
 
         /* Label name for static symbols */

@@ -61,7 +61,6 @@
 #include "standard.h"
 #include "staticassert.h"
 #include "symtab.h"
-#include "wrappedcall.h"
 #include "typeconv.h"
 
 
@@ -1965,9 +1964,6 @@ static void ParseAnsiParamList (FuncDesc* F)
 static FuncDesc* ParseFuncDecl (void)
 /* Parse the argument list of a function with the enclosing parentheses */
 {
-    SymEntry* WrappedCall;
-    unsigned int WrappedCallData;
-
     /* Create a new function descriptor */
     FuncDesc* F = NewFuncDesc ();
 
@@ -2022,13 +2018,6 @@ static FuncDesc* ParseFuncDecl (void)
 
     /* Leave the lexical level remembering the symbol tables */
     RememberFunctionLevel (F);
-
-    /* Did we have a WrappedCall for this function? */
-    GetWrappedCall((void **) &WrappedCall, &WrappedCallData);
-    if (WrappedCall) {
-        F->WrappedCall = WrappedCall;
-        F->WrappedCallData = WrappedCallData;
-    }
 
     /* Return the function descriptor */
     return F;
@@ -2102,7 +2091,6 @@ static void DirectDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
 
             /* Function declarator */
             FuncDesc* F;
-            SymEntry* PrevEntry;
 
             /* Parse the function declarator */
             F = ParseFuncDecl ();
@@ -2111,16 +2099,6 @@ static void DirectDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
             if ((F->Flags & FD_VARIADIC) && (Qualifiers & T_QUAL_FASTCALL)) {
                 Error ("Variadic functions cannot be __fastcall__");
                 Qualifiers &= ~T_QUAL_FASTCALL;
-            }
-
-            /* Was there a previous entry? If so, copy WrappedCall info from it */
-            PrevEntry = FindGlobalSym (D->Ident);
-            if (PrevEntry && PrevEntry->Flags & SC_FUNC) {
-                FuncDesc* D = GetFuncDesc (PrevEntry->Type);
-                if (D->WrappedCall && !F->WrappedCall) {
-                    F->WrappedCall = D->WrappedCall;
-                    F->WrappedCallData = D->WrappedCallData;
-                }
             }
 
             /* Add the function type. Be sure to bounds check the type buffer */

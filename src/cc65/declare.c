@@ -2087,10 +2087,13 @@ static void DirectDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
         NextToken ();
     } else {
         D->Ident[0] = '\0';
-        if ((Spec->Flags & DS_NO_EMPTY_DECL) != 0   &&
-            CurTok.Tok != TOK_LBRACK                &&
+        if (CurTok.Tok != TOK_LBRACK &&
             ((Spec->Flags & DS_ALLOW_BITFIELD) == 0 || CurTok.Tok != TOK_COLON)) {
-            Error ("Identifier expected");
+            if ((Spec->Flags & DS_TYPE_MASK) == DS_DEF_TYPE) {
+                Error ("Declaration specifier or identifier expected");
+            } else if ((Spec->Flags & DS_NO_EMPTY_DECL) != 0) {
+                Error ("Identifier expected");
+            }
         }
     }
 

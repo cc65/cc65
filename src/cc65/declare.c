@@ -1740,10 +1740,12 @@ static const Type* ParamTypeCvt (Type* T)
 static void ParseOldStyleParamList (FuncDesc* F)
 /* Parse an old-style (K&R) parameter list */
 {
-    unsigned PrevErrorCount = ErrorCount;
+    if (CurTok.Tok == TOK_RPAREN) {
+        return;
+    }
 
     /* Parse params */
-    while (CurTok.Tok != TOK_RPAREN) {
+    while (1) {
 
         /* List of identifiers expected */
         if (CurTok.Tok == TOK_IDENT) {
@@ -1768,28 +1770,32 @@ static void ParseOldStyleParamList (FuncDesc* F)
         }
 
         /* Check for more parameters */
-        if (CurTok.Tok == TOK_COMMA) {
-            NextToken ();
-        } else {
+        if (CurTok.Tok != TOK_COMMA) {
             break;
         }
-    }
+        NextToken ();
 
-    /* Skip right paren. We must explicitly check for one here, since some of
-    ** the breaks above bail out without checking.
-    */
-    ConsumeRParen ();
+    }
+}
+
+
+
+static void ParseOldStyleParamDeclList (FuncDesc* F attribute ((unused)))
+/* Parse an old-style (K&R) function declarator declaration list */
+{
+    if (CurTok.Tok == TOK_SEMI) {
+        /* No parameter declaration list */
+        return;
+    }
 
     /* An optional list of type specifications follows */
     while (CurTok.Tok != TOK_LCURLY) {
 
         DeclSpec        Spec;
+        int             NeedClean;
 
         /* Read the declaration specifier */
         ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_NONE, SC_AUTO);
-
-        /* Paremeters must have identifiers as names */
-        Spec.Flags |= DS_NO_EMPTY_DECL;
 
         /* We accept only auto and register as storage class specifiers, but
         ** we ignore all this, since we use auto anyway.
@@ -1799,10 +1805,14 @@ static void ParseOldStyleParamList (FuncDesc* F)
             Error ("Illegal storage class");
         }
 
-        /* Type must be specified */
+        /* If we haven't got a type specifier yet, something must be wrong */
         if ((Spec.Flags & DS_TYPE_MASK) == DS_NONE) {
-            Error ("Expected declaration specifiers");
-            break;
+            /* Avoid extra errors if it was a failed type specifier */
+            if ((Spec.Flags & DS_EXTRA_TYPE) == 0) {
+                Error ("Declaration specifier expected");
+            }
+            NeedClean = -1;
+            goto EndOfDecl;
         }
 
         /* Parse a comma separated variable list */
@@ -1811,7 +1821,12 @@ static void ParseOldStyleParamList (FuncDesc* F)
             Declarator Decl;
 
             /* Read the parameter */
-            ParseDecl (&Spec, &Decl, DM_IDENT_OR_EMPTY);
+            NeedClean = ParseDecl (&Spec, &Decl, DM_IDENT_OR_EMPTY);
+
+            /* Bail out if there are errors */
+            if (NeedClean <= 0) {
+                break;
+            }
 
             /* Warn about new local type declaration */
             if ((Spec.Flags & DS_NEW_TYPE_DECL) != 0) {
@@ -1820,9 +1835,9 @@ static void ParseOldStyleParamList (FuncDesc* F)
             }
 
             if (Decl.Ident[0] != '\0') {
-
                 /* We have a name given. Search for the symbol */
                 SymEntry* Param = FindLocalSym (Decl.Ident);
+
                 if (Param) {
                     /* Check if we already changed the type for this
                     ** parameter.
@@ -1837,25 +1852,40 @@ static void ParseOldStyleParamList (FuncDesc* F)
                         Error ("Redefinition for parameter '%s'", Param->Name);
                     }
                 } else {
-                    Error ("Unknown identifier: '%s'", Decl.Ident);
+                    Error ("Unknown parameter '%s'", Decl.Ident);
+                }
+
+                /* Initialization is not allowed */
+                if (CurTok.Tok == TOK_ASSIGN) {
+                    Error ("Parameter '%s' cannot be initialized", Decl.Ident);
+
+                    /* Try some smart error recovery */
+                    SmartErrorSkip (0);
                 }
             }
 
-            if (CurTok.Tok == TOK_COMMA) {
-                NextToken ();
-            } else {
+            /* Check for more declarators */
+            if (CurTok.Tok != TOK_COMMA) {
                 break;
             }
+            NextToken ();
 
         }
 
-        /* Variable list must be semicolon terminated */
-        ConsumeSemi ();
-    }
+EndOfDecl:
+        if (NeedClean > 0) {
+            /* Must be followed by a semicolon */
+            if (ConsumeSemi ()) {
+                NeedClean = 0;
+            } else {
+                NeedClean = -1;
+            }
+        }
 
-    if (PrevErrorCount != ErrorCount && CurTok.Tok != TOK_LCURLY) {
         /* Try some smart error recovery */
-        SmartErrorSkip (0);
+        if (NeedClean < 0) {
+            SmartErrorSkip (1);
+        }
     }
 }
 
@@ -1864,8 +1894,12 @@ static void ParseOldStyleParamList (FuncDesc* F)
 static void ParseAnsiParamList (FuncDesc* F)
 /* Parse a new-style (ANSI) parameter list */
 {
+    if (CurTok.Tok == TOK_RPAREN) {
+        return;
+    }
+
     /* Parse params */
-    while (CurTok.Tok != TOK_RPAREN) {
+    while (1) {
 
         DeclSpec    Spec;
         Declarator  Decl;
@@ -1894,7 +1928,7 @@ static void ParseAnsiParamList (FuncDesc* F)
 
         /* Type must be specified */
         if ((Spec.Flags & DS_TYPE_MASK) == DS_NONE) {
-            Error ("Type specifier missing");
+            Error ("Declaration specifier or '...' expected");
         }
 
         /* Warn about new local type declaration */
@@ -1945,18 +1979,12 @@ static void ParseAnsiParamList (FuncDesc* F)
             }
         }
 
-        /* Check for more parameters */
-        if (CurTok.Tok == TOK_COMMA) {
-            NextToken ();
-        } else {
+        /* Check for end of parameter type list */
+        if (CurTok.Tok != TOK_COMMA) {
             break;
         }
+        NextToken ();
     }
-
-    /* Skip right paren. We must explicitly check for one here, since some of
-    ** the breaks above bail out without checking.
-    */
-    ConsumeRParen ();
 }
 
 
@@ -1998,9 +2026,12 @@ static FuncDesc* ParseFuncDecl (void)
     if ((F->Flags & FD_OLDSTYLE) == 0) {
         /* New-style function */
         ParseAnsiParamList (F);
+        ConsumeRParen ();
     } else {
         /* Old-style function */
         ParseOldStyleParamList (F);
+        ConsumeRParen ();
+        ParseOldStyleParamDeclList (F);
     }
     PopLexicalLevel ();
 

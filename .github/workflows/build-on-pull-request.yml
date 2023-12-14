@@ -68,15 +68,15 @@ jobs:
         uses: microsoft/setup-msbuild@v1.1
 
       - name: Build app (x86 debug)
-        run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Debug Platform=Win32
+        run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Debug -Platform=Win32
 
       - name: Build app (x86 release)
-        run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Release Platform=Win32
+        run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Release -Platform=Win32
 
       - name: Build app (x64 release)
-        run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Debug Platform=x64
+        run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Debug -Platform=x64
 
       - name: Build app (x64 release)
-        run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Release Platform=x64
+        run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Release -Platform=x64
 
 

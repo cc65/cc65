@@ -4089,7 +4089,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   Allocate space for a struct or union. This is equivalent to
   <tt><ref id=".RES" name=".RES"></tt> with the
   <tt><ref id=".SIZEOF" name=".SIZEOF"></tt> of a struct.
-  
+
   Example:
 
   <tscreen><verb>

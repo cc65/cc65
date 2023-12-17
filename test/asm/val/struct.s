@@ -1,4 +1,4 @@
-; test .struct feature
+; test .struct and .union features
 
 .code
 

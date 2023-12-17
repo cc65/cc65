@@ -4998,7 +4998,8 @@ the struct variable itself:
 Nested structures or unions are treated differently depending on whether they
 are anonymous. If named, a new structure definition is created within the
 enclosing scope, with its offsets beginning at 0. If anonymous, the members of
-the new structure are added to the enclosing scope instead. Example:
+the new structure are added to the enclosing scope instead, with offsets
+continuing through that scope. Example:
 
 <tscreen><verb>
       .struct Object
@@ -5023,11 +5024,11 @@ O:    .tag   Object
 
 In this example, the first nested structure is named "Point", and its member
 offsets begin at 0. On the other hand, the two anonymous structures simply
-continue to add members to the enclosing Object structure.
+continue to add members to the enclosing "Object" structure.
 
 Note that an anonymous structure does not need a member name, since all of its
 members become part of the enclosing structure. The "unnamed" member in the
-example is redundantly the same offset as its first member "un1.
+example is redundantly the same offset as its first member "un1".
 
 
 <sect1>Limitations<p>

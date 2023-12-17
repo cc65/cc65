@@ -4875,8 +4875,8 @@ beginning of the structure. In the case of a union, all members are placed at
 the same offset, typically 0.
 
 Each named member also has a storage size which can be accessed with the
-<ref id=".SIZEOF" name=".SIZEOF"></tt> operator. The struct or union itself also
-has a <tt/.SIZEOF/ indicating its total storage size.
+<tt><ref id=".SIZEOF" name=".SIZEOF"></tt> operator. The struct or union itself
+also has a <tt/.SIZEOF/ indicating its total storage size.
 
 <sect1>Declaration<p>
 

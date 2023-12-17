@@ -5003,23 +5003,29 @@ continuing through that scope. Example:
 
 <tscreen><verb>
       .struct Object
-              member .byte            ; Object::member = 0
-              named .struct Point     ; Object::named = 1
+              id .byte                ; Object::id = 0
+              target .struct Point    ; Object::target = 1
                       xcoord  .word   ; Object::Point::xcoord = 0
                       ycoord  .word   ; Object::Point::ycoord = 2
               .endstruct
-              unnamed .struct         ; Object::unnamed = 5
-                      un1  .word      ; Object::un1 = 5
-                      un2  .word      ; Object::un2 = 7
+               cost .struct           ; Object::cost = 5
+                      price  .word    ; Object::price = 5
+                      tax  .word      ; Object::tax = 7
               .endstruct
               .struct
-                      un3  .word      ; Object::un3 = 9
+                      radius  .word   ; Object::radius = 9
               .endstruct
       .endstruct
 
 O:    .tag   Object
-      lda    O + Object::named + Object::Point::ycoord
-      lda    O + Object::un2
+      lda    O + Object::target + Object::Point::ycoord  ; Named struct
+      lda    O + Object::tax                             ; Anonymous
+      lda    O + Object::radius                          ; Anonymous
+
+      ; Be careful not to use a named nested structure without also adding the
+      ; offset to the nested structure itself.
+      lda    O + Object::Point::ycoord                   ; Incorrect!
+      lda    O + Object::target + Object::Point::ycoord  ; Correct
 </verb></tscreen>
 
 In this example, the first nested structure is named "Point", and its member
@@ -5027,8 +5033,8 @@ offsets begin at 0. On the other hand, the two anonymous structures simply
 continue to add members to the enclosing "Object" structure.
 
 Note that an anonymous structure does not need a member name, since all of its
-members become part of the enclosing structure. The "unnamed" member in the
-example is redundantly the same offset as its first member "un1".
+members become part of the enclosing structure. The "cost" member in the
+example is redundantly the same offset as its first member "price".
 
 
 <sect1>Limitations<p>

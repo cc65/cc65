@@ -5016,6 +5016,7 @@ the new structure are added to the enclosing scope instead. Example:
               .endstruct
       .endstruct
 
+O:    .tag   Object
       lda    O + Object::named + Object::Point::ycoord
       lda    O + Object::un2
 </verb></tscreen>

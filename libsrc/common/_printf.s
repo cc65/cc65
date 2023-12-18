@@ -6,7 +6,7 @@
 
         .include        "zeropage.inc"
 
-        .export         __printf
+        ;.export         __printf
 
         .import         popax, pushax, pusheax, decsp6, push1, axlong, axulong
         .import         _ltoa, _ultoa

@@ -7,7 +7,7 @@
 
 
 /* Flag to #ifdef the tests out that crash the old implementation */
-#define NOCRASH         1
+//#define NOCRASH         1
 
 
 

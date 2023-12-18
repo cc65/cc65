@@ -1,0 +1,183 @@
+
+;    arg1 += arg2
+;    arg1 is u16
+;    arg2 is either u16 or immediate
+
+.macro  u16_add arg1, arg2
+    .local @out
+        clc        
+        lda     arg1   
+    .if (.match (.left (1, {arg2}), #))
+      .if >(.right (.tcount ({arg2})-1, {arg2}))=0
+        ; arg2 = single byte immediate
+        adc     arg2
+        sta     arg1   
+        bcc     @out
+        inc     arg1+1
+      .else
+        ; arg2 = word immediate
+        adc     #<(.right (.tcount ({arg2})-1, {arg2}))
+        sta     arg1
+        lda     arg1+1
+        adc     #>(.right (.tcount ({arg2})-1, {arg2}))
+        sta     arg1+1
+      .endif
+    .else
+        ; arg2 = word
+        adc     arg2
+        sta     arg1   
+        lda     arg1+1
+        adc     arg2+2
+        sta     arg1+1 
+    .endif
+    @out:
+.endmacro     
+
+;    arg1 -= arg2
+;    arg1 is u16
+;    arg2 is either u16 or immediate
+
+.macro u16_sub arg1, arg2
+    .local      @out
+        sec        
+        lda     arg1   
+    .if (.match (.left (1, {arg2}), #))
+      .if >(.right (.tcount ({arg2})-1, {arg2}))=0
+        sbc     arg2
+        sta     arg1 
+        bcs     @out
+        dec     arg1+1
+      .else
+        sbc     #<(.right (.tcount ({arg2})-1, {arg2}))
+        sta     arg1
+        lda     arg1+1
+        sbc     #>(.right (.tcount ({arg2})-1, {arg2}))
+        sta     arg1+1
+      .endif
+    .else
+        sbc     arg2
+        sta     arg1 
+        lda     arg1+1
+        sbc     arg2+1
+        sta     arg1+1 
+    .endif
+    @out: 
+.endmacro
+
+;   arg1 == arg2
+;    arg1 is u16
+;    arg2 is either u16 or  immediate
+
+.macro u16_eq arg1,arg2
+.local @out
+        lda     arg1
+    .if (.match (.left (1, {arg2}), #))
+      .if >(.right (.tcount ({arg2})-1, {arg2}))=0
+        cmp     arg2
+        bne     @out
+        lda     arg1+1
+      .else
+        cmp     #<(.right (.tcount ({arg2})-1, {arg2}))
+        bne     @out
+        lda     arg1+1
+        cmp     #>(.right (.tcount ({arg2})-1, {arg2}))
+      .endif
+    .else
+        cmp     arg2
+        bne     @out
+        lda     arg1+1
+        cmp     arg2+1
+    .endif
+    @out:
+.endmacro
+
+;  arg1 > arg2?
+;   set Z if false
+;   clear Z if true
+;
+
+.macro u16_gt arg1,arg2
+.local @less, @out
+    lda   arg1+1    ; high bytes
+    cmp   arg2+1
+    bcc   @less      ; hiVal1 < hiVal2 --> Val1 < Val2
+    bne   @out       ; hiVal1 ≠ hiVal2 --> Val1 > Val2
+    lda   arg1       ; low bytes
+    cmp   arg2
+    bcc   @less
+    bne   @out
+@less:
+    lda   #0  ; force z = 1 = false
+@out:
+.endmacro
+
+
+;   arg1++
+.macro u16_inc arg1
+.local @out
+        inc     arg1
+        bne     @out
+        inc     arg1+1
+@out:
+.endmacro
+
+;   arg1--
+.macro u16_dec arg1
+.local @half
+        lda     arg1
+        bne     @half
+        dec     arg1+1
+    @half:
+        dec     arg1
+.endmacro
+
+;   arg1 == 0?
+.macro u16_isz arg1
+        lda     arg1
+        ora     arg1+1
+.endmacro
+
+;   arg = 0
+.macro u16_clr arg1
+        lda     #0
+        sta     arg1
+        sta     arg1+1
+.endmacro
+
+.macro u16_asg arg1,arg2
+    .if (.match (.left (1, {arg2}), #))
+     .if >(.right (.tcount ({arg2})-1, {arg2}))=0
+         lda     #<(.right (.tcount ({arg2})-1, {arg2}))
+        sta     arg1
+        lda     #0
+        sta     arg1+1
+      .else
+        lda     #<(.right (.tcount ({arg2})-1, {arg2}))
+        sta     arg1
+        lda     #>(.right (.tcount ({arg2})-1, {arg2}))
+        sta     arg1+1
+      .endif
+    .else
+        lda     arg2
+        sta     arg1
+        lda     arg2+1
+        sta     arg1+1
+    .endif
+.endmacro
+.macro p16_asg arg1, arg2
+        lda     #<arg2
+        sta     arg1
+        lda     #>arg2
+        sta     arg1+1
+.endmacro
+
+.macro s16_gt arg1, arg2
+.local @out
+     lda arg1 ; NUM1-NUM2
+          cmp arg2; NUM2L
+          lda arg1+1; NUM1H
+          sbc arg2+1; NUM2H
+          bvc @out ; N eor V
+          eor #$80
+          @out:
+.endmacro

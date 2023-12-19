@@ -5,13 +5,13 @@
 
 .macro  u16_add arg1, arg2
     .local @out
-        clc        
-        lda     arg1   
+        clc
+        lda     arg1
     .if (.match (.left (1, {arg2}), #))
       .if >(.right (.tcount ({arg2})-1, {arg2}))=0
         ; arg2 = single byte immediate
         adc     arg2
-        sta     arg1   
+        sta     arg1
         bcc     @out
         inc     arg1+1
       .else
@@ -25,13 +25,13 @@
     .else
         ; arg2 = word
         adc     arg2
-        sta     arg1   
+        sta     arg1
         lda     arg1+1
         adc     arg2+2
-        sta     arg1+1 
+        sta     arg1+1
     .endif
     @out:
-.endmacro     
+.endmacro
 
 ;    arg1 -= arg2
 ;    arg1 is u16
@@ -39,12 +39,12 @@
 
 .macro u16_sub arg1, arg2
     .local      @out
-        sec        
-        lda     arg1   
+        sec
+        lda     arg1
     .if (.match (.left (1, {arg2}), #))
       .if >(.right (.tcount ({arg2})-1, {arg2}))=0
         sbc     arg2
-        sta     arg1 
+        sta     arg1
         bcs     @out
         dec     arg1+1
       .else
@@ -56,12 +56,12 @@
       .endif
     .else
         sbc     arg2
-        sta     arg1 
+        sta     arg1
         lda     arg1+1
         sbc     arg2+1
-        sta     arg1+1 
+        sta     arg1+1
     .endif
-    @out: 
+    @out:
 .endmacro
 
 ;   arg1 == arg2

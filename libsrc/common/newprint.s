@@ -56,52 +56,52 @@ DoField:
         ;       fchar = *format_ptr++;
 NextFlag:
         jsr     NextFChar
-       	; 	switch (fchar) {
-	; 	case '-':
+        ;       switch (fchar) {
+        ;       case '-':
         cmp    #'-'
         bne    @L2                
-	; 		left_align = 1;
+        ;               left_align = 1;
         lda    #$ff
         sta    LeftJust
         jmp    NextFlag
-	; 		break;
-	; 	case '+':
+        ;               break;
+        ;       case '+':
  @L2:   cmp    #'+'
         bne    @L3
-	; 		add_sign = 1;
+        ;               add_sign = 1;
         lda    #$ff
         sta    AddSign
         jmp    NextFlag
-	; 		break;
-	; 	case '0':
+        ;               break;
+        ;       case '0':
  @L3:   cmp    #'0'
-	; 		pad_zero = 1;
+        ;               pad_zero = 1;
         bne    @L4
         lda    #$ff
         sta    PadZero
         jmp    NextFlag
-	; 		break;
-        ; 	case ' ':
+        ;               break;
+        ;       case ' ':
 @L4:    cmp    #' '
-	; 		space_for_plus = 1;
+        ;               space_for_plus = 1;
         bne    @L5
         lda    #$ff
         sta    AddBlank
         jmp    NextFlag
-	; 		break;
-        ; 	case '#':altform = 1;
+        ;               break;
+        ;       case '#':altform = 1;
 @L5:    cmp    #'#'
         bne    @L6
         lda    #$ff
         sta    AltForm
         jmp    NextFlag
-	; 		break;
-	; 	default:
-	; 		--format_ptr;
+        ;               break;
+        ;       default:
+        ;               --format_ptr;
 @L6:    
         ;u16_dec Format
-	; 		goto width;
-	;}
+        ;               goto width;
+        ;}
 
 ;=======================
 ;       Width 
@@ -111,29 +111,29 @@ NextFlag:
         lda     FChar
         cmp     #'*'
         bne     InlineWidth
-	; 	width = va_arg(*args, int);
+        ;       width = va_arg(*args, int);
         jsr     GetIntArg
         sta     Width
         stx     Width+1
-	; 	if (width < 0) {
+        ;       if (width < 0) {
         bit     Width +1
         bpl     @L1   
-	;		left_align = 1;
+        ;               left_align = 1;
         lda     #1
         sta     LeftJust
-	; 		width = -width;
+        ;               width = -width;
         u16_asg Pad, #0 ;; borrow Pad for negation
         u16_sub Pad, Width
         u16_asg Width, Pad
-	; 	}
-	; 	++format_ptr;
+        ;       }
+        ;       ++format_ptr;
 @L1:    jsr     NextFChar
         jmp GetPrecision
-	; }
+        ; }
 InlineWidth:
-	;else {
-	;	width = strtol(format_ptr, (char**)&format_ptr, 10);
-	;}
+        ;else {
+        ;       width = strtol(format_ptr, (char**)&format_ptr, 10);
+        ;}
         
         jsr     ReadInt
         sta     Width
@@ -146,60 +146,60 @@ InlineWidth:
 ;====================
 GetPrecision:
         lda     FChar
-	;if (fchar == '.') {
+        ;if (fchar == '.') {
         cmp     #'.'
         bne     SizeSkip
-	; 	++format_ptr;
+        ;       ++format_ptr;
         jsr     NextFChar
-	; 	precision_set = 1;
+        ;       precision_set = 1;
         lda     #1
         sta     PrecisionSet
-	; 	if (*format_ptr == '*') {
+        ;       if (*format_ptr == '*') {
         lda     FChar
         cmp     #'*'
         bne     @L2
-	; 		precision = va_arg(*args, int);
+        ;               precision = va_arg(*args, int);
         jsr     GetIntArg
         sta     Precision
         stx     Precision+1
         bit     Precision+1
         bpl     @L3
-	; 		if (precision < 0) {
-	; 			precision_set = 0;
-        ; 		}
+        ;               if (precision < 0) {
+        ;                       precision_set = 0;
+        ;               }
         lda     #0
         sta     PrecisionSet
-	; 		++format_ptr;
+        ;               ++format_ptr;
         @L3:    jsr     NextFChar
         jmp     SizeSkip
-	; 	}
-	; 	else {
-       	; 		precision = strtol(format_ptr, (char**)&format_ptr, 10);
+        ;       }
+        ;       else {
+               ;                precision = strtol(format_ptr, (char**)&format_ptr, 10);
 @L2:    jsr     ReadInt
         sta     Precision
         stx     Precision+1
         lda     FChar
         jmp     SizeSkip
-	; 	}
-	; }  
+        ;       }
+        ; }  
 ;====================
 ;   size qualifiers 
 ;====================
 ReadSize:    
-	; while (1) {
-	; 	fchar = *format_ptr;
-	; 	++format_ptr;
+        ; while (1) {
+        ;       fchar = *format_ptr;
+        ;       ++format_ptr;
         jsr     NextFChar
-	; 	switch (fchar) {
-	; 		case 'h':
+        ;       switch (fchar) {
+        ;               case 'h':
 SizeSkip: ; entry when we already have next format char loaded
         cmp     #'h'
         bne     @Ll
-        ; 			if (hmod) {
-	; 				hhmod = 1;
-	; 			}
-	; 			hmod = 1;
-	; 			break;
+        ;                       if (hmod) {
+        ;                               hhmod = 1;
+        ;                       }
+        ;                       hmod = 1;
+        ;                       break;
         ldx     #$ff
         lda     HMod
         beq     @Lh
@@ -207,15 +207,15 @@ SizeSkip: ; entry when we already have next format char loaded
 @Lh: 
         stx     HMod
         jmp     ReadSize
-	; 		case 'l':
+        ;               case 'l':
 @Ll:    cmp     #'l'
         beq     @Ll2
-	; 		case 'L':
-       	; 			if (lmod) {
-	; 				llmod = 1;
-	; 			}
-	; 			lmod = 1;
-	; 			break;
+        ;               case 'L':
+               ;                        if (lmod) {
+        ;                               llmod = 1;
+        ;                       }
+        ;                       lmod = 1;
+        ;                       break;
         cmp     #'L'
         bne     @Lj
 @Ll2:
@@ -227,87 +227,87 @@ SizeSkip: ; entry when we already have next format char loaded
         stx     LMod
         stx     IsLong
         jmp     ReadSize
-	; 		case 'j':
+        ;               case 'j':
 @Lj:    cmp #'j'
         bne     @Lz
-	; 			jmod = 1;
-	; 			break;
+        ;                       jmod = 1;
+        ;                       break;
         ldx     #$ff
         stx     JMod
         stx     IsLong
         jmp     ReadSize
-	; 		case 'z':
+        ;               case 'z':
 @Lz:
         cmp     #'z'
         bne     @Lt
-	; 			zmod = 1;
-	; 			break;
+        ;                       zmod = 1;
+        ;                       break;
         ldx     #1
         stx     ZMod
         jmp     ReadSize
-	; 		case 't':
+        ;               case 't':
 @Lt:
         cmp     #'t'
         bne     @Ldef
         ldx     #1
-	; 			tmod = 1;
-	; 			break;
+        ;                       tmod = 1;
+        ;                       break;
         stx     TMod
         jmp     ReadSize
-	; 		default:
+        ;               default:
 @Ldef:  ;
-	; 			--format_ptr;
-	; 			goto type;
-	; 	}
-	; }
+        ;                       --format_ptr;
+        ;                       goto type;
+        ;       }
+        ; }
 
 ;================================
 ;       Types (d,i,u,o,x....)
 ;================================
 
         lda     FChar
-	; fchar = *format_ptr;
-	; switch (fchar) {
-	; 	case 'd':
+        ; fchar = *format_ptr;
+        ; switch (fchar) {
+        ;       case 'd':
         cmp     #'d'
         beq      @Ld
-	; 	case 'i': {
+        ;       case 'i': {
         cmp     #'i'
         bne     @Lu
 @Ld:
-	; 		do_number(args, 10);
+        ;               do_number(args, 10);
         lda     #10 
         sta     Base
         jsr     DoNumber
         jmp     DoFormat
-	; 		break;
-	; 	}
-	; 	case 'u': {
+        ;               break;
+        ;       }
+        ;       case 'u': {
 @Lu:    cmp     #'u'
         bne     @Lo
-	; 		do_unumber(args, 10);
+        ;               do_unumber(args, 10);
         lda     #10 
         sta     Base
         jsr     DoUNumber
         jmp     DoFormat
-	; 		break;
-	; 	}
-	; 	case 'o': {
+        ;               break;
+        ;       }
+        ;       case 'o': {
 @Lo:    cmp     #'o'
         bne     @Lx
-	; 		do_unumber(args, 8);
+        ;               do_unumber(args, 8);
         lda     #8
         sta     Base
         jsr     DoUNumber
-	; 		break;
+        ;               break;
         jmp     DoFormat
-	; 	}
-	; 	case 'x': {
+        ;       }
+        ;       case 'x': {
 @Lx:    cmp     #'x'
         bne     @LX
         lda     #16
         sta     Base
-	; 		if (do_unumber(args, 16) && altform) first_char = 'x';
+        ;               if (do_unumber(args, 16) && altform) first_char = 'x';
         jsr     DoUNumber
         ;  ultoa returns upper case hex, lower case it
         lda     Str
@@ -321,15 +321,15 @@ SizeSkip: ; entry when we already have next format char loaded
         sta     FirstChar
         sta     IsHex ; remember we are doing hex
         jmp     DoFormat
-	; 		break;
-	; 	}
-	; 	case 'X': {
+        ;               break;
+        ;       }
+        ;       case 'X': {
 @LX:    cmp     #'X'
         bne     @Lc
 @Ptr:   lda     #16
         sta     Base
-	; 		int i;
-	; 		if (do_unumber(args, 16) && altform) first_char = 'X';
+        ;               int i;
+        ;               if (do_unumber(args, 16) && altform) first_char = 'X';
         jsr     DoUNumber
         lda     NotZero
         jeq     DoFormat
@@ -338,86 +338,86 @@ SizeSkip: ; entry when we already have next format char loaded
         lda     #'X'
         sta     FirstChar
         sta     IsHex
-	; 		for (i = 0; conv_buff[i]; i++) {
-	; 			conv_buff[i] = toupper(conv_buff[i]);
-	; 		}
+        ;               for (i = 0; conv_buff[i]; i++) {
+        ;                       conv_buff[i] = toupper(conv_buff[i]);
+        ;               }
  
-	; 		break;
+        ;               break;
         jmp     DoFormat
-	; 	}
+        ;       }
 ;=====================================
 ;  floating point not (yet) suported
 ;=====================================
-	; 	case 'f':
-	; 		break;
-	; 	case 'F':
-	; 		break;
-	; 	case 'e':
-	; 		break;
-	; 	case 'E':
-	; 		break;
-	; 	case 'g':
-	; 		break;
-	; 	case 'G':
-	; 		break;
-	; 	case 'a':
-	; 		break;
-	; 	case 'A':
-	; 		break;
-	; 	case 'c':
+        ;       case 'f':
+        ;               break;
+        ;       case 'F':
+        ;               break;
+        ;       case 'e':
+        ;               break;
+        ;       case 'E':
+        ;               break;
+        ;       case 'g':
+        ;               break;
+        ;       case 'G':
+        ;               break;
+        ;       case 'a':
+        ;               break;
+        ;       case 'A':
+        ;               break;
+        ;       case 'c':
 @Lc:    cmp     #'c'
         bne     @Ls
-	; 		add_sign = 0;
+        ;               add_sign = 0;
         lda     #0
         sta     AddSign
-	; 		space_for_plus = 0;
+        ;               space_for_plus = 0;
         sta     AddBlank
-	; 		precision_set = 0;
+        ;               precision_set = 0;
         sta     PrecisionSet
-        ; 		conv_buff[0] = va_arg(*args, int);
-	; 		conv_buff[1] = 0;
+        ;               conv_buff[0] = va_arg(*args, int);
+        ;               conv_buff[1] = 0;
         jsr     GetIntArg               ; Get the argument (promoted to int)
         sta     Buf   
         lda     #0
         sta     Buf+1
-	; 		break;
+        ;               break;
         jmp     DoFormat
 
 
-	; 	case 's':
+        ;       case 's':
 @Ls:    cmp     #'s'
         bne     @Lp
-	; 		add_sign = 0;
+        ;               add_sign = 0;
         lda     #0
         sta     AddSign
-	; 		space_for_plus = 0;
+        ;               space_for_plus = 0;
         sta     AddBlank        
         jsr     GetIntArg
         sta     Str
         stx     Str+1
         jmp     DoFormat
-	; 		str = va_arg(*args, char*);
-	; 		break;
-	; 	case 'p': {
+        ;               str = va_arg(*args, char*);
+        ;               break;
+        ;       case 'p': {
 @Lp:    cmp     #'p'
         bne     @Ln
-	; 		void* ptr = va_arg(*args, char*);
+        ;               void* ptr = va_arg(*args, char*);
        
-	; 		add_sign = 0;
+        ;               add_sign = 0;
         ldx     #0
         stx     AddSign
-	; 		space_for_plus = 0;
-	stx     AddBlank
+        ;               space_for_plus = 0;
+        stx     AddBlank
                 lda     #16
         sta     Base
         jsr     DoUNumber
         jmp     DoFormat
-        	; 		precision_set = 1;
-	; 		precision = 16;
+                ;               precision_set = 1;
+        ;               precision = 16;
 
-	; 		break;
-	; 	}
-	; 	case 'n':
+        ;               break;
+        ;       }
+        ;       case 'n':
 @Ln:    cmp     #'n'
         bne     @Lpct
         lda     #0
@@ -453,21 +453,21 @@ SizeSkip: ; entry when we already have next format char loaded
         sta     (ptr2),y
 
 @Endn:  rts
-	; 		break;
-	; 	case '%':
+        ;               break;
+        ;       case '%':
         @Lpct:  cmp     #'%'
         bne     DoFormat
-	; 		conv_buff[0] = '%';
+        ;               conv_buff[0] = '%';
         sta     Buf
-	; 		conv_buff[1] = 0;
+        ;               conv_buff[1] = 0;
         lda     #0
         sta     Buf+1
         jmp     DoFormat
 
-	; 		break;
-	; 	default:
-	; 		break;
-	; }
+        ;               break;
+        ;       default:
+        ;               break;
+        ; }
 
 ;==============================================================
 ; when we get here Str points to the output string
@@ -481,28 +481,28 @@ DoFormat:
 ; ====================
 ; determine first char
 ;=====================
-	;if (first_char == '-') {
+        ;if (first_char == '-') {
         lda     FirstChar
         cmp     #'-'
         beq     StrLen
-	;	// taken care of already
-	;}
-	;else if (add_sign) {
+        ;       // taken care of already
+        ;}
+        ;else if (add_sign) {
         lda     AddSign
         beq     @L1
-	;	first_char = '+';
+        ;       first_char = '+';
         lda     #'+'
         sta     FirstChar
         jmp     StrLen
-	;}
-	;else if (space_for_plus) {
+        ;}
+        ;else if (space_for_plus) {
 @L1:    lda     AddBlank
         beq     StrLen
-        ;		first_char = ' ';
+        ;               first_char = ' ';
         lda     #' '
         sta     FirstChar
-	;}
-	; slen = (int)strlen(str);
+        ;}
+        ; slen = (int)strlen(str);
 
 
 StrLen:
@@ -513,7 +513,7 @@ StrLen:
         stx     SLen+1
 ; specifc case. if string length is zero and we are 
 ; printing a number output one \0 character
-	; if (slen == 0 && str == conv_buff) {
+        ; if (slen == 0 && str == conv_buff) {
         lda     Str
         cmp     #<Buf
         bne     td111
@@ -522,38 +522,38 @@ StrLen:
         bne     td111
         u16_isz SLen
         bne     td111
-	; 	slen = 1;
+        ;       slen = 1;
         lda     #1
         sta     SLen
 td111:
-	; }
+        ; }
 
-	;arglen = slen;
+        ;arglen = slen;
         u16_asg ArgLen, SLen
-	; if (!is_number) {
+        ; if (!is_number) {
         lda     IsNumber
         bne     @L1
-	; 	if (precision_set) {
+        ;       if (precision_set) {
         lda     PrecisionSet
         jeq     CalcPadding
-	; 		if (precision < slen) {
+        ;               if (precision < slen) {
         u16_gt  SLen, Precision
         jeq     CalcPadding
-	; 			slen = precision;
+        ;                       slen = precision;
         u16_asg SLen, Precision
-	; 			arglen = slen;
+        ;                       arglen = slen;
         u16_asg ArgLen, SLen
         jmp     CalcPadding
-	; 		}
-	; 	}
-	; }
-	; else {
+        ;               }
+        ;       }
+        ; }
+        ; else {
 @L1:   
        
-	; 	//If precision is specified as 0, and the value to be converted is 0, the result is no characters output, as shown in this example:
-	; 	//printf( "%.0d", 0 ); /* No characters output */
+        ;       //If precision is specified as 0, and the value to be converted is 0, the result is no characters output, as shown in this example:
+        ;       //printf( "%.0d", 0 ); /* No characters output */
 
-	; 	if (slen == 1 && str[0] == '0' && precision_set && precision == 0) {
+        ;       if (slen == 1 && str[0] == '0' && precision_set && precision == 0) {
         u16_eq  SLen, #1
         bne     @L2
         lda     Buf
@@ -567,11 +567,11 @@ td111:
         u16_asg ArgLen, #0
         jmp     CalcPadding
 
-	; 		slen = 0;
-	; 		arglen = 0;
-	; 	}
-	; 	else {
-	; 		arglen = MAX(slen, (int)precision);
+        ;               slen = 0;
+        ;               arglen = 0;
+        ;       }
+        ;       else {
+        ;               arglen = MAX(slen, (int)precision);
 @L2:
         u16_gt  SLen, Precision
         beq     @L3
@@ -579,21 +579,21 @@ td111:
         jmp     CalcPadding
 @L3:    u16_asg ArgLen, Precision
 
-	; 		zpad = precision - slen;
+        ;               zpad = precision - slen;
         u16_asg ZPad, Precision
         u16_sub ZPad, SLen
-	; 	}
-	; }
+        ;       }
+        ; }
 CalcPadding:
 
-	; pad = arglen < width ? width - arglen : 0;
+        ; pad = arglen < width ? width - arglen : 0;
         u16_gt  Width, ArgLen
         beq     @L1
         u16_asg Pad, Width
         u16_sub Pad, ArgLen
         jmp     @L2
 @L1:    u16_asg Pad, #0
-	; pad_char = pad_zero ? '0' : ' ';
+        ; pad_char = pad_zero ? '0' : ' ';
 @L2:    lda     #' '
         sta     PadChar
         lda     PadZero
@@ -601,18 +601,18 @@ CalcPadding:
         lda     #'0'
         sta     PadChar
 @L3:
-	; if (left_align && !altform) {
+        ; if (left_align && !altform) {
         lda     LeftJust
         beq     EmitFirstCharLeft
         lda     AltForm
         bne     EmitFirstCharLeft
-	; 	pad_char = ' ';
+        ;       pad_char = ' ';
         lda     #' '
         sta     PadChar
 
-	; }
+        ; }
 EmitFirstCharLeft:
-	; if (first_char) {
+        ; if (first_char) {
         lda     FirstChar
         beq     NoFirstChar
         ;       if (pad_char == '0') {
@@ -620,40 +620,40 @@ EmitFirstCharLeft:
         cpx     #'0'
         bne     Not0
         ;  
-	; 	        if (first_char == 'x' || first_char == 'X') {
+        ;               if (first_char == 'x' || first_char == 'X') {
         lda     IsHex
         beq     @L1
-	; 		        *outb_ptr = '0';
-	; 		        outb_ptr++;
+        ;                       *outb_ptr = '0';
+        ;                       outb_ptr++;
         lda    #'0'
         jsr     Output1
         ;                       pad--
         u16_dec Pad          ; one less pad char for the xor X
-	; 	}
+        ;       }
         ;else{
-	; 	*outb_ptr = first_char;
-	; 	outb_ptr++;
+        ;       *outb_ptr = first_char;
+        ;       outb_ptr++;
 @L1:    lda     FirstChar
         jsr     Output1
         lda     #0
         sta     FirstChar
         u16_dec Pad
         jmp     NoFirstChar
-	; }
+        ; }
 Not0:
         ; else if (first_char == 'x' || first_char == 'X') {
         lda     IsHex
         beq     @L1
-	; 		pad--;
-	; 		pad--;
+        ;               pad--;
+        ;               pad--;
         u16_dec Pad
-	; 	}
-	; 	else
-	; 		pad--;
+        ;       }
+        ;       else
+        ;               pad--;
 @L1:
         u16_dec Pad
 
-	; }
+        ; }
 NoFirstChar:
 
 ;==============================
@@ -662,7 +662,7 @@ NoFirstChar:
 ;==============================
         ;if (!left_align) {
         lda     LeftJust
-	; 	for ( i = 0; i < pad; i++) {
+        ;       for ( i = 0; i < pad; i++) {
         bne     @L1
         u16_asg I, Pad
         jsr     PadOut
@@ -671,24 +671,24 @@ NoFirstChar:
 ;=================
 ;  now 0 or 0x
 ;=================
-	; if (first_char) {
+        ; if (first_char) {
         lda     FirstChar
         beq     NoFC
-	; 	if (first_char == 'x' || first_char == 'X') {
+        ;       if (first_char == 'x' || first_char == 'X') {
         lda     IsHex
         beq     @L2
         lda     #'0'
         jsr     Output1
-	; 		*outb_ptr = '0';
-	; 		outb_ptr++;
+        ;               *outb_ptr = '0';
+        ;               outb_ptr++;
 
-	; 	}
-	; 	*outb_ptr = first_char;
-	; 	outb_ptr++;
+        ;       }
+        ;       *outb_ptr = first_char;
+        ;       outb_ptr++;
 @L2:    lda     FirstChar
         jsr     Output1
 NoFC:
-	; }
+        ; }
 
         ;========================
         ; now zero padding
@@ -701,20 +701,20 @@ NoFC:
         lda     #'0'
         sta     PadChar
         jsr     PadOut
-	; 	*outb_ptr = '0';
-	; 	outb_ptr++;
-	; }
+        ;       *outb_ptr = '0';
+        ;       outb_ptr++;
+        ; }
         pla             ; restore padchar
         sta     PadChar
 
 ; ==============================
 ;  now the actual field
 ; ==============================
-	; for (i = 0; i < slen; i++) {
-	; 	*outb_ptr = *str;
-	; 	outb_ptr++;
-	; 	str++;
-	; }
+        ; for (i = 0; i < slen; i++) {
+        ;       *outb_ptr = *str;
+        ;       outb_ptr++;
+        ;       str++;
+        ; }
         jsr     PushOutData
         lda     Str
         ldx     Str+1
@@ -727,16 +727,16 @@ NoFC:
 ;==============================
 ; now , finally, right padding
 ;==============================        
-	; if (left_align)
+        ; if (left_align)
         lda     LeftJust
         beq     AllDone
         u16_asg I, Pad
         jsr     PadOut
 AllDone:
-	; 	for (i = 0; i < pad; i++) {
-	; 		*outb_ptr = pad_char;
-	; 		outb_ptr++;
-	; 	}
+        ;       for (i = 0; i < pad; i++) {
+        ;               *outb_ptr = pad_char;
+        ;               outb_ptr++;
+        ;       }
        rts
 
 
@@ -746,10 +746,10 @@ AllDone:
 
 
 DoNumber:
-; 	is_number = 1;
+;       is_number = 1;
         lda     #$ff
         sta     IsNumber
-; 	if (pad_zero) pad_zero = !precision_set;
+;       if (pad_zero) pad_zero = !precision_set;
         lda     PadZero
         beq     @L1
         lda     PrecisionSet
@@ -757,10 +757,10 @@ DoNumber:
         lda     #0
         sta     PadZero
 @L1:
-; 	intmax_t v = va_arg(*args, intmax_t);
+;       intmax_t v = va_arg(*args, intmax_t);
         jsr     GetSignedArg
 
-; 	if (hhmod) {
+;       if (hhmod) {
         bit     HHMod   ; truncate if 1 byte arg
         beq     @L2
         ldx     #0      ; either set high bytes to 0
@@ -772,28 +772,28 @@ DoNumber:
         stx     sreg+1
              
         
-; 		char cv = (char)v;
-; 		itoa(cv, conv_buff, base);
-; 	}
-; 	else if (hmod) {
-; 		short cv = (short)v;
-; 		itoa(cv, conv_buff, base);
-; 	}
-; 	else if (llmod) {
-; 		//long long cv = (long long)v;
-; 		//i64toa(cv, conv_buff, base); // TODO
-; 	}
-; 	else if (lmod) {
-; 		long cv = (long)v;
-; 		ltoa(cv, conv_buff, base);
-; 	}
+;               char cv = (char)v;
+;               itoa(cv, conv_buff, base);
+;       }
+;       else if (hmod) {
+;               short cv = (short)v;
+;               itoa(cv, conv_buff, base);
+;       }
+;       else if (llmod) {
+;               //long long cv = (long long)v;
+;               //i64toa(cv, conv_buff, base); // TODO
+;       }
+;       else if (lmod) {
+;               long cv = (long)v;
+;               ltoa(cv, conv_buff, base);
+;       }
 
-; 	else {
-; 		itoa(v, conv_buff, base);
+;       else {
+;               itoa(v, conv_buff, base);
   @L2:
         jsr     ltoa
-; 	}
-; 	if (str[0] == '-') {
+;       }
+;       if (str[0] == '-') {
 ;--------------------------------------
 ; if we get a minus sign we need some
 ; juggling. Move it to FirstChar
@@ -809,9 +809,9 @@ DoNumber:
         u16_inc Str
         lda     #'-'
         sta    FirstChar
-; 		str++;
-; 		first_char = '-';
-; 	}
+;               str++;
+;               first_char = '-';
+;       }
 @L3:        
         rts
 ; }
@@ -821,16 +821,16 @@ DoNumber:
 ;--------------------------------------------------------
 
 DoUNumber:
-; 	uintmax_t v;
-; 	is_number = 1;
+;       uintmax_t v;
+;       is_number = 1;
         lda     #$ff
         sta     IsNumber
         lda     #0
-; 	add_sign = 0;
+;       add_sign = 0;
         sta     AddSign
-; 	space_for_plus = 0;
-	sta     AddBlank
-; 	if (pad_zero) pad_zero = !precision_set;
+;       space_for_plus = 0;
+        sta     AddBlank
+;       if (pad_zero) pad_zero = !precision_set;
         lda     PadZero
         beq     @L1
         lda     PrecisionSet
@@ -839,12 +839,12 @@ DoUNumber:
         sta     PadZero
 @L1:
 
-; 	v= va_arg(*args, uintmax_t);
+;       v= va_arg(*args, uintmax_t);
         jsr GetUnsignedArg
 ;============================
 ; big special case for octal
 ;============================
-; 	if (v > 0 && altform && base == 8) {
+;       if (v > 0 && altform && base == 8) {
         cmp     #0
         jne     @L2
         cpx     #0
@@ -872,38 +872,38 @@ DoUNumber:
         u16_dec Str     ; restore Str
         rts
 
-; 		str[0] = '0';
-; 		str++;
-; 	}
-; 	if (hhmod) {
+;               str[0] = '0';
+;               str++;
+;       }
+;       if (hhmod) {
 NotOctal:
         bit     HHMod
         beq     @L2
         ldx     #0    ; simple truncate (no sign)
         stx     sreg
         stx     sreg+1
-; 		unsigned char cv = (unsigned char)v;
-; 		ultoa(cv, str, base);
-; 	}
-; 	else if (hmod) {
-; 		unsigned short cv = (unsigned short)v;
-; 		ultoa(cv, str, base);
-; 	}
-; 	else if (llmod) {
-; 		//unsigned long long cv = (unsigned long long)v;
-; 		//ui64toa(cv, str, base); // TODO
-; 	}
-; 	else if (lmod) {
-; 		unsigned long cv = (unsigned long)v;
-; 		ultoa(cv, str, base);
-; 	}
-; 	else {
-; 		ultoa(v, str, base);
+;               unsigned char cv = (unsigned char)v;
+;               ultoa(cv, str, base);
+;       }
+;       else if (hmod) {
+;               unsigned short cv = (unsigned short)v;
+;               ultoa(cv, str, base);
+;       }
+;       else if (llmod) {
+;               //unsigned long long cv = (unsigned long long)v;
+;               //ui64toa(cv, str, base); // TODO
+;       }
+;       else if (lmod) {
+;               unsigned long cv = (unsigned long)v;
+;               ultoa(cv, str, base);
+;       }
+;       else {
+;               ultoa(v, str, base);
  @L2:
         jsr    ultoa
-; 	}
-; 	str = conv_buff;
-; 	return v > 0;
+;       }
+;       str = conv_buff;
+;       return v > 0;
         rts
 ; }
 ;==================================================================
@@ -1056,7 +1056,7 @@ PushOutData:
 ; Clean up and return
 ;--------------------
 CleanAndExit:
-	ldx     #5
+        ldx     #5
 Rest:   lda     RegSave,x
         sta     regbank,x
         dex

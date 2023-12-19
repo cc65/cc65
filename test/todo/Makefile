@@ -53,7 +53,7 @@ $(WORKDIR)/%.$1.$2.prg: %.c | $(WORKDIR)
 	$(CC65) -t sim$2 $$(CC65FLAGS) -$1 -o $$(@:.prg=.s) $$< $(NULLERR)
 	$(CA65) -t sim$2 -o $$(@:.prg=.o) $$(@:.prg=.s) $(NULLERR)
 	$(LD65) -t sim$2 -o $$@ $$(@:.prg=.o) sim$2.lib $(NULLERR)
-	$(NOT) $(SIM65) $(SIM65FLAGS) $$@ $(NULLOUT)
+	$(SIM65) $(SIM65FLAGS) $$@ $(NULLOUT) 
 
 endef # PRG_template
 

@@ -383,12 +383,13 @@ jmp ReadSize
         ;       case 'c':
 @Lc:    cmp     #'c'
         bne     @Ls
+        
         ;               add_sign = 0;
         ; lda     #0
         ; sta     AddSign
         ; ;               space_for_plus = 0;
         ; sta     AddBlank
-        jsr ClearSignBlank
+        jsr     ClearSignBlank
         ;               precision_set = 0;
         sta     PrecisionSet
         ;               conv_buff[0] = va_arg(*args, int);
@@ -536,6 +537,8 @@ StrLen:
 ; specifc case. if string length is zero and we are
 ; printing a number output one \0 character
         ; if (slen == 0 && str == conv_buff) {
+        ;lda IsNumber
+        ;beq td111
         lda     Str
         cmp     #<Buf
         bne     td111
@@ -650,16 +653,16 @@ EmitFirstCharLeft:
         lda    #'0'
         jsr     Output1
         ;                       pad--
-        u16_dec Pad          ; one less pad char for the xor X
+        jsr DecPad          ; one less pad char for the xor X
         ;       }
         ;else{
         ;       *outb_ptr = first_char;
         ;       outb_ptr++;
-@L1:    lda     FirstChar
-        jsr     Output1
+@L1:   ; lda     FirstChar
+        jsr     WriteFirstChar
         lda     #0
         sta     FirstChar
-        u16_dec Pad
+        jsr DecPad
         jmp     NoFirstChar
         ; }
 Not0:
@@ -668,12 +671,12 @@ Not0:
         beq     @L1
         ;               pad--;
         ;               pad--;
-        u16_dec Pad
+        jsr DecPad
         ;       }
         ;       else
         ;               pad--;
 @L1:
-        u16_dec Pad
+        jsr DecPad
 
         ; }
 NoFirstChar:
@@ -707,8 +710,8 @@ NoFirstChar:
         ;       }
         ;       *outb_ptr = first_char;
         ;       outb_ptr++;
-@L2:    lda     FirstChar
-        jsr     Output1
+@L2:    ;lda     FirstChar
+        jsr     WriteFirstChar
 NoFC:
         ; }
 
@@ -760,6 +763,15 @@ AllDone:
         ;               outb_ptr++;
         ;       }
        rts
+
+;====================================================================================================
+;====================================================================================================
+;===============
+;  u16_dec Pad 
+;===============
+DecPad:
+  u16_dec Pad 
+  rts
 ;==============================
 ; WriteFirstCHar
 ;==============================
@@ -801,21 +813,21 @@ DoHex:
         ;               if (do_unumber(args, 16) && altform) first_char = 'x';
         jsr     DoUNumber
         pla 
-        tay
-        lda     NotZero ; set in DoUNumber
-        jeq     MaybeLower
-        lda     AltForm
-        jeq     MaybeLower
-        sty     FirstChar
+       ; tay
+        bit     NotZero ; set in DoUNumber
+        bpl     MaybeLower
+        bit     AltForm
+        bpl     MaybeLower
+        sta     FirstChar
 MaybeLower:     
         ;  ultoa returns upper case hex, lower case it if x     
 
-        cpy     #'X'
+        cmp     #'X'
         jeq     DoFormat
         lda     Str
         ldx     Str+1
         jsr     _strlower
-@L1:    jmp     DoFormat
+    jmp     DoFormat
 
 ;==============================================================
 ;   Process one signed number
@@ -1005,7 +1017,7 @@ NextFChar:
 PadOut:
         u16_isz I
         beq     PadDone
-        bit     I
+        bit     I+1
         bmi     PadDone
 PadLoop:
         lda     PadChar
@@ -1296,11 +1308,11 @@ FormatVarSize   = * - FormatVars
 
 ; Argument buffer and pointer
 ; max len is -377 777 777 77\0 = 13
-Buf:            .res    20
-Str:            .word   0
+Buf:            .res    13
+Str:            .res   2
 ArgLen:         .res    2
 SLen:           .res    2
-I:              .word   0
+I:              .res   2
 
 .data
 CallOutFunc:    jmp     $0000

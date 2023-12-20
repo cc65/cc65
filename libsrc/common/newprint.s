@@ -440,39 +440,39 @@ jmp ReadSize
         ;       }
         ;       case 'n':
 @Ln:    cmp     #'n'
-jmp @Lpct
-        ; bne     @Lpct
-        ; lda     #0
-        ; tay
-        ; ; current outchar count is at OutData[0..1]
-        ; lda     (OutData),y
-        ; sta     Width ; borrow width to temp store count
-        ; iny
-        ; lda     (OutData),y
-        ; sta     Width+1
-        ; lda     #0
-        ; sta     IsLong ; clear IsLong, we are reading a pointer
-        ; jsr     GetUnsignedArg
-        ; sta     ptr2     ; pointer to variable
-        ; stx     ptr2+1   ; to receive the count
+bne @Lpct
+        bne     @Lpct
+        ;lda     #0
+        ;tay
+        ; current outchar count is at OutData[0..1]
+        ;lda     (OutData),y
+        ;sta     Width ; borrow width to temp store count
+        ;iny
+        ;lda     (OutData),y
+        ;sta     Width+1
+        ;lda     #0
+        ;sta     IsLong ; clear IsLong, we are reading a pointer
+        jsr     GetIntArg
+        sta     ptr2     ; pointer to variable
+        stx     ptr2+1   ; to receive the count
 
-        ; lda #0
-        ; tay
-        ; lda     Width   ; always store lsb first
-        ; sta     (ptr2),y
-        ; bit     HHMod
-        ; bmi     @Endn       ; thats all folks
-        ; iny
-        ; lda     Width+1   ; now either 2 or 4 bytes
-        ; sta     (ptr2),y  ; store byte 2
-        ; bit     LMod      ; 4 bytes?
-        ; bpl     @Endn
+       ; lda #0
+        ;tay ; GetIntArg promises y = 0
+        lda     (OutData),y   ; always store lsb first
+        sta     (ptr2),y
+        bit     HHMod
+        bmi     @Endn       ; thats all folks
+        iny
+        lda     (OutData),y   ; now either 2 or 4 bytes
+        sta     (ptr2),y  ; store byte 2
+        bit     LMod      ; 4 bytes?
+        bpl     @Endn
 
-        ; lda     #0         ; 4 bytes, store 0 into bytes 3 & 4
-        ; iny
-        ; sta     (ptr2),y
-        ; iny
-        ; sta     (ptr2),y
+        lda     #0         ; 4 bytes, store 0 into bytes 3 & 4
+        iny
+        sta     (ptr2),y
+        iny
+        sta     (ptr2),y
 
 @Endn:  rts
         ;               break;

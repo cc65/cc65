@@ -185,7 +185,7 @@ GetPrecision:
 ;====================
 ;   size qualifiers
 ;====================
-        
+
 ReadSize:
         ; while (1) {
         ;       fchar = *format_ptr;
@@ -326,7 +326,7 @@ SizeSkip: ; entry when we already have next format char loaded
         ;       case 'c':
 @Lc:    cmp     #'c'
         bne     @Ls
-        
+
         ;               add_sign = 0;
         ;               space_for_plus = 0;
         jsr     ClearSignBlank
@@ -621,7 +621,7 @@ NoFirstChar:
         ;}
         ;       *outb_ptr = first_char;
         ;       outb_ptr++;
-@L2:    
+@L2:
         jsr     WriteFirstChar
 NoFC:
         ; }
@@ -680,10 +680,10 @@ AllDone:
 ;                   many are common code factored out into subroutines
 ;====================================================================================================
 ;===============
-;  u16_dec Pad 
+;  u16_dec Pad
 ;===============
 DecPad:
-        u16_dec Pad 
+        u16_dec Pad
         rts
 ;==============================
 ; WriteFirstCHar
@@ -725,20 +725,20 @@ DoHex:
         pha
         ;               if (do_unumber(args, 16) && altform) first_char = 'x';
         jsr     DoUNumber
-        pla 
+        pla
         bit     NotZero ; set in DoUNumber
         bpl     MaybeLower
         bit     AltForm
         bpl     MaybeLower
         sta     FirstChar
-MaybeLower:     
-        ;  ultoa returns upper case hex, lower case it if x     
+MaybeLower:
+        ;  ultoa returns upper case hex, lower case it if x
 
         cmp     #'X'
         jeq     DoFormat
 
         ; hand coded strlower
-        ; makes this code larger but 
+        ; makes this code larger but
         ; avoids larger string library
         ; to be loaded
 
@@ -809,7 +809,7 @@ DoNumber:
         bne     @L3
         stx     FirstChar
         u16_inc Str
-        
+
 ;               str++;
 ;               first_char = '-';
 ;       }

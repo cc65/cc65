@@ -10,7 +10,7 @@
 
         .import         popax, pushax, pusheax, decsp6, push1, axlong, axulong
         .import         _ltoa, _ultoa
-        .import         _strlower, _strlen
+        .import         _strlen
         .import         decax1, tossubax, negeax
 
         .macpack        generic
@@ -27,9 +27,10 @@ OutData         = regbank+4             ; Function parameters
 ; ----------------------------------------------------------------------------
 ; Other zero page cells
 
-FSave           = ptr4
-FCount          = ptr3
+;FSave           = ptr4
+;FCount          = ptr3
 FChar           = tmp1
+;Str             = ptr4
 
 
 ;==============================================================
@@ -516,7 +517,7 @@ DoFormat:
         ;       first_char = '+';
         lda     #'+'
         sta     FirstChar
-        jmp     StrLen
+        bne     StrLen
         ;}
         ;else if (space_for_plus) {
 @L1:    lda     AddBlank
@@ -620,12 +621,12 @@ CalcPadding:
 @L1:    u16_asg Pad, #0
         ; pad_char = pad_zero ? '0' : ' ';
 @L2:    lda     #' '
-        sta     PadChar
-        lda     PadZero
-        beq     @L3
+        ;sta     PadChar
+        bit     PadZero
+        bpl     @L3
         lda     #'0'
-        sta     PadChar
-@L3:
+@L3:        sta     PadChar
+;@L3:
         ; if (left_align && !altform) {
         lda     LeftJust
         beq     EmitFirstCharLeft
@@ -824,10 +825,20 @@ MaybeLower:
 
         cmp     #'X'
         jeq     DoFormat
-        lda     Str
-        ldx     Str+1
-        jsr     _strlower
-    jmp     DoFormat
+
+        ; hand coded strlower
+        ; makes this code larger but 
+        ; does not cause larger string library
+        ; to be loaded
+
+        p16_asg ptr1, Buf
+        ldy     #0
+@Loop:  lda     (ptr1),Y
+        jeq     DoFormat
+        ora     #$20         ; for 0123456789ABCDEF simply force bit on
+        sta     (ptr1),Y
+        iny
+        bne     @Loop        ; can never be 0
 
 ;==============================================================
 ;   Process one signed number
@@ -1040,12 +1051,12 @@ Flush:
         ldx     FSave+1
         jsr     tossubax
         jsr     decax1
-        sta     FCount
-        stx     FCount+1
+        sta     Width
+        stx     Width+1
        ; u16_asg FCount, Format
        ; u16_sub FCount, FSave
         ;u16_dec FCount ; we dont want the last char read (% or \0)
-        u16_isz FCount
+        u16_isz Width
         beq     FlushDone
         jsr     PushOutData
 
@@ -1053,8 +1064,8 @@ Flush:
         ldx     FSave+1
         jsr     pushax
 
-        lda     FCount
-        ldx     FCount+1
+        lda     Width
+        ldx     Width+1
         jsr     pushax
         jsr     CallOutFunc
 FlushDone:
@@ -1313,6 +1324,7 @@ Str:            .res   2
 ArgLen:         .res    2
 SLen:           .res    2
 I:              .res   2
+FSave:          .res   2
 
 .data
 CallOutFunc:    jmp     $0000

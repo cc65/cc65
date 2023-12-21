@@ -590,8 +590,8 @@ void PrintSegmentMap (FILE* F)
     qsort (SegPool, CollCount (&SegmentList), sizeof (Segment*), CmpSegStart);
 
     /* Print a header */
-    fprintf (F, "Name                   Start     End    Size  Align\n"
-                "----------------------------------------------------\n");
+    fprintf (F, "Name                   Start     End    Size  Align    Free  Memory area\n"
+                "------------------------------------------------------------------------\n");
 
     /* Print the segments */
     for (I = 0; I < CollCount (&SegmentList); ++I) {
@@ -602,13 +602,41 @@ void PrintSegmentMap (FILE* F)
         /* Print empty segments only if explicitly requested */
         if (VerboseMap || S->Size > 0) {
             /* Print the segment data */
-            long End = S->PC + S->Size;
+            unsigned long End = S->PC + S->Size;
+
             if (S->Size > 0) {
                 /* Point to last element addressed */
                 --End;
             }
-            fprintf (F, "%-20s  %06lX  %06lX  %06lX  %05lX\n",
+            fprintf (F, "%-20s  %06lX  %06lX  %06lX  %05lX",
                      GetString (S->Name), S->PC, End, S->Size, S->Alignment);
+
+            /* If the segment is of type BSS (or is apple2's LC),
+             * check if it's the last one in this memory area to print
+             * a relevant free count.
+             */
+            if (S->MemArea
+                && (!strcmp(GetString(S->MemArea->Name), "BSS")
+                 || !strcmp(GetString(S->MemArea->Name), "LC"))
+                && S->Size > 0
+                && (I + 1 == CollCount (&SegmentList) || SegPool[I+1]->MemArea != S->MemArea)
+                && S->MemArea->Size > S->MemArea->FillLevel) {
+                fprintf(F, "  %06lX", S->MemArea->Size - S->MemArea->FillLevel);
+
+            /* If the next segment is in the same memory area, but starts after
+             * the end of this one, we have free space
+             */
+            } else if (I + 1 < CollCount (&SegmentList)
+                       && SegPool[I+1]->MemArea == S->MemArea
+                       && SegPool[I+1]->PC - 1 > End
+                       && S->Size > 0) {
+                fprintf(F, "  %06lX", SegPool[I+1]->PC - End - 1);
+
+            /* No free space there. */
+            } else {
+                fprintf(F, "  %06X", 0);
+            }
+            fprintf(F, "  %s\n", S->MemArea ? GetString(S->MemArea->Name):"");
         }
     }
 

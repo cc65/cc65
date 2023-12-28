@@ -108,7 +108,7 @@ static unsigned get_dir_entry(char* p_name)
     }
 
     /* Field header_pointer directly follows field last_mod */
-    cur_addr = *(unsigned*)(&dirent->d_mtime.hour + 1);
+    cur_addr = *(unsigned*)(&dirent->d_mtime.time.hour + 1);
 
     dhandle = dio_open(getcurrentdevice());
     if (!dhandle) {

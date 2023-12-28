@@ -93,6 +93,8 @@ function.
 <itemize>
 <item>_dos_type
 <item><ref id="get_ostype" name="get_ostype">
+<item><ref id="gmtime_dt" name="gmtime_dt">
+<item><ref id="mktime_dt" name="mktime_dt">
 <item>rebootafterexit
 </itemize>
 
@@ -844,6 +846,20 @@ communication, see also <tt>testcode/lib/ser-test.c</tt>.
 </itemize>
 
 (incomplete)
+
+
+<sect1><tt/stat.h/<label id="sys/stat.h"><p>
+
+<itemize>
+<item><ref id="stat" name="stat">
+</itemize>
+
+
+<sect1><tt/statvfs.h/<label id="sys/statvfs.h"><p>
+
+<itemize>
+<item><ref id="statvfs" name="statvfs">
+</itemize>
 
 
 <sect1><tt/vic20.h/<label id="vic20.h"><p>
@@ -2847,6 +2863,79 @@ setting the time may not work. See also the platform-specific information.
 <ref id="clock_getres" name="clock_getres">,
 <ref id="clock_gettime" name="clock_gettime">
 <tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>gmtime_dt<label id="gmtime_dt"><p>
+
+<quote>
+<descrip>
+<tag/Function/Converts a ProDOS date to a struct tm.
+<tag/Header/<tt/<ref id="apple2.h" name="apple2.h">/
+<tag/Declaration/<tt/struct tm* __fastcall__ gmtime_dt (const struct datetime* dt);/
+<tag/Description/The <tt/gmtime_dt/ function converts the given
+proDOS date/time to a struct tm. On error, NULL is returned and <tt/errno/ is set
+to an error code describing the reason for the failure.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>This function is only available on Apple II.
+<item>On Apple II, you can't stat() an opened file. stat() before opening.
+</itemize>
+<tag/Availability/cc65
+<tag/Example/
+<verb>
+
+#include <stdio.h>
+#include <time.h>
+#include <sys/stat.h>
+int main(void)
+{
+    struct stat st;
+    struct tm* tm;
+    if (stat ("/disk/file", &amp;st) == 0) {
+        tm = gmtime_dt (&amp;st.st_ctime);
+        if (tm)
+            printf ("File created on %s\n", asctime(tm));
+    }
+}
+</verb>
+</descrip>
+</quote>
+
+
+<sect1>mktime_dt<label id="mktime_dt"><p>
+
+<quote>
+<descrip>
+<tag/Function/Converts a ProDOS date to a time_t.
+<tag/Header/<tt/<ref id="apple2.h" name="apple2.h">/
+<tag/Declaration/<tt/time_t __fastcall__ mktime_dt (const struct datetime* dt);/
+<tag/Description/The <tt/mktime_dt/ function parses the given
+proDOS date/time and returns a time_t timestamp. On error, 0 is returned,
+and errno is set.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>This function is only available on Apple II.
+</itemize>
+<tag/Availability/cc65
+<tag/Example/
+<verb>
+
+#include <stdio.h>
+#include <time.h>
+#include <sys/stat.h>
+int main(void)
+{
+    struct stat st;
+    if (stat ("/disk/file", &amp;st) == 0) {
+        printf ("File created on %s\n",
+          localtime (mktime_dt (&amp;st.st_ctime)));
+    }
+}
+</verb>
 </descrip>
 </quote>
 
@@ -6229,6 +6318,9 @@ be used in presence of a prototype.
 <item>The returned pointer may point to a statically allocated instance of
 <tt/struct dirent/, so it may get overwritten by subsequent calls to
 <tt/readdir/.
+<item>On the Apple II platform, the d_ctime and d_mtime returned are in the
+ProDOS format. You can convert them to more portable time representations using
+the ProDOS datetime conversion functions.
 <item>On several platforms, namely the CBMs and the Atari, the disk drives get
 confused when opening/closing files between directory reads. So for example a
 program that reads the list of files on a disk, and after each call to
@@ -7071,6 +7163,85 @@ be used in presence of a prototype.
 <ref id="_randomize" name="_randomize">,
 <ref id="rand" name="rand">
 <tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>stat<label id="stat"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get file status.
+<tag/Header/<tt/<ref id="sys/stat.h" name="sys/stat.h">/
+<tag/Declaration/<tt/int __fastcall__ stat (const char* pathname, struct stat* statbuf);/
+<tag/Description/<tt/stat/ gets information for the file with the given name. On success,
+zero is returned. On error, -1 is returned and <tt/errno/ is set to an error
+code describing the reason for the failure.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>On the Apple II platform, the st_ctim, st_mtim and st_atim members are left
+to zero, for size and performance reasons. The ProDOS creation and modification dates
+are returned in the ProDOS format in st_ctime and st_mtime. The access date does
+not exist. You can convert them to POSIX-style time representations using
+the <url url="apple2.html#ss9.3" name="ProDOS datetime conversion functions">.
+</itemize>
+<tag/Availability/POSIX 1003.1
+<tag/See also/
+<ref id="statvfs" name="statvfs">
+<tag/Example/
+<verb>
+#include &lt;sys/stat.h&gt;
+
+#define FILENAME "helloworld"
+struct stat stbuf;
+if (stat (FILENAME, &amp;stbuf) == 0) {
+    printf ("%s size is %lu bytes (created on %s)\n", FILENAME, stbuf.st_size,
+#ifndef __APPLE2__
+    localtime (&amp;stbuf.st_ctim.tv_sec)
+#else
+    localtime (mktime_dt (&amp;stbuf.st_ctime))
+#endif
+    );
+} else {
+    printf ("There was a problem stat'ing %s: %d\n", FILENAME, errno);
+}
+</verb>
+</descrip>
+</quote>
+
+
+<sect1>statvfs<label id="statvfs"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get filesystem statistics.
+<tag/Header/<tt/<ref id="sys/statvfs.h" name="sys/statvfs.h">/
+<tag/Declaration/<tt/int __fastcall__ statvfs (const char* pathname, struct statvfs* buf);/
+<tag/Description/<tt/statvfs/ gets information for the filesytem on which the given file
+resides. On success,
+zero is returned. On error, -1 is returned and <tt/errno/ is set to an error
+code describing the reason for the failure.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>The function requires an absolute pathname.
+</itemize>
+<tag/Availability/POSIX 1003.1
+<tag/See also/
+<ref id="stat" name="stat">
+<tag/Example/
+<verb>
+#include &lt;sys/statvfs.h&gt;
+
+#define FILENAME "/disk/helloworld"
+struct statvfs stvbuf;
+if (statvfs (FILENAME, &amp;stvbuf) == 0) {
+    printf ("%s filesystem has %u blocks of %u size, %u of them free.\n", FILENAME, stvbuf.f_blocks, stvbuf.f_bsize, stvbuf.f_bfree);
+} else {
+    printf ("There was a problem statvfs'ing %s: %d\n", FILENAME, errno);
+}
+</verb>
 </descrip>
 </quote>
 

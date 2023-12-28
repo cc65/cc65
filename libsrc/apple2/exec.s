@@ -5,8 +5,8 @@
 ;
 
         .export         _exec
-        .import         pushname, popname
-        .import         popax, done, _exit
+        .import         mli_file_info_direct
+        .import         pushname, popname, popax, done, _exit
 
         .include        "zeropage.inc"
         .include        "errno.inc"
@@ -17,13 +17,12 @@
 typerr: lda     #$4A            ; "Incompatible file format"
 
         ; Cleanup name
-oserr:  jsr     popname         ; Preserves A
 
-        ; Set ___oserror
-        jmp     ___mappederrno
+mlierr: jsr     popname
+oserr:  jmp     ___mappederrno
 
 _exec:
-        ; Save cmdline
+        ; Store cmdline
         sta     ptr4
         stx     ptr4+1
 
@@ -31,6 +30,9 @@ _exec:
         jsr     popax
         jsr     pushname
         bne     oserr
+
+        jsr     mli_file_info_direct
+        bcs     mlierr
 
         ; ProDOS TechRefMan, chapter 5.1.5.1:
         ; "The complete or partial pathname of the system program
@@ -45,18 +47,6 @@ _exec:
         sta     $0280,y
         dey
         bpl     :-
-
-        ; Set pushed name
-        lda     sp
-        ldx     sp+1
-        sta     mliparam + MLI::INFO::PATHNAME
-        stx     mliparam + MLI::INFO::PATHNAME+1
-
-        ; Get file_type and aux_type
-        lda     #GET_INFO_CALL
-        ldx     #GET_INFO_COUNT
-        jsr     callmli
-        bcs     oserr
 
         ; If we get here the program file at least exists so we copy
         ; the loader stub right now and patch it later to set params

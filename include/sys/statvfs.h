@@ -1,15 +1,10 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                  stat.h                                   */
+/*                                  statvfs.h                                */
 /*                                                                           */
-/*                             stat(2) definition                            */
+/*                             statvfs(3) definition                         */
 /*                                                                           */
 /*                                                                           */
-/*                                                                           */
-/* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /* (C) 2023      Colin Leroy-Mira                                            */
 /* EMail:        colin@colino.net                                            */
@@ -36,11 +31,9 @@
 
 
 
-#ifndef _STAT_H
-#define _STAT_H
+#ifndef _STATVFS_H
+#define _STATVFS_H
 
-#include <time.h>
-#include <target.h>
 #include <sys/types.h>
 
 
@@ -51,31 +44,18 @@
 
 
 
-#define S_IREAD  0x01
-#define S_IWRITE 0x02
-
-#define S_IFMT   0x03
-
-struct stat {
-    dev_t           st_dev;
-    ino_t           st_ino;
-    mode_t          st_mode;
-    nlink_t         st_nlink;
-    uid_t           st_uid;
-    gid_t           st_gid;
-    off_t           st_size;
-    struct timespec st_atim;
-    struct timespec st_ctim;
-    struct timespec st_mtim;
-    #ifdef __APPLE2__
-    unsigned char   st_access;
-    unsigned char   st_type;
-    unsigned int    st_auxtype;
-    unsigned char   st_storagetype;
-    unsigned int    st_blocks;
-    struct datetime st_mtime;
-    struct datetime st_ctime;
-    #endif
+struct statvfs {
+    unsigned long     f_bsize;
+    unsigned long     f_frsize;
+    fsblkcnt_t        f_blocks;
+    fsblkcnt_t        f_bfree;
+    fsblkcnt_t        f_bavail;
+    fsfilcnt_t        f_files;
+    fsfilcnt_t        f_ffree;
+    fsfilcnt_t        f_favail;
+    unsigned long     f_fsid;
+    unsigned long     f_flag;
+    unsigned long     f_namemax;
 };
 
 
@@ -86,9 +66,9 @@ struct stat {
 
 
 
-int __fastcall__ stat (const char* pathname, struct stat* statbuf);
+int __fastcall__ statvfs (const char* pathname, struct statvfs* buf);
 
 
 
-/* End of stat.h */
+/* End of statvfs.h */
 #endif

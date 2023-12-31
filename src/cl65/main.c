@@ -1610,7 +1610,7 @@ int main (int argc, char* argv [])
             }
 
             /* Determine the file type by the extension */
-            switch (GetFileType (Arg)) {
+            switch (GetTypeOfFile (Arg)) {
 
                 case FILETYPE_C:
                     /* Compile the file */
